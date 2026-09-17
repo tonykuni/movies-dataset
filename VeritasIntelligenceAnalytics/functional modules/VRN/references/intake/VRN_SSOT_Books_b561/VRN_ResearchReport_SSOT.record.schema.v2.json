@@ -1,0 +1,380 @@
+{
+  "$id": "urn:via:vrn:research-report:ssot:v2:full",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "else": {
+        "properties": {
+          "report_date_guess": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_date_guess"
+        ]
+      },
+      "if": {
+        "properties": {
+          "report_date_resolution_state": {
+            "const": "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+          }
+        },
+        "required": [
+          "report_date_resolution_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "report_date_candidates": {
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "report_date_guess": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "report_date_guess",
+          "report_date_candidates"
+        ]
+      }
+    }
+  ],
+  "description": "Self-contained v2 record schema materialized from the locked v1 schema, v2 overlay and observed v2 candidate fields. Promotion remains disabled.",
+  "properties": {
+    "broker_alias_status": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_conflict": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_conflict_review": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_provenance": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "canonical_record_state": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "confidence": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "date_content_guesses": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "date_source": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_basis": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_precedence": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_state": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "filtered_target_price_proposals": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_broker_proposal": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_broker_review_ready": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_primary_ticker_proposals": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_primary_tickers_review_ready": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_report_type_proposal": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_report_type_review_ready": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_ticker_proposals": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "full_path": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "mentioned_tickers_review_only": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "page_count": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "previous_record_hash": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "primary_ticker_provenance": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "qc_flags": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "rating_content_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "record_hash": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "record_id": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "relative_path": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_date_candidates": {
+      "items": {},
+      "type": "array",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_evidence_state": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_guess": {
+      "format": "YYYY-MM-DD",
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-via-observed-null-count": 1,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_resolution_provenance": {
+      "type": "object",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_resolution_state": {
+      "enum": [
+        "RESOLVED_DIRECT",
+        "RESOLVED_EXISTING",
+        "RESOLVED_OPERATOR",
+        "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+      ],
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_type_content_conflict": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_content_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_provenance": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "review_flags": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "review_required": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "schema_version": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "source_document": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "source_sha256": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "subject_guess": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "target_price_content_guesses": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "text_evidence_ready_pages": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "ticker_content_guesses": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "ticker_guesses": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "unresolved_pages": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "validated_target_prices_review_ready": {
+      "type": "string",
+      "x-via-observed-null-count": 0,
+      "x-via-observed-present-count": 60,
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    }
+  },
+  "required": [
+    "report_date_candidates",
+    "report_date_evidence_state",
+    "report_date_resolution_provenance",
+    "report_date_resolution_state"
+  ],
+  "title": "VRN Research Report SSOT v2 Full Record",
+  "type": "object"
+}

@@ -8055,8 +8055,17 @@
    "code": "批561 操作員上傳「這些能協助改善」",
    "kind": "收容 14 件 VRN 規則/同義字冊到 functional modules/VRN/references/intake/VRN_SSOT_Books_b561/,原名原位元組零觸碰 + _INTAKE_MANIFEST_b561.json(逐件 md5/sha256/bytes)。**只收不掛線**。最重要的量測:`VRN_Rating_Dict` 38 詞與樞紐正本 38 詞**交集只有 19**,兩邊各多 19——不是重複是互補。冊補的是**未評等整族**(未評等/未評級/無評等/暫無評等/NR/N/A/No Rating/Not Rated)與**強力賣出/Strong Sell**(正本有強力買進卻沒有對稱的賣出端);正本補的是批538 在 64 份真研報打出來的本土尺度(優於大盤系列/增加持股/區間操作…)。**但冊裡有四個不能收**:「賣超」是籌碼用語(外資賣超≠SELL)、「Long」是部位方向不是評等、「推薦」「平衡」語意含糊。照單全收就是製造假評等——批540/554/558 已經量過三次同一件事。其餘 13 件量過:KeywordSSOT 611 條 · FinData_Synonym 195 metrics · Trilingual_Fill 195 fills · financial_metrics_mapping 57 項四欄對照 · AnnualExtract 約 80 item + 30 公式(含 MOPS 三條判定規則:認『合計』、應收/存貨取『淨額』、權益與 ROE/BVPS 以『歸屬於母公司業主之權益』為準)· TickerDate_Regex 七市場 18+21 條 · Broker_Dict 29 家(樞紐已有 45 家撞名 0,合之前必須先跑 conflicts)· Lexicon/Method/Digest_Params。⚠️ 上傳的 vrn_reports.duckdb **不是 64 份那個庫**:vrn_report_basic 只有 2 列、metrics/analyst 皆 0 列,與容器裡原本那個一樣空——所以批554/558 的真語料增減**還是量不了**。交付 docs/VIA_IntakeBooks_B561.md(逐冊量測 + 風險註記 + 建議收哪幾族)。**沒有把任何一個詞寫進正本冊**(LL90 同義的裁定權在操作員)",
    "batch": 561
+  },
+  {
+   "ts": "2026-09-17 15:50",
+   "op": "ADD",
+   "category": "VRN 研報欄位規則",
+   "component": "SUP_MDL749_VRNFieldRuleHub_v0104 · VRN_SSOT_Books_b561 追收 5 件",
+   "code": "批562 操作員裁示「SSOT 只增不減除非衝突」",
+   "kind": "評等詞彙從兩源變**三源**:收容件字典 24 + 本土尺度 14 + **操作員收容冊 36** = **66 詞**。「只增不減」=三源全收;「除非衝突」=撞名者排除,而撞名是**量出來的**:`Accumulate`/`Add` 冊判 BUY、正本判 ADD,同一別名對到兩個正典名 → 排除這 2 個,正本的 ADD 保留。關鍵分寸:**只增不減 ≠ 照單全收就開判**。冊裡的 `賣超`(籌碼用語,外資賣超≠SELL)、`Long`(部位方向)、`推薦`、`平衡`、`觀望`、`避免` 依裁示**留在 SSOT 詞表裡**,但要命中必須過樞紐第五道 `_intake_rating` 的閘:前 14 字內有線索詞(投資評等/評等/建議/Rating/維持/重申/給予…)或整行去尾標點後剛好等於該詞,再過專屬否決。實測正向 6 筆(未評等/強力賣出/Not Rated/積極買進/觀望獨立行/NR)、負向 7 筆(外資賣超 3,000 張 · long-term growth · 推薦閱讀 · 平衡型基金 · 市場觀望氣氛 · 避免重複計算 · 增持庫藏股)**全過,0 壞**。drift 同步改 v4 三源分母,並多兩處誠實修:① 分母與 rating_words() 同源(先前委樞列印 38/66 是我自己造的錯尺);② 「經樞紐」那一欄**只給真的走樞紐的**(正本與委樞),TW02 與首頁全能兩支沒有那條路,替它們印「經樞紐 40/66」就是假綠。追收 5 件(geminicode 兩件 · CNYES/FactSet/YFinance 共識融合引擎 · ResearchReport SSOT 兩個 schema),同夾同律,收容合計 19 件。樞紐 18/18 · ENG073 43/43 · ENG086 20/20 不動",
+   "batch": 562
   }
  ],
- "updated_at": "2026-09-17 15:35",
- "batch": 561
+ "updated_at": "2026-09-17 15:50",
+ "batch": 562
 }

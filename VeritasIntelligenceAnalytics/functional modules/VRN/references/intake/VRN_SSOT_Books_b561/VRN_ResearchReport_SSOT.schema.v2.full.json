@@ -1,0 +1,1228 @@
+{
+  "activation_allowed": false,
+  "append_only": true,
+  "base_schema": {
+    "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\SSOT\\VRN_ResearchReport_SSOT.schema.v1.json",
+    "schema_name": "VRN_RESEARCH_REPORT_SSOT_v1",
+    "sha256": "862e243352ed9c88be4183aa0b9d438e6fc4e2d8a3263c00fdd9d35e2ce068b9"
+  },
+  "canonical_fields": [
+    "record_id",
+    "source_document",
+    "full_path",
+    "relative_path",
+    "source_sha256",
+    "broker_guess",
+    "ticker_guesses",
+    "report_date_guess",
+    "date_source",
+    "report_type_guess",
+    "subject_guess",
+    "evidence_basis",
+    "confidence",
+    "review_required",
+    "broker_content_guess",
+    "ticker_content_guesses",
+    "date_content_guesses",
+    "report_type_content_guess",
+    "rating_content_guess",
+    "target_price_content_guesses",
+    "final_broker_proposal",
+    "final_ticker_proposals",
+    "final_report_type_proposal",
+    "page_count",
+    "text_evidence_ready_pages",
+    "unresolved_pages",
+    "evidence_state",
+    "final_primary_ticker_proposals",
+    "mentioned_tickers_review_only",
+    "filtered_target_price_proposals",
+    "broker_content_conflict",
+    "report_type_content_conflict",
+    "qc_flags",
+    "evidence_precedence",
+    "final_broker_review_ready",
+    "broker_provenance",
+    "broker_content_conflict_review",
+    "final_primary_tickers_review_ready",
+    "primary_ticker_provenance",
+    "final_report_type_review_ready",
+    "report_type_provenance",
+    "validated_target_prices_review_ready",
+    "review_flags"
+  ],
+  "conditional_rules_materialized": [
+    {
+      "else": {
+        "properties": {
+          "report_date_guess": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_date_guess"
+        ]
+      },
+      "if": {
+        "properties": {
+          "report_date_resolution_state": {
+            "const": "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+          }
+        },
+        "required": [
+          "report_date_resolution_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "report_date_candidates": {
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "report_date_guess": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "report_date_guess",
+          "report_date_candidates"
+        ]
+      }
+    }
+  ],
+  "excluded_run_local_fields": [
+    "canonical_ssot_mutated",
+    "operator_approval_required",
+    "ssot_state"
+  ],
+  "field_rules": {
+    "broker_alias_status": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_conflict": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_conflict_review": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_content_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "broker_provenance": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "canonical_record_state": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "confidence": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "date_content_guesses": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "date_source": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_basis": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_precedence": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "evidence_state": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "filtered_target_price_proposals": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_broker_proposal": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_broker_review_ready": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_primary_ticker_proposals": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_primary_tickers_review_ready": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_report_type_proposal": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_report_type_review_ready": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "final_ticker_proposals": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "full_path": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "mentioned_tickers_review_only": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "page_count": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "previous_record_hash": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "primary_ticker_provenance": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "qc_flags": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "rating_content_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "record_hash": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "record_id": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "relative_path": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_date_candidates": {
+      "maximum_items": 10,
+      "required": true,
+      "type": "array[string]",
+      "unique_items": true,
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_evidence_state": {
+      "required": true,
+      "type": "string",
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_guess": {
+      "format": "YYYY-MM-DD",
+      "nullable_when": "report_date_resolution_state == 'UNRESOLVED_EVIDENCE_INSUFFICIENT'",
+      "required_when": "report_date_resolution_state in ['RESOLVED_EXISTING','RESOLVED_DIRECT','RESOLVED_OPERATOR']",
+      "requirement_mode": "CONDITIONAL",
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_resolution_provenance": {
+      "required": true,
+      "type": "object",
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_date_resolution_state": {
+      "enum": [
+        "RESOLVED_DIRECT",
+        "RESOLVED_EXISTING",
+        "RESOLVED_OPERATOR",
+        "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+      ],
+      "required": true,
+      "type": "string",
+      "x-via-source": "OVERLAY_SCHEMA"
+    },
+    "report_type_content_conflict": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_content_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "report_type_provenance": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "review_flags": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "review_required": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "schema_version": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "source_document": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "source_sha256": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "subject_guess": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "target_price_content_guesses": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "text_evidence_ready_pages": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "ticker_content_guesses": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "ticker_guesses": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "unresolved_pages": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    },
+    "validated_target_prices_review_ready": {
+      "required": false,
+      "type": [
+        "string"
+      ],
+      "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+    }
+  },
+  "fields": [
+    {
+      "canonical_included": true,
+      "field": "record_id",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "source_document",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "full_path",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "relative_path",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "source_sha256",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "broker_guess",
+      "nonempty_count": 56,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "ticker_guesses",
+      "nonempty_count": 38,
+      "required": false,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "report_date_guess",
+      "nonempty_count": 57,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "date_source",
+      "nonempty_count": 57,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "report_type_guess",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "subject_guess",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "evidence_basis",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "confidence",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": false,
+      "field": "ssot_state",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": false,
+      "field": "canonical_ssot_mutated",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "canonical_included": true,
+      "field": "review_required",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "canonical_included": true,
+      "field": "broker_content_guess",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "ticker_content_guesses",
+      "nonempty_count": 56,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "date_content_guesses",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "report_type_content_guess",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "rating_content_guess",
+      "nonempty_count": 31,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "target_price_content_guesses",
+      "nonempty_count": 18,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_broker_proposal",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_ticker_proposals",
+      "nonempty_count": 56,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_report_type_proposal",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "page_count",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "text_evidence_ready_pages",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "unresolved_pages",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "evidence_state",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_primary_ticker_proposals",
+      "nonempty_count": 38,
+      "required": false,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "mentioned_tickers_review_only",
+      "nonempty_count": 50,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "filtered_target_price_proposals",
+      "nonempty_count": 18,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "broker_content_conflict",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "canonical_included": true,
+      "field": "report_type_content_conflict",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "canonical_included": true,
+      "field": "qc_flags",
+      "nonempty_count": 28,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "evidence_precedence",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_broker_review_ready",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "broker_provenance",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "broker_content_conflict_review",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_primary_tickers_review_ready",
+      "nonempty_count": 38,
+      "required": true,
+      "type": "integer"
+    },
+    {
+      "canonical_included": true,
+      "field": "primary_ticker_provenance",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "final_report_type_review_ready",
+      "nonempty_count": 60,
+      "required": true,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "report_type_provenance",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "validated_target_prices_review_ready",
+      "nonempty_count": 18,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": true,
+      "field": "review_flags",
+      "nonempty_count": 11,
+      "required": false,
+      "type": "string"
+    },
+    {
+      "canonical_included": false,
+      "field": "operator_approval_required",
+      "nonempty_count": 60,
+      "required": false,
+      "type": "boolean"
+    }
+  ],
+  "governance_decision": "NO_FABRICATION_PRESERVE_UNRESOLVED",
+  "hash_chain": true,
+  "json_schema_record_contract": {
+    "$id": "urn:via:vrn:research-report:ssot:v2:full",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": true,
+    "allOf": [
+      {
+        "else": {
+          "properties": {
+            "report_date_guess": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "report_date_guess"
+          ]
+        },
+        "if": {
+          "properties": {
+            "report_date_resolution_state": {
+              "const": "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+            }
+          },
+          "required": [
+            "report_date_resolution_state"
+          ]
+        },
+        "then": {
+          "properties": {
+            "report_date_candidates": {
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "report_date_guess": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "report_date_guess",
+            "report_date_candidates"
+          ]
+        }
+      }
+    ],
+    "description": "Self-contained v2 record schema materialized from the locked v1 schema, v2 overlay and observed v2 candidate fields. Promotion remains disabled.",
+    "properties": {
+      "broker_alias_status": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "broker_content_conflict": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "broker_content_conflict_review": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "broker_content_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "broker_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "broker_provenance": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "canonical_record_state": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "confidence": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "date_content_guesses": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "date_source": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "evidence_basis": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "evidence_precedence": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "evidence_state": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "filtered_target_price_proposals": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_broker_proposal": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_broker_review_ready": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_primary_ticker_proposals": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_primary_tickers_review_ready": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_report_type_proposal": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_report_type_review_ready": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "final_ticker_proposals": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "full_path": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "mentioned_tickers_review_only": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "page_count": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "previous_record_hash": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "primary_ticker_provenance": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "qc_flags": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "rating_content_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "record_hash": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "record_id": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "relative_path": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "report_date_candidates": {
+        "items": {},
+        "type": "array",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OVERLAY_SCHEMA"
+      },
+      "report_date_evidence_state": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OVERLAY_SCHEMA"
+      },
+      "report_date_guess": {
+        "format": "YYYY-MM-DD",
+        "type": [
+          "string",
+          "null"
+        ],
+        "x-via-observed-null-count": 1,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OVERLAY_SCHEMA"
+      },
+      "report_date_resolution_provenance": {
+        "type": "object",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OVERLAY_SCHEMA"
+      },
+      "report_date_resolution_state": {
+        "enum": [
+          "RESOLVED_DIRECT",
+          "RESOLVED_EXISTING",
+          "RESOLVED_OPERATOR",
+          "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+        ],
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OVERLAY_SCHEMA"
+      },
+      "report_type_content_conflict": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "report_type_content_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "report_type_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "report_type_provenance": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "review_flags": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "review_required": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "schema_version": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "source_document": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "source_sha256": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "subject_guess": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "target_price_content_guesses": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "text_evidence_ready_pages": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "ticker_content_guesses": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "ticker_guesses": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "unresolved_pages": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      },
+      "validated_target_prices_review_ready": {
+        "type": "string",
+        "x-via-observed-null-count": 0,
+        "x-via-observed-present-count": 60,
+        "x-via-source": "OBSERVED_V2_CANDIDATE_FIELD"
+      }
+    },
+    "required": [
+      "report_date_candidates",
+      "report_date_evidence_state",
+      "report_date_resolution_provenance",
+      "report_date_resolution_state"
+    ],
+    "title": "VRN Research Report SSOT v2 Full Record",
+    "type": "object"
+  },
+  "key_column": "record_id",
+  "legacy_compatibility": {
+    "resolved_only_view": "report_date_resolution_state != 'UNRESOLVED_EVIDENCE_INSUFFICIENT'",
+    "unresolved_review_queue": "report_date_resolution_state == 'UNRESOLVED_EVIDENCE_INSUFFICIENT'",
+    "v1_active_pointer_remains_unchanged": true,
+    "v1_reader_must_not_receive_v2_until_adapter_ready": true
+  },
+  "materialization": {
+    "activation_allowed": false,
+    "authority_time_policy": "RUN_TIMESTAMP_EXCLUDED_FROM_AUTHORITY_BYTES",
+    "conditional_rule_count": 1,
+    "field_count": 52,
+    "materialization_version": "v0152H11",
+    "observed_field_count": 52,
+    "observed_only_field_count": 47,
+    "promotion_executed": false,
+    "required_field_count": 4,
+    "runtime_external_schema_dependency": false,
+    "runtime_reader_modes": [
+      "resolved_only",
+      "include_unresolved",
+      "review_queue"
+    ],
+    "self_contained": true,
+    "source_authorities": {
+      "candidate_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_via_vrn_unresolved_date_governance_runs\\RUN_20260726_171441_VIA_VRN_UNRESOLVED_DATE_GOVERNANCE_8TRACK_v0152F\\tracks\\F5_V2_HASH_CHAIN_AND_UNIQUENESS\\VRN_ResearchReport_SSOT.v2.candidate.jsonl",
+      "candidate_sha256": "e54d515888130a6394a6070a80cffcd366497257fe45deac872d9742befd0c85",
+      "overlay_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_via_vrn_unresolved_date_governance_runs\\RUN_20260726_171441_VIA_VRN_UNRESOLVED_DATE_GOVERNANCE_8TRACK_v0152F\\tracks\\F3_V2_SCHEMA_OVERLAY_PROPOSAL\\VRN_ResearchReport_SSOT.schema.v2.proposed.json",
+      "overlay_sha256": "e67574e2b2b87a07a892c47fb59a701b5c542223f6b442b661f9e6104f9c186b",
+      "v1_schema_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\SSOT\\VRN_ResearchReport_SSOT.schema.v1.json",
+      "v1_schema_sha256": "862e243352ed9c88be4183aa0b9d438e6fc4e2d8a3263c00fdd9d35e2ce068b9"
+    },
+    "unresolved_state": "UNRESOLVED_EVIDENCE_INSUFFICIENT"
+  },
+  "materialization_digest_sha256": "32a2d1f202c0d7e33240f15e46cfe9b40ebcc43d57723f4f33756631633b0c47",
+  "nullability_proposal_source": {
+    "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_via_vrn_ssot_nullability_panorama_runs\\RUN_20260726_160941_VIA_VRN_SSOT_NULLABILITY_PANORAMA_6TRACK_v0152A\\tracks\\N4_SCHEMA_AMENDMENT_PROPOSAL\\VRN_ResearchReport_SSOT.schema.v1.1.nullability.proposed.json",
+    "sha256": "d20f2f92410c197102bfc5622a5c16d4dea4c0c2425f1e03a8e9148a0eb05484"
+  },
+  "promotion_state": "PREFLIGHT_ONLY",
+  "required_fields": [
+    "report_date_candidates",
+    "report_date_evidence_state",
+    "report_date_resolution_provenance",
+    "report_date_resolution_state"
+  ],
+  "schema_name": "VRN_RESEARCH_REPORT_SSOT_v2_FULL",
+  "schema_revision": "2.0",
+  "schema_version": "2.0",
+  "secondary_unique_column": "source_sha256",
+  "self_contained": true,
+  "storage_format": "JSONL"
+}
