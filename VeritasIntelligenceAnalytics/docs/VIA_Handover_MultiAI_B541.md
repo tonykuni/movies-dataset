@@ -1,4 +1,4 @@
-# VIA 交接報告 · 多 AI 協作版(批541 · 2026-09-17)
+# VIA 交接報告 · 多 AI 協作版(批541 立 · **批554 更新** · 2026-09-17)
 
 > 這一份是**給下一個接手的人或 AI 看的**,不是給機器讀的。
 > 目的只有一個:讓你在**不問任何人**的情況下,知道東西在哪、規矩是什麼、現在卡在哪。
@@ -24,19 +24,19 @@ C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
 | 門 | 檔 | 用途 |
 |---|---|---|
 | **總管** | `VIA_SYSTEM_MANAGER_v0140.py` | 正式任務 81 項 + 總控頁再生。`python VIA_SYSTEM_MANAGER_v0140.py --no-open` |
-| **短令冊** | `Register-VIA-Commands-v0211.ps1` | 所有 `via-*` 短令的來源。**尾版律**:永遠點最新那一支 |
+| **短令冊** | `Register-VIA-Commands-v0213.ps1`(**在母系統根,不在 `supportive modules/`**) | 所有 `via-*` 短令的來源。**尾版律**:永遠點最新那一支 |
 | **中央控管台** | `supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0111.py` | 唯一對接口(律 L20)。`registry-sync --apply` 是元件冊的**唯一寫者** |
-| **自測格** | `supportive modules/registry/CGC_MDL064_SelftestGrid_v0321.py` | **230 站**驗收閘。要判斷系統健不健康,跑這一支就夠 |
+| **自測格** | `supportive modules/registry/CGC_MDL064_SelftestGrid_v0332.py` | **231 站**驗收閘。要判斷系統健不健康,跑這一支就夠。<br>注意:不帶旗標或帶不認得的旗標=**跑全矩陣**(很久);單站除錯用 `--only "站名片段"` |
 
 ### 程式碼分佈(實測檔數,不含收容件與 `__pycache__`)
 
 ```
 functional modules/VDF    182 .py   資料鍛造(價格/籌碼/月營收/ETF)
-functional modules/VRN    299 .py   研報擷取(PDF→欄位→入庫→文摘)
+functional modules/VRN    308 .py   研報擷取(PDF→欄位→入庫→文摘)
 functional modules/VAP    246 .py   自動繪圖與產出
-supportive modules      1,635 .py   治理/登錄/工具(其中 registry 751 支)
+supportive modules      1,650 .py   治理/登錄/工具(其中 registry 765 支)
 ```
-中央治理家族(CGC_MDL***)**126 個**模組編號。
+中央治理家族(CGC_MDL***)**127 個**模組編號。(批555 實測;不含 `__pycache__` 與收容件)
 
 ---
 
@@ -48,10 +48,10 @@ supportive modules      1,635 .py   治理/登錄/工具(其中 registry 751 支
 
 | 庫 | 路徑 | 本境實測 |
 |---|---|---|
-| **台股總庫** | `functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb` | 147 MB · 22 表 · `features_daily` / `prices_canonical` / `tw_daily_prices` / `tw_prices_adj` 各 **577,733 列** · `tw_trading_daily` 57,649 |
+| **台股總庫** | `functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb` | **179 MB** · 22 表 · `features_daily` / `prices_canonical` / `tw_daily_prices` / `tw_prices_adj` 各 **577,733 列** · `tw_trading_daily` 57,649 |
 | **國際總庫** | `functional modules/VDF/output_hub/mega/vdf_global_market.duckdb` | 16 MB · 9 表 · `features_daily` / `gl_prices_adj` / `global_daily` 各 **47,973 列** |
 | **主動式 ETF** | `functional modules/VDF/output_hub/active_tw_etf/…/ActiveTWETF.duckdb` | 3.6 MB · `holdings_daily` 1,125 · `active_tw_etf_universe` 154 |
-| **研報庫** | `functional modules/VRN/db/vrn_reports.duckdb` | 576 KB · `vrn_report_basic` **2 列** ← **本境幾乎是空的** |
+| **研報庫** | `functional modules/VRN/db/vrn_reports.duckdb` | 1.8 MB · 5 表 · `vrn_report_basic` **2 列** ← **本境幾乎是空的**(工作站 64 份) |
 
 ### ⚠️ 本境 ≠ 工作站(教訓 LL49,最容易踩的一個坑)
 
@@ -72,7 +72,7 @@ VIA_Reports/vcgc/               中央控管台一頁交接
 ### 收容件(intake)—— 正本零觸碰
 外來的程式碼/字典/字型一律先落在 `references/intake/`,**原名原位元組,一個 byte 都不准改**,
 旁邊放 `_INTAKE_MANIFEST_*.json` 記 md5/sha256,由「橋」(Bridge 引擎)用 `importlib` 載進來,
-所有防呆都寫在橋這一側。目前 6 個收容夾、共 72 件。
+所有防呆都寫在橋這一側。目前 6 個收容夾、頂層共 72 項(展開後 1,622 個檔)。
 
 ---
 
@@ -82,9 +82,14 @@ VIA_Reports/vcgc/               中央控管台一頁交接
 |---|---|
 | 倉庫 | https://github.com/tonykuni/movies-dataset |
 | **開發分支** | `claude/via-envmanager-governance-7cls8h` |
-| **PR** | [tonykuni/movies-dataset#37](https://github.com/tonykuni/movies-dataset/pull/37) → base `main` |
-| 目前 HEAD | `81e4054c`(批541b) |
-| 上一批 | `f5def0d6`(批541)· `36be0197`(批540)· `594b51a4`(批539) |
+| **PR #37** | [tonykuni/movies-dataset#37](https://github.com/tonykuni/movies-dataset/pull/37) → **已由 tonykuni 併入 `main`**(2026-09-17 12:41Z,併的是 `7ed4d860`=批553;47 commits · 663 檔) |
+| 目前 HEAD | `edb3ad52`(批555) |
+| **分支超前 `main`** | 兩批:`51ec2603`(批554)· `edb3ad52`(批555)。三點差異 **11 檔**,就是這兩批的內容,**沒有夾帶** |
+| `main` 超前分支 | 只有兩個 merge commit(#36 · #37),**內容為零** → 下一個 PR 會乾淨,不需要 rebase |
+| 上一批 | `7ed4d860`(批553,已在 main)· `fce11b2e`(批552)· `103eeb82`(批551) |
+
+> **PR #37 已經是完成品,不能拿來裝新東西。** 批554/555 要開的是**新 PR**(我不自己開,等你一句話)。
+> 分支與 main 沒有衝突,所以**不需要 rebase、不需要 force push**——規矩沒破。
 
 **規矩(不可違)**:只推這一個分支 · **不 force push** · 不自己 merge、不自己 approve PR。
 
@@ -95,19 +100,24 @@ VIA_Reports/vcgc/               中央控管台一頁交接
 ### 目前已經發生的協作(git 實測,不是規劃)
 
 ```
-Claude Opus 5      126 commits    session_01RLMQGZLcigd5Bt5aN6J4Ck  (184 筆帶此 session 標)
-Claude Fable 5.1   116 commits    session_01R2d69oa1AGvnPVwjSUdSv5  ( 58 筆帶此 session 標)
-tonykuni (人)      145 commits    裁決者
+                   批541      批554      session
+Claude Opus 5      126   →    140        session_01RLMQGZLcigd5Bt5aN6J4Ck
+Claude Fable 5.1   116   →    130        session_01R2d69oa1AGvnPVwjSUdSv5
+tonykuni (人)      145   →    163        裁決者
+                                         (git 樹共 333 筆)
 ```
 
-兩個不同模型、兩個不同 session,在**同一個分支**上接力做了 240+ 批。能接得起來,是因為有下面五樣東西:
+> 數法:前兩列數 commit message 的 `Co-Authored-By` 標,第三列數 `%an`。
+> 兩種數法不同類,加起來不等於 333——**這是誠實分母,不是對帳表**(LL86)。
+
+兩個不同模型、兩個不同 session,在**同一個分支**上接力做了 250+ 批。能接得起來,是因為有下面五樣東西:
 
 ### 協作靠的五樣共用件(接手前先認識它們)
 
 | # | 件 | 路徑 | 它解決什麼 |
 |---|---|---|---|
-| ① | **台帳**(只增不減) | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | **1,073 筆**。每一批做了什麼、為什麼這樣做,全寫在這。接手第一件事是讀最後 3 筆 |
-| ② | **律與教訓** | `supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json` | **律 59 條 · 教訓 90 條**。教訓都是**踩過才寫**的,每條都有批次編號可回溯 |
+| ① | **台帳**(只增不減) | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | **1,086 筆**(批554)。每一批做了什麼、為什麼這樣做,全寫在這。接手第一件事是讀最後 3 筆 |
+| ② | **律與教訓** | `supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json` | **律 59 條 · 教訓 107 條**(批554 加 LL107)。教訓都是**踩過才寫**的,每條都有批次編號可回溯 |
 | ③ | **元件自動編號冊** | `…/VIA_Component_Inventory_SSOT_v0100.json` | **5,145 個活元件**。防撞名。唯一寫者是 `via-vcgc registry-sync --apply`,**不要手改** |
 | ④ | **自測格 230 站** | `CGC_MDL064_SelftestGrid_v0321.py` | 共同驗收標準。你改完東西,它說綠才算綠 |
 | ⑤ | **commit trailer** | 每個 commit 尾巴 | `Co-Authored-By:` + `Claude-Session:` → 任何一行程式碼都追得回哪個 AI、哪一場對話寫的 |
@@ -152,21 +162,89 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 
 | 檔 | 大小 | 誰產的 | 看它的時機 |
 |---|---|---|---|
-| **本檔** `docs/VIA_Handover_MultiAI_B541.md` | ~12 KB | 手寫 | **冷啟動、換人、換 AI** ← 從這裡開始 |
-| `docs/VIA_Handover_20260914_B498.md` | 152 KB | 手寫累積 | 想知道某一批**為什麼**那樣做。批498 至今逐批記錄 |
-| `docs/VIA_Handover_ONEPAGE.md` | 260 KB | `via-vcgc page --publish` 自動產 | 要機器全量快照(政策庫/邏輯庫/因子庫/資料庫/調度/多矩陣…十二段) |
-| `../VIA_HANDOVER_LATEST.md` | 260 KB | 同上(倉庫根副本) | 同上。給不進 VIA 夾的人看 |
+| **本檔** `docs/VIA_Handover_MultiAI_B541.md` | 14 KB | 手寫 | **冷啟動、換人、換 AI** ← 從這裡開始 |
+| `docs/VIA_Handover_20260914_B498.md` | 188 KB | 手寫累積 | 想知道某一批**為什麼**那樣做。批498 至今逐批記錄 |
+| `docs/VIA_Handover_ONEPAGE.md` | 310 KB | `via-vcgc page --publish` 自動產 | 要機器全量快照(政策庫/邏輯庫/因子庫/資料庫/調度/多矩陣…十二段) |
+| `../VIA_HANDOVER_LATEST.md` | 310 KB | 同上(倉庫根**鏡像**,逐位元相同) | 同上。給不進 VIA 夾的人看 |
 | `supportive modules/ui_support/VIA_UI_MasterControl_v0100.html` | — | `VIA_SYSTEM_MANAGER --no-open` | 要用**瀏覽器**看 81 項正式任務 |
+
+> **ONEPAGE 的批次段是從 `VIA_Handover_20260914_B498.md` 抽的**,所以逐批紀錄請以 B498 為正本。
+> 批553/554 兩段我是**手動補進 ONEPAGE**(容器裡不能跑 `page --publish`——沙盒庫是空的,
+> 跑了會用假資料覆蓋整份正本,那就是 LL49)。在工作站跑一次 `via-vcgc page --publish`
+> 就會從 B498 重新生成、內容一致;根目錄鏡像同步更新。
 
 ---
 
-## 六、現在卡在哪(接手就看這節)
+## 六、現在的狀態(批557 · 2026-09-17 實測,不是上次的紀錄)
+
+**三家全跑過一遍,零 RED。** 動詞 `matrix --apply-family <家> --profile test`(有界自測,不寫正本庫):
+
+| 家 | 項 | 結果 |
+|---|---|---|
+| **VDF** 資料鍛造 | 33 | **GREEN 33** |
+| **VRN** 研報擷取 | 15 | **GREEN 13 · ABSENT 2 · RED 0** |
+| **VAP** 自動繪圖 | 6 | **GREEN 6** |
+| 中央控管台 VCGC v0111 | 19 檢 | **OK 19 · FAIL 0** |
+| 自測格 v0332 | 231 站 | 兩個異動站 `--only` 實跑 OK(全矩陣很久,沒跑) |
+
+VRN 那兩盞 **ABSENT 是誠實的缺件,不是壞掉**:
+
+| 項 | 態 | 差什麼 |
+|---|---|---|
+| `vrn_pdfplus` | ABSENT | 引擎自述「需要 reportlab」——**要你的手**(裝套件我不代做) |
+| `vrn_nlp_vrn_vdf_pipeline` | ABSENT | argparse 自述「required: `--in`」——冊上這項的 params 該由主控台/`--ids` 帶值 |
+
+> **第 1 站 `vrn_firstpage`(ENG072 v0134)現在 GREEN**——那就是你連看了十批的 ㉜ 紅燈。
+> 但**這一盞在本境的綠是半盞**:容器一個 OCR 後端都沒有,`ocr_page1` 會 SKIP,
+> 走不到出事那一步(這正是 LL106 的形狀)。你機器上 tesseract 在,會走得更遠——
+> **要你那邊跑出來才算數。**
+
+### 工作站實證(批558 · 操作員貼回來的那一跑)
+
+**ENG072 的 ㉜ 紅燈在工作站也綠了** —— 這才算數,本境那盞是半盞(容器沒有 OCR 後端)。
+操作員那一跑的 log 走完了真的 OCR 階梯(`tesseract_direct` · `NEEDS_OCR` · ㉟ DPI 帶 · ㊱ retry-failed · ㊷ 車道候選),
+`vrn_firstpage` GREEN 181s。連 `vrn_pdfplus`(20.98s)與 `vrn_nlp_vrn_vdf_pipeline` 也 GREEN
+—— 本境那兩盞 ABSENT 是**容器缺 reportlab / 缺 `--in` 帶值**,工作站兩樣都有。
+
+```
+[矩陣] 63 項 · profile=test · 真跑家族 vrn · GREEN 15 · PLAN 48
+```
+
+> ⚠️ **工作站上有三支比倉庫新的檔**:ENG072 **v0135** · ENG086 **v0109** · EngineBus **v0128**。
+> `main` 與本分支都沒有它們。那是另一條線(或本機未推)的成果——
+> **請把它們推上來**,否則下一批就會有兩個頭(九頭龍風險不是假設,是這種狀況的定義)。
+
+### 規則收斂現況(`via-vrnrules drift`)
+
+```
+[正本  ] ENG086 第一頁邏輯橋  v0108  評等 38/38 · 目標價  7/16
+[委樞  ] ENG073 報告結構庫    v0128  評等 38/38 · 目標價 16/16   ← 批554 委由樞紐
+[落差  ] TW02 報告解析器      v0101  評等 12/38 · 目標價 10/16
+[落差  ] 首頁全能引擎          v0125  評等 25/38 · 目標價 11/16
+[不適用] ENG080 四點文摘      v0105  評等   —   · 目標價  5/16
+```
+
+### 分支與冊
+
+| 項 | 值 |
+|---|---|
+| HEAD | `55a96ead`(批556)→ 本批後 批557 |
+| 超前 `main` | 批554 · 批555 · 批556(+本批);**PR #37 已併,要開新 PR** |
+| 台帳 | 1,086 筆 |
+| 律 · 教訓 | 59 條 · **107 條**(批554 加 LL107) |
+| 元件冊 | 活元件 5,174 · 退役 0 |
+
+---
+
+## 七、現在卡在哪(接手就看這節)
 
 ### A. 等操作員一句話才能動的
 
 | 件 | 狀態 | 要什麼 |
 |---|---|---|
-| 三支評等落差引擎 | **一支都還沒接** | ENG073 報告結構庫(中風險)→ 首頁全能 v0125(低)→ TW02(低)。建議一支一支,每支都用同一份 64 份語料驗零回歸 |
+| 三支評等落差引擎 | **ENG073 已接(批554)· 還剩兩支** | ~~ENG073 報告結構庫~~ → 首頁全能 v0125(低,評等 25/38 · 目標價 11/16)→ TW02 v0101(低,評等 12/38 · 目標價 10/16)。接法照 ENG073 的樣子:**向樞紐要實作,不抄詞表**;每支都要用同一份 64 份語料驗零回歸 |
+| ENG086 正本自己的目標價同義字 | **7/16**(批554 量出來) | 正本實作只認 5 條強線索,加寬的 11 條走樞紐弱道。要不要把加寬道併進 ENG086 本體,是你的決定(併了會動到 64 份語料驗過的正本,風險不是零) |
+| 批554 的真語料增減 | **未量** | 容器裡沒有那 64 份報告,批554 的正負對照全是合成文字。第二道從「全文」收窄到「前 40 行」理論上只少假評等——請在工作站跑一次,以 `rating_ssot_key` 與目標價命中數的變化為準 |
 | 報告類全景項 | 掛著 | HARDIMP 100 · PINVER 23 · VERB 6 |
 | 兩件收容件 | 存了但**沒接線** | `VIA_CodeChain_ALL_b534` · `VIA_CGE_AdaptiveInterface_b532` |
 
@@ -183,9 +261,60 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 
 ---
 
-## 七、批541 收在哪裡(最近一批)
+## 八、批541 收在哪裡
 
 - `f5def0d6` 批541:券商表去衝突(撞名 0 · 45 家)· 候選同義字 harvest(只提不寫冊)· 收容件導入驗證 ⑱ + 負控 ⑱'
 - `81e4054c` 批541b:補短令 `via-vrnrules`(批540 漏了七處之一)
 - 實測:ENG086 v0105 **19/19** · 64 份語料**零回歸**(券商 64/64 · 評等 36 · 目標價 30 · 真 RED 0)· 樞紐 **10/10** · 自測格 230 站 OK 227
 - 新教訓:**LL88**(檔案在≠導得進來;檔案對冊≠驗過)· **LL89**(永遠回 0 的濾網=假綠燈)· **LL90**(同義的裁定權在操作員)
+
+---
+
+## 九、批542–556 收在哪裡(批557 追記)
+
+| 批 | commit | 一句話 |
+|---|---|---|
+| 542 | `1d634ab1` | PS 叫用器加速:首呼 1137→280ms(−75%)· 後續 279→37ms(−87%)· 行為 6/6 不變 |
+| 543 | `e3e86eb7` | 40 支缺的 `.cmd` 梭一次補齊(現在零缺) |
+| 544 | `a96f0a92` | **CGC_MDL159 統一主控台**:TAB1 給 AI 的資訊全放一起(可轉 JSON/MD)· TAB2 收兩個既有頁 |
+| 545–553 | `3ba666e6`…`7ed4d860` | ENG072 的 ㉜ 紅燈。**十批才收掉**,誠實帳見下 |
+| 554 | `51ec2603` | 同義字收斂到一處:評等向樞紐要實作(前三道漏 14 → 0)· 目標價讀機構 SSOT(「目標 / target」在缺的 11 條裡)· 一個真迴歸修 |
+| 555 | `edb3ad52` | 交接更新:多 AI 版刷到批554 · 一頁交接補 批553/554 · 根鏡像同步 |
+| 556 | `55a96ead` | 一/二/三節重量:短令冊在**母系統根**(我前兩則給錯路徑)· PR #37 已併入 main · 自測格 231 站 |
+| 557 | `ee662aef` | **三家全跑一遍**:VDF 33/33 · VRN 13 GREEN + 2 ABSENT + **RED 0** · VAP 6/6 · VCGC 19/19;新增第六節「現在的狀態」 |
+| 558 | 本批 | **在哪裡找**:補 `footer`(主 join 從批237 起就漏這一區)· 中間本文標題區 · 兩處刻意改判各自單獨列檢 |
+
+### ㉜ 那十批的誠實帳(接手的人請先讀這段)
+
+紅燈從 批544 掛到 批553,**真 bug 只有兩個**:
+① ㊷ 的斷言寫反了(只有在那個套件**不存在**時才會過);
+② 夾具檔 `far/scan65.pdf` **從來沒被建立過**。
+
+其餘八批是:**三次診斷錯**(說 ACCEL-BRIDGE 注入 → 其實是 CRLF;說 `pyvenv.cfg` 壞 →
+那個值是我自己的 PowerShell 捏出來的;說「只剩 638 行」→ 那行根本沒被執行)、
+**兩次拆我自己蒙的眼罩**(`str(exc)[:60]`、`f"({_g32[:90]})"`)、兩次更正、一次全景稽核。
+**生產影響是零**(tesseract 道全程正常)。
+
+三條新教訓寫在 LL102 / LL106 / LL107,共同形狀是同一句:
+> **我先有了解釋,再去把任何數字湊上去。**
+
+### 批554 現在的 drift 長這樣(一眼看誰還沒收斂)
+
+```
+[正本] ENG086 第一頁邏輯橋  v0108  評等 38/38 · 目標價  7/16
+[委樞] ENG073 報告結構庫    v0128  評等 38/38 · 目標價 16/16   ← 委由樞紐(沒抄詞表=對的做法)
+[落差] TW02 報告解析器      v0101  評等 12/38 · 目標價 10/16
+[落差] 首頁全能引擎          v0125  評等 25/38 · 目標價 11/16
+[不適用] ENG080 四點文摘     v0105  評等   —   · 目標價  5/16
+```
+
+一貼即用:
+
+```powershell
+Set-Location 'D:\OneDrive\文件\GitHub\movies-dataset\VeritasIntelligenceAnalytics'
+git pull origin claude/via-envmanager-governance-7cls8h
+. (Get-ChildItem 'supportive modules\Register-VIA-Commands-v*.ps1' | Sort-Object Name | Select-Object -Last 1).FullName
+via-vrnrules drift      # 誰還沒收斂
+via-ryg vrn             # VRN 四態燈
+via-unified             # 批544 統一主控台(TAB1 給 AI · TAB2 兩頁合一)
+```

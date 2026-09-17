@@ -86,7 +86,15 @@
     "NOT_STOCK": "非個股(不需)",
     "MISS": "有線索抓不到(RED)"
    },
-   "lesson": "LL64 目標價 ≠ 潛在上漲空間;無線索詞不得用弱 NT$ 正則(會把營收數字當目標價)。"
+   "lesson": "LL64 目標價 ≠ 潛在上漲空間;無線索詞不得用弱 NT$ 正則(會把營收數字當目標價)。",
+   "alias_source": "supportive modules/ssot/VIA_Financial_Institution_SSOT_v*.json#registries.research_fields.TARGET_PRICE.aliases",
+   "alias_note": "批554 操作員令「目標價 目標 target price price target target」。同義字的正本在機構 SSOT 那一本(16 條),**本冊不抄第二份**——抄了就是第二顆會漂移的頭。cue_rx 這兩條是 ENG086 在 64 份真研報上驗過的**強線索**(5 詞);其餘 11 條由樞紐 tp_terms() 讀冊取得,走加寬弱道,且守衛比強線索更緊(見 alias_weak_guard)。",
+   "alias_weak_guard": [
+    "詞與數字間最多 6 字元,且不得夾雜白名單以外的中文(『目標市場規模 2026』不算)",
+    "數字後(容一個空白)接 % ／ 倍 ／ x ／ 年 = 不是價格",
+    "數字要吃乾淨((?![\\d.,]));否則正則回溯成『202』再看見『6』就過關",
+    "沿用正本實作的 _is_upside_context(LL64 幅度不是價格)與 _plausible_tp"
+   ]
   },
   "broker": {
    "zh": "券商",
