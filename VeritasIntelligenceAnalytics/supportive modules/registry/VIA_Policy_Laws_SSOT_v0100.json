@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批546",
+ "batch": "批547",
  "ts": "2026-09-17",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -887,6 +887,16 @@
    "id": "LL99",
    "batch": "批546",
    "zh": "md5 比對**原始位元**時,一定要先把行尾鎖住,否則 Windows 上必然誤報。git 依 core.autocrlf 在 checkout 時把 LF 轉成 CRLF,同一個檔就多出「行數」個位元組(這次是 612 行 → 612 B),raw md5 當然對不上。我從批544 起連著兩批把它斷言成「正本被就地改過」,還指名是 ACCEL-BRIDGE 注入、寫了兩套救法、上了台帳與交接檔——全是我造的判錯紅燈(L57:判錯的紅燈和假綠一樣傷)。最難看的是倉庫的 .gitattributes 裡早就寫著同一個教訓:『VTR subsystem: manifest hashes raw bytes - checkout must be byte-exact (no CRLF conversion)』,VTR 與 v0160A 都因為同一個理由鎖過位元,我做收容件位元錨時沒去看。兩層修:① 比對要行尾無關——只差行尾照樣算對並講明原因,LF 正規化後仍不符才是真的 RED;② `references/intake/** -text` 鎖進 .gitattributes,讓它不再發生。另一條:**跨平台的量尺,要先想清楚那個平台會對檔案做什麼**,不要拿本境(Linux/LF)的位元當普世真理。"
+  },
+  {
+   "id": "LL100",
+   "batch": "批547",
+   "zh": "驗「路徑在不在」不等於驗「那裡有沒有東西」。操作員的 via_paddle_311 其 pyvenv.cfg 寫 home=C:\\Users\\tonyk——那是他的家目錄,不是 base Python 的夾。我的車道境預檢只做 `Path(home).exists()`,家目錄當然存在,於是一路放行;Windows 的 venv 啟動器照 cfg 去那裡找 python.exe,找不到,子行程炸成 FileNotFoundError,最後印成 OCR_RUN_FAIL——看起來像「OCR 壞了」,其實是「境壞了而且我沒攔住」。預檢的責任是在**派工之前**把壞境講出來,而且要講得出是哪一種壞。凡是「檢查某個路徑」的地方,都要再問一句:我要的是這個路徑本身,還是路徑裡的那個東西?"
+  },
+  {
+   "id": "LL101",
+   "batch": "批547",
+   "zh": "補洞的時候把同類一視同仁,很容易補出新洞。我第一版把 `bin` 跟 `Scripts` 一樣嚴(都要求 pyvenv.cfg),結果 `/usr/bin/python3` 這種**系統 python** 也被判成壞 venv,當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢。兩者不對稱是有道理的:Windows 的 `Scripts\\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。規則要寫成 Scripts=cfg 必須在、bin=cfg **在才驗**。這次是自己的負控當場抓到,沒有推出去——檢查夠密的時候,錯誤會在自己家裡被攔下。"
   }
  ]
 }

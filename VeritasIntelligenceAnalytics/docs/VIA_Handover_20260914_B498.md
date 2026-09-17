@@ -1756,3 +1756,67 @@ MDL159 檢⑦ 又被自我指涉咬一次——**教訓 LL96 的內文裡就寫�
 新教訓 **LL99**:md5 比對原始位元時一定要先鎖行尾;跨平台的量尺,
 要先想清楚那個平台會對檔案做什麼,不要拿本境(Linux/LF)的位元當普世真理。
 LL94 / LL95 / LL98 已就地標【批546 更正】並指向 LL99。
+
+---
+
+## 批547 —— 你那個境是真的壞的,而我的預檢該攔沒攔
+
+你跑出來的環境證據把根因指出來了:
+
+```
+境根 = C:\Users\tonyk\envs\via_paddle_311
+  pyvenv.cfg = 在 · home = C:\Users\tonyk        ← 兇手
+```
+
+venv 的 `home` 應該指向 **base Python 所在的資料夾**(你機器上是 `C:\Python313`),
+你這個卻指向**家目錄**。Windows 的 venv 啟動器照 `pyvenv.cfg` 去 `C:\Users\tonyk\python.exe` 找,
+找不到 → **`FileNotFoundError: [Errno 2]`** → 印成 `OCR_RUN_FAIL`,看起來像「OCR 壞了」。
+
+### 我的預檢本來就該攔住,它沒攔——兩個洞
+
+```python
+if home and not Path(home).exists():
+    return f"基底解譯器缺(home={home})"
+```
+① `C:\Users\tonyk` **存在**(那是家目錄),所以一路放行。
+**我驗的是「home 這個路徑在不在」,不是「home 裡面有沒有 python」。**
+
+② `pp.parent.name.lower() in ("scripts",)` —— 註解本來就寫「Scripts/**bin**」,
+程式卻只認 `scripts`,POSIX 佈局的車道境整個沒被預檢過。
+
+### 補的過程我自己又踩一次
+
+第一版把 `bin` 跟 `Scripts` 一視同仁(都要求 `pyvenv.cfg`),結果 `/usr/bin/python3`
+這種**系統 python** 也被判成壞 venv,**當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢**。
+兩者不對稱是有道理的:Windows 的 `Scripts\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),
+沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。
+
+**規則定案:`Scripts` = cfg 必須在;`bin` = cfg 在才驗。**
+這次是自己的負控在家裡抓到,沒推出去。
+
+### v0130 實測
+
+| 檢 | 結果 |
+|---|---|
+| ㉜ 後端健康閘 | OK |
+| ㊷ 車道候選不吃本境標壞鍵 | OK(第一版被我咬壞,修回來了) |
+| ㊻ 車道境預檢 | OK(同上) |
+| **㊼ 新增** | OK —— 用你那個形狀(存在但沒有 python 的 home)當夾具釘住 |
+| **總計** | **四十七檢 47/47 · 零回歸** |
+
+站名也順手說實話:首頁文字擷取 **二十二檢 → 四十七檢**(檢數早就長到 47,名字停在 22)。
+
+### 講清楚這修的是什麼、不是什麼
+
+**修的是**:紅燈判得對——境壞會在**派工之前**被說出來,印成
+`SKIP(lane=via_paddle_311 境壞:基底解譯器目錄裡沒有 python(home=C:\Users\tonyk))`,
+而不是讓子行程炸了再猜。
+
+**沒修的是**:你那個境**本身確實是壞的**。要真的讓 paddle 車道能跑,得重建它——那是你的手:
+
+```powershell
+via-rebuild --env via_paddle_311
+via-vrnlogic reset-backends
+```
+
+新教訓 **LL100**(驗路徑在不在 ≠ 驗那裡有沒有東西)· **LL101**(補洞時把同類一視同仁,容易補出新洞)。

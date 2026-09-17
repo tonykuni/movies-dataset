@@ -7963,8 +7963,16 @@
    "component": "VRN_ENG086 v0108 + CGC_MDL159 v0100(行尾無關)+ .gitattributes 收容件位元鎖 + Grid v0326",
    "code": "批546 更正批544/545 的錯誤診斷:收容件根本沒被改過,是 CRLF",
    "kind": "**這是一筆更正,不是新功能。** 操作員照批545 的診斷列了收容件夾,只有一個檔、沒有入侵者。把倉庫那份(LF · 30,115B · d4cdaedf)逐位元轉成 CRLF 再算:30,727B · 7bedf1d680a5e65e223ed0f914350cb4——位元數與 md5 都跟工作站回報的完全吻合。收容件**一個位元都沒被改**,是 git 在 Windows 上依 core.autocrlf 把 LF 轉 CRLF,612 正是該檔行數。我從批544 起連著兩批斷言「正本被就地改過」、指名 ACCEL-BRIDGE 注入、寫了兩套救法,並讓它上了台帳 1076/1077、教訓 LL94/LL95/LL98 與交接檔——全是我造的判錯紅燈(L57)。那三條教訓已就地標【批546 更正】並指向 LL99。更難看的是 .gitattributes 裡早就寫著同一個教訓(VTR / v0160A 因『冊比對原始位元』鎖過位元),我沒去看。修兩層:① ENG086 v0108 與 MDL159 的比對改**行尾無關**——只差行尾照樣過並講明原因,LF 正規化後仍不符才是真 RED;② `VeritasIntelligenceAnalytics/**/references/intake/** -text` 鎖進 .gitattributes。實測三態:LF 原檔 20/20 · 轉成 CRLF(重現工作站)v0107 兩紅→v0108 兩綠並印出『只差行尾』· 真的改內容 → 仍然 RED 並講明『LF 正規化後也不符=內容真的不同』。MDL159 十一檢 11/11。附帶:MDL159 檢⑦ 又被自我指涉咬一次——教訓 LL96 的內文裡就寫著 `class=tab data-t=`,而教訓會被排進 TAB1 與內嵌 payload,於是分頁數被數成 5。改數結構性的 `data-t=<名> role=tab`。教訓 LL99:md5 比對原始位元時要先鎖行尾;跨平台的量尺要先想清楚那個平台會對檔案做什麼。"
+  },
+  {
+   "ts": "2026-09-17 11:50",
+   "op": "ASSIGN",
+   "category": "功能性引擎",
+   "component": "VRN_ENG072_FirstPageText_v0130 + Grid v0327",
+   "code": "批547 工作站實錄:via_paddle_311 的 pyvenv.cfg home=C:\\Users\\tonyk(家目錄,不是 base Python 的夾)",
+   "kind": "操作員的環境證據把根因指出來了:那個境的 pyvenv.cfg 在,但 home 指到家目錄。Windows 的 venv 啟動器照 cfg 去那裡找 python.exe → FileNotFoundError [Errno 2] → 印成 OCR_RUN_FAIL,看起來像 OCR 壞了。預檢本來就該在派工前攔下來,它沒攔,兩個洞:① 只驗 `Path(home).exists()` —— 家目錄當然存在,一路放行;驗的是路徑在不在,不是裡面有沒有 python。② `pp.parent.name.lower() in ('scripts',)` —— 註解寫「Scripts/bin」,程式只認 scripts,POSIX 佈局整個沒預檢。v0130 兩個都補,並加 ㊼ 用他那個形狀(存在但沒有 python 的 home)當夾具釘住。補的過程自己又踩一次:第一版 bin 跟 Scripts 一視同仁,`/usr/bin/python3`(系統 python)被判壞 venv,當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢——負控在自己家裡抓到,沒推出去。規則定案:Scripts=cfg 必須在;bin=cfg 在才驗。實測 47/47 零回歸(㉜ ㊷ ㊻ ㊼ 全綠)。站名順手說實話:首頁文字擷取 二十二檢→四十七檢(檢數早就長到 47,名字停在 22)。注意:這只讓紅燈**判得對**(境壞→誠實 SKIP)。他那個境本身確實是壞的,要修得他自己 via-rebuild(不代裝)。教訓 LL100 驗路徑在不在 ≠ 驗那裡有沒有東西 · LL101 補洞時把同類一視同仁容易補出新洞。"
   }
  ],
- "updated_at": "2026-09-17 11:05",
- "batch": "批546"
+ "updated_at": "2026-09-17 11:50",
+ "batch": "批547"
 }

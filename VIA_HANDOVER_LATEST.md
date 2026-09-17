@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批546)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批547)
 
-> 產生 2026-09-17 10:10:57 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-17 11:08:37 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -257,17 +257,19 @@
 - LL97(批544)沒帶逾時就是**無上限等下去**,那正是卡斷的來源。Invoke-VIAPython 的 -TimeoutSec 預設 0,而 0 走的是「永遠等」那條路:引擎一掛住,那個視窗就再也回不來。批544 改成沒帶就套保底天花板(預設 1800s,VIA_PY_TIMEOUT_SEC 可調,真要不設限才寫 0),並在逾時訊息裡講明這是保底不是判它壞、以及怎麼調大。任何「等外部東西回來」的迴圈都要有天花板。
 - LL98(批545)【批546 更正】「尾版律」用在**收容件**上是錯的。引擎用 `sorted(glob)[-1]` 取尾版,那是給『我方版本號遞增的引擎檔』用的;套到收容件夾就開了一個洞:夾裡多一個排在後面的同系列檔(`_3.py`、`_v0101.py`…),它立刻變成「正典」,而那種檔多半未追蹤,git checkout 還救不回來——操作員照救法跑了、沒報錯、md5 卻一點沒變,就是這樣來的。收容件的正典是**冊上點名的那個檔名**,要按名字取,不是按排序取。而且按名字取之後 ①⑱ 會轉綠,那一刻最危險:夾裡那個多餘檔還在,轉綠等於把汙染掃到地毯下。所以要分兩盞燈:引擎吃對了是一盞,夾子乾不乾淨是另一盞。 ——【後續】這整條的前提是錯的:收容件根本沒被改過。把倉庫那份(LF · 30,115B · d4cdaedf)轉成 CRLF 就是 30,727B · 7bedf1d6,跟工作站回報的完全吻合。是 git 依 core.autocrlf 轉行尾,612 正是該檔行數。請看 LL99。
 - LL99(批546)md5 比對**原始位元**時,一定要先把行尾鎖住,否則 Windows 上必然誤報。git 依 core.autocrlf 在 checkout 時把 LF 轉成 CRLF,同一個檔就多出「行數」個位元組(這次是 612 行 → 612 B),raw md5 當然對不上。我從批544 起連著兩批把它斷言成「正本被就地改過」,還指名是 ACCEL-BRIDGE 注入、寫了兩套救法、上了台帳與交接檔——全是我造的判錯紅燈(L57:判錯的紅燈和假綠一樣傷)。最難看的是倉庫的 .gitattributes 裡早就寫著同一個教訓:『VTR subsystem: manifest hashes raw bytes - checkout must be byte-exact (no CRLF conversion)』,VTR 與 v0160A 都因為同一個理由鎖過位元,我做收容件位元錨時沒去看。兩層修:① 比對要行尾無關——只差行尾照樣算對並講明原因,LF 正規化後仍不符才是真的 RED;② `references/intake/** -text` 鎖進 .gitattributes,讓它不再發生。另一條:**跨平台的量尺,要先想清楚那個平台會對檔案做什麼**,不要拿本境(Linux/LF)的位元當普世真理。
+- LL100(批547)驗「路徑在不在」不等於驗「那裡有沒有東西」。操作員的 via_paddle_311 其 pyvenv.cfg 寫 home=C:\Users\tonyk——那是他的家目錄,不是 base Python 的夾。我的車道境預檢只做 `Path(home).exists()`,家目錄當然存在,於是一路放行;Windows 的 venv 啟動器照 cfg 去那裡找 python.exe,找不到,子行程炸成 FileNotFoundError,最後印成 OCR_RUN_FAIL——看起來像「OCR 壞了」,其實是「境壞了而且我沒攔住」。預檢的責任是在**派工之前**把壞境講出來,而且要講得出是哪一種壞。凡是「檢查某個路徑」的地方,都要再問一句:我要的是這個路徑本身,還是路徑裡的那個東西?
+- LL101(批547)補洞的時候把同類一視同仁,很容易補出新洞。我第一版把 `bin` 跟 `Scripts` 一樣嚴(都要求 pyvenv.cfg),結果 `/usr/bin/python3` 這種**系統 python** 也被判成壞 venv,當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢。兩者不對稱是有道理的:Windows 的 `Scripts\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。規則要寫成 Scripts=cfg 必須在、bin=cfg **在才驗**。這次是自己的負控當場抓到,沒有推出去——檢查夠密的時候,錯誤會在自己家裡被攔下。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 206.9 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 207.9 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 808 列 · 全庫同步 {'hash': '7290eac4ca33', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '03cdc3c98f4d', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 814 列 · 全庫同步 {'hash': 'cc62fd1fc102', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'c7ac85788431', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -419,21 +421,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5165/5165 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4304, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
+- 中央自動編號冊 OK · ACTIVE 5166/5166 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4305, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
 - 尾版引擎/模組家族 242 · 中央冊已登 242 · **未登 0** · 操作介面有掛載 200 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1078 筆 · 元件 149 · 更新 2026-09-17 11:05
-- 元件冊 OK · ACTIVE 5165 · RETIRED 115 · 更新 2026-09-17T10:10:57 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4304, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
+- 全域台帳 1079 筆 · 元件 149 · 更新 2026-09-17 11:50
+- 元件冊 OK · ACTIVE 5166 · RETIRED 115 · 更新 2026-09-17T11:08:37 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4305, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-17 07:58 批540 立了 SUP_MDL749 規則正本樞紐卻**沒給短令**——七處少一處,等於你在工作站叫不出它。補 via-vrnrules(status|drift|conflict
 - 2026-09-17 08:20 先量再說,量出來兩件已完成、一件是真的:① 25 個 PS 加速器**早就在冊**——VIA_Accelerator_Roster_SSOT accelerators=25、VIA
 - 2026-09-17 08:55 根因不是短令寫錯,是功能註冊七處只做了六處:冊上有 function global:via-pyprog,身邊沒有同名 .cmd 梭。而且不是只有我新加的兩個——量完是冊上 133
 - 2026-09-17 09:45 六個獨立流程,彼此不共用狀態:F1 收容件汙染——操作員工作站跑 via-ryg,ENG086 的 ⑱ 第一次真跑就咬到:VRN 收容件 md5 7bedf1d6 ≠ 錨 d4cd
 - 2026-09-17 10:20 救法沒救到,因為紅燈點名的是**資料夾**不是那個檔。根因在選檔方式:intake_engine_file() = sorted(home.glob('VIA_VRN_FirstP
 - 2026-09-17 11:05 **這是一筆更正,不是新功能。** 操作員照批545 的診斷列了收容件夾,只有一個檔、沒有入侵者。把倉庫那份(LF · 30,115B · d4cdaedf)逐位元轉成 CRLF 
+- 2026-09-17 11:50 操作員的環境證據把根因指出來了:那個境的 pyvenv.cfg 在,但 home 指到家目錄。Windows 的 venv 啟動器照 cfg 去那裡找 python.exe → F
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -2194,6 +2196,70 @@ MDL159 檢⑦ 又被自我指涉咬一次——**教訓 LL96 的內文裡就寫�
 新教訓 **LL99**:md5 比對原始位元時一定要先鎖行尾;跨平台的量尺,
 要先想清楚那個平台會對檔案做什麼,不要拿本境(Linux/LF)的位元當普世真理。
 LL94 / LL95 / LL98 已就地標【批546 更正】並指向 LL99。
+
+---
+
+### 批547 —— 你那個境是真的壞的,而我的預檢該攔沒攔
+
+你跑出來的環境證據把根因指出來了:
+
+```
+境根 = C:\Users\tonyk\envs\via_paddle_311
+  pyvenv.cfg = 在 · home = C:\Users\tonyk        ← 兇手
+```
+
+venv 的 `home` 應該指向 **base Python 所在的資料夾**(你機器上是 `C:\Python313`),
+你這個卻指向**家目錄**。Windows 的 venv 啟動器照 `pyvenv.cfg` 去 `C:\Users\tonyk\python.exe` 找,
+找不到 → **`FileNotFoundError: [Errno 2]`** → 印成 `OCR_RUN_FAIL`,看起來像「OCR 壞了」。
+
+#### 我的預檢本來就該攔住,它沒攔——兩個洞
+
+```python
+if home and not Path(home).exists():
+    return f"基底解譯器缺(home={home})"
+```
+① `C:\Users\tonyk` **存在**(那是家目錄),所以一路放行。
+**我驗的是「home 這個路徑在不在」,不是「home 裡面有沒有 python」。**
+
+② `pp.parent.name.lower() in ("scripts",)` —— 註解本來就寫「Scripts/**bin**」,
+程式卻只認 `scripts`,POSIX 佈局的車道境整個沒被預檢過。
+
+#### 補的過程我自己又踩一次
+
+第一版把 `bin` 跟 `Scripts` 一視同仁(都要求 `pyvenv.cfg`),結果 `/usr/bin/python3`
+這種**系統 python** 也被判成壞 venv,**當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢**。
+兩者不對稱是有道理的:Windows 的 `Scripts\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),
+沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。
+
+**規則定案:`Scripts` = cfg 必須在;`bin` = cfg 在才驗。**
+這次是自己的負控在家裡抓到,沒推出去。
+
+#### v0130 實測
+
+| 檢 | 結果 |
+|---|---|
+| ㉜ 後端健康閘 | OK |
+| ㊷ 車道候選不吃本境標壞鍵 | OK(第一版被我咬壞,修回來了) |
+| ㊻ 車道境預檢 | OK(同上) |
+| **㊼ 新增** | OK —— 用你那個形狀(存在但沒有 python 的 home)當夾具釘住 |
+| **總計** | **四十七檢 47/47 · 零回歸** |
+
+站名也順手說實話:首頁文字擷取 **二十二檢 → 四十七檢**(檢數早就長到 47,名字停在 22)。
+
+#### 講清楚這修的是什麼、不是什麼
+
+**修的是**:紅燈判得對——境壞會在**派工之前**被說出來,印成
+`SKIP(lane=via_paddle_311 境壞:基底解譯器目錄裡沒有 python(home=C:\Users\tonyk))`,
+而不是讓子行程炸了再猜。
+
+**沒修的是**:你那個境**本身確實是壞的**。要真的讓 paddle 車道能跑,得重建它——那是你的手:
+
+```powershell
+via-rebuild --env via_paddle_311
+via-vrnlogic reset-backends
+```
+
+新教訓 **LL100**(驗路徑在不在 ≠ 驗那裡有沒有東西)· **LL101**(補洞時把同類一視同仁,容易補出新洞)。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 
