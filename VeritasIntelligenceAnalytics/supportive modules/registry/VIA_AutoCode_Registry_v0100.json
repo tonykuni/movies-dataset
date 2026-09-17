@@ -7979,8 +7979,16 @@
    "component": "批547 根因更正(VRN_ENG072 v0130 的硬化保留,診斷作廢)",
    "code": "批548 操作員實測推翻批547:pyvenv.cfg home = C:\\Python313,境是好的",
    "kind": "**這是一筆更正。** 操作員逐條量:pyvenv.cfg home = C:\\Python313(正確的 venv,不是家目錄)· Scripts\\python.exe 在且跑得起來(OK 3.13.7)· cv2/paddle/paddleocr/pypdfium2 四件 find_spec 全 True。那個境沒有壞,我批547 的根因整條作廢。我引用的『home=C:\\Users\\tonyk』是我自己 PowerShell 腳本的產物:`$home = ...` 賦值被 PowerShell 拒絕($HOME 是唯讀自動變數,腳本當場印了 WriteError),變數保留家目錄的值,我把它當成 cfg 內容讀進來。這是連續第三次拿自己的產物當證據(LL102)。v0130 的兩處硬化(home 裡要有 python · bin 佈局納入預檢但 cfg 在才驗)**本身仍是對的**,47/47 零回歸,只是它**不是這盞紅燈的解**——預檢沒觸發,因為沒有東西要攔。重新定位(這次從自己的程式碼讀出來,不是猜):_ocr_via_runner 產生 `OCR_RUN_FAIL(lane=…)` 只有三處,其中 599 對 FileNotFoundError 是死路(597 的 except FileNotFoundError 在它前面會先配到),所以只剩 **638** —— 那是**執行器 SUP_MDL747 在 via_paddle_311 裡面跑起來之後、自己丟出的錯**,用 JSON 回報。與其他證據全部吻合:境好、python 好、套件都在;壞的是執行器跑起來之後找不到某個檔。待證:那個檔是什麼(領先假設=paddleocr 首次使用要下載的模型檔,而網路閘預設 OFF;**未證實,不入結論**)。本批不改 ENG072,只更正記錄。教訓 LL102。"
+  },
+  {
+   "ts": "2026-09-17 13:10",
+   "op": "ASSIGN",
+   "category": "功能性引擎",
+   "component": "VRN_ENG072_FirstPageText_v0131 + Grid v0328",
+   "code": "批549 操作員直接叫執行器:err=\"\" · paddleocr SKIPPED_POLICY · binary_available=False",
+   "kind": "操作員直接跑 SUP_MDL747,回的 JSON 乾淨:err 空、paddleocr status=SKIPPED_POLICY、probe binary_available=False。執行器沒壞、模組在位(cv2/paddle/paddleocr/pypdfium2 find_spec 全 True),是**收容件 GLE 自己的政策**跳過它;我們的執行器對 paddleocr 的 binary 需求本來就是 None,只是照實回報。㊷ 的舊斷言 `\"paddleocr(\" in _g42` 找的是名稱後面的**左括號**,而那個左括號只在模組缺席時才出現(`paddleocr(缺 paddleocr,paddle)`);裝好之後 tag 是 `paddleocr:SKIPPED_POLICY/0元素`,沒有左括號 → FAIL。**這一檢只有在那個套件不存在時才會過,裝好了反而亮紅。** 它宣稱要驗的『派車道名單』在他機器上明明成立(`OCR_EMPTY[paddleocr+paddle_pdf_pipeline; …]`,ppstructure 確實被濾掉)。v0131 改成驗名單本身(名稱用詞界比對,兩種呈現都認),加 ㊽ 負控:同一份名單兩種呈現要同答案 · ppstructure 真漏進名單要抓得到 · 並在負控裡證明舊斷言在『裝好了』那一種下會判錯(裝好=False)。實測 48/48 零回歸,且不需要 Windows 就證明了他那盞紅燈的成因。**㉜ 仍未解**:他直接叫執行器沒有重現 FileNotFoundError,不猜,留紅等證據。教訓 LL103。"
   }
  ],
- "updated_at": "2026-09-17 12:30",
- "batch": "批548"
+ "updated_at": "2026-09-17 13:10",
+ "batch": "批549"
 }

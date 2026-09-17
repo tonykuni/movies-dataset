@@ -1878,3 +1878,55 @@ WriteError: 無法覆寫變數 HOME,因為它是唯讀或常數。
 
 新教訓 **LL102**:診斷工具自己要先驗證(腳本報錯就代表那段輸出不可信)·
 近似不是證據 · 根因寫進台帳前要能講出「哪一行程式、在什麼條件下、產生了這個字串」。
+
+---
+
+## 批549 —— ㊷ 的斷言只有在那個套件**不存在**時才會過
+
+你直接叫執行器跑,回的 JSON 很乾淨:
+
+```json
+"paddleocr", "status": "SKIPPED_POLICY", "error": "",
+"probe": "AdapterProbe(available=True, module_available=True, binary_available=False, configured=True)"
+"err": ""
+```
+
+**執行器沒壞、模組在位、`err` 空的。** 是**收容件 GLE 自己的政策**跳過它
+(我們的 `SUP_MDL747` 對 paddleocr 的 binary 需求本來就是 `None`,只是照實回報)。
+
+### ㊷ 為什麼還是紅
+
+```python
+"paddleocr(" in _g42 and "paddle_pdf_pipeline(" in _g42     # ← 找的是「名稱(」
+```
+
+那個**左括號**只在模組**缺席**時才出現(容器的 tag:`paddleocr(缺 paddleocr,paddle)`)。
+你把 paddleocr 裝好之後,tag 變成 `paddleocr:SKIPPED_POLICY/0元素` —— 沒有左括號,判 FAIL。
+
+> **這一檢只有在那個套件不存在時才會過,裝好了反而亮紅。方向剛好相反。**
+
+而它自己宣稱要驗的「派車道名單」,**在你機器上明明成立**:
+`OCR_EMPTY[paddleocr+paddle_pdf_pipeline; …]` —— 名單正是那兩支,`ppstructure` 確實被濾掉了。
+
+根因:我拿**當時本境的輸出字串**當判準,而那個字串的形狀會隨「在不在位」改變;
+我把**呈現差別**誤當成**名單差別**。
+
+### v0131 的修法與負控
+
+改成驗名單本身(名稱用**詞界**比對,兩種呈現都認得),並加 **㊽ 負控**:
+
+```
+新判準  缺席=True  · 裝好=True  · ppstructure 漏進名單=False
+舊斷言  缺席=True  · 裝好=False  ← 這就是你機器上那盞紅燈
+```
+
+**四十八檢 48/48 零回歸**,而且不需要 Windows 就在容器裡證明了成因。
+
+### ㉜ 仍未解,留紅
+
+你直接叫執行器**沒有**重現那個 FileNotFoundError。我上一則說「只剩 638」也是錯的——
+`err` 是空的,638 不會觸發。**我不猜,留紅等證據。**
+
+新教訓 **LL103**:最陰險的一種判錯紅燈,是**只有在那個東西不存在時才會過的檢查**。
+斷言要對著「它宣稱要驗的那件事」,不是對著你當時看到的那一行字;
+而且要用兩種狀態(有/沒有)各跑一次當負控。
