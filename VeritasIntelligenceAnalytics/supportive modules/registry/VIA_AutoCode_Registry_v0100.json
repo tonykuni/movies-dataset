@@ -7939,8 +7939,16 @@
    "component": "40 個 .cmd 直通梭 + CGC_MDL157 v0102(二十一→二十四檢)+ Grid v0323",
    "code": "批543 操作員實錄:`via-pyprog` 無法將字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱",
    "kind": "根因不是短令寫錯,是功能註冊七處只做了六處:冊上有 function global:via-pyprog,身邊沒有同名 .cmd 梭。而且不是只有我新加的兩個——量完是冊上 133 個短令只有 93 個有梭,**缺 40 個**,via-vcgc / via-panorama / via-ryg / via-bus / via-boot / via-fplogic / via-vrnrules 全在缺的名單裡。① 依既有樣板(批324 VIA-Verb-Shim v0100 + 批340 VIA_NO_OPEN 零跳出律)補齊 40 個梭,現在零缺;編碼沿用既有慣例(UTF-8 no-BOM + CRLF,跟 via-accel-check.cmd 一致,那支在工作站已跑 200+ 批)。② CGC_MDL157 v0102 加三檢釘住:冊上每個 function global:via-* 必有同名 .cmd(大小寫不計)· 沒有梭可以把版號釘死(尾版律)· 負控證明前兩檢真的咬得住。③ 實測負控:把 via-pyprog.cmd 拿掉 → RED 23/24;放回去 → GREEN 24/24。④ 過程中我自己量錯兩次(都寫進 MDL157 的註解與 LL93):第一版拿『樣板長相』當判準,把 VIA-ALL / VIA-ROOTCHECK / VIA-TOWER-RESET / via-pipeline / via-ppp / via-repo-optimize 六個**獨立啟動器**判成紅;第二版正則只認 `-v*.ps1`,漏掉 `VIA_WinIO_InputPicker_v*.ps1` 這種底線接 v 的寫法,冤枉 via-vrnin。最後只留一條真的會咬人的:版號不得釘死。注:supportive modules/bootstrap/sitecustomize.py 第 156 行仍寫 VIA_ENTRY_CONTROL=..._v0100(已與尾版脫節);MDL157 那一檢是版號無關的,所以不是紅燈,但這是一個會慢慢漂的標籤,本批不動它(改 bootstrap 影響面太大),記在此備查。教訓 LL92 七處少一處=那個功能在操作員手上等於不存在 · LL93 量『到得了嗎』不要量『長得像不像』。"
+  },
+  {
+   "ts": "2026-09-17 09:45",
+   "op": "ASSIGN",
+   "category": "中央治理功能模組",
+   "component": "CGC_MDL159_VIAUnifiedConsole_v0100 + VRN_ENG086 v0106 + VIA_PS_PyProgress_Module(不卡斷保底)+ Register v0213 + via-unified.cmd + Grid v0324",
+   "code": "批544 操作員令「ps加25個加速器不卡斷 · 全景式分析後分六個獨立流程 · 不傷害系統不引起九頭龍風險 · 動態進度條 · 跳出的兩個 html 整合唯一放在 tab2 · tab1 放要給 ai 的資訊全部放一起 · 字小一點專業 · 可將整頁內容轉換成 json/md」",
+   "kind": "六個獨立流程,彼此不共用狀態:F1 收容件汙染——操作員工作站跑 via-ryg,ENG086 的 ⑱ 第一次真跑就咬到:VRN 收容件 md5 7bedf1d6 ≠ 錨 d4cdaedf、檔案 30,727B(錨 30,115B、多 612B)、冊沒被動。倉庫那份乾淨,所以是工作站那份被就地改過(最可能是全樹補橋把 629B 的 ACCEL-BRIDGE 注進收容件;LL72 同型事故)。ENG086 v0106:紅燈自救——①/⑱ 失敗時直接印 git checkout 還原指令與正確位元數,不代改任何檔(不代設)。沙盒負控:模擬注入 → ① 亮紅並印出救法;還原 → 十九檢 19/19。F2 不卡斷保底——Invoke-VIAPython 的 -TimeoutSec 預設 0 走的是『永遠等』那條路,引擎一掛視窗就回不來。改成沒帶就套 1800s 天花板(VIA_PY_TIMEOUT_SEC 可調;0 才是真不設限),逾時訊息講明是保底不是判壞。六檢仍 FAIL 0。F3 統一主控頁 CGC_MDL159——TAB1『給 AI 的一頁』(律七條/現況卡/收容件體檢/資料庫/台帳四筆/教訓六條/冷啟動/座標)、TAB2 把三張既有頁(引擎匯流排矩陣 · 全景稽核 · 中央控管台)以 iframe **相對路徑**內嵌。零九頭龍:不重算也不重畫任何一張,原頁改版這裡自動跟著變。零 CDN · 零彈窗 · 只讀正本(三處 write_text 全在產物夾)。F4 動態進度條——沿用全樹慣例 @@PROGRESS|pct|msg,PS 側轉播。F5 整頁轉 JSON/MD——payload 與 md 嵌在頁裡,按鈕用純 Blob 下載;同時落 .json/.md 兩檔。字級 12.5px/表格 12px。F6 登錄——Grid v0324(+統一主控十一檢站;230→231)· Register v0213(via-unified + 梭)· 台帳 1076 · 教訓 LL94–LL97。本境實測:MDL159 十一檢 11/11(收容件 40 件 · 被動過 0)· ENG086 v0106 十九檢 19/19 · PS 啟動器六檢 6/6。"
   }
  ],
- "updated_at": "2026-09-17 08:55",
- "batch": "批543"
+ "updated_at": "2026-09-17 09:45",
+ "batch": "批544"
 }

@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批543)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批544)
 
-> 產生 2026-09-17 09:14:42 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-17 09:40:38 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -251,17 +251,21 @@
 - LL91(批542)「跑太慢」的時候,先把秒數拆開再決定加什麼。操作員說慢、要我再加 25 個 PS 加速器——量完才知道:25 個加速器早就在冊(MDL156 accelerators=25),活樹 797 支 py 的加速器橋也早就 100%(via-sweep accel_miss 0)。慢的不是加速器,是**每一道 py 指令都要穿過的那件外套**:python 側 `-c pass` 只要 20ms,外套收 279ms,開視窗第一道再多付 1137ms——而那 1137ms 裡有 625ms 是「每格睡 25ms」的純動畫,快取模式根本沒有東西要等。照著要求再加 25 個,只會讓已經 100% 的東西變成 100%,慢照樣慢。加東西之前先量哪一段在花時間;量不出來就不要加。
 - LL92(批543)「叫不出來」幾乎都不是短令寫錯,是**七處只做了六處**。操作員打 `via-pyprog` 得到「無法將…辨識為 Cmdlet」,查下去是冊上有 function、身邊沒有同名 .cmd 梭;再查才發現冊上 133 個短令只有 93 個有梭,缺 40 個(via-vcgc / via-panorama / via-ryg / via-bus / via-boot 全在內),不是只有我新加的兩個。新加一個短令時,冊上定義、同名梭、自測站、台帳、docs、SSOT、總控頁——七處要一次做完;少一處的代價不是難看,是那個功能在操作員手上等於不存在。
 - LL93(批543)寫檢查的時候,量「到得了嗎」不要量「長得像不像」。我第一版要求每個 .cmd 都走『點源冊尾版 + %~n0』的樣板,六個檔當場判紅——查完全是獨立啟動器(VIA-ALL 做 git 自癒、VIA-TOWER-RESET 清埠、via-pipeline 各自 glob 自己的 ps1),它們用另一條路到達,一樣到得了。第二版把條件放寬成『要有動態解析』,正則卻只寫 `-v*.ps1`,漏掉 `_v*.ps1`,又冤枉了 via-vrnin。兩次都是同一種錯:我把自己熟悉的形狀當成正確的定義。最後只留一條真的會咬人的——**版號不得釘死**(尾版律),其餘形狀不是我該管的。
+- LL94(批544)一檢在本境永遠是綠的,不代表它沒用——要看它在**有問題的那台機器上**會不會亮。批541 加的 ⑱(收容件位元錨)在容器裡三方一致、每次都綠,當時看起來像一檢多餘的東西;批543 操作員在工作站跑 via-ryg,它第一次真跑就咬到:VRN 收容件 md5 7bedf1d6 ≠ 冊上的 d4cdaedf,檔案多了 612 位元組,而冊沒被動。倉庫裡那份是乾淨的,所以是工作站那一份被就地改過(最可能是某次全樹補橋把 629B 的 ACCEL-BRIDGE 注進了收容件——LL72 同一種事故換個地方發生)。檢查的價值在於它能不能在壞掉的那一天亮,不在於它平常好不好看。
+- LL95(批544)紅燈要能自救。①/⑱ 原本只丟兩串 md5 給人看,操作員拿到的是「7bedf1d6≠d4cdaedf」——那是事實,但不是幫助。v0106 改成失敗時直接印出還原指令(git checkout 那一行)與正確的位元數,並講明還原是他的手(不代設)。同一個道理:掉球清單要寫「要什麼、找誰」,不是只寫「缺」。
+- LL96(批544)掃自己原始碼的檢查,一定要先把自測本體切掉。CGC_MDL159 第一版十檢有四檢 FAIL,查完全是**自我指涉**:斷言裡寫的字串(`src='http`、`def build_matrix`、`.write_text(`)被自己掃到;還有 `class=tabs` 含 `class=tab` 導致分頁數多算一個。都不是程式的問題,是我在講的話被當成程式在做的事。切法沿用批540:`full.split('\\ndef selftest()')[0]`,而且比對用夠長的 token(`class=tab data-t=`)不要用會被包住的短字串。
+- LL97(批544)沒帶逾時就是**無上限等下去**,那正是卡斷的來源。Invoke-VIAPython 的 -TimeoutSec 預設 0,而 0 走的是「永遠等」那條路:引擎一掛住,那個視窗就再也回不來。批544 改成沒帶就套保底天花板(預設 1800s,VIA_PY_TIMEOUT_SEC 可調,真要不設限才寫 0),並在逾時訊息裡講明這是保底不是判它壞、以及怎麼調大。任何「等外部東西回來」的迴圈都要有天花板。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 206.0 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 206.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 790 列 · 全庫同步 {'hash': 'e7d24e71e08e', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'cb273c1bca5f', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 802 列 · 全庫同步 {'hash': '2b8242192eae', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '47501ab68fa1', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -270,9 +274,9 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 81 · 規格項 63 · 格子站 230(在位 230)· Register 指令 135 · Manager 正式名稱 任務 81 / 引擎 91
+- Deck 任務 81 · 規格項 63 · 格子站 231(在位 231)· Register 指令 136 · Manager 正式名稱 任務 81 / 引擎 91
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0212.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0213.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -391,6 +395,7 @@
 - `via-boot`(別名 啟動層):批476:via-boot=啟動層實證:每個家族真的起一個子行程,印它看到的(加速器 | 網路件 | via_net 可 import | 同意閘)
 - `via-vetf`(別名 via-vatetf/主動ETF應用/共識擴充):via-vetf -Factset <檔> -Yfinance <檔> -AsOf 2026-09-12 -Holdings <庫::表> -Prices <庫::表>
 - `via-fplogic`(別名 首頁邏輯):── 批522:via-fplogic —— 第一頁邏輯補缺正主橋(VRN_ENG086;收容件 functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522 零觸碰;status|gap|bench [--limit N]|enrich [--in DIR] [--limit N];vrn 境 python)
+- `via-unified`(別名 統一主控):via-unified selftest   十一檢(含收容件位元體檢與負控)
 - `via-pyprog`(別名 啟動器自測):via-pyprog -Bench     六檢 + 首發/後續耗時(批542 之前:首發 1137ms · 後續 279ms)
 - `via-vrnrules`(別名 研報規則):via-vrnrules selftest          十檢自測(含候選閘門負控:假的擋掉、真的放得出來)
 - `via-nlpvrn`(別名 NLP研報/NLP串接):── 批529:via-nlpvrn —— NLP文字修復+證據型摘要→VRN ENG072/ENG073→VDF ENG087 唯讀狀態
@@ -412,21 +417,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5146/5146 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
-- 尾版引擎/模組家族 241 · 中央冊已登 241 · **未登 0** · 操作介面有掛載 199 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 5162/5162 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4301, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
+- 尾版引擎/模組家族 242 · 中央冊已登 242 · **未登 0** · 操作介面有掛載 200 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1075 筆 · 元件 149 · 更新 2026-09-17 08:55
-- 元件冊 OK · ACTIVE 5146 · RETIRED 115 · 更新 2026-09-17T09:14:42 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
+- 全域台帳 1076 筆 · 元件 149 · 更新 2026-09-17 09:45
+- 元件冊 OK · ACTIVE 5162 · RETIRED 115 · 更新 2026-09-17T09:40:37 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4301, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-17 05:24 批539 六處拔線 + 本境卸載。批534 只刪了檔,接線還指著已不存在的 CGC_MDL151 / VDF_ENG083 / VAP_ENG004_TAFactory / VDF
 - 2026-09-17 06:47 批540 VRN 規則收斂第一步(零改線)。量出硬落差:同一套評等詞彙在四支現役引擎各有各的版本——ENG086 38/38(正本,64 份真研報驗過)· ENG073 17/38
 - 2026-09-17 07:45 批541 VRN 規則收斂第二步(仍零改線,只多了兩個量尺與一個裁定)。① 去衝突:合併收容件字典×SSOT 正本×橋側補冊三張券商表,掃出 17 個原始撞名、合併後仍有 2 個活
 - 2026-09-17 07:58 批540 立了 SUP_MDL749 規則正本樞紐卻**沒給短令**——七處少一處,等於你在工作站叫不出它。補 via-vrnrules(status|drift|conflict
 - 2026-09-17 08:20 先量再說,量出來兩件已完成、一件是真的:① 25 個 PS 加速器**早就在冊**——VIA_Accelerator_Roster_SSOT accelerators=25、VIA
 - 2026-09-17 08:55 根因不是短令寫錯,是功能註冊七處只做了六處:冊上有 function global:via-pyprog,身邊沒有同名 .cmd 梭。而且不是只有我新加的兩個——量完是冊上 133
+- 2026-09-17 09:45 六個獨立流程,彼此不共用狀態:F1 收容件汙染——操作員工作站跑 via-ryg,ENG086 的 ⑱ 第一次真跑就咬到:VRN 收容件 md5 7bedf1d6 ≠ 錨 d4cd
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1980,6 +1985,95 @@ MDL157 那一檢是版號無關的,所以**不是紅燈**;但這是一個會慢�
 改 bootstrap 的影響面太大,本批不碰,記在這裡備查。
 
 新教訓 **LL92**(七處少一處=那個功能在操作員手上等於不存在)· **LL93**(量「到得了嗎」不要量「長得像不像」)。
+
+---
+
+### 批544 —— 六個獨立流程:⑱ 在你機器上咬到真東西了
+
+操作員令:「ps加25個加速器不卡斷 · 全景式分析後分六個獨立流程 · 在不傷害系統不引起九頭龍風險下進行修正 ·
+動態進度條 · 將跳出的兩個 html 整合唯一放在 tab 2 · tab 1 放要給 ai 的資訊全部放一起 · 字小一點專業 ·
+可將整頁內容轉換成 json/md」
+
+#### F1 —— 你的工作站上,VRN 收容件被就地改過
+
+你貼的 `via-ryg vrn` 裡有這兩行,是這一批最重要的東西:
+
+```
+[FAIL] ① 收容件在位…md5 7bedf1d6 ≠ d4cdaedf
+[FAIL] ⑱ 批541 收容件導入驗證 (錨 ≠錨 md5 7bedf1d6 · 30727B · 冊 =錨 · 模組 11/11)
+```
+
+讀法:**冊沒被動,檔被動了**,而且多了 **612 位元組**(30,727 − 30,115)。
+倉庫裡那份是乾淨的(`d4cdaedf`),所以是工作站那一份被就地改過。
+最可能的兇手:某次全樹補橋把 `[VIA:ACCEL-BRIDGE]`(約 629 B)注進了收容件——
+**LL72 記過的同一種事故,只是這次落在 VRN 的收容件上**。
+這也解釋了為什麼同一份 30,115 B 的原檔今天被上傳了四次:那是在試圖把它救回來。
+
+> **批541 我加 ⑱ 的時候,它在本境永遠是綠的**,看起來像一檢多餘的東西。
+> 到你機器上第一次真跑就咬到。檢查的價值在於它能不能在壞掉的那天亮,不在平常好不好看(LL94)。
+
+`ENG086 v0106` 只改一件事:**紅燈要能自救**。①/⑱ 失敗時直接印還原指令,不再只丟兩串 md5:
+
+```
+  [FAIL] ① 收容件在位(尾版 glob)且 md5 對冊(零觸碰) (… md5 a271b64a≠d4cdaedf)
+     ↳ 救法(你的手,一行):git checkout -- "functional modules/VRN/references/intake/…/VIA_VRN_FirstPageEngine_2.py"
+       倉庫裡那份就是錨(30,115B / d4cdaedf);工作站這份被就地改過。
+```
+沙盒負控做過:模擬注入 → ① 亮紅並印出救法;還原 → 十九檢 19/19。**本支不代改任何檔**(不代設)。
+
+#### F2 —— 「不卡段」的真正來源:沒帶逾時就是無上限等
+
+`Invoke-VIAPython` 的 `-TimeoutSec` 預設 **0**,而 0 走的是「**永遠等下去**」那條路。
+引擎一掛住,那個視窗就再也回不來——這才是卡斷。
+改成沒帶就套保底天花板(**1800 s**;`$env:VIA_PY_TIMEOUT_SEC` 可調,真要不設限才寫 0),
+逾時訊息講明「這是保底不是判它壞」並附調大的方法。長工(自測格 213 s、你那次 vrn_firstpage 169 s)照跑。
+六檢仍 **FAIL 0**。
+
+#### F3 —— 三張頁整合成一頁(TAB1 給 AI · TAB2 內嵌)
+
+`CGC_MDL159_VIAUnifiedConsole`。**零九頭龍的做法**:它不重算也不重畫那三張頁,
+只把它們用 iframe **相對路徑**內嵌到 TAB2;原頁改版,這裡自動跟著變。
+
+| | 內容 |
+|---|---|
+| **TAB 1** 給 AI 的一頁 | 規矩七條 · 現況卡(律/教訓/台帳/活元件/自測格/全景/短令梭/**收容件位元**)· 冷啟動 · 資料庫 · 最近四筆台帳 · 最近六條教訓 · 座標 |
+| **TAB 2** 頁 | 引擎匯流排矩陣 · 全景稽核 · 中央控管台 —— 三張內嵌,各附「單獨開」連結 |
+
+**收容件位元體檢**(⑪)是這一站最該留的一檢:全樹逐本 `_INTAKE_MANIFEST_*.json` 對 md5。
+本境量到 **40 件 · 被動過 0**;你機器上會點名那一件並附還原指令。
+
+#### F4/F5 —— 動態進度條 · 整頁轉 JSON/MD
+
+進度條沿用全樹慣例 `@@PROGRESS|pct|msg`(PS 側 `Invoke-VIAPython` 轉播)。
+整頁可一鍵轉 **JSON / MD**(payload 與 md 嵌在頁裡,純 Blob 下載,**零 CDN、不連外**);
+同時也落 `.json` / `.md` 兩個檔。字級 12.5 px、表格 12 px、等寬字只用在程式碼。
+
+#### F6 —— 登錄
+
+`Grid v0324`(+統一主控十一檢站;230→**231**)· `Register v0213`(`via-unified` + 梭)· 台帳 1076。
+
+#### 本批我自己又量錯一次(第一版十檢 FAIL 4)
+
+四個 FAIL 全是**自我指涉**:斷言裡寫的字串(``src='http``、``def build_matrix``、``.write_text(``)
+被自己掃到;還有 `class=tabs` 含 `class=tab` 讓分頁數多算一個。
+切法沿用批540:`full.split("\ndef selftest()")[0]`,比對用夠長的 token。修完 **11/11**(LL96)。
+
+#### 你 pull 不下來的原因
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+        VIA_HANDOVER_LATEST.md · docs/VIA_Handover_ONEPAGE.md · VIA_UI_CentralGovernanceConsole_v0100.html
+```
+這三個**正是 `via-vcgc page --publish` 自己產的**。你每次發佈完再 pull 就會撞。
+它們是產物不是手寫,直接丟掉本地版即可:
+
+```powershell
+git checkout -- VIA_HANDOVER_LATEST.md "VeritasIntelligenceAnalytics/docs/VIA_Handover_ONEPAGE.md" "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_CentralGovernanceConsole_v0100.html"
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+```
+
+新教訓 **LL94**(本境永遠綠不代表沒用)· **LL95**(紅燈要能自救)· **LL96**(掃自己原始碼先切掉自測本體)·
+**LL97**(沒帶逾時就是無上限等)。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 

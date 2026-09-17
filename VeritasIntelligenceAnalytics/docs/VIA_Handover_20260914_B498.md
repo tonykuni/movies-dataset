@@ -1549,3 +1549,92 @@ MDL157 那一檢是版號無關的,所以**不是紅燈**;但這是一個會慢�
 改 bootstrap 的影響面太大,本批不碰,記在這裡備查。
 
 新教訓 **LL92**(七處少一處=那個功能在操作員手上等於不存在)· **LL93**(量「到得了嗎」不要量「長得像不像」)。
+
+---
+
+## 批544 —— 六個獨立流程:⑱ 在你機器上咬到真東西了
+
+操作員令:「ps加25個加速器不卡斷 · 全景式分析後分六個獨立流程 · 在不傷害系統不引起九頭龍風險下進行修正 ·
+動態進度條 · 將跳出的兩個 html 整合唯一放在 tab 2 · tab 1 放要給 ai 的資訊全部放一起 · 字小一點專業 ·
+可將整頁內容轉換成 json/md」
+
+### F1 —— 你的工作站上,VRN 收容件被就地改過
+
+你貼的 `via-ryg vrn` 裡有這兩行,是這一批最重要的東西:
+
+```
+[FAIL] ① 收容件在位…md5 7bedf1d6 ≠ d4cdaedf
+[FAIL] ⑱ 批541 收容件導入驗證 (錨 ≠錨 md5 7bedf1d6 · 30727B · 冊 =錨 · 模組 11/11)
+```
+
+讀法:**冊沒被動,檔被動了**,而且多了 **612 位元組**(30,727 − 30,115)。
+倉庫裡那份是乾淨的(`d4cdaedf`),所以是工作站那一份被就地改過。
+最可能的兇手:某次全樹補橋把 `[VIA:ACCEL-BRIDGE]`(約 629 B)注進了收容件——
+**LL72 記過的同一種事故,只是這次落在 VRN 的收容件上**。
+這也解釋了為什麼同一份 30,115 B 的原檔今天被上傳了四次:那是在試圖把它救回來。
+
+> **批541 我加 ⑱ 的時候,它在本境永遠是綠的**,看起來像一檢多餘的東西。
+> 到你機器上第一次真跑就咬到。檢查的價值在於它能不能在壞掉的那天亮,不在平常好不好看(LL94)。
+
+`ENG086 v0106` 只改一件事:**紅燈要能自救**。①/⑱ 失敗時直接印還原指令,不再只丟兩串 md5:
+
+```
+  [FAIL] ① 收容件在位(尾版 glob)且 md5 對冊(零觸碰) (… md5 a271b64a≠d4cdaedf)
+     ↳ 救法(你的手,一行):git checkout -- "functional modules/VRN/references/intake/…/VIA_VRN_FirstPageEngine_2.py"
+       倉庫裡那份就是錨(30,115B / d4cdaedf);工作站這份被就地改過。
+```
+沙盒負控做過:模擬注入 → ① 亮紅並印出救法;還原 → 十九檢 19/19。**本支不代改任何檔**(不代設)。
+
+### F2 —— 「不卡段」的真正來源:沒帶逾時就是無上限等
+
+`Invoke-VIAPython` 的 `-TimeoutSec` 預設 **0**,而 0 走的是「**永遠等下去**」那條路。
+引擎一掛住,那個視窗就再也回不來——這才是卡斷。
+改成沒帶就套保底天花板(**1800 s**;`$env:VIA_PY_TIMEOUT_SEC` 可調,真要不設限才寫 0),
+逾時訊息講明「這是保底不是判它壞」並附調大的方法。長工(自測格 213 s、你那次 vrn_firstpage 169 s)照跑。
+六檢仍 **FAIL 0**。
+
+### F3 —— 三張頁整合成一頁(TAB1 給 AI · TAB2 內嵌)
+
+`CGC_MDL159_VIAUnifiedConsole`。**零九頭龍的做法**:它不重算也不重畫那三張頁,
+只把它們用 iframe **相對路徑**內嵌到 TAB2;原頁改版,這裡自動跟著變。
+
+| | 內容 |
+|---|---|
+| **TAB 1** 給 AI 的一頁 | 規矩七條 · 現況卡(律/教訓/台帳/活元件/自測格/全景/短令梭/**收容件位元**)· 冷啟動 · 資料庫 · 最近四筆台帳 · 最近六條教訓 · 座標 |
+| **TAB 2** 頁 | 引擎匯流排矩陣 · 全景稽核 · 中央控管台 —— 三張內嵌,各附「單獨開」連結 |
+
+**收容件位元體檢**(⑪)是這一站最該留的一檢:全樹逐本 `_INTAKE_MANIFEST_*.json` 對 md5。
+本境量到 **40 件 · 被動過 0**;你機器上會點名那一件並附還原指令。
+
+### F4/F5 —— 動態進度條 · 整頁轉 JSON/MD
+
+進度條沿用全樹慣例 `@@PROGRESS|pct|msg`(PS 側 `Invoke-VIAPython` 轉播)。
+整頁可一鍵轉 **JSON / MD**(payload 與 md 嵌在頁裡,純 Blob 下載,**零 CDN、不連外**);
+同時也落 `.json` / `.md` 兩個檔。字級 12.5 px、表格 12 px、等寬字只用在程式碼。
+
+### F6 —— 登錄
+
+`Grid v0324`(+統一主控十一檢站;230→**231**)· `Register v0213`(`via-unified` + 梭)· 台帳 1076。
+
+### 本批我自己又量錯一次(第一版十檢 FAIL 4)
+
+四個 FAIL 全是**自我指涉**:斷言裡寫的字串(``src='http``、``def build_matrix``、``.write_text(``)
+被自己掃到;還有 `class=tabs` 含 `class=tab` 讓分頁數多算一個。
+切法沿用批540:`full.split("\ndef selftest()")[0]`,比對用夠長的 token。修完 **11/11**(LL96)。
+
+### 你 pull 不下來的原因
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+        VIA_HANDOVER_LATEST.md · docs/VIA_Handover_ONEPAGE.md · VIA_UI_CentralGovernanceConsole_v0100.html
+```
+這三個**正是 `via-vcgc page --publish` 自己產的**。你每次發佈完再 pull 就會撞。
+它們是產物不是手寫,直接丟掉本地版即可:
+
+```powershell
+git checkout -- VIA_HANDOVER_LATEST.md "VeritasIntelligenceAnalytics/docs/VIA_Handover_ONEPAGE.md" "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_CentralGovernanceConsole_v0100.html"
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+```
+
+新教訓 **LL94**(本境永遠綠不代表沒用)· **LL95**(紅燈要能自救)· **LL96**(掃自己原始碼先切掉自測本體)·
+**LL97**(沒帶逾時就是無上限等)。

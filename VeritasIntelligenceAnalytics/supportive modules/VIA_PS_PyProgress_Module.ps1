@@ -131,6 +131,15 @@ function Invoke-VIAPython {
     #   ③ **進度條節流**:Write-Progress 在 Windows 主控台是重繪整條橫幅,很貴。原本每 250ms 無條件重繪,
     #      即使那一秒什麼都沒變。改成「秒數變了或狀態行變了」才畫。
     #   ④ **短跑免橫幅**:400ms 內就結束的指令不該閃一條橫幅再消失——那一閃本身就是成本。
+    # 批544 不卡斷保底:沒帶 -TimeoutSec 時原本是 **無上限**等下去——引擎一旦掛住,
+    # 這個視窗就永遠回不來(操作員令「不卡段」講的就是這件事)。
+    # 給一個高天花板(預設 1800s=30 分;VIA_PY_TIMEOUT_SEC 可調,設 0 才是真的不設限),
+    # 長工(自測格 213s、籌碼回補數分鐘)照樣跑完,掛住的則會誠實被停掉並回 rc 124。
+    if ($TimeoutSec -le 0) {
+        $capEnv = $env:VIA_PY_TIMEOUT_SEC
+        if ($null -ne $capEnv -and $capEnv -ne "") { $TimeoutSec = [int]$capEnv }
+        else { $TimeoutSec = 1800 }
+    }
     $script:__viaProgOn = $false; $lastKey = ""; $poll = 10
     $swPoll = [Diagnostics.Stopwatch]::StartNew()
     while (-not $p.HasExited) {
@@ -157,6 +166,7 @@ function Invoke-VIAPython {
     if ($script:__viaProgOn) { Write-Progress -Id 13 -Activity ("VIA · " + $name) -Completed }
     $rc = if ($timedOut) { 124 } else { try { $p.WaitForExit(); $p.ExitCode } catch { 1 } }
     Remove-Item -LiteralPath $outF, $errF -Force -ErrorAction SilentlyContinue
-    if ($timedOut) { Write-Host ("  [Invoke-VIAPython] 逾 {0}s 已停(不卡斷;只殺自己生的樹)" -f $TimeoutSec) -ForegroundColor Yellow }
+    if ($timedOut) { Write-Host ("  [Invoke-VIAPython] 逾 {0}s 已停(不卡斷;只殺自己生的樹)。這是保底天花板,不是判它壞——" -f $TimeoutSec) -ForegroundColor Yellow
+                     Write-Host ("  真的需要更久:`$env:VIA_PY_TIMEOUT_SEC=3600 後重跑;要完全不設限用 0(自負卡住風險)") -ForegroundColor DarkGray }
     $global:LASTEXITCODE = $rc
 }
