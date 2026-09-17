@@ -8082,8 +8082,17 @@
    "code": "批564 工作站實錄:via-consensus 無法辨識(兩次)",
    "kind": "**補我自己的漏。**批563 立了 VDF_ENG088 共識融合橋,卻沒跑功能註冊七處,然後在回覆與 docs 的一貼即用裡叫操作員跑 `via-consensus`——他照打兩次,兩次都是「無法將 'via-consensus' 字詞辨識為…」。冊上沒有那個函式,身邊也沒有梭。修:Register v0214 +via-consensus(別名 共識橋;無參數=status)+ via-consensus.cmd(梭模板,CRLF)。**更重要的是補上會抓到這一類的檢**,而這一檢我試了三把尺才留下一把(LL86:尺錯了量出來的全不可信):① 「可跑引擎都要有短令」→ 273 個家族裡 194 個冊上沒有 = 一面假紅牆(多數是內部件/樞紐);② 「自測格點名 + 只有 v0100 + 冊上沒有」→ 還有 19 支,多是別人 import 的樞紐,照樣假紅;③ **只量一貼即用區塊裡真的被呼叫的短令** → 430 次呼叫只有 3 個對不上,而那 3 個全部可解釋(`via-envmanager-governance-7cls8h` 是分支名被 regex 誤抓;`via-talib`/`via-taone` 是 L50 退役令,冊上沒有才是對的)。扣掉這兩類 = 零噪音 → 這把尺留下來,寫進 MDL157 v0103(24→25 檢)。負向對照實跑:塞 via-thiscommanddoesnotexist 進 docs → RED 24/25;撤掉 → GREEN 25/25。順手修:MDL157 的 VERSION 我照抄成 v0102 而檔是 v0103,橫幅印錯版號——改成從檔名取,一個會說謊的版號下次就是有人拿它去對版本",
    "batch": 564
+  },
+  {
+   "ts": "2026-09-17 16:20",
+   "op": "FIX",
+   "category": "功能註冊",
+   "component": "VIA_UI_MasterControl_v0100.html 再生(98→99 現役引擎族)",
+   "code": "批565 CI 實錄:PR #39 test_11_committed_page_matches_generator FAIL",
+   "kind": "**同一類漏,兩批內第二次。**批563 新增 VDF_ENG088 讓現役引擎族 98→99,但我沒再生總控頁——tracked 的 MasterControl 還印 98,CI 的 test_11 逐字比對「committed 頁 vs 正主管理器輸出」當場 FAIL(`<b>98</b>` != `<b>99</b>`,訊息就寫著『tracked MasterControl 與正主管理器輸出不同步』)。批564 漏的是七處裡的「短令+梭」,批565 漏的是「總控頁再生」——**新增一支引擎會改變的東西比我記得的多**。修:跑 VIA_SYSTEM_MANAGER_v0140.py --no-open 再生,diff 剛好 4 行(時戳 + 98→99 兩處 + 引擎表多一列),沒有夾帶。推之前先在本境把那支合約測跑過:**19/19 OK**(先重現紅、再證明綠,不是推上去碰運氣)。這一次守衛本來就在(CI test_11),我漏的是**推之前沒跑它**",
+   "batch": 565
   }
  ],
- "updated_at": "2026-09-17 16:35",
- "batch": 564
+ "updated_at": "2026-09-17 16:20",
+ "batch": 565
 }
