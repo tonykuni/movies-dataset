@@ -1638,3 +1638,60 @@ git pull --ff-only origin claude/via-envmanager-governance-7cls8h
 
 新教訓 **LL94**(本境永遠綠不代表沒用)· **LL95**(紅燈要能自救)· **LL96**(掃自己原始碼先切掉自測本體)·
 **LL97**(沒帶逾時就是無上限等)。
+
+---
+
+## 批545 —— 救法沒救到:紅燈點名的是資料夾,不是那個檔
+
+你照 v0106 印的救法跑了 `git checkout -- "…/VIA_VRN_FirstPageEngine_2.py"`,**沒有報錯**,
+再跑 `via-ryg` md5 還是 `7bedf1d6`。不是 git 沒動,是**它動的那個檔根本不是被算到的那個**。
+
+### 根因:選檔方式
+
+```python
+ENGINE_GLOB = "VIA_VRN_FirstPageEngine*.py"
+intake_engine_file() = sorted(home.glob(ENGINE_GLOB))[-1]     # ← 排最後的那個
+```
+
+收容件夾裡只要多一個排在 `_2.py` **後面**的同系列檔(`_3.py`、`_v0101.py`…),
+它就自動變成「正典」。而那種檔多半是**未追蹤**的,`git checkout` 根本動不到它。
+
+> 這是「尾版律」被套錯地方:那條律是給**我方版本號遞增的引擎檔**用的。
+> 收容件的正典是**冊上點名的那個檔名**,要按名字取,不是按排序取(LL98)。
+
+### 容器裡重現過
+
+丟一個 30,727 B 的 `VIA_VRN_FirstPageEngine_3.py` 進收容件夾:
+
+| 版本 | 結果 |
+|---|---|
+| v0106(你手上那版) | **① ⑱ 兩檢同時亮紅** —— 跟你貼的一模一樣 |
+| v0107 | **① ⑱ 綠**(引擎吃對了)· **⑲ 紅**,當場點名 `VIA_VRN_FirstPageEngine_3.py` |
+
+### v0107 四件
+
+1. 錨檔一律**按名字取**(`home / INTAKE_ANCHOR["name"]`),不再吃 glob 排序
+2. `intake_files()` 把夾內**每一個**同系列檔列出來(檔名 · 位元 · md5),多出來的當場現形
+3. 救法分兩種講:錨檔被改過 → `git checkout`;**夾內多餘檔** → 未追蹤,git 救不了,要你自己挪走
+4. **新增 ⑲** —— 按名字取之後 ①⑱ 會轉綠,**那一刻最危險**:夾裡那個多餘檔還在,
+   轉綠等於把汙染掃到地毯下。所以分兩盞燈:**引擎吃對了**一盞、**夾子乾不乾淨**另一盞
+
+### 你機器上先確認那個檔叫什麼
+
+```powershell
+Get-ChildItem "functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522\VIA_VRN_FirstPageEngine*.py" |
+  ForEach-Object { "{0,-42} {1,7} B  {2}" -f $_.Name, $_.Length, (Get-FileHash $_ -Algorithm MD5).Hash.Substring(0,8) }
+```
+冊上只認 `VIA_VRN_FirstPageEngine_2.py`(30,115 B / `d4cdaedf`);其他的都是後來放進去的。
+
+### 你 pull 不下來,是我給錯路徑
+
+你人在 `VeritasIntelligenceAnalytics\` 底下,我給的卻是**倉庫根**相對路徑,所以 git 說 pathspec 不認。
+從你現在這個位置要這樣打:
+
+```powershell
+git checkout -- ..\VIA_HANDOVER_LATEST.md docs\VIA_Handover_ONEPAGE.md "supportive modules\ui_support\VIA_UI_CentralGovernanceConsole_v0100.html"
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+```
+
+新教訓 **LL98**:尾版律不能套在收容件上;收容件的正典是冊上點名的那個檔名。
