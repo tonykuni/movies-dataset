@@ -8003,8 +8003,16 @@
    "component": "VRN_ENG072_FirstPageText_v0133 + Grid v0330",
    "code": "批551 操作員開了 VIA_OCR_TRACE=1 再跑,同一個位置還是被切斷",
    "kind": "眼罩有兩層,第二層也是我自己蒙的。批550 拆掉例外格式化的 str(exc)[:60],操作員開追蹤再跑一次拿到的還是同一句話——切它的是 ㉜ 自己的註記 `f\"({_g32[:90]})\"`,那句正好 90 字。v0133:自測註記一律走 _note()(預設仍切,一行一檢不能爆版;VIA_OCR_TRACE=1 給全文),㉜/㉝/㊷/㊻ 四處註記切片一併改;加 ㊿ 用那句真話當夾具釘住(關=90 字看不到檔名 · 開=157 字看得到 inference.pdiparams)。五十檢 50/50。**㉜ 本身仍未解**——但這次開關是真的一路開到底了。順帶,操作員那一跑的 log 有兩行值得記:『PP-Structure 不可用,改用 PaddleOCR:ImportError』與『Engine paddle_static is unavailable because dependency paddlepaddle is not installed』——後者與 find_spec('paddle')=True 看似矛盾(paddle 模組在,但 paddlepaddle 發行版沒裝齊),**列為觀察,未證實,不入結論**。教訓 LL105。"
+  },
+  {
+   "ts": "2026-09-17 15:05",
+   "op": "ASSIGN",
+   "category": "功能性引擎",
+   "component": "VRN_ENG072_FirstPageText_v0134 + Grid v0331",
+   "code": "批552 ㉜ 根因:FileNotFoundError 缺的是 far/scan65.pdf,而那個檔從來沒被建立過",
+   "kind": "兩層眼罩(批550 例外格式化 [:60] · 批551 自測註記 [:90])都拆掉之後,操作員拿到完整訊息:缺的是 `…\\\\任意位置\\\\操作員隨手放的夾\\\\scan65.pdf`。查夾具——**那個檔從來沒被建立過**:只存了 scan65.png,而 v0133 之前的註解裡我自己還寫著「far 沒有 scan65.pdf,只有 scan65.png」,㉜/㉞/㉟ 卻照樣拿它當輸入。本境一直綠是因為容器裡一個 OCR 後端都沒有,ocr_page1 在碰到檔案**之前**就 SKIP 了——綠燈是「沒走到那一步」換來的;操作員機器上 tesseract 在,走得更遠才真的去開檔。㉟ 那句『auto_dpi 失敗 FileNotFoundError→退帶頂 350』也是同一個檔,只是它把例外吞了。v0134 三件:① 照掃描件語意把 scan65.pdf 真的造出來(一頁·只有影像·無文字層);② 加 51 驗夾具完整性(宣稱要用的檔一個都不能少 + scan65.pdf 真的是掃描件);③ ㉓ 的斷言從『寫死兩邊檔名集合』改成『驗兩閘的差集剛好是影像件』——夾具一長件舊斷言就判錯(LL103 同族)。實測 51/51 全綠,而且 ㉜ 是**因為對的理由**綠的(檔案在、後端標壞後真的 SKIP);㉟ 從『auto_dpi 失敗』變成『原生 300 DPI 落在帶內→取 310』。51 這一檢第一版我放在自測結尾,那時 far 暫存夾早就清掉了,報四個檔全缺——它說的是實話,是我放錯位置,已移進夾具作用域內。教訓 LL106。"
   }
  ],
- "updated_at": "2026-09-17 14:25",
- "batch": "批551"
+ "updated_at": "2026-09-17 15:05",
+ "batch": "批552"
 }
