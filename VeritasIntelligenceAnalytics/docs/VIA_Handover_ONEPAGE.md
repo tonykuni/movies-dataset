@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批541)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批542)
 
-> 產生 2026-09-17 07:43:14 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-17 09:05:58 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -248,17 +248,18 @@
 - LL88(批541)「檔案在」不等於「導得進來」,「檔案對冊」也不等於「驗過」。收容件的 md5 冊跟收容件放在同一個資料夾:兩邊一起被換掉,md5 仍然一致,綠燈照亮——那是自洽,不是驗證(跟 LL74 先建後斷言同一種形狀)。期望值要有一份寫死在**程式碼裡**當錨,錨不在那個資料夾裡,才擋得住。而且位元對也只是第一段:真的 exec_module 導得進來、冊上宣告的模組一個不少,三段全過才算導入成立。
 - LL89(批541)濾網修到「真語料端出 0 條」之後,那個 0 本身就變得可疑——一個永遠回 0 的濾網跟一盞假綠燈沒有兩樣(LL77 的同族)。每一道濾網都要配一個負控:合成一組資料,假的要擋掉、真的要放得出來,兩邊都對才算這道濾網在工作。斷言只寫「沒有壞東西」的檢查,擋不住「什麼都沒看」。
 - LL90(批541)同一件事的規則散在多處時,「同義」的裁定權在操作員不在我:冊上把 CLSA 與 CLST 分成兩家、把 CTBC 與中信分開看,都是冊自己的說法;操作員一句「clsa = clst」「CTBC 中信」就是正本。我該做的是照裁定併冊(原文保留在 merged_ 鍵下,只增不減)並當場量回歸,不是拿冊去反駁人。
+- LL91(批542)「跑太慢」的時候,先把秒數拆開再決定加什麼。操作員說慢、要我再加 25 個 PS 加速器——量完才知道:25 個加速器早就在冊(MDL156 accelerators=25),活樹 797 支 py 的加速器橋也早就 100%(via-sweep accel_miss 0)。慢的不是加速器,是**每一道 py 指令都要穿過的那件外套**:python 側 `-c pass` 只要 20ms,外套收 279ms,開視窗第一道再多付 1137ms——而那 1137ms 裡有 625ms 是「每格睡 25ms」的純動畫,快取模式根本沒有東西要等。照著要求再加 25 個,只會讓已經 100% 的東西變成 100%,慢照樣慢。加東西之前先量哪一段在花時間;量不出來就不要加。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 204.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 205.8 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 781 列 · 全庫同步 {'hash': '7d005415c0e1', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '35f90a31ef09', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 784 列 · 全庫同步 {'hash': 'dd147e333718', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '90e6f3ae7fa9', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -267,9 +268,9 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 81 · 規格項 63 · 格子站 230(在位 230)· Register 指令 133 · Manager 正式名稱 任務 81 / 引擎 91
+- Deck 任務 81 · 規格項 63 · 格子站 230(在位 230)· Register 指令 135 · Manager 正式名稱 任務 81 / 引擎 91
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0210.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0212.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -388,6 +389,8 @@
 - `via-boot`(別名 啟動層):批476:via-boot=啟動層實證:每個家族真的起一個子行程,印它看到的(加速器 | 網路件 | via_net 可 import | 同意閘)
 - `via-vetf`(別名 via-vatetf/主動ETF應用/共識擴充):via-vetf -Factset <檔> -Yfinance <檔> -AsOf 2026-09-12 -Holdings <庫::表> -Prices <庫::表>
 - `via-fplogic`(別名 首頁邏輯):── 批522:via-fplogic —— 第一頁邏輯補缺正主橋(VRN_ENG086;收容件 functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522 零觸碰;status|gap|bench [--limit N]|enrich [--in DIR] [--limit N];vrn 境 python)
+- `via-pyprog`(別名 啟動器自測):via-pyprog -Bench     六檢 + 首發/後續耗時(批542 之前:首發 1137ms · 後續 279ms)
+- `via-vrnrules`(別名 研報規則):via-vrnrules selftest          十檢自測(含候選閘門負控:假的擋掉、真的放得出來)
 - `via-nlpvrn`(別名 NLP研報/NLP串接):── 批529:via-nlpvrn —— NLP文字修復+證據型摘要→VRN ENG072/ENG073→VDF ENG087 唯讀狀態
 - `via-nlpunified`(別名 NLP統一/via-nlp-unified):── 批532:via-nlpunified —— SUP_MDL866 統一 NLP 控制入口(Hub→VRN→VDF；附件只走受控 intake)
 - `via-central`(別名 VIA中央):via-central quantguard -SelfTest           VIA→VDF_ENG086 QuantGuard 實測
@@ -407,21 +410,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5144/5144 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5146/5146 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
 - 尾版引擎/模組家族 241 · 中央冊已登 241 · **未登 0** · 操作介面有掛載 199 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1072 筆 · 元件 149 · 更新 2026-09-17 07:45
-- 元件冊 OK · ACTIVE 5144 · RETIRED 115 · 更新 2026-09-17T07:40:35 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 134}
+- 全域台帳 1074 筆 · 元件 149 · 更新 2026-09-17 08:20
+- 元件冊 OK · ACTIVE 5146 · RETIRED 115 · 更新 2026-09-17T09:05:57 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-16 21:02 批538 VRN 段三站全綠。① 首頁全能引擎 v0125:`--file` 後面沒有值時舊行為是「印一句忽略然後照樣退回掃預設收件夾」,收件夾一有東西就變成默默處理另一批檔且回 
-- 2026-09-16 21:09 批538 VDF 段四站全綠。① ENG060 v0104 + ② ENG061 v0102:數學實證寫死 2330.TW,本境庫 892 檔沒有 2330;改成挑任何一支真有資料
 - 2026-09-16 21:17 批538 收尾四件。① VAP_ENG005 v0101:⑥⑩ 走 seaborn corrheat,本境沒裝就報紅;改誠實 SKIP + pip 行(不代裝),並把計數改成 OK
 - 2026-09-17 05:24 批539 六處拔線 + 本境卸載。批534 只刪了檔,接線還指著已不存在的 CGC_MDL151 / VDF_ENG083 / VAP_ENG004_TAFactory / VDF
 - 2026-09-17 06:47 批540 VRN 規則收斂第一步(零改線)。量出硬落差:同一套評等詞彙在四支現役引擎各有各的版本——ENG086 38/38(正本,64 份真研報驗過)· ENG073 17/38
 - 2026-09-17 07:45 批541 VRN 規則收斂第二步(仍零改線,只多了兩個量尺與一個裁定)。① 去衝突:合併收容件字典×SSOT 正本×橋側補冊三張券商表,掃出 17 個原始撞名、合併後仍有 2 個活
+- 2026-09-17 07:58 批540 立了 SUP_MDL749 規則正本樞紐卻**沒給短令**——七處少一處,等於你在工作站叫不出它。補 via-vrnrules(status|drift|conflict
+- 2026-09-17 08:20 先量再說,量出來兩件已完成、一件是真的:① 25 個 PS 加速器**早就在冊**——VIA_Accelerator_Roster_SSOT accelerators=25、VIA
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1828,6 +1831,93 @@ CTBC 合併後有 7 個別名:`中信 / 中信金 / 中國信託 / ctbc / CTBC /
 
 批540 列的三支落差引擎(ENG073 → 首頁全能 → TW02)**一支都還沒接**,現況照舊跑,一位元沒動。
 你說一個,我就接一個,每接完一支都用同一份 64 份語料驗零回歸。
+
+#### 批541b 補洞:短令 `via-vrnrules`
+
+批540 立了規則正本樞紐卻**沒給短令**——功能註冊七處少一處,等於你在工作站叫不出它。
+Register **v0211** 補上(pwsh 語法解析 OK · 12465 tokens):
+
+```
+via-vrnrules             一行狀態(冊在不在 · 評等詞幾個 · 券商證據分級 · 消費端幾支)
+via-vrnrules drift       逐支現役引擎列「正本有、它沒有」的規則(只量它真的在抽的欄位)
+via-vrnrules conflicts   去衝突:同一別名對到多個正典名 = 撞名,必須是 0
+via-vrnrules harvest     邊實測邊長同義字:端出候選,一律 PENDING_OPERATOR(絕不自己寫進正本冊)
+via-vrnrules selftest    十檢自測(含候選閘門負控)
+```
+
+---
+
+### 批542 —— 「跑太慢」的根因不在加速器,在每道指令都要穿的那件外套
+
+操作員令:「前一個指令跑太慢 請加入25個PS加速器 請確認所有PY指令都有加入加速器」
+
+#### 一、先量再說:你要的兩件,量出來都已完成
+
+| 你問的 | 量到的 | 憑據 |
+|---|---|---|
+| 加 25 個 PS 加速器 | **早就是 25 個** | `VIA_Accelerator_Roster_SSOT` accelerators=25 · `VIA_PS_Accelerators_25_Roster_v0100.ps1` 25 條 · `$global:VIA_ACCEL25` 由它生成 · MDL156 二十三檢 GREEN |
+| 所有 PY 指令都有加速器 | **活樹 100%** | `via-sweep --audit`:活樹 **797** 支 · `accel_have 797` · **`accel_miss 0`** · 網路橋 50/50 |
+
+非活樹另有 accel 缺 66、net 缺 6——66 支全是**舊版號檔**(`VIA_VRN_FirstPageEngine_v0104…v0122` 那種),
+6 支在**凍結產出夾**。依 L55 活樹律這兩類不是活樹,對它們報缺就是假紅(批538 已經處理過同一件事)。
+
+短令側也早就接好:`Register-VIA-Commands` 第 24~33 行就是 `[VIA:PS-ACCEL]` 橋,
+而且**所有 py 指令一律走 `Invoke-VIAPython`** 這個中央唯一入口,沒有繞道。
+
+**所以照著你說的再加 25 個,只會把已經 100% 的東西變成 100%,慢照樣慢。**
+
+#### 二、真的慢在哪:拆秒數
+
+| 段 | 耗時 |
+|---|---|
+| python 本身(`-c pass`) | **~20 ms** |
+| `Invoke-VIAPython` 外套 | **279 ms** |
+| 開視窗第一道再加點燈 | **+1,137 ms** |
+
+拆開是三筆,全在 `supportive modules/VIA_PS_PyProgress_Module.ps1`:
+
+1. **點燈純動畫 625 ms** —— 快取模式每格 `Start-Sleep -Milliseconds 25` × 25 格。
+   快取模式**根本沒有東西要等**,那 625 ms 是畫給人看的,不是工作。
+2. **固定 250 ms 輪詢** —— 每道指令平均多付 125 ms、最壞 250 ms,才發現它其實早就跑完了。
+   而短指令(`--selftest` / `status` / `conflicts`,python 側 0.0~2.5 s)佔絕大多數,卻全額付這個稅。
+3. **`Write-Progress` 每 250 ms 無條件重繪** —— Windows 主控台是重繪整條橫幅,很貴;
+   即使那一秒什麼都沒變也照畫。400 ms 就結束的指令還會閃一條橫幅再消失。
+
+#### 三、改法(只動輪詢節奏,不動排水邏輯)
+
+- 快取點燈**零睡眠**
+- **自適應輪詢**:10 ms 起跳、倍增退到 250 ms —— 短跑幾乎零延遲,長跑照樣 250 ms 一次,CPU 不多花
+- **進度條節流**:秒數或狀態行變了才畫;**400 ms 內免橫幅**
+
+#### 四、實測(同一棵樹、同一條快取路徑量的)
+
+| | 改前 | 改後 | |
+|---|---:|---:|---|
+| 首發(含點燈 25 格) | 1,137 ms | **280 ms** | −75% |
+| 後續每道 | 279 ms | **37 ms** | −87% |
+| 六檢行為 | FAIL 0 | FAIL 0 | 零變更 |
+
+七道一組的區塊(上一則我給你的那種):**3.2 s → 0.5 s,省約 2.7 秒的純外套稅。**
+
+#### 五、行為用六檢釘住(快不能拿正確性換)
+
+改外套最怕的是「快了,但吞掉一行 stdout / 吞掉一個 rc」。新增
+`supportive modules/VIA_PS_PyProgress_Selftest_v0100.ps1`(短令 **`via-pyprog`**):
+
+```
+① 短跑 stdout 一行不少地回到 pipeline   ② rc 0 照實回
+③ 長跑邊跑邊轉播、結束仍收齊            ④ 非零 rc 不吞
+⑤ stderr 不混進 stdout pipeline         ⑥ 逾時 rc 124、不卡斷
+```
+**改前改後跑同一組六檢,都是 FAIL 0。**
+
+#### 六、加一道「別改回去」閘,並且做了負控
+
+`CGC_MDL156` v0103(二十三檢 → **二十八檢**)靜態斷言那三個加速還在、外套六檢在位。
+負控當場做過:**把外套改回舊版 → RED 25/28;還原 → GREEN 28/28。**
+(這正是 LL89——一個永遠會過的檢查跟假綠燈沒兩樣。)
+
+新教訓 **LL91**:「跑太慢」的時候,先把秒數拆開再決定加什麼。量不出來就不要加。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 
