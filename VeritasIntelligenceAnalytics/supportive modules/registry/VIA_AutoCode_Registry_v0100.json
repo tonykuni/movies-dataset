@@ -7987,8 +7987,16 @@
    "component": "VRN_ENG072_FirstPageText_v0131 + Grid v0328",
    "code": "批549 操作員直接叫執行器:err=\"\" · paddleocr SKIPPED_POLICY · binary_available=False",
    "kind": "操作員直接跑 SUP_MDL747,回的 JSON 乾淨:err 空、paddleocr status=SKIPPED_POLICY、probe binary_available=False。執行器沒壞、模組在位(cv2/paddle/paddleocr/pypdfium2 find_spec 全 True),是**收容件 GLE 自己的政策**跳過它;我們的執行器對 paddleocr 的 binary 需求本來就是 None,只是照實回報。㊷ 的舊斷言 `\"paddleocr(\" in _g42` 找的是名稱後面的**左括號**,而那個左括號只在模組缺席時才出現(`paddleocr(缺 paddleocr,paddle)`);裝好之後 tag 是 `paddleocr:SKIPPED_POLICY/0元素`,沒有左括號 → FAIL。**這一檢只有在那個套件不存在時才會過,裝好了反而亮紅。** 它宣稱要驗的『派車道名單』在他機器上明明成立(`OCR_EMPTY[paddleocr+paddle_pdf_pipeline; …]`,ppstructure 確實被濾掉)。v0131 改成驗名單本身(名稱用詞界比對,兩種呈現都認),加 ㊽ 負控:同一份名單兩種呈現要同答案 · ppstructure 真漏進名單要抓得到 · 並在負控裡證明舊斷言在『裝好了』那一種下會判錯(裝好=False)。實測 48/48 零回歸,且不需要 Windows 就證明了他那盞紅燈的成因。**㉜ 仍未解**:他直接叫執行器沒有重現 FileNotFoundError,不猜,留紅等證據。教訓 LL103。"
+  },
+  {
+   "ts": "2026-09-17 13:50",
+   "op": "ASSIGN",
+   "category": "功能性引擎",
+   "component": "VRN_ENG072_FirstPageText_v0132 + Grid v0329",
+   "code": "批550 ㉜ 查不下去的原因是我自己把診斷資訊截掉了(str(exc)[:60])",
+   "kind": "操作員機器實測:v0131 把 ㊷ 修好了(48 檢 OK 47 / FAIL 1,只剩 ㉜)。ㄍ㉜ 追了三批,每次拿到同一句 `FileNotFoundError:[Errno 2] No such file or direct`——因為 tag 用 str(exc)[:60],而 `[Errno 2] No such file or directory: 'C:\\…'` 缺的檔名剛好在第 60 字之後。我三次猜根因(ACCEL-BRIDGE 注入 · pyvenv.cfg home 指到家目錄 · 只剩 638 那條路)全錯,卻沒發現自己戴著眼罩,還一直在那句被切斷的話上面推理。v0132 三件:① VIA_OCR_TRACE=1 給完整訊息 + 完整 traceback(預設行為零變更,tag 不爆版);② _page1_pdf 本來在 try 之外,包進去並另給 LANE_PAGE1_FAIL 字樣——「切頁失敗(還沒派工)」與「派工失敗」要分得出來,否則兩種病共用一個名字;③ ㊾ 驗這個開關真的有用:關=60 字看不到檔名 · 開=450 字含完整路徑與 traceback。四十九檢 49/49。**㉜ 本身仍未解**,這一批只是把眼罩拿掉。教訓 LL104。"
   }
  ],
- "updated_at": "2026-09-17 13:10",
- "batch": "批549"
+ "updated_at": "2026-09-17 13:50",
+ "batch": "批550"
 }
