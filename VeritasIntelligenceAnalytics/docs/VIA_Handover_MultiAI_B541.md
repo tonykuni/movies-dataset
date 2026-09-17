@@ -24,19 +24,19 @@ C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
 | 門 | 檔 | 用途 |
 |---|---|---|
 | **總管** | `VIA_SYSTEM_MANAGER_v0140.py` | 正式任務 81 項 + 總控頁再生。`python VIA_SYSTEM_MANAGER_v0140.py --no-open` |
-| **短令冊** | `Register-VIA-Commands-v0211.ps1` | 所有 `via-*` 短令的來源。**尾版律**:永遠點最新那一支 |
+| **短令冊** | `Register-VIA-Commands-v0213.ps1`(**在母系統根,不在 `supportive modules/`**) | 所有 `via-*` 短令的來源。**尾版律**:永遠點最新那一支 |
 | **中央控管台** | `supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0111.py` | 唯一對接口(律 L20)。`registry-sync --apply` 是元件冊的**唯一寫者** |
-| **自測格** | `supportive modules/registry/CGC_MDL064_SelftestGrid_v0321.py` | **230 站**驗收閘。要判斷系統健不健康,跑這一支就夠 |
+| **自測格** | `supportive modules/registry/CGC_MDL064_SelftestGrid_v0332.py` | **231 站**驗收閘。要判斷系統健不健康,跑這一支就夠。<br>注意:不帶旗標或帶不認得的旗標=**跑全矩陣**(很久);單站除錯用 `--only "站名片段"` |
 
 ### 程式碼分佈(實測檔數,不含收容件與 `__pycache__`)
 
 ```
 functional modules/VDF    182 .py   資料鍛造(價格/籌碼/月營收/ETF)
-functional modules/VRN    299 .py   研報擷取(PDF→欄位→入庫→文摘)
+functional modules/VRN    308 .py   研報擷取(PDF→欄位→入庫→文摘)
 functional modules/VAP    246 .py   自動繪圖與產出
-supportive modules      1,635 .py   治理/登錄/工具(其中 registry 751 支)
+supportive modules      1,650 .py   治理/登錄/工具(其中 registry 765 支)
 ```
-中央治理家族(CGC_MDL***)**126 個**模組編號。
+中央治理家族(CGC_MDL***)**127 個**模組編號。(批555 實測;不含 `__pycache__` 與收容件)
 
 ---
 
@@ -48,10 +48,10 @@ supportive modules      1,635 .py   治理/登錄/工具(其中 registry 751 支
 
 | 庫 | 路徑 | 本境實測 |
 |---|---|---|
-| **台股總庫** | `functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb` | 147 MB · 22 表 · `features_daily` / `prices_canonical` / `tw_daily_prices` / `tw_prices_adj` 各 **577,733 列** · `tw_trading_daily` 57,649 |
+| **台股總庫** | `functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb` | **179 MB** · 22 表 · `features_daily` / `prices_canonical` / `tw_daily_prices` / `tw_prices_adj` 各 **577,733 列** · `tw_trading_daily` 57,649 |
 | **國際總庫** | `functional modules/VDF/output_hub/mega/vdf_global_market.duckdb` | 16 MB · 9 表 · `features_daily` / `gl_prices_adj` / `global_daily` 各 **47,973 列** |
 | **主動式 ETF** | `functional modules/VDF/output_hub/active_tw_etf/…/ActiveTWETF.duckdb` | 3.6 MB · `holdings_daily` 1,125 · `active_tw_etf_universe` 154 |
-| **研報庫** | `functional modules/VRN/db/vrn_reports.duckdb` | 576 KB · `vrn_report_basic` **2 列** ← **本境幾乎是空的** |
+| **研報庫** | `functional modules/VRN/db/vrn_reports.duckdb` | 1.8 MB · 5 表 · `vrn_report_basic` **2 列** ← **本境幾乎是空的**(工作站 64 份) |
 
 ### ⚠️ 本境 ≠ 工作站(教訓 LL49,最容易踩的一個坑)
 
@@ -72,7 +72,7 @@ VIA_Reports/vcgc/               中央控管台一頁交接
 ### 收容件(intake)—— 正本零觸碰
 外來的程式碼/字典/字型一律先落在 `references/intake/`,**原名原位元組,一個 byte 都不准改**,
 旁邊放 `_INTAKE_MANIFEST_*.json` 記 md5/sha256,由「橋」(Bridge 引擎)用 `importlib` 載進來,
-所有防呆都寫在橋這一側。目前 6 個收容夾、共 72 件。
+所有防呆都寫在橋這一側。目前 6 個收容夾、頂層共 72 項(展開後 1,622 個檔)。
 
 ---
 
@@ -82,9 +82,14 @@ VIA_Reports/vcgc/               中央控管台一頁交接
 |---|---|
 | 倉庫 | https://github.com/tonykuni/movies-dataset |
 | **開發分支** | `claude/via-envmanager-governance-7cls8h` |
-| **PR** | [tonykuni/movies-dataset#37](https://github.com/tonykuni/movies-dataset/pull/37) → base `main` |
-| 目前 HEAD | `81e4054c`(批541b) |
-| 上一批 | `f5def0d6`(批541)· `36be0197`(批540)· `594b51a4`(批539) |
+| **PR #37** | [tonykuni/movies-dataset#37](https://github.com/tonykuni/movies-dataset/pull/37) → **已由 tonykuni 併入 `main`**(2026-09-17 12:41Z,併的是 `7ed4d860`=批553;47 commits · 663 檔) |
+| 目前 HEAD | `edb3ad52`(批555) |
+| **分支超前 `main`** | 兩批:`51ec2603`(批554)· `edb3ad52`(批555)。三點差異 **11 檔**,就是這兩批的內容,**沒有夾帶** |
+| `main` 超前分支 | 只有兩個 merge commit(#36 · #37),**內容為零** → 下一個 PR 會乾淨,不需要 rebase |
+| 上一批 | `7ed4d860`(批553,已在 main)· `fce11b2e`(批552)· `103eeb82`(批551) |
+
+> **PR #37 已經是完成品,不能拿來裝新東西。** 批554/555 要開的是**新 PR**(我不自己開,等你一句話)。
+> 分支與 main 沒有衝突,所以**不需要 rebase、不需要 force push**——規矩沒破。
 
 **規矩(不可違)**:只推這一個分支 · **不 force push** · 不自己 merge、不自己 approve PR。
 
