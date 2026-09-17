@@ -8127,8 +8127,26 @@
    "code": "批567 收 L62 後順手跑 VCGC 驗有沒有誤傷 → ⑨ 紅",
    "kind": "**不是我改壞的,是一盞本來就在看機器臉色的燈。**⑨ 安裝核可是合成檢(暫存夾八份 RunGate 報告 + `VIA_RUNGATE_LATEST`),但 `_rungate_merged()`(批517)另外掃真機器的 `RUNGATE_2*.json` 史,**史優先於傳進來那份**;本境有一份 2.2h 前 verdict=YELLOW 的真報告(我自己批566 跑 OneShot 留的),合成的八份全被蓋掉,⑨ 印「雙族=BLOCKED_UNITEST」。修:⑨ 連 `VIA_RUNGATE_DIR` 一起指進暫存夾(引擎本來就吃這覆寫鍵),跑完還原兩鍵;**生產邏輯零變更**。同機同狀態前後對照:v0111 十九檢 FAIL 1 · v0112 **19/19 GREEN**。另補兩件登錄漏網:① 中央元件編號冊 `registry-sync --apply`——新 4(`_show` · `_live_tail_py` · `coverage_checks` · **`tool|via-consensus`**;最後那個是批564 七處又漏的第八處)② 格子 VCGC 站名還寫「十一檢」,而引擎早就十九檢(批516–519 加的四檢從沒回頭改站名),一併更正。教訓寫在 LL114",
    "batch": 567
+  },
+  {
+   "ts": "2026-09-17 17:40",
+   "op": "FIX",
+   "category": "測試",
+   "component": "CGC_MDL149_VeritasCentralGovernanceConsole_v0113.py(⑨ 第二個洩漏口 panorama + ⑳ 來源閘;十九檢→二十檢)",
+   "code": "批568 操作員工作站實錄:⑨ 印 BLOCKED_PANORAMA(不是我本境修的 BLOCKED_UNITEST)",
+   "kind": "**我上一批才立的 LL114,下一批被自己打臉。**`check()` 讀兩個真機器來源,批567 我只關了 `rungate()` 那個,漏掉 `REPORTS/panorama/PANORAMA_latest.json`——它**寫死路徑、沒有覆寫鍵**,而且直接覆蓋 install 值,所以八個合成案例全變 BLOCKED_PANORAMA。我本境沒有 panorama 夾,那閘是啞的,才印成 UNITEST:**同一個檢、兩台機器、兩種紅法,核可邏輯一行沒錯**。修兩件:① 比照 RunGate 慣例加 `VIA_PANORAMA_LATEST` 覆寫鍵(生產預設路徑零變更),⑨ 一併關沙盒;② 新增 **⑳ 來源閘**——AST 掃 `check/rungate/_rungate_merged`,列出這條路每一個 `REPORTS / …` 磁碟來源,要求每個都配覆寫鍵、每個都被自測 ⑨ 區塊指進暫存夾,少一個就指名報紅。**先重現再證明**:容器裡照工作站樣子放一份未完成的全景報告 → v0112 ⑨ FAIL(BLOCKED_PANORAMA,與操作員貼回來的一字不差)· v0113 ⑨ OK;撤掉模擬檔後 ⑳ 印(來源 3 · 覆寫鍵 3 · 沒配鍵 無 · 沒關沙盒 無)。新律 L63 + 教訓 LL115",
+   "batch": 568
+  },
+  {
+   "ts": "2026-09-17 17:45",
+   "op": "ADD",
+   "category": "整合去重",
+   "component": "PEIS 統一引擎收容(functional modules/VIA_PEIS/references/intake/PEIS_UnifiedEngine_b568/)+ CGC_MDL158_PEISCapabilityEngine_v0100.py 掛線口(19 檢)+ Register v0215 via-peis/能力庫 + 梭 + 格子站",
+   "code": "批568 操作員令「將 session_01FQMN8uBxreDrzmDUpPrXTG 引擎整合進來」+ PEIS 六功能規格 +「用引擎去執行以節省 TOKEN」「你自己收留整合後啟動她」",
+   "kind": "**先量,量出來的結論是「不要重寫」。**PEIS 六件功能已經有一支正主:`via_unified_engine.py` v0200(VIA-VIA-ENG996;github.com/tonykuni/via-vdf-vrn @ 412e9af),6,628 行、純標準庫、零網路、零安裝、不改來源檔、**自己的自測 69/69**。照規格再寫一支=第二顆頭(零九頭龍)。做法回到老規矩:**正本收容(4 檔逐檔 md5/sha256)+ 掛線口 subprocess 代跑**,本檔一個 byte 不改它。掛線口 19 檢只驗 VIA 這一側該驗的:sha256 逐字相符 · 正本自己的 69 檢跑得過 · 合成語料真跑證明同義實作被聚成一個能力 · **真跑後來源檔位元組不變(比 bytes,不看旗標)** · 零重複=NODATA 不報紅(照 PEIS 啟動條件)· 零網路/零安裝/不代設同意閘/**不提供 --apply**(能力表落地是操作員的裁定,LL90 同族)。**收下來真跑才看到三件事**(寫在 LL116):① 省略 `--db` 能力庫只在記憶體=白掃,我第一版就是;② `--params` 傳物件會在正本沙箱車道壞掉(`list({..})` 取到 key),而操作員規格用的正是物件——正本零觸碰,轉接寫在掛線口:依卡上簽章順序攤平,簽章讀不到就不猜;③ 小語料 token 帳是負的,正本照實報 −1511%。**啟動實測**:VDF+VRN 674 檔/14,984 函式→2,606 能力·折疊 10,436·省 99.92%;CGC+SUP 1,780 檔/31,416 函式→7,291 能力·折疊 18,694·近似 42,902·省 99.95%;VAP 37 檔/806 函式→324 能力·省 98.04%。能力庫 51 MB SQLite·2,606 張卡·140 SEALED。快速截取層實證:`RUN(misc.upside, {target:180, current:120})` → **0.5**,物件道與陣列道同值。**自己抓到自己一件**:檢號標籤排到 ⑳ 但實跑 19 檢,計數行寫死「二十檢」——LL112 同款,改成由 n[0] 推導",
+   "batch": 568
   }
  ],
- "updated_at": "2026-09-17 17:15",
- "batch": 567
+ "updated_at": "2026-09-17 17:45",
+ "batch": 568
 }
