@@ -166,16 +166,62 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 | `docs/VIA_Handover_20260914_B498.md` | 188 KB | 手寫累積 | 想知道某一批**為什麼**那樣做。批498 至今逐批記錄 |
 | `docs/VIA_Handover_ONEPAGE.md` | 310 KB | `via-vcgc page --publish` 自動產 | 要機器全量快照(政策庫/邏輯庫/因子庫/資料庫/調度/多矩陣…十二段) |
 | `../VIA_HANDOVER_LATEST.md` | 310 KB | 同上(倉庫根**鏡像**,逐位元相同) | 同上。給不進 VIA 夾的人看 |
+| `supportive modules/ui_support/VIA_UI_MasterControl_v0100.html` | — | `VIA_SYSTEM_MANAGER --no-open` | 要用**瀏覽器**看 81 項正式任務 |
 
 > **ONEPAGE 的批次段是從 `VIA_Handover_20260914_B498.md` 抽的**,所以逐批紀錄請以 B498 為正本。
 > 批553/554 兩段我是**手動補進 ONEPAGE**(容器裡不能跑 `page --publish`——沙盒庫是空的,
 > 跑了會用假資料覆蓋整份正本,那就是 LL49)。在工作站跑一次 `via-vcgc page --publish`
 > 就會從 B498 重新生成、內容一致;根目錄鏡像同步更新。
-| `supportive modules/ui_support/VIA_UI_MasterControl_v0100.html` | — | `VIA_SYSTEM_MANAGER --no-open` | 要用**瀏覽器**看 81 項正式任務 |
 
 ---
 
-## 六、現在卡在哪(接手就看這節)
+## 六、現在的狀態(批557 · 2026-09-17 實測,不是上次的紀錄)
+
+**三家全跑過一遍,零 RED。** 動詞 `matrix --apply-family <家> --profile test`(有界自測,不寫正本庫):
+
+| 家 | 項 | 結果 |
+|---|---|---|
+| **VDF** 資料鍛造 | 33 | **GREEN 33** |
+| **VRN** 研報擷取 | 15 | **GREEN 13 · ABSENT 2 · RED 0** |
+| **VAP** 自動繪圖 | 6 | **GREEN 6** |
+| 中央控管台 VCGC v0111 | 19 檢 | **OK 19 · FAIL 0** |
+| 自測格 v0332 | 231 站 | 兩個異動站 `--only` 實跑 OK(全矩陣很久,沒跑) |
+
+VRN 那兩盞 **ABSENT 是誠實的缺件,不是壞掉**:
+
+| 項 | 態 | 差什麼 |
+|---|---|---|
+| `vrn_pdfplus` | ABSENT | 引擎自述「需要 reportlab」——**要你的手**(裝套件我不代做) |
+| `vrn_nlp_vrn_vdf_pipeline` | ABSENT | argparse 自述「required: `--in`」——冊上這項的 params 該由主控台/`--ids` 帶值 |
+
+> **第 1 站 `vrn_firstpage`(ENG072 v0134)現在 GREEN**——那就是你連看了十批的 ㉜ 紅燈。
+> 但**這一盞在本境的綠是半盞**:容器一個 OCR 後端都沒有,`ocr_page1` 會 SKIP,
+> 走不到出事那一步(這正是 LL106 的形狀)。你機器上 tesseract 在,會走得更遠——
+> **要你那邊跑出來才算數。**
+
+### 規則收斂現況(`via-vrnrules drift`)
+
+```
+[正本  ] ENG086 第一頁邏輯橋  v0108  評等 38/38 · 目標價  7/16
+[委樞  ] ENG073 報告結構庫    v0128  評等 38/38 · 目標價 16/16   ← 批554 委由樞紐
+[落差  ] TW02 報告解析器      v0101  評等 12/38 · 目標價 10/16
+[落差  ] 首頁全能引擎          v0125  評等 25/38 · 目標價 11/16
+[不適用] ENG080 四點文摘      v0105  評等   —   · 目標價  5/16
+```
+
+### 分支與冊
+
+| 項 | 值 |
+|---|---|
+| HEAD | `55a96ead`(批556)→ 本批後 批557 |
+| 超前 `main` | 批554 · 批555 · 批556(+本批);**PR #37 已併,要開新 PR** |
+| 台帳 | 1,086 筆 |
+| 律 · 教訓 | 59 條 · **107 條**(批554 加 LL107) |
+| 元件冊 | 活元件 5,174 · 退役 0 |
+
+---
+
+## 七、現在卡在哪(接手就看這節)
 
 ### A. 等操作員一句話才能動的
 
@@ -200,7 +246,7 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 
 ---
 
-## 七、批541 收在哪裡
+## 八、批541 收在哪裡
 
 - `f5def0d6` 批541:券商表去衝突(撞名 0 · 45 家)· 候選同義字 harvest(只提不寫冊)· 收容件導入驗證 ⑱ + 負控 ⑱'
 - `81e4054c` 批541b:補短令 `via-vrnrules`(批540 漏了七處之一)
@@ -209,7 +255,7 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 
 ---
 
-## 八、批542–554 收在哪裡(批554 追記)
+## 九、批542–556 收在哪裡(批557 追記)
 
 | 批 | commit | 一句話 |
 |---|---|---|
@@ -218,6 +264,9 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 | 544 | `a96f0a92` | **CGC_MDL159 統一主控台**:TAB1 給 AI 的資訊全放一起(可轉 JSON/MD)· TAB2 收兩個既有頁 |
 | 545–553 | `3ba666e6`…`7ed4d860` | ENG072 的 ㉜ 紅燈。**十批才收掉**,誠實帳見下 |
 | 554 | `51ec2603` | 同義字收斂到一處:評等向樞紐要實作(前三道漏 14 → 0)· 目標價讀機構 SSOT(「目標 / target」在缺的 11 條裡)· 一個真迴歸修 |
+| 555 | `edb3ad52` | 交接更新:多 AI 版刷到批554 · 一頁交接補 批553/554 · 根鏡像同步 |
+| 556 | `55a96ead` | 一/二/三節重量:短令冊在**母系統根**(我前兩則給錯路徑)· PR #37 已併入 main · 自測格 231 站 |
+| 557 | 本批 | **三家全跑一遍**:VDF 33/33 · VRN 13 GREEN + 2 ABSENT + **RED 0** · VAP 6/6 · VCGC 19/19;新增第六節「現在的狀態」 |
 
 ### ㉜ 那十批的誠實帳(接手的人請先讀這段)
 
