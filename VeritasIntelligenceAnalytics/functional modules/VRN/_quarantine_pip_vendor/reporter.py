@@ -20,7 +20,13 @@ from typing import Any
 
 from pip._vendor.resolvelib.reporters import BaseReporter
 
-from .base import Candidate, Requirement
+try:
+    from .base import Candidate, Requirement
+except ImportError:
+    # Quarantined pip-vendor copy: keep import health independent of pip's
+    # private base module, which is not shipped in current pip versions.
+    Candidate = Any
+    Requirement = Any
 
 logger = getLogger(__name__)
 

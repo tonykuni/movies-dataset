@@ -25,18 +25,32 @@ from typing import (
     Union,
 )
 
-from . import box, errors
-from ._loop import loop_first_last, loop_last
-from ._pick import pick_bool
-from ._ratio import ratio_distribute, ratio_reduce
-from .align import VerticalAlignMethod
-from .jupyter import JupyterMixin
-from .measure import Measurement
-from .padding import Padding, PaddingDimensions
-from .protocol import is_renderable
-from .segment import Segment
-from .style import Style, StyleType
-from .text import Text, TextType
+try:
+    from . import box, errors
+    from ._loop import loop_first_last, loop_last
+    from ._pick import pick_bool
+    from ._ratio import ratio_distribute, ratio_reduce
+    from .align import VerticalAlignMethod
+    from .jupyter import JupyterMixin
+    from .measure import Measurement
+    from .padding import Padding, PaddingDimensions
+    from .protocol import is_renderable
+    from .segment import Segment
+    from .style import Style, StyleType
+    from .text import Text, TextType
+except ImportError:
+    from rich import box, errors
+    from rich._loop import loop_first_last, loop_last
+    from rich._pick import pick_bool
+    from rich._ratio import ratio_distribute, ratio_reduce
+    from rich.align import VerticalAlignMethod
+    from rich.jupyter import JupyterMixin
+    from rich.measure import Measurement
+    from rich.padding import Padding, PaddingDimensions
+    from rich.protocol import is_renderable
+    from rich.segment import Segment
+    from rich.style import Style, StyleType
+    from rich.text import Text, TextType
 
 if TYPE_CHECKING:
     from .console import (

@@ -21,6 +21,22 @@ VIA Central Government 的「向下遞迴、自適應、沙盒修復」治理擴
 
 from __future__ import annotations
 
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # def PARAMETERS — 所有可調參數集中於頂部
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1945,7 +1961,8 @@ def def_verify_assets(assets: Sequence[def_AssetRecord], patches: Sequence[def_P
                     json.loads(source)
                 result.update(status="PASS", detail="JSON parse")
             elif asset.language == "POWERSHELL" and powershell:
-                command = [powershell, "-NoProfile", "-NonInteractive", "-Command", f"$e=$null;$t=$null;[System.Management.Automation.Language.Parser]::ParseFile('{str(path_value).replace("'", "''")}',[ref]$t,[ref]$e)|Out-Null;if($e.Count -gt 0){{$e|ForEach-Object{{$_.Message}};throw 'AST_FAIL'}}"]
+                _ps_path_b535 = str(path_value).replace("'", "''")   # 批535:f-string 內巢狀雙引號在 Python 3.11 會炸(先算好再帶入)
+                command = [powershell, "-NoProfile", "-NonInteractive", "-Command", f"$e=$null;$t=$null;[System.Management.Automation.Language.Parser]::ParseFile('{_ps_path_b535}',[ref]$t,[ref]$e)|Out-Null;if($e.Count -gt 0){{$e|ForEach-Object{{$_.Message}};throw 'AST_FAIL'}}"]
                 completed = subprocess.run(command, capture_output=True, text=True, timeout=def_PARAM_SUBPROCESS_TIMEOUT_SECONDS)
                 if completed.returncode == 0:
                     result.update(status="PASS", detail="PowerShell Parser AST")

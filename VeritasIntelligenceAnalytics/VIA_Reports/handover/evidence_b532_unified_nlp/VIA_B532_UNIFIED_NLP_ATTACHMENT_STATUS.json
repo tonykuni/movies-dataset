@@ -1,0 +1,79 @@
+{
+  "schema": "VIA.B532.UnifiedNLPAttachmentHandover.v1",
+  "batch": "B532",
+  "timestamp": "2026-09-16T14:25:00Z",
+  "verdict": "GREEN_NLP_CONTROL_YELLOW_FILE_PIPELINE",
+  "central_engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+  "provider": "SUP_MDL744_NLPApplicationHub_v0102",
+  "vrn_vdf_bridge": "VRN_ENG087_NLPTextSummaryBridge_v0100",
+  "quantguard_data_flow": {
+    "direction": "VDF_DUCKDB_TO_QUANTGUARD",
+    "pipeline": ["VDF/DuckDB read surface", "QuantGuard validation", "QuantGuard features/factors", "append-only evidence"],
+    "source_mutation": "FORBIDDEN",
+    "reverse_edges_forbidden": ["QuantGuard -> VDF source overwrite", "QuantGuard -> database schema mutation", "QuantGuard -> network fetch", "QuantGuard -> silent consent"],
+    "source_frame_read_only_hash_check": true
+  },
+  "network": {
+    "mode": "OFFLINE_ONLY",
+    "consent": "OFF",
+    "akshare_executed": false,
+    "data_replenishment_started": false
+  },
+  "ta_policy": {
+    "active": "QuantGuard-only",
+    "talib": "FORBIDDEN_NOT_USED",
+    "installed_or_imported": false
+  },
+  "core_tests": {
+    "unified_nlp_selftest": {"state": "GREEN", "passed": 10, "total": 10, "rc": 0},
+    "nlp_hub_selftest": {"state": "GREEN", "passed": 12, "total": 12, "rc": 0},
+    "vrn_eng087_selftest": {"state": "GREEN", "passed": 11, "total": 11, "rc": 0},
+    "unified_text_probe": {"state": "GREEN", "rc": 0, "tables": 1, "layout_blocks": 3, "evidence_points": 3},
+    "synthetic_docx_pipeline": {
+      "state": "YELLOW",
+      "nlp_processed": 1,
+      "summary_ok": 1,
+      "eng073_db": "GREEN",
+      "duckdb_tables": ["vrn_nlp_text_summary", "vrn_pipeline_runs", "vrn_report_analyst", "vrn_report_basic", "vrn_report_metrics"],
+      "vdf_green": false,
+      "reason": "VDF coverage gate did not meet the 2023-start requirement; downstream bridge correctly returned rc=2."
+    },
+    "quantguard_bridge": {"state": "GREEN", "passed": 8, "total": 8, "rc": 0, "direction": "VDF_DUCKDB_TO_QUANTGUARD", "source_read_only": true, "source_frame_hash_equal": true},
+    "cgc156_accelerator_control": {"state": "GREEN", "passed": 23, "total": 23, "accelerators": 25, "rc": 0, "data_flow": "VDF_DUCKDB_TO_QUANTGUARD"},
+    "vcgc_registry_sync": {"state": "GREEN", "active": 5014, "apply_new": 2, "apply_changed": 14, "final_new": 0, "final_changed": 0, "retired": 0, "ast_errors": 0},
+    "iface_binding_sync": {"state": "YELLOW", "ok": 50, "drift": 6, "bump": 1, "drift_scope": "pre-existing historical InputConsole contracts; not silently rewritten"}
+  },
+  "central_registration": {
+    "inputconsole": "central/acceptance/via_unified_nlp",
+    "workflow": "via_unified_nlp_pipeline",
+    "toolroster": "unified_nlp",
+    "engine_catalog": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "component_inventory": "VIA-MDL-0149 plus function records",
+    "interface_registry": "VIA-IFACE-4014",
+    "naming_registry": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "attachment_manifest": "supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json"
+  },
+  "attachment_matrix": [
+    {"id": "vake_ps", "classification": "VDF data adapter, not NLP", "state": "COLLECTED_NOT_RUN", "network": true},
+    {"id": "vake_py", "classification": "VDF data fetcher, not NLP", "state": "COLLECTED_NOT_RUN", "network": true, "offline_scan": "BLOCKED_MISSING_AKSHARE"},
+    {"id": "ves_ps", "classification": "NLP support governance", "state": "INTAKE_ONLY", "windows_runtime": "PENDING"},
+    {"id": "ves_py", "classification": "NLP support governance", "state": "PASS_103_103", "execution": "READONLY"},
+    {"id": "ves_collab", "classification": "NLP handover protocol", "state": "INTAKE_ONLY"},
+    {"id": "vcaf", "classification": "governance auto-fix candidate, not NLP", "state": "PASS_DRYRUN_ONLY", "commit": false},
+    {"id": "cge_adaptive", "classification": "interface governance candidate, not NLP", "state": "PASS_25_25", "execution": "TEMP_FIXTURE_ONLY"}
+  ],
+  "known_limits": [
+    "PowerShell runtime cannot be executed in this sandbox because pwsh/powershell/PSScriptAnalyzer are absent.",
+    "VRN_ENG078 legacy selftest is 4/6 because it hard-codes NLP v1.5.0 while the active hub is v1.8.0; it is not the active SUP_MDL866 route.",
+    "Windows C:\\測試樣本報告 source files are not mounted; no real user PDF/DOCX content claim is made.",
+    "The synthetic DOCX pipeline validates the central dispatch and DuckDB schema, not VDF historical data completeness."
+  ],
+  "evidence": {
+    "report": "VIA_Reports/handover/VIA_B532_UNIFIED_NLP_ATTACHMENT_HANDOVER.md",
+    "html": "VIA_Reports/handover/VIA_B532_UNIFIED_NLP_ATTACHMENT_CONTROL.html",
+    "windows_probe": "VIA_Reports/handover/VIA_B532_UNIFIED_NLP_TEST.ps1",
+    "manifest": "supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json",
+    "unified_json": "VIA_Reports/nlp_unified/VIA_UNIFIED_NLP_latest.json",
+    "bundle": "VIA_Reports/handover/evidence_b532_unified_nlp/"
+  }
+}

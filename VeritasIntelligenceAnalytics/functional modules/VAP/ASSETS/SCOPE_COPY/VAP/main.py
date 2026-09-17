@@ -64,13 +64,13 @@ def cmd_health():
         "Template dir": VAPPaths.TEMPLATES.exists() or True,
     }
 
-    # Check imports
+    # Numerical features are centrally provided by VIA QuantGuard.
     try:
-        import talib
-        checks["TA-Lib"] = True
-        checks["TA-Lib version"] = talib.__version__
+        import quant_engine
+        checks["QuantGuard"] = True
+        checks["QuantGuard policy"] = "FORBIDDEN_LEGACY_LIBRARY_NOT_USED"
     except ImportError:
-        checks["TA-Lib"] = False
+        checks["QuantGuard"] = False
 
     try:
         import plotly

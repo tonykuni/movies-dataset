@@ -26,6 +26,22 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
 
 怎麼證明有綁上:`python3 CGC_MDL148_EngineBus_v*.py boot` 起一個子行程回報它看到的。
 """
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
 import os
 import sys
 
@@ -131,6 +147,13 @@ def _boot():
     # 已設 VIA_ACCEL_BOOT,第一版在這裡整段 return,連 vdf 該掛的網路件都跳掉;子行程印的還是父行程的值。
     # 改:每個行程都各做各的(環境變數本來就 setdefault、網路件本來就依 VIA_FAMILY),不靠「父做過就跳」。
     root = _via_root()
+    # B531/B533：所有 Python 家族共用 25 項 roster、CGC156 accelerator gate
+    # 與 CGC157 VIA unique-entry identity；沒有中央身份的裸跑不宣稱已經過 VIA。
+    # 只寫入啟動環境，不逐檔改寫引擎，也不繞過 SuperAccel/Celeritas/Aegis 閘。
+    os.environ.setdefault("VIA_ACCELERATOR_ROSTER", "VIA_PS_Accelerators_25_Roster_v0100:25")
+    os.environ.setdefault("VIA_ACCELERATOR_CONTROL", "CGC_MDL156_VIAAcceleratorControl_v0100")
+    os.environ.setdefault("VIA_CENTRAL_ENTRY", "1")
+    os.environ.setdefault("VIA_ENTRY_CONTROL", "CGC_MDL157_VIAUniqueEntryControl_v0100")
     fam = (os.environ.get("VIA_FAMILY") or "").lower()
     note = []
     try:

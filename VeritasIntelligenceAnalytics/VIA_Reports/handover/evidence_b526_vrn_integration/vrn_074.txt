@@ -1,0 +1,44 @@
+=== vrn_074 ===
+=== 財報頁表格擷取器(VRN_ENG074 v0107)· 十九檢自測(零網路)===
+  [OK] ① SynonymEngine SSOT 掛載(normalize_metric 正主)
+  [OK] ② 期間表頭定位(混合年/季/E·F 狀態拆離)
+  [OK] ③ 壓平數據列拆解+科目對齊(Gemini 首數字切分)
+  [OK] ④ 未命中=UNKNOWN 誠實(不硬套;候 register)
+  [OK] ⑤ 負數雙格式((1,250)=-1250;-70.2)
+  [OK] ⑥ 財務頁判準(核心科目≥2+期間≥2;非財頁拒)
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+[財報頁] 夾律=冊 VIA_InputConsole_Spec_v0100.json;取件 1 份 · tmpq6ck77to=1 件(PDF 1/WORD 0/影像 0)
+  [fx_fin] +6 值(UNKNOWN 科目 3=候 register)
+  [對照] ENG073 兩表(basic/metrics)缺=誠實略過,不假綠;先跑 VRN_ENG073_ReportStructuredDB run
+[財報頁計] 1 件(PDF 1/WORD 0/影像 0)· 本輪 +6 值(未對齊 3 誠實) · 庫 6 列
+  [二見] UNKNOWN 3 值中有第二意見 3 值 · 候 register(登錄進 VRN_Financial_Synonyms_SSOT=你定):gross_profit@allinone/gross_profit@fds ×3
+[財報頁] 夾律=冊 VIA_InputConsole_Spec_v0100.json;取件 1 份 · tmpq6ck77to=1 件(PDF 1/WORD 0/影像 0)
+  [fx_fin] +6 值(UNKNOWN 科目 3=候 register)
+  [對照] ENG073 兩表(basic/metrics)缺=誠實略過,不假綠;先跑 VRN_ENG073_ReportStructuredDB run
+[財報頁計] 1 件(PDF 1/WORD 0/影像 0)· 本輪 +6 值(未對齊 3 誠實) · 庫 6 列
+  [二見] UNKNOWN 3 值中有第二意見 3 值 · 候 register(登錄進 VRN_Financial_Synonyms_SSOT=你定):gross_profit@allinone/gross_profit@fds ×3
+  [OK] ⑦ PDF 端到端(頁2 表→庫;2025F=12108 ESTIMATE)
+  [OK] ⑧ 重跑冪等(派生層重算;列數不倍增)
+  [OK] ⑨ 雙 SSOT 隔離宣告(REPORT_STATED/ESTIMATE;永不冒充官方)
+  [OK] ⑩ 零網路+加速橋
+  [OK] ⑪ 對照狀態律(AGREE≤1%/ROUNDING≤5%/UNIT_SCALE 千百萬倍/DIVERGE/單邊/雙缺)
+[財報頁] 夾律=冊 VIA_InputConsole_Spec_v0100.json;取件 1 份 · tmp2uj4h5he=1 件(PDF 1/WORD 0/影像 0)
+  [6873_2024-05-06_元大] +6 值(UNKNOWN 科目 0=候 register)
+  [對照] 1 件 × 三邊 → 8 列 · ONLY_TABLE 4 · AGREE 1 · DIVERGE 1 · TICKER_NOT_ON_FIN_PAGE 1 · DATE_CONSISTENT 1
+[財報頁計] 1 件(PDF 1/WORD 0/影像 0)· 本輪 +6 值(未對齊 0 誠實) · 庫 6 列
+  [二見] UNKNOWN 0 值中有第二意見 0 值 · 候 register(登錄進 VRN_Financial_Synonyms_SSOT=你定):無
+[財報頁] 夾律=冊 VIA_InputConsole_Spec_v0100.json;取件 1 份 · tmp2uj4h5he=1 件(PDF 1/WORD 0/影像 0)
+  [6873_2024-05-06_元大] +6 值(UNKNOWN 科目 0=候 register)
+  [對照] 1 件 × 三邊 → 8 列 · ONLY_TABLE 4 · AGREE 1 · DIVERGE 1 · TICKER_NOT_ON_FIN_PAGE 1 · DATE_CONSISTENT 1
+[財報頁計] 1 件(PDF 1/WORD 0/影像 0)· 本輪 +6 值(未對齊 0 誠實) · 庫 6 列
+  [二見] UNKNOWN 0 值中有第二意見 0 值 · 候 register(登錄進 VRN_Financial_Synonyms_SSOT=你定):無
+  [OK] ⑫ 三方對照端到端(首頁 eps 2024=2.40 對表格 2.40=AGREE;2025 首頁 9.90 對表格 3.10=DIVERGE) {'2023': 'ONLY_TABLE', '2024': 'AGREE', '2025': 'DIVERGE'}
+  [OK] ⑬ 表格獨有科目 ONLY_TABLE + 檔名↔財報頁 ticker + 報告日 vs 期間 ('TICKER_NOT_ON_FIN_PAGE',) ('DATE_CONSISTENT', '表格已報 2024 ≤ 報告日 2024')
+  [OK] ⑭ 對照冪等(派生層重算不倍增)
+  [OK] ⑮ ENG073 兩表缺=誠實略過不 crash(指路先跑 ENG073)
+  [OK] ⑯ run 動詞的 --db 真的接到 run()(批425:v0102 是 run(d, None, ...),db 那格寫死 None,`run --db X` 永遠寫進預設庫;--db 只有 --crosscheck 分支解析得到=更難察覺。實跑證據:ENG074 印「對照 28 列」而收尾讀 X 是「已對照 0/5」) (src=/tmp/_d_ db=/tmp/_b_.duckdb cross=True)
+  [OK] ⑰ 收件三類(批466 實測:①站 ENG072 收得下的 docx 與影像,到本站**連被看見都沒有**——v0105 的閘是 `d.glob("*.pdf")`,同一個夾直接回「無 PDF」rc=2。判準綁 ENG072 尾版的 kind_of,不另抄一份;橋缺席退回 PDF-only=零回歸) (v0105 閘=0 件 · v0106 閘=2 件)
+  [OK] ⑱ WORD 財報表零相依讀法(.docx 本來就是 zip,`<w:tbl>` 就是表)。**Zero-Hydra:不另造解析器**——每個 <w:tr> 併成一行交回本檔既有的 parse_header/parse_data_row/_syn,所以同一份報告換成 Word 出的值與 PDF 道一致。WORD 無頁界 → page 記 0 並在 raw_text 標「WORD 表N」,不假裝有頁碼 (9 值 · 科目 ['eps', 'gross_margin', 'revenue'] · EPS2024=(45.25, 'REPORT_STATED') · EPS2026=(59.8, 'ESTIMATE') · page 全 0=True)
+  [OK] ⑲ 第二意見(批504):SSOT 未命中「資產總計」→ canonical 仍空(不硬套),alt 帶 total_assets@allinone(候 register) (alt=total_assets@allinone)
+  [計] 十九檢 OK 19 · FAIL 0
+RC=0

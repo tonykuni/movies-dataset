@@ -1,0 +1,576 @@
+{
+ "schema": "VIA.PolicyLaws.SSOT.v1",
+ "batch": "批522",
+ "ts": "2026-09-15 15:31",
+ "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
+ "laws": [
+  {
+   "id": "L01",
+   "batch": "批475",
+   "zh": "凡是流程皆要想一個節省 TOKEN 的方式,想好才進行;先查再造,先量再改",
+   "cat": "流程"
+  },
+  {
+   "id": "L02",
+   "batch": "批475",
+   "zh": "所有紀錄/工具/模組/引擎/功能註冊,除非過時,只增不減",
+   "cat": "註冊"
+  },
+  {
+   "id": "L03",
+   "batch": "批232",
+   "zh": "正本零觸碰:references/intake 收容件永不編輯;新版=新收容夾 _bNNN + MANIFEST",
+   "cat": "正本"
+  },
+  {
+   "id": "L04",
+   "batch": "批254",
+   "zh": "尾版律:引擎改動=新版號檔;無版號檔(sitecustomize/JSON 冊)才就地改;glob 取尾版",
+   "cat": "版本"
+  },
+  {
+   "id": "L05",
+   "batch": "批403",
+   "zh": "Zero-Hydra:綁既有引擎不重造;同一判準只寫一處(寫兩處只改一邊=另一邊靜靜走錯)",
+   "cat": "架構"
+  },
+  {
+   "id": "L06",
+   "batch": "批390",
+   "zh": "零 CDN · 零彈窗:頁面自足,沒人要求不跳窗",
+   "cat": "UI"
+  },
+  {
+   "id": "L07",
+   "batch": "批478",
+   "zh": "同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT / 金鑰)一律操作員自設,我不代設;setdefault 只在未設時給預設;fail-closed",
+   "cat": "法遵",
+   "note_b512": "操作員令「要用的閘就打開」(2026-09-15):一貼即用區塊可直接列 $env:VIA_NET_CONSENT='YES' 與 --approve-install/-Approve 行(操作員貼=他的手);AI 端程式仍永不自設閘、永不自動裝"
+  },
+  {
+   "id": "L08",
+   "batch": "批474",
+   "zh": "零 force push;不 Stop-Process;不 Remove-Item / conda remove / pip uninstall 環境;--approve-remove 只在明令下;裝套件=操作員的手(--approve + 閘)",
+   "cat": "安全"
+  },
+  {
+   "id": "L09",
+   "batch": "批494",
+   "zh": "加速器與網路工具只認 VeritasCeleritas / VeritasAegisNexus;SUP_MDL737/740 留作橋不直 import;網路件只收不掛線除非走 AegisNexus 車道",
+   "cat": "工具"
+  },
+  {
+   "id": "L10",
+   "batch": "批490",
+   "zh": "資料家律:parquet 存、duckdb 管;家在 C:\\Users\\tonyk\\VIA System\\via_database;鏡根 via_database\\movies-dataset\\data;搬=link(junction,hash 定生死,零刪除)不複製;刪資料=操作員的手;census --hygiene 永無 apply",
+   "cat": "資料"
+  },
+  {
+   "id": "L11",
+   "batch": "批493/496",
+   "zh": "VRN 擷取次序律:非 OCR 一律先跑(兩法互核)→ 修復 → 驗證;失敗才 OCR 階梯 輕→重(simple→dual→paddle);都失敗才畫質提升 DPI 300~350;成功=資料標示還原+文字修復;成功法入中央邏輯庫",
+   "cat": "VRN"
+  },
+  {
+   "id": "L12",
+   "batch": "批497",
+   "zh": "環境隔離律:特殊/中高風險件直接拉出獨立境連同相關工具隔離;numpy 等樞紐件可多境多版本多 Python(H2b);加速器與網路工具的工具很多請勿遺漏(全冊聯集)",
+   "cat": "環境"
+  },
+  {
+   "id": "L13",
+   "batch": "批498/500",
+   "zh": "via_core 白名單律:白名單單一來源 VIA_EnvManager def_PARAM_VIA_CORE_WHITELIST;白名單件才進 via_core(只增);非白名單缺件留置 WHITELIST_HOLD;無家族通用件列 [未路由];HIGH 家族只認同名獨立境不借 alt",
+   "cat": "環境"
+  },
+  {
+   "id": "L14",
+   "batch": "批499",
+   "zh": "全庫同步律:所有的庫政策邏輯因子庫都要同步更新——sync-db 對資料家每本 .duckdb 寫同一份(同一 hash)+ via_policy_sync 對帳單",
+   "cat": "資料"
+  },
+  {
+   "id": "L15",
+   "batch": "批499",
+   "zh": "交接三處律:交接報告在 docs(github)、倉根 VIA_HANDOVER_LATEST.md(母檔案夾)、每本庫 via_handover + 資料家根",
+   "cat": "交接"
+  },
+  {
+   "id": "L16",
+   "batch": "批474/498",
+   "zh": "誠實四態:ABSENT(缺件)/NODATA(缺料)/GATED(閘未開)/RED(壞);判錯的紅燈和假綠一樣傷;缺件≠缺料≠壞掉≠閘未開",
+   "cat": "燈"
+  },
+  {
+   "id": "L17",
+   "batch": "批410/504/505",
+   "zh": "自測零污染律:自測只寫暫存;VIA_SELFTEST=1;自測期間撤 VIA_DB_* 與 VIA_DATA_HOME;真庫永不進自測目標",
+   "cat": "測試"
+  },
+  {
+   "id": "L18",
+   "batch": "批482",
+   "zh": "功能註冊只增不減:新引擎/工具=規格項、格子站、Register 指令、Deck 任務、Manager 正式名稱、台帳、交接七處齊備;指令與參數不丟失",
+   "cat": "註冊"
+  },
+  {
+   "id": "L19",
+   "batch": "批506",
+   "zh": "安裝核可律:環境統一測式(RunGate 家族境 python × 套件探針 × 引擎自測)無誤(GREEN,24h 內)後才可核可安裝;否則 BLOCKED_UNITEST 誠實停",
+   "cat": "環境"
+  },
+  {
+   "id": "L20",
+   "batch": "批506",
+   "zh": "唯一對接口律:Veritas Central Governance Console(CGC_MDL149)為各模組引擎連接系統的唯一對接口,統管政策庫/邏輯庫/因子庫/資料庫/VIA 引擎調度/多矩陣實測結果/註冊表/環境工具/交接",
+   "cat": "架構"
+  },
+  {
+   "id": "L21",
+   "batch": "批474",
+   "zh": "所有 VDF 價格資料皆 adj(除權息調整後);報告上是報告日原始價;兩者不可直接比",
+   "cat": "資料"
+  },
+  {
+   "id": "L22",
+   "batch": "批478",
+   "zh": "SSOT 正本 VIA_Financial_Institution_SSOT_v0100.py READ_ONLY 不改;台帳 indent=1、衝突取聯集;VIA_Reports 不入 git;容器空沙盒再生的冊/頁不 commit",
+   "cat": "SSOT"
+  },
+  {
+   "id": "L23",
+   "batch": "批506",
+   "zh": "倉衛生律:只刪有證據的重複件(byte 同、BACKUP 孿生、__DUP__)與過時再生件;正本/收容件/UI 正本頁/唯一副本不刪;每次刪除附清單與 md5 證據(git 可回溯)",
+   "cat": "倉"
+  },
+  {
+   "id": "L24",
+   "batch": "批508",
+   "cat": "環境",
+   "zh": "環境復原律:環境安裝出了問題 → ①先還原前次環境(LKGC lock 逐境;無 LKGC 則 Baseline 原本規劃;sync 破壞段只在 --approve-remove)②再把所有工具順序裝上(core 白名單→LOW 家族境→MEDIUM 隔離境→HIGH 隔離境→外部本體→驗證)③中高風險(_M/_H 家族)一律單獨隔離境,不借 alt 境;plan 唯讀,--execute --approve 才跑,同意閘不代設;①不受 L19 擋(LKGC 本身即曾 GREEN),②新裝段仍過 L19"
+  },
+  {
+   "id": "L25",
+   "batch": "批509",
+   "cat": "交接",
+   "zh": "多 AI 交會律:每個工作階段第一步 git fetch + git status + git log HEAD..origin 比對;落後就先 pull --ff-only 再造件;本機/另一 AI 的並行線一律先 commit 到側枝並 push(local/parallel-B<批>),再把工作分支對齊遠端;只由一隻手併(併時只增不減:版本檔名撞名者高版號另起,律/台帳/掉球清單取聯集);永不在陳舊樹上造件、永不 force push"
+  },
+  {
+   "key": "panorama_ssot_route",
+   "zh": "全景修復與調度只由VCGC呼叫既有EngineBus及原引擎；不建立第二套擷取器、環境管理器或政策正本。",
+   "cat": "中央治理",
+   "id": "L26",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L24"
+  },
+  {
+   "key": "panorama_db_first",
+   "zh": "每次擷取前查正庫的日期、標的、欄位缺口；範圍預設最近兩個曆月且排除當日未完成資料。",
+   "cat": "增量",
+   "id": "L27",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L25"
+  },
+  {
+   "key": "panorama_journal",
+   "zh": "批次先存來源Parquet/UTF8-BOM CSV，再交易式入庫，成功才原子記帳；中斷先重播已存批次，失敗與空資料不得冒充完成。",
+   "cat": "續傳",
+   "id": "L28",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L26"
+  },
+  {
+   "key": "panorama_honest_matrix",
+   "zh": "獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。",
+   "cat": "驗證",
+   "id": "L29",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L27"
+  },
+  {
+   "id": "L30",
+   "batch": "批512",
+   "cat": "架構",
+   "zh": "相似整合律(操作員令「類似參數功能引擎就整合優化」):同一判準、同一子行程環境、同一啟動邏輯、同一參數冊只寫一處(冊的擁有者),其餘轉呼叫;新件先找既有件,找到就整合優化不另起;撞名/同功能副本(檔名帶 (2)/(3)、new modules engines/*)一律去重或入收容冊"
+  },
+  {
+   "id": "L31",
+   "batch": "批513",
+   "cat": "架構",
+   "zh": "彈性嫁接與自適應合約律(操作員令「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」):引擎以冊綁定(id→尾版 glob/verb/params/outputs)不寫死路徑;合約追碼不追人(尾版一出,綁定合約自動追、漂移具名列示);換引擎(嫁接)前先驗旗標相容,只增候選、換不換由冊主/操作員;執行期模組對模組介面自湊走 via_iface_autosync;新引擎 I/O 走 VIA_Engine_Contract 封包"
+  },
+  {
+   "id": "L32",
+   "batch": "批514",
+   "cat": "環境",
+   "zh": "子行程環境衛生律(Z15 根因:母殼帶 PYTHONHOME 指 uv 3.12,家族境 3.13 venv 子行程繼承=SRE module mismatch):PYTHONHOME 永不傳給 VIA 任何子行程(venv/base 各自從 python.exe 算 home);撤除只寫一律三處(bootstrap sitecustomize 起跑撤 · 匯流排 child_env · RunGate interp/probe/station),撤了什麼記 VIA_PYTHONHOME_SCRUBBED 並在閘的 [ENV] 行/次步講明;根治(殼層/profile/使用者環境變數)=操作員的手,程式不動殼層"
+  },
+  {
+   "id": "L33",
+   "batch": "批515",
+   "cat": "工序",
+   "zh": "工序律(操作員令「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG」):每件功能走 測→修→優化→測→修→整併(去重/歸位一處)→測→修→操作員實測→修→啟用→測→修;每一步的量測與判讀入交接,沒測過的不叫完成;判錯的紅燈(過時判準)與假綠同罪"
+  },
+  {
+   "id": "L34",
+   "batch": "批515",
+   "cat": "架構",
+   "zh": "VATETF 應用端律(操作員令「VETF 改名為 VATETF;直接抓 VDF 擷取的資料庫來用,他是應用端」):VATETF(舊名 VETF,只增不減雙名)不自抓任何資料,只讀 VDF 擷取落的庫(ActiveTWETF.duckdb::holdings_daily · vdf_tw_market 價表等);擷取一律 VDF 的事"
+  },
+  {
+   "id": "L35",
+   "batch": "批515",
+   "cat": "範圍",
+   "zh": "VDF 基金範圍律(操作員令「VDF 基金只抓主動式台股 ETF 其他基金不抓」):VDF 的基金/ETF 擷取只及主動式台股 ETF(ENG077 A 碼律宇宙 + ENG078 持股);被動 ETF 只到價格(批401),其他基金一律不抓、不建表"
+  },
+  {
+   "id": "L36",
+   "batch": "批516",
+   "cat": "架構",
+   "zh": "VTMRA 家族律(操作員令「除錯成功後才 Veritas Taiwan Monthly Revenue Analysis;TA-LIB 確認測試無誤」):VTMRA=台股月營收分析家族名,不是第四套引擎;成員=ENG063 月營收擷取 · ENG075 史深回補 · ENG069 營收×共識 · ENG076 ETF 營收動能 · TWREV v2.7(收容包)· CrossGroupPhase v030(收容包)· TA-Lib(指標庫);「測試無誤」的唯一量尺=CGC_MDL152 以家族境真跑每個成員自測成矩陣(零網路;TA-Lib 未裝=YELLOW 不是壞;任一 FAIL/TIMEOUT=RED);先除錯(工序律 L33)再擴功能",
+   "status": "SUPERSEDED",
+   "active_route": false,
+   "superseded_by": "L50"
+  },
+  {
+   "id": "L37",
+   "batch": "批517",
+   "cat": "擷取",
+   "zh": "VDF 擷取範圍律(操作員問「擷取前有無先檢視資料庫現況、定義好抓取範圍、批次擷取不重複」):①抓前先查庫現況(每標的 MAX(date)/checkpoint/census)②缺口=範圍(增量只抓 MAX(date)-3 日重疊起;史深由新到舊分段;全在=零請求)③批次落盤+checkpoint(每批 anti-join INSERT 只補缺鍵;中斷零損失)④永不重抓已在鍵;⑤短缺口(≤ 數個交易日)應走「逐日全市場」道(一日一請求),長史才走「逐檔」道(一檔一請求)——目前價量增量(ENG054/ENG064)只有逐檔道=五個交易日也要 1,800+ 請求,這就是慢的根因;逐日道候建(Z35)"
+  },
+  {
+   "id": "L38",
+   "batch": "批518",
+   "cat": "治理",
+   "zh": "治理閘處置律(中央治理主控台 RED 的判讀):工具的 FAIL/WARN 先分「活樹/新模組/存檔/收容/退役」再判——①G17 循環:活樹圈才是債(懶載入/單向依賴修);退役/收容/存檔內互呼零觸碰只記錄(via-cgfamily cycles 對回檔名分區 → CYCLES_latest.json)②G03 重複家族依 L23:byte 同且檔名零引用才刪;惰性存檔(SCOPE_COPY/_output)與被冊引用的副本=留 ③G04 無法解析=退役/收容件原始語法錯與空 __init__.py,零觸碰 ④G16 外部呼叫無 URN、G18 爆炸半徑(我們從不 --commit)、G22 未探針(--probe=操作員之手)=設計上 WARN 不擋;判讀寫進 FAMILY_latest,VCGC 十一段一行講清楚,工具整體 RED 不等於活樹 RED"
+  },
+  {
+   "id": "L39",
+   "batch": "批519",
+   "cat": "介面",
+   "zh": "U/I 對接契約律(操作員令「規劃好所有 U/I 自小一點更專業 · 中央自適應式連結對接 U/I · 介面做好與 HTML U/I 對接規格」):①每頁一產生器(L30),頁名/擁有者/家族/再生短令登在 VIA_UI_Contract_v0100.json(CGC_MDL153 ui-contract --apply 掃出來,不手填)②中央(VCGC 十二段)只連結不重造:頁在=file:// 連、不在=ABSENT 誠實、逾 7 日=YELLOW ③頁面規格:零 CDN、系統字、內嵌 JSON 快照(SNAPSHOT),樞紐 127.0.0.1:8765 在聽才 LIVE 重取、產生器不開瀏覽器(via-open 才開)、引擎→JSON→頁(頁不直讀庫)④樣式 tokens:12.5px 緊湊表格單色系,燈色只講狀態,手機單欄"
+  },
+  {
+   "id": "L40",
+   "batch": "批519",
+   "cat": "調度",
+   "zh": "工作流重組律(操作員令「WORKFLOW 圖可重整不同引擎形成新功能 · 對接口合約自適應式功能完善化 · 自動跳出實測真實結果」):①工作流=冊上項(VIA_InputConsole_Spec)依序重組,冊在 VIA_Workflow_SSOT_v0100.json(種子八條;頁面匯出 JSON 存回即入冊)②執行只經匯流排 call --item --apply --profile(家族境/閘/PYTHONHOME 撤除全在匯流排;不另起爐灶)③合約自適應:節點在冊?參數有預設/要操作員給/可解?觸網?→ 逐邊 OK/DEFAULT/NEED_INPUT/GATED/ABSENT,整條取最壞;RED 節點後預設 SKIP(--continue 才續)④實測面板=最新真跑(工作流/五矩陣/RunGate/VTMRA/主控台/循環判讀)自動展開,ABSENT 誠實"
+  },
+  {
+   "id": "L41",
+   "batch": "批520",
+   "cat": "指標",
+   "zh": "TA-Lib 量值政策律(操作員令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖交易量值跟沒扣除,但計算指標一律使用扣除後」):①價=ADJUSTED_PRICE_ONLY(tw_prices_adj 的 adj_open/high/low/close;缺則由 tw_daily_prices 以 adj_close/close 因子還原;不拿 raw OHLC 算指標)②量值四欄同時保留:volume_raw/volume_ex_daytrade/turnover_raw/turnover_ex_daytrade ③指標一律以扣當沖後量值計(display_mode/indicator_volume_bases=ex_daytrade)④當日無當沖資料 → ex 欄 NULL、該日量能指標 NULL 並警告,不拿 raw 冒充 ⑤扣法:ex_volume=成交股數−當沖成交股數(TWSE 當沖股數=買賣兩腿平均);ex_turnover=成交金額−(當沖買進金額+當沖賣出金額)/2 ⑥源:價 ENG060 tw_prices_adj · 值 ENG057 tw_trading_daily · 當沖 ENG055 L15 tw_daytrade_stock(WAF 擋=誠實缺);政策 config=functional modules/TALib/VIA_TALib_OneEngine.via.config.json(收容件 config 零觸碰)",
+   "status": "SUPERSEDED",
+   "active_route": false,
+   "superseded_by": "L50"
+  },
+  {
+   "id": "L42",
+   "batch": "批521",
+   "cat": "指標",
+   "zh": "TA-Lib→VAP 交接律(操作員令「全面性解決 TA-LIB 輸入為 VDF 產出的資料庫,未來輸出給 VAP 或其他專題繪圖」):①輸入只從 VDF 庫(tw_prices_adj/tw_daily_prices · tw_trading_daily · tw_daytrade_stock)經正主橋 --query 進引擎,引擎不自抓 ②交接物=特徵表 features parquet(date×ticker 寬表:adj_* · volume_raw/ex_daytrade · turnover_raw/ex_daytrade · ta__<函數>__<參數>__<輸出>)+ 訊號表 + VAP Catalog(VIA-VDF-VAP-CONNECTION-MANIFEST/1.0);VAP/專題繪圖只讀特徵表,不重算指標 ③圖規走 VAP ONE 堆疊 config(還原價 K 線+扣當沖量;量缺=raw 誠實標;SMA20 雙軸;RSI14)由橋生成,VAP_ENG016 --render 出 svg/html(零 CDN)④收容件 JSON/啟動邊界的毛病由橋墊片吸收,收容件零觸碰",
+   "status": "SUPERSEDED",
+   "active_route": false,
+   "superseded_by": "L50"
+  },
+  {
+   "id": "L43",
+   "batch": "批521",
+   "cat": "共識",
+   "zh": "共識 EPS 律(操作員令「CONSENSUS EPS SHOULD BE DILUTED EPS ONLY IN FACTSET CONSENSUS」):Forward P/E 用的共識 EPS 只取 FactSet 共識(consensus_daily source=CNYES_FACTSET:鉅亨 FactSet estimateProfit 年度 feMean=稀釋 EPS 共識均值)的 N/N+1 兩期;YFinance(YAHOO_QS)與其他來源只給目標價(Low/Mean/Median/High 分欄,不跨源平均),不給 EPS;碎片帶 eps_basis 欄標示來源與稀釋基礎;EPS 缺=Forward P/E fail-closed 不編"
+  },
+  {
+   "id": "L44",
+   "batch": "批522",
+   "cat": "VATETF 產出",
+   "zh": "VATETF 產出每跑一夾律:adapter 是 append-only(asof= 夾已有 manifest 就 FileExistsError)。橋每跑開新夾 VIA_Reports/vatetf/out/RUN_<ts>,判讀只認本跑新產的 audit.json;舊夾 audit 永不當這一跑的結果(假綠)。"
+  },
+  {
+   "id": "L45",
+   "batch": "批522",
+   "cat": "VDF 資料源",
+   "zh": "當沖量值來源三態律(只收不掛線):TWSE openapi TWTB4U=當沖標的冊(無量值);TWSE rwd/TPEX 個股當沖頁對 python 客戶端回 WAF 安全導向(302/安全頁)。量值走檔案收容道:操作員瀏覽器存 CSV/JSON → functional modules/VDF/references/intake/daytrade_files/ 或 via-daytrade --from-file;引擎解析入 tw_daytrade_stock;線上三源永遠先試、誠實列示;不裝瀏覽器自動化繞 WAF。"
+  },
+  {
+   "id": "L46",
+   "batch": "批522",
+   "cat": "VRN 第一頁邏輯",
+   "zh": "第一頁邏輯附加側檔律:第一頁邏輯補缺(代碼階梯/券商/評等/目標價/檔名×首頁互核)由 VRN_ENG086 正主橋做,讀 ENG072 sidecar 只讀,產物寫 VIA_Reports/first_page_logic/<stem>.logic86.json(append-only);ENG072 正本與其 sidecar 零觸碰;收容件 FirstPageEngine 零觸碰,已知毛病在橋側防呆(券商短別名詞界、評等線索詞、目標價旁四碼=代碼不算、多公司摘要不取)。"
+  },
+  {
+   "id": "L47",
+   "batch": "批522",
+   "cat": "VRN OCR 車道",
+   "zh": "車道境預檢律:OCR 車道派送前先預檢車道 python:檔在、venv 佈局(Scripts)要有 pyvenv.cfg、cfg 的 home 基底解譯器在;壞=逐支 name@境 記 BROKEN 並 SKIP(境壞;重建 via-rebuild --env;重建後 via-vrnlogic reset-backends),不當 OCR_RUN_FAIL(那是 OCR 壞的訊號)。子行程 FileNotFoundError/rc=106 同判。"
+  },
+  {
+    "id": "L50",
+    "batch": "B531",
+    "cat": "指標",
+    "zh": "QuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。",
+    "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
+    "enforcement": "CGC_MDL156_VIAAcceleratorControl_v0100 + VDF_ENG086_QuantGuardOneBridge_v0100",
+    "status": "ACTIVE"
+  }
+ ],
+ "lessons": [
+  {
+   "id": "LL01",
+   "batch": "批489/490",
+   "zh": "49 張 ABSENT 是點錯的燈:庫在倉外的資料家;census 先找家再判缺"
+  },
+  {
+   "id": "LL02",
+   "batch": "批491",
+   "zh": "接點死了不是庫沒了:junction LINKED_ELSEWHERE → --relink,不重建庫"
+  },
+  {
+   "id": "LL03",
+   "batch": "批493",
+   "zh": "paddleocr 3.x 拒收 2.x 參數(show_log)=900 秒 TIMEOUT 根因;相容墊片剝參數重試"
+  },
+  {
+   "id": "LL04",
+   "batch": "批499",
+   "zh": "FirstPageText 卻 OCR 全卷=1138 秒;後端 PASS/0元素、SKIPPED_UNAVAILABLE 都沒記=每件重載 Paddle;只送第 1 頁 + 分境健康全記"
+  },
+  {
+   "id": "LL05",
+   "batch": "批500",
+   "zh": "冊上 db 欄寫「全庫」機器對不上=冊外;對帳單一列一天=假 AMBER;db_scope/lamp 欄補上;via_paddle_311 缺 pymupdf=整批 OCR 轉接器 off"
+  },
+  {
+   "id": "LL06",
+   "batch": "批501",
+   "zh": "階梯用轉接器名、後端矩陣回規格名,兩套名對不上=paddle 三支永遠不在位;判準照抄 adapter.probe 只寫一處;黑底白字要反白"
+  },
+  {
+   "id": "LL07",
+   "batch": "批502",
+   "zh": "本境標壞鍵剔掉車道候選=第三階誤 SKIP;本境鍵與車道鍵分開;零字再試 psm 11→6;錯誤全文 400 字"
+  },
+  {
+   "id": "LL08",
+   "batch": "批504/505",
+   "zh": "自測寫進真庫兩次:全庫同步律讓 sync_targets 掃家與 VIA_DB_*,自測只導向首選庫不夠;自測整段撤 VIA_DB_*/VIA_DATA_HOME + VIA_SELFTEST 旗,並用假 VIA_DB 鍵重現證明零觸碰"
+  },
+  {
+   "id": "LL09",
+   "batch": "批505",
+   "zh": "登冊腳本在一個錨點斷掉=只上一半還 commit 了;每檔獨立寫入、失敗要可見、commit 前對清單"
+  },
+  {
+   "id": "LL10",
+   "batch": "批506",
+   "zh": "倉 560MB pack:ICON_FORGE 1.5GB 含 __DUP__/_vN 孿生、BACKUP 939/944 與正本 byte 同、25MB 巨檔四份同本;刪只憑 md5 證據且不動被引用的檔名"
+  },
+  {
+   "id": "LL11",
+   "batch": "批508",
+   "zh": "壞境上疊裝只會越疊越壞(via_vap_312 pyarrow 半拆、paddle 境 ppstructure 相依斷):先回到前次乾淨基線再按序裝,借 alt 境把 webui/ml_boost 件混進 vap/ml/vdf 境是 Hydra 病根,故 _M 比照 _H 單獨隔離"
+  },
+  {
+   "id": "LL12",
+   "batch": "批509",
+   "zh": "RunGate 把家族境「解譯器壞(SRE module mismatch:標準庫錯配)」判成「必要庫缺」並開補庫令——判錯的紅燈與假綠同罪:import re 都不行時,pip install 是錯藥;先探解譯器(-E/-S/-I 三試分病因:環境變數/site 層/venv 本體),再談庫"
+  },
+  {
+   "id": "LL13",
+   "batch": "批509",
+   "zh": "操作員機器出現本倉沒有的 CGC_MDL149 v0103 / Register v0200 / 律 27 lessons 14——另一條 AI 並行線在同一台機器上造件而沒拉遠端;結果 via-envrecover 不存在、台帳停在 1041、Grid 停在 v0301。檔案是唯一記憶,但兩條線各寫各的記憶=兩個腦;交會律 L25 立"
+  },
+  {
+   "id": "LL14",
+   "batch": "批510",
+   "zh": "矩陣 vrn_firstpage 每跑 600s TIMEOUT,螢幕停著 PPP「OCR 引擎載入失敗…paddle_static」讓操作員以為沒有 OCR 引擎——其實 tesseract 直道在做工;燒時間的是 16 件 PARTIAL 每跑都重燒整條 OCR 階梯(命中律只認 SUCCESS/FAIL)。命中律要涵蓋 PARTIAL(TTL 內不重燒;--retry-failed 才重抽);最後一行不等於病因"
+  },
+  {
+   "key": "panorama_input_isolation",
+   "zh": "暫存輸出不等於輸入隔離；selftest須明示禁止掃入正式incoming。",
+   "cat": "測試",
+   "id": "LL15",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL11"
+  },
+  {
+   "key": "panorama_short_tail",
+   "zh": "截斷矩陣why會丟失失敗斷言；完整每站日誌與進度必须隨測試保存。",
+   "cat": "診斷",
+   "id": "LL16",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL12"
+  },
+  {
+   "key": "panorama_false_done",
+   "zh": "API空回或逾時不得加入done；以資料庫存在及欄位驗證為準，非checkpoint單方宣稱。",
+   "cat": "續傳",
+   "id": "LL17",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL13"
+  },
+  {
+   "key": "panorama_snapshot_atomic",
+   "zh": "ETF逐列autocommit會留下假完整快照；一日持股應同一交易提交，快照日期覆蓋與持股完整性分開。",
+   "cat": "資料品質",
+   "id": "LL18",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL14"
+  },
+  {
+   "id": "LL19",
+   "batch": "批511",
+   "zh": "併線實錄:操作員機器上的線是 main(8071a062)+並行 commit,不是本分支;側枝推上來後量到 734 件新增,374 件與倉內 byte 同、48 件互為孿生、.via_envmanager 163MB 執行期狀態被 commit 進來;四個檔撞名(Register v0200/ENG072 v0126/RunGate v0102/MDL149 v0102)各自內容不同。併法:撞名者留並行線內容、本線改動移到更高版號並帶上對方功能(只增不減);律/lessons 取聯集保留 orig_id;執行期狀態 gitignore;孿生只刪未被引用者。兩條線各寫各的記憶=兩個腦,L25 交會律不是建議是必須"
+  },
+  {
+   "id": "LL20",
+   "batch": "批512",
+   "zh": "Z15 實錄:PYTHONHOME 空、PYTHONPATH 只有 bootstrap、via_vdf_312 = C:\\Python313 3.13.7 的 venv;RunGate 的 -c 探針 import re 過,站以檔案起跑卻 SRE module mismatch,而匯流排在同一 venv 跑 vap 引擎正常——差在站的子行程環境(cwd=引擎夾)與匯流排 child_env 不同一處;兩處各寫一套子行程環境=Hydra;整合成一處並把 traceback 的 File 路徑(where)印出來,病因才會自己說話"
+  },
+  {
+   "id": "LL21",
+   "batch": "批512",
+   "zh": "批511 併線時把本線 RunGate 的補丁切片用「下一個 def install_missing」當界,結果把中間 10 個既有函式一併複製進 v0103(_bridge/python_for/probe_libs 各兩份;自測仍綠=看不出來)。切片要以緊接的下一個 def 為界,併完 grep '^def ' 數重複"
+  },
+  {
+   "id": "LL22",
+   "batch": "批514",
+   "zh": "批509–513 四輪診斷都在子行程/cwd/遮蔽檔層打轉,實錄一行 PYTHONHOME=…uv\\python\\cpython-3.12 才定案;而操作員 PS 視窗 $env:PYTHONHOME 曾印空、venv 手動直跑 13/13 過——同一台機器不同視窗/啟動路徑(via_core 啟動、profile)帶的環境不同。診斷要先量「跑閘的那個行程」自己的 os.environ/sys.executable/base_prefix,不是量另一個視窗"
+  },
+  {
+   "id": "LL23",
+   "batch": "批514",
+   "zh": "操作員上傳的五件「中央管理系統」md5 與 new modules engines/ 內 (1)/(2)/(3)/(4) 副本 byte 全同——收件先算 md5 對全樹,再決定是新件還是歸位;「不足」常常不是缺程式而是缺登冊(Register/Deck/Grid/Manager/VCGC 皆無)與缺統一的閘/工作夾"
+  },
+  {
+   "id": "LL24",
+   "batch": "批515",
+   "zh": "via-cgfamily 在工作站五成員全 MD5_DRIFT——不是檔案被改,是 Windows git autocrlf 簽出把 LF 換成 CRLF;冊裡的 md5 以 LF 正本算。凡以 md5 對冊,先把內容正規化(CRLF→LF、去 BOM)再算;位元組同≠內容同的反面也成立"
+  },
+  {
+   "id": "LL25",
+   "batch": "批515",
+   "zh": "via-cgconsole 工作站 RED rc=1 192 秒,擁有者只印了尾四行=別家引擎的 SyntaxWarning(走 stderr),裁決理由一行都看不到。子行程尾行要 stdout 優先,RED 要把快照裡的 Gate FAIL/WARN(code/title/detail)列出來——沒有理由的紅燈等於沒量"
+  },
+  {
+   "id": "LL26",
+   "batch": "批515",
+   "zh": "MDL139 自測 ①②⑥ 從批505 三大報表出貨(state SHIPPED)起就一直紅:判準還釘著 fin_statements=PLANNED、range 旗標定序、報告夾缺=NEED_DIR(批446 報告夾律已改成改指有件的夾)。過時的判準是判錯的紅燈,與假綠同罪;每次改律要 grep 全樹哪些自測釘著舊值"
+  },
+  {
+   "id": "LL27",
+   "batch": "批516",
+   "zh": "via-console tab3 印 報告 0,而 via-vcgc 邏輯庫 64 件、資料家 OK——主控台 status 開的是寫死主路徑 MEGA/vdf_tw_market.duckdb,ENG073 早已資料家優先寫進 VIA_DATA_HOME 那本。批443/446「庫就在那裡,是我找不到那個庫」第三次現身;凡開庫,先走同一條解析律(目錄頁 → 資料家 rglob → 舊鏈),並把看了哪本庫印出來"
+  },
+  {
+   "id": "LL28",
+   "batch": "批516",
+   "zh": "via-cgfamily TypeError: object of type 'int' has no len()——別家快照裡 duplicate_groups 是數不是表。讀外來 JSON 的欄位型別不可假設:表取長度、數直接用、其餘 0;讀不動要誠實印,不可讓整個 status 炸掉"
+  },
+  {
+   "id": "LL29",
+   "batch": "批517",
+   "zh": "「五個交易日為什麼那麼慢」:ENG054 增量道已是「查庫 MAX(date) 只抓缺口」,但抓取單位是每檔一請求(yf_history 0.54s/檔 × 1,800 檔 ≈ 16 分),缺口 5 日或 500 日成本一樣;慢不在重抓、在道的單位。短缺口要一日一請求的全市場道"
+  },
+  {
+   "id": "LL30",
+   "batch": "批517",
+   "zh": "ENG069 月營收×共識 FAIL rc=1 在工作站與容器同病:DB_TW 寫死主路徑(LL27 第四次);資料家優先的解析律早在 ENG073 v0125,凡開 vdf_tw_market.duckdb 的引擎都要走同一條;表在但零列=缺料不是壞,自測要走誠實缺料模式"
+  },
+  {
+   "id": "LL31",
+   "batch": "批517",
+   "zh": "「NLP 工具要導入」差點第二次收容 v1.8.0——批421 早收在 intake 頂層(109 檔)、正主 SUP_MDL744 已在冊,我用 maxdepth 4 的 find 沒找到就以為缺。收件前要全深度找同名+查冊(Register/Grid/Deck)有沒有正主;有正主就在正主上加功能(summarize),不另起橋"
+  },
+  {
+   "id": "LL32",
+   "batch": "批518",
+   "zh": "交接寫「via-console status 印每表 max 日」,操作員照做 Select-String 印出空——status 的 print 段只印一句「庫表 N」,每表 rows/max 只落 CONSOLE_latest.json。沒看 do_print 段就講功能存在=判錯的綠燈;講「會印」前先看印段(MDL139 v0108 tables_lines 補印「更新到哪一天」)"
+  },
+  {
+   "id": "LL33",
+   "batch": "批518",
+   "zh": "主控台快照只存 URN、files/duplicate_*/unresolved 全是計數,RED 對不回檔名;要拿 records 得在行程內驅動工具(dataclass 模組須先註冊進 sys.modules,否則 exec_module 就 AttributeError NoneType.__dict__)。對回後:三圈在退役件(batch180/186)與收容件(OmniFormat b245 引擎↔Invoke ps1),一圈是活樹的舊啟動器 Invoke-VRN-Activate-And-Validate.ps1 仍呼叫批180 已退役的 VRN_ENG008——啟動器沒隨引擎退=活樹真債(git mv 退役 wave8 即解)。工具 RED ≠ 活樹 RED,先分區再判(L38)。容器 3.11 另多 12 件 f-string 反斜線「無法解析」=3.12 以下語法差,工作站 3.13 不算"
+  },
+  {
+   "id": "LL34",
+   "batch": "批519",
+   "zh": "三件上傳先對 md5/SHA256SUMS 再收(LL31 的落實):VRN_BatchFourEngine_v0100.py 與 b245/b383 兩處 byte 全同=第三次上傳,不再收;VETF_FINAL_SEAL_2 的 SHA256SUMS 與 b242 逐行同=不再收;只有 VIA_TALib_OneEngine 是新件(倉內零同名同 md5)→ 收容 _b519 + 正主橋。功能需求對回正主:docx→md 橋=ENG075(markitdown)、批次=匯流排、對帳=ENG074;four_engine_orchestrator 套件不在倉=ABSENT 誠實"
+  },
+  {
+   "id": "LL35",
+   "batch": "批519",
+   "zh": "via-vetf 找庫只翻 output_hub 舊主路徑,資料家那本 ActiveTWETF.duckdb/vdf_tw_market.duckdb 永遠找不到=第五次「庫就在那裡,是我找不到那個庫」(LL27/LL30 在 Register 短令層漏了)→ Register v0206 $findDb 資料家優先、output_hub 退路;之後凡短令自己找庫,一律先問 VIA_DATA_HOME"
+  },
+  {
+   "id": "LL36",
+   "batch": "批519",
+   "zh": "ENG069 自測在資料在位時把資料側門檻(市場檔數>1000/交集>0)當程式檢:工作站庫在、共識表沒交集就 rc=1,VTMRA 家族閘連帶 RED=判錯的紅燈;容器無庫走誠實缺料二檢全綠=判不到。自測要分「程式檢」(結構不變量)與「資料側」(YELLOW 註記),資料在位卻誠實停 rc2 也是資料側;例外才是程式壞(印類別+訊息貼回)"
+  },
+  {
+   "id": "LL37",
+   "batch": "批520",
+   "zh": "via-vetf 找到庫了卻 FAIL_CLOSED「Need a DataFrame with at least one column」:收容件 adapter 只認自己的欄名別名(holding_date/etf_code/ticker/holding_weight、price_date/adj_close),VDF 正本 holdings_daily 叫 portfolio_date/etf_ticker/holding_ticker/weight_pct、價表 ticker 帶 .TW 尾綴 → 每列被丟成 0 筆 → 寫候選 DuckDB 空表炸。錯的不是庫也不是 adapter,是對接口沒合約 → 正主橋 ENG085 建暫存輸入庫把欄名改成它認得的(L31 對接口合約自適應),缺哪欄講哪欄"
+  },
+  {
+   "id": "LL38",
+   "batch": "批520",
+   "zh": "ENG069 ② 每檔唯一最新月 FAIL:工作站 monthly_revenue_analysis 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym 沒鎖列 → JOIN 放大;容器空庫判不到。修=QUALIFY ROW_NUMBER() 去重 + 印重複列數(庫零觸碰)+ 合成庫自測證 join 不放大(容器也能跑)。凡 JOIN 到「每檔一列」的視圖,兩側都要鎖唯一"
+  },
+  {
+   "id": "LL39",
+   "batch": "批521",
+   "zh": "via-taone 印的裝法 numpy<2 在工作站 pip 從原始碼編譯失敗(Meson/clang):via_vdf_312 實為 Python 3.13 venv,numpy 1.26 沒有 3.13 wheel;收容件 requirements 的釘版是 numpy<2 世界的。裝法要依境選:numpy≥2 或 Python≥3.13 → TA-Lib≥0.6(wheel 自帶 C 庫;容器 0.8.0+numpy 2.4.6 self-test PASS);probe 先印 python/numpy 版本再給令"
+  },
+  {
+   "id": "LL40",
+   "batch": "批521",
+   "zh": "via-taone run --codes 2330,2317 到引擎變成 IN ('2330 2317'):PowerShell 把逗號拆陣列、Register 再以空白合回(批514 split_need 同病)。凡吃清單的旗標,引擎端一律逗號/空白/分號/全形逗號/頓號皆分隔,不能只 split(',')"
+  },
+  {
+   "id": "LL41",
+   "batch": "批521",
+   "zh": "五矩陣 3 紅具名:vrn_firstpage=ENG072 二十二檢含 OCR 階梯逾 600s(慢≠壞 → 冊項 timeout 1500,匯流排 v0127 認冊上逾時);vrn_structdb ㉞/vrn_finpages ⑯=自測用 str(Path('/tmp/_d_')) 比對,Windows 印反斜線永遠不等=判錯的紅燈(as_posix 比對)。容器(Linux)看不到這兩紅,工作站才看得到——判準要對兩個作業系統都成立"
+  },
+  {
+   "id": "LL42",
+   "batch": "批521",
+   "zh": "TA-Lib 收容件把 talib.__ta_version__(bytes)寫進 manifest → json.dumps 炸「無法 JSON 序列化:bytes」;容器裝上 TA-Lib 才跑得到這一步(工作站沒裝=看不到)。收容件零觸碰:橋以 -c 墊片載入模組、補 json_default(bytes→str)再呼 main;凡收容件的 JSON/啟動邊界毛病都在橋吸收"
+  },
+  {
+   "id": "LL43",
+   "batch": "批521",
+   "zh": "收容件 main() 跑完但部分函數缺量基時回 status=YELLOW 且 rc=2(不是 0):判讀器以 status 為準(rc 0/2 + YELLOW=誠實黃),不以 rc≠0 一律判 FAIL;因由行要先濾掉 pandas PerformanceWarning 等噪音,否則假紅的理由是一行警告。容器證:run 1240 → YELLOW 31 列/577 欄/覆蓋 0.93/MissingActivityBasis 34 → latest → vap OK 圖 3"
+  },
+  {
+   "id": "LL44",
+   "batch": "批522",
+   "zh": "橋的判讀退回「舊 audit」=假綠:工作站 via-vetf 印 OK 40 筆,其實 adapter 在同 asof 夾 FileExistsError 一字未寫;判讀只認本跑新產物(before/after 集合差),沒有就是 FAIL 帶 adapter 的 error_type。"
+  },
+  {
+   "id": "LL45",
+   "batch": "批522",
+   "zh": "TWSE openapi 的 TWTB4U 只有 Date/Code/Name/Suspension(標的冊),鍵名貼回才知道;上一批以「量值鍵名不確定」寫了防禦對映=空跑。凡靠鍵名的抓取先把鍵印回來再寫對映(批521 v0110 印鍵名是對的,這批補檔案收容道)。"
+  },
+  {
+   "id": "LL46",
+   "batch": "批522",
+   "zh": "ENG072 ㉙ 工作站紅:樞紐(ENG066→ENG064 normalizer)在,但 vrn 境沒 opencc → normalize 直通,自測要求「有樞紐就要繁化」=把境的缺當引擎的錯。判讀要分三態:樞紐缺/樞紐在無轉換器(印裝法=你的手)/樞紐在能轉;探針一句 normalize('报告营收') 就分得出。"
+  },
+  {
+   "id": "LL47",
+   "batch": "批522",
+   "zh": "自測夾具 symlink 的是 venv 的 python.exe(啟動器):在 Windows 離開 venv 夾就 rc=106 找不到 pyvenv.cfg → ㊷ 假紅。夾具要連 sys._base_executable(基底解譯器);跨平台夾具先想 Windows venv 啟動器的行為。"
+  },
+  {
+   "id": "LL48",
+   "batch": "批522",
+   "zh": "收容件邏輯直接接線會把它的字典毛病帶進來(broker_normalize 子字串:earnings→GOLDMAN;rating `or a in low` 讓詞界失效:buyback→BUY)。真檔名 76 份實測抓出來的:對真資料跑一輪比讀一遍程式碼快。三個「代碼漏」其實是舊真值把年份 2026 當代碼——階梯拒收年段是對的。"
+  },
+  {
+   "id": "LL49",
+   "batch": "批522",
+   "zh": "容器跑 Grid 全站自測(CGC_MDL064 --selftest 無 --fast)會讓各站把冊/頁在沙盒空庫上再生:6 本 registry JSON + 22 張 ui_support 頁全被改。commit 前 git status 逐檔對:不是這批的手改就 git checkout 還原(只留 Manager 再生的總控頁與 VCGC 三面);要驗新站只跑該站 --selftest。"
+  }
+ ]
+}

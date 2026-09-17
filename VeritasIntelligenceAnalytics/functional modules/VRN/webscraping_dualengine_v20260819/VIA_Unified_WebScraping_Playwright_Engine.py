@@ -81,6 +81,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable, Optional, Protocol, Sequence
 
+_VRN_ENGINE_DIR = Path(__file__).resolve().parent
+if str(_VRN_ENGINE_DIR) not in sys.path:
+    sys.path.insert(0, str(_VRN_ENGINE_DIR))
+
 from VIA_Investment_Report_Classifier import (
     def_classify_investment_report,
     def_split_morning_brief,

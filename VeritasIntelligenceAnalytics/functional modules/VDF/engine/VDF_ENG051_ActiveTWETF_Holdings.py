@@ -94,10 +94,29 @@ except ImportError:
     duckdb = None
 
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+# ===== 批536:網路庫探針式載入(LL51)——模組頂層硬 import 會讓「本境沒裝」變成 Traceback,
+# 中央派送判成 RED=假紅。缺=誠實 ABSENT 並印裝法(你的手;不代裝)。行為與原版相同(有裝就照跑)。
+requests = None
+BeautifulSoup = None
+HTTPAdapter = None
+Retry = None
+NET_LIBS_ERR = ""
+try:
+    import requests as _rq
+    from bs4 import BeautifulSoup as _bs
+    from requests.adapters import HTTPAdapter as _ha
+    from urllib3.util.retry import Retry as _rt
+    requests, BeautifulSoup, HTTPAdapter, Retry = _rq, _bs, _ha, _rt
+except Exception as _net_exc:                      # noqa: BLE001
+    NET_LIBS_ERR = f"{type(_net_exc).__name__}: {_net_exc}"
+
+
+def _require_net_libs() -> None:
+    """抓取前呼叫;缺件=誠實 ABSENT(rc 由呼叫端決定),不在 import 期間炸。"""
+    if requests is None or BeautifulSoup is None:
+        raise RuntimeError(
+            f"[ABSENT] 本境缺網路解析庫(不是壞):{NET_LIBS_ERR};"
+            '裝=你的手:& <vdf python> -m pip install requests beautifulsoup4 urllib3')
 
 
 ENGINE_NAME = "VIA_ActiveTWETF_DailyHoldings_Engine"

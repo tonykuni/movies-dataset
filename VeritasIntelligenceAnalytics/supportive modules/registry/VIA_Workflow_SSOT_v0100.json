@@ -1,6 +1,6 @@
 {
  "schema": "VIA.Workflow.SSOT.v1",
- "batch": "批522",
+ "batch": "批535",
  "note": "工作流=冊上項(VIA_InputConsole_Spec 家族項)依序重組;執行只經匯流排 call --item(閘不變:net 項要操作員同意閘);L40 工作流重組律",
  "workflows": [
   {
@@ -72,14 +72,12 @@
    ]
   },
   {
-   "id": "vdf_talib_features",
-   "zh": "技術指標特徵鏈(個股當沖量值→架構矩陣→TA-Lib OneEngine 正主橋→VAP ONE 堆疊圖;L41/L42;TA-Lib 缺=ABSENT)",
+   "id": "vdf_quantguard_features",
+   "zh": "QuantGuard 技術指標特徵鏈(資料架構→ENG086 Polars 技術分析與因子;零網路；當沖輸入另走收容鏈)",
    "profile": "test",
    "nodes": [
-    "tw_daytrade_stock",
     "db_arch",
-    "vdf_talib_one",
-    "vdf_talib_vap"
+    "vdf_quantguard_one"
    ]
   },
   {
@@ -103,12 +101,85 @@
   },
   {
    "id": "vdf_daytrade_file_chain",
-   "zh": "當沖檔案收容→TA-Lib 扣當沖特徵→VAP(瀏覽器存的 CSV 進庫後重算量能指標;L41/L45;批522)",
+   "zh": "當沖檔案收容→資料架構重建→QuantGuard 狀態檢查(真實計算另走 vdf_quantguard_run 並明給 --in)",
    "profile": "run",
    "nodes": [
     "tw_daytrade_files",
-    "vdf_talib_one",
-    "vdf_talib_vap"
+    "db_arch",
+    "vdf_quantguard_status"
+   ]
+  },
+  {
+   "id": "vdf_market_lists_acceptance",
+   "zh": "VDF 中央市場清單驗收(股票全集/主動 ETF/熱門族群去重；2023-01-01 起；離線可驗收)",
+   "profile": "test",
+   "nodes": [
+    "vdf_market_lists"
+   ]
+  },
+  {
+   "id": "via_functional_acceptance",
+   "zh": "VIA 功能級整合驗收(中央 gate；逐站 rc/裁決/證據)",
+   "profile": "test",
+   "nodes": [
+    "via_functional_acceptance"
+   ]
+  },
+  {
+   "id": "via_ssot_autocode_governance",
+   "zh": "VIA 統一 SSOT 治理(Regex／同義字／邏輯／參數／因子／資料庫／模組／狀態／收容；自動編碼隔離協定)",
+   "profile": "test",
+   "nodes": [
+    "via_ssot_autocode"
+   ]
+  },
+  {
+   "id": "vrn_nlp_vdf_pipeline",
+   "zh": "NLP文字修復／證據型摘要→VRN→VDF中央鏈(B529；三頁HTML矩陣；VDF阻擋不假綠)",
+   "profile": "run",
+   "nodes": [
+    "vrn_nlp_vrn_vdf_pipeline"
+   ]
+  },
+  {
+   "id": "via_accelerator_control",
+   "zh": "VIA 25 項加速器線控(PS roster→Python bootstrap→Celeritas/Aegis mount→證據矩陣)",
+   "profile": "test",
+   "nodes": [
+    "via_accelerator_control"
+   ]
+  },
+  {
+   "id": "via_unified_nlp_pipeline",
+   "zh": "VIA 統一 NLP 強化鏈(Hub→文字正規化／表格／版面／角色／證據摘要→VRN→VDF；附件 adapter 受控)",
+   "profile": "test",
+   "nodes": [
+    "via_unified_nlp",
+    "vrn_nlp_vrn_vdf_pipeline"
+   ],
+   "network": "OFFLINE_ONLY",
+   "gate": "SUP_MDL866 selftest GREEN before any adapter execution"
+  },
+  {
+   "id": "via_unique_entry_control",
+   "zh": "VIA 唯一接觸口控制(VIA command book→CGC157→VRN/VDF/QuantGuard)",
+   "profile": "test",
+   "nodes": [
+    "via_unique_entry_control",
+    "vrn_dispatch",
+    "vdf_dispatch",
+    "quantguard_dispatch"
+   ],
+   "network": "OFFLINE_ONLY",
+   "gate": "CGC_MDL157 GREEN before any child-system dispatch"
+  },
+  {
+   "id": "via_panorama_chain",
+   "zh": "全景稽核修復鏈(唯一接觸口閘 → 全景 AST 稽核與純增量修 → 中央三家族派送;批535)",
+   "profile": "run",
+   "nodes": [
+    "via_unique_entry_control",
+    "via_panorama_audit"
    ]
   }
  ]

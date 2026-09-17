@@ -193,12 +193,6 @@
      "pip": "duckdb",
      "imp": "duckdb",
      "role": "庫"
-    },
-    {
-     "pip": "TA-Lib",
-     "imp": "talib",
-     "role": "技術指標庫(批516 操作員令 TA-LIB 確認測試無誤;VTMRA/VAP 指標;0.5+ wheel 內含 C 庫;閘=CGC_MDL151 via-talib)",
-     "risk": "LOW"
     }
    ],
    "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
@@ -250,13 +244,41 @@
      "role": "AegisNexus 網路核心相依"
     },
     {
-     "pip": "TA-Lib",
-     "imp": "talib",
-     "role": "技術指標庫(批516 操作員令 TA-LIB 確認測試無誤;VTMRA/VAP 指標;0.5+ wheel 內含 C 庫;閘=CGC_MDL151 via-talib)",
+     "pip": "VIA QuantGuard intake",
+     "imp": "quant_engine",
+     "role": "Polars-first 技術分析、因子、風險與 PIT 回測核心(不使用禁用舊指標庫)",
+     "health": [
+      "ssot_manifest",
+      "pytest_regression",
+      "anti_lookahead"
+     ],
      "risk": "LOW"
+    },
+    {
+     "pip": "VDF_ENG087_MarketListGovernance",
+     "imp": "VDF_ENG087_MarketListGovernance_v0100",
+     "role": "中央市場清單治理橋：股票全集/主動ETF/熱門族群去重驗收；不重造抓取器",
+     "optional": true
     }
    ],
-   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)",
+   "external_mounts": [
+    {
+     "name": "VeritasCeleritas",
+     "path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasCeleritas.py",
+     "sha256": "ecb06be4badb7ce648e275a4c35a1ac44759f155ab39a137f9fbbbb7a536a1d0",
+     "role": "VIA 加速器掛載",
+     "activation": "VIA_SuperAccel bridge; graceful fallback"
+    },
+    {
+     "name": "VeritasAegisNexus",
+     "path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasAegisNexus.py",
+     "sha256": "4a9443686a8f5de076a9f69d4cd00fab9576180d17f9fe03f9ff59a526be4d7d",
+     "role": "VIA 網路工具掛載",
+     "activation": "network gate OFF by default; no network in QuantGuard selftest"
+    }
+   ],
+   "mount_policy": "Celeritas/Aegis mounted for registry traceability; QuantGuard calculation is offline and network-gated."
   }
  },
  "health_checks": {
@@ -322,5 +344,230 @@
   }
  },
  "recover_law": "L24 環境復原律(批508):via-envrecover = ①還原前次 ②順序裝全部工具 ③_M/_H 單獨隔離;plan 唯讀;-Execute -Approve 才跑;① 不受 L19,② 過 L19;存證 VIA_Reports/env_governance/RECOVER_latest.json/.ps1",
- "note_b516": "TA-Lib 入冊 via_vdf_312/via_vap_312(LOW;官方 wheel);裝=操作員的手 via-envtools -Apply -Approve 或 uv pip install --python <境> TA-Lib;驗=via-talib(CGC_MDL151 數值檢對手算)"
+ "note_b523": "QuantGuard ENG086 已取代舊技術指標生產接線；計算只允許 adjusted price + non-day-trade volume，網路閘預設關閉；Celeritas/Aegis 以 intake mount 雜湊登錄。",
+ "accelerator_control": {
+  "roster": "supportive modules/registry/VIA_Accelerator_Roster_SSOT_v0100.json",
+  "powershell_roster": "supportive modules/registry/VIA_PS_Accelerators_25_Roster_v0100.ps1",
+  "runtime": "supportive modules/VIA_PS_Accel_Module.ps1",
+  "python_bootstrap": "supportive modules/bootstrap/sitecustomize.py",
+  "python_accelerator": "supportive modules/VIA_SuperAccel_Module.py",
+  "policy_ssot": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
+  "technical_analysis_policy": "QuantGuard-only; TA-Lib/talib forbidden_not_used",
+  "network_tools": [
+   "supportive modules/accelerator/VeritasCeleritas.py",
+   "supportive modules/network/VeritasAegisNexus.py"
+  ],
+  "count": 25,
+  "activation": "CGC_MDL156 only; GREEN gate; network consent remains operator-owned",
+  "items": [
+   {
+    "id": "01",
+    "name": "AST 精準解析加速器",
+    "python_api": "ast_parse/safe_compile",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "02",
+    "name": "多語言語意模型加速器",
+    "python_api": "regex_synonym_normalize",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "03",
+    "name": "九頭龍風險預測加速器",
+    "python_api": "risk_guard",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "04",
+    "name": "依賴拓撲排序加速器",
+    "python_api": "dependency_order",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "05",
+    "name": "沙盒隔離執行加速器",
+    "python_api": "isolated_call",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "06",
+    "name": "自動修正建議生成加速器",
+    "python_api": "repair_plan",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "07",
+    "name": "三輪全景式分析加速器",
+    "python_api": "panorama_matrix",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "08",
+    "name": "SSOT 對齊加速器",
+    "python_api": "ssot_align",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "09",
+    "name": "視覺化矩陣生成加速器",
+    "python_api": "matrix_html",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "10",
+    "name": "錯誤分類與分群加速器",
+    "python_api": "error_cluster",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "11",
+    "name": "性能與複雜度分析加速器",
+    "python_api": "perf_profile",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "12",
+    "name": "多子系統同步檢視加速器",
+    "python_api": "subsystem_sync",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "13",
+    "name": "版本差異與回滾加速器",
+    "python_api": "git_diff_rollback",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "14",
+    "name": "覆蓋率與回歸檢查加速器",
+    "python_api": "regression_gate",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "15",
+    "name": "修正順序最佳化加速器",
+    "python_api": "fix_order",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "16",
+    "name": "動態進度條加速器",
+    "python_api": "progress_event",
+    "route": "PS",
+    "network": false
+   },
+   {
+    "id": "17",
+    "name": "動態說明加速器",
+    "python_api": "status_narration",
+    "route": "PS",
+    "network": false
+   },
+   {
+    "id": "18",
+    "name": "非阻塞 PowerShell 執行加速器",
+    "python_api": "nonblocking_process",
+    "route": "PS",
+    "network": false
+   },
+   {
+    "id": "19",
+    "name": "多引擎整合加速器",
+    "python_api": "engine_bus_call",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "20",
+    "name": "自動部署與環境初始化加速器",
+    "python_api": "env_bootstrap",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "21",
+    "name": "資源預算與自動節流加速器",
+    "python_api": "resource_budget",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "22",
+    "name": "快取、去重與斷點續跑加速器",
+    "python_api": "cache_checkpoint",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "23",
+    "name": "網路同意閘與斷路器加速器",
+    "python_api": "network_gate",
+    "route": "PS+Python",
+    "network": true
+   },
+   {
+    "id": "24",
+    "name": "輸入輸出契約與 Schema 驗證加速器",
+    "python_api": "contract_validate",
+    "route": "PS+Python",
+    "network": false
+   },
+   {
+    "id": "25",
+    "name": "證據雜湊與 HTML/JSON 矩陣加速器",
+    "python_api": "evidence_bundle",
+    "route": "PS+Python",
+    "network": false
+   }
+  ]
+ },
+ "unified_nlp": {
+  "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+  "version": "v0100",
+  "source": "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0100.py",
+  "provider": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+  "vrn_bridge": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0100.py",
+  "attachment_manifest": "supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json",
+  "execution": "offline_text_and_file_only",
+  "network_default": "OFF",
+  "ta_policy": "QuantGuard-only; TA-Lib forbidden_not_used",
+  "supported_services": [
+   "normalization",
+   "segmentation",
+   "table_extraction",
+   "layout_analysis",
+   "content_roles",
+   "evidence_summarization"
+  ],
+  "adapter_policy": "intake_only_until_individually approved; no silent network, install, schedule, overwrite, or auto-fix",
+  "quantguard_data_flow": "VDF/DuckDB read -> QuantGuard -> features/factors/evidence; no reverse source edge"
+ },
+ "unique_entry_control": {
+  "engine": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+  "source": "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0100.py",
+  "command_book": "Register-VIA-Commands-v0208.ps1",
+  "powershell_dispatch": "via-central",
+  "python_dispatch": "Invoke-VIAPython",
+  "bootstrap": "supportive modules/bootstrap/sitecustomize.py",
+  "families": ["vrn", "vdf", "quantguard"],
+  "network_default": "OFF",
+  "gate": "CGC157 GREEN before child dispatch",
+  "direct_child_execution": "FORBIDDEN_AS_VIA_CLAIM"
+ }
 }

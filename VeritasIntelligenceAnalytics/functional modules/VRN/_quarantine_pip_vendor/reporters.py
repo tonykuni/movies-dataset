@@ -14,9 +14,16 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-from typing import TYPE_CHECKING, Collection, Generic
+from typing import TYPE_CHECKING, Any, Collection, Generic, TypeVar
 
-from .structs import CT, KT, RT, RequirementInformation, State
+try:
+    from .structs import CT, KT, RT, RequirementInformation, State
+except ImportError:
+    CT = TypeVar("CT")
+    KT = TypeVar("KT")
+    RT = TypeVar("RT")
+    RequirementInformation = Any
+    State = Any
 
 if TYPE_CHECKING:
     from .resolvers import Criterion

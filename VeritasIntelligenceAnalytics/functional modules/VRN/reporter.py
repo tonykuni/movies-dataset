@@ -20,7 +20,13 @@ from typing import Any
 
 from pip._vendor.resolvelib.reporters import BaseReporter
 
-from .base import Candidate, Requirement
+try:
+    from .base import Candidate, Requirement
+except ImportError:
+    # This file is retained as an isolated pip-vendor compatibility module;
+    # its annotations do not require the removed vendored base module.
+    Candidate = Any
+    Requirement = Any
 
 logger = getLogger(__name__)
 

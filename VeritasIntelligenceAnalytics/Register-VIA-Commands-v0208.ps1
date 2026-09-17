@@ -1,7 +1,8 @@
-﻿# Register-VIA-Commands-v0208.ps1 — 批522:+via-fplogic(別名 首頁邏輯;VRN_ENG086 第一頁邏輯補缺正主橋:status/gap/bench/enrich;收容件 FirstPageEngine _b522 零觸碰;產物 VIA_Reports\first_page_logic\*.logic86.json append-only)+ via-daytrade(別名 當沖量值;VDF_ENG055 run --lane L15 [--from-file A,B] [--date] [--market];L45 檔案收容道:瀏覽器存的 TWSE/TPEX CSV 進 tw_daytrade_stock);via-vetf→ENG085 v0104(每跑一夾/假綠修)、via-firstpage→ENG072 v0129 尾版;其餘沿用 v0207。
-# Register-VIA-Commands-v0207.ps1 — 批520:via-vetf 改走正主橋 VDF_ENG085 VatetfBridge(對接口合約自適應:VDF 正本欄→adapter 別名、代碼去尾綴、持股/價/共識暫存輸入庫;status|run [--asof]);via-taone 走 v0101(L41 扣當沖查詢/政策 config/check-data/policy);其餘沿用 v0206。
-# Register-VIA-Commands-v0206.ps1 — 批519:+via-taone(別名 技術指標引擎;VDF_ENG083 TA-Lib OneEngine 正主橋:probe/selftest-engine/catalog/run;收容件 _b519;TA-Lib 缺=ABSENT 不代裝)+ via-workflow(別名 工作流;CGC_MDL153 工作流重組台:catalog/validate/run/ui-contract/db-summary/page)· via-vetf 找庫改資料家優先(LL35:output_hub 舊路徑第五次「庫就在那裡」);其餘沿用 v0205。
-# Register-VIA-Commands-v0205.ps1 — 批516:+via-vtmra(別名 月營收分析;VTMRA=Veritas Taiwan Monthly Revenue Analysis 家族測試閘 CGC_MDL152:ENG063/075/069/076·TWREV·CrossGroupPhase·TA-Lib 以家族境真跑自測成矩陣)+ via-talib(別名 技術指標;CGC_MDL151 TA-Lib 閘:probe 數值檢對手算;ABSENT 印補庫令不代裝);其餘沿用 v0204。
+﻿# Register-VIA-Commands-v0208.ps1 — 批523:QuantGuard ENG086、SuperAccel、Celeritas/Aegis mounts 已註冊；舊技術指標生產接線移除；網路閘預設關閉。
+# VIA command registry: central EngineBus / InputConsole / Workflow SSOT are the source of truth.
+# Python engines must carry the standard ACCEL-BRIDGE and use the registered family environment.
+# Historical command aliases are not retained in the active command book.
+# QuantGuard commands: via-quantguard / 量化技術引擎 / 技術指標引擎 / 技術指標。
 # Register-VIA-Commands-v0204.ps1 — 批515:+via-vdf-extra5(別名 五額外;VDF 五個額外資料試跑=匯流排 matrix --ids 月營收/三大報表/主動ETF持股/FRED宏觀/國際宇宙;觸網=你的手 $env:VIA_NET_CONSENT)+ via-vatetf(VETF 改名 VATETF;應用端:直接讀 VDF 擷取庫);其餘沿用 v0203。
 # Register-VIA-Commands-v0203.ps1 — 批514:+中央治理家族六令 via-cgfamily/via-cgconsole/via-cgengine/via-cgrouter/via-cgdownward/via-samename(CGC_MDL150 擁有者;預設 dry-run;閘/權杖=你的手)+ via-iface -Need 陣列以逗號合回(實錄 need ['首頁 ocr'] 命中 0)+ Set-VIABoot 母殼帶 PYTHONHOME 誠實印黃(L32;根治=你的手);其餘沿用 v0202。
 # Register-VIA-Commands-v0202.ps1 — 批513:+via-iface(MDL054 v0102 綁定合約層 sync/connect/graft/status;別名 合約);其餘沿用 v0201。
@@ -17,7 +18,7 @@
 #     在後=後定義勝)
 #   ③當場生效:. "<本檔路徑>"(不用新視窗不用 via)
 # =====================================================================
-# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
     while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
@@ -28,8 +29,8 @@ try {
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
 $VIA = Split-Path -Parent $MyInvocation.MyCommand.Path
-# 批486:所有 py 指令統一走 Invoke-VIAPython(20 加速器點亮一次 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;stdout 走 pipeline,上游捕捉照舊)
-$viaPyProg = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"; if (Test-Path -LiteralPath $viaPyProg) { . $viaPyProg } else { Write-Host "  [VIA] VIA_PS_PyProgress_Module.ps1 缺(誠實;短令改回直呼)" -ForegroundColor Yellow; function global:Invoke-VIAPython { param([string]$Family="",[string]$Python="",[int]$TimeoutSec=0,[Parameter(ValueFromRemainingArguments=$true)][object[]]$Rest) $exe = if ($Python) { $Python } else { Get-VIAEnvPython $Family }; & $exe @Rest } }
+# 批486/B531:所有 py 指令統一走 Invoke-VIAPython(25 加速器控制面 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;stdout 走 pipeline,上游捕捉照舊)
+$viaPyProg = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"; if (Test-Path -LiteralPath $viaPyProg) { . $viaPyProg } else { Write-Host "  [VIA] VIA_PS_PyProgress_Module.ps1 缺(中央唯一入口不可用;已 fail-closed 停止)" -ForegroundColor Red; function global:Invoke-VIAPython { param([string]$Family="",[string]$Python="",[int]$TimeoutSec=0,[Parameter(ValueFromRemainingArguments=$true)][object[]]$Rest) Write-Host "  [Invoke-VIAPython] 中央 helper 缺失;禁止繞過 VIA 直呼 Python" -ForegroundColor Red; $global:LASTEXITCODE = 2 } }
 $global:VIARegisterPath = $MyInvocation.MyCommand.Path   # 批383:撞名守衛掃描本冊用
 
 # 批378:全域零跳出律——.html 預設程式=VS Code,任何 --open 皆會彈 VS Code(批366 只管 via-mobile 不夠)。載入短令冊即設 VIA_NO_OPEN=1:
@@ -42,14 +43,14 @@ function global:Get-VIANewest([string]$Dir, [string]$Pat) {
     (Get-ChildItem -Path $Dir -Filter $Pat -File -ErrorAction SilentlyContinue |
      Sort-Object Name | Select-Object -Last 1).FullName
 }
-# 批408:同意閘不覆蓋律。舊寫法 `$env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"`
+# 批408/B533:同意閘不覆蓋且 fail-closed。未明確設置時固定為 OFF；VIA 絕不代操作員開網路。
 # 每次呼叫都覆寫,操作員自設的值永遠被蓋掉;閘二包內法遵只認 I_ACCEPT_RESPONSIBLE_SCRAPING
 # (見 functional modules/VRN/webscraping_dualengine_*/VIA_WebScraping_Compliance_SSOT.json 的
 # required_consent_token),"YES" 過不了 def_validate_consent → check_url 一律 DENY → 爬蟲道不可達。
 # 本函式只在「未設」時補預設值(既有六令行為零變更),已設者尊重;仍不代操作員設任何新意圖。
 function global:Set-VIAGateDefaults {
-    if (-not $env:VIA_NET_CONSENT)    { $env:VIA_NET_CONSENT = "YES" }
-    if (-not $env:VIA_SCRAPE_CONSENT) { $env:VIA_SCRAPE_CONSENT = "YES" }
+    if (-not $env:VIA_NET_CONSENT)    { $env:VIA_NET_CONSENT = "OFF" }
+    if (-not $env:VIA_SCRAPE_CONSENT) { $env:VIA_SCRAPE_CONSENT = "OFF" }
 }
 # 批408:閘態一覽(唯讀;絕不印原值,只報是否等於期望 token)
 function global:via-gates {
@@ -157,14 +158,34 @@ function global:via-health { Invoke-VIAPython (Get-VIANewest "$VIA\supportive mo
 function global:via-tpn { Invoke-VIAPython -Family "vap" (Get-VIANewest "$VIA\functional modules\VAP\engine" "VAP_ENG011_TemplateRegistry_v*.py") @args }
 function global:via-psrepair { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-PSRepair-v*.ps1") @args }
 function global:via-all { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-All-v*.ps1") @args }
-# 批323:加速器啟動報告(SUP_MDL737 尾版 --activate/--libs)+覆蓋×啟動稽核(CGC_MDL117)
-function global:via-accel { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules" "SUP_MDL737_SuperAccelModule_v*.py") $(if ($args) { $args } else { "--activate" }) }
+# 批323/B531:25 項加速器唯一入口。--activate 先點亮 SUP_MDL737，再由 CGC_MDL156 驗收。
+# PS roster→PS runtime→Python sitecustomize→SuperAccel/Celeritas/Aegis mount 全部 GREEN 才算 READY。
+function global:via-accel {
+    $a = @($args)
+    $control = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL156_VIAAcceleratorControl_v*.py"
+    $super = Get-VIANewest "$VIA\supportive modules" "SUP_MDL737_SuperAccelModule_v*.py"
+    if (-not $a) { $a = @("selftest") }
+    if ($a -contains "--activate") {
+        Invoke-VIAPython $super "--activate"
+        Invoke-VIAPython $control "selftest"
+    } elseif ($a[0] -in @("status", "selftest", "manifest", "routes")) {
+        Invoke-VIAPython $control $a
+    } elseif ($a[0] -in @("--status", "--selftest", "--manifest", "--routes")) {
+        Invoke-VIAPython $control (($a[0] -replace '^--', ''))
+    } else {
+        Invoke-VIAPython $super $a
+        Invoke-VIAPython $control "status"
+    }
+}
 # 批384:加速器套件導入閘(MDL142;冊=Celeritas 尾版 _LIB_MAP 88 件;路由=MDL135 尾版 core_whitelist/high_risk/purpose_hints;
 #   境=via_core/via_vdf/via_vrn/via_vap(別名序);探針 find_spec 零副作用;GPU 無卡/需系統二進位/平台不符=誠實不列計畫;
 #   base 零觸碰(除 --include-base);--apply --approve 才裝(uv 優先退 pip);同意閘未開=拒裝)
 #   via-accel-import [--env-root <envs 根>] [--apply --approve] [--include-base] [--timeout N] [digest]
 function global:via-accel-import { Set-VIAGateDefaults; Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL142_AccelImport_v*.py") @args }
-function global:via-accel-check { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL117_AccelCoverage_v*.py") run }
+function global:via-accel-check {
+    Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL117_AccelCoverage_v*.py") run
+    Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL156_VIAAcceleratorControl_v*.py") selftest
+}
 # 批325:故事族群輪動橋接(ENG072 尾版;run 預設,可帶 export/preflight/--pkgtest)+repo 衛生一鍵(只宜工作站)
 function global:via-rotation { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG072_StoryRotationBridge_v*.py") $(if ($args) { $args } else { "run" }) }
 function global:via-repo-optimize { $ps = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }; & $ps -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-RepoOptimizer-v*.ps1") @args }
@@ -292,10 +313,10 @@ function global:via-etfhist { Set-VIAGateDefaults; Invoke-VIAPython -Family "vdf
 function global:via-etfuniv { Set-VIAGateDefaults; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG077_ActiveETFUniverse_v*.py") $(if ($args) { $args } else { "run" }) }
 # 批373:主動 ETF 持股×月營收動能(ENG076;兩專案合流層;零網路;加權 yoy/重疊榜;頁 VIA_UI_ETFRevenueMomentum);via-etfrev [run|status]
 function global:via-etfrev { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG076_ETFRevenueMomentum_v*.py") $(if ($args) { $args } else { "run" }) }
-# 批379/380:via-autorun=一鍵全自動四閘版:①via-accel --activate(20 加速器)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
+# 批379/380/B531:via-autorun=一鍵全自動四閘版:①via-accel --activate(25 加速器控制面)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
 function global:via-autorun { $env:VIA_NO_OPEN = "1"; $env:VIA_FRED_PROMPT = "0"; $env:GIT_EDITOR = "true"; $env:PYTHONUTF8 = "1"
     Write-Host "=== [via-autorun] 一鍵全自動(單一 PowerShell;零跳出;不卡斷;約 20–60 分鐘)===" -ForegroundColor Cyan
-    Write-Host "--- ① 20 加速器點亮(SUP_MDL737 --activate;缺席=誠實 SKIP 零影響)---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }
+    Write-Host "--- ① 25 加速器點亮與中央線控(CGC_MDL156;缺席=誠實 SKIP 零影響)---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }
     Write-Host "--- ② 九頭龍哨兵 H1–H6(唯讀;H3 進程雙頭/H5 尾版律 FAIL=誠實停,不跑)---" -ForegroundColor Cyan; $plan = (via-lanes plan 2>&1 | Out-String); Write-Host $plan
     if ($plan -match "H3 FAIL|H5 FAIL") { Write-Host "=== [via-autorun] 九頭龍風險(見上 H3/H5)=停;請先關閉另一條在跑的補齊鏈或修尾版後重試 ===" -ForegroundColor Red; return }
     Write-Host "--- ③ 全自動主鏈(拉齊→六流程 dry-run→十道並行補齊→四專案矩陣→產品閘)---" -ForegroundColor Cyan; via-mobile --lanes
@@ -462,17 +483,20 @@ Set-Alias -Name 主動ETF應用 -Value via-vetf -Scope Global -Force
 
 # 批516 操作員令「除錯成功後才 Veritas Taiwan Monthly Revenue Analysis VTMRA · TA-LIB 確認測試無誤」
 #   via-vtmra [test|status] [--timeout 600] [--json]   VTMRA 家族測試閘(CGC_MDL152;家族境 vdf 真跑七成員自測;零網路;落 VIA_Reports\vtmra)
-#   via-talib [probe] [--json]                          TA-Lib 閘(CGC_MDL151;ABSENT=未裝不是壞;裝=你的手:uv pip install --python <境> TA-Lib)
 function global:via-vtmra { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL152_VtmraGate_v*.py") $(if ($args) { $args } else { @("test") }) }
-function global:via-talib { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL151_TaLibGate_v*.py") $(if ($args) { $args } else { @("probe") }) }
-# ── 批519:via-taone —— TA-Lib OneEngine 正主橋(VDF_ENG083;收容件 functional modules\TALib\references\intake\VIA_TALib_OneEngine_v0100_b519;橋自己解析 vdf 境 python;TA-Lib 缺=ABSENT 印 pip 令=你的手)
-function global:via-taone { Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG083_TALibOneBridge_v*.py") $(if ($args) { $args } else { @("probe") }) }
-Set-Alias -Name 技術指標引擎 -Value via-taone -Scope Global -Force
+# ── 批523:via-quantguard —— QuantGuard ENG086 正主橋(Polars 技術分析/因子/PIT;SuperAccel bridge;Celeritas+Aegis intake mounts;network gate OFF)
+function global:via-quantguard { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG086_QuantGuardOneBridge_v*.py") $(if ($args) { $args } else { @("status") }) }
+Set-Alias -Name 量化技術引擎 -Value via-quantguard -Scope Global -Force
+Set-Alias -Name 技術指標引擎 -Value via-quantguard -Scope Global -Force
+Set-Alias -Name 技術指標 -Value via-quantguard -Scope Global -Force
+# ── 批524:via-market-lists —— VDF_ENG087 中央市場清單治理(股票全集/主動ETF/熱門族群去重;離線可驗收;結果檔非GREEN不得假綠)
+function global:via-market-lists { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG087_MarketListGovernance_v*.py") $(if ($args) { $args } else { @("status") }) }
+Set-Alias -Name 市場清單驗收 -Value via-market-lists -Scope Global -Force
+Set-Alias -Name 台股清單 -Value via-market-lists -Scope Global -Force
 # ── 批519:via-workflow —— 工作流重組台(CGC_MDL153;catalog | validate <id> | run <id> [--profile test|run] [--continue] | ui-contract [--apply] | db-summary | page [--publish];零彈窗:頁用 via-open 開)
 function global:via-workflow { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL153_WorkflowComposer_v*.py") $(if ($args) { $args } else { @("status") }) }
 Set-Alias -Name 工作流 -Value via-workflow -Scope Global -Force
 Set-Alias -Name 月營收分析 -Value via-vtmra -Scope Global -Force
-Set-Alias -Name 技術指標 -Value via-talib -Scope Global -Force
 
 # 批383:單一入口(操作員令「單一入口與這個(SYSTEM MANAGER MATRIX v0700)整合」):via-entry=母倉唯一入口燈板(GitHub/Mother/Data/Env/PATH/EnvGov/VDF-DB/VAP/Matrix/Console/Grok;零網路;落 VIA_Reports/entry)
 # via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)
@@ -713,6 +737,27 @@ function global:via-vcgc {
     if (($a -contains "page") -and (Test-Path "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html")) { via-open "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html" }
 }
 Set-Alias -Name 中央控管 -Value via-vcgc -Scope Global -Force
+# ── 批525:via-functional-acceptance —— CGC_MDL154 單一功能級整合驗收 gate
+#   僅執行既有中央/VRN/VDF/VAP selftest 與資料證據核驗；輸出 JSON/HTML；RED 或 PARTIAL_BLOCKED 不得假綠。
+function global:via-functional-acceptance {
+    $eng = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL154_VIAFunctionalAcceptance_v*.py"
+    if (-not $eng) { Write-Host "  [via-functional-acceptance] FAIL:CGC_MDL154_VIAFunctionalAcceptance_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object { if ($_ -eq "-SelfTest") { "--selftest" } else { $_ } })
+    if (-not $a) { $a = @("run") }
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name VIA功能驗收 -Value via-functional-acceptance -Scope Global -Force
+Set-Alias -Name 功能級驗收 -Value via-functional-acceptance -Scope Global -Force
+# ── CGC_MDL155:統一 SSOT／Regex 同義字／附件自動編碼受控驗收(中央唯一入口) ──
+#   via-ssot [selftest|status|manifest|routes|classify <text>]；不執行收容模組、不開網路。
+function global:via-ssot {
+    $eng = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py"
+    if (-not $eng) { Write-Host "  [via-ssot] FAIL:CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args)
+    if (-not $a) { $a = @("status") }
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name SSOT治理 -Value via-ssot -Scope Global -Force
 # via-firstpage:首頁三法擷取器 ENG072 尾版直呼(-Force 忽略邏輯庫命中整批重抽;-RetryFailed 只重試 FAIL 件;-OcrBudget N 每件 OCR 預算秒;--in 檔/夾可重複)
 function global:via-firstpage {
     $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG072_FirstPageText_v*.py"
@@ -764,6 +809,99 @@ Set-Alias -Name 共識擴充 -Value via-vetf -Scope Global -Force
 # ── 批522:via-fplogic —— 第一頁邏輯補缺正主橋(VRN_ENG086;收容件 functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522 零觸碰;status|gap|bench [--limit N]|enrich [--in DIR] [--limit N];vrn 境 python)
 function global:via-fplogic { $env:VIA_FAMILY = "vrn"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG086_FirstPageLogicBridge_v*.py") $(if ($args) { $args } else { @("status") }) }
 Set-Alias -Name 首頁邏輯 -Value via-fplogic -Scope Global -Force
+# ── 批529:via-nlpvrn —— NLP文字修復+證據型摘要→VRN ENG072/ENG073→VDF ENG087 唯讀狀態
+#   單一入口;輸入可重複 -In <PDF/DOCX/夾>;預設寫 functional modules\VRN\db\vrn_reports.duckdb
+#   NLP 輸出 vrn_nlp_text_summary(保留 normalized_text/source hash/evidence span)；不覆寫 ENG073 canonical 欄位
+#   -DB/-Out/-Points/-Force 映射到 Python；網路預設關閉，VDF RED 會誠實回報資料覆蓋缺口，不假綠
+function global:via-nlpvrn {
+    $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG087_NLPTextSummaryBridge_v*.py"
+    if (-not $eng) { Write-Host "  [via-nlpvrn] FAIL:VRN_ENG087_NLPTextSummaryBridge_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object {
+        if ($_ -eq "-In") { "--in" }
+        elseif ($_ -eq "-DB") { "--db" }
+        elseif ($_ -eq "-Out") { "--out" }
+        elseif ($_ -eq "-Points") { "--points" }
+        elseif ($_ -eq "-Force") { "--force" }
+        elseif ($_ -eq "-SelfTest") { "selftest" }
+        elseif ($_ -eq "-Status") { "status" }
+        else { $_ }
+    })
+    if (-not $a) { $a = @("status") }
+    if (-not ($a | Where-Object { $_ -in @("run", "status", "selftest") })) { $a = @("run") + $a }
+    if (($a -contains "run") -and -not ($a -contains "--db")) { $a += @("--db", "$VIA\functional modules\VRN\db\vrn_reports.duckdb") }
+    if (($a -contains "run") -and -not ($a -contains "--out")) { $a += @("--out", "$VIA\VIA_Reports\vrn\nlp_pipeline") }
+    $env:VIA_FAMILY = "vrn"
+    Invoke-VIAPython -Family "vrn" $eng @a
+    if ($a -contains "run") {
+        $html = "$VIA\VIA_Reports\vrn\nlp_pipeline\NLP_VRN_VDF_latest.html"
+        if (Test-Path -LiteralPath $html) {
+            Write-Host "  [via-nlpvrn] 三頁 HTML 矩陣：$html" -ForegroundColor Cyan
+            Start-Process -FilePath $html
+        }
+    }
+}
+Set-Alias -Name NLP研報 -Value via-nlpvrn -Scope Global -Force
+Set-Alias -Name NLP串接 -Value via-nlpvrn -Scope Global -Force
+# ── 批532:via-nlpunified —— SUP_MDL866 統一 NLP 控制入口(Hub→VRN→VDF；附件只走受控 intake)
+#   -Text/-File/-Points 對應離線 NLP；-SelfTest/-Status 只讀；不啟動 AKShare、排程、安裝或 auto-fix
+function global:via-nlpunified {
+    $eng = Get-VIANewest "$VIA\supportive modules\70_VRN_Rules" "SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+    if (-not $eng) { Write-Host "  [via-nlpunified] FAIL:SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object {
+        if ($_ -eq "-Text") { "--text" }
+        elseif ($_ -eq "-File") { "--file" }
+        elseif ($_ -eq "-In") { "--in" }
+        elseif ($_ -eq "-DB") { "--db" }
+        elseif ($_ -eq "-Out") { "--out" }
+        elseif ($_ -eq "-Points") { "--points" }
+        elseif ($_ -eq "-Force") { "--force" }
+        elseif ($_ -eq "-SelfTest") { "selftest" }
+        elseif ($_ -eq "-Status") { "status" }
+        elseif ($_ -eq "-RunText") { "text" }
+        elseif ($_ -eq "-Pipeline") { "pipeline" }
+        else { $_ }
+    })
+    if (-not $a) { $a = @("status") }
+    if (-not ($a | Where-Object { $_ -in @("status", "selftest", "text", "pipeline") })) { $a = @("text") + $a }
+    $env:VIA_FAMILY = "vrn"
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name NLP統一 -Value via-nlpunified -Scope Global -Force
+Set-Alias -Name via-nlp-unified -Value via-nlpunified -Scope Global -Force
+# ── 批533:via-central —— VIA 唯一接觸口；先過 CGC157，再由 VIA 子入口 dispatch
+#   via-central status                         唯一入口/registry/bootstrap/network gate 自測
+#   via-central vrn -SelfTest                  VIA→VRN_ENG087 實測
+#   via-central vdf -Status                    VIA→VDF architecture/status 實測
+#   via-central quantguard -SelfTest           VIA→VDF_ENG086 QuantGuard 實測
+#   子系統不得繞過此門直接宣稱已完成 VIA 驗收；網路同意仍由操作員明確設定。
+function global:via-central {
+    param(
+        [ValidateSet("status", "vrn", "vdf", "quantguard")][string]$Family = "status",
+        [Parameter(ValueFromRemainingArguments = $true)][object[]]$Rest
+    )
+    $ctl = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL157_VIAUniqueEntryControl_v*.py"
+    if (-not $ctl) { Write-Host "  [via-central] FAIL:CGC_MDL157 唯一接觸口控制面缺失" -ForegroundColor Red; $global:LASTEXITCODE = 2; return }
+    $env:VIA_CENTRAL_ENTRY = "1"; $env:VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"
+    Invoke-VIAPython -Family "core" $ctl selftest
+    if ($global:LASTEXITCODE -ne 0) { Write-Host "  [via-central] STOP:CGC157 未 GREEN，不派送子系統" -ForegroundColor Red; return }
+    $r = @($Rest)
+    if ($r.Count -eq 0) { $r = @("-SelfTest") }
+    switch ($Family) {
+        "status" { return }
+        "vrn" { via-nlpvrn @r; return }
+        "vdf" {
+            if ($r -contains "-Status") { via-vdfarch "--selftest" } elseif ($r -contains "-SelfTest") { via-vdfarch "--selftest" } else { via-vdfarch @r }
+            return
+        }
+        "quantguard" {
+            $q = @($r | ForEach-Object { if ($_ -eq "-SelfTest") { "selftest" } elseif ($_ -eq "-Status") { "status" } else { $_ } })
+            via-quantguard @q; return
+        }
+    }
+}
+function global:via-unique-check { via-central status @args }
+Set-Alias -Name VIA中央 -Value via-central -Scope Global -Force
+Set-Alias -Name via-unique -Value via-unique-check -Scope Global -Force
 # ── 批522:via-daytrade —— 個股當沖量值(VDF_ENG055 L15;線上三源誠實 + 檔案收容道 L45:via-daytrade --from-file A.csv,B.csv --date 2026-09-12 [--market TWSE|TPEX];收容夾 functional modules\VDF\references\intake\daytrade_files;觸網項=你開閘)
 function global:via-daytrade { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG055_OmniFetch_v*.py") (@("run", "--lane", "L15") + @($args)) }
 Set-Alias -Name 當沖量值 -Value via-daytrade -Scope Global -Force

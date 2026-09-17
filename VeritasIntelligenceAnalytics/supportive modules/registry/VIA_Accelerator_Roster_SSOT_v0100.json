@@ -1,0 +1,67 @@
+{
+  "schema": "VIA.Accelerator.Roster.SSOT.v1",
+  "batch": "B531",
+  "version": "VIA_Accelerator_Roster_SSOT_v0100",
+  "control_plane": {
+    "owner": "VIA central governance",
+    "powershell_roster": "supportive modules/registry/VIA_PS_Accelerators_25_Roster_v0100.ps1",
+    "powershell_runtime": "supportive modules/VIA_PS_Accel_Module.ps1",
+    "python_bootstrap": "supportive modules/bootstrap/sitecustomize.py",
+    "python_accelerator": "supportive modules/VIA_SuperAccel_Module.py",
+    "network_mount": "supportive modules/network/VeritasAegisNexus.py",
+    "fetch_mount": "supportive modules/accelerator/VeritasCeleritas.py",
+    "policy_ssot": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
+    "technical_analysis_policy": "QuantGuard-only; TA-Lib/talib forbidden_not_used",
+    "activation": "VIA central command only; no direct execution from quarantine",
+    "network_default": "OFF",
+    "write_policy": "append-only evidence; no source mutation during selftest",
+    "quantguard_data_flow": "VDF/DuckDB read -> QuantGuard -> features/factors/evidence; reverse edges forbidden",
+    "unique_entry_control": "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0100.py"
+  },
+  "python_bridge_policy": {
+    "all_python": "sitecustomize via PYTHONPATH",
+    "vdf_network": "VIA_FAMILY=vdf loads via_net; consent remains operator-owned",
+    "vrn_vap": "SuperAccel lazy mount; no network mount unless family policy allows",
+    "fallback": "graceful and explicit ABSENT/BLOCKED; never false-green"
+  },
+  "acceptance": {
+    "required_count": 25,
+    "required_ids": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
+    "gates": [
+      "powershell roster count=25",
+      "VIA_PS_Accel_Module exports VIA_ACCEL25",
+      "sitecustomize is active and exposes VIA_ACCEL_BOOT",
+      "Celeritas and Aegis mounts are centrally registered",
+      "network consent is OFF by default",
+      "central input/workflow/interface/component registries contain the roster",
+      "selftest is offline, deterministic and evidence-producing"
+    ]
+  },
+  "accelerators": [
+    {"id":"01","name":"AST 精準解析加速器","route":"PS+Python","python_api":"ast_parse/safe_compile","network":false,"evidence":"syntax_report"},
+    {"id":"02","name":"多語言語意模型加速器","route":"PS+Python","python_api":"regex_synonym_normalize","network":false,"evidence":"ssot_manifest"},
+    {"id":"03","name":"九頭龍風險預測加速器","route":"PS+Python","python_api":"risk_guard","network":false,"evidence":"risk_matrix"},
+    {"id":"04","name":"依賴拓撲排序加速器","route":"PS+Python","python_api":"dependency_order","network":false,"evidence":"dependency_graph"},
+    {"id":"05","name":"沙盒隔離執行加速器","route":"PS+Python","python_api":"isolated_call","network":false,"evidence":"sandbox_result"},
+    {"id":"06","name":"自動修正建議生成加速器","route":"PS+Python","python_api":"repair_plan","network":false,"evidence":"repair_plan"},
+    {"id":"07","name":"三輪全景式分析加速器","route":"PS+Python","python_api":"panorama_matrix","network":false,"evidence":"three_round_matrix"},
+    {"id":"08","name":"SSOT 對齊加速器","route":"PS+Python","python_api":"ssot_align","network":false,"evidence":"registry_sync"},
+    {"id":"09","name":"視覺化矩陣生成加速器","route":"PS+Python","python_api":"matrix_html","network":false,"evidence":"html_matrix"},
+    {"id":"10","name":"錯誤分類與分群加速器","route":"PS+Python","python_api":"error_cluster","network":false,"evidence":"error_groups"},
+    {"id":"11","name":"性能與複雜度分析加速器","route":"PS+Python","python_api":"perf_profile","network":false,"evidence":"perf_report"},
+    {"id":"12","name":"多子系統同步檢視加速器","route":"PS+Python","python_api":"subsystem_sync","network":false,"evidence":"sync_matrix"},
+    {"id":"13","name":"版本差異與回滾加速器","route":"PS+Python","python_api":"git_diff_rollback","network":false,"evidence":"git_manifest"},
+    {"id":"14","name":"覆蓋率與回歸檢查加速器","route":"PS+Python","python_api":"regression_gate","network":false,"evidence":"coverage_report"},
+    {"id":"15","name":"修正順序最佳化加速器","route":"PS+Python","python_api":"fix_order","network":false,"evidence":"schedule_plan"},
+    {"id":"16","name":"動態進度條加速器","route":"PS","python_api":"progress_event","network":false,"evidence":"progress_log"},
+    {"id":"17","name":"動態說明加速器","route":"PS","python_api":"status_narration","network":false,"evidence":"status_log"},
+    {"id":"18","name":"非阻塞 PowerShell 執行加速器","route":"PS","python_api":"nonblocking_process","network":false,"evidence":"process_exit"},
+    {"id":"19","name":"多引擎整合加速器","route":"PS+Python","python_api":"engine_bus_call","network":false,"evidence":"engine_bus_matrix"},
+    {"id":"20","name":"自動部署與環境初始化加速器","route":"PS+Python","python_api":"env_bootstrap","network":false,"evidence":"env_status"},
+    {"id":"21","name":"資源預算與自動節流加速器","route":"PS+Python","python_api":"resource_budget","network":false,"evidence":"resource_status"},
+    {"id":"22","name":"快取、去重與斷點續跑加速器","route":"PS+Python","python_api":"cache_checkpoint","network":false,"evidence":"checkpoint_manifest"},
+    {"id":"23","name":"網路同意閘與斷路器加速器","route":"PS+Python","python_api":"network_gate","network":true,"evidence":"gate_state"},
+    {"id":"24","name":"輸入輸出契約與 Schema 驗證加速器","route":"PS+Python","python_api":"contract_validate","network":false,"evidence":"contract_report"},
+    {"id":"25","name":"證據雜湊與 HTML/JSON 矩陣加速器","route":"PS+Python","python_api":"evidence_bundle","network":false,"evidence":"sha256_manifest"}
+  ]
+}

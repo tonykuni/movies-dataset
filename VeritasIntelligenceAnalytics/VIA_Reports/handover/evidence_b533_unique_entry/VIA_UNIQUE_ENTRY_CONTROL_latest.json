@@ -1,0 +1,161 @@
+{
+  "schema": "VIA.CGC157.UniqueEntryControl.v1",
+  "engine": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+  "timestamp": "2026-09-16T15:19:42+00:00",
+  "verdict": "GREEN",
+  "control_state": "ONLY_VIA_ENTRY",
+  "scope": {
+    "vrn": [
+      "via-nlpvrn",
+      "via-nlpunified",
+      "via-vrn4"
+    ],
+    "vdf": [
+      "via-vdfarch",
+      "via-vdfdb"
+    ],
+    "quantguard": [
+      "via-quantguard"
+    ]
+  },
+  "checks": [
+    {
+      "name": "VIA command book exists",
+      "state": "PASS",
+      "ok": true,
+      "detail": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/Register-VIA-Commands-v0208.ps1"
+    },
+    {
+      "name": "VIA Python helper exists",
+      "state": "PASS",
+      "ok": true,
+      "detail": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/VIA_PS_PyProgress_Module.ps1"
+    },
+    {
+      "name": "single Invoke-VIAPython helper is defined",
+      "state": "PASS",
+      "ok": true,
+      "detail": "VIA_PS_PyProgress_Module.ps1"
+    },
+    {
+      "name": "helper owns process start",
+      "state": "PASS",
+      "ok": true,
+      "detail": "central process wrapper"
+    },
+    {
+      "name": "bootstrap exists",
+      "state": "PASS",
+      "ok": true,
+      "detail": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/bootstrap/sitecustomize.py"
+    },
+    {
+      "name": "bootstrap carries central entry identity",
+      "state": "PASS",
+      "ok": true,
+      "detail": "sitecustomize.py"
+    },
+    {
+      "name": "network default is fail-closed in command book",
+      "state": "PASS",
+      "ok": true,
+      "detail": "Set-VIAGateDefaults"
+    },
+    {
+      "name": "command book never auto-opens consent",
+      "state": "PASS",
+      "ok": true,
+      "detail": "operator consent only"
+    },
+    {
+      "name": "command book has unique central dispatcher",
+      "state": "PASS",
+      "ok": true,
+      "detail": "VIA central command"
+    },
+    {
+      "name": "central dispatcher routes VRN/VDF/QuantGuard",
+      "state": "PASS",
+      "ok": true,
+      "detail": "via-central child routes"
+    },
+    {
+      "name": "central dispatcher gates before child route",
+      "state": "PASS",
+      "ok": true,
+      "detail": "pre-dispatch gate"
+    },
+    {
+      "name": "VRN/VDF/QuantGuard target entries exist",
+      "state": "PASS",
+      "ok": true,
+      "detail": "missing="
+    },
+    {
+      "name": "target entries dispatch only through VIA Python helper",
+      "state": "PASS",
+      "ok": true,
+      "detail": "bypass="
+    },
+    {
+      "name": "no target engine line bypasses Invoke-VIAPython",
+      "state": "PASS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "fail-closed helper does not direct-fallback",
+      "state": "PASS",
+      "ok": true,
+      "detail": "missing helper must stop"
+    },
+    {
+      "name": "policy SSOT is active and one-way",
+      "state": "PASS",
+      "ok": true,
+      "detail": "QuantGuard policy"
+    },
+    {
+      "name": "central registries contain unique entry contract",
+      "state": "PASS",
+      "ok": true,
+      "detail": "InputConsole/Workflow/ToolRoster"
+    },
+    {
+      "name": "entry-control report directory is writable",
+      "state": "PASS",
+      "ok": true,
+      "detail": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/entry"
+    }
+  ],
+  "counts": {
+    "total": 18,
+    "pass": 18,
+    "fail": 0
+  },
+  "network": {
+    "default": "OFF",
+    "consent": "operator_owned",
+    "silent_open": false
+  },
+  "data_flow": "VDF_DUCKDB_TO_QUANTGUARD",
+  "source_mutation": "FORBIDDEN",
+  "artifacts": {
+    "command_book": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/Register-VIA-Commands-v0208.ps1",
+      "sha256": "894b043cee16a7e53abdbe9a1a9669c4a92748049ff947bfcde438ccf48025c1"
+    },
+    "python_helper": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/VIA_PS_PyProgress_Module.ps1",
+      "sha256": "bbf897cfc1109bb77e8dfe5942d111282506e94055fef0f0feaba5c8fc34600d"
+    },
+    "bootstrap": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/bootstrap/sitecustomize.py",
+      "sha256": "0426f697deba4b9a125ce7760d1be8d191eced377b6b8b56b826bef1f65b20fb"
+    },
+    "policy": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
+      "sha256": "b0677bc9332f20e1a35778470e054e40d5df764c9ed33d71a98f749fe962fe52"
+    }
+  }
+}

@@ -17,12 +17,30 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import logging
+import sys
 from collections.abc import Sequence
 
 from pip._internal.build_env import BuildEnvironment
 from pip._internal.utils.logging import indent_log
-from pip._internal.utils.setuptools_build import make_setuptools_develop_args
 from pip._internal.utils.subprocess import call_subprocess
+
+try:
+    from pip._internal.utils.setuptools_build import make_setuptools_develop_args
+except ModuleNotFoundError:
+    # pip 25+ removed this private helper; keep the quarantined legacy API
+    # importable without reintroducing a private pip dependency at runtime.
+    def make_setuptools_develop_args(
+        setup_py_path: str,
+        *,
+        global_options: Sequence[str],
+        no_user_config: bool,
+        prefix: str | None,
+        home: str | None,
+        use_user_site: bool,
+    ) -> list[str]:
+        args = [sys.executable, setup_py_path, "develop"]
+        args.extend(global_options)
+        return args
 
 logger = logging.getLogger(__name__)
 

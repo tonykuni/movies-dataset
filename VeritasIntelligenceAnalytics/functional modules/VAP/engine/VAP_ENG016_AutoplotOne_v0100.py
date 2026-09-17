@@ -15,7 +15,7 @@ VAP_ENG016_AutoplotOne_v0100 — VAP ONE · 單檔整合引擎(Veritas AutoPlot 
       本檔預設 family="v23"(超集,v2.3.1 UAT 通過);family="v018" 供守衛對勘。格式器保留必要尾零(1.25 / 2.50)。
   • 視覺鎖(併軌案 方案 A 核准 2026-08-04):vap_spec v1.0.x 為唯一視覺真相 → 線 0.9 / 線下 0.75(陰影 0.5)/ 柱 0.6 · 密 0.8 / 事件 0.3;
       Seaborn 垂直圖組 v2.3.1 為獨立域(線寬 1.65、alpha .82、柱 .75、面積 .5);Macro Dashboard Seaborn 0.80 獨立域 —— 三域互不覆寫。
-  • 批330 資料律:TA-Lib 及所有繪圖價格一律還原價 adj_close(裸 close 需 allow_raw=True);成交量一律扣除當沖成交量。
+  • 批330 資料律:QuantGuard 與所有繪圖價格一律還原價 adj_close(裸 close 需 allow_raw=True);成交量一律扣除當沖成交量。
   • 缺值律(v2.3 §6.1):價格可 ffill;Volume 不 ffill、不 interpolate、不補零;不新增休市日。
   • 標準高度:420 px × 倍數(0.25–4.0,步進 0.25);Candlestick = 一個邏輯圖、兩個實體單軸 panel 75% / 25%,共享 X,不用 twinx / secondary_y。
   • 大資料:render_max_points 預設 5000;line/area/step 用多序列首尾極值包絡;candlestick 用連續桶 OHLCV;方法/列數入 audit。
@@ -1405,9 +1405,9 @@ def validate_config(config: dict) -> list[str]:
     return errs
 
 
-# ------------------------------------------------------------------ 橋:發現外部 VAP 引擎(不執行、不改寫)
+# ------------------------------------------------------------------ 橋:發現外部 VAP/QuantGuard 引擎(不執行、不改寫)
 BRIDGE_PATTERNS = {"ENG001": "VAP_ENG001_AutoplotEngineChartlib_v*.py", "ENG002": "VAP_ENG002_AutoplotEngine_v*.py",
-                   "ENG003": "VAP_ENG003_AutoplotSeabornPlotly_v*.py", "ENG004": "VAP_ENG004_TAFactory_v*.py",
+                   "ENG003": "VAP_ENG003_AutoplotSeabornPlotly_v*.py", "QUANTGUARD": "VDF_ENG086_QuantGuardOneBridge_v*.py",
                    "ENG015": "VAP_ENG015_SeabornStackBridge_v*.py", "CORE": "via_autoplot_engine_v*.py",
                    "GUARD": "vap_spec_guard_v*.py", "V23_GEN": "vap_seaborn_stack_generator.py", "V025_RT": "vap_data_runtime_v*.py"}
 

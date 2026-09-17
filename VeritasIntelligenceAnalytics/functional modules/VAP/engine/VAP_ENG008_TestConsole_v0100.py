@@ -5,7 +5,7 @@ VAP_ENG008_TestConsole — VAP 全測×簡潔響應式主控台(批162;via-vapui
 ====================================================================
 操作員令:VAP 測試完做一個簡單 U/I 操作——字小一點、響應式設計、
 內涵測試報告、自動畫(自動繪圖)規格。
-  測試面(subprocess 實跑,誠實三態):ENG004 TAFactory/ENG005
+  測試面(subprocess 實跑,誠實三態):QuantGuard/ENG005
     TemplateRunner/ENG007 RawWide/spec_guard(TOOL-083 圖規鎖)各
     --selftest;ENG001 chartlib(尾版)/ENG003=py_compile 編譯檢
     (無 selftest 介面=誠實標 COMPILE_ONLY,不假測)
@@ -13,7 +13,7 @@ VAP_ENG008_TestConsole — VAP 全測×簡潔響應式主控台(批162;via-vapui
     模板冊 spec/VAP_Template_Registry_v0100.json(6 模板)
     圖規冊 spec/VIA_VAP_40_Structural_Snapshots_v017.json(40 圖規)
     chartlib 函數面=ENG001 尾版 AST def 收割
-    TA 面=ENG004 源碼 ta_ 函數收割
+    數值面=VDF_ENG086 QuantGuard 中央橋接
   UI=VIA_UI_VAPConsole_v0100.html:淺色、小字級(基準 clamp 10.5-12.5px)、
     grid auto-fit 響應式、overflow-wrap:anywhere、行動裝置 viewport
 用法:via-vapui run(全測+收割+產 UI)| --status | --selftest
@@ -58,7 +58,6 @@ def _newest(pattern: str, root: Path) -> Path | None:
 def run_tests() -> list[dict]:
     """VAP 測試電池(誠實三態;selftest 缺者=COMPILE_ONLY 不假測)"""
     battery = [
-        ("TAFactory selftest", _newest("VAP_ENG004_TAFactory_v*.py", HERE), ["--selftest"]),
         ("TemplateRunner 十檢", _newest("VAP_ENG005_TemplateRunner_v*.py", HERE), ["--selftest"]),
         ("寬表刷新六檢", _newest("VAP_ENG007_RawWideRefresh_v*.py", HERE), ["--selftest"]),
         ("圖規鎖守衛(TOOL-083)", _newest("vap_spec_guard_v*.py", VAP), ["--selftest"]),
@@ -116,21 +115,9 @@ def harvest_specs() -> dict:
                and not n.name.startswith("_")]
         out["chartlib_functions"] = sorted(set(fns))
         out["sources"]["chartlib"] = lib.name
-    ta = _newest("VAP_ENG004_TAFactory_v*.py", HERE)
-    if ta is not None:
-        try:  # 正主冊=indicator_roster()(動態載入;敗=源碼 family 鍵後備)
-            import importlib.util
-            spec = importlib.util.spec_from_file_location("vap_ta_dyn", ta)
-            m = importlib.util.module_from_spec(spec)
-            sys.modules["vap_ta_dyn"] = m
-            spec.loader.exec_module(m)
-            roster = m.indicator_roster()
-            out["ta_functions"] = sorted(roster.keys() if isinstance(roster, dict)
-                                         else roster)
-        except Exception:
-            src = ta.read_text(encoding="utf-8")
-            out["ta_functions"] = sorted(set(re.findall(r'"([A-Z][A-Z0-9_%]{1,12})":', src)))
-        out["sources"]["ta"] = ta.name
+    # Legacy indicator-factory harvesting is intentionally empty. VAP numerical
+    # values are supplied by the central QuantGuard adapter, not a local factory.
+    out["sources"]["quantguard"] = "VDF_ENG086_QuantGuardOneBridge_v0100.py"
     return out
 
 
@@ -194,7 +181,7 @@ padding:1px 7px;margin:2px;font-size:.85em}}
 <div class="tablewrap"><table><tr><th>模板</th><th>中文</th><th>型</th><th>chart_ref</th><th>資料源</th></tr>{tpl_rows}</table></div></div>
 <div class="card"><h2>圖規冊 v017({len(specs['chart_specs'])} 規格)</h2>{spec_chips}</div>
 <div class="card"><h2>chartlib 函數面({len(specs['chartlib_functions'])})</h2>{fn_chips}</div>
-<div class="card"><h2>TA 工廠({len(specs['ta_functions'])})</h2>{ta_chips}</div>
+<div class="card"><h2>QuantGuard 數值面</h2><span class="chip">中央橋 VDF_ENG086</span></div>
 </div></div></body></html>"""
     UI_OUT.write_text(html, encoding="utf-8")
     return UI_OUT
@@ -207,7 +194,7 @@ def run() -> int:
         print(f"  [{r['state']}] {r['name']} {r.get('note', '')[:60]}")
     specs = harvest_specs()
     print(f"[收割] 模板 {len(specs['templates'])} · 圖規 {len(specs['chart_specs'])}"
-          f" · 函數 {len(specs['chartlib_functions'])} · TA {len(specs['ta_functions'])}")
+          f" · 函數 {len(specs['chartlib_functions'])} · QuantGuard 中央橋在位")
     p = build_ui(results, specs)
     fail = sum(1 for r in results if r["state"] == "FAIL")
     print(f"[UI] {p.name} · FAIL {fail}")

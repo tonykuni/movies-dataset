@@ -279,8 +279,7 @@ class Tower:
             t.append({"g": group, "n": name, "s": state, "d": str(detail)})
 
         db = self.fm / "VDF" / "db" / "movies_dataset.sqlite"
-        add("VDF", "intake 引擎", "G" if (self.fm / "VDF" / "engine"
-            / "VDF_ENG042_MoviesIntake_v001.py").is_file() else "R")
+        add("VDF", "intake 引擎", "G" if any(self.fm / "VDF" / "engine".glob("VDF_ENG042_MoviesIntake_v*.py")) else "R")
         add("VDF", "分析資料庫", "G" if db.is_file() else "Y",
             f"{db.stat().st_size} bytes" if db.is_file() else "未建(跑 VDF)")
         ev = self.fm / "VDF" / "qa" / "evidence" / "movies_intake_summary.json"
@@ -293,8 +292,7 @@ class Tower:
         add("VDF", "QA 閘門", "G" if gate.startswith("GREEN") else ("Y" if gate else "R"), gate or "無證據")
         charts = len(list((self.base / "VAP" / "output").glob("VAP_*.html"))) \
             if (self.base / "VAP" / "output").is_dir() else 0
-        add("VAP", "繪圖引擎", "G" if (self.fm / "VAP" / "engine"
-            / "VAP_ENG002_AutoplotEngine_v001.py").is_file() else "R")
+        add("VAP", "繪圖引擎", "G" if any(self.fm / "VAP" / "engine".glob("VAP_ENG002_AutoplotEngine_v*.py")) else "R")
         add("VAP", "圖表產出", "G" if charts else "Y", f"{charts} 張")
         add("VAP", "Workbench v010", "G" if (self.fm / "VAP" / "ui"
             / "VAP_Workbench_v010.html").is_file() else "R")
@@ -330,11 +328,8 @@ class Tower:
                 pass
         add("SSOT", "TickerRegex v0100", "G" if tkr_ok else "R",
             "四碼首碼非零 · 消歧層" if tkr_ok else "未發行")
-        add("SSOT", "P2 墊片入口", "G" if ((self.sm / "70_VRN_Rules"
-            / "SUP_MDL031_VISVRNTickerRegexShim_v0100.py").is_file() and (self.fm / "VRN"
-            / "Invoke-VRN-Shimmed-Entry-v0100.ps1").is_file()) else "R", "opt-in")
-        add("VAP", "chartlib_v002", "G" if (self.fm / "VAP" / "engine"
-            / "VAP_ENG001_AutoplotEngineChartlib_v002.py").is_file() else "Y", "UNIT03 晉升版")
+        add("SSOT", "P2 墊片入口", "G" if (any((self.sm / "70_VRN_Rules").glob("SUP_MDL031_VISVRNTickerRegexShim_v*.py")) and any((self.fm / "VRN").glob("Invoke-VRN-Shimmed-Entry-v*.ps1"))) else "R", "opt-in")
+        add("VAP", "chartlib_v002", "G" if any(self.fm / "VAP" / "engine".glob("VAP_ENG001_AutoplotEngineChartlib_v*.py")) else "Y", "UNIT03 晉升版")
         add("VAP", "判定表 v002", "G" if (self.sm / "VIA_Canonical_Units"
             / "VAP_VisualLock_Adjudication_Table_v002.json").is_file() else "Y", "方案A 分項閘")
         return t

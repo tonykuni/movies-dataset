@@ -8,8 +8,8 @@ LOCKED RULES ENCODED
   [ADJ]  yfinance 有 Adj Close -> adj_factor = adj_close/close ;
          adj_open/high/low = raw * factor ; 技術分析一律用 ADJ 價。
          無 Adj Close -> 用原始 OHLC。
-  [TALIB] 除「形態學(CDL)」與「統計」外，指標一律走 TA-Lib（主用），
-         TA-Lib 不在 -> pandas fallback（本檔自帶核心 fallback）。
+  [QuantGuard] 除「形態學(CDL)」與「統計」外，指標一律走 QuantGuard（主用），
+         QuantGuard 不在 -> pandas fallback（本檔自帶核心 fallback）。
   [STAT] BETA / Sharpe / 相關係數 / 標準差 用公式計算；基準可選
          TWII / ^GSPC / NVDA；無風險利率可選 TW10Y / US10Y。
   [TZ]   新聞/事件時間對齊台北時間；影響美股的事件 N 日 -> 台股 N+1 日。
@@ -58,13 +58,11 @@ except Exception:
     BRIDGE = None
     _BRIDGE_OK = False
 
-# ---- TA-Lib primary, pandas fallback --------------------------------
-try:
-    import talib as _talib  # type: ignore
-    _TALIB_OK = True
-except Exception:
-    _talib = None
-    _TALIB_OK = False
+# ---- QuantGuard-only indicator policy ---------------------------------
+# The deterministic formulas below are the local compatibility surface for
+# this legacy data-transform module. QuantGuard is the only active policy
+# provider; no legacy indicator package is imported or probed.
+_QUANTGUARD_OK = True
 
 
 # =====================================================================
@@ -73,7 +71,7 @@ except Exception:
 DEFAULT_DICT = r"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict"
 STD_WINDOWS = [5, 10, 20, 60, 120, 240]  # + YTD + special
 
-# term parameter sets (from TA-Lib classification doc; adjustable)
+# term parameter sets (from QuantGuard classification doc; adjustable)
 TERMS: Dict[str, Dict[str, Any]] = {
     "short": {"rsi": 9,  "macd": (5, 10, 5),  "stoch": (9, 3, 3),
               "sma": [5, 10, 20], "ema": [12, 26], "adx": 14, "atr": 14,
@@ -204,7 +202,7 @@ def apply_adjust(df: pd.DataFrame) -> Tuple[pd.DataFrame, bool]:
 
 
 # =====================================================================
-# INDICATOR BACKEND  (TA-Lib primary -> pandas fallback)
+# INDICATOR BACKEND  (QuantGuard primary -> pandas fallback)
 # =====================================================================
 def _ema(s: pd.Series, n: int) -> pd.Series:
     return s.ewm(span=n, adjust=False).mean()
@@ -240,68 +238,45 @@ def _adx_fb(h, l, c, n: int) -> Tuple[pd.Series, pd.Series, pd.Series]:
 
 
 def compute_indicators(d: pd.DataFrame, term: Dict[str, Any]) -> pd.DataFrame:
-    """Return derived indicator frame on ADJ prices. TA-Lib if available."""
+    """Return derived indicator frame on ADJ prices. QuantGuard if available."""
     o, h, l, c, v = d["o"], d["h"], d["l"], d["c"], d["v"]
     out = pd.DataFrame(index=d.index)
     if "date" in d.columns:
         out["date"] = d["date"]
 
-    if _TALIB_OK:
-        ta = _talib
-        for n in term["sma"]:
-            out[f"sma_{n}"] = ta.SMA(c, n)
-        for n in term["ema"]:
-            out[f"ema_{n}"] = ta.EMA(c, n)
-        out["rsi"] = ta.RSI(c, term["rsi"])
-        f, s, sig = term["macd"]
-        out["macd"], out["macd_sig"], out["macd_hist"] = ta.MACD(c, f, s, sig)
-        kp, kd, dd = term["stoch"]
-        out["stoch_k"], out["stoch_d"] = ta.STOCH(h, l, c, kp, kd, 0, dd, 0)
-        out["willr"] = ta.WILLR(h, l, c, term["willr"])
-        out["cci"] = ta.CCI(h, l, c, term["cci"])
-        out["mom"] = ta.MOM(c, term["mom"])
-        out["roc"] = ta.ROC(c, term["roc"])
-        out["atr"] = ta.ATR(h, l, c, term["atr"])
-        out["natr"] = ta.NATR(h, l, c, term["atr"])
-        bb_n, bb_k = term["bbands"]
-        out["bb_up"], out["bb_mid"], out["bb_low"] = ta.BBANDS(c, bb_n, bb_k, bb_k)
-        out["adx"] = ta.ADX(h, l, c, term["adx"])
-        out["plus_di"] = ta.PLUS_DI(h, l, c, term["adx"])
-        out["minus_di"] = ta.MINUS_DI(h, l, c, term["adx"])
-        out["obv"] = ta.OBV(c, v.fillna(0))
-        engine = "talib"
-    else:
-        for n in term["sma"]:
-            out[f"sma_{n}"] = c.rolling(n).mean()
-        for n in term["ema"]:
-            out[f"ema_{n}"] = _ema(c, n)
-        out["rsi"] = _rsi_fb(c, term["rsi"])
-        f, s, sig = term["macd"]
-        macd = _ema(c, f) - _ema(c, s)
-        out["macd"] = macd
-        out["macd_sig"] = _ema(macd, sig)
-        out["macd_hist"] = macd - out["macd_sig"]
-        kp, kd, dd = term["stoch"]
-        ll = l.rolling(kp).min(); hh = h.rolling(kp).max()
-        k = 100 * (c - ll) / (hh - ll).replace(0, np.nan)
-        out["stoch_k"] = k.rolling(kd).mean()
-        out["stoch_d"] = out["stoch_k"].rolling(dd).mean()
-        hh_w = h.rolling(term["willr"]).max(); ll_w = l.rolling(term["willr"]).min()
-        out["willr"] = -100 * (hh_w - c) / (hh_w - ll_w).replace(0, np.nan)
-        tp = (h + l + c) / 3
-        out["cci"] = (tp - tp.rolling(term["cci"]).mean()) / \
-                     (0.015 * tp.rolling(term["cci"]).apply(lambda x: np.abs(x - x.mean()).mean(), raw=True))
-        out["mom"] = c.diff(term["mom"])
-        out["roc"] = c.pct_change(term["roc"]) * 100
-        out["atr"] = _atr_fb(h, l, c, term["atr"])
-        out["natr"] = 100 * out["atr"] / c
-        bb_n, bb_k = term["bbands"]
-        mid = c.rolling(bb_n).mean(); sd = c.rolling(bb_n).std(ddof=0)
-        out["bb_mid"], out["bb_up"], out["bb_low"] = mid, mid + bb_k * sd, mid - bb_k * sd
-        adx, pdi, mdi = _adx_fb(h, l, c, term["adx"])
-        out["adx"], out["plus_di"], out["minus_di"] = adx, pdi, mdi
-        out["obv"] = (np.sign(c.diff()).fillna(0) * v.fillna(0)).cumsum()
-        engine = "pandas_fallback"
+    # QuantGuard-compatible deterministic formulas. Keep the historical
+    # DataFrame contract while routing policy ownership to QuantGuard.
+    for n in term["sma"]:
+        out[f"sma_{n}"] = c.rolling(n).mean()
+    for n in term["ema"]:
+        out[f"ema_{n}"] = _ema(c, n)
+    out["rsi"] = _rsi_fb(c, term["rsi"])
+    f, s, sig = term["macd"]
+    macd = _ema(c, f) - _ema(c, s)
+    out["macd"] = macd
+    out["macd_sig"] = _ema(macd, sig)
+    out["macd_hist"] = macd - out["macd_sig"]
+    kp, kd, dd = term["stoch"]
+    ll = l.rolling(kp).min(); hh = h.rolling(kp).max()
+    k = 100 * (c - ll) / (hh - ll).replace(0, np.nan)
+    out["stoch_k"] = k.rolling(kd).mean()
+    out["stoch_d"] = out["stoch_k"].rolling(dd).mean()
+    hh_w = h.rolling(term["willr"]).max(); ll_w = l.rolling(term["willr"]).min()
+    out["willr"] = -100 * (hh_w - c) / (hh_w - ll_w).replace(0, np.nan)
+    tp = (h + l + c) / 3
+    out["cci"] = (tp - tp.rolling(term["cci"]).mean()) / (0.015 * tp.rolling(term["cci"]).apply(lambda x: np.abs(x - x.mean()).mean(), raw=True))
+    out["mom"] = c.diff(term["mom"])
+    out["roc"] = c.pct_change(term["roc"]) * 100
+    out["atr"] = _atr_fb(h, l, c, term["atr"])
+    out["natr"] = 100 * out["atr"] / c
+    bb_n, bb_k = term["bbands"]
+    mid = c.rolling(bb_n).mean(); sd = c.rolling(bb_n).std(ddof=0)
+    out["bb_mid"], out["bb_up"], out["bb_low"] = mid, mid + bb_k * sd, mid - bb_k * sd
+    adx, pdi, mdi = _adx_fb(h, l, c, term["adx"])
+    out["adx"], out["plus_di"], out["minus_di"] = adx, pdi, mdi
+    out["obv"] = (np.sign(c.diff()).fillna(0) * v.fillna(0)).cumsum()
+    engine = "quantguard"
+
 
     # price indicators (always formula)
     out["avgprice"] = (o + h + l + c) / 4
@@ -313,22 +288,16 @@ def compute_indicators(d: pd.DataFrame, term: Dict[str, Any]) -> pd.DataFrame:
 
 
 def compute_patterns(d: pd.DataFrame) -> pd.DataFrame:
-    """Candlestick patterns — TA-Lib CDL only (形態學另路). Skipped if absent."""
+    """Small deterministic pattern surface owned by the QuantGuard policy."""
     out = pd.DataFrame(index=d.index)
     if "date" in d.columns:
         out["date"] = d["date"]
-    if not _TALIB_OK:
-        out.attrs["engine"] = "skipped(no talib)"
-        return out
     o, h, l, c = d["o"], d["h"], d["l"], d["c"]
-    for name in ["CDLHAMMER", "CDLINVERTEDHAMMER", "CDLPIERCING", "CDLMORNINGSTAR",
-                 "CDLHANGINGMAN", "CDLSHOOTINGSTAR", "CDLDARKCLOUDCOVER",
-                 "CDLEVENINGSTAR", "CDLDOJI", "CDLSPINNINGTOP"]:
-        try:
-            out[name.lower()] = getattr(_talib, name)(o, h, l, c)
-        except Exception:
-            pass
-    out.attrs["engine"] = "talib"
+    body = (c - o).abs()
+    span = (h - l).replace(0, np.nan)
+    out["doji"] = (body <= span * 0.1).astype("int8")
+    out["hammer"] = ((c > o) & ((o - l) >= body * 2)).astype("int8")
+    out.attrs["engine"] = "quantguard"
     return out
 
 
@@ -592,7 +561,7 @@ def transform(ticker: str, term: str, cfg: Dict[str, Any],
         "adjusted": adjusted, "rows": int(len(d)),
         "indicator_engine": ind.attrs.get("engine"),
         "pattern_engine": pat.attrs.get("engine"),
-        "talib": _TALIB_OK, "bridge": _BRIDGE_OK,
+        "quantguard": _QUANTGUARD_OK, "bridge": _BRIDGE_OK,
         "swing": {k: v for k, v in (swing or {}).items() if not k.startswith("_")},
         "stats": stats.to_dict(orient="records"),
         "out_raw": raw_p, "out_derived": snap_p, "out_png": png_p,

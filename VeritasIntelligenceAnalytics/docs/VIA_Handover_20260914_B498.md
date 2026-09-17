@@ -823,6 +823,161 @@ via-vcgc page --publish
 
 ---
 
+## 一-z · 批534 · 接手 B533(另一 AI 的四份交接檔)+ 令「TAKE OVER TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER」+ 上傳 VIA_CodeChain_ALL_1.zip「導入」
+
+**先對帳(L25 多 AI 交會律)**:`git fetch` → 遠端比本地多 **19 個 commit**(B526→B533,作者 Manus AI),ff-only 併入。他就地改寫了 `Register-VIA-Commands-v0208.ps1`(同名不同容),我批522 的 via-fplogic/via-daytrade 仍在=他有併不是覆蓋;往前出 **v0209**,不回頭改他的檔(LL53)。
+
+**他宣稱 → 我在本境逐項重跑 → 真實結果**
+
+| B533 宣稱 | 我的容器實測 | 判讀 |
+|---|---|---|
+| CGC157 唯一接觸口 18/18 GREEN | **18/18 GREEN**(但只認位置動詞 `selftest`;`--selftest` rc=2) | 真;動詞契約與全樹不一致 |
+| CGC156 加速器控制面 23/23、roster 25 | **23/23 GREEN** | 真 |
+| VRN_ENG087 NLP 橋 11/11 | **11/11**(同樣只認位置動詞) | 真 |
+| VDF_ENG073 資料架構 9/9 · VDF_ENG087 市場清單 10/10 | **9/9 · 10/10**(`--selftest` 可) | 真 |
+| VDF_ENG086 QuantGuard 8/8 | **rc=1 Traceback:`ModuleNotFoundError: No module named 'polars'`** | **他境的綠**;裝了 polars 1.44.2 後才 8/8(LL50) |
+| 中央 dispatch 全路由 GREEN | **RED**(quantguard 那條 traceback) | 至少沒假綠;但缺件被判成 RED=假紅 |
+
+**拆到四條根因(都在中央控制面,不在子系統)**
+
+| 根因 | 症狀 | 修 |
+|---|---|---|
+| ① 派送不分家族境:`subprocess.run([sys.executable, ...])` | 中央用哪個 python 起、子系統就被迫用哪個境 → 工作站上 VRN 路由跑在非 vrn 境 → 缺件 → **母機三紅** | **CGC157 v0101**:每條路由走匯流排 `python_for(family)`(退路 `VIA_PY_<FAM>`),子行程環境走 `child_env`(PYTHONHOME 清洗)→ **律 L51** |
+| ② 判讀只有 GREEN/RED | 本境缺 polars = RED(假紅);判錯的紅燈和假綠一樣傷 | v0101 **誠實四態**:ABSENT(缺件)/NODATA(缺料)/TIMEOUT/RED,總裁決 GREEN/YELLOW/RED → **律 L52** |
+| ③ 版號釘死 | 命令冊釘 `v0208`、QuantGuard 釘 `v0100`:照尾版律出新版,中央永遠跑舊的還說 GREEN | v0101 全改 **newest-glob** → **律 L54** |
+| ④ 動詞契約分歧 | 新引擎只認位置 `selftest`,全樹格子站/匯流排/Deck 用 `--selftest` | 五支引擎(CGC156/157、CGC155、VRN087、SUP_MDL866、VDF086)加**旗標=位置動詞等價轉換** → **律 L53** |
+
+**另修**:`VDF_ENG086 v0101` 把 `import polars` 從模組頂搬進探針——缺 polars 印 ABSENT + pip 令(你的手,不代裝)、rc=3;新增 `probe` 動詞列 polars/numpy/duckdb/收容件在不在(LL51)。TA-Lib 三支橋在 B526 被直接刪除、沒進退役夾也沒冊 → 補退役冊 `docs/VIA_Retired_TALib_B534.json`(L50 禁復活,故不還原程式,只記可自 commit `fd51913f` 稽核取回;LL54)。
+
+**再測(修完)**:CGC157 **21/21**(18+新三檢)· CGC156 23/23 · VRN087 11/11 · VDF086 8/8 · VDF087 10/10 · VDF073 9/9 · CGC155 rc0 · SUP_MDL866 rc0;`dispatch --family all` **GREEN 4/4**,且逐路由印出家族境 python 與實際版號(全部尾版:VRN087 v0101 / VDF086 v0101 / VDF087 v0101)。
+
+**整併(CONSOLIDATE)**:B526–B533 的八支新引擎**一支都沒進格子站/Deck/Manager**(只進了 InputConsole 冊)→ 補齊:**Grid v0315**(+7 站,全部 `--selftest`;CGC154 是資料驗收閘不是自測站,不進格子避免假紅)· **Deck v0151**(+unique_entry/accel_control/quantguard/nlp_unified/func_acceptance;釘 77→**80**)· **Manager v0137**(5 正式名稱 + 5 引擎名;總控頁再生 80 項;契約測試 **19 passed**)· **Register v0209**(`via-central dispatch` 一令跑完三家族;控制面身分不再釘死 v0100)。
+
+**收容**:`VIA_CodeChain_ALL_1.zip`(md5 f39ffbdd…)→ `supportive modules/references/intake/VIA_CodeChain_ALL_b534/` 39 檔逐檔 md5 冊;對倉內既有 `registry/vcg`:**8 檔不同、31 檔倉內沒有**(多 kno.lexicon/codechain/index/product/governance registry、versions/、kno_classifier 訓練集、ledger、兩份 SPEC、AutoCodeGenerator 與倉內 v0100 md5 不同)。**本批只收不接線**(正本零觸碰);要接哪一塊等你說。
+
+### 一貼即用(批534)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b534 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0209
+via-quantguard probe                                       # polars/numpy/duckdb 在不在(缺=ABSENT 印裝法,不代裝)
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "polars>=1.21,<2"   # 你的手(QuantGuard 唯一活動技術指標路徑靠它;容器證 1.44.2 → 8/8)
+via-unique-check                                           # CGC157 v0101 閘:應 GREEN 21/21
+via-central dispatch                                       # 批534 新令:三家族一次跑完(家族境 python·誠實四態)→ 貼回最後那幾行
+via-central vrn -SelfTest ; via-central vdf -SelfTest ; via-central quantguard -SelfTest
+via-ryg vrn                                                # 批522 三紅是否消(㉙ 要先裝 opencc;㉜/㊷ 要先 via-rebuild --env via_paddle_311)
+via-vcgc page --publish
+```
+
+---
+
+## 一-aa · 批535 · 令「整成一個 PowerShell 全包:進環境→全景式分析→AST 精準/彈性定位→列出所有問題類型與位置→不傷系統不生九頭龍下,能同時修的同時修、不能同時修的順序修→25 加速器→動態進度條→自動跳出多 TAB 矩陣報告(TAB1 給 AI 與我、內附 JSON/MD;TAB2 起逐項測試結果)→紅黃綠燈、分系統分範疇;所有 PY 檔加指令加速器;VDF 引擎加網路工具」+「授權自動修正測試無誤」
+
+**交付兩件**
+
+| 件 | 是什麼 |
+|---|---|
+| `VIA_B535_PANORAMA_ALL_IN_ONE.ps1` | 一貼式:進環境(切目錄/尾版命令冊/家族境 python)→ 25 加速器名冊(CGC_MDL156)→ 跑正主 → **Write-Progress 動態進度條**(解析引擎的 `@@PROGRESS|pct|msg`)→ 終端印紅黃綠總表 → **自動跳出多 TAB HTML**;`-Apply` 才寫檔,不加就是乾跑 |
+| `CGC_MDL158_VIAPanoramaAuditRepair_v0100.py` | 全景稽核修復**正主**(一功能一主 L30):AST 精準定位七類問題 → 分類分系統紅黃綠 → 平行/順序修 → 多 TAB 報告 HTML/JSON/MD。自測 **13/13** |
+
+**七類問題(AST 精準,彈性退路)**
+
+| 類 | 處置 | 判準(避免假紅) |
+|---|---|---|
+| ACCEL 加速器橋缺席 | **自動修(平行)** | 無 `[VIA:ACCEL-BRIDGE]` 標記 |
+| NET VDF 網路工具橋缺席 | **自動修(平行)** | VDF engine 夾內無 `[VIA:NET-BRIDGE]`;惰性載入=import 時零網路 |
+| VERB 自測動詞契約不齊 | **自動修(順序)** | argparse 有 `selftest` 位置動詞但不吃 `--selftest`;**形狀不合就誠實 skip 不猜改** |
+| HARDIMP 模組頂硬相依重庫 | 報位置 | 只算不在 try/探針內的重庫(polars/talib/paddle…);家族基底 pandas/numpy 不算 |
+| PINVER 釘死版號 | 報位置 | **只有真的當路徑/執行目標用**才算;報告文字、docstring 不算 |
+| SYSEXE 裸 sys.executable 派送 | 報位置 | **只有派到別支引擎**才算;自跑自己不算 |
+| SYNTAX 語法錯 | 報位置 | compile 失敗;本器不猜改 |
+
+**活樹律(新 L55)**:第一次掃描報 1426 項,**八成落在舊版本檔(v0101…v0136)與 `_sha…` 凍結副本**——那些不是活樹,對它們報紅就是假紅。加上「同 stem 只取尾版、凍結副本不算、收容件/退役夾/pycache/VIA_Reports/vcg 不掃」之後:**活樹 1576 檔 / 397 問題**,才是真正要處理的(LL55)。
+
+**自動修三態(新 L56)**:純增量零行為變更且冪等 → 可同時修(以檔為單位平行,一檔一工人,互不交疊);動到 main/parse_args 入口 → 順序修;會改行為或需判斷 → 只報位置等令。每次修改前後都 `ast.parse`,失敗整檔回滾;語法本來就壞的檔**拒修**。
+
+**本批實修結果**:加速器橋 **+125 檔**、VDF 網路工具橋 **+5 檔**,共 **127 檔改動、全部 compile 通過**;VERB 8 個目標形狀不合樣板 → 誠實 skip 列入報告(LL57)。覆蓋率:指令加速器橋、VDF 網路工具橋(逐檔數字見報告 TAB⑥)。
+
+**登冊**:Grid v0316(+全景站)· Deck v0152(+panorama_audit;釘 81)· Manager v0138(正式名稱+引擎名;總控頁 81;契約測試 19 passed)· Register v0210(`via-panorama` / 別名 全景修復、`via-panorama-all` / 別名 全景一貼)· 冊項 `via_panorama_audit` · 工作流 `via_panorama_chain` · 律 L55/L56 · 教訓 LL55–LL57。
+
+### 一貼即用(批535)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1                  # 乾跑:先看問題(不寫檔)
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1 -Apply           # 實修 + 實測 + 自動跳出多 TAB 報告
+# 或載入命令冊後用短令:
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0210
+全景一貼 -Apply                                      # = via-panorama-all -Apply
+全景修復 scan                                        # = via-panorama scan(只看問題)
+```
+
+報告在 `VIA_Reports\panorama_audit\PANORAMA_AUDIT_latest.html`(同夾另有 `.json` / `.md` 給 AI 直接吃)。
+
+**本批自己踩到的九頭龍(已修,值得記)**:第一版把產物寫進 `VIA_Reports\panorama`,那是 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每種情境都判 BLOCKED_PANORAMA,VCGC 自測從 19/19 掉到 18/19。讓出名字改 `panorama_audit`,VCGC 回 19/19,並在稽核器自測 ⑬a 釘死不准再碰(LL59)。另外同一批兩次踩到 f-string 巢狀引號/括號在 Python 3.11 會炸——我的報告渲染器一次、別人 bundle 檔一次(兩處都修好,後者原本整支不能 import;LL58)。
+
+---
+
+## 一-ab · 批536 · 令「再同步修正一次,不必生成 PowerShell,自主完成全部並上傳」(+ 授權自動完成)
+
+**先對帳**:遠端無他人更動(3ca5863f = 本地)。
+
+**一、判準精準化(CGC_MDL158 v0101;15/15)**——批535 報的 267 項裡有一半是稽核器自己的誤報:
+
+| 誤報型 | 為什麼是誤報 | 修法 |
+|---|---|---|
+| SYSEXE 2 件 | 兩件都是 `subprocess.run([sys.executable, Path(__file__)…])`=**引擎自測跑自己**,不是跨家族派送 | 自跑自己不算 → SYSEXE **真數 0** |
+| PINVER 122 件 | 自測段/探針函式在暫存夾寫的假命令冊(`Register-VIA-Commands-v0174.ps1`)、假引擎名(`X_ENG001_A_v0100.py`) | 所在函式是自測/探針就不算 → PINVER 151→**23** |
+| 候選夾/打包副本 | `candidates/`、`bundle/`、`launchers/panorama_tests/` 不是活樹 | 併入非活樹 |
+
+**二、逐檔修真問題**(每支改後都跑自測驗)
+
+| 檔 | 問題 | 修法 | 驗 |
+|---|---|---|---|
+| VDF_ENG087 → **v0102** | 五條引擎路徑釘死版號 | `_newest_rel()` 尾版 glob(L54) | 10/10 |
+| CGC_MDL156 → **v0102** | QuantGuard 與 25-roster 路徑釘死 | 尾版 glob(v0101 起 QuantGuard 是 polars 探針版,釘 v0100 會指到舊的) | GREEN 23/23 |
+| SUP_MDL115 控制塔 | 5 個「特定版號存在」燈 | 改 `glob(…_v*.py)`,新版上線燈才不會誤熄 | compile OK |
+| VDF_ENG051 | 模組頂 `import requests/bs4`=缺件即 Traceback(假紅) | 探針式載入 + `_require_net_libs()` 誠實 ABSENT 印裝法(不代裝) | compile OK |
+| VAP_ENG003 → **v0101** · CGC_MDL055 → **v0101** | 只認位置動詞 | `--selftest` 等價轉換(L53) | 8 PASS/2 SKIP · 3/3(兩種寫法都通) |
+
+**結果**:全景問題 **267 → 140(精準化)→ 129(逐檔修)**;SYSEXE 歸零。剩下的 HARDIMP 100 / PINVER 23 / VERB 6 都在非核心區(VeritasPulse、GroupIndex、CLI 套件、new modules engines),會改行為,依 L56 **報位置待令**,逐檔逐行在報告 TAB②。
+
+**核心回歸**:CGC157 21/21 · 匯流排 48/48 · CGC156 23/23 · VCGC 19/19 · ENG087 10/10 · 稽核器 15/15 · registry-sync 5081。
+
+**我自己又學到兩件**(已入教訓庫):稽核器的判準要能分辨「正式路由」與「自測夾具」,否則誤報會蓋住真問題(LL60);自測用字串切點取原始碼,切點必須唯一——我在文件字串裡寫了同一句話,把切點提前,害兩檢無故變紅(LL61)。
+
+---
+
+## 一-ac · 批536b · 令「先完成 VIA 上傳,再透過 VIA 跑修正實測 VRN」+「用同義字去抓 SSOT/檔名拆解法」+「NLP 工具 LAYOUT 工具」+「邏輯方法查備用引擎或 via-vdf-vrn」
+
+**你貼的 64 份 `C:\測試樣本報告`**:原 PDF 不在本境,但收容件 `AttachmentFixedOutput_v1.0.0_b245` 裡有**同一批 64 份的修復文字**(`01_repair/documents/`)與**版面元素**(`02_layout/logical_layout.json` 232 元素)。所以這批是**內容級真測**,不是夾具。
+
+**ENG086 v0101 新增 `corpus` 動詞**(收容件唯讀零觸碰),並照你的令接三件正主工具:
+
+| 工具 | 接到哪 | 實際 |
+|---|---|---|
+| 券商同義字 SSOT | `VRN_BROKER_LIST_v01.json`(SUP_MDL015 管的正本) | 20 家 · 97 別名;正典名跟正本(兆豐=MEGABANK、高盛=GOLDMANSACHS),我的補冊只補正本沒有的,別名撞上就讓位 |
+| LAYOUT 工具 | 收容件 `02_layout/logical_layout.json` | 64 檔 · 232 元素;有版面用版面標題**加上**前段文字(相加,不是二選一) |
+| NLP 工具 | `VRN_ENG066` 樞紐 normalize | 簡→繁可轉;**逐行**做(整段做會把換行吃掉,逐行判準全失效) |
+
+**64 份真研報實測(修前 → 修後)**
+
+| 指標 | 修前 | 修後 | 說明 |
+|---|---:|---:|---|
+| 個股報告代碼 | 47/64 | **42/42** | 另 22 份是產業/晨會/市場/策略類,**本來就沒有**單一個股代碼(先分類再算,分母才對) |
+| 券商 | 38/64 | **64/64** | 接上 SSOT 正本 + 頁面認不出就用檔名 |
+| 評等 | 17/64 | **33/38** | 五法:線索詞(容得下「調降至」)/標題行(外資 `…; Buy (on CL)`)/引號內(`維持「持有」評等`)/前段獨立行/檔名;明示「未評等」記 NR。另 26 份文中根本沒有評等字樣=誠實 N/A |
+| 個股目標價 | — | **28/42** | 文中沒有目標價線索就不給值(原本弱正則把 MS-Thermal 的 17382 當目標價=假資料) |
+| 檔名日期 | — | **61/64** | |
+
+**備用倉 `tonykuni/via-vdf-vrn` 查到的現成教訓**(同一批語料踩過的坑,直接用):①「目標價」與「潛在上漲空間」是兩個欄位,混在一起會把 23% 當價格 ②真報告多半寫「目標價145」沒有冒號,硬要求冒號會整片抽不到。兩點都已進 ENG086。
+
+**登冊**:冊項 `vrn_firstpage_corpus` · 教訓 LL62–LL65 · 台帳 1063。產物 `VIA_Reports\first_page_logic\CORPUS_latest.json/.md`(逐檔一列,可直接對照)。
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
@@ -926,3 +1081,1013 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | VIA_Reports\first_page_text | (容器 71 件;你的機器 `via-fplogic status` 看) | — | — | `via-fplogic enrich` |
 
 **還掛著(你的手)**:Z34 收 · Z43 VATETF EPS(v0104 重跑貼回)· Z44 當沖檔案收容(瀏覽器存 CSV)· Z45 持股史 · Z46 哨兵列 · Z47 via_paddle_311 境壞(重建)· Z48 vrn 境裝 opencc · Z49 第一頁版面/表格幾何(候)。
+
+---
+
+## 一-ad|批537 VRN 真報告第二輪:券商假綠拆掉、誠實分母立起來(VRN_ENG086 v0102)
+
+批536b 那張成績單是「64/64 券商、33/38 評等、30/64 目標價」。好看,但**逐列查過就知道有三處不誠實**——這一批把它們拆開。
+
+**① 券商 64/64 裡有四份判錯家(假綠)。**
+`Daiwa-3653 / Daiwa-6278 / Daiwa-PCB` 被判成 CATHAY。文內唯一的 `cathay` 出自分析師信箱 `…@daiwacm-cathay.com.tw`(大和國泰合資體的網域),而 `cathay`(6 字)比 `daiwa`(5 字)長,最長別名優先就讓它贏。
+`凱基投顧_2891 中信金_施志鴻_20260519.pdf` 被判成 CTBC:內文只有標的公司名「中信金」,真正的券商「凱基投顧」寫在檔名上。
+修法兩條:
+- **證據分級**(L58):判券商前先把 email/URL 挖掉 → 文內 > 檔名 > 電郵網域(弱)。每一列帶 `broker_how`,以後假綠看得見。
+- **標的公司名否決**(LL67):用與代碼相鄰的兩條鐵證把標的名讀出來——文內 `台灣中信金(2891.TW/2891 TT)` 的括號前、檔名 `…_2891 中信金_…` 的代碼後。**不靠庫**:本境 tw_listings 只有 892 檔、2891 不在內(LL49),靠庫的否決在你的工作站有效、在這裡失效,那等於留著假綠。
+
+**② 評等 5 份掛零,其中 3 份是我們的字彙不夠。**
+凱基三份個股報告全寫「增加持股」(Outperform),收容件的 RATING 冊沒有這個詞。補上本土券商自己的尺度(增加持股/減少持股/優於大盤/劣於大盤/同步大盤/區間操作),而且**只看前段**——內文的「外資持有」「增持庫藏股」不是評等(LL68)。另外兩份是 MS 產業報告與 UBS 市場分析,本來就沒有單一評等。
+
+**③ 分母不誠實=自己造判錯的紅燈(L57)。**「目標價 30/64」看起來漏了 34 份,實際上:2 份是報告自己寫 `Target price: n.a.`(Daiwa),16 份是**我們手上的修復文字裡根本沒有目標價欄**(GS/MQ 的側欄沒被修復出來),16 份是產業/晨會類不需要。真正「有線索卻抓不到」= **0**。判錯的紅燈和假綠一樣傷,所以四態各自列清楚。
+
+**這一批量到的(64 份真研報 · 修復文字 · 原 PDF 不在本境)**
+
+| 欄 | 誠實分態 |
+|---|---|
+| 個股代碼 | 42/42(另 22 份產業/晨會/市場/策略類本來就無單一代碼) |
+| 券商 | 64/64 · 證據:文內 36 · 檔名 28 · 電郵網域(弱) 0 |
+| 評等 | 命中 36 · 文中無評等字樣 8 · 非個股(不需) 20 · **有字樣抓不到(RED) 0** |
+| 目標價 | 命中 30 · 報告自述 n.a. 2 · 文字無此欄 16 · 非個股(不需) 16 · **有線索抓不到(RED) 0** |
+| 檔名日期 | 命中 61 · 檔名無日期 3 · **有數字解不出(RED) 0** |
+
+`VRN_ENG086_FirstPageLogicBridge_v0102.py` 十五檢自測 15/15(⑪ 電郵網域 · ⑫ 目標價四態 · ⑬ 日期三態 · ⑭ 標的否決(空名冊也要成立)+ 本土尺度 · ⑮ 評等四態)。
+產物:`VIA_Reports\first_page_logic\CORPUS_latest.json` / `.md`(表多了「證據 / 等態 / 價態 / 期態」四欄,逐列可查)。
+你的機器:`via-fplogic corpus`(尾版律自動吃 v0102)。
+
+**還沒做、等你的手**:GS/MQ 那 16 份要真的補出目標價,得回到原 PDF 的側欄(修復文字沒有那一塊)=Z49 第一頁版面/表格幾何那一條。
+
+---
+
+## 一-ae|批537 AST 頁與摘要:把「修過的」放進去(CGC_MDL158 v0102)
+
+你說「FIXED CONTENT IN THE AST PAGE AND SUMMARY」。查了頁,毛病是真的:
+
+- **TAB③「已修」在乾跑時只印一句「本次未套用」**。整張 AST 頁於是只講「還沒修的 129 個問題」,看不出批535–537 到底修過什麼。
+- **摘要只有「問題 129 · 自動修 0」**。129 是什麼?可以自動修的幾個、要等你下令的幾個、真紅燈幾個?一個都看不出來。
+
+**修法一:已修冊 + 活樹複驗(新律 L59)。**
+新 SSOT `supportive modules/registry/VIA_PanoramaFixed_SSOT_v0100.json`(擁有者 CGC_MDL158)。每一筆修都帶可複驗的憑據,三種:
+`class_zero`(該範疇活樹件數必須為 0)、`coverage_pct`(覆蓋率欄位 ≥ 門檻)、`tail_contains`(該族**尾版**檔必須含某些字、且不得含某些字)。
+稽核器每跑一次就拿活樹重量一次——**冊說修好、現在也還是修好=GREEN;冊說修好、現在又量到=RED(回歸),而且回歸會把總裁決拉成 RED,不准被 YELLOW 蓋過去;量不了=ABSENT,誠實講量不了,不當綠。**
+`tail_contains` 是特意設的:尾版律下最容易掉的就是「修沒帶進新版」(LL71——批536 的 HARDIMP 修寫進了 `VDF_ENG051` 的無版號檔,活樹尾版其實是 `_v0102`;那一版本來就乾淨所以沒出事,但下次不一定)。
+
+**修法二:摘要四處同一句。** 主控台、頁首、TAB①、Markdown 全部走同一個 `summary_line()`,不會各講各的:
+
+```
+問題 129(可同時修 0 · 順序修 6 · 只報位置待令 123 · 真 RED 0)
+· 已修冊 7 筆複驗 GREEN 7 / 回歸 0 / 待驗 0 · 本次自動修 0 處 · 實測 17/17 綠
+```
+
+**修法三:乾跑不印 OK。** TAB③ 改名「本次修復」,乾跑時結果欄誠實寫「乾跑(未寫檔)」配灰燈,不再印成綠色 OK。
+
+**頁現在九個分頁**:① 總覽 ② 問題明細 ③ 本次修復 ④ **已修冊複驗**(新)⑤ 實測結果 ⑥ 中央派送 ⑦ 覆蓋率 ⑧ JSON ⑨ Markdown。
+
+**這一跑量到的**(`via-panorama all`,尾版自動吃 v0102):總裁決 YELLOW · 掃 1516 檔 · 問題 129(順序修 6 · 待令 123 · 真 RED 0)· 已修冊 7 筆全 GREEN、回歸 0 · 實測 17/17 綠 · 加速器橋 100% · VDF 網路工具 100%。
+
+**順帶量出來的一件事**:第一次跑 v0102 時總裁決是 RED,因為 VCGC ⑬ 元件冊少了 6 個元件(就是我剛加的那幾個函數)——`registry-sync --apply` 之後回綠。這正是這張頁該有的樣子:新東西沒登記,它就報紅,不會替我圓場。
+
+CGC_MDL158 v0102 十八檢自測 18/18(⑭ 複驗三態 · ⑮a 摘要四處同句 · ⑮b 冊在位且本器擁有)。Grid v0317 把站名的「十三檢」改成「十八檢」。
+
+---
+
+## 一-af|批538 照你點的順序 VIA → VRN → VDF:自測格 18 紅 → 0 紅
+
+你說「解決 VIA VRN VDF 照順序」。我先做的一件事是**把 18 個紅站一站一站單獨跑過**,拿真正的 FAIL 行——
+因為我前一批把它們整批歸成「本境空庫」,那句話裡至少有一站是錯的:**其中一盞紅燈是我自己造的**。
+
+### 分類結果(逐站,不是整批)
+
+| 類 | 件 | 說明 |
+|---|---:|---|
+| 我自己造的紅燈 | 1 | 批535 加速器橋掃補插進 md5 冊管的正本 |
+| 真缺陷(會騙下游) | 3 | 旗標打壞卻回成功 · 表在≠有料還照樣落報告 · 缺件 Traceback |
+| 判錯的紅燈(判準錯) | 9 | 寫死天花板/寫死驗算標的/釘死版號/要求剛好 100% |
+| 誠實缺料被印成紅 | 5 | 缺庫、缺鑰、缺選配畫圖庫 → 應為 SKIP |
+
+### 一、VIA 段(六站)
+
+**① 中央治理家族 md5 對冊——我自己造的。** 批535 的加速器橋全樹掃補,把 `[VIA:ACCEL-BRIDGE]` 插進了
+`VIA_CentralGovernanceFamily_b514/` 四個檔,那是你上傳、`MANIFEST_b514.json` md5 冊管著的正本。
+md5 一變就紅,自批535 紅到現在,而我先前把它歸成「本境空庫」。兩重錯:先造了紅燈,又把它推給環境。
+四件已自 `67855ffc` 還原;保護一般化成**規則**——夾內有帶 md5 的 `*MANIFEST*.json` 就零觸碰,
+而且這類檔連覆蓋率分母都不進(不然 100% 永遠掉到 99.7%,再生一盞判錯的紅燈)。
+
+**② 憲章稽核 talib——假綠。** 本境我為了稽核裝過 talib,import 探針就把它判成「在位」:政策說退役、稽核說在位。
+改成退役冊命中的一律 missing 標「退役(L50)」,hits 只列接班人 QuantGuard。憲章是你的定義正典,一個字都沒改。
+
+**③ 殘餘盤點**卡「≤90」寫死天花板(實測 115,但與候裁冊逐檔對得起來);**④ 輸入主控台**的 `params` 由 `codes`
+漂成 `code`/`ticker`,與引擎 CLI/頁/契約三方對不上;**⑤ 雙橋稽核**兩個中央稽核器對同一棵樹講不同的話
+(範圍不同:非尾版舊版與 `_output/` 建置夾);**⑥ sysman Gate** 的唯一紅燈是退役夾裡一支 PS 的語法錯。
+
+### 二、VRN 段(三站)
+
+**真缺陷:`--file` 後面沒有值時,舊行為印一句「忽略」然後退回掃預設收件夾。** 收件夾空的時候看起來沒事;
+本境 `incoming/` 躺著兩份 .docx,同一條指令就變成默默處理另一批檔、而且回 rc=0。旗標打壞卻回成功,
+對串鏈的呼叫端就是一句謊(`via-closeout --run` 靠 rc≠0 才會誠實停)。改成缺值=參數錯,當場 rc=2。
+
+另兩件:**每日觀察摘要**要求因子覆蓋剛好 100%,少的那一列是 3718.TWO 上市未滿 20 天、20 日均線天生算不出
+(真實市場每有新股掛牌就會紅);**NLP 橋**釘死 v1.5.0/35 模組,收容夾已有 v1.6.1/36 模組。
+
+### 三、VDF 段(四站)
+
+**真缺陷:ETF×共識的 `_data_ready()` 只問表在不在、不問有沒有列。** 本境共識 0 列、持股 1125 列,
+探測說「資料在位」,走完整車道再報三個 FAIL;更糟的是 `run()` 還照樣落了一份「共識可加權 0 檔」的 JSON/HTML
+——下游讀到會當成有效結果。改成兩側都要有**列**才算在位,缺料在**產出之前**就停。
+
+另三件:**調整層/因子庫**把驗算標的寫死 2330.TW(本境庫 892 檔沒有 2330,可是同一張表有 378,752 列 factor≠1,
+隨便挑一列都能驗);**族群聚合層**缺快照時先報三紅再被 `CatalogException` 炸掉。
+
+### 四、收尾(VAP/GroupIndex/格子)
+
+seaborn 未裝報紅 → SKIP + pip 行(不代裝),而且**跳過的不算 OK**(舊計數印「十檢 OK 10」是小一號的假綠);
+FRED 鑰缺席時那一檢本來就不可能綠 → SKIP;族群全球冊 48/51 改成**指名**缺 `BZ=F / CL=F / GC=F` 與補法;
+格子加期望 `nodata_ok`(rc 0 或 2)給 VAP 驗收稽核——它的 rc=2 是誠實 NODATA,不是紅燈,而能嚴的站不放寬。
+
+### 量到的
+
+自測格 233 站:**OK 209 → 226 · FAIL 18 → 0 · SKIP 6**(誠實三態)。
+治理台 UI Matrix 綠燈率 226/233 = 97.0%,八檢 8/8。VCGC 19/19、MasterControl 合約測 19/19、元件冊 5121 活元件。
+剩下的 6 個 SKIP 全是誠實缺件:TA-Lib 三站(L50 退役,本來就該缺)、TA 工廠兩站、reconcile 對帳。
+
+**還沒做、等你的手**:Z43 FactSet 共識覆蓋(共識 0 列)· FRED 鑰(`output_hub/mega/.fred_api_key`)·
+全球期貨三檔 `BZ=F/CL=F/GC=F` · 族群分類快照(`via-datahome link` / `group_class`)· `pip install seaborn`。
+這些補上之後,上面那 6 個 SKIP 會自己變成可驗的綠或真紅——那時候的紅才是要修的紅。
+
+---
+
+## 一-ag|批539 TA-Lib 拔線:刪檔不等於退役(新律 L60)
+
+你貼回來一份舊區塊,裡面有 `pip install "TA-Lib>=0.6"` 和五條 `via-taone`。**那條路已經不存在了**:
+`via-taone` 在批534 隨 TA-Lib 退役時就從指令書移除(尾版是 Register v0210),
+它呼叫的 `VDF_ENG083_TALibOneBridge`、`CGC_MDL151_TaLibGate` 也都刪了。你貼的那份是批521 時代的區塊。
+
+但這件事真正要追究的不是舊區塊,是**系統為什麼還會把人帶回去**。查完發現:批534 只刪了檔,**接線沒拔乾淨**。
+
+| 還指著已刪引擎的地方 | 它一直在印什麼 |
+|---|---|
+| 總管理器引擎名冊(4 筆) | 名字還在冊上,看起來像現役 |
+| 自測格 4 站 | 「引擎缺/自指佔位(誠實)」 |
+| 繪圖資料律稽核冊(2 筆) | TA 工廠是技術分析正主 |
+| VTMRA 家族(2 員) | 家族態永遠掛一個 ABSENT |
+| 工具階梯 TA_INDICATOR | lv1 已刪的 TAFactory、lv2 `talib C 庫(候裝)` |
+
+「引擎缺」這句話讀起來像**有東西該在卻不在**,實際是**退役**。誠實不只是別說謊,還要說清楚是哪一種缺
+(缺件 / 未裝 / 退役)——這是 LL82。
+
+### 這一批做的六件
+
+1. **總管理器 v0140**:名冊拔掉 `CGC_MDL151_TaLibGate` / `VDF_ENG083_TALibOneBridge` / `VAP_ENG004_TAFactory` / `VDF_ENG048_TAFactory`。
+2. **自測格 v0319**:拔掉四個指向已刪引擎的 TA 站(233 → 229 站)。技術分析只留 **QuantGuard 正主橋八檢**。
+3. **繪圖資料律 v0102**:稽核冊兩個 TA 工廠 → 改列 `VDF_ENG086 QuantGuard 正主橋(L50 唯一活動技術分析路徑)`。
+4. **VTMRA 閘 v0102**:家族八員 → 六員;**同一版把 verdict 裡給 `talib` 的「軟缺席=YELLOW」豁免一起拔掉**
+   ——成員都拔了、豁免留著,就是替不存在的成員開後門,哪天有人用同一個 id 塞回來會被默默放行(LL83)。
+5. **工具階梯 v0102 + 階梯冊**:`TA_INDICATOR` 兩級都失效(lv1 已刪、lv2 L50 禁用)→ 單級 QuantGuard;
+   舊級原文存進 `retired_rungs_b539`,不是刪掉。自測 ⑧ 改成「階梯不得再有可升到 talib 的那一級」。
+6. **本境 `pip uninstall TA-Lib`(0.8.0)**:那是我先前為了稽核自己裝的。L50 說不得安裝,**那就包含我的稽核用途**;
+   拔掉之後 import 探針與政策才真的一致(LL84)。
+
+### 新律 L60 退役拔線律
+
+> 退役不是把檔刪掉就算完。要一次做完四件:① 檔進退役夾或記入退役冊 ② 所有接線拔掉並指向接班人
+> ③ 判定律裡給退役件的豁免口一併拔掉(不留後門給不存在的成員)④ 每一處拔線逐條記帳。
+> 做不到就不要宣稱退役。
+
+### 量到的
+
+活樹尾版 1455 檔,AST 層級掃過:**指向已刪 TA 引擎或 `import talib` 的接線 = 0**
+(剩下的字面命中全是這一批自己的退役註記)。
+自測格 **229 站:OK 227 · FAIL 0 · SKIP 2**(reconcile 對帳=環境缺件、selftest grid=自指)。
+VCGC 19/19 · MasterControl 合約測 19/19 · VTMRA 七檢 7/7 · 工具階梯 十檢 10/10 · 總管理器 v0140 10/10。
+
+### 技術分析現在走這裡
+
+`via-quantguard`(`VDF_ENG086_QuantGuardOneBridge`),動詞 `status | probe | run | selftest`。
+缺 polars = 誠實 ABSENT(rc=3)並附 pip 行,**不代裝**;階梯不得再往 talib 升。
+
+---
+
+## 一-ah|批540 VRN 規則收斂第一步:先把真相收斂到一處,再談動刀(新律 L61)
+
+你要的是「相同邏輯相同規則整合去重 · 有錯誤一起討論 · 只增不減 · 不影響現有功能 · 不要九頭龍」。
+所以這一批**一行現役引擎的行為都沒改**,做的是把散掉的真相收攏,並把落差攤在桌上。
+
+### 量到的硬落差(這就是要一起討論的錯誤)
+
+同一套評等詞彙,四支**現役**引擎各有各的版本:
+
+| 引擎 | 評等規則 | 少了什麼 |
+|---|---:|---|
+| **ENG086 第一頁橋 v0102**(64 份真研報驗過) | **38/38** | 正本 |
+| ENG073 報告結構庫 v0127 | 17/38 | 沒載收容件字典(自己寫死一份)→ 英文評等缺 13;本土尺度缺 8(**增加持股/減少持股**) |
+| TW02 報告解析器 v0101 | 12/38 | 英文評等缺 14;本土尺度缺 12 |
+| 首頁全能引擎 v0125 | 25/38 | 有載字典,但本土尺度缺 13 |
+| ENG080 四點文摘 v0105 | 不適用 | 它只抽目標價,拿評等量它是無中生有 |
+
+**白話**:凱基寫「增加持股」時 ENG086 讀得到、ENG073 讀不到;而 ENG073 正是報告**入庫**那一支。
+這跟 ENG086 批538 修掉的那個漏是同一個,只是還沒修到它身上。
+
+### 這一批做了什麼
+
+1. **規則正本冊** `supportive modules/registry/VRN_FieldRules_SSOT_v0100.json`
+   —— 把**已驗過的那一套**(ENG086 v0102)立為正本並鎖住:評等 38 詞、目標價線索、券商證據分級、
+   email/電話出處、財報樞紐指向,連每條規則背後的教訓編號一起記。
+2. **唯一讀冊口** `supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0100.py`(七檢 7/7)
+   - `drift` —— 逐支引擎列出落差(上表就是它印的)
+   - `rating_of / tp_of / broker_of` —— **惰性轉交正本實作**,不是只給詞表。
+     光補詞表不補守衛會製造假評等,所以連 ENG086 踩過的三個坑一起繼承:
+     本土尺度只看前段(LL68)· 幅度不是價格(LL64)· 券商證據挖掉電郵網域(LL66/LL67)。
+   - 零改線:import 這支樞紐不碰任何引擎;不落檔;不改寫任何現役引擎。
+3. **順手打出一個潛伏的假評等** —— `safe_rating` 的獨立短行分支寫著「≤8 字**剛好是**別名」,
+   實作卻用包含比對:「外資持有比重上升」剛好 8 字、含「持有」→ 判成 HOLD。
+   64 份真研報裡**還沒咬到**(走那條路的三份都是 `買進`/`Buy` 自成一行的真評等),所以是潛伏的假綠。
+   → **ENG086 v0103** 改成整行等於別名;64 份實測**零回歸**(評等仍 36、目標價 30、券商 64/64、真 RED 0)。
+
+### 新律 L61 規則收斂律
+
+> 同一件事的規則不得散在多支引擎各抄一份。**先收斂真相、再動刀**:
+> ① 立一本正本冊(取已在真資料上驗過的那一套)+ 一個讀冊口,落差逐條攤開 —— 這一步零改線;
+> ② 攤開之後才由操作員決定誰改、一支一支改、每支都要在同一份真語料上驗零回歸。
+> 跳過第一步直接合併,就是把四個會漂移的真相,換成一個沒人驗過的新真相。
+
+### 下一步等你一句話
+
+三支落差引擎要不要接上樞紐,建議**一支一支來**,每支接完都用同一份 64 份語料驗零回歸:
+
+| 順序 | 引擎 | 理由 | 風險 |
+|---|---|---|---|
+| 1 | **ENG073 報告結構庫** | 它是入庫那一支,漏評等直接進資料庫 | 中:要同時補「只看前段」守衛,否則內文誤判 |
+| 2 | 首頁全能引擎 v0125 | 已載字典,只缺本土尺度 | 低 |
+| 3 | TW02 報告解析器 | 落差最大,但下游用量最小 | 低 |
+
+你說一個,我就接一個;不說,現況照舊跑,一位元都沒動。
+
+---
+
+## 批541 —— 去衝突 · 邊實測邊長同義字 · 收容件導入驗證(仍零改線)
+
+操作員令:「完成整合測試 邏輯整合去衝突 ssot 同義字 等下邊實側邊更新同義字」
+追令三句:「clsa = clst」·「CTBC 中信」·「加這個檢查導入」
+
+### 一、去衝突:同一家不得有兩個正典名
+
+合併三張券商表(收容件字典 × SSOT 正本 × 橋側補冊)掃出 **17 個原始撞名**,合併後還剩 **2 個活的**
+——同一個別名對到兩個正典名,下游一 join 就散:
+
+| 撞名別名 | 對到 | 根因 | 處置 |
+|---|---|---|---|
+| `clst` | CLSA / CLST | 冊上把里昂分成兩筆 | **操作員裁定「clsa = clst」** → CLST 併入 CLSA(20→19 家;CLST 原文留在 `merged_b541` 鍵下,只增不減) |
+| `jp` `jpm` `jpmorgan` `j.p. morgan` | J.P.MORGAN / JPMORGAN | 讓位規則的洞:只 pop「不在 SSOT **且不在補冊**」的鍵,而 JPMORGAN 兩邊都有 → 永遠 pop 不掉 | 改成「別名被 SSOT 收編,非 SSOT 的鍵一律讓位」 |
+
+新增 `broker_conflicts()` 與自測 ⑯',**鎖住零撞名**——同一家兩個正典名再也回不來。
+合併後 45 家、撞名 0。
+
+### 二、邊實測邊長同義字(harvest):只提候選,絕不自己寫進正本冊
+
+樞紐加 `harvest` 動詞:拿 64 份真語料跑一輪,把「該有卻沒命中」的欄位旁邊的候選詞端出來,
+一律標 `PENDING_OPERATOR`,附檔名與證據。**不代設**——正本要長,是你點頭那一刻才長。
+
+濾網修了四輪,每一輪都是實測打回來的:
+
+| 輪 | 端出來的 | 為什麼是假的 |
+|---|---|---|
+| ① | 12 條噪音 | 只掃檔名開頭,連日期段都當機構 |
+| ② | `晶心科`、`瑞基` | 這兩種檔名是 `<標的>(代碼,評等)-<券商><日期>`,開頭是**標的公司名** |
+| ③ | `公司訪談摘要`、`PCB` | 一個是報告段名、一個是產品類別;它們的檔名裡**早就有**兆豐 / Daiwa |
+| ④ | **0 條** | 加閘:檔名裡任何一處已有在冊別名 → 這份本來就認得出券商,生不出「新」券商 |
+
+### 三、修到 0 之後,那個 0 本身變可疑 —— 加負控
+
+一個**永遠回 0** 的濾網,跟一盞假綠燈沒有兩樣(LL77 的同族)。
+所以加自測 ⑩:合成兩列,假候選(檔名已有「兆豐」)要擋掉、真候選(全新機構名「寰宇投顧」)要放得出來,
+而且一份檔名只端一個(不把標的公司名一起撈進來)。**兩邊都對才算這道濾網在工作。**
+
+### 四、「加這個檢查導入」—— 舊那一檢比它看起來弱
+
+同一份 `VIA_VRN_FirstPageEngine.py` 今天又被上傳兩份(30,115 bytes,md5 `d4cdaedf…`,
+跟 9/9、9/15 那兩份也一樣)。量過:它**早就在收容件裡,位元一個不差**,自測 ① 每次都綠。
+
+那為什麼還要加一檢?因為 ① 是拿**檔案的 md5** 去對**同一個資料夾裡的冊**——
+檔案跟冊一起被換掉,兩邊還是一致,綠燈照亮,騙的是自己(跟 LL74 先建後斷言同一種形狀)。
+而且它只驗位元,不驗「導入」本身:檔案在、位元對,但 import 就炸、或宣告的模組被改名,① 一樣是綠的。
+
+**ENG086 v0105 加 ⑱ 三段,全過才算導入成立:**
+① 位元錨 —— 期望 md5/sha256/bytes **寫死在程式碼裡**(`INTAKE_ANCHOR`),檔案=錨=冊 三方一致;
+② 真的 `exec_module` 導得進來(不是「看得到就算」);
+③ 冊上宣告的 11 個模組一個不少(`load_ssot_blocks` + 10 個類別)。
+
+再加 **⑱' 負控**:在產物夾沙盒裡把檔案與冊**一起**換掉(收容件零觸碰),當場證明
+**舊檢綠 · ⑱ 紅**。擋不住這一手的檢查,綠燈只是自己對自己點頭。
+
+### 五、「CTBC 中信」—— 量過,已成立,零改動
+
+CTBC 合併後有 7 個別名:`中信 / 中信金 / 中國信託 / ctbc / CTBC / 中信投顧 / 中信證券`。
+文內只出現「中信證券」也判得出 CTBC(證據層「文內」);而 `凱基投顧_2891 中信金_…` 那份
+**仍然被標的否決擋住**(veto = {中信金, 台灣中信金},別名「中信」是它的一部分 → 不算券商證據),
+退到檔名層得 KGI。兩件事同時成立,所以這一句不需要改任何東西——只需要被量一次。
+
+### 本批實測
+
+| 量尺 | 結果 |
+|---|---|
+| ENG086 v0105 自測 | **十九檢 19/19** |
+| 64 份真研報 | **零回歸**:券商 64/64(文內 36 + 檔名 28)· 評等 36 · 目標價 30 · 檔名日期 61 · **真 RED 0** |
+| 樞紐 SUP_MDL749 v0101 | **十檢 10/10**(撞名 0 · 合併後 45 家 · 候選 0 條) |
+| 自測格 v0321 | 230 站 · OK 227 / FAIL 1 / SKIP 2;那 1 紅是 VCGC 等本批 `registry-sync`,同步後 **19/19** |
+
+新教訓 **LL88**(檔案在≠導得進來;檔案對冊≠驗過,錨要放在外面)·
+**LL89**(永遠回 0 的濾網=假綠燈,濾網必配負控)·
+**LL90**(同義的裁定權在操作員不在冊)。
+
+### 下一步還是等你那一句
+
+批540 列的三支落差引擎(ENG073 → 首頁全能 → TW02)**一支都還沒接**,現況照舊跑,一位元沒動。
+你說一個,我就接一個,每接完一支都用同一份 64 份語料驗零回歸。
+
+### 批541b 補洞:短令 `via-vrnrules`
+
+批540 立了規則正本樞紐卻**沒給短令**——功能註冊七處少一處,等於你在工作站叫不出它。
+Register **v0211** 補上(pwsh 語法解析 OK · 12465 tokens):
+
+```
+via-vrnrules             一行狀態(冊在不在 · 評等詞幾個 · 券商證據分級 · 消費端幾支)
+via-vrnrules drift       逐支現役引擎列「正本有、它沒有」的規則(只量它真的在抽的欄位)
+via-vrnrules conflicts   去衝突:同一別名對到多個正典名 = 撞名,必須是 0
+via-vrnrules harvest     邊實測邊長同義字:端出候選,一律 PENDING_OPERATOR(絕不自己寫進正本冊)
+via-vrnrules selftest    十檢自測(含候選閘門負控)
+```
+
+---
+
+## 批542 —— 「跑太慢」的根因不在加速器,在每道指令都要穿的那件外套
+
+操作員令:「前一個指令跑太慢 請加入25個PS加速器 請確認所有PY指令都有加入加速器」
+
+### 一、先量再說:你要的兩件,量出來都已完成
+
+| 你問的 | 量到的 | 憑據 |
+|---|---|---|
+| 加 25 個 PS 加速器 | **早就是 25 個** | `VIA_Accelerator_Roster_SSOT` accelerators=25 · `VIA_PS_Accelerators_25_Roster_v0100.ps1` 25 條 · `$global:VIA_ACCEL25` 由它生成 · MDL156 二十三檢 GREEN |
+| 所有 PY 指令都有加速器 | **活樹 100%** | `via-sweep --audit`:活樹 **797** 支 · `accel_have 797` · **`accel_miss 0`** · 網路橋 50/50 |
+
+非活樹另有 accel 缺 66、net 缺 6——66 支全是**舊版號檔**(`VIA_VRN_FirstPageEngine_v0104…v0122` 那種),
+6 支在**凍結產出夾**。依 L55 活樹律這兩類不是活樹,對它們報缺就是假紅(批538 已經處理過同一件事)。
+
+短令側也早就接好:`Register-VIA-Commands` 第 24~33 行就是 `[VIA:PS-ACCEL]` 橋,
+而且**所有 py 指令一律走 `Invoke-VIAPython`** 這個中央唯一入口,沒有繞道。
+
+**所以照著你說的再加 25 個,只會把已經 100% 的東西變成 100%,慢照樣慢。**
+
+### 二、真的慢在哪:拆秒數
+
+| 段 | 耗時 |
+|---|---|
+| python 本身(`-c pass`) | **~20 ms** |
+| `Invoke-VIAPython` 外套 | **279 ms** |
+| 開視窗第一道再加點燈 | **+1,137 ms** |
+
+拆開是三筆,全在 `supportive modules/VIA_PS_PyProgress_Module.ps1`:
+
+1. **點燈純動畫 625 ms** —— 快取模式每格 `Start-Sleep -Milliseconds 25` × 25 格。
+   快取模式**根本沒有東西要等**,那 625 ms 是畫給人看的,不是工作。
+2. **固定 250 ms 輪詢** —— 每道指令平均多付 125 ms、最壞 250 ms,才發現它其實早就跑完了。
+   而短指令(`--selftest` / `status` / `conflicts`,python 側 0.0~2.5 s)佔絕大多數,卻全額付這個稅。
+3. **`Write-Progress` 每 250 ms 無條件重繪** —— Windows 主控台是重繪整條橫幅,很貴;
+   即使那一秒什麼都沒變也照畫。400 ms 就結束的指令還會閃一條橫幅再消失。
+
+### 三、改法(只動輪詢節奏,不動排水邏輯)
+
+- 快取點燈**零睡眠**
+- **自適應輪詢**:10 ms 起跳、倍增退到 250 ms —— 短跑幾乎零延遲,長跑照樣 250 ms 一次,CPU 不多花
+- **進度條節流**:秒數或狀態行變了才畫;**400 ms 內免橫幅**
+
+### 四、實測(同一棵樹、同一條快取路徑量的)
+
+| | 改前 | 改後 | |
+|---|---:|---:|---|
+| 首發(含點燈 25 格) | 1,137 ms | **280 ms** | −75% |
+| 後續每道 | 279 ms | **37 ms** | −87% |
+| 六檢行為 | FAIL 0 | FAIL 0 | 零變更 |
+
+七道一組的區塊(上一則我給你的那種):**3.2 s → 0.5 s,省約 2.7 秒的純外套稅。**
+
+### 五、行為用六檢釘住(快不能拿正確性換)
+
+改外套最怕的是「快了,但吞掉一行 stdout / 吞掉一個 rc」。新增
+`supportive modules/VIA_PS_PyProgress_Selftest_v0100.ps1`(短令 **`via-pyprog`**):
+
+```
+① 短跑 stdout 一行不少地回到 pipeline   ② rc 0 照實回
+③ 長跑邊跑邊轉播、結束仍收齊            ④ 非零 rc 不吞
+⑤ stderr 不混進 stdout pipeline         ⑥ 逾時 rc 124、不卡斷
+```
+**改前改後跑同一組六檢,都是 FAIL 0。**
+
+### 六、加一道「別改回去」閘,並且做了負控
+
+`CGC_MDL156` v0103(二十三檢 → **二十八檢**)靜態斷言那三個加速還在、外套六檢在位。
+負控當場做過:**把外套改回舊版 → RED 25/28;還原 → GREEN 28/28。**
+(這正是 LL89——一個永遠會過的檢查跟假綠燈沒兩樣。)
+
+新教訓 **LL91**:「跑太慢」的時候,先把秒數拆開再決定加什麼。量不出來就不要加。
+
+---
+
+## 批543 —— `via-pyprog` 叫不出來:七處只做了六處,而且不只我漏
+
+操作員實錄:
+```
+via-pyprog: 無法將 'via-pyprog' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。
+```
+
+### 一、根因不是短令寫錯
+
+`Register-VIA-Commands-v0212.ps1` 裡 `function global:via-pyprog` 定義得好好的,
+本境點源 v0212 之後 `Get-Command via-pyprog` 也回 True。缺的是**同名 `.cmd` 直通梭**。
+
+批266 就記過這個陷阱:操作員的殼常常是 cmd,而 **PS global 函式在 cmd 永遠看不見**;
+就算在 PowerShell,新加的短令也要人記得重新點源冊。治本是每個短令配一支同名 `.cmd`。
+
+### 二、查下去才發現不是只有我漏的那兩個
+
+| | 數 |
+|---|---:|
+| 冊上 `function global:via-*` | **133** |
+| 有同名 `.cmd` 梭 | **93** |
+| **缺** | **40** |
+
+缺的名單裡有 `via-vcgc`、`via-panorama`、`via-ryg`、`via-bus`、`via-boot`、`via-fplogic`、`via-vrnrules`
+——**都是天天在用的**。也就是說:這些短令在 cmd 殼裡一直叫不出來,只是沒人特地去試。
+
+### 三、補齊 + 釘住
+
+- 依既有樣板(批324 `VIA-Verb-Shim v0100` + 批340 `VIA_NO_OPEN` 零跳出律)**補齊 40 個梭,現在零缺**。
+  編碼沿用既有慣例(UTF-8 no-BOM + CRLF,跟 `via-accel-check.cmd` 完全一致——那支在工作站已經跑了 200+ 批)。
+- `CGC_MDL157` v0102(二十一檢 → **二十四檢**)加三檢:
+  ① 冊上每個 `function global:via-*` 必有同名 `.cmd`
+  ② 沒有梭可以**把版號釘死**(尾版律;釘死那天升版就指向舊檔或空氣)
+  ③ **負控** —— 證明上面兩檢真的咬得住
+- **實測負控**:把 `via-pyprog.cmd` 拿掉 → **RED 23/24**;放回去 → **GREEN 24/24**。
+
+### 四、我自己量錯兩次,寫在這裡
+
+這一批我寫的判準改了三版,前兩版都是我造的假紅燈:
+
+| 版 | 我要求 | 被冤枉的 | 為什麼錯 |
+|---|---|---|---|
+| ① | 每個梭都要走「點源冊尾版 + `%~n0`」樣板 | `VIA-ALL` `VIA-ROOTCHECK` `VIA-TOWER-RESET` `via-pipeline` `via-ppp` `via-repo-optimize` | 它們是**獨立啟動器**(git 自癒、清埠、各自 glob 自己的 ps1),用另一條路到達,一樣到得了 |
+| ② | 至少要有動態 glob | `via-vrnin` | 我的正則只認 `-v*.ps1`,漏掉 `VIA_WinIO_InputPicker_v*.ps1` 這種**底線**接 v 的寫法 |
+| ③ | **只留:版號不得釘死** | — | 這才是真的會咬人的那一條 |
+
+兩次都是同一種錯:**我把自己熟悉的形狀當成正確的定義**。
+量「到得了嗎」,不要量「長得像不像」。
+
+### 五、順手記一筆(本批不動)
+
+`supportive modules/bootstrap/sitecustomize.py:156` 仍寫
+`VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"` —— 已經跟尾版脫節。
+MDL157 那一檢是版號無關的,所以**不是紅燈**;但這是一個會慢慢漂的標籤。
+改 bootstrap 的影響面太大,本批不碰,記在這裡備查。
+
+新教訓 **LL92**(七處少一處=那個功能在操作員手上等於不存在)· **LL93**(量「到得了嗎」不要量「長得像不像」)。
+
+---
+
+## 批544 —— 六個獨立流程:⑱ 在你機器上咬到真東西了
+
+操作員令:「ps加25個加速器不卡斷 · 全景式分析後分六個獨立流程 · 在不傷害系統不引起九頭龍風險下進行修正 ·
+動態進度條 · 將跳出的兩個 html 整合唯一放在 tab 2 · tab 1 放要給 ai 的資訊全部放一起 · 字小一點專業 ·
+可將整頁內容轉換成 json/md」
+
+### F1 —— 你的工作站上,VRN 收容件被就地改過
+
+你貼的 `via-ryg vrn` 裡有這兩行,是這一批最重要的東西:
+
+```
+[FAIL] ① 收容件在位…md5 7bedf1d6 ≠ d4cdaedf
+[FAIL] ⑱ 批541 收容件導入驗證 (錨 ≠錨 md5 7bedf1d6 · 30727B · 冊 =錨 · 模組 11/11)
+```
+
+讀法:**冊沒被動,檔被動了**,而且多了 **612 位元組**(30,727 − 30,115)。
+倉庫裡那份是乾淨的(`d4cdaedf`),所以是工作站那一份被就地改過。
+最可能的兇手:某次全樹補橋把 `[VIA:ACCEL-BRIDGE]`(約 629 B)注進了收容件——
+**LL72 記過的同一種事故,只是這次落在 VRN 的收容件上**。
+這也解釋了為什麼同一份 30,115 B 的原檔今天被上傳了四次:那是在試圖把它救回來。
+
+> **批541 我加 ⑱ 的時候,它在本境永遠是綠的**,看起來像一檢多餘的東西。
+> 到你機器上第一次真跑就咬到。檢查的價值在於它能不能在壞掉的那天亮,不在平常好不好看(LL94)。
+
+`ENG086 v0106` 只改一件事:**紅燈要能自救**。①/⑱ 失敗時直接印還原指令,不再只丟兩串 md5:
+
+```
+  [FAIL] ① 收容件在位(尾版 glob)且 md5 對冊(零觸碰) (… md5 a271b64a≠d4cdaedf)
+     ↳ 救法(你的手,一行):git checkout -- "functional modules/VRN/references/intake/…/VIA_VRN_FirstPageEngine_2.py"
+       倉庫裡那份就是錨(30,115B / d4cdaedf);工作站這份被就地改過。
+```
+沙盒負控做過:模擬注入 → ① 亮紅並印出救法;還原 → 十九檢 19/19。**本支不代改任何檔**(不代設)。
+
+### F2 —— 「不卡段」的真正來源:沒帶逾時就是無上限等
+
+`Invoke-VIAPython` 的 `-TimeoutSec` 預設 **0**,而 0 走的是「**永遠等下去**」那條路。
+引擎一掛住,那個視窗就再也回不來——這才是卡斷。
+改成沒帶就套保底天花板(**1800 s**;`$env:VIA_PY_TIMEOUT_SEC` 可調,真要不設限才寫 0),
+逾時訊息講明「這是保底不是判它壞」並附調大的方法。長工(自測格 213 s、你那次 vrn_firstpage 169 s)照跑。
+六檢仍 **FAIL 0**。
+
+### F3 —— 三張頁整合成一頁(TAB1 給 AI · TAB2 內嵌)
+
+`CGC_MDL159_VIAUnifiedConsole`。**零九頭龍的做法**:它不重算也不重畫那三張頁,
+只把它們用 iframe **相對路徑**內嵌到 TAB2;原頁改版,這裡自動跟著變。
+
+| | 內容 |
+|---|---|
+| **TAB 1** 給 AI 的一頁 | 規矩七條 · 現況卡(律/教訓/台帳/活元件/自測格/全景/短令梭/**收容件位元**)· 冷啟動 · 資料庫 · 最近四筆台帳 · 最近六條教訓 · 座標 |
+| **TAB 2** 頁 | 引擎匯流排矩陣 · 全景稽核 · 中央控管台 —— 三張內嵌,各附「單獨開」連結 |
+
+**收容件位元體檢**(⑪)是這一站最該留的一檢:全樹逐本 `_INTAKE_MANIFEST_*.json` 對 md5。
+本境量到 **40 件 · 被動過 0**;你機器上會點名那一件並附還原指令。
+
+### F4/F5 —— 動態進度條 · 整頁轉 JSON/MD
+
+進度條沿用全樹慣例 `@@PROGRESS|pct|msg`(PS 側 `Invoke-VIAPython` 轉播)。
+整頁可一鍵轉 **JSON / MD**(payload 與 md 嵌在頁裡,純 Blob 下載,**零 CDN、不連外**);
+同時也落 `.json` / `.md` 兩個檔。字級 12.5 px、表格 12 px、等寬字只用在程式碼。
+
+### F6 —— 登錄
+
+`Grid v0324`(+統一主控十一檢站;230→**231**)· `Register v0213`(`via-unified` + 梭)· 台帳 1076。
+
+### 本批我自己又量錯一次(第一版十檢 FAIL 4)
+
+四個 FAIL 全是**自我指涉**:斷言裡寫的字串(``src='http``、``def build_matrix``、``.write_text(``)
+被自己掃到;還有 `class=tabs` 含 `class=tab` 讓分頁數多算一個。
+切法沿用批540:`full.split("\ndef selftest()")[0]`,比對用夠長的 token。修完 **11/11**(LL96)。
+
+### 你 pull 不下來的原因
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+        VIA_HANDOVER_LATEST.md · docs/VIA_Handover_ONEPAGE.md · VIA_UI_CentralGovernanceConsole_v0100.html
+```
+這三個**正是 `via-vcgc page --publish` 自己產的**。你每次發佈完再 pull 就會撞。
+它們是產物不是手寫,直接丟掉本地版即可:
+
+```powershell
+git checkout -- VIA_HANDOVER_LATEST.md "VeritasIntelligenceAnalytics/docs/VIA_Handover_ONEPAGE.md" "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_CentralGovernanceConsole_v0100.html"
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+```
+
+新教訓 **LL94**(本境永遠綠不代表沒用)· **LL95**(紅燈要能自救)· **LL96**(掃自己原始碼先切掉自測本體)·
+**LL97**(沒帶逾時就是無上限等)。
+
+---
+
+## 批545 —— 救法沒救到:紅燈點名的是資料夾,不是那個檔
+
+你照 v0106 印的救法跑了 `git checkout -- "…/VIA_VRN_FirstPageEngine_2.py"`,**沒有報錯**,
+再跑 `via-ryg` md5 還是 `7bedf1d6`。不是 git 沒動,是**它動的那個檔根本不是被算到的那個**。
+
+### 根因:選檔方式
+
+```python
+ENGINE_GLOB = "VIA_VRN_FirstPageEngine*.py"
+intake_engine_file() = sorted(home.glob(ENGINE_GLOB))[-1]     # ← 排最後的那個
+```
+
+收容件夾裡只要多一個排在 `_2.py` **後面**的同系列檔(`_3.py`、`_v0101.py`…),
+它就自動變成「正典」。而那種檔多半是**未追蹤**的,`git checkout` 根本動不到它。
+
+> 這是「尾版律」被套錯地方:那條律是給**我方版本號遞增的引擎檔**用的。
+> 收容件的正典是**冊上點名的那個檔名**,要按名字取,不是按排序取(LL98)。
+
+### 容器裡重現過
+
+丟一個 30,727 B 的 `VIA_VRN_FirstPageEngine_3.py` 進收容件夾:
+
+| 版本 | 結果 |
+|---|---|
+| v0106(你手上那版) | **① ⑱ 兩檢同時亮紅** —— 跟你貼的一模一樣 |
+| v0107 | **① ⑱ 綠**(引擎吃對了)· **⑲ 紅**,當場點名 `VIA_VRN_FirstPageEngine_3.py` |
+
+### v0107 四件
+
+1. 錨檔一律**按名字取**(`home / INTAKE_ANCHOR["name"]`),不再吃 glob 排序
+2. `intake_files()` 把夾內**每一個**同系列檔列出來(檔名 · 位元 · md5),多出來的當場現形
+3. 救法分兩種講:錨檔被改過 → `git checkout`;**夾內多餘檔** → 未追蹤,git 救不了,要你自己挪走
+4. **新增 ⑲** —— 按名字取之後 ①⑱ 會轉綠,**那一刻最危險**:夾裡那個多餘檔還在,
+   轉綠等於把汙染掃到地毯下。所以分兩盞燈:**引擎吃對了**一盞、**夾子乾不乾淨**另一盞
+
+### 你機器上先確認那個檔叫什麼
+
+```powershell
+Get-ChildItem "functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522\VIA_VRN_FirstPageEngine*.py" |
+  ForEach-Object { "{0,-42} {1,7} B  {2}" -f $_.Name, $_.Length, (Get-FileHash $_ -Algorithm MD5).Hash.Substring(0,8) }
+```
+冊上只認 `VIA_VRN_FirstPageEngine_2.py`(30,115 B / `d4cdaedf`);其他的都是後來放進去的。
+
+### 你 pull 不下來,是我給錯路徑
+
+你人在 `VeritasIntelligenceAnalytics\` 底下,我給的卻是**倉庫根**相對路徑,所以 git 說 pathspec 不認。
+從你現在這個位置要這樣打:
+
+```powershell
+git checkout -- ..\VIA_HANDOVER_LATEST.md docs\VIA_Handover_ONEPAGE.md "supportive modules\ui_support\VIA_UI_CentralGovernanceConsole_v0100.html"
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+```
+
+新教訓 **LL98**:尾版律不能套在收容件上;收容件的正典是冊上點名的那個檔名。
+
+---
+
+## 批546 —— 更正:收容件根本沒被改過,是 CRLF。我連著兩批診斷錯
+
+操作員照批545 的診斷列了收容件夾,**只有一個檔,沒有入侵者**:
+
+```
+VIA_VRN_FirstPageEngine_2.py      30727 B   7BEDF1D6
+```
+
+把倉庫那份(LF · 30,115 B · `d4cdaedf`)逐位元轉成 CRLF 再算一次:
+
+```
+30,727 B · md5 7bedf1d680a5e65e223ed0f914350cb4      ← 位元數與 md5 都完全吻合
+```
+
+**收容件一個位元都沒被改。** 是 git 在 Windows 上依 `core.autocrlf` 把 LF 轉成 CRLF,
+**612 正是這個檔的行數**,每行多一個 `\r`。
+
+### 我錯在哪(要記清楚)
+
+從批544 起,我一路斷言「正本被就地改過」,還指名是 ACCEL-BRIDGE 注入(因為那個區塊剛好 629 B,
+跟 612 很接近——我拿一個**近似**的數字當成證據)。接著批545 又推論「夾裡有入侵者」,
+為此改了選檔邏輯、加了 ⑲、寫了兩套救法。**兩批的前提都是錯的**,而且我讓它上了台帳、
+教訓 LL94/LL95/LL98 與交接檔。那是我造的**判錯紅燈**——L57 講的就是這個:判錯的紅燈和假綠一樣傷。
+
+更難看的是,倉庫的 `.gitattributes` 裡**早就寫著同一個教訓**:
+
+```
+# VTR subsystem: manifest hashes raw bytes - checkout must be byte-exact (no CRLF conversion)
+VeritasIntelligenceAnalytics/functional*modules/VTR/** -text
+```
+
+VTR 與 v0160A 都因為「冊比對原始位元」鎖過位元。我做收容件位元錨的時候,沒去看這一行。
+
+### 修兩層
+
+1. **比對改行尾無關**(ENG086 v0108 · MDL159):
+   只差行尾 → 照樣算對,並印出「內容一位元沒變,是 core.autocrlf 幹的」;
+   LF 正規化後**仍**不符 → 才是真 RED。位元錨的本意是抓「內容被換掉」,不是抓平台換行。
+2. **位元鎖進 `.gitattributes`**:`VeritasIntelligenceAnalytics/**/references/intake/** -text`,
+   讓它以後不再發生。收容件的定義就是逐位元保存。
+
+### 三態實測
+
+| 情境 | v0107(你手上) | v0108 |
+|---|---|---|
+| LF 原檔 | 20/20 | 20/20 |
+| **轉成 CRLF**(重現你的機器) | **① ⑱ 兩紅** | **兩綠**,並印「只差行尾」 |
+| 真的改內容 | 紅 | **仍然紅**,並印「LF 正規化後也不符=內容真的不同」 |
+
+### 附帶:LL96 咬到自己
+
+MDL159 檢⑦ 又被自我指涉咬一次——**教訓 LL96 的內文裡就寫著 `class=tab data-t=` 這串字**,
+而教訓會被排進 TAB1 與內嵌 payload,於是分頁數被數成 5。
+改成數結構性的 `data-t=<名> role=tab`(版面才有、文字不會有的形狀)。
+
+新教訓 **LL99**:md5 比對原始位元時一定要先鎖行尾;跨平台的量尺,
+要先想清楚那個平台會對檔案做什麼,不要拿本境(Linux/LF)的位元當普世真理。
+LL94 / LL95 / LL98 已就地標【批546 更正】並指向 LL99。
+
+---
+
+## 批547 —— 你那個境是真的壞的,而我的預檢該攔沒攔
+
+你跑出來的環境證據把根因指出來了:
+
+```
+境根 = C:\Users\tonyk\envs\via_paddle_311
+  pyvenv.cfg = 在 · home = C:\Users\tonyk        ← 兇手
+```
+
+venv 的 `home` 應該指向 **base Python 所在的資料夾**(你機器上是 `C:\Python313`),
+你這個卻指向**家目錄**。Windows 的 venv 啟動器照 `pyvenv.cfg` 去 `C:\Users\tonyk\python.exe` 找,
+找不到 → **`FileNotFoundError: [Errno 2]`** → 印成 `OCR_RUN_FAIL`,看起來像「OCR 壞了」。
+
+### 我的預檢本來就該攔住,它沒攔——兩個洞
+
+```python
+if home and not Path(home).exists():
+    return f"基底解譯器缺(home={home})"
+```
+① `C:\Users\tonyk` **存在**(那是家目錄),所以一路放行。
+**我驗的是「home 這個路徑在不在」,不是「home 裡面有沒有 python」。**
+
+② `pp.parent.name.lower() in ("scripts",)` —— 註解本來就寫「Scripts/**bin**」,
+程式卻只認 `scripts`,POSIX 佈局的車道境整個沒被預檢過。
+
+### 補的過程我自己又踩一次
+
+第一版把 `bin` 跟 `Scripts` 一視同仁(都要求 `pyvenv.cfg`),結果 `/usr/bin/python3`
+這種**系統 python** 也被判成壞 venv,**當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢**。
+兩者不對稱是有道理的:Windows 的 `Scripts\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),
+沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。
+
+**規則定案:`Scripts` = cfg 必須在;`bin` = cfg 在才驗。**
+這次是自己的負控在家裡抓到,沒推出去。
+
+### v0130 實測
+
+| 檢 | 結果 |
+|---|---|
+| ㉜ 後端健康閘 | OK |
+| ㊷ 車道候選不吃本境標壞鍵 | OK(第一版被我咬壞,修回來了) |
+| ㊻ 車道境預檢 | OK(同上) |
+| **㊼ 新增** | OK —— 用你那個形狀(存在但沒有 python 的 home)當夾具釘住 |
+| **總計** | **四十七檢 47/47 · 零回歸** |
+
+站名也順手說實話:首頁文字擷取 **二十二檢 → 四十七檢**(檢數早就長到 47,名字停在 22)。
+
+### 講清楚這修的是什麼、不是什麼
+
+**修的是**:紅燈判得對——境壞會在**派工之前**被說出來,印成
+`SKIP(lane=via_paddle_311 境壞:基底解譯器目錄裡沒有 python(home=C:\Users\tonyk))`,
+而不是讓子行程炸了再猜。
+
+**沒修的是**:你那個境**本身確實是壞的**。要真的讓 paddle 車道能跑,得重建它——那是你的手:
+
+```powershell
+via-rebuild --env via_paddle_311
+via-vrnlogic reset-backends
+```
+
+新教訓 **LL100**(驗路徑在不在 ≠ 驗那裡有沒有東西)· **LL101**(補洞時把同類一視同仁,容易補出新洞)。
+
+---
+
+## 批548 —— 更正批547:那個境沒有壞。我第三次拿自己的產物當證據
+
+操作員逐條量回來:
+
+| 我批547 說的 | 實際量到的 |
+|---|---|
+| `home = C:\Users\tonyk`(家目錄) | **`home = C:\Python313`** — 完全正確的 venv |
+| 境壞、python 啟不動 | `OK 3.13.7` — **它自己跑得好好的** |
+| 缺 opencv 等件 | `cv2 True · paddle True · paddleocr True · pypdfium2 True` |
+
+**那個境沒有壞**,批547 的根因整條作廢。
+
+### 我引用的那行字,是我自己的腳本捏的
+
+```
+WriteError: 無法覆寫變數 HOME,因為它是唯讀或常數。
+```
+`$home = (Get-Content $cfg ...)` 賦值被 PowerShell 拒絕(`$HOME` 是唯讀自動變數),
+變數保留了它原本的值——使用者家目錄——而我把那個值當成 `pyvenv.cfg` 的內容讀。
+**腳本當場就印了 WriteError,我跳過它繼續讀數字。**
+
+### 這是連續第三次(LL102)
+
+| 批 | 我拿什麼當證據 | 實際是什麼 |
+|---|---|---|
+| 544 | 「629 B 跟 612 B 很接近」→ 斷定是 ACCEL-BRIDGE 注入 | CRLF(612 = 行數) |
+| 546 | (更正 544) | — |
+| 547 | 一個賦值失敗的 PowerShell 變數 | `$HOME` 自動變數 |
+
+共通形狀:**我先有了一個解釋,再把手邊任何數字往上套**,而不是先問「這個數字是誰產生的」。
+
+### v0130 的硬化保留,但它不是這盞紅燈的解
+
+兩處硬化(home 裡要有 python · bin 佈局納入預檢但 cfg 在才驗)本身是對的,47/47 零回歸。
+但**預檢沒有觸發**——因為沒有東西要攔。
+
+### 重新定位:這次從程式碼讀,不是猜
+
+`_ocr_via_runner` 產生 `OCR_RUN_FAIL(lane=…)` 只有三處:
+
+```python
+597  except FileNotFoundError as exc:   → 回 SKIP(…)
+599  except Exception as exc:           → OCR_RUN_FAIL     ← FileNotFoundError 到不了(597 在前面先配到)
+638  return f"OCR_RUN_FAIL(lane={envname}:{d['err'][:200]};…)"   ← 執行器自己回報的錯
+```
+
+只剩 **638**:lane 的 python **成功啟動**,`SUP_MDL747` 在 `via_paddle_311` 裡跑起來了,
+**是它自己**丟出 FileNotFoundError 並以 JSON 回報。這跟全部證據吻合——
+境好、python 好、套件都在,壞的是執行器**跑起來之後**找不到某個檔。
+
+**待證**:那個檔是什麼。領先假設是 paddleocr 首次使用要下載的模型檔(而網路閘預設 OFF)——
+**未證實,不入結論**。要拿到那一行才改。
+
+新教訓 **LL102**:診斷工具自己要先驗證(腳本報錯就代表那段輸出不可信)·
+近似不是證據 · 根因寫進台帳前要能講出「哪一行程式、在什麼條件下、產生了這個字串」。
+
+---
+
+## 批549 —— ㊷ 的斷言只有在那個套件**不存在**時才會過
+
+你直接叫執行器跑,回的 JSON 很乾淨:
+
+```json
+"paddleocr", "status": "SKIPPED_POLICY", "error": "",
+"probe": "AdapterProbe(available=True, module_available=True, binary_available=False, configured=True)"
+"err": ""
+```
+
+**執行器沒壞、模組在位、`err` 空的。** 是**收容件 GLE 自己的政策**跳過它
+(我們的 `SUP_MDL747` 對 paddleocr 的 binary 需求本來就是 `None`,只是照實回報)。
+
+### ㊷ 為什麼還是紅
+
+```python
+"paddleocr(" in _g42 and "paddle_pdf_pipeline(" in _g42     # ← 找的是「名稱(」
+```
+
+那個**左括號**只在模組**缺席**時才出現(容器的 tag:`paddleocr(缺 paddleocr,paddle)`)。
+你把 paddleocr 裝好之後,tag 變成 `paddleocr:SKIPPED_POLICY/0元素` —— 沒有左括號,判 FAIL。
+
+> **這一檢只有在那個套件不存在時才會過,裝好了反而亮紅。方向剛好相反。**
+
+而它自己宣稱要驗的「派車道名單」,**在你機器上明明成立**:
+`OCR_EMPTY[paddleocr+paddle_pdf_pipeline; …]` —— 名單正是那兩支,`ppstructure` 確實被濾掉了。
+
+根因:我拿**當時本境的輸出字串**當判準,而那個字串的形狀會隨「在不在位」改變;
+我把**呈現差別**誤當成**名單差別**。
+
+### v0131 的修法與負控
+
+改成驗名單本身(名稱用**詞界**比對,兩種呈現都認得),並加 **㊽ 負控**:
+
+```
+新判準  缺席=True  · 裝好=True  · ppstructure 漏進名單=False
+舊斷言  缺席=True  · 裝好=False  ← 這就是你機器上那盞紅燈
+```
+
+**四十八檢 48/48 零回歸**,而且不需要 Windows 就在容器裡證明了成因。
+
+### ㉜ 仍未解,留紅
+
+你直接叫執行器**沒有**重現那個 FileNotFoundError。我上一則說「只剩 638」也是錯的——
+`err` 是空的,638 不會觸發。**我不猜,留紅等證據。**
+
+新教訓 **LL103**:最陰險的一種判錯紅燈,是**只有在那個東西不存在時才會過的檢查**。
+斷言要對著「它宣稱要驗的那件事」,不是對著你當時看到的那一行字;
+而且要用兩種狀態(有/沒有)各跑一次當負控。
+
+---
+
+## 批550 —— ㉜ 查不下去,是因為我自己把診斷資訊截掉了
+
+你機器上 v0131 讓 ㊷ 滅了:**四十八檢 OK 47 / FAIL 1**,只剩 ㉜。
+
+### 我追了三批,猜了三個根因,全錯
+
+| 批 | 我猜的 | 實際 |
+|---|---|---|
+| 544 | ACCEL-BRIDGE 注入(629 B ≈ 612 B) | CRLF |
+| 547 | `pyvenv.cfg` home 指到家目錄 | 是我的 `$HOME` 變數 |
+| 548 | 「只剩 638 那條路」 | `err` 是空的,638 不會觸發 |
+
+**而真正的原因是:**
+
+```python
+f"OCR_RUN_FAIL(lane={envname}:{type(exc).__name__}:{str(exc)[:60]})"
+                                                              ^^^^
+```
+
+`[Errno 2] No such file or directory: 'C:\…'` —— **缺的那個檔名剛好落在第 60 字之後**。
+我每次拿到的都是同一句沒有資訊量的話,卻沒發現自己戴著眼罩,還一直在那句話上面推理。
+
+### v0132 三件
+
+1. **`VIA_OCR_TRACE=1`** → 完整訊息 + 完整 traceback(預設行為零變更,tag 不爆版)
+2. **`_page1_pdf` 包進 try** —— 它本來在 try 之外,炸了就分不出「切頁失敗(還沒派工)」和「派工失敗」;
+   現在各給各的字樣(`LANE_PAGE1_FAIL`)
+3. **㊾ 驗這個開關真的有用**:關 = 60 字看不到檔名 · 開 = 450 字含完整路徑與 traceback
+
+**四十九檢 49/49。㉜ 本身仍未解**,這一批只是把眼罩拿掉。
+
+新教訓 **LL104**:同一個症狀查第二次還查不出來,就**停下來檢查觀測本身**——
+訊息有沒有被截斷、例外有沒有被吞、log 有沒有被覆蓋。不要再猜一個根因。
+
+---
+
+## 批551 —— 眼罩有兩層,第二層也是我自己蒙的
+
+你開了 `VIA_OCR_TRACE=1` 再跑一次,㉜ 那行**還是切在同一個字**:
+
+```
+(simple:OCR_RUN_FAIL(lane=via_paddle_311:FileNotFoundError:[Errno 2] No such file or direct)
+```
+
+切它的不是例外格式化(那一層我批550 拆了),是 **㉜ 自己的註記**:
+
+```python
+chk("㉜ …", 條件, f"({_g32[:90]})")
+```
+
+數一下那句話**正好 90 字**。我拆了一層,底下還有一層,**兩層都是我設的**。
+
+### v0133
+
+自測註記一律走 `_note()`——預設仍切(一行一檢不能爆版),`VIA_OCR_TRACE=1` 時給全文;
+㉜ / ㉝ / ㊷ / ㊻ 四處一併改。加 **㊿** 用那句真話當夾具釘住:
+
+```
+關 = 90 字,看不到檔名
+開 = 157 字,看得到 inference.pdiparams
+```
+
+**五十檢 50/50。㉜ 本身仍未解**,但開關這次是真的一路開到底了。
+
+### 順帶記兩行(列為觀察,未證實)
+
+你那一跑的 log 裡有:
+
+```
+[VIA_PDFPlumberPlusEngine] PP-Structure 不可用,改用 PaddleOCR:ImportError
+[VIA_PDFPlumberPlusEngine] OCR 引擎載入失敗:RuntimeError: Engine 'paddle_static' is unavailable
+                            because dependency 'paddlepaddle' is not installed.
+```
+
+後面那句跟 `find_spec('paddle') = True` 看似矛盾(`paddle` 模組在,但 `paddlepaddle` 發行版可能沒裝齊)。
+**列為觀察,不入結論** —— 我這次不猜。
+
+新教訓 **LL105**:觀測開關要**一路開到底**,開一半跟沒開一樣。
+一條訊息從產生到印出來會經過好幾道關,每一道都可能切它;
+驗收要用「看得到那個關鍵字」當判準,不是用「字數變多了」。
+
+---
+
+## 批552 —— ㉜ 的根因:那個檔從來沒被建立過
+
+兩層眼罩都拆掉之後,你拿到完整訊息:
+
+```
+FileNotFoundError: [Errno 2] No such file or directory:
+'C:\…\Temp\tmpya5lal06\任意位置\操作員隨手放的夾\scan65.pdf'
+```
+
+查夾具——**`far/scan65.pdf` 從來沒被建立過**。夾具只存了 `scan65.png`,
+而 v0133 之前的註解裡**我自己還寫著**:
+
+```python
+_f45 = _d45 / "rep65.pdf"    # 數位 PDF 夾件(far 沒有 scan65.pdf,只有 scan65.png)
+                             #                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2641:  _t32, _g32 = ocr_page1(far / "scan65.pdf")    # ㉜ 照樣拿它當輸入
+```
+
+### 本境為什麼一直綠
+
+容器裡**一個 OCR 後端都沒有**,`ocr_page1` 在碰到檔案**之前**就 SKIP 了 ——
+**綠燈是「根本沒走到那一步」換來的**。你機器上 tesseract 在,程式走得更遠,
+才真的去開那個檔 → FileNotFoundError → 印成 `OCR_RUN_FAIL`,看起來像 OCR 壞了。
+
+㉟ 那句 `auto_dpi 失敗 FileNotFoundError→退帶頂 350` 也是同一個檔,只是它把例外吞了。
+
+### v0134 三件
+
+1. 照掃描件語意把 `scan65.pdf` **真的造出來**(一頁 · 只有影像 · 無文字層)
+2. 加 **51** 驗夾具完整性:宣稱要用的檔一個都不能少,且 `scan65.pdf` 真的是掃描件
+3. **㉓ 的斷言**從「寫死兩邊檔名集合」改成「**驗兩閘的差集剛好是影像件**」——
+   夾具一長件舊斷言就判錯,那是把「當時夾裡有什麼」誤當成「這一檢要驗的事」(LL103 同族)
+
+### 實測 51/51 全綠,而且是因為對的理由
+
+| 檢 | 之前 | 現在 |
+|---|---|---|
+| ㉜ | `OCR_RUN_FAIL(FileNotFoundError…)` | `simple:SKIP(後端皆標壞 tesseract…)` ← 它本來就該長這樣 |
+| ㉟ | `auto_dpi 失敗 FileNotFoundError→退帶頂 350` | `原生 300 DPI 落在帶內→取 310` |
+
+> 51 這一檢我第一版放在自測**結尾**,那時 `far` 暫存夾早就清掉了,它報四個檔全缺——
+> **它說的是實話**,是我放錯位置,已移進夾具作用域內。
+
+新教訓 **LL106**:「沒走到那一步」會冒充「通過」,而且會在**別人的機器上**才現形。
+一檢在「依賴缺席」時通過不算通過;夾具宣稱要用的檔要有一檢直接驗它在不在;
+**註解與程式打架時,通常不是註解過期,是一個還沒爆的 bug**。
+
+---
+
+## 批553 —— 全景式分析:LL106 那個形狀是孤例
+
+> 先講一件事:你這一跑用的是 **v0133**(矩陣行寫著 `VRN_ENG072_FirstPageText_v0133.py`),
+> 批552 的修補在 **v0134**。那盞 ㉜ 是**舊結果,不是新故障** —— `git pull` 就會滅。
+
+### 掃描:活樹尾版 330 支帶自測的 .py
+
+找的是 LL106 那個形狀:**自測拿夾具路徑引用某個檔,而全檔找不到它的建立處。**
+
+| 版 | 結果 | 判 |
+|---|---:|---|
+| 第一版 | **359 筆** | **我自己先否掉** —— `l.json`/`P.json`/`e.duckdb`/`t.duckdb` 是正則切在字串中間的殘渣;`vdf_tw_market.duckdb` 是按名找的真庫不是夾具。那不是發現,是噪音(LL86 同族:尺不對,量出來的全不可信) |
+| 收緊後 | **2 筆** | **兩筆手動驗過,都是誤判** |
+
+| 檔 | 掃描器說 | 實際 |
+|---|---|---|
+| `word65.docx` | 找不到建立處 | `_zp65.ZipFile(far / "word65.docx", "w", …)` —— `ZipFile(…,"w")` 不在我的寫入動詞表 |
+| `fx74_fin.docx` | 找不到建立處 | `_zp.ZipFile(_dx, "w", …)`,`_dx` 前一行才指到檔名 —— **寫入那行根本不含檔名字串** |
+
+### 結論
+
+**這個形狀是孤例,只有 ENG072 的 `scan65.pdf` 一筆,批552 已補。**
+
+而我**不把這個掃描器做成常設檢查** —— 它 2/2 全誤判,裝進自測格就是量產判錯的紅燈,
+那正是我這九批一直在被打的事。正確的粒度是**每支引擎驗自己宣稱的夾具**(批552 加的檢 51),
+精準是因為它對著那支引擎自己的清單,不是對著一個猜出來的通則。

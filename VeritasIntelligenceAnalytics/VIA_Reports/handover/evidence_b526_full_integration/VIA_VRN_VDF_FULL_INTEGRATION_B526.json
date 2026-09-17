@@ -1,0 +1,667 @@
+{
+  "schema": "VIA.VRN.VDF.FullIntegrationAcceptance.B526.v1",
+  "generated_at": "2026-09-16T08:30:49.269952+00:00",
+  "verdict": "PARTIAL_BLOCKED",
+  "checks": {
+    "vrn_active_compile_288_288": true,
+    "vrn_active_import_288_288": true,
+    "vrn_state_green": true,
+    "pdf_dual_engine_green": true,
+    "central_market_lists_green": true,
+    "stock_duckdb_integrity": true,
+    "stock_required_fields_zero": true,
+    "stock_duplicate_keys_zero": true,
+    "stock_price_required_zero": true,
+    "etf_duckdb_integrity": true,
+    "etf_fetch_failures_zero": true,
+    "eng073_structured_db_36_36": true,
+    "first_page_artifacts_present": true,
+    "original_windows_samples_available": false
+  },
+  "software_gate": {
+    "vrn": {
+      "state": "GREEN",
+      "scope": "functional modules/VRN active tree; references/intake excluded",
+      "active_python_files": 288,
+      "latest_family_files": 115,
+      "all_compile_ok": true,
+      "all_import_ok": true,
+      "compile_ok": 288,
+      "import_ok": 288,
+      "compile_failures": [],
+      "import_failures": [],
+      "latest_import_failures": []
+    },
+    "pdf": {
+      "pdf": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+      "exists": true,
+      "sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+      "expected": {
+        "pages": 2,
+        "layout_elements": 32,
+        "text_characters": 684,
+        "tables": 1,
+        "table_cells": 12
+      },
+      "manifest_files": {
+        "01_repair/pdf_repair_manifest.json": {
+          "exists": true,
+          "sha256": "96514c8729540270e2c13df9160e2a0449a54fb3a2c7f727e2c49e1258d24bf9",
+          "bytes": 3693
+        },
+        "02_layout/layout_document.json": {
+          "exists": true,
+          "sha256": "899e6279368add41e8441f06538943292e544d694da511a4c7e35ae8abb6b690",
+          "bytes": 50554
+        },
+        "02_layout/layout_elements.csv": {
+          "exists": true,
+          "sha256": "f3de779fb489aefde0a790a3ec4e48c4bdf390615fb00f139934ce1e101f48f8",
+          "bytes": 13646
+        },
+        "03_text/backend/multi_engine_run.json": {
+          "exists": true,
+          "sha256": "ae3c9dbd67bd7b02df7441a5cf1caa7ccc1aba7149be9bd2dca90730ca70e1a1",
+          "bytes": 13192
+        },
+        "03_text/raw_text.txt": {
+          "exists": true,
+          "sha256": "12b7b559fb57d48f8c2d6bf0141311a04a4caceb16918a086aa31a2a54f9a179",
+          "bytes": 689
+        },
+        "04_table/backend/multi_engine_run.json": {
+          "exists": true,
+          "sha256": "3f01396f4e69280080a66206a1eb0f22e8de86300e6014e9cac9af52834c356e",
+          "bytes": 18575
+        },
+        "04_table/table_cells.jsonl": {
+          "exists": true,
+          "sha256": "10ec093a70f5017d534f83e62dfc5dd0e2474067382ecf233390fa1974a4645f",
+          "bytes": 1953
+        },
+        "four_engine_manifest.json": {
+          "exists": true,
+          "sha256": "5fb13f53cc44ddc873fd2d7dc2b86aff92dac67a985b62977f583900ef1f83f7",
+          "bytes": 6370
+        },
+        "EXECUTION_SUMMARY.md": {
+          "exists": true,
+          "sha256": "476e56267ca364ed559b4f19021824ded3530bae95f0fe4bb23992a2b3494e72",
+          "bytes": 634
+        }
+      },
+      "fitz": {
+        "state": "PASS",
+        "pages": 2,
+        "text_characters": 677,
+        "page_characters": [
+          443,
+          234
+        ]
+      },
+      "pdfplumber": {
+        "state": "PASS",
+        "pages": 2,
+        "text_characters": 675,
+        "tables": 1,
+        "nonempty_cells": 12
+      },
+      "artifact_checks": {
+        "layout_elements_rows": 32,
+        "table_cells_rows": 12,
+        "raw_text_bytes": 689
+      },
+      "cross_engine": {
+        "pages_agree": true,
+        "text_nonempty_both": true,
+        "artifact_manifest_present": true
+      },
+      "state": "GREEN"
+    },
+    "import_repair_status": {
+      "schema": "VIA.VRN.B526.ImportRepairStatus.v1",
+      "as_of": "2026-09-16T07:05:00Z",
+      "scope": "functional modules/VRN active tree; references/intake excluded",
+      "verdict": "GREEN",
+      "active_python_files": 288,
+      "compile_ok": 288,
+      "import_ok": 288,
+      "compile_failures": 0,
+      "import_failures": 0,
+      "latest_family_files": 115,
+      "latest_import_failures": 0,
+      "pdf_regression": {
+        "verdict": "GREEN",
+        "pages_fitz": 2,
+        "pages_pdfplumber": 2,
+        "tables_pdfplumber": 1,
+        "nonempty_table_cells": 12,
+        "artifact_manifest_present": true
+      },
+      "repair": {
+        "files_modified": 10,
+        "categories": [
+          "entrypoint_import_safe_and_legacy_mdl_loader",
+          "pip_editable_legacy_private_api_fallback",
+          "resolvelib_reporter_bare_file_fallback",
+          "rich_table_absolute_fallback",
+          "webscraping_classifier_path_bootstrap"
+        ],
+        "rich_environment": "quantguard_venv rich>=13,<15"
+      },
+      "backup": {
+        "path": "/home/ubuntu/work/vrn_import_repair_b526_backup_20260916T1454/VRN_active_tree_before_fix.tar.gz",
+        "sha256": "0fe1693d1f7f26c10321338193926a0596581bbae9d1566d0878571005a56d25"
+      },
+      "after_sha256_manifest": {
+        "path": "/home/ubuntu/work/vrn_import_repair_b526_after_sha256.txt",
+        "sha256": "1d6db512f4b4de5532f7e42b353f41b90587a1b29234ed0c500b62a3bb788812",
+        "python_file_count": 510
+      },
+      "limitations": [
+        "HardGate capability is not claimed online; import probe used /tmp/fake_ssot and reported 0/7 capable.",
+        "Entrypoint runtime fixtures under /home/claude/work/test_pdfs are not mounted in this sandbox.",
+        "User Windows PDF/DOCX originals remain unavailable for content-level validation."
+      ],
+      "machine_evidence": "/home/ubuntu/work/vrn_pdf_validation_b524.json",
+      "handover": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_VRN_B526_IMPORT_REPAIR_HANDOVER.md"
+    }
+  },
+  "database_gate": {
+    "central_market_lists": {
+      "schema": "VIA.VDF.CentralMarketLists.v1",
+      "engine": "VDF_ENG087_MarketListGovernance_v0100",
+      "ts": "2026-09-16T08:28:30+00:00",
+      "start_required": "2023-01-01",
+      "verdict": "GREEN",
+      "policy": {
+        "dispatcher_only": true,
+        "network_default": "OFF_BY_DEFAULT",
+        "stock_update_engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
+        "active_etf_update_engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
+        "active_etf_history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+        "story_group_engine": "supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_hierarchical_group_index_engine.py",
+        "turnover_key": [
+          "date",
+          "ticker"
+        ],
+        "cross_group_overlap": "allowed",
+        "central_registry": "VCGC registry-sync"
+      },
+      "lists": {
+        "tw_stock_universe": {
+          "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
+          "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+          "state": "GREEN",
+          "table": "tw_listings_industry",
+          "columns": [
+            "code",
+            "name",
+            "market",
+            "external_ticker",
+            "industry_code",
+            "industry_name",
+            "us_industry",
+            "us_industry_source",
+            "classification_level",
+            "isin"
+          ],
+          "mapping": {
+            "code": "code",
+            "name": "name",
+            "exchange": "market",
+            "external_ticker": "external_ticker",
+            "taiwan_industry": "industry_name",
+            "us_industry": "us_industry"
+          },
+          "rows": 1979,
+          "missing_fields": [],
+          "why": "股票代號、名稱、交易所與雙產業分類均在位",
+          "prices": {
+            "state": "OK",
+            "column": "date",
+            "min": "2024-01-02",
+            "max": "2026-09-15",
+            "rows": 208848
+          }
+        },
+        "active_tw_etf": {
+          "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
+          "history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+          "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+          "state": "GREEN",
+          "mapping": {
+            "registry_ticker": "ticker",
+            "registry_name": "name",
+            "issuer": "issuer",
+            "daily_required": "daily_required",
+            "holding_ticker": "holding_ticker",
+            "portfolio_date": "portfolio_date"
+          },
+          "registry_rows": 30,
+          "holdings_rows": 1122,
+          "missing_fields": [],
+          "duplicate_registry": 0,
+          "daily_required_count": 22,
+          "why": "A 碼 registry 與持股資料表在位；逐日缺口交由 ENG078 coverage 驗證",
+          "holdings_dates": {
+            "state": "OK",
+            "column": "portfolio_date",
+            "min": "2026-09-15",
+            "max": "2026-09-15",
+            "rows": 1122
+          }
+        },
+        "hot_story_groups": {
+          "state": "GREEN",
+          "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VDF_StoryGroup_Registry_v0101.json",
+          "groups": 33,
+          "membership_rows": 197,
+          "distinct_tickers": 165,
+          "cross_group_overlap_tickers": 32,
+          "overlap_sample": {
+            "2317": [
+              "02",
+              "32"
+            ],
+            "2324": [
+              "02",
+              "35"
+            ],
+            "2356": [
+              "02",
+              "32"
+            ],
+            "2376": [
+              "02",
+              "35"
+            ],
+            "2382": [
+              "02",
+              "32"
+            ],
+            "3231": [
+              "02",
+              "32"
+            ],
+            "3706": [
+              "02",
+              "32"
+            ],
+            "4938": [
+              "02",
+              "35"
+            ],
+            "5274": [
+              "02",
+              "34"
+            ],
+            "6669": [
+              "02",
+              "32"
+            ],
+            "8210": [
+              "02",
+              "33"
+            ],
+            "3006": [
+              "07",
+              "15"
+            ],
+            "8299": [
+              "07",
+              "15"
+            ],
+            "2449": [
+              "08",
+              "14"
+            ],
+            "3583": [
+              "08",
+              "11"
+            ],
+            "3711": [
+              "08",
+              "14"
+            ],
+            "6187": [
+              "08",
+              "11"
+            ],
+            "6239": [
+              "08",
+              "14"
+            ],
+            "2313": [
+              "10",
+              "36"
+            ],
+            "2367": [
+              "10",
+              "36"
+            ]
+          },
+          "invalid_groups": [],
+          "why": "跨族群重複允許；跨族群成交值彙總必須以 (date,ticker) 去重"
+        }
+      },
+      "result_rule": "只有結果檔存在且 verdict=GREEN 才算此橋驗收通過；ABSENT/NODATA/RED 不得假綠"
+    },
+    "stock_db": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+      "exists": true,
+      "checks": [
+        {
+          "name": "listing_rows",
+          "sql": "select count(*) from tw_listings_industry",
+          "result": [
+            [
+              1979
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "listing_null_required",
+          "sql": "select count(*) from tw_listings_industry where code is null or name is null or market is null or external_ticker is null or industry_name is null or us_industry is null",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "listing_duplicate_code",
+          "sql": "select count(*) from (select code from tw_listings_industry group by code having count(*) > 1)",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "listing_bad_code",
+          "sql": "select count(*) from tw_listings_industry where not regexp_matches(code, '^[0-9]{4}$')",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "listing_market_counts",
+          "sql": "select market, count(*) from tw_listings_industry group by market order by market",
+          "result": [
+            [
+              "TPEX",
+              891
+            ],
+            [
+              "TWSE",
+              1088
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "listing_industry_counts",
+          "sql": "select count(distinct industry_code), count(distinct industry_name), count(distinct us_industry) from tw_listings_industry",
+          "result": [
+            [
+              35,
+              35,
+              3
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "price_rows",
+          "sql": "select count(*) from tw_daily_prices",
+          "result": [
+            [
+              208848
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "price_range",
+          "sql": "select min(date), max(date), count(distinct date), count(distinct ticker) from tw_daily_prices",
+          "result": [
+            [
+              "2024-01-02",
+              "2026-09-15",
+              655,
+              319
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "price_null_required",
+          "sql": "select count(*) from tw_daily_prices where ticker is null or date is null or close is null",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "price_duplicate_key",
+          "sql": "select count(*) from (select ticker, date from tw_daily_prices group by ticker, date having count(*) > 1)",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        }
+      ],
+      "tables": [
+        "tw_daily_prices",
+        "tw_listings",
+        "tw_listings_industry"
+      ]
+    },
+    "etf_db": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+      "exists": true,
+      "checks": [
+        {
+          "name": "registry_rows",
+          "sql": "select count(*) from active_tw_etf_registry",
+          "result": [
+            [
+              30
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "registry_duplicate_ticker",
+          "sql": "select count(*) from (select ticker from active_tw_etf_registry group by ticker having count(*) > 1)",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "daily_required_count",
+          "sql": "select count(*) from active_tw_etf_registry where daily_required=true",
+          "result": [
+            [
+              22
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "holdings_rows",
+          "sql": "select count(*) from holdings_daily",
+          "result": [
+            [
+              1122
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "holdings_range",
+          "sql": "select min(portfolio_date), max(portfolio_date), count(distinct portfolio_date), count(distinct etf_ticker), count(distinct holding_ticker) from holdings_daily",
+          "result": [
+            [
+              "2026-09-15",
+              "2026-09-15",
+              1,
+              22,
+              241
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "holdings_null_required",
+          "sql": "select count(*) from holdings_daily where portfolio_date is null or etf_ticker is null or holding_ticker is null",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "holdings_duplicate_key",
+          "sql": "select count(*) from (select portfolio_date, etf_ticker, holding_ticker from holdings_daily group by portfolio_date, etf_ticker, holding_ticker having count(*) > 1)",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "fetch_status_counts",
+          "sql": "select status, count(*) from fetch_status group by status order by status",
+          "result": [
+            [
+              "PASS",
+              22
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "name": "fetch_failures",
+          "sql": "select count(*) from fetch_status where status <> 'PASS'",
+          "result": [
+            [
+              0
+            ]
+          ],
+          "ok": true
+        }
+      ],
+      "tables": [
+        "active_etf_holdings_coverage",
+        "active_tw_etf_registry",
+        "active_tw_etf_universe",
+        "fetch_status",
+        "holdings_changes",
+        "holdings_daily"
+      ]
+    },
+    "eng073_structured_db": {
+      "evidence_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/evidence_b524/vrn073.txt",
+      "exists": true,
+      "checks_total": 36,
+      "checks_ok": 36,
+      "checks_fail": 0,
+      "rc0": true
+    }
+  },
+  "first_page_gate": {
+    "bench_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/first_page_logic/BENCH_latest.json",
+    "bench_exists": true,
+    "logic_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/extraction_logic/LOGIC_latest.json",
+    "logic_exists": true,
+    "bench_verdict": "OK",
+    "logic_verdict": null
+  },
+  "sample_gate": {
+    "schema": "VIA.WindowsSampleAcceptance.B526.v1",
+    "checked_at": "2026-09-16T07:14:19Z",
+    "manifest": "/home/ubuntu/work/user_sample_manifest_b526.txt",
+    "provided_files": 64,
+    "formats": {
+      "pdf": 60,
+      "docx": 4
+    },
+    "groups": {
+      "華南": 11,
+      "凱基": 9,
+      "兆豐": 6,
+      "其他": 38
+    },
+    "mounted_readable_files": 0,
+    "content_parsed_files": 0,
+    "vrn_content_acceptance": "BLOCKED_NO_ORIGINAL_FILES",
+    "group_status": {
+      "華南投顧": {
+        "listed": 11,
+        "readable": 0,
+        "parsed": 0,
+        "accepted": 0
+      },
+      "凱基投顧": {
+        "listed": 9,
+        "readable": 0,
+        "parsed": 0,
+        "accepted": 0
+      },
+      "兆豐": {
+        "listed": 6,
+        "readable": 0,
+        "parsed": 0,
+        "accepted": 0
+      },
+      "其他": {
+        "listed": 38,
+        "readable": 0,
+        "parsed": 0,
+        "accepted": 0
+      }
+    },
+    "available_fixture_status": {
+      "synthetic_financial_report_pdf": "GREEN",
+      "pages_fitz": 2,
+      "pages_pdfplumber": 2,
+      "tables_pdfplumber": 1,
+      "nonempty_table_cells": 12
+    },
+    "reason": "Only Windows paths were provided; C:\\測試樣本報告 is not mounted in the current sandbox.",
+    "next_gate": "Upload the original PDF/DOCX files or provide a sandbox-readable directory, then run VRN intake, first-page extraction, structured DB write, and dual-engine verification."
+  },
+  "rerun_commands": {
+    "real_acceptance": {
+      "cmd": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/run_real_acceptance_b526.py"
+      ],
+      "returncode": 0,
+      "output_file": "/home/ubuntu/work/full_integration_b526/real_acceptance_rerun.txt",
+      "tail": "warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.\n{\n  \"report\": \"/home/ubuntu/work/real_acceptance_b526/REAL_ACCEPTANCE_B526.json\",\n  \"verdict\": \"PARTIAL_BLOCKED\",\n  \"checks\": {\n    \"stock_db_real_integrity\": true,\n    \"stock_required_fields_zero\": true,\n    \"stock_duplicate_keys_zero\": true,\n    \"stock_price_required_zero\": true,\n    \"etf_db_real_integrity\": true,\n    \"etf_fetch_failures_zero\": true,\n    \"central_eng087_real_status_rc0\": true,\n    \"vrn_pdf_pdf_green\": true,\n    \"user_original_samples_available\": false\n  },\n  \"sample_names\": 64,\n  \"mounted_matches\": 0\n}\n"
+    }
+  },
+  "limitations": [
+    "The 64 original Windows PDF/DOCX files are not mounted in the sandbox; no content-level pass is claimed.",
+    "The two historical runtime entrypoints require /home/claude/work/test_pdfs, which is not mounted.",
+    "The retained ENG073 evidence is a verified prior zero-network 36/36 run and is reported separately from current original-file intake."
+  ]
+}

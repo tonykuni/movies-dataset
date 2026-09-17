@@ -482,15 +482,9 @@ def task_registry() -> dict:
         "panorama": {"zh": "全景修復與續跑(批511 併線 panorama-v0103;VCGC 尾版 panorama 動詞;預設唯讀計畫;--fetch/--apply 走 via-panorama;Z19 對表前勿 --apply)",
                      "argv": [sys.executable, _eng("supportive modules/registry", "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"), "panorama"],
                      "net": False},
-        "vtmra_tests": {"zh": "VTMRA 家族測試閘(批516;Veritas Taiwan Monthly Revenue Analysis:ENG063/075/069/076·TWREV·CrossGroupPhase·TA-Lib 家族境真跑自測成矩陣;零網路)",
+        "vtmra_tests": {"zh": "VTMRA 家族測試閘(批516;Veritas Taiwan Monthly Revenue Analysis:ENG063/075/069/076·TWREV·CrossGroupPhase 家族境真跑自測成矩陣;零網路)",
                         "argv": [sys.executable, _eng("supportive modules/registry", "CGC_MDL152_VtmraGate_v*.py"), "test"],
                         "net": False},
-        "talib_probe": {"zh": "TA-Lib 技術指標庫閘(批516;CGC_MDL151:import/版本/函式數/SMA·EMA·RSI·MACD·BBANDS 對手算;ABSENT=未裝不是壞;不代裝)",
-                        "argv": [sys.executable, _eng("supportive modules/registry", "CGC_MDL151_TaLibGate_v*.py"), "probe"],
-                        "net": False},
-        "talib_one": {"zh": "TA-Lib OneEngine 正主橋(批519;VDF_ENG083:收容件 _b519 self-test 家族境真跑;TA-Lib 缺=ABSENT 不代裝;印 pip 令=操作員之手)",
-                      "argv": [sys.executable, _eng("functional modules/VDF/engine", "VDF_ENG083_TALibOneBridge_v*.py"), "selftest-engine"],
-                      "net": False},
         "workflow_page": {"zh": "工作流重組台頁(批519;CGC_MDL153:目錄積木/工作流+SVG 鏈圖/實測面板/VDF 庫分類/U/I 對接;落 VIA_Reports/workflow;--publish 才入倉;零彈窗)",
                           "argv": [sys.executable, _eng("supportive modules/registry", "CGC_MDL153_WorkflowComposer_v*.py"), "page"],
                           "net": False},
@@ -1887,8 +1881,8 @@ def selftest() -> int:
             _VAP["m"] = FakeVap()
 
             tasks = task_registry()
-            chk("① 白名單任務冊固定 72 項(批516 +vtmra_tests/talib_probe;批515a +panorama;批515 +vdf_extra5;批514 +cg_family_status/cg_router;批513 +iface_sync;批508 +env_recover;批506 +vcgc_status/vcgc_page;批505 +fin_statements;批504 +fin_logic;批498 +vrn_logic/vrn_logic_syncdb/datahome_catalog/env_tools;firstpage 早在冊;批485 +bus_ryg/bus_census;批400 +closeout;批392 +handover;批390 +console_ui/align;批388 +ui_vdf/ui_vrn;批386 +vrn4;批384 +rungate;批383 +entry/vdfdb/vapone;批381 +envgov;批334 +4;批335 +complete_all)且治理/VAP 任務齊備",
-                len(tasks) == 77  # 批522 +firstpage_logic;批520 +vatetf_app;批519 +talib_one/workflow_page/ui_contract;批516 +vtmra_tests/talib_probe;批515a +panorama;批515 +vdf_extra5;批514 +cg_family_status/cg_router;批513 +iface_sync;批508 +env_recover;批506 +vcgc_status/vcgc_page;批505 +fin_statements;批504 +fin_logic;批498 +4(firstpage 早在冊);批400 +closeout;批392 +1;批390 +2;批388 +2;批386 +vrn4;批384 +rungate;批383 +3;批381 +envgov and "system_ui" in tasks and "group_class" in tasks and "complete_all" in tasks
+            chk("① 白名單任務冊固定 75 項(TA-Lib probe/OneEngine 已退役;其餘治理/VIA/VDF/VAP 任務齊備)",
+                len(tasks) == 75 and "system_ui" in tasks and "group_class" in tasks and "complete_all" in tasks
                 and all(k in tasks for k in (
                     "deps_scan", "rebuild_full", "govcon", "uispec",
                     "etf_fetch", "etf_analysis", "revenue_consensus",
@@ -2288,7 +2282,7 @@ def selftest() -> int:
         len(_co_argv) == 3 and _co_argv[0] == sys.executable and _co_argv[2] == "all"
         and _co_name is not None and re.fullmatch(r"CGC_MDL141_ClosingGate_v\d{4}\.py", _co_name) is not None
         and Path(_co_argv[1]).is_file() and _co.get("net") is False
-        and "批400" in _co.get("zh", "") and "MDL141" in _co.get("zh", "") and len(task_registry()) == 77,
+        and "批400" in _co.get("zh", "") and "MDL141" in _co.get("zh", "") and len(task_registry()) == 75,
         f"({_co_name};net={_co.get('net')};argv[2]={_co_argv[2] if len(_co_argv) > 2 else None})")
     chk("㉒ 批342 寫回斷線三類全吞(BrokenPipe/ConnectionReset/ConnectionAborted=WinError 10053)",
         len(re.findall(r"^\s*except \(BrokenPipeError, ConnectionResetError, ConnectionAbortedError\):", src, re.M)) == 4   # 批392 +/vap_img 供圖道

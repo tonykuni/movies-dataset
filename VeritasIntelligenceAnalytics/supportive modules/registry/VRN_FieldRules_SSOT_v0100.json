@@ -1,0 +1,282 @@
+{
+ "schema": "VIA.VRNFieldRules.SSOT.v1",
+ "batch": "批540",
+ "ts": "2026-09-17T06:41:53",
+ "owner": "SUP_MDL749_VRNFieldRuleHub",
+ "canonical_source": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0102.py",
+ "why": "研報六欄(券商/評等/目標價/財報/email/電話)的規則,今天散在四支現役引擎裡各有各的版本:ENG086 35 個評等詞、ENG073 29、TW02 24、首頁全能 13(英文評等全缺)。同一件事四套規則=四個會各自漂移的真相。這本冊把**已驗過的那一套**(ENG086 v0102,64 份真研報上打出來的)立為正本並鎖住,其餘引擎的落差逐條記在 drift 區——**先看得見,再決定誰改**。本冊與樞紐都是純增量:不改任何現役引擎的行為(只增不減 · 不影響現有功能 · 不製造九頭龍)。",
+ "rules": {
+  "rating": {
+   "zh": "評等",
+   "canon_map": {
+    "BUY": [
+     "buy",
+     "outperform",
+     "overweight",
+     "strong buy",
+     "加碼",
+     "強力買進",
+     "買進"
+    ],
+    "HOLD": [
+     "equal-weight",
+     "equalweight",
+     "hold",
+     "market perform",
+     "neutral",
+     "中立",
+     "區間",
+     "持有"
+    ],
+    "SELL": [
+     "reduce",
+     "sell",
+     "underperform",
+     "underweight",
+     "減碼",
+     "賣出"
+    ],
+    "ADD": [
+     "accumulate",
+     "add",
+     "逢低"
+    ]
+   },
+   "local_scale": {
+    "增加持股": "BUY",
+    "增持": "BUY",
+    "優於大盤": "BUY",
+    "強於大盤": "BUY",
+    "表現優於大盤": "BUY",
+    "減少持股": "SELL",
+    "減持": "SELL",
+    "劣於大盤": "SELL",
+    "弱於大盤": "SELL",
+    "表現劣於大盤": "SELL",
+    "持有評等": "HOLD",
+    "同步大盤": "HOLD",
+    "與大盤同步": "HOLD",
+    "區間操作": "HOLD"
+   },
+   "cue_rx": "(投資評等|評等|評級|建議|Rating|Recommendation|Rec\\.)[^\\n]{0,8}?[:：]?\\s*(強力買進|買進|加碼|逢低|中立|持有|區間|賣出|減碼|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)",
+   "title_rx": "[;,，、:：\\-–—(（]\\s*(強力買進|買進|加碼|逢低|中立|持有|區間|賣出|減碼|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)\\b",
+   "quoted_rx": "(維持|調整為|調升為|調降為|給予|給與)?\\s*[「『\\u201c\\\"]\\s*(強力買進|買進|加碼|逢低|中立|持有|區間|賣出|減碼)\\s*[」』”\\\"]\\s*(評等|評級)?",
+   "not_rated_rx": "未評等|NR[_\\s]*未評等|Not\\s*Rated|\\bNR\\b",
+   "four_state": {
+    "HIT": "命中",
+    "NA_NO_TOKEN": "文中無評等字樣",
+    "NOT_STOCK": "非個股(不需)",
+    "MISS": "有字樣抓不到(RED)"
+   },
+   "lesson": "LL68 本土券商自有尺度(增加持股=Outperform)要收;只看前段,內文『外資持有』不是評等。"
+  },
+  "target_price": {
+   "zh": "目標價",
+   "cue_rx": [
+    "目標價[^\\d]{0,14}?(\\d[\\d,]*\\.?\\d*)",
+    "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*[:：]?\\s*(?:\\(?NT\\$?\\)?|NTD|TWD)?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
+   ],
+   "cue_any_rx": "目標價|Target\\s*Price|Price\\s*Target|(?<![A-Za-z])TP(?![A-Za-z])|(?<![A-Za-z])PT(?![A-Za-z])",
+   "na_rx": "(?:目標價|Target\\s*Price|Price\\s*Target)\\s*[:：]?\\s*(?:n\\.\\s?a\\.?|(?<![A-Za-z])na(?![A-Za-z])|not\\s+applicable|不適用|未提供|未評等)",
+   "upside_rx": "(潛在)?上漲空間|上檔空間|upside",
+   "four_state": {
+    "HIT": "命中",
+    "NA_DECLARED": "報告自述 n.a.",
+    "ABSENT_IN_TEXT": "文字無此欄",
+    "NOT_STOCK": "非個股(不需)",
+    "MISS": "有線索抓不到(RED)"
+   },
+   "lesson": "LL64 目標價 ≠ 潛在上漲空間;無線索詞不得用弱 NT$ 正則(會把營收數字當目標價)。"
+  },
+  "broker": {
+   "zh": "券商",
+   "ssot_file": "functional modules/VRN/registry/VRN_BROKER_LIST_v01.json",
+   "extra_table": {
+    "MEGA": [
+     "兆豐",
+     "mega securities",
+     "mega sec"
+    ],
+    "CATHAY": [
+     "國泰證期",
+     "國泰證券",
+     "國泰投顧",
+     "cathay securities",
+     "cathay sec"
+    ],
+    "SINOPAC": [
+     "永豐",
+     "sinopac"
+    ],
+    "ESUN": [
+     "玉山",
+     "e.sun",
+     "esun"
+    ],
+    "MASTERLINK": [
+     "元富",
+     "masterlink"
+    ],
+    "HUANAN": [
+     "華南永昌",
+     "華南",
+     "hua nan"
+    ],
+    "JIHSUN": [
+     "日盛",
+     "jih sun",
+     "jihsun"
+    ],
+    "CONCORD": [
+     "康和",
+     "concord securities"
+    ],
+    "HONGYUAN": [
+     "宏遠",
+     "hong yuan"
+    ],
+    "TAISHIN": [
+     "台新",
+     "taishin"
+    ],
+    "FIRSTSEC": [
+     "第一金",
+     "first securities"
+    ],
+    "TCB": [
+     "合庫",
+     "合作金庫"
+    ],
+    "SKS": [
+     "新光",
+     "shin kong"
+    ],
+    "IBF": [
+     "國票",
+     "ibf securities"
+    ],
+    "ORIENTAL": [
+     "亞東",
+     "oriental securities"
+    ],
+    "DACHANG": [
+     "大昌",
+     "ta chang"
+    ],
+    "FUBANG": [
+     "福邦"
+    ],
+    "TACHING": [
+     "德信"
+    ],
+    "HSBC": [
+     "匯豐",
+     "hsbc"
+    ],
+    "BNP": [
+     "法巴",
+     "bnp paribas",
+     "bnp"
+    ],
+    "CREDITSUISSE": [
+     "瑞信",
+     "credit suisse"
+    ],
+    "BARCLAYS": [
+     "巴克萊",
+     "barclays"
+    ],
+    "JEFFERIES": [
+     "jefferies"
+    ],
+    "HAITONG": [
+     "海通",
+     "haitong"
+    ],
+    "CICC": [
+     "中金",
+     "cicc"
+    ],
+    "MIZUHO": [
+     "瑞穗",
+     "mizuho"
+    ],
+    "NIKKO": [
+     "日興",
+     "smbc nikko",
+     "nikko"
+    ],
+    "BERNSTEIN": [
+     "bernstein"
+    ],
+    "JPMORGAN": [
+     "jp",
+     "小摩"
+    ],
+    "MORGANSTANLEY": [
+     "大摩"
+    ],
+    "CLSA": [
+     "clst",
+     "clsa",
+     "里昂"
+    ],
+    "GF": [
+     "gf securities",
+     "廣發"
+    ],
+    "KGI": [
+     "凱基投顧",
+     "凱基證券"
+    ],
+    "CAPITAL": [
+     "群益投顧",
+     "群益證券"
+    ],
+    "PRESIDENT": [
+     "統一投顧",
+     "統一證券"
+    ],
+    "CTBC": [
+     "中信投顧",
+     "中信證券"
+    ]
+   },
+   "generic_latin": [
+    "add",
+    "capital",
+    "concord",
+    "first",
+    "mega",
+    "oriental",
+    "president"
+   ],
+   "evidence_tiers": [
+    "文內(去電郵/網址)",
+    "檔名",
+    "電郵網域(弱)"
+   ],
+   "contact_strip_rx": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+|(?:https?://|www\\.)\\S+",
+   "lesson": "LL66 電郵網域不是文內證據;LL67 標的公司名不是券商證據(不靠庫,用代碼相鄰兩條鐵證)。"
+  },
+  "date": {
+   "zh": "檔名日期",
+   "four_state": {
+    "HIT": "命中",
+    "ABSENT": "檔名無日期",
+    "MISS": "有數字解不出(RED)"
+   },
+   "roc7": "民國 7 碼 1140822 → 2025-08-22"
+  },
+  "contact": {
+   "zh": "email / 電話",
+   "source": "收容件 VIA_VRN_FirstPageEngine_v0101_b522 的 FieldValidation(唯讀正本)",
+   "note": "ENG086 以 email 網域對券商做 email_validation;電話樣式同出一源。"
+  },
+  "financial": {
+   "zh": "財報",
+   "hub": "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub",
+   "note": "財報欄位邏輯的正主不在 VRN 引擎裡,在 70_VRN_Rules 的財報樞紐。"
+  }
+ }
+}

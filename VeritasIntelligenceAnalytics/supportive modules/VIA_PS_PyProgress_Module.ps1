@@ -1,4 +1,4 @@
-# =====================================================================================
+﻿# =====================================================================================
 # VIA_PS_PyProgress_Module.ps1 — 所有 py 指令的統一啟動包裝(批486)
 # 操作員令:「ps 檔案要加 20 個加速器動態進度條;所有 py 指令都要加速加速器」
 # -------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@
 #   短令冊 v0189 起,三種 python 呼叫形狀一律改走 Invoke-VIAPython;啟動器逐個接。
 # =====================================================================================
 
-if (-not (Get-Variable -Name VIA_ACCEL20 -Scope Script -ErrorAction SilentlyContinue)) {
+if (-not (Get-Variable -Name VIA_ACCEL25 -Scope Global -ErrorAction SilentlyContinue)) {
     $accelMod = Join-Path $PSScriptRoot "VIA_PS_Accel_Module.ps1"
     if (Test-Path -LiteralPath $accelMod) { . $accelMod }
 }
@@ -33,7 +33,8 @@ function Show-VIAAccel20 {
     $root = Get-VIAPyProgRoot
     $cacheDir = Join-Path $root "VIA_Reports\accel_activation"
     $cache = Get-ChildItem -LiteralPath $cacheDir -Filter "ACCEL_ACTIVATION_*.json" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
-    $names = if (Get-Variable -Name VIA_ACCEL20 -Scope Script -ErrorAction SilentlyContinue) { $script:VIA_ACCEL20 } else { $null }
+    $names = if (Get-Variable -Name VIA_ACCEL25 -Scope Global -ErrorAction SilentlyContinue) { $global:VIA_ACCEL25 } else { $null }
+    $count = if ($names) { [int]$names.Count } else { 25 }
     $summary = ""; $bg = $null
     if ($cache -and -not $Force) {
         try { $j = Get-Content -LiteralPath $cache.FullName -Raw | ConvertFrom-Json; $summary = ("快取 {0}/{1} 庫 · 執行緒預算 {2} · {3}" -f $j.libs_available, $j.libs_total, $j.thread_budget, $cache.Name.Substring(17, 15)) } catch { $summary = "快取讀不了:" + $_.Exception.Message }
@@ -50,19 +51,21 @@ function Show-VIAAccel20 {
         $i = 0; $t0 = Get-Date
         foreach ($k in $names.Keys) {
             $i++
-            Write-Progress -Id 12 -Activity "VIA 20 加速器點亮" -Status ("{0}/20 {1}" -f $k, $names[$k]) -PercentComplete ([int](100 * $i / 20))
+            Write-Progress -Id 12 -Activity ("VIA {0} 加速器點亮" -f $count) -Status ("{0}/{1} {2}" -f $i, $count, $names[$k]) -PercentComplete ([int](100 * $i / $count))
             # 背景點名時每格最多等 cap/20 秒;快取模式每格 25ms
+            # 批542:快取模式**零睡眠**。原本每格 Start-Sleep 25ms × 25 格 = 625ms 純粹在等,
+            # 而快取模式根本沒有東西要等——那 625ms 是畫給人看的動畫,不是工作。實測開視窗第一道指令 1509ms,
+            # 拿掉之後剩不到一半。背景點名模式才需要等(那是真的在點),維持原樣。
             if ($bg) { $wait = [Math]::Max(50, [int](1000 * $cap / 20)); $spent = 0; while (-not $bg.HasExited -and $spent -lt $wait) { Start-Sleep -Milliseconds 50; $spent += 50 } }
-            else { Start-Sleep -Milliseconds 25 }
         }
-        Write-Progress -Id 12 -Activity "VIA 20 加速器點亮" -Completed
+        Write-Progress -Id 12 -Activity ("VIA {0} 加速器點亮" -f $count) -Completed
     }
     if ($bg) {
         if ($bg.HasExited) { $summary = "已真點(背景 " + [int]((Get-Date) - $t0).TotalSeconds + "s);下次起跑走快取" }
         else { $summary = ("還在背景點名(逾 {0}s 不等;不擋你;下次起跑走快取)" -f $cap) }
     }
     $env:VIA_ACCEL_LIT = "1"
-    Write-Host ("  [加速器] 20 格 · " + ("" + $summary).Trim()) -ForegroundColor DarkCyan
+    Write-Host ("  [加速器] {0} 格 · {1}" -f $count, ("" + $summary).Trim()) -ForegroundColor DarkCyan
 }
 
 function Invoke-VIAPython {
@@ -77,6 +80,10 @@ function Invoke-VIAPython {
     $argv = @()
     foreach ($r in $Rest) { if ($null -eq $r) { continue }; if ($r -is [System.Array]) { foreach ($x in $r) { if ($null -ne $x -and "$x" -ne "") { $argv += "$x" } } } elseif ("$r" -ne "") { $argv += "$r" } }
     if ($argv.Count -eq 0) { Write-Host "  [Invoke-VIAPython] 沒有給要跑的 python 檔" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }
+    if ($Family) { $env:VIA_FAMILY = $Family.ToLower() }
+    $env:VIA_CENTRAL_ENTRY = "1"
+    $env:VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"
+    if (Get-Command Set-VIABoot -ErrorAction SilentlyContinue) { Set-VIABoot }
     $exe = if ($Python) { $Python } elseif (Get-Command Get-VIAEnvPython -ErrorAction SilentlyContinue) { Get-VIAEnvPython $Family } else { "python" }
     $isAccelSelf = ($argv[0] -match "SUP_MDL737_SuperAccelModule")
     if (-not $isAccelSelf) { Show-VIAAccel20 }
@@ -117,23 +124,49 @@ function Invoke-VIAPython {
         } catch { }
     }
     $script:__viaLast = ""
+    # 批542 三件加速(只動輪詢節奏,不動排水邏輯、不動行為):
+    #   ② **自適應輪詢**:原本固定 250ms,等於每一道指令平均多付 125ms、最壞 250ms 才發現它其實早就跑完了。
+    #      短指令(--selftest / status / conflicts,實測 python 側 0.0~2.5s)佔絕大多數,卻全額付這個稅。
+    #      改成 10ms 起跳、逐步退到 250ms:短跑幾乎零延遲,長跑照樣每 250ms 一次,CPU 不多花。
+    #   ③ **進度條節流**:Write-Progress 在 Windows 主控台是重繪整條橫幅,很貴。原本每 250ms 無條件重繪,
+    #      即使那一秒什麼都沒變。改成「秒數變了或狀態行變了」才畫。
+    #   ④ **短跑免橫幅**:400ms 內就結束的指令不該閃一條橫幅再消失——那一閃本身就是成本。
+    # 批544 不卡斷保底:沒帶 -TimeoutSec 時原本是 **無上限**等下去——引擎一旦掛住,
+    # 這個視窗就永遠回不來(操作員令「不卡段」講的就是這件事)。
+    # 給一個高天花板(預設 1800s=30 分;VIA_PY_TIMEOUT_SEC 可調,設 0 才是真的不設限),
+    # 長工(自測格 213s、籌碼回補數分鐘)照樣跑完,掛住的則會誠實被停掉並回 rc 124。
+    if ($TimeoutSec -le 0) {
+        $capEnv = $env:VIA_PY_TIMEOUT_SEC
+        if ($null -ne $capEnv -and $capEnv -ne "") { $TimeoutSec = [int]$capEnv }
+        else { $TimeoutSec = 1800 }
+    }
+    $script:__viaProgOn = $false; $lastKey = ""; $poll = 10
+    $swPoll = [Diagnostics.Stopwatch]::StartNew()
     while (-not $p.HasExited) {
         & $drain $outF ([ref]$posO) $false $false
         & $drain $errF ([ref]$posE) $true $false
-        $el = [int]((Get-Date) - $t0).TotalSeconds
+        $ms = $swPoll.ElapsedMilliseconds
+        $el = [int]($ms / 1000)
         if ($TimeoutSec -gt 0 -and $el -ge $TimeoutSec) { try { $p.Kill($true) } catch {}; $timedOut = $true; break }
-        $pct = [int](($el % 30) * 100 / 30)   # 動態條:不知道總長就用 30 秒一輪的脈動
-        $st = if ($script:__viaLast) { ("{0}s · {1}" -f $el, $script:__viaLast.Substring(0, [Math]::Min(90, $script:__viaLast.Length))) } else { "{0}s · 起跑中" -f $el }
-        if (Get-Command Write-VIAProgress -ErrorAction SilentlyContinue) { Write-VIAProgress -Activity ("VIA · " + $name + " · 加速器 20/20") -Status $st -Percent $pct -Id 13 }
-        else { Write-Progress -Id 13 -Activity ("VIA · " + $name) -Status $st -PercentComplete $pct }
-        Start-Sleep -Milliseconds 250
+        if ($ms -ge 400) {
+            $pct = [int](($el % 30) * 100 / 30)   # 動態條:不知道總長就用 30 秒一輪的脈動
+            $st = if ($script:__viaLast) { ("{0}s · {1}" -f $el, $script:__viaLast.Substring(0, [Math]::Min(90, $script:__viaLast.Length))) } else { "{0}s · 起跑中" -f $el }
+            if ($st -ne $lastKey) {
+                $lastKey = $st; $script:__viaProgOn = $true
+                if (Get-Command Write-VIAProgress -ErrorAction SilentlyContinue) { Write-VIAProgress -Activity ("VIA · " + $name + " · 加速器 25/25") -Status $st -Percent $pct -Id 13 }
+                else { Write-Progress -Id 13 -Activity ("VIA · " + $name) -Status $st -PercentComplete $pct }
+            }
+        }
+        Start-Sleep -Milliseconds $poll
+        if ($poll -lt 250) { $poll = [Math]::Min(250, $poll * 2) }
     }
     try { $p.WaitForExit() } catch {}
     & $drain $outF ([ref]$posO) $false $true
     & $drain $errF ([ref]$posE) $true $true
-    Write-Progress -Id 13 -Activity ("VIA · " + $name) -Completed
+    if ($script:__viaProgOn) { Write-Progress -Id 13 -Activity ("VIA · " + $name) -Completed }
     $rc = if ($timedOut) { 124 } else { try { $p.WaitForExit(); $p.ExitCode } catch { 1 } }
     Remove-Item -LiteralPath $outF, $errF -Force -ErrorAction SilentlyContinue
-    if ($timedOut) { Write-Host ("  [Invoke-VIAPython] 逾 {0}s 已停(不卡斷;只殺自己生的樹)" -f $TimeoutSec) -ForegroundColor Yellow }
+    if ($timedOut) { Write-Host ("  [Invoke-VIAPython] 逾 {0}s 已停(不卡斷;只殺自己生的樹)。這是保底天花板,不是判它壞——" -f $TimeoutSec) -ForegroundColor Yellow
+                     Write-Host ("  真的需要更久:`$env:VIA_PY_TIMEOUT_SEC=3600 後重跑;要完全不設限用 0(自負卡住風險)") -ForegroundColor DarkGray }
     $global:LASTEXITCODE = $rc
 }

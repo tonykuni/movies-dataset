@@ -64,4 +64,11 @@
 | Z47 | OCR 車道 via_paddle_311 境壞:python 不在(FileNotFoundError)/pyvenv.cfg 缺(rc=106)→ ENG072 v0129 預檢 SKIP 誠實(L47);重建=你的手 `via-rebuild --env via_paddle_311` → `via-vrnlogic reset-backends` | 候 | 操作員 | via-ryg vrn ㉜/㊷ |
 | Z48 | vrn 境無 opencc → OCR 道簡→繁直通(㉙);裝=你的手 `<vrn python> -m pip install opencc-python-reimplemented`;裝前 tag 標 [未繁化:樞紐無 opencc] | 候 | 操作員 | via-ryg vrn ㉙ |
 | Z49 | 第一頁邏輯收容件的 Layout 字級階層/公司名 與 TableGeometry 隱藏格線表格重建要 chars 幾何;ENG072 sidecar 無 chars → 未接線(候);財務容差帶候接 ENG074/ENG080 | 候 | AI | 下一批看 ENG072 能否留 chars 幾何 sidecar |
+| Z50 | QuantGuard 唯一活動技術指標路徑(L50)靠 polars:工作站 via_vdf_312 要裝 `pip install "polars>=1.21,<2"`(容器已證 1.44.2 → 8/8);沒裝=ABSENT 誠實不報紅(ENG086 v0101) | 候 | 操作員 | via-quantguard probe 貼回 |
+| Z51 | Windows `C:\測試樣本報告` 60 份 PDF + 4 份 DOCX 未掛載到任何 AI 境;B526–B533 的 NLP/VRN 實測都只跑倉內夾具,不等於真檔已解析 | 候 | 操作員 | `NLP統一 -Pipeline -In 'C:\測試樣本報告'` 貼回 |
+| Z52 | VDF 價格資料最早 2024-01-02,未達要求的 2023-01-01;補庫按你的指示停止中 → CGC154 功能驗收與 VDF 覆蓋閘會誠實非綠,不是引擎壞 | 候(你喊停) | 操作員 | 要恢復補庫再說 |
+| Z53 | TA-Lib 橋 ENG083 v0100–v0103 於 commit fd51913f 被直接刪除(未進退役夾、無退役冊);L50 禁復活故不還原程式,已在退役冊補記可自 git 歷史取回 | 已記 | AI | docs/VIA_Retired_TALib_B534.json |
+| Z54 | 全景掃描報位置待令三類(活樹):PINVER 150(釘死版號當路徑用)· HARDIMP 106(模組頂硬相依重庫,缺件會 Traceback=假紅)· SYSEXE 2(裸 sys.executable 派別支引擎)。會改行為,本器不自動改;逐檔逐行在 PANORAMA 報告 TAB② | 候令 | 操作員 | 說要修哪一類我就分批修 |
+| Z55 | VERB 9 件的 main/parse_args 形狀不合樣板(CLI 套件與舊引擎),誠實 skip 不猜改;要統一動詞契約需逐檔手改 | 候令 | AI | 下批可逐檔處理 |
+| Z56 | 外資報告目標價在側欄,修復文字沒有那一塊(批537 量出):GS 五份 · MQ 一份 · Daiwa-PCB · AMAX-KY · 華南四份 Memo · 瑞基 NR,共 16 份個股報告通篇無「目標價/Target Price/TP/PT」線索詞 → 不是抓漏,是我們手上的文字沒有這一欄(誠實四態記 `ABSENT_IN_TEXT`);要補得回原 PDF 側欄/表格幾何,與 Z49 同一條路 | 候 | 操作員 | 原 PDF 在 `C:\測試樣本報告`,本境沒有 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
