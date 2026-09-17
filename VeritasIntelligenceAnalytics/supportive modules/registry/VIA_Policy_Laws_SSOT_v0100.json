@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批547",
+ "batch": "批548",
  "ts": "2026-09-17",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -891,12 +891,17 @@
   {
    "id": "LL100",
    "batch": "批547",
-   "zh": "驗「路徑在不在」不等於驗「那裡有沒有東西」。操作員的 via_paddle_311 其 pyvenv.cfg 寫 home=C:\\Users\\tonyk——那是他的家目錄,不是 base Python 的夾。我的車道境預檢只做 `Path(home).exists()`,家目錄當然存在,於是一路放行;Windows 的 venv 啟動器照 cfg 去那裡找 python.exe,找不到,子行程炸成 FileNotFoundError,最後印成 OCR_RUN_FAIL——看起來像「OCR 壞了」,其實是「境壞了而且我沒攔住」。預檢的責任是在**派工之前**把壞境講出來,而且要講得出是哪一種壞。凡是「檢查某個路徑」的地方,都要再問一句:我要的是這個路徑本身,還是路徑裡的那個東西?"
+   "zh": "【批548 更正:本條的**個案**是我編的,通則仍成立】驗「路徑在不在」不等於驗「那裡有沒有東西」。操作員的 via_paddle_311 其 pyvenv.cfg 寫 home=C:\\Users\\tonyk——那是他的家目錄,不是 base Python 的夾。我的車道境預檢只做 `Path(home).exists()`,家目錄當然存在,於是一路放行;Windows 的 venv 啟動器照 cfg 去那裡找 python.exe,找不到,子行程炸成 FileNotFoundError,最後印成 OCR_RUN_FAIL——看起來像「OCR 壞了」,其實是「境壞了而且我沒攔住」。預檢的責任是在**派工之前**把壞境講出來,而且要講得出是哪一種壞。凡是「檢查某個路徑」的地方,都要再問一句:我要的是這個路徑本身,還是路徑裡的那個東西? ——【更正】操作員實測:那個境的 pyvenv.cfg 寫的是 home = C:\\Python313(完全正確),python 跑得起來(OK 3.13.7),cv2/paddle/paddleocr/pypdfium2 四件全在。我批547 引用的「home=C:\\Users\\tonyk」是我自己 PowerShell 腳本的產物——`$home = ...` 賦值被拒(PowerShell 的 $HOME 是唯讀自動變數),變數保留了家目錄那個值,我把它當成 cfg 的內容讀。**第三次拿自己的產物當證據。** 見 LL102。"
   },
   {
    "id": "LL101",
    "batch": "批547",
    "zh": "補洞的時候把同類一視同仁,很容易補出新洞。我第一版把 `bin` 跟 `Scripts` 一樣嚴(都要求 pyvenv.cfg),結果 `/usr/bin/python3` 這種**系統 python** 也被判成壞 venv,當場咬壞 ㊷ 與 ㊻ 兩個本來會過的檢。兩者不對稱是有道理的:Windows 的 `Scripts\\python.exe` 幾乎必然是 venv(系統 Python 不長那樣),沒 cfg 就是壞;`bin/python` 卻可能是系統 python,對它要 cfg 是無中生有。規則要寫成 Scripts=cfg 必須在、bin=cfg **在才驗**。這次是自己的負控當場抓到,沒有推出去——檢查夠密的時候,錯誤會在自己家裡被攔下。"
+  },
+  {
+   "id": "LL102",
+   "batch": "批548",
+   "zh": "我連續三次拿自己的產物當證據:批544 拿『629B 跟 612B 很接近』當 ACCEL-BRIDGE 注入的證明;批546 才發現那是 CRLF;批547 又拿一個賦值失敗的 PowerShell 變數($HOME 唯讀,保留家目錄值)當 pyvenv.cfg 的內容,寫出一整批的錯誤根因。共通形狀是:**我先有了一個解釋,然後把手邊任何數字往上套**,而不是先問「這個數字是誰產生的、它可信嗎」。守則三條:① 診斷工具自己要先驗證——腳本報了 WriteError 就代表那一段的輸出不可信,不可以跳過錯誤繼續讀數字;② 近似不是證據(629≈612 不是等於);③ 任何根因在寫進台帳前,要能講出「哪一行程式、在什麼條件下、產生了這個字串」——講不出來就只是假設,要標成假設。"
   }
  ]
 }
