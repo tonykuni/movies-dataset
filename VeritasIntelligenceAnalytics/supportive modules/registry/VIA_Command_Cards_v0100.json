@@ -1,15 +1,15 @@
 {
  "schema": "VIA.CommandCards.v1",
- "register": "Register-VIA-Commands-v0216.ps1",
- "generated": "2026-09-17T18:48:12",
+ "register": "Register-VIA-Commands-v0218.ps1",
+ "generated": "2026-09-17T19:25:39",
  "policy": "L65:AI 讀卡,不讀原始碼",
  "token_ledger": {
-  "register_tokens": 39232,
-  "card_tokens": 15393,
-  "saved_tokens": 23839,
-  "saved_percent": 60.76
+  "register_tokens": 40581,
+  "card_tokens": 15840,
+  "saved_tokens": 24741,
+  "saved_percent": 60.97
  },
- "n": 140,
+ "n": 143,
  "cards": [
   {
    "cmd": "via-gates",
@@ -1048,11 +1048,11 @@
    "alias": [
     "能力庫"
    ],
-   "engine": "CGC_MDL158_PEISCapabilityEngine_v*.py",
+   "engine": "CGC_MDL161_PEISCapabilityEngine_v*.py",
    "family": "",
    "one_line": "批568:via-peis=PEIS 能力引擎掛線口(CGC_MDL158)。無參數=status(收容正本在不在+它自己的 69 檢); scan [--family vdf,vrn,vap,cgc,sup] = INTAKE→SCAN→CLUSTER→TEST→LOCK→ANNOTATE→STORE(AUDIT;零重複=誠實 NODATA 不報紅); cards [能力] = 能力卡 capsule(AI 只讀卡,不讀全文原始碼=省",
    "hooks": [],
-   "sha256": "b3ba46d513a6354cfd3011e1ff1a9354a0495d903afc66b34a5ea40fee116d50",
+   "sha256": "498dd43df7875c5c2cf14a7b322fbc72fe6c091349243d24bfb91f970733d2fb",
    "body_tokens": 45
   },
   {
@@ -1078,6 +1078,42 @@
    "hooks": [],
    "sha256": "0d21008b7bcf69cc58bc8c8ca56395f37d9d25f3e0573402c15f8aa802ad3c7c",
    "body_tokens": 53
+  },
+  {
+   "cmd": "via-cmdcard",
+   "alias": [
+    "指令卡"
+   ],
+   "engine": "CGC_MDL162_CommandCardFreeze_v*.py",
+   "family": "",
+   "one_line": "批570:via-cmdcard=指令卡與凍結冊(CGC_MDL162)。L65「AI 讀卡,不讀原始碼」;L66「凍結但留鉤子」。 cards=一行一指令(名稱·別名·背後引擎·鉤子·一句話)+ token 帳;freeze [--apply --evidence <存證>];verify=凍結後被動過沒有(DRIFT 指名)。 **沒有 unfreeze**:解凍是操作員的裁定。",
+   "hooks": [],
+   "sha256": "14461af498c35f93a616f3681296602e03be90f3793dccd4d6aad7abf9855874",
+   "body_tokens": 44
+  },
+  {
+   "cmd": "via-vdfcov",
+   "alias": [
+    "涵蓋閘"
+   ],
+   "engine": "VDF_ENG090_DataCoverageGate_v*.py",
+   "family": "vdf",
+   "one_line": "批570:via-vdfcov=VDF 資料涵蓋閘(VDF_ENG090)。universe=兩張名單欄位齊不齊(缺欄逐欄給補法;要觸網的標 GATED); revenue=月營收涵蓋(停在哪個月);macro=總經×akshare 候選對照(預設全 UNVERIFIED,--probe 才驗且**不代裝**)。零網路零寫無 --apply。",
+   "hooks": [],
+   "sha256": "f9732b8a3be265f177829af39d454c41d9e0788046e7cd4f91803008df3e16d2",
+   "body_tokens": 56
+  },
+  {
+   "cmd": "via-uiunify",
+   "alias": [
+    "畫面統一"
+   ],
+   "engine": "CGC_MDL160_UIUnifyGate_v*.py",
+   "family": "",
+   "one_line": "批570:via-uiunify=U/I 畫面統一閘(CGC_MDL160)。contract=三級契約;scan=逐頁判定;plan=只列不合的並指名該由哪支引擎再生。 LAW 違反=RED(零 CDN/零彈窗/charset/viewport/lang)· UNIFY 缺=YELLOW(主題令牌/頁腳/標題)· ADVISORY 永不判紅。**不代改頁**。",
+   "hooks": [],
+   "sha256": "256d89c337f2c42eb658e58f3246998a3355b2f7aee1ef091a26e2d4fa7d6822",
+   "body_tokens": 42
   },
   {
    "cmd": "via-vdfdb",
