@@ -8208,8 +8208,26 @@
    "code": "批570 自查:CGC_MDL160 的 owner 對照印出 CGC_MDL159_VIAUnifiedConsole,才發現號早被佔了",
    "kind": "**取號之前沒掃樹,兩批犯兩次。**批568 的 MDL158 撞 `VIAPanoramaAuditRepair`,批570 的 MDL159 撞 `VIAUnifiedConsole`。號是元件冊的唯一鍵,一號兩家族=唯一性被自己破掉,而**當批 VCGC ⑬ 照樣綠**(冊按家族名收,從來沒人驗過號)。修:改號 + 舊件退役到 `VIA_RetiredEngines/batch570_number_collision/`(只增不減)+ **守衛加在 CGC_MDL157**(唯一性本來就是它的事),基線 ratchet 收既有的 `CGC_MDL142`(非本線造成,裁定權在操作員),超出基線報紅指名。**寫守衛時又錯一次**:第一版用裸號當鍵,把 `VDF_ENG072`/`VRN_ENG072` 這種**刻意的並存命名空間**也算成撞號,一掃 57 個假紅;改成「前綴+號」才對。另修 MDL162 一個自我過期的尺(⑨ 釘 MDL158 編號,改號就自己紅;改成釘家族名)。教訓 LL120/LL121",
    "batch": 570
+  },
+  {
+   "ts": "2026-09-17 19:10",
+   "op": "ADD",
+   "category": "對接契約",
+   "component": "Register-VIA-Commands-v0218.ps1(CommandNotFoundAction:via-* 找不到時當場分辨兩種根因)",
+   "code": "批571 工作站實錄:via-cmdcard / via-vdfcov 無法辨識,而同視窗 via-datahome 跑得動",
+   "kind": "**症狀一樣、根因相反,而分辨它每次都要一趟往返。**批564 兩次是真的沒登錄;這次是**視窗點的是舊冊**(v0216 沒有這三令)。修法不是我下次記得問,是讓冊自己講:註冊 `CommandNotFoundAction`,凡 `via-*` 找不到就當場判①**冊上有但本視窗沒點到**——印出本視窗點的版本 vs 磁碟最新版本 + 重點指令;②**冊上也沒有**——那才是真漏登錄,請貼回來。兩條路都在 pwsh 真跑驗過。順帶記一筆:PowerShell **不搜尋目前目錄**,所以 `.cmd` 梭在 PS 裡要打 `.\\via-xxx`;梭是為 cmd 殼設計的,PS 殼靠點源。教訓 LL122",
+   "batch": 571
+  },
+  {
+   "ts": "2026-09-17 19:15",
+   "op": "ADD",
+   "category": "資料",
+   "component": "VDF_ENG090_DataCoverageGate_v0101.py(+lakes:壞檔逐個點名不截斷 · 湖落後庫逐夾算;15 檢→18 檢)",
+   "code": "批571 操作員貼回 via-datahome catalog:fiveday 11 個 PART 壞檔 · px/chip 停 2026-08-25 而庫到 2026-09-16",
+   "kind": "**目錄印了,但沒有引擎追它,等於沒印。**MDL123 老早就把 `bad`(壞檔清單)與 `hi`(最新日)寫進目錄頁,但**沒有下游**——每次都要靠人眼在幾十行輸出裡看見。實錄兩件:① `fiveday` 湖 **11 個 PART 壞檔**(`Invalid Input Error: Failed to read Parquet file`)② px/chip 兩湖停 **2026-08-25**、正典庫到 **2026-09-16**=**落後 22 天**。`lakes` 動詞把它變成有人追的帳:壞檔逐個點名且**理由原樣不截斷**(L62——壞檔的理由是唯一線索)、落後天數逐夾算(>7 天=STALE)、**不刪任何壞檔**(刪不刪、怎麼重建是操作員的手)。自測用合成目錄把三件釘住(理由不截斷 · 22 天算得對 · 不刪)。教訓 LL123",
+   "batch": 571
   }
  ],
- "updated_at": "2026-09-17 19:40",
- "batch": 570
+ "updated_at": "2026-09-17 19:15",
+ "batch": 571
 }
