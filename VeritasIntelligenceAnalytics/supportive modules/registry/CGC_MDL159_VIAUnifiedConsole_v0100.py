@@ -134,10 +134,15 @@ def collect(do_prog: bool = True) -> dict:
             if not q.is_file():
                 intake.append({"folder": man.parent.name, "name": f.get("name"), "state": "MISSING"})
                 continue
-            got = _h.md5(q.read_bytes()).hexdigest()
-            intake.append({"folder": man.parent.name, "name": f.get("name"),
-                           "state": "OK" if got == f.get("md5") else "TOUCHED",
-                           "want": f.get("md5"), "got": got,
+            raw = q.read_bytes()
+            got = _h.md5(raw).hexdigest()
+            lf = _h.md5(raw.replace(b"\r\n", b"\n")).hexdigest()
+            # 批546 更正:Windows 上 git 依 core.autocrlf 把 LF 轉 CRLF,同一個檔就多出「行數」個位元組,
+            # raw md5 自然對不上。那不是汙染,是平台換行——把它判成 TOUCHED 就是我造的判錯紅燈。
+            # 只差行尾 → EOL_CRLF(算過);LF 正規化後還是不符 → 才是真的 TOUCHED。
+            st = "OK" if got == f.get("md5") else ("EOL_CRLF" if lf == f.get("md5") else "TOUCHED")
+            intake.append({"folder": man.parent.name, "name": f.get("name"), "state": st,
+                           "want": f.get("md5"), "got": got, "lf": lf,
                            "bytes": q.stat().st_size, "want_bytes": f.get("bytes")})
     if do_prog:
         prog(75, "讀 git 狀態")
@@ -163,7 +168,8 @@ def collect(do_prog: bool = True) -> dict:
         "commands": {"book": book.name if book else None, "n_commands": len(fns),
                      "n_shims": len(shims),
                      "missing_shims": [f for f in fns if f.lower() not in shims]},
-        "intake": {"n": len(intake), "bad": [x for x in intake if x["state"] != "OK"],
+        "intake": {"n": len(intake), "bad": [x for x in intake if x["state"] == "TOUCHED"],
+                   "eol": [x for x in intake if x["state"] == "EOL_CRLF"],
                    "rescue": "git checkout -- \"<路徑>\"  # 倉庫裡那份就是錨;被就地改過的還原回去"},
         "pages": [{"zh": zh, "cmd": cmd, "path": str(p), "exists": p.is_file(),
                    "kb": round(p.stat().st_size / 1024) if p.is_file() else None}
@@ -307,7 +313,8 @@ def build_html(pay: dict, md: str) -> str:
     ik = pay["intake"]
     cards.append(f"<div class=card><h2>收容件位元</h2>"
                  f"<div class='big {'ok' if not ik['bad'] else 'bad'}'>{ik['n'] - len(ik['bad'])}/{ik['n']}</div>"
-                 f"<div class=sub>{'全部對得上冊' if not ik['bad'] else str(len(ik['bad'])) + ' 件被動過'}</div></div>")
+                 f"<div class=sub>{'全部對得上冊' if not ik['bad'] else str(len(ik['bad'])) + ' 件被動過'}"
+                 f"{' · 行尾 CRLF ' + str(len(ik.get('eol') or [])) + ' 件(不算汙染)' if ik.get('eol') else ''}</div></div>")
     cards.append(f"<div class=card><h2>短令 · 梭</h2><div class=big>{c['n_commands']} · {c['n_shims']}</div>"
                  f"<div class=sub>{lamp(not c['missing_shims'], '缺梭 ' + str(len(c['missing_shims'])))}</div></div>")
 
@@ -436,7 +443,10 @@ def selftest() -> int:
     h = build_html(pay, md)
     chk("⑥ 整頁轉 JSON/MD:payload 與 md 都嵌在頁裡,匯出用純 Blob(零 CDN、不連外)",
         'id=via-payload' in h and 'id=via-md' in h and "URL.createObjectURL" in JS and "cdn" not in JS.lower())
-    n_tab = h.count("class=tab data-t=")          # `class=tabs` 也含 `class=tab`,要連 data-t 一起數才準
+    # `class=tabs` 也含 `class=tab`,所以要數更長的 token——但批546 這一檢又被咬了一次:
+    # 教訓 LL96 的**內文裡就寫著** `class=tab data-t=` 這串字,而教訓會被排進 TAB1 與內嵌 payload,
+    # 於是數出來變成 5。改數結構性的 `data-t=<名> role=tab`,那是版面才有、文字不會有的形狀。
+    n_tab = h.count("data-t=ai role=tab") + h.count("data-t=pages role=tab")
     n_emb = sum(1 for p in pay["pages"] if p["exists"])
     chk("⑦ 兩個分頁都在,且 TAB2 內嵌的 src 是**相對路徑**(搬夾也不會斷)",
         n_tab == 2 and (n_emb == 0 or "src='../" in h),
@@ -451,10 +461,11 @@ def selftest() -> int:
                   and broken["ledger"]["n"] > 0 and (broken["components"]["active"] or 0) > 0)
     chk("⑩ 檢④ 的負控:把 payload 讀成全 0 時必須判 FAIL(讀壞 SSOT 不可以靜靜給 0)", caught, f"(咬得住={caught})")
     ik = pay["intake"]
-    chk("⑪ 收容件位元體檢:全樹逐本 _INTAKE_MANIFEST 對 md5,對不上就點名並附還原指令"
-        "(工作站上正是靠這個才看出 VRN 收容件被就地改過)",
+    chk("⑪ 收容件位元體檢:全樹逐本 _INTAKE_MANIFEST 對 md5,且**行尾無關**"
+        "(批546 更正:Windows 上 core.autocrlf 把 LF 轉 CRLF,raw md5 自然對不上——"
+        "那是平台換行不是汙染,判成 TOUCHED 就是判錯的紅燈)",
         ik["n"] > 0 and isinstance(ik["bad"], list) and "git checkout" in ik["rescue"],
-        f"(收容件 {ik['n']} 件 · 被動過 {len(ik['bad'])})")
+        f"(收容件 {ik['n']} 件 · 真被動過 {len(ik['bad'])} · 只差行尾 {len(ik.get('eol') or [])})")
     print(f"  [計] 十一檢 OK {11 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
