@@ -1212,3 +1212,54 @@ FRED 鑰缺席時那一檢本來就不可能綠 → SKIP;族群全球冊 48/51 �
 **還沒做、等你的手**:Z43 FactSet 共識覆蓋(共識 0 列)· FRED 鑰(`output_hub/mega/.fred_api_key`)·
 全球期貨三檔 `BZ=F/CL=F/GC=F` · 族群分類快照(`via-datahome link` / `group_class`)· `pip install seaborn`。
 這些補上之後,上面那 6 個 SKIP 會自己變成可驗的綠或真紅——那時候的紅才是要修的紅。
+
+---
+
+## 一-ag|批539 TA-Lib 拔線:刪檔不等於退役(新律 L60)
+
+你貼回來一份舊區塊,裡面有 `pip install "TA-Lib>=0.6"` 和五條 `via-taone`。**那條路已經不存在了**:
+`via-taone` 在批534 隨 TA-Lib 退役時就從指令書移除(尾版是 Register v0210),
+它呼叫的 `VDF_ENG083_TALibOneBridge`、`CGC_MDL151_TaLibGate` 也都刪了。你貼的那份是批521 時代的區塊。
+
+但這件事真正要追究的不是舊區塊,是**系統為什麼還會把人帶回去**。查完發現:批534 只刪了檔,**接線沒拔乾淨**。
+
+| 還指著已刪引擎的地方 | 它一直在印什麼 |
+|---|---|
+| 總管理器引擎名冊(4 筆) | 名字還在冊上,看起來像現役 |
+| 自測格 4 站 | 「引擎缺/自指佔位(誠實)」 |
+| 繪圖資料律稽核冊(2 筆) | TA 工廠是技術分析正主 |
+| VTMRA 家族(2 員) | 家族態永遠掛一個 ABSENT |
+| 工具階梯 TA_INDICATOR | lv1 已刪的 TAFactory、lv2 `talib C 庫(候裝)` |
+
+「引擎缺」這句話讀起來像**有東西該在卻不在**,實際是**退役**。誠實不只是別說謊,還要說清楚是哪一種缺
+(缺件 / 未裝 / 退役)——這是 LL82。
+
+### 這一批做的六件
+
+1. **總管理器 v0140**:名冊拔掉 `CGC_MDL151_TaLibGate` / `VDF_ENG083_TALibOneBridge` / `VAP_ENG004_TAFactory` / `VDF_ENG048_TAFactory`。
+2. **自測格 v0319**:拔掉四個指向已刪引擎的 TA 站(233 → 229 站)。技術分析只留 **QuantGuard 正主橋八檢**。
+3. **繪圖資料律 v0102**:稽核冊兩個 TA 工廠 → 改列 `VDF_ENG086 QuantGuard 正主橋(L50 唯一活動技術分析路徑)`。
+4. **VTMRA 閘 v0102**:家族八員 → 六員;**同一版把 verdict 裡給 `talib` 的「軟缺席=YELLOW」豁免一起拔掉**
+   ——成員都拔了、豁免留著,就是替不存在的成員開後門,哪天有人用同一個 id 塞回來會被默默放行(LL83)。
+5. **工具階梯 v0102 + 階梯冊**:`TA_INDICATOR` 兩級都失效(lv1 已刪、lv2 L50 禁用)→ 單級 QuantGuard;
+   舊級原文存進 `retired_rungs_b539`,不是刪掉。自測 ⑧ 改成「階梯不得再有可升到 talib 的那一級」。
+6. **本境 `pip uninstall TA-Lib`(0.8.0)**:那是我先前為了稽核自己裝的。L50 說不得安裝,**那就包含我的稽核用途**;
+   拔掉之後 import 探針與政策才真的一致(LL84)。
+
+### 新律 L60 退役拔線律
+
+> 退役不是把檔刪掉就算完。要一次做完四件:① 檔進退役夾或記入退役冊 ② 所有接線拔掉並指向接班人
+> ③ 判定律裡給退役件的豁免口一併拔掉(不留後門給不存在的成員)④ 每一處拔線逐條記帳。
+> 做不到就不要宣稱退役。
+
+### 量到的
+
+活樹尾版 1455 檔,AST 層級掃過:**指向已刪 TA 引擎或 `import talib` 的接線 = 0**
+(剩下的字面命中全是這一批自己的退役註記)。
+自測格 **229 站:OK 227 · FAIL 0 · SKIP 2**(reconcile 對帳=環境缺件、selftest grid=自指)。
+VCGC 19/19 · MasterControl 合約測 19/19 · VTMRA 七檢 7/7 · 工具階梯 十檢 10/10 · 總管理器 v0140 10/10。
+
+### 技術分析現在走這裡
+
+`via-quantguard`(`VDF_ENG086_QuantGuardOneBridge`),動詞 `status | probe | run | selftest`。
+缺 polars = 誠實 ABSENT(rc=3)並附 pip 行,**不代裝**;階梯不得再往 talib 升。

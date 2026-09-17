@@ -58,5 +58,38 @@
   "dir": "functional modules/VDF/engine",
   "glob": "VDF_ENG086_QuantGuardOneBridge_v*.py",
   "note": "批538:批534 的 successor 是給人看的一句話;這一筆是給稽核器查樹用的(dir+glob 尾版律)。憲章原文零觸碰,接班關係記在退役冊這一側。"
+ },
+ "wave2_b539": {
+  "ts": "2026-09-17 05:22",
+  "order": "操作員令(批539):「禁止使用 TA-LIB 將 TA-LIB 刪除 該境改用 QUANTGUARD」",
+  "why": "批534 只刪了檔,**接線沒拔乾淨**:名冊、站點、稽核冊、家族成員、工具階梯還指著已不存在的 CGC_MDL151 / VDF_ENG083 / VAP_ENG004_TAFactory / VDF_ENG048_TAFactory。留著的後果不是「缺件誠實」,是把人帶回退役路——操作員今天貼回一份含 `pip install TA-Lib` 與 `via-taone` 的舊區塊,而那些短令與引擎早就不存在了。",
+  "cut": [
+   {
+    "where": "VIA_SYSTEM_MANAGER v0140",
+    "what": "ENGINE_NAMES 拔掉 CGC_MDL151_TaLibGate / VDF_ENG083_TALibOneBridge / VAP_ENG004_TAFactory / VDF_ENG048_TAFactory 四筆"
+   },
+   {
+    "where": "CGC_MDL064_SelftestGrid v0319",
+    "what": "拔掉四個指向已刪引擎的 TA 站(233→229 站);技術分析只留 QuantGuard 正主橋八檢"
+   },
+   {
+    "where": "CGC_MDL118_PlotDataLaw v0102",
+    "what": "稽核冊兩個 TA 工廠目標 → 改列 VDF_ENG086 QuantGuard 正主橋"
+   },
+   {
+    "where": "CGC_MDL152_VtmraGate v0102",
+    "what": "家族拔掉 talib / talib_one 兩員(八員→六員);verdict 一併拔掉『talib 軟缺席=YELLOW』豁免,不留後門給不存在的成員"
+   },
+   {
+    "where": "SUP_MDL742_ToolLadder v0102 + VIA_Tool_Escalation_Ladder",
+    "what": "TA_INDICATOR 兩級(lv1 已刪的 TAFactory、lv2 talib C 庫)→ 單級 QuantGuard;舊級原文存 retired_rungs_b539"
+   },
+   {
+    "where": "本境 python",
+    "what": "pip uninstall TA-Lib(0.8.0)——那是我先前為了稽核自己裝的,L50 明令不得安裝;拔掉後稽核器不會再把它讀成『在位』"
+   }
+  ],
+  "successor_now": "VDF_ENG086_QuantGuardOneBridge(via-quantguard;動詞 status|probe|run|selftest)",
+  "law": "L50:QuantGuard 為唯一活動技術分析/因子路徑;TA-Lib 不得安裝、import、載入、復活或掛入活動路由。"
  }
 }
