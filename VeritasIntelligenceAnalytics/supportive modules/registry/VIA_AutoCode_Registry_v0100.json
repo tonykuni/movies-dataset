@@ -8568,8 +8568,35 @@
    "code": "批588 前 40 大 VDF 真債,四冊都查無 35 類",
    "kind": "四冊都在、名實相符(`VIA_Central_Params_SSOT` / `VIA_Lib_Registry` / `VIA_Policy_Laws_SSOT` / `VIA_Feature_Catalog`),但**沒有覆蓋 VDF 真正的重複**。查無的前幾名:`load.ckpt`/`save.ckpt` 各 32 份 · `_connect_ro` 25 · `_num` 24 · `_tickers_gl` 24 · `_diag` 23 · `write_parquet` 23 · `_data_ready` 21 · `trading_days` 14 · `_fred_key` 14 · ETF/global/us_macro 等 `lane_*` 十餘條各 12 份。用**詞界比對**不用子字串(LL137:`num` 會被 `number`/`enum` 亂命中,兩個方向都會錯)。撿哪些進冊是操作員裁定(LL90),本批不代撿。",
    "batch": 588
+  },
+  {
+   "ts": "2026-09-18 17:50",
+   "op": "FIX",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0106 · debt 改以家族計;更正批588 的 VDF 數字",
+   "code": "批589 版本史被當成整合債:CGC battery() 258 份=自測格 258 個版號",
+   "kind": "掃 CGC 族當場穿幫:`misc.newest` 451 份 · `battery()`/`run_one()` 各 258 份,而那是 `CGC_MDL064_SelftestGrid` 的 **258 個歷史版號**。`debt` 第一版數的是**檔案**,把版本史整批算成債。更正:加 `_fam_key`(路徑去 `_vNNNN`),分四層——契約 / 泛名 / **版本史** / 真債,真債以**跨家族數**計。批588 報的 VDF「272 類 1186 份」更正為 **56 類 / 90 跨家族**(差 13 倍)。+檢㉚ 釘住。→ LL142",
+   "batch": 589
+  },
+  {
+   "ts": "2026-09-18 17:55",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "三族同線整併實測(VDF · VRN · CGC/SSOT)",
+   "code": "批589 卡書 555 支引擎省 98%+;真債 VDF 56 · CGC 275 · VRN 890 類",
+   "kind": "掃:VDF 144 檔→471 能力(省 99.53%)· VRN 537 檔 12568 函式→2233 能力(省 99.90%)· CGC 825 檔 12751 函式→1390 能力(省 99.93%)。卡書三本共 **555 支引擎**:VDF 45 支 8392 token(省 98.39%)· VRN 342 支 56858 token(省 98.06%)· CGC 168 支 29360 token(省 98.28%)。真債(跨家族)前幾名——VDF:`load/save_ckpt` 各 5 族 · `_num` 5 族 · `write_parquet` 4 族;VRN:`_si` 33 族 · `_cel_submit` 33 族(33 個家族各手寫一份 Celeritas 包裝,**不是律定的橋**,查過加速器橋只 import 不定義函式)· `close()` 32 族 · `export_csv` 29 族 · `_hash8` 28 族;CGC:`newest(pattern, root)` **33 族**各寫一份尾版 glob · `_read_json` 13 族 · `plan()` 12 族。**一份都沒有併**(LL90)。",
+   "batch": 589
+  },
+  {
+   "ts": "2026-09-18 18:00",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0357 · VIA_Essentia_Product_SSOT",
+   "code": "批589 PEIS 站 29→30 檢;產品正本補 VRN/CGC 實測段與一條已知債",
+   "kind": "站名與描述同步四層分法;產品正本 `measured` 補 `vrn_only` / `cgc_only` 兩段與三本卡書路徑,`known_debt` 記下「第一版以檔為單位」這條並指向更正。",
+   "batch": 589
   }
  ],
- "updated_at": "2026-09-18 17:05",
- "batch": 588
+ "updated_at": "2026-09-18 18:05",
+ "batch": 589
 }
