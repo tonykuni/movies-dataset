@@ -1,0 +1,58 @@
+--- a/CGC_MDL148_EngineBus_v0127.py
++++ b/CGC_MDL148_EngineBus_v0128.py
+@@ -1,6 +1,10 @@
+ #!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ r"""
++CGC_MDL148_EngineBus v0128 — 引擎調度匯流排(批600:缺必要參數誠實 ABSENT,含自訂 [ERROR]/[NEED_INPUT] --in)
++v0127→v0128(批600 工作站矩陣 vrn_unified/vdf_quantguard_run 假紅):引擎自述
++  `[ERROR] at least one --in file/directory is required` / `[NEED_INPUT] run requires --in`
++  不是 argparse 標準句,ARGERR_RX 漏接→假 RED。缺參數≠壞掉=ABSENT(L16)。
+ CGC_MDL148_EngineBus v0127 — 引擎調度匯流排(批514 子行程環境衛生律 L32)(批521:冊項可帶 timeout)
+ v0126→v0127(批521 操作員實錄 via-ryg vrn:vrn_firstpage 逾 600s TIMEOUT——ENG072 二十二檢含 OCR 階梯,工作站就是要跑更久;不是壞):
+   冊項(VIA_InputConsole_Spec)可帶 timeout 秒,catalog 帶進 row,call() 以 row.timeout 覆蓋預設(冊上沒寫=照舊);㊽。
+@@ -528,6 +532,14 @@
+     r"error: (argument [^\n:]{1,40}: expected one argument|"
+     r"the following arguments are required:[^\n]{0,60}|"
+     r"argument [^\n:]{1,40}: invalid [^\n]{0,40})")
++#: 批600:引擎自訂缺參句(非 argparse 標準形)。vrn_unified / quantguard_run 工作站假紅根因。
++NEED_INPUT_RX = re.compile(
++    r"\[NEED_INPUT\][^\n]{0,80}|"
++    r"at least one --in (file/directory )?is required|"
++    r"requires --in\b|"
++    r"run requires --in\b|"
++    r"required: --in\b",
++    re.IGNORECASE)
+ 
+ 
+ def classify_stop(tail: str) -> tuple[str, str]:
+@@ -553,6 +565,10 @@
+     if m:
+         return ("ABSENT", f"**缺參數**(不是壞掉):argparse 自述「{m.group(0)[7:59]}」"
+                           f";冊上這項的 params 該由主控台/--ids 帶值給它")
++    m_ni = NEED_INPUT_RX.search(tail)
++    if m_ni:
++        return ("ABSENT", f"**缺參數**(不是壞掉):引擎自述「{m_ni.group(0).strip()[:56]}」"
++                          f";冊上 params(in/out) 該由主控台/--ids 帶值,或跑 --selftest/test profile")
+     # 批473:缺件**不再要求先命中誠實停字樣**。`需要 reportlab` 本身就是一句
+     # 完整的誠實話,它不會再多寫一次「誠實停」;v0105 把缺件掛在誠實停底下,
+     # 等於要求引擎用兩種措辭講同一件事才算數。
+@@ -2092,7 +2108,17 @@
+     r48 = next((r for r in rows48 if r["id"] == "vrn_firstpage"), None)
+     chk("㊽ 批521 冊項 timeout:catalog row 帶 timeout(冊無=0);vrn_firstpage 冊上 1500 → call() 以此覆蓋預設(慢≠壞)",
+         r48 is not None and "timeout" in r48 and int(r48.get("timeout") or 0) == 1500 and all("timeout" in r for r in rows48))
+-    print(f"  [計] 四十七檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
++    # ── 批600 ㊾:自訂缺參句 → ABSENT,不是 RED ──
++    _ni1 = classify_stop("[ERROR] at least one --in file/directory is required")
++    _ni2 = classify_stop("[NEED_INPUT] run requires --in <Parquet>")
++    _ni3 = classify_stop("Traceback: ValueError boom")
++    chk("㊾ 批600 缺必要參數誠實 ABSENT:自訂 [ERROR]/[NEED_INPUT] --in 句→ABSENT;真 traceback 仍不誤放",
++        _ni1[0] == "ABSENT" and "缺參數" in _ni1[1]
++        and _ni2[0] == "ABSENT" and "缺參數" in _ni2[1]
++        and _ni3[0] == "",
++        f"(uni={_ni1[0]} · qg={_ni2[0]} · real={_ni3[0] or 'RED-fallback'})")
++
++    print(f"  [計] 四十八檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
+     return 1 if fails else 0
+ 
+ 
