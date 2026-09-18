@@ -8964,8 +8964,26 @@
    "code": "設過參數就把自測弄紅的尺,是壞的尺",
    "kind": "照冊設了 `user.group_starts` 五個群組之後,MDL139 自測**四檢連紅**:②⑥⑨ 寫死「統一起始 **2023-01-01**」、④ 寫死「changelog **兩筆**」——那是**操作員還沒設過任何參數**時的樣子。也就是說:**用了這本冊該有的功能,它自己的尺就翻臉**。逐項二分證過:清空 `group_starts` → 4 紅剩 1;再移走 datahome 目錄 → 仍剩 ④(changelog 已有 5 筆 ≠ 2)。v0109 修法:斷言用的 spec 一律先把**操作員設定過的那一塊**(`starts` / `group_starts` / `changelog`)回到空基線——**量的是「給這些輸入會產生什麼 argv」,不是「這台機器現在設了什麼」**。實測:帶著 2023-07-01 的設定、帶著 datahome 目錄、在格子的 PYTHONPATH 下,**18/18 全綠**。",
    "batch": 599
+  },
+  {
+   "ts": "2026-09-18 17:10",
+   "op": "ADD",
+   "category": "啟動器",
+   "component": "launchers/Invoke-VIA-AcceleratedTest-v0103.ps1(ALL-IN-ONE 全系統加速實測)",
+   "code": "v0102 → v0103:25 名冊 · 不卡斷 · 全部系統 · 產出驗證",
+   "kind": "操作員令「一個 ALL-IN-ONE PS CODE,加 25 的加速器,不卡斷,啟動實測全部系統生成輸出並驗證,指令前都要先進入環境」。**先量再造(L80)**:量到 `launchers/Invoke-VIA-AcceleratedTest-v0102.ps1` 已經在,所以**接它的版**不另開一支平行啟動器。四個改法各對一段令:① 25 名冊——v0102 卡在 `if ($Roster.Count -ne 20) { throw }`,**那是 20 的那本冊**;v0103 點源 `VIA_PS_Accelerators_25_Roster_v0100.ps1`,而且數量不符**從 throw 降成 WARN**(名冊不對是治理問題,不是今天不准跑實測的理由)。② 不卡斷——v0102 是 `$ErrorActionPreference='Stop'` + 每步 rc≠0 就 `throw`,**第一盞紅就整條停**,而且讀取迴圈**沒有死線**,引擎一掛就掛到天亮;v0103 每步 try/catch + **逐步逾時只殺自己生的那個子行程** + 失敗照樣往下,最後一次點名。③ 全部系統——補上全格自測/矩陣控制台/全景稽核/U/I 統一閘/制度健全度,共 12 步。④ **產出驗證**——v0102 的「通過」只看 rc;v0103 多一段 VERIFY,逐個產出比**存在 + mtime ≥ 開跑時間** → FRESH/STALE/MISSING,因為**舊檔還在不等於這一跑產出了東西**。環境:所有 python 一律走中央唯一入口 `Invoke-VIAPython -Family`(它自帶 25 加速器控制面與逾時不卡斷);家族境解析不到會退 base,**不 throw**但標 `ENV_FALLBACK` 紅字提醒「能跑 ≠ 在本位跑」。rc 誠實三態 0/1/2。",
+   "batch": 600
+  },
+  {
+   "ts": "2026-09-18 17:10",
+   "op": "FIX",
+   "category": "實測",
+   "component": "不卡斷核心的獨立實證(而且第一版的實證是**壞的**)",
+   "code": "TIMEOUT · GREEN · NODATA · GATED · RED —— 五態逐一量到",
+   "kind": "本容器有 `pwsh`,所以不是只看語法:①`Parser::ParseFile` 語法 OK(2267 權杖);②把逾時迴圈抽成獨立 harness,拿五個假子行程真跑——睡 600 秒的那支在 **3.1s 被殺掉**、其餘四支照樣跑完並各自判成 GREEN/NODATA(rc2)/GATED(rc4)/RED(rc1)。**第一版 harness 是壞的**:我把參數命名成 `$Args`,那是 PowerShell 的**自動變數**,綁不進去→`python3` 沒收到參數→改讀 stdin→**五步全部逾時**,看起來像迴圈壞了。改名 `$ChildArgs` 才量到真的。教訓同 LL152:**量出來的紅,先問是不是尺自己壞了**。v0103 本體用的是 `$Arguments`,沒有這個撞名(已逐一掃過 Args/Input/Error/Host/Matches/PSItem/This 全無)。另外逐項驗過:VERIFY 的 6 個期待路徑**全部存在**、9 個引擎 glob **全部解析得到尾版**——不然會報一堆假的 MISSING/ABSENT。",
+   "batch": 600
   }
  ],
- "updated_at": "2026-09-18 16:00",
- "batch": 599
+ "updated_at": "2026-09-18 17:10",
+ "batch": 600
 }
