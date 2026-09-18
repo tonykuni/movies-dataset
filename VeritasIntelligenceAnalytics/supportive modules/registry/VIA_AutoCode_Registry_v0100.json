@@ -8388,8 +8388,35 @@
    "code": "批583 兩盞紅燈同一行:未正規化的路徑比對,在 Windows 上讓整份排除清單失效",
    "kind": "操作員工作站 `via-accel selftest` RED 33/35:① tails=2390 missing=**726**(全是 `venv/Lib/site-packages/pip/…`)② vdf=173 raw_only=**12**(全是 `references/intake` 收容件)。容器裡是 35/35 / tails=1571 / vdf=64。差別不在系統,在**作業系統**:`_live_tail_py` 的 `sp = str(q)` 拿未正規化路徑去比一串正斜線片語,Windows 的反斜線讓 `'references/intake' in sp` 永遠 False,整份清單只剩沒有斜線的 `__pycache__` 有效。修:比對前正規化分隔符,並把第三方環境(venv/.venv/site-packages/node_modules/Lib/quarantine/SCOPE_COPY…)逐類具名排除——**加速器橋差一點就注進 pip 的原始碼**。加兩檢釘住:合成 Windows 路徑驗正規化(沒正規化就會漏,正是那個 bug)、第三方類別逐條在冊。立 L71 跨作業系統同解律,教訓 LL135。附註:這兩盞紅燈查得出來,是因為批582 剛把「紅燈要指名紅在哪」做進 selftest;還是只印「RED 33/35」的話我只能繼續猜。",
    "batch": 583
+  },
+  {
+   "ts": "2026-09-18 12:10",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL165_CommandRunGate_v0100.py(10 檢)+ Grid v0352 第 242 站",
+   "code": "批584 短令能跑閘:146 個短令逐令解析驗證 —— **待修 0,沒有一個是死的**",
+   "kind": "操作員貼回整份短令清單說「我不懂程式系統,請幫我完成」。可執行的等價說法=**每個短令打下去都要真的有東西跑起來**。逐 `function global:` 解析五種寫法(Get-VIANewest 資料夾×樣式 / 直路徑 / `& cmd /c` 梭 / 轉呼其他短令 / 純行內),驗目標在不在、Python 目標 AST 讀不讀得進來,`--deep` 才真的跑 --selftest。實測 **146 個 · OK 123 · 轉呼 17 · 行內 6 · 待修 0**。過程中我的解析器自己生了三個假紅並全部補掉(via-ves 的 `*` 在資料夾段、兩支 cmd 梭寫法)。本閘從設計上就帶 **UNPARSED**:讀不懂就說讀不懂,不猜也不算過。**只讀 .ps1 絕不改**(L70);零網路;無寫入旗標。教訓 LL136",
+   "batch": 584
+  },
+  {
+   "ts": "2026-09-18 13:10",
+   "op": "FIX",
+   "category": "誠實",
+   "component": "VDF_ENG072_StoryRotationBridge v0100→v0101(缺表誠實 NODATA + 下游誠實跳過)",
+   "code": "批584 via-rotation 紅了卻一行 FAIL 都不印 —— 根因是缺表就丟 CatalogException 整支炸掉",
+   "kind": "`--deep` 逐令真跑之後,五支 SELFTEST_RED 裡四支是缺料(容器空庫),**只有 via-rotation 是真問題**:它 rc=1 卻**一行 FAIL 都印不出來**,因為 `export()` 讀 `tw_chip_inst` 時直接 CatalogException,自測還沒走到 chk 就死了。這與批581 修過的 GRP_ENG041 是同一個模子。修法兩段:① `export()` 先 `show tables` 比對,缺表就回 `state=NODATA` + **指名缺哪幾張**(tw_chip_inst / tw_chip_margin)+ 指路(先跑 via-chip 與 via-daytrade);② 自測看到上游 NODATA 就**誠實跳過下游七檢**並回 **rc=2**(誠實四態),不是接著讀不存在的 parquet 再炸第二次。**缺料不是壞掉(L57);紅燈不指名紅在哪等於只講了一半(批582)。**",
+   "batch": 584
+  },
+  {
+   "ts": "2026-09-18 13:10",
+   "op": "DOC",
+   "category": "調度",
+   "component": "docs/VIA_B584_DispatchCanon.md",
+   "code": "批584 VDF/VRN 調度正典 —— 從台帳 1127 筆挖出真的跑成功過的十二條",
+   "kind": "操作員令「依照過去紀錄找出 vrn vdf 最成功的引擎調度邏輯」。掃全台帳,取**同時命中調度類與實跑成功類**(實跑/實測/端到端/PASS/跑通/收斂/零卡斷)的 179 筆,統計哪些設計被反覆記載。前四名:**尾版 glob 不寫死版號 163 筆 · 讓庫律(單寫者鎖)98 · 逾時 kill 不卡斷 78 · 家族境 python 72**。骨幹元件依被點名次數:SUP_MDL740 統包網路口 11 · SUP_MDL737 加速器口 7 · CGC_MDL148 匯流排 3 · CGC_MDL141 收尾閘 3。兩條鏈的形狀也不同:**VDF 是扇出型**(十道彼此不相依,唯一共用資源是 DuckDB 單寫者鎖 → 並行 + 撞鎖序跑複判);**VRN 是串接型**(每站吃上一站產出 → 扇出無意義,風險在「上游沒料下游假裝有」,所以收尾閘要逐份核對且 PENDING 與 FAIL 分開判)。",
+   "batch": 584
   }
  ],
- "updated_at": "2026-09-18 11:20",
- "batch": 583
+ "updated_at": "2026-09-18 13:10",
+ "batch": 584
 }
