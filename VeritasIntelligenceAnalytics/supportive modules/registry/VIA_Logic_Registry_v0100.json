@@ -1,0 +1,160 @@
+{
+ "schema": "VIA.LogicRegistry.v1",
+ "batch": 597,
+ "ts": "2026-09-18 12:30",
+ "append_only": true,
+ "purpose": "邏輯庫正本:可重用的業務計算/取用邏輯,同一件事只留一份實作,差異寫成參數(L75/LL143)。",
+ "naming_finding": {
+  "state": "PENDING_OPERATOR",
+  "zh": "CGC_MDL166 量到掛在「邏輯庫」名下的 VIA_Lib_Registry_v0100.json **名實不符**:頂層鍵是 ['ledger','schema'],內容是 pip 安裝台帳(packages / pre_conflicts / post_conflicts / support_smoke),不是邏輯庫。本批**不改它的名字也不動它一個位元組**(只增不減;命名的裁定權在操作員 LL90),另立本冊記錄真正的邏輯正典路由。舊本要改名成什麼(安裝台帳?環境台帳?)請操作員裁定。",
+  "misfiled_book": "supportive modules/registry/VIA_Lib_Registry_v0100.json"
+ },
+ "canon": {
+  "參數": {
+   "module": "SUP_MDL753_VIACommonUtils",
+   "entry": "argval",
+   "what": "從 argv 取旗標值(參數**值**的讀取口)"
+  },
+  "邏輯": {
+   "module": "SUP_MDL753_VIACommonUtils / SUP_MDL751_VIATailPick / SUP_MDL752_VIAJsonIO",
+   "entry": "num · newest · bind · jread · jwrite",
+   "what": "可重用的業務計算/取用邏輯(數值轉換 · 尾版取用 · JSON 讀寫)"
+  },
+  "因子": {
+   "module": "(本批未動)",
+   "entry": "-",
+   "what": "量化/籌碼/財務特徵工程的計算因子"
+  }
+ },
+ "canon_tails": {
+  "SUP_MDL751_VIATailPick": "SUP_MDL751_VIATailPick_v0102.py",
+  "SUP_MDL752_VIAJsonIO": "SUP_MDL752_VIAJsonIO_v0100.py",
+  "SUP_MDL753_VIACommonUtils": "SUP_MDL753_VIACommonUtils_v0101.py"
+ },
+ "bridge": {
+  "file": "supportive modules/VIA_LibCanon.py",
+  "zh": "穩定名字的轉接口(跟 VIA_SuperAccel_Module 同一個角色),底下用尾版律接三本正典;呼叫端永遠不寫死版號。缺席=**大聲拋**不 graceful(LL151)。",
+  "engine_block": "[VIA:LIB-BRIDGE:v0100]"
+ },
+ "routes": [
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0111.py",
+   "was": "_num",
+   "category": "邏輯",
+   "now": "_LIB.num",
+   "evidence": "純轉換;28 組語料零差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0101.py",
+   "was": "_num",
+   "category": "邏輯",
+   "now": "_LIB.num",
+   "evidence": "純轉換(原多一個 .strip(),float() 本來就吃得下);28 組零差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0102.py",
+   "was": "_num",
+   "category": "邏輯",
+   "now": "num(drop=(\"\",\"--\",\"-\",\"None\",\"nan\"))",
+   "evidence": "哨兵含 'nan';不綁 drop 會回 nan 不是 None(量到 2 處差異)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0105.py",
+   "was": "_num",
+   "category": "邏輯",
+   "now": "num(positive=True)",
+   "evidence": "只收正數;不綁會放行 '0'/'-inf'/'nan'(量到 8 處差異)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0102.py",
+   "was": "_num",
+   "category": "邏輯",
+   "now": "num(positive=True)",
+   "evidence": "同上;量到 8 處差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0100.py",
+   "was": "_arg",
+   "category": "參數",
+   "now": "argval(quiet=True, dashdash=True)",
+   "evidence": "VDF 三支同一群;default 走位置參數"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0100.py",
+   "was": "_arg",
+   "category": "參數",
+   "now": "argval(quiet=True, dashdash=True)",
+   "evidence": "同群"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0104.py",
+   "was": "_arg",
+   "category": "參數",
+   "now": "argval(quiet=True, dashdash=True)",
+   "evidence": "同群"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0100.py",
+   "was": "_write_json",
+   "category": "邏輯",
+   "now": "jwrite(indent=1, atomic=True)",
+   "evidence": "7 組語料比**位元組**零差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0100.py",
+   "was": "_write_json",
+   "category": "邏輯",
+   "now": "jwrite(indent=1, atomic=True, default=str)",
+   "evidence": "位元組零差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v0101.py",
+   "was": "_write_json",
+   "category": "邏輯",
+   "now": "jwrite(indent=2, atomic=False, default=str, newline=True)",
+   "evidence": "位元組零差異"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG046_FetchMatrixRegistry.py",
+   "was": "_newest",
+   "category": "邏輯",
+   "now": "_LIB.newest",
+   "evidence": "newest(root, pattern)→Path|None;呼叫端樣式無 `**`"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG049_FiveDayFetch.py",
+   "was": "_newest",
+   "category": "邏輯",
+   "now": "_LIB.newest",
+   "evidence": "同群"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0104.py",
+   "was": "_newest",
+   "category": "邏輯",
+   "now": "_LIB.newest",
+   "evidence": "原多一個 root.exists() 守衛;正典的 base.is_dir() 已涵蓋"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py",
+   "was": "_newest",
+   "category": "邏輯",
+   "now": "bind_newest(order=\"pr\", root_default=HERE, attr=\"name\", missing=\"\")",
+   "evidence": "這一群回**檔名字串**、缺件回空字串,與其他群不是同一件事"
+  }
+ ],
+ "not_same_thing": {
+  "VDF_ENG056_ChipBackfill_v0102.ProgressBar._write_json(self, force)": "是**類別方法**而且帶 2 秒節流(`now - self.last_json < 2.0` 就直接 return),寫的是自己的 snapshot()。名字一樣,做的事不一樣——不遷。"
+ },
+ "pending_operator": {
+  "zh": "以下是 CGC_MDL166 量到的候選,**只提不寫冊**(LL90)。本批沒有動因子庫。",
+  "參數庫候選遺漏": 22,
+  "邏輯庫候選遺漏": 57,
+  "因子庫候選遺漏": 5,
+  "因子庫候選_前二": [
+   "policy_factors(9 處各寫一份)",
+   "feature_audit(6 處各寫一份)"
+  ]
+ },
+ "honest_note": "本冊記的是**已證零損失**的路由。證明在三支正典自己的自測裡:SUP_MDL751 十四檢(含 15 變體×6 語料=90 組)· SUP_MDL753 十六檢(num 5 群×28 語料=140 組;argval 7×3 組)· SUP_MDL752 的 _jwrite 3 群比位元組。證不出來的一支都沒遷。"
+}

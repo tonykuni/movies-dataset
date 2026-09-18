@@ -125,6 +125,19 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:LIB-BRIDGE:v0100] 三庫正典橋(批597;缺席大聲拋,不 graceful) =====
+import sys as _lb_sys
+from functools import partial as _lb_partial
+from pathlib import Path as _lb_Path
+_lb_p = _lb_Path(__file__).resolve()
+while _lb_p.parent != _lb_p:
+    if (_lb_p / "supportive modules").is_dir():
+        _lb_sys.path.insert(0, str(_lb_p / "supportive modules"))
+        break
+    _lb_p = _lb_p.parent
+import VIA_LibCanon as _LIB          # 正典缺席=大聲拋,不假裝有(LL151)
+# ===== [VIA:LIB-BRIDGE:END] =====
+
 
 CELERITAS_MOUNT = PACKAGE_ROOT / "mounts" / "VeritasCeleritas.py"
 AEGIS_MOUNT = PACKAGE_ROOT / "mounts" / "VeritasAegisNexus.py"
@@ -177,9 +190,9 @@ def _synthetic_frame(days: int = 180) -> pl.DataFrame:
     return pl.DataFrame(rows)
 
 
-def _write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+#: 批597 三庫整併:_write_json → 正典綁定(非 atomic · indent=2 · 尾端加 \n;位元組零差異)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_write_json = _lb_partial(_LIB.jwrite, indent=2, atomic=False, default=str, newline=True)
 
 
 def _frame_hash(frame: pl.DataFrame) -> str:

@@ -166,13 +166,54 @@ def _write_text(p: Path, text: str) -> None:
     os.replace(tmp, p)
 
 
-def _write_json(p: Path, obj) -> None:
-    _write_text(p, json.dumps(obj, ensure_ascii=False, indent=1, default=str))
+# ===== [VIA:JSONIO-BRIDGE:v0100] JSON 讀寫正典橋(批592;正典 SUP_MDL752_VIAJsonIO)=====
+# 本處原本的行為:走本地 `_write_text`(原子寫)· indent=1 · default=str · 無尾換行
+# 批592 量過:活樹尾版 168 支只有 **20 處**定義 / **17 個行為群**(debt 報的 83/35 檔含版本史,LL142)。
+# 差異軸:讀=編碼 utf-8-sig vs utf-8(**活的不一致**:帶 BOM 的檔有些引擎讀得到有些讀不到)、
+# 缺檔與壞檔**是兩個旋鈕**(合成一個 default 會把壞檔說成不存在=假的零,LL138);
+# 寫=原子寫 / indent / 尾換行 / default=str ——**indent 與尾換行是產出契約,不得統一**。
+# 所以正典把差異變成明示選項,並逐群重放證零損失(讀 9 種 × 4 語料全同;寫 4 種**逐位元組相同**)。
+# 這裡是**綁定**不是再定義一支 def(寫 def 家族數不會掉=等於沒併,LL143)。
+import importlib.util as _js_ilu
+from pathlib import Path as _js_Path
+_JS_MOD = None
+_js_p = _js_Path(__file__).resolve()
+while _js_p.parent != _js_p:
+    _js_hits = sorted((_js_p / "supportive modules").glob("SUP_MDL752_VIAJsonIO_v*.py"))
+    if _js_hits:
+        _js_spec = _js_ilu.spec_from_file_location("VIA_JSONIO", _js_hits[-1])
+        _JS_MOD = _js_ilu.module_from_spec(_js_spec)
+        _js_spec.loader.exec_module(_JS_MOD)
+        break
+    _js_p = _js_p.parent
+if _JS_MOD is None:      # 大聲壞掉:讀錯編碼/寫錯 indent 都是無聲的錯
+    raise RuntimeError("[FAIL] JSON 讀寫正典缺席:supportive modules/SUP_MDL752_VIAJsonIO_v*.py")
+_write_json = _JS_MOD.bind_write(indent=1, default=str)
+# ===== [VIA:JSONIO-BRIDGE:END] =====
 
 
-def newest(dirp: Path, pat: str) -> Path | None:
-    hits = sorted(dirp.glob(pat)) if dirp.exists() else []
-    return hits[-1] if hits else None
+# ===== [VIA:TAILPICK-BRIDGE:v0100] 尾版取用正典橋(批590/591;正典 SUP_MDL751_VIATailPick)=====
+# 本群原本的行為:newest(dirp, pat)
+# 批590 量過:CGC 族 32 份 `newest` 是 **13 個行為群**,不是同一件事(最大兩群參數順序相反、
+# 兩支走 rglob、一支缺件回 pattern、一支按 mtime 排序)。所以正典把差異變成**明示選項**,
+# 並逐群重放證零損失(15 種具名變體 × 6 組語料,90 組全同)。
+# 這裡是**綁定**不是再定義一支 def:寫 def 的話能力庫裡這一家族還在,家族數不會掉(LL143)。
+import importlib.util as _tp_ilu
+from pathlib import Path as _tp_Path
+_TP_MOD = None
+_tp_p = _tp_Path(__file__).resolve()
+while _tp_p.parent != _tp_p:
+    _tp_hits = sorted((_tp_p / "supportive modules").glob("SUP_MDL751_VIATailPick_v*.py"))
+    if _tp_hits:
+        _tp_spec = _tp_ilu.spec_from_file_location("VIA_TAILPICK", _tp_hits[-1])
+        _TP_MOD = _tp_ilu.module_from_spec(_tp_spec)
+        _tp_spec.loader.exec_module(_TP_MOD)
+        break
+    _tp_p = _tp_p.parent
+if _TP_MOD is None:      # 大聲壞掉:尾版取錯是無聲的錯(整條鏈指到舊引擎,沒人會發現)
+    raise RuntimeError("[FAIL] 尾版取用正典缺席:supportive modules/SUP_MDL751_VIATailPick_v*.py")
+newest = _TP_MOD.bind(order="rp")
+# ===== [VIA:TAILPICK-BRIDGE:END] =====
 
 
 def _date_ok(s: str) -> bool:
@@ -1193,11 +1234,7 @@ def vap_images(spec: dict, limit: int = 60) -> list:
     return out[:limit]
 
 
-def _read_json(p: Path):
-    try:
-        return json.loads(p.read_text(encoding="utf-8-sig"))
-    except Exception:
-        return None
+_read_json = _JS_MOD.bind_read()
 
 
 def family_success() -> dict:

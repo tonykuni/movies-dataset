@@ -8091,8 +8091,899 @@
    "code": "批565 CI 實錄:PR #39 test_11_committed_page_matches_generator FAIL",
    "kind": "**同一類漏,兩批內第二次。**批563 新增 VDF_ENG088 讓現役引擎族 98→99,但我沒再生總控頁——tracked 的 MasterControl 還印 98,CI 的 test_11 逐字比對「committed 頁 vs 正主管理器輸出」當場 FAIL(`<b>98</b>` != `<b>99</b>`,訊息就寫著『tracked MasterControl 與正主管理器輸出不同步』)。批564 漏的是七處裡的「短令+梭」,批565 漏的是「總控頁再生」——**新增一支引擎會改變的東西比我記得的多**。修:跑 VIA_SYSTEM_MANAGER_v0140.py --no-open 再生,diff 剛好 4 行(時戳 + 98→99 兩處 + 引擎表多一列),沒有夾帶。推之前先在本境把那支合約測跑過:**19/19 OK**(先重現紅、再證明綠,不是推上去碰運氣)。這一次守衛本來就在(CI test_11),我漏的是**推之前沒跑它**",
    "batch": 565
+  },
+  {
+   "ts": "2026-09-17 16:50",
+   "op": "ADD",
+   "category": "一鍵統包",
+   "component": "Invoke-VIA-OneShot-v0103.ps1(24 段 · 25 加速器 · 動態進度條)",
+   "code": "批566 操作員令「INTEGRATE ALL INTO ONE POWERSHELL CODE TO HANDLE ALL WITH 25 ACCELERATORS · 動態進度條」",
+   "kind": "**不另開一支,升 OneShot 尾版**(Zero-Hydra:一鍵統包已經有正主 v0102,再寫一支就是第二顆頭)。v0102→v0103 三件:① **25 加速器真點名**——點源 VIA_PS_Accel_Module.ps1,開跑印 25 盞;缺席誠實說缺(v0102 只在文字裡提加速器,從沒真的點過名)。② **動態進度條**——走模組的 Write-VIAProgress(不另寫第二條);非 TTY 退單行 `[####....] 48%`,**不靜默**(批423:畫面全白看起來就是死機)。③ **把散在外面的收進來**:S10a/b 共識融合橋(批563/564)· S11a VTMRA · S11b 中央治理家族 cycles · S11c 家族 U/I · S12a 庫況 · S12b 規則落差 · S13 四態燈。9 段 → **24 段**。三條紀律寫進檔頭,因為它們最容易在『一鍵跑完』裡被偷偷破掉:**不代設同意閘**(VIA_NET_CONSENT/VIA_SCRAPE_CONSENT 只讀不寫;未開=觸網段標新態 **GATED** 並印出要貼哪兩行,GATED 不是 SKIP 也不是 FAIL)· **不代裝套件**(via-envgov apply --approve 只在 -ApproveInstall 時才跑;預設安全還不夠,要沒說就不做)· **不卡斷**(逐段逾時 kill + 邊跑邊吐)。另加 -FullMatrix(預設 --fast)與 -Only(只跑點名段)。**自己抓到自己兩件**:① 進度條分母我寫 21(去數 Invoke-Stage 次數),第一次真跑我加的『分母對帳』檢當場印「實跑 24 段而分母寫 21」——因為有四列是段外直接 Add-Row 的;改成分子分母**數同一件事**(都數列),對帳檢留著當守衛。② 照 LL110 在推之前驗:本檔叫到的 19 個短令**全部在冊上**(0 個 ghost)。照 LL111 驗:跑總控頁再生,diff 只有時戳=引擎族數沒變(.ps1 啟動器不進引擎表)→ 回退該檔;合約測 19/19 OK。pwsh AST 零解析錯;-Only 兩段真跑過(共識橋 NODATA · 規則落差 66 詞)",
+   "batch": 566
+  },
+  {
+   "ts": "2026-09-17 17:05",
+   "op": "ADD",
+   "category": "全景稽核",
+   "component": "CGC_MDL156_VIAAcceleratorControl_v0104.py(+加速器橋覆蓋閘 · +VDF 網路唯一正典口閘;28 檢→30 檢)",
+   "code": "批567 操作員令「所有 PY 指令加入加速器 · 所有 VDF 加入網路工具」",
+   "kind": "**先量,量出來兩件都已經成立**——加速器橋:活樹 .py 2,698 支 · 帶橋 2,614 · 缺 84;那 84 支拆開是 尾版現役 7 · 舊版(非尾版)59 · 產物/新模組夾 18,而**那 7 支尾版一支都不該改**(4 支收容件=正本零觸碰只能 importlib 讀 · 2 支 READ_ONLY 正典 SSOT · 1 支測試檔不是引擎)。VDF 網路:尾版 90 支 · 不觸網 62 · 走正典網路件 28 · **生網路呼叫 0**(requests/urllib 直呼零)。既然都已成立,這一批值錢的不是再做一次,是**把事實釘成守衛**,否則下一批有人加一支沒橋的引擎、或在 VDF 裡直呼 requests,沒有人會發現。v0103→v0104:① `_ACCEL_EXEMPT` 把 4 類豁免**逐條寫上理由**(豁免不寫理由就是後門)② `_live_tail_py()` 只認尾版活樹(舊版不該被拖來當紅燈,LL103 同族)③ 兩道新檢:「每一支尾版活樹 .py 都帶加速器橋,豁免須具名具理由」「VDF 尾版引擎不得繞過正典網路口觸網」。**28/28 → 30/30 GREEN · accelerators=25**",
+   "batch": 567
+  },
+  {
+   "ts": "2026-09-17 17:10",
+   "op": "FIX",
+   "category": "測試",
+   "component": "CGC_MDL064_SelftestGrid_v0337.py(敗站註記不截斷;+_show();加速器控制面站 28 檢→30 檢)",
+   "code": "批567 操作員令「自測時測字完成」",
+   "kind": "**第三層眼罩,在我自己收證據的那支手上。**批550 拆掉 ENG072 的 `str(exc)[:60]`、批551 拆掉底下的 `_g32[:90]`,我當時只往**下**找,沒往**上**看一層——自測格自己每一站都戴著同一副。量:全樹尾版帶自測的檔裡訊息被切片 **250 處**;我差點把 250 處一起掃掉,那正是燒過我三次的假陽性機器(批554 負控過關過錯理由 · 批562 直覺挑的風險詞與實測零重疊 · 批563 站名改錯站)。改成先分辨哪一種切會害人:**綠站註記是計數(「43/43」),切了沒損失;敗站註記是唯一線索,切了就是眼罩**。規則因此只收一句(新增 L62)、只落三處敗站路徑:① run_one `\" / \".join(t[:80] for t in tail)` → FAIL 走全文 ② except 分支 `str(exc)[:80]` → **這條路必定是 FAIL**,全文照給 ③ 主控台兩處 `note[:96]` → 抽成 `_show()`,FAIL 全文、其餘維持 96(一行一站才讀得動)。**底下沒有第四層**:存證 GRID_*.json 寫的是 results 原物,在「生成」與「印出」兩點不切就到底了。先量後證:同一支假敗站 v0336 拿到 80 字(不完整)、v0337 拿到 130 字(完整);同一支假例外站 v0336 80 字、v0337 122 字(完整);同一支假綠站兩版都維持 80 字=零誤傷",
+   "batch": 567
+  },
+  {
+   "ts": "2026-09-17 17:15",
+   "op": "FIX",
+   "category": "測試",
+   "component": "CGC_MDL149_VeritasCentralGovernanceConsole_v0112.py(⑨ 合成檢關進沙盒;零生產邏輯變更)+ 格子 v0337 站名 十一檢→十九檢",
+   "code": "批567 收 L62 後順手跑 VCGC 驗有沒有誤傷 → ⑨ 紅",
+   "kind": "**不是我改壞的,是一盞本來就在看機器臉色的燈。**⑨ 安裝核可是合成檢(暫存夾八份 RunGate 報告 + `VIA_RUNGATE_LATEST`),但 `_rungate_merged()`(批517)另外掃真機器的 `RUNGATE_2*.json` 史,**史優先於傳進來那份**;本境有一份 2.2h 前 verdict=YELLOW 的真報告(我自己批566 跑 OneShot 留的),合成的八份全被蓋掉,⑨ 印「雙族=BLOCKED_UNITEST」。修:⑨ 連 `VIA_RUNGATE_DIR` 一起指進暫存夾(引擎本來就吃這覆寫鍵),跑完還原兩鍵;**生產邏輯零變更**。同機同狀態前後對照:v0111 十九檢 FAIL 1 · v0112 **19/19 GREEN**。另補兩件登錄漏網:① 中央元件編號冊 `registry-sync --apply`——新 4(`_show` · `_live_tail_py` · `coverage_checks` · **`tool|via-consensus`**;最後那個是批564 七處又漏的第八處)② 格子 VCGC 站名還寫「十一檢」,而引擎早就十九檢(批516–519 加的四檢從沒回頭改站名),一併更正。教訓寫在 LL114",
+   "batch": 567
+  },
+  {
+   "ts": "2026-09-17 17:40",
+   "op": "FIX",
+   "category": "測試",
+   "component": "CGC_MDL149_VeritasCentralGovernanceConsole_v0113.py(⑨ 第二個洩漏口 panorama + ⑳ 來源閘;十九檢→二十檢)",
+   "code": "批568 操作員工作站實錄:⑨ 印 BLOCKED_PANORAMA(不是我本境修的 BLOCKED_UNITEST)",
+   "kind": "**我上一批才立的 LL114,下一批被自己打臉。**`check()` 讀兩個真機器來源,批567 我只關了 `rungate()` 那個,漏掉 `REPORTS/panorama/PANORAMA_latest.json`——它**寫死路徑、沒有覆寫鍵**,而且直接覆蓋 install 值,所以八個合成案例全變 BLOCKED_PANORAMA。我本境沒有 panorama 夾,那閘是啞的,才印成 UNITEST:**同一個檢、兩台機器、兩種紅法,核可邏輯一行沒錯**。修兩件:① 比照 RunGate 慣例加 `VIA_PANORAMA_LATEST` 覆寫鍵(生產預設路徑零變更),⑨ 一併關沙盒;② 新增 **⑳ 來源閘**——AST 掃 `check/rungate/_rungate_merged`,列出這條路每一個 `REPORTS / …` 磁碟來源,要求每個都配覆寫鍵、每個都被自測 ⑨ 區塊指進暫存夾,少一個就指名報紅。**先重現再證明**:容器裡照工作站樣子放一份未完成的全景報告 → v0112 ⑨ FAIL(BLOCKED_PANORAMA,與操作員貼回來的一字不差)· v0113 ⑨ OK;撤掉模擬檔後 ⑳ 印(來源 3 · 覆寫鍵 3 · 沒配鍵 無 · 沒關沙盒 無)。新律 L63 + 教訓 LL115",
+   "batch": 568
+  },
+  {
+   "ts": "2026-09-17 17:45",
+   "op": "ADD",
+   "category": "整合去重",
+   "component": "PEIS 統一引擎收容(functional modules/VIA_PEIS/references/intake/PEIS_UnifiedEngine_b568/)+ CGC_MDL158_PEISCapabilityEngine_v0100.py 掛線口(19 檢)+ Register v0215 via-peis/能力庫 + 梭 + 格子站",
+   "code": "批568 操作員令「將 session_01FQMN8uBxreDrzmDUpPrXTG 引擎整合進來」+ PEIS 六功能規格 +「用引擎去執行以節省 TOKEN」「你自己收留整合後啟動她」",
+   "kind": "**先量,量出來的結論是「不要重寫」。**PEIS 六件功能已經有一支正主:`via_unified_engine.py` v0200(VIA-VIA-ENG996;github.com/tonykuni/via-vdf-vrn @ 412e9af),6,628 行、純標準庫、零網路、零安裝、不改來源檔、**自己的自測 69/69**。照規格再寫一支=第二顆頭(零九頭龍)。做法回到老規矩:**正本收容(4 檔逐檔 md5/sha256)+ 掛線口 subprocess 代跑**,本檔一個 byte 不改它。掛線口 19 檢只驗 VIA 這一側該驗的:sha256 逐字相符 · 正本自己的 69 檢跑得過 · 合成語料真跑證明同義實作被聚成一個能力 · **真跑後來源檔位元組不變(比 bytes,不看旗標)** · 零重複=NODATA 不報紅(照 PEIS 啟動條件)· 零網路/零安裝/不代設同意閘/**不提供 --apply**(能力表落地是操作員的裁定,LL90 同族)。**收下來真跑才看到三件事**(寫在 LL116):① 省略 `--db` 能力庫只在記憶體=白掃,我第一版就是;② `--params` 傳物件會在正本沙箱車道壞掉(`list({..})` 取到 key),而操作員規格用的正是物件——正本零觸碰,轉接寫在掛線口:依卡上簽章順序攤平,簽章讀不到就不猜;③ 小語料 token 帳是負的,正本照實報 −1511%。**啟動實測**:VDF+VRN 674 檔/14,984 函式→2,606 能力·折疊 10,436·省 99.92%;CGC+SUP 1,780 檔/31,416 函式→7,291 能力·折疊 18,694·近似 42,902·省 99.95%;VAP 37 檔/806 函式→324 能力·省 98.04%。能力庫 51 MB SQLite·2,606 張卡·140 SEALED。快速截取層實證:`RUN(misc.upside, {target:180, current:120})` → **0.5**,物件道與陣列道同值。**自己抓到自己一件**:檢號標籤排到 ⑳ 但實跑 19 檢,計數行寫死「二十檢」——LL112 同款,改成由 n[0] 推導",
+   "batch": 568
+  },
+  {
+   "ts": "2026-09-17 17:55",
+   "op": "FIX",
+   "component": "VIA_SYSTEM_MANAGER_v0141.py(+peis 正式名稱「能力聚眾與能力卡建置」)+ 總控頁再生 + 元件冊同步",
+   "category": "功能註冊",
+   "code": "批568 推完之後跑的全格子回歸:227 站 OK 224 · FAIL 1 —— 總系統管理器自測 ⑥",
+   "kind": "**七處的第四處我只做了後半。**批567 我才把「功能註冊七處」寫進交接報告,第四處明寫『正主管理器正式名稱 **+** 總控頁再生』;批568 加 peis 任務時我再生了頁,沒補 `TASK_FORMAL_NAMES`,⑥ 的 `len(TASK_FORMAL_NAMES)==len(tasks)` 判 81≠82 而 FAIL,**那一檢 CI 會跑**。抓到它的是推完才跑的全格子(不是我記得)——守則改成:全格子回歸**在推之前**跑。修:manager v0140→v0141 補一行正式名稱 → ⑥ 10/10、合約測 19/19、該站轉綠。另照 LL49 逐檔回退全格子從空沙盒庫再生的 30 個 U/I 頁與 6 本名冊,只留總控頁與元件冊兩個真變更。**這一批的紅燈全數可解釋**:平行 6 敗經第二段序跑 5 站轉綠(duckdb 單寫者鎖撞=假紅,讓庫律),剩的那 1 站就是本筆。教訓 LL117",
+   "batch": 568
+  },
+  {
+   "ts": "2026-09-17 18:30",
+   "op": "FIX",
+   "category": "對接契約",
+   "component": "CGC_MDL158_PEISCapabilityEngine_v0101.py(家族參數切 [,\\s;]+;認不得的指名)+ Register v0216(via-peis 走 ConvertTo-VIACleanArgs)",
+   "code": "批569 工作站實錄:via-peis scan --family vdf,vrn → ABSENT「家族沒有可掃的起點:['vdf vrn']」",
+   "kind": "PowerShell 把 `vdf,vrn` 當**陣列**傳,空白相連,argparse 收到一個字。**冊裡早就有這一課**:`ConvertTo-VIACleanArgs` 的註解逐字寫著同一個坑,我加 via-peis 時沒走它。兩邊都修(PS 走輔助函式 + Python 自己切),四種寫法 `'vdf vrn'`/`'vdf,vrn'`/`['vdf,vrn','vap']`/`'VDF, VRN ;vap'` 同解;認不得的家族指名並列出合法家族。**操作員那一句原樣重跑**:674 檔 · 14,984 函式 → 2,606 能力 · 折疊 10,436 · 省 99.92%。十九檢→二十一檢 21/21。教訓 LL118",
+   "batch": 569
+  },
+  {
+   "ts": "2026-09-17 18:35",
+   "op": "ADD",
+   "category": "增量",
+   "component": "VDF_ENG089_IncrementalFetchGate_v0100.py(scan 水位 · plan 只列缺口 · plan --deep 逐日反連結 · audit 誰抓之前沒看庫;16 檢)",
+   "code": "批569 操作員令「VDF 自2023年後到最新的資料庫增量擷取,不要重複 BATCH FETCHING」",
+   "kind": "同一句話操作員**批383 就說過一次**(「抓過的資料不必再抓」)——說第二次=還在重抓。照 L61 只做第一步、**零改線**:不動任何現役擷取引擎,只把真相攤開。① `scan` 每張表的水位(複用 MDL123 資料家 catalog,不自己再寫一份掃庫=零九頭龍)② `plan` 自 2023-01-01 到最新**只列缺口**,並誠實說「目錄只看得到最早/最新兩點,中間的洞看不到」③ `plan --deep` 逐日反連結(週末不算缺)=真正的不重抓清單 ④ `audit` 靜態指名。**本境實測 audit**:觸網尾版 37 支 · 有看庫 31 · **重抓風險 4**(ENG047 · ENG050 · ENG058 · ENG072)——並在輸出裡明講這是**程式碼層代理指標**,不等於「一定重抓」,真憑實據要在工作站跑 `plan --deep`。零網路 · 唯讀連線 · **沒有 --apply**。自己抓到自己一件:夾具寫得不純(hi 比 until 少一天),檢為了錯的理由紅——修夾具不動程式,並補一張頭尾都缺的表(LL119)",
+   "batch": 569
+  },
+  {
+   "ts": "2026-09-17 18:40",
+   "op": "ADD",
+   "category": "驗證",
+   "component": "VRN_ENG083_VerifiedMatrix_v0100.py(run 代跑 ENG072→ENG073 · matrix 出四態驗證矩陣 + 零 CDN 頁;18 檢)",
+   "code": "批569 操作員令「VRN 用 C:\\測試樣本報告 中的檔案實測,驗證過的輸出用矩陣表示」",
+   "kind": "重點在**「驗證過」**三個字:「有值」不等於「對」。每一格不是「有沒有抓到」,是「抓到而且**驗得過**」,而且**七欄的驗法都寫在檔裡、跑出來逐欄印**(代號要四到六碼且與檔名對得上 · 報告日不得是未來 · 券商要標明出自正典冊 · 評等要落在樞紐的正典詞彙 · 目標價/現價要在 0.2–5.0 · 上漲空間要 upside_state 是 EXACT_MATCH_DB/ROUNDING_ONLY_DB · analyst_n≥1)——操作員看得到我用什麼尺量。四態:GREEN 擷到且驗過 · YELLOW 擷到但驗不過**或**驗不了(理由分得開)· NODATA 沒擷到 · ABSENT 庫裡沒這欄。零九頭龍:`run` 只依序代跑 ENG072→ENG073,不自己再寫一條擷取鏈。零網路 · 唯讀連線(跑完比 mtime 證明)· 零 CDN · 無 --apply。自己抓到自己一件:`in (None,\"\",0)` 判空會把**上漲空間 0.0** 誤判成沒擷到,開特例又換來不一致——改成一條規則管到底並補一檢專釘 0.0(LL119)",
+   "batch": 569
+  },
+  {
+   "ts": "2026-09-17 19:20",
+   "op": "ADD",
+   "category": "法遵",
+   "component": "政策庫 +L64 四階段治理流程 · +L65 Token 撙節 · +L66 凍結與鉤子 · +L67 無損精簡",
+   "code": "批570 操作員令「上面列入邏輯或政策」(四階段流程 + Token 撙節方法論 + 階段四無損精簡,原文)",
+   "kind": "操作員貼了一份完整的治理規格,要求入冊。四條逐字收進政策庫:**L64** 四階段(單元→整合→系統實測→報告;稽核→凍結留鉤子;反碎片化合併成大一統引擎;無損精簡)· **L65** Token 撙節(嚴禁全檔傾倒、本機檔當外部記憶體、直奔重點、結果導向本機文字檔)· **L66** 凍結與鉤子(凍在哪一版+憑什麼凍+哪些還可調,三件缺一不算凍結;解凍不由 AI 代行)· **L67** 無損精簡(零功能損失;精簡後必須重跑測試 100% 通過才准凍)。這一批的 CGC_MDL162 就是 L65/L66 的實作",
+   "batch": 570
+  },
+  {
+   "ts": "2026-09-17 19:30",
+   "op": "ADD",
+   "category": "整合去重",
+   "component": "CGC_MDL162_CommandCardFreeze_v0100.py(指令卡 + 凍結冊;18 檢)· CGC_MDL160_UIUnifyGate_v0100.py(畫面統一三級契約;12 檢)· VDF_ENG090_DataCoverageGate_v0100.py(名單/月營收/總經涵蓋;15 檢)",
+   "code": "批570 操作員令:鎖住指令但未來可調整 · 節省 AI 了解指令的時間 · 兩張名單欄位 · 月營收全部都要 · 總經對上 akshare · 畫面統一",
+   "kind": "**指令卡(MDL162)**:AI 現在要知道 VIA 有哪些指令,唯一辦法是讀 1,100 行的短令冊,每接手一次付一次那個 token。壓成一行一指令的卡(名稱·別名·背後引擎·鉤子·一句話):**冊 39,232 token → 卡 15,393 token,省 60.76%**,而且當場印給你看。凍結照 L66 三件齊,`--apply` 沒帶 `--evidence` 一律擋,`verify` 抓 DRIFT 並指名,**沒有 unfreeze**。**涵蓋閘(ENG090)**:合成一支大一統引擎答三件事(L64 階段三,不為三件事開三支小腳本)——兩張名單的八個欄位逐欄判(缺欄給補法;yfinance sector/industry 要觸網=**GATED**,不與缺件混)· 月營收落後幾個月 · 總經 16 項 × akshare 候選對照(**預設全 UNVERIFIED**,`--probe` 才驗且**不代裝**)。**畫面統一閘(MDL160)**:先量 65 張頁再定契約(零 CDN 只有 56/65、深色模式只有 7/65),分 LAW/UNIFY/ADVISORY 三級,ADVISORY 永不判紅;實測 106 張活頁 **43 張 RED,多數破零 CDN 這條既有律**;**不代改頁**,只指名該由哪支引擎再生",
+   "batch": 570
+  },
+  {
+   "ts": "2026-09-17 19:40",
+   "op": "FIX",
+   "category": "註冊",
+   "component": "撞號更正:CGC_MDL158_PEIS→CGC_MDL161(v0102)· CGC_MDL159_CommandCardFreeze→CGC_MDL162 · CGC_MDL157_v0104 +撞號閘 · 舊件退役",
+   "code": "批570 自查:CGC_MDL160 的 owner 對照印出 CGC_MDL159_VIAUnifiedConsole,才發現號早被佔了",
+   "kind": "**取號之前沒掃樹,兩批犯兩次。**批568 的 MDL158 撞 `VIAPanoramaAuditRepair`,批570 的 MDL159 撞 `VIAUnifiedConsole`。號是元件冊的唯一鍵,一號兩家族=唯一性被自己破掉,而**當批 VCGC ⑬ 照樣綠**(冊按家族名收,從來沒人驗過號)。修:改號 + 舊件退役到 `VIA_RetiredEngines/batch570_number_collision/`(只增不減)+ **守衛加在 CGC_MDL157**(唯一性本來就是它的事),基線 ratchet 收既有的 `CGC_MDL142`(非本線造成,裁定權在操作員),超出基線報紅指名。**寫守衛時又錯一次**:第一版用裸號當鍵,把 `VDF_ENG072`/`VRN_ENG072` 這種**刻意的並存命名空間**也算成撞號,一掃 57 個假紅;改成「前綴+號」才對。另修 MDL162 一個自我過期的尺(⑨ 釘 MDL158 編號,改號就自己紅;改成釘家族名)。教訓 LL120/LL121",
+   "batch": 570
+  },
+  {
+   "ts": "2026-09-17 19:10",
+   "op": "ADD",
+   "category": "對接契約",
+   "component": "Register-VIA-Commands-v0218.ps1(CommandNotFoundAction:via-* 找不到時當場分辨兩種根因)",
+   "code": "批571 工作站實錄:via-cmdcard / via-vdfcov 無法辨識,而同視窗 via-datahome 跑得動",
+   "kind": "**症狀一樣、根因相反,而分辨它每次都要一趟往返。**批564 兩次是真的沒登錄;這次是**視窗點的是舊冊**(v0216 沒有這三令)。修法不是我下次記得問,是讓冊自己講:註冊 `CommandNotFoundAction`,凡 `via-*` 找不到就當場判①**冊上有但本視窗沒點到**——印出本視窗點的版本 vs 磁碟最新版本 + 重點指令;②**冊上也沒有**——那才是真漏登錄,請貼回來。兩條路都在 pwsh 真跑驗過。順帶記一筆:PowerShell **不搜尋目前目錄**,所以 `.cmd` 梭在 PS 裡要打 `.\\via-xxx`;梭是為 cmd 殼設計的,PS 殼靠點源。教訓 LL122",
+   "batch": 571
+  },
+  {
+   "ts": "2026-09-17 19:15",
+   "op": "ADD",
+   "category": "資料",
+   "component": "VDF_ENG090_DataCoverageGate_v0101.py(+lakes:壞檔逐個點名不截斷 · 湖落後庫逐夾算;15 檢→18 檢)",
+   "code": "批571 操作員貼回 via-datahome catalog:fiveday 11 個 PART 壞檔 · px/chip 停 2026-08-25 而庫到 2026-09-16",
+   "kind": "**目錄印了,但沒有引擎追它,等於沒印。**MDL123 老早就把 `bad`(壞檔清單)與 `hi`(最新日)寫進目錄頁,但**沒有下游**——每次都要靠人眼在幾十行輸出裡看見。實錄兩件:① `fiveday` 湖 **11 個 PART 壞檔**(`Invalid Input Error: Failed to read Parquet file`)② px/chip 兩湖停 **2026-08-25**、正典庫到 **2026-09-16**=**落後 22 天**。`lakes` 動詞把它變成有人追的帳:壞檔逐個點名且**理由原樣不截斷**(L62——壞檔的理由是唯一線索)、落後天數逐夾算(>7 天=STALE)、**不刪任何壞檔**(刪不刪、怎麼重建是操作員的手)。自測用合成目錄把三件釘住(理由不截斷 · 22 天算得對 · 不刪)。教訓 LL123",
+   "batch": 571
+  },
+  {
+   "ts": "2026-09-17 19:30",
+   "op": "ADD",
+   "category": "一鍵統包",
+   "component": "Invoke-VIA-OneShot-v0104.ps1(24 段→36 段 · 分母自本檔實掃 · 誠實七態 · 25 加速器 · 動態進度條)",
+   "code": "批572 操作員令「INTEGRATE ALL INTO ONE PS CODE WITH 加速器及動態進度條完成以上」",
+   "kind": "**升尾版,不另開第二支**(零九頭龍:一鍵統包已有正主 v0103)。+12 段把批567–571 長出來的全部收進來:S14 指令卡 · S15 指令凍結驗證 · S16 PEIS 能力掃描 · S17 資料家清點 · S17a 湖壞檔與落後 · S17b 名單欄位 · S17c 月營收涵蓋 · S17d 總經×akshare · S18a 增量缺口 · S18b 重抓風險稽核 · S19 畫面統一 · S20 VRN 驗證矩陣——**12 段全部零網路、零寫、無 --apply**(它們本來就是判定閘,不是動手的引擎)。兩件是這一批真正的修:**① 分母不再手寫**——v0103 寫死 24 靠對帳檢守著,加 12 段手寫必錯;改成自本檔實掃會落一列的呼叫點,扣互斥組與可選列,分子分母同源、加段自動跟上;對帳檢改成「差額由可選列解釋得掉就安靜一行,解釋不掉才逐段**指名**」。**② rc 四態統包這一層沒認**——全庫 py 引擎早就回 0/1/2/3,OneShot 卻「非 0 就 FAIL」;本窗真跑當場撞到 S17 回 rc=2(跑得動但沒料)被印成 FAIL、via-vdfcov 三段 rc=3 也全紅。補上 rc=2→NODATA、rc=3→ABSENT,總表五態擴成**七態**。**真跑驗過**:-DryRun 全 36 段;`-Only S14,S17,S19,S18b` 真跑 → 進度條 `段 23/36 61%`…`段 27/36 72%` 逐段重畫;25 加速器點名在位;修後同一跑 `OK 5 · WARN 1 · FAIL 0 · NODATA 1 · ABSENT 3`。另修兩個手寫脫鉤:橫幅還印 v0103(改自檔名 regex 取)、取版號用 `_v` 而 PS 慣例是 `-v`。教訓 LL124/LL125",
+   "batch": 572
+  },
+  {
+   "ts": "2026-09-17 20:50",
+   "op": "ADD",
+   "category": "交接",
+   "component": "CGC_MDL163_MasterFileCard_v0100.py(母檔卡;14 檢)+ VIA_MasterFile_Card_v0100.md + via-mastercard/母檔卡 + 梭",
+   "code": "批573 操作員令「自動完成 · 自測實測字完成 · **輸出母檔**」",
+   "kind": "**母檔是正本,但正本不該是入口。**母檔正主 `docs/VIA_Handover_ONEPAGE.md` 是 310 KB / 約 **87,932 token**,AI 每接手一次付一次——牴觸剛立的 L65。不再造一份交接(第二顆頭,兩份一定漂移),而是做母檔的**卡**:座標 · 現況數字(律 65 · 教訓 127 · 台帳 1111 · 元件 5314 · 短令 143 · 掉球 68/未結 63)· **按台帳實際引用次數排**的最會咬人的律(前三 L19×4 · L50×3 · L62×3,不是我挑的)· 母檔十六段的段落索引。**87,932 → 1,761 token,省 98%**。三條自我約束:卡第一句就寫「這是索引,不是母檔」· 有一節「這張卡不回答的事」· 容器**不 publish 母檔**(沙盒空,會拿 ABSENT 蓋掉真快照;LL49),但卡可以發布(只讀倉內 SSOT,**任何機器同解**)。教訓 LL127",
+   "batch": 573
+  },
+  {
+   "ts": "2026-09-17 20:55",
+   "op": "FIX",
+   "category": "全景稽核",
+   "component": "VDF_ENG090_DataCoverageGate_v0102.py(akshare probe 改子行程;本引擎零網路庫匯入)+ 舊版退役 + VCGC 元件冊同步",
+   "code": "批573 全格子回歸 232 站:OK 228 · FAIL 2 —— 兩紅都查到根因並修掉",
+   "kind": "**全格子回歸抓到兩紅,其中一紅是我自己的。**① `自動總跑器六檢` 的雙橋稽核判「外呼 51 · **網路缺 1**」,那一支就是我批570 寫的 ENG090:`macro --probe` 裡有 `import akshare as ak`。我當時想「只做 hasattr、沒抓資料」——**但稽核器是對的**:它抓的是行首 `import (…|akshare|…)`,而律(網路只認 AegisNexus)管的正是「網路庫不得在引擎行程內就地匯入」。**沒有去掛 NET-BRIDGE 標記把它消音**(那是為了好看而說謊),而是真的不匯入:probe 改開子行程問「介面在不在」回 JSON,結果一樣、稽核乾淨、子行程死了不帶走本引擎。網路缺 1 → **0**,該站轉綠;舊 v0101 退役到 `VIA_RetiredEngines/batch573_net_import/`(只增不減)。並在自測裡**用稽核器的同一條 regex 驗自己**。② `VCGC ⑬` 元件冊落後(加了 MDL163),`registry-sync --apply` 後 20/20。另六個平行紅經第二段序跑全部轉綠(duckdb 鎖撞=假紅,讓庫律)。教訓 LL126",
+   "batch": 573
+  },
+  {
+   "ts": "2026-09-17 21:40",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL164_GovernanceCompletenessAudit_v0100.py(13 檢)+ 短令 via-govaudit / 制度稽核",
+   "code": "批574 制度健全度稽核:14 庫 + 3 機制,逐本判「冊在 / 有料 / 有活讀者」",
+   "kind": "操作員給十四庫三機制藍圖問「制度健全了嗎 不足補之」。不掃檔案存不存在了事——三條件逐本判,零活讀者判 ORPHAN(不是紅燈,但也沒在治理)。實測 **17/17 GREEN · ORPHAN 0**,深度指標另報 **單一讀者 3 本**(參數庫 via_params_central · 因子庫 VDF_ENG061 · 外部端點庫 via_net_injector)與 **多冊並存 7 處**(同義字管理庫主冊 12 筆,比它名義上治理的 VRN_FieldRules 還薄)。哪一本是正本 = 操作員裁定(LL90),引擎只點名不改字。開發中自抓一紅:PARTIAL 原本比檔數不比逐 glob 命中,已修。教訓 LL128",
+   "batch": 574
+  },
+  {
+   "ts": "2026-09-17 21:40",
+   "op": "UPGRADE",
+   "category": "畫面統一",
+   "component": "CGC_MDL160_UIUnifyGate_v0101.py(15 檢;新增 TARGET 級 + header 動詞)",
+   "code": "批574 Veritas 統一表頭立為第四級 TARGET —— 永不判燈,只報覆蓋率",
+   "kind": "操作員給了 Veritas 統一表頭完整規格(三行 13/26/13px、#8C99A6/#F0F4F8/#737D87、六子系統定位)。先量再定級:本境 106 活頁 `vh_struct 0/106 · vh_three 0/106 · vh_ink 0/106`(vh_brand 40/106),判 LAW 會生 106 假紅、判 UNIFY 會生 106 黃,兩者都會淹掉真正該修的 **43 紅**。故加第四級 TARGET(已立契約尚未施工、不判燈),新增 `header` 動詞印正典規格供施工者抄。上一版釘「三級」的第③檢因此轉紅——修尺不關尺。教訓 LL129",
+   "batch": 574
+  },
+  {
+   "ts": "2026-09-17 23:20",
+   "op": "NEW",
+   "category": "收容",
+   "component": "supportive modules/references/intake/VIA_TwoTools_b575/(兩支獨立工具 + manifest;byte-exact CRLF 原樣)",
+   "code": "批575 收容操作員手上的兩支工具正本 —— 行尾正規化後與庫內掛載本 **完全相同**,沒有版本漂移",
+   "kind": "第一版我拿裸 md5 比,判「上傳比庫內任何一份都新」——**錯的**:差別只是 CRLF/LF。正規化後 VeritasCeleritas.py = supportive modules/VeritasCeleritas.py、VeritasAegisNexus.py = supportive modules/network/VeritasAegisNexus.py,一個位元都不差。與批345 凍結原件的唯一差異是批102 注入的 14 行 ACCEL-BRIDGE。真正的差異只有一處:accelerator/VeritasCeleritas.py 把 talib 整條換成 QuantGuard(L50 合規),但 SUP_MDL737 的 CEL_CANDIDATES 把它排第三=執行期永遠解析不到。",
+   "batch": 575
+  },
+  {
+   "ts": "2026-09-17 23:20",
+   "op": "UPGRADE",
+   "category": "加速器",
+   "component": "CGC_MDL156_VIAAcceleratorControl v0104→v0105(30→35 檢)",
+   "code": "批575 兩支工具的覆蓋尺改寫:分母攤開 + 正向尺 + 解析順序 + L50 曝險 + 正本指紋",
+   "kind": "操作員質問「是不是沒按我要求所有 PY 裝加速器 所有 VDF 裝網路工具」。量完:**他問對了,而且問到的是尺的問題**。③ 全樹分母攤開:3411 支 = 尾版 1571(全問)+ 非尾版 1840,具名豁免 1398 支/18 類,**不明原因沒問 0**。④ 批115 正向尺(舊尺是負向的):VDF 活件 64,量出**缺 3**=ENG088/ENG089/ENG090,全是我自己批569/570/573 新寫的。⑤ 解析順序可指。⑥ L50 曝險:解析首位帶 talib 惰性路徑,本境未安裝故判 PENDING_OPERATOR 不判紅(判紅會變成操作員清不掉的紅燈;一行修法已寫在 detail,裁定權在操作員)。⑦ 收容正本 vs 掛載本指紋一致。教訓 LL130",
+   "batch": 575
+  },
+  {
+   "ts": "2026-09-17 23:20",
+   "op": "FIX",
+   "category": "網路",
+   "component": "VDF_ENG088 v0101(新版:+NET 橋 +第①檢收窄)· ENG089 v0100 / ENG090 v0102(就地補掛 NET 橋)",
+   "code": "批575 補掛批115 VDF 全導入令漏掉的三支 —— 用 via_bridge_sweeper 自己的注入器,位元一致",
+   "kind": "三支都是不 import 網路庫的引擎,所以舊的條件式尺從來沒問過它們。補掛用掃器自己的 NET_BRIDGE 塊(graceful 零行為變更)。ENG088 補完當場紅一檢:它的第①檢禁「importlib 這個字出現在本檔」,而網路橋塊正好用 importlib 載正典網路工具——**舊尺是代理指標,生的是假紅**;收窄成「不得拿 importlib 去載收容件」(排除網路橋塊)後 7/7。因為改到自測尺,ENG088 走尾版律開 v0101,v0100 原地不動(只增不減);短令 via-consensus 用 Get-VIANewest 自動接到新版=**零 PowerShell 改動**(L70)。",
+   "batch": 575
+  },
+  {
+   "ts": "2026-09-18 00:40",
+   "op": "NEW",
+   "category": "畫面統一",
+   "component": "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0100.py(12 檢)",
+   "code": "批576 Veritas 正本頁頭件 —— 畫面統一的唯一出處,且與閘契約耦合",
+   "kind": "18 張紅頁的原因高度集中在頁頭:零 CDN 9 · 零彈窗 4 · viewport 5 · lang 2。每支產頁引擎各抄一份 `<head>` 就會各漏各的(L61 規則收斂律)。立一個頁頭正本:`page()` / `veritas_header()` / `tokens_css()`,一次滿足畫面統一閘的**全部 13 條**契約(LAW 5 + UNIFY 3 + ADVISORY 1 + **TARGET 4**)——Veritas 三行表頭不再只是契約,這裡是真的施工了。自測的做法是**把閘的 CONTRACT 載進來對自己跑**(契約耦合):閘改尺,這裡當場紅,兩邊永遠不會各說各話。零網路 · 零 CDN(系統字體堆疊)· 零彈窗 · 純函式無副作用。**零 PowerShell 改動**(L70:它是程式庫,不需要短令)。",
+   "batch": 576
+  },
+  {
+   "ts": "2026-09-18 00:40",
+   "op": "UPGRADE",
+   "category": "畫面統一",
+   "component": "CGC_MDL160_UIUnifyGate v0101→v0102(15→19 檢)",
+   "code": "批576 U/I 閘自己先套尾版律 —— 106 張是灌水的,真數字是 72 張 RED 18",
+   "kind": "拿批575 剛立的 L68 回頭量自己:ReportDigest 17 份、Hub 9 版、VapDeck 6、GovDeck 5,同一張頁數了很多遍。尾版律後 **72 張 · GREEN 39 · YELLOW 15 · RED 18**,並在 note 裡同時印全掃與尾版兩個數字(分母要看得見)。owner 從「提到檔名就算」收窄成 write/title/mention/none 四級證據(量出 14/42/9/7);none 的頁 plan 改講「**這張頁自己就是正本**」而不是「請操作員指認」。新增第⑯⑰⑱⑲檢,並把 v0101 釘舊行為的第⑨檢一起改掉(尺跟著行為走,不是關掉它)。教訓 LL131",
+   "batch": 576
+  },
+  {
+   "ts": "2026-09-18 01:30",
+   "op": "FIX",
+   "category": "畫面統一",
+   "component": "CGC_MDL160 v0103(19→22 檢)+ MDL096 v0110 / MDL098 v0101 / MDL153 v0101 / SUP_MDL141 v0109 / MDL149 v0114 / vrn_report_digest v0116 + 三張無再生者的頁",
+   "code": "批577 U/I 紅燈 18→6,而且剩下的 5 張全是「頁比引擎舊」不是「引擎沒修」",
+   "kind": "先逐張看紅在哪一個字,抓到 **9 盞假紅**:8 張是本機橋 127.0.0.1(不是 CDN)、1 張是文件裡的 `<code>confirm()</code>`(不是彈窗)。尺收窄(零 CDN 只管第三方且回送位址另計;零彈窗只看 `<script>` 與 `on*`),並用合成頁雙向釘住(真違規仍判紅)。真紅九張逐支修:三支彈窗引擎改**行內提示條**(自帶元素,不動 HTML 模板)、Hub 拿掉 Google Fonts 改系統字體堆疊、VCGC 與 VRN 摘要頁補 viewport、三張無再生者的頁直接補 lang/viewport/移除字體外連。剩 5 張全部 fix_ready。另修:owner 判定排除閘自己(自我指涉的假 owner)、OWNER_SCAN 補上 VIA_Governance_Runtime 與 ui_support(Hub 系列的 owner 住那裡)。教訓 LL132",
+   "batch": 577
+  },
+  {
+   "ts": "2026-09-18 02:20",
+   "op": "UPGRADE",
+   "category": "中央治理",
+   "component": "CGC_MDL164 v0100→v0101(13→16 檢;+books 動詞)",
+   "code": "批578 多冊並存攤成可裁定的對照表;並修掉「開新版號就偽造改善」的自我指涉",
+   "kind": "操作員的待辦是「哪一本是正本」,但批574 只給了檔名清單——那不夠裁定。books 逐組攤開:主/另各幾筆、**頂層鍵**、鍵的交集與各自獨有、誰在讀哪一本、誰比較新,再給一句可裁定的結論。實測 **7 個庫 / 8 組對照**,其中 6 組的鍵**完全不重疊**——那很可能根本是兩件不同的冊,不是同一本的兩個版本,亦即那幾處不是『多冊並存』而是**名冊分類錯了**(引擎只提出,不替操作員決定;LL90)。另外 2 組是真子集(NetGate v0100 被 v0101 包住、AutoCode 的 sha 快照被正本包住),併回後可退役。**修掉一個會偽造改善的 bug**:讀者判定只排除 `__file__`,我一開 v0101 舊版就變成每本冊的第二讀者,單一讀者 3 本當場歸零;改成排除整個家族後回到 3 本(真實)。教訓 LL133",
+   "batch": 578
+  },
+  {
+   "ts": "2026-09-18 02:20",
+   "op": "UPGRADE",
+   "category": "畫面統一",
+   "component": "SUP_MDL750 v0100→v0101(12→16 檢;+adopt())",
+   "code": "批578 既有頁一行接上 Veritas 表頭 —— 冪等、不覆蓋既有版面、只補不刪",
+   "kind": "整頁重寫的成本太高,而且會把人家調好的版面換掉。`adopt(html, \"VeritasDataForge\")` 只做三件事:補齊缺的 lang/viewport/charset(**缺才補**)、注入表頭自己的 CSS 與令牌(**刻意不碰 body/html/\\***)、在 `<body>` 後插入三行表頭並蓋標記。自測證明:接過的舊頁 LAW 五條與 TARGET 四條**一起達成**,既有 `body{background:#fff}` 原封不動,再接一百次還是一個表頭。**本批先交機制不代接線**——操作員說「設計還在進行」,趁他睡覺把 106 張頁的視覺改掉不是我該做的;要開只要在產頁引擎寫檔前加一行。",
+   "batch": 578
+  },
+  {
+   "ts": "2026-09-18 03:05",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL164 v0101→v0102(16→18 檢;+selfref 動詞 + SELFREF_BASELINE 棘輪)",
+   "code": "批579 自我指涉閘 —— 把 LL133 從一條教訓變成一道守得住的閘",
+   "kind": "批578 被自我指涉咬三次,其中一次差點變成假進步。與其記在冊上等下次再踩,不如立閘:掃全樹尾版,找出「在回答**誰引用/誰是 owner/誰是讀者**」的判定器,檢查它有沒有把**自己的家族**排掉。實測 **18 支:SAFE 3 · WEAK_SELF 0 · NO_EXCLUDE 15**。NO_EXCLUDE 不等於一定壞(要它的說明文字剛好提到它在數的名字才會自己算自己),所以**不判紅、走棘輪**:基線內是既有債,**基線外再冒出一支就是紅燈**,新寫的一律要排自己。做這道閘時又踩兩次同類坑:① 第一版沒套尾版律,分母 130(一百多支是歷史版號)→ 18;② WEAK_SELF 第一版只看「檔案裡有沒有 __file__ 這個字」,把 MDL157 解版號、MDL158 自測樣本誤判成 WEAK_SELF,收窄成「在掃描迴圈裡 continue 掉自己」後歸零。**判錯的狀態和判錯的紅燈一樣傷。** 另加第⑱檢:偵測器自己必須是 SAFE,否則它就是在示範反例。",
+   "batch": 579
+  },
+  {
+   "ts": "2026-09-18 03:40",
+   "op": "DOC",
+   "category": "交接",
+   "component": "docs/VIA_Handover_MultiAI_B541.md 第十一段(批575–579)+ B579 文件補「線索不是判定」一節",
+   "code": "批580 自主批的交接段 —— 三律四教訓、五批量到什麼、接手要記得的三件事",
+   "kind": "操作員睡前授權自主推進,五批(575–579)全部推上去。交接段把**下一個接手的人會踩的坑**寫在最前面:① 全格子要在推之前跑(LL117)② LL49 回退清單(全格子會在沙盒再生約 30 個產物,VIA_Schema_Registry 曾少 155 行差點推上去)③ L70 要短令就開新版檔或新動詞。另把 selfref 的 15 支既有債往下看一層:其中 3 支(MDL153 / MDL158 / via_bridge_sweeper)原始碼裡有自家族字面 + 豁免機制,**很可能早就安全**,只是用名單不是家族比對所以偵測器認不出來——**不把「偵測器認不出來」當成「它壞了」**,那又是一種判錯。逐支改時從這 3 支確認起,力氣省下來修真正的 12 支。",
+   "batch": 580
+  },
+  {
+   "ts": "2026-09-18 09:10",
+   "op": "RETIRE",
+   "category": "中央治理",
+   "component": "VIA_NetGate_Wiring_Register_v0100.json · VIA_AutoCode_Registry_v0100_sha1fbffae2.json → VIA_RetiredEngines/batch581_dupbooks/ + CGC_MDL164 v0103(18→20 檢)",
+   "code": "批581 多冊並存清乾淨:真並存 8 組 → **0**",
+   "kind": "操作員令「找到真的刪除舊的」。先做實證據再動手:① **真舊本 2 本**——NetGate v0100 的 92 筆逐鍵都在 v0101 的 94 筆裡(差異只有 42 筆 gated False→True,那是批115 掛上 NET-BRIDGE 之後的正常前進);AutoCode 的 sha 快照 ledger 292/components 147/coexisting 6/categories 25 全在正本裡。兩本**零活引擎在讀**。退役到 VIA_RetiredEngines(只增不減:不硬刪,manifest 記 sha256+零遺失證明+復原指令,git 歷史也還在)。② **分類錯 4 處**——Central_Synonym 掛在 REGEX 庫、VRN_FieldRules 掛在同義字庫、Engine_Consolidation 掛在已用模組庫、VDF_ENG046.py 掛在端點庫(**引擎不是冊**);這四本各自有家,候選拆掉。③ **一庫兩冊分工 2 處**——報表模板+品牌視覺、DB 表綱要+資料家位置,兩本各管一半,本來就該並存,正名不刪。結果 **真並存 0 · 分工 2 · 分類錯 0**。",
+   "batch": 581
+  },
+  {
+   "ts": "2026-09-18 10:30",
+   "op": "FIX",
+   "category": "誠實",
+   "component": "CGC_MDL156 v0106(紅燈指名)· CGC_MDL160 v0104(收回承諾)· CGC_MDL164 v0104(措辭對齊)· Grid v0350",
+   "code": "批582 收回一個我不能證明的承諾 —— 「跑一次再生就會綠」變成「再生一次即可驗證」",
+   "kind": "操作員工作站實錄逼出三件。① `via-accel` 印「RED 33/35」卻不講哪兩檢,他得自己翻 JSON——**紅燈不指名紅在哪等於只講了一半**;selftest 改成逐條印出沒過的檢。② **假綠標記**:他那邊 RED 13 裡有四張(ETFConsensusAnalysis / RevenueConsensusAnalysis / StdDashboard / VRNControlTower)掛著「★ owner 尾版已修好(批577):跑一次再生這張就會綠」,**但那些 owner 我批577 根本沒碰過**。根因是批577 的 `_owner_clean` 只問「owner 尾版原始碼裡找不到這條違規」就下保證:對 viewport/lang 這種正向律還算數,對 zero_cdn/zero_popup 這種**否定律**完全不算數——違規可能來自它 read 進來的樣板檔。三處收窄:弱證據(mention)不給標記、否定律遇到會讀外部樣板的引擎就不下結論、措辭從「就會綠」改成「**再生一次即可驗證**;若仍紅,違規來自它引用的樣板」;自測第㉒檢加一條「全頁不得出現『就會綠』」釘住。標記數 6→2。③ audit 深度行措辭與 books 三分類對齊。",
+   "batch": 582
+  },
+  {
+   "ts": "2026-09-18 11:20",
+   "op": "FIX",
+   "category": "加速器",
+   "component": "CGC_MDL156 v0106→v0107(35→37 檢;路徑正規化 + 第三方環境逐類排除)+ Grid v0351",
+   "code": "批583 兩盞紅燈同一行:未正規化的路徑比對,在 Windows 上讓整份排除清單失效",
+   "kind": "操作員工作站 `via-accel selftest` RED 33/35:① tails=2390 missing=**726**(全是 `venv/Lib/site-packages/pip/…`)② vdf=173 raw_only=**12**(全是 `references/intake` 收容件)。容器裡是 35/35 / tails=1571 / vdf=64。差別不在系統,在**作業系統**:`_live_tail_py` 的 `sp = str(q)` 拿未正規化路徑去比一串正斜線片語,Windows 的反斜線讓 `'references/intake' in sp` 永遠 False,整份清單只剩沒有斜線的 `__pycache__` 有效。修:比對前正規化分隔符,並把第三方環境(venv/.venv/site-packages/node_modules/Lib/quarantine/SCOPE_COPY…)逐類具名排除——**加速器橋差一點就注進 pip 的原始碼**。加兩檢釘住:合成 Windows 路徑驗正規化(沒正規化就會漏,正是那個 bug)、第三方類別逐條在冊。立 L71 跨作業系統同解律,教訓 LL135。附註:這兩盞紅燈查得出來,是因為批582 剛把「紅燈要指名紅在哪」做進 selftest;還是只印「RED 33/35」的話我只能繼續猜。",
+   "batch": 583
+  },
+  {
+   "ts": "2026-09-18 12:10",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL165_CommandRunGate_v0100.py(10 檢)+ Grid v0352 第 242 站",
+   "code": "批584 短令能跑閘:146 個短令逐令解析驗證 —— **待修 0,沒有一個是死的**",
+   "kind": "操作員貼回整份短令清單說「我不懂程式系統,請幫我完成」。可執行的等價說法=**每個短令打下去都要真的有東西跑起來**。逐 `function global:` 解析五種寫法(Get-VIANewest 資料夾×樣式 / 直路徑 / `& cmd /c` 梭 / 轉呼其他短令 / 純行內),驗目標在不在、Python 目標 AST 讀不讀得進來,`--deep` 才真的跑 --selftest。實測 **146 個 · OK 123 · 轉呼 17 · 行內 6 · 待修 0**。過程中我的解析器自己生了三個假紅並全部補掉(via-ves 的 `*` 在資料夾段、兩支 cmd 梭寫法)。本閘從設計上就帶 **UNPARSED**:讀不懂就說讀不懂,不猜也不算過。**只讀 .ps1 絕不改**(L70);零網路;無寫入旗標。教訓 LL136",
+   "batch": 584
+  },
+  {
+   "ts": "2026-09-18 13:10",
+   "op": "FIX",
+   "category": "誠實",
+   "component": "VDF_ENG072_StoryRotationBridge v0100→v0101(缺表誠實 NODATA + 下游誠實跳過)",
+   "code": "批584 via-rotation 紅了卻一行 FAIL 都不印 —— 根因是缺表就丟 CatalogException 整支炸掉",
+   "kind": "`--deep` 逐令真跑之後,五支 SELFTEST_RED 裡四支是缺料(容器空庫),**只有 via-rotation 是真問題**:它 rc=1 卻**一行 FAIL 都印不出來**,因為 `export()` 讀 `tw_chip_inst` 時直接 CatalogException,自測還沒走到 chk 就死了。這與批581 修過的 GRP_ENG041 是同一個模子。修法兩段:① `export()` 先 `show tables` 比對,缺表就回 `state=NODATA` + **指名缺哪幾張**(tw_chip_inst / tw_chip_margin)+ 指路(先跑 via-chip 與 via-daytrade);② 自測看到上游 NODATA 就**誠實跳過下游七檢**並回 **rc=2**(誠實四態),不是接著讀不存在的 parquet 再炸第二次。**缺料不是壞掉(L57);紅燈不指名紅在哪等於只講了一半(批582)。**",
+   "batch": 584
+  },
+  {
+   "ts": "2026-09-18 13:10",
+   "op": "DOC",
+   "category": "調度",
+   "component": "docs/VIA_B584_DispatchCanon.md",
+   "code": "批584 VDF/VRN 調度正典 —— 從台帳 1127 筆挖出真的跑成功過的十二條",
+   "kind": "操作員令「依照過去紀錄找出 vrn vdf 最成功的引擎調度邏輯」。掃全台帳,取**同時命中調度類與實跑成功類**(實跑/實測/端到端/PASS/跑通/收斂/零卡斷)的 179 筆,統計哪些設計被反覆記載。前四名:**尾版 glob 不寫死版號 163 筆 · 讓庫律(單寫者鎖)98 · 逾時 kill 不卡斷 78 · 家族境 python 72**。骨幹元件依被點名次數:SUP_MDL740 統包網路口 11 · SUP_MDL737 加速器口 7 · CGC_MDL148 匯流排 3 · CGC_MDL141 收尾閘 3。兩條鏈的形狀也不同:**VDF 是扇出型**(十道彼此不相依,唯一共用資源是 DuckDB 單寫者鎖 → 並行 + 撞鎖序跑複判);**VRN 是串接型**(每站吃上一站產出 → 扇出無意義,風險在「上游沒料下游假裝有」,所以收尾閘要逐份核對且 PENDING 與 FAIL 分開判)。",
+   "batch": 584
+  },
+  {
+   "ts": "2026-09-18 14:20",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL166_LibraryConsolidationGate_v0100.py(11 檢)+ Grid v0353 第 243 站",
+   "code": "批585 四庫整合遺漏閘:**邏輯庫掛的是 pip 安裝台帳**,參數庫 ocr_budget 被 18 處各寫一份",
+   "kind": "操作員令「參數庫/邏輯庫/政策庫/因子庫 整合有無遺漏」+「**用 PEIS 工具**去查同功能有無遺漏」+「都要註冊」。本閘不重刻掃描器,直接**唯讀**讀 PEIS 能力庫(`via-peis scan --family cgc sup vdf vrn` 先跑:2507 檔 / 47999 函式 → 9134 能力 / 塌縮 31217 / 近似 49978,省 99.97% token)。兩層判定且順序不能顛倒:**① 名實相符**——抓到 `VIA_Lib_Registry_v0100.json` 的 `ledger` 裝的是 **pip 安裝紀錄**,不是業務計算邏輯;判 MISFILED 且**不報它的整合數字**(那個「36 筆」是假的,真正的邏輯庫是空的)。**② 整合遺漏**——判準是 PEIS 的 members>1(同一件事在 N 處各寫一份),不是「冊上沒有」。實測 **GAP 3 · MISFILED 1**:參數庫 `ocr_budget` **18 處** / `panorama_params` 12 / `thread_budget` 10;邏輯庫 `gross_margin` **24 處** / `cjk_ratio` 21;政策庫 `forge_policy` **19 處**;因子庫候選 81。報告自己講出尺的極限(字面比對會低估)。**只提候選不寫冊**(LL90),無寫入旗標,唯讀開庫(mode=ro)。教訓 LL137",
+   "batch": 585
+  },
+  {
+   "ts": "2026-09-18 14:20",
+   "op": "AUDIT",
+   "category": "退役",
+   "component": "退役前的功能遺失掃描(舊版 vs 尾版 AST 符號差,扣掉『搬到別支去了』)",
+   "code": "批585 舊檔有沒有尾版弄丟的功能:348 家族只有 8 個疑似、20 個名目,絕大多數是誤報",
+   "kind": "操作員問「舊檔有沒有我們所缺漏的功能」——退役 1061 支之前該問的正是這個。逐家族比對舊版與尾版的 def/class/argparse 動詞,再**扣掉名字在其他活尾版找得到的**(那是搬家不是丟)。結果:**348 家族,只有 8 個疑似遺失、20 個名目**。逐個查真假:`VIS_VRN_FinancialSSOT` 那 5 個是 **函式名自帶版號後綴**(`..._v0599`/`_v0600`)=誤報;多數其餘是 `_` 開頭的私有重構。唯一值得看的是 `via_net_unified` 的 `net_consent` / `net_ok` / `get_session`——尾版 v0101 是純委派殼,正典本體 SUP_MDL740 v0113 提供的是 `gate_state` / `http_json` / `http_bytes` 等**不同名字**,那三個名字全樹確實沒有了。",
+   "batch": 585
+  },
+  {
+   "ts": "2026-09-18 15:05",
+   "op": "FIX",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0102→v0103(能力庫綁掃描範圍 + 讀時回退)",
+   "code": "批585 根因修:PEIS 的封印跟掃描範圍綁死,換範圍重掃就整支 RED",
+   "kind": "我先用 `--family cgc sup vdf vrn` 掃(2507 檔 / 47999 函式 → 9134 能力),再用 `vdf vrn` 掃 → **RED「封印指紋沒有對應記錄:load.path」**。根因:封印(LOCK)是蓋在某一次掃描的 plan 上的;上一輪蓋在 cgc/sup 能力上的封印,在這一輪較窄的 plan 裡找不到對應記錄,收容正本 `via_unified_engine.py` 直接 raise。**那是收容正本,零觸碰**,所以修在包裝層:能力庫檔名帶**掃描範圍簽章**(`VIA_Capability_Store__<sig>.sqlite`),範圍一樣沿用同一庫(append-only 照舊),範圍不同就各用各的庫,封印永遠只跟自己的 plan 比對;讀的時候先找本範圍、沒有才回退舊單一庫(相容,只增不減)。修後 PEIS 21/21。",
+   "batch": 585
+  },
+  {
+   "ts": "2026-09-18 15:05",
+   "op": "AUDIT",
+   "category": "PEIS",
+   "component": "VRN 同功能整合現況(PEIS 能力庫實查)",
+   "code": "批585 VRN 有沒有透過 PEIS 做同功能整合:有,塌縮 81.8%;但**備用件一支都沒掃到**",
+   "kind": "操作員問「VRN 的引擎有無透過 PEIS 進行同功能整合?包含那些備用的」。實查能力庫:**VRN 全境 12568 函式 → 2282 能力,塌縮率 81.8%**,散在 525 檔;收容 intake 件有掃進去 2870 支、quarantine 46 支。**但備用件是 0**——`_backup` 底下 2 支 VRN .py、`VIA_RetiredEngines` 底下 51 支,PEIS 命中 **0 支**,因為家族起點把那些夾排除了。所以答案分兩半:**活樹有整合(81.8%),備用件完全沒進來**。扣掉泛名之後,VRN 境內真正的同功能重複前幾名:`nlp_hub` 52 份散在 52 檔 · `resolve_db` 48 · `argval` 47 · `kind_expects_ticker` 46 · `purge` 43 · `repair_text` 37 —— 每一個都是同一件事在數十個檔各寫一份。",
+   "batch": 585
+  },
+  {
+   "ts": "2026-09-18 14:40",
+   "op": "ENGINE",
+   "category": "PEIS",
+   "component": "CGC_MDL161_PEISCapabilityEngine_v0104",
+   "code": "批586 死樹兩族納入 PEIS + 斷開閘 + deadcheck 動詞;自測 21→25 檢",
+   "kind": "操作員令「1. yes(備用件也要納入)… 先跟 via / vdf 斷開」。①`retired`/`backup` 兩族改走**全樹 glob**——實測墓園有兩座:根下 `VIA_RetiredEngines/` **0 支 .py**、`functional modules/VIA_RetiredEngines/` **261 支**;寫死根下那座會回報 0=**假的零**。備份夾散在七處,容器樹內 .py **0 支**(誠實報零)。②**斷開**:死樹與活樹不同掃,同掃回 GATED(rc=4)並指名兩條各自的令,兩棵樹兩個庫。③放行門只對本次明示的那一族有效,`references/intake` 永遠不放行。④讀庫回退改挑**最寬的活樹庫**——原本挑最新的,剛掃完 retired 就會拿墓園當能力庫(檢⑱ 當場 FAIL 抓到)。⑤新增 `deadcheck` 動詞。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:45",
+   "op": "AUDIT",
+   "category": "PEIS",
+   "component": "備用件裡有沒有活樹沒有的東西(deadcheck 實查)",
+   "code": "批586 墓園 261 檔 / 3283 函式 → 1595 能力;only_dead 989 · suspect 105 · 人看完剩 2 組",
+   "kind": "死樹能力名 × 活樹能力庫(9134 能力)對名。**only_dead 989 不是答案**——改名/重構就會製造它(批585 量過:348 族疑似 8 族,真掉一族)。詞根比對縮到 120,壓平葉名再縮到 **105**(`misc.walkforward` 被判成活樹沒有,而活樹有 `misc.walk_forward`,差一條底線)。逐條看完 105,真正站得住的兩組:**① OCR 影像前處理**——活樹有 42 個 OCR 能力(tesseract/paddleocr 車道都在),但 `recognize`/`skew_angle`/`denoise`/`grayscale`/`enhance_contrast`/`16bit`/`tiff`/簡繁轉換 **一個都沒有**;**② 盤中 VWAP 防禦與下市情境壓測**(活樹 `vwap` 0、`scenario|stress` 0)。其餘:約 30 個是 **L50 明令禁用的 TA-Lib 指標包**(依法退役,不是遺漏)、其餘是退役的 WorkOps 專案管理件與電影/地理資料集(不在 VIA 範圍)。撿不撿回是操作員裁定(LL90),本批不代撿。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:50",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0354",
+   "code": "批586 PEIS 站 21→25 檢",
+   "kind": "站點用 `newest(\"CGC_MDL161_PEISCapabilityEngine_v*.py\")` 自動指尾版,只改站名檢數與描述(死樹全樹 glob · 斷開不同掃 · 讀庫回退不得挑到墓園)。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:55",
+   "op": "POLICY",
+   "category": "政策",
+   "component": "VIA_Policy_Laws_SSOT_v0100 +L72 +LL138 +LL139",
+   "code": "批586 死樹與活樹不同掃律;假的零跟假綠是同一件事;對名第一層數字永遠不是答案",
+   "kind": "L72 死樹與活樹不同掃律(操作員令「先跟 via / vdf 斷開」;GATED rc=4、兩庫分簽章、讀也要斷)。LL138 假的零——回報「0/無/沒有」的結論都要能說出**尺伸到哪裡**。LL139 對名分兩層,尺報 105、人看完剩 2。律 69→70,課 137→139。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL149 v0114 · CGC_MDL153 v0101 · VERSION 改由檔名推導",
+   "code": "批586 引擎報錯自己的版本:v0114 印 v0113、v0101 印 v0100",
+   "kind": "全格跑到 MDL149 時橫幅印 v0113,而跑的是 v0114 的檔——`VERSION` 是寫死常數,開新版複製時忘了改,於是**每一份它寫的報告**都報錯版本。全樹量:尾版件寫死 `VERSION` 的 **6 支**,錯 **2 支**。兩支都改成 `Path(__file__).stem.rsplit('_v',1)[-1]` 推導。誠實揭露:這件事目前**沒有尺在守**(現況 0 違規,面只有 6 支),先記成 LL140 慣例,不假裝已經有閘。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:12",
+   "op": "FIX",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0104 · deadcheck 扣掉本尺家族(LL133)",
+   "code": "批586 全格 MDL164 檢⑰ 棘輪抓到:新寫的 deadcheck 沒排掉自己家族",
+   "kind": "MDL164 的自我指涉棘輪(LL133)當場報「基線外新增 1 支」——就是我這批新寫的 `deadcheck`。它把活樹能力庫當對照集,而本檔住在 `cgc` 族、自己的函式也會被收成能力進對照集;我多寫一個帶 `recognize` 字樣的函式,墓園那支 `misc.recognize` 就自動不再是疑似=**用自己的版本號製造假進步**。修法:對照集扣掉「只由 `_SELF_FAMILY` 貢獻」的能力,並把扣掉幾個(`self_excluded`)**報出來**。實測目前 0(活樹庫是 v0104 出生前掃的),但機制先在位。棘輪回綠:SAFE 3→4 · 基線外 0。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:14",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "VIA_Component_Inventory_SSOT_v0100(VCGC registry-sync --apply)",
+   "code": "批586 中央元件編號冊補登 7 新 38 變更;MDL149 檢⑬ 5372/5379 → 20/20 綠",
+   "kind": "本批新增兩支尾版件(MDL161 v0104、MDL064 v0354),中央元件自動編號冊沒跟上,MDL149 檢⑬ 報 ACTIVE 5372/5379。由**唯一寫入口** `via-vcgc registry-sync --apply` 補登:新 7 · 變更 38 · **退役 0** · AST 錯 0。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 16:15",
+   "op": "AUDIT",
+   "category": "治理",
+   "component": "PEIS 導入狀態實查(七處逐處點名)",
+   "code": "批587 技術面六處齊、治理藍圖零——跑得起來但沒人管",
+   "kind": "操作員問「這個系統導入了嗎」。逐處量:收容正本 ✅(PEIS_UnifiedEngine_b568,4 檔 sha256)· `via-peis` 短令 ✅(Register v0220,批568 起)· 指令卡 ✅ · 自測格站 ✅(二十五檢)· 政策 SSOT ✅(8 處)· 台帳 ✅(21 筆)· 元件編號冊 ✅(30 筆元件)。**但 CGC_MDL164 的 14 庫+3 機制治理藍圖裡 0 處**。另查:EngineBus 任務盤 0 處——**這是正常的**,治理型引擎(accel/uiunify/govaudit)一個都不在任務盤上,任務盤掛的是 VDF/VRN/VAP 的資料工,不是缺口是分工。MDL139 輸入主控台 0 處(先不碰 HTML,本批不動)。",
+   "batch": 587
+  },
+  {
+   "ts": "2026-09-18 16:18",
+   "op": "PRODUCT",
+   "category": "治理",
+   "component": "VIA Essentia 能力精粹核 · VIA_Essentia_Product_SSOT_v0100.json",
+   "code": "批587 命名 + 產品身分正本 + 列為第 4 自適應機制",
+   "kind": "操作員令「用 VIA 為開頭給他一個商業化名稱 · 註冊導入獨立功能」。名:**VIA Essentia**(拉丁語 essence,對齊 Veritas / Celeritas / Aegis / Nexus 家族)· 中文 **能力精粹核** · 一句話「把一棵長歪的樹,收斂成一本讀得完的書」。產品身分正本寫齊:十一段管線 · 六動詞(status/scan/cards/run/report/deadcheck)· 七保證 · 實測(活樹 2507 檔→9134 能力省 99.97%;VRN 塌縮 81.8%;墓園 261 檔→1595 能力)· 登錄處(**含明列哪裡沒登錄與為什麼**)· 已知債三條。MDL164 v0105 列為**第 4 自適應機制**,從此進中央盤點。",
+   "batch": 587
+  },
+  {
+   "ts": "2026-09-18 16:22",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL164 v0105 · CGC_MDL064_SelftestGrid_v0355",
+   "code": "批587 制度健全度稽核 20→21 檢;順手修掉一個會永遠 PARTIAL 的假黃燈",
+   "kind": "檢② 改判 14 庫 + **4** 機制且末項須為 essentia;+檢②之二 產品身分正本在位(名稱 VIA 開頭 · 中文名 · 動詞 ≥5 · 保證 ≥5 · 引擎 glob 指得到尾版)。第一版我把收容正本 `references/intake/PEIS_UnifiedEngine_b*` 列進承載件,當場 PARTIAL——因為 `references/intake` 在**本閘自己的 SKIP 裡**(正本零觸碰),列了就永遠少一件=**判錯的黃燈**。改列自測格,GREEN。→ L73",
+   "batch": 587
+  },
+  {
+   "ts": "2026-09-18 16:50",
+   "op": "AUDIT",
+   "category": "VDF",
+   "component": "VDF 引擎全境實測(engine 夾尾版 45 支)",
+   "code": "批588 F1:有自測 40 支 → GREEN 36 · RED 3 · NODATA 1",
+   "kind": "RED 三支:ENG061_FeatureStore / ENG062_GroupFeatureLayer 是 **duckdb 鎖衝突**(平行跑搶 `vdf_tw_market.duckdb`,序跑即綠,併發假紅);**ENG070_GroupClassificationIndex_v0111 是真紅**——十八檢 OK 11 FAIL 7(⑦故事性分群 ⑧故事階層守恆 ⑩跨窗比較…)。NODATA 一支:ENG072_StoryRotationBridge_v0101(上游表缺,誠實多態)。另有 5 支 engine 夾尾版**沒有 `--selftest`**:ENG051_ActiveTWETF_Holdings_v0102 / VDF_MDL002 / VDF_MDL003 / VDF_MDL007 / sector_rotation_capital_flow_engine。",
+   "batch": 588
+  },
+  {
+   "ts": "2026-09-18 16:55",
+   "op": "ENGINE",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0105 · +debt +book;自測 25→29 檢",
+   "code": "批588 整合債分層 + 能力卡書;VDF 45 支引擎省 98.39% token",
+   "kind": "`debt`:VDF 1497 份重複拆成 契約 6 類 311 份(律規定每檔都有,**不計債**)· 泛名 9 類 554 份 · **真債 272 類 1186 份**(逐筆附函式名與簽章)。→ L74。`book`:一族一本卡書,45 張卡,519902 → 8392 token。抽取器三個洞全修並釘進自測:用途欄改用 `ast.get_docstring`(批115 的橋注在 docstring 前面,正則抓空 21 支)· 動詞四種分派寫法都要認(只認 argparse 的話空 42 支)· 資料表欄排掉 import 行。→ LL141",
+   "batch": 588
+  },
+  {
+   "ts": "2026-09-18 17:00",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "VDF 真債 × 四庫交叉(參數/邏輯/政策/因子)",
+   "code": "批588 前 40 大 VDF 真債,四冊都查無 35 類",
+   "kind": "四冊都在、名實相符(`VIA_Central_Params_SSOT` / `VIA_Lib_Registry` / `VIA_Policy_Laws_SSOT` / `VIA_Feature_Catalog`),但**沒有覆蓋 VDF 真正的重複**。查無的前幾名:`load.ckpt`/`save.ckpt` 各 32 份 · `_connect_ro` 25 · `_num` 24 · `_tickers_gl` 24 · `_diag` 23 · `write_parquet` 23 · `_data_ready` 21 · `trading_days` 14 · `_fred_key` 14 · ETF/global/us_macro 等 `lane_*` 十餘條各 12 份。用**詞界比對**不用子字串(LL137:`num` 會被 `number`/`enum` 亂命中,兩個方向都會錯)。撿哪些進冊是操作員裁定(LL90),本批不代撿。",
+   "batch": 588
+  },
+  {
+   "ts": "2026-09-18 17:50",
+   "op": "FIX",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0106 · debt 改以家族計;更正批588 的 VDF 數字",
+   "code": "批589 版本史被當成整合債:CGC battery() 258 份=自測格 258 個版號",
+   "kind": "掃 CGC 族當場穿幫:`misc.newest` 451 份 · `battery()`/`run_one()` 各 258 份,而那是 `CGC_MDL064_SelftestGrid` 的 **258 個歷史版號**。`debt` 第一版數的是**檔案**,把版本史整批算成債。更正:加 `_fam_key`(路徑去 `_vNNNN`),分四層——契約 / 泛名 / **版本史** / 真債,真債以**跨家族數**計。批588 報的 VDF「272 類 1186 份」更正為 **56 類 / 90 跨家族**(差 13 倍)。+檢㉚ 釘住。→ LL142",
+   "batch": 589
+  },
+  {
+   "ts": "2026-09-18 17:55",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "三族同線整併實測(VDF · VRN · CGC/SSOT)",
+   "code": "批589 卡書 555 支引擎省 98%+;真債 VDF 56 · CGC 275 · VRN 890 類",
+   "kind": "掃:VDF 144 檔→471 能力(省 99.53%)· VRN 537 檔 12568 函式→2233 能力(省 99.90%)· CGC 825 檔 12751 函式→1390 能力(省 99.93%)。卡書三本共 **555 支引擎**:VDF 45 支 8392 token(省 98.39%)· VRN 342 支 56858 token(省 98.06%)· CGC 168 支 29360 token(省 98.28%)。真債(跨家族)前幾名——VDF:`load/save_ckpt` 各 5 族 · `_num` 5 族 · `write_parquet` 4 族;VRN:`_si` 33 族 · `_cel_submit` 33 族(33 個家族各手寫一份 Celeritas 包裝,**不是律定的橋**,查過加速器橋只 import 不定義函式)· `close()` 32 族 · `export_csv` 29 族 · `_hash8` 28 族;CGC:`newest(pattern, root)` **33 族**各寫一份尾版 glob · `_read_json` 13 族 · `plan()` 12 族。**一份都沒有併**(LL90)。",
+   "batch": 589
+  },
+  {
+   "ts": "2026-09-18 18:00",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0357 · VIA_Essentia_Product_SSOT",
+   "code": "批589 PEIS 站 29→30 檢;產品正本補 VRN/CGC 實測段與一條已知債",
+   "kind": "站名與描述同步四層分法;產品正本 `measured` 補 `vrn_only` / `cgc_only` 兩段與三本卡書路徑,`known_debt` 記下「第一版以檔為單位」這條並指向更正。",
+   "batch": 589
+  },
+  {
+   "ts": "2026-09-18 18:40",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "CGC `newest` 32 份按行為分群",
+   "code": "批590 看起來同一件事,實際是 13 個行為群",
+   "kind": "併之前先量(AST 正規化後比骨架,不比長相):32 份定義 / **13 群**。f88659f52d 10 支 `newest(pattern, root)` · 0cf7954847 6 支 `newest(dirp, pat)`(**參數順序相反**)· 814deab1ca 2 支走 **rglob** · 2c54462eb1 1 支缺件回 `str(folder/pattern)` 不回 None · 358116394a 1 支濾掉 `_sha` · 000606dfba 1 支 pat 帶目錄 · **69abf90773 1 支按 `st_mtime` 排序**(違反尾版律的字典序,但不代改 LL90)· 其餘為守衛與預設值差異。**盲併就是遺失。**→ L75",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 18:50",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL751_VIATailPick_v0100(尾版取用正典)",
+   "code": "批590 一個簽章 + 明示選項 + 逐群重放證零損失(48 組全同)",
+   "kind": "`newest(root, pattern, *, recursive=False, exclude=(), on_missing=None, key='name')`;參數順序相反的那一群給**具名**相容綁定 `newest_pr(pattern, root)`,不用看型別猜路徑的魔法。自測十二檢,核心是第⑫檢:8 種具名變體的**原始實作**原樣抄進來當對照組,× 6 組語料逐一對答案,**48 組全同**。第⑩檢刻意把 mtime 做成跟版號相反,證明 mtime 與字典序**本來就不是同一把尺**。①②③ 第一版是拿字串比自己的原始碼,檢查標籤裡就寫著 `import requests`/`open(`/`CONSENT`,當場自己判自己 FAIL(LL133),改用 AST 問語法樹。",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:00",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "9 支尾版改吃正典綁定;活樹尾版 32→23 家族",
+   "code": "批590 模組層綁定不是再包一層 def,家族數才真的掉",
+   "kind": "遷移 CGC_MDL042/050/064/069/087/125/135/142 與 via_ocr_super 九支尾版:模組層 `def newest|_newest` → `newest = _TP_MOD.newest_pr`。**再包一層橋函式的話家族數不會掉,等於沒併**。正典缺席 → import 時 RuntimeError(**大聲壞掉**,不 graceful 回退——回退等於把重複留著,而尾版取錯是無聲的錯)。`via_selftest_grid_v0105_shac435dd5a` 是 **sha 凍結快照,不得改**。自測格自己也在被遷的九支裡,改用新版號 v0358(尾版律),v0357 還原。逐支冒煙:九支 import 後 `newest` 都解到同一個尾版。→ LL143",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:05",
+   "op": "FIX",
+   "category": "治理",
+   "component": "SUP_MDL751 補加速器橋;MDL156 GREEN 37/37",
+   "code": "批590 全格抓到:新開的正典忘了掛批102 全樹導入令的橋",
+   "kind": "全格跑完 FAIL 2,兩盞都是本批造成的而且都對:① MDL156 加速器覆蓋閘——新開的 `SUP_MDL751` 沒有 `[VIA:ACCEL-BRIDGE]`。「全樹導入」就是全樹,新開的檔沒有豁免權,補上後 **GREEN 37/37**。② MDL149 元件編號冊沒跟上新檔,`registry-sync --apply` 補登:變更 241 · **退役 8**(就是被移除的那幾支 `newest`,冊上誠實記成退役,不是刪)。",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:40",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL751_VIATailPick_v0101 · +bind() 綁定工廠",
+   "code": "批591 群數一多,每群取一個名字會長成 newest_pr_rglob_nosha_mtime",
+   "kind": "剩下的群還差**預設 root**(HERE/VIA/只吃一個參數)、**rglob**、**exclude `_sha`**、**mtime 排序**、**缺件回 pattern**(且命中時也要回 str,型別不能兩樣)。給一個工廠 `bind(order=, root_default=, recursive=, exclude=, on_missing=, key=, stringify=)`:選項留在呼叫端、看得見、可被質疑;回來的是**綁定不是 def**(寫 def 家族數不會掉,LL143)。自測變體表 8→**15 種**、語料組 48→**90 組全同**——**工廠繞出來的路也要證,不能只證直呼**。",
+   "batch": 591
+  },
+  {
+   "ts": "2026-09-18 19:55",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "其餘 22 支尾版改吃正典;活樹 32 → **1** 家族",
+   "code": "批591 收乾淨:剩下的那一個是 sha 凍結快照,不能動",
+   "kind": "逐群配明示綁定式:rp 10 支(MDL136/137/138/139/152/153/095/149/159 · via_conflict_guard)· pr 4 支(MDL078/141/154 · via_tree_atlas)· rglob 2 支(MDL080/104)· root_default=HERE 3 支(MDL082 另加 exclude `_sha` · MDL134 · MDL052)· root_default=VIA 1 支(MDL133)· key=mtime 1 支(MDL119,**違反尾版律但等價遷移不代改** LL90)· on_missing+stringify 1 支(MDL157)。遷移前驗**綁定式用到的 HERE/VIA 在注入點之前已指派**,驗不過判 BLOCKED 不硬幹。逐支冒煙 22/22 都解到同一個尾版。剩 `via_selftest_grid_v0105_shac435dd5a` —— sha 凍結快照,改它 sha 就對不上。→ LL144",
+   "batch": 591
+  },
+  {
+   "ts": "2026-09-18 20:00",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "元件編號冊 · 全格",
+   "code": "批591 registry-sync 變更 491 · 退役 20;全格 OK 242 · FAIL 0",
+   "kind": "被移除的那些 `newest` 冊上誠實記成**退役 20**,不是刪(只增不減)。全格 243 站 OK 242 · FAIL 0 · SKIP 2,零紅。",
+   "batch": 591
+  },
+  {
+   "ts": "2026-09-18 20:30",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "JSON 讀寫 20 處按行為分群",
+   "code": "批592 17 群 / 20 處,而且兩處根本不是檔案 IO",
+   "kind": "照 L75 先分群。跟 `newest`(32 份 13 群,最大一群 10 支全同)**完全不是同一種情況**:20 處 / **17 群**,幾乎每處都不一樣。兩處是 `CGC_MDL095_DeckServer` 的**類別方法**——`_json(self,obj,code)` 發 HTTP 回應、`_read_json(self,cap)` 讀請求 body(Content-Type 驗證 · 拒 Transfer-Encoding · 容量上限),**不得併**,具名進 NOT_FILE_IO。讀的差異:編碼 `utf-8-sig` 7 處 vs `utf-8` 5 處(**活的不一致**)、缺檔/壞檔回什麼。寫的差異:原子寫 / indent(1 三處、2+尾換行一處)/ default=str。→ LL145",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 20:45",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL752_VIAJsonIO_v0100(JSON 讀寫正典)",
+   "code": "批592 讀正典化 · 寫只併證得出位元組相同的;十一檢",
+   "kind": "`read(path, *, missing=None, broken=None, bom=True, strict=False)` —— **缺檔與壞檔是兩個旋鈕**(合成一個 default 會把壞檔說成不存在=假的零,LL138)。`write(path, obj, *, indent=1, ensure_ascii=False, atomic=True, mkdir=True, default=…, newline=False)` —— **indent 與尾換行是產出契約,預設值不代表對**。零損失:讀 **9 種具名變體 × 4 語料(正常/BOM/缺檔/壞檔)全同**;寫 **4 種變體逐位元組相同**。自測第一版的對照組把 `try/except` 抄漏,報「原 EXC ≠ 正典 None」——**紅的是對照組不是正典**,對照組抄錯零損失就是假的。①②③ 也照 LL133 用 AST 問語法樹,不拿字串比自己。",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:00",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "13 支改吃 JSON 正典;模組層 18 → 1",
+   "code": "批592 一支證不過,還原並具名在 NOT_MIGRATED(L75)",
+   "kind": "遷 13 支(MDL058/135/139/140/149/153/154/155/156/163/136/137 · VIA_GovernanceParameterControl)。**`VIA_AutoCodeGenerator` 證不過**:換綁定後 MDL155 檢④⑨ 由綠轉紅(計數累加 index 2 · product 3 · LNK-0004),還原即回 OK 9 · FAIL 0;位元組零損失是過的,差異在呼叫端的狀態語意,根因未明 → **不遷**,名字與理由寫進 `NOT_MIGRATED` 並加檢②之二釘住。另一個坑:同檔兩處要遷時我由下往上改,把**載入器放在後面那一處**,前面那一處先執行就 NameError,四支當場炸——載入器要放在**最前面**那一處。→ LL146",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:05",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0359 · 全格",
+   "code": "批592 +JSON 讀寫正典站;全格 OK 243 · FAIL 0 · SKIP 2",
+   "kind": "站名帶上「證不過的那一支具名在 NOT_MIGRATED」。全格零紅。",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:40",
+   "op": "FIX",
+   "category": "整合",
+   "component": "SUP_MDL752 `_fresh()` · 綁定工廠的可變預設值",
+   "code": "批593 根因:bind_read(missing={}) 的 {} 是同一個物件,呼叫端 append 它",
+   "kind": "`VIA_AutoCodeGenerator.load_json` 原本「檔案不在就回一個空 dict」——**每次都是新的**。遷成綁定工廠後,那個 `{}` 在**工廠建立時求值一次**,呼叫端 `chain_reg.setdefault('codechains', []); chain_reg['codechains'].append(obj)` 直接改它,第二次呼叫拿到被改過的那一份 → 計數累加(index 2 · product 3 · LNK-0004),MDL155 檢④⑨ 由綠轉紅。**位元組層級的零損失自測全過**,因為差異不在輸出而在**回傳值的身分**。修:`_fresh()` 對 dict/list/set/bytearray 回 deepcopy;+檢⑤之二(連呼三次、中間改第一次的回傳值,第二三次必須乾淨)。→ L76 · LL147",
+   "batch": 593
+  },
+  {
+   "ts": "2026-09-18 21:50",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "VIA_AutoCodeGenerator 補遷;模組層 18 → 0",
+   "code": "批593 JSON 讀寫整併收乾淨,NOT_MIGRATED 清空",
+   "kind": "根因查清後補遷,MDL155 回 OK 9 · FAIL 0。活樹尾版**模組層自己定義 JSON 讀寫的家族 0**,14 支改吃正典;唯一剩下的 `CGC_MDL095_DeckServer` 是**類別方法**(HTTP 回應與請求 body),本來就不該併,具名在 NOT_FILE_IO。`NOT_MIGRATED` 清空,根因留在 `RESOLVED`——**根因比結果值錢**。",
+   "batch": 593
+  },
+  {
+   "ts": "2026-09-18 22:00",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0360",
+   "code": "批593 JSON 讀寫正典站 十一→十二檢;全格 OK 243 · FAIL 0",
+   "kind": "站名帶上根因。全格 245 站零紅。",
+   "batch": 593
+  },
+  {
+   "ts": "2026-09-18 22:40",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "VRN 前幾大共用小工具按行為分群",
+   "code": "批594 尾版 170 支 / 定義 68 處 / 18 群(全在模組層)",
+   "kind": "`_cel_submit` 17 處 4 群(差別只在有沒有第二層退路)· `_si` 17 處 4 群(**有一群用 bare `except:`**,連 SystemExit 都吞——潛在缺陷不是風格)· `_hash8` 14 處 2 群(**有一處根本沒有 xxhash 分支**)· `_jwrite` 14 處 3 群(mkdir / default / 吞不吞例外)· `_argval` 3 處 2 群 · `_num` 2 處 2 群。`close` / `export_csv` 是類別方法,不是共用小工具,具名不遷。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 22:55",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL753_VIACommonUtils_v0100(VRN 共用小工具正典)",
+   "code": "批594 十四檢;`_jwrite` 轉接 SUP_MDL752,不另造 JSON 寫法",
+   "kind": "`safe_import(catch_all=)` · `cel_submit(_submit_fallback=)` · `hash8(errors=, prefer_xxhash=)` · `num` · `argval(as_path=)` · `nan_safe` · `bind_jwrite(mkdir=, default=, quiet_fail=)`。零損失:`_jwrite` 三群**逐群比位元組全同**。`prefer_xxhash=False` 是為了保住那一處沒有 xxhash 分支的實作——併成預設值等於悄悄改掉它產生的所有 id。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 23:10",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "13 支 VRN 尾版改吃正典;**`_cel_submit` 17 處出貨前擋下**",
+   "code": "批594 早綁不等於晚讀 —— L76 同族的第二種長相",
+   "kind": "遷 13 支(`_si`/`_hash8`/`_jwrite`/`_argval`/`_num`),逐支冒煙 BAD/EXC 0。**`_cel_submit` 17 處具名不遷**:它讀的 `_CEL`/`_CEL_OK` 檔頭是 `None`/`False`,真值由開機函式 `global` 事後填;模組層綁定會在 import 當下把 `False` 凍住,開機後永遠走不到池子,**而且不會報錯只是變慢**。過程中還發現偵測器把 `_CEL: Any = None`(AnnAssign)認不到,8 支誤判 BLOCKED——**BLOCKED 的是尺不是檔**。→ L76 擴充 · LL148",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 23:15",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0361 · 全格",
+   "code": "批594 +VRN 共用小工具正典站;全格 OK 244 · FAIL 0 · SKIP 2",
+   "kind": "registry-sync:變更 104 · 退役 7。全格零紅。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-19 00:00",
+   "op": "FIX",
+   "category": "紀律",
+   "component": "批594 自糾:遷移腳本改到收容正本與退役件,已還原",
+   "code": "寫檔的腳本沒有排除清單 —— 兩條核心律同一個原因",
+   "kind": "遷移腳本掃 `functional modules/VRN` 整棵子樹,改到 `references/intake/GenericLayoutEngine_.../generic_layout_engine.py`(**收容正本零觸碰**)與 `_superseded/20260804/` 五支(**退役件不是活樹**)。commit 前 `git status` 發現,全部 `git checkout` 還原,收容夾 diff 為空。**這不是尺量錯,是我根本沒給尺邊界**;前四批遷 registry 時剛好沒有 intake 子夾,一路沒事叫運氣不叫紀律。→ L77 掃描根一律帶排除清單律 · LL149",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-19 00:05",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL164 v0106 +`intake` 收容正本零觸碰閘;二十一→二十二檢",
+   "code": "批594 58 夾 GREEN 23 · RED 0 · UNKEPT 10 · NODATA 25",
+   "kind": "逐夾比 sha。**RED 只給「檔案在、sha 對不上」**(那才叫正本被改);原件沒留(多半是上傳的 .zip 解開後沒留)=UNKEPT;沒有可比的 sha=NODATA ——**兩者都不算綠**。做的過程踩兩個坑:①又中 L71——`source_path` 是 Windows 絕對路徑,Linux 取 `.name` 拿到整串,14 夾假紅,正規化分隔符後 RED 14→0;②第一版把「原件沒留」也算 RED,那是判錯的紅燈,拆成兩態。**誠實揭露:這道閘擋不下本批那一筆**——那個收容夾沒有 manifest,落在 NODATA 25 裡;閘的價值是把 25 夾具名列出不算綠,真正擋下的是排除清單。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-19 00:40",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "SUP_MDL754_VIAIntakeBaseline_v0100(收容夾基線冊)",
+   "code": "批595 25 夾 NODATA → 0;十檢",
+   "kind": "MDL164 是**唯讀稽核**(檢①就是零寫入倉),所以寫冊另立一支——**尺不寫字,寫字的另外一支**。零觸碰保證:只新增 `_INTAKE_BASELINE_b595.json`(檔名跟既有 `_INTAKE_MANIFEST.json` 不同,不覆蓋任何人的冊),寫入前後各算一次全夾 sha 逐檔比對,動到既有檔案就報紅停手。**空夾也照寫**——空不等於沒查過(自測⑩ 當場抓到我第一版用 `any()` 判,空夾寫完還被當成沒冊)。冊裡強制帶 `baseline_note`:**基線不是「沒被動過」的證明**。",
+   "batch": 595
+  },
+  {
+   "ts": "2026-09-19 00:50",
+   "op": "AUDIT",
+   "category": "治理",
+   "component": "收容夾 58 個 · NODATA 25 → 0",
+   "code": "批595 GREEN 23→46 · RED 0 · UNKEPT 10→12 · NODATA 25→0",
+   "kind": "兩件事分開做:①**修尺**——兩夾其實有 `sha256` + **`source`**(不是 `source_path`)的寫法,解析器認不得,**NODATA 有一部分是尺不認得不是樹沒有**;②**補冊**——其餘 23 夾寫基線,565 檔入冊。git 驗:收容夾底下只多出 21 個未追蹤檔、**既有檔 0 個被改**。誠實兩條:`TALib/...b519` 是空夾(git 不追蹤空目錄,基線冊是它唯一的檔);`daytrade_files/` 自己有 `.gitignore: *`,**整夾刻意不入倉**,它的基線冊不會被提交,**在乾淨 clone 上會回到 NODATA——本機綠不等於倉裡綠**。",
+   "batch": 595
+  },
+  {
+   "ts": "2026-09-19 01:10",
+   "op": "POLICY",
+   "category": "政策",
+   "component": "L50 補執法憑據(操作員令「不可使用 TA-LIB 用 QuantGuard 取代」)",
+   "code": "批595 條文早在 B531 就有;補的是憑據與釘版失效",
+   "kind": "查完:**L50(B531)原文一字不差就是操作員這句話**。真正該補的是:①正典替代路徑**具名**(`VDF_ENG086_QuantGuardOneBridge_v*` · `via-quantguard` · `VIA_QuantGuard_TA_Lib_Policy_v0100.json` · 收容正本 `VIA_QuantGuard_v20260916`)②`enforcement` 原本**釘死 v0100**,而尾版是 v0107/v0101——改成 glob ③**實測憑據**:活樹尾版 2604 支,真的 `import talib` 的 **0 支**。→ LL150",
+   "batch": 595
+  },
+  {
+   "ts": "2026-09-19 01:15",
+   "op": "FIX",
+   "category": "稽核",
+   "component": "禁用律的尺不能用字串比對(578 → 0)",
+   "code": "批595 我第一版量出「活件曝險 578 處」,那是假的",
+   "kind": "用 `talib` 當關鍵字全樹掃 → 578 處。逐項拆開:**版本史**(SelftestGrid 180 個歷史版號、DeckServer 11 個各算一次)+ **治理件因為在禁它才提到它**(MDL156 曝險檢、站名、ToolLadder 排除清單)。換成**只看尾版 × 只比 import 語句**:**0 支**。跟 LL142 同族——**量的單位不對,數字就沒有意義,而且偏向「看起來更該做事」**;照 578 去清理,清掉的會是自己的執法程式。附帶自糾:我把那 578 筆**整份印出來**,自己燒掉一大段上下文,而操作員先前才糾正過同一件事。→ LL150",
+   "batch": 595
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "FIX",
+   "category": "引擎",
+   "component": "VDF_ENG070_GroupClassificationIndex v0112(VDF 唯一真紅)",
+   "code": "根因 = 空表守衛少一欄,整段分析被 except 吞掉而 rc 仍 0",
+   "kind": "`capital_style()` 的空表守衛回四欄(缺 `story`),有料路徑是五欄;金流整庫缺(`tw_chip_inst` 不在)時 `build_master` 的 `merge(cs, on=[\"ticker\",\"story\"])` → `KeyError: 'story'`。整段故事性分群包在 `try:` 裡,`except` 把例外塞進 `story[\"err\"]` 就丟掉——**存證沒有這個欄位、rc 照樣 0**,MASTER_LIST/ROTATION/WINDOW_COMPARE/STORY_CLASS/STORY_MEMBER 五種產物全部悄悄不見。三修:①守衛欄位與語意齊(整庫無金流=每列「候料」)②故事段三態入存證 `meta.story_state`,RED 時 `run()` 回 1 ③自測缺件報 NODATA 指名缺因,不再崩在 `_latest(...).read_text()`。實測 十八檢三態 OK 18/FAIL 0/NODATA 0;強制注入例外的對照組:rc=1、`story_state=RED`、自測 OK 10/FAIL 1/NODATA 7(不崩、不假綠)",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "ADD",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid v0363(+三站;245 → 248)",
+   "code": "ENG070 的真紅之所以躲得住,是格子裡從來沒有它的站",
+   "kind": "量法:VDF 引擎尾版 **38 支有 `--selftest`**,格內 **29 支有站**,缺的正是 VDF_ENG070/071/072。三站期望值都用 `nodata_ok`(rc0 或 rc2 皆 OK,**rc1 照樣紅**)。本境實測:ENG070 十八檢三態 OK 18(72s)· ENG071 六檢 OK 6(37s)· ENG072 八檢 OK 1/NODATA 1/SKIP 6(rc2,上游籌碼表缺)。**「引擎有自測」和「自測有人跑」是兩件事,只有後者算治理。**",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "ADD",
+   "category": "政策",
+   "component": "L78 空表守衛同構律 · LL151 被接住的例外必須改變某個看得見的東西",
+   "code": "AST 尺已立並以對照組驗過",
+   "kind": "L78 的尺:同函式內 `return pd.DataFrame(columns=[...])` 的欄集 vs `append({...})` 的鍵集,少者點名。對照組 ENG070 **v0111 抓到 1 處、v0112 為 0**(尺不是壞的);全樹尾版 360 支掃出 **0 處**(唯讀掃描,已套 L77 排除清單)。LL151 記三件:`err` 欄位不是存證 · rc 必須帶狀態 · 自測不能崩在缺件上(把缺料報成壞掉,跟把壞掉報成沒事一樣傷)。",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:45",
+   "op": "FIX",
+   "category": "引擎",
+   "component": "VAP_ENG015_SeabornStackBridge v0104(修好上游,下游第一次被走到)",
+   "code": "環境缺件被報成壞掉——ENG070 修好之後才量得出來",
+   "kind": "ENG070 v0112 讓 `ROTATION_*.json` **第一次真的產出**,`build_heatmap` 這條路才第一次被走到,於是量到本境根本沒裝 **seaborn**:收容包 `vap_seaborn_stack_generator.py` 一 import 就 `ModuleNotFoundError`,而 v0103 把它報成 **FAIL**。這正是 LL151 第三條的鏡像:**把環境缺件報成壞掉,跟把壞掉報成沒事一樣傷**。v0104 加 `_absent_mod()`:收容包 import 不到自己的相依 → 誠實 **SKIP 並指名缺哪一支**,**不代裝套件**。收容正本(`references/intake/VIA_VAPSeabornStack_b327/`)一個位元組沒動。實測 九檢 OK 9 · FAIL 0,④ 的註記是「收容包相依缺席:seaborn(不代裝套件;裝了再跑)」。",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:45",
+   "op": "SYNC",
+   "category": "註冊",
+   "component": "VIA_Component_Inventory_SSOT v0100(VCGC registry-sync --apply)",
+   "code": "新 4 · 變更 92 · 退役 0 · AST錯 0",
+   "kind": "本批新增三個版本檔(ENG070 v0112 / SelftestGrid v0363 / VAP_ENG015 v0104)後,CGC_MDL149 第⑬檢報 `ACTIVE 5340/5343` 紅——**功能註冊七處漏了元件自動編號冊**。同步後綠。逐鍵驗過這份 diff 只動 `source`(尾版路徑前移)/`line`(行號位移)/`changed_at`,加 4 筆新記錄,**零 ACTIVE→RETIRED**(只增不減沒有被破)。",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 12:40",
+   "op": "ADD",
+   "category": "治理",
+   "component": "全樹加速器/網路工具導入(BridgeSweeper --apply;63 檔)",
+   "code": "ACCEL 2585/2648 → **100%**;NET(真擷取檔)本來就 100%",
+   "kind": "操作員令「將全部 PY 檔案導入加速器 VeritasCeleritas / 網路工具 VeritasAegisNexus」。注入 63 檔(VDF 5 · VRN 32 · supportive 26),VAP 本來就滿。**跑之前先驗 L77**:拿 BridgeSweeper 自己的 `_excluded()` 去問風險集合——`_superseded` 缺橋 0 支、`_sha` 缺橋 2 支但**兩支都被排除**,所以 `--apply` 碰不到收容正本/退役件/凍結快照;跑完 `git status` 逐檔複驗:63 檔全是 .py,**零 L77 違規**,全數編譯通過。**鏈是實證的不是文字**:`VIA_SuperAccel_Module.celeritas()` 真的回到 `supportive modules/VeritasCeleritas.py` 這個模組物件。另外更正一個尺:`--subsystems` 報的「VDF/net 181/189 95.8%」是**錯的尺**——它沒帶 `--net-callers`,把 161 支非擷取檔也算進分母;正確的尺(批402 立的)是 28 掛/0 缺/**100%**。",
+   "batch": 597
+  },
+  {
+   "ts": "2026-09-18 12:40",
+   "op": "FIX",
+   "category": "正典",
+   "component": "SUP_MDL751_VIATailPick v0102(+2 檢 → 十四檢)",
+   "code": "`**` 樣式以前**靜默回 None**",
+   "kind": "`newest(root, \"**/x.py\")` 會把 `root/**` 當成一個不存在的目錄(`p.parent`),`base.is_dir()` False → hits=[] → **回 None**。呼叫端看到的是「沒找到」,而不是「這支不支援」——跟批596 的假綠同一個病(LL151)。改成 `**` 在樣式裡就直接交給 `Path.glob`。量過:活樹 32 個呼叫端**目前沒有人傳 `**`**,所以這是補洞不是修災情。另加 `bind(attr=, missing=)`:VDF_ENG073 那一群要的是**檔名字串 + 缺件回空字串**,`stringify=True` 給的是整條路徑,兩者不一樣。",
+   "batch": 597
+  },
+  {
+   "ts": "2026-09-18 12:40",
+   "op": "ADD",
+   "category": "正典",
+   "component": "SUP_MDL753_VIACommonUtils v0101(+2 檢 → 十六檢)· VIA_LibCanon.py(新;七檢)",
+   "code": "num(drop=, positive=) · argval(default=, dashdash=)",
+   "kind": "VDF 五支 `_num` **分群之後是五個群**,不是同一件事:兩支純轉換(零差異)、一支哨兵含 'nan'(量到 2 處差異)、兩支只收正數(量到 8 處差異)。強行併成一支就是遷出行為變更,所以差異寫成參數。`argval` 補 `default`(VDF 活樹是**位置參數**在用)與 `dashdash`(VDF 那三支不把 `--` 開頭的下一個 token 當成沒有值,正典會)。`default` 每次回**新的一份**(L76/LL147,接 SUP_MDL752 的 `_fresh`)。`VIA_LibCanon.py` = 穩定名字的轉接口(跟 `VIA_SuperAccel_Module` 同角色),底下尾版律接三本正典,呼叫端不寫死版號;缺席**大聲拋**不 graceful。",
+   "batch": 597
+  },
+  {
+   "ts": "2026-09-18 12:40",
+   "op": "FIX",
+   "category": "整併",
+   "component": "VDF 三庫整併:12 支尾版引擎 · 15 支函式 → 正典綁定",
+   "code": "零損失逐群證過才遷;證不出來的一支都沒遷",
+   "kind": "**先更正一個量**:PEIS 的 debt 報 `_num` 24 檔、`_connect_ro` 25 檔、`_diag` 23 檔——那是**含版本史**的數字。只看**活樹尾版**(VDF 65 支),真正的重複是 `_num` 5 · `_newest` 4 · `_write_json` 4 · `_arg` 3。遷的是這 15 支(扣掉 ENG056 那支帶 2 秒節流的類別方法 `_write_json`=NOT_SAME_THING 不遷)。遷法是**模組層綁定**不是再包一層 `def`(LL143)。12 支引擎自測全部 FAIL 0。新立 `VIA_Logic_Registry_v0100.json` 記路由與證據;舊的「邏輯庫」`VIA_Lib_Registry_v0100.json` **一個位元組沒動**——它其實是 pip 安裝台帳(名實不符,MDL166 判 MISFILED),要改名成什麼是**操作員裁定**(LL90),本批只記不改。**因子庫本批沒動**,MDL166 量到的 5 個候選只列不寫。",
+   "batch": 597
+  },
+  {
+   "ts": "2026-09-18 12:40",
+   "op": "SCAN",
+   "category": "資料",
+   "component": "2023-07-01 起增量擷取:實測缺口 + 授權閘實證",
+   "code": "GATED(擷取授權旗標未開)——**不代設同意閘**",
+   "kind": "先補 `via-datahome catalog`(ENG089 原本 ABSENT 就是缺這一頁),再量:38 表 · **18 表有缺**。逐日尺(ENG064 `--gap-mode plan`)對 `tw_daily_prices`:**缺 170,655 個(日期×票)鍵**,既有 578,625,涉及 829 個交易日候選 × 892 檔,逐年 2023:130 · 2024:262 · 2025:261 · 2026:176。本容器的庫**從 2024-01-02 才開始**,所以 2023-07-01→2023-12-29 整段是空的;`tw_chip_inst` / `tw_chip_margin` **連表都不存在**(批596 那個空表守衛走的就是這條路)。真要擷取需要 `VIA_NET_CONSENT` + `VIA_SCRAPE_CONSENT`,兩個都**沒設也不由我設**;實跑 `--gap-mode fetch` 驗過閘:回 `state=GATED · why=擷取授權旗標未開`,**沒有碰網路**。",
+   "batch": 597
+  },
+  {
+   "ts": "2026-09-18 14:30",
+   "op": "ADD",
+   "category": "治理",
+   "component": "CGC_MDL149 v0115 `matrix` —— 中央管理系統的矩陣控制台(via-vcgc matrix)",
+   "code": "一行跑法都不自己寫;既有三支正典串起來合成一頁",
+   "kind": "操作員令「在中央管理系統設一個管理啟動各子系統及引擎及設定參數的指令…已經內建指令全景式修復工具,引擎請用他節省 TOKEN」。**先量再動**:量到啟動側 `CGC_MDL148 EngineBus` 早就有 `catalog/matrix/call`(冊 **63 項**,不是文件寫的 37),測試側 `CGC_MDL158 全景稽核修復` 早就有 `run_tests`(誠實四態,而且 `judge()` 是看引擎自己印的那句話,不是 rc)與 `scan`(修復候選),頁頭側 `SUP_MDL750` 是 U/I 統一閘認的正本。所以新動詞只做**編排**:四個正典呼叫 `bus.catalog` / `bus.matrix` / `rep.run_tests` / `rep.scan`,全部**尾版律 import**、缺席大聲拋。第㉑檢就是釘這件事——四個呼叫缺一個就 FAIL,因為那代表又造了一支匯流排。**零 .ps1 改動**:`via-vcgc` 本來就把 args 全轉給尾版 MDL149,所以 `via-vcgc matrix` 立刻可用(L70)。",
+   "batch": 598
+  },
+  {
+   "ts": "2026-09-18 14:30",
+   "op": "ADD",
+   "category": "U/I",
+   "component": "VIA_UI_MatrixControl_v0100.html(一頁四矩陣;via-vcgc matrix 產)",
+   "code": "零 CDN · 零彈窗 · 欄寬是量出來的",
+   "kind": "四張矩陣:①子系統×引擎×參數冊 ②啟動矩陣(`--ids` 單獨啟動)③引擎檢查邏輯誠實四態(`--engine` 單獨測一支)④全景修復候選(**只列不修**)。**自動調節欄寬**:逐欄量每一格的**顯示寬度**(CJK 算 2 格)取最大,夾在 [6ch, 44ch]——夾上限是因為一格塞 200 字會把其他欄擠成一條線,**最佳化不是讓某一欄贏,是讓整頁讀得動**;第㉒檢用合成語料真跑證明「窄 6 < 寬 32 < 上限、超長夾成 44」。卡片用 `repeat(auto-fit, minmax(min(100%,30rem),1fr))`,手機自動收成一欄。**壞的排前面**,紅列底色標出來。頁頭/主題令牌/頁腳走 SUP_MDL750 正本,所以 U/I 統一閘 22/22 照樣綠。",
+   "batch": 598
+  },
+  {
+   "ts": "2026-09-18 14:30",
+   "op": "SCAN",
+   "category": "實測",
+   "component": "via-vcgc matrix 首跑實測",
+   "code": "冊 63 項 · 調度 63 PLAN · 引擎 GREEN 16 / RED 1 · 修復候選 111 處",
+   "kind": "第一次跑報 **RED**,而且那支紅的是 **CGC_MDL149 自己**——因為我新增了 v0115,元件自動編號冊還沒同步(⑬ `ACTIVE 5332/5339`)。**這不是巧合,是這個矩陣第一次就抓到了本批自己的缺口**。`registry-sync --apply`(新 7 · 變更 71 · 退役 0)之後 MDL149 自測 **22/22**。修復候選 111 處是 `CGC_MDL158 scan` 的既有讀數,**只列不修**——要修得走 `via-panorama fix --apply`,那是另一個明點。",
+   "batch": 598
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "SET",
+   "category": "參數",
+   "component": "統一起始 2023-01-01 → **2023-07-01**(via-console set group-start;5 個群組)",
+   "code": "起始日在**參數庫**裡,不是矩陣的旗標",
+   "kind": "操作員令「啟動指令透過 VRN VDF 2023-07-01~今」。起始日的正本是 `VIA_InputConsole_Spec_v0100.json` 的 `user.group_starts`(批392 立的「整類遮罩」),不是隨手的 CLI 參數——所以照冊設:`tw_equity` / `macro` / `financials` / `etf` / `intl` **五個群組全設 2023-07-01**,`defaults.start` 的 2023-01-01 **不動**(群組值優先,只增不減)。逐鍵複驗過冊裡真的寫進去了,不是只看 `OK:` 那行。**VRN 的 `pipeline` 群組沒有任何日期參數**(15 項的參數是 `dir`/`codes`/`limit`/`in`/`out`),所以「2023-07-01~今」對 VRN 是 **no-op**——講成「VRN 也跑了這個區間」就是假的。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL149 v0116 `matrix --family vdf,vrn`(多家族)+ 頁上帶參數冊現值",
+   "code": "冊 48 項 = vdf 33 + vrn 15",
+   "kind": "`bus.catalog()` 只吃單一家族,所以逐家取再串——**串的是正典的輸出,不是自己重查一遍冊**(L80)。另加 `_mx_param_note()`:把 `user.group_starts` 的**現值**印在頁的範圍列上。理由:起始日不是矩陣的旗標,它在參數庫裡;頁上看不到現值的話,「跑了 2023-07-01 起」這句話**沒有出處**。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 16:00",
+   "op": "RUN",
+   "category": "實測",
+   "component": "via-vcgc matrix --family vdf,vrn --apply(起始 2023-07-01)",
+   "code": "48 項 → GREEN 23 · GATED 15 · RED 3 · NODATA 3 · PLAN 2 · ABSENT 2",
+   "kind": "**GATED 15 才是那句令真正的答案**:起始日照冊設好了,但要抓資料的 15 支(tw_prices_inc / tw_history / tw_chips / tw_trading_value / tw_daytrade_stock / tw_daytrade_files / macro_fred / macro_detail / macro_lanes / fin_statements / tw_revenue_codes / tw_revenue_backfill / estimate_bands / global_universe / global_lanes)**全部卡在同意閘**,引擎自己 fail-closed 印「同意閘未開(VIA_NET_CONSENT/VIA_SCRAPE_CONSENT)」——**閘是操作員的手,不代設**。3 紅拆開:`vdf/tw_align` 是**真資料紅**(逐日 價 892 · 籌碼 **0** · MISALIGNED,本容器籌碼表空);`vdf/vdf_quantguard_run` 與 `vrn/vrn_unified` 是**缺必要參數**(`[NEED_INPUT] run requires --in`、`at least one --in file/directory is required`),冊上參數欄寫著 `in,out` 但沒人給值——**要填什麼是操作員裁定,只點名不代填**。PLAN 2 = 寫庫動詞(`tw_universe_update` / `db_localdb_apply`),家族全掃永不代跑,要跑得 `--ids` 明點。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 16:00",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL139_InputConsole v0109 —— 自測沙盒基線",
+   "code": "設過參數就把自測弄紅的尺,是壞的尺",
+   "kind": "照冊設了 `user.group_starts` 五個群組之後,MDL139 自測**四檢連紅**:②⑥⑨ 寫死「統一起始 **2023-01-01**」、④ 寫死「changelog **兩筆**」——那是**操作員還沒設過任何參數**時的樣子。也就是說:**用了這本冊該有的功能,它自己的尺就翻臉**。逐項二分證過:清空 `group_starts` → 4 紅剩 1;再移走 datahome 目錄 → 仍剩 ④(changelog 已有 5 筆 ≠ 2)。v0109 修法:斷言用的 spec 一律先把**操作員設定過的那一塊**(`starts` / `group_starts` / `changelog`)回到空基線——**量的是「給這些輸入會產生什麼 argv」,不是「這台機器現在設了什麼」**。實測:帶著 2023-07-01 的設定、帶著 datahome 目錄、在格子的 PYTHONPATH 下,**18/18 全綠**。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 17:10",
+   "op": "ADD",
+   "category": "啟動器",
+   "component": "launchers/Invoke-VIA-AcceleratedTest-v0103.ps1(ALL-IN-ONE 全系統加速實測)",
+   "code": "v0102 → v0103:25 名冊 · 不卡斷 · 全部系統 · 產出驗證",
+   "kind": "操作員令「一個 ALL-IN-ONE PS CODE,加 25 的加速器,不卡斷,啟動實測全部系統生成輸出並驗證,指令前都要先進入環境」。**先量再造(L80)**:量到 `launchers/Invoke-VIA-AcceleratedTest-v0102.ps1` 已經在,所以**接它的版**不另開一支平行啟動器。四個改法各對一段令:① 25 名冊——v0102 卡在 `if ($Roster.Count -ne 20) { throw }`,**那是 20 的那本冊**;v0103 點源 `VIA_PS_Accelerators_25_Roster_v0100.ps1`,而且數量不符**從 throw 降成 WARN**(名冊不對是治理問題,不是今天不准跑實測的理由)。② 不卡斷——v0102 是 `$ErrorActionPreference='Stop'` + 每步 rc≠0 就 `throw`,**第一盞紅就整條停**,而且讀取迴圈**沒有死線**,引擎一掛就掛到天亮;v0103 每步 try/catch + **逐步逾時只殺自己生的那個子行程** + 失敗照樣往下,最後一次點名。③ 全部系統——補上全格自測/矩陣控制台/全景稽核/U/I 統一閘/制度健全度,共 12 步。④ **產出驗證**——v0102 的「通過」只看 rc;v0103 多一段 VERIFY,逐個產出比**存在 + mtime ≥ 開跑時間** → FRESH/STALE/MISSING,因為**舊檔還在不等於這一跑產出了東西**。環境:所有 python 一律走中央唯一入口 `Invoke-VIAPython -Family`(它自帶 25 加速器控制面與逾時不卡斷);家族境解析不到會退 base,**不 throw**但標 `ENV_FALLBACK` 紅字提醒「能跑 ≠ 在本位跑」。rc 誠實三態 0/1/2。",
+   "batch": 600
+  },
+  {
+   "ts": "2026-09-18 17:10",
+   "op": "FIX",
+   "category": "實測",
+   "component": "不卡斷核心的獨立實證(而且第一版的實證是**壞的**)",
+   "code": "TIMEOUT · GREEN · NODATA · GATED · RED —— 五態逐一量到",
+   "kind": "本容器有 `pwsh`,所以不是只看語法:①`Parser::ParseFile` 語法 OK(2267 權杖);②把逾時迴圈抽成獨立 harness,拿五個假子行程真跑——睡 600 秒的那支在 **3.1s 被殺掉**、其餘四支照樣跑完並各自判成 GREEN/NODATA(rc2)/GATED(rc4)/RED(rc1)。**第一版 harness 是壞的**:我把參數命名成 `$Args`,那是 PowerShell 的**自動變數**,綁不進去→`python3` 沒收到參數→改讀 stdin→**五步全部逾時**,看起來像迴圈壞了。改名 `$ChildArgs` 才量到真的。教訓同 LL152:**量出來的紅,先問是不是尺自己壞了**。v0103 本體用的是 `$Arguments`,沒有這個撞名(已逐一掃過 Args/Input/Error/Host/Matches/PSItem/This 全無)。另外逐項驗過:VERIFY 的 6 個期待路徑**全部存在**、9 個引擎 glob **全部解析得到尾版**——不然會報一堆假的 MISSING/ABSENT。",
+   "batch": 600
   }
  ],
- "updated_at": "2026-09-17 16:20",
- "batch": 565
+ "updated_at": "2026-09-18 17:10",
+ "batch": 600
 }

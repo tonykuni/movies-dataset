@@ -3,13 +3,13 @@
  "ts": "2026-09-07",
  "policy": "批390 操作員令「左面板輸入/右面板顯示;VDF 查詢標的分類細項(總體經濟 PMI/通膨/就業…;台股 TWSE/TPEX 可新增代碼);起始日期個別可改;財報當季/累計/年度年起迄;DEFAULT 皆最新;目前資料庫狀況;日交易與籌碼數量對齊=更新股票清單並核對一致;輸出 parquet 增量+DuckDB 管理;右側矩陣篩選/大到小排列;Windows U/I 下拉/勾選/全選/全不選;VRN 資料夾拖曳輸入/啟動/互動動畫/高自動化;VRN 整體跑況 BASIC INFO/SUMMARY/FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面簡單但保留個別改動;VAP 同」。零發明:每一項目綁定母倉現役引擎與其真旗標(尾版 glob);引擎缺=誠實 PLANNED 不假跑;預設 start=latest=不帶旗標=引擎增量律;user 段=操作員個別改動(只增不減;台股代碼/財報期別鏡寫 VDF_Input_Interface_Matrix 活冊)。 批392 操作員令:「參數最小化:VRN 只透過 Windows I/O 或拖曳(檔案及資料夾)啟動就跑;台股除財報可選股票外其他抓全部;國際資訊現有哪些/增減哪些=勾選放右面板;啟動跑一切+輸入及運作結果矩陣;TAB2 BASIC INFO(核對態)/TAB3 SUMMARY 矩陣/TAB4 FINANCIAL DATA 核對(報告歷史值≠報告值時以 VDF 抓來的歷史值為主);起始時間統一 2023-01-01 至最新,可整類改起始日(YYYY-MM-DD 遮罩輸入,'-' 固定,未輸入前淺色 YYYY-MM-DD);VAP 規格細節與圖片顯示;VDF/VRN/VAP 跑成功了嗎」",
  "defaults": {
-  "start": "2023-01-01",
+  "start": "2023-07-01",
   "period": "年度",
   "days": 20,
   "vap_code": "2330",
   "vap_formats": "svg,html",
   "vap_profile": "vap_spec_v1",
-  "start_note": "批392 統一起始 2023-01-01 → 最新;整類(群組)可改 user.group_starts[group]=YYYY-MM-DD|latest;單項 user.starts[item] 優先"
+  "start_note": "批600 操作員令「測試日統一改為 2023-07-01 起」:預設起始 2023-01-01 → **2023-07-01**(批392 的 2023-01-01 退場);整類(群組)可改 user.group_starts[group]=YYYY-MM-DD|latest;單項 user.starts[item] 優先。"
  },
  "param_kinds": {
   "range": "--start YYYY-MM-DD --end YYYY-MM-DD(成對;ENG064 律 <2022-01-01 抬升)",
@@ -7653,8 +7653,61 @@
    "config": ""
   },
   "global_cats": [],
-  "changelog": [],
-  "group_starts": {}
+  "changelog": [
+   {
+    "ts": "2026-09-18 12:02",
+    "ops": {
+     "group-start": "intl:2023-07-01"
+    },
+    "notes": [
+     "OK:group_start[intl]=2023-07-01"
+    ]
+   },
+   {
+    "ts": "2026-09-18 12:02",
+    "ops": {
+     "group-start": "tw_equity:2023-07-01"
+    },
+    "notes": [
+     "OK:group_start[tw_equity]=2023-07-01"
+    ]
+   },
+   {
+    "ts": "2026-09-18 12:02",
+    "ops": {
+     "group-start": "macro:2023-07-01"
+    },
+    "notes": [
+     "OK:group_start[macro]=2023-07-01"
+    ]
+   },
+   {
+    "ts": "2026-09-18 12:02",
+    "ops": {
+     "group-start": "financials:2023-07-01"
+    },
+    "notes": [
+     "OK:group_start[financials]=2023-07-01",
+     "MIRROR:1 筆鏡寫 VDF_Input_Interface_Matrix_v0100.json"
+    ]
+   },
+   {
+    "ts": "2026-09-18 12:02",
+    "ops": {
+     "group-start": "etf:2023-07-01"
+    },
+    "notes": [
+     "OK:group_start[etf]=2023-07-01"
+    ]
+   }
+  ],
+  "group_starts": {
+   "intl": "2023-07-01",
+   "tw_equity": "2023-07-01",
+   "macro": "2023-07-01",
+   "financials": "2023-07-01",
+   "etf": "2023-07-01"
+  }
  },
  "contract_sync_ts": "20260916_151847",
  "batch": "CGC_MDL157"
