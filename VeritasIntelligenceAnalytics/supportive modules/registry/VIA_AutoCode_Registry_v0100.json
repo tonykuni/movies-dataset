@@ -8379,8 +8379,17 @@
    "code": "批582 收回一個我不能證明的承諾 —— 「跑一次再生就會綠」變成「再生一次即可驗證」",
    "kind": "操作員工作站實錄逼出三件。① `via-accel` 印「RED 33/35」卻不講哪兩檢,他得自己翻 JSON——**紅燈不指名紅在哪等於只講了一半**;selftest 改成逐條印出沒過的檢。② **假綠標記**:他那邊 RED 13 裡有四張(ETFConsensusAnalysis / RevenueConsensusAnalysis / StdDashboard / VRNControlTower)掛著「★ owner 尾版已修好(批577):跑一次再生這張就會綠」,**但那些 owner 我批577 根本沒碰過**。根因是批577 的 `_owner_clean` 只問「owner 尾版原始碼裡找不到這條違規」就下保證:對 viewport/lang 這種正向律還算數,對 zero_cdn/zero_popup 這種**否定律**完全不算數——違規可能來自它 read 進來的樣板檔。三處收窄:弱證據(mention)不給標記、否定律遇到會讀外部樣板的引擎就不下結論、措辭從「就會綠」改成「**再生一次即可驗證**;若仍紅,違規來自它引用的樣板」;自測第㉒檢加一條「全頁不得出現『就會綠』」釘住。標記數 6→2。③ audit 深度行措辭與 books 三分類對齊。",
    "batch": 582
+  },
+  {
+   "ts": "2026-09-18 11:20",
+   "op": "FIX",
+   "category": "加速器",
+   "component": "CGC_MDL156 v0106→v0107(35→37 檢;路徑正規化 + 第三方環境逐類排除)+ Grid v0351",
+   "code": "批583 兩盞紅燈同一行:未正規化的路徑比對,在 Windows 上讓整份排除清單失效",
+   "kind": "操作員工作站 `via-accel selftest` RED 33/35:① tails=2390 missing=**726**(全是 `venv/Lib/site-packages/pip/…`)② vdf=173 raw_only=**12**(全是 `references/intake` 收容件)。容器裡是 35/35 / tails=1571 / vdf=64。差別不在系統,在**作業系統**:`_live_tail_py` 的 `sp = str(q)` 拿未正規化路徑去比一串正斜線片語,Windows 的反斜線讓 `'references/intake' in sp` 永遠 False,整份清單只剩沒有斜線的 `__pycache__` 有效。修:比對前正規化分隔符,並把第三方環境(venv/.venv/site-packages/node_modules/Lib/quarantine/SCOPE_COPY…)逐類具名排除——**加速器橋差一點就注進 pip 的原始碼**。加兩檢釘住:合成 Windows 路徑驗正規化(沒正規化就會漏,正是那個 bug)、第三方類別逐條在冊。立 L71 跨作業系統同解律,教訓 LL135。附註:這兩盞紅燈查得出來,是因為批582 剛把「紅燈要指名紅在哪」做進 selftest;還是只印「RED 33/35」的話我只能繼續猜。",
+   "batch": 583
   }
  ],
- "updated_at": "2026-09-18 10:30",
- "batch": 582
+ "updated_at": "2026-09-18 11:20",
+ "batch": 583
 }
