@@ -507,11 +507,30 @@ RATING_LIST: tuple = (
 )
 
 
-def _num(s: str) -> float | None:
-    try:
-        return float(s.replace(",", ""))
-    except Exception:
-        return None
+# ===== [VIA:COMMONUTILS-BRIDGE:v0100] VRN 共用小工具正典橋(批594;正典 SUP_MDL753)=====
+# 本處原本的行為:逗號千分位 → float / None
+# 批594 量過:VRN 尾版 170 支 · 定義 68 處 · **18 個行為群**(全部在模組層)。
+# 差異是真的:`_cel_submit` 兩群差在「有沒有第二層退路」;`_si` 有一群用 **bare `except:`**
+# (連 SystemExit 都吞——**那是潛在缺陷不是風格**,正典給選項等價遷移,不代改 LL90);
+# `_jwrite` 三群差在 mkdir / default / 吞不吞例外,而且**底下直接接批592 的 SUP_MDL752**,
+# 不另造一支 JSON 寫法。綁定不是 def(寫 def 家族數不會掉,LL143);
+# 可變預設值由正典 `_fresh()` 保證每次新的一份(L76)。
+import importlib.util as _cu_ilu
+from pathlib import Path as _cu_Path
+_CU_MOD = None
+_cu_p = _cu_Path(__file__).resolve()
+while _cu_p.parent != _cu_p:
+    _cu_hits = sorted((_cu_p / "supportive modules").glob("SUP_MDL753_VIACommonUtils_v*.py"))
+    if _cu_hits:
+        _cu_spec = _cu_ilu.spec_from_file_location("VIA_COMMONUTILS", _cu_hits[-1])
+        _CU_MOD = _cu_ilu.module_from_spec(_cu_spec)
+        _cu_spec.loader.exec_module(_CU_MOD)
+        break
+    _cu_p = _cu_p.parent
+if _CU_MOD is None:
+    raise RuntimeError("[FAIL] 共用小工具正典缺席:supportive modules/SUP_MDL753_VIACommonUtils_v*.py")
+_num = _CU_MOD.num
+# ===== [VIA:COMMONUTILS-BRIDGE:END] =====
 
 
 def date_from_token(tok: str) -> str:
@@ -2320,15 +2339,7 @@ def selftest() -> int:
     return 1 if fails else 0
 
 
-def _argval(args: list, flag: str) -> Path | None:
-    """旗標取值(缺值=誠實 None,不 IndexError);批425 與 ENG072/ENG074 同慣例"""
-    if flag not in args:
-        return None
-    i = args.index(flag) + 1
-    if i >= len(args) or args[i].startswith("--"):
-        print(f"[旗標] {flag} 後面沒有值=忽略(誠實提示,不當作預設)")
-        return None
-    return Path(args[i])
+_argval = _CU_MOD.bind_argval(as_path=True)
 
 
 def main() -> int:

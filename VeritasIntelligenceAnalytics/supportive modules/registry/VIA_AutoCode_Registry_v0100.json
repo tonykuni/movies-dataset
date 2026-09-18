@@ -8721,8 +8721,62 @@
    "code": "批593 JSON 讀寫正典站 十一→十二檢;全格 OK 243 · FAIL 0",
    "kind": "站名帶上根因。全格 245 站零紅。",
    "batch": 593
+  },
+  {
+   "ts": "2026-09-18 22:40",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "VRN 前幾大共用小工具按行為分群",
+   "code": "批594 尾版 170 支 / 定義 68 處 / 18 群(全在模組層)",
+   "kind": "`_cel_submit` 17 處 4 群(差別只在有沒有第二層退路)· `_si` 17 處 4 群(**有一群用 bare `except:`**,連 SystemExit 都吞——潛在缺陷不是風格)· `_hash8` 14 處 2 群(**有一處根本沒有 xxhash 分支**)· `_jwrite` 14 處 3 群(mkdir / default / 吞不吞例外)· `_argval` 3 處 2 群 · `_num` 2 處 2 群。`close` / `export_csv` 是類別方法,不是共用小工具,具名不遷。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 22:55",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL753_VIACommonUtils_v0100(VRN 共用小工具正典)",
+   "code": "批594 十四檢;`_jwrite` 轉接 SUP_MDL752,不另造 JSON 寫法",
+   "kind": "`safe_import(catch_all=)` · `cel_submit(_submit_fallback=)` · `hash8(errors=, prefer_xxhash=)` · `num` · `argval(as_path=)` · `nan_safe` · `bind_jwrite(mkdir=, default=, quiet_fail=)`。零損失:`_jwrite` 三群**逐群比位元組全同**。`prefer_xxhash=False` 是為了保住那一處沒有 xxhash 分支的實作——併成預設值等於悄悄改掉它產生的所有 id。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 23:10",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "13 支 VRN 尾版改吃正典;**`_cel_submit` 17 處出貨前擋下**",
+   "code": "批594 早綁不等於晚讀 —— L76 同族的第二種長相",
+   "kind": "遷 13 支(`_si`/`_hash8`/`_jwrite`/`_argval`/`_num`),逐支冒煙 BAD/EXC 0。**`_cel_submit` 17 處具名不遷**:它讀的 `_CEL`/`_CEL_OK` 檔頭是 `None`/`False`,真值由開機函式 `global` 事後填;模組層綁定會在 import 當下把 `False` 凍住,開機後永遠走不到池子,**而且不會報錯只是變慢**。過程中還發現偵測器把 `_CEL: Any = None`(AnnAssign)認不到,8 支誤判 BLOCKED——**BLOCKED 的是尺不是檔**。→ L76 擴充 · LL148",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-18 23:15",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0361 · 全格",
+   "code": "批594 +VRN 共用小工具正典站;全格 OK 244 · FAIL 0 · SKIP 2",
+   "kind": "registry-sync:變更 104 · 退役 7。全格零紅。",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-19 00:00",
+   "op": "FIX",
+   "category": "紀律",
+   "component": "批594 自糾:遷移腳本改到收容正本與退役件,已還原",
+   "code": "寫檔的腳本沒有排除清單 —— 兩條核心律同一個原因",
+   "kind": "遷移腳本掃 `functional modules/VRN` 整棵子樹,改到 `references/intake/GenericLayoutEngine_.../generic_layout_engine.py`(**收容正本零觸碰**)與 `_superseded/20260804/` 五支(**退役件不是活樹**)。commit 前 `git status` 發現,全部 `git checkout` 還原,收容夾 diff 為空。**這不是尺量錯,是我根本沒給尺邊界**;前四批遷 registry 時剛好沒有 intake 子夾,一路沒事叫運氣不叫紀律。→ L77 掃描根一律帶排除清單律 · LL149",
+   "batch": 594
+  },
+  {
+   "ts": "2026-09-19 00:05",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL164 v0106 +`intake` 收容正本零觸碰閘;二十一→二十二檢",
+   "code": "批594 58 夾 GREEN 23 · RED 0 · UNKEPT 10 · NODATA 25",
+   "kind": "逐夾比 sha。**RED 只給「檔案在、sha 對不上」**(那才叫正本被改);原件沒留(多半是上傳的 .zip 解開後沒留)=UNKEPT;沒有可比的 sha=NODATA ——**兩者都不算綠**。做的過程踩兩個坑:①又中 L71——`source_path` 是 Windows 絕對路徑,Linux 取 `.name` 拿到整串,14 夾假紅,正規化分隔符後 RED 14→0;②第一版把「原件沒留」也算 RED,那是判錯的紅燈,拆成兩態。**誠實揭露:這道閘擋不下本批那一筆**——那個收容夾沒有 manifest,落在 NODATA 25 裡;閘的價值是把 25 夾具名列出不算綠,真正擋下的是排除清單。",
+   "batch": 594
   }
  ],
- "updated_at": "2026-09-18 22:05",
- "batch": 593
+ "updated_at": "2026-09-19 00:10",
+ "batch": 594
 }
