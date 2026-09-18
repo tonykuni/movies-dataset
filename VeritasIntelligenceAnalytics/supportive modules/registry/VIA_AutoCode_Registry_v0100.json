@@ -8811,8 +8811,53 @@
    "code": "批595 我第一版量出「活件曝險 578 處」,那是假的",
    "kind": "用 `talib` 當關鍵字全樹掃 → 578 處。逐項拆開:**版本史**(SelftestGrid 180 個歷史版號、DeckServer 11 個各算一次)+ **治理件因為在禁它才提到它**(MDL156 曝險檢、站名、ToolLadder 排除清單)。換成**只看尾版 × 只比 import 語句**:**0 支**。跟 LL142 同族——**量的單位不對,數字就沒有意義,而且偏向「看起來更該做事」**;照 578 去清理,清掉的會是自己的執法程式。附帶自糾:我把那 578 筆**整份印出來**,自己燒掉一大段上下文,而操作員先前才糾正過同一件事。→ LL150",
    "batch": 595
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "FIX",
+   "category": "引擎",
+   "component": "VDF_ENG070_GroupClassificationIndex v0112(VDF 唯一真紅)",
+   "code": "根因 = 空表守衛少一欄,整段分析被 except 吞掉而 rc 仍 0",
+   "kind": "`capital_style()` 的空表守衛回四欄(缺 `story`),有料路徑是五欄;金流整庫缺(`tw_chip_inst` 不在)時 `build_master` 的 `merge(cs, on=[\"ticker\",\"story\"])` → `KeyError: 'story'`。整段故事性分群包在 `try:` 裡,`except` 把例外塞進 `story[\"err\"]` 就丟掉——**存證沒有這個欄位、rc 照樣 0**,MASTER_LIST/ROTATION/WINDOW_COMPARE/STORY_CLASS/STORY_MEMBER 五種產物全部悄悄不見。三修:①守衛欄位與語意齊(整庫無金流=每列「候料」)②故事段三態入存證 `meta.story_state`,RED 時 `run()` 回 1 ③自測缺件報 NODATA 指名缺因,不再崩在 `_latest(...).read_text()`。實測 十八檢三態 OK 18/FAIL 0/NODATA 0;強制注入例外的對照組:rc=1、`story_state=RED`、自測 OK 10/FAIL 1/NODATA 7(不崩、不假綠)",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "ADD",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid v0363(+三站;245 → 248)",
+   "code": "ENG070 的真紅之所以躲得住,是格子裡從來沒有它的站",
+   "kind": "量法:VDF 引擎尾版 **38 支有 `--selftest`**,格內 **29 支有站**,缺的正是 VDF_ENG070/071/072。三站期望值都用 `nodata_ok`(rc0 或 rc2 皆 OK,**rc1 照樣紅**)。本境實測:ENG070 十八檢三態 OK 18(72s)· ENG071 六檢 OK 6(37s)· ENG072 八檢 OK 1/NODATA 1/SKIP 6(rc2,上游籌碼表缺)。**「引擎有自測」和「自測有人跑」是兩件事,只有後者算治理。**",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:10",
+   "op": "ADD",
+   "category": "政策",
+   "component": "L78 空表守衛同構律 · LL151 被接住的例外必須改變某個看得見的東西",
+   "code": "AST 尺已立並以對照組驗過",
+   "kind": "L78 的尺:同函式內 `return pd.DataFrame(columns=[...])` 的欄集 vs `append({...})` 的鍵集,少者點名。對照組 ENG070 **v0111 抓到 1 處、v0112 為 0**(尺不是壞的);全樹尾版 360 支掃出 **0 處**(唯讀掃描,已套 L77 排除清單)。LL151 記三件:`err` 欄位不是存證 · rc 必須帶狀態 · 自測不能崩在缺件上(把缺料報成壞掉,跟把壞掉報成沒事一樣傷)。",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:45",
+   "op": "FIX",
+   "category": "引擎",
+   "component": "VAP_ENG015_SeabornStackBridge v0104(修好上游,下游第一次被走到)",
+   "code": "環境缺件被報成壞掉——ENG070 修好之後才量得出來",
+   "kind": "ENG070 v0112 讓 `ROTATION_*.json` **第一次真的產出**,`build_heatmap` 這條路才第一次被走到,於是量到本境根本沒裝 **seaborn**:收容包 `vap_seaborn_stack_generator.py` 一 import 就 `ModuleNotFoundError`,而 v0103 把它報成 **FAIL**。這正是 LL151 第三條的鏡像:**把環境缺件報成壞掉,跟把壞掉報成沒事一樣傷**。v0104 加 `_absent_mod()`:收容包 import 不到自己的相依 → 誠實 **SKIP 並指名缺哪一支**,**不代裝套件**。收容正本(`references/intake/VIA_VAPSeabornStack_b327/`)一個位元組沒動。實測 九檢 OK 9 · FAIL 0,④ 的註記是「收容包相依缺席:seaborn(不代裝套件;裝了再跑)」。",
+   "batch": 596
+  },
+  {
+   "ts": "2026-09-18 11:45",
+   "op": "SYNC",
+   "category": "註冊",
+   "component": "VIA_Component_Inventory_SSOT v0100(VCGC registry-sync --apply)",
+   "code": "新 4 · 變更 92 · 退役 0 · AST錯 0",
+   "kind": "本批新增三個版本檔(ENG070 v0112 / SelftestGrid v0363 / VAP_ENG015 v0104)後,CGC_MDL149 第⑬檢報 `ACTIVE 5340/5343` 紅——**功能註冊七處漏了元件自動編號冊**。同步後綠。逐鍵驗過這份 diff 只動 `source`(尾版路徑前移)/`line`(行號位移)/`changed_at`,加 4 筆新記錄,**零 ACTIVE→RETIRED**(只增不減沒有被破)。",
+   "batch": 596
   }
  ],
- "updated_at": "2026-09-19 01:20",
- "batch": 595
+ "updated_at": "2026-09-18 11:45",
+ "batch": 596
 }
