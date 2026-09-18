@@ -8361,8 +8361,17 @@
    "code": "批580 自主批的交接段 —— 三律四教訓、五批量到什麼、接手要記得的三件事",
    "kind": "操作員睡前授權自主推進,五批(575–579)全部推上去。交接段把**下一個接手的人會踩的坑**寫在最前面:① 全格子要在推之前跑(LL117)② LL49 回退清單(全格子會在沙盒再生約 30 個產物,VIA_Schema_Registry 曾少 155 行差點推上去)③ L70 要短令就開新版檔或新動詞。另把 selfref 的 15 支既有債往下看一層:其中 3 支(MDL153 / MDL158 / via_bridge_sweeper)原始碼裡有自家族字面 + 豁免機制,**很可能早就安全**,只是用名單不是家族比對所以偵測器認不出來——**不把「偵測器認不出來」當成「它壞了」**,那又是一種判錯。逐支改時從這 3 支確認起,力氣省下來修真正的 12 支。",
    "batch": 580
+  },
+  {
+   "ts": "2026-09-18 09:10",
+   "op": "RETIRE",
+   "category": "中央治理",
+   "component": "VIA_NetGate_Wiring_Register_v0100.json · VIA_AutoCode_Registry_v0100_sha1fbffae2.json → VIA_RetiredEngines/batch581_dupbooks/ + CGC_MDL164 v0103(18→20 檢)",
+   "code": "批581 多冊並存清乾淨:真並存 8 組 → **0**",
+   "kind": "操作員令「找到真的刪除舊的」。先做實證據再動手:① **真舊本 2 本**——NetGate v0100 的 92 筆逐鍵都在 v0101 的 94 筆裡(差異只有 42 筆 gated False→True,那是批115 掛上 NET-BRIDGE 之後的正常前進);AutoCode 的 sha 快照 ledger 292/components 147/coexisting 6/categories 25 全在正本裡。兩本**零活引擎在讀**。退役到 VIA_RetiredEngines(只增不減:不硬刪,manifest 記 sha256+零遺失證明+復原指令,git 歷史也還在)。② **分類錯 4 處**——Central_Synonym 掛在 REGEX 庫、VRN_FieldRules 掛在同義字庫、Engine_Consolidation 掛在已用模組庫、VDF_ENG046.py 掛在端點庫(**引擎不是冊**);這四本各自有家,候選拆掉。③ **一庫兩冊分工 2 處**——報表模板+品牌視覺、DB 表綱要+資料家位置,兩本各管一半,本來就該並存,正名不刪。結果 **真並存 0 · 分工 2 · 分類錯 0**。",
+   "batch": 581
   }
  ],
- "updated_at": "2026-09-18 03:40",
- "batch": 580
+ "updated_at": "2026-09-18 09:10",
+ "batch": 581
 }
