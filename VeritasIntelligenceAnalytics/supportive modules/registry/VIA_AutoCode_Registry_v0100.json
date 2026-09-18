@@ -8541,8 +8541,35 @@
    "code": "批587 制度健全度稽核 20→21 檢;順手修掉一個會永遠 PARTIAL 的假黃燈",
    "kind": "檢② 改判 14 庫 + **4** 機制且末項須為 essentia;+檢②之二 產品身分正本在位(名稱 VIA 開頭 · 中文名 · 動詞 ≥5 · 保證 ≥5 · 引擎 glob 指得到尾版)。第一版我把收容正本 `references/intake/PEIS_UnifiedEngine_b*` 列進承載件,當場 PARTIAL——因為 `references/intake` 在**本閘自己的 SKIP 裡**(正本零觸碰),列了就永遠少一件=**判錯的黃燈**。改列自測格,GREEN。→ L73",
    "batch": 587
+  },
+  {
+   "ts": "2026-09-18 16:50",
+   "op": "AUDIT",
+   "category": "VDF",
+   "component": "VDF 引擎全境實測(engine 夾尾版 45 支)",
+   "code": "批588 F1:有自測 40 支 → GREEN 36 · RED 3 · NODATA 1",
+   "kind": "RED 三支:ENG061_FeatureStore / ENG062_GroupFeatureLayer 是 **duckdb 鎖衝突**(平行跑搶 `vdf_tw_market.duckdb`,序跑即綠,併發假紅);**ENG070_GroupClassificationIndex_v0111 是真紅**——十八檢 OK 11 FAIL 7(⑦故事性分群 ⑧故事階層守恆 ⑩跨窗比較…)。NODATA 一支:ENG072_StoryRotationBridge_v0101(上游表缺,誠實多態)。另有 5 支 engine 夾尾版**沒有 `--selftest`**:ENG051_ActiveTWETF_Holdings_v0102 / VDF_MDL002 / VDF_MDL003 / VDF_MDL007 / sector_rotation_capital_flow_engine。",
+   "batch": 588
+  },
+  {
+   "ts": "2026-09-18 16:55",
+   "op": "ENGINE",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0105 · +debt +book;自測 25→29 檢",
+   "code": "批588 整合債分層 + 能力卡書;VDF 45 支引擎省 98.39% token",
+   "kind": "`debt`:VDF 1497 份重複拆成 契約 6 類 311 份(律規定每檔都有,**不計債**)· 泛名 9 類 554 份 · **真債 272 類 1186 份**(逐筆附函式名與簽章)。→ L74。`book`:一族一本卡書,45 張卡,519902 → 8392 token。抽取器三個洞全修並釘進自測:用途欄改用 `ast.get_docstring`(批115 的橋注在 docstring 前面,正則抓空 21 支)· 動詞四種分派寫法都要認(只認 argparse 的話空 42 支)· 資料表欄排掉 import 行。→ LL141",
+   "batch": 588
+  },
+  {
+   "ts": "2026-09-18 17:00",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "VDF 真債 × 四庫交叉(參數/邏輯/政策/因子)",
+   "code": "批588 前 40 大 VDF 真債,四冊都查無 35 類",
+   "kind": "四冊都在、名實相符(`VIA_Central_Params_SSOT` / `VIA_Lib_Registry` / `VIA_Policy_Laws_SSOT` / `VIA_Feature_Catalog`),但**沒有覆蓋 VDF 真正的重複**。查無的前幾名:`load.ckpt`/`save.ckpt` 各 32 份 · `_connect_ro` 25 · `_num` 24 · `_tickers_gl` 24 · `_diag` 23 · `write_parquet` 23 · `_data_ready` 21 · `trading_days` 14 · `_fred_key` 14 · ETF/global/us_macro 等 `lane_*` 十餘條各 12 份。用**詞界比對**不用子字串(LL137:`num` 會被 `number`/`enum` 亂命中,兩個方向都會錯)。撿哪些進冊是操作員裁定(LL90),本批不代撿。",
+   "batch": 588
   }
  ],
- "updated_at": "2026-09-18 16:22",
- "batch": 587
+ "updated_at": "2026-09-18 17:05",
+ "batch": 588
 }

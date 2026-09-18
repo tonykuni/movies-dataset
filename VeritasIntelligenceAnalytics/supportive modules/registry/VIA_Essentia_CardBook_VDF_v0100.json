@@ -1,0 +1,1622 @@
+{
+ "schema": "VIA.Essentia.CardBook.v1",
+ "family": [
+  "vdf"
+ ],
+ "batch": 588,
+ "ts": "2026-09-18 07:41",
+ "engines": 45,
+ "store": "VIA_Capability_Store__vdf.sqlite",
+ "note": "一族一本,一引擎一張卡,只收尾版。全部欄位由 AST 與能力庫推導;推不出來就留空,不補話。AI 讀這本就不必再掃原始碼。",
+ "cards": [
+  {
+   "engine": "VDF_ENG046_FetchMatrixRegistry",
+   "path": "functional modules/VDF/engine/VDF_ENG046_FetchMatrixRegistry.py",
+   "version": "",
+   "purpose": "VDF_ENG046_FetchMatrixRegistry — VDF-390 擷取總冊機器轉錄引擎(批104)",
+   "verbs": [],
+   "flags": [
+    "--sync-etf"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "build.registry",
+    "merge.etf_registry",
+    "misc.newest",
+    "parse.active_etfs",
+    "parse.matrix",
+    "validate.schema"
+   ],
+   "owns_n": 6,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG047_USMacroDetailFetcher_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG047_USMacroDetailFetcher_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG047_USMacroDetailFetcher — 美國經濟細目擷取引擎(批109;via-usmacro)",
+   "verbs": [],
+   "flags": [
+    "--fetch",
+    "--start"
+   ],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [
+    "load.cmd",
+    "load.http_json",
+    "load.roster",
+    "load.series",
+    "misc.cmd_list",
+    "misc.roster_items",
+    "save.outputs",
+    "validate.status"
+   ],
+   "owns_n": 8,
+   "tables": [],
+   "deps": [
+    "VDF_MDL003_SentimentMacroEngine"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG049_FiveDayFetch",
+   "path": "functional modules/VDF/engine/VDF_ENG049_FiveDayFetch.py",
+   "version": "",
+   "purpose": "VDF_ENG049_FiveDayFetch — 五日相關數據擷取引擎(批112;via-fetch5d)",
+   "verbs": [],
+   "flags": [
+    "--plan"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "build.universe",
+    "load.5d",
+    "misc.newest",
+    "misc.preflight"
+   ],
+   "owns_n": 4,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG050_OrderFetch_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG050_OrderFetch_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG050_OrderFetch v0101 — 擷取單接單引擎(批114+批119 十域;via-order)",
+   "verbs": [],
+   "flags": [
+    "--order",
+    "--plan"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "load.financials_lane",
+    "load.json_lane",
+    "load.order",
+    "load.orders",
+    "load.twse_lane",
+    "load.yf_consensus",
+    "load.yf_lane",
+    "misc.http_json",
+    "misc.preflight",
+    "misc.trading_days_back",
+    "save.order_run"
+   ],
+   "owns_n": 11,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG051_ActiveTWETF_Holdings_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0102.py",
+   "version": "0102",
+   "purpose": "[ 理 ] Veritas Intelligence Analytics",
+   "verbs": [],
+   "flags": [
+    "--check-dependencies",
+    "--duckdb-path",
+    "--no-refresh-universe",
+    "--output-dir",
+    "--parquet-root",
+    "--self-test",
+    "--tickers",
+    "--universe-csv",
+    "--verbose",
+    "--version"
+   ],
+   "contract": [],
+   "owns": [
+    "build.self_test_holding",
+    "build.session",
+    "clean.etf_ticker",
+    "clean.holdings",
+    "clean.text",
+    "detect.holdings_frame",
+    "load.atomic_copy_parquet",
+    "load.daily_holdings",
+    "load.dynamic_universe",
+    "load.http_text",
+    "load.insert_status",
+    "load.issuer",
+    "load.moneydj",
+    "load.one_etf"
+   ],
+   "owns_n": 46,
+   "tables": [
+    "active_tw_etf_universe",
+    "date_pairs",
+    "fetch_status",
+    "holdings_changes",
+    "holdings_daily",
+    "holdings_stage",
+    "read_parquet",
+    "shares_current",
+    "status_stage",
+    "universe_stage"
+   ],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG052_MegaFetch_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG052_MegaFetch_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG052_MegaFetch — 總擷取引擎 · 單 003 執行器(批128;via-mega)",
+   "verbs": [],
+   "flags": [
+    "--lane",
+    "--plan"
+   ],
+   "contract": [
+    "plan",
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "load.order",
+    "misc.derive_chip_fields",
+    "misc.holdings_views",
+    "misc.lane_global_yf",
+    "misc.lane_tw_listings",
+    "misc.plan",
+    "misc.preflight",
+    "save.duckdb",
+    "save.parquet"
+   ],
+   "owns_n": 9,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG053_ParamEngineMap_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG053_ParamEngineMap_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG053_ParamEngineMap — VDF 輸入參數×引擎整合映射器(批134;via-vdf-map)",
+   "verbs": [],
+   "flags": [
+    "--mode"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "build.map",
+    "load.books",
+    "misc.active_engines",
+    "misc.derive_string_consumers",
+    "misc.flat",
+    "misc.harvest_path",
+    "misc.ready_lanes"
+   ],
+   "owns_n": 7,
+   "tables": [],
+   "deps": [
+    "VDF_ENG052_MegaFetch"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG054_TWDailyBackfill_v0104",
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
+   "version": "0104",
+   "purpose": "VDF_ENG054_TWDailyBackfill — 台股全市場日線回補工人(批136;via-tw-backfill)",
+   "verbs": [],
+   "flags": [
+    "--full",
+    "--limit",
+    "--status"
+   ],
+   "contract": [
+    "plan",
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.ckpt",
+    "load.etf_listings",
+    "load.group",
+    "load.listings",
+    "misc.connect_retry",
+    "misc.last_dates",
+    "misc.plan",
+    "misc.target_date",
+    "save.ckpt",
+    "save.duckdb",
+    "save.parquet"
+   ],
+   "owns_n": 11,
+   "tables": [
+    "tw_daily_prices"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG055_OmniFetch_v0111",
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0111.py",
+   "version": "0111",
+   "purpose": "VDF_ENG055_OmniFetch — 單 004 總擷取執行器(批137;via-omni)",
+   "verbs": [],
+   "flags": [
+    "--date",
+    "--export",
+    "--from-file",
+    "--lane",
+    "--market",
+    "--status"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.text_any",
+    "misc.daytrade_path",
+    "misc.eng074",
+    "misc.etf_universe",
+    "misc.fred_key",
+    "misc.grid_rows",
+    "misc.iso_date",
+    "misc.lane_cross_macro",
+    "misc.lane_daytrade",
+    "misc.lane_daytrade_stock",
+    "misc.lane_etf_book",
+    "misc.lane_etf_stats",
+    "misc.lane_eurostat",
+    "misc.lane_factset"
+   ],
+   "owns_n": 26,
+   "tables": [
+    "etf_stats_daily",
+    "global_daily"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified",
+    "VDF_ENG074_FredMacroSSOT"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG056_ChipBackfill_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG056_ChipBackfill — 台股籌碼欄歷史回補(批140;via-chip)",
+   "verbs": [],
+   "flags": [
+    "--days",
+    "--derive",
+    "--status",
+    "--workers"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.lane",
+    "misc.connect",
+    "misc.curl_json",
+    "misc.db_done_lanes",
+    "misc.derive",
+    "misc.finish",
+    "misc.fmt_eta",
+    "misc.line",
+    "misc.num",
+    "misc.snapshot",
+    "misc.tick",
+    "misc.trading_days",
+    "parse.inst_tpex",
+    "parse.margin_tpex"
+   ],
+   "owns_n": 18,
+   "tables": [
+    "tw_chip_derived",
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_daily_prices"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG057_TradingValueBackfill_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG057_TradingValueBackfill v0101 — 逐股成交值歷史回補(批154;via-tval)",
+   "verbs": [],
+   "flags": [
+    "--days",
+    "--status"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "detect.frame",
+    "misc.curl_json",
+    "misc.idx",
+    "misc.num",
+    "misc.tpex_probe",
+    "misc.trading_days",
+    "parse.tpex",
+    "parse.twse_mi"
+   ],
+   "owns_n": 8,
+   "tables": [
+    "tw_daily_prices",
+    "tw_trading_daily"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG058_IndustryUnifiedMap_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG058_IndustryUnifiedMap_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG058_IndustryUnifiedMap — 雙所產業混合分類編號冊(批155;via-industry)",
+   "verbs": [],
+   "flags": [
+    "--status"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.rollup"
+   ],
+   "owns_n": 1,
+   "tables": [
+    "tw_listings_industry"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG059_EstimateBands_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG059_EstimateBands — 分析師預估×PE/PB band(批155;via-bands)",
+   "verbs": [],
+   "flags": [
+    "--chart",
+    "--status",
+    "--top"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.band_stats",
+    "misc.pd_dates",
+    "misc.price_series",
+    "misc.raw",
+    "misc.universe",
+    "parse.estimates"
+   ],
+   "owns_n": 6,
+   "tables": [
+    "analyst_estimates",
+    "tw_daily_prices"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG060_AdjPriceLayer_v0104",
+   "path": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v0104.py",
+   "version": "0104",
+   "purpose": "於是「無調整日」報紅——紅的是**檢查只在某一台機器的資料上成立**,不是引擎算錯:",
+   "verbs": [],
+   "flags": [
+    "--status"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "build.one"
+   ],
+   "owns_n": 1,
+   "tables": [
+    "dq_ohlc_flags",
+    "information_schema",
+    "prices_canonical",
+    "tw_daily_prices",
+    "tw_prices_adj"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG061_FeatureStore_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG061_FeatureStore_v0102.py",
+   "version": "0102",
+   "purpose": "於是「無列」報紅。改成優先 2330.TW、沒有就挑任何一支**兩張表都有**的標的驗 ret_1d 手算對合;",
+   "verbs": [],
+   "flags": [
+    "--status"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "build.one",
+    "load.catalog"
+   ],
+   "owns_n": 2,
+   "tables": [
+    "features_daily",
+    "gl_prices_adj",
+    "prices_canonical",
+    "tw_prices_adj"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG062_GroupFeatureLayer_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG062_GroupFeatureLayer_v0102.py",
+   "version": "0102",
+   "purpose": "group_features_daily 這張表也不在。舊自測的反應是:①②④ 報 FAIL,然後 ⑤ 直接一句",
+   "verbs": [],
+   "flags": [
+    "--status"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.latest_classification"
+   ],
+   "owns_n": 1,
+   "tables": [
+    "features_daily",
+    "group_features_daily",
+    "information_schema",
+    "read_csv_auto"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG063_MonthlyRevenue_v0105",
+   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0105.py",
+   "version": "0105",
+   "purpose": "VDF_ENG063_MonthlyRevenue v0105 — 月營收分析模組(批194;操作員令)",
+   "verbs": [
+    "run"
+   ],
+   "flags": [
+    "--analyze",
+    "--groups",
+    "--status"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "build.group_view",
+    "misc.analyze",
+    "misc.groups",
+    "misc.latest_classification",
+    "misc.mops_rows",
+    "misc.num",
+    "misc.prev_ym",
+    "misc.roc_ym",
+    "parse.rows",
+    "run.mops",
+    "validate.dirs",
+    "validate.schema"
+   ],
+   "owns_n": 12,
+   "tables": [
+    "monthly_revenue_analysis",
+    "read_csv_auto",
+    "revenue_group_analysis",
+    "tw_monthly_revenue"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG064_HistoryBackfill_v0111",
+   "path": "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0111.py",
+   "version": "0111",
+   "purpose": "VDF_ENG064_HistoryBackfill v0111 — 歷史回補引擎(批203 立;批212 收束;批226 自訂日期;批322 讓庫律;批353 批內平行=真用加速器)",
+   "verbs": [
+    "requests",
+    "run"
+   ],
+   "flags": [
+    "--end",
+    "--gap-mode",
+    "--limit",
+    "--rebuild-ckpt",
+    "--report",
+    "--start",
+    "--status"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.batch",
+    "load.ckpt",
+    "misc.connect_retry",
+    "misc.gap_commit",
+    "misc.gap_json",
+    "misc.gap_plan",
+    "misc.gap_replay",
+    "misc.gap_stage",
+    "misc.insert_missing",
+    "misc.rebuild_ckpt",
+    "misc.tickers_gl",
+    "misc.tickers_tw",
+    "run.clamp",
+    "run.db"
+   ],
+   "owns_n": 18,
+   "tables": [
+    "global_daily",
+    "tw_daily_prices"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG065_DbImport_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG065_DbImport_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG065_DbImport — 資料庫 parquet 合併匯入引擎(批216;操作員令)",
+   "verbs": [
+    "import"
+   ],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [
+    "load.one",
+    "misc.qcols",
+    "run.import"
+   ],
+   "owns_n": 3,
+   "tables": [
+    "read_parquet"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG066_GlobalUniverse_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG066_GlobalUniverse v0102 — 全球宇宙擷取引擎(批226 立;批228 P3 契約對齊)",
+   "verbs": [
+    "run"
+   ],
+   "flags": [
+    "--cats",
+    "--end",
+    "--list"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "filter.symbols",
+    "load.roster",
+    "misc.insert_missing",
+    "misc.list_cats"
+   ],
+   "owns_n": 4,
+   "tables": [
+    "global_daily"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG067_ConsensusEnrichment_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG067_ConsensusEnrichment_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG067_ConsensusEnrichment — ETF 持股×共識增益橋(批243;操作員令)",
+   "verbs": [
+    "probe",
+    "run"
+   ],
+   "flags": [],
+   "contract": [
+    "probe",
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "misc.adapter",
+    "misc.stage"
+   ],
+   "owns_n": 2,
+   "tables": [
+    "consensus_latest",
+    "holdings_daily",
+    "tw_prices_adj"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG068_ETFConsensusAnalysis_v0105",
+   "path": "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v0105.py",
+   "version": "0105",
+   "purpose": "不問裡面有沒有料。本境 consensus_latest 是 0 列(Z43 FactSet 共識覆蓋還沒補),holdings_daily 有 1125 列——",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "probe",
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "misc.analyze",
+    "misc.connect_ro",
+    "misc.consensus",
+    "misc.diag",
+    "misc.holdings",
+    "misc.plotly",
+    "misc.ready",
+    "misc.rows",
+    "misc.svg_bar"
+   ],
+   "owns_n": 9,
+   "tables": [
+    "consensus_latest",
+    "holdings_daily"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG069_RevenueConsensusAnalysis_v0108",
+   "path": "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v0108.py",
+   "version": "0108",
+   "purpose": "VDF_ENG069_RevenueConsensusAnalysis v0108 — 台股月營收×共識分析(批517:主庫資料家優先 + 空表誠實缺料)(批519:資料在位時的自測分「程式檢」與「資料側」)(批520:(code,ym) 重複列去重)",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "probe",
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "misc.analyze",
+    "misc.connect_ro",
+    "misc.diag",
+    "misc.plotly",
+    "misc.ready",
+    "misc.resolve_db",
+    "misc.svg_quad",
+    "validate.syn"
+   ],
+   "owns_n": 8,
+   "tables": [
+    "consensus_latest",
+    "monthly_revenue_analysis",
+    "revenue_group_analysis"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG070_GroupClassificationIndex_v0111",
+   "path": "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v0111.py",
+   "version": "0111",
+   "purpose": "(v0110→v0111 批335「完成一切未完工作自動化」:+輪動快照成員冊輸出 export_rotation_snapshot=",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "build.indices",
+    "build.master",
+    "detect.story",
+    "load.flows",
+    "load.listings",
+    "load.panel",
+    "load.stories",
+    "misc.add_residual",
+    "misc.asym_peak",
+    "misc.bh_q",
+    "misc.cap_norm",
+    "misc.capital_style",
+    "misc.compare_windows",
+    "misc.composition_sets"
+   ],
+   "owns_n": 26,
+   "tables": [
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_daily_prices",
+    "tw_daytrade_market",
+    "tw_listings",
+    "tw_prices_adj"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG071_GroupBacktest_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG071_GroupBacktest_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG071_GroupBacktest — 族群分類回測引擎(批315;操作員令",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "filter.random_test",
+    "misc.ann_days",
+    "misc.block_permutation",
+    "misc.eng070",
+    "misc.metrics",
+    "misc.plotly",
+    "misc.risk_free",
+    "misc.walk_forward"
+   ],
+   "owns_n": 8,
+   "tables": [],
+   "deps": [
+    "VDF_ENG070_GroupClassificationIndex"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG072_StoryRotationBridge_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG072_StoryRotationBridge v0100 — 故事族群輪動引擎 v0.5 橋接(批325)",
+   "verbs": [],
+   "flags": [
+    "--pkgtest"
+   ],
+   "contract": [
+    "run",
+    "selftest"
+   ],
+   "owns": [
+    "load.stories",
+    "misc.block_reason",
+    "misc.con",
+    "misc.pkg_root",
+    "misc.pkgtest",
+    "misc.preflight",
+    "misc.ts",
+    "misc.yf",
+    "run.pkg"
+   ],
+   "owns_n": 9,
+   "tables": [
+    "global_daily",
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_daily_prices",
+    "tw_daytrade_market",
+    "tw_listings",
+    "tw_monthly_revenue",
+    "tw_prices_adj"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG073_DataArchitecture_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG073_DataArchitecture — VDF 資料架構對映/盤點/最佳化計畫(批360;via-vdfarch)",
+   "verbs": [
+    "build",
+    "plan"
+   ],
+   "flags": [
+    "--go",
+    "--open",
+    "--optimize"
+   ],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [
+    "load.lamps",
+    "load.ssot",
+    "misc.bridge_coverage",
+    "misc.date_expr",
+    "misc.home",
+    "misc.inventory",
+    "misc.lanes",
+    "misc.newest",
+    "misc.optimize_plan",
+    "misc.ssot_dir",
+    "run.plan"
+   ],
+   "owns_n": 11,
+   "tables": [
+    "tw_daily_prices",
+    "tw_monthly_revenue",
+    "us_macro"
+   ],
+   "deps": [
+    "CGC_MDL123_DataHome",
+    "SUP_MDL740_NetUnified",
+    "VDF_ENG051_ActiveTWETF",
+    "VDF_ENG054_TWDailyBackfill",
+    "VDF_ENG055_OmniFetch",
+    "VDF_ENG056_ChipBackfill",
+    "VDF_ENG060_AdjPriceLayer",
+    "VDF_ENG061_FeatureStore",
+    "VDF_ENG063_MonthlyRevenue",
+    "VDF_ENG064_HistoryBackfill"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG074_FredMacroSSOT_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG074_FredMacroSSOT v0102 — FRED 宏觀 SSOT 擷取引擎(批360/361;批362 動詞修;批363 FAIL 序列 PARK 律+status 紅冊)",
+   "verbs": [
+    "lamps",
+    "status"
+   ],
+   "flags": [
+    "--fred-key",
+    "--retry-parked"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "build.mirror",
+    "load.ckpt",
+    "load.series",
+    "load.window",
+    "misc.fred_key",
+    "misc.home_note",
+    "misc.lamps",
+    "misc.note_fail",
+    "misc.plan_windows",
+    "misc.progress_bar",
+    "misc.ssot_path",
+    "misc.throttle",
+    "parse.verb",
+    "save.ckpt"
+   ],
+   "owns_n": 18,
+   "tables": [],
+   "deps": [
+    "CGC_MDL123_DataHome",
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG075_MonthlyRevenueBackfill_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG075_MonthlyRevenueBackfill — 月營收全市場史深回補(批368;via-revfill)",
+   "verbs": [
+    "run",
+    "status"
+   ],
+   "flags": [],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.ckpt",
+    "load.hosts",
+    "load.one",
+    "misc.eng063",
+    "misc.handle",
+    "misc.handle_endtag",
+    "misc.handle_starttag",
+    "misc.is_stub",
+    "misc.month_seq",
+    "misc.num",
+    "misc.progress_bar",
+    "misc.rebuild_view",
+    "misc.url",
+    "parse.page"
+   ],
+   "owns_n": 16,
+   "tables": [],
+   "deps": [
+    "SUP_MDL740_NetUnified",
+    "VDF_ENG063_MonthlyRevenue"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG076_ETFRevenueMomentum_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG076_ETFRevenueMomentum — 主動 ETF 持股 × 月營收動能(批373;via-etfrev)",
+   "verbs": [
+    "status"
+   ],
+   "flags": [],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.con",
+    "misc.latest_revenue_month"
+   ],
+   "owns_n": 2,
+   "tables": [
+    "holdings_daily",
+    "monthly_revenue_analysis"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG077_ActiveETFUniverse_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG077_ActiveETFUniverse — 主動式 ETF 宇宙日更器(批374;via-etfuniv)",
+   "verbs": [
+    "status"
+   ],
+   "flags": [
+    "--offline"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.etf_book",
+    "misc.existing",
+    "misc.is_active_code",
+    "misc.is_domestic",
+    "misc.twse",
+    "save.ssot_csv"
+   ],
+   "owns_n": 6,
+   "tables": [
+    "active_tw_etf_universe",
+    "etf_book"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG078_ActiveETFHoldingsHistory_v0108",
+   "path": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+   "version": "0108",
+   "purpose": "VDF_ENG078_ActiveETFHoldingsHistory — 主動 ETF 每日持股史深覆蓋器(批375;via-etfhist)",
+   "verbs": [
+    "backfill",
+    "discover",
+    "probe",
+    "status",
+    "sync",
+    "sync-lanes"
+   ],
+   "flags": [
+    "--apply",
+    "--date",
+    "--end",
+    "--gap-mode",
+    "--max-days",
+    "--offline",
+    "--report",
+    "--start",
+    "--ticker"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "load.ckpt",
+    "load.dated",
+    "load.escalating",
+    "load.lane",
+    "load.lanes",
+    "load.mode",
+    "merge.lanes",
+    "misc.backfill",
+    "misc.coverage",
+    "misc.daily",
+    "misc.dig",
+    "misc.discover_twse",
+    "misc.gate2_diagnosis",
+    "misc.holding_yf"
+   ],
+   "owns_n": 31,
+   "tables": [
+    "active_tw_etf_registry",
+    "active_tw_etf_universe",
+    "holdings_daily",
+    "tw_daily_prices"
+   ],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG079_LocalDbConsolidate_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG079_LocalDbConsolidate v0100 — 本機三庫整併入正典 DuckDB 引擎(批383)",
+   "verbs": [
+    "ckpt",
+    "coverage",
+    "need",
+    "run",
+    "scan"
+   ],
+   "flags": [
+    "--apply",
+    "--assume-twse",
+    "--end",
+    "--force",
+    "--only",
+    "--tickers"
+   ],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [
+    "log.event",
+    "misc.alias",
+    "misc.arg",
+    "misc.ckpt_argv",
+    "misc.connect",
+    "misc.count",
+    "misc.coverage",
+    "misc.datahome_note",
+    "misc.date_expr",
+    "misc.do_ckpt",
+    "misc.duckdb",
+    "misc.enumerate_sources",
+    "misc.expand_db_units",
+    "misc.fingerprint"
+   ],
+   "owns_n": 34,
+   "tables": [
+    "global_daily",
+    "information_schema",
+    "local_px_daily",
+    "px_extra",
+    "read_csv_auto",
+    "read_parquet",
+    "tw_chips_daily",
+    "tw_daily_prices",
+    "tw_listings",
+    "tw_listings_industry",
+    "tw_rest_daily",
+    "us_macro"
+   ],
+   "deps": [
+    "CGC_MDL123_DataHome",
+    "VDF_ENG064_HistoryBackfill"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG081_UniverseAlign_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG081_UniverseAlign v0100 — 台股每日交易資訊×籌碼 數量對齊與股票清單更新引擎(批390)",
+   "verbs": [
+    "check",
+    "update"
+   ],
+   "flags": [
+    "--allow-latest",
+    "--apply",
+    "--asof"
+   ],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "filter.asof",
+    "log.event",
+    "misc.arg",
+    "misc.chip_ticker",
+    "misc.cols",
+    "misc.connect",
+    "misc.daily_counts",
+    "misc.daily_sets",
+    "misc.date_sets",
+    "misc.duckdb",
+    "misc.finish",
+    "misc.holder",
+    "misc.holder_label",
+    "misc.listings_map"
+   ],
+   "owns_n": 25,
+   "tables": [
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_daily_prices",
+    "tw_listings"
+   ],
+   "deps": [
+    "VDF_ENG064_HistoryBackfill"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG082_FinStatements_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG082_FinStatements v0100 — 三大報表擷取引擎(批505;填主控台冊 vdf/fin_statements「缺席」空位)",
+   "verbs": [
+    "run",
+    "status"
+   ],
+   "flags": [
+    "--db",
+    "--dry"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.aegis_session",
+    "misc.argval",
+    "misc.columns",
+    "misc.fetcher",
+    "misc.listings",
+    "misc.mops_probe",
+    "misc.norm_ticker",
+    "misc.resolve_db",
+    "save.rows"
+   ],
+   "owns_n": 9,
+   "tables": [
+    "tw_listings"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG085_VatetfBridge_v0104",
+   "path": "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0104.py",
+   "version": "0104",
+   "purpose": "VDF_ENG085_VatetfBridge v0104 — VATETF 應用端正主橋(批522 工作站實錄:via-vetf 印 OK 40 筆但 adapter 其實 FileExistsError APPEND_ONLY_CONFLICT=假綠)",
+   "verbs": [
+    "run",
+    "status"
+   ],
+   "flags": [
+    "--holdings",
+    "--prices"
+   ],
+   "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.arg",
+    "misc.bus",
+    "misc.child_env",
+    "misc.err_line",
+    "misc.family_json",
+    "misc.family_python",
+    "misc.judge_adapter",
+    "misc.newest",
+    "misc.resolve_sources",
+    "run.adapter",
+    "validate.contract"
+   ],
+   "owns_n": 11,
+   "tables": [
+    "consensus_latest",
+    "holdings_daily",
+    "information_schema",
+    "tw_prices_adj"
+   ],
+   "deps": [
+    "CGC_MDL148_EngineBus"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG086_QuantGuardOneBridge_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG086 QuantGuard bridge — v0101(批534 接手 B533 實測修).",
+   "verbs": [
+    "probe",
+    "run",
+    "selftest"
+   ],
+   "flags": [
+    "--in",
+    "--out"
+   ],
+   "contract": [
+    "probe",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "clean.argv",
+    "encrypt.frame",
+    "load.quantguard",
+    "misc.absent_polars",
+    "misc.accelerator_status",
+    "misc.mount_status",
+    "misc.polars",
+    "misc.polars_pip",
+    "misc.synthetic_frame",
+    "run.features",
+    "run.input",
+    "save.json"
+   ],
+   "owns_n": 12,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG087_MarketListGovernance_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG087 — Central market-list governance bridge.",
+   "verbs": [
+    "run",
+    "selftest",
+    "update"
+   ],
+   "flags": [],
+   "contract": [
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "clean.market_turnover",
+    "load.story_registry",
+    "misc.columns",
+    "misc.consent_open",
+    "misc.date_range",
+    "misc.env_path",
+    "misc.first",
+    "misc.newest_rel",
+    "misc.now",
+    "misc.open",
+    "misc.safe_frame",
+    "misc.status_etf",
+    "misc.status_stock",
+    "misc.tables"
+   ],
+   "owns_n": 15,
+   "tables": [],
+   "deps": [
+    "VDF_ENG054_TWDailyBackfill",
+    "VDF_ENG077_ActiveETFUniverse",
+    "VDF_ENG078_ActiveETFHoldingsHistory",
+    "VDF_ENG081_UniverseAlign"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG088_ConsensusFusionBridge_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG088_ConsensusFusionBridge v0100 — 共識融合橋(批563 操作員「同意」)",
+   "verbs": [
+    "plan",
+    "status",
+    "sync"
+   ],
+   "flags": [
+    "--apply"
+   ],
+   "contract": [
+    "plan",
+    "selftest",
+    "status"
+   ],
+   "owns": [
+    "misc.duck",
+    "misc.intake_engine",
+    "misc.plan",
+    "misc.source_db",
+    "misc.tables"
+   ],
+   "owns_n": 5,
+   "tables": [
+    "consensus_daily",
+    "information_schema"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG089_IncrementalFetchGate_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG089_IncrementalFetchGate v0100 — 增量擷取閘(批569)",
+   "verbs": [
+    "audit",
+    "plan",
+    "scan",
+    "state"
+   ],
+   "flags": [
+    "--deep",
+    "--since",
+    "--until"
+   ],
+   "contract": [
+    "plan",
+    "selftest"
+   ],
+   "owns": [
+    "misc.calls_net",
+    "misc.d",
+    "misc.db_path",
+    "misc.deep_gaps",
+    "misc.json",
+    "misc.plan",
+    "misc.tails",
+    "save.out"
+   ],
+   "owns_n": 8,
+   "tables": [
+    "information_schema"
+   ],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG090_DataCoverageGate_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0102.py",
+   "version": "0102",
+   "purpose": "VDF_ENG090_DataCoverageGate v0102 — VDF 資料涵蓋閘(批573:不在行程內匯入網路庫)",
+   "verbs": [
+    "lakes",
+    "macro",
+    "revenue",
+    "tables",
+    "universe"
+   ],
+   "flags": [
+    "--probe"
+   ],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [
+    "misc.catalog_cols",
+    "misc.json",
+    "misc.lakes",
+    "misc.macro",
+    "misc.revenue",
+    "misc.universe",
+    "save.out"
+   ],
+   "owns_n": 7,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL002_YFinanceFetchingEngine",
+   "path": "functional modules/VDF/engine/VDF_MDL002_YFinanceFetchingEngine.py",
+   "version": "",
+   "purpose": "VDF_MDL002_YFinanceFetchingEngine.py",
+   "verbs": [],
+   "flags": [
+    "--etf-only",
+    "--non-etf-only"
+   ],
+   "contract": [],
+   "owns": [
+    "build.backup",
+    "compute.tier2_per_etf",
+    "compute.tier4_composite",
+    "detect.ssot",
+    "detect.tw_ticker_format",
+    "filter.etf_only",
+    "load.batch_v17",
+    "load.existing",
+    "load.market_info",
+    "load.missing_dates",
+    "load.region_market",
+    "load.single_v5",
+    "load.yfinance",
+    "log.plain_summary"
+   ],
+   "owns_n": 29,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_MDL003_SentimentMacroEngine",
+   "path": "functional modules/VDF/engine/VDF_MDL003_SentimentMacroEngine.py",
+   "version": "",
+   "purpose": "VDF_MDL003_SentimentMacroEngine.py",
+   "verbs": [
+    "cnn_subindicators",
+    "indicator"
+   ],
+   "flags": [
+    "--aaii",
+    "--akshare",
+    "--cnn",
+    "--fred"
+   ],
+   "contract": [],
+   "owns": [
+    "load.http",
+    "load.one",
+    "log.plain_summary",
+    "log.rich_summary_matrix",
+    "misc.ak_call",
+    "misc.backup",
+    "misc.end_date",
+    "misc.interactive_menu",
+    "misc.now_iso",
+    "misc.today",
+    "misc.try_excel",
+    "misc.try_html",
+    "misc.via_fred_keyfile",
+    "render.header"
+   ],
+   "owns_n": 16,
+   "tables": [],
+   "deps": [
+    "VRN_MDL013_AKShareFetcher",
+    "VRN_MDL014_MacroFetcher"
+   ],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_MDL007_SSOTResolver",
+   "path": "functional modules/VDF/engine/VDF_MDL007_SSOTResolver.py",
+   "version": "",
+   "purpose": "VDF_MDL007_SSOTResolver.py",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [
+    "load.batch",
+    "load.bwibbu",
+    "load.company_basic",
+    "load.daily",
+    "load.http",
+    "load.one",
+    "load.pe_ratio",
+    "load.record",
+    "log.rich_summary",
+    "merge.codes",
+    "merge.name",
+    "misc.cached",
+    "misc.canonical",
+    "misc.gather_inputs"
+   ],
+   "owns_n": 22,
+   "tables": [],
+   "deps": [
+    "VDF_MDL101_OutputManager"
+   ],
+   "has_selftest": false
+  },
+  {
+   "engine": "sector_rotation_capital_flow_engine",
+   "path": "functional modules/VDF/engine/candidates/sector_rotation_capital_flow_engine.py",
+   "version": "",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [
+    "build.noisy_market",
+    "compute.comovement",
+    "misc.compare_raw_vs_pruned_performance",
+    "misc.prune_sector_members"
+   ],
+   "owns_n": 4,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  }
+ ],
+ "token_ledger": {
+  "source_tokens": 519902,
+  "cardbook_tokens": 8392,
+  "saved_percent": 98.39
+ }
+}
