@@ -33,6 +33,19 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:LIB-BRIDGE:v0100] 三庫正典橋(批597;缺席大聲拋,不 graceful) =====
+import sys as _lb_sys
+from functools import partial as _lb_partial
+from pathlib import Path as _lb_Path
+_lb_p = _lb_Path(__file__).resolve()
+while _lb_p.parent != _lb_p:
+    if (_lb_p / "supportive modules").is_dir():
+        _lb_sys.path.insert(0, str(_lb_p / "supportive modules"))
+        break
+    _lb_p = _lb_p.parent
+import VIA_LibCanon as _LIB          # 正典缺席=大聲拋,不假裝有(LL151)
+# ===== [VIA:LIB-BRIDGE:END] =====
+
 # ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
 VIA_NET_TOOL_PATH = None
 try:
@@ -77,9 +90,9 @@ OUT = VDF / "output_hub" / "fiveday"
 PREFLIGHT_HOST = "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d"
 
 
-def _newest(folder: Path, pattern: str) -> Path | None:
-    hits = sorted(folder.glob(pattern))
-    return hits[-1] if hits else None
+#: 批597 三庫整併:_newest → 正典綁定(同 ENG046 群)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_newest = _LIB.newest
 
 
 def build_universe(root: Path = VDF) -> dict:

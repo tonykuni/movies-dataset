@@ -24,6 +24,20 @@ CGC_MDL150_CentralGovernanceFamily v0100 — 中央治理家族擁有者(批514 
 律:只增不減;正本零觸碰(成員件不改,新版=新 _b5NN 夾);尾版律(夾名 glob);Zero-Hydra(成員自己的判斷不重寫);誠實三態;零 CDN;零彈窗;零網路;同意閘/權杖不代設。
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import datetime as _dt
 import hashlib

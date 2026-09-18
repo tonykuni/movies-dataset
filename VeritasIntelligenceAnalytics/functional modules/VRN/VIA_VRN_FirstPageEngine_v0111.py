@@ -377,6 +377,20 @@ v0110 → v0111(批434):黃燈太多,其中一半是我自己造的
   python3 VIA_VRN_FirstPageEngine_v0111.py --dir <報告夾> --trace 神達     印出候選表(貼回來給我看)
   python3 VIA_VRN_FirstPageEngine_v0111.py --text-dir <語料夾> --report   純文字語料
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import bisect
 import datetime as _dt
 import html

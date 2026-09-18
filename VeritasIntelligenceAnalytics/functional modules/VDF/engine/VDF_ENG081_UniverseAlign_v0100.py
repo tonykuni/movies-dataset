@@ -45,6 +45,19 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:LIB-BRIDGE:v0100] 三庫正典橋(批597;缺席大聲拋,不 graceful) =====
+import sys as _lb_sys
+from functools import partial as _lb_partial
+from pathlib import Path as _lb_Path
+_lb_p = _lb_Path(__file__).resolve()
+while _lb_p.parent != _lb_p:
+    if (_lb_p / "supportive modules").is_dir():
+        _lb_sys.path.insert(0, str(_lb_p / "supportive modules"))
+        break
+    _lb_p = _lb_p.parent
+import VIA_LibCanon as _LIB          # 正典缺席=大聲拋,不假裝有(LL151)
+# ===== [VIA:LIB-BRIDGE:END] =====
+
 # ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
 VIA_NET_TOOL_PATH = None
 try:
@@ -118,11 +131,9 @@ def log_event(kind: str, msg: str, **kw) -> None:
         pass
 
 
-def _write_json(p: Path, obj) -> None:
-    p.parent.mkdir(parents=True, exist_ok=True)
-    tmp = p.with_suffix(p.suffix + ".tmp")
-    tmp.write_text(json.dumps(obj, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
-    os.replace(tmp, p)
+#: 批597 三庫整併:_write_json → 正典綁定(同上但帶 default=str;位元組零差異)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_write_json = _lb_partial(_LIB.jwrite, indent=1, atomic=True, default=str)
 
 
 def _duckdb():
@@ -855,12 +866,9 @@ def selftest() -> int:
 
 
 # ---------------------------------------------------------------- CLI
-def _arg(a: list, flag: str, default=None):
-    if flag in a:
-        i = a.index(flag)
-        if i + 1 < len(a):
-            return a[i + 1]
-    return default
+#: 批597 三庫整併:_arg → 正典綁定(同 ENG079 群)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_arg = _lb_partial(_LIB.argval, quiet=True, dashdash=True)
 
 
 def main() -> int:

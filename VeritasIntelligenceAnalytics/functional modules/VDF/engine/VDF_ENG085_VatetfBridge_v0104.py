@@ -80,6 +80,19 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:LIB-BRIDGE:v0100] 三庫正典橋(批597;缺席大聲拋,不 graceful) =====
+import sys as _lb_sys
+from functools import partial as _lb_partial
+from pathlib import Path as _lb_Path
+_lb_p = _lb_Path(__file__).resolve()
+while _lb_p.parent != _lb_p:
+    if (_lb_p / "supportive modules").is_dir():
+        _lb_sys.path.insert(0, str(_lb_p / "supportive modules"))
+        break
+    _lb_p = _lb_p.parent
+import VIA_LibCanon as _LIB          # 正典缺席=大聲拋,不假裝有(LL151)
+# ===== [VIA:LIB-BRIDGE:END] =====
+
 
 
 import datetime as _dt
@@ -107,9 +120,9 @@ CONTRACT = {
 }
 
 
-def _newest(root: Path, pat: str) -> Path | None:
-    hits = sorted(root.glob(pat)) if root.exists() else []
-    return hits[-1] if hits else None
+#: 批597 三庫整併:_newest → 正典綁定(原本多一個 root.exists() 守衛;正典的 base.is_dir() 已涵蓋,語料零差異)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_newest = _LIB.newest
 
 
 def _bus():
@@ -454,12 +467,9 @@ def _emit(rep: dict, do_print: bool) -> None:
         print(f"  [audit] {rep['audit']}")
 
 
-def _arg(a: list, flag: str, default=None):
-    if flag in a:
-        i = a.index(flag)
-        if i + 1 < len(a):
-            return a[i + 1]
-    return default
+#: 批597 三庫整併:_arg → 正典綁定(同 ENG079 群)。
+#  綁定不是 def——再包一層 def 的話能力庫裡那一族還在,家族數不會掉(LL143)。
+_arg = _lb_partial(_LIB.argval, quiet=True, dashdash=True)
 
 
 def selftest() -> int:
