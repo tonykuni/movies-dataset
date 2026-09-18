@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": 594,
- "ts": "2026-09-19 00:10",
+ "batch": 595,
+ "ts": "2026-09-19 01:20",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
   {
@@ -306,11 +306,11 @@
   },
   {
    "id": "L50",
-   "batch": "B531",
+   "batch": "B531 · 批595 補執法憑據",
    "cat": "指標",
-   "zh": "QuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。",
+   "zh": "QuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。\n\n**批595 操作員複述並要求入冊(「不可使用 TA-LIB,用 QuantGuard 取代」),同時補執法憑據:**① **正典替代路徑具名**:`VDF_ENG086_QuantGuardOneBridge_v*.py`(引擎)· `via-quantguard`(短令)· `supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json`(政策冊)· `functional modules/VDF/references/intake/VIA_QuantGuard_v20260916`(收容正本)。② **實測(批595)**:活樹尾版含無版號 **2604 支**,真的 `import talib` / `from talib import` 的 **0 支**;另有 40 支**提到** talib,逐支看過**全是治理件在禁它**(MDL156 曝險檢、SelftestGrid 站名、ToolLadder 的排除清單…)。③ **量這條律不准用字串比對**:第一版我用 `talib` 當關鍵字全樹掃,得到 578 處「活件曝險」——那裡面絕大多數是**版本史**(自測格 180 個歷史版號各算一次)加上**因為在禁它才提到它**的治理件。禁用律的尺必須是 **import 語句**(`^\\s*import talib` / `^\\s*from talib import`)且**只看尾版**,否則 578 這個數字會逼人去「清理」自己的執法程式(LL142 同族:量的單位不對,數字就沒有意義)。",
    "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
-   "enforcement": "CGC_MDL156_VIAAcceleratorControl_v0100 + VDF_ENG086_QuantGuardOneBridge_v0100",
+   "enforcement": "CGC_MDL156_VIAAcceleratorControl_v*(talib 曝險檢;尾版 glob 不釘版號) + VDF_ENG086_QuantGuardOneBridge_v*(正典替代路徑) + VIA_QuantGuard_TA_Lib_Policy_v0100.json;尺必須比 import 語句且只看尾版,不得用字串比對(批595 實測 0 支真曝險)",
    "status": "ACTIVE"
   },
   {
@@ -1253,6 +1253,11 @@
    "id": "LL149",
    "batch": "批594",
    "zh": "**我自己踩了兩條核心律,而且是同一個原因:寫檔的腳本沒有排除清單。**批594 遷 VRN 時,遷移腳本掃 `functional modules/VRN` 整棵子樹,結果改到:①`references/intake/GenericLayoutEngine_.../generic_layout_engine.py` ——**收容正本,零觸碰**;②`_superseded/20260804/` 五支 ——**退役件不是活樹**。commit 前的 `git status` 看到才發現,全部還原。誠實記三件事:**第一**,這不是尺量錯,是**我根本沒給尺邊界**;前四批(590–593)遷 registry 時剛好沒有 intake 子夾,所以一路沒事,這叫運氣不叫紀律。**第二**,我補了一道 `via-govaudit intake` 閘(逐夾比 sha,58 夾 GREEN 23 · RED 0 · UNKEPT 10 · NODATA 25),但要說清楚:**那道閘擋不下我剛才那一筆**——那個收容夾**沒有 manifest**,落在 NODATA 25 裡。閘的價值是把那 25 夾**具名列出來、不算綠**,真正擋下我的是排除清單。**不能把「我補了閘」講成「以後不會再發生」。** **第三**,做那道閘時我又踩了一次 L71:`source_path` 是操作員工作站的 Windows 絕對路徑,在 Linux 上取 `.name` 拿到整串,14 夾全判假紅;正規化分隔符後 RED 14→0。而且第一版把「原件沒留」也算成 RED——**RED 要留給「檔案在、sha 對不上」**,那才叫正本被改;混在一起就是判錯的紅燈。"
+  },
+  {
+   "id": "LL150",
+   "batch": "批595",
+   "zh": "**禁用律的尺,不能用字串比對。**操作員要我把「不可使用 TA-Lib,用 QuantGuard 取代」入政策庫。查完發現**條文早在 L50(B531)就有**,一字不差;真正該做的是查執法。第一版我用 `talib` 當關鍵字全樹掃,得到「**活件曝險 578 處**」——如果就這樣回報,操作員會以為系統爛掉了。實際上那 578 處是:**版本史**(`CGC_MDL064_SelftestGrid` 180 個歷史版號、`CGC_MDL095_DeckServer` 11 個,各算一次)+ **治理件因為在禁它才提到它**(MDL156 的曝險檢、站名描述、ToolLadder 的排除清單)。換成正確的尺——**只看尾版 × 只比 `import talib` / `from talib import` 語句**——答案是:活樹尾版 2604 支,**真的 import 的 0 支**,另 40 支只是提到,逐支看過全是執法程式。**578 → 0。**這跟 LL142(債要以家族計不以檔計)是同一個病灶:**量的單位不對,數字就沒有意義,而且偏的方向是「看起來更該做事」**——照 578 去「清理」,清掉的會是自己的執法程式。附帶一件我當場犯的:我把那 578 筆**整份印出來**,等於自己燒掉一大段上下文,而操作員先前才糾正過同一件事(『用它來執行不是不耗費 TOKEN?』)。**量錯了要重量,但不要把錯的中間產物整份攤在檯面上。**"
   }
  ]
 }
