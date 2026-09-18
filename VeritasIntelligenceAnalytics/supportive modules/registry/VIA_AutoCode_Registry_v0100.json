@@ -9024,6 +9024,14 @@
    "component": "launchers/Invoke-VIA-AllInOne-v0104.ps1(同步 + 25 加速器 + 15 步全系統實測 + 產出驗證)",
    "code": "402 行;新第 0 段 SYNC;pwsh 7.4.6 真跑三態驗過(FASTFORWARD / DIVERGED 誠實停 / 未追蹤件零觸碰)",
    "kind": "操作員令「all integrate into one ps code with 25 accelerators」。v0103 → v0104 加的是**第 0 段 SYNC**,因為工作站實錄三次證明真正卡住的不是引擎而是同步:`git status -sb` 印 **[behind 3]**,工作樹有 **41 個被改過的追蹤檔**(再生的 U/I 頁與註冊表),其中幾支這三批也動過 → git 為了不蓋掉本地修改**拒絕合併**,於是 `via-envgov` 永遠挑到 v0108,新動詞一律掉進 `print(__doc__)`。SYNC 段紅線:① 只 stash **追蹤檔**(`git stash` 不帶 `-u`)→ 操作員的 `?? EngineBus_v0128.py` / `_patches\\` / `*.bak_b600_*` 一根不碰;② stash 前先**整包複製**到本跑存證夾(stash 之外的第二條退路);③ 只做 `--ff-only`,真的分岔就**誠實停**,不自動 merge/rebase/force;④ `-NoSync` 可整段跳過;⑤ 同步沒成功 → 判定至少 YELLOW(跑的可能不是最新版,不准綠)。**這一支是真的跑過才交的**(批600 那次我交了語法對但行為錯的 .ps1):容器裡有 pwsh 7.4.6,造了一個和工作站同形狀的 scratch 倉(落後 3 · 一個被改過的追蹤檔遠端也改過 · 兩個未追蹤件),把**檔案裡第 67–143 行原封不動**抽出來跑,五件逐件量:未追蹤件內容不變 · stash 可還原 · 看得見的備份有操作員的內容 · 新版檔到位 · 分支回到同步。反面也釘:製造分岔(ahead 1, behind 2)→ **DIVERGED 誠實停、HEAD 沒動、沒有多 stash 一筆**。另 AST 檢過:參數名無自動變數撞名(批600 `$Args` 那個坑)。步數 12 → 15:新增 `05_EnvTools` / `06_EnvPlan` / `07_EnvResume`(批601/602 的唯讀動詞),產出驗證多一項 `TOOLS_PLAN_latest.ps1`;紅的 Why 併批603 L81 同律——把 `[FAIL]` 那幾行帶進總表。"
+  },
+  {
+   "ts": "2026-09-18 18:13",
+   "op": "NEW",
+   "category": "交接",
+   "component": "launchers/Sync-VIA-Bootstrap-v0100.ps1(固定檔名同步解卡引導)",
+   "code": "新律 L85 · LL162;pwsh 7.4.6 同形狀 scratch 倉真跑(落後 4 → 快轉;未追蹤件零觸碰;stash 可還原;備份落 VIA_Reports)",
+   "kind": "**我的設計錯誤,操作員的 pwsh 當場打臉**:批604 把解卡工具 `Invoke-VIA-AllInOne-v0104.ps1` 推進倉裡,然後叫操作員去跑——可是他正**因為同步卡住**才沒有那個檔,pwsh 回「無法辨識為指令碼檔案名稱」。**解卡的工具不能放在被卡住的那一側。** 補兩件:① 對話與 docs 交一份**貼上就能跑、零檔案相依**的版本;② 倉裡加一支**固定檔名**(不帶版本尾碼)的 `Sync-VIA-Bootstrap-v0100.ps1`,一旦落地就永遠是同一個路徑。紅線與 v0104 第 0 段同律:只 stash 追蹤檔(不帶 -u)· stash 前整包備份到 `VIA_Reports\\presync_<ts>` · 只做 --ff-only,分岔誠實停 · 不裝不刪不設閘。**真跑驗過**(不是只過語法):造和工作站同形狀的 scratch 倉(落後 4 · 一個被改過的追蹤檔遠端也改過 · 兩個未追蹤件),跑**倉裡那一支的實際位元組**,逐件量:未追蹤件內容一字不差 · stash 可還原 · 備份裡是操作員那份內容 · 分支回到同步 · 尾版解析正確。順手修掉貼上版的兩個坑:`Select-Object -Last 1 Name` 會被當成 `-Property`(印不出尾版名),以及頂層 `return` 貼進互動式終端機會出事——改成 `if/else` 分支。"
   }
  ],
  "updated_at": "2026-09-18 15:20",
