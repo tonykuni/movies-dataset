@@ -57,7 +57,7 @@ UI_SUPPORT = VIA / "supportive modules" / "ui_support"
 WF_SSOT = HERE / "VIA_Workflow_SSOT_v0100.json"
 UI_SSOT = HERE / "VIA_UI_Contract_v0100.json"
 SPEC = HERE / "VIA_InputConsole_Spec_v0100.json"
-VERSION = "0100"
+VERSION = Path(__file__).stem.rsplit("_v", 1)[-1]   # 批586:寫死會爛——v0114 上印著 v0113,一路印進每一份報告
 BATCH = 519
 PAGE_NAME = "VIA_UI_WorkflowComposer_v0100.html"
 

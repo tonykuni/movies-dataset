@@ -8451,8 +8451,71 @@
    "code": "批585 VRN 有沒有透過 PEIS 做同功能整合:有,塌縮 81.8%;但**備用件一支都沒掃到**",
    "kind": "操作員問「VRN 的引擎有無透過 PEIS 進行同功能整合?包含那些備用的」。實查能力庫:**VRN 全境 12568 函式 → 2282 能力,塌縮率 81.8%**,散在 525 檔;收容 intake 件有掃進去 2870 支、quarantine 46 支。**但備用件是 0**——`_backup` 底下 2 支 VRN .py、`VIA_RetiredEngines` 底下 51 支,PEIS 命中 **0 支**,因為家族起點把那些夾排除了。所以答案分兩半:**活樹有整合(81.8%),備用件完全沒進來**。扣掉泛名之後,VRN 境內真正的同功能重複前幾名:`nlp_hub` 52 份散在 52 檔 · `resolve_db` 48 · `argval` 47 · `kind_expects_ticker` 46 · `purge` 43 · `repair_text` 37 —— 每一個都是同一件事在數十個檔各寫一份。",
    "batch": 585
+  },
+  {
+   "ts": "2026-09-18 14:40",
+   "op": "ENGINE",
+   "category": "PEIS",
+   "component": "CGC_MDL161_PEISCapabilityEngine_v0104",
+   "code": "批586 死樹兩族納入 PEIS + 斷開閘 + deadcheck 動詞;自測 21→25 檢",
+   "kind": "操作員令「1. yes(備用件也要納入)… 先跟 via / vdf 斷開」。①`retired`/`backup` 兩族改走**全樹 glob**——實測墓園有兩座:根下 `VIA_RetiredEngines/` **0 支 .py**、`functional modules/VIA_RetiredEngines/` **261 支**;寫死根下那座會回報 0=**假的零**。備份夾散在七處,容器樹內 .py **0 支**(誠實報零)。②**斷開**:死樹與活樹不同掃,同掃回 GATED(rc=4)並指名兩條各自的令,兩棵樹兩個庫。③放行門只對本次明示的那一族有效,`references/intake` 永遠不放行。④讀庫回退改挑**最寬的活樹庫**——原本挑最新的,剛掃完 retired 就會拿墓園當能力庫(檢⑱ 當場 FAIL 抓到)。⑤新增 `deadcheck` 動詞。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:45",
+   "op": "AUDIT",
+   "category": "PEIS",
+   "component": "備用件裡有沒有活樹沒有的東西(deadcheck 實查)",
+   "code": "批586 墓園 261 檔 / 3283 函式 → 1595 能力;only_dead 989 · suspect 105 · 人看完剩 2 組",
+   "kind": "死樹能力名 × 活樹能力庫(9134 能力)對名。**only_dead 989 不是答案**——改名/重構就會製造它(批585 量過:348 族疑似 8 族,真掉一族)。詞根比對縮到 120,壓平葉名再縮到 **105**(`misc.walkforward` 被判成活樹沒有,而活樹有 `misc.walk_forward`,差一條底線)。逐條看完 105,真正站得住的兩組:**① OCR 影像前處理**——活樹有 42 個 OCR 能力(tesseract/paddleocr 車道都在),但 `recognize`/`skew_angle`/`denoise`/`grayscale`/`enhance_contrast`/`16bit`/`tiff`/簡繁轉換 **一個都沒有**;**② 盤中 VWAP 防禦與下市情境壓測**(活樹 `vwap` 0、`scenario|stress` 0)。其餘:約 30 個是 **L50 明令禁用的 TA-Lib 指標包**(依法退役,不是遺漏)、其餘是退役的 WorkOps 專案管理件與電影/地理資料集(不在 VIA 範圍)。撿不撿回是操作員裁定(LL90),本批不代撿。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:50",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0354",
+   "code": "批586 PEIS 站 21→25 檢",
+   "kind": "站點用 `newest(\"CGC_MDL161_PEISCapabilityEngine_v*.py\")` 自動指尾版,只改站名檢數與描述(死樹全樹 glob · 斷開不同掃 · 讀庫回退不得挑到墓園)。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 14:55",
+   "op": "POLICY",
+   "category": "政策",
+   "component": "VIA_Policy_Laws_SSOT_v0100 +L72 +LL138 +LL139",
+   "code": "批586 死樹與活樹不同掃律;假的零跟假綠是同一件事;對名第一層數字永遠不是答案",
+   "kind": "L72 死樹與活樹不同掃律(操作員令「先跟 via / vdf 斷開」;GATED rc=4、兩庫分簽章、讀也要斷)。LL138 假的零——回報「0/無/沒有」的結論都要能說出**尺伸到哪裡**。LL139 對名分兩層,尺報 105、人看完剩 2。律 69→70,課 137→139。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL149 v0114 · CGC_MDL153 v0101 · VERSION 改由檔名推導",
+   "code": "批586 引擎報錯自己的版本:v0114 印 v0113、v0101 印 v0100",
+   "kind": "全格跑到 MDL149 時橫幅印 v0113,而跑的是 v0114 的檔——`VERSION` 是寫死常數,開新版複製時忘了改,於是**每一份它寫的報告**都報錯版本。全樹量:尾版件寫死 `VERSION` 的 **6 支**,錯 **2 支**。兩支都改成 `Path(__file__).stem.rsplit('_v',1)[-1]` 推導。誠實揭露:這件事目前**沒有尺在守**(現況 0 違規,面只有 6 支),先記成 LL140 慣例,不假裝已經有閘。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:12",
+   "op": "FIX",
+   "category": "PEIS",
+   "component": "CGC_MDL161 v0104 · deadcheck 扣掉本尺家族(LL133)",
+   "code": "批586 全格 MDL164 檢⑰ 棘輪抓到:新寫的 deadcheck 沒排掉自己家族",
+   "kind": "MDL164 的自我指涉棘輪(LL133)當場報「基線外新增 1 支」——就是我這批新寫的 `deadcheck`。它把活樹能力庫當對照集,而本檔住在 `cgc` 族、自己的函式也會被收成能力進對照集;我多寫一個帶 `recognize` 字樣的函式,墓園那支 `misc.recognize` 就自動不再是疑似=**用自己的版本號製造假進步**。修法:對照集扣掉「只由 `_SELF_FAMILY` 貢獻」的能力,並把扣掉幾個(`self_excluded`)**報出來**。實測目前 0(活樹庫是 v0104 出生前掃的),但機制先在位。棘輪回綠:SAFE 3→4 · 基線外 0。",
+   "batch": 586
+  },
+  {
+   "ts": "2026-09-18 15:14",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "VIA_Component_Inventory_SSOT_v0100(VCGC registry-sync --apply)",
+   "code": "批586 中央元件編號冊補登 7 新 38 變更;MDL149 檢⑬ 5372/5379 → 20/20 綠",
+   "kind": "本批新增兩支尾版件(MDL161 v0104、MDL064 v0354),中央元件自動編號冊沒跟上,MDL149 檢⑬ 報 ACTIVE 5372/5379。由**唯一寫入口** `via-vcgc registry-sync --apply` 補登:新 7 · 變更 38 · **退役 0** · AST 錯 0。",
+   "batch": 586
   }
  ],
- "updated_at": "2026-09-18 15:05",
- "batch": 585
+ "updated_at": "2026-09-18 15:14",
+ "batch": 586
 }

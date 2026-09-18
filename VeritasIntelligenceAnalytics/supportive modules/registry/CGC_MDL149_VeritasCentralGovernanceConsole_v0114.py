@@ -109,7 +109,7 @@ VIA = HERE.parent.parent
 ROOT = VIA.parent
 REPORTS = VIA / "VIA_Reports"
 OUTDIR = REPORTS / "vcgc"
-VERSION = "0113"
+VERSION = Path(__file__).stem.rsplit("_v", 1)[-1]   # 批586:寫死會爛——v0114 上印著 v0113,一路印進每一份報告
 def _batch_from_laws() -> int:
     """批520:批號正本=政策庫 batch(「批520」→ 520);讀不到退 519。"""
     try:
