@@ -8928,8 +8928,44 @@
    "code": "冊 63 項 · 調度 63 PLAN · 引擎 GREEN 16 / RED 1 · 修復候選 111 處",
    "kind": "第一次跑報 **RED**,而且那支紅的是 **CGC_MDL149 自己**——因為我新增了 v0115,元件自動編號冊還沒同步(⑬ `ACTIVE 5332/5339`)。**這不是巧合,是這個矩陣第一次就抓到了本批自己的缺口**。`registry-sync --apply`(新 7 · 變更 71 · 退役 0)之後 MDL149 自測 **22/22**。修復候選 111 處是 `CGC_MDL158 scan` 的既有讀數,**只列不修**——要修得走 `via-panorama fix --apply`,那是另一個明點。",
    "batch": 598
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "SET",
+   "category": "參數",
+   "component": "統一起始 2023-01-01 → **2023-07-01**(via-console set group-start;5 個群組)",
+   "code": "起始日在**參數庫**裡,不是矩陣的旗標",
+   "kind": "操作員令「啟動指令透過 VRN VDF 2023-07-01~今」。起始日的正本是 `VIA_InputConsole_Spec_v0100.json` 的 `user.group_starts`(批392 立的「整類遮罩」),不是隨手的 CLI 參數——所以照冊設:`tw_equity` / `macro` / `financials` / `etf` / `intl` **五個群組全設 2023-07-01**,`defaults.start` 的 2023-01-01 **不動**(群組值優先,只增不減)。逐鍵複驗過冊裡真的寫進去了,不是只看 `OK:` 那行。**VRN 的 `pipeline` 群組沒有任何日期參數**(15 項的參數是 `dir`/`codes`/`limit`/`in`/`out`),所以「2023-07-01~今」對 VRN 是 **no-op**——講成「VRN 也跑了這個區間」就是假的。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 15:10",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL149 v0116 `matrix --family vdf,vrn`(多家族)+ 頁上帶參數冊現值",
+   "code": "冊 48 項 = vdf 33 + vrn 15",
+   "kind": "`bus.catalog()` 只吃單一家族,所以逐家取再串——**串的是正典的輸出,不是自己重查一遍冊**(L80)。另加 `_mx_param_note()`:把 `user.group_starts` 的**現值**印在頁的範圍列上。理由:起始日不是矩陣的旗標,它在參數庫裡;頁上看不到現值的話,「跑了 2023-07-01 起」這句話**沒有出處**。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 16:00",
+   "op": "RUN",
+   "category": "實測",
+   "component": "via-vcgc matrix --family vdf,vrn --apply(起始 2023-07-01)",
+   "code": "48 項 → GREEN 23 · GATED 15 · RED 3 · NODATA 3 · PLAN 2 · ABSENT 2",
+   "kind": "**GATED 15 才是那句令真正的答案**:起始日照冊設好了,但要抓資料的 15 支(tw_prices_inc / tw_history / tw_chips / tw_trading_value / tw_daytrade_stock / tw_daytrade_files / macro_fred / macro_detail / macro_lanes / fin_statements / tw_revenue_codes / tw_revenue_backfill / estimate_bands / global_universe / global_lanes)**全部卡在同意閘**,引擎自己 fail-closed 印「同意閘未開(VIA_NET_CONSENT/VIA_SCRAPE_CONSENT)」——**閘是操作員的手,不代設**。3 紅拆開:`vdf/tw_align` 是**真資料紅**(逐日 價 892 · 籌碼 **0** · MISALIGNED,本容器籌碼表空);`vdf/vdf_quantguard_run` 與 `vrn/vrn_unified` 是**缺必要參數**(`[NEED_INPUT] run requires --in`、`at least one --in file/directory is required`),冊上參數欄寫著 `in,out` 但沒人給值——**要填什麼是操作員裁定,只點名不代填**。PLAN 2 = 寫庫動詞(`tw_universe_update` / `db_localdb_apply`),家族全掃永不代跑,要跑得 `--ids` 明點。",
+   "batch": 599
+  },
+  {
+   "ts": "2026-09-18 16:00",
+   "op": "FIX",
+   "category": "治理",
+   "component": "CGC_MDL139_InputConsole v0109 —— 自測沙盒基線",
+   "code": "設過參數就把自測弄紅的尺,是壞的尺",
+   "kind": "照冊設了 `user.group_starts` 五個群組之後,MDL139 自測**四檢連紅**:②⑥⑨ 寫死「統一起始 **2023-01-01**」、④ 寫死「changelog **兩筆**」——那是**操作員還沒設過任何參數**時的樣子。也就是說:**用了這本冊該有的功能,它自己的尺就翻臉**。逐項二分證過:清空 `group_starts` → 4 紅剩 1;再移走 datahome 目錄 → 仍剩 ④(changelog 已有 5 筆 ≠ 2)。v0109 修法:斷言用的 spec 一律先把**操作員設定過的那一塊**(`starts` / `group_starts` / `changelog`)回到空基線——**量的是「給這些輸入會產生什麼 argv」,不是「這台機器現在設了什麼」**。實測:帶著 2023-07-01 的設定、帶著 datahome 目錄、在格子的 PYTHONPATH 下,**18/18 全綠**。",
+   "batch": 599
   }
  ],
- "updated_at": "2026-09-18 14:30",
- "batch": 598
+ "updated_at": "2026-09-18 16:00",
+ "batch": 599
 }
