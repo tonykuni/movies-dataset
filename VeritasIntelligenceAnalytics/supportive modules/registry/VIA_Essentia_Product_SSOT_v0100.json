@@ -1,0 +1,141 @@
+{
+ "schema": "VIA.Essentia.Product.SSOT.v1",
+ "batch": 587,
+ "ts": "2026-09-18 16:10",
+ "purpose": "VIA Essentia 產品身分正本:商業名稱、承諾、動詞、保證、實測、登錄處。只增不減;改動走新版號。",
+ "product": {
+  "name": "VIA Essentia",
+  "name_zh": "能力精粹核",
+  "tagline_zh": "把一棵長歪的樹,收斂成一本讀得完的書。",
+  "tagline_en": "Distill a sprawling codebase into capabilities you can actually read.",
+  "naming_note": "批587 操作員令『用 VIA 為開頭給他一個商業化名稱』。取 Essentia(拉丁語:本質),對齊既有命名家族 Veritas / Celeritas / Aegis / Nexus。在此之前它只有技術代號『PEIS 能力引擎掛線口』——那是零件編號,不是一個功能。",
+  "category": "自適應機制(不是冊;驗的是有沒有引擎在做)",
+  "status": "ACTIVE"
+ },
+ "what_it_does": {
+  "one_line": "掃全樹 → 把同一件事的 N 份實作聚成一個能力 → 封印 → 發能力卡。",
+  "why_it_matters": "AI 讀原始碼是按 token 計價的。一棵 2507 檔 / 47999 函式的樹,全文是 120 萬 token 級;精粹成 9134 張能力卡之後是千位數級。**省的不是錢,是讀得完與讀不完的差別。**",
+  "pipeline": [
+   "INTAKE",
+   "SCAN",
+   "CLUSTER",
+   "TEST",
+   "LOCK",
+   "EVIDENCE",
+   "POOL",
+   "HYDRA",
+   "MAP",
+   "ANNOTATE",
+   "STORE"
+  ],
+  "start_condition": "零重複 → **不啟動整合**(誠實 NODATA,不是紅燈)。沒有重複就沒有東西可收斂。"
+ },
+ "verbs": [
+  {
+   "verb": "status",
+   "cmd": "via-peis",
+   "does": "收容正本在不在 + 它自己的 69 檢"
+  },
+  {
+   "verb": "scan",
+   "cmd": "via-peis scan --family vdf,vrn",
+   "does": "掃一族或多族,建能力庫(append-only)"
+  },
+  {
+   "verb": "cards",
+   "cmd": "via-peis cards [能力]",
+   "does": "取能力卡 capsule——AI 只讀卡,不讀全文"
+  },
+  {
+   "verb": "run",
+   "cmd": "via-peis run <能力> --params JSON",
+   "does": "快速截取層:直接跑一個能力(物件道/陣列道同解)"
+  },
+  {
+   "verb": "report",
+   "cmd": "via-peis report",
+   "does": "能力庫總帳"
+  },
+  {
+   "verb": "deadcheck",
+   "cmd": "via-peis deadcheck --family retired",
+   "does": "批586:墓園/備份夾裡有沒有活樹沒有的東西(分兩層輸出:候選 / 疑似)"
+  }
+ ],
+ "guarantees": [
+  "正本零觸碰:掃描 mode=READ_ONLY_SOURCES,跑完逐檔比 bytes,不是看旗標。",
+  "零網路:代跑時明示 VIA_NET_DISABLED=1;本口不 import requests/httpx/urllib。",
+  "零安裝:不呼叫 pip / conda(裝套件是操作員的手,L70)。",
+  "不代設同意閘:本口不寫任何 VIA_*_CONSENT / API key。",
+  "不提供 --apply:能力表落地與引擎鎖定是操作員的裁定(LL90),不由本口代行。",
+  "死樹與活樹不同掃(L72):退役件/備份夾單獨成族,混掃回 GATED;庫名帶範圍簽章,兩棵樹兩個庫。",
+  "尺不量自己(LL133):對名時扣掉只由本尺家族貢獻的能力,並把扣掉幾個報出來。"
+ ],
+ "measured": {
+  "ts": "2026-09-18",
+  "live_tree": {
+   "scope": "cgc sup vdf vrn",
+   "files": 2507,
+   "functions": 47999,
+   "capabilities": 9134,
+   "collapsed": 31217,
+   "near": 49978,
+   "saved_percent": 99.97
+  },
+  "vrn_only": {
+   "functions": 12568,
+   "capabilities": 2282,
+   "collapse_percent": 81.8,
+   "files": 525
+  },
+  "retired": {
+   "files": 261,
+   "functions": 3283,
+   "capabilities": 1595,
+   "collapsed": 922,
+   "near": 296,
+   "saved_percent": 99.42
+  },
+  "backup": {
+   "dirs": 7,
+   "files": 0,
+   "note": "七座備份夾,容器樹內 0 支 .py——誠實報零,不是尺沒伸到"
+  },
+  "deadcheck_retired": {
+   "only_dead": 989,
+   "suspect": 105,
+   "real_gaps_after_human_review": 2,
+   "gaps": [
+    "OCR 影像前處理(recognize/skew/denoise/grayscale/contrast/16bit/tiff/簡繁轉換)",
+    "盤中 VWAP 防禦 · 下市情境壓測"
+   ]
+  }
+ },
+ "engine": {
+  "entry": "CGC_MDL161_PEISCapabilityEngine_v*.py",
+  "entry_note": "尾版律:用 glob 指尾版,不寫死版號。",
+  "canonical_intake": "functional modules/VIA_PEIS/references/intake/PEIS_UnifiedEngine_b*",
+  "canonical_note": "收容正本 via_unified_engine.py(VIA-VIA-ENG996 v0200)**零觸碰**;掛線口只在外面包一層。",
+  "store": "VIA_Reports/peis/VIA_Capability_Store__<範圍簽章>.sqlite",
+  "store_note": "庫名帶掃描範圍簽章;封印只跟自己的 plan 比對(批585 根因)。"
+ },
+ "registered_at": {
+  "intake": "functional modules/VIA_PEIS/references/intake/PEIS_UnifiedEngine_b568(4 檔 sha256 逐檔比對)",
+  "command": "Register-VIA-Commands-v0220.ps1 · via-peis(別名 能力庫)· 批568 起",
+  "command_card": "VIA_Command_Cards_v0100.json · via-peis",
+  "selftest_grid": "CGC_MDL064_SelftestGrid_v* · PEIS 站 二十五檢",
+  "component_registry": "VIA_Component_Inventory_SSOT_v0100.json · 30 筆元件",
+  "policy_ssot": "VIA_Policy_Laws_SSOT_v0100.json · L72 · LL133 · LL138 · LL139",
+  "autocode_ledger": "VIA_AutoCode_Registry_v0100.json",
+  "governance_blueprint": "CGC_MDL164_GovernanceCompletenessAudit_v* · 第 4 自適應機制 essentia(批587 新增)",
+  "not_registered_at": {
+   "engine_bus_deck": "EngineBus 任務盤沒有它——**這是正常的**:治理型引擎(accel/uiunify/govaudit)一個都不在任務盤上,任務盤掛的是 VDF/VRN/VAP 的資料工。不是缺口,是分工。",
+   "input_console_ui": "MDL139 輸入主控台沒有它。操作員令『先不碰 HTML』,本批不動。"
+  }
+ },
+ "known_debt": [
+  "deadcheck 的詞根比對會低估同義改名(walkforward ↔ walk_forward 那一類已用壓平葉名修掉;中文描述比不中的仍會低估)。",
+  "backup 族在容器樹掃出 0 支 .py;操作員工作站上的備份夾若有 .py,要在工作站再跑一次才算數。",
+  "能力卡目前只在能力庫裡,沒有出成人看的頁(先不碰 HTML)。"
+ ]
+}
