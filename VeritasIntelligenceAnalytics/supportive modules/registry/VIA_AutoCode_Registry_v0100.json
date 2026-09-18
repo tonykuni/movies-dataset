@@ -9000,6 +9000,14 @@
    "code": "樹內件當套件名 · 版本釘沒引號 · 境根寫死",
    "kind": "產出的 `.ps1` 自稱「一貼即用」,逐行看過發現三個會炸的地方:①**樹內件被當成套件名**——冊裡 `via_vdf_312` 的 `pip` 欄寫的是敘述句 `\"VIA QuantGuard intake\"`(那是樹內收容件,`imp=quant_engine`),生成器照字面拆成三個套件塞進 `uv pip install`;而 **`intake` 在 PyPI 上真的有同名套件**,貼下去會裝到不相干的東西、整行還會失敗 → vdf 境一件都沒裝。修法:冊上加 `install: false`(只增不減,條目保留),生成器照旗標跳過,**不靠看名字像不像**。②**版本釘沒引號**——`paddlepaddle>=3.0` 在 PowerShell 裡 `>` 是**重導向**,會變成「裝 paddlepaddle,順便把 stdout 寫進一個叫 `=3.0` 的檔」,套件照裝但**版本釘悄悄不見**;bash 不會這樣,所以**在 Linux 產、在 Windows 貼**才踩得到(L71 同一族)。③**境根寫死**——計畫在容器算的,`.ps1` 裡就是 `/root/envs`,貼到 Windows 等於把別人的路徑帶過去;改成抽出 `$EnvRoot` 變數 + 分隔符正規化。第㊸檢**正反兩向都釘**:樹內件不得出現、正常件(duckdb)必須還在;版本釘一律引號;`$EnvRoot` 要在。另修**版號寫死**:檔名已是 `_v0109`,橫幅還印 `v0108`——操作員會以為自己跑的是舊版;改成從檔名讀。自測 **43/43**。",
    "batch": 601
+  },
+  {
+   "ts": "2026-09-18 15:57",
+   "op": "FIX",
+   "category": "環境",
+   "component": "CGC_MDL135_EnvGovernance v0110(命名律兩軸/零動作說話/逐境 LKGC + resume)",
+   "code": "46 檢(+㊹㊺㊻);冊 naming_law.exempt 收斂為 BASE;新動詞 via-envgov resume",
+   "kind": "操作員工作站實錄(46 境 · 境根 C:\\\\Users\\\\tonyk\\\\envs · BASE py3.13.7 件 317 衝突 136 · REBUILD via_iso_scrape_H/via_paddle_311/via_vrn_312 · 42 境零衝突 · LKGC eligible=False 衝突 139)驅動三修。① **命名律兩軸分開**:操作員令「BASE 應該是獨立的,其他都是 via_core 及 via_ 開頭的」。批385 把 `env_layout.protected_envs` 整包 OR 進命名律豁免,結果 `vmt_pm` 這種**受保護但名字不合律**的境一輩子不會被列出來——實錄只列了 camelot_311 / paddle_311 兩個,第三個在尺上根本不存在。v0110 拆成兩軸:protected 只管「不重建」,命名律只認 BASE 與冊 `naming_law.exempt`;被列出來仍只是 YELLOW 唯讀出令,不自動改名。② **授權後零動作必須說話**:實錄 `apply --approve` 印完抬頭就接同一份 digest,一條段果都沒有,最後又叫你再跑一次——和引擎壞掉長得一樣。根因不是沒做事,是 digest 截斷 `L[:21] + 省略 + L[-3:]` **正好吃掉「執行:跑 N …」那一行**(證據:plan 省略 9 行 vs apply 省略 10 行,多的那一行就是它)。修法:執行/零動作兩行移進必留尾段,且零動作時用 `apply_zero_why()` 講出主因(取段果**眾數**,不是第一條;L19 這種整批擋下的直接講)。③ **逐境 LKGC**:舊 LKGC 全境 all-or-nothing,42 境好、BASE 一境壞就整組不晉升,所以操作員說的「前一次成功紀錄」**一次都沒被存下來過**。改成逐境判定與逐境晉升(只增不減:後來壞掉的境**保留舊成功紀錄**並標 stale),新動詞 `via-envgov resume` 依前次成功狀態出 `uv pip install -r <lock>` 補齊令,`uv pip sync` 破壞段一律註解候裁。**誠實界定**:本容器沒有那 46 境,③ 的實跑證據是自測沙盒(㊻ 兩跑對照),不是工作站實跑;裝仍是操作員的手。"
   }
  ],
  "updated_at": "2026-09-18 15:20",
