@@ -8595,8 +8595,44 @@
    "code": "批589 PEIS 站 29→30 檢;產品正本補 VRN/CGC 實測段與一條已知債",
    "kind": "站名與描述同步四層分法;產品正本 `measured` 補 `vrn_only` / `cgc_only` 兩段與三本卡書路徑,`known_debt` 記下「第一版以檔為單位」這條並指向更正。",
    "batch": 589
+  },
+  {
+   "ts": "2026-09-18 18:40",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "CGC `newest` 32 份按行為分群",
+   "code": "批590 看起來同一件事,實際是 13 個行為群",
+   "kind": "併之前先量(AST 正規化後比骨架,不比長相):32 份定義 / **13 群**。f88659f52d 10 支 `newest(pattern, root)` · 0cf7954847 6 支 `newest(dirp, pat)`(**參數順序相反**)· 814deab1ca 2 支走 **rglob** · 2c54462eb1 1 支缺件回 `str(folder/pattern)` 不回 None · 358116394a 1 支濾掉 `_sha` · 000606dfba 1 支 pat 帶目錄 · **69abf90773 1 支按 `st_mtime` 排序**(違反尾版律的字典序,但不代改 LL90)· 其餘為守衛與預設值差異。**盲併就是遺失。**→ L75",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 18:50",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL751_VIATailPick_v0100(尾版取用正典)",
+   "code": "批590 一個簽章 + 明示選項 + 逐群重放證零損失(48 組全同)",
+   "kind": "`newest(root, pattern, *, recursive=False, exclude=(), on_missing=None, key='name')`;參數順序相反的那一群給**具名**相容綁定 `newest_pr(pattern, root)`,不用看型別猜路徑的魔法。自測十二檢,核心是第⑫檢:8 種具名變體的**原始實作**原樣抄進來當對照組,× 6 組語料逐一對答案,**48 組全同**。第⑩檢刻意把 mtime 做成跟版號相反,證明 mtime 與字典序**本來就不是同一把尺**。①②③ 第一版是拿字串比自己的原始碼,檢查標籤裡就寫著 `import requests`/`open(`/`CONSENT`,當場自己判自己 FAIL(LL133),改用 AST 問語法樹。",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:00",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "9 支尾版改吃正典綁定;活樹尾版 32→23 家族",
+   "code": "批590 模組層綁定不是再包一層 def,家族數才真的掉",
+   "kind": "遷移 CGC_MDL042/050/064/069/087/125/135/142 與 via_ocr_super 九支尾版:模組層 `def newest|_newest` → `newest = _TP_MOD.newest_pr`。**再包一層橋函式的話家族數不會掉,等於沒併**。正典缺席 → import 時 RuntimeError(**大聲壞掉**,不 graceful 回退——回退等於把重複留著,而尾版取錯是無聲的錯)。`via_selftest_grid_v0105_shac435dd5a` 是 **sha 凍結快照,不得改**。自測格自己也在被遷的九支裡,改用新版號 v0358(尾版律),v0357 還原。逐支冒煙:九支 import 後 `newest` 都解到同一個尾版。→ LL143",
+   "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:05",
+   "op": "FIX",
+   "category": "治理",
+   "component": "SUP_MDL751 補加速器橋;MDL156 GREEN 37/37",
+   "code": "批590 全格抓到:新開的正典忘了掛批102 全樹導入令的橋",
+   "kind": "全格跑完 FAIL 2,兩盞都是本批造成的而且都對:① MDL156 加速器覆蓋閘——新開的 `SUP_MDL751` 沒有 `[VIA:ACCEL-BRIDGE]`。「全樹導入」就是全樹,新開的檔沒有豁免權,補上後 **GREEN 37/37**。② MDL149 元件編號冊沒跟上新檔,`registry-sync --apply` 補登:變更 241 · **退役 8**(就是被移除的那幾支 `newest`,冊上誠實記成退役,不是刪)。",
+   "batch": 590
   }
  ],
- "updated_at": "2026-09-18 18:05",
- "batch": 589
+ "updated_at": "2026-09-18 19:10",
+ "batch": 590
 }

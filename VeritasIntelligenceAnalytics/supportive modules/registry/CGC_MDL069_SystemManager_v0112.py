@@ -167,9 +167,29 @@ def progress(step: int, total: int) -> None:
     print(f"[PROGRESS] {bar} {pct}%", flush=True)
 
 
-def newest(pattern: str, root: Path) -> Path | None:
-    hits = sorted(root.glob(pattern))
-    return hits[-1] if hits else None
+# ===== [VIA:TAILPICK-BRIDGE:v0100] 尾版取用正典橋(批590;正典 SUP_MDL751_VIATailPick)=====
+# 批589 量到 CGC 族最大的一筆整合債:**33 個家族各寫一份 `newest`**,而且 32 份裡有 13 種行為
+# ——最大兩群的參數順序是相反的、兩支走 rglob、一支缺件回 pattern、一支按 mtime 排序。
+# 批590 把規則收進正典並**逐群重放證明零損失**(8 種變體 × 6 組語料,48 組全同)。
+# 這裡是**模組層綁定**不是再定義一支橋函式:本檔從此不再有 `def newest`,
+# 能力庫裡這一家族就真的消失了(再包一層 def 的話家族數不會掉,等於沒併)。
+# `newest_pr` = 參數順序 (pattern, root),沿用本檔原本的用法,呼叫端零改動。
+import importlib.util as _tp_ilu
+from pathlib import Path as _tp_Path
+_TP_MOD = None
+_tp_p = _tp_Path(__file__).resolve()
+while _tp_p.parent != _tp_p:
+    _tp_hits = sorted((_tp_p / "supportive modules").glob("SUP_MDL751_VIATailPick_v*.py"))
+    if _tp_hits:
+        _tp_spec = _tp_ilu.spec_from_file_location("VIA_TAILPICK", _tp_hits[-1])
+        _TP_MOD = _tp_ilu.module_from_spec(_tp_spec)
+        _tp_spec.loader.exec_module(_TP_MOD)
+        break
+    _tp_p = _tp_p.parent
+if _TP_MOD is None:      # 大聲壞掉:回錯檔比壞掉更糟(尾版取錯=整條鏈指到舊引擎)
+    raise RuntimeError("[FAIL] 尾版取用正典缺席:supportive modules/SUP_MDL751_VIATailPick_v*.py")
+newest = _TP_MOD.newest_pr
+# ===== [VIA:TAILPICK-BRIDGE:END] =====
 
 
 # ── C1 AST 精準解析(原生)──────────────────────────────────────────────
