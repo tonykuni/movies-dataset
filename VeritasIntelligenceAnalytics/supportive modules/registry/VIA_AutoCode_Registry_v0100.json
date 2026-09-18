@@ -8982,8 +8982,26 @@
    "code": "TIMEOUT · GREEN · NODATA · GATED · RED —— 五態逐一量到",
    "kind": "本容器有 `pwsh`,所以不是只看語法:①`Parser::ParseFile` 語法 OK(2267 權杖);②把逾時迴圈抽成獨立 harness,拿五個假子行程真跑——睡 600 秒的那支在 **3.1s 被殺掉**、其餘四支照樣跑完並各自判成 GREEN/NODATA(rc2)/GATED(rc4)/RED(rc1)。**第一版 harness 是壞的**:我把參數命名成 `$Args`,那是 PowerShell 的**自動變數**,綁不進去→`python3` 沒收到參數→改讀 stdin→**五步全部逾時**,看起來像迴圈壞了。改名 `$ChildArgs` 才量到真的。教訓同 LL152:**量出來的紅,先問是不是尺自己壞了**。v0103 本體用的是 `$Arguments`,沒有這個撞名(已逐一掃過 Args/Input/Error/Host/Matches/PSItem/This 全無)。另外逐項驗過:VERIFY 的 6 個期待路徑**全部存在**、9 個引擎 glob **全部解析得到尾版**——不然會報一堆假的 MISSING/ABSENT。",
    "batch": 600
+  },
+  {
+   "ts": "2026-09-18 15:20",
+   "op": "SCAN",
+   "category": "環境",
+   "component": "工具清點(via-envgov tools)+ BASE/其他境重建計畫(plan)",
+   "code": "工具 130 件 · 境 8 + BASE · BASE 判 RED 衝突 37 · 段冊 21",
+   "kind": "操作員令「清點所有工具,依照 ENVMANAGER 重建修正 BASE 及其他環境,安裝所有工具」。**先量再動(L80)**:清點與計畫都走既有正典 `CGC_MDL135 EnvGovernance`(`tools` / `plan`),不另寫盤點器。清點:130 件,來源 `VIA_ToolRoster_SSOT_v0100.json` ∪ Celeritas `_LIB_MAP`(88)∪ AegisNexus 相依(3);**ENV_ABSENT 69 · UNROUTED 59**;風險 HIGH 2 · MEDIUM 9 · LOW 101 · SPECIAL 16。境:via_core / via_vrn_312 / via_paddle_311 / via_vap_312 / via_vdf_312 / via_mix_ds_np2_M / via_mix_http_M / via_iso_ml_cuda_H,共 16 段(ENSURE_ENV + INSTALL_TOOLS)。BASE:判 **RED**,衝突 37 條,三個拉出(nlp→via_nlp · browser→via_iso_scrape_H · table_extraction→via_camelot_311)、改道隔離 3 件、段冊 21(並行 13 · 序 8 · **破壞候裁 4**)、LKGC 不合格。**apply 是操作員的手,不代跑**(`via-envgov apply --approve` 只做非破壞段;綠了才談 `--approve-remove`)。**誠實界定**:這些數字是**本容器**的 BASE 與境量出來的(py3.11.15),**不是工作站的**;計畫的結構可用,數字得在你那台重量一次。",
+   "batch": 601
+  },
+  {
+   "ts": "2026-09-18 15:20",
+   "op": "FIX",
+   "category": "環境",
+   "component": "CGC_MDL135_EnvGovernance v0109 —— 三個「一貼即炸」的坑(+第㊸檢)",
+   "code": "樹內件當套件名 · 版本釘沒引號 · 境根寫死",
+   "kind": "產出的 `.ps1` 自稱「一貼即用」,逐行看過發現三個會炸的地方:①**樹內件被當成套件名**——冊裡 `via_vdf_312` 的 `pip` 欄寫的是敘述句 `\"VIA QuantGuard intake\"`(那是樹內收容件,`imp=quant_engine`),生成器照字面拆成三個套件塞進 `uv pip install`;而 **`intake` 在 PyPI 上真的有同名套件**,貼下去會裝到不相干的東西、整行還會失敗 → vdf 境一件都沒裝。修法:冊上加 `install: false`(只增不減,條目保留),生成器照旗標跳過,**不靠看名字像不像**。②**版本釘沒引號**——`paddlepaddle>=3.0` 在 PowerShell 裡 `>` 是**重導向**,會變成「裝 paddlepaddle,順便把 stdout 寫進一個叫 `=3.0` 的檔」,套件照裝但**版本釘悄悄不見**;bash 不會這樣,所以**在 Linux 產、在 Windows 貼**才踩得到(L71 同一族)。③**境根寫死**——計畫在容器算的,`.ps1` 裡就是 `/root/envs`,貼到 Windows 等於把別人的路徑帶過去;改成抽出 `$EnvRoot` 變數 + 分隔符正規化。第㊸檢**正反兩向都釘**:樹內件不得出現、正常件(duckdb)必須還在;版本釘一律引號;`$EnvRoot` 要在。另修**版號寫死**:檔名已是 `_v0109`,橫幅還印 `v0108`——操作員會以為自己跑的是舊版;改成從檔名讀。自測 **43/43**。",
+   "batch": 601
   }
  ],
- "updated_at": "2026-09-18 17:10",
- "batch": 600
+ "updated_at": "2026-09-18 15:20",
+ "batch": 601
 }
