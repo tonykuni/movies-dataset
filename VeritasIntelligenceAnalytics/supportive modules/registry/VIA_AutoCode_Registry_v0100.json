@@ -8694,8 +8694,35 @@
    "code": "批592 +JSON 讀寫正典站;全格 OK 243 · FAIL 0 · SKIP 2",
    "kind": "站名帶上「證不過的那一支具名在 NOT_MIGRATED」。全格零紅。",
    "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:40",
+   "op": "FIX",
+   "category": "整合",
+   "component": "SUP_MDL752 `_fresh()` · 綁定工廠的可變預設值",
+   "code": "批593 根因:bind_read(missing={}) 的 {} 是同一個物件,呼叫端 append 它",
+   "kind": "`VIA_AutoCodeGenerator.load_json` 原本「檔案不在就回一個空 dict」——**每次都是新的**。遷成綁定工廠後,那個 `{}` 在**工廠建立時求值一次**,呼叫端 `chain_reg.setdefault('codechains', []); chain_reg['codechains'].append(obj)` 直接改它,第二次呼叫拿到被改過的那一份 → 計數累加(index 2 · product 3 · LNK-0004),MDL155 檢④⑨ 由綠轉紅。**位元組層級的零損失自測全過**,因為差異不在輸出而在**回傳值的身分**。修:`_fresh()` 對 dict/list/set/bytearray 回 deepcopy;+檢⑤之二(連呼三次、中間改第一次的回傳值,第二三次必須乾淨)。→ L76 · LL147",
+   "batch": 593
+  },
+  {
+   "ts": "2026-09-18 21:50",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "VIA_AutoCodeGenerator 補遷;模組層 18 → 0",
+   "code": "批593 JSON 讀寫整併收乾淨,NOT_MIGRATED 清空",
+   "kind": "根因查清後補遷,MDL155 回 OK 9 · FAIL 0。活樹尾版**模組層自己定義 JSON 讀寫的家族 0**,14 支改吃正典;唯一剩下的 `CGC_MDL095_DeckServer` 是**類別方法**(HTTP 回應與請求 body),本來就不該併,具名在 NOT_FILE_IO。`NOT_MIGRATED` 清空,根因留在 `RESOLVED`——**根因比結果值錢**。",
+   "batch": 593
+  },
+  {
+   "ts": "2026-09-18 22:00",
+   "op": "ENGINE",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0360",
+   "code": "批593 JSON 讀寫正典站 十一→十二檢;全格 OK 243 · FAIL 0",
+   "kind": "站名帶上根因。全格 245 站零紅。",
+   "batch": 593
   }
  ],
- "updated_at": "2026-09-18 21:10",
- "batch": 592
+ "updated_at": "2026-09-18 22:05",
+ "batch": 593
 }

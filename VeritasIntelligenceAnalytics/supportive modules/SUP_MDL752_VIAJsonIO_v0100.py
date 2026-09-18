@@ -59,6 +59,7 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+import copy
 import json
 import os
 import sys
@@ -72,15 +73,39 @@ NOT_FILE_IO = {
     "CGC_MDL095_DeckServer._read_json": "讀 HTTP 請求 body(Content-Type 驗證 · 拒 Transfer-Encoding · 容量上限),不是讀檔",
 }
 
-#: **證不過所以沒遷**(L75:證不出來的不准遷)。留名字、留理由,不留一句「之後再說」。
-NOT_MIGRATED = {
-    "VIA_AutoCodeGenerator_v0100.load_json/write_json":
-        "它寫的是**帶累加計數的 SSOT 冊**(codechain / module / function),"
-        "換成正典綁定之後 `CGC_MDL155` 的檢④⑨ 由綠轉紅(index_count 2 · product_count 3 · LNK-0004)。"
-        "逐支二分確認就是這一支;把它還原,MDL155 立刻回 OK 9 · FAIL 0。"
-        "位元組層級的零損失自測是過的,所以差異在**呼叫端的狀態語意**而不是在 dumps 的輸出——"
-        "根因還沒查清楚。**沒查清楚就不遷**,不是留著等下次踩。",
+#: **證不過所以沒遷**(L75)。目前為空——留這個表是為了下一次:
+#: 遷不動的一律留名字、留理由,不留一句「之後再說」。
+NOT_MIGRATED: dict[str, str] = {}
+#: 曾經進過上表、批593 查清根因後補遷完成的。留著是因為**根因比結果值錢**。
+RESOLVED = {
+    "VIA_AutoCodeGenerator_v0100.load_json":
+        "批592 遷完 CGC_MDL155 檢④⑨ 由綠轉紅(計數累加)。批593 根因:"
+        "原本 `if not path.exists(): return {}` **每次都是新的空 dict**,"
+        "遷成 `bind_read(missing={})` 之後那個 `{}` 是工廠建立時求值的**同一個物件**,"
+        "而呼叫端 `chain_reg[\"codechains\"].append(obj)` 直接改它——"
+        "第二次呼叫就拿到被改過的那一份。**位元組零損失全過卻還是壞了**,"
+        "因為差異不在 dumps 的輸出,在『回傳值是不是同一個物件』。"
+        "修法:`_fresh()` 對可變容器回 deepcopy;自測 ⑤之二 釘住。",
 }
+
+def _fresh(v):
+    """可變的預設值每次都給**新的一份**。
+
+    批593 根因:`VIA_AutoCodeGenerator.load_json` 原本是 `if not path.exists(): return {}`
+    ——**每次呼叫都是一個新的空 dict**。我把它遷成 `bind_read(missing={})`,那個 `{}` 是在
+    **工廠建立時**求值的**同一個物件**,而呼叫端會直接改它:
+
+        chain_reg = load_json(self.ssot.codechain)
+        chain_reg.setdefault("codechains", [])
+        chain_reg["codechains"].append(obj)        # ← 改到的是綁在工廠裡的那一個
+
+    於是第二次呼叫拿到的是被改過的那一份,計數一路累加
+    (`index_count 2` · `product_count 3` · `LNK-0004`),`CGC_MDL155` 檢④⑨ 由綠轉紅。
+    **位元組層級的零損失自測全過,卻還是壞了**——因為差異不在 dumps 的輸出,
+    在「回傳值是不是同一個物件」。這就是 Python 的可變預設值坑,只是換了一件外套。
+    """
+    return copy.deepcopy(v) if isinstance(v, (dict, list, set, bytearray)) else v
+
 
 _MISSING = object()
 #: 明示的「請拋出來」哨兵。寫 `missing=RAISE` 比寫 `strict=True` 更看得出是哪一半要拋。
@@ -107,13 +132,13 @@ def read(path, *, missing=None, broken=None, bom: bool = True, strict: bool = Fa
     if p is None or not p.is_file():
         if missing is RAISE:
             return json.loads(Path(path).read_text(encoding=enc))   # 讓它用原生錯誤拋
-        return missing
+        return _fresh(missing)
     try:
         return json.loads(p.read_text(encoding=enc))
     except Exception:
         if broken is RAISE:
             raise
-        return broken
+        return _fresh(broken)
 
 
 def write(path, obj, *, indent=1, ensure_ascii: bool = False, atomic: bool = True,
@@ -260,11 +285,11 @@ def selftest() -> int:
         "免得下一輪又被算成整合債",
         len(NOT_FILE_IO) == 2 and all("HTTP" in v for v in NOT_FILE_IO.values()),
         f"({sorted(NOT_FILE_IO)})")
-    chk("②之二 **證不過的那一支具名在冊**(L75:證不出來的不准遷;留名字留理由,"
-        "不留一句『之後再說』)",
-        len(NOT_MIGRATED) >= 1
-        and all(len(v) > 60 and "根因" in v or "還原" in v for v in NOT_MIGRATED.values()),
-        f"({sorted(NOT_MIGRATED)})")
+    chk("②之二 遷不動的一律**留名字留理由**(L75);查清根因補遷的留在 RESOLVED,"
+        "因為**根因比結果值錢**",
+        all(len(v) > 60 for v in NOT_MIGRATED.values())
+        and all(len(v) > 60 for v in RESOLVED.values()) and len(RESOLVED) >= 1,
+        f"(未遷 {sorted(NOT_MIGRATED) or '無'} · 已補遷 {sorted(RESOLVED)})")
 
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
@@ -284,6 +309,13 @@ def selftest() -> int:
             and read(gone, missing={}) == {} and read(bad, broken=[]) == []
             and read(gone, missing={}, broken=RAISE) == {}
             and _raises(lambda: read(bad, missing={}, broken=RAISE)))
+        _b = bind_read(bom=False, missing={})
+        _one, _two = _b(gone), _b(gone)
+        _one["x"] = 1
+        chk("⑤之二 **可變預設值每次都要是新的一份**(批593 根因:呼叫端 append 回傳值,"
+            "把綁在工廠裡的那個 dict 改掉,下一次就拿到被改過的——計數一路累加)",
+            _two == {} and _one is not _two and _b(gone) == {},
+            f"(第一次改成 {_one} · 第二次 {_two} · 第三次 {_b(gone)})")
         chk("⑤ `strict=True` 缺檔壞檔**直接拋**(回 default 會把壞檔說成不存在=假的零)",
             _raises(lambda: read(gone, strict=True)) and _raises(lambda: read(bad, strict=True))
             and read(good, strict=True) == payload)
@@ -346,7 +378,8 @@ def main() -> int:
     print("  write(path, obj, *, indent=1, ensure_ascii=False, atomic=True, mkdir=True,"
           " default=…, newline=False)")
     print(f"  不得併的兩處(不是檔案 IO):{sorted(NOT_FILE_IO)}")
-    print(f"  證不過所以沒遷:{sorted(NOT_MIGRATED)}")
+    print(f"  證不過所以沒遷:{sorted(NOT_MIGRATED) or '無'}")
+    print(f"  查清根因後補遷:{sorted(RESOLVED)}")
     return 0
 
 
