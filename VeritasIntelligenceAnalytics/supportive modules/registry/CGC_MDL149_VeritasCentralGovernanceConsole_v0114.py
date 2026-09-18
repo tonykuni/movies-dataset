@@ -157,11 +157,30 @@ def _load(name: str, path: Path):
     return m
 
 
-def _json(p: Path | None) -> dict | None:
-    try:
-        return json.loads(Path(p).read_text(encoding="utf-8-sig")) if p and Path(p).is_file() else None
-    except Exception:
-        return None
+# ===== [VIA:JSONIO-BRIDGE:v0100] JSON 讀寫正典橋(批592;正典 SUP_MDL752_VIAJsonIO)=====
+# 本處原本的行為:utf-8-sig + is_file 守衛 · try/except→None
+# 批592 量過:活樹尾版 168 支只有 **20 處**定義 / **17 個行為群**(debt 報的 83/35 檔含版本史,LL142)。
+# 差異軸:讀=編碼 utf-8-sig vs utf-8(**活的不一致**:帶 BOM 的檔有些引擎讀得到有些讀不到)、
+# 缺檔與壞檔**是兩個旋鈕**(合成一個 default 會把壞檔說成不存在=假的零,LL138);
+# 寫=原子寫 / indent / 尾換行 / default=str ——**indent 與尾換行是產出契約,不得統一**。
+# 所以正典把差異變成明示選項,並逐群重放證零損失(讀 9 種 × 4 語料全同;寫 4 種**逐位元組相同**)。
+# 這裡是**綁定**不是再定義一支 def(寫 def 家族數不會掉=等於沒併,LL143)。
+import importlib.util as _js_ilu
+from pathlib import Path as _js_Path
+_JS_MOD = None
+_js_p = _js_Path(__file__).resolve()
+while _js_p.parent != _js_p:
+    _js_hits = sorted((_js_p / "supportive modules").glob("SUP_MDL752_VIAJsonIO_v*.py"))
+    if _js_hits:
+        _js_spec = _js_ilu.spec_from_file_location("VIA_JSONIO", _js_hits[-1])
+        _JS_MOD = _js_ilu.module_from_spec(_js_spec)
+        _js_spec.loader.exec_module(_JS_MOD)
+        break
+    _js_p = _js_p.parent
+if _JS_MOD is None:      # 大聲壞掉:讀錯編碼/寫錯 indent 都是無聲的錯
+    raise RuntimeError("[FAIL] JSON 讀寫正典缺席:supportive modules/SUP_MDL752_VIAJsonIO_v*.py")
+_json = _JS_MOD.bind_read()
+# ===== [VIA:JSONIO-BRIDGE:END] =====
 
 
 def _age_h(ts: str) -> float | None:

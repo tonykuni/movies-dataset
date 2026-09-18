@@ -8658,8 +8658,44 @@
    "code": "批591 registry-sync 變更 491 · 退役 20;全格 OK 242 · FAIL 0",
    "kind": "被移除的那些 `newest` 冊上誠實記成**退役 20**,不是刪(只增不減)。全格 243 站 OK 242 · FAIL 0 · SKIP 2,零紅。",
    "batch": 591
+  },
+  {
+   "ts": "2026-09-18 20:30",
+   "op": "AUDIT",
+   "category": "整合",
+   "component": "JSON 讀寫 20 處按行為分群",
+   "code": "批592 17 群 / 20 處,而且兩處根本不是檔案 IO",
+   "kind": "照 L75 先分群。跟 `newest`(32 份 13 群,最大一群 10 支全同)**完全不是同一種情況**:20 處 / **17 群**,幾乎每處都不一樣。兩處是 `CGC_MDL095_DeckServer` 的**類別方法**——`_json(self,obj,code)` 發 HTTP 回應、`_read_json(self,cap)` 讀請求 body(Content-Type 驗證 · 拒 Transfer-Encoding · 容量上限),**不得併**,具名進 NOT_FILE_IO。讀的差異:編碼 `utf-8-sig` 7 處 vs `utf-8` 5 處(**活的不一致**)、缺檔/壞檔回什麼。寫的差異:原子寫 / indent(1 三處、2+尾換行一處)/ default=str。→ LL145",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 20:45",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL752_VIAJsonIO_v0100(JSON 讀寫正典)",
+   "code": "批592 讀正典化 · 寫只併證得出位元組相同的;十一檢",
+   "kind": "`read(path, *, missing=None, broken=None, bom=True, strict=False)` —— **缺檔與壞檔是兩個旋鈕**(合成一個 default 會把壞檔說成不存在=假的零,LL138)。`write(path, obj, *, indent=1, ensure_ascii=False, atomic=True, mkdir=True, default=…, newline=False)` —— **indent 與尾換行是產出契約,預設值不代表對**。零損失:讀 **9 種具名變體 × 4 語料(正常/BOM/缺檔/壞檔)全同**;寫 **4 種變體逐位元組相同**。自測第一版的對照組把 `try/except` 抄漏,報「原 EXC ≠ 正典 None」——**紅的是對照組不是正典**,對照組抄錯零損失就是假的。①②③ 也照 LL133 用 AST 問語法樹,不拿字串比自己。",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:00",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "13 支改吃 JSON 正典;模組層 18 → 1",
+   "code": "批592 一支證不過,還原並具名在 NOT_MIGRATED(L75)",
+   "kind": "遷 13 支(MDL058/135/139/140/149/153/154/155/156/163/136/137 · VIA_GovernanceParameterControl)。**`VIA_AutoCodeGenerator` 證不過**:換綁定後 MDL155 檢④⑨ 由綠轉紅(計數累加 index 2 · product 3 · LNK-0004),還原即回 OK 9 · FAIL 0;位元組零損失是過的,差異在呼叫端的狀態語意,根因未明 → **不遷**,名字與理由寫進 `NOT_MIGRATED` 並加檢②之二釘住。另一個坑:同檔兩處要遷時我由下往上改,把**載入器放在後面那一處**,前面那一處先執行就 NameError,四支當場炸——載入器要放在**最前面**那一處。→ LL146",
+   "batch": 592
+  },
+  {
+   "ts": "2026-09-18 21:05",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "CGC_MDL064_SelftestGrid_v0359 · 全格",
+   "code": "批592 +JSON 讀寫正典站;全格 OK 243 · FAIL 0 · SKIP 2",
+   "kind": "站名帶上「證不過的那一支具名在 NOT_MIGRATED」。全格零紅。",
+   "batch": 592
   }
  ],
- "updated_at": "2026-09-18 20:05",
- "batch": 591
+ "updated_at": "2026-09-18 21:10",
+ "batch": 592
 }
