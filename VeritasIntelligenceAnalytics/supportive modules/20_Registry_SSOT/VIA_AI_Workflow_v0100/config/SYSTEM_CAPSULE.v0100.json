@@ -1,0 +1,55 @@
+{
+  "$schema": "../schemas/system_capsule.schema.json",
+  "capsule_id": "VIA-SYSTEM-CAPSULE-000001",
+  "version": "0100",
+  "system_name": "Veritas Intelligence Analytics",
+  "mode": "fail_closed",
+  "layers": ["PREFLIGHT", "DATA", "CORE", "UI", "QA", "OPS"],
+  "canonical_anchors": {
+    "mother_system": "VIA_SYSTEM_MANAGER_v0121.py",
+    "central_registry": "supportive modules/20_Registry_SSOT/VIA_RegistryCore_v1.py",
+    "unified_ssot": "supportive modules/20_Registry_SSOT/VIA_SSOT_Unified.py",
+    "ast_runtime": "supportive modules/VIA_Panorama_AST_RuntimeInjector.py",
+    "runtime_bridge": "supportive modules/VIA_Runtime_Bridge_All_in_One.py",
+    "governance_engine": "supportive modules/VIA_Central_Governance/CGC_MDL001_CentralGovernanceEngine_v0401.py",
+    "ai_workflow_bridge_proposal": "supportive modules/20_Registry_SSOT/VIA_AI_Workflow_v0100/src/via_mother_system_bridge.py"
+  },
+  "canonical_selection_order": [
+    "lifecycle",
+    "role",
+    "syntax",
+    "version",
+    "path_depth",
+    "stable_path_name"
+  ],
+  "required_gates": [
+    "STATIC",
+    "AST",
+    "CONTRACT",
+    "UNIT",
+    "SANDBOX",
+    "INTEGRATION",
+    "REGRESSION",
+    "USER_TEST"
+  ],
+  "promotion": {
+    "automatic": false,
+    "requires_human_approval": true,
+    "delete_or_rename_existing": false
+  },
+  "context_policy": {
+    "default_budget_tokens": 12000,
+    "load_full_repository": false,
+    "load_full_database": false,
+    "require_path_allowlist": true,
+    "prefer_symbol_slices": true,
+    "cache_keys": ["git_sha", "path", "content_sha256", "schema_fingerprint", "parameters"]
+  },
+  "github_policy": {
+    "repository": "tonykuni/movies-dataset",
+    "base_branch": "main",
+    "agent_branch_pattern": "^(ChatGPT|agent|claude)/?[A-Za-z0-9._/-]*$",
+    "force_push": false,
+    "direct_merge": false
+  }
+}
