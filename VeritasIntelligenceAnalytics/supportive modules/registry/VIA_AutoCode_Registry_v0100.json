@@ -8631,8 +8631,35 @@
    "code": "批590 全格抓到:新開的正典忘了掛批102 全樹導入令的橋",
    "kind": "全格跑完 FAIL 2,兩盞都是本批造成的而且都對:① MDL156 加速器覆蓋閘——新開的 `SUP_MDL751` 沒有 `[VIA:ACCEL-BRIDGE]`。「全樹導入」就是全樹,新開的檔沒有豁免權,補上後 **GREEN 37/37**。② MDL149 元件編號冊沒跟上新檔,`registry-sync --apply` 補登:變更 241 · **退役 8**(就是被移除的那幾支 `newest`,冊上誠實記成退役,不是刪)。",
    "batch": 590
+  },
+  {
+   "ts": "2026-09-18 19:40",
+   "op": "ENGINE",
+   "category": "整合",
+   "component": "SUP_MDL751_VIATailPick_v0101 · +bind() 綁定工廠",
+   "code": "批591 群數一多,每群取一個名字會長成 newest_pr_rglob_nosha_mtime",
+   "kind": "剩下的群還差**預設 root**(HERE/VIA/只吃一個參數)、**rglob**、**exclude `_sha`**、**mtime 排序**、**缺件回 pattern**(且命中時也要回 str,型別不能兩樣)。給一個工廠 `bind(order=, root_default=, recursive=, exclude=, on_missing=, key=, stringify=)`:選項留在呼叫端、看得見、可被質疑;回來的是**綁定不是 def**(寫 def 家族數不會掉,LL143)。自測變體表 8→**15 種**、語料組 48→**90 組全同**——**工廠繞出來的路也要證,不能只證直呼**。",
+   "batch": 591
+  },
+  {
+   "ts": "2026-09-18 19:55",
+   "op": "MIGRATE",
+   "category": "整合",
+   "component": "其餘 22 支尾版改吃正典;活樹 32 → **1** 家族",
+   "code": "批591 收乾淨:剩下的那一個是 sha 凍結快照,不能動",
+   "kind": "逐群配明示綁定式:rp 10 支(MDL136/137/138/139/152/153/095/149/159 · via_conflict_guard)· pr 4 支(MDL078/141/154 · via_tree_atlas)· rglob 2 支(MDL080/104)· root_default=HERE 3 支(MDL082 另加 exclude `_sha` · MDL134 · MDL052)· root_default=VIA 1 支(MDL133)· key=mtime 1 支(MDL119,**違反尾版律但等價遷移不代改** LL90)· on_missing+stringify 1 支(MDL157)。遷移前驗**綁定式用到的 HERE/VIA 在注入點之前已指派**,驗不過判 BLOCKED 不硬幹。逐支冒煙 22/22 都解到同一個尾版。剩 `via_selftest_grid_v0105_shac435dd5a` —— sha 凍結快照,改它 sha 就對不上。→ LL144",
+   "batch": 591
+  },
+  {
+   "ts": "2026-09-18 20:00",
+   "op": "SYNC",
+   "category": "治理",
+   "component": "元件編號冊 · 全格",
+   "code": "批591 registry-sync 變更 491 · 退役 20;全格 OK 242 · FAIL 0",
+   "kind": "被移除的那些 `newest` 冊上誠實記成**退役 20**,不是刪(只增不減)。全格 243 站 OK 242 · FAIL 0 · SKIP 2,零紅。",
+   "batch": 591
   }
  ],
- "updated_at": "2026-09-18 19:10",
- "batch": 590
+ "updated_at": "2026-09-18 20:05",
+ "batch": 591
 }

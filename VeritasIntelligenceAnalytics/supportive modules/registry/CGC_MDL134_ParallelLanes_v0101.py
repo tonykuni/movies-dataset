@@ -123,9 +123,28 @@ RULES = ["單寫者律:同一 DuckDB/安裝器的步在同鏈序跑;鏈間才並
 
 
 # ---------------------------------------------------------------- 載入
-def newest(pat: str, root: Path = HERE) -> Path | None:
-    hits = sorted(root.glob(pat))
-    return hits[-1] if hits else None
+# ===== [VIA:TAILPICK-BRIDGE:v0100] 尾版取用正典橋(批590/591;正典 SUP_MDL751_VIATailPick)=====
+# 本群原本的行為:root 預設 HERE
+# 批590 量過:CGC 族 32 份 `newest` 是 **13 個行為群**,不是同一件事(最大兩群參數順序相反、
+# 兩支走 rglob、一支缺件回 pattern、一支按 mtime 排序)。所以正典把差異變成**明示選項**,
+# 並逐群重放證零損失(15 種具名變體 × 6 組語料,90 組全同)。
+# 這裡是**綁定**不是再定義一支 def:寫 def 的話能力庫裡這一家族還在,家族數不會掉(LL143)。
+import importlib.util as _tp_ilu
+from pathlib import Path as _tp_Path
+_TP_MOD = None
+_tp_p = _tp_Path(__file__).resolve()
+while _tp_p.parent != _tp_p:
+    _tp_hits = sorted((_tp_p / "supportive modules").glob("SUP_MDL751_VIATailPick_v*.py"))
+    if _tp_hits:
+        _tp_spec = _tp_ilu.spec_from_file_location("VIA_TAILPICK", _tp_hits[-1])
+        _TP_MOD = _tp_ilu.module_from_spec(_tp_spec)
+        _tp_spec.loader.exec_module(_TP_MOD)
+        break
+    _tp_p = _tp_p.parent
+if _TP_MOD is None:      # 大聲壞掉:尾版取錯是無聲的錯(整條鏈指到舊引擎,沒人會發現)
+    raise RuntimeError("[FAIL] 尾版取用正典缺席:supportive modules/SUP_MDL751_VIATailPick_v*.py")
+newest = _TP_MOD.bind(order="pr", root_default=HERE)
+# ===== [VIA:TAILPICK-BRIDGE:END] =====
 
 
 def _load(pat: str, alias: str):
