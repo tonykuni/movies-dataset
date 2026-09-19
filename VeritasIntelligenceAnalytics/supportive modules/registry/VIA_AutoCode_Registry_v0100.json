@@ -9104,8 +9104,16 @@
    "component": "Register v0224(短令找不到時**自己重點源後重跑**;$VIA/$VIAGrokVerbs 升 global)",
    "code": "容器實跑:假裝本視窗點 v0220 且函式不存在 → 打 via-regen → 自動重點 v0224 → 引擎真的跑完(rc=0)",
    "kind": "工作站實錄:他照我寫的打 `via-presync` / `via-allinone`,兩支都回「**冊上有,但本視窗沒點到**」(視窗開機時點的是 v0220,磁碟已 v0222);`via-regen` 回「**冊上也沒有**」(它在 v0223,而 v0223 在他還沒拉的 commit 裡)。**要拉新冊得先用 via-presync,而 via-presync 點不到**——解卡的工具又在被卡住的那一側(L85 第四次)。v0218 起冊已經會**講出**是哪一種,但它只給建議,操作員還是得自己再打一次。v0224 把它從「講」變成「做」:冊上有但本視窗沒點到 → **自動重點源尾版冊,並把原來那句重跑一次**;同一個名字只自動接一次($global:VIA_AUTORELOAD 記名)防迴圈;接第二次還不通才退回印建議。陷阱先驗過:`$VIA` 原本只在點源那個 scope,如果在 scriptblock 裡點源,離開就沒了,之後從全域呼叫任何短令都會找不到根——所以同時釘一份 `$global:VIA`(`$VIAGrokVerbs` 同理),`function global:` 的函式解析 `$VIA` 會沿 scope 鏈走到 global,就接得上。只增不減,原行一字未動。容器 pwsh 7.4.6 端到端實跑:假裝本視窗點的是 v0220 且 `via-regen` 不存在 → 打 via-regen → 自動重點 v0224 → 再生物還原閘真的跑完並印出裁決。"
+  },
+  {
+   "ts": "2026-09-19 12:16",
+   "op": "UPDATE",
+   "category": "操作員裁定 + VRN",
+   "component": "VRN_ENG074 v0111(期間拆解 + 單位/幣別 + 具名欄位 INSERT)· ENG081 v0101(正名:派生非正典)· Grid v0370",
+   "code": "二十五檢 OK 25 · FAIL 0;ENG081 十一檢 OK 11",
+   "kind": "**操作員批615 裁定:VRN 正典儲存層 = DuckDB。**這一條把批472「Parquet 當唯一真實主資料庫」的措辭覆蓋掉,兩條令並存、時序為準;ENG081 的實作從來沒變過(它 v0100 自己就量過「資料早就在正典 DuckDB 裡,所以本件是派生車道」),改的只是名分,並釘上**單向律**:永不把 Parquet 讀回去當抽取來源,正典壞了就重跑抽取,不從派生層回灌。① 實害:庫裡躺著 `revenue 營業收入淨額 2023 = 5839.0`——**沒有單位**。百萬元還是千元,下游無從得知。既有的 UNIT_SCALE 只能在**事後**拿兩個值的比值猜「大概差 1000 倍」,那是推論不是資料。v0111 在抽取當下掃頁面的單位宣告並記下 unit/currency/scale。**只認寫出來的**,頁面沒寫就留 NULL 並記 `NO_DECL`,絕不由數值大小反推(零發明)。語意單位另判:比率永遠 %、倍數永遠 x、每股跟幣別——這三類不吃頁面的金額宣告。② 抽取漏:`PERIOD_TOKEN_RX` 吃得下 `24Q1`(年在前)卻吃不下 `1Q25`(季在前)——那是外資報告最常見的寫法,整個表頭會被判非表頭、整欄丟掉。v0111 兩種寫法都解,並補 `1H25`/`FY26`/`TTM`/民國三碼,拆出 period_type/fiscal_year/fiscal_quarter。③ 未爆彈:`INSERT INTO vrn_report_financial VALUES (?,?,?,?,?,?,?,?)` 配 `list(r.values())`——靠 dict 順序的位置參數,而 WORD 道的列多了 mops_rank/mops_why 兩鍵(10 值塞 8 位)。加欄時一併改成具名欄位 INSERT。④ 遷移只增不減:`ALTER TABLE … ADD COLUMN IF NOT EXISTS` 八欄,舊列留 NULL——**NULL 的意思是「還沒重抽」,不是「沒有單位」**,兩者不可混為一談。自審:第一版檢㉑ 拿 `period_parts('1Q25') == period_parts('25Q1')` 比整個 dict,而 `why` 欄記的是原文、本來就該不同,於是判自己紅——改成只比結構三欄。"
   }
  ],
- "updated_at": "2026-09-19 10:45",
- "batch": "批614"
+ "updated_at": "2026-09-19 12:16",
+ "batch": "批615"
 }
