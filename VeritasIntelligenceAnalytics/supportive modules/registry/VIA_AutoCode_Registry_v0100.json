@@ -9184,8 +9184,24 @@
    "component": "CGC_MDL164 v0108:收容正本零觸碰閘加 EOL 態(工作站 RED 41 是假紅)",
    "code": "沙盒三條路實走:原樣 GREEN 1 · 只換行尾 EOL 1(不是紅)· 真的改字 RED 1;容器實樹 58 夾 GREEN 46 · RED 0 · UNKEPT 12 · EOL 0 · NODATA 0(不變);自測 23 檢 OK 23",
    "kind": "工作站 `GREEN 5 · RED 41`,容器同一棵樹 `GREEN 46 · RED 0`。一棵樹不會有兩個真相。根因:_sha256() 讀原始位元組,Windows core.autocrlf 把 LF 換 CRLF。`.gitattributes` 只對 VTR 等四棵子樹寫 `-text`,references/intake/** 不在裡面。**CGC_MDL159 批546 就解過**(檢⑪ 行尾無關),躺在隔壁 73 批沒帶過來(LL189→L93)。v0108:raw 不符再比 CRLF→LF 正規化的 sha,對得上判 EOL 不判紅。**不代改 .gitattributes**——那一行會讓操作員下次 checkout 重新正規化一整片檔,是他的手。"
+  },
+  {
+   "ts": "2026-09-19 16:05",
+   "op": "UPDATE",
+   "category": "環境治理",
+   "component": "CGC_MDL135 v0112:BASE 身分釘住 + 跨跑換人閘(L94)+ 境身分四來源對照(ABI)",
+   "code": "自測 46 → **49 檢全綠**(㊼ 五條路 OK/NAME_LIES/HOME_DRIFT/ABI_MISMATCH/NODATA 各走一次;㊽ SAME/CHANGED/NODATA 三態;㊾ 閘真的在 apply 之前)· 容器實跑 plan:`BASE 身分:3.11.15 @ /usr/local/bin/python3 · 件 98 · base`",
+   "kind": "操作員令「先把環境完工」。量完才知道**完不了工不是因為缺件**:(甲)BASE 的定義是 `sys.executable`,70 分鐘內從 3.12.12/242 件/衝突 0 變 3.13.7/692 件/衝突 136,而 digest 從來沒印過 BASE 是哪一支檔案(LL192→L94);(乙)家族境叫 `via_*_312` 而 RunGate 量到 3.13.7,`pyarrow no attribute '__version__'` 是原生模組半載的長相——**ABI 不合,不是缺件**,而 RunGate 的下一步卻是再裝一個輪子(LL193)。v0112 把「名字 / pyvenv.cfg / 活直譯器 / 原生輪子標籤」四者對照做成一層,並在 BASE 換人時**擋下 apply**,覆寫要操作員自己打 `--base-changed-ok`(不代設)。**不代裝、不代刪、不代重建**:引擎只負責把「差在哪」講到可以照著做。"
+  },
+  {
+   "ts": "2026-09-19 16:20",
+   "op": "FIX",
+   "category": "自測沙盒",
+   "component": "CGC_MDL135 v0112 ㊶:把 OUT/LKGC_* 一起關進沙盒(以前只關境根)",
+   "code": "重現條件:先跑一次 `via-envgov plan --offline`(LKGC 落地)再跑 --selftest → ㊶ FAIL;沙盒化後在同樣條件下 49/49 全綠",
+   "kind": "全格子 FAIL 1 抓到的。㊶ 讀實樹 LKGC 決定 restore.mode——**判定器讀自己跑出來的輸出**(LL179 第四次)。這是時間炸彈:容器乾淨所以一直綠,操作員那台跑過幾十次 via-envgov,那一站在他那邊本來就該紅。同一支檔的 ⑥ 檢早有正確的換沙盒寫法,只是沒帶到 ㊶(LL189 同病)。"
   }
  ],
- "updated_at": "2026-09-19T15:10:00",
- "batch": 619
+ "updated_at": "2026-09-19T16:05:00",
+ "batch": 620
 }
