@@ -1,0 +1,318 @@
+{
+ "schema": "VIA.VRN.LogicArchitecture.SSOT.v1",
+ "version": "v0100",
+ "batch": "批622",
+ "ts": "2026-09-19",
+ "purpose": "操作員令「把今天的 VRN 邏輯整合一遍不要遺漏」。本冊是**索引**不是內容:每一層只記『正典在哪一支』,規則本身留在原處。複製一份規則出來就是開第二顆頭(零 Hydra),而且它一定會比正本先過期。",
+ "how_built": "本冊由 docs 附的建冊腳本 glob 尾版解析、逐支讀出檔頭第一句職責後產生——**指標是量出來的,職責是讀出來的**,不是我寫的(LL180)。解析不到任何一支就整本不寫(半本冊比沒有冊危險)。",
+ "law_bindings": [
+  "L90 VRN 正典儲存層=DuckDB(批615 操作員裁定)",
+  "L30 一功能一主(擷取文字修復的擁有者=ENG082)",
+  "L54 尾版律(本冊所有指標一律 glob 尾版,不寫死版號)"
+ ],
+ "layers": {
+  "L0_輸入識別": {
+   "why": "檔名 → 股號/券商/日期;識別錯了後面全錯",
+   "nodes": [
+    {
+     "family": "SUP_MDL030_VISVRNTickerFilenameSSOT",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py",
+     "head": "VIS_VRN_TickerFilenameSSOT (reference build for review)",
+     "role": "檔名→股號正本"
+    },
+    {
+     "family": "SUP_MDL031_VISVRNTickerRegexShim",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL031_VISVRNTickerRegexShim_v0100.py",
+     "head": "VIS_VRN_TickerRegexShim_v0100 - P2 runtime shim (operator-approved 2026-08-04)",
+     "role": "regex 橋"
+    },
+    {
+     "family": "SUP_MDL015_VISVRNBrokerAliasFullList",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL015_VISVRNBrokerAliasFullList_v0100.py",
+     "head": "VIS_VRN_BrokerAlias_FullList_v0100",
+     "role": "券商別名全表"
+    }
+   ]
+  },
+  "L1_擷取": {
+   "why": "非 OCR 優先,抓不到才退 OCR;由簡到繁(批493 操作員令)",
+   "owner": "VRN_ENG082_ExtractionLogic(L30:文字修復只寫在這一支)",
+   "nodes": [
+    {
+     "family": "VRN_ENG082_ExtractionLogic",
+     "tail": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py",
+     "head": "VRN_ENG082_ExtractionLogic v0110 — VRN 擷取**中央邏輯庫**(批515 +fix_contents:TAB3「FIXED CONTENTS」修正識別)",
+     "role": "擷取中央邏輯庫(擁有者)"
+    },
+    {
+     "family": "VRN_ENG060_TextOmni",
+     "tail": "functional modules/VRN/VRN_ENG060_TextOmni_v0100.py",
+     "head": "vrn_text_omni_v0100 — 文字統包引擎(TOOL-050;操作員令 2026-08-18)",
+     "role": "文字道"
+    },
+    {
+     "family": "VRN_ENG058_TableOmni",
+     "tail": "functional modules/VRN/VRN_ENG058_TableOmni_v0105.py",
+     "head": "vrn_table_omni_v0105 — 本地免費表格函式庫統包引擎(TOOL-029)",
+     "role": "表格道(需 poppler)"
+    },
+    {
+     "family": "VRN_ENG057_ScanOcrRescue",
+     "tail": "functional modules/VRN/VRN_ENG057_ScanOcrRescue_v0104.py",
+     "head": "vrn_scan_ocr_rescue_v0104 — 純影像掃描件 OCR 救援(mobile 模型加速版)",
+     "role": "掃描件 OCR 救援"
+    },
+    {
+     "family": "VRN_ENG056_PdfForensics",
+     "tail": "functional modules/VRN/VRN_ENG056_PdfForensics_v0100.py",
+     "head": "vrn_pdf_forensics_v0100 — PDF 法醫探針(唯讀;零輸出檔死因判定)",
+     "role": "PDF 取證"
+    },
+    {
+     "family": "VRN_ENG059_GapMultirescue",
+     "tail": "functional modules/VRN/VRN_ENG059_GapMultirescue_v0100.py",
+     "head": "vrn_gap_multirescue_v0100 — 表格缺口多方案總攻指揮(TOOL-049;操作員令 2026-08-18)",
+     "role": "缺口多重救援"
+    },
+    {
+     "family": "VRN_ENG075_DocToMarkdown",
+     "tail": "functional modules/VRN/VRN_ENG075_DocToMarkdown_v0101.py",
+     "head": "VRN_ENG075_DocToMarkdown — 文件→Markdown→JSON 引擎(批249 立;批258 JSON 道)",
+     "role": "文件→Markdown"
+    },
+    {
+     "family": "VRN_ENG077_OmniFormatBridge",
+     "tail": "functional modules/VRN/VRN_ENG077_OmniFormatBridge_v0100.py",
+     "head": "VRN_ENG077_OmniFormatBridge — VOFIE 全格式引擎橋(批256;操作員令)",
+     "role": "多格式橋"
+    },
+    {
+     "family": "SUP_MDL747_OcrLaneRunner",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL747_OcrLaneRunner_v0102.py",
+     "head": "SUP_MDL747_OcrLaneRunner v0102 — OCR 車道執行器(批495;v0101 批499;v0102 批501)",
+     "role": "OCR 車道調度(需 poppler/tesseract)"
+    },
+    {
+     "family": "SUP_MDL746_PDFPlumberPlusHub",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v0100.py",
+     "head": "SUP_MDL746 · PDFPlumberPlusHub v0100 —— PDFPlumber-Plus 收容件統轄橋",
+     "role": "pdfplumber 樞紐"
+    }
+   ]
+  },
+  "L2_結構與知識": {
+   "why": "把抽出來的字變成有欄位的東西",
+   "nodes": [
+    {
+     "family": "VRN_ENG072_FirstPageText",
+     "tail": "functional modules/VRN/VRN_ENG072_FirstPageText_v0135.py",
+     "head": "v0134→v0135(批624:抬頭的 Windows 路徑把整支檔變成每跑一次噴一行警告)",
+     "role": "首頁文字"
+    },
+    {
+     "family": "VRN_ENG073_ReportStructuredDB",
+     "tail": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0129.py",
+     "head": "v0128→v0129(批558 操作員令「加入同義字 第一頁周圍訊息區塊及中間本文標題區修復後尋找」)",
+     "role": "研報結構庫"
+    },
+    {
+     "family": "VRN_ENG074_FinancialPages",
+     "tail": "functional modules/VRN/VRN_ENG074_FinancialPages_v0111.py",
+     "head": "(讀不到抬頭;誠實)",
+     "role": "財報頁(批615 期間/單位/幣別)"
+    },
+    {
+     "family": "VRN_ENG063_Lexicon",
+     "tail": "functional modules/VRN/VRN_ENG063_Lexicon_v0101.py",
+     "head": "vrn_lexicon_v0101 — 中英文字庫+知識樹引擎(TOOL-059;品質閘版)",
+     "role": "詞庫"
+    },
+    {
+     "family": "VRN_ENG064_KnowledgeStack",
+     "tail": "functional modules/VRN/VRN_ENG064_KnowledgeStack_v0102.py",
+     "head": "VRN_ENG064_KnowledgeStack — 本地知識抽取堆疊轉接 v0101(批152;via-know)",
+     "role": "知識堆疊(批611 零依賴簡→繁)"
+    }
+   ]
+  },
+  "L3_驗證": {
+   "why": "「有值」不等於「對」——驗過才准進矩陣(批569)",
+   "nodes": [
+    {
+     "family": "VRN_ENG083_VerifiedMatrix",
+     "tail": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0102.py",
+     "head": "VRN_ENG083_VerifiedMatrix v0100 — 驗證矩陣(批569)",
+     "role": "驗證矩陣"
+    },
+    {
+     "family": "VRN_ENG076_RegressionGate",
+     "tail": "functional modules/VRN/VRN_ENG076_RegressionGate_v0101.py",
+     "head": "VRN_ENG076_RegressionGate v0101 — 抽取鏈迴歸閘(批251;操作員「完成所有工作",
+     "role": "回歸閘"
+    },
+    {
+     "family": "CGC_MDL141_ClosingGate",
+     "tail": "supportive modules/registry/CGC_MDL141_ClosingGate_v0109.py",
+     "head": "CGC_MDL141_ClosingGate v0100 — 收尾閘(批398 操作員令「將 VRN VAL 收個尾吧」;via-closeout / via-vrnval / via-vapval)",
+     "role": "收尾閘(VRN 驗證收尾)"
+    }
+   ]
+  },
+  "L4_產出": {
+   "why": "給人看的那一層",
+   "nodes": [
+    {
+     "family": "VRN_ENG080_FourPointDigest",
+     "tail": "functional modules/VRN/VRN_ENG080_FourPointDigest_v0105.py",
+     "head": "VRN_ENG080_FourPointDigest v0100 — 研報「一題四點」文摘+潛在上漲空間(目標價除權息調整)引擎(批386)",
+     "role": "一題四點文摘"
+    },
+    {
+     "family": "VRN_ENG068_DailyBrief",
+     "tail": "functional modules/VRN/VRN_ENG068_DailyBrief_v0105.py",
+     "head": "v0104→v0105(批538 VRN 實測):⑨ 要求「因子覆蓋 100%(n_ma == 該日在庫列數)」,實測 891/892 就紅。",
+     "role": "每日簡報"
+    },
+    {
+     "family": "VRN_ENG079_ControlTowerDashboard",
+     "tail": "functional modules/VRN/VRN_ENG079_ControlTowerDashboard_v0100.py",
+     "head": "VRN_ENG079_ControlTowerDashboard — VRN 控制塔儀表板(批306)",
+     "role": "控制塔"
+    }
+   ]
+  },
+  "L5_儲存": {
+   "why": "L90:正典=DuckDB;其餘全是派生層,單向永不回灌",
+   "canonical": "**DuckDB** —— `vdf_tw_market.duckdb` 的 `vrn_*` 七張表(L90;批615 操作員裁定)",
+   "nodes": [
+    {
+     "family": "VRN_ENG081_ParquetMainDB",
+     "tail": "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0101.py",
+     "head": "VRN_ENG081_ParquetMainDB v0101 — VRN 交付派生庫(Parquet;正典是 DuckDB)",
+     "role": "Parquet 派生車道(**非正典**;批615 正名)"
+    }
+   ]
+  }
+ },
+ "rule_canons": {
+  "方法冊_def01_21": {
+   "family": "vrn_method_kernel",
+   "tail": "functional modules/VRN/vrn_method_kernel_v0102.py",
+   "head": "vrn_method_kernel_v0102 — VRN 方法核(TOOL-071)",
+   "role": "方法核:def01–def21(含期間解析)"
+  },
+  "六欄規則": {
+   "family": "SUP_MDL749_VRNFieldRuleHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0106.py",
+   "head": "v0104→v0105(批563 操作員「同意」接收容冊的 MOPS 判定規則)",
+   "role": "研報六欄規則正本樞紐"
+  },
+  "財務邏輯": {
+   "family": "SUP_MDL748_FinancialLogicHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v0100.py",
+   "head": "SUP_MDL748_FinancialLogicHub v0100 — 財務邏輯統轄橋(批504)",
+   "role": "財務邏輯樞紐"
+  },
+  "版面樞紐": {
+   "family": "SUP_MDL743_GenericLayoutHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0100.py",
+   "head": "SUP_MDL743_GenericLayoutHub — GLE 全後端統轄橋(批421;操作員令)",
+   "role": "通用版面樞紐"
+  },
+  "NLP 應用": {
+   "family": "SUP_MDL744_NLPApplicationHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+   "head": "SUP_MDL744_NLPApplicationHub v0102 — NLP 應用系統統轄橋(批517 操作員令「VRN 實測 NLP 工具要導入」)",
+   "role": "NLP 應用樞紐"
+  },
+  "Markdown 結構": {
+   "family": "SUP_MDL745_MarkdownStructureHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL745_MarkdownStructureHub_v0100.py",
+   "head": "SUP_MDL745 · MarkdownStructureHub v0100 —— Markdown 結構重組收容件統轄橋",
+   "role": "Markdown 結構樞紐"
+  },
+  "階段別名": {
+   "book": "supportive modules/registry/VIA_VRN_StageAlias_Map_v0100.json",
+   "exists": true
+  },
+  "繁簡轉換": {
+   "book": "supportive modules/registry/VIA_ZhConvert_S2TWP_CharMap_v0100.json",
+   "exists": true,
+   "why": "批611:opencc 缺席時的凍結對照表;**函式消失不是降級,是斷線**"
+  },
+  "基本資料欄": {
+   "book": "functional modules/VRN/StockReportBasicInfo.json",
+   "exists": true
+  },
+  "Sheet 產出計畫": {
+   "book": "functional modules/VRN/StockReport_GoogleSheet_OutputPlan.json",
+   "exists": true
+  }
+ },
+ "external_tools": {
+  "why": "批618 量過:pdf2image 靠 PATH 找 pdftoppm;剝掉 = VRN 取表道當場斷線",
+  "anchors_book": "supportive modules/registry/VIA_BadEnv_Blacklist_v0102.json#path_tool_anchors",
+  "tools": [
+   "poppler(pdftoppm/pdfinfo/pdftocairo)",
+   "tesseract"
+  ]
+ },
+ "rulings_today": [
+  {
+   "batch": "批611",
+   "what": "簡→繁不再依賴 opencc:凍結對照表 2,784 筆",
+   "landed_in": [
+    "functional modules/VRN/VRN_ENG064_KnowledgeStack_v0102.py",
+    "supportive modules/registry/VIA_ZhConvert_S2TWP_CharMap_v0100.json"
+   ],
+   "why": "一個套件缺席讓三站同時紅;shim 把函式變成 None=**函式消失**,不是降級"
+  },
+  {
+   "batch": "批615",
+   "what": "操作員裁定:VRN 正典儲存層 = DuckDB(L90)",
+   "landed_in": [
+    "supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json#L90",
+    "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0101.py"
+   ],
+   "why": "批472 原令寫 Parquet 當唯一真值;批615 覆蓋。兩令並存,時序為準,不刪舊令"
+  },
+  {
+   "batch": "批615",
+   "what": "數值入正典必須帶**宣告出來的**單位,不得由數值大小反推(LL178)",
+   "landed_in": [
+    "supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json#L90 配套②",
+    "functional modules/VRN/VRN_ENG074_FinancialPages_v0111.py"
+   ],
+   "why": ""
+  },
+  {
+   "batch": "批615",
+   "what": "期間拆解:1Q25 與 25Q1 同義(ENG074 檢㉑ 只比三個結構欄,不比 why)",
+   "landed_in": [
+    "functional modules/VRN/VRN_ENG074_FinancialPages_v0111.py"
+   ],
+   "why": ""
+  },
+  {
+   "batch": "批618",
+   "what": "poppler 是 VRN 的活相依,列入 PATH 搬家白名單(不得盲剝)",
+   "landed_in": [
+    "supportive modules/registry/VIA_BadEnv_Blacklist_v0102.json#path_tool_anchors",
+    "supportive modules/registry/via_conflict_guard_v0101.py"
+   ],
+   "why": ""
+  }
+ ],
+ "known_gaps": [
+  {
+   "item": "財報欄位清單(FinancialData)沒有與 StockReportBasicInfo.json 對稱的正本冊",
+   "state": "PENDING_OPERATOR",
+   "why": "量過:VRN 夾內有 StockReportBasicInfo.json,沒有 StockReportFinancialData.json。欄位清單目前散在 ENG074 的程式碼裡。要不要獨立成冊是裁定,不是我能決定的(LL90)"
+  },
+  {
+   "item": "四層擷取/五層驗證的**層名**是本冊第一次寫下來的",
+   "state": "PENDING_OPERATOR",
+   "why": "各引擎自己知道自己在做什麼,但沒有一本冊講過整條鏈怎麼分層。本冊的 L0–L5 是依既有引擎職責歸納的,**請操作員覆核層名與歸屬**"
+  }
+ ]
+}

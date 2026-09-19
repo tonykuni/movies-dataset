@@ -9184,8 +9184,120 @@
    "component": "CGC_MDL164 v0108:收容正本零觸碰閘加 EOL 態(工作站 RED 41 是假紅)",
    "code": "沙盒三條路實走:原樣 GREEN 1 · 只換行尾 EOL 1(不是紅)· 真的改字 RED 1;容器實樹 58 夾 GREEN 46 · RED 0 · UNKEPT 12 · EOL 0 · NODATA 0(不變);自測 23 檢 OK 23",
    "kind": "工作站 `GREEN 5 · RED 41`,容器同一棵樹 `GREEN 46 · RED 0`。一棵樹不會有兩個真相。根因:_sha256() 讀原始位元組,Windows core.autocrlf 把 LF 換 CRLF。`.gitattributes` 只對 VTR 等四棵子樹寫 `-text`,references/intake/** 不在裡面。**CGC_MDL159 批546 就解過**(檢⑪ 行尾無關),躺在隔壁 73 批沒帶過來(LL189→L93)。v0108:raw 不符再比 CRLF→LF 正規化的 sha,對得上判 EOL 不判紅。**不代改 .gitattributes**——那一行會讓操作員下次 checkout 重新正規化一整片檔,是他的手。"
+  },
+  {
+   "ts": "2026-09-19 16:05",
+   "op": "UPDATE",
+   "category": "環境治理",
+   "component": "CGC_MDL135 v0112:BASE 身分釘住 + 跨跑換人閘(L94)+ 境身分四來源對照(ABI)",
+   "code": "自測 46 → **49 檢全綠**(㊼ 五條路 OK/NAME_LIES/HOME_DRIFT/ABI_MISMATCH/NODATA 各走一次;㊽ SAME/CHANGED/NODATA 三態;㊾ 閘真的在 apply 之前)· 容器實跑 plan:`BASE 身分:3.11.15 @ /usr/local/bin/python3 · 件 98 · base`",
+   "kind": "操作員令「先把環境完工」。量完才知道**完不了工不是因為缺件**:(甲)BASE 的定義是 `sys.executable`,70 分鐘內從 3.12.12/242 件/衝突 0 變 3.13.7/692 件/衝突 136,而 digest 從來沒印過 BASE 是哪一支檔案(LL192→L94);(乙)家族境叫 `via_*_312` 而 RunGate 量到 3.13.7,`pyarrow no attribute '__version__'` 是原生模組半載的長相——**ABI 不合,不是缺件**,而 RunGate 的下一步卻是再裝一個輪子(LL193)。v0112 把「名字 / pyvenv.cfg / 活直譯器 / 原生輪子標籤」四者對照做成一層,並在 BASE 換人時**擋下 apply**,覆寫要操作員自己打 `--base-changed-ok`(不代設)。**不代裝、不代刪、不代重建**:引擎只負責把「差在哪」講到可以照著做。"
+  },
+  {
+   "ts": "2026-09-19 16:20",
+   "op": "FIX",
+   "category": "自測沙盒",
+   "component": "CGC_MDL135 v0112 ㊶:把 OUT/LKGC_* 一起關進沙盒(以前只關境根)",
+   "code": "重現條件:先跑一次 `via-envgov plan --offline`(LKGC 落地)再跑 --selftest → ㊶ FAIL;沙盒化後在同樣條件下 49/49 全綠",
+   "kind": "全格子 FAIL 1 抓到的。㊶ 讀實樹 LKGC 決定 restore.mode——**判定器讀自己跑出來的輸出**(LL179 第四次)。這是時間炸彈:容器乾淨所以一直綠,操作員那台跑過幾十次 via-envgov,那一站在他那邊本來就該紅。同一支檔的 ⑥ 檢早有正確的換沙盒寫法,只是沒帶到 ㊶(LL189 同病)。"
+  },
+  {
+   "ts": "2026-09-19 16:50",
+   "op": "UPDATE",
+   "category": "環境治理",
+   "component": "CGC_MDL135 v0113 · resume 升級:還原前次成功布局 → 補沒裝的 → 衝突檢查 → 依計畫裝(不複驗)",
+   "code": "自測 49 → **50 檢全綠**(㊿ 四道紅線各撞一次:未授權=零動作 · 無同意=BLOCKED_CONSENT · CONFLICT=SKIP 不裝 · 指令裡零 sync/uninstall/remove;uv 缺=NOT_RUN 不猜)",
+   "kind": "操作員令「找前一個成功安裝環境工具布局 根據歷史紀錄還原 再把沒安裝的工具經過衝突檢查後無誤建立新增計畫 依計畫執行安裝 不測是因為之前已測試過」。他卡在 L19 的死結裡:要綠才准裝,而黃的原因就是沒裝(LL195)。①②(還原)本來就有——批602 的逐境 LKGC;新的是 ③ 衝突檢查(`uv pip install --dry-run`,零安裝)與 ④ 執行(`resume --approve`)。L19 具名豁免,理由印在輸出裡(L87),界線寫死:只增不減 · 只裝 CLEAN · 破壞段不進 · 同意閘不代設 · reverified=False 附操作員原話(LL196)。"
+  },
+  {
+   "ts": "2026-09-19 16:52",
+   "op": "FIX",
+   "category": "自審",
+   "component": "MDL135 v0113 digest:名實不符依嚴重度排序 + 印出被截掉幾境(批620 我自己造的)",
+   "code": "ABI_MISMATCH > HOME_DRIFT > NAME_LIES;>6 境時逐態列出未印計數",
+   "kind": "v0112 寫 `bad_id[:6]` 而 bad_id 是掃描順序。工作站 9 境只看到 6 列全是 NAME_LIES——萬一 ABI_MISMATCH 排第 7 位就被截掉了,而那是唯一一種「裝更多件只會更糟」的狀態(LL197)。"
+  },
+  {
+   "ts": "2026-09-19 17:20",
+   "op": "NEW",
+   "category": "VRN 治理",
+   "component": "VIA_VRN_LogicArchitecture_SSOT v0100(索引正本)+ via_vrn_logic_book v0100(建冊器+守門員)+ via-vrnbook",
+   "code": "實跑:層 6 · 引擎指標 25 · 規則正本 10 · 今日裁定 5 · 待裁定 2;守門 31 指標全在位且為尾版 GREEN;自測七檢 OK 7",
+   "kind": "操作員令「把今天的 VRN 邏輯整合一遍不要遺漏」。**指過去,不複製**:37 個引擎家族 + 10 本規則樞紐,抄一份進索引冊就是第二顆頭。冊由樹生成(glob 尾版 + 逐支讀檔頭),不是手寫;守門比「冊上寫的」對「樹上尾版」,過期就紅並指名 `via-vrnbook build`。今日五條裁定逐條入冊帶批號與落地處(批611 凍結繁簡表 · 批615 L90 DuckDB 正典 · 批615 單位不得反推 · 批615 期間拆解 · 批618 poppler 列 PATH 搬家白名單);兩條 known_gaps 一律 PENDING_OPERATOR。格 253 → 255 站(工具健康一盞、冊新不新一盞)。"
+  },
+  {
+   "ts": "2026-09-19 17:45",
+   "op": "FIX",
+   "category": "登錄面",
+   "component": "via_vrn_logic_book 補三個登錄面:加速器橋 + 根目錄梭(批340 契約)+ Register v0225",
+   "code": "MDL156 RED 36/37 → GREEN 37/37;MDL157 RED 25/26(ghost + missing shim)→ GREEN 26/26",
+   "kind": "三個都是全格子抓出來的,沒有一個是我自己想到的(LL199)。最刺的是第三個:MDL157 檢「貼給操作員的每一個 via-* 都要解析得到真指令」,當場抓到我在 docs 的一貼即用區寫了 `via-vrnbook` 這個幽靈令——L89 的反面教材。梭一律放**倉庫根**並照抄批340 契約(點源 Register 尾版 → 呼 %~n0),不自寫第二種實作。"
+  },
+  {
+   "ts": "2026-09-19 18:05",
+   "op": "UPDATE",
+   "category": "工作站實錄修",
+   "component": "CGC_MDL137 v0107:--family 收逗號也收空白(PowerShell 陣列潑灑)+ Grid v0377 站名 10→19 檢",
+   "code": "四種長相實跑:一個帶空白的字串 → 族 vdf,vrn,vap · 潑灑成多 argv → 族 vdf,vrn,vap · 正常逗號照舊 · --family nope 照樣 FAIL 並附原因;自測十九檢 OK 19",
+   "kind": "操作員照我給的句子打,當場 FAIL。逗號在 PowerShell 裡不加引號就是陣列,@args 潑灑後消失;而同一句寫在 .ps1 裡有引號所以不會爆——**同一個指令兩個地方行為不一樣,容器裡永遠測不到**(LL200)。收下但講原因(L92);潑灑成多 argv 的那半邊也要收,否則會變成「只跑了 vdf 卻以為三族都跑了」的假綠。"
+  },
+  {
+   "ts": "2026-09-19 19:10",
+   "op": "NEW",
+   "category": "方法論存檔",
+   "component": "VIA_EnvRestore_Methodology_SSOT v0100(環境還原+補齊方法論)",
+   "code": "步 5 · 紅線 5 · L19 具名豁免界線 · 證據=工作站 APPLIED 跑 42 失敗 0,之後 vrn GREEN 8/8 · vap GREEN 8/8(VAP_ENG015 從 ENV_BROKEN 轉 OK)",
+   "kind": "操作員令「整理環境若正確則將方法論導入 VIA 存檔」。批621 那條路是**真的把環境從死結裡拉出來的**,所以從一次性處置升格成可重複、可稽核的方法。冊上寫明何時**不適用**(直譯器換版/壞掉是 via-rebuild 的事)、L19 豁免的界線、以及「這不是 L19 普遍可繞」的但書。兩條 known_limits 一律 PENDING_OPERATOR(全境成功紀錄至今從未有過)。"
+  },
+  {
+   "ts": "2026-09-19 19:12",
+   "op": "UPDATE",
+   "category": "VRN 治理",
+   "component": "SUP_MDL749 v0106 +downstream 上下貫通檢(+自測 ㉑;格子站名 20→21)",
+   "code": "實測:供應 17 · USED 6 · INTERNAL 11 · **ORPHAN 0** · 活消費者 3 支(ENG073 v0129 / ENG074 v0111 / ENG083 v0100);自測二十一檢 OK 21",
+   "kind": "操作員令「SSOT 同義字 REGEX 隨時新增更新 上下自動檢視」。照的是「冊上加一個同義字,下游到底吃不吃得到」——冊寫了不等於工具做到。兩枚自審都在這一檢上:CLI 動詞被當成供應函式(14 假 ORPHAN)、樞紐內部零件被當成 ORPHAN(11 假 ORPHAN);三態 USED/INTERNAL/ORPHAN 之後才是真的(LL201)。"
+  },
+  {
+   "ts": "2026-09-19 19:14",
+   "op": "FIX",
+   "category": "工作站實錄修",
+   "component": "CGC_MDL137 v0108:尾句不得對著紅燈說綠燈",
+   "code": "判定 RED 那一跑原本照印「三族皆以家族境 python 真跑綠燈」——條件只看 next 空不空,不看裁決",
+   "kind": "拿「沒有待辦」當「一切都好」的代理指標,遲早會在紅燈旁邊說反話(LL202)。改成看裁決:非 GREEN 就講「沒有可自動修的次步:紅在引擎自測本身,逐支看 [FAIL] 行」。"
+  },
+  {
+   "ts": "2026-09-20 01:40",
+   "op": "FIX",
+   "category": "工作站實測修",
+   "component": "VRN_ENG083 v0101:鏈的關節接上(--dir/--db)+ 修法句不再指回原地",
+   "code": "自測 18 → **21 檢**(⑤ 關節原始碼斷言 · ⑥ 兩半同一個庫 · ⑦ 兩態兩句);21 檢 OK 21",
+   "kind": "工作站 `via-vrnmatrix run --in \"C:\\測試樣本報告\"` 印「鏈實跑 · OK」,下一行 matrix 卻說庫不在、而且叫他再跑一次 run。兩個洞:(甲)ENG073 的旗標是 --dir,v0100 一個都沒傳,它跑的是自己的預設夾,兩支 rc=0 於是整條假綠(LL204);(乙)不給 --db 兩邊各用各的預設,是兩個不同的檔。(丙)ABSENT 那句把「還沒跑過」與「跑過了但庫沒出現」壓成一句(LL205)。"
+  },
+  {
+   "ts": "2026-09-20 01:45",
+   "op": "FIX",
+   "category": "誠實",
+   "component": "VRN_ENG072 v0135:抬頭加 r 前綴(每跑一次噴一行假警告)",
+   "code": "v0134 編譯警告 1 → v0135 **0**;自測五十一檢 OK 51",
+   "kind": "抬頭存證用的 Windows 路徑讓整支檔每跑一次噴 `invalid escape sequence '\\.'`。碼沒錯,但看久了會開始略過警告(LL206)。寫版史時我自己又把三引號寫進註解,當場 SyntaxError。"
+  },
+  {
+   "ts": "2026-09-20 02:30",
+   "op": "NEW",
+   "category": "一鍵實測",
+   "component": "Invoke-VIA-VRNAudit v0100(25 加速器 + 動態進度條 + VRN 實測鏈 + 輪迴修正)+ via-vrnaudit + Register v0226",
+   "code": "容器兩半都走過:ABSENT 半(樣本夾不在 → rc=3 誠實態,不說引擎壞)· 非 ABSENT 半(真 PDF 兩份 → 鏈 NODATA → 逐輪換庫 → 裁決 NODATA rc=2,輪次 3 步,加速器 25/25)",
+   "kind": "操作員令「整合入一個 PS 指令,25 加速器,動態進度條,測試修正 VRN 直到成功,測試樣本如先前」。**輪迴律**:下一輪一定要跟這一輪不一樣,找不到可調整的差異就誠實停——把同一句跑三次不叫修正(批624 LL205)。目前只認一種可調整差異(量出來的):鏈跑完但矩陣說庫不在 → 去找實際寫到哪個 .duckdb,下一輪讀那個。引擎自己 rc 非誠實態一律不重試(重跑一個會爆的只會再爆一次)。零代設、零卡斷、@@PROGRESS 當內層進度來源(批619)。"
+  },
+  {
+   "ts": "2026-09-20 02:35",
+   "op": "FIX",
+   "category": "自審",
+   "component": "VRN_ENG083 v0102:誠實四態接齊 rc(_RC_OF + 自測 ㉒);格子站名 21→22 檢",
+   "code": "修前:畫面 `鏈實跑 · NODATA` 而 rc=1;修後 rc=2。自測 21 → 22 檢 OK 22",
+   "kind": "批624 我加了 NODATA 卻沒接 rc,批625 自己寫的下游照 rc 判就說「引擎壞了」(LL207)。㉒ 掃原始碼把所有產得出來的 state 撈出來逐個對 _RC_OF——新增態沒登記當場點名。"
   }
  ],
- "updated_at": "2026-09-19T15:10:00",
- "batch": 619
+ "updated_at": "2026-09-19T16:05:00",
+ "batch": 625
 }
