@@ -9056,6 +9056,14 @@
    "component": "Sync-VIA-Bootstrap v0100 +`-Onboard`(上船母資料夾;-Commit/-Push 才動)",
    "code": "三類分流實測 11 件全對;-Commit 只收 5 件、其餘 6 件原封不動、**不 push**",
    "kind": "操作員令「上船母資料夾」。**先量再造(L80)**:倉裡已有 `CGC_MDL057_Intake`(`via-intake`),但那支是把**外面的檔**(預設掃 `~\\Downloads`)收編進倉、給 URN、搬檔案;而「上船母資料夾」的檔**早就在它該在的位置**,缺的只是 git ——**名字像不代表是同一件事**,不套用它。家選在 `Sync-VIA-Bootstrap`:git 側的事歸 git 側的工具,固定檔名,而且**已經在操作員磁碟上**(批605 那次快轉帶進去的),不必再經歷一次 L85 的「工具在拿不到的那一側」。分三類並逐件印出:**再生物**(`VIA_Reports\\`、`ui_support` 的頁、被引擎覆寫的註冊表)· **暫存**(`.bak_`/`.tmp`/`__pycache__`/`_patches\\`)· **該上船**(其餘)。**預設只清點不動**;`-Commit` 才 add+commit(訊息逐件列出)、`-Push` 才推——分類我做,裁定他的。真跑驗過(scratch 倉造 11 件三類混合):分類全對 · `-Commit` 只收 5 件 · 沒上船的 6 件工作樹原封不動 · `origin` 仍停在基準(沒有被推)。→ LL165"
+  },
+  {
+   "ts": "2026-09-19 05:14",
+   "op": "NEW",
+   "category": "交接",
+   "component": "Register v0221(via-sync / via-allinone 短令 + 梭)+ AllInOne v0107(自動交接報告 + 第16步上船清點)",
+   "code": "HANDOVER.md 每跑自動產(實測 63 行,取代 400+ 行主控台);16_Onboard 唯讀清點實測抓到本倉 4 件未追蹤",
+   "kind": "操作員實錄兩個缺口 + 大授權(TEST/DEBUG/OPTIMIZE/AUTO-CONSOLIDATE/AUTO SYNC/SAVE ALL STATUS AND HANDOVER REPORT AUTOMATICALLY)。① **`Sync-VIA-Bootstrap` 打不通**:他直接打它,回「無法辨識為 Cmdlet」——**治理件全家都有短令,只有它沒有**。Register v0221 補 `via-sync`(同步解卡 / `-Onboard [-Commit] [-Push]` 上船)與 `via-allinone`,兩支都 **glob 取尾版不寫死版號**(L85 的教訓);`.cmd` 梭用 `%~n0` 叫同名函式,直接複製即成。② **自動交接報告**:`HANDOVER.md` 每一跑自動產——判定 / 母資料夾 / 同步態 / HEAD / 加速器 / 步驟表 / **紅的逐個點名(每條指得到自己的 log)** / 產出驗證 / 上船清點 / 下一步。實測 63 行,**取代操作員一直在貼的 400+ 行主控台**——這才是 round-trip 的 TOKEN 大頭。③ **第 16 步上船清點(唯讀)**:AUTO SYNC 只做了 pull 那一半;另一半是「母資料夾有什麼還沒進 git」,每一跑浮出來但**只清點不動**(上船是 `via-sync -Onboard -Commit`,他的手)。實測:對本倉真跑,正確抓到 4 件未追蹤(v0221 / v0107 / 兩支 .cmd)。**誠實界定**:工作站全格第一段 OK 196 · FAIL 52(序跑複判轉綠 12),那 ~40 個紅**在他那台**,本容器 248/250 全綠,**我這邊重現不出來**;要逐站修得靠他把 HANDOVER.md 貼回來——這正是自動產這份報告的用意。"
   }
  ],
  "updated_at": "2026-09-18 15:20",
