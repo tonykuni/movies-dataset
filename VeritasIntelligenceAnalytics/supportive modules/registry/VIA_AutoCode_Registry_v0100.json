@@ -9384,8 +9384,24 @@
    "component": "ENG073 v0130 ㊸:差分檢的對照組釘在 v0128,不是「上一版」",
    "code": "修前:v0130 出版當下這一檢當場紅(對照組變成已經有修正的 v0129,『改判』看起來消失);修後 43 檢 OK 43",
    "kind": "LL219。量『這一批改了什麼』的差分檢,對照組要釘在**被改的那一版**;『不准改判』的零回歸檢才該比最近的上一版。兩種檢的對照組選法相反,寫錯就會自己失效。"
+  },
+  {
+   "ts": "2026-09-20 06:10",
+   "op": "NEW",
+   "category": "診斷成本",
+   "component": "Invoke-VIA-VRNAudit v0104:抬頭加「樹齡」行(零網路;只讀本地 ref)+ 印結構引擎版號",
+   "code": "三態都渲染過:落後→`**本地落後遠端 2 批** · 下一步 git pull …`(紅);齊平→`本地 ref 看不出落後`+**這不等於最新**的但書;git 問不到→不判不猜。容器實跑:`矩陣引擎 v0106 · 結構引擎 v0130 · 樹齡 d26178fb 批628 · 本地 ref 看不出落後`",
+   "kind": "LL222。批626→628 三批推完,操作員三次跑的都是舊引擎,而畫面上看不出樹是舊的——我連講三次『你還沒拉』。**診斷成本本來是工具的事**。`git rev-list --count HEAD..origin/<branch>` 只讀本地 ref,不連網;而且不敢說『最新』(沒 fetch 過的 origin ref 只新到上次 fetch 為止)。"
+  },
+  {
+   "ts": "2026-09-20 06:25",
+   "op": "NEW",
+   "category": "覆蓋",
+   "component": "CGC_MDL168_PSSyntaxGate v0100:PowerShell 語法道 + 參數名道 + 棘輪基線",
+   "code": "全樹實掃:活樹尾版 .ps1 **816 支** · A 語法道 5 支解析不過(53 筆)· B 參數道撞 CommonParameters **0**。立基線後裁決 GREEN(基線內具名的債;基線外才算新傷)。自測 **8 檢 OK 8**",
+   "kind": "LL223/LL224。格子 257 站零站 parse 過 .ps1,而批625 兩個坑都是跑起來才炸。兩道刻意分開:ParseFile 抓得到反引號那個,**抓不到 `-Db` 撞 `-Debug` 別名**那個。本批**不開短令**(四個面沒到位就是幽靈令 LL199;要動 Register.ps1 得逐次許可 L70)。基線 5 支:PSRepair v0102 / VRN-Fallback-Activation v0136 / VRN-OneClick-Sidebar v0159 / FlowSystem_SandboxPatch v025 / Run_VIS_HyperBOM_v2 —— 要不要修,裁定權在操作員。"
   }
  ],
- "updated_at": "2026-09-19T20:20:00",
- "batch": 628
+ "updated_at": "2026-09-19T20:45:00",
+ "batch": 629
 }
