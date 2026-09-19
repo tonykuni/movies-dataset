@@ -2,7 +2,7 @@
  "schema": "VIA.EnvGovernanceBaseline.v1",
  "module_id": "VIS-ENV-GOVERNANCE-000001",
  "version": "0100",
- "batch": 382,
+ "batch": 602,
  "owner": "VIA_ENV_MANAGER",
  "updated_at_utc": "2026-09-07T13:00:00+00:00",
  "doc": "docs/via-env-governance.md",
@@ -874,14 +874,14 @@
  "naming_law": {
   "prefix": "via_",
   "exempt": [
-   "BASE",
-   "vmt_pm"
+   "BASE"
   ],
   "rule": "受管境一律 via_ 前綴(工作站實錄:camelot_311/paddle_311 兩境違律)。rename 流程:uv venv via_<舊名> --python <舊境實際版本> → uv pip sync 舊境 lock → uv pip check(cv2 錨遮蔽殘餘=接受)→ 驗綠後舊境改名 _retire_<舊名>(候裁 --approve-remove;掃描自然除名)→ 別名冊 A 法:alias 改指新境零檔案移動",
   "renames": {
    "paddle_311": "via_paddle_311",
    "camelot_311": "via_camelot_311",
-   "paddle_312": "via_paddle_312"
+   "paddle_312": "via_paddle_312",
+   "vmt_pm": "via_vmt_pm"
   },
   "downstream": [
    "CGC_MDL050_EnvRebuild v0109:_route_env 出口一律 via_ 前綴",
@@ -889,7 +889,8 @@
    "CGC_MDL062_Provision v0102:功能件改於 via_ 境檢",
    "VIA_EnvManager 正本零觸碰(purpose hints 舊鍵=別名層)"
   ],
-  "exempt_note": "批385:受保護境(env_layout.protected_envs)一律豁免命名律;vmt_pm=process_mining 專屬境(工作站實錄被列為違律=噪音)"
+  "exempt_note": "批602 操作員令「BASE 應該是獨立的,其他都是 via_core 及 via_ 開頭的」:**受保護(不重建)和豁免命名律是兩件事**。批385 把 env_layout.protected_envs 整包 OR 進豁免,結果 vmt_pm 這種「受保護但名字不合律」的境一輩子不會被列出來——尺上根本沒有它。v0110 起兩軸分開:protected_envs 只管「不重建」,命名律只認 BASE 與本鍵 exempt。被列出來仍只是 YELLOW 唯讀出令(via-envgov rename),不自動改名、不自動退役。",
+  "b602_operator_order": "BASE 獨立;其餘受管境一律 via_core 或 via_ 前綴(工作站實錄 46 境:camelot_311 / paddle_311 / vmt_pm 三境不合律)"
  },
  "package_env_overrides": {
   "catboost": "via_catboost",

@@ -252,13 +252,21 @@
       "pytest_regression",
       "anti_lookahead"
      ],
-     "risk": "LOW"
+     "risk": "LOW",
+     "install": false,
+     "source_kind": "in_tree",
+     "in_tree_path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916",
+     "note_b601": "批601:**這一項不是 PyPI 套件**,是樹內件。以前 `pip` 欄寫的是敘述句,工具計畫就照字面拆成套件名塞進 `uv pip install`——一貼即炸,而且 `intake` 在 PyPI 上**真的有一個同名套件**,裝下去會裝到不相干的東西。只增不減:條目保留,加旗標讓安裝器跳過。"
     },
     {
      "pip": "VDF_ENG087_MarketListGovernance",
      "imp": "VDF_ENG087_MarketListGovernance_v0100",
      "role": "中央市場清單治理橋：股票全集/主動ETF/熱門族群去重驗收；不重造抓取器",
-     "optional": true
+     "optional": true,
+     "install": false,
+     "source_kind": "in_tree",
+     "in_tree_path": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+     "note_b601": "批601:**這一項不是 PyPI 套件**,是樹內件。以前 `pip` 欄寫的是敘述句,工具計畫就照字面拆成套件名塞進 `uv pip install`——一貼即炸,而且 `intake` 在 PyPI 上**真的有一個同名套件**,裝下去會裝到不相干的東西。只增不減:條目保留,加旗標讓安裝器跳過。"
     }
    ],
    "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)",
@@ -569,5 +577,8 @@
   "network_default": "OFF",
   "gate": "CGC157 GREEN before child dispatch",
   "direct_child_execution": "FORBIDDEN_AS_VIA_CLAIM"
+ },
+ "install_policy": {
+  "b601_in_tree": "`tools[]` 裡 `install: false` 的項目是**樹內件**(引擎/收容件),只登錄不安裝;安裝器必須跳過,不得把 `pip` 欄當成套件名。"
  }
 }

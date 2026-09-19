@@ -8982,8 +8982,98 @@
    "code": "TIMEOUT · GREEN · NODATA · GATED · RED —— 五態逐一量到",
    "kind": "本容器有 `pwsh`,所以不是只看語法:①`Parser::ParseFile` 語法 OK(2267 權杖);②把逾時迴圈抽成獨立 harness,拿五個假子行程真跑——睡 600 秒的那支在 **3.1s 被殺掉**、其餘四支照樣跑完並各自判成 GREEN/NODATA(rc2)/GATED(rc4)/RED(rc1)。**第一版 harness 是壞的**:我把參數命名成 `$Args`,那是 PowerShell 的**自動變數**,綁不進去→`python3` 沒收到參數→改讀 stdin→**五步全部逾時**,看起來像迴圈壞了。改名 `$ChildArgs` 才量到真的。教訓同 LL152:**量出來的紅,先問是不是尺自己壞了**。v0103 本體用的是 `$Arguments`,沒有這個撞名(已逐一掃過 Args/Input/Error/Host/Matches/PSItem/This 全無)。另外逐項驗過:VERIFY 的 6 個期待路徑**全部存在**、9 個引擎 glob **全部解析得到尾版**——不然會報一堆假的 MISSING/ABSENT。",
    "batch": 600
+  },
+  {
+   "ts": "2026-09-18 15:20",
+   "op": "SCAN",
+   "category": "環境",
+   "component": "工具清點(via-envgov tools)+ BASE/其他境重建計畫(plan)",
+   "code": "工具 130 件 · 境 8 + BASE · BASE 判 RED 衝突 37 · 段冊 21",
+   "kind": "操作員令「清點所有工具,依照 ENVMANAGER 重建修正 BASE 及其他環境,安裝所有工具」。**先量再動(L80)**:清點與計畫都走既有正典 `CGC_MDL135 EnvGovernance`(`tools` / `plan`),不另寫盤點器。清點:130 件,來源 `VIA_ToolRoster_SSOT_v0100.json` ∪ Celeritas `_LIB_MAP`(88)∪ AegisNexus 相依(3);**ENV_ABSENT 69 · UNROUTED 59**;風險 HIGH 2 · MEDIUM 9 · LOW 101 · SPECIAL 16。境:via_core / via_vrn_312 / via_paddle_311 / via_vap_312 / via_vdf_312 / via_mix_ds_np2_M / via_mix_http_M / via_iso_ml_cuda_H,共 16 段(ENSURE_ENV + INSTALL_TOOLS)。BASE:判 **RED**,衝突 37 條,三個拉出(nlp→via_nlp · browser→via_iso_scrape_H · table_extraction→via_camelot_311)、改道隔離 3 件、段冊 21(並行 13 · 序 8 · **破壞候裁 4**)、LKGC 不合格。**apply 是操作員的手,不代跑**(`via-envgov apply --approve` 只做非破壞段;綠了才談 `--approve-remove`)。**誠實界定**:這些數字是**本容器**的 BASE 與境量出來的(py3.11.15),**不是工作站的**;計畫的結構可用,數字得在你那台重量一次。",
+   "batch": 601
+  },
+  {
+   "ts": "2026-09-18 15:20",
+   "op": "FIX",
+   "category": "環境",
+   "component": "CGC_MDL135_EnvGovernance v0109 —— 三個「一貼即炸」的坑(+第㊸檢)",
+   "code": "樹內件當套件名 · 版本釘沒引號 · 境根寫死",
+   "kind": "產出的 `.ps1` 自稱「一貼即用」,逐行看過發現三個會炸的地方:①**樹內件被當成套件名**——冊裡 `via_vdf_312` 的 `pip` 欄寫的是敘述句 `\"VIA QuantGuard intake\"`(那是樹內收容件,`imp=quant_engine`),生成器照字面拆成三個套件塞進 `uv pip install`;而 **`intake` 在 PyPI 上真的有同名套件**,貼下去會裝到不相干的東西、整行還會失敗 → vdf 境一件都沒裝。修法:冊上加 `install: false`(只增不減,條目保留),生成器照旗標跳過,**不靠看名字像不像**。②**版本釘沒引號**——`paddlepaddle>=3.0` 在 PowerShell 裡 `>` 是**重導向**,會變成「裝 paddlepaddle,順便把 stdout 寫進一個叫 `=3.0` 的檔」,套件照裝但**版本釘悄悄不見**;bash 不會這樣,所以**在 Linux 產、在 Windows 貼**才踩得到(L71 同一族)。③**境根寫死**——計畫在容器算的,`.ps1` 裡就是 `/root/envs`,貼到 Windows 等於把別人的路徑帶過去;改成抽出 `$EnvRoot` 變數 + 分隔符正規化。第㊸檢**正反兩向都釘**:樹內件不得出現、正常件(duckdb)必須還在;版本釘一律引號;`$EnvRoot` 要在。另修**版號寫死**:檔名已是 `_v0109`,橫幅還印 `v0108`——操作員會以為自己跑的是舊版;改成從檔名讀。自測 **43/43**。",
+   "batch": 601
+  },
+  {
+   "ts": "2026-09-18 15:57",
+   "op": "FIX",
+   "category": "環境",
+   "component": "CGC_MDL135_EnvGovernance v0110(命名律兩軸/零動作說話/逐境 LKGC + resume)",
+   "code": "46 檢(+㊹㊺㊻);冊 naming_law.exempt 收斂為 BASE;新動詞 via-envgov resume",
+   "kind": "操作員工作站實錄(46 境 · 境根 C:\\\\Users\\\\tonyk\\\\envs · BASE py3.13.7 件 317 衝突 136 · REBUILD via_iso_scrape_H/via_paddle_311/via_vrn_312 · 42 境零衝突 · LKGC eligible=False 衝突 139)驅動三修。① **命名律兩軸分開**:操作員令「BASE 應該是獨立的,其他都是 via_core 及 via_ 開頭的」。批385 把 `env_layout.protected_envs` 整包 OR 進命名律豁免,結果 `vmt_pm` 這種**受保護但名字不合律**的境一輩子不會被列出來——實錄只列了 camelot_311 / paddle_311 兩個,第三個在尺上根本不存在。v0110 拆成兩軸:protected 只管「不重建」,命名律只認 BASE 與冊 `naming_law.exempt`;被列出來仍只是 YELLOW 唯讀出令,不自動改名。② **授權後零動作必須說話**:實錄 `apply --approve` 印完抬頭就接同一份 digest,一條段果都沒有,最後又叫你再跑一次——和引擎壞掉長得一樣。根因不是沒做事,是 digest 截斷 `L[:21] + 省略 + L[-3:]` **正好吃掉「執行:跑 N …」那一行**(證據:plan 省略 9 行 vs apply 省略 10 行,多的那一行就是它)。修法:執行/零動作兩行移進必留尾段,且零動作時用 `apply_zero_why()` 講出主因(取段果**眾數**,不是第一條;L19 這種整批擋下的直接講)。③ **逐境 LKGC**:舊 LKGC 全境 all-or-nothing,42 境好、BASE 一境壞就整組不晉升,所以操作員說的「前一次成功紀錄」**一次都沒被存下來過**。改成逐境判定與逐境晉升(只增不減:後來壞掉的境**保留舊成功紀錄**並標 stale),新動詞 `via-envgov resume` 依前次成功狀態出 `uv pip install -r <lock>` 補齊令,`uv pip sync` 破壞段一律註解候裁。**誠實界定**:本容器沒有那 46 境,③ 的實跑證據是自測沙盒(㊻ 兩跑對照),不是工作站實跑;裝仍是操作員的手。"
+  },
+  {
+   "ts": "2026-09-18 16:38",
+   "op": "FIX",
+   "category": "測試",
+   "component": "VDF_ENG090 v0103(import os)+ RunGate v0106(紅 tail 指得出哪一檢 · 半拆件=ENV_BROKEN)+ SelftestGrid v0365 / PEIS v0107(同族摘要同律掃)",
+   "code": "ENG090 20 檢(+㉑ 假 akshare 走有裝的那半邊)· RunGate 19 檢(+⑱⑲ 正反控制組)",
+   "kind": "操作員工作站 `via-rungate` 實錄(vdf RED · vrn GREEN · vap RED;總判 RED)驅動三修。① **VDF_ENG090_DataCoverageGate v0102 第 280 行 `NameError: name 'os' is not defined`**——`macro(probe=True)` 要 `dict(os.environ)` 但檔頭沒 `import os`。**為什麼本容器一路綠?因為這裡沒裝 akshare**,`find_spec` 那一關就 ABSENT 回頭,那一行從來沒被走到;⑮ 只驗了「沒裝時誠實 ABSENT」,「裝了會怎樣」這半邊在本容器永遠量不到。v0103 補 import + ㉑ 造假 akshare 進 sys.path/PYTHONPATH **逼著走有裝的那一半**;對照組實證:同一段對 v0102 跑 → 重現 `NameError`,對 v0103 跑 → OK。② **紅了卻看不出哪一檢紅**:VDF_ENG088 印「七檢 OK 6 · FAIL 1」,而 RunGate 的 tail 取 `alll[-2:]`=**綠的最後一檢 + 計數行**,真正紅的那一檢在上面,操作員只能自己重跑才知道(與批602 L81 同族:只有這一跑才有的結果行不准被摘要吃掉)。v0106 紅的時候先取 `[FAIL]` 行再補計數行;綠的維持原樣。③ **半拆件被判成引擎壞**:via_vap_312 的 pyarrow 半拆,VAP_ENG013/ENG015 炸在 `site-packages/pandas/compat/pyarrow.py` 的 `AttributeError: module 'pyarrow' has no attribute '__version__'`。批596 已替 ENG015 認過 `ModuleNotFoundError`,但半拆件拋 `AttributeError`,**形狀不同就漏了**——尺只認一種「缺」。v0106 加 ENV_BROKEN 態:**用證據判不是用字串猜**——最內層 frame 必須在 site-packages(不在我們樹裡)且訊息符合缺件/半拆形狀,兩個條件缺一不可;判定與「必要庫缺」同級 YELLOW 並點名。⑲ **正反兩向都釘**:同一句話炸在自己樹裡照樣 FAIL 且 RED,不讓這條路變成漂白真 bug 的後門。**誠實界定**:① 的工作站原始紅燈我修掉了;② ③ 改的是**判讀與顯示**,vap 的 pandas 缺件與 pyarrow 半拆仍要操作員自己裝(不代裝);ENG088 那一檢紅在工作站,本容器 7/7(沒有那份來源庫),**我沒有修它**,要等 v0106 的 tail 把它指出來才知道是哪一檢。 ④ **同族掃描(LL160 自己要求的那一步)**:同樣「摘最後 N 行」的實作全樹尾版還有三支——`CGC_MDL064_SelftestGrid`(`[-2:]`;**這一輪就是它把 MDL149 的紅站摘成綠的 ㉒ + 計數行,我自己重跑才找到 ⑬**)、`CGC_MDL161_PEIS`(`[-1:]`,只給一行)、`CGC_MDL148_EngineBus`(`[-6:]`,夠寬,不動)。前兩支同律修:SelftestGrid v0365 · PEIS v0107(30/30)。過程出過一次錯並已復原:`cp v0102 v0103` 時 v0103 **本來就存在**(樹上 v0102…v0106),等於拿舊版蓋新版,`git status` 抓到 ` M` 後 `git checkout --` 復原,改以 v0106 為基底開 v0107 → LL161。"
+  },
+  {
+   "ts": "2026-09-18 17:56",
+   "op": "NEW",
+   "category": "交接",
+   "component": "launchers/Invoke-VIA-AllInOne-v0104.ps1(同步 + 25 加速器 + 15 步全系統實測 + 產出驗證)",
+   "code": "402 行;新第 0 段 SYNC;pwsh 7.4.6 真跑三態驗過(FASTFORWARD / DIVERGED 誠實停 / 未追蹤件零觸碰)",
+   "kind": "操作員令「all integrate into one ps code with 25 accelerators」。v0103 → v0104 加的是**第 0 段 SYNC**,因為工作站實錄三次證明真正卡住的不是引擎而是同步:`git status -sb` 印 **[behind 3]**,工作樹有 **41 個被改過的追蹤檔**(再生的 U/I 頁與註冊表),其中幾支這三批也動過 → git 為了不蓋掉本地修改**拒絕合併**,於是 `via-envgov` 永遠挑到 v0108,新動詞一律掉進 `print(__doc__)`。SYNC 段紅線:① 只 stash **追蹤檔**(`git stash` 不帶 `-u`)→ 操作員的 `?? EngineBus_v0128.py` / `_patches\\` / `*.bak_b600_*` 一根不碰;② stash 前先**整包複製**到本跑存證夾(stash 之外的第二條退路);③ 只做 `--ff-only`,真的分岔就**誠實停**,不自動 merge/rebase/force;④ `-NoSync` 可整段跳過;⑤ 同步沒成功 → 判定至少 YELLOW(跑的可能不是最新版,不准綠)。**這一支是真的跑過才交的**(批600 那次我交了語法對但行為錯的 .ps1):容器裡有 pwsh 7.4.6,造了一個和工作站同形狀的 scratch 倉(落後 3 · 一個被改過的追蹤檔遠端也改過 · 兩個未追蹤件),把**檔案裡第 67–143 行原封不動**抽出來跑,五件逐件量:未追蹤件內容不變 · stash 可還原 · 看得見的備份有操作員的內容 · 新版檔到位 · 分支回到同步。反面也釘:製造分岔(ahead 1, behind 2)→ **DIVERGED 誠實停、HEAD 沒動、沒有多 stash 一筆**。另 AST 檢過:參數名無自動變數撞名(批600 `$Args` 那個坑)。步數 12 → 15:新增 `05_EnvTools` / `06_EnvPlan` / `07_EnvResume`(批601/602 的唯讀動詞),產出驗證多一項 `TOOLS_PLAN_latest.ps1`;紅的 Why 併批603 L81 同律——把 `[FAIL]` 那幾行帶進總表。"
+  },
+  {
+   "ts": "2026-09-18 18:13",
+   "op": "NEW",
+   "category": "交接",
+   "component": "launchers/Sync-VIA-Bootstrap-v0100.ps1(固定檔名同步解卡引導)",
+   "code": "新律 L85 · LL162;pwsh 7.4.6 同形狀 scratch 倉真跑(落後 4 → 快轉;未追蹤件零觸碰;stash 可還原;備份落 VIA_Reports)",
+   "kind": "**我的設計錯誤,操作員的 pwsh 當場打臉**:批604 把解卡工具 `Invoke-VIA-AllInOne-v0104.ps1` 推進倉裡,然後叫操作員去跑——可是他正**因為同步卡住**才沒有那個檔,pwsh 回「無法辨識為指令碼檔案名稱」。**解卡的工具不能放在被卡住的那一側。** 補兩件:① 對話與 docs 交一份**貼上就能跑、零檔案相依**的版本;② 倉裡加一支**固定檔名**(不帶版本尾碼)的 `Sync-VIA-Bootstrap-v0100.ps1`,一旦落地就永遠是同一個路徑。紅線與 v0104 第 0 段同律:只 stash 追蹤檔(不帶 -u)· stash 前整包備份到 `VIA_Reports\\presync_<ts>` · 只做 --ff-only,分岔誠實停 · 不裝不刪不設閘。**真跑驗過**(不是只過語法):造和工作站同形狀的 scratch 倉(落後 4 · 一個被改過的追蹤檔遠端也改過 · 兩個未追蹤件),跑**倉裡那一支的實際位元組**,逐件量:未追蹤件內容一字不差 · stash 可還原 · 備份裡是操作員那份內容 · 分支回到同步 · 尾版解析正確。順手修掉貼上版的兩個坑:`Select-Object -Last 1 Name` 會被當成 `-Property`(印不出尾版名),以及頂層 `return` 貼進互動式終端機會出事——改成 `if/else` 分支。"
+  },
+  {
+   "ts": "2026-09-18 19:34",
+   "op": "FIX",
+   "category": "交接",
+   "component": "Sync-VIA-Bootstrap v0100 就地更新 + Invoke-VIA-AllInOne v0105(未追蹤件撞名清理)",
+   "code": "pwsh 7.4.6 真跑:撞到 3 個(位元組相同 1 · 不同 2)→ 全部移開保存 → ff-only 成功;沒撞到的未追蹤件零觸碰",
+   "kind": "工作站實錄第三層擋路物:追蹤檔清乾淨(備份 0 個)之後,`git merge --ff-only` 仍停在 `error: The following untracked working tree files would be overwritten by merge` —— PR #41 把 `VeritasIntelligenceAnalytics/_patches/` 那三個檔 **commit 進分支**,而操作員本機同路徑是**未追蹤**的。批605 的腳本刻意「未追蹤件一根不碰」,方向對但**不完整**。修法:撞名集合 = `git diff --name-only --diff-filter=A HEAD origin/<b>` ∩ `git ls-files --others --exclude-standard`;**只搬交集**(不是整夾清掉),搬到存證夾 `_untracked_collisions/` 而**不是刪**;並用 `git hash-object` 對 `git rev-parse origin/<b>:<path>` **逐檔比位元組**,把「其實一樣」與「真的不同」分開報數。順手修尾版律:bootstrap 的『下一步』原本寫死 `Invoke-VIA-AllInOne-v0104.ps1`,改成 glob 取尾版(寫死版號的話,升版又會變成「你那一版沒有那個檔」——正是 L85 本身要防的事)。**固定檔名就地改版是刻意的**:版本尾碼是給引擎換代並存用的,而解卡件的價值在於**路徑永遠不變**;沿革寫在檔頭。真跑驗過(scratch 倉造同形狀情境):撞到 3(相同 1 · 不同 2)全部保住本機內容 · 沒撞到的未追蹤件內容一字不差 · 分支回到同步 · 尾版與 launcher 解析正確。→ LL163 **另記一筆我自己的失誤(已復原)**:寫完 docs 追記後跑 LL49 還原,我的排除清單只列了台帳/政策庫/bootstrap,忘了把**自己剛追記的 docs** 也排除——那個檔是批605 就 committed 的追蹤檔,於是追記被 `git checkout --` 一起洗掉。改成獨立新檔 `docs/VIA_B606_UntrackedCollision.md`(新檔永遠是 `??`,不會落進還原清單)。教訓與 LL161 同族:**還原清單是白名單邏輯,漏列就是被刪**;動到既有追蹤檔之後,還原前要先想「這一批我改過哪些追蹤檔」。"
+  },
+  {
+   "ts": "2026-09-19 04:50",
+   "op": "FIX",
+   "category": "交接",
+   "component": "Invoke-VIA-AllInOne v0106(畫面濾鏡/全格逾時/心跳)+ CGC_MDL135 v0111(`\\e` 修)",
+   "code": "新律 L86 · LL164;濾鏡合成實測 248 行→畫面 63 行,埋在第 201 行的 FAIL 仍印得出來,log 248 行齊",
+   "kind": "操作員令「優化指令省 TOKEN」+ 工作站 ALL-IN-ONE 全跑實錄(15 步:GREEN 9 · NODATA 4 · RED 1 · TIMEOUT 1)。**TOKEN 大戶是我自己排的**:① `11_PanoramaScan` 帶 `--json` 把 101 列問題全吐畫面——**同一份 JSON 本來就落在 `VIA_Reports\\panorama_audit`**,不帶 `--json` 是 6 行摘要,資訊密度一樣;② 全格 250 站逐站刷屏;③ 每一步開頭都印一次 `SyntaxWarning: invalid escape sequence '\\e'`(那是我批601 留下的)。修法:**畫面濾鏡**——log 永遠全,畫面才壓(上限 `-MaxLines` 預設 60),純噪音(進度條/`@@PROGRESS`/SyntaxWarning 與其回音)直接丟,**`[FAIL]`/`[計]`/`[停]`/Traceback/判定/裁決 不受上限**,每步收尾報出壓了幾行、丟了幾行噪音。合成實測(248 行,FAIL 故意埋在第 201 行):畫面 63 行 · FAIL 與計數行都在 · 噪音 0 · log 248 行齊 → L86。**另兩件工作站才量得到的**:`\\e` 在 py3.11 只是 DeprecationWarning(本容器看不到)、py3.12 才是 SyntaxWarning → MDL135 v0111 修掉,對照組 v0110 仍 1 筆、v0111 為 0;全格逾時 3600s 是拿本容器的 292s 去量工作站的 2314s,**差 8 倍**,整跑被殺、前 240 站結果跟著沒了 → 拉到 7200(`-GridTimeoutSec` 可調),且逾時要讀 `SELFTEST_PROGRESS.json` 心跳講出「跑到第幾站、綠幾紅幾、最後在哪一站」。→ LL164"
+  },
+  {
+   "ts": "2026-09-19 05:05",
+   "op": "NEW",
+   "category": "交接",
+   "component": "Sync-VIA-Bootstrap v0100 +`-Onboard`(上船母資料夾;-Commit/-Push 才動)",
+   "code": "三類分流實測 11 件全對;-Commit 只收 5 件、其餘 6 件原封不動、**不 push**",
+   "kind": "操作員令「上船母資料夾」。**先量再造(L80)**:倉裡已有 `CGC_MDL057_Intake`(`via-intake`),但那支是把**外面的檔**(預設掃 `~\\Downloads`)收編進倉、給 URN、搬檔案;而「上船母資料夾」的檔**早就在它該在的位置**,缺的只是 git ——**名字像不代表是同一件事**,不套用它。家選在 `Sync-VIA-Bootstrap`:git 側的事歸 git 側的工具,固定檔名,而且**已經在操作員磁碟上**(批605 那次快轉帶進去的),不必再經歷一次 L85 的「工具在拿不到的那一側」。分三類並逐件印出:**再生物**(`VIA_Reports\\`、`ui_support` 的頁、被引擎覆寫的註冊表)· **暫存**(`.bak_`/`.tmp`/`__pycache__`/`_patches\\`)· **該上船**(其餘)。**預設只清點不動**;`-Commit` 才 add+commit(訊息逐件列出)、`-Push` 才推——分類我做,裁定他的。真跑驗過(scratch 倉造 11 件三類混合):分類全對 · `-Commit` 只收 5 件 · 沒上船的 6 件工作樹原封不動 · `origin` 仍停在基準(沒有被推)。→ LL165"
+  },
+  {
+   "ts": "2026-09-19 05:14",
+   "op": "NEW",
+   "category": "交接",
+   "component": "Register v0221(via-sync / via-allinone 短令 + 梭)+ AllInOne v0107(自動交接報告 + 第16步上船清點)",
+   "code": "HANDOVER.md 每跑自動產(實測 63 行,取代 400+ 行主控台);16_Onboard 唯讀清點實測抓到本倉 4 件未追蹤",
+   "kind": "操作員實錄兩個缺口 + 大授權(TEST/DEBUG/OPTIMIZE/AUTO-CONSOLIDATE/AUTO SYNC/SAVE ALL STATUS AND HANDOVER REPORT AUTOMATICALLY)。① **`Sync-VIA-Bootstrap` 打不通**:他直接打它,回「無法辨識為 Cmdlet」——**治理件全家都有短令,只有它沒有**。Register v0221 補 `via-sync`(同步解卡 / `-Onboard [-Commit] [-Push]` 上船)與 `via-allinone`,兩支都 **glob 取尾版不寫死版號**(L85 的教訓);`.cmd` 梭用 `%~n0` 叫同名函式,直接複製即成。② **自動交接報告**:`HANDOVER.md` 每一跑自動產——判定 / 母資料夾 / 同步態 / HEAD / 加速器 / 步驟表 / **紅的逐個點名(每條指得到自己的 log)** / 產出驗證 / 上船清點 / 下一步。實測 63 行,**取代操作員一直在貼的 400+ 行主控台**——這才是 round-trip 的 TOKEN 大頭。③ **第 16 步上船清點(唯讀)**:AUTO SYNC 只做了 pull 那一半;另一半是「母資料夾有什麼還沒進 git」,每一跑浮出來但**只清點不動**(上船是 `via-sync -Onboard -Commit`,他的手)。實測:對本倉真跑,正確抓到 4 件未追蹤(v0221 / v0107 / 兩支 .cmd)。**誠實界定**:工作站全格第一段 OK 196 · FAIL 52(序跑複判轉綠 12),那 ~40 個紅**在他那台**,本容器 248/250 全綠,**我這邊重現不出來**;要逐站修得靠他把 HANDOVER.md 貼回來——這正是自動產這份報告的用意。"
+  },
+  {
+   "ts": "2026-09-19 05:59",
+   "op": "NEW",
+   "category": "審計",
+   "component": "VDF_ENG091_VdfAuditGate v0100(VDF 審計閘)+ L53 動詞補齊 10 支 + MDL003 模組層早用修 + MDL105 冊路徑解析修 + Grid v0366",
+   "code": "全樹實測:活樹 59 支待審 · 豁免 7 支(附理由)→ GREEN 50 · NODATA 9 · RED 0 · 缺動詞 0(rc=2 NODATA,缺的是套件不是功能) · 格子 OK 248 · FAIL 1 → 修 ENG091 自我指涉後複跑",
+   "kind": "操作員令「vdf pass audit and run perfectly」。把「VDF 通過審計」從我的便條腳本變成可重跑的引擎,並在做的過程中抓到三件真缺陷。① **我的尺自己壞掉**:便條版 6 路平行跑,DuckDB 鎖撞讓三支全紅;單獨跑全是綠/NODATA。更關鍵的是**兩次跑撞到的檔案不一樣**(第一次 ENG060/062/072,第二次 ENG061/062/070)——不可重現正是鎖撞的指紋。ENG091 把**序跑複判**做成骨頭而不是選配,並用合成假引擎(持鎖者 A / 等鎖者 B / 真壞 C)證明兩條路都走:B 平行判紅→序跑轉綠,C 兩段都紅不被洗綠(L83)。② **有自測不等於有動詞**:VDF_MDL101_OutputManager 早就有完整自測,但掛在裸 `__main__` 上,`--selftest` 點不到它——從格子看它跟沒有自測一模一樣。L53 的補法(旗標→既有行為等價轉換、只增不減)套進 10 支缺動詞的活樹檔:ENG019 · ENG044 · MDL002/003/007(根與 engine/ 各一份)· MDL101 · MDL104。新動詞零連線(socket.connect 實證攔截)、不呼叫 main()、缺套件判 NODATA 不判紅。③ **模組層早用,一個炸很大聲一個不出聲**:VDF_MDL003_SentimentMacroEngine 在檔尾那批 `import os` **之前**就用了 `os.environ`(NameError,整支引擎 import 即死,根與 engine/ 兩份都死),同一段的 `Path(...)` 卻被 try/except 吞掉(FRED 鑰匙檔車道**默默失效**=假綠)。**不出聲的那個躲得更久。**對照組:批610 修改前的正本exec_module 即 NameError。補法只增不減——首次使用前補上標準庫 import,既有行為一行未改。④ MDL105_CrossValidator 的 `RegistryLoader(\"VDF_MDL403_RegistryFull.json\")` 是裸檔名,冊的正典位置在 supportive modules/registry/,自測必噴 FileNotFoundError;改為三處解析(本夾/正典冊夾/cwd),找不到時 return 3=ABSENT 並講清楚「缺冊不是壞掉」,不裸噴 traceback。⑤ 豁免冊 7 支各附理由:VAP 隔離清理殘件 · RUN_* 跑次產物快照 · candidates/ 未升正 · 一次性注入工具(同批605 `_patches/` 理由)· sentiment_strength 純函式庫模組(自測歸呼叫端 SUP_MDL566 Router)。ENG091 自測第①檢就是「豁免冊每筆都附非空理由」——**沒理由的豁免等於假綠**(新法 L87)。⑥ **棘輪當場抓到我自己**:ENG091 寫完跑全格子,CGC_MDL164 ⑰ 自我指涉閘判「基線外新增 1 支」,那一支就是 ENG091——它掃 VDF 樹回答「誰要受審」卻沒排掉自己的家族(LL133)。沒有把它加進基線(那等於把棘輪拆掉),而是排掉整個家族(`stem.rsplit('_v',1)[0] == _SELF_FAMILY`,不是只排 `__file__` 那一支),並照 L87 連理由一起印。複量:SAFE 4→5,**基線外 0 支(棘輪守住了)**;自測 10 檢→11 檢。"
   }
  ],
- "updated_at": "2026-09-18 17:10",
- "batch": 600
+ "updated_at": "2026-09-19 05:59",
+ "batch": "批610"
 }
