@@ -9040,6 +9040,14 @@
    "component": "Sync-VIA-Bootstrap v0100 就地更新 + Invoke-VIA-AllInOne v0105(未追蹤件撞名清理)",
    "code": "pwsh 7.4.6 真跑:撞到 3 個(位元組相同 1 · 不同 2)→ 全部移開保存 → ff-only 成功;沒撞到的未追蹤件零觸碰",
    "kind": "工作站實錄第三層擋路物:追蹤檔清乾淨(備份 0 個)之後,`git merge --ff-only` 仍停在 `error: The following untracked working tree files would be overwritten by merge` —— PR #41 把 `VeritasIntelligenceAnalytics/_patches/` 那三個檔 **commit 進分支**,而操作員本機同路徑是**未追蹤**的。批605 的腳本刻意「未追蹤件一根不碰」,方向對但**不完整**。修法:撞名集合 = `git diff --name-only --diff-filter=A HEAD origin/<b>` ∩ `git ls-files --others --exclude-standard`;**只搬交集**(不是整夾清掉),搬到存證夾 `_untracked_collisions/` 而**不是刪**;並用 `git hash-object` 對 `git rev-parse origin/<b>:<path>` **逐檔比位元組**,把「其實一樣」與「真的不同」分開報數。順手修尾版律:bootstrap 的『下一步』原本寫死 `Invoke-VIA-AllInOne-v0104.ps1`,改成 glob 取尾版(寫死版號的話,升版又會變成「你那一版沒有那個檔」——正是 L85 本身要防的事)。**固定檔名就地改版是刻意的**:版本尾碼是給引擎換代並存用的,而解卡件的價值在於**路徑永遠不變**;沿革寫在檔頭。真跑驗過(scratch 倉造同形狀情境):撞到 3(相同 1 · 不同 2)全部保住本機內容 · 沒撞到的未追蹤件內容一字不差 · 分支回到同步 · 尾版與 launcher 解析正確。→ LL163 **另記一筆我自己的失誤(已復原)**:寫完 docs 追記後跑 LL49 還原,我的排除清單只列了台帳/政策庫/bootstrap,忘了把**自己剛追記的 docs** 也排除——那個檔是批605 就 committed 的追蹤檔,於是追記被 `git checkout --` 一起洗掉。改成獨立新檔 `docs/VIA_B606_UntrackedCollision.md`(新檔永遠是 `??`,不會落進還原清單)。教訓與 LL161 同族:**還原清單是白名單邏輯,漏列就是被刪**;動到既有追蹤檔之後,還原前要先想「這一批我改過哪些追蹤檔」。"
+  },
+  {
+   "ts": "2026-09-19 04:50",
+   "op": "FIX",
+   "category": "交接",
+   "component": "Invoke-VIA-AllInOne v0106(畫面濾鏡/全格逾時/心跳)+ CGC_MDL135 v0111(`\\e` 修)",
+   "code": "新律 L86 · LL164;濾鏡合成實測 248 行→畫面 63 行,埋在第 201 行的 FAIL 仍印得出來,log 248 行齊",
+   "kind": "操作員令「優化指令省 TOKEN」+ 工作站 ALL-IN-ONE 全跑實錄(15 步:GREEN 9 · NODATA 4 · RED 1 · TIMEOUT 1)。**TOKEN 大戶是我自己排的**:① `11_PanoramaScan` 帶 `--json` 把 101 列問題全吐畫面——**同一份 JSON 本來就落在 `VIA_Reports\\panorama_audit`**,不帶 `--json` 是 6 行摘要,資訊密度一樣;② 全格 250 站逐站刷屏;③ 每一步開頭都印一次 `SyntaxWarning: invalid escape sequence '\\e'`(那是我批601 留下的)。修法:**畫面濾鏡**——log 永遠全,畫面才壓(上限 `-MaxLines` 預設 60),純噪音(進度條/`@@PROGRESS`/SyntaxWarning 與其回音)直接丟,**`[FAIL]`/`[計]`/`[停]`/Traceback/判定/裁決 不受上限**,每步收尾報出壓了幾行、丟了幾行噪音。合成實測(248 行,FAIL 故意埋在第 201 行):畫面 63 行 · FAIL 與計數行都在 · 噪音 0 · log 248 行齊 → L86。**另兩件工作站才量得到的**:`\\e` 在 py3.11 只是 DeprecationWarning(本容器看不到)、py3.12 才是 SyntaxWarning → MDL135 v0111 修掉,對照組 v0110 仍 1 筆、v0111 為 0;全格逾時 3600s 是拿本容器的 292s 去量工作站的 2314s,**差 8 倍**,整跑被殺、前 240 站結果跟著沒了 → 拉到 7200(`-GridTimeoutSec` 可調),且逾時要讀 `SELFTEST_PROGRESS.json` 心跳講出「跑到第幾站、綠幾紅幾、最後在哪一站」。→ LL164"
   }
  ],
  "updated_at": "2026-09-18 15:20",
