@@ -9048,6 +9048,14 @@
    "component": "Invoke-VIA-AllInOne v0106(畫面濾鏡/全格逾時/心跳)+ CGC_MDL135 v0111(`\\e` 修)",
    "code": "新律 L86 · LL164;濾鏡合成實測 248 行→畫面 63 行,埋在第 201 行的 FAIL 仍印得出來,log 248 行齊",
    "kind": "操作員令「優化指令省 TOKEN」+ 工作站 ALL-IN-ONE 全跑實錄(15 步:GREEN 9 · NODATA 4 · RED 1 · TIMEOUT 1)。**TOKEN 大戶是我自己排的**:① `11_PanoramaScan` 帶 `--json` 把 101 列問題全吐畫面——**同一份 JSON 本來就落在 `VIA_Reports\\panorama_audit`**,不帶 `--json` 是 6 行摘要,資訊密度一樣;② 全格 250 站逐站刷屏;③ 每一步開頭都印一次 `SyntaxWarning: invalid escape sequence '\\e'`(那是我批601 留下的)。修法:**畫面濾鏡**——log 永遠全,畫面才壓(上限 `-MaxLines` 預設 60),純噪音(進度條/`@@PROGRESS`/SyntaxWarning 與其回音)直接丟,**`[FAIL]`/`[計]`/`[停]`/Traceback/判定/裁決 不受上限**,每步收尾報出壓了幾行、丟了幾行噪音。合成實測(248 行,FAIL 故意埋在第 201 行):畫面 63 行 · FAIL 與計數行都在 · 噪音 0 · log 248 行齊 → L86。**另兩件工作站才量得到的**:`\\e` 在 py3.11 只是 DeprecationWarning(本容器看不到)、py3.12 才是 SyntaxWarning → MDL135 v0111 修掉,對照組 v0110 仍 1 筆、v0111 為 0;全格逾時 3600s 是拿本容器的 292s 去量工作站的 2314s,**差 8 倍**,整跑被殺、前 240 站結果跟著沒了 → 拉到 7200(`-GridTimeoutSec` 可調),且逾時要讀 `SELFTEST_PROGRESS.json` 心跳講出「跑到第幾站、綠幾紅幾、最後在哪一站」。→ LL164"
+  },
+  {
+   "ts": "2026-09-19 05:05",
+   "op": "NEW",
+   "category": "交接",
+   "component": "Sync-VIA-Bootstrap v0100 +`-Onboard`(上船母資料夾;-Commit/-Push 才動)",
+   "code": "三類分流實測 11 件全對;-Commit 只收 5 件、其餘 6 件原封不動、**不 push**",
+   "kind": "操作員令「上船母資料夾」。**先量再造(L80)**:倉裡已有 `CGC_MDL057_Intake`(`via-intake`),但那支是把**外面的檔**(預設掃 `~\\Downloads`)收編進倉、給 URN、搬檔案;而「上船母資料夾」的檔**早就在它該在的位置**,缺的只是 git ——**名字像不代表是同一件事**,不套用它。家選在 `Sync-VIA-Bootstrap`:git 側的事歸 git 側的工具,固定檔名,而且**已經在操作員磁碟上**(批605 那次快轉帶進去的),不必再經歷一次 L85 的「工具在拿不到的那一側」。分三類並逐件印出:**再生物**(`VIA_Reports\\`、`ui_support` 的頁、被引擎覆寫的註冊表)· **暫存**(`.bak_`/`.tmp`/`__pycache__`/`_patches\\`)· **該上船**(其餘)。**預設只清點不動**;`-Commit` 才 add+commit(訊息逐件列出)、`-Push` 才推——分類我做,裁定他的。真跑驗過(scratch 倉造 11 件三類混合):分類全對 · `-Commit` 只收 5 件 · 沒上船的 6 件工作樹原封不動 · `origin` 仍停在基準(沒有被推)。→ LL165"
   }
  ],
  "updated_at": "2026-09-18 15:20",

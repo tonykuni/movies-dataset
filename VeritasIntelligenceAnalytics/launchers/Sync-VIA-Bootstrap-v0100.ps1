@@ -33,7 +33,30 @@
       `_patches\` 的未追蹤件擋住 merge)。
 #>
 [CmdletBinding()]
-param([string]$RepoRoot)
+param(
+    [string]$RepoRoot,
+    [switch]$Onboard,      # 批608「上船母資料夾」:清點母資料夾裡沒進 git 的東西(唯讀)
+    [switch]$Commit,       # 與 -Onboard 併用才會真的 git add + commit(你的手)
+    [switch]$Push          # 與 -Commit 併用才 push
+)
+
+# ── 上船分類(批608)────────────────────────────────────────────────────────
+#   「上船母資料夾」= 母資料夾裡**已經在那、但沒進 git** 的東西要進倉。
+#   這跟 via-intake 不是同一件事:那支是把**外面的檔**(預設掃 Downloads)收編進來給 URN;
+#   這裡的檔早就在它該在的位置,缺的只是 git。
+#   分三類,而且**每一類都印出來讓你看**——不是我替你決定:
+#     再生物  引擎跑一次就重生(VIA_Reports\、ui_support 的頁、被引擎覆寫的註冊表)→ 不上船
+#     暫存    *.bak_*、*.tmp、__pycache__、一次性補丁夾 _patches\        → 不上船
+#     該上船  其餘(引擎新版、docs、launchers、手維護的冊)                 → 上船
+#   預設**只清點不動**;-Commit 才 git add + commit;-Push 才推。
+$script:RegenPat = '(^VeritasIntelligenceAnalytics/VIA_Reports/|/ui_support/VIA_UI_.*\.html$|/registry/VIA_(Engine_|Schema_|Unified_Register|IndustryUnifiedMap|SSOT_RegexDict|ProjectCompletion|ParallelLanes|VDFArchitecture))'
+$script:TempPat  = '(\.bak_|\.tmp$|__pycache__|~$|/_patches/|\.orig$|\.rej$)'
+
+function Get-OnboardClass([string]$Rel) {
+    if ($Rel -match $script:TempPat)  { return '暫存' }
+    if ($Rel -match $script:RegenPat) { return '再生物' }
+    return '該上船'
+}
 
 $ErrorActionPreference = 'Continue'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -55,6 +78,52 @@ if (-not (Test-Path -LiteralPath $RepoRoot -PathType Container)) {
     $top = (git rev-parse --show-toplevel 2>$null)
     if ($LASTEXITCODE -ne 0 -or -not $top) {
         Write-Host "  [FAIL] 這裡不是 git 工作樹(或 git 不在 PATH):$RepoRoot" -ForegroundColor Red
+    } elseif ($Onboard) {
+        # ── 批608「上船母資料夾」──────────────────────────────────────────
+        $B = (git rev-parse --abbrev-ref HEAD).Trim()
+        Write-Host "=== 上船母資料夾 · 分支 $B ===" -ForegroundColor Cyan
+        $rows = @()
+        foreach ($r in @(git ls-files --others --exclude-standard | ForEach-Object { Unquote $_ } | Where-Object { $_ })) {
+            $rows += [pscustomobject]@{ 狀態 = '未追蹤'; 類 = (Get-OnboardClass $r); 路徑 = $r }
+        }
+        foreach ($d in @(git status --porcelain --untracked-files=no | Where-Object { $_ -and $_.Length -gt 3 })) {
+            $r = Unquote $d.Substring(3)
+            if ($r -match ' -> ') { $r = ($r -split ' -> ')[-1] }
+            $rows += [pscustomobject]@{ 狀態 = '已改'; 類 = (Get-OnboardClass $r); 路徑 = $r }
+        }
+        if (-not $rows.Count) {
+            Write-Host "  母資料夾與 git 一致,沒有東西要上船" -ForegroundColor Green
+        } else {
+            foreach ($g in ('該上船', '再生物', '暫存')) {
+                $sel = @($rows | Where-Object { $_.類 -eq $g })
+                if (-not $sel.Count) { continue }
+                $col = if ($g -eq '該上船') { 'Yellow' } else { 'DarkGray' }
+                Write-Host ("  [{0}] {1} 件" -f $g, $sel.Count) -ForegroundColor $col
+                foreach ($x in $sel) { Write-Host ("     {0}  {1}" -f $x.狀態, $x.路徑) -ForegroundColor $col }
+            }
+            $take = @($rows | Where-Object { $_.類 -eq '該上船' })
+            Write-Host ("  ---- 該上船 {0} 件 · 再生物 {1} 件(不上船)· 暫存 {2} 件(不上船)" -f `
+                    $take.Count, @($rows | Where-Object { $_.類 -eq '再生物' }).Count,
+                @($rows | Where-Object { $_.類 -eq '暫存' }).Count) -ForegroundColor Cyan
+            if (-not $Commit) {
+                Write-Host "  [唯讀] 只清點沒動。要真的上船:加 -Commit(再加 -Push 才推)" -ForegroundColor DarkGray
+            } elseif (-not $take.Count) {
+                Write-Host "  [停] 沒有「該上船」的件,不做 commit" -ForegroundColor Yellow
+            } else {
+                foreach ($x in $take) { git add -- "$($x.路徑)" }
+                $msg = "上船母資料夾(Sync-VIA-Bootstrap -Onboard -Commit):$($take.Count) 件"
+                $body = ($take | ForEach-Object { "- $($_.狀態) $($_.路徑)" }) -join "`n"
+                git commit -m $msg -m $body
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "  [OK] 已 commit $($take.Count) 件" -ForegroundColor Green
+                    git log --oneline -1
+                    if ($Push) { git push -u origin $B }
+                    else { Write-Host "  推是你的手:git push -u origin $B" -ForegroundColor DarkGray }
+                } else {
+                    Write-Host "  [停] commit 失敗,工作樹沒有被推上去" -ForegroundColor Red
+                }
+            }
+        }
     } else {
         $B = (git rev-parse --abbrev-ref HEAD).Trim()
         Write-Host "=== VIA 同步解卡 · 分支 $B ===" -ForegroundColor Cyan
