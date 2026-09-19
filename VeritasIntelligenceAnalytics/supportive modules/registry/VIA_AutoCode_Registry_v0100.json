@@ -9216,8 +9216,32 @@
    "component": "MDL135 v0113 digest:名實不符依嚴重度排序 + 印出被截掉幾境(批620 我自己造的)",
    "code": "ABI_MISMATCH > HOME_DRIFT > NAME_LIES;>6 境時逐態列出未印計數",
    "kind": "v0112 寫 `bad_id[:6]` 而 bad_id 是掃描順序。工作站 9 境只看到 6 列全是 NAME_LIES——萬一 ABI_MISMATCH 排第 7 位就被截掉了,而那是唯一一種「裝更多件只會更糟」的狀態(LL197)。"
+  },
+  {
+   "ts": "2026-09-19 17:20",
+   "op": "NEW",
+   "category": "VRN 治理",
+   "component": "VIA_VRN_LogicArchitecture_SSOT v0100(索引正本)+ via_vrn_logic_book v0100(建冊器+守門員)+ via-vrnbook",
+   "code": "實跑:層 6 · 引擎指標 25 · 規則正本 10 · 今日裁定 5 · 待裁定 2;守門 31 指標全在位且為尾版 GREEN;自測七檢 OK 7",
+   "kind": "操作員令「把今天的 VRN 邏輯整合一遍不要遺漏」。**指過去,不複製**:37 個引擎家族 + 10 本規則樞紐,抄一份進索引冊就是第二顆頭。冊由樹生成(glob 尾版 + 逐支讀檔頭),不是手寫;守門比「冊上寫的」對「樹上尾版」,過期就紅並指名 `via-vrnbook build`。今日五條裁定逐條入冊帶批號與落地處(批611 凍結繁簡表 · 批615 L90 DuckDB 正典 · 批615 單位不得反推 · 批615 期間拆解 · 批618 poppler 列 PATH 搬家白名單);兩條 known_gaps 一律 PENDING_OPERATOR。格 253 → 255 站(工具健康一盞、冊新不新一盞)。"
+  },
+  {
+   "ts": "2026-09-19 17:45",
+   "op": "FIX",
+   "category": "登錄面",
+   "component": "via_vrn_logic_book 補三個登錄面:加速器橋 + 根目錄梭(批340 契約)+ Register v0225",
+   "code": "MDL156 RED 36/37 → GREEN 37/37;MDL157 RED 25/26(ghost + missing shim)→ GREEN 26/26",
+   "kind": "三個都是全格子抓出來的,沒有一個是我自己想到的(LL199)。最刺的是第三個:MDL157 檢「貼給操作員的每一個 via-* 都要解析得到真指令」,當場抓到我在 docs 的一貼即用區寫了 `via-vrnbook` 這個幽靈令——L89 的反面教材。梭一律放**倉庫根**並照抄批340 契約(點源 Register 尾版 → 呼 %~n0),不自寫第二種實作。"
+  },
+  {
+   "ts": "2026-09-19 18:05",
+   "op": "UPDATE",
+   "category": "工作站實錄修",
+   "component": "CGC_MDL137 v0107:--family 收逗號也收空白(PowerShell 陣列潑灑)+ Grid v0377 站名 10→19 檢",
+   "code": "四種長相實跑:一個帶空白的字串 → 族 vdf,vrn,vap · 潑灑成多 argv → 族 vdf,vrn,vap · 正常逗號照舊 · --family nope 照樣 FAIL 並附原因;自測十九檢 OK 19",
+   "kind": "操作員照我給的句子打,當場 FAIL。逗號在 PowerShell 裡不加引號就是陣列,@args 潑灑後消失;而同一句寫在 .ps1 裡有引號所以不會爆——**同一個指令兩個地方行為不一樣,容器裡永遠測不到**(LL200)。收下但講原因(L92);潑灑成多 argv 的那半邊也要收,否則會變成「只跑了 vdf 卻以為三族都跑了」的假綠。"
   }
  ],
  "updated_at": "2026-09-19T16:05:00",
- "batch": 621
+ "batch": 622
 }
