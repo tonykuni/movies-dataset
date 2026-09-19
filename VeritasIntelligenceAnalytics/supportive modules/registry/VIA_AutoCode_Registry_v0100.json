@@ -9240,8 +9240,32 @@
    "component": "CGC_MDL137 v0107:--family 收逗號也收空白(PowerShell 陣列潑灑)+ Grid v0377 站名 10→19 檢",
    "code": "四種長相實跑:一個帶空白的字串 → 族 vdf,vrn,vap · 潑灑成多 argv → 族 vdf,vrn,vap · 正常逗號照舊 · --family nope 照樣 FAIL 並附原因;自測十九檢 OK 19",
    "kind": "操作員照我給的句子打,當場 FAIL。逗號在 PowerShell 裡不加引號就是陣列,@args 潑灑後消失;而同一句寫在 .ps1 裡有引號所以不會爆——**同一個指令兩個地方行為不一樣,容器裡永遠測不到**(LL200)。收下但講原因(L92);潑灑成多 argv 的那半邊也要收,否則會變成「只跑了 vdf 卻以為三族都跑了」的假綠。"
+  },
+  {
+   "ts": "2026-09-19 19:10",
+   "op": "NEW",
+   "category": "方法論存檔",
+   "component": "VIA_EnvRestore_Methodology_SSOT v0100(環境還原+補齊方法論)",
+   "code": "步 5 · 紅線 5 · L19 具名豁免界線 · 證據=工作站 APPLIED 跑 42 失敗 0,之後 vrn GREEN 8/8 · vap GREEN 8/8(VAP_ENG015 從 ENV_BROKEN 轉 OK)",
+   "kind": "操作員令「整理環境若正確則將方法論導入 VIA 存檔」。批621 那條路是**真的把環境從死結裡拉出來的**,所以從一次性處置升格成可重複、可稽核的方法。冊上寫明何時**不適用**(直譯器換版/壞掉是 via-rebuild 的事)、L19 豁免的界線、以及「這不是 L19 普遍可繞」的但書。兩條 known_limits 一律 PENDING_OPERATOR(全境成功紀錄至今從未有過)。"
+  },
+  {
+   "ts": "2026-09-19 19:12",
+   "op": "UPDATE",
+   "category": "VRN 治理",
+   "component": "SUP_MDL749 v0106 +downstream 上下貫通檢(+自測 ㉑;格子站名 20→21)",
+   "code": "實測:供應 17 · USED 6 · INTERNAL 11 · **ORPHAN 0** · 活消費者 3 支(ENG073 v0129 / ENG074 v0111 / ENG083 v0100);自測二十一檢 OK 21",
+   "kind": "操作員令「SSOT 同義字 REGEX 隨時新增更新 上下自動檢視」。照的是「冊上加一個同義字,下游到底吃不吃得到」——冊寫了不等於工具做到。兩枚自審都在這一檢上:CLI 動詞被當成供應函式(14 假 ORPHAN)、樞紐內部零件被當成 ORPHAN(11 假 ORPHAN);三態 USED/INTERNAL/ORPHAN 之後才是真的(LL201)。"
+  },
+  {
+   "ts": "2026-09-19 19:14",
+   "op": "FIX",
+   "category": "工作站實錄修",
+   "component": "CGC_MDL137 v0108:尾句不得對著紅燈說綠燈",
+   "code": "判定 RED 那一跑原本照印「三族皆以家族境 python 真跑綠燈」——條件只看 next 空不空,不看裁決",
+   "kind": "拿「沒有待辦」當「一切都好」的代理指標,遲早會在紅燈旁邊說反話(LL202)。改成看裁決:非 GREEN 就講「沒有可自動修的次步:紅在引擎自測本身,逐支看 [FAIL] 行」。"
   }
  ],
  "updated_at": "2026-09-19T16:05:00",
- "batch": 622
+ "batch": 623
 }
