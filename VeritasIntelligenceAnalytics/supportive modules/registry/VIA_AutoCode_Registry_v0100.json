@@ -9296,8 +9296,48 @@
    "component": "VRN_ENG083 v0102:誠實四態接齊 rc(_RC_OF + 自測 ㉒);格子站名 21→22 檢",
    "code": "修前:畫面 `鏈實跑 · NODATA` 而 rc=1;修後 rc=2。自測 21 → 22 檢 OK 22",
    "kind": "批624 我加了 NODATA 卻沒接 rc,批625 自己寫的下游照 rc 判就說「引擎壞了」(LL207)。㉒ 掃原始碼把所有產得出來的 state 撈出來逐個對 _RC_OF——新增態沒登記當場點名。"
+  },
+  {
+   "ts": "2026-09-20 03:10",
+   "op": "MEASURE",
+   "category": "加速器",
+   "component": "全樹橋覆蓋率 + 使用率實掃(CGC_MDL124 尾版;git 在冊律)",
+   "code": "ACCEL 全樹 2693/2693 = **100.0% · 缺 0**(VDF 191 · VAP 247 · VRN 318 · VIA 1753)· NET 真外呼件 VDF 28/28 = 100.0%(另 163 件判非擷取,不注入)· **使用率:持橋 1426 支,橋後真的呼叫加速器 76 支(5.3%),只掛不用 1350**",
+   "kind": "操作員令「請加入 25 個加速器,所有 py 檔都加入 VeritasCeleritas,vdf 檔都加入 VeritasAegisNexus」。先量再做:兩條鏈都在,兩邊都沒有可注入的缺口——**這件事批102/115/345/402 已經做完了**。真正的數字是使用率,而覆蓋率報告上不會出現它(LL210)。"
+  },
+  {
+   "ts": "2026-09-20 03:15",
+   "op": "FIX",
+   "category": "正典",
+   "component": "SUP_MDL753_VIACommonUtils v0102:`_celeritas()` 交回正典 SUP_MDL737 + L77 正典排除清單",
+   "code": "修前 `SUP_MDL753._celeritas()` → None(AttributeError: 'NoneType' has no '__dict__');`SUP_MDL737.celeritas()` → 模組,_LazyPool 在位。修後 `cel_submit` 回 Future。自測 16 → **24 檢 OK 24**",
+   "kind": "批594 收斂 17 處 `_cel_submit` 時抄了形狀,漏了 `sys.modules[name] = mod` 要在 exec_module 之前(3.11+ dataclass 會查 sys.modules[cls.__module__])。批323 早在 MDL737 修過。後果:`cel_submit` 全數退回直呼,**池子一次也沒被用到**,graceful 蓋得一聲不響(LL209)。活樹受影響者含 VRN_ENG073(鏈上的站)/ENG074 v0110,v0111/MDL001_Converter_v0121/ENG017,018,023/MDL010/VIA_LibCanon。順帶:v0101 的第 ⑤ 檢**是靠那個 bug 才亮的**(`_cel=None` 永遠直呼回 6),已改成池子在位必須回 Future。"
+  },
+  {
+   "ts": "2026-09-20 03:25",
+   "op": "NEW",
+   "category": "加速",
+   "component": "VRN_ENG072_FirstPageText v0136:行程分片預熱車道(`--jobs`;prewarm-shard 動詞)",
+   "code": "語料 64 件 × 3 頁 · CPU 4:序列 9.0s / 執行緒 4 工 **11.9s(0.76×,比序列慢)** / 行程 4 工 2.4s(3.68×)。端到端(FORCE,24 件)序列 4.9s → 行程預熱 2.6s = **1.90×**,且 sidecar **逐位元組相同**(jobs=1 vs auto、v0135 vs v0136 兩組都同)。自測 51 → **56 檢 OK 56**",
+   "kind": "工作站 R1 579s 的去處是 triage/fitz 分區/pdfplumber 三支的序列迴圈。第一版用執行緒池+Celeritas thread_budget,量出來是**減速**——那三支是純 Python CPU 工,GIL 擋著;thread_budget 是給等待工的預算,拿它配 CPU 工就是拿錯尺(LL211)。改行程分片,走 `subprocess`+動詞+清單而不是 ProcessPoolExecutor(本引擎常被以臨時模組名載入,那個名字在子行程不存在;Windows spawn 又會重跑主模組)。OCR 車道刻意不碰(預算時鐘會壞)。`--jobs 1` 退得回 v0135;邏輯庫命中的件不預熱;預熱拋例外的件不記(錯要留在原地)。"
+  },
+  {
+   "ts": "2026-09-20 03:30",
+   "op": "FIX",
+   "category": "假綠",
+   "component": "三盞假綠:ENG072 ⑰ 自己量自己 · MDL124 寫死檢數 · 批626 自己的三檢靜靜跳過",
+   "code": "ENG072 v0135 `_src72.index(\"else extract_page1_zones(p)\")` —— 整支檔裡唯一一處就是那行檢查自己,所以永遠綠(改讀 `inspect.getsource(run)`)· MDL124 `10 - len(fails)` 寫死,加了第 11 檢照樣印 10 · 批626 第一版三檢借已關閉的 `tdp` 夾具 → 列表恆空 → 整段跳過,畫面「52 檢 OK 52」其中三檢沒跑",
+   "kind": "LL212 / LL213 / LL214。第三個是我自己這一批犯的,自審抓到——**跳過不出聲跟假綠是同一件事**。SUP_MDL753「十六檢」、ENG072 抬頭停在 v0129,一併改成現場計 / 由檔名取版號。"
+  },
+  {
+   "ts": "2026-09-20 03:35",
+   "op": "FIX",
+   "category": "正本零觸碰",
+   "component": "via_accel_injector v0101 / via_net_injector v0101:排除清單接 SUP_MDL753 L77 正典;CGC_MDL124 v0105 +READONLY_CANON",
+   "code": "v0100 vs v0101 逐路徑比:`references/intake/…`、`_superseded`、`RetiredEngines`、`_backup`、`SCOPE_COPY` 五段 v0100 **會寫**、v0101 排除;活檔兩邊都會寫(排除清單不得過寬)。MDL124 v0105 把唯讀正典 SSOT 列冊,全樹 ACCEL 覆蓋率 99.9% → **100.0% · 缺 0**",
+   "kind": "`via-inject` / `via-netinject` 是活的根層短令,`--run` 一跑就寫進收容正本(帶 sha 冊)。MDL124 那一支則是不知道唯讀律,照樣把唯讀正典列進注入計畫——**覆蓋率差的那 0.1% 不是欠帳,是不准動的東西**,不在冊講清楚遲早有人為了補成 100% 去動它(新律 L95)。兩支注入器與 MDL124 做的是同一件事,**要不要留兩支是操作員的裁定**(LL90),本批只補破口不代裁。"
   }
  ],
- "updated_at": "2026-09-19T16:05:00",
- "batch": 625
+ "updated_at": "2026-09-19T19:40:00",
+ "batch": 626
 }
