@@ -9416,8 +9416,16 @@
    "component": "VDF 庫 27 表逐表列數與日期範圍(為「以 2023-07-01 為起點跑所有引擎」先立基線)",
    "code": "價格四表 prices_canonical / tw_daily_prices / tw_prices_adj / features_daily **同為 579,517 列**(一致)· 但起點是 **2024-01-02**,離 2023-07-01 **缺約半年**;代號 892 支**全是 .TWO 上櫃**(tw_listings 也是 892,上市 0 支);空表 4 張:consensus_daily / consensus_latest / tw_monthly_revenue / monthly_revenue_analysis;只有近兩週:tw_daytrade_market(9/01–9/18)· tw_valuation_daily(9/08–9/18)· tw_market_agg(6 列)",
    "kind": "操作員令「以 2023-07-01 為起點至今啟動 VDF 所有引擎,然後逐一核對資料庫數是否一致」。先量再跑:一致性的**第一條不變式**(四表同列數)現在是成立的;缺口是起點日、上市股覆蓋、四張空表。實跑要觸網=**你的手**(不代設 VIA_NET_CONSENT)。"
+  },
+  {
+   "ts": "2026-09-20 08:10",
+   "op": "FIX",
+   "category": "假紅",
+   "component": "SUP_MDL749 v0108 +rating_keys() · VRN_ENG083 v0108 verdict 分流 + 驗法句現場填",
+   "code": "評等欄 GREEN 42 → **46** · YELLOW 4 → **0**;判對率 97.4% → **100.0% = PASS ÷(PASS+FAIL) = 302/302(FAIL 0)**;可判率 53.3% = 302/567;UNVERIFIABLE **4 格具名列出**。MDL749 自測 28 → **30 檢 OK 30** · ENG083 自測 31 → **33 檢 OK 33**",
+   "kind": "LL227/LL228。判定器退到人話詞表去量正典鍵(NOT RATED vs NOT_RATED 只差一個底線),把四份抽對的判成黃燈;補 `rating_keys()` 之後 ENG083 **不必改一個字**就接上了(那個 fallback 鏈本來就先找 rating_keys)。另修:『驗不了』從判對率分母移出——那是缺料不是判錯,**判對率變好不是因為藏起來,是因為它本來就不該在分母裡**。"
   }
  ],
- "updated_at": "2026-09-19T21:50:00",
- "batch": 630
+ "updated_at": "2026-09-19T22:15:00",
+ "batch": "批630B"
 }
