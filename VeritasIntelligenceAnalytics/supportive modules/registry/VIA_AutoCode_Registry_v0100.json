@@ -9080,8 +9080,16 @@
    "component": "VRN_ENG064 v0102(零依賴簡→繁後備)+ VIA_ZhConvert_S2TWP_CharMap v0100(凍結對照表 2,784 筆)+ Grid v0367(判決行尺修 + 產品資格閘逾時 300→900 + 知識堆疊站改 nodata_ok)",
    "code": "三站一修:ENG064 ② · ENG066 ② · ENG067 ③ —— 無 opencc 那條路全部轉綠,而 ENG066/ENG067 **檔案一行未改**(修在咽喉,下游自己好)",
    "kind": "操作員貼回批610 之前那一跑的 ALL-IN-ONE(v0106 + Grid v0365,落後 1 commit):15 步 GREEN 9 · NODATA 3 · RED 3;格子 OK 223 · FAIL 23 · SKIP 4 · 7,062s(序跑複判已翻綠 17 支)。① **三站一個病根**:工作站沒裝 opencc → 收容正主 LanguageNormalizer 煙測 raise → `except Exception: return None` → 退補殼 → 補殼 `self._cc = None` **直通不轉** → 簡體原樣交給下游,而下游的冊全按繁體正字比對,於是條條落空。容器裝了 opencc,所以**只走過裝了的那一半**,三站一直假綠(L83 第二次現身)。把 opencc 擋掉,三站當場全紅,一次複現。補法不代裝套件:給補殼一條零依賴的路——opencc 在照用,缺就退凍結對照表。表不是憑記憶造字,是在容器裡**逐字元實跑 opencc s2twp 量出來的**(掃 28,096 個 CJK 碼位,會變的 2,784 筆),冊裡帶 provenance(工具/版本/config/範圍/日期)。而且講白補不到什麼:這是**字元層**,片語層台灣用詞(軟件→軟體 這一類)補不起來,所以 `zh_which()` 要說得出走的是 opencc / builtin_char / passthrough——不講就是假綠。③b 改判 NODATA:正主件**在**,是它的相依缺;缺套件 ≠ 缺件 ≠ 壞掉,判紅會把真正的紅淹掉(L57)。站改掛 `nodata_ok`。另外順手撈出一句被 `except` 吞掉十幾批的話:`RuntimeError: 缺少 OpenCC 依賴。請執行：pip install opencc-python-reimplemented`——它一直都在,只是沒人看得到(批610 LL168 同一課)。② **尺挑理由挑到狀態名**:工作站「擷取單引擎八檢」紅了,格子只印 `[FAIL-CLOSED] VIA_NET_CONSENT≠YES…`——那行其實是某一檢**通過時**印的誠實訊息(容器同一支 rc=0 十檢全過),真正紅的那一檢被它擠掉,操作員拿不到任何線索。批603 我寫的挑選器用 `startswith('[FAIL')`,`[FAIL-CLOSED]` 長得像就被抓走名額。v0367 把 `[FAIL-CLOSED]/[FAIL_CLOSED]/[FAIL-SAFE]` 具名排除,並在一行判決都挑不到時明說「挑不到」。③ **被砍的站不是紅**:產品資格閘工作站 300s 逾時(容器 31s),逾時 300→900。④ **我自己在這一批踩的**:改逾時用了跨行正則,打到隔壁那一站(產品資格閘還是 300、十道並行編排被改成 900),改完回讀才抓到。"
+  },
+  {
+   "ts": "2026-09-19 10:17",
+   "op": "NEW",
+   "category": "工作站實錄修",
+   "component": "CGC_MDL165 v0101(短令撞名閘)+ Register v0222(via-sync 守門 + via-presync)+ Grid v0368 + 解卡貼上區塊",
+   "code": "短令名 285 · 真撞名 18(梭不算)· 基線外 0 · 同冊重複定義 2(via-panorama · via-ssot)· 危險件 1(via-sync→推 main)",
+   "kind": "**我叫操作員打的指令,在他機器上是另一個東西。**批609 我登了 `via-sync`,可是 `bin\\via-sync.ps1` 早就存在,內容是 `git fetch` + `git merge origin/claude/via-system-followup-tz7k9t`(寫死另一條分支)+ **`git push origin main`**。他照我寫的打 via-sync,跑到的是那一支:merge 了別條分支(所以冒出一堆 ChipWar/GroupIndex 髒檔)、然後想推 main(被拒)。而我批609 的 v0221 在他**拉不下來的 commit 裡**(他磁碟最新是 v0220)——L85 第三次:解卡的工具又放在被卡住的那一側。① 撞名閘(MDL165 v0101 `collide`):難的是分母。批340 律規定每個短令配同名 `.cmd` 梭(點源 Register 尾版→叫 `%~n0`),那是**契約不是撞名**;第一版尺不分,量出 146 筆等於沒講。分清楚後真撞名 18 筆,而會推 main 的那一支就在裡面,單獨標**危險**。另外抓到同一份 Register 裡 `via-panorama`/`via-ssot` 各定義兩次(後者靜默蓋掉前者)。五檢兩種分類都走過(L83),棘輪基線外 0。② Register v0222:**不搶名**——`via-sync` 改成攤開兩支、要求指名的守門函式(零動作,LL90 裁定權在操作員);同步解卡正名為 `via-presync`(量過:285 個短令名裡沒有這個名字)。重複定義只講不改。③ 解卡貼上區塊:零檔案依賴(L85),pwsh 7.4.6 對真 git 倉**兩條路都跑過**——ff-only 成功路(備份→stash→FF,未追蹤件一根沒碰)與分岔誠實停路。④ **自審抓到的**:我把 `bin\\via-sync.ps1` 這個 Windows 路徑直接寫進格子的站名字串,`\\v` 被 Python 當成垂直定位跳脫,站名印出來變成 `binia-sync.ps1`——跟批607 那個 `\\e` 同一族(**Windows 路徑寫進 Python 字串,反斜線就是跳脫字元**)。改成正斜線,並把本批動過的四支 .py 用 `-W error::SyntaxWarning` 逐支再掃一次,無效跳脫 0。"
   }
  ],
- "updated_at": "2026-09-19 09:47",
- "batch": "批611"
+ "updated_at": "2026-09-19 10:17",
+ "batch": "批612"
 }
