@@ -9200,8 +9200,24 @@
    "component": "CGC_MDL135 v0112 ㊶:把 OUT/LKGC_* 一起關進沙盒(以前只關境根)",
    "code": "重現條件:先跑一次 `via-envgov plan --offline`(LKGC 落地)再跑 --selftest → ㊶ FAIL;沙盒化後在同樣條件下 49/49 全綠",
    "kind": "全格子 FAIL 1 抓到的。㊶ 讀實樹 LKGC 決定 restore.mode——**判定器讀自己跑出來的輸出**(LL179 第四次)。這是時間炸彈:容器乾淨所以一直綠,操作員那台跑過幾十次 via-envgov,那一站在他那邊本來就該紅。同一支檔的 ⑥ 檢早有正確的換沙盒寫法,只是沒帶到 ㊶(LL189 同病)。"
+  },
+  {
+   "ts": "2026-09-19 16:50",
+   "op": "UPDATE",
+   "category": "環境治理",
+   "component": "CGC_MDL135 v0113 · resume 升級:還原前次成功布局 → 補沒裝的 → 衝突檢查 → 依計畫裝(不複驗)",
+   "code": "自測 49 → **50 檢全綠**(㊿ 四道紅線各撞一次:未授權=零動作 · 無同意=BLOCKED_CONSENT · CONFLICT=SKIP 不裝 · 指令裡零 sync/uninstall/remove;uv 缺=NOT_RUN 不猜)",
+   "kind": "操作員令「找前一個成功安裝環境工具布局 根據歷史紀錄還原 再把沒安裝的工具經過衝突檢查後無誤建立新增計畫 依計畫執行安裝 不測是因為之前已測試過」。他卡在 L19 的死結裡:要綠才准裝,而黃的原因就是沒裝(LL195)。①②(還原)本來就有——批602 的逐境 LKGC;新的是 ③ 衝突檢查(`uv pip install --dry-run`,零安裝)與 ④ 執行(`resume --approve`)。L19 具名豁免,理由印在輸出裡(L87),界線寫死:只增不減 · 只裝 CLEAN · 破壞段不進 · 同意閘不代設 · reverified=False 附操作員原話(LL196)。"
+  },
+  {
+   "ts": "2026-09-19 16:52",
+   "op": "FIX",
+   "category": "自審",
+   "component": "MDL135 v0113 digest:名實不符依嚴重度排序 + 印出被截掉幾境(批620 我自己造的)",
+   "code": "ABI_MISMATCH > HOME_DRIFT > NAME_LIES;>6 境時逐態列出未印計數",
+   "kind": "v0112 寫 `bad_id[:6]` 而 bad_id 是掃描順序。工作站 9 境只看到 6 列全是 NAME_LIES——萬一 ABI_MISMATCH 排第 7 位就被截掉了,而那是唯一一種「裝更多件只會更糟」的狀態(LL197)。"
   }
  ],
  "updated_at": "2026-09-19T16:05:00",
- "batch": 620
+ "batch": 621
 }
