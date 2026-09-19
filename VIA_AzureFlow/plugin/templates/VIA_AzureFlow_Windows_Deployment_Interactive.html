@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="via-azureflow-light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA 天青智流 AzureFlow｜Windows 安裝與 Plug-in 架構</title>
+<style>
+:root{--paper:#f7faf9;--panel:#fff;--ink:#20353b;--muted:#6b7d81;--line:#d8e7e4;--cyan:#2b9db0;--cyan-dark:#197789;--cyan-soft:#e7f5f6;--teal:#4c9f86;--amber:#e8b04e;--red:#c96868;--shadow:0 10px 28px rgba(32,74,80,.08);--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif}.shell{max-width:1320px;margin:0 auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:20px}.eyebrow{margin:0 0 5px;color:var(--cyan-dark);font-size:12px;font-weight:800;letter-spacing:.12em}.hero h1{margin:0;font-size:clamp(24px,3.3vw,40px);line-height:1.12;letter-spacing:-.03em}.hero p{max-width:760px;margin:10px 0 0;color:var(--muted)}.badge{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--teal);background:#f0f8f4;white-space:nowrap;font-size:12px;font-weight:800}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.toolbar button{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--cyan-dark);padding:9px 12px;font-weight:800;cursor:pointer}.toolbar button.primary{border-color:var(--cyan);background:var(--cyan);color:#fff}.toolbar button:hover{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-soft)}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.panel h2{margin:0 0 5px;font-size:18px}.sub{margin:0 0 14px;color:var(--muted);font-size:13px}.diagram-shell{position:relative;min-height:670px;overflow:auto;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#fbfefe,#f3faf8);padding:18px}.diagram{position:relative;min-width:920px;min-height:630px}.node{position:absolute;width:182px;min-height:58px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 5px 14px rgba(32,74,80,.06);cursor:pointer;transition:.15s}.node:hover,.node.active{border-color:var(--cyan);box-shadow:0 0 0 4px var(--cyan-soft),0 8px 18px rgba(32,74,80,.1);transform:translateY(-2px)}.node strong{display:block;color:var(--cyan-dark);font-size:13px}.node span{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.4}.node.install{background:#f0fbfc;border-color:#a9d3d6}.node.action{background:#f0f8f4;border-color:#c9e4dd}.node.safety{background:#fff8e8;border-color:#f1dfb5}.node.fail{background:#fff3f3;border-color:#efd0d0}.edge{position:absolute;height:2px;background:#96bab8;transform-origin:0 50%;opacity:.78}.edge:after{content:"";position:absolute;right:-1px;top:-4px;border-left:8px solid #6f9d9a;border-top:5px solid transparent;border-bottom:5px solid transparent}.edge.dash{background:transparent;border-top:2px dashed #a4c2bf;height:0}.edge.dash:after{border-left-color:#8aa9a5}.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;color:var(--muted);font-size:12px}.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:4px;vertical-align:-2px;border:1px solid var(--line)}.legend .i-install{background:#f0fbfc}.legend .i-action{background:#f0f8f4}.legend .i-safety{background:#fff8e8}.legend .i-fail{background:#fff3f3}.detail{min-height:220px;margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8fbfa}.detail h3{margin:0 0 6px;color:var(--cyan-dark)}.detail p{margin:7px 0;color:#41585d}.detail code{display:block;white-space:pre-wrap;background:#eef6f4;padding:10px;border-radius:8px;color:#31545a;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}.side section+section{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.side h3{margin:0 0 7px;font-size:15px}.side ul{margin:8px 0 0;padding-left:19px;color:#496066}.side li+li{margin-top:6px}.status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#f3f8f7;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex:0 0 auto}.path{font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all;background:#f5faf9;border:1px solid var(--line);padding:9px;border-radius:8px;color:#31545a}.foot{margin:18px 0 0;color:var(--muted);font-size:12px;text-align:center}@media(max-width:980px){.hero{display:block}.badge{display:inline-block;margin-top:12px}.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:16px}.side section+section{margin-top:0;padding-top:0;border-top:0}@media(max-width:650px){.shell{padding:14px}.side{display:block}.side section+section{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.diagram-shell{min-height:540px}.diagram{transform:scale(.82);transform-origin:top left;min-width:920px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="hero">
+  <div><p class="eyebrow">VIA 天青智流 AZUREFLOW</p><h1>Windows 安裝與 Plug-in 架構圖</h1><p>點選節點檢視功能、輸入、輸出與安全邊界。流程圖採本地 HTML，不依賴 CDN，不會讀取或上傳來源檔案。</p></div>
+  <div class="badge">LOCAL · READ-ONLY · TASK SCHEDULER READY</div>
+</header>
+<div class="toolbar">
+  <button class="primary" data-focus="install">看安裝流程</button>
+  <button data-focus="actions">看三個 QA Actions</button>
+  <button data-focus="scheduler">看 Task Scheduler</button>
+  <button data-focus="system">看完整系統</button>
+  <button data-action="reset">重設檢視</button>
+  <button data-action="download">下載圖表狀態 JSON</button>
+</div>
+<section class="layout">
+  <div class="panel">
+    <h2>互動架構圖</h2>
+    <p class="sub">可用滑鼠點選任一節點；箭頭代表資料／控制流，虛線代表 UI 只產生命令而不直接執行。</p>
+    <div class="diagram-shell"><div id="diagram" class="diagram" aria-label="VIA AzureFlow Windows deployment architecture">
+      <div class="node install" id="n-host" data-node="host" style="left:20px;top:24px"><strong>Windows 開發主機</strong><span>PowerShell、Python、Edge／Chrome</span></div>
+      <div class="node install" id="n-hash" data-node="hash" style="left:250px;top:24px"><strong>ZIP + SHA-256</strong><span>先驗證完整性再解壓</span></div>
+      <div class="node fail" id="n-stop" data-node="stop" style="left:480px;top:24px"><strong>不一致：停止</strong><span>重新取得交付包</span></div>
+      <div class="node install" id="n-unzip" data-node="unzip" style="left:710px;top:24px"><strong>Expand-Archive</strong><span>部署到 C:\VIA\plugins</span></div>
+
+      <div class="node install" id="n-manifest" data-node="manifest" style="left:710px;top:150px"><strong>plugin_manifest.json</strong><span>母系統註冊與 handoff schema</span></div>
+      <div class="node install" id="n-launcher" data-node="launcher" style="left:480px;top:150px"><strong>PowerShell launcher</strong><span>Invoke-VIA-AzureFlowQA.ps1</span></div>
+      <div class="node install" id="n-ui" data-node="ui" style="left:250px;top:150px"><strong>Standalone HTML UI</strong><span>拖曳、路徑、命令預覽</span></div>
+      <div class="node install" id="n-python" data-node="python" style="left:20px;top:150px"><strong>Python 3</strong><span>python 或 py -3</span></div>
+
+      <div class="node action" id="n-orch" data-node="orch" style="left:20px;top:296px"><strong>Python orchestrator</strong><span>via_azureflow_qa.py</span></div>
+      <div class="node action" id="n-inspect" data-node="inspect" style="left:250px;top:296px"><strong>inspect</strong><span>API、SSOT、runs、jobs、dashboard</span></div>
+      <div class="node action" id="n-verify" data-node="verify" style="left:480px;top:296px"><strong>verify</strong><span>SHA、path safety、CRC、package</span></div>
+      <div class="node action" id="n-all" data-node="all" style="left:710px;top:296px"><strong>all</strong><span>inspect + verify + combined handoff</span></div>
+
+      <div class="node action" id="n-via" data-node="via" style="left:250px;top:440px"><strong>VIA validator</strong><span>validate_via_zip.py</span></div>
+      <div class="node action" id="n-standard" data-node="standard" style="left:480px;top:440px"><strong>Standardized validator</strong><span>validate_standardized_zip.py</span></div>
+      <div class="node action" id="n-output" data-node="output" style="left:710px;top:440px"><strong>Timestamped output</strong><span>summary、report、logs、artifacts</span></div>
+      <div class="node safety" id="n-system" data-node="system" style="left:20px;top:440px"><strong>Complete System</strong><span>manifest → All → readiness → activation gate</span></div>
+
+      <div class="node safety" id="n-task" data-node="scheduler" style="left:20px;top:570px"><strong>Task Scheduler</strong><span>PowerShell.exe → Scheduled runner</span></div>
+      <div class="node safety" id="n-review" data-node="review" style="left:250px;top:570px"><strong>人工 review</strong><span>不得自動 promotion／command activation</span></div>
+      <div class="node safety" id="n-handoff" data-node="handoff" style="left:480px;top:570px"><strong>母系統 handoff</strong><span>VIA_AzureFlow_QA_Run_Summary.json</span></div>
+      <div class="node fail" id="n-e2e" data-node="e2e" style="left:710px;top:570px"><strong>extracted E2E</strong><span>只有明確勾選才執行</span></div>
+
+      <i class="edge" style="left:202px;top:53px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:432px;top:53px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:662px;top:53px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:792px;top:82px;width:2px;height:68px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:570px;top:82px;width:2px;height:68px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:340px;top:82px;width:2px;height:68px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:110px;top:82px;width:2px;height:68px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:111px;top:208px;width:48px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:570px;top:208px;width:48px;transform:rotate(90deg)"></i>
+      <i class="edge dash" style="left:342px;top:178px;width:138px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:202px;top:325px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:432px;top:325px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:662px;top:325px;width:48px;transform:rotate(0deg)"></i>
+      <i class="edge" style="left:570px;top:354px;width:2px;height:86px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:792px;top:354px;width:2px;height:86px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:340px;top:354px;width:2px;height:86px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:111px;top:354px;width:2px;height:216px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:340px;top:498px;width:2px;height:72px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:570px;top:498px;width:2px;height:72px;transform:rotate(90deg)"></i>
+      <i class="edge" style="left:792px;top:498px;width:2px;height:72px;transform:rotate(90deg)"></i>
+    </div></div>
+    <div class="legend"><span><i class="i-install"></i>安裝／入口</span><span><i class="i-action"></i>QA action／validator</span><span><i class="i-safety"></i>排程／handoff</span><span><i class="i-fail"></i>停止／需人工確認</span></div>
+    <div id="detail" class="detail"><h3>點選一個節點</h3><p>架構圖會顯示該節點的用途、輸入、輸出與安全限制。</p></div>
+  </div>
+  <aside class="panel side">
+    <section><h2>快速導覽</h2><p class="sub">用按鈕聚焦流程，再點選節點查看細節。</p><div id="status" class="status"><i class="dot"></i><span>待命：尚未選取節點。</span></div></section>
+    <section><h3>Windows 安裝位置</h3><div class="path">C:\VIA\plugins\via-azureflow-qa-plugin\</div><ul><li>先用 SHA-256 sidecar 驗證 ZIP。</li><li>用 Expand-Archive 解壓。</li><li>用 launcher 或 Scheduled runner 執行。</li></ul></section>
+    <section><h3>Task Scheduler 建議</h3><ul><li>Action：`PowerShell.exe`。</li><li>Arguments：`-NoProfile -NonInteractive -ExecutionPolicy Bypass -File ...`。</li><li>Start in：Plug-in 根目錄。</li><li>Output：每次使用 timestamped directory。</li><li>保留 `task_scheduler.log`、`task_result.json` 與 combined summary。</li></ul></section>
+    <section><h3>完整資源</h3><ul><li><a href="../references/windows_installation_deployment_manual.md">Windows 安裝／部署手冊</a></li><li><a href="../references/VIA_AzureFlow_Windows_Deployment_Architecture.mmd">Mermaid 圖表來源</a></li><li><a href="../Invoke-VIA-AzureFlowQA.ps1">PowerShell launcher</a></li><li><a href="../Invoke-VIAAzureFlowQASystem.ps1">Complete system launcher</a></li><li><a href="../scripts/Invoke-VIA-AzureFlowQA-Scheduled.ps1">Scheduled runner</a></li><li><a href="../scripts/Register-VIAAzureFlowQATask.ps1">Task 註冊腳本</a></li></ul></section>
+    <section><h3>本地安全狀態</h3><p class="sub">source write=false · source delete=false · network default=false · human review required=true</p></section>
+  </aside>
+</section>
+<p class="foot">VIA 天青智流 AzureFlow · local-only interactive architecture · no CDN · no upload · no automatic command activation</p>
+</main>
+<script>
+(function(){
+  "use strict";
+  var details={
+    host:{title:"Windows 開發主機",body:"安裝目標是另一個 Windows 開發環境。需要 PowerShell 與 Python 3；Edge／Chrome 只用來開啟本地 UI。",code:"winver\n$PSVersionTable.PSVersion\npython --version"},
+    hash:{title:"ZIP + SHA-256",body:"先用 Get-FileHash 驗證交付 ZIP。hash 不一致時停止，不解壓、不執行。",code:"Get-FileHash -Algorithm SHA256 .\\VIA_AzureFlow_QA_Plugin_Standalone.zip"},
+    stop:{title:"不一致：停止",body:"不接受不一致的 Plug-in ZIP。重新取得 ZIP 與外部 .sha256 sidecar。",code:"if hash != sidecar: stop"},
+    unzip:{title:"Expand-Archive",body:"將完整 Plug-in 目錄解壓到 C:\\VIA\\plugins。解壓後保留 SKILL、manifest、scripts、templates 與 references。",code:"Expand-Archive -LiteralPath $zip -DestinationPath C:\\VIA\\plugins -Force"},
+    manifest:{title:"plugin_manifest.json",body:"給母系統讀取 plugin_id、三個 action、entrypoints、output artifacts 與安全政策。",code:"schema=VIA_PLUGIN_MANIFEST/1.0\nssot_promotion=false\nautomatic_command_activation=false"},
+    launcher:{title:"PowerShell launcher",body:"確認 CLI 存在，尋找 python 或 py，將 PowerShell 參數轉成 CLI 參數，並保留 exit code。",code:".\\Invoke-VIA-AzureFlowQA.ps1 -Action All -Root ... -Zip ..."},
+    ui:{title:"Standalone HTML UI",body:"file:// 可開啟的本地控制面板。可拖曳 ZIP、填入 Windows path、選 action、複製命令；不直接執行 Python。",code:"file:///C:/VIA/plugins/via-azureflow-qa-plugin/templates/VIA_AzureFlow_QA_Standalone.html"},
+    python:{title:"Python 3",body:"CLI 與 validators 使用 standard library。Python 缺失時 launcher 會明確失敗，不會自動下載。",code:"python -m py_compile .\\scripts\\*.py"},
+    orch:{title:"Python orchestrator",body:"執行三個 action，做 path preflight、validator routing、summary 與安全旗標。",code:"python .\\scripts\\via_azureflow_qa.py all ..."},
+    inspect:{title:"inspect",body:"讀取 AzureFlow health、catalog、status、jobs、dashboard、SSOT 與 local run artifacts。",code:"GET /api/health\nGET /api/catalog\nGET /api/status\nGET /api/jobs\nGET /api/dashboard"},
+    verify:{title:"verify",body:"檢查 SHA-256、path safety、CRC、package root、required files、HTML／E2E／JUnit 等。",code:"-PackageKind Auto|Via|Standardized"},
+    all:{title:"all",body:"依序執行 inspect 與 verify，只有兩者都 PASS 時 combined status 才是 PASS。",code:"VIA_AzureFlow_QA_Run_Summary.json"},
+    system:{title:"Complete System",body:"以 plugin_manifest.json 為單一契約，依序完成 manifest preflight、All QA、Task Scheduler readiness 與人工 activation gate。預設不註冊 Windows task。",code:".\\Invoke-VIAAzureFlowQASystem.ps1 -Root ... -Zip ...\nactivation=READY_FOR_WINDOWS_ACTIVATION\n\n# Windows 人工審核後才加：\n-ActivateSchedule"},
+    via:{title:"VIA validator",body:"VIA all-in-one package validator。錯誤 package 會輸出結構化 FAIL，不繼續讀取不存在的 report。",code:"scripts\\validate_via_zip.py"},
+    standard:{title:"Standardized validator",body:"Standardized package safe extractor／validator。可由 Auto 或 PackageKind Standardized 選用。",code:"scripts\\validate_standardized_zip.py"},
+    output:{title:"Timestamped output",body:"每次執行獨立保存 summary、report、stdout、stderr、task log 與 task result，避免排程覆寫稽核資料。",code:"Downloads\\VIA_AzureFlow_QA_Scheduled\\All-YYYYMMDD_HHmmss\\"},
+    scheduler:{title:"Windows Task Scheduler",body:"排程只負責啟動 PowerShell scheduled runner。runner 再呼叫原有 launcher，不建立常駐服務。",code:"PowerShell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File scripts\\Invoke-VIA-AzureFlowQA-Scheduled.ps1"},
+    review:{title:"人工 review",body:"QA PASS 不等於 SSOT promotion，不等於 command approval，也不等於自動部署。",code:"human_review_required=true"},
+    handoff:{title:"母系統 handoff",body:"母系統讀取 combined summary 與 inspect／verify 子目錄，不需要複製來源檔案。",code:"VIA_AZUREFLOW_QA_PLUGIN_RUN/1.0"},
+    e2e:{title:"extracted E2E",body:"只有明確加入 -RunExtractedE2E 才會執行 package 內測試 runner；預設為 false。",code:"-RunExtractedE2E  # opt-in only"}
+  };
+  var allNodes=document.querySelectorAll(".node"), detail=document.getElementById("detail"), status=document.getElementById("status");
+  function select(key){
+    allNodes.forEach(function(n){n.classList.toggle("active",n.getAttribute("data-node")===key)});
+    var d=details[key]||{title:key,body:"此節點沒有詳細資料。",code:""};
+    detail.innerHTML="<h3>"+d.title+"</h3><p>"+d.body+"</p><code>"+d.code.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</code>";
+    status.lastElementChild.textContent="已選取："+d.title;
+  }
+  function focusNodes(keys){
+    allNodes.forEach(function(n){n.classList.toggle("active",keys.indexOf(n.getAttribute("data-node"))>=0)});
+    var first=keys[0];if(first)select(first);
+  }
+  allNodes.forEach(function(n){n.addEventListener("click",function(){select(n.getAttribute("data-node"))})});
+  document.querySelectorAll("button[data-focus]").forEach(function(b){b.addEventListener("click",function(){var k=b.getAttribute("data-focus");if(k==="install")focusNodes(["host","hash","unzip","launcher","python"]);if(k==="actions")focusNodes(["orch","inspect","verify","all","via","standard","output"]);if(k==="scheduler")focusNodes(["scheduler","output","review","handoff","e2e"]);if(k==="system")focusNodes(["manifest","orch","all","system","output","scheduler","review","handoff"])})});
+  document.querySelector("button[data-action=reset]").addEventListener("click",function(){allNodes.forEach(function(n){n.classList.remove("active")});detail.innerHTML="<h3>點選一個節點</h3><p>架構圖會顯示該節點的用途、輸入、輸出與安全限制。</p>";status.lastElementChild.textContent="待命：尚未選取節點。"});
+  document.querySelector("button[data-action=download]").addEventListener("click",function(){var selected=document.querySelector(".node.active"),payload={schema:"VIA_AZUREFLOW_ARCHITECTURE_VIEW/1.0",selected_node:selected?selected.getAttribute("data-node"):null,generated_at:new Date().toISOString(),local_only:true};var blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="VIA_AzureFlow_Windows_Architecture_View.json";a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000);status.lastElementChild.textContent="已下載目前圖表狀態 JSON。"});
+})();
+</script>
+</body>
+</html>
