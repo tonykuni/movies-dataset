@@ -9336,8 +9336,24 @@
    "component": "via_accel_injector v0101 / via_net_injector v0101:排除清單接 SUP_MDL753 L77 正典;CGC_MDL124 v0105 +READONLY_CANON",
    "code": "v0100 vs v0101 逐路徑比:`references/intake/…`、`_superseded`、`RetiredEngines`、`_backup`、`SCOPE_COPY` 五段 v0100 **會寫**、v0101 排除;活檔兩邊都會寫(排除清單不得過寬)。MDL124 v0105 把唯讀正典 SSOT 列冊,全樹 ACCEL 覆蓋率 99.9% → **100.0% · 缺 0**",
    "kind": "`via-inject` / `via-netinject` 是活的根層短令,`--run` 一跑就寫進收容正本(帶 sha 冊)。MDL124 那一支則是不知道唯讀律,照樣把唯讀正典列進注入計畫——**覆蓋率差的那 0.1% 不是欠帳,是不准動的東西**,不在冊講清楚遲早有人為了補成 100% 去動它(新律 L95)。兩支注入器與 MDL124 做的是同一件事,**要不要留兩支是操作員的裁定**(LL90),本批只補破口不代裁。"
+  },
+  {
+   "ts": "2026-09-20 04:10",
+   "op": "FIX",
+   "category": "誠實態",
+   "component": "VRN_ENG083_VerifiedMatrix v0105:rc=2 不再被一句寫死的話吞掉;`[鏈因]` 穩定標記",
+   "code": "工作站實錄 `ENG073 rc=2` 的下一行印「兩支都 rc=0」。修後:`VRN_ENG072_FirstPageText rc=0 · VRN_ENG073_ReportStructuredDB rc=2。鏈上有站誠實回報 NODATA…**換一個庫去讀也不會變出資料**`。自測 22 → **26 檢 OK 26**",
+   "kind": "LL215/LL216。`bad` 把 rc=2 算成不壞(對),然後 `if not bad` 把它一起吞了(錯),再接一句寫死的斷言——**把真正的答案蓋掉**,叫人去找一個根本沒被寫出來的庫。另:尾訊 `[-200:]` 切到橫幅半句話,改成取尾 n 行;理由印成單行 `[鏈因]` 給下游 grep。"
+  },
+  {
+   "ts": "2026-09-20 04:20",
+   "op": "FIX",
+   "category": "修法句",
+   "component": "Invoke-VIA-VRNAudit v0103:鏈說沒料當場停,不換庫;次步換成對的一組",
+   "code": "半 A(空樣本夾)NODATA · **輪次 1 步**(v0101 是 4 步 / 3 輪 / 換 2 個庫)· 不換庫;半 B(合成 8 件)**GREEN · exit 0 · 輪次 2 步** · ENG083 v0105 · matrix OK 81 份 × 7 欄",
+   "kind": "LL217。鏈沒有料庫就不會被寫出來,換庫不是一個真差異(批625 輪迴律)。次步也換成:① 料在不在 ② 分區 sidecar 在不在 ③ 逐步原文——**給一個保證走不通的下一步,等於讓人繞圈繞得更久**。"
   }
  ],
- "updated_at": "2026-09-19T19:40:00",
- "batch": 626
+ "updated_at": "2026-09-19T19:35:00",
+ "batch": 627
 }
