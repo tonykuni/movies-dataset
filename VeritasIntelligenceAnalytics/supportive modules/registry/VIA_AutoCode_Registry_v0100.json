@@ -9072,8 +9072,16 @@
    "component": "VDF_ENG091_VdfAuditGate v0100(VDF 審計閘)+ L53 動詞補齊 10 支 + MDL003 模組層早用修 + MDL105 冊路徑解析修 + Grid v0366",
    "code": "全樹實測:活樹 59 支待審 · 豁免 7 支(附理由)→ GREEN 50 · NODATA 9 · RED 0 · 缺動詞 0(rc=2 NODATA,缺的是套件不是功能) · 格子 OK 248 · FAIL 1 → 修 ENG091 自我指涉後複跑",
    "kind": "操作員令「vdf pass audit and run perfectly」。把「VDF 通過審計」從我的便條腳本變成可重跑的引擎,並在做的過程中抓到三件真缺陷。① **我的尺自己壞掉**:便條版 6 路平行跑,DuckDB 鎖撞讓三支全紅;單獨跑全是綠/NODATA。更關鍵的是**兩次跑撞到的檔案不一樣**(第一次 ENG060/062/072,第二次 ENG061/062/070)——不可重現正是鎖撞的指紋。ENG091 把**序跑複判**做成骨頭而不是選配,並用合成假引擎(持鎖者 A / 等鎖者 B / 真壞 C)證明兩條路都走:B 平行判紅→序跑轉綠,C 兩段都紅不被洗綠(L83)。② **有自測不等於有動詞**:VDF_MDL101_OutputManager 早就有完整自測,但掛在裸 `__main__` 上,`--selftest` 點不到它——從格子看它跟沒有自測一模一樣。L53 的補法(旗標→既有行為等價轉換、只增不減)套進 10 支缺動詞的活樹檔:ENG019 · ENG044 · MDL002/003/007(根與 engine/ 各一份)· MDL101 · MDL104。新動詞零連線(socket.connect 實證攔截)、不呼叫 main()、缺套件判 NODATA 不判紅。③ **模組層早用,一個炸很大聲一個不出聲**:VDF_MDL003_SentimentMacroEngine 在檔尾那批 `import os` **之前**就用了 `os.environ`(NameError,整支引擎 import 即死,根與 engine/ 兩份都死),同一段的 `Path(...)` 卻被 try/except 吞掉(FRED 鑰匙檔車道**默默失效**=假綠)。**不出聲的那個躲得更久。**對照組:批610 修改前的正本exec_module 即 NameError。補法只增不減——首次使用前補上標準庫 import,既有行為一行未改。④ MDL105_CrossValidator 的 `RegistryLoader(\"VDF_MDL403_RegistryFull.json\")` 是裸檔名,冊的正典位置在 supportive modules/registry/,自測必噴 FileNotFoundError;改為三處解析(本夾/正典冊夾/cwd),找不到時 return 3=ABSENT 並講清楚「缺冊不是壞掉」,不裸噴 traceback。⑤ 豁免冊 7 支各附理由:VAP 隔離清理殘件 · RUN_* 跑次產物快照 · candidates/ 未升正 · 一次性注入工具(同批605 `_patches/` 理由)· sentiment_strength 純函式庫模組(自測歸呼叫端 SUP_MDL566 Router)。ENG091 自測第①檢就是「豁免冊每筆都附非空理由」——**沒理由的豁免等於假綠**(新法 L87)。⑥ **棘輪當場抓到我自己**:ENG091 寫完跑全格子,CGC_MDL164 ⑰ 自我指涉閘判「基線外新增 1 支」,那一支就是 ENG091——它掃 VDF 樹回答「誰要受審」卻沒排掉自己的家族(LL133)。沒有把它加進基線(那等於把棘輪拆掉),而是排掉整個家族(`stem.rsplit('_v',1)[0] == _SELF_FAMILY`,不是只排 `__file__` 那一支),並照 L87 連理由一起印。複量:SAFE 4→5,**基線外 0 支(棘輪守住了)**;自測 10 檢→11 檢。"
+  },
+  {
+   "ts": "2026-09-19 09:47",
+   "op": "NEW",
+   "category": "工作站實錄修",
+   "component": "VRN_ENG064 v0102(零依賴簡→繁後備)+ VIA_ZhConvert_S2TWP_CharMap v0100(凍結對照表 2,784 筆)+ Grid v0367(判決行尺修 + 產品資格閘逾時 300→900 + 知識堆疊站改 nodata_ok)",
+   "code": "三站一修:ENG064 ② · ENG066 ② · ENG067 ③ —— 無 opencc 那條路全部轉綠,而 ENG066/ENG067 **檔案一行未改**(修在咽喉,下游自己好)",
+   "kind": "操作員貼回批610 之前那一跑的 ALL-IN-ONE(v0106 + Grid v0365,落後 1 commit):15 步 GREEN 9 · NODATA 3 · RED 3;格子 OK 223 · FAIL 23 · SKIP 4 · 7,062s(序跑複判已翻綠 17 支)。① **三站一個病根**:工作站沒裝 opencc → 收容正主 LanguageNormalizer 煙測 raise → `except Exception: return None` → 退補殼 → 補殼 `self._cc = None` **直通不轉** → 簡體原樣交給下游,而下游的冊全按繁體正字比對,於是條條落空。容器裝了 opencc,所以**只走過裝了的那一半**,三站一直假綠(L83 第二次現身)。把 opencc 擋掉,三站當場全紅,一次複現。補法不代裝套件:給補殼一條零依賴的路——opencc 在照用,缺就退凍結對照表。表不是憑記憶造字,是在容器裡**逐字元實跑 opencc s2twp 量出來的**(掃 28,096 個 CJK 碼位,會變的 2,784 筆),冊裡帶 provenance(工具/版本/config/範圍/日期)。而且講白補不到什麼:這是**字元層**,片語層台灣用詞(軟件→軟體 這一類)補不起來,所以 `zh_which()` 要說得出走的是 opencc / builtin_char / passthrough——不講就是假綠。③b 改判 NODATA:正主件**在**,是它的相依缺;缺套件 ≠ 缺件 ≠ 壞掉,判紅會把真正的紅淹掉(L57)。站改掛 `nodata_ok`。另外順手撈出一句被 `except` 吞掉十幾批的話:`RuntimeError: 缺少 OpenCC 依賴。請執行：pip install opencc-python-reimplemented`——它一直都在,只是沒人看得到(批610 LL168 同一課)。② **尺挑理由挑到狀態名**:工作站「擷取單引擎八檢」紅了,格子只印 `[FAIL-CLOSED] VIA_NET_CONSENT≠YES…`——那行其實是某一檢**通過時**印的誠實訊息(容器同一支 rc=0 十檢全過),真正紅的那一檢被它擠掉,操作員拿不到任何線索。批603 我寫的挑選器用 `startswith('[FAIL')`,`[FAIL-CLOSED]` 長得像就被抓走名額。v0367 把 `[FAIL-CLOSED]/[FAIL_CLOSED]/[FAIL-SAFE]` 具名排除,並在一行判決都挑不到時明說「挑不到」。③ **被砍的站不是紅**:產品資格閘工作站 300s 逾時(容器 31s),逾時 300→900。④ **我自己在這一批踩的**:改逾時用了跨行正則,打到隔壁那一站(產品資格閘還是 300、十道並行編排被改成 900),改完回讀才抓到。"
   }
  ],
- "updated_at": "2026-09-19 05:59",
- "batch": "批610"
+ "updated_at": "2026-09-19 09:47",
+ "batch": "批611"
 }
