@@ -9424,8 +9424,24 @@
    "component": "SUP_MDL749 v0108 +rating_keys() · VRN_ENG083 v0108 verdict 分流 + 驗法句現場填",
    "code": "評等欄 GREEN 42 → **46** · YELLOW 4 → **0**;判對率 97.4% → **100.0% = PASS ÷(PASS+FAIL) = 302/302(FAIL 0)**;可判率 53.3% = 302/567;UNVERIFIABLE **4 格具名列出**。MDL749 自測 28 → **30 檢 OK 30** · ENG083 自測 31 → **33 檢 OK 33**",
    "kind": "LL227/LL228。判定器退到人話詞表去量正典鍵(NOT RATED vs NOT_RATED 只差一個底線),把四份抽對的判成黃燈;補 `rating_keys()` 之後 ENG083 **不必改一個字**就接上了(那個 fallback 鏈本來就先找 rating_keys)。另修:『驗不了』從判對率分母移出——那是缺料不是判錯,**判對率變好不是因為藏起來,是因為它本來就不該在分母裡**。"
+  },
+  {
+   "ts": "2026-09-20 09:05",
+   "op": "FIX",
+   "category": "跨機器判定不一致",
+   "component": "SUP_MDL749 v0109 · VRN_ENG074 v0112 · SUP_MDL750 v0102 · via_conflict_guard v0102 · SUP_MDL753 v0103 (+tail_files) · CGC_MDL168 v0101 (+C 轉義道)",
+   "code": "工作站 py3.12 把 `SyntaxWarning: invalid escape sequence` **連同那一行原始碼**印到終端,把矩陣表格切斷。容器 py3.11 只給 DeprecationWarning(不印)——**我第一次只比類別,掃出 0 支**;改成只比訊息 → **6 支**,其中 4 支是活尾版(已改 raw),2 支是被舊尾版尺誤算成活件的第 0 版。MDL168 全樹:C 轉義道 GREEN 0 · B 參數道 GREEN 0 · A 語法道棘輪 新壞 0 / 變嚴重 0(基線 5 支 53 筆)· 裁決 GREEN。自測:MDL168 8 → **11 檢 OK 11** · MDL753 24 → **25 檢 OK 25**",
+   "kind": "LL229/LL230/LL231。L93 用在我自己身上:不一致先疑尺,而「比類別」是一把會隨 Python 版本改名的尺。另外把尾版律收成 `SUP_MDL753.tail_files()` 正典——沒版號的是第 0 版不是另一支引擎。"
+  },
+  {
+   "ts": "2026-09-20 09:40",
+   "op": "FEATURE",
+   "category": "舉證",
+   "component": "VRN_ENG083 v0109 分頁式舉證頁 + LAMPS/VERDICTS 燈號冊",
+   "code": "六分頁:① 給 AI 的舉證(MD/JSON 切換·複製·下載;伺服端同源內嵌)· ② 矩陣 · ③ 逐欄燈號 · ④ 逐格驗證(依燈號篩)· ⑤ 自我驗證算式 · ⑥ 燈號冊。字級 11 → **10.5px**;HTML **預設自動跳出**(`--no-open` 可關);舉證另落 `VRN_MATRIX_EVIDENCE.md` / `.json`。舉證自動調節:≤1200 格全量、超過只列非 GREEN 並寫出省了幾格。自測 33 → **42 檢 OK 42**",
+   "kind": "L96/LL232/LL233/LL234/LL235。這一批我自己的檢先假綠了一次:㊴ 用正規式掃三元運算式,只看得到 `PASS` 一個答案;改 AST 後又抓到 `state` 鍵有引擎層與格子層兩個命名空間。"
   }
  ],
- "updated_at": "2026-09-19T22:15:00",
- "batch": "批630B"
+ "updated_at": "2026-09-20T09:40:00",
+ "batch": "批632"
 }

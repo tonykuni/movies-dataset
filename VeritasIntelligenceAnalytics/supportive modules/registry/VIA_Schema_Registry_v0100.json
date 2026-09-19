@@ -2,32 +2,10 @@
  "schema": "VIA_SCHEMA_REGISTRY_V1",
  "version": "v0100",
  "append_only": true,
- "ts": "2026-09-13 15:09",
+ "ts": "2026-09-19 22:50",
  "policy": "Phase 1 schema drift 守門基線:新引擎改表須先過本冊比對;漂移=新版 append 舊版留存。",
  "databases": {
   "vdf_tw_market": {
-   "analyst_estimates": {
-    "date": "VARCHAR",
-    "code": "VARCHAR",
-    "yf_ticker": "VARCHAR",
-    "source": "VARCHAR",
-    "target_high": "DOUBLE",
-    "target_low": "DOUBLE",
-    "target_mean": "DOUBLE",
-    "target_median": "DOUBLE",
-    "n_analysts": "DOUBLE",
-    "trailing_eps": "DOUBLE",
-    "bps": "DOUBLE",
-    "eps0y_avg": "DOUBLE",
-    "eps0y_low": "DOUBLE",
-    "eps0y_high": "DOUBLE",
-    "eps0y_n": "DOUBLE",
-    "eps1y_avg": "DOUBLE",
-    "eps1y_low": "DOUBLE",
-    "eps1y_high": "DOUBLE",
-    "eps1y_n": "DOUBLE",
-    "adopted_eps": "DOUBLE"
-   },
    "consensus_daily": {
     "date": "DATE",
     "code": "VARCHAR",
@@ -68,36 +46,6 @@
     "is_active": "BOOLEAN",
     "tracking_index": "VARCHAR",
     "as_of": "VARCHAR"
-   },
-   "etf_revenue_holdings": {
-    "etf_ticker": "VARCHAR",
-    "asof_ym": "VARCHAR",
-    "portfolio_date": "VARCHAR",
-    "code": "VARCHAR",
-    "name": "VARCHAR",
-    "w": "DOUBLE",
-    "yoy": "DOUBLE",
-    "mom": "DOUBLE",
-    "streak": "INTEGER",
-    "high60": "INTEGER",
-    "computed_at": "VARCHAR"
-   },
-   "etf_revenue_momentum": {
-    "etf_ticker": "VARCHAR",
-    "asof_ym": "VARCHAR",
-    "portfolio_date": "VARCHAR",
-    "etf_name": "VARCHAR",
-    "n_holdings": "INTEGER",
-    "cov_w": "DOUBLE",
-    "w_yoy": "DOUBLE",
-    "med_yoy": "DOUBLE",
-    "pos_share_w": "DOUBLE",
-    "w_mom": "DOUBLE",
-    "high60_share_w": "DOUBLE",
-    "avg_streak": "DOUBLE",
-    "rank": "INTEGER",
-    "flag": "VARCHAR",
-    "computed_at": "VARCHAR"
    },
    "features_daily": {
     "date": "VARCHAR",
@@ -145,43 +93,9 @@
     "high": "DOUBLE",
     "low": "DOUBLE",
     "close": "DOUBLE",
-    "volume": "BIGINT",
+    "volume": "DOUBLE",
     "factor": "DOUBLE",
     "data_class": "VARCHAR"
-   },
-   "tw_chip_derived": {
-    "date": "VARCHAR",
-    "code": "VARCHAR",
-    "market": "VARCHAR",
-    "short_margin_ratio_pct": "DOUBLE",
-    "foreign_net": "DOUBLE",
-    "trust_net": "DOUBLE",
-    "dealer_net": "DOUBLE",
-    "total_net": "DOUBLE"
-   },
-   "tw_chip_inst": {
-    "date": "VARCHAR",
-    "code": "VARCHAR",
-    "market": "VARCHAR",
-    "foreign_net": "DOUBLE",
-    "trust_net": "DOUBLE",
-    "dealer_net": "DOUBLE",
-    "total_net": "DOUBLE"
-   },
-   "tw_chip_margin": {
-    "date": "VARCHAR",
-    "code": "VARCHAR",
-    "market": "VARCHAR",
-    "margin_buy": "DOUBLE",
-    "margin_sell": "DOUBLE",
-    "margin_redeem": "DOUBLE",
-    "margin_bal_prev": "DOUBLE",
-    "margin_bal": "DOUBLE",
-    "short_buy": "DOUBLE",
-    "short_sell": "DOUBLE",
-    "short_redeem": "DOUBLE",
-    "short_bal_prev": "DOUBLE",
-    "short_bal": "DOUBLE"
    },
    "tw_daily_prices": {
     "date": "VARCHAR",
@@ -191,12 +105,7 @@
     "low": "DOUBLE",
     "close": "DOUBLE",
     "adj_close": "DOUBLE",
-    "volume": "BIGINT"
-   },
-   "tw_daytrade_eligible": {
-    "date": "VARCHAR",
-    "code": "VARCHAR",
-    "suspension": "VARCHAR"
+    "volume": "DOUBLE"
    },
    "tw_daytrade_market": {
     "date": "VARCHAR",
@@ -243,7 +152,7 @@
     "adj_high": "DOUBLE",
     "adj_low": "DOUBLE",
     "adj_close": "DOUBLE",
-    "volume": "BIGINT",
+    "volume": "DOUBLE",
     "data_class": "VARCHAR"
    },
    "tw_rates_cbc": {
@@ -263,17 +172,6 @@
     "transactions": "DOUBLE",
     "close": "DOUBLE"
    },
-   "tw_universe": {
-    "asof_date": "VARCHAR",
-    "ticker": "VARCHAR",
-    "code": "VARCHAR",
-    "market": "VARCHAR",
-    "name": "VARCHAR",
-    "in_prices": "BOOLEAN",
-    "in_chips": "BOOLEAN",
-    "aligned": "BOOLEAN",
-    "updated_at": "VARCHAR"
-   },
    "tw_valuation_daily": {
     "date": "VARCHAR",
     "code": "VARCHAR",
@@ -283,17 +181,44 @@
     "dividend_yield": "DOUBLE",
     "dps": "DOUBLE"
    },
-   "via_ingest_ledger": {
-    "run_id": "VARCHAR",
+   "via_handover": {
+    "file": "VARCHAR",
+    "batch": "VARCHAR",
     "ts": "VARCHAR",
-    "part": "VARCHAR",
-    "unit": "VARCHAR",
-    "path": "VARCHAR",
-    "fingerprint": "VARCHAR",
-    "target_table": "VARCHAR",
-    "rows_src": "BIGINT",
-    "rows_new": "BIGINT",
-    "note": "VARCHAR"
+    "sha1": "VARCHAR",
+    "chars": "INTEGER",
+    "body": "VARCHAR"
+   },
+   "via_policy_factors": {
+    "source": "VARCHAR",
+    "key": "VARCHAR",
+    "value": "VARCHAR",
+    "synced_at": "VARCHAR"
+   },
+   "via_policy_sync": {
+    "sync_id": "VARCHAR",
+    "ts": "VARCHAR",
+    "host": "VARCHAR",
+    "logic_rows": "INTEGER",
+    "policy_rows": "INTEGER",
+    "policy_hash": "VARCHAR",
+    "engine": "VARCHAR"
+   },
+   "vrn_extraction_logic": {
+    "ts": "VARCHAR",
+    "file": "VARCHAR",
+    "sha1": "VARCHAR",
+    "verdict": "VARCHAR",
+    "method": "VARCHAR",
+    "stage": "VARCHAR",
+    "chars": "INTEGER",
+    "xcheck_state": "VARCHAR",
+    "xcheck_bag": "DOUBLE",
+    "xcheck_seq": "DOUBLE",
+    "labels_ok": "BOOLEAN",
+    "repair_json": "VARCHAR",
+    "secs": "DOUBLE",
+    "tag": "VARCHAR"
    },
    "vrn_four_point_digest": {
     "report_file": "VARCHAR",
@@ -386,7 +311,8 @@
     "analyst_n": "INTEGER",
     "ssot_state": "VARCHAR",
     "report_kind": "VARCHAR",
-    "kind_reason": "VARCHAR"
+    "kind_reason": "VARCHAR",
+    "upside_basis": "VARCHAR"
    },
    "vrn_report_crosscheck": {
     "report_file": "VARCHAR",
@@ -436,7 +362,7 @@
     "market_cap": "INTEGER",
     "shares_outstanding": "INTEGER",
     "trailing_pe": "DOUBLE",
-    "forward_pe": "DOUBLE",
+    "forward_pe": "INTEGER",
     "price_to_book": "INTEGER",
     "yield_": "DOUBLE",
     "currency": "VARCHAR"
@@ -496,26 +422,10 @@
     "market_cap": "INTEGER",
     "shares_outstanding": "INTEGER",
     "trailing_pe": "DOUBLE",
-    "forward_pe": "DOUBLE",
+    "forward_pe": "INTEGER",
     "price_to_book": "INTEGER",
     "yield_": "DOUBLE",
     "currency": "VARCHAR"
-   },
-   "macro_series_registry": {
-    "series": "VARCHAR",
-    "via_code": "VARCHAR",
-    "src": "VARCHAR",
-    "freq": "VARCHAR",
-    "unit": "VARCHAR",
-    "theme": "VARCHAR",
-    "sub_theme": "VARCHAR",
-    "indicator": "VARCHAR",
-    "min_date": "VARCHAR",
-    "max_date": "VARCHAR",
-    "n_rows": "BIGINT",
-    "state": "VARCHAR",
-    "note": "VARCHAR",
-    "updated_at": "TIMESTAMP"
    },
    "prices_canonical": {
     "date": "VARCHAR",
@@ -533,11 +443,6 @@
     "index": "VARCHAR",
     "score": "DOUBLE",
     "rating": "VARCHAR"
-   },
-   "us_macro": {
-    "date": "VARCHAR",
-    "series": "VARCHAR",
-    "value": "DOUBLE"
    }
   }
  }
