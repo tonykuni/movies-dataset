@@ -9064,8 +9064,16 @@
    "component": "Register v0221(via-sync / via-allinone 短令 + 梭)+ AllInOne v0107(自動交接報告 + 第16步上船清點)",
    "code": "HANDOVER.md 每跑自動產(實測 63 行,取代 400+ 行主控台);16_Onboard 唯讀清點實測抓到本倉 4 件未追蹤",
    "kind": "操作員實錄兩個缺口 + 大授權(TEST/DEBUG/OPTIMIZE/AUTO-CONSOLIDATE/AUTO SYNC/SAVE ALL STATUS AND HANDOVER REPORT AUTOMATICALLY)。① **`Sync-VIA-Bootstrap` 打不通**:他直接打它,回「無法辨識為 Cmdlet」——**治理件全家都有短令,只有它沒有**。Register v0221 補 `via-sync`(同步解卡 / `-Onboard [-Commit] [-Push]` 上船)與 `via-allinone`,兩支都 **glob 取尾版不寫死版號**(L85 的教訓);`.cmd` 梭用 `%~n0` 叫同名函式,直接複製即成。② **自動交接報告**:`HANDOVER.md` 每一跑自動產——判定 / 母資料夾 / 同步態 / HEAD / 加速器 / 步驟表 / **紅的逐個點名(每條指得到自己的 log)** / 產出驗證 / 上船清點 / 下一步。實測 63 行,**取代操作員一直在貼的 400+ 行主控台**——這才是 round-trip 的 TOKEN 大頭。③ **第 16 步上船清點(唯讀)**:AUTO SYNC 只做了 pull 那一半;另一半是「母資料夾有什麼還沒進 git」,每一跑浮出來但**只清點不動**(上船是 `via-sync -Onboard -Commit`,他的手)。實測:對本倉真跑,正確抓到 4 件未追蹤(v0221 / v0107 / 兩支 .cmd)。**誠實界定**:工作站全格第一段 OK 196 · FAIL 52(序跑複判轉綠 12),那 ~40 個紅**在他那台**,本容器 248/250 全綠,**我這邊重現不出來**;要逐站修得靠他把 HANDOVER.md 貼回來——這正是自動產這份報告的用意。"
+  },
+  {
+   "ts": "2026-09-19 05:59",
+   "op": "NEW",
+   "category": "審計",
+   "component": "VDF_ENG091_VdfAuditGate v0100(VDF 審計閘)+ L53 動詞補齊 10 支 + MDL003 模組層早用修 + MDL105 冊路徑解析修 + Grid v0366",
+   "code": "全樹實測:活樹 59 支待審 · 豁免 7 支(附理由)→ GREEN 50 · NODATA 9 · RED 0 · 缺動詞 0(rc=2 NODATA,缺的是套件不是功能) · 格子 OK 248 · FAIL 1 → 修 ENG091 自我指涉後複跑",
+   "kind": "操作員令「vdf pass audit and run perfectly」。把「VDF 通過審計」從我的便條腳本變成可重跑的引擎,並在做的過程中抓到三件真缺陷。① **我的尺自己壞掉**:便條版 6 路平行跑,DuckDB 鎖撞讓三支全紅;單獨跑全是綠/NODATA。更關鍵的是**兩次跑撞到的檔案不一樣**(第一次 ENG060/062/072,第二次 ENG061/062/070)——不可重現正是鎖撞的指紋。ENG091 把**序跑複判**做成骨頭而不是選配,並用合成假引擎(持鎖者 A / 等鎖者 B / 真壞 C)證明兩條路都走:B 平行判紅→序跑轉綠,C 兩段都紅不被洗綠(L83)。② **有自測不等於有動詞**:VDF_MDL101_OutputManager 早就有完整自測,但掛在裸 `__main__` 上,`--selftest` 點不到它——從格子看它跟沒有自測一模一樣。L53 的補法(旗標→既有行為等價轉換、只增不減)套進 10 支缺動詞的活樹檔:ENG019 · ENG044 · MDL002/003/007(根與 engine/ 各一份)· MDL101 · MDL104。新動詞零連線(socket.connect 實證攔截)、不呼叫 main()、缺套件判 NODATA 不判紅。③ **模組層早用,一個炸很大聲一個不出聲**:VDF_MDL003_SentimentMacroEngine 在檔尾那批 `import os` **之前**就用了 `os.environ`(NameError,整支引擎 import 即死,根與 engine/ 兩份都死),同一段的 `Path(...)` 卻被 try/except 吞掉(FRED 鑰匙檔車道**默默失效**=假綠)。**不出聲的那個躲得更久。**對照組:批610 修改前的正本exec_module 即 NameError。補法只增不減——首次使用前補上標準庫 import,既有行為一行未改。④ MDL105_CrossValidator 的 `RegistryLoader(\"VDF_MDL403_RegistryFull.json\")` 是裸檔名,冊的正典位置在 supportive modules/registry/,自測必噴 FileNotFoundError;改為三處解析(本夾/正典冊夾/cwd),找不到時 return 3=ABSENT 並講清楚「缺冊不是壞掉」,不裸噴 traceback。⑤ 豁免冊 7 支各附理由:VAP 隔離清理殘件 · RUN_* 跑次產物快照 · candidates/ 未升正 · 一次性注入工具(同批605 `_patches/` 理由)· sentiment_strength 純函式庫模組(自測歸呼叫端 SUP_MDL566 Router)。ENG091 自測第①檢就是「豁免冊每筆都附非空理由」——**沒理由的豁免等於假綠**(新法 L87)。⑥ **棘輪當場抓到我自己**:ENG091 寫完跑全格子,CGC_MDL164 ⑰ 自我指涉閘判「基線外新增 1 支」,那一支就是 ENG091——它掃 VDF 樹回答「誰要受審」卻沒排掉自己的家族(LL133)。沒有把它加進基線(那等於把棘輪拆掉),而是排掉整個家族(`stem.rsplit('_v',1)[0] == _SELF_FAMILY`,不是只排 `__file__` 那一支),並照 L87 連理由一起印。複量:SAFE 4→5,**基線外 0 支(棘輪守住了)**;自測 10 檢→11 檢。"
   }
  ],
- "updated_at": "2026-09-18 15:20",
- "batch": 601
+ "updated_at": "2026-09-19 05:59",
+ "batch": "批610"
 }
