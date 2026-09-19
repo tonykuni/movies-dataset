@@ -9088,8 +9088,16 @@
    "component": "CGC_MDL165 v0101(短令撞名閘)+ Register v0222(via-sync 守門 + via-presync)+ Grid v0368 + 解卡貼上區塊",
    "code": "短令名 285 · 真撞名 18(梭不算)· 基線外 0 · 同冊重複定義 2(via-panorama · via-ssot)· 危險件 1(via-sync→推 main)",
    "kind": "**我叫操作員打的指令,在他機器上是另一個東西。**批609 我登了 `via-sync`,可是 `bin\\via-sync.ps1` 早就存在,內容是 `git fetch` + `git merge origin/claude/via-system-followup-tz7k9t`(寫死另一條分支)+ **`git push origin main`**。他照我寫的打 via-sync,跑到的是那一支:merge 了別條分支(所以冒出一堆 ChipWar/GroupIndex 髒檔)、然後想推 main(被拒)。而我批609 的 v0221 在他**拉不下來的 commit 裡**(他磁碟最新是 v0220)——L85 第三次:解卡的工具又放在被卡住的那一側。① 撞名閘(MDL165 v0101 `collide`):難的是分母。批340 律規定每個短令配同名 `.cmd` 梭(點源 Register 尾版→叫 `%~n0`),那是**契約不是撞名**;第一版尺不分,量出 146 筆等於沒講。分清楚後真撞名 18 筆,而會推 main 的那一支就在裡面,單獨標**危險**。另外抓到同一份 Register 裡 `via-panorama`/`via-ssot` 各定義兩次(後者靜默蓋掉前者)。五檢兩種分類都走過(L83),棘輪基線外 0。② Register v0222:**不搶名**——`via-sync` 改成攤開兩支、要求指名的守門函式(零動作,LL90 裁定權在操作員);同步解卡正名為 `via-presync`(量過:285 個短令名裡沒有這個名字)。重複定義只講不改。③ 解卡貼上區塊:零檔案依賴(L85),pwsh 7.4.6 對真 git 倉**兩條路都跑過**——ff-only 成功路(備份→stash→FF,未追蹤件一根沒碰)與分岔誠實停路。④ **自審抓到的**:我把 `bin\\via-sync.ps1` 這個 Windows 路徑直接寫進格子的站名字串,`\\v` 被 Python 當成垂直定位跳脫,站名印出來變成 `binia-sync.ps1`——跟批607 那個 `\\e` 同一族(**Windows 路徑寫進 Python 字串,反斜線就是跳脫字元**)。改成正斜線,並把本批動過的四支 .py 用 `-W error::SyntaxWarning` 逐支再掃一次,無效跳脫 0。"
+  },
+  {
+   "ts": "2026-09-19 10:35",
+   "op": "NEW",
+   "category": "制度",
+   "component": "CGC_MDL167_RegenRevert v0100(再生物還原閘)+ VIA_RegenArtifacts_SSOT v0100 + Register v0223(via-regen)+ Grid v0369",
+   "code": "十四檢 rc=0 · 對真倉 scan:髒 0 · 預設零動作,--apply 才還原,不明一律不還原",
+   "kind": "**三次卡死同一個病根**(批605 · 批606 · 批612):工作站跑一次 ALL-IN-ONE,再生物(報告夾 / U/I 頁 / 掃樹冊)把追蹤檔弄髒;沒人還原 → 下一次 `git pull` 被它擋住 → 操作員卡住 → 我送解卡工具 → 解卡工具在拉不下來的 commit 裡 → 再卡一次。容器這邊我每一批 commit 前都手動還原(批612 還原 30 支)——**靠我記得不是制度**。做成引擎之後:① 樣式進冊(VIA_RegenArtifacts_SSOT),每一筆附**憑什麼算再生物**的理由(L87);② **預設一個字都不改**,`--apply` 才還原,而且只還原再生物;③ **對不上樣式的判『不明』不還原**——引擎寫到原始碼、和操作員自己改的,長得一模一樣,只有他分得出來(只增不減 + LL90 裁定權在操作員);④ 未追蹤檔一根不碰;⑤ 還原前整包複製到 VIA_Reports/regen_revert/<ts>/(第二條退路);⑥ 零 force 零刪除零 commit 零 push;⑦ 冪等。取名照新法 L88 掃過全樹 286 個短令名:`via-regen` 沒被佔用(這是 L88 立法後第一次真的用它)。自審:第一版檢⑬ 禁止整份原始碼出現 `\"commit\"`,可是自測造假倉本來就要 `git commit`,於是它判自己紅——尺要量的是**正式路徑**,不是連測具一起管(LL159 同族),收窄到自測段之前。"
   }
  ],
- "updated_at": "2026-09-19 10:17",
- "batch": "批612"
+ "updated_at": "2026-09-19 10:35",
+ "batch": "批613"
 }
