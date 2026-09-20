@@ -9582,8 +9582,15 @@
       "category": "誠實態",
       "component": "VRN_ENG085 v0104(32 檢)· CGC_MDL160 v0107(30 檢)· .gitattributes 位元鎖 · 格子 v0406 · LL286/LL287",
       "code": "操作員實機跑 via-run25:GREEN 4 · RED 2 · NODATA 1 · SKIP 1。兩盞紅都是容器量不到的。**① ENG085 NameError**(v0103 main:1040 `disagree_pairs(ok)`,`ok` 是 run() 的區域變數)。那一行只有二尺對不上才跑;容器一致 380/380 永遠走不到,他 1093/1123=97.3% 一走就炸。批640 我已抽出 disagree_pairs 並寫檢 ㉛ 測它——測了函式,沒測呼叫它的那一行(LL286)。v0104 把整段畫面抽成 render_run() 純函式,檢 ㉜ 餵有分歧的 res 走完全程;把舊錯注回去檢 ㉜ 當場 FAIL=尺咬得住。**② MDL160 漂移 173**:容器量同包 二進位 42 + 原生 CRLF 8 = 正好 50(=他對得上的),純 LF 173(=他的漂移)。是 core.autocrlf 改寫位元,不是正本被動。倉庫 .gitattributes 早有 VTR/v0160A/收容件(批546)同理由的位元鎖,批647 我漏看(LL287)。補 `VIA_HTML_UI/** -text`;沙盒實測證明光 pull 不會換回來,還要 `git checkout HEAD -- <路徑>`。v0107 把它分流成 eol_converted(**仍判紅**,附治法),檢 ㉗ 雙向負控(CRLF→eol_converted / 竄改→sha_drift)。另記:他的 ENG090 量到 冊 1995 · 價表 1990 · **缺 6 檔(全是老 ETF 0054/0058/0059/0060/0080/0081)**,UNIVERSE_RECONCILIATION 已在位 —— 容器那句「TWSE 整所缺席 1088」是**容器空庫的樣子**,不是他的庫的樣子;他那邊 TWSE 99.5% 有料。"
+    },
+    {
+      "ts": "2026-09-21 23:40",
+      "op": "ADD",
+      "category": "VRN",
+      "component": "Register v0230 +matrix 站(九站)· VRN_ENG085 v0105(33 檢)· CGC_MDL160 v0108(31 檢)· 格子 v0407 · LL288",
+      "code": "操作員令「只要先完成 VIA VRN VDF…VRN 之前有非常成功的實測成功紀錄…從最成功的狀態去修改優化直到成功」。**考古結果:批630B 判對率 100.0% = 302/302 · FAIL 0**(ENG083 驗真矩陣),容器今天重跑仍 302/302 rc=0 —— 沒有退步,但**它不在 via-run25 的八站裡**,每天跑的鏈量不到 VRN 的頭號指標。開第九站 matrix(needs structdb;認 VIA_NO_OPEN 零彈窗);容器九站實跑 GREEN 7 · RED 0 · NODATA 1 · SKIP 1,判對率當場印在鏈上。**ENG085 v0105**:操作員 105 份分歧成對統計 30 塊中,16 次是「一個字母 'M' 被判大標題」;讀碼證實 level_of() 只看字級×粗體完全不看內容,而規則自己寫的是「大標題是帶著股票名稱與代碼的那一句」。加內容閘(≥2 有效字元,兩個出標題的口都過);容器 81 份單字元標題計 0 → v0104/v0105 輸出逐行相同=零回歸。分歧統計補**檔名**(容器重現不了 'M',要讓下一次跑自己說得出是哪一份)。**MDL160 v0108**:批650 我給的 checkout 在沙盒兩情境都成功、他機器上沒生效;把 check-attr/status/core.autocrlf 三個只讀問題搬進閘裡,三種局面各給不同下一道(LL288)。"
     }
   ],
-  "updated_at": "2026-09-21 22:30",
-  "batch": "批650"
+  "updated_at": "2026-09-21 23:40",
+  "batch": "批651"
 }
