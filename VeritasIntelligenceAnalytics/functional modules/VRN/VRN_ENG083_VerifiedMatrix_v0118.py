@@ -2099,8 +2099,8 @@ def main() -> int:
                 print("  [目標價年齡] 算得出上漲空間的 "
                       + str(sum(_age.values())) + " 筆:"
                       + " · ".join(f"{k} {v}" for k, v in sorted(_age.items(), key=lambda x: -x[1]))
-                      + "  —— 舊報告的目標價從沒更新過,**這個百分比在回答「從現在看」,不是券商當時的看法**;"
-                      "多久算失效=操作員裁定(ENG073 的 TARGET_FRESH_BANDS 一行)")
+                      + "  —— 描述性年齡帶,**不參與判燈**(批662 操作員裁定:樣本資料不做失效判定);"
+                      "留著是因為這個百分比在回答「從現在看」,不是券商當時的看法")
             if m.get("note"):
                 print(f"  註:{m['note']}")
             print(f"  頁 {hp}")
