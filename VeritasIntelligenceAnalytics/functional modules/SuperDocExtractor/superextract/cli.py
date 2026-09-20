@@ -199,8 +199,24 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+
+# ===== [VIA:VERB-ALIAS:v0100] 批535:全樹以 `--selftest` 呼叫自測(格子站/匯流排/Deck/總控頁契約;律 L53)=====
+# 本引擎原只認位置動詞;等價轉換,只增不減,既有呼叫方零影響。
+_FLAG_VERBS_B535 = {"--selftest": "selftest", "--status": "status", "--manifest": "manifest", "--routes": "routes"}
+
+
+def _normalise_argv_b535(argv):
+    out, verb = [], None
+    for a in argv:
+        if a in _FLAG_VERBS_B535 and verb is None:
+            verb = _FLAG_VERBS_B535[a]
+        else:
+            out.append(a)
+    return ([verb] + out) if verb else out
+
+
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    args = build_parser().parse_args(_normalise_argv_b535(argv if argv is not None else sys.argv[1:]))
     try:
         return args.func(args)
     except ExtractionError as exc:

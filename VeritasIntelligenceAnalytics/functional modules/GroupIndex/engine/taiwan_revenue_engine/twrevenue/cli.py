@@ -169,13 +169,29 @@ def cmd_selftest(cfg):
         sys.exit(1)
 
 
+
+# ===== [VIA:VERB-ALIAS:v0100] 批535:全樹以 `--selftest` 呼叫自測(格子站/匯流排/Deck/總控頁契約;律 L53)=====
+# 本引擎原只認位置動詞;等價轉換,只增不減,既有呼叫方零影響。
+_FLAG_VERBS_B535 = {"--selftest": "selftest", "--status": "status", "--manifest": "manifest", "--routes": "routes"}
+
+
+def _normalise_argv_b535(argv):
+    out, verb = [], None
+    for a in argv:
+        if a in _FLAG_VERBS_B535 and verb is None:
+            verb = _FLAG_VERBS_B535[a]
+        else:
+            out.append(a)
+    return ([verb] + out) if verb else out
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="台股月營收動能引擎")
     p.add_argument("command",
                    choices=["fetch", "analyze", "report", "run", "demo",
                             "groups", "selftest"])
     p.add_argument("--config", default="config.yaml")
-    args = p.parse_args(argv)
+    args = p.parse_args(_normalise_argv_b535(argv if argv is not None else sys.argv[1:]))
     cfg = load_cfg(args.config)
     {
         "fetch": cmd_fetch, "analyze": lambda c: cmd_analyze(c),
