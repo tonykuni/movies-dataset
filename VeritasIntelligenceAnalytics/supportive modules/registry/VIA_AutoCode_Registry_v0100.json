@@ -9544,6 +9544,14 @@
       "component": "VDF_ENG054 v0105(11 檢)· VDF_ENG064 v0112(10 檢)· 格子 v0401 · LL275/LL276",
       "code": "批644 量到 TWSE 整所缺席,本批追到根:ENG054 的 `fetch_listings()` 一所失敗只印一行 `[FAIL]` 然後 `continue`,另一所照寫;`run()` 接著印「**雙所**+ETF …落庫」、rc 照樣 0。`if not listings` 只擋兩所全滅——**剛好少一所是它最擋不住的情況**。九檢沒抓到是因為檢③ 驗的是端點冊上的後綴:**冊上有兩所 ≠ 庫裡有兩所**(LL275)。v0105:`fetch_listings` 回 `(rows, per_market)` 逐所帶 state/n/why · 少一所印「單所落庫(缺 X)」並逐所列數 · 本輪降 rc=2(NODATA:宇宙不全不是抓爆了;只增不減,已落庫的照留) · 補檢⑩⑪ **注入假 net** 讓失敗路在零網路下走過(L83)· 檢數改現場計(LL213)。**本修無法在容器內端到端驗證**(真抓要觸網=操作員的手),兩檢量的是本支自己的判斷與措辭。ENG064 v0112:那個只有名字沒有值的 `UNIVERSE_RECONCILIATION` 改成**指** ENG090::roster,加檢⑩ 咬住被指名的產出者真的在樹上且真的有那個動詞;並講明本支取票是閉環**而那是對的**。檢⑩ 我連錯三把文字切片尺,改成**呼叫它讀回傳值**才量出真相:**舊名字真的還在報告欄位裡**,因為我把沿革說明寫進了那個值——三次是尺錯,第四次是碼錯,而三次尺錯全源自一個**被我自己截短的輸出**(LL276)。",
       "verify": "ENG054 v0105 十一檢 OK 11 · ENG064 v0112 十檢 OK 10 · 全格子 v0401"
+    },
+    {
+      "ts": "2026-09-21 15:10",
+      "op": "FEATURE",
+      "category": "治理",
+      "component": "via_bridge_sweeper v0102 第二層(11 檢)· 格子 v0402 · LL277/LL278",
+      "code": "操作員令「全部都要加網路工具」。先量:既有稽核器回「網路缺 0(全覆蓋)」——但那條 RX 只認 import requests|urllib|httpx…,**看不見 socket/ssl/http.client/smtplib/paramiko/pycurl**。所以那個 0 是**尺的範圍內**的 0(LL277)。v0102 加第二層:AST 掃(不看註解)、逐件分類、**豁免一律附理由**(L87):VENDORED / HOSTNAME_ONLY / LOCALHOST_ONLY / NEEDS_BRIDGE;`--net2` 動詞**零寫入只報不改**——把正典橋硬掛到一個 `gethostname()` 上是為了好看而說謊。第二層的尺連改五版才乾淨(22 假紅 → 0):`connect` 誤收 duckdb · 參數預設值解析不到 · 埠號被當主機 · 同一呼叫被兩輪各數一次(LL278)。**實測結論:活件 2,362,真的出門而沒掛正典橋的 = 0**;socket 那 31 件全是 `gethostname()` 讀本機名(23)或 `127.0.0.1` 本機 hub 探活(14),http/ssl 那一批是被複製進樹的三方件。檢⑪ 把這個結論變成機器每次都會重驗的事,不是我的一句話。順帶:第一層掃出 `_patches/_apply_bus_diff.py` 缺加速橋,已注入(批102 全樹導入令)。",
+      "verify": "sweeper v0102 十一檢 OK 11 · --net2 實跑 NEEDS_BRIDGE 0 · 全格子 v0402"
     }
   ],
   "updated_at": "2026-09-21T02:10:00",
