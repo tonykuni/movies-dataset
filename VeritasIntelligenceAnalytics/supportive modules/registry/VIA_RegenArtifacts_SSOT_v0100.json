@@ -104,6 +104,10 @@
   {
    "path": "VeritasIntelligenceAnalytics/functional modules/VRN/knowledge/VRN_NumberFormat_Regex_v0100.json",
    "why": "財務五冊(broker/財務數據同義/報表同義/評等/ticker-date)+批663 新增的數字格式冊,由 `vrn_finlex --build` **設計的寫入口**收割自倉內正本產生,是刻意要入倉的(與元件冊、VRN 邏輯架構冊同類)。批663 實錄:搭橋(alias_index/same_as)之後五冊變髒,閘判「不明」報 RED 並叫人看 diff——**閘做對了**,是冊上少了這幾條。冊是**衍生物**不是正本(正本是 InvestmentRegexPattern_VALIDATED.py 等倉內件),但它是唯一寫入口的產物,還原它等於把收割結果丟掉。"
+  },
+  {
+   "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_SSOT_RegexDict_v0100.json",
+   "why": "全樹 regex 清冊由 CGC_MDL115 **設計的寫入口**產生,是刻意要入倉的(與元件冊、VRN 五冊同類)。批664 實錄:MDL168 六域矩陣上線第一跑就把這本冊照紅了——top_shared 兩條 pattern 編不過。不是樹上有壞式,是**冊把式記斷了**(舊尺 `(.+?)\\1` 碰到式子裡跳脫過的引號就收手)。改走 AST 之後樣式 1264→1110(補 L77 排除退役夾,分母變誠實)、編不過 2→0。這本冊的內容是**判斷的依據**,還原它等於把修好的式換回記斷的那一版。"
   }
  ]
 }
