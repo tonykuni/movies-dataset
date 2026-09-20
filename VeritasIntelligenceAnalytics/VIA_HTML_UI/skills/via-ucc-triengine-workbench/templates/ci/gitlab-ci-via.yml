@@ -1,0 +1,29 @@
+stages:
+  - via-quality
+
+via-quality-gate:
+  stage: via-quality
+  image: python:3.11-slim
+  parallel:
+    matrix:
+      - VIA_INDUSTRY: smart-manufacturing
+        VIA_HTML: ui/VIA-SYNCHRONIZER-Standalone.html
+        VIA_SOURCE: ui/VIA-SYNCHRONIZER-Standalone.html
+      - VIA_INDUSTRY: finance-cyber
+        VIA_HTML: ui/VIA-SYNCHRONIZER-Standalone.html
+        VIA_SOURCE: ui/VIA-SYNCHRONIZER-Standalone.html
+  script:
+    - python skills/via-ucc-triengine-workbench/scripts/run_via_ci.py
+      --extractor tools/via_spec_extractor.py
+      --hub tools/via_triengine_hub.py
+      --html "$VIA_HTML"
+      --profile config/industry-profile.json
+      --industry "$VIA_INDUSTRY"
+      --source "$VIA_SOURCE"
+      --out "artifacts/via-ci/$VIA_INDUSTRY"
+      --root .
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - artifacts/via-ci/

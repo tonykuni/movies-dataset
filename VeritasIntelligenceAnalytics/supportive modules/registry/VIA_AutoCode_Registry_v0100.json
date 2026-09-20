@@ -9552,6 +9552,14 @@
       "component": "via_bridge_sweeper v0102 第二層(11 檢)· 格子 v0402 · LL277/LL278",
       "code": "操作員令「全部都要加網路工具」。先量:既有稽核器回「網路缺 0(全覆蓋)」——但那條 RX 只認 import requests|urllib|httpx…,**看不見 socket/ssl/http.client/smtplib/paramiko/pycurl**。所以那個 0 是**尺的範圍內**的 0(LL277)。v0102 加第二層:AST 掃(不看註解)、逐件分類、**豁免一律附理由**(L87):VENDORED / HOSTNAME_ONLY / LOCALHOST_ONLY / NEEDS_BRIDGE;`--net2` 動詞**零寫入只報不改**——把正典橋硬掛到一個 `gethostname()` 上是為了好看而說謊。第二層的尺連改五版才乾淨(22 假紅 → 0):`connect` 誤收 duckdb · 參數預設值解析不到 · 埠號被當主機 · 同一呼叫被兩輪各數一次(LL278)。**實測結論:活件 2,362,真的出門而沒掛正典橋的 = 0**;socket 那 31 件全是 `gethostname()` 讀本機名(23)或 `127.0.0.1` 本機 hub 探活(14),http/ssl 那一批是被複製進樹的三方件。檢⑪ 把這個結論變成機器每次都會重驗的事,不是我的一句話。順帶:第一層掃出 `_patches/_apply_bus_diff.py` 缺加速橋,已注入(批102 全樹導入令)。",
       "verify": "sweeper v0102 十一檢 OK 11 · --net2 實跑 NEEDS_BRIDGE 0 · 全格子 v0402"
+    },
+    {
+      "ts": "2026-09-21 17:20",
+      "op": "FEATURE",
+      "category": "U/I",
+      "component": "VIA_HTML_UI 226 件進 VIA 樹 · CGC_MDL160 v0105 +template(26 檢)· Register v0228 via-ui + 梭 · 格子 v0403 · L100/LL279 · SUP_MDL753 v0104 · CGC_MDL156 v0109 · via_bridge_sweeper v0103",
+      "code": "操作員裁定「VIA_HTML_UI 進 VIA,為可調整統一銜接系統的 TEMPLATE」。量到的起點:那 226 件**只在 main**,本分支 0 件,Register 冊上零引用——沒有短令、沒有梭、沒有站;**一整包做好的東西站在系統外面**(LL279)。兩條歷史無共同祖先(merge 被拒),改以目錄整包搬入 `VeritasIntelligenceAnalytics/VIA_HTML_UI/`,內部相對路徑原封不動,**逐檔對 main 驗 sha256:226 件不一致 0**(正本零觸碰)。MDL160 v0105 `template` 車道(零網路零寫頁):① 逐檔 sha256 對 manifest 223 筆 → 223/223、漂移 0、缺件 0;② **離線契約從散文變成機器驗**:三支入口頁(VIA-Complete-System / VIA-UI-Standalone-NoServer / VIA-SYNCHRONIZER-Standalone)逐頁掃 fetch(/XHR/外部 src/相對 .json → 全 GREEN;③ 銜接面照印 manifest 正本(4 產業 profile × 5 模組、e2e 54/54、跨頁同步 11/11、三視埠);④ `--open` 走 SUP_MDL737 的 VIA_NO_OPEN 閘(批366),不自己繞過。`root` 可注入,自測不摸全域正式產物(LL263)。四檢咬得住:改一個位元組就指名漂移、夾不在=ABSENT 不是 GREEN、入口頁塞一個 fetch( 就 RED。登錄四處(LL199):加速器橋(MDL160 既有)· **via-ui.cmd 梭**(MDL157 26/26)· Register v0228 · 格子站改名。**via-ui 梭刻意不設 VIA_NO_OPEN**——其餘 86 支梭都設 1,而它的工作就是跳出來(操作員令「本機自動跳出」);不想跳就 `via-ui --check`。對照:樹內 ui_support/VIA_UI_*.html 68 份裡 30 份要靠 hub=產物面不是入口面(L100)。 **搬進來當場兩站紅**:活件 823→845、加速殘 22、網路缺 4(全來自那包的 ci/e2e/skills .py)。不能注入橋——注入就打破 manifest 的 223 筆 sha256,我自己的檢⑳ 第一個紅。裁定正本零觸碰優先於全樹導入令,三處具名排除各附理由(L87):L77 正典 SCAN_EXCLUDE(SUP_MDL753 v0104)· CGC_MDL156 v0109 的 _ACCEL_EXEMPT/_TREE_EXEMPT · 清掃器 v0103 新類 EXEMPT_TEMPLATE。**排除不是不驗,是換一把尺驗**(via-ui --check)。修後:清掃器回 823/0/0、MDL156 37/37 GREEN。LL280。",
+      "verify": "MDL160 v0105 二十六檢 OK 26 · template 實跑 223/223 GREEN · MDL157 26/26 · 全格子 v0403"
     }
   ],
   "updated_at": "2026-09-21T02:10:00",

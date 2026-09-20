@@ -1,0 +1,57 @@
+name: VIA spec and TriEngine quality gate
+
+on:
+  push:
+    paths:
+      - 'ui/**'
+      - 'config/**'
+      - 'tools/**'
+      - 'skills/via-ucc-triengine-workbench/**'
+  pull_request:
+    paths:
+      - 'ui/**'
+      - 'config/**'
+      - 'tools/**'
+      - 'skills/via-ucc-triengine-workbench/**'
+
+jobs:
+  via-quality-gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - industry: smart-manufacturing
+            html: ui/VIA-SYNCHRONIZER-Standalone.html
+            source: ui/VIA-SYNCHRONIZER-Standalone.html
+          - industry: finance-cyber
+            html: ui/VIA-SYNCHRONIZER-Standalone.html
+            source: ui/VIA-SYNCHRONIZER-Standalone.html
+    env:
+      PYTHONUNBUFFERED: '1'
+      VIA_EXTRACTOR: tools/via_spec_extractor.py
+      VIA_HUB: tools/via_triengine_hub.py
+      VIA_PROFILE: config/industry-profile.json
+      VIA_CI_RUNNER: skills/via-ucc-triengine-workbench/scripts/run_via_ci.py
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run VSX, generated module validation, and TriEngine Hub
+        run: >-
+          python "$VIA_CI_RUNNER"
+          --extractor "$VIA_EXTRACTOR"
+          --hub "$VIA_HUB"
+          --html "${{ matrix.html }}"
+          --profile "$VIA_PROFILE"
+          --industry "${{ matrix.industry }}"
+          --source "${{ matrix.source }}"
+          --out "artifacts/via-ci/${{ matrix.industry }}"
+          --root .
+      - name: Upload VIA quality-gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: via-ci-${{ matrix.industry }}
+          path: artifacts/via-ci/${{ matrix.industry }}/
