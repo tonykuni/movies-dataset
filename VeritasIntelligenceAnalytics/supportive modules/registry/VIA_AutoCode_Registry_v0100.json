@@ -9296,8 +9296,168 @@
    "component": "VRN_ENG083 v0102:誠實四態接齊 rc(_RC_OF + 自測 ㉒);格子站名 21→22 檢",
    "code": "修前:畫面 `鏈實跑 · NODATA` 而 rc=1;修後 rc=2。自測 21 → 22 檢 OK 22",
    "kind": "批624 我加了 NODATA 卻沒接 rc,批625 自己寫的下游照 rc 判就說「引擎壞了」(LL207)。㉒ 掃原始碼把所有產得出來的 state 撈出來逐個對 _RC_OF——新增態沒登記當場點名。"
+  },
+  {
+   "ts": "2026-09-20 03:10",
+   "op": "MEASURE",
+   "category": "加速器",
+   "component": "全樹橋覆蓋率 + 使用率實掃(CGC_MDL124 尾版;git 在冊律)",
+   "code": "ACCEL 全樹 2693/2693 = **100.0% · 缺 0**(VDF 191 · VAP 247 · VRN 318 · VIA 1753)· NET 真外呼件 VDF 28/28 = 100.0%(另 163 件判非擷取,不注入)· **使用率:持橋 1426 支,橋後真的呼叫加速器 76 支(5.3%),只掛不用 1350**",
+   "kind": "操作員令「請加入 25 個加速器,所有 py 檔都加入 VeritasCeleritas,vdf 檔都加入 VeritasAegisNexus」。先量再做:兩條鏈都在,兩邊都沒有可注入的缺口——**這件事批102/115/345/402 已經做完了**。真正的數字是使用率,而覆蓋率報告上不會出現它(LL210)。"
+  },
+  {
+   "ts": "2026-09-20 03:15",
+   "op": "FIX",
+   "category": "正典",
+   "component": "SUP_MDL753_VIACommonUtils v0102:`_celeritas()` 交回正典 SUP_MDL737 + L77 正典排除清單",
+   "code": "修前 `SUP_MDL753._celeritas()` → None(AttributeError: 'NoneType' has no '__dict__');`SUP_MDL737.celeritas()` → 模組,_LazyPool 在位。修後 `cel_submit` 回 Future。自測 16 → **24 檢 OK 24**",
+   "kind": "批594 收斂 17 處 `_cel_submit` 時抄了形狀,漏了 `sys.modules[name] = mod` 要在 exec_module 之前(3.11+ dataclass 會查 sys.modules[cls.__module__])。批323 早在 MDL737 修過。後果:`cel_submit` 全數退回直呼,**池子一次也沒被用到**,graceful 蓋得一聲不響(LL209)。活樹受影響者含 VRN_ENG073(鏈上的站)/ENG074 v0110,v0111/MDL001_Converter_v0121/ENG017,018,023/MDL010/VIA_LibCanon。順帶:v0101 的第 ⑤ 檢**是靠那個 bug 才亮的**(`_cel=None` 永遠直呼回 6),已改成池子在位必須回 Future。"
+  },
+  {
+   "ts": "2026-09-20 03:25",
+   "op": "NEW",
+   "category": "加速",
+   "component": "VRN_ENG072_FirstPageText v0136:行程分片預熱車道(`--jobs`;prewarm-shard 動詞)",
+   "code": "語料 64 件 × 3 頁 · CPU 4:序列 9.0s / 執行緒 4 工 **11.9s(0.76×,比序列慢)** / 行程 4 工 2.4s(3.68×)。端到端(FORCE,24 件)序列 4.9s → 行程預熱 2.6s = **1.90×**,且 sidecar **逐位元組相同**(jobs=1 vs auto、v0135 vs v0136 兩組都同)。自測 51 → **56 檢 OK 56**",
+   "kind": "工作站 R1 579s 的去處是 triage/fitz 分區/pdfplumber 三支的序列迴圈。第一版用執行緒池+Celeritas thread_budget,量出來是**減速**——那三支是純 Python CPU 工,GIL 擋著;thread_budget 是給等待工的預算,拿它配 CPU 工就是拿錯尺(LL211)。改行程分片,走 `subprocess`+動詞+清單而不是 ProcessPoolExecutor(本引擎常被以臨時模組名載入,那個名字在子行程不存在;Windows spawn 又會重跑主模組)。OCR 車道刻意不碰(預算時鐘會壞)。`--jobs 1` 退得回 v0135;邏輯庫命中的件不預熱;預熱拋例外的件不記(錯要留在原地)。"
+  },
+  {
+   "ts": "2026-09-20 03:30",
+   "op": "FIX",
+   "category": "假綠",
+   "component": "三盞假綠:ENG072 ⑰ 自己量自己 · MDL124 寫死檢數 · 批626 自己的三檢靜靜跳過",
+   "code": "ENG072 v0135 `_src72.index(\"else extract_page1_zones(p)\")` —— 整支檔裡唯一一處就是那行檢查自己,所以永遠綠(改讀 `inspect.getsource(run)`)· MDL124 `10 - len(fails)` 寫死,加了第 11 檢照樣印 10 · 批626 第一版三檢借已關閉的 `tdp` 夾具 → 列表恆空 → 整段跳過,畫面「52 檢 OK 52」其中三檢沒跑",
+   "kind": "LL212 / LL213 / LL214。第三個是我自己這一批犯的,自審抓到——**跳過不出聲跟假綠是同一件事**。SUP_MDL753「十六檢」、ENG072 抬頭停在 v0129,一併改成現場計 / 由檔名取版號。"
+  },
+  {
+   "ts": "2026-09-20 03:35",
+   "op": "FIX",
+   "category": "正本零觸碰",
+   "component": "via_accel_injector v0101 / via_net_injector v0101:排除清單接 SUP_MDL753 L77 正典;CGC_MDL124 v0105 +READONLY_CANON",
+   "code": "v0100 vs v0101 逐路徑比:`references/intake/…`、`_superseded`、`RetiredEngines`、`_backup`、`SCOPE_COPY` 五段 v0100 **會寫**、v0101 排除;活檔兩邊都會寫(排除清單不得過寬)。MDL124 v0105 把唯讀正典 SSOT 列冊,全樹 ACCEL 覆蓋率 99.9% → **100.0% · 缺 0**",
+   "kind": "`via-inject` / `via-netinject` 是活的根層短令,`--run` 一跑就寫進收容正本(帶 sha 冊)。MDL124 那一支則是不知道唯讀律,照樣把唯讀正典列進注入計畫——**覆蓋率差的那 0.1% 不是欠帳,是不准動的東西**,不在冊講清楚遲早有人為了補成 100% 去動它(新律 L95)。兩支注入器與 MDL124 做的是同一件事,**要不要留兩支是操作員的裁定**(LL90),本批只補破口不代裁。"
+  },
+  {
+   "ts": "2026-09-20 04:10",
+   "op": "FIX",
+   "category": "誠實態",
+   "component": "VRN_ENG083_VerifiedMatrix v0105:rc=2 不再被一句寫死的話吞掉;`[鏈因]` 穩定標記",
+   "code": "工作站實錄 `ENG073 rc=2` 的下一行印「兩支都 rc=0」。修後:`VRN_ENG072_FirstPageText rc=0 · VRN_ENG073_ReportStructuredDB rc=2。鏈上有站誠實回報 NODATA…**換一個庫去讀也不會變出資料**`。自測 22 → **26 檢 OK 26**",
+   "kind": "LL215/LL216。`bad` 把 rc=2 算成不壞(對),然後 `if not bad` 把它一起吞了(錯),再接一句寫死的斷言——**把真正的答案蓋掉**,叫人去找一個根本沒被寫出來的庫。另:尾訊 `[-200:]` 切到橫幅半句話,改成取尾 n 行;理由印成單行 `[鏈因]` 給下游 grep。"
+  },
+  {
+   "ts": "2026-09-20 04:20",
+   "op": "FIX",
+   "category": "修法句",
+   "component": "Invoke-VIA-VRNAudit v0103:鏈說沒料當場停,不換庫;次步換成對的一組",
+   "code": "半 A(空樣本夾)NODATA · **輪次 1 步**(v0101 是 4 步 / 3 輪 / 換 2 個庫)· 不換庫;半 B(合成 8 件)**GREEN · exit 0 · 輪次 2 步** · ENG083 v0105 · matrix OK 81 份 × 7 欄",
+   "kind": "LL217。鏈沒有料庫就不會被寫出來,換庫不是一個真差異(批625 輪迴律)。次步也換成:① 料在不在 ② 分區 sidecar 在不在 ③ 逐步原文——**給一個保證走不通的下一步,等於讓人繞圈繞得更久**。"
+  },
+  {
+   "ts": "2026-09-20 05:10",
+   "op": "MEASURE",
+   "category": "SSOT",
+   "component": "同義字/REGEX 跨冊實掃(操作員貼了 28 家券商 + 16 條目標價同義字要求整合)",
+   "code": "券商 28 家(台資 16 + 外資 12)**逐字已在** VIA_ALL_BROKER_SSOT_REGISTRY;目標價 16 條同義字**逐字已在** research_fields.TARGET_PRICE.aliases;148 個券商別名 **0 撞鍵** · 目標價同義字 **0 撞券商別名**。缺的是:機構冊 8 條 regex(電話/信箱/網域/姓名/機構標籤)**沒有 ticker、沒有日期**;VRN 規則冊 date 區只有一句 `roc7` 註記,**沒有真的 pattern**",
+   "kind": "先量再做。要整合的那兩份早就在冊上——冊是乾淨的,缺的是**另外兩本規則從來沒進過冊**,只活在 ENG073 的檔名拆解器裡。冊上沒有的東西,第二支引擎要用就只能再抄一份。"
+  },
+  {
+   "ts": "2026-09-20 05:20",
+   "op": "NEW",
+   "category": "SSOT",
+   "component": "VRN_FieldRules_SSOT + SUP_MDL749 v0107:ticker 三平台九型 + 日期十二式 + 跨冊衝突掃描",
+   "code": "ticker:原式 as_given 與修正式 corrected **兩份都在冊上**;九型歸屬 2330/0050/006208/00878/00679B/00757A/00632R/00675L/00635U/00713T **全部歸得了型**。日期十五式實測全中(20251202 / 1141202 / 251202 / 2025-12-02 / 2025/12/2 / 2025年12月2日 / 114-12-02 / 民國114年12月2日 / 114年12月2日 / 25/12/02 / 2025年12月 / 114年12月 / 民國114年 / 2 Dec 2025 / Dec 2, 2025)。跨冊衝突 RED 0 · WARN 4(每條附實例)。自測 21 → **28 檢 OK 28**",
+   "kind": "LL220(位數要拿真實例撞:`0050` 四碼,原式 `00\\d{3}` 五碼,九型全部收不到它)· LL221(年月/只有年不補成一日;有序表順序是判準的一部分)。CLI 新增 `regex` / `date --in` / `ticker --in` 三個動詞。"
+  },
+  {
+   "ts": "2026-09-20 05:30",
+   "op": "FIX",
+   "category": "來源",
+   "component": "VIA_FinancialInstitution_Overlay v0102 + ENG073 v0130 + ENG083 v0106:通道與權威分開",
+   "code": "券商欄 **GREEN 0 → 61 · YELLOW 59 → 0**(81 份實跑)。矩陣總計 GREEN 237 → **298** · YELLOW 69 → **8**",
+   "kind": "LL218。overlay 一行 `r[\"src\"] = \"FILENAME_MAP\" if r.get(\"src\") == \"CANON\" else ...` 把正典冊命中的標籤改寫成檔名通道。加一千條同義字那一欄還是黃的——**問題不在冊上有沒有,在查到之後標籤被誰蓋掉**。v0102 拆 channel / authority,src 合成 `FILENAME_MAP+CANON`。"
+  },
+  {
+   "ts": "2026-09-20 05:35",
+   "op": "FIX",
+   "category": "假綠",
+   "component": "ENG073 v0130 ㊸:差分檢的對照組釘在 v0128,不是「上一版」",
+   "code": "修前:v0130 出版當下這一檢當場紅(對照組變成已經有修正的 v0129,『改判』看起來消失);修後 43 檢 OK 43",
+   "kind": "LL219。量『這一批改了什麼』的差分檢,對照組要釘在**被改的那一版**;『不准改判』的零回歸檢才該比最近的上一版。兩種檢的對照組選法相反,寫錯就會自己失效。"
+  },
+  {
+   "ts": "2026-09-20 06:10",
+   "op": "NEW",
+   "category": "診斷成本",
+   "component": "Invoke-VIA-VRNAudit v0104:抬頭加「樹齡」行(零網路;只讀本地 ref)+ 印結構引擎版號",
+   "code": "三態都渲染過:落後→`**本地落後遠端 2 批** · 下一步 git pull …`(紅);齊平→`本地 ref 看不出落後`+**這不等於最新**的但書;git 問不到→不判不猜。容器實跑:`矩陣引擎 v0106 · 結構引擎 v0130 · 樹齡 d26178fb 批628 · 本地 ref 看不出落後`",
+   "kind": "LL222。批626→628 三批推完,操作員三次跑的都是舊引擎,而畫面上看不出樹是舊的——我連講三次『你還沒拉』。**診斷成本本來是工具的事**。`git rev-list --count HEAD..origin/<branch>` 只讀本地 ref,不連網;而且不敢說『最新』(沒 fetch 過的 origin ref 只新到上次 fetch 為止)。"
+  },
+  {
+   "ts": "2026-09-20 06:25",
+   "op": "NEW",
+   "category": "覆蓋",
+   "component": "CGC_MDL168_PSSyntaxGate v0100:PowerShell 語法道 + 參數名道 + 棘輪基線",
+   "code": "全樹實掃:活樹尾版 .ps1 **816 支** · A 語法道 5 支解析不過(53 筆)· B 參數道撞 CommonParameters **0**。立基線後裁決 GREEN(基線內具名的債;基線外才算新傷)。自測 **8 檢 OK 8**",
+   "kind": "LL223/LL224。格子 257 站零站 parse 過 .ps1,而批625 兩個坑都是跑起來才炸。兩道刻意分開:ParseFile 抓得到反引號那個,**抓不到 `-Db` 撞 `-Debug` 別名**那個。本批**不開短令**(四個面沒到位就是幽靈令 LL199;要動 Register.ps1 得逐次許可 L70)。基線 5 支:PSRepair v0102 / VRN-Fallback-Activation v0136 / VRN-OneClick-Sidebar v0159 / FlowSystem_SandboxPatch v025 / Run_VIS_HyperBOM_v2 —— 要不要修,裁定權在操作員。"
+  },
+  {
+   "ts": "2026-09-20 07:10",
+   "op": "NEW",
+   "category": "U/I",
+   "component": "VRN_ENG083 v0107 + Invoke-VIA-VRNAudit v0105:HTML 矩陣自動跳出 · 字級調小 · 自動最佳化 · 頁上自我驗證",
+   "code": "容器實跑:`[自證] 一致 · 格子 567/567 · 四態重數符合` · `[判對率] 97.4% = 298/306` · `[可判率] 54.0% = 306/567` · `[開頁] 無頭環境(沒有 DISPLAY)開不了瀏覽器`(誠實,不假裝開了)。自測 27 → **31 檢 OK 31**",
+   "kind": "LL225/LL226。版面照令:11px / table-layout:auto + width:max-content(欄寬按內容) / word-break 自動換行 / 表頭與第一欄 sticky / 零 CDN。自我驗證是**現場重數**不是抄 tally;負控 ㉚ 把 tally 動手腳必須照得出來。判對率與可判率**分開**——缺料不是判錯,混進分母的話補料會假裝成變準。"
+  },
+  {
+   "ts": "2026-09-20 07:20",
+   "op": "MEASURE",
+   "category": "VDF",
+   "component": "VDF 庫 27 表逐表列數與日期範圍(為「以 2023-07-01 為起點跑所有引擎」先立基線)",
+   "code": "價格四表 prices_canonical / tw_daily_prices / tw_prices_adj / features_daily **同為 579,517 列**(一致)· 但起點是 **2024-01-02**,離 2023-07-01 **缺約半年**;代號 892 支**全是 .TWO 上櫃**(tw_listings 也是 892,上市 0 支);空表 4 張:consensus_daily / consensus_latest / tw_monthly_revenue / monthly_revenue_analysis;只有近兩週:tw_daytrade_market(9/01–9/18)· tw_valuation_daily(9/08–9/18)· tw_market_agg(6 列)",
+   "kind": "操作員令「以 2023-07-01 為起點至今啟動 VDF 所有引擎,然後逐一核對資料庫數是否一致」。先量再跑:一致性的**第一條不變式**(四表同列數)現在是成立的;缺口是起點日、上市股覆蓋、四張空表。實跑要觸網=**你的手**(不代設 VIA_NET_CONSENT)。"
+  },
+  {
+   "ts": "2026-09-20 08:10",
+   "op": "FIX",
+   "category": "假紅",
+   "component": "SUP_MDL749 v0108 +rating_keys() · VRN_ENG083 v0108 verdict 分流 + 驗法句現場填",
+   "code": "評等欄 GREEN 42 → **46** · YELLOW 4 → **0**;判對率 97.4% → **100.0% = PASS ÷(PASS+FAIL) = 302/302(FAIL 0)**;可判率 53.3% = 302/567;UNVERIFIABLE **4 格具名列出**。MDL749 自測 28 → **30 檢 OK 30** · ENG083 自測 31 → **33 檢 OK 33**",
+   "kind": "LL227/LL228。判定器退到人話詞表去量正典鍵(NOT RATED vs NOT_RATED 只差一個底線),把四份抽對的判成黃燈;補 `rating_keys()` 之後 ENG083 **不必改一個字**就接上了(那個 fallback 鏈本來就先找 rating_keys)。另修:『驗不了』從判對率分母移出——那是缺料不是判錯,**判對率變好不是因為藏起來,是因為它本來就不該在分母裡**。"
+  },
+  {
+   "ts": "2026-09-20 09:05",
+   "op": "FIX",
+   "category": "跨機器判定不一致",
+   "component": "SUP_MDL749 v0109 · VRN_ENG074 v0112 · SUP_MDL750 v0102 · via_conflict_guard v0102 · SUP_MDL753 v0103 (+tail_files) · CGC_MDL168 v0101 (+C 轉義道)",
+   "code": "工作站 py3.12 把 `SyntaxWarning: invalid escape sequence` **連同那一行原始碼**印到終端,把矩陣表格切斷。容器 py3.11 只給 DeprecationWarning(不印)——**我第一次只比類別,掃出 0 支**;改成只比訊息 → **6 支**,其中 4 支是活尾版(已改 raw),2 支是被舊尾版尺誤算成活件的第 0 版。MDL168 全樹:C 轉義道 GREEN 0 · B 參數道 GREEN 0 · A 語法道棘輪 新壞 0 / 變嚴重 0(基線 5 支 53 筆)· 裁決 GREEN。自測:MDL168 8 → **11 檢 OK 11** · MDL753 24 → **25 檢 OK 25**",
+   "kind": "LL229/LL230/LL231。L93 用在我自己身上:不一致先疑尺,而「比類別」是一把會隨 Python 版本改名的尺。另外把尾版律收成 `SUP_MDL753.tail_files()` 正典——沒版號的是第 0 版不是另一支引擎。"
+  },
+  {
+   "ts": "2026-09-20 09:40",
+   "op": "FEATURE",
+   "category": "舉證",
+   "component": "VRN_ENG083 v0109 分頁式舉證頁 + LAMPS/VERDICTS 燈號冊",
+   "code": "六分頁:① 給 AI 的舉證(MD/JSON 切換·複製·下載;伺服端同源內嵌)· ② 矩陣 · ③ 逐欄燈號 · ④ 逐格驗證(依燈號篩)· ⑤ 自我驗證算式 · ⑥ 燈號冊。字級 11 → **10.5px**;HTML **預設自動跳出**(`--no-open` 可關);舉證另落 `VRN_MATRIX_EVIDENCE.md` / `.json`。舉證自動調節:≤1200 格全量、超過只列非 GREEN 並寫出省了幾格。自測 33 → **42 檢 OK 42**",
+   "kind": "L96/LL232/LL233/LL234/LL235。這一批我自己的檢先假綠了一次:㊴ 用正規式掃三元運算式,只看得到 `PASS` 一個答案;改 AST 後又抓到 `state` 鍵有引擎層與格子層兩個命名空間。"
+  },
+  {
+   "ts": "2026-09-20 11:20",
+   "op": "FIX",
+   "category": "假態",
+   "component": "VRN_ENG083 v0110 欄名修 + 第五盞燈 N/A + VRN_MatrixApplicability_SSOT_v0100.json",
+   "code": "工作站 105 份 × 7 欄 = 735 格:上漲空間 **105 格全 ABSENT**——正典表沒有叫 `upside` 的欄(叫 `upside_calc`),欄名寫錯整欄安靜缺席;股票代號 NODATA 48 格 ↔ 非個股報告 48 份,是**不適用**不是缺料。修後:欄位鍵對回 `upside_calc`;第五盞燈 N/A 只認適用性冊(1 條推導規則 + 2 條待裁定);兩個可判率都印。自測 42 → **50 檢 OK 50**",
+   "kind": "LL236–LL240。㊸ 釘欄位鍵對得上 ENG073 正典表、㊾ 釘自測夾具的表結構是正典表的子集——夾具自己造 schema(`upside`/`close_price` 都不是正典欄名)是這件事活那麼久的根因,連 `_v_tp` 退到 `price` 的真路都被假欄名擋住從沒走過(L83 在夾具上的樣子)。另:VIA_NO_OPEN(批378)與批632 自動跳出兩令打架,依較新較具體的做但印出 [令衝突]。"
+  },
+  {
+   "ts": "2026-09-20 14:30",
+   "op": "FEATURE",
+   "category": "規格進冊",
+   "component": "VRN_FieldRules_SSOT +6 區 · SUP_MDL749 v0110 +10 動詞 · VRN_ENG084 v0100 新引擎 · VRN_ENG083 v0111",
+   "code": "操作員逐字給定整套規格(檔名切分/三平台代號/ETF 八型/主動式台股 ETF 三條件/季度年度 FY 全變體/中英姓名/電郵/台港電話/本次vs前次目標價/三來源優先權)。量出來的缺口:`ticker_kind('2330.TW')` 回 UNCLASSIFIED;`parse_date_any` 對 2025Q2/25Q2/2Q25/FY25/2025E **全回空字典**;`rules.contact` 沒有任何正則。落地後:樞紐 30 → **41 檢 OK 41** · ENG084 **19 檢 OK 19** · ENG083 51 → **52 檢 OK 52**。實測五種真實檔名樣式全解對(含 `2330 TT` / `00715B` / `1140122` / `2Q25` / `FY25E` / 中文券商)",
+   "kind": "LL241–LL244。操作員原文一字不改留 as_given,修正逐條寫理由:英文姓名漏掉全大寫/連字號/中間名縮寫、台港電話漏掉 +886/+852 與分機、**裸兩位數不可判年**、ETF `00\\d{3}` 第二次來但 `0050` 仍是四字元(批628 已量過,記一次不改)。"
   }
  ],
- "updated_at": "2026-09-19T16:05:00",
- "batch": 625
+ "updated_at": "2026-09-20T14:30:00",
+ "batch": "批634"
 }

@@ -1,0 +1,40 @@
+{
+ "schema": "VRN_MatrixApplicability/v1",
+ "batch": "批633",
+ "purpose": "報告型別 × 欄位「適不適用」的正本。矩陣的第五態 N/A 只認這一本,引擎不自己判。",
+ "why": [
+  "工作站實錄(105 份):股票代號 GREEN 57 · NODATA 48,而 ENG073 分出來的型別剛好是 個股 57 · 非個股 48。",
+  "那 48 格不是『沒擷到』,是『這種報告本來就沒有個股代號』。把它記成 NODATA,等於把一個永遠補不起來的洞算進缺料,可判率就永遠到不了 100%。",
+  "但 N/A 也不能亂給:給多了就是把真的缺料藏起來,跟假綠同一種傷。所以這一本只收**推得出來的**,其餘一律 PENDING_OPERATOR。"
+ ],
+ "rules": [
+  {
+   "id": "NA-01",
+   "column": "ticker",
+   "not_applicable_when": {"report_kind_not_in": ["個股"]},
+   "basis": "DERIVED_FROM_ENG073_CLASSIFIER",
+   "evidence": "ENG073 的分類律寫明『有代號一律先算個股(代號是最硬的證據)』。所以一份被判成非個股的報告,依分類器自己的契約就是**檔名裡沒有可驗證的代號**。這不是我的意見,是從既有正典推出來的。",
+   "measured": "工作站 105 份:個股 57 ↔ 股票代號 GREEN 57;非個股 48 ↔ NODATA 48,完全對上。"
+  }
+ ],
+ "pending_operator": [
+  {
+   "id": "NA-P1",
+   "column": "target_price / rating_ssot_key / upside_calc",
+   "question": "產業 / 大盤晨報 / 研討會 / 海外 這四型報告,裡面本來就會給個股的評等與目標價(常常一次好幾檔)。所以這幾欄在非個股報告上到底算『不適用』還是『沒擷到』?",
+   "why_i_do_not_decide": "這是領域裁定不是可推導的事實。我給錯方向的話:判成 N/A 會把真缺料藏起來,判成 NODATA 會讓可判率永遠壓著。裁定權在操作員(LL90 同族)。",
+   "state": "PENDING_OPERATOR"
+  },
+  {
+   "id": "NA-P2",
+   "column": "analyst_names",
+   "question": "大盤晨報常常不掛分析師名。這算不適用嗎?",
+   "state": "PENDING_OPERATOR"
+  }
+ ],
+ "discipline": [
+  "只增不減:新規則用新 id 追加,不改舊 id 的語意。",
+  "N/A 不進判對率分母,也不進『扣掉不適用之後』的可判率分母——但**兩個可判率都要印出來**,不許只印好看的那一個。",
+  "沒有這一本 = 全部當『適用』(退回批632 的四態),不假造 N/A。"
+ ]
+}
