@@ -1,18 +1,42 @@
 {
  "schema": "VIA.CentralParamsSSOT.v1",
- "generated": "2026-08-19 05:54:02",
+ "generated": "2026-09-20 00:30:27",
  "policy": "指標索引冊;單一真相留原冊不搬家;衝突=建議燈候操作員裁決",
- "books_total": 25,
- "books_ok": 25,
+ "books_total": 66,
+ "books_ok": 66,
  "books_missing": 0,
  "books_fail": 0,
- "leaf_total": 52593,
+ "leaf_total": 126244,
  "conflicts": [],
  "locked_alignment": [
+  {
+   "name": "ActiveTWETFTicker",
+   "state": "ALIGNED",
+   "pattern": "^00\\d{2,3}[AD]$",
+   "drift": []
+  },
   {
    "name": "PRODUCT_CODE",
    "state": "ALIGNED",
    "pattern": "^VIA-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+   "drift": []
+  },
+  {
+   "name": "TWEquityBBGTicker",
+   "state": "ALIGNED",
+   "pattern": "^([1-9]\\d{3})\\s+TT$",
+   "drift": []
+  },
+  {
+   "name": "TWEquityTicker",
+   "state": "ALIGNED",
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "drift": []
+  },
+  {
+   "name": "TWEquityYFTicker",
+   "state": "ALIGNED",
+   "pattern": "^([1-9]\\d{3})\\.(TW|TWO)$",
    "drift": []
   },
   {
@@ -46,6 +70,12 @@
    "drift": []
   },
   {
+   "name": "YEAR_BY_ROSTER",
+   "state": "ALIGNED",
+   "pattern": "^[1-9]\\d{3}$",
+   "drift": []
+  },
+  {
    "name": "YEAR_SUSPECT",
    "state": "ALIGNED",
    "pattern": "^(?:202[1-9]|2030)$",
@@ -59,10 +89,10 @@
    "path": "supportive modules/registry/VIA_Central_Synonym_Regex_v0100.json",
    "note": "Regex 治理中心(7 LOCKED+7 同義集)",
    "conflict_scope": true,
-   "sha256": "ad449d70f155e255b61a6d7eb0b11c212c2774ffe281c56886524134d7d4e8af",
-   "bytes": 1943,
+   "sha256": "001179a734f41b65c49f9a7fafa09c832d6d36e506b2d7011fee91cb94ea56be",
+   "bytes": 5437,
    "state": "OK",
-   "leaf_count": 64,
+   "leaf_count": 99,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -95,10 +125,10 @@
    "path": "functional modules/VDF/VDF_Unified_Params_v0100.json",
    "note": "VDF 統一輸入參數+六格式輸出樞紐",
    "conflict_scope": true,
-   "sha256": "c977d374c1387691d3a9bd95e8638711c8103224055b91c4171b3416fde05469",
-   "bytes": 964,
+   "sha256": "09b2740f2f136de830f6a1249503c7c067024828927039e4f1f1ff97dd63c0d0",
+   "bytes": 1170,
    "state": "OK",
-   "leaf_count": 28,
+   "leaf_count": 30,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -136,10 +166,10 @@
    "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/TW_Active_ETF_Registry_v0100.json",
    "note": "台灣主動式 ETF 清單 SSOT",
    "conflict_scope": true,
-   "sha256": "3ddc1ce705c09741e6f4a46f776f6720c0306a0ad006e4a8844702d38dc17f6d",
-   "bytes": 749,
+   "sha256": "79182d39d8cc2403b22107bb732173129829548325f48ae9edc2dc6d7801ed0a",
+   "bytes": 11857,
    "state": "OK",
-   "leaf_count": 18,
+   "leaf_count": 304,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -273,10 +303,10 @@
    "path": "functional modules/VRN/knowledge/VRN_Digest_Params_v0100.json",
    "note": "個股報告摘要批跑參數(TOOL-070)",
    "conflict_scope": true,
-   "sha256": "100f2edf98d4d5f2f2e6473afe830562135dde26d5a587f51ed47eeb32450357",
-   "bytes": 1293,
+   "sha256": "cd2bb7f4a513432d8cd2184eadb50e46dfbedb7751c955be8f4bcca2bdee2dc5",
+   "bytes": 3511,
    "state": "OK",
-   "leaf_count": 25,
+   "leaf_count": 151,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -472,10 +502,10 @@
    "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/TW_Equity_Registry_v0100.json",
    "note": "台股個股清單 SSOT(TOOL-075 --refresh-equity 官方 OpenAPI 併冊)",
    "conflict_scope": false,
-   "sha256": "5dfb12cae4805ef9ef707309b4a8265344e15b5ff04152a53fff07112113754d",
-   "bytes": 504,
+   "sha256": "ba5385710b912a6b55b7dad2377482727dd85f0cf5905dc328c93e4c5163acc4",
+   "bytes": 889,
    "state": "OK",
-   "leaf_count": 15,
+   "leaf_count": 28,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -483,6 +513,63 @@
     "as_of",
     "history",
     "equities"
+   ]
+  },
+  {
+   "id": "VRN_PARAM_REG",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/VRN_Param_Registry_v0100.json",
+   "note": "VRN 引擎參數收割冊+canonical 裁決區(批98-99;append-only)",
+   "conflict_scope": false,
+   "sha256": "fe7a65df287887d003e4410c0ea579f8b1c617603fa1a03140e9b24c4c966bc8",
+   "bytes": 92149,
+   "state": "OK",
+   "leaf_count": 2046,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "sub",
+    "policy",
+    "params",
+    "canonical"
+   ]
+  },
+  {
+   "id": "VDF_PARAM_REG",
+   "domain": "CONFIG",
+   "path": "functional modules/VDF/VDF_Param_Registry_v0100.json",
+   "note": "VDF 引擎參數收割冊+canonical 裁決區(批98-99;append-only)",
+   "conflict_scope": false,
+   "sha256": "785f48e49202433d1830ebc873ac833f34acebda21c0b897d934c76396ac4f1f",
+   "bytes": 133746,
+   "state": "OK",
+   "leaf_count": 3599,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "sub",
+    "policy",
+    "params",
+    "canonical"
+   ]
+  },
+  {
+   "id": "VAP_PARAM_REG",
+   "domain": "CONFIG",
+   "path": "functional modules/VAP/VAP_Param_Registry_v0100.json",
+   "note": "VAP 引擎參數收割冊+canonical 裁決區(批98-99;append-only)",
+   "conflict_scope": false,
+   "sha256": "f91bca451eb0629d9a075288b7c89d24bdfe465b92802b4896d8bdba07d9c37d",
+   "bytes": 408949,
+   "state": "OK",
+   "leaf_count": 6818,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "sub",
+    "policy",
+    "params",
+    "canonical"
    ]
   },
   {
@@ -507,10 +594,10 @@
    "path": "supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
    "note": "自動編號命名冊(append-only;編號永不變)",
    "conflict_scope": false,
-   "sha256": "faa22c867a0efbb0564e45d222b391fb8e35d854364b1ee7e48a7a54752a0354",
-   "bytes": 320397,
+   "sha256": "d73ebc1a4092955a82a8d14671df4e15fcd0e906275fa33c7dd9650ce35b10fe",
+   "bytes": 1346023,
    "state": "OK",
-   "leaf_count": 2447,
+   "leaf_count": 6897,
    "truncated": false,
    "top_keys": [
     "registry_id",
@@ -518,7 +605,9 @@
     "coexisting_namespaces",
     "categories",
     "components",
-    "ledger"
+    "ledger",
+    "updated_at",
+    "batch"
    ]
   },
   {
@@ -527,8 +616,8 @@
    "path": "supportive modules/registry/VIA_Interface_Contract_Registry_v0100.json",
    "note": "介面契約冊(2,000+ 模組)",
    "conflict_scope": false,
-   "sha256": "2bab6812b7291eeba1904484e89f383cbc172bd1d6c2a88fa495bd92146d776a",
-   "bytes": 2648163,
+   "sha256": "35f4ca59c0f0335c1a435b47eed46fc2ee8bc8283a2c5b594298c7b9180d7a4d",
+   "bytes": 6379227,
    "state": "OK",
    "leaf_count": 20000,
    "truncated": true,
@@ -545,10 +634,10 @@
    "path": "supportive modules/registry/VIA_MasterGovernance_SSOT_v0100.local.json",
    "note": "主治理冊(工作站 .local;容器缺=誠實 MISSING)",
    "conflict_scope": false,
-   "sha256": "df7f60a2025e946ce3fdca8c2977736a1916d0bc75df708ceac0be62e2620690",
-   "bytes": 20156,
+   "sha256": "8853f73de69471f4861df13dca56959ac054049d3754093ea29e9304e23c76ec",
+   "bytes": 23448,
    "state": "OK",
-   "leaf_count": 192,
+   "leaf_count": 211,
    "truncated": false,
    "top_keys": [
     "schema",
@@ -559,6 +648,789 @@
     "product_rules",
     "verbs",
     "entry"
+   ]
+  },
+  {
+   "id": "VDF_CONTRACT_SUMMARY",
+   "domain": "CONFIG",
+   "path": "functional modules/GroupIndex/flow_simulation_v0400/evidence/vdf_contract_summary.json",
+   "note": "批635 補冊;葉 12",
+   "conflict_scope": true,
+   "sha256": "7e51e004b2f7e501d3077016d564f3bfd291f0025c60e1b415e874f9af80275c",
+   "bytes": 544,
+   "state": "OK",
+   "leaf_count": 12,
+   "truncated": false,
+   "top_keys": [
+    "SourceFile",
+    "Title",
+    "DeclaredTWSE",
+    "DeclaredTPEX",
+    "DeclaredTaiwanTotal",
+    "ContractStatus",
+    "ExternalFontDependencyDetected",
+    "EmbedPolicy",
+    "FetcherExecution",
+    "NetworkExecution",
+    "CanonicalMutation",
+    "SourceSha256"
+   ]
+  },
+  {
+   "id": "VDF_FETCHONE_MATRIX_REGISTRY_V0100",
+   "domain": "REGISTRY",
+   "path": "functional modules/VDF/VDF_FetchOne_Matrix_Registry_v0100.json",
+   "note": "批635 補冊;葉 3739",
+   "conflict_scope": false,
+   "sha256": "68f727e541e95f57b8fa9deb65567026e43936f8a5a58bc2e69c57576fda0c01",
+   "bytes": 130421,
+   "state": "OK",
+   "leaf_count": 3739,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "source_md",
+    "generated",
+    "provenance",
+    "counts_measured",
+    "sections_measured",
+    "active_etf_roster",
+    "governance",
+    "items"
+   ]
+  },
+  {
+   "id": "VDF_USMACRO_DETAIL_FETCH_ROSTER_V0",
+   "domain": "KNOWLEDGE",
+   "path": "functional modules/VDF/VDF_USMacro_Detail_Fetch_Roster_v0100.json",
+   "note": "批635 補冊;葉 226",
+   "conflict_scope": false,
+   "sha256": "8f35bf82bcbdc488e213e310a2f80c330ce69140cdaf360d5b2751f8505e83b0",
+   "bytes": 7035,
+   "state": "OK",
+   "leaf_count": 226,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "source",
+    "policy",
+    "engine",
+    "sections",
+    "dedupe_note",
+    "changelog"
+   ]
+  },
+  {
+   "id": "VDF_FETCH_CONTRACT",
+   "domain": "CONFIG",
+   "path": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
+   "note": "批635 補冊;葉 5002",
+   "conflict_scope": true,
+   "sha256": "e03595932055393a5d45e999a38f3cc41f0618cf4781aa4a56472646cdf3f7e7",
+   "bytes": 149378,
+   "state": "OK",
+   "leaf_count": 5002,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "code",
+    "asof",
+    "contract",
+    "domains",
+    "parameter_contract",
+    "availability_audit",
+    "cockpit_integration",
+    "revisions",
+    "instrument_symbol_map",
+    "selection_model"
+   ]
+  },
+  {
+   "id": "VRN_RESEARCHREPORT_SSOT_ACTIVE",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/SSOT/VRN_ResearchReport_SSOT.active.json",
+   "note": "批635 補冊;葉 24",
+   "conflict_scope": true,
+   "sha256": "8b5732637d5e8630eab902a43a5c90ebba64ab5307ac4e0d18982d90fcf55a2b",
+   "bytes": 1896,
+   "state": "OK",
+   "leaf_count": 24,
+   "truncated": false,
+   "top_keys": [
+    "active_canonical_path",
+    "active_canonical_sha256",
+    "active_final_chain_hash",
+    "active_record_count",
+    "active_record_json_schema_path",
+    "active_record_json_schema_sha256",
+    "active_schema_name",
+    "active_schema_path",
+    "active_schema_sha256",
+    "active_schema_version",
+    "authority_generation",
+    "authority_time_policy"
+   ]
+  },
+  {
+   "id": "VRN_TWROSTER_OFFLINE_V0100",
+   "domain": "KNOWLEDGE",
+   "path": "functional modules/VRN/VRN_TWRoster_Offline_v0100.json",
+   "note": "批635 補冊;葉 7917",
+   "conflict_scope": false,
+   "sha256": "69de0c498b3fc5670fedd5735e4c2c26302d9d4b1fe73b870f14e86f165f30b3",
+   "bytes": 192451,
+   "state": "OK",
+   "leaf_count": 7917,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "source",
+    "asof",
+    "note",
+    "n",
+    "codes"
+   ]
+  },
+  {
+   "id": "VRN_KEYWORDSSOT_V0100",
+   "domain": "KNOWLEDGE",
+   "path": "functional modules/VRN/dict/VRN_KeywordSSOT_v0100.json",
+   "note": "批635 補冊;葉 17097",
+   "conflict_scope": false,
+   "sha256": "9c8f9ce0d8060b2b176170b2cc3caa60b3e05b7cd180e6d725b8662891281160",
+   "bytes": 457911,
+   "state": "OK",
+   "leaf_count": 17097,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "append_only",
+    "next_id",
+    "keywords",
+    "ingest_log"
+   ]
+  },
+  {
+   "id": "VRN_ANNUALEXTRACT_SSOT_V0100",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/knowledge/VRN_AnnualExtract_SSOT_v0100.json",
+   "note": "批635 補冊;葉 600",
+   "conflict_scope": true,
+   "sha256": "b02139b50775f6a82b08644dd1d36ee6183ac7af92db6d688a85d68c6cdf6f58",
+   "bytes": 18856,
+   "state": "OK",
+   "leaf_count": 600,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "source",
+    "note",
+    "year_regex",
+    "blocks",
+    "items",
+    "formulas",
+    "financial_mapping"
+   ]
+  },
+  {
+   "id": "INVESTMENT_REPORT_TYPE_SSOT",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/webscraping_dualengine_v20260819/VIA_Investment_Report_Type_SSOT.json",
+   "note": "批635 補冊;葉 317",
+   "conflict_scope": true,
+   "sha256": "6b32bcb31334884587e716a4d40b9a731ef5269d7507a4058b87b9a125324881",
+   "bytes": 9482,
+   "state": "OK",
+   "leaf_count": 317,
+   "truncated": false,
+   "top_keys": [
+    "schema_version",
+    "default_type",
+    "types",
+    "morning_section_patterns"
+   ]
+  },
+  {
+   "id": "WEBSCRAPING_COMPLIANCE_SSOT",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/webscraping_dualengine_v20260819/VIA_WebScraping_Compliance_SSOT.json",
+   "note": "批635 補冊;葉 34",
+   "conflict_scope": true,
+   "sha256": "b1eb3ae787dc281326a598e835df5a2fc0d8e02fa36c658f32d6719d064def2e",
+   "bytes": 1845,
+   "state": "OK",
+   "leaf_count": 34,
+   "truncated": false,
+   "top_keys": [
+    "schema_version",
+    "required_consent_token",
+    "default_user_agent",
+    "risk_notice",
+    "terms_link_patterns",
+    "terms_prohibition_patterns",
+    "block_page_patterns",
+    "pii",
+    "minimum_delay_seconds",
+    "maximum_concurrency_per_domain",
+    "terms_high_risk_threshold"
+   ]
+  },
+  {
+   "id": "MACRO_SSOT",
+   "domain": "CONFIG",
+   "path": "new modules engines/VDF_final/config/macro_ssot.json",
+   "note": "批635 補冊;葉 2039",
+   "conflict_scope": true,
+   "sha256": "b592082379868be8d0c2aa8e72076379ec831ff34dbaf154ae79788738e28a6d",
+   "bytes": 69998,
+   "state": "OK",
+   "leaf_count": 2039,
+   "truncated": false,
+   "top_keys": [
+    "schema_version",
+    "build_date",
+    "description",
+    "naming_convention",
+    "regions",
+    "sources_legend",
+    "fetcher_routing",
+    "macro_tree",
+    "series_registry",
+    "derived_models",
+    "fetcher_groups",
+    "summary"
+   ]
+  },
+  {
+   "id": "MASTER_SSOT",
+   "domain": "CONFIG",
+   "path": "new modules engines/VDF_final/config/via_master_ssot.json",
+   "note": "批635 補冊;葉 3479",
+   "conflict_scope": true,
+   "sha256": "7f57f92687f8abfc6fd6523a5d3f2cc34898621036b6b76720af2f16f3530654",
+   "bytes": 152179,
+   "state": "OK",
+   "leaf_count": 3479,
+   "truncated": false,
+   "top_keys": [
+    "schema_version",
+    "build_date",
+    "title",
+    "description",
+    "naming_convention",
+    "owner",
+    "sources_legend",
+    "credentials",
+    "section_A_market_matrix",
+    "section_B_us_macro",
+    "section_C_etf_universe",
+    "section_D_tw_active_etf_holdings"
+   ]
+  },
+  {
+   "id": "VRN_BROKERALIASSSOT_V029SSOT1B",
+   "domain": "KNOWLEDGE",
+   "path": "supportive modules/environment/VRN_BrokerAliasSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 175",
+   "conflict_scope": false,
+   "sha256": "b65e4bab78f8ae8f2cf4337236ae035e85068ecf1b99a971be02cff15face158",
+   "bytes": 4797,
+   "state": "OK",
+   "leaf_count": 175,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_FINANCIALACCOUNTALIASSSOT_V029",
+   "domain": "KNOWLEDGE",
+   "path": "supportive modules/environment/VRN_FinancialAccountAliasSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 168",
+   "conflict_scope": false,
+   "sha256": "cd7aa1c3db0fdb0a3d97990825fa0b4519356199c8141a1efc9dada0d818a389",
+   "bytes": 5274,
+   "state": "OK",
+   "leaf_count": 168,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_RATINGALIASSSOT_V029SSOT1B",
+   "domain": "KNOWLEDGE",
+   "path": "supportive modules/environment/VRN_RatingAliasSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 64",
+   "conflict_scope": false,
+   "sha256": "c8057759ece70a63ed900a6617860c6b96241e49f9114ee18e0b82329b02dd03",
+   "bytes": 1718,
+   "state": "OK",
+   "leaf_count": 64,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VDF_DATASCOPE_HEADERREGISTRY_SSOT",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_DataScope_HeaderRegistry_SSOT.json",
+   "note": "批635 補冊;葉 239",
+   "conflict_scope": false,
+   "sha256": "028a073e74b28f65b15d6d8e5f9aebe0ec710e607cbe707d246ffd74904bef07",
+   "bytes": 17013,
+   "state": "OK",
+   "leaf_count": 239,
+   "truncated": false,
+   "top_keys": [
+    "generated_at",
+    "status",
+    "risk",
+    "system",
+    "subsystem",
+    "purpose",
+    "root",
+    "vdf_dict",
+    "ssot_dir",
+    "database_root",
+    "params_ssot",
+    "supportive_manifest"
+   ]
+  },
+  {
+   "id": "VDF_MDL401_REGISTRYSCHEMA",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_MDL401_RegistrySchema.json",
+   "note": "批635 補冊;葉 248",
+   "conflict_scope": false,
+   "sha256": "fffc87e8c61ace0d75875afea598a23495e7e4f67f7a660484fbbcf3d8269cab",
+   "bytes": 10390,
+   "state": "OK",
+   "leaf_count": 248,
+   "truncated": false,
+   "top_keys": [
+    "$schema",
+    "$id",
+    "title",
+    "description",
+    "type",
+    "required",
+    "additionalProperties",
+    "properties",
+    "definitions"
+   ]
+  },
+  {
+   "id": "VDF_MDL402_REGISTRYSAMPLE",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_MDL402_RegistrySample.json",
+   "note": "批635 補冊;葉 475",
+   "conflict_scope": false,
+   "sha256": "49a5bb5914c0d323d85d0b2dea8622878282abb7e7d53192ace19d48c6b3ec10",
+   "bytes": 18582,
+   "state": "OK",
+   "leaf_count": 475,
+   "truncated": false,
+   "top_keys": [
+    "meta",
+    "items"
+   ]
+  },
+  {
+   "id": "VDF_MDL403_REGISTRYFULL",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_MDL403_RegistryFull.json",
+   "note": "批635 補冊;葉 5162",
+   "conflict_scope": false,
+   "sha256": "bd1a251ff4a8940e038eb504487ac0ec526c5c87f066d47c4c0ea0b269e82b7b",
+   "bytes": 198561,
+   "state": "OK",
+   "leaf_count": 5162,
+   "truncated": false,
+   "top_keys": [
+    "meta",
+    "items"
+   ]
+  },
+  {
+   "id": "VDF_NEXUSCORE_MODULEREGISTRY",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_NexusCore_ModuleRegistry.json",
+   "note": "批635 補冊;葉 204",
+   "conflict_scope": false,
+   "sha256": "a90bdedfe3588ba21360d1ea1cd72b97065be7ffe3154c959c4c3ced470c6e0f",
+   "bytes": 9626,
+   "state": "OK",
+   "leaf_count": 204,
+   "truncated": false,
+   "top_keys": [
+    "system_name",
+    "subsystem",
+    "generated_at",
+    "policy",
+    "nexuscore_entry",
+    "support_readme",
+    "modules"
+   ]
+  },
+  {
+   "id": "VDF_STORYGROUP_REGISTRY_V0100",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_StoryGroup_Registry_v0100.json",
+   "note": "批635 補冊;葉 275",
+   "conflict_scope": false,
+   "sha256": "2d64e42488e07e3becb750abf69a2147e95185f5538e59dcb19744b8b29a2eaa",
+   "bytes": 5361,
+   "state": "OK",
+   "leaf_count": 275,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "ts",
+    "batch",
+    "append_only",
+    "source",
+    "rules",
+    "stories",
+    "dedup_dropped"
+   ]
+  },
+  {
+   "id": "VDF_STORYGROUP_REGISTRY_V0101",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VDF_StoryGroup_Registry_v0101.json",
+   "note": "批635 補冊;葉 362",
+   "conflict_scope": false,
+   "sha256": "a973beae15a4a456503be2f5c3704065240ee1d4249062ab8e4dd76dbdc748ef",
+   "bytes": 7209,
+   "state": "OK",
+   "leaf_count": 362,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "ts",
+    "batch",
+    "append_only",
+    "source",
+    "rules",
+    "stories",
+    "dedup_dropped"
+   ]
+  },
+  {
+   "id": "VRN_LOGICARCHITECTURE_SSOT_V0100",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json",
+   "note": "批635 補冊;葉 184",
+   "conflict_scope": false,
+   "sha256": "d560c9baa54d2a552948224de7d69e597932dab9ebca71b61fc79b6777f441c3",
+   "bytes": 13349,
+   "state": "OK",
+   "leaf_count": 184,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "version",
+    "batch",
+    "ts",
+    "purpose",
+    "how_built",
+    "law_bindings",
+    "layers",
+    "rule_canons",
+    "external_tools",
+    "rulings_today",
+    "known_gaps"
+   ]
+  },
+  {
+   "id": "VRN_EXTRACTIONLOGIC_SSOT_V0100",
+   "domain": "CONFIG",
+   "path": "supportive modules/registry/VRN_ExtractionLogic_SSOT_v0100.json",
+   "note": "批635 補冊;葉 92",
+   "conflict_scope": true,
+   "sha256": "2231965ca6d3fddd943be8fa9c3d14a0848e9a720de243728f8929c6ab02e78c",
+   "bytes": 5661,
+   "state": "OK",
+   "leaf_count": 92,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "declared_by",
+    "law",
+    "ladder",
+    "budget_s",
+    "hq_min_remaining_s",
+    "xcheck",
+    "min_chars",
+    "backend_ttl_h",
+    "fail_ttl_h",
+    "repair",
+    "note"
+   ]
+  },
+  {
+   "id": "VRN_FIELDRULES_SSOT_V0100",
+   "domain": "CONFIG",
+   "path": "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json",
+   "note": "批635 補冊;葉 502",
+   "conflict_scope": true,
+   "sha256": "ebffc223cf4495e9e83592d9807d453c1372364ffcdb4fc0ae05146e2321085e",
+   "bytes": 29338,
+   "state": "OK",
+   "leaf_count": 502,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "batch",
+    "ts",
+    "owner",
+    "canonical_source",
+    "why",
+    "rules"
+   ]
+  },
+  {
+   "id": "VRN_MATRIXAPPLICABILITY_SSOT_V0100",
+   "domain": "CONFIG",
+   "path": "supportive modules/registry/VRN_MatrixApplicability_SSOT_v0100.json",
+   "note": "批635 補冊;葉 24",
+   "conflict_scope": true,
+   "sha256": "95aa9924a5f53c26f7224c86346ef17c8a15d0186fa4fccb35a322f460b90c12",
+   "bytes": 2359,
+   "state": "OK",
+   "leaf_count": 24,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "batch",
+    "purpose",
+    "why",
+    "rules",
+    "pending_operator",
+    "discipline"
+   ]
+  },
+  {
+   "id": "VRN_VERIFIED_MODULE_REGISTRY",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VRN_Verified_Module_Registry.json",
+   "note": "批635 補冊;葉 3600",
+   "conflict_scope": false,
+   "sha256": "6e8edffedf1f319fb399e6f96928c29759752c711b6a71270bd579c9c4fa2143",
+   "bytes": 246173,
+   "state": "OK",
+   "leaf_count": 3600,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VDF_AKSHARE_CANONICALMAPPINGRULES_",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VDF_AkShare_CanonicalMappingRules_v0277.json",
+   "note": "批635 補冊;葉 41",
+   "conflict_scope": true,
+   "sha256": "6ca692f802204b14c1dd98eca53a88ba68d798dded23a06097ebc6023cb797f0",
+   "bytes": 1661,
+   "state": "OK",
+   "leaf_count": 41,
+   "truncated": false,
+   "top_keys": [
+    "generated_at",
+    "policy",
+    "mapping_rule_count",
+    "rules"
+   ]
+  },
+  {
+   "id": "VDF_AKSHARE_NARROWSOURCE_CANONICAL",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VDF_AkShare_NarrowSource_CanonicalKeyContract_v02782.json",
+   "note": "批635 補冊;葉 27",
+   "conflict_scope": true,
+   "sha256": "03d1a19219df1b419c702ca00d3b79d3fcfe0170ea67dce62c5d88153d270ad9",
+   "bytes": 955,
+   "state": "OK",
+   "leaf_count": 27,
+   "truncated": false,
+   "top_keys": [
+    "generated_at",
+    "status",
+    "risk",
+    "source_scope",
+    "db_write_enabled",
+    "canonical_merge_enabled",
+    "canonical_family",
+    "required_fields",
+    "primary_key",
+    "symbol_rule",
+    "date_rule",
+    "value_rule"
+   ]
+  },
+  {
+   "id": "VDF_AKSHARE_SMARTREMAPRULES_V02781",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VDF_AkShare_SmartRemapRules_v027811.json",
+   "note": "批635 補冊;葉 10",
+   "conflict_scope": true,
+   "sha256": "d1c8d914a74b2f0ca0555c41e1cabed7bf4f15835a203c242712c5167805a014",
+   "bytes": 646,
+   "state": "OK",
+   "leaf_count": 10,
+   "truncated": false,
+   "top_keys": [
+    "generated_at",
+    "policy",
+    "selected_columns",
+    "rules"
+   ]
+  },
+  {
+   "id": "VRN_ACTIVE_STAGE_POINTER_CANDIDATE",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_ACTIVE_STAGE_POINTER_CANDIDATE_v029SSOT1B.json",
+   "note": "批635 補冊;葉 32",
+   "conflict_scope": true,
+   "sha256": "476886aea72449cfd18dfc3acb102981c04aa871ae4ee1045dc4637b34fecba6",
+   "bytes": 5187,
+   "state": "OK",
+   "leaf_count": 32,
+   "truncated": false,
+   "top_keys": [
+    "generated_at",
+    "status",
+    "risk",
+    "main_format",
+    "basic_info_candidate",
+    "report_text_candidate",
+    "parquet_manifest_1c3",
+    "broker_runtime_1c41",
+    "ssot_parquet",
+    "ssot_json",
+    "rules",
+    "promotion_allowed"
+   ]
+  },
+  {
+   "id": "VRN_BASICINFODEFINITIONSSOT_V029SS",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_BasicInfoDefinitionSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 42",
+   "conflict_scope": true,
+   "sha256": "aafbccb50b8c53514a2f010daa82fbb4eb1fbf890d1e157c67f561164aade15e",
+   "bytes": 1593,
+   "state": "OK",
+   "leaf_count": 42,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_DATEPERIODREGEXSSOT_V029SSOT1B",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_DatePeriodRegexSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 24",
+   "conflict_scope": true,
+   "sha256": "6a35cb1b9b1d19d7e1d7cddca9e3967d5233254ad6774510165740be7a1e52ed",
+   "bytes": 1065,
+   "state": "OK",
+   "leaf_count": 24,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_FINANCIALREGEX_SSOT",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_FinancialRegex_SSOT.json",
+   "note": "批635 補冊;葉 135",
+   "conflict_scope": true,
+   "sha256": "5d946f90d273b9e21d97bc0d9aa85d779e1961db27b700fc5d07e29f6318a792",
+   "bytes": 6501,
+   "state": "OK",
+   "leaf_count": 135,
+   "truncated": false,
+   "top_keys": [
+    "system_name",
+    "generated_at",
+    "regex_terms"
+   ]
+  },
+  {
+   "id": "VRN_FINANCIALVALIDATIONRULESSSOT_V",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_FinancialValidationRulesSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 75",
+   "conflict_scope": true,
+   "sha256": "48f355a901b75ee181ff4e512e3eb8fecd4c2a1bf08c0a033ba1eec1c008d42a",
+   "bytes": 2916,
+   "state": "OK",
+   "leaf_count": 75,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_SSOT_SOURCEINVENTORY_V029SSOT1",
+   "domain": "KNOWLEDGE",
+   "path": "supportive modules/ssot/VRN_SSOT_SourceInventory_v029SSOT1B.json",
+   "note": "批635 補冊;葉 3534",
+   "conflict_scope": false,
+   "sha256": "e981a442faa960e8a7dcab3d5c536f87df6f46ba7b9bec44a097fe8f7181ce80",
+   "bytes": 233311,
+   "state": "OK",
+   "leaf_count": 3534,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
+   ]
+  },
+  {
+   "id": "VRN_TICKERREGEXSSOT_V0100",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_TickerRegexSSOT_v0100.json",
+   "note": "批635 補冊;葉 46",
+   "conflict_scope": true,
+   "sha256": "19622fb35b9dd167f644e9783281b04308f01758bc32753b64bff34f5c6d9d22",
+   "bytes": 2548,
+   "state": "OK",
+   "leaf_count": 46,
+   "truncated": false,
+   "top_keys": [
+    "schema_id",
+    "version",
+    "status",
+    "issued",
+    "operator_directive",
+    "scope",
+    "scope_freeze",
+    "supersedes",
+    "rules",
+    "corroborating_artifacts",
+    "legacy_debt_policy",
+    "only_add_compliance"
+   ]
+  },
+  {
+   "id": "VRN_TICKERREGEXSSOT_V029SSOT1B",
+   "domain": "CONFIG",
+   "path": "supportive modules/ssot/VRN_TickerRegexSSOT_v029SSOT1B.json",
+   "note": "批635 補冊;葉 31",
+   "conflict_scope": true,
+   "sha256": "54904adc8cba492b997515bb9df11b95e2f522e9a0c8b01dcd10632a8672b99e",
+   "bytes": 1495,
+   "state": "OK",
+   "leaf_count": 31,
+   "truncated": false,
+   "top_keys": [
+    "<list>"
    ]
   }
  ]

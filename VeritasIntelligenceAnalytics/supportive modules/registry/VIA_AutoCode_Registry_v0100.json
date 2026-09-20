@@ -9456,8 +9456,16 @@
    "component": "VRN_FieldRules_SSOT +6 區 · SUP_MDL749 v0110 +10 動詞 · VRN_ENG084 v0100 新引擎 · VRN_ENG083 v0111",
    "code": "操作員逐字給定整套規格(檔名切分/三平台代號/ETF 八型/主動式台股 ETF 三條件/季度年度 FY 全變體/中英姓名/電郵/台港電話/本次vs前次目標價/三來源優先權)。量出來的缺口:`ticker_kind('2330.TW')` 回 UNCLASSIFIED;`parse_date_any` 對 2025Q2/25Q2/2Q25/FY25/2025E **全回空字典**;`rules.contact` 沒有任何正則。落地後:樞紐 30 → **41 檢 OK 41** · ENG084 **19 檢 OK 19** · ENG083 51 → **52 檢 OK 52**。實測五種真實檔名樣式全解對(含 `2330 TT` / `00715B` / `1140122` / `2Q25` / `FY25E` / 中文券商)",
    "kind": "LL241–LL244。操作員原文一字不改留 as_given,修正逐條寫理由:英文姓名漏掉全大寫/連字號/中間名縮寫、台港電話漏掉 +886/+852 與分機、**裸兩位數不可判年**、ETF `00\\d{3}` 第二次來但 `0050` 仍是四字元(批628 已量過,記一次不改)。"
+  },
+  {
+   "ts": "2026-09-20 16:40",
+   "op": "FIX",
+   "category": "覆蓋率假綠",
+   "component": "via_params_central v0107(名冊 28→66 · META_KEYS 補 18 鍵 · +⑩⑪ 兩檢)",
+   "code": "操作員令「重新檢視整合 VRN VDF 所有 SSOT 參數邏輯」。樞紐原本回報**冊 OK 28 · 葉 69,987 · 衝突 0**,而活樹裡有引擎在讀、帶參數的 VRN/VDF 冊**49 本不在名冊上**(含 VRN_FieldRules_SSOT)。補冊後:**冊 OK 66 · 葉 126,244 · 衝突 0 · LOCKED DRIFT 0**——這個零才是量過 66 本的零。自測 9 → **11 檢 OK 11**",
+   "kind": "LL245/LL246。選件規則量得出來(活樹×有讀者×葉≥5×非收容/鏡像/範本/過渡產物),同名雙份記 TWIN_BOOKS 不丟名。補冊後冒出的「衝突」幾乎全是 generated_at/status/owner 這類每本各有的中繼資料——假紅跟假綠一樣傷,所以 META_KEYS 補齊並用 ⑪ 做負控。conflict_scope 只開 CONFIG/LOCKED 域 33 本,KNOWLEDGE/REGISTRY 有登記不比值,這件事寫在檔上。"
   }
  ],
- "updated_at": "2026-09-20T14:30:00",
- "batch": "批634"
+ "updated_at": "2026-09-20T16:40:00",
+ "batch": "批635"
 }
