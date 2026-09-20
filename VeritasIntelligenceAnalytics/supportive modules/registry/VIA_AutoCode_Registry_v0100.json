@@ -9520,6 +9520,14 @@
       "component": "VRN_ENG080 v0107 誠實分母+漏斗(26 檢)· 格子 v0398 · LL267 · VRN_ENG069 v0105 · VDF_ENG088 v0102",
       "code": "操作員令 VRN 完工。量 VRN 全鏈:sidecar 81 → 還原 .md 81(掉 0)→ 入庫 71 → 文摘 46。71→46 的缺口一查全是 `ticker` 空字串,而那 25 份的 report_kind = 產業 10 · 大盤晨報 7 · 海外 3 · 研討會 3 · 未分類 2;有票號的 46 份 report_kind **全部是個股,百分之百**。結論:**鏈沒有漏**,個股報告 46/46 全做到了;缺的是「不適用」這一格沒有被印出來。v0107 把分母攤開成三態(文摘 / NOT_APPLICABLE 依既有 VRN_MatrixApplicability NA-01 / NODATA 型別未定),**本件不自己判型別**(LL133),那本冊缺席就一律當適用、不假造 N/A。另印 sidecar 漏斗並點名**零正文空殼**:容器 8 份 rep_0X 是自測寫進正式夾的空殼(同時也是批641 LL263 那次撞名的根:自測不只會讀到正式產物,還會寫進去)——只點名不刪。VRN 剩下的紅全部指向 VDF:basis_state UNKNOWN 46/46 · tp_state NA 44/46 · 上漲已算 2/46,根因是價表沒有這些票的價——**這正是 L98 次序 VRN→VDF 的理由**。 同批全格子照出兩盞自己造的紅:VRN_ENG069 檢④ 拋 TypeError(`{None:.6f}` 炸在**組自己的失敗訊息**那一行;且先硬選 EXTERNAL_ANALYST 那一列而它 close 是 NULL=拿沒有輸入的資料驗公式)→ v0105 兩改 + 印背景 195/198;VDF_ENG088 檢② 斷言含 `consensus_daily == 0`(批559 的環境快照),ENG069 自測把表寫成 198 列就紅——**引擎行為完全正確,錯的是尺** → v0102 判準換成 `source_db is None`,列數降為背景。LL268 · LL269。",
       "verify": "ENG080 v0107 二十六檢 OK 26 · ENG069 v0105 八檢 OK 8 · ENG088 v0102 七檢 OK 7 · 全格子 v0398"
+    },
+    {
+      "ts": "2026-09-21 09:20",
+      "op": "FIX",
+      "category": "VRN",
+      "component": "VRN_ENG080 v0108(29 檢)· L99 除權息基準律 · NA-02/NA-03 裁定 · 更正批642",
+      "code": "① **更正批642 的誤判**:我寫「81→71 掉的 10 份全是自測空殼」,8 份錯了。那 8 份 sidecar 裡 ENG072 早就寫了 `tag=NEEDS_OCR`、`why=留空是誠實不是抽失敗`——我只看字數 0 沒讀旁邊那一欄。零正文 8 份是 **VRN 的 OCR 缺口(容器無 tesseract),可補的真料**;真正人造的只有 2 份且有字。漏斗改讀引擎自己的 tag 分類。LL270。② `adjust_method` **41 份是空字串**——`price_context` 兩個提早 return 沒帶態。補 NO_PRICE / NO_ADJ_CLOSE / NO_PRICE_TABLE;落庫實測 NO_PRICE 41 · PRICE_FACTOR_CHAIN 4 · NONE 1,零空字串。LL271。③ 操作員令「有目標價過了除權息都要改成 ADJ CLOSE,跟目前的 ADJ CLOSE 更新計算目標價」→ **L99**。量過:既有實作已成立(因子鏈 = 報告日因子 ÷ 最新日因子、事件日由因子變動偵測、tp×因子、對 adj_close 算),且價表 892 檔最新日因子**全部 = 1**,adj 基準就是「目前」。這一批做的是釘成律 + 檢㉗,免得被改掉。瓶頸不在口徑:46 份只有 5 份有價,只有 4 份走得到因子鏈——**根在 VDF 價表涵蓋**。④ 操作員授權自行裁定 → VRN_MatrixApplicability 補 NA-02/NA-03:非個股研報的目標價/評等/上漲空間與分析師**一律不判不適用,維持 NODATA**。理由:那些報告確實會寫個股目標價(常常好幾檔),是我們的**單值欄裝不下**,不是報告裡沒有;判 N/A 等於把「我們裝不下」說成「本來就沒有」。標 AI_DECIDED_REVISABLE。",
+      "verify": "ENG080 v0108 二十九檢 OK 29 · 全格子 v0399"
     }
   ],
   "updated_at": "2026-09-21T02:10:00",
