@@ -1,69 +1,77 @@
 {
- "schema": "VIA.RegenArtifacts.v1",
- "batch": "批613",
- "ts": "2026-09-19 10:33",
- "purpose": "哪些**被追蹤的檔**是引擎跑完自己長出來的(再生物)。再生物在容器與工作站的內容必然不同(庫不同、套件不同、時間不同),**入倉就是噪音,而且下一次 pull 會被它擋住**——批605/606/612 三次卡死都是它。",
- "law": "每一筆都要附**理由**(L87);沒理由的分類等於假綠。沒對上任何一筆的**一律不還原**——不明的東西交給操作員看,不是替他丟掉(只增不減)。",
- "patterns": [
-  {
-   "rx": "^VeritasIntelligenceAnalytics/VIA_Reports/",
-   "why": "跑次報告夾:每一跑都重寫,內容綁當下的庫與時間"
-  },
-  {
-   "rx": "/ui_support/VIA_UI_.*\\.html$",
-   "why": "U/I 頁由引擎再生(CGC_MDL138/MDL160 家族);頁是產物不是正本"
-  },
-  {
-   "rx": "/registry/VIA_Engine_",
-   "why": "引擎冊由 registry-sync / 匯流排掃樹再生"
-  },
-  {
-   "rx": "/registry/VIA_Schema_",
-   "why": "schema 冊由掃樹再生"
-  },
-  {
-   "rx": "/registry/VIA_Unified_Register",
-   "why": "統一註冊表由掃樹再生"
-  },
-  {
-   "rx": "/registry/VIA_IndustryUnifiedMap",
-   "why": "產業對照冊自 tw_listings_industry 再生;庫不同數字就不同"
-  },
-  {
-   "rx": "/registry/VIA_SSOT_RegexDict",
-   "why": "SSOT 詞典由 CGC_MDL115 再生"
-  },
-  {
-   "rx": "/registry/VIA_ProjectCompletion",
-   "why": "完工矩陣由實測結果再生"
-  },
-  {
-   "rx": "/registry/VIA_ParallelLanes",
-   "why": "並行車道冊由編排器再生"
-  },
-  {
-   "rx": "/registry/VIA_VDFArchitecture",
-   "why": "VDF 架構冊由掃樹再生"
-  }
- ],
- "never_touch": [
-  {
-   "rx": "^(?!.*)$",
-   "why": "佔位:未追蹤檔一律不碰(引擎層面根本不讀 untracked)"
-  }
- ],
- "keep_even_if_matched": [
-  {
-   "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
-   "why": "台帳是 append-only 人寫件,不是再生物"
-  },
-  {
-   "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json",
-   "why": "法與課是人寫件"
-  },
-  {
-   "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
-   "why": "元件冊由 registry-sync **設計的寫入口**產生,是刻意要入倉的"
-  }
- ]
+  "schema": "VIA.RegenArtifacts.v1",
+  "batch": "批641",
+  "ts": "2026-09-19 10:33",
+  "purpose": "哪些**被追蹤的檔**是引擎跑完自己長出來的(再生物)。再生物在容器與工作站的內容必然不同(庫不同、套件不同、時間不同),**入倉就是噪音,而且下一次 pull 會被它擋住**——批605/606/612 三次卡死都是它。",
+  "law": "每一筆都要附**理由**(L87);沒理由的分類等於假綠。沒對上任何一筆的**一律不還原**——不明的東西交給操作員看,不是替他丟掉(只增不減)。",
+  "patterns": [
+    {
+      "rx": "^VeritasIntelligenceAnalytics/VIA_Reports/",
+      "why": "跑次報告夾:每一跑都重寫,內容綁當下的庫與時間"
+    },
+    {
+      "rx": "/ui_support/VIA_UI_.*\\.html$",
+      "why": "U/I 頁由引擎再生(CGC_MDL138/MDL160 家族);頁是產物不是正本"
+    },
+    {
+      "rx": "/registry/VIA_Engine_",
+      "why": "引擎冊由 registry-sync / 匯流排掃樹再生"
+    },
+    {
+      "rx": "/registry/VIA_Schema_",
+      "why": "schema 冊由掃樹再生"
+    },
+    {
+      "rx": "/registry/VIA_Unified_Register",
+      "why": "統一註冊表由掃樹再生"
+    },
+    {
+      "rx": "/registry/VIA_IndustryUnifiedMap",
+      "why": "產業對照冊自 tw_listings_industry 再生;庫不同數字就不同"
+    },
+    {
+      "rx": "/registry/VIA_SSOT_RegexDict",
+      "why": "SSOT 詞典由 CGC_MDL115 再生"
+    },
+    {
+      "rx": "/registry/VIA_ProjectCompletion",
+      "why": "完工矩陣由實測結果再生"
+    },
+    {
+      "rx": "/registry/VIA_ParallelLanes",
+      "why": "並行車道冊由編排器再生"
+    },
+    {
+      "rx": "/registry/VIA_VDFArchitecture",
+      "why": "VDF 架構冊由掃樹再生"
+    }
+  ],
+  "never_touch": [
+    {
+      "rx": "^(?!.*)$",
+      "why": "佔位:未追蹤檔一律不碰(引擎層面根本不讀 untracked)"
+    }
+  ],
+  "keep_even_if_matched": [
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
+      "why": "台帳是 append-only 人寫件,不是再生物"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json",
+      "why": "法與課是人寫件"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
+      "why": "元件冊由 registry-sync **設計的寫入口**產生,是刻意要入倉的"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json",
+      "why": "VRN 邏輯架構索引冊由 `via-vrnbook build` **設計的寫入口**產生,是刻意要入倉的(與元件冊同類)。批641 實錄:ENG084/085/086/087 四支入冊之後它第一次變髒,閘判「不明」報 RED 並叫人看 diff——**閘做對了**,是冊上少了這一條。分不出「引擎寫的」和「人改的」時,不還原才是對的(不明一律保留)。"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_RegenArtifacts_SSOT_v0100.json",
+      "why": "**本閘自己的規則冊,是人寫件。**批641:補完 VRN 索引冊那一條之後,閘立刻把**自己的冊**判成不明——它從來沒有把自己算進去過。那不是壞掉,是這本冊第一次被改。同 LL231(新閘上線第一件事是拿它掃自己):**規則冊也要被自己那條規則蓋到**。"
+    }
+  ]
 }
