@@ -1,8 +1,8 @@
 {
  "schema": "VIA.VRN.LogicArchitecture.SSOT.v1",
- "version": "v0100",
- "batch": "批622",
- "ts": "2026-09-19",
+ "version": "v0101",
+ "batch": "批641",
+ "ts": "2026-09-20",
  "purpose": "操作員令「把今天的 VRN 邏輯整合一遍不要遺漏」。本冊是**索引**不是內容:每一層只記『正典在哪一支』,規則本身留在原處。複製一份規則出來就是開第二顆頭(零 Hydra),而且它一定會比正本先過期。",
  "how_built": "本冊由 docs 附的建冊腳本 glob 尾版解析、逐支讀出檔頭第一句職責後產生——**指標是量出來的,職責是讀出來的**,不是我寫的(LL180)。解析不到任何一支就整本不寫(半本冊比沒有冊危險)。",
  "law_bindings": [
@@ -31,6 +31,12 @@
      "tail": "supportive modules/70_VRN_Rules/SUP_MDL015_VISVRNBrokerAliasFullList_v0100.py",
      "head": "VIS_VRN_BrokerAlias_FullList_v0100",
      "role": "券商別名全表"
+    },
+    {
+     "family": "VRN_ENG084_FilenameTokenParse",
+     "tail": "functional modules/VRN/VRN_ENG084_FilenameTokenParse_v0100.py",
+     "head": "VRN_ENG084_FilenameTokenParse v0100 — 檔名切分與三來源合流(批634)",
+     "role": "檔名切分×三來源合流(批634 操作員規格)"
     }
    ]
   },
@@ -111,7 +117,7 @@
     },
     {
      "family": "VRN_ENG073_ReportStructuredDB",
-     "tail": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0130.py",
+     "tail": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0132.py",
      "head": "v0128→v0129(批558 操作員令「加入同義字 第一頁周圍訊息區塊及中間本文標題區修復後尋找」)",
      "role": "研報結構庫"
     },
@@ -132,6 +138,24 @@
      "tail": "functional modules/VRN/VRN_ENG064_KnowledgeStack_v0102.py",
      "head": "VRN_ENG064_KnowledgeStack — 本地知識抽取堆疊轉接 v0101(批152;via-know)",
      "role": "知識堆疊(批611 零依賴簡→繁)"
+    },
+    {
+     "family": "VRN_ENG085_MarkdownRestore",
+     "tail": "functional modules/VRN/VRN_ENG085_MarkdownRestore_v0106.py",
+     "head": "VRN_ENG085_MarkdownRestore v0100 — 本文還原與分類標註(批636)",
+     "role": "本文還原(不刪除;類別/次類別/頁數;批636–640)"
+    },
+    {
+     "family": "VRN_ENG086_FirstPageLogicBridge",
+     "tail": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0108.py",
+     "head": "v0107→v0108(批546 **更正**:收容件根本沒被改過,是 CRLF;批544/545 的診斷我錯了兩次)",
+     "role": "首頁邏輯橋"
+    },
+    {
+     "family": "VRN_ENG087_NLPTextSummaryBridge",
+     "tail": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+     "head": "VRN_ENG087_NLPTextSummaryBridge v0100",
+     "role": "NLP 文摘橋(072→MDL744→073 編排)"
     }
    ]
   },
@@ -140,7 +164,7 @@
    "nodes": [
     {
      "family": "VRN_ENG083_VerifiedMatrix",
-     "tail": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0111.py",
+     "tail": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0116.py",
      "head": "VRN_ENG083_VerifiedMatrix v0100 — 驗證矩陣(批569)",
      "role": "驗證矩陣"
     },
@@ -163,8 +187,8 @@
    "nodes": [
     {
      "family": "VRN_ENG080_FourPointDigest",
-     "tail": "functional modules/VRN/VRN_ENG080_FourPointDigest_v0105.py",
-     "head": "VRN_ENG080_FourPointDigest v0100 — 研報「一題四點」文摘+潛在上漲空間(目標價除權息調整)引擎(批386)",
+     "tail": "functional modules/VRN/VRN_ENG080_FourPointDigest_v0108.py",
+     "head": "v0107→v0108(批643 ① 我在批642 把真缺料叫成垃圾 ② 41 份的調整態是空字串)",
      "role": "一題四點文摘"
     },
     {
@@ -194,6 +218,113 @@
    ]
   }
  },
+ "off_book_pending": [
+  {
+   "family": "VRN_ENG017_MDL004OCRFetchingPDFTable",
+   "state": "PENDING_OPERATOR",
+   "head": "from __future__ import annotations",
+   "tail": "functional modules/VRN/VRN_ENG017_MDL004OCRFetchingPDFTable.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG018_MDL005OCRFetchingPDFText",
+   "state": "PENDING_OPERATOR",
+   "head": "from __future__ import annotations",
+   "tail": "functional modules/VRN/VRN_ENG018_MDL005OCRFetchingPDFText.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG023_MDL011DailyFetcher",
+   "state": "PENDING_OPERATOR",
+   "head": "from __future__ import annotations",
+   "tail": "functional modules/VRN/VRN_ENG023_MDL011DailyFetcher.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG049_ContentReconcile",
+   "state": "PENDING_OPERATOR",
+   "head": "vrn_content_reconcile_v0102 — OCR 擷取產物 × SSOT v2 內容級對帳(唯讀;批244 認得首頁道)",
+   "tail": "functional modules/VRN/VRN_ENG049_ContentReconcile_v0102.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG050_ContentStore",
+   "state": "PENDING_OPERATOR",
+   "head": "vrn_content_store_v0106 — 對帳綠燈內容落庫 via.duckdb(Windows 自鎖根因修)",
+   "tail": "functional modules/VRN/VRN_ENG050_ContentStore_v0106.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG052_DocxEngine",
+   "state": "PENDING_OPERATOR",
+   "head": "vrn_docx_engine_v0101 — DOCX 深度解析引擎(10 地雷硬化版)",
+   "tail": "functional modules/VRN/VRN_ENG052_DocxEngine_v0101.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG055_OfficeMerge",
+   "state": "PENDING_OPERATOR",
+   "head": "vrn_office_merge_v0101 — Office(xlsx/csv/docx)併主表橋(TOOL-044)",
+   "tail": "functional modules/VRN/VRN_ENG055_OfficeMerge_v0101.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG062_SummarizerV1",
+   "state": "PENDING_OPERATOR",
+   "head": "import sys as _sa_sys",
+   "tail": "functional modules/VRN/VRN_ENG062_SummarizerV1_v0102.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG065_MailIntel",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG065_MailIntel — NLP×郵件追蹤×報告摘要整合管線(批143;via-mail)",
+   "tail": "functional modules/VRN/VRN_ENG065_MailIntel_v0100.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG066_NLPSupportHub",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG066_NLPSupportHub — NLP 工具統一整合×Summarizer 支援樞紐(批157;via-nlphub)",
+   "tail": "functional modules/VRN/VRN_ENG066_NLPSupportHub_v0100.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG067_MindMapSSOT",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG067_MindMapSSOT — 三語關鍵字 SSOT×分類×漸進知識體 Mind map(批158;via-mindmap)",
+   "tail": "functional modules/VRN/VRN_ENG067_MindMapSSOT_v0103.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG069_ConsensusDB",
+   "state": "PENDING_OPERATOR",
+   "head": "v0104→v0105(批642 **這一檢連自己失敗都印不出來**)",
+   "tail": "functional modules/VRN/VRN_ENG069_ConsensusDB_v0105.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG070_YahooConsensus",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG070_YahooConsensus — Yahoo 共識資料引擎(批194;操作員令)",
+   "tail": "functional modules/VRN/VRN_ENG070_YahooConsensus_v0102.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG071_CnyesFusion",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG071_CnyesFusion — 鉅亨 FactSet 共識融合引擎(批199;操作員令)",
+   "tail": "functional modules/VRN/VRN_ENG071_CnyesFusion_v0100.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  },
+  {
+   "family": "VRN_ENG078_NLPOneBridge",
+   "state": "PENDING_OPERATOR",
+   "head": "v0101→v0102(批538 VRN 實測):①② 把版號與模組數寫死(v1.5.0 / 35 模組),而收容夾裡已經有 v1.6.1(36 模組)——",
+   "tail": "functional modules/VRN/VRN_ENG078_NLPOneBridge_v0102.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  }
+ ],
  "rule_canons": {
   "方法冊_def01_21": {
    "family": "vrn_method_kernel",

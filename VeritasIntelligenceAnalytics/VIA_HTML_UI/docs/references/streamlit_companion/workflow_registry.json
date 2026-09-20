@@ -1,0 +1,40 @@
+{
+  "id": "via-streamlit-companion",
+  "version": 1,
+  "runtime": "optional-local",
+  "canonicalStandaloneUnaffected": true,
+  "entrypoint": "app.py",
+  "dataInput": {
+    "formats": ["csv"],
+    "policy": "user-provided-only",
+    "syntheticData": false
+  },
+  "backends": [
+    {
+      "id": "mermaid",
+      "package": "streamlit-mermaid",
+      "rendering": "text-to-flowchart",
+      "interaction": "static-view"
+    },
+    {
+      "id": "graphviz",
+      "package": "streamlit",
+      "rendering": "DOT-layout",
+      "interaction": "static-view",
+      "systemDependency": "optional Graphviz runtime"
+    },
+    {
+      "id": "agraph",
+      "package": "streamlit-agraph",
+      "rendering": "Vis.js-network",
+      "interaction": "drag-zoom"
+    }
+  ],
+  "palette": {
+    "blue": "#4c78a8",
+    "teal": "#72b7b2",
+    "yellow": "#f2cf5b",
+    "red": "#e45756",
+    "green": "#54a24b"
+  }
+}

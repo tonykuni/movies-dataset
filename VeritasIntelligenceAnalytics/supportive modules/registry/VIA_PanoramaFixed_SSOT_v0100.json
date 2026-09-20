@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PanoramaFixed.SSOT.v1",
- "batch": "批537",
- "ts": "2026-09-16T20:17:32",
+ "batch": "批658",
+ "ts": "2026-09-20T12:38:53",
  "owner": "CGC_MDL158_VIAPanoramaAuditRepair",
  "purpose": "全景稽核『已修冊』。不是功勞簿:每一筆都帶可複驗的憑據,本器每次跑都拿活樹重量一次。冊說修好、現在也還是修好=GREEN;冊說修好、現在又量到=RED(回歸,尾版律下最容易發生:有人切了新版卻沒把修帶過去);量不了=ABSENT,誠實講量不了,不當綠。",
  "verify_kinds": {
@@ -156,6 +156,71 @@
      "markers_absent": [
       "\"talib_probe\":",
       "\"talib_one\":"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-VERB",
+   "batch": "批658",
+   "cls": "內容級",
+   "n": 3,
+   "what": "VERB 等價轉換第一回(修復器補第二型 `main(argv=None)` + `X.parse_args(argv)`):VIA_WorkflowEngine / twrevenue.cli / superextract.cli 三支開始認 `--selftest`;舊位置動詞照常可用(只增不減),三支改前改後各雙跑驗過",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": ".",
+     "glob": "VIA_WorkflowEngine.py",
+     "markers": [
+      "_normalise_argv_b535",
+      "parse_args(_normalise_argv_b535(argv if argv is not None else sys.argv[1:]))"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-SYSEXE",
+   "batch": "批658",
+   "cls": "範疇級",
+   "what": "L51 家族境律:VRN_ENG083 的 `_call` 從裸 sys.executable 改走匯流排家族 python(CGC_MDL148 python_for,匯流排不在則 graceful 退回本行程);全樹 SYSEXE 1 → 0;ENG083 自測 55/55 綠",
+   "verify": [
+    {
+     "kind": "class_zero",
+     "cls": "SYSEXE"
+    }
+   ]
+  },
+  {
+   "id": "F658-EXEMPT",
+   "batch": "批658",
+   "cls": "尺級",
+   "what": "第四把掃描器補上批647 正典 TEMPLATE 豁免(LL297):CGC_MDL158 v0104 不抄第二份名冊,以 ast.literal_eval 讀 CGC_MDL156 尾版的 _ACCEL_EXEMPT+_TREE_EXEMPT(36 條)並把出處寫進報告;豁免只擋修不擋掃(L57),閘擺在唯一寫檔出口 fix_one();自測附反向對照",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+     "markers": [
+      "_load_exempt_roster",
+      "_EXEMPT_ROSTER",
+      "template_exempt",
+      "exempt_source"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-PINVER",
+   "batch": "批658",
+   "cls": "尺級",
+   "what": "L93 先疑尺不疑樹:跨行寫的尾版 glob 後備(`sorted(D.glob(...)) or [D/'X_v0100.py']`)不再誤判成釘死版號;改看同一個簡單陳述式(刻意不含 def/if/for,免得尺放太寬);PINVER 24 → 22;自測 ㉓ 附反例",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+     "markers": [
+      "glob_stmt_lines"
      ]
     }
    ]

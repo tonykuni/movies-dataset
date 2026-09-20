@@ -1,0 +1,79 @@
+{
+  "mode": "serverless-compatible progressive enhancement",
+  "critical_boot": {
+    "target_kb": "4-8",
+    "load": "inline or defer",
+    "contains": [
+      "shell state",
+      "navigation",
+      "first-paint controls",
+      "toast"
+    ]
+  },
+  "modules": [
+    {
+      "id": "investment",
+      "file": "modules/investment.js",
+      "load": "requestAnimationFrame + requestIdleCallback",
+      "trigger": "after first paint or when #investmentDesk enters viewport",
+      "dom_scope": ".investment-desk",
+      "measured_nodes": 140
+    },
+    {
+      "id": "topology",
+      "file": "modules/topology.js",
+      "load": "requestAnimationFrame + requestIdleCallback",
+      "trigger": "after first paint; pause animation until visible",
+      "dom_scope": ".content-grid .topology-panel",
+      "measured_nodes": 121
+    },
+    {
+      "id": "settings",
+      "file": "modules/settings.js",
+      "load": "on first settings button click",
+      "trigger": "[data-open-settings]",
+      "dom_scope": "#settingsBackdrop",
+      "measured_nodes": 38
+    },
+    {
+      "id": "connection",
+      "file": "modules/connection.js",
+      "load": "on first new connection click",
+      "trigger": "#newConnectionBtn",
+      "dom_scope": "#connectionBackdrop",
+      "measured_nodes": 38
+    },
+    {
+      "id": "export",
+      "file": "modules/export.js",
+      "load": "on export button click",
+      "trigger": "#exportBtn",
+      "dom_scope": "endpoint export path",
+      "measured_nodes": 0
+    },
+    {
+      "id": "ui-lab",
+      "file": "modules/ui-lab.js",
+      "load": "on UI Lab click",
+      "trigger": "#uiLabBtn",
+      "dom_scope": "#uiLab",
+      "measured_nodes": 22
+    },
+    {
+      "id": "sync-bridge",
+      "file": "modules/sync-bridge.js",
+      "load": "after first paint or on sync action",
+      "trigger": "#syncLaunch and storage/BroadcastChannel",
+      "dom_scope": "local state bridge",
+      "measured_nodes": 0
+    }
+  ],
+  "strict_file_protocol_note": "ES module import() may be restricted under file:// in some browsers. For strict no-server delivery, use defer-loaded classic scripts from the same folder or keep a build-time single-file fallback. Use import() when served over http(s), Tauri, or another controlled origin.",
+  "measured_opportunity": {
+    "hidden_modal_nodes": 76,
+    "hidden_ui_lab_nodes": 22,
+    "theoretical_live_dom_after_removing_these": 624,
+    "current_total_nodes": 722,
+    "note": "624 is a structural DOM scenario, not a measured FCP/DCL forecast."
+  }
+}
