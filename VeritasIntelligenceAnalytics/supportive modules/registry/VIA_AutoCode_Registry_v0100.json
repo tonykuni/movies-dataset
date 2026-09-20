@@ -9568,8 +9568,15 @@
       "component": "CGC_MDL160 v0106 +surface(29 檢)· 格子 v0404 · LL281/LL282",
       "code": "**更正批647 的題目**。我寫「ui_support 那 30 份靠 hub 的頁要不要收成資料內嵌」,真的去量:**沒有一份在抓自己的 .json**,抓的全是 `/run?task=`·`/intake`·`/auto`·`/ping`·`/status`。致動器 14 → (只看腳本脈絡後)ACTUATOR 10 · READONLY_PANEL 8 · VIEW 60。**會打 /run 的頁是致動器不是視圖,靜態檔跑不了任務**——那個問題不成立(LL281)。v0106 把「面」寫進契約 + L100 邊界檢(宣告面 57 張:VIA_HTML_UI/ui + VIA_Reports latest,越界 0)。尺改了三次才乾淨:① 整頁比對 → `<code>fetch()</code>` 說明文字被算成 fetch(改用本閘既有的 `script_text()`,L30 不另寫一份)· ② `try {` 帶空格 → 壓縮碼 `try{` 三件真頁誤判(改成往回走括號深度找包住它的區塊)· ③ 越界條件由分類自己推導 → **一盞永遠不會亮的燈**(改成宣告看位置、實測看端點,兩個獨立來源;LL282)。退路那一項**降 ADVISORY 不判燈**:靜態掃描證不出「每個 fetch 都有退路」(回呼內的 fetch、被 return 出去的 promise,守衛在掃描窗外),硬判就是假紅牆;本閘 v0104 的紀律是**不承諾自己不能證明的結果**。ADVISORY 攤開 5 張供人看,不判燈。零 CDN 那一筆(VIA_UI_Hub_v0108 的 Google Fonts)**既有 LAW 已在報紅**,不重複造第二把尺。零註冊面:`via-uiunify surface` 騎既有短令。",
       "verify": "MDL160 v0106 二十九檢 OK 29 · surface 實跑 GREEN(越界 0)· 全格子 v0404"
+    },
+    {
+      "ts": "2026-09-21 21:10",
+      "op": "ADD",
+      "category": "登錄",
+      "component": "via-run25(全鏈編排器)· CGC_MDL157 v0105 +shadow(29 檢)· 冊 v0229 · 四梭 · L101/LL283/LL284/LL285",
+      "code": "操作員令「INTEGRATE INTO ONE PS CODE WITH 25 加速器去完成以上全部 動態進度條及百分比」。**via-run25** 一令跑完批643–648 八站(extract/restore/structdb/digest/roster/net2/template/surface),逐站誠實五態、依賴律 SKIP 不偷跑、同意閘不代設。進度條不另造(L30 一個出處):Id 12 Show-VIAAccel20(25 加速器)· Id 13 Invoke-VIAPython(單站脈動)· **Id 11 本批新增=鏈層真百分比**(站數已知)。容器實跑 8 站 27s:GREEN 6 · RED 0 · NODATA 1(ENG090 roster=TWSE 整所缺席)· SKIP 1(沒給 --in)· rc=2。編排器例外(LL199):只配冊+梭,**不開格子站**——站屬於它呼叫的那些引擎。順手照出三件更重的事:**CGC_MDL157 v0105 新動詞 shadow** 掃出冊裡三個同名後定義把前定義無聲吃掉,MDL115_SSOTRegexDict / MDL130_UIBridge / Invoke-VIA-Panorama 三支引擎樹上在、冊上失聯(LL283;L101 立律),補 via-ssotregex / via-uibridge / via-panorama-run 三扇門 + 三梭;燈判的是「被吃的那支還到不到得了」而非「有沒有被吃」,附合成負控(無門=ORPHAN 咬得住、另有門=RESCUED、乾淨冊=0)。以及 via-run25 自己的三個參數洞(LL284 單旗標被拆成字元故 --list 反而整條跑掉;逗號清單攤平;篩到零站判假綠)。"
     }
   ],
-  "updated_at": "2026-09-21T02:10:00",
-  "batch": "批640"
+  "updated_at": "2026-09-21 21:10",
+  "batch": "批649"
 }
