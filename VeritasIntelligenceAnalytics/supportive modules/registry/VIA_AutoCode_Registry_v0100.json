@@ -9617,8 +9617,15 @@
       "category": "SSOT",
       "component": "VRN_ENG083 v0113 resolve_db + 第二顆頭哨兵(54 檢)· 方法存檔 MegaPrompt · 格子 v0411 · LL293",
       "code": "操作員令「儲存以下方法」+ 實機回報。**① 方法存檔**:docs/methods/VIA_METHOD_MegaPrompt_20Accel_6Streams_v0100.md 逐字保存操作員給的20 加速器 × 六獨立流程 × 零九頭龍 Mega-Prompt,**只存不改正典**,附逐條對照(20 加速器→母系統 25 格 · 全景→MDL158 · AST→MDL146 · SSOT→MDL115/155 · 沙盒回歸→262 站格子 · 回滾→MDL167;只有『四大分區』與『固定六道流程』是新的,裁定權在操作員)。**② 批654 的修生效了但矩陣沒動**:操作員畫面 [EXACT_MATCH_DB] 清楚,矩陣仍 GREEN 0 · YELLOW 38 · NODATA 67 一個數字沒動。先證尺:把 _DB 態灌進真庫餵 matrix() → **GREEN 30**,尺是好的。根因是**兩個人指到不同檔案**:ENG073 走批490 資料家優先解到 vdf_tw_market.duckdb,ENG083 把 output/vrn_reports.duckdb 寫死;兩本都有 vrn_report_basic,誰都不報錯,矩陣安靜讀了一張舊表(LL293)。**容器結構上看不見**(沒有資料家,兩條路同檔)。v0113:resolve_db() 照 ENG073 次序解(--db 仍最高)+ 把其他有這張表的庫當場印出來(第二顆頭要被看見);檢 (54) 造替代庫 + 設 env 驗解析與頭數,把 env 那一行退回寫死 → (54) 當場 FAIL(53/54)=咬得住。"
+    },
+    {
+      "ts": "2026-09-22 07:00",
+      "op": "FIX",
+      "category": "診斷",
+      "component": "VRN_ENG083 v0114 zero_green_probe + 選庫取最新(55 檢)· 格子 v0412 · LL294",
+      "code": "操作員實機:ENG073 印 [EXACT_MATCH_DB],矩陣仍 GREEN 0。**更正批655**:我斷定「兩本庫」,但他同一跑 candidates 讀 output/ 量到券商缺口 15,與 ENG073 的 90/105 完全吻合 —— 舊表也可能給同樣數字,兩種說法都還站得住,而我沒有他的機器。這是第三次隔空猜(LL294)。**不再猜,改成讓下一跑自己回答**:①zero_green_probe——任何一欄 GREEN 0 就印出底下原始值分佈(零綠只有缺料/尺與值對不上兩種),且從**判燈用的同一份 rows** 數(第一版拿已 close 的 con 查,印出三行 ConnectionException);容器實跑一行說完:upside_state MISSING_SOURCE×51/SINGLE_SOURCE×23/EXACT_MATCH×5/ROUNDING_ONLY×2 + upside_db (NULL)×81 = 容器沒有價,_DB 永遠升不起來,純缺料。②選庫次序改掉批655 寫死的『資料家優先』(那支解的是**價表**),改成在真的有 vrn_report_basic 的候選裡取**最後被寫過**的一本,並印出全部候選的列數與最後寫入時間。檢 (55) 負控驗探針。"
     }
   ],
-  "updated_at": "2026-09-22 05:30",
-  "batch": "批655"
+  "updated_at": "2026-09-22 07:00",
+  "batch": "批656"
 }
