@@ -9528,6 +9528,14 @@
       "component": "VRN_ENG080 v0108(29 檢)· L99 除權息基準律 · NA-02/NA-03 裁定 · 更正批642",
       "code": "① **更正批642 的誤判**:我寫「81→71 掉的 10 份全是自測空殼」,8 份錯了。那 8 份 sidecar 裡 ENG072 早就寫了 `tag=NEEDS_OCR`、`why=留空是誠實不是抽失敗`——我只看字數 0 沒讀旁邊那一欄。零正文 8 份是 **VRN 的 OCR 缺口(容器無 tesseract),可補的真料**;真正人造的只有 2 份且有字。漏斗改讀引擎自己的 tag 分類。LL270。② `adjust_method` **41 份是空字串**——`price_context` 兩個提早 return 沒帶態。補 NO_PRICE / NO_ADJ_CLOSE / NO_PRICE_TABLE;落庫實測 NO_PRICE 41 · PRICE_FACTOR_CHAIN 4 · NONE 1,零空字串。LL271。③ 操作員令「有目標價過了除權息都要改成 ADJ CLOSE,跟目前的 ADJ CLOSE 更新計算目標價」→ **L99**。量過:既有實作已成立(因子鏈 = 報告日因子 ÷ 最新日因子、事件日由因子變動偵測、tp×因子、對 adj_close 算),且價表 892 檔最新日因子**全部 = 1**,adj 基準就是「目前」。這一批做的是釘成律 + 檢㉗,免得被改掉。瓶頸不在口徑:46 份只有 5 份有價,只有 4 份走得到因子鏈——**根在 VDF 價表涵蓋**。④ 操作員授權自行裁定 → VRN_MatrixApplicability 補 NA-02/NA-03:非個股研報的目標價/評等/上漲空間與分析師**一律不判不適用,維持 NODATA**。理由:那些報告確實會寫個股目標價(常常好幾檔),是我們的**單值欄裝不下**,不是報告裡沒有;判 N/A 等於把「我們裝不下」說成「本來就沒有」。標 AI_DECIDED_REVISABLE。",
       "verify": "ENG080 v0108 二十九檢 OK 29 · 全格子 v0399"
+    },
+    {
+      "ts": "2026-09-21 11:30",
+      "op": "FEATURE",
+      "category": "VDF",
+      "component": "VDF_ENG090 v0104 +roster 車道(23 檢)· 格子 v0400 · LL273/LL274",
+      "code": "L98 次序轉 VDF。VRN 剩下的紅全部指向價料,往上追**不是抓取失敗**:正典名冊 CGC_MDL142_TWNameBook 1,980 檔,價表只涵蓋 892 檔。照 market 拆開之後真相塌成一句話:**TPEX 上櫃 892/892 齊(100%)· TWSE 上市 0/1,088(整所缺席)**。價表 892 個 ticker 後綴**全部 `.TWO`**、`tw_listings` 892 列 market **全部 `TPEX`**;ENG054 註解寫「雙所+ETF」而庫裡只有一所。VRN 37 檔個股有價的 5 檔(4171/3675/4153/6147/6143)**全部是上櫃**;2330/2317/2454/3008/1101 一檔都沒有,因為全是上市。另照出 `UNIVERSE_RECONCILIATION`:ENG064 的計畫裡寫了這個名字,**全樹搜過只出現在那一個註記字串裡**——沒有人產出、沒有人讀、沒有一道檢量它;而同一支的取票是 `SELECT DISTINCT ticker FROM tw_daily_prices`,**永遠加不進新票**(閉環)。v0104 把那張表真的做出來:照 market 拆、點名整所缺席、標下游誰在等。零網路、零寫、唯讀;`market_rollup` 抽成純函式才驗得了(LL262)。**補上市那一所要觸網,同意閘是操作員的手,本閘不代設。**零註冊面:`via-vdfcov roster` 騎既有短令,不新開命令、不加梭。",
+      "verify": "ENG090 v0104 二十三檢 OK 23 · roster 實跑 TWSE 整所缺席 · 全格子 v0400"
     }
   ],
   "updated_at": "2026-09-21T02:10:00",
