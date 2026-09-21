@@ -50,6 +50,15 @@
 
 ENG086 v0113 在「第一頁邏輯補缺正主橋二十六檢」站上 OK(站名待改,Z112)。格子再生 30 件 `git stash push -- <paths>` 收起不 commit(LL117 ③)。
 
+## 四b · 實錄讀出(操作員工作站真跑姊妹倉探針=膠囊 b;母線 2026-09-21 16:48Z 轉交,已對 awesome-bardeen 93369e11 的 B690 文六節)
+
+| 貼的 | 讀出 | 修 |
+|---|---|---|
+| `VRN_PanoramaProbe.py` 64 件 · python 3.13.7 · VRN tree PRESENT · modules 14/14 · deps 9/18 · accel bridge RESOLVED | verdict AMBER;S01–S03/S05 OK 64 · S04 WARN 4(四份華南 Memo docx)· S06 OK 41 / WARN 23 · S07 SKIP 64(閘關=政策)· **S08–S10 READY 64**;**卡點:無**;契約風險 GREEN 41 · YELLOW 23 · RED 0 | 無——容器裡的 RC1(無位元組)/RC2(正典樹缺)在母機上都消失,剩 RC3 缺件 9/18(polars/xxhash/pypdf/docx/markitdown/paddleocr/pytesseract/rapidfuzz/psutil=操作員的手,不代裝)+ RC5 黃燈 23(依規不轉紅)+ RC6 閘關 |
+| 券商欄:MKC/TSC/CLSA/CITI/DAI/GS/JPM/MAQ/MS/UBS/CT/KGI/CTBC/HNSC/PSC;空 5 件(3014TT · GF-Thoughts · 6933_AMAX-KY · 投資早報251209 · 第三場…陳子昂) | 與本線容器量的探針 59/64 **逐件一致**,空的 5 件也一樣;母閘路(ENG086 v0113)同樣 59/64,且正典鍵已回 DAIWA / JPM / MEGA(探針用的是 DAI / JPM / MKC 另一套縮寫=Z109 的命名空間差) | 無新洞;Z109 三選一的料齊了 |
+
+讀法:探針在母機上「READY 64」不是「跑了」——S08–S10 要母管線真跑才有結果;要不要讓它落地當第十段的量尺,還是 Z109 那一題。
+
 ## 五 · 你的手
 
 1. **Z109**:探針落地三選一(①不落地 · ②落地 ENG089 改綁樞紐 · ③併 PR #23 原樣)。
