@@ -39,6 +39,16 @@ param(
     [switch]$Commit,       # 與 -Onboard 併用才會真的 git add + commit(你的手)
     [switch]$Push          # 與 -Commit 併用才 push
 )
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 # ── 上船分類(批608)────────────────────────────────────────────────────────
 #   「上船母資料夾」= 母資料夾裡**已經在那、但沒進 git** 的東西要進倉。
