@@ -63,7 +63,7 @@ CGC_MDL176_SynonymUnion v0100 — 同義字聯集閘(批678)
   plan        印新增計畫(零寫)
   --apply     寫聯集冊 + 疊加層下一版(只增不減,寫前先證 contains)
   resolve <scope> <token>   一扇門解析(拒絕→正典→疊加→聯集;L101)
-  --selftest  三十檢
+  --selftest  卅一檢
 誠實 rc:0 GREEN · 1 真的壞 · 2 缺料 · 3 缺件
 """
 from __future__ import annotations
@@ -327,6 +327,53 @@ BROKER_BOOK_MARKS = ("VRN_BROKER_LIST_v01", "extra_table", "VRN_Broker_Dict", "b
                      "def broker_of(", "BROKER_ABBR")
 
 
+def gate_behaviour() -> dict:
+    """**行為**上過沒過閘——不是檔案裡有沒有那幾個字。
+
+    批680:ENG086 接上拒絕閘之後,中央規則樞紐 SUP_MDL749 的 `broker_of()`
+    其實**也過閘了**——因為它是委派給 ENG086 的 `safe_broker_ev()`,
+    樞紐自己一個位元都沒改(而且它的 v0111 已被側線 PR #53 佔走,不該我去取)。
+    文字尺看不到這件事,所以它會把樞紐判成「沒過閘」——**判得沒錯,它量的是文字**。
+    兩件事分兩欄各自報,不混成一個數字(LL327)。
+
+    量法是正控:把解析器假裝成「冊上還有廣發」,看樞紐回什麼。
+    回 (None, 拒絕…) = 行為過閘;把廣發放行 = 沒過閘;跑不起來 = NODATA 不猜。
+    """
+    out = {"state": "NODATA", "why": "", "denied": None, "allowed": None}
+    try:
+        import importlib.util as _iu
+        import sys as _sys
+        hub = _newest("SUP_MDL749_VRNFieldRuleHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules")
+        if hub is None:
+            out["why"] = "樞紐缺席"
+            return out
+        _s = _iu.spec_from_file_location("_via_hub_probe", hub)
+        _m = _iu.module_from_spec(_s)
+        _sys.modules["_via_hub_probe"] = _m
+        _s.loader.exec_module(_m)
+        mod, why = _m.matchers()
+        if mod is None:
+            out["why"] = "樞紐的解析器缺席:" + str(why)
+            return out
+        bak = mod._safe_broker_raw
+        try:
+            mod._safe_broker_raw = lambda *a, **k: "GF"
+            out["denied"] = list(_m.broker_of("合成文字"))
+            mod._safe_broker_raw = lambda *a, **k: "YUANTA"
+            out["allowed"] = list(_m.broker_of("合成文字"))
+        finally:
+            mod._safe_broker_raw = bak
+        blocked = out["denied"][0] is None and "拒絕" in str(out["denied"][1])
+        passed = out["allowed"][0] == "YUANTA"
+        out["state"] = "GREEN" if (blocked and passed) else "RED"
+        out["why"] = ("樞紐委派給 %s,而那一支有閘" % getattr(mod, "__file__", "?").split("/")[-1]
+                      if blocked else "被拒的機構從樞紐**放行出去了**")
+        out["delegates_to"] = getattr(mod, "__file__", "").split("/")[-1]
+    except Exception as ex:
+        out["why"] = "量不到(%s)——不猜,回 NODATA" % type(ex).__name__
+    return out
+
+
 def _is_gated(text: str) -> bool:
     return any(m in text for m in GATE_MARKS)
 
@@ -477,6 +524,7 @@ def union(base: dict, lib: dict, rows: list) -> dict:
         "deny_leak": deny_leak(base),
         "book_defects": book_defects(),
         "gate_bypass": gate_bypass(),
+        "gate_behaviour": gate_behaviour(),
         "rulings": rulings,
         "unverified": lib.get("unverified_tokens", []),
         "scopes": {s: scopes[s] for s in sorted(scopes)},
@@ -608,6 +656,11 @@ def status() -> int:
           % (sum(1 for r in gb if not r["gated"]), len(gb), "/".join(GATE_MARKS)))
     for r in gb:
         print("  %s %s" % ("[過閘]" if r["gated"] else "[沒過閘]", r["engine"]))
+    bh = u["gate_behaviour"]
+    print("\n[行為上過沒過閘] %s · %s(這一欄量的是**真的跑一次**,跟上面那張文字表不是同一把尺,不相加)"
+          % (bh["state"], bh["why"]))
+    print("   被拒的 → %s" % (bh["denied"],))
+    print("   合法的 → %s" % (bh["allowed"],))
     miss = contains(base, u)
     print("\n[只增不減] 底冊 %d 條逐條比對 → 少 %d 條"
           % (sum(len(v) for m in base["alias"].values() for v in m.values()), len(miss)))
@@ -808,14 +861,19 @@ def selftest() -> int:
         "讀券商冊的活尾版 %d 支 · 沒過閘 %d 支" % (len(gb), sum(1 for r in gb if not r["gated"])))
     _gated_src = "from VIA_FinancialInstitution_Overlay_v0100 import resolve_broker\nextra_table\n"
     _bare_src = "def broker_of(text):\n    return text\n"
+    _bh = u["gate_behaviour"]
+    chk("㉗b **行為**上樞紐過閘了嗎(文字尺看不到委派;兩把尺分兩欄各自報,不相加 LL327)",
+        _bh["state"] in ("GREEN", "NODATA")
+        and (_bh["state"] != "GREEN" or (_bh["denied"][0] is None and _bh["allowed"][0] == "YUANTA")),
+        "%s · %s" % (_bh["state"], _bh["why"]))
     chk("㉘ 負控:兩個判準都要當場證明咬得住(會過的檢=沒有檢;LL89)",
         _reads_broker_book(_gated_src) and _is_gated(_gated_src)
         and _reads_broker_book(_bare_src) and not _is_gated(_bare_src)
         and not _reads_broker_book("print('hello')"),
         "有閘的判成有閘 · 沒閘的判成沒閘 · 不讀券商冊的不進分母")
-    print("=== CGC_MDL176 同義字聯集閘 v%s · 三十檢自測(零網路;預設零寫)===" % VERSION)
+    print("=== CGC_MDL176 同義字聯集閘 v%s · 卅一檢自測(零網路;預設零寫)===" % VERSION)
     print("\n".join(lines))
-    print("  [計] 三十檢 OK %d · FAIL %d" % (ok, fail))
+    print("  [計] 卅一檢 OK %d · FAIL %d" % (ok, fail))
     return 0 if fail == 0 else 1
 
 
