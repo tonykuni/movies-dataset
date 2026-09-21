@@ -111,3 +111,5 @@ OK 271 · FAIL 6 · SKIP 8 · TIMEOUT 0(301s;GRID_20260921_165618)。對併前 r
 | 姊妹倉 `VIA_EnvManager.py scan` | 全 GREEN(UVT-01–08 · LOCAL-FREE · uv · ISO99)· PLAN YELLOW「待同意 · 母機 launch.ps1 · 本檔不 spawn」 | — |
 | 姊妹倉 `VIA_EnvManager.py plan` | ENV-FLEET 47 境/管 41;UVT findings 335 · **FAIL 1** · WARN 44;DRY_RUN_PASS:S03 via_core OPTIMIZE(13 pins)· S28 via_nlp(3)· S36 via_vdf(37)· S42/S43 ISOLATE rapidocr/img2table;其餘 36 步 VERIFY_ONLY DEFERRED(未登錄環境,--verify-legacy 才驗);RED ACTION 5 條全是 LEGACY_POLICY advisory(camelot_311/paddle_311/vif_aio/vif_core 保留不遷移;vmt_pm 退役候選要明示 --retire-environment)。**計畫裡沒有 via_vrn 的裝件步驟**:探針缺的 9 個選配套件(polars/xxhash/pypdf/docx/markitdown/paddleocr/pytesseract/rapidfuzz/psutil)不會因 apply 而裝上,要用母機 launch.ps1 的 -AddTool(或把它們登進 via_vrn 的 manifest)另開一步 | 裝件=操作員的手;VRN 線可先把 9 個套件登進膠囊的處置清單 |
 | 姊妹倉分支又前進 | `claude/festive-ptolemy-ts2yyh` 965504f「PyMuPDF table fallback · real import checks · honest dependency warnings · correct corpus count」 | VRN 線取件時拉最新 |
+
+**第三次併 main**(f9600d5d,PR #66 VRN 線 批691:ENG086 v0113、膠囊收件、Z109–Z113):台帳 1303;全格子 v0445 OK 273 · FAIL 5 逐站相同(GRID_20260921_171422)。Z112(ENG086 站名二十二→二十三檢)留給 VRN 線在本 PR 併後開 v0446——Grid 版號一天撞三次,不再在本線疊。
