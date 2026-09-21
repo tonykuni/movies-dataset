@@ -428,3 +428,7 @@ via-vcgc matrix --family vdf --apply
 
 工作站實錄(2026-09-21 14:56):橋三動詞與容器逐字同答;單元測試 test_02 紅是活樹收容件的 CRLF 殘留(L93 批619 同型)→ manifest/測試/橋改成 EOL_ONLY 自成一態;`via-vrnrun` 的 V2 六層鏈沒跑(啟動器單元素陣列被拆成字串再 splat 成 `'r'`,LL284 同族)→ `Invoke-VIA-VRN-v0101.ps1` 一行修;V3/V4 判對率 100.0% = 461/461、可判率 62.7%/67.1%。細節見側線紀錄第四段。
 第二輪附件三件(整合附件):兩件與已收 v0.2.0 件位元相同,zip 是更早一代子集(舊冊 393 鍵/792 筆 ⊆ 新冊,缺 0)→ 零新料不收第二份,雜湊記於 manifest。工作站 `via-vrnchain run`:GREEN 29 · RED 3 · NODATA 14;3 紅都不讀樞紐/橋,讀樞紐的 7 支全綠。
+
+## 追記 · 2026-09-21 b:這份審視接進了一扇門
+
+本文量到的六域現況從此由 `functional modules/VDF/VDF_SystemManager_v*.py`(VDF 子系統管理對接口)每跑現量:`status` 九域燈、`read logic|factor|param|engine|bridge|tool|handover|records`;VCGC v0119 一頁第十四段照抄它。全記錄見 `docs/VIA_S20260921b_VDFSystemManager.md`。
