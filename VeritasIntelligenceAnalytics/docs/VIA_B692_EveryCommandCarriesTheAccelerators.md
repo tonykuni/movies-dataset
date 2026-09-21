@@ -38,3 +38,17 @@
 OK 273 · FAIL 5 · SKIP 8 · TIMEOUT 0(231s;GRID_20260921_173357)——逐站與批690 收尾相同:新紅 0 · 消失 0。21 支 ps1 注入後 PS 語法閘仍 GREEN(棘輪 5/53 不變)。
 
 **併 main 90c59c14**(PR #65 本線 批690 已併 · PR #68 VRN 線 批691 追記):掉球 Z114 撞號,VRN 線先併贏,本線 PyProgress 那條改 **Z115**;併後鏈綠(VCGC v0123 29/29 · 契約 OK);全格子 v0445 OK 273 · FAIL 5 逐站相同(GRID_20260921_174055)。批692 尚未併 main:要併請開新 PR(本線分支 claude/awesome-bardeen-h0wm5v)。
+
+## 六 · 工作站側枝 `local/parallel-b692`(bee8a683;39 件 · 39,866 行)——VRN 件,交 VRN 線收容
+
+操作員照 L25 把工作站未追蹤件推到側枝(原件零觸碰,再生物已用 MDL167 還原,工作樹只剩 `.bak_b600_*`)。件名:
+
+| 夾 | 件 | 看起來是 |
+|----|----|----------|
+| `functional modules/VRN/engine/` | VIA_TW_Ticker_Master_v0210.py · VIA_VRN_FirstPageEngine.py(無版號)· VRN_AutoTestLoop.py · **VRN_Integrated_ReportDatabase_Engine.py**(批685 操作員上傳的那支)· **VRN_PanoramaProbe.py**(姊妹倉探針副本) | 別條線/探針落在母樹的引擎件;版號律與 Hydra 要 VRN 線對表(母樹已有 FirstPageEngine v0127) |
+| `functional modules/VRN/tests/` | test_VRN_AutoTestLoop · test_VRN_FirstPageEngine · test_VRN_PanoramaProbe · test_VRN_ReportDatabase_Engine | 對應上列四支 |
+| `functional modules/VRN/knowledge/` | SYNONYM_LIBRARY_v3.json · v4.json · VRN_WORKFLOW_SPEC_v0200.md | 同義字冊上傳更新候選(只增不減閘 MDL176/樞紐增補冊走) |
+| `functional modules/VRN/references/intake/VIA_SSOT_Additive_Audit_v0100/` | ADDITIVE_CANDIDATE · ALIAS_COMPARISON · CROSS_REGISTRY_CONFLICTS · SYNONYM_LIBRARY · user_aliases · audit_ssot.py · ticker_regexes.py · baseline/(樞紐 v0110、SSOT 五冊、broker_list…)· _upload/*.zip | 「SSOT REGEX 同義字上傳更新」的稽核包(操作員批689B 令的正本材料);收容原件不編輯,只讀進候選 |
+| 根 | Invoke-VRN-AutoTest.ps1 | 自動測試啟動器(ps1;L70) |
+
+本線不動這些(VRN 線的);已轉交(見七)。
