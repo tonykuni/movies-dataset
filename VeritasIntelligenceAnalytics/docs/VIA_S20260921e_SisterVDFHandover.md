@@ -65,6 +65,12 @@ ACCEL 橋 RESOLVED → `supportive modules/VIA_SuperAccel_Module.py` → `SUP_MD
 
 收到 §四 / §七。做了:對照表(二)、對接點對表(三)、橋複核(四);沒做:不抄引擎、不注入、不餵探針(一)。你這邊要改的只有一件:`VDF_PricesFactorRegistry.candidate.json` 的表名 `prices_canonical` 在母庫是 ENG060 的視圖,候選表要改名或改層(Z106)。
 
+## 六之二 · 併線(推之後主線又動了:PR #59 via-envmanager-governance 批686b)
+
+- 四檔衝突,按 L25 解:`CGC_MDL064_SelftestGrid_v0441.py` 又撞名(主線 v0441 = 主線 v0439 + ENG086 二十六檢 + SUP_MDL015 站 + 疊回本線的 VDF 對接口兩站)→ 取主線,本線差再貼到 **Grid v0443**(= v0442 + 主線那兩處;VDF 對接口兩站本線本來就有;中央控管台站名 → 二十八檢;站 290 → 291);三本再生冊取主線後重建(registry-sync 6134 → 再 sync · VRN 索引冊 build 守門 GREEN · 總控頁再生)。掉球冊與台帳自動併(主線 Z 最大仍 Z92,本線 Z93–Z108 不再改號;台帳 1294 + 本線 5)。
+- **主線 VCGC v0121 的一個回歸**:批686b 把三家的段收成一把尺 `_subsys_section()`,收尺時漏了側線 v0120 `vdf_system()` 的 bridge 段;主線 ㉖ 自己要 `bridge.tails` 是 int,在沒有 VDF 對接口的樹上走 ABSENT 那條路所以綠,對接口一在位就紅(併後實錄:二十八檢 OK 27 · FAIL 1;單元測試 T03.test_01 同紅)。修在同一把尺上 → **VCGC v0122**(任何家族 collect() 有 bridge 就回同形摘要,mode/why 鏈補回;㉔㉖㉗㉘ 一字不改;二十八檢)。
+- 併後複測:VDF 對接口 29/29 · VRN 對接口 v0104 27/27 · VCGC v0122 28/28 · 單元測試 26 + 10 OK · 契約 19/19 · MDL164 23/23 · Grid v0443 十一站(VDF 對接口 ×3 · 中央控管台 · VRN 對接口 ×2 · ENG086 · SUP_MDL015 · 索引冊 · 衝突哨兵 ×2)。
+
 ## 七 · 指標
 
 姊妹倉 PR #23 `https://github.com/tonykuni/VIA-VDF-VRN/pull/23`(head `c1989e618c`;膠囊 `docs/VIA_VRN_HANDOVER.md`;驗證矩陣 `docs/VIA_BRIDGE_AND_VRN_PANORAMA.md`)· 母倉本線:`VIA_S20260921d_VDFLaunch.md`(啟動就緒)· `VIA_DroppedBalls_B507.md`(A · Z67 · Z68 · Z106–Z108)。
