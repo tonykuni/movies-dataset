@@ -52,3 +52,5 @@ except SyntaxError as e:
     ls=t.splitlines(); print('[ast]    FAIL', p.name, 'line', e.lineno, e.msg); print('[那一行]', repr(ls[e.lineno-1][:160]) if e.lineno and e.lineno<=len(ls) else '(超出檔尾)')" $f
   } }
 ```
+
+> **批695 補**:三種可能不必工作站量了——根因已在容器重現(側線 86a72a0e 同名檔加/加衝突,標記留在工作站樹裡),見 `VIA_B695_TheLampMustSayWhoIsRed.md`;MDL172 v0104 起燈自己會講。
