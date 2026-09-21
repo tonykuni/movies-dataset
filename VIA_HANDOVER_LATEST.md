@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0119 · 批689)
 
-> 產生 2026-09-21 11:56:50 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-21 13:45:17 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0101.md)
 
@@ -598,14 +598,14 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:RED · 2026-09-21T07:11:27 · 齡 4.8 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=RED、家族境非 OK、必要庫 1/4、自測站 2/3', 'required_ok': 1, 'required_n': 4, 'engines_ok': 2, 'engines_n': 3}, 'vrn': {'ok': False, 'why': '燈=YELLOW、家族境非 OK、必要庫 0/3', 'required_ok': 0, 'required_n': 3, 'engines_ok': 3, 'engines_n': 3}} → **BLOCKED_UNITEST** · 原因 ['總燈=RED≠GREEN', 'vdf:燈=RED、家族境非 OK、必要庫 1/4、自測站 2/3', 'vrn:燈=YELLOW、家族境非 OK、必要庫 0/3']
+- RunGate:ABSENT · - · 齡 None h · 必驗 None · 覆蓋 None → **BLOCKED_UNITEST**
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):ABSENT · - · 還原 - · 段 None · 單獨隔離境 None · 借境封鎖 None · 次序 -(RECOVER_latest.json 不在(via-envrecover;L24 安裝出問題先還原前次再順序裝));安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1918 列 · 全庫同步 {'hash': '4ee818b2c0eb', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'd310b17f184d', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1918 列 · 全庫同步 {'hash': '4ee818b2c0eb', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'a4e0a6e48313', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -787,21 +787,21 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 6017/6017 · **缺 0** · 類別 {'class': 101, 'engine': 89, 'environment': 43, 'function': 5080, 'feature': 97, 'module': 171, 'package': 252, 'system': 11, 'tool': 173}
+- 中央自動編號冊 OK · ACTIVE 6019/6019 · **缺 0** · 類別 {'class': 101, 'engine': 89, 'environment': 43, 'function': 5082, 'feature': 97, 'module': 171, 'package': 252, 'system': 11, 'tool': 173}
 - 尾版引擎/模組家族 270 · 中央冊已登 270 · **未登 0** · 操作介面有掛載 228 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1293 筆 · 元件 149 · 更新 2026-09-21T11:55:42
-- 元件冊 OK · ACTIVE 6017 · RETIRED 242 · 更新 2026-09-21T11:48:35 · {'class': 101, 'engine': 89, 'environment': 43, 'function': 5080, 'feature': 97, 'module': 171, 'package': 252, 'system': 11, 'tool': 173}
+- 全域台帳 1295 筆 · 元件 149 · 更新 2026-09-21T13:45:17
+- 元件冊 OK · ACTIVE 6019 · RETIRED 242 · 更新 2026-09-21T13:31:23 · {'class': 101, 'engine': 89, 'environment': 43, 'function': 5082, 'feature': 97, 'module': 171, 'package': 252, 'system': 11, 'tool': 173}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-21 19:35 UPDATE 政策庫 批689 · Z59 結:LL306–LL343 入律冊(38 條;冊 batch 批662 → 批689)· 提示詞 v0101 第 3 步改寫 · pag
-- 2026-09-21 10:25 ADD VRN鏈跑器 批686 CGC_MDL172 v0102:六層鏈「量到什麼」rc≠0 先印 [FAIL] 行再 [計] 行(最後一行的 OK 蓋住紅燈=跑器自己戴的眼罩);
 - 2026-09-21 10:46 ADD VRN財報驗算 批687B VRN_ENG074 v0114:同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」· FAIL/DIVERGE 
 - 2026-09-21 11:18 ADD 工作站實錄修 批688B via_vrn_logic_book v0106 建冊冪等(內容沒變不重寫;pull 不再被索引冊擋)· VDF_ENG082 v0101(--o
 - 2026-09-21 11:42 ADD VRN全景修 批689B 全景式檢視 VRN:ENG086 v0110 券商拒絕閘+正典鍵對映(閘在正本實作)· SUP_MDL749 v0112 broker_gate 
 - 2026-09-21 11:55 ADD 併線 批689B 併 main a8fafd14(brave-goldberg 批687/688/689):三檔衝突聯集(掉球清單雙邊結案都留 · 台帳只增不減 1285+
+- 2026-09-21 12:06 ADD VRN總管 批689B 收尾:VRN_SystemManager v0103「沒過閘的活支」尺改對(聯集冊 gate_bypass 列=所有讀券商冊的活支,只數 gated
+- 2026-09-21 13:45 ADD VRN橋 批691 姊妹倉 VRN 膠囊收件(母線批690 轉交;正本 VIA-VDF-VRN claude/festive-ptolemy-ts2yyh c1989e6 
 
 ## 八 · 交接本文(來源 VIA_Handover_20260921_B688.md;逐批紀錄見該檔)
 
@@ -892,7 +892,7 @@ python3 "$VCGC" --selftest    # 期望:二十五檢 OK 25 · ⑬ ACTIVE N/N · r
 git log --oneline -3          # 期望:頭是本線批688 或之後
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 104 · 未結 90;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 109 · 未結 94;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -1004,6 +1004,11 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 | Z90 | 工作站 `git pull` 被 `VIA_VRN_LogicArchitecture_SSOT_v0100.json` 擋:`via-vrnrun` 第一站 build 每次改 built_at=永遠髒,而這本是刻意入倉的冊(MDL167 不還原);批688B v0106 建冊冪等(內容沒變不重寫)。**這一次**要先 `git checkout -- <冊>` 再拉;以後用 `via-reload`(先 stash 再拉) | 操作員的手 | 操作員 | `git checkout -- "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json"; git pull origin claude/awesome-bardeen-h0wm5v; git log --oneline -1` 貼回 |
 | Z91 | 仍沒過拒絕閘的 7 支舊讀冊件:SUP_MDL015_VISVRNBrokerAliasFullList v0100(六層冊 L0 節點、沒自測門)· VIS_VRN_BrokerAlias_Compatibility v0222 · VIS_VRN_BrokerAlias_Extension v0224 · VIS_VRN_PDFTextLayerFallbackPlan v0222 · VIS_VRN_Q1_AliasRoutePatch v0100 · VRN_ENG062_SummarizerV1 v0102 · vrn_report_digest v0116;它們自己讀券商冊、不經 ENG086/樞紐——要不要逐支改綁樞紐(或退役)=先對表誰還在活路上 | 候 | AI | 出對表(誰呼叫它、六層冊在不在);裁「改綁」或「退役」再動 |
 | Z92 | 容器全格子剩 15 盞 VDF/VAP 紅是同一型病:表不在時 SQL 直接炸(因子庫九檢 tw_prices_adj · 族群聚合因子層 features_daily · 調整後價格層 tw_daily_prices · 故事輪動橋/產業混合分類冊 tw_listings* · 每日觀察摘要已修)、matplotlib 缺件判紅(VAP 模板跑器 ⑦)、Schema Registry ≥20 表(引擎簡化稽核 ④)、資料庫目錄台 ②、治理主控台 ⑨、市場分析引擎 ②③、全球市場觀測 ①②、寬表刷新器 ①、系統同步樞紐 ③、VDF 資料涵蓋閘、治理台 UI Matrix ②(綠燈率門檻)——缺料/缺件該 NODATA 不該 RED(L16);工作站有料時它們多半綠 | 候 | AI(下一批) | 逐支改「表不在=NODATA rc2」+ 格子站 nodata_ok;一批一族,先 VDF 五支 |
+| Z102 | **姊妹倉 VRN 膠囊 a**(批690 母線轉交;正本 VIA-VDF-VRN 分支 `claude/festive-ptolemy-ts2yyh` c1989e6 `docs/VIA_VRN_HANDOVER.md`,PR #23 未併其 main):`VRN_PanoramaProbe.py`(1073 行,十段 S01–S10)落地方式。本線量到:探針指到母 VRN 根跑,RC2「正典樹缺」消失,剩 RC1 無位元組 ×64 / RC3 選配套件 9/18 / RC4 橋找的是舊名 `VIA_SuperAccel_Module`(母正本是 SUP_MDL737 v0105)/ RC5 黃燈 23 / RC6 閘關;**但探針 S06 自帶 BROKER_PREFIX/BROKER_ZH 券商表=第二套券商判準**(L05),正典鍵命名空間也不同(HNSC/MKC/DAI/CT vs 母 HUANAN/MEGA/DAIWA/CATHAY)。VRN_ENG089 號空(全遠端掃過) | 候 | 操作員 | 三選一:① 不落地(母已有六層鏈跑器 MDL172 + 總管全景,探針留在姊妹倉當契約測試)· ② 落地 `VRN_ENG089_PanoramaProbe_v0100` 但 S06 券商/代號改綁樞紐 `SUP_MDL749.broker_of`(自帶表降為缺席退路;一批的量)· ③ 併姊妹倉 PR #23 原樣(帶著第二套判準)。本線建議 ②;膠囊 b(工作站真跑探針)/ d(注入器 `--apply`)是你的手 |
+| ~~Z103~~ | ~~膠囊 c「券商正本對齊」:姊妹倉說母解析器 50/64、建議改 `vrn_d8b` 前綴比對~~ | **已結(批691)**:本線現場量 64 件——母**閘路**(樞紐 broker_of → ENG086)59/64,與探針零差;缺 13 件的是無版號 `vrn_d8b_filename_parser.py`(不在六層冊、格子無站,只被冊/manifest 引)→ 不改它(改=第二套判準)。真洞在別處:正典鍵對映 ② 對**活表鍵**只中 1/3(DAIWASECURITIES / J.P.MORGAN 沒空白,裁定拼法有空白,逐字查不到;㉒ 拿裁定冊自己的字串驗所以綠)→ ENG086 **v0113** 摺鍵查表 +㉓(裁定冊 × 活表現場取交集 4/4);Daiwa ×4 → DAIWA、JP ×2 → JPM | — | — |
+| Z104 | 膠囊 e 七處登冊:二節對表(20 支 `vrn-*.ts` + 探針 + 注入器 ↔ 母 MDL001–008 / 總管 v0103 / FirstPageEngine v0127 / finlex v0107 / digest v0116 / knowledge 六本 / VRN_BROKER_LIST_v01.json)登進 VRN_SystemManager 連結與台帳——對表指的是**另一個倉**的檔,落地前登「連結」只會是 ABSENT;等 Z102 裁 | 候 | 操作員裁 Z102 後 AI | Z102 選 ② → 隨 ENG089 一起登;選 ① → 登進總管 upstream 域當「外部對表」一列 |
+| Z105 | Grid 站名「第一頁邏輯補缺正主橋二十二檢」應改「二十三檢」(ENG086 v0113):本線**不開** Grid 新版——v0441 已三線各一份(busy-bell · awesome-bardeen 批690 · via-envmanager),第四份=LL334 再撞;站以 `--selftest` rc 判,功能不受影響 | 未做 | 併線者 | 下一個開 Grid 版號的人順手改站名;本線 ENG086 v0113 在 v0439 站上 OK |
+| Z106 | 加新尾版檔會讓刻意入倉的索引冊 `VIA_VRN_LogicArchitecture_SSOT_v0100.json` 立刻「冊落後」:總管連結 RED 2(logic:guard · logic:ENG082)直到 `via-vrnbook build`——不是壞,是 Z90 同一件事的另一面;本批已重建(指標 50 過期 0) | 已改(批691) | — | 引擎改版的批,收尾固定跑 `via-vrnbook build` 再 commit(三本會指到尾版的冊:索引冊 · 聯集冊 `--apply` · 元件冊 registry-sync) |
 
 
 ## 十一 · 中央治理家族(批514;VIA-SYS-MGR-001 主控台 · VIA-GOV-ENG-001 詞彙引擎 · VIA-SYS-MGR-003 下行控制 · VIA-SYS-ENG-003 檔案優先序 · 同名整併;擁有者 CGC_MDL150;預設 dry-run)
@@ -1081,5 +1086,5 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 
 ## 十三 · VRN 子系統管理對接口(批681;VRN_SystemManager;VIA 往下讀 VRN 四庫一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 交接;自適應連結現解尾版;預設只讀)
 
-- GREEN · VRN_SystemManager_v0102 · 2026-09-21 11:56:50 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 166 {'GREEN': 164, 'GATED': 1, 'ABSENT': 1} · 七處自審 4/7 {'spec': True, 'grid': True, 'register': False, 'deck': False, 'manager': False, 'inventory': 'VIA-SYS-0011', 'handover': True}
+- GREEN · VRN_SystemManager_v0103 · 2026-09-21 13:45:17 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 167 {'GREEN': 165, 'GATED': 1, 'ABSENT': 1} · 七處自審 4/7 {'spec': True, 'grid': True, 'register': False, 'deck': False, 'manager': False, 'inventory': 'VIA-SYS-0011', 'handover': True}
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VRN/VRN_SystemManager_v*.py status | catalog | links | read <policy|logic|factor|param|engine|handover|upstream> [key] | sync --apply(只落 VIA_Reports/vrn_system)
