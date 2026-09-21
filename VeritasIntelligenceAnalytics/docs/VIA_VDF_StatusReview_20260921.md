@@ -167,7 +167,8 @@ VDF(Veritas Data Forge,資料鍛造子系統)**引擎面已可獨立跑通**:批
 
 ```powershell
 Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
-git pull origin claude/via-envmanager-governance-7cls8h
+git fetch origin claude/via-envmanager-governance-7cls8h
+git checkout claude/via-envmanager-governance-7cls8h   # 先切到那條分支再點源;不要在 main 上 git pull——pull 會把它併進你當下所在的分支(Codex P2 審查照出)
 . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
 via-fresh
 via-vdfchain
@@ -196,7 +197,8 @@ via-vcgc matrix --family vdf --apply
 ## 八 · 本審視的方法與限制
 
 - 讀:倉根一頁交接(批554)· `docs/VIA_B588/596/597/599/610/644–674`(後 12 批自遠端分支 `git show`)· 政策庫 99 律 · 規格冊 · 工作流冊 · 庫表冊 · VDF 卡書 · VDF 四本參數冊 · ENG054/060/064/089/090/091 與 CGC_MDL170 尾版原始碼抬頭。
-- 跑(容器,零網路):`via-vcgc status`、`--selftest`(22/23,⑬ 見 4.1)。**沒有跑任何擷取引擎、沒有寫任何庫、沒有設任何閘。**
+- 跑,A 段(〇–十;容器,零網路):`via-vcgc status`、`--selftest`(22/23,⑬ 見 4.1)。**這一段沒有跑任何擷取引擎、沒有寫任何庫、沒有設任何閘。**
+- 跑,B 段(十一 追問;02:35 容器):**跑了一次 `via_boot_update.sh` 開機日更鏈**——腳本自己在第 21 行 `export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES`(不是本文設的,但那一跑的閘確實是開的),落 marker `.last_boot_update` 與 `BOOT_20260921_023505.log`;ENG054 落了 `tw_listings_20260921_024013.csv`(TPEX 892 檔)並嘗試 upsert(炸在 pandas 缺);另對 TWSE openapi **直接 GET 一次**驗 WAF 頁。11.5 全表以這一跑為準。「零網路 / 零寫入」只對 A 段成立(Codex P2 審查照出本文原先把兩段混寫)。
 - 前一個 session 的對話本文讀不到(只能取得其 session 記錄與 post_turn 摘要);本文的「前一 session 現況」全部以它已 commit 的 docs 為準。
 
 ---
@@ -335,7 +337,7 @@ via-vcgc matrix --family vdf --apply
 
 ### 11.1 直答
 
-**有,兩張清單各有正主引擎,而且都掛在同一條「開機日更鏈」上;但「自動」的意思是「開機/一鍵時每日首跑一次」,不是排程器。** 本容器今天 02:35 的日更鏈實跑證明:台股清單只拿到上櫃一所(TWSE openapi 對本容器回 WAF 安全頁),主動 ETF 宇宙 SKIP(三源皆空);工作站 9/15 快照兩張清單都在位。另外,驗收閘 ENG087 對台股清單要求一個**全樹沒有人產出的欄位**(`us_industry`),所以 `via-market-lists` 的股票全集永遠判不到 GREEN——這是尺的問題,不是清單的問題(見 11.5)。
+**有,兩張清單各有正主引擎,都掛在 Bash 開機日更鏈 `via_boot_update.sh` 上;PowerShell 版 `via_boot_update.ps1` 原少了 ④a 宇宙 / ④b 持股史兩步(11.4;Z98;側線 d 整份量下來其實少 13 步且裸 python,**已補齊到同鏈 ⓪–⑳**,同鏈由 VDF_SystemManager v0103 launch ㉘ 守),補齊前走 `VIA.ps1` / `launch.ps1` 的工作站,主動 ETF 那張**不會**自動更新;而且「自動」的意思是「開機/一鍵時每日首跑一次」,不是排程器。** 本容器今天 02:35 的日更鏈實跑證明:台股清單只拿到上櫃一所(TWSE openapi 對本容器回 WAF 安全頁),主動 ETF 宇宙 SKIP(三源皆空);工作站 9/15 快照兩張清單都在位。另外,驗收閘 ENG087 對台股清單要求一個**全樹沒有人產出的欄位**(`us_industry`),所以 `via-market-lists` 的股票全集永遠判不到 GREEN——這是尺的問題,不是清單的問題(見 11.5)。
 
 ### 11.2 清單一:台股全集(上市+上櫃)
 
@@ -366,7 +368,7 @@ via-vcgc matrix --family vdf --apply
 | 載體 | 觸發 | 做什麼 | 閘 |
 |---|---|---|---|
 | `supportive modules/registry/via_boot_update.sh` | 倉根 `.claude/settings.json` SessionStart hook(批150「開啟系統即更新」);marker `.last_boot_update` 每日首開才實跑 | ⓪ 環境自補 → ① OmniFetch 全車道(含 L1 清單/L4 etf_book)→ ② ENG054 價格增量(先抓雙所清單)→ ③ 籌碼 → **④a ENG077 宇宙日更** → ④ ENG051 持股 → ④b ENG078 史深 → ⑥⑦ 成交值/估值/共識/月營收 → ⑧ 輪動 → ⑨ UI 再生 … ⑳ | 腳本**自帶** `VIA_NET_CONSENT=YES`/`VIA_SCRAPE_CONSENT=YES`(操作員批123/137/150 常令授權) |
-| `via_boot_update.ps1` | 工作站:`VIA.ps1` 全自動模式 / `launch.ps1`(Deck 任務「boot 全自動日更(建議每日一次)」)背景 Job | 同鏈 ⓪–⑨(.sh 為正主,ps1 跟隨) | 同上 |
+| `via_boot_update.ps1` | 工作站:`VIA.ps1` 全自動模式 / `launch.ps1`(Deck 任務「boot 全自動日更(建議每日一次)」)背景 Job | 側線 d 前:⓪–⑨ 但**缺 ④a ENG077 宇宙 · ④b ENG078 持股史**(Codex P1 審查照出;Z98),整份量下來其實少 13 步(+⑩ ENG076 · ⑪–⑳ MDL131/133/135/136/ENG079/MDL137/ENG081/MDL139/140/141)且裸 `python` 起引擎。側線 d(操作員「GO … 完善到可啟動」= 這一次的 L70 許可)**已補齊到與 .sh 同鏈 ⓪–⑳**,⓪ 家族境 python 走 CGC_MDL136 envpy 正本;同鏈由 `via-vdfsys launch` ㉘ 每跑守;還原一行見 `VIA_S20260921d_VDFLaunch.md` 三之一 | 同上 |
 | 開機自啟 | `Install-VIA.ps1 -AutoStart` 才登錄 logon 工作 `VIA_Control_Tower`(**預設關**);全樹**沒有** VDF 的 DAILY 排程(只有 WorkOps 的兩個 DAILY 工作,與 VDF 無關) | — | — |
 | 手動 | OneShot S6(`via-price → via-chip → via-align update --apply`)· `via-etfuniv` · `via-omni` | 單段 | 操作員自設 |
 | **不抓清單的鏈** | `via-run25`(九站)· `via-vdfchain`(十站 selftest) | 治理/驗證 | — |
@@ -428,3 +430,7 @@ via-vcgc matrix --family vdf --apply
 
 工作站實錄(2026-09-21 14:56):橋三動詞與容器逐字同答;單元測試 test_02 紅是活樹收容件的 CRLF 殘留(L93 批619 同型)→ manifest/測試/橋改成 EOL_ONLY 自成一態;`via-vrnrun` 的 V2 六層鏈沒跑(啟動器單元素陣列被拆成字串再 splat 成 `'r'`,LL284 同族)→ `Invoke-VIA-VRN-v0101.ps1` 一行修;V3/V4 判對率 100.0% = 461/461、可判率 62.7%/67.1%。細節見側線紀錄第四段。
 第二輪附件三件(整合附件):兩件與已收 v0.2.0 件位元相同,zip 是更早一代子集(舊冊 393 鍵/792 筆 ⊆ 新冊,缺 0)→ 零新料不收第二份,雜湊記於 manifest。工作站 `via-vrnchain run`:GREEN 29 · RED 3 · NODATA 14;3 紅都不讀樞紐/橋,讀樞紐的 7 支全綠。
+
+## 追記 · 2026-09-21 b:這份審視接進了一扇門
+
+本文量到的六域現況從此由 `functional modules/VDF/VDF_SystemManager_v*.py`(VDF 子系統管理對接口)每跑現量:`status` 九域燈、`read logic|factor|param|engine|bridge|tool|handover|records`;VCGC v0120 一頁第十四段照抄它。全記錄見 `docs/VIA_S20260921b_VDFSystemManager.md`。

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# v0100→v0101(側線 2026-09-21 c):--selftest 遇產業庫不在 → [NODATA] rc2(四態律:缺料≠壞掉;容器沒落庫),不再 [FAIL] rc1;
+#   庫在時六檢照跑一字不動。
 """
-v0100→v0101(批690 Z92 誠實燈):`tw_listings_industry` 不在時 build() 直接丟 CatalogException,--selftest 連一行 FAIL 都印不出來
-  (容器/新機沒有產業冊=缺料,不是引擎壞;L16 缺料≠壞掉;批584 ENG072 同律)。v0101:表不在 → build 回 NODATA 並指路,
-  自測印 [NODATA] ② + ③–⑥ 誠實 SKIP,rc=2(不是紅);表在、數字不合才是 FAIL。六檢不變。
 VDF_ENG058_IndustryUnifiedMap — 雙所產業混合分類編號冊(批155;via-industry)
 ====================================================================
 操作員令:證交所×櫃買產業分類「大多一樣、少部分差異」→混合分類法+
@@ -87,28 +86,7 @@ def rollup(code: str) -> str:
     return "TRAD"
 
 
-def _missing_tables(db, need) -> list:
-    """批690:表不在=缺料(NODATA rc2),不是壞掉(L16;批584/689B 同律)。回缺的表名;庫檔不在=全缺。"""
-    if not db.exists():
-        return list(need)
-    import duckdb
-    con = duckdb.connect(str(db), read_only=True)
-    try:
-        have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
-    finally:
-        con.close()
-    return [t for t in need if t not in have]
-
-NEED_TABLES = ("tw_listings_industry",)
-REMEDY = ("補料=`$env:VIA_NET_CONSENT='YES'; via-market-lists`(VDF_ENG087 雙所 openapi 產業冊;閘=操作員的手;"
-          "容器三車道回非 JSON=固定缺)")
-
-
 def build() -> dict:
-    miss = _missing_tables(DB_TW, NEED_TABLES)
-    if miss:
-        return {"state": "NODATA", "missing_tables": miss,
-                "why": f"表不在:{', '.join(miss)} —— {REMEDY}。缺料不是壞掉(L16)"}
     import duckdb
     con = duckdb.connect(str(DB_TW), read_only=True)
     rows = con.execute(
@@ -186,13 +164,9 @@ def selftest() -> int:
     chk("① 三大類規則(24-31 電子/17 金融/餘傳產)",
         rollup("24") == "ELEC" and rollup("31") == "ELEC"
         and rollup("17") == "FIN" and rollup("01") == "TRAD" and rollup("35") == "TRAD")
-    miss = _missing_tables(DB_TW, NEED_TABLES)
-    if miss:                          # 批690:缺料誠實 NODATA,不炸不報紅
-        print(f"  [NODATA] ② 產業庫/表不在:{', '.join(miss)}(庫 {'在' if DB_TW.exists() else '不在'})")
-        print(f"           {REMEDY}")
-        print("  [SKIP] ③–⑥ 冊生成/單所限定/三大類計數/落盤:上游沒料,誠實跳過(不是壞掉,也不假裝過)")
-        print(f"  [計] 六檢 OK {1 - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP 4(誠實多態)")
-        return 1 if fails else 2
+    if not DB_TW.exists():
+        print(f"  [NODATA] ② 產業庫在位:{DB_TW.name} 不在(缺料≠壞掉;工作站 via-vdfdb 落庫後六檢照跑)")
+        return 2
     chk("② 產業庫在位", DB_TW.exists())
     b = build()
     chk("③ 冊生成(雙所合併+編號)", b["totals"]["codes"] >= 30
@@ -218,9 +192,6 @@ def main() -> int:
         return status()
     if "build" in args:
         b = build()
-        if b.get("state") == "NODATA":
-            print(f"[NODATA] {b['why']}")
-            return 2
         print(f"[冊] {OUT_JSON.name} · {b['totals']}")
         return 0
     print(__doc__.split("用法:")[1])

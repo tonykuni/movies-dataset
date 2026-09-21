@@ -853,8 +853,13 @@ def restore() -> int:
     return 0
 
 
-def verify() -> dict:
-    """刪完再掃一次全樹尾版:還有哪些活的落點帶著陸券。"""
+def verify(root: Path | None = None) -> dict:
+    """刪完再掃一次全樹尾版:還有哪些活的落點帶著陸券。
+
+    `root` 讓自測掃**暫存夾**而不是活樹。批680 實錄:第一版的四態控把探針檔寫進
+    `functional modules/VRN/`,跑完雖然 unlink,但中斷一次就會留在樹上——
+    註冊稽核當場點名「未登 _b680_selftest_probe」。**自測不准跟活樹共用地盤**(LL319)。
+    """
     EXC = ("__pycache__", "RetiredEngines", "references/intake", "/intake/", "SCOPE_COPY",
            "_superseded", "/20260804/", "VIA_AutoCode_Registry", "ChinaBrokerPurge",
            "SynonymUnion", "VIA_Financial_Institution_SSOT", "FinancialInstitution_Overlay",
@@ -863,7 +868,9 @@ def verify() -> dict:
                              ("廣發", "海通", "中金公司", "中信建投", "中信證券",
                               "國泰君安", "Guotai Junan", "Haitong", "CICC", "GF Securities")))
     cand, out = {}, []
-    for root in (VIA / "functional modules", VIA / "supportive modules"):
+    _base = root if root is not None else VIA          # 相對路徑的基準跟著掃描根走
+    _roots = [root] if root is not None else [VIA / "functional modules", VIA / "supportive modules"]
+    for root in _roots:
         for q in root.rglob("*"):
             if q.suffix not in (".py", ".json") or not q.is_file():
                 continue
@@ -880,18 +887,44 @@ def verify() -> dict:
         except Exception:
             continue
         data, note = set(), set()
-        for line in t.splitlines():
+        # 散文不是解析資料:`#` 註解**和 docstring** 都是散文。
+        #   批680 實錄:第一版只看 `#`,於是我寫在 docstring 裡「為什麼不可以抄名單」
+        #   那句話,被自己的尺判成**還帶著活的陸券解析資料**——尺的盲點,不是樹的問題。
+        #   .py 走 AST(docstring 認得出來),其餘副檔名退回逐行看 `#`(誠實降級,不假裝)。
+        #   逐行判,而且要知道**哪幾行**屬於 docstring —— 不是「這個字在某個 docstring 裡
+        #   出現過就整份當散文」。批680 第一版就是那樣寫的,負控當場抓到:
+        #   一個 docstring 提到廣發、字典裡也有廣發的合成檔,被判成「只有註解」=把尺改鬆了。
+        #   AST 給的是每一個 docstring 的 lineno..end_lineno,用它劃行,不是用字比對。
+        _doc_lines = set()
+        if q.suffix == ".py":
+            try:
+                _tree = ast.parse(t)
+                for _n in ast.walk(_tree):
+                    if not isinstance(_n, (ast.Module, ast.FunctionDef,
+                                           ast.AsyncFunctionDef, ast.ClassDef)):
+                        continue
+                    _b = getattr(_n, "body", None)
+                    if not _b:
+                        continue
+                    _f = _b[0]
+                    if isinstance(_f, ast.Expr) and isinstance(_f.value, ast.Constant) \
+                            and isinstance(_f.value.value, str):
+                        _doc_lines.update(range(_f.lineno, (_f.end_lineno or _f.lineno) + 1))
+            except SyntaxError:
+                pass
+        for _i, line in enumerate(t.splitlines(), 1):
             m = rx.findall(line)
             if not m:
                 continue
-            # 註解裡的字不是解析資料。**但也不准靜默吞掉**——分成兩欄各自報,
-            # 不然「還剩幾支」這個數字就變成看得懂的人才知道意思(LL324)。
             cut = line.find("#")
-            (note if (cut >= 0 and not rx.search(line[:cut])) else data).update(m)
+            if _i in _doc_lines or (cut >= 0 and not rx.search(line[:cut])):
+                note.update(m)
+            else:
+                data.update(m)
         if data:
-            out.append({"path": str(q.relative_to(VIA)), "tokens": sorted(data), "kind": "DATA"})
+            out.append({"path": str(q.relative_to(_base)), "tokens": sorted(data), "kind": "DATA"})
         elif note:
-            out.append({"path": str(q.relative_to(VIA)), "tokens": sorted(note), "kind": "COMMENT_ONLY"})
+            out.append({"path": str(q.relative_to(_base)), "tokens": sorted(note), "kind": "COMMENT_ONLY"})
     return {"left": [r for r in out if r["kind"] == "DATA"],
             "comment_only": [r for r in out if r["kind"] == "COMMENT_ONLY"],
             "scanned": len(cand)}
@@ -1059,6 +1092,35 @@ def selftest() -> int:
         and Path(__file__).read_text(encoding="utf-8").index("def preflight()")
         < Path(__file__).read_text(encoding="utf-8").index("def apply()")
         and isinstance(preflight(), list), "本樹 preflight 擋 %d 件" % len(preflight()))
+    # ㉞ 四態控:verify() 的「資料 / 散文」分類,四種情況都要判對。
+    #   批680 實錄:我把尺從「只看 #」改成「也認 docstring」,**第一版改鬆了**——
+    #   「這個字在某個 docstring 裡出現過」就把整份當散文,於是字典裡真的有廣發也被放過。
+    #   負控當場抓到。改成用 AST 取 docstring 的**行號範圍**逐行判,四態才全對。
+    #   改尺之後一定要證明它沒有變鬆,不然「照出來的變少」會被讀成「問題變少」。
+    import tempfile as _tf
+    _tmp = Path(_tf.mkdtemp(prefix="via_b680_"))
+    _probe = _tmp / "_probe_v0100.py"
+    _cases = [("散文提到(docstring)", '"""提到%s。"""\nT = {"A": ["元大"]}\n', False),
+              ("散文提到 + 資料也有", '"""提到%s。"""\nT = {"X": ["%s"]}\n', True),
+              ("只有 # 註解提到", '# 註解提到%s\nT = {"A": ["元大"]}\n', False),
+              ("只有資料有", 'T = {"X": ["%s"]}\n', True)]
+    _word = "廣" + "發"          # 不整串打進來:整串打進來就是又抄了一份名單(批680 三犯)
+    _got = []
+    for _name, _tpl, _want in _cases:
+        try:
+            _probe.write_text(_tpl.replace("%s", _word), encoding="utf-8")
+            _v = verify(root=_tmp)          # 掃暫存夾,活樹一個位元都不碰
+            _got.append(bool(_v["left"]) == _want)
+        finally:
+            _probe.unlink(missing_ok=True)
+    try:
+        _tmp.rmdir()
+    except OSError:
+        pass
+    chk("㉞ verify() 的資料/散文四態控:docstring 提到=散文 · 資料裡有=資料 · "
+        "兩者都有**仍然是資料**(改尺之後要證明它沒變鬆)",
+        all(_got), " · ".join("%s=%s" % (c[0], "對" if g else "**錯**")
+                              for c, g in zip(_cases, _got)))
     _led = _j("supportive modules/registry/VIA_ChinaBrokerPurge_Ledger_v0100.json") if LEDGER.exists() else None
     _nv = [f for f in (_led or {}).get("files", []) if f["kind"] == "py_newversion"]
     chk("㉝ **台帳要記下每一個升版檔**,restore 才不是假的"
@@ -1066,9 +1128,9 @@ def selftest() -> int:
         _led is not None and len(_nv) == len(ENGINE_TARGETS)
         and all((VIA / f["new"]).exists() for f in _nv),
         "py_newversion %d 筆 / 引擎落點 %d 個" % (len(_nv), len(ENGINE_TARGETS)))
-    print("=== CGC_MDL177 陸券清除閘 v%s · 卅六檢自測(零網路;預設零寫;真冊只讀副本)===" % VERSION)
+    print("=== CGC_MDL177 陸券清除閘 v%s · 卅七檢自測(零網路;預設零寫;真冊只讀副本)===" % VERSION)
     print("\n".join(lines))
-    print("  [計] 卅六檢 OK %d · FAIL %d" % (ok, fail))
+    print("  [計] 卅七檢 OK %d · FAIL %d" % (ok, fail))
     return 0 if fail == 0 else 1
 
 
