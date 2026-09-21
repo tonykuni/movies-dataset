@@ -73,7 +73,7 @@
 | Z56 | 外資報告目標價在側欄,修復文字沒有那一塊(批537 量出):GS 五份 · MQ 一份 · Daiwa-PCB · AMAX-KY · 華南四份 Memo · 瑞基 NR,共 16 份個股報告通篇無「目標價/Target Price/TP/PT」線索詞 → 不是抓漏,是我們手上的文字沒有這一欄(誠實四態記 `ABSENT_IN_TEXT`);要補得回原 PDF 側欄/表格幾何,與 Z49 同一條路 | 候 | 操作員 | 原 PDF 在 `C:\測試樣本報告`,本境沒有 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 | Z57 | 前 session(VIA Integration · session_01RLMQGZLcigd5Bt5aN6J4Ck)批680 五檔已 stage 未 commit(post_turn:awaiting go to run full linter LL117);收尾階段不落地即遺失;本線(claude/awesome-bardeen-h0wm5v)自 批681 起算避免撞號 | 候 | 操作員 | 回該 session 按 go(全格子→commit→push)或裁「棄」;併線時版號對表 |
-| Z58 | 一頁交接三處(倉根 VIA_HANDOVER_LATEST.md / docs ONEPAGE / 頁)停在 批554(2026-09-17),律冊已 批662、逐批 B 文已 679;L15 三處同一份但都舊;收尾清單#2 `via-vcgc page --publish` 自 批554 未跑 | 未做 | AI | 下一批發布前先 `via-vcgc status` 看容器 ABSENT 段;工作站跑更準 |
+| ~~Z58~~ | ~~一頁交接三處(倉根 VIA_HANDOVER_LATEST.md / docs ONEPAGE / 頁)停在 批554(2026-09-17),律冊已 批662、逐批 B 文已 679;L15 三處同一份但都舊;收尾清單#2 `via-vcgc page --publish` 自 批554 未跑~~ | **已結(批688)**:`via-vcgc page --publish`(VCGC v0119)三處同一份(一頁 md · 倉根副本 · 頁),〇 換 `VIA_AI_Handover_Prompt_v0101.md`、八 換 `VIA_Handover_20260921_B688.md`;動態段是容器快照(工作站以最新一次 `via-vcgc onepage` 為準) | — | 每批收尾都要再 --publish 一次(B 清單 #2) |
 | Z59 | 律冊 lessons 停在 LL305(批662);批663–679d 的 LL306–LL335 只在 docs/commit 訊息,未入 VIA_Policy_Laws_SSOT(政策庫是批號正本,VCGC 因此印 批662) | 未做 | AI | 逐條從 docs/commit 收回冊(只增不減;id 不改;先對表再寫) |
 | Z60 | 六層鏈跑器 MDL172 對 import 缺件判 RED(容器 16 紅:VRN_SystemManager 拆成 缺件 10+ · 缺料 1 · 其餘 5);L16 缺件≠壞掉;Z54 HARDIMP 同族 | 未做 | AI | MDL172 v0102:ModuleNotFoundError→ABSENT 並具名缺哪個套件;批681 先由對接口拆開講、不改鏈跑器的燈 |
 | Z61 | 讀券商冊的活尾版 9/10 未過拒絕閘(CGC_MDL176 status 實跑;含中央樞紐 SUP_MDL749 v0110 與 ENG086 v0109;只有 vrn_finlex v0107 過閘) | 未做 | AI(單獨一批) | SUP_MDL749 解析道改走 resolve()(拒絕→正典→疊加→聯集)+ 自測;側線 PR #53 的 v0111 也要一起看 |
@@ -85,7 +85,7 @@
 | Z67 | 姊妹倉 VIA-VDF-VRN 7 個 open PR(#2/#3/#5 自 09-10 起 dirty;#23 含 VRN_PanoramaProbe 未併;#21/#29;#35 效能 7.9×)· main 無 functional modules/VRN · 20 支 vrn-*.ts(2,470 行含測試)與母倉 VRN 引擎無對表 | 候 | 操作員 | 裁哪些關/併;要對表我就出 |
 | Z68 | 姊妹倉 VIA_EnvManager.py:main 4,218 行(v0300)vs 操作員 clone 328 行(批469 已知,未見「已拉最新」實錄);.vercel/output 內另有 39 行舊產物 | 操作員的手 | 操作員 | `git -C C:\Users\tonyk\Github\VIA-VDF-VRN pull` 後貼回 `python public\via\VIA_EnvManager.py --help` 首行 |
 | Z69 | 側線 PR #53 的 VRN 件已於 批682 原樣收進本線(ENG088 · 749 v0111 · 收容包 31 · 單元測試 · 交接文 · Deck v0158 · Manager v0147 · Register v0241 · 啟動器 v0101 · 梭);PR #53 剩 VDF 審視文 + Grid v0431 + 它自己的再生冊;併 PR #53 時元件冊/台帳/索引冊/規格冊/總控頁會衝突 | 候 | 操作員 | 以本線為準併(再 `via-vcgc registry-sync --apply`)或關 PR #53 改併本線 |
-| Z70 | 第三條線 `claude/brave-goldberg-ri5k42`:側線 session(01YJPv…)07:52 狀態「awaiting push of claude/brave-goldberg-ri5k42 to read session VRN logic」;遠端尚無此分支;出現後三線對表(版號 LL334 · 台帳 · 冊)再併 | 候 | 操作員 | 推上來後貼回分支名,我出對表 |
+| ~~Z70~~ | ~~第三條線 `claude/brave-goldberg-ri5k42`:側線 session(01YJPv…)07:52 狀態「awaiting push of claude/brave-goldberg-ri5k42 to read session VRN logic」;遠端尚無此分支;出現後三線對表(版號 LL334 · 台帳 · 冊)再併~~ | **已結(批688)**:brave-goldberg 線已出現並併入 main(PR #58 批682B · PR #61 批687);三線對表見 `VIA_Handover_20260921_B688.md` 三/四 | — | — |
 | Z71 | Register v0241 / Invoke-VIA-VRN v0101 / via-ssotadd 兩梭:側線在操作員令「註冊這些」下造(L70 逐次許可寫在其交接文二-3);批682 原樣搬入本線未改一位元;若不認可刪三檔即回退;`via-vrnsys` 仍未登,下一版 v0242 | 候 | 操作員 | 認可=不動;不認可=刪檔 |
 | Z72 | 實測樣本夾(操作員 2026-09-21 令「實測樣本(隨時更新):C:\測試樣本報告」)已登冊 `user.vrn_dir`(via-console set;changelog 留痕);以後不帶 --in 的 VRN 跑法都吃它;容器 ABSENT 誠實;Z51 掛進 AI 境仍是你的手 | 操作員的手 | 操作員 | 工作站 `via-vrnrun` 貼回 V2 取件數(應 ≈ 60 PDF + 4 DOCX,隨時更新以貼回為準) |
 | Z73 | VRN_ENG088(側線稽核件)掛在索引冊 OFF_BOOK_PENDING(via_vrn_logic_book v0105):上不上架構冊、上哪一層(L3 驗證?)=架構裁定 | 候 | 操作員 | 一句「上 L3」或「不上」我就落冊 |
@@ -102,3 +102,4 @@
 | Z84 | 工作站 V2 三盞紅有兩盞根因未定:SUP_MDL746 九檢 FAIL 1(容器 9/9)· CGC_MDL141 ⑭(容器 14/14;⑭ 用固定夾具比 MDL139 與本檔解出的報告夾是否一致,候選根因=工作站 MDL139 尾版不同) | 候 | 操作員 | 貼回兩支 `--selftest` 的 FAIL 行(批685 六節 PS) |
 | Z85 | ENG068 ⑨ features_daily 2026-09-14 因子覆蓋 530/1978=26.8%:⑨ 要求最新完整日 100%;是因子鏈沒跑全宇宙(資料缺),不是引擎壞 | 操作員的手 | 操作員 | `via-vdffetch`(3a/3b 因子段)後 `via-vrnrun` 看 ⑨ |
 | Z86 | **VCGC v0119 撞號**:main(PR #58 brave-goldberg:執行期境不進等式 ㉕)與側線 busy-bell(`+vdf_system` 段 ㉕)各有一份**內容不同**的 `CGC_MDL149_…_v0119.py`;Grid v0434 亦只在 busy-bell(本線已取 v0435 避開)。併 busy-bell 時 VCGC 必撞 | 候 | 操作員/側線 | 側線那份改 v0120 並把 main v0119 的執行期境律一起帶上,再併;或先併本線再由我出聯集版 |
+| Z87 | **批687 撞號**:awesome-bardeen 62d38dd4「第一次真跑 --verify 讀對了」也取了 批687(未併);main 的 批687 是本線 cd2ac7a3/4c872e25(PR #61 已併)。先併 main 的贏,那條線改 687B 或下一號;LL334 今天第四次 | 候 | 操作員轉告 | 它改號後本列劃線 |
