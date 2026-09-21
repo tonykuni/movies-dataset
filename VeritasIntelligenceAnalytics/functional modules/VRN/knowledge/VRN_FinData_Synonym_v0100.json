@@ -1,10 +1,32 @@
 {
  "schema": "VIA.VRN.FinDataSynonym.v1",
- "generated": "2026-08-19 00:04:01",
+ "generated": "2026-09-20 18:11:43",
  "policy": "中英文同義字庫;多源並列 sources 標註不仲裁;收割自倉內正本",
  "count": 195,
  "multi_source": 105,
  "folded": 4,
+ "bridge_policy": "批663 只增不減搭橋:辨識式空的鍵指向有式的同一件事;alias_index=冊記 merged_from 反查(鍵被摺掉、名字還在被喊)、same_as=同中文名逐字相同。兩條車道只取冊上既有的字,零新造詞;接不上的入 pending_operator 待裁定(LL90)",
+ "same_as_count": 13,
+ "ruled_b665": {
+  "BRIDGE": 10,
+  "SYNTH": 5,
+  "DERIVED": 3,
+  "DIMENSION": 1
+ },
+ "intentionally_no_pattern": [
+  "ebit",
+  "eps_qoq",
+  "period",
+  "sales_qoq"
+ ],
+ "intentionally_no_pattern_why": "批665 裁定:DERIVED 是算出來的(頁面上沒有那一行)、DIMENSION 不是財務數字。給它們辨識式等於宣稱認得出一個不存在的東西——那是假綠。**刻意留白不等於待裁定**,所以不進 pending_operator",
+ "alias_index": {
+  "pe": "pe_ratio",
+  "pb": "pb_ratio",
+  "eps_diluted": "diluted_eps",
+  "eps_basic": "basic_eps"
+ },
+ "pending_operator": [],
  "metrics": {
   "cash": {
    "zh": "現金及約當現金",
@@ -4214,7 +4236,9 @@
    "mops_official": [
     "營業費用合計"
    ],
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "total_operating_expenses",
+   "same_as_basis": "同中文名逐字相同"
   },
   "pretax_income": {
    "zh": "稅前純益",
@@ -4299,7 +4323,9 @@
     "earnings_per_share"
    ],
    "vrn_uid": "VRN_FIN_0055",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "basic_eps",
+   "same_as_basis": "同中文名逐字相同"
   },
   "diluted_eps": {
    "zh": "稀釋每股盈餘",
@@ -4607,7 +4633,15 @@
     "VRN_Method_SSOT_v0100.json",
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "cost_of_sales",
+    "why": "共有「營業成本」「銷貨成本」兩個字;cost_of_sales 5 式 > cogs 1 式",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "cost_of_sales",
+   "same_as_basis": "批665 裁定:共有「營業成本」「銷貨成本」兩個字;cost_of_sales 5 式 > cogs 1 式"
   },
   "basic_eps": {
    "zh": "基本每股盈餘",
@@ -5190,7 +5224,9 @@
     "twstock": "tax_expense",
     "yfinance": "incomeTaxExpense"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "income_tax",
+   "same_as_basis": "同中文名逐字相同"
   },
   "share_capital": {
    "zh": "股本",
@@ -5219,7 +5255,15 @@
     "twstock": "share_capital",
     "yfinance": "commonStock"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "common_stock",
+    "why": "共有三個字「股本」「實收資本」「普通股股本」;common_stock 7 式",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "common_stock",
+   "same_as_basis": "批665 裁定:共有三個字「股本」「實收資本」「普通股股本」;common_stock 7 式"
   },
   "shareholders_equity": {
    "zh": "股東權益",
@@ -5249,7 +5293,15 @@
     "twstock": "shareholders_equity",
     "yfinance": "totalEquity"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "total_equity",
+    "why": "共有「權益合計」「股東權益」「淨值」。**口徑註記:total_equity 是「權益總計」= 含非控制權益**;ROE 的分母要用 parent_equity,拿總權益當分母 ROE 會偏低而且看起來完全正常(ENG074 v0112 docstring 記過這個坑)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "total_equity",
+   "same_as_basis": "批665 裁定:共有「權益合計」「股東權益」「淨值」。**口徑註記:total_equity 是「權益總計」= 含非控制權益**;ROE"
   },
   "free_cashflow": {
    "zh": "自由現金流",
@@ -5275,7 +5327,9 @@
     "twstock": "free_cashflow",
     "yfinance": "freeCashflow"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "fcf",
+   "same_as_basis": "同中文名逐字相同"
   },
   "cashflow_per_share": {
    "zh": "每股現金流",
@@ -5300,7 +5354,15 @@
    "field_map": {
     "twstock": "cashflow_per_share"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "operating_cf_per_share",
+    "why": "本欄 synonyms_zh 自己就寫著「每股營業現金流」——冊自己認的,不是我認的",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "operating_cf_per_share",
+   "same_as_basis": "批665 裁定:本欄 synonyms_zh 自己就寫著「每股營業現金流」——冊自己認的,不是我認的"
   },
   "sales_per_share": {
    "zh": "每股營收",
@@ -5325,7 +5387,9 @@
    "field_map": {
     "twstock": "sales_per_share"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "revenue_per_share",
+   "same_as_basis": "同中文名逐字相同"
   },
   "diluted_shares": {
    "zh": "完全稀釋後股數",
@@ -5340,7 +5404,9 @@
     "FD shares",
     "Total diluted shares"
    ],
-   "patterns": [],
+   "patterns": [
+    "(Fully\\ Diluted\\ Shares|Total\\ diluted\\ shares|dilutedAverageShares|diluted_shares|FD\\ shares|完全稀釋後股數|稀釋後流通股數|完全稀釋股本|稀釋後股數)"
+   ],
    "statement": "PER_SHARE",
    "category": "",
    "unit": "",
@@ -5354,7 +5420,14 @@
     "twstock": "diluted_shares",
     "yfinance": "dilutedAverageShares"
    },
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "SYNTH",
+    "target": "",
+    "why": "field_map 已有 twse_tpex「稀釋後股數」;diluted_eps 是**每股盈餘**不是**股數**,不接",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "patterns_synth_b665": true
   },
   "period": {
    "zh": "年份/期間",
@@ -5383,6 +5456,12 @@
    "field_map": {
     "twstock": "period",
     "yfinance": "fiscalYear"
+   },
+   "ruled_b665": {
+    "lane": "DIMENSION",
+    "target": "VRN_ENG074 PERIOD_RX",
+    "why": "「年份/期間」是**維度**不是科目。期間解析已經有專門的一扇門,這本冊再開一扇就是 L101 的反面",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
    }
   },
   "operating_expense": {
@@ -5408,7 +5487,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0004",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "operating_expenses",
+   "same_as_basis": "同中文名逐字相同"
   },
   "depreciation_and_amortization": {
    "zh": "折舊及攤銷",
@@ -5431,7 +5512,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0009",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "depreciation_amortization",
+   "same_as_basis": "同中文名逐字相同"
   },
   "long_term_investments": {
    "zh": "長期投資",
@@ -5455,7 +5538,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0016",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "long_term_investment",
+   "same_as_basis": "同中文名逐字相同"
   },
   "other_non_current_assets": {
    "zh": "其他非流動資產",
@@ -5478,7 +5563,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0017",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "other_noncurrent_assets",
+   "same_as_basis": "同中文名逐字相同"
   },
   "non_current_liabilities": {
    "zh": "非流動負債",
@@ -5502,7 +5589,15 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0023",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "total_non_current_liabilities",
+    "why": "**候選演算法在這裡給錯了**:它算出最像的是other_noncurrent_liabilities「其他非流動負債」,因為本欄的synonyms_zh 誤收了那五個字。**總額接到子科目會算錯。**「非流動負債」對應的是「非流動負債合計」(3 式)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "total_non_current_liabilities",
+   "same_as_basis": "批665 裁定:**候選演算法在這裡給錯了**:它算出最像的是other_noncurrent_liabilities「其他非流動負債」"
   },
   "parent_equity": {
    "zh": "母公司業主權益",
@@ -5516,7 +5611,9 @@
     "parent equity",
     "equity attributable to owners of parent"
    ],
-   "patterns": [],
+   "patterns": [
+    "(equity\\ attributable\\ to\\ owners\\ of\\ parent|Parent\\ Equity|parent\\ equity|歸屬母公司業主權益|母公司業主權益)"
+   ],
    "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
@@ -5526,7 +5623,14 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0027",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "SYNTH",
+    "target": "",
+    "why": "**不接 total_equity** —— 那是含非控制權益的總額,本欄是歸屬母公司。接過去會讓 ROE 分母悄悄換掉(同 shareholders_equity 那一條的反面)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "patterns_synth_b665": true
   },
   "total_liabilities_and_equity": {
    "zh": "負債及權益總計",
@@ -5549,7 +5653,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0029",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "total_liabilities_equity",
+   "same_as_basis": "同中文名逐字相同"
   },
   "capital_expenditure": {
    "zh": "資本支出",
@@ -5573,7 +5679,15 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0033",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "capex",
+    "why": "冊上 capex(購置不動產廠房設備·7 式)的同義字本來就含「資本支出」",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "capex",
+   "same_as_basis": "批665 裁定:冊上 capex(購置不動產廠房設備·7 式)的同義字本來就含「資本支出」"
   },
   "working_capital_change": {
    "zh": "營運資金變動",
@@ -5586,7 +5700,9 @@
     "working capital change",
     "change in working capital"
    ],
-   "patterns": [],
+   "patterns": [
+    "(change\\ in\\ working\\ capital|Working\\ Capital\\ Change|working\\ capital\\ change|營運資金變動)"
+   ],
    "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
@@ -5596,7 +5712,14 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0038",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "SYNTH",
+    "target": "",
+    "why": "冊上零對應鍵;自冊上既有同義字合成",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "patterns_synth_b665": true
   },
   "long_term_investment_change": {
    "zh": "長期投資變動",
@@ -5609,7 +5732,9 @@
     "long term investment change",
     "change in long term investment"
    ],
-   "patterns": [],
+   "patterns": [
+    "(change\\ in\\ long\\ term\\ investment|Long\\ Term\\ Investment\\ Change|long\\ term\\ investment\\ change|長期投資變動)"
+   ],
    "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
@@ -5619,7 +5744,14 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0039",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "SYNTH",
+    "target": "",
+    "why": "冊上 long_term_investment「長期投資」是**餘額**,本欄是**變動**;接過去會把存量當流量",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "patterns_synth_b665": true
   },
   "debt_change": {
    "zh": "長借公司債變動",
@@ -5632,7 +5764,9 @@
     "Debt Change",
     "debt change"
    ],
-   "patterns": [],
+   "patterns": [
+    "(Debt\\ Change|debt\\ change|長借/公司債變動|長借公司債變動)"
+   ],
    "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
@@ -5642,7 +5776,14 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0040",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "SYNTH",
+    "target": "",
+    "why": "現金流量表真的有這一行,但正本沒給式;冊上也沒有「長借公司債變動」的有式鍵(long_term_borrowings 是**餘額**不是**變動**,接過去會把存量當流量)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "patterns_synth_b665": true
   },
   "cash_dividend_paid": {
    "zh": "發放現金股利",
@@ -5665,7 +5806,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0041",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "dividends_paid",
+   "same_as_basis": "同中文名逐字相同"
   },
   "cash_capital_increase": {
    "zh": "現金增資",
@@ -5687,7 +5830,9 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0042",
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "stock_issuance",
+   "same_as_basis": "同中文名逐字相同"
   },
   "cfps": {
    "zh": "每股現金流",
@@ -5710,7 +5855,15 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0057",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "cashflow_per_share",
+    "why": "與 cashflow_per_share 中文名逐字相同(都是「每股現金流」);它自己也沒式,所以要**再跳一手**到 operating_cf_per_share",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "cashflow_per_share",
+   "same_as_basis": "批665 裁定:與 cashflow_per_share 中文名逐字相同(都是「每股現金流」);它自己也沒式,所以要**再跳一手**到 "
   },
   "sales_yoy": {
    "zh": "營收年增率",
@@ -5733,7 +5886,15 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0059",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "revenue_growth",
+    "why": "共有字「營收年增率」;revenue_growth 5 式",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "revenue_growth",
+   "same_as_basis": "批665 裁定:共有字「營收年增率」;revenue_growth 5 式"
   },
   "eps_yoy": {
    "zh": "eps年增率",
@@ -5755,7 +5916,15 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0060",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "eps_growth",
+    "why": "共有字「eps年增率」;年增率研報真的會印,eps_growth 有 3 式",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "eps_growth",
+   "same_as_basis": "批665 裁定:共有字「eps年增率」;年增率研報真的會印,eps_growth 有 3 式"
   },
   "sales_qoq": {
    "zh": "營收季增率",
@@ -5778,7 +5947,13 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0061",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "DERIVED",
+    "target": "revenue 本季 ÷ revenue 上季 − 1",
+    "why": "同 eps_qoq:季增率沒有一行印在報表上。「同上」這種憑據在單獨看這一列時等於沒有憑據(L96 舉證要能整份帶走),所以寫全",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   }
   },
   "eps_qoq": {
    "zh": "eps季增率",
@@ -5800,7 +5975,13 @@
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0062",
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "DERIVED",
+    "target": "eps 本季 ÷ eps 上季 − 1",
+    "why": "季增率沒有一行印在報表上(年增率相反,研報會印「每股盈餘成長率」,所以 eps_yoy 走 BRIDGE)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   }
   },
   "op_profit": {
    "zh": "營業利益",
@@ -5822,7 +6003,9 @@
     "VRN_Financial_Synonyms_SSOT.py",
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "operator_filled": true
+   "operator_filled": true,
+   "same_as": "operating_income",
+   "same_as_basis": "同中文名逐字相同"
   },
   "ebit": {
    "zh": "",
@@ -5840,7 +6023,13 @@
     "VRN_Financial_Synonyms_SSOT.py",
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "DERIVED",
+    "target": "operating_income + 營業外收支(非利息非稅)",
+    "why": "台灣財報**沒有「EBIT」這一行**。給它辨識式等於宣稱認得出一個不存在的東西,那是假綠。接到 operating_income 也不對:兩者不相等(差在營業外收支)",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   }
   },
   "ocf": {
    "zh": "營業現金流",
@@ -5860,7 +6049,15 @@
     "VRN_Financial_Synonyms_SSOT.py",
     "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "operator_filled": true
+   "operator_filled": true,
+   "ruled_b665": {
+    "lane": "BRIDGE",
+    "target": "operating_cash_flow",
+    "why": "三個名字指同一件事(ocf「營業現金流」· operating_cf「營業活動現金流」1 式 · operating_cash_flow「營業活動淨現金流入(出)」4 式)。取式最多、而且它的中文名正是財報上那一行的正式寫法",
+    "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成字洞」)"
+   },
+   "same_as": "operating_cash_flow",
+   "same_as_basis": "批665 裁定:三個名字指同一件事(ocf「營業現金流」· operating_cf「營業活動現金流」1 式 · operating_c"
   }
  }
 }
