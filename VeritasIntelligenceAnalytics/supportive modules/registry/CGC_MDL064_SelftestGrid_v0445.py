@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0444→v0445(批690 疊在 main v0444(批691B envmanager 線)上;本線 v0444 又與其撞名,併線取 main,本線內容再疊一次 LL334):
+  三站 rc0 → **nodata_ok**:調整後價格層(ENG060 v0106)· 因子庫(ENG061 v0104)· 族群聚合因子層(ENG062 v0103);
+  故事輪動橋(ENG072 v0103)站名補「NODATA 在 run/export 也 rc2 停」。表不在=缺料 rc2 並指路(L16),不吃料的檢兩條路都跑;門檻一字沒動。站數不變。
 v0443→v0444(批691B 工具與支援性模組盤點 + 棘輪 + 撞號;v0443 已被主線先併,
   照 LL334 版號還給先併的那一份,本批從**主線 v0443** 長):
   +一站「工具盤點與歷來最佳棘輪十六檢」(CGC_MDL178)。
@@ -2118,14 +2121,14 @@ def battery(fast: bool):
     add("每日觀察摘要八檢(批174;批689B 缺料 SKIP=rc2 不是壞)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "nodata_ok", 300)
     add("系統憲章對照八檢(批175)", newest("CGC_MDL091_CharterAudit_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("驗證共識庫八檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300)
-    add("調整後價格層八檢(批178)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
+    add("調整後價格層八檢(批178;批690 原始價表不在=NODATA rc2 不是壞,⑦⑧ 不吃料照檢)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
     add("引擎簡化稽核八檢(批179)", newest("CGC_MDL092_ConsolidationAudit_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("工具升階梯十檢(批181/424)", newest("SUP_MDL742_ToolLadder_v*.py", VIA / "supportive modules" / "network"), ["--selftest"], "rc0", 300)
     add("GLE 全後端統轄橋九檢(批421)", newest("SUP_MDL743_GenericLayoutHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("NLP 應用系統統轄橋十一檢(批421)", newest("SUP_MDL744_NLPApplicationHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("WorkPulse 整合門面九檢(批185)", newest("VIA_ENG170_WorkPulseUnified_v*.py", VIA / "functional modules/WorkOps"), ["--selftest"], "rc0", 300)
-    add("因子庫九檢(批188)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
-    add("族群聚合因子層八檢(批193)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
+    add("因子庫九檢(批188;批690 調整層不在=NODATA rc2 不是壞,⑨ 不吃料照檢)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
+    add("族群聚合因子層八檢(批193;批690 因子庫不在=NODATA rc2 不是壞)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
     add("月營收分析九檢(批194)", newest("VDF_ENG063_MonthlyRevenue_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("Yahoo 共識八檢(批194)", newest("VRN_ENG070_YahooConsensus_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("鉅亨 FactSet 共識九檢(批199)", newest("VRN_ENG071_CnyesFusion_v*.py", VRN), ["--selftest"], "rc0", 300)
@@ -2336,7 +2339,7 @@ def battery(fast: bool):
     add("族群回測六檢(批321;存證缺=誠實停 rc2)",
         newest("VDF_ENG071_GroupBacktest_v*.py", VIA / "functional modules/VDF/engine"),
         ["--selftest"], "nodata_ok", 600)
-    add("故事輪動橋八檢(批596 登站;上游籌碼表缺=誠實 NODATA 不報紅)",
+    add("故事輪動橋八檢(批596 登站;上游籌碼表缺=誠實 NODATA 不報紅;批690 名冊/價/調整層六張一次探,NODATA 在 run/export 也 rc2 停)",
         newest("VDF_ENG072_StoryRotationBridge_v*.py", VIA / "functional modules/VDF/engine"),
         ["--selftest"], "nodata_ok", 600)
     add("VAP ONE 單檔整合引擎 72 檢(批383)", newest("VAP_ENG016_AutoplotOne_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
