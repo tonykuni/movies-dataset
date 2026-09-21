@@ -378,6 +378,83 @@ def purge_json_generic(o, dropped=None, path=""):
     return o
 
 
+GROUP_RX = (
+    re.compile(r"^(?P<base>[A-Za-z_.]+)\[(?P<idx>\d+)\]"),          # brokers[11].country
+    re.compile(r"^(?P<base>email_domain_to_broker\.[^.]+)\."),       # email_domain_to_broker.gf.com.cn.*
+    re.compile(r"^(?P<base>def_vrn_report_ssot\.broker_alias_extension\.records\.[A-Za-z]+)"),
+)
+
+
+def _group_of(key: str):
+    """扁平化鍵屬於哪一個**群組**。`brokers[11].country` 的群組是 ('brokers', 11)。"""
+    for rx in GROUP_RX:
+        m = rx.match(str(key or ""))
+        if m:
+            d = m.groupdict()
+            return (d["base"], int(d["idx"]) if d.get("idx") else None)
+    return None
+
+
+def purge_json_grouped(rows: list, key_field: str) -> tuple:
+    """扁平化清冊:一個群組裡**只要有一片葉子是陸券,整個群組都要走**,然後重新編號。
+
+    批679 實錄(Codex 在 PR #55 照出的 P1,照得對):
+      第一輪我只刪了「值是陸券」的那幾列,於是 `brokers[11]` 的
+      canonical / canonical_en / aliases[0..3] 沒了,
+      country=China · rank=12 · alias_count=4 · source_layers[0] 卻留在原地。
+      而清乾淨後的 VRN_BROKER_LIST 裡 index 11 已經變成**里昂 CLSA**
+      ——任何人照這份扁平冊重建參數,就會得到「**里昂穿著廣發的 metadata**」。
+      刪一片葉子留下一個無頭群組,比不刪還危險:它看起來是完整的一筆。
+
+    所以兩件事一起做:**整組刪**,而且**把後面的 index 往前補**,
+    讓 `brokers[N]` 跟清乾淨後的冊逐位對得起來。
+    """
+    groups, loose, order = {}, [], []
+    for r in rows:
+        g = _group_of(r.get("def_preferred_key", ""))
+        if g is None:
+            loose.append(r)
+            continue
+        if g not in groups:
+            groups[g] = []
+            order.append(g)
+        groups[g].append(r)
+    banned = {g for g, rs in groups.items()
+              if any(is_cn_alias(r.get("def_preferred_value")) or is_cn_canon(r.get("def_preferred_value"))
+                     for r in rs)}
+    dropped = [{"group": str(g), "rows": len(groups[g]),
+                "values": [r.get("def_preferred_value") for r in groups[g]]} for g in sorted(banned, key=str)]
+    # 同一個 base 底下的 index 重新編號(只動被刪掉那一組之後的)
+    shift = {}
+    for base in {g[0] for g in groups if g[1] is not None}:
+        idxs = sorted(g[1] for g in groups if g[0] == base and g[1] is not None)
+        n = 0
+        for i in idxs:
+            if (base, i) in banned:
+                continue
+            shift[(base, i)] = n
+            n += 1
+    out, renum = [], 0
+    for r in rows:
+        g = _group_of(r.get("def_preferred_key", ""))
+        if g is None:
+            out.append(r)
+            continue
+        if g in banned:
+            continue
+        if g[1] is not None and shift.get(g) not in (None, g[1]):
+            new_i = shift[g]
+            r = dict(r)
+            old_pk, old_kf = r["def_preferred_key"], str(r.get(key_field, ""))
+            r["def_preferred_key"] = re.sub(r"^(%s)\[%d\]" % (re.escape(g[0]), g[1]),
+                                            r"\1[%d]" % new_i, old_pk)
+            r[key_field] = re.sub(r"^(%s)_%d_" % (re.escape(g[0]), g[1]),
+                                  r"\1_%d_" % new_i, old_kf)
+            renum += 1
+        out.append(r)
+    return out, dropped, renum
+
+
 # 第二輪:通吃型清除 + 兩處**改正**(不是刪——那兩筆是台灣的中國信託被寫成「中信證券」)
 PASS2_JSON = (
     "functional modules/VRN/SSOT/VRN_Report_Parser_Integrated_SSOT.json",
@@ -528,13 +605,37 @@ def scan() -> dict:
     return plan
 
 
-def apply() -> int:
+def preflight() -> list:
+    """**動任何一個位元之前**,把所有會擋下來的事先問完。
+
+    批679 實錄(Codex 在 PR #55 照出的 P2,照得對):
+      Hydra 守衛(目標版號已存在就拒寫)原本寫在引擎那一圈,
+      而 JSON 與就地改的 .py **在那之前就已經寫下去了**。
+      於是「版號撞了」會回 rc=1,但倉庫已經是**改了一半**的狀態,
+      而且 `_merge_ledger` 還沒跑 → **那些改動連台帳都沒有**。
+      擋要擋在第一次寫之前,不然叫「失敗之後留下一個爛攤子」。
+    """
+    stop = []
     plan = scan()
-    blocked = [r for r in plan["py"] + plan["engine"] if r["blocked"]]
-    if blocked:
-        for r in blocked:
-            print("[擋] %s · %s" % (r["rel"], r["blocked"]))
+    for r in plan["py"] + plan["engine"]:
+        if r["blocked"]:
+            stop.append("%s · %s" % (r["rel"], r["blocked"]))
+    for r in plan["engine"]:
+        if r["spans"] and (VIA / r["rel"]).with_name(r["next"]).exists():
+            stop.append("%s 已存在=Hydra 守衛(版號只往前)" % r["next"])
+    for rel in plan["missing"]:
+        stop.append("落點不在位:%s" % rel)
+    return stop
+
+
+def apply() -> int:
+    stop = preflight()
+    if stop:
+        for x in stop:
+            print("[擋] %s" % x)
+        print("[擋] **一個位元都沒有動**——擋在第一次寫之前(批679 P2)")
         return 1
+    plan = scan()
     led = {"schema": "VIA.ChinaBrokerPurge.Ledger.v1", "version": VERSION, "batch": BATCH,
            "ts": datetime.now().strftime("%Y-%m-%d %H:%M"), "ruled_by": RULED_BY,
            "why": "操作員批679 令「刪中國券商」。只增不減由操作員親自解除;"
@@ -571,8 +672,8 @@ def apply() -> int:
         if n == 0:
             continue
         nxt = p.with_name(_bump(p.name))
-        if nxt.exists():
-            print("[拒寫] %s 已存在=Hydra 守衛(版號只往前)" % nxt.name)
+        if nxt.exists():   # preflight() 應該已經擋掉;留著當殿後,真到這裡就是 preflight 漏了
+            print("[拒寫] %s 已存在=Hydra 守衛(preflight 漏網,請看 preflight())" % nxt.name)
             return 1
         head = ("# %s:依操作員令「刪中國券商」自 %s 升版——別名表移出陸券(%s)。\n"
                 "#   舊版一個位元不動;刪掉的原文在 %s。\n"
@@ -732,7 +833,23 @@ def restore() -> int:
         p.write_text(f["original"], encoding="utf-8")
         n += 1
         print("[還原] %s" % f["path"])
-    print("[還原] %d 檔回到刪之前" % n)
+    # 批679 實錄(Codex 在 PR #55 照出的 P3,照得對):
+    #   台帳裡要是**漏了** py_newversion 這一類,restore 跑完那幾支升版檔還在,
+    #   而尾版律只認最新那一份 → 解析照樣走清乾淨後的表,
+    #   也就是「還原了」這句話是假的。所以還原完要**逐支驗它真的不在了**。
+    left = [f["new"] for f in led["files"]
+            if f["kind"] == "py_newversion" and (VIA / f["new"]).exists()]
+    created = [f.get("new") for f in led["files"] if f["kind"] == "py_newversion"]
+    print("[還原] %d 檔回到刪之前 · 本批造出的版本檔 %d 支 · 還沒清掉 %d 支"
+          % (n, len(created), len(left)))
+    if left:
+        for x in left:
+            print("  [殘留] %s" % x)
+        return 1
+    if not created:
+        print("  [警] 台帳裡一筆 py_newversion 都沒有——這一批真的沒有升版,"
+              "還是台帳漏記了?漏記的話 restore 是假的(批679 P3)")
+        return 2
     return 0
 
 
@@ -915,9 +1032,43 @@ def selftest() -> int:
     chk("㉚ 零網路零開庫:本支只讀寫檔,不 import duckdb/requests,不跑 subprocess",
         not any(m in Path(__file__).read_text(encoding="utf-8").split("def selftest(")[0]
                 for m in ("import duckdb", "import requests", "subprocess", "urllib.request")))
-    print("=== CGC_MDL177 陸券清除閘 v%s · 卅一檢自測(零網路;預設零寫;真冊只讀副本)===" % VERSION)
+    # ── Codex 在 PR #55 照出的三條,各配一個會咬人的檢(批679d)────────────
+    _rows = [{"def_preferred_key": "brokers[0].canonical", "def_preferred_value": "YUANTA", "def_normalized_key": "brokers_0_canonical"},
+             {"def_preferred_key": "brokers[1].canonical", "def_preferred_value": "GF", "def_normalized_key": "brokers_1_canonical"},
+             {"def_preferred_key": "brokers[1].country", "def_preferred_value": "China", "def_normalized_key": "brokers_1_country"},
+             {"def_preferred_key": "brokers[1].rank", "def_preferred_value": "12", "def_normalized_key": "brokers_1_rank"},
+             {"def_preferred_key": "brokers[2].canonical", "def_preferred_value": "CLSA", "def_normalized_key": "brokers_2_canonical"},
+             {"def_preferred_key": "brokers[2].country", "def_preferred_value": "HK", "def_normalized_key": "brokers_2_country"}]
+    _out, _drp, _rn = purge_json_grouped(_rows, "def_normalized_key")
+    _keys = {r["def_preferred_key"]: r["def_preferred_value"] for r in _out}
+    chk("㉛ **整組刪**:群組裡只要有一片葉子是陸券,country/rank 那幾列也要一起走"
+        "(Codex PR #55 P1:留下無頭群組比不刪還危險,它看起來是完整的一筆)",
+        len(_drp) == 1 and "China" not in _keys.values() and "12" not in _keys.values(),
+        "刪 %d 組 · 剩 %s" % (len(_drp), sorted(_keys)))
+    chk("㉛b **重新編號**:刪掉 index 1 之後,原本的 index 2 要補上來,"
+        "不然扁平冊的 brokers[N] 會跟清乾淨後的冊對不起來(里昂穿著廣發的 metadata)",
+        _keys.get("brokers[1].canonical") == "CLSA" and _keys.get("brokers[1].country") == "HK"
+        and _rn == 2, "brokers[1]=%s · 重編 %d 列" % (_keys.get("brokers[1].canonical"), _rn))
+    chk("㉛c 負控:沒有陸券的群組一組都不准被動到",
+        purge_json_grouped([r for r in _rows if "GF" not in str(r["def_preferred_value"])
+                            and "China" not in str(r["def_preferred_value"])
+                            and "12" != r["def_preferred_value"]], "def_normalized_key")[1] == [])
+    chk("㉜ **擋在第一次寫之前**:preflight() 把所有會擋的事先問完"
+        "(Codex PR #55 P2:守衛寫在後面=失敗時留下改了一半又沒有台帳的倉庫)",
+        "def preflight()" in Path(__file__).read_text(encoding="utf-8")
+        and Path(__file__).read_text(encoding="utf-8").index("def preflight()")
+        < Path(__file__).read_text(encoding="utf-8").index("def apply()")
+        and isinstance(preflight(), list), "本樹 preflight 擋 %d 件" % len(preflight()))
+    _led = _j("supportive modules/registry/VIA_ChinaBrokerPurge_Ledger_v0100.json") if LEDGER.exists() else None
+    _nv = [f for f in (_led or {}).get("files", []) if f["kind"] == "py_newversion"]
+    chk("㉝ **台帳要記下每一個升版檔**,restore 才不是假的"
+        "(Codex PR #55 P3:漏記 → restore 跑完升版檔還在 → 尾版律照樣走清乾淨後的表)",
+        _led is not None and len(_nv) == len(ENGINE_TARGETS)
+        and all((VIA / f["new"]).exists() for f in _nv),
+        "py_newversion %d 筆 / 引擎落點 %d 個" % (len(_nv), len(ENGINE_TARGETS)))
+    print("=== CGC_MDL177 陸券清除閘 v%s · 卅六檢自測(零網路;預設零寫;真冊只讀副本)===" % VERSION)
     print("\n".join(lines))
-    print("  [計] 卅一檢 OK %d · FAIL %d" % (ok, fail))
+    print("  [計] 卅六檢 OK %d · FAIL %d" % (ok, fail))
     return 0 if fail == 0 else 1
 
 
