@@ -6184,6 +6184,62 @@
          "--dir"
         ]
        }
+      },
+      {
+       "id": "vrn_ssot_additive",
+       "zh": "⑯ SSOT 增補審計橋(ENG088;側線 2026-09-21;收容包自帶測試在暫存副本實跑+收容夾 sha256 前後對 · 包內尺 vs 正典落差每列帶下一步 · 候選一律 PENDING_OPERATOR;零網路零寫庫;只落 VIA_Reports/vrn/ssot_additive;不在六層鏈上,是稽核件;verb=status 唯讀,test_verb=--selftest;tests/drift/candidates 由短令 via-ssotadd 走)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG088_SsotAdditiveBridge_v*.py",
+        "verb": [
+         "status"
+        ]
+       },
+       "params": [
+        "out",
+        "limit",
+        "timeout"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vrn/ssot_additive/RUN_<ts>/TESTS.json",
+        "VIA_Reports/vrn/ssot_additive/RUN_<ts>/DRIFT.json",
+        "VIA_Reports/vrn/ssot_additive/RUN_<ts>/CANDIDATES.json"
+       ],
+       "timeout": 900,
+       "test_verb": [
+        "--selftest"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "management",
+     "zh": "管理對接口(批681;VIA→VRN 下行讀取一律經此;上接 VCGC)",
+     "items": [
+      {
+       "id": "vrn_system",
+       "zh": "VRN 子系統管理對接口(批681;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 交接;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_SystemManager_v*.py",
+        "verb": [
+         "status",
+         "catalog",
+         "links",
+         "read",
+         "sync",
+         "selftest"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vrn_system/VRN_SYSTEM_latest.json",
+        "VIA_Reports/vrn_system/VRN_SYSTEM_latest.md",
+        "VIA_Reports/vrn_system/VIA_VRN_SystemManager_v0100.html",
+        "VIA_Reports/vrn_system/LEDGER.tsv"
+       ]
       }
      ]
     }
@@ -7642,7 +7698,7 @@
    "year_from": "",
    "year_to": ""
   },
-  "vrn_dir": "",
+  "vrn_dir": "C:\\測試樣本報告",
   "vrn_chain": [],
   "vap": {
    "code": "2330",
@@ -7698,6 +7754,16 @@
     },
     "notes": [
      "OK:group_start[etf]=2023-07-01"
+    ]
+   },
+   {
+    "ts": "2026-09-21 08:13",
+    "ops": {
+     "vrn-dir": "C:\\測試樣本報告"
+    },
+    "notes": [
+     "OK:vrn_dir=C:\\測試樣本報告",
+     "MIRROR:1 筆鏡寫 VDF_Input_Interface_Matrix_v0100.json"
     ]
    }
   ],
