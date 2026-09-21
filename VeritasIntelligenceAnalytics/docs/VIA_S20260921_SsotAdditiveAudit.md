@@ -155,7 +155,7 @@
 | P9 | 側線併入治理線 + 批號 | 操作員的手 | 操作員 | 只由一隻手併(L25);台帳/規格/索引冊取聯集 |
 | P10 | 工作站最後一次實測(`via-vrnrun` V1–V5,真研報) | 操作員的手 | 操作員 | 第七段 |
 | P11 | CI 只跑總控契約測試;新單元測試沒進 CI | 候 | 操作員 | 第七段兩行 |
-| P12 | 啟動器 v0101 在工作站實跑驗證(`via-vrnrun` V2 要真的跑出 44 節點) | 操作員的手 | 操作員 | 第七段;若還是 `'r'`,貼回 V2 那幾行 |
+| ~~P12~~ | ~~啟動器 v0101 在工作站實跑驗證~~ | **結案** | — | 操作員貼回 `via-vrnrun`(HEAD e3db1365,點的冊 v0241):V2 印 `=== VRN 六層鏈 · run ===`,GREEN 29 · RED 3 · NODATA 14,與直跑 `via-vrnchain run` 同答;V1/V3/V4/V5 rc=0 |
 | P14 | 工作站六層鏈 3 紅(MDL746 九檢 FAIL 1 · MDL141 ⑭ · ENG068 ⑨)+ ENG072 逾時 180s | 候 | 主線 | 不在側線範圍(三支都不讀樞紐/橋);併線後由主線逐支讀 FAIL 那一行修;ENG072 可用 `via-vrnchain run --only L2` 拉長逾時看它到底要多久 |
 | P13 | 工作站 `references/intake/` 有 autocrlf 舊轉換殘留(至少共識融合引擎那份) | 候 | 操作員 | `git ls-files --eol "VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120.py"` 看 w/crlf;要清就 `git rm --cached` 該檔再 `git checkout -- 該檔`(不動 blob);不清也沒事,尺已把 EOL_ONLY 分開 |
 
