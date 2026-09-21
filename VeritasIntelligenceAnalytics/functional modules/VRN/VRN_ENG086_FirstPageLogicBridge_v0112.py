@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0112→v0113(批691 姊妹倉 VRN 膠囊 c「券商正本對齊」量到:正典鍵對映 ② 對**活表鍵**只中 1/3;疊在 main 的 v0112(批686b 聯集版)上)
-  64 件進件檔名走閘路(樞紐 SUP_MDL749.broker_of → 本橋):59/64 有券商,與姊妹倉探針零差——缺 13 件的是無版號的
-  vrn_d8b_filename_parser(不在六層鏈上、格子無站),不是本橋。但 Daiwa ×4 回 DAIWASECURITIES、JP ×2 回 J.P.MORGAN:
-  MDL176 裁定拼法是「DAIWA SECURITIES」「J.P. MORGAN」(有空白),三張券商表合併後的正典鍵是 DAIWASECURITIES / J.P.MORGAN(無空白),
-  `_canon_key` 逐字 upper() 查表查不到 → 同一家仍兩個名;只有 MEGABANK(本來就無空白)中。
-  ㉒ 拿裁定冊自己的拼法去驗,所以一直綠——**自測讀的是裁定冊的字串,不是活表上的鍵**(自測不讀自測本身的字串)。
-  v0113:對映兩邊都先摺掉非字母數字(DAIWA SECURITIES / DAIWASECURITIES / daiwa-securities 同鍵)再查;六條裁定一條不動、冊零觸碰;
-  二十七檢 +㉗:從 MDL176 裁定冊與**活**券商表現場取交集(不寫死鍵名),每個撞上裁定拼法的表鍵都必須回正典鍵。
-  v0112 的別名層/文字層拒絕閘(㉓–㉖)判準不動;㉕ 的**期望值**改走 _canon_key(表鍵 DAIWASECURITIES 的正確答案是 DAIWA,不是表鍵本身——對映生效後,㉕ 拿表鍵當標準答案就會把對映當誤殺);自測橫幅自 v0110/二十二檢 追到 v0113/二十七檢。
 v0109→v0110(批689B 操作員令「與總管系統 SSOT REGEX 同義字 上傳更新只增不減不衝突 整合好」)
   CGC_MDL176 同義字聯集閘(批678)量到:讀券商冊的活尾版 10 支有 9 支**沒走過拒絕閘**,本支是其中一支——
   而本支的 `_safe_broker_raw` 正是 SUP_MDL749.broker_of 委派的**唯一實作**,ENG073/ENG084/ENG080/ENG083 全經它。
@@ -563,7 +554,7 @@ def nlp_normalize(text: str) -> str:
     return "\n".join(out)
 
 # ═══ 批689B:券商拒絕閘 + 正典鍵對映(委派 CGC_MDL176;冊零觸碰;閘缺席=零回歸)═══
-_G176 = {"tried": False, "mod": None, "deny": set(), "rulings": {}, "rulings_norm": {}, "why": "", "src": ""}
+_G176 = {"tried": False, "mod": None, "deny": set(), "rulings": {}, "why": "", "src": ""}
 
 
 def _gate176() -> dict:
@@ -586,7 +577,6 @@ def _gate176() -> dict:
         _G176["deny_raw"] = [str(x) for x in (base.get("deny_raw") or []) if str(x).strip()]  # 批686b:文字尺要原文
         _G176["rulings"] = {str(k).upper(): (v[0] if isinstance(v, (tuple, list)) else str(v))
                             for k, v in (getattr(m, "KEY_ALIAS_RULINGS", {}) or {}).items()}
-        _G176["rulings_norm"] = {_norm_key(k): v for k, v in _G176["rulings"].items()}   # 批691:摺掉空白/點/連字號後的鍵
         _G176["mod"], _G176["src"] = m, hits[-1].name
         _G176["why"] = f"閘在位 {hits[-1].name}(拒 {len(_G176['deny'])} · 正典鍵對映 {len(_G176['rulings'])})"
     except Exception as exc:
@@ -603,19 +593,11 @@ def _denied_alias(alias: str) -> bool:
     return key in g["deny"]
 
 
-def _norm_key(s) -> str:
-    """批691:鍵比對只看字母數字(DAIWA SECURITIES / DAIWASECURITIES / daiwa-securities 同一把鍵)。"""
-    return re.sub(r"[^A-Z0-9]", "", str(s or "").upper())
-
-
 def _canon_key(canon: str | None) -> str | None:
-    """正典鍵對映:別本冊的拼法(MEGABANK / J.P. MORGAN / IBF …)一律回正典鍵(MEGA / JPM / WATERLAND …)。
-    批691:先逐字查,查不到再以摺掉非字母數字的鍵查——活表鍵 DAIWASECURITIES / J.P.MORGAN 對得上裁定拼法 DAIWA SECURITIES / J.P. MORGAN。"""
+    """正典鍵對映:別本冊的拼法(MEGABANK / J.P. MORGAN / IBF …)一律回正典鍵(MEGA / JPM / WATERLAND …)。"""
     if not canon:
         return canon
-    g = _gate176()
-    k = str(canon).upper()
-    return g["rulings"].get(k) or g["rulings_norm"].get(_norm_key(k), canon)
+    return _gate176()["rulings"].get(str(canon).upper(), canon)
 
 
 def broker_gate_state() -> dict:
@@ -1996,7 +1978,7 @@ def selftest() -> int:
     E, why = load_intake()
     chk("② importlib 載入收容件:TickerFilename/BrokerRatingDict/FieldValidation/CrossValidation/FinancialValidation/FirstPageEngine 齊", E is not None, why)
     if E is None:
-        print(f"  [計] 二十七檢 OK {27 - len(fails) - 25} · FAIL {len(fails) + 25}(收容件缺,後二十五檢略)")
+        print(f"  [計] 二十六檢 OK {26 - len(fails) - 24} · FAIL {len(fails) + 24}(收容件缺,後二十四檢略)")
         return 1
     tf = make_tf(E, {"3706", "2330", "6873"}, {"台積電": "2330", "神達": "3706", "泓德能源": "6873"})
     fn1 = "【國泰證期研究部】神達(3706 TT)-初次評等買進(+30.4_)-大顯神威，營運騰達-20250822.pdf"
@@ -2201,7 +2183,7 @@ def selftest() -> int:
              if d.lower() != a.lower() and d.lower() in a.lower() and len(a) > len(d)]
     _short = [(d, a) for d in _keys for a in _amap
               if d.lower() != a.lower() and a.lower() in d.lower() and len(a) < len(d)]
-    _lbad = [a for d, a in _long if safe_broker_ev(f"本報告由{a}研究部出具")[0] != _canon_key(_amap[a])]   # 批691:期望值也走正典鍵(表鍵 DAIWASECURITIES 的答案是 DAIWA)
+    _lbad = [a for d, a in _long if safe_broker_ev(f"本報告由{a}研究部出具")[0] != _amap[a]]
     _sbad = [d for d, a in _short if safe_broker_ev(f"本報告由{d}研究部出具")[0] is not None]
     chk("㉕ 最長優先仲裁(Codex 在 PR #59 照出的那一條的正身):被拒名**比合法別名短**時"
         "合法的贏(不准連坐整個長名);被拒名**比合法別名長**時被拒的贏(短別名接不走長的被拒名)。"
@@ -2211,22 +2193,14 @@ def selftest() -> int:
     chk("㉖ 拒絕閘讀得到操作員那一份名單(讀不到就誠實說讀不到,不假裝有擋)",
         bool(_keys) and bool(_via_deny_reason(_keys[0])) and not _via_deny_reason("元大"),
         f"(名單 {len(_keys)} 條 · 第一條→擋 · 元大→放行)")
-    _rul = getattr(_gate176()["mod"], "KEY_ALIAS_RULINGS", {}) or {}
-    _hits = sorted({(tk, (v[0] if isinstance(v, (tuple, list)) else str(v)))
-                    for tk in tbl_k for sp, v in _rul.items() if _norm_key(tk) == _norm_key(sp)})
-    _leak = [(tk, _canon_key(tk)) for tk, tgt in _hits if _canon_key(tk) != tgt]
-    chk("㉗ 批691 正典鍵對映對**活表鍵**生效:裁定冊拼法 × 活券商表鍵現場取交集(不寫死鍵名;空白/點/連字號摺掉同鍵),"
-        "每個撞上的表鍵都回正典鍵(v0110–v0112 只中 1/3:DAIWASECURITIES / J.P.MORGAN 漏網=同一家兩個名)",
-        bool(_hits) and not _leak,
-        f"(交集 {len(_hits)}:{_hits} · 漏 {_leak})")
-    print(f"  [計] 二十七檢 OK {27 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 二十六檢 OK {26 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0113)· 二十七檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
+        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0110)· 二十二檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
         return selftest()
     verb = args[0] if args and not args[0].startswith("--") else "status"
     if verb == "status":

@@ -4365,6 +4365,35 @@
        }
       }
      ]
+    },
+    {
+     "id": "management",
+     "zh": "管理對接口(側線 2026-09-21;VIA→VDF 下行讀取一律經此;上接 VCGC;橋律逐支量)",
+     "items": [
+      {
+       "id": "vdf_system",
+       "zh": "VDF 子系統管理對接口(側線 2026-09-21;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 橋/工具面(所有 PY 接加速器 · 真擷取走網路工具;尺=CGC_MDL124)+ 交接/紀錄;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照;verb=status 唯讀,test_verb=--selftest;側線 2026-09-21 d +launch 啟動就緒:家族境 python+必要庫(尺 MDL137/136)· 同意閘只讀 · 啟動器/短令/鏈 · via_boot_update.sh↔.ps1 同鏈 · 上次實跑 · 下一步卡;rc 0 可啟動/4 閘未開/3 境缺/1 壞)",
+       "engine": {
+        "dir": "functional modules/VDF",
+        "glob": "VDF_SystemManager_v*.py",
+        "verb": [
+         "status"
+        ]
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vdf_system/VDF_SYSTEM_latest.json",
+        "VIA_Reports/vdf_system/VDF_SYSTEM_latest.md",
+        "VIA_Reports/vdf_system/VIA_VDF_SystemManager_v0103.html",
+        "VIA_Reports/vdf_system/LEDGER.tsv"
+       ],
+       "timeout": 300
+      }
+     ]
     }
    ]
   },
@@ -6219,25 +6248,23 @@
      "items": [
       {
        "id": "vrn_system",
-       "zh": "VRN 子系統管理對接口(批681;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 交接;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照)",
+       "zh": "VRN 子系統管理對接口(批681;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 交接;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照);verb=status 唯讀,test_verb=--selftest(側線 2026-09-21 b 對正:六動詞整串當 argv 會讓匯流排 test profile 判 NODATA)",
        "engine": {
         "dir": "functional modules/VRN",
         "glob": "VRN_SystemManager_v*.py",
         "verb": [
-         "status",
-         "catalog",
-         "links",
-         "read",
-         "sync",
-         "selftest"
+         "status"
         ]
        },
+       "test_verb": [
+        "--selftest"
+       ],
        "params": [],
        "net": false,
        "outputs": [
         "VIA_Reports/vrn_system/VRN_SYSTEM_latest.json",
         "VIA_Reports/vrn_system/VRN_SYSTEM_latest.md",
-        "VIA_Reports/vrn_system/VIA_VRN_SystemManager_v0100.html",
+        "VIA_Reports/vrn_system/VIA_VRN_SystemManager_v0102.html",
         "VIA_Reports/vrn_system/LEDGER.tsv"
        ]
       }
