@@ -27,7 +27,7 @@ VCGC 的批號正本讀的是這本冊的 `batch`,所以它印了兩個星期的
 ```
 VCGC v0119 status     政策庫 OK:律 99 · lessons 343 · 政策因子 1766 → 1906 列 · 印「批689」
 VCGC v0119 --selftest 二十五檢 OK 25 · FAIL 0(① 99 律 · 343 lessons)
-推之前全格子 v0435   <<GRID_TALLY>>
+推之前全格子 v0435   OK 278 · FAIL 5 · SKIP 4 · TIMEOUT 0(GRID_20260921_111931);紅 5 全是容器(pwsh 不在 · TWSE openapi 三車道無產業表/ETF 冊 · sidecar 庫 0 份)
 ```
 
 ## 四 · 順帶
