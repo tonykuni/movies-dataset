@@ -51,4 +51,4 @@ registry-sync  PLAN · 活元件 5991 · 新 0 · 變更 0 · 退役 0
 | `docs/VIA_DroppedBalls_B507.md` | ~~Z80~~ · ~~Z81~~ 已結;Z79 補工作站實錄 |
 | `docs/VIA_B687_ARetreatMustNotDropThePromise.md` | 本文 |
 
-推之前全格子 v0435:<<GRID_TALLY>>
+推之前全格子 v0435:OK 278 · FAIL 5 · SKIP 4 · TIMEOUT 0(GRID_20260921_104543,350s);紅 5 全是容器(pwsh 不在 · TWSE openapi 三車道無產業表/ETF 冊 · sidecar 庫 0 份);VDF 資料涵蓋閘站(newest → v0105)OK
