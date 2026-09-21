@@ -52,6 +52,7 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 
 - 本線:`claude/busy-bell-97sa4f`(PR #53)。造件前把 `origin/main`(批663–679d + 批681)與 `origin/claude/awesome-bardeen-h0wm5v`(批682)併進來:兩處衝突(VRN 邏輯架構冊 · 總控頁)都取主線版;台帳與規格冊做聯集(1280 筆 · 65 項)。
 - 第三條線 `claude/brave-goldberg-ri5k42`(session_01JaiaB5…):本文第一版(09:00 前量的)寫「遠端沒有這條分支」;之後它從那個 session 推上去了,主線以 **PR #58** 併入(EngineBus v0128/v0129 · VCGC v0119 執行期境不進等式 · B682B 文 · 台帳 1282)。工作站那次 `src refspec does not match any` 的原因照舊:本地沒有那條分支,push 只能在那個 session 裡下。
+- 18:01 貼回:工作站 HEAD 在 `claude/awesome-bardeen-h0wm5v` 批684(0b6f7dfb;批683 橋掃器 v0106 + PS 尾版注橋 · 批684 吸收 PR #57 的 EngineBus v0128 與 VDF 審視文),那三筆 main 還沒有。本線把它併進來(五處衝突:掉球冊取主線 · VDF 審視文取本線(本線多兩行追記,其餘逐行相同)· 台帳聯集 1285 · 元件冊取主線再以 v0120 重跑(6076/6076;VDF_SystemManager 仍 VIA-SYS-0012)· 總控頁由 Manager v0148 再生),所以工作站在 awesome-bardeen 上 `git merge --ff-only origin/claude/busy-bell-97sa4f` 是**快轉、零衝突**。
 - 撞號(L25):本線與主線批682B **同一小時各造一支 VCGC v0119**。本線併主線時取主線的 v0119,本線的 VDF 對接口段改號 **v0120** 疊在它上面(它的 ㉕ 原樣保留,本線的 VDF 檢改 ㉖,二十六檢);台帳聯集 1283;元件冊以 v0120 重跑(273/273 未登 0)。
 
 ## 六 · 容器實測(全部零網路)
@@ -70,12 +71,12 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 
 ## 七 · 掛著(下一手接)
 
-- Z74 Register `via-vdfsys` / `via-vrnsys` 候准(L70;貼行在九)。
-- Z75 VeritasCeleritas 正典裁定(四-1)。
-- Z76 engine/ 無版號 8 支立版號 + 卡書重建(四-2、四-3)。
-- Z77 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
+- Z82 Register `via-vdfsys` / `via-vrnsys` 候准(L70;貼行在九)。(本文第一版寫 Z74–Z78,與主線掉球冊 Z74–Z77 撞號,改接續 Z82–Z86)
+- Z83 VeritasCeleritas 正典裁定(四-1)。
+- Z84 engine/ 無版號 8 支立版號 + 卡書重建(四-2、四-3)。
+- Z85 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
 - Z70 已結:brave-goldberg 由 PR #58 併入 main。
-- Z78 工作站切到本線(或併 PR #53)後跑 `via-vdfsys` 與 `via-vcgc`(應印 v0120);17:08 貼回的 via-vcgc 是 v0118 · Deck 90 · 規格 65 · 台帳 1282 = main 的樹,還沒有本線。
+- Z86 工作站把本線快轉進 awesome-bardeen 後跑 `via-vdfsys` 與 `via-vcgc`(應印 v0120);17:08/18:01 兩次貼回的 via-vcgc 都是 v0118 · Deck 90 · 規格 65 · 台帳 1282 = awesome-bardeen 批684 的樹,還沒有本線;`git checkout` 被工作站再生的 VIA_VRN_LogicArchitecture_SSOT 冊擋住(LL49 冊,stash 掉即可)。
 
 ## 八 · 接手驗收(一行一答)
 
@@ -93,14 +94,24 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 #   via-vdfsys read <policy|logic|factor|param|engine|bridge|tool|handover|records|upstream> [key] [--full]
 #   via-vdfsys sync --apply            落快照(只落 VIA_Reports/vdf_system)
 #   via-vdfsys --selftest              廿七檢(零污染)
-function global:via-vdfsys { $a = ConvertTo-VIACleanArgs $args; $py = Get-VIAEnvPython "vdf"; Invoke-VIAPython -Python $py (Get-VIANewest "$VIA\functional modules\VDF" "VDF_SystemManager_v*.py") $(if ($a) { $a } else { "status" }) }
+function global:via-vdfsys { $a = ConvertTo-VIACleanArgs $args; $eng = Get-VIANewest "$VIA\functional modules\VDF" "VDF_SystemManager_v*.py"; if (-not $eng) { Write-Host "  [via-vdfsys] ABSENT:functional modules\VDF\VDF_SystemManager_v*.py 不在這棵樹(把 claude/busy-bell-97sa4f 併進來)" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }; $py = Get-VIAEnvPython "vdf"; Invoke-VIAPython -Python $py $eng $(if ($a) { $a } else { "status" }) }
 Set-Alias -Name 資料對接口 -Value via-vdfsys -Scope Global -Force
 
 # ── 批681/682:via-vrnsys —— VRN 子系統管理對接口(VRN_SystemManager;Z65 候准)
-function global:via-vrnsys { $a = ConvertTo-VIACleanArgs $args; $py = Get-VIAEnvPython "vrn"; Invoke-VIAPython -Python $py (Get-VIANewest "$VIA\functional modules\VRN" "VRN_SystemManager_v*.py") $(if ($a) { $a } else { "status" }) }
+function global:via-vrnsys { $a = ConvertTo-VIACleanArgs $args; $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_SystemManager_v*.py"; if (-not $eng) { Write-Host "  [via-vrnsys] ABSENT:functional modules\VRN\VRN_SystemManager_v*.py 不在這棵樹" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }; $py = Get-VIAEnvPython "vrn"; Invoke-VIAPython -Python $py $eng $(if ($a) { $a } else { "status" }) }
 Set-Alias -Name 研報對接口 -Value via-vrnsys -Scope Global -Force
 ```
 
-操作員 17:08 已把上面兩個 function 貼進 PowerShell 現行 session(不是 Register 檔)。同一貼回的 via-vcgc 印 **v0118 · Deck 90 · 規格 65 · 台帳 1282**:工作站的樹是 main(PR #58 之後),還沒有本線,所以那棵樹上 `via-vdfsys` 會找不到 `VDF_SystemManager_v*.py`。先切到本線(或併 PR #53):`git fetch origin claude/busy-bell-97sa4f; git checkout claude/busy-bell-97sa4f`。要把兩行寫進 Register 檔(v0242 + 根/bin 兩支梭),等一句「准」(L70)。
+18:01 實錄:第一版貼行在沒有對接口的樹上跑出 `python.exe: can't open file '…\status'`——`Get-VIANewest` 回空,`Invoke-VIAPython` 就把 `status` 當腳本餵給 python。上面已改成守門版:缺件印 ABSENT、rc 2、不呼 python(L16)。操作員 17:08 已把第一版兩個 function 貼進 PowerShell 現行 session(不是 Register 檔)。同一貼回的 via-vcgc 印 **v0118 · Deck 90 · 規格 65 · 台帳 1282**:工作站的樹是 main(PR #58 之後),還沒有本線,所以那棵樹上 `via-vdfsys` 會找不到 `VDF_SystemManager_v*.py`。本線已含 awesome-bardeen 批684,工作站在 awesome-bardeen 上快轉即可:
+
+```powershell
+git stash push -m "工作站再生冊(LL49)" -- "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json"
+git fetch origin claude/busy-bell-97sa4f
+git merge --ff-only origin/claude/busy-bell-97sa4f
+git stash drop     # 那份是引擎再生冊,要就 via-vrnbook build 再生
+via-vcgc           # 應印 v0120,多一行「VDF 系統管理」
+via-vdfsys         # 九域燈;via-vdfsys bridges → 加速器 43/43 · 網路 43/43
+```
+要把兩行寫進 Register 檔(v0242 + 根/bin 兩支梭),等一句「准」(L70)。
 
 工作站驗收(切到本線之後):`via-vdfsys` → 九域燈;`via-vdfsys bridges` → 43/43 · 43/43;`via-vcgc` → 註冊稽核 未登 0;`via-vdfchain run` → 對接口引擎域從 NODATA 轉為鏈跑器的燈。
