@@ -1,0 +1,580 @@
+{
+  "schema": "VIA.VRN.WorkflowExtension.v1",
+  "version": "0.2.0",
+  "source": "USER_WORKFLOW_20260921",
+  "scope": "Append-only extension; repository read-only",
+  "aliases": [
+    {
+      "field": "target_price",
+      "raw": "目標價格",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "股價目標",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "十二個月目標價",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "12個月目標價",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "12M Target Price",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "12-month Target Price",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "12-month Price Target",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "Fair Value Estimate",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "target_price",
+      "raw": "合理價值",
+      "canonical": "TARGET_PRICE",
+      "guard": "Require price/currency/per-share context. Reject percentages, valuation multiples and market-size targets."
+    },
+    {
+      "field": "rating",
+      "raw": "B",
+      "canonical": "BUY",
+      "guard": "Only a broker-specific structured rating field; not arbitrary text."
+    },
+    {
+      "field": "rating",
+      "raw": "Buy rating",
+      "canonical": "BUY",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "買進評等",
+      "canonical": "BUY",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "推薦買進",
+      "canonical": "BUY",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "超配",
+      "canonical": "BUY",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "H",
+      "canonical": "HOLD",
+      "guard": "Only a broker-specific structured rating field; not arbitrary text."
+    },
+    {
+      "field": "rating",
+      "raw": "Hold rating",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "Equal-weight",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "Equalweight",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "Market Weight",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "持平",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "標準配置",
+      "canonical": "HOLD",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "S",
+      "canonical": "SELL",
+      "guard": "Only a broker-specific structured rating field; not arbitrary text."
+    },
+    {
+      "field": "rating",
+      "raw": "Sell rating",
+      "canonical": "SELL",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "低配",
+      "canonical": "SELL",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "建議減碼",
+      "canonical": "SELL",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "Unrated",
+      "canonical": "NOT_RATED",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "Not Covered",
+      "canonical": "NOT_RATED",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "No Recommendation",
+      "canonical": "NOT_RATED",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "不予評等",
+      "canonical": "NOT_RATED",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating",
+      "raw": "尚未評級",
+      "canonical": "NOT_RATED",
+      "guard": "Rating field/explicit recommendation context required; preserve native source scale."
+    },
+    {
+      "field": "rating_label",
+      "raw": "投資評等",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "投資評級",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "投資建議",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "Rating",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "Investment Rating",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "Recommendation",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "rating_label",
+      "raw": "投資評價",
+      "canonical": "RATING_FIELD",
+      "guard": "Field label only; no rating value inferred."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "P/E",
+      "canonical": "PE",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "PE",
+      "canonical": "PE",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "本益比",
+      "canonical": "PE",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "市盈率",
+      "canonical": "PE",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "P/B",
+      "canonical": "PB",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "PB",
+      "canonical": "PB",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "股價淨值比",
+      "canonical": "PB",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "市淨率",
+      "canonical": "PB",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "EV/EBITDA",
+      "canonical": "EV_EBITDA",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "企業價值倍數",
+      "canonical": "EV_EBITDA",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "DCF",
+      "canonical": "DCF",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "Discounted Cash Flow",
+      "canonical": "DCF",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "折現現金流",
+      "canonical": "DCF",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "現金流量折現法",
+      "canonical": "DCF",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "SOTP",
+      "canonical": "SOTP",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "Sum of the Parts",
+      "canonical": "SOTP",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "分部加總",
+      "canonical": "SOTP",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "分部估值",
+      "canonical": "SOTP",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "Dividend Yield",
+      "canonical": "DIVIDEND_YIELD",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "valuation_method",
+      "raw": "股利殖利率",
+      "canonical": "DIVIDEND_YIELD",
+      "guard": "Preserve formula, valuation year, inputs, units, reasons, page and span; method label alone is insufficient."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "稀釋每股盈餘",
+      "canonical": "EPS_DILUTED",
+      "guard": "Do not replace basic EPS; retain period, scope and per-share currency."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "稀釋EPS",
+      "canonical": "EPS_DILUTED",
+      "guard": "Do not replace basic EPS; retain period, scope and per-share currency."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "Diluted EPS",
+      "canonical": "EPS_DILUTED",
+      "guard": "Do not replace basic EPS; retain period, scope and per-share currency."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "Diluted earnings per share",
+      "canonical": "EPS_DILUTED",
+      "guard": "Do not replace basic EPS; retain period, scope and per-share currency."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "基本每股盈餘",
+      "canonical": "EPS_BASIC",
+      "guard": "Do not treat as diluted EPS."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "基本EPS",
+      "canonical": "EPS_BASIC",
+      "guard": "Do not treat as diluted EPS."
+    },
+    {
+      "field": "financial_concept",
+      "raw": "Basic EPS",
+      "canonical": "EPS_BASIC",
+      "guard": "Do not treat as diluted EPS."
+    }
+  ],
+  "workflow": {
+    "company_name": {
+      "key": "TW_STOCK_CODE",
+      "authority": [
+        "TWSE",
+        "TPEX",
+        "MOPS"
+      ],
+      "output_fields": [
+        "official_security_name",
+        "official_company_name",
+        "official_name_en",
+        "source",
+        "source_url",
+        "as_of",
+        "raw_report_name"
+      ],
+      "rule": "Preserve official KY/F/foreign-company suffixes. Report/filename names never overwrite official names. Multiple official current values => conflict retained."
+    },
+    "filename": {
+      "order": [
+        "preserve_raw",
+        "protect ticker/date/quarter/English-month/KY spans",
+        "split remaining CJK/Latin/numeric/punctuation boundaries",
+        "trim tokens",
+        "calendar validate dates",
+        "official master lookup",
+        "partial broker alias match",
+        "crosscheck first-page codes"
+      ],
+      "numeric_rule": "Four ASCII digits nonzero-leading are stock candidates, not proof; long digit strings are date candidates, not proof.",
+      "date_formats": [
+        "YYYYMMDD",
+        "ROCYYYMMDD",
+        "YYMMDD",
+        "YYYY-MM-DD",
+        "YYYY/MM/DD",
+        "(20)YYMMDD",
+        "MMDD_WITH_YEAR_MISSING"
+      ],
+      "no_year_guess": true,
+      "broker_partial": "Registered short aliases may match inside filename text; prefer longest alias, Latin token boundary, company-name masking; ambiguity retained."
+    },
+    "first_page": {
+      "regions": [
+        "TOP",
+        "LEFT_INFO",
+        "RIGHT_INFO",
+        "BODY",
+        "FOOTER",
+        "NOTE"
+      ],
+      "features": [
+        "bbox",
+        "column_id",
+        "font_size_relative",
+        "bold",
+        "line_gap",
+        "reading_order"
+      ],
+      "roles": [
+        "MAIN_TITLE",
+        "SUBTITLE",
+        "SECTION_TITLE",
+        "BODY_SENTENCE",
+        "FIELD_VALUE",
+        "FOOTNOTE",
+        "TABLE_CELL"
+      ],
+      "rules": [
+        "Use repaired text plus original layout, never cleaned text alone.",
+        "Missing period is a title feature, not a sufficient or necessary condition.",
+        "Retain relevant small-print rating/price/date/EPS/units; exclude only irrelevant footer/disclaimer content from summary.",
+        "Repair within same column/block only; keep numeric signs, decimals, percentages, units and raw provenance.",
+        "One sentence/field per record; maintain raw-to-clean links and repair logs."
+      ]
+    },
+    "crosscheck": {
+      "stock": "Exact four-digit local code equality across filename/local/Yahoo/Bloomberg. Market TW/TWO verified separately.",
+      "etf": "Full local code equality including suffix; never compare only first four digits.",
+      "state": [
+        "MATCH",
+        "MISMATCH",
+        "INSUFFICIENT_EVIDENCE",
+        "OFFICIAL_LOOKUP_REQUIRED"
+      ]
+    },
+    "summary": {
+      "page_scope": 1,
+      "header": "官方證券名稱(已驗證Yahoo代碼)-首頁主標題",
+      "items": [
+        {
+          "id": 1,
+          "fields": [
+            "target_price",
+            "rating",
+            "latest_adjusted_close",
+            "price_as_of",
+            "upside_pct",
+            "valuation_method",
+            "valuation_year",
+            "valuation_inputs",
+            "reason"
+          ]
+        },
+        {
+          "id": 2,
+          "fields": [
+            "diluted_eps",
+            "eps_year",
+            "actual_or_estimate",
+            "growth_rate",
+            "growth_drivers"
+          ]
+        },
+        {
+          "id": 3,
+          "fields": [
+            "remaining_operating_drivers_and_highlights"
+          ]
+        },
+        {
+          "id": 4,
+          "fields": [
+            "remaining_catalysts_risks_and_conditions"
+          ]
+        }
+      ],
+      "missing": "Explicit not-disclosed; never invent a fourth claim or diluted EPS.",
+      "numeric_origin": "Latest adjusted close is an external calculation input; all report narrative facts must be grounded in page 1."
+    },
+    "upside": {
+      "formula": "(target_price_same_basis / latest_adjusted_close - 1) * 100",
+      "same_basis_required": [
+        "currency",
+        "share_basis",
+        "split_adjustment_basis"
+      ],
+      "price_source": "VDF adjusted price, latest available valid close with as_of; no volume forward fill.",
+      "historical_mode": "For report-date/backtest metrics use price known as of report date, separate from requested current upside.",
+      "target_adjustment": "Only apply explicit verified per-share split/conversion factor. Do not blindly multiply the target by a dividend-adjusted AdjClose/Close ratio."
+    },
+    "financial": {
+      "capture": "All regions and tables on all identified annual-financial pages, including headers, units, footnotes, formulas and totals.",
+      "key": [
+        "ticker",
+        "period",
+        "concept",
+        "scope",
+        "currency",
+        "unit",
+        "accounting_basis",
+        "actual_or_estimate"
+      ],
+      "history_priority": "Official historical actuals win only for semantically identical cells; retain report value/delta/revision dates. Estimates remain broker estimates.",
+      "anchor": "At least one comparable non-ambiguous actual may establish an alignment anchor; not whole-table approval.",
+      "checks": [
+        "Assets = liabilities + total equity",
+        "Revenue - cost = gross profit",
+        "Profit / revenue = margin with correct profit definition",
+        "YoY with matching period and scope",
+        "Diluted EPS numerator / weighted diluted shares, not ending shares",
+        "Annual-vs-quarter sums only additive flow metrics, never EPS/ratios/balance-sheet stocks"
+      ],
+      "coverage": "Expected pages/tables/rows/cells vs extracted; no file => NOT_RUN. Zero/null/dash distinct.",
+      "revision": "Current restated history for latest view; point-in-time as_of gate for historical backtests."
+    }
+  },
+  "official_sources": [
+    {
+      "name": "TWSE company master API",
+      "url": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
+    },
+    {
+      "name": "TPEx official site",
+      "url": "https://www.tpex.org.tw/"
+    },
+    {
+      "name": "MOPS official filings",
+      "url": "https://mops.twse.com.tw/"
+    }
+  ],
+  "delivery_state": {
+    "production_wiring": "NOT_CHANGED",
+    "report_bytes": "NOT_PROVIDED",
+    "official_bulk_fetch": "NOT_RUN",
+    "layout_ocr": "ADAPTER_REQUIRED"
+  }
+}

@@ -357,15 +357,7 @@ ROUTE_ONLY_INPUT_POLICY_ROWS = [
         'route_policy': 'INDUSTRY_REPORT_ROUTE',
         'route_reason': 'industry report; route/quarantine unless company ticker section extraction is added',
     },
-    {
-        'file_name': 'GF-Thoughts on TPU Competition with GPU 20251126.pdf',
-        'broker_alias': 'GF Securities',
-        'ticker': '',
-        'company_alias': '',
-        'report_date': '2025-11-26',
-        'route_policy': 'INDUSTRY_REPORT_ROUTE',
-        'route_reason': 'industry report; route/quarantine unless company ticker section extraction is added',
-    },
+    
     {
         'file_name': 'GS-AI PCB CCL 20251204.pdf',
         'broker_alias': 'Goldman Sachs',
