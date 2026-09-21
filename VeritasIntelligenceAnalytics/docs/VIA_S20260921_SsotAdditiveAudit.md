@@ -205,3 +205,53 @@ python "$env:VIA_TEST2"                                                         
 | `via-vrnrun`(或 `via-vrnchain run`) | V2 印 `=== VRN 六層鏈 · run ===` 與 `[計] GREEN n · RED n · GATED n · NODATA n`,不再是 `[用法] … (收到 'r')` |
 
 不符就先疑尺(L93):看是哪台機器、哪個 python、收容夾有沒有被 autocrlf 動過(收容夾在 .gitattributes `-text`,不該動)。
+
+## 九 · VRN 邏輯讀出(操作員令「讀取 session_01JaiaB5DWiYqyU6v4wcu6L1 vrn邏輯」;2026-09-21)
+
+**那個工作階段讀不到**:`get_session` 回的是「VIA 项目接手」(2026-09-21 07:03–07:35Z · 分支 `claude/brave-goldberg-ri5k42` · 狀態 review_ready · 最後一句 `stage ⑥ running (per-stock turnover increments)`)。遠端**沒有**這條分支、全倉沒有任何 commit 帶它的 Claude-Session 尾註、ListAgents 搆不到它 → 它的工作還在那個容器裡沒 push(LL331:量出「沒有」再去樹上問一次,問過了)。要讓這裡讀得到,在那個階段打一行:`git push -u origin claude/brave-goldberg-ri5k42`。以下是**樹上現在的** VRN 邏輯,直接從六層冊讀出來,不手抄。
+
+冊 `VIA_VRN_LogicArchitecture_SSOT_v0100.json` · schema VIA.VRN.LogicArchitecture.SSOT.v1 · 由 via_vrn_logic_book_v0104 建於 2026-09-21 05:37 · 鏈即冊(CGC_MDL172 的 44 節點就是這本冊的 layers)。
+
+| 層 | 節點 | 這一層在做什麼 | 節點(尾版) |
+|---|---|---|---|
+| L0_輸入識別 | 4 | 檔名 → 股號/券商/日期;識別錯了後面全錯 | MDL030_VISVRNTickerFilenameSSOT · MDL031_VISVRNTickerRegexShim · MDL015_VISVRNBrokerAliasFullList · ENG084_FilenameTokenParse |
+| L1_擷取 | 15 | 非 OCR 優先,抓不到才退 OCR;由簡到繁(批493 操作員令) | ENG082_ExtractionLogic · ENG060_TextOmni · ENG058_TableOmni · ENG057_ScanOcrRescue · ENG056_PdfForensics · ENG059_GapMultirescue · ENG075_DocToMarkdown · ENG077_OmniFormatBridge · MDL747_OcrLaneRunner · MDL746_PDFPlumberPlusHub · ENG017_MDL004OCRFetchingPDFTable · ENG018_MDL005OCRFetchingPDFText · ENG023_MDL011DailyFetcher · ENG052_DocxEngine · ENG070_YahooConsensus |
+| L2_結構與知識 | 13 | 把抽出來的字變成有欄位的東西 | ENG072_FirstPageText · ENG073_ReportStructuredDB · ENG074_FinancialPages · ENG063_Lexicon · ENG064_KnowledgeStack · ENG085_MarkdownRestore · ENG086_FirstPageLogicBridge · ENG087_NLPTextSummaryBridge · ENG055_OfficeMerge · ENG066_NLPSupportHub · ENG067_MindMapSSOT · ENG071_CnyesFusion · ENG078_NLPOneBridge |
+| L3_驗證 | 4 | 「有值」不等於「對」——驗過才准進矩陣(批569) | ENG083_VerifiedMatrix · ENG076_RegressionGate · MDL141_ClosingGate · ENG049_ContentReconcile |
+| L4_產出 | 5 | 給人看的那一層 | ENG080_FourPointDigest · ENG068_DailyBrief · ENG079_ControlTowerDashboard · ENG062_SummarizerV1 · ENG065_MailIntel |
+| L5_儲存 | 3 | L90:正典=DuckDB;其餘全是派生層,單向永不回灌 | ENG081_ParquetMainDB · ENG050_ContentStore · ENG069_ConsensusDB |
+
+**規則正本(rule_canons;鏈上每一層都跟這 10 本拿規則,不各抄)**
+
+| 名 | 正本 | 職責 |
+|---|---|---|
+| 方法冊_def01_21 | `vrn_method_kernel_v0102.py` | 方法核:def01–def21(含期間解析) |
+| 六欄規則 | `SUP_MDL749_VRNFieldRuleHub_v0111.py` | 研報六欄規則正本樞紐 |
+| 財務邏輯 | `SUP_MDL748_FinancialLogicHub_v0100.py` | 財務邏輯樞紐 |
+| 版面樞紐 | `SUP_MDL743_GenericLayoutHub_v0100.py` | 通用版面樞紐 |
+| NLP 應用 | `SUP_MDL744_NLPApplicationHub_v0102.py` | NLP 應用樞紐 |
+| Markdown 結構 | `SUP_MDL745_MarkdownStructureHub_v0100.py` | Markdown 結構樞紐 |
+| 階段別名 | `VIA_VRN_StageAlias_Map_v0100.json` |  |
+| 繁簡轉換 | `VIA_ZhConvert_S2TWP_CharMap_v0100.json` | 批611:opencc 缺席時的凍結對照表;**函式消失不是降級,是斷線** |
+| 基本資料欄 | `StockReportBasicInfo.json` |  |
+| Sheet 產出計畫 | `StockReport_GoogleSheet_OutputPlan.json` |  |
+
+**今日裁定(rulings_today)**
+
+- 批611:簡→繁不再依賴 opencc:凍結對照表 2,784 筆(落在 VRN_ENG064_KnowledgeStack_v0102.py, VIA_ZhConvert_S2TWP_CharMap_v0100.json)
+- 批615:操作員裁定:VRN 正典儲存層 = DuckDB(L90)(落在 VIA_Policy_Laws_SSOT_v0100.json#L90, VRN_ENG081_ParquetMainDB_v0101.py)
+- 批615:數值入正典必須帶**宣告出來的**單位,不得由數值大小反推(LL178)(落在 VIA_Policy_Laws_SSOT_v0100.json#L90 配套②, VRN_ENG074_FinancialPages_v0111.py)
+- 批615:期間拆解:1Q25 與 25Q1 同義(ENG074 檢㉑ 只比三個結構欄,不比 why)(落在 VRN_ENG074_FinancialPages_v0111.py)
+- 批618:poppler 是 VRN 的活相依,列入 PATH 搬家白名單(不得盲剝)(落在 VIA_BadEnv_Blacklist_v0102.json#path_tool_anchors, via_conflict_guard_v0101.py)
+
+**待裁定(off_book_pending,0)**
+
+
+**已知缺口(known_gaps,2)**
+
+- {"item": "財報欄位清單(FinancialData)沒有與 StockReportBasicInfo.json 對稱的正本冊", "state": "PENDING_OPERATOR", "why": "量過:VRN 夾內有 StockReportBasicInfo.json,沒有 StockReportFinancialData.json。欄位清單目前散在 ENG074 的程式碼裡。要
+- {"item": "L0-L5 六層的層名(本冊第一次寫下來的那六個名字)", "state": "REVIEWED_B665", "why": "操作員批665 授權「你決定 你覆核 你完成」。**裁定:六層層名與層數維持。**改名/改層數要重做 50 個指標與 15 支歸位,換不到任何一個新的判斷力。原本提的兩個怪處,量過之後錯的不是層名,是『一支引擎只能站一層』這個假設:① L2 混著加工站
+
+**律的綁定(law_bindings)**:["L90 VRN 正典儲存層=DuckDB(批615 操作員裁定)", "L30 一功能一主(擷取文字修復的擁有者=ENG082)", "L54 尾版律(本冊所有指標一律 glob 尾版,不寫死版號)"]
+
+**側線在這張圖上的位置**:樞紐 `SUP_MDL749`(六欄規則正本)是 rule_canons 之一,v0111 只多讀冊口,冊已重建指到 v0111;`VRN_ENG088` 是稽核件,不在六層鏈上(不進 chain_default),歸哪一層是 P6 的裁定。工作站六層鏈實跑:讀樞紐的 7 支全綠;3 紅(MDL746 · MDL141 · ENG068)都不在樞紐/橋的讀者名單上(P14)。
