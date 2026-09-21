@@ -1,25 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL149_VeritasCentralGovernanceConsole v0122 — VCGC(批686:VIA 往下只准有一扇門;三家一把尺 + VAP 補位)
-v0121→v0122(側線 2026-09-21 e 併 main 批686b(PR #59);主線批號由併線的手指定 L25):主線把三家的段收成一把尺 `_subsys_section()`,
-  但收尺時漏了側線 v0120 `vdf_system()` 回的 **bridge 段**(tails/accel/net/net_callers/…)與 mode、why 鏈;主線 ㉖ 自己就要 `bridge.tails` 是 int——
-  在沒有 VDF 對接口的樹上走「缺席=ABSENT」那條路所以綠,對接口一在位就紅(本線併後實錄:二十八檢 OK 27 · FAIL 1;單元測試 T03 同紅)。
-  修在同一把尺上:`_subsys_section()` 對**任何**家族只要 collect() 有 bridge 就回同形的 bridge 摘要(沒有的家族回 None),mode/why 鏈照舊補回;
-  不另開第二個載入器、不改 ㉔㉖㉗㉘ 一個字;檢數不變(二十八檢)。其餘一字不動(v0121 留作版史,尾版律 L04)。
-v0120→v0121(操作員令「VIA 東西太多,用一個中央治理台整合一切;已經有這個角色就合併;對接下方」):
-  先量再寫——這個角色**已經存在**(本支就是),而 `VIA_CentralGovernanceConsole.py` 這個檔名
-  已被 b514 家族件佔用(原名零觸碰,MANIFEST_b514.json md5 冊,擁有者 CGC_MDL150)。
-  所以**不開新檔**(同名兩扇門=L101),而是把這一支補成真正的那一扇門。
-  ① 收尺:批681 接 VRN、側線接 VDF,兩段是**逐字複製貼上、只換家族名**;再抄一份給 VAP 就是第三顆頭。
-     新增 `[VIA:SUBSYS-PORT]` 區塊——`SUBSYS_PORT` 一家一列,`_subsys()` / `_subsys_section()` 一把尺。
-     `_VRNSYS`/`_VDFSYS` 仍是**同一個 dict 物件**,`_via_vrnsys()`、批681 的 ㉔、側線的 ㉖ 一個字都不用改。
-  ② 補位:VAP 那條腿接上(樹上尚無 VAP_SystemManager → **ABSENT 誠實**,不假裝有);
-     新增 `subsystems()` 一次報三家,`audit` 收錄 vap_system 與 subsystems。
-  ③ +㉗㉘ 兩檢:AST 釘住「三家一律委派同一把尺」(有人再抄一份載入器就當場紅)· 誠實四態正負控。
-     二十六 → 二十八檢。
-  沒做的(L87):沒有建立 VAP_SystemManager(那是一支新引擎,另一批);沒有動任何 .ps1(L70)。
-
 CGC_MDL149_VeritasCentralGovernanceConsole v0120 — VCGC(側線 2026-09-21:VDF 子系統管理對接口上線;VIA 往下讀 VDF 也只走一扇門)
 v0119→v0120(操作員令「將 session_01RLMQ… 關於 VDF 全數接過來 · 建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 讀取 VIA 政策所有 PY 檔案一定要接加速器 ·
   所有 VDF 都要加裝網路工具」;側線 claude/busy-bell-97sa4f,主線批號由併線的手指定 L25):
@@ -372,80 +353,22 @@ def datahome() -> dict:
     return {"state": "OK", "home": j.get("home", ""), "dbs": len(j.get("by_name") or {}), "tables": len(j.get("by_table") or {}), "lakes": len(j.get("lake") or []), "ts": j.get("ts", "")}
 
 
-# ===== [VIA:SUBSYS-PORT:v0100] 子系統管理對接口(批686:三家一把尺)=====
-#   批681 接 VRN、側線接 VDF——兩段是**逐字複製貼上、只換家族名**。
-#   每多一家就多抄一份二十行,而那正是「VIA 東西太多」的樣態(L30 一個出處 / Zero-Hydra)。
-#   這裡把它收成一把尺:家族只是 SUBSYS_PORT 上的一列,第四家不必再抄一次。
-#   `_VRNSYS` / `_VDFSYS` 仍是**同一個 dict 物件**,所以 `_via_vrnsys()`、
-#   批681 的 ㉔ 與側線的 ㉖ 一個字都不用改 —— 收尺不是改行為。
-SUBSYS_PORT = {
-    "VRN": {"dir": ("functional modules", "VRN"), "glob": "VRN_SystemManager_v*.py"},
-    "VDF": {"dir": ("functional modules", "VDF"), "glob": "VDF_SystemManager_v*.py"},
-    "VAP": {"dir": ("functional modules", "VAP"), "glob": "VAP_SystemManager_v*.py"},
-}
 _VRNSYS = {"mod": None, "why": ""}
-_VDFSYS = {"mod": None, "why": ""}
-_VAPSYS = {"mod": None, "why": ""}
-_SUBSYS_STATE = {"VRN": _VRNSYS, "VDF": _VDFSYS, "VAP": _VAPSYS}
-
-
-def _subsys(fam: str):
-    """家族的子系統管理對接口尾版;缺席=None 而且把因由留在該家族的狀態格
-    (缺件≠壞掉;**不退回舊路**——退回舊路=同一判準寫兩處=第二顆頭)。"""
-    st = _SUBSYS_STATE.get(fam)
-    if st is None:
-        return None
-    if st["mod"] is not None or st["why"]:
-        return st["mod"]
-    spec = SUBSYS_PORT[fam]
-    p = _newest(VIA.joinpath(*spec["dir"]), spec["glob"])
-    if not p:
-        st["why"] = "%s/%s 缺" % ("/".join(spec["dir"]), spec["glob"])
-        return None
-    try:
-        st["mod"] = _load("vcgc_%ssys" % fam.lower(), p)
-    except Exception as exc:
-        st["why"] = f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"
-    return st["mod"]
-
-
-def _subsys_section(fam: str) -> dict:
-    """一家的子系統管理段——對接口 collect();不寫任何檔。三家共用這一段。"""
-    m = _subsys(fam)
-    if m is None:
-        return {"state": "ABSENT", "why": _SUBSYS_STATE[fam]["why"] or f"{fam}_SystemManager 缺"}
-    try:
-        s = m.collect()
-        br = s.get("bridge") if isinstance(s.get("bridge"), dict) else None      # v0122:有橋律的家族(VDF)回同形摘要;沒有的回 None
-        bridge = None if br is None else {"tails": br.get("tails"), "accel": (br.get("accel") or {}).get("has"), "net": (br.get("net") or {}).get("has"),
-                                          "net_callers": (br.get("net") or {}).get("callers"), "accel_missing": (br.get("accel") or {}).get("missing"),
-                                          "net_callers_missing": (br.get("net") or {}).get("callers_missing"), "ruler": br.get("ruler")}
-        return {"state": s.get("rc_name"), "rc": s.get("rc"), "src": s.get("me"), "ts": s.get("ts"), "mode": s.get("mode"),
-                "lamps": s.get("lamps"), "links": len(s.get("links") or []),
-                "link_counts": s.get("link_counts"), "seven": (s.get("upstream") or {}).get("seven"),
-                "seven_done": (s.get("upstream") or {}).get("done"), "bridge": bridge,
-                "why": (s.get("logic") or {}).get("why") or (s.get("tool") or {}).get("why") or (s.get("handover") or {}).get("why", "")}
-    except Exception as exc:
-        return {"state": f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"}
-
-
-def subsystems() -> dict:
-    """VIA 往下的**那一扇門**:三家對接口一次報,誠實四態各自說,不混成一個數字(LL327)。
-    想加第四家,加 SUBSYS_PORT 一列即可——不必再抄一份載入器。"""
-    out = {}
-    for fam in SUBSYS_PORT:
-        sec = _subsys_section(fam)
-        mod = _subsys(fam)
-        out[fam] = {"state": sec.get("state") or "ABSENT", "why": sec.get("why", ""),
-                    "engine": (getattr(mod, "__file__", "") or "").replace("\\", "/").split("/")[-1],
-                    "lamps": sec.get("lamps"), "links": sec.get("links")}
-    live = [f for f, v in out.items() if v["engine"]]
-    return {"families": out, "n": len(out), "live": len(live), "live_names": live}
 
 
 def _vrnsys():
-    """批681 的門;批686 起實作收在 _subsys('VRN')——同一把尺,形狀與行為不變。"""
-    return _subsys("VRN")
+    """批681:VRN 子系統管理對接口(VRN_SystemManager 尾版)。VIA 往下讀 VRN 四庫一律經它;缺席=ABSENT 誠實,不退回舊路。"""
+    if _VRNSYS["mod"] is not None or _VRNSYS["why"]:
+        return _VRNSYS["mod"]
+    p = _newest(VIA / "functional modules" / "VRN", "VRN_SystemManager_v*.py")
+    if not p:
+        _VRNSYS["why"] = "functional modules/VRN/VRN_SystemManager_v*.py 缺"
+        return None
+    try:
+        _VRNSYS["mod"] = _load("vcgc_vrnsys", p)
+    except Exception as exc:
+        _VRNSYS["why"] = f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"
+    return _VRNSYS["mod"]
 
 
 def _via_vrnsys(domain: str) -> dict:
@@ -469,29 +392,55 @@ def factors() -> dict:
 
 
 def vrn_system() -> dict:
-    """批681:VRN 子系統管理段——六域燈 · 連結 · 七處自審(對接口 collect();不寫任何檔)。(批686 起與其餘家族共用 _subsys_section)"""
-    return _subsys_section("VRN")
+    """批681:VRN 子系統管理段——六域燈 · 連結 · 七處自審(對接口 collect();不寫任何檔)。"""
+    m = _vrnsys()
+    if m is None:
+        return {"state": "ABSENT", "why": _VRNSYS["why"] or "VRN_SystemManager 缺"}
+    try:
+        s = m.collect()
+        return {"state": s.get("rc_name"), "rc": s.get("rc"), "src": s.get("me"), "ts": s.get("ts"), "lamps": s.get("lamps"),
+                "links": len(s.get("links") or []), "link_counts": s.get("link_counts"), "seven": (s.get("upstream") or {}).get("seven"),
+                "seven_done": (s.get("upstream") or {}).get("done"), "why": (s.get("handover") or {}).get("why", "")}
+    except Exception as exc:
+        return {"state": f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"}
 
+
+
+_VDFSYS = {"mod": None, "why": ""}
 
 
 def _vdfsys():
-    """側線的門;批686 起實作收在 _subsys('VDF')——同一把尺,形狀與行為不變。"""
-    return _subsys("VDF")
+    """側線 2026-09-21:VDF 子系統管理對接口(VDF_SystemManager 尾版;與 VRN 那扇門同一份契約)。VIA 往下讀 VDF 一律經它;缺席=ABSENT 誠實,不退回舊路。"""
+    if _VDFSYS["mod"] is not None or _VDFSYS["why"]:
+        return _VDFSYS["mod"]
+    p = _newest(VIA / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
+    if not p:
+        _VDFSYS["why"] = "functional modules/VDF/VDF_SystemManager_v*.py 缺"
+        return None
+    try:
+        _VDFSYS["mod"] = _load("vcgc_vdfsys", p)
+    except Exception as exc:
+        _VDFSYS["why"] = f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"
+    return _VDFSYS["mod"]
 
 
 def vdf_system() -> dict:
-    """VDF 子系統管理段——九域燈 · 連結 · 七處自審 · 橋律逐支量(對接口 collect();不寫任何檔)。(批686 起與其餘家族共用 _subsys_section)"""
-    return _subsys_section("VDF")
-
-
-def _vapsys():
-    """批686:VAP 子系統管理對接口(與 VRN/VDF 同一份契約)。樹上尚無 VAP_SystemManager → ABSENT 誠實。"""
-    return _subsys("VAP")
-
-
-def vap_system() -> dict:
-    """批686:VAP 子系統管理段——與 VRN/VDF 共用 _subsys_section;對接口缺席=ABSENT,不假裝有。"""
-    return _subsys_section("VAP")
+    """VDF 子系統管理段——九域燈 · 連結 · 七處自審 · 橋律逐支量(對接口 collect();不寫任何檔)。"""
+    m = _vdfsys()
+    if m is None:
+        return {"state": "ABSENT", "why": _VDFSYS["why"] or "VDF_SystemManager 缺"}
+    try:
+        s = m.collect()
+        br = s.get("bridge") or {}
+        return {"state": s.get("rc_name"), "rc": s.get("rc"), "src": s.get("me"), "ts": s.get("ts"), "mode": s.get("mode"), "lamps": s.get("lamps"),
+                "links": len(s.get("links") or []), "link_counts": s.get("link_counts"), "seven": (s.get("upstream") or {}).get("seven"),
+                "seven_done": (s.get("upstream") or {}).get("done"),
+                "bridge": {"tails": br.get("tails"), "accel": (br.get("accel") or {}).get("has"), "net": (br.get("net") or {}).get("has"),
+                           "net_callers": (br.get("net") or {}).get("callers"), "accel_missing": (br.get("accel") or {}).get("missing"),
+                           "net_callers_missing": (br.get("net") or {}).get("callers_missing"), "ruler": br.get("ruler")},
+                "why": (s.get("logic") or {}).get("why") or (s.get("tool") or {}).get("why") or (s.get("handover") or {}).get("why", "")}
+    except Exception as exc:
+        return {"state": f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"}
 
 
 def tools_plan() -> dict:
@@ -1002,7 +951,7 @@ def source_guard() -> dict:
 def snapshot() -> dict:
     deck, spec, grid, reg, man = deck_tasks(), spec_items(), grid_stations(), register_cmds(), manager_names()
     return {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "version": VERSION, "batch": BATCH, "laws": laws(), "ledger": ledger(), "deck": deck, "spec": spec,
-            "grid": grid, "register": reg, "manager": man, "db_sheet": db_sheet(), "datahome": datahome(), "logic": logic(), "factors": factors(), "vrn_system": vrn_system(), "vdf_system": vdf_system(), "vap_system": vap_system(), "subsystems": subsystems(),
+            "grid": grid, "register": reg, "manager": man, "db_sheet": db_sheet(), "datahome": datahome(), "logic": logic(), "factors": factors(), "vrn_system": vrn_system(), "vdf_system": vdf_system(),
             "tools": tools_plan(), "recover": recover_plan(), "cg_family": cg_family(), "vtmra": vtmra(), "ui_workflow": ui_workflow(), "rungate": rungate(), "bus": bus(), "handover": handover_src(), "audit": audit(deck, spec, grid, reg, man),
             "inventory": component_registry(), "prompt": prompt_doc(), "balls": dropped_balls(),
             "panorama": _json(REPORTS / "panorama" / "PANORAMA_latest.json") or {}}
@@ -1504,16 +1453,8 @@ def selftest() -> int:
     try:
         lo24, fa24, vs24 = logic(), factors(), vrn_system()
         m24 = _vrnsys()
-        # 批686:改成**不變量**。原本 `ok_present` 裡寫著 `m24 is not None`,
-        #   等於斷言「VRN 這條腿一定要在」——在沒有 VRN_SystemManager 的樹上它**永遠紅**,
-        #   而那是狀態不是規格(LL332)。兩態各驗各的:在位驗署名與燈,缺席驗誠實 ABSENT。
-        present24 = m24 is not None
-        ok_present = (not present24) or (
-            str(lo24.get("via", "")).startswith("VRN_SystemManager")
-            and str(fa24.get("via", "")).startswith("VRN_SystemManager")
-            and isinstance(vs24.get("lamps"), dict) and (vs24.get("links") or 0) > 0)
-        ok_honest24 = present24 or all(
-            x.get("state") == "ABSENT" and bool(x.get("why")) for x in (lo24, fa24, vs24))
+        ok_present = (m24 is not None and str(lo24.get("via", "")).startswith("VRN_SystemManager") and str(fa24.get("via", "")).startswith("VRN_SystemManager")
+                      and isinstance(vs24.get("lamps"), dict) and (vs24.get("links") or 0) > 0)
         _saved = dict(_VRNSYS)
         _VRNSYS["mod"], _VRNSYS["why"] = None, "selftest:模擬缺席"
         try:
@@ -1523,8 +1464,7 @@ def selftest() -> int:
             _VRNSYS.update(_saved)
         ok_absent = all(x.get("state") == "ABSENT" for x in (lo_abs, fa_abs, vs_abs))
         chk("㉔ 批681 VRN 對接口:在位時 logic()/factors() 必須署名 VRN_SystemManager(VIA 往下讀 VRN 經此口)且 vrn_system 段有燈有連結;缺席時三者都 ABSENT 而不是炸、也不退回舊路",
-            ok_present and ok_absent and ok_honest24,
-            f"(模式 {'在位' if present24 else '缺席(誠實 ABSENT,不是紅燈)'} · via {lo24.get('via')} · 連結 {vs24.get('links')} · 缺席控 {lo_abs.get('state')}/{fa_abs.get('state')}/{vs_abs.get('state')})")
+            ok_present and ok_absent, f"(via {lo24.get('via')} · 連結 {vs24.get('links')} · 缺席態 {lo_abs.get('state')}/{fa_abs.get('state')}/{vs_abs.get('state')})")
     except Exception as exc:
         fails.append("㉔"); print("  [FAIL] ㉔ 例外:", type(exc).__name__, exc)
 
@@ -1559,17 +1499,9 @@ def selftest() -> int:
     try:
         vd26 = vdf_system()
         m26 = _vdfsys()
-        # 批686:同 ㉔,改成**不變量**。原式要求 `m26 is not None` + `VDF_SystemManager in _tail_files()`,
-        #   於是在本線(VDF_SystemManager 只在側線分支)它**永遠紅**——那是狀態不是規格(LL332)。
-        #   「尺有沒有含 VDF 根目錄」與對接口在不在無關,所以它維持無條件斷言。
-        present26 = m26 is not None
-        ok_glob26 = any(d == "functional modules/VDF" for d, _ in ENGINE_GLOBS)
-        ok_present = (not present26) or (
-            isinstance(vd26.get("lamps"), dict) and len(vd26["lamps"]) == 9 and (vd26.get("links") or 0) > 0
-            and isinstance(vd26.get("seven"), dict) and len(vd26["seven"]) == 7
-            and isinstance((vd26.get("bridge") or {}).get("tails"), int)
-            and "VDF_SystemManager" in _tail_files())
-        ok_honest26 = present26 or (vd26.get("state") == "ABSENT" and bool(vd26.get("why")))
+        ok_present = (m26 is not None and isinstance(vd26.get("lamps"), dict) and len(vd26["lamps"]) == 9 and (vd26.get("links") or 0) > 0
+                      and isinstance(vd26.get("seven"), dict) and len(vd26["seven"]) == 7 and isinstance((vd26.get("bridge") or {}).get("tails"), int)
+                      and any(d == "functional modules/VDF" for d, _ in ENGINE_GLOBS) and "VDF_SystemManager" in _tail_files())
         _saved = dict(_VDFSYS)
         _VDFSYS["mod"], _VDFSYS["why"] = None, "selftest:模擬缺席"
         try:
@@ -1578,40 +1510,12 @@ def selftest() -> int:
             _VDFSYS.clear()
             _VDFSYS.update(_saved)
         chk("㉖ 側線 2026-09-21 VDF 對接口:在位時 vdf_system 段九盞燈、有連結、七處為七鍵、橋律量得出尾版數,且 VDF 根目錄尾版件入尺(VDF_SystemManager 是受治理家族);缺席時 ABSENT 而不是炸、也不退回舊路",
-            ok_glob26 and ok_present and ok_honest26 and vd_abs.get("state") == "ABSENT",
-            f"(模式 {'在位' if present26 else '缺席(誠實 ABSENT,不是紅燈)'} · 尺含 VDF 根 {ok_glob26} · 燈 {list((vd26.get('lamps') or {}).keys())} · 連結 {vd26.get('links')} · 橋 {(vd26.get('bridge') or {}).get('accel')}/{(vd26.get('bridge') or {}).get('net')}/{(vd26.get('bridge') or {}).get('tails')} · 缺席態 {vd_abs.get('state')})")
+            ok_present and vd_abs.get("state") == "ABSENT",
+            f"(燈 {list((vd26.get('lamps') or {}).keys())} · 連結 {vd26.get('links')} · 橋 {(vd26.get('bridge') or {}).get('accel')}/{(vd26.get('bridge') or {}).get('net')}/{(vd26.get('bridge') or {}).get('tails')} · 缺席態 {vd_abs.get('state')})")
     except Exception as exc:
         fails.append("㉖"); print("  [FAIL] ㉖ 例外:", type(exc).__name__, exc)
 
-    # ── 批686:VIA 往下只准有**一扇門**。批681 接 VRN、側線接 VDF,兩段是逐字複製貼上;
-    #   再照抄一份給 VAP 就是第三顆頭。㉗ 用 AST 釘住「三家走的是同一把尺」——
-    #   哪天有人手癢再抄一份載入器,這一檢當場紅。
-    import ast as _a
-    _selfsrc = open(__file__, encoding="utf-8").read()
-    _tree = _a.parse(_selfsrc)
-    def _calls_of(_fn):
-        return {c.func.id for c in _a.walk(_fn) if isinstance(c, _a.Call) and isinstance(c.func, _a.Name)}
-    _shell, _secs = {}, {}
-    for _n in _tree.body:
-        if isinstance(_n, _a.FunctionDef) and _n.name in ("_vrnsys", "_vdfsys", "_vapsys"):
-            _shell[_n.name] = "_subsys" in _calls_of(_n)
-        if isinstance(_n, _a.FunctionDef) and _n.name in ("vrn_system", "vdf_system", "vap_system"):
-            _secs[_n.name] = "_subsys_section" in _calls_of(_n)
-    chk("㉗ 批686 三家一把尺:VRN/VDF/VAP 的門一律委派 `_subsys()`、段一律委派 `_subsys_section()`,"
-        "**不准有第二份載入器**(每多一家抄一份二十行,正是「VIA 東西太多」的長法;L30 / Zero-Hydra)",
-        len(_shell) == 3 and all(_shell.values()) and len(_secs) == 3 and all(_secs.values()),
-        f"(門 {sum(_shell.values())}/3 委派 · 段 {sum(_secs.values())}/3 委派 · 家族表 {len(SUBSYS_PORT)} 列)")
-    _ss = subsystems()
-    _fams = set(_ss["families"])
-    _absent_ok = all(v["state"] == "ABSENT" and v["why"]
-                     for v in _ss["families"].values() if not v["engine"])
-    _live_ok = all(v["engine"] for v in _ss["families"].values() if v["state"] != "ABSENT")
-    chk("㉘ 誠實四態:對接口缺席的家族要回 **ABSENT + 講得出因由**(缺件≠壞掉,也不准假綠);"
-        "在位的家族一定要署名是哪一支引擎讀來的。三家分三欄各自報,不混成一個數字(LL327)",
-        _fams == set(SUBSYS_PORT) and _absent_ok and _live_ok,
-        "(" + " · ".join(f"{f}={v['state']}" + (f"/{v['engine']}" if v["engine"] else "") 
-                          for f, v in _ss["families"].items()) + ")")
-    print(f"  [計] 二十八檢 OK {28 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 二十六檢 OK {26 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 

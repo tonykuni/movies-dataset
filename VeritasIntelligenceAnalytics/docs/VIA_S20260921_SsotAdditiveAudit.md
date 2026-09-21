@@ -255,3 +255,7 @@ python "$env:VIA_TEST2"                                                         
 **律的綁定(law_bindings)**:["L90 VRN 正典儲存層=DuckDB(批615 操作員裁定)", "L30 一功能一主(擷取文字修復的擁有者=ENG082)", "L54 尾版律(本冊所有指標一律 glob 尾版,不寫死版號)"]
 
 **側線在這張圖上的位置**:樞紐 `SUP_MDL749`(六欄規則正本)是 rule_canons 之一,v0111 只多讀冊口,冊已重建指到 v0111;`VRN_ENG088` 是稽核件,不在六層鏈上(不進 chain_default),歸哪一層是 P6 的裁定。工作站六層鏈實跑:讀樞紐的 7 支全綠;3 紅(MDL746 · MDL141 · ENG068)都不在樞紐/橋的讀者名單上(P14)。
+
+## 十 · 續(同日 b):VDF 子系統管理對接口
+
+操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」→ 見 `docs/VIA_S20260921b_VDFSystemManager.md`(對接口 v0100 廿七檢 · VCGC v0120 十四段/㉖ · Grid v0434 · Deck v0159 · Manager v0148 · 中央冊補號 273/273 · 單元測試 20 檢;Register v0242 +via-vdfsys/+via-vrnsys 已入,操作員「依你建議執行」= L70 許可)。

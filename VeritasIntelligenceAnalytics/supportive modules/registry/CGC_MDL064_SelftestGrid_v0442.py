@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0442→v0443(側線 2026-09-21 e 併 main 批686b(PR #59 via-envmanager-governance);主線批號由併線的手指定 L25):主線又出了自己的 v0441(從主線 v0439 長,
-  疊回 SUP_MDL015 站與本線的 VDF 對接口兩站),與本線 d 批的 v0441 撞名;併線取主線 v0441,本線 v0442 是從本線 v0441 長出來的。這一版把主線 v0441 相對 v0439 的兩處照抄進來:
-  「第一頁邏輯補缺正主橋二十二檢」→「二十六檢」(批686b 兩線拒絕閘聯集:別名層+文字層;ENG086 v0112)· +站「券商別名全清單八檢」(SUP_MDL015 批680/680b);
-  主線疊回的 VDF 對接口兩站本線本來就有(廿九檢 + 實跑 + 啟動就緒,不重複)。另:中央控管台站名 二十六檢 → **二十八檢**(主線 VCGC v0121 +㉗㉘ 三家一把尺;側線 v0122 補回收尺時漏掉的 VDF bridge 段——主線 ㉖ 在對接口在位的樹上必紅;側線的 ㉖ 一字不改)。
-  站 290 → 291。其餘一字不動(v0442 留作版史,尾版律 L04)。
-
 v0441→v0442(側線 2026-09-21 d 併 main 批689B(PR #63 awesome-bardeen);主線批號由併線的手指定 L25):主線出了自己的 v0439(批689B 全景式檢視 VRN),
   與本線 c 批的 v0439 撞名;併線取主線 v0439,本線 v0440/v0441 是從本線 v0439 長出來的,主線 v0439 的八處改動因此不在裡面。這一版把它們照抄進來(其餘一字不動,v0441 留作版史):
   「第一頁邏輯補缺正主橋二十檢」→「二十二檢」· 「VRN 研報六欄規則正本樞紐四十八檢/四十三檢」→「四十九檢」(兩站)· 「每日觀察摘要八檢」rc0 → nodata_ok ·
@@ -2222,11 +2216,6 @@ def battery(fast: bool):
     # ── 側線 2026-09-21:VDF 子系統管理對接口(操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」)
     #   與 VRN 那扇門同一份契約:上接 VCGC(v0120 起 vdf_system() 經它讀),下管 VDF 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;
     #   橋律逐支量(尺=CGC_MDL124:尾版缺加速器橋或真擷取缺網路橋=RED);零網路 · 零寫庫 · 預設只讀(sync --apply 只落 VIA_Reports/vdf_system)。
-    # ── 批686b(主線 PR #59;本線 v0443 照抄):SUP_MDL015 券商別名全清單接拒絕閘(批680/680b)
-    add("券商別名全清單八檢(批680;批680b 拒絕閘下到文字層;SUP_MDL015 接拒絕閘:正控把被拒機構塞回表裡必須解不出來/"
-        "不連帶擋掉合法的/名單不在本檔;CLST-6669 的期待值補上批541 併案裁定)",
-        newest("SUP_MDL015_VISVRNBrokerAliasFullList_v*.py", VIA / "supportive modules" / "70_VRN_Rules"),
-        ["--selftest"], "rc0", 180)
     add("VDF 子系統管理對接口廿九檢(側線 2026-09-21;VDF_SystemManager:上接 VCGC 下管四庫+橋/工具 · 四態表驅動 · 橋律逐支量委派橋掃器 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染 · 開機鏈雙載體同鏈 · 啟動就緒只量不動手)",
         newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["--selftest"], "rc0", 300)
     add("VDF 子系統管理實跑(側線 2026-09-21;status 九域現況+連結表+橋律;rc0 綠 / rc2 過期或缺料誠實 / rc1 才是壞)",
@@ -2375,11 +2364,11 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台二十八檢(批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台二十六檢(側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("OCR 車道執行器三檢(批495;本境缺後端派到 via_paddle_311 跑 GLE 編排器,JSON 回主行程)",
         newest("SUP_MDL747_OcrLaneRunner_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
-    add("第一頁邏輯補缺正主橋二十六檢(批686b 兩線拒絕閘聯集:別名層+文字層)(批689B 券商拒絕閘 CGC_MDL176+正典鍵對映;批522/537/540/541/545;VRN_ENG086:收容件 md5 冊·檔名→代碼階梯·券商證據分級+標的否決·評等/目標價/檔名日期誠實四態·三張券商表合併零撞名·收容件位元錨導入驗證+負控·錨檔按名字取+夾內多餘檔點名·md5 比對行尾無關;零網路)",
+    add("第一頁邏輯補缺正主橋二十二檢(批689B 券商拒絕閘 CGC_MDL176+正典鍵對映;批522/537/540/541/545;VRN_ENG086:收容件 md5 冊·檔名→代碼階梯·券商證據分級+標的否決·評等/目標價/檔名日期誠實四態·三張券商表合併零撞名·收容件位元錨導入驗證+負控·錨檔按名字取+夾內多餘檔點名·md5 比對行尾無關;零網路)",
         newest("VRN_ENG086_FirstPageLogicBridge_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 180)
     add("唯一接觸口控制面二十六檢(批533/534/543/570;CGC_MDL157:短令必有梭·梭不得釘死版號·命令冊尾版·單一 Invoke-VIAPython·bootstrap 身分·網路 fail-closed·家族境派送·誠實四態)",
         newest("CGC_MDL157_VIAUniqueEntryControl_v*.py", HERE), ["--selftest"], "rc0", 600)

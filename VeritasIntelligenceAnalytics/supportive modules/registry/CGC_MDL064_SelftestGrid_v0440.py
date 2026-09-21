@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0442→v0443(側線 2026-09-21 e 併 main 批686b(PR #59 via-envmanager-governance);主線批號由併線的手指定 L25):主線又出了自己的 v0441(從主線 v0439 長,
-  疊回 SUP_MDL015 站與本線的 VDF 對接口兩站),與本線 d 批的 v0441 撞名;併線取主線 v0441,本線 v0442 是從本線 v0441 長出來的。這一版把主線 v0441 相對 v0439 的兩處照抄進來:
-  「第一頁邏輯補缺正主橋二十二檢」→「二十六檢」(批686b 兩線拒絕閘聯集:別名層+文字層;ENG086 v0112)· +站「券商別名全清單八檢」(SUP_MDL015 批680/680b);
-  主線疊回的 VDF 對接口兩站本線本來就有(廿九檢 + 實跑 + 啟動就緒,不重複)。另:中央控管台站名 二十六檢 → **二十八檢**(主線 VCGC v0121 +㉗㉘ 三家一把尺;側線 v0122 補回收尺時漏掉的 VDF bridge 段——主線 ㉖ 在對接口在位的樹上必紅;側線的 ㉖ 一字不改)。
-  站 290 → 291。其餘一字不動(v0442 留作版史,尾版律 L04)。
-
-v0441→v0442(側線 2026-09-21 d 併 main 批689B(PR #63 awesome-bardeen);主線批號由併線的手指定 L25):主線出了自己的 v0439(批689B 全景式檢視 VRN),
-  與本線 c 批的 v0439 撞名;併線取主線 v0439,本線 v0440/v0441 是從本線 v0439 長出來的,主線 v0439 的八處改動因此不在裡面。這一版把它們照抄進來(其餘一字不動,v0441 留作版史):
-  「第一頁邏輯補缺正主橋二十檢」→「二十二檢」· 「VRN 研報六欄規則正本樞紐四十八檢/四十三檢」→「四十九檢」(兩站)· 「每日觀察摘要八檢」rc0 → nodata_ok ·
-  「首頁全能引擎三十九檢」→「四十一檢」rc0 → nodata_ok · 「VRN 子系統管理對接口廿二檢」→「廿七檢」(主線 v0102 +同義字域;主線 v0103 尺改對)。站數不變(290)。
-
-v0440→v0441(側線 2026-09-21 d;主線批號由併線的手指定 L25;操作員令「GO 我需要擷取 VDF 的資料,幫我完善到可啟動她」):
-  ① 站名:VDF 子系統管理對接口 廿七檢 → **廿九檢**(VDF_SystemManager v0103 +㉘ 開機鏈雙載體同鏈 +㉙ 啟動就緒只量不動手)。
-  ② +一站「VDF 啟動就緒」(launch --no-probe;gated_ok):rc0 可啟動 / rc4 同意閘未開=GATED 不是紅 / rc3 家族境缺必要庫=境缺分類器收 SKIP(不進分母 L57)/
-     rc1 才是壞(啟動器/鏈缺 · via_boot_update.sh 與 .ps1 不同鏈——Z94 那一課量出來其實少 13 步,.ps1 本批補齊)。站 289 → 290。
-  其餘一字不動(v0440 留作版史,尾版律 L04)。
-
 v0438→v0440(側線 2026-09-21 c;主線批號由併線的手指定 L25):主線批688 出了自己的 v0438(與本線 b 批的 v0438 撞名,本線 v0439 又是從本線 v0438 長出來的),
   這一版把本線所有格子改動重貼在**主線 v0438** 上(v0439 留作版史,尾版律 L04):
   ① 兩站:VDF 子系統管理對接口廿七檢(--selftest rc0)· VDF 子系統管理實跑(status nodata_ok);中央控管台站名 二十二檢 → 二十六檢(VCGC v0120)。
@@ -2109,7 +2092,7 @@ def battery(fast: bool):
     add("原始 UI 模板八檢(批165)", newest("CGC_MDL089_UIBaseTemplate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("儀表板原始版八檢(批167)+缺料前檢(批400 v0107)", newest("VAP_ENG009_DashboardUI_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
     add("系統同步樞紐八檢(批168)", newest("CGC_MDL090_SystemHub_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("每日觀察摘要八檢(批174;批689B 缺料 SKIP=rc2 不是壞)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "nodata_ok", 300)
+    add("每日觀察摘要八檢(批174)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("系統憲章對照八檢(批175)", newest("CGC_MDL091_CharterAudit_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("驗證共識庫八檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("調整後價格層八檢(批178)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
@@ -2132,7 +2115,7 @@ def battery(fast: bool):
     add("資料庫目錄台八檢(批226;側線 2026-09-21 c:庫/再生頁不在=NODATA rc2 不是紅)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "nodata_ok", 180)
     add("全球市場觀測八檢(批227;側線 2026-09-21 c:庫/再生頁不在=NODATA rc2 不是紅)", newest("CGC_MDL099_GlobalMarkets_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "nodata_ok", 120)
     add("首頁文字擷取五十六檢(批235/410/444/449/450/451/522/547/549/550/551/552/626;密度分流閘·三階梯·不編造「跑了」·在位≠跑得動·車道境預檢:cfg 在不在×home 裡有沒有 python;**批626 行程分片預熱**:三支抽取是純 Python CPU 工,執行緒 0.76×(比序列慢)、行程 3.68×,端到端 1.90× 且 sidecar 逐位元組相同;`--jobs 1` 退得回原路;順帶修掉一盞**自己量自己**的假綠——`_src72.index(\"else extract_page1_zones(p)\")` 整支檔裡只有檢查自己那一行有,所以它永遠綠)", newest("VRN_ENG072_FirstPageText_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 180)
-    add("首頁全能引擎四十一檢(批448;批689B ㊳ 無 sidecar 的境=NODATA rc2)", newest("VIA_VRN_FirstPageEngine_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "nodata_ok", 600)
+    add("首頁全能引擎三十九檢(批448)", newest("VIA_VRN_FirstPageEngine_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 600)
     add("轉檔器 DPI 自動調整九檢(批448/449;批516 逾時 600:渲染類自測重)", newest("VRN_MDL001_Converter_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 600)
     add("Markdown 結構橋六檢(批438)", newest("SUP_MDL745_MarkdownStructureHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("PDFPlumber-Plus 統轄橋九檢(批444)", newest("SUP_MDL746_PDFPlumberPlusHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 240)
@@ -2214,7 +2197,7 @@ def battery(fast: bool):
     #   上接 VCGC(v0118 起 logic()/factors() 經它讀),下管 VRN 政策/邏輯/因子/參數四庫 + 引擎面 + 交接;
     #   自適應連結=每次現解尾版、現算 sha、現量年齡,不釘版號;零網路 · 零寫庫 · 預設只讀(sync --apply 才落快照,且只落 VIA_Reports)。
     #   第二站 rc 2 = STALE/NODATA(過期或缺料,例如一頁交接比律冊舊)——**過期不是壞掉**,用 nodata_ok 收;rc 1 才是壞。
-    add("VRN 子系統管理對接口廿七檢(批689B +同義字域;批681;VRN_SystemManager:上接 VCGC 下管四庫 · 四態表驅動 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)",
+    add("VRN 子系統管理對接口廿二檢(批681;VRN_SystemManager:上接 VCGC 下管四庫 · 四態表驅動 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)",
         newest("VRN_SystemManager_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("VRN 子系統管理實跑(批681;status 六域現況+連結表;rc0 綠 / rc2 過期或缺料誠實 / rc1 才是壞)",
         newest("VRN_SystemManager_v*.py", VRN), ["status"], "nodata_ok", 300)
@@ -2222,19 +2205,10 @@ def battery(fast: bool):
     # ── 側線 2026-09-21:VDF 子系統管理對接口(操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」)
     #   與 VRN 那扇門同一份契約:上接 VCGC(v0120 起 vdf_system() 經它讀),下管 VDF 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;
     #   橋律逐支量(尺=CGC_MDL124:尾版缺加速器橋或真擷取缺網路橋=RED);零網路 · 零寫庫 · 預設只讀(sync --apply 只落 VIA_Reports/vdf_system)。
-    # ── 批686b(主線 PR #59;本線 v0443 照抄):SUP_MDL015 券商別名全清單接拒絕閘(批680/680b)
-    add("券商別名全清單八檢(批680;批680b 拒絕閘下到文字層;SUP_MDL015 接拒絕閘:正控把被拒機構塞回表裡必須解不出來/"
-        "不連帶擋掉合法的/名單不在本檔;CLST-6669 的期待值補上批541 併案裁定)",
-        newest("SUP_MDL015_VISVRNBrokerAliasFullList_v*.py", VIA / "supportive modules" / "70_VRN_Rules"),
-        ["--selftest"], "rc0", 180)
-    add("VDF 子系統管理對接口廿九檢(側線 2026-09-21;VDF_SystemManager:上接 VCGC 下管四庫+橋/工具 · 四態表驅動 · 橋律逐支量委派橋掃器 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染 · 開機鏈雙載體同鏈 · 啟動就緒只量不動手)",
+    add("VDF 子系統管理對接口廿七檢(側線 2026-09-21;VDF_SystemManager:上接 VCGC 下管四庫+橋/工具 · 四態表驅動 · 橋律逐支量委派橋掃器 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)",
         newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["--selftest"], "rc0", 300)
     add("VDF 子系統管理實跑(側線 2026-09-21;status 九域現況+連結表+橋律;rc0 綠 / rc2 過期或缺料誠實 / rc1 才是壞)",
         newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["status"], "nodata_ok", 300)
-    # ── 側線 2026-09-21 d:VDF 啟動就緒(操作員令「擷取 VDF 的資料 · 完善到可啟動」)——只量不動手:家族境 python+必要庫(尺 MDL137/136)· 同意閘只讀 ·
-    #   啟動器/短令/鏈在位 · via_boot_update.sh↔.ps1 同鏈 · 上次實跑存證 · 落點。rc4 閘未開=GATED(料齊等人);rc3 家族境缺件=分類器收 SKIP;rc1 才是壞。
-    add("VDF 啟動就緒(側線 2026-09-21 d;VDF_SystemManager launch --no-probe:八項現量+下一步卡;rc0 可啟動 / rc4 同意閘未開 GATED / rc3 家族境缺必要庫=境缺 SKIP / rc1 啟動器缺或雙載體不同鏈)",
-        newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["launch", "--no-probe"], "gated_ok", 300)
 
     # ── 側線 2026-09-21(claude/busy-bell-97sa4f · PR #53)的三站,原樣收進來 ────────
     #   兩條分支**同時取了 v0431 這個版號**:他們的 v0431 加了下面三站,我的 v0431 加了
@@ -2244,7 +2218,7 @@ def battery(fast: bool):
     #   ②把他們三站原樣併進來,於是不論誰先併,兩邊的站都在同一份尾版上。
     #   他們那三支引擎只在他們分支上,本分支 newest() 找不到會回 None → 格子判**誠實 SKIP**
     #   (不是紅燈);等 PR #53 併進 main,同一份檔就會開始真的跑它們。
-    add("VRN 研報六欄規則正本樞紐四十九檢(批689B +㊼ 券商拒絕閘經 ENG086 生效;側線 2026-09-21 +㊷–㊻ 增補冊讀冊口:在位且宣告 only_add/四態判得出且多義不挑/只增不減實證(樞紐 38 別名冊上全在且正典都在候選)/多義只攤開不裁且讀冊不改冊/合成冊負控 only_add:false 拒讀;批540/541/554/558/562/563/623/628/630/634;SUP_MDL749 v0111:**批634 +十動詞**——三平台代號(`2330.TW`/`2330 TT` 原本都回 UNCLASSIFIED)· 三平台對照(對不上=YELLOW 且三個值都留著,不挑一個用)· 季度六寫法 · 年度/FY · 聯絡正則(電郵/中英姓名/台港電話,原文四條全放寬過)· 本次vs前次目標價(箭號句左前右本)· 逐型 × 逐平台 27 條(操作員批634 那張表;冊上從 types_ordered **推**出來不另抄)· **ETF 位數量在冊上**(操作員規格 `00\\d{3}` 五字元在容器庫 39 支 00 開頭代號上一支都收不到;但庫不完整,`00692`/`00878` 是真的五字元,所以四五六都要收)· 三來源合流。**裸兩位數不可判年**、**Bloomberg TT 一律 UNKNOWN**(判不出上市櫃就寫判不出)、**裸四碼與西元年重疊要自己招**;`broker_of` 沒中回 `(None, 無)` 是非空 tuple,`if bk:` 判等於沒判(實測 ubs.com → 空)。**㉙㉚ 鍵與詞是兩個鍵空間不可互代**——`rating_keys()` 驗證用(6 鍵,從機構冊讀)、`rating_words()` 抽取用(66 詞人話);拿詞表當驗證尺會把 `NOT_RATED`/`STRONG_BUY` 判成錯的(只差一個底線);**批628 ticker / date 兩本規則進冊**——台股代號三平台九型(操作員逐字給定的原式 `as_given` 與實測修正式 `corrected` **兩份都留**:原式的 `00\\d{3}` 是五碼,而 `0050` 是四碼,九型全部收不到它);日期十二式有序表(純數字三式零回歸 + 帶分隔 + 中文 + 民國字樣 + 年月 + 只有年 + 英文月),**年月/只有年不補成一日**(補出來的那一天是捏造的);跨冊衝突掃描每條都要舉得出實例,讀不到別名表就要講「沒掃過」不是「沒衝突」;**㉑ 上下貫通檢**(供應函式逐支照出誰在吃;CLI 動詞不算供應函式=量出來不是手抄;樞紐自己在用判 INTERNAL 不判 ORPHAN——沒有外部消費者不等於沒人用);規則收斂到一本冊·落差逐條攤開·惰性轉交正本實作·去衝突零撞名·候選同義字只提不寫冊+閘門負控·目標價同義字讀機構 SSOT 冊+加寬弱道負控+量尺負控·三公用件(斷行修復/周圍訊息區塊/本文標題區)+本土尺度上下文否決負控·評等詞彙三源聯集(只增不減除非衝突;撞名 2 個排除)+收容冊閘負控·MOPS 列優先序+同鍵多列負控)",
+    add("VRN 研報六欄規則正本樞紐四十八檢(側線 2026-09-21 +㊷–㊻ 增補冊讀冊口:在位且宣告 only_add/四態判得出且多義不挑/只增不減實證(樞紐 38 別名冊上全在且正典都在候選)/多義只攤開不裁且讀冊不改冊/合成冊負控 only_add:false 拒讀;批540/541/554/558/562/563/623/628/630/634;SUP_MDL749 v0111:**批634 +十動詞**——三平台代號(`2330.TW`/`2330 TT` 原本都回 UNCLASSIFIED)· 三平台對照(對不上=YELLOW 且三個值都留著,不挑一個用)· 季度六寫法 · 年度/FY · 聯絡正則(電郵/中英姓名/台港電話,原文四條全放寬過)· 本次vs前次目標價(箭號句左前右本)· 逐型 × 逐平台 27 條(操作員批634 那張表;冊上從 types_ordered **推**出來不另抄)· **ETF 位數量在冊上**(操作員規格 `00\\d{3}` 五字元在容器庫 39 支 00 開頭代號上一支都收不到;但庫不完整,`00692`/`00878` 是真的五字元,所以四五六都要收)· 三來源合流。**裸兩位數不可判年**、**Bloomberg TT 一律 UNKNOWN**(判不出上市櫃就寫判不出)、**裸四碼與西元年重疊要自己招**;`broker_of` 沒中回 `(None, 無)` 是非空 tuple,`if bk:` 判等於沒判(實測 ubs.com → 空)。**㉙㉚ 鍵與詞是兩個鍵空間不可互代**——`rating_keys()` 驗證用(6 鍵,從機構冊讀)、`rating_words()` 抽取用(66 詞人話);拿詞表當驗證尺會把 `NOT_RATED`/`STRONG_BUY` 判成錯的(只差一個底線);**批628 ticker / date 兩本規則進冊**——台股代號三平台九型(操作員逐字給定的原式 `as_given` 與實測修正式 `corrected` **兩份都留**:原式的 `00\\d{3}` 是五碼,而 `0050` 是四碼,九型全部收不到它);日期十二式有序表(純數字三式零回歸 + 帶分隔 + 中文 + 民國字樣 + 年月 + 只有年 + 英文月),**年月/只有年不補成一日**(補出來的那一天是捏造的);跨冊衝突掃描每條都要舉得出實例,讀不到別名表就要講「沒掃過」不是「沒衝突」;**㉑ 上下貫通檢**(供應函式逐支照出誰在吃;CLI 動詞不算供應函式=量出來不是手抄;樞紐自己在用判 INTERNAL 不判 ORPHAN——沒有外部消費者不等於沒人用);規則收斂到一本冊·落差逐條攤開·惰性轉交正本實作·去衝突零撞名·候選同義字只提不寫冊+閘門負控·目標價同義字讀機構 SSOT 冊+加寬弱道負控+量尺負控·三公用件(斷行修復/周圍訊息區塊/本文標題區)+本土尺度上下文否決負控·評等詞彙三源聯集(只增不減除非衝突;撞名 2 個排除)+收容冊閘負控·MOPS 列優先序+同鍵多列負控)",
         newest("SUP_MDL749_VRNFieldRuleHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 300)
     # 側線 2026-09-21:操作員上傳 VIA_SSOT_Additive_Audit_v0100(五件先比 md5:四件是重複件不再收,只收審計包 30 件)。
     #   正主橋 ENG088 在**暫存副本**跑包內 30+48 檢並拿收容夾 sha256 前後對(零觸碰是量的不是宣告);
@@ -2375,11 +2349,11 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台二十八檢(批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台二十六檢(側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("OCR 車道執行器三檢(批495;本境缺後端派到 via_paddle_311 跑 GLE 編排器,JSON 回主行程)",
         newest("SUP_MDL747_OcrLaneRunner_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
-    add("第一頁邏輯補缺正主橋二十六檢(批686b 兩線拒絕閘聯集:別名層+文字層)(批689B 券商拒絕閘 CGC_MDL176+正典鍵對映;批522/537/540/541/545;VRN_ENG086:收容件 md5 冊·檔名→代碼階梯·券商證據分級+標的否決·評等/目標價/檔名日期誠實四態·三張券商表合併零撞名·收容件位元錨導入驗證+負控·錨檔按名字取+夾內多餘檔點名·md5 比對行尾無關;零網路)",
+    add("第一頁邏輯補缺正主橋二十檢(批522/537/540/541/545;VRN_ENG086:收容件 md5 冊·檔名→代碼階梯·券商證據分級+標的否決·評等/目標價/檔名日期誠實四態·三張券商表合併零撞名·收容件位元錨導入驗證+負控·錨檔按名字取+夾內多餘檔點名·md5 比對行尾無關;零網路)",
         newest("VRN_ENG086_FirstPageLogicBridge_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 180)
     add("唯一接觸口控制面二十六檢(批533/534/543/570;CGC_MDL157:短令必有梭·梭不得釘死版號·命令冊尾版·單一 Invoke-VIAPython·bootstrap 身分·網路 fail-closed·家族境派送·誠實四態)",
         newest("CGC_MDL157_VIAUniqueEntryControl_v*.py", HERE), ["--selftest"], "rc0", 600)
@@ -2496,7 +2470,7 @@ def battery(fast: bool):
     add("共識融合橋七檢(批563:量到正典 consensus_daily/latest 皆 0 列,而收容件引擎寫的是它自己的 consensus_current/history/long——**兩邊從來沒接上過**;誠實四態·來源缺不猜對映·sync 不寫 0 列充數·COPY_ONLY 反連結)",
         newest("VDF_ENG088_ConsensusFusionBridge_v*.py", VIA / "functional modules/VDF/engine"),
         ["--selftest"], "rc0", 120)
-    add("VRN 研報六欄規則正本樞紐四十九檢(批689B +㊼;批540/541/554/558/562/563/623/628/630/634;SUP_MDL749 v0110:**批634 +十動詞**——三平台代號(`2330.TW`/`2330 TT` 原本都回 UNCLASSIFIED)· 三平台對照(對不上=YELLOW 且三個值都留著,不挑一個用)· 季度六寫法 · 年度/FY · 聯絡正則(電郵/中英姓名/台港電話,原文四條全放寬過)· 本次vs前次目標價(箭號句左前右本)· 逐型 × 逐平台 27 條(操作員批634 那張表;冊上從 types_ordered **推**出來不另抄)· **ETF 位數量在冊上**(操作員規格 `00\\d{3}` 五字元在容器庫 39 支 00 開頭代號上一支都收不到;但庫不完整,`00692`/`00878` 是真的五字元,所以四五六都要收)· 三來源合流。**裸兩位數不可判年**、**Bloomberg TT 一律 UNKNOWN**(判不出上市櫃就寫判不出)、**裸四碼與西元年重疊要自己招**;`broker_of` 沒中回 `(None, 無)` 是非空 tuple,`if bk:` 判等於沒判(實測 ubs.com → 空)。**㉙㉚ 鍵與詞是兩個鍵空間不可互代**——`rating_keys()` 驗證用(6 鍵,從機構冊讀)、`rating_words()` 抽取用(66 詞人話);拿詞表當驗證尺會把 `NOT_RATED`/`STRONG_BUY` 判成錯的(只差一個底線);**批628 ticker / date 兩本規則進冊**——台股代號三平台九型(操作員逐字給定的原式 `as_given` 與實測修正式 `corrected` **兩份都留**:原式的 `00\\d{3}` 是五碼,而 `0050` 是四碼,九型全部收不到它);日期十二式有序表(純數字三式零回歸 + 帶分隔 + 中文 + 民國字樣 + 年月 + 只有年 + 英文月),**年月/只有年不補成一日**(補出來的那一天是捏造的);跨冊衝突掃描每條都要舉得出實例,讀不到別名表就要講「沒掃過」不是「沒衝突」;**㉑ 上下貫通檢**(供應函式逐支照出誰在吃;CLI 動詞不算供應函式=量出來不是手抄;樞紐自己在用判 INTERNAL 不判 ORPHAN——沒有外部消費者不等於沒人用);規則收斂到一本冊·落差逐條攤開·惰性轉交正本實作·去衝突零撞名·候選同義字只提不寫冊+閘門負控·目標價同義字讀機構 SSOT 冊+加寬弱道負控+量尺負控·三公用件(斷行修復/周圍訊息區塊/本文標題區)+本土尺度上下文否決負控·評等詞彙三源聯集(只增不減除非衝突;撞名 2 個排除)+收容冊閘負控·MOPS 列優先序+同鍵多列負控)",
+    add("VRN 研報六欄規則正本樞紐四十三檢(批540/541/554/558/562/563/623/628/630/634;SUP_MDL749 v0110:**批634 +十動詞**——三平台代號(`2330.TW`/`2330 TT` 原本都回 UNCLASSIFIED)· 三平台對照(對不上=YELLOW 且三個值都留著,不挑一個用)· 季度六寫法 · 年度/FY · 聯絡正則(電郵/中英姓名/台港電話,原文四條全放寬過)· 本次vs前次目標價(箭號句左前右本)· 逐型 × 逐平台 27 條(操作員批634 那張表;冊上從 types_ordered **推**出來不另抄)· **ETF 位數量在冊上**(操作員規格 `00\\d{3}` 五字元在容器庫 39 支 00 開頭代號上一支都收不到;但庫不完整,`00692`/`00878` 是真的五字元,所以四五六都要收)· 三來源合流。**裸兩位數不可判年**、**Bloomberg TT 一律 UNKNOWN**(判不出上市櫃就寫判不出)、**裸四碼與西元年重疊要自己招**;`broker_of` 沒中回 `(None, 無)` 是非空 tuple,`if bk:` 判等於沒判(實測 ubs.com → 空)。**㉙㉚ 鍵與詞是兩個鍵空間不可互代**——`rating_keys()` 驗證用(6 鍵,從機構冊讀)、`rating_words()` 抽取用(66 詞人話);拿詞表當驗證尺會把 `NOT_RATED`/`STRONG_BUY` 判成錯的(只差一個底線);**批628 ticker / date 兩本規則進冊**——台股代號三平台九型(操作員逐字給定的原式 `as_given` 與實測修正式 `corrected` **兩份都留**:原式的 `00\\d{3}` 是五碼,而 `0050` 是四碼,九型全部收不到它);日期十二式有序表(純數字三式零回歸 + 帶分隔 + 中文 + 民國字樣 + 年月 + 只有年 + 英文月),**年月/只有年不補成一日**(補出來的那一天是捏造的);跨冊衝突掃描每條都要舉得出實例,讀不到別名表就要講「沒掃過」不是「沒衝突」;**㉑ 上下貫通檢**(供應函式逐支照出誰在吃;CLI 動詞不算供應函式=量出來不是手抄;樞紐自己在用判 INTERNAL 不判 ORPHAN——沒有外部消費者不等於沒人用);規則收斂到一本冊·落差逐條攤開·惰性轉交正本實作·去衝突零撞名·候選同義字只提不寫冊+閘門負控·目標價同義字讀機構 SSOT 冊+加寬弱道負控+量尺負控·三公用件(斷行修復/周圍訊息區塊/本文標題區)+本土尺度上下文否決負控·評等詞彙三源聯集(只增不減除非衝突;撞名 2 個排除)+收容冊閘負控·MOPS 列優先序+同鍵多列負控)",
         newest("SUP_MDL749_VRNFieldRuleHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("全景稽核修復正主二十八檢(批658;CGC_MDL158 v0104:AST 定位七類問題·活樹尾版過濾·純增量修復冪等·語法壞檔拒修·誠實四態·免修名冊讀 MDL156 同一份+反向對照;零網路)",
         newest("CGC_MDL158_VIAPanoramaAuditRepair_v*.py", HERE), ["--selftest"], "rc0", 300)
