@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""SUP_MDL746 · PDFPlumberPlusHub v0100 —— PDFPlumber-Plus 收容件統轄橋
+r"""SUP_MDL746 · PDFPlumberPlusHub v0101 —— PDFPlumber-Plus 收容件統轄橋
 
-v0100→v0101(批692 工作站實錄修:⑦ 第三條斷言把「全庫長相」當成了規格):
-  操作員工作站 83 件真檔:⑥ 綠(DIGITAL 71 · THIN 1 · SCANNED 11),⑦ 紅;
-  容器 18 件全綠。一棵樹不會有兩個真相 —— 逐條對過之後,紅的是尺。
-  舊斷言要求「全庫最低 DIGITAL 首頁字數 > 300」,而分類器的 dense_ok
-  在字數之前就短路,小版面密度夠的 112 字件本來就該是 DIGITAL。
-  改成驗分類器真的保證的那一件:DIGITAL 密度一律 >= 門檻。檢數不變(九檢)。
+v0100→v0101(批692 Z84:工作站 via-vrnrun ⑦ 紅、容器綠——尺拿「隨資料變的數」當斷言,LL332)
+  ⑦ 原本斷言三件:THIN 全 >= 300 字 · SCANNED 全 < 300 字 · **全庫最低 DIGITAL 首頁字數 > 300**。
+  前兩件是 triage() 規則表推得出的不變量;第三件不是——DIGITAL 只看密度(>= 2e-4),字數只要 >= 10,
+  一頁小版面、字少但密的封面/摘要頁(工作站 incoming 64 件裡有,容器的 specs/ 夾具裡沒有)就是 DIGITAL < 300 字,
+  ⑦ 在工作站必紅、在容器必綠。**判錯的燈和假綠一樣傷**(L16)。
+  v0101 的 ⑦:① 夾具本人(specs/Veritas Intelligence Analytics Brief.pdf,949×7448 長捲頁)必須是 THIN、字數 >= 300、密度 < 門檻
+  ——這才是「密度只當訊號不當判決」的真檔證據;② 全庫每一件都要合規則表(THIN ⇒ 字數 >= 300;SCANNED ⇒ 字數 < 300;
+  DIGITAL ⇒ 密度 >= 門檻);③ 全庫最低 DIGITAL 字數只印出來,不當斷言。判準(triage 本體)一個字沒動。
 
 操作員 2026-09-12 上傳 `VIA_PDFPlumberPlusEngine.py`(1196 行)並令「接上去」。
 
@@ -76,7 +78,7 @@ INTAKE = VIA / "functional modules" / "VRN" / "references" / "intake"
 
 MODULE_ID = "SUP_MDL746"
 HUB_NAME = "PDFPlumberPlusHub"
-HUB_VERSION = "v0100"
+HUB_VERSION = "v0101"
 PKG_GLOB = "VIA_PDFPlumberPlusEngine_v*"
 PKG_MARKER = Path("VIA_PDFPlumberPlusEngine.py")
 
@@ -535,35 +537,23 @@ def selftest() -> int:
         f"UNKNOWN {len(seen.get('UNKNOWN', []))})")
 
     # ⑦ 真檔證出來的假紅:長捲頁不准只憑密度降級
+    #    批692:斷言只留規則表推得出的不變量 + 夾具本人;「全庫最低 DIGITAL 字數」隨庫變,只印不斷言(LL332)
     thin6 = seen.get("THIN", [])
-    dig6 = seen.get("DIGITAL", [])
-    P7 = params()
-    lo_real = min([c for _, c, _ in dig6] or [0])
-    lo_dens = min([d for _, _, d in dig6] or [1.0])
-    # ── 批692 工作站實錄修(操作員 83 件真檔一跑就紅,容器 18 件是綠的)
-    #   舊的第三條斷言是「全庫最低 DIGITAL 首頁字數 > SPARSE_CHARS」。
-    #   **分類器從來沒有保證過這件事** —— 它的實際規則是:
-    #       n < TRIAGE_MIN_CHARS → SCANNED
-    #       dense_ok            → DIGITAL      ← 在字數之前就短路了
-    #       n >= SPARSE_CHARS   → THIN
-    #       否則                 → SCANNED
-    #   所以「小版面、密度夠、首頁只有 112 字」是**合法的 DIGITAL**。
-    #   那一條記的是寫檢當天那棵樹的全庫長相,不是規格
-    #   (LL332:會隨全庫改變的數字不可以當斷言)。**紅的是尺,不是樹。**
-    #   換成分類器真的保證的那一件:DIGITAL 的密度一律 >= 門檻(與全庫無關)。
-    #   附帶修:舊的細節句把 `>` 寫死在字串裡,失敗時印成「112 字 > 界線 300」
-    #   —— 一句**在自己紅的時候還在說條件成立**的話。
-    chk("⑦ 密度只當訊號不當判決——949×7448 長捲頁那件有 862 字真正文、密度 1.22e-04 "
-        f"低於門檻,光看密度會**假紅**;字數 >= {SPARSE_CHARS} 只標 THIN 不降級"
-        "(批440 那一課:改嚴一道閘之前要有真檔證據)。"
-        "**DIGITAL 不看字數**——密度夠就過,所以「首頁字少」不是紅燈(批692 更正)",
-        all(c >= SPARSE_CHARS for _, c, _ in thin6)
+    lo_real = min([c for _, c, _ in seen.get("DIGITAL", [])] or [0])
+    fx7 = VIA / "supportive modules" / "specs" / "Veritas Intelligence Analytics Brief.pdf"
+    t7 = triage(fx7) if fx7.is_file() else {"state": "UNKNOWN", "n_chars": 0, "density": 0.0, "min_density": 0.0}
+    dig_lo_dens = [n for n, _, d in seen.get("DIGITAL", []) if d < params()["TRIAGE_MIN_CHAR_DENSITY"]]
+    chk("⑦ 密度只當訊號不當判決——夾具 949×7448 長捲頁(specs/…Brief.pdf)真文字 >= "
+        f"{SPARSE_CHARS} 字、密度低於門檻,必須判 THIN 不降級;全庫每件合規則表"
+        "(THIN ⇒ 字數 >= 界線 · SCANNED ⇒ 字數 < 界線 · DIGITAL ⇒ 密度 >= 門檻);"
+        "最低 DIGITAL 字數只印不斷言(批692:那是隨庫變的數,工作站 64 件裡有小版面密頁)",
+        fx7.is_file() and t7["state"] == "THIN" and t7["n_chars"] >= SPARSE_CHARS
+        and t7["density"] < t7["min_density"]
+        and all(c >= SPARSE_CHARS for _, c, _ in thin6)
         and all(c < SPARSE_CHARS for _, c, _ in seen.get("SCANNED", []))
-        and all(d >= P7["TRIAGE_MIN_CHAR_DENSITY"] for _, _, d in dig6),
-        f"(THIN {len(thin6)} 件:{', '.join(f'{n[:22]}={c}字' for n, c, _ in thin6[:2]) or '-'}"
-        f" · DIGITAL {len(dig6)} 件最低密度 {lo_dens:.2e} 對門檻 "
-        f"{P7['TRIAGE_MIN_CHAR_DENSITY']:.0e}"
-        f" · 最低首頁字數 {lo_real} 字〔只報不判〕)")
+        and not dig_lo_dens,
+        f"(夾具 {t7['state']} {t7['n_chars']}字 密度 {t7['density']:.2e} · THIN {len(thin6)} 件"
+        f" · DIGITAL 密度違規 {len(dig_lo_dens)} · 全庫最低 DIGITAL 首頁 {lo_real} 字(只印))")
 
     # ⑧ 補位不取代:不宣稱比 GLE 的 OCR 新
 

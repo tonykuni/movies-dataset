@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# v0110→v0111(批692 Z84:工作站 via-vrnrun ⑫ 紅、容器綠——自測拿 POSIX 字串比 Windows 的 Path):⑫ 餵 --db /tmp/_x_.duckdb,main() 照批425 包成 Path(_v) 再轉發;
+#   自測用 str(kw["db"]) == "/tmp/_x_.duckdb" 比——Windows 的 str(Path("/tmp/_x_.duckdb")) 是反斜線,永遠不等 → 工作站必紅、容器必綠。判準沒錯,錯的是尺:改比 Path;
+#   橫幅 v0105/十二檢 追到 v0111/十四檢(停了五版)。v0110 號被側線 c 先取(LL334),本檔疊在它上面;其餘一字不動。
 # v0109→v0110(側線 2026-09-21 c):--selftest 遇 duckdb 缺 → [ABSENT] rc3(四態律:缺件≠壞掉),不再 [FAIL] rc1;輸出帶 ModuleNotFoundError 字樣讓三把尺同判。其餘一字不動。
 """
-
-v0110→v0111(批692 工作站實錄修:⑫ 的字串比對是 POSIX 專用的):
-  容器綠、工作站紅,而細節句印的是 db=\\tmp\\_x_.duckdb ——「有傳到」寫在臉上。
-  main() 轉 Path,Windows 的 str() 是反斜線;改比 as_posix(),跨平台同答案。
-  檢數不變(十四檢),驗的內容一個字沒放鬆。
 CGC_MDL141_ClosingGate v0100 — 收尾閘(批398 操作員令「將 VRN VAL 收個尾吧」;via-closeout / via-vrnval / via-vapval)
 ====================================================================
 收尾=「跑成功了嗎」的最後一道誠實閘:不另算、不另抓,只彙整母倉現役引擎的落檔與判準,逐份/逐圖給 DONE|FAIL|PENDING,
@@ -1057,16 +1055,6 @@ def selftest() -> int:
 
     # ⑫ 批425:--db/--zones 必須真的傳到 vrn_closeout。攔真實呼叫來證明,
     # 不掃原始碼字串(那只證明字在,不證明會生效)。
-    # ── 批692 工作站實錄修:這一檢在容器綠、在工作站紅,而**旗標其實有傳到**。
-    #   `main()` 把 CLI 字串轉成 Path,所以 Windows 上
-    #       str(Path("/tmp/_x_.duckdb")) == "\\tmp\\_x_.duckdb"
-    #   舊斷言拿它跟 POSIX 字面值比,於是一到 Windows 就紅 ——
-    #   操作員那一跑的細節句 `db=\tmp\_x_.duckdb` 自己就是「有傳到」的證據。
-    #   跟批619 的 CRLF 同一族:**一棵樹不會有兩個真相,紅的是尺不是樹。**
-    #   改比 as_posix(),兩個平台同一個答案;驗的東西一個字都沒放鬆。
-    def _posix(v):
-        return Path(str(v)).as_posix() if v is not None else None
-
     _seen = {}
     _real_co, _real_argv = globals()["closeout"], sys.argv
     try:
@@ -1085,10 +1073,10 @@ def selftest() -> int:
         "收尾閘永遠讀寫死的預設庫;實跑證據=ENG080 報 GREEN/上漲已算 3/3,"
         "收尾卻三份都印「四點-」,因為兩邊讀的不是同一個庫。"
         "不給旗標時不得硬塞 None,以免覆蓋函式預設值)",
-        _rc == 0 and _posix(_seen.get("db")) == "/tmp/_x_.duckdb"
-        and _posix(_seen.get("zones")) == "/tmp/_z_"
+        _rc == 0 and Path(str(_seen.get("db"))) == Path("/tmp/_x_.duckdb")     # 批692:比 Path,Windows 反斜線也等
+        and Path(str(_seen.get("zones"))) == Path("/tmp/_z_")
         and _rc2 == 0 and "db" not in _seen2 and "zones" not in _seen2,
-        f"(db={_posix(_seen.get('db'))} zones={_posix(_seen.get('zones'))};"
+        f"(db={_seen.get('db')} zones={_seen.get('zones')};"
         f"無旗標時 kw={sorted(_seen2)})")
 
 
@@ -1183,7 +1171,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 收尾閘(CGC_MDL141_ClosingGate v0105)· 十二檢自測(零網路;臨時庫/臨時夾/假圖)===")
+        print("=== 收尾閘(CGC_MDL141_ClosingGate v0111)· 十四檢自測(零網路;臨時庫/臨時夾/假圖)===")
         return selftest()
     verb = next((x for x in a if x in VERBS), "all")
     as_json = "--json" in a
