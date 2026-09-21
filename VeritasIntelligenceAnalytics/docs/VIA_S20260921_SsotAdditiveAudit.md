@@ -38,6 +38,14 @@
 | `SYNONYM_LIBRARY_2.json` | 172,418 | 4a946821… | = 包內 `SYNONYM_LIBRARY.json` → 不另收 |
 | `VRN_WORKFLOW_SPEC.md` | 11,026 | 96ee2a83… | = 包內同名件 → 不另收 |
 
+**第二輪附件(操作員令「整合附件」)——三件,零新料**
+
+| 上傳 | bytes | md5 | 判定 |
+|---|---|---|---|
+| `VRN_WORKFLOW_SPEC_1.md` | 11,026 | 96ee2a83… | 與已收 `VRN_WORKFLOW_SPEC.md` **位元相同** → 不收 |
+| `SYNONYM_LIBRARY_4.json` | 172,418 | 4a946821… | 與已收 `SYNONYM_LIBRARY.json` **位元相同** → 不收 |
+| `VIA_SSOT_Additive_Audit_v0100_2.zip` | 122,931 | 64c76feb… | **更早一代的同一包**:25 件裡 21 件與已收位元相同,4 件是 v0.2.0 之前的版本(`audit_ssot.py` 無 workflow_extension 段、`SYNONYM_LIBRARY.json` 只有 4 域 393 鍵/792 筆、README 無 v0.2.0 段、DELIVERY_MANIFEST 無 content_version),缺 v0.2.0 才有的 5 件(Evidence_Core / test / EXTENSION / QA / SPEC)。**舊冊 ⊆ 新冊實證:393 鍵/792 筆在已收冊全部找得到,缺 0**;舊包自帶 30 檢在暫存副本全過 → 不收第二份(收了會成為 `ADDITIVE_GLOB` 的尾版,把讀冊口指回舊冊;只增不減不等於把舊代再擺一份)。雜湊逐件記在 manifest `prior_generation_uploads` |
+
 包內 `baseline/` 九件對回活樹在 8e8e766f 的 blob:七件 **只差檔尾一個換行**(GitHub API 正規化)、一件只差 CRLF、一件包內沒有;零內容差。包的 `baseline_bytes_unchanged` 只證明包沒動自己的副本,manifest 另外記了對活樹的判定。
 
 **造件(件 / 檔(版號) / 自測 n/n / 證據)**
@@ -95,6 +103,18 @@
 | V4 `via-vrnmatrix` rc=0 | 105 份 × 7 欄 · 格子 735 · GREEN 461 · YELLOW 11 · NODATA 215 · NA 48;**判對率 100.0% = 461/461**;可判率 62.7%(扣不適用 67.1%);第二顆頭:`output/vrn_reports.duckdb` 也有 `vrn_report_basic`(09-20 07:54 舊) | ENG083 既有提示;裁定在 P9 併線後看要不要清舊庫 |
 | V5 `via-console` rc=0 | 3053 KB 零 CDN 快照 | — |
 
+**工作站六層鏈(操作員貼回 `via-vrnchain run`;同意閘 YES 是操作員的手)**
+
+| 計 | GREEN 29 · RED 3 · GATED 0 · NODATA 14 · ABSENT 0 → RED(rc 1) |
+|---|---|
+| 3 紅 | `SUP_MDL746_PDFPlumberPlusHub` 九檢 FAIL 1 · `CGC_MDL141_ClosingGate` ⑭(報告夾律/主庫路徑律;工作站 64 份在 incoming)· `VRN_ENG068_DailyBrief` ⑨ 市場寬度句(features_daily 2026-09-14:530/1978)——**三支都不讀樞紐/橋**(grep SUP_MDL749/ENG088/additive 皆 0),是主線既有的工作站條件 |
+| 讀樞紐的 7 支 | ENG073 · ENG074 · ENG080 · ENG083 · ENG084 · ENG085 · ENG088 **全 GREEN**(樞紐 v0111 沒有改壞任何讀冊者) |
+| NODATA 14 | 12 支「沒有自測門」+ ENG072 逾時 180s(沒跑完=沒有結論)+ ENG064(rc=1 缺料) |
+| 資料驗證段 | 與 V4 同一組數字(105 × 7;判對率 100.0% = 461/461) |
+| 格子 `--only "SSOT 增補"` | 兩站 OK(橋 3.8s · 單元測試 9.3s)——test_02 的 CRLF 殘留已由 EOL_ONLY 一態吸收 |
+
+對照批677 容器(有家族境):GREEN 33 · RED 0 · GATED 1 · NODATA 12。差在工作站的 3 紅與 ENG072 逾時,都不在側線範圍。
+
 **與容器不同的一個數字**:橋 `tests` 的收容夾 sha256 容器 `8c6a193e…` vs 工作站 `9226276…`——tree_sha 連 manifest 一起算,manifest 在工作站被 autocrlf 留成 CRLF 的可能性最高(30 件收容件逐件 sha256 在工作站全對,所以差只在 manifest 本身)。零觸碰證明是同一台機器前後對,不受影響。
 
 **drift 八列(只攤開不裁定;每列在 JSON 帶下一步)**
@@ -136,6 +156,7 @@
 | P10 | 工作站最後一次實測(`via-vrnrun` V1–V5,真研報) | 操作員的手 | 操作員 | 第七段 |
 | P11 | CI 只跑總控契約測試;新單元測試沒進 CI | 候 | 操作員 | 第七段兩行 |
 | P12 | 啟動器 v0101 在工作站實跑驗證(`via-vrnrun` V2 要真的跑出 44 節點) | 操作員的手 | 操作員 | 第七段;若還是 `'r'`,貼回 V2 那幾行 |
+| P14 | 工作站六層鏈 3 紅(MDL746 九檢 FAIL 1 · MDL141 ⑭ · ENG068 ⑨)+ ENG072 逾時 180s | 候 | 主線 | 不在側線範圍(三支都不讀樞紐/橋);併線後由主線逐支讀 FAIL 那一行修;ENG072 可用 `via-vrnchain run --only L2` 拉長逾時看它到底要多久 |
 | P13 | 工作站 `references/intake/` 有 autocrlf 舊轉換殘留(至少共識融合引擎那份) | 候 | 操作員 | `git ls-files --eol "VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120.py"` 看 w/crlf;要清就 `git rm --cached` 該檔再 `git checkout -- 該檔`(不動 blob);不清也沒事,尺已把 EOL_ONLY 分開 |
 
 ## 六 · 你的手
