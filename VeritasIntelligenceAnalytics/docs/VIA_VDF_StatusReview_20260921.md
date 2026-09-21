@@ -198,3 +198,84 @@ via-vcgc matrix --family vdf --apply
 - 讀:倉根一頁交接(批554)· `docs/VIA_B588/596/597/599/610/644–674`(後 12 批自遠端分支 `git show`)· 政策庫 99 律 · 規格冊 · 工作流冊 · 庫表冊 · VDF 卡書 · VDF 四本參數冊 · ENG054/060/064/089/090/091 與 CGC_MDL170 尾版原始碼抬頭。
 - 跑(容器,零網路):`via-vcgc status`、`--selftest`(22/23,⑬ 見 4.1)。**沒有跑任何擷取引擎、沒有寫任何庫、沒有設任何閘。**
 - 前一個 session 的對話本文讀不到(只能取得其 session 記錄與 post_turn 摘要);本文的「前一 session 現況」全部以它已 commit 的 docs 為準。
+
+---
+
+## 九 · 追問:VDF 是不是「一個引擎單獨抓」?流程有幾條、抓什麼、起始日、矩陣(2026-09-21 補)
+
+### 9.1 直答
+
+- **不是一個引擎。** VDF 是 45 支引擎家族分車道抓,由 VIA 的規格冊(`VIA_InputConsole_Spec` `families.vdf`,33 項)+ 匯流排(CGC_MDL148)調度。批667「VDF 是獨立引擎」的意思是**對 VRN/VAP 真依賴 0**,不是只有一支引擎。
+- **`via-vdfchain run` 不抓資料。** 它的七站(1/2/3a/3b/4a/4b/4c)呼叫的全是 `--selftest`,`--since` 只寫進 `VIA_SINCE` 環境變數與報告抬頭(CGC_MDL170 `run_one`),沒有任何一站帶 `--start`。真正抓資料的是下面 **15 條觸網流程 + 1 條檔案道**,走 `via-vcgc matrix --family vdf --apply`(批599 實跑:GATED 15)或各自短令。
+
+### 9.2 擷取流程(冊項 id → 引擎 → 抓什麼 → 起始/窗口 → 閘)
+
+**台股 tw_equity**
+
+| 冊項 | 引擎 / 短令 | 抓什麼(來源 → 表) | 起始 / 窗口 | 閘 |
+|---|---|---|---|---|
+| tw_prices_inc | ENG054 `via-price` | 雙所清單(TWSE t187ap03_L + TPEX mopsfin_t187ap03_O + ETF 冊 t187ap47_L 四碼被動碼)→ `tw_listings`;Yahoo chart/yf OHLCV+adj_close → `tw_daily_prices` + parquet | 各票 `MAX(date)−3` 日起;無料票自 `START_DATE=2024-01-02`;`--full` 全抓;冊項無 start 參數 | NET+SCRAPE |
+| tw_history | ENG064 | 既有票的歷史缺口(逐日反連結)→ `tw_daily_prices`(`global_daily` 同法) | 冊起始 **2023-07-01**(range → `--start/--end`);引擎下限 `TERMINATION_FLOOR=2022-01-01`;段 2023→2022 倒序;`GAP_BATCH_SIZE=20`;checkpoint 續跑 | NET+SCRAPE |
+| tw_chips | ENG056 `via-chip` | TWSE T86 三大法人 + MI_MARGN 融資融券(TPEX 對應)→ `tw_chip_inst` `tw_chip_margin` | 交易日曆=價表實際日期;無 `--days` 時=價表全部未 done 的日(即自 2024-01-02);`--days N` 只補最近 N 日;day×lane checkpoint | NET+SCRAPE |
+| tw_chips_derive | ENG056 `--derive` | `tw_chip_derived`(券資比/維持率等衍生) | 讀庫重建 | 無 |
+| tw_trading_value | ENG057 `via-tval` | TWSE MI_INDEX ALLBUT0999 逐股成交值 + TPEX 日收 → `tw_trading_daily` | 同 ENG056(價表日曆;`--days N`) | NET+SCRAPE |
+| tw_daytrade_stock | ENG055 L15 `via-daytrade` | TWSE rwd TWTB4U + TPEX dayTrade 逐股當沖量值 → `tw_daytrade_stock` | 當日/`--date`;兩源被 WAF 擋=誠實 FAIL(L45) | NET+SCRAPE |
+| tw_daytrade_files | ENG055 L15 `--from-file` | 瀏覽器存的 CSV/JSON → `tw_daytrade_stock` | `--date --market`;收容夾 `references/intake/daytrade_files` | 無(檔案道) |
+| tw_align / tw_universe_update / tw_need | ENG081 / ENG079 | 價×籌碼對齊核對 → ALIGN_latest;`tw_universe`(anti-join 只增);覆蓋缺口清單 NEED_latest | 唯讀;tw_need 帶冊起始 | 無 |
+| vdf_market_lists | ENG087 `via-market-lists` | 調度 ENG054/077/078/081 驗收股票全集/主動 ETF/熱門族群 → MARKET_LISTS_latest | `START_REQUIRED=2023-01-01`(價未達=RED) | run 需雙閘 |
+
+**總經 macro**
+
+| 冊項 | 引擎 | 抓什麼 | 起始 / 窗口 | 閘 |
+|---|---|---|---|---|
+| macro_fred | ENG074 `via-fred` | FRED 序列(宏觀 SSOT 冊 190 序列;`--only` 依類別)→ `us_macro` `macro_series_registry` + parquet | 冊起始 2023-07-01 → `--since`;無 since 時 `SINCE_DEFAULT=1990-01-01`;頻率窗 `WINDOW_YEARS`(日 2/週 5/月 10/季 20/年 60);已 DONE 序列只刷 `REFRESH_DAYS=45` 修訂窗 | NET + `FRED_API_KEY` |
+| macro_detail | ENG047 | 美國細目冊 43 序列(就業 23/通膨細目 15/PMI 5)→ `output_hub/usmacro/*.parquet` | 冊起始 2023-07-01 → `--start`;引擎預設 `2004-01-01` | NET |
+| macro_lanes | ENG055 L8/L9/L10/L11/L14 | L8 us_macro(FRED 16 序列)· L9 cross_macro(FRED 跨區)· L10 tw_rates(CBC 臺銀利率 a13rate)· L11 sentiment(CNN Fear&Greed;AAII 403 候源)· L14 eurostat(歐元區 PPI)→ `us_macro` `cross_macro` `tw_rates_cbc` `sentiment_daily` | 車道內定(無冊起始);FRED 車道無鑰=SKIP | NET(+鑰) |
+
+**財報 financials**
+
+| 冊項 | 引擎 | 抓什麼 | 起始 / 窗口 | 閘 |
+|---|---|---|---|---|
+| fin_statements | ENG082 `via-finstat` | 三大報表(yfinance 車道走 AegisNexus;MOPS 探路候源)→ `tw_financial` + `mega/fin` parquet | `--years 5`(cutoff=今年−5 → 2021-01-01);`--only 2330,2317` `--limit` | 雙閘 |
+| tw_revenue_codes | ENG063 | MOPS 月營收(可選代碼;預設 2330/2317/2454)→ `tw_monthly_revenue` `monthly_revenue_analysis` | 最新月;無起始參數 | NET |
+| tw_revenue_backfill | ENG075 `via-revfill` | MOPS t21sc03 全市場月營收史深(新→舊游標;anti-join (code,ym))→ `tw_monthly_revenue` | 冊起始 2023-07-01 截月 → `--since 2023-07`;引擎預設 `2023-01` | NET |
+| estimate_bands | ENG059 | Yahoo quoteSummary 分析師預估快照 → `analyst_estimates`(upsert)+ PE/PB band | 快照,無起始 | NET |
+| vdf_twrev / vdf_revphase | 收容包自測 | 月營收動能 v2.7 / 相位 v030 | 免網路 | 無 |
+
+**主動 ETF etf**(L35:只抓主動式台股 ETF)
+
+| 冊項 | 引擎 | 抓什麼 | 起始 / 窗口 | 閘 |
+|---|---|---|---|---|
+| etf_universe | ENG077 `via-etfuniv` | TWSE openapi t187ap47_L 依 A 碼律 `^\d{5}A$` → `ActiveTWETF.duckdb::active_tw_etf_universe` | 日更 | NET |
+| etf_holdings_daily | ENG078 `via-etfhist` | 發行商 PCF 持股(車道冊:MONEYDJ 最新日;群益 ISSUER_ARCHIVE 有日期)→ `holdings_daily` | 冊起始 2023-07-01 → `--start/--end`;引擎下界 `ACTIVE_ETF_ERA=2025-05-01`;`backfill --max-days` 預設 5 | NET |
+| etf_revenue / vdf_vetf_consensus | ENG076 / ENG085 | 持股×月營收動能;VATETF 持股×共識(應用端,零自抓) | 讀庫 | 無 |
+
+**國際 intl**
+
+| 冊項 | 引擎 | 抓什麼 | 起始 / 窗口 | 閘 |
+|---|---|---|---|---|
+| global_universe | ENG066 | 11 類(idx/etf/us_jp/fin_reports/oil/fx/cmdty/crypto/us_macro/fed/us_fiscal_rates;yfinance)→ `global_daily` | 冊起始 2023-07-01 → `--start/--end`;引擎預設 `2018-01-01`(FetchOne P3) | NET |
+| global_lanes | ENG055 L5/L6/L7 | L5 etf_stats(Yahoo quoteSummary ETF 宇宙)· L6 global(Yahoo chart:美/亞/歐/南亞指數 + FX + 區域 ETF)· L7 idx_val → `etf_stats_daily` `global_daily` `index_valuation_proxy` | 車道內定 | NET |
+
+**db 群(7 項,全部零網路)**:db_arch(ENG073 架構矩陣)· db_coverage / db_localdb_scan / db_localdb_apply(ENG079 本機三庫盤點與整併)· vdf_quantguard_status / one / run(ENG086)。
+
+計數:**觸網擷取 15 條**(批599 GATED 那 15 條)+ 檔案道 1 條 + 驗收/衍生/治理 17 條 = 33 項。每日例行鏈=工作流 `vdf_daily_update`:tw_prices_inc → tw_chips → tw_trading_value → tw_align → db_arch。
+
+### 9.3 起始時間怎麼定(四層優先序,CGC_MDL139 `effective_start`)
+
+`呼叫參數 > user.starts[item] > user.group_starts[group] > defaults.start`;任一層是 `latest` 就**不帶旗標**=引擎增量律。現值:`defaults.start=2023-07-01`(批600)、五群組 `group_starts` 全部 2023-07-01(批599)、`starts` 空。只有冊項參數含 range/start/since/since_ym 的流程會收到這個日期(tw_history · tw_need · macro_fred · macro_detail · tw_revenue_backfill(截月)· etf_holdings_daily · global_universe);其餘流程用引擎自己的窗口(上表)。
+
+引擎底限與實際庫:ENG054 `START_DATE=2024-01-02`(擷取單 003/004 的「2024-01-02 → 最新日更增量」)、ENG064 `2022-01-01` 地板、ENG066 `2018-01-01`、ENG047 `2004-01-01`、ENG074 `1990-01-01`、ENG078 `2025-05-01`、ENG087 `2023-01-01`。**工作站價表實際自 2024-01-02 起**(批559 census),所以 2023-07-01→2023-12-29 這一段仍是缺口(容器量到 170,655 個日期×票鍵,批597);補它=開閘跑 tw_history(Z52 目前照操作員指示停止中)。
+
+### 9.4 矩陣說明(七張,各答不同的問題)
+
+| 矩陣 | 答什麼 | 列 × 欄 / 態 | 在哪 |
+|---|---|---|---|
+| 擷取總冊 FetchOne(VDF-390) | **該抓什麼** | 390 項 × 17 節;DONE 296 · PROXY 75 · TODO 19;來源以 yfinance/FRED/MOPS/TWSE/AKShare 為主 | `VDF_FetchOne_Matrix_Registry_v0100.json` / `_SSOT.md`(ENG046 轉錄) |
+| 取數契約 VDF-FETCH/1.0 | 取數規則與 4 個可變參數 | 14 域 277 項(ok 217/proxy 45/todo 15);規則:Adj 優先、缺值取前一交易日、成交量不補、低頻對齊、權威層級官方>商業>FRED 代理>推導;P1 宇宙 34 檔 · P2 財報預設 · P3 起始 2018-01-01 · P4 FRED 鑰 | `registry/VIA_VDF_Fetch_Contract.json` |
+| 擷取資料矩陣(A–F) | 資金流(FIS)分類 | 77 列:A 全球指數 · B ETF 宇宙 · C 台股族群/個股流 · D 主動 ETF · E 商品 · F 加密 | `registry/VIA_Extraction_Matrix.md` / `_v8.csv` |
+| 參數×引擎映射 | 哪個參數餵哪支引擎 | 57 引擎 × 317 參數 × 14 車道 | `VDF_Param_Engine_Map_v0100.json`(ENG053) |
+| **五矩陣頁(執行矩陣)** | **這次跑起來每一項的態** | 列=冊項(vdf 33 + vrn 15 …),欄=誠實態 GREEN/RED/NODATA/ABSENT/GATED/PLAN/TIMEOUT;profile `test`=有界 selftest 不觸網,`run`=production(寫庫動詞須 `--ids` 明點);批599 vdf 33 項:GREEN 23 · GATED 15 · RED 3 · NODATA 3 · PLAN 2 · ABSENT 2(合 vrn) | `via-ryg` / `via-vcgc matrix` → `VIA_Reports/engine_bus/ENGINE_BUS_latest.json` + `ENGINE_BUS_MATRIX.html` |
+| VDF 鏈矩陣 | 參數·邏輯·因子·引擎四件串起來能不能過 | 10 站 × (態/秒/證據/修法);rc 0 GREEN/1 RED/2 NODATA/3 ABSENT/4 GATED;`--resume` 只重跑沒過的站;rich HTML 依 MDL173 規格(10.5px);批667:七站綠、0b GATED | `via-vdfchain run` → `VIA_Reports/vdf_chain/`(遠端分支) |
+| 資料架構矩陣 | 庫裡實際有什麼 | 3 庫 × 61 表 × (列/最早/最新/滯後);六態 POPULATED/PARTIAL/SCHEMA-ONLY/PLANNED/PENDING_KEY/PENDING_AUTH(9/15 工作站:POPULATED 1 · PARTIAL 10 · PLANNED 1);12 SSOT 類 | `via-vdfarch` → `VIA_VDFArchitecture_v0100.json` + `VIA_UI_VDFArchitecture` 頁 |
+| 涵蓋 / 增量閘 | 缺誰、缺哪段 | ENG090 roster:market × 冊/有料/缺(工作站 TPEX 892/892 · TWSE 1097/1103);ENG089 plan:表 × 頭缺/尾缺(自 2023-01-01) | `via-vdfcov roster` / `via-vdfinc plan` |
