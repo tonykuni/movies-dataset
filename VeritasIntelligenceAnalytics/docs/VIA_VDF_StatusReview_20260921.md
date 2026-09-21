@@ -328,3 +328,61 @@ via-vcgc matrix --family vdf --apply
 3. **VDF 擷取面根本不用 regex 選票**:ENG054 用 `isdigit() and len==4`,宇宙=官方雙所清單全員;regex 只在 VRN 從研報/檔名抓代號、以及 ETF 分型時才上場。
 
 工作站查法:`via-ssotregex`(CGC_MDL115 全樹 regex 清冊)· `via-etfuniv --offline`(A 碼律宇宙)· `via-finlex --reconcile`(欄位 regex 對帳)。
+
+---
+
+## 十一 · 追問:現在有沒有「兩張全部清單」自動更新並抓全部(台股 · 主動式台股 ETF)?(2026-09-21 補)
+
+### 11.1 直答
+
+**有,兩張清單各有正主引擎,而且都掛在同一條「開機日更鏈」上;但「自動」的意思是「開機/一鍵時每日首跑一次」,不是排程器。** 本容器今天 02:35 的日更鏈實跑證明:台股清單只拿到上櫃一所(TWSE openapi 對本容器回 WAF 安全頁),主動 ETF 宇宙 SKIP(三源皆空);工作站 9/15 快照兩張清單都在位。另外,驗收閘 ENG087 對台股清單要求一個**全樹沒有人產出的欄位**(`us_industry`),所以 `via-market-lists` 的股票全集永遠判不到 GREEN——這是尺的問題,不是清單的問題(見 11.5)。
+
+### 11.2 清單一:台股全集(上市+上櫃)
+
+| 表 / 件 | 正主 | 來源 | 更新時機 | 工作站現況(9/15 快照) |
+|---|---|---|---|---|
+| `tw_listings` | ENG054 `fetch_listings()` + `fetch_etf_listings()` | TWSE openapi t187ap03_L + TPEX mopsfin_t187ap03_O(四碼普通股)+ t187ap47_L(四碼被動 ETF) | **每次 `via-price`/日更鏈②開頭先抓清單**再抓價;upsert 只增(鍵 code+market);少一所 → rc=2 且印「單所落庫(缺 X)」(批645) | 1,996 列(全名;批650 roster 冊 TWSE 1,103 + TPEX 892) |
+| `tw_listings_industry` | ENG055 L1 `lane_listings` | 同兩端點 + 產業別 | 日更鏈①(OmniFetch 全車道);`via-omni run` | 1,981 列(簡稱;TWSE 1,088 / TPEX 890);**MDL142 名冊正典取數來源** |
+| 名冊正典 `CGC_MDL142_TWNameBook` | 讀 ①tw_listings_industry → ②VRN_TWRoster_Offline → ③tw_listings 全名補 | — | `refresh` 委派 ENG055 L1 抓新 | 1,980 檔(批644 roster) |
+| `tw_universe` | ENG081 `update --apply` | 基準日(價表∪籌碼)∩ tw_listings | OneShot S6 `via-align update --apply`;anti-join 只增 | 7,930 列(逐 asof 快照) |
+| 涵蓋閘 | ENG090 `roster` | 名冊 vs 價表,照 market 拆 | `via-vdfcov roster`(零網路) | TPEX 892/892 · TWSE 1,097/1,103(缺 6 檔老 ETF;批650) |
+
+主動 ETF **不在** tw_listings(ENG054 只收四碼被動碼;五碼+A 留給 ENG077,Zero-Hydra 分工),所以「台股全部清單」與「主動 ETF 清單」本來就是兩張表。已知債:19 支尾版引擎仍讀 `tw_listings`(全名)而非正典 `tw_listings_industry`(簡稱)(MDL142 抬頭)。
+
+### 11.3 清單二:主動式台股 ETF
+
+| 件 | 內容 |
+|---|---|
+| 正主 | `VDF_ENG077_ActiveETFUniverse`(`via-etfuniv`;日更鏈 ④a,在 ④ 持股之前) |
+| 律 | A 碼律 `^\d{5}A$`(非 A 碼=被動不入宇宙)+ 國內成分揭露律:fund_type 含「國內成分」→ `daily_required=True`(ACTIVE_DOMESTIC);「國外成分」→ FOREIGN_COMPONENT 保留但不抓持股;類型未知 → UNKNOWN_TYPE 保守視為須抓 |
+| 三源 | L1 TWSE openapi t187ap47_L → L2 `etf_book` 最新 as_of(ENG055 L4)→ L3 既有 `active_tw_etf_registry`;**聯集只增,永不刪**;官方冊消失=MISSING_FROM_SOURCE 候查 |
+| 落地 | `ActiveTWETF.duckdb::active_tw_etf_registry`(PK ticker;first_seen/last_seen)· `active_tw_etf_universe`(每日快照 append-only,只含 daily_required)· SSOT csv `active_tw_etf_ssot/ActiveTWETF_Latest.csv`(ENG051 讀此檔抓持股)· `VIA_Reports/active_etf_universe/UNIVERSE_<ts>.json`(NEW/MISSING 逐字) |
+| 下游 | ENG051 最新持股(SSOT csv)→ ENG078 `daily` 持股史深(車道冊:MONEYDJ 最新日 VERIFIED;群益 DATED VERIFIED 在 v0108 碼內;其餘 15 家投信 PENDING_SOURCE)→ ENG076/ENG085 應用端 |
+| 工作站現況(9/15) | registry **31** 檔 · universe 快照列 283 · etf_book as_of 到 115/09/13 · **holdings_daily 只有 1 檔 ETF / 40 列**(Z45:清單齊、持股史沒齊) |
+| 擷取總冊(批104,8/23) | A/D 碼 37 檔=台股股票型 24(A)+ 海外股票型 6(A)+ 債券型 7(D);ENG077 只收 A 碼且海外標 FOREIGN → 須每日抓持股的約 24 檔,與 L35 一致 |
+
+### 11.4 「自動更新」到底是什麼
+
+| 載體 | 觸發 | 做什麼 | 閘 |
+|---|---|---|---|
+| `supportive modules/registry/via_boot_update.sh` | 倉根 `.claude/settings.json` SessionStart hook(批150「開啟系統即更新」);marker `.last_boot_update` 每日首開才實跑 | ⓪ 環境自補 → ① OmniFetch 全車道(含 L1 清單/L4 etf_book)→ ② ENG054 價格增量(先抓雙所清單)→ ③ 籌碼 → **④a ENG077 宇宙日更** → ④ ENG051 持股 → ④b ENG078 史深 → ⑥⑦ 成交值/估值/共識/月營收 → ⑧ 輪動 → ⑨ UI 再生 … ⑳ | 腳本**自帶** `VIA_NET_CONSENT=YES`/`VIA_SCRAPE_CONSENT=YES`(操作員批123/137/150 常令授權) |
+| `via_boot_update.ps1` | 工作站:`VIA.ps1` 全自動模式 / `launch.ps1`(Deck 任務「boot 全自動日更(建議每日一次)」)背景 Job | 同鏈 ⓪–⑨(.sh 為正主,ps1 跟隨) | 同上 |
+| 開機自啟 | `Install-VIA.ps1 -AutoStart` 才登錄 logon 工作 `VIA_Control_Tower`(**預設關**);全樹**沒有** VDF 的 DAILY 排程(只有 WorkOps 的兩個 DAILY 工作,與 VDF 無關) | — | — |
+| 手動 | OneShot S6(`via-price → via-chip → via-align update --apply`)· `via-etfuniv` · `via-omni` | 單段 | 操作員自設 |
+| **不抓清單的鏈** | `via-run25`(九站)· `via-vdfchain`(十站 selftest) | 治理/驗證 | — |
+
+### 11.5 今天容器實跑(BOOT_20260921_023505.log)與工作站的差別
+
+| 步 | 容器結果 | 根因 | 工作站 |
+|---|---|---|---|
+| ① L1 listings / L4 etf_book | FAIL `Expecting value: line 1 column 1` | **TWSE openapi 對本容器回 WAF 安全頁**(本審視直接 GET 驗證:HTTP 200、text/html、「因為安全性考量，您所執行的頁面無法呈現」;TPEX openapi 正常回 JSON 720 KB);其餘車道 FAIL `No module named duckdb`(容器 base python 缺件,⓪ 自補未成) | 批650 實錄 TWSE 1,103 檔在位 |
+| ② ENG054 | 清單只落 TPEX 892 檔(`tw_listings_20260921_024013.csv` 全 .TWO)後在 upsert 炸 `No module named pandas` | 同上 + 容器缺 pandas | 雙所正常 |
+| ④a ENG077 | `[SKIP] 三源皆空(TWSE FAIL;etf_book 庫缺;既有 0)` rc=3 | 同上 | registry 31 |
+| ④ ENG051 / ④b ENG078 | pandas 缺 / `SKIP 宇宙缺` | 同上 | 持股史 1 檔(Z45) |
+
+**這些都是容器的樣子,不是你的機器。** 要知道今天工作站兩張清單的真況,貼回 `via-etfuniv status` 與 `via-vdfcov roster`。
+
+### 11.6 兩件要裁定的事(只列,不代改)
+
+1. **ENG087 股票全集的尺永遠紅**:`_status_stock()` 把 `us_industry/industry_us/gics_industry/sic_industry` 列為必要欄,全樹**沒有任何引擎寫這個欄**(tw_listings_industry 只有 industry_code/industry_name;ENG058 也不產美國分類)→ 永遠 `SCHEMA_MISSING`,`via-market-lists` verdict 不可能 GREEN;而它的自測不碰真表(只驗夾具去重與三支引擎有 selftest),所以自測綠、實跑紅。裁定:拿掉美國產業欄要求,或指定誰來產它(候選 ENG058)。
+2. **清單「全部」的定義**:台股全集正典是 `tw_listings_industry`(簡稱),但 19 支引擎仍讀 `tw_listings`(全名);主動 ETF 宇宙 A 碼 30 vs 擷取總冊 37(含 D 債券 7),LOCKED 尺 `^00\d{2,3}[AD]$` 與執行尺 `^\d{5}A$` 並存(第十段)。要不要把債券型主動 ETF 納入「全部」,是你的裁定(L35 現在說不納)。
