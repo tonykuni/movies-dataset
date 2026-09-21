@@ -9739,14 +9739,42 @@
       "op": "ADD",
       "category": "VRN鏈跑器",
       "component": "批686 CGC_MDL172 v0102:六層鏈「量到什麼」rc≠0 先印 [FAIL] 行再 [計] 行(最後一行的 OK 蓋住紅燈=跑器自己戴的眼罩);ModuleNotFoundError → ABSENT 具名套件(Z60 結)· Grid v0436 站名廿四檢",
-      "code": "操作員第二次貼回 via-vrnrun(HEAD 0b6f7dfb):SUP_MDL746/MDL141 RED 但格子印 [OK] ⑨/[OK] ⑭;批685 據此猜 ⑭ 是猜錯(B685/Z84 更正)。v0102 廿四檢 24/24;容器 run --fast GREEN 31 · RED 1 · GATED 1 · NODATA 13。registry-sync 活 6006 · 新 2 · 變更 41;契約 19/19。全格子 v0436:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(256s;GRID_20260921_102019)· 終判 FAIL 集對 批685 逐站相同:新紅 0 · 消失 0(平行段 1 站 DuckDB 鎖撞序跑轉綠)。 掉球 +Z87(第二顆頭的庫 vrn_reports.duckdb 舊路徑;封存=操作員的手)。"
+      "code": "操作員第二次貼回 via-vrnrun(HEAD 0b6f7dfb):SUP_MDL746/MDL141 RED 但格子印 [OK] ⑨/[OK] ⑭;批685 據此猜 ⑭ 是猜錯(B685/Z84 更正)。v0102 廿四檢 24/24;容器 run --fast GREEN 31 · RED 1 · GATED 1 · NODATA 13。registry-sync 活 6006 · 新 2 · 變更 41;契約 19/19。全格子 v0436:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(256s;GRID_20260921_102019)· 終判 FAIL 集對 批685 逐站相同:新紅 0 · 消失 0(平行段 1 站 DuckDB 鎖撞序跑轉綠)。 掉球 +Z88(第二顆頭的庫 vrn_reports.duckdb 舊路徑;封存=操作員的手)。"
     },
     {
       "ts": "2026-09-21 10:46",
       "op": "ADD",
       "category": "VRN財報驗算",
-      "component": "批687 VRN_ENG074 v0114:同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」· FAIL/DIVERGE 列直接印 · 分母(有財報列 N/入庫 M)印出 · Grid v0437 站名三十三檢",
-      "code": "工作站第一次真跑 v0113 --verify:30 件 × 7 條 → 665 列 · INSUFFICIENT 627 · FAIL 21 · PASS 17;tw_financial 不在。七條裡只有 GM_DIV 三正典都登錄,21 FAIL 第一嫌疑=多列取第一列;627 混未登錄正典(cogs/op_margin/net_margin/opex/shares)與報告未載(gross_profit ×173/net_income ×84)。v0114 三十三檢 33/33。全格子 v0437:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(266s;GRID_20260921_104209)· 終判 FAIL 集對 批686 逐站相同:新紅 0 · 消失 0。 Z82 補計數 · +Z88(財報列覆蓋 30/105)。"
+      "component": "批687B VRN_ENG074 v0114:同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」· FAIL/DIVERGE 列直接印 · 分母(有財報列 N/入庫 M)印出 · Grid v0437 站名三十三檢",
+      "code": "工作站第一次真跑 v0113 --verify:30 件 × 7 條 → 665 列 · INSUFFICIENT 627 · FAIL 21 · PASS 17;tw_financial 不在。七條裡只有 GM_DIV 三正典都登錄,21 FAIL 第一嫌疑=多列取第一列;627 混未登錄正典(cogs/op_margin/net_margin/opex/shares)與報告未載(gross_profit ×173/net_income ×84)。v0114 三十三檢 33/33。全格子 v0437:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(266s;GRID_20260921_104209)· 終判 FAIL 集對 批686 逐站相同:新紅 0 · 消失 0。 Z82 補計數 · +Z89(財報列覆蓋 30/105)。"
+    },
+    {
+      "ts": "2026-09-21 11:18",
+      "op": "ADD",
+      "category": "工作站實錄修",
+      "component": "批688B via_vrn_logic_book v0106 建冊冪等(內容沒變不重寫;pull 不再被索引冊擋)· VDF_ENG082 v0101(--only 吃 PowerShell 陣列 · 注入 session 看門狗 40s 逾時/拒收/零列→原生子行程(YfData 單例) · 零列誠實 rc2 不炸)· Grid v0438",
+      "code": "操作員貼回:git pull 被 VIA_VRN_LogicArchitecture_SSOT 擋(built_at 每建必改;刻意入倉的冊 MDL167 不還原);VDF_ENG082 run --only 2330,2454 目標 1 檔、yfinance 拒收 requests.Session 被收容件吞成 WARNING 零列、COUNT 對沒建的表 Traceback。v0106 十七檢 17/17;v0101 十二檢 12/12;容器實測注入那一趟在 urllib3 Retry 退避裡爬幾分鐘、原生 0.7s 54×5。全格子 v0438:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(257s;GRID_20260921_111252)· 終判 FAIL 集對 批687B 逐站相同:新紅 0 · 消失 0。 掉球 Z83 更新 · +Z90。"
+    },
+    {
+      "ts": "2026-09-21 11:42",
+      "op": "ADD",
+      "category": "VRN全景修",
+      "component": "批689B 全景式檢視 VRN:ENG086 v0110 券商拒絕閘+正典鍵對映(閘在正本實作)· SUP_MDL749 v0112 broker_gate · VRN_SystemManager v0102 +同義字域 · ENG068 v0106/ENG064 v0103/FirstPage v0127/SUP_MDL742 v0103 缺料缺件記 NODATA · Grid v0439",
+      "code": "六層鏈容器 RED 1→0(GREEN 31 · GATED 1 · NODATA 14 → rc4);MDL176 沒過閘 9/10→7/10(剩 7 支舊讀冊件 Z91);增補冊多義 10/候選 36 待操作員裁定;正典/疊加/聯集/增補冊零改(只增不減 971 少 0)。自測:086 22/22 · 749 49/49 · 總管 27/27 · VCGC 25/25 · 068 rc2 SKIP 5 · 064 rc2 NODATA 2 · 首頁 rc2 NODATA 1 · 742 10/10。全格子 v0439(run13):OK 259 · FAIL 16 · SKIP 6 · TIMEOUT 0(239s;GRID_20260921_113240)· 對 批688B 終判:消失 5(六層鏈實跑 · 工具升階梯 · 每日觀察摘要 · 知識堆疊 · 首頁全能)· 新紅 1(陸券清除實跑驗收:我在自測裡寫了拒絕清單的字面=把陸券資料種回樹上)→ 改成從閘上取、合成別名表隔離驗,單站複跑 OK;併 main 後再跑一次全格子。 Z61 結 · +Z91 · +Z92。"
+    },
+    {
+      "ts": "2026-09-21 11:55",
+      "op": "ADD",
+      "category": "併線",
+      "component": "批689B 併 main a8fafd14(brave-goldberg 批687/688/689):三檔衝突聯集(掉球清單雙邊結案都留 · 台帳只增不減 1285+3+4 · 元件冊取本線後 registry-sync 重算)· 本線三批改稱 687B/688B/689B(LL334)· 掉球 Z87 結、本線五條 Z88–Z92",
+      "code": "併後鏈:registry-sync 活 6017 · 新 0 · 變更 15 · 退役 0;索引冊未變(built_at 沿用);總控頁再生 90 任務;契約 OK;VCGC 二十五檢 25/25。全格子 v0439(併後):OK 260 · FAIL 15 · SKIP 6 · TIMEOUT 0(233s;GRID_20260921_115001)· 平行段 1 站轉綠(鉅亨 FactSet)· 終判 FAIL 集對 批689B run13:消失 2(VDF 資料涵蓋閘=main ENG090 v0105 ㉔ 四態全帶 · 陸券清除實跑驗收=從閘上取 token 的自測進全格子也綠)· 新紅 1 = PowerShell 語法閘裁決 ABSENT(本殼 PATH 沒有 /opt/pwsh;PATH 補上單站重跑 GREEN,不是程式紅);剩 14 盞全是 Z92 那一族(VDF/VAP 表不在直接炸/matplotlib 缺件)。regen gate 還原 29 支再生物(元件冊/正則冊/總控頁契約件留下)。"
+    },
+    {
+      "ts": "2026-09-21 12:06",
+      "op": "ADD",
+      "category": "VRN總管",
+      "component": "批689B 收尾:VRN_SystemManager v0103「沒過閘的活支」尺改對(聯集冊 gate_bypass 列=所有讀券商冊的活支,只數 gated=False → 沒過閘 7/讀冊 10;㉖ 合成清單釘尺;廿七檢不變)· 聯集冊 CGC_MDL176 --apply(只增不減先證 底冊 971 少 0;內容不變、gate_bypass 旗刷新:ENG086 v0110/SUP_MDL749 v0112/vrn_finlex v0107 過閘)",
+      "code": "v0102 印沒過閘 10 支、MDL176 status 實跑 7 支——尺數整列。v0103 廿七檢 27/27;read ssot pending 沒過拒絕閘 7 · 讀券商冊 10;VCGC 二十五檢 25/25(㉔ 經 v0103);registry-sync 活 6018 · 新 1 · 變更 51;契約 OK。全格子 v0439(PATH 帶 /opt/pwsh):OK 261 · FAIL 14 · SKIP 6 · TIMEOUT 0(232s;GRID_20260921_120233)· 終判 FAIL 集對 run14:新紅 0 · 消失 1(PowerShell 語法閘=殼 PATH)· 剩 14 盞全是 Z92 那一族(VDF/VAP 表不在直接炸/matplotlib 缺件)。regen gate 還原再生物。"
     },
     {
       "ts": "2026-09-21 16:54",
@@ -9761,7 +9789,7 @@
       "op": "ADD",
       "category": "Register",
       "component": "Register-VIA-Commands v0242(+via-vdfsys 資料對接口 · +via-vrnsys 研報對接口;守門版:尾版不在印 ABSENT rc2 不呼 python)+ 梭 4 支(via-vdfsys.cmd / via-vrnsys.cmd 根+bin;不釘版號) · VDF_SystemManager v0101(⑱ 改量 Register 現況:登了 True 沒登 False;v0100 把暫態釘成不變量,短令一登就紅) · VRN_SystemManager v0102(同一處 ⑱ 同改;主線 v0101 的檢一登 via-vrnsys 就紅,格子站實錄)",
-      "code": "操作員「依你建議執行」= L70 這一次的許可(18:01 工作站實錄:第一版貼行在沒有對接口的樹上把 status 當腳本餵給 python → 改守門版)。v0241 一字不動;VDF/VRN 兩扇門七處登記 6/7 → 7/7。Z65(via-vrnsys 候准)與 Z89(via-vdfsys 候准;本線掉球號三度撞主線,第四次取 Z89–Z93)結案。",
+      "code": "操作員「依你建議執行」= L70 這一次的許可(18:01 工作站實錄:第一版貼行在沒有對接口的樹上把 status 當腳本餵給 python → 改守門版)。v0241 一字不動;VDF/VRN 兩扇門七處登記 6/7 → 7/7。Z65(via-vrnsys 候准)與 Z93(via-vdfsys 候准;本線掉球號三度撞主線,第四次取 Z93–Z97)結案。",
       "origin": "側線 claude/busy-bell-97sa4f(session_01YJPv4NqSj3YsMkkcrywaHw);主線批號由併線的手指定 L25"
     },
     {
@@ -9769,25 +9797,18 @@
       "op": "FIX",
       "category": "VDF",
       "component": "側線 c · VDF 修正循環:Grid v0439(境缺=SKIP 誠實分類器;自家模組集向 CGC_MDL124.tracked_set 取)· CGC_MDL170 v0102(缺件具名 ABSENT +⑲)· ENG081/079/058/045/088 · MDL141/080/098/099/105/088 · EngineBus v0130 · Overlay v0103(誠實態:境缺 rc3/缺料 rc2,生產邏輯零改)· ENG076 v0101 / ENG078 v0109(頁接 CGC_MDL173,不自備 CSS)· VDF_SystemManager v0102(LL133)· 單元測試 test_vdf_honest_states 10 檢 + test_vdf_system_manager v0101",
-      "code": "操作員令「檢視 VDF 現況 · 測試修正各引擎 · 全景式分析 · 識別錯誤 · 避免傷害引擎 · 避免九頭龍 · 可同時修的同時修 · TEST DEBUG TILL IT WORKS · SSOT REGEX 同義字上傳只增不減不衝突」。先量:全格子 FAIL 82 站,~60 站同一根因(pandas/duckdb/fitz/pyarrow/rich 不在本境)各自寫成 FAIL;鏈跑器同事兩種燈;匯流排 vdf RED 6;MDL174 ⑥ 兩支自帶 CSS;MDL164 ⑰ 本線的門是基線外 NO_EXCLUDE。修在尺上(格子+鏈跑器)再修各引擎的講法;結果:全格子 FAIL 82→26(SKIP 8→61,不進分母)、鏈 RED 0、匯流排 RED 0、⑥ GREEN、⑰ 23/23。SSOT/同義字:只增不減成立(971 少 0)、衝突 5 條是自家兩冊拼法候裁、採用面 9/10 活支沒過拒絕閘(VRN,Z97)。剩下的紅:VRN 家族同病(Z95)、無版號 ENG049/051(Z96)、真庫/真檔才有結論的站。",
+      "code": "操作員令「檢視 VDF 現況 · 測試修正各引擎 · 全景式分析 · 識別錯誤 · 避免傷害引擎 · 避免九頭龍 · 可同時修的同時修 · TEST DEBUG TILL IT WORKS · SSOT REGEX 同義字上傳只增不減不衝突」。先量:全格子 FAIL 82 站,~60 站同一根因(pandas/duckdb/fitz/pyarrow/rich 不在本境)各自寫成 FAIL;鏈跑器同事兩種燈;匯流排 vdf RED 6;MDL174 ⑥ 兩支自帶 CSS;MDL164 ⑰ 本線的門是基線外 NO_EXCLUDE。修在尺上(格子+鏈跑器)再修各引擎的講法;結果:全格子 FAIL 82→26(SKIP 8→61,不進分母)、鏈 RED 0、匯流排 RED 0、⑥ GREEN、⑰ 23/23。SSOT/同義字:只增不減成立(971 少 0)、衝突 5 條是自家兩冊拼法候裁、採用面 9/10 活支沒過拒絕閘(VRN,Z101)。剩下的紅:VRN 家族同病(Z99)、無版號 ENG049/051(Z100)、真庫/真檔才有結論的站。",
       "origin": "側線 claude/busy-bell-97sa4f(session_01YJPv4NqSj3YsMkkcrywaHw);主線批號由併線的手指定 L25"
-    },
-    {
-      "ts": "2026-09-21 11:18",
-      "op": "ADD",
-      "category": "工作站實錄修",
-      "component": "批688 via_vrn_logic_book v0106 建冊冪等(內容沒變不重寫;pull 不再被索引冊擋)· VDF_ENG082 v0101(--only 吃 PowerShell 陣列 · 注入 session 看門狗 40s 逾時/拒收/零列→原生子行程(YfData 單例) · 零列誠實 rc2 不炸)· Grid v0438",
-      "code": "操作員貼回:git pull 被 VIA_VRN_LogicArchitecture_SSOT 擋(built_at 每建必改;刻意入倉的冊 MDL167 不還原);VDF_ENG082 run --only 2330,2454 目標 1 檔、yfinance 拒收 requests.Session 被收容件吞成 WARNING 零列、COUNT 對沒建的表 Traceback。v0106 十七檢 17/17;v0101 十二檢 12/12;容器實測注入那一趟在 urllib3 Retry 退避裡爬幾分鐘、原生 0.7s 54×5。全格子 v0438:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(257s;GRID_20260921_111252)· 終判 FAIL 集對 批687 逐站相同:新紅 0 · 消失 0。 掉球 Z83 更新 · +Z89。"
     },
     {
       "ts": "2026-09-21 20:39",
       "op": "FIX",
       "category": "VDF",
       "component": "側線 d · VDF 啟動就緒:via_boot_update.ps1 補齊到與 .sh 同鏈 ⓪–⑳(+④a ENG077 · ④b ENG078 · ⑩c2 ENG076 · ⑪–⑳ MDL131/133/135/136/ENG079/MDL137/ENG081/MDL139/140/141;⓪ 家族境 python 走 CGC_MDL136 envpy 正本,Step 改 & $PY)· VDF_SystemManager v0103 +launch(八項現量 + 下一步卡;L16 五態碼;status/page 帶啟動段;連結 +4;自測 27→29:㉘ 雙載體同鏈負控 · ㉙ 只量不動手)· Grid v0441(站名 廿七→廿九;+站「VDF 啟動就緒」launch --no-probe gated_ok;289→290)· 規格 vdf_system outputs v0103 · 單元測試 v0102(+T07 六測;T05 格子站集合等式)· 中央冊 registry-sync 6117(新 8)",
-      "code": "操作員令「GO 我需要擷取 VDF 的資料,幫我完善到可啟動她」。先量:啟動正主 = via-vdffetch → Invoke-VIA-VdfFetch-v0104(自找根/自癒/點源/閘不覆蓋 fail-closed/家族境 python/年份旗標/加速器+Hydra/MDL134 十一步十道並行)在位 16/16 短令;每日鏈 .ps1 比 .sh 少 13 步且裸 python(Z94 只照出 2 步);容器家族境缺 duckdb/pandas/pyarrow = ABSENT、閘未設 = GATED——兩件是操作員的手,一件是樹上的檔。修樹上那件(L70 這一次的許可讀自本令,還原一行寫在文裡),其餘每跑量一次印下一行。容器實測:door 29/29 · launch ABSENT rc3(誠實)· 單元測試 26+10 OK · VCGC 26/26 · 契約 19/19 · MDL164 23/23 · 格子 6 站 OK 4 SKIP 2(境缺/pwsh 缺)。Z94 結;+Z99–Z101。",
+      "code": "操作員令「GO 我需要擷取 VDF 的資料,幫我完善到可啟動她」。先量:啟動正主 = via-vdffetch → Invoke-VIA-VdfFetch-v0104(自找根/自癒/點源/閘不覆蓋 fail-closed/家族境 python/年份旗標/加速器+Hydra/MDL134 十一步十道並行)在位 16/16 短令;每日鏈 .ps1 比 .sh 少 13 步且裸 python(Z98 只照出 2 步);容器家族境缺 duckdb/pandas/pyarrow = ABSENT、閘未設 = GATED——兩件是操作員的手,一件是樹上的檔。修樹上那件(L70 這一次的許可讀自本令,還原一行寫在文裡),其餘每跑量一次印下一行。容器實測:door 29/29 · launch ABSENT rc3(誠實)· 單元測試 26+10 OK · VCGC 26/26 · 契約 19/19 · MDL164 23/23 · 格子 6 站 OK 4 SKIP 2(境缺/pwsh 缺)。Z98 結;+Z103–Z105。",
       "origin": "側線 claude/busy-bell-97sa4f(session_01YJPv4NqSj3YsMkkcrywaHw);主線批號由併線的手指定 L25"
     }
   ],
-  "updated_at": "2026-09-21 19:35",
-  "batch": "批689"
+  "updated_at": "2026-09-21T12:06:56",
+  "batch": "批689B"
 }

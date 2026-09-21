@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0102→v0103(批689B 收尾):
+  「沒過閘的活支」尺改對:聯集冊 gate_bypass 列的是**所有讀券商冊的活支**(每支帶 gated 旗),v0102 數整列=把過了閘的也算成沒過
+  (印 10 支;MDL176 status 實跑沒過 7 支)。v0103 只數 gated=False(`_gate_open()`)並另印「讀冊 N 支」為分母;
+  ㉖ 加合成清單釘住尺(4 支 1 過閘 → 沒過 3)。廿七檢不變;不寫冊。
+
 v0101→v0102(批689B 操作員令「與總管系統 SSOT REGEX 同義字 上傳更新只增不減不衝突 整合好」):
   +第八域 **同義字(ssot)**:總管視角讀 CGC_MDL176 聯集冊(只增不減 tally · 拒絕 · 正典鍵對映裁定 · 沒過閘的活支)
   與 SUP_MDL749 增補冊(多義=候操作員裁定 · 候選=REVIEWABLE 未安裝)。只讀冊與模組自報,**不重算聯集、不寫任何冊**。
@@ -101,7 +106,7 @@ VIA_TAG = f"{FAMILY} v{VERSION}"
 BORN = "批681"
 DOMAINS = ("policy", "logic", "factor", "param", "engine", "handover", "records", "ssot")
 DOMAIN_ZH = {"policy": "政策", "logic": "邏輯", "factor": "因子", "param": "參數", "engine": "引擎", "handover": "交接", "records": "紀錄", "ssot": "同義字"}
-BATCHES = "批681→批682"
+BATCHES = "批681→批689B"
 _FORCE_STANDALONE = {"on": False}   # --standalone:硬把 VIA 當成不在(自測㉓ 也走這裡)
 RC_SCOPE = ("policy", "logic", "factor", "param", "handover", "ssot")   # 引擎面的燈是鏈跑器的判準,不折進本口 rc;批689B +同義字
 LAMPS = {"GREEN": "綠", "NODATA": "缺料", "GATED": "閘", "ABSENT": "缺件", "STALE": "過期", "RED": "壞"}
@@ -684,7 +689,7 @@ def read_ssot(key: str | None = None) -> dict:
                         "counts": d.get("counts"), "rulings": len(rul),
                         "rulings_by_kind": _count(r.get("kind") or r.get("state") for r in rul),
                         "deny": len(d.get("deny") or []), "deny_leak": len(d.get("deny_leak") or []),
-                        "gate_bypass": list(d.get("gate_bypass") or []), "unverified": len(d.get("unverified") or []),
+                        "gate_bypass": list(d.get("gate_bypass") or []), "gate_bypass_open": _gate_open(d.get("gate_bypass")), "unverified": len(d.get("unverified") or []),
                         "book_defects": len(d.get("book_defects") or [])}
         out["state"] = "GREEN"
     # 樞紐增補冊(多義=按來源可判,裁定權在操作員;候選=未安裝)
@@ -708,11 +713,16 @@ def read_ssot(key: str | None = None) -> dict:
             add_ = {"state": "RED", "why": f"樞紐讀不動 {type(exc).__name__}:{str(exc)[:60]}"}
     out["additive"] = add_
     out["pending"] = {"多義待裁定": add_.get("polysemy"), "候選未安裝": add_.get("candidates"),
-                      "沒過拒絕閘的活支": len(out["union"].get("gate_bypass") or []),
+                      "沒過拒絕閘的活支": len(out["union"].get("gate_bypass_open") or []), "讀券商冊的活支": len(out["union"].get("gate_bypass") or []),
                       "拒絕清單": out["union"].get("deny"), "正典鍵對映裁定": (out["union"].get("rulings_by_kind") or {}).get("KEY_ALIAS")}
     if key:
         return {"state": out["state"], "key": key, "value": out.get(key), "via": VIA_TAG}
     return out
+
+
+def _gate_open(gb) -> list:
+    """聯集冊 gate_bypass 列=所有讀券商冊的活支(每支 {engine, gated});沒過閘=gated 不為真(裸字串視為沒過)。"""
+    return [e for e in (gb or []) if not (isinstance(e, dict) and e.get("gated"))]
 
 
 def _count(it) -> dict:
@@ -757,7 +767,7 @@ def links(s: dict) -> list:
         add("intake", "records:intake:" + r["intake"], "functional modules/VRN/references/intake/" + r["intake"], "GREEN", domain="records", files=r["files"])
     ss = s.get("ssot") or {}
     add("engine", "ssot:CGC_MDL176", ("supportive modules/registry/" + ss["src"]) if ss.get("src") else "", ("GREEN" if ss.get("src") else "ABSENT"), domain="ssot")
-    add("book", "ssot:union", (ss.get("union") or {}).get("path"), ss.get("state"), domain="ssot", tally=(ss.get("union") or {}).get("tally"), gate_bypass=len((ss.get("union") or {}).get("gate_bypass") or []))
+    add("book", "ssot:union", (ss.get("union") or {}).get("path"), ss.get("state"), domain="ssot", tally=(ss.get("union") or {}).get("tally"), gate_bypass=len((ss.get("union") or {}).get("gate_bypass_open") or []), readers=len((ss.get("union") or {}).get("gate_bypass") or []))
     add("book", "ssot:additive", "", (ss.get("additive") or {}).get("state"), domain="ssot", polysemy=(ss.get("additive") or {}).get("polysemy"), candidates=(ss.get("additive") or {}).get("candidates"))
     up = s["upstream"]
     vc = up.get("vcgc")
@@ -838,7 +848,7 @@ def to_markdown(s: dict) -> str:
     o.append(f"| 交接 | {s['lamps']['handover']} | ENG082 三處 + docs + 掉球 · read handover | 一頁 批{op.get('docs_batch')} vs 律冊 批{op.get('laws_batch')} 同 {op.get('same')} · 逐批 {ho.get('latest_batch_doc')} · B 文 {ho.get('latest_b_doc')} · 掉球 {ho.get('dropped_balls')} · {ho.get('why', '')} |")
     _ss = s.get("ssot") or {}
     _su, _sa, _sp = _ss.get("union") or {}, _ss.get("additive") or {}, _ss.get("pending") or {}
-    o.append(f"| 同義字 | {s['lamps'].get('ssot', '-')} | CGC_MDL176 聯集冊 + SUP_MDL749 增補冊 · read ssot [union|additive|pending] | 聯集 {_su.get('tally')} · 拒 {_su.get('deny')} · 裁定 {_su.get('rulings_by_kind')} · 沒過閘 {len(_su.get('gate_bypass') or [])} 支 · 多義 {_sa.get('polysemy')} · 候選 {_sa.get('candidates')} · 券商閘 {(_sa.get('broker_gate') or {}).get('state')}(待裁定=候不是壞) |")
+    o.append(f"| 同義字 | {s['lamps'].get('ssot', '-')} | CGC_MDL176 聯集冊 + SUP_MDL749 增補冊 · read ssot [union|additive|pending] | 聯集 {_su.get('tally')} · 拒 {_su.get('deny')} · 裁定 {_su.get('rulings_by_kind')} · 沒過閘 {len(_su.get('gate_bypass_open') or [])}/讀冊 {len(_su.get('gate_bypass') or [])} 支 · 多義 {_sa.get('polysemy')} · 候選 {_sa.get('candidates')} · 券商閘 {(_sa.get('broker_gate') or {}).get('state')}(待裁定=候不是壞) |")
     up = s["upstream"]
     o += ["", "## 一之二 · 兩線血脈(git 尾註量出來的;批682)", "", "| session | commit | 批號範圍 | 最新主題 |", "|---|---|---|---|"]
     for sid, v in sorted((rc_.get("lineage") or {}).items(), key=lambda kv: -kv[1].get("commits", 0)):
@@ -963,7 +973,7 @@ def _print_status(s: dict) -> None:
     print(f"  紀錄 {s['lamps'].get('records', '-'):6s} session {len(ln)}(commit {sum(v.get('commits', 0) for v in ln.values())})· VRN 文 {len(rc_.get('docs') or [])} · 收容包 {len(rc_.get('intake') or [])} · 活線 {(rc_.get('lines') or {}).get('remote_heads')}(本線 {(rc_.get('lines') or {}).get('current')})")
     ss = s.get("ssot") or {}
     _u, _a, _p = ss.get("union") or {}, ss.get("additive") or {}, ss.get("pending") or {}
-    print(f"  同義字 {s['lamps'].get('ssot', '-'):5s} 聯集冊 {_u.get('tally')} · 拒 {_u.get('deny')} · 裁定 {_u.get('rulings_by_kind')} · 沒過閘 {len(_u.get('gate_bypass') or [])} 支 · 增補冊 {_a.get('state')} {_a.get('keys')} 詞 多義 {_a.get('polysemy')} 候選 {_a.get('candidates')} · 券商閘 {(_a.get('broker_gate') or {}).get('state')}(拒 {(_a.get('broker_gate') or {}).get('deny')})· 待裁定=候不是壞(出處 {ss.get('src')})")
+    print(f"  同義字 {s['lamps'].get('ssot', '-'):5s} 聯集冊 {_u.get('tally')} · 拒 {_u.get('deny')} · 裁定 {_u.get('rulings_by_kind')} · 沒過閘 {len(_u.get('gate_bypass_open') or [])}/讀冊 {len(_u.get('gate_bypass') or [])} 支 · 增補冊 {_a.get('state')} {_a.get('keys')} 詞 多義 {_a.get('polysemy')} 候選 {_a.get('candidates')} · 券商閘 {(_a.get('broker_gate') or {}).get('state')}(拒 {(_a.get('broker_gate') or {}).get('deny')})· 待裁定=候不是壞(出處 {ss.get('src')})")
     up = s["upstream"]
     print(f"  上行 七處 {up.get('done')}/{len(SEVEN)} {json.dumps(up.get('seven'), ensure_ascii=False)} · VCGC 委派 {(up.get('vcgc') or {}).get('delegates') if isinstance(up.get('vcgc'), dict) else '-'} · 總管理器 {up.get('via_manager')}")
     print(f"  [計] 連結 {len(s['links'])} · {s['link_counts']} · 本口 rc {s['rc']} {s['rc_name']}(只看四庫+交接;引擎面不折進 rc)" + (f" · 差異 {s['diff']}" if s.get("diff") else ""))
@@ -1134,10 +1144,14 @@ def selftest() -> int:
     chk("㉖ 同義字域:聯集冊 tally(SAME/ADD/CONFLICT/DENIED)+ 拒絕清單 ≥10 + 正典鍵對映裁定 + 沒過閘的活支列得出;增補冊多義/候選端上;券商閘 OK;燈 GREEN 且入 rc 範圍",
         _ss.get("state") == "GREEN" and isinstance(_u26.get("tally"), dict) and {"SAME", "ADD"} <= set(_u26["tally"])
         and int(_u26.get("deny") or 0) >= 10 and (_u26.get("rulings_by_kind") or {}).get("KEY_ALIAS")
-        and isinstance(_u26.get("gate_bypass"), list) and (_ss.get("additive") or {}).get("state") == "OK"
+        and isinstance(_u26.get("gate_bypass"), list) and isinstance(_u26.get("gate_bypass_open"), list)
+        and len(_u26["gate_bypass_open"]) <= len(_u26["gate_bypass"])
+        and all(not (isinstance(e, dict) and e.get("gated")) for e in _u26["gate_bypass_open"])
+        and len(_gate_open([{"engine": "A", "gated": False}, {"engine": "B", "gated": True}, {"engine": "C"}, "D"])) == 3
+        and (_ss.get("additive") or {}).get("state") == "OK"
         and ((_ss.get("additive") or {}).get("broker_gate") or {}).get("state") == "OK"
         and "ssot" in RC_SCOPE and "ssot" in DOMAINS,
-        f"(tally {_u26.get('tally')} · 拒 {_u26.get('deny')} · 裁定 {_u26.get('rulings_by_kind')} · 沒過閘 {len(_u26.get('gate_bypass') or [])} · 多義 {(_ss.get('additive') or {}).get('polysemy')} · 候選 {(_ss.get('additive') or {}).get('candidates')})")
+        f"(tally {_u26.get('tally')} · 拒 {_u26.get('deny')} · 裁定 {_u26.get('rulings_by_kind')} · 沒過閘 {len(_u26.get('gate_bypass_open') or [])}/讀冊 {len(_u26.get('gate_bypass') or [])} · 多義 {(_ss.get('additive') or {}).get('polysemy')} · 候選 {(_ss.get('additive') or {}).get('candidates')})")
     _keep_newest = globals()["newest"]
     try:
         globals()["newest"] = lambda folder, pat: (None if "CGC_MDL176" in pat else _keep_newest(folder, pat))

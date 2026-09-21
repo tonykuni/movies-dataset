@@ -21,7 +21,7 @@ LL49(容器再生冊不入 git,總控頁例外)· LL133(判定器排掉自己的
 | 匯流排 test profile · vdf 家族 66 項 | ABSENT 23 · GREEN 5 · PLAN 32 · **RED 6** | RED 6 = ENG081 ×2 · ENG079 ×4:自測遇 duckdb 缺印 `[FAIL]` rc1 |
 | CGC_MDL174 打包閘 VDF | ⑥ 落頁同一份規格 NODATA:3 支落頁,**2 支自己帶一份 CSS**(ENG076 · ENG078) | 尺散了(批672):同一張頁兩份 CSS 就是九頭龍 |
 | CGC_MDL164 制度稽核 ⑰ 自我指涉閘 | 基線外 1:**VDF_SystemManager**(NO_EXCLUDE) | 本線 b 批立的門,版史掃描把自己算進分母(LL133) |
-| VDF 對接口 status | 邏輯 STALE(卡書 45 張:冊有樹無 1 · 無版號 5 · 樹有冊無 3)· 工具 STALE(Celeritas 三副本兩版本)· 七處 7/7 | 候裁項不變(b 批 Z89/Z90) |
+| VDF 對接口 status | 邏輯 STALE(卡書 45 張:冊有樹無 1 · 無版號 5 · 樹有冊無 3)· 工具 STALE(Celeritas 三副本兩版本)· 七處 7/7 | 候裁項不變(b 批 Z93/Z94) |
 | SSOT/同義字四閘 | MDL115 9/9 · MDL176 30/30(只增不減:底冊 971 條少 0)· SUP_MDL749 48/48 · ENG088 drift YELLOW(KEY_BRIDGE 包內鍵橋不在正典)| 只增不減成立;衝突 5 條是我們自己兩本冊的鍵拼法(候裁,四)|
 
 ## 三 · 修在哪裡(可同時修的一起修;每件新版號檔;生產邏輯零改動,改的全是「怎麼講」)
@@ -54,7 +54,7 @@ LL49(容器再生冊不入 git,總控頁例外)· LL133(判定器排掉自己的
 - **只增不減**:CGC_MDL176 聯集閘「底冊 971 條逐條比對 → 少 0 條」;冊內瑕疵 0;聯集冊 broker 255 · rating 189 · target_price 29 · valuation_method 20 · financial_concept 7 · rating_label 7 · scenario 3。MDL115 樣式 1156 · 共用 651 · 同義字冊 37,九檢 9/9。樞紐 SUP_MDL749 v0111 四十八檢 48/48。
 - **衝突**(不是上傳帶進來的,是我們自己兩本冊對同一家用了兩個正典鍵拼法;批678 已列,候操作員裁,LL90):megabank(Megabank vs MEGA)· daiwa capital(Daiwa Securities vs DAIWA)· jp(J.P. Morgan vs JPM)· ibf securities(IBF vs WATERLAND)+1。裁了之後聯集閘自轉綠。
 - **上傳的增補**:ENG088 drift 只剩一條 YELLOW——包內 `KEY_BRIDGE`(BOA→BOFA · MCQ→MACQUARIE · JP→JPM)不在任何正典冊;candidates 25 條一律 PENDING_OPERATOR(本橋不抄)。
-- **整合好了沒**:冊面整合成立(只增不減 · 無衝突新增);**採用面**有缺口——MDL176「沒過拒絕閘的活支 9/10」(SUP_MDL015 · SUP_MDL749 · VIS_VRN_BrokerAlias ×2 · PDFTextLayerFallbackPlan · Q1_AliasRoutePatch · VRN_ENG062 · VRN_ENG086 · vrn_report_digest 各自解券商別名,沒經 resolve_broker/deny_reason)。那是 VRN 九支的改線,不在本令(VDF)範圍,登掉球 Z97 候裁。
+- **整合好了沒**:冊面整合成立(只增不減 · 無衝突新增);**採用面**有缺口——MDL176「沒過拒絕閘的活支 9/10」(SUP_MDL015 · SUP_MDL749 · VIS_VRN_BrokerAlias ×2 · PDFTextLayerFallbackPlan · Q1_AliasRoutePatch · VRN_ENG062 · VRN_ENG086 · vrn_report_digest 各自解券商別名,沒經 resolve_broker/deny_reason)。那是 VRN 九支的改線,不在本令(VDF)範圍,登掉球 Z101 候裁。
 - 疊加層引擎 VIA_FinancialInstitution_Overlay v0103:正典載入要 pydantic,本境沒有 → 以前 ①④⑥ 連環紅,現在 [ABSENT] rc3;工作站(家族境有 pydantic)十檢照跑。
 
 ## 五 · 修完之後還紅的(誠實列;不在本令範圍或要操作員的手)
@@ -63,7 +63,7 @@ LL49(容器再生冊不入 git,總控頁例外)· LL133(判定器排掉自己的
 
 | 站 | 根因 | 誰 |
 |---|---|---|
-| 五日擷取八檢(ENG049)· ETF 持股引擎自測(ENG051) | 兩支**沒版號**的 VDF 檔(b 批 Z90),自測把 yfinance/pandas 不在寫成 FAIL;立版號前不動它們(動了就是第二顆頭) | 操作員裁 Z90 |
+| 五日擷取八檢(ENG049)· ETF 持股引擎自測(ENG051) | 兩支**沒版號**的 VDF 檔(b 批 Z94),自測把 yfinance/pandas 不在寫成 FAIL;立版號前不動它們(動了就是第二顆頭) | 操作員裁 Z94 |
 | 文字統包六檢 · VRN 六層鏈廿四檢/實跑 · 研報一題四點文摘三十檢 · 首頁全能引擎 ㊳ · PDFPlumber-Plus ⑥ · 三語 SSOT×MindMap ① · 知識堆疊轉接 | VRN 家族:pymupdf/openpyxl/duckdb 不在本境、或要真檔/真庫;同一種「把境缺寫成 FAIL」的病,修法同本批 ENG081 那一行 | VRN 那條線(本令是 VDF) |
 | 系統同步樞紐 ③ · 每日觀察摘要 ②③ · 治理台 UI Matrix ② · 工具升階梯 ③④ | 讀真庫列數 / 綠燈率 / OCR 件;容器沒料 | 工作站跑才有結論 |
 | TWREV v2.7 selftest(收容 b477 PYCODE 站) | `-m` 啟動於收容包,pandas 不在 → 空輸出 | 收容件,零觸碰 |
@@ -85,16 +85,16 @@ LL49(容器再生冊不入 git,總控頁例外)· LL133(判定器排掉自己的
 
 ## 六之二 · 併線(推之前主線又動了兩次)
 
-- main:PR #62/#64(brave-goldberg 批688/689:一頁交接追到現況 · LL306–LL343 入律冊 · 接手提示詞 v0101)→ 掉球冊取主線+本線 b/c 兩段接後(Z89–Z98 沒撞)· 台帳聯集 1294。
+- main:PR #62/#64(brave-goldberg 批688/689:一頁交接追到現況 · LL306–LL343 入律冊 · 接手提示詞 v0101)→ 掉球冊取主線+本線 b/c 兩段接後(Z89–Z98 當時沒撞;併 main 批689B 後主線取了 Z88–Z92,本線改號 Z93–Z102)· 台帳聯集 1294。
 - awesome-bardeen 批688(a49f52e4:索引冊建冊冪等 v0106 · VDF_ENG082 v0101 · **Grid v0438**)→ Grid 取主線 v0438、本線改動重貼成 **v0440**;VRN 索引冊以 builder v0106 重建(MDL141 v0110 讓指標過期)· 元件冊取主線再以 VCGC v0120 重跑(6109/6109)· 總控頁再生。
 - 併後複測:VCGC 26/26 · 契約 19/19 · 兩檔單元測試 10/10 · 20/20(兩版 Python)· MDL164 23/23 · Grid v0440 `--only` 19 站 OK 15 · SKIP 4 · FAIL 0。
 
-## 七 · 掛著(接續主線掉球冊 Z94 → Z95–Z98)
+## 七 · 掛著(接續主線掉球冊 Z98 → Z99–Z102;併 main 批689B 後改號,原 Z95–Z98)
 
-- Z95 VRN 家族同病(把境缺寫成 FAIL):ENG060 TextOmni · ENG080 · ENG072 …;修法同本批一行(`[ABSENT] rc3` + ModuleNotFoundError 字樣),要在 VRN 那條線做。
-- Z96 兩支無版號 VDF 檔(ENG049 · ENG051)的自測境缺判紅,等 Z90 立版號一起做。
-- Z97 同義字採用面:MDL176 拒絕閘 9/10 活支沒經 resolve_broker(VRN 九支);冊面已只增不減無衝突。
-- Z98 五條券商鍵拼法衝突(megabank · daiwa · jp · ibf +1)候裁(LL90);裁後 MDL176 自轉綠。
+- Z99 VRN 家族同病(把境缺寫成 FAIL):ENG060 TextOmni · ENG080 · ENG072 …;修法同本批一行(`[ABSENT] rc3` + ModuleNotFoundError 字樣),要在 VRN 那條線做。
+- Z100 兩支無版號 VDF 檔(ENG049 · ENG051)的自測境缺判紅,等 Z94 立版號一起做。
+- Z101 同義字採用面:MDL176 拒絕閘 9/10 活支沒經 resolve_broker(VRN 九支);冊面已只增不減無衝突。
+- Z102 五條券商鍵拼法衝突(megabank · daiwa · jp · ibf +1)候裁(LL90);裁後 MDL176 自轉綠。
 
 ## 八 · 接手驗收(一行一答)
 

@@ -19,7 +19,7 @@
 | 啟動面 | 正主(量到的) | 現況 |
 |---|---|---|
 | 一鍵抓史深 | `via-vdffetch [年]`(Register v0242)→ 尾版 `Invoke-VIA-VdfFetch-v0104.ps1`(批383):① 自找 VIA 根 → ①b 倉庫自癒(`-NoHeal` 關)→ ② 點源短令冊(`-NoEnter` 關)→ ③ 同意閘不覆蓋(`Set-VIAGateDefaults`:**未設補 OFF = fail-closed**,已設者尊重)→ ④ 家族境 python(`Get-VIAEnvPython vdf`)→ ⑤ 年份旗標 `VIA_HIST_SINCE=<年>-01-01` / `VIA_REV_SINCE=<年>-01`(`-Limit N` 先小量;`-Dry` 只印)→ ⑥ 20 加速器 + MDL134 `plan` Hydra 哨兵 H1–H6(H3 進程雙頭 / H5 尾版律 FAIL = 誠實停)→ ⑦ CGC_MDL134 `run --only datahome,hist_2023,global,fred,revenue_backfill,etf_universe,etf_fetch,etf_history,consensus,revenue_consensus,etf_revenue` 十道並行 → `digest` + MDL131 `digest`;梭 `via-vdffetch.cmd` | 在位;啟動要用的 16 短令 16/16 在冊 |
-| 每日增量 | `via_boot_update.sh`(正主;倉根 SessionStart hook;腳本自帶 `VIA_NET_CONSENT=YES`,批123/137/150 常令)/ `via_boot_update.ps1`(工作站:`VIA.ps1` 全自動 · `launch.ps1` · Deck「boot」→ `Start-Process powershell -File`) | **`.ps1` 比 `.sh` 少 13 步、且用裸 `python` 起引擎**——Z94 只照出 ④a/④b 兩步;整份量下來還少 ⑩ ENG076 與 ⑪–⑳ 十一步(MDL131 · MDL133 · MDL135 · MDL136 · ENG079 · MDL137 · ENG081 · MDL139 · MDL140 · MDL141)。裸 python 在沒 duckdb/pandas 的 base 會把**每一步**跑成 ModuleNotFoundError |
+| 每日增量 | `via_boot_update.sh`(正主;倉根 SessionStart hook;腳本自帶 `VIA_NET_CONSENT=YES`,批123/137/150 常令)/ `via_boot_update.ps1`(工作站:`VIA.ps1` 全自動 · `launch.ps1` · Deck「boot」→ `Start-Process powershell -File`) | **`.ps1` 比 `.sh` 少 13 步、且用裸 `python` 起引擎**——Z98 只照出 ④a/④b 兩步;整份量下來還少 ⑩ ENG076 與 ⑪–⑳ 十一步(MDL131 · MDL133 · MDL135 · MDL136 · ENG079 · MDL137 · ENG081 · MDL139 · MDL140 · MDL141)。裸 python 在沒 duckdb/pandas 的 base 會把**每一步**跑成 ModuleNotFoundError |
 | 家族境 | CGC_MDL137 `python_for("vdf")` → CGC_MDL136 → `via_vdf_312`;必要 duckdb / pandas / numpy / pyarrow | 容器 BASE_FALLBACK,缺 duckdb · pandas · pyarrow → ABSENT(工作站家族境是操作員的手;AI 不裝套件) |
 | 閘 | `VIA_NET_CONSENT`(http 道)· `VIA_SCRAPE_CONSENT`(爬蟲道要期望 token,`via-gates` 印)· `FRED_API_KEY`(via-fred) | 三個都未設 → 閘態 GATED;鑰缺 → 那一步 SKIP 印指令 |
 | 網路工具 | `supportive modules/network/via_net_unified_v0101.py`(統包唯一)→ 後端 VeritasAegisNexus 正典 | 在;`net_ok` 在容器 None(requests 不在 base) |
@@ -37,7 +37,7 @@
 - ⓪ 家族境 python:`& python <CGC_MDL136 尾版> envpy vdf --json` → `$PY`(尺=正本,不抄別名表);`Step` 改 `& $PY $script`;境未見 = base 退路且**寫進 log 第二行**(`--- ⓪ 家族境 python(尺=CGC_MDL136 envpy):<python> · <state>`)。
 - 不裝套件(`.sh` ⓪ 的 pip 自補是容器非持久境的事)、不改同意閘行為、LF 照舊、無 BOM 照舊。
 - **還原(讀錯許可時一行)**:`git checkout -- "VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.ps1"`(併線後:`git show <本批前一個 commit>:"VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.ps1" > …`)。
-- 容器沒有 pwsh:格子「PowerShell 語法與參數名閘」站 SKIP(ABSENT 不假綠),本批 `.ps1` 改動只有人眼複讀過,工作站要跑一次 `via-selftest --only "PowerShell 語法"`(Z101)。
+- 容器沒有 pwsh:格子「PowerShell 語法與參數名閘」站 SKIP(ABSENT 不假綠),本批 `.ps1` 改動只有人眼複讀過,工作站要跑一次 `via-selftest --only "PowerShell 語法"`(Z105)。
 
 ### 三之二 · VDF_SystemManager v0103:`launch`(啟動就緒;只量不動手)
 
@@ -51,7 +51,7 @@
 - 規格 `vdf_system`:outputs 頁名 v0103、zh 註 launch(verb 仍 status 唯讀)。
 - 格子 v0441:站名「廿七檢」→「廿九檢」;+站「VDF 啟動就緒」(`launch --no-probe`;gated_ok:rc4 閘未開 GATED 不是紅、rc3 家族境缺件由境缺分類器收 SKIP、rc1 才是壞);站 289 → 290。
 - Deck / Manager / Register:同家族不加項(launch 是 via-vdfsys 的動詞,`via-vdfsys launch` 走 v0242 既有短令);中央冊 `registry-sync --apply` 6117(新 8 = launch 段八個函式);台帳 +1;總控頁再生(LL49 例外件);交接 = 本文。
-- 單元測試 v0102:+T07 啟動就緒六測;T05 格子站 2 → 3 改**集合等式**(v0101 釘死「兩站」,第三站一上就紅——把暫態釘成不變量,同 ⑱ 那一課;v0101 留版史,單跑會在 T05 紅,Z100)。
+- 單元測試 v0102:+T07 啟動就緒六測;T05 格子站 2 → 3 改**集合等式**(v0101 釘死「兩站」,第三站一上就紅——把暫態釘成不變量,同 ⑱ 那一課;v0101 留版史,單跑會在 T05 紅,Z104)。
 
 ## 四 · 容器實測總表
 
@@ -71,12 +71,19 @@
 
 工作站(有 via_vdf_312)預期:`via-vdfsys launch` → GATED rc 4(閘未開)→ 你設閘 → GREEN rc 0;格子「VDF 啟動就緒」站 GATED/GREEN 都收。
 
-## 五 · 掛著(接續 Z98 → Z99–Z101;Z94 本批結)
+## 四之二 · 併線(推之後主線又動了:PR #63 awesome-bardeen 批689B,9 commits)
 
-- Z94 已結:`.ps1` 補 13 步 + 家族境 python;同鏈由 launch ㉘ 每跑守。
-- Z99 工作站實跑 `via-vdfsys launch` 並回貼:ABSENT 就先建境(`via-envgov apply --approve` ENSURE_ENV via_vdf_312;AI 不裝)、GATED 就設閘,然後 `via-vdffetch 2023 --dry` → `via-vdffetch 2023`;抓完 `via-vdfsys`(引擎域拿到十道/獨立鏈快照)。
-- Z100 `test_vdf_system_manager_v0101.py` T05 釘死格子「兩站」,第三站上了就紅;v0102 已改集合等式,v0101 留版史候裁(刪或留)。
-- Z101 容器無 pwsh,`via_boot_update.ps1` 本批改動只人眼複讀:工作站跑一次 `via-selftest --only "PowerShell 語法"`;紅了就一行還原(三之一)。
+- 七檔衝突,按 L25 解:`VRN_SystemManager_v0102.py` 與 `CGC_MDL064_SelftestGrid_v0439.py` 撞名 → 取主線;三本再生冊(中央元件冊 · VRN 索引冊 · 總控頁)取主線後各以 builder 重建(registry-sync 6118 · via-vrnbook build 守門 GREEN · Manager 再生);掉球冊與台帳聯集(台帳 1294 + 本線 4 = 1298;主線把 批687/688 兩條改名 687B/688B 的舊拼法不重收)。
+- 撞名的兩處把本線的差再貼到更高版號:**VRN_SystemManager v0104** = 主線 v0103 + 側線 b 的 ⑱ 改量不釘(主線 v0103 仍寫「Register 未登必須 False」,v0242 已登 via-vrnsys → 併後必紅;v0104 27/27);**Grid v0442** = v0441 + 主線 v0439 的八處站名/期望改動(ENG086 二十二檢 · SUP_MDL749 四十九檢×2 · ENG068/首頁引擎 nodata_ok · VRN 對接口廿七檢);站數 290 不變。
+- 掉球號第五次重取:主線批689B 取了 Z88–Z92,本線 b/c/d 三段全部 +4(五)。
+- 併後複測:VDF 對接口 29/29 · VRN 對接口 v0104 27/27 · VCGC 26/26 · 單元測試 26 + 10 OK · 契約 19/19 · MDL164 23/23 · Grid v0442 十站 OK 9 · SKIP 1(啟動就緒 rc3 境缺)。
+
+## 五 · 掛著(接續 Z102 → Z103–Z105;Z98 本批結;併 main 批689B(PR #63)後本線掉球全部 +4:原 Z94 = 現 Z98、原 Z99–Z101 = 現 Z103–Z105;程式註解與自測 ㉘ 標籤裡寫的「Z94」指的是現在的 Z98)
+
+- Z98 已結:`.ps1` 補 13 步 + 家族境 python;同鏈由 launch ㉘ 每跑守。
+- Z103 工作站實跑 `via-vdfsys launch` 並回貼:ABSENT 就先建境(`via-envgov apply --approve` ENSURE_ENV via_vdf_312;AI 不裝)、GATED 就設閘,然後 `via-vdffetch 2023 --dry` → `via-vdffetch 2023`;抓完 `via-vdfsys`(引擎域拿到十道/獨立鏈快照)。
+- Z104 `test_vdf_system_manager_v0101.py` T05 釘死格子「兩站」,第三站上了就紅;v0102 已改集合等式,v0101 留版史候裁(刪或留)。
+- Z105 容器無 pwsh,`via_boot_update.ps1` 本批改動只人眼複讀:工作站跑一次 `via-selftest --only "PowerShell 語法"`;紅了就一行還原(三之一)。
 
 ## 六 · 接手驗收(一行一答)
 
