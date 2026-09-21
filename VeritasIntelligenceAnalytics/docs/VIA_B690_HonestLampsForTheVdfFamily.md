@@ -99,3 +99,15 @@ OK 271 · FAIL 6 · SKIP 8 · TIMEOUT 0(301s;GRID_20260921_165618)。對併前 r
 **再併一次**:推完 fdc325bf 後 main 又進了 PR #67(envmanager 線 批691/691B:Grid v0444 · VCGC v0123)。本線 v0444 撞名讓位,內容疊到 **v0445**;併後鏈 VCGC v0123 廿九檢 29/29 · 契約 OK · registry-sync 活 6169 · 新 7。
 
 **全格子 v0445**(再併後):OK 273 · FAIL 5 · SKIP 8 · TIMEOUT 0(228s;GRID_20260921_170450)——對 v0444 那一跑新紅 0、消失 1(治理台 UI Matrix 綠燈率過門檻);剩 5 盞=Z92 餘族。
+
+## 九 · 實錄讀出(二)——工作站 via-vrnrun V2–V5 與姊妹倉 VIA_EnvManager scan/plan(2026-09-21 晚)
+
+| 你貼的 | 讀出 | 誰的手 |
+|--------|------|--------|
+| V2 鏈證據表(105 份 × 7 欄)後 **rc=1** | 七欄燈:代號 GREEN 57/NA 48 · 報告日 97/NODATA 8 · 券商 90/15 · 評等 72/33 · 目標價 38/NODATA 58/YELLOW 9 · 上漲空間 36/67/2 · 分析師 71/34。rc=1 那一站的 [FAIL] 行在你貼的上方沒進來 | 貼回 V2 段最上面的 [FAIL] 行(交 VRN 線) |
+| V3 repair-price | 列 105 · 有改動 10 · 新拿到庫價 0;價出自 tw_daily_prices 56、(無代號或無報告日)49;ADJ 上漲空間算得出 39(ADJ_OK 25 + 因子1 14)· ADJ_NO_KEY 49 · ADJ_NO_TARGET 17;目標價年齡 STALE_365 15 · FRESH_90 10 · AGING_180 8 · EXPIRED_OVER_1Y 6(描述性,不判燈) | — |
+| V4 驗真矩陣 ENG083 v0119 | 格子 735:GREEN 461 · YELLOW 11 · NODATA 215 · NA 48;判對率 100%(461/461)· 可判率 62.7%(扣不適用 67.1%);**第二顆頭仍在**:`functional modules\VRN\output\vrn_reports.duckdb`(105 列 · 最後寫於 09-20 07:54)與資料家正典並存(Z88) | Z88 封存=操作員的手(改名即可) |
+| V5 via-console build | 3064 KB 零 CDN,rc=0 | — |
+| 姊妹倉 `VIA_EnvManager.py scan` | 全 GREEN(UVT-01–08 · LOCAL-FREE · uv · ISO99)· PLAN YELLOW「待同意 · 母機 launch.ps1 · 本檔不 spawn」 | — |
+| 姊妹倉 `VIA_EnvManager.py plan` | ENV-FLEET 47 境/管 41;UVT findings 335 · **FAIL 1** · WARN 44;DRY_RUN_PASS:S03 via_core OPTIMIZE(13 pins)· S28 via_nlp(3)· S36 via_vdf(37)· S42/S43 ISOLATE rapidocr/img2table;其餘 36 步 VERIFY_ONLY DEFERRED(未登錄環境,--verify-legacy 才驗);RED ACTION 5 條全是 LEGACY_POLICY advisory(camelot_311/paddle_311/vif_aio/vif_core 保留不遷移;vmt_pm 退役候選要明示 --retire-environment)。**計畫裡沒有 via_vrn 的裝件步驟**:探針缺的 9 個選配套件(polars/xxhash/pypdf/docx/markitdown/paddleocr/pytesseract/rapidfuzz/psutil)不會因 apply 而裝上,要用母機 launch.ps1 的 -AddTool(或把它們登進 via_vrn 的 manifest)另開一步 | 裝件=操作員的手;VRN 線可先把 9 個套件登進膠囊的處置清單 |
+| 姊妹倉分支又前進 | `claude/festive-ptolemy-ts2yyh` 965504f「PyMuPDF table fallback · real import checks · honest dependency warnings · correct corpus count」 | VRN 線取件時拉最新 |
