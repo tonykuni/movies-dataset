@@ -46,7 +46,7 @@ Register / Deck / Manager 不用動:同一支引擎、同一個名字,短令 `vi
 
 ### 順帶照出的四件
 
-1. **⑬ 是尺,不是樹**(Z79):`live_components()` 把執行期產物 `TOOLS_PLAN_latest.json` 裡的虛境 `(未路由:加速器通用件)` 算成活元件;工作站有這份檔、容器沒有。批681 與本批各自在容器 `--apply` 都把 VIA-ENV-0001 退役,一併入 main,工作站的 ⑬ 就會變「缺 1」,工作站再 `--apply` 它又復活。根治要開 MDL149 v0119(v0118 已被批681 佔),把 runtime 列排除在等式之外。
+1. **⑬ 是尺,不是樹**(Z79):`live_components()` 把執行期產物 `TOOLS_PLAN_latest.json` 裡的虛境 `(未路由:加速器通用件)` 算成活元件;工作站有這份檔、容器沒有。批681 與本批各自在容器 `--apply` 都把 VIA-ENV-0001 退役,一併入 main,工作站的 ⑬ 就會變「缺 1」,工作站再 `--apply` 它又復活。根治要開 MDL149 v0119(v0118 已被批681 佔),把 runtime 列排除在等式之外。 **→ 本批已做(七)。**
 2. **㉔ 在沒有價表的環境必紅**(Z80):ENG090 `roster()` 的 ABSENT 早退分支沒帶「不代設」,它自己的檢就把它判紅。補料後轉綠只是因為不再走那條分支。
 3. **開機更新器的自補在新容器是壞的**(Z81):jieba 在 Debian setuptools 68 建輪失敗,pip 把整份 requirements 放棄,結果 15 條 OmniFetch 車道全因 `No module named duckdb/pandas` 假敗。`--use-pep517` 裝得過;補裝後重跑,收尾 YELLOW(vrn YELLOW · vap YELLOW),10 車道真抓到料。
 4. **我自己違了一次 L50**:補裝套件時把 TA-Lib 裝進容器,六域現況矩陣當場照紅「talib 竟然裝著」。判得對,已移除,站轉綠。尺比我先想起律。
@@ -77,4 +77,18 @@ Register / Deck / Manager 不用動:同一支引擎、同一個名字,短令 `vi
 | `supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json` | registry-sync:變更 40 · 退役 1 |
 | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | 台帳 +1 |
 | `docs/VIA_DroppedBalls_B507.md` | ~~Z78~~ · Z79 · Z80 · Z81 |
+| `supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0119.py` | 二十五檢:執行期境標 runtime 另列、覆寫鍵 `VIA_TOOLS_PLAN_LATEST`、+㉕(Z79 結;PR #58 Codex P1) |
+| `supportive modules/registry/CGC_MDL148_EngineBus_v0129.py` | 四十九檢:NEED_INPUT 只認帶 `--in` 的那一句、+㊿(PR #58 Codex P2) |
 | `docs/VIA_B682B_APatchKitWithoutItsOutputIsAFork.md` | 本文 |
+
+## 七 · PR #58 Codex 兩條,兩條都是真的(逐條對樹驗過才動手)
+
+| 條 | 它說的 | 對樹量到 | 修(尾版律:新版號檔) |
+|---|---|---|---|
+| P1 元件冊 | 退役 VIA-ENV-0001 會讓有 `TOOLS_PLAN_latest.json` 的工作站 ⑬ 缺 1,工作站 `--apply` 復活、容器再退役,冊隨機器翻轉 | 正是 Z79:`live_components()` 把執行期產物列的境算成活元件;批681/682/682B 三次在容器 `--apply` 都退役了同一筆 | **MDL149 v0119**:TOOLS_PLAN 來的境標 `runtime` 另列 `runtime_rows`,不進 rows(⑬ 等式、audit 缺件表、registry-sync 新增/退役都看不到);覆寫鍵 `VIA_TOOLS_PLAN_LATEST`(⑳ 的規矩:每個真機器來源配覆寫鍵);+㉕ 合成檢:有那份檔/沒那份檔,活元件數相同、plan 新 0、冊上已有的境不重列。已退役的那一筆留著不動:執行期境本來就不是樹上的元件 |
+| P2 匯流排 | `NEED_INPUT_RX` 第一支 `\[NEED_INPUT\][^\n]{0,80}` 吃掉任何 `[NEED_INPUT]` 行;引擎要憑證/要確認也會被判成「缺參數 params(in/out)」這句假理由 | 樹上 `[NEED_INPUT]` 目前只有 ENG086 在印(帶 --in),但 CGC_MDL157/158 早把它當**通用** NODATA 標記在用——下一支用它要別的東西的引擎就會被蓋掉停因 | **EngineBus v0129**:該行必須帶 `--in` 才算缺參數;+㊿:`[NEED_INPUT] confirm credentials` → 不是缺參數(RED-fallback,停因照印)、`[NEED_INPUT] 需要 --in 資料夾` → 仍 ABSENT |
+
+驗:v0119 二十五檢 **OK 25**(⑬ ACTIVE 5991/5991 · runtime 另列)· v0129 四十九檢(50 檢)**OK 50** · 格子站「引擎調度匯流排十九檢」OK ·
+`registry-sync --apply`(v0119)後 status 註冊稽核 5991/5991 缺 0 · 家族 270/270 未登 0。
+`_patches/` 那份副本已不在樹上,Codex 說的「同樣修正」只有 registry 正位這一份要做。
+
