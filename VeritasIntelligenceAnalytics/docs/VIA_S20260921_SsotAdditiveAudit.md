@@ -1,0 +1,166 @@
+# VIA 交接紀錄 · 側線 2026-09-21(branch `claude/busy-bell-97sa4f`;主線批號由併線的手指定 L25)
+
+操作員令:
+① 上傳五件(共識融合引擎 · VETF 封存包 · `VIA_SSOT_Additive_Audit_v0100.zip` · `SYNONYM_LIBRARY_2.json` · `VRN_WORKFLOW_SPEC.md`)「**整合優化 UNITTEST FOR ALL**」
+② 「**註冊這些後更新完 VRN 相關可以進行最後一次實測收尾;開始前先檢視今天弄了什麼,有無過去的規定遺漏**」
+
+〇 接手提示詞 → 見 docs/VIA_AI_Handover_Prompt_v*.md(尾版)。本側線的接手驗收在第八段。
+
+## 一 · 律(本批沒有新律;引用既有律的地方逐條註明)
+
+沒有新收到的律原文。用到的:L02/L18 七處登記 · L03 收容零觸碰 · L04 尾版律 · L17 自測只落暫存 · L22/LL49 再生冊不入 git · L25 多 AI 交會(先併主線再造件)· L30 一功能一主 · L57 誠實分母 · L70 .ps1 逐次許可 · L92 修法句 · L93 先疑尺 · L99 目標價 ADJ 口徑 · L101 一名一門 · LL34/LL306 先比 md5 · LL90 同義字裁定權在操作員 · LL199 四面登錄。
+
+## 二 · 開始前的檢視(操作員令②的前半)
+
+**今天到令②為止做了什麼**:5 筆 commit 只動 `docs/VIA_VDF_StatusReview_20260921.md`(VDF 唯讀審視 〇–十二段);收容夾與樞紐 v0111 複本未提交。
+
+**對律抓到的遺漏 → 怎麼補**
+
+| # | 遺漏 | 補法 | 證據 |
+|---|---|---|---|
+| 1 | L25:造件前側線落後主線 15 筆(批663–677、PR #54),Grid/Register 尾版都會寫錯 | `git merge origin/main`(零衝突,merge 2ca697c6) | 樹尾:Grid **v0430**、Register **v0240**、Deck v0157、Manager v0146、樞紐 v0110 |
+| 2 | L18 七處登記一處都沒做 | 本批做齊(第三段) | MDL174 四面登錄 VRN GREEN;MDL157 shadow 被吃 0 |
+| 3 | L70:改 Register 屬 .ps1 | 依令②「註冊這些」作逐次許可;走新版號檔 v0241,可刪檔回退 | Register v0241 檔頭第一行寫明 |
+| 4 | VRN 索引冊釘樞紐 v0110,新版一出守門會紅 | `via-vrnbook build` 重建冊,不手改 | 守門 GREEN:指標 50 · 在位且為尾版 50 · 過期 0 |
+| 5 | 尾版誤判(自己在本批踩的):把 Grid 尾版當 v0429 造了 v0430,而主線尾版**就是 v0430**,複本蓋掉主線檔 | `git checkout` 還原,改造 v0431;**尾版要用 find/glob 量,不用被 `tail` 截掉的清單猜**(L93) | Grid v0431 檔頭記著這一課 |
+
+其餘已守住:收容零觸碰(位元相同、manifest 逐件 md5/sha256)· 先比 md5 · 包內測試只在暫存副本跑 · VIA_Reports 不入 git · 候選一律 PENDING_OPERATOR · L99 只列不裁 · 不設同意閘不裝套件。
+
+## 三 · 本批做了什麼
+
+**先比 md5(LL34/LL306)——五件只有一件是新料**
+
+| 上傳 | bytes | md5 | 處置 |
+|---|---|---|---|
+| `VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120_2.py` | 187,802 | aefb3b30… | 與 `VRN/references/intake/` 同名收容件**位元相同** → 不收第二份 |
+| `VETF_FINAL_SEAL_20260829_013330.zip` | 5,006,801 | c0b6b1ee… | 解壓後 `SHA256SUMS.txt`(125 列)與 `VDF/references/intake/VETF_FINAL_SEAL_b242/` 位元相同(md5 0f538582…)→ 不收 |
+| `VIA_SSOT_Additive_Audit_v0100.zip` | 146,167 | e6fe0d13… | **30 件原名原字節收於** `functional modules/VRN/references/intake/VIA_SSOT_Additive_Audit_v0100_b20260921/` + `_INTAKE_MANIFEST_b20260921.json` |
+| `SYNONYM_LIBRARY_2.json` | 172,418 | 4a946821… | = 包內 `SYNONYM_LIBRARY.json` → 不另收 |
+| `VRN_WORKFLOW_SPEC.md` | 11,026 | 96ee2a83… | = 包內同名件 → 不另收 |
+
+包內 `baseline/` 九件對回活樹在 8e8e766f 的 blob:七件 **只差檔尾一個換行**(GitHub API 正規化)、一件只差 CRLF、一件包內沒有;零內容差。包的 `baseline_bytes_unchanged` 只證明包沒動自己的副本,manifest 另外記了對活樹的判定。
+
+**造件(件 / 檔(版號) / 自測 n/n / 證據)**
+
+| 件 | 檔(版號) | 自測 | 證據 |
+|---|---|---|---|
+| 樞紐增補讀冊口 | `supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0111.py` | **48/48**(43 舊檢一字不動 + ㊷–㊻) | `additive_library / resolve_synonym / additive_conflicts / additive_candidates`;新動詞 `additive`(rc 0 RESOLVED · 1 SOURCE_REQUIRED · 2 UNKNOWN · 3 ABSENT);`status` 多印「增補冊 OK 443 詞/7 域 · 多義 10」;3.11/3.12 `-W error` 編譯過 |
+| 正主橋 | `functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0100.py` | **19/19**(含兩負控) | `tests`:暫存副本跑包內 **30/30 + 48/48**,收容夾 sha256 前後 `8c6a193e…` 相同;`drift` 八列;`candidates` 36 條 PENDING_OPERATOR;落檔唯一出口 `_write`;`sys.dont_write_bytecode` |
+| 單元測試 | `supportive modules/registry/tests/test_vrn_ssot_additive_v0100.py` | **20/20**(py3.11 與 3.12 同過) | 收容 × 樞紐 × 包內測試 × 落差 × 橋 五層;跨機器敏感點寫在檔頭(L93) |
+| 規格項 | `VIA_InputConsole_Spec_v0100.json` +`vrn_ssot_additive`(vrn pipeline 群,**不進 chain_default**) | 匯流排 `matrix --profile test --ids vrn_ssot_additive` **GREEN 1.32s** | `verb=["status"]`(冊上 verb = 實跑 argv)· `test_verb=["--selftest"]` |
+| 格子站 | `CGC_MDL064_SelftestGrid_v0431.py`(主線尾版 v0430) | `--only "SSOT 增補"` 2 站 OK · `--only "研報六欄規則正本樞紐"` OK | 樞紐站改名 四十三 → **四十八檢**;+增補審計橋十九檢;+增補單元測試二十檢 |
+| Register + 梭 | `Register-VIA-Commands-v0241.ps1`(+`via-ssotadd`,別名 `增補審計`)· `via-ssotadd.cmd`(根,批340 契約寫法)· `bin/via-ssotadd.cmd` | MDL157 shadow:函式 166 · 別名 86 · **被吃 0 · 失門 0** | 檔頭第一行寫明 L70 逐次許可來源 |
+| Deck 任務 | `CGC_MDL095_DeckServer_v0158.py` +`vrn_ssot_additive`(argv = 家族境 python → ENG088 `tests`) | **25/25**(py3.12) | 釘 89 → 90 **兩處**(① 與 ㉕ 都釘了數;第一版只改 ① 被 ㉕ 抓到) |
+| Manager 正式名稱 | `VIA_SYSTEM_MANAGER_v0147.py` +任務名「研報同義字增補審計」+引擎名「同義字增補審計橋(…)」 | **10/10**(py3.12);總控頁契約測試 **19/19**(= CI 那支) | 引擎名第一版含 `SSOT`/`PENDING_OPERATOR` 被 test_05「正式名稱不得含程式識別字」抓到 → 改純中文 |
+| 總控頁 | `supportive modules/ui_support/VIA_UI_MasterControl_v0100.html`(Manager 再生;LL49 唯一保留的再生頁) | test_11 tracked 頁 = 產生器 | 正式工作項目 89 → 90 · 現役引擎族 105 → 106 |
+| 台帳 | `VIA_AutoCode_Registry_v0100.json` ledger +1(op ADD · 引擎) | 序列化與原檔同式(indent=2,無檔尾換行) | `updated_at` 跟著推 |
+| VRN 索引冊 | `VIA_VRN_LogicArchitecture_SSOT_v0100.json`(`via-vrnbook build` 再生) | 守門 GREEN 50/50 | 只動三行:built_at、樞紐 tail/head → v0111 |
+| 交接 | 本檔 + `docs/VIA_VDF_StatusReview_20260921.md` 十三段 | — | `VIA_HANDOVER_LATEST.md` 是 VCGC 再生頁,不手改 |
+
+**沒做、且說明為什麼**
+
+| 事 | 為什麼 | 下一步 |
+|---|---|---|
+| `VIA_Command_Cards_v0100.json` 再生 | `via-cmdcard cards` 在本樹跑出 330 行差:卡冊還停在 Register **v0218**,再生會一口氣補進主線 v0219–v0240 的 23 個短令,不是側線該帶的差 | 併線後在合併樹上跑一次 `via-cmdcard cards`(操作員的手) |
+| `VIA_Engine_Consolidation_Register_v0100.json` | 六層鏈實跑時被某節點再生(+14 行 candidates);容器沙盒再生的冊不 commit(LL49) | 已 `git checkout` 還原 |
+| CI workflow 加新測試 | `.github/workflows/via-master-control-ui.yml` 只跑總控契約那一支;改 workflow 是主線治理 | 一貼即用的兩行在第七段 |
+| ENG088 進 VRN 六層索引冊 | 它是稽核件,不在六層鏈上;要歸哪一層是裁定 | 第五段 P6 |
+
+## 四 · 實錄讀出(容器實測;工作站實測是第八段的事)
+
+| 站 | 結果 | 讀出 |
+|---|---|---|
+| 樞紐 v0111 `--selftest` | 48/48 | ㊹ 只增不減實證:樞紐 38 個評等別名冊上全在、正典都在候選、`rating_words()` 66 詞全在冊 |
+| ENG088 `tests` | GREEN:`audit_ssot.py` rc0 30/30 · `test_vrn_evidence.py` rc0 48/48 · 零觸碰 True | 包自帶測試在本樹的 python 3.11 也過 |
+| ENG088 `drift` | GREEN 2 · YELLOW 6(表在下) | 九型代表碼**兩把尺同答**;差都在「冊上沒有的東西」 |
+| ENG088 `candidates` | 36 條,一律 PENDING_OPERATOR;包自述 `mode=REVIEWABLE_CANDIDATE_NOT_INSTALLED · runtime_enabled=False` | 不替它升級 |
+| 單元測試 | 20/20(3.11)· 20/20(3.12) | — |
+| Deck / Manager / 契約測試(py3.12 = CI) | 25/25 · 10/10 · 19/19 | 契約測試在 origin/main 乾淨樹也是 19/19,兩盞紅是我造的、已修 |
+| 格子 `--only` | 3 站 OK | 存證落 VIA_Reports(不入 git) |
+| 匯流排 test profile | `vrn_ssot_additive` GREEN | 第一版 RED:冊上 `verb` 是實跑 argv,五個動詞一起丟給 argparse |
+| MDL157 shadow / MDL174 四面登錄 | 被吃 0 / VRN ④ GREEN(橋 50/50 · Register 2/2 · 梭 2/2 · 格子站 在) | — |
+| **六層鏈 `run --fast`(容器基礎 python,無家族境)** | GREEN 16 · RED 16 · GATED 1 · NODATA 13 → rc 1 | RED 16 = 9 `ModuleNotFoundError`(duckdb…)+ ENG060(pymupdf/openpyxl 缺)+ ENG087/MDL141/ENG080(duckdb 缺)+ ENG067(依賴鏈)+ ENG083 (53)(54);**這七盞在 origin/main 乾淨樹上一模一樣**(worktree 逐支對過)→ 容器缺家族境,不是側線造成。批677 在有家族境的容器量到 GREEN 33 · RED 0 · GATED 1 |
+| ENG083 `matrix` | ABSENT:`vrn_reports.duckdb` 不在容器 | 真正的最後實測要在工作站跑 `via-vrnrun` |
+
+**drift 八列(只攤開不裁定;每列在 JSON 帶下一步)**
+
+| 列 | 燈 | 量到 |
+|---|---|---|
+| TICKER_TYPES | 🟢 | 九型 16 顆代表碼樞紐 `ticker_kind` 與包內 `ticker_schema.json` 同答 |
+| TICKER_V_SUFFIX | 🟡 | 正典 U/V 同歸期貨型;包把 V 另立外幣期貨型 |
+| TICKER_EXTRA_TYPES | 🟡 | 包多 K/C/M/S/V 五型;冊上沒有 → 樞紐回 UNCLASSIFIED 不硬塞 |
+| UPSIDE_BASIS | 🟡 | 包:口徑不合回 BASIS_MISMATCH,不套因子;律 L99:因子鏈 → 同一例 22.5%(包同口徑 25.0%)。兩套口徑同列不混 |
+| BROKER_PARTIAL | 🟡 | 106 檔名:同答 76 · 只有包認得 4 · 兩邊都沒 7 · **兩邊答不同 19**(鍵橋兩邊都套) |
+| DATE_PARSE | 🟢 | 106 檔名:同答 97 · 兩邊都沒 9 · 不同 0 |
+| RATING_POLYSEMY | 🟡 | 冊 10 鍵多義 vs 樞紐 intake_conflicts 2;差的 8 個 = STRONG_BUY/STRONG_SELL 那把老尺(批630B) |
+| KEY_BRIDGE | 🟡 | 包內 BOA→BOFA · MCQ→MACQUARIE · JP/JPMORGAN→JPM…,不在任何正典冊 |
+
+**我自己在本批踩的坑(都已修,記著)**
+
+1. 橋自測 ①② 第一版假紅:自測讀到自測本身 docstring 裡的「import requests」「DuckDB」字串(LL 批504/506 同族)→ 改措辭。
+2. Grid 尾版誤判造成同號複本蓋掉主線檔(第二段 #5)。
+3. Register 登記腳本把撞名斷言放在插入表頭之後(自己撞自己)→ 斷言移前。
+4. 規格項 `verb` 語意用錯(動詞清單 vs 實跑 argv)→ 匯流排 RED → `verb=status`、`test_verb=--selftest`。
+5. Manager 引擎正式名稱含拉丁識別字 → 契約測試 test_05 紅 → 純中文。
+6. Deck 釘數兩處(① 與 ㉕),只改一處 → ㉕ 紅 → 兩處都改。
+7. BROKER_PARTIAL 的「不同」把單邊有答混進去 → 拆成 `disagree`(兩邊都有答、答不同)與 `one_sided`(L57)。
+
+## 五 · 掉球清單(只增不減;結案劃線)
+
+| 代號 | 事 | 狀態 | 誰 | 下一步 |
+|---|---|---|---|---|
+| P1 | STRONG_BUY / STRONG_SELL 是否為獨立正典鍵(`rating_keys()` 6 鍵 vs `canon_map` 4 鍵;冊 8 個多義鍵卡在這) | 候 | 操作員 | 裁了才改 `VRN_FieldRules_SSOT rating.canon_map`(樞紐讀冊);沒裁之前判詞帶 `--source` |
+| P2 | K/C/M/S/V 外幣型 ETF 納不納九型;V 是否從期貨型拆出 | 候 | 操作員 | 納之前先舉得出市場真實代號;納了改 `ticker.corrected.types_ordered` 與三平台式 |
+| P3 | 上漲空間口徑:包 BASIS_MISMATCH vs L99 因子鏈 | 候 | 操作員 | 接法:ENG080 因子鏈先把目標價換 ADJ 口徑(留轉換紀錄)再呼 `compute_upside`;兩車道具名(批675 LL327) |
+| P4 | 包內 KEY_BRIDGE 要不要進 `VRN_FieldRules_SSOT` broker 區 | 候 | 操作員 | 進冊由樞紐讀;不進就留在包裡 |
+| P5 | 36 條候選同義字(34 alias + GFHK + 未驗 token) | 候 | 操作員 | `via-ssotadd candidates` 逐條;點頭的才進正本冊 |
+| P6 | ENG088 歸 VRN 六層索引冊哪一層(目前不在鏈上) | 候 | 操作員 | `via-vrnbook build` 的歸位表 |
+| P7 | 券商檔名局部識別 19 件兩把尺答不同 | 未做 | AI(裁定後) | 逐件看鍵橋/別名覆蓋;要併就提給 ENG086 `safe_broker` 正本 |
+| P8 | 卡冊 `VIA_Command_Cards_v0100.json` 停在 v0218 | 操作員的手 | 操作員 | 併線後 `via-cmdcard cards` |
+| P9 | 側線併入治理線 + 批號 | 操作員的手 | 操作員 | 只由一隻手併(L25);台帳/規格/索引冊取聯集 |
+| P10 | 工作站最後一次實測(`via-vrnrun` V1–V5,真研報) | 操作員的手 | 操作員 | 第七段 |
+| P11 | CI 只跑總控契約測試;新單元測試沒進 CI | 候 | 操作員 | 第七段兩行 |
+
+## 六 · 你的手
+
+- 併線與批號(P9)。
+- 五個裁定(P1–P6),都不急;沒裁之前系統照舊,樞紐既有判定一位元沒變。
+- 工作站 `via-vrnrun`(P10):不裝套件、不設同意閘;閘沒開就把可貼的一行印出來。
+
+## 七 · 一貼即用(工作站 PowerShell;前兩行固定)
+
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
+git fetch origin claude/busy-bell-97sa4f; git status --short; git log --oneline HEAD...origin/claude/busy-bell-97sa4f | head
+git checkout claude/busy-bell-97sa4f      # 或在治理線上:git merge origin/claude/busy-bell-97sa4f(只由一隻手併 L25)
+cd .\VeritasIntelligenceAnalytics
+. .\Register-VIA-Commands-v0241.ps1        # 點源尾版(或直接打同名 .cmd 梭,梭每次現場解析尾版)
+via-vrnrules                               # 一行狀態:… 增補冊 OK 443 詞/7 域 · 多義 10(按來源判)
+via-vrnrules additive                      # 冊況 · 多義 10 · 對回樞紐 4 · 候選 36
+via-vrnrules additive --in "Strong Buy"    # rc 1 SOURCE_REQUIRED(BUY|STRONG_BUY 都回);帶 --source institution.broker_ratings → rc 0 STRONG_BUY
+via-ssotadd                                # 橋一行狀態
+via-ssotadd tests                          # 暫存副本跑 30+48 檢 + 收容夾 sha256 前後對
+via-ssotadd drift                          # 八列落差表(JSON 落 VIA_Reports\vrn\ssot_additive\RUN_<ts>\)
+via-ssotadd candidates                     # 36 條 PENDING_OPERATOR
+via-selftest --only "SSOT 增補"             # 格子兩站
+via-selftest --only "研報六欄規則正本樞紐"    # 格子樞紐站(四十八檢)
+python ".\supportive modules\registry\tests\test_vrn_ssot_additive_v0100.py"   # 20 檢;基礎 python 3.12 即可
+via-vrnbook                                # 守門:冊已重建到樞紐 v0111(GREEN)
+via-vrnrun                                 # 批677 五步:冊重建 → 六層鏈 → 庫價重算 → 驗真矩陣 → 標準 U/I(最後一次實測收尾)
+```
+
+CI 若要接新測試(主線治理,兩行;`.github/workflows/via-master-control-ui.yml`):
+```powershell
+$env:VIA_TEST2 = Tail (Join-Path $reg "tests") "test_vrn_ssot_additive_v*.py"   # 放在 $test 那一行旁
+python "$env:VIA_TEST2"                                                          # 放在「Run isolated MasterControl contract tests」那一步之後
+```
+
+## 八 · 接手驗收(三個指令與預期)
+
+| 指令 | 預期 |
+|---|---|
+| `via-vrnrules --selftest` | `[計] 48 檢 OK 48 · FAIL 0` |
+| `via-ssotadd --selftest` | `[計] 19 檢 OK 19 · FAIL 0`;⑧ 印 `audit_ssot.py rc0 30/30 · test_vrn_evidence.py rc0 48/48 · 零觸碰 True` |
+| `python ".\supportive modules\registry\tests\test_vrn_ssot_additive_v0100.py"` | `Ran 20 tests … OK` |
+
+不符就先疑尺(L93):看是哪台機器、哪個 python、收容夾有沒有被 autocrlf 動過(收容夾在 .gitattributes `-text`,不該動)。

@@ -408,3 +408,20 @@ via-vcgc matrix --family vdf --apply
 | 長期維護 SSOT 0 · 臨時擷取 AD-HOC 390 | 契約 `selection_model`:選取持久化在瀏覽器 `localStorage:vdf_selection` | 這是你瀏覽器的勾選狀態:**沒有任何一項被勾為長期維護** |
 
 結論:這頁可以當「總冊/契約的閱讀面」(它的 390 項與契約規則與冊一致),**不能拿它的引擎登錄、工具鏈、台股檔數判活系統**。要讓它反映現況,正主是 ENG046(轉錄冊)+ ENG073/VCGC 的頁;或依 L39 把它列進 U/I 契約冊為收容件。裁定權在操作員,本文只對照。
+
+---
+
+## 十三 · 操作員上傳五件「整合優化 UNITTEST FOR ALL」→ 側線造件與登記(2026-09-21 補;細節見 `docs/VIA_S20260921_SsotAdditiveAudit.md`)
+
+先比 md5(LL34/LL306):五件只有 `VIA_SSOT_Additive_Audit_v0100.zip` 是新料。共識融合引擎與 VETF 封存包與活樹收容件**位元相同**(不收第二份);單獨上傳的 `SYNONYM_LIBRARY_2.json` / `VRN_WORKFLOW_SPEC.md` 與包內同名件相同。審計包 30 件原名原字節收於 `functional modules/VRN/references/intake/VIA_SSOT_Additive_Audit_v0100_b20260921/`,manifest 逐件 md5/sha256,並記了包內 baseline 九件對活樹 blob 的判定(七件只差檔尾換行、一件只差 CRLF、零內容差)。
+
+| 件 | 版 | 自測 |
+|---|---|---|
+| 樞紐 SUP_MDL749(+增補冊讀冊口;同詞多義按來源判,無來源回全部候選) | v0111 | 48/48(43 舊檢不動) |
+| 正主橋 VRN_ENG088_SsotAdditiveBridge(tests 暫存副本跑包內測試+零觸碰證明 · drift 八列 · candidates 36 條 PENDING_OPERATOR) | v0100 | 19/19 |
+| 單元測試 tests/test_vrn_ssot_additive | v0100 | 20/20(py3.11 · 3.12) |
+| 七處登記:規格項 `vrn_ssot_additive` · 格子 v0431(+2 站,樞紐站 43→48 檢)· Register v0241(+`via-ssotadd`)+ 根/bin 梭 · Deck v0158(89→90)· Manager v0147 · 台帳 +1 · 交接(本段+側線紀錄) | — | Deck 25/25 · Manager 10/10 · 契約測試 19/19 · MDL157 被吃 0 · MDL174 VRN 四面登錄 GREEN · 匯流排 test profile GREEN |
+
+與 VDF 那一半的關係:第十段的兩把尺(主動 ETF `^00\d{2,3}[AD]$` vs `^\d{5}A$`)之外,包又帶進第三把(`^00[0-9]{3}A$` + K/C/M/S/V 外幣型);橋的 `TICKER_TYPES` 列量到**正典九型在 16 顆代表碼上樞紐與包同答**,差只在冊上沒有的五型與 V 尾碼歸屬(YELLOW,裁定權在操作員)。上漲空間的口徑(包 BASIS_MISMATCH vs 律 L99 因子鏈)同列不混。
+
+容器端最後實測:六層鏈 `run --fast` GREEN 16 · RED 16 · GATED 1 · NODATA 13,RED 全數在 origin/main 乾淨樹上一模一樣(容器缺 duckdb/pymupdf 家族境),不是側線造成;工作站的最後一次實測是 `via-vrnrun`(批677 五步),在側線紀錄第七段一貼即用。
