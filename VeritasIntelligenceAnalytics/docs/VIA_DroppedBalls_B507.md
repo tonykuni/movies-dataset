@@ -75,7 +75,7 @@
 | Z57 | 前 session(VIA Integration · session_01RLMQGZLcigd5Bt5aN6J4Ck)批680 五檔已 stage 未 commit(post_turn:awaiting go to run full linter LL117);收尾階段不落地即遺失;本線(claude/awesome-bardeen-h0wm5v)自 批681 起算避免撞號 | 候 | 操作員 | 回該 session 按 go(全格子→commit→push)或裁「棄」;併線時版號對表 |
 | Z58 | 一頁交接三處(倉根 VIA_HANDOVER_LATEST.md / docs ONEPAGE / 頁)停在 批554(2026-09-17),律冊已 批662、逐批 B 文已 679;L15 三處同一份但都舊;收尾清單#2 `via-vcgc page --publish` 自 批554 未跑 | 未做 | AI | 下一批發布前先 `via-vcgc status` 看容器 ABSENT 段;工作站跑更準 |
 | Z59 | 律冊 lessons 停在 LL305(批662);批663–679d 的 LL306–LL335 只在 docs/commit 訊息,未入 VIA_Policy_Laws_SSOT(政策庫是批號正本,VCGC 因此印 批662) | 未做 | AI | 逐條從 docs/commit 收回冊(只增不減;id 不改;先對表再寫) |
-| Z60 | 六層鏈跑器 MDL172 對 import 缺件判 RED(容器 16 紅:VRN_SystemManager 拆成 缺件 10+ · 缺料 1 · 其餘 5);L16 缺件≠壞掉;Z54 HARDIMP 同族 | 未做 | AI | MDL172 v0102:ModuleNotFoundError→ABSENT 並具名缺哪個套件;批681 先由對接口拆開講、不改鏈跑器的燈 |
+| ~~Z60~~ | ~~六層鏈跑器 MDL172 對 import 缺件判 RED(容器 16 紅:VRN_SystemManager 拆成 缺件 10+ · 缺料 1 · 其餘 5);L16 缺件≠壞掉;Z54 HARDIMP 同族~~ | **已結(批686)**:MDL172 v0102 `_missing_module()` → ABSENT 具名套件,修法指 via-rungate --approve-install(裝=操作員的手);㉔ 釘住 | AI | — |
 | Z61 | 讀券商冊的活尾版 9/10 未過拒絕閘(CGC_MDL176 status 實跑;含中央樞紐 SUP_MDL749 v0110 與 ENG086 v0109;只有 vrn_finlex v0107 過閘) | 未做 | AI(單獨一批) | SUP_MDL749 解析道改走 resolve()(拒絕→正典→疊加→聯集)+ 自測;側線 PR #53 的 v0111 也要一起看 |
 | Z62 | ADJ 車道 30 件卡「上市所整個不在 ADJ 表」(tw_daily_prices / tw_prices_adj / prices_canonical 都是 892 檔 TPEX only);RAW 車道 29 件已算成(批677) | 操作員的手 | 閘 | `$env:VIA_NET_CONSENT='YES'; via-market-lists; via-price` → `via-repairprice --apply` → `via-vrnmatrix` 貼回 |
 | Z63 | finlex 對帳 19 欄待一句話(ebit→operating_income?ocf 三名一路?)+ 5 個券商同義候選 PENDING_OPERATOR(GF/MORGANSTANLEY/UBS/CAPITAL/DAIWA)+ 12 個 UNKEPT 收容夾 + regen_revert 備份夾 40+ | 候 | 操作員 | `via-finlex --reconcile` 逐欄指名「A 併到 B」 |
@@ -93,13 +93,24 @@
 | Z75 | PS 語法閘棘輪基線 5 支/53 筆舊債(含 `VIA_Canonical_Units/Invoke-VIA-VRN-Fallback-Activation-v0136.ps1` foreach 缺 in),容器 pwsh 7.4.6 量到;不是本批弄壞的;修=另開版號檔 | 候 | AI | 裁「修」我就逐支修(pwsh 可在容器複驗) |
 | Z76 | 832 支 .ps1 帶 [VIA:PS-ACCEL:v0100]「20」註解,實際 dot-source 同一個 25 冊模組;要不要把註解統一成 v0101(改 832 支只動一行註解)=你裁 | 候 | 操作員 | 裁「統一」我就用 v0106 換標記(逐字、零行為) |
 | Z77 | PR #57(local/parallel-b600-bus-v0128;側線 11 commit + 工作站 EngineBus v0128)與 main 衝突 5 檔=舊快照 vs 只增不減冊;批684 已把它真正新的兩件(EngineBus v0128 · VDF 審視文)收進本線,其餘 ⊂ 本線 → PR #57 與 PR #53 都可關;`_patches/` 的 v0128 副本不收(第二顆頭) | 候 | 操作員 | 關 PR #57 / #53;要保留 `_patches` 副本再說 |
+| ~~Z78~~ | ~~B600 補丁包產物 `CGC_MDL148_EngineBus_v0128.py` 自 09-18 起只在工作站(尾版律:工作站矩陣跑 v0128、倉裡任何人跑 v0127;`_patches/` 補丁包在樹上、產物不在),批604–606 刻意不碰但沒登進本清單~~ | **已結(批682B)**:操作員依 L25 推側枝 `local/parallel-b600-bus-v0128`(da89abbc)→ 本線 cherry-pick ee9c4a53;v0127+diff 位元同 · md5 213a6412 · 四十八檢 49/49;批684 同一小時收進位元相同的一份,自動合併不撞;`_patches/` 副本兩線都不收(L23) | — | PR #57 可關(內容 ⊂ 本線與批684);`.bak_b600_*` 由操作員留刪 |
+| ~~Z79~~ | ~~VCGC ⑬ 把執行期產物 `VIA_Reports/env_governance/TOOLS_PLAN_latest.json` 的虛境 `(未路由:加速器通用件)`(VIA-ENV-0001)算進活元件等式:工作站有這份檔=活、容器沒有=退役。批681/682/682B 各自在容器 `registry-sync --apply` 都把它退役;併入 main 後工作站 ⑬ 會變「缺 1」,工作站再 `--apply` 又復活,容器再紅(兩台機器互翻;不是誰修錯,是尺把執行期的列算進等式)~~ | **已結(批682B)**:MDL149 v0119 把 TOOLS_PLAN 來的境標 runtime 另列(覆寫鍵 `VIA_TOOLS_PLAN_LATEST`;㉕ 合成檢有檔/無檔活元件數相同);已退役的 VIA-ENV-0001 留著不動;PR #58 Codex P1 同一判斷 | — | 工作站併入後 `via-vcgc --selftest` ⑬ 應綠,且 `registry-sync` 不再復活它 |
+| Z80 | VDF_ENG090 ㉔:`roster()` 走 ABSENT 早退分支(名冊缺/duckdb 缺/庫缺/`tw_daily_prices` 缺)時 note 沒帶「不代設」字樣,㉔ 自檢在沒有價表的環境必紅(批682B 容器:補料前紅、補料後綠) | 未做 | AI | ENG090 v0105:初始 `out` 就帶「不代設」note,四態全帶 |
+| Z81 | 容器 SessionStart 開機更新器 ⓪ 環境自補:jieba 在 Debian setuptools 68/wheel 0.42 建輪失敗(`install_layout`),pip 把整份 `VIA_Env_Requirements_v0100.txt` 一起放棄 → 29 條 `No module named duckdb/pandas`,OmniFetch 15 車道全假敗;`pip install --use-pep517 jieba` 可過(批682B 實證,補裝後重跑收尾 YELLOW) | 未做 | AI | `via_boot_update.sh` ⓪ 段:先裝可裝的,jieba 單獨 `--use-pep517`,失敗只列不放棄整份 |
+| Z82 | 財報恆等式 7 條裡 5 條的運算元正典(cogs/opex/op_margin/net_margin/total_assets/total_liabilities/equity/shares)不在 VRN_Financial_Synonyms_SSOT(營業成本/營業費用/資產總計/負債總計/權益總計 normalize_metric 回原文=UNKNOWN):ENG074 v0113 驗算多為 INSUFFICIENT 並點名,直到登錄;登錄=只增不減、你定(批504 律) | 候 | 操作員 | 一句「登錄這幾個」我就寫進 SSOT + 重跑 `via-vrnrun`;冊 `rules.financial.verify.unregistered_canonicals` 就是清單 |
+| Z83 | 官方年度核對(ENG074 v0113 official_check)的料是 VDF_ENG082 的 `tw_financial`(yfinance 車道;MOPS 只探路),容器/工作站都還沒抓;沒料=NO_OFFICIAL_TABLE 誠實略;同意閘 VIA_NET_CONSENT 你設 | 操作員的手 | 操作員 | `$env:VIA_NET_CONSENT='YES'; via-py vdf "functional modules\VDF\engine\VDF_ENG082_FinStatements_v0100.py" run --only 2330,2454`(先兩檔試)→ `via-py vrn "functional modules\VRN\VRN_ENG074_FinancialPages_v0113.py" --verify` 貼回 `[官方核對]` 行 |
+| Z84 | 工作站 V2 三盞紅有兩盞根因未定:SUP_MDL746 九檢 FAIL 1 · CGC_MDL141 十四檢 FAIL 1(容器兩支全綠)。**批686 更正**:鏈跑器 v0101 的「量到什麼」只印最後一行,所以看到的 `[OK] ⑨` / `[OK] ⑭` 不是紅的那一檢——批685 把 MDL141 的紅記成 ⑭ 是猜錯;v0102 起 rc≠0 先印 [FAIL] 行 | 候 | 操作員 | 拉 批686 後 `via-vrnrun`,兩格會直接印 [FAIL] 行;貼回那兩行 |
+| Z85 | ENG068 ⑨ features_daily 2026-09-14 因子覆蓋 530/1978=26.8%:⑨ 要求最新完整日 100%;是因子鏈沒跑全宇宙(資料缺),不是引擎壞 | 操作員的手 | 操作員 | `via-vdffetch`(3a/3b 因子段)後 `via-vrnrun` 看 ⑨ |
+| Z86 | **VCGC v0119 撞號**:main(PR #58 brave-goldberg:執行期境不進等式 ㉕)與側線 busy-bell(`+vdf_system` 段 ㉕)各有一份**內容不同**的 `CGC_MDL149_…_v0119.py`;Grid v0434 亦只在 busy-bell(本線已取 v0435 避開)。併 busy-bell 時 VCGC 必撞 | 候 | 操作員/側線 | 側線那份改 v0120 並把 main v0119 的執行期境律一起帶上,再併;或先併本線再由我出聯集版 | ← 側線 b 已解:VCGC **v0120** 疊在主線 v0119 上(主線 ㉕ 原樣保留,VDF 檢改 ㉖,二十六檢 26/26;PR #53) |
 
-## 側線 2026-09-21 b 追記(VDF 子系統管理對接口;編號接續主線 Z81 → Z82–Z86;來源 docs/VIA_S20260921b_VDFSystemManager.md 七)
+| Z87 | **第二顆頭的庫**:工作站 V4 量到 `functional modules\VRN\output\vrn_reports.duckdb`(舊路徑;105 列;最後寫於 09-20 07:54)也有 vrn_report_basic,與資料家正典 `vdf_tw_market.duckdb`(09-21 18:14)並存;讀的人與寫的人可能指到不同檔(Zero-Hydra)。矩陣已具名點出,不代刪 | 候 | 操作員 | 確認沒人再讀舊路徑後,把它改名封存(例如 `vrn_reports.duckdb.b686_retired`);要保留就說一聲,我在冊上登成刻意保留 |
+
+## 側線 2026-09-21 b 追記(VDF 子系統管理對接口;編號接續主線 Z87 → Z88–Z92;本線先取 Z74–Z78 撞主線批683,再取 Z82–Z86 撞主線批685/686,第三次才空——側線的 Z 號要在併線當下取,不能先寫;來源 docs/VIA_S20260921b_VDFSystemManager.md 七)
 
 | 代號 | 事 | 狀態 | 誰 | 下一步 |
 |------|----|------|----|--------|
-| Z82 | Register `via-vdfsys` / `via-vrnsys`:操作員「依你建議執行」= L70 許可 → Register v0242 + 根/bin 四支梭(守門版);Z65 一併結 | 已結 | 側線 | 工作站 `via-fresh` 或重點源 v0242 |
-| Z83 | VeritasCeleritas 三副本兩個版本(accelerator/ f6ecbfc4 237,382 B vs 根+50_Protection d9b107e2 237,062 B;VDF 對接口工具域 STALE) | 候裁 | 操作員 | 裁哪份是正典,另兩份對齊;對接口自轉綠 |
-| Z84 | VDF engine/ 8 支無版號 .py(ENG046/049 · MDL002/003/007 只有無版號檔且卡書指著;ENG047/050/051 旁邊另有尾版檔=疑似舊複本)+ 卡書 45 張是舊快照(冊有樹無 1 · 樹有冊無 3) | 候裁 | 主線 | 立版號/清複本 → 卡書重建(不手改) |
-| Z85 | VDF 獨立鏈容器沒跑過(對接口引擎域 NODATA)· 一頁交接 批554 < 律冊 批662(交接域 STALE;VRN 門同報) | 待跑 | 操作員 | `via-vdfchain run` · `via-vcgc page --publish` |
-| Z86 | 工作站樹是 awesome-bardeen 批684,還沒有 VDF 對接口;本線已含 批684,快轉即可(`git merge --ff-only origin/claude/busy-bell-97sa4f`;先 stash 再生的 VIA_VRN_LogicArchitecture_SSOT 冊) | 待做 | 操作員 | 快轉後 via-vcgc 應印 v0120 |
+| Z88 | Register `via-vdfsys` / `via-vrnsys`:操作員「依你建議執行」= L70 許可 → Register v0242 + 根/bin 四支梭(守門版);Z65 一併結 | 已結 | 側線 | 工作站 `via-fresh` 或重點源 v0242 |
+| Z89 | VeritasCeleritas 三副本兩個版本(accelerator/ f6ecbfc4 237,382 B vs 根+50_Protection d9b107e2 237,062 B;VDF 對接口工具域 STALE) | 候裁 | 操作員 | 裁哪份是正典,另兩份對齊;對接口自轉綠 |
+| Z90 | VDF engine/ 8 支無版號 .py(ENG046/049 · MDL002/003/007 只有無版號檔且卡書指著;ENG047/050/051 旁邊另有尾版檔=疑似舊複本)+ 卡書 45 張是舊快照(冊有樹無 1 · 樹有冊無 3) | 候裁 | 主線 | 立版號/清複本 → 卡書重建(不手改) |
+| Z91 | VDF 獨立鏈容器沒跑過(對接口引擎域 NODATA)· 一頁交接 批554 < 律冊 批662(交接域 STALE;VRN 門同報) | 待跑 | 操作員 | `via-vdfchain run` · `via-vcgc page --publish` |
+| Z92 | 工作站樹是 awesome-bardeen 批684,還沒有 VDF 對接口;本線已含 批684,快轉即可(`git merge --ff-only origin/claude/busy-bell-97sa4f`;先 stash 再生的 VIA_VRN_LogicArchitecture_SSOT 冊) | 待做 | 操作員 | 快轉後 via-vcgc 應印 v0120 |
