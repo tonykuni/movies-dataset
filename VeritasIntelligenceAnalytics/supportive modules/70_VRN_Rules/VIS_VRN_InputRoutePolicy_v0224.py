@@ -42,7 +42,6 @@ BROKER_PREFIX_RULES = {
     "Daiwa": "Daiwa",
     "UBS": "UBS",
     "Citi": "Citigroup",
-    "GF": "GF Securities",
     "CLST": "CLST",
     "CTBC": "CTBC",
     "KGI": "KGI",

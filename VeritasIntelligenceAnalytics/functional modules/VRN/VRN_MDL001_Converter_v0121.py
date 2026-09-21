@@ -247,7 +247,7 @@ _BROKER_FN_MAP: Dict[str, str] = {
     "CITI": "Citigroup",     "UBS": "UBS",             "DB": "Deutsche Bank",
     "CS": "Credit Suisse",   "BAML": "BofA Merrill",  "NOMURA": "Nomura",
     "DAIWA": "Daiwa",        "CLSA": "CLSA",           "MACQ": "Macquarie",
-    "兆豐": "兆豐金控",       "國泰": "國泰證券",        "中信": "中信證券",
+    "兆豐": "兆豐金控",       "國泰": "國泰證券",        "中信": "中國信託",
     "元大": "元大證券",        "富邦": "富邦證券",        "凱基": "凱基證券",
     "永豐金": "永豐金證券",    "華南永昌": "華南永昌",    "玉山": "玉山證券",
 }

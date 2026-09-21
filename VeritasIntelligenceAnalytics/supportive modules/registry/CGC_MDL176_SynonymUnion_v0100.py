@@ -63,7 +63,7 @@ CGC_MDL176_SynonymUnion v0100 — 同義字聯集閘(批678)
   plan        印新增計畫(零寫)
   --apply     寫聯集冊 + 疊加層下一版(只增不減,寫前先證 contains)
   resolve <scope> <token>   一扇門解析(拒絕→正典→疊加→聯集;L101)
-  --selftest  廿九檢
+  --selftest  三十檢
 誠實 rc:0 GREEN · 1 真的壞 · 2 缺料 · 3 缺件
 """
 from __future__ import annotations
@@ -627,6 +627,10 @@ def plan(write: bool = False) -> int:
         print("[同義聯集] 只增不減證明不過:底冊少了 %d 條 → 不寫(fail-closed)" % len(miss))
         return 1
     nxt, why = overlay_next(base, rows)
+    cur_ov = _j(Path(base["overlay_path"])) or {}
+    if nxt is not None and {k: v for k, v in nxt.items() if k not in ("version", "batch")} \
+            == {k: v for k, v in cur_ov.items() if k not in ("version", "batch")}:
+        nxt, why = None, "疊加層沒有新東西=不開新版號(只差一個版號的新檔是 Hydra,不是進度)"
     adds = [r for r in rows if r["state"] == "ADD"]
     print("[計畫] 聯集冊 %s · 新增 %d 條(%s)"
           % (UNION_OUT.name, len(adds),
@@ -697,8 +701,16 @@ def selftest() -> int:
     chk("⑨ 拒絕清單真的有咬到收容件", sum(1 for r in rows if r["state"] == "DENIED") >= 8,
         "%d 條" % sum(1 for r in rows if r["state"] == "DENIED"))
     leak = u["deny_leak"]
-    chk("⑩ 漏口逐條指名(不是一句「有漏」),而且不刪任何一本冊",
-        len(leak) >= 8 and all(r["book"] and r["alias"] and r["canonical"] for r in leak), "%d 條" % len(leak))
+    _lk = [r for r in leak if r["kind"] == "LEAK"]
+    _ov = [r for r in leak if r["kind"] == "OVERRIDDEN"]
+    # 批679 之後這一檢要驗的是**不變量**:真漏口 0,而剩下的一定只在**唯讀正典**裡
+    #(那兩條是撞名不是陸券,拒絕清單先行已擋,正典唯讀動不得)。
+    # 第一版寫成「至少 8 條」,刪乾淨之後自己把自己判紅——冪等的事要用結果判(LL332)。
+    chk("⑩ 真漏口 0;剩下的只在唯讀正典裡,而且逐條指名(不是一句「有漏」)",
+        not _lk and all(r["book"].startswith("institution.") for r in _ov)
+        and all(r["book"] and r["alias"] and r["canonical"] for r in leak),
+        "LEAK %d · OVERRIDDEN %d(%s)" % (len(_lk), len(_ov),
+                                          ",".join(r["alias"] for r in _ov)))
     chk("⑪ 五個 CONFLICT 全部有裁定,而且每條都帶 ruled_by + why(LL90)",
         all(r.get("ruled_by") and r.get("why") for r in u["rulings"]), "%d 條裁定" % len(u["rulings"]))
     ka = [r for r in u["rulings"] if r.get("kind") == "KEY_ALIAS"]
@@ -760,15 +772,36 @@ def selftest() -> int:
                 for m in ("import duckdb", "import requests", "subprocess", "urllib.request")))
     leak2 = [r for r in leak if r["kind"] == "LEAK"]
     over2 = [r for r in leak if r["kind"] == "OVERRIDDEN"]
-    chk("㉕ 漏口分兩種,不混成一個數字:正典裡的是**已被拒絕清單擋住**,別本冊的才是真漏口",
-        bool(leak2) and bool(over2) and len(leak2) + len(over2) == len(leak),
+    # 這一檢驗的是**分類本身站得住**(每一列都有 kind、兩欄相加等於總數、
+    # OVERRIDDEN 一定在正典),不是「兩欄都要有東西」——批679 刪乾淨之後
+    # LEAK 本來就該是 0,要求它非空等於要求問題永遠不准被修好(LL332)。
+    chk("㉕ 漏口分兩種且分得乾淨:每列都有 kind · 兩欄相加=總數 · OVERRIDDEN 一定在唯讀正典",
+        all(r.get("kind") in ("LEAK", "OVERRIDDEN") for r in leak)
+        and len(leak2) + len(over2) == len(leak)
+        and all(r["book"].startswith("institution.") for r in over2),
         "LEAK %d · OVERRIDDEN %d" % (len(leak2), len(over2)))
     defects = u["book_defects"]
-    chk("㉖ 兩條冊內瑕疵逐條指名(國泰君安掛成國泰的別名 · 兩家共用同一縮寫鍵),而且一本冊都沒刪",
-        any(d["kind"] == "FALSE_ALIAS" for d in defects) and
-        any(d["kind"] == "ABBR_COLLISION" for d in defects) and
-        all(d.get("why") and d.get("fix") for d in defects),
-        " · ".join("%s:%s" % (d["kind"], d["alias"]) for d in defects))
+    chk("㉖ 冊內瑕疵 0(批678 照出的兩條,批679 依操作員令已清:國泰君安拆離國泰 · 大華改回 DH)",
+        not defects and all(d.get("why") and d.get("fix") for d in defects),
+        " · ".join("%s:%s" % (d["kind"], d["alias"]) for d in defects) or "零瑕疵")
+    # 正控:偵測器本身還是要證明咬得住——合成一本有瑕疵的冊,它一定要抓出來。
+    _syn_bd = {"brokers": {"國泰": {"abbr": "CT", "aliases": ["國泰", "國泰君安"]},
+                           "甲": {"abbr": "ZZ"}, "乙": {"abbr": "ZZ"}}}
+    import json as _js, tempfile as _tf, os as _os
+    _fd, _tp = _tf.mkstemp(suffix=".json")
+    _os.close(_fd)
+    Path(_tp).write_text(_js.dumps(_syn_bd, ensure_ascii=False), encoding="utf-8")
+    _real = VIA / "functional modules" / "VRN" / "knowledge" / "VRN_Broker_Dict_v0100.json"
+    _bak = _real.read_text(encoding="utf-8")
+    try:
+        _real.write_text(Path(_tp).read_text(encoding="utf-8"), encoding="utf-8")
+        _syn_def = book_defects()
+    finally:
+        _real.write_text(_bak, encoding="utf-8")
+        Path(_tp).unlink(missing_ok=True)
+    chk("㉖b 正控:合成一本有瑕疵的冊,兩種瑕疵都一定要被抓出來(LL89)",
+        {d["kind"] for d in _syn_def} == {"FALSE_ALIAS", "ABBR_COLLISION"},
+        str(sorted({d["kind"] for d in _syn_def})))
     gb = u["gate_bypass"]
     chk("㉗ 沒過閘的活支逐支指名(尺量的是**檔案內容**,不是印象;L93)",
         bool(gb) and all("engine" in r and isinstance(r["gated"], bool) for r in gb),
@@ -780,9 +813,9 @@ def selftest() -> int:
         and _reads_broker_book(_bare_src) and not _is_gated(_bare_src)
         and not _reads_broker_book("print('hello')"),
         "有閘的判成有閘 · 沒閘的判成沒閘 · 不讀券商冊的不進分母")
-    print("=== CGC_MDL176 同義字聯集閘 v%s · 廿九檢自測(零網路;預設零寫)===" % VERSION)
+    print("=== CGC_MDL176 同義字聯集閘 v%s · 三十檢自測(零網路;預設零寫)===" % VERSION)
     print("\n".join(lines))
-    print("  [計] 廿九檢 OK %d · FAIL %d" % (ok, fail))
+    print("  [計] 三十檢 OK %d · FAIL %d" % (ok, fail))
     return 0 if fail == 0 else 1
 
 
