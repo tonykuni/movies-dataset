@@ -9714,18 +9714,25 @@
       "code": "上傳件每支函式樹上都有正主(ENG084/SUP_MDL749/MDL142/MDL176/ENG072/ENG082/ENG073/ENG074/ENG080/ENG081/ENG083),實測檔名/日期/券商/評等/目標價全命中 → 只收不嫁接(L03/L09/L90/L05)。補的三件:ENG080 三十檢 30/30 · ENG074 三十一檢 31/31(㉖–㉛)· hub 749 48/48 · VCGC v0119 25/25。先併回 origin/main(PR #58 批682B)聯集三冊(台帳 1284);registry-sync 活 6004 · 新 11 · 變更 212;契約 19/19。全格子 v0435:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(282s;GRID_20260921_095933)· 對 批684 第七跑逐站相同:只在本批紅 0 · 只在 批684 紅 0。 工作站 V2 RED 3 讀法入 docs/VIA_B685;掉球 +Z82–Z86。"
     },
     {
-      "ts": "2026-09-21 18:20",
-      "op": "FIX",
-      "category": "L16",
-      "component": "批687 · VDF_ENG090 v0105(㉔ 四態全帶「不代設」;+㉕ 合成 ABSENT;Z80 結)· via_boot_update.sh ⓪ 逐件退路(Z81 結)· Z79 工作站實錄結案 · PR #57 關",
-      "code": "操作員令「依你建議進行 · 關」。Z80:roster() 四條 ABSENT 早退分支沒帶「不代設」,㉔ 在沒有價表的環境必紅;v0105 初始 out 的 note 就帶,+㉕ 把正典庫指到不存在的路驗 ABSENT/why/note/by_market;24 檢 OK 24。Z81:⓪ 環境自補整份 pip 一件建輪失敗就全部放棄(jieba/install_layout → 29 條 No module named 假敗);改逐件退路、失敗再試 --use-pep517、只列名不放棄其餘;覆寫鍵 VIA_ENV_REQ 只給合成檢;合成檢 bogus+jieba → 整份 rc=1 → 逐件 2 件 · 失敗 1(bogus)。Z79 工作站實錄(main b45c9380,v0119):registry-sync PLAN 活 5991 · 新 0 · 變更 0 · 退役 0;二十五檢 OK 25;⑬ 5991/5991 · runtime 另列 1;㉕ 有檔/無檔 5991。PR #57 關(內容 ⊂ #58 + 批684)。批號 687:680–686 已用(LL334)。"
-    },
-    {
       "ts": "2026-09-21 10:25",
       "op": "ADD",
       "category": "VRN鏈跑器",
       "component": "批686 CGC_MDL172 v0102:六層鏈「量到什麼」rc≠0 先印 [FAIL] 行再 [計] 行(最後一行的 OK 蓋住紅燈=跑器自己戴的眼罩);ModuleNotFoundError → ABSENT 具名套件(Z60 結)· Grid v0436 站名廿四檢",
       "code": "操作員第二次貼回 via-vrnrun(HEAD 0b6f7dfb):SUP_MDL746/MDL141 RED 但格子印 [OK] ⑨/[OK] ⑭;批685 據此猜 ⑭ 是猜錯(B685/Z84 更正)。v0102 廿四檢 24/24;容器 run --fast GREEN 31 · RED 1 · GATED 1 · NODATA 13。registry-sync 活 6006 · 新 2 · 變更 41;契約 19/19。全格子 v0436:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(256s;GRID_20260921_102019)· 終判 FAIL 集對 批685 逐站相同:新紅 0 · 消失 0(平行段 1 站 DuckDB 鎖撞序跑轉綠)。 掉球 +Z87(第二顆頭的庫 vrn_reports.duckdb 舊路徑;封存=操作員的手)。"
+    },
+    {
+      "ts": "2026-09-21 10:46",
+      "op": "ADD",
+      "category": "VRN財報驗算",
+      "component": "批687 VRN_ENG074 v0114:同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」· FAIL/DIVERGE 列直接印 · 分母(有財報列 N/入庫 M)印出 · Grid v0437 站名三十三檢",
+      "code": "工作站第一次真跑 v0113 --verify:30 件 × 7 條 → 665 列 · INSUFFICIENT 627 · FAIL 21 · PASS 17;tw_financial 不在。七條裡只有 GM_DIV 三正典都登錄,21 FAIL 第一嫌疑=多列取第一列;627 混未登錄正典(cogs/op_margin/net_margin/opex/shares)與報告未載(gross_profit ×173/net_income ×84)。v0114 三十三檢 33/33。全格子 v0437:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(266s;GRID_20260921_104209)· 終判 FAIL 集對 批686 逐站相同:新紅 0 · 消失 0。 Z82 補計數 · +Z88(財報列覆蓋 30/105)。"
+    },
+    {
+      "ts": "2026-09-21 18:20",
+      "op": "FIX",
+      "category": "L16",
+      "component": "批687 · VDF_ENG090 v0105(㉔ 四態全帶「不代設」;+㉕ 合成 ABSENT;Z80 結)· via_boot_update.sh ⓪ 逐件退路(Z81 結)· Z79 工作站實錄結案 · PR #57 關",
+      "code": "操作員令「依你建議進行 · 關」。Z80:roster() 四條 ABSENT 早退分支沒帶「不代設」,㉔ 在沒有價表的環境必紅;v0105 初始 out 的 note 就帶,+㉕ 把正典庫指到不存在的路驗 ABSENT/why/note/by_market;24 檢 OK 24。Z81:⓪ 環境自補整份 pip 一件建輪失敗就全部放棄(jieba/install_layout → 29 條 No module named 假敗);改逐件退路、失敗再試 --use-pep517、只列名不放棄其餘;覆寫鍵 VIA_ENV_REQ 只給合成檢;合成檢 bogus+jieba → 整份 rc=1 → 逐件 2 件 · 失敗 1(bogus)。Z79 工作站實錄(main b45c9380,v0119):registry-sync PLAN 活 5991 · 新 0 · 變更 0 · 退役 0;二十五檢 OK 25;⑬ 5991/5991 · runtime 另列 1;㉕ 有檔/無檔 5991。PR #57 關(內容 ⊂ #58 + 批684)。批號 687:680–686 已用(LL334)。"
     },
     {
       "ts": "2026-09-21 16:54",
@@ -9740,10 +9747,10 @@
       "op": "ADD",
       "category": "Register",
       "component": "Register-VIA-Commands v0242(+via-vdfsys 資料對接口 · +via-vrnsys 研報對接口;守門版:尾版不在印 ABSENT rc2 不呼 python)+ 梭 4 支(via-vdfsys.cmd / via-vrnsys.cmd 根+bin;不釘版號) · VDF_SystemManager v0101(⑱ 改量 Register 現況:登了 True 沒登 False;v0100 把暫態釘成不變量,短令一登就紅) · VRN_SystemManager v0102(同一處 ⑱ 同改;主線 v0101 的檢一登 via-vrnsys 就紅,格子站實錄)",
-      "code": "操作員「依你建議執行」= L70 這一次的許可(18:01 工作站實錄:第一版貼行在沒有對接口的樹上把 status 當腳本餵給 python → 改守門版)。v0241 一字不動;VDF/VRN 兩扇門七處登記 6/7 → 7/7。Z65(via-vrnsys 候准)與 Z88(via-vdfsys 候准;本線掉球號兩度撞主線,第三次取 Z88–Z92)結案。",
+      "code": "操作員「依你建議執行」= L70 這一次的許可(18:01 工作站實錄:第一版貼行在沒有對接口的樹上把 status 當腳本餵給 python → 改守門版)。v0241 一字不動;VDF/VRN 兩扇門七處登記 6/7 → 7/7。Z65(via-vrnsys 候准)與 Z89(via-vdfsys 候准;本線掉球號三度撞主線,第四次取 Z89–Z93)結案。",
       "origin": "側線 claude/busy-bell-97sa4f(session_01YJPv4NqSj3YsMkkcrywaHw);主線批號由併線的手指定 L25"
     }
   ],
-  "updated_at": "2026-09-21 18:20",
+  "updated_at": "2026-09-21T10:46:56",
   "batch": "批687"
 }

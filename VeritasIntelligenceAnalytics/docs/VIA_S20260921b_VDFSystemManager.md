@@ -40,7 +40,7 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 | `tests/test_vdf_system_manager_v0100.py`(新) | 20 檢:本體 3 · 橋律兩把尺 2 · VCGC 委派 3 · 快照 1 · 七處 6 · 讀器 5;Register 短令**只量不假設** | py3.11 · 3.12 **20/20**(交接文寫完前 19/20,缺的正是本文) |
 | `VDF_SystemManager_v0101.py`(新版) | Register 一登冊,v0100 的 ⑱ 就紅:它把「Register 未登必須 False」這個**暫態**釘成不變量。v0101 改成量 Register 尾版(登了 True、沒登 False);其餘一字不動,v0100 留作版史(L04) | 27/27(py3.11 · 3.12);單元測試 20/20 |
 | `VRN_SystemManager_v0102.py`(新版;主線 v0101 留作版史) | 同一處 ⑱:via-vrnsys 一登冊,主線 v0101 的「未登必須 False」就紅(Grid --only 子系統管理 實錄 4/5)。v0102 改量 Register 尾版;其餘一字不動。主線批號由併線的手指定(L25) | 25/25(py3.11 · 3.12);Grid 5/5 |
-| Register v0242(新版;v0241 一字不動) | 操作員「依你建議執行」= L70 這一次的許可 → +`via-vdfsys`(資料對接口)· +`via-vrnsys`(研報對接口;批682 Z65)守門版 + 梭 4 支(根+bin,不釘版號) | 兩扇門七處 **7/7**;Z65 · Z88 結案 |
+| Register v0242(新版;v0241 一字不動) | 操作員「依你建議執行」= L70 這一次的許可 → +`via-vdfsys`(資料對接口)· +`via-vrnsys`(研報對接口;批682 Z65)守門版 + 梭 4 支(根+bin,不釘版號) | 兩扇門七處 **7/7**;Z65 · Z89 結案 |
 
 ## 四 · 量到但沒改的(L16 只報,候裁)
 
@@ -55,7 +55,8 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 - 本線:`claude/busy-bell-97sa4f`(PR #53)。造件前把 `origin/main`(批663–679d + 批681)與 `origin/claude/awesome-bardeen-h0wm5v`(批682)併進來:兩處衝突(VRN 邏輯架構冊 · 總控頁)都取主線版;台帳與規格冊做聯集(1280 筆 · 65 項)。
 - 第三條線 `claude/brave-goldberg-ri5k42`(session_01JaiaB5…):本文第一版(09:00 前量的)寫「遠端沒有這條分支」;之後它從那個 session 推上去了,主線以 **PR #58** 併入(EngineBus v0128/v0129 · VCGC v0119 執行期境不進等式 · B682B 文 · 台帳 1282)。工作站那次 `src refspec does not match any` 的原因照舊:本地沒有那條分支,push 只能在那個 session 裡下。
 - 18:01 貼回:工作站 HEAD 在 `claude/awesome-bardeen-h0wm5v` 批684(0b6f7dfb;批683 橋掃器 v0106 + PS 尾版注橋 · 批684 吸收 PR #57 的 EngineBus v0128 與 VDF 審視文),那三筆 main 還沒有。本線把它併進來(五處衝突:掉球冊取主線 · VDF 審視文取本線(本線多兩行追記,其餘逐行相同)· 台帳聯集 1285 · 元件冊取主線再以 v0120 重跑(6076/6076;VDF_SystemManager 仍 VIA-SYS-0012)· 總控頁由 Manager v0148 再生),所以工作站在 awesome-bardeen 上 `git merge --ff-only origin/claude/busy-bell-97sa4f` 是**快轉、零衝突**。
-- 18:36 貼回:工作站 awesome-bardeen 已推到 批686(53736e39;批685 上傳整合引擎收容 · 批686 鏈跑器 v0102 + Grid v0435/v0436),main 併了 PR #60(到 批685)。本線再併一次(四處衝突:掉球冊取主線+本線五顆改號 Z88–Z92 · 台帳聯集 1288 · 元件冊取主線再以 v0120 重跑 · 總控頁再生);Grid **v0437** = 主線 v0436 + 本線兩站 + 中央控管台站名(主線 v0435/v0436 從 v0433 長出來,沒有本線 v0434 的兩站,尾版律下兩站會消失——併線的手要重貼)。之後工作站 `--ff-only` 又成立。
+- 18:36 貼回:工作站 awesome-bardeen 已推到 批686(53736e39;批685 上傳整合引擎收容 · 批686 鏈跑器 v0102 + Grid v0435/v0436),main 併了 PR #60(到 批685)。本線再併一次(四處衝突:掉球冊取主線+本線五顆改號(現為 Z90–Z93)· 台帳聯集 1288 · 元件冊取主線再以 v0120 重跑 · 總控頁再生);Grid **v0437** = 主線 v0436 + 本線兩站 + 中央控管台站名(主線 v0435/v0436 從 v0433 長出來,沒有本線 v0434 的兩站,尾版律下兩站會消失——併線的手要重貼)。之後工作站 `--ff-only` 又成立。
+- 10:55 PR #53 轉 dirty:main 併了 PR #61(brave-goldberg 批687:ENG090 v0105 · via_boot_update.sh 改版),awesome-bardeen 另推了自己的批687(ENG074 v0114 · **Grid v0437**——與本線 v0437 撞名)。本線兩者都併:台帳聯集 1290 · 元件冊取主線再以 v0120 重跑(6092/6092)· 總控頁再生 · Grid **v0438** = 主線 v0437 + 本線兩站 + 站名(第三次重貼)· 掉球冊本線六顆第四次改號 Z89–Z94(主線批687 用了 Z88)· 審視文裡 via_boot_update.sh 的行號隨新版對正(閘第 21 行 · ENG077/078 第 83/85 行)。
 - 撞號(L25):本線與主線批682B **同一小時各造一支 VCGC v0119**(主線批686 的掉球冊 Z86 也記了這一顆;本線 v0120 已解,Z86 標已解)。本線併主線時取主線的 v0119,本線的 VDF 對接口段改號 **v0120** 疊在它上面(它的 ㉕ 原樣保留,本線的 VDF 檢改 ㉖,二十六檢);台帳聯集 1283;元件冊以 v0120 重跑(273/273 未登 0)。
 
 ## 六 · 容器實測(全部零網路)
@@ -75,13 +76,13 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 
 ## 七 · 掛著(下一手接)
 
-- Z88 已結:Register v0242 + 梭 4 支(操作員「依你建議執行」)。(本文第一版寫 Z74–Z78 撞主線批683 的 Z74–Z77;第二版 Z82–Z86 又撞主線批685/686 的 Z82–Z87;第三版接續 Z88–Z92)
-- Z89 VeritasCeleritas 正典裁定(四-1)。
-- Z90 engine/ 無版號 8 支立版號 + 卡書重建(四-2、四-3)。
-- Z91 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
+- Z89 已結:Register v0242 + 梭 4 支(操作員「依你建議執行」)。(本文第一版寫 Z74–Z78 撞主線批683 的 Z74–Z77;第二版 Z82–Z86 又撞主線批685/686 的 Z82–Z87;第三版 Z89–Z93 又撞主線批687 的 Z89;第四版接續 Z90–Z94)
+- Z90 VeritasCeleritas 正典裁定(四-1)。
+- Z91 engine/ 無版號 8 支立版號 + 卡書重建(四-2、四-3)。
+- Z92 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
 - Z70 已結:brave-goldberg 由 PR #58 併入 main。
-- Z92 工作站把本線快轉進 awesome-bardeen 後跑 `via-vdfsys` 與 `via-vcgc`(應印 v0120);17:08/18:01 兩次貼回的 via-vcgc 都是 v0118 · Deck 90 · 規格 65 · 台帳 1282 = awesome-bardeen 批684 的樹,還沒有本線;`git checkout` 被工作站再生的 VIA_VRN_LogicArchitecture_SSOT 冊擋住(LL49 冊,stash 掉即可)。
-- Z93 `via_boot_update.ps1` 缺 ④a ENG077 / ④b ENG078 兩步(.sh 有):PR #53 的 Codex 審查(P1)照出 VDF 審視文 11.4 把兩條鏈寫成同鏈;文已改口,補齊是 .ps1 改動候 L70。同一輪另兩條(P2):七段的 `git pull` 改成 fetch+checkout;八段方法論拆成 A 段零網路 / B 段 02:35 日更鏈實跑(腳本自設閘、落 log/csv、TWSE 直接 GET)。
+- Z93 工作站把本線快轉進 awesome-bardeen 後跑 `via-vdfsys` 與 `via-vcgc`(應印 v0120);17:08/18:01 兩次貼回的 via-vcgc 都是 v0118 · Deck 90 · 規格 65 · 台帳 1282 = awesome-bardeen 批684 的樹,還沒有本線;`git checkout` 被工作站再生的 VIA_VRN_LogicArchitecture_SSOT 冊擋住(LL49 冊,stash 掉即可)。
+- Z94 `via_boot_update.ps1` 缺 ④a ENG077 / ④b ENG078 兩步(.sh 有):PR #53 的 Codex 審查(P1)照出 VDF 審視文 11.4 把兩條鏈寫成同鏈;文已改口,補齊是 .ps1 改動候 L70。同一輪另兩條(P2):七段的 `git pull` 改成 fetch+checkout;八段方法論拆成 A 段零網路 / B 段 02:35 日更鏈實跑(腳本自設閘、落 log/csv、TWSE 直接 GET)。
 
 ## 八 · 接手驗收(一行一答)
 
