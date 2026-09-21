@@ -39,6 +39,16 @@ param(
     [switch]$SkipHeavy,
     [switch]$OpenPage
 )
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 # 不卡斷律:全域不用 Stop。單步的錯自己接,接完往下走。
 $ErrorActionPreference = 'Continue'
