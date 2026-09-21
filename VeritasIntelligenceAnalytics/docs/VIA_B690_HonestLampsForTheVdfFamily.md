@@ -59,3 +59,16 @@ OK 266 · FAIL 9 · SKIP 6 · TIMEOUT 0(235s;GRID_20260921_125458)。對 批689B
 | 七 VDF session 的手 | VDF_PricesCanonical/VDF_FactorLibrary 已帶橋;對接點 digest-four.ts / vrn-field-cache.ts(57 欄)/ vdf-prices-factor.ts;探針 JSON 可餵「只量不動手」格子;PS20 ↔ VIA_ACCEL25 對照表待出 |
 
 **本線的處置**:VRN 的部分(a/c/e 的 AI 端)轉交 **VRN 線** session_01GkJosEQeEZpMhCyJpF8BuZ(它只做 VRN、批691 起);b/d 與 --apply 是操作員的手;七節 VDF 對接點登本線待辦(下一批看)。掉球 A / Z67 / Z68 更新如清單;不劃線(併不併 PR、關不關 #2/#3/#5/#21/#29 是操作員裁)。
+
+## 六 · 實錄讀出(工作站貼回 2026-09-21;母倉 9637ace5)
+
+| 你貼的 | 讀出 | 修 |
+|--------|------|----|
+| VDF_ENG060 v0105 `--selftest` | 八檢 OK 8 · FAIL 0(台 2,193,186 列 · 全 223,470;③ 2330.TW 因子數學對合;④ 守恆 4510=4510) | 無——有料走完整檢,NODATA 路不干擾 |
+| VDF_ENG061 v0103 | 九檢 OK 9(台 2,193,186 · 1990 檔;ret_1d 2,191,196 · ma20 2,155,382) | 無 |
+| VDF_ENG062 v0103 | 八檢 OK 8 · SKIP 0(ROTATION_TW_20260914_ENG070;37,751 列 · 33 群 · 193 成員;④ (8, 8)) | 無 |
+| VDF_ENG058 v0101 | 六檢 OK 6(35 碼;TWSE_ONLY 7 · TPEX_ONLY 2;ELEC 910 / FIN 41 / TRAD 1030) | 無 |
+| VDF_ENG072 v0102 | 六檢 OK 6(七輸入檔全出:full_market_daily 2,193,186 · monthly_revenue 92,334 …;preflight rc=0) | 無 |
+| 姊妹倉 `VRN_PanoramaProbe.py`(64 件;膠囊六節 2) | verdict **AMBER**;S01–S05 OK 64(S04 格式 WARN 4=四份 docx)· S06 OCR 路由 OK 41 / WARN 23 · S07 NLP SKIP 64(閘關=政策)· S08–S10 READY 64;**卡點:無**;契約風險 GREEN 41 · YELLOW 23 · RED 0。根因:RC3_DEPS_ABSENT 選配套件 9/18 缺(polars, xxhash, pypdf, docx, markitdown, paddleocr, pytesseract, rapidfuzz, psutil)· RC5 檔名契約黃燈 23 件(晨會/產業/無代號;依規不轉紅)· RC6 NLP 閘關(VIA_NET=0;政策非故障)。VRN tree PRESENT · modules 14/14 · deps 9/18 · accel bridge RESOLVED · python 3.13.7 | 裝 9 個選配套件到 via_vrn 境=操作員的手(VIA_EnvManager;不動 base);黃燈 23 件不發明代號;轉交 VRN 線 |
+
+讀法:五支引擎在有料的機器上走的是原本的完整檢,容器上走的是 NODATA 路——同一支檔兩種誠實。探針 64 件沒有一段 BLOCKED/FAIL,AMBER 來自缺件(RC3)與黃燈(RC5),不是引擎壞。
