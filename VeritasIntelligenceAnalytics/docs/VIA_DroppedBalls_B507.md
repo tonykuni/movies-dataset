@@ -119,7 +119,7 @@
 | Z91 | VDF engine/ 8 支無版號 .py(ENG046/049 · MDL002/003/007 只有無版號檔且卡書指著;ENG047/050/051 旁邊另有尾版檔=疑似舊複本)+ 卡書 45 張是舊快照(冊有樹無 1 · 樹有冊無 3) | 候裁 | 主線 | 立版號/清複本 → 卡書重建(不手改) |
 | Z92 | VDF 獨立鏈容器沒跑過(對接口引擎域 NODATA)· 一頁交接 批554 < 律冊 批662(交接域 STALE;VRN 門同報) | 待跑 | 操作員 | `via-vdfchain run` · `via-vcgc page --publish` |
 | Z93 | 工作站樹是 awesome-bardeen 批684,還沒有 VDF 對接口;本線已含 批684,快轉即可(`git merge --ff-only origin/claude/busy-bell-97sa4f`;先 stash 再生的 VIA_VRN_LogicArchitecture_SSOT 冊) | 待做 | 操作員 | 快轉後 via-vcgc 應印 v0120 |
-| Z94 | `via_boot_update.ps1` 缺 ④a ENG077 主動 ETF 宇宙 · ④b ENG078 持股史(第 46–79 行從 ③ ENG056 直接跳 ④ ENG051;`via_boot_update.sh` 第 83/85 行有)——走 VIA.ps1/launch.ps1 的工作站,主動 ETF 宇宙與持股史不會自動更新(PR #53 Codex P1 審查照出;VDF 審視文 11.1/11.4 已改口) | 候准 | 操作員 | 准 .ps1 新版補兩步(L70),或改走 .sh / 手動 via-etfuniv · via-etfhist |
+| Z94 | `via_boot_update.ps1` 缺 ④a ENG077 主動 ETF 宇宙 · ④b ENG078 持股史(第 46–79 行從 ③ ENG056 直接跳 ④ ENG051;`via_boot_update.sh` 第 83/85 行有)——走 VIA.ps1/launch.ps1 的工作站,主動 ETF 宇宙與持股史不會自動更新(PR #53 Codex P1 審查照出;VDF 審視文 11.1/11.4 已改口) | 已結(側線 d:整份量下來少 13 步且裸 python;操作員「GO … 完善到可啟動」= L70 這一次的許可,補齊到同鏈 ⓪–⑳ + 家族境 python;launch ㉘ 每跑守) | 側線 | 工作站 `via-selftest --only "PowerShell 語法"` 一次(Z101);讀錯許可一行還原(`VIA_S20260921d_VDFLaunch.md` 三之一) |
 
 ## 側線 2026-09-21 c 追記(VDF 修正循環;編號接續 Z94 → Z95–Z98;來源 docs/VIA_S20260921c_VDFFixCycle.md 七)
 
@@ -129,3 +129,12 @@
 | Z96 | 兩支無版號 VDF 檔(VDF_ENG049_FiveDayFetch · VDF_ENG051_ActiveTWETF_Holdings)自測把 yfinance/pandas 不在寫成 FAIL;立版號(Z90)前不動 | 候裁 | 操作員 | Z90 裁了一起改 |
 | Z97 | 同義字採用面:CGC_MDL176 拒絕閘「沒過閘的活支 9/10」(SUP_MDL015 · SUP_MDL749 · VIS_VRN_BrokerAlias_Compatibility/Extension · PDFTextLayerFallbackPlan · Q1_AliasRoutePatch · VRN_ENG062 · VRN_ENG086 · vrn_report_digest 各自解券商別名);冊面只增不減無衝突已成立 | 候裁 | 操作員/VRN 線 | 樞紐 SUP_MDL749 先接 resolve_broker/deny_reason,下游跟 |
 | Z98 | 五條券商正典鍵拼法衝突(批678 量到:megabank↔MEGA · daiwa capital↔DAIWA · jp↔JPM · ibf securities↔WATERLAND +1)候裁(LL90);裁後 MDL176 自轉綠 | 候裁 | 操作員 | 一行裁定寫進 VRN_FieldRules_SSOT broker 區 |
+
+
+## 側線 2026-09-21 d 追記(VDF 啟動就緒;編號接續 Z98 → Z99–Z101;Z94 本批結;來源 docs/VIA_S20260921d_VDFLaunch.md 五)
+
+| 代號 | 事 | 狀態 | 誰 | 下一步 |
+|------|----|------|----|--------|
+| Z99 | 工作站實跑 `via-vdfsys launch`(八項現量 + 下一步卡;容器 ABSENT rc3 = 家族境缺 duckdb/pandas/pyarrow,工作站預期 GATED rc4 → 設閘 → GREEN rc0)→ `via-vdffetch 2023 --dry` → `via-vdffetch 2023` → 抓完 `via-vdfsys`(引擎域拿到十道/獨立鏈快照) | 待做 | 操作員 | ABSENT 先建境(`via-envgov apply --approve` ENSURE_ENV via_vdf_312;AI 不裝);GATED 是你的手 `$env:VIA_NET_CONSENT='YES'` |
+| Z100 | `test_vdf_system_manager_v0101.py` T05 釘死格子「兩站」,第三站「VDF 啟動就緒」一上就紅(把暫態釘成不變量,同 ⑱ 那一課);v0102 已改集合等式,v0101 留版史 | 候裁 | 主線 | 刪 v0101 或留作版史(CI 不跑它;格子也不跑它) |
+| Z101 | 容器無 pwsh:`via_boot_update.ps1` 本批 +13 步 + ⓪ 家族境 python 只人眼複讀,格子「PowerShell 語法與參數名閘」站 SKIP | 待跑 | 操作員 | 工作站 `via-selftest --only "PowerShell 語法"`;紅了 `git checkout -- "VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.ps1"` |

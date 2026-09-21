@@ -82,7 +82,7 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 - Z92 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
 - Z70 已結:brave-goldberg 由 PR #58 併入 main。
 - Z93 工作站把本線快轉進 awesome-bardeen 後跑 `via-vdfsys` 與 `via-vcgc`(應印 v0120);17:08/18:01 兩次貼回的 via-vcgc 都是 v0118 · Deck 90 · 規格 65 · 台帳 1282 = awesome-bardeen 批684 的樹,還沒有本線;`git checkout` 被工作站再生的 VIA_VRN_LogicArchitecture_SSOT 冊擋住(LL49 冊,stash 掉即可)。
-- Z94 `via_boot_update.ps1` 缺 ④a ENG077 / ④b ENG078 兩步(.sh 有):PR #53 的 Codex 審查(P1)照出 VDF 審視文 11.4 把兩條鏈寫成同鏈;文已改口,補齊是 .ps1 改動候 L70。同一輪另兩條(P2):七段的 `git pull` 改成 fetch+checkout;八段方法論拆成 A 段零網路 / B 段 02:35 日更鏈實跑(腳本自設閘、落 log/csv、TWSE 直接 GET)。
+- Z94 `via_boot_update.ps1` 缺 ④a ENG077 / ④b ENG078 兩步(.sh 有):PR #53 的 Codex 審查(P1)照出 VDF 審視文 11.4 把兩條鏈寫成同鏈;文已改口,補齊是 .ps1 改動候 L70。→ 側線 d 已結:整份量下來少 13 步且裸 python,「GO … 完善到可啟動」= 這一次的許可,補齊到同鏈 ⓪–⑳ + ⓪ 家族境 python;`VDF_SystemManager v0103 launch` ㉘ 每跑守(`VIA_S20260921d_VDFLaunch.md`)。同一輪另兩條(P2):七段的 `git pull` 改成 fetch+checkout;八段方法論拆成 A 段零網路 / B 段 02:35 日更鏈實跑(腳本自設閘、落 log/csv、TWSE 直接 GET)。
 
 ## 八 · 接手驗收(一行一答)
 
