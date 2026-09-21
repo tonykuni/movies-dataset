@@ -9726,8 +9726,15 @@
       "category": "VRN財報驗算",
       "component": "批687 VRN_ENG074 v0114:同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」· FAIL/DIVERGE 列直接印 · 分母(有財報列 N/入庫 M)印出 · Grid v0437 站名三十三檢",
       "code": "工作站第一次真跑 v0113 --verify:30 件 × 7 條 → 665 列 · INSUFFICIENT 627 · FAIL 21 · PASS 17;tw_financial 不在。七條裡只有 GM_DIV 三正典都登錄,21 FAIL 第一嫌疑=多列取第一列;627 混未登錄正典(cogs/op_margin/net_margin/opex/shares)與報告未載(gross_profit ×173/net_income ×84)。v0114 三十三檢 33/33。全格子 v0437:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(266s;GRID_20260921_104209)· 終判 FAIL 集對 批686 逐站相同:新紅 0 · 消失 0。 Z82 補計數 · +Z88(財報列覆蓋 30/105)。"
+    },
+    {
+      "ts": "2026-09-21 11:18",
+      "op": "ADD",
+      "category": "工作站實錄修",
+      "component": "批688 via_vrn_logic_book v0106 建冊冪等(內容沒變不重寫;pull 不再被索引冊擋)· VDF_ENG082 v0101(--only 吃 PowerShell 陣列 · 注入 session 看門狗 40s 逾時/拒收/零列→原生子行程(YfData 單例) · 零列誠實 rc2 不炸)· Grid v0438",
+      "code": "操作員貼回:git pull 被 VIA_VRN_LogicArchitecture_SSOT 擋(built_at 每建必改;刻意入倉的冊 MDL167 不還原);VDF_ENG082 run --only 2330,2454 目標 1 檔、yfinance 拒收 requests.Session 被收容件吞成 WARNING 零列、COUNT 對沒建的表 Traceback。v0106 十七檢 17/17;v0101 十二檢 12/12;容器實測注入那一趟在 urllib3 Retry 退避裡爬幾分鐘、原生 0.7s 54×5。全格子 v0438:OK 255 · FAIL 20 · SKIP 6 · TIMEOUT 0(257s;GRID_20260921_111252)· 終判 FAIL 集對 批687 逐站相同:新紅 0 · 消失 0。 掉球 Z83 更新 · +Z89。"
     }
   ],
-  "updated_at": "2026-09-21T10:46:56",
-  "batch": "批687"
+  "updated_at": "2026-09-21T11:18:26",
+  "batch": "批688"
 }
