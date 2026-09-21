@@ -22,3 +22,35 @@
 ## 三 · 全格子 v0446(容器;PATH 帶 /opt/pwsh)
 
 OK 278 · FAIL 0 · SKIP 8 · TIMEOUT 0(236s;GRID_20260921_183342;rc=0)。PS 語法閘棘輪 5 支/53 筆不變;MDL172 v0103 站(newest)綠。
+
+## 四 · 實錄讀出(工作站 `via-vrnrun` 2026-09-21;跑在拉 批694 **之前**的樹)
+
+橫幅「VRN 六層鏈 · 批671 · v0102」、沒有 `[加速器]` 與 `[進度] k/5` 行——所以這一輪還看不到批694 的進度條;V1/V3/V4/V5 rc=0,**V2 rc=1**:GREEN 30 · RED 2 · NODATA 14。
+
+| 讀出 | 容器對照(main 576aba61,PR #73 已併) | 判 |
+|------|------------------------------------------|----|
+| `SUP_MDL746_PDFPlumberPlusHub RED 語法樹讀不出來(line 15)` | v0101 在 python3.11 / 3.12 / 3.13 `ast.parse` 全 OK;用 MDL172 `selftest_door` 同一讀法(utf-8 · errors=replace)也 OK;無 BOM 無 CRLF;line 15 在模組 docstring 裡 | **紅的不是 git 上的內容**。MDL172 `resolve_tail` 敲的是樹上同 stem 最新 `_vNNNN.py`,讀出又沒有「【冊落後】」註 → 剩三種可能:① 工作站該路徑的檔跟 git 不同(OneDrive 半寫/佔位/衝突標記;前一輪有 unmerged files 史)② 工作站有未追蹤的更高版號同名檔(L25 側枝那類)③ 工作站直譯器 via_vrn_312 真的不吃某一行。**三種要工作站自己量**(文末 PS 診斷塊),貼回定案;VRN 家族歸 VRN 線(已轉交 2026-09-21 18:52Z)。掉球 **Z118** |
+| `CGC_MDL141_ClosingGate RED 語法樹讀不出來(line 13)` | v0111 同上三直譯器全 OK;line 13 在 docstring 裡 | 同上 |
+| `VRN_ENG072_FirstPageText NODATA 逾時 180.4s` | — | 沒跑完=沒有結論,不是紅(批616 律);ENG072 逾時歸 VRN 線 |
+| V4 格子 735 · GREEN 461 · YELLOW 11 · NODATA 215 · NA 48;判對率 100%(461/461)· 可判率 62.7% / 扣不適用 67.1% | — | 兩個都印,可判率離 100% 是缺料(215 NODATA)不是判錯 |
+| `[第二顆頭] 另有 1 本庫也有 vrn_report_basic` | — | Z88 仍候操作員封存舊庫 |
+
+診斷塊(工作站貼回三樣:python 版本、兩支同 stem 版號檔與 git 是否同 blob、工作站 python 直接 `ast.parse` 的錯誤訊息與那一行):
+
+```powershell
+& { $py = (Get-ChildItem "$env:VIA_ENV_ROOT\via_vrn_*\Scripts\python.exe" -ErrorAction SilentlyContinue | Select-Object -First 1).FullName; if (-not $py) { $py = 'python' }
+  & $py -c "import sys; print('[py]', sys.version.split()[0], sys.executable)"
+  foreach ($stem in @('supportive modules\70_VRN_Rules\SUP_MDL746_PDFPlumberPlusHub', 'supportive modules\registry\CGC_MDL141_ClosingGate')) {
+    $sibs = Get-ChildItem "${stem}_v[0-9][0-9][0-9][0-9].py" | Sort-Object Name
+    $f = $sibs[-1].FullName; $rel = ($f.Substring((Get-Location).Path.Length + 1)) -replace '\\', '/'
+    "[樹尾版] " + ($sibs | ForEach-Object { $_.Name + '(' + $_.Length + 'B)' }) -join ' · '
+    "[git]    工作樹 blob " + (git hash-object $f) + " · HEAD blob " + (git rev-parse "HEAD:VeritasIntelligenceAnalytics/$rel" 2>$null) + " · status " + ((git status --short -- $f) -join ' ')
+    & $py -c "import ast,sys,pathlib; p=pathlib.Path(sys.argv[1]); t=p.read_text(encoding='utf-8',errors='replace')
+try:
+    ast.parse(t); print('[ast]    OK', p.name)
+except SyntaxError as e:
+    ls=t.splitlines(); print('[ast]    FAIL', p.name, 'line', e.lineno, e.msg); print('[那一行]', repr(ls[e.lineno-1][:160]) if e.lineno and e.lineno<=len(ls) else '(超出檔尾)')" $f
+  } }
+```
+
+> **批695 補**:三種可能不必工作站量了——根因已在容器重現(側線 86a72a0e 同名檔加/加衝突,標記留在工作站樹裡),見 `VIA_B695_TheLampMustSayWhoIsRed.md`;MDL172 v0104 起燈自己會講。
