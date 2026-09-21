@@ -336,8 +336,9 @@ def gate_behaviour() -> dict:
     文字尺看不到這件事,所以它會把樞紐判成「沒過閘」——**判得沒錯,它量的是文字**。
     兩件事分兩欄各自報,不混成一個數字(LL327)。
 
-    量法是正控:把解析器假裝成「冊上還有廣發」,看樞紐回什麼。
-    回 (None, 拒絕…) = 行為過閘;把廣發放行 = 沒過閘;跑不起來 = NODATA 不猜。
+    量法是正控:把名單上**每一條**放進一句報告文字裡,看樞紐回什麼。
+    回 (None, 拒絕…) = 行為過閘;放行出去 = 沒過閘;跑不起來 = NODATA 不猜。
+    探針值從名單當場取,不打字進來(LL336;批680 這裡犯過,Codex 在 PR #59 照出)。
     """
     out = {"state": "NODATA", "why": "", "denied": None, "allowed": None}
     try:
@@ -355,19 +356,24 @@ def gate_behaviour() -> dict:
         if mod is None:
             out["why"] = "樞紐的解析器缺席:" + str(why)
             return out
-        bak = mod._safe_broker_raw
-        try:
-            mod._safe_broker_raw = lambda *a, **k: "GF"
-            out["denied"] = list(_m.broker_of("合成文字"))
-            mod._safe_broker_raw = lambda *a, **k: "YUANTA"
-            out["allowed"] = list(_m.broker_of("合成文字"))
-        finally:
-            mod._safe_broker_raw = bak
-        blocked = out["denied"][0] is None and "拒絕" in str(out["denied"][1])
+        # 批681:不再 monkeypatch。批680 這裡把解析器換成「回傳被拒正典名」的假函式,
+        #   兩個毛病:① 探針值 "GF" 是**打字打進來的**——那就是又抄了一份名單(LL336,
+        #   Codex 在 PR #59 照出);② 假解析器量不到真正的路,而真正的路正是出問題的地方
+        #   (文內寫被拒機構時被較短的合法別名接走)。改成**餵真文字**、名單當場取、逐條試。
+        keys = [str(k) for k in (baseline().get("deny_raw") or []) if str(k).strip()]
+        if not keys:
+            out["why"] = "拒絕清單讀不到——不猜,回 NODATA"
+            return out
+        leaked = [k for k in keys if _m.broker_of("本報告由%s研究部出具" % k)[0] is not None]
+        out["denied"] = list(_m.broker_of("本報告由%s研究部出具" % keys[0]))
+        out["allowed"] = list(_m.broker_of("本報告由元大投顧出具"))
+        out["probed"], out["leaked"] = len(keys), leaked
+        blocked = not leaked
         passed = out["allowed"][0] == "YUANTA"
         out["state"] = "GREEN" if (blocked and passed) else "RED"
-        out["why"] = ("樞紐委派給 %s,而那一支有閘" % getattr(mod, "__file__", "?").split("/")[-1]
-                      if blocked else "被拒的機構從樞紐**放行出去了**")
+        out["why"] = ("樞紐委派給 %s,而那一支有閘(名單 %d 條逐條餵真文字,漏擋 0)"
+                      % (getattr(mod, "__file__", "?").replace("\\", "/").split("/")[-1], len(keys))
+                      if blocked else "被拒的機構從樞紐**放行出去了**:%s" % "、".join(leaked[:5]))
         out["delegates_to"] = getattr(mod, "__file__", "").split("/")[-1]
     except Exception as ex:
         out["why"] = "量不到(%s)——不猜,回 NODATA" % type(ex).__name__
