@@ -34,3 +34,14 @@
 1. 拉線 → `via-vrnrun`:六層鏈這一次應該只剩 SUP_MDL746 / MDL141 兩盞紅,而且格子裡會直接印 `[FAIL]` 行——貼回那兩行(Z84)。
 2. `via-vcgc status` 看「VRN 系統管理」燈:多了 `ssot`(同義字);`via-py vrn "functional modules\VRN\VRN_SystemManager_v0102.py" read ssot pending` 看待裁定清單(多義 10 · 候選 36)。
 3. 同義字裁定(LL90,你的手):多義 10 鍵(strong buy / conviction buy / top pick / 強力買進 … 是 BUY 還是 STRONG_BUY;accumulate/add 是 ADD 還是 BUY)一句話裁,我落冊(只增)。
+
+## 收尾補記(併 main 之後)
+
+| 事 | 量到 |
+|----|------|
+| 併 main a8fafd14(brave-goldberg 批687/688/689) | 三檔衝突聯集:掉球清單雙邊結案都留(main 結 Z58/Z59/Z70/Z79/Z80/Z81 · 本線結 Z60/Z61 · Z87 撞號結)· 台帳只增不減 1285+3+4 · 元件冊取本線後 `registry-sync --apply`(活 6017 · 新 0 · 變更 15)。第一版重建時漏了 main 的 Z70 劃線,逐列對表 base/ours/theirs 補回(只此一列) |
+| 併後全格子 v0439 | OK 260 · FAIL 15 · SKIP 6 · TIMEOUT 0(233s;GRID_20260921_115001)。對 run13:**消失 2**(VDF 資料涵蓋閘=main ENG090 v0105 ㉔ 四態全帶 · 陸券清除實跑驗收=從閘上取 token 的自測進全格子也綠)· **新紅 1**=PowerShell 語法閘裁決 ABSENT——本殼 PATH 沒有 `/opt/pwsh`,補上單站重跑 GREEN(殼的事不是程式的事)· 剩 14 盞全是 Z92 那一族 |
+| 聯集冊 `MDL176 --apply` | 只增不減先證(底冊 971 條少 0)才寫;內容沒變(ADD 62 是聯集對底冊的常態 tally,不是待做),變的是 `gate_bypass` 的旗:ENG086 v0110 · SUP_MDL749 v0112 · vrn_finlex v0107 三支 gated=True;疊加層沒新東西不開新版號(Hydra) |
+| 總管 v0103 尺改對 | v0102 的「沒過閘的活支」數的是 `gate_bypass` 整列(=所有讀券商冊的活支,10 支),把過了閘的三支也算成沒過。v0103 `_gate_open()` 只數 gated=False → **沒過閘 7/讀冊 10**(7 支就是 Z91 那份名單);㉖ 加合成清單釘住尺;廿七檢不變、不寫冊 |
+| PR #63 | Codex 兩條 P2(注入執行緒逾時後沒真的停 · ⑪ 無 duckdb 炸)都由 VDF_ENG082 v0102 收:兩條車道都是子行程(逾時=kill)· ⑪ 走 ③–⑥ 同一條 ImportError=SKIP;逐條回覆並 resolve;PR 併 main 後不再 dirty |
+| 收尾全格子 v0439(PATH 帶 /opt/pwsh) | OK 261 · FAIL 14 · SKIP 6 · TIMEOUT 0(232s;GRID_20260921_120233)。對併後那一跑:新紅 0 · 消失 1(PowerShell 語法閘)· **剩 14 盞=Z92 那一族,一盞不多**;總管 v0103 經 VCGC ㉔ 與格子總管站都綠 |
