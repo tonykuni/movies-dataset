@@ -198,7 +198,7 @@ via-vcgc matrix --family vdf --apply
 
 - 讀:倉根一頁交接(批554)· `docs/VIA_B588/596/597/599/610/644–674`(後 12 批自遠端分支 `git show`)· 政策庫 99 律 · 規格冊 · 工作流冊 · 庫表冊 · VDF 卡書 · VDF 四本參數冊 · ENG054/060/064/089/090/091 與 CGC_MDL170 尾版原始碼抬頭。
 - 跑,A 段(〇–十;容器,零網路):`via-vcgc status`、`--selftest`(22/23,⑬ 見 4.1)。**這一段沒有跑任何擷取引擎、沒有寫任何庫、沒有設任何閘。**
-- 跑,B 段(十一 追問;02:35 容器):**跑了一次 `via_boot_update.sh` 開機日更鏈**——腳本自己在第 20 行 `export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES`(不是本文設的,但那一跑的閘確實是開的),落 marker `.last_boot_update` 與 `BOOT_20260921_023505.log`;ENG054 落了 `tw_listings_20260921_024013.csv`(TPEX 892 檔)並嘗試 upsert(炸在 pandas 缺);另對 TWSE openapi **直接 GET 一次**驗 WAF 頁。11.5 全表以這一跑為準。「零網路 / 零寫入」只對 A 段成立(Codex P2 審查照出本文原先把兩段混寫)。
+- 跑,B 段(十一 追問;02:35 容器):**跑了一次 `via_boot_update.sh` 開機日更鏈**——腳本自己在第 21 行 `export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES`(不是本文設的,但那一跑的閘確實是開的),落 marker `.last_boot_update` 與 `BOOT_20260921_023505.log`;ENG054 落了 `tw_listings_20260921_024013.csv`(TPEX 892 檔)並嘗試 upsert(炸在 pandas 缺);另對 TWSE openapi **直接 GET 一次**驗 WAF 頁。11.5 全表以這一跑為準。「零網路 / 零寫入」只對 A 段成立(Codex P2 審查照出本文原先把兩段混寫)。
 - 前一個 session 的對話本文讀不到(只能取得其 session 記錄與 post_turn 摘要);本文的「前一 session 現況」全部以它已 commit 的 docs 為準。
 
 ---
@@ -368,7 +368,7 @@ via-vcgc matrix --family vdf --apply
 | 載體 | 觸發 | 做什麼 | 閘 |
 |---|---|---|---|
 | `supportive modules/registry/via_boot_update.sh` | 倉根 `.claude/settings.json` SessionStart hook(批150「開啟系統即更新」);marker `.last_boot_update` 每日首開才實跑 | ⓪ 環境自補 → ① OmniFetch 全車道(含 L1 清單/L4 etf_book)→ ② ENG054 價格增量(先抓雙所清單)→ ③ 籌碼 → **④a ENG077 宇宙日更** → ④ ENG051 持股 → ④b ENG078 史深 → ⑥⑦ 成交值/估值/共識/月營收 → ⑧ 輪動 → ⑨ UI 再生 … ⑳ | 腳本**自帶** `VIA_NET_CONSENT=YES`/`VIA_SCRAPE_CONSENT=YES`(操作員批123/137/150 常令授權) |
-| `via_boot_update.ps1` | 工作站:`VIA.ps1` 全自動模式 / `launch.ps1`(Deck 任務「boot 全自動日更(建議每日一次)」)背景 Job | ⓪–⑨ 但**缺 ④a ENG077 宇宙 · ④b ENG078 持股史**(第 46–79 行從 ③ ENG056 直接跳 ④ ENG051;.sh 第 67/69 行有)——工作站的主動 ETF 宇宙與持股史要走 .sh 或手動 `via-etfuniv` / `via-etfhist`;補齊是 .ps1 改動,候 L70(Z93;Codex P1 審查照出) | 同上 |
+| `via_boot_update.ps1` | 工作站:`VIA.ps1` 全自動模式 / `launch.ps1`(Deck 任務「boot 全自動日更(建議每日一次)」)背景 Job | ⓪–⑨ 但**缺 ④a ENG077 宇宙 · ④b ENG078 持股史**(第 46–79 行從 ③ ENG056 直接跳 ④ ENG051;.sh 第 83/85 行有)——工作站的主動 ETF 宇宙與持股史要走 .sh 或手動 `via-etfuniv` / `via-etfhist`;補齊是 .ps1 改動,候 L70(Z93;Codex P1 審查照出) | 同上 |
 | 開機自啟 | `Install-VIA.ps1 -AutoStart` 才登錄 logon 工作 `VIA_Control_Tower`(**預設關**);全樹**沒有** VDF 的 DAILY 排程(只有 WorkOps 的兩個 DAILY 工作,與 VDF 無關) | — | — |
 | 手動 | OneShot S6(`via-price → via-chip → via-align update --apply`)· `via-etfuniv` · `via-omni` | 單段 | 操作員自設 |
 | **不抓清單的鏈** | `via-run25`(九站)· `via-vdfchain`(十站 selftest) | 治理/驗證 | — |
