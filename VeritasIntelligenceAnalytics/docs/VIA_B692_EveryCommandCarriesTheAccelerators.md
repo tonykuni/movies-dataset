@@ -36,3 +36,5 @@
 ## 五 · 全格子 v0445(容器;PATH 帶 /opt/pwsh)
 
 OK 273 · FAIL 5 · SKIP 8 · TIMEOUT 0(231s;GRID_20260921_173357)——逐站與批690 收尾相同:新紅 0 · 消失 0。21 支 ps1 注入後 PS 語法閘仍 GREEN(棘輪 5/53 不變)。
+
+**併 main 90c59c14**(PR #65 本線 批690 已併 · PR #68 VRN 線 批691 追記):掉球 Z114 撞號,VRN 線先併贏,本線 PyProgress 那條改 **Z115**;併後鏈綠(VCGC v0123 29/29 · 契約 OK);全格子 v0445 OK 273 · FAIL 5 逐站相同(GRID_20260921_174055)。批692 尚未併 main:要併請開新 PR(本線分支 claude/awesome-bardeen-h0wm5v)。
