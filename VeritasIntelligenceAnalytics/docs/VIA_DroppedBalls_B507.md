@@ -137,3 +137,11 @@
 | Z103 | 工作站實跑 `via-vdfsys launch`(八項現量 + 下一步卡;容器 ABSENT rc3 = 家族境缺 duckdb/pandas/pyarrow,工作站預期 GATED rc4 → 設閘 → GREEN rc0)→ `via-vdffetch 2023 --dry` → `via-vdffetch 2023` → 抓完 `via-vdfsys`(引擎域拿到十道/獨立鏈快照) | 待做 | 操作員 | ABSENT 先建境(`via-envgov apply --approve` ENSURE_ENV via_vdf_312;AI 不裝);GATED 是你的手 `$env:VIA_NET_CONSENT='YES'` |
 | Z104 | `test_vdf_system_manager_v0101.py` T05 釘死格子「兩站」,第三站「VDF 啟動就緒」一上就紅(把暫態釘成不變量,同 ⑱ 那一課);v0102 已改集合等式,v0101 留版史 | 候裁 | 主線 | 刪 v0101 或留作版史(CI 不跑它;格子也不跑它) |
 | Z105 | 容器無 pwsh:`via_boot_update.ps1` 本批 +13 步 + ⓪ 家族境 python 只人眼複讀,格子「PowerShell 語法與參數名閘」站 SKIP | 待跑 | 操作員 | 工作站 `via-selftest --only "PowerShell 語法"`;紅了 `git checkout -- "VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.ps1"` |
+
+## 側線 2026-09-21 e 追記(姊妹倉 VIA-VDF-VRN → VDF session 交接接手;編號接續 Z105 → Z106–Z108;來源 docs/VIA_S20260921e_SisterVDFHandover.md 五;Z67 的 VRN 對表歸 VRN session)
+
+| 代號 | 事 | 狀態 | 誰 | 下一步 |
+|------|----|------|----|--------|
+| Z106 | `prices_canonical` 同名不同形:母 `VDF_ENG060` v0104 的 9 欄**視圖**(批178 正典取數視圖;ENG061/VRN ENG069/070/VAP_ENG009 都讀它)vs 姊妹倉 `VDF_PricesCanonical.py` 候選 32 欄**表**(`config/ssot/VDF_PricesFactorRegistry.candidate.json`);寫進同一庫撞名 = Hydra。附:DB 表冊把 `prices_canonical` 記成表且 writers 空、`tw_prices_adj` writers 也空(其實是 ENG060) | 候裁 | 操作員 / 主線 VDF | 裁正典;表冊補「VIEW by ENG060」;姊妹引擎要進母樹先改名或改層 |
+| Z107 | PS20 車道 ↔ VIA_ACCEL25:對照表已出(對應 5 · 部分 10 · 無 5;反向 25 冊 19 條 PS20 沒有)——兩層各一本(資料面 vs 治理面),PS20 宜登記為 #19 多引擎整合之下的資料面子冊;母樹現在零 `$VIAPS20` 宣告,注入 = 48 支 `.ps1`(L70) | 候裁 | 操作員 | 裁「登記為子冊」與「要不要注入」兩件 |
+| Z108 | 姊妹倉 `vrn-field-cache.ts` 57 欄財報欄位 TWSE/TWS/YF 對照(yf 鍵 55):母樹沒有這本(ENG082 用自家欄名;SUP_MDL749 是研報六欄) | 候裁 | 操作員 / 主線 VDF | 收進 `references/intake`(零觸碰)或作 ENG082 別名冊(只增不減) |
