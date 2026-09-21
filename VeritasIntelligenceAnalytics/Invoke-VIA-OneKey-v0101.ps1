@@ -2,6 +2,16 @@
 # 設計上的一條鐵律:git 那一步是**非阻塞**的。拉不動也不擋後面——
 # 上一版把後面的事綁在 pull 成功上,於是「拉不下來→檔案不在→腳本跑不了」變成死迴圈。
 # 零破壞性指令(無 reset --hard / clean / checkout --force / rm)；不代設任何同意閘；不代合併 PR。
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Continue'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8; $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 $L = New-Object System.Collections.ArrayList
