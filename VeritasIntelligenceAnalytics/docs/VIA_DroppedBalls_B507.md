@@ -4,7 +4,7 @@
 
 | 代號 | 事 | 狀態 | 誰 | 下一步 |
 |------|----|------|----|--------|
-| A | 姊妹倉 tonykuni/VIA-VDF-VRN 同步 | 候 | 工具層權限 | 操作員在工具層授權後再做 |
+| A | 姊妹倉 tonykuni/VIA-VDF-VRN 同步 | 候(膠囊已收 批690) | 操作員裁 → VRN 線動 | 姊妹倉分支 `claude/festive-ptolemy-ts2yyh`(PR #23,未併其 main)`docs/VIA_VRN_HANDOVER.md` c1989e6=VRN 資產對表+64 件交叉驗證+橋實測;交 VRN 線 session_01GkJosEQeEZpMhCyJpF8BuZ(落地 PanoramaProbe/券商正本對齊/登冊);工作站真跑探針與注入器 --apply 是操作員的手;見 VIA_B690 文五 |
 | D | 批416 F2 逐家投信 PCF 端點查實 | 操作員的手 | 需網路+閘 | 開閘後跑 ENG078 sync |
 | G | VRN_MDL 數量 300 vs 294 | 未做 | AI | 同一把尺再量 |
 | I/P | VDF SSOT 化;`_repo_` 副本庫哪本正本 | 候 | 操作員 | 冊講明後 census 對冊 |
@@ -82,8 +82,8 @@
 | Z64 | 側線 PR #53(claude/busy-bell-97sa4f;+35,834 行 46 檔;dirty):SUP_MDL749 v0111 · VRN_ENG088 · Register v0241 · Manager v0147 · Deck v0158 · Grid v0431(批679c 已併其三站);P1–P6 與 36 條候選待裁;併不併=操作員 | 候 | 操作員 | 裁併/關;併後 `via-vcgc registry-sync --apply` 與 `via-vrnbook build` |
 | Z65 | VRN_SystemManager(批681)七處只做四處(引擎 / 規格項 vrn_system / 格子 v0433 兩站 / 台帳+交接);Register 短令、根與 bin 梭、Deck 任務、Manager 正式名稱 未做:L70 未許可 + v0241/v0147/v0158 已被 PR #53 佔號(LL334) | 操作員的手 | 操作員 | 一句「准改 Register」→ 短令+梭+Deck+Manager 四面一起補(取 v0242/v0148/v0159 或 PR #53 併後順號) |
 | Z66 | VCGC 自測 ⑬ 在 main 容器 FAIL:中央冊 ACTIVE 5909/5908(批679c 撤 Grid v0431 後一筆 ACTIVE 未退役)→ 批681 `registry-sync --apply` 後複驗 | 已修(批681 複驗) | AI | 貼回 `via-vcgc --selftest` 尾行 |
-| Z67 | 姊妹倉 VIA-VDF-VRN 7 個 open PR(#2/#3/#5 自 09-10 起 dirty;#23 含 VRN_PanoramaProbe 未併;#21/#29;#35 效能 7.9×)· main 無 functional modules/VRN · 20 支 vrn-*.ts(2,470 行含測試)與母倉 VRN 引擎無對表 | 候 | 操作員 | 裁哪些關/併;要對表我就出 |
-| Z68 | 姊妹倉 VIA_EnvManager.py:main 4,218 行(v0300)vs 操作員 clone 328 行(批469 已知,未見「已拉最新」實錄);.vercel/output 內另有 39 行舊產物 | 操作員的手 | 操作員 | `git -C C:\Users\tonyk\Github\VIA-VDF-VRN pull` 後貼回 `python public\via\VIA_EnvManager.py --help` 首行 |
+| Z67 | 姊妹倉 VIA-VDF-VRN 7 個 open PR(#2/#3/#5 自 09-10 起 dirty;#23 含 VRN_PanoramaProbe 未併;#21/#29;#35 效能 7.9×)· main 無 functional modules/VRN · 20 支 vrn-*.ts(2,470 行含測試)與母倉 VRN 引擎無對表 | 候(對表已出 批690:姊妹倉膠囊二節,20 支 vrn-*.ts ↔ 母倉引擎逐列) | 操作員 | 裁 #2/#3/#5/#21/#29 關或併、PR #23 併不併;對表由 VRN 線登進 VRN_SystemManager 連結與台帳 |
+| Z68 | 姊妹倉 VIA_EnvManager.py:main 4,218 行(v0300)vs 操作員 clone 328 行(批469 已知,未見「已拉最新」實錄);.vercel/output 內另有 39 行舊產物 | 操作員的手 | 操作員 | `git -C C:\Users\tonyk\Github\VIA-VDF-VRN pull` 後貼回 `python public\via\VIA_EnvManager.py --help` 首行;姊妹倉 main 已至 PR #35(88de4b0),拉最新後復核 v0300(批690 膠囊五節) |
 | Z69 | 側線 PR #53 的 VRN 件已於 批682 原樣收進本線(ENG088 · 749 v0111 · 收容包 31 · 單元測試 · 交接文 · Deck v0158 · Manager v0147 · Register v0241 · 啟動器 v0101 · 梭);PR #53 剩 VDF 審視文 + Grid v0431 + 它自己的再生冊;併 PR #53 時元件冊/台帳/索引冊/規格冊/總控頁會衝突 | 候 | 操作員 | 以本線為準併(再 `via-vcgc registry-sync --apply`)或關 PR #53 改併本線 |
 | ~~Z70~~ | ~~第三條線 `claude/brave-goldberg-ri5k42`:側線 session(01YJPv…)07:52 狀態「awaiting push of claude/brave-goldberg-ri5k42 to read session VRN logic」;遠端尚無此分支;出現後三線對表(版號 LL334 · 台帳 · 冊)再併~~ | **已結(批688)**:brave-goldberg 線已出現並併入 main(PR #58 批682B · PR #61 批687);三線對表見 `VIA_Handover_20260921_B688.md` 三/四 | — | — |
 | Z71 | Register v0241 / Invoke-VIA-VRN v0101 / via-ssotadd 兩梭:側線在操作員令「註冊這些」下造(L70 逐次許可寫在其交接文二-3);批682 原樣搬入本線未改一位元;若不認可刪三檔即回退;`via-vrnsys` 仍未登,下一版 v0242 | 候 | 操作員 | 認可=不動;不認可=刪檔 |
