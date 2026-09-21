@@ -68,6 +68,18 @@ ENG086 v0113 在「第一頁邏輯補缺正主橋二十六檢」站上 OK(站名
 | 工作站在本線分支 `claude/vrn-line-b691`(644663ee)上 `git pull origin claude/awesome-bardeen-h0wm5v` → 9 檔衝突 | 母線分支還沒併 main(PR #65 落後 main 46 筆),把它拉進本線分支=把母線未併的批拉進 PR #66;不該併,**先 `git merge --abort`** | 七節 PS 區塊第一行 |
 | 姊妹倉 `VIA_EnvManager.py scan/plan`(clone 已在 v0300;main 88de4b0) | **Z68 復核證據**:操作員 clone 已是 v0300,不再是 328 行舊版;plan 零寫 · ENV-FLEET 47/41 · UVT findings 335 FAIL 1 · LEGACY_POLICY 5 條 advisory(camelot_311/paddle_311/vif_aio/vif_core 保留、vmt_pm 退役候)· via_vrn 的 9 件缺件(探針 RC3)要走它的 apply/-AddTool=你的手,不代裝 | Z68 的劃線歸母線那一列(本線不動它);證據記此 |
 
+## 四d · 併後實錄讀出(二):工作站 via-vrnrun V2–V5(母線 2026-09-21 17:12Z 轉交;已對 awesome-bardeen cb1939a2 B690 文九節;直接當量測)
+
+| 貼的 | 讀出 | 落點 |
+|---|---|---|
+| V2 鏈證據表 105 份 × 7 欄 | 代號 GREEN 57 / NA 48 · 報告日 97 / NODATA 8 · 券商 90 / NODATA 15 · 評等 72 / 33 · 目標價 38 / 58 / YELLOW 9 · 上漲空間 36 / 67 / 2 · 分析師 71 / 34;段尾 **rc=1 的 [FAIL] 行沒貼進來** | Z84 仍掛(SUP_MDL746 / CGC_MDL141):要那一行 |
+| V3 repair-price | 列 105 · 有改動 10 · 新拿到庫價 0;價出自 tw_daily_prices 56 · 無代號/無報告日 49;ADJ 上漲空間算得出 39(ADJ_OK 25 · 因子1 14)· ADJ_NO_KEY 49 · ADJ_NO_TARGET 17;目標價年齡 STALE_365 15 · FRESH_90 10 · AGING_180 8 · EXPIRED_OVER_1Y 6(描述性,批662 裁定不判燈) | 無新洞;分母 49 無代號/無報告日=非個股件(四c 裁定:範圍外) |
+| V4 驗真矩陣 ENG083 v0119 | 735 格 GREEN 461 · YELLOW 11 · NODATA 215 · NA 48;判對率 100%(461/461)· 可判率 62.7%;**第二顆頭仍在**:`VRN\output\vrn_reports.duckdb` 105 列(09-20 07:54)與正典 `vdf_tw_market.duckdb`(09-22 01:06)並存 | Z88 仍掛(封存=你的手,改名即可) |
+| V5 via-console build | 3064 KB 零 CDN rc=0 | — |
+| 姊妹倉 EnvManager plan 對 VRN 的意思 | 母機 vrn 家族第一順位境是 **via_vrn_312**(Register `$alias["vrn"]` 序:via_vrn_312 → via_vrn → via_extract_312 → via_vrn4);plan 裡 via_vrn_312(S39)/ via_vrn4(S38)都是 VERIFY_ONLY **DEFERRED(未登錄)**,apply 一件都裝不到 via_vrn_312 | Z114:9 件缺件一句話 |
+| 探針缺的 9 件 vs 母 VRN 六層鏈真的 import 的(索引冊 44 指標檔現場 grep) | pypdf ×1(ENG072 首頁文字)· docx ×3(ENG052/060/072)· markitdown ×2(ENG060/075)· paddleocr ×4(ENG017/018/057/058)· pytesseract ×1(ENG060)· rapidfuzz ×2(ENG062/063)· polars ×1(ENG023)· **xxhash 0 · psutil 0** | 9 件裡 7 件是母 VRN 活引擎真相依,2 件(xxhash/psutil)只是探針自己的選配 |
+| 姊妹倉分支前進 965504f | 探針 S08「模組在位且編得過才算」、S10「摘要引擎編得過才算」、真 import 檢、誠實相依警示、語料數修正(+四支測試 670 行);膠囊文未改 | Z109 落地取件時以 965504f 為準 |
+
 ## 五 · 你的手
 
 1. **Z109**:探針落地三選一(①不落地 · ②落地 ENG089 改綁樞紐 · ③併 PR #23 原樣)。
