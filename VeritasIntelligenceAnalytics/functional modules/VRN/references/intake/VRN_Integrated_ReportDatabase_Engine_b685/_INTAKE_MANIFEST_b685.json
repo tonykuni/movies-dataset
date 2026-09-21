@@ -1,0 +1,39 @@
+{
+ "schema": "VIA.IntakeManifest.v1",
+ "batch": "批685",
+ "ts": "2026-09-21",
+ "upload": "VRN_Integrated_ReportDatabase_Engine.py(操作員 2026-09-21 上傳;檔頭自稱 VRN Integrated Report Database Engine 單檔整合版;SCHEMA_VERSION VRN_SCHEMA_20260921_001)",
+ "law": "L03 正本零觸碰(原名原字節)· LL34 先對 md5 再收(倉內零同名同 md5)· L09 網路件只收不掛線(urllib 直連 TWSE/TPEX OpenAPI)· L90 Parquet 是派生層不是正典 · L05/L30 每一件功能都先找正主,正主在就不另起",
+ "files": [
+  {
+   "name": "VRN_Integrated_ReportDatabase_Engine.py",
+   "bytes": 78094,
+   "lines": 1940,
+   "md5": "58120333d3043d6a9d7ce4d77d4fdb34",
+   "sha256": "0e4041dad1818ef7008249d4053ba307a12193f7a18a2d68656901a47ca56d04"
+  }
+ ],
+ "measured": {
+  "selftest": "容器 --self-test PASS(離線;一份樣本檔名 凱基_神達3706 TT_初次評等_(20)260131_TargetPrice 168.pdf;零落檔)",
+  "hardcoded_paths": "無(docstring 示例 C:/Reports/incoming 只是說明)",
+  "network": "urllib.request.urlopen 直連 https://openapi.twse.com.tw/v1/opendata/t187ap03_L 與 tpex mopsfin_t187ap03_O;預設關(--online-name-update 才開);無同意閘 → 只收不掛線(L09;正主 CGC_MDL142 refresh → VDF_ENG055 L1 listings 車道,同兩支 OpenAPI,走 AegisNexus+同意閘)",
+  "storage": "Parquet 唯一主庫 + 累積 upsert(批472 措辭);批615 L90 已裁 VRN 正典=DuckDB vrn_* 七表,Parquet 為派生層 → 正主 VRN_ENG081_ParquetMainDB(派生車道)",
+  "google_sheet": "gspread 憑證接口(保留);樹上無此車道,不收(憑證=操作員的手)"
+ },
+ "function_to_owner": {
+  "tokenize_filename / split_mixed_token": "VRN_ENG084_FilenameTokenParse(保護→切分→歸類;規則自 SUP_MDL749 filename_token_rules;實測 (20)260131 → 2026-01-31、2330.TW 鎖平台、3706 TT 鎖平台)",
+  "parse_date_* / parse_date_candidates_from_number_tokens / choose_best_report_date": "SUP_MDL749.parse_date_any(冊上 12 樣式:AD8/ROC7/AD6/AD_SEP/ROC_SEP/AD2_SEP/月/年/EN_DMY/EN_MDY;實測 (20)260131、260131、20260131、1140822、114/08/22、Jan 22, 2025 全解)",
+  "fetch_exchange_name_table / load_local_ticker_ssot / merge_ticker_lookups": "CGC_MDL142_TWNameBook(name_of/code_of;正典 tw_listings_industry 1,978 檔;refresh 委派 VDF_ENG055;同意閘不代設)",
+  "default_broker_aliases / match_broker_from_tokens_and_text": "SUP_MDL749.broker_of(實測 凱基/KGI/元大/GS/兆豐/國票 局部識別全命中)+ CGC_MDL176 同義字聯集閘(拒絕→正典→疊加→聯集)",
+  "DEFAULT_RATING_ALIASES / extract_rating / extract_rating_change": "SUP_MDL749.rating_of(收容冊+本土尺度+詞界守衛;實測 買進評等/增加持股/Outperform/中立)",
+  "extract_pdf_text_and_first_page_zones / split_blocks_into_top_zones": "VRN_ENG072_FirstPageText.extract_page1_zones(四區 header/right/body/footer + 字級≥13/粗體標題;法 C GLE 字重階層);上傳只切 top 42%/左右 45–55%,無字級資訊",
+  "repair_sentences_until_period / text_to_lines / should_join_without_space": "VRN_ENG082_ExtractionLogic.repair_text/fix_contents + SUP_MDL749.repair + ENG072.split_sentences_repaired + VRN_ENG085_MarkdownRestore",
+  "extract_*_ticker_candidates / choose_canonical_ticker": "SUP_MDL749.source_priority/reconcile(本文 > 第一頁周邊 > 檔名;衝突三值都列)+ ticker_crosscheck/platform_matrix + ENG084.reconcile_report",
+  "extract_target_price / extract_current_price / calculate_upside_downside": "SUP_MDL749.tp_of(實測 目標價:$345 亦解)+ VRN_ENG073 apply_adj_upside/apply_raw_upside(ADJ/RAW 車道 · 新鮮度閘)+ VRN_ENG080 K1(L99 除權息基準)",
+  "extract_report_title / detect_report_type / detect_language": "ENG073 title_head(header 區)+ classify_kind(型別冊)+ ENG080 headline;**批685 補 名(代號.TW)-本文標題 組字(ENG080 v0109)**",
+  "extract_pdf_tables / parse_financial_tables_to_records / normalize_metric_name / infer_unit_and_scale / parse_period_label": "VRN_ENG074_FinancialPages(財務頁判準 · 期間表頭 · 數據列 · VRN_Financial_Synonyms_SSOT · 單位只認宣告 · MOPS 列優先序 · 三方對照);**批685 補 官方年度核對(歷史數據為主)+ 加減除驗算(ENG074 v0113;規則在 VRN_FieldRules_SSOT rules.financial.verify)**",
+  "cumulative_upsert / write_parquet_mandatory / write_*_optional": "VRN_ENG081_ParquetMainDB(DuckDB 正典 → Parquet ⊎ 去重 → CSV/JSON/DuckDB 派生;COPY 零新相依)",
+  "write_html_matrix / write_batch_matrix_csv / score_basicinfo_confidence": "VRN_ENG083_VerifiedMatrix(四態燈 GREEN/YELLOW/NODATA/ABSENT + N/A;判對率/可判率;信心分數不採=誠實態取代)"
+ },
+ "verdict": "收容零嫁接:上傳的每一支函式樹上都有正主且尺更嚴(樞紐讀冊、守衛、誠實態);真缺的三件不在上傳裡而在操作員的邏輯敘述裡——①標題格式 名(代號.TW)-本文標題 ②年度財報對 TWSE/TPEX/MOPS 歷史數據核對且歷史為主 ③加減法/除法驗算——三件本批分別落在 ENG080 v0109 / ENG074 v0113 / VRN_FieldRules_SSOT。字級大中小五層(Z49)兩邊都沒有,仍候 chars 幾何。"
+}
