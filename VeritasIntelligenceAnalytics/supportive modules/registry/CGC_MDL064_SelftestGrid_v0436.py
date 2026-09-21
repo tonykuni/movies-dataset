@@ -2328,7 +2328,7 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎八檢(批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台二十二檢(批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台二十八檢(批686 子系統對接口三家一把尺 VRN/VDF/VAP;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("OCR 車道執行器三檢(批495;本境缺後端派到 via_paddle_311 跑 GLE 編排器,JSON 回主行程)",
         newest("SUP_MDL747_OcrLaneRunner_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
