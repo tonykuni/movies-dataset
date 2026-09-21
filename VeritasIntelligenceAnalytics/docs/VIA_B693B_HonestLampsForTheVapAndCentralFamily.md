@@ -23,3 +23,5 @@ VRN 引擎一支未動(VRN 線)。`VIA_PS_PyProgress_Module.ps1` 未動(Z115 候
 ## 三 · 全格子 v0446(容器;PATH 帶 /opt/pwsh)
 
 **OK 278 · FAIL 0 · SKIP 8 · TIMEOUT 0**(234s;GRID_20260921_180133;rc=0)。對上一跑(FAIL 5):消失 5 · 新紅 0。容器全格子**第一次零紅**——不是為了綠改尺,是把崩潰改成量測;工作站有料時這五支走原本的完整檢。Z92 結。
+
+**併 main ba35b062**(PR #71 VRN 線 批693:側枝 39 件對表零新料):掉球 Z117 留、本線 Z92 結案留;台帳 1308;全格子 v0446 再跑 **OK 278 · FAIL 0**(GRID_20260921_180717)。批692B/693B 尚未併 main:要併請開新 PR(本線分支 claude/awesome-bardeen-h0wm5v)。
