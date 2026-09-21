@@ -116,3 +116,12 @@
 | Z92 | VDF 獨立鏈容器沒跑過(對接口引擎域 NODATA)· 一頁交接 批554 < 律冊 批662(交接域 STALE;VRN 門同報) | 待跑 | 操作員 | `via-vdfchain run` · `via-vcgc page --publish` |
 | Z93 | 工作站樹是 awesome-bardeen 批684,還沒有 VDF 對接口;本線已含 批684,快轉即可(`git merge --ff-only origin/claude/busy-bell-97sa4f`;先 stash 再生的 VIA_VRN_LogicArchitecture_SSOT 冊) | 待做 | 操作員 | 快轉後 via-vcgc 應印 v0120 |
 | Z94 | `via_boot_update.ps1` 缺 ④a ENG077 主動 ETF 宇宙 · ④b ENG078 持股史(第 46–79 行從 ③ ENG056 直接跳 ④ ENG051;`via_boot_update.sh` 第 83/85 行有)——走 VIA.ps1/launch.ps1 的工作站,主動 ETF 宇宙與持股史不會自動更新(PR #53 Codex P1 審查照出;VDF 審視文 11.1/11.4 已改口) | 候准 | 操作員 | 准 .ps1 新版補兩步(L70),或改走 .sh / 手動 via-etfuniv · via-etfhist |
+
+## 側線 2026-09-21 c 追記(VDF 修正循環;編號接續 Z94 → Z95–Z98;來源 docs/VIA_S20260921c_VDFFixCycle.md 七)
+
+| 代號 | 事 | 狀態 | 誰 | 下一步 |
+|------|----|------|----|--------|
+| Z95 | VRN 家族「把境缺寫成 FAIL」同病(ENG060 TextOmni pymupdf/openpyxl · ENG080 duckdb · ENG072 真檔 · MindMap 依賴鏈 …):容器紅、工作站綠,尺已改(Grid v0439 認 ModuleNotFoundError/rc3),引擎自己印的 `[FAIL] duckdb 缺` 要改成 `[ABSENT] rc3`(同本批 ENG081 那一行) | 候做 | VRN 線 | 逐支新版號,只動自測報態 |
+| Z96 | 兩支無版號 VDF 檔(VDF_ENG049_FiveDayFetch · VDF_ENG051_ActiveTWETF_Holdings)自測把 yfinance/pandas 不在寫成 FAIL;立版號(Z90)前不動 | 候裁 | 操作員 | Z90 裁了一起改 |
+| Z97 | 同義字採用面:CGC_MDL176 拒絕閘「沒過閘的活支 9/10」(SUP_MDL015 · SUP_MDL749 · VIS_VRN_BrokerAlias_Compatibility/Extension · PDFTextLayerFallbackPlan · Q1_AliasRoutePatch · VRN_ENG062 · VRN_ENG086 · vrn_report_digest 各自解券商別名);冊面只增不減無衝突已成立 | 候裁 | 操作員/VRN 線 | 樞紐 SUP_MDL749 先接 resolve_broker/deny_reason,下游跟 |
+| Z98 | 五條券商正典鍵拼法衝突(批678 量到:megabank↔MEGA · daiwa capital↔DAIWA · jp↔JPM · ibf securities↔WATERLAND +1)候裁(LL90);裁後 MDL176 自轉綠 | 候裁 | 操作員 | 一行裁定寫進 VRN_FieldRules_SSOT broker 區 |

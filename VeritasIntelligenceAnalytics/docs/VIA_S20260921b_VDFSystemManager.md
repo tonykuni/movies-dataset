@@ -121,3 +121,7 @@ via-vdfsys         # 九域燈;via-vdfsys bridges → 加速器 43/43 · 網路 
 操作員「依你建議執行」後已寫進 Register v0242 + 根/bin 兩支梭(L70 這一次的許可)。
 
 工作站驗收(切到本線之後):`via-vdfsys` → 九域燈;`via-vdfsys bridges` → 43/43 · 43/43;`via-vcgc` → 註冊稽核 未登 0;`via-vdfchain run` → 對接口引擎域從 NODATA 轉為鏈跑器的燈。
+
+## 十 · 續(同日 c):VDF 修正循環
+
+操作員令「檢視 VDF 現況 · 測試修正各引擎 · 全景式分析 · 避免九頭龍 · TEST DEBUG TILL IT WORKS」→ 見 `docs/VIA_S20260921c_VDFFixCycle.md`(全格子 FAIL 82→26:修在尺上 Grid v0439 + 鏈跑器 v0102,再修 12 支引擎的誠實態;ENG076/078 頁接 CGC_MDL173;對接口 v0102 LL133)。
