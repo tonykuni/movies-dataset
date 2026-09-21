@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0108→v0109(批691:⑰ 把 **L77 的排除清單**誤讀成「這支在回答誰引用」):
-  批691 新寫的 `CGC_MDL178` 一上樹,⑰ 就報「基線外 1」。逐字查過命中處:
+v0108→v0109(批691B:⑰ 把 **L77 的排除清單**誤讀成「這支在回答誰引用」):
+  批691B 新寫的 `CGC_MDL178` 一上樹,⑰ 就報「基線外 1」。逐字查過命中處:
 
       _SR_ANSWER 命中的是 `referenc` —— 而它出現在
       `EXCLUDE = ("__pycache__", "_superseded", "RetiredEngines", "references/intake", …)`
@@ -427,7 +427,7 @@ def books() -> dict:
 #: 「單一讀者 3 本」當場變 0 ——**版本號造出來的假進步**。
 _SR_SCAN = re.compile(r"rglob\(\s*[\"']\*\.py[\"']|glob\(\s*[\"']\*\*/\*\.py[\"']"
                       r"|_live_files\(|_live_tail_py\(|py_files\(")
-#: 批691:`referenc` 後面緊跟路徑分隔號的**不算答詞** —— 那是 L77 排除清單裡的
+#: 批691B:`referenc` 後面緊跟路徑分隔號的**不算答詞** —— 那是 L77 排除清單裡的
 #:   `references/intake` 這個**路徑**,樹上 302 支檔都帶著它。
 #:   `referenced` / `references by` 這種真的答詞照舊算(`e?s?` 之後不是 `/` 或 `\`)。
 _SR_ANSWER = re.compile(r"\breaders?\b|\bowners?\b|\bcallers?\b|referenc(?!e?s?[/\\])"

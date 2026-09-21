@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL178_ToolInventoryRatchet v0100 — 工具與支援性模組盤點 + 逐站歷來最佳棘輪(批691)
+CGC_MDL178_ToolInventoryRatchet v0100 — 工具與支援性模組盤點 + 逐站歷來最佳棘輪(批691B)
 =========================================================================
-操作員令(批691):「這裡負責環境工具及 VCGC 對接子系統,並盤點支援性及所有工具模組;
+操作員令(批691B):「這裡負責環境工具及 VCGC 對接子系統,並盤點支援性及所有工具模組;
   將 VRN 接進來補充,**以之前紀錄最成功的狀態來自測、自修正**。」
 
 先量再寫(LL341):樹上已經有 `CGC_MDL164_GovernanceCompletenessAudit`,
@@ -28,7 +28,7 @@ CGC_MDL178_ToolInventoryRatchet v0100 — 工具與支援性模組盤點 + 逐�
 
 ## 自修正的邊界(這一支只做安全的,其餘只提不做)
 
-  可代跑   registry-sync(冪等)——但**它補不完**:批691 實測 --apply 之後回「新 0」,
+  可代跑   registry-sync(冪等)——但**它補不完**:批691B 實測 --apply 之後回「新 0」,
            冊外仍有 92 支尾版模組沒被 VCGC 的掃描規則走到。可代跑那一欄一定要帶這句話。
   只提不做 缺自測門 / 缺格子站 / 缺梭 —— 那要寫碼,是下一批的事,不是掃描器該順手做的
   永不     裝套件 · 開同意閘 · 改任何 .ps1(L70)——那三件永遠是操作員的手
@@ -337,7 +337,7 @@ def plan() -> dict:
     inv = inventory()
     steps, propose = [], []
     if inv["modules"]["missing"]["冊"]:
-        # **實測過才敢寫**(批691):跑完 `registry-sync --apply` 之後再跑一次 plan,
+        # **實測過才敢寫**(批691B):跑完 `registry-sync --apply` 之後再跑一次 plan,
         #   回的是「新 0」,而冊外仍有 92 支尾版模組。也就是說這道門**按它自己的尺已經滿了**,
         #   那 92 支是 VCGC `live_components()` 的掃描規則根本沒走到的一群。
         #   原本這裡寫「冊上未登 → 跑這道就好」——那是**假的修法**,
@@ -345,7 +345,7 @@ def plan() -> dict:
         steps.append({"why": "冊上未登:VCGC 掃得到的那一種,這道門冪等補得上",
                       "cmd": "via-vcgc registry-sync --apply",
                       "n": len(inv["modules"]["missing"]["冊"]),
-                      "caveat": "**這道門補不完**——批691 實測:--apply 跑完後 plan 回「新 0」,"
+                      "caveat": "**這道門補不完**——批691B 實測:--apply 跑完後 plan 回「新 0」,"
                                 "冊外仍留 92 支。那群是 VCGC live_components() 掃描規則沒走到的,"
                                 "不是還沒跑。要動那條規則是 CGC_MDL149 的事,另批。"})
         propose.append({"面": "冊外", "n": len(inv["modules"]["missing"]["冊"]),
@@ -373,7 +373,7 @@ def plan() -> dict:
 #
 # LL334 的病:兩條活線同時把**下一個版號**拿去用。誰先併誰得號,
 # 後到的那一份在**尾版律**下會整個消失 —— 而且沒有任何一盞燈會紅。
-# 批686 撞過 `CGC_MDL149_v0120`;批691 取號時當場量到 `CGC_MDL064_v0441`
+# 批686 撞過 `CGC_MDL149_v0120`;批691B 取號時當場量到 `CGC_MDL064_v0441`
 # **同時長在三條活線上**,而 main 一份都還沒有。
 #
 # 這把尺**只報不裁**:版號還給誰是合併當下的事,裁定權在操作員(LL90)。
@@ -400,7 +400,7 @@ def _live_refs() -> list:
 def _ver_blobs(ref: str) -> dict:
     """`家族_vNNNN` → blob sha。**要 blob 不要只要名字**:
     同名同 blob 是「一份檔長在很多條線上」(多半是 main 刪掉的舊檔還留在老分支),
-    那不是撞號;**同名不同 blob 才是兩個人各寫了一份**(批691 實測:
+    那不是撞號;**同名不同 blob 才是兩個人各寫了一份**(批691B 實測:
     `VAP_ENG004_TAFactory_v0100` 在 12 條線上都是 5237e5a8 同一顆 → 旁觀;
     `CGC_MDL064_SelftestGrid_v0441` 在三條活線上是三顆不同的 blob → 真撞)。"""
     out = {}
@@ -572,7 +572,7 @@ def selftest() -> int:
         ratchet([])["state"] == "NODATA", f"({ratchet([])['state']})")
 
     chk("③b 分母要對:梭只量**短令(via-*)**——PS 啟動器不配梭是規格不是缺件,"
-        "混進分母會讓比例變成假的(批691 修尺實錄)",
+        "混進分母會讓比例變成假的(批691B 修尺實錄)",
         all(str(r["tool"]).startswith("via-") for r in inv["tools"]["rows"])
         and inv["other_kinds"]["n"] >= 0,
         f"(短令 {inv['tools']['n']} · 非短令另欄 {inv['other_kinds']['n']})")
@@ -603,7 +603,7 @@ def selftest() -> int:
     p16 = plan()
     _apply16 = [x for x in p16["apply"] if "registry-sync" in x["cmd"]]
     chk("⑯ 「可代跑」那一欄不准只寫好消息:**跑完補不完就要當場講**。"
-        "批691 實測 --apply 之後 plan 回「新 0」而冊外仍有 92 支 —— "
+        "批691B 實測 --apply 之後 plan 回「新 0」而冊外仍有 92 支 —— "
         "一句「跑這道就好」等於指一條死路(L89)。釘死:冊那一步必須帶 caveat,"
         "而且冊外那一群要另列一條 propose,不准併進可代跑裡充數",
         (not _apply16) or (bool(_apply16[0].get("caveat"))
@@ -639,7 +639,7 @@ def selftest() -> int:
         f"({vr['tally']} · {[r['版號'] for r in vr['races']]})")
     chk("⑬ 撞號負控三條:**基線已經有的**不算撞(併完的常態)· **只長在一條線上的**不算撞"
         "(正常開新版)· **同名同 blob 的**不算撞(一份檔長在很多線上,"
-        "多半是 main 刪掉的舊檔——批691 實測 12 條線同一顆 5237e5a8)",
+        "多半是 main 刪掉的舊檔——批691B 實測 12 條線同一顆 5237e5a8)",
         all(r["版號"] not in ("F_v0100", "G_v0100", "G_v0101", "H_v0100") for r in vr["races"])
         and vr["tally"]["同名同血(非撞)"] == 1 and vr["races"][0]["血"] == 2,
         f"(同名同血另欄 {vr['tally']['同名同血(非撞)']} · 真撞血數 {vr['races'][0]['血']})")
