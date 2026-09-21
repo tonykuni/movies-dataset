@@ -177,8 +177,8 @@ class T03_VcgcDelegation(unittest.TestCase):
         src = VCGC.read_text(encoding="utf-8")
         self.assertIn('"vdf_system": vdf_system()', src)
         self.assertIn("## 十四 · VDF 子系統管理對接口", src)
-        self.assertIn("二十五檢", src)
-        self.assertNotIn("二十四檢 OK", src)
+        self.assertIn("二十六檢", src)
+        self.assertNotIn("二十五檢 OK", src)
 
 
 class T04_Snapshot(unittest.TestCase):

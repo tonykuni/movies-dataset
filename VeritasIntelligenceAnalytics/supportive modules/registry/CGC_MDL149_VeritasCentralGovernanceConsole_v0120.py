@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+CGC_MDL149_VeritasCentralGovernanceConsole v0120 — VCGC(側線 2026-09-21:VDF 子系統管理對接口上線;VIA 往下讀 VDF 也只走一扇門)
+v0119→v0120(操作員令「將 session_01RLMQ… 關於 VDF 全數接過來 · 建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 讀取 VIA 政策所有 PY 檔案一定要接加速器 ·
+  所有 VDF 都要加裝網路工具」;側線 claude/busy-bell-97sa4f,主線批號由併線的手指定 L25):
+  ① +_vdfsys()/vdf_system() 段:讀 functional modules/VDF/VDF_SystemManager 尾版的 collect()(九域燈:政策/邏輯/因子/參數/引擎/橋/工具/交接/紀錄 · 連結表 · 七處自審 · 橋律逐支量);
+     status 多一行、一頁多一段(十四)、頁多一卡。對接口缺席 = ABSENT 誠實(缺件≠壞掉),**不退回舊路**(L05)。與 VRN 那扇門(批681)同一份契約。
+     本台不另判 VDF 的燈:「所有 PY 接加速器 / 所有 VDF 加裝網路工具」由對接口 bridge 域按 CGC_MDL124 的尺逐支量,尾版少一支就是它的 RED;本台照抄。
+  ② ENGINE_GLOBS +("functional modules/VDF", "*_v????.py"):VDF **根目錄**的尾版件(VDF_SystemManager · VDF_ENG045_OutputHub · vdf_input_matrix)以前不在受治理範圍——
+     「VDF 所有引擎找出來」量出來就是這三支漏網(engine/ 另有 8 支無版號 .py,L04 尾版律外,尺照舊看不見,對接口 logic 域分開報)。入尺後 registry-sync --apply 才補號(唯一寫入口不變)。
+  ③ +㉖ 檢:對接口在位時 vdf_system 段九盞燈、有連結、七處為七鍵、橋律量得出尾版數,且 VDF_SystemManager 是受治理家族;缺席時 ABSENT 而不是炸。二十五檢 → 二十六檢。主線批682B 同時取了 v0119(執行期境不進等式 ㉕),L25 改號:本線 v0120 疊在它上面,它的 ㉕ 原樣保留。
+
 CGC_MDL149_VeritasCentralGovernanceConsole v0119 — VCGC(批682B:執行期境不進元件等式——⑬ 兩台機器互翻的根治;Z79 / PR #58 Codex P1)
 v0118→v0119(批682B):live_components() 把 TOOLS_PLAN_latest.json(執行期產物,不入 git)列出的境標 runtime,
   不進 rows(⑬ 等式、audit 缺件表、registry-sync 新增/退役都看不到它),另列 runtime_rows 供查;
@@ -395,6 +405,44 @@ def vrn_system() -> dict:
         return {"state": f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"}
 
 
+
+_VDFSYS = {"mod": None, "why": ""}
+
+
+def _vdfsys():
+    """側線 2026-09-21:VDF 子系統管理對接口(VDF_SystemManager 尾版;與 VRN 那扇門同一份契約)。VIA 往下讀 VDF 一律經它;缺席=ABSENT 誠實,不退回舊路。"""
+    if _VDFSYS["mod"] is not None or _VDFSYS["why"]:
+        return _VDFSYS["mod"]
+    p = _newest(VIA / "functional modules" / "VDF", "VDF_SystemManager_v*.py")
+    if not p:
+        _VDFSYS["why"] = "functional modules/VDF/VDF_SystemManager_v*.py 缺"
+        return None
+    try:
+        _VDFSYS["mod"] = _load("vcgc_vdfsys", p)
+    except Exception as exc:
+        _VDFSYS["why"] = f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"
+    return _VDFSYS["mod"]
+
+
+def vdf_system() -> dict:
+    """VDF 子系統管理段——九域燈 · 連結 · 七處自審 · 橋律逐支量(對接口 collect();不寫任何檔)。"""
+    m = _vdfsys()
+    if m is None:
+        return {"state": "ABSENT", "why": _VDFSYS["why"] or "VDF_SystemManager 缺"}
+    try:
+        s = m.collect()
+        br = s.get("bridge") or {}
+        return {"state": s.get("rc_name"), "rc": s.get("rc"), "src": s.get("me"), "ts": s.get("ts"), "mode": s.get("mode"), "lamps": s.get("lamps"),
+                "links": len(s.get("links") or []), "link_counts": s.get("link_counts"), "seven": (s.get("upstream") or {}).get("seven"),
+                "seven_done": (s.get("upstream") or {}).get("done"),
+                "bridge": {"tails": br.get("tails"), "accel": (br.get("accel") or {}).get("has"), "net": (br.get("net") or {}).get("has"),
+                           "net_callers": (br.get("net") or {}).get("callers"), "accel_missing": (br.get("accel") or {}).get("missing"),
+                           "net_callers_missing": (br.get("net") or {}).get("callers_missing"), "ruler": br.get("ruler")},
+                "why": (s.get("logic") or {}).get("why") or (s.get("tool") or {}).get("why") or (s.get("handover") or {}).get("why", "")}
+    except Exception as exc:
+        return {"state": f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"}
+
+
 def tools_plan() -> dict:
     j = _json(REPORTS / "env_governance" / "TOOLS_PLAN_latest.json")
     if not j:
@@ -593,7 +641,7 @@ def dropped_balls() -> dict:
 
 
 # ────────────────────────── 註冊稽核 ──────────────────────────
-ENGINE_GLOBS = [("functional modules/VDF/engine", "*_v????.py"), ("functional modules/VRN", "*_v????.py"), ("functional modules/VAP/engine", "*_v????.py"),
+ENGINE_GLOBS = [("functional modules/VDF/engine", "*_v????.py"), ("functional modules/VDF", "*_v????.py"), ("functional modules/VRN", "*_v????.py"), ("functional modules/VAP/engine", "*_v????.py"),
                 ("supportive modules/registry", "CGC_*_v????.py"), ("supportive modules/70_VRN_Rules", "SUP_*_v????.py"), ("supportive modules/network", "SUP_*_v????.py"),
                 ("supportive modules/VIA_Central_Governance", "CGC_*_v????.py"), (".", "VIA_SYSTEM_MANAGER_v????.py")]
 
@@ -903,7 +951,7 @@ def source_guard() -> dict:
 def snapshot() -> dict:
     deck, spec, grid, reg, man = deck_tasks(), spec_items(), grid_stations(), register_cmds(), manager_names()
     return {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "version": VERSION, "batch": BATCH, "laws": laws(), "ledger": ledger(), "deck": deck, "spec": spec,
-            "grid": grid, "register": reg, "manager": man, "db_sheet": db_sheet(), "datahome": datahome(), "logic": logic(), "factors": factors(), "vrn_system": vrn_system(),
+            "grid": grid, "register": reg, "manager": man, "db_sheet": db_sheet(), "datahome": datahome(), "logic": logic(), "factors": factors(), "vrn_system": vrn_system(), "vdf_system": vdf_system(),
             "tools": tools_plan(), "recover": recover_plan(), "cg_family": cg_family(), "vtmra": vtmra(), "ui_workflow": ui_workflow(), "rungate": rungate(), "bus": bus(), "handover": handover_src(), "audit": audit(deck, spec, grid, reg, man),
             "inventory": component_registry(), "prompt": prompt_doc(), "balls": dropped_balls(),
             "panorama": _json(REPORTS / "panorama" / "PANORAMA_latest.json") or {}}
@@ -1001,6 +1049,12 @@ def onepage_md(s: dict) -> str:
     o += ["", "## 十三 · VRN 子系統管理對接口(批681;VRN_SystemManager;VIA 往下讀 VRN 四庫一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 交接;自適應連結現解尾版;預設只讀)", "",
           f"- {vs.get('state')} · {vs.get('src') or vs.get('why') or '-'} · {vs.get('ts') or '-'} · 燈 {vs.get('lamps') or '-'} · 連結 {vs.get('links')} {vs.get('link_counts') or ''} · 七處自審 {vs.get('seven_done')}/7 {vs.get('seven') or ''}" + (f" · {vs.get('why')}" if vs.get('why') else ""),
           "- 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VRN/VRN_SystemManager_v*.py status | catalog | links | read <policy|logic|factor|param|engine|handover|upstream> [key] | sync --apply(只落 VIA_Reports/vrn_system)"]
+    vd = s.get("vdf_system") or {}
+    vb = vd.get("bridge") or {}
+    o += ["", "## 十四 · VDF 子系統管理對接口(側線 2026-09-21;VDF_SystemManager;VIA 往下讀 VDF 一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 橋/工具面 + 交接/紀錄;橋律逐支量;自適應連結現解尾版;預設只讀)", "",
+          f"- {vd.get('state')} · {vd.get('src') or vd.get('why') or '-'} · {vd.get('ts') or '-'} · 模式 {vd.get('mode') or '-'} · 燈 {vd.get('lamps') or '-'} · 連結 {vd.get('links')} {vd.get('link_counts') or ''} · 七處自審 {vd.get('seven_done')}/7 {vd.get('seven') or ''}" + (f" · {vd.get('why')}" if vd.get('why') else ""),
+          f"- 橋律(所有 PY 接加速器 · 真向外擷取走網路工具;尺=CGC_MDL124):尾版 {vb.get('tails')} · 加速器橋 {vb.get('accel')} · 網路橋 {vb.get('net')} · 真擷取 {vb.get('net_callers')} · 缺加速器 {vb.get('accel_missing')} · 真擷取缺網路橋 {vb.get('net_callers_missing')}",
+          "- 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VDF/VDF_SystemManager_v*.py status | engines | bridges | tools | catalog | links | records | read <policy|logic|factor|param|engine|bridge|tool|handover|records|upstream> [key] [--full] | sync --apply(只落 VIA_Reports/vdf_system)"]
     return "\n".join(o) + "\n"
 
 
@@ -1035,6 +1089,7 @@ def page_html(s: dict) -> str:
              f"<div class='card'><b>邏輯庫</b><br>{chip(lo.get('state'))} 件 {esc(lo.get('files'))} · {esc(lo.get('verdicts'))}<br>壞後端 {esc(lo.get('broken'))}<br>同步 {esc(lo.get('sync'))}</div>",
              f"<div class='card'><b>因子庫</b><br>{chip(fa.get('state'))} {esc(fa.get('rows'))} 列 · {esc(fa.get('by_source'))}</div>",
              f"<div class='card'><b>VRN 子系統管理(批681)</b><br>{chip((s.get('vrn_system') or {}).get('state'))} {esc((s.get('vrn_system') or {}).get('src') or (s.get('vrn_system') or {}).get('why') or '')}<br>燈 {esc((s.get('vrn_system') or {}).get('lamps'))}<br>連結 {esc((s.get('vrn_system') or {}).get('links'))} {esc((s.get('vrn_system') or {}).get('link_counts'))} · 七處 {esc((s.get('vrn_system') or {}).get('seven_done'))}/7</div>",
+             f"<div class='card'><b>VDF 子系統管理(側線 2026-09-21)</b><br>{chip((s.get('vdf_system') or {}).get('state'))} {esc((s.get('vdf_system') or {}).get('src') or (s.get('vdf_system') or {}).get('why') or '')}<br>燈 {esc((s.get('vdf_system') or {}).get('lamps'))}<br>連結 {esc((s.get('vdf_system') or {}).get('links'))} {esc((s.get('vdf_system') or {}).get('link_counts'))} · 七處 {esc((s.get('vdf_system') or {}).get('seven_done'))}/7<br>橋 加速器 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('accel'))}/{esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('tails'))} · 網路 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('net'))}/{esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('tails'))} · 真擷取 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('net_callers'))}</div>",
              f"<div class='card'><b>資料庫</b><br>庫表冊 {esc(db.get('n'))} 表({esc(db.get('batch'))})· 資料家 {chip(dh.get('state'))} {esc(dh.get('home') or dh.get('why'))} · 庫 {esc(dh.get('dbs') if dh.get('dbs') is not None else '-')} 湖 {esc(dh.get('lakes') if dh.get('lakes') is not None else '-')}</div>",
              f"<div class='card'><b>註冊稽核</b><br>中央冊 {esc(au.get('inventory_active'))}/{esc(au.get('inventory_expected'))} · 缺 {len(au.get('inventory_missing', []))}<br>尾版家族 {au['families']} · 已登 {au['registered']} · 未登 {len(au['unregistered'])} · 介面掛載 {esc(au.get('interface_registered'))}</div>",
              f"<div class='card'><b>掉球清單</b><br>{esc(s.get('balls', {}).get('src') or 'ABSENT')} · 列 {esc(s.get('balls', {}).get('n'))} · 未結 {esc(s.get('balls', {}).get('open'))}<br><small>接手提示詞:{esc(s.get('prompt', {}).get('src') or 'ABSENT')}</small></div>",
@@ -1081,6 +1136,9 @@ def status() -> int:
     print(f"  因子庫 {s['factors'].get('state')}:{s['factors'].get('rows')} 列 {s['factors'].get('by_source')}")
     vs = s.get("vrn_system") or {}
     print(f"  VRN 系統管理 {vs.get('state')}:燈 {vs.get('lamps')} · 連結 {vs.get('links')} {vs.get('link_counts')} · 七處 {vs.get('seven_done')}/7 · {vs.get('src') or vs.get('why')}(批681;VIA 往下讀 VRN 經此口;via {s['logic'].get('via')})")
+    vd = s.get("vdf_system") or {}
+    vb = vd.get("bridge") or {}
+    print(f"  VDF 系統管理 {vd.get('state')}:燈 {vd.get('lamps')} · 連結 {vd.get('links')} {vd.get('link_counts')} · 七處 {vd.get('seven_done')}/7 · 橋 加速器 {vb.get('accel')}/{vb.get('tails')} 網路 {vb.get('net')}/{vb.get('tails')} 真擷取 {vb.get('net_callers')} · {vd.get('src') or vd.get('why')}(側線 2026-09-21;VIA 往下讀 VDF 經此口)")
     print(f"  資料庫:庫表冊 {s['db_sheet'].get('n')} 表 · 資料家 {s['datahome'].get('state')} {s['datahome'].get('home') or s['datahome'].get('why')}")
     print(f"  引擎調度:Deck {len(s['deck'].get('tasks', {}))} 任務 · 規格 {len(s['spec'].get('items', []))} 項 · 格子 {len(s['grid'].get('stations', []))} 站 · Register {len(s['register'].get('cmds', []))} 指令")
     print(f"  多矩陣 {s['bus'].get('state')}:{s['bus'].get('counts') or s['bus'].get('why')} · profile {s['bus'].get('profile')} · RunGate {s['rungate'].get('state')} → {s['rungate'].get('install')}")
@@ -1438,7 +1496,26 @@ def selftest() -> int:
         else:
             os.environ["VIA_TOOLS_PLAN_LATEST"] = _tp_saved
 
-    print(f"  [計] 二十五檢 OK {25 - len(fails)} · FAIL {len(fails)}")
+    try:
+        vd26 = vdf_system()
+        m26 = _vdfsys()
+        ok_present = (m26 is not None and isinstance(vd26.get("lamps"), dict) and len(vd26["lamps"]) == 9 and (vd26.get("links") or 0) > 0
+                      and isinstance(vd26.get("seven"), dict) and len(vd26["seven"]) == 7 and isinstance((vd26.get("bridge") or {}).get("tails"), int)
+                      and any(d == "functional modules/VDF" for d, _ in ENGINE_GLOBS) and "VDF_SystemManager" in _tail_files())
+        _saved = dict(_VDFSYS)
+        _VDFSYS["mod"], _VDFSYS["why"] = None, "selftest:模擬缺席"
+        try:
+            vd_abs = vdf_system()
+        finally:
+            _VDFSYS.clear()
+            _VDFSYS.update(_saved)
+        chk("㉖ 側線 2026-09-21 VDF 對接口:在位時 vdf_system 段九盞燈、有連結、七處為七鍵、橋律量得出尾版數,且 VDF 根目錄尾版件入尺(VDF_SystemManager 是受治理家族);缺席時 ABSENT 而不是炸、也不退回舊路",
+            ok_present and vd_abs.get("state") == "ABSENT",
+            f"(燈 {list((vd26.get('lamps') or {}).keys())} · 連結 {vd26.get('links')} · 橋 {(vd26.get('bridge') or {}).get('accel')}/{(vd26.get('bridge') or {}).get('net')}/{(vd26.get('bridge') or {}).get('tails')} · 缺席態 {vd_abs.get('state')})")
+    except Exception as exc:
+        fails.append("㉖"); print("  [FAIL] ㉖ 例外:", type(exc).__name__, exc)
+
+    print(f"  [計] 二十六檢 OK {26 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -2067,7 +2144,7 @@ def matrix_page(d: dict, out: Path | None = None) -> Path:
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 二十五檢自測(零網路;預設只讀)===")
+        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 二十六檢自測(零網路;預設只讀)===")
         return selftest()
     verb = a[0] if a else "status"
     if verb == "status":

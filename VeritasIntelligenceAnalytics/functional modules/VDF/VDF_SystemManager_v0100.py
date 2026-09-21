@@ -21,7 +21,7 @@ VDF 所有引擎找出來 · 讀取 VIA 政策所有 PY 檔案一定要接加速
 
 位置:VIA ─(L20 唯一對接口 VCGC CGC_MDL149)─► **本口** ─► VDF 四庫 + 引擎面 + 橋/工具面 + 交接
   上行(向 VIA 報):九域燈 · 連結表 · 七處自審 · 快照 VIA_Reports/vdf_system/VDF_SYSTEM_latest.json
-                  (VCGC v0119 起 vdf_system() 經本口 collect();對接口缺席=ABSENT 誠實,不退回舊路)
+                  (VCGC v0120 起 vdf_system() 經本口 collect();對接口缺席=ABSENT 誠實,不退回舊路)
   下行(管 VDF):政策 policy (律/lessons 的 VDF 子集 + 釘住的六條:L07/L08 同意閘 · L09 網路只認 Nexus · L35 · L90 · L99)
                邏輯 logic  (VIA_VDFArchitecture 冊 · VDF 卡書 45 張 vs 樹上尾版(冊樹不同步就是 STALE)· 鏈跑器 CGC_MDL170 尾版)
                因子 factor (VDF_Unified_Params · VDF_Param_Registry(678 參數)· VDF_Param_Engine_Map;寫者 ENG053,本口只讀)

@@ -5,7 +5,7 @@ v0433→v0434(側線 2026-09-21 VDF 子系統管理對接口上站;操作員令�
   所有 VDF 都要加裝網路工具」;側線 claude/busy-bell-97sa4f,主線批號由併線的手指定 L25):
   兩盞,與 VRN 那扇門同形:廿七檢(九域 · 橋律逐支量委派 CGC_MDL124 · 四態表驅動 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)
   與 status 實跑(九域現況+連結表+橋律;rc2 過期/缺料用 nodata_ok 收,rc1 才紅)。
-  中央控管台站名 二十二檢 → **二十五檢**(VCGC v0119:+vdf_system 段 · ENGINE_GLOBS +VDF 根目錄 · ㉕;站名兩批沒跟上,這次一起對正)。站 285 → 287。
+  中央控管台站名 二十二檢 → **二十六檢**(VCGC v0120:+vdf_system 段 · ENGINE_GLOBS +VDF 根目錄 · ㉖;主線批682B 同時取了 v0119(㉕ 執行期境不進等式),L25 改號疊上;站名兩批沒跟上,這次一起對正)。站 285 → 287。
 
 v0432→v0433(批681 VRN 子系統管理對接口上站):操作員令「設立 VRN_SystemManager.py 上下銜接 VIA,管理子系統的政策/邏輯/因子/參數;
   以後讀取就從 VIA 往下透過 VRN_System 作為管理對接口;自適應、智慧化、上下資訊自動更新的連結」。
@@ -2184,7 +2184,7 @@ def battery(fast: bool):
         newest("VRN_SystemManager_v*.py", VRN), ["status"], "nodata_ok", 300)
 
     # ── 側線 2026-09-21:VDF 子系統管理對接口(操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」)
-    #   與 VRN 那扇門同一份契約:上接 VCGC(v0119 起 vdf_system() 經它讀),下管 VDF 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;
+    #   與 VRN 那扇門同一份契約:上接 VCGC(v0120 起 vdf_system() 經它讀),下管 VDF 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;
     #   橋律逐支量(尺=CGC_MDL124:尾版缺加速器橋或真擷取缺網路橋=RED);零網路 · 零寫庫 · 預設只讀(sync --apply 只落 VIA_Reports/vdf_system)。
     add("VDF 子系統管理對接口廿七檢(側線 2026-09-21;VDF_SystemManager:上接 VCGC 下管四庫+橋/工具 · 四態表驅動 · 橋律逐支量委派橋掃器 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)",
         newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["--selftest"], "rc0", 300)
@@ -2330,7 +2330,7 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎八檢(批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台二十五檢(側線 2026-09-21 +㉕ VDF 對接口;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台二十六檢(側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("OCR 車道執行器三檢(批495;本境缺後端派到 via_paddle_311 跑 GLE 編排器,JSON 回主行程)",
         newest("SUP_MDL747_OcrLaneRunner_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)

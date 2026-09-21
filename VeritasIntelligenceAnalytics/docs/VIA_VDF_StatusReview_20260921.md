@@ -431,4 +431,4 @@ via-vcgc matrix --family vdf --apply
 
 ## 追記 · 2026-09-21 b:這份審視接進了一扇門
 
-本文量到的六域現況從此由 `functional modules/VDF/VDF_SystemManager_v*.py`(VDF 子系統管理對接口)每跑現量:`status` 九域燈、`read logic|factor|param|engine|bridge|tool|handover|records`;VCGC v0119 一頁第十四段照抄它。全記錄見 `docs/VIA_S20260921b_VDFSystemManager.md`。
+本文量到的六域現況從此由 `functional modules/VDF/VDF_SystemManager_v*.py`(VDF 子系統管理對接口)每跑現量:`status` 九域燈、`read logic|factor|param|engine|bridge|tool|handover|records`;VCGC v0120 一頁第十四段照抄它。全記錄見 `docs/VIA_S20260921b_VDFSystemManager.md`。
