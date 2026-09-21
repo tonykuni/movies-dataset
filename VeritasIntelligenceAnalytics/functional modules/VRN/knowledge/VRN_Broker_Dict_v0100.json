@@ -2,7 +2,7 @@
  "schema": "VIA.VRN.BrokerDict.v1",
  "generated": "2026-09-20 18:11:43",
  "policy": "AI 只整理不發明;逐條標來源;正本=Summarizer BROKER_ABBR_DICT",
- "count": 29,
+ "count": 28,
  "brokers": {
   "元大": {
    "abbr": "YT",
@@ -48,21 +48,13 @@
     "Cathay Securities",
     "國泰證券",
     "國泰投顧",
-    "國泰金控",
-    "Guotai Junan",
-    "國泰君安",
-    "國泰君安證券"
+    "國泰金控"
    ]
   },
   "中信": {
    "abbr": "CTBC",
    "source": "VRN_ENG062_SummarizerV1_v0102.py",
-   "aliases": [
-    "CITIC",
-    "CITIC Securities",
-    "中信證券",
-    "中信建投"
-   ]
+   "aliases": []
   },
   "台新": {
    "abbr": "TSC",
@@ -148,8 +140,9 @@
    "source": "VRN_ENG062_SummarizerV1_v0102.py"
   },
   "大華": {
-   "abbr": "GS",
-   "source": "VRN_ENG062_SummarizerV1_v0102.py"
+   "abbr": "DH",
+   "source": "VRN_ENG062_SummarizerV1_v0102.py",
+   "abbr_fixed_b679": "原本與高盛共用 GS——同一個縮寫鍵兩家機構,下游一 join 就散(L101)。疊加層 broker_add 批413 已給大華正典鍵 DH,冊上補齊,兩邊同一句話"
   },
   "康和": {
    "abbr": "CH",
@@ -158,24 +151,6 @@
   "宏遠": {
    "abbr": "HY",
    "source": "VRN_ENG062_SummarizerV1_v0102.py"
-  },
-  "摩根": {
-   "abbr": "JPM",
-   "source": "VRN_ENG062_SummarizerV1_v0102.py",
-   "aliases": [
-    "MS",
-    "Morgan Stanley",
-    "摩根士丹利",
-    "摩根史坦利",
-    "大摩",
-    "JPM",
-    "JPMorgan Chase",
-    "JPMorgan",
-    "JP Morgan",
-    "摩根大通",
-    "JP摩根",
-    "小摩"
-   ]
   },
   "瑞銀": {
    "abbr": "UBS",
@@ -669,58 +644,9 @@
    ],
    "country": "TW",
    "type": "Securities"
-  },
-  {
-   "code": "CICC",
-   "en": "China International Capital Corporation",
-   "zh": "中金公司",
-   "aliases": [
-    "CICC",
-    "China International Capital",
-    "中金公司",
-    "中國國際金融"
-   ],
-   "country": "CN",
-   "type": "Securities"
-  },
-  {
-   "code": "CITIC",
-   "en": "CITIC Securities",
-   "zh": "中信證券",
-   "aliases": [
-    "CITIC",
-    "CITIC Securities",
-    "中信證券",
-    "中信建投"
-   ],
-   "country": "CN",
-   "type": "Securities"
-  },
-  {
-   "code": "HAITONG",
-   "en": "Haitong Securities",
-   "zh": "海通證券",
-   "aliases": [
-    "Haitong",
-    "Haitong Securities",
-    "海通證券"
-   ],
-   "country": "CN",
-   "type": "Securities"
-  },
-  {
-   "code": "GUOTAIJUNAN",
-   "en": "Guotai Junan Securities",
-   "zh": "國泰君安證券",
-   "aliases": [
-    "Guotai Junan",
-    "國泰君安",
-    "國泰君安證券"
-   ],
-   "country": "CN",
-   "type": "Securities"
   }
  ],
  "extended_source": "financial_classification_rules.py",
- "count_extended": 32
+ "count_extended": 28,
+ "b679_removed_摩根": "「摩根」這一桶的 abbr 是 JPM,別名卻是**摩根士丹利與摩根大通兩家的聯集**(MS / Morgan Stanley / 摩根士丹利 / 大摩 全都會解成 JPM)=摩根士丹利的研報會被記成摩根大通的。操作員批413 早就把『摩根』列進拒絕清單,正是為了這件事。整桶移出;兩家各自的正確條目在 brokers_extended(MS / JPM)與正典裡都還在,一條都沒少。"
 }

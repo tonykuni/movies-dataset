@@ -28,7 +28,6 @@ from typing import Dict, List, Optional
 
 BROKER_ALIAS_EXTENSION = {
     "MQ": ["MQ", "Macquarie", "Macquarie Capital", "麥格理", "麥格理資本"],
-    "GF": ["GF", "GF Securities", "廣發", "廣發證券"],
     "CLST": ["CLST"],
     "Cathay": ["Cathay", "國泰", "國泰證期", "國泰證券"],
     "Taishin": ["Taishin", "台新", "台新投顧", "台新證券"],

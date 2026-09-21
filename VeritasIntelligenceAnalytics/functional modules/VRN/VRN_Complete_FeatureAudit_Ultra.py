@@ -280,7 +280,7 @@ BROKER_LIST = {
     "第一": {"code": ["第一", "First"], "en": "First Securities", "zh": "第一金證券"},
     "新光": {"code": ["新光", "Shin Kong"], "en": "Shin Kong Securities", "zh": "新光證券"},
     "宏遠": {"code": ["宏遠", "Hung Yuan"], "en": "Hung Yuan Securities", "zh": "宏遠證券"},
-    "中信": {"code": ["中信", "CTBC"], "en": "CTBC Securities", "zh": "中信證券"},
+    "中信": {"code": ["中信", "CTBC"], "en": "CTBC Securities", "zh": "中國信託"},
     "日盛": {"code": ["日盛", "Jih Sun"], "en": "Jih Sun Securities", "zh": "日盛證券"},
     "統一": {"code": ["統一", "President"], "en": "President Securities", "zh": "統一證券"},
     "玉山": {"code": ["玉山", "E.SUN"], "en": "E.SUN Securities", "zh": "玉山證券"},

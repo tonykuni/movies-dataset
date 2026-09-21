@@ -1118,38 +1118,10 @@ BROKER_LIST: List[Dict[str, Any]] = [
     # ═══════════════════════════════════════════════════════════════════════
     # 中國券商 China Brokers
     # ═══════════════════════════════════════════════════════════════════════
-    {
-        "code": "CICC",
-        "en": "China International Capital Corporation",
-        "zh": "中金公司",
-        "aliases": ["CICC", "China International Capital", "中金公司", "中國國際金融"],
-        "country": "CN",
-        "type": "Securities"
-    },
-    {
-        "code": "CITIC",
-        "en": "CITIC Securities",
-        "zh": "中信證券",
-        "aliases": ["CITIC", "CITIC Securities", "中信證券", "中信建投"],
-        "country": "CN",
-        "type": "Securities"
-    },
-    {
-        "code": "HAITONG",
-        "en": "Haitong Securities",
-        "zh": "海通證券",
-        "aliases": ["Haitong", "Haitong Securities", "海通證券"],
-        "country": "CN",
-        "type": "Securities"
-    },
-    {
-        "code": "GUOTAIJUNAN",
-        "en": "Guotai Junan Securities",
-        "zh": "國泰君安證券",
-        "aliases": ["Guotai Junan", "國泰君安", "國泰君安證券"],
-        "country": "CN",
-        "type": "Securities"
-    },
+    
+    
+    
+    
 ]
 
 
