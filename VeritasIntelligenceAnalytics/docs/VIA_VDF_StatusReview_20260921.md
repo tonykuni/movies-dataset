@@ -386,3 +386,25 @@ via-vcgc matrix --family vdf --apply
 
 1. **ENG087 股票全集的尺永遠紅**:`_status_stock()` 把 `us_industry/industry_us/gics_industry/sic_industry` 列為必要欄,全樹**沒有任何引擎寫這個欄**(tw_listings_industry 只有 industry_code/industry_name;ENG058 也不產美國分類)→ 永遠 `SCHEMA_MISSING`,`via-market-lists` verdict 不可能 GREEN;而它的自測不碰真表(只驗夾具去重與三支引擎有 selftest),所以自測綠、實跑紅。裁定:拿掉美國產業欄要求,或指定誰來產它(候選 ENG058)。
 2. **清單「全部」的定義**:台股全集正典是 `tw_listings_industry`(簡稱),但 19 支引擎仍讀 `tw_listings`(全名);主動 ETF 宇宙 A 碼 30 vs 擷取總冊 37(含 D 債券 7),LOCKED 尺 `^00\d{2,3}[AD]$` 與執行尺 `^\d{5}A$` 並存(第十段)。要不要把債券型主動 ETF 納入「全部」,是你的裁定(L35 現在說不納)。
+
+---
+
+## 十二 · 操作員貼回 Fetch ONE 單頁內容 → 對回活樹(2026-09-21 補)
+
+貼回的內容 = `functional modules/VDF/VIA_VDF_Fetch_ONE__Standalone.html`(6.3 MB;`build 2026-05-27`;煙霧測試證據 `VDF_FetchSmoke_v1.1 · 20260517`)。這是批104 收容存證的**宣告冊頁**(頁上自己寫「本頁狀態為宣告值…未接後端時以宣告為準,不得視為已驗證」),描述的是 2026-05 那一代 VDF(D0–D6 引擎 · 10 個 vdf_fetchers · vdf_supportive_bridge · vdf_api),**不是活系統現況**。
+
+| 頁上的東西 | 活樹對應 | 判讀 |
+|---|---|---|
+| 引擎登錄 20 列(VDF_M00_Config · VDF_Engine_TWSE · SuperCrawler · MacroSelector · FlowCalc · SO_Upgrade · FinancialModel/Validator · DataHub_Orchestrator · VIA_IntegrationSystem · VIA_FusionEngine · D3_Align v1/v2/Verified …) | 全樹 **一支都不在**(find 全 ABSENT);只剩 `VDF/ui/VIA_VDF_v4.3_Cockpit.html`、`WorkOps/VMT/via_master_params.json`,以及 `vdf_fetchers_*` / `vdf_supportive_bridge` 在收容夾 `references/intake/VIA_VDF_SSOT_b360`(零觸碰、只收不掛線;批504 `vdf_fetchers_financials_b504` 同) | 舊世代名冊;活樹現役是 45 支 ENG 家族(卡書)。「有實測證據 6/20」是 20260517 的證據,對現況無效 |
+| 10 個 fetcher(vdf_fetchers_market/macro/financials/derived/etf_holdings/sentiment/consensus/fiscal/fed/tdcc) | 只有 `VDF_ENG046_FetchMatrixRegistry` 讀 FetchOne 冊(轉錄用);ENG053 的三冊是 Unified_Params / Param_Registry / Input_Interface_Matrix | 冊上的 fetcher 欄是分類標籤,不對應任何活引擎 |
+| 台股上市全市場 980 檔 · 上櫃 838 檔(估 2.2M/1.8M 列) | 頁面原始碼寫死 `["台股上市全市場",980,…]`;活系統名冊 TWSE 1,088–1,103 · TPEX 890–892(第十一段) | 估算值,與現況差 ~150 檔 |
+| FN-00 台股全上市櫃公司清單(全量基準) | ENG054 `fetch_listings` → `tw_listings`;ENG055 L1 → `tw_listings_industry`(正典) | 同一件事,活樹已有正主 |
+| EF-42 主動式 ETF 總表 37 檔 = 台股股票型 24(A)+ 海外 6(A)+ 債券 7(D);EF-01 全清單 24 檔末碼 A;MX-A12「v4.3 記 18 檔 → 現行 37 檔」 | ENG077 A 碼律只收 A(30),海外 6 標 FOREIGN_COMPONENT 不抓持股 → 須每日揭露 ≈24,與 EF-01 的 24 一致;債券 D 型 7 檔活系統不抓(L35);registry 31(9/15) | 頁與活樹在「台股股票型 24」上一致;差在 D 型與海外的處置 |
+| P1 國際股票清單 34 檔(唯一可增減參數) | 住在 `registry/VIA_VDF_Fetch_Contract.json` `parameter_contract.P1_ticker_universe`(count 34);**活樹沒有任何引擎讀 P1**(ENG066 走自己的 11 類;ENG055 L6 走內建指數清單) | P1 目前只存在於頁與契約,不驅動擷取 |
+| P3 START_DATE 2018-01-01(歷史長度 8.7 年) | 規格冊 `defaults.start=2023-07-01`(批600);ENG066 `DEFAULT_START=2018-01-01` 仍對齊 P3;ENG054 2024-01-02 | 兩套起始日並存(第 9.3 節) |
+| P4 FRED 金鑰未設定 · 0 項解鎖 | 活系統同樣要 `FRED_API_KEY`(env 或 `mega/.fred_api_key`);未設=ENG074 GATED/SKIP | 一致;你的手 |
+| 「所有 HTTP 一律經 vdf_supportive_bridge」「實際以 vdf_api 健康檢查回寫為準」 | 律 L09/批402:網路只認 VeritasAegisNexus(SUP_MDL740 為橋);`VIA_VDFArchitecture` 冊 rules:vdf_api(8765 撞 DeckServer)不啟用、vdf_supportive_bridge 不重掛 | 頁上的工具鏈是舊設計 |
+| 資料總冊 390 項:DONE 296 · PROXY 75 · TODO 19;免憑證 261 · FRED 78 · 授權 19 · 爬取 13 | 與 `VDF_FetchOne_Matrix_Registry_v0100.json` counts_measured 一致 | 冊本身是對的(它答「該抓什麼」,第 9.4 節) |
+| 長期維護 SSOT 0 · 臨時擷取 AD-HOC 390 | 契約 `selection_model`:選取持久化在瀏覽器 `localStorage:vdf_selection` | 這是你瀏覽器的勾選狀態:**沒有任何一項被勾為長期維護** |
+
+結論:這頁可以當「總冊/契約的閱讀面」(它的 390 項與契約規則與冊一致),**不能拿它的引擎登錄、工具鏈、台股檔數判活系統**。要讓它反映現況,正主是 ENG046(轉錄冊)+ ENG073/VCGC 的頁;或依 L39 把它列進 U/I 契約冊為收容件。裁定權在操作員,本文只對照。
