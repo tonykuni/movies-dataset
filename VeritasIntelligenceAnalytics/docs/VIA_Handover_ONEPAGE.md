@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0122 · 批689)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0123 · 批689)
 
-> 產生 2026-09-21 13:55:49 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-21 17:07:16 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0101.md)
 
@@ -605,7 +605,7 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1918 列 · 全庫同步 {'hash': '4ee818b2c0eb', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '35d15444f030', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1918 列 · 全庫同步 {'hash': '4ee818b2c0eb', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '339f2aad723d', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -614,7 +614,7 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 - 五矩陣 ABSENT:ENGINE_BUS_latest.json 不在(via-ryg) · profile None · 真跑 None · 項 None · 態 None
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):ABSENT · VTMRA_latest.json 不在(via-vtmra 跑一次即有;七成員家族境真跑自測) · 成員 -
-- Deck 任務 92 · 規格項 66 · 格子站 291(在位 291)· Register 指令 168 · Manager 正式名稱 任務 92 / 引擎 94
+- Deck 任務 92 · 規格項 66 · 格子站 292(在位 292)· Register 指令 168 · Manager 正式名稱 任務 92 / 引擎 94
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0242.ps1)
 
@@ -789,13 +789,13 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 6135/6135 · **缺 0** · 類別 {'class': 101, 'engine': 90, 'environment': 43, 'function': 5192, 'feature': 98, 'module': 171, 'package': 252, 'system': 13, 'tool': 175}
-- 尾版引擎/模組家族 273 · 中央冊已登 273 · **未登 0** · 操作介面有掛載 232 · 內部件無操作介面 41(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 6163/6163 · **缺 0** · 類別 {'class': 101, 'engine': 90, 'environment': 43, 'function': 5219, 'feature': 98, 'module': 172, 'package': 252, 'system': 13, 'tool': 175}
+- 尾版引擎/模組家族 274 · 中央冊已登 274 · **未登 0** · 操作介面有掛載 233 · 內部件無操作介面 41(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1300 筆 · 元件 149 · 更新 2026-09-21T13:50:15
-- 元件冊 OK · ACTIVE 6135 · RETIRED 245 · 更新 2026-09-21T13:50:31 · {'class': 101, 'engine': 90, 'environment': 43, 'function': 5192, 'feature': 98, 'module': 171, 'package': 252, 'system': 13, 'tool': 175}
+- 全域台帳 1300 筆 · 元件 149 · 更新 2026-09-21T17:07:16
+- 元件冊 OK · ACTIVE 6163 · RETIRED 245 · 更新 2026-09-21T17:00:43 · {'class': 101, 'engine': 90, 'environment': 43, 'function': 5219, 'feature': 98, 'module': 172, 'package': 252, 'system': 13, 'tool': 175}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
 - 2026-09-21 16:54 ADD VDF VDF_SystemManager v0100(廿七檢;九域:政策/邏輯/因子/參數/引擎/橋/工具/交接/紀錄;與 VRN_SystemManager 同一份契約
@@ -1043,7 +1043,7 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 | Z106 | `prices_canonical` 同名不同形:母 `VDF_ENG060` v0104 的 9 欄**視圖**(批178 正典取數視圖;ENG061/VRN ENG069/070/VAP_ENG009 都讀它)vs 姊妹倉 `VDF_PricesCanonical.py` 候選 32 欄**表**(`config/ssot/VDF_PricesFactorRegistry.candidate.json`);寫進同一庫撞名 = Hydra。附:DB 表冊把 `prices_canonical` 記成表且 writers 空、`tw_prices_adj` writers 也空(其實是 ENG060) | 候裁 | 操作員 / 主線 VDF | 裁正典;表冊補「VIEW by ENG060」;姊妹引擎要進母樹先改名或改層 |
 | Z107 | PS20 車道 ↔ VIA_ACCEL25:對照表已出(對應 5 · 部分 10 · 無 5;反向 25 冊 19 條 PS20 沒有)——兩層各一本(資料面 vs 治理面),PS20 宜登記為 #19 多引擎整合之下的資料面子冊;母樹現在零 `$VIAPS20` 宣告,注入 = 48 支 `.ps1`(L70) | 候裁 | 操作員 | 裁「登記為子冊」與「要不要注入」兩件 |
 | Z108 | 姊妹倉 `vrn-field-cache.ts` 57 欄財報欄位 TWSE/TWS/YF 對照(yf 鍵 55):母樹沒有這本(ENG082 用自家欄名;SUP_MDL749 是研報六欄) | 候裁 | 操作員 / 主線 VDF | 收進 `references/intake`(零觸碰)或作 ENG082 別名冊(只增不減) |
-| Z109 | **姊妹倉 VRN 膠囊 a**(批690 母線轉交;正本 VIA-VDF-VRN 分支 `claude/festive-ptolemy-ts2yyh` c1989e6 `docs/VIA_VRN_HANDOVER.md`,PR #23 未併其 main):`VRN_PanoramaProbe.py`(1073 行,十段 S01–S10)落地方式。本線量到:探針指到母 VRN 根跑,RC2「正典樹缺」消失,剩 RC1 無位元組 ×64 / RC3 選配套件 9/18 / RC4 橋找的是舊名 `VIA_SuperAccel_Module`(母正本是 SUP_MDL737 v0105)/ RC5 黃燈 23 / RC6 閘關;**但探針 S06 自帶 BROKER_PREFIX/BROKER_ZH 券商表=第二套券商判準**(L05),正典鍵命名空間也不同(HNSC/MKC/DAI/CT vs 母 HUANAN/MEGA/DAIWA/CATHAY)。VRN_ENG089 號空(全遠端掃過) | 候 | 操作員 | 三選一:① 不落地(母已有六層鏈跑器 MDL172 + 總管全景,探針留在姊妹倉當契約測試)· ② 落地 `VRN_ENG089_PanoramaProbe_v0100` 但 S06 券商/代號改綁樞紐 `SUP_MDL749.broker_of`(自帶表降為缺席退路;一批的量)· ③ 併姊妹倉 PR #23 原樣(帶著第二套判準)。本線建議 ②;膠囊 b(工作站真跑探針)/ d(注入器 `--apply`)是你的手 |
+| Z109 | **姊妹倉 VRN 膠囊 a**(批690 母線轉交;正本 VIA-VDF-VRN 分支 `claude/festive-ptolemy-ts2yyh` c1989e6 `docs/VIA_VRN_HANDOVER.md`,PR #23 未併其 main):`VRN_PanoramaProbe.py`(1073 行,十段 S01–S10)落地方式。本線量到:探針指到母 VRN 根跑,RC2「正典樹缺」消失,剩 RC1 無位元組 ×64 / RC3 選配套件 9/18 / RC4 橋找的是舊名 `VIA_SuperAccel_Module`(母正本是 SUP_MDL737 v0105)/ RC5 黃燈 23 / RC6 閘關;**但探針 S06 自帶 BROKER_PREFIX/BROKER_ZH 券商表=第二套券商判準**(L05),正典鍵命名空間也不同(HNSC/MKC/DAI/CT vs 母 HUANAN/MEGA/DAIWA/CATHAY)。VRN_ENG089 號空(全遠端掃過) | 候 | 操作員 | 三選一:① 不落地(母已有六層鏈跑器 MDL172 + 總管全景,探針留在姊妹倉當契約測試)· ② 落地 `VRN_ENG089_PanoramaProbe_v0100` 但 S06 券商/代號改綁樞紐 `SUP_MDL749.broker_of`(自帶表降為缺席退路;一批的量)· ③ 併姊妹倉 PR #23 原樣(帶著第二套判準)。本線建議 ②;**膠囊 b 已跑**(工作站 2026-09-21:AMBER · 卡點無 · S08–S10 READY 64 · 缺件 9/18 · 券商欄與本線容器量的 59/64 逐件一致;批691 文四b)/ d(注入器 `--apply`)是你的手;**操作員裁定(2026-09-21)「vrn 目前只截取個股報告」**:RC5 黃燈 23 件非個股=範圍外不是缺口(批691 文四c) |
 | ~~Z110~~ | ~~膠囊 c「券商正本對齊」:姊妹倉說母解析器 50/64、建議改 `vrn_d8b` 前綴比對~~ | **已結(批691)**:本線現場量 64 件——母**閘路**(樞紐 broker_of → ENG086)59/64,與探針零差;缺 13 件的是無版號 `vrn_d8b_filename_parser.py`(不在六層冊、格子無站,只被冊/manifest 引)→ 不改它(改=第二套判準)。真洞在別處:正典鍵對映 ② 對**活表鍵**只中 1/3(DAIWASECURITIES / J.P.MORGAN 沒空白,裁定拼法有空白,逐字查不到;㉒ 拿裁定冊自己的字串驗所以綠)→ ENG086 **v0113** 摺鍵查表 +㉓(裁定冊 × 活表現場取交集 4/4;併線後疊在 main v0112 聯集版上,㉗);Daiwa ×4 → DAIWA、JP ×2 → JPM | — | — |
 | Z111 | 膠囊 e 七處登冊:二節對表(20 支 `vrn-*.ts` + 探針 + 注入器 ↔ 母 MDL001–008 / 總管 v0103 / FirstPageEngine v0127 / finlex v0107 / digest v0116 / knowledge 六本 / VRN_BROKER_LIST_v01.json)登進 VRN_SystemManager 連結與台帳——對表指的是**另一個倉**的檔,落地前登「連結」只會是 ABSENT;等 Z109 裁 | 候 | 操作員裁 Z109 後 AI | Z109 選 ② → 隨 ENG089 一起登;選 ① → 登進總管 upstream 域當「外部對表」一列 |
 | Z112 | Grid 站名「第一頁邏輯補缺正主橋二十二檢」應改「二十三檢」(ENG086 v0113):本線**不開** Grid 新版——併線後 main 尾版 Grid v0443 站名「二十六檢」(v0112),本線 v0113 為二十七檢;v0440–v0443 一天四版(LL334),本線不再開第五版;站以 `--selftest` rc 判,功能不受影響 | 未做 | 併線者 | 下一個開 Grid 版號的人順手改站名;本線 ENG086 v0113 在 v0443 站上 OK |
@@ -1125,11 +1125,11 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 
 ## 十三 · VRN 子系統管理對接口(批681;VRN_SystemManager;VIA 往下讀 VRN 四庫一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 交接;自適應連結現解尾版;預設只讀)
 
-- GREEN · VRN_SystemManager_v0104 · 2026-09-21 13:55:50 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 173 {'GREEN': 171, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
+- GREEN · VRN_SystemManager_v0104 · 2026-09-21 17:07:17 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 173 {'GREEN': 171, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VRN/VRN_SystemManager_v*.py status | catalog | links | read <policy|logic|factor|param|engine|handover|upstream> [key] | sync --apply(只落 VIA_Reports/vrn_system)
 
 ## 十四 · VDF 子系統管理對接口(側線 2026-09-21;VDF_SystemManager;VIA 往下讀 VDF 一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 橋/工具面 + 交接/紀錄;橋律逐支量;自適應連結現解尾版;預設只讀)
 
-- STALE/NODATA · VDF_SystemManager_v0103 · 2026-09-21 13:55:50 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 116 {'GREEN': 113, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 5(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 3 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
+- STALE/NODATA · VDF_SystemManager_v0103 · 2026-09-21 17:07:17 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 116 {'GREEN': 113, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 5(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 3 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
 - 橋律(所有 PY 接加速器 · 真向外擷取走網路工具;尺=CGC_MDL124):尾版 43 · 加速器橋 43 · 網路橋 43 · 真擷取 3 · 缺加速器 [] · 真擷取缺網路橋 []
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VDF/VDF_SystemManager_v*.py status | engines | bridges | tools | catalog | links | records | read <policy|logic|factor|param|engine|bridge|tool|handover|records|upstream> [key] [--full] | sync --apply(只落 VIA_Reports/vdf_system)

@@ -47,6 +47,7 @@
 | 第二跑(沙盒補三件) | **OK 268 · FAIL 15 · SKIP 4 · TIMEOUT 0**(260s;GRID_20260921_134001) | VRN 家族全綠、六層鏈實跑 OK;15 盞 = Z92 一族 13 + PowerShell 語法閘(pwsh 不在=容器固定紅)+ 矩陣式報告排版規格(非 VRN,兩跑同紅,未追根)。對 批689B 收尾的 FAIL 14:新紅 0(排版規格那站在那次容器也不在 Z92 名單,待下次對 GRID 存證) |
 
 | 第三跑(併 main 後;Grid v0443 · 291 站) | **OK 274 · FAIL 12 · SKIP 5 · TIMEOUT 0**(267s;GRID_20260921_135042) | 12 盞=Z92 一族 + Yahoo 共識(容器無網);VRN 家族全綠;VCGC v0122 二十八檢 28/28 · 總管 v0104 連結 GREEN 171 · 沒過閘 6/讀冊 10(main 併入 SUP_MDL015 v0101 過閘,Z91 剩 6) |
+| 第四跑(第二次併 main a323ff70 後;Grid v0444 · 292 站) | **OK 275 · FAIL 12 · SKIP 5 · TIMEOUT 0**(290s;GRID_20260921_170157) | 12 盞=Z92 一族 + 鉅亨 FactSet;VRN 家族全綠;VCGC v0123 廿九檢 29/29 · 中央冊 6163/6163 |
 
 ENG086 v0113 在「第一頁邏輯補缺正主橋二十六檢」站上 OK(站名待改,Z112)。格子再生 30 件 `git stash push -- <paths>` 收起不 commit(LL117 ③)。
 
@@ -58,6 +59,14 @@ ENG086 v0113 在「第一頁邏輯補缺正主橋二十六檢」站上 OK(站名
 | 券商欄:MKC/TSC/CLSA/CITI/DAI/GS/JPM/MAQ/MS/UBS/CT/KGI/CTBC/HNSC/PSC;空 5 件(3014TT · GF-Thoughts · 6933_AMAX-KY · 投資早報251209 · 第三場…陳子昂) | 與本線容器量的探針 59/64 **逐件一致**,空的 5 件也一樣;母閘路(ENG086 v0113)同樣 59/64,且正典鍵已回 DAIWA / JPM / MEGA(探針用的是 DAI / JPM / MKC 另一套縮寫=Z109 的命名空間差) | 無新洞;Z109 三選一的料齊了 |
 
 讀法:探針在母機上「READY 64」不是「跑了」——S08–S10 要母管線真跑才有結果;要不要讓它落地當第十段的量尺,還是 Z109 那一題。
+
+## 四c · 操作員一句話與姊妹倉 EnvManager 貼回(2026-09-21 工作站)
+
+| 貼的 | 讀出 | 落點 |
+|---|---|---|
+| 「vrn 目前只截取個股報告」 | **範圍裁定(操作員)**:VRN 現階段只擷取個股報告;晨會/盤勢/產業/早報等非個股件不是缺口——探針 RC5 黃燈 23 件、ENG086 的 NOT_STOCK(非個股,不需)四態、首頁邏輯「強非個股 → 有代號 → 產業」都對得上這句話;非個股件留檔不發明代號、不進財報驗算分母 | 記 Z109;要不要進索引冊 `rulings_today`(via_vrn_logic_book 新版號)=你一句話 |
+| 工作站在本線分支 `claude/vrn-line-b691`(644663ee)上 `git pull origin claude/awesome-bardeen-h0wm5v` → 9 檔衝突 | 母線分支還沒併 main(PR #65 落後 main 46 筆),把它拉進本線分支=把母線未併的批拉進 PR #66;不該併,**先 `git merge --abort`** | 七節 PS 區塊第一行 |
+| 姊妹倉 `VIA_EnvManager.py scan/plan`(clone 已在 v0300;main 88de4b0) | **Z68 復核證據**:操作員 clone 已是 v0300,不再是 328 行舊版;plan 零寫 · ENV-FLEET 47/41 · UVT findings 335 FAIL 1 · LEGACY_POLICY 5 條 advisory(camelot_311/paddle_311/vif_aio/vif_core 保留、vmt_pm 退役候)· via_vrn 的 9 件缺件(探針 RC3)要走它的 apply/-AddTool=你的手,不代裝 | Z68 的劃線歸母線那一列(本線不動它);證據記此 |
 
 ## 五 · 你的手
 
