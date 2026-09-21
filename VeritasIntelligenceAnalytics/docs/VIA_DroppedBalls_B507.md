@@ -92,3 +92,4 @@
 | Z74 | PS 版史 21 支(同族非尾版:OneShot v0100–0102 · VdfFetch v0100–0103 · AllInOne v0104–0110 · VRNAudit v0100–0104 · OneKey v0100 · VRN v0100)未注 PS-ACCEL(批670:尺不把版史當資產);要全注=`CGC_MDL124 --ps --apply`(不加 --ps-tail)一句話 | 候 | 操作員 | 裁「注」即跑 |
 | Z75 | PS 語法閘棘輪基線 5 支/53 筆舊債(含 `VIA_Canonical_Units/Invoke-VIA-VRN-Fallback-Activation-v0136.ps1` foreach 缺 in),容器 pwsh 7.4.6 量到;不是本批弄壞的;修=另開版號檔 | 候 | AI | 裁「修」我就逐支修(pwsh 可在容器複驗) |
 | Z76 | 832 支 .ps1 帶 [VIA:PS-ACCEL:v0100]「20」註解,實際 dot-source 同一個 25 冊模組;要不要把註解統一成 v0101(改 832 支只動一行註解)=你裁 | 候 | 操作員 | 裁「統一」我就用 v0106 換標記(逐字、零行為) |
+| Z77 | PR #57(local/parallel-b600-bus-v0128;側線 11 commit + 工作站 EngineBus v0128)與 main 衝突 5 檔=舊快照 vs 只增不減冊;批684 已把它真正新的兩件(EngineBus v0128 · VDF 審視文)收進本線,其餘 ⊂ 本線 → PR #57 與 PR #53 都可關;`_patches/` 的 v0128 副本不收(第二顆頭) | 候 | 操作員 | 關 PR #57 / #53;要保留 `_patches` 副本再說 |
