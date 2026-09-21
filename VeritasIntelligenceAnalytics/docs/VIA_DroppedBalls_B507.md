@@ -89,3 +89,6 @@
 | Z71 | Register v0241 / Invoke-VIA-VRN v0101 / via-ssotadd 兩梭:側線在操作員令「註冊這些」下造(L70 逐次許可寫在其交接文二-3);批682 原樣搬入本線未改一位元;若不認可刪三檔即回退;`via-vrnsys` 仍未登,下一版 v0242 | 候 | 操作員 | 認可=不動;不認可=刪檔 |
 | Z72 | 實測樣本夾(操作員 2026-09-21 令「實測樣本(隨時更新):C:\測試樣本報告」)已登冊 `user.vrn_dir`(via-console set;changelog 留痕);以後不帶 --in 的 VRN 跑法都吃它;容器 ABSENT 誠實;Z51 掛進 AI 境仍是你的手 | 操作員的手 | 操作員 | 工作站 `via-vrnrun` 貼回 V2 取件數(應 ≈ 60 PDF + 4 DOCX,隨時更新以貼回為準) |
 | Z73 | VRN_ENG088(側線稽核件)掛在索引冊 OFF_BOOK_PENDING(via_vrn_logic_book v0105):上不上架構冊、上哪一層(L3 驗證?)=架構裁定 | 候 | 操作員 | 一句「上 L3」或「不上」我就落冊 |
+| Z74 | PS 版史 21 支(同族非尾版:OneShot v0100–0102 · VdfFetch v0100–0103 · AllInOne v0104–0110 · VRNAudit v0100–0104 · OneKey v0100 · VRN v0100)未注 PS-ACCEL(批670:尺不把版史當資產);要全注=`CGC_MDL124 --ps --apply`(不加 --ps-tail)一句話 | 候 | 操作員 | 裁「注」即跑 |
+| Z75 | PS 語法閘棘輪基線 5 支/53 筆舊債(含 `VIA_Canonical_Units/Invoke-VIA-VRN-Fallback-Activation-v0136.ps1` foreach 缺 in),容器 pwsh 7.4.6 量到;不是本批弄壞的;修=另開版號檔 | 候 | AI | 裁「修」我就逐支修(pwsh 可在容器複驗) |
+| Z76 | 832 支 .ps1 帶 [VIA:PS-ACCEL:v0100]「20」註解,實際 dot-source 同一個 25 冊模組;要不要把註解統一成 v0101(改 832 支只動一行註解)=你裁 | 候 | 操作員 | 裁「統一」我就用 v0106 換標記(逐字、零行為) |

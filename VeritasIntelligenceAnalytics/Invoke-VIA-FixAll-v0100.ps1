@@ -2,6 +2,16 @@
 # v1 的兩個錯：①貼進互動視窗時 if{...} 自成一句先跑掉、下一行 else 變孤兒指令
 #              ②只驗 EnvManager「檔案在不在」，沒驗「它會不會做 ocr」＝在位≠跑得動
 # v2：所有 if/else 一律 "} else {" 同一行（貼上去才不會散）；EnvManager 改驗**能力**。
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Continue'
 try { [Console]::OutputEncoding = [Text.Encoding]::UTF8; $OutputEncoding = [Text.Encoding]::UTF8 } catch {}
 $L = New-Object System.Collections.ArrayList
