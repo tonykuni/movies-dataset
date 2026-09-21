@@ -1,4 +1,4 @@
-# 批688 · 三個洞一次補:pull 被冊擋、抓官方料零列還炸、`--only` 只吃一半
+# 批688B · 三個洞一次補:pull 被冊擋、抓官方料零列還炸、`--only` 只吃一半
 
 操作員貼回(HEAD 仍 `53736e39`=批686):
 
@@ -30,7 +30,7 @@ via-vrnlogic sync-db → 6 庫 OK(邏輯庫同步 落後 6 → 同步 6,結)
 ## 三 · 你的手(順序很重要)
 
 1. 先把被擋的那本冊放回去再拉(它是產物,重建就有):`git checkout -- "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json"` → `git pull`(以後用 `via-reload`,它會先 stash 再拉)。
-2. 拉到 批688 之後,`via-vrnbook build` 第二次會印「冊未變」,pull 不再被它擋。
+2. 拉到 批688B 之後,`via-vrnbook build` 第二次會印「冊未變」,pull 不再被它擋。
 3. 官方料:同意閘後 `via-finstat run --only "2330,2454"`(加引號;不加也吃得下了)→ 貼回每檔括號裡的車道 tag 與 `[三大報表計]` 行。
 4. 然後 `ENG074 v0114 --verify` 與 `--official`,貼回 `[官方核對]`、`__alignment__`、`✗` 列。
 
