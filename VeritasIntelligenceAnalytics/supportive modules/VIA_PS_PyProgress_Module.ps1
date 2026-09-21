@@ -1,5 +1,11 @@
 ﻿# =====================================================================================
 # VIA_PS_PyProgress_Module.ps1 — 所有 py 指令的統一啟動包裝(批486)
+# 批694(操作員三令「動態進度條及百分比 · 不卡斷 · 25 個加速器」;L70 逐次許可=這三道令本身):
+#   ① **真百分比**:引擎印 `[進度] n/N …`(或格子的 `n/N xx% ·`、啟動器的 `[Vk] i/n`)就用 n/N 畫,狀態列印「n/N xx% · 經過 · 剩約」;
+#      引擎沒報進度才退回 30 秒脈動,而且狀態列寫明「脈動(引擎未報進度)」——不假裝知道。
+#   ② **心跳**:30 秒沒任何輸出,狀態列寫「無輸出 Ns(仍在跑;逾時 Ts 才停)」,讓人分得出「在算」跟「卡住」。
+#   ③ 結束後把最後一筆進度放進 $global:VIA_PYPROG_LAST(n/d/pct/秒),via-pyprog 第七檢釘住這條協定。
+#   零依賴、零行為變更:stdout 一行不少照樣進 pipeline,rc 照真回,逾時 Kill 整樹保留。
 # 操作員令:「ps 檔案要加 20 個加速器動態進度條;所有 py 指令都要加速加速器」
 # -------------------------------------------------------------------------------------
 # 先查再造:PS 側 20 加速器實體模組早在 supportive modules\VIA_PS_Accel_Module.ps1(TOOL-101,批102):
@@ -118,12 +124,17 @@ function Invoke-VIAPython {
                 foreach ($ln in ($text -split "`n")) {
                     $ln = $ln.TrimEnd("`r"); if ($ln -eq "") { continue }
                     $script:__viaLast = $ln
+                    $script:__viaLastAt = [DateTime]::Now
+                    # 批694 進度協定:[進度] n/N · 格子 n/N xx% · 啟動器 [Vk] i/n —— 只認「n/N」,不猜
+                    if ($ln -match '^\s*\[進度\]\s*(\d+)\s*/\s*(\d+)' -or $ln -match '(\d+)/(\d+)\s+\d+(\.\d+)?%' -or $ln -match '^\s*\[V\d+\]\s+(\d+)/(\d+)\b') {
+                        $d_ = [int]$Matches[2]; if ($d_ -gt 0) { $script:__viaProgN = [int]$Matches[1]; $script:__viaProgD = $d_ }
+                    }
                     if ($IsErr) { Write-Host ("  " + $ln) -ForegroundColor DarkGray } else { Write-Output $ln }
                 }
             } finally { $fs.Close() }
         } catch { }
     }
-    $script:__viaLast = ""
+    $script:__viaLast = ""; $script:__viaLastAt = [DateTime]::Now; $script:__viaProgN = 0; $script:__viaProgD = 0
     # 批542 三件加速(只動輪詢節奏,不動排水邏輯、不動行為):
     #   ② **自適應輪詢**:原本固定 250ms,等於每一道指令平均多付 125ms、最壞 250ms 才發現它其實早就跑完了。
     #      短指令(--selftest / status / conflicts,實測 python 側 0.0~2.5s)佔絕大多數,卻全額付這個稅。
@@ -149,8 +160,18 @@ function Invoke-VIAPython {
         $el = [int]($ms / 1000)
         if ($TimeoutSec -gt 0 -and $el -ge $TimeoutSec) { try { $p.Kill($true) } catch {}; $timedOut = $true; break }
         if ($ms -ge 400) {
-            $pct = [int](($el % 30) * 100 / 30)   # 動態條:不知道總長就用 30 秒一輪的脈動
-            $st = if ($script:__viaLast) { ("{0}s · {1}" -f $el, $script:__viaLast.Substring(0, [Math]::Min(90, $script:__viaLast.Length))) } else { "{0}s · 起跑中" -f $el }
+            $tail = if ($script:__viaLast) { $script:__viaLast.Substring(0, [Math]::Min(70, $script:__viaLast.Length)) } else { "起跑中" }
+            $quiet = [int]([DateTime]::Now - $script:__viaLastAt).TotalSeconds
+            $hb = if ($quiet -ge 30) { ("無輸出 {0}s(仍在跑;逾時 {1}s 才停)· " -f $quiet, $TimeoutSec) } else { "" }
+            if ($script:__viaProgD -gt 0) {
+                # 批694 真百分比:引擎報了 n/N 就用它;剩約=按目前速度外推(n=0 時不估)
+                $pct = [int](100 * $script:__viaProgN / $script:__viaProgD)
+                $eta = if ($script:__viaProgN -gt 0) { [int]($el * ($script:__viaProgD - $script:__viaProgN) / $script:__viaProgN) } else { -1 }
+                $st = ("{0}/{1} {2}% · 經過 {3}s" -f $script:__viaProgN, $script:__viaProgD, $pct, $el) + $(if ($eta -ge 0) { " · 剩約 {0}s" -f $eta } else { "" }) + " · " + $hb + $tail
+            } else {
+                $pct = [int](($el % 30) * 100 / 30)   # 引擎沒報進度:30 秒一輪的脈動,而且講明是脈動
+                $st = ("{0}s · 脈動(引擎未報進度)· " -f $el) + $hb + $tail
+            }
             if ($st -ne $lastKey) {
                 $lastKey = $st; $script:__viaProgOn = $true
                 if (Get-Command Write-VIAProgress -ErrorAction SilentlyContinue) { Write-VIAProgress -Activity ("VIA · " + $name + " · 加速器 25/25") -Status $st -Percent $pct -Id 13 }
@@ -164,6 +185,7 @@ function Invoke-VIAPython {
     & $drain $outF ([ref]$posO) $false $true
     & $drain $errF ([ref]$posE) $true $true
     if ($script:__viaProgOn) { Write-Progress -Id 13 -Activity ("VIA · " + $name) -Completed }
+    $global:VIA_PYPROG_LAST = @{ n = $script:__viaProgN; d = $script:__viaProgD; pct = $(if ($script:__viaProgD -gt 0) { [int](100 * $script:__viaProgN / $script:__viaProgD) } else { -1 }); secs = [int]$swPoll.ElapsedMilliseconds / 1000; name = $name }
     $rc = if ($timedOut) { 124 } else { try { $p.WaitForExit(); $p.ExitCode } catch { 1 } }
     Remove-Item -LiteralPath $outF, $errF -Force -ErrorAction SilentlyContinue
     if ($timedOut) { Write-Host ("  [Invoke-VIAPython] 逾 {0}s 已停(不卡斷;只殺自己生的樹)。這是保底天花板,不是判它壞——" -f $TimeoutSec) -ForegroundColor Yellow
