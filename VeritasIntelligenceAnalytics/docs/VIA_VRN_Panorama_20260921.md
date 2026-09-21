@@ -126,3 +126,10 @@ git log --oneline -3 → c8310908 Merge PR #55 · 88f8a10b 批679d · 2fbfed28 �
 - 不 merge / 不 approve 任何 PR(#53 / #32 / #12 / 姊妹倉 7 個);只指出。
 - 不動 `.ps1`(L70);不代設同意閘(L07);不裝套件到工作站(L08)。
 - 不把 批680 那五檔當成存在:它們只在前一個 session 的容器裡。
+
+## 十 · 批682 補:第二個 session(側線)的 VRN 資訊
+
+- 側線 `claude/busy-bell-97sa4f`(session_01YJPv4NqSj3YsMkkcrywaHw)的 VRN 件已原樣收進本線:ENG088 增補審計橋(19/19)· SUP_MDL749 v0111(48/48)· 31 件收容包 · 單元測試(20/20)· 交接文 · Deck v0158 · Manager v0147 · Register v0241 · Invoke-VIA-VRN v0101 · 梭。細節見 `docs/VIA_B682_TwoLinesIntoOneDoor.md`。
+- 它的台帳帶回工作站數字(操作員貼回 `via-vrnrun`):六層鏈 **GREEN 29 · RED 3 · GATED 0 · NODATA 14**;庫價重算 **39 筆 ADJ**;判對率 **100.0% = 461/461**;可判率 **62.7% / 67.1%**。
+- 它現在的狀態(07:52):等 `claude/brave-goldberg-ri5k42` 推上來「to read session VRN logic」——第三條線,遠端尚未出現(Z70)。
+- 兩線血脈由 `VRN_SystemManager records` 從 git 尾註量出來,不另抄一份。
