@@ -72,3 +72,26 @@ OK 266 · FAIL 9 · SKIP 6 · TIMEOUT 0(235s;GRID_20260921_125458)。對 批689B
 | 姊妹倉 `VRN_PanoramaProbe.py`(64 件;膠囊六節 2) | verdict **AMBER**;S01–S05 OK 64(S04 格式 WARN 4=四份 docx)· S06 OCR 路由 OK 41 / WARN 23 · S07 NLP SKIP 64(閘關=政策)· S08–S10 READY 64;**卡點:無**;契約風險 GREEN 41 · YELLOW 23 · RED 0。根因:RC3_DEPS_ABSENT 選配套件 9/18 缺(polars, xxhash, pypdf, docx, markitdown, paddleocr, pytesseract, rapidfuzz, psutil)· RC5 檔名契約黃燈 23 件(晨會/產業/無代號;依規不轉紅)· RC6 NLP 閘關(VIA_NET=0;政策非故障)。VRN tree PRESENT · modules 14/14 · deps 9/18 · accel bridge RESOLVED · python 3.13.7 | 裝 9 個選配套件到 via_vrn 境=操作員的手(VIA_EnvManager;不動 base);黃燈 23 件不發明代號;轉交 VRN 線 |
 
 讀法:五支引擎在有料的機器上走的是原本的完整檢,容器上走的是 NODATA 路——同一支檔兩種誠實。探針 64 件沒有一段 BLOCKED/FAIL,AMBER 來自缺件(RC3)與黃燈(RC5),不是引擎壞。
+
+## 七 · 併 PR #53(busy-bell)後的重疊與 Codex 兩條
+
+**撞名**(LL334,先併 main 的贏):側線同日也開了 `VDF_ENG058 v0101`(只探庫檔)與 Grid v0441(其後 v0442/v0443);併線取 main 那兩份,本線內容改疊到 main 上開下一版——
+
+| 本線原件 | 疊到 main 後 | 差在哪 |
+|----------|-------------|--------|
+| ENG058 v0101(本線) | **v0102**(=側線 v0101 + 探到表) | 側線只探「庫檔在不在」;庫在但 `tw_listings_industry` 不在(容器固定缺)build 仍炸 |
+| Grid v0441(本線,從 v0439 長) | **v0444**(=main v0443 + 三站 nodata_ok + 輪動橋站名) | 側線 v0440–v0443 已含 批689B 各站與 ENG058/目錄台/全球市場/治理主控台/排版規格 nodata_ok |
+| ENG086 v0110 / 總管 v0103(本線) | 側線 v0112 / v0104 已含本線內容(併 PR #63 時聯集) | 不必再疊;VRN 線接手後續 |
+
+**Codex(PR #65)兩條都真,都修**:
+
+| 條 | 讀出 | 修 |
+|----|------|----|
+| P1 ENG072:export 回 NODATA 沒設 err,run()/CLI export 只認 err → export rc0、run 接著 preflight 吃舊一次 export 的陳料 | 真:v0102 的 NODATA 路只在自測收尾,run/export 兩條 CLI 路漏了 | **v0103**:NODATA 在 preflight 之前就 rc2 停(run 與 `export` 兩路),印因由;容器實測 export rc2 · run rc2 |
+| P2 ENG060:NODATA 早退把 ⑦ boot 接線 / ⑧ 紀律宣告一起退掉,nodata_ok 站在容器永遠走這條路 → 拿掉 boot 登記格子仍綠 | 真(早退不准把承諾一起退掉,批687 同律);ENG061 ⑨ 同病 | **ENG060 v0106** `_chk78()` · **ENG061 v0104** `_chk9()`:不吃料的檢兩條路共用一處判準都跑;紅=rc1 不被 NODATA 蓋住。容器實測:ENG060 OK 2 · NODATA 1 · SKIP 5;ENG061 OK 2 · NODATA 1 · SKIP 6 |
+
+併後鏈(main 尾版):VCGC **v0122** 二十八檢 28/28 · 總管 v0148 總控頁 92 任務 · 契約 OK · registry-sync 活 6141 · 新 7。
+
+## 八 · 併後全格子 v0444(容器;PATH 帶 /opt/pwsh)
+
+OK 271 · FAIL 6 · SKIP 8 · TIMEOUT 0(301s;GRID_20260921_165618)。對併前 run16(FAIL 9):**新紅 0 · 消失 3**(VAP 模板跑器 · 全球市場觀測 · 治理主控台——側線 c 修的)。剩 6 盞:寬表刷新器 · 市場分析引擎 · 引擎簡化稽核 · 治理台 UI Matrix(綠燈率門檻)· 系統同步樞紐 · 資料庫目錄台(側線站已改 nodata_ok,引擎在容器仍 rc1=引擎那邊還沒改)。下一批一族一批。
