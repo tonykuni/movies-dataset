@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0436→v0437(批687 一站改名):「財報頁擷取三十一檢」→「三十三檢」(VRN_ENG074 v0114:工作站第一次真跑 --verify 665 列 INSUFFICIENT 627 · FAIL 21 · PASS 17
+  → 同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」兩類 · FAIL/DIVERGE 列直接印 · 分母 30/105 印出)。站數不變(287)。
+
 v0435→v0436(批686 一站改名):「VRN 六層鏈廿二檢」→「廿四檢」(CGC_MDL172 v0102:rc≠0 的「量到什麼」先給 [FAIL] 行再給 [計] 行,
   不是最後一行的 [OK]——工作站兩次貼回 SUP_MDL746/MDL141 的紅都被最後一行蓋住;ModuleNotFoundError → ABSENT 具名套件(Z60 結))。站數不變(287)。
 
@@ -2106,7 +2109,7 @@ def battery(fast: bool):
     add("報告結構化入庫五十五檢(批659 ADJ 上漲空間+repair-price;批237;批412 SSOT;批418 年份守衛+報告型別;批447 整對換;批554 評等第四道委由樞紐+第二道本文守衛真迴歸修;批558 周圍訊息區塊(補頁尾)+本文標題區+評等優先權換序)", newest("VRN_ENG073_ReportStructuredDB_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("金融機構疊加層十檢(批413 操作員裁決;批419f 正典缺席鍵不陪葬)", newest("VIA_FinancialInstitution_Overlay_v*.py", VIA / "supportive modules/ssot"), ["--selftest"], "rc0", 120)
     add("券商報告卡八檢(批241)", newest("CGC_MDL100_ReportCards_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
-    add("財報頁擷取三十一檢(批685 官方年度核對=歷史數據為主 + 加減除驗算,規則在 VRN_FieldRules_SSOT rules.financial.verify、引擎零影子規則;批241/403 三方對照;**批615 操作員裁定 VRN 正典=DuckDB**,故補的是正典表的欄位不是換儲存層:期間拆成 period_type/fiscal_year/fiscal_quarter(`1Q25` 季在前的寫法原本整欄被當非表頭丟掉)· 單位/幣別/倍率只認**頁面寫出來的宣告**,不由數值大小反推(庫裡 `revenue 5839` 原本沒有單位,百萬還是千元下游無從得知;既有 UNIT_SCALE 只能事後用比值猜)· 解不出就留 NULL 並在 *_src 說原文 · 遷移只增不減(舊列留 NULL=還沒重抽)· INSERT 改具名欄位(原本靠 dict 順序的位置參數,WORD 道多兩鍵=10 值塞 8 位的未爆彈);批425 --db 接線;批563 MOPS 列優先序——同鍵多列時「歸屬於母公司業主之權益」勝過「權益總計」,輸的那列不刪只標名次)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
+    add("財報頁擷取三十三檢(批687 多列取差最小/缺分兩類/FAIL 列直接印;批685 官方年度核對=歷史數據為主 + 加減除驗算,規則在 VRN_FieldRules_SSOT rules.financial.verify、引擎零影子規則;批241/403 三方對照;**批615 操作員裁定 VRN 正典=DuckDB**,故補的是正典表的欄位不是換儲存層:期間拆成 period_type/fiscal_year/fiscal_quarter(`1Q25` 季在前的寫法原本整欄被當非表頭丟掉)· 單位/幣別/倍率只認**頁面寫出來的宣告**,不由數值大小反推(庫裡 `revenue 5839` 原本沒有單位,百萬還是千元下游無從得知;既有 UNIT_SCALE 只能事後用比值猜)· 解不出就留 NULL 並在 *_src 說原文 · 遷移只增不減(舊列留 NULL=還沒重抽)· INSERT 改具名欄位(原本靠 dict 順序的位置參數,WORD 道多兩鍵=10 值塞 8 位的未爆彈);批425 --db 接線;批563 MOPS 列優先序——同鍵多列時「歸屬於母公司業主之權益」勝過「權益總計」,輸的那列不刪只標名次)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("共識增益橋十檢(批243)", newest("VDF_ENG067_ConsensusEnrichment_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("PS AST 修正引擎十檢(批244)", newest("CGC_MDL101_PSAstRepair_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("圖庫 SSOT 橋十檢(批247)", newest("VAP_ENG010_ChartLibrarySSOT_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 120)

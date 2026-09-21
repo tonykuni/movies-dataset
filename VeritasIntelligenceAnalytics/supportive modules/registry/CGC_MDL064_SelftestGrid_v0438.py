@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0437→v0438(批688 兩站改名):「VRN 邏輯架構索引冊十六檢」→「十七檢」(via_vrn_logic_book v0106:建冊冪等——內容沒變不重寫、built_at 沿用;
+  工作站實錄 `via-vrnbook build` 之後 `git pull` 被這本刻意入倉的冊擋掉)· 「三大報表擷取引擎八檢」→「十二檢」(VDF_ENG082 v0101:
+  --only 吃 PowerShell 拆開的陣列 · 注入 session 零列再跑原生 · 零列不 Traceback)。站數不變(287)。
+
+v0436→v0437(批687 一站改名):「財報頁擷取三十一檢」→「三十三檢」(VRN_ENG074 v0114:工作站第一次真跑 --verify 665 列 INSUFFICIENT 627 · FAIL 21 · PASS 17
+  → 同期間同正典多列逐組合取差最小(同頁優先)· 缺運算元分「未登錄正典/報告未載」兩類 · FAIL/DIVERGE 列直接印 · 分母 30/105 印出)。站數不變(287)。
+
 v0435→v0436(批686 一站改名):「VRN 六層鏈廿二檢」→「廿四檢」(CGC_MDL172 v0102:rc≠0 的「量到什麼」先給 [FAIL] 行再給 [計] 行,
   不是最後一行的 [OK]——工作站兩次貼回 SUP_MDL746/MDL141 的紅都被最後一行蓋住;ModuleNotFoundError → ABSENT 具名套件(Z60 結))。站數不變(287)。
 
@@ -1922,7 +1929,7 @@ def battery(fast: bool):
     add("sysman 三輪協議", newest("CGC_MDL069_SystemManager_v0*.py", HERE), ["--no-open"], "rc0", 900, heavy=True)
     add("衝突哨兵十四檢", newest("via_conflict_guard_v0*.py", HERE), ["--selftest"], "rc0", 300)
     # 批622:工具健康與冊新不新是兩件事,兩盞燈(批618 衝突哨兵同律)。
-    add("VRN 邏輯架構索引冊十六檢(批665 層名覆核;批666 冊版不同步閘:綠燈配舊冊)", newest("via_vrn_logic_book_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("VRN 邏輯架構索引冊十七檢(批688 建冊冪等:內容沒變不重寫、built_at 沿用,追蹤檔不再每跑一次就髒;批665 層名覆核;批666 冊版不同步閘:綠燈配舊冊)", newest("via_vrn_logic_book_v0*.py", HERE), ["--selftest"], "rc0", 300)
     add("VRN 索引冊守門(實樹尾版對照)", newest("via_vrn_logic_book_v0*.py", HERE), [], "rc0", 300)
     # 批618:工具健康與樹的乾淨是兩件事,兩盞燈。這一盞照樹——
     # ⑫ PATH 黑名單命中在工作站是真紅,而且哨兵 v0101 會在紅燈底下印出換錨句。
@@ -2106,7 +2113,7 @@ def battery(fast: bool):
     add("報告結構化入庫五十五檢(批659 ADJ 上漲空間+repair-price;批237;批412 SSOT;批418 年份守衛+報告型別;批447 整對換;批554 評等第四道委由樞紐+第二道本文守衛真迴歸修;批558 周圍訊息區塊(補頁尾)+本文標題區+評等優先權換序)", newest("VRN_ENG073_ReportStructuredDB_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("金融機構疊加層十檢(批413 操作員裁決;批419f 正典缺席鍵不陪葬)", newest("VIA_FinancialInstitution_Overlay_v*.py", VIA / "supportive modules/ssot"), ["--selftest"], "rc0", 120)
     add("券商報告卡八檢(批241)", newest("CGC_MDL100_ReportCards_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
-    add("財報頁擷取三十一檢(批685 官方年度核對=歷史數據為主 + 加減除驗算,規則在 VRN_FieldRules_SSOT rules.financial.verify、引擎零影子規則;批241/403 三方對照;**批615 操作員裁定 VRN 正典=DuckDB**,故補的是正典表的欄位不是換儲存層:期間拆成 period_type/fiscal_year/fiscal_quarter(`1Q25` 季在前的寫法原本整欄被當非表頭丟掉)· 單位/幣別/倍率只認**頁面寫出來的宣告**,不由數值大小反推(庫裡 `revenue 5839` 原本沒有單位,百萬還是千元下游無從得知;既有 UNIT_SCALE 只能事後用比值猜)· 解不出就留 NULL 並在 *_src 說原文 · 遷移只增不減(舊列留 NULL=還沒重抽)· INSERT 改具名欄位(原本靠 dict 順序的位置參數,WORD 道多兩鍵=10 值塞 8 位的未爆彈);批425 --db 接線;批563 MOPS 列優先序——同鍵多列時「歸屬於母公司業主之權益」勝過「權益總計」,輸的那列不刪只標名次)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
+    add("財報頁擷取三十三檢(批687 多列取差最小/缺分兩類/FAIL 列直接印;批685 官方年度核對=歷史數據為主 + 加減除驗算,規則在 VRN_FieldRules_SSOT rules.financial.verify、引擎零影子規則;批241/403 三方對照;**批615 操作員裁定 VRN 正典=DuckDB**,故補的是正典表的欄位不是換儲存層:期間拆成 period_type/fiscal_year/fiscal_quarter(`1Q25` 季在前的寫法原本整欄被當非表頭丟掉)· 單位/幣別/倍率只認**頁面寫出來的宣告**,不由數值大小反推(庫裡 `revenue 5839` 原本沒有單位,百萬還是千元下游無從得知;既有 UNIT_SCALE 只能事後用比值猜)· 解不出就留 NULL 並在 *_src 說原文 · 遷移只增不減(舊列留 NULL=還沒重抽)· INSERT 改具名欄位(原本靠 dict 順序的位置參數,WORD 道多兩鍵=10 值塞 8 位的未爆彈);批425 --db 接線;批563 MOPS 列優先序——同鍵多列時「歸屬於母公司業主之權益」勝過「權益總計」,輸的那列不刪只標名次)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("共識增益橋十檢(批243)", newest("VDF_ENG067_ConsensusEnrichment_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("PS AST 修正引擎十檢(批244)", newest("CGC_MDL101_PSAstRepair_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("圖庫 SSOT 橋十檢(批247)", newest("VAP_ENG010_ChartLibrarySSOT_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 120)
@@ -2323,7 +2330,7 @@ def battery(fast: bool):
         newest("VRN_ENG082_ExtractionLogic_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 300)
     add("財務邏輯統轄橋九檢(批504;AllInOne 2.1.0 + FDS 28 欄掛載·第二意見·評等正典·政策因子·公式檢;零網路)",
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
-    add("三大報表擷取引擎八檢(批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
+    add("三大報表擷取引擎十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("Veritas 中央控管台二十二檢(批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)

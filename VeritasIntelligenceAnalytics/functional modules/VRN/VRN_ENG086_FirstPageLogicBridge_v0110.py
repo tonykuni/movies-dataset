@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0109→v0110(批680:把拒絕閘接到真正讀券商名的那扇門)。
-  批678 量到讀券商冊的活尾版 10/10 都沒走過拒絕閘;這一支是其中最關鍵的一個
-  ——中央規則樞紐 SUP_MDL749 的 broker_of() 其實是**委派**給本支的 safe_broker_ev()。
-  門裝在這裡,樞紐不必升版就一起過閘(而且 v0111 已被側線 PR #53 佔走,LL334)。
-  被拒回 (None, "拒絕:…"),不是靜默 None——查無與被拒是兩件事。
-
+v0109→v0110(批689B 操作員令「與總管系統 SSOT REGEX 同義字 上傳更新只增不減不衝突 整合好」)
+  CGC_MDL176 同義字聯集閘(批678)量到:讀券商冊的活尾版 10 支有 9 支**沒走過拒絕閘**,本支是其中一支——
+  而本支的 `_safe_broker_raw` 正是 SUP_MDL749.broker_of 委派的**唯一實作**,ENG073/ENG084/ENG080/ENG083 全經它。
+  v0110 把閘裝在實作那一處(L30 一個出處),四支消費者一起過閘:
+    ① 拒絕清單(操作員批413 令;名單只在 MDL176 那一本,本檔零字面):別名在 MDL176 baseline().deny 者**不算券商證據**(跳過,繼續比對其餘別名;冊零觸碰)
+    ② 正典鍵對映(KEY_ALIAS_RULINGS:MEGABANK→MEGA · DAIWA SECURITIES→DAIWA · J.P. MORGAN/JPMORGAN/JP→JPM · IBF→WATERLAND):回正典鍵,不再同一家兩個名
+    ③ MDL176 缺席=零回歸(閘空、對映空),`broker_gate_state()` 講得出缺席;二十二檢 +㉑㉒。
 v0107→v0108(批546 **更正**:收容件根本沒被改過,是 CRLF;批544/545 的診斷我錯了兩次)
 
   操作員照批545 印的診斷列了夾內檔案,結果只有一個檔:
@@ -137,91 +138,6 @@ VRN_ENG086_FirstPageLogicBridge v0100 — 第一頁邏輯補缺正主橋(批522 
 # 批679:依操作員令「刪中國券商」自 VRN_ENG086_FirstPageLogicBridge_v0108.py 升版——別名表移出陸券(首頁邏輯橋:別名表的 HAITONG / CICC / GF 三鍵移出)。
 #   舊版一個位元不動;刪掉的原文在 VIA_ChinaBrokerPurge_Ledger_v0100.json。
 from __future__ import annotations
-
-# ===== [VIA:DENY-GATE:v0100] 券商拒絕閘(批680;graceful 零行為變更) =====
-#   操作員批413 的拒絕清單(「大陸券商刪除」「去摩通」)原本只擋得住**走疊加層**那一條路;
-#   批678 量下去,讀券商冊的活尾版 10/10 都沒走過那扇門——拒絕清單立了、裁定留了,
-#   可是真正在讀研報券商名的這幾支從來沒經過它。這個區塊把門接上:
-#   解析出來的券商在**回傳之前**過一次閘,被拒就回空 + 因由,不是靜默放行。
-#
-#   名單**不在這裡**:它在疊加層的 `deny_keys`(L30 一個出處 / Zero-Hydra)。
-#   批679 我曾經在一支自測裡又抄了一份陸券名單,當場被陸券清除閘判成
-#   「還帶著活的陸券解析資料」——判得對,抄第二份名單就是第二顆會漂移的頭。
-#   疊加層缺席 / 讀不到 / 任何例外 → **原樣放行**(缺件不是壞掉,而且零行為變更)。
-def _via_deny_reason(*values) -> str:
-    """任何一個值在拒絕清單上就回一句因由;都不在(或疊加層缺席)回空字串。"""
-    fn = _VIA_DENY.get("fn", False)
-    if fn is False:
-        fn = None
-        try:
-            import glob as _g
-            import importlib.util as _iu
-            from pathlib import Path as _P
-            _p = _P(__file__).resolve()
-            while _p.parent != _p:
-                _d = _p / "supportive modules" / "ssot"
-                if _d.is_dir():
-                    _h = sorted(_g.glob(str(_d / "VIA_FinancialInstitution_Overlay_v*.py")))
-                    if _h:
-                        _s = _iu.spec_from_file_location("_via_ov_gate", _h[-1])
-                        _m = _iu.module_from_spec(_s)
-                        _s.loader.exec_module(_m)
-                        fn = getattr(_m, "deny_reason", None)
-                    break
-                _p = _p.parent
-        except Exception:
-            fn = None
-        _VIA_DENY["fn"] = fn
-    if not fn:
-        return ""
-    for v in values:
-        if not v:
-            continue
-        try:
-            why = fn(str(v))
-        except Exception:
-            return ""
-        if why:
-            return why
-    return ""
-
-
-_VIA_DENY: dict = {}
-
-
-def _via_deny_sample(n: int = 1) -> list:
-    """從**那一份名單本身**取樣,當拒絕閘正控的探針值。
-
-    批680 實錄(同一個錯的第三次):要證明閘會咬,就得餵它一個被拒的名字;
-    我三次都直接把「廣發」打進檢裡——而那就是又抄了一份名單,
-    陸券清除閘每次都當場把我判成「還帶著活的陸券解析資料」,三次都判得對。
-    **「不准出現 X」的檢,天生會把 X 抄進來。** 出路只有一條:探針值從名單當場取。
-    順帶好處:操作員哪天改了名單,這個正控會自動跟著改,不會變成釘住舊名單的殭屍。
-    """
-    fn = _VIA_DENY.get("keys", False)
-    if fn is False:
-        keys = []
-        try:
-            import glob as _g
-            import json as _js
-            from pathlib import Path as _P
-            _p = _P(__file__).resolve()
-            while _p.parent != _p:
-                _d = _p / "supportive modules" / "ssot"
-                if _d.is_dir():
-                    _h = sorted(_g.glob(str(_d / "VIA_FinancialInstitution_Overlay_v*.json")))
-                    if _h:
-                        keys = [str(x) for x in
-                                _js.loads(_P(_h[-1]).read_text(encoding="utf-8")).get("deny_keys", []) if x]
-                    break
-                _p = _p.parent
-        except Exception:
-            keys = []
-        _VIA_DENY["keys"] = keys
-        fn = keys
-    return list(fn)[:n]
-# ===== [VIA:DENY-GATE:END] =====
-
 
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
@@ -627,6 +543,58 @@ def nlp_normalize(text: str) -> str:
             out.append(ln)
     return "\n".join(out)
 
+# ═══ 批689B:券商拒絕閘 + 正典鍵對映(委派 CGC_MDL176;冊零觸碰;閘缺席=零回歸)═══
+_G176 = {"tried": False, "mod": None, "deny": set(), "rulings": {}, "why": "", "src": ""}
+
+
+def _gate176() -> dict:
+    """惰性載入 CGC_MDL176 尾版:拒絕清單(baseline().deny,已正規化)與正典鍵對映(KEY_ALIAS_RULINGS)。缺席=空集合+因由。"""
+    if _G176["tried"]:
+        return _G176
+    _G176["tried"] = True
+    try:
+        root = Path(__file__).resolve().parents[2]
+        hits = sorted((root / "supportive modules" / "registry").glob("CGC_MDL176_SynonymUnion_v*.py"))
+        if not hits:
+            _G176["why"] = "CGC_MDL176_SynonymUnion_v*.py 缺席(閘空=零回歸)"
+            return _G176
+        sp = importlib.util.spec_from_file_location("_mdl176_for_086", hits[-1])
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        base = m.baseline() if hasattr(m, "baseline") else {}
+        norm = getattr(m, "norm", lambda s: str(s).strip().lower())
+        _G176["deny"] = {norm(x) for x in (base.get("deny") or [])}
+        _G176["rulings"] = {str(k).upper(): (v[0] if isinstance(v, (tuple, list)) else str(v))
+                            for k, v in (getattr(m, "KEY_ALIAS_RULINGS", {}) or {}).items()}
+        _G176["mod"], _G176["src"] = m, hits[-1].name
+        _G176["why"] = f"閘在位 {hits[-1].name}(拒 {len(_G176['deny'])} · 正典鍵對映 {len(_G176['rulings'])})"
+    except Exception as exc:
+        _G176["why"] = f"CGC_MDL176 載入失敗 {type(exc).__name__}:{str(exc)[:60]}(閘空=零回歸)"
+    return _G176
+
+
+def _denied_alias(alias: str) -> bool:
+    g = _gate176()
+    if not g["deny"]:
+        return False
+    norm = getattr(g["mod"], "norm", None)
+    key = norm(alias) if norm else str(alias).strip().lower()
+    return key in g["deny"]
+
+
+def _canon_key(canon: str | None) -> str | None:
+    """正典鍵對映:別本冊的拼法(MEGABANK / J.P. MORGAN / IBF …)一律回正典鍵(MEGA / JPM / WATERLAND …)。"""
+    if not canon:
+        return canon
+    return _gate176()["rulings"].get(str(canon).upper(), canon)
+
+
+def broker_gate_state() -> dict:
+    g = _gate176()
+    return {"state": ("OK" if g["mod"] is not None else "ABSENT"), "deny": len(g["deny"]),
+            "rulings": len(g["rulings"]), "src": g["src"], "why": g["why"]}
+
+
 def _has_cjk(s: str) -> bool:
     return bool(re.search(r"[一-鿿]", s or ""))
 
@@ -698,11 +666,6 @@ def safe_broker_ev(text: str, E=None, allow_contacts: bool = False, veto: set | 
     veto=本報告標的公司名:別名若是標的公司名的一部分就不算券商證據(批537)。"""
     canon = _safe_broker_raw(text if allow_contacts else strip_contacts(text), E, veto)
     if canon:
-        # 批680:回傳之前過一次拒絕閘。被拒的機構**不是查無**,要講得出為什麼被拒
-        #   ——靜默回 None 會讓下一個人以為「冊上沒有這家」,然後跑去把它加回冊上。
-        why = _via_deny_reason(canon)
-        if why:
-            return None, "拒絕:" + why
         return canon, ("電郵網域(弱)" if allow_contacts else "文內")
     return None, "無"
 
@@ -727,6 +690,8 @@ def _safe_broker_raw(text: str, E=None, veto: set | None = None) -> str | None:
             al = a.lower().strip()
             if not al or any(al in v for v in vetol):      # 批537:別名是標的公司名的一部分 → 不算券商證據
                 continue
+            if _denied_alias(a):                           # 批689B:拒絕清單(操作員令)的別名不算券商證據;冊零觸碰
+                continue
             hit = False
             if _has_cjk(al):
                 hit = al in text
@@ -738,7 +703,7 @@ def _safe_broker_raw(text: str, E=None, veto: set | None = None) -> str | None:
                 hit = re.search(r"(?<![a-z])" + re.escape(al) + r"(?![a-z])", low) is not None
             if hit and (best is None or len(al) > best[1]):
                 best = (canon, len(al))
-    return best[0] if best else None
+    return _canon_key(best[0]) if best else None          # 批689B:回正典鍵(同一家不再兩個名)
 
 
 def safe_rating(text: str, E=None) -> dict:
@@ -1452,7 +1417,7 @@ def selftest() -> int:
     E, why = load_intake()
     chk("② importlib 載入收容件:TickerFilename/BrokerRatingDict/FieldValidation/CrossValidation/FinancialValidation/FirstPageEngine 齊", E is not None, why)
     if E is None:
-        print(f"  [計] 廿二檢 OK {22 - len(fails) - 20} · FAIL {len(fails) + 20}(收容件缺,後二十檢略)")
+        print(f"  [計] 二十二檢 OK {22 - len(fails) - 20} · FAIL {len(fails) + 20}(收容件缺,後二十檢略)")
         return 1
     tf = make_tf(E, {"3706", "2330", "6873"}, {"台積電": "2330", "神達": "3706", "泓德能源": "6873"})
     fn1 = "【國泰證期研究部】神達(3706 TT)-初次評等買進(+30.4_)-大顯神威，營運騰達-20250822.pdf"
@@ -1601,35 +1566,35 @@ def selftest() -> int:
         not _extra,
         f"(夾內 {len(_files)} 個 · 冊上 {len(_reg)} 個"
         + (f" · **多出來** {'、'.join(_extra)} ← 未追蹤的話請自行挪走" if _extra else " · 零多餘") + ")")
-    # ── 批680:拒絕閘。今天它是**備援**——批679 把冊清乾淨之後,被拒的機構
-    #   根本解不出來,所以閘在真跑裡一次都不會觸發。一個永遠不觸發的閘等於沒有閘(LL89),
-    #   所以這裡用**正控**當場證明它咬得住:把解析器假裝成「冊上還有那個被拒的機構」,
-    #   要求回 (None, "拒絕:…") 而不是把它放行;同時要求合法券商原樣通過。
-    #   探針值**從名單當場取**,不打字進來——打進來就是又抄了一份名單(批680 我犯了三次)。
-    _probe = (_via_deny_sample(1) or [""])[0]
-    _raw_bak = globals()["_safe_broker_raw"]
+    # ㉑ 批689B:拒絕清單的別名不算券商證據(廣發證券/中信證券/摩通=操作員令拒);其餘照常(凱基→KGI);冊零觸碰
+    _g86 = broker_gate_state()
+    # 拒絕清單的詞**只從閘上取**,本檔零字面(陸券清除實跑驗收:活尾版不得帶陸券解析資料);
+    # 用合成別名表把閘的判斷隔離出來驗:同一個被拒別名掛在假正典下 → 不算證據 → None;沒被拒的別名 → 照常
+    _dn = sorted(x for x in _gate176()["deny"] if _has_cjk(x))
+    _keep_bt = globals()["broker_tables"]
     try:
-        globals()["_safe_broker_raw"] = lambda *a, **k: _probe
-        _den = safe_broker_ev("合成文字")
-        globals()["_safe_broker_raw"] = lambda *a, **k: "YUANTA"
-        _pas = safe_broker_ev("合成文字")
+        globals()["broker_tables"] = lambda E=None: {"FAKE_X": list(_dn[:2]), "KGI": ["凱基", "凱基證券"]}
+        _d1 = _safe_broker_raw(f"{_dn[0]} 研究報告 台積電 買進", E) if _dn else "閘空"
+        _d2 = _safe_broker_raw(f"{_dn[1]} 維持買進 目標價 1300 元", E) if len(_dn) > 1 else "閘空"
+        _k1 = _safe_broker_raw("凱基證券 研究報告 台積電 買進", E)
     finally:
-        globals()["_safe_broker_raw"] = _raw_bak
-    chk("⑳ 拒絕閘正控:解出被拒機構**一定要被擋下來並講得出因由**(查無與被拒是兩件事);"
-        "合法券商原樣通過。名單在疊加層 deny_keys,不在本檔(L30);疊加層缺席=原樣放行",
-        bool(_probe) and _den[0] is None and "拒絕" in str(_den[1]) and _pas == ("YUANTA", "文內"),
-        f"(探針取自名單第一條 · 被拒→{_den[1]} · YUANTA→{_pas})")
-    chk("㉑ 拒絕閘讀得到操作員那一份名單(讀不到就誠實說讀不到,不假裝有擋)",
-        bool(_probe) and bool(_via_deny_reason(_probe)) and not _via_deny_reason("元大"),
-        f"(名單 {len(_via_deny_sample(99))} 條 · 第一條→擋 · 元大→放行)")
-    print(f"  [計] 廿二檢 OK {22 - len(fails)} · FAIL {len(fails)}")
+        globals()["broker_tables"] = _keep_bt
+    chk("㉑ 券商拒絕閘(CGC_MDL176 拒絕清單先行;操作員批413 令):被拒別名(從閘上取,本檔零字面;合成別名表隔離驗)不算券商證據 → None;凱基 → KGI;閘在位且冊零觸碰",
+        _g86["state"] == "OK" and _g86["deny"] >= 10 and _d1 is None and _d2 is None and _k1 == "KGI",
+        f"(閘 {_g86['state']} 拒 {_g86['deny']} · 被拒別名 {len(_dn)} 個 CJK 試兩個={_d1}/{_d2} · 凱基={_k1})")
+    # ㉒ 正典鍵對映:別本冊的拼法回正典鍵(不再同一家兩個名);沒對映的原樣
+    chk("㉒ 正典鍵對映(KEY_ALIAS_RULINGS):MEGABANK→MEGA · J.P. MORGAN→JPM · IBF→WATERLAND · KGI→KGI(原樣)",
+        _canon_key("MEGABANK") == "MEGA" and _canon_key("J.P. MORGAN") == "JPM" and _canon_key("IBF") == "WATERLAND"
+        and _canon_key("KGI") == "KGI" and _canon_key(None) is None,
+        f"(對映 {_g86['rulings']} 條)")
+    print(f"  [計] 二十二檢 OK {22 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0107)· 二十檢自測(零網路;收容件 FirstPageEngine v0101 _b522)===")
+        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0110)· 二十二檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
         return selftest()
     verb = args[0] if args and not args[0].startswith("--") else "status"
     if verb == "status":

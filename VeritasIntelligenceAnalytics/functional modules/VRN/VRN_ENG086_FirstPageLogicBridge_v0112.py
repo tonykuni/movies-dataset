@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0109→v0110(批680:把拒絕閘接到真正讀券商名的那扇門)。
-  批678 量到讀券商冊的活尾版 10/10 都沒走過拒絕閘;這一支是其中最關鍵的一個
-  ——中央規則樞紐 SUP_MDL749 的 broker_of() 其實是**委派**給本支的 safe_broker_ev()。
-  門裝在這裡,樞紐不必升版就一起過閘(而且 v0111 已被側線 PR #53 佔走,LL334)。
-  被拒回 (None, "拒絕:…"),不是靜默 None——查無與被拒是兩件事。
-
+v0109→v0110(批689B 操作員令「與總管系統 SSOT REGEX 同義字 上傳更新只增不減不衝突 整合好」)
+  CGC_MDL176 同義字聯集閘(批678)量到:讀券商冊的活尾版 10 支有 9 支**沒走過拒絕閘**,本支是其中一支——
+  而本支的 `_safe_broker_raw` 正是 SUP_MDL749.broker_of 委派的**唯一實作**,ENG073/ENG084/ENG080/ENG083 全經它。
+  v0110 把閘裝在實作那一處(L30 一個出處),四支消費者一起過閘:
+    ① 拒絕清單(操作員批413 令;名單只在 MDL176 那一本,本檔零字面):別名在 MDL176 baseline().deny 者**不算券商證據**(跳過,繼續比對其餘別名;冊零觸碰)
+    ② 正典鍵對映(KEY_ALIAS_RULINGS:MEGABANK→MEGA · DAIWA SECURITIES→DAIWA · J.P. MORGAN/JPMORGAN/JP→JPM · IBF→WATERLAND):回正典鍵,不再同一家兩個名
+    ③ MDL176 缺席=零回歸(閘空、對映空),`broker_gate_state()` 講得出缺席;二十二檢 +㉑㉒。
 v0107→v0108(批546 **更正**:收容件根本沒被改過,是 CRLF;批544/545 的診斷我錯了兩次)
 
   操作員照批545 印的診斷列了夾內檔案,結果只有一個檔:
@@ -135,15 +136,479 @@ VRN_ENG086_FirstPageLogicBridge v0100 — 第一頁邏輯補缺正主橋(批522 
 用法:python3 VRN_ENG086_FirstPageLogicBridge_v0104.py [status|gap|bench [--limit N]|corpus [--limit N]|enrich [--in DIR] [--out DIR] [--limit N]] | --selftest
 """
 
-# 批681(v0110→v0111):拒絕閘從「正典名這一層」下到「文字這一層」。
-#   Codex 在 PR #59 照出 P1:文內寫「中信證券」時,最長別名優先先命中合法的「中信」
-#   → 回 CTBC,一個被拒的陸券被記成台灣的中國信託。驗過是真的,而且更廣:
-#   「國泰君安」→CATHAY、「海通證券」→查無(不是拒絕)。根因同一個——
-#   閘看的是**解出來的正典名**,看不到命中的是哪一個別名,更看不到文字裡有什麼。
-#   修法:把拒絕清單當成候選別名丟進**同一把**最長優先尺(_via_deny_in_text)。
+# 批686b(main v0110 ⊎ 本線 v0111 → v0112):兩條線**各自獨立做了同一個拒絕閘**,
+#   而且各有對方沒有的東西,所以取聯集,不是二選一(LL334 最深的一次):
+#     批689B(main v0110)  閘跳過被拒的**別名**(_denied_alias → continue),四支消費者一起過;
+#                          外加 _canon_key() 正典鍵對映(同一家不再兩個名)——本線沒有。
+#     批680/680b(本線 v0111) 閘下到**文字這一層**,_safe_broker_hit 多回命中的別名——側線沒有。
+#   決定性的一點:**他們那一版有跟批680 完全相同的洞**——被拒的名字不在冊上時
+#   (批679 已清),較短的合法別名照樣命中(Codex 在 PR #59 照出)。所以文字層不可省。
+#   名單仍是**一個出處**:_via_deny_sample 先問 _gate176()(批689B 的讀取器),缺席才退疊加層。
+#   二十二 → 二十六檢(他們的 ㉑㉒ 一個字都沒改)。
 # 批679:依操作員令「刪中國券商」自 VRN_ENG086_FirstPageLogicBridge_v0108.py 升版——別名表移出陸券(首頁邏輯橋:別名表的 HAITONG / CICC / GF 三鍵移出)。
 #   舊版一個位元不動;刪掉的原文在 VIA_ChinaBrokerPurge_Ledger_v0100.json。
 from __future__ import annotations
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+
+import datetime as _dt
+import hashlib
+import importlib.util
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+VIA = HERE.parent.parent
+INTAKE_ROOT = HERE / "references" / "intake"
+INTAKE_GLOB = "VIA_VRN_FirstPageEngine_v*_b*"
+ENGINE_GLOB = "VIA_VRN_FirstPageEngine*.py"
+FP_OUT = VIA / "VIA_Reports" / "first_page_text"       # ENG072 sidecar(只讀)
+OUT = VIA / "VIA_Reports" / "first_page_logic"         # 本橋產物(append-only)
+BASICINFO = HERE / "StockReportBasicInfo.json"
+OLD_DB = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb"
+
+EXTRA_BROKER = {
+    "MEGA": ["兆豐", "mega securities", "mega sec"], "CATHAY": ["國泰證期", "國泰證券", "國泰投顧", "cathay securities", "cathay sec"],
+    "SINOPAC": ["永豐", "sinopac"], "ESUN": ["玉山", "e.sun", "esun"], "MASTERLINK": ["元富", "masterlink"],
+    "HUANAN": ["華南永昌", "華南", "hua nan"], "JIHSUN": ["日盛", "jih sun", "jihsun"], "CONCORD": ["康和", "concord securities"],
+    "HONGYUAN": ["宏遠", "hong yuan"], "TAISHIN": ["台新", "taishin"], "FIRSTSEC": ["第一金", "first securities"],
+    "TCB": ["合庫", "合作金庫"], "SKS": ["新光", "shin kong"], "IBF": ["國票", "ibf securities"], "ORIENTAL": ["亞東", "oriental securities"],
+    "DACHANG": ["大昌", "ta chang"], "FUBANG": ["福邦"], "TACHING": ["德信"],
+    "HSBC": ["匯豐", "hsbc"], "BNP": ["法巴", "bnp paribas", "bnp"], "CREDITSUISSE": ["瑞信", "credit suisse"], "BARCLAYS": ["巴克萊", "barclays"],
+    "JEFFERIES": ["jefferies"],   "MIZUHO": ["瑞穗", "mizuho"], "NIKKO": ["日興", "smbc nikko", "nikko"],
+    "BERNSTEIN": ["bernstein"], "JPMORGAN": ["jp", "小摩"], "MORGANSTANLEY": ["大摩"], "CLSA": ["clst", "clsa", "里昂"],  "KGI": ["凱基投顧", "凱基證券"], "CAPITAL": ["群益投顧", "群益證券"], "PRESIDENT": ["統一投顧", "統一證券"], "CTBC": ["中信投顧", ],
+}
+GENERIC_LATIN = {"capital", "president", "first", "oriental", "concord", "mega", "add"}     # 泛用英文字:要跟 securities/invest 才算券商
+_RATING_CUE = re.compile(  # 批536:線索詞與評等之間容得下「調降至/調升至/維持/由X至」
+    r"(投資評等|評等|評級|建議|Rating|Recommendation|Rec\.)[^\n]{0,8}?[:：]?\s*"
+    r"(強力買進|買進|加碼|逢低|中立|持有|區間|賣出|減碼|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)", re.I)
+_TP_CUES = (re.compile(r"目標價[^\d]{0,14}?(\d[\d,]*\.?\d*)"),
+            re.compile(r"(?<![A-Za-z])(?:(?i:target\s*price|price\s*target)|TP|PT)(?![A-Za-z])\s*[:：]?\s*(?:\(?NT\$?\)?|NTD|TWD)?\s*\$?\s*(\d[\d,]*\.?\d*)"))
+
+
+# ---------------------------------------------------------------- 收容件
+def intake_home() -> Path | None:
+    hits = sorted(p for p in INTAKE_ROOT.glob(INTAKE_GLOB) if p.is_dir())
+    return hits[-1] if hits else None
+
+
+def _eol_pair(b: bytes) -> tuple:
+    """批546:回 (原始 md5, LF 正規化後 md5)。位元錨要抓的是「內容被換掉」,
+    不是「git 在 Windows 上把 LF 換成 CRLF」——後者是平台行為,不是汙染。"""
+    lf = b.replace(b"\r\n", b"\n")
+    return hashlib.md5(b).hexdigest(), hashlib.md5(lf).hexdigest()
+
+
+def eol_verdict(b: bytes, want_md5: str, want_bytes: int | None = None) -> tuple:
+    """回 (ok, 說法)。三態:位元一致 / 只差行尾(照樣算對) / 內容真的不同(RED)。"""
+    raw, lf = _eol_pair(b)
+    if raw == want_md5:
+        return True, f"md5 {raw[:8]}=錨 · {len(b)}B"
+    if lf == want_md5 or (want_bytes and len(b.replace(b"\r\n", b"\n")) == want_bytes and lf == want_md5):
+        return True, (f"md5 {raw[:8]}≠錨,但**只差行尾**(CRLF;LF 正規化後 {lf[:8]}=錨)"
+                      f" · {len(b)}B vs 錨 {want_bytes}B —— 內容一位元沒變,是 core.autocrlf 幹的")
+    return False, f"md5 {raw[:8]}≠錨 {want_md5[:8]}(LF 正規化後 {lf[:8]} 也不符=內容真的不同)· {len(b)}B"
+
+
+def intake_files(home: Path | None = None) -> list:
+    """批545:收容件夾裡**每一個**同系列檔都列出來(檔名 · 位元 · md5)。
+    多一個不在冊上的檔就會當場現形——不必再從一句 md5 去猜是哪個檔被算到。"""
+    home = home or intake_home()
+    if home is None:
+        return []
+    out = []
+    for f in sorted(home.glob(ENGINE_GLOB)):
+        try:
+            b = f.read_bytes()
+            out.append({"name": f.name, "bytes": len(b), "md5": hashlib.md5(b).hexdigest()})
+        except Exception as exc:
+            out.append({"name": f.name, "bytes": None, "md5": f"讀不了 {type(exc).__name__}"})
+    return out
+
+
+def intake_engine_file(home: Path | None = None) -> Path | None:
+    """批545:**按冊上點名的檔名取**,不再吃 glob 排序。
+    舊寫法 `sorted(glob)[-1]` 有洞:夾裡多一個排在後面的同系列檔(`_3.py`/`_v0101.py`…),
+    它就自動變成「正典」,而那種檔多半未追蹤,git checkout 還救不回來。
+    錨檔不在時才退回 glob 尾版(維持舊行為,但會在 ① 誠實講出來)。"""
+    home = home or intake_home()
+    if home is None:
+        return None
+    named = home / INTAKE_ANCHOR["name"]
+    if named.is_file():
+        return named
+    fs = sorted(home.glob(ENGINE_GLOB))
+    return fs[-1] if fs else None
+
+
+def intake_md5_ok(home: Path | None = None) -> tuple[bool, str]:
+    home = home or intake_home()
+    if home is None:
+        return False, "收容件缺"
+    mans = sorted(home.glob("_INTAKE_MANIFEST_*.json"))
+    f = intake_engine_file(home)
+    if not mans or f is None:
+        return False, "冊或引擎檔缺"
+    try:
+        m = json.loads(mans[-1].read_text(encoding="utf-8"))
+        e = next((x for x in m.get("files", []) if x.get("name") == f.name), None)
+        if not e:
+            return False, f"冊上沒有 {f.name}"
+        return eol_verdict(f.read_bytes(), e.get("md5") or "", e.get("bytes"))   # 批546 行尾無關
+    except Exception as exc:
+        return False, f"冊讀不了 {type(exc).__name__}"
+
+
+# 批541 位元錨:期望值寫死在**程式碼裡**,不是只寫在收容件資料夾的冊裡。
+# 冊跟檔案一起被換掉時,兩邊仍然自洽——那種綠燈只是自己對自己點頭(LL74)。錨放在外面才擋得住。
+INTAKE_ANCHOR = {
+    "name": "VIA_VRN_FirstPageEngine_2.py",
+    "bytes": 30115,
+    "md5": "d4cdaedf949d78d062a12c0a779b2fb0",
+    "sha256": "05029fc07d6679b5ca5d55e351610a7c812eaef755cc59900dc716060699b906",
+    # 冊上 `modules` 宣告的 11 項,對到模組裡真正的物件名(SSOT loader 是函式不是類別)
+    "symbols": ("load_ssot_blocks", "TickerFilename", "Layout", "TableGeometry", "NLPRepair",
+                "FinancialValidation", "PriceAdjustment", "BrokerRatingDict", "FieldValidation",
+                "CrossValidation", "FirstPageEngine"),
+    "batch": "批522 導入;批541 加錨",
+}
+
+
+INTAKE_REL = "functional modules/VRN/references/intake/VIA_VRN_FirstPageEngine_v0101_b522/VIA_VRN_FirstPageEngine_2.py"
+
+
+def intake_restore_hint(r: dict) -> str:
+    """批544:收容件對不上錨時,直接給還原指令——紅燈要能自救,不是丟兩串 md5 給人猜。
+    倉庫裡那份就是錨本身,所以 git checkout 一行就回得來;**本支不代改任何檔**(不代設)。"""
+    if "\u2260" not in str(r.get("anchor", "")):
+        return ""
+    files = intake_files()
+    extra = [x for x in files if x["name"] != INTAKE_ANCHOR["name"]]
+    lines = ["\n     \u6536\u5bb9\u4ef6\u593e\u88e1\u7684\u540c\u7cfb\u5217\u6a94(\u5168\u5217;\u518a\u4e0a\u53ea\u8a8d "
+             + INTAKE_ANCHOR["name"] + "):"]
+    for x in files:
+        mark = "\u2190 \u518a\u4e0a\u9019\u4e00\u500b" if x["name"] == INTAKE_ANCHOR["name"] else "\u2190 \u4e0d\u5728\u518a\u4e0a"
+        lines.append(f"       {x['name']:<40} {x['bytes']}B  {str(x['md5'])[:8]}  {mark}")
+    if extra:
+        lines.append("     \u21b3 \u6551\u6cd5\u4e00(\u4f60\u7684\u624b):\u4e0a\u9762\u6a19\u300c\u4e0d\u5728\u518a\u4e0a\u300d\u7684\u6a94\u662f\u5f8c\u4f86\u653e\u9032\u53bb\u7684,"
+                     "git checkout \u6551\u4e0d\u4e86(\u5b83\u672a\u8ffd\u8e64)\u3002\u8acb\u81ea\u884c\u632a\u8d70\u6216\u522a\u9664\u3002")
+    return "\n".join(lines) + ("\n     \u21b3 \u6551\u6cd5(\u4f60\u7684\u624b,\u4e00\u884c):git checkout -- \"" + INTAKE_REL + "\"\n"
+            "       \u5009\u5eab\u88e1\u90a3\u4efd\u5c31\u662f\u9328(30,115B / d4cdaedf);\u5de5\u4f5c\u7ad9\u9019\u4efd\u88ab\u5c31\u5730\u6539\u904e\u3002\n"
+            "       \u6539\u5b8c\u518d\u8dd1\u4e00\u6b21\u672c\u81ea\u6e2c;\u4ecd\u4e0d\u7b26\u5c31\u628a git status \u90a3\u4e00\u884c\u8cbc\u51fa\u4f86\u3002")
+
+
+def intake_import_ok(home: Path | None = None) -> tuple[bool, dict]:
+    """收容件**導入**驗證(不是「檔案在不在」,是「導得進來、東西都在」)。三段全過才算成立。
+
+    ① 位元錨:檔案 md5/sha256/bytes == 程式碼裡的錨,且錨 == 冊裡的值(三方一致)。
+    ② 真 import:exec_module 真的跑完(不是 importlib.util.find_spec 那種「看得到就算」)。
+    ③ 模組齊全:冊上宣告的 11 項一個不少。
+    回 (ok, 明細);任何一段掛掉都誠實說是哪一段,不含混成一句「收容件有問題」。
+    """
+    A = INTAKE_ANCHOR
+    r = {"anchor": None, "manifest": None, "import": None, "symbols": None, "missing": []}
+    home = home or intake_home()
+    f = intake_engine_file(home) if home is not None else None
+    if f is None:
+        r["anchor"] = "ABSENT:收容件缺"
+        return False, r
+    b = f.read_bytes()
+    md5 = hashlib.md5(b).hexdigest()
+    sha = hashlib.sha256(b).hexdigest()
+    ok_anchor, why_anchor = eol_verdict(b, A["md5"], A["bytes"])      # 批546 行尾無關
+    ok_anchor = ok_anchor and f.name == A["name"]
+    r["anchor"] = why_anchor if f.name == A["name"] else f"檔名不符:{f.name} ≠ 冊上的 {A['name']}"
+    # 冊也要跟錨一致——冊被改寫的那一刻,這裡就會亮
+    ok_man = False
+    mans = sorted(home.glob("_INTAKE_MANIFEST_*.json"))
+    if mans:
+        try:
+            m = json.loads(mans[-1].read_text(encoding="utf-8"))
+            e = next((x for x in m.get("files", []) if x.get("name") == A["name"]), None)
+            ok_man = bool(e) and e.get("md5") == A["md5"] and e.get("sha256") == A["sha256"] and e.get("bytes") == A["bytes"]
+            r["manifest"] = f"{mans[-1].name} {'=' if ok_man else '≠'}錨"
+        except Exception as exc:
+            r["manifest"] = f"冊讀不了 {type(exc).__name__}"
+    else:
+        r["manifest"] = "冊缺"
+    mod, why = load_intake()
+    ok_imp = mod is not None
+    r["import"] = why if ok_imp else f"載不動:{why}"
+    if ok_imp:
+        r["missing"] = [k for k in A["symbols"] if not hasattr(mod, k)]
+        r["symbols"] = f"{len(A['symbols']) - len(r['missing'])}/{len(A['symbols'])}"
+    ok_sym = ok_imp and not r["missing"]
+    return (ok_anchor and ok_man and ok_sym), r
+
+
+_E = {"mod": None, "why": ""}
+
+
+def load_intake():
+    """收容件模組(importlib;零觸碰);缺=None+因由。"""
+    if _E["mod"] is not None or _E["why"]:
+        return _E["mod"], _E["why"]
+    f = intake_engine_file()
+    if f is None:
+        _E["why"] = f"收容件缺:{INTAKE_ROOT / INTAKE_GLOB}"
+        return None, _E["why"]
+    try:
+        spec = importlib.util.spec_from_file_location("via_vrn_firstpage_intake", f)
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["via_vrn_firstpage_intake"] = m
+        spec.loader.exec_module(m)
+        for need in ("TickerFilename", "BrokerRatingDict", "FieldValidation", "CrossValidation", "FinancialValidation", "FirstPageEngine"):
+            if not hasattr(m, need):
+                _E["why"] = f"收容件無 {need}"
+                return None, _E["why"]
+        _E["mod"] = m
+        return m, ""
+    except Exception as exc:
+        _E["why"] = f"收容件載入失敗 {type(exc).__name__}:{str(exc)[:60]}"
+        return None, _E["why"]
+
+
+# ---------------------------------------------------------------- 名冊(VDF tw_listings 唯讀)
+def resolve_vdf_db() -> tuple[Path | None, str]:
+    p = os.environ.get("VIA_DB_VDF_TW_MARKET")
+    if p and Path(p).is_file():
+        return Path(p), "VIA_DB_VDF_TW_MARKET"
+    home = os.environ.get("VIA_DATA_HOME")
+    if home and Path(home).is_dir():
+        hits = sorted(Path(home).rglob("vdf_tw_market.duckdb"))
+        if hits:
+            return hits[0], "VIA_DATA_HOME rglob"
+    if OLD_DB.is_file():
+        return OLD_DB, "舊主路徑 output_hub/mega"
+    return None, "庫缺(先 via-vdffetch / via-datahome)"
+
+
+_R = {"tried": False, "codes": set(), "names": {}, "how": ""}
+
+
+def roster() -> dict:
+    """official_set(四碼)+ 名→碼;庫缺/表缺=空集誠實(命中率打折並標明)。"""
+    if _R["tried"]:
+        return _R
+    _R["tried"] = True
+    db, how = resolve_vdf_db()
+    _R["how"] = how
+    if db is None:
+        return _R
+    try:
+        import duckdb
+        con = duckdb.connect(str(db), read_only=True)
+        try:
+            rows = con.execute("SELECT code, name FROM tw_listings WHERE code IS NOT NULL").fetchall()
+        finally:
+            con.close()
+        for code, name in rows:
+            c = str(code).strip()
+            if len(c) == 4 and c.isdigit():
+                _R["codes"].add(c)
+                n = str(name or "").strip()
+                if len(n) >= 2:
+                    _R["names"][n] = c
+        _R["how"] = f"{how} · tw_listings {len(_R['codes'])} 檔"
+    except Exception as exc:
+        _R["how"] = f"{how} · tw_listings 讀不了 {type(exc).__name__}"
+    return _R
+
+
+# ---------------------------------------------------------------- 橋側防呆
+
+# ── 批536:三件正主工具(操作員令「用同義字抓 SSOT/檔名拆解 · NLP 工具 · LAYOUT 工具」)
+BROKER_SSOT = VIA / "functional modules" / "VRN" / "registry" / "VRN_BROKER_LIST_v01.json"
+_SSOT = {"tried": False, "table": {}, "how": ""}
+
+
+def ssot_brokers() -> tuple[dict, str]:
+    """券商同義字**正本**=VRN_BROKER_LIST(SUP_MDL015 管的那本;20 家含完整別名)。
+    canonical 用 canonical_en(英文代號),同時收中文 canonical 當別名。缺=空表誠實。"""
+    if _SSOT["tried"]:
+        return _SSOT["table"], _SSOT["how"]
+    _SSOT["tried"] = True
+    if not BROKER_SSOT.is_file():
+        _SSOT["how"] = f"SSOT 缺:{BROKER_SSOT.name}"
+        return {}, _SSOT["how"]
+    try:
+        d = json.loads(BROKER_SSOT.read_text(encoding="utf-8"))
+        rows = d.get("brokers") or d.get("items") or (d if isinstance(d, list) else [])
+        if not rows:
+            rows = [v for k, v in d.items() if isinstance(v, dict) and v.get("aliases")]
+        tbl = {}
+        for b in rows:
+            key = str(b.get("canonical_en") or b.get("canonical") or "").upper().replace(" ", "")
+            if not key:
+                continue
+            al = [str(x) for x in (b.get("aliases") or []) if str(x).strip()]
+            for extra in (b.get("canonical"), b.get("canonical_en")):
+                if extra and str(extra) not in al:
+                    al.append(str(extra))
+            tbl[key] = al
+        _SSOT.update(table=tbl, how=f"{BROKER_SSOT.name} · {len(tbl)} 家 · {sum(len(v) for v in tbl.values())} 別名")
+    except Exception as exc:                                  # noqa: BLE001
+        _SSOT["how"] = f"SSOT 讀不了 {type(exc).__name__}"
+    return _SSOT["table"], _SSOT["how"]
+
+
+_LAYOUT = {"tried": False, "idx": {}, "how": ""}
+
+
+def layout_index() -> tuple[dict, str]:
+    """LAYOUT 工具:收容件 02_layout/logical_layout.json(唯讀)→ {原檔名: {header, body}}。
+    有版面就用版面,沒有才退回「前 N 行當資訊區」(不編造分區)。"""
+    if _LAYOUT["tried"]:
+        return _LAYOUT["idx"], _LAYOUT["how"]
+    _LAYOUT["tried"] = True
+    home = corpus_home()
+    if home is None:
+        _LAYOUT["how"] = "語料收容件缺"
+        return {}, _LAYOUT["how"]
+    lay = home.parent.parent / "02_layout" / "logical_layout.json"
+    if not lay.is_file():
+        _LAYOUT["how"] = "logical_layout.json 缺(退回行數啟發)"
+        return {}, _LAYOUT["how"]
+    try:
+        d = json.loads(lay.read_text(encoding="utf-8"))
+        idx: dict = {}
+        for e in d.get("elements", []):
+            fn = str(e.get("filename") or "")
+            if not fn:
+                continue
+            sub = str(e.get("subtype") or "").upper()
+            txt = str(e.get("text") or "")
+            slot = "header" if sub in ("TITLE", "HEADER", "HEAD", "SUBTITLE") else "body"
+            idx.setdefault(fn, {"header": [], "body": []})[slot].append(txt)
+        _LAYOUT.update(idx={k: {"header": "\n".join(v["header"]), "body": "\n".join(v["body"])} for k, v in idx.items()},
+                       how=f"logical_layout.json · {len(idx)} 檔 · {d.get('element_count')} 元素")
+    except Exception as exc:                                  # noqa: BLE001
+        _LAYOUT["how"] = f"layout 讀不了 {type(exc).__name__}"
+    return _LAYOUT["idx"], _LAYOUT["how"]
+
+
+_NLPH = {"tried": False, "mod": None, "how": ""}
+
+
+def nlp_hub():
+    """NLP 工具:VRN_ENG066 樞紐(normalize 正主);缺=None 誠實(不自己寫轉換表)。"""
+    if _NLPH["tried"]:
+        return _NLPH["mod"], _NLPH["how"]
+    _NLPH["tried"] = True
+    try:
+        c = sorted(HERE.glob("VRN_ENG066_NLPSupportHub_v*.py"))
+        if not c:
+            _NLPH["how"] = "ENG066 缺席"
+            return None, _NLPH["how"]
+        spec = importlib.util.spec_from_file_location("eng066_for_086", c[-1])
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["eng066_for_086"] = m
+        spec.loader.exec_module(m)
+        if not hasattr(m, "normalize"):
+            _NLPH["how"] = f"{c[-1].name} 無 normalize"
+            return None, _NLPH["how"]
+        try:
+            probe = m.normalize("报告营收")
+            ok = "報告" in probe and "營收" in probe
+        except Exception:
+            ok = False
+        _NLPH.update(mod=m, how=f"{c[-1].name} · 簡繁轉換{'可' if ok else '不可(本境無 opencc;直通)'}")
+    except Exception as exc:                                  # noqa: BLE001
+        _NLPH["how"] = f"ENG066 載入失敗 {type(exc).__name__}"
+    return _NLPH["mod"], _NLPH["how"]
+
+
+def nlp_normalize(text: str) -> str:
+    """過 ENG066 樞紐做簡→繁與全形正規化。**逐行**做:樞紐的 normalize 會把換行吃掉
+    (ENG064 normalizer 的 preserve_newlines=False),行結構一沒,逐行判準(標題行/獨立短行評等)就全失效——
+    批536 實測:整段丟進去,評等由 33/38 掉到 29/38。缺樞紐=原樣回傳(誠實)。"""
+    m, _ = nlp_hub()
+    if m is None or not text:
+        return text
+    out = []
+    for ln in text.splitlines():
+        if not ln.strip():
+            out.append(ln)
+            continue
+        try:
+            out.append(m.normalize(ln) or ln)
+        except Exception:
+            out.append(ln)
+    return "\n".join(out)
+
+# ═══ 批689B:券商拒絕閘 + 正典鍵對映(委派 CGC_MDL176;冊零觸碰;閘缺席=零回歸)═══
+_G176 = {"tried": False, "mod": None, "deny": set(), "rulings": {}, "why": "", "src": ""}
+
+
+def _gate176() -> dict:
+    """惰性載入 CGC_MDL176 尾版:拒絕清單(baseline().deny,已正規化)與正典鍵對映(KEY_ALIAS_RULINGS)。缺席=空集合+因由。"""
+    if _G176["tried"]:
+        return _G176
+    _G176["tried"] = True
+    try:
+        root = Path(__file__).resolve().parents[2]
+        hits = sorted((root / "supportive modules" / "registry").glob("CGC_MDL176_SynonymUnion_v*.py"))
+        if not hits:
+            _G176["why"] = "CGC_MDL176_SynonymUnion_v*.py 缺席(閘空=零回歸)"
+            return _G176
+        sp = importlib.util.spec_from_file_location("_mdl176_for_086", hits[-1])
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        base = m.baseline() if hasattr(m, "baseline") else {}
+        norm = getattr(m, "norm", lambda s: str(s).strip().lower())
+        _G176["deny"] = {norm(x) for x in (base.get("deny") or [])}
+        _G176["deny_raw"] = [str(x) for x in (base.get("deny_raw") or []) if str(x).strip()]  # 批686b:文字尺要原文
+        _G176["rulings"] = {str(k).upper(): (v[0] if isinstance(v, (tuple, list)) else str(v))
+                            for k, v in (getattr(m, "KEY_ALIAS_RULINGS", {}) or {}).items()}
+        _G176["mod"], _G176["src"] = m, hits[-1].name
+        _G176["why"] = f"閘在位 {hits[-1].name}(拒 {len(_G176['deny'])} · 正典鍵對映 {len(_G176['rulings'])})"
+    except Exception as exc:
+        _G176["why"] = f"CGC_MDL176 載入失敗 {type(exc).__name__}:{str(exc)[:60]}(閘空=零回歸)"
+    return _G176
+
+
+def _denied_alias(alias: str) -> bool:
+    g = _gate176()
+    if not g["deny"]:
+        return False
+    norm = getattr(g["mod"], "norm", None)
+    key = norm(alias) if norm else str(alias).strip().lower()
+    return key in g["deny"]
+
+
+def _canon_key(canon: str | None) -> str | None:
+    """正典鍵對映:別本冊的拼法(MEGABANK / J.P. MORGAN / IBF …)一律回正典鍵(MEGA / JPM / WATERLAND …)。"""
+    if not canon:
+        return canon
+    return _gate176()["rulings"].get(str(canon).upper(), canon)
+
+
+def broker_gate_state() -> dict:
+    g = _gate176()
+    return {"state": ("OK" if g["mod"] is not None else "ABSENT"), "deny": len(g["deny"]),
+            "rulings": len(g["rulings"]), "src": g["src"], "why": g["why"]}
+
+
+def _has_cjk(s: str) -> bool:
+    return bool(re.search(r"[一-鿿]", s or ""))
+
 
 # ===== [VIA:DENY-GATE:v0101] 券商拒絕閘(批680;graceful 零行為變更) =====
 #   操作員批413 的拒絕清單(「大陸券商刪除」「去摩通」)原本只擋得住**走疊加層**那一條路;
@@ -197,36 +662,40 @@ _VIA_DENY: dict = {}
 
 
 def _via_deny_sample(n: int = 1) -> list:
-    """從**那一份名單本身**取樣,當拒絕閘正控的探針值。
+    """從**那一份名單本身**取樣(n<=0 = 全部),當拒絕閘正控與文字尺的探針值。
 
-    批680 實錄(同一個錯的第三次):要證明閘會咬,就得餵它一個被拒的名字;
-    我三次都直接把「廣發」打進檢裡——而那就是又抄了一份名單,
-    陸券清除閘每次都當場把我判成「還帶著活的陸券解析資料」,三次都判得對。
-    **「不准出現 X」的檢,天生會把 X 抄進來。** 出路只有一條:探針值從名單當場取。
-    順帶好處:操作員哪天改了名單,這個正控會自動跟著改,不會變成釘住舊名單的殭屍。
+    批680 實錄(同一個錯犯了四次):要證明閘會咬,就得餵它一個被拒的名字;
+    我每次都直接把名字打進檢裡——而那就是又抄了一份名單,陸券清除閘每次都當場判我
+    「還帶著活的陸券解析資料」,每次都判得對(LL336)。
+    批686b:**先問 `_gate176()`**——批689B 已經有一個讀取器了,不另開第二個讀者(L30);
+    它缺席才退回疊加層 JSON。讀不到就回空,誠實跳過,不自己編一份。
     """
-    fn = _VIA_DENY.get("keys", False)
-    if fn is False:
+    keys = _VIA_DENY.get("keys")
+    if keys is None:
         keys = []
         try:
-            import glob as _g
-            import json as _js
-            from pathlib import Path as _P
-            _p = _P(__file__).resolve()
-            while _p.parent != _p:
-                _d = _p / "supportive modules" / "ssot"
-                if _d.is_dir():
-                    _h = sorted(_g.glob(str(_d / "VIA_FinancialInstitution_Overlay_v*.json")))
-                    if _h:
-                        keys = [str(x) for x in
-                                _js.loads(_P(_h[-1]).read_text(encoding="utf-8")).get("deny_keys", []) if x]
-                    break
-                _p = _p.parent
+            keys = [str(x) for x in (_gate176().get("deny_raw") or []) if str(x).strip()]
         except Exception:
             keys = []
+        if not keys:
+            try:
+                import glob as _g
+                import json as _js
+                from pathlib import Path as _P
+                _p = _P(__file__).resolve()
+                while _p.parent != _p:
+                    _d = _p / "supportive modules" / "ssot"
+                    if _d.is_dir():
+                        _h = sorted(_g.glob(str(_d / "VIA_FinancialInstitution_Overlay_v*.json")))
+                        if _h:
+                            keys = [str(x) for x in _js.loads(
+                                _P(_h[-1]).read_text(encoding="utf-8")).get("deny_keys", []) if str(x).strip()]
+                        break
+                    _p = _p.parent
+            except Exception:
+                keys = []
         _VIA_DENY["keys"] = keys
-        fn = keys
-    return list(fn) if (n is None or n <= 0) else list(fn)[:n]
+    return list(keys) if (n is None or n <= 0) else list(keys)[:n]
 
 
 def _via_deny_in_text(text: str) -> tuple:
@@ -738,20 +1207,19 @@ def safe_broker_ev(text: str, E=None, allow_contacts: bool = False, veto: set | 
     veto=本報告標的公司名:別名若是標的公司名的一部分就不算券商證據(批537)。"""
     txt = text if allow_contacts else strip_contacts(text)
     canon, alias = _safe_broker_hit(txt, E, veto)
-    # 批681:**拒絕清單先行**(操作員裁定的次序:拒絕清單 → 正典 → 疊加層 → 聯集冊)。
-    #   批680 只在這裡看 canon,於是「中信證券」被較短的合法別名「中信」接走 → CTBC。
-    #   把被拒名丟進**同一把**最長優先尺:文內命中的被拒名只要不比合法別名短,就是它贏。
-    #   ——`摩根`(2 字)輸給 `摩根士丹利`(5 字),所以摩根士丹利不會被連坐;
-    #     `中信證券`(4 字)贏過 `中信`(2 字),所以它擋得住。
+    # 批686b:**拒絕清單先行**,而且下到**文字這一層**。
+    #   批689B 的閘跳過被拒的**別名**;批680 的閘只看解出來的**正典名**——
+    #   兩者都擋不住同一種情形:被拒的名字不在冊上時,最長別名優先會先命中一個
+    #   **較短的合法別名**,於是被拒的機構被記成另一家合法券商(Codex 在 PR #59 照出)。
+    #   把拒絕清單當成候選別名丟進**同一把最長優先尺**:文內命中的被拒名
+    #   只要不比合法別名短就是它贏(短的被拒名輸給長的合法別名,合法券商不連坐)。
     bad, blen = _via_deny_in_text(txt)
     if bad and blen >= len(alias or ""):
         return None, "拒絕:" + (_via_deny_reason(bad) or "拒絕清單:" + bad)
     if canon:
-        # 被拒的機構**不是查無**,要講得出為什麼被拒——靜默回 None 會讓下一個人
-        # 以為「冊上沒有這家」,然後跑去把它加回冊上。
         why = _via_deny_reason(canon, alias)
         if why:
-            return None, "拒絕:" + why
+            return None, "拒絕:" + why          # 被拒**不是查無**,要講得出為什麼
         return canon, ("電郵網域(弱)" if allow_contacts else "文內")
     return None, "無"
 
@@ -776,6 +1244,8 @@ def _safe_broker_hit(text: str, E=None, veto: set | None = None) -> tuple:
             al = a.lower().strip()
             if not al or any(al in v for v in vetol):      # 批537:別名是標的公司名的一部分 → 不算券商證據
                 continue
+            if _denied_alias(a):                           # 批689B:拒絕清單(操作員令)的別名不算券商證據;冊零觸碰
+                continue
             hit = False
             if _has_cjk(al):
                 hit = al in text
@@ -787,12 +1257,13 @@ def _safe_broker_hit(text: str, E=None, veto: set | None = None) -> tuple:
                 hit = re.search(r"(?<![a-z])" + re.escape(al) + r"(?![a-z])", low) is not None
             if hit and (best is None or len(al) > best[1]):
                 best = (canon, len(al), al)
-    return (best[0], best[2]) if best else (None, "")
+    # 批689B:回正典鍵(同一家不再兩個名)。批686b:多回**命中的別名**——
+    #   拒絕閘要拿它去跟文內被拒名比長短,沒有它就只能看正典名(Codex 在 PR #59 照出的那一層)。
+    return (_canon_key(best[0]), best[2]) if best else (None, "")
 
 
 def _safe_broker_raw(text: str, E=None, veto: set | None = None) -> str | None:
-    """相容殼:只要正典名。批681 起真正的實作是 `_safe_broker_hit`,它多回一個**命中的別名**
-    ——拒絕閘要拿那個別名去跟被拒名比長短,沒有它就只能看正典名,而那正是批680 漏掉的那一層。"""
+    """相容殼:只要正典鍵。批686b 起實作是 `_safe_broker_hit`;批689B 的別名層閘與四支消費者零影響。"""
     return _safe_broker_hit(text, E, veto)[0]
 
 
@@ -1507,7 +1978,7 @@ def selftest() -> int:
     E, why = load_intake()
     chk("② importlib 載入收容件:TickerFilename/BrokerRatingDict/FieldValidation/CrossValidation/FinancialValidation/FirstPageEngine 齊", E is not None, why)
     if E is None:
-        print(f"  [計] 廿二檢 OK {22 - len(fails) - 20} · FAIL {len(fails) + 20}(收容件缺,後二十檢略)")
+        print(f"  [計] 二十六檢 OK {26 - len(fails) - 24} · FAIL {len(fails) + 24}(收容件缺,後二十四檢略)")
         return 1
     tf = make_tf(E, {"3706", "2330", "6873"}, {"台積電": "2330", "神達": "3706", "泓德能源": "6873"})
     fn1 = "【國泰證期研究部】神達(3706 TT)-初次評等買進(+30.4_)-大顯神威，營運騰達-20250822.pdf"
@@ -1656,7 +2127,28 @@ def selftest() -> int:
         not _extra,
         f"(夾內 {len(_files)} 個 · 冊上 {len(_reg)} 個"
         + (f" · **多出來** {'、'.join(_extra)} ← 未追蹤的話請自行挪走" if _extra else " · 零多餘") + ")")
-    # ── 批681:拒絕閘下到**文字這一層**。批680 那一版只看解出來的正典名,
+    # ㉑ 批689B:拒絕清單的別名不算券商證據(廣發證券/中信證券/摩通=操作員令拒);其餘照常(凱基→KGI);冊零觸碰
+    _g86 = broker_gate_state()
+    # 拒絕清單的詞**只從閘上取**,本檔零字面(陸券清除實跑驗收:活尾版不得帶陸券解析資料);
+    # 用合成別名表把閘的判斷隔離出來驗:同一個被拒別名掛在假正典下 → 不算證據 → None;沒被拒的別名 → 照常
+    _dn = sorted(x for x in _gate176()["deny"] if _has_cjk(x))
+    _keep_bt = globals()["broker_tables"]
+    try:
+        globals()["broker_tables"] = lambda E=None: {"FAKE_X": list(_dn[:2]), "KGI": ["凱基", "凱基證券"]}
+        _d1 = _safe_broker_raw(f"{_dn[0]} 研究報告 台積電 買進", E) if _dn else "閘空"
+        _d2 = _safe_broker_raw(f"{_dn[1]} 維持買進 目標價 1300 元", E) if len(_dn) > 1 else "閘空"
+        _k1 = _safe_broker_raw("凱基證券 研究報告 台積電 買進", E)
+    finally:
+        globals()["broker_tables"] = _keep_bt
+    chk("㉑ 券商拒絕閘(CGC_MDL176 拒絕清單先行;操作員批413 令):被拒別名(從閘上取,本檔零字面;合成別名表隔離驗)不算券商證據 → None;凱基 → KGI;閘在位且冊零觸碰",
+        _g86["state"] == "OK" and _g86["deny"] >= 10 and _d1 is None and _d2 is None and _k1 == "KGI",
+        f"(閘 {_g86['state']} 拒 {_g86['deny']} · 被拒別名 {len(_dn)} 個 CJK 試兩個={_d1}/{_d2} · 凱基={_k1})")
+    # ㉒ 正典鍵對映:別本冊的拼法回正典鍵(不再同一家兩個名);沒對映的原樣
+    chk("㉒ 正典鍵對映(KEY_ALIAS_RULINGS):MEGABANK→MEGA · J.P. MORGAN→JPM · IBF→WATERLAND · KGI→KGI(原樣)",
+        _canon_key("MEGABANK") == "MEGA" and _canon_key("J.P. MORGAN") == "JPM" and _canon_key("IBF") == "WATERLAND"
+        and _canon_key("KGI") == "KGI" and _canon_key(None) is None,
+        f"(對映 {_g86['rulings']} 條)")
+    # ── 批686b:拒絕閘下到**文字這一層**。批680 那一版只看解出來的正典名,
     #   Codex 在 PR #59 照出它擋不住的情形:最長別名優先會先命中一個**較短的合法別名**,
     #   於是被拒的機構被記成另一家合法券商。而且批679 把冊清乾淨之後,被拒的名字
     #   根本解不出正典名,那個閘**永遠不會觸發**——批680 我把這件事寫成「今天不會觸發」,
@@ -1664,7 +2156,7 @@ def selftest() -> int:
     #   ——「不准出現 X」的檢天生會把 X 抄進來(LL336),這個錯我已經犯過四次。
     _keys = _via_deny_sample(0)
     _miss = [k for k in _keys if safe_broker_ev(f"本報告由{k}研究部出具")[0] is not None]
-    chk("⑳ 拒絕閘正控:名單上**每一條**放進報告文字裡都要被擋下來,而且回得出因由"
+    chk("㉓ 拒絕閘正控:名單上**每一條**放進報告文字裡都要被擋下來,而且回得出因由"
         "(查無與被拒是兩件事)。名單在疊加層 deny_keys,不在本檔(L30);疊加層缺席=原樣放行",
         bool(_keys) and not _miss,
         f"(名單 {len(_keys)} 條 · 漏擋 {len(_miss)} 條"
@@ -1680,7 +2172,7 @@ def selftest() -> int:
             _t = f"本報告由{_a}研究部出具"
             if _safe_broker_hit(_t, None, None)[0] != safe_broker_ev(_t)[0]:
                 _fp.append(_a)
-    chk("㉑ 負控:冊上**每一條**合法別名,接閘前後的答案必須一模一樣——"
+    chk("㉔ 負控:冊上**每一條**合法別名,接閘前後的答案必須一模一樣——"
         "閘只准改「文字裡真的寫了被拒機構」那些,一條合法券商都不准被連坐"
         "(改尺之後要證明它沒有改到不該改的 LL337)",
         not _fp,
@@ -1693,22 +2185,22 @@ def selftest() -> int:
               if d.lower() != a.lower() and a.lower() in d.lower() and len(a) < len(d)]
     _lbad = [a for d, a in _long if safe_broker_ev(f"本報告由{a}研究部出具")[0] != _amap[a]]
     _sbad = [d for d, a in _short if safe_broker_ev(f"本報告由{d}研究部出具")[0] is not None]
-    chk("㉒ 最長優先仲裁(Codex 在 PR #59 照出的那一條的正身):被拒名**比合法別名短**時"
+    chk("㉕ 最長優先仲裁(Codex 在 PR #59 照出的那一條的正身):被拒名**比合法別名短**時"
         "合法的贏(不准連坐整個長名);被拒名**比合法別名長**時被拒的贏(短別名接不走長的被拒名)。"
         "配對從名單與冊當場配出來,不是我挑兩個例子打進來",
         not _lbad and not _sbad,
         f"(短被拒⊂長合法 {len(_long)} 對 · 誤殺 {len(_lbad)} ｜ 短合法⊂長被拒 {len(_short)} 對 · 漏擋 {len(_sbad)})")
-    chk("㉓ 拒絕閘讀得到操作員那一份名單(讀不到就誠實說讀不到,不假裝有擋)",
+    chk("㉖ 拒絕閘讀得到操作員那一份名單(讀不到就誠實說讀不到,不假裝有擋)",
         bool(_keys) and bool(_via_deny_reason(_keys[0])) and not _via_deny_reason("元大"),
         f"(名單 {len(_keys)} 條 · 第一條→擋 · 元大→放行)")
-    print(f"  [計] 廿四檢 OK {24 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 二十六檢 OK {26 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0107)· 二十檢自測(零網路;收容件 FirstPageEngine v0101 _b522)===")
+        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0110)· 二十二檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
         return selftest()
     verb = args[0] if args and not args[0].startswith("--") else "status"
     if verb == "status":
