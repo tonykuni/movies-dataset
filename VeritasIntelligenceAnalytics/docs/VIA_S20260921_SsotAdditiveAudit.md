@@ -56,6 +56,7 @@
 | 台帳 | `VIA_AutoCode_Registry_v0100.json` ledger +1(op ADD · 引擎) | 序列化與原檔同式(indent=2,無檔尾換行) | `updated_at` 跟著推 |
 | VRN 索引冊 | `VIA_VRN_LogicArchitecture_SSOT_v0100.json`(`via-vrnbook build` 再生) | 守門 GREEN 50/50 | 只動三行:built_at、樞紐 tail/head → v0111 |
 | 交接 | 本檔 + `docs/VIA_VDF_StatusReview_20260921.md` 十三段 | — | `VIA_HANDOVER_LATEST.md` 是 VCGC 再生頁,不手改 |
+| VRN 啟動器修(工作站實錄修) | `Invoke-VIA-VRN-v0101.ps1`(一行:`$chainArgs = @(if ($Quick) { 'run'; '--fast' } else { 'run' })`) | 容器無 pwsh,無法實跑;依 PowerShell 語意與冊上 LL284 診斷 | 不帶 `-Quick` 時 `@('run')` 經 if 輸出被拆成字串,`@chainArgs` 對字串 splat 逐字元展開 → 鏈收到 `'r'`(操作員實錄 V2 rc=2)。L70 逐次許可=本輪令「更新完 VRN 相關可以進行最後一次實測收尾」;`via-vrnrun` 走尾版 glob,刪檔即回退 |
 
 **沒做、且說明為什麼**
 
@@ -81,6 +82,20 @@
 | MDL157 shadow / MDL174 四面登錄 | 被吃 0 / VRN ④ GREEN(橋 50/50 · Register 2/2 · 梭 2/2 · 格子站 在) | — |
 | **六層鏈 `run --fast`(容器基礎 python,無家族境)** | GREEN 16 · RED 16 · GATED 1 · NODATA 13 → rc 1 | RED 16 = 9 `ModuleNotFoundError`(duckdb…)+ ENG060(pymupdf/openpyxl 缺)+ ENG087/MDL141/ENG080(duckdb 缺)+ ENG067(依賴鏈)+ ENG083 (53)(54);**這七盞在 origin/main 乾淨樹上一模一樣**(worktree 逐支對過)→ 容器缺家族境,不是側線造成。批677 在有家族境的容器量到 GREEN 33 · RED 0 · GATED 1 |
 | ENG083 `matrix` | ABSENT:`vrn_reports.duckdb` 不在容器 | 真正的最後實測要在工作站跑 `via-vrnrun` |
+
+**工作站實錄(操作員貼回 2026-09-21 14:56;via_vrn_312 境)**
+
+| 你貼的 | 讀出 | 修 |
+|---|---|---|
+| `via-vrnrules additive` / `via-ssotadd tests|drift|candidates` | 與容器逐字同答:30/30 + 48/48 零觸碰 True;八列燈同;36 條候選 | 不動 |
+| `via-selftest --only "SSOT 增補"`:橋站 OK 3.8s;**單元測試站 FAIL** test_02:活樹側 md5 `8883cc6d` ≠ 記的 `aefb3b30` | 容器裡 `8883cc6d` 正是同一檔的 **CRLF 變體**(頂層那份是 LF;把它換成 CRLF 的 md5 逐字相同)。工作站那份是 `.gitattributes -text` 加上之前 autocrlf 的舊轉換殘留;位元內容同(L93 批619 同型:尺讀原始位元組) | manifest 逐件另記 `md5_lf/sha256_lf`、重複件記 `live_md5_lf/crlf_variant_md5`;test_01/test_02 與橋 ⑦ raw 對不上就退一步比 LF 正規化 → **EOL_ONLY 自成一態不判紅**,正規化後也不同才紅。容器模擬工作站(兩份轉 CRLF)→ 20/20 綠並印 `[EOL_ONLY] 2 件` |
+| `via-vrnrun` V1 冊重建 rc=0 | 冊指標 44 · 待裁定 2 | — |
+| `via-vrnrun` **V2 六層鏈 rc=2:「[用法] plan \| run … (收到 'r')」** | 鏈根本沒跑。根因在啟動器第 52 行:不帶 `-Quick` 時 `@('run')` 單元素陣列經 if 輸出被 PowerShell 拆成字串 `'run'`,`via-vrnchain @chainArgs` 對字串 splat 逐字元展開 → 鏈收到 `r`/`u`/`n`(LL284 同族;批677 沒踩到是因為容器直接跑 python) | `Invoke-VIA-VRN-v0101.ps1` 一行包 `@()`。今天要跑就直接打 `via-vrnchain run`(參數走 `$args`,不經那一行) |
+| V3 `via-repairprice --apply` rc=0 | 105 列 · 有改動 0 · 新拿到庫價 0;ADJ 上漲空間算得出 39(ADJ_OK 25 + 因子1 14);目標價年齡 STALE_365 15 · FRESH_90 10 · AGING_180 8 · EXPIRED_OVER_1Y 6;RAW 車道 0 | 與批675/677 同型;不動 |
+| V4 `via-vrnmatrix` rc=0 | 105 份 × 7 欄 · 格子 735 · GREEN 461 · YELLOW 11 · NODATA 215 · NA 48;**判對率 100.0% = 461/461**;可判率 62.7%(扣不適用 67.1%);第二顆頭:`output/vrn_reports.duckdb` 也有 `vrn_report_basic`(09-20 07:54 舊) | ENG083 既有提示;裁定在 P9 併線後看要不要清舊庫 |
+| V5 `via-console` rc=0 | 3053 KB 零 CDN 快照 | — |
+
+**與容器不同的一個數字**:橋 `tests` 的收容夾 sha256 容器 `8c6a193e…` vs 工作站 `9226276…`——tree_sha 連 manifest 一起算,manifest 在工作站被 autocrlf 留成 CRLF 的可能性最高(30 件收容件逐件 sha256 在工作站全對,所以差只在 manifest 本身)。零觸碰證明是同一台機器前後對,不受影響。
 
 **drift 八列(只攤開不裁定;每列在 JSON 帶下一步)**
 
@@ -120,6 +135,8 @@
 | P9 | 側線併入治理線 + 批號 | 操作員的手 | 操作員 | 只由一隻手併(L25);台帳/規格/索引冊取聯集 |
 | P10 | 工作站最後一次實測(`via-vrnrun` V1–V5,真研報) | 操作員的手 | 操作員 | 第七段 |
 | P11 | CI 只跑總控契約測試;新單元測試沒進 CI | 候 | 操作員 | 第七段兩行 |
+| P12 | 啟動器 v0101 在工作站實跑驗證(`via-vrnrun` V2 要真的跑出 44 節點) | 操作員的手 | 操作員 | 第七段;若還是 `'r'`,貼回 V2 那幾行 |
+| P13 | 工作站 `references/intake/` 有 autocrlf 舊轉換殘留(至少共識融合引擎那份) | 候 | 操作員 | `git ls-files --eol "VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120.py"` 看 w/crlf;要清就 `git rm --cached` 該檔再 `git checkout -- 該檔`(不動 blob);不清也沒事,尺已把 EOL_ONLY 分開 |
 
 ## 六 · 你的手
 
@@ -146,7 +163,9 @@ via-selftest --only "SSOT 增補"             # 格子兩站
 via-selftest --only "研報六欄規則正本樞紐"    # 格子樞紐站(四十八檢)
 python ".\supportive modules\registry\tests\test_vrn_ssot_additive_v0100.py"   # 20 檢;基礎 python 3.12 即可
 via-vrnbook                                # 守門:冊已重建到樞紐 v0111(GREEN)
-via-vrnrun                                 # 批677 五步:冊重建 → 六層鏈 → 庫價重算 → 驗真矩陣 → 標準 U/I(最後一次實測收尾)
+via-vrnchain run                           # 六層鏈直跑(不經啟動器那一行;今天就能補 V2)
+via-vrnrun                                 # 批677 五步(尾版 = Invoke-VIA-VRN-v0101;V2 修了單元素陣列拆字串)
+via-selftest --only "SSOT 增補"             # 單元測試站現在該綠;若有 CRLF 殘留會印 [EOL_ONLY] n 件,不判紅
 ```
 
 CI 若要接新測試(主線治理,兩行;`.github/workflows/via-master-control-ui.yml`):
@@ -162,5 +181,6 @@ python "$env:VIA_TEST2"                                                         
 | `via-vrnrules --selftest` | `[計] 48 檢 OK 48 · FAIL 0` |
 | `via-ssotadd --selftest` | `[計] 19 檢 OK 19 · FAIL 0`;⑧ 印 `audit_ssot.py rc0 30/30 · test_vrn_evidence.py rc0 48/48 · 零觸碰 True` |
 | `python ".\supportive modules\registry\tests\test_vrn_ssot_additive_v0100.py"` | `Ran 20 tests … OK` |
+| `via-vrnrun`(或 `via-vrnchain run`) | V2 印 `=== VRN 六層鏈 · run ===` 與 `[計] GREEN n · RED n · GATED n · NODATA n`,不再是 `[用法] … (收到 'r')` |
 
 不符就先疑尺(L93):看是哪台機器、哪個 python、收容夾有沒有被 autocrlf 動過(收容夾在 .gitattributes `-text`,不該動)。

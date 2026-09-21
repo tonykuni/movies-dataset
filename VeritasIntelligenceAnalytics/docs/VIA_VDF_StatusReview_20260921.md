@@ -425,3 +425,5 @@ via-vcgc matrix --family vdf --apply
 與 VDF 那一半的關係:第十段的兩把尺(主動 ETF `^00\d{2,3}[AD]$` vs `^\d{5}A$`)之外,包又帶進第三把(`^00[0-9]{3}A$` + K/C/M/S/V 外幣型);橋的 `TICKER_TYPES` 列量到**正典九型在 16 顆代表碼上樞紐與包同答**,差只在冊上沒有的五型與 V 尾碼歸屬(YELLOW,裁定權在操作員)。上漲空間的口徑(包 BASIS_MISMATCH vs 律 L99 因子鏈)同列不混。
 
 容器端最後實測:六層鏈 `run --fast` GREEN 16 · RED 16 · GATED 1 · NODATA 13,RED 全數在 origin/main 乾淨樹上一模一樣(容器缺 duckdb/pymupdf 家族境),不是側線造成;工作站的最後一次實測是 `via-vrnrun`(批677 五步),在側線紀錄第七段一貼即用。
+
+工作站實錄(2026-09-21 14:56):橋三動詞與容器逐字同答;單元測試 test_02 紅是活樹收容件的 CRLF 殘留(L93 批619 同型)→ manifest/測試/橋改成 EOL_ONLY 自成一態;`via-vrnrun` 的 V2 六層鏈沒跑(啟動器單元素陣列被拆成字串再 splat 成 `'r'`,LL284 同族)→ `Invoke-VIA-VRN-v0101.ps1` 一行修;V3/V4 判對率 100.0% = 461/461、可判率 62.7%/67.1%。細節見側線紀錄第四段。

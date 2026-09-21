@@ -516,18 +516,28 @@ def selftest() -> int:
         try:
             m = json.loads(Path(P["manifest"]).read_text(encoding="utf-8"))
             d = Path(P["dir"])
-            bad = []
+            bad, eol = [], []
             for f in m.get("files", []):
                 p = d / f["name"]
-                if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != f["sha256"] or p.stat().st_size != f["bytes"]:
+                if not p.is_file():
+                    bad.append(f["name"])
+                    continue
+                b = p.read_bytes()
+                if hashlib.sha256(b).hexdigest() == f["sha256"] and len(b) == f["bytes"]:
+                    continue
+                # L93(批619 同型):raw 對不上先問行尾——LF 正規化後相同 = EOL_ONLY 自成一態,不判紅
+                if f.get("sha256_lf") and hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest() == f["sha256_lf"]:
+                    eol.append(f["name"])
+                else:
                     bad.append(f["name"])
             on_disk = sorted(x.relative_to(d).as_posix() for x in d.rglob("*") if x.is_file() and x.name != Path(P["manifest"]).name)
             listed = sorted(f["name"] for f in m.get("files", []))
             man_ok = (m.get("schema") == "VIA.IntakeManifest.v1" and not bad and on_disk == listed)
-            man_note = f"{len(listed)} 件 · 不符 {len(bad)} · 夾內多出/少掉 {len(set(on_disk) ^ set(listed))}"
+            man_note = (f"{len(listed)} 件 · 不符 {len(bad)} · 夾內多出/少掉 {len(set(on_disk) ^ set(listed))}"
+                        + (f" · EOL_ONLY {len(eol)}(L93 機器差,自成一態)" if eol else ""))
         except Exception as exc:
             man_note = f"manifest 讀不動 {type(exc).__name__}"
-    chk("⑦ 收容包在位、manifest 在位、逐件 sha256/bytes 現場對得上、夾內沒有冊外的檔(零觸碰有證據)",
+    chk("⑦ 收容包在位、manifest 在位、逐件 sha256/bytes 現場對得上(raw 不對時退一步比 LF 正規化=EOL_ONLY 自成一態 L93)、夾內沒有冊外的檔(零觸碰有證據)",
         P["state"] == "OK" and man_ok, f"{P['state']} · {man_note}")
     T = run_tests()
     chk("⑧ 包內兩套測試在暫存副本實跑全綠(rc 0/0 · passed==total)且收容夾 sha256 前後相同",

@@ -10,7 +10,8 @@
   T04 落差:九型代表碼兩把尺同答;K/C/M/S/V 不在正典;上漲空間兩套口徑都留
   T05 橋:--selftest rc0、落檔只有一個出口、status --json、tests --no-report 零觸碰
 
-跨機器敏感點(L93):只對收容夾(.gitattributes `-text`,位元跨機器不變)算 sha;
+跨機器敏感點(L93):只對收容夾(.gitattributes `-text`,位元跨機器不變)算 sha;raw 對不上時退一步比 LF 正規化
+(工作站實錄 2026-09-21:重複件證據那份活樹收容件在工作站是 CRLF 殘留,md5 8883cc6d = LF 版 aefb3b30 的 CRLF 變體)→ EOL_ONLY 自成一態;
 .py 源碼只做子字串檢查(CRLF 無影響);子行程用本行程 python(格子跑就是家族境)。
 
 跑法:python "supportive modules/registry/tests/test_vrn_ssot_additive_v0100.py"   (格子站同一句)
@@ -62,6 +63,22 @@ def md5(p: Path) -> str:
     return hashlib.md5(p.read_bytes()).hexdigest()
 
 
+def _lf(b: bytes) -> bytes:
+    return b.replace(b"\r\n", b"\n")
+
+
+def md5_lf(p: Path) -> str:
+    """LF 正規化後的 md5(L93:工作站 core.autocrlf 舊轉換會把 LF 檔留成 CRLF;位元內容同 → EOL_ONLY 自成一態)。"""
+    return hashlib.md5(_lf(p.read_bytes())).hexdigest()
+
+
+def sha256_lf(p: Path) -> str:
+    return hashlib.sha256(_lf(p.read_bytes())).hexdigest()
+
+
+EOL_NOTES: list = []   # 本次跑到的 EOL_ONLY 件(印出來,不判紅)
+
+
 def tree_sha(d: Path) -> str:
     h = hashlib.sha256()
     for p in sorted(x for x in d.rglob("*") if x.is_file() and "__pycache__" not in x.parts):
@@ -99,9 +116,11 @@ class T01_Intake(unittest.TestCase):
         for f in files:
             p = INTAKE / f["name"]
             self.assertTrue(p.is_file(), f["name"])
-            self.assertEqual(p.stat().st_size, f["bytes"], f["name"])
-            self.assertEqual(sha256(p), f["sha256"], f["name"])
-            self.assertEqual(md5(p), f["md5"], f["name"])
+            if sha256(p) == f["sha256"] and md5(p) == f["md5"] and p.stat().st_size == f["bytes"]:
+                continue
+            # L93:位元對不上時先問是不是行尾——同一內容被 autocrlf 留成 CRLF 是機器差,自成一態
+            self.assertEqual(sha256_lf(p), f.get("sha256_lf"), f"{f['name']}:raw 與 LF 正規化都對不上=真的被動了")
+            EOL_NOTES.append(f["name"])
         on_disk = sorted(x.relative_to(INTAKE).as_posix() for x in INTAKE.rglob("*")
                          if x.is_file() and x.name != self.man_path.name and "__pycache__" not in x.parts)
         self.assertEqual(on_disk, sorted(f["name"] for f in files), "夾內有冊外的檔或少了冊上的檔")
@@ -112,13 +131,21 @@ class T01_Intake(unittest.TestCase):
         for d in dups:
             live = VIA / d["live_copy"]
             self.assertTrue(live.is_file(), d["live_copy"])
-            self.assertEqual(md5(live), d["live_md5"], "活樹側 md5 與收容時記的不同(活樹收容件被動了?)")
+            if md5(live) != d["live_md5"]:
+                # L93(批619 同型):工作站 autocrlf 把 LF 檔留成 CRLF → raw md5 變成 crlf_variant_md5;
+                # LF 正規化後仍相同就是 EOL_ONLY,自成一態,不判紅;正規化後也不同才是真的被動了
+                self.assertEqual(md5_lf(live), d["live_md5_lf"],
+                                 f"{d['live_copy']}:raw 與 LF 正規化都對不上(收容件真的被動了?)")
+                EOL_NOTES.append(f"{d['live_copy']}(raw {md5(live)[:8]} = "
+                                 f"{'crlf_variant' if md5(live) == d.get('crlf_variant_md5') else '其他 EOL 型'})")
             self.assertTrue(d["identical"])
             self.assertEqual(d["live_md5"], d["upload_md5"], "上傳件與活樹收容件不相同,不該標 duplicate")
         prov = {u["upload_name"]: u for u in self.man["uploads_provenance"]}
         self.assertEqual(prov["VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120_2.py"]["md5"], dups[0]["live_md5"])
-        self.assertEqual(prov["SYNONYM_LIBRARY_2.json"]["md5"], md5(INTAKE / "SYNONYM_LIBRARY.json"))
-        self.assertEqual(prov["VRN_WORKFLOW_SPEC.md"]["md5"], md5(INTAKE / "VRN_WORKFLOW_SPEC.md"))
+        self.assertEqual(prov["SYNONYM_LIBRARY_2.json"]["md5_lf"], md5_lf(INTAKE / "SYNONYM_LIBRARY.json"))
+        self.assertEqual(prov["VRN_WORKFLOW_SPEC.md"]["md5_lf"], md5_lf(INTAKE / "VRN_WORKFLOW_SPEC.md"))
+        if EOL_NOTES:
+            print(f"\n  [EOL_ONLY] {len(EOL_NOTES)} 件只差行尾(L93 機器差,自成一態):{EOL_NOTES}")
         self.assertEqual(prov["VIA_SSOT_Additive_Audit_v0100.zip"]["disposition"], "INTAKEN_HERE")
 
     def test_03_baseline_copies_differ_only_by_newline(self):
