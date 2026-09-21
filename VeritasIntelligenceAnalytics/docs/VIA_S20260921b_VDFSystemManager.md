@@ -38,7 +38,9 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 | 中央冊 `VIA_Component_Inventory_SSOT_v0100.json` | `registry-sync --apply`(唯一寫入口)| VDF_SystemManager=**VIA-SYS-0012** · VDF_ENG045_OutputHub=ENG · vdf_input_matrix=SYS;⑬ 由紅轉綠 |
 | 台帳 `VIA_AutoCode_Registry_v0100.json` | +1 筆(1280→1281;indent=2 同式)| — |
 | `tests/test_vdf_system_manager_v0100.py`(新) | 20 檢:本體 3 · 橋律兩把尺 2 · VCGC 委派 3 · 快照 1 · 七處 6 · 讀器 5;Register 短令**只量不假設** | py3.11 · 3.12 **20/20**(交接文寫完前 19/20,缺的正是本文) |
-| Register | **沒動**(L70 逐次許可):`via-vdfsys` 與 `via-vrnsys`(批682 Z65)兩行候准,貼行在第九段 | 對接口七處自審 register=False 誠實 |
+| `VDF_SystemManager_v0101.py`(新版) | Register 一登冊,v0100 的 ⑱ 就紅:它把「Register 未登必須 False」這個**暫態**釘成不變量。v0101 改成量 Register 尾版(登了 True、沒登 False);其餘一字不動,v0100 留作版史(L04) | 27/27(py3.11 · 3.12);單元測試 20/20 |
+| `VRN_SystemManager_v0102.py`(新版;主線 v0101 留作版史) | 同一處 ⑱:via-vrnsys 一登冊,主線 v0101 的「未登必須 False」就紅(Grid --only 子系統管理 實錄 4/5)。v0102 改量 Register 尾版;其餘一字不動。主線批號由併線的手指定(L25) | 25/25(py3.11 · 3.12);Grid 5/5 |
+| Register v0242(新版;v0241 一字不動) | 操作員「依你建議執行」= L70 這一次的許可 → +`via-vdfsys`(資料對接口)· +`via-vrnsys`(研報對接口;批682 Z65)守門版 + 梭 4 支(根+bin,不釘版號) | 兩扇門七處 **7/7**;Z65 · Z82 結案 |
 
 ## 四 · 量到但沒改的(L16 只報,候裁)
 
@@ -46,7 +48,7 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 2. **engine/ 8 支無版號 .py**(L04 外):ENG046_FetchMatrixRegistry · ENG049_FiveDayFetch · MDL002_YFinanceFetchingEngine · MDL003_SentimentMacroEngine · MDL007_SSOTResolver 只有無版號檔(卡書指著它們);ENG047_USMacroDetailFetcher · ENG050_OrderFetch · ENG051_ActiveTWETF_Holdings 旁邊另有尾版檔(疑似舊複本)。立版號/清複本後卡書要重建(不手改)。
 3. **卡書 vs 樹**:冊有樹無 1(sector_rotation_capital_flow_engine)· 樹有冊無 3(VDF_ENG091_VdfAuditGate · VDF_ENG045_OutputHub · vdf_input_matrix)——卡書 45 張是舊快照,重建卡書是主線的事。
 4. **一頁交接 批554 < 律冊 批662**(交接域 STALE;VRN 那扇門同樣報)· **VDF 獨立鏈容器沒跑過**(引擎域 NODATA:`via-vdfchain run` 在工作站跑一次就有快照)。
-5. 規格冊 VRN `vrn_system` 項的 `verb` 是六個動詞的清單(批681 主線寫法);EngineBus 會把整串當 argv,對接口只取第一個所以沒炸。改成 `verb=["status"]`+`test_verb` 是主線一行的事,側線不碰主線的項。
+5. 規格冊 VRN `vrn_system` 項的 `verb` 原是六個動詞的清單(批681 主線寫法);EngineBus test profile 量到 **NODATA**(整串當 argv)。b 批既已動到這一項(outputs 檔名跟版號走),一併對正成 `verb=["status"]`+`test_verb=["--selftest"]` → GREEN。
 
 ## 五 · 兩條線、三條線(L25)
 
@@ -65,13 +67,14 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 | Deck v0159 / Manager v0148 | 25/25 · 10/10 |
 | 契約測試 test_master_control_contract_v0102(py3.12) | 19/19 |
 | Grid v0434 `--only 子系統管理` | 5/5 OK |
-| EngineBus v0129(主線 PR #58 尾版)test profile `vdf_system` | GREEN |
+| EngineBus v0129(主線 PR #58 尾版)test profile `vdf_system` / `vrn_system` | GREEN / GREEN(vrn 項 verb 對正前 NODATA) |
+| Register v0242 · 梭 4 支 | VCGC Register 168 指令 · 兩扇門七處 **7/7** · CGC_MDL157 29/29(短令必有梭)· CGC_MDL174 四面登錄 VDF/VRN GREEN(Register · 梭 根+bin)· CGC_MDL168 A 語法道 ABSENT(容器無 pwsh,工作站格子會判;B 參數道 GREEN) |
 | MDL174 打包閘 VDF ④ 四面登錄 | GREEN 93/93 |
 | 單元測試 test_vdf_system_manager_v0100 | 20/20(py3.11 · 3.12) |
 
 ## 七 · 掛著(下一手接)
 
-- Z82 Register `via-vdfsys` / `via-vrnsys` 候准(L70;貼行在九)。(本文第一版寫 Z74–Z78,與主線掉球冊 Z74–Z77 撞號,改接續 Z82–Z86)
+- Z82 已結:Register v0242 + 梭 4 支(操作員「依你建議執行」)。(本文第一版寫 Z74–Z78,與主線掉球冊 Z74–Z77 撞號,改接續 Z82–Z86)
 - Z83 VeritasCeleritas 正典裁定(四-1)。
 - Z84 engine/ 無版號 8 支立版號 + 卡書重建(四-2、四-3)。
 - Z85 工作站跑 `via-vdfchain run`(引擎域拿到快照)與 `via-vcgc page --publish`(交接域批號對上)。
@@ -85,7 +88,7 @@ L57 誠實分母 · L61/LL331 先量再造 · L70 .ps1 逐次許可 · L92 修�
 3. `python "supportive modules/registry/tests/test_vdf_system_manager_v0100.py"` → Ran 20 · OK。
 4. `via-selftest --only 子系統管理` → 5 站 OK。
 
-## 九 · 一貼即用(Register 兩行,候 L70 准;新版號檔 v0242 或直接貼進 profile 都行)
+## 九 · 一貼即用(已入 Register v0242 + 梭;下面兩行留給還沒點源新冊的視窗——點源 v0242 或 `via-fresh` 之後就不用貼)
 
 ```powershell
 # ── 側線 2026-09-21:via-vdfsys —— VDF 子系統管理對接口(VDF_SystemManager;上接 VCGC 下管四庫+引擎面+橋/工具面+交接/紀錄;零網路 · 預設只讀 · sync --apply 才落 VIA_Reports/vdf_system)
@@ -112,6 +115,6 @@ git stash drop     # 那份是引擎再生冊,要就 via-vrnbook build 再生
 via-vcgc           # 應印 v0120,多一行「VDF 系統管理」
 via-vdfsys         # 九域燈;via-vdfsys bridges → 加速器 43/43 · 網路 43/43
 ```
-要把兩行寫進 Register 檔(v0242 + 根/bin 兩支梭),等一句「准」(L70)。
+操作員「依你建議執行」後已寫進 Register v0242 + 根/bin 兩支梭(L70 這一次的許可)。
 
 工作站驗收(切到本線之後):`via-vdfsys` → 九域燈;`via-vdfsys bridges` → 43/43 · 43/43;`via-vcgc` → 註冊稽核 未登 0;`via-vdfchain run` → 對接口引擎域從 NODATA 轉為鏈跑器的燈。

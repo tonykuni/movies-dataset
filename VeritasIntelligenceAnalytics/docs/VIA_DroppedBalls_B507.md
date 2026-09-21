@@ -98,7 +98,7 @@
 
 | 代號 | 事 | 狀態 | 誰 | 下一步 |
 |------|----|------|----|--------|
-| Z82 | Register `via-vdfsys` / `via-vrnsys` 兩行候准(L70;守門版貼行在 docs/VIA_S20260921b_VDFSystemManager.md 九;准了走 v0242 + 根/bin 兩支梭) | 候准 | 操作員 | 一句「准」 |
+| Z82 | Register `via-vdfsys` / `via-vrnsys`:操作員「依你建議執行」= L70 許可 → Register v0242 + 根/bin 四支梭(守門版);Z65 一併結 | 已結 | 側線 | 工作站 `via-fresh` 或重點源 v0242 |
 | Z83 | VeritasCeleritas 三副本兩個版本(accelerator/ f6ecbfc4 237,382 B vs 根+50_Protection d9b107e2 237,062 B;VDF 對接口工具域 STALE) | 候裁 | 操作員 | 裁哪份是正典,另兩份對齊;對接口自轉綠 |
 | Z84 | VDF engine/ 8 支無版號 .py(ENG046/049 · MDL002/003/007 只有無版號檔且卡書指著;ENG047/050/051 旁邊另有尾版檔=疑似舊複本)+ 卡書 45 張是舊快照(冊有樹無 1 · 樹有冊無 3) | 候裁 | 主線 | 立版號/清複本 → 卡書重建(不手改) |
 | Z85 | VDF 獨立鏈容器沒跑過(對接口引擎域 NODATA)· 一頁交接 批554 < 律冊 批662(交接域 STALE;VRN 門同報) | 待跑 | 操作員 | `via-vdfchain run` · `via-vcgc page --publish` |

@@ -258,4 +258,4 @@ python "$env:VIA_TEST2"                                                         
 
 ## 十 · 續(同日 b):VDF 子系統管理對接口
 
-操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」→ 見 `docs/VIA_S20260921b_VDFSystemManager.md`(對接口 v0100 廿七檢 · VCGC v0120 十四段/㉖ · Grid v0434 · Deck v0159 · Manager v0148 · 中央冊補號 273/273 · 單元測試 20 檢;Register 兩行候 L70)。
+操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」→ 見 `docs/VIA_S20260921b_VDFSystemManager.md`(對接口 v0100 廿七檢 · VCGC v0120 十四段/㉖ · Grid v0434 · Deck v0159 · Manager v0148 · 中央冊補號 273/273 · 單元測試 20 檢;Register v0242 +via-vdfsys/+via-vrnsys 已入,操作員「依你建議執行」= L70 許可)。
