@@ -279,3 +279,52 @@ via-vcgc matrix --family vdf --apply
 | VDF 鏈矩陣 | 參數·邏輯·因子·引擎四件串起來能不能過 | 10 站 × (態/秒/證據/修法);rc 0 GREEN/1 RED/2 NODATA/3 ABSENT/4 GATED;`--resume` 只重跑沒過的站;rich HTML 依 MDL173 規格(10.5px);批667:七站綠、0b GATED | `via-vdfchain run` → `VIA_Reports/vdf_chain/`(遠端分支) |
 | 資料架構矩陣 | 庫裡實際有什麼 | 3 庫 × 61 表 × (列/最早/最新/滯後);六態 POPULATED/PARTIAL/SCHEMA-ONLY/PLANNED/PENDING_KEY/PENDING_AUTH(9/15 工作站:POPULATED 1 · PARTIAL 10 · PLANNED 1);12 SSOT 類 | `via-vdfarch` → `VIA_VDFArchitecture_v0100.json` + `VIA_UI_VDFArchitecture` 頁 |
 | 涵蓋 / 增量閘 | 缺誰、缺哪段 | ENG090 roster:market × 冊/有料/缺(工作站 TPEX 892/892 · TWSE 1097/1103);ENG089 plan:表 × 頭缺/尾缺(自 2023-01-01) | `via-vdfcov roster` / `via-vdfinc plan` |
+
+---
+
+## 十 · 追問:台股與主動式台股 ETF 的 REGEX(全樹找出來;2026-09-21 補)
+
+### 10.1 正典在哪(三本冊)
+
+| 冊 | 角色 | 現況 |
+|---|---|---|
+| `supportive modules/registry/VIA_Central_Synonym_Regex_v0100.json` | Regex 治理中心(append-only;LOCKED 不改;衝突=RED;新規先入此冊再落引擎) | 12 條;`VIA_Central_Params_SSOT` `locked_alignment` 對 12 條全 ALIGNED、drift 0 |
+| `supportive modules/ssot/VRN_TickerRegexSSOT_v0100.json` | 2026-08-04 操作員核准:「VDF/VRN/VAP ticker regex=四碼數字第一碼不可為零」;範疇凍結 | 取代 v029SSOT1B(該版把 2021–2030 年份排除寫進 regex,誤殺帶內 9 檔真股號:2021 中鋼構 · 2022 聚亨 · 2023 燁輝 · 2024 志聯 · 2025 千興 · 2027 大成鋼 · 2028 威致 · 2029 盛餘 · 2030 彰源) |
+| `supportive modules/registry/VRN_FieldRules_SSOT_v0100.json` `rules.ticker` | 操作員批628/634 逐字給定的**九型 ETF 表**(as_given 原文保留;corrected 是實測修正) | 被動股票 ETF 位數修正為 `00\d{2,4}`(0050 四碼 / 00878 五碼 / 006208 六碼) |
+
+### 10.2 台股個股(三代號政策:官方碼 / yfinance / Bloomberg)
+
+| 名稱 | Regex | 出處 | 備註 |
+|---|---|---|---|
+| `TW_TICKER_LOCKED` = `TWEquityTicker` | `^(?:[1-9]\d{3})$\|^(?!202[1-9]\|2030)\d{4}$` | Central_Synonym_Regex(LOCKED;owner VRN_Summarizer_v1 / 批118 正名) | **defect_note(批472)**:第一選項已全收,第二選項的年份負向前瞻是死碼,2026 照收。字形只管字形;**年份判定改綁 `YEAR_BY_ROSTER`** |
+| `YEAR_BY_ROSTER` | `^[1-9]\d{3}$` + 名冊對帳 | 同上(owner `VIA_VRN_FirstPageEngine.is_valid_bare`;冊=`tw_listings_industry`,正主 CGC_MDL142_TWNameBook) | 四碼 → 冊在且 1990–2100 且**不在冊上**=年份;其餘=代號;冊不可得=不判、標「未經庫對帳」。**不能用排除區間修**(整個鋼鐵類股住在 2000–2030) |
+| `TW_YFINANCE` / `TWEquityYFTicker` | `^[1-9]\d{3}\.(TW\|TWO)$` / `^([1-9]\d{3})\.(TW\|TWO)$` | Central_Synonym_Regex(LOCKED) | 上市 `.TW` / 上櫃 `.TWO` |
+| `TW_BLOOMBERG` / `TWEquityBBGTicker` | `^[1-9]\d{3}\s*TT$` / `^([1-9]\d{3})\s+TT$` | 同上(LOCKED) | 四碼 + TT |
+| VRN 文中/檔名擷取版 | `(?<!\d)([1-9]\d{3})(?!\d)` · `(?<!\d)([1-9]\d{3})\.(TW\|TWO)\b` · `(?<!\d)([1-9]\d{3})\s+TT\b` | `VRN_TickerRegexSSOT_v0100.rules` = `supportive modules/70_VRN_Rules/SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py` 第 32–34 行 | 全樹 regex 清冊量到 **37 檔共用**(`VIA_SSOT_RegexDict` top_shared);2021–2030 走 `disambiguate_year_vs_ticker` 語境層(首頁代碼 0.97 · 官方冊 0.9 · 日期線索 0.9;無佐證=AMBIGUOUS 人工) |
+| 中央詞彙引擎 | 嚴格 `^[1-9]\d{3}$` · 擷取 `(?<!\d)[1-9]\d{3}(?!\d)` · 帶後綴 `(?<!\d)([1-9]\d{3})(?:\.(?:TW\|TWO)\| TT)?(?![A-Za-z0-9])` | `CGC_MDL001_CentralGovernanceEngine_v0401.py` 230–251 行 | |
+| VDF 擷取端實際過濾 | **不是 regex**:`code.isdigit() and len(code)==4` | `VDF_ENG054_TWDailyBackfill_v0105.py` 195/221 行 | 特別股/權證等非四碼誠實排除;`yf_ticker = code + .TW/.TWO` |
+| 舊式(帶年份排除;已被 v0100 SSOT 取代但活樹仍在) | `(?!0)(?!202[1-9])(?!2030)([1-9]\d{3})`(MDL007 根+engine/、MDL004)· `^(?!202[1-9])(?!2030)[1-9]\d{3}$`(MDL002、`VIA_SSOT_Unified.py` 5138/5234/7020/7563/8038 行)· `TW_STOCK_CODE_4DIGIT`(FirstPageEngine 575 行,實際判碼已改走 `rx_bare_any` + 冊) | 凍結債務普查 `audit_tools/TickerRegex_LegacyDebt_Census_v0100.json`(106 檔) | 政策:不做全庫突變,執行入口以 runtime 墊片優先 |
+
+已知衝突(冊上自己寫的):`^[1-9]\d{3}$` 與西元四位年**完全重疊**(2025/2026 兩邊都合法)→ 裸四碼沒有上下文不可判;ENG073 `_date_spans()` 先遮日期區段再找代號。
+
+### 10.3 主動式台股 ETF
+
+| 名稱 | Regex | 出處 | 收什麼 |
+|---|---|---|---|
+| `ActiveTWETFTicker`(LOCKED) | `^00\d{2,3}[AD]$` | Central_Synonym_Regex(批118 升格 LOCKED;ENG046/ENG051 共用) | 00 + 2~3 位數 + 尾碼 **A(股票/海外)或 D(債券)**;5 或 6 字元 |
+| `TW_ACTIVE_ETF`(未鎖;執行冊) | `^\d{5}A$` | Central_Synonym_Regex(owner flow_tw_active_etf TOOL-060 = CGC_MDL075)· **`VDF_ENG077_ActiveETFUniverse` 第 69 行 `A_CODE`**(宇宙日更正主;Register 註解「A 碼律」) | 五碼數字 + A;**只股票型**;這就是 L35「VDF 基金只抓主動式台股 ETF」實際用的尺;非 A 碼=被動,不入宇宙 |
+| ENG051 持股引擎(尾版 v0102) | `ACTIVE_TW_ETF_PATTERN = ^00\d{3}A$` · 成分股 `HOLDING_TICKER_PATTERN = ^\d{4}[A-Z]?$` | `VDF_ENG051_ActiveTWETF_Holdings_v0102.py` 172–173 行 | 恰 6 字元 A 碼(v0100/v0101 是 `00\d{2,3}A`) |
+| ENG046 擷取總冊轉錄 | `ETF_CODE_RE = ^(00\d{2,3}[AD])\s+(.+)$`;驗證 `^00\d{2,3}[AD]$` | `VDF_ENG046_FetchMatrixRegistry.py` 98/332 行 | 與 LOCKED 一致(含 D) |
+| MDL002 yfinance 引擎 | `TW_ETF_ACTIVE_REGEX = ^\d{5}A\.TW$` | `VDF_MDL002_YFinanceFetchingEngine.py` 494/498 行 | yfinance 碼形 |
+| ENG078 持股史深 | `TW_CODE_RX = ^\d{4}[A-Z]?$` | 394 行 | PCF 表內成分股碼 |
+| ENG087 市場清單治理 | `CODE_RE = ^\d{4,6}[A-Z]?$` | 107 行 | 寬鬆,股票與 ETF 通收 |
+| ENG054 ETF 補源 | 只收**四碼數字**被動碼(0050);五碼+A 留給 ENG077 | v0104 批401 | Zero-Hydra 分工 |
+| VRN FieldRules 九型表(操作員給定) | 主動股票 `^(00\d{3}A)$` · 被動債券 `^(00\d{3}B)$` · 主動債券 `^(00\d{3}D)$` · 槓桿 `^(00\d{3}L)$` · 反向 `^(00\d{3}R)$` · 期貨 `^(00\d{3}[UV])$` · 平衡 `^(00\d{3}T)$` · 被動股票 `^(00\d{2,4})$` · 一般個股 `^([1-9]\d{3})$`;合併 `^(?:[1-9]\d{3}\|00\d{3}[ABDLRTUV]\|00\d{2,4})$`(+`\.(TW\|TWO)` / `\sTT`) | `VRN_FieldRules_SSOT_v0100.json` `rules.ticker.corrected` / `platform.by_type` | **帶尾碼先判、純數字後判**(倒過來 `00\d{2,4}` 會先吃掉 00679 再丟 B) |
+
+### 10.4 要注意的三件事
+
+1. **主動 ETF 有兩把尺並存**:`^00\d{2,3}[AD]$`(含 D 債券型、5 或 6 字元)與 `^\d{5}A$`(只股票型、恰 6 字元)。00980A 兩把都收;主動債券 ETF(尾 D)只有前者收;`^00\d{2,3}A$` 會收 5 字元 `0098A`。中央 Params 冊把兩者都判 ALIGNED,因為各自對各自的使用者;**VDF 宇宙(ENG077)實際用的是 `^\d{5}A$`**,與 L35 一致。
+2. **個股尺的年份排除是死碼**(LOCKED 式第二選項永遠輪不到);VRN v0100 SSOT 明令「年份排除不得寫入 regex 本體」,年份靠冊對帳(YEAR_BY_ROSTER)。VDF 的 MDL002/MDL007 與 `VIA_SSOT_Unified.py` 仍是舊式,列在凍結債務普查,靠 runtime 墊片。
+3. **VDF 擷取面根本不用 regex 選票**:ENG054 用 `isdigit() and len==4`,宇宙=官方雙所清單全員;regex 只在 VRN 從研報/檔名抓代號、以及 ETF 分型時才上場。
+
+工作站查法:`via-ssotregex`(CGC_MDL115 全樹 regex 清冊)· `via-etfuniv --offline`(A 碼律宇宙)· `via-finlex --reconcile`(欄位 regex 對帳)。
