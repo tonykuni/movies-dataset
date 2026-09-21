@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0438→v0440(側線 2026-09-21 c;主線批號由併線的手指定 L25):主線批688 出了自己的 v0438(與本線 b 批的 v0438 撞名,本線 v0439 又是從本線 v0438 長出來的),
+  這一版把本線所有格子改動重貼在**主線 v0438** 上(v0439 留作版史,尾版律 L04):
+  ① 兩站:VDF 子系統管理對接口廿七檢(--selftest rc0)· VDF 子系統管理實跑(status nodata_ok);中央控管台站名 二十二檢 → 二十六檢(VCGC v0120)。
+  ② 境缺=SKIP 誠實分類器(操作員令「檢視 VDF 現況 · 測試修正各引擎 · 避免九頭龍」):全格子 289 站容器實跑 FAIL 82,~60 站同一根因——pandas/duckdb/fitz/pyarrow/rich 不在本境,
+     每支引擎各自寫成 FAIL。改在尺上:站敗但輸出說「第三方套件不在本境」(`No module named x`,x 不是自家模組——自家模組集向 CGC_MDL124.tracked_set() 取,不另掃樹)或引擎自報 rc=3,
+     判 SKIP 環境缺件(不是綠、不進分母 L57;批686 ABSENT 具名套件同律);自家模組炸了照舊 FAIL。結果 FAIL 82 → 15、SKIP 8 → 67。
+  ③ 五站改 nodata_ok(ENG058 · MDL098 · MDL099 · MDL105 · MDL173:庫/再生頁/rich 不在=NODATA rc2 不是紅);VDF 獨立鏈站名 十八檢 → 十九檢(CGC_MDL170 v0102 +⑲)。站 287 → 289。
+
 v0437→v0438(批688 兩站改名):「VRN 邏輯架構索引冊十六檢」→「十七檢」(via_vrn_logic_book v0106:建冊冪等——內容沒變不重寫、built_at 沿用;
   工作站實錄 `via-vrnbook build` 之後 `git pull` 被這本刻意入倉的冊擋掉)· 「三大報表擷取引擎八檢」→「十二檢」(VDF_ENG082 v0101:
   --only 吃 PowerShell 拆開的陣列 · 注入 session 零列再跑原生 · 零列不 Traceback)。站數不變(287)。
@@ -1880,6 +1888,7 @@ except Exception:
 
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -2073,7 +2082,7 @@ def battery(fast: bool):
     add("族群輪動實庫轉接六檢(批152)", newest("GRP_ENG040_GroupingRotationRunner_v*.py", VIA / "functional modules/GroupIndex/engine"), ["--selftest"], "rc0", 600, heavy=True)
     add("成交值回補六檢(批154)", newest("VDF_ENG057_TradingValueBackfill_v*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 300)
     add("輪動方法論實測室八檢(批154)", newest("GRP_ENG041_RotationMethodLab_v*.py", VIA / "functional modules/GroupIndex/engine"), ["--selftest"], "rc0", 600, heavy=True)
-    add("產業混合分類冊六檢(批155)", newest("VDF_ENG058_IndustryUnifiedMap_v*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 180)
+    add("產業混合分類冊六檢(批155;側線 2026-09-21 c:ENG058 v0101 庫缺=NODATA rc2 不是紅)", newest("VDF_ENG058_IndustryUnifiedMap_v*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "nodata_ok", 180)
     add("估值 band 引擎七檢(批155)", newest("VDF_ENG059_EstimateBands_v*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 180)
     add("網路韌性診斷層七檢(批156)", newest("SUP_MDL741_NetResilience_v*.py", VIA / "supportive modules" / "network"), ["--selftest"], "rc0", 120)
     add("NLP 支援樞紐九檢(批157)", newest("VRN_ENG066_NLPSupportHub_v*.py", VRN), ["--selftest"], "rc0", 300)
@@ -2103,8 +2112,8 @@ def battery(fast: bool):
     add("資料庫合併匯入八檢(批216)", newest("VDF_ENG065_DbImport_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 120)
     add("使用者介面總入口八檢(批222)", newest("CGC_MDL097_PortalUI_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
     add("全球宇宙擷取八檢(批226)", newest("VDF_ENG066_GlobalUniverse_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 120)
-    add("資料庫目錄台八檢(批226)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 180)
-    add("全球市場觀測八檢(批227)", newest("CGC_MDL099_GlobalMarkets_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
+    add("資料庫目錄台八檢(批226;側線 2026-09-21 c:庫/再生頁不在=NODATA rc2 不是紅)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "nodata_ok", 180)
+    add("全球市場觀測八檢(批227;側線 2026-09-21 c:庫/再生頁不在=NODATA rc2 不是紅)", newest("CGC_MDL099_GlobalMarkets_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "nodata_ok", 120)
     add("首頁文字擷取五十六檢(批235/410/444/449/450/451/522/547/549/550/551/552/626;密度分流閘·三階梯·不編造「跑了」·在位≠跑得動·車道境預檢:cfg 在不在×home 裡有沒有 python;**批626 行程分片預熱**:三支抽取是純 Python CPU 工,執行緒 0.76×(比序列慢)、行程 3.68×,端到端 1.90× 且 sidecar 逐位元組相同;`--jobs 1` 退得回原路;順帶修掉一盞**自己量自己**的假綠——`_src72.index(\"else extract_page1_zones(p)\")` 整支檔裡只有檢查自己那一行有,所以它永遠綠)", newest("VRN_ENG072_FirstPageText_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 180)
     add("首頁全能引擎三十九檢(批448)", newest("VIA_VRN_FirstPageEngine_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 600)
     add("轉檔器 DPI 自動調整九檢(批448/449;批516 逾時 600:渲染類自測重)", newest("VRN_MDL001_Converter_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 600)
@@ -2125,7 +2134,7 @@ def battery(fast: bool):
     add("加速器覆蓋十檢(批255)", newest("CGC_MDL103_AccelCoverage_v*.py", HERE), ["--selftest"], "rc0", 240)
     add("VOFIE 全格式橋八檢(批256)", newest("VRN_ENG077_OmniFormatBridge_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 300)
     add("測試結果總表六檢(批257)", newest("CGC_MDL104_TestResultsHub_v*.py", HERE), ["--selftest"], "rc0", 180)
-    add("治理主控台六檢(批258)", newest("CGC_MDL105_GovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 120)
+    add("治理主控台六檢(批258;側線 2026-09-21 c:庫/再生頁不在=NODATA rc2 不是紅)", newest("CGC_MDL105_GovernanceConsole_v*.py", HERE), ["--selftest"], "nodata_ok", 120)
     add("市場分析引擎自測(批259 合流)", newest("VAP_ENG013_MarketAnalytics_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
     add("主動ETF×共識分析自測(批264)", newest("VDF_ENG068_ETFConsensusAnalysis_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("月營收×共識分析自測(批264)", newest("VDF_ENG069_RevenueConsensusAnalysis_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
@@ -2149,7 +2158,7 @@ def battery(fast: bool):
     add("全景批次修復計畫實跑(批670;rc=現況分類,非健康度)",
         newest("CGC_MDL171_PanoramaBatchPlanner_v*.py", HERE), [], "env", 420)
     # 批667:VDF 獨立鏈。兩盞燈——工具健康(自測)與**鏈本身跑不跑得動**(實跑)是兩件事。
-    add("VDF 獨立鏈十八檢(批667;加速器+網路工具+參數/邏輯/因子/引擎七站;since 2023-07-01)",
+    add("VDF 獨立鏈十九檢(側線 2026-09-21 c +⑲ 缺件具名 ABSENT;批667;加速器+網路工具+參數/邏輯/因子/引擎七站;since 2023-07-01)",
         newest("CGC_MDL170_VDFChainRunner_v*.py", HERE), ["--selftest"], "rc0", 420)
     # 實跑期望 gated_ok:容器沒開同意閘,要觸網的站是 GATED(缺料)不是 RED(壞掉)。
     add("VDF 獨立鏈實跑(批667;GATED=同意閘未開,AI 永不代設)",
@@ -2193,6 +2202,14 @@ def battery(fast: bool):
     add("VRN 子系統管理實跑(批681;status 六域現況+連結表;rc0 綠 / rc2 過期或缺料誠實 / rc1 才是壞)",
         newest("VRN_SystemManager_v*.py", VRN), ["status"], "nodata_ok", 300)
 
+    # ── 側線 2026-09-21:VDF 子系統管理對接口(操作員令「建立 VDF_SystemManager 與 VIA 對接 · VDF 所有引擎找出來 · 所有 PY 接加速器 · 所有 VDF 加裝網路工具」)
+    #   與 VRN 那扇門同一份契約:上接 VCGC(v0120 起 vdf_system() 經它讀),下管 VDF 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;
+    #   橋律逐支量(尺=CGC_MDL124:尾版缺加速器橋或真擷取缺網路橋=RED);零網路 · 零寫庫 · 預設只讀(sync --apply 只落 VIA_Reports/vdf_system)。
+    add("VDF 子系統管理對接口廿七檢(側線 2026-09-21;VDF_SystemManager:上接 VCGC 下管四庫+橋/工具 · 四態表驅動 · 橋律逐支量委派橋掃器 · 乾跑零寫 · 快照差異負控 · 七處自審不假綠 · 自測零污染)",
+        newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["--selftest"], "rc0", 300)
+    add("VDF 子系統管理實跑(側線 2026-09-21;status 九域現況+連結表+橋律;rc0 綠 / rc2 過期或缺料誠實 / rc1 才是壞)",
+        newest("VDF_SystemManager_v*.py", VIA / "functional modules/VDF"), ["status"], "nodata_ok", 300)
+
     # ── 側線 2026-09-21(claude/busy-bell-97sa4f · PR #53)的三站,原樣收進來 ────────
     #   兩條分支**同時取了 v0431 這個版號**:他們的 v0431 加了下面三站,我的 v0431 加了
     #   同義字聯集兩站。同名不同內容的新檔=保證撞合併,而且誰後併誰的站就會**整批不見**
@@ -2214,8 +2231,8 @@ def battery(fast: bool):
     #   這一站不判任何燈也不碰庫——它量的是**規格還是不是一份**:
     #   四支落頁引擎(MDL169/170/171/172)共用它的 css()/殼/三顆鍵,
     #   誰哪天又自己長一份 CSS,那一支的 HTML 檢就會先紅。
-    add("矩陣式報告排版規格二十檢(批672;字小 10.5px/rich 與 HTML 兩車道共用同一個殼/三顆鍵零外連)",
-        newest("CGC_MDL173_MatrixReportSpec_v*.py", HERE), ["--selftest"], "rc0", 240)
+    add("矩陣式報告排版規格二十檢(批672;字小 10.5px/rich 與 HTML 兩車道共用同一個殼/三顆鍵零外連;側線 2026-09-21 c:rich 缺=NODATA rc2 不是紅)",
+        newest("CGC_MDL173_MatrixReportSpec_v*.py", HERE), ["--selftest"], "nodata_ok", 240)
     # 批671:VRN 六層鏈。同樣兩盞燈,而且這支的尺在批671 當天被自己照出兩個洞——
     #   ① 沒有自測門的支被 `--selftest` 判成 RED(假紅)或跑了預設動作判成 GREEN(假綠);
     #   ② 冊釘著舊版號,於是敲到的是「剛修好那支的前一版」。兩個洞都進了檢。
@@ -2332,7 +2349,7 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台二十二檢(批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台二十六檢(側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("OCR 車道執行器三檢(批495;本境缺後端派到 via_paddle_311 跑 GLE 編排器,JSON 回主行程)",
         newest("SUP_MDL747_OcrLaneRunner_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
@@ -2707,6 +2724,52 @@ sys.exit(0 if r.returncode == 0 else 1)
 """
 
 
+_MODNF = re.compile(r"No module named '([A-Za-z0-9_.]+)'")   # 有沒有 ModuleNotFoundError: 前綴都認(有的引擎只印後半句)
+_LOCAL_MODS: set | None = None
+
+
+def _local_modules() -> set:
+    """VIA 樹上自家模組名(.py 檔名與套件夾名),算一次。缺的名字在這裡=自家件炸了(FAIL),不在=第三方套件不在本境(SKIP)。
+    尺=CGC_MDL124.tracked_set()(橋掃器的受管檔集;抄到函式才算出處 LL316,本站不另掃樹);橋掃器缺就退空集並在註記講明。"""
+    global _LOCAL_MODS
+    if _LOCAL_MODS is None:
+        mods = set()
+        try:
+            import importlib.util as _ilu
+            sw = sorted(HERE.glob("CGC_MDL124_BridgeSweeper_v????.py"))[-1]
+            spec = _ilu.spec_from_file_location("grid_sweeper_ruler", sw)
+            mod = _ilu.module_from_spec(spec)
+            sys.modules["grid_sweeper_ruler"] = mod
+            spec.loader.exec_module(mod)
+            for rel in mod.tracked_set():
+                q = Path(str(rel))
+                if q.suffix == ".py":
+                    mods.add(q.stem)
+                    if q.name == "__init__.py":
+                        mods.add(q.parent.name)
+        except Exception:
+            pass
+        _LOCAL_MODS = mods
+    return _LOCAL_MODS
+
+
+def _missing_third_party(text: str, station_dir: Path | None = None) -> list:
+    """輸出裡每一個 ModuleNotFoundError 的頂層名:不是自家模組的才算「境缺」。
+    自家=受管檔集裡的 .py 名,或站點自己那一夾裡的 .py 名(還沒 commit 的新件也算自家)。"""
+    local = set(_local_modules())
+    if station_dir is not None:
+        try:
+            local |= {q.stem for q in Path(station_dir).glob("*.py")}
+        except Exception:
+            pass
+    out: list = []
+    for name in _MODNF.findall(text or ""):
+        top = name.split(".")[0]
+        if top not in out and top not in local:
+            out.append(top)
+    return out
+
+
 def run_one(b):
     if b["path"] is None or (b["path"] != "PYCODE" and not Path(b["path"]).exists()):
         return {"name": b["name"], "state": "SKIP", "note": "引擎缺/自指佔位(誠實)", "secs": 0}
@@ -2735,6 +2798,13 @@ def run_one(b):
             state = "OK" if r.returncode in (0, 4) else "FAIL"
         else:  # env
             state = "OK" if r.returncode == 0 else "SKIP"
+        # 側線 2026-09-21 c:缺件≠壞掉。站敗但輸出說的是「第三方套件不在本境」或引擎自報 rc=3(四態律 ABSENT),
+        # 判 SKIP 環境缺件(不是綠、不進分母 L57;批686 ModuleNotFoundError → ABSENT 具名套件同律)。缺的是自家模組照舊 FAIL。
+        if state == "FAIL" and b["expect"] != "env":
+            _miss = _missing_third_party(r.stdout + r.stderr, None if b["path"] == "PYCODE" else Path(b["path"]).parent)
+            if _miss or r.returncode == 3:
+                state = "SKIP"
+                tail = [("套件不在本境:" + " · ".join(_miss)) if _miss else "引擎自報 ABSENT(rc=3;缺件≠壞掉)"] + list(tail)
         # 批567「自測時測字完成」:敗站的註記是唯一線索,一律不截斷;OK/SKIP 的是計數,切了沒損失
         note = " / ".join(tail) if state == "FAIL" else " / ".join(t[:80] for t in tail)
         if state == "SKIP":

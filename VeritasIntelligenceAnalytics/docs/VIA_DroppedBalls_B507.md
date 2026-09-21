@@ -103,6 +103,12 @@
 | Z85 | ENG068 ⑨ features_daily 2026-09-14 因子覆蓋 530/1978=26.8%:⑨ 要求最新完整日 100%;是因子鏈沒跑全宇宙(資料缺),不是引擎壞 | 操作員的手 | 操作員 | `via-vdffetch`(3a/3b 因子段)後 `via-vrnrun` 看 ⑨ |
 | Z86 | **VCGC v0119 撞號**:main(PR #58 brave-goldberg:執行期境不進等式 ㉕)與側線 busy-bell(`+vdf_system` 段 ㉕)各有一份**內容不同**的 `CGC_MDL149_…_v0119.py`;Grid v0434 亦只在 busy-bell(本線已取 v0435 避開)。併 busy-bell 時 VCGC 必撞 | 候 | 操作員/側線 | 側線那份改 v0120 並把 main v0119 的執行期境律一起帶上,再併;或先併本線再由我出聯集版 | ← 側線 b 已解:VCGC **v0120** 疊在主線 v0119 上(主線 ㉕ 原樣保留,VDF 檢改 ㉖;PR #53) |
 | Z87 | **批687 撞號**:awesome-bardeen 62d38dd4「第一次真跑 --verify 讀對了」也取了 批687(未併);main 的 批687 是本線 cd2ac7a3/4c872e25(PR #61 已併)。先併 main 的贏,那條線改 687B 或下一號;LL334 今天第四次 | 候 | 操作員轉告 | 它改號後本列劃線 |
+| Z58 | 一頁交接三處(倉根 VIA_HANDOVER_LATEST.md / docs ONEPAGE / 頁)停在 批554(2026-09-17),律冊已 批662、逐批 B 文已 679;L15 三處同一份但都舊;收尾清單#2 `via-vcgc page --publish` 自 批554 未跑 | 未做 | AI | 下一批發布前先 `via-vcgc status` 看容器 ABSENT 段;工作站跑更準 |
+| Z59 | 律冊 lessons 停在 LL305(批662);批663–679d 的 LL306–LL335 只在 docs/commit 訊息,未入 VIA_Policy_Laws_SSOT(政策庫是批號正本,VCGC 因此印 批662) | 未做 | AI | 逐條從 docs/commit 收回冊(只增不減;id 不改;先對表再寫) |
+| Z70 | 第三條線 `claude/brave-goldberg-ri5k42`:側線 session(01YJPv…)07:52 狀態「awaiting push of claude/brave-goldberg-ri5k42 to read session VRN logic」;遠端尚無此分支;出現後三線對表(版號 LL334 · 台帳 · 冊)再併 | 候 | 操作員 | 推上來後貼回分支名,我出對表 |
+| Z80 | VDF_ENG090 ㉔:`roster()` 走 ABSENT 早退分支(名冊缺/duckdb 缺/庫缺/`tw_daily_prices` 缺)時 note 沒帶「不代設」字樣,㉔ 自檢在沒有價表的環境必紅(批682B 容器:補料前紅、補料後綠) | 未做 | AI | ENG090 v0105:初始 `out` 就帶「不代設」note,四態全帶 |
+| Z81 | 容器 SessionStart 開機更新器 ⓪ 環境自補:jieba 在 Debian setuptools 68/wheel 0.42 建輪失敗(`install_layout`),pip 把整份 `VIA_Env_Requirements_v0100.txt` 一起放棄 → 29 條 `No module named duckdb/pandas`,OmniFetch 15 車道全假敗;`pip install --use-pep517 jieba` 可過(批682B 實證,補裝後重跑收尾 YELLOW) | 未做 | AI | `via_boot_update.sh` ⓪ 段:先裝可裝的,jieba 單獨 `--use-pep517`,失敗只列不放棄整份 |
+| Z88 | 財報頁列只覆蓋 30/105 份(48 份非個股 N/A;**27 份個股沒有 vrn_report_financial 列**=財報頁擷取未覆蓋或表格未被判成財務頁),驗算與官方核對的分母被它壓住;v0114 起分母印在畫面 | 操作員的手 | 操作員 | `via-py vrn "functional modules\VRN\VRN_ENG074_FinancialPages_v0114.py" run` 後 `--verify` 貼回分母行;仍不上去的那些貼回檔名,我看是判準還是表格形狀 |
 
 ## 側線 2026-09-21 b 追記(VDF 子系統管理對接口;編號接續主線 Z88 → Z89–Z94;本線先取 Z74–Z78 撞主線批683,再取 Z82–Z86 撞主線批685/686,第三次取 Z88–Z93 又撞主線批687(awesome-bardeen)的 Z88,第四次才空——側線的 Z 號只能在併線當下取,而且每併一次都要重看;來源 docs/VIA_S20260921b_VDFSystemManager.md 七)
 
