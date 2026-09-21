@@ -9631,8 +9631,15 @@
       "category": "SSOT",
       "component": "VRN_ENG073 v0132 [結構庫] 落點印出(44 檢)· VRN_ENG083 v0115 候選補舊路徑鏈(55 檢)· 格子 v0413 · LL295/LL296",
       "code": "**定案:批655 是對的,批656 是我自我懷疑錯了。**ENG073 v0132 加一行 `[結構庫] vrn_report_basic 寫入 → …`,容器實跑印出 `…/VDF/output_hub/mega/vdf_tw_market.duckdb` —— 而 ENG083 v0112 讀 `functional modules/VRN/output/vrn_reports.duckdb`。**兩個不同檔案,程式碼事實**。批656 我拿「舊表券商缺口剛好也是 15」去推翻它:舊表本來就是同一支引擎同一批 105 份更早一次寫的,數字一樣是必然(LL295);我還誤稱「容器看不見」,容器一直有只是沒印。ENG083 v0115:批656 的 resolve_db 只抄了環境變數那半、沒抄舊路徑鏈,容器候選裡根本沒有 mega 那本=看起來修好其實一格沒動(LL296)。補上同一常數後容器實跑:庫→mega(最後被寫過的一本)· 第二顆頭 81 列 09-20 11:51 vs 81 列 09-19 21:44(舊的差一天)· 零綠探針 upside_state 多出 DB_DERIVED×2、upside_db 出現 35.3/11.5。ENG073 44/44 · ENG083 55/55。"
+    },
+    {
+      "ts": "2026-09-21 07:36",
+      "op": "ADD",
+      "category": "VRN",
+      "component": "VRN_SystemManager v0100 子系統管理對接口(廿二檢;VIA-SYS-0011)· VCGC v0118 經口讀 VRN(廿四檢)· 格子 v0433 +2 站 · 規格項 vrn_system · 掉球 Z57–Z68 · VRN 全景掃描 docs/VIA_VRN_Panorama_20260921.md",
+      "code": "操作員令「設立 VRN_SystemManager.py 上下銜接 VIA,管理子系統的政策/邏輯/因子/參數;以後讀取就從 VIA 往下透過 VRN_System 作為管理對接口;自適應、智慧化、上下資訊自動更新的連結」。上接:VCGC v0118 的 logic()/factors() 一律呼叫 VRN_SystemManager.read('logic'|'factor')(回傳形狀不變、多 via 署名;對接口缺席=ABSENT 不退回舊路),+vrn_system() 段(status 一行/一頁十三段/頁一卡)+㉔ 檢。下管:政策(律冊 VRN 子集+ENG082 政策因子)· 邏輯(索引冊+守門委派 do_check+ENG082 latest)· 因子(SUP_MDL748 policy_rows)· 參數(via_params_central.BOOKS VRN 子集 34 本 + 樞紐自報常數 4 本=38)· 引擎(六層鏈快照照抄再拆:容器 RED 16 = 缺件 11 · 缺料 1 · 其餘 4;尾版家族 58 用 VCGC._tail_files 同一把尺;五面 15/69/25/9/1404)· 交接(ENG082 三處 hash · 一頁 批554 < 律冊 批662 → STALE 不是 RED)。自適應連結:每條現解尾版/現算 sha/現量年齡;sync 對上一次快照判 NEW/CHANGED/GONE/SAME(負控:改一條 sha 抓到 CHANGED 1、鬼連結抓到 GONE 1);乾跑零寫;--apply 只落 VIA_Reports/vrn_system。七處只做四處(引擎/規格項/格子/台帳+交接):短令 via-vrnsys、梭、Deck、Manager 正式名稱候操作員「准改 Register」(L70;且 v0241/v0147/v0158 已被 PR #53 佔號 LL334;30 條活分支掃過 v0433/v0118/VRN_SystemManager 空號)。registry-sync --apply:活元件 5955 · 新 47 · 變更 99 · 退役 1(VIA-ENV-0001 未路由件)→ VCGC ⑬ 5909/5908 那一盞紅隨之收(複驗見 B681 文)。批號自 681 起算:前 session 的 批680 五檔只 stage 未 commit(Z57)。"
     }
   ],
-  "updated_at": "2026-09-22 08:30",
-  "batch": "批657"
+  "updated_at": "2026-09-21T07:36:24",
+  "batch": "批681"
 }
