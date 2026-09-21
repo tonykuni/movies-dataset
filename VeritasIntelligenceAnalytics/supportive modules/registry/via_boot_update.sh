@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # via_boot_update.sh — VIA 開機自動更新器(批150;操作員令:不用固定時間,開啟系統即更新)
+# 批687(Z81):⓪ 環境自補改逐件退路(整份一件建輪失敗不再全部放棄;jieba --use-pep517;覆寫鍵 VIA_ENV_REQ 只給合成檢)
 # SessionStart hook 背景喚起;每日首開才實跑(marker 防重複);log 落 VIA_Reports/boot_update_logs/
 # 同意閘:操作員批123/137/150 自動更新常令授權,本腳本屬該令執行面。
 set -u
@@ -35,10 +36,25 @@ missing = [pip for mod,pip in need if importlib.util.find_spec(mod) is None]
 core = ["pandas","numpy","duckdb","plotly","pyarrow","yfinance","fitz",
         "jieba","markitdown","openpyxl","matplotlib","psutil"]
 core_missing = [m for m in core if importlib.util.find_spec(m) is None]
-if core_missing:
-    req = Path(os.environ["VIA"]) / "supportive modules/registry/VIA_Env_Requirements_v0100.txt"
-    print(f"[env] 核心缺 {len(core_missing)}:{','.join(core_missing)} → 冊補裝")
-    subprocess.run([sys.executable,"-m","pip","install","--quiet","-r",str(req)],check=False)
+req_override = os.environ.get("VIA_ENV_REQ")   # 批687(Z81):覆寫鍵,只給合成檢用;真機器不設
+req = Path(req_override) if req_override else Path(os.environ["VIA"]) / "supportive modules/registry/VIA_Env_Requirements_v0100.txt"
+if core_missing or req_override:
+    print(f"[env] 核心缺 {len(core_missing)}:{','.join(core_missing) or '-'} → 冊補裝 {req.name}")
+    pip = [sys.executable,"-m","pip","install","--quiet","--disable-pip-version-check"]
+    r = subprocess.run([*pip,"-r",str(req)],check=False)
+    if r.returncode != 0:
+        # 批687(Z81):整份一起裝,一件建輪失敗 pip 就把整份放棄(jieba 在 Debian setuptools 68 撞 install_layout),
+        # 29 條 No module named 全是假敗。退回逐件裝;失敗的再試 --use-pep517;還是失敗只列名,不放棄其餘。
+        pkgs = [l.split("#",1)[0].strip() for l in req.read_text(encoding="utf-8").splitlines()]
+        pkgs = [x for x in pkgs if x]
+        bad = []
+        for x in pkgs:
+            r1 = subprocess.run([*pip,x],check=False,capture_output=True,text=True)
+            if r1.returncode != 0:
+                r2 = subprocess.run([*pip,"--use-pep517",x],check=False,capture_output=True,text=True)
+                if r2.returncode != 0:
+                    bad.append(x)
+        print(f"[env] 整份補裝 rc={r.returncode} → 逐件補裝 {len(pkgs)} 件 · 失敗 {len(bad)}" + (f":{','.join(bad)}" if bad else ""))
 if missing:
     subprocess.run([sys.executable,"-m","pip","install","--quiet","docopt-ng"],check=False)
     subprocess.run([sys.executable,"-m","pip","install","--quiet","--no-deps",*missing],check=False)
