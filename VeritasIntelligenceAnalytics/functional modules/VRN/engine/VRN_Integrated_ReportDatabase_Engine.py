@@ -52,6 +52,36 @@ try:
 except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import argparse
 import csv
@@ -527,7 +557,7 @@ BROKER_KEY_BRIDGE = {
     "CITI": "CITI", "CITIGROUP": "CITI", "UBS": "UBS", "CLSA": "CLSA", "CLST": "CLSA", "MACQUARIE": "MACQUARIE",
     "MQ": "MACQUARIE", "MCQ": "MACQUARIE", "HSBC": "HSBC", "HUANAN": "HUANAN", "HN": "HUANAN", "TAISHIN": "TAISHIN",
     "TSC": "TAISHIN", "PRESIDENT": "PRESIDENT", "PSC": "PRESIDENT", "DAIWA": "DAIWA", "BOFA": "BOFA", "BOA": "BOFA",
-    "GF": "GF", "GFHK": "GF", "ESUN": "ESUN", "FIRST": "FIRST", "CS": "CS", "CREDITSUISSE": "CS",
+     "GFHK": "GF", "ESUN": "ESUN", "FIRST": "FIRST", "CS": "CS", "CREDITSUISSE": "CS",
 }
 
 
@@ -988,7 +1018,7 @@ def default_broker_aliases() -> Dict[str, List[str]]:
         "MasterLink": ["MasterLink", "元富", "元富投顧", "元富證券"],
         "Jih Sun": ["Jih Sun", "日盛", "日盛投顧", "日盛證券"],
         "Mega": ["Mega", "兆豐", "兆豐投顧", "兆豐證券"],
-        "CTBC": ["CTBC", "中信", "中信投顧", "中國信託", "中信證券"],
+        "CTBC": ["CTBC", "中信", "中信投顧", "中國信託", ],
         "Nomura": ["Nomura", "野村"],
         "Morgan Stanley": ["Morgan Stanley", "MS", "摩根士丹利"],
         "JPMorgan": ["JPMorgan", "J.P. Morgan", "JP Morgan", "摩根大通"],

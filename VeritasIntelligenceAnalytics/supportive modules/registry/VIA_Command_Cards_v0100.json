@@ -1,15 +1,15 @@
 {
  "schema": "VIA.CommandCards.v1",
- "register": "Register-VIA-Commands-v0218.ps1",
- "generated": "2026-09-17T20:45:17",
+ "register": "Register-VIA-Commands-v0242.ps1",
+ "generated": "2026-09-22T15:41:21",
  "policy": "L65:AI 讀卡,不讀原始碼",
  "token_ledger": {
-  "register_tokens": 40581,
-  "card_tokens": 15840,
-  "saved_tokens": 24741,
-  "saved_percent": 60.97
+  "register_tokens": 55585,
+  "card_tokens": 19839,
+  "saved_tokens": 35746,
+  "saved_percent": 64.31
  },
- "n": 143,
+ "n": 168,
  "cards": [
   {
    "cmd": "via-gates",
@@ -174,23 +174,11 @@
    "body_tokens": 9
   },
   {
-   "cmd": "via-ssot",
-   "alias": [
-    "SSOT治理"
-   ],
-   "engine": "CGC_MDL115_SSOTRegexDict_v*.py",
-   "family": "",
-   "one_line": "",
-   "hooks": [],
-   "sha256": "2d0de91e41ecdc1352f7517e26df6670343856e260d476eb22c2d3b2f73a0a4a",
-   "body_tokens": 27
-  },
-  {
    "cmd": "via-register",
    "alias": [],
    "engine": "CGC_MDL113_UnifiedRegistry_v*.py",
    "family": "",
-   "one_line": "",
+   "one_line": "批673(L101):這裡原本有第二個 via-ssot 定義(指向 CGC_MDL115 全樹 regex 清冊), 會被後面 1000 多行的 via-ssot(CGC_MDL155)**默默蓋掉**——它從來沒有被叫到過。 MDL115 有自己的門:**via-ssotregex**。這一行移除,行為零變更(本來就打不開)。",
    "hooks": [],
    "sha256": "3835000db50ab07b45de01aecaed298babfda1f27f02cb9d31801d2b0551f035",
    "body_tokens": 28
@@ -714,23 +702,11 @@
    "body_tokens": 36
   },
   {
-   "cmd": "via-ui",
-   "alias": [],
-   "engine": "CGC_MDL130_UIBridge_v*.py",
-   "family": "",
-   "one_line": "",
-   "hooks": [
-    "--open"
-   ],
-   "sha256": "19ed0a18b57527648dea602a5aaf247a9dcf8ec90082e5ed008ffe63f353bc3a",
-   "body_tokens": 38
-  },
-  {
    "cmd": "via-pipeline",
    "alias": [],
    "engine": "",
    "family": "",
-   "one_line": "批316:族群分類一鍵管線(補料→ENG070 自測+run→ENG071 自測+run→開頁;pwsh 缺退 powershell)",
+   "one_line": "批673(L101):這裡原本有第二個 via-ui 定義(指向 CGC_MDL130 UIBridge), 會被批647 那個 via-ui(CGC_MDL160 正典 TEMPLATE)**默默蓋掉**。 MDL130 有自己的門:**via-uibridge**。這一行移除,行為零變更(本來就打不開)。 批316:族群分類一鍵管線(補料→ENG070 自測+run→ENG071 自測+run→開頁;pwsh 缺退 powershe",
    "hooks": [],
    "sha256": "8de68e266154179ef93792a615e729cecda4d83e2dfe0878c1d2f768cea48e73",
    "body_tokens": 50
@@ -748,11 +724,185 @@
    "body_tokens": 39
   },
   {
+   "cmd": "via-sync",
+   "alias": [],
+   "engine": "Sync-VIA-Bootstrap-v*.ps1",
+   "family": "",
+   "one_line": "批381:單一 PowerShell 一貼即用(Invoke-VIA-EnvGovernance 尾版):①20 加速器點亮 ②全景+計畫(唯讀)③-Approve 執行 GREEN 段(-ApproveRemove 破壞段)④矩陣落檔零跳出;-Online 開同意閘;-Background 背景 Job 不阻塞(-Watch 直播 log);-Open 只走瀏覽器 exe 批609:`Sync-VIA-Bootstrap` 只是個檔,",
+   "hooks": [],
+   "sha256": "9a026d50fe6f7da284c23c386d8817d1ce53c3c0d9d81b662f92b9eb1a5f6eb1",
+   "body_tokens": 206
+  },
+  {
+   "cmd": "via-regen",
+   "alias": [],
+   "engine": "CGC_MDL167_RegenRevert_v*.py",
+   "family": "",
+   "one_line": "批613:再生物還原閘(CGC_MDL167)。三次卡死同一個病根——跑完之後沒人把引擎 自己長出來的東西放回去,下一次 pull 就被它擋住(批605/606/612)。 **預設零動作**:via-regen 只攤開分類;要還原是 via-regen --apply(你的手)。 對不上樣式的一律判「不明」**不還原**——引擎寫到原始碼和你自己改的長得一樣,只有你分得出來。 取名前照 L88 掃過全樹 286 個短令名:via-re",
+   "hooks": [],
+   "sha256": "3a25faaaff4d6941c11a3386c0a750966345b0551549085dbbc02de28fd6d698",
+   "body_tokens": 27
+  },
+  {
+   "cmd": "via-vrnbook",
+   "alias": [
+    "VRN冊"
+   ],
+   "engine": "via_vrn_logic_book_v*.py",
+   "family": "",
+   "one_line": "批622:VRN 邏輯架構索引冊。無動詞=守門(冊上指標還是不是樹上尾版)· build=重建 · --selftest=七檢 登錄的理由不是「有個 .cmd 就好」:MDL157 檢「貼給操作員的每一個 via-* 都要解析得到真指令」 當場抓到 docs 裡的 via-vrnbook 是幽靈令——**我要他打的東西,必須是他打得動的**(L89)。",
+   "hooks": [],
+   "sha256": "4890cc7084f3f48f1d19bd810a00abfae23f38628afc61a41b677575e43795d7",
+   "body_tokens": 26
+  },
+  {
+   "cmd": "via-finlex",
+   "alias": [
+    "財務字庫"
+   ],
+   "engine": "vrn_finlex_v*.py",
+   "family": "vrn",
+   "one_line": "批664(操作員逐次許可 L70:「准改 Register 加 via-finlex」): via-finlex=財務字庫收割引擎(vrn_finlex 尾版)。批663 量到它**跑了這麼久都沒有短令**, 工作站只能打全路徑——做好的東西站在系統外面,跟沒做一樣(批647 同律)。 無參數=印用法;--build 收割落六冊;--ask <詞> 跨冊查;--all 全覽頁; --reconcile 正本↔冊對帳(批663;誠實 rc",
+   "hooks": [],
+   "sha256": "194b7b7c0b826b113d3a6979dfb3bdfa3a3e71848cddf0e79f15c32cad60a920",
+   "body_tokens": 83
+  },
+  {
+   "cmd": "via-state",
+   "alias": [
+    "現況矩陣"
+   ],
+   "engine": "CGC_MDL169_VIAStateMatrix_v*.py",
+   "family": "",
+   "one_line": "批664:via-state=VIA 六域現況矩陣(CGC_MDL168)。ENV/LIBS/SSOT/TOOLS/VDF/VRN 六域, 逐列誠實態 + **出處** + **年齡**(一個數字沒有年齡會誤導,LL304)。 無參數=主控台矩陣(rich;缺 rich 自動降級純文字並講出來);html=落 rich 直出 HTML (零 CDN 零外連,file:// 直開);--json <路徑>=現況紀錄另存;--selftes",
+   "hooks": [],
+   "sha256": "143aafdde71b903b40dbf98243c5c8ee370d23bb9de5f59bd53870ceae520fe0",
+   "body_tokens": 38
+  },
+  {
+   "cmd": "via-vdfchain",
+   "alias": [
+    "VDF鏈"
+   ],
+   "engine": "CGC_MDL170_VDFChainRunner_v*.py",
+   "family": "vdf",
+   "one_line": "批667(操作員令「VDF 是獨立引擎…邏輯·因子·參數·引擎串連一下,給我一個 PS 指令啟動他們, 自 2023-07-01 開始的資料,邊測邊修直到成功,跳出 HTML MATRIX SUMMARY BY RICH」 +「要加入我指令的加速器及網路工具」): via-vdfchain=VDF 獨立鏈串連器(CGC_MDL170)。十站: 0a 加速器掛載(VIA_SuperAccel_Module)· 0b 網路工具掛載(SUP_",
+   "hooks": [],
+   "sha256": "a7688876967df9ee050c0ebeb0e776f197961cb573e5ffb0da4a53ecd7853842",
+   "body_tokens": 122
+  },
+  {
+   "cmd": "via-panoplan",
+   "alias": [
+    "全景計畫"
+   ],
+   "engine": "CGC_MDL171_PanoramaBatchPlanner_v*.py",
+   "family": "",
+   "one_line": "批670(操作員令「PS 指令加入全景式分析 · 錯誤識別 · 可同時處理/依序處理 · 不可傷害系統指令 · 產生九頭龍風險 · 一次同時解決一批問題」): via-panoplan=全景式分析 + 批次修復規劃器(CGC_MDL171)。**只規劃不動手。** ① 錯誤識別四類:REAL_GAP 真缺 / RULER 尺的錯 / NEED_DATA 缺料 / GATED 等閘 ——只有 REAL_GAP 進修復波;把後三類排進波,人",
+   "hooks": [],
+   "sha256": "7c8b9568fb5e7d85b440ae91a4edb9fe735a89c2ded6fa8a9602120fddb0b356",
+   "body_tokens": 87
+  },
+  {
+   "cmd": "via-vrnchain",
+   "alias": [
+    "VRN鏈"
+   ],
+   "engine": "CGC_MDL172_VRNChainRunner_v*.py",
+   "family": "vrn",
+   "one_line": "批671(操作員令「將 VRN 實測完畢」): via-vrnchain=VRN 六層鏈實測器(CGC_MDL172)。**鏈表不寫死**—— 直接讀批665 已覆核的六層冊 VIA_VRN_LogicArchitecture_SSOT_v0100.json: L0_輸入識別 4 · L1_擷取 15 · L2_結構與知識 13 · L3_驗證 4 · L4_產出 5 · L5_儲存 3 = 44 冊改了鏈跟著改,不必回來改這支(L30",
+   "hooks": [],
+   "sha256": "6f1faef1fb0c8803621aac8fe4ea2ceef67109f08ae9f67b1c6f607f5047adfa",
+   "body_tokens": 122
+  },
+  {
+   "cmd": "via-matrixspec",
+   "alias": [
+    "矩陣規格"
+   ],
+   "engine": "CGC_MDL173_MatrixReportSpec_v*.py",
+   "family": "",
+   "one_line": "批672(操作員令「以後跑完都要生成矩陣式報告 BY RICH,字小,優化矩陣排版規格」): via-matrixspec=矩陣式報告排版規格(CGC_MDL173)。**它是排版,不是引擎**—— 不產生任何新資料、不判任何燈、不碰任何庫。 一份規格,四支引擎共用(MDL169/170/171/172);操作員要改字級,只要改這裡一個數字。 無參數=印規格(可貼給操作員對);demo=落一張示範頁(看得到字級與密度); --selft",
+   "hooks": [],
+   "sha256": "a2114e85efb9787828e83296cf5b83acb056112b2d1bd0a1f812a265d866087a",
+   "body_tokens": 85
+  },
+  {
+   "cmd": "via-packgate",
+   "alias": [
+    "打包閘"
+   ],
+   "engine": "CGC_MDL174_PackagingGate_v*.py",
+   "family": "",
+   "one_line": "批673(操作員令「受測字測字完成,邊修邊改,**三個專案到準備打包的程度**」): via-packgate=三個專案的打包就緒閘(CGC_MDL174)。**能不能打包不是一句感覺**, 是七條各自量得出來的事,每個專案各量一次: ① 引擎在位 ② 自測門覆蓋(誠實分母)③ 自測綠(讀格子存證;存證比樹舊就不判) ④ 四面登錄 LL199 + **短令重名 L101** ⑤ 家族境可跑 ⑥ 落頁同一份排版規格 ⑦ 資料證據(空庫記 ",
+   "hooks": [],
+   "sha256": "0bdb4b23ea5b966cee691272b484eb7fc2818f4ff34e8683a0141ef17f16ef16",
+   "body_tokens": 83
+  },
+  {
+   "cmd": "via-deploy",
+   "alias": [
+    "一鍵佈署"
+   ],
+   "engine": "CGC_MDL175_AutoDeploy_v*.py",
+   "family": "",
+   "one_line": "批673(操作員令「A POWERSHELL TO LAUNCH AUTO DEPLOY INSTALLATION **BASED ON OUR THE LAST STATUS**. THEN USER USE THE SYSTEM ON HTML U/I」): via-deploy=依現況佈署(CGC_MDL175 排路,本函式跑路)。 **兩條車道永遠分得開**: auto  零風險可代跑:同步冊 · 重建索引 · 再生頁 · 跑四",
+   "hooks": [
+    "--apply"
+   ],
+   "sha256": "bff6e1cce796fcfeb007e8f5c00cd1927a8a05f2c81830a690976b9e10184104",
+   "body_tokens": 607
+  },
+  {
+   "cmd": "via-vrnrun",
+   "alias": [
+    "跑VRN"
+   ],
+   "engine": "",
+   "family": "",
+   "one_line": "批677(操作員令「實測 VRN 驗證通過後給我一個啟動 VRN 的 POWERSHELL CODE」): via-vrnrun=一支跑完 VRN 一輪實測(Invoke-VIA-VRN-v0100.ps1)。五步照順序: V1 via-vrnbook build   冊即鏈——冊釘舊版號就會敲到你剛修好那支的前一版(批671 LL318) V2 via-vrnchain run    六層 44 節點(層間依序、層內並行) V3 vi",
+   "hooks": [],
+   "sha256": "b99806e8f867ea1436fc088dc73a6525d38c751cf1ff4acc2e1911bc247fa005",
+   "body_tokens": 93
+  },
+  {
+   "cmd": "via-vrnaudit",
+   "alias": [
+    "VRN實測"
+   ],
+   "engine": "Invoke-VIA-VRNAudit-v*.ps1",
+   "family": "",
+   "one_line": "批625 操作員令「整合入一個 PS 指令,25 加速器,動態進度條,測試修正 VRN 直到成功」。 輪迴律:**下一輪一定要跟這一輪不一樣**,找不到可調整的差異就誠實停—— 把同一句跑三次不叫修正(批624 LL205)。",
+   "hooks": [],
+   "sha256": "1575295f8ef3304fedd7ff710f276df588d2995124a8da42f900f7caf814b3c1",
+   "body_tokens": 87
+  },
+  {
+   "cmd": "via-presync",
+   "alias": [],
+   "engine": "Sync-VIA-Bootstrap-v*.ps1",
+   "family": "",
+   "one_line": "批612:同步解卡的正名(via-sync 撞名,不再用它)",
+   "hooks": [],
+   "sha256": "0f84974c44137f56a7f702c43729256ed4c39f3f858b592e54702b0a9a836f86",
+   "body_tokens": 87
+  },
+  {
+   "cmd": "via-allinone",
+   "alias": [],
+   "engine": "Invoke-VIA-AllInOne-v*.ps1",
+   "family": "",
+   "one_line": "批609:ALL-IN-ONE 也配一支短令(同樣 glob 取尾版,不寫死版號)",
+   "hooks": [],
+   "sha256": "ac41a96efd45a7a88e5280b960f07245bd7081c40c180380174121ae99d7516e",
+   "body_tokens": 87
+  },
+  {
    "cmd": "via-envgov-auto",
    "alias": [],
    "engine": "",
    "family": "",
-   "one_line": "批381:單一 PowerShell 一貼即用(Invoke-VIA-EnvGovernance 尾版):①20 加速器點亮 ②全景+計畫(唯讀)③-Approve 執行 GREEN 段(-ApproveRemove 破壞段)④矩陣落檔零跳出;-Online 開同意閘;-Background 背景 Job 不阻塞(-Watch 直播 log);-Open 只走瀏覽器 exe",
+   "one_line": "批612:本冊有名字定義兩次(後者靜默生效)。**不替操作員裁定哪一個是正本**,只講出來。 via-panorama(第 442 行 / 第 1018 行)· via-ssot(第 166 行 / 第 825 行) 要哪一個是正本,請你裁;裁完我再把另一支退役。查:via-cmdrun collide",
    "hooks": [],
    "sha256": "bbdf840acdd4a0bb392ab4707b949b92e155d7cf7ec1c4614611980e06aa91f7",
    "body_tokens": 50
@@ -790,19 +940,6 @@
    ],
    "sha256": "aab6b61b2b34e073f3f3ec229e91dc7065a12c2dfa7475de2305c6c0d2a835df",
    "body_tokens": 177
-  },
-  {
-   "cmd": "via-panorama",
-   "alias": [
-    "全景修復",
-    "全景修復"
-   ],
-   "engine": "Invoke-VIA-Panorama-v*.ps1",
-   "family": "",
-   "one_line": "批511 併線:並行線(批508 panorama-v0103)的全景修復啟動器 launchers\\Invoke-VIA-Panorama-v*.ps1(pwsh 7;-Months 2 -StationTimeout 600 -FetchTimeout 7200 -BatchSize 20 [-Fetch] [-ReadOnly];落 VIA_Reports\\panorama)",
-   "hooks": [],
-   "sha256": "644a968bddc34140535b0cab590deca7859ca52a7aa60b7d0c3139ad98f4349e",
-   "body_tokens": 52
   },
   {
    "cmd": "via-iface",
@@ -1068,16 +1205,42 @@
    "body_tokens": 56
   },
   {
+   "cmd": "via-vrnmd",
+   "alias": [],
+   "engine": "VRN_ENG085_MarkdownRestore_v*.py",
+   "family": "",
+   "one_line": "批569:via-vrnmatrix=VRN 驗證矩陣(VRN_ENG083)。操作員令「用 C:\\測試樣本報告 的檔案實測,驗證過的輸出用矩陣表示」。 run --in \"<報告夾>\" [--db] = 代跑 ENG072→ENG073 後出矩陣;matrix [--db] = 只讀既有庫不重跑。 每一格是**擷到且驗過**才 GREEN;驗不過/驗不了=YELLOW(理由分得開);沒擷到=NODATA;欄位不存在=ABSENT。零網",
+   "hooks": [
+    "--chain"
+   ],
+   "sha256": "c813690c8920430029ec6ff5a48448a92556b7eac703b0e072007ae00b850e91",
+   "body_tokens": 371
+  },
+  {
    "cmd": "via-vrnmatrix",
    "alias": [
     "驗證矩陣"
    ],
    "engine": "VRN_ENG083_VerifiedMatrix_v*.py",
    "family": "vrn",
-   "one_line": "批569:via-vrnmatrix=VRN 驗證矩陣(VRN_ENG083)。操作員令「用 C:\\測試樣本報告 的檔案實測,驗證過的輸出用矩陣表示」。 run --in \"<報告夾>\" [--db] = 代跑 ENG072→ENG073 後出矩陣;matrix [--db] = 只讀既有庫不重跑。 每一格是**擷到且驗過**才 GREEN;驗不過/驗不了=YELLOW(理由分得開);沒擷到=NODATA;欄位不存在=ABSENT。零網",
+   "one_line": "",
    "hooks": [],
    "sha256": "0d21008b7bcf69cc58bc8c8ca56395f37d9d25f3e0573402c15f8aa802ad3c7c",
    "body_tokens": 53
+  },
+  {
+   "cmd": "via-repairprice",
+   "alias": [
+    "補庫價"
+   ],
+   "engine": "VRN_ENG073_ReportStructuredDB_v*.py",
+   "family": "vrn",
+   "one_line": "批659(操作員逐次許可 L70):via-repairprice=補庫價與上漲空間(VRN_ENG073 repair-price)。 零網路 · 零擷取 · 不碰正本報告;**無 --apply 一律乾跑**(乾跑會把前幾筆逐件印出來—— 批659 就是那幾行明細救的:摘要說「新拿到 37 件」,明細才看得出它們全是同一天的舊價)。 無參數=乾跑。加 --apply 才寫庫。--db <路徑> 可指定另一本庫。",
+   "hooks": [
+    "--apply"
+   ],
+   "sha256": "2d0ff266ba67bbcf0c66c61d801e050ab7cadea701d8b2d0706eba11ffd834d8",
+   "body_tokens": 204
   },
   {
    "cmd": "via-cmdcard",
@@ -1114,6 +1277,45 @@
    "hooks": [],
    "sha256": "256d89c337f2c42eb658e58f3246998a3355b2f7aee1ef091a26e2d4fa7d6822",
    "body_tokens": 42
+  },
+  {
+   "cmd": "via-ui",
+   "alias": [
+    "畫面"
+   ],
+   "engine": "CGC_MDL160_UIUnifyGate_v*.py",
+   "family": "",
+   "one_line": "批647 操作員裁定「VIA_HTML_UI 進 VIA,為可調整統一銜接系統的 TEMPLATE」。 via-ui = 正典 TEMPLATE 一鍵開(零 server:三支入口頁 file:// 直開就會動)。 **預設就開**——操作員令「本機自動跳出 HTML U/I NO SERVER」; 不想跳出就設 VIA_NO_OPEN=1(批366 零跳出閘,本令不繞過它)。 --check = 只驗不開(逐檔 sha256 對 ma",
+   "hooks": [
+    "--check",
+    "--open"
+   ],
+   "sha256": "d617daf43708079a36c07f0d45dc6dc058ab9f9cdedefd3e54c17674563ff86f",
+   "body_tokens": 120
+  },
+  {
+   "cmd": "via-mastercard",
+   "alias": [
+    "母檔卡"
+   ],
+   "engine": "CGC_MDL163_MasterFileCard_v*.py",
+   "family": "",
+   "one_line": "批573:via-mastercard=母檔卡(CGC_MDL163)。L65「AI 讀卡,不讀原始碼」推到交接這一層。 card=印卡(+token 帳);export=卡落報告夾;export --publish=寫入倉內卡。 **絕不寫母檔**:母檔正主是 docs\\VIA_Handover_ONEPAGE.md,要更新請在工作站跑 via-vcgc page --publish(LL49)。",
+   "hooks": [],
+   "sha256": "87c9711da063a8fca683bd304320c9cf6cac05bf8fbd14dd10d54180adf8a701",
+   "body_tokens": 43
+  },
+  {
+   "cmd": "via-govaudit",
+   "alias": [
+    "制度稽核"
+   ],
+   "engine": "CGC_MDL164_GovernanceCompletenessAudit_v*.py",
+   "family": "",
+   "one_line": "批574:via-govaudit=制度健全度稽核(CGC_MDL164)。audit=14 庫+3 機制逐條判;plan=只列不健全的+怎麼補;spec=印藍圖。 判準三件缺一不可:冊在 · 有料 · **有活樹上真的有引擎讀它**。零活讀者=ORPHAN(不是紅燈,但它沒在治理任何東西)。 另報「單一讀者」(那一支一動就變孤兒)與「多冊並存」(哪本是正本=操作員裁定,LL90)。零網路零寫無 --apply。",
+   "hooks": [],
+   "sha256": "4206d44f3b3c790fb6ec738f9bcc524296299d56e74866239feea10e52c73e27",
+   "body_tokens": 47
   },
   {
    "cmd": "via-vdfdb",
@@ -1546,6 +1748,42 @@
    "body_tokens": 45
   },
   {
+   "cmd": "via-ssotadd",
+   "alias": [
+    "增補審計"
+   ],
+   "engine": "VRN_ENG088_SsotAdditiveBridge_v*.py",
+   "family": "vrn",
+   "one_line": "── 側線 2026-09-21:via-ssotadd —— SSOT 增補審計橋(VRN_ENG088;收容包自帶測試在暫存副本實跑 · 包內尺 vs 正典落差 · 候選 PENDING_OPERATOR;零網路·零寫庫·只落 VIA_Reports/vrn/ssot_additive) 收容 = functional modules\\VRN\\references\\intake\\VIA_SSOT_Additive_Audit_v01",
+   "hooks": [],
+   "sha256": "7cf468e41196bfe86a002fa0bb91513f846ec0d6d01089288daa48956cc1995b",
+   "body_tokens": 54
+  },
+  {
+   "cmd": "via-vdfsys",
+   "alias": [
+    "資料對接口"
+   ],
+   "engine": "VDF_SystemManager_v*.py",
+   "family": "vdf",
+   "one_line": "── 側線 2026-09-21 b:via-vdfsys —— VDF 子系統管理對接口(VDF_SystemManager;與 VRN 那扇門同一份契約;上接 VCGC v0120 下管 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面 + 交接/紀錄;零網路·零寫庫·預設只讀) via-vdfsys                     status:九域燈 + 連結表 + 七處自審(rc0 綠 / rc2 過期或缺料誠實",
+   "hooks": [],
+   "sha256": "c7d0945073bf7099ac2a705c514e281525a6f4fbda0b637f25a360cb0695e4e1",
+   "body_tokens": 110
+  },
+  {
+   "cmd": "via-vrnsys",
+   "alias": [
+    "研報對接口"
+   ],
+   "engine": "VRN_SystemManager_v*.py",
+   "family": "vrn",
+   "one_line": "── 批681/682 Z65 候准 → 側線 2026-09-21 b 准:via-vrnsys —— VRN 子系統管理對接口(VRN_SystemManager;上接 VCGC 下管 政策/邏輯/因子/參數四庫 + 引擎面 + 交接;零網路·預設只讀) via-vrnsys                     status:七域燈 + 連結表 + 七處自審 via-vrnsys catalog|links|read <poli",
+   "hooks": [],
+   "sha256": "36e59ed5b14956e24eed879a14fb1bfdd8ba5097f8a5fb824119e6178e711f2a",
+   "body_tokens": 99
+  },
+  {
    "cmd": "via-nlpvrn",
    "alias": [
     "NLP研報",
@@ -1758,6 +1996,74 @@
    ],
    "sha256": "2f46186bc629c6de732b7f9cc87047a03bdc671bb20d1f8c2379d16003ba3baa",
    "body_tokens": 134
+  },
+  {
+   "cmd": "via-run25",
+   "alias": [
+    "全鏈"
+   ],
+   "engine": "",
+   "family": "",
+   "one_line": "═══════════════════════════════════════════════════════════════════════════ 批649 操作員令:「INTEGRATE INTO ONE PS CODE WITH 25 加速器去完成以上全部 動態進度條及百分比」 「以上全部」= 批643–648 這一輪立的八站,一次跑完、逐站誠實四態、總表收斂。  進度條**不另造**(L30 一個出處): Id 12  Sho",
+   "hooks": [
+    "--family",
+    "--list",
+    "--net2",
+    "--only",
+    "--skip"
+   ],
+   "sha256": "bb21ed4ce62070e3407c6f724701cf6eb52f0eafb9fc7bf7b26f99d3da9291c0",
+   "body_tokens": 2602
+  },
+  {
+   "cmd": "via-ssotregex",
+   "alias": [
+    "正則字典"
+   ],
+   "engine": "CGC_MDL115_SSOTRegexDict_v*.py",
+   "family": "",
+   "one_line": "───────────────────────────────────────────────────────────────────────────── 批649 續:被同名後定義「無聲吃掉」的三扇門,各自補回一個名(只增不減;活的那支一律不動) ───────────────────────────────────────────────────────────────────────────── CGC_MDL157 v0105 ",
+   "hooks": [],
+   "sha256": "2d0de91e41ecdc1352f7517e26df6670343856e260d476eb22c2d3b2f73a0a4a",
+   "body_tokens": 27
+  },
+  {
+   "cmd": "via-uibridge",
+   "alias": [
+    "畫面橋"
+   ],
+   "engine": "CGC_MDL130_UIBridge_v*.py",
+   "family": "",
+   "one_line": "",
+   "hooks": [
+    "--open"
+   ],
+   "sha256": "19ed0a18b57527648dea602a5aaf247a9dcf8ec90082e5ed008ffe63f353bc3a",
+   "body_tokens": 38
+  },
+  {
+   "cmd": "via-panorama-run",
+   "alias": [
+    "全景啟動"
+   ],
+   "engine": "Invoke-VIA-Panorama-v*.ps1",
+   "family": "",
+   "one_line": "",
+   "hooks": [],
+   "sha256": "644a968bddc34140535b0cab590deca7859ca52a7aa60b7d0c3139ad98f4349e",
+   "body_tokens": 52
+  },
+  {
+   "cmd": "via-fresh",
+   "alias": [
+    "冊新鮮"
+   ],
+   "engine": "",
+   "family": "",
+   "one_line": "",
+   "hooks": [],
+   "sha256": "59d4c9fb03b89a0d05fae1312d54c73b0e67b366b39eb835ff1ea5d60a062dcc",
+   "body_tokens": 62
   }
  ]
 }
