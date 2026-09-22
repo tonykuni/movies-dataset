@@ -449,6 +449,13 @@ _SYNCPORT = {"mod": None, "why": ""}
 _SYNCPORT_GLOB = "CGC_MDL179_VcgcSyncHub_v*.py"
 
 
+def _hub_broken(state) -> bool:
+    """collect() 契約回的是 `BROKEN OSError:...` 這種**帶後綴**的字串,不是剛好等於 "BROKEN"。
+    所以一律比前綴。比相等會讓「硬壞掉」從所有判斷裡漏掉,最後被當成軟的(NODATA)報出去。
+    """
+    return str(state or "").startswith("BROKEN")
+
+
 def _syncport():
     """資料樞紐引擎尾版;缺席=None + 因由(缺件≠壞掉,也不准在這裡自己算一份對帳)。"""
     if _SYNCPORT["mod"] is not None or _SYNCPORT["why"]:
@@ -473,7 +480,14 @@ def sync_hub() -> dict:
     """
     m = _syncport()
     if m is None:
-        return {"state": "ABSENT", "why": _SYNCPORT["why"] or "CGC_MDL179 缺",
+        why = _SYNCPORT["why"] or "CGC_MDL179 缺"
+        # 批698 自審修(Codex P2,對):_syncport() 在**兩種**情形回 None ——
+        #   檔不在(ABSENT)、檔在但 import 期就炸(BROKEN)。舊寫法一律報 ABSENT,
+        #   於是「裝了但壞掉的引擎」被說成「沒裝」,rc 還回 3(缺席)而不是 1(壞)。
+        #   而我**在同一個 commit 裡剛立了 LL360**(門最容易犯的錯是把態壓扁),
+        #   然後在它描述的那個函式裡自己第一個犯。LL339 說得沒錯:
+        #   自己剛立的律,最先違反的人通常是自己。
+        return {"state": "BROKEN" if _hub_broken(why) else "ABSENT", "why": why,
                 "src": "", "端點": {}, "燈": {}}
     try:
         c = m.collect()
@@ -1753,15 +1767,26 @@ def selftest() -> int:
     _HONEST30 = ("GREEN", "RED", "NODATA", "ABSENT", "GATED", "SKIP", "FIRST_RUN")
     _hub_ok = (
         (_h30["state"] == "ABSENT" and bool(_h30["why"]))            # 引擎缺席:要講得出因由
-        or (_h30["state"] == "BROKEN" and bool(_h30["why"]))         # 引擎壞掉:同樣要有因由
+        or (_hub_broken(_h30["state"]) and bool(_h30["why"]))        # 引擎壞掉:比前綴,要有因由
         or (_h30["src"].startswith("CGC_MDL179") and _h30["state"] in _HONEST30)
     )
+    # 反面控制(批698 自審修):檔在但載入就炸,**必須報 BROKEN 不是 ABSENT**。
+    #   直接把埠的記憶換成「載入失敗」的樣子,證明那條分支真的分得出來(LL354:要實跑)。
+    _sv30 = dict(_SYNCPORT)
+    try:
+        _SYNCPORT.update({"mod": None, "why": "BROKEN ImportError:合成的載入失敗"})
+        _broke30 = sync_hub()
+    finally:
+        _SYNCPORT.clear(); _SYNCPORT.update(_sv30)
+    _not_flat = _broke30["state"] == "BROKEN" and "ImportError" in _broke30["why"]
     chk("㉚ 樞紐口是**委派不是複製**(批698):實作留在 CGC_MDL179,本檔只解析尾版 + 原樣端上來;"
         "誠實態原封轉呈(GATED/FIRST_RUN/ABSENT 不准被壓成 GREEN 或 RED);"
-        "一旦有人把對帳/雲端掃描抄進這裡就當場紅(LL341)",
-        not _copied30 and _hub_ok,
+        "一旦有人把對帳/雲端掃描抄進這裡就當場紅(LL341)。"
+        "**反面控制**:檔在但載入就炸要報 BROKEN 不是 ABSENT——"
+        "「裝了但壞掉」跟「沒裝」是兩件事,壓成同一態就是把態壓扁(LL360)",
+        not _copied30 and _hub_ok and _not_flat,
         f"(態 {_h30['state']} · 來源 {_h30['src'] or _h30['why']} · 端點 {_h30.get('端點')}"
-        f" · 抄進來的實作 {sorted(_copied30) or '無'})")
+        f" · 載入失敗時報 {_broke30['state']} · 抄進來的實作 {sorted(_copied30) or '無'})")
 
     print(f"  [計] 三十檢 OK {30 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
@@ -2454,7 +2479,8 @@ def main() -> int:
         return {"GREEN": 0, "RED": 1}.get(d["verdict"], 2)
     if verb == "sync":
         h = sync_hub()
-        if h["state"] in ("ABSENT", "BROKEN"):
+        if h["state"] == "ABSENT" or _hub_broken(h["state"]):
+            # 比前綴不比相等:collect() 回的是 `BROKEN OSError:...`(Codex P2)
             print(f"[VCGC 資料樞紐] {h['state']} · {h['why']}")
             return 3 if h["state"] == "ABSENT" else 1
         print(f"[VCGC 資料樞紐] {h['state']} · 來源 {h['src']}(**委派,本台不另立一把尺**)")
@@ -2465,7 +2491,10 @@ def main() -> int:
             print(f"  [委派] {k}:{v}")
         print("  界線:樞紐全唯讀——零搬移、零寫入對端、零網路。"
               "分岔只報不裁(LL90);要動手是操作員的手。")
-        return {"GREEN": 0, "FIRST_RUN": 0, "RED": 1}.get(h["state"], 2)
+        # rc 也走委派:樞紐自己算過一份(GREEN/FIRST_RUN→0 · RED→1 · 其餘→2),
+        # 這裡再算一次就是第二把尺,而且兩把尺遲早會分岔。拿不到才退回本地對照表。
+        return h["rc"] if isinstance(h.get("rc"), int) else {
+            "GREEN": 0, "FIRST_RUN": 0, "RED": 1}.get(h["state"], 2)
     if verb == "inventory":
         t = tool_inventory()
         if t["state"] in ("ABSENT", "BROKEN"):
