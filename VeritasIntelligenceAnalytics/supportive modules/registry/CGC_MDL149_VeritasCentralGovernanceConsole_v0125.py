@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL149_VeritasCentralGovernanceConsole v0123 — VCGC(批691B:那扇門再往下一層——工具與支援性模組盤點)
+CGC_MDL149_VeritasCentralGovernanceConsole v0125 — VCGC(批699:掃描面本身就是假的;版史自 批691B:那扇門再往下一層——工具與支援性模組盤點)
 v0122→v0123(操作員令「這裡負責環境工具及 VCGC 對接子系統,並盤點支援性及所有工具模組」;
   **從主線 v0122 長**,不是從我自己的那一份 —— 主線 v0122 修了我 v0121 收尺時漏掉的 bridge 段,
   從我那一份長會把他們的修整個弄丟(LL334/LL343)):
@@ -14,6 +14,18 @@ v0123→v0124(批698 開第三扇門):+SYNC-PORT 資料樞紐對接口(正主 CG
   ㉚ 另外釘一件 ㉙ 沒釘的:**誠實態原封轉呈** —— 樞紐回 GATED/FIRST_RUN,
   本台就報 GATED/FIRST_RUN;壓成 GREEN 或 RED 就是在門上偷偷立第二把尺。廿九檢→三十檢。
   順手更正抬頭口誤:`--selftest` 抬頭印「二十六檢」而 [計] 印「二十八檢」,抬頭是舊的。
+v0124→v0125(批699 / 任務 #65:掃描面本身就是假的):
+  `_tail_files()` 十幾批以來一直是**九條手寫的 (夾, glob)**。樹長大之後,整批治理中的
+  尾版模組落在那九條之外 —— 量到 **92 支**。最難看的一支是 `SUP_MDL751_VIATailPick`:
+  **決定「哪一版是尾版」的那把尺,自己不在受治理範圍裡**。同一批漏掉的還有加速器
+  `SUP_MDL737`、共用 I/O `SUP_MDL752/753/754`、16 支 `ssot` 模組、6 支 `audit_tools`。
+  後果不是某一盞燈變紅,是**中央元件編號冊裡根本沒有它們**(冊上沒有,不是退役)——
+  1,966 個活著的元件從來沒被登記過。而這件事**漏掉不會紅**,所以它躺了十幾批。
+  改成「全樹 − 具名排除」(L77):新開的治理夾自動進來,要排除就得寫得出因由。
+  九式留著當**歷史下限**,㉛ 檢拿它守只增不減。三十檢→三十二檢。
+  順手修一條兩把尺:舊寫法用 glob `*_v????.py` 比、用 `_v\d{4}\.py$` 去版號,兩條尺不同——
+  `..._v139L.py` 收得進來卻去不掉版號,家族名裡帶著 `.py`。現在比與去同一條尺,
+  版號異形由 `scan_face()["oddver"]` 誠實列出,不是默默丟掉。
   `status` 刻意不動 —— 撞號那把尺要掃 30+ 條 refs,掛進 status 會讓每次看狀態都變慢。
 v0121→v0122(側線 2026-09-21 e 併 main 批686b(PR #59);主線批號由併線的手指定 L25):主線把三家的段收成一把尺 `_subsys_section()`,
   但收尺時漏了側線 v0120 `vdf_system()` 回的 **bridge 段**(tails/accel/net/net_callers/…)與 mode、why 鏈;主線 ㉖ 自己就要 `bridge.tails` 是 int——
@@ -821,17 +833,103 @@ def dropped_balls() -> dict:
 
 
 # ────────────────────────── 註冊稽核 ──────────────────────────
+# 批699:這九式現在是**歷史下限(floor)**,不再是掃描面。
+#   留著它有兩個用處,都不是拿來掃樹:
+#     ① ㉛ 檢拿它當下限 —— 新的全樹掃必須覆蓋它的每一支,**只增不減**;
+#     ② 版史:批686 ② 那條「VDF 根目錄的尾版件以前不在受治理範圍」就是靠它讀得懂。
+#   為什麼不繼續手寫清單:手寫的毛病不是寫漏一行,是**它會隨著樹長大愈來愈假,而且漏掉不會紅**。
 ENGINE_GLOBS = [("functional modules/VDF/engine", "*_v????.py"), ("functional modules/VDF", "*_v????.py"), ("functional modules/VRN", "*_v????.py"), ("functional modules/VAP/engine", "*_v????.py"),
                 ("supportive modules/registry", "CGC_*_v????.py"), ("supportive modules/70_VRN_Rules", "SUP_*_v????.py"), ("supportive modules/network", "SUP_*_v????.py"),
                 ("supportive modules/VIA_Central_Governance", "CGC_*_v????.py"), (".", "VIA_SYSTEM_MANAGER_v????.py")]
+
+# 掃描面 = 全樹 − 具名排除(L77 掃描根一律帶排除清單律)。
+#   規矩:**每一條排除都要寫得出因由**。寫不出因由的排除 = 在掃描面上挖一個沒人知道的洞,
+#   而洞裡的東西在中央控管台上等於不存在(LL359)。㉜ 檢逐條釘著。
+SCAN_EXCLUDE: list[tuple[str, str]] = [
+    ("__pycache__",         "位元碼快取,不是原始碼"),
+    ("VIA_RetiredEngines",  "已退役樹;退役件不算現役元件"),
+    ("references/",         "收容倉(正本零觸碰);除非規格冊把它掛成正式功能,否則不當現役元件"),
+    ("SCOPE_COPY",          "VAP 資產夾裡的整樹副本 —— 數它等於把同一棵樹數兩次"),
+    ("node_modules",        "第三方套件樹"),
+    ("VIA_Reports/",        "產出報告不是元件(.gitignore:205 本來就不入倉)"),
+    ("_superseded",         "被取代件的存放處"),
+    ("new modules engines", "未歸位的新件暫存區;進了正式夾才算現役"),
+    ("_inbox_to_classify",  "未分類收件匣"),
+    ("_review_quarantine",  "審查隔離區"),
+    ("/envs/",              "家族虛擬環境 —— 裡頭是第三方套件,不是本系統元件"),
+    (".venv",               "虛擬環境"),
+    # 預防條文:這兩條今天吃 0 支(量過),留著是因為它們背後各有一條律 ——
+    #   掃描面改成「全樹 −」之後唯一新增的風險,就是有人把第三方碼放進來並帶上 `_vNNNN`,
+    #   它會**自動變成 VIA 元件**。㉛ 守著它們不准吃到下限裡的檔。
+    ("預防:TALib",          "預防:L50 第一條 TA-Lib 禁用、QuantGuard 是唯一正主;"
+                            "第三方指標庫不得因為帶了版號就變成受治理元件"),
+    ("預防:vendor",         "預防:第三方 vendored 碼不是本系統元件"),
+]
+
+# 尾版律 L04 的版本族就是 `_vNNNN`(四位數字)。
+#   比對與去版號**用同一條尺** —— 舊寫法用 glob `*_v????.py` 比、用 `_v\d{4}\.py$` 去,
+#   兩條尺不同:`..._v139L.py` 被 glob 收進來卻去不掉版號,於是家族名裡帶著 `.py`。
+#   這類檔不歸尾版律管,由 `scan_face()["oddver"]` 誠實列出來,不是默默丟掉。
+TAIL_PY = re.compile(r"_v\d{4}\.py$")
+_TAIL_CACHE: dict[tuple, dict] = {}
+
+
+def _frag(frag: str) -> str:
+    """`預防:` 是**標記**不是路徑片段 —— 比對前先拆掉,不然它永遠吃不到東西,
+    那就成了一條「看起來在擋、其實擋不到」的假條文(LL354 同一族)。"""
+    return frag.split("預防:", 1)[-1] if frag.startswith("預防:") else frag
+
+
+def _excuse(rel: str, exclude=None) -> str:
+    """這條路徑被哪一條具名排除吃掉?回因由;沒有就回空字串(=受治理)。"""
+    for frag, why in (SCAN_EXCLUDE if exclude is None else exclude):
+        if _frag(frag) in rel:
+            return why or "(因由留空)"
+    return ""
 
 COMPONENT_PREFIX = {"system": "SYS", "engine": "ENG", "module": "MDL", "class": "CLS",
                     "function": "FNC", "feature": "FNT", "tool": "TOOL",
                     "package": "PKG", "environment": "ENV"}
 
 
-def _tail_files() -> dict[str, Path]:
-    """受治理範圍的尾版家族。版本變動不重發元件號。"""
+def _all_tail_py() -> list[Path]:
+    """全樹一次 rglob(0.1 秒級),結果給掃描面與排除稽核共用。"""
+    if "_files" not in _TAIL_CACHE:
+        _TAIL_CACHE["_files"] = sorted(VIA.rglob("*_v????.py"))
+    return _TAIL_CACHE["_files"]
+
+
+def _tail_files(exclude=None) -> dict[str, Path]:
+    """受治理範圍的尾版家族 = 全樹 − 具名排除。版本變動不重發元件號。
+
+    批699(任務 #65):原本是九條手寫的 (夾, glob)。樹長大之後,整批治理中的
+    尾版模組落在那九條之外 —— 量到 92 支,而且**連決定「哪一版是尾版」的
+    SUP_MDL751_VIATailPick 自己都在外面**,加速器 SUP_MDL737、共用 I/O
+    SUP_MDL752/753/754、16 支 ssot 模組、6 支 audit_tools 也都是。
+    中央控管台看不見它們,報告上就等於它們不存在(LL359),而**漏掉不會紅**。
+
+    `exclude` 只給自測注入用(㉛㉜ 要讓資料真的跨過那條界線,LL358);
+    正跑一律走 SCAN_EXCLUDE。
+    """
+    key = ("_gov",) if exclude is None else tuple(tuple(x) for x in exclude)
+    if key in _TAIL_CACHE:
+        return dict(_TAIL_CACHE[key])
+    fams: dict[str, Path] = {}
+    for q in _all_tail_py():
+        rel = q.relative_to(VIA).as_posix()
+        if _excuse(rel, exclude):
+            continue
+        if not TAIL_PY.search(q.name):        # 版號異形不歸尾版律管;scan_face() 會列出來
+            continue
+        stem = re.sub(TAIL_PY, "", q.name)
+        if stem not in fams or q.name > fams[stem].name:
+            fams[stem] = q
+    _TAIL_CACHE[key] = dict(fams)
+    return fams
+
+
+def _floor_files() -> dict[str, Path]:
+    """批699 之前的九式掃描面。只給 ㉛ 當下限用,不參與正跑。"""
     fams: dict[str, Path] = {}
     for d, g in ENGINE_GLOBS:
         for q in (VIA / d).glob(g):
@@ -841,6 +939,40 @@ def _tail_files() -> dict[str, Path]:
             if stem not in fams or q.name > fams[stem].name:
                 fams[stem] = q
     return fams
+
+
+def scan_face(exclude=None) -> dict:
+    """掃描面自己的體檢表:治理了幾支、每一條排除吃掉幾支、誰還是看不見。
+
+    存在理由:排除清單是**子字串**比對,一條寫得太寬的排除(例如只寫 `test`)
+    會安安靜靜吃掉一整個治理夾。所以每一條都要印出它吃掉幾支 ——
+    過寬的排除會以「數字大得不合理」現形,而不是以沉默現形。
+    吃掉 0 支的排除是死條文:照實報 `dead`,不報紅(留著也不傷人)。
+    """
+    ex = SCAN_EXCLUDE if exclude is None else list(exclude)
+    fams = _tail_files(exclude)
+    eaten = {frag: 0 for frag, _ in ex}
+    odd, missing_why = [], []
+    for q in _all_tail_py():
+        rel = q.relative_to(VIA).as_posix()
+        hit = ""
+        for frag, why in ex:
+            if _frag(frag) in rel:
+                eaten[frag] += 1
+                hit = frag
+                if not (why or "").strip():
+                    missing_why.append(frag)
+                break
+        if hit:
+            continue
+        if not TAIL_PY.search(q.name):
+            odd.append(rel)
+    return {"families": len(fams), "scanned": len(_all_tail_py()),
+            "eaten": eaten,
+            "dead": sorted(f for f, n in eaten.items() if n == 0 and not f.startswith("預防:")),
+            "prevent": sorted(f for f, n in eaten.items() if n == 0 and f.startswith("預防:")),
+            "alive_prevent": sorted(f for f, n in eaten.items() if n and f.startswith("預防:")),
+            "no_why": sorted(set(missing_why)), "oddver": sorted(odd)}
 
 
 def live_components() -> dict:
@@ -1788,7 +1920,41 @@ def selftest() -> int:
         f"(態 {_h30['state']} · 來源 {_h30['src'] or _h30['why']} · 端點 {_h30.get('端點')}"
         f" · 載入失敗時報 {_broke30['state']} · 抄進來的實作 {sorted(_copied30) or '無'})")
 
-    print(f"  [計] 三十檢 OK {30 - len(fails)} · FAIL {len(fails)}")
+    # ㉛ 掃描面只准長不准縮(批699 / 任務 #65)——
+    #    全樹掃的結果必須覆蓋批699 之前那九式的**每一支**。只增不減不是口號,是這一條在守。
+    #    **反面控制**:注入一條會吃掉整個 registry 夾的排除,必須當場照出缺口並**點名**掉了哪些——
+    #    讓資料真的跨過那條界線,不是複述宣告(LL358)。
+    _floor31 = _floor_files()
+    _gov31 = _tail_files()
+    _lost31 = sorted(set(_floor31) - set(_gov31))
+    _bad31 = _tail_files([("supportive modules/registry", "合成的過寬排除")])
+    _caught31 = sorted(set(_floor31) - set(_bad31))
+    chk("㉛ 掃描面**只增不減**:全樹 − 具名排除的結果要覆蓋批699 前九式的每一支;"
+        "手寫清單換成全樹掃之後,新開的治理夾自動進來 —— 漏掉不再是沉默,是紅燈。"
+        "**反面控制**:注入一條吃掉整個 registry 夾的排除,下限檢必須當場破且點得出名字",
+        not _lost31 and len(_caught31) > 20 and len(_gov31) > len(_floor31),
+        f"(下限 {len(_floor31)} · 受治理 {len(_gov31)} · 掉了 {_lost31 or '無'}"
+        f" · 反面控制被照出 {len(_caught31)} 支)")
+
+    # ㉜ 每一條排除都要講得出因由,而且不准過寬(L77)——
+    #    排除是**子字串**比對:一條寫得太寬的排除會安安靜靜吃掉一整個治理夾。
+    #    所以逐條印出它吃掉幾支:過寬會以「數字不合理」現形,而不是以沉默現形。
+    _face32 = scan_face()
+    _over32 = [f for f, _ in SCAN_EXCLUDE
+               if set(_floor_files()) - set(_tail_files([(f, "x")] + [(a, b) for a, b in SCAN_EXCLUDE if a != f]))]
+    # 反面控制二:因由留空的排除必須被抓到(不是「看起來有寫」就算)。
+    _blank32 = scan_face([("supportive modules/ssot", "")])["no_why"]
+    chk("㉜ 排除清單逐條具名:每一條都要寫得出因由,且**不准吃到下限裡的檔**;"
+        "逐條印出吃掉幾支 —— 過寬的排除以數字現形,不是以沉默現形。"
+        "吃 0 支的是**這棵樹上**的死條文(容器沒有 .venv/envs/node_modules,工作站有),照實報不報紅。"
+        "**反面控制**:塞一條因由留空的排除,必須當場被點名",
+        not _face32["no_why"] and not _over32 and _blank32 == ["supportive modules/ssot"],
+        f"(掃 {_face32['scanned']} 支 → 治理 {_face32['families']} 家族 · 因由留空 {_face32['no_why'] or '無'}"
+        f" · 過寬 {_over32 or '無'} · 死條文 {_face32['dead'] or '無'}"
+        f" · 預防條文今天吃 0 {_face32['prevent'] or '無'} · 預防條文真的擋到東西 {_face32['alive_prevent'] or '無'}"
+        f" · 版號異形 {len(_face32['oddver'])} 支(不歸尾版律管,誠實列出))")
+
+    print(f"  [計] 三十二檢 OK {32 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -2417,7 +2583,7 @@ def matrix_page(d: dict, out: Path | None = None) -> Path:
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 廿九檢自測(零網路;預設只讀)===")
+        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 三十二檢自測(零網路;預設只讀)===")
         return selftest()
     verb = a[0] if a else "status"
     if verb == "status":
