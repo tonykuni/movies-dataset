@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0449→v0450(批697 開一站):+「VCGC 資料樞紐對帳層二十檢」(CGC_MDL179 v0100)。
+v0449→v0450(批697 開一站):+「VCGC 資料樞紐對帳層廿三檢」(CGC_MDL179 v0100)。
   站名檢數寫 16 不寫 15:引擎補上 ⑯ 登錄面檢之後我差點又讓站名停在舊數——
   批695 寫過、批696 又踩過,這是**第三次**。引擎 N 檢而站名寫 M,站照樣綠(只驗 rc0),
   但那是一句說謊的敘述。
@@ -2357,7 +2357,7 @@ def battery(fast: bool):
         "例外態**只放行建、永不放行移除**;⓶ 是**實跑** apply_plan 不是讀原始碼次序,"
         "外加真 GREEN 的反面控制——第一版把例外擺在 deps 守衛後面,那條分支從來沒被走過而檢是綠的))",
         newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("VCGC 資料樞紐對帳層二十檢(批697;CGC_MDL179:操作員令要一個 synchronizer,量完樹上的三條"
+    add("VCGC 資料樞紐對帳層廿三檢(批697;CGC_MDL179:操作員令要一個 synchronizer,量完樹上的三條"
         "鐵則之後做成**對帳層不是搬運層**——MDL059:83「不落 OneDrive」· MDL123:26「複製=三副本病」"
         "· MDL149:44 兩機各 --apply 一次就互翻(批681/682/682B 三次)。"
         "功能面比元件冊 ACTIVE key 集合,兩端各有獨有件就**預先算出互翻風險**(以前是翻三次才發現);"
@@ -2369,7 +2369,8 @@ def battery(fast: bool):
         "⑯ 登錄面:加速器橋/自測門在位,第四面短令在 .ps1(L70)誠實列為缺口不假裝齊 · "
         "⑰⑱⑲⑳ Codex 四條自審修:size 相等不准判一致(DuckDB 就地改頁不改長度,"
         "淺比一律 UNVERIFIED+NODATA,--deep 才逐檔 hash)· 掃到上限就停不准發綠 · "
-        "gdrive 疑似不准留在綠 · 名冊 endpoints 空清單也要收)",
+        "gdrive 疑似不准留在綠 · 名冊 endpoints 空清單也要收 · "
+        "㉑㉒㉓ Codex 再三條:--deep 要真的越過雜湊上限(不然對 GB 級的庫等於沒作用,是宣告了一個不存在的能力)· `page --deep` 要真的傳下去 · 頁面逐格轉義(why 會帶對端檔名,檔名是別人給的字串))",
         newest("CGC_MDL179_VcgcSyncHub_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("單一入口橋九檢(批383)(批400 deadends)", newest("CGC_MDL136_EntryBridge_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("本機三庫整併十三檢(批383/389)", newest("VDF_ENG079_LocalDbConsolidate_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)

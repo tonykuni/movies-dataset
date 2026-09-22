@@ -89,6 +89,7 @@ one drive / google drive / dropbox」
 from __future__ import annotations
 
 import hashlib
+import html as _html
 import importlib.util
 import json
 import os
@@ -149,6 +150,12 @@ CLOUD_MARKS = (
 )
 
 # Windows Files-On-Demand 佔位檔屬性
+# 淺比時的雜湊上限:契約件都很小,這道上限只是防手滑。
+# **--deep 一律不受它管** —— 批697 自審修二(Codex P1,對):上一輪我加了 --deep 說「庫也逐檔 hash」,
+# 但 _stat_row 的上限照舊擋在前面,而庫本來就動輒 GB,於是 --deep 對**真實的庫**完全沒作用。
+# 那不是「少驗一點」,是我**宣告了一個不存在的能力**。做成常數是為了讓檢真的能驗到這條界線。
+HASH_CAP_SHALLOW = 64 << 20
+
 _FA_OFFLINE = 0x1000
 _FA_RECALL_ON_OPEN = 0x40000
 _FA_RECALL_ON_DATA = 0x400000
@@ -495,7 +502,7 @@ def watch_list(deep: bool = False) -> list:
     return rows
 
 
-def _stat_row(root: Path, rel: str, do_hash: bool) -> dict:
+def _stat_row(root: Path, rel: str, do_hash: bool, deep: bool = False) -> dict:
     p = Path(root) / rel
     try:
         st = p.stat()
@@ -510,7 +517,7 @@ def _stat_row(root: Path, rel: str, do_hash: bool) -> dict:
                 "why": "雲端佔位檔(在位≠在本機;沒讀它)"}
     row = {"state": "OK", "size": st.st_size,
            "mtime": datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%dT%H:%M:%S")}
-    if do_hash and st.st_size <= (64 << 20):
+    if do_hash and (deep or st.st_size <= HASH_CAP_SHALLOW):
         try:
             h = hashlib.sha256()
             with open(p, "rb") as fh:
@@ -536,7 +543,7 @@ def data_plane(ep: dict, self_rows: dict, deep: bool = False) -> dict:
     root = Path(ep["root"])
     same, diff, only_here, only_there, cloud, bad, unver = 0, 0, 0, 0, 0, 0, 0
     for w in watch_list(deep):
-        there = _stat_row(root, w["rel"], w["hash"])
+        there = _stat_row(root, w["rel"], w["hash"], deep)
         here = self_rows.get(w["rel"], {"state": "MISSING"})
         v = {"cls": w["cls"], "rel": w["rel"], "here": here.get("state"), "there": there.get("state")}
         if there["state"] == "CLOUD_ONLY" or here.get("state") == "CLOUD_ONLY":
@@ -601,7 +608,7 @@ def data_plane(ep: dict, self_rows: dict, deep: bool = False) -> dict:
 def reconcile(deep: bool = False) -> dict:
     eps = endpoints()
     self_inv, self_why = _inv_of(VIA)
-    self_rows = {w["rel"]: _stat_row(VIA, w["rel"], w["hash"]) for w in watch_list(deep)}
+    self_rows = {w["rel"]: _stat_row(VIA, w["rel"], w["hash"], deep) for w in watch_list(deep)}
     base = _read_json(LATEST)
     first_run = not isinstance(base, dict) or not base.get("endpoints")
     rows = []
@@ -698,8 +705,8 @@ def do_endpoints(rest: list) -> int:
     return 0
 
 
-def page(publish: bool = False) -> str:
-    r = reconcile()
+def page(publish: bool = False, deep: bool = False) -> str:
+    r = reconcile(deep)
     css = ("body{font-family:system-ui,'Noto Sans TC',sans-serif;margin:18px;background:#fbfcfb;color:#1a1f1a}"
            "h1{font-size:17px;margin:0 0 4px} .sub{color:#667;font-size:11.5px}"
            "table{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:8px}"
@@ -715,9 +722,16 @@ def page(publish: bool = False) -> str:
             p = e[plane]
             if plane == "雲端" and p["state"] == "SKIP":
                 continue
-            rows.append(f"<tr><td>{e['id']}</td><td>{e['kind']}</td><td>{e.get('provider') or '—'}</td>"
-                        f"<td>{plane}</td><td class='{p['state']}'>{p['state']}</td>"
-                        f"<td>{(p.get('why') or '')[:220]}</td></tr>")
+                # 批697 自審修二(Codex P2,對):`why` 裡會帶**對端的檔名**(衝突副本會點名),
+            # 而檔名是別人給的字串。直接插進 <td> 等於把對端檔名當成 HTML ——
+            # 只要有人能在同步夾裡建一個帶標記的檔名,這張報告一打開就執行它。
+            # 逐格轉義,不只轉 why:態與端點名同樣是資料不是標記。
+            _q = _html.escape
+            rows.append(f"<tr><td>{_q(str(e['id']))}</td><td>{_q(str(e['kind']))}</td>"
+                        f"<td>{_q(str(e.get('provider') or '—'))}</td>"
+                        f"<td>{_q(plane)}</td>"
+                        f"<td class='{_q(str(p['state']))}'>{_q(str(p['state']))}</td>"
+                        f"<td>{_q(str(p.get('why') or '')[:220])}</td></tr>")
     html = (f"<!DOCTYPE html><html lang='zh-Hant'><head><meta charset='utf-8'>"
             f"<title>VCGC 資料樞紐(對帳層)</title><style>{css}</style></head><body>"
             f"<h1>VCGC 資料樞紐 · 對帳層 <span class='sub'>MDL179 v{VERSION} · "
@@ -1094,6 +1108,71 @@ def selftest() -> int:
     except Exception as exc:
         checks.append(("⑳ 例外", False)); print("  [FAIL] ⑳", type(exc).__name__, exc); traceback.print_exc()
 
+    # ── 批697 自審修二(Codex 再三條)────────────────────────────────────────
+    # ㉑ --deep 必須真的越過雜湊上限。
+    #    上一輪我加了 --deep 宣稱「庫也逐檔 hash」,但上限照舊擋在前面,而庫本來就動輒 GB ——
+    #    **宣告了一個不存在的能力**。而我那時的 ⑰ 檢用 64 位元組的檔,根本碰不到上限,
+    #    所以它「過了」卻什麼都沒證明(LL354 同族:檢要真的走到那條界線)。
+    try:
+        import tempfile as _tf21
+        with _tf21.TemporaryDirectory() as td:
+            big = Path(td) / "big.duckdb"
+            big.write_bytes(b"Z" * 4096)
+            sv = globals()["HASH_CAP_SHALLOW"]
+            globals()["HASH_CAP_SHALLOW"] = 1024          # 讓 4096 超過上限,不必真的造 GB
+            try:
+                shallow = _stat_row(Path(td), "big.duckdb", True, False)
+                deep = _stat_row(Path(td), "big.duckdb", True, True)
+            finally:
+                globals()["HASH_CAP_SHALLOW"] = sv
+        chk("㉑ --deep 必須**真的越過**雜湊上限(Codex P1;上一輪的 --deep 被上限擋著,"
+            "對真實的庫等於沒作用——宣告了一個不存在的能力):超過上限時淺比無 sha256、"
+            "deep 有 sha256",
+            "sha256" not in shallow and "sha256" in deep,
+            f"(淺 sha={'有' if 'sha256' in shallow else '無'} · 深 sha={'有' if 'sha256' in deep else '無'})")
+    except Exception as exc:
+        checks.append(("㉑ 例外", False)); print("  [FAIL] ㉑", type(exc).__name__, exc); traceback.print_exc()
+
+    # ㉒ page 要吃 --deep(收了旗標卻不辦事,等於騙人)
+    try:
+        import inspect as _in22
+        sig_p = _in22.signature(page)
+        src22 = Path(__file__).read_text(encoding="utf-8")
+        chk("㉒ `page --deep` 要真的傳下去(Codex P2;旗標收了卻不辦事,"
+            "操作員以為拿到深比報告,其實是淺的):page() 有 deep 參數且動詞有傳",
+            "deep" in sig_p.parameters and 'page(publish="--publish" in rest, deep="--deep" in rest)' in src22)
+    except Exception as exc:
+        checks.append(("㉒ 例外", False)); print("  [FAIL] ㉒", type(exc).__name__, exc)
+
+    # ㉓ 頁面逐格轉義:對端檔名是**別人給的字串**,不是我給的標記
+    try:
+        import tempfile as _tf23
+        nasty = '<img src=x onerror=alert(1)>.pdf'
+        with _tf23.TemporaryDirectory() as td:
+            gd = Path(td) / "gd"; gd.mkdir()
+            (gd / '<img src=x onerror=alert(1)>.pdf').write_text("a", encoding="utf-8")
+            (gd / '<img src=x onerror=alert(1)> (1).pdf').write_text("b", encoding="utf-8")
+            h = scan_cloud_health(gd, limit=999)
+            ep23 = {"id": nasty, "kind": "cloudfolder", "provider": "gdrive",
+                    "root": str(gd), "present": True,
+                    "功能面": {"state": "NODATA", "why": nasty},
+                    "資料面": {"state": "NODATA", "why": ""},
+                    "雲端": h}
+            sv = globals()["reconcile"]
+            globals()["reconcile"] = lambda deep=False: {
+                "verdict": "NODATA", "ts": now_iso(), "endpoints": [ep23], "deep": deep}
+            try:
+                htm = page(publish=False)
+            finally:
+                globals()["reconcile"] = sv
+        bad = "<img src=x onerror=" in htm
+        chk("㉓ 頁面逐格轉義(Codex P2 · 安全):`why` 會帶**對端的檔名**,而檔名是別人給的字串;"
+            "直接插進 <td> 等於誰能在同步夾建檔名誰就能在這張報告裡放標記。"
+            "原始標記不得出現,轉義後的 &lt; 要在",
+            (not bad) and "&lt;img" in htm, f"(原始標記 {'還在' if bad else '沒了'})")
+    except Exception as exc:
+        checks.append(("㉓ 例外", False)); print("  [FAIL] ㉓", type(exc).__name__, exc); traceback.print_exc()
+
     n_ok = sum(1 for _, c in checks if c)
     print(f"  [計] {n_ok}/{len(checks)} 檢 OK")
     return 0 if n_ok == len(checks) else 1
@@ -1126,7 +1205,7 @@ def main() -> int:
     if verb == "endpoints":
         return do_endpoints(rest)
     if verb == "page":
-        page(publish="--publish" in rest)
+        page(publish="--publish" in rest, deep="--deep" in rest)
         print(f"  [頁] {OUT / 'VIA_UI_SyncHub_v0100.html'}"
               + ("  + ui_support(已發佈)" if "--publish" in rest else "(未發佈;--publish 才進 ui_support)"))
         return 0
