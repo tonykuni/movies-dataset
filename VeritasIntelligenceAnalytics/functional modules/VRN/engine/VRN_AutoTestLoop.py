@@ -344,7 +344,7 @@ def def_synthetic_truth(engines: Engines, name: str, index: int) -> Dict[str, An
         zh = display or {"KGI": "凱基", "MS": "摩根士丹利", "GS": "高盛", "JPM": "摩根大通", "UBS": "瑞銀", "CITI": "花旗",
                          "DAIWA": "大和", "CLSA": "里昂", "MACQUARIE": "麥格理", "HUANAN": "華南永昌", "MEGA": "兆豐",
                          "CTBC": "中國信託", "CATHAY": "國泰", "PRESIDENT": "統一", "TAISHIN": "台新", "CAPITAL": "群益",
-                         "GF": "廣發"}.get(broker, broker)
+                         }.get(broker, broker)
         broker_line = f"{zh}證券投資顧問  {broker} Securities Research"
     stock = bool(ticker)
     rating = (f.get("rating") or SYNTH_RATINGS[index % 3]) if stock else ""

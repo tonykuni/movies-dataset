@@ -215,7 +215,7 @@ BROKER_CANONICAL_BRIDGE = {
     "MACQUARIE": "MACQUARIE", "JPM": "JPM", "MS": "MS", "GS": "GS", "BOFA": "BOFA",
     "YUANTA": "YUANTA", "FUBON": "FUBON", "CATHAY": "CATHAY", "TAISHIN": "TAISHIN",
     "PRESIDENT": "PRESIDENT", "CAPITAL": "CAPITAL", "MASTERLINK": "MASTERLINK",
-    "JIHSUN": "JIHSUN", "ESUN": "ESUN", "FIRST": "FIRST", "GF": "GF", "GFHK": "GF",
+    "JIHSUN": "JIHSUN", "ESUN": "ESUN", "FIRST": "FIRST",  "GFHK": "GF",
 }
 
 # =====================================================================
@@ -845,7 +845,7 @@ class BrokerRatingDict:
     BROKER = {
         "KGI": ["凱基", "kgi", "kgieworld", "凱基證券", "凱基投顧"], "YUANTA": ["元大", "yuanta"],
         "FUBON": ["富邦", "fubon"], "CAPITAL": ["群益", "capital securities", "capital"],
-        "PRESIDENT": ["統一", "統一投顧", "pscnet", "president"], "CTBC": ["中信", "中國信託", "ctbc", "中信投顧", "中信證券"],
+        "PRESIDENT": ["統一", "統一投顧", "pscnet", "president"], "CTBC": ["中信", "中國信託", "ctbc", "中信投顧", ],
         "JPM": ["摩根大通", "jp morgan", "j.p. morgan", "jpm", "jpmorgan", "jp"],
         "GS": ["高盛", "goldman", "goldman sachs", "gs"], "BOFA": ["美銀", "美林", "bofa", "merrill", "boa"],
         "MACQUARIE": ["麥格理", "macquarie", "mq", "mcq"], "CITI": ["花旗", "citi", "citigroup"],
@@ -854,7 +854,7 @@ class BrokerRatingDict:
         "HUANAN": ["華南", "華南永昌", "華南投顧", "hua nan", "huanan"], "MEGA": ["兆豐", "兆豐證券", "兆豐投顧", "mega"],
         "TAISHIN": ["台新", "台新投顧", "taishin"], "CATHAY": ["國泰", "國泰證期", "國泰投顧", "國泰證券", "cathay"],
         "SINOPAC": ["永豐", "永豐金", "sinopac"], "MASTERLINK": ["元富", "masterlink"], "JIHSUN": ["日盛", "jih sun"],
-        "HSBC": ["匯豐", "hsbc"], "GF": ["廣發", "gf securities", "gf"], "ESUN": ["玉山", "esun"], "FIRST": ["第一金", "第一金投顧"],
+        "HSBC": ["匯豐", "hsbc"],  "ESUN": ["玉山", "esun"], "FIRST": ["第一金", "第一金投顧"],
     }
     RATING = {
         "BUY": ["買進", "強力買進", "加碼", "buy", "outperform", "overweight", "strong buy", "增加持股", "增持", "推薦買進", "買進評等", "超配"],
