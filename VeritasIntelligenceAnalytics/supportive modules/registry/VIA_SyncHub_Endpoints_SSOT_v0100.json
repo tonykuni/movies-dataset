@@ -1,0 +1,32 @@
+{
+ "schema": "VIA.SyncHub.Endpoints.v1",
+ "writer": "操作員(手寫)· CGC_MDL179 只讀不寫這本",
+ "ts": "2026-09-22",
+ "batch": "批697",
+ "policy": [
+  "全唯讀:對端一個位元都不寫;零搬移、零刪除、零 force",
+  "不落 OneDrive —— CGC_MDL059_MasterHub_v0108.py:83 儲存鐵則(2026-08-12)",
+  "不複製 —— CGC_MDL123_DataHome_v0103.py:26「搬=link;複製=三副本病,不做」",
+  "api 端點只登記不撥號:系統無憑證機制(SUP_MDL740 零 Authorization/Bearer/oauth),且 AegisNexus 是批345 不可動律",
+  "發現分岔只報不裁(LL90:同義/正本的裁定權在操作員)"
+ ],
+ "endpoints": [],
+ "endpoints_說明": [
+  "留空=全靠 CGC_MDL144_CopyDoctor.candidate_roots() 掃。",
+  "但它只認『父夾叫 movies-dataset* 且裡面有 Register-VIA-Commands-v*.ps1』的副本;",
+  "一份直接攤在 OneDrive\\VeritasIntelligenceAnalytics 底下的樹它掃不到——那種就逐筆寫在這裡。",
+  "逐筆格式:{\"id\":\"od_daily\",\"root\":\"C:\\\\Users\\\\tonyk\\\\OneDrive\\\\VeritasIntelligenceAnalytics\",\"kind\":\"cloudfolder\",\"provider\":\"onedrive\"}",
+  "kind/provider 留空會自動判(provider 從路徑片段認 onedrive/dropbox/gdrive)。",
+  "另一條明路:環境變數 VIA_COPY_ROOTS(分號清單),兩條結果取聯集去重。"
+ ],
+ "api_declared": [
+  {"id": "onedrive_api", "provider": "onedrive", "why_gated": "無憑證機制(740 零 Authorization/Bearer/oauth)"},
+  {"id": "gdrive_api", "provider": "gdrive", "why_gated": "無憑證機制(同上)"},
+  {"id": "dropbox_api", "provider": "dropbox", "why_gated": "無憑證機制(同上)"}
+ ],
+ "api_說明": [
+  "這三筆是**宣告**不是實作:一律回 GATED,理由印在臉上,絕不假裝跑得動。",
+  "要真的接 REST,依『網路只認 AegisNexus』得把憑證流程做進 AegisNexus/740——",
+  "而 AegisNexus 是批345 不可動律,所以那是另一批,而且要先由操作員改鐵則。"
+ ]
+}
