@@ -225,7 +225,11 @@ def is_via_tree(root) -> bool:
 def roster() -> dict:
     """端點名冊 SSOT。缺席=用內建預設(不猜、不寫檔)。"""
     j = _read_json(ROSTER)
-    if isinstance(j, dict) and j.get("endpoints"):
+    # 判「是不是一份合法名冊」要看 endpoints **是不是 list**,不是看它空不空。
+    # 批697 自審(Codex P2,對):我出的名冊本來就寫 "endpoints": [],
+    # 而空清單是 falsy —— 於是我自己的載入器把我自己出的名冊丟掉、退回內建預設,
+    # 操作員改 api_declared / policy 全部無效,CLI 還報「名冊不在」。
+    if isinstance(j, dict) and isinstance(j.get("endpoints"), list):
         return j
     return {
         "schema": "VIA.SyncHub.Endpoints.v1",
@@ -340,9 +344,20 @@ def conflict_copies(names) -> dict:
 
 
 def scan_cloud_health(root: Path, limit: int = 4000) -> dict:
-    """雲端資料夾健康:衝突副本 + 佔位檔 + 最新 mtime。**零開檔**。"""
+    """雲端資料夾健康:衝突副本 + 佔位檔 + 最新 mtime。**零開檔**。
+
+    批697 自審(Codex P1/P2,兩條都對):
+      ② 掃到 limit 就停,而停之後**後面的目錄一次都沒看過**,函式卻照樣回 GREEN。
+         真的 OneDrive/Dropbox 樹動輒超過四千件 —— 那個綠是假的保證。
+         → 記 truncated,截斷就回 NODATA,並把「看過幾件」說出來。
+      ③ gdrive 疑似件被算出來了,卻沒進總判(real 只收 dropbox+onedrive),
+         於是 state 留在 GREEN、why 還是空的,而頁面只印 state 與 why ——
+         偵測到的東西對操作員**完全隱形**。
+         → 疑似件不得留在綠:升成 NODATA 並點名,但**不升 RED**(疑似就是疑似)。
+    """
     out = {"state": "NODATA", "conflicts": {"dropbox": [], "onedrive": [], "gdrive_suspect": []},
-           "cloud_only": 0, "files": 0, "newest_mtime": None, "why": ""}
+           "cloud_only": 0, "files": 0, "newest_mtime": None, "why": "",
+           "truncated": False, "limit": limit}
     if not root.is_dir():
         out["state"] = "ABSENT"
         out["why"] = "端點不在這台機器上(不是紅)"
@@ -368,6 +383,7 @@ def scan_cloud_health(root: Path, limit: int = 4000) -> dict:
                     continue            # **不開檔**:讀它就是觸發下載
                 newest_m = max(newest_m, st.st_mtime)
             if n > limit:
+                out["truncated"] = True
                 break
     except Exception as exc:
         out["why"] = f"BROKEN {type(exc).__name__}:{str(exc)[:60]}"
@@ -375,11 +391,25 @@ def scan_cloud_health(root: Path, limit: int = 4000) -> dict:
     out["files"], out["cloud_only"] = n, co
     out["newest_mtime"] = datetime.fromtimestamp(newest_m).strftime("%Y-%m-%dT%H:%M:%S") if newest_m else None
     real = out["conflicts"]["dropbox"] + out["conflicts"]["onedrive"]
-    out["state"] = "RED" if real else "GREEN"
+    sus = out["conflicts"]["gdrive_suspect"]
     if real:
+        out["state"] = "RED"
         out["why"] = f"provider 已經放棄合併:衝突副本 {len(real)} 件(它自己生的,不是我判的)"
-    elif co:
-        out["why"] = f"雲端佔位檔 {co} 件未下載(**沒讀它們**;在位≠同步好)"
+    elif out["truncated"]:
+        # 綠只能發給「整棵看完」的掃描。看了前 N 件沒事,不是這棵樹沒事。
+        out["state"] = "NODATA"
+        out["why"] = (f"掃到上限 {limit} 件就停,後面的目錄一次都沒看過"
+                      f"(已看 {n} 件,其中佔位 {co})——**乾淨的前綴不是整棵樹的保證**")
+    elif sus:
+        out["state"] = "NODATA"
+        out["why"] = (f"Google Drive 疑似衝突 {len(sus)} 件(如 {sus[0]['file'][:40]}):"
+                      "同名正本在旁,但 `(1)` 這種也可能只是瀏覽器下載——疑似不升紅,但也不准留在綠")
+    else:
+        out["state"] = "GREEN"
+        if co:
+            out["why"] = f"整棵看完 {n} 件無衝突;雲端佔位檔 {co} 件未下載(**沒讀它們**;在位≠同步好)"
+        else:
+            out["why"] = f"整棵看完 {n} 件:無衝突副本、無佔位檔"
     return out
 
 
@@ -446,13 +476,17 @@ def function_plane(ep: dict, self_inv: dict) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 # ④ 資料面:宣告產物內容定址對帳
 # ══════════════════════════════════════════════════════════════════════════════
-def watch_list() -> list:
-    """要對帳的宣告產物。DB 清單委派 MDL123.DB_PROBES(不自己再抄一份)。"""
+def watch_list(deep: bool = False) -> list:
+    """要對帳的宣告產物。DB 清單委派 MDL123.DB_PROBES(不自己再抄一份)。
+
+    deep=False(預設):庫不做全檔 hash(動輒 GB)。**但也因此不准說「一致」**——見 data_plane。
+    deep=True(`--deep`):庫照樣逐檔 hash,慢但判得準。
+    """
     rows = []
     dh, _ = _datahome()
     probes = list(getattr(dh, "DB_PROBES", []) or []) if dh else []
     for rel in probes:
-        rows.append({"cls": "庫", "rel": rel, "hash": False})     # 庫太大:比 size+mtime,不做全檔 hash
+        rows.append({"cls": "庫", "rel": rel, "hash": bool(deep)})
     for rel in (INVENTORY_REL,
                 "supportive modules/registry/VIA_SSOT_RegexDict_v0100.json",
                 "supportive modules/registry/VIA_InputConsole_Spec_v0100.json",
@@ -488,7 +522,7 @@ def _stat_row(root: Path, rel: str, do_hash: bool) -> dict:
     return row
 
 
-def data_plane(ep: dict, self_rows: dict) -> dict:
+def data_plane(ep: dict, self_rows: dict, deep: bool = False) -> dict:
     out = {"plane": "資料面", "state": "NODATA", "items": [], "why": ""}
     if ep["kind"] == "api":
         out.update(state="GATED", why=ep.get("why", "缺憑證機制"))
@@ -500,8 +534,8 @@ def data_plane(ep: dict, self_rows: dict) -> dict:
         out.update(state="SKIP", why="資料家走 MDL123 的 link 模型,不在本支對帳範圍")
         return out
     root = Path(ep["root"])
-    same, diff, only_here, only_there, cloud, bad = 0, 0, 0, 0, 0, 0
-    for w in watch_list():
+    same, diff, only_here, only_there, cloud, bad, unver = 0, 0, 0, 0, 0, 0, 0
+    for w in watch_list(deep):
         there = _stat_row(root, w["rel"], w["hash"])
         here = self_rows.get(w["rel"], {"state": "MISSING"})
         v = {"cls": w["cls"], "rel": w["rel"], "here": here.get("state"), "there": there.get("state")}
@@ -521,42 +555,60 @@ def data_plane(ep: dict, self_rows: dict) -> dict:
             v["sha_here"], v["sha_there"] = here["sha256"][:12], there["sha256"][:12]
             same, diff = same + int(ok), diff + int(not ok)
         else:
-            ok = here.get("size") == there.get("size")
-            v["verdict"] = "SAME" if ok else "DIFF"
-            v["size_here"], v["size_there"] = here.get("size"), there.get("size")
-            v["by"] = "size(庫不做全檔 hash)"
-            same, diff = same + int(ok), diff + int(not ok)
+            # 批697 自審(Codex P1,**這條最重**):size 相等 ≠ 內容相同。
+            #   DuckDB 改資料常常是就地改頁,**總長度一個位元組都不變**。
+            #   舊寫法在這裡直接判 SAME → 整面 GREEN,
+            #   於是這支樞紐會漏掉**它唯一存在理由**的那件事:一邊的庫舊了。
+            #   改法:size 不同=DIFF(確定);size 相同=**UNVERIFIED**(沒量過就不准說一致),
+            #   整面因此落到 NODATA 而不是 GREEN。要判準就 `--deep` 逐檔 hash。
+            sz_h, sz_t = here.get("size"), there.get("size")
+            v["size_here"], v["size_there"] = sz_h, sz_t
+            if sz_h != sz_t:
+                v["verdict"] = "DIFF"
+                v["by"] = "size 不同(確定分岔)"
+                diff += 1
+            else:
+                v["verdict"] = "UNVERIFIED"
+                v["by"] = "size 相同但沒做內容比對——DuckDB 就地改頁不改長度,所以**不判一致**(要判用 --deep)"
+                unver += 1
         out["items"].append(v)
     out.update(same=same, diff=diff, only_here=only_here, only_there=only_there,
-               cloud_only=cloud, unreadable=bad)
+               cloud_only=cloud, unreadable=bad, unverified=unver, deep=bool(deep))
     if ep["kind"] == "self":
         out.update(state="GREEN", why="本端自己")
     elif diff or only_here or only_there:
         out.update(state="RED",
                    why=(f"內容分岔:不同 {diff} · 只有本端 {only_here} · 只有對端 {only_there}"
                         + (f" · 雲端佔位 {cloud}" if cloud else "")
+                        + (f" · 未驗 {unver}" if unver else "")
                         + "(批429-W4 的那個症狀就是這一欄)"))
-    elif cloud:
-        out.update(state="NODATA", why=f"雲端佔位 {cloud} 件未下載——**沒讀它們**,所以不判一致也不判分岔")
+    elif cloud or unver:
+        bits = []
+        if unver:
+            bits.append(f"未驗 {unver} 件(庫 size 相同但沒比內容;`--deep` 才逐檔 hash)")
+        if cloud:
+            bits.append(f"雲端佔位 {cloud} 件未下載(**沒讀它們**)")
+        out.update(state="NODATA", why=" · ".join(bits) + " —— 沒量過就不判一致,也不判分岔")
     else:
-        out.update(state="GREEN", why="宣告產物逐件一致")
+        out.update(state="GREEN",
+                   why=("宣告產物逐件內容一致" + ("(--deep:庫也逐檔 hash 過)" if deep else "")))
     return out
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ⑤ 對帳總成
 # ══════════════════════════════════════════════════════════════════════════════
-def reconcile() -> dict:
+def reconcile(deep: bool = False) -> dict:
     eps = endpoints()
     self_inv, self_why = _inv_of(VIA)
-    self_rows = {w["rel"]: _stat_row(VIA, w["rel"], w["hash"]) for w in watch_list()}
+    self_rows = {w["rel"]: _stat_row(VIA, w["rel"], w["hash"]) for w in watch_list(deep)}
     base = _read_json(LATEST)
     first_run = not isinstance(base, dict) or not base.get("endpoints")
     rows = []
     for ep in eps["endpoints"]:
         r = dict(ep)
         r["功能面"] = function_plane(ep, self_inv)
-        r["資料面"] = data_plane(ep, self_rows)
+        r["資料面"] = data_plane(ep, self_rows, deep)
         r["雲端"] = (scan_cloud_health(Path(ep["root"])) if ep["kind"] == "cloudfolder"
                      else {"state": "SKIP", "why": "非雲端資料夾端點"})
         rows.append(r)
@@ -567,7 +619,7 @@ def reconcile() -> dict:
            "version": VERSION, "ts": now_iso(), "self_root": eps["self_root"],
            "self_inventory": {"n": self_inv.get("n", 0), "why": self_why} if not self_inv else
                              {"n": self_inv["n"], "updated_at": self_inv.get("updated_at", "")},
-           "endpoints": rows, "why": eps["why"],
+           "endpoints": rows, "why": eps["why"], "deep": bool(deep),
            "verdict": verdict,
            "first_run": first_run}
     if first_run:
@@ -604,11 +656,12 @@ _MARK = {"GREEN": "🟢", "RED": "🔴", "NODATA": "⚪", "ABSENT": "⚫", "GATE
 
 
 def do_status(rest: list) -> int:
-    r = reconcile()
+    r = reconcile(deep="--deep" in rest)
     print(f"=== VCGC 資料樞紐(對帳層)· MDL179 v{VERSION} · {r['verdict']} · {r['ts']} ===")
     print(f"  [界線] 全唯讀 · 對端零寫入 · 零搬移 · 零網路 —— 不落 OneDrive(MDL059:83)"
           f"· 不複製(MDL123:26)")
-    print(f"  [本端] {r['self_root']} · 元件冊 ACTIVE {r['self_inventory'].get('n', 0)} 件")
+    print(f"  [本端] {r['self_root']} · 元件冊 ACTIVE {r['self_inventory'].get('n', 0)} 件"
+          + (" · --deep(庫逐檔 hash)" if r.get("deep") else " · 淺比(庫不做全檔 hash;--deep 才逐檔)"))
     for e in r["endpoints"]:
         head = f"  {_MARK.get(e['功能面']['state'], '?')} {e['id']:<26} {e['kind']:<12}"
         if e.get("provider"):
@@ -949,6 +1002,98 @@ def selftest() -> int:
     except Exception as exc:
         checks.append(("⑯ 例外", False)); print("  [FAIL] ⑯", type(exc).__name__, exc)
 
+    # ── 批697 自審修(Codex 四條,逐條加檢;一正一負)────────────────────────
+    # ⑰ size 相等不准判一致(P1,最重):DuckDB 就地改頁不改長度
+    try:
+        import tempfile as _tf17
+        with _tf17.TemporaryDirectory() as td:
+            a, b = Path(td) / "A", Path(td) / "B"
+            for r in (a, b):
+                (r / "supportive modules").mkdir(parents=True); (r / "functional modules").mkdir()
+            rel = "db.duckdb"
+            (a / rel).write_bytes(b"X" * 64)
+            (b / rel).write_bytes(b"Y" * 64)          # 同長度、不同內容
+            sv = globals()["watch_list"]
+            globals()["watch_list"] = lambda deep=False: [{"cls": "庫", "rel": rel, "hash": bool(deep)}]
+            try:
+                hs = {rel: _stat_row(a, rel, False)}
+                shallow = data_plane({"id": "t", "kind": "copy", "root": str(b), "present": True}, hs, False)
+                hd = {rel: _stat_row(a, rel, True)}
+                deep = data_plane({"id": "t", "kind": "copy", "root": str(b), "present": True}, hd, True)
+            finally:
+                globals()["watch_list"] = sv
+        ok = (shallow["items"][0]["verdict"] == "UNVERIFIED" and shallow["state"] == "NODATA"
+              and shallow.get("unverified") == 1 and shallow.get("same", 0) == 0
+              and deep["items"][0]["verdict"] == "DIFF" and deep["state"] == "RED")
+        chk("⑰ size 相等**不准**判一致(Codex P1;DuckDB 就地改頁不改總長度):同長不同內容 → "
+            "淺比 UNVERIFIED + 整面 NODATA(絕不 SAME/GREEN);--deep 逐檔 hash → DIFF + RED。"
+            "漏掉這條,這支樞紐就會漏掉它唯一存在理由的那件事",
+            ok, f"(淺 {shallow['items'][0]['verdict']}/{shallow['state']} · "
+                f"深 {deep['items'][0]['verdict']}/{deep['state']})")
+    except Exception as exc:
+        checks.append(("⑰ 例外", False)); print("  [FAIL] ⑰", type(exc).__name__, exc); traceback.print_exc()
+
+    # ⑱ 掃描截斷不准發綠(P1)+ ⑲ gdrive 疑似不准留在綠(P2)
+    try:
+        import tempfile as _tf18
+        with _tf18.TemporaryDirectory() as td:
+            big = Path(td) / "big"; big.mkdir()
+            for i in range(12):
+                (big / f"f{i}.txt").write_text("x", encoding="utf-8")
+            trunc = scan_cloud_health(big, limit=5)
+            full = scan_cloud_health(big, limit=999)
+            gd = Path(td) / "gd"; gd.mkdir()
+            (gd / "報告.pdf").write_text("a", encoding="utf-8")
+            (gd / "報告 (1).pdf").write_text("b", encoding="utf-8")
+            sus = scan_cloud_health(gd, limit=999)
+            od = Path(td) / "od"; od.mkdir()
+            (od / "reg.json").write_text("a", encoding="utf-8")
+            (od / "reg-DESKTOP-A1B2C3.json").write_text("b", encoding="utf-8")
+            real = scan_cloud_health(od, limit=999)
+        chk("⑱ 掃到上限就停 → **不准發綠**(Codex P1;真的 OneDrive 樹動輒破四千件,"
+            "乾淨的前綴不是整棵樹的保證):截斷 NODATA 且說得出看了幾件;整棵看完才 GREEN",
+            trunc["state"] == "NODATA" and trunc["truncated"] is True and "上限" in trunc["why"]
+            and full["state"] == "GREEN" and full["truncated"] is False,
+            f"(截斷 {trunc['state']}/truncated={trunc['truncated']} · 完整 {full['state']})")
+        chk("⑲ gdrive 疑似件**不准留在綠**(Codex P2;算出來卻沒進總判=對操作員完全隱形):"
+            "疑似 → NODATA 並點名;確定衝突(dropbox/onedrive)→ RED。疑似不升紅,但也不留綠",
+            sus["state"] == "NODATA" and "疑似" in sus["why"] and len(sus["conflicts"]["gdrive_suspect"]) == 1
+            and real["state"] == "RED",
+            f"(疑似 {sus['state']} · 確定 {real['state']})")
+    except Exception as exc:
+        checks.append(("⑱⑲ 例外", False)); print("  [FAIL] ⑱⑲", type(exc).__name__, exc); traceback.print_exc()
+
+    # ⑳ 名冊 endpoints 是空清單也要收(P2;我自己出的名冊就寫空清單)
+    try:
+        import tempfile as _tf20
+        with _tf20.TemporaryDirectory() as td:
+            p = Path(td) / "r.json"
+            p.write_text(json.dumps({"schema": "VIA.SyncHub.Endpoints.v1", "endpoints": [],
+                                     "api_declared": [{"id": "只有這一筆", "provider": "x",
+                                                       "why_gated": "自測"}]},
+                                    ensure_ascii=False), encoding="utf-8")
+            sv = globals()["ROSTER"]
+            globals()["ROSTER"] = p
+            try:
+                got = roster()
+            finally:
+                globals()["ROSTER"] = sv
+            bad = Path(td) / "bad.json"; bad.write_text("{}", encoding="utf-8")
+            globals()["ROSTER"] = bad
+            try:
+                fallback = roster()
+            finally:
+                globals()["ROSTER"] = sv
+        chk("⑳ 名冊 endpoints 是**空清單也要收**(Codex P2):判準看它是不是 list,不是看它空不空——"
+            "舊寫法把我自己出的那份名冊(endpoints: [])當成不存在,操作員改 api_declared/policy 全部無效;"
+            "真的缺鍵才退回內建預設",
+            got.get("api_declared", [{}])[0].get("id") == "只有這一筆"
+            and fallback.get("_src", "").startswith("內建預設"),
+            f"(讀到名冊 api_declared {len(got.get('api_declared', []))} 筆 · 缺鍵時退預設 "
+            f"{fallback.get('_src', '')[:12]})")
+    except Exception as exc:
+        checks.append(("⑳ 例外", False)); print("  [FAIL] ⑳", type(exc).__name__, exc); traceback.print_exc()
+
     n_ok = sum(1 for _, c in checks if c)
     print(f"  [計] {n_ok}/{len(checks)} 檢 OK")
     return 0 if n_ok == len(checks) else 1
@@ -957,7 +1102,7 @@ def selftest() -> int:
 # ══════════════════════════════════════════════════════════════════════════════
 # ⑧ CLI
 # ══════════════════════════════════════════════════════════════════════════════
-KNOWN_FLAGS = {"--selftest", "--publish", "--json", "--help", "-h"}
+KNOWN_FLAGS = {"--selftest", "--publish", "--json", "--deep", "--help", "-h"}
 VERBS = {"status", "endpoints", "page", "diff"}
 
 
@@ -986,7 +1131,7 @@ def main() -> int:
               + ("  + ui_support(已發佈)" if "--publish" in rest else "(未發佈;--publish 才進 ui_support)"))
         return 0
     if verb == "diff":
-        r = reconcile()
+        r = reconcile(deep="--deep" in rest)
         print(json.dumps(r, ensure_ascii=False, indent=1)[:4000])
         return {"GREEN": 0, "FIRST_RUN": 0, "RED": 1, "NODATA": 2}.get(r["verdict"], 2)
     return do_status(rest)
