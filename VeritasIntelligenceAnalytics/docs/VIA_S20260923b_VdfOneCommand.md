@@ -67,7 +67,7 @@ $VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnal
 | 模板章稽核(兩支新 .ps1) | joined · restore · requires7 全到 · verdict pass |
 | 格子 | 一鍵啟動台自測 OK;資料庫狀況頁在容器 SKIP(容器沒有目錄,rc 3 = 環境缺件);你的機器上有目錄就會是 OK |
 | PowerShell 括號絆線(容器沒有 pwsh 的替代:跳過註解、各種字串、here-string、`$(...)`) | 工作站 pwsh 真跑過的 v0100 · v0105 · 短令冊 v0242 全 OK;兩個負控(少一個 `}`、多一個 `(`)都抓到;v0101 · v0106 OK |
-| VCGC · 契約 · SSOT 驗收 | 36/36 · 19/19 · PASS(正則清冊 1282 條,交正主 CGC_MDL115 重建) |
+| VCGC · 契約 · SSOT 驗收(第一輪;第七節有最新一輪) | 36/36 · 19/19 · PASS(正則清冊 1282 條,交正主 CGC_MDL115 重建) |
 
 **沒實測到的一件**:容器沒有 pwsh,`Open-VIA-VDF-v0100.ps1` 與 `Open-VIA-VDF.cmd` 在這裡沒真跑過(Z139)。
 它們很薄:點源短令冊、呼叫上面測過的引擎、把網址交給 `via-open`、呼叫既有的啟動器。你第一次跑就是它的實測;貼回最後一行 `=== [Open-VIA-VDF] 畢 …`。
@@ -122,6 +122,69 @@ NativeArgs        = (Get-Variable -Name PSNativeCommandArgumentPassing -ValueOnl
 
 ---
 
-## 七 · 還原
+## 七 · 問參數頁改版 · 逐一引擎測修 · 最高政策(2026-09-23 晚)
 
-刪掉 `Open-VIA-VDF-v0100.ps1`、`Open-VIA-VDF-v0101.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1`(短令冊自動退回 v0105)、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。既有檔一支都沒動。
+你看過頁之後的令:「每道上限檔數刪除 · 要抓就全抓 · 導入網路工具 · 起始日期 YYYY-MM-DD · 截止日期自動帶入今天 · 方便打勾方格自動 ·
+逐一引擎邊測邊修正到成功 · 並將輸入參數(要找的資料)用大矩陣顯示出來完整」「PY 檔都要導入加速器 · VDF 都要導入網路工具 · PS 都要導入模板工具 列為最高政策」「自測自修正再測再修正直到成功」。
+
+**問參數頁(VDF_ENG093 v0101)**
+- 檔數上限欄拿掉了:全市場全抓。有人硬送 `limit` 會被拒,並講明「要抓就全抓」。
+- 起始日期直接打 `YYYY-MM-DD`,或按右邊日曆挑;截止日期自動帶入今天(各引擎一律抓到最新,不收別的值)。
+- **要抓的資料矩陣**:11 步一列一列,打勾方格預設全勾,有「全選 / 全不選」。每一列寫清楚:
+  - 要抓的資料、跑哪支引擎尾版、實際帶的參數(藍底隨起始日變);
+  - 觸網與否、網路工具橋、加速器橋、在哪條鏈、等哪幾步、逾時秒數。
+  - 步冊委派 CGC_MDL125,鏈委派 CGC_MDL134,步清單讀自啟動器;本頁一條規則都不自己寫。
+- **逐一引擎自測**:頁上一鍵,背景一支一支跑 `--selftest`,每列填上燈號、rc、秒數、最後一行。
+  子行程拿掉同意閘變數,只寫暫存;跑的時候不收「啟動」,跑完才收。
+- 按「用下面勾的啟動」→ 決定檔帶 `since · until · steps · dry · noheal`。
+
+**啟動器**
+- `Invoke-VIA-VdfFetch-v0107.ps1`:+`-Since YYYY-MM-DD`(蓋過 -Year)、+`-Steps a,b,c`(只跑勾的步,照步清單順序),在 ⑤ 一起驗,錯了什麼都還沒做就停。
+- `Open-VIA-VDF-v0102.ps1`:照決定檔送 `-Since -Steps -Dry -NoHeal`,永不送 `-Limit`;狀況頁多帶本次決定。
+- 狀況頁多兩張卡:「本次輸入參數」與「各步結果」。
+  - 各步結果取 CGC_MDL134 最近一次非 PLAN 報告;紅步附紀錄檔路徑,主控台也逐步印出非綠的步。
+  - 報告若比本次決定早,會講明「是上一次的」,不冒充這一次。
+
+**逐一引擎測修(容器,離線)**
+
+| 步 | 引擎尾版 | 自測 | 加速器橋 | 網路工具橋 | 這次修了什麼 |
+|---|---|---|---|---|---|
+| datahome | CGC_MDL123_DataHome_v0103 | 13/13 | ✓ | 不觸網(CGC 件,不在 L69 範圍) | — |
+| hist_2023 | VDF_ENG064_HistoryBackfill_v0112 | 10/10 | ✓ | ✓ | — |
+| global | VDF_ENG066_GlobalUniverse_v0102 | 8/8 | ✓ | ✓ | — |
+| fred | VDF_ENG074_FredMacroSSOT_v0102 | 17/17 | ✓ | ✓ | — |
+| revenue_backfill | VDF_ENG075_MonthlyRevenueBackfill_v0102 | 10/10 | ✓ | ✓ | — |
+| etf_universe | VDF_ENG077_ActiveETFUniverse_v0100 | 8/8 | ✓ | ✓ | — |
+| etf_fetch | VDF_ENG051_ActiveTWETF_Holdings_**v0103** | 27/27 | ✓ | ✓ | v0102 只認 `--self-test`,打 `--selftest` 被 argparse 拒 → 加別名(L56 ①) |
+| etf_history | VDF_ENG078_ActiveETFHoldingsHistory_v0109 | 29/29 | ✓ | ✓ | — |
+| consensus | VRN_ENG071_CnyesFusion_**v0101** | 9/9 | ✓ | ✓ | 網路本來就走統包 SUP_MDL740,只缺標準橋 → 正主 via_bridge_sweeper 掛上 |
+| revenue_consensus | VDF_ENG069_RevenueConsensusAnalysis_v0108 | 3/3 | ✓ | ✓ | — |
+| etf_revenue | VDF_ENG076_ETFRevenueMomentum_v0101 | 8/8 | ✓ | ✓ | — |
+
+同一張表在問參數頁上按「逐一引擎自測」會再跑一次:容器實跑 11/11 綠。真的觸網抓資料要在你的機器上跑(同意閘是你的手)。
+
+**最高政策(L103,法典 `VIA_Policy_Laws_SSOT_v0100.json`)**
+- 三條:PY 導入加速器 · VDF 導入網路工具 · PS 導入模板工具。
+- 實量:
+  - PY:正主 via_accel_injector 全樹 2607 支補 1 支,就是原掉球 Z138 那支測試檔;格子「Celeritas 產出契約實跑」轉綠。
+  - VDF:CGC_MDL156 量到 VDF 活件 72 全掛、生呼叫 0,擷取鏈裡的 VRN_ENG071 也掛上了。
+  - PS:新產出全接;既有 838 支升為最高政策的欠帳。改 `.ps1` 仍要你逐批許可(L70),而且要先看到 Z137 的「已套」。
+- **排序待你確認**:我照你的原話把 L103 排 rank 1,批618 的 L50「第一條」(TA-Lib)順延 rank 2,L102 順延 rank 3。
+  要 L50 仍居首,兩處對調即可,全樹沒有程式依賴 rank 值。
+
+**實測**
+- VDF_ENG093 v0101 自測 12/12,突變測(收 limit、拿掉自測鎖)都轉紅。
+- 無頭 Chromium 照工作站緩衝跑了三條路:
+  - 自訂:改日 2024-03-15、全不選、勾兩步 → 決定檔完全相同。
+  - 逐一引擎自測 11/11 綠,跑時啟動鈕鎖住,跑完用預設啟動。
+  - 不啟動;錯權杖 403。
+- 啟動器:兩支新 `.ps1` 模板章稽核 pass、括號絆線 OK。
+  - 審 diff 時抓到一個 pwsh 才會露的錯:PowerShell 變數不分大小寫,步清單叫 `$steps` 會蓋掉新參數 `-Steps`,所以改名 `$stepBook`。
+- 其餘:VCGC 36/36 · 門 31/31 · 門單元測 34/34 · 元件冊同步(新 14)· 正則清冊交正主重建 1284 條 · SSOT 驗收 PASS。
+  格子一鍵啟動台與 Celeritas 三站都綠;本 PR 的 CI 在容器照步驟全過。
+
+---
+
+## 八 · 還原
+
+刪掉 `Open-VIA-VDF-v0100.ps1`~`v0102.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1` 與 `v0107.ps1`(短令冊自動退回 v0105)、`VDF_ENG093_LaunchConsole_v0101.py`、`VDF_ENG051_ActiveTWETF_Holdings_v0103.py`、`VRN_ENG071_CnyesFusion_v0101.py`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。既有檔一支都沒動。

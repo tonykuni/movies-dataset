@@ -5,6 +5,17 @@
   "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
   "laws": [
     {
+      "id": "L103",
+      "batch": "側線 2026-09-23(主線批號由併線的手指定 L25)",
+      "cat": "最高政策",
+      "rank": 1,
+      "ranked_by": "操作員 2026-09-23 原文「PY檔都要導入加速器 VDF都要導入網路工具 PS都要導入模板工具列為最高政策」→ 本律 rank=1。批618 的 L50「第一條」(TA-Lib 禁用)條文與效力一字不動,位階順延 rank=2;L102 順延 rank=3。**這個排序待操作員確認**:要 L50 仍居首,把 L103 與 L50 的 rank 對調、陣列前兩個互換即可(兩處,零其他影響——全樹沒有程式依賴 rank 值,只有散文提到「L50 第一條」)。",
+      "key": "TOP_POLICY_BRIDGES",
+      "zh": "**【最高政策】三條,缺一不可:PY 導入加速器 · VDF 導入網路工具 · PS 導入模板工具。**\n① **PY 檔都要導入加速器**:凡本樹 .py 都帶加速器橋;判準是橋的標記,不是文中提到名字(L102 ①)。2026-09-23 實量:正主 via_accel_injector 全樹掃 2607 支,補 1 支(functional modules/VRN/tests/test_broker_source_zones.py,原掉球 Z138),後驗 AST 0 敗;格子「Celeritas 產出契約實跑」轉綠。\n② **VDF 都要導入網路工具**:每一支 VDF 活件尾版帶統包網路工具橋(L69,不是「有 import 網路庫才掛」);VDF 擷取鏈裡的非 VDF 觸網引擎一併掛——2026-09-23 VRN_ENG071 v0101 由正主 via_bridge_sweeper.inject_one 掛上(它的網路本來就走統包 SUP_MDL740,只缺橋)。實量:CGC_MDL156 VDF 活件 72 全掛 · 生呼叫 0。\n③ **PS 都要導入模板工具**:凡本樹 .ps1 都要接 Celeritas 模板章(CELERITAS-TEMPLATE-JOIN)。新產出:出生就接(L102 ②,棘輪基線不許新增缺口)。既有 838 支:從「既有債」升為**最高政策的欠帳**,逐批補;**每一批改 .ps1 仍要操作員逐次許可(L70 不變)**,而且要先在工作站實證「不包裹接法」真的套上(Open-VIA-VDF v0101 印的 [Celeritas] 行是「本行程減壓已套」,掉球 Z137)——正主 xps_join 的包裹接法會讓啟動器的 param() 綁不上(Z136),不能拿去批次套。\n三條的判準各只有一個出處,本律不另寫尺:加速器與 PS 模板 = CGC_MDL183 Celeritas 產出契約閘;VDF 網路工具 = CGC_MDL156 第②④檢。",
+      "enforcement": "CGC_MDL183_CeleritasPolicyGate(PY 加速器橋 + PS 模板章;格子站)· CGC_MDL156_VIAAcceleratorControl 第②④檢(VDF 網路工具)· 正主注入器 via_accel_injector / via_bridge_sweeper(可 --undo)",
+      "status": "ACTIVE"
+    },
+    {
       "id": "L50",
       "batch": "B531 · 批595 補執法憑據",
       "cat": "指標",
@@ -12,21 +23,23 @@
       "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
       "enforcement": "CGC_MDL156_VIAAcceleratorControl_v*(talib 曝險檢;尾版 glob 不釘版號) + VDF_ENG086_QuantGuardOneBridge_v*(正典替代路徑) + VIA_QuantGuard_TA_Lib_Policy_v0100.json;尺必須比 import 語句且只看尾版,不得用字串比對(批595 實測 0 支真曝險)",
       "status": "ACTIVE",
-      "rank": 1,
-      "ranked_by": "操作員批618 裁定:「不准使用 TA-LIB,刪除關於他的一切,列入第一條,用 QuantGuard 替代」"
+      "rank": 2,
+      "ranked_by": "操作員批618 裁定:「不准使用 TA-LIB,刪除關於他的一切,列入第一條,用 QuantGuard 替代」",
+      "rank_note": "操作員 2026-09-23 令三條「列為最高政策」(L103 rank 1)後,本律位階順延為 2;條文、效力、落地三層一字不動。要恢復第一條:與 L103 對調 rank。"
     },
     {
       "id": "L102",
       "batch": "批715",
       "cat": "產出契約",
-      "rank": 2,
+      "rank": 3,
       "ranked_by": "操作員 2026-09-23 原文「INTO ONE PY ENGINE REGISTER AND MAKE IT A POLICY AS HIGHER PRIORITY」。**L50 仍是第一條**(批618 操作員裁定),本律置其後 rank=2 —— 不動既有位階,只插自己。",
       "key": "CELERITAS_OUTPUT_CONTRACT",
       "zh": "**【第二條】凡本樹產出的程式,都要接上 Celeritas 契約。**\n操作員 2026-09-23 原文:「測試整合優化這個新加入棄標註版本取代現有,所有 PY 黨都要加入,AI 若生成 PS 檔都要加入其功能模板,INTO ONE PY ENGINE REGISTER AND MAKE IT A POLICY AS HIGHER PRIORITY」。\n三層落地,缺一不可:\n① **所有 .py 帶加速橋** —— 判準是**橋的標記** `[VIA:ACCEL-BRIDGE`,**不是**『文中提到加速器的名字』。批715 實測:舊導入器把『提到名字』當成『已橋』,**18 支從來沒有橋卻一直被報成綠的**(而且兩支加速器正本自己都帶著標記,那道守衛從來沒保護過任何東西)。掃描面吃 SUP_MDL753 正典排除清單(L77);批597 凍結夾**具名豁免**(封章在,注進去就毀章),不混進分母當綠。\n② **AI 產出的 .ps1 一律接模板** —— `VeritasCeleritas.PS7.Template.ps1`,章 `CELERITAS-TEMPLATE-JOIN v1`;契約:只動 `$PID` · 關閉即還原 · 不改系統檔 · ErrorAction Continue。**本律只管新產出**:樹上既有 838 支 .ps1 沒有章,那是**既有債,不是違律** —— L70 說得很清楚,未經操作員逐次許可不得修改任何 .ps1。棘輪釘住基線,**新增的一支都不許漏**。\n③ **一支 PY 引擎當唯一正主** —— `supportive modules/VeritasCeleritas_v1140.py`(v1.14.0,38 份封章全數對上),PS 堆疊由 Python 擁有(引擎自身 ANC-29/ANC-30)。稽核與生成一律**委派**給它的 `xps_audit` / `xps_join` / `xps_generate`,**本樹不另寫第二把尺**(LL404)。\n**批345 不可動律不變**:`supportive modules/VeritasCeleritas.py` 一個位元組都沒動;新版以**尾版**身分並存,要不要把舊正本退役是操作員的手。",
       "enforcement": "CGC_MDL183_CeleritasPolicyGate(格子站)+ via_accel_injector_v0102(導入器,可 --undo)+ VIA_CeleritasPolicy_Baseline_v0100.json(既有債基線,在資料檔不在碼裡)",
       "policy_ref": "supportive modules/references/intake/VIA_Celeritas_v1140_b715/(收容正本,零觸碰)",
       "status": "ACTIVE",
-      "active_route": "supportive modules/VeritasCeleritas_v1140.py · supportive modules/ps7/"
+      "active_route": "supportive modules/VeritasCeleritas_v1140.py · supportive modules/ps7/",
+      "rank_note": "操作員 2026-09-23 令 L103「最高政策」(涵蓋本律 ①② 並加上 VDF 網路工具)後順延為 3;本律條文不動,仍是 PY 橋與 PS 模板章的細則。"
     },
     {
       "id": "L01",
@@ -2580,5 +2593,5 @@
       "zh": "**早退分支不准把承諾一起退掉。**「不代設」這句誠實話只跟著走完全程的那條路,四條 ABSENT 早退分支沒帶,自己的檢在沒有價表的環境就必紅;補料後轉綠不是修好,是不再走那條路。承諾要放在初始值裡,四態全帶。"
     }
   ],
-  "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。"
+  "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。 側線 2026-09-23:操作員令三條「列為最高政策」→ L103 置陣列首位 rank=1,L50 順延 2、L102 順延 3;id 不重編。排序待操作員確認(要 L50 仍居首=兩處對調)。"
 }
