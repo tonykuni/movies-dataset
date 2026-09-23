@@ -61,7 +61,35 @@ except Exception:
 import re, os, sys, json, unicodedata, statistics, datetime
 from collections import defaultdict
 
-ENGINE_VERSION = "v0102"
+ENGINE_VERSION = "v0103"
+
+
+_CORE_MODNAME = "vrn_engine_evidence_core"
+
+
+def _load_evidence_core():
+    """VRN_Evidence_Core (same folder): one rule set for both engines; None keeps the v0102 behaviour.
+    Mother 批727: cached under a unique module name and reused only when it IS the sibling file -- the mother
+    also keeps an older intake VRN_Evidence_Core.py (audit package v0.2.0) that a plain `import
+    VRN_Evidence_Core` elsewhere in the same process would bind; the engine must never pick that one up."""
+    try:
+        import importlib.util
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "VRN_Evidence_Core.py")
+        cached = sys.modules.get(_CORE_MODNAME)
+        if cached is not None and os.path.abspath(getattr(cached, "__file__", "") or "") == os.path.abspath(path):
+            return cached
+        if not os.path.isfile(path):
+            return None
+        spec = importlib.util.spec_from_file_location(_CORE_MODNAME, path)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[_CORE_MODNAME] = mod
+        spec.loader.exec_module(mod)
+        return mod
+    except Exception:
+        return None
+
+
+EVIDENCE_CORE = _load_evidence_core()
 
 # =====================================================================
 # 1 · SSOT LOADER
@@ -546,7 +574,13 @@ class Layout:
 
     @staticmethod
     def _lines_from_chars(chars):
-        """group chars into text lines by rounded 'top', ordered top->bottom, left->right."""
+        """Rows of glyphs -> lines.  v0103: VRN_Evidence_Core groups by baseline and writes spaces from the
+        glyph geometry (CTBC filler spaces, English words, chart overlays); v0102 grouping is the fallback."""
+        if EVIDENCE_CORE is not None:
+            try:
+                return EVIDENCE_CORE.lines_from_chars(chars)
+            except Exception:
+                pass
         rows = defaultdict(list)
         for c in chars:
             rows[round(c["top"] / 3.0)].append(c)
@@ -973,6 +1007,11 @@ class BrokerRatingDict:
                     continue
                 if any(f.startswith(a) for f in frag_low) and not any(self._alias_hits(a, low.replace(f, " ")) for f in frag_low):
                     continue
+                # mother 批727: the mother's deny list (overlay deny_keys + CGC_MDL177) through the evidence core;
+                # a hit inside a longer-or-equal denied name is not a broker (中信 inside 中信證券), and a denied
+                # alias (摩通) never resolves.  Longest wins, the mother's 批681 rule.
+                if EVIDENCE_CORE is not None and EVIDENCE_CORE.deny_shadowed(a, s):
+                    continue
                 hits.append({"broker": canon, "alias": a, "display": self.display.get(canon, "")})
                 break
         hits.sort(key=lambda h: (-len(h["alias"]), h["broker"]))
@@ -1156,6 +1195,30 @@ class CrossValidation:
         return out
 
     @staticmethod
+    def filename_vs_page_core(fnf, core):
+        """v0103 contract: FAIL only when the page contradicts the filename on the ticker (the page's own
+        primary code differs and the filename code is absent) or when strong page evidence names another
+        broker.  A differing date is CONFLICT (kept, never picked silently): reports are often filed later."""
+        out = {"fields": {}, "verdict": "PASS"}
+        tri = core.get("tri_code") or {}
+        page_primary = (core.get("ticker") or {}).get("ticker")
+        t_state = {"PASS": True, "MISMATCH": False}.get(tri.get("verdict"))
+        out["fields"]["ticker"] = {"filename": fnf.get("ticker"), "page": page_primary, "match": t_state,
+                                   "verdict": tri.get("verdict")}
+        b_verdict = core.get("broker_vs_filename")
+        out["fields"]["broker"] = {"filename": fnf.get("broker"), "page": (core.get("broker") or {}).get("broker"),
+                                   "match": {"PASS": True, "MISMATCH": False}.get(b_verdict), "verdict": b_verdict,
+                                   "tier": (core.get("broker") or {}).get("tier")}
+        pd, fd = (core.get("page_date") or {}).get("iso"), fnf.get("date")
+        out["fields"]["date"] = {"filename": fd, "page": pd, "match": (pd == fd) if (pd and fd) else None,
+                                 "verdict": ("PASS" if pd == fd else "CONFLICT") if (pd and fd) else "INSUFFICIENT_EVIDENCE"}
+        if tri.get("verdict") == "MISMATCH" or b_verdict == "MISMATCH":
+            out["verdict"] = "FAIL"
+        elif out["fields"]["date"]["verdict"] == "CONFLICT" or b_verdict in ("AMBIGUOUS",):
+            out["verdict"] = "WARN"
+        return out
+
+    @staticmethod
     def tri_code(filename_ticker, page_codes):
         """Spec section 2 verdict from filename core vs page platform codes (list of tricode dicts)."""
         cores = {c.get("core") for c in (page_codes or []) if c.get("core")}
@@ -1288,6 +1351,15 @@ class FirstPageEngine:
         title = lay["company_name"]; body = lay["main_text"]
         full_text = "\n".join(l["text"] for l in lay.get("lines", [])) or (lay["footer"] + " " + body)
         res = self.tf.resolve(filename, title, body)
+        core = None
+        if EVIDENCE_CORE is not None and getattr(self, "use_core", True):
+            try:
+                core = EVIDENCE_CORE.analyze(filename, [l["text"] for l in lay.get("lines", [])],
+                                             alias_table=self.brd.b, filename_ticker=fnf["ticker"],
+                                             filename_date=fnf["date"], filename_broker=fnf["broker"],
+                                             official_market=official_market, text_layer=bool(chars))
+            except Exception as exc:          # graceful: the v0102 path still answers
+                core = {"error": "%s: %s" % (type(exc).__name__, exc)}
         out["ticker"] = res
         out["ticker_classification"] = self.classification(res.get("ticker"))
         out["main_text_raw"] = body
@@ -1302,6 +1374,16 @@ class FirstPageEngine:
         out["broker"] = page_broker or fnf["broker"]
         out["broker_page"] = page_broker
         out["broker_filename"] = fnf["broker"]
+        if core and not core.get("error"):
+            ev = core["broker"]
+            out["broker_page_legacy"] = page_broker
+            page_broker = ev["broker"] if ev.get("strong") else None
+            denied = core.get("broker_vs_filename") == "DENIED"
+            out["broker"] = ev["broker"] or (None if denied else fnf["broker"])
+            out["broker_page"] = page_broker
+            out["broker_tier"] = ev.get("tier")
+            out["broker_vs_filename"] = core.get("broker_vs_filename")
+            out["broker_denied"] = ev.get("denied") or ({fnf["broker"]: 1} if denied else {})
         # spec section 4: a rating needs a structure, a rating label or the info zone; body prose alone is only a hint
         label_rx = re.compile(r"投資評等|投資評級|投資建議|評等|評級|rating|recommendation|目標價|target\s*price", re.I)
         evidence_lines = [l["text"] for l in lay.get("lines", [])
@@ -1314,6 +1396,23 @@ class FirstPageEngine:
         tp = tps["primary"]
         out["target_prices"] = tps
         cp = current_price if current_price is not None else self.fv.extract_current_price(full_text)
+        if core and not core.get("error"):
+            r = core["rating"]
+            out["rating_legacy"] = out["rating"]
+            out["rating"] = {"raw": r.get("raw"), "canonical": r.get("value"), "fine": r.get("fine"),
+                             "canonical_key": r.get("canonical_key"), "in_dict": r.get("value") is not None,
+                             "scope": "EVIDENCE_CORE:" + str(r.get("source") or ""), "state": r.get("state"),
+                             "action": r.get("action", ""), "candidates": [c.get("value") for c in r.get("candidates", [])][:8],
+                             "body_hint": out["rating_legacy"].get("body_hint"), "kept_value": r.get("kept_value")}
+            t = core["target_price"]
+            out["target_prices_legacy"] = tps
+            tp = t.get("value")
+            out["target_prices"] = {"values": t.get("distinct_values", []), "primary": tp, "scenarios": tps.get("scenarios", {}),
+                                    "ambiguous": len(t.get("distinct_values", [])) > 1, "raw": t.get("raw"),
+                                    "source": t.get("source"), "state": t.get("state"), "currency": t.get("currency")}
+            if current_price is None:
+                out["current_price_legacy"] = cp
+                cp = core["current_price"].get("value")
         out["current_price"] = cp
         out["target_price"] = self.fv.validate_target_price(tp, per=per, eps=eps, current=cp, fin=self.fin)
         out["upside"] = self.price.upside_checked(tp, cp)
@@ -1330,6 +1429,10 @@ class FirstPageEngine:
             page_codes.append({"raw": m.group(0), "core": m.group(1), "platform": "bloomberg", "market": ""})
         out["page_codes"] = page_codes
         out["tri_code"] = self.xv.tri_code(fnf["ticker"] or res.get("ticker") or "", page_codes)
+        if core and not core.get("error"):
+            out["tri_code_legacy"] = out["tri_code"]
+            out["tri_code"] = dict(core["tri_code"])
+            out["page_codes_core"] = core.get("page_codes", [])
         if out["tri_code"]["verdict"] == "PASS" and official_market:
             yf = next((c for c in page_codes if c["platform"] == "yfinance"), None)
             if yf and yf["market"] != str(official_market).upper():
@@ -1344,15 +1447,33 @@ class FirstPageEngine:
         if not page_date:
             m = re.search(r"(?<!\d)((?:19|20)\d{6})(?!\d)", full_text)
             page_date = TickerFilename.numtoken_to_date(m.group(1)) if m else None
-        out["report_date"] = fnf["date"] or page_date or ""
+        if core and not core.get("error"):
+            out["page_date_legacy"] = page_date
+            page_date = core["page_date"].get("iso")
+        # mother source priority (本文 > 首頁周邊 > 檔名): the page date leads, the filename date is kept
+        out["report_date"] = page_date or fnf["date"] or ""
         out["report_date_display"] = TickerFilename.to_display(out["report_date"])
-        out["report_date_source"] = "FILENAME" if fnf["date"] else ("PAGE" if page_date else "")
+        out["report_date_source"] = "PAGE" if page_date else ("FILENAME" if fnf["date"] else "")
         out["page_date"] = page_date
+        out["date_conflict"] = bool(page_date and fnf["date"] and page_date != fnf["date"])
 
         # cross validations
         out["xv_filename_vs_page"] = self.xv.filename_vs_page(
             {"ticker": fnf["ticker"], "broker": fnf["broker"], "date": fnf["date"]},
             {"ticker": (page_codes[0]["core"] if page_codes else (res["ticker"] or None)), "broker": page_broker, "date": page_date})
+        if core and not core.get("error"):
+            out["xv_filename_vs_page_legacy"] = out["xv_filename_vs_page"]
+            out["xv_filename_vs_page"] = self.xv.filename_vs_page_core(fnf, core)
+            out["report_type"] = core["report_type"]
+            out["ticker_page"] = core["ticker"]
+            out["analysts"] = core.get("analysts", [])
+            out["company_name_page"] = core.get("company_name")
+            out["evidence_core"] = {"core": core.get("core"), "vcgc": core.get("vcgc"), "text_layer": core.get("text_layer"),
+                                    "broker_evidence": core["broker"].get("evidence", [])[:12],
+                                    "rating_state": core["rating"].get("state"), "tp_state": core["target_price"].get("state"),
+                                    "cp_state": core["current_price"].get("state"), "date_state": core["page_date"].get("state")}
+        elif core:
+            out["evidence_core"] = {"error": core.get("error")}
         info_zone = [x for x in [tp, out["rating"]["canonical"], page_broker] if x]
         body_zone = self.nlp.split_sentences(body)
         out["xv_zone_presence"] = self.xv.zone_presence(info_zone, body_zone)
@@ -1379,7 +1500,15 @@ class FirstPageEngine:
 # CLI
 # =====================================================================
 def _chars_from_pdf(path):
-    """First-page chars via pdfplumber (preferred) or PyMuPDF; None when neither is installed."""
+    """First-page chars via pdfplumber (preferred) or PyMuPDF; None when neither is installed.
+    v0103: through VRN_Evidence_Core.pdf_page_chars (x1/bottom kept, rotated chart labels left out)."""
+    if EVIDENCE_CORE is not None:
+        try:
+            got = EVIDENCE_CORE.pdf_page_chars(path, 0)
+            if got is not None:
+                return got
+        except Exception:
+            pass
     try:
         import pdfplumber
         with pdfplumber.open(path) as pdf:
@@ -1414,7 +1543,27 @@ def _chars_from_pdf(path):
 
 
 def _chars_from_docx(path):
-    """Synthesize chars from DOCX paragraphs (one line per paragraph, heading size by style)."""
+    """Synthesize chars from DOCX paragraphs (one line per paragraph, heading size by style).
+    v0103: header, text boxes, body, tables and footer through VRN_Evidence_Core.docx_lines (華南 memos
+    print the date in a header text box and the issuer only in the footer)."""
+    if EVIDENCE_CORE is not None:
+        try:
+            got = EVIDENCE_CORE.docx_lines(path)
+        except Exception:
+            got = None
+        if got:
+            lines, sizes = got
+            chars, top = [], 60.0
+            for text, size in zip(lines, sizes):
+                size = float(size or 10.0)
+                x = 60.0
+                for ch in text:
+                    width = size * (1.0 if ord(ch) > 255 else 0.55)
+                    chars.append({"text": ch, "x0": x, "x1": x + width, "top": top, "bottom": top + size,
+                                  "size": size, "fontname": "Regular"})
+                    x += width
+                top += size * 1.6
+            return chars, (595.0, max(842.0, top + 40.0))
     try:
         import docx
     except ImportError:
@@ -1453,6 +1602,8 @@ def _chars_from_docx(path):
 
 
 def main(argv=None):
+    import logging
+    logging.getLogger("pdfminer").setLevel(logging.ERROR)   # 'Could not get FontBBox …' is noise, not an error
     import argparse
     parser = argparse.ArgumentParser(description="VIA_VRN_FirstPageEngine " + ENGINE_VERSION + " (LIVE off, no network)")
     parser.add_argument("--filename", help="filename-only contract: ticker / date / broker / rating")

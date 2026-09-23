@@ -100,8 +100,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
-SCHEMA_VERSION = "VRN_SCHEMA_20260921_002"
-ENGINE_VERSION = "v0101"
+SCHEMA_VERSION = "VRN_SCHEMA_20260923_003"
+ENGINE_VERSION = "v0102"
 # v0101 (auto-test loop 2026-09-21): DOCX/TXT intake, boundary-safe broker/rating/target-price matching,
 # year-band and ETF aware tickers, calendar-validated dates, MM/YY period headers, typed Parquet columns,
 # NaN-safe JSON, VIA_NET consent gate for the optional online name table, first-page engine hook.
@@ -222,6 +222,17 @@ BASICINFO_COLUMNS = [
     "UpdatedAt",
     "RunID",
     "SchemaVersion",
+    # v0102 (2026-09-23, real-report loop + VCGC): appended only, nothing above moved or dropped
+    "RatingKey",
+    "BrokerTier",
+    "BrokerDenied",
+    "PageDate",
+    "FilenameDate",
+    "DateConflict",
+    "AnalystEmail",
+    "CompanyNamePage",
+    "PageCodes",
+    "EvidenceCore",
 ]
 
 # FinancialData 欄位，採 long format。
@@ -634,18 +645,53 @@ def load_synonym_scope(path: Optional[Path], scope: str) -> Dict[str, List[str]]
     return table
 
 
+_FIRST_PAGE_MODULE_CACHE: Dict[str, Any] = {}
+
+
 def optional_import_first_page_engine():
+    """Load VIA_VRN_FirstPageEngine once per process (v0101 re-executed it for every report)."""
     path = find_knowledge_root().get("first_page_engine")
     if not path:
         return None
+    key = str(path)
+    if key in _FIRST_PAGE_MODULE_CACHE:
+        return _FIRST_PAGE_MODULE_CACHE[key]
     try:
         import importlib.util
         spec = importlib.util.spec_from_file_location("via_vrn_first_page_engine", str(path))
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)  # type: ignore[union-attr]
-        return module
     except Exception:
-        return None
+        module = None
+    _FIRST_PAGE_MODULE_CACHE[key] = module
+    return module
+
+
+_EVIDENCE_CORE_CACHE: Dict[str, Any] = {}
+
+
+def optional_import_evidence_core():
+    """VRN_Evidence_Core (same folder as this engine); None when absent."""
+    if "core" in _EVIDENCE_CORE_CACHE:
+        return _EVIDENCE_CORE_CACHE["core"]
+    module = None
+    try:
+        import importlib.util
+        # mother 批727: unique module name, and only the sibling file (an older intake VRN_Evidence_Core.py exists)
+        modname = "vrn_engine_evidence_core"
+        path = Path(__file__).resolve().parent / "VRN_Evidence_Core.py"
+        cached = sys.modules.get(modname)
+        if cached is not None and Path(getattr(cached, "__file__", "") or ".").resolve() == path:
+            module = cached
+        elif path.is_file():
+            spec = importlib.util.spec_from_file_location(modname, str(path))
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[modname] = module
+            spec.loader.exec_module(module)  # type: ignore[union-attr]
+    except Exception:
+        module = None
+    _EVIDENCE_CORE_CACHE["core"] = module
+    return module
 
 # ============================================================
 # def 03_FILENAME_TOKENIZATION_AND_DATE
@@ -1196,9 +1242,26 @@ def extract_document_text_and_zones(path: Path) -> Dict[str, Any]:
     return result
 
 
+COLUMN_TABLE_PAGES = 4      # unruled summary tables are read from the first pages only
+
+
 def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     if path.suffix.lower() == ".pdf":
-        return extract_pdf_tables(path)
+        tables = extract_pdf_tables(path)
+        # v0102: sell-side summary tables rarely carry ruling lines.  When the ruled tables yield no EPS row,
+        # the evidence core reads column-aligned and transposed tables ('12/25E 12/26E', '會計年度 … 每股盈餘').
+        try:
+            probe = parse_financial_tables_to_records(tables, {"ReportID": "probe", "FileID": "probe"}, "probe")
+        except Exception:
+            probe = []
+        if not any(r.get("MetricName") == "EPS" for r in probe):
+            core = optional_import_evidence_core()
+            if core is not None:
+                try:
+                    tables += core.pdf_column_tables(str(path), COLUMN_TABLE_PAGES)
+                except Exception as exc:  # graceful: ruled tables stay as they are
+                    print(f"[WARN] column tables failed: {path.name} -> {exc}", file=sys.stderr)
+        return tables
     if extracted and extracted.get("tables"):
         return list(extracted["tables"])
     return []
@@ -1363,6 +1426,7 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
     long_text = normalize_unicode_text(text)
     fragments = [normalize_unicode_text(f) for f in (company_fragments or [])]
     matches: List[Dict[str, str]] = []
+    core = optional_import_evidence_core()      # mother 批727: the one deny gate (overlay deny_keys + CGC_MDL177)
     for broker, aliases in broker_alias.items():
         ordered = [normalize_unicode_text(a) for a in sorted(aliases, key=len, reverse=True) if normalize_unicode_text(a)]
         token_match = None
@@ -1370,6 +1434,8 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
             for idx, h in enumerate(haystacks):
                 if h in fragments and h.lower().startswith(alias.lower()):
                     continue        # company fragment after the code: 中信 inside 中信金 is not the broker
+                if core is not None and core.deny_shadowed(alias, h):
+                    continue        # denied name, or inside a longer denied name (中信 in 中信證券): never a broker
                 if alias_hits(alias, h):
                     token_match = {"broker": broker, "alias": alias, "hit": "token", "index": str(idx)}
                     break
@@ -1379,6 +1445,8 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
             matches.append(token_match)
             continue
         for alias in ordered:                       # pass 2: page text, longest alias first
+            if core is not None and core.deny_shadowed(alias, long_text):
+                continue
             if alias_hits(alias, long_text):
                 matches.append({"broker": broker, "alias": alias, "hit": "text", "index": "999"})
                 break
@@ -1895,7 +1963,33 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
     upside = calculate_upside_downside(target_price, current_price)
     tri_code = tri_code_verdict(filename_ticker_candidates, page_ticker_candidates)
     first_page_engine = run_first_page_engine(pdf_path, source_filename)
-    if first_page_engine:
+    fn_ticker = next((c.get("ticker", "") for c in filename_ticker_candidates if c.get("ticker")), "")
+    fn_date = filename_date_candidates[0].get("date", "") if filename_date_candidates else ""
+    fn_broker, _fn_cands, _fn_matches = match_broker_from_tokens_and_text(
+        token_info.get("chinese_tokens", []), token_info.get("english_tokens", []), "", broker_alias, company_fragments)
+    ev = evidence_from_core(pdf_path, source_filename, first_page_engine, fn_ticker, fn_date, fn_broker, broker_alias)
+    if ev and not ev.get("error"):
+        # v0102: one rule set with the first-page engine; the v0101 values stay in EvidenceJson (append-only)
+        legacy = {"tw_ticker": tw_ticker, "report_date": report_date, "broker": broker, "rating": rating,
+                  "target_price": target_price, "current_price": current_price, "report_type": report_type, "tri_code": tri_code}
+        report_type = ev.get("type") or report_type
+        if report_type == "STOCK":
+            if ev.get("ticker"):
+                tw_ticker = ev["ticker"]
+        else:
+            tw_ticker = ""                          # NOT_APPLICABLE: industry / market / macro / ETF / event report
+        ticker_row = ticker_lookup.get(tw_ticker, {}) if tw_ticker else {}
+        page_yf = next((c.get("raw", "") for c in ev.get("page_codes", []) if c.get("core") == tw_ticker and c.get("kind") == "yfinance"), "")
+        yf_ticker = (page_yf.upper() if page_yf else "") or ticker_row.get("YF_TICKER", "") if tw_ticker else ""
+        broker = ev.get("broker") or ""
+        rating = ev.get("rating") or ""
+        target_price = ev.get("tp")
+        current_price = ev.get("cp")
+        upside = calculate_upside_downside(target_price, current_price)
+        report_date = ev.get("page_date") or report_date
+        tri_code = ev.get("tri") or tri_code
+    else:
+        legacy = {}
         if not broker and first_page_engine.get("broker"):
             broker = canonical_broker_key(first_page_engine["broker"])
         if not rating and (first_page_engine.get("rating") or {}).get("canonical"):
@@ -1984,7 +2078,81 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         "RunID": run_id,
         "SchemaVersion": SCHEMA_VERSION,
     })
+    if ev and not ev.get("error"):
+        names = [a.get("name", "") for a in ev.get("analysts", []) if a.get("name")]
+        row.update({
+            "Analyst": " | ".join(names),
+            "AnalystEmail": " | ".join(a.get("email", "") for a in ev.get("analysts", []) if a.get("email")),
+            "RatingFine": ev.get("rating_fine") or row.get("RatingFine", ""),
+            "RatingAction": ev.get("rating_action") or row.get("RatingAction", ""),
+            "RatingKey": ev.get("rating_key") or "",
+            "BrokerTier": ev.get("broker_tier") or "",
+            "BrokerDenied": " | ".join(sorted(str(k) for k in (ev.get("denied") or {}) if k)),
+            "PageDate": ev.get("page_date") or "",
+            "FilenameDate": fn_date or "",
+            "DateConflict": "Y" if ev.get("date_conflict") else "",
+            "CompanyNamePage": ev.get("company_page") or "",
+            "PageCodes": " | ".join(sorted({c.get("core", "") for c in ev.get("page_codes", []) if c.get("core")})),
+            "EvidenceCore": safe_json_dumps({"source": ev.get("source"), "rating_raw": ev.get("rating_raw"),
+                                             "broker_vs_filename": ev.get("broker_vs_filename"), "legacy_v0101": legacy}),
+        })
+        if ev.get("company_page") and ev["company_page"] not in row.get("CompanyNameCandidate", ""):
+            row["CompanyNameCandidate"] = " | ".join(x for x in [ev["company_page"], row.get("CompanyNameCandidate", "")] if x)
+    elif ev:
+        row["EvidenceCore"] = safe_json_dumps({"error": ev.get("error")})
     return row
+
+
+def evidence_from_core(path: Path, source_filename: str, first_page_engine: Dict[str, Any],
+                       filename_ticker: str, filename_date: str, filename_broker: str,
+                       broker_alias: Dict[str, List[str]]) -> Dict[str, Any]:
+    """The shared evidence core's answer for this report: from the first-page hook when it ran (v0103
+    engines carry it), else straight from VRN_Evidence_Core (the F2 fix turns the hook off).  {} if absent."""
+    fp = first_page_engine or {}
+    hook_had_text = bool((fp.get("evidence_core") or {}).get("text_layer"))
+    if fp.get("report_type") and not fp.get("error") and hook_had_text:
+        rating = fp.get("rating") or {}
+        tps = fp.get("target_prices") or {}
+        return {
+            "source": "FIRST_PAGE_HOOK",
+            "type": (fp.get("report_type") or {}).get("type", ""),
+            "ticker": (fp.get("ticker_page") or {}).get("ticker"),
+            "tri": (fp.get("tri_code") or {}).get("verdict", ""),
+            "broker": fp.get("broker") or None,
+            "broker_tier": fp.get("broker_tier") or "",
+            "broker_vs_filename": fp.get("broker_vs_filename") or "",
+            "denied": fp.get("broker_denied") or {},
+            "rating": rating.get("canonical"), "rating_fine": rating.get("fine"), "rating_key": fp.get("rating_key"),
+            "rating_raw": fp.get("rating_raw"), "rating_action": rating.get("action"),
+            "tp": tps.get("primary"), "cp": fp.get("current_price"),
+            "page_date": fp.get("page_date"), "date_conflict": bool(fp.get("date_conflict")),
+            "analysts": fp.get("analysts") or [], "company_page": fp.get("company_name_page"),
+            "page_codes": fp.get("page_codes_core") or [],
+        }
+    core = optional_import_evidence_core()
+    if core is None:
+        return {}
+    try:
+        got = core.document_first_page_lines(str(path))
+        a = core.analyze(source_filename, got["lines"], alias_table=broker_alias, filename_ticker=filename_ticker or None,
+                         filename_date=filename_date or None, filename_broker=filename_broker or None,
+                         text_layer=got["text_layer"])
+    except Exception as exc:
+        return {"error": f"{exc.__class__.__name__}: {exc}"}
+    denied = a.get("broker_vs_filename") == "DENIED"
+    return {
+        "source": "CORE_DIRECT",
+        "type": a["report_type"]["type"], "ticker": a["ticker"].get("ticker"), "tri": a["tri_code"].get("verdict", ""),
+        "broker": a["broker"].get("broker") or (None if denied else (filename_broker or None)),
+        "broker_tier": a["broker"].get("tier", ""), "broker_vs_filename": a.get("broker_vs_filename", ""),
+        "denied": a["broker"].get("denied") or ({filename_broker: 1} if denied else {}),
+        "rating": a["rating"].get("value"), "rating_fine": a["rating"].get("fine"), "rating_key": a["rating"].get("canonical_key"),
+        "rating_raw": a["rating"].get("raw"), "rating_action": a["rating"].get("action"),
+        "tp": a["target_price"].get("value"), "cp": a["current_price"].get("value"),
+        "page_date": a["page_date"].get("iso"),
+        "date_conflict": bool(a["page_date"].get("iso") and filename_date and a["page_date"].get("iso") != filename_date),
+        "analysts": a.get("analysts") or [], "company_page": a.get("company_name"), "page_codes": a.get("page_codes") or [],
+    }
 
 
 def tri_code_verdict(filename_candidates: List[Dict[str, Any]], page_candidates: List[Dict[str, Any]]) -> str:
@@ -2011,7 +2179,11 @@ def run_first_page_engine(path: Path, source_filename: str) -> Dict[str, Any]:
     if module is None:
         return {}
     try:
-        engine = module.FirstPageEngine()
+        engine = _FIRST_PAGE_MODULE_CACHE.get("engine")
+        if engine is None or _FIRST_PAGE_MODULE_CACHE.get("engine_module") is not module:
+            engine = module.FirstPageEngine()
+            _FIRST_PAGE_MODULE_CACHE["engine"] = engine
+            _FIRST_PAGE_MODULE_CACHE["engine_module"] = module
         chars, size = None, (None, None)
         suffix = path.suffix.lower()
         if suffix == ".pdf":
@@ -2034,6 +2206,21 @@ def run_first_page_engine(path: Path, source_filename: str) -> Dict[str, Any]:
             "report_date": result.get("report_date", ""),
             "company_name": (result.get("layout") or {}).get("company_name", ""),
             "xv_filename_vs_page": result.get("xv_filename_vs_page", {}),
+            # v0103 first-page engine: the shared evidence core's answers (absent on older engines)
+            "report_type": result.get("report_type"),
+            "ticker_page": result.get("ticker_page"),
+            "broker_tier": result.get("broker_tier"),
+            "broker_vs_filename": result.get("broker_vs_filename"),
+            "broker_denied": result.get("broker_denied"),
+            "rating_key": (result.get("rating") or {}).get("canonical_key"),
+            "rating_raw": (result.get("rating") or {}).get("raw"),
+            "page_date": result.get("page_date"),
+            "date_conflict": result.get("date_conflict"),
+            "analysts": result.get("analysts"),
+            "company_name_page": result.get("company_name_page"),
+            "page_codes_core": result.get("page_codes_core"),
+            "evidence_core": result.get("evidence_core"),
+            "filename_fields": result.get("filename_fields"),
         }
     except Exception as exc:  # graceful by design
         return {"error": f"{exc.__class__.__name__}: {exc}"}
@@ -2540,6 +2727,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    import logging
+    logging.getLogger("pdfminer").setLevel(logging.ERROR)   # 'Could not get FontBBox …' is noise, not an error
     parser = build_arg_parser()
     args = parser.parse_args(argv)
     try:
