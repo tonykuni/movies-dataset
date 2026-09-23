@@ -8,6 +8,8 @@
 2. 「自動實測自動修正自動完成」(附 MDL002 / MDL003 / MDL006 三支上傳檔)
 3. 「SSOT REGEX 同義字等與 VCGC 相連自動規劃檢查更新 · 實測自測自完工 · 結果驗證」
 4. 「善用 VCGC 工具節省 TOKEN」
+5. 同日第二段:「許可出 v0105 依你建議執行」(= L70 許可),附工作站實錄(`via-vcgc ssot` 四次都印出 v0125 的整份版史)
+6. 「https://github.com/tonykuni/movies-dataset 路徑應改為這個」:貼上區一律從這個倉拉,不依賴視窗所在資料夾或本機 `origin` 指到哪
 
 ---
 
@@ -17,6 +19,8 @@
 - **三支上傳引擎**已成治理版 v0100:閘沒開回 rc4、零出網零寫檔;沒料回 rc2,不再印「完成」。
 - **VCGC 現在看得到、也管得到 SSOT 正則與同義字層**:`via-vcgc ssot` 檢、`ssot plan` 規劃、`ssot plan -Apply` 交正主更新、`ssot verify` 驗收。
   今天實跑:正則清冊落後 7 條樣式,交正主重建後驗收 PASS。
+- **啟動器還原版 Invoke v0105 已出貨**(你許可):跑完把 `--limit` 與年份旗標還原;接上 L102 模板章,Celeritas 兩站綠。
+- **VCGC v0127**:不認得的動詞只印 22 行用法段,不再印三百多行版史;你貼回的那四次就是這個問題。
 
 ---
 
@@ -25,7 +29,7 @@
 | 症狀(工作站實錄) | 根因 | 處理 | 你的手 |
 |---|---|---|---|
 | `via-vdfinc plan` 兩次都報 56 個缺口,抓完也不變 | 計畫讀的是**快取目錄**,目錄沒重建;而且不說目錄幾分鐘前產的 | ENG089 v0101:先印目錄時間與年齡,過期標 `[過期]` 並回 rc2;紀錄表(`ts` 欄)不算缺口;1900-01-01 哨兵列另列 | 抓完先 `via-datahome catalog` 再 `via-vdfinc plan` |
-| 第二次 `via-vdffetch` 仍只抓 100 | Invoke v0104 寫了 `$env:VIA_HIST_LIMIT`,Register v0242 第 363 行在沒給 `--limit` 時讀回 → **黏住** | 對接口 v0104 量出來並印清除那一行;每個出口都還原的 Invoke v0105 **只做成提案**(見第六段,未出貨) | 本視窗 `$env:VIA_HIST_LIMIT=''`;許可後才出 v0105 與改 Register 那一行(Z127) |
+| 第二次 `via-vdffetch` 仍只抓 100 | Invoke v0104 寫了 `$env:VIA_HIST_LIMIT`,Register v0242 第 363 行在沒給 `--limit` 時讀回 → **黏住** | 對接口 v0104 量出來並印清除那一行;**Invoke v0105 已出貨**:每個出口都還原三個視窗變數 | 已不必手清;Register 第 363 行的讀回仍在,改它要另一次許可(Z127) |
 | `via-price ; via-chip` → `[FAIL-CLOSED] 同意閘未開` | 閘二有三把尺:13 支引擎認字面 `YES`;統包把 Register 預設的 `OFF` 算「已設」;車道在子行程強設 YES,直呼不會 | 對接口 v0104 `launch` 逐把量,印直呼前要打的那一行 | 直呼前本視窗 `$env:VIA_SCRAPE_CONSENT='YES'`;長期要裁一把尺(掉球 Z120) |
 | `launch.ps1` 不認得 | PowerShell 執行目前資料夾的腳本要帶 `.\` | 對接口下一步卡改印 `.\launch.ps1` | 打 `.\launch.ps1` |
 | 調整後價格層/因子庫沒跟著更新 | 車道不建 ENG060/ENG061,只有開機鏈 ②b ②c 建 | 下一步卡印明 | 需要時跑開機鏈(掉球 Z122) |
@@ -93,99 +97,55 @@ via-vcgc ssot verify          # 驗收(含深檢):自動那一半到位 = rc0;�
 | MasterControl 契約測試 | 19/19 |
 | 治理完整度自指閘(CGC_MDL164 selfref) | 基線外 0 |
 | `via-vcgc ssot verify` | PASS(綠 7 · 黃 4 待裁定) |
-| Celeritas 產出契約閘(L102) | 撤回 v0105 後基線外新缺 0(見第六段) |
+| Celeritas 產出契約閘(L102) | 第一段撤回 v0105 時綠;第二段出貨 v0105(接上模板章)後兩站仍綠 |
+| Invoke v0105 模板章稽核(正主 `xps_audit`) | joined · restore · requires7 全到 · forbidden 0 · verdict pass |
+| VCGC v0127 自測 | 36/36(+㊱ 不認得的動詞只印用法段,22 行) |
+| 對接口讀新啟動器 | `launcher_restores` = True;對接口 31/31 · 單元測試 34/34 · 契約 19/19 |
 | 格子逐站(新改 16 站) | OK 15 · SKIP 1(啟動就緒要工作站家族境) |
 | 全格子 350 站 | OK 325 · FAIL 12 · SKIP 13 · TIMEOUT 0(815 秒;平行段撞到單寫者庫的站,序跑複判過) |
 | 12 紅逐站複驗 | **每一站在 main 原碼也紅**(乾淨 main,或 main 原碼跑同一份本地料):工具升階梯 · 治理台 UI Matrix · 首頁文字擷取 · VRN 六層鏈廿五檢與實跑 · VRN 統一報告引擎 · U/I 畫面統一閘 · 研報欄位規格實跑 · CGC_MDL120/143/144 · 系統 API 三態。本側線新增的紅 0 |
 
 ---
 
-## 六 · L70 旗標:只有提案,沒有出貨的 .ps1
+## 六 · L70:Invoke v0105 已出貨(你 2026-09-23 許可)
 
-本側線**沒有新增或修改任何 .ps1**。啟動器還原版 v0105 原本做好了,格子的 Celeritas 產出契約閘(L102,批715)當場點名它沒接模板章;
-用正主 `xps_join` 接上又會把整支包進一個 scriptblock:`param()` 不再是腳本參數(`-Year` / `-Limit` 綁不上)、點源進環境的函式被關在裡面。
-兩件事都指向同一個結論:新 .ps1 是你的手(L70),而且接模板章要先有適合啟動器的接法(Z136)。所以撤回,改成下面這份提案。
-
-許可後的做法:照這份差異出 `Invoke-VIA-VdfFetch-v0105.ps1`(舊版 v0104 零觸碰),接上模板章後,格子的 Celeritas 兩站要轉綠;還原=刪掉 v0105,尾版律退回 v0104。
-
-```diff
---- Invoke-VIA-VdfFetch-v0104.ps1
-+++ Invoke-VIA-VdfFetch-v0105.ps1
-@@ -1,5 +1,11 @@
- # =====================================================================
--# Invoke-VIA-VdfFetch-v0104.ps1 — 單一 PowerShell 啟動 VDF 擷取(含進入環境+倉庫自癒)
-+# Invoke-VIA-VdfFetch-v0105.ps1 — 單一 PowerShell 啟動 VDF 擷取(含進入環境+倉庫自癒)
-+# v0104→v0105(側線 2026-09-23;主線批號由併線的手指定 L25;操作員「更新 VDF」):工作站 09-21 實錄——
-+#   先打 `via-vdffetch 2023 --limit 100`,再打 `via-vdffetch 2023` 想抓全市場,第二跑 hist_2023 仍 43 秒、庫只多幾百列:**還是 100 檔**。
-+#   根因:⑤ 把 $env:VIA_HIST_LIMIT 寫進本進程(視窗)後沒有還原;短令冊 via-vdffetch 沒打 --limit 時又會讀回它 → 探測上限黏在視窗裡。
-+#   修法只在本檔:起跑先記下 VIA_HIST_SINCE / VIA_REV_SINCE / VIA_HIST_LIMIT 三個的原值,每一個出口都還原(Restore-VIAFetchEnv);
-+#   你自己事先設的值照樣尊重(還原成你設的那個)。視窗原本就帶著 VIA_HIST_LIMIT 時 ⑤ 印黃字講明它從哪來、怎麼清。其餘一字不動(v0104 留作版史 L04)。
-+#   還原本版:刪掉本檔,短令冊 newest glob 自動退回 v0104。
- # 批383 操作員令「用一個 powershell 啟動 vdf 包含進入環境」
- # =====================================================================
- # 一貼即用(新視窗、任何目錄皆可;不需先載短令冊):
-@@ -43,6 +49,16 @@
- $ErrorActionPreference = "Continue"
- # 點源道安全退出:. 本檔 時 exit 會關掉操作員視窗→改 return(僅結束本腳本);-File 道維持 exit <rc>
- $script:Dotted = ($MyInvocation.InvocationName -eq ".")
-+# v0105:本跑前的視窗環境——跑完逐一還原(不讓 --limit / 年份旗標黏在操作員的視窗裡)
-+$script:VIAFetchEnvBefore = [ordered]@{}
-+foreach ($k in @("VIA_HIST_SINCE", "VIA_REV_SINCE", "VIA_HIST_LIMIT")) {
-+    $script:VIAFetchEnvBefore[$k] = [Environment]::GetEnvironmentVariable($k, "Process")
-+}
-+function Restore-VIAFetchEnv {
-+    foreach ($k in @($script:VIAFetchEnvBefore.Keys)) {
-+        [Environment]::SetEnvironmentVariable($k, $script:VIAFetchEnvBefore[$k], "Process")
-+    }
-+}
- 
- 
- function Write-Step([string]$Text) { Write-Host ("--- " + $Text) -ForegroundColor Cyan }
-@@ -192,6 +208,10 @@
- 
- # ---------------------------------------------------------------- ⑤ 年份旗標
- if (-not ($Year -match "^\d{4}$")) { Write-Host ("  [FAIL] -Year 需四位數年份,收到:" + $Year) -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 } }
-+$limWas = "" + $script:VIAFetchEnvBefore["VIA_HIST_LIMIT"]
-+if ($limWas -match "^\d+$") {
-+    Write-Host ("  [注意] 本視窗原本就帶著 VIA_HIST_LIMIT=" + $limWas + "(上一次 --limit 留下的,或你自己設的);短令冊沒打 --limit 時會沿用它。要全市場:`$env:VIA_HIST_LIMIT='' 後再跑") -ForegroundColor Yellow
-+}
- $env:VIA_HIST_SINCE = $Year + "-01-01"
- $env:VIA_REV_SINCE = $Year + "-01"
- if ($Limit -gt 0) { $env:VIA_HIST_LIMIT = "" + $Limit } else { $env:VIA_HIST_LIMIT = "" }
-@@ -204,11 +224,12 @@
- if ($accel) { Invoke-VIAPython -Python $PY $accel --activate } else { Write-Host "  [加速器] 模組缺=略(graceful)" -ForegroundColor Yellow }
- 
- $lanes = Get-Tail (Join-Path $VIA "supportive modules\registry") "CGC_MDL134_ParallelLanes_v*.py"
--if (-not $lanes) { Write-Host "  [FAIL] 十道並行編排引擎缺(CGC_MDL134_ParallelLanes_v*.py)" -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 } }
-+if (-not $lanes) { Restore-VIAFetchEnv; Write-Host "  [FAIL] 十道並行編排引擎缺(CGC_MDL134_ParallelLanes_v*.py)" -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 } }
- Write-Step "⑥ 九頭龍哨兵 H1-H6(唯讀;H3 進程雙頭/H5 尾版律 FAIL=誠實停)"
- $plan = (Invoke-VIAPython -Python $PY $lanes plan 2>&1 | Out-String)
- Write-Host $plan
- if ($plan -match "H3 FAIL|H5 FAIL") {
-+    Restore-VIAFetchEnv
-     Write-Host "=== [via-vdffetch] 九頭龍風險(見上 H3/H5)=誠實停;關閉另一條在跑的鏈或修尾版後重試 ===" -ForegroundColor Red
-     if ($script:Dotted) { $global:LASTEXITCODE = 3; return } else { exit 3 }
- }
-@@ -226,5 +247,6 @@
- $proj = Get-Tail (Join-Path $VIA "supportive modules\registry") "CGC_MDL131_ProjectCompletion_v*.py"
- if ($proj) { Invoke-VIAPython -Python $PY $proj digest }
- 
--Write-Host ("=== [via-vdffetch] 畢 rc=" + $rc + ";看頁:via-open 架構 / via-open 竣工(零跳出律:頁只落檔)===") -ForegroundColor Cyan
-+Restore-VIAFetchEnv
-+Write-Host ("=== [via-vdffetch] 畢 rc=" + $rc + " · " + $limTxt + "(視窗的 VIA_HIST_SINCE/VIA_REV_SINCE/VIA_HIST_LIMIT 已還原成本跑前的值);看頁:via-open 架構 / via-open 竣工(零跳出律:頁只落檔)===") -ForegroundColor Cyan
- if ($script:Dotted) { $global:LASTEXITCODE = $rc } else { exit $rc }
-```
+- **做什麼**:起跑記下 `VIA_HIST_SINCE` / `VIA_REV_SINCE` / `VIA_HIST_LIMIT`,**每一個出口**都還原(含找不到根、`-Year` 不合格兩個早退)。
+- **模板章(L102)接法:不包裹**。正主 `xps_join` 會把整支包進 scriptblock,`-Year` / `-Limit` 綁不上、點源進環境失效(Z136)。所以:
+  - 最上面兩行是章頭與 `#Requires -Version 7.0`,`param()` 仍是第一個敘述。
+  - 正主 `supportive modules\ps7\VeritasCeleritas.PS7.ps1` 載進動態模組,它檔頭的 `Set-StrictMode` 與變數不外洩到本檔或你的視窗。
+  - 每一個出口都呼叫正主 `Restore-CeleritasPS7`,跑完就還原,不等視窗關。
+- **跑的時候會變的**:正主只動本行程,優先權 AboveNormal、親和性、GC、執行緒池、本執行緒文化、主控台 UTF-8,跑完全數還原。
+  子行程(十道 python)會繼承較高的優先權,跑擷取時電腦可能稍微頓。
+- **開跑會多印一行** `[Celeritas] …`:「本行程減壓已套」或「正主在但沒套上,略過」並附正主的第一個錯。
+  容器沒有 pwsh,我量不到正主首載是否正常(Z137),這一行就是工作站上的答案。
+- **pwsh 7 才能跑**:`via-vdffetch` 在你的 pwsh 視窗裡直接呼叫,PS 測試閘也先找 pwsh,兩條路都不受影響;只有「一貼即用」那一行從 `powershell` 改成 `pwsh`。
+- **還原**:刪掉 `Invoke-VIA-VdfFetch-v0105.ps1`,尾版律自動退回 v0104。容器沒有 pwsh,**PowerShell 語法還沒真剖析過**;工作站的 PS 測試閘(CGC_MDL145)會拿 pwsh 對它跑 `-Dry -NoEnter`,那是第一次真剖析。
 
 ---
 
 ## 七 · 工作站貼上區
 
+你貼回的四次整份版史,原因只有一個:視窗裡 `via-vcgc` 讀的那棵樹還沒拉到這條分支,最新的還是 v0125,它沒有 `ssot` 這個動詞。
+`via-*` 讀的是 Register 設的 `$VIA`,**跟視窗現在在哪個資料夾無關**(你那時在 `C:\Users\tonyk\VIA-VDF-VRN`,沒關係)。
+所以下面每一行都指明倉庫 `https://github.com/tonykuni/movies-dataset`,並用 `git -C $VIA` 對準 `$VIA` 那棵樹,不管本機 `origin` 指到哪。
+
 ```powershell
-git fetch origin
-git merge --no-edit origin/main
-git merge --no-edit origin/claude/busy-bell-97sa4f
-. .\Register-VIA-Commands-v0242.ps1
-$env:VIA_HIST_LIMIT=''
+git -C $VIA remote -v
+git -C $VIA pull --no-edit https://github.com/tonykuni/movies-dataset claude/busy-bell-97sa4f
+via-reload
+via-vcgc status
+```
+
+`via-vcgc status` 第一行要是 `[VCGC] v0127`。還是 v0125 的話,先打 `via-pin --show` 看這個視窗用的是哪一份副本,再對那一份重跑上面的 `git -C` 兩行。
+第一行 `remote -v` 如果 `origin` 不是 movies-dataset,要改是你的手:
+
+```powershell
+git -C $VIA remote set-url origin https://github.com/tonykuni/movies-dataset
+```
+
+版本對了之後:
+
+```powershell
 via-vcgc ssot verify
 via-vcgc ssot plan
 via-vdfsys launch
@@ -204,13 +164,13 @@ $env:VIA_SCRAPE_CONSENT='YES'
 
 ```powershell
 $env:VIA_NET_CONSENT='YES'
-& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" "functional modules\VDF\VDF_MDL006_FinancialModel_v0100.py" --tickers 2330,3324 --no-charts --no-pause
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" "$VIA\functional modules\VDF\VDF_MDL006_FinancialModel_v0100.py" --tickers 2330,3324 --no-charts --no-pause
 ```
 
-貼回:`via-vcgc ssot verify` 第一行、`via-vdfsys launch` 的下一步卡、`via-vdfinc plan` 的目錄時間那一行。
+貼回:`via-vcgc status` 第一行、`via-vdffetch` 開跑印的 `[Celeritas]` 那一行、`via-vcgc ssot verify` 第一行、`via-vdfsys launch` 的下一步卡。
 
 ---
 
 ## 八 · 掉球
 
-新增 Z120–Z136(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法。
+新增 Z120–Z137(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法(v0105 先在本檔做了,正主側仍待)· Celeritas 正主首載在自己的 StrictMode 下可能讀到未設變數(Z137,待工作站那一行)。
