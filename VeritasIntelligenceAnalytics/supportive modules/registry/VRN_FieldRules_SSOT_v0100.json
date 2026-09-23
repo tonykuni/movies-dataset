@@ -74,7 +74,7 @@
    "zh": "\u76ee\u6a19\u50f9",
    "cue_rx": [
     "\u76ee\u6a19\u50f9[^\\d]{0,14}?(\\d[\\d,]*\\.?\\d*)",
-    "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*[:\uff1a]?\\s*(?:\\(?NT\\$?\\)?|NTD|TWD)?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
+    "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*(?:\\([^)\\n]{0,12}\\))?\\s*[:\uff1a]?\\s*(?:\\(?(?:NTD|TWD|HKD|SGD|AUD|USD|JPY|EUR|GBP|RMB|CNY)\\)?|\\(?(?:NT|US|HK|S|A)\\$\\)?|[\u00a5\u20ac\u00a3$])?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
    ],
    "cue_any_rx": "\u76ee\u6a19\u50f9|Target\\s*Price|Price\\s*Target|(?<![A-Za-z])TP(?![A-Za-z])|(?<![A-Za-z])PT(?![A-Za-z])",
    "na_rx": "(?:\u76ee\u6a19\u50f9|Target\\s*Price|Price\\s*Target)\\s*[:\uff1a]?\\s*(?:n\\.\\s?a\\.?|(?<![A-Za-z])na(?![A-Za-z])|not\\s+applicable|\u4e0d\u9069\u7528|\u672a\u63d0\u4f9b|\u672a\u8a55\u7b49)",
@@ -126,6 +126,22 @@
     "direction": "\u672c\u6b21 > \u524d\u6b21 = \u8abf\u5347 \u00b7 \u672c\u6b21 < \u524d\u6b21 = \u8abf\u964d \u00b7 \u76f8\u7b49 = \u7dad\u6301",
     "why": "\u518a\u4e0a\u539f\u672c\u53ea\u6709\u76ee\u6a19\u50f9**\u540c\u7fa9\u5b57**,\u6c92\u6709\u300e\u54ea\u4e00\u500b\u662f\u672c\u6b21\u3001\u54ea\u4e00\u500b\u662f\u524d\u6b21\u300f\u3002\u4e00\u4efd\u5831\u544a\u540c\u6642\u5beb\u5169\u500b\u6578\u5b57,\u6293\u932f\u5c31\u662f\u628a\u8abf\u964d\u8b80\u6210\u8abf\u5347\u2014\u2014\u90a3\u4e0d\u662f\u7f3a\u6599,\u662f\u5224\u932f\u3002",
     "four_state": "\u5169\u500b\u90fd\u89e3\u5f97\u51fa\u4e14\u65b9\u5411\u4e00\u81f4=GREEN \u00b7 \u53ea\u89e3\u5f97\u51fa\u672c\u6b21=GREEN(\u524d\u6b21\u6b04 NODATA)\u00b7 \u89e3\u51fa\u5169\u500b\u4f46\u77db\u76fe=YELLOW"
+   },
+   "b727": {
+    "ruled_by": "\u64cd\u4f5c\u54e1 2026-09-23\u300cGO ON\u300d(\u6838\u51c6 #85 \u5148\u9032\u518a\u3001\u53ef\u9006);\u8a3a\u65b7\u7531\u672c\u6279\u5be6\u6e2c\u66f4\u6b63",
+    "why": "\u539f\u5148\u5047\u8a2d\u662f\u300e\u82f1\u6587\u6a19\u7c64\u6c92\u9032\u518a / cue_rx \u5340\u5206\u5927\u5c0f\u5beb\u300f\u2014\u2014**\u91cf\u4e0b\u53bb\u662f\u932f\u7684**\u3002\u672c\u6a4b _RATING_CUE \u672c\u4f86\u5c31\u5e36 re.I,\u4e14 `Rating` \u662f\u5b50\u5b57\u4e32\u6bd4\u5c0d,\u6240\u4ee5 `Stock Rating` / `12-month rating` / `STOCK RATING` \u5728 v0113 \u8d77\u5c31\u5168\u4e2d;\u800c\u8a55\u7b49\u6839\u672c\u4e0d\u8b80\u518a\u4e0a\u7684 rating.cue_rx(\u8a5e\u8868\u5beb\u5728\u672c\u6a4b\u81ea\u5df1\u6a94\u88e1),\u5f80\u518a\u88e1\u52a0\u82f1\u6587\u6a19\u7c64\u5c0d\u672c\u6a4b\u662f\u96f6\u6548\u679c\u3002\u771f\u7f3a\u53e3\u53ea\u5728\u76ee\u6a19\u50f9,\u5169\u500b\u539f\u56e0\u90fd\u5728 cue_rx[1]:\u2460 \u6a19\u7c64\u8207\u6578\u5b57\u4e4b\u9593\u7684\u62ec\u865f\u4fee\u98fe\u8a9e(`Price Target (Dec-25):` / `Target Price (12M):`)\u628a\u5f37\u7dda\u7d22\u6253\u65b7;\u2461 \u5e63\u5225\u524d\u7db4\u53ea\u8a8d NT/NTD/TWD,`US$190` / `HK$52.5` \u5168\u6c92\u4e2d\u3002",
+    "measured_2026_09_23": {
+     "engines_ab": "v0113 / v0114 / v0115 \u4e09\u7248\u5c0d\u540c\u4e00\u7d44\u82f1\u6587\u4e03\u5f0f\u540c\u70ba 3/7 \u2014\u2014 PR #75 \u6c92\u78b0\u904e\u9019\u689d\u8def",
+     "v0116": "7/7,\u4e14 `Price Target (Dec-25): NT$250` \u7531\u300c\u6536\u5bb9\u4ef6 NT$ \u6b63\u5247(\u5f31)\u300d\u5347\u7d1a\u70ba\u300cTP \u7dda\u7d22\u300d(\u5f37)",
+     "rating": "\u82f1\u6587\u4e5d\u5f0f\u5728 v0113 \u8d77\u5373 9/9,\u7121\u7f3a\u53e3",
+     "corpus_64": "\u672c\u5883 64 \u4efd\u771f\u7814\u5831\u8a9e\u6599 v0115 \u8207 v0116 **\u5b8c\u5168\u76f8\u540c**(\u8a55\u7b49\u547d\u4e2d 36 \u00b7 \u76ee\u6a19\u50f9\u547d\u4e2d 30 \u00b7 \u771f RED 0)\u2014\u2014\u4e0d\u9000\u6b65,\u4f46\u672c\u5883\u8a9e\u6599\u6c92\u6709\u9019\u4e9b\u82f1\u6587\u7248\u9762,\u8b49\u4e0d\u51fa\u9032\u6b65",
+     "selftest": "v0115 41 \u6aa2 OK 41 \u2192 v0116 56 \u6aa2 OK 56(+\u82f1\u6587\u76ee\u6a19\u50f9\u4e03\u5f0f\u6b63\u63a7 + \u4e03\u5f0f\u8ca0\u63a7 + \u96d9\u982d\u5b88\u885b)"
+    },
+    "impl_is": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py \u7684 _TP_CUES(\u5c3e\u7248)\u3002\u672c\u518a\u9019\u5169\u689d\u662f\u5b83\u7684**\u96d9\u80de\u80ce\u6284\u672c**,\u4e0d\u662f\u53e6\u4e00\u500b\u6b63\u4e3b;v0116 \u8d77\u7531\u8a72\u6a4b\u81ea\u6e2c\u9010\u5b57\u6bd4\u5c0d,\u6f02\u6389\u6703\u7d05\u3002",
+    "cue_rx_before_b727": [
+     "\u76ee\u6a19\u50f9[^\\d]{0,14}?(\\d[\\d,]*\\.?\\d*)",
+     "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*[:\uff1a]?\\s*(?:\\(?NT\\$?\\)?|NTD|TWD)?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
+    ]
    }
   },
   "broker": {
