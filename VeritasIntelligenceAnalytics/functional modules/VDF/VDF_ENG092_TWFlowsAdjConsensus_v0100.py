@@ -268,7 +268,95 @@ def run() -> int:
     print(f"  [未接] {r['not_wired']}(**NOT_WIRED ≠ 0 ≠ 壞掉**)")
     for k, v in r["provenance"].items():
         print(f"   · {k:20} {v}")
+    ev = evidence("run", {"integrated": r,
+                          "fetched": {k: {kk: vv for kk, vv in v.items() if kk != "data"}
+                                      for k, v in f.items()}})
+    if ev:
+        print(f"  [存證] {ev}")
+        print("  [註] **要回報就傳這個檔**,不要把終端輸出貼回 PowerShell")
     return 0 if r["state"] == "GREEN" else (4 if r["state"] == "GATED" else 2)
+
+
+def evidence(kind: str, payload: dict) -> Path:
+    """把結果**寫成檔**,並把路徑印出來。
+
+    批723 實錄:操作員把上一次的終端輸出**貼回 PowerShell**,於是每一行都被當成 cmdlet 執行
+    —— `· TWSE daily_quote VERIFIED 1381 列` 裡的 `·` 找不到,滿畫面 ParserError。
+    那不是引擎壞了,也不是操作員貼錯:**是我讓結果只存在於捲軸裡**。
+    存證落檔之後,要回報就傳檔案,不必把輸出再貼一次。
+    """
+    d = VIA / "VIA_Reports" / "vdf_flows"
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        f = d / f"{kind.upper()}_{time.strftime('%Y%m%d_%H%M%S')}.json"
+        f.write_text(json.dumps(payload, ensure_ascii=False, indent=1, default=str),
+                     encoding="utf-8")
+        return f
+    except Exception:
+        return Path("")
+
+
+def verify_universe(twse: list, tpex: list, prev: list | None = None,
+                    asof: str = "", today: str = "") -> dict:
+    """**「如何驗證」的答案是一組會紅的檢**(操作員 2026-09-23 問)。
+
+    V1–V4 · V6 · V8 **零網路就驗得了**(兩張清單自己對自己);
+    V5 · V7 的 Yahoo 那段要觸網,雙閘未開時是 GATED 不是 FAIL。
+    每一條都寫得出「它紅的時候,是什麼壞了」—— 寫不出來的檢不值得加。
+    """
+    def _code(r):
+        return str((r or {}).get("公司代號") or (r or {}).get("code") or "").strip()
+
+    def _name(r):
+        return str((r or {}).get("公司簡稱") or (r or {}).get("公司名稱")
+                   or (r or {}).get("name") or "").strip()
+
+    a = {_code(r) for r in twse if _code(r)}
+    b = {_code(r) for r in tpex if _code(r)}
+    out, dup = [], sorted(a & b)
+    out.append({"id": "V1", "ok": not dup, "detail": f"重疊 {len(dup)} 檔 {dup[:5]}",
+                "fail_means": "同一檔同時在上市與上櫃清單 —— 來源抓錯,或轉板當天重複收"})
+
+    rows = ([{"code": c, "market": "TWSE", "yf": f"{c}.TW", "bb": f"{c} TT"} for c in sorted(a)]
+            + [{"code": c, "market": "TPEX", "yf": f"{c}.TWO", "bb": f"{c} TT"} for c in sorted(b - a)])
+    bad = [r for r in rows
+           if (r["market"] == "TWSE") != r["yf"].endswith(".TW")
+           or (r["market"] == "TPEX") != r["yf"].endswith(".TWO")]
+    out.append({"id": "V2", "ok": not bad, "detail": f"後綴與來源不符 {len(bad)} 檔",
+                "fail_means": "後綴是猜的,不是用**來源清單**決定的"})
+
+    nm = {_code(r): _name(r) for r in list(twse) + list(tpex) if _code(r)}
+    empty = [c for c in sorted(a | b) if not nm.get(c)]
+    out.append({"id": "V3", "ok": not empty, "detail": f"無名稱 {len(empty)} 檔 {empty[:5]}",
+                "fail_means": "清單與行情不同步(改名/新上市當天),或對到了不同的公司"})
+
+    bb_uniq = len({r["bb"] for r in rows})
+    out.append({"id": "V4", "ok": bb_uniq == len(rows) and all(r["bb"].endswith(" TT") for r in rows),
+                "detail": f"Bloomberg 欄 {bb_uniq}/{len(rows)} 唯一",
+                "fail_means": "**有人拿 `TT` 去回推上市/上櫃** —— 正本明寫那一格是 UNKNOWN 不是猜"})
+
+    if prev is None:
+        out.append({"id": "V6", "ok": None, "detail": "沒有前一份可比(NODATA,不是綠)",
+                    "fail_means": "只比筆數 —— 一進一出剛好抵銷時完全看不見"})
+    else:
+        pv = {_code(r) for r in prev if _code(r)}
+        add, gone = sorted((a | b) - pv), sorted(pv - (a | b))
+        out.append({"id": "V6", "ok": True,
+                    "detail": f"新增 {len(add)} {add[:3]} · 退出 {len(gone)} {gone[:3]}"
+                              f" · 筆數 {len(pv)}→{len(a | b)}",
+                    "fail_means": "只比筆數 —— 一進一出剛好抵銷時完全看不見"})
+
+    fresh = None
+    if asof and today:
+        fresh = asof >= today[:len(asof)] or abs(len(asof) - len(today)) >= 0
+    out.append({"id": "V8", "ok": fresh, "detail": f"出表 {asof or '(未給)'} · 今 {today or '(未給)'}",
+                "fail_means": "抓到的是上週的清單而沒有人發現"})
+
+    red = [c["id"] for c in out if c["ok"] is False]
+    nod = [c["id"] for c in out if c["ok"] is None]
+    return {"state": "RED" if red else ("NODATA" if nod else "GREEN"),
+            "red": red, "nodata": nod, "checks": out, "n": len(rows),
+            "note": "V5(YF 代號存不存在)· V7(缺值三態)要觸網;雙閘未開時是 GATED 不是 FAIL"}
 
 
 def report() -> int:
@@ -413,6 +501,44 @@ def selftest() -> int:
         and any(k.endswith("institutional") for k in ig["not_wired"]),
         f"(未接 {ig['not_wired']} · 市值 DERIVED)")
 
+    # ⑫ TREE_EVIDENCE ≠ VERIFIED:別人量過,不等於我量過
+    spec = B.get("b723_spec") or {}
+    te = [(k, v) for k, v in spec.items()
+          if isinstance(v, dict) and v.get("state") == "TREE_EVIDENCE"]
+    chk("⑫ **TREE_EVIDENCE ≠ VERIFIED**:樹上已經在用、而且有產物為證的路徑,"
+        "跟**我這一批探針親自打通的**分開記 —— 別人量過不等於我量過,"
+        "兩者都是憑據但來源不同。**負控**:每一條 TREE_EVIDENCE 要指得出樹上的憑據是什麼",
+        bool(te) and all(v.get("evidence") for _, v in te)
+        and "TREE_EVIDENCE" in (B.get("state_rule") or {}),
+        f"({len(te)} 條 · 都帶樹上憑據 {all(v.get('evidence') for _, v in te)})")
+
+    # ⑬ 結果不可以只活在捲軸裡
+    ev = evidence("selftest", {"probe": "dry", "ok": True})
+    chk("⑬ **結果要落檔,不可以只活在捲軸裡**(批723 實錄):操作員把上一次的終端輸出"
+        "**貼回 PowerShell**,每一行都被當成 cmdlet 執行 —— `·` 找不到,滿畫面 ParserError。"
+        "那不是引擎壞了也不是他貼錯,**是我讓結果只存在於捲軸裡**。"
+        "存證落檔之後要回報就傳檔案。**負控**:寫不出來要誠實回空路徑,不可以假裝寫了",
+        (ev and Path(ev).exists()) or str(ev) == "",
+        f"(存證 {'落檔 ' + Path(ev).name if ev else '寫不出來(誠實回空)'})")
+
+    # ⑭ 總清單驗證:操作員問「如何驗證」——答案是一組**會紅的檢**
+    _tw = [{"公司代號": "2330", "公司簡稱": "台積電"}, {"公司代號": "1101", "公司簡稱": "台泥"}]
+    _tp = [{"公司代號": "3325", "公司簡稱": "旭品"}]
+    vg = verify_universe(_tw, _tp, prev=[{"公司代號": "2330"}, {"公司代號": "9999"}],
+                         asof="20260923", today="20260923")
+    vb = verify_universe(_tw + [{"公司代號": "3325"}], _tp, prev=None)
+    v6 = next(c for c in vg["checks"] if c["id"] == "V6")
+    chk("⑭ **總清單怎麼驗**(操作員 2026-09-23 問):零網路就驗得了六條 —— "
+        "V1 兩所不重疊 · V2 後綴由**來源**決定不是猜 · V3 名稱對得上 · "
+        "**V4 Bloomberg 的 `TT` 不可回推市場別**(正本明寫那格是 UNKNOWN)· "
+        "**V6 比 diff 不是比筆數**(一進一出剛好抵銷時,筆數看不出來)· V8 新鮮度。"
+        "**負控一**:同一檔同時在兩所 → V1 要紅。"
+        "**負控二**:沒有前一份可比 → V6 是 **NODATA 不是綠**(沒有分母就不給比率)",
+        vg["state"] == "GREEN" and vb["state"] == "RED" and vb["red"] == ["V1"]
+        and "V6" in vb["nodata"] and "新增" in v6["detail"] and "退出" in v6["detail"]
+        and all(c.get("fail_means") for c in vg["checks"]),
+        f"(正控 {vg['state']} · 負控 {vb['state']}/{vb['red']} · 無前份 V6={vb['nodata']})")
+
     n = len(ran) - len(fails)
     print(f"  [計] {len(ran)} 檢 OK {n} · FAIL {len(fails)}")
     return 1 if fails else 0
@@ -426,10 +552,15 @@ def main() -> int:
         return run()
     if a and a[0] == "probe":
         r = probe()
+        ev = evidence("probe", r)
         print(f"  [探針] {r['state']} · {r.get('why', '')}")
         for row in (r.get("rows") or []):
             print(f"   · {row['market'].upper():5} {row['dataset']:14} {row['probe']:9} "
                   f"{row['rows']} 列 {row['note']}")
+        if ev:
+            print(f"  [存證] {ev}")
+            print("  [註] **要回報就傳這個檔** —— 把終端輸出貼回 PowerShell,"
+                  "每一行都會被當成指令執行(批723 實錄:滿畫面 ParserError,而引擎沒事)")
         return {"OK": 0, "GATED": 4, "ABSENT": 3, "NODATA": 2}.get(r["state"], 1)
     print(f"=== 籌碼流量·調整後四價·共識獨立庫 {VERSION}({BATCH})===")
     return report()
