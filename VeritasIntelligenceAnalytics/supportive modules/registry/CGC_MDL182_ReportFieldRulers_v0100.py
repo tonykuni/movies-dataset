@@ -228,9 +228,14 @@ def contacts_of(text: str, R: dict | None = None, C: dict | None = None) -> list
     email_rx = ag.get("email") or cc.get("email") or r"(?!x)x"
     name_en_rx = cc.get("name_en") or ag.get("en_name") or r"(?!x)x"
     cn_rx = cc.get("name_cn") or r"[\u4e00-\u9fa5]{2,4}"
-    stop = ((R.get("name") or {}).get("stop") or {}).get("rx") or r"(?!x)x"
+    N = (R.get("name") or {})
+    NS = (N.get("stop") or {})
+    stop = "|".join(x for x in (NS.get("rx"), NS.get("rx_b714_add")) if x) or r"(?!x)x"
     stop2 = co.get("tw_name_stop_add") or r"(?!x)x"
+    bound = NS.get("boundary_rule") or cn_rx     # 批714:候選要是**獨立中文串**,左右不接中文
     strong = ag.get("tw_name") or ""
+    AK = (N.get("at_left_kind") or {})
+    roles = set(AK.get("role_words") or [])
     out, prev_end = [], 0
     for m in re.finditer(email_rx, text):
         # 視窗起點不只看 80 字元,還要**卡在前一個錨點之後** ——
@@ -243,22 +248,40 @@ def contacts_of(text: str, R: dict | None = None, C: dict | None = None) -> list
         en = [x for x in dict.fromkeys(re.findall(name_en_rx, blk) if "(" not in name_en_rx
                                        else [g.group(0) for g in re.finditer(name_en_rx, blk)])
               if x not in titles and not any(t.lower() == x.lower() for t in titles)]
-        raw_cn = list(dict.fromkeys(re.findall(cn_rx, blk)))
-        cn = [w for w in raw_cn
-              if not re.search(stop, w) and w not in titles and not re.search(stop2, w)]
+        raw_cn = list(dict.fromkeys(re.findall(bound, blk)))
+        keep = [w for w in raw_cn
+                if not re.search(stop, w) and w not in titles and not re.search(stop2, w)]
+        sur = ((R.get("name") or {}).get("surname") or {}).get("list") or ""
+        cn = [w for w in keep if w[:1] in sur]          # 首字是常見姓
+        cn_weak = [w for w in keep if w[:1] not in sur]  # 不是 → 留著標 weak,不丟
         sm = re.search(strong, blk) if strong else None
         if sm and sm.group("tw_name") and not re.search(stop2, sm.group("tw_name")):
             cn = [sm.group("tw_name")] + [w for w in cn if w != sm.group("tw_name")]
         local, dom = addr.split("@", 1)
         at_left = re.sub(r"[._]+", " ", local).title()   # 操作員令:`.` 換空白,`-` 留著(Da-Ming Wang)
+        low = local.lower()
+        kind = ("STAFF_ID" if not re.search(r"[A-Za-z]", local) else
+                "ROLE" if low.split(".")[0] in roles else "NAME")
         toks = {t.lower() for t in re.split(r"[ ._-]+", local) if len(t) > 1}
-        agree = [n for n in en if {w.lower() for w in re.split(r"[ .-]+", n) if w} & toks]
-        st = ("GREEN" if agree else "YELLOW" if en else
+        flat = re.sub(r"[^a-z]", "", low)
+        agree = []
+        for n in en:                                    # 操作員給的三式:first.last / firstlast / flast
+            w = [x.lower() for x in re.split(r"[ .-]+", n) if x]
+            if not w:
+                continue
+            pairs = ["".join(w[i:i + 2]) for i in range(len(w) - 1)]
+            if (set(w) & toks or "".join(w) == flat or (w[0][:1] + w[-1]) == flat
+                    or flat in pairs):
+                agree.append(n)
+        st = ("UNVERIFIABLE" if kind != "NAME" else
+              "GREEN" if agree else "YELLOW" if en else
               "UNVERIFIABLE" if cn else "NODATA")
-        out.append({"email": addr, "at_left": at_left,
-                    "broker": broker_of_domain(addr, R) or dom.split(".")[0].upper(),
-                    "broker_src": "冊" if broker_of_domain(addr, R) else "網域字面(**未對冊,不是裁定**)",
-                    "name_en": en[:3], "name_cn": cn[:3], "title": titles[:3],
+        dv = domain_verdict(addr, R)
+        out.append({"email": addr, "at_left": at_left, "at_left_kind": kind,
+                    "broker": dv["broker"], "broker_state": dv["state"],
+                    "broker_raw": dv.get("raw", ""), "broker_why": dv["why"],
+                    "name_en": en[:3], "name_cn": cn[:3], "name_cn_weak": cn_weak[:3],
+                    "title": titles[:3],
                     "phone": [p["hit"] for p in ph], "state": st,
                     "window_chars": len(blk)})
     return out
@@ -319,15 +342,40 @@ def titles_in(text: str, R: dict | None = None) -> list:
     return sorted(set(hits), key=lambda x: -len(x))
 
 
-def broker_of_domain(addr: str, R: dict | None = None) -> str:
-    """電郵網域 → 券商(**只補冊上量到缺的那幾條**;正本查不到時才用,只增不減)。"""
+def domain_verdict(addr: str, R: dict | None = None) -> dict:
+    """電郵網域 → 券商,**先過拒絕閘**。
+
+    批714 實測打出來的洞:語料裡有一個**陸券研究部網域**(批678 拒絕清單上那幾家之一)進來了 2 次。
+    拒絕閘比的是**別名字面**,網域字根一條都對不上 —— 它從網域這道側門整個繞過去。
+    **本支不寫那些名字**:寫下去就變成活的解析資料(批714 實錄:第一版寫了,陸券清除閘當場紅,
+    而且把樹上兩條懸空指標救活成真指標 —— 拒絕清單把它要拒絕的東西救回來了)。
+    三態:DENIED(有這條而且不收)· RESOLVED(冊上有)· UNKNOWN(冊上沒有,**不猜**)。
+    """
     R = R if R is not None else rules()
+    A = (R.get("broker_domains_addendum") or {})
     dom = addr.split("@")[-1].strip().lower()
-    mp = ((R.get("broker_domains_addendum") or {}).get("map") or {})
-    for k, v in mp.items():
-        if dom == k or dom.endswith("." + k):
-            return v
-    return ""
+
+    def _hit(mp: dict) -> str:
+        for k, v in (mp or {}).items():
+            if dom == k or dom.endswith("." + k):
+                return v
+        return ""
+
+    if _hit(((A.get("deny_domains") or {}).get("map") or {})):
+        # raw 刻意留空:**本冊不帶被拒者的名字**。名字留在批678 那一本留痕台帳。
+        # 批714 實錄:第一版把名字寫成值,陸券清除閘當場紅,而且把兩條懸空指標救活了。
+        return {"broker": "", "state": "DENIED", "raw": "",
+                "why": "陸券網域(批678 拒絕清單);擋錯頂多少收一份,放進來就是假資料進庫"}
+    hit = _hit(A.get("map") or {})
+    if hit:
+        return {"broker": hit, "state": "RESOLVED", "why": "網域冊裁定"}
+    return {"broker": "", "state": "UNKNOWN", "raw": dom.split(".")[0].upper(),
+            "why": "網域不在冊上 —— **不猜**(猜出來的券商,下游看不出來那是猜的)"}
+
+
+def broker_of_domain(addr: str, R: dict | None = None) -> str:
+    """電郵網域 → 券商(只回**裁定得出來**的;拒絕與查無都回空,分不出來就看 domain_verdict)。"""
+    return domain_verdict(addr, R)["broker"]
 
 
 def selftest() -> int:
@@ -501,6 +549,57 @@ def selftest() -> int:
         and not any("的看法" in w or w in ("看法是", "的看法是") for c in cn_bad for w in c["name_cn"]),
         f"((03)→{[p['hit'] for p in tpe3]} · 職稱當姓名 {[n for c in en_bad for n in c['name_en']]} · "
         f"虛詞當姓名 {[w for c in cn_bad for w in c['name_cn']]})")
+
+    # ⑮ 拒絕閘的網域側門(批714 在 81 份真研報第一頁上量到的洞)
+    gf = domain_verdict("a@gfgroup.com.hk")
+    ct = domain_verdict("b@ctbcsis.com")
+    unk = domain_verdict("c@nobody-knows.example")
+    chk("⑮ **拒絕閘走網域這道側門**:語料裡有一個**陸券研究部網域**,它的別名全在批678 拒絕清單上 —— "
+        "但閘比的是**別名字面**,網域字根一條都對不上,語料裡它就這樣進來了 2 次。三態要分得開。"
+        "**負控一**:`ctbcsis.com` 是中國信託(台),**不可以**被清單上那個**撞名**的陸券條目誤擋;"
+        "**負控二**:不認識的網域回 UNKNOWN **不猜**(猜出來的券商下游看不出來那是猜的)。"
+        "(本檢刻意**不寫**被拒者的名字 —— 寫下去這一支就變成活的陸券解析面,批714 犯過一次)",
+        gf["state"] == "DENIED" and gf["broker"] == "" and gf["raw"] == ""
+        and ct["state"] == "RESOLVED" and ct["broker"] == "CTBC"
+        and unk["state"] == "UNKNOWN" and unk["broker"] == "",
+        f"(側門→{gf['state']}/名字留空 {gf['raw'] == ''} · 中信託→{ct['state']}/{ct['broker']} · "
+        f"未知→{unk['state']})")
+
+    # ⑯ `@` 前是人名還是員工編號 —— 驗不了不是對不上
+    staff = contacts_of("研究員 王小明\n電話 (02)2181-8888\n450@entrust.com.tw")
+    role = contacts_of("研究部\nresearch@kgi.com")
+    person = contacts_of("研究員 劉昃恩 Vincent Liu\nvincent.liu@kgi.com")
+    chk("⑯ **`@` 前的身分別**:實測華南投顧四份研報的分析師電郵是 `450@` `10863@` `9899@` —— "
+        "**員工編號,不是姓名**。這種互證不了,判成 YELLOW(具名衝突)就是憑空造一個衝突。"
+        "STAFF_ID / ROLE 一律 UNVERIFIABLE,**永不 YELLOW**;券商照樣由網域裁定(那一條不受影響)。"
+        "**正控**:`vincent.liu@` 要判回 NAME 並照常互證",
+        staff[0]["at_left_kind"] == "STAFF_ID" and staff[0]["state"] == "UNVERIFIABLE"
+        and staff[0]["broker"] == "HUANAN"
+        and role[0]["at_left_kind"] == "ROLE" and role[0]["state"] == "UNVERIFIABLE"
+        and person[0]["at_left_kind"] == "NAME" and person[0]["state"] == "GREEN",
+        f"({staff[0]['at_left_kind']}/{staff[0]['state']}/{staff[0]['broker']} · "
+        f"{role[0]['at_left_kind']} · {person[0]['at_left_kind']}/{person[0]['state']})")
+
+    # ⑰ 中文姓名:邊界律掃長句切片,姓氏只分級不丟棄
+    leak = contacts_of("設計 紡織 據設備領導製造商\n研究員 林子期\nlin@kgi.com")
+    chk("⑰ **中文姓名兩道**:① 邊界律 —— 候選要是**獨立中文串**(左右不接中文),"
+        "`據設備領` `導製造商` 這種從長句切出來的四字片段整批消失(不必猜一張永遠補不完的詞表);"
+        "② 姓氏**只分級不丟棄** —— 首字是常見姓進 `name_cn`,不是的留在 `name_cn_weak`。"
+        "**正控**:`林子期` 要在 cn;**負控**:`設計`/`紡織` 不准進 cn,但也**不准消失**",
+        "林子期" in leak[0]["name_cn"]
+        and not any(w in leak[0]["name_cn"] for w in ("設計", "紡織", "據設備領", "導製造商"))
+        and any(w in leak[0]["name_cn_weak"] for w in ("設計", "紡織")),
+        f"(cn={leak[0]['name_cn']} · weak={leak[0]['name_cn_weak']})")
+
+    # ⑱ `@` 前三式 + 相鄰兩字組
+    jp = contacts_of("GPU Jeff Pu\nResearch Analyst\njeffpu@ctbcsis.com")
+    fl = contacts_of("John Doe\njdoe@citi.com")
+    chk("⑱ **`@` 前三式全部要跑**(操作員逐字給定 `first.last` / `firstlast` / `flast`):"
+        "實測 `jeffpu@` 對不上 `GPU Jeff Pu` —— 抽出來的英文姓名前面黏了產業詞 `GPU`,"
+        "黏起來是 `gpujeffpu` 不是 `jeffpu`。姓名通常是**相鄰兩個 token**,所以三式之外再試相鄰兩字組。"
+        "**正控**:`jdoe@` 要靠 `flast` 對上 `John Doe`",
+        jp[0]["state"] == "GREEN" and fl[0]["state"] == "GREEN",
+        f"(firstlast→{jp[0]['state']} · flast→{fl[0]['state']})")
 
     chk("⑦ 唯讀零網路:本支只讀冊、只比對字串,不出網、不寫檔",
         not banned, f"(違禁 {banned or '無'})")
