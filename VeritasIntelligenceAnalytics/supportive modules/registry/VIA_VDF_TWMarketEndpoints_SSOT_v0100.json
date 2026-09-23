@@ -1,0 +1,153 @@
+{
+  "schema": "VIA.VDF.TWMarketEndpoints.SSOT.v1",
+  "batch": "批720",
+  "ruled_by": "操作員 2026-09-23 逐項給定:「FACTSET/YFINANCE CONSENSUS 存一個資料庫 · 不用算移動平均量價 · 三大法人買賣超 · 融資融券 · 當沖交易 · ADJ OPEN/HIGH/LOW/CLOSE · 從 TWSE TPEX 擷取成交量 成交值 市值」;SMA 欄位『保留好了』、ADJ『四欄全給』為操作員 2026-09-23 逐題裁定",
+  "why": "端點清單放**冊**不放碼。批720 只有兩條是**實測驗過**的(MDL004 在工作站真的抓到料),其餘一律標 CANDIDATE 或 UNKNOWN —— **沒量過的不寫成事實**。探針跑過之後把 state 改成 VERIFIED/DEAD,改的是冊不是碼。",
+  "state_rule": {
+    "VERIFIED": "實測抓到料(誰在哪一天抓到,記在 evidence)",
+    "CANDIDATE": "依官方 OpenAPI 命名慣例推出來的路徑 —— **未經實測**,探針要去證實或證偽",
+    "UNKNOWN": "我不知道正確路徑,**不編一個** —— 空著等實測或操作員給"
+  },
+  "twse": {
+    "base": "https://openapi.twse.com.tw/v1",
+    "datasets": {
+      "daily_quote": {
+        "path": "/exchangeReport/STOCK_DAY_ALL",
+        "state": "VERIFIED",
+        "gives": [
+          "成交量",
+          "成交值",
+          "成交筆數",
+          "開高低收"
+        ],
+        "evidence": "批719 工作站實跑:TWSE=1078 檔"
+      },
+      "per_pbr_yield": {
+        "path": "/exchangeReport/BWIBBU_ALL",
+        "state": "VERIFIED",
+        "gives": [
+          "本益比",
+          "股價淨值比",
+          "殖利率"
+        ],
+        "evidence": "MDL004 v0100 原件已在用"
+      },
+      "institutional": {
+        "path": "/fund/T86",
+        "state": "CANDIDATE",
+        "zh": "三大法人買賣超日報",
+        "gives": [
+          "外資",
+          "投信",
+          "自營商",
+          "買賣超"
+        ]
+      },
+      "margin": {
+        "path": "/exchangeReport/MI_MARGN",
+        "state": "CANDIDATE",
+        "zh": "融資融券餘額",
+        "gives": [
+          "融資餘額",
+          "融券餘額",
+          "增減"
+        ]
+      },
+      "day_trade": {
+        "path": "/exchangeReport/TWTB4U",
+        "state": "CANDIDATE",
+        "zh": "當日沖銷交易標的及統計",
+        "gives": [
+          "當沖張數",
+          "當沖金額"
+        ]
+      },
+      "market_total": {
+        "path": "/exchangeReport/FMTQIK",
+        "state": "CANDIDATE",
+        "zh": "市場成交資訊(全市場合計)",
+        "gives": [
+          "成交金額",
+          "成交股數",
+          "發行量加權股價指數"
+        ]
+      }
+    }
+  },
+  "tpex": {
+    "base": "https://www.tpex.org.tw/openapi/v1",
+    "datasets": {
+      "daily_quote": {
+        "path": "/tpex_mainboard_daily_close_quotes",
+        "state": "VERIFIED",
+        "gives": [
+          "成交量",
+          "成交值",
+          "開高低收"
+        ],
+        "evidence": "批719 工作站實跑:TPEX=890 檔"
+      },
+      "per_pbr": {
+        "path": "/tpex_mainboard_peratio_analysis",
+        "state": "VERIFIED",
+        "gives": [
+          "本益比",
+          "股價淨值比"
+        ],
+        "evidence": "MDL004 v0100 原件已在用"
+      },
+      "institutional": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "三大法人買賣超",
+        "why_unknown": "我不知道 TPEX 這一道的正確路徑,**不編一個**。探針會去 base 撈清單,撈不到就誠實 UNKNOWN。"
+      },
+      "margin": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "融資融券"
+      },
+      "day_trade": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "當沖交易"
+      }
+    }
+  },
+  "market_cap": {
+    "zh": "市值",
+    "rule": "**交易所不直接給市值。** 市值 = 收盤價 × 發行股數;發行股數來自 Yahoo quoteSummary 的 sharesOutstanding(走統包 cookie+crumb 握手道)。",
+    "why": "操作員令「從 TWSE TPEX 擷取成交量 成交值 市值」—— 前兩項交易所直接有,第三項**沒有**。照實講:算出來的那一欄要標明是算的,不是抓的。",
+    "state": "DERIVED"
+  },
+  "adj_ohlc": {
+    "zh": "除權息調整後四價",
+    "cols": [
+      "adj_open",
+      "adj_high",
+      "adj_low",
+      "adj_close"
+    ],
+    "ruled_by": "操作員 2026-09-23 逐題裁定「四欄全給」",
+    "rule": "yfinance history(auto_adjust=True)四價皆為調整後;auto_adjust=False 時只有 Adj Close 一欄,其餘三價要自行乘上 adj_close/close 的比例。",
+    "honest": "比例法是**近似**(股息與分割的處理次序會有尾差),所以要另存 `adj_method` 欄講明這一列是哪一種來的。"
+  },
+  "consensus_db": {
+    "zh": "共識獨立庫",
+    "ruled_by": "操作員 2026-09-23「FACTSET/YFINANCE CONSENSUS 存一個資料庫」",
+    "file": "vdf_consensus.duckdb",
+    "tables": [
+      "yf_consensus",
+      "factset_consensus"
+    ],
+    "why": "共識的更新節奏與日行情不同(分析師改預估不是每天),混在同一庫裡會讓「今天沒更新」看起來像「今天沒有料」。"
+  },
+  "sma_note": {
+    "ruling_1": "操作員 2026-09-23 逐題裁定:**「保留好了」** —— 既有欄位照留,新庫不算。",
+    "ruling_2": "操作員 2026-09-23 同日改令:**「SMA AVERAGE+VOL 全數刪除欄位也刪除」** —— 推翻 ruling_1。",
+    "applied": "依 ruling_2 辦理:VDF_MDL004 的 SMA_WINDOWS / AVG_VOL_WINDOWS 清空,`sma_*` 與 `avg_vol_*` **停算且不產欄位**;摘要表與樣本表的那兩組也拿掉。",
+    "why_both_kept": "**兩次裁定都留著。** 只記最後一次,下一個人會看不出這裡曾經有過欄位、也看不出它是被裁掉的還是從來沒有過。留痕的重點不是誰對,是**這裡發生過一次改變**。",
+    "reduction_check": "這是**減**,所以動手前先量:全樹 grep `sma_20|sma_60|sma_240|avg_vol_*`,排除收容/快照/退役後,**只有 MDL004 自己**在讀 —— 零下游。量完才刪,不是刪完才說沒人在用。",
+    "kept": "ytd_pct 與 market_cap / shares_outstanding **不在這道令裡**,照留。"
+  }
+}

@@ -14,8 +14,10 @@ ROLE
   全市場 TW Equity Engine 升級版 (供 MDL005/006 上游使用), 一次抓出每檔個股:
     [1] Identity        ticker · yf_ticker · name · market(TWSE/TPEX)
     [2] Daily Quote     adj_close · volume · turnover · market_cap
-    [3] Moving Average  sma_5 · sma_10 · sma_20 · sma_60 · sma_120 · sma_240 · ytd_pct
-    [4] Average Volume  avg_vol_60 · avg_vol_120 · avg_vol_240
+    [3] YTD             ytd_pct
+        (批720 操作員令「SMA AVERAGE+VOL 全數刪除欄位也刪除」:
+         sma_* / avg_vol_* 整組停算且不產欄位。動手前量過:全樹**零下游在讀**那幾欄,
+         只有本支自己。這是**減**,所以量與留痕都寫在這裡與端點冊 sma_note。)
     [5] YF Consensus    target_mean/median/high/low · num_analysts · recommendation
     [6] FactSet         consensus stub (預留 API 接口)
 
@@ -97,8 +99,8 @@ YF_RETRY_ATTEMPTS  = 3
 YF_RETRY_DELAY     = 1.5
 
 # SMA 設定 (鎖定窗格)
-SMA_WINDOWS        = [5, 10, 20, 60, 120, 240]
-AVG_VOL_WINDOWS    = [60, 120, 240]
+SMA_WINDOWS: list = []          # 批720 操作員令「SMA AVERAGE+VOL 全數刪除欄位也刪除」
+AVG_VOL_WINDOWS: list = []      # 同上。清空視窗=不算也不產欄位;留清單是為了呼叫端零改動
 COMPUTE_YTD        = True
 
 # 並發
@@ -1130,8 +1132,7 @@ class TWFullMarketEngine:
             groups = {
                 "Identity":  ["ticker", "code", "yf_ticker", "name", "market"],
                 "Daily":     ["open","high","low","close","change","volume","turnover","transactions","adj_close"],
-                "SMA":       [f"sma_{w}" for w in SMA_WINDOWS] + ["ytd_pct"],
-                "AvgVol":    [f"avg_vol_{w}" for w in AVG_VOL_WINDOWS],
+                "YTD":       ["ytd_pct"],
                 "MarketCap": ["market_cap","shares_outstanding"],
                 "YF Cons":   ["target_mean","target_median","target_high","target_low",
                               "num_analysts","recommendation","trailing_pe","forward_pe",
@@ -1175,8 +1176,6 @@ class TWFullMarketEngine:
                     f(r.get("close") or r.get("adj_close")),
                     f(r.get("volume")),
                     f(r.get("market_cap")),
-                    f(r.get("sma_20")),
-                    f(r.get("sma_60")),
                     f(r.get("ytd_pct"), 1),
                     f(r.get("target_mean")),
                 )
