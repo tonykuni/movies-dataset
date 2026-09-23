@@ -9913,8 +9913,22 @@
       "category": "併線",
       "component": "側線 2026-09-23 併入 main 0b457a85(PR #75:ENG072 v0137 · ENG086 v0114/v0115 · SUP_MDL749 v0113 · test_broker_source_zones.py);零衝突",
       "code": "併後:registry-sync 活 9394 · 新 2;VCGC v0127 ssot 自動改委派 SUP_MDL749 v0113;正則清冊共用 704→705 交正主重建,驗收 PASS;VCGC 36/36;格子相關 9 站 OK 8 · FAIL 1 =「Celeritas 產出契約實跑」由 PR #75 新增的測試檔缺加速器橋造成,乾淨 main 同紅(Z138)。"
+    },
+    {
+      "ts": "2026-09-23 22:20",
+      "op": "ADD",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段(主線批號由併線的手指定 L25)操作員令「幫我開 PR · 給我一個指令含進入環境一件開啟 VDF 的 POWERSHELL CODE 實測 · 應先跳出 HTML U/I 問我要不要改參數啟動 · 然後看到資料庫狀況」:VDF_ENG093_LaunchConsole v0100(ask 本機頁:127.0.0.1 · 一次性權杖 · 同源送出 · 參數預設讀自啟動器 · 逐欄驗證;status 資料庫狀況頁:委派 CGC_MDL123 目錄 · CGC_MDL153 分類燈 · VDF_ENG089 缺口;同意閘只讀不寫;零 CDN)· Open-VIA-VDF-v0100.ps1(新檔;進環境 → ask → Invoke-VIA-VdfFetch 尾版 -NoEnter → status;L102 模板章不包裹接法)· Open-VIA-VDF.cmd(雙擊)· CGC_MDL064 v0477(+2 站 350→352)· 規格 +vdf_launch_console",
+      "code": "容器實測:ENG093 自測 8/8;無頭 Chromium 點過三條路(自訂 2024/100/只看計畫 · 預設模式忽略頁上亂填 · 不啟動)+ 錯權杖 403;狀況頁合成目錄 10 表 rc2、零外部資源;模板章稽核 pass、Celeritas 閘基線外新缺 0;VCGC 36/36;契約 19/19;registry-sync 活 9430 · 新 36;正則清冊交正主重建驗收 PASS。容器無 pwsh:.ps1/.cmd 待工作站第一次實跑(Z139)。"
+    },
+    {
+      "ts": "2026-09-23 22:40",
+      "op": "FIX",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 出貨前自修(主線批號由併線的手指定 L25):VDF_ENG093 v0100 兩行 flush(Invoke-VIAPython 把 stdout 導到暫存檔,區塊緩衝;不 flush 網址等行程結束才落檔)· status 頁路徑獨佔一行絕對路徑 · 自測 +⑨(照 Invoke-VIAPython 導檔、去 PYTHONUNBUFFERED)· Open-VIA-VDF-v0100.ps1 改從 stdout 取網址/頁路徑交短令冊 via-open(只走瀏覽器 exe;VIA_NO_OPEN=1 下 webbrowser 靜默不開,.html 預設程式=VS Code)· 一行指令與 .cmd 改點源(& 跑時 Invoke-VIAPython 不是 global:,跑完就消失)· -NoUi 時第 ④ 步頁只落檔不跳 · 改名 Open-VIA-VDF(functional modules/VDF 已有 Start-VIA-VDF-v0101~v0104 一族,免撞族名 L04;全部遠端分支無同名)· Z140",
+      "code": "容器實測:ENG093 自測 9/9(無回送介面 6 綠 + 2 NODATA);突變測拿掉 flush → ⑨ 轉紅;照工作站緩衝跑的無頭 Chromium 三條路決定檔完全相同、錯權杖 403;狀況頁「頁:」行以 Start 腳本同一條正則取得、路徑存在;模板章稽核 pass;正則清冊交 CGC_MDL115 重建 1282 條、ssot 驗收 PASS;registry-sync 變更 34(皆 ENG093 行號)。容器設 PYTHONUNBUFFERED=1 曾讓第一輪測試誤綠(Z140)。.ps1/.cmd 待工作站第一次實跑(Z139)。"
     }
   ],
-  "updated_at": "2026-09-23 21:30",
+  "updated_at": "2026-09-23 22:40",
   "batch": "批695"
 }
