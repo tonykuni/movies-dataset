@@ -515,7 +515,7 @@ def selftest() -> int:
     # 改驗更嚴的相對守恆:該完整日的因子覆蓋須為 100%(n_ma == 該日在庫列數),
     # 且宇宙規模須與庫內最大單日一致(不是隨便一個小日冒充完整日),並照舊驗守恆與百分比界。
     _uni = _day = None
-    _nullma, _nullwho = None, []
+    _nullma, _nullwho, _missing = None, [], []
     if br is not None:
         try:
             import duckdb as _dd
@@ -530,12 +530,19 @@ def selftest() -> int:
             _nullwho = [r[0] for r in _c.execute(
                 "SELECT ticker FROM features_daily WHERE date = ? AND ma20_ratio IS NULL LIMIT 5",
                 [br["date"]]).fetchall()]
+            # 批726:差幾檔要**點名是哪幾檔**。工作站實錄 1988/1990=99.9% —— 只差 2 檔,
+            # 而「因子鏈未跑全宇宙」這句話會讓人去重跑整條鏈。
+            # 點名之後才分得出「那兩檔天生沒有(新上市/停牌)」還是「真的漏跑」。
+            _missing = [r[0] for r in _c.execute(
+                "SELECT DISTINCT ticker FROM features_daily WHERE ticker NOT IN "
+                "(SELECT ticker FROM features_daily WHERE date = ?) LIMIT 12",
+                [br["date"]]).fetchall()]
             _c.close()
         except Exception as _exc:
             # 批725:原本把庫錯訊整個吞掉,紅燈只剩一句「因子庫缺」,
             # 而真正的原因(表不存在 / 權限 / 檔鎖)看不到。留住它。
             _uni = _day = None
-            _nullma, _nullwho = None, []
+            _nullma, _nullwho, _missing = None, [], []
             _dberr = f"{type(_exc).__name__}: {str(_exc)[:90]}"
     # 批468:因子庫**根本不在**=上游未產生 → SKIP;庫在而數字不合格才 FAIL。
     if br is None:
@@ -545,8 +552,11 @@ def selftest() -> int:
     elif _day is not None and _uni is not None and _day != _uni:
         # 批689B:該日在庫 ≠ 庫標的宇宙=因子鏈沒跑全宇宙(工作站實錄 530/1978=26.8%)——缺料不是壞,指路重跑因子段
         skp("⑨ 市場寬度句(批192/538:features_daily 最新完整日聚合)",
-            f"({br['date']}:該日在庫 {_day} ≠ 庫標的宇宙 {_uni}={round(100.0 * _day / _uni, 1) if _uni else 0}%"
-            f"=因子鏈未跑全宇宙,缺料不是壞;via-vdffetch(3a/3b 因子段)後複判)")
+            f"({br['date']}:該日在庫 {_day} ≠ 庫標的宇宙 {_uni}"
+            f"={round(100.0 * _day / _uni, 1) if _uni else 0}% · **差 {_uni - _day} 檔**"
+            + (f":{'、'.join(map(str, _missing[:12]))}" if _missing else "(點不出是哪幾檔)")
+            + " —— **先看這幾檔是不是天生沒有**(新上市/停牌/下市當日),"
+              "是的話重跑整條因子鏈也補不出來;不是才 via-vdffetch(3a/3b 因子段)後複判)")
     else:
         chk("⑨ 市場寬度句(批192/538:features_daily 最新完整日聚合庫取+**逐列對得起來**"
         "(有因子 + 天生算不出=該日在庫;上市未滿 20 天算不出 20 日均線,不是漏算)"
