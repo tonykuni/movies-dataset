@@ -404,6 +404,31 @@ def stats() -> dict:
 
 def selftest() -> int:
     print(f"=== SuperAccel SUP_MDL737 v{Path(__file__).stem.rsplit(chr(95)+chr(118), 1)[-1]} · 離線九檢 ===")
+    # 批718:解析序要印在**預設那條路**上。批717 只印在 `--activate` 裡,
+    # 而操作員照我給的指令跑的是預設路 —— 我要他看的那兩行,他根本看不到。
+    # 一個沒被印出來的診斷等於沒有做:L50 那盞紅只在工作站會亮(容器 find_spec 是 False),
+    # 這兩行是唯一能把答案送到現場的東西。
+    import importlib.util as _ilu737
+    import re as _re737
+    try:
+        _talib_live = _ilu737.find_spec("talib") is not None
+    except Exception:
+        _talib_live = False
+    _first = next((c for c in CEL_CANDIDATES if (VIA / "supportive modules" / c).is_file()), None)
+    _ft = ""
+    if _first:
+        try:
+            _ft = (VIA / "supportive modules" / _first).read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            _ft = ""
+    _rx737 = "_si" + r"\(\s*[\"']talib[\"']\s*\)" + r"|^\s*import\s+talib\b"
+    _first_talib = bool(_re737.search(_rx737, _ft, _re737.M))
+    print(f"  [註] 解析序 CEL_CANDIDATES:{list(CEL_CANDIDATES)}")
+    print(f"  [註] 解析首位(執行期真的會載的那一本):{_first or chr(42) * 2 + chr(19968)}")
+    _verdict = ("**L50 活違規** ← 工作站那盞紅就是這一條" if (_first_talib and _talib_live)
+                else "L50 合規" if not _first_talib else "惰性曝險(本境未裝 talib,未活化)")
+    print(f"  [註] L50:首位帶 talib 路徑={_first_talib} · 本境 find_spec(talib)={_talib_live}"
+          f"  → {_verdict}")
     import os
     checks = []
     # ① 平行 map 保序+例外隔離
