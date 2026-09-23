@@ -9927,8 +9927,15 @@
       "category": "一鍵啟動",
       "component": "側線 2026-09-23 第三段 出貨前自修(主線批號由併線的手指定 L25):VDF_ENG093 v0100 兩行 flush(Invoke-VIAPython 把 stdout 導到暫存檔,區塊緩衝;不 flush 網址等行程結束才落檔)· status 頁路徑獨佔一行絕對路徑 · 自測 +⑨(照 Invoke-VIAPython 導檔、去 PYTHONUNBUFFERED)· Open-VIA-VDF-v0100.ps1 改從 stdout 取網址/頁路徑交短令冊 via-open(只走瀏覽器 exe;VIA_NO_OPEN=1 下 webbrowser 靜默不開,.html 預設程式=VS Code)· 一行指令與 .cmd 改點源(& 跑時 Invoke-VIAPython 不是 global:,跑完就消失)· -NoUi 時第 ④ 步頁只落檔不跳 · 改名 Open-VIA-VDF(functional modules/VDF 已有 Start-VIA-VDF-v0101~v0104 一族,免撞族名 L04;全部遠端分支無同名)· Z140",
       "code": "容器實測:ENG093 自測 9/9(無回送介面 6 綠 + 2 NODATA);突變測拿掉 flush → ⑨ 轉紅;照工作站緩衝跑的無頭 Chromium 三條路決定檔完全相同、錯權杖 403;狀況頁「頁:」行以 Start 腳本同一條正則取得、路徑存在;模板章稽核 pass;正則清冊交 CGC_MDL115 重建 1282 條、ssot 驗收 PASS;registry-sync 變更 34(皆 ENG093 行號)。容器設 PYTHONUNBUFFERED=1 曾讓第一輪測試誤綠(Z140)。.ps1/.cmd 待工作站第一次實跑(Z139)。"
+    },
+    {
+      "ts": "2026-09-23 23:10",
+      "op": "FIX",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 工作站第一次實跑後自修(主線批號由併線的手指定 L25;操作員「實測自測自修自完成」):工作站畫面證實 ENG093 網址行即時到、via-open 叫起 msedge;模板章首載即炸(Z137 實證:Celeritas 正主 StrictMode 下讀還沒設的 $script:CeleritasPS7 → New-Module 失敗、紅字;第一個錯印成最後一個)。Open-VIA-VDF-v0101.ps1 · Invoke-VIA-VdfFetch-v0106.ps1(新版;v0100 / v0105 留作版史 L04)換同一段載法:模組 scope 先設 CeleritasPS7 / OFS / PSNativeCommandArgumentPassing · -RestoreOnly 只載函式 · 先試拍快照(拍不到不起跑)· 起跑後驗已套且有快照 · 失敗依快照還原 · 錯誤不噴紅字、印真正第一個;Open v0101 另包 try/finally(Ctrl+C 也還原)、開頁後講明去工作列找瀏覽器。正主不改(Celeritas 線;三行修法寫進 Z137)",
+      "code": "容器實測:兩支新 .ps1 模板章稽核 pass;Celeritas 產出契約閘 .ps1 帶模板章 5 · 基線外新缺 0;PowerShell 括號絆線(容器無 pwsh 的替代)工作站真跑過的 v0100 · v0105 · 短令冊 v0242 OK、兩負控抓到、v0101 · v0106 OK;兩支載法逐字相同(45 行);v0105→v0106 只差載法與檔頭;ENG093 9/9(③ 讀 v0106 param);門 31/31;門單元測 34/34。容器無 pwsh:Celeritas 是否真的「已套」待工作站再跑一次(Z137/Z139)。"
     }
   ],
-  "updated_at": "2026-09-23 22:40",
+  "updated_at": "2026-09-23 23:10",
   "batch": "批695"
 }

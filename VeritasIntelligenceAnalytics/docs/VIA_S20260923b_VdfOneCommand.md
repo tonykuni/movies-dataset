@@ -11,15 +11,16 @@
 **第一次**(先把這條分支拉進工作站那棵樹,再開;整行貼進任何 pwsh 7 視窗):
 
 ```powershell
-$VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics"; git -C $VIA pull --no-edit https://github.com/tonykuni/movies-dataset claude/busy-bell-97sa4f; . "$VIA\Open-VIA-VDF-v0100.ps1"
+$VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics"; git -C $VIA pull --no-edit https://github.com/tonykuni/movies-dataset claude/busy-bell-97sa4f; . (Get-ChildItem "$VIA\Open-VIA-VDF-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName
 ```
 
 **之後每次**(任何 pwsh 7 視窗、任何資料夾):
 
 ```powershell
-. "$VIA\Open-VIA-VDF-v0100.ps1"
+. (Get-ChildItem "$VIA\Open-VIA-VDF-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName
 ```
 
+- 這一行永遠開最新一版(今天是 `Open-VIA-VDF-v0101.ps1`;寫死版號也行,只是出新版要跟著改)。
 - 最前面是**一個點、一個空白**(點源)。這樣短令冊才會留在這個視窗,跑完 `via-*` 照常能打。
   用 `&` 也能跑完四步,只是冊只活在腳本裡;沒有 `$PROFILE` 載冊的視窗,跑完會提醒你改用點源。
 - 新開的視窗還沒有 `$VIA`:把 `$VIA` 換成完整路徑(上面第一次那一行已經設好)。
@@ -65,6 +66,7 @@ $VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnal
 | 資料庫狀況頁(合成目錄,10 張表) | 分類燈、增量缺口、逐表都在;零外部資源;rc 2(資料落後,不是壞掉);「頁:」那一行用一鍵腳本同一條正則取得到,路徑存在 |
 | 模板章稽核(兩支新 .ps1) | joined · restore · requires7 全到 · verdict pass |
 | 格子 | 一鍵啟動台自測 OK;資料庫狀況頁在容器 SKIP(容器沒有目錄,rc 3 = 環境缺件);你的機器上有目錄就會是 OK |
+| PowerShell 括號絆線(容器沒有 pwsh 的替代:跳過註解、各種字串、here-string、`$(...)`) | 工作站 pwsh 真跑過的 v0100 · v0105 · 短令冊 v0242 全 OK;兩個負控(少一個 `}`、多一個 `(`)都抓到;v0101 · v0106 OK |
 | VCGC · 契約 · SSOT 驗收 | 36/36 · 19/19 · PASS(正則清冊 1282 條,交正主 CGC_MDL115 重建) |
 
 **沒實測到的一件**:容器沒有 pwsh,`Open-VIA-VDF-v0100.ps1` 與 `Open-VIA-VDF.cmd` 在這裡沒真跑過(Z139)。
@@ -84,6 +86,42 @@ $VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnal
 
 ---
 
-## 六 · 還原
+## 六 · 工作站第一次實跑(2026-09-23)→ v0101
 
-刪掉 `Open-VIA-VDF-v0100.ps1`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。既有檔一支都沒動。
+你貼回的畫面:
+- 網址行即時到(flush 修對了),`via-open` 叫起 msedge 開了問參數頁;引擎停在「等你按」(257 秒)。
+- **模板章首載就炸**(掉球 Z137 實證):`無法擷取變數 '$script:CeleritasPS7'，因為它尚未設定`。
+  正主 `supportive modules/ps7/VeritasCeleritas.PS7.ps1` 第 18 行開 StrictMode,第 24 行就讀還沒設的變數;快照還讀 `$OFS`(預設不存在)與
+  `$PSNativeCommandArgumentPassing`(7.3 起才有)。正主自己的 `VeritasCeleritas.PS7.Template.ps1` 走同一條路,同樣會炸。
+- 「正主第一個錯」印成了最後一個錯(`$Error[0]`)。
+
+修法(只動本側線自己的檔;正主是 Celeritas 線的,留提案):
+- `Open-VIA-VDF-v0101.ps1` 與 `Invoke-VIA-VdfFetch-v0106.ps1`(v0100 / v0105 留作版史)換同一段載法:
+  1. 先在模組 scope 設好那三個變數。
+  2. `-RestoreOnly` 只載函式,不自動起跑。
+  3. 先試拍快照,拍不到就不起跑。
+  4. 起跑,驗「已套且有快照」;沒套上就依快照還原。
+  5. 錯誤不噴紅字,印真正的第一個。
+- `Open-VIA-VDF-v0101.ps1` 起跑後整段包 try/finally:按 Ctrl+C 也還原。
+- 頁交給瀏覽器之後多印一行:沒跳到最前面就點工作列的瀏覽器。
+
+v0101 起模板章第一次真的套上:跑的時候本行程優先權 AboveNormal、本執行緒文化 Invariant、主控台 UTF-8、進度條 Minimal。
+跑完、Ctrl+C、關窗都依快照還原;只動這個行程。
+
+給 Celeritas 線的正主修法(三行;改 .ps1 要 L70 許可):
+
+```powershell
+# 第 24 行
+if ($null -eq (Get-Variable -Name CeleritasPS7 -Scope Script -ValueOnly -ErrorAction SilentlyContinue)) {
+# Get-CeleritasSnapshot 裡的兩個鍵
+OFS               = (Get-Variable -Name OFS -ValueOnly -ErrorAction SilentlyContinue)
+NativeArgs        = (Get-Variable -Name PSNativeCommandArgumentPassing -ValueOnly -ErrorAction SilentlyContinue)
+```
+
+下一次跑請貼回兩行:`[Celeritas] …`(應為「本行程減壓已套」)與最後一行 `=== [Open-VIA-VDF] 畢 …`。
+
+---
+
+## 七 · 還原
+
+刪掉 `Open-VIA-VDF-v0100.ps1`、`Open-VIA-VDF-v0101.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1`(短令冊自動退回 v0105)、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。既有檔一支都沒動。

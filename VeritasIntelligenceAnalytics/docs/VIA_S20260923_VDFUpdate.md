@@ -127,7 +127,7 @@ via-vcgc ssot verify          # 驗收(含深檢):自動那一半到位 = rc0;�
 
 ## 七 · 工作站貼上區
 
-**一個指令開 VDF(第三段):** 拉到這條分支之後,`. "$VIA\Open-VIA-VDF-v0100.ps1"`(最前面一個點 = 點源,短令冊才留在視窗)或雙擊 `Open-VIA-VDF.cmd`,先跳問參數頁、跑完跳資料庫狀況頁;說明在 `docs/VIA_S20260923b_VdfOneCommand.md`。
+**一個指令開 VDF(第三段):** 拉到這條分支之後,`. (Get-ChildItem "$VIA\Open-VIA-VDF-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName`(最前面一個點 = 點源,短令冊才留在視窗;永遠開最新一版)或雙擊 `Open-VIA-VDF.cmd`,先跳問參數頁、跑完跳資料庫狀況頁;說明在 `docs/VIA_S20260923b_VdfOneCommand.md`。
 
 你貼回的四次整份版史,原因只有一個:視窗裡 `via-vcgc` 讀的那棵樹還沒拉到這條分支,最新的還是 v0125,它沒有 `ssot` 這個動詞。
 `via-*` 讀的是 Register 設的 `$VIA`,**跟視窗現在在哪個資料夾無關**(你那時在 `C:\Users\tonyk\VIA-VDF-VRN`,沒關係)。
