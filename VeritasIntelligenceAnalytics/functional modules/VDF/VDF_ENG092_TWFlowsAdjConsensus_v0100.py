@@ -27,7 +27,8 @@ VDF_ENG092_TWFlowsAdjConsensus v0100 — 籌碼流量 · 調整後四價 · 共�
 
 律:唯讀冊 · 網路只走統包(批115 全導入令)· 雙閘未開=rc4 GATED 不是壞掉 ·
 零彈窗 · 不編端點 · 不把「算的」講成「抓的」。
-用法:python3 VDF_ENG092_TWFlowsAdjConsensus_v0100.py [probe|--selftest]
+用法:python3 VDF_ENG092_TWFlowsAdjConsensus_v0100.py [run|probe|--selftest]
+     run   = **分開擷取後整合**(操作員 2026-09-23 令);閘沒開 rc4 零出網
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(graceful 缺席零影響) =====
@@ -170,6 +171,106 @@ def probe(limit: int = 0) -> dict:
     return {"state": "OK", "rows": out, "unknown": [r for r in rows if not r["url"]]}
 
 
+def fetch_one(row: dict, nt=None) -> dict:
+    """**一道一擷取**(操作員令「可分開擷取後整合」)。
+
+    每一道各自回自己的態,**互不牽連** —— 一道敗不會把其他道拖下水。
+    態:OK / GATED / ABSENT / NOT_WIRED(路徑未通,不是壞掉)/ FAIL:…
+    """
+    st = row.get("state")
+    if st in ("UNKNOWN", "DEAD") or not row.get("url"):
+        return {**row, "fetch": "NOT_WIRED", "rows": 0,
+                "why": "路徑未通(UNKNOWN=不知道 · DEAD=推過被打掉)——**不是壞掉,是還沒接上**"}
+    nt = nt if nt is not None else _via_net()
+    if nt is None or not hasattr(nt, "http_json"):
+        return {**row, "fetch": "ABSENT", "rows": 0, "why": "統包網路工具缺席(誠實)"}
+    try:
+        r = nt.http_json(row["url"], timeout=30) or {}
+    except Exception as exc:
+        return {**row, "fetch": f"FAIL:{type(exc).__name__}", "rows": 0, "why": str(exc)[:70]}
+    s = str(r.get("state") or "")
+    if s == "DENY":
+        return {**row, "fetch": "GATED", "rows": 0, "why": "雙閘未開,零出網(不是壞掉)"}
+    if s != "OK":
+        return {**row, "fetch": "FAIL", "rows": 0, "why": str(r.get("note") or s)[:70]}
+    data = r.get("data")
+    recs = data if isinstance(data, list) else ([data] if data else [])
+    return {**row, "fetch": "OK", "rows": len(recs), "data": recs, "why": ""}
+
+
+def fetch_all(limit: int = 0) -> dict:
+    """逐道擷取,**一道敗不中止其他道**。回 {dataset_key: 結果}。"""
+    rows = [r for r in endpoints() if not r["dataset"].endswith("#alt")]
+    if limit:
+        rows = rows[:limit]
+    nt = _via_net()
+    out, t0 = {}, time.time()
+    for i, r in enumerate(rows, 1):
+        key = f"{r['market']}.{r['dataset']}"
+        try:
+            out[key] = fetch_one(r, nt)
+        except Exception as exc:                  # 單道例外也要被關住,不然它會吃掉整跑
+            out[key] = {**r, "fetch": f"FAIL:{type(exc).__name__}", "rows": 0,
+                        "why": str(exc)[:70]}
+        print(f"  [進度] {i}/{len(rows)} · {i * 100.0 / max(len(rows), 1):.0f}%"
+              f" · 已 {time.time() - t0:.0f}s · 擷取 {key} → {out[key]['fetch']}", flush=True)
+    return out
+
+
+def integrate(fetched: dict) -> dict:
+    """**再整合**。逐欄講明它是抓來的還是算來的,以及哪一道沒接上。
+
+    不做的事:不把 NOT_WIRED 當成 0、不把市場合計當成個股別、不把算的講成抓的。
+    """
+    B = book()
+    tally = {}
+    for v in fetched.values():
+        tally[v["fetch"]] = tally.get(v["fetch"], 0) + 1
+    wired = {k: v for k, v in fetched.items() if v["fetch"] == "OK"}
+    cols = {
+        "identity": ["code", "name", "market", "yf_ticker"],
+        "daily_from_exchange": ["open", "high", "low", "close", "volume", "turnover",
+                                "transactions"],
+        "adj": list((B.get("adj_ohlc") or {}).get("cols") or []) + ["adj_method"],
+        "flows": ["margin_balance", "short_balance", "day_trade_shares", "day_trade_value"],
+        "institutional": ["foreign_net", "trust_net", "dealer_net"],
+        "derived": ["market_cap", "shares_outstanding"],
+        "consensus_db": list((B.get("consensus_db") or {}).get("tables") or []),
+    }
+    provenance = {
+        "daily_from_exchange": "EXCHANGE(TWSE/TPEX OpenAPI 直接給)",
+        "flows": "EXCHANGE(融資券 MI_MARGN · 當沖 TWTB4U —— 批721 實測證實)",
+        "institutional": "NOT_WIRED(T86 推過被打掉;**不可以拿市場合計冒充個股別**)",
+        "adj": "YAHOO(四價;auto_adjust 或比例法,逐列記 adj_method)",
+        "derived": "**DERIVED**(市值 = 收盤價 × 發行股數;交易所不給市值)",
+        "consensus_db": "獨立庫 vdf_consensus.duckdb(更新節奏與日行情不同,混庫會讓"
+                        "『今天沒更新』看起來像『今天沒有料』)",
+    }
+    return {"tally": tally, "wired": sorted(wired), "columns": cols,
+            "provenance": provenance,
+            "not_wired": [k for k, v in fetched.items() if v["fetch"] == "NOT_WIRED"],
+            "state": "GREEN" if tally.get("OK") else
+                     ("GATED" if tally.get("GATED") else "NODATA")}
+
+
+def run() -> int:
+    """分開擷取 → 再整合(操作員 2026-09-23 令)。閘沒開回 rc4,一個位元組不出網。"""
+    g = gate()
+    if not g.get("open"):
+        print("  [GATED] 雙閘未開 —— **這不是壞掉**。要開請操作員自己貼:")
+        print("       $env:VIA_NET_CONSENT='YES'")
+        print("       $env:VIA_SCRAPE_CONSENT='<你自己的 token>'")
+        return 4
+    f = fetch_all()
+    r = integrate(f)
+    print(f"  [擷取] {r['tally']}")
+    print(f"  [接上] {len(r['wired'])} 道:{r['wired']}")
+    print(f"  [未接] {r['not_wired']}(**NOT_WIRED ≠ 0 ≠ 壞掉**)")
+    for k, v in r["provenance"].items():
+        print(f"   · {k:20} {v}")
+    return 0 if r["state"] == "GREEN" else (4 if r["state"] == "GATED" else 2)
+
+
 def report() -> int:
     B = book()
     rows = endpoints(B)
@@ -274,6 +375,44 @@ def selftest() -> int:
         f"(DEAD {len(dead)} 道 · 都帶錯訊與下一批候選 "
         f"{all((v.get('next_candidates') or []) for _, _, v in dead) if dead else '無 DEAD'})")
 
+    # ⑩ 分開擷取:一道敗**不中止**其他道(操作員令「可分開擷取後整合」的全部重點)
+    class _FakeNet:
+        def http_json(self, url, timeout=30):
+            if "MI_MARGN" in url:
+                raise RuntimeError("假裝這一道炸了")
+            if "STOCK_DAY_ALL" in url:
+                return {"state": "OK", "data": [{"a": 1}, {"a": 2}]}
+            return {"state": "OK", "data": [{"a": 1}]}
+
+    fake = _FakeNet()
+    got = {}
+    for r in [x for x in endpoints() if not x["dataset"].endswith("#alt")]:
+        k = f"{r['market']}.{r['dataset']}"
+        try:
+            got[k] = fetch_one(r, fake)
+        except Exception as exc:
+            got[k] = {**r, "fetch": f"FAIL:{type(exc).__name__}", "rows": 0}
+    boom = [k for k, v in got.items() if str(v["fetch"]).startswith("FAIL")]
+    fine = [k for k, v in got.items() if v["fetch"] == "OK"]
+    chk("⑩ **分開擷取:一道敗不中止其他道**(操作員令「可分開擷取後整合」)。"
+        "餵一個會在融資券那一道炸掉的假網路工具:那一道要 FAIL,"
+        "**其餘每一道照樣拿到料**。**負控**:如果整跑被一道拖死,這條令就沒落地",
+        len(boom) == 1 and len(fine) >= 4
+        and got["twse.daily_quote"]["rows"] == 2,
+        f"(炸 {len(boom)} 道 · 仍拿到料 {len(fine)} 道)")
+
+    # ⑪ 再整合:逐欄講明抓來的還是算來的,未接上的不准當成 0
+    ig = integrate(got)
+    chk("⑪ **再整合要逐欄講明出處**:交易所直接給的、Yahoo 來的、**算出來的**、"
+        "還沒接上的,四種要分得開。**負控**:三大法人未接上時只能是 NOT_WIRED —— "
+        "不可以當成 0(0 是『今天沒人買賣』,NOT_WIRED 是『我還沒接上』),"
+        "更不可以拿市場合計冒充個股別",
+        "NOT_WIRED" in ig["provenance"]["institutional"]
+        and "冒充" in ig["provenance"]["institutional"]
+        and "DERIVED" in ig["provenance"]["derived"]
+        and any(k.endswith("institutional") for k in ig["not_wired"]),
+        f"(未接 {ig['not_wired']} · 市值 DERIVED)")
+
     n = len(ran) - len(fails)
     print(f"  [計] {len(ran)} 檢 OK {n} · FAIL {len(fails)}")
     return 1 if fails else 0
@@ -283,6 +422,8 @@ def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
         return selftest()
+    if a and a[0] == "run":
+        return run()
     if a and a[0] == "probe":
         r = probe()
         print(f"  [探針] {r['state']} · {r.get('why', '')}")
