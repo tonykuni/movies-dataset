@@ -101,6 +101,8 @@ via-vcgc ssot verify          # 驗收(含深檢):自動那一半到位 = rc0;�
 | Invoke v0105 模板章稽核(正主 `xps_audit`) | joined · restore · requires7 全到 · forbidden 0 · verdict pass |
 | VCGC v0127 自測 | 36/36(+㊱ 不認得的動詞只印用法段,22 行) |
 | 對接口讀新啟動器 | `launcher_restores` = True;對接口 31/31 · 單元測試 34/34 · 契約 19/19 |
+| 併入 main 0b457a85(PR #75)之後 | `ssot` 自動改委派規則樞紐 SUP_MDL749 v0113 · 正則清冊共用 704→705 再交正主重建,驗收 PASS · VCGC 36/36 · 格子相關 9 站 OK 8 |
+| 唯一的紅 | 「Celeritas 產出契約實跑」:PR #75 新增的 `functional modules/VRN/tests/test_broker_source_zones.py` 沒有加速器橋;**乾淨 main 同紅**(Z138),不是本側線造成 |
 | 格子逐站(新改 16 站) | OK 15 · SKIP 1(啟動就緒要工作站家族境) |
 | 全格子 350 站 | OK 325 · FAIL 12 · SKIP 13 · TIMEOUT 0(815 秒;平行段撞到單寫者庫的站,序跑複判過) |
 | 12 紅逐站複驗 | **每一站在 main 原碼也紅**(乾淨 main,或 main 原碼跑同一份本地料):工具升階梯 · 治理台 UI Matrix · 首頁文字擷取 · VRN 六層鏈廿五檢與實跑 · VRN 統一報告引擎 · U/I 畫面統一閘 · 研報欄位規格實跑 · CGC_MDL120/143/144 · 系統 API 三態。本側線新增的紅 0 |
@@ -173,4 +175,4 @@ $env:VIA_NET_CONSENT='YES'
 
 ## 八 · 掉球
 
-新增 Z120–Z137(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法(v0105 先在本檔做了,正主側仍待)· Celeritas 正主首載在自己的 StrictMode 下可能讀到未設變數(Z137,待工作站那一行)。
+新增 Z120–Z138(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法(v0105 先在本檔做了,正主側仍待)· Celeritas 正主首載在自己的 StrictMode 下可能讀到未設變數(Z137,待工作站那一行)。
