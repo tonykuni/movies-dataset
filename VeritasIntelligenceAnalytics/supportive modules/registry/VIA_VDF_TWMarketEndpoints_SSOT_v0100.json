@@ -20,7 +20,8 @@
           "成交筆數",
           "開高低收"
         ],
-        "evidence": "批719 工作站實跑:TWSE=1078 檔"
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1381 列",
+        "rows_probed": 1381
       },
       "per_pbr_yield": {
         "path": "/exchangeReport/BWIBBU_ALL",
@@ -30,47 +31,72 @@
           "股價淨值比",
           "殖利率"
         ],
-        "evidence": "MDL004 v0100 原件已在用"
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1082 列",
+        "rows_probed": 1082
       },
       "institutional": {
         "path": "/fund/T86",
-        "state": "CANDIDATE",
+        "state": "DEAD",
         "zh": "三大法人買賣超日報",
         "gives": [
           "外資",
           "投信",
           "自營商",
           "買賣超"
-        ]
+        ],
+        "probe_error": "Expecting value: line 1 column 1 (char 0)(回的不是 JSON —— 空的或 HTML)",
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):0 列,證偽",
+        "why_dead": "**這一道是我推的路徑,探針把它打掉了 —— 這就是 CANDIDATE 存在的意義。**推錯不丟臉,推錯又寫成事實才丟臉。原路徑原樣留著當留痕,不刪。",
+        "next_candidates": [
+          {
+            "path": "/fund/BFI82U",
+            "zh": "三大法人買賣金額統計表(市場合計)",
+            "state": "CANDIDATE",
+            "note": "若 T86 是個股別、BFI82U 是市場合計,兩者給的粒度不同 —— 要的是個股別買賣超"
+          },
+          {
+            "path": "/fund/T86",
+            "zh": "同一路徑帶日期參數再試",
+            "state": "CANDIDATE",
+            "note": "多數 TWSE 報表端點要 `?date=YYYYMMDD`;空參數回非 JSON 是這一類的典型症狀"
+          }
+        ],
+        "honest": "**下一輪探針要去打這兩條。** 在打通之前,三大法人這一欄一律 NOT_WIRED,不可以拿市場合計去冒充個股別。"
       },
       "margin": {
         "path": "/exchangeReport/MI_MARGN",
-        "state": "CANDIDATE",
+        "state": "VERIFIED",
         "zh": "融資融券餘額",
         "gives": [
           "融資餘額",
           "融券餘額",
           "增減"
-        ]
+        ],
+        "rows_probed": 1297,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1297 列"
       },
       "day_trade": {
         "path": "/exchangeReport/TWTB4U",
-        "state": "CANDIDATE",
+        "state": "VERIFIED",
         "zh": "當日沖銷交易標的及統計",
         "gives": [
           "當沖張數",
           "當沖金額"
-        ]
+        ],
+        "rows_probed": 1233,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1233 列"
       },
       "market_total": {
         "path": "/exchangeReport/FMTQIK",
-        "state": "CANDIDATE",
+        "state": "VERIFIED",
         "zh": "市場成交資訊(全市場合計)",
         "gives": [
           "成交金額",
           "成交股數",
           "發行量加權股價指數"
-        ]
+        ],
+        "rows_probed": 16,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):16 列"
       }
     }
   },
@@ -85,7 +111,8 @@
           "成交值",
           "開高低收"
         ],
-        "evidence": "批719 工作站實跑:TPEX=890 檔"
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):11696 列",
+        "rows_probed": 11696
       },
       "per_pbr": {
         "path": "/tpex_mainboard_peratio_analysis",
@@ -94,7 +121,8 @@
           "本益比",
           "股價淨值比"
         ],
-        "evidence": "MDL004 v0100 原件已在用"
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):889 列",
+        "rows_probed": 889
       },
       "institutional": {
         "path": "",
@@ -149,5 +177,19 @@
     "why_both_kept": "**兩次裁定都留著。** 只記最後一次,下一個人會看不出這裡曾經有過欄位、也看不出它是被裁掉的還是從來沒有過。留痕的重點不是誰對,是**這裡發生過一次改變**。",
     "reduction_check": "這是**減**,所以動手前先量:全樹 grep `sma_20|sma_60|sma_240|avg_vol_*`,排除收容/快照/退役後,**只有 MDL004 自己**在讀 —— 零下游。量完才刪,不是刪完才說沒人在用。",
     "kept": "ytd_pct 與 market_cap / shares_outstanding **不在這道令裡**,照留。"
+  },
+  "probe_log": {
+    "b721": {
+      "ts": "2026-09-23",
+      "who": "操作員工作站(雙閘開)",
+      "result": {
+        "VERIFIED": 7,
+        "DEAD": 1,
+        "UNKNOWN": 3
+      },
+      "gained": "CANDIDATE 4 道裡 **3 道證實**:融資融券(MI_MARGN 1297 列)· 當沖(TWTB4U 1233 列)· 市場成交資訊(FMTQIK 16 列)。這三道從此是有憑據的,不是我推的。",
+      "lost": "三大法人(T86)證偽 —— 回的不是 JSON。",
+      "note": "工作站流量經本機 127.0.0.1 代理(urllib3 InsecureRequestWarning);這不影響本探針的判讀,但記一筆:**那些警告不是引擎發的**。"
+    }
   }
 }

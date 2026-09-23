@@ -123,6 +123,14 @@ def endpoints(B: dict | None = None) -> list:
                          "url": (base + p) if p else "",
                          "state": d.get("state") or ("UNKNOWN" if not p else "CANDIDATE"),
                          "zh": d.get("zh") or name})
+            # 被探針打掉的那一道,把冊上登記的**下一批候選**也攤出來 ——
+            # 探針要打的就是它們。證偽之後不補候選,這道就永遠停在 DEAD。
+            for alt in (d.get("next_candidates") or []):
+                ap = alt.get("path") or ""
+                rows.append({"market": mkt, "dataset": f"{name}#alt",
+                             "url": (base + ap) if ap else "",
+                             "state": alt.get("state") or "CANDIDATE",
+                             "zh": alt.get("zh") or ""})
     return rows
 
 
@@ -253,6 +261,18 @@ def selftest() -> int:
         and ("requests." + "get") not in code
         and ("urllib.request." + "urlopen") not in code,
         "(橋在 · 零直連)")
+
+    dead = [(mkt, k, v) for mkt in ("twse", "tpex")
+            for k, v in ((B.get(mkt) or {}).get("datasets") or {}).items()
+            if v.get("state") == "DEAD"]
+    chk("⑨ **被探針打掉的道要留成 DEAD,不是刪掉也不是留在 CANDIDATE**:"
+        "要帶得出 `probe_error`(回的到底是什麼)、`evidence`(誰在哪一天打掉的),"
+        "而且**原路徑原樣留著** —— 推錯不丟臉,推錯又把證據抹掉才丟臉。"
+        "**負控**:DEAD 一定要補 `next_candidates`,不然這道就永遠停在死路上",
+        all(v.get("probe_error") and v.get("evidence") and v.get("path")
+            and (v.get("next_candidates") or []) for _, _, v in dead) if dead else True,
+        f"(DEAD {len(dead)} 道 · 都帶錯訊與下一批候選 "
+        f"{all((v.get('next_candidates') or []) for _, _, v in dead) if dead else '無 DEAD'})")
 
     n = len(ran) - len(fails)
     print(f"  [計] {len(ran)} 檢 OK {n} · FAIL {len(fails)}")
