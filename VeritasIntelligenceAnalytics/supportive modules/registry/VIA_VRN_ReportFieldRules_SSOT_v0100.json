@@ -1,0 +1,327 @@
+{
+  "schema": "VIA_VRN_ReportFieldRules_SSOT_v0100",
+  "batch": "批713",
+  "ruled_by": "操作員 2026-09-23 本對話逐項指名(檔名括號式評等 / 台北香港電話 / 研究員職稱表 / 券商網域補遺)",
+  "why": "這四把尺樹上原本沒有,或有而掃不到。規格入冊、實作走 CGC_MDL182;不動 ENG086/RuleHub —— PR #75 正佔著它們的下一號(避免跨分支撞號,批708/711 實錄)。",
+  "filename_rating_slot": {
+    "why": "CTBC/凱基這類檔名把評等放在括號裡、代號後面:`瑞基(4171,NR_未評等)`、`欣銓(3264,B_買進)`。正本 safe_rating 要**線索詞**(「評等」)才判,所以這種**位置式**完全沒進掃描面。位置本身就是證據,比線索詞更強。",
+    "rx": "[（(]\\s*(?P<code>\\d{4,6}[A-Za-z]{0,2})\\s*[,，]\\s*(?P<slot>[^)）]{1,24})\\s*[)）]",
+    "slot_split_rx": "[_＿/／,，]",
+    "not_in_dict": "UNRATED_SLOT",
+    "not_in_dict_why": "槽位取得出來但那個詞不在評等冊上(例如 `Note` 是**報告類型**不是評等)。誠實回 UNRATED_SLOT + 原文,**不硬塞一個評等**——把報告類型講成評等等於憑空造一個沒有人裁定過的評等。",
+    "slot_split_rx_as_given": "[_＿/／]",
+    "slot_split_why": "批713 實測 `晶心科(6533,N,中立)-CTBC251208`:槽位是**三段式**`代號,短碼,評等`,原本只切 `_` / `/`,整個槽被當成一個詞 `N,中立` → UNRATED_SLOT。加切逗號後 `中立` 對得上冊。**逐 token 試,命中即取;全不中才 UNRATED_SLOT**。",
+    "shortcode_note": "括號槽是**受限命名空間**(代號後面那一格),所以 `N` / `B` / `NR` 這種一兩碼在這裡認得 —— 批678 短碼律管的是**內文**別名,不是這裡。內文一律不收。"
+  },
+  "analyst_titles": {
+    "why": "姓名出現在電話/電郵/職稱的**上方**——所以要先認得出職稱,才框得出姓名那一行。",
+    "zh": [
+      "總體經濟分析師",
+      "助理研究員",
+      "產業分析師",
+      "產業研究員",
+      "研究部主管",
+      "策略分析師",
+      "董事總經理",
+      "資深分析師",
+      "副總經理",
+      "投資顧問",
+      "研究主管",
+      "研究協理",
+      "分析師",
+      "副總裁",
+      "研究員",
+      "研究部",
+      "協理",
+      "經理",
+      "襄理"
+    ],
+    "en": [
+      "Executive Director",
+      "Research Associate",
+      "Managing Director",
+      "Head of Research",
+      "Research Analyst",
+      "Equity Analyst",
+      "Sector Analyst",
+      "Senior Analyst",
+      "Vice President",
+      "Strategist",
+      "Associate",
+      "Economist",
+      "Director",
+      "Analyst",
+      "VP"
+    ],
+    "alias_note": "正本 contact.proximity 只寫了三個字樣(分析師 / Analyst / 研究員),**沒有表**。本冊補的是那張表,不是改那條鄰域規則。",
+    "four_state": {
+      "HIT": "命中職稱",
+      "ABSENT": "無職稱字樣",
+      "MISS": "有職稱樣但不在表上(誠實記原文,不硬塞)"
+    },
+    "ruled_by_addendum": "操作員 2026-09-23 逐字給定的中英職稱字典,與批713 原表取聯集(只增不減)",
+    "order_why": "長的排前面 —— `資深分析師` 要在 `分析師` 之前試,不然只會命中後面那三個字。"
+  },
+  "broker_domains_addendum": {
+    "why": "實測 analyst_from_email('…@ctbcsecurities.com') 的 broker 回空,而 kgi.com/kgi.com.tw 正確。只補量到缺的,不重寫網域冊(只增不減)。",
+    "map": {
+      "ctbcsecurities.com": "CTBC",
+      "ctbcbank.com": "CTBC",
+      "megabank.com.tw": "MEGA",
+      "entrust.com.tw": "HUANAN",
+      "cathaysec.com.tw": "CATHAY",
+      "citi.com": "CITI",
+      "morganstanley.com": "MORGAN STANLEY",
+      "gs.com": "GOLDMAN SACHS",
+      "ubs.com": "UBS",
+      "ctbcsec.com": "CTBC",
+      "kgi.com": "KGI",
+      "kgi.com.tw": "KGI",
+      "daiwacm-cathay.com.tw": "DAIWA-CATHAY",
+      "jpmorgan.com": "J.P. MORGAN",
+      "ctbcsis.com": "CTBC",
+      "cathayfut.com.tw": "CATHAY"
+    },
+    "alias_source": "functional modules/VRN/registry/VRN_BROKER_LIST_v01.json(正本券商冊)+ VRN_FieldRules#rules.broker.extra_table",
+    "deny_note": "本補遺**不收**批678 拒絕清單那幾條;量到缺的台灣券商與該清單零交集。清單內容看批678 那一本,本冊不列。",
+    "ruled_by_addendum": "操作員 2026-09-23 給定的 broker_mapping 六條(citi / morganstanley / gs / ubs / ctbcsec / kgi)。`kgi` 正本本來就認得,列在這裡是**對帳留痕**不是新增。陸券一條都沒有,與批678 拒絕清單 20 條零交集。",
+    "ruled_by_b714": "批714 由 AI 裁定(LL90 同義裁定權批665 起委派;留痕:ruled_by + why)。語料=容器內 81 份真研報第一頁文字(VIA_Reports/first_page_text),量到 6 個網域落在冊外。",
+    "why_each_b714": {
+      "daiwacm-cathay.com.tw": "7 次。大和資本市場與國泰的合資體,冊上兩邊各有但合資名沒有 —— 只補這一條,不改任一邊。",
+      "jpmorgan.com": "5 次。`J.P. MORGAN` 本來就是批678 的正典鍵,只是**網域沒有掛上去**。",
+      "ctbcsis.com": "4 次。中國信託(台)。**與批678 拒絕清單上那個撞名的陸券完全是兩家** —— deny_leak 早就記過這個同名陷阱,檢 ⑮ 再釘一次:擋錯人跟放錯人一樣傷。",
+      "cathayfut.com.tw": "2 次。國泰期貨,與既有 `cathaysec.com.tw` 同一家,只是期貨端網域。"
+    },
+    "unadjudicated": {
+      "cl-sec.com": "1 次。查不出是哪一家 —— **不猜**。留在這裡,誰知道誰補。"
+    },
+    "deny_domains": {
+      "ruled_by": "批714 AI 裁定(批665 委派);依據=批678 拒絕清單 20 條(陸券)",
+      "why": "實測打出來的洞:語料裡有一個**陸券研究部網域**(批678 拒絕清單上那幾家之一)進來了 2 次。拒絕閘比對的是**別名字面**,網域字根與那些別名一個都對不上 —— 它就從**網域這道側門**整個繞過閘。L20『網路只認 AegisNexus』管的是連線;這一條管的是**資料來源身分**。**本冊只記網域,不記名字**:名字在批678 那一本留痕台帳,抄過來就是第二份(而且會把清掉的東西救回來)。",
+      "map": {
+        "gfgroup.com.hk": "DENIED",
+        "gf.com.cn": "DENIED",
+        "citics.com": "DENIED",
+        "citicsf.com": "DENIED",
+        "gtja.com": "DENIED",
+        "gtjai.com": "DENIED",
+        "cicc.com": "DENIED",
+        "cicc.com.cn": "DENIED",
+        "htsec.com": "DENIED",
+        "htisec.com": "DENIED"
+      },
+      "measured": "語料裡實際出現過的是其中一條(2 次);其餘九條是同一批的常見研究部網域,**列為拒絕不是列為映射** —— 擋錯頂多少收一份,放進來就是假資料進庫。",
+      "state": "DENIED(不是查無 —— 查無是沒這條,DENIED 是有這條而且不收)",
+      "value_why": "批714 實錄:第一版把被拒者的名字寫成 map 的**值**,批679 陸券清除閘當場紅 —— 一張寫著那些正典名的鍵值表,不管標題叫『拒絕』還是『映射』,在掃描器眼裡就是**活的解析資料**。而且更糟:那個值一出現,樹上原本兩條懸空指標(指著已清掉的鍵,批702 起不算紅)**當場復活成真指標**。**我的拒絕清單把它要拒絕的東西救回來了。**改法:值一律寫 `DENIED`(那是**態**不是名字)。",
+      "names_live_where": "批678 VIA_SSOT_SynonymUnion_v0100.json#deny(20 條) —— 那一本是留痕台帳,本冊只擋不抄"
+    }
+  },
+  "broker_case_note": {
+    "why": "實測 `260914_daiwa_aspeed` 的小寫 daiwa 認得出,`260914_ubs_parade` 的小寫 ubs 認不出 —— 同樣是小寫,一個認一個不認。本冊記下這個不一致,由 CGC_MDL182 的檢釘住;**修哪一邊屬正本實作(ENG086),PR #75 在飛,先不動**。",
+    "probe_hit": "260914_daiwa_aspeed",
+    "probe_miss": "260914_ubs_parade"
+  },
+  "canonical_source": "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json(正本;canonical = VRN_ENG086_FirstPageLogicBridge_v0102,64 份真研報驗過)",
+  "standard": {
+    "why": "操作員 2026-09-23 令「檢查前兩次成功經驗他們的 ssot regex 同意字級標準」。本冊立冊前先照兩本成功冊的規矩量自己一次,量出來的缺口逐條補,補不了的寫明。",
+    "ref_1": {
+      "book": "VRN_FieldRules_SSOT_v0100.json(批628/634)",
+      "criteria": [
+        "正本指名(canonical_source)",
+        "as_given/corrected 雙欄 + 逐條 *_why",
+        "鄰域鎖(proximity):抓太多的正則不准單獨用",
+        "交叉驗證(cross_check):兩個獨立來源互證",
+        "每欄多態 four_state(不是二元)",
+        "不抄第二份(alias_source 指正本)",
+        "conflicts_known / as_given_rejected:退掉的式子也要寫理由"
+      ]
+    },
+    "ref_2": {
+      "book": "VIA_SSOT_SynonymUnion_v0100.json(批678)",
+      "criteria": [
+        "合併順序寫死:拒絕清單 → 正典 → 疊加層 → 聯集冊",
+        "only_add:既有冊一律唯讀",
+        "正規化:NFKC + casefold + 空白收斂,raw 保留原拼法",
+        "兩條車道不混(fine_of 六鍵 / coarse_of 四鍵,LL327)",
+        "短碼律:兩三字母 token 只在受限命名空間認得",
+        "逐條記帳 tally(CONFLICT/DENIED/SAME/ADD/WIDEN)",
+        "deny 清單 + deny_leak:漏網的也記名"
+      ]
+    },
+    "self_audit_b713": "首版本冊自帶五條電話正則 —— 那是**第二顆會漂移的頭**,正本 contact.corrected 早就有而且更強(裸號 `2971 6686` 正本抓得到、我那五條抓不到)。本版撤掉自帶式子,改成 alias_source 指正本,只留量得出來的一條 WIDEN。留痕不刪。"
+  },
+  "tally": {
+    "SAME": 2,
+    "ADD": 7,
+    "WIDEN": 2,
+    "CONFLICT": 0,
+    "DENIED": 0,
+    "note": "SAME=電話台/港沿用式子的骨架 · email 式照收;ADD=檔名括號式評等 · 職稱表 · 券商網域補遺 · 電話鄰域守衛 · 中文姓名機構詞擋板 · **逐 Email 獨立視窗(不串位)** · `@` 前反推英文名;WIDEN=槽位加切逗號 · 台灣區碼由 `2` 放寬到 `\\d{1,2}`(分機 `#` 原本記 WIDEN,查出操作員式子已含,退回 SAME);CONFLICT=0;DENIED=0"
+  },
+  "phone": {
+    "ruled_by": "操作員 2026-09-23 逐字給定(式子原文在 contact_block.as_given)",
+    "use": [
+      {
+        "id": "TPE",
+        "from": "contact_block.corrected.tpe_phone",
+        "grade": "HIT"
+      },
+      {
+        "id": "HK",
+        "from": "contact_block.as_given.hk_phone",
+        "grade": "HIT"
+      },
+      {
+        "id": "HK_MOBILE",
+        "from": "VRN_FieldRules_SSOT_v0100.json#rules.contact.corrected.phone_hk",
+        "grade": "WEAK_ONLY",
+        "why": "操作員新式首碼 `[23]` 只收香港**固網**;舊正本 `[2-9]` 多收 5/6/9 開頭的**手機**。只增不減 —— 舊式留著跑第二輪,但只能產 WEAK,不搶操作員那一式的判定權。"
+      }
+    ],
+    "supersedes": {
+      "book": "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json#rules.contact.corrected",
+      "keys": [
+        "phone_tw"
+      ],
+      "why": "實測操作員新式**比舊正本嚴**:舊 `phone_tw` 咬得到 `00878 2025`(六碼 ETF 代號+年),新式不咬;新式還把 `ext` / `#` / `分機` 三種分機寫法收進同一條。**正本冊一個字不改**(只增不減),但跑的是新的這一式。",
+      "narrowed": "新式原文把區碼寫死成 `2`(台北),`(03)` `(07)` 整個抓不到 —— 這一點在 corrected 放寬成 `\\d{1,2}`,其餘一字不動。"
+    },
+    "ext_note": "批713 原本自己加了一條 `#\\s*\\d{2,5}` 當分機。操作員的式子**已經把 `#` 含在裡面**,所以那一條撤掉 —— 記在這裡當留痕(WIDEN 退回 SAME)。",
+    "guard": {
+      "why": "正本那兩條**單獨用會咬錯**(批713 實測,逐條記在 known_false_positive)。正本自己對 name_cn 下過同一道鎖(『正則本身沒問題,問題是它不可以單獨用』),電話這條漏了。本冊補的是那道鎖,**正本式子一個字不改**。",
+      "rule": [
+        "① 先跑 phone_tw,命中的字元區間遮掉;剩下的字串才跑 phone_hk(同一支電話不得判成兩個地點)",
+        "② 命中要**收得下**,同一行得有電話字樣(cue_rx),或號碼本身帶 `+` / `(` / `-` 其中一個",
+        "③ 兩者都沒有 = WEAK(**不丟掉、也不當命中**),原文留著給呼叫端自己裁"
+      ],
+      "cue_rx": "電\\s*話|Tel\\.?|TEL|Phone|Direct|專線|總機|分機|ext\\.?|傳真|Fax",
+      "state": {
+        "HIT": "命中且過得了守衛",
+        "WEAK": "式子中了但沒有任何電話證據(誠實留著,不當命中)",
+        "ABSENT": "第一頁無電話",
+        "MISS": "有號碼樣式但兩條式子都不收(RED)"
+      }
+    },
+    "known_false_positive": [
+      {
+        "probe": "(02) 2181-8888",
+        "bare_hk_hits": "2181-8888",
+        "why": "台灣號碼的後八碼長得就是香港號碼 —— 不遮掉就變成同一支電話判在兩個地點"
+      },
+      {
+        "probe": "2025 1231",
+        "bare_hk_hits": "2025 1231",
+        "why": "研報第一頁滿滿都是日期,港號式子照收"
+      },
+      {
+        "probe": "00878 2025",
+        "tw_hits": "00878 2025",
+        "why": "六碼 ETF 代號 + 年:`(?:\\(?0)\\d{1,2}\\)?` 吃掉 `008`,剩下 `78 2025` 剛好補成 3-4/3-4"
+      }
+    ]
+  },
+  "name": {
+    "alias_source": "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json#rules.contact",
+    "use": [
+      "corrected.name_en",
+      "corrected.name_cn",
+      "corrected.email",
+      "proximity",
+      "cross_check"
+    ],
+    "note": "操作員問的『中英文姓名 regex · @ 前英文名最準 · 姓名在電話/電郵/職稱上方』**正本全都有**(批634 立的)。本冊一條都不抄;CGC_MDL182.analyst_of() 只是把那三條**合起來跑**——樹上原本有規則沒有實作。",
+    "gap": "正本寫了鄰域規則卻沒有人跑它。批713 補的是實作,不是規則。",
+    "stop": {
+      "rx": "投顧|證券|投信|金控|銀行|研究|報告|評等|分析|投資|顧問|公司|部門|產業|策略|目標價|免責",
+      "tally": "ADD",
+      "why": "正本只把中文姓名**鎖在鄰域裡**(往前 1 行、往後 2 行),沒有鎖『鄰域裡也有一堆兩到四字的非姓名』。批713 實測:`凱基投顧` `研究報告` `研究員` 三個都落在鄰域內、三個都中 `[\\u4e00-\\u9fa5]{2,4}`。本條只擋**機構詞與版面詞**,不猜姓名。",
+      "honest": "被擋掉的候選不消失,原文留在 name_cn_dropped —— 擋錯了下一個人看得見。",
+      "also_drop": "analyst_titles.zh 整張表(職稱本身不是姓名)",
+      "rx_b714_add": "信箱|來源|財務|報表|摘要|說明|聲明|評級|價格|區間|漲跌|大盤|股價|表現|營收|獲利|毛利|產能|客戶|市場|需求|供給|法人|外資|投信|自營|成交|均價|本益|淨值|每股",
+      "boundary_rule": "(?<![一-龥])[一-龥]{2,4}(?![一-龥])",
+      "boundary_why": "批714 實測:`據設備領` `導製造商` `戶多元且` 這些**是從長句子裡切出來的四字片段**,字面上一個擋板詞都不中。只要求候選是**獨立的中文串**(左右不接中文),這一類整批消失 —— 不必猜一張永遠補不完的詞表。",
+      "rx_b714_why": "剩下的是**版面標籤**,本身就是獨立中文串:`電子信箱`(4 次)`資料來源`(3)`主要財務`(2)`股價相對` `大盤表現`。這些逐條量到才加,不預先想。"
+    },
+    "at_left_kind": {
+      "ruled_by": "批714 AI 裁定(批665 委派)",
+      "why": "實測華南投顧四份研報的分析師電郵是 `450@` `10863@` `9899@` —— **員工編號,不是姓名**。這種 `@` 前**互證不了**,不是對不上。判成 YELLOW(具名衝突)就是憑空造一個衝突。",
+      "kinds": {
+        "NAME": "看得出是人名(含 first.last / firstlast / flast)",
+        "STAFF_ID": "全數字 —— 員工編號,互證不了",
+        "ROLE": "研究部信箱(research / ir / service / info / contact / mail / webmaster)—— 互證不了"
+      },
+      "role_words": [
+        "research",
+        "ir",
+        "service",
+        "info",
+        "contact",
+        "mail",
+        "webmaster",
+        "admin",
+        "support",
+        "sales"
+      ],
+      "state_rule": "STAFF_ID / ROLE 一律 UNVERIFIABLE,**永不 YELLOW**。券商照樣由網域裁定(那一條不受影響)。"
+    },
+    "at_left_match": {
+      "ruled_by": "操作員 2026-09-23 逐字給定(`first.last` / `firstlast` / `flast`)",
+      "why": "實測 `jeffpu@` 對 `Jeff Pu` **對不上** —— 原本只比對切開的 token,沒有比**黏起來**的那一種。操作員原文三式都列了,程式只跑了一式。",
+      "forms": [
+        "first.last(切開比對)",
+        "firstlast(黏起來比對)",
+        "flast(首字母+姓)",
+        "相鄰兩字組(批714:`GPU Jeff Pu` 的 `Jeff Pu` 要對得上 `jeffpu@`)"
+      ],
+      "adjacent_pair_why": "實測 `jeffpu@` 對不上 `GPU Jeff Pu` —— 抽出來的英文姓名前面黏了一個產業詞 `GPU`。姓名通常是**相鄰兩個 token**,所以三式之外再試相鄰兩字組。這不是放寬,是把『姓名在哪兩個字』講清楚。"
+    },
+    "surname": {
+      "ruled_by": "批714 AI 裁定(批665 委派)",
+      "grade_only": true,
+      "why": "邊界律掃掉長句切片之後,剩下的假陽性是**獨立的兩字詞**:`設計` `揭露` `紡織` `尋求` `群展`。再往下補詞表是打地鼠。改用一條有依據的線:台灣分析師姓名的**首字是姓**。實測語料裡真姓名的首字 —— 林 郭 李 黃 呂 鄭 潘 —— 全部在常見姓氏上;那五個假陽性一個都不在。",
+      "honest": "**只分級不丟棄**:首字是常見姓 → name_cn;不是 → name_cn_weak(原文留著)。罕見姓的分析師會落在 weak,那是**驗不了不是判錯** —— 丟掉才是判錯。",
+      "list": "趙錢孫李周吳鄭王馮陳褚衛蔣沈韓楊朱秦尤許何呂施張孔曹嚴華金魏陶姜戚謝鄒喻柏水竇章雲蘇潘葛奚范彭郎魯韋昌馬苗鳳花方俞任袁柳酆鮑史唐費廉岑薛雷賀倪湯滕殷羅畢郝鄔安常樂于時傅皮卞齊康伍余元卜顧孟平黃和穆蕭尹姚邵湛汪祁毛禹狄米貝明臧計伏成戴談宋茅龐熊紀舒屈項祝董梁杜阮藍閔席季麻強賈路婁危江童顏郭梅盛林刁鍾徐邱駱高夏蔡田樊胡凌霍虞萬支柯昝管盧莫房繆干解應宗丁宣賁鄧郁單杭洪包諸左石崔吉鈕龔程嵇邢滑裴陸榮翁荀羊於惠甄曲家封芮羿儲靳汲邴糜松井段富巫烏焦巴弓牧隗山谷車侯宓蓬全郗班仰秋仲伊宮寧仇欒暴甘鈄厲戎祖武符劉景詹束龍葉幸司韶郜黎薊薄印宿白懷蒲邰從鄂索咸籍賴卓藺屠蒙池喬陰鬱胥能蒼雙聞莘黨翟譚貢勞逄姬申扶堵冉宰酈雍卻璩桑桂濮牛壽通邊扈燕冀郟浦尚農溫別莊晏柴瞿閻充慕連茹習宦艾魚容向古易慎戈廖庾終暨居衡步都耿滿弘匡國文寇廣祿闕東歐殳沃利蔚越夔隆師鞏厙聶晁勾敖融冷訾辛闞那簡饒空曾毋沙乜養鞠須豐巢關蒯相查后荊紅游竺權逯蓋益桓公"
+    }
+  },
+  "contact_block": {
+    "zh": "聯絡區塊(錨點回溯法)",
+    "ruled_by": "操作員 2026-09-23 逐字給定(附 VRN_Integrated_ReportDatabase_Engine_1.py 為語境)",
+    "as_given": {
+      "note": "操作員原文**一字不改**。下面 corrected 是實測後的修正,兩份都留,差在哪逐條寫明。",
+      "strategy": "錨點回溯法:先定位 Email 或電話,再向上擷取相鄰 2~3 行(或前方 80 字元)形成聯絡區塊,接著在此區塊內分別擊破姓名、職稱與電話。re.finditer 逐個 Email 觸發,各自獨立視窗,**不會把 A 的電話對應到 B 的名字**。",
+      "window_chars": 80,
+      "tw_title": "研究部主管|董事總經理|副總經理|協理|經理|策略分析師|總體經濟分析師|資深分析師|產業研究員|研究員|分析師|助理研究員",
+      "en_title": "Head\\s+of\\s+Research|Managing\\s+Director|Executive\\s+Director|Director|Vice\\s+President|VP|Associate|Senior\\s+Analyst|Research\\s+Analyst|Analyst|Economist|Strategist",
+      "tw_name": "(?:撰稿|分析師|研究員|姓名|Author)[\\s:：]*?(?P<tw_name>[\\u4e00-\\u9fa5]{2,4})",
+      "en_name": "(?P<en_name>[A-Z][a-z]+(?:\\s+[A-Z][a-z]+|\\s+[A-Z]\\.|\\-[A-Z][a-z]+)*)",
+      "tpe_phone": "(?P<tpe_phone>(?:\\+?886[-\\s]?2|\\(02\\)|02)[-\\s]?\\d{3,4}[-\\s]?\\d{4}(?:\\s*(?:ext\\.?|#|分機)\\s*\\d{1,5})?)",
+      "hk_phone": "(?P<hk_phone>(?:\\+?852[-\\s]?|\\(852\\)[-\\s]?)?[23]\\d{3}[-\\s]?\\d{4})",
+      "email": "(?P<raw_email>(?P<eng_name>[a-zA-Z0-9._%+-]+)@(?P<broker_domain>[a-zA-Z0-9.-]+)\\.(?P<tld>[a-zA-Z]{2,}))",
+      "at_left_rule": "左側帳號 `.` 換空白再字首大寫 → 英文姓名;右側網域查券商映射字典",
+      "claim": "單靠掃描 @,就能完成 80% 的作者資料建檔"
+    },
+    "corrected": {
+      "note": "批713 逐條實測。**對的不動**,錯的寫明是哪一個探針打破它。",
+      "strategy": "**照收,而且這一條是本批最重要的一條**。原本 CGC_MDL182.analyst_of() 把全文的鄰域**併成一塊**再抽 —— 三位分析師就會串位。改成逐 Email 各自開窗(contacts_of)。",
+      "tpe_phone": "(?:\\+?886[-\\s]?\\d{1,2}|\\(0\\d{1,2}\\)|0\\d{1,2})[-\\s]?\\d{3,4}[-\\s]?\\d{4}(?:\\s*(?:ext\\.?|#|分機)\\s*\\d{1,5})?",
+      "tpe_phone_why": "原文把區碼寫死成 `2`(台北)。實測 `(03) 578-1234`(新竹)、`(07)`(高雄)**整個抓不到**;台灣券商分公司與中南部投顧的研究部電話就是這些區碼。改成 `\\d{1,2}` 收全台,其餘(ext/#/分機 三式、`+886-2-`、`(02)`)原文就對,一個字不動。",
+      "tpe_phone_kept": "原文**比舊正本嚴**:`報告日 20251202`、`00878 2025` 兩個舊正本會咬的,原文都不咬。這一點照收。",
+      "hk_phone_why": "原文 `[23]` 比舊正本 `[2-9]` 嚴,照收。但**實測仍然咬得到** `(02) 2181-8888` 裡的 `2181-8888` 與日期 `2025 1231` —— 所以 phone.guard 那道鄰域鎖照樣要掛(先台後港遮區間 + 同行要有電話字樣)。",
+      "en_name_why": "原文尾巴是 `*`(可以零次),所以**單一個大寫字就算姓名**:實測 `Senior Analyst`、`Tel Fax` 全中,而聯絡區塊裡滿滿都是這種詞。另外 `CHEN WEI-TING`(全大寫)抓不到、`McDonald` 被切成 `Mc`+`Donald`。改用正本 `contact.corrected.name_en`(它收得了全大寫/Mc/O'),**再拿操作員這張職稱表當擋板**把職稱扣掉 —— 兩邊各取所長。",
+      "tw_name_why": "原文用錨點直接帶出姓名,兩個實測打破它:① 操作員自己舉的排版 `資深產業分析師 / Senior Analyst\\n林大衛` **抓不到**(`[\\s:：]*?` 吃不掉 `/` 和中間那串英文職稱);② `分析師的看法是這樣` 抓出 `的看法是` —— 虛詞被當成姓名。改成:錨點(職稱表/電郵/電話)開窗 → 窗內取 2~4 漢字 → 扣掉職稱表、機構版面詞(name.stop)、虛詞。原文那一式**留作強線索**:錨點後只隔空白或冒號就命中的,優先採。",
+      "tw_name_stop_add": "的|是|了|在|有|和|與|及|或|等|其|之|所|將|已|未",
+      "email_why": "原文就對,而且 named group 拆得比舊正本細(eng_name / broker_domain / tld)。照收。",
+      "at_left_rule_why": "照收。正本 cross_check 早就寫過『@ 前最硬』,操作員這一條把它**變成可執行的步驟**(`.` 換空白 + title case),樹上原本沒有人在跑。",
+      "claim_check": "「單靠 @ 完成 80%」是**還沒量過的宣稱**,不當事實收。要量得先有一批帶電郵的真研報第一頁文字;批713 只把管線做出來,覆蓋率等有料再報(不報沒量過的數字)。",
+      "window_clamp": "視窗起點 = max(Email 起點 - 80, **前一個 Email 的結尾**)",
+      "window_clamp_why": "實測三位分析師的聯絡區塊:第三位的 80 字元視窗往回伸,**把第二位的電話 `(02)8888-1234` 捲進來**。操作員警告的串位就是這個,只是它不是從『併成一塊』來的,是從**視窗互相重疊**來的。把起點卡在前一個錨點之後,三人各自乾淨。",
+      "at_left_rule_fix": "只把 `.` `_` 換成空白,**`-` 留著** —— `da-ming.wang` → `Da-Ming Wang`(照操作員給的預期輸出)。"
+    },
+    "four_state": {
+      "GREEN": "姓名與 @ 前對得上",
+      "YELLOW": "有姓名有電郵但對不上(具名衝突,三個值都列出來不挑)",
+      "UNVERIFIABLE": "有姓名沒有電郵 —— 驗不了,不是判錯",
+      "NODATA": "視窗裡什麼都沒有"
+    }
+  }
+}

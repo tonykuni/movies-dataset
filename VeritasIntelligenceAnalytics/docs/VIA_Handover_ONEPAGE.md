@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0123 · 批689)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0125 · 批689)
 
-> 產生 2026-09-21 20:07:42 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-23 09:25:50 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0101.md)
 
@@ -598,23 +598,23 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:RED · 2026-09-21T07:11:27 · 齡 12.9 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=RED、家族境非 OK、必要庫 1/4、自測站 2/3', 'required_ok': 1, 'required_n': 4, 'engines_ok': 2, 'engines_n': 3}, 'vrn': {'ok': False, 'why': '燈=YELLOW、家族境非 OK、必要庫 0/3', 'required_ok': 0, 'required_n': 3, 'engines_ok': 3, 'engines_n': 3}} → **BLOCKED_UNITEST** · 原因 ['總燈=RED≠GREEN', 'vdf:燈=RED、家族境非 OK、必要庫 1/4、自測站 2/3', 'vrn:燈=YELLOW、家族境非 OK、必要庫 0/3']
-- 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
-- 環境復原(L24):ABSENT · - · 還原 - · 段 None · 單獨隔離境 None · 借境封鎖 None · 次序 -(RECOVER_latest.json 不在(via-envrecover;L24 安裝出問題先還原前次再順序裝));安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
+- RunGate:YELLOW · 2026-09-22T06:39:37 · 齡 26.8 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 3, 'required_n': 3, 'engines_ok': 8, 'engines_n': 8}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn:燈=YELLOW、家族境非 OK']
+- 工具冊導入計畫:PLAN · 2026-09-18 15:01:14 · 件態 {'ENV_ABSENT': 69, 'UNROUTED': 59} · 風險 {'LOW': 101, 'SPECIAL': 16, 'MEDIUM': 9, 'HIGH': 2} · 段 16 · 未路由 59 · 白名單留置 0
+- 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1918 列 · 全庫同步 {'hash': '4ee818b2c0eb', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '5a42266af1a3', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 60 · 判準 {'SUCCESS': 2, 'PARTIAL': 2, 'FAIL': 56} · 壞後端 [] · 政策因子 1919 列 · 全庫同步 {'hash': '24a048df06fb', 'counts': {'落後': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '4fe11e684586', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
 
 ## 四 · 引擎調度 · 多矩陣實測
 
-- 五矩陣 ABSENT:ENGINE_BUS_latest.json 不在(via-ryg) · profile None · 真跑 None · 項 None · 態 None
-- VTMRA 家族測試閘(批516;台股月營收分析七成員):ABSENT · VTMRA_latest.json 不在(via-vtmra 跑一次即有;七成員家族境真跑自測) · 成員 -
-- Deck 任務 92 · 規格項 66 · 格子站 292(在位 292)· Register 指令 168 · Manager 正式名稱 任務 92 / 引擎 94
+- 五矩陣 OK:2026-09-17T14:44:00 · profile test · 真跑 ['vrn'] · 項 15 · 態 {'GREEN': 13, 'ABSENT': 2}
+- VTMRA 家族測試閘(批516;台股月營收分析七成員):GREEN · 2026-09-17T14:55:59 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'OK', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK'}
+- Deck 任務 92 · 規格項 66 · 格子站 336(在位 336)· Register 指令 168 · Manager 正式名稱 任務 92 / 引擎 94
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0242.ps1)
 
@@ -789,13 +789,13 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 6176/6176 · **缺 0** · 類別 {'class': 101, 'engine': 90, 'environment': 43, 'function': 5232, 'feature': 98, 'module': 172, 'package': 252, 'system': 13, 'tool': 175}
-- 尾版引擎/模組家族 274 · 中央冊已登 274 · **未登 0** · 操作介面有掛載 233 · 內部件無操作介面 41(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 8301/8301 · **缺 0** · 類別 {'class': 220, 'engine': 93, 'environment': 43, 'function': 7145, 'feature': 98, 'module': 209, 'package': 252, 'system': 66, 'tool': 175}
+- 尾版引擎/模組家族 367 · 中央冊已登 367 · **未登 0** · 操作介面有掛載 288 · 內部件無操作介面 79(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
 - 全域台帳 1310 筆 · 元件 149 · 更新 2026-09-21 20:07
-- 元件冊 OK · ACTIVE 6176 · RETIRED 245 · 更新 2026-09-21T19:59:52 · {'class': 101, 'engine': 90, 'environment': 43, 'function': 5232, 'feature': 98, 'module': 172, 'package': 252, 'system': 13, 'tool': 175}
+- 元件冊 OK · ACTIVE 8301 · RETIRED 256 · 更新 2026-09-23T09:25:46 · {'class': 220, 'engine': 93, 'environment': 43, 'function': 7145, 'feature': 98, 'module': 209, 'package': 252, 'system': 66, 'tool': 175}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
 - 2026-09-21 17:42 ADD VRN尺 批692 Z84 結案:工作站 via-vrnrun 兩紅的 [FAIL] 行(操作員貼回,母線轉交)對樹——紅的是尺不是引擎。SUP_MDL746 ⑦ 拿「全庫
@@ -1058,8 +1058,13 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 
 ## 十一 · 中央治理家族(批514;VIA-SYS-MGR-001 主控台 · VIA-GOV-ENG-001 詞彙引擎 · VIA-SYS-MGR-003 下行控制 · VIA-SYS-ENG-003 檔案優先序 · 同名整併;擁有者 CGC_MDL150;預設 dry-run)
 
-- 家族 ABSENT · FAMILY_latest.json 不在(via-cgfamily 跑一次即有;五成員經 CGC_MDL150 擁有者起跑,預設 dry-run) · 正位 - · 成員件 -
-- 主控台 G17 循環判讀:ABSENT(via-cgfamily cycles 跑一次即有;工具 RED 先分活樹/存檔再判)
+- 家族 RED · 2026-09-17T14:55:33 · 正位 VIA_CentralGovernanceFamily_b514 · 成員件 {'console': 'OK', 'engine': 'OK', 'downward': 'OK', 'router': 'OK', 'samename': 'OK'}
+  - console:RED · governance_snapshot_20260915_113543.json
+  - downward:ABSENT · 尚未跑 via-cgdownward
+  - router:ABSENT · 尚未跑 via-cgrouter
+  - engine:ABSENT · 尚未跑 via-cgengine(--selftest 不落地;--seed --commit 才有 configs)
+  - samename:ABSENT · 尚未跑 via-samename(需 pwsh 7)
+- 主控台 G17 循環判讀(批518;L38):4 圈 · 活樹 0 · 退役 3 · 收容 1 → 活樹 GREEN(退役/收容/存檔內互呼不是活樹的債;via-cgfamily cycles @ 2026-09-15T11:53:44)
 - 一貼即用:`via-cgfamily plan`(router → engine --selftest → console → downward → samename;--commit/--probe/--token=你的手)
 
 ## 十二 · U/I 對接與工作流(批519;擁有者 CGC_MDL153 WorkflowComposer;中央只連結不重造;頁在=連、不在=ABSENT)
@@ -1125,17 +1130,20 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
   - [YELLOW] vap · VIA_UI_VapDeck_v0101.html · 擁有者 - · 再生 -
   - [YELLOW] vap · VIA_UI_VapDeck_v0102.html · 擁有者 - · 再生 -
   - [YELLOW] vap · VIA_UI_VapDeck_v0103.html · 擁有者 - · 再生 -
-- 工作流最新一跑 ABSENT ·  · 尚未 via-workflow run · 
-- VDF 庫分類歸納 ABSENT · 尚未 via-workflow db-summary · 表 - · 
+- 工作流最新一跑 GREEN · vrn_logic_nlp · 2026-09-15T13:08:43 · {'GREEN': 3}
+  - [GREEN] vrn_logic 
+  - [GREEN] fin_logic 
+  - [GREEN] vrn_nlp 
+- VDF 庫分類歸納 RED · 2026-09-15T13:08:43 · 表 51 · 價量 GREEN(表 6 最新 2026-09-14 滯後 1) · 籌碼 YELLOW(表 3 最新 2026-09-11 滯後 4) · 營收 NODATA(表 4 最新 - 滯後 ?) · ETF GREEN(表 7 最新 2026-09-15 滯後 0) · 宏觀 RED(表 5 最新 2026-09-14 滯後 76) · 國際 YELLOW(表 6 最新 2026-09-14 滯後 5) · VRN 報告 NODATA(表 6 最新 - 滯後 ?) · 治理 NODATA(表 4 最新 - 滯後 ?) · 其他 RED(表 10 最新 2026-09-15 滯後 45)
 - 一貼即用:`via-workflow ui-contract --apply` → `via-workflow db-summary` → `via-workflow run <id> --profile test` → `via-workflow page --publish` → `via-open`(零彈窗:頁不自開)
 
 ## 十三 · VRN 子系統管理對接口(批681;VRN_SystemManager;VIA 往下讀 VRN 四庫一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 交接;自適應連結現解尾版;預設只讀)
 
-- GREEN · VRN_SystemManager_v0104 · 2026-09-21 20:07:42 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 178 {'GREEN': 176, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
+- GREEN · VRN_SystemManager_v0104 · 2026-09-23 09:25:50 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 197 {'GREEN': 195, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VRN/VRN_SystemManager_v*.py status | catalog | links | read <policy|logic|factor|param|engine|handover|upstream> [key] | sync --apply(只落 VIA_Reports/vrn_system)
 
 ## 十四 · VDF 子系統管理對接口(側線 2026-09-21;VDF_SystemManager;VIA 往下讀 VDF 一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 橋/工具面 + 交接/紀錄;橋律逐支量;自適應連結現解尾版;預設只讀)
 
-- STALE/NODATA · VDF_SystemManager_v0103 · 2026-09-21 20:07:43 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 117 {'GREEN': 114, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 5(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 3 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
-- 橋律(所有 PY 接加速器 · 真向外擷取走網路工具;尺=CGC_MDL124):尾版 43 · 加速器橋 43 · 網路橋 43 · 真擷取 3 · 缺加速器 [] · 真擷取缺網路橋 []
+- STALE/NODATA · VDF_SystemManager_v0103 · 2026-09-23 09:25:52 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 118 {'GREEN': 115, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 5(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 4 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
+- 橋律(所有 PY 接加速器 · 真向外擷取走網路工具;尺=CGC_MDL124):尾版 44 · 加速器橋 44 · 網路橋 44 · 真擷取 3 · 缺加速器 [] · 真擷取缺網路橋 []
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VDF/VDF_SystemManager_v*.py status | engines | bridges | tools | catalog | links | records | read <policy|logic|factor|param|engine|bridge|tool|handover|records|upstream> [key] [--full] | sync --apply(只落 VIA_Reports/vdf_system)
