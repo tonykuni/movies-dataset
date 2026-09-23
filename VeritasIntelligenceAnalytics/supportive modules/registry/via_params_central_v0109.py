@@ -153,6 +153,11 @@ BOOKS = [
      "note": "批712 操作員逐欄給定的研報 15 欄規格;CGC_MDL181 讀它對帳。"
              "REGISTRY 域、不進衝突圈——它是**欄位定義**不是共用參數值,"
              "拿它去跟別本冊比值只會生假紅"},
+    {"id": "CELERITAS_POLICY_BASELINE", "domain": "REGISTRY", "conflict_scope": False,
+     "path": "supportive modules/registry/VIA_CeleritasPolicy_Baseline_v0100.json",
+     "note": "批715 L102 執法基線:.ps1 既有債 838 支 · 凍結夾具名豁免 4 支 · 批345 舊正本 sha256。"
+             "**基線放資料檔不放碼裡**(批709 那 102 條字面路徑的教訓)。CGC_MDL183 讀它。"
+             "REGISTRY 域、不進衝突圈:它是**清單**不是共用參數值"},
     {"id": "VRN_REPORT_FIELD_RULES", "domain": "REGISTRY", "conflict_scope": False,
      "path": "supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v0100.json",
      "note": "批713 補尺冊(檔名括號槽位式評等 · 研究員職稱表 · 券商網域補遺 · 電話鄰域守衛 · "
