@@ -197,12 +197,33 @@ MDL004 在批180 退役之後,**沒有任何一支接手抓上市資料** ——
 | 真的去抓 TWSE 全上市 | **同意閘**。引擎已就緒、起得來、停在閘上 |
 | MDL002/003/006 要不要用上傳版覆蓋樹上版 | 我的判讀是**不要**(退版);要覆蓋請下令 |
 
-要補上市那一半,請貼這兩行:
+要補上市那一半,請貼這一段(**批716 更正**:原本這裡寫 `python3`,那是 Linux 的講法;
+操作員機器是 Windows PowerShell,`python3` 不是 Cmdlet,而且統包工具是**雙閘**):
 
 ```powershell
+cd "$env:USERPROFILE\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics"
 $env:VIA_NET_CONSENT='YES'
-python3 "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py"
+$env:VIA_SCRAPE_CONSENT='<你自己的 token>'
+& "$env:USERPROFILE\envs\via_vdf_312\Scripts\python.exe" "functional modules\VDF\VDF_MDL004_TWFullMarketEngine_v0100.py"
 ```
+
+> **閘二那一行是操作員的手。** 統包 `SUP_MDL740.gate_state()` 的 `open` 要**兩閘都開**
+> (`gate1_net_consent` **且** `gate2_scrape_token_set`)。
+> 2026-09-23 實錄:工作站 `NET=YES SCRAPE=OFF` —— 閘一開了閘二沒開,
+> 所以 `http_json` 照樣 DENY,引擎照樣誠實回 rc4 GATED。**那不是引擎壞了。**
+
+**LL420 一次貼上的區塊,第一行不可以是 `cd`。**
+2026-09-23 實錄:區塊貼進去時第一行**黏在操作員上一行的尾巴上** ——
+`via-vdffetch` + `cd "…"` 變成 `via-vdffetchcd "…"`,於是 `cd` 從來沒有執行,
+後面每一行都在 `C:\Users\tonyk` 跑:`git pull` 說不是 git 倉、python 說檔案不存在。
+**三行紅,沒有一行是真的壞了。**
+修法不是叫人貼小心一點,是**讓區塊不依賴 cd**:`git -C "<倉>"`、絕對路徑、
+路徑先存成變數。**每一行都要能單獨跑,才叫一次貼上。**
+
+**LL418 一次貼上的區塊要用對方那台機器的語言。**
+容器是 Linux、操作員是 Windows PowerShell。`python3` 在那邊不是 Cmdlet,
+一貼下去就是一行紅 —— 而那一行紅跟引擎一點關係都沒有,純粹是我寫錯了殼。
+**貼給誰,就用誰的殼;而且雙閘要一起列,不然他開了一半會以為是引擎壞了。**
 
 ---
 

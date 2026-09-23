@@ -14,8 +14,10 @@ ROLE
   全市場 TW Equity Engine 升級版 (供 MDL005/006 上游使用), 一次抓出每檔個股:
     [1] Identity        ticker · yf_ticker · name · market(TWSE/TPEX)
     [2] Daily Quote     adj_close · volume · turnover · market_cap
-    [3] Moving Average  sma_5 · sma_10 · sma_20 · sma_60 · sma_120 · sma_240 · ytd_pct
-    [4] Average Volume  avg_vol_60 · avg_vol_120 · avg_vol_240
+    [3] YTD             ytd_pct
+        (批720 操作員令「SMA AVERAGE+VOL 全數刪除欄位也刪除」:
+         sma_* / avg_vol_* 整組停算且不產欄位。動手前量過:全樹**零下游在讀**那幾欄,
+         只有本支自己。這是**減**,所以量與留痕都寫在這裡與端點冊 sma_note。)
     [5] YF Consensus    target_mean/median/high/low · num_analysts · recommendation
     [6] FactSet         consensus stub (預留 API 接口)
 
@@ -97,8 +99,8 @@ YF_RETRY_ATTEMPTS  = 3
 YF_RETRY_DELAY     = 1.5
 
 # SMA 設定 (鎖定窗格)
-SMA_WINDOWS        = [5, 10, 20, 60, 120, 240]
-AVG_VOL_WINDOWS    = [60, 120, 240]
+SMA_WINDOWS: list = []          # 批720 操作員令「SMA AVERAGE+VOL 全數刪除欄位也刪除」
+AVG_VOL_WINDOWS: list = []      # 同上。清空視窗=不算也不產欄位;留清單是為了呼叫端零改動
 COMPUTE_YTD        = True
 
 # 並發
@@ -279,6 +281,28 @@ def _safe_num(v: Any) -> Optional[float]:
 def _safe_int(v: Any) -> Optional[int]:
     f = _safe_num(v)
     return int(f) if f is not None else None
+
+
+def _progress(total: int, label: str, every: float = 5.0):
+    """批719:操作員實錄「**現在不知道是卡斷還在運作**」。
+
+    用批694 立的那一條約定:印 `[進度] n/N` —— PowerShell 那端的動態進度條
+    認這個字樣畫真百分比;沒報進度的就只能脈動,而**脈動跟卡死長得一模一樣**。
+    節流 every 秒印一次,並附已跑秒數與估剩秒數:看的人要判斷得出「還在動」。
+    """
+    st = {"n": 0, "last": time.time(), "t0": time.time()}
+
+    def cb(step: int = 1):
+        st["n"] += step
+        now = time.time()
+        if st["n"] >= total or now - st["last"] >= every:
+            st["last"] = now
+            done, el = st["n"], now - st["t0"]
+            eta = (el / max(done, 1)) * max(total - done, 0)
+            print(f"  [進度] {done}/{total} · {done * 100.0 / max(total, 1):.1f}%"
+                  f" · 已 {el:.0f}s · 估剩 {eta:.0f}s · {label}", flush=True)
+
+    return cb
 
 
 def net_consent() -> bool:
@@ -616,8 +640,57 @@ class YFConsensusFetcher:
                     self.stats["errors"].append(f"{yf_ticker}: {str(e)[:60]}")
         return out
 
+    def _fetch_via_net(self, yf_tickers, progress_cb=None):
+        """**先走統包的 quoteSummary raw 道**(SUP_MDL740;cookie+crumb 標準握手)。
+
+        批719 實錄:工作站 Step 3 撞 `HTTP 401 Invalid Crumb` —— 裸 yfinance 沒做
+        Yahoo 那套 cookie+crumb 握手就會這樣。統包身上**早就有**這道握手
+        (批137/批155),所以這裡只接線不重寫(LL404)。取不到就回 None,
+        讓呼叫端誠實落回原路徑**並講明為什麼**。
+        """
+        nt = _via_net()
+        if nt is None or not hasattr(nt, "yahoo_quote_summary_raw"):
+            return None
+        out = {}
+        CH = 40
+        for i in range(0, len(yf_tickers), CH):
+            chunk = yf_tickers[i:i + CH]
+            try:
+                r = nt.yahoo_quote_summary_raw(chunk, "financialData") or {}
+            except Exception as exc:
+                _log("WARN", f"統包 quoteSummary 道例外:{type(exc).__name__}")
+                return None
+            if str(r.get("state")) == "DENY":
+                _log("INFO", "雙閘未開 —— 共識這一步 GATED,**不是壞掉**")
+                return None
+            for sym, res in (r.get("results") or {}).items():
+                fd = (res or {}).get("financialData") or {}
+
+                def _raw(k, _fd=fd):
+                    v = _fd.get(k)
+                    return v.get("raw") if isinstance(v, dict) else v
+
+                out[sym] = {"yf_ticker": sym,
+                            "target_mean_price": _safe_num(_raw("targetMeanPrice")),
+                            "target_median_price": _safe_num(_raw("targetMedianPrice")),
+                            "target_high_price": _safe_num(_raw("targetHighPrice")),
+                            "target_low_price": _safe_num(_raw("targetLowPrice")),
+                            "number_of_analysts": _safe_int(_raw("numberOfAnalystOpinions")),
+                            "recommendation_mean": _safe_num(_raw("recommendationMean")),
+                            "_via": "SUP_MDL740.quoteSummary"}
+            for _ in chunk:
+                if progress_cb:
+                    progress_cb()
+        return out or None
+
     def fetch(self, yf_tickers: List[str],
               progress_cb=None) -> Dict[str, Dict]:
+        via = self._fetch_via_net(yf_tickers, progress_cb)
+        if via is not None:
+            _log("OK", f"共識走統包 quoteSummary 道:{len(via)}/{len(yf_tickers)}")
+            return via
+        _log("WARN", "統包道取不到 —— 落回裸 yfinance(**可能撞 401 Invalid Crumb**;"
+                     "那不是本引擎壞了,是 Yahoo 要 cookie+crumb 握手)")
         results: Dict[str, Dict] = {}
         if ENABLE_THREADPOOL and len(yf_tickers) > 1:
             with ThreadPoolExecutor(max_workers=YF_INFO_WORKERS) as pool:
@@ -926,7 +999,8 @@ class TWFullMarketEngine:
                 _log("INFO", f"Step 2/5: YF bulk history fetch ({len(yf_tickers)} tickers, "
                      f"period={YF_HISTORY_PERIOD}, batch={YF_BULK_BATCH_SIZE})")
                 t0 = time.time()
-                hist_by_ticker = self.yf_history.fetch(yf_tickers)
+                hist_by_ticker = self.yf_history.fetch(
+                    yf_tickers, progress_cb=_progress(len(yf_tickers), "YF 歷史"))
                 _log("OK", f"YF history: {self.yf_history.stats['tickers_ok']}/"
                      f"{self.yf_history.stats['tickers_total']} OK · "
                      f"{self.yf_history.stats['batches']} batches · "
@@ -940,7 +1014,8 @@ class TWFullMarketEngine:
                 _log("INFO", f"Step 3/5: YF consensus (info.targetMeanPrice etc, "
                      f"{YF_INFO_WORKERS} workers)")
                 t0 = time.time()
-                consensus_by_ticker = self.yf_consensus.fetch(yf_tickers)
+                consensus_by_ticker = self.yf_consensus.fetch(
+                    yf_tickers, progress_cb=_progress(len(yf_tickers), "YF 共識"))
                 _log("OK", f"YF consensus: {self.yf_consensus.stats['ok']}/"
                      f"{self.yf_consensus.stats['ok']+self.yf_consensus.stats['fail']} OK · "
                      f"{round(time.time()-t0, 1)}s")
@@ -1057,8 +1132,7 @@ class TWFullMarketEngine:
             groups = {
                 "Identity":  ["ticker", "code", "yf_ticker", "name", "market"],
                 "Daily":     ["open","high","low","close","change","volume","turnover","transactions","adj_close"],
-                "SMA":       [f"sma_{w}" for w in SMA_WINDOWS] + ["ytd_pct"],
-                "AvgVol":    [f"avg_vol_{w}" for w in AVG_VOL_WINDOWS],
+                "YTD":       ["ytd_pct"],
                 "MarketCap": ["market_cap","shares_outstanding"],
                 "YF Cons":   ["target_mean","target_median","target_high","target_low",
                               "num_analysts","recommendation","trailing_pe","forward_pe",
@@ -1102,8 +1176,6 @@ class TWFullMarketEngine:
                     f(r.get("close") or r.get("adj_close")),
                     f(r.get("volume")),
                     f(r.get("market_cap")),
-                    f(r.get("sma_20")),
-                    f(r.get("sma_60")),
                     f(r.get("ytd_pct"), 1),
                     f(r.get("target_mean")),
                 )
@@ -1214,6 +1286,26 @@ def selftest() -> int:
         "兩所都拿不到料然後 abort 回 1 —— **把『閘沒開』講成『壞了』**。"
         "判錯的紅燈和假綠一樣傷:看的人會去修一支沒有壞的引擎",
         "main_governed" in src and "return 4" in src, "(governed 入口 在)")
+    import io as _io, contextlib as _ctx
+    _buf = _io.StringIO()
+    with _ctx.redirect_stdout(_buf):
+        _cb = _progress(3, "自測", every=0.0)
+        _cb(); _cb(); _cb()
+    _out = _buf.getvalue()
+    chk("⑧ **動態進度**(操作員實錄「現在不知道是卡斷還在運作」):長步驟要印 `[進度] n/N · %`"
+        "(批694 約定的字樣,PowerShell 那端的動態進度條認它畫真百分比),而且要附**已跑秒數與估剩**。"
+        "**負控**:只脈動不報數 = 跟卡死長得一模一樣,看的人分不出來",
+        "[進度]" in _out and "3/3" in _out and "100.0%" in _out and "估剩" in _out
+        and "progress_cb=_progress(" in src,
+        f"(樣本 {_out.strip().splitlines()[-1][:58] if _out.strip() else '無'})")
+
+    chk("⑨ **共識走統包的 cookie+crumb 握手道**:工作站實錄 Step 3 撞 `HTTP 401 Invalid Crumb` —— "
+        "裸 yfinance 沒做 Yahoo 那套握手。統包身上早就有(批137/批155),這裡只接線不重寫。"
+        "**負控**:取不到要誠實落回並**講明為什麼**,不可以默默回空當成「沒有共識」",
+        "yahoo_quote_summary_raw" in src and "_fetch_via_net" in src
+        and "Invalid Crumb" in src,
+        "(委派 + 誠實落回 皆在)")
+
     chk("⑥ 兩所都在掃描面(TWSE **與** TPEX):樹上 893 檔全是 `.TWO`,缺的就是上市那一半",
         "TWSEFullMarketFetcher" in src and "TPEXFullMarketFetcher" in src
         and "openapi.twse.com.tw" in src,

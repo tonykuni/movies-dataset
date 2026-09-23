@@ -153,6 +153,12 @@ BOOKS = [
      "note": "批712 操作員逐欄給定的研報 15 欄規格;CGC_MDL181 讀它對帳。"
              "REGISTRY 域、不進衝突圈——它是**欄位定義**不是共用參數值,"
              "拿它去跟別本冊比值只會生假紅"},
+    {"id": "VDF_TW_ENDPOINTS", "domain": "REGISTRY", "conflict_scope": False,
+     "path": "supportive modules/registry/VIA_VDF_TWMarketEndpoints_SSOT_v0100.json",
+     "note": "批720 操作員逐項給定的 TWSE/TPEX 端點冊(三大法人/融資券/當沖/成交量值/市值)。"
+             "三態 VERIFIED / CANDIDATE / **UNKNOWN(不知道就不編一個)**;VDF_ENG092 讀它。"
+             "另存 SMA 兩次裁定的留痕(先『保留好了』後『全數刪除』)與減前的下游量測。"
+             "REGISTRY 域、不進衝突圈:它是**端點清單**不是共用參數值"},
     {"id": "CELERITAS_POLICY_BASELINE", "domain": "REGISTRY", "conflict_scope": False,
      "path": "supportive modules/registry/VIA_CeleritasPolicy_Baseline_v0100.json",
      "note": "批715 L102 執法基線:.ps1 既有債 838 支 · 凍結夾具名豁免 4 支 · 批345 舊正本 sha256。"
