@@ -338,7 +338,13 @@ def activate(apply_limits: bool = True) -> dict:
 
 def cmd_activate() -> int:
     a = activate()
-    print(f"=== 加速器啟動報告(SUP_MDL737 v0103)===")
+    # 批716 自糾:這一行從 v0104 起就**寫死 v0103**,所以工作站報表上的版號一直是假的 ——
+    # 操作員看著它以為跑的是舊版,而真正在跑的是尾版。版號要從檔名現算,不能手寫。
+    _ver = Path(__file__).stem.rsplit("_v", 1)[-1]
+    print(f"=== 加速器啟動報告(SUP_MDL737 v{_ver})===")
+    print(f"  解析序(CEL_CANDIDATES):{list(CEL_CANDIDATES)}")
+    _cel_first = next((c for c in CEL_CANDIDATES if (VIA / "supportive modules" / c).is_file()), None)
+    print(f"  解析首位(執行期真的會載的那一本):{_cel_first or '**一本都解析不到**'}")
     print(f"  Celeritas 載入:{'OK' if a['celeritas'] else 'FAIL'} {a['err']}")
     print(f"  lib 冊:{a['libs_total']} · 可用 {a['libs_available']} · 缺 {len(a['missing'])}"
           f" · 真實能力 {a['capability_real']}/{a['capability_total']}"
@@ -397,7 +403,7 @@ def stats() -> dict:
 
 
 def selftest() -> int:
-    print("=== SuperAccel SUP_MDL737 v0104 · 離線九檢 ===")
+    print(f"=== SuperAccel SUP_MDL737 v{Path(__file__).stem.rsplit(chr(95)+chr(118), 1)[-1]} · 離線九檢 ===")
     import os
     checks = []
     # ① 平行 map 保序+例外隔離
