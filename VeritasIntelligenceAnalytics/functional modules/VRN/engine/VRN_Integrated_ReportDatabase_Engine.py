@@ -677,7 +677,7 @@ def optional_import_evidence_core():
     module = None
     try:
         import importlib.util
-        # mother 批727: unique module name, and only the sibling file (an older intake VRN_Evidence_Core.py exists)
+        # mother 批728: unique module name, and only the sibling file (an older intake VRN_Evidence_Core.py exists)
         modname = "vrn_engine_evidence_core"
         path = Path(__file__).resolve().parent / "VRN_Evidence_Core.py"
         cached = sys.modules.get(modname)
@@ -1426,7 +1426,7 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
     long_text = normalize_unicode_text(text)
     fragments = [normalize_unicode_text(f) for f in (company_fragments or [])]
     matches: List[Dict[str, str]] = []
-    core = optional_import_evidence_core()      # mother 批727: the one deny gate (overlay deny_keys + CGC_MDL177)
+    core = optional_import_evidence_core()      # mother 批728: the one deny gate (overlay deny_keys + CGC_MDL177)
     for broker, aliases in broker_alias.items():
         ordered = [normalize_unicode_text(a) for a in sorted(aliases, key=len, reverse=True) if normalize_unicode_text(a)]
         token_match = None

@@ -2,10 +2,10 @@
 # Invoke-VIA-VRN-v0103.ps1 —— 啟動 VRN(批677 操作員令「實測 VRN 驗證通過後
 #   給我一個啟動 VRN 的 POWERSHELL CODE」)
 # =====================================================================
-# v0102→v0103(批727 操作員令「重整 VRN 實測修正到成功」+ 沿用令「"C:\測試樣本報告" 實測實修正直到成功」;
+# v0102→v0103(批728 操作員令「重整 VRN 實測修正到成功」+ 沿用令「"C:\測試樣本報告" 實測實修正直到成功」;
 #   L70 逐次許可=這兩道令;新版號檔,刪檔即回退;v0102 一字未動):
 #   +V6 VRN 實檔自測迴圈(functional modules\VRN\engine\VRN_AutoTestLoop.py,12 閘)——姊妹倉 2026-09-23 在 106 份
-#   實檔上跑到 FAIL 0 的那一套,批727 搬回母倉正位後由這一步直接敲。樣本預設 C:\測試樣本報告;夾不在=改跑合成語料
+#   實檔上跑到 FAIL 0 的那一套,批728 搬回母倉正位後由這一步直接敲。樣本預設 C:\測試樣本報告;夾不在=改跑合成語料
 #   並**講明不是實測**;-Truth 給人工真值檔才開 G11;落點 VIA_Reports\vrn_autotest\<時間>(不入 git)。
 #   迴圈每檔印 [進度] k/K,Invoke-VIAPython 照它畫第六步的真百分比。-NoAutoTest 跳過第六步。
 # v0101→v0102(批694 操作員三令「卡斷 · 25 個加速器 · 動態進度條及百分比」;L70 逐次許可=這三道令;新版號檔,刪檔即回退):
@@ -81,10 +81,11 @@ else { Write-Host "  [加速器] 模組缺席(supportive modules\VIA_PS_Accel_Mo
 # ===== [CELERITAS-TEMPLATE-JOIN v1] L102(批715 操作員令;rank 2):AI 產出的 .ps1 一律接 Celeritas 模板 =====
 #   契約:只動 $PID · 關閉即還原 · 不改系統檔 · ErrorAction Continue。
 #   模板在**自己的模組範圍**點源(New-Module):它的 Set-StrictMode 與 $script: 狀態都關在裡面,不外溢到本支與
-#   Register 的函式(外溢會讓前五步的舊碼在嚴格模式下炸;批727 容器實測:直接點源就外溢)。
+#   Register 的函式(外溢會讓前五步的舊碼在嚴格模式下炸;批728 容器實測:直接點源就外溢)。
 #   它要 PS7——PS 5.1 上不接,照實印一行,**不擋跑**。本支是新版號檔,刪檔即回退。
-#   批727 實測:模組 VeritasCeleritas.PS7.ps1 第 24 行在嚴格模式下讀未設的 $script:CeleritasPS7,**第一次載入就炸**
-#   (掉球 Z120;修它是改 .ps1,L70 候操作員許可)。炸的時候這裡照實印「未接」與原因,不擋跑;修好就自動接上。
+#   批728 實測:模組 VeritasCeleritas.PS7.ps1 第 24 行在嚴格模式下讀未設的 $script:CeleritasPS7,**第一次載入就炸**;
+#   第 24 行改掉後第 83 行 `OFS = $OFS` 也炸(掉球 Z137,兩行改法已在沙盒副本實測;修它是改 .ps1,L70 候操作員許可)。
+#   炸的時候這裡照實印「未接」與原因,不擋跑;修好就自動接上。
 $celeritasTpl = Join-Path $here 'supportive modules\ps7\VeritasCeleritas.PS7.Template.ps1'
 $celeritasJoin = $null; $celeritasWhy = ''
 if ($PSVersionTable.PSVersion.Major -ge 7 -and (Test-Path -LiteralPath $celeritasTpl)) {
@@ -102,7 +103,7 @@ if ($celeritasJoin -and $celeritasJoin.Joined) {
 } elseif ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Host ("  [Celeritas] 本窗是 PowerShell " + $PSVersionTable.PSVersion + ",模板要 PS7 —— 未接(不擋跑)") -ForegroundColor Yellow
 } else {
-    Write-Host ("  [Celeritas] 模板未接(" + $(if ($celeritasWhy) { $celeritasWhy } else { 'supportive modules\ps7\ 缺件' }) + ";掉球 Z120;不擋跑)") -ForegroundColor Yellow
+    Write-Host ("  [Celeritas] 模板未接(" + $(if ($celeritasWhy) { $celeritasWhy } else { 'supportive modules\ps7\ 缺件' }) + ";掉球 Z137;不擋跑)") -ForegroundColor Yellow
 }
 # ===== [CELERITAS-TEMPLATE-JOIN:END] =====
 
@@ -116,17 +117,17 @@ foreach ($g in 'VIA_NET_CONSENT', 'VIA_SCRAPE_CONSENT') {
     }
 }
 
-# ── 五步(+批727 第六步),照順序。次序就是這一支存在的理由(LL272)。
+# ── 五步(+批728 第六步),照順序。次序就是這一支存在的理由(LL272)。
 # LL284 同族:if 的輸出經管線會把單元素陣列拆成字串,再 splat 就逐字元展開(v0100 工作站實錄:鏈收到 'r')。整段包 @()。
 $chainArgs = @(if ($Quick) { 'run'; '--fast' } else { 'run' })
 $steps = @(
     @{ id = 'V1'; name = 'VRN 六層冊重建(冊即鏈;冊釘舊版號就會敲到前一版)'; run = { via-vrnbook build } },
-    @{ id = 'V2'; name = 'VRN 六層鏈實測(冊上節點全跑;批727 起含第二血統總驗;層間依序層內並行)';       run = { via-vrnchain @chainArgs } },
+    @{ id = 'V2'; name = 'VRN 六層鏈實測(冊上節點全跑;批728 起含第二血統總驗;層間依序層內並行)';       run = { via-vrnchain @chainArgs } },
     @{ id = 'V3'; name = '庫價與上漲空間重算(零網路;不重新擷取任何報告)';   run = { via-repairprice --apply } },
     @{ id = 'V4'; name = '驗真矩陣(判對率 + 可判率;兩個都要 100% 才叫準確)'; run = { via-vrnmatrix } },
     @{ id = 'V5'; name = '標準 HTML U/I(左輸入 / 右矩陣四 TAB)';            run = { via-console } }
 )
-# ── 批727 第六步:實檔自測迴圈(12 閘)。樣本夾不在就講明「合成語料,不是實測」,不假裝。
+# ── 批728 第六步:實檔自測迴圈(12 閘)。樣本夾不在就講明「合成語料,不是實測」,不假裝。
 $autoLoop = Join-Path $here 'functional modules\VRN\engine\VRN_AutoTestLoop.py'
 $autoOut = Join-Path $here ('VIA_Reports\vrn_autotest\' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 $autoArgs = @('--out', $autoOut, '--rounds', [string]$Rounds)

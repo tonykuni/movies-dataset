@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL181_VRNFieldSpecGate v0101 — 研報欄位規格對帳閘(批712;批727 誠實燈)
+CGC_MDL181_VRNFieldSpecGate v0101 — 研報欄位規格對帳閘(批712;批728 誠實燈)
 
-v0100→v0101(批727 操作員令「重整 VRN 實測修正到成功」;稽核照出):
+v0100→v0101(批728 操作員令「重整 VRN 實測修正到成功」;稽核照出):
   庫**在**但 `vrn_report_basic` **不在**(開機掛件先把 VDF 表落進 vdf_tw_market.duckdb、VRN 還沒入庫)時,
   v0100 直接 `select count(*) from vrn_report_basic` → duckdb CatalogException 整支炸掉(rc1 traceback)——
   **缺料被報成壞掉**(L16)。而且庫缺席時回 rc3、格子站卻期望 rc0,兩種缺料都只有在「有 VRN 料的機器」才綠。
@@ -200,7 +200,7 @@ def render(d: dict) -> str:
     if d.get("state") == "ABSENT":
         return f"[欄位規格閘] ABSENT · {d.get('why')}"
     if d.get("state") == "NODATA":
-        # 批727:庫在、表不在 = 缺料,逐欄照列 NODATA,不假裝量過。
+        # 批728:庫在、表不在 = 缺料,逐欄照列 NODATA,不假裝量過。
         #   自審:本版第一次只改了 measure(),render() 還只認量過的形狀,一讀 n_reports 就 KeyError ——
         #   全格子「研報欄位規格實跑」咬到(自測 ⑥ 只驗 measure 沒驗 render,所以綠);⑥ 現在兩個都驗。
         out = [f"=== 研報欄位規格對帳閘 {VERSION}({BATCH})· 唯讀 · 零網路 ===",
@@ -287,7 +287,7 @@ def selftest() -> int:
         "一支會寫庫的稽核閘,量的是它自己改過的東西(LL368)",
         "read_only=True" in code and not banned, f"(違禁 {banned or '無'})")
 
-    # ⑥ 批727:庫在、表不在 → NODATA(不炸),15 欄照列。臨時庫只落暫存夾。
+    # ⑥ 批728:庫在、表不在 → NODATA(不炸),15 欄照列。臨時庫只落暫存夾。
     try:
         import duckdb as _ddb
         import tempfile as _tf
@@ -298,17 +298,17 @@ def selftest() -> int:
         _w.close()
         _nd = measure(db=_tmp)
         try:
-            _txt = render(_nd)            # 批727 自審:render 也要吃得下 NODATA 形狀(第一版 KeyError n_reports)
+            _txt = render(_nd)            # 批728 自審:render 也要吃得下 NODATA 形狀(第一版 KeyError n_reports)
         except Exception as _exc:
             _txt = f"render 炸了:{type(_exc).__name__}: {_exc}"
-        chk("⑥ 批727 **庫在、表不在**:誠實 NODATA 並逐欄照列、指路入庫——不炸 CatalogException,render 也不炸(缺料不是壞掉 L16)",
+        chk("⑥ 批728 **庫在、表不在**:誠實 NODATA 並逐欄照列、指路入庫——不炸 CatalogException,render 也不炸(缺料不是壞掉 L16)",
             _nd["state"] == "NODATA" and len(_nd["rows"]) == 15 and "vrn_report_basic" in _nd["why"]
             and "[NODATA]" in _txt and _txt.count("[NODATA ") == 15,
             f"({_nd['state']} · 逐欄 {len(_nd['rows'])} 列 · render {'OK' if '[NODATA]' in _txt else _txt[:80]})")
         import shutil as _sh
         _sh.rmtree(_dir, ignore_errors=True)
     except ImportError:
-        chk("⑥ 批727 庫在、表不在 → NODATA", True, "本境無 duckdb,此檢不適用")
+        chk("⑥ 批728 庫在、表不在 → NODATA", True, "本境無 duckdb,此檢不適用")
 
     print("  [計] %d 檢 OK %d · FAIL %d" % (len(ran), len(ran) - len(fails), len(fails)))
     return 1 if fails else 0
@@ -324,7 +324,7 @@ def main() -> int:
     if st == "OK":
         return 0
     if st == "NODATA" or (st == "ABSENT" and str(d.get("why", "")).startswith("庫缺席")):
-        return 2          # 批727:庫缺 / 表不在 = 缺料 rc2(批693B 同律)
+        return 2          # 批728:庫缺 / 表不在 = 缺料 rc2(批693B 同律)
     return 3
 
 

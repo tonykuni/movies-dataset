@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-批727(v0106→v0107):**第二血統上架構冊**(操作員令「重整 VRN 實測修正到成功」;姊妹倉那一條線「在錯誤位置進行」的成果搬回母倉正位)。
+批728(v0106→v0107):**第二血統上架構冊**(操作員令「重整 VRN 實測修正到成功」;姊妹倉那一條線「在錯誤位置進行」的成果搬回母倉正位)。
   L3_驗證 +1 節點 `functional modules/VRN/engine/VRN_AutoTestLoop.py`(實檔自測迴圈 12 閘;姊妹倉 2026-09-23 在 106 份實檔上 FAIL 0 的那一套)。
   它的 `--selftest` 跑 VRN/tests 全部單元測試(首頁引擎 · 資料庫引擎 · 證據核心 · 名冊探針 · 迴圈)+ 合成語料小批,
   所以六層鏈(CGC_MDL172)敲這一個節點就等於把整條第二血統驗一遍——不必把沒有自測門的引擎一支支掛上來當 NODATA。
@@ -311,7 +311,7 @@ BOOK = {
                         node(VRN, "VRN_ENG076_RegressionGate_v*.py", "回歸閘"),
                         node(REG, "CGC_MDL141_ClosingGate_v*.py", "收尾閘(VRN 驗證收尾)"),
                         node(VRN / "engine", "VRN_AutoTestLoop*.py",
-                             "實檔自測迴圈(第二血統總驗 12 閘;--selftest=VRN/tests 全部單元測試+合成小批;批727 自姊妹倉收回正位)")]},
+                             "實檔自測迴圈(第二血統總驗 12 閘;--selftest=VRN/tests 全部單元測試+合成小批;批728 自姊妹倉收回正位)")]},
   "L4_產出": {"why": "給人看的那一層",
               "nodes": [node(VRN, "VRN_ENG080_FourPointDigest_v*.py", "一題四點文摘"),
                         node(VRN, "VRN_ENG068_DailyBrief_v*.py", "每日簡報"),

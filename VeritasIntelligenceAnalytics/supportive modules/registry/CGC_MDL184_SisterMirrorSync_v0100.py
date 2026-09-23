@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL184_SisterMirrorSync v0100 — 母倉 ↔ 姊妹倉 同步自動相互更新檢查(批727)
+CGC_MDL184_SisterMirrorSync v0100 — 母倉 ↔ 姊妹倉 同步自動相互更新檢查(批728)
 
 操作員 2026-09-23 令:「讀取 VCGC 的相關工具 SSOT REGEX 同步自動相互更新檢查」+「重整 VRN 實測修正到成功」,
 並指出姊妹倉那一條線的 VRN 成果「在錯誤位置進行」——正位是母倉。
 
-**先量再造(LL400)。** 批727 量出來的兩個洞:
+**先量再造(LL400)。** 批728 量出來的兩個洞:
 
 | 方向 | 誰在管 | 洞 |
 |---|---|---|
 | 母 → 姊(VCGC 鏡像) | 姊妹倉 `scripts/VIA_VCGC_Sync.py --compare`(要一份母倉 clone) | **只有姊妹倉那一側看得到**。母倉升一版(SUP_MDL749 v0112→v0113、PR #75 改 VRN_FieldRules 券商法),母倉自己沒有任何一盞燈會亮 |
-| 姊 ↔ 母(VRN 第二血統) | 沒有人 | 批727 把姊妹倉 34d91ac 的引擎搬回母倉,母倉在其上另有修(批702 陸券清除 · 批727 拒絕清單認法 · 名冊收容副本 · G10 母倉模式 · [進度] 協定)。之後誰先動、誰落後,**沒有冊記、沒有燈量** |
+| 姊 ↔ 母(VRN 第二血統) | 沒有人 | 批728 把姊妹倉 34d91ac 的引擎搬回母倉,母倉在其上另有修(批702 陸券清除 · 批728 拒絕清單認法 · 名冊收容副本 · G10 母倉模式 · [進度] 協定)。之後誰先動、誰落後,**沒有冊記、沒有燈量** |
 
 所以一支唯讀、兩個方向:
 ① **鏡像新鮮度**:讀姊妹倉 `supportive modules/DELIVERY_MANIFEST.json`(VIA_VCGC_Mirror_Manifest_v0100),每一條對母倉的
@@ -63,7 +63,7 @@ from pathlib import Path
 
 ENGINE_ID = "CGC_MDL184_SisterMirrorSync"
 VERSION = "v0100"
-BATCH = "批727"
+BATCH = "批728"
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent                      # 母倉 VeritasIntelligenceAnalytics/
 SYNC_BOOK = HERE / "VIA_VRN_SisterLineage_Sync_v0100.json"

@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL185_SsotBookSync v0100 — SSOT REGEX 同義字冊 同步自動相互更新檢查(批727)
+CGC_MDL185_SsotBookSync v0100 — SSOT REGEX 同義字冊 同步自動相互更新檢查(批728;VCGC ssot 門 ⑥ 的正主)
 
 操作員 2026-09-23 令:「讀取 VCGC 的相關工具 SSOT REGEX 同步自動相互更新檢查」。
 
-**先量再造(LL400)。** 批727 把樹上所有 regex / 同義字 / 券商 / 網域冊與讀寫它們的工具全量過一遍,量出來的是:
+**先量再造(LL400)。** 批728 把樹上所有 regex / 同義字 / 券商 / 網域冊與讀寫它們的工具全量過一遍,量出來的是:
 **這些冊是各自獨立的副本,沒有任何一條自動傳遞路徑**——
 
 | 量到的 | 證據 |
 |---|---|
-| RegexDict 只是全樹 regex 的**普查**(不帶同義字),只在 CGC_MDL115 `run`/`--selftest` 時**順手**重寫 | CGC_MDL115 run();批722–726 一天重新入倉 4 次 |
-| 聯集冊 VIA_SSOT_SynonymUnion 存的是 09-21 那一次;之後底冊變了,**沒有一盞燈說它舊了** | CGC_MDL176 status 只跟記憶體裡的聯集比 |
-| 拒絕清單(疊加層 deny_keys,操作員批413/679)**有的解析器守、有的不守** | SUP_MDL749 `resolve_synonym`:陸券名 → RESOLVED;第二血統首頁引擎:批413 已拒的一個別名 → JPM(批727 已修) |
+| 拒絕清單(疊加層 deny_keys,操作員批413/679)**有的解析器守、有的不守** | SUP_MDL749 `resolve_synonym`:陸券名 → RESOLVED;第二血統首頁引擎:批413 已拒的一個別名 → JPM(批728 已修) |
 | 兩本網域冊對同一網域寫**不同拼法**的鍵 | 正典 jpmorgan.com→JPM · 增補冊 jpmorgan.com→"J.P. MORGAN" |
 | 同一本冊有 5 份實體副本,各被不同工具讀 | SYNONYM_LIBRARY ×5 · VRN_Rating_Dict ×5 · VRN_Broker_Dict ×5 |
+| 四本台股代號 regex 冊對同一個代號判法不同 | 0050 / 00878 / 00981A / 2026 |
 
-所以這一支**一次量五條邊**,每條邊一個誠實態,不混成一個數字:
-  E1 普查新鮮度    CGC_MDL115.scan() 現掃 vs 冊(不看 ts)            FRESH / STALE
-  E2 聯集冊新鮮度  CGC_MDL176 baseline→intake→classify→union 現算 vs 冊(不看 ts)  FRESH / STALE
-  E3 拒絕清單守不守 整本拒絕清單(疊加層 deny_keys ∪ CGC_MDL177)逐字丟進每一個券商解析器;
+所以這一支**一次量四條邊**,每條邊一個誠實態、一盞燈(`lamp`),不混成一個數字:
+  E1 拒絕清單守不守 整本拒絕清單(疊加層 deny_keys ∪ CGC_MDL177)逐字丟進每一個券商解析器;
                    負控(合法券商)照樣要解得出來                    HOLDS / LEAK / CONTROL_LOST / ABSENT
-  E4 網域冊一致    兩本網域冊共有的網域:正典化後同一個鍵         SAME / SPELLING / NONCANONICAL / CONFLICT / SIDE_DOOR
-  E5 副本釘住      同名冊的實體副本:內容一致或差異全部講得出因由  IDENTICAL / EXPLAINED / DIVERGED
-  E6 regex 冊一致  四本台股代號 regex 冊(中央 LOCKED · 規則冊 corrected · TickerRegexSSOT · 知識冊寬鬆式)
+  E2 網域冊一致    兩本網域冊共有的網域:正典化後同一個鍵         SAME / SPELLING / NONCANONICAL / CONFLICT / SIDE_DOOR
+  E3 副本釘住      同名冊的實體副本:內容一致或差異全部講得出因由  IDENTICAL / EXPLAINED / DIVERGED
+  E4 regex 冊一致  四本台股代號 regex 冊(中央 LOCKED · 規則冊 corrected · TickerRegexSSOT · 知識冊寬鬆式)
                    拿同一組探針逐冊判收不收                          AGREE / DISAGREE(列出哪幾個探針、哪幾本冊)
-  E1 先問再生物冊(VIA_RegenArtifacts_SSOT):只登在「再生物」而不在「刻意入倉」的冊=DERIVED(本來就不入倉,舊是常態,不判黃);
-     刻意入倉的冊舊了才是 STALE。
 
-總判:有 LEAK / CONTROL_LOST / CONFLICT / SIDE_DOOR = RED rc1;有 STALE / SPELLING / NONCANONICAL / DIVERGED = YELLOW rc0;
-全綠 GREEN rc0;五條都量不到 NODATA rc2。STALE 會印**正主那一支的重生指令**(自動=指令備好,寫不寫是批次/操作員的手;
-本支永遠不寫任何冊)。
+**為什麼不是六條(Zero-Hydra L05 / LL316)。** 本支第一版還有兩條邊:RegexDict 普查新鮮度(CGC_MDL115.scan 對冊)與
+聯集冊新鮮度(CGC_MDL176 現算對冊)。同一天側線 2026-09-23 在 VCGC v0126 開了 ssot 門,門的 ③ union.missing 與
+⑤ regexdict.book 兩格早就逐格委派同兩支正主,而且 ⑤ 有本支沒有的護欄:冊由較新 python 產的不比(3.12 讀得動的檔 3.11
+讀不動,容器與工作站才不會來回覆寫)。兩處量同一件事就是兩道閘——併線後拿掉這兩條,剩下這四條沒有任何一支量過,
+由 VCGC v0128 的 ssot 門 ⑥ 逐格委派(`via-vcgc ssot` / `ssot plan` / `ssot verify`)。門只翻譯本支的 `lamp`,不重判。
+
+總判:有 LEAK / CONTROL_LOST / CONFLICT / SIDE_DOOR = RED rc1;有 SPELLING / NONCANONICAL / DIVERGED / DISAGREE = YELLOW rc0;
+全綠 GREEN rc0;四條都量不到 NODATA rc2。黃=要操作員裁定(VCGC `ssot plan` 列在待裁定);本支永遠不寫任何冊。
 
 律:唯讀 · 零網路 · 不設同意閘 · 不重寫任何工具的判準(委派:每一條邊都問正主那一支)· stdlib。
 用法:
@@ -66,7 +66,7 @@ from pathlib import Path
 
 ENGINE_ID = "CGC_MDL185_SsotBookSync"
 VERSION = "v0100"
-BATCH = "批727"
+BATCH = "批728"
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent
 REG = VIA / "supportive modules" / "registry"
@@ -75,8 +75,8 @@ R70 = VIA / "supportive modules" / "70_VRN_Rules"
 VRN = VIA / "functional modules" / "VRN"
 
 RED_STATES = {"LEAK", "CONTROL_LOST", "CONFLICT", "SIDE_DOOR"}
-YELLOW_STATES = {"STALE", "SPELLING", "NONCANONICAL", "DIVERGED", "DISAGREE"}
-# E5:同名冊的實體副本(誰讀哪一份,冊在 docs/VIA_B727 文;此處只釘「要一致或講得出因由」)
+YELLOW_STATES = {"SPELLING", "NONCANONICAL", "DIVERGED", "DISAGREE"}
+# E3:同名冊的實體副本(誰讀哪一份,冊在 docs/VIA_B727 文;此處只釘「要一致或講得出因由」)
 COPY_GROUPS = {
     "SYNONYM_LIBRARY": ["supportive modules/references/intake/VIA_SSOT_SynonymUnion_b678/SYNONYM_LIBRARY.json",
                         "functional modules/VRN/references/intake/VIA_SSOT_Additive_Audit_v0100_b20260921/SYNONYM_LIBRARY.json",
@@ -135,77 +135,20 @@ def _quiet(fn, *a, **k):
         return fn(*a, **k)
 
 
-def edge(name: str, state: str, detail: str = "", fix: str = "", rows=None) -> dict:
-    return {"edge": name, "state": state, "detail": detail, "fix": fix, "rows": rows or []}
+def lamp(state: str) -> str:
+    """本支的態 → 一盞燈(VCGC ssot 門 ⑥ 只翻譯這盞燈,不重判):RED / YELLOW / ABSENT / GREEN。"""
+    if state in RED_STATES:
+        return "RED"
+    if state in YELLOW_STATES:
+        return "YELLOW"
+    return "ABSENT" if state == "ABSENT" else "GREEN"
 
 
-def diff_books(stored: dict | None, fresh: dict | None, ignore=("ts",)) -> list:
-    """兩本冊頂層鍵的差(忽略 ts)。任一方不在 → None(量不到,不判)。"""
-    if not isinstance(stored, dict) or not isinstance(fresh, dict):
-        return None
-    return [k for k in sorted(set(stored) | set(fresh)) if k not in ignore and stored.get(k) != fresh.get(k)]
+def edge(eid: str, name: str, state: str, detail: str = "", fix: str = "", rows=None) -> dict:
+    return {"id": eid, "edge": name, "state": state, "lamp": lamp(state), "detail": detail, "fix": fix, "rows": rows or []}
 
 
-# ── E1 普查新鮮度 ────────────────────────────────────────────────────────
-def e1_regex_fresh() -> dict:
-    m, why = _load(REG, "CGC_MDL115_SSOTRegexDict_v*.py", "_s185_m115")
-    if m is None:
-        return edge("E1 RegexDict 普查新鮮度", "ABSENT", why)
-    stored = _json(getattr(m, "OUTJ", REG / "VIA_SSOT_RegexDict_v0100.json"))
-    try:
-        fresh = _quiet(m.scan)
-    except Exception as exc:
-        return edge("E1 RegexDict 普查新鮮度", "ABSENT", f"scan() 失敗:{type(exc).__name__}")
-    d = diff_books(stored, fresh)
-    if d is None:
-        return edge("E1 RegexDict 普查新鮮度", "ABSENT", "冊不在或讀不出來")
-    tail = (f"樣式 {stored.get('total_patterns')}→{fresh.get('total_patterns')} · "
-            f"共用 {stored.get('total_shared')}→{fresh.get('total_shared')}")
-    if not d:
-        return edge("E1 RegexDict 普查新鮮度", "FRESH", f"現掃 = 冊(不看 ts)· {tail} · {why}")
-    if regen_policy("VIA_SSOT_RegexDict_v0100.json") == "DERIVED":
-        return edge("E1 RegexDict 普查新鮮度", "DERIVED",
-                    f"再生物冊(不入倉,舊是常態):現掃 ≠ 冊 · {tail} · {why}")
-    return edge("E1 RegexDict 普查新鮮度", "STALE", f"刻意入倉的冊舊了:變動鍵 {d} · {tail} · {why}",
-                f"via-ssotregex(= python \"{getattr(m, '__s185_path__', Path('CGC_MDL115')).name}\";重寫冊與頁)")
-
-
-def regen_policy(name: str, book: dict | None = None) -> str:
-    """再生物冊(MDL167 的冊)怎麼說這本:KEPT(刻意入倉)· DERIVED(只登再生物)· TRACKED(兩邊都沒登=一般追蹤檔)。"""
-    book = book if book is not None else (_json(REG / "VIA_RegenArtifacts_SSOT_v0100.json") or {})
-    if any(str(k.get("path", "")).endswith("/" + name) for k in book.get("keep_even_if_matched", []) or []):
-        return "KEPT"
-    if any(re.search(str(p.get("rx", "")), "VeritasIntelligenceAnalytics/supportive modules/registry/" + name)
-           for p in book.get("patterns", []) or []):
-        return "DERIVED"
-    return "TRACKED"
-
-
-# ── E2 聯集冊新鮮度 ──────────────────────────────────────────────────────
-def e2_union_fresh() -> dict:
-    m, why = _load(REG, "CGC_MDL176_SynonymUnion_v*.py", "_s185_m176")
-    if m is None:
-        return edge("E2 SynonymUnion 聯集冊新鮮度", "ABSENT", why)
-    try:
-        base = _quiet(m.baseline)
-        lib = _quiet(m.intake)
-        if not lib:
-            return edge("E2 SynonymUnion 聯集冊新鮮度", "ABSENT", "收容件(b678 SYNONYM_LIBRARY)缺席")
-        rows = _quiet(m.classify, base, lib)
-        fresh = _quiet(m.union, base, lib, rows)
-    except Exception as exc:
-        return edge("E2 SynonymUnion 聯集冊新鮮度", "ABSENT", f"現算失敗:{type(exc).__name__}: {str(exc)[:80]}")
-    stored = _json(getattr(m, "UNION_OUT", REG / "VIA_SSOT_SynonymUnion_v0100.json"))
-    d = diff_books(stored, fresh)
-    if d is None:
-        return edge("E2 SynonymUnion 聯集冊新鮮度", "ABSENT", "聯集冊不在或讀不出來")
-    if not d:
-        return edge("E2 SynonymUnion 聯集冊新鮮度", "FRESH", f"現算 = 冊(不看 ts)· 冊時 {stored.get('ts')} · {why}")
-    return edge("E2 SynonymUnion 聯集冊新鮮度", "STALE", f"現算 ≠ 冊:變動鍵 {d} · 冊時 {stored.get('ts')} · {why}",
-                f"python \"{getattr(m, '__s185_path__', Path('CGC_MDL176')).name}\" plan --apply(只增不減由它自己先證,不過就 fail-closed)")
-
-
-# ── E3 拒絕清單守不守 ────────────────────────────────────────────────────
+# ── E1 拒絕清單守不守 ────────────────────────────────────────────────────
 def deny_list() -> tuple:
     out = set()
     hits = sorted(SSOT.glob("VIA_FinancialInstitution_Overlay_v*.json"), key=_ver)
@@ -293,10 +236,10 @@ def live_resolvers() -> list:
     return out
 
 
-def e3_deny() -> dict:
+def e1_deny() -> dict:
     denied = deny_list()
     if not denied:
-        return edge("E3 拒絕清單在每一個解析器都守", "ABSENT", "拒絕清單兩個來源都讀不到")
+        return edge("deny", "E1 拒絕清單在每一個解析器都守", "ABSENT", "拒絕清單兩個來源都讀不到")
     rows = probe_resolvers(live_resolvers(), denied)
     red = [r for r in rows if r["state"] in RED_STATES]
     absent = [r for r in rows if r["state"] == "ABSENT"]
@@ -306,10 +249,10 @@ def e3_deny() -> dict:
         f"{r['resolver']}={r['state']}" + (f"({r['n_leak']})" if r.get("n_leak") else "") for r in rows)
     fix = ("漏的那一支在回傳前過拒絕閘(疊加層 deny_keys ∪ CGC_MDL177;最長者勝 批681);名單不抄進解析器(L30)"
            if red else "")
-    return edge("E3 拒絕清單在每一個解析器都守", state, detail, fix, rows)
+    return edge("deny", "E1 拒絕清單在每一個解析器都守", state, detail, fix, rows)
 
 
-# ── E4 網域冊一致 ────────────────────────────────────────────────────────
+# ── E2 網域冊一致 ────────────────────────────────────────────────────────
 def _canon_index(inst: dict) -> dict:
     idx = {}
     regs = (inst or {}).get("registries") or {}
@@ -353,11 +296,11 @@ def compare_domains(inst_dom: dict, add_map: dict, deny_domains: dict, canon_idx
     return rows
 
 
-def e4_domains() -> dict:
+def e2_domains() -> dict:
     inst = _json(SSOT / "VIA_Financial_Institution_SSOT_v0100.json")
     rfr = _json(REG / "VIA_VRN_ReportFieldRules_SSOT_v0100.json")
     if not inst or not rfr:
-        return edge("E4 兩本網域冊一致", "ABSENT", "正典或增補冊不在")
+        return edge("domains", "E2 兩本網域冊一致", "ABSENT", "正典或增補冊不在")
     raw_dom = inst.get("domains") or (inst.get("registries") or {}).get("domains") or {}
     inst_dom = {d: (s.get("broker_ssot_key") if isinstance(s, dict) else s) for d, s in raw_dom.items()}
     bda = rfr.get("broker_domains_addendum") or {}
@@ -372,10 +315,10 @@ def e4_domains() -> dict:
     fix = ("增補冊的值改寫成正典鍵(只改拼法不改歸屬;VIA_VRN_ReportFieldRules_SSOT broker_domains_addendum.map)"
            if state in ("SPELLING", "NONCANONICAL") else ("兩冊歸屬不同=要操作員裁" if state == "CONFLICT" else
                                                            ("拒絕網域不得在任何冊解出券商" if state == "SIDE_DOOR" else "")))
-    return edge("E4 兩本網域冊一致", state, detail + (" · 例 " + " ; ".join(ex) if ex else ""), fix, rows)
+    return edge("domains", "E2 兩本網域冊一致", state, detail + (" · 例 " + " ; ".join(ex) if ex else ""), fix, rows)
 
 
-# ── E5 副本釘住 ──────────────────────────────────────────────────────────
+# ── E3 副本釘住 ──────────────────────────────────────────────────────────
 def _triples(lib: dict) -> set:
     out = set()
     for scope, keys in ((lib or {}).get("scopes") or {}).items():
@@ -416,7 +359,7 @@ def compare_copies(name: str, docs: dict, denied_norm: set) -> dict:
     return {"group": name, "state": state, "rows": rows, "reference": ref_path}
 
 
-def e5_copies() -> dict:
+def e3_copies() -> dict:
     denied_norm = {_norm(x) for x in deny_list()}
     groups = []
     for name, paths in COPY_GROUPS.items():
@@ -429,10 +372,10 @@ def e5_copies() -> dict:
         f"(差 {sum(1 for r in g['rows'] if r['state'] == 'DIVERGED')}/{len(g['rows'])} 份)" if g["state"] == "DIVERGED" else "")
         for g in groups)
     fix = "差異講不出因由的副本:裁定哪一份是正本,其餘改指向它(alias_source),不再各讀各的" if state == "DIVERGED" else ""
-    return edge("E5 同名冊副本釘住", state, detail, fix, groups)
+    return edge("copies", "E3 同名冊副本釘住", state, detail, fix, groups)
 
 
-# ── E6 regex 冊一致 ──────────────────────────────────────────────────────
+# ── E4 regex 冊一致 ──────────────────────────────────────────────────────
 TICKER_PROBES = ("2330", "1101", "0050", "00878", "00981A", "2026", "123", "12345", "2330.TW")
 
 
@@ -478,16 +421,16 @@ def compare_regex_books(books: list, probes: tuple = TICKER_PROBES) -> dict:
     return {"matrix": matrix, "split": split, "rows": rows}
 
 
-def e6_regex_books() -> dict:
+def e4_ticker() -> dict:
     books = ticker_books()
     if len(books) < 2:
-        return edge("E6 台股代號 regex 冊一致", "ABSENT", f"讀得到的冊 {len(books)} 本(至少兩本才比得了)")
+        return edge("ticker", "E4 台股代號 regex 冊一致", "ABSENT", f"讀得到的冊 {len(books)} 本(至少兩本才比得了)")
     cmp = compare_regex_books(books)
     names = " · ".join(f"{n}「{k}」" for n, k, _ in books)
     if not cmp["split"]:
-        return edge("E6 台股代號 regex 冊一致", "AGREE", f"{len(books)} 本冊對 {len(TICKER_PROBES)} 個探針判法相同 · {names}")
+        return edge("ticker", "E4 台股代號 regex 冊一致", "AGREE", f"{len(books)} 本冊對 {len(TICKER_PROBES)} 個探針判法相同 · {names}")
     ex = " ; ".join(f"{r['probe']}:收 {len(r['accept'])} 本 / 拒 {len(r['reject'])} 本" for r in cmp["rows"][:6])
-    return edge("E6 台股代號 regex 冊一致", "DISAGREE",
+    return edge("ticker", "E4 台股代號 regex 冊一致", "DISAGREE",
                 f"{len(books)} 本冊在 {len(cmp['split'])} 個探針上判法不同 · {ex} · {names}",
                 "各冊的範疇是不同的操作員裁定(批628 三平台九型含 ETF · 2026-08-04 四碼首碼非零範疇凍結 · 寬鬆式不入 LOCKED 圈);"
                 "要不要收斂成一本=操作員裁,本支只把分歧攤開", cmp["rows"])
@@ -495,7 +438,7 @@ def e6_regex_books() -> dict:
 
 # ── 總判 ────────────────────────────────────────────────────────────────
 def check() -> dict:
-    edges = [e1_regex_fresh(), e2_union_fresh(), e3_deny(), e4_domains(), e5_copies(), e6_regex_books()]
+    edges = [e1_deny(), e2_domains(), e3_copies(), e4_ticker()]
     states = [e["state"] for e in edges]
     if any(s in RED_STATES for s in states):
         verdict, rc = "RED", 1
@@ -511,7 +454,7 @@ def check() -> dict:
 def render(res: dict) -> None:
     print(f"=== {ENGINE_ID} {VERSION} · SSOT REGEX 同義字冊 同步自動相互更新檢查 ===")
     for e in res["edges"]:
-        print(f"  [{e['state']:<12}] {e['edge']}")
+        print(f"  [{e['state']:<12}] {e['lamp']:<6} {e['edge']}")
         print(f"      {e['detail'][:300]}")
         for r in e.get("rows", []):
             if isinstance(r, dict) and r.get("state") in RED_STATES:
@@ -533,11 +476,7 @@ def selftest() -> int:
             fails.append(name)
         print(f"  [{'OK' if ok else 'FAIL'}] {name} {detail}".rstrip())
 
-    # E1/E2 比冊邏輯
-    chk("① 冊 = 現算(只差 ts)→ 不算變動", diff_books({"a": 1, "ts": "t1"}, {"a": 1, "ts": "t2"}) == [])
-    chk("② 冊 ≠ 現算 → 點名變動鍵", diff_books({"a": 1, "b": 2, "ts": "x"}, {"a": 1, "b": 3, "ts": "y"}) == ["b"])
-    chk("③ 冊不在 → None(量不到不判)", diff_books(None, {"a": 1}) is None)
-    # E3 解析器探針
+    # E1 解析器探針
     denied = ("禁甲名", "禁乙名")        # 夾具名(真拒絕名只從冊讀,原始碼一個都不寫;CGC_MDL177 verify 會把寫出來的當活資料)
     tight = ("守得住", lambda k: None if k in denied else ("KGI" if k == "凱基" else None), "")
     leaky = ("會漏", lambda k: "XX" if k == "禁甲名" else ("KGI" if k == "凱基" else None), "")
@@ -545,50 +484,49 @@ def selftest() -> int:
     absent = ("不在", None, "載不到")
     rows = probe_resolvers([tight, leaky, blind, absent], denied, controls=("凱基",))
     st = {r["resolver"]: r["state"] for r in rows}
-    chk("④ 拒絕名全擋、負控解得出 → HOLDS", st["守得住"] == "HOLDS")
-    chk("⑤ 拒絕名被解出 → LEAK 並具名", st["會漏"] == "LEAK" and rows[1]["leaks"] == ["禁甲名→XX"], f"({rows[1]['leaks']})")
-    chk("⑥ 連合法券商都解不出 → CONTROL_LOST(把好人一起關掉也是錯)", st["全關"] == "CONTROL_LOST")
-    chk("⑦ 解析器載不到 → ABSENT(不是漏)", st["不在"] == "ABSENT")
-    chk("⑧ 回 'DENIED' 字樣不算漏", probe_resolvers([("d", lambda k: "DENIED" if k in denied else "KGI", "")],
+    chk("① 拒絕名全擋、負控解得出 → HOLDS", st["守得住"] == "HOLDS")
+    chk("② 拒絕名被解出 → LEAK 並具名", st["會漏"] == "LEAK" and rows[1]["leaks"] == ["禁甲名→XX"], f"({rows[1]['leaks']})")
+    chk("③ 連合法券商都解不出 → CONTROL_LOST(把好人一起關掉也是錯)", st["全關"] == "CONTROL_LOST")
+    chk("④ 解析器載不到 → ABSENT(不是漏)", st["不在"] == "ABSENT")
+    chk("⑤ 回 'DENIED' 字樣不算漏", probe_resolvers([("d", lambda k: "DENIED" if k in denied else "KGI", "")],
                                                    denied, controls=("凱基",))[0]["state"] == "HOLDS")
-    # E4 網域
-    idx = {"jpm": "JPM", "jpmorgan": "JPM", "j.p.morgan": "JPM", "jpmorgan": "JPM", "ms": "MS", "morganstanley": "MS",
-           "kgi": "KGI"}
+    # E2 網域
+    idx = {"jpm": "JPM", "jpmorgan": "JPM", "j.p.morgan": "JPM", "ms": "MS", "morganstanley": "MS", "kgi": "KGI"}
     idx = {re.sub(r"[\s.\-_&]", "", k): v for k, v in idx.items()}
     rows = compare_domains({"a.com": "KGI", "b.com": "JPM", "c.com": "MS", "d.com": "KGI", "x.hk": "XX"},
                            {"a.com": "KGI", "b.com": "J.P. MORGAN", "c.com": "WHO KNOWS", "d.com": "MS", "x.hk": "DENIED"},
                            {"x.hk": "DENIED", "y.hk": "DENIED"}, idx)
     by = {(r["domain"], r["state"]) for r in rows}
-    chk("⑨ 同鍵 → SAME", ("a.com", "SAME") in by)
-    chk("⑩ 拼法不同同一家 → SPELLING", ("b.com", "SPELLING") in by)
-    chk("⑪ 增補冊的值不是任何正典鍵 → NONCANONICAL", ("c.com", "NONCANONICAL") in by)
-    chk("⑫ 兩冊歸屬不同 → CONFLICT", ("d.com", "CONFLICT") in by)
-    chk("⑬ 拒絕網域在正典還解得出 → SIDE_DOOR", ("x.hk", "SIDE_DOOR") in by)
-    # E5 副本
+    chk("⑥ 同鍵 → SAME", ("a.com", "SAME") in by)
+    chk("⑦ 拼法不同同一家 → SPELLING", ("b.com", "SPELLING") in by)
+    chk("⑧ 增補冊的值不是任何正典鍵 → NONCANONICAL", ("c.com", "NONCANONICAL") in by)
+    chk("⑨ 兩冊歸屬不同 → CONFLICT", ("d.com", "CONFLICT") in by)
+    chk("⑩ 拒絕網域在正典還解得出 → SIDE_DOOR", ("x.hk", "SIDE_DOOR") in by)
+    # E3 副本
     lib = {"scopes": {"broker": {"凱基": [{"canonical": "KGI"}], "禁甲名": [{"canonical": "XX"}]}}}
     purged = {"scopes": {"broker": {"凱基": [{"canonical": "KGI"}]}}}
     drift = {"scopes": {"broker": {"凱基": [{"canonical": "KGI"}], "新詞": [{"canonical": "NEW"}]}}}
     g = compare_copies("SYNONYM_LIBRARY", {"ref": lib, "same": lib, "purged": purged}, {_norm("禁甲名")})
-    chk("⑭ 副本少的全是拒絕名 → EXPLAINED(批702 清除有因由)", g["state"] == "EXPLAINED", f"({g['state']})")
+    chk("⑪ 副本少的全是拒絕名 → EXPLAINED(批702 清除有因由)", g["state"] == "EXPLAINED", f"({g['state']})")
     g = compare_copies("SYNONYM_LIBRARY", {"ref": lib, "drift": drift}, {_norm("禁甲名")})
-    chk("⑮ 副本多出講不出因由的詞 → DIVERGED", g["state"] == "DIVERGED")
+    chk("⑫ 副本多出講不出因由的詞 → DIVERGED", g["state"] == "DIVERGED")
     g = compare_copies("VRN_Rating_Dict_v0100", {"a": {"x": 1}, "b": {"x": 1}, "c": {"x": 2}}, set())
-    chk("⑯ 一般冊比內容指紋:不同 → DIVERGED", g["state"] == "DIVERGED" and sum(r["state"] == "DIVERGED" for r in g["rows"]) == 1)
-    chk("⑰ 副本只剩一份 → 不判 DIVERGED", compare_copies("x", {"a": {"x": 1}, "b": None}, set())["state"] == "IDENTICAL")
-    # E1 再生物冊政策
-    pol = {"patterns": [{"rx": "/registry/VIA_SSOT_RegexDict"}], "keep_even_if_matched": [{"path": "a/b/VIA_Kept_v0100.json"}]}
-    chk("⑱a 只登再生物 → DERIVED(舊是常態,不判黃)", regen_policy("VIA_SSOT_RegexDict_v0100.json", pol) == "DERIVED")
-    pol["keep_even_if_matched"].append({"path": "x/registry/VIA_SSOT_RegexDict_v0100.json"})
-    chk("⑱b 同時登刻意入倉 → KEPT(舊了才算 STALE)", regen_policy("VIA_SSOT_RegexDict_v0100.json", pol) == "KEPT")
-    chk("⑱c 兩邊都沒登 → TRACKED", regen_policy("Other_v0100.json", pol) == "TRACKED")
-    # E6 regex 冊
+    chk("⑬ 一般冊比內容指紋:不同 → DIVERGED", g["state"] == "DIVERGED" and sum(r["state"] == "DIVERGED" for r in g["rows"]) == 1)
+    chk("⑭ 副本只剩一份 → 不判 DIVERGED", compare_copies("x", {"a": {"x": 1}, "b": None}, set())["state"] == "IDENTICAL")
+    # E4 regex 冊
     cmp = compare_regex_books([("A", "k", r"^[1-9]\d{3}$"), ("B", "k", r"^(?:[1-9]\d{3}|00\d{2,4})$")], ("2330", "0050"))
-    chk("⑱d 兩本冊對 0050 判法不同 → 分歧只列 0050", cmp["split"] == ["0050"] and cmp["rows"][0]["accept"] == ["B"])
+    chk("⑮ 兩本冊對 0050 判法不同 → 分歧只列 0050", cmp["split"] == ["0050"] and cmp["rows"][0]["accept"] == ["B"])
     cmp = compare_regex_books([("A", "k", r"^[1-9]\d{3}$"), ("B", "k", r"(?<!\d)([1-9]\d{3})(?!\d)")], ("2330", "123"))
-    chk("⑱e 同一語意不同寫法 → 無分歧", cmp["split"] == [])
-    chk("⑱f 壞式不當成「全拒」混進比對", "__error__" in compare_regex_books([("A", "k", "(")], ("1",))["matrix"]["A"])
+    chk("⑯ 同一語意不同寫法 → 無分歧", cmp["split"] == [])
+    chk("⑰ 壞式不當成「全拒」混進比對", "__error__" in compare_regex_books([("A", "k", "(")], ("1",))["matrix"]["A"])
+    # 燈:VCGC ssot 門 ⑥ 只翻譯 lamp——每一個態都要落在對的燈上,門才不必重判
+    want = {"LEAK": "RED", "CONTROL_LOST": "RED", "CONFLICT": "RED", "SIDE_DOOR": "RED",
+            "SPELLING": "YELLOW", "NONCANONICAL": "YELLOW", "DIVERGED": "YELLOW", "DISAGREE": "YELLOW",
+            "HOLDS": "GREEN", "SAME": "GREEN", "IDENTICAL": "GREEN", "EXPLAINED": "GREEN", "AGREE": "GREEN", "ABSENT": "ABSENT"}
+    bad = {k: lamp(k) for k, v in want.items() if lamp(k) != v}
+    chk("⑱ 每一個態落在對的燈(紅=拒絕名漏/歸屬衝突/側門;黃=要人裁;缺席≠綠)", not bad, f"(錯 {bad})" if bad else "")
     # 真樹唯讀 + 紀律
-    # ⑱ 唯讀:**本行程寫入守衛**——check() 期間任何寫檔企圖(本支或它載入的正主)都記下並擋掉。
+    # ⑲ 唯讀:**本行程寫入守衛**——check() 期間任何寫檔企圖(本支或它載入的正主)都記下並擋掉。
     #   第一版比 registry/ssot 兩夾的 mtime,在全格子並行時被**別站**合法的寫入咬到(量到的是格子,不是本支)。
     import builtins
     _writes = []
@@ -608,19 +546,27 @@ def selftest() -> int:
         live = check()
     finally:
         builtins.open, Path.write_text, Path.write_bytes = _real_open, _real_wt, _real_wb
-    chk("⑱ check 唯讀(本行程寫入守衛:任何寫檔企圖都記下並擋掉;不受格子並行的別站影響)", not _writes,
+    chk("⑲ check 唯讀(本行程寫入守衛:任何寫檔企圖都記下並擋掉;不受格子並行的別站影響)", not _writes,
         f"(寫入企圖 {_writes[:3]})" if _writes else "")
-    chk("⑲ 六條邊每條都有態(真樹實跑)", len(live["edges"]) == 6 and all(e["state"] for e in live["edges"]),
-        "(" + " · ".join(e["state"] for e in live["edges"]) + ")")
+    chk("⑳ 四條邊每條都有 id · 態 · 燈(真樹實跑;VCGC 門 ⑥ 靠 id 與燈)",
+        [e["id"] for e in live["edges"]] == ["deny", "domains", "copies", "ticker"]
+        and all(e["state"] and e["lamp"] == lamp(e["state"]) for e in live["edges"]),
+        "(" + " · ".join(f"{e['id']}={e['state']}/{e['lamp']}" for e in live["edges"]) + ")")
     src = Path(__file__).read_text(encoding="utf-8")
-    chk("⑳ 同意閘永不代設(原始碼層)", not re.findall(r"environ\[\s*['\"]VIA_(?:NET|SCRAPE)_CONSENT", src))
-    chk("㉑ 零網路(原始碼不引 urllib/requests/socket)",
+    code = src.split('"""', 2)[2] if src.count('"""') >= 2 else src          # 只看程式碼,不看檔頭說明
+    # 針用拼接寫(字面寫出來,這一行自己就會被自己咬到——㉔ 同一族)
+    needles = ("CGC_MDL115_" + "SSOTRegexDict_v", "." + "classify(", "." + "union(", "UNION" + "_OUT")
+    dup = [x for x in needles if x in code]
+    chk("㉑ 不重量 VCGC ssot 門已委派的兩格(RegexDict 普查 · 聯集冊新鮮度;Zero-Hydra:一件事一處量)", not dup,
+        f"(又出現 {dup})" if dup else "")
+    chk("㉒ 同意閘永不代設(原始碼層)", not re.findall(r"environ\[\s*['\"]VIA_(?:NET|SCRAPE)_CONSENT", src))
+    chk("㉓ 零網路(原始碼不引 urllib/requests/socket)",
         not re.search(r"^\s*(import|from) (urllib|requests|socket)", src, re.M))
     scan_src = src
     for c in CONTROLS:                   # 合法的較長名(摩根士丹利)含拒絕的短名不算抄——最長者勝 批681
         scan_src = scan_src.replace(c, " ")
     spelled = [n for n in deny_list() if (re.search(r"[\u4e00-\u9fff]", n) or len(n) >= 5) and n in scan_src]
-    chk("㉒ 原始碼不抄拒絕名單(名單只從冊讀,L30;CJK 名與 ≥5 字拉丁名一個都不寫)", "deny_keys" in src and not spelled,
+    chk("㉔ 原始碼不抄拒絕名單(名單只從冊讀,L30;CJK 名與 ≥5 字拉丁名一個都不寫)", "deny_keys" in src and not spelled,
         f"(寫出來的 {spelled[:4]})" if spelled else "")
     n_ok = len(ran) - len(fails)
     print(f"  [計] 自測 {len(ran)} 檢 OK {n_ok} · FAIL {len(fails)} · {round(time.time() - t0, 1)}s")

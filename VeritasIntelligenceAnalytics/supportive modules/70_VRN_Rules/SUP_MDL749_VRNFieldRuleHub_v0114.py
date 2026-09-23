@@ -6,7 +6,7 @@
 #   修法:那個 docstring 改成 r"""…"""(一個字元),語意零變。
 # -*- coding: utf-8 -*-
 r"""
-v0113→v0114(批727 操作員令「VCGC 相關工具 SSOT REGEX 同步自動相互更新檢查」):
+v0113→v0114(批728 操作員令「VCGC 相關工具 SSOT REGEX 同步自動相互更新檢查」):
   CGC_MDL185(本批新立的冊同步檢查)E3 量到:**拒絕清單在本樞紐的 `resolve_synonym`(增補冊讀冊口)不生效**——
   `broker_of` 早就經正本實作 ENG086 過閘(㊼),但 `additive --scope broker --in <被拒名>` 照樣回 RESOLVED
   (16 個被拒名解得出券商:陸券英文名、中金、海通……)。同一個樞紐,一個口守、一個口不守。
@@ -171,7 +171,7 @@ ADDITIVE_SCHEMA = "VIA.Synonyms.SourceScoped.v1"
 ADDITIVE_CANDIDATE_NAME = "ADDITIVE_CANDIDATE.json"
 #: 增補判定的 rc 對照表(唯一出處;新增態一定要登記在這裡,不然下游照 rc 判就會判錯 LL:批625)
 ADDITIVE_RC = {"RESOLVED": 0, "SOURCE_REQUIRED": 1, "UNKNOWN": 2, "ABSENT": 3}
-# 批727:DENIED(拒絕清單先行)不進上表——表是契約,測試釘住四鍵;判詞時 DENIED 與 UNKNOWN 同碼 2(沒解出),畫面照印 DENIED。
+# 批728:DENIED(拒絕清單先行)不進上表——表是契約,測試釘住四鍵;判詞時 DENIED 與 UNKNOWN 同碼 2(沒解出),畫面照印 DENIED。
 ADDITIVE_RC_DENIED = 2
 
 
@@ -1629,7 +1629,7 @@ _DENY_PURGE = {"mod": None, "tried": False}
 
 
 def _broker_denied(value) -> bool:
-    """批727:券商拒絕閘——與 broker_of 同一個(經正本實作 ENG086 `_gate176()` = CGC_MDL176 讀的疊加層 deny_keys),
+    """批728:券商拒絕閘——與 broker_of 同一個(經正本實作 ENG086 `_gate176()` = CGC_MDL176 讀的疊加層 deny_keys),
     再聯集 CGC_MDL177 的陸券名單(CN_ALIAS / CN_CANON)。名單一個字都不寫在本檔(L30);兩個來源都讀不到=不擋(誠實,不猜)。"""
     n = _norm_additive(value)
     if not n:
@@ -1687,7 +1687,7 @@ def resolve_synonym(term, scope: str, source=None, lib=None) -> dict:
     selected = [m for m in matches if isinstance(m, dict) and (source is None or m.get("source") == source)]
     owners = sorted({str(m.get("canonical")) for m in selected if m.get("canonical")})
     if scope == "broker":
-        # 批727:拒絕清單先行(操作員次序:拒絕清單 → 正典 → 疊加層 → 聯集冊),與 broker_of 同一個閘
+        # 批728:拒絕清單先行(操作員次序:拒絕清單 → 正典 → 疊加層 → 聯集冊),與 broker_of 同一個閘
         _den = [o for o in owners if _broker_denied(o)]
         if _broker_denied(term) or (owners and len(_den) == len(owners)):
             return {"status": "DENIED", "canonical": None, "candidates": [], "evidence": [], "sources": [],
@@ -2245,7 +2245,7 @@ def selftest() -> int:
         _bg.get("state") == "OK" and int(_bg.get("deny") or 0) >= 10 and int(_bg.get("rulings") or 0) >= 4
         and bool(_dn49) and _bo1[0] is None and _bo2[0] == "KGI",
         f"(閘 {_bg.get('state')} 拒 {_bg.get('deny')} 對映 {_bg.get('rulings')} · 被拒別名 {len(_dn49)} 個試一個={_bo1[0]} · 凱基={_bo2[0]})")
-    # ㊽ 批727:增補冊讀冊口也過同一個拒絕閘(名單從閘上取,本檔零字面)
+    # ㊽ 批728:增補冊讀冊口也過同一個拒絕閘(名單從閘上取,本檔零字面)
     _g48 = getattr(_mod49, "_gate176", None) if _mod49 is not None else None
     try:
         _dn48 = sorted((_g48() or {}).get("deny", set())) if _g48 else []
@@ -2257,7 +2257,7 @@ def selftest() -> int:
                                     "凱基": [{"canonical": "KGI", "source": "t", "raw": "凱基"}]}}}
     _c48 = resolve_synonym("禁測別名", "broker", lib=_lib48)
     _k48 = resolve_synonym("凱基", "broker", lib=_lib48)
-    chk("㊽ 批727 增補冊讀冊口 resolve_synonym(broker) 也過同一個拒絕閘:閘上每個被拒名 → DENIED;"
+    chk("㊽ 批728 增補冊讀冊口 resolve_synonym(broker) 也過同一個拒絕閘:閘上每個被拒名 → DENIED;"
         "合成冊「別名合法但正典被拒」→ DENIED;凱基 → KGI 不被連坐(名單從閘上取,本檔零字面)",
         bool(_dn48) and not _ok48 and _c48["status"] == "DENIED" and _k48["status"] == "RESOLVED" and _k48["canonical"] == "KGI",
         f"(閘 {len(_dn48)} 名 · 漏 {len(_ok48)} · 正典被拒={_c48['status']} · 凱基={_k48['canonical']})")

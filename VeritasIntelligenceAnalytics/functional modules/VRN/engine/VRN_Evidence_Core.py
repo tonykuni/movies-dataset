@@ -3,7 +3,7 @@
 """
 VRN_Evidence_Core v0101 -- one evidence rule set for both VRN engines.
 
-v0100 -> v0101 (mother 批727: the sister's 2026-09-23 work brought home to its proper place):
+v0100 -> v0101 (mother 批728: the sister's 2026-09-23 work brought home to its proper place):
   the two deny-listed CJK names are no longer spelled out in GENERIC_BROKER_ALIASES -- the mother's
   purge gate (CGC_MDL177 verify, 批679/批702) counts any spelled-out denied name as live data.
   generic_aliases() now adds the deny list's own CN_ALIAS at run time instead, so the behaviour is the

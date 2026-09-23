@@ -51,7 +51,7 @@ from typing import Any
 PROBE_NAME = "VRN_PanoramaProbe"
 PROBE_VERSION = "v0101"
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-# v0101(母倉 批727):這支原本住在姊妹倉根(TS 主控台 + attachments/);搬回母倉後那一層不在,
+# v0101(母倉 批728):這支原本住在姊妹倉根(TS 主控台 + attachments/);搬回母倉後那一層不在,
 #   母倉收容夾 VIA_GrokConsole_AuroraAcorn_b383 就是同一個 app 的收容副本(名冊位元相同、十段表相同)——
 #   APP_ROOT 先找倉根,再找收容副本(唯讀,L03 零觸碰);兩處都沒有就照舊指倉根,缺什麼照實報 ABSENT。
 APP_CANDIDATES = (

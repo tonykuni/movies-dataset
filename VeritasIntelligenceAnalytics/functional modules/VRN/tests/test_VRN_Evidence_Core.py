@@ -53,7 +53,7 @@ ALIASES = {
     "DAIWA": ["大和", "daiwa"], "CLSA": ["clsa", "里昂"], "CAPITAL": ["群益", "capital"], "FIRST": ["第一", "first"],
     "MS": ["morgan stanley", "ms"], "MEGA": ["兆豐", "mega"], "YUANTA": ["元大"],
 }
-# 批727 (mother): denied names are never spelled out here -- the purge gate (CGC_MDL177 verify) counts a spelled-out
+# 批728 (mother): denied names are never spelled out here -- the purge gate (CGC_MDL177 verify) counts a spelled-out
 # denied name as live data.  The deny-list test reads them from CGC_MDL177 itself (CN_CANON / CN_ALIAS) at run time.
 
 
@@ -62,7 +62,7 @@ class def_EvidenceCoreTests(unittest.TestCase):
     def setUpClass(cls):
         cls.C = def_load("VRN_Evidence_Core")
 
-    # ---- mother 批727: one deny gate, longest wins (overlay deny_keys + CGC_MDL177) -----------------
+    # ---- mother 批728: one deny gate, longest wins (overlay deny_keys + CGC_MDL177) -----------------
     def test_one_deny_gate_longest_wins(self):
         C = self.C
         phrases = C.deny_phrases()
@@ -84,7 +84,7 @@ class def_EvidenceCoreTests(unittest.TestCase):
         self.assertFalse(C.is_denied_token("JPM"))
         self.assertEqual(C.compare_broker(phrases[-1], {"broker": None}), "DENIED")
 
-    # ---- mother 批727: the engines load the sibling core, never a foreign module of the same name -------
+    # ---- mother 批728: the engines load the sibling core, never a foreign module of the same name -------
     def test_engines_ignore_a_foreign_module_named_like_the_core(self):
         import sys
         import types

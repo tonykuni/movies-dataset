@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-v0101→v0102(批727 容器實測:開機掛件落了部分 VDF 表,consensus_latest 在、monthly_revenue_analysis 不在):
+v0101→v0102(批728 容器實測:開機掛件落了部分 VDF 表,consensus_latest 在、monthly_revenue_analysis 不在):
   `_data_ready()` 改成直接試 gather()(問真的資料路徑)——探測與 run() 用同一條路,就不會一個說有料一個說沒料;
   缺料照舊走誠實缺料模式(rc2 + 指路)。判準與產頁一字未動。
 VAP_ENG014_StdDashboardTemplate — 標準化模板階層(批279;操作員令)
@@ -229,7 +229,7 @@ def run() -> int:
 
 def _data_ready() -> bool:
     """資料在位探測(批293 雙模自測):缺=誠實缺料模式非假紅。
-    批727(v0102):**問真的資料路徑,不猜一張表**。v0101 只看 consensus_latest 在不在;
+    批728(v0102):**問真的資料路徑,不猜一張表**。v0101 只看 consensus_latest 在不在;
     開機掛件落了一部分 VDF 表(consensus_latest 在、monthly_revenue_analysis 不在)時,探測說「在」、
     run() 卻誠實停 rc2——自測就把六檢全判紅,缺料被報成壞掉(L16)。現在直接跑一次 gather():
     過得了才叫資料在位。"""

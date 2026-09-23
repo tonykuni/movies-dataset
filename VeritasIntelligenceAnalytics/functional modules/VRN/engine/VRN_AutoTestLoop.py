@@ -2,7 +2,7 @@
 """
 VRN_AutoTestLoop v0102 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
 
-v0101→v0102(母倉 批727 收回:姊妹倉 festive-ptolemy 41ce6d4/34d91ac 的成果搬回母倉正位):
+v0101→v0102(母倉 批728 收回:姊妹倉 festive-ptolemy 41ce6d4/34d91ac 的成果搬回母倉正位):
     +--selftest 自測門(VRN/tests 全部單元測試 + 合成語料 8 檔一輪):六層鏈與全格子都敲這一扇;
     G10 母倉模式(工具讀正本、三支自測、拒絕清單/負控/同義字對帳照跑);名冊讀收容副本;每檔印 [進度] k/K。
     G03 FILENAME 的期望值會認母倉 批679/批702 拒絕清單——稽核包 oracle 寫著 broker=GF 的檔,
@@ -103,7 +103,7 @@ LAST_FIRST_PAGE: Dict[str, Dict[str, Any]] = {}      # per-file first-page answe
 LAST_SAMPLES: Dict[str, Path] = {}                    # file name -> sample path of the current round
 TRUTH_CRITICAL = ("type", "ticker", "broker", "page_date", "rating", "target_price", "current_price")
 AUDIT_DIR = VRN_ROOT / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100"
-# v0102(母倉 批727):母倉沒有 src/lib/via/,讀收容夾裡位元相同的名冊(唯讀,L03);兩處都沒有才回空。
+# v0102(母倉 批728):母倉沒有 src/lib/via/,讀收容夾裡位元相同的名冊(唯讀,L03);兩處都沒有才回空。
 ROSTER_CANDIDATES = (
     REPO_ROOT / "src" / "lib" / "via" / "incoming-roster.ts",
     REPO_ROOT / "supportive modules" / "references" / "intake" / "VIA_GrokConsole_AuroraAcorn_b383" / "src" / "lib" / "via" / "incoming-roster.ts",
@@ -1359,7 +1359,7 @@ def def_render_html(report: Dict[str, Any]) -> str:
 
 
 def def_selftest() -> int:
-    """母倉 批727 自測門(六層鏈 CGC_MDL172 與全格子都敲這扇門):
+    """母倉 批728 自測門(六層鏈 CGC_MDL172 與全格子都敲這扇門):
     ① VRN/tests 全部單元測試(unittest,不需 pytest);② 合成語料小批(--limit 8,一輪)跑到底,不得有 FAIL。
     輸出寫暫存夾、跑完刪掉;不連網、不設同意閘、不動樣本。rc 0 = 兩段都沒有 FAIL。"""
     import unittest

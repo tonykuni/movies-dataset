@@ -69,7 +69,7 @@ _CORE_MODNAME = "vrn_engine_evidence_core"
 
 def _load_evidence_core():
     """VRN_Evidence_Core (same folder): one rule set for both engines; None keeps the v0102 behaviour.
-    Mother 批727: cached under a unique module name and reused only when it IS the sibling file -- the mother
+    Mother 批728: cached under a unique module name and reused only when it IS the sibling file -- the mother
     also keeps an older intake VRN_Evidence_Core.py (audit package v0.2.0) that a plain `import
     VRN_Evidence_Core` elsewhere in the same process would bind; the engine must never pick that one up."""
     try:
@@ -1007,7 +1007,7 @@ class BrokerRatingDict:
                     continue
                 if any(f.startswith(a) for f in frag_low) and not any(self._alias_hits(a, low.replace(f, " ")) for f in frag_low):
                     continue
-                # mother 批727: the mother's deny list (overlay deny_keys + CGC_MDL177) through the evidence core;
+                # mother 批728: the mother's deny list (overlay deny_keys + CGC_MDL177) through the evidence core;
                 # a hit inside a longer-or-equal denied name is not a broker (中信 inside 中信證券), and a denied
                 # alias (摩通) never resolves.  Longest wins, the mother's 批681 rule.
                 if EVIDENCE_CORE is not None and EVIDENCE_CORE.deny_shadowed(a, s):
