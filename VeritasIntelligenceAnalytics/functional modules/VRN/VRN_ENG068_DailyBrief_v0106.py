@@ -341,6 +341,34 @@ def build() -> Path:
     return UI_OUT, gate
 
 
+def _breadth_ok(br, day, uni, nullma):
+    """市場寬度句:**逐條點名是哪一個條件破的**(批725)。
+
+    四個條件 AND 成一盞燈,紅的時候看的人不知道要修哪裡 —— 工作站實錄就是這樣。
+    回 (過不過, [破掉的那幾條]);每一條都寫得出「它破的時候代表什麼」。
+    """
+    bad = []
+    if br is None:
+        bad.append("因子庫缺(br 為空)")
+        return False, bad
+    if day is None or uni is None:
+        bad.append("庫查不到(見 _dberr)")
+        return False, bad
+    if nullma is None:
+        bad.append("**算不出 null 計數** → 該日那一列根本沒查成功")
+    elif br["n_ma"] + nullma != day:
+        bad.append(f"**逐列對不起來**(有因子 {br['n_ma']} + 天生算不出 {nullma} "
+                   f"≠ 該日在庫 {day}) → 中間漏了一類,不是四捨五入")
+    if day != uni:
+        bad.append(f"**該日不是完整日**(該日 {day} · 宇宙 {uni}) → 因子鏈未跑全宇宙")
+    if br["n_ma"] < br["win60"] + br["lose60"]:
+        bad.append(f"**守恆破了**(n {br['n_ma']} < 勝 {br['win60']}+負 {br['lose60']}) "
+                   "→ 同一檔被算兩次,或分母取錯")
+    if not (0 <= br["pct_above"] <= 100):
+        bad.append(f"**百分比出界**({br['pct_above']})")
+    return (not bad), bad
+
+
 def selftest() -> int:
     fails = []
 
@@ -503,9 +531,12 @@ def selftest() -> int:
                 "SELECT ticker FROM features_daily WHERE date = ? AND ma20_ratio IS NULL LIMIT 5",
                 [br["date"]]).fetchall()]
             _c.close()
-        except Exception:
+        except Exception as _exc:
+            # 批725:原本把庫錯訊整個吞掉,紅燈只剩一句「因子庫缺」,
+            # 而真正的原因(表不存在 / 權限 / 檔鎖)看不到。留住它。
             _uni = _day = None
             _nullma, _nullwho = None, []
+            _dberr = f"{type(_exc).__name__}: {str(_exc)[:90]}"
     # 批468:因子庫**根本不在**=上游未產生 → SKIP;庫在而數字不合格才 FAIL。
     if br is None:
         skp("⑨ 市場寬度句(批192:features_daily 最新完整日聚合)",
@@ -520,15 +551,14 @@ def selftest() -> int:
         chk("⑨ 市場寬度句(批192/538:features_daily 最新完整日聚合庫取+**逐列對得起來**"
         "(有因子 + 天生算不出=該日在庫;上市未滿 20 天算不出 20 日均線,不是漏算)"
         "+守恆 n≥勝+負+誠實閘納句)",
-        br is not None and _day is not None and _uni is not None
-        and _nullma is not None and br["n_ma"] + _nullma == _day and _day == _uni
-        and br["n_ma"] >= br["win60"] + br["lose60"]
-        and 0 <= br["pct_above"] <= 100,
+        _breadth_ok(br, _day, _uni, _nullma)[0],
         f"({br['date']}:{br['above_ma20']}/{br['n_ma']}={br['pct_above']}%"
         f"·勝 {br['win60']}/負 {br['lose60']}"
         f"·該日在庫 {_day}=有因子 {br['n_ma']}+天生算不出 {_nullma}"
         f"{('(' + '、'.join(_nullwho) + ':上市未滿 20 天)') if _nullwho else ''}"
-        f"·庫標的宇宙 {_uni} 檔(此庫涵蓋面事實,非台股全市場))")
+        f"·庫標的宇宙 {_uni} 檔(此庫涵蓋面事實,非台股全市場)"
+        + (" · **破:" + " · ".join(_breadth_ok(br, _day, _uni, _nullma)[1]) + "**"
+           if not _breadth_ok(br, _day, _uni, _nullma)[0] else "") + ")")
     print(f"  [計] 九檢 OK {9 - len(fails) - len(skips)} · FAIL {len(fails)}"
           f" · SKIP {len(skips)}(誠實三態;上游件未產生非本引擎缺陷)")
     return 1 if fails else (2 if skips else 0)     # 批689B:無 FAIL 有 SKIP=rc2 NODATA(缺料不是壞)

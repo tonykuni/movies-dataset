@@ -346,9 +346,27 @@ def selftest() -> int:
     if _ilu64.find_spec("jieba") is None:
         nod("⑦ 分詞(jieba 道)", "(缺件 jieba;不代裝——via-rungate --family vrn --approve-install)")
     else:
+        _probe = "台積電第三季毛利率創高"
         seg = stack["local_knowledge_engine"].LocalKnowledgePipeline.segment(
-            "台積電第三季毛利率創高", backend="auto")
-        chk("⑦ 分詞(jieba 道)", "毛利率" in seg or len(seg) >= 4, f"({seg[:5]})")
+            _probe, backend="auto")
+        # 批725:這一檢紅的時候要**自己講原因**。工作站實錄切出 ['台積電第三季毛利率創高']
+        # —— 整串沒切,那不是「分詞判斷錯」,是**字典根本沒載進來**(jieba 退化成原樣回傳)。
+        # 兩種紅長得一樣、修法完全不同,所以把它們分開講。
+        _whole = (len(seg) == 1 and str(seg[0]).replace(" ", "") == _probe)
+        if _whole:
+            try:
+                import jieba as _jb
+                _cache = getattr(_jb.dt, "cache_file", "(問不到)")
+            except Exception:
+                _cache = "(問不到)"
+            _why = (f"**整串沒切** → jieba 字典沒載進來(退化成原樣回傳),"
+                    f"**不是分詞判斷錯**。快取 {_cache} —— 刪掉它讓 jieba 重建;"
+                    f"刪不掉就是權限。切出來的:{seg[:2]}")
+        else:
+            _why = f"({seg[:5]})"
+        chk("⑦ 分詞(jieba 道):切得開才算過。**整串原樣回傳=字典沒載**,"
+            "與『切錯詞』是兩種紅、兩種修法,要分開講",
+            ("毛利率" in seg or len(seg) >= 4) and not _whole, _why)
 
     tree = INTAKE / "mail_tracker_v2_packaged"
     if _ilu64.find_spec("pytest") is None:
