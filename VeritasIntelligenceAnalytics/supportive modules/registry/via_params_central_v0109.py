@@ -153,6 +153,12 @@ BOOKS = [
      "note": "批712 操作員逐欄給定的研報 15 欄規格;CGC_MDL181 讀它對帳。"
              "REGISTRY 域、不進衝突圈——它是**欄位定義**不是共用參數值,"
              "拿它去跟別本冊比值只會生假紅"},
+    {"id": "VRN_REPORT_FIELD_RULES", "domain": "REGISTRY", "conflict_scope": False,
+     "path": "supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v0100.json",
+     "note": "批713 補尺冊(檔名括號槽位式評等 · 研究員職稱表 · 券商網域補遺 · 電話鄰域守衛 · "
+             "中文姓名機構詞擋板);CGC_MDL182 讀它。電話與姓名的式子**不在這本**——"
+             "只留 alias_source 指向正本 VRN_FieldRules_SSOT(抄了就是第二顆會漂移的頭)。"
+             "REGISTRY 域、不進衝突圈:它是**規則定義**不是共用參數值"},
     {"id": "AUTOCODE_REG", "domain": "REGISTRY", "conflict_scope": False,
      "path": "supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
      "note": "自動編號命名冊(append-only;編號永不變)"},
