@@ -3872,7 +3872,8 @@ def unitest_gate() -> tuple:
     return True, f"RunGate GREEN {round(age, 1)} h 前"
 
 
-def tools_apply(plan: dict, approve: bool, ensure_env: bool = False) -> dict:
+def tools_apply(plan: dict, approve: bool, ensure_env: bool = False,
+                bootstrap_prechecked: bool = False) -> dict:
     ran, fails = 0, 0
     if not approve:
         for st in plan["stages"]:
@@ -3885,14 +3886,19 @@ def tools_apply(plan: dict, approve: bool, ensure_env: bool = False) -> dict:
         plan["state"] = "BLOCKED_CONSENT"
         return {"ran": 0, "fails": 0, "note": "同意閘未開,零動作"}
     ok_u, why_u = unitest_gate()
-    if not ok_u:
+    if not ok_u and not bootstrap_prechecked:
         for st in plan["stages"]:
             st["result"] = {"state": "SKIP", "note": f"L19 安裝核可律:{why_u}"}
         plan["state"] = "BLOCKED_UNITEST"
         return {"ran": 0, "fails": 0, "note": f"L19 環境統一測式未核可:{why_u}"}
+    if bootstrap_prechecked and not ok_u:
+        log_event("L19_BOOTSTRAP", "*", "", "ALLOW", "預檢已通過;僅 ENSURE/INSTALL/VERIFY;移除與修復仍阻擋")
     done_ids: set = set()
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     for st in plan["stages"]:
+        if bootstrap_prechecked and not ok_u and st["kind"] not in ("ENSURE_ENV", "INSTALL_TOOLS", "VERIFY_TOOLS"):
+            st["result"] = {"state": "SKIP", "note": "L19 bootstrap 僅建境裝件驗證"}
+            continue
         if any(d not in done_ids for d in st.get("deps", [])):
             st["result"] = {"state": "SKIP", "note": "前置段未綠"}
             continue
