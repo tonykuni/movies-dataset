@@ -40,6 +40,7 @@ def def_load_module(name: str, path: Path):
 
 
 PROBE = def_load_module("vrn_panorama_probe", ENGINE_PATH)
+CATALOG_TS = getattr(PROBE, "APP_ROOT", PROJECT_ROOT) / "src" / "lib" / "via" / "catalog.ts"   # 母倉:讀收容副本(批728)
 ROSTER = PROBE.def_load_roster()
 KNOWLEDGE = PROBE.Knowledge()
 ENV = PROBE.def_probe_environment()

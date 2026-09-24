@@ -31,6 +31,20 @@ ENGINE = HERE.parent / "engine" / "VRN_Integrated_ReportDatabase_Engine.py"
 ORACLE = HERE.parent / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100" / "FILENAME_RESULTS.json"
 
 
+def def_purge_tool():
+    """The mother's 批679 deny list (CGC_MDL177) through the evidence core; None when either is absent."""
+    core_path = Path(__file__).resolve().parent.parent / "engine" / "VRN_Evidence_Core.py"
+    if not core_path.is_file():
+        return None
+    try:
+        spec = importlib.util.spec_from_file_location("vrn_evidence_core_for_db_test", str(core_path))
+        core = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(core)  # type: ignore[union-attr]
+        return core.vcgc("purge")
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def def_load():
     spec = importlib.util.spec_from_file_location("vrn_report_database_engine_test", str(ENGINE))
     module = importlib.util.module_from_spec(spec)
@@ -164,6 +178,7 @@ class def_ReportDatabaseEngineTests(unittest.TestCase):
     def test_all_106_oracle_filenames_agree(self) -> None:
         db = self.db
         rows = json.loads(ORACLE.read_text(encoding="utf-8-sig"))
+        purge = def_purge_tool()
         bad = []
         for row in rows:
             name = row["filename"]
@@ -173,7 +188,10 @@ class def_ReportDatabaseEngineTests(unittest.TestCase):
             frags = db.company_fragments_after_ticker(ti["tokens"])
             broker, _, _ = db.match_broker_from_tokens_and_text(ti["chinese_tokens"], ti["english_tokens"], "", self.broker_alias, frags)
             got = ((cands or [""])[0], dates[0]["date"] if dates else "", broker or "")
-            exp = ((row.get("ticker_candidates") or [""])[0], row.get("report_date") or "", (row.get("broker") or {}).get("value") or "")
+            broker_exp = (row.get("broker") or {}).get("value") or ""
+            if broker_exp and purge is not None and purge.is_cn_canon(broker_exp):
+                broker_exp = ""        # 批679/批702: a purged China broker never resolves from a file name
+            exp = ((row.get("ticker_candidates") or [""])[0], row.get("report_date") or "", broker_exp)
             if got != exp:
                 bad.append((name, got, exp))
         self.assertEqual(bad, [])
