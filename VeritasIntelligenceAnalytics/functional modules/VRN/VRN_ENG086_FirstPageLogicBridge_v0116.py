@@ -1371,10 +1371,18 @@ _UPSIDE_RX = re.compile(  # 批727b:Codex P1 追因——舊表只有 upside,而
 
 
 _PCT_UNIT_RX = re.compile(r"\(\s*[%％]\s*\)")            # 欄位單位標記 (%),不是行內的 15%
-_PCT_AFTER_RX = re.compile(r"[ \t\r\n\u3000]*[%％]")       # 數字之後(跳過版面空白)緊接 %
+# 批727e:單位要綁在**這個欄位**上,不是綁在物理行上(Codex 第四輪兩條 P2 的共同根因)。
+_PCT_SAME_LINE_RX = re.compile(r"[ \t\u3000]*[%％]")        # 同一行:數字後只隔空白就是 %
+# 跨行只認「% 獨占一行」:`250\n   %` 是版面把單位換行了;
+# `250\n% Revenue growth: 15` 的 % 是**下一個欄位標籤的開頭**,不是 250 的單位。
+_PCT_OWN_LINE_RX = re.compile(r"[ \t\u3000]*(?:\r?\n[ \t\u3000]*)+[%％][ \t\u3000]*(?:\r?\n|$)")
+# `(%)` 以連接詞繫在線索詞之前 =「Downside (%) to Price Target」那一類欄位標題;
+# 沒有連接詞的(`Revenue growth (%)   Target Price:`)是**另一欄**,不算。
+_PCT_LABEL_BEFORE_RX = re.compile(r"\(\s*[%％]\s*\)\s*(?:to|vs\.?|versus)\s+$", re.I)
 
 
-def _is_upside_context(text: str, pos: int, span: int = 26, num_start: int | None = None) -> bool:
+def _is_upside_context(text: str, pos: int, span: int = 26,
+                       num_start: int | None = None, cue_start: int | None = None) -> bool:
     """備用倉 via-vdf-vrn 對同一批 64 份報告的教訓:目標價與「潛在上漲空間」是兩個欄位;
     幅度(23%)不是價格。命中點前後有上漲空間字樣、或數字帶 %,一律不當目標價。"""
     # 批727d:前三輪都在補「視窗」,每補一次就冒出新的邊緣形狀(4 字元切片放過
@@ -1384,11 +1392,14 @@ def _is_upside_context(text: str, pos: int, span: int = 26, num_start: int | Non
     #   B 同一行的標籤區出現 `(%)` 這種**欄位單位標記** → 整欄是百分比欄。
     #     只認獨立的 `(%)`,**不認行內的 `15%`** —— 否則
     #     `Revenue +15%, Target Price: 250` 這種一行兩值的會被誤殺。
-    if _PCT_AFTER_RX.match(text, pos):                      # A
+    if _PCT_SAME_LINE_RX.match(text, pos) or _PCT_OWN_LINE_RX.match(text, pos):      # A
         return True
-    if num_start is not None:                               # B
-        line_start = text.rfind("\n", 0, num_start) + 1
-        if _PCT_UNIT_RX.search(text, line_start, num_start):
+    if cue_start is not None and num_start is not None:                             # B
+        # B1 `(%)` 夾在線索詞與數字之間 → 這一欄是百分比欄
+        if _PCT_UNIT_RX.search(text, cue_start, num_start):
+            return True
+        # B2 `(%)` 以連接詞繫在線索詞之前(`Downside (%) to Price Target`)
+        if _PCT_LABEL_BEFORE_RX.search(text[max(0, cue_start - 40): cue_start]):
             return True
     return bool(_UPSIDE_RX.search(text[max(0, pos - span): pos + span]))
 
@@ -1419,7 +1430,7 @@ def safe_target_price(text: str, E=None, exclude_code: str | None = None, exclud
         for m in rx.finditer(text or ""):
             # 批727b:除了數字周邊,**線索詞之前**也要看。`Up/downside to price target (%)\n38`
             # 的 downside 離數字太遠,只看數字周邊會漏;漏掉就把一個幅度當成目標價寫進庫。
-            if (_is_upside_context(text or "", m.end(1), num_start=m.start(1))
+            if (_is_upside_context(text or "", m.end(1), num_start=m.start(1), cue_start=m.start())
                     or _is_upside_context(text or "", m.start())):
                 continue
             v = _ok(m.group(1))
@@ -2408,7 +2419,12 @@ def selftest() -> int:
                       # 認了的話這三式(一行同時有幅度與價)就會被誤殺。
                       ("Revenue +15%, Target Price: 250", 250.0),
                       ("Target Price: 250 (+15%)", 250.0),
-                      ("目標價 250(上漲空間 15%)", 250.0)):
+                      ("目標價 250(上漲空間 15%)", 250.0),
+                      # 批727e(Codex 第四輪 P2 ×2):單位要綁在**這個欄位**上,不是綁在物理行上。
+                      #   前者:同一擷取行上**另一欄**的 (%) 不得壓掉後面的目標價;
+                      #   後者:換行後的 % 是**下一個欄位標籤的開頭**,不是 250 的單位。
+                      ("Revenue growth (%)   Target Price: 250", 250.0),
+                      ("Target Price: 250\n% Revenue growth: 15", 250.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
@@ -2430,7 +2446,9 @@ def selftest() -> int:
                # % 被換行與縮排推到第 5 個字元;以及 `(%)` 出現在**線索詞之前**的欄位標題。
                "Price Target (12M): 25\n   %", "Price Target: 25\n\t%",
                "Price Target (12M): 25  \n\n  ％",
-               "Downside (%) to Price Target (12M): 38", "Up/downside (%) to Target Price: 12"):
+               "Downside (%) to Price Target (12M): 38", "Up/downside (%) to Target Price: 12",
+               # 數字在 % **之前**的幅度句(靠詞表接住,不是靠規則 A)
+               "38% upside to target price", "12% downside to price target"):
         _v, _ = safe_target_price(_s)
         chk(f"英文目標價負控:{_s} 不准生出價", _v is None)
     # ---- 批727 雙頭守衛:冊上的 cue_rx 與本橋 _TP_CUES 本來就是雙胞胎,漂了沒人知道 ----
