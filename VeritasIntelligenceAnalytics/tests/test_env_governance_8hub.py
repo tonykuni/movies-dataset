@@ -26,7 +26,7 @@ class FakeCore:
     def canon(self, name):
         return name.lower()
 
-    def tools_apply(self, plan, approve):
+    def tools_apply(self, plan, approve, bootstrap_prechecked=False):
         self.applied.extend(plan["stages"])
         return {"ran": len(plan["stages"]), "fails": 0}
 
