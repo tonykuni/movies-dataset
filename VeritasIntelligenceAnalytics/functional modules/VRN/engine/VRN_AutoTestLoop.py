@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-VRN_AutoTestLoop v0103 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+VRN_AutoTestLoop v0104 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+
+v0103→v0104(母倉 批731;操作員 2026-09-24「PS PY檔案都要依規定裝加速器  剛剛跑好慢」「自測報告要自動跳出來」):
+  工作站實錄:106 份實檔 G06 入庫 20 分、G07 6.6 分,G08 冪等把 106 份**整批再入庫一次**,第六步撞 1800 秒天花板被停。
+  ① G08 改抽樣:平均抽 12 檔(--g08-sample N;首尾兩檔必在,檔名以報告日開頭,尾檔 = 最新一份)再入庫一次,
+     列數仍必須不變——冪等是 upsert(ReportID)的性質,
+     不必把 106 份重新擷取一遍才驗得出;要全批:--g08-full。明細寫明「抽 12/106 檔」。G11 / G12 讀的是 G06 寫的 JSON,
+     G08 不重寫它,抽樣不影響它們看到的列。
+  ② 起跑先 VIA_ACCEL.activate()(批323 啟動律:載 Celeritas、套執行緒預算),印一行 [加速器] 在位 / 缺席與原因——
+     橋一直在,但從來沒有啟動過。
+  ③ 進度協定:一輪的總數改成 G06 n + G07 n + G08 抽樣數,百分比一路往上,不會在 G08 開頭倒退。
+  證據核心同批:每一頁、每一份附錄小字對同一個檔只解析一次(首頁、附錄、欄表、G07、G08 原本各自重讀)。
+  ④ --selftest 的單元測試改成一檔一個子行程並排跑(行程數同整批平行池:VRN_BATCH_WORKERS > 加速器執行緒預算 >
+     CPU−1;大檔先跑):六層鏈 V2 敲這扇門時節點天花板 180 秒(格子 60 秒),序跑 104 支會撞天花板 → 那一格
+     「沒跑完=沒有結論」,V2 整層陪它等。子行程在父行程被天花板砍掉時自己收(stdin 關了就走),不留著佔住庫。
 
 v0102→v0103(母倉 批729;操作員 2026-09-24「報告後小字體不相關附錄可抓到局部識別券商」「報告後方小字級附錄可抓到所有評等法可增加到同義字」):
   G07 把檔案路徑交給首頁引擎(PDF 才讀附錄);每檔記下附錄小字的券商、層級、是否用上、與檔名是否衝突與評等定義。
@@ -94,7 +108,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-LOOP_VERSION = "v0103"
+LOOP_VERSION = "v0104"
 HERE = Path(__file__).resolve().parent
 VRN_ROOT = HERE.parent
 REPO_ROOT = VRN_ROOT.parent.parent if (VRN_ROOT.parent.name == "functional modules") else VRN_ROOT
@@ -171,6 +185,19 @@ def def_say(text: str) -> None:
 
 
 PASS_INDEX = {"G06": 0, "G07": 1, "G08": 2}    # 三批逐檔:入庫 · 首頁 · 冪等第二批
+G08_SAMPLE = 12                                 # v0104:冪等抽樣檔數(--g08-sample;--g08-full 全批)
+
+
+def def_g08_pick(names: Sequence[str], sample: int, full: bool) -> List[str]:
+    """v0104: the idempotency pass re-ingests an evenly spread, fixed sample of the batch (sorted names).  The first
+    and the last file are always in it -- names start with the report date, so the last one is the newest report."""
+    names = sorted(names)
+    if full or sample <= 0 or len(names) <= sample:
+        return list(names)
+    if sample == 1:
+        return [names[-1]]
+    last = len(names) - 1
+    return [names[round(i * last / (sample - 1))] for i in range(sample)]
 
 
 def def_tick(prefix: str, i: int, n: int, name: str) -> None:
@@ -181,9 +208,13 @@ def def_tick(prefix: str, i: int, n: int, name: str) -> None:
     def_say(f"   [{prefix} {i}/{n}] {name}")
     if PROGRESS["quiet"] or n <= 0:
         return
-    k = PASS_INDEX.get(prefix, 0) * n + i
+    total, offsets = PROGRESS.get("round_total"), PROGRESS.get("round_offsets") or {}
+    if total and prefix in offsets:              # v0104: the round declared its real total (G08 is a sample)
+        k, kk = min(offsets[prefix] + i, total), total
+    else:
+        k, kk = PASS_INDEX.get(prefix, 0) * n + i, 3 * n
     stream = PROGRESS.get("stream") or sys.__stdout__ or sys.stdout
-    stream.write(f"[進度] {k}/{3 * n} {prefix} {name}\n")
+    stream.write(f"[進度] {k}/{kk} {prefix} {name}\n")
     stream.flush()
 
 
@@ -800,22 +831,27 @@ def def_gate_first_page(engines: Engines, truth: List[Dict[str, Any]], samples: 
     return rows
 
 
-def def_gate_idempotent(engines: Engines, samples: Path, out_dir: Path, run_id: str) -> List[Dict[str, Any]]:
+def def_gate_idempotent(engines: Engines, samples: Path, out_dir: Path, run_id: str,
+                        sample: int = G08_SAMPLE, full: bool = False) -> List[Dict[str, Any]]:
     db = engines.database
     if db is None or not (def_has("pandas") and def_has("pyarrow")):
         return [def_row("G08 IDEMPOTENT", "second batch", "SKIP", "DEPENDENCY_MISSING")]
     try:
         import pandas as pd  # type: ignore
         before = len(pd.read_parquet(out_dir / "vrn_db" / db.BASICINFO_PARQUET_NAME))
+        names = [f.name for f in db.scan_input_files(Path(samples)) if f.suffix.lower() not in db.OCR_SUFFIXES]
+        pick = def_g08_pick(names, sample, full)
         args = argparse.Namespace(input=str(samples), output=str(out_dir / "vrn_db"), ticker_ssot="", broker_ssot="", rating_ssot="",
                                   online_name_update=False, csv=False, json=False, duckdb=False, google_sheet="", google_credentials="",
-                                  run_id=run_id + "_R2", self_test=False)
+                                  run_id=run_id + "_R2", self_test=False, only_files=pick)
         import contextlib
         with contextlib.redirect_stdout(def_ProgressTee("G08")):
             db.process_batch(args)
         after = len(pd.read_parquet(out_dir / "vrn_db" / db.BASICINFO_PARQUET_NAME))
         ok = before == after
-        return [def_row("G08 IDEMPOTENT", "second batch keeps one row per ReportID", "PASS" if ok else "FAIL", f"before={before} after={after}")]
+        how = "" if len(pick) == len(names) else f" · 抽 {len(pick)}/{len(names)} 檔再入庫(要全批:--g08-full)"
+        return [def_row("G08 IDEMPOTENT", "second batch keeps one row per ReportID", "PASS" if ok else "FAIL",
+                        f"before={before} after={after}{how}")]
     except Exception as error:  # noqa: BLE001
         return [def_row("G08 IDEMPOTENT", "second batch", "FAIL", f"{error.__class__.__name__}: {error}"[:300])]
 
@@ -1317,6 +1353,14 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
             shutil.rmtree(out_dir)
         out_dir.mkdir(parents=True)
         run_id = f"VRN_AUTOTEST_R{round_no}"
+        g08_full, g08_n = bool(getattr(args, "g08_full", False)), int(getattr(args, "g08_sample", G08_SAMPLE))
+        db_eng = engines.database
+        files_in = db_eng.scan_input_files(Path(samples)) if db_eng is not None else []
+        n_in = len(files_in) if db_eng is not None else len(before)
+        n_g08 = len(def_g08_pick([f.name for f in files_in if f.suffix.lower() not in db_eng.OCR_SUFFIXES]
+                                 if db_eng is not None else [], g08_n, g08_full))
+        PROGRESS["round_total"] = 2 * n_in + n_g08            # v0104:G06 n + G07 n + G08 抽樣,百分比一路往上
+        PROGRESS["round_offsets"] = {"G06": 0, "G07": n_in, "G08": 2 * n_in}
         def_say(f"[ROUND {round_no}] G06 資料庫引擎整批入庫（{len(before)} 檔；每檔一行進度）")
         batch_rows, summary = def_gate_batch(engines, samples, out_dir, truth, real_mode, run_id)
         rows += batch_rows
@@ -1325,8 +1369,8 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
         def_say(f"[ROUND {round_no}] G07 首頁引擎逐檔")
         rows += def_gate_first_page(engines, truth, samples, real_mode)
         if summary:
-            def_say(f"[ROUND {round_no}] G08 冪等：同一批再入庫一次，列數必須不變")
-            rows += def_gate_idempotent(engines, samples, out_dir, run_id)
+            def_say(f"[ROUND {round_no}] G08 冪等：抽 {n_g08} 檔再入庫一次（--g08-full 全批），列數必須不變")
+            rows += def_gate_idempotent(engines, samples, out_dir, run_id, g08_n, g08_full)
         rows += def_gate_read_only(samples, before)
         def_say(f"[ROUND {round_no}] G09 唯讀 · G11 真值" + ("" if getattr(args, "truth", "") else "（未給 --truth，略過）") + " · G12 15 欄六態")
         truth_rows, truth_summary = def_gate_truth(engines, getattr(args, "truth", ""), out_dir if summary else None, run_id)
@@ -1384,6 +1428,131 @@ def def_render_html(report: Dict[str, Any]) -> str:
     return "".join(parts)
 
 
+UNIT_MARK = "[UNIT-JSON] "
+UNIT_FILE_TIMEOUT = 900        # v0104:單一測試檔的天花板(秒);逾時 = 那一檔 FAIL,不拖住整扇門
+
+
+def def_flatten(suite: Any) -> List[Any]:
+    import unittest
+    out: List[Any] = []
+    for item in suite:
+        out += def_flatten(item) if isinstance(item, unittest.TestSuite) else [item]
+    return out
+
+
+def def_unit_file(spec: str) -> int:
+    """v0104 (--unit-file FILE[::k/n]): one VRN/tests file in this process -- or part k of n of it: the file is
+    discovered whole and its test classes are dealt out in name order, so every test runs in exactly one part (inherited
+    tests too) and a class's shared set-up runs once per part.  One ASCII JSON line on stdout.  Started by the
+    self-test with VRN_UNIT_WATCH_STDIN=1: when that parent is gone (killed by an outer ceiling) its end of our stdin
+    closes and this process exits too -- an orphaned test must not keep the market database open for the next station."""
+    import threading
+    import unittest
+    path, _, part = spec.partition("::")
+    if os.environ.get("VRN_UNIT_WATCH_STDIN") == "1" and sys.stdin is not None:
+        def watch_parent() -> None:
+            try:
+                sys.stdin.buffer.read()
+            except (OSError, ValueError):
+                return
+            os._exit(3)
+        threading.Thread(target=watch_parent, daemon=True).start()
+    target = Path(path).resolve()
+    suite = unittest.TestLoader().discover(str(target.parent), pattern=target.name, top_level_dir=str(target.parent))
+    if part:
+        k, n = (int(x) for x in part.split("/"))
+        cases = def_flatten(suite)
+        names = sorted({f"{type(c).__module__}.{type(c).__qualname__}" for c in cases})
+        mine = set(names[k::n])
+        suite = unittest.TestSuite([c for c in cases if f"{type(c).__module__}.{type(c).__qualname__}" in mine])
+    res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)
+    print(UNIT_MARK + json.dumps({"file": target.name + (f"[{part}]" if part else ""), "run": res.testsRun,
+                                  "skipped": len(res.skipped), "bad": [str(t[0]) for t in res.failures + res.errors]}),
+          flush=True)
+    return 0
+
+
+def def_unit_specs(tests_dir: Path, workers: int) -> List[str]:
+    """v0104: the self-test's work units, costliest first -- a file, or FILE::k/n parts when it holds several classes
+    (the ADJ oracle's three classes then run side by side instead of one after another).  Cost = the file's own
+    `SELFTEST_SECONDS = N` (read from its source, not run) shared by its parts; otherwise its size (~1 s per 4 KB).
+    Nothing is timed and written back: a self-test writes only to its scratch folder."""
+    import ast
+    weighted: List[Tuple[float, str, str]] = []
+    for f in sorted(tests_dir.glob("test_*.py")):
+        try:
+            body = ast.parse(f.read_text(encoding="utf-8", errors="replace")).body
+        except SyntaxError:
+            body = []                               # its own run reports the error
+        n_cls = sum(isinstance(n, ast.ClassDef) for n in body) or 1
+        hint = next((float(n.value.value) for n in body if isinstance(n, ast.Assign)
+                     and any(isinstance(t, ast.Name) and t.id == "SELFTEST_SECONDS" for t in n.targets)
+                     and isinstance(n.value, ast.Constant) and isinstance(n.value.value, (int, float))), None)
+        parts = min(n_cls, workers)
+        cost = (hint if hint is not None else f.stat().st_size / 4000) / max(parts, 1)
+        units = [f"{f}::{k}/{parts}" for k in range(parts)] if parts > 1 else [str(f)]
+        weighted += [(cost, f.name, u) for u in units]
+    return [u for _, _, u in sorted(weighted, key=lambda w: (-w[0], w[1], w[2]))]
+
+
+def def_unit_child(spec: str, timeout: int = UNIT_FILE_TIMEOUT) -> Dict[str, Any]:
+    """v0104: one work unit (a test file or FILE::k/n) in a child process of this script -> {file, run, skipped, bad,
+    secs}.  No answer line (crash, timeout) = that unit is a failure, with the last lines of its output."""
+    import threading
+    t0 = time.time()
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", VRN_UNIT_WATCH_STDIN="1")
+    proc = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--unit-file", spec],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    timer = threading.Timer(timeout, proc.kill)
+    timer.start()
+    try:
+        raw = proc.stdout.read() if proc.stdout else b""
+        rc = proc.wait()
+    finally:
+        timer.cancel()
+        if proc.stdin:
+            proc.stdin.close()
+    text = raw.decode("utf-8", errors="replace")
+    secs = round(time.time() - t0, 1)
+    for line in reversed(text.splitlines()):
+        if line.startswith(UNIT_MARK):
+            out = json.loads(line[len(UNIT_MARK):])
+            out["secs"] = secs
+            return out
+    why = f"逾時 {timeout}s" if secs >= timeout else f"rc={rc}"
+    tail = " / ".join(text.strip().splitlines()[-2:])[:200]
+    name = Path(spec.partition("::")[0]).name + (f"[{spec.partition('::')[2]}]" if "::" in spec else "")
+    return {"file": name, "run": 0, "skipped": 0, "bad": [f"{name} 沒有回報({why}){tail}"], "secs": secs}
+
+
+def def_unit_all(tests_dir: Path) -> Tuple[int, int, List[str], str]:
+    """v0104: all VRN/tests files -> (run, skipped, bad, how).  Work units (def_unit_specs) run side by side, one
+    process each (the batch pool's worker count: VRN_BATCH_WORKERS > the accelerator's thread budget > CPUs - 1); one
+    worker = the whole suite in this process, as before.  Each unit keeps its own main process, so the tests that
+    start the batch pool still start it."""
+    import unittest
+    files = sorted(tests_dir.glob("test_*.py"), key=lambda f: (-f.stat().st_size, f.name))
+    workers, why = 1, ""
+    try:
+        if str(HERE) not in sys.path:
+            sys.path.insert(0, str(HERE))
+        import VRN_BatchPool as pool  # type: ignore
+        workers = pool.workers_for(len(files))
+    except ImportError as exc:
+        why = f"(平行池載不到:{exc.name or exc})"
+    if workers <= 1:
+        suite = unittest.TestLoader().discover(str(tests_dir), pattern="test_*.py", top_level_dir=str(tests_dir))
+        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)
+        return res.testsRun, len(res.skipped), [str(t[0]) for t in res.failures + res.errors], "本行程序跑" + why
+    from concurrent.futures import ThreadPoolExecutor
+    specs = def_unit_specs(tests_dir, workers)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        got = list(ex.map(def_unit_child, specs))
+    slow = max(got, key=lambda g: g["secs"])
+    return (sum(g["run"] for g in got), sum(g["skipped"] for g in got), [b for g in got for b in g["bad"]],
+            f"{len(files)} 檔 {len(specs)} 份 · 平行 {workers} 行程 · 最慢 {slow['file']} {slow['secs']}s")
+
+
 def def_selftest() -> int:
     """母倉 批728 自測門(六層鏈 CGC_MDL172 與全格子都敲這扇門):
     ① VRN/tests 全部單元測試(unittest,不需 pytest);② 合成語料小批(--limit 8,一輪)跑到底,不得有 FAIL。
@@ -1402,17 +1571,18 @@ def def_selftest() -> int:
 
     tests_dir = VRN_ROOT / "tests"
     if tests_dir.is_dir():
-        suite = unittest.TestLoader().discover(str(tests_dir), pattern="test_*.py", top_level_dir=str(tests_dir))
-        buf = io.StringIO()
-        res = unittest.TextTestRunner(stream=buf, verbosity=0).run(suite)
-        bad = [str(t[0]) for t in res.failures + res.errors]
-        chk(f"① VRN/tests 單元測試 {res.testsRun} 支(跳過 {len(res.skipped)})", not bad and res.testsRun > 0,
+        n_run, n_skip, bad, how = def_unit_all(tests_dir)
+        chk(f"① VRN/tests 單元測試 {n_run} 支(跳過 {n_skip};{how})", not bad and n_run > 0,
             ("壞:" + " | ".join(bad[:3])) if bad else "")
     else:
         chk("① VRN/tests 單元測試", False, "tests 夾不在")
     tmp = Path(tempfile.mkdtemp(prefix="vrn_autotest_selftest_"))
     try:
-        rc = def_main(["--synthetic", "--limit", "8", "--rounds", "1", "--quiet", "--out", str(tmp)])
+        import contextlib
+        # v0104: the pool's one-line notes go to stderr; the six-layer chain reads stdout then stderr and shows the
+        # last two lines, so keep them in stdout here -- the [計] summary stays the last line it shows
+        with contextlib.redirect_stderr(sys.stdout):
+            rc = def_main(["--synthetic", "--limit", "8", "--rounds", "1", "--quiet", "--out", str(tmp)])
         rep = tmp / "VRN_AutoTest_Report.json"
         verdict, n_fail = "?", -1
         if rep.is_file():
@@ -1480,6 +1650,9 @@ def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def def_main(argv: Optional[Sequence[str]] = None) -> int:
+    if argv is None and "--unit-file" in sys.argv[1:]:
+        at = sys.argv.index("--unit-file")
+        return def_unit_file(sys.argv[at + 1]) if at + 1 < len(sys.argv) else 2
     if argv is None and "--selftest" in sys.argv[1:]:
         try:
             sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
@@ -1499,6 +1672,8 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--html", default="", help="報告 HTML 路徑")
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--truth", default="", help="人工真值 JSON（schema 見 docs/VIA_VRN_AUTOTEST.md；只放操作員手上，不入庫）")
+    parser.add_argument("--g08-sample", type=int, default=G08_SAMPLE, help="G08 冪等抽幾檔再入庫(預設 12;0=全批)")
+    parser.add_argument("--g08-full", action="store_true", help="G08 冪等把整批再入庫一次(舊行為;慢)")
     parser.add_argument("--canonical-crosscheck", action="store_true",
                         help="G11 另量母倉正本 ENG086（經 SUP_MDL749）在同一份真值上的表現（僅供參考，不影響判定）")
     args = parser.parse_args(argv)
@@ -1511,6 +1686,16 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
     # pdfminer logs 'Could not get FontBBox from font descriptor …' for fonts without a bounding box; the text
     # is still extracted.  The warning floods the console on real reports, so only its errors are shown.
     logging.getLogger("pdfminer").setLevel(logging.ERROR)
+    # v0104 批323 啟動律:橋一直在,但從來沒有啟動過——載 Celeritas、套執行緒預算,在位 / 缺席照實印一行
+    if VIA_ACCEL is not None and hasattr(VIA_ACCEL, "activate"):
+        try:
+            act = VIA_ACCEL.activate()
+            def_say(f"[加速器] Celeritas {'在位' if act.get('celeritas') else '缺席'} · lib {act.get('libs_available')}/"
+                    f"{act.get('libs_total')} · 執行緒預算 {act.get('thread_budget')}" + (f" · {act['err']}" if act.get("err") else ""))
+        except Exception as error:  # noqa: BLE001
+            def_say(f"[加速器] 啟動失敗(不擋跑):{error.__class__.__name__}: {str(error)[:80]}")
+    else:
+        def_say("[加速器] 橋缺席(不擋跑;supportive modules/VIA_SuperAccel_Module.py 找不到)")
     if not args.samples and os.name == "nt" and Path(DEFAULT_SAMPLES_WINDOWS).is_dir():
         args.samples = DEFAULT_SAMPLES_WINDOWS
     workdir = Path(args.out) if args.out else Path(tempfile.gettempdir()) / f"VRN_AutoTest_{time.strftime('%Y%m%dT%H%M%S')}"

@@ -69,7 +69,9 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+import copy
 import datetime
+import functools
 import glob
 import importlib.util
 import json
@@ -78,7 +80,7 @@ import re
 import statistics
 import sys
 import unicodedata
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 
 CORE_VERSION = "v0102"
 
@@ -123,13 +125,20 @@ _RULES_CACHE = {}
 
 def repo_root(start=None):
     """The tree root that holds 'functional modules' (sister repo root = mother VeritasIntelligenceAnalytics/)."""
-    probe = os.path.dirname(os.path.abspath(start or __file__))
+    return _repo_root_from(os.path.dirname(os.path.abspath(start or __file__)))
+
+
+@functools.lru_cache(maxsize=64)
+def _repo_root_from(probe):
+    """批730 speed: the walk up is file-system calls (slow on a synced Windows folder) and ran ~30,000 times per
+    batch from the deny check; the tree does not move during a run, so each starting folder is walked once."""
+    start_dir = probe
     while True:
         if os.path.isdir(os.path.join(probe, "functional modules")):
             return probe
         parent = os.path.dirname(probe)
         if parent == probe:
-            return os.path.dirname(os.path.abspath(start or __file__))
+            return start_dir
         probe = parent
 
 
@@ -197,8 +206,26 @@ OVERLAY_GLOB = ("supportive modules/ssot", "VIA_FinancialInstitution_Overlay_v*.
 _DENY_CACHE = {}
 
 
+@functools.lru_cache(maxsize=256)
 def _deny_norm(value):
+    # 批730 speed: the same page text is checked once per broker alias (hundreds per file) -- normalise it once
     return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", str(value or ""))).strip().casefold()
+
+
+_DENY_NORM_CACHE = {}
+
+
+def _deny_table(start=None):
+    """(normalised deny phrases, longest first · the same as a set): normalised once per tree.
+    批730 speed: the check used to re-normalise every deny phrase on every call (1.17 million times for 19 one-page
+    files); the answers are the same, only computed once."""
+    root = repo_root(start)
+    hit = _DENY_NORM_CACHE.get(root)
+    if hit is None:
+        norm = tuple(_deny_norm(k) for k in deny_phrases(start))
+        hit = (norm, frozenset(norm))
+        _DENY_NORM_CACHE[root] = hit
+    return hit
 
 
 def deny_phrases(start=None):
@@ -230,7 +257,7 @@ def deny_phrases(start=None):
 def is_denied_token(value, start=None):
     """True when the whole value IS a denied name (normalised exact match) -- the filename / canonical-key layer."""
     n = _deny_norm(value)
-    return bool(n) and any(_deny_norm(k) == n for k in deny_phrases(start))
+    return bool(n) and n in _deny_table(start)[1]
 
 
 def deny_shadowed(alias, text, start=None):
@@ -248,8 +275,7 @@ def deny_shadowed(alias, text, start=None):
     if not a_spans:
         return False
     d_spans = []
-    for d in deny_phrases(start):
-        dn = _deny_norm(d)
+    for dn in _deny_table(start)[0]:
         if len(dn) >= len(a) and a in dn:
             d_spans.extend(_alias_spans(dn, low))
     return bool(d_spans) and all(any(ds <= s0 and t0 <= dt for ds, dt in d_spans) for s0, t0 in a_spans)
@@ -408,9 +434,45 @@ def lines_from_chars(chars):
     return lines
 
 
+# 批730 speed (operator 2026-09-24「剛剛跑好慢」): one report's page 1 and its last pages were parsed again by every
+# reader (first page, appendix body size, appendix, column tables) and again in G07 / G08 -- 24 pdfplumber parses for a
+# 15-page file.  The same file (path · size · modified time) and page give the same glyphs, so they are parsed once;
+# callers get copies, and a file edited in place gets a new key.
+_PAGE_CACHE = OrderedDict()
+_PAGE_CACHE_MAX = 24
+_APPENDIX_CACHE = OrderedDict()
+_APPENDIX_CACHE_MAX = 512
+_PAGE_COUNT_CACHE = {}
+
+
+def _file_key(path):
+    """(absolute path, size, modified time in ns); None when the file cannot be stat'ed (then nothing is cached)."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return None
+    return os.path.abspath(str(path)), st.st_size, st.st_mtime_ns
+
+
 def pdf_page_chars(path, page_index=0, order=("pdfplumber", "fitz")):
     """Glyphs of one PDF page as dicts (text, x0, x1, top, bottom, size, fontname) plus (width, height).
     Returns None when no PDF library is installed or the file cannot be opened."""
+    key = _file_key(path)
+    k = key + (int(page_index), tuple(order)) if key is not None else None
+    if k is not None and k in _PAGE_CACHE:
+        _PAGE_CACHE.move_to_end(k)
+        chars, size = _PAGE_CACHE[k]
+        return [dict(c) for c in chars], size
+    got = _pdf_page_chars_parse(path, page_index, order)
+    if k is not None and got is not None:
+        _PAGE_CACHE[k] = ([dict(c) for c in got[0]], got[1])
+        while len(_PAGE_CACHE) > _PAGE_CACHE_MAX:
+            _PAGE_CACHE.popitem(last=False)
+    return got
+
+
+def _pdf_page_chars_parse(path, page_index=0, order=("pdfplumber", "fitz")):
+    """The uncached reader behind pdf_page_chars()."""
     for engine in order:
         if engine == "pdfplumber":
             try:
@@ -1011,6 +1073,17 @@ def _appendix_issuer_line(line):
 
 def pdf_page_count(path):
     """Number of pages of a PDF; 0 when no PDF library is installed or the file cannot be opened."""
+    key = _file_key(path)
+    if key is not None and key in _PAGE_COUNT_CACHE:
+        return _PAGE_COUNT_CACHE[key]
+    n = _pdf_page_count_open(path)
+    if key is not None and n:
+        _PAGE_COUNT_CACHE[key] = n
+    return n
+
+
+def _pdf_page_count_open(path):
+    """The uncached counter behind pdf_page_count()."""
     try:
         if importlib.util.find_spec("pdfplumber") is not None:
             import pdfplumber
@@ -1041,7 +1114,23 @@ def _body_size(lines):
 def appendix_lines(path, last_pages=APPENDIX_PAGES, small_only=True):
     """Small-print lines of the report's last pages (page 1 excluded).
     Returns (lines, info): lines = [{"page", "text", "size"}]; info says which pages were read, the page-1 body size
-    and the small-print threshold.  Not a PDF / one page only / no text layer = ([], info with the honest reason)."""
+    and the small-print threshold.  Not a PDF / one page only / no text layer = ([], info with the honest reason).
+    批730 speed: read once per file version (the batch, the first-page gate and the idempotency pass all ask)."""
+    key = _file_key(path)
+    k = key + (int(last_pages), bool(small_only)) if key is not None else None
+    if k is not None and k in _APPENDIX_CACHE:
+        _APPENDIX_CACHE.move_to_end(k)
+        return copy.deepcopy(_APPENDIX_CACHE[k])
+    got = _appendix_lines_read(path, last_pages, small_only)
+    if k is not None:
+        _APPENDIX_CACHE[k] = copy.deepcopy(got)
+        while len(_APPENDIX_CACHE) > _APPENDIX_CACHE_MAX:
+            _APPENDIX_CACHE.popitem(last=False)
+    return got
+
+
+def _appendix_lines_read(path, last_pages=APPENDIX_PAGES, small_only=True):
+    """The uncached reader behind appendix_lines()."""
     info = {"state": "NODATA", "pages": [], "n_pages": 0, "body_size": None, "threshold": None, "why": ""}
     if not str(path).lower().endswith(".pdf"):
         info["why"] = "appendix is read from PDF only"

@@ -37,6 +37,7 @@ ENGINE = Path(__file__).resolve().parents[1] / "engine"
 TP_MULT = 1.2           # a synthetic target 20% above the traded close of the day before the report
 N_RETRO, N_PLAIN = 60, 60
 N_STRATUM = 40
+SELFTEST_SECONDS = 40   # rough cost in the loop's self-test (批731: it runs the costliest units first)
 
 
 def def_load(name, filename):
@@ -50,7 +51,10 @@ def def_load(name, filename):
 
 
 @unittest.skipUnless(importlib.util.find_spec("duckdb"), "duckdb absent")
-class AdjOracleTest(unittest.TestCase):
+class AdjOracleBase(unittest.TestCase):
+    """The shared sample and helpers; the checks are in three classes below (批731) so the self-test can run
+    them side by side -- one after another they were 40 of its 60 seconds."""
+
     @classmethod
     def setUpClass(cls):
         import duckdb
@@ -120,6 +124,15 @@ class AdjOracleTest(unittest.TestCase):
         tp = round(rc * TP_MULT, 2)
         return tp, self.C.adj_basis(tk.split(".")[0], nd, tp, db=self.db)
 
+    def engine(self):
+        mod, why = self.C.adj_engine()
+        self.assertIsNotNone(mod, why)
+        return mod
+
+
+class AdjOracleInvariantTest(AdjOracleBase):
+    """The report-time ratio, the ex-dividend day, the one-day stale price, the latest close."""
+
     def test_the_report_time_ratio_survives_the_adj_conversion(self):
         checked, events = 0, 0
         for row in self.retro + self.plain:
@@ -138,33 +151,6 @@ class AdjOracleTest(unittest.TestCase):
                                    msg=(tk, nd, q["target_price_adj"], q["price_prev_adj"], tp, rc))
             checked += 1
         self.assertGreater(checked, 0.5 * (len(self.retro) + len(self.plain)), (checked, events))
-
-    def test_upside_matches_a_separately_written_oracle(self):
-        mismatches, v0137_off, n = [], [], 0
-        for row in self.retro + self.plain:
-            tk, d, nd, yc, ya, rc = row
-            tp, q = self.quote(row)
-            lat = self.latest.get(tk)
-            if not lat or not str(q.get("state") or "").startswith("ADJ_OK") or q.get("adj_factor_basis") != "RAW_EXCHANGE":
-                continue
-            oracle = round((round(tp * ya / rc, 4) / lat[0] - 1) * 100, 1)
-            old = round((round(tp * ya / yc, 4) / lat[0] - 1) * 100, 1)
-            n += 1
-            if q["upside_adj"] != oracle:
-                mismatches.append((tk, nd, q["upside_adj"], oracle))
-            if abs(old - oracle) > 0.5:
-                v0137_off.append((tk, nd, old, oracle))
-        print(f"\n[ADJ oracle] samples {n} · v0138 vs oracle mismatches {len(mismatches)} · "
-              f"v0137 off by >0.5pt {len(v0137_off)}" + (f" (e.g. {v0137_off[0]})" if v0137_off else ""))
-        self.assertEqual(mismatches, [])
-        self.assertGreater(n, 0)
-        if self.retro:
-            self.assertGreater(len(v0137_off), 0, "Yahoo re-adjusted closes were sampled, so v0137 must disagree somewhere")
-
-    def engine(self):
-        mod, why = self.C.adj_engine()
-        self.assertIsNotNone(mod, why)
-        return mod
 
     def test_an_ex_dividend_on_the_factor_day_is_used_as_it_is(self):
         import duckdb
@@ -198,6 +184,38 @@ class AdjOracleTest(unittest.TestCase):
         self.assertEqual(moved, [])
         self.assertGreater(len(self.blip), 0)
 
+    def test_the_latest_adj_close_is_the_traded_price(self):
+        both = [(tk, v) for tk, v in self.latest.items() if v and v[2]]
+        off = [(tk, v) for tk, v in both if abs(v[0] / v[2] - 1) > 0.005]
+        self.assertEqual(off, [], "the upside divides by the latest adj close; it must equal today's traded close")
+        self.assertGreater(len(both), 0)
+
+
+class AdjOracleUpsideTest(AdjOracleBase):
+    """The upside against a separately written oracle; suffixed tickers."""
+
+    def test_upside_matches_a_separately_written_oracle(self):
+        mismatches, v0137_off, n = [], [], 0
+        for row in self.retro + self.plain:
+            tk, d, nd, yc, ya, rc = row
+            tp, q = self.quote(row)
+            lat = self.latest.get(tk)
+            if not lat or not str(q.get("state") or "").startswith("ADJ_OK") or q.get("adj_factor_basis") != "RAW_EXCHANGE":
+                continue
+            oracle = round((round(tp * ya / rc, 4) / lat[0] - 1) * 100, 1)
+            old = round((round(tp * ya / yc, 4) / lat[0] - 1) * 100, 1)
+            n += 1
+            if q["upside_adj"] != oracle:
+                mismatches.append((tk, nd, q["upside_adj"], oracle))
+            if abs(old - oracle) > 0.5:
+                v0137_off.append((tk, nd, old, oracle))
+        print(f"\n[ADJ oracle] samples {n} · v0138 vs oracle mismatches {len(mismatches)} · "
+              f"v0137 off by >0.5pt {len(v0137_off)}" + (f" (e.g. {v0137_off[0]})" if v0137_off else ""))
+        self.assertEqual(mismatches, [])
+        self.assertGreater(n, 0)
+        if self.retro:
+            self.assertGreater(len(v0137_off), 0, "Yahoo re-adjusted closes were sampled, so v0137 must disagree somewhere")
+
     def test_a_suffixed_ticker_gives_the_same_answer(self):
         import duckdb
         mod = self.engine()
@@ -209,6 +227,10 @@ class AdjOracleTest(unittest.TestCase):
                 diff.append((tk, nd, bare.get("adj_factor_basis"), suffixed.get("adj_factor_basis")))
         con.close()
         self.assertEqual(diff, [])
+
+
+class AdjOracleDigestTest(AdjOracleBase):
+    """ENG080 gives ENG073's factor and refuses the same events."""
 
     def test_the_four_point_digest_uses_the_same_factor(self):
         import duckdb
@@ -243,12 +265,6 @@ class AdjOracleTest(unittest.TestCase):
         print(f"\n[ENG080 vs ENG073] samples {n} · disagree {len(diff)}")
         self.assertEqual(diff, [])
         self.assertGreater(n, 0)
-
-    def test_the_latest_adj_close_is_the_traded_price(self):
-        both = [(tk, v) for tk, v in self.latest.items() if v and v[2]]
-        off = [(tk, v) for tk, v in both if abs(v[0] / v[2] - 1) > 0.005]
-        self.assertEqual(off, [], "the upside divides by the latest adj close; it must equal today's traded close")
-        self.assertGreater(len(both), 0)
 
 
 if __name__ == "__main__":

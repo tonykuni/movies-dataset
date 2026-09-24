@@ -25,6 +25,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 LOOP = HERE.parent / "engine" / "VRN_AutoTestLoop.py"
+SELFTEST_SECONDS = 16   # rough cost in the loop's self-test (批731: it runs the costliest units first)
 
 
 def def_load():
