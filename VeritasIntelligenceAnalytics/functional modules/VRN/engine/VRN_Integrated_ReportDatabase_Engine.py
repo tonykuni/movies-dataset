@@ -101,7 +101,16 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
 SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
-ENGINE_VERSION = "v0104"
+ENGINE_VERSION = "v0105"
+# v0105 (mother 批732; operator's screenshot 2026-09-24 of 20251128兆豐訪談速報-神達(3706) p.4 季度損益表):
+#   that table came out wrong three ways -- (1) quarter headers "25Q1".."26Q1(F)" lost their year (FiscalYear None,
+#   PERIOD_UNCLEAR), (2) "(F)" was not read as a forecast, (3) 營業成本 / 營業費用 had no metric, so both rows were
+#   dropped.  Period headers now go to the mother's parser first (VRN_ENG074 period_parts, the one that already
+#   reads 24Q1 / 25Q1(F) / 2025(F) / 1H25 / FY25); what it cannot parse keeps the rules below.  Metrics: COGS,
+#   OperatingExpense (+ their ratios, so a percentage never becomes an amount), NonOperatingIncome, InterestIncome.
+#   financial_identity_checks(): the table must add up (gross = revenue - cost, operating = gross - expense, four
+#   quarters = the year) within the rounding the printed digits carry -- a read table that does not add up is
+#   named, not trusted.
 # v0104 (mother 批731; operator 2026-09-24「剛剛跑好慢」): process_batch takes an optional args.only_files (file names)
 #   -- the self-test loop's idempotency pass re-ingests a named sample instead of the whole folder; without it nothing
 #   changes.  The evidence core behind the first-page reader now parses each page / appendix once per file version.
@@ -381,6 +390,15 @@ METRIC_ALIASES = {
     "MarketCap": ["Market Cap", "市值"],
     "TargetPrice": ["Target Price", "TP", "目標價"],
     "CurrentPrice": ["Current Price", "現價", "股價"],
+    # v0105 (批732): cost and expense rows were dropped whole (no metric).  Only added; the ratios are here so that
+    # 營業費用率 / 營業成本率 (a percentage) never lands in the amount (the longest alias wins).
+    "COGS": ["COGS", "Cost of Revenue", "Cost of Sales", "Cost of Goods Sold", "營業成本", "銷貨成本"],
+    "COGSRatio": ["營業成本率", "銷貨成本率"],
+    "OperatingExpense": ["Operating Expense", "Operating Expenses", "OPEX", "營業費用"],
+    "OperatingExpenseRatio": ["營業費用率", "費用率", "OPEX Ratio"],
+    "NonOperatingIncome": ["營業外收支", "營業外收入及支出", "營業外收入", "業外收支", "業外損益", "Non-operating Income",
+                           "Non-Operating Income"],
+    "InterestIncome": ["利息收入", "Interest Income"],
 }
 
 METRIC_CATEGORY_MAP = {
@@ -408,6 +426,12 @@ METRIC_CATEGORY_MAP = {
     "MarketCap": "Basic Info",
     "TargetPrice": "Valuation",
     "CurrentPrice": "Valuation",
+    "COGS": "Income Statement",
+    "COGSRatio": "Income Statement",
+    "OperatingExpense": "Income Statement",
+    "OperatingExpenseRatio": "Income Statement",
+    "NonOperatingIncome": "Income Statement",
+    "InterestIncome": "Income Statement",
 }
 
 # CSV 編碼。
@@ -1816,10 +1840,28 @@ def infer_unit_and_scale(metric_raw: str, table_context: str) -> Tuple[str, str,
     return unit, currency, scale
 
 
+def _period_from_eng074(raw: str) -> Optional[Dict[str, Any]]:
+    """v0105 (批732): the mother's reading of one header cell (VRN_ENG074 period_parts, through the evidence core --
+    one period parser for the VRN), in this engine's columns; None = the local rules below decide."""
+    core = optional_import_evidence_core()
+    p = core.period_parts(raw) if core is not None and callable(getattr(core, "period_parts", None)) else None
+    if not p:
+        return None
+    quarter = f"Q{p['fiscal_quarter']}" if p.get("fiscal_quarter") else (f"H{p['half']}" if p.get("half") else "")
+    return {"PeriodType": p["period_type"], "FiscalYear": p.get("fiscal_year"), "FiscalQuarter": quarter,
+            "EstimateFlag": {"E": "Estimate", "F": "Estimate", "A": "Actual"}.get(str(p.get("estimate") or "").upper(), "")}
+
+
 def parse_period_label(label: str) -> Dict[str, Any]:
     raw = normalize_unicode_text(label)
     result = {"PeriodType": "", "FiscalYear": None, "FiscalQuarter": "", "EstimateFlag": "", "PeriodLabelRaw": raw}
     if not raw:
+        return result
+    canon = _period_from_eng074(raw)
+    if canon is not None:
+        if not canon["EstimateFlag"] and ("預估" in raw or "估" in raw or "FORECAST" in raw.upper() or "ESTIMATE" in raw.upper()):
+            canon["EstimateFlag"] = "Estimate"
+        result.update(canon)
         return result
     upper = raw.upper()
     if re.search(r"(?<![A-Z])(TTM|LTM)(?![A-Z])", upper):
@@ -1949,6 +1991,68 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
                     record[metric] = value
                 records.append(record)
     return records
+
+
+IDENTITY_RULES = (
+    ("GrossProfit", "Revenue", "COGS", "毛利 = 營收 − 營業成本"),
+    ("OperatingProfit", "GrossProfit", "OperatingExpense", "營業利益 = 毛利 − 營業費用"),
+)
+QUARTER_SUM_METRICS = ("Revenue", "COGS", "GrossProfit", "OperatingExpense", "OperatingProfit", "PretaxIncome",
+                       "NetIncome", "InterestIncome")
+
+
+def _printed_step(value_raw: Any) -> float:
+    """The last printed digit of a cell ("61,360" -> 1, "5.12" -> 0.01): the rounding the table itself carries."""
+    m = re.search(r"\.(\d+)", str(value_raw or ""))
+    return 10.0 ** -len(m.group(1)) if m else 1.0
+
+
+def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """v0105 (批732): does one report's extracted table add up?  In each table column: gross profit = revenue - cost
+    and operating profit = gross profit - operating expense; in each table: four quarters = the year, for the flow
+    items.  Tolerance = half a last printed digit per number involved (the table's own rounding) -- nothing looser.
+    A cost printed as a negative number counts by its size.  A check runs only when every number it needs was
+    read; nothing is filled in.  Returns counts, the failures in words, and two plain counts that say whether the
+    period headers were read: quarter/half rows without a year, and rows marked as a forecast."""
+    checks: List[Dict[str, Any]] = []
+    columns: Dict[Tuple[Any, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in records:
+        if r.get("MetricName") and isinstance(r.get("Value"), (int, float)):
+            columns.setdefault((r.get("TableID"), r.get("ColumnIndex")), {}).setdefault(r["MetricName"], r)
+    for (table, _col), m in sorted(columns.items(), key=lambda kv: (str(kv[0][0]), str(kv[0][1]))):
+        for target, left, right, rule in IDENTITY_RULES:
+            if target in m and left in m and right in m:
+                got, expected = m[target]["Value"], m[left]["Value"] - abs(m[right]["Value"])
+                tol = 0.5 * sum(_printed_step(m[k].get("ValueRaw")) for k in (target, left, right)) + 1e-9
+                checks.append({"rule": rule, "table": table, "period": m[target].get("PeriodLabelRaw", ""),
+                               "got": got, "expected": round(expected, 6), "tol": tol, "ok": abs(got - expected) <= tol})
+    groups: Dict[Tuple[Any, str, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in records:
+        if r.get("MetricName") in QUARTER_SUM_METRICS and r.get("FiscalYear") and isinstance(r.get("Value"), (int, float)):
+            key = "FY" if r.get("PeriodType") == "FY" else (r.get("FiscalQuarter") if r.get("PeriodType") == "FQ" else "")
+            if key:
+                groups.setdefault((r.get("TableID"), r["MetricName"], r["FiscalYear"]), {}).setdefault(key, r)
+    for (table, metric, year), g in sorted(groups.items(), key=lambda kv: (str(kv[0][0]), kv[0][1], str(kv[0][2]))):
+        if "FY" in g and all(q in g for q in ("Q1", "Q2", "Q3", "Q4")):
+            parts = [g[q] for q in ("Q1", "Q2", "Q3", "Q4")]
+            total = sum(p["Value"] for p in parts)
+            tol = 0.5 * sum(_printed_step(p.get("ValueRaw")) for p in parts + [g["FY"]]) + 1e-9
+            checks.append({"rule": f"{metric} 四季和 = 全年", "table": table, "period": str(int(year)),
+                           "got": g["FY"]["Value"], "expected": round(total, 6), "tol": tol,
+                           "ok": abs(g["FY"]["Value"] - total) <= tol})
+    failed = [c for c in checks if not c["ok"]]
+    return {"checked": len(checks), "passed": len(checks) - len(failed), "failed": failed,
+            "periods_unclear": sum(1 for r in records if r.get("PeriodType") in ("FQ", "FH") and not r.get("FiscalYear")),
+            "estimate_rows": sum(1 for r in records if r.get("EstimateFlag") == "Estimate")}
+
+
+def _plain(x: float) -> str:
+    return f"{int(round(x)):,}" if abs(x - round(x)) < 1e-9 else f"{x:,.4f}".rstrip("0").rstrip(".")
+
+
+def identity_failure_text(check: Dict[str, Any]) -> str:
+    return (f"{check['rule']} · {check['period']} · 表 {check['table']}:印 {_plain(check['got'])} · "
+            f"算 {_plain(check['expected'])}(差 {_plain(abs(check['got'] - check['expected']))},容許 {_plain(check['tol'])})")
 
 
 def find_best_header_row(rows: List[List[str]]) -> Optional[int]:
@@ -2616,7 +2720,8 @@ def batch_pool_results(files: List[Path], ticker_lookup: Dict[str, Dict[str, Any
         if p.suffix.lower() in OCR_SUFFIXES:
             done[idx] = ("OCR", None, None)
             on_done(idx)
-    print(f"[VRN] 平行池 {workers} 個工作行程({len(todo)} 份;VRN_BatchPool {pool.POOL_VERSION};VRN_BATCH_WORKERS=1 可改回序跑)",
+    why = pool.workers_reason(len(todo)) if callable(getattr(pool, "workers_reason", None)) else "VRN_BATCH_WORKERS=1 可改回序跑"
+    print(f"[VRN] 平行池 {workers} 個工作行程({len(todo)} 份;VRN_BatchPool {pool.POOL_VERSION};{why})",
           file=sys.stderr)
     try:
         done.update(pool.map_reports(todo, Path(__file__).resolve(), (ticker_lookup, broker_alias, rating_alias),

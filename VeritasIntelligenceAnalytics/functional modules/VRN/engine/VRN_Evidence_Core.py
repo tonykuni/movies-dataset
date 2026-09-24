@@ -1331,6 +1331,61 @@ def adj_db(db=None, start=None):
     return _ADJ_CACHE[key]
 
 
+# ── period headers (批732) ───────────────────────────────────────────────────────────────────────────────────────
+# The operator's screenshot (20251128兆豐訪談速報-神達(3706) p.4) showed the batch engine reading 25Q1..25Q4(F) with no
+# year and 2025(F) as an actual; this lineage's first-page reader had a copy with the same blind spot.  The mother's
+# financial-pages engine (VRN_ENG074 period_parts) already reads 24Q1 / 25Q1(F) / 2025(F) / 1H25 / FY25 / TTM, so
+# both readers ask it here (one parser, LL404) and keep their own rules only for what it cannot read.
+PERIOD_ENGINE_GLOB = ("functional modules/VRN", "VRN_ENG074_FinancialPages_v*.py")
+_PERIOD_CACHE = {}
+_BARE_YEAR = re.compile(r"(?:19|20)\d{2}\s*年?\s*\(?[EFA]?\)?", re.I)
+
+
+def period_engine(start=None):
+    """(module | None, why): the newest ENG074 that carries period_parts(); loaded once per tree."""
+    root = repo_root(start)
+    if root in _PERIOD_CACHE:
+        return _PERIOD_CACHE[root]
+    folder, pattern = PERIOD_ENGINE_GLOB
+    hits = sorted(glob.glob(os.path.join(root, folder, pattern)), key=_version_of)
+    mod, why = None, "no %s under %s" % (pattern, folder)
+    if hits:
+        name = os.path.basename(hits[-1])
+        try:
+            spec = importlib.util.spec_from_file_location("_vrn_period_eng074", hits[-1])
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = mod
+            spec.loader.exec_module(mod)
+            why = name
+            if not callable(getattr(mod, "period_parts", None)):
+                mod, why = None, "%s has no period_parts()" % name
+        except Exception as exc:
+            sys.modules.pop("_vrn_period_eng074", None)
+            mod, why = None, "%s failed to load: %s: %s" % (name, type(exc).__name__, str(exc)[:80])
+    _PERIOD_CACHE[root] = (mod, why)
+    return mod, why
+
+
+def period_parts(token, start=None):
+    """ENG074's reading of one period header cell -- {period_type FY|FQ|FH|TTM, fiscal_year, fiscal_quarter, half,
+    estimate 'E'|'F'|'A'|'', why} -- or None when ENG074 is absent or cannot read it (the caller's own rules decide).
+    A bare 3-digit number is not taken for a (ROC) year here: data rows hold such numbers too, and a header finder
+    must not take a row of values for a row of years."""
+    mod, _why = period_engine(start)
+    raw = str(token or "").strip()
+    if mod is None or not raw:
+        return None
+    try:
+        p = mod.period_parts(raw)
+    except Exception:  # noqa: BLE001 -- one odd cell must not stop a table
+        return None
+    if not p.get("period_type"):
+        return None
+    if str(p.get("why") or "").startswith("YEAR:") and not _BARE_YEAR.fullmatch(raw):
+        return None
+    return p
+
+
 def _adj_ticker(ticker):
     """'2330' / '2330.TW' / '6147.TWO' / '2330 TT' / '00878' -> the bare code; None without one."""
     m = re.search(r"(?<![0-9A-Za-z])(\d{4,6}[A-Z]?)(?=$|[^0-9A-Za-z]|\.TWO?\b|TT\b)", str(ticker or "").strip())
