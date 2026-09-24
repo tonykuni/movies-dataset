@@ -4,6 +4,9 @@
 v0100→v0101(批733;操作員 09-24「上漲空間都要用最新的ADJ CLOSE」;掉球 Z157 的指揮台段):個股卡的共識表 upside 欄
   改顯示最新 ADJ CLOSE 的上漲空間(CGC_MDL095 v0160 在每列尾端帶的 c[9];算不出 → 「—」+ 狀態,不拿原始價補);
   橋還是舊版(列沒有 c[9])→ 照舊顯示 c[8] 並標「原始價」,不讓舊數字頂著 ADJ 的名字(L16)。+⑩。
+  PR #115 審查(Codex P1):目標價跟 upside 要同一個基準——高 / 低 / 中位改顯示 ADJ 目標價(橋 v0160 的 c[11..13],跟 c[9]
+  同一個因子),另列「最新 ADJ 收盤」(c[14],滑過看日期 c[15]);中位 ÷ 收盤 − 1 就是 upside。c[9] 算不出或舊橋 → 目標價
+  顯示原始價並標「(原始)」、收盤欄「—」(不讓原始目標價站在 ADJ upside 旁邊冒充同一個基準)。⑩ 一併驗。
 
 CGC_MDL094_CommandDeck — VIA 指揮台(批204;操作員令)
 ====================================================================
@@ -255,6 +258,10 @@ const pc2 = (x, d = 1) => x == null ? "—" : (x * 100).toFixed(d) + "%";
 const upA = c => c.length > 9
   ? (c[9] == null ? `<span class="mut" title="${{c[10] || ""}}">— ${{String(c[10] || "").split("(")[0]}}</span>` : pc2(c[9]))
   : pc2(c[8]) + '<span class="mut">(原始價)</span>';
+// PR #115 審查:目標價跟 upside 同一個基準——c[9] 有數、橋帶了 ADJ 目標價(c[11..13])才顯示 ADJ;否則原始價並標「(原始)」
+const adjT = c => c.length > 14 && c[9] != null && c[13] != null;
+const tg = (c, i) => adjT(c) ? (c[9 + i] ?? "—") : (c[i] == null ? "—" : `${{c[i]}}<span class="mut">(原始)</span>`);
+const pxA = c => adjT(c) && c[14] != null ? `<span title="${{c[15] || ""}}">${{c[14]}}</span>` : "—";
 function svgLine(px) {{
   if (!px || px.length < 2) return '<div class="mut">價格序列不足(誠實)</div>';
   const vs = px.map(p => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);
@@ -276,8 +283,8 @@ function renderStock(d) {{
       · 52週高點 ${{pc2(hi)}} · 量能Z ${{vz == null ? "—" : vz.toFixed(2)}}</div>`;
   }}
   if (d.consensus && d.consensus.length)
-    h += '<div class="tablewrap"><table><tr><th>共識源</th><th>日期</th><th>高</th><th>低</th><th>中位</th><th>分析師</th><th>FY1 EPS</th><th>upside(最新 ADJ)</th></tr>' +
-      d.consensus.map(c => `<tr><td>${{c[0]}}</td><td>${{c[1]}}</td><td>${{c[2] ?? "—"}}</td><td>${{c[3] ?? "—"}}</td><td><b>${{c[4] ?? "—"}}</b></td><td>${{c[5] ?? "—"}}</td><td>${{c[6] ?? "—"}}</td><td>${{upA(c)}}</td></tr>`).join("") + "</table></div>";
+    h += '<div class="tablewrap"><table><tr><th>共識源</th><th>日期</th><th>目標高(ADJ)</th><th>目標低(ADJ)</th><th>目標中位(ADJ)</th><th>分析師</th><th>FY1 EPS</th><th>最新 ADJ 收盤</th><th>upside(最新 ADJ)</th></tr>' +
+      d.consensus.map(c => `<tr><td>${{c[0]}}</td><td>${{c[1]}}</td><td>${{tg(c, 2)}}</td><td>${{tg(c, 3)}}</td><td><b>${{tg(c, 4)}}</b></td><td>${{c[5] ?? "—"}}</td><td>${{c[6] ?? "—"}}</td><td>${{pxA(c)}}</td><td>${{upA(c)}}</td></tr>`).join("") + "</table></div>";
   else h += '<div class="mut">共識:尚無(擷取任務可能仍在跑,矩陣看燈)</div>';
   if (d.revenue && d.revenue.length)
     h += '<div class="tablewrap"><table><tr><th>月營收</th><th>金額(千元)</th><th>月增</th><th>年增</th><th>60月高</th></tr>' +
@@ -363,8 +370,11 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑨ 紀律宣告(任務冊 SSOT/誠實界線/加速橋)",
         "任務冊(單一 SSOT" in src and "VIA:ACCEL-BRIDGE" in src)
-    chk("⑩ 批733 個股卡共識 upside 用最新 ADJ(欄名標明 · c[9] · 算不出給狀態 · 舊橋退回原始價並標明;Z157)",
-        "upside(最新 ADJ)" in h and "upA(c)" in h and "c[9]" in h and "(原始價)" in h)
+    chk("⑩ 批733 個股卡共識 upside 用最新 ADJ(欄名標明 · c[9] · 算不出給狀態 · 舊橋退回原始價並標明;Z157)"
+        " · PR #115 審查:目標價同基準(ADJ 目標價 c[11..13] · 最新 ADJ 收盤 c[14] · 算不出 = 原始價標「(原始)」)",
+        "upside(最新 ADJ)" in h and "upA(c)" in h and "c[9]" in h and "(原始價)" in h
+        and "目標中位(ADJ)" in h and "最新 ADJ 收盤" in h and "tg(c, 4)" in h and "pxA(c)" in h and "c[9 + i]" in h
+        and "(原始)</span>" in h)
     print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 

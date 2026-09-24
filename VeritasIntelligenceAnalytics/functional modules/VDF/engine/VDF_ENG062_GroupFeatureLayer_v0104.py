@@ -4,6 +4,9 @@
 v0103→v0104(批733;掉球 Z189「自測只寫暫存庫」L17):v0103 的自測直接呼叫 build(),在**正式庫**上 CREATE OR REPLACE
   group_features_daily,平行格子時拿著寫鎖。v0104:自測先把輸入表 features_daily **唯讀**複製進暫存庫(ATTACH … READ_ONLY),
   build() 寫暫存庫;①–⑧ 判準一字不動(同一份真資料)。+⑨ build() 那一刻庫指向暫存夾。正式庫被別的行程鎖住 → 誠實 NODATA rc2。
+  PR #115 審查(Codex P1):前置出錯**只有真的撞鎖**才判 NODATA(DuckDB 原話「Could not set lock on file」);duckdb 不在本境 =
+  ABSENT rc3;庫壞 / 程式錯不吞 → 照常丟出、自測紅。判法跟 VDF_ENG061 v0105 同一處(那支的 _setup_verdict;L05 一處定義)。
+  +⑩ 判法本身。缺料那條路的計數行一併更正(舊的還寫八檢)。
 v0102→v0103(批690 Z92 誠實燈):v0102 把「快照冊不在」做成 SKIP 了,但 `features_daily`(因子庫)不在時 ③ 前那句
   `SELECT count(*) FROM features_daily` 還是丟 CatalogException 整支炸掉(容器/新機因子庫沒建)。v0103:先探表,不在 →
   [NODATA] ② + ③–⑦ 誠實 SKIP、⑧ boot/紀律照檢,rc=2;預設 build 路同樣先探。八檢不變;⑧ 只寫一處(兩條路共用)。
@@ -176,6 +179,22 @@ def _fingerprint(path: Path):
         return None
 
 
+def _setup_verdict(exc: BaseException):
+    """PR #115 審查:前置出錯怎麼判——借 VDF_ENG061 v0105 那一處(同一條規則不寫第二份;L05)。
+    載不到那支(不在本境)= 保守:只認撞鎖原話,其餘不吞。"""
+    try:
+        import importlib.util as _u
+        f = sorted(HERE.glob("VDF_ENG061_FeatureStore_v*.py"))[-1]
+        spec = _u.spec_from_file_location("_eng061_verdict", f)
+        m = _u.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m._setup_verdict(exc)
+    except (IndexError, AttributeError, ImportError, OSError):
+        if isinstance(exc, ImportError):
+            return "ABSENT", 3
+        return ("NODATA", 2) if "Could not set lock on file" in str(exc) else None
+
+
 def _scratch_copy(src: Path, dst: Path, tables) -> Path:
     """v0104(Z189):把正式庫的輸入表唯讀複製進暫存庫(ATTACH READ_ONLY)。正式庫不在 / 表不在 = 暫存庫也沒有(自測照走 NODATA)。"""
     import duckdb
@@ -205,10 +224,15 @@ def selftest() -> int:
     try:
         try:
             DB_TW = _scratch_copy(live_tw, Path(td.name) / "tw.duckdb", NEED_TABLES)
-        except Exception as exc:  # noqa: BLE001 -- the production DB is locked elsewhere: nothing to copy, honest NODATA
-            print(f"  [NODATA] 正式庫讀不到({type(exc).__name__}: {str(exc)[:80]})——多半是別的行程正拿寫鎖;"
-                  "自測不硬開、也不寫它(Z189)")
-            return 2
+        except Exception as exc:  # noqa: BLE001 -- only a real lock conflict / a missing duckdb is honest; the rest is raised
+            verdict = _setup_verdict(exc)
+            if verdict is None:
+                raise
+            if verdict[1] == 2:
+                print(f"  [NODATA] 正式庫被別的行程鎖住({str(exc)[:80]})——自測不硬開、也不寫它(Z189)")
+            else:
+                print(f"  [ABSENT] 本境沒有 duckdb({exc})——這支自測量不到,不是壞掉")
+            return verdict[1]
         rc = _selftest_body()
     finally:
         DB_TW = live_tw
@@ -242,6 +266,16 @@ def _selftest_body() -> int:
             "VDF_ENG062" in boot and all(k in src for k in
             ("正本零觸碰", "快照冊直出", "冪等", "零固定參數")))
 
+    def _chk10():                     # ⑩ 不吃料:前置出錯的判法(兩條路共用)
+        class _E(Exception):
+            pass
+        v = [_setup_verdict(_E('IO Error: Could not set lock on file "/x/vdf_tw_market.duckdb": Conflicting lock is held in python (PID 1)')),
+             _setup_verdict(ModuleNotFoundError("No module named 'duckdb'")),
+             _setup_verdict(_E('IO Error: The file "x.duckdb" exists, but it is not a valid DuckDB database file!')),
+             _setup_verdict(_E("Catalog Error: Table with name features_daily does not exist!"))]
+        chk("⑩ 前置出錯怎麼判(PR #115 審查:只有撞鎖 = NODATA · 缺 duckdb = ABSENT · 庫壞 / 表錯不吞 → 紅;判法借 ENG061 一處)",
+            v == [("NODATA", 2), ("ABSENT", 3), None, None], f"({v})")
+
     cls = _latest_classification()
     _REMEDY = "(族群分類快照冊不在=上游未產生,非本引擎缺陷;補法 via-datahome link / group_class 後複判)"
     if cls is None:
@@ -255,8 +289,10 @@ def _selftest_body() -> int:
         print(f"           {REMEDY}")
         print("  [SKIP] ③–⑦ 正本/聚合數學/守恆/data_class/冪等:上游沒料,誠實跳過(不是壞掉,也不假裝過)")
         _chk8()
-        _ran = 2 - len([x for x in skips if x.startswith("①")])
-        print(f"  [計] 八檢 OK {_ran - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP {5 + len(skips)}(誠實多態)")
+        print("  [SKIP] ⑨ build() 沒跑(上游沒料):寫不寫暫存庫這一跑量不到")
+        _chk10()
+        _ran = 3 - len([x for x in skips if x.startswith("①")])
+        print(f"  [計] 十檢 OK {_ran - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP {6 + len(skips)}(誠實多態)")
         return 1 if fails else 2
     con0 = duckdb.connect(str(DB_TW), read_only=True)
     before = con0.execute("SELECT count(*) FROM features_daily").fetchone()[0]
@@ -306,7 +342,8 @@ def _selftest_body() -> int:
     _chk8()
     chk("⑨ 自測只寫暫存庫(批733 Z189;v0103 的 build() 直接 CREATE OR REPLACE 正式庫的 group_features_daily)",
         in_scratch, f"(build() 寫 {DB_TW.parent.name}/{DB_TW.name})")
-    print(f"  [計] 九檢 OK {9 - len(fails) - len(skips)} · FAIL {len(fails)}"
+    _chk10()
+    print(f"  [計] 十檢 OK {10 - len(fails) - len(skips)} · FAIL {len(fails)}"
           f" · SKIP {len(skips)}(誠實三態;上游件未產生非本引擎缺陷)")
     return 1 if fails else 0
 
@@ -314,7 +351,7 @@ def _selftest_body() -> int:
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 族群聚合因子層(VDF_ENG062 v0104)· 九檢自測(零網路;只寫暫存庫)===")
+        print("=== 族群聚合因子層(VDF_ENG062 v0104)· 十檢自測(零網路;只寫暫存庫)===")
         return selftest()
     if "--status" in args:
         return status()

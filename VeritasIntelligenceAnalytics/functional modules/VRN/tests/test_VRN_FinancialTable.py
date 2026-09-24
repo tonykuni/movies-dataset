@@ -370,6 +370,27 @@ class UnruledTableTest(unittest.TestCase):
         self.assertEqual(len(kept), len(recs))
         self.assertIn(("EPS", "2026F"), {(r["MetricName"], r["PeriodLabelRaw"]) for r in kept})
 
+    def test_the_later_page_scan_stops_at_the_last_page(self):
+        """PR #115 審查(Codex P2):過了最後一頁 pdf_page_chars 回 ([], 頁寬高) 不是 None——後段頁不能一路重開到第 40 頁。"""
+        calls = []
+        real = self.core._pdf_page_chars_parse
+
+        def counting(path, page_index=0, order=("pdfplumber", "fitz")):
+            calls.append(page_index)
+            return real(path, page_index, order)
+
+        for pages, table_page in ((2, 1), (8, 6)):
+            pdf = self.dir / f"later_scan_{pages}p.pdf"
+            def_unruled_table_pdf(pdf, pages=pages, table_page=table_page)
+            calls.clear()
+            self.core._PAGE_CACHE.clear()
+            self.core._pdf_page_chars_parse = counting
+            try:
+                self.core.pdf_column_tables_later(str(pdf), 4, self.core.LATER_PAGES_MAX)
+            finally:
+                self.core._pdf_page_chars_parse = real
+            self.assertEqual(sorted(set(calls)), list(range(4, pages)), (pages, calls))
+
 
 if __name__ == "__main__":
     unittest.main()

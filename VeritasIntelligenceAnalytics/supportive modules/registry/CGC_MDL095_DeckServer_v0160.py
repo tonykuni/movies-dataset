@@ -1191,17 +1191,24 @@ def stock_data(code: str, db: Path | None = None) -> dict:
         "n_analysts, eps_fy1, close, upside_pct FROM consensus_daily "
         "WHERE code=? QUALIFY row_number() OVER (PARTITION BY source "
         "ORDER BY date DESC)=1", [code])]
-    # v0160(批733 Z157):ADJ 上漲空間接在每列尾端(c[9] 分數 · c[10] 狀態);判定走 VRN_ENG069 的視圖(STALE / NOT_RUN 一處算)
+    # v0160(批733 Z157):ADJ 接在每列尾端(只增不減;判定走 VRN_ENG069 的視圖,STALE / NOT_RUN 一處算):
+    #   c[9] upside 分數 · c[10] 狀態 · PR #115 審查(Codex P1)c[11..13] ADJ 目標價 高 / 低 / 中位(跟 c[9] 同一個 adj_factor、
+    #   同一次計算)· c[14] 最新 ADJ 收盤 · c[15] 它的日期。c[9] 沒數(STALE / NOT_RUN / 算不出)→ c[11..15] 一律 None,不拿原始價補
     if "consensus_latest_adj" in {t for (t,) in q("SHOW TABLES")}:
-        adj = {(s_, d_): (u_, st_) for s_, d_, u_, st_ in q(
-            "SELECT source, CAST(date AS VARCHAR), upside_adj, upside_adj_state FROM consensus_latest_adj "
-            "WHERE code=?", [code])}
+        adj = {(s_, d_): tuple(rest) for s_, d_, *rest in q(
+            "SELECT source, CAST(date AS VARCHAR), upside_adj, upside_adj_state, adj_factor, target_median_adj, "
+            "price_latest_adj, price_latest_date FROM consensus_latest_adj WHERE code=?", [code])}
         for row in out["consensus"]:
-            u_, st_ = adj.get((row[0], row[1]), (None, "ADJ_NOT_RUN"))
-            row += [None if u_ is None else round(u_ / 100, 6), st_]
+            u_, st_, f_, tma_, pla_, pld_ = adj.get((row[0], row[1]), (None, "ADJ_NOT_RUN", None, None, None, None))
+            ok = u_ is not None and f_ is not None
+            row += [None if u_ is None else round(u_ / 100, 6), st_,
+                    round(row[2] * f_, 4) if ok and row[2] is not None else None,
+                    round(row[3] * f_, 4) if ok and row[3] is not None else None,
+                    tma_ if ok else None, pla_ if ok else None,
+                    str(pld_) if ok and pld_ is not None else None]
     else:
         for row in out["consensus"]:
-            row += [None, "ADJ_NOT_BUILT(共識庫還沒用 VRN_ENG069 v0106 build)"]
+            row += [None, "ADJ_NOT_BUILT(共識庫還沒用 VRN_ENG069 v0106 build)", None, None, None, None, None]
     out["revenue"] = [[ym, rev, mom, yoy, hi] for ym, rev, mom, yoy, hi in q(
         "SELECT ym, revenue, mom_pct, yoy_pct, high_60m "
         "FROM monthly_revenue_analysis WHERE code=? ORDER BY ym DESC LIMIT 12",
@@ -2432,16 +2439,20 @@ def selftest() -> int:
             _c.executemany("INSERT INTO consensus_daily VALUES (?,?,?,?,?,?,?,?,?,?)", [
                 ("2026-09-08", "9901", "A", 150, 110, 130, 12, 9.0, 97.0, 130 / 97 - 1),
                 ("2026-09-08", "9901", "B", 140, 100, 125, 3, 8.5, 97.0, 125 / 97 - 1)])
-            _c.execute("CREATE TABLE consensus_latest_adj(date DATE, code VARCHAR, source VARCHAR, upside_adj DOUBLE, upside_adj_state VARCHAR)")
-            _c.executemany("INSERT INTO consensus_latest_adj VALUES (?,?,?,?,?)", [
-                ("2026-09-08", "9901", "A", 30.0, "ADJ_OK"), ("2026-09-08", "9901", "B", None, "ADJ_STALE")])
+            _c.execute("CREATE TABLE consensus_latest_adj(date DATE, code VARCHAR, source VARCHAR, upside_adj DOUBLE, upside_adj_state VARCHAR, "
+                       "adj_factor DOUBLE, target_median_adj DOUBLE, price_latest_adj DOUBLE, price_latest_date VARCHAR)")
+            _c.executemany("INSERT INTO consensus_latest_adj VALUES (?,?,?,?,?,?,?,?,?)", [
+                ("2026-09-08", "9901", "A", 30.0, "ADJ_OK", 0.9, 117.0, 90.0, "2026-09-23"),        # 130×0.9=117;117/90−1=30%
+                ("2026-09-08", "9901", "B", None, "ADJ_STALE", 0.9, 112.5, 90.0, "2026-09-23")])   # 過期:因子在也不給 ADJ 目標價
             _c.close()
             _sd = stock_data("9901", db=_db)
             _rows = {r[0]: r for r in _sd.get("consensus", [])}
             _a, _b = _rows.get("A", []), _rows.get("B", [])
-            chk("㉖ 批733 /stock_data 共識列尾端帶 ADJ(c[9] = upside_adj ÷ 100 · c[10] 狀態;c[8] 原始價原樣;Z157)",
-                len(_a) == 11 and _a[9] == 0.3 and _a[10] == "ADJ_OK" and abs(_a[8] - (130 / 97 - 1)) < 1e-9
-                and len(_b) == 11 and _b[9] is None and _b[10] == "ADJ_STALE",
+            chk("㉖ 批733 /stock_data 共識列尾端帶 ADJ(c[9] = upside_adj ÷ 100 · c[10] 狀態 · c[11..13] ADJ 目標價同一個因子 · "
+                "c[14..15] 最新 ADJ 收盤與日期 · 目標中位 ÷ 收盤 − 1 = c[9];過期列 c[11..15] 全空;c[8] 原始價原樣;Z157 · PR #115 審查)",
+                len(_a) == 16 and _a[9] == 0.3 and _a[10] == "ADJ_OK" and abs(_a[8] - (130 / 97 - 1)) < 1e-9
+                and _a[11:16] == [135.0, 99.0, 117.0, 90.0, "2026-09-23"] and abs(_a[13] / _a[14] - 1 - _a[9]) < 1e-9
+                and len(_b) == 16 and _b[9] is None and _b[10] == "ADJ_STALE" and _b[11:16] == [None] * 5,
                 f"(A {_a[8:] if _a else '缺'} · B {_b[8:] if _b else '缺'})")
     print(f"  [計] 安全橋自測 {n_chk[0] + len(_skip)} 項 · OK {n_chk[0] - len(fails)}"
           f" · FAIL {len(fails)}" + (f" · SKIP {len(_skip)}({'、'.join(_skip)} 本境缺件)" if _skip else ""))

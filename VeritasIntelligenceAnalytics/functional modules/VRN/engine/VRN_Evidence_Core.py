@@ -2436,9 +2436,12 @@ LATER_PAGES_MAX = 40
 def pdf_column_tables_later(path, first=4, last=LATER_PAGES_MAX):
     """批733(Z195):第 first+1 頁起(到 last 頁或最後一頁)也讀沒有框線的表——但只讀字面上像損益表的頁
     (FIN_PAGE_RX)。長報告(初次評等)的財報常在後段,舊的只看前 4 頁就漏了;全讀每一頁又太慢,所以先看字。
-    圖片頁(沒有字)跳過、繼續往後;過了最後一頁就停。"""
+    圖片頁(沒有字)跳過、繼續往後;過了最後一頁就停。
+    PR #115 審查(Codex P2):頁碼超過最後一頁時 pdf_page_chars 回的是 ([], 頁寬高) 不是 None——只靠它停,短報告會被
+    重開重解析到第 last 頁(2 頁的 PDF 解析 36 次);改用有快取的 pdf_page_count 定上界,中間的圖片頁照舊跳過。"""
     out = []
-    for idx in range(first, last):
+    n = pdf_page_count(path)
+    for idx in range(first, min(last, n) if n else last):
         got = pdf_page_chars(path, idx)
         if not got:
             break

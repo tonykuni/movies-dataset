@@ -6,6 +6,9 @@ v0104→v0105(批733;掉球 Z189「自測只寫暫存庫」L17):v0104 的自測�
   v0105:自測先把輸入表(tw_prices_adj、prices_canonical;全球 gl_prices_adj、prices_canonical)**唯讀**複製進暫存庫
   (ATTACH … READ_ONLY;視圖複製成表),build() 寫暫存庫;①–⑨ 判準一字不動(同一份真資料,只是換了寫的地方)。
   +⑩ build() 那一刻兩本庫都指向暫存夾。正式庫被別的行程鎖住、複製不了 → 誠實 NODATA rc2(格子本站 nodata_ok)。
+  PR #115 審查(Codex P1):前置出錯**只有真的撞鎖**才判 NODATA(DuckDB 原話「Could not set lock on file」,格子認鎖撞也認這一句);
+  duckdb 不在本境 = ABSENT rc3(格子判缺件);庫壞 / 程式錯不吞 → 照常丟出、自測紅(原本一律 NODATA,本站 nodata_ok 會把壞掉吞成綠)。
+  +⑪ 判法本身(撞鎖 / 缺件 / 庫壞 / 表錯 四種例外各判一次)。缺料那條路的計數行一併更正(舊的還寫九檢)。
 v0103→v0104(批690 PR #65 Codex P2 同病根治):v0103 的 NODATA 早退把 ⑨ boot 接線+紀律宣告一起退掉(不吃料的檢不該跟著料走)。
   v0104 把 ⑨ 收成一處 `_chk9()`,有料/NODATA 兩條路都跑;⑨ 紅=rc1。九檢不變。
 v0102→v0103(批690 Z92 誠實燈):`tw_prices_adj`/`prices_canonical` 不在(調整層還沒建)時自測第二句 SELECT 就丟 CatalogException 整支炸掉
@@ -183,6 +186,19 @@ def _fingerprint(path: Path):
         return None
 
 
+_LOCK_PHRASE = "Could not set lock on file"   # DuckDB 撞寫鎖的原話(格子 CGC_MDL064 的 _lock_hit 也認這一句)
+
+
+def _setup_verdict(exc: BaseException):
+    """v0105(PR #115 審查):自測前置(唯讀複製正式庫)出錯怎麼判。只有真的撞鎖 = ("NODATA", 2);
+    duckdb 不在本境 = ("ABSENT", 3);其餘(庫壞 / 表錯 / 程式錯)= None → 照常丟出,自測紅,不吞。"""
+    if isinstance(exc, ImportError):
+        return "ABSENT", 3
+    if _LOCK_PHRASE in str(exc):
+        return "NODATA", 2
+    return None
+
+
 def _scratch_copy(src: Path, dst: Path, tables) -> Path:
     """v0105(Z189):把正式庫的輸入表唯讀複製進暫存庫(ATTACH READ_ONLY;視圖複製成表)。
     正式庫不在 / 表不在 = 暫存庫也沒有(自測照走 NODATA,跟 v0104 一樣誠實)。回暫存庫路徑。"""
@@ -215,10 +231,15 @@ def selftest() -> int:
             DB_TW = _scratch_copy(live_tw, Path(td.name) / "tw.duckdb", NEED_TABLES)
             DB_GL = (_scratch_copy(live_gl, Path(td.name) / "gl.duckdb", ("gl_prices_adj", "prices_canonical"))
                      if live_gl.exists() else Path(td.name) / "gl_absent.duckdb")
-        except Exception as exc:  # noqa: BLE001 -- the production DB is locked elsewhere: nothing to copy, honest NODATA
-            print(f"  [NODATA] 正式庫讀不到({type(exc).__name__}: {str(exc)[:80]})——多半是別的行程正拿寫鎖;"
-                  "自測不硬開、也不寫它(Z189)")
-            return 2
+        except Exception as exc:  # noqa: BLE001 -- only a real lock conflict / a missing duckdb is honest; the rest is raised
+            verdict = _setup_verdict(exc)
+            if verdict is None:
+                raise
+            if verdict[1] == 2:
+                print(f"  [NODATA] 正式庫被別的行程鎖住({str(exc)[:80]})——自測不硬開、也不寫它(Z189)")
+            else:
+                print(f"  [ABSENT] 本境沒有 duckdb({exc})——這支自測量不到,不是壞掉")
+            return verdict[1]
         rc = _selftest_body()
     finally:
         DB_TW, DB_GL = live_tw, live_gl
@@ -250,13 +271,25 @@ def _selftest_body() -> int:
             "VDF_ENG061" in boot and all(k in src for k in
             ("正本零觸碰", "誠實不外插", "冪等", "零固定參數")))
 
+    def _chk11():                     # ⑪ 不吃料:前置出錯的判法(兩條路共用)
+        class _E(Exception):
+            pass
+        v = [_setup_verdict(_E('IO Error: Could not set lock on file "/x/vdf_tw_market.duckdb": Conflicting lock is held in python (PID 1)')),
+             _setup_verdict(ModuleNotFoundError("No module named 'duckdb'")),
+             _setup_verdict(_E('IO Error: The file "x.duckdb" exists, but it is not a valid DuckDB database file!')),
+             _setup_verdict(_E("Catalog Error: Table with name tw_prices_adj does not exist!"))]
+        chk("⑪ 前置出錯怎麼判(PR #115 審查:只有撞鎖 = NODATA · 缺 duckdb = ABSENT · 庫壞 / 表錯不吞 → 紅)",
+            v == [("NODATA", 2), ("ABSENT", 3), None, None], f"({v})")
+
     miss = _missing_tables(DB_TW, NEED_TABLES)
     if miss:                          # 批690:缺料誠實 NODATA,不炸不報紅;不吃料的 ⑨ 照檢
         print(f"  [NODATA] ② 調整層/正典視圖不在:{', '.join(miss)}(庫 {'在' if DB_TW.exists() else '不在'})")
         print(f"           {REMEDY}")
         print("  [SKIP] ③–⑧ 正本/數學/NULL/覆蓋/data_class/冪等:上游沒料,誠實跳過(不是壞掉,也不假裝過)")
         _chk9()
-        print(f"  [計] 九檢 OK {2 - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP 6(誠實多態)")
+        print("  [SKIP] ⑩ build() 沒跑(上游沒料):寫不寫暫存庫這一跑量不到")
+        _chk11()
+        print(f"  [計] 十一檢 OK {3 - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP 7(誠實多態)")
         return 1 if fails else 2
     con0 = duckdb.connect(str(DB_TW), read_only=True)
     before = con0.execute("SELECT count(*) FROM tw_prices_adj").fetchone()[0]
@@ -316,14 +349,15 @@ def _selftest_body() -> int:
     _chk9()
     chk("⑩ 自測只寫暫存庫(批733 Z189;v0104 的 build() 直接 CREATE OR REPLACE 正式庫的 features_daily)",
         in_scratch, f"(build() 寫 {DB_TW.parent.name}/{DB_TW.name} · {DB_GL.name})")
-    print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
+    _chk11()
+    print(f"  [計] 十一檢 OK {11 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 因子庫(VDF_ENG061 v0105)· 十檢自測(零網路;只寫暫存庫)===")
+        print("=== 因子庫(VDF_ENG061 v0105)· 十一檢自測(零網路;只寫暫存庫)===")
         return selftest()
     if "--status" in args:
         return status()

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 r"""
 v0490→v0491(批733;LL213 站名的檢數要手動跟;本批原擬 v0490,收尾時側線 PR #114 先併進 main 用了 v0490 → LL334 改號):
-  **只改站名裡的檢數**,站數不變、引擎 glob / 參數 / 期望一字不動。因子庫 九 → **十**(VDF_ENG061 v0105 +⑩ build() 那一刻庫指向暫存夾,
-  自測不再寫正式庫;掉球 Z189)· 族群聚合因子層 八 → **九**(VDF_ENG062 v0104 +⑨ 同上)· 指揮台 九 → **十**(CGC_MDL094 v0101 +⑩ 個股卡
+  **只改站名裡的檢數**,站數不變、引擎 glob / 參數 / 期望一字不動。因子庫 九 → **十一**(VDF_ENG061 v0105 +⑩ build() 那一刻庫指向暫存夾,
+  自測不再寫正式庫;掉球 Z189 · +⑪ PR #115 審查:前置出錯只有撞鎖才判 NODATA)· 族群聚合因子層 八 → **十**(VDF_ENG062 v0104 +⑨ 同上 · +⑩ 同上)· 指揮台 九 → **十**(CGC_MDL094 v0101 +⑩ 個股卡
   upside 用最新 ADJ;Z157)· 執行橋 八 → **二十六**(CGC_MDL095 v0160 +㉖ /stock_data 共識列帶 ADJ;站名的「八」是批208 的數,之後
   各版加檢站名沒跟,本批一併對齊實數)· 產品資格閘 九 → **十**(CGC_MDL133 v0102 +⑩)。
   **別的尺拿站名當鑰匙**,只換數字不動其他字。其中產品閘 CGC_MDL133 v0101 的核心站鑰匙是「執行橋八檢」「指揮台九檢」**帶著檢數**——
@@ -2757,8 +2757,8 @@ def battery(fast: bool):
     add("GLE 全後端統轄橋九檢(批421)", newest("SUP_MDL743_GenericLayoutHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("NLP 應用系統統轄橋十一檢(批421)", newest("SUP_MDL744_NLPApplicationHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("WorkPulse 整合門面九檢(批185)", newest("VIA_ENG170_WorkPulseUnified_v*.py", VIA / "functional modules/WorkOps"), ["--selftest"], "rc0", 300)
-    add("因子庫十檢(批188;批690 調整層不在=NODATA rc2 不是壞,⑨ 不吃料照檢)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
-    add("族群聚合因子層九檢(批193;批690 因子庫不在=NODATA rc2 不是壞)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
+    add("因子庫十一檢(批188;批690 調整層不在=NODATA rc2 不是壞,⑨ 不吃料照檢)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
+    add("族群聚合因子層十檢(批193;批690 因子庫不在=NODATA rc2 不是壞)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
     add("月營收分析十檢(批194)", newest("VDF_ENG063_MonthlyRevenue_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("Yahoo 共識九檢(批194)", newest("VRN_ENG070_YahooConsensus_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("鉅亨 FactSet 共識十檢(批199)", newest("VRN_ENG071_CnyesFusion_v*.py", VRN), ["--selftest"], "rc0", 300)
