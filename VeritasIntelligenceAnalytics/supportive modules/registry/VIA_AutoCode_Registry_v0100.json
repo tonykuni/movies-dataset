@@ -10034,6 +10034,20 @@
       "component": "側線 2026-09-24 第四段(主線批號由併線的手指定 L25)操作員令「自動進行實測自修正直到全部成功」·「擷取前先查庫缺啥 · 定範圍 · 批次定時暫存 · 去重補不足 · 加速器與網路工具覆蓋所有動作」·「所有數據以交易所為主,Yahoo 只取 ADJ CLOSE,CLOSE 重複是為了核對」:SUP_MDL753 v0108(batch_fetch · BatchProgress · fmt_eta 正典)· SUP_MDL740 v0114(curl_bytes 位元組車道)· VDF_ENG055 v0114(L10/L11 走網路工具 · upsert 照欄名插入 · L2 收開高低)· VDF_ENG056 v0103(批次呼叫正典、修 range 步進跳項、拿掉生 curl)· VDF_ENG057 v0102(交易所開高低 · 先查庫 · 只抓缺的 · 補空欄不覆蓋 · 完整度 · verify 與 Yahoo 核對)· VDF_ENG060 v0107(factor_basis 具名 · 自測暫存庫 L17)· VDF_ENG085 v0105(收盤取交易所)· CGC_MDL172 v0105(存證 ABSENT/0 份不報 ok)· 格子 v0481(七站檢數)· 掉球 Z35 · Z173 結、Z170/Z174/Z175 追記、+Z178–Z182(LL334 所有分支最大 Z177)"
     },
     {
+      "ts": "2026-09-24 13:20",
+      "op": "ADD",
+      "category": "VRN速度·加速器",
+      "component": "批731 操作員令「PS PY檔案都要依規定裝加速器  剛剛跑好慢」「自測報告要自動跳出來」(工作站 via-vrnrun 2268 秒,V6 106 份撞 1800 秒天花板):VRN_BatchPool v0100(新;整批入庫平行池,行程數 VRN_BATCH_WORKERS > 加速器執行緒預算 > CPU−1,上限 6,原檔序交回,附錄快取帶回主行程,spawn 守衛)· 資料庫引擎 v0104(batch_pool_results · process_batch only_files)· 證據核心(頁字元/附錄小字/頁數依檔版本快取,呼叫端拿副本;拒絕清單正規化一次)· VRN_AutoTestLoop v0104(G08 抽 12 首尾必在 --g08-sample/--g08-full · 起跑 VIA_ACCEL.activate() · 進度總數 · --selftest 單元測試並排跑:--unit-file FILE[::k/n] 子行程、多類別分份、SELFTEST_SECONDS 成本先跑、父行程死了子行程自收)· Invoke-VIA-VRN-v0104.ps1(V6 天花板 3600 秒 · 跑完自動用瀏覽器開自測報告 · -NoOpen)· Celeritas PS7 正主 Z137 三處 Get-Variable(操作員許可 L70)· CGC_MDL124 v0107(Celeritas 本體/模板 PS 不可動 · 具名豁免名冊讀 CGC_MDL156 `_ACCEL_EXEMPT`,正典 U/I TEMPLATE 不注橋)· CGC_MDL178 v0100/v0101 補加速器橋 · tests/test_VRN_BatchSpeed.py(10 條)· test_VRN_AdjOracle 拆共用基底 + 三類別(方法逐字不動)",
+      "code": "容器實測:合成 20 份一輪 158→48 秒(G06 66→24 · G07 20→6 · G08 66→16),閘列 80/80 閘·名·狀態相同、落庫 20 列相同;自測門 80.4→51.4 秒(107 支,序跑退路 79.3 秒);VRN/tests 107/107;資料庫引擎 --self-test PASS;加速器 PY 全樹 3047/3047 · PS-ACCEL 缺 0;Celeritas pwsh 7.4 模板已接·還原·不外溢;跑手樁測:預設開頁 · -NoOpen 不開 · 天花板 3600/尊重 VIA_PY_TIMEOUT_SEC;全格子 v0480 OK 340 · FAIL 2 · SKIP 6(1179 秒);掉球 Z137 結、Z188–Z189 開"
+    },
+    {
+      "ts": "2026-09-24 13:20",
+      "op": "FIX",
+      "category": "格子紅燈",
+      "component": "批731 格子 v0480 平行段四紅逐一追:① 陸券清除驗收——本批新測試字串帶一個被拒陸券名 → 改從拒絕清單現場取(活的 0 支)② VRN 六層鏈——L5 VRN_ENG069 自測 build() 寫正式市場庫拿寫鎖,撞同時段讀者(序跑綠;登 Z189,非本批造成)③ 全景批次修復規劃器 ⑫-b——負向例的尾版橋掃器 v0107 未入冊(未 commit)④ VCGC ⑬——格子跑中新增兩個函式,registry-sync 重跑",
+      "code": "併線:main 9bae6d3b(PR #101 批730 · PR #103 側線第三段)純快轉進本分支,零改寫;LL334 推前掃全部分支:main 已用到 Z182、側線分支推到 Z187(第五至七段,未併),本批改號兩次,取 Z188–Z190"
+    },
+    {
       "ts": "2026-09-24 13:28",
       "op": "FIX",
       "code": "容器實測:自測 15/13 檢(總擷取 · 成交值)全綠;改壞測試全抓:總擷取 新 7 + v0114 舊 9 · 成交值 新 8 + v0102 舊 9(本段起每一檢的例外只紅那一檢);真資料端到端(容器庫副本,不是真庫):L1 解析吃真回包 1,980 檔股數(上市 1,087 樹上快照 · 上櫃 893 當天 openapi)· 樹上快照重放 1,977 列 · 市值檢視表 上櫃嚴格 864 列(最新 2026-09-23;前幾大 5274 7,666.4 億)· 股數跳動 ≥20% 20 檔(8277 ×0.43 · 4747 ×2.0);ENG057 upsert 缺欄一律 DOUBLE → src 字串欄 ConversionException,自測 ⑫ 實跑抓到並修;asof 是 DuckDB 保留字 → 欄名 asof_date;主線端點冊 market_cap 規則改指向交易所股數(舊規則留 rule_history)ENG092 照樣 14/14;格子 v0482 相關站 OK;VCGC 37/37 · ssot verify rc0 · 本機照 CI 綠;元件冊 新 6 + main PR #105 CGC_MDL135 八中心 11 件(那一條線沒同步,元件冊唯一寫入口只增不減)",
@@ -10048,11 +10062,25 @@
       "component": "側線 2026-09-24 第六段(主線批號由併線的手指定 L25)操作員令「VDF加速器跟網路工具都要導入並覆蓋深入所有指令細節動作」:VDF_ENG089 v0103(audit 看語法樹:真的呼叫網路工具才算出網、抓取型看識別字、直連另列、標有沒有啟動入口)· VDF_ENG055 v0116(L13 FactSet 走統包 curl_bytes · 已在庫文章不重抓 · 閘關照實回 DENY · 更正 v0114 表頭)· 格子 v0483(兩站檢數)· 掉球 +Z187(休眠兩支擷取引擎要你裁)、Z170/Z186 追記尾版"
     },
     {
+      "ts": "2026-09-24 13:50",
+      "op": "FIX",
+      "category": "併線",
+      "component": "批731 併入 main dc5ed25e(PR #105 環境八樞紐 · PR #106 側線第四段 · PR #108 整併稽核):先 commit 再 merge;衝突四件——掉球(main Z178–Z182 在前、本批 Z188–Z189 在後)· 台帳聯集(1329 + 1 + 2)· 元件冊 / regex 清冊取 main 再重生(活元件 9603 · 新 13 · regex 1373);順手結 Z182(VRN 線):test_synthetic_loop_ends_green_or_amber 扣掉因缺 python-docx 跳過的檔,PDF 那一半照測;併進來唯一沒加速器橋的 CGC_MDL135_EnvGovernance_8Hub_v0100.py(PR #105)用 CGC_MDL124 v0107 --apply 注入(只插 14 行,4 條測試照綠)→ PY 全樹 3059/3059",
+      "code": "模擬沒有 python-docx(匯入攔截):main 舊斷言紅、新斷言綠;有 python-docx 照綠;VCGC 37/37 · 契約 OK"
+    },
+    {
       "ts": "2026-09-24 13:55",
       "op": "FIX",
       "code": "容器實測:自測 14 檢全綠;改壞測試全抓:新 6(不先查庫 · 閘關說成 OK · 容差失效 · 比值算反 · 沒回的不記 · 不看最新一份)+ v0103 舊 17;真資料(容器庫副本,上櫃前 30 大;Yahoo 真回應在獨立行程錄下再重播——VIA 行程內直連被網路閘攔下,照規矩不繞):SAME 21 · SNAPSHOT_STALE 2 · DIFF 6 · NO_YAHOO_SHARES 1;2330 Yahoo 股數與交易所已發行一股不差;格子 v0484 站 OK;VCGC 37/37 · ssot verify rc0;元件冊 新 5 · 變更 64",
       "category": "跟其他看盤網站核對",
       "component": "側線 2026-09-24 第七段(主線批號由併線的手指定 L25)操作員令「… 市值都以交易所為主 可以跟其他看盤網站核對正確性」:VDF_ENG057 v0104(xcheck:交易所股數/市值 × Yahoo quoteSummary;SAME/DIFF/SNAPSHOT_STALE/NO_YAHOO_ROW;tw_market_cap_xcheck 一天一份)· 格子 v0484 · 掉球 Z185 結、Z186 追記"
+    },
+    {
+      "ts": "2026-09-24 14:10",
+      "op": "FIX",
+      "category": "格子紅燈",
+      "component": "批731 併線後全格子 v0481 兩紅(main 帶進來的,main 自己也紅):① Celeritas 產出契約實跑——`tests/test_env_governance_8hub.py`(PR #105)沒加速器橋 → 用 via_accel_injector_v0102 的 inject_py 單檔注入(只插 14 行;4 條測試照綠;CGC_MDL183 缺 0)② 唯一接觸口控制面——CGC_MDL135 撞號(八樞紐與既有族同號)→ 掉球 Z190 候操作員裁,改名是環境線的事",
+      "code": "CGC_MDL183 rc0(PY 缺 0 · PS 基線外新缺 0);CGC_MDL157 28/29(只剩撞號那一檢)"
     },
     {
       "ts": "2026-09-24 14:28",
@@ -10062,6 +10090,6 @@
       "component": "側線 2026-09-24 第八段(主線批號由併線的手指定 L25)操作員令「整合資料庫去重補不足 確保完整性」「市值都以交易所為主」:SUP_MDL753 v0109(upsert_rows 去重寫入唯一實作)· VDF_ENG055 v0117(upsert 綁正典)· VDF_ENG057 v0105(upsert 轉接正典 · shares 每日發行股數史:TWSE MI_QFIIS · TPEX otc)· 格子 v0485 · 掉球 Z184 結、Z186 追記、+Z191(7 族私有 upsert 待遷)"
     }
   ],
-  "updated_at": "2026-09-24 10:37",
-  "batch": "批730"
+  "updated_at": "2026-09-24 14:10",
+  "batch": "批731"
 }
