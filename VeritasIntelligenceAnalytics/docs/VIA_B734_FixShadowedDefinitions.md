@@ -54,6 +54,14 @@ ENG086 升 v0116、FirstPageEngine 升 v0129(`_esc` 重複已不在)。所以:
 - 無版號的 26 支支援模組 main 沒動過,原修正照舊有效;
 - `CLAUDE.md` 改成永遠取 MDL158 尾版,不再寫死版號。
 
+## 更正:我違反了批345 不可動律,已還原
+
+VCGC 盤點 VDF 工具格時才看到 SUP_MDL737 的一句話:「兩支加速器工具本體一個位元都沒動(**批345 不可動律**)」,
+L50 第②層也寫著「兩支工具本體與收容正本一個位元都不動」。批708 那一刀刪到了 `VeritasCeleritas.py` ×3、`VeritasAegisNexus.py` ×3
+(含正典 `accelerator/`、`network/`),而 `50_Protection_Acceleration/` 與 `supportive modules/network/` 本來就在
+via_bridge_sweeper 的豁免名冊(EXEMPT_INTAKE / EXEMPT_SELF / EXEMPT_LEGACY_NET)上。**6 檔全數還原成 main 原樣**。
+修正器當初只排了凍結夾,沒去讀既有的不可動名冊——先查再改(L01)。刪死碼仍然是零行為變更,但律管的是位元組,不是行為。
+
 ## 附:修正器原始碼(一次性,留作存證)
 
 ```python

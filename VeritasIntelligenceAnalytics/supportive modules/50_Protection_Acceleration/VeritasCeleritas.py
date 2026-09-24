@@ -5489,7 +5489,38 @@ def xbatch(func, iterable, max_workers=4):
     except Exception:
         return [func(x) for x in iterable]
 
+def celeritas_health():
+    return {"status": "alive", "module": "VeritasCeleritas"}
+
+def accelerate(func=None, *args, **kwargs):
+    if callable(func):
+        return func(*args, **kwargs)
+    return {"status": "ready", "module": "VeritasCeleritas"}
+
 # === VIA_FINAL_PATCH_CELERITAS_XRUN_XSUBMIT ===
+def xrun(func=None, *args, **kwargs):
+    """
+    Safe single-task runner compatibility alias.
+    """
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xrun"}
+    except Exception as e:
+        return {"status": "error", "runner": "xrun", "msg": str(e)}
+
+def xsubmit(func=None, *args, **kwargs):
+    """
+    Safe submit compatibility alias.
+    """
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
+    except Exception as e:
+        return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
+
 # ===== [VIA:ANCHOR:PATCH:Xbatch-Compat-20260424:START] =====
 # Compatibility shim: append-only xbatch fallback for coverage/runtime bridge.
 def xbatch(items, batch_size=20):
@@ -5519,6 +5550,22 @@ except Exception:
 
 
 # === VIA_FORCE_PATCH_CELERITAS_XRUN_XSUBMIT_V2 ===
+def xrun(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xrun"}
+    except Exception as e:
+        return {"status": "error", "runner": "xrun", "msg": str(e)}
+
+def xsubmit(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
+    except Exception as e:
+        return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
 # === VIA_FINAL_PATCH_CELERITAS_FULL_COMPAT_V3 ===
 def xrun(func=None, *args, **kwargs):
     try:
@@ -5535,6 +5582,14 @@ def xsubmit(func=None, *args, **kwargs):
         return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
     except Exception as e:
         return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
+def xbatch(func, iterable, max_workers=4):
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            return list(ex.map(func, iterable))
+    except Exception:
+        return [func(x) for x in iterable]
 
 def celeritas_health():
     return {"status": "alive", "module": "VeritasCeleritas"}
