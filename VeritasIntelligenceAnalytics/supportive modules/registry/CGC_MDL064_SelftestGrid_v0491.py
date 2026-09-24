@@ -9,6 +9,14 @@ v0490→v0491(批733;LL213 站名的檢數要手動跟;本批原擬 v0490,收尾
   **別的尺拿站名當鑰匙**,只換數字不動其他字。其中產品閘 CGC_MDL133 v0101 的核心站鑰匙是「執行橋八檢」「指揮台九檢」**帶著檢數**——
   站名一跟就靜靜掉出核心;而且它數「(批376)」八站時右括號要緊接,批406 / 批611 兩站追記批號後只數到 7,G1 從批611 起一直誤判
   「存證早於 v0225」(掉球 Z201)。v0102 鑰匙改成不看檢數(「(批376」後接 ) / ; 都算),⑩ 盯尾版格子每把鑰匙都認得到站。
+  **正式庫守門(批733 Z189,L17「自測只寫暫存」)**:每一次全格子跑前跑後各 stat 三本正式庫(台股 · 全球 · 主動 ETF;
+  只看位元組與 mtime_ns、不開檔),存證 GRID json 多一欄 prod_db(before / after / changed),摘要多一行「[正式庫]」。
+  變了只**警告**不判紅(工作站上同時段你另外跑的日更 / 回補也會改它,格子分不出是誰);要找是哪一站:--only <站名子字串>
+  (逐站除錯那條路也前後各 stat、REFAIL json 同一欄、印同一行)。
+  由來:批733 收尾跑全格子,台股庫 mtime 在跑的那 11 分鐘裡變了——CGC_MDL121 v0104 自測 ④ 真跑 ENG063 --groups,可寫打開正式庫
+  建表 / 換視圖;前一輪 v0488 剛好別站鎖著庫、那支開不了,所以沒量到(時有時無 = 只靠跑前跑後一次比對的量法抓不牢,
+  這一行至少讓每一跑都量)。格子自測 +⑦ 守門實跑(暫存檔:改了抓得到、沒改不誤報、不在照記不在)→ 站名「全面自測矩陣自身」
+  五 → **七**(本來就少寫一檢:批704 +⑥ 時站名沒跟)。
 v0489→v0490(側線 2026-09-24 第十二段;主線批號由併線的手指定 L25;PR #113 Codex 審一條,實量屬實):
   **只改站名裡的檢數**,站數不變、引擎 glob / 參數 / 期望一字不動。本機三庫整併 十五 → **十六**(VDF_ENG079 v0103 +⑯ scan 遇到既有表缺欄
   照「--apply 先加欄」計畫、不 Binder 錯)· VRN 共用小工具正典 四十三 → **四十四**(SUP_MDL753 v0112 +㊹ upsert_select 計畫時表缺的欄當 NULL 數)。
@@ -2386,6 +2394,27 @@ HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent
 VRN = VIA / "functional modules/VRN"
 OUT = VIA / "VIA_Reports" / "selftest_runs"
+# 批733(Z189 · L17「自測只寫暫存」):三本正式庫。每一次全格子跑前跑後各 stat 一次(只看位元組與 mtime_ns,不開檔)
+PROD_DBS = {"台股": VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb",
+            "全球": VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_global_market.duckdb",
+            "主動ETF": VIA / "functional modules" / "VDF" / "output_hub" / "active_tw_etf" / "active_tw_etf_holdings" / "ActiveTWETF.duckdb"}
+
+
+def prod_fingerprint(dbs=None) -> dict:
+    """{名: [位元組, mtime_ns]};不在 = None。只 stat,不開檔(開了就可能換掉它的 mtime)。"""
+    out = {}
+    for k, pth in (dbs or PROD_DBS).items():
+        try:
+            st = Path(pth).stat()
+            out[k] = [st.st_size, st.st_mtime_ns]
+        except OSError:
+            out[k] = None
+    return out
+
+
+def prod_changed(before: dict, after: dict) -> list:
+    """前後不一樣的庫名(不在 → 出現、出現 → 不在,也算變)。"""
+    return [k for k in sorted(set(before) | set(after)) if before.get(k) != after.get(k)]
 
 
 # ===== [VIA:TAILPICK-BRIDGE:v0100] 尾版取用正典橋(批590;正典 SUP_MDL751_VIATailPick)=====
@@ -3131,7 +3160,7 @@ def battery(fast: bool):
     #   這支檔判了 293 站的生死,自己卻從來沒有一條檢;尺量不到自己的那個洞,
     #   不會有任何一盞燈照出來,因為照燈的那支也在洞外面。
     #   不遞迴:站跑的是 `--selftest`(五檢),不是整跑;② 檢裡的 main() 已把電池換成一站合成站。
-    add("全面自測矩陣自身五檢(批700;CGC_MDL064:①態→記號一張表蓋住每一態且永不丟例外"
+    add("全面自測矩陣自身七檢(批700;CGC_MDL064:①態→記號一張表蓋住每一態且永不丟例外"
         "(舊版三處字面 dict 只寫 OK/FAIL/SKIP,TIMEOUT 一到——有加速器時 KeyError 被工人吞掉、"
         "那一站的行整個不印;沒加速器時整跑當場炸)·②實跑逼一站真的逾時,兩條平行路都要印得出它、"
         "rc 都要 2·③鎖撞判準寫窄(要同時有 DuckDB 鎖訊息和 .duckdb 檔名;判寬=把紅洗成非紅的後門)"
@@ -4102,6 +4131,27 @@ def selftest() -> int:
             f" · 還沒人看的可跑性 {_cov.get('pending_kind')} · 分類器活著 {_cls_ok}"
             f" · 負控咬住 {_bit})")
 
+    # ⑦ 批733:正式庫守門**實跑**——暫存夾三個假庫檔:改了一個抓得到那一個、沒改不誤報、不在照記不在、不在 → 出現也算變
+    import tempfile as _tf
+    with _tf.TemporaryDirectory(prefix="via_grid_prodfp_") as _td:
+        _dbs = {"甲": Path(_td) / "a.duckdb", "乙": Path(_td) / "b.duckdb", "丙": Path(_td) / "c.duckdb"}
+        _dbs["甲"].write_bytes(b"x" * 10)
+        _dbs["乙"].write_bytes(b"y" * 10)
+        _f0 = prod_fingerprint(_dbs)
+        _same = prod_changed(_f0, prod_fingerprint(_dbs))
+        time.sleep(0.02)
+        with open(_dbs["乙"], "ab") as _fh:
+            _fh.write(b"z")
+        _f1 = prod_fingerprint(_dbs)
+        _one = prod_changed(_f0, _f1)
+        _dbs["丙"].write_bytes(b"")
+        _born = prod_changed(_f1, prod_fingerprint(_dbs))
+    chk("⑦ 正式庫守門實跑(批733 Z189:沒改不誤報 · 改了一本只點那一本 · 不在照記不在 · 不在 → 出現也算變;"
+        "尺本身三本正式庫的路徑都在 VDF output_hub)",
+        _same == [] and _one == ["乙"] and _f0["丙"] is None and _born == ["丙"]
+        and set(PROD_DBS) == {"台股", "全球", "主動ETF"} and all("output_hub" in str(v) for v in PROD_DBS.values()),
+        f"(沒改 {_same or '零'} · 改一本 {_one} · 新出現 {_born})")
+
     # 批704(LL372):檢數不寫死,由 chk 自己數。
     print(f"  [計] {n[0]} 檢 OK {n[0] - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
@@ -4117,6 +4167,7 @@ def main() -> int:
         max_lines = int(a[a.index("--lines") + 1]) if "--lines" in a and a.index("--lines") + 1 < len(a) else 40
         sel = [b for b in B if b["name"] in names or any(sb in b["name"] for sb in subs)]
         print(f"=== 逐站除錯(v0265)· {len(sel)} 站 · 全原因 ===")
+        _fp0 = prod_fingerprint()             # 批733:正式庫守門(逐站找寫正式庫的站就走這條路)
         results = []
         for b in sel:
             r = run_one(b)
@@ -4131,15 +4182,21 @@ def main() -> int:
         n_fail = sum(1 for r in results if r["state"] == "FAIL")
         OUT.mkdir(parents=True, exist_ok=True)
         ev = OUT / f"REFAIL_{ts}.json"
+        _fp1 = prod_fingerprint()
+        _moved = prod_changed(_fp0, _fp1)
         ev.write_text(json.dumps({"schema": "VIA.SelftestGrid.refail.v1", "ts": ts, "n": len(sel), "ok": n_ok, "fail": n_fail,
+                                  "prod_db": {"before": _fp0, "after": _fp1, "changed": _moved},
                                   "results": results}, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"  [計] 重跑 {len(sel)} 站 · OK {n_ok} · FAIL {n_fail}(轉綠 {n_ok})· 存證 {ev.name}")
+        print(f"  [正式庫] " + (f"這 {len(sel)} 站跑的時候變了:{'、'.join(_moved)}(位元組 / mtime_ns)——自測只准寫暫存(L17)"
+                               if _moved else f"這 {len(sel)} 站前後三本一致(位元組與 mtime_ns)"), flush=True)
         return 0 if n_fail == 0 else 1
     print(f"=== 全面自測矩陣 v0265 · {len(B)} 站 · {'FAST' if fast else 'FULL'} · 全安全模式(零 commit 零網路)===")
     print(f"  [{accel_lamp()}]", flush=True)          # 批423:20 加速器真點名(缺席誠實說缺)
     results = [None] * len(B)
     workers = 1 if "--serial" in a else max(1, int(os.environ.get("VIA_GRID_WORKERS") or min(8, os.cpu_count() or 4)))
     t_grid = time.time()
+    _fp0 = prod_fingerprint()                 # 批733:正式庫守門(跑前)
     done_n = [0]
     print(f"  [進度] 動態進度條{'(TTY 就地重畫)' if _TTY else '(非 TTY:每 10 站一行)'}"
           f" · 心跳 {PROG_P.name}(每站落檔;外部可證明還活著)· Ctrl+C 安全落檔", flush=True)
@@ -4224,6 +4281,8 @@ def main() -> int:
     if _TTY:
         _bar(done_n[0], len(B), t_grid, n_ok, n_fail, n_skip)
         print()
+    _fp1 = prod_fingerprint()                 # 批733:正式庫守門(跑後)
+    _moved = prod_changed(_fp0, _fp1)
     OUT.mkdir(parents=True, exist_ok=True)
     ev = OUT / f"GRID_{ts}.json"
     ev.write_text(json.dumps({"schema": "VIA.SelftestGrid.v1", "ts": ts, "fast": fast,
@@ -4233,7 +4292,9 @@ def main() -> int:
                               "locked_dbs": sorted(_DBLOCKS),
                               "machine_factor": machine_factor()[0],
                               "machine_factor_why": machine_factor()[1],
-                              "elapsed_s": round(time.time() - t_grid, 1), "results": results},
+                              "elapsed_s": round(time.time() - t_grid, 1),
+                              "prod_db": {"before": _fp0, "after": _fp1, "changed": _moved},
+                              "results": results},
                              ensure_ascii=False, indent=1), encoding="utf-8")
     _progress_write(done_n[0], len(B), t_grid, n_ok, n_fail, n_skip,
                     "", "INTERRUPTED" if interrupted else "DONE")
@@ -4244,6 +4305,12 @@ def main() -> int:
           + (f" · NOT_RUN {n_nr}(中斷)" if n_nr else "")
           + f"(誠實多態)· {int(time.time() - t_grid)}s · 機器係數 ×{_f}({_w})"
           + f" · 存證 {ev.name}")
+    if _moved:
+        print(f"  [正式庫] 這一跑前後變了:{'、'.join(_moved)}(位元組 / mtime_ns)——自測只准寫暫存(L17)。"
+              f"不是同時段你另外在跑的工作(日更 / 回補),就是有站寫了正式庫;找站:--only <站名子字串>(那條路也會印這一行)", flush=True)
+    else:
+        print(f"  [正式庫] 三本前後一致(位元組與 mtime_ns;"
+              + " · ".join(f"{k} {'不在' if v is None else '在'}" for k, v in _fp1.items()) + ")", flush=True)
     if n_lock:
         # 批700:鎖撞逐站點名。不點名就等於默默把「量不到」混進「沒問題」裡。
         print(f"  [鎖撞] {n_lock} 站序跑之後庫還是被佔著(**不是紅**,是這一跑量不到)——"
