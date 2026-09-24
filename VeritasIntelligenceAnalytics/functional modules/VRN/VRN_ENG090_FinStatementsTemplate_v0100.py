@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-VRN_ENG089_FinStatementsTemplate v0100 — 交易所財報 VRN 模板頁(制式 HTML U/I · SYNCHRONIZER 交接 · 上下自動燈號)
+VRN_ENG090_FinStatementsTemplate v0100 — 交易所財報 VRN 模板頁(制式 HTML U/I · SYNCHRONIZER 交接 · 上下自動燈號)
 ====================================================================
 側線 2026-09-24 第十五段;主線批號由併線的手指定(L25)。
+LL334 改號(第十五段(續),併 main 批735 時):原名 VRN_ENG089_FinStatementsTemplate——主線批735 先用了 VRN_ENG089
+(VRN_ENG089_TemplateView),本支讓號為 VRN_ENG090;內容只換自己的名字,其餘一字不動。
 操作員令(2026-09-24,原話):
   「實測無誤後結果驗證無誤後收尾並用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接自適應式自動化」
   「上下的自動連結更新新增檢查機能建構須完成」
@@ -617,7 +619,7 @@ def validate(env: dict, pkg: dict) -> list:
 
 def profile_of(env: dict) -> dict:
     a = env["analytics"]
-    return {TEMPLATE_ID: {"name": TEMPLATE_NAME, "description": "交易所 MOPS 彙總財報(VDF_ENG082)的覆蓋、完整度與新鮮度;由 VRN_ENG089 從庫產生",
+    return {TEMPLATE_ID: {"name": TEMPLATE_NAME, "description": "交易所 MOPS 彙總財報(VDF_ENG082)的覆蓋、完整度與新鮮度;由 VRN_ENG090 從庫產生",
                           "modules": [{k: m[k] for k in ("id", "name", "type", "note")} for m in env["modules"] if not m.get("system")],
                           "charts": [{k: c[k] for k in ("id", "name", "type", "metric", "groupBy")} for c in a["charts"]],
                           "historySchema": ["date", "module_id", "metric", "value", "category"]}}
@@ -937,7 +939,7 @@ def run(db=None, today: date | None = None, page: Path = PAGE, out: Path = OUT, 
     _LIB.jwrite(out / FILES["report"], rep, indent=1, newline=True)
     if do_print:
         tg = rep.get("target") or {}
-        print(f"[VRN 財報模板] VRN_ENG089 v{VERSION} · 上游 {rep['e82'].get('src') or '—'} · 庫 {rep['db'] or '—'} · 今天 {rep['today']}"
+        print(f"[VRN 財報模板] VRN_ENG090 v{VERSION} · 上游 {rep['e82'].get('src') or '—'} · 庫 {rep['db'] or '—'} · 今天 {rep['today']}"
               f"(該齊 {tg.get('qe') or '?'} 那一季,期限 {tg.get('due') or '?'})")
         for x in rep["up"]:
             print(f"  [{x['state']:<6}] 上 {x['name']}:{x['detail']}")
@@ -996,7 +998,7 @@ def check(db=None, today: date | None = None, page: Path = PAGE, out: Path = OUT
     states = [x["state"] for x in rep["up"] + downs]
     rep["rc"] = rc_of(states)
     if do_print:
-        print(f"=== [VRN_ENG089 v{VERSION}] 上下連結檢查 · 庫 {rep['db'] or '—'} · 頁 {_rel(page)} ===")
+        print(f"=== [VRN_ENG090 v{VERSION}] 上下連結檢查 · 庫 {rep['db'] or '—'} · 頁 {_rel(page)} ===")
         for x in rep["up"] + downs:
             print(f"  [{x['state']:<6}] {'上' if x['dir'] == 'up' else '下'} {x['name']}:{x['detail']}" + (f"  → {x['fix']}" if x["state"] != "GREEN" and x.get("fix") else ""))
         print(f"  [計] 上 {len(rep['up'])} · 下 {len(downs)} · 最壞 {worst(states)} → rc{rep['rc']}")
@@ -1111,7 +1113,7 @@ def selftest() -> int:
         shutil.copyfile(gatesrc, reg / gatesrc.name)
         shutil.copyfile(vsys, T / "vrn" / vsys.name)
         page = T / "ui" / "VIA_UI_VRNFinStatements_v0100.html"
-        roster_ok = "ROSTER = " + repr({"vrn": [{"zh": "VRN 交易所財報模板", "dir": "functional modules/VRN", "glob": "VRN_ENG089_FinStatementsTemplate_v*.py",
+        roster_ok = "ROSTER = " + repr({"vrn": [{"zh": "VRN 交易所財報模板", "dir": "functional modules/VRN", "glob": "VRN_ENG090_FinStatementsTemplate_v*.py",
                                                   "args": ["run"], "page": str(page), "timeout": 300, "python": "family", "data_gate": True}]}) + "\n"
         (reg / "CGC_MDL138_FamilyUI_v0999.py").write_text(roster_ok, encoding="utf-8")
         contract = T / "UI_CONTRACT_latest.json"
@@ -1319,7 +1321,7 @@ def _argval(a: list, flag: str, default=None):
 def main(argv=None) -> int:
     a = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in a or (a and a[0] == "selftest"):
-        print(f"=== VRN_ENG089 交易所財報 VRN 模板頁 v{VERSION} · 二十二檢自測(暫存夾 · 零網路 · 不碰真庫)===")
+        print(f"=== VRN_ENG090 交易所財報 VRN 模板頁 v{VERSION} · 二十二檢自測(暫存夾 · 零網路 · 不碰真庫)===")
         return selftest()
     verb = a[0] if a and not a[0].startswith("--") else "run"
     try:

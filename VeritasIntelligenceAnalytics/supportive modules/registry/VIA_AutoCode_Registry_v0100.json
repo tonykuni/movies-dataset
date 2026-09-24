@@ -10144,6 +10144,13 @@
       "code": "容器實測:VRN_ENG089 v0100 自測 22/22(暫存夾 · 零網路 · 不碰真庫;旁邊有人唯讀開著照樣跑;驗器正控六種壞信封);改壞測試 Python 39/39 · 頁上交接 JS 11/11(第一輪 30/39 · 9/11,缺口全補後重跑);瀏覽器使用者實測 17/17(三頁全 file:// 同源;交接後 SYNCHRONIZER 與中央 UI 都收到、頻道有廣播;手動 / 只同步檢視 / 本機優先都擋;只往新的方向自動更新;換範本先問;匯入信封 / 歷史 CSV;手機 390 不橫捲;中央 UI toast 缺陷基線實量=套件既有,Z210);真庫副本(TPEX 12 端點錄樣經 ENG082 v0105):上櫃綠 12/12 · 上市缺料(交易所擋)rc2;check 上 6 下 10(下游全綠);CGC_MDL138 v0102 8/8(真跑本頁判 DATA 本趟新產)· CGC_MDL153 v0102 12/12(U/I 契約自動收頁、擁有者自動認、再生短令讀頁自報);格子 v0491 相關六站 OK · VCGC 37/37 · ssot verify rc0 · 本機照 CI 綠(MasterControl 108→109 依 LL49 重產)· 全景零報 · py3.12/3.13 編譯過;元件冊 新 48 · 變更 47 · 退役 0",
       "category": "VRN 模板頁 · SYNCHRONIZER 交接 · 上下自動燈號",
       "component": "側線 2026-09-24 第十五段(主線批號由併線的手指定 L25)交易所財報 VRN 模板頁:VRN_ENG089_FinStatementsTemplate v0100(制式 HTML U/I · SYNCHRONIZER 控制交接 · 上下自動燈號 · run/check/status)· CGC_MDL138 v0102(名冊 +1、資料閘附註誠實)· CGC_MDL153 v0102(再生短令讀頁自報 via-refresh)· uxtest_vrn_finstatements_v0100.js(使用者實測 + HTML 結果報告)· .gitignore · MasterControl 重產(LL49)· 掉球 +Z210 +Z211 +Z212 · 文件 S20260924o"
+    },
+    {
+      "ts": "2026-09-24 22:25",
+      "op": "FIX",
+      "code": "容器實測(併 main 457a67c6 批735 之後):LL334 撞號——主線批735 先用了 VRN_ENG089(TemplateView),本支讓號 VRN_ENG090_FinStatementsTemplate(掃 41 條遠端分支、檔名沒人用過;v0100 內容只換自己的名字,自測 22/22);真 bug:v0100 交接照 SYNCHRONIZER「取代」模式,同一份狀態裡批735 的 vrn-report-template 與使用者自建模組交接一次就被刪、使用者關掉的本頁模組自動更新就被打開 → v0101 改「合併」模式只增不減(別人的模組連啟用 / 釘選 / 順序不動;自己的換新名稱與註記、保留啟用與釘選;不再產的自己的才拿掉;順序照 normalizeModules),合併碼一份頁與自測共用;自測 23/23(㉓ node 實跑四種狀態;㉒ 子行程只准在 _run_node)· 合併碼改壞 14/14(第一輪 12/14,同 order 平手與系統模組 id 撞前綴補情境後抓到)· 頁上 JS 改壞 15/15 · 瀏覽器實測 v0101 20/20(+⑱⑲⑳ 跟批735 共存;反面控制 v0100 的頁 ⑱⑲⑳ 紅);U/I 契約燈改號後當場亮紅(擁有者還是舊檔)→ via-workflow ui-contract 重產後自己認到 v0101、轉綠;漏跑的一站:第十五段第一版回歸沒跑六層冊,守門 ⑧ 在 v0107 實量紅(ENG089_FinStatementsTemplate 沒被交代)→ via_vrn_logic_book v0109 掛 OFF_BOOK_PENDING(Z213)、冊照建冊程式重建,17/17 · 守門 GREEN;CGC_MDL138 v0103(名冊 glob 換 ENG090)8/8;格子 v0495(LL334:v0494 已被 PR #121 批736 推上遠端,以 main 的 v0493 為底;+1 站 · 三大報表 二十一 → 二十二,Z204 結)全格子 OK 337 · FAIL 6 · SKIP 14 · TIMEOUT 0(765 秒;6 紅在乾淨 main 樹 v0493 同一容器一樣紅:pdfplumber/fitz 表格引擎 · OCR 未裝 · 生成頁不在 · 舊存證綠燈率,不是本 PR 的;改號 v0495 後 12 站再跑全 OK)· 正式庫三本前後一致;VCGC 38/38 · ssot verify rc0 · 本機照 CI 綠(總控頁 109 → 110 依 LL49 重產)· 全景問題數同前一版(沿用舊債)· py3.12/3.13 編譯過;元件冊 新 54 · 變更 141 · 退役 0",
+      "category": "VRN 模板頁 · LL334 讓號 · 交接只增不減",
+      "component": "側線 2026-09-24 第十五段(續)(主線批號由併線的手指定 L25)併 main 批735:VRN_ENG090_FinStatementsTemplate v0100(改號)/ v0101(交接只增不減)· CGC_MDL138 v0103 · via_vrn_logic_book v0109 · CGC_MDL064 格子 v0495 · uxtest_vrn_finstatements_v0101.js · 元件冊 / 正則清冊 / 六層冊照建冊程式重建 · 總控頁重產(LL49)· 掉球 Z204 結 · Z210 補量 · Z212 · +Z213 · 文件 S20260924o 第十節"
     }
   ],
   "updated_at": "2026-09-24 14:10",
