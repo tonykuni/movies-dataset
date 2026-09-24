@@ -227,7 +227,7 @@ _TP_CUES = (re.compile(r"目標價[^\d]{0,14}?(\d[\d,]*\.?\d*)"),
             #   ② 幣別前綴只認 NT/NTD/TWD:`US$190`、`HK$52.5` 全沒中。外資英文研報是常態寫法。
             #   守衛不放寬:括號內不含換行且上限 12 字元,_plausible_tp 與 _is_upside_context 原樣生效。
             re.compile(r"(?<![A-Za-z])(?:(?i:target\s*price|price\s*target)|TP|PT)(?![A-Za-z])"
-                       r"\s*(?:\([^)\n]{0,12}\))?\s*[:：]?\s*"
+                       r"\s*(?:\([^)\n%％]{0,12}\))?\s*[:：]?\s*"
                        r"(?:\(?(?:NTD|TWD|HKD|SGD|AUD|USD|JPY|EUR|GBP|RMB|CNY)\)?"
                        r"|\(?(?:NT|US|HK|S|A)\$\)?|[¥€£$])?\s*\$?\s*"
                        r"(\d[\d,]*\.?\d*)"))
@@ -829,7 +829,7 @@ _TP_CUES = (re.compile(r"目標價[^\d]{0,14}?(\d[\d,]*\.?\d*)"),
             #   ② 幣別前綴只認 NT/NTD/TWD:`US$190`、`HK$52.5` 全沒中。外資英文研報是常態寫法。
             #   守衛不放寬:括號內不含換行且上限 12 字元,_plausible_tp 與 _is_upside_context 原樣生效。
             re.compile(r"(?<![A-Za-z])(?:(?i:target\s*price|price\s*target)|TP|PT)(?![A-Za-z])"
-                       r"\s*(?:\([^)\n]{0,12}\))?\s*[:：]?\s*"
+                       r"\s*(?:\([^)\n%％]{0,12}\))?\s*[:：]?\s*"
                        r"(?:\(?(?:NTD|TWD|HKD|SGD|AUD|USD|JPY|EUR|GBP|RMB|CNY)\)?"
                        r"|\(?(?:NT|US|HK|S|A)\$\)?|[¥€£$])?\s*\$?\s*"
                        r"(\d[\d,]*\.?\d*)"))
@@ -1363,7 +1363,8 @@ def safe_rating(text: str, E=None) -> dict:
     return {"raw": None, "canonical": None, "in_dict": False, "how": "無線索"}
 
 
-_UPSIDE_RX = re.compile(r"(潛在)?上漲空間|上檔空間|upside", re.I)
+_UPSIDE_RX = re.compile(  # 批727b:Codex P1 追因——舊表只有 upside,而 `Up/downside` 裡沒有 "upside" 這個子字串,downside 那一類從來沒被攔過
+    r"(潛在)?上漲空間|上檔空間|下跌空間|up\s*/?\s*downside|downside|upside", re.I)
 
 
 def _is_upside_context(text: str, pos: int, span: int = 26) -> bool:
@@ -1397,7 +1398,9 @@ def safe_target_price(text: str, E=None, exclude_code: str | None = None, exclud
         return v
     for i, rx in enumerate(_TP_CUES):
         for m in rx.finditer(text or ""):
-            if _is_upside_context(text or "", m.end(1)):      # 幅度不是價格
+            # 批727b:除了數字周邊,**線索詞之前**也要看。`Up/downside to price target (%)\n38`
+            # 的 downside 離數字太遠,只看數字周邊會漏;漏掉就把一個幅度當成目標價寫進庫。
+            if _is_upside_context(text or "", m.end(1)) or _is_upside_context(text or "", m.start()):
                 continue
             v = _ok(m.group(1))
             if v is not None:
@@ -2381,7 +2384,13 @@ def selftest() -> int:
                "Price Target (Dec-25): 上漲空間 15%",
                # 批727 放寬括號修飾語後最容易生出的兩種誤報:括號裡本來就有數字、括號後接的是幅度
                "Our price target methodology (see page 12)", "Target Price (12M) upside 20%",
-               "營收 US$1,234 百萬,年增 20%"):
+               "營收 US$1,234 百萬,年增 20%",
+               # 批727b(Codex P1 實證迴歸):放寬括號後,幅度欄整欄被當成目標價。
+               # `Up/downside` 裡沒有 "upside" 子字串,舊守衛詞表從來攔不到 downside 那一類;
+               # 而且幅度詞離數字太遠,只看數字周邊的視窗也看不到 → 守衛改成線索詞之前也看。
+               "Up/downside to price target (%)\n38", "Upside to price target (%) 38",
+               "Up/downside to price target (Dec-25)\n38", "Price target (%)\n25",
+               "Downside to price target: 38"):
         _v, _ = safe_target_price(_s)
         chk(f"英文目標價負控:{_s} 不准生出價", _v is None)
     # ---- 批727 雙頭守衛:冊上的 cue_rx 與本橋 _TP_CUES 本來就是雙胞胎,漂了沒人知道 ----
