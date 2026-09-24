@@ -357,6 +357,13 @@ def judge(paths: list[str] | None = None, base: str | None = None,
             mm = _VER_RX.match(Path(path).name)
             if not mm or _exempt(path):
                 continue
+            # 被刪掉的檔不算「新出一支版本」。git 的改動清單把刪除也列進來,
+            #   不擋掉的話,**把一支過時的版本拿掉**這個動作本身會被判成
+            #   「你出了一支比基線舊的版本」——那正好是反過來的。
+            #   (KILL-01 早就同律跳過不存在的檔:「被刪掉的檔不判語法」。)
+            #   註:刪除本身該不該擋(只增不減)是另一條條款的事,目前沒有人管,已記單。
+            if not (cwd / path).is_file():
+                continue
             mine = int(mm.group("num"))
             in_head = _head_text(path, cwd) is not None
             on_base = _on_ref(ref, path, cwd) if ref else in_head
@@ -447,6 +454,14 @@ def judge(paths: list[str] | None = None, base: str | None = None,
     for f in files:
         m = _VER_RX.match(Path(f).name)
         if not m or _exempt(f):
+            continue
+        # **只判基線上真的有的那些舊版。** 這一條律是「舊版一個位元不動」——
+        #   基線上不存在的版本沒有「舊內容」可以保:它是這次**新造**的,不是被改的。
+        #   實例(批736c,真 PR 上遇到的):本線先出 v0494,main 隨後走到 v0495,
+        #   於是本線照 LL334 補出 v0496;此時 v0494 與 v0496 都是「相對基線新增」,
+        #   舊式把 v0494 判成「舊版被改動」——誤判,我沒改它,我造了它。
+        #   它該由 KILL-11 判「比基線還舊」,那一條才是對的;一件事由對的那條判就好。
+        if ref and not _on_ref(ref, f, cwd):
             continue
         stem = str(Path(f).parent / m.group("stem"))
         if stem in new_stems and int(m.group("num")) < new_stems[stem]:

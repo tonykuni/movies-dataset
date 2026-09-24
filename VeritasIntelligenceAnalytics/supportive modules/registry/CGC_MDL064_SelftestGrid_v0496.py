@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0493→v0494(批736 操作員令「更新模組或修正模組都要有嚴格的把關擊斃較機制」+「最後實測要 HTML U/I 結果報告」):
-  **+4 站**:CGC_MDL187_ModuleChangeKillGate v0100 兩站 · CGC_MDL188_BatchResultReport v0100 兩站。
-  擊斃閘**廿三檢** rc0 + 實判 nodata_ok;報告頁**九檢** rc0 + 實跑 nodata_ok。
-  (檢數含 Codex 審查 PR #121 抓出的四個 fail-open 各一格正負控,加本閘實跑咬出的落後基線一格,與報告頁承諾的 rc3 走不到一格。)
-  **這一版的重點是第十一條條款,而它是本批自己付的學費**:本線在一個落後 89 個 commit 的基線上
-  做完一整批,開的 `VRN_ENG073_v0137` 撞上 main 上別的批做的同名 v0137(main 已到 v0138),
-  而本批要做的「目標價與前一日價換 ADJ CLOSE」——批729 就交付了、批730 還拿真料修得更對。
-  前十條條款一條都沒攔住:它們全部只問「這次改了什麼」,**沒有一條問「你改的是不是當下那一版」**。
-  KILL-11 基線時效就是補這一刀(撞號 / 舊號 / 跳號三個正控 + 正常升版負控 + 找不到基線時降 PARTIAL 不准報 PASS)。
-  本檔表頭 v0491→v0493 那一段記的 LL334(側線取用 v0492/批734 → 本線跳號)是**同一個病**的前一次發作。
-  其餘一字不動(v0493 留作版史)。
+v0495→v0496(批736c;**LL334 照 v0495 表頭的指示辦**):把 PR #121(批736)的四站重套到當時的尾版上。
+  v0495 是側線在 main 尾版 v0493 上做的(那時 #121 的新模組還不在 main,不能拿 v0494 當底),
+  它的表頭已經寫明:「#121 若先併,本版的改動要在它的 v0494 上重套成新的尾版」——反過來也一樣。
+  #121 併 main 之前 main 先走到 v0495,於是本線的 v0494 變成**比基線還舊**,
+  而這件事是本批自己做的 `CGC_MDL187` 的 `KILL-11 基線時效`**在真 PR 上當場攔下來的**:
+      [擊斃] KILL-11 · CGC_MDL064_SelftestGrid_v0494.py
+             犯:origin/main 上同名尾版已是 v0495,這支卻是 v0494——版號比基線還舊
+  v0496 = v0495(一位元不動)+ v0494 那四站原樣搬過來(不重打,免得漂成第二份)。
+  v0494 留作版史。站數 v0495 的基礎上 +4。
+v0493→v0495(側線 2026-09-24 第十五段(續);主線批號由併線的手指定 L25。LL334:v0492 在側線 upbeat-feynman(PR #104,未併)、
+             v0493 是主線批735、v0494 在 claude/via-envmanager-governance(PR #121 批736,未併;+4 站 MDL187 / MDL188)
+             → 本側線取 v0495,**以 main 尾版 v0493 為底**(#121 的新模組還不在 main,不能拿 v0494 當底)。
+             #104 / #121 之後併 main 時照 LL334 在當時尾版上重套自己的站;反過來 #121 若先併,本版的改動要在它的 v0494 上
+             重套成新的尾版——本版只有下面兩處):
+  ① +1 站「VRN 交易所財報模板二十三檢」(VRN_ENG090_FinStatementsTemplate --selftest;操作員 2026-09-24「用制式模板html u/i套進去
+     形成vrn模板都由synchonizer控制交接自適應式自動化」「上下的自動連結更新新增檢查機能建構須完成」):讀 VDF_ENG082 交易所彙總財報 →
+     制式 U/I 模板頁 + SYNCHRONIZER 信封 v2 · 交接只增不減(同 SYNCHRONIZER「合併」模式:批735 的 vrn-report-template、你自建的模組
+     一個不動)· 上下自動燈號 · 自測只寫暫存、零網路;㉓ 用 node 實跑頁上那一份合併碼,沒有 node 照實 SKIP(站仍 rc0)。
+     (LL334:原號 VRN_ENG089 與主線批735 的 VRN_ENG089_TemplateView 撞號,本支讓號 090。)
+  ② 站名檢數(LL213,只換數字不動其他字):三大報表擷取引擎 二十一 → **二十二**(VDF_ENG082 v0104 起 +㉒ 空列表 / 佔位列判準,
+     v0105 同;側線掉球 Z204 結)。站數 +1,其餘站的 glob / 參數 / 期望一字不動。
 v0491→v0493(批735;LL334:v0492 與批734 已被側線 claude/upbeat-feynman-1uurww 取用 → 本線跳號 v0493、改號批735;
              側線的 v0492 若先併進 main,本版的改動要在 v0492 上重套成新的尾版——只有下面兩處):
   ① +1 站「VRN 模板十二檢」(VRN_ENG089 --selftest;操作員 2026-09-24「用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接
@@ -3085,6 +3095,10 @@ def battery(fast: bool):
     add("VRN 模板十二檢(批735 VRN_ENG089:制式 U/I 三入口套版模板零改動 · synchronizer 模組只增不減 · 中央頁面板由 synchronizer 控制 · "
         "上下游連結冊對上一輪 NEW/CHANGED/GONE/SAME · 新增必上頁 · 跨輪自動接上一輪 · 瀏覽器實跑缺 playwright 照實 SKIP;自測只寫暫存)",
         newest("VRN_ENG089_TemplateView_v*.py", VRN), ["--selftest"], "rc0", 300)
+    # 側線第十五段(續):交易所財報 VRN 模板頁(VDF_ENG082 → 制式 U/I + SYNCHRONIZER 信封 v2;交接只增不減;上下自動燈號)。㉓ 缺 node 照實 SKIP,站仍 rc0。
+    add("VRN 交易所財報模板二十三檢(側線第十五段 VRN_ENG090:讀 VDF_ENG082 交易所彙總財報 → 制式 U/I 模板頁 + SYNCHRONIZER 信封 v2 · "
+        "交接只增不減(同 SYNCHRONIZER「合併」模式,別人的模組一個不動)· 上下自動燈號 · ㉓ node 實跑合併碼、缺 node 照實 SKIP;自測只寫暫存、零網路)",
+        newest("VRN_ENG090_FinStatementsTemplate_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("母倉↔姊妹倉 同步自動相互更新檢查十九檢(批728 CGC_MDL184:VCGC 鏡像新鮮度 + VRN 第二血統同步;沙盒兩棵假樹,唯讀零網路)",
         newest("CGC_MDL184_SisterMirrorSync_v*.py", HERE), ["--selftest"], "rc0", 180)
     # 批728:SSOT 冊同步(四條邊;唯讀;委派每一支正主)。實跑不另上站:VCGC v0128 ssot 門 ⑥ 逐格委派,下面 ssot 三站就是它的實跑。
@@ -3214,7 +3228,7 @@ def battery(fast: bool):
         newest("VRN_ENG082_ExtractionLogic_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 300)
     add("財務邏輯統轄橋九檢(批504;AllInOne 2.1.0 + FDS 28 欄掛載·第二意見·評等正典·政策因子·公式檢;零網路)",
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
-    add("三大報表擷取引擎二十一檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
+    add("三大報表擷取引擎二十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("Veritas 中央控管台三十八檢(批735 v0129 +㊳ VRN 模板交接段:讀 VRN_ENG089 交接口本台只翻譯 · 缺席=ABSENT · 炸掉=RED;批728 v0128 +㊲ 冊同步 CGC_MDL185 四格委派:正主判燈本台只翻譯 · 缺席=ABSENT · 紅進 verify;側線 2026-09-23 v0127 +㊱ 不認得的動詞只印用法段;v0126 +㉝㉞㉟ SSOT 正則·同義字連動口:逐格委派正主 · plan 零寫 · 判燈;批699 +㉛㉜ 掃描面只增不減 · 排除清單逐條具名;批698 +㉚ 樞紐口委派檢;批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
