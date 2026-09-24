@@ -10116,6 +10116,13 @@
       "code": "容器實測:Codex 審的兩種情況實量屬實(ENG079 v0102 scan:無鍵表新來源多一欄 · 籌碼多一個 kind 鍵欄 → 兩單元 Binder 錯 FAIL;v0101 數得出 2 · 1 是因為 scan 先 ALTER);正典 44 檢(+㊹)· ENG079 16 檢(+⑯)全綠;改壞測試正典新 6 + 舊 22 全抓;負控:沙盒正典退回 v0111 → ⑯ 失敗、v0112 才過;真庫副本零差異 Z194 七組(新加 H3c:無鍵多一欄 893 列 · 籌碼多 kind 鍵欄 890 列,舊 v0101 與新 v0103 計畫與實寫同數、整張表全同,舊版 scan 會加三欄、新版不加)+ Z191 十三組全同;格子 v0490 相關 15 站 OK;普查私有去重寫入仍 0;讀 ENG089 的三支與單元測試 34 綠;VCGC 37/37 · ssot verify rc0 · 本機照 CI 綠;元件冊 新 1 · 變更 162 · 退役 0",
       "category": "PR #113 審查修正 · scan 遇到新欄的計畫",
       "component": "側線 2026-09-24 第十二段(主線批號由併線的手指定 L25)PR #113 Codex 審一條,實量屬實:SUP_MDL753 v0112(upsert_select 計畫時表還沒有的欄當 NULL 數;欄齊時 SQL 一字不動、實寫缺欄照舊大聲拋)· VDF_ENG079 v0103(邏輯不動,+⑯)· 格子 v0490(兩站檢數)"
+    },
+    {
+      "ts": "2026-09-24 18:56",
+      "op": "FIX",
+      "code": "容器實測:ENG082 v0103 自測 21 檢(+⑬–㉑)全綠(py3.12/3.13 無 duckdb:交易所車道誠實 SKIP,⑩⑫ 缺件 FAIL 與 v0102 基線相同);改壞測試 49 抓 48(沒抓到的 1 個等價:被擋端點回 [] 或 None,本車道不寫 checkpoint、台帳照態記);錄下的 TPEX 12 端點真回應 → 容器 vdf_tw_market 真庫副本:+29,368 項 · 892 家 · 57 科目 · 4 端點來源 · 鍵不重 · 冊上 893 家有 892(缺 3718);台帳 TPEX OK 12 · TWSE BLOCKED 12;重跑 TPEX 零請求、TWSE 被擋照報 PARTIAL rc0;--force +0;損益是累計:883 家 Q2 營收 ÷ 1–8 月累計月營收中位數 0.736;上市 OpenAPI 與 swagger 容器回 800B 安全頁;上櫃 swagger 225 端點無現金流量表;資料家目錄判讀:tw_financial_mops → PERIOD_DUE(due 2026-11-14)· 台帳 → LABEL(不計燈);命令列 dry/用法/FAIL-CLOSED/status 真庫副本 md5 不變;普查 ENG082 看庫、私有去重寫入 0;全景代讀零報;py3.12/3.13 -W error 編譯過;格子 v0490 相關 12 站 10 OK + 2 SKIP(容器無目錄,同基線);VCGC 37/37 · ssot verify rc0 · 讀 ENG089 三支與單元測試 34 綠 · 本機照 CI 綠;元件冊 新 16 · 變更 23 · 退役 0",
+      "category": "交易所 MOPS 彙總財報車道 · 逐端點先查庫 · 覆蓋率另立",
+      "component": "側線 2026-09-24 第十三段(主線批號由併線的手指定 L25)掉球 Z165 · Z4:VDF_ENG082 v0103 `run --mops`(交易所 OpenAPI MOPS 彙總財報 → 長表 tw_financial_mops;逐端點擷取台帳 tw_financial_mops_log;季界與期限走正典 period_lag、季底月日讀期別規則冊 LL442;status 覆蓋另立)· 期別規則冊 quarterly_statements 認 tw_financial_mops · 資料表冊 +2 表 · 掉球 Z165 結、Z4 部分做、+Z202 · +Z203 · +Z204 · 格子不出新版(v0491 已被批733 用、未併 main;站名檢數等併線後補,Z204)"
     }
   ],
   "updated_at": "2026-09-24 14:10",

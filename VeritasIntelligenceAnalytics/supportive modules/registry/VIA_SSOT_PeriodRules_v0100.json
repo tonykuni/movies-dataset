@@ -70,7 +70,7 @@
       "why": "工作站 2026-09-24:營收整類 NODATA——ym=YYYYMM 算不出天數;就算硬算月底天數,8 月營收在 9/24 是能拿到的最新一期,9 月營收 10/10 才到期"
     },
     "quarterly_statements": {
-      "tables_rx": "^tw_financial$",
+      "tables_rx": "^(tw_financial|tw_financial_mops)$",
       "period": "quarter",
       "due": {"03-31": "05-15", "06-30": "08-14", "09-30": "11-14", "12-31": "+1y-03-31"},
       "canonical_source": "上市櫃公司財報公告期限:第一季 5/15 · 第二季 8/14 · 第三季 11/14 · 年報次年 3/31(證券交易法第 36 條)",
@@ -126,6 +126,7 @@
     {"ts": "2026-09-24", "op": "ADD", "what": "date_columns.census(九份在範圍 · 七類範圍外附因由)· corrected 尾端補六欄 · record_only 補 snapshot_at / run_at · fallback_rule", "evidence": "AST 普查尾版 2025 支;VDF_ENG051 v0103 建表語句(holdings_daily / holdings_changes 只有 portfolio_date;snapshot_at / run_at = datetime.now())"},
     {"ts": "2026-09-24", "op": "ADD", "what": "private_copies_to_migrate.roc_date_2:重量方法與數字(70/61/41)· ENG055 v0113 六處綁正典 · ENG063 v0106 _roc_ym 綁正典 · value_shapes 立 ROC_YM · 正典 v0106 八碼 19xx · roc_to_iso_keep · roc_ym", "evidence": "SUP_MDL753 v0106 自測 ㉖㉗㉟㊱;VDF_ENG055 v0113 自測 ⑪(變種四支全抓);VDF_ENG063 v0106 自測 ⑨b"},
     {"ts": "2026-09-24", "op": "ADD", "what": "sentinel_rows:ENG054 舊版空跑哨兵 ticker='_NOOP_' 的排除規則(量最早日/最新日/跨度時排除,列數照算)", "evidence": "VDF_ENG054 v0106 說明與自測 ⑫;工作站 2026-09-24 日價表最早日 1900-01-01"},
-    {"ts": "2026-09-24", "op": "UPDATE", "what": "census.in_scope 七支 TO_MIGRATE → BOUND(MDL123 v0105 · MDL148 v0131 · ENG089 v0102 · ENG087 v0103 · ENG090 v0106 · MDL119 v0106 · MDL128 v0102);sentinel_rows.rule 讀者名單補四支與 CAST 註;private_copies_to_migrate.date_columns 補七條、date_columns_open 改寫為已清空(規則本身一條未刪);private_copies_to_migrate.roc_date_2 補 focus_group_measured(焦點組十支量過,只剩 ENG075 反方向一處)", "evidence": "SUP_MDL753 v0107 自測 39/39;焦點組十支尾版逐行 grep;各支自測 15/15 · 51/51 · 20/20 · 11/11 · 27/27 · 10 OK+3 NODATA(同 v0105 基線)· 10/10;各支改壞測試全抓(側線 2026-09-24 第三段文件)"}
+    {"ts": "2026-09-24", "op": "UPDATE", "what": "census.in_scope 七支 TO_MIGRATE → BOUND(MDL123 v0105 · MDL148 v0131 · ENG089 v0102 · ENG087 v0103 · ENG090 v0106 · MDL119 v0106 · MDL128 v0102);sentinel_rows.rule 讀者名單補四支與 CAST 註;private_copies_to_migrate.date_columns 補七條、date_columns_open 改寫為已清空(規則本身一條未刪);private_copies_to_migrate.roc_date_2 補 focus_group_measured(焦點組十支量過,只剩 ENG075 反方向一處)", "evidence": "SUP_MDL753 v0107 自測 39/39;焦點組十支尾版逐行 grep;各支自測 15/15 · 51/51 · 20/20 · 11/11 · 27/27 · 10 OK+3 NODATA(同 v0105 基線)· 10/10;各支改壞測試全抓(側線 2026-09-24 第三段文件)"},
+    {"ts": "2026-09-24", "op": "UPDATE", "what": "cadences.quarterly_statements.tables_rx 加 tw_financial_mops(VDF_ENG082 v0103 交易所 MOPS 彙總財報長表;同一套季別與公告期限,期限一字未改);原有 tw_financial 照舊。新讀者:VDF_ENG082 v0103 讀本規則兩處——季界與期限走正典 period_lag(mops_target:法定期限已過的最近一季)· 季別 1–4 → 季底月日取 quarterly_statements.due 的四個鍵(_mops_qends;鍵不是四個=大聲拋、rc1 零請求),本支不另寫季底表或期別換算(LL442)", "evidence": "VDF_ENG082 v0103 自測 ⑮⑯⑳㉑(逐端點先查庫:該齊那一季的期限之後抓成功過=不抓 · 期限前抓的照抓 · 10/01 仍判齊 · 下一季到期照抓 · 本規則少了季表 → rc1 零請求);資料家目錄量 tw_financial_mops → PERIOD_DUE(due 2026-11-14);側線 2026-09-24 第十三段文件"}
   ]
 }
