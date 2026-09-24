@@ -1364,14 +1364,22 @@ def safe_rating(text: str, E=None) -> dict:
 
 
 _UPSIDE_RX = re.compile(  # 批727b:Codex P1 追因——舊表只有 upside,而 `Up/downside` 裡沒有 "upside" 這個子字串,downside 那一類從來沒被攔過
-    r"(潛在)?上漲空間|上檔空間|下跌空間|up\s*/?\s*downside|downside|upside", re.I)
+    r"(潛在)?上漲空間|上檔空間|下跌空間|up\s*/?\s*downside"
+    r"|downside\s+(?:to|vs\.?|versus)|upside", re.I)  # 批727c(Codex P2):
+    # 裸 downside 會把 `Target Price: 100; downside risks remain` 這種正當命中誤殺
+    # (v0115 回 100.0,我改完回 None)。只認**欄位標籤**形狀的 downside,不認散文裡的風險敘述。
 
 
 def _is_upside_context(text: str, pos: int, span: int = 26) -> bool:
     """備用倉 via-vdf-vrn 對同一批 64 份報告的教訓:目標價與「潛在上漲空間」是兩個欄位;
     幅度(23%)不是價格。命中點前後有上漲空間字樣、或數字帶 %,一律不當目標價。"""
     seg = text[max(0, pos - span): pos + span]
-    return bool(_UPSIDE_RX.search(seg)) or "%" in seg[span:span + 4] or "％" in seg[span:span + 4]
+    # 批727c(Codex P1):舊寫法固定用 seg[span:span+4] 當「pos 之後那幾個字」,
+    # 但 pos < span 時 seg 是從 0 起算的,那一段會落在完全無關的位置 ——
+    # 也就是這道「數字後面帶 %」的檢查**在短文裡從來沒生效過**(v0115 的
+    # `Target Price: 25%` 就回 25.0)。直接取 text[pos:pos+4],不再自己算偏移。
+    after = text[pos:pos + 4]
+    return bool(_UPSIDE_RX.search(seg)) or "%" in after or "％" in after
 
 
 def _plausible_tp(raw: str) -> bool:
@@ -2380,6 +2388,12 @@ def selftest() -> int:
                       ("Price Target: HK$52.5", 52.5), ("Target Price: NT$250", 250.0), ("目標價:250", 250.0)):
         _v, _how = safe_target_price(_s)
         chk(f"英文目標價:{_s} → {_want}(走強線索,不靠 NT$ 弱正則)", _v == _want and _how.endswith("線索"))
+    # 批727c(Codex P2)正控:目標價旁邊出現 downside 散文,**不准**因此被誤殺
+    for _s, _want in (("Target Price: 100; downside risks remain", 100.0),
+                      ("目標價 100,下檔風險仍在", 100.0),
+                      ("Target Price: NT$250. Key downside risk is FX.", 250.0)):
+        _v, _ = safe_target_price(_s)
+        chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
                "Price Target (Dec-25): 上漲空間 15%",
                # 批727 放寬括號修飾語後最容易生出的兩種誤報:括號裡本來就有數字、括號後接的是幅度
@@ -2390,7 +2404,11 @@ def selftest() -> int:
                # 而且幅度詞離數字太遠,只看數字周邊的視窗也看不到 → 守衛改成線索詞之前也看。
                "Up/downside to price target (%)\n38", "Upside to price target (%) 38",
                "Up/downside to price target (Dec-25)\n38", "Price target (%)\n25",
-               "Downside to price target: 38"):
+               "Downside to price target: 38",
+               # 批727c(Codex P1):數字**後面**帶 % 的百分比欄。第三式 v0115 也錯 ——
+               # _is_upside_context 的 seg[span:span+4] 在 pos < span 時算錯位置,
+               # 那道 % 檢查在短文裡從來沒生效過,是既有 bug 不是本批造成的。
+               "Price Target (12M): 25%", "Price Target (Dec-25): 38%", "Target Price: 25%"):
         _v, _ = safe_target_price(_s)
         chk(f"英文目標價負控:{_s} 不准生出價", _v is None)
     # ---- 批727 雙頭守衛:冊上的 cue_rx 與本橋 _TP_CUES 本來就是雙胞胎,漂了沒人知道 ----
