@@ -74,7 +74,10 @@ except Exception:
 import re, os, sys, json, unicodedata, statistics, datetime
 from collections import defaultdict
 
-ENGINE_VERSION = "v0104"
+ENGINE_VERSION = "v0105"
+# v0105 (mother 批732; the operator's screenshot of a 兆豐 季度損益表): restore_period_header asks the mother's
+#   period parser first (VRN_ENG074 period_parts through the evidence core) -- 25Q1 / 25Q4(F) / 2025(F) / 1H25 came
+#   back as None here; what it cannot read keeps the rules below.
 
 
 _CORE_MODNAME = "vrn_engine_evidence_core"
@@ -703,6 +706,12 @@ class TableGeometry:
         kinds = {"A": "actual", "E": "estimate", "F": "forecast"}
         for c in cells:
             c = c.strip()
+            p = EVIDENCE_CORE.period_parts(c) if EVIDENCE_CORE is not None and hasattr(EVIDENCE_CORE, "period_parts") else None
+            if p and p.get("fiscal_year") and p.get("period_type") in ("FY", "FQ", "FH"):
+                y = int(p["fiscal_year"])
+                period = str(y) if p["period_type"] == "FY" else (
+                    "%04d-Q%d" % (y, p["fiscal_quarter"]) if p["period_type"] == "FQ" else "%04d-H%d" % (y, p["half"]))
+                out.append({"raw": c, "period": period, "kind": kinds.get(str(p.get("estimate") or "").upper(), "actual")}); continue
             m = re.match(r"(\d{1,2})/(\d{2})([AEF]?)$", c)
             if m:
                 out.append({"raw": c, "period": "20%s-%s" % (m.group(2), m.group(1).zfill(2)),

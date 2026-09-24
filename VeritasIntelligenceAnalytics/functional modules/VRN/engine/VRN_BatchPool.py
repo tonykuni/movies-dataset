@@ -16,7 +16,11 @@ VRN_BatchPool v0100 — 研報整批入庫的平行池(批731;操作員 2026-09-
     錯誤以結果帶回。
 
 律:只讀不寫(寫庫仍在主行程、整批一次);零網路;不設同意閘;尾版律(本件無版號檔名 = 穩定匯入名,
-工作行程要能用名字 import 它;內部版號 v0100)。
+工作行程要能用名字 import 它;內部版號見 POOL_VERSION)。
+
+v0100→v0101(批732;工作站實跑 G06 105 份 2 個行程 675 秒):加速器的執行緒預算在那台機器上是 2(實體核心 ×
+記憶體壓力),池照它開 2 個——這是加速器的治理,不是池的錯,池不越權改它。但主控台那一行只印「2 個」,看不出為什麼。
++workers_reason():哪一個設定決定的 · 上限 · 本機邏輯/實體核心 · 怎麼改(VRN_BATCH_WORKERS=N),印在平行池那一行。
 ======================================================================
 """
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -43,7 +47,7 @@ import sys
 import traceback
 from pathlib import Path
 
-POOL_VERSION = "v0100"
+POOL_VERSION = "v0101"
 MIN_FILES = 6            # fewer files than this: starting worker processes costs more than it saves
 MAX_WORKERS = 6
 CORE_MODNAMES = ("vrn_engine_evidence_core",)   # the evidence core both engines share (its appendix cache)
@@ -81,6 +85,25 @@ def workers_for(n_files):
     if wanted <= 1 or n_files < MIN_FILES:
         return 1
     return max(1, min(wanted, MAX_WORKERS, n_files // 2))
+
+
+def workers_reason(n_files):
+    """v0101 (批732; the workstation ran with 2 because the accelerator's budget said 2): where the number came from,
+    in one line -- which setting decided, the caps, and this machine's cores -- so a small pool explains itself."""
+    if not _spawn_safe():
+        return "本行程序跑(主程式沒有 __main__ 守衛或不在主行程,開池會重跑整支)"
+    src = next((f"{k}={os.environ[k].strip()}" for k in ("VRN_BATCH_WORKERS", "VIA_ACCEL_ACTIVE_THREADS")
+                if (os.environ.get(k) or "").strip().isdecimal()), f"CPU−1={(os.cpu_count() or 2) - 1}")
+    if src.startswith("VIA_ACCEL_ACTIVE_THREADS"):
+        src += "(加速器執行緒預算:實體核心 × 記憶體壓力)"
+    phys = ""
+    try:
+        import psutil  # type: ignore
+        phys = f" · 實體 {psutil.cpu_count(logical=False)}"
+    except Exception:  # noqa: BLE001 -- psutil is optional; logical count still printed
+        phys = ""
+    return (f"來源 {src} · 本機 邏輯 {os.cpu_count()}{phys} · 上限 {MAX_WORKERS} · 份數÷2={n_files // 2}"
+            f" → {workers_for(n_files)};要改:VRN_BATCH_WORKERS=N")
 
 
 def _init(engine_path, lookups):

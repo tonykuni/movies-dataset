@@ -125,6 +125,7 @@ VCGC_SYNC = REPO_ROOT / "scripts" / "VIA_VCGC_Sync.py"
 LAST_FIRST_PAGE: Dict[str, Dict[str, Any]] = {}      # per-file first-page answers of the current round (G11)
 LAST_APPENDIX: Dict[str, Dict[str, Any]] = {}        # v0103 (批729): per-file appendix small print (broker + rating scale)
 LAST_ADJ: Dict[str, Dict[str, Any]] = {}             # v0103 (批729): per-file ADJ CLOSE upside (state, value, reason)
+LAST_FIN: Dict[str, Dict[str, Any]] = {}             # v0105 (批732): per-file financial table read-back (identities)
 LAST_SAMPLES: Dict[str, Path] = {}                    # file name -> sample path of the current round
 TRUTH_CRITICAL = ("type", "ticker", "broker", "page_date", "rating", "target_price", "current_price")
 AUDIT_DIR = VRN_ROOT / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100"
@@ -724,10 +725,28 @@ def def_gate_batch(engines: Engines, samples: Path, out_dir: Path, truth: List[D
             issues = str(row.get("ValidationIssues") or "")
             if "failed" in issues.lower() or "No PDF extraction engine" in issues:
                 problems.append(issues[:200])
+        fin_check = ""
+        if fins and callable(getattr(db, "financial_identity_checks", None)):
+            # v0105 (批732): the extracted table has to add up (gross = revenue - cost, operating = gross - expense,
+            # four quarters = the year, within the printed rounding); a header whose year was not read is counted
+            ident = db.financial_identity_checks(fins)
+            LAST_FIN[name] = {"rows": len(fins), "checked": ident["checked"], "passed": ident["passed"],
+                              "n_failed": len(ident["failed"]), "periods_unclear": ident["periods_unclear"],
+                              "estimate_rows": ident["estimate_rows"],
+                              "failed": [db.identity_failure_text(f) for f in ident["failed"][:5]]}
+            fin_check = f"{ident['passed']}/{ident['checked']}"
+            if ident["failed"]:
+                warns.append(f"財報恆等式 {len(ident['failed'])}/{ident['checked']} 不過:"
+                             + db.identity_failure_text(ident["failed"][0]))
+            if ident["periods_unclear"]:
+                warns.append(f"季別缺年 {ident['periods_unclear']} 列(表頭年度沒讀到)")
+        elif row.get("SourceFormat") == "pdf":
+            LAST_FIN[name] = {"rows": 0, "checked": 0, "passed": 0, "n_failed": 0, "periods_unclear": 0,
+                              "estimate_rows": 0, "failed": []}
         status = "FAIL" if problems else ("WARN" if warns else "PASS")
         rows.append(def_row("G06 BATCH", name, status, "; ".join(problems + warns),
                             ticker=row.get("TW_TICKER"), date=row.get("ReportDate"), broker=row.get("Broker"),
-                            rating=row.get("Rating"), target=row.get("TargetPrice"), fin_rows=len(fins),
+                            rating=row.get("Rating"), target=row.get("TargetPrice"), fin_rows=len(fins), fin_identity=fin_check,
                             tri_code=row.get("TriCodeVerdict"), confidence=row.get("ConfidenceScore"),
                             stage="S09 FINANCIAL_SSOT" if problems else "S10 SUMMARIZER"))
     parquet_rows = []
@@ -1318,6 +1337,7 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
     LAST_FIRST_PAGE.clear()
     LAST_APPENDIX.clear()
     LAST_ADJ.clear()
+    LAST_FIN.clear()
     LAST_SAMPLES.clear()
     def_say(f"[ROUND {round_no}] G01 編譯 · G02 自測 · G03 檔名 oracle" + ("" if args.no_audit else " · G04 稽核"))
     rows += def_gate_compile()
@@ -1417,6 +1437,18 @@ def def_render_html(report: Dict[str, Any]) -> str:
                 parts.append(f"<tr><td>{html.escape(kind)}</td><td>{html.escape(fld)}</td><td>{st.get('OK', 0)}</td><td>{st.get('BAD', 0)}</td>"
                              f"<td>{st.get('FALSE_POSITIVE', 0)}</td><td>{st.get('NOT_ON_PAGE1', 0)}</td></tr>")
         parts.append("</tbody></table>")
+    fin = report.get("financial") or {}
+    if fin.get("n_files"):
+        parts.append(f"<h2>財報表格讀得對不對(批732:表自己要加得起來)</h2><p>表格抽到 {fin['n_with_rows']}/{fin['n_files']} 份 PDF · "
+                     f"恆等式 {fin['passed']}/{fin['checked']} 成立({fin['files_checked']} 份有可驗的表)· 不成立 {fin['n_failed']} 條 · "
+                     f"季別缺年 {fin['periods_unclear']} 列 · 預估欄 {fin['estimate_rows']} 列</p>")
+        bad = [(n, a) for n, a in (fin.get("files") or {}).items() if a.get("n_failed") or a.get("periods_unclear")]
+        if bad:
+            parts.append("<table><thead><tr><th>檔</th><th>成立</th><th>季別缺年</th><th>不成立(前幾條)</th></tr></thead><tbody>")
+            for n, a in bad:
+                parts.append(f"<tr><td>{html.escape(n)}</td><td>{a.get('passed', 0)}/{a.get('checked', 0)}</td><td>{a.get('periods_unclear', 0)}</td>"
+                             f"<td>{'<br>'.join(html.escape(t) for t in a.get('failed') or [])}</td></tr>")
+            parts.append("</tbody></table>")
     for rnd in report["rounds"]:
         parts.append(f"<h2>第 {rnd['round']} 輪 · {html.escape(rnd['verdict'])}</h2><table><thead><tr><th>閘門</th><th>項目</th><th>狀態</th><th>段</th><th>細節</th></tr></thead><tbody>")
         for r in rnd["rows"]:
@@ -1544,10 +1576,19 @@ def def_unit_all(tests_dir: Path) -> Tuple[int, int, List[str], str]:
         suite = unittest.TestLoader().discover(str(tests_dir), pattern="test_*.py", top_level_dir=str(tests_dir))
         res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)
         return res.testsRun, len(res.skipped), [str(t[0]) for t in res.failures + res.errors], "本行程序跑" + why
-    from concurrent.futures import ThreadPoolExecutor
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     specs = def_unit_specs(tests_dir, workers)
+    t0 = time.time()
+    done: Dict[str, Dict[str, Any]] = {}
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        got = list(ex.map(def_unit_child, specs))
+        futures = {ex.submit(def_unit_child, spec): spec for spec in specs}
+        for future in as_completed(futures):
+            g = done[futures[future]] = future.result()
+            # 批732: one line per unit as it finishes -- when an outer ceiling cuts the self-test, the lines already
+            # printed still say which units were done and how long each took (the workstation's V2 cut it at 180 s)
+            print(f"     · {time.time() - t0:6.1f}s 完成 {g['file']} {g['secs']}s · {g['run']} 支"
+                  + (f" · 壞 {len(g['bad'])}" if g["bad"] else ""), flush=True)
+    got = [done[spec] for spec in specs]
     slow = max(got, key=lambda g: g["secs"])
     return (sum(g["run"] for g in got), sum(g["skipped"] for g in got), [b for g in got for b in g["bad"]],
             f"{len(files)} 檔 {len(specs)} 份 · 平行 {workers} 行程 · 最慢 {slow['file']} {slow['secs']}s")
@@ -1622,6 +1663,20 @@ def def_appendix_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             "n_used": sum(1 for a in vals if a.get("used")), "n_conflict": sum(1 for a in vals if a.get("conflict")),
             "n_scale_lines": sum(len(a.get("rating_scale") or []) for a in vals),
             "new_words": sorted(new.values(), key=lambda x: (-x["count"], x["word"]))}
+
+
+def def_fin_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """v0105 (批732): the financial tables of the round, summed -- how many PDFs gave rows, how many identities were
+    checked and held, which files did not add up, how many quarter/half rows came without a year."""
+    vals = list(per_file.values())
+    return {"n_files": len(vals), "n_with_rows": sum(1 for a in vals if a.get("rows")),
+            "rows": sum(a.get("rows", 0) for a in vals), "checked": sum(a.get("checked", 0) for a in vals),
+            "passed": sum(a.get("passed", 0) for a in vals), "n_failed": sum(a.get("n_failed", 0) for a in vals),
+            "files_failed": sorted(n for n, a in per_file.items() if a.get("n_failed")),
+            "files_checked": sum(1 for a in vals if a.get("checked")),
+            "periods_unclear": sum(a.get("periods_unclear", 0) for a in vals),
+            "estimate_rows": sum(a.get("estimate_rows", 0) for a in vals),
+            "files": {name: a for name, a in sorted(per_file.items())}}
 
 
 def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
@@ -1766,6 +1821,14 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"[ADJ] 上漲空間用最新 ADJ CLOSE:算出 {adj['n_adj']}/{adj['n_with_target']} 檔(有目標價者)"
               + (f" · 因子分母 {' · '.join(f'{k} {v}' for k, v in adj['bases'].items())}" if adj["bases"] else "")
               + (f" · 其餘 {top}" if top else "") + (f" · 最多的因由:{adj['why'][0]['reason']}" if adj["why"] else ""))
+    fin = def_fin_summary(LAST_FIN)
+    report["financial"] = fin
+    if fin["n_files"] and not args.quiet:
+        print(f"[財報] 表格抽到 {fin['n_with_rows']}/{fin['n_files']} 份 PDF · 恆等式 {fin['passed']}/{fin['checked']} 成立"
+              f"({fin['files_checked']} 份有可驗的表)· 不成立 {fin['n_failed']} 條"
+              + (f"({len(fin['files_failed'])} 份:{' · '.join(fin['files_failed'][:3])}"
+                 + (" …" if len(fin["files_failed"]) > 3 else "") + ")" if fin["files_failed"] else "")
+              + f" · 季別缺年 {fin['periods_unclear']} 列 · 預估欄 {fin['estimate_rows']} 列")
     json_path = Path(args.json) if args.json else workdir / "VRN_AutoTest_Report.json"
     html_path = Path(args.html) if args.html else workdir / "VRN_AutoTest_Report.html"
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
