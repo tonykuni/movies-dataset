@@ -1392,8 +1392,16 @@ _PCT_OWN_LINE_RX = re.compile(r"[ \t\u3000]*(?:\r?\n[ \t\u3000]*)+[%％][ \t\u30
 #     —— 否則 `Revenue growth (%): Target Price: 250` 會被誤殺(第四輪 P2 同型)。
 _PCT_REL_BEFORE_RX = re.compile(                      # a:關係連接詞,不看詞表
     r"\(\s*[%％]\s*\)\s*(?:to|vs\.?|versus|from)\s+$", re.I)
-_PCT_LABEL_BEFORE_RX = re.compile(                    # b:冒號分欄,要幅度/報酬詞
-    r"(?:up\s*/?\s*downside|upside|downside|return|報酬|上漲空間|下跌空間|上檔空間)"
+# 批727i(Codex 第七輪 P2):727g 我在冒號路徑放了裸 `return`,結果把
+# `Return on equity (%): Target Price: 250` 這種**獲利率欄位**也當成幅度欄,
+# 真目標價被丟掉(v0115 回 250.0)。ROE/ROA/ROIC 是獲利率,不是「相對於目標價的報酬」。
+# 所以 return 必須帶**標的相對**的修飾語才算;`Return on X` 沒有那種修飾語。
+# 這一小段詞表是目前無法再退的部分 —— 冒號只表示分欄,不帶繫屬資訊,
+# 只能靠語意分辨;正解是讀機構 SSOT 而非手寫(已記後續項)。
+_PCT_LABEL_BEFORE_RX = re.compile(                    # b:冒號分欄,要幅度/標的報酬詞
+    r"(?:up\s*/?\s*downside|upside|downside"
+    r"|(?:potential|implied|total|expected|estimated|target)\s+return"
+    r"|預期報酬|潛在報酬|上漲空間|下跌空間|上檔空間)"
     r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
 # 單位標記也可能落在**數字之後**(`Target Price: 38 (%)`);裸 % 的規則 A 看不到括號。
 _PCT_UNIT_AFTER_RX = re.compile(r"[ \t\u3000]*\(\s*[%％]\s*\)")
@@ -2456,7 +2464,11 @@ def selftest() -> int:
                       # 這一式的幅度詞就緊貼在 (%) 前面、也在視窗內,**只有「連接詞必需」擋得住**,
                       # 上面那幾式(間距長/詞不在表)擋不住它,所以要獨立一條。
                       ("Downside (%) Price Target (12M): 250", 250.0),
-                      ("Upside (%) Target Price: 188", 188.0)):
+                      ("Upside (%) Target Price: 188", 188.0),
+                      # 批727i:ROE/ROA 是**獲利率**不是「相對於目標價的報酬」。
+                      # 727g 在冒號路徑放裸 `return`,把這兩式的真目標價丟掉了(v0115 回 250/188)。
+                      ("Return on equity (%): Target Price: 250", 250.0),
+                      ("Return on assets (%): Target Price 188", 188.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
@@ -2491,6 +2503,8 @@ def selftest() -> int:
                # 判準改看**連接詞的性質**:to/vs/from 是關係連接詞(X 是相對於目標價的百分比),
                # 與 X 叫什麼無關;冒號只是分欄,才需要再看標籤是不是幅度/報酬詞。
                "Potential return (%) to Price Target: 38", "ETR (%) to Target Price: 15",
+               # 帶標的相對修飾語的 return 走冒號路徑也要擋(與 ROE/ROA 正控成對)
+               "Potential return (%): Price Target 38",
                "Total return (%) vs Price Target: 19", "Implied return (%): Price Target 22",
                "Downside (%) from Price Target (12M): 38", "Downside (%): Price Target (12M): 38",
                "Price Target (12M): 38 (%)"):
