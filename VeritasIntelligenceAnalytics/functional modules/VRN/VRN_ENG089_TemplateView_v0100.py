@@ -704,16 +704,19 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
                                                   "new_items": new_items})
     if _sections_hook:
         _sections_hook(payload)
+    rendered = {}                      # 三張先在記憶體組好;組不出來(模板改版找不到插入點)= BLOCKED,一張都不寫(不留半套)
+    for role in ROLES:
+        src = (troot / ent[role]).read_bytes()
+        try:
+            rendered[role] = src if role == "launcher" else inject(src.decode("utf-8"), payload, defaults, role).encode("utf-8")
+        except (ValueError, UnicodeDecodeError) as exc:
+            return {"state": "BLOCKED", "rc": 1, "why": f"{names[role]} 插不進去:{exc}", "pages": {}, "links": {}, "new_items": []}
     ui_dir.mkdir(parents=True, exist_ok=True)
     pages = {}
     for role in ROLES:
-        src = (troot / ent[role]).read_bytes()
         dst = ui_dir / names[role]
-        if role == "launcher":
-            dst.write_bytes(src)
-        else:
-            dst.write_bytes(inject(src.decode("utf-8"), payload, defaults, role).encode("utf-8"))
-        pages[names[role]] = _sha(dst.read_bytes())
+        dst.write_bytes(rendered[role])
+        pages[names[role]] = _sha(rendered[role])
     missing = [n for n in new_items if not n["on_page"]]
     rec = {"schema": "VIA.VRN.TemplateLinks.v1", "engine": ENGINE_TAG, "built_at": datetime.now().isoformat(timespec="seconds"),
            "report": str(report_path), "report_sha": report_sha, "out": str(out_dir),
@@ -1024,8 +1027,22 @@ def selftest() -> int:
         rep4["another_new"] = [1, 2]
         rp.write_text(json.dumps(rep4, ensure_ascii=False), encoding="utf-8")
         r6 = build(rp, out, _sections_hook=drop)
-        chk("⑦ 反面控制:新增項目的落點段不在 → build rc1 並點名(新增不能被吞)",
-            r6["rc"] == 1 and "another_new" in r6["why"], f"({r6['why'][:80]})")
+        # 模板改版、找不到插入點(假模板:中央頁沒有 </body>,manifest 跟著改)→ BLOCKED,一張都不寫
+        fake, man_f, files_f = tmp / "fake_tpl", json.loads(MANIFEST.read_text(encoding="utf-8")), []
+        for role in ROLES:
+            rel = man_f["canonicalEntrypoints"][role]
+            data = (TEMPLATE_ROOT / rel).read_bytes()
+            if role == "centralUI":
+                data = re.sub(rb"(?i)</body>", b"</body-gone>", data)
+            (fake / rel).parent.mkdir(parents=True, exist_ok=True)
+            (fake / rel).write_bytes(data)
+            files_f.append({"path": rel, "sha256": _sha(data)})
+        man_f["files"] = files_f
+        (fake / "manifest.json").write_text(json.dumps(man_f, ensure_ascii=False), encoding="utf-8")
+        rb7 = build(rp, tmp / "blocked_out", template_root=fake)
+        blocked7 = rb7["state"] == "BLOCKED" and "插不進去" in rb7["why"] and not (tmp / "blocked_out").exists()
+        chk("⑦ 反面控制:新增項目的落點段不在 → build rc1 並點名(新增不能被吞)· 模板找不到插入點 → BLOCKED 且一張都不寫",
+            r6["rc"] == 1 and "another_new" in r6["why"] and blocked7, f"({r6['why'][:80]} · 插入點不在 {rb7['state']})")
         chk_state = check(out)
         rep_v = json.loads(rp.read_text(encoding="utf-8"))
         rep_v["generated"] = "2099-01-01T00:00:00"             # 只改每輪必變的欄:內容簽章不變,但檔案重寫過

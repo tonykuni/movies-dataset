@@ -25,6 +25,8 @@
   - 資料(`</body>` 之前):這一輪的成果,`type="application/json"`,頁上零連線(借 CGC_MDL160 離線四尺驗,插入段零命中)。
   - 外掛:走模板正式外掛 API——中央頁 `VIA_REGISTER_ADDON`、synchronizer 頁 `VIA_REGISTER_SYNC_ADDON`。
 - **由 synchronizer 控制**:中央頁 VRN 面板的開 / 關跟著 synchronizer 模組冊的 `enabled` 走(localStorage + BroadcastChannel `via.sync.v2`,即時)。在 synchronizer 關掉,中央頁面板當場收起;打開就回來;釘選、排序也在 synchronizer。
+  - 瀏覽器裡 file:// 頁共用同一份 localStorage,所以 VRN 模組也會出現在你直接開的原版模板 synchronizer 裡(同一份共享狀態,本來就該看得到)。
+  - **要收起 VRN 面板請用「停用」(把勾拿掉),不要刪**:停用會一直記著;刪掉的話,下一次開 VRN 模板頁,預置段照只增不減再加回來(它分不出「沒加過」與「被刪掉」)。
 - **自適應**:認得的欄畫專屬段(總覽 KPI · 這一輪 · 關卡總表 · 關卡明細 · 欄位規格 · 財報 · 上漲空間 · 附錄 · 相依 · 引擎 · VCGC 尺 …)。**沒人認得的頂層欄一律一欄一段**(「其他欄位:… 自動收」),不吞。逐檔表的欄取每檔記錄鍵的聯集:上游每檔多一個欄,表就多一欄。超過 25 列的表收合;WARN / FAIL / 異動 / 消失的列拉到收合外面,不展開也看得到;收合摘要寫各狀態幾列。
 
 ## 三 · 上下游自動連結 · 自動更新 · 新增檢查
