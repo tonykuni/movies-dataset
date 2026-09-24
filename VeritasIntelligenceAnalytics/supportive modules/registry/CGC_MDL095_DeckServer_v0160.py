@@ -2413,29 +2413,38 @@ def selftest() -> int:
         len(re.findall(r"^\s*except \(BrokenPipeError, ConnectionResetError, ConnectionAbortedError\):", src, re.M)) == 4   # 批392 +/vap_img 供圖道
         and len(re.findall(r"^\s*except \(BrokenPipeError, ConnectionResetError\):", src, re.M)) == 0)
     # v0160(批733 Z157):/stock_data 的共識列尾端帶 ADJ(暫存庫夾具;不碰正式庫)
+    #   CI 的 Windows UAT 只裝標準庫(沒有 duckdb):這一檢在那裡量不到 → 誠實 SKIP,不冒充綠、也不當紅(L16)
     import tempfile as _tf
-    import duckdb as _ddb
-    with _tf.TemporaryDirectory(prefix="deck_adj_") as _td:
-        _db = Path(_td) / "deck_fixture.duckdb"
-        _c = _ddb.connect(str(_db))
-        _c.execute("CREATE TABLE consensus_daily(date DATE, code VARCHAR, source VARCHAR, target_high DOUBLE, target_low DOUBLE, "
-                   "target_median DOUBLE, n_analysts INTEGER, eps_fy1 DOUBLE, close DOUBLE, upside_pct DOUBLE)")
-        _c.executemany("INSERT INTO consensus_daily VALUES (?,?,?,?,?,?,?,?,?,?)", [
-            ("2026-09-08", "9901", "A", 150, 110, 130, 12, 9.0, 97.0, 130 / 97 - 1),
-            ("2026-09-08", "9901", "B", 140, 100, 125, 3, 8.5, 97.0, 125 / 97 - 1)])
-        _c.execute("CREATE TABLE consensus_latest_adj(date DATE, code VARCHAR, source VARCHAR, upside_adj DOUBLE, upside_adj_state VARCHAR)")
-        _c.executemany("INSERT INTO consensus_latest_adj VALUES (?,?,?,?,?)", [
-            ("2026-09-08", "9901", "A", 30.0, "ADJ_OK"), ("2026-09-08", "9901", "B", None, "ADJ_STALE")])
-        _c.close()
-        _sd = stock_data("9901", db=_db)
-        _rows = {r[0]: r for r in _sd.get("consensus", [])}
-        _a, _b = _rows.get("A", []), _rows.get("B", [])
-        chk("㉖ 批733 /stock_data 共識列尾端帶 ADJ(c[9] = upside_adj ÷ 100 · c[10] 狀態;c[8] 原始價原樣;Z157)",
-            len(_a) == 11 and _a[9] == 0.3 and _a[10] == "ADJ_OK" and abs(_a[8] - (130 / 97 - 1)) < 1e-9
-            and len(_b) == 11 and _b[9] is None and _b[10] == "ADJ_STALE",
-            f"(A {_a[8:] if _a else '缺'} · B {_b[8:] if _b else '缺'})")
-    print(f"  [計] 安全橋自測 {n_chk[0]} 項 · OK {n_chk[0] - len(fails)}"
-          f" · FAIL {len(fails)}")
+    try:
+        import duckdb as _ddb
+    except ImportError:
+        _ddb = None
+    _skip = []
+    if _ddb is None:
+        _skip.append("㉖")
+        print("  [SKIP] ㉖ 批733 /stock_data 共識列尾端帶 ADJ(本境沒有 duckdb:量不到;容器 / 工作站 / 全格子有 duckdb 照跑)")
+    else:
+        with _tf.TemporaryDirectory(prefix="deck_adj_") as _td:
+            _db = Path(_td) / "deck_fixture.duckdb"
+            _c = _ddb.connect(str(_db))
+            _c.execute("CREATE TABLE consensus_daily(date DATE, code VARCHAR, source VARCHAR, target_high DOUBLE, target_low DOUBLE, "
+                       "target_median DOUBLE, n_analysts INTEGER, eps_fy1 DOUBLE, close DOUBLE, upside_pct DOUBLE)")
+            _c.executemany("INSERT INTO consensus_daily VALUES (?,?,?,?,?,?,?,?,?,?)", [
+                ("2026-09-08", "9901", "A", 150, 110, 130, 12, 9.0, 97.0, 130 / 97 - 1),
+                ("2026-09-08", "9901", "B", 140, 100, 125, 3, 8.5, 97.0, 125 / 97 - 1)])
+            _c.execute("CREATE TABLE consensus_latest_adj(date DATE, code VARCHAR, source VARCHAR, upside_adj DOUBLE, upside_adj_state VARCHAR)")
+            _c.executemany("INSERT INTO consensus_latest_adj VALUES (?,?,?,?,?)", [
+                ("2026-09-08", "9901", "A", 30.0, "ADJ_OK"), ("2026-09-08", "9901", "B", None, "ADJ_STALE")])
+            _c.close()
+            _sd = stock_data("9901", db=_db)
+            _rows = {r[0]: r for r in _sd.get("consensus", [])}
+            _a, _b = _rows.get("A", []), _rows.get("B", [])
+            chk("㉖ 批733 /stock_data 共識列尾端帶 ADJ(c[9] = upside_adj ÷ 100 · c[10] 狀態;c[8] 原始價原樣;Z157)",
+                len(_a) == 11 and _a[9] == 0.3 and _a[10] == "ADJ_OK" and abs(_a[8] - (130 / 97 - 1)) < 1e-9
+                and len(_b) == 11 and _b[9] is None and _b[10] == "ADJ_STALE",
+                f"(A {_a[8:] if _a else '缺'} · B {_b[8:] if _b else '缺'})")
+    print(f"  [計] 安全橋自測 {n_chk[0] + len(_skip)} 項 · OK {n_chk[0] - len(fails)}"
+          f" · FAIL {len(fails)}" + (f" · SKIP {len(_skip)}({'、'.join(_skip)} 本境缺件)" if _skip else ""))
     return 1 if fails else 0
 
 
