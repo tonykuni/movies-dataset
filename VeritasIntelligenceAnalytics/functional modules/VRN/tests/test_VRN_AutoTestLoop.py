@@ -25,6 +25,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 LOOP = HERE.parent / "engine" / "VRN_AutoTestLoop.py"
+SELFTEST_SECONDS = 16   # rough cost in the loop's self-test (批731: it runs the costliest units first)
 
 
 def def_load():
@@ -81,7 +82,14 @@ class def_AutoTestLoopTests(unittest.TestCase):
         self.assertEqual(code, 0, report["counts"])
         self.assertIn(report["verdict"], ("GREEN", "AMBER"))
         self.assertEqual(report["counts"]["FAIL"], 0)
-        self.assertGreaterEqual(report["file_count"], 8)
+        # 批731 (Z182): without python-docx the synthetic .docx files are skipped with a G05 row -- the PDF half is still
+        # tested; every other file must still be there, and nothing is skipped for that reason when python-docx exists
+        rows = [r for rnd in report.get("rounds") or [] for r in rnd.get("rows") or []]
+        no_docx = len({r.get("name") for r in rows if r.get("gate") == "G05 CORPUS" and r.get("status") == "SKIP"
+                       and str(r.get("detail", "")).startswith("python-docx missing")})
+        self.assertGreaterEqual(report["file_count"], 8 - no_docx)
+        if def_has("docx"):
+            self.assertEqual(no_docx, 0)
 
 
 if __name__ == "__main__":

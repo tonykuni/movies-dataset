@@ -21,7 +21,9 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     throw "VeritasCeleritas.PS7 需要 PowerShell 7+。目前：$($PSVersionTable.PSVersion)"
 }
 
-if ($null -eq $script:CeleritasPS7) {
+# 批731 Z137(操作員 2026-09-24「PS PY檔案都要依規定裝加速器」= L70 逐次許可):StrictMode 下讀未設的 $script: 變數會丟例外,
+#   首載永遠套不上(工作站 2026-09-23 · 容器 pwsh 7.4 皆實證)。改用 Get-Variable 探;其餘一字不動。
+if (-not (Get-Variable -Name CeleritasPS7 -Scope Script -ErrorAction SilentlyContinue)) {
     $script:CeleritasPS7 = [ordered]@{
         Version     = '1.0.0'
         Applied     = $false
@@ -80,12 +82,12 @@ function Get-CeleritasSnapshot {
         WarningPref       = $WarningPreference
         InformationPref   = $InformationPreference
         ErrorPref         = $ErrorActionPreference
-        OFS               = $OFS
+        OFS               = $(Get-Variable -Name OFS -ValueOnly -ErrorAction SilentlyContinue)   # 批731 Z137:$OFS 預設不存在
         OutputEncoding    = $OutputEncoding
         ConsoleEncoding   = [Console]::OutputEncoding
         Culture           = [System.Threading.Thread]::CurrentThread.CurrentCulture
         UICulture         = [System.Threading.Thread]::CurrentThread.CurrentUICulture
-        NativeArgs        = $PSNativeCommandArgumentPassing
+        NativeArgs        = $(Get-Variable -Name PSNativeCommandArgumentPassing -ValueOnly -ErrorAction SilentlyContinue)   # 批731 Z137:7.3 起才有
         DebugMode         = $dbg
         PSStyleProgress   = $(if (Get-Variable PSStyle -ErrorAction SilentlyContinue) { $PSStyle.Progress.View } else { $null })
     }

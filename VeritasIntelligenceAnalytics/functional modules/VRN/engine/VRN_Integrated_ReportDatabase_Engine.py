@@ -101,7 +101,10 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
 SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
-ENGINE_VERSION = "v0103"
+ENGINE_VERSION = "v0104"
+# v0104 (mother 批731; operator 2026-09-24「剛剛跑好慢」): process_batch takes an optional args.only_files (file names)
+#   -- the self-test loop's idempotency pass re-ingests a named sample instead of the whole folder; without it nothing
+#   changes.  The evidence core behind the first-page reader now parses each page / appendix once per file version.
 # v0103 (mother 批729; operator 2026-09-24 "所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE"):
 # UpsideDownsidePct is the upside over the LATEST adj close (the mother's L99 through VRN_Evidence_Core.adj_basis ->
 # ENG073 adj_quote); the target and the day-before prices in ADJ CLOSE terms get their own columns (appended only);
@@ -2585,6 +2588,45 @@ def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], br
 process_one_document = process_one_pdf
 
 
+def batch_pool_results(files: List[Path], ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]],
+                       rating_alias: Dict[str, List[str]], run_id: str) -> Dict[int, Tuple[Any, ...]]:
+    """v0104 (批731): the reports of one batch in worker processes (VRN_BatchPool, sized by the accelerator's thread
+    budget).  {idx: (status, basic | error, financial)} in the batch numbering, progress lines printed as reports
+    finish; {} = everything runs in this process (small batch, VRN_BATCH_WORKERS=1, or the pool could not run --
+    then the unfinished files go through the sequential loop and one line says why)."""
+    todo = [(idx, p) for idx, p in enumerate(files, start=1) if p.suffix.lower() not in OCR_SUFFIXES]
+    here = str(Path(__file__).resolve().parent)
+    try:
+        if here not in sys.path:
+            sys.path.insert(0, here)                 # the workers import the pool by this stable name
+        import VRN_BatchPool as pool
+    except ImportError:
+        return {}
+    workers = pool.workers_for(len(todo))
+    if workers <= 1:
+        return {}
+    done: Dict[int, Tuple[Any, ...]] = {}
+    count = [0]
+
+    def on_done(idx: int) -> None:
+        count[0] += 1
+        print(f"[{count[0]}/{len(files)}] VRN processing: {files[idx - 1].name}")
+
+    for idx, p in enumerate(files, start=1):         # image files are skipped at once; number them first
+        if p.suffix.lower() in OCR_SUFFIXES:
+            done[idx] = ("OCR", None, None)
+            on_done(idx)
+    print(f"[VRN] 平行池 {workers} 個工作行程({len(todo)} 份;VRN_BatchPool {pool.POOL_VERSION};VRN_BATCH_WORKERS=1 可改回序跑)",
+          file=sys.stderr)
+    try:
+        done.update(pool.map_reports(todo, Path(__file__).resolve(), (ticker_lookup, broker_alias, rating_alias),
+                                     run_id, workers, on_done))
+    except Exception as exc:  # noqa: BLE001 -- the pool is an accelerator, never a gate
+        print(f"[VRN] 平行池中斷,沒跑完的改在本行程序跑:{type(exc).__name__}: {exc!r}"[:220], file=sys.stderr)
+        done = {k: v for k, v in done.items() if v[0] != "OCR"}
+    return done
+
+
 def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
     output_dir = ensure_dir(Path(args.output).expanduser().resolve())
     input_path = Path(args.input).expanduser().resolve()
@@ -2601,6 +2643,10 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
     rating_alias = load_rating_alias_ssot(rating_ssot_path)
 
     files = scan_input_files(input_path)
+    only = getattr(args, "only_files", None)
+    if only:                                    # v0104: a named sample (the loop's idempotency pass)
+        keep = {str(name) for name in only}
+        files = [f for f in files if f.name in keep]
     basic_rows: List[Dict[str, Any]] = []
     financial_rows: List[Dict[str, Any]] = []
     checkpoint = {
@@ -2612,16 +2658,29 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
         "SchemaVersion": SCHEMA_VERSION,
     }
 
+    pooled = batch_pool_results(files, ticker_lookup, broker_alias, rating_alias, run_id)   # v0104; {} = in this process
     for idx, pdf_path in enumerate(files, start=1):
-        print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
+        pre = pooled.get(idx)
+        if pre is None:
+            print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
         item = {"path": str(pdf_path), "status": "", "error": ""}
         if pdf_path.suffix.lower() in OCR_SUFFIXES:
             item["status"] = "SKIP_OCR_REQUIRED"
             checkpoint["Files"].append(item)
             write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
             continue
+        if pre is not None and pre[0] == "FAIL":
+            item["status"] = "FAIL"
+            item["error"] = pre[1]
+            print(f"[ERROR] {pdf_path}: {str(pre[1]).splitlines()[0] if pre[1] else ''}", file=sys.stderr)
+            checkpoint["Files"].append(item)
+            write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
+            continue
         try:
-            basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
+            if pre is not None:
+                basic, financial = pre[1], pre[2]
+            else:
+                basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
             basic_rows.append(basic)
             financial_rows.extend(financial)
             item["status"] = "OK"
