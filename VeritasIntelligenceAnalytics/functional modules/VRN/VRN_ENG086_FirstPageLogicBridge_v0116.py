@@ -1365,7 +1365,10 @@ def safe_rating(text: str, E=None) -> dict:
 
 _UPSIDE_RX = re.compile(  # 批727b:Codex P1 追因——舊表只有 upside,而 `Up/downside` 裡沒有 "upside" 這個子字串,downside 那一類從來沒被攔過
     r"(潛在)?上漲空間|上檔空間|下跌空間|up\s*/?\s*downside"
-    r"|downside\s+(?:to|vs\.?|versus)|upside", re.I)  # 批727c(Codex P2):
+    r"|(?:up|down)side\s+(?:to|vs\.?|versus|from)", re.I)  # 批727h:upside/downside 對稱 ——
+    # 727c 把 downside 收成標籤形狀,卻把 upside 留成裸字,於是 `Upside (%) Target Price: 188`
+    # 被誤殺、而 `Downside (%) Price Target: 250` 沒事。兩邊同一件事就該同一個判準。
+    # 原 批727c(Codex P2):
     # 裸 downside 會把 `Target Price: 100; downside risks remain` 這種正當命中誤殺
     # (v0115 回 100.0,我改完回 None)。只認**欄位標籤**形狀的 downside,不認散文裡的風險敘述。
 
@@ -2447,7 +2450,13 @@ def selftest() -> int:
                       ("Revenue growth (%): Target Price: 250", 250.0),
                       # 批727g:關係連接詞不看詞表,但**冒號/無連接詞**仍須看 —— 否則這三式被誤殺。
                       ("Downside risk section ends here (%) Target Price: 250", 250.0),
-                      ("Revenue growth (%) and margin   Target Price: 250", 250.0)):
+                      ("Revenue growth (%) and margin   Target Price: 250", 250.0),
+                      # 批727h:**連接詞必需,不得可選**。727f 曾把連接詞群寫成 `(?:…)?`,
+                      # 於是只隔空白的相鄰兩欄也被綁成繫屬,真目標價被丟掉。
+                      # 這一式的幅度詞就緊貼在 (%) 前面、也在視窗內,**只有「連接詞必需」擋得住**,
+                      # 上面那幾式(間距長/詞不在表)擋不住它,所以要獨立一條。
+                      ("Downside (%) Price Target (12M): 250", 250.0),
+                      ("Upside (%) Target Price: 188", 188.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
