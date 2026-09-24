@@ -38,6 +38,19 @@ class FakeCore:
 
 
 class EightHubTests(unittest.TestCase):
+    def test_preflight_is_offline_without_network_consent(self):
+        core = FakeCore()
+        core._consent = lambda: False
+        commands = []
+        core.run_cmd = lambda argv, timeout=0: (commands.append(argv) or
+                                                  {"rc": 1, "out": "cache miss", "err": ""})
+        rows = [{"env": "via_vrn", "state": "PASS", "interpreter": "python"}]
+        plan = {"stages": [{"env": "via_vrn", "kind": "INSTALL_TOOLS", "pkgs": ["duckdb"]}]}
+        with patch.object(EXT.shutil, "which", return_value="uv"):
+            result = EXT._uv_preflight(core, rows, plan)
+        self.assertIn("--offline", commands[0])
+        self.assertEqual(result[0]["state"], "NOT_RUN")
+
     def test_execute_with_bad_base_does_not_invoke_install(self):
         core = FakeCore()
         core._arg_after = lambda args, key: None
