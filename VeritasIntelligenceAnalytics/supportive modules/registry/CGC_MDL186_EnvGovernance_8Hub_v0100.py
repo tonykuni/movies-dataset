@@ -2,6 +2,10 @@
 
 This module is loaded by the existing via-envgov command. It never changes an
 active environment name, deletes packages, or promotes a central registry.
+
+CGC_MDL186 (批733, 掉球 Z190): renumbered from CGC_MDL135_EnvGovernance_8Hub_v0100.py. It shared the number MDL135 with
+the CGC_MDL135_EnvGovernance family, which the single-entry gate CGC_MDL157 reports as a new number collision
+("engine numbers are unique per family"). Content unchanged; CGC_MDL135_EnvGovernance v0116 loads it (tail by glob).
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
