@@ -285,12 +285,20 @@ def build_payload(report: dict, report_path: Path, links: dict | None = None) ->
             add({"id": "extra-" + _slug(key), "title": f"其他欄位:{key}(自動收)", "kind": "tree", "data": val}, (key,))
     links = links or {}
     if links.get("rows"):
-        add({"id": "links", "title": "上下游連結(自動更新)", "kind": "table", "columns": ["方向", "項目", "參照", "狀態"],
-             "rows": links["rows"], "status_col": 3})
+        c, cmp_, prev_at = links.get("counts") or {}, links.get("compared_to"), links.get("previous")
+        basis = (f"對上一輪({prev_at})" if cmp_ == "baseline" else f"對這個夾的上一版({prev_at})" if cmp_ == "self"
+                 else "首建:沒有上一輪可比")
+        add({"id": "links", "title": f"上下游連結(自動更新 · {basis} · 新增 {c.get('NEW', 0)} · 異動 {c.get('CHANGED', 0)} · "
+                                     f"消失 {c.get('GONE', 0)} · 未變 {c.get('SAME', 0)})",
+             "kind": "table", "columns": ["方向", "項目", "參照", "狀態"], "rows": links["rows"], "status_col": 3})
         news = [r for r in links.get("new_items") or []]
+        lost = sum(1 for n in news if not n.get("on_page"))
+        note = ("首建:沒有上一輪可比,每一項都算新增(下一輪起只列真的新出現的)" if not cmp_ else
+                "對上一輪沒有新增項目" if not news else
+                f"對上一輪新出現 {len(news)} 項" + (f",其中 {lost} 項沒上頁(建構判 rc1)" if lost else ",逐項驗過都上了頁"))
         add({"id": "new", "title": f"新增檢查({len(news)} 項)", "kind": "table", "columns": ["類別", "項目", "上了哪一段", "在頁上"],
              "rows": [[n["kind"], n["what"], n.get("home") or "—", "OK" if n.get("on_page") else "FAIL"] for n in news],
-             "status_col": 3})
+             "status_col": 3, "note": note})
     return {"engine": ENGINE_TAG, "module": MODULE, "stateKey": STATE_KEY, "channel": CHANNEL,
             "summary": {"verdict": report.get("verdict"), "counts": counts, "file_count": report.get("file_count"),
                         "generated": report.get("generated"), "loop": report.get("loop")},
@@ -478,6 +486,8 @@ CENTRAL_JS = r"""(function () {
     box.id = 'vrn-sec-' + sec.id; box.setAttribute('data-vrn-section', sec.id);
     titles.appendChild(el('h3', 'panel-title', sec.title)); head.appendChild(titles); box.appendChild(head);
     var rows = sec.rows || [], sc = typeof sec.status_col === 'number' ? sec.status_col : -1, isTable = sec.kind === 'table' || sec.kind === 'kv';
+    if (sec.note) box.appendChild(el('p', 'panel-caption vrn-tpl-note', sec.note));
+    if (isTable && !rows.length) { if (!sec.note) box.appendChild(el('p', 'panel-caption vrn-tpl-note', '(這一段沒有列)')); return box; }
     var body = sec.kind === 'kpi' ? kpis(sec) : sec.kind === 'table' ? table(sec.columns, rows, sc)
       : sec.kind === 'kv' ? table(['項目', '值'], rows, -1) : tree(sec);
     if (!(isTable ? rows.length > FOLD : sec.kind === 'tree' && sizeOf(sec.data) > 1500)) { box.appendChild(body); return box; }
@@ -514,8 +524,14 @@ CENTRAL_JS = r"""(function () {
     if (typeof window.toast !== 'function' && api && typeof api.toast === 'function') { try { window.toast = api.toast; shim = 'APPLIED'; } catch (e) { shim = 'ERROR'; } }
     window.VRN_TEMPLATE_TOAST_SHIM = shim;
     host.className = 'vrn-tpl'; host.replaceChildren();
+    // 面板自己的樣式只作用在 .vrn-tpl-root 底下;[hidden] 一律真的藏(批735 使用者路徑實測抓到:行內 display 會蓋掉 hidden)
+    var css = el('style');
+    css.textContent = '.vrn-tpl-root{display:grid;gap:14px;width:100%}.vrn-tpl-root [hidden]{display:none!important}'
+      + '.vrn-tpl-body{display:grid;gap:14px}.vrn-tpl-root>.panel-header{flex-wrap:wrap;gap:8px 14px}'
+      + '.vrn-tpl-off{padding:14px 16px;line-height:1.6}.vrn-tpl-note{margin:4px 0 8px}.vrn-tpl-fold>summary{cursor:pointer;padding:6px 0}'
+      + '.vrn-tpl-tree{white-space:pre-wrap;overflow-wrap:anywhere;max-height:520px;overflow:auto;margin:0}';
+    host.appendChild(css);
     var root = el('div', 'vrn-tpl-root'), head = el('div', 'panel-header'), titles = el('div'), s = (P && P.summary) || {};
-    root.style.cssText = 'display:grid;gap:14px;width:100%';
     titles.appendChild(el('h2', 'panel-title', 'VRN 研報自測成果 · 制式 U/I'));
     titles.appendChild(el('p', 'panel-caption', txt(s.loop) + ' · ' + txt(s.generated) + ' · ' + ((P && P.engine) || '')));
     head.appendChild(titles); head.appendChild(badge(s.verdict));
@@ -524,8 +540,8 @@ CENTRAL_JS = r"""(function () {
     ctl.appendChild(document.createTextNode('由 synchronizer 控制:模組 ' + MID + '(開 / 關 / 釘選 / 排序在 '));
     var a = el('a', 'link', 'synchronizer 頁'); a.setAttribute('href', 'VIA-SYNCHRONIZER-Standalone.html'); ctl.appendChild(a);
     ctl.appendChild(document.createTextNode(')'));
-    var off = el('div', 'panel', 'VRN 面板已在 synchronizer 關閉——到 synchronizer 頁的模組清單把「' + NAME + '」打開,這裡會即時回來。');
-    var body = el('div', 'vrn-tpl-body'); body.style.cssText = 'display:grid;gap:14px';
+    var off = el('div', 'panel vrn-tpl-off', 'VRN 面板已在 synchronizer 停用——到 synchronizer 頁的模組清單把「' + NAME + '」勾回來,這裡會即時回來(請用停用,不要刪:刪掉的話下一次開這一頁會照只增不減再加回來)。');
+    var body = el('div', 'vrn-tpl-body');
     if (!P) body.appendChild(el('div', 'panel', '這一頁的 VRN 資料讀不到(建構不完整);重跑 VRN_ENG089 build。'));
     ((P && P.sections) || []).forEach(function (sec) { body.appendChild(section(sec)); });
     root.appendChild(head); root.appendChild(ctl); root.appendChild(off); root.appendChild(body); host.appendChild(root);
@@ -677,8 +693,9 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
     rows += [["下游", "頁 · " + names[r], "ui/" + names[r], "REBUILT"] for r in ROLES]
     rows.append(["下游", "synchronizer 模組 · " + MODULE["id"], STATE_KEY, "REGISTERED"])
     new_keys = [k for k, st in states.items() if st == "NEW" and not k.startswith("上游|")]
+    compared = "baseline" if base_used else "self" if prev else None
     payload = build_payload(report, report_path, {"rows": rows, "counts": counts, "previous": prev.get("built_at"),
-                                                  "new_items": []})
+                                                  "compared_to": compared, "new_items": []})
     if _sections_hook:
         _sections_hook(payload)
     homes, sec_ids = payload["homes"], {s["id"] for s in payload["sections"]}
@@ -701,7 +718,7 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
             on = it["what"] in row_index.get(home, set())
         new_items.append({"kind": it["kind"], "what": it["what"], "home": home, "on_page": on})
     payload = build_payload(report, report_path, {"rows": rows, "counts": counts, "previous": prev.get("built_at"),
-                                                  "new_items": new_items})
+                                                  "compared_to": compared, "new_items": new_items})
     if _sections_hook:
         _sections_hook(payload)
     rendered = {}                      # 三張先在記憶體組好;組不出來(模板改版找不到插入點)= BLOCKED,一張都不寫(不留半套)
@@ -721,7 +738,7 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
     rec = {"schema": "VIA.VRN.TemplateLinks.v1", "engine": ENGINE_TAG, "built_at": datetime.now().isoformat(timespec="seconds"),
            "report": str(report_path), "report_sha": report_sha, "out": str(out_dir),
            "template": {"release": tpl["release"], "rows": tpl["rows"]},
-           "compared_to": "baseline" if base_used else "self" if prev else None, "baseline": base_used,
+           "compared_to": compared, "baseline": base_used,
            "previous": prev.get("built_at"), "entry": {role: "ui/" + names[role] for role in ROLES},
            "module": MODULE, "pages": pages, "items": items, "states": states, "counts": counts,
            "new_items": new_items, "new_missing": [n["what"] for n in missing],
@@ -841,7 +858,7 @@ const { chromium } = require('playwright');
   await s0.evaluate(() => document.querySelector('.module-row .module-toggle').click());
   await c0.waitForTimeout(800);
   await ctx0.close();
-  const ctx = await browser.newContext();
+  const ctx = await browser.newContext({ acceptDownloads: true });
   const sync = await ctx.newPage(); sync.on('pageerror', e => out.errors.push('sync:' + e.message));
   await sync.goto(__SYNC_URL__); await sync.waitForFunction(() => window.VRN_TEMPLATE_SYNC_MOUNTED === true, null, { timeout: 15000 });
   out.sync_mounted = true;
@@ -855,9 +872,30 @@ const { chromium } = require('playwright');
   await sync.evaluate(mid => { const row = Array.from(document.querySelectorAll('.module-row')).find(r => (r.querySelector('small') || {}).textContent === mid); row.querySelector('.module-toggle').click(); }, __MID__);
   await cen.waitForFunction(() => document.querySelector('.vrn-tpl-root').getAttribute('data-vrn-enabled') === '0', null, { timeout: 15000 }).catch(() => {});
   out.enabled_after_off = await cen.evaluate(() => document.querySelector('.vrn-tpl-root').getAttribute('data-vrn-enabled'));
+  // 量「真的看不看得到」(高度),不只看屬性——批735 使用者路徑實測抓到:行內 display 會蓋掉 hidden,屬性對了畫面沒收
+  out.seen_off = await cen.evaluate(() => { const r = document.querySelector('.vrn-tpl-root'), o = r.querySelector('.vrn-tpl-off');
+    return { body: r.querySelector('.vrn-tpl-body').offsetHeight > 0, hint: !!o && o.offsetHeight > 0 }; });
   await sync.evaluate(mid => { const row = Array.from(document.querySelectorAll('.module-row')).find(r => (r.querySelector('small') || {}).textContent === mid); row.querySelector('.module-toggle').click(); }, __MID__);
   await cen.waitForFunction(() => document.querySelector('.vrn-tpl-root').getAttribute('data-vrn-enabled') === '1', null, { timeout: 15000 }).catch(() => {});
   out.enabled_after_on = await cen.evaluate(() => document.querySelector('.vrn-tpl-root').getAttribute('data-vrn-enabled'));
+  out.seen_on = await cen.evaluate(() => { const r = document.querySelector('.vrn-tpl-root'), o = r.querySelector('.vrn-tpl-off');
+    return { body: r.querySelector('.vrn-tpl-body').offsetHeight > 0, hint: !!o && o.offsetHeight > 0 }; });
+  // 釘選:synchronizer 取消 → 中央頁標記真的收;釘回 → 出來
+  const pinSeen = () => cen.evaluate(() => { const n = Array.from(document.querySelectorAll('.vrn-tpl-root .status')).find(x => x.textContent.includes('釘選')); return !!n && n.offsetHeight > 0; });
+  const pinClick = () => sync.evaluate(mid => Array.from(document.querySelectorAll('.module-row')).find(r => (r.querySelector('small') || {}).textContent === mid).querySelector('.module-pin').click(), __MID__);
+  await pinClick(); await cen.waitForTimeout(300); out.pin_after_unpin = await pinSeen();
+  await pinClick(); await cen.waitForTimeout(300); out.pin_after_repin = await pinSeen();
+  // 下載 VRN 資料:真的下載一份 JSON、讀得回來
+  try {
+    const [dl] = await Promise.all([sync.waitForEvent('download', { timeout: 10000 }), sync.click('#syncAddonSlotBody button')]);
+    const fs = require('fs'); const p = await dl.path();
+    const dj = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    out.download = { name: dl.suggestedFilename(), sections: Array.isArray(dj.sections) ? dj.sections.length : -1 };
+  } catch (e) { out.download = { error: String(e && e.message || e) }; }
+  // 手機寬 390:頁面不橫向捲(收合全打開再量;表格在自己的捲動框裡)
+  await cen.setViewportSize({ width: 390, height: 844 }); await cen.waitForTimeout(300);
+  out.narrow = await cen.evaluate(() => { document.querySelectorAll('.vrn-tpl-root details').forEach(d => { d.open = true; });
+    return { sw: document.documentElement.scrollWidth, iw: window.innerWidth }; });
   out.shim = await cen.evaluate(() => window.VRN_TEMPLATE_TOAST_SHIM || null);
   out.toast_shown = await cen.evaluate(() => { const t = document.getElementById('toast'); return !!(t && t.classList.contains('show')); });
   if (__SHOT__) {
@@ -908,14 +946,21 @@ def browser_probe(central: Path, synchronizer: Path, verdict: str, shot: str = "
         defect = sorted(set(res.get("template_errors") or []))
         # 模板有缺陷 → 補丁一定要作用、模板自己的通知要真的出來;模板沒缺陷 → 補丁不作用也對
         shim_ok = (res.get("shim") == "APPLIED" and res.get("toast_shown")) if defect else res.get("shim") in ("NOT_NEEDED", "APPLIED")
+        so, sn, dl, nw = res.get("seen_off") or {}, res.get("seen_on") or {}, res.get("download") or {}, res.get("narrow") or {}
+        seen_ok = so.get("body") is False and so.get("hint") is True and sn.get("body") is True and sn.get("hint") is False
+        pin_ok = res.get("pin_after_unpin") is False and res.get("pin_after_repin") is True
+        dl_ok = str(dl.get("name", "")).endswith(".json") and (dl.get("sections") or 0) >= 1
+        narrow_ok = bool(nw) and nw.get("sw", 10 ** 6) <= nw.get("iw", 0) + 1
         ok = (rc == 0 and not res.get("errors") and res.get("sync_mounted") and res.get("sync_row") and res.get("central_mounted")
               and res.get("enabled_before") == "1" and res.get("enabled_after_off") == "0" and res.get("enabled_after_on") == "1"
-              and res.get("verdict_text") and "summary" in (res.get("sections") or []) and shim_ok)
+              and res.get("verdict_text") and "summary" in (res.get("sections") or []) and shim_ok
+              and seen_ok and pin_ok and dl_ok and narrow_ok)
         why = ("模板既有缺陷(原封模板對照:中央頁 " + " · ".join(defect) + ")→ 衍生頁補丁 " + str(res.get("shim"))
                + (" · 模板通知照出" if res.get("toast_shown") else "") + " · " if defect else "原封模板對照零錯 · ")
         why += (f"衍生頁錯 {len(res.get('errors') or [])} · synchronizer 模組列 {'有' if res.get('sync_row') else '無'} · "
-                f"關 / 開 → 中央 {res.get('enabled_before')}→{res.get('enabled_after_off')}→{res.get('enabled_after_on')} · "
-                f"段 {len(res.get('sections') or [])}")
+                f"關 / 開 → 中央 {res.get('enabled_before')}→{res.get('enabled_after_off')}→{res.get('enabled_after_on')}"
+                f"(量高度:{'真的收起再回來' if seen_ok else '沒真的收起!'})· 釘選 {'跟著' if pin_ok else '沒跟!'} · "
+                f"下載 {dl.get('name') or dl.get('error') or '-'} · 手機寬 {nw.get('sw')}/{nw.get('iw')} · 段 {len(res.get('sections') or [])}")
         if not ok:
             why += " · " + json.dumps(res, ensure_ascii=False)[:400]
         return {"state": "OK" if ok else "FAIL", "why": why, "res": res, "template_defect": defect,
@@ -1078,7 +1123,8 @@ def selftest() -> int:
         r7 = build(rp, out)
         br = browser_probe(Path(r7["central"]), Path(r7["synchronizer"]), rep["verdict"])
         name10 = ("⑩ 瀏覽器實跑(原封模板對照組點名模板既有缺陷 · 中央頁外掛掛上 · synchronizer 模組清單有 VRN · "
-                  "在 synchronizer 關 / 開 → 中央頁即時跟著 · 衍生頁零頁面錯誤)")
+                  "在 synchronizer 關 / 開 → 中央頁即時跟著且**量高度真的收起再回來** · 釘選跟著 · 下載鈕真的下載 JSON · "
+                  "手機寬不橫捲 · 衍生頁零頁面錯誤)")
         if br["state"] == "SKIP":
             skp(name10, br["why"])
         else:
