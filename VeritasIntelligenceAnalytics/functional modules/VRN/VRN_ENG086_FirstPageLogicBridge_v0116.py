@@ -1400,7 +1400,13 @@ _PCT_REL_BEFORE_RX = re.compile(                      # a:關係連接詞,不看
 # 只能靠語意分辨;正解是讀機構 SSOT 而非手寫(已記後續項)。
 _PCT_LABEL_BEFORE_RX = re.compile(                    # b:冒號分欄,要幅度/標的報酬詞
     r"(?:up\s*/?\s*downside|upside|downside"
-    r"|(?:potential|implied|total|expected|estimated|target)\s+return"
+    # 批727j(Codex 第八輪):兩個方向同時要顧,727i 只顧了一邊。
+    #   誤殺:`Target/Expected return on equity (%)` —— 修飾語中了,`[^()]{0,20}` 又把
+    #        ` on equity` 吃掉,ROE 被當成標的報酬。**`return on X` 是獲利率,一律排除**。
+    #   誤報:`Expected share price return (%)` —— 修飾語與 return 不相鄰就不中;
+    #        而這是 Citi 的真實欄位(ENG073 v0136 註記 `Expected share price return 44.7%`),
+    #        所以修飾語與 return 之間要容得下 `share price` 這種插入語。
+    r"|(?:potential|implied|total|expected|estimated|target)[^()\n]{0,20}?return(?!\s+on\b)"
     r"|預期報酬|潛在報酬|上漲空間|下跌空間|上檔空間)"
     r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
 # 單位標記也可能落在**數字之後**(`Target Price: 38 (%)`);裸 % 的規則 A 看不到括號。
@@ -2468,7 +2474,12 @@ def selftest() -> int:
                       # 批727i:ROE/ROA 是**獲利率**不是「相對於目標價的報酬」。
                       # 727g 在冒號路徑放裸 `return`,把這兩式的真目標價丟掉了(v0115 回 250/188)。
                       ("Return on equity (%): Target Price: 250", 250.0),
-                      ("Return on assets (%): Target Price 188", 188.0)):
+                      ("Return on assets (%): Target Price 188", 188.0),
+                      # 批727j:帶修飾語的 ROE/ROA 也是獲利率 —— `return on X` 一律排除。
+                      # 727i 只修好「裸」Return on equity,`Target/Expected return on equity` 仍被誤殺。
+                      ("Target return on equity (%): Target Price: 250", 250.0),
+                      ("Expected return on equity (%): Target Price: 250", 250.0),
+                      ("Estimated return on assets (%): Target Price 188", 188.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
@@ -2505,6 +2516,10 @@ def selftest() -> int:
                "Potential return (%) to Price Target: 38", "ETR (%) to Target Price: 15",
                # 帶標的相對修飾語的 return 走冒號路徑也要擋(與 ROE/ROA 正控成對)
                "Potential return (%): Price Target 38",
+               # 批727j:Citi 真實欄位(ENG073 v0136 註記 `Expected share price return 44.7%`);
+               # 修飾語與 return 之間夾著 `share price`,727i 的相鄰式抓不到 → 曾把 38 當成價。
+               "Expected share price return (%): Price Target: 38",
+               "Expected total share price return (%): Price Target 22",
                "Total return (%) vs Price Target: 19", "Implied return (%): Price Target 22",
                "Downside (%) from Price Target (12M): 38", "Downside (%): Price Target (12M): 38",
                "Price Target (12M): 38 (%)"):
