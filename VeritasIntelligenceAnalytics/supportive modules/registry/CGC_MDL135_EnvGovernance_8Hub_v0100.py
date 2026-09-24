@@ -92,6 +92,7 @@ def _pending(tools: dict) -> list[dict]:
 def _uv_preflight(core, rows: list[dict], tools: dict) -> list[dict]:
     """Resolve the full per-environment install set without changing the environment."""
     uv = shutil.which("uv")
+    online = core._consent()
     dry = []
     for row in rows:
         env = row["env"]
@@ -105,9 +106,12 @@ def _uv_preflight(core, rows: list[dict], tools: dict) -> list[dict]:
         if not uv or not row.get("interpreter"):
             dry.append({"env": env, "state": "NOT_RUN", "packages": packages, "reason": "uv or interpreter missing"})
             continue
-        args = [uv, "pip", "install", "--dry-run", "--python", row["interpreter"], *packages]
+        args = [uv, "pip", "install", "--dry-run", "--python", row["interpreter"]]
+        if not online:
+            args.append("--offline")
+        args.extend(packages)
         r = core.run_cmd(args, timeout=UV_TIMEOUT)
-        dry.append({"env": env, "state": "PASS" if r["rc"] == 0 else "BLOCK",
+        dry.append({"env": env, "state": "PASS" if r["rc"] == 0 else ("NOT_RUN" if not online else "BLOCK"),
                     "packages": packages, "reason": (r.get("out", "") + r.get("err", ""))[-400:]})
     return dry
 
