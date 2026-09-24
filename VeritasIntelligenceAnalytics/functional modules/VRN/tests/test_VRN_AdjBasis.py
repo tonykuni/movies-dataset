@@ -30,7 +30,10 @@ ENGINE = Path(__file__).resolve().parents[1] / "engine"
 # day before the report 2025-08-22: close 129.00, adj 125.13 (factor 0.97); latest adj close 150.00 on 2026-09-23
 PRICES = [("2025-08-20", "3706.TW", 128.0, 124.16), ("2025-08-21", "3706.TW", 129.0, 125.13),
           ("2025-08-22", "3706.TW", 130.0, 126.10), ("2026-09-23", "3706.TW", 150.0, 150.00),
-          ("2025-08-21", "6147.TWO", 207.0, 207.0), ("2026-09-23", "6147.TWO", 214.5, 214.5)]
+          ("2025-08-21", "6147.TWO", 207.0, 207.0), ("2026-09-23", "6147.TWO", 214.5, 214.5),
+          # 1294-like (批730): Yahoo re-adjusted the 2024-09-26 close to 95.7617 after later stock dividends;
+          # the report page printed the traded 126.5
+          ("2024-09-26", "1294.TWO", 95.7617, 87.532), ("2026-09-22", "1294.TWO", 80.0, 80.0)]
 
 
 def def_load(name, filename):
@@ -141,6 +144,16 @@ class AdjBasisTest(unittest.TestCase):
             else:
                 os.environ["VIA_DB_VDF_TW_MARKET"] = old
 
+    def test_the_page_price_corrects_a_readjusted_yahoo_close(self):
+        # 批730: with no exchange row for the day, the printed page price is the traded close -> the right factor
+        q = self.C.adj_basis("1294", "2024-09-27", 150.0, db=self.db, page_price=126.5)
+        self.assertEqual(q["adj_factor_basis"], "PAGE_PRICE")
+        self.assertAlmostEqual(q["adj_factor"], 87.532 / 126.5, places=9)
+        self.assertEqual(q["upside_adj"], round((round(150.0 * 87.532 / 126.5, 4) / 80.0 - 1) * 100, 1))
+        self.assertEqual(q["upside_adj"], 29.7)
+        plain = self.C.adj_basis("1294", "2024-09-27", 150.0, db=self.db)       # no page price: v0137's answer, named
+        self.assertEqual((plain["adj_factor_basis"], plain["upside_adj"]), ("YAHOO_CLOSE", 71.4))
+
     def test_cli_answers_one_quote_and_names_a_miss(self):
         import contextlib
         import io
@@ -161,6 +174,7 @@ class AdjBasisTest(unittest.TestCase):
         self.assertEqual((up["status"], up["basis"], up["upside_pct"]), ("DERIVED_ADJ", "ADJ_LATEST", 8.6))
         self.assertEqual((up["target_price_adj"], up["current_price"], up["price_date"]), (162.96, 150.0, "2026-09-23"))
         self.assertEqual((up["price_prev_adj"], up["page_price"], up["page_price_adj"]), (125.13, 129.0, 125.13))
+        self.assertEqual(up["factor_basis"], "PAGE_PRICE", "no exchange table here: the printed price is the divisor")
         self.assertAlmostEqual(out["upside_page"]["upside_pct"], 30.23, places=2)
         self.assertNotIn("adjusted", out["upside_page"]["formula"], "the page arithmetic is not labelled adjusted")
         self.assertIn("上漲空間 8.6% (ADJ;最新 adj close 2026-09-23)", out["summary_four_points"]["points"][0]["text"])
