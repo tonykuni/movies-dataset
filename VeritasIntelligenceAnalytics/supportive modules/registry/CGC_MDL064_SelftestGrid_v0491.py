@@ -9,6 +9,8 @@ v0490→v0491(批733;LL213 站名的檢數要手動跟;本批原擬 v0490,收尾
   **別的尺拿站名當鑰匙**,只換數字不動其他字。其中產品閘 CGC_MDL133 v0101 的核心站鑰匙是「執行橋八檢」「指揮台九檢」**帶著檢數**——
   站名一跟就靜靜掉出核心;而且它數「(批376)」八站時右括號要緊接,批406 / 批611 兩站追記批號後只數到 7,G1 從批611 起一直誤判
   「存證早於 v0225」(掉球 Z201)。v0102 鑰匙改成不看檢數(「(批376」後接 ) / ; 都算),⑩ 盯尾版格子每把鑰匙都認得到站。
+  **併 main(側線 PR #116)時一併**:三大報表擷取引擎 十二 → **二十一**(VDF_ENG082 v0103 二十一檢;側線掉球 Z204——它看到 v0491
+  已被本批用掉就沒出格子版,留給後併的一方;只換數字,站數 / glob / 參數 / 期望不動)。
   **正式庫守門(批733 Z189,L17「自測只寫暫存」)**:每一次全格子跑前跑後各 stat 三本正式庫(台股 · 全球 · 主動 ETF;
   只看位元組與 mtime_ns、不開檔),存證 GRID json 多一欄 prod_db(before / after / changed),摘要多一行「[正式庫]」。
   變了只**警告**不判紅(工作站上同時段你另外跑的日更 / 回補也會改它,格子分不出是誰);要找是哪一站:--only <站名子字串>
@@ -3146,7 +3148,7 @@ def battery(fast: bool):
         newest("VRN_ENG082_ExtractionLogic_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 300)
     add("財務邏輯統轄橋九檢(批504;AllInOne 2.1.0 + FDS 28 欄掛載·第二意見·評等正典·政策因子·公式檢;零網路)",
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
-    add("三大報表擷取引擎十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
+    add("三大報表擷取引擎二十一檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("Veritas 中央控管台三十七檢(批728 v0128 +㊲ 冊同步 CGC_MDL185 四格委派:正主判燈本台只翻譯 · 缺席=ABSENT · 紅進 verify;側線 2026-09-23 v0127 +㊱ 不認得的動詞只印用法段;v0126 +㉝㉞㉟ SSOT 正則·同義字連動口:逐格委派正主 · plan 零寫 · 判燈;批699 +㉛㉜ 掃描面只增不減 · 排除清單逐條具名;批698 +㉚ 樞紐口委派檢;批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
