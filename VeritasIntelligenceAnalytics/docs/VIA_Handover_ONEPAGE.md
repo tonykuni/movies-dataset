@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0128 · 批715)
 
-> 產生 2026-09-24 14:02:10 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-24 16:09:42 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0101.md)
 
@@ -610,14 +610,14 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-23T22:56:02 · 齡 15.1 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 3, 'engines_n': 3}, 'vrn': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 3, 'required_n': 3, 'engines_ok': 3, 'engines_n': 3}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'vdf:燈=YELLOW、家族境非 OK', 'vrn:燈=YELLOW、家族境非 OK']
+- RunGate:YELLOW · 2026-09-23T22:56:02 · 齡 17.2 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 3, 'engines_n': 3}, 'vrn': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 3, 'required_n': 3, 'engines_ok': 3, 'engines_n': 3}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'vdf:燈=YELLOW、家族境非 OK', 'vrn:燈=YELLOW、家族境非 OK']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):ABSENT · - · 還原 - · 段 None · 單獨隔離境 None · 借境封鎖 None · 次序 -(RECOVER_latest.json 不在(via-envrecover;L24 安裝出問題先還原前次再順序裝));安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1940 列 · 全庫同步 {'hash': '8a445b368cd3', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'e05e89c2aa26', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 0 · 判準 {} · 壞後端 [] · 政策因子 1940 列 · 全庫同步 {'hash': '8a445b368cd3', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '2da962f51d47', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -801,13 +801,13 @@ r["src"] = "FILENAME_MAP" if r.get("src") == "CANON" else (...)
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 9603/9603 · **缺 0** · 類別 {'class': 394, 'engine': 95, 'environment': 43, 'function': 8257, 'feature': 103, 'module': 217, 'package': 252, 'system': 67, 'tool': 175}
+- 中央自動編號冊 OK · ACTIVE 9611/9611 · **缺 0** · 類別 {'class': 394, 'engine': 95, 'environment': 43, 'function': 8265, 'feature': 103, 'module': 217, 'package': 252, 'system': 67, 'tool': 175}
 - 尾版引擎/模組家族 378 · 中央冊已登 378 · **未登 0** · 操作介面有掛載 297 · 內部件無操作介面 81(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
 - 全域台帳 1334 筆 · 元件 149 · 更新 2026-09-24 14:10
-- 元件冊 OK · ACTIVE 9603 · RETIRED 271 · 更新 2026-09-24T13:37:43 · {'class': 394, 'engine': 95, 'environment': 43, 'function': 8257, 'feature': 103, 'module': 217, 'package': 252, 'system': 67, 'tool': 175}
+- 元件冊 OK · ACTIVE 9611 · RETIRED 271 · 更新 2026-09-24T15:49:34 · {'class': 394, 'engine': 95, 'environment': 43, 'function': 8265, 'feature': 103, 'module': 217, 'package': 252, 'system': 67, 'tool': 175}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
 - 2026-09-24 11:16 FIX 期別正典遷移 側線 2026-09-24 第三段(主線批號由併線的手指定 L25)操作員令「請繼續完成用中文說明」:期別正典第三回遷移——SUP_MDL753 v0107(
@@ -906,7 +906,7 @@ python3 "$VCGC" --selftest    # 期望:二十五檢 OK 25 · ⑬ ACTIVE N/N · r
 git log --oneline -3          # 期望:頭是本線批688 或之後
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 197 · 未結 162;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 201 · 未結 165;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -1103,7 +1103,7 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 | Z154 | 總控頁 Plotly 面板判「已就緒」只看 `VIA_UI_StdDashboard_v0100.html` 在不在(VIA_SYSTEM_MANAGER v0148 `STD_DASHBOARD_OUT.exists()`);那一頁被 `.gitignore` 擋(批279 日更再生類)。任何有本機儀表板的機器重生總控頁再提交(LL49 准提交這一頁),乾淨拉下來的樹就連到不存在的檔。本側線 PR #93 中過一次(Codex 審查 P2) | 開 | Manager 線(母線) | 本側線這次先把本機檔移開再重生、產完放回,頁已回空狀態。正主新版:判就緒改成「檔在而且受 git 追蹤」,或分出本機看的頁與要提交的頁 |
 | ~~Z155~~ | ~~容器市場庫 `tw_daily_prices` 893 檔全是 .TWO(上櫃),**上市所整個不在**:上市股的 ADJ 上漲空間一律 `ADJ_NO_FACTOR`(批729 合成一輪 45 檔)。第二血統照實報 `NO_ADJ`、**不退頁面值**;ENG073 另有具名 `RAW_CLOSE` 車道~~ **批729 工作站實量**:V3 ADJ 算成 39 · ADJ_NO_FACTOR **0**(3231 · 2383 · 6669 · 1319 · 3706 等上市股都算成)——工作站庫有上市價,**只有容器缺** | 已結(批729 工作站實證) | VDF 線 → 操作員 | 工作站跑一次 V6 看 `[ADJ]` 那一行:算出數明顯變多 = 工作站庫有上市價;仍卡 `ADJ_NO_FACTOR` = 要補上市所價(`via-market-lists` 補名冊 + `via-price` 抓價,**要開同意閘,AI 不開**) |
 | Z156 | ENG080 v0109 四點摘要自算因子鏈(報告日因子 ÷ 最新日因子);容器量過 893/893 檔最新日因子 = 1,數值與 L99 相同。**唯一分歧**:因子推不出(報告日缺 / 報告日前無價列,`adjust_method=NONE`「目標價照列」)時,`upside(tp_adj if tp_adj is not None else tp, adj)` 拿**原始目標價**對最新 adj close 算——操作員 09-24「所有目標價…都要換成 ADJ CLOSE」之下這是混基準;批643 自測 ㉗ 逐字釘住這一行;**批730**:ENG080 v0110 報告日因子與「沒調到的公司行動」改向 ENG073 要(同一件事一處算:前一交易日、交易所分母、單日不一致取前後一致值;Yahoo 回調比 ≠ 1 算一次股本事件,舊碼只配股的股票目標價一分不調);事件 → EVENT_UNADJUSTED 不生數字;「推不出因子時拿原始目標價算」這一條仍候你裁 | 候(操作員確認) | 操作員 → ENG080 線 | 准就出 v0110:因子推不出 → 上漲空間不算、講因由(同 L99 的 `ADJ_NO_FACTOR` / `ADJ_NO_KEY`),㉗ 改釘新行;要不要一併改成委派 ENG073 `adj_quote`(一個算法一個地方)同時裁 |
-| Z157 | 共識庫 ENG069 v0105 `upside_pct = target_median ÷ 同日 close − 1`(原始價、同一時點;ENG079 控制塔與 VAP_ENG014 儀表板都讀它)。操作員 09-24「上漲空間都要用最新的 ADJ CLOSE」還沒落到共識線;**批730**:共識庫的 close 也是 Yahoo 的——同日時點若是舊資料,同樣吃到事後按配股回調(Z173 同一個洞),改版時分母一併改交易所收盤 | 開 | 共識線(VRN ENG069/070 · VAP) | 新版:目標中位數 × 共識日因子 ÷ 最新 adj close − 1,委派 ENG073 `adj_quote`(報告日取共識日的次一交易日,因子即共識日那一列);舊欄留,只增不減 |
+| Z157 | 共識庫 ENG069 v0105 `upside_pct = target_median ÷ 同日 close − 1`(原始價、同一時點;ENG079 控制塔與 VAP_ENG014 儀表板都讀它)。操作員 09-24「上漲空間都要用最新的 ADJ CLOSE」還沒落到共識線;**批730**:共識庫的 close 也是 Yahoo 的——同日時點若是舊資料,同樣吃到事後按配股回調(Z173 同一個洞),改版時分母一併改交易所收盤。**批732**:ENG069 v0106 做完這一段——每列委派 ENG073 `adj_quote`(共識快照基準 = 共識日那一列;券商報告 = 報告日前一交易日),結果落旁表 `consensus_adj` + 視圖 `consensus_latest_adj`(舊表 14 欄不動:ENG070 / ENG071 用位置插入);容器 198 列 ADJ_OK 20(舊欄有數 3);VRN 控制塔 ENG079 v0101 改讀 `upside_adj`。**剩**:VDF ENG068 / ENG069(自己拿 target ÷ close)→ VAP ENG014 | 開(VRN 段批732 做完;剩 VDF / VAP 讀者) | 共識線(VRN ENG069/070 · VAP) | 新版:目標中位數 × 共識日因子 ÷ 最新 adj close − 1,委派 ENG073 `adj_quote`(報告日取共識日的次一交易日,因子即共識日那一列);舊欄留,只增不減 |
 | Z158 | 附錄評等法的新詞(V6 工作夾 `RATING_SCALE_CANDIDATES.json` · `VIA_Reports/vrn_appendix/APPENDIX_latest.md` 的 new_words)只是**候選**:NEW 詞有 KNOWN 配對才給建議鍵,兩個都不認得就不猜 | 候(工作站實測後操作員裁) | 操作員 → VCGC ssot 門 | 工作站產出候選 → 操作員圈選 → 走樞紐只增不減(CGC_MDL176 聯集 / SUP_MDL749 增補冊);證據核心與自測迴圈永不寫冊 |
 | Z159 | 附錄的兩個門檻(末 3 頁 · 字級 < 0.9 × 首頁本文)只在合成 PDF 上定過;106 份實檔沒量(容器拿不到,Z144) | 候(工作站實測) | 操作員 → 母線 | 工作站 `Invoke-VIAPython -Family vrn ".\functional modules\VRN\engine\VRN_Evidence_Core.py" appendix "C:\測試樣本報告"`:看「讀到附錄小字 N/M」與逐檔 `why`;要調只改 `APPENDIX_PAGES` / `SMALL_RATIO`,並附量測 |
 | ~~Z160~~ | ~~VDF_ENG093 v0101(側線 2026-09-23,PR #93 進 main)問參數頁內嵌 JS 的起始日檢查 `\d` 寫在非 raw 的 f-string → 全格子「PowerShell 語法與參數名閘」C 轉義道紅(main 同紅;py3.12 會在操作員終端印 SyntaxWarning)~~ | 已結(批729) | 母線代修 → VDF 側線知悉 | **v0102 已由母線用掉**:只改那一個跳脫,整支模組 AST 與 v0101 相同(產生的頁逐位元不變)、自測 12/12;側線下一版請出 **v0103** |
@@ -1129,9 +1129,13 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 | Z180 | 成交量口徑:同一天同一檔,交易所不同表的成交股數不一樣——5483 在 2026-09-23:TPEX dailyQuotes 41,907,426(不是整千)· otc「不含定價」41,028,000(整千)· Yahoo 41,111,613;上櫃 868 檔 Yahoo 量**一律 ≤ 交易所**(中位 98.4%,1% 內只有 325 檔)。ENG057 啟動時探第一個會答的 TPEX 變體,跨次執行可能混到不同口徑,而 COALESCE 補值不覆蓋 → 混了看不出來 | 開 | 本側線(下一段) | 已量:TPEX rwd dailyQuotes 與 TPEX openapi 每日收盤同口徑(2026-09-24 四碼 890 檔成交股數 890/890 一樣),ENG055 L2 與 ENG057 寫同表不混;風險只在 ENG057 退到 otc/tradingStock 那兩個變體。ENG057 新版逐列記來源表(`src`),`verify` 報各市場口徑分布;退到別的變體時具名、不與 dailyQuotes 混在同一欄 |
 | Z181 | 容器全格 v0481 剩的紅燈,main 乾淨樹同樣紅,全是環境或他線:① 工具升階梯 ③⑧(OCR/TA 階梯態隨裝件而變)② 治理台 UI Matrix ②(綠燈率=全格實跑,其餘紅燈的連帶)③ 首頁文字擷取 ⑪ 與 VRN 統一報告引擎「兩種表格引擎」(容器沒有 pdfplumber)④ VRN 六層鏈實跑(ENG072/ENG073 要 pydantic)⑤ VRN 第二血統總驗(→Z182)⑥ CGC_MDL120 ⑥(`VIA_UI_ETFConsensusAnalysis_v0100.html` 是產生頁、gitignore、容器沒產) | 容器紅 | 環境(裝件=操作員的手 L19)/ 各線 | 工作站全格照跑;容器不代裝 |
 | ~~Z182~~ | ~~VRN 單元測試 `test_synthetic_loop_ends_green_or_amber` 的跳過條件只看 fitz/pandas/pyarrow,**沒看 python-docx**;合成語料的 .docx 在沒有 python-docx 的機器上被跳過(容器 4/8 檔),`file_count ≥ 8` 就紅——是測試的斷言錯,不是引擎錯(LL439)~~ | 已結(批731) | VRN 線 | 斷言改成「file_count ≥ 8 − 因缺 python-docx 而跳過的檔數」(從報告的 G05 SKIP 列數,不整條跳過:PDF 那一半照測);有 python-docx 時跳過數必須是 0。容器用匯入攔截模擬沒有 python-docx:main 上的舊斷言紅、新斷言綠;有 python-docx 照綠 |
-| Z188 | 批731 的速度與自動開頁要在工作站實量(容器只有合成語料):平行池 · 頁與附錄快取 · G08 抽 12 · 自測門並排跑 · 跑完自動用瀏覽器開自測報告 · V6 天花板 3600 秒 | 操作員的手 | 操作員 → 母線 | `docs/VIA_B731_TheSlowRunAndTheAccelerators.md` 第九節一貼即用;貼回每一步秒數(`總計` 那一行)、V2 的 `L3_驗證 VRN_AutoTestLoop` 那一格、`[加速器]`、`[VRN] 平行池 N 個工作行程`、G08「抽 12/106」、`[DONE]`,以及報告頁有沒有自己跳出來 |
-| Z189 | 平行格子共用正式市場庫 `vdf_tw_market.duckdb`:`VRN_ENG069_ConsensusDB` 自測的 `build()` 寫正式庫、拿寫鎖(違 L17「自測只寫暫存」),撞到同時段其他站的讀鎖就紅「Could not set lock on file」(批731 格子 v0480 平行段 VRN 六層鏈紅在這裡,序跑複驗綠);靜態掃還有約 23 支尾版的自測可能開可寫連線(啟發式,未逐支核)| 未做 | AI | 逐支改成自測寫暫存庫(ENG070 / ENG071 v0103 的做法):ENG069 先;每改一支,全格子前後各跑一次比紅燈數;不為了綠去改格子的平行度 |
+| ~~Z188~~ | ~~批731 的速度與自動開頁要在工作站實量(容器只有合成語料):平行池 · 頁與附錄快取 · G08 抽 12 · 自測門並排跑 · 跑完自動用瀏覽器開自測報告 · V6 天花板 3600 秒~~ | 已結(批732) | 操作員 → 母線 | 工作站實量(批732 貼回):V6 **934 秒跑完**(批731 撞 1800 秒)· G06 675 秒(2 個工作行程 = 加速器預算 2)· G07 98 秒 · G08 114 秒(抽 12)· AMBER PASS 242 / WARN 9 / FAIL 0 · 自測報告自動開 Edge · Celeritas 模板已接;剩的:V2 L3 自測門 180.1 秒 NODATA → Z195;池只開 2 個的由來 → 平行池那一行現在印來源(VRN_BatchPool v0101) |
+| Z189 | 平行格子共用正式市場庫 `vdf_tw_market.duckdb`:`VRN_ENG069_ConsensusDB` 自測的 `build()` 寫正式庫、拿寫鎖(違 L17「自測只寫暫存」),撞到同時段其他站的讀鎖就紅「Could not set lock on file」(批731 格子 v0480 平行段 VRN 六層鏈紅在這裡,序跑複驗綠);靜態掃還有約 23 支尾版的自測可能開可寫連線(啟發式,未逐支核)。**批732**:ENG069 v0106 做完(第一支)——自測在暫存庫建夾具,正式庫只開唯讀,⑬ 記下本支開過的每條連線、正式庫一次都沒被可寫地打開(容器:正式庫 193,212,416 位元組、mtime 前後一致);變異測試「那條連線改成可寫」⑬ 會紅 | 進行(1 支做完) | AI | 逐支改成自測寫暫存庫(ENG070 / ENG071 v0103 的做法):ENG069 先;每改一支,全格子前後各跑一次比紅燈數;不為了綠去改格子的平行度 |
 | Z190 | 引擎號撞號(main PR #105 環境八樞紐帶進來):`CGC_MDL135_EnvGovernance_8Hub_v0100.py` 跟既有族 `CGC_MDL135_EnvGovernance` 用同一個號 MDL135——唯一接觸口閘 CGC_MDL157「engine numbers are unique per family (baseline-ratcheted)」報「新撞號 CGC_MDL135」,格子 v0481「唯一接觸口控制面」站紅;main 自己也紅,不是批731 造成 | 候(操作員裁)| 操作員 → 環境線(codex) | 兩條路擇一:① 八樞紐改用下一個空號(全分支最大 CGC_MDL185 → **CGC_MDL186**),改名並改兩處引用(`CGC_MDL135_EnvGovernance_v0114.py` 載入處 · `tests/test_env_governance_8hub.py`)② 併進 `CGC_MDL135_EnvGovernance` 族當下一版。改別條線的模組名是那條線的事,本批只記不動 |
+| Z194 | 沒有框線的財報表不讀:第二血統資料庫引擎只抽有框線的表,工作站 105 份裡 7 份 G06 報「no financial rows (no ruled table found)」(3014TT · MQ-1560 · 國泰證期 神達 3706 · 光焱 7728 · 凱基 Takeaway 3605 · 國光生 4142 · 瑞基 4171)| 開 | VRN 線 | 文字對齊的表另走一道(pdfplumber text 策略或欄位 x 座標分群);**讀出來的表一律過批732 的恆等式**(毛利 = 營收 − 成本 · 四季和 = 全年),加不起來的不入庫——恆等式就是沒有框線時的尺;先在工作站量那 7 份有幾份真的有損益表 |
+| Z195 | 工作站 V2 六層鏈 L3 `VRN_AutoTestLoop --selftest` 180.1 秒 NODATA(節點上限 180 秒;容器同一支約 52 秒,平行單元檔)| 候(工作站實量)| 操作員 → VRN 線 | 批732 起自測門每跑完一個單元檔印一行 `· Ns 完成 test_…py Ms · K 支`;貼回那幾行,看是哪一支慢(工作站 2 個行程)→ 拆檔或把那一支的前置改共用;不為了綠去拉高節點上限 |
+| Z196 | 母線財務字庫(vrn_finlex 尾版)沒有三個比率詞:營業成本率 · 營業費用率 · 費用率(`via-finlex --ask` 零命中);第二血統資料庫引擎 v0105 已有(COGSRatio · OperatingExpenseRatio)。其餘批732 新同義字(營業成本 / 銷貨成本 · 營業費用 · 營業外收支 / 業外損益 · 利息收入)母線冊上同一個意思,不打架 | 候 | VRN 字庫線 | 走字庫的收割路徑入冊(只增不減;不手改冊檔),入冊後 `via-finlex --reconcile` 對帳 |
+| Z197 | 格子站名「驗證共識庫八檢(批176)」:ENG069 v0106 是十三檢(LL213:站名的檢數要手動跟)| 開(低)| 格子線 | 側線 busy-bell 已有格子 v0482–v0486;等它併進 main 後,下一版格子一併改名(免撞版號)|
 
 
 ## 十一 · 中央治理家族(批514;VIA-SYS-MGR-001 主控台 · VIA-GOV-ENG-001 詞彙引擎 · VIA-SYS-MGR-003 下行控制 · VIA-SYS-ENG-003 檔案優先序 · 同名整併;擁有者 CGC_MDL150;預設 dry-run)
@@ -1209,12 +1213,12 @@ git log --oneline -3          # 期望:頭是本線批688 或之後
 
 ## 十三 · VRN 子系統管理對接口(批681;VRN_SystemManager;VIA 往下讀 VRN 四庫一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 交接;自適應連結現解尾版;預設只讀)
 
-- GREEN · VRN_SystemManager_v0104 · 2026-09-24 14:02:10 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 205 {'GREEN': 203, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
+- GREEN · VRN_SystemManager_v0104 · 2026-09-24 16:09:43 · 燈 {'policy': 'GREEN', 'logic': 'GREEN', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'handover': 'GREEN', 'records': 'GREEN', 'ssot': 'GREEN'} · 連結 206 {'GREEN': 204, 'GATED': 1, 'ABSENT': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0011', 'handover': True}
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VRN/VRN_SystemManager_v*.py status | catalog | links | read <policy|logic|factor|param|engine|handover|upstream> [key] | sync --apply(只落 VIA_Reports/vrn_system)
 
 ## 十四 · VDF 子系統管理對接口(側線 2026-09-21;VDF_SystemManager;VIA 往下讀 VDF 一律經此;上接 VCGC · 下管 政策/邏輯/因子/參數 + 引擎面 + 橋/工具面 + 交接/紀錄;橋律逐支量;自適應連結現解尾版;預設只讀)
 
-- STALE/NODATA · VDF_SystemManager_v0104 · 2026-09-24 14:02:11 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 132 {'GREEN': 129, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 3(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 8 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
+- STALE/NODATA · VDF_SystemManager_v0104 · 2026-09-24 16:09:44 · 模式 subsystem · 燈 {'policy': 'GREEN', 'logic': 'STALE', 'factor': 'GREEN', 'param': 'GREEN', 'engine': 'GATED', 'bridge': 'GREEN', 'tool': 'STALE', 'handover': 'GREEN', 'records': 'GREEN'} · 連結 132 {'GREEN': 129, 'STALE': 2, 'GATED': 1} · 七處自審 7/7 {'spec': True, 'grid': True, 'register': True, 'deck': True, 'manager': True, 'inventory': 'VIA-SYS-0013', 'handover': True} · 冊樹不同步:冊有樹無 1 · 樹上有檔但無版號 3(L04 尾版律外,VCGC 的尺看不見)· 樹有冊無 8 · 冊上路徑不在 0(卡書要重建,不手改;版號要立,本口只報)
 - 橋律(所有 PY 接加速器 · 真向外擷取走網路工具;尺=CGC_MDL124):尾版 50 · 加速器橋 50 · 網路橋 50 · 真擷取 6 · 缺加速器 [] · 真擷取缺網路橋 []
 - 直呼引擎(尾版 glob,短令候 L70 許可):functional modules/VDF/VDF_SystemManager_v*.py status | engines | bridges | tools | catalog | links | records | read <policy|logic|factor|param|engine|bridge|tool|handover|records|upstream> [key] [--full] | sync --apply(只落 VIA_Reports/vdf_system)
 
