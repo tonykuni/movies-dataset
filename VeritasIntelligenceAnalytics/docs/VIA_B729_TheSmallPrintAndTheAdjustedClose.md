@@ -98,38 +98,48 @@ SKIP 6 全是環境缺件,照實列:reconcile 對帳(沒有對帳報告)· 全�
 - ENG080 的原始目標價退路(Z156)與共識庫的同日 close(Z157)**本批不越線改**:兩支各有自己的線與自測,改法寫在掉球列,等你點頭。
 - 評等法候選要不要進同義字冊(Z158)是操作員裁;迴圈只產候選。
 
-## 九 · 工作站(一貼即用;批729 第二版:先清本機再生物再合併,拉不到就停)
+## 九 · 工作站(一貼即用;批729 第三版:先解卡,再切到最新 main)
 
 ```powershell
 Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
 . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
-git log --oneline -1
-via-regen --apply
-if (git status --porcelain --untracked-files=no) { git stash push -m "workstation-local-before-b729" }
-git fetch https://github.com/tonykuni/movies-dataset claude/awesome-bardeen-h0wm5v
-git merge --no-edit FETCH_HEAD
-if ($LASTEXITCODE -eq 0 -and (Test-Path .\Invoke-VIA-VRN-v0103.ps1) -and (Test-Path ".\functional modules\VRN\VRN_ENG073_ReportStructuredDB_v0137.py")) {
-    git log --oneline -1
+$top = git rev-parse --show-toplevel
+"  [前] 分支 " + (git branch --show-current) + " · " + (git log --oneline -1)
+git reflog -3 --format="  [前] %h %gs"
+if (git rev-parse -q --verify MERGE_HEAD) { "  [前] 卡在合併:" + (git log --oneline -1 MERGE_HEAD) + " → merge --abort"; git merge --abort }
+$held = @()
+foreach ($p in @(git -C $top diff --name-only --diff-filter=U)) { if ($p -match '(ui_support/.+\.html|registry/VIA_(VRN_LogicArchitecture_SSOT|Engine_Consolidation_Register|Engine_Contract|SSOT_RegexDict|Schema_Registry|Unified_Register|ParallelLanes|ProjectCompletion|ProductGate|Component_Inventory_SSOT)_v\d+\.json)$') { git -C $top checkout HEAD -- $p; "  [解卡] 再生冊取提交版:" + $p } else { $held += $p } }
+if ($held.Count -eq 0) {
+    git reset -q
+    via-regen --apply
+    if (git status --porcelain --untracked-files=no) { git stash push -m "workstation-local-before-b729" }
+    git stash list | Select-Object -First 3
+    git fetch https://github.com/tonykuni/movies-dataset main
+    git merge-base --is-ancestor main FETCH_HEAD 2>$null; $ff = ($LASTEXITCODE -eq 0)
+    if (-not (git rev-parse -q --verify refs/heads/main)) { git switch -c main FETCH_HEAD } elseif ($ff) { git switch main; git merge --ff-only FETCH_HEAD } else { git switch -c ("main-latest-" + (Get-Date -Format "MMddHHmm")) FETCH_HEAD }
+} else { "  [解卡] 人寫件卡在衝突,不自動處理,先停:" + ($held -join " · ") }
+if ($held.Count -eq 0 -and $LASTEXITCODE -eq 0 -and (Test-Path .\Invoke-VIA-VRN-v0103.ps1) -and (Test-Path ".\functional modules\VRN\VRN_ENG073_ReportStructuredDB_v0137.py")) {
+    "  [後] 分支 " + (git branch --show-current) + " · " + (git log --oneline -1)
     . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
     Invoke-VIAPython -Family vrn ".\functional modules\VRN\engine\VRN_Evidence_Core.py" appendix "C:\測試樣本報告"
     Invoke-VIAPython -Family vrn ".\functional modules\VRN\engine\VRN_Evidence_Core.py" adj 6147 2026-05-19 280
     via-vrnrun 2>&1 | Tee-Object -FilePath "$env:TEMP\vrnrun_b729.txt"
     Select-String -Path "$env:TEMP\vrnrun_b729.txt" -Pattern '\[Celeritas\]|\[進度\] \d+/6|\[V[1-6]\]|\[ROUND|\[DONE\]|\[附錄\]|\[ADJ\]|FAIL G|WARN G|RED|rc=' | ForEach-Object { $_.Line }
-} else { Write-Host "  [拉取] 沒拉到批729,先停(上面 git 那幾行就是原因)" -ForegroundColor Red; git status --short | Select-Object -First 15 }
+} else { Write-Host "  [拉取] 沒拉到批729,先停(上面幾行就是原因)" -ForegroundColor Red; git status --short | Select-Object -First 15 }
 ```
 
-- `via-regen --apply` 只倒回引擎再生的頁與冊,倒之前整包備份(`VIA_Reports\regen_revert\<時間>`)。
-- 其餘本機改動收進 `git stash`,**保留不刪**:`git stash list` 看得到,要拿回來 `git stash pop`。
-- 合併失敗或兩支新檔不在,整段就停,不會在舊碼上又跑一輪。
+- **解卡**:卡在合併就 `git merge --abort`;卡在再生冊(六層冊、U/I 頁、再生冊)就取已提交的版本(V1 每跑都會重建);**人寫件(例如 AutoCode 台帳)卡住就整段停,什麼都不動**。
+- `via-regen --apply` 只倒回引擎再生的頁與冊,倒之前整包備份;其餘本機改動收進 `git stash`,**保留不刪**(`git stash list` 看得到)。
+- **切到最新 main**(PR #96 已把批729 併進 main):本機沒有 main 就建;本機 main 落後就快轉;本機 main 有自己的提交就另開 `main-latest-<時間>`,本機 main 一字不動。原本所在分支與它的本機提交都留著。
+- 容器以 pwsh 7.4 實跑四種情境:stash 放回卡住 · 合併卡住 · 本機 main 分岔 · 台帳卡住(停)。
 
-要貼回:兩次 `git log` 各一行(第二行要是 `461e1610` 或含它的合併)· `git merge` 的輸出 · `appendix` 最後一行 `[附錄] 檔 N · 讀到附錄小字 … · 新詞 … 個` · `adj` 前兩行 · V6 的 `[ROUND …] PASS= WARN= SKIP= FAIL=`、`[附錄]`、`[ADJ]`、`[DONE]` 各一行 · 任何 `FAIL G..` 行;若停在「沒拉到」,貼那一行與下面的 `git status`。
-`VIA_Reports\vrn_appendix\APPENDIX_latest.md` 與 V6 工作夾裡的 `RATING_SCALE_CANDIDATES.json` 是**候選清單**,看過再說哪些詞要進冊(只增不減,走樞紐)。
+要貼回:`[前]` 幾行 · `[解卡]` 行 · `git stash list` 三行 · `[後]` 一行 · `appendix` 最後一行 · `adj` 前兩行 · V6 的 `[ROUND …]`、`[附錄]`、`[ADJ]`、`[DONE]` 各一行 · 任何 `FAIL G..` 行;停下來就貼停的那一行與下面的 `git status`。
 
-## 十 · 工作站第一次回報(2026-09-24;**跑到的是 main 的碼**)
+## 十 · 工作站第一次回報(2026-09-24;**跑到的是舊碼**)
 
-**判定**:`via-vrnrun` 只跑了五步(V1–V5;本分支 `Invoke-VIA-VRN-v0103.ps1` 才有 V6),六層鏈裡 ENG073 那一行最後一檢是 ⓮(v0137 到 ⓰)——工作站那棵樹是 main(Invoke-VIA-VRN v0102 · ENG073 v0136),**批727–729 都沒拉進去**。最可能的兩個原因:本機每跑都會改寫的冊與頁擋住合併(批613 記過的病根,`via-regen` 就是為它立的),或新版 git 在分支分岔時 `git pull` 要求先指定合併方式。新的一貼即用改成:`via-regen --apply`(再生物倒回,先整包備份)→ 其餘本機改動 `git stash`(**保留不刪**,`git stash list` 看得到)→ `git fetch` + `git merge FETCH_HEAD` → 驗 v0103 與 v0137 在場才往下跑。
+**判定**:`via-vrnrun` 只跑了五步(V1–V5;本分支 `Invoke-VIA-VRN-v0103.ps1` 才有 V6),六層鏈裡 ENG073 那一行最後一檢是 ⓮(v0137 到 ⓰)——工作站那棵樹是舊碼(Invoke-VIA-VRN v0102 · ENG073 v0136),**批727–729 都沒拉進去**(原先以為是 main;第二次回報才看出它停在 envmanager 分支,見十一)。最可能的兩個原因:本機每跑都會改寫的冊與頁擋住合併(批613 記過的病根,`via-regen` 就是為它立的),或新版 git 在分支分岔時 `git pull` 要求先指定合併方式。新的一貼即用改成:`via-regen --apply`(再生物倒回,先整包備份)→ 其餘本機改動 `git stash`(**保留不刪**,`git stash list` 看得到)→ `git fetch` + `git merge FETCH_HEAD` → 驗 v0103 與 v0137 在場才往下跑。
 
-**量到的**(main 的碼,工作站真庫):
+**量到的**(舊碼,工作站真庫):
 
 | 步 | 結果 |
 |---|---|
@@ -140,3 +150,11 @@ if ($LASTEXITCODE -eq 0 -and (Test-Path .\Invoke-VIA-VRN-v0103.ps1) -and (Test-P
 | V5 | 工作站 Python 3.13 每跑印三行 jieba 的 SyntaxWarning(第三方套件自己的原始碼跳脫,不是本樹);下一跑還在再處理 |
 
 可判率 67.1% 的缺口是母線第一血統(ENG073 → ENG083)在 105 份真檔上的擷取覆蓋;第二血統在同一批真值上的成績見批728(評等 48/48 · 目標價 41/41),要不要回灌正本仍是 Z146。批729 的附錄與 ADJ 要等工作站真的拉到本分支、V6 跑完才有真數。
+
+## 十一 · 工作站第二次回報(第二版一貼即用;還是沒拉到)
+
+工作站**不在 main**:停在另一條線的分支 `claude/via-envmanager-governance-7cls8h`,HEAD `16524649`「解未完成合併(MergeMedic)」——**只在工作站本機**(任何遠端分支都沒有這一筆)。
+樹上卡著一個衝突:六層冊 `VIA_VRN_LogicArchitecture_SSOT_v0100.json` 是 `UU`,另有五支再生物已暫存(M)。`git stash` 回「needs merge」、`git merge` 回「unmerged files」,第二版的守門照設計停下,**沒有在舊碼上又跑一輪**。
+`via-regen --apply` 倒回了 4 支再生物(備份 `VIA_Reports\regen_revert\20260924_154511`)。
+看樣子是「合併完再放回暫存(stash pop)」時撞到六層冊;這種卡法**沒有 MERGE_HEAD**,單用 `git merge --abort` 解不開——第三版一貼即用兩種卡法都處理,並加 `git reflog` 三行,下次看得出是誰讓它卡住。
+
