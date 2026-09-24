@@ -109,14 +109,31 @@ EXEMPT_PREFIXES = ("VeritasIntelligenceAnalytics/VIA_HTML_UI/",)
 _VER_RX = re.compile(r"^(?P<stem>.+)_v(?P<num>\d{4})\.(?P<ext>py|json|ps1)$")
 #: KILL-06/07 的字面。**拼接寫**——不拼接的話這支自己的原始碼就會咬中自己
 #:   (LL384:字面禁用檢要先剝註解,而且檢自己不能含那個字面)。
-_TALIB_RX = re.compile(r"^\+.*(?:import\s+ta" + r"lib|\bta" + r"lib\s*\.)")
+#: Codex 審查(PR #121 P2)實測漏判:`from ta·lib import RSI` 這個常見寫法
+#:   既不含 `import ta·lib` 也不含 `ta·lib.`,舊式三條分支一條都不中。
+_TALIB_RX = re.compile(r"^\+.*(?:import\s+ta" + r"lib\b|from\s+ta"
+                       + r"lib\b|\bta" + r"lib\s*\.)")
 _CONSENT_KEYS = ("VIA_NET" + "_CONSENT", "VIA_SCRAPE" + "_CONSENT")
+#: Codex 審查(PR #121 P1)實測漏判三種:本樹最常見的
+#:   `os.environ["同意閘"] = "YES"`(鍵後面先是引號再是 `]`)、
+#:   `{"同意閘": "YES"}`(冒號)、`setdefault("同意閘", "YES")`(逗號)。
+#:   舊式要求 `]` 緊貼鍵,於是**最該擋的那個寫法正好過**——
+#:   一條在最常見寫法上漏判的條款,等於只在罕見寫法上生效。
+#:   讀取比較(`== "YES"`)不是賦值,不得誤判。
 _CONSENT_GRANT_RX = re.compile(
-    r"^\+.*(?:" + "|".join(_CONSENT_KEYS) + r")\s*(?:=|\]\s*=|,)\s*[\"']?"
-    r"(?:YES|yes|1|true|True|GRANTED)\b")
+    r"^\+.*(?:" + "|".join(_CONSENT_KEYS) + r")[\"']?\s*\]?\s*(?:=|:|,)\s*[\"']?"
+    r"(?:YES|yes|true|True|GRANTED|granted)\b")
 _APIKEY_RX = re.compile(
     r"^\+.*(?:API_KEY|APIKEY|SECRET_KEY|ACCESS_TOKEN)\s*=\s*[\"'][A-Za-z0-9_\-]{16,}[\"']")
 _CHK_RX = re.compile(r"""chk\(\s*f?["']([^\s"']+)""")
+#: KILL-10 的留痕證據。Codex 審查(PR #121 P1)實測:舊式拿
+#:   `取代批|裁示|ruled_by|操作員令` 去搜**整份檔**,而 `操作員令` 是本樹表頭的常見詞——
+#:   於是任何一支表頭有那三個字的引擎,刪掉釘住的 chk 都自動放行,KILL-10 實質失效。
+#:   改兩件事:①證據只認**這次的新增行** ②要點得出批號或 ruled_by。
+_TRACE_RX = re.compile(
+    r"取代批\s*\d+|supersedes?\b|ruled_by"
+    r"|(?:裁示|操作員令|裁定)[^\n]{0,60}?批\s*\d+"
+    r"|批\s*\d+[^\n]{0,60}?(?:裁示|操作員令|裁定)")
 
 HONEST_RCS = (0, 2, 3, 5)      # 0綠 2缺料 3缺席 5跳過;1=紅 不算誠實態(它就是擊斃)
 
@@ -305,6 +322,7 @@ def judge(paths: list[str] | None = None, base: str | None = None,
     **fail-closed**:量不到走 ABSENT,絕不走 PASS。
     """
     cwd = cwd or ROOT
+    base = resolve_base(base, cwd)         # 落後的本地 main 會讓判的檔數差 645 倍(見 resolve_base)
     if paths:
         files, src = sorted(set(paths)), "指定路徑"
     else:
@@ -319,6 +337,34 @@ def judge(paths: list[str] | None = None, base: str | None = None,
     kills: list[dict] = []
     debts: list[dict] = []
     unmeasured: list[dict] = []
+
+    #: **KILL-11 要同時問 HEAD 與基線,問一邊都會漏掉一種。**
+    #:   初版只問 HEAD(`_head_text is None`):改動一旦提交,檔就在 HEAD 裡了,
+    #:   於是「提交後帶 `--base main` 跑」這條路——**接進 CI 之後唯一會走的那條路**——
+    #:   永遠不觸發(Codex 審查 PR #121 P1 指出的)。
+    #:   改成只問基線又漏掉另一種,而那正是本批真的犯的那一種:
+    #:   我在本機**新造**了一支 v0137,而基線上早就有同名的 v0137(內容完全不同)——
+    #:   對基線來說那支「存在」,於是只問基線就不會響。
+    #:   四種組合只有兩種是 KILL-11 的事:
+    #:     ①我新造 + 基線已有 → **撞號**(本批真的犯的那一種)
+    #:     ②基線沒有(不管提交了沒)→ 版號必須正好是基線尾版 +1
+    #:     ③我在改基線也有的檔 → 那是 KILL-02 的事,不是這一條
+    ref = _base_ref(cwd)
+
+    def _ver_cands() -> list[tuple[str, int, str]]:
+        out = []
+        for path in files:
+            mm = _VER_RX.match(Path(path).name)
+            if not mm or _exempt(path):
+                continue
+            mine = int(mm.group("num"))
+            in_head = _head_text(path, cwd) is not None
+            on_base = _on_ref(ref, path, cwd) if ref else in_head
+            if not on_base:
+                out.append((path, mine, "new"))
+            elif not in_head:
+                out.append((path, mine, "collide"))
+        return out
 
     def kill(code, path, detail):
         kills.append({"code": code, "律": CLAUSES[code][0], "path": path,
@@ -369,11 +415,16 @@ def judge(paths: list[str] | None = None, base: str | None = None,
                           "detail": "既有撞號 " + "、".join(sorted(now_dups & was_dups))
                                     + "(記債,不擊斃)"})
 
-        # KILL-10 翻令留痕:既有 chk 檢名被刪 = 動到釘住的合約
+        # KILL-10 翻令留痕:既有 chk 檢名被刪 = 動到釘住的合約。
+        #   證據只認**這次的新增行**,而且要點得出批號或 ruled_by(見 _TRACE_RX 的因由)。
         if base_text:
-            gone = set(_CHK_RX.findall(base_text)) - set(_CHK_RX.findall(text))
-            if gone and not re.search(r"取代批|裁示|ruled_by|操作員令", text):
-                kill("KILL-10", f, "刪掉檢號 " + "、".join(sorted(gone)) + ",檔內無留痕")
+            gone = set(_chk_syms(base_text)) - set(_chk_syms(text))
+            if gone:
+                added_txt = "\n".join(l for _ln, l in added_lines(f, base, cwd))
+                if not _TRACE_RX.search(added_txt):
+                    kill("KILL-10", f,
+                         "刪掉檢號 " + "、".join(sorted(gone))
+                         + ",而這次的新增行裡沒有指名批號的留痕")
 
         # KILL-06 / KILL-07:只看新增行,而且判的是**遮蔽過註解與字串**的那一份。
         #   遮蔽不了(tokenize 失敗)就退回判原始行——退回比較嚴的那一邊。
@@ -389,10 +440,10 @@ def judge(paths: list[str] | None = None, base: str | None = None,
 
     # KILL-02 尾版律:出了新版,舊版必須一個位元沒動
     new_stems = {}
-    for f in files:
-        m = _VER_RX.match(Path(f).name)
-        if m and _head_text(f, cwd) is None and not _exempt(f):
-            new_stems[str(Path(f).parent / m.group("stem"))] = int(m.group("num"))
+    #   「出了新版」也要含**已提交的**新增(同 Codex P1 的因由:只問 HEAD 會漏掉提交後那條路)
+    for f, mine, _kind in _ver_cands():
+        mm = _VER_RX.match(Path(f).name)
+        new_stems[str(Path(f).parent / mm.group("stem"))] = mine
     for f in files:
         m = _VER_RX.match(Path(f).name)
         if not m or _exempt(f):
@@ -403,40 +454,49 @@ def judge(paths: list[str] | None = None, base: str | None = None,
 
     # KILL-11 基線時效:新出的 _vNNNN 必須接在**預設分支當下的尾版**之後。
     #   量不到(找不到預設分支參照)**不算通過**——記進 unmeasured,整體降成 PARTIAL(rc2)。
-    ref = _base_ref(cwd)
-    ver_news = [f for f in files
-                if _VER_RX.match(Path(f).name) and _head_text(f, cwd) is None and not _exempt(f)]
-    if ver_news and ref is None:
+    cands = _ver_cands()
+    if cands and ref is None:
         unmeasured.append({"code": "KILL-11", "path": "(全部新版檔)",
                            "detail": "找不到預設分支參照("
                                      + "/".join(BASE_REFS) + ")—— 量不到基線是不是當下的尾版"})
-    elif ver_news:
-        for f in ver_news:
-            m = _VER_RX.match(Path(f).name)
-            mine = int(m.group("num"))
+    elif cands:
+        for f, mine, kind in cands:
             tail = _tail_on_ref(ref, f, cwd)
+            if kind == "collide":
+                kill("KILL-11", f,
+                     f"這支是新造的,但 {ref} 上**已經有同名的 v{mine:04d}**(內容不同)"
+                     f"——撞號;該分支尾版是 v{(tail if tail is not None else mine):04d}")
+                continue
             if tail is None:
-                continue                   # 那支在預設分支上還不存在=全新的一支,沒有基線可比
+                continue                   # 那個 stem 在基線上完全不存在=全新一族,沒有基線可比
             if mine <= tail:
                 kill("KILL-11", f,
-                     f"{ref} 上同名尾版已是 v{tail:04d},這支卻是 v{mine:04d}"
-                     f"——{'撞號(同名不同內容)' if mine == tail else '版號比基線還舊'}")
+                     f"{ref} 上同名尾版已是 v{tail:04d},這支卻是 v{mine:04d}——版號比基線還舊")
             elif mine > tail + 1:
                 kill("KILL-11", f,
                      f"{ref} 上同名尾版是 v{tail:04d},這支跳到 v{mine:04d}"
                      f"——中間那幾版沒讀過,等於在舊基線上改")
 
-    # KILL-08 自測在位(只在被要求時真跑——跑引擎要時間,格子上才開)
+    # KILL-08 自測在位。**拆成兩段,而且沒跑的那一段不准當過。**
+    #   Codex 審查(PR #121 P1)實測:舊版把整條 KILL-08 關在 `--run-selftest` 後面,
+    #   而**兩個生產接法都沒帶那個旗標**(格子站空參數、報告頁只給 `--json`),
+    #   於是這條條款在真判時從來沒生效過——一支改壞的引擎、或根本沒有 `--selftest` 的引擎,
+    #   照樣拿到 PASS,而 render 還印「11 條全過」。**那是我自己的閘在報假綠。**
+    #     (a) 有沒有 `--selftest` —— 便宜,**永遠檢**。
+    #     (b) 真的跑一次看 rc 誠不誠實 —— 貴(每支最多 600s),要旗標;
+    #         沒跑就記進 `unmeasured` → 整體 PARTIAL(rc2),**絕不是 PASS**。
+    eng_files = [f for f in py_files
+                 if (cwd / f).is_file() and re.search(r"_(ENG|MDL)\d+_", Path(f).name)]
+    no_st = []
+    for f in eng_files:
+        if "--selftest" not in (cwd / f).read_text(encoding="utf-8", errors="replace"):
+            kill("KILL-08", f, "引擎沒有 --selftest(這一段永遠檢,不吃旗標)")
+            no_st.append(f)
+    runnable = [f for f in eng_files if f not in no_st]
     if run_selftest:
-        for f in py_files:
-            fp = cwd / f
-            if not fp.is_file() or not re.search(r"_(ENG|MDL)\d+_", Path(f).name):
-                continue
-            if "--selftest" not in fp.read_text(encoding="utf-8", errors="replace"):
-                kill("KILL-08", f, "引擎沒有 --selftest")
-                continue
+        for f in runnable:
             try:
-                p = subprocess.run([sys.executable, str(fp), "--selftest"],
+                p = subprocess.run([sys.executable, str(cwd / f), "--selftest"],
                                    capture_output=True, text=True, timeout=600)
             except Exception as exc:
                 kill("KILL-08", f, f"自測跑不起來:{exc}")
@@ -444,6 +504,11 @@ def judge(paths: list[str] | None = None, base: str | None = None,
             if p.returncode not in HONEST_RCS:
                 tail = (p.stdout or p.stderr or "").strip().splitlines()[-1:] or [""]
                 kill("KILL-08", f, f"自測 rc={p.returncode}(誠實態只有 {HONEST_RCS}):{tail[0][:70]}")
+    elif runnable:
+        unmeasured.append(
+            {"code": "KILL-08", "path": f"({len(runnable)} 支引擎)",
+             "detail": "沒帶 --run-selftest → 只檢了「有沒有 --selftest」,"
+                       "**rc 誠不誠實這一段沒量**;要量就帶 --run-selftest"})
 
     # 次序有意義:擊斃 > 量不到 > 通過。**量不到永遠不是通過**(fail-closed)。
     if kills:
@@ -463,6 +528,31 @@ def _base_ref(cwd: Path | None = None) -> str | None:
         if rc == 0:
             return r
     return None
+
+
+def resolve_base(base: str | None, cwd: Path | None = None) -> str | None:
+    """把使用者給的 `--base main` 解成**真的跟得上的那一個** ref:先試 `origin/main`,再試 `main`。
+
+    **這一條是這道閘自己實跑時咬出來的,而且跟 KILL-11 是同一個病。**
+    容器裡本地 `main` 停在舊 commit、`origin/main` 已經往前走——
+    於是 `--base main` 的 `main...HEAD` 吐出 **4,518 檔**(把併進來的 89 個 commit
+    全算成「這次的改動」,連別的批動過的收容件都被 KILL-03 擊斃),
+    而 `origin/main...HEAD` 只有 **7 檔**——正好是這次那一個 commit。
+    **一個落後的參照會讓答案整個錯掉**,不管你判得多仔細。
+    """
+    if not base:
+        return None
+    for cand in ((f"origin/{base}", base) if "/" not in base else (base,)):
+        rc, _ = _git(["rev-parse", "--verify", "--quiet", cand], cwd)
+        if rc == 0:
+            return cand
+    return base                            # 兩個都解不開:照原樣交給 git 去報錯(不安靜換掉)
+
+
+def _on_ref(ref: str, path: str, cwd: Path | None = None) -> bool:
+    """這個檔在 `ref` 上存在嗎。"""
+    rc, _ = _git(["cat-file", "-e", f"{ref}:{path}"], cwd)
+    return rc == 0
 
 
 def _tail_on_ref(ref: str, path: str, cwd: Path | None = None) -> int | None:
@@ -512,8 +602,14 @@ def render(d: dict) -> str:
         out.append(f"  [債] {t['code']} {t['path']} · {t['detail']}")
     for u in d.get("unmeasured", []):
         out.append(f"  [量不到] {u['code']} {u['path']} · {u['detail']}(量不到不是通過)")
+    un = {u["code"] for u in d.get("unmeasured", [])}
     if d["state"] == "PASS":
         out.append(f"  {len(CLAUSES)} 條全過(既有債 {len(d['debts'])} 筆另記)")
+    elif d["state"] == "PARTIAL":
+        # **不准說「全過」。** 沒量到的那幾條要點名——
+        #   「其餘都過」配著一條沒量過的條款,就是把分母偷偷變小(L57)。
+        out.append(f"  {len(CLAUSES) - len(un)}/{len(CLAUSES)} 條量過且全過 · "
+                   f"{len(un)} 條沒量到({'、'.join(sorted(un))})—— 量不到不是通過")
     return "\n".join(out)
 
 
@@ -708,9 +804,12 @@ def selftest() -> int:
                   ["config", "user.name", "t"]):
             _git(a, r3)
         (r3 / "m").mkdir()
-        (r3 / "m" / "E_ENG010_Q_v0100.py").write_text("x = 1\n", encoding="utf-8")
+        # 帶 `--selftest` 字樣:新的 KILL-08「有沒有 --selftest」是**永遠檢**的,
+        #   夾具若不帶,這一格會被 KILL-08 擊斃,量不到 KILL-11 的 PARTIAL(夾具的事,不是規則的事)
+        _ST = '"--selftest"\n'
+        (r3 / "m" / "E_ENG010_Q_v0100.py").write_text("x = 1\n" + _ST, encoding="utf-8")
         _git(["add", "-A"], r3); _git(["commit", "-qm", "b"], r3)
-        (r3 / "m" / "E_ENG010_Q_v0101.py").write_text("y = 1\n", encoding="utf-8")
+        (r3 / "m" / "E_ENG010_Q_v0101.py").write_text("y = 1\n" + _ST, encoding="utf-8")
         d_un = judge(cwd=r3)
         chk("⑱ KILL-11 **量不到 ≠ 通過**:沒有 main/master 可比時,這一條記進 `unmeasured`,"
             "整體降成 PARTIAL(rc2),**不准報 PASS**。"
@@ -729,8 +828,61 @@ def selftest() -> int:
             d11["state"] in ("ABSENT", "NODATA") and d11["rc"] != 0,
             f"({d11['state']} rc={d11['rc']})")
 
-    # ⑪ 條款表一份(Zero-Hydra)
+    # ⑲–㉓:Codex 審查(PR #121)抓出的四個 fail-open + 本閘實跑咬出的落後基線,逐條正負控。
+    #   四個都是「出事就放行」—— 那比沒有閘更糟,所以一條都不能只修不釘。
     src = Path(__file__).read_text(encoding="utf-8")
+    _G = "VIA_NET" + "_CONSENT"
+    consent_cases = [
+        (f'+{_G} = "YES"', True, "裸賦值"),
+        (f'+os.environ["{_G}"] = "YES"', True, "os.environ 形(本樹最常見)"),
+        (f'+cfg = {{"{_G}": "YES"}}', True, "dict 形"),
+        (f'+os.environ.setdefault("{_G}", "YES")', True, "setdefault 形"),
+        (f'+if os.environ.get("{_G}", "") == "YES":', False, "讀取比較(負控)"),
+        (f'+if os.environ["{_G}"] == "YES":', False, "讀取比較(負控)"),
+    ]
+    consent_bad = [w for l, want, w in consent_cases
+                   if bool(_CONSENT_GRANT_RX.search(l)) != want]
+    chk("⑲ Codex P1:KILL-07 要認得**本樹最常見的那個寫法**。實測舊式漏判三種:"
+        "os.environ 形(鍵後面先是引號再是 `]`)、dict 冒號形、setdefault 逗號形 —— "
+        "**最該擋的那個寫法正好過**,那是 fail-open。而讀取比較不是賦值,不得誤判",
+        not consent_bad, "(六形全對)" if not consent_bad else f"(錯 {consent_bad})")
+
+    talib_cases = [("+import ta" + "lib", True, "import"),
+                   ("+from ta" + "lib import RSI", True, "from-import(舊式漏判)"),
+                   ("+x = ta" + "lib.RSI(c)", True, "屬性呼叫")]
+    talib_bad = [y for l, w, y in talib_cases if bool(_TALIB_RX.search(l)) != w]
+    chk("⑳ Codex P2:KILL-06 要認得 `from ta·lib import RSI` —— 那個寫法既不含 `import ta·lib` "
+        "也不含 `ta·lib.`,舊式三條分支一條都不中,禁用的相依可以大方走進來",
+        not talib_bad, "(三形全中)" if not talib_bad else f"(錯 {talib_bad})")
+
+    chk("㉑ Codex P1:KILL-08 **拆兩段,而且沒跑的那一段不准當過**。舊版把整條關在 "
+        "`--run-selftest` 後面,而兩個生產接法都沒帶那個旗標(格子站空參數、報告頁只給 --json)"
+        "—— 於是這條條款在真判時從來沒生效過,render 還印「11 條全過」。那是我自己的閘在報假綠。"
+        "現在:『有沒有 --selftest』永遠檢;『rc 誠不誠實』沒跑就記 unmeasured 降 PARTIAL",
+        "永遠檢,不吃旗標" in src and '"code": "KILL-08"' in src
+        and "量不到不是通過" in src)
+
+    trace_cases = [("本令取代批240,因由:…", True, "取代批NNN(強痕)"),
+                   ("ruled_by: 操作員", True, "ruled_by(強痕)"),
+                   ("(批736 操作員令)", True, "批號+泛詞同句(算痕)"),
+                   ("這支引擎的表頭寫著操作員令,跟這次改動無關", False,
+                    "**泛詞單獨出現**(負控:舊式在這裡放行,KILL-10 就實質失效)")]
+    trace_bad = [y for t, w, y in trace_cases if bool(_TRACE_RX.search(t)) != w]
+    chk("㉒ Codex P1:KILL-10 的留痕證據要**這次新增的行**、而且點得出批號或 ruled_by。"
+        "舊式拿 `操作員令` 這種表頭常見詞去搜**整份檔** —— 任何表頭有那三個字的引擎,"
+        "刪掉釘住的 chk 都自動放行,那條條款實質失效",
+        not trace_bad and "added_lines(f, base, cwd)" in src,
+        "(四形全對)" if not trace_bad else f"(錯 {trace_bad})")
+
+    chk("㉓ 本閘實跑咬出來的:`--base main` 要解成**跟得上的那一個** ref(先 `origin/main` 再 `main`)。"
+        "容器本地 main 停在舊 commit,`main...HEAD` 吐出 4,518 檔 —— 把併進來的 89 個 commit "
+        "全算成「這次的改動」,連別的批動過的收容件都被 KILL-03 擊斃;"
+        "`origin/main...HEAD` 只有 7 檔,正好是這次那一個 commit。"
+        "**一個落後的參照會讓答案整個錯掉,不管你判得多仔細** —— 跟 KILL-11 同一個病",
+        "def resolve_base" in src and "resolve_base(base, cwd)" in src
+        and 'f"origin/{base}"' in src)
+
+    # ⑪ 條款表一份(Zero-Hydra)
     chk("⑪ 條款寫在 CLAUSES 一份,render/judge/自測都讀它(Zero-Hydra:抄第二份=第二顆會漂移的頭)",
         len(CLAUSES) == 11 and 'CLAUSES[code][2]' in src and 'len(CLAUSES)' in src,
         f"(條款 {len(CLAUSES)} 條)")

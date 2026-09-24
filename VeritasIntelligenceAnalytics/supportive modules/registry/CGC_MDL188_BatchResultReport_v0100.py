@@ -394,6 +394,19 @@ def selftest() -> int:
         len(d["rows"]) == 5 and all(r.get("state") in STATE_RANK for r in d["rows"]),
         f"({[r['state'] for r in d['rows']]})")
 
+    # ⑨ Codex P2:承諾的 rc3 要**真的走得到**
+    import subprocess as _sp
+    import tempfile as _tf
+    _ro = Path(_tf.mkdtemp()) / "nodir"
+    _ro.write_text("我是一個檔,不是夾", encoding="utf-8")   # 讓 mkdir(parents) 必炸
+    _p = _sp.run([sys.executable, str(Path(__file__)), "--out", str(_ro / "sub" / "r.html")],
+                 capture_output=True, text=True, timeout=900)
+    chk("⑨ Codex P2:檔頭承諾「連頁都寫不出來 → rc3」,那條路要**真的走得到**。"
+        "原版 `build()` 會在 mkdir/write 當場拋例外、`d` 還沒賦值,整支以未捕捉例外結束(rc1)"
+        "—— 呼叫端因此分不出「報告不在」與「報告說有紅」。承諾了就要走得到",
+        _p.returncode == 3 and "rc3" in (_p.stdout + _p.stderr),
+        f"(rc={_p.returncode})")
+
     # ⑧ rc 不是總判(非循環)
     #   初版用 `split("def main(")[1]` 取 main 的碼——那串字在本檔出現**兩次**
     #   (第二次就是我這格檢自己寫的那個字面),於是切到的是我自己這格的條文,檢當場咬到自己。
@@ -431,7 +444,15 @@ def main() -> int:
     if "--selftest" in a or "--self-test" in a:
         return selftest()
     out = a[a.index("--out") + 1] if "--out" in a and len(a) > a.index("--out") + 1 else None
-    d = build(Path(out) if out else None)
+    # Codex 審查(PR #121 P2):檔頭承諾「連頁都寫不出來 → rc3」,但 `build()` 會在
+    #   `mkdir` / `write_text` 當場拋例外,`d` 根本還沒賦值——整支以未捕捉例外結束(rc1),
+    #   **承諾的 rc3 那條路永遠到不了**。呼叫端因此分不出「報告不在」與「報告說有紅」。
+    #   承諾了就要走得到:寫不出來就回 3,並把因由印出來(不是靜靜吞掉)。
+    try:
+        d = build(Path(out) if out else None)
+    except Exception as exc:
+        print(f"[B736 報告] ABSENT rc3 · 頁寫不出來:{type(exc).__name__}: {exc}")
+        return 3
     if "--json" in a:
         print(json.dumps({k: v for k, v in d.items() if k != "rows"} |
                          {"rows": [{kk: vv for kk, vv in r.items()

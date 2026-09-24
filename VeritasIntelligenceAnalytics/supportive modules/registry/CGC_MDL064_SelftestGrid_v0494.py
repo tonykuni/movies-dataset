@@ -3,7 +3,8 @@
 r"""
 v0493→v0494(批736 操作員令「更新模組或修正模組都要有嚴格的把關擊斃較機制」+「最後實測要 HTML U/I 結果報告」):
   **+4 站**:CGC_MDL187_ModuleChangeKillGate v0100 兩站 · CGC_MDL188_BatchResultReport v0100 兩站。
-  擊斃閘十八檢 rc0 + 實判 nodata_ok;報告頁七檢 rc0 + 實跑 nodata_ok。
+  擊斃閘**廿三檢** rc0 + 實判 nodata_ok;報告頁**九檢** rc0 + 實跑 nodata_ok。
+  (檢數含 Codex 審查 PR #121 抓出的四個 fail-open 各一格正負控,加本閘實跑咬出的落後基線一格,與報告頁承諾的 rc3 走不到一格。)
   **這一版的重點是第十一條條款,而它是本批自己付的學費**:本線在一個落後 89 個 commit 的基線上
   做完一整批,開的 `VRN_ENG073_v0137` 撞上 main 上別的批做的同名 v0137(main 已到 v0138),
   而本批要做的「目標價與前一日價換 ADJ CLOSE」——批729 就交付了、批730 還拿真料修得更對。
@@ -2970,7 +2971,7 @@ def battery(fast: bool):
         newest("CGC_MDL183_CeleritasPolicyGate_v*.py", HERE), [], "rc0", 420)
 
     # ── 批736 操作員令:模組更新/修正的把關擊斃閘 + HTML U/I 實測結果報告 ──────
-    add("模組更新擊斃閘十八檢(批736 操作員令「更新模組或修正模組都要有嚴格的把關擊斃較機制」;"
+    add("模組更新擊斃閘廿三檢(批736 操作員令「更新模組或修正模組都要有嚴格的把關擊斃較機制」;"
         "CGC_MDL187:**擊斃 ≠ 報告**——中一條款就 rc1,不是印一行紅字讓改動照樣進去。"
         "十一條條款逐條正負成對,其中四件事是**這道閘咬到自己**咬出來的:"
         "**①KILL-11 基線時效**(本批在落後 89 個 commit 的基線上做完一整批,開的 v0137 撞上 main 上"
@@ -2981,7 +2982,16 @@ def battery(fast: bool):
         "全遮會把同意閘的放行值遮瞎成 fail-open,全不遮會把說明判成違規)· "
         "**④git diff 從來不列未追蹤檔**(新出一支 _vNNNN 正是最該攔的一類)· "
         "另:**棘輪**(既有撞號記債不擊斃,否則第一天把樹擋死然後這閘會被關掉)· "
-        "**fail-closed**(量不到回 ABSENT/PARTIAL,**絕不回 PASS**;本倉單子上就有一個 fail-open 的同意閘 #67))",
+        "**fail-closed**(量不到回 ABSENT/PARTIAL,**絕不回 PASS**;本倉單子上就有一個 fail-open 的同意閘 #67)· "
+        "**Codex 審查 PR #121 又抓出四個 fail-open**,全部修掉並各補正負控:"
+        "①KILL-11 只問 HEAD → 提交後帶 --base 跑(接進 CI 唯一會走的那條路)永不觸發;"
+        "改成 HEAD 與基線兩邊都問——只問基線又漏掉『我新造的撞上基線已有的』,那正是本批犯的那一種 · "
+        "②KILL-08 整條關在 --run-selftest 後面,而兩個生產接法都沒帶那旗標 → 真判時從來沒生效,"
+        "render 還印「11 條全過」= 我自己的閘在報假綠;現在『有沒有 --selftest』永遠檢、"
+        "『rc 誠不誠實』沒跑就記 unmeasured 降 PARTIAL · "
+        "③KILL-07 漏 os.environ 形(本樹最常見)與 dict/setdefault 形 · "
+        "④KILL-10 拿 `操作員令` 這種表頭常見詞搜整份檔 → 表頭有那三個字的引擎刪釘住的 chk 都自動放行。"
+        "另加一格 ㉓:`--base main` 撞上落後的本地 main,判的檔數差 645 倍(4,518 vs 7))",
         newest("CGC_MDL187_ModuleChangeKillGate_v*.py", HERE), ["--selftest"], "rc0", 600)
 
     add("模組更新擊斃實判(批736;CGC_MDL187 拿**當下的改動**真判一次:工作區+暫存區+未追蹤三處都看。"
@@ -2989,7 +2999,7 @@ def battery(fast: bool):
         "找不到預設分支參照時 KILL-11 記 unmeasured 降 rc2)",
         newest("CGC_MDL187_ModuleChangeKillGate_v*.py", HERE), [], "nodata_ok", 600)
 
-    add("批次實測結果報告頁七檢(批736 操作員令「最後實測要 HTML U/I 結果報告」;CGC_MDL188:"
+    add("批次實測結果報告頁九檢(批736 操作員令「最後實測要 HTML U/I 結果報告」;CGC_MDL188:"
         "報告裡每一個數字都在產頁當下**現場量**(自測真跑、擊斃閘真判、ADJ 對照真用 duckdb 算),"
         "**①總判取最差那一格不取平均**(四綠一紅=RED;把五格裡的四格綠平均成「大致綠」就是假綠)· "
         "**②量不到的格子要留在表上寫 ABSENT,不是從表上消失**(省略了量不到那幾格的報告會比實況漂亮;L57)· "
