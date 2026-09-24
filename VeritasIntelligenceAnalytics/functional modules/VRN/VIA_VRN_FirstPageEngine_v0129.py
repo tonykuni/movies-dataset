@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 r"""
+v0128→v0129(批732 操作員截圖 20251128兆豐訪談速報-神達(3706) 第 4 頁季度損益表;原擬 v0128——LL334 掃到側線 claude/upbeat-feynman-1uurww 已有 v0128(批708 刪死碼),改號 v0129 並把那一刀一併帶上,兩條線誰先併都不丟):括號或季尾的基準記號讀不出來——
+  `2025(F)` / `25Q4(F)` / `26Q1(F)` / `25Q4F` 整欄回 None(期間與基準都丟)。parse_period 在**原本所有規則都讀不出**的時候,
+  剝下尾端的 (A)/(E)/(F) 或季後直接接的 A/E/F,讀剩下的部分、把基準帶回;已經讀得出的寫法一個都不改道(+㊷)。
+
 v0127→v0128(批708 全景代讀量到 DUPDEF 1):第 3807 行的 _esc 被第 3984 行同名定義蓋掉=死碼。刪掉前者;行為零變更(自測 42 OK/11 FAIL 前後一致,11 FAIL 為本境缺料既有)。
 v0126→v0127(批689B 缺料不是壞掉 L16):㊳ 全庫 sidecar 回歸在**0 份 sidecar 的境**(容器/新境)以前判 FAIL(真的跑過 0/0 份)
   → 現在印 [NODATA] 並 rc2;有 sidecar 才真驗(工作站 66 份)。其餘一字不動。
@@ -1979,6 +1983,15 @@ def parse_period(tok):
         y = int(m.group(1))
         return out("year", str(y if y >= 1000 else _yy_to_year(y)),
                    _BASIS[m.group(2).upper()])
+
+    # 批732:基準寫在括號裡或直接接在季後 —— 2025(F) / 25Q4(F) / 26Q1(E) / 25Q4F。只在上面全部讀不出時才走這裡:
+    # 剝下記號、讀剩下的部分;剩下的是年或季才算數(日期、月份不吃括號基準),基準照記號帶回。
+    m = re.fullmatch(r"(.+?)\s*\(\s*([AEF])\s*\)", s, re.I) or re.fullmatch(r"(.*Q\s*[1-4])([AEF])", s, re.I)
+    if m:
+        inner = parse_period(m.group(1))
+        if inner["kind"] in ("year", "quarter"):
+            inner.update(raw=tok, basis=_BASIS[m.group(2).upper()])
+            return inner
 
     return out(None, None)
 
@@ -6273,7 +6286,20 @@ def selftest() -> int:
         not _bad66,
         f"(七例全中)" if not _bad66 else f"(不符 {_bad66})")
 
-    print(f"  [計] 四十一檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}"
+    # ㊷ 批732:括號基準的表頭(操作員截圖:兆豐 神達 3706 季度損益表)
+    _p42 = {t: parse_period(t) for t in ("2025(F)", "25Q4(F)", "26Q1(E)", "25Q4F", "2024(A)", "2025F", "25Q1", "1Q25", "12/24A")}
+    _want42 = {"2025(F)": ("year", "2025", "forecast"), "25Q4(F)": ("quarter", "2025-Q4", "forecast"),
+               "26Q1(E)": ("quarter", "2026-Q1", "estimate"), "25Q4F": ("quarter", "2025-Q4", "forecast"),
+               "2024(A)": ("year", "2024", "actual"), "2025F": ("year", "2025", "forecast"),
+               "25Q1": ("quarter", "2025-Q1", None), "1Q25": ("quarter", "2025-Q1", None),
+               "12/24A": ("month", "2024-12", "actual")}
+    _bad42 = {t: (_p42[t]["kind"], _p42[t]["period"], _p42[t]["basis"]) for t, w in _want42.items()
+              if (_p42[t]["kind"], _p42[t]["period"], _p42[t]["basis"]) != w}
+    chk("㊷ 括號或季尾的基準記號(批732 操作員截圖 兆豐 神達 3706 季度損益表):2025(F) / 25Q4(F) / 26Q1(E) / 25Q4F "
+        "讀得出期間與基準;原本讀得出的 2025F / 25Q1 / 1Q25 / 12/24A 一個都不改道",
+        not _bad42, "(九例全中)" if not _bad42 else f"(不符 {_bad42})")
+
+    print(f"  [計] 四十二檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}"
           + (" · NODATA 1(㊳ 無 sidecar)" if _nodata45 else ""))
     return 1 if fails else (2 if _nodata45 else 0)     # 批689B:缺料 rc2,不是壞
 

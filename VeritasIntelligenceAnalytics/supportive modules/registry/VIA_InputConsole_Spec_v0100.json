@@ -1916,6 +1916,24 @@
          "--status"
         ]
        }
+      },
+      {
+       "id": "vdf_sentiment_macro",
+       "zh": "情緒總經四管道(VDF_MDL003 v0100;側線 2026-09-23 治理版:閘關 rc4 · FRED 鑰只印末四碼 · 季資料 YoY 期數 · CNN Referer · AAII .xls 引擎;與 ENG074(FRED)· ENG055(CNN)重疊見掉球)",
+       "engine": {
+        "dir": "functional modules/VDF",
+        "glob": "VDF_MDL003_SentimentMacroEngine_v*.py",
+        "verb": []
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": true,
+       "outputs": [
+        "<BASE_DIR>/1-4-SentimentMacro/VDF_MDL003_SentimentMacro.duckdb"
+       ],
+       "timeout": 3600
       }
      ]
     },
@@ -2653,6 +2671,25 @@
          "--write-duckdb"
         ]
        }
+      },
+      {
+       "id": "vdf_financial_model",
+       "zh": "財務模型(VDF_MDL006 v0100;側線 2026-09-23 復役治理版:閘關 rc4 · 有料才算 ok · 三表依期末日對期 · 季表真年增+季增 · 殖利率單位 · 跨幣別留空 · --tickers 依台股名冊定 .TW/.TWO;批182 讓位封存的那一支,與 ENG082/055/059/060 重疊見掉球)",
+       "engine": {
+        "dir": "functional modules/VDF",
+        "glob": "VDF_MDL006_FinancialModel_v*.py",
+        "verb": []
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": true,
+       "outputs": [
+        "<BASE_DIR>/1-6-FinancialModel/VDF_MDL006_FinancialModel.duckdb",
+        "<BASE_DIR>/1-6-FinancialModel/charts/<t>_pe_band.html"
+       ],
+       "timeout": 3600
       }
      ]
     },
@@ -3373,6 +3410,25 @@
          "--status"
         ]
        }
+      },
+      {
+       "id": "vdf_yf_universe",
+       "zh": "yfinance 全宇宙(VDF_MDL002 v0100;側線 2026-09-23 治理版:閘一委派統包 gate_state,閘關 rc4 零出網零寫;逐代號增量(晚收盤市場補得回來)· 零新列 rc2 不重存 · 失敗代號記名 · 不代裝套件 rc3 · --help/未知旗標不觸網;輸出為本支私有 CSV/Parquet(1-3-YFinanceUniverse),與 ENG066/ENG054/ENG077 重疊見掉球)",
+       "engine": {
+        "dir": "functional modules/VDF",
+        "glob": "VDF_MDL002_YFinanceFetchingEngine_v*.py",
+        "verb": []
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": true,
+       "outputs": [
+        "<BASE_DIR>/1-3-YFinanceUniverse/YFinanceData.parquet",
+        "<BASE_DIR>/1-3-YFinanceUniverse/ETF_FlowSignals.parquet"
+       ],
+       "timeout": 3600
       }
      ],
      "matrix_source": "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json",
@@ -4372,7 +4428,7 @@
      "items": [
       {
        "id": "vdf_system",
-       "zh": "VDF 子系統管理對接口(側線 2026-09-21;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 橋/工具面(所有 PY 接加速器 · 真擷取走網路工具;尺=CGC_MDL124)+ 交接/紀錄;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照;verb=status 唯讀,test_verb=--selftest;側線 2026-09-21 d +launch 啟動就緒:家族境 python+必要庫(尺 MDL137/136)· 同意閘只讀 · 啟動器/短令/鏈 · via_boot_update.sh↔.ps1 同鏈 · 上次實跑 · 下一步卡;rc 0 可啟動/4 閘未開/3 境缺/1 壞)",
+       "zh": "VDF 子系統管理對接口(側線 2026-09-21;上接 VIA/VCGC,下管 政策·邏輯·因子·參數 四庫 + 引擎面 + 橋/工具面(所有 PY 接加速器 · 真擷取走網路工具;尺=CGC_MDL124)+ 交接/紀錄;自適應連結:現解尾版/現算 sha/現量年齡;零網路;預設只讀;sync --apply 才落快照;verb=status 唯讀,test_verb=--selftest;側線 2026-09-21 d +launch 啟動就緒:家族境 python+必要庫(尺 MDL137/136)· 同意閘只讀 · 啟動器/短令/鏈 · via_boot_update.sh↔.ps1 同鏈 · 上次實跑 · 下一步卡;rc 0 可啟動/4 閘未開/3 境缺/1 壞);側線 2026-09-23 v0104 +閘二三把尺(字面 YES/統包 gate_state/套件字串)· 視窗限量(VIA_HIST_LIMIT 與啟動器還原)· 增量目錄新鮮度(委派 ENG089 catalog_freshness)· 其他擷取引擎治理態",
        "engine": {
         "dir": "functional modules/VDF",
         "glob": "VDF_SystemManager_v*.py",
@@ -4388,8 +4444,29 @@
        "outputs": [
         "VIA_Reports/vdf_system/VDF_SYSTEM_latest.json",
         "VIA_Reports/vdf_system/VDF_SYSTEM_latest.md",
-        "VIA_Reports/vdf_system/VIA_VDF_SystemManager_v0103.html",
+        "VIA_Reports/vdf_system/VIA_VDF_SystemManager_v0104.html",
         "VIA_Reports/vdf_system/LEDGER.tsv"
+       ],
+       "timeout": 300
+      },
+      {
+       "id": "vdf_launch_console",
+       "zh": "VDF 一鍵啟動台(VDF_ENG093 v0100;側線 2026-09-23 操作員令「一個指令含進入環境一件開啟 VDF · 先跳出 HTML 問要不要改參數 · 然後看到資料庫狀況」;一鍵腳本 Open-VIA-VDF-v*.ps1(點源)/ 雙擊 Open-VIA-VDF.cmd:ask 本機頁(127.0.0.1 · 一次性權杖 · 同源送出;參數預設讀自啟動器)→ Invoke-VIA-VdfFetch 尾版 → status 資料庫狀況頁(委派 CGC_MDL123 目錄 · CGC_MDL153 分類燈 · VDF_ENG089 缺口);同意閘只讀不寫;verb=status 只讀目錄,test_verb=--selftest)",
+       "engine": {
+        "dir": "functional modules/VDF",
+        "glob": "VDF_ENG093_LaunchConsole_v*.py",
+        "verb": [
+         "status"
+        ]
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vdf_console/VDF_DB_STATUS_latest.html",
+        "VIA_Reports/vdf_console/VDF_DB_STATUS_latest.json"
        ],
        "timeout": 300
       }
@@ -7490,6 +7567,24 @@
         ],
         "unexposed": []
        }
+      },
+      {
+       "id": "via_ssot_link",
+       "zh": "SSOT 正則·同義字連動口(VCGC v0126 第四扇門;側線 2026-09-23;逐格委派正主:規則樞紐 SUP_MDL749 · 增補橋 VRN_ENG088 · 同義聯集 CGC_MDL176 · 全冊編譯 CGC_MDL169 · 正則清冊 CGC_MDL115 · 陸券清除 CGC_MDL177;verb=ssot 只讀零寫;ssot plan 零寫規劃;ssot plan --apply 只委派正主寫;ssot verify 驗收;黃=待操作員裁定)",
+       "engine": {
+        "dir": "supportive modules/registry",
+        "glob": "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+        "verb": [
+         "ssot"
+        ]
+       },
+       "test_verb": [
+        "--selftest"
+       ],
+       "params": [],
+       "net": false,
+       "outputs": [],
+       "timeout": 600
       }
      ]
     },

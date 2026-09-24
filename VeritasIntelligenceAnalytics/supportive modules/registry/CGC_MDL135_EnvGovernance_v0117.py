@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0114→v0115(批708 全景代讀量到 DUPDEF 1):第 368 行的 core_whitelist 被第 3587 行同名定義蓋掉,前者是死碼。刪掉前者;執行期本來就只用後者,行為零變更(自測 53/53 前後一致)。
+v0116→v0117(批734 全景代讀量到 DUPDEF 1;原 PR #104 修在 v0115,main 已升 v0116 改號重套):第 373 行的 core_whitelist 被第 3592 行同名定義蓋掉=死碼。刪掉前者;執行期本來就只用後者,行為零變更(自測輸出前後逐行相同)。
+v0114→v0116(批733 掉球 Z190;v0115 已被舊分支 upbeat-feynman 的批708 用掉 → LL334 跳號):八樞紐附加模組改號
+  CGC_MDL135_EnvGovernance_8Hub_v0100.py → CGC_MDL186_EnvGovernance_8Hub_v0100.py(它跟本族同號 MDL135,唯一接觸口閘 CGC_MDL157
+  「engine numbers are unique per family」報新撞號,格子唯一的紅)。本版只改 eight-hub 動詞的載入處:照尾版律 glob
+  CGC_MDL186_EnvGovernance_8Hub_v*.py 取尾版(舊版寫死 v0100 檔名);找不到照舊誠實停 rc2。其餘一字不動。
+
 
 v0113→v0114(批696:L19 與 RunGate 互指的死結——一道閘把自己的產物當成了自己的前提):
   apply --approve 回「BLOCKED 25 · 零動作」;RunGate 黃的唯一理由是「家族境未見」,
@@ -4000,7 +4005,7 @@ def do_tools(rest: list) -> int:
 KNOWN_FLAGS = {"--offline", "--online", "--quiet", "--workers", "--task-timeout", "--rounds", "--roots", "--env-root", "--base-python", "--env",
                "--apply", "--roster", "--tool-env", "--sheet-only",
                "--approve", "--approve-remove", "--only", "--only-kind", "--open", "--no-open", "--install-plan", "--to", "--baseline", "--execute", "--from",
-               "--limit", "--json", "--selftest", "--help", "-h"}
+               "--limit", "--json", "--base-changed-ok", "--no-tools", "--selftest", "--help", "-h"}
 
 
 def unknown_flags(args: list) -> list:
@@ -4297,6 +4302,13 @@ def main() -> int:
         return do_conflicts(rest)
     if verb == "tools":
         return do_tools(rest)
+    if verb == "eight-hub":
+        _hubs = sorted(REG.glob("CGC_MDL186_EnvGovernance_8Hub_v*.py"))   # v0116(Z190):改號後照尾版律取
+        ext = _load_by_path("VIA_env_eight_hub", _hubs[-1]) if _hubs else None
+        if ext is None:
+            print("[eight-hub] 附加檢查模組缺失或無法匯入，停止執行")
+            return 2
+        return ext.run(sys.modules[__name__], rest)
     if verb == "run":
         return do_run(rest, "run")
     if verb in ("panorama", "scan"):

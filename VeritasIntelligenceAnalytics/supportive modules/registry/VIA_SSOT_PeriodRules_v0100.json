@@ -1,0 +1,132 @@
+{
+  "schema": "VIA.SSOT.PeriodRules.v1",
+  "title": "期別規則正本:哪一欄是日期 · 值長什麼樣 · 哪張表是月/季表、何時到期 · 哪些庫表已凍結不計燈",
+  "origin": "側線 2026-09-24(主線批號由併線的手指定 L25);操作員令「走檢查好 SSOT REGEX 同義字 邏輯庫 · 全景式分析三回發現錯誤所在 · 不毀壞系統 · 不產生九頭龍風險」",
+  "canonical_source": "supportive modules/SUP_MDL753_VIACommonUtils_v0105.py 的 period_lag() / date_columns() / roc_to_iso() 讀本冊;冊外不得另寫日期欄清單或期別換算(LL442)",
+  "only_add": true,
+  "merge_order": "本冊 → 讀冊的正典函式 → 呼叫端;呼叫端只取結果,不自帶規則",
+  "states": {
+    "LAG_DAYS": "日頻:今天 − 最新日(天);與 v0105 之前各處的算法一致,零行為變更",
+    "PERIOD_DUE": "月/季表:下一期的法定公告期限已過幾天(未到期=0)",
+    "FROZEN": "凍結的鏡像庫或舊暫存表:照列,不計分類燈",
+    "LABEL": "期別標籤(Q3 · CY2026 · 26Q4 · 2027):是報告期別,不是抓取新鮮度,不算天數",
+    "UNPARSED": "值認不出日期形狀:誠實不算,不猜",
+    "EMPTY": "沒有值"
+  },
+  "date_columns": {
+    "as_given": {
+      "CGC_MDL123_DataHome_v0103._DATE_COLS": ["date", "trade_date", "obs_date", "period", "dt", "as_of", "ts"],
+      "CGC_MDL139_InputConsole_v0110.status()": ["date", "obs_date", "as_of", "asof_date", "ym", "published"]
+    },
+    "corrected": ["date", "trade_date", "obs_date", "as_of", "asof_date", "period", "ym", "published", "dt", "ts", "data_date", "datadate", "asof", "portfolio_date", "holding_date", "ymd"],
+    "corrected_why": "兩份清單各缺對方有的欄:MDL123 沒有 ym,月營收三表(tw_monthly_revenue 等)在目錄裡量不到最新日 → 工作站 2026-09-24 狀況頁「營收 NODATA」;MDL139 沒有 trade_date/period/dt/ts。聯集只增不減",
+    "corrected_add_2": "第二次全樹普查(見 census)補六欄,接在尾端、不動前十欄順序:data_date(ENG073)· datadate(ENG089)· asof(MDL119)· portfolio_date(ENG087 · MDL119;VDF_ENG051 v0103 holdings_daily / holdings_changes 唯一的日期欄——沒有它這兩張表永遠量不到新鮮度)· holding_date(MDL119;VDF_ENG085 VATETF 來源欄名,對映到 portfolio_date)· ymd(MDL128)。其中 data_date · datadate · asof · ymd 倉內查無建表語句(git grep 2026-09-24),照收是為了日後那幾支遷過來時一欄都不丟",
+    "primary_first_rule": "既有讀者照舊先認自己原本那份(已量得到的表,日期欄一個都不換),原本一欄都認不到時才用聯集補——只增不減,不改既有量測",
+    "record_only": ["ts", "snapshot_at", "run_at"],
+    "record_only_why": "ts 是寫入時間戳,不是資料日(VDF_ENG089 v0101 RECORD_DATE_COLS 同判);snapshot_at · run_at 同類:VDF_ENG051 v0103 寫 datetime.now()(active_tw_etf_universe.snapshot_at · fetch_status.run_at)。補位(fallback)一律跳過這三欄;snapshot_at · run_at 不進 corrected——進了,MDL123 v0104 的補位會把它們當資料日(那支不跳 record_only)。ts 留在 corrected 是因為 MDL123 原份就有它(primary-first 照舊)",
+    "fallback_rule": "補位欄 = corrected − 讀者自己那份 − record_only,照 corrected 序;正典 SUP_MDL753 v0106 fallback_date_columns(own) 是唯一實作,讀者不自己做差集",
+    "census": {
+      "swept": "側線 2026-09-24:AST 掃全樹尾版 2025 支 .py(references/intake 除外),找「字串常值的 tuple/list/set 且過半是日期欄名」;第一回門檻 ≥3 名 · 第二回 ≥2 名",
+      "why": "v0100 本冊只記了兩份(MDL123 · MDL139),實際在 VDF/VIA 碼裡是九份——第一批寫冊前沒有普查就下「兩份」的結論(LL443:量測,不是推理)",
+      "in_scope": {
+        "supportive modules/registry/CGC_MDL123_DataHome_v0104.py:86": {"cols": ["date", "trade_date", "obs_date", "period", "dt", "as_of", "ts"], "use": "資料家目錄 max/min(表序比對)", "state": "BOUND v0104(補位讀正典)· v0105 補位差集改呼叫正典 fallback_date_columns(不再私算)、最早/最新日排除哨兵列(sentinel_where)"},
+        "supportive modules/registry/CGC_MDL139_InputConsole_v0110.py:1335": {"cols": ["date", "obs_date", "as_of", "asof_date", "ym", "published"], "use": "主控台 status 每表最新日與滯後(清單序比對)", "state": "BOUND v0111(補位 + 滯後讀正典)"},
+        "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py:86": {"cols": ["date", "as_of", "published", "trade_date", "data_date"], "use": "架構冊盤點 lag_days(表序、大小寫敏感)", "state": "BOUND v0101(補位 + 滯後讀正典)"},
+        "supportive modules/registry/CGC_MDL148_EngineBus_v0130.py:1010": {"cols": ["date", "trade_date", "obs_date", "period", "dt", "as_of", "ts"], "use": "匯流排庫況普查:跨度(span)判薄,不是滯後", "state": "BOUND v0131(側線 2026-09-24 第三段):日期欄與哨兵交給 CGC_MDL123 v0105 table_stat(本檔不再自帶一份);跨度兩端用正典 period_bounds(月表以月初到月底計,立規則的前提已在正典 v0107)"},
+        "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0101.py:309": {"cols": ["date", "obs_date", "trade_date", "dt", "ts", "datadate"], "use": "增量擷取閘:日頻缺日(週末不算)", "state": "BOUND v0102(側線 2026-09-24 第三段):補位讀正典;冊上月/季表(cadence_of)改照下一期法定期限判(period_lag),不再逐日比;寫入時間欄 = 自帶 ts ∪ 冊 record_only"},
+        "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0102.py:140": {"cols": ["date", "trade_date", "obs_date", "portfolio_date", "snapshot_at", "as_of"], "use": "市場清單治理:表的 min/max", "state": "BOUND v0103(側線 2026-09-24 第三段):補位讀正典;最早/最新日排除哨兵列;只剩哨兵列=NODATA;拿掉哨兵後量到起日規則少寬限,補 7 天(START_GRACE_DAYS)"},
+        "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v0105.py:154": {"cols": ["date", "asof_date", "snapshot_at", "obs_date", "trade_date", "dt"], "use": "覆蓋閘欄位別名 COL_ALIASES['date'](逐字比對)", "state": "BOUND v0106(側線 2026-09-24 第三段):Date 別名 = 自帶 ∪ 正典補位欄;roster 價表排除哨兵列;revenue 月份讀 period_bounds(v0105 切字串十到十二月全錯)、冊上月表讀 period_lag"},
+        "supportive modules/registry/CGC_MDL119_SystemAPI_v0105.py:183": {"cols": ["date", "asof", "trade_date", "ym", "portfolio_date", "holding_date", "published", "snapshot_at", "run_at", "as_of"], "use": "系統 API 家表", "state": "BOUND v0106(側線 2026-09-24 第三段):自帶那份照舊先認,認不到才用正典補位欄;最早/最新日排除哨兵列(只剩哨兵列=空白)"},
+        "supportive modules/registry/CGC_MDL128_SystemCharter_v0101.py:156": {"cols": ["date", "trade_date", "dt", "ymd"], "use": "系統憲章 max_date(跨表字串取大)", "state": "BOUND v0102(側線 2026-09-24 第三段):補位讀正典;跨表比期末日(period_bounds)不比字串(8 碼贏 ISO · 民國永遠輸 · 標籤 Q3 贏所有日期,三件一起修);標籤不猜記 note;最新日排除哨兵列"}
+      },
+      "out_of_scope": {
+        "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0105.py:163": "API 回包 JSON 鍵(walk 找年月鍵),不是庫表日期欄",
+        "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0101.py:125": "併表時的欄名別名(ALIASES['date'] 把外來欄正規化成 date)——屬同義字那條道(成功② 兩道不混),不是滯後判讀",
+        "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0112.py:916/934/953": "INSERT 欄序(published, metric, period, value),不是日期欄判讀",
+        "supportive modules/ssot/SUP_MDL700_StockreportIncrementalOutputStoreV029ssot1d.py:124": "VRN 報告庫(report_date);VRN 線",
+        "functional modules/VAP/VeritasAutoPlot_v42_EcoSystem/engine/vdf_connector.py:668/996": "VAP 資料框欄名偵測;VAP 線",
+        "Celeritas / SUP_MDL630 · SUP_MDL592 PriceFetch / SUP_MDL515 / GroupIndex / VDF_MDL006": "記憶體資料框欄名(yfinance 'Date' 索引等)或打分啟發式,不是庫表",
+        "VIA_RetiredEngines/* · VAP/ASSETS/SCOPE_COPY/* · VRN_MDL218 副本": "退役或封存副本"
+      }
+    }
+  },
+  "value_shapes": {
+    "ISO_DATE": {"rx": "^\\d{4}-\\d{2}-\\d{2}", "example": "2026-09-23"},
+    "COMPACT_DATE": {"rx": "^20\\d{6}$", "example": "20260923"},
+    "ROC_COMPACT": {"rx": "^1[01]\\d{5}$", "example": "1150913", "why": "TWSE openapi t187ap47_L「出表日期」;工作站 2026-09-24 etf_book 最新值 1150913 就是這個形狀(ENG055 v0111 原樣落表)"},
+    "ROC_SLASH": {"rx": "^\\d{2,3}/\\d{1,2}/\\d{1,2}$", "example": "115/09/23", "why": "TPEX www 回包 tables[].date"},
+    "ROC_WORDS": {"rx": "\\d{2,3}\\s*年\\s*\\d{1,2}\\s*月\\s*\\d{1,2}\\s*日", "example": "115年09月23日"},
+    "YYYYMM": {"rx": "^\\d{6}$", "example": "202608", "why": "tw_monthly_revenue.ym(VDF_ENG063/ENG075 皆以 ym[:4]/ym[4:6] 讀)"},
+    "YYYY_MM": {"rx": "^\\d{4}-\\d{2}$", "example": "2026-08"},
+    "ROC_YM": {"rx": "^\\d{5}$", "example": "11507", "canon": "SUP_MDL753 v0106 roc_ym → 'YYYYMM'(月 1–12、民國 80–200 年;字串裡的數字取出來 5 或 6 碼)", "why": "MOPS openapi t187ap05_L「資料年月」· CBC a13rate.xls 年月欄;全樹兩份私有(VDF_ENG063 _roc_ym · VDF_ENG055 L10 內嵌),側線 2026-09-24 第二段兩支同批改綁"},
+    "LABEL": {"rx": "^(Q[1-4]|CY\\d{4}|FY\\d{2,4}|\\d{2}Q[1-4]|\\d{4}Q[1-4]|\\d{4})$", "example": "Q3 · CY2026 · 26Q4 · 2027", "why": "工作站 2026-09-24 逐表:factset_earnings 最新 Q3、vrn_report_* 最新 26Q4 / 2027——是期別不是日期"}
+  },
+  "cadences": {
+    "monthly_revenue": {
+      "tables_rx": "^(tw_monthly_revenue|monthly_revenue_analysis|etf_revenue_momentum|etf_revenue_holdings)$",
+      "period": "month",
+      "due": {"next_month_day": 10},
+      "canonical_source": "上市櫃公司每月營業額應於次月 10 日前申報公告(證券交易法第 36 條第 1 項第 3 款)",
+      "why": "工作站 2026-09-24:營收整類 NODATA——ym=YYYYMM 算不出天數;就算硬算月底天數,8 月營收在 9/24 是能拿到的最新一期,9 月營收 10/10 才到期"
+    },
+    "quarterly_statements": {
+      "tables_rx": "^(tw_financial|tw_financial_mops)$",
+      "period": "quarter",
+      "due": {"03-31": "05-15", "06-30": "08-14", "09-30": "11-14", "12-31": "+1y-03-31"},
+      "canonical_source": "上市櫃公司財報公告期限:第一季 5/15 · 第二季 8/14 · 第三季 11/14 · 年報次年 3/31(證券交易法第 36 條)",
+      "why": "工作站 2026-09-24:財報 RED 最壞滯後 86 日——最新 2026-06-30 是 Q2 期末,Q3 要 11/14 才到期,不是落後"
+    }
+  },
+  "cadence_candidates": {
+    "tw_rates_cbc": {"state": "候證", "why": "CBC a13rate.xls 月觀測(最新 2026-08-01);公告日沒有正本可引,照日頻算(不立規則;LL443 不用推理代替量測)"},
+    "factset_earnings": {"state": "候證", "why": "值是期別標籤(Q3/CY2026)→ LABEL;抓取新鮮度要另立 fetched_at 規則,本版不做"}
+  },
+  "frozen": {
+    "db_rx": "_repo_[0-9a-f]{6,}\\.duckdb$",
+    "table_rx": "^local_(rest|px|chip)_",
+    "canonical_source": "VDF_ENG079_LocalDbConsolidate 文件:「舊 local_rest__* 表只增不減留存」——改路由後同名正典表接手,舊暫存表不再更新",
+    "why": "工作站 2026-09-24:vdf_tw_market_repo_a7752b3d.duckdb / vdf_global_market_repo_ae7b06f2.duckdb 的表停在 2026-08-25/26,籌碼與宏觀的最壞滯後 30 日都來自這兩本;它們沒有任何引擎在寫,算進燈號會永遠紅"
+  },
+  "sentinel_rows": {
+    "ticker": ["_NOOP_"],
+    "canonical_source": "VDF_ENG054_TWDailyBackfill v0100–v0105:一輪抓到 0 列時往 tw_daily_prices 寫一列 ticker='_NOOP_' date='1900-01-01'(v0106 起不再寫;舊列只增不減照留)",
+    "rule": "量最早日 / 最新日 / 跨度時,排除這幾個 ticker 值的列(列數照算,另記 sentinel 列數);ENG054 · ENG064 · ENG070 · ENG089 早就在自己的 SQL 裡排除,目錄 CGC_MDL123 與匯流排普查 CGC_MDL148 讀本條;側線 2026-09-24 第三段起 市場清單治理 VDF_ENG087 · 覆蓋閘 VDF_ENG090 · 系統 API CGC_MDL119 · 結構總冊 CGC_MDL128 也讀本條。條件一律由正典 sentinel_where 產生(欄先 CAST 成 VARCHAR:整數型 ticker 欄直比字串值 DuckDB 會丟 ConversionException)",
+    "why": "工作站 2026-09-24:日價表最早日顯示 1900-01-01;匯流排普查把跨度算成一百多年(假厚,永遠 GREEN)"
+  },
+  "private_copies_to_migrate": {
+    "note": "同一概念的私有實作(九頭龍帳);只增不減之外的方向:逐支遷到正典後這份清單只減不增",
+    "date_columns": [
+      "CGC_MDL123_DataHome_v0103._DATE_COLS(v0104 改讀本冊)",
+      "CGC_MDL139_InputConsole_v0110.status() 內嵌 tuple(v0111 補位與滯後改讀正典)",
+      "VDF_ENG093_LaunchConsole_v0102.tables_from_catalog() 只認 ISO(v0103 改用 period_lag)",
+      "VDF_ENG073_DataArchitecture_v0100 lag_days(v0101 補位與滯後改讀正典)",
+      "CGC_MDL123_DataHome_v0104 補位差集私算(v0105 改呼叫 fallback_date_columns)",
+      "CGC_MDL148_EngineBus_v0130._tbl_state 內嵌日期欄與 ISO 跨度(v0131 交給 MDL123 table_stat + period_bounds)",
+      "VDF_ENG089_IncrementalFetchGate_v0101 日期欄與逐日缺口(v0102 補位 + 月/季表照期限)",
+      "VDF_ENG087_MarketListGovernance_v0102._date_range(v0103 補位 + 哨兵)",
+      "VDF_ENG090_DataCoverageGate_v0105 COL_ALIASES['date'] · roster 起訖 · revenue 切字串月份(v0106 三處讀正典)",
+      "CGC_MDL119_SystemAPI_v0105._DATE_COLS 之外的補位與哨兵(v0106)",
+      "CGC_MDL128_SystemCharter_v0101 跨表字串取大(v0102 期末日比較 + 補位 + 哨兵)"
+    ],
+    "date_columns_open": "側線 2026-09-24 第三段:census.in_scope 九份全數 BOUND。自帶清單照舊留在各支(先認自己那份,認不到才補位——不是第二顆頭,是讀者的首選);再有新的私有日期欄清單,照 census.swept 的掃法重掃後補登",
+    "roc_date": "全樹 81 支尾版各自做民國年 +1911(側線 2026-09-24 實數);VDF_ENG055_OmniFetch_v0111 一支就有 _iso_date 與 _roc_to_iso 兩份——正典 roc_to_iso 以這兩份為語料,零差異才准遷",
+    "roc_date_2": {
+      "remeasured": "側線 2026-09-24 第二段重量:尾版 2456 支(git ls-files *.py 含未追蹤新檔;同族取版號最大)裡原始碼有 `1911 +` 或 `+ 1911` 算式的 70 支;references/intake 除外 61 支;再除退役(VIA_RetiredEngines)與封存副本(SCOPE_COPY)41 支。第一段記的 81 支當時的算法沒留下,這次重量不出 81——以本條方法為準",
+      "bound": {
+        "VDF_ENG055_OmniFetch_v0113": "六處全綁正典(_iso_date = roc_to_iso_keep · _roc_to_iso = roc_to_iso · L12/L15 三處內嵌改呼叫綁定 · L10 年月改呼叫 roc_ym);第一段說兩份,逐行數是六份",
+        "VDF_ENG063_MonthlyRevenue_v0106": "_roc_ym = roc_ym(正典實作逐字取自本支 v0105;SUP_MDL753 v0106 自測 ㊱ 零差異)",
+        "VDF_ENG055 v0113 L10": "CBC 民國年月五碼改呼叫 roc_ym(本冊 value_shapes 新立 ROC_YM);舊內嵌遇月份 13 會造 2026-13-01,現在跳過"
+      },
+      "canon_changes": "SUP_MDL753 v0106:roc_to_iso 八碼整串比對放寬到 19xx(v0105 ㉖ 的『零差異』語料沒有 19xx,_iso_date('19991231') 給 1999-12-31 而正本回 None);新增 roc_to_iso_keep(認不出=原值,ENG055 _iso_date 語意);㉟ 逐式四類",
+      "focus_group_measured": "側線 2026-09-24 第三段:焦點組尾版十支(VDF_ENG054 · 055 · 056 · 057 · 063 · 064 · 075 · 082 · VRN_ENG070 · 071)逐支量 `1911 +` / `+ 1911` / `- 1911`:只剩 VDF_ENG075 v0102 L148 一處,是西元→民國組 MOPS 網址(反方向,正典沒有也不該為一處立函式)照留具名;ENG055 v0113 · ENG063 v0106 已綁;ENG056 / ENG057 請求網址用西元日、列的日期取自請求的 ISO 日(不從回包換算);ENG064 / ENG082 走 yfinance。焦點組已無待遷的民國換算;其餘 41 支在焦點外,照帳只減不增"
+    }
+  },
+  "ledger": [
+    {"ts": "2026-09-24", "op": "ADD", "what": "本冊 v0100:date_columns · value_shapes · cadences(monthly_revenue · quarterly_statements)· frozen", "evidence": "工作站 2026-09-24 15:17 狀況頁 + VDF_ENG079 文件 + 證券交易法第 36 條公告期限"},
+    {"ts": "2026-09-24", "op": "ADD", "what": "date_columns.census(九份在範圍 · 七類範圍外附因由)· corrected 尾端補六欄 · record_only 補 snapshot_at / run_at · fallback_rule", "evidence": "AST 普查尾版 2025 支;VDF_ENG051 v0103 建表語句(holdings_daily / holdings_changes 只有 portfolio_date;snapshot_at / run_at = datetime.now())"},
+    {"ts": "2026-09-24", "op": "ADD", "what": "private_copies_to_migrate.roc_date_2:重量方法與數字(70/61/41)· ENG055 v0113 六處綁正典 · ENG063 v0106 _roc_ym 綁正典 · value_shapes 立 ROC_YM · 正典 v0106 八碼 19xx · roc_to_iso_keep · roc_ym", "evidence": "SUP_MDL753 v0106 自測 ㉖㉗㉟㊱;VDF_ENG055 v0113 自測 ⑪(變種四支全抓);VDF_ENG063 v0106 自測 ⑨b"},
+    {"ts": "2026-09-24", "op": "ADD", "what": "sentinel_rows:ENG054 舊版空跑哨兵 ticker='_NOOP_' 的排除規則(量最早日/最新日/跨度時排除,列數照算)", "evidence": "VDF_ENG054 v0106 說明與自測 ⑫;工作站 2026-09-24 日價表最早日 1900-01-01"},
+    {"ts": "2026-09-24", "op": "UPDATE", "what": "census.in_scope 七支 TO_MIGRATE → BOUND(MDL123 v0105 · MDL148 v0131 · ENG089 v0102 · ENG087 v0103 · ENG090 v0106 · MDL119 v0106 · MDL128 v0102);sentinel_rows.rule 讀者名單補四支與 CAST 註;private_copies_to_migrate.date_columns 補七條、date_columns_open 改寫為已清空(規則本身一條未刪);private_copies_to_migrate.roc_date_2 補 focus_group_measured(焦點組十支量過,只剩 ENG075 反方向一處)", "evidence": "SUP_MDL753 v0107 自測 39/39;焦點組十支尾版逐行 grep;各支自測 15/15 · 51/51 · 20/20 · 11/11 · 27/27 · 10 OK+3 NODATA(同 v0105 基線)· 10/10;各支改壞測試全抓(側線 2026-09-24 第三段文件)"},
+    {"ts": "2026-09-24", "op": "UPDATE", "what": "cadences.quarterly_statements.tables_rx 加 tw_financial_mops(VDF_ENG082 v0103 交易所 MOPS 彙總財報長表;同一套季別與公告期限,期限一字未改);原有 tw_financial 照舊。新讀者:VDF_ENG082 v0103 讀本規則兩處——季界與期限走正典 period_lag(mops_target:法定期限已過的最近一季)· 季別 1–4 → 季底月日取 quarterly_statements.due 的四個鍵(_mops_qends;鍵不是四個=大聲拋、rc1 零請求),本支不另寫季底表或期別換算(LL442)", "evidence": "VDF_ENG082 v0103 自測 ⑮⑯⑳㉑(逐端點先查庫:該齊那一季的期限之後抓成功過=不抓 · 期限前抓的照抓 · 10/01 仍判齊 · 下一季到期照抓 · 本規則少了季表 → rc1 零請求);資料家目錄量 tw_financial_mops → PERIOD_DUE(due 2026-11-14);側線 2026-09-24 第十三段文件"}
+  ]
+}

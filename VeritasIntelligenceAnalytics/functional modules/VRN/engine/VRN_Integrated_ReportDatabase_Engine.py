@@ -100,8 +100,34 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
-SCHEMA_VERSION = "VRN_SCHEMA_20260921_002"
-ENGINE_VERSION = "v0101"
+SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
+ENGINE_VERSION = "v0106"
+# v0106 (批733; 掉球 Z195 -- the workstation run of 2026-09-24: 7 of 105 PDFs gave "no financial rows"):
+#   tables printed without ruling lines.  (1) the column reader (evidence core) now knows the year-first quarter
+#   headers of the screenshot table (25Q1 / 25Q4(F)), half years and 2024年; before, it saw only 2024 and 2025(F) in
+#   that header and read nothing -- in other layouts it would have put quarter numbers under the year columns.
+#   (2) when the ruled tables and the first four pages still give no income-statement row, later pages are read
+#   too, but only pages whose text looks like an income statement (long initiation reports carry their statements
+#   at the back).  (3) a table read without ruling lines is stored only if it adds up (gate_fallback_tables:
+#   the same identities as v0105); one that does not is left out and named in the report's ValidationIssues as
+#   FIN_TABLE_REJECTED(...).  Ruled tables are unchanged (their failures stay warnings, as in v0105).
+# v0105 (mother 批732; operator's screenshot 2026-09-24 of 20251128兆豐訪談速報-神達(3706) p.4 季度損益表):
+#   that table came out wrong three ways -- (1) quarter headers "25Q1".."26Q1(F)" lost their year (FiscalYear None,
+#   PERIOD_UNCLEAR), (2) "(F)" was not read as a forecast, (3) 營業成本 / 營業費用 had no metric, so both rows were
+#   dropped.  Period headers now go to the mother's parser first (VRN_ENG074 period_parts, the one that already
+#   reads 24Q1 / 25Q1(F) / 2025(F) / 1H25 / FY25); what it cannot parse keeps the rules below.  Metrics: COGS,
+#   OperatingExpense (+ their ratios, so a percentage never becomes an amount), NonOperatingIncome, InterestIncome.
+#   financial_identity_checks(): the table must add up (gross = revenue - cost, operating = gross - expense, four
+#   quarters = the year) within the rounding the printed digits carry -- a read table that does not add up is
+#   named, not trusted.
+# v0104 (mother 批731; operator 2026-09-24「剛剛跑好慢」): process_batch takes an optional args.only_files (file names)
+#   -- the self-test loop's idempotency pass re-ingests a named sample instead of the whole folder; without it nothing
+#   changes.  The evidence core behind the first-page reader now parses each page / appendix once per file version.
+# v0103 (mother 批729; operator 2026-09-24 "所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE"):
+# UpsideDownsidePct is the upside over the LATEST adj close (the mother's L99 through VRN_Evidence_Core.adj_basis ->
+# ENG073 adj_quote); the target and the day-before prices in ADJ CLOSE terms get their own columns (appended only);
+# the page arithmetic (target / printed price) is kept as UpsidePagePct and never promoted when ADJ is missing.
+# The first-page engine gets the file path, so the appendix small print can name the issuer (broker_tier APPENDIX_*).
 # v0101 (auto-test loop 2026-09-21): DOCX/TXT intake, boundary-safe broker/rating/target-price matching,
 # year-band and ETF aware tickers, calendar-validated dates, MM/YY period headers, typed Parquet columns,
 # NaN-safe JSON, VIA_NET consent gate for the optional online name table, first-page engine hook.
@@ -222,6 +248,30 @@ BASICINFO_COLUMNS = [
     "UpdatedAt",
     "RunID",
     "SchemaVersion",
+    # v0102 (2026-09-23, real-report loop + VCGC): appended only, nothing above moved or dropped
+    "RatingKey",
+    "BrokerTier",
+    "BrokerDenied",
+    "PageDate",
+    "FilenameDate",
+    "DateConflict",
+    "AnalystEmail",
+    "CompanyNamePage",
+    "PageCodes",
+    "EvidenceCore",
+    # v0103 (批729, ADJ CLOSE basis): appended only, nothing above moved or dropped
+    "UpsideBasis",
+    "UpsideState",
+    "UpsidePagePct",
+    "TargetPriceAdj",
+    "AdjFactor",
+    "AdjFactorDate",
+    "PrevClose",
+    "PrevCloseAdj",
+    "PrevCloseDate",
+    "CurrentPriceAdj",
+    "LatestAdjClose",
+    "LatestAdjDate",
 ]
 
 # FinancialData 欄位，採 long format。
@@ -288,7 +338,9 @@ BASICINFO_UPSERT_KEYS = ["ReportID"]
 FINANCIALDATA_UPSERT_KEYS = ["FinancialRowID"]
 
 # Parquet needs one type per column: these are numeric (NaN when missing), everything else is text.
-BASICINFO_NUMERIC_COLUMNS = ("TargetPrice", "CurrentPrice", "UpsideDownsidePct", "ConfidenceScore", "MarketCap", "ShareCapital")
+BASICINFO_NUMERIC_COLUMNS = ("TargetPrice", "CurrentPrice", "UpsideDownsidePct", "ConfidenceScore", "MarketCap", "ShareCapital",
+                             "UpsidePagePct", "TargetPriceAdj", "AdjFactor", "PrevClose", "PrevCloseAdj", "CurrentPriceAdj",
+                             "LatestAdjClose")
 FINANCIALDATA_NUMERIC_COLUMNS = (
     "Value", "Scale", "YoY", "QoQ", "PER", "PBR", "EV_EBITDA", "DividendYield", "ROE", "ROA", "Revenue",
     "GrossProfit", "GrossMargin", "OperatingProfit", "OperatingMargin", "NetIncome", "EPS", "TotalAssets",
@@ -347,6 +399,15 @@ METRIC_ALIASES = {
     "MarketCap": ["Market Cap", "市值"],
     "TargetPrice": ["Target Price", "TP", "目標價"],
     "CurrentPrice": ["Current Price", "現價", "股價"],
+    # v0105 (批732): cost and expense rows were dropped whole (no metric).  Only added; the ratios are here so that
+    # 營業費用率 / 營業成本率 (a percentage) never lands in the amount (the longest alias wins).
+    "COGS": ["COGS", "Cost of Revenue", "Cost of Sales", "Cost of Goods Sold", "營業成本", "銷貨成本"],
+    "COGSRatio": ["營業成本率", "銷貨成本率"],
+    "OperatingExpense": ["Operating Expense", "Operating Expenses", "OPEX", "營業費用"],
+    "OperatingExpenseRatio": ["營業費用率", "費用率", "OPEX Ratio"],
+    "NonOperatingIncome": ["營業外收支", "營業外收入及支出", "營業外收入", "業外收支", "業外損益", "Non-operating Income",
+                           "Non-Operating Income"],
+    "InterestIncome": ["利息收入", "Interest Income"],
 }
 
 METRIC_CATEGORY_MAP = {
@@ -374,6 +435,12 @@ METRIC_CATEGORY_MAP = {
     "MarketCap": "Basic Info",
     "TargetPrice": "Valuation",
     "CurrentPrice": "Valuation",
+    "COGS": "Income Statement",
+    "COGSRatio": "Income Statement",
+    "OperatingExpense": "Income Statement",
+    "OperatingExpenseRatio": "Income Statement",
+    "NonOperatingIncome": "Income Statement",
+    "InterestIncome": "Income Statement",
 }
 
 # CSV 編碼。
@@ -634,18 +701,53 @@ def load_synonym_scope(path: Optional[Path], scope: str) -> Dict[str, List[str]]
     return table
 
 
+_FIRST_PAGE_MODULE_CACHE: Dict[str, Any] = {}
+
+
 def optional_import_first_page_engine():
+    """Load VIA_VRN_FirstPageEngine once per process (v0101 re-executed it for every report)."""
     path = find_knowledge_root().get("first_page_engine")
     if not path:
         return None
+    key = str(path)
+    if key in _FIRST_PAGE_MODULE_CACHE:
+        return _FIRST_PAGE_MODULE_CACHE[key]
     try:
         import importlib.util
         spec = importlib.util.spec_from_file_location("via_vrn_first_page_engine", str(path))
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)  # type: ignore[union-attr]
-        return module
     except Exception:
-        return None
+        module = None
+    _FIRST_PAGE_MODULE_CACHE[key] = module
+    return module
+
+
+_EVIDENCE_CORE_CACHE: Dict[str, Any] = {}
+
+
+def optional_import_evidence_core():
+    """VRN_Evidence_Core (same folder as this engine); None when absent."""
+    if "core" in _EVIDENCE_CORE_CACHE:
+        return _EVIDENCE_CORE_CACHE["core"]
+    module = None
+    try:
+        import importlib.util
+        # mother 批728: unique module name, and only the sibling file (an older intake VRN_Evidence_Core.py exists)
+        modname = "vrn_engine_evidence_core"
+        path = Path(__file__).resolve().parent / "VRN_Evidence_Core.py"
+        cached = sys.modules.get(modname)
+        if cached is not None and Path(getattr(cached, "__file__", "") or ".").resolve() == path:
+            module = cached
+        elif path.is_file():
+            spec = importlib.util.spec_from_file_location(modname, str(path))
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[modname] = module
+            spec.loader.exec_module(module)  # type: ignore[union-attr]
+    except Exception:
+        module = None
+    _EVIDENCE_CORE_CACHE["core"] = module
+    return module
 
 # ============================================================
 # def 03_FILENAME_TOKENIZATION_AND_DATE
@@ -1196,9 +1298,70 @@ def extract_document_text_and_zones(path: Path) -> Dict[str, Any]:
     return result
 
 
+COLUMN_TABLE_PAGES = 4      # unruled summary tables are read from the first pages only
+PDF_COLUMN_LATER_MAX = 40   # v0106: ... and, when those give no income-statement row, up to this page (keyword-gated)
+INCOME_METRICS = ("Revenue", "GrossProfit", "OperatingProfit", "NetIncome", "EPS", "PretaxIncome")
+FALLBACK_STRATEGIES = ("COLUMN_ALIGNED", "TRANSPOSED")
+
+
+def _number_cells(table: Dict[str, Any]) -> set:
+    """The numbers printed in a table's body (label column and header left out), as printed minus commas."""
+    rows = table.get("Rows") or []
+    return {str(v).replace(",", "").strip() for row in rows[1:] for v in list(row)[1:]
+            if v and safe_float(str(v)) is not None}
+
+
+def drop_reread_tables(tables: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """v0106 (批733): the column reader also sees the text of a ruled table -- the fallback runs on any page when the
+    ruled tables give no EPS row (the screenshot table has none), and with the quarter headers now read it read that
+    table a second time (72 rows for 36 cells).  A fallback table whose numbers are mostly (>= 60 %) numbers of a
+    ruled table on the same page is the same table read twice: left out."""
+    ruled: Dict[Any, set] = {}
+    for t in tables:
+        if t.get("Strategy") not in FALLBACK_STRATEGIES:
+            ruled.setdefault(t.get("PageNumber"), set()).update(_number_cells(t))
+    out = []
+    for t in tables:
+        if t.get("Strategy") in FALLBACK_STRATEGIES:
+            nums = _number_cells(t)
+            if nums and len(nums & ruled.get(t.get("PageNumber"), set())) >= 0.6 * len(nums):
+                continue
+        out.append(t)
+    return out
+
+
+def _has_income_rows(tables: List[Dict[str, Any]]) -> bool:
+    """v0106: does any table already give an income-statement row (the trigger for reading later pages)?"""
+    try:
+        probe = parse_financial_tables_to_records(tables, {"ReportID": "probe", "FileID": "probe"}, "probe")
+    except Exception:  # noqa: BLE001 -- an unparseable probe counts as "no rows": the later pages are read
+        return False
+    return any(r.get("MetricName") in INCOME_METRICS for r in probe)
+
+
 def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     if path.suffix.lower() == ".pdf":
-        return extract_pdf_tables(path)
+        tables = extract_pdf_tables(path)
+        # v0102: sell-side summary tables rarely carry ruling lines.  When the ruled tables yield no EPS row,
+        # the evidence core reads column-aligned and transposed tables ('12/25E 12/26E', '會計年度 … 每股盈餘').
+        try:
+            probe = parse_financial_tables_to_records(tables, {"ReportID": "probe", "FileID": "probe"}, "probe")
+        except Exception:
+            probe = []
+        if not any(r.get("MetricName") == "EPS" for r in probe):
+            core = optional_import_evidence_core()
+            if core is not None:
+                try:
+                    tables += core.pdf_column_tables(str(path), COLUMN_TABLE_PAGES)
+                except Exception as exc:  # graceful: ruled tables stay as they are
+                    print(f"[WARN] column tables failed: {path.name} -> {exc}", file=sys.stderr)
+                # v0106 (批733 Z195): still no income-statement row -> later pages, the ones whose text looks like one
+                if callable(getattr(core, "pdf_column_tables_later", None)) and not _has_income_rows(tables):
+                    try:
+                        tables += core.pdf_column_tables_later(str(path), COLUMN_TABLE_PAGES, PDF_COLUMN_LATER_MAX)
+                    except Exception as exc:  # graceful, as above
+                        print(f"[WARN] later-page column tables failed: {path.name} -> {exc}", file=sys.stderr)
+        return drop_reread_tables(tables)
     if extracted and extracted.get("tables"):
         return list(extracted["tables"])
     return []
@@ -1363,6 +1526,7 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
     long_text = normalize_unicode_text(text)
     fragments = [normalize_unicode_text(f) for f in (company_fragments or [])]
     matches: List[Dict[str, str]] = []
+    core = optional_import_evidence_core()      # mother 批728: the one deny gate (overlay deny_keys + CGC_MDL177)
     for broker, aliases in broker_alias.items():
         ordered = [normalize_unicode_text(a) for a in sorted(aliases, key=len, reverse=True) if normalize_unicode_text(a)]
         token_match = None
@@ -1370,6 +1534,8 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
             for idx, h in enumerate(haystacks):
                 if h in fragments and h.lower().startswith(alias.lower()):
                     continue        # company fragment after the code: 中信 inside 中信金 is not the broker
+                if core is not None and core.deny_shadowed(alias, h):
+                    continue        # denied name, or inside a longer denied name (中信 in 中信證券): never a broker
                 if alias_hits(alias, h):
                     token_match = {"broker": broker, "alias": alias, "hit": "token", "index": str(idx)}
                     break
@@ -1379,6 +1545,8 @@ def match_broker_from_tokens_and_text(chinese_tokens: Sequence[str], english_tok
             matches.append(token_match)
             continue
         for alias in ordered:                       # pass 2: page text, longest alias first
+            if core is not None and core.deny_shadowed(alias, long_text):
+                continue
             if alias_hits(alias, long_text):
                 matches.append({"broker": broker, "alias": alias, "hit": "text", "index": "999"})
                 break
@@ -1567,9 +1735,51 @@ def extract_current_price(text: str) -> Optional[float]:
 
 
 def calculate_upside_downside(target: Optional[float], current: Optional[float]) -> Optional[float]:
+    """Page arithmetic: target / printed price (v0103 keeps it as UpsidePagePct; the upside itself is ADJ)."""
     if target is None or current is None or current == 0:
         return None
     return round((target / current - 1.0) * 100.0, 4)
+
+
+def adj_upside_columns(tw_ticker: str, report_date: str, target_price: Optional[float],
+                       current_price: Optional[float], db: Optional[str] = None) -> Dict[str, Any]:
+    """v0103 (批729): the ADJ CLOSE columns of one report.  UpsideDownsidePct = the upside over the latest adj close
+    (VRN_Evidence_Core.adj_basis -> ENG073 adj_quote); CurrentPriceAdj = the printed price x the same adj factor;
+    UpsidePagePct = the page arithmetic.  When ADJ is missing the cells stay empty and UpsideState says why."""
+    page = calculate_upside_downside(target_price, current_price)
+    cols: Dict[str, Any] = {"UpsideDownsidePct": "", "UpsideBasis": "ADJ_LATEST", "UpsideState": "",
+                            "UpsidePagePct": page if page is not None else ""}
+    for col in ("TargetPriceAdj", "AdjFactor", "AdjFactorDate", "PrevClose", "PrevCloseAdj", "PrevCloseDate",
+                "CurrentPriceAdj", "LatestAdjClose", "LatestAdjDate"):
+        cols[col] = ""
+    core = optional_import_evidence_core()
+    if core is None or not hasattr(core, "adj_basis"):
+        cols["UpsideState"] = "ADJ_NO_CORE"
+        return cols
+    try:
+        q = core.adj_basis(tw_ticker or None, report_date or None, target_price, db=db, page_price=current_price)
+    except Exception as exc:  # graceful by design
+        cols["UpsideState"] = f"ADJ_ERROR({exc.__class__.__name__})"
+        return cols
+    fac = q.get("adj_factor")
+
+    def cell(value: Any) -> Any:
+        return "" if value is None else value
+
+    cols.update({
+        "UpsideDownsidePct": cell(q.get("upside_adj")),
+        "UpsideState": q.get("state") or "",
+        "TargetPriceAdj": cell(q.get("target_price_adj")),
+        "AdjFactor": cell(round(fac, 6) if fac is not None else None),
+        "AdjFactorDate": q.get("adj_factor_date") or "",
+        "PrevClose": cell(q.get("price_prev_close")),
+        "PrevCloseAdj": cell(q.get("price_prev_adj")),
+        "PrevCloseDate": q.get("price_prev_date") or "",
+        "CurrentPriceAdj": cell(round(current_price * fac, 4) if (current_price and fac) else None),
+        "LatestAdjClose": cell(q.get("price_latest_adj")),
+        "LatestAdjDate": q.get("price_latest_date") or "",
+    })
+    return cols
 
 # ============================================================
 # def 08_FINANCIAL_TABLE_EXTRACTION
@@ -1683,10 +1893,28 @@ def infer_unit_and_scale(metric_raw: str, table_context: str) -> Tuple[str, str,
     return unit, currency, scale
 
 
+def _period_from_eng074(raw: str) -> Optional[Dict[str, Any]]:
+    """v0105 (批732): the mother's reading of one header cell (VRN_ENG074 period_parts, through the evidence core --
+    one period parser for the VRN), in this engine's columns; None = the local rules below decide."""
+    core = optional_import_evidence_core()
+    p = core.period_parts(raw) if core is not None and callable(getattr(core, "period_parts", None)) else None
+    if not p:
+        return None
+    quarter = f"Q{p['fiscal_quarter']}" if p.get("fiscal_quarter") else (f"H{p['half']}" if p.get("half") else "")
+    return {"PeriodType": p["period_type"], "FiscalYear": p.get("fiscal_year"), "FiscalQuarter": quarter,
+            "EstimateFlag": {"E": "Estimate", "F": "Estimate", "A": "Actual"}.get(str(p.get("estimate") or "").upper(), "")}
+
+
 def parse_period_label(label: str) -> Dict[str, Any]:
     raw = normalize_unicode_text(label)
     result = {"PeriodType": "", "FiscalYear": None, "FiscalQuarter": "", "EstimateFlag": "", "PeriodLabelRaw": raw}
     if not raw:
+        return result
+    canon = _period_from_eng074(raw)
+    if canon is not None:
+        if not canon["EstimateFlag"] and ("預估" in raw or "估" in raw or "FORECAST" in raw.upper() or "ESTIMATE" in raw.upper()):
+            canon["EstimateFlag"] = "Estimate"
+        result.update(canon)
         return result
     upper = raw.upper()
     if re.search(r"(?<![A-Z])(TTM|LTM)(?![A-Z])", upper):
@@ -1818,6 +2046,68 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
     return records
 
 
+IDENTITY_RULES = (
+    ("GrossProfit", "Revenue", "COGS", "毛利 = 營收 − 營業成本"),
+    ("OperatingProfit", "GrossProfit", "OperatingExpense", "營業利益 = 毛利 − 營業費用"),
+)
+QUARTER_SUM_METRICS = ("Revenue", "COGS", "GrossProfit", "OperatingExpense", "OperatingProfit", "PretaxIncome",
+                       "NetIncome", "InterestIncome")
+
+
+def _printed_step(value_raw: Any) -> float:
+    """The last printed digit of a cell ("61,360" -> 1, "5.12" -> 0.01): the rounding the table itself carries."""
+    m = re.search(r"\.(\d+)", str(value_raw or ""))
+    return 10.0 ** -len(m.group(1)) if m else 1.0
+
+
+def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """v0105 (批732): does one report's extracted table add up?  In each table column: gross profit = revenue - cost
+    and operating profit = gross profit - operating expense; in each table: four quarters = the year, for the flow
+    items.  Tolerance = half a last printed digit per number involved (the table's own rounding) -- nothing looser.
+    A cost printed as a negative number counts by its size.  A check runs only when every number it needs was
+    read; nothing is filled in.  Returns counts, the failures in words, and two plain counts that say whether the
+    period headers were read: quarter/half rows without a year, and rows marked as a forecast."""
+    checks: List[Dict[str, Any]] = []
+    columns: Dict[Tuple[Any, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in records:
+        if r.get("MetricName") and isinstance(r.get("Value"), (int, float)):
+            columns.setdefault((r.get("TableID"), r.get("ColumnIndex")), {}).setdefault(r["MetricName"], r)
+    for (table, _col), m in sorted(columns.items(), key=lambda kv: (str(kv[0][0]), str(kv[0][1]))):
+        for target, left, right, rule in IDENTITY_RULES:
+            if target in m and left in m and right in m:
+                got, expected = m[target]["Value"], m[left]["Value"] - abs(m[right]["Value"])
+                tol = 0.5 * sum(_printed_step(m[k].get("ValueRaw")) for k in (target, left, right)) + 1e-9
+                checks.append({"rule": rule, "table": table, "period": m[target].get("PeriodLabelRaw", ""),
+                               "got": got, "expected": round(expected, 6), "tol": tol, "ok": abs(got - expected) <= tol})
+    groups: Dict[Tuple[Any, str, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in records:
+        if r.get("MetricName") in QUARTER_SUM_METRICS and r.get("FiscalYear") and isinstance(r.get("Value"), (int, float)):
+            key = "FY" if r.get("PeriodType") == "FY" else (r.get("FiscalQuarter") if r.get("PeriodType") == "FQ" else "")
+            if key:
+                groups.setdefault((r.get("TableID"), r["MetricName"], r["FiscalYear"]), {}).setdefault(key, r)
+    for (table, metric, year), g in sorted(groups.items(), key=lambda kv: (str(kv[0][0]), kv[0][1], str(kv[0][2]))):
+        if "FY" in g and all(q in g for q in ("Q1", "Q2", "Q3", "Q4")):
+            parts = [g[q] for q in ("Q1", "Q2", "Q3", "Q4")]
+            total = sum(p["Value"] for p in parts)
+            tol = 0.5 * sum(_printed_step(p.get("ValueRaw")) for p in parts + [g["FY"]]) + 1e-9
+            checks.append({"rule": f"{metric} 四季和 = 全年", "table": table, "period": str(int(year)),
+                           "got": g["FY"]["Value"], "expected": round(total, 6), "tol": tol,
+                           "ok": abs(g["FY"]["Value"] - total) <= tol})
+    failed = [c for c in checks if not c["ok"]]
+    return {"checked": len(checks), "passed": len(checks) - len(failed), "failed": failed,
+            "periods_unclear": sum(1 for r in records if r.get("PeriodType") in ("FQ", "FH") and not r.get("FiscalYear")),
+            "estimate_rows": sum(1 for r in records if r.get("EstimateFlag") == "Estimate")}
+
+
+def _plain(x: float) -> str:
+    return f"{int(round(x)):,}" if abs(x - round(x)) < 1e-9 else f"{x:,.4f}".rstrip("0").rstrip(".")
+
+
+def identity_failure_text(check: Dict[str, Any]) -> str:
+    return (f"{check['rule']} · {check['period']} · 表 {check['table']}:印 {_plain(check['got'])} · "
+            f"算 {_plain(check['expected'])}(差 {_plain(abs(check['got'] - check['expected']))},容許 {_plain(check['tol'])})")
+
+
 def find_best_header_row(rows: List[List[str]]) -> Optional[int]:
     best_idx = None
     best_score = -1
@@ -1892,17 +2182,40 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
     target_price = extract_target_price(first_page_text + "\n" + top_zone_text)
     target_scenarios = extract_target_price_scenarios(first_page_text + "\n" + top_zone_text)
     current_price = extract_current_price(first_page_text + "\n" + top_zone_text)
-    upside = calculate_upside_downside(target_price, current_price)
     tri_code = tri_code_verdict(filename_ticker_candidates, page_ticker_candidates)
     first_page_engine = run_first_page_engine(pdf_path, source_filename)
-    if first_page_engine:
+    fn_ticker = next((c.get("ticker", "") for c in filename_ticker_candidates if c.get("ticker")), "")
+    fn_date = filename_date_candidates[0].get("date", "") if filename_date_candidates else ""
+    fn_broker, _fn_cands, _fn_matches = match_broker_from_tokens_and_text(
+        token_info.get("chinese_tokens", []), token_info.get("english_tokens", []), "", broker_alias, company_fragments)
+    ev = evidence_from_core(pdf_path, source_filename, first_page_engine, fn_ticker, fn_date, fn_broker, broker_alias)
+    if ev and not ev.get("error"):
+        # v0102: one rule set with the first-page engine; the v0101 values stay in EvidenceJson (append-only)
+        legacy = {"tw_ticker": tw_ticker, "report_date": report_date, "broker": broker, "rating": rating,
+                  "target_price": target_price, "current_price": current_price, "report_type": report_type, "tri_code": tri_code}
+        report_type = ev.get("type") or report_type
+        if report_type == "STOCK":
+            if ev.get("ticker"):
+                tw_ticker = ev["ticker"]
+        else:
+            tw_ticker = ""                          # NOT_APPLICABLE: industry / market / macro / ETF / event report
+        ticker_row = ticker_lookup.get(tw_ticker, {}) if tw_ticker else {}
+        page_yf = next((c.get("raw", "") for c in ev.get("page_codes", []) if c.get("core") == tw_ticker and c.get("kind") == "yfinance"), "")
+        yf_ticker = (page_yf.upper() if page_yf else "") or ticker_row.get("YF_TICKER", "") if tw_ticker else ""
+        broker = ev.get("broker") or ""
+        rating = ev.get("rating") or ""
+        target_price = ev.get("tp")
+        current_price = ev.get("cp")
+        report_date = ev.get("page_date") or report_date
+        tri_code = ev.get("tri") or tri_code
+    else:
+        legacy = {}
         if not broker and first_page_engine.get("broker"):
             broker = canonical_broker_key(first_page_engine["broker"])
         if not rating and (first_page_engine.get("rating") or {}).get("canonical"):
             rating = first_page_engine["rating"]["canonical"]
         if target_price is None and (first_page_engine.get("target_prices") or {}).get("primary") is not None:
             target_price = first_page_engine["target_prices"]["primary"]
-            upside = calculate_upside_downside(target_price, current_price)
     confidence, status, validation_issues = score_basicinfo_confidence(
         filename_ticker_candidates,
         page_ticker_candidates,
@@ -1960,7 +2273,7 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         "RatingChange": rating_change,
         "TargetPrice": target_price if target_price is not None else "",
         "CurrentPrice": current_price if current_price is not None else "",
-        "UpsideDownsidePct": upside if upside is not None else "",
+        "UpsideDownsidePct": "",          # v0103: the ADJ upside, filled by adj_upside_columns() below
         "InvestmentThesis": first_non_empty(repaired_sentences[:2])[:800],
         "SourceFormat": pdf_path.suffix.lower().lstrip("."),
         "ReportDateDisplay": report_date.replace("-", "/") if report_date else "",
@@ -1984,7 +2297,83 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         "RunID": run_id,
         "SchemaVersion": SCHEMA_VERSION,
     })
+    # v0103 (批729): the upside is on the latest ADJ close; the page arithmetic stays as UpsidePagePct
+    row.update(adj_upside_columns(tw_ticker, report_date, target_price, current_price))
+    if ev and not ev.get("error"):
+        names = [a.get("name", "") for a in ev.get("analysts", []) if a.get("name")]
+        row.update({
+            "Analyst": " | ".join(names),
+            "AnalystEmail": " | ".join(a.get("email", "") for a in ev.get("analysts", []) if a.get("email")),
+            "RatingFine": ev.get("rating_fine") or row.get("RatingFine", ""),
+            "RatingAction": ev.get("rating_action") or row.get("RatingAction", ""),
+            "RatingKey": ev.get("rating_key") or "",
+            "BrokerTier": ev.get("broker_tier") or "",
+            "BrokerDenied": " | ".join(sorted(str(k) for k in (ev.get("denied") or {}) if k)),
+            "PageDate": ev.get("page_date") or "",
+            "FilenameDate": fn_date or "",
+            "DateConflict": "Y" if ev.get("date_conflict") else "",
+            "CompanyNamePage": ev.get("company_page") or "",
+            "PageCodes": " | ".join(sorted({c.get("core", "") for c in ev.get("page_codes", []) if c.get("core")})),
+            "EvidenceCore": safe_json_dumps({"source": ev.get("source"), "rating_raw": ev.get("rating_raw"),
+                                             "broker_vs_filename": ev.get("broker_vs_filename"), "legacy_v0101": legacy}),
+        })
+        if ev.get("company_page") and ev["company_page"] not in row.get("CompanyNameCandidate", ""):
+            row["CompanyNameCandidate"] = " | ".join(x for x in [ev["company_page"], row.get("CompanyNameCandidate", "")] if x)
+    elif ev:
+        row["EvidenceCore"] = safe_json_dumps({"error": ev.get("error")})
     return row
+
+
+def evidence_from_core(path: Path, source_filename: str, first_page_engine: Dict[str, Any],
+                       filename_ticker: str, filename_date: str, filename_broker: str,
+                       broker_alias: Dict[str, List[str]]) -> Dict[str, Any]:
+    """The shared evidence core's answer for this report: from the first-page hook when it ran (v0103
+    engines carry it), else straight from VRN_Evidence_Core (the F2 fix turns the hook off).  {} if absent."""
+    fp = first_page_engine or {}
+    hook_had_text = bool((fp.get("evidence_core") or {}).get("text_layer"))
+    if fp.get("report_type") and not fp.get("error") and hook_had_text:
+        rating = fp.get("rating") or {}
+        tps = fp.get("target_prices") or {}
+        return {
+            "source": "FIRST_PAGE_HOOK",
+            "type": (fp.get("report_type") or {}).get("type", ""),
+            "ticker": (fp.get("ticker_page") or {}).get("ticker"),
+            "tri": (fp.get("tri_code") or {}).get("verdict", ""),
+            "broker": fp.get("broker") or None,
+            "broker_tier": fp.get("broker_tier") or "",
+            "broker_vs_filename": fp.get("broker_vs_filename") or "",
+            "denied": fp.get("broker_denied") or {},
+            "rating": rating.get("canonical"), "rating_fine": rating.get("fine"), "rating_key": fp.get("rating_key"),
+            "rating_raw": fp.get("rating_raw"), "rating_action": rating.get("action"),
+            "tp": tps.get("primary"), "cp": fp.get("current_price"),
+            "page_date": fp.get("page_date"), "date_conflict": bool(fp.get("date_conflict")),
+            "analysts": fp.get("analysts") or [], "company_page": fp.get("company_name_page"),
+            "page_codes": fp.get("page_codes_core") or [],
+        }
+    core = optional_import_evidence_core()
+    if core is None:
+        return {}
+    try:
+        got = core.document_first_page_lines(str(path))
+        a = core.analyze(source_filename, got["lines"], alias_table=broker_alias, filename_ticker=filename_ticker or None,
+                         filename_date=filename_date or None, filename_broker=filename_broker or None,
+                         text_layer=got["text_layer"])
+    except Exception as exc:
+        return {"error": f"{exc.__class__.__name__}: {exc}"}
+    denied = a.get("broker_vs_filename") == "DENIED"
+    return {
+        "source": "CORE_DIRECT",
+        "type": a["report_type"]["type"], "ticker": a["ticker"].get("ticker"), "tri": a["tri_code"].get("verdict", ""),
+        "broker": a["broker"].get("broker") or (None if denied else (filename_broker or None)),
+        "broker_tier": a["broker"].get("tier", ""), "broker_vs_filename": a.get("broker_vs_filename", ""),
+        "denied": a["broker"].get("denied") or ({filename_broker: 1} if denied else {}),
+        "rating": a["rating"].get("value"), "rating_fine": a["rating"].get("fine"), "rating_key": a["rating"].get("canonical_key"),
+        "rating_raw": a["rating"].get("raw"), "rating_action": a["rating"].get("action"),
+        "tp": a["target_price"].get("value"), "cp": a["current_price"].get("value"),
+        "page_date": a["page_date"].get("iso"),
+        "date_conflict": bool(a["page_date"].get("iso") and filename_date and a["page_date"].get("iso") != filename_date),
+        "analysts": a.get("analysts") or [], "company_page": a.get("company_name"), "page_codes": a.get("page_codes") or [],
+    }
 
 
 def tri_code_verdict(filename_candidates: List[Dict[str, Any]], page_candidates: List[Dict[str, Any]]) -> str:
@@ -2011,7 +2400,11 @@ def run_first_page_engine(path: Path, source_filename: str) -> Dict[str, Any]:
     if module is None:
         return {}
     try:
-        engine = module.FirstPageEngine()
+        engine = _FIRST_PAGE_MODULE_CACHE.get("engine")
+        if engine is None or _FIRST_PAGE_MODULE_CACHE.get("engine_module") is not module:
+            engine = module.FirstPageEngine()
+            _FIRST_PAGE_MODULE_CACHE["engine"] = engine
+            _FIRST_PAGE_MODULE_CACHE["engine_module"] = module
         chars, size = None, (None, None)
         suffix = path.suffix.lower()
         if suffix == ".pdf":
@@ -2022,18 +2415,39 @@ def run_first_page_engine(path: Path, source_filename: str) -> Dict[str, Any]:
             got = None
         if got is not None:
             chars, size = got
-        result = engine.run(source_filename, chars=chars, page_width=size[0], page_height=size[1])
+        # 批729: the file path lets the first-page engine read the appendix small print (issuer when page 1 is weak)
+        result = engine.run(source_filename, chars=chars, page_width=size[0], page_height=size[1],
+                            source_path=str(path) if suffix == ".pdf" else None)
         return {
             "engine": result.get("engine", ""),
             "ticker": result.get("ticker", {}),
             "broker": result.get("broker", ""),
+            "broker_tier": result.get("broker_tier"),
+            "broker_conflict": result.get("broker_conflict"),
             "rating": {k: result.get("rating", {}).get(k) for k in ("canonical", "fine", "scope", "action")},
             "target_prices": result.get("target_prices", {}),
             "current_price": result.get("current_price"),
+            "upside": result.get("upside"),           # v0103 first-page engine v0104: ADJ basis (latest adj close)
+            "upside_page": result.get("upside_page"),
             "tri_code": result.get("tri_code", {}),
             "report_date": result.get("report_date", ""),
             "company_name": (result.get("layout") or {}).get("company_name", ""),
             "xv_filename_vs_page": result.get("xv_filename_vs_page", {}),
+            # v0103 first-page engine: the shared evidence core's answers (absent on older engines)
+            "report_type": result.get("report_type"),
+            "ticker_page": result.get("ticker_page"),
+            "broker_tier": result.get("broker_tier"),
+            "broker_vs_filename": result.get("broker_vs_filename"),
+            "broker_denied": result.get("broker_denied"),
+            "rating_key": (result.get("rating") or {}).get("canonical_key"),
+            "rating_raw": (result.get("rating") or {}).get("raw"),
+            "page_date": result.get("page_date"),
+            "date_conflict": result.get("date_conflict"),
+            "analysts": result.get("analysts"),
+            "company_name_page": result.get("company_name_page"),
+            "page_codes_core": result.get("page_codes_core"),
+            "evidence_core": result.get("evidence_core"),
+            "filename_fields": result.get("filename_fields"),
         }
     except Exception as exc:  # graceful by design
         return {"error": f"{exc.__class__.__name__}: {exc}"}
@@ -2318,6 +2732,21 @@ tr.fail td:first-child {{ border-left:5px solid #dc2626; }}
 # def 13_PROCESSING_PIPELINE
 # ============================================================
 
+def gate_fallback_tables(tables: List[Dict[str, Any]], records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """v0106 (批733 Z195): a table read without ruling lines (column-aligned / transposed) is stored only if it adds
+    up -- the identities of financial_identity_checks, per table.  Returns (the records kept, one line per table
+    left out).  A table with nothing to check is kept (nothing says it is wrong); ruled tables are not gated."""
+    fallback = sorted({t.get("TableID") for t in tables if t.get("Strategy") in FALLBACK_STRATEGIES})
+    drop, rejected = set(), []
+    for tid in fallback:
+        check = financial_identity_checks([r for r in records if r.get("TableID") == tid])
+        if check["failed"]:
+            drop.add(tid)
+            more = f"(另 {len(check['failed']) - 1} 條)" if len(check["failed"]) > 1 else ""
+            rejected.append(f"{tid} " + identity_failure_text(check["failed"][0]) + more)
+    return [r for r in records if r.get("TableID") not in drop], rejected
+
+
 def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]], rating_alias: Dict[str, List[str]], run_id: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     basic = build_basicinfo_record(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
     extracted = None
@@ -2325,10 +2754,54 @@ def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], br
         extracted = extract_document_text_and_zones(pdf_path)
     tables = extract_document_tables(pdf_path, extracted)
     financial = parse_financial_tables_to_records(tables, basic, run_id)
+    financial, rejected = gate_fallback_tables(tables, financial)      # v0106 (批733 Z195)
+    if rejected:
+        issues = [x for x in str(basic.get("ValidationIssues") or "").split(" | ") if x]
+        basic["ValidationIssues"] = " | ".join(issues + ["FIN_TABLE_REJECTED(" + " ; ".join(rejected) + ")"])
     return basic, financial
 
 
 process_one_document = process_one_pdf
+
+
+def batch_pool_results(files: List[Path], ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]],
+                       rating_alias: Dict[str, List[str]], run_id: str) -> Dict[int, Tuple[Any, ...]]:
+    """v0104 (批731): the reports of one batch in worker processes (VRN_BatchPool, sized by the accelerator's thread
+    budget).  {idx: (status, basic | error, financial)} in the batch numbering, progress lines printed as reports
+    finish; {} = everything runs in this process (small batch, VRN_BATCH_WORKERS=1, or the pool could not run --
+    then the unfinished files go through the sequential loop and one line says why)."""
+    todo = [(idx, p) for idx, p in enumerate(files, start=1) if p.suffix.lower() not in OCR_SUFFIXES]
+    here = str(Path(__file__).resolve().parent)
+    try:
+        if here not in sys.path:
+            sys.path.insert(0, here)                 # the workers import the pool by this stable name
+        import VRN_BatchPool as pool
+    except ImportError:
+        return {}
+    workers = pool.workers_for(len(todo))
+    if workers <= 1:
+        return {}
+    done: Dict[int, Tuple[Any, ...]] = {}
+    count = [0]
+
+    def on_done(idx: int) -> None:
+        count[0] += 1
+        print(f"[{count[0]}/{len(files)}] VRN processing: {files[idx - 1].name}")
+
+    for idx, p in enumerate(files, start=1):         # image files are skipped at once; number them first
+        if p.suffix.lower() in OCR_SUFFIXES:
+            done[idx] = ("OCR", None, None)
+            on_done(idx)
+    why = pool.workers_reason(len(todo)) if callable(getattr(pool, "workers_reason", None)) else "VRN_BATCH_WORKERS=1 可改回序跑"
+    print(f"[VRN] 平行池 {workers} 個工作行程({len(todo)} 份;VRN_BatchPool {pool.POOL_VERSION};{why})",
+          file=sys.stderr)
+    try:
+        done.update(pool.map_reports(todo, Path(__file__).resolve(), (ticker_lookup, broker_alias, rating_alias),
+                                     run_id, workers, on_done))
+    except Exception as exc:  # noqa: BLE001 -- the pool is an accelerator, never a gate
+        print(f"[VRN] 平行池中斷,沒跑完的改在本行程序跑:{type(exc).__name__}: {exc!r}"[:220], file=sys.stderr)
+        done = {k: v for k, v in done.items() if v[0] != "OCR"}
+    return done
 
 
 def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
@@ -2347,6 +2820,10 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
     rating_alias = load_rating_alias_ssot(rating_ssot_path)
 
     files = scan_input_files(input_path)
+    only = getattr(args, "only_files", None)
+    if only:                                    # v0104: a named sample (the loop's idempotency pass)
+        keep = {str(name) for name in only}
+        files = [f for f in files if f.name in keep]
     basic_rows: List[Dict[str, Any]] = []
     financial_rows: List[Dict[str, Any]] = []
     checkpoint = {
@@ -2358,16 +2835,29 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
         "SchemaVersion": SCHEMA_VERSION,
     }
 
+    pooled = batch_pool_results(files, ticker_lookup, broker_alias, rating_alias, run_id)   # v0104; {} = in this process
     for idx, pdf_path in enumerate(files, start=1):
-        print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
+        pre = pooled.get(idx)
+        if pre is None:
+            print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
         item = {"path": str(pdf_path), "status": "", "error": ""}
         if pdf_path.suffix.lower() in OCR_SUFFIXES:
             item["status"] = "SKIP_OCR_REQUIRED"
             checkpoint["Files"].append(item)
             write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
             continue
+        if pre is not None and pre[0] == "FAIL":
+            item["status"] = "FAIL"
+            item["error"] = pre[1]
+            print(f"[ERROR] {pdf_path}: {str(pre[1]).splitlines()[0] if pre[1] else ''}", file=sys.stderr)
+            checkpoint["Files"].append(item)
+            write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
+            continue
         try:
-            basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
+            if pre is not None:
+                basic, financial = pre[1], pre[2]
+            else:
+                basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
             basic_rows.append(basic)
             financial_rows.extend(financial)
             item["status"] = "OK"
@@ -2540,6 +3030,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    import logging
+    logging.getLogger("pdfminer").setLevel(logging.ERROR)   # 'Could not get FontBBox …' is noise, not an error
     parser = build_arg_parser()
     args = parser.parse_args(argv)
     try:

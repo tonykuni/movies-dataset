@@ -683,6 +683,32 @@
    ],
    "min_rows": 0,
    "note": "派生層:同 Ticker DELETE+INSERT;parquet 鏡 mega/fin;閘未開=空表非缺陷"
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_financial_mops",
+   "role": "VDF·交易所 MOPS 彙總財報長表(一家 × 一季 × 一科目一列;損益 basis=YTD 年初至今累計 · 資產負債 POINT;單位 仟元/元/股;交易所車道 run --mops;側線 2026-09-24 第十三段)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG082"
+   ],
+   "min_rows": 0,
+   "note": "只增不覆寫(正典 upsert_rows,鍵 code+period+statement+item;同鍵異值照留舊值只報數);交易所 OpenAPI 只給最新一季,歷史靠每季跑一次累積;date=季底日;閘未開=空表非缺陷;損益是累計數,不混進 tw_financial"
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_financial_mops_log",
+   "role": "VDF·交易所 MOPS 彙總財報擷取台帳(每個端點每一趟一列:市場 · 報表 · 業別 · 端點 · 態 OK/BLOCKED/FAIL/DENY/ABSENT/UNSAVED · 幾列幾項 · 期別 · 時間;側線 2026-09-24 第十三段)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG082"
+   ],
+   "min_rows": 0,
+   "note": "紀錄表(fetched_at=寫入時間,不是資料覆蓋);只增(正典 upsert_rows,鍵 source+fetched_at);run --mops 逐端點查它定範圍:空業別只有佔位列、資料表裡沒有痕跡,只能靠它知道「抓成功過」;中斷那一趟不記"
   }
  ]
 }

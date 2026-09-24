@@ -49,10 +49,18 @@ from pathlib import Path
 from typing import Any
 
 PROBE_NAME = "VRN_PanoramaProbe"
-PROBE_VERSION = "v0100"
+PROBE_VERSION = "v0101"
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-ROSTER_TS = PROJECT_ROOT / "src" / "lib" / "via" / "incoming-roster.ts"
-ATTACHMENTS = PROJECT_ROOT / "attachments"
+# v0101(母倉 批728):這支原本住在姊妹倉根(TS 主控台 + attachments/);搬回母倉後那一層不在,
+#   母倉收容夾 VIA_GrokConsole_AuroraAcorn_b383 就是同一個 app 的收容副本(名冊位元相同、十段表相同)——
+#   APP_ROOT 先找倉根,再找收容副本(唯讀,L03 零觸碰);兩處都沒有就照舊指倉根,缺什麼照實報 ABSENT。
+APP_CANDIDATES = (
+    PROJECT_ROOT,
+    PROJECT_ROOT / "supportive modules" / "references" / "intake" / "VIA_GrokConsole_AuroraAcorn_b383",
+)
+APP_ROOT = next((c for c in APP_CANDIDATES if (c / "src" / "lib" / "via" / "incoming-roster.ts").is_file()), PROJECT_ROOT)
+ROSTER_TS = APP_ROOT / "src" / "lib" / "via" / "incoming-roster.ts"
+ATTACHMENTS = APP_ROOT / "attachments"
 MOTHER_INCOMING_DIR = (
     "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics"
     "\\functional modules\\VRN\\input\\incoming"
@@ -533,6 +541,8 @@ def def_probe_environment(repo_root: Path = PROJECT_ROOT, vrn_root: Path | None 
     if vrn_root is not None and vrn_root.resolve() != roots[0].resolve():
         roots.append(vrn_root)
     roots.append(repo_root / "attachments")
+    if ATTACHMENTS.resolve() not in [r.resolve() for r in roots]:
+        roots.append(ATTACHMENTS)          # v0101 母倉:收容副本的 attachments(唯讀)
     modules: dict[str, dict[str, str]] = {}
     for key, pattern, stage in MODULES:
         found = None
@@ -554,9 +564,11 @@ def def_probe_environment(repo_root: Path = PROJECT_ROOT, vrn_root: Path | None 
                 entry["syntax"] = "FAIL " + error.__class__.__name__
         modules[key] = entry
     ssot: dict[str, str] = {}
+    # v0101 母倉:活的冊住在 VRN/knowledge 與 VRN/SSOT(不是倉根 attachments/);先找活冊,再找收容副本
+    ssot_roots = [roots[0], roots[0] / "knowledge", roots[0] / "SSOT"] + roots[1:]
     for fn in SSOT_FILES:
         hit = None
-        for root in roots:
+        for root in ssot_roots:
             candidate = root / fn if root.is_dir() else None
             if candidate is not None and candidate.is_file():
                 hit = candidate

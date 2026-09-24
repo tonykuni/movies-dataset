@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0113→v0114(批708 全景代讀量到 DUPDEF 16):v0113 疊在 v0112 上時整段函式重貼了一份,前面 16 個同名定義全被後面蓋掉=死碼。刪掉前者;執行期本來就只用後者,行為零變更(自測輸出前後逐行相同)。
 v0112→v0113(批691 姊妹倉 VRN 膠囊 c「券商正本對齊」量到:正典鍵對映 ② 對**活表鍵**只中 1/3;疊在 main 的 v0112(批686b 聯集版)上)
   64 件進件檔名走閘路(樞紐 SUP_MDL749.broker_of → 本橋):59/64 有券商,與姊妹倉探針零差——缺 13 件的是無版號的
   vrn_d8b_filename_parser(不在六層鏈上、格子無站),不是本橋。但 Daiwa ×4 回 DAIWASECURITIES、JP ×2 回 J.P.MORGAN:
@@ -214,6 +213,78 @@ _TP_CUES = (re.compile(r"目標價[^\d]{0,14}?(\d[\d,]*\.?\d*)"),
 
 
 # ---------------------------------------------------------------- 收容件
+def intake_home() -> Path | None:
+    hits = sorted(p for p in INTAKE_ROOT.glob(INTAKE_GLOB) if p.is_dir())
+    return hits[-1] if hits else None
+
+
+def _eol_pair(b: bytes) -> tuple:
+    """批546:回 (原始 md5, LF 正規化後 md5)。位元錨要抓的是「內容被換掉」,
+    不是「git 在 Windows 上把 LF 換成 CRLF」——後者是平台行為,不是汙染。"""
+    lf = b.replace(b"\r\n", b"\n")
+    return hashlib.md5(b).hexdigest(), hashlib.md5(lf).hexdigest()
+
+
+def eol_verdict(b: bytes, want_md5: str, want_bytes: int | None = None) -> tuple:
+    """回 (ok, 說法)。三態:位元一致 / 只差行尾(照樣算對) / 內容真的不同(RED)。"""
+    raw, lf = _eol_pair(b)
+    if raw == want_md5:
+        return True, f"md5 {raw[:8]}=錨 · {len(b)}B"
+    if lf == want_md5 or (want_bytes and len(b.replace(b"\r\n", b"\n")) == want_bytes and lf == want_md5):
+        return True, (f"md5 {raw[:8]}≠錨,但**只差行尾**(CRLF;LF 正規化後 {lf[:8]}=錨)"
+                      f" · {len(b)}B vs 錨 {want_bytes}B —— 內容一位元沒變,是 core.autocrlf 幹的")
+    return False, f"md5 {raw[:8]}≠錨 {want_md5[:8]}(LF 正規化後 {lf[:8]} 也不符=內容真的不同)· {len(b)}B"
+
+
+def intake_files(home: Path | None = None) -> list:
+    """批545:收容件夾裡**每一個**同系列檔都列出來(檔名 · 位元 · md5)。
+    多一個不在冊上的檔就會當場現形——不必再從一句 md5 去猜是哪個檔被算到。"""
+    home = home or intake_home()
+    if home is None:
+        return []
+    out = []
+    for f in sorted(home.glob(ENGINE_GLOB)):
+        try:
+            b = f.read_bytes()
+            out.append({"name": f.name, "bytes": len(b), "md5": hashlib.md5(b).hexdigest()})
+        except Exception as exc:
+            out.append({"name": f.name, "bytes": None, "md5": f"讀不了 {type(exc).__name__}"})
+    return out
+
+
+def intake_engine_file(home: Path | None = None) -> Path | None:
+    """批545:**按冊上點名的檔名取**,不再吃 glob 排序。
+    舊寫法 `sorted(glob)[-1]` 有洞:夾裡多一個排在後面的同系列檔(`_3.py`/`_v0101.py`…),
+    它就自動變成「正典」,而那種檔多半未追蹤,git checkout 還救不回來。
+    錨檔不在時才退回 glob 尾版(維持舊行為,但會在 ① 誠實講出來)。"""
+    home = home or intake_home()
+    if home is None:
+        return None
+    named = home / INTAKE_ANCHOR["name"]
+    if named.is_file():
+        return named
+    fs = sorted(home.glob(ENGINE_GLOB))
+    return fs[-1] if fs else None
+
+
+def intake_md5_ok(home: Path | None = None) -> tuple[bool, str]:
+    home = home or intake_home()
+    if home is None:
+        return False, "收容件缺"
+    mans = sorted(home.glob("_INTAKE_MANIFEST_*.json"))
+    f = intake_engine_file(home)
+    if not mans or f is None:
+        return False, "冊或引擎檔缺"
+    try:
+        m = json.loads(mans[-1].read_text(encoding="utf-8"))
+        e = next((x for x in m.get("files", []) if x.get("name") == f.name), None)
+        if not e:
+            return False, f"冊上沒有 {f.name}"
+        return eol_verdict(f.read_bytes(), e.get("md5") or "", e.get("bytes"))   # 批546 行尾無關
+    except Exception as exc:
+        return False, f"冊讀不了 {type(exc).__name__}"
+
+
 # 批541 位元錨:期望值寫死在**程式碼裡**,不是只寫在收容件資料夾的冊裡。
 # 冊跟檔案一起被換掉時,兩邊仍然自洽——那種綠燈只是自己對自己點頭(LL74)。錨放在外面才擋得住。
 INTAKE_ANCHOR = {
@@ -232,11 +303,142 @@ INTAKE_ANCHOR = {
 INTAKE_REL = "functional modules/VRN/references/intake/VIA_VRN_FirstPageEngine_v0101_b522/VIA_VRN_FirstPageEngine_2.py"
 
 
+def intake_restore_hint(r: dict) -> str:
+    """批544:收容件對不上錨時,直接給還原指令——紅燈要能自救,不是丟兩串 md5 給人猜。
+    倉庫裡那份就是錨本身,所以 git checkout 一行就回得來;**本支不代改任何檔**(不代設)。"""
+    if "\u2260" not in str(r.get("anchor", "")):
+        return ""
+    files = intake_files()
+    extra = [x for x in files if x["name"] != INTAKE_ANCHOR["name"]]
+    lines = ["\n     \u6536\u5bb9\u4ef6\u593e\u88e1\u7684\u540c\u7cfb\u5217\u6a94(\u5168\u5217;\u518a\u4e0a\u53ea\u8a8d "
+             + INTAKE_ANCHOR["name"] + "):"]
+    for x in files:
+        mark = "\u2190 \u518a\u4e0a\u9019\u4e00\u500b" if x["name"] == INTAKE_ANCHOR["name"] else "\u2190 \u4e0d\u5728\u518a\u4e0a"
+        lines.append(f"       {x['name']:<40} {x['bytes']}B  {str(x['md5'])[:8]}  {mark}")
+    if extra:
+        lines.append("     \u21b3 \u6551\u6cd5\u4e00(\u4f60\u7684\u624b):\u4e0a\u9762\u6a19\u300c\u4e0d\u5728\u518a\u4e0a\u300d\u7684\u6a94\u662f\u5f8c\u4f86\u653e\u9032\u53bb\u7684,"
+                     "git checkout \u6551\u4e0d\u4e86(\u5b83\u672a\u8ffd\u8e64)\u3002\u8acb\u81ea\u884c\u632a\u8d70\u6216\u522a\u9664\u3002")
+    return "\n".join(lines) + ("\n     \u21b3 \u6551\u6cd5(\u4f60\u7684\u624b,\u4e00\u884c):git checkout -- \"" + INTAKE_REL + "\"\n"
+            "       \u5009\u5eab\u88e1\u90a3\u4efd\u5c31\u662f\u9328(30,115B / d4cdaedf);\u5de5\u4f5c\u7ad9\u9019\u4efd\u88ab\u5c31\u5730\u6539\u904e\u3002\n"
+            "       \u6539\u5b8c\u518d\u8dd1\u4e00\u6b21\u672c\u81ea\u6e2c;\u4ecd\u4e0d\u7b26\u5c31\u628a git status \u90a3\u4e00\u884c\u8cbc\u51fa\u4f86\u3002")
+
+
+def intake_import_ok(home: Path | None = None) -> tuple[bool, dict]:
+    """收容件**導入**驗證(不是「檔案在不在」,是「導得進來、東西都在」)。三段全過才算成立。
+
+    ① 位元錨:檔案 md5/sha256/bytes == 程式碼裡的錨,且錨 == 冊裡的值(三方一致)。
+    ② 真 import:exec_module 真的跑完(不是 importlib.util.find_spec 那種「看得到就算」)。
+    ③ 模組齊全:冊上宣告的 11 項一個不少。
+    回 (ok, 明細);任何一段掛掉都誠實說是哪一段,不含混成一句「收容件有問題」。
+    """
+    A = INTAKE_ANCHOR
+    r = {"anchor": None, "manifest": None, "import": None, "symbols": None, "missing": []}
+    home = home or intake_home()
+    f = intake_engine_file(home) if home is not None else None
+    if f is None:
+        r["anchor"] = "ABSENT:收容件缺"
+        return False, r
+    b = f.read_bytes()
+    md5 = hashlib.md5(b).hexdigest()
+    sha = hashlib.sha256(b).hexdigest()
+    ok_anchor, why_anchor = eol_verdict(b, A["md5"], A["bytes"])      # 批546 行尾無關
+    ok_anchor = ok_anchor and f.name == A["name"]
+    r["anchor"] = why_anchor if f.name == A["name"] else f"檔名不符:{f.name} ≠ 冊上的 {A['name']}"
+    # 冊也要跟錨一致——冊被改寫的那一刻,這裡就會亮
+    ok_man = False
+    mans = sorted(home.glob("_INTAKE_MANIFEST_*.json"))
+    if mans:
+        try:
+            m = json.loads(mans[-1].read_text(encoding="utf-8"))
+            e = next((x for x in m.get("files", []) if x.get("name") == A["name"]), None)
+            ok_man = bool(e) and e.get("md5") == A["md5"] and e.get("sha256") == A["sha256"] and e.get("bytes") == A["bytes"]
+            r["manifest"] = f"{mans[-1].name} {'=' if ok_man else '≠'}錨"
+        except Exception as exc:
+            r["manifest"] = f"冊讀不了 {type(exc).__name__}"
+    else:
+        r["manifest"] = "冊缺"
+    mod, why = load_intake()
+    ok_imp = mod is not None
+    r["import"] = why if ok_imp else f"載不動:{why}"
+    if ok_imp:
+        r["missing"] = [k for k in A["symbols"] if not hasattr(mod, k)]
+        r["symbols"] = f"{len(A['symbols']) - len(r['missing'])}/{len(A['symbols'])}"
+    ok_sym = ok_imp and not r["missing"]
+    return (ok_anchor and ok_man and ok_sym), r
+
+
 _E = {"mod": None, "why": ""}
 
 
+def load_intake():
+    """收容件模組(importlib;零觸碰);缺=None+因由。"""
+    if _E["mod"] is not None or _E["why"]:
+        return _E["mod"], _E["why"]
+    f = intake_engine_file()
+    if f is None:
+        _E["why"] = f"收容件缺:{INTAKE_ROOT / INTAKE_GLOB}"
+        return None, _E["why"]
+    try:
+        spec = importlib.util.spec_from_file_location("via_vrn_firstpage_intake", f)
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["via_vrn_firstpage_intake"] = m
+        spec.loader.exec_module(m)
+        for need in ("TickerFilename", "BrokerRatingDict", "FieldValidation", "CrossValidation", "FinancialValidation", "FirstPageEngine"):
+            if not hasattr(m, need):
+                _E["why"] = f"收容件無 {need}"
+                return None, _E["why"]
+        _E["mod"] = m
+        return m, ""
+    except Exception as exc:
+        _E["why"] = f"收容件載入失敗 {type(exc).__name__}:{str(exc)[:60]}"
+        return None, _E["why"]
+
+
 # ---------------------------------------------------------------- 名冊(VDF tw_listings 唯讀)
+def resolve_vdf_db() -> tuple[Path | None, str]:
+    p = os.environ.get("VIA_DB_VDF_TW_MARKET")
+    if p and Path(p).is_file():
+        return Path(p), "VIA_DB_VDF_TW_MARKET"
+    home = os.environ.get("VIA_DATA_HOME")
+    if home and Path(home).is_dir():
+        hits = sorted(Path(home).rglob("vdf_tw_market.duckdb"))
+        if hits:
+            return hits[0], "VIA_DATA_HOME rglob"
+    if OLD_DB.is_file():
+        return OLD_DB, "舊主路徑 output_hub/mega"
+    return None, "庫缺(先 via-vdffetch / via-datahome)"
+
+
 _R = {"tried": False, "codes": set(), "names": {}, "how": ""}
+
+
+def roster() -> dict:
+    """official_set(四碼)+ 名→碼;庫缺/表缺=空集誠實(命中率打折並標明)。"""
+    if _R["tried"]:
+        return _R
+    _R["tried"] = True
+    db, how = resolve_vdf_db()
+    _R["how"] = how
+    if db is None:
+        return _R
+    try:
+        import duckdb
+        con = duckdb.connect(str(db), read_only=True)
+        try:
+            rows = con.execute("SELECT code, name FROM tw_listings WHERE code IS NOT NULL").fetchall()
+        finally:
+            con.close()
+        for code, name in rows:
+            c = str(code).strip()
+            if len(c) == 4 and c.isdigit():
+                _R["codes"].add(c)
+                n = str(name or "").strip()
+                if len(n) >= 2:
+                    _R["names"][n] = c
+        _R["how"] = f"{how} · tw_listings {len(_R['codes'])} 檔"
+    except Exception as exc:
+        _R["how"] = f"{how} · tw_listings 讀不了 {type(exc).__name__}"
+    return _R
 
 
 # ---------------------------------------------------------------- 橋側防呆
@@ -246,11 +448,119 @@ BROKER_SSOT = VIA / "functional modules" / "VRN" / "registry" / "VRN_BROKER_LIST
 _SSOT = {"tried": False, "table": {}, "how": ""}
 
 
+def ssot_brokers() -> tuple[dict, str]:
+    """券商同義字**正本**=VRN_BROKER_LIST(SUP_MDL015 管的那本;20 家含完整別名)。
+    canonical 用 canonical_en(英文代號),同時收中文 canonical 當別名。缺=空表誠實。"""
+    if _SSOT["tried"]:
+        return _SSOT["table"], _SSOT["how"]
+    _SSOT["tried"] = True
+    if not BROKER_SSOT.is_file():
+        _SSOT["how"] = f"SSOT 缺:{BROKER_SSOT.name}"
+        return {}, _SSOT["how"]
+    try:
+        d = json.loads(BROKER_SSOT.read_text(encoding="utf-8"))
+        rows = d.get("brokers") or d.get("items") or (d if isinstance(d, list) else [])
+        if not rows:
+            rows = [v for k, v in d.items() if isinstance(v, dict) and v.get("aliases")]
+        tbl = {}
+        for b in rows:
+            key = str(b.get("canonical_en") or b.get("canonical") or "").upper().replace(" ", "")
+            if not key:
+                continue
+            al = [str(x) for x in (b.get("aliases") or []) if str(x).strip()]
+            for extra in (b.get("canonical"), b.get("canonical_en")):
+                if extra and str(extra) not in al:
+                    al.append(str(extra))
+            tbl[key] = al
+        _SSOT.update(table=tbl, how=f"{BROKER_SSOT.name} · {len(tbl)} 家 · {sum(len(v) for v in tbl.values())} 別名")
+    except Exception as exc:                                  # noqa: BLE001
+        _SSOT["how"] = f"SSOT 讀不了 {type(exc).__name__}"
+    return _SSOT["table"], _SSOT["how"]
+
+
 _LAYOUT = {"tried": False, "idx": {}, "how": ""}
+
+
+def layout_index() -> tuple[dict, str]:
+    """LAYOUT 工具:收容件 02_layout/logical_layout.json(唯讀)→ {原檔名: {header, body}}。
+    有版面就用版面,沒有才退回「前 N 行當資訊區」(不編造分區)。"""
+    if _LAYOUT["tried"]:
+        return _LAYOUT["idx"], _LAYOUT["how"]
+    _LAYOUT["tried"] = True
+    home = corpus_home()
+    if home is None:
+        _LAYOUT["how"] = "語料收容件缺"
+        return {}, _LAYOUT["how"]
+    lay = home.parent.parent / "02_layout" / "logical_layout.json"
+    if not lay.is_file():
+        _LAYOUT["how"] = "logical_layout.json 缺(退回行數啟發)"
+        return {}, _LAYOUT["how"]
+    try:
+        d = json.loads(lay.read_text(encoding="utf-8"))
+        idx: dict = {}
+        for e in d.get("elements", []):
+            fn = str(e.get("filename") or "")
+            if not fn:
+                continue
+            sub = str(e.get("subtype") or "").upper()
+            txt = str(e.get("text") or "")
+            slot = "header" if sub in ("TITLE", "HEADER", "HEAD", "SUBTITLE") else "body"
+            idx.setdefault(fn, {"header": [], "body": []})[slot].append(txt)
+        _LAYOUT.update(idx={k: {"header": "\n".join(v["header"]), "body": "\n".join(v["body"])} for k, v in idx.items()},
+                       how=f"logical_layout.json · {len(idx)} 檔 · {d.get('element_count')} 元素")
+    except Exception as exc:                                  # noqa: BLE001
+        _LAYOUT["how"] = f"layout 讀不了 {type(exc).__name__}"
+    return _LAYOUT["idx"], _LAYOUT["how"]
 
 
 _NLPH = {"tried": False, "mod": None, "how": ""}
 
+
+def nlp_hub():
+    """NLP 工具:VRN_ENG066 樞紐(normalize 正主);缺=None 誠實(不自己寫轉換表)。"""
+    if _NLPH["tried"]:
+        return _NLPH["mod"], _NLPH["how"]
+    _NLPH["tried"] = True
+    try:
+        c = sorted(HERE.glob("VRN_ENG066_NLPSupportHub_v*.py"))
+        if not c:
+            _NLPH["how"] = "ENG066 缺席"
+            return None, _NLPH["how"]
+        spec = importlib.util.spec_from_file_location("eng066_for_086", c[-1])
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["eng066_for_086"] = m
+        spec.loader.exec_module(m)
+        if not hasattr(m, "normalize"):
+            _NLPH["how"] = f"{c[-1].name} 無 normalize"
+            return None, _NLPH["how"]
+        try:
+            probe = m.normalize("报告营收")
+            ok = "報告" in probe and "營收" in probe
+        except Exception:
+            ok = False
+        _NLPH.update(mod=m, how=f"{c[-1].name} · 簡繁轉換{'可' if ok else '不可(本境無 opencc;直通)'}")
+    except Exception as exc:                                  # noqa: BLE001
+        _NLPH["how"] = f"ENG066 載入失敗 {type(exc).__name__}"
+    return _NLPH["mod"], _NLPH["how"]
+
+
+def nlp_normalize(text: str) -> str:
+    """過 ENG066 樞紐做簡→繁與全形正規化。**逐行**做:樞紐的 normalize 會把換行吃掉
+    (ENG064 normalizer 的 preserve_newlines=False),行結構一沒,逐行判準(標題行/獨立短行評等)就全失效——
+    批536 實測:整段丟進去,評等由 33/38 掉到 29/38。缺樞紐=原樣回傳(誠實)。"""
+    m, _ = nlp_hub()
+    if m is None or not text:
+        return text
+    out = []
+    for ln in text.splitlines():
+        if not ln.strip():
+            out.append(ln)
+            continue
+        try:
+            out.append(m.normalize(ln) or ln)
+        except Exception:
+            out.append(ln)
+    return "\n".join(out)
 
 # ═══ 批689B:券商拒絕閘 + 正典鍵對映(委派 CGC_MDL176;冊零觸碰;閘缺席=零回歸)═══
 _G176 = {"tried": False, "mod": None, "deny": set(), "rulings": {}, "rulings_norm": {}, "why": "", "src": ""}
@@ -312,6 +622,10 @@ def broker_gate_state() -> dict:
     g = _gate176()
     return {"state": ("OK" if g["mod"] is not None else "ABSENT"), "deny": len(g["deny"]),
             "rulings": len(g["rulings"]), "src": g["src"], "why": g["why"]}
+
+
+def _has_cjk(s: str) -> bool:
+    return bool(re.search(r"[一-鿿]", s or ""))
 
 
 # ===== [VIA:DENY-GATE:v0101] 券商拒絕閘(批680;graceful 零行為變更) =====
@@ -1258,12 +1572,58 @@ def filename_fields(E, tf, filename: str) -> dict:
             if kind == "DIGIT" and roc7_to_iso(tok):
                 date = roc7_to_iso(tok)
                 break
-    broker = safe_broker(re.sub(r"\.(pdf|docx?|pptx?)$", "", filename, flags=re.I), E)
-    return {"ticker": ticker, "broker": broker, "date": date, "parse": p}
+    stem = re.sub(r"\.(pdf|docx?|pptx?)$", "", Path(filename).name, flags=re.I)
+    # Preserve cross-token long aliases first; the existing tokenizer supplies
+    # CJK/Latin/digit boundaries (e.g. CTBC260915). No second alias dictionary.
+    tokens = [tok for tok, _kind in tf.tokenize(stem)]
+    broker = safe_broker(stem, E)
+    if not broker:
+        candidates = {hit for tok in tokens if (hit := safe_broker(tok.upper() if tok.isascii() and tok.isalpha() else tok, E))}
+        broker = next(iter(candidates)) if len(candidates) == 1 else None
+    return {"ticker": ticker, "broker": broker, "date": date, "parse": p, "tokens": tokens}
+
+
+_BROKER_RULE_HUB = None
+
+
+def broker_source_evidence(filename_broker, header, right, E, veto):
+    """Use the shared field policy; never use body/footer as publisher evidence.
+
+    Caller supplies layout zones, including small-font publisher names. Domain
+    matches are recorded separately and cannot select or override a broker.
+    """
+    global _BROKER_RULE_HUB
+    if _BROKER_RULE_HUB is None:
+        hits = sorted((VIA / "supportive modules" / "70_VRN_Rules").glob("SUP_MDL749_VRNFieldRuleHub_v*.py"))
+        if not hits:
+            raise RuntimeError("broker source policy hub ABSENT")
+        spec = importlib.util.spec_from_file_location("_vrn086_broker_rules", hits[-1])
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _BROKER_RULE_HUB = module
+    policy = (_BROKER_RULE_HUB.source_priority().get("fields") or {}).get("broker")
+    if not policy:
+        raise RuntimeError("broker source policy ABSENT")
+    zones = {}
+    weak = {}
+    for name, text in (("header", header), ("right", right)):
+        value, how = safe_broker_ev(text or "", E, veto=veto)
+        if value:
+            zones[name] = {"value": value, "how": how}
+        contact, how = safe_broker_ev(text or "", E, allow_contacts=True, veto=veto)
+        if contact and not value:
+            weak[name] = {"value": contact, "how": how}
+    unique = {e["value"] for e in zones.values()}
+    page_broker = next(iter(unique)) if len(unique) == 1 else None
+    evidence = _BROKER_RULE_HUB.reconcile({"檔名": filename_broker, "第一頁周邊資訊區": page_broker}, field="broker")
+    if len(unique) > 1:
+        evidence.update(state="YELLOW", why="首頁左右券商不一致；保留各區證據")
+    evidence.update(page_broker=page_broker, zones=zones, weak_contacts=weak)
+    return evidence
 
 
 # ---------------------------------------------------------------- 逐件邏輯
-def analyze_one(E, tf, filename: str, header: str, right: str, body: str, footer: str) -> dict:
+def analyze_one(E, tf, filename: str, header: str, right: str, body: str, footer: str, broker_zones: dict | None = None) -> dict:
     fnf = filename_fields(E, tf, filename)
     title = (header or "").strip() or (body or "").strip().splitlines()[0][:120] if (header or body) else ""
     full = "\n".join(x for x in (header, right, body, footer) if x)
@@ -1273,13 +1633,12 @@ def analyze_one(E, tf, filename: str, header: str, right: str, body: str, footer
     fv = E.FieldValidation()
     veto = {n for n in ((getattr(tf, "tk2name", {}) or {}).get(res.get("ticker")), ) if n}   # 批537:標的公司名(庫)
     veto |= subject_names(full, filename, res.get("ticker"))                          # 批537:標的公司名(文內/檔名相鄰;不靠庫)
-    page_broker, broker_how = safe_broker_ev(zone, E, veto=veto)                      # 批537 證據分級:文內(去電郵/網址)
-    if not page_broker:
-        page_broker, broker_how = safe_broker_ev(full, E, veto=veto)
-    if not page_broker and fnf["broker"]:
-        page_broker, broker_how = fnf["broker"], "檔名"                                # 批536:頁面沒認出就用檔名(券商自己命名的)
-    if not page_broker:
-        page_broker, broker_how = safe_broker_ev(full, E, allow_contacts=True, veto=veto)   # 批537 最弱一層:分析師電郵網域
+    broker_header = header if broker_zones is None else broker_zones.get("left", "")
+    broker_right = right if broker_zones is None else broker_zones.get("right", "")
+    broker_evidence = broker_source_evidence(fnf["broker"], broker_header, broker_right, E, veto)
+    broker_evidence["layout_source"] = "upper_page_zones" if broker_zones is not None else "legacy_header_right"
+    page_broker = broker_evidence["value"]  # selected output; independent page evidence below
+    broker_how = broker_evidence["src"] or "無"
     head_for_rating = "\n".join(x for x in (header, right) if x) + "\n" + (body or "")     # 批537:本土尺度只看前段
     rating = safe_rating(zone, E)
     if not rating.get("canonical"):                                                   # 批536:檔名評等 → 前段獨立行(外資寫法)
@@ -1310,11 +1669,12 @@ def analyze_one(E, tf, filename: str, header: str, right: str, body: str, footer
         if tp is None:
             tp, tp_how = safe_target_price(full, E, exclude_codes=codes_in_text)
     xv = E.CrossValidation()
-    page = {"ticker": res.get("ticker") or None, "broker": page_broker, "date": fnf["date"]}
+    page = {"ticker": res.get("ticker") or None, "broker": broker_evidence["page_broker"], "date": fnf["date"]}
     out = {
         "schema": "VIA.FirstPageLogic86.v1", "filename": filename,
         "filename_fields": {k: fnf[k] for k in ("ticker", "broker", "date")},
         "ticker": res, "broker": page_broker, "broker_how": broker_how, "rating": rating,
+        "broker_state": broker_evidence["state"], "broker_evidence": broker_evidence,
         "target_price": {"value": tp, "how": tp_how, "validation": (fv.validate_target_price(tp) if tp is not None else {"target_price": None, "verdict": "N/A"})},
         "doc_type": doc_type(filename), "expects_ticker": expects_ticker(filename),
         "emails": emails, "tel": fv.extract_tel(full)[:3],
@@ -1349,7 +1709,7 @@ def _read_sidecar(p: Path) -> dict:
         fn = src
     fn = Path(fn).name if fn and re.search(r"\.(pdf|docx?|pptx?|png|jpe?g|tiff?)$", str(fn), re.I) else None     # source 多半是方法描述字串,不是檔名
     fn = fn or (p.stem + ".pdf")
-    return {"filename": fn, "header": d.get("header") or "", "right": d.get("right") or "", "body": body, "footer": d.get("footer") or ""}
+    return {"filename": fn, "header": d.get("header") or "", "right": d.get("right") or "", "body": body, "footer": d.get("footer") or "", "broker_zones": d.get("broker_zones") if isinstance(d.get("broker_zones"), dict) else None}
 
 
 def enrich(args: list, do_print: bool = True) -> dict:
@@ -1379,7 +1739,7 @@ def enrich(args: list, do_print: bool = True) -> dict:
             items.append({"stem": p.stem, "state": "FAIL", "why": sc["_err"]})
             continue
         try:
-            r = analyze_one(E, tf, sc["filename"], sc["header"], sc["right"], sc["body"], sc["footer"])
+            r = analyze_one(E, tf, sc["filename"], sc["header"], sc["right"], sc["body"], sc["footer"], broker_zones=sc.get("broker_zones"))
         except Exception as exc:
             n_err += 1
             items.append({"stem": p.stem, "state": "FAIL", "why": f"{type(exc).__name__}:{str(exc)[:60]}"})
@@ -1394,9 +1754,10 @@ def enrich(args: list, do_print: bool = True) -> dict:
         n_broker += 1 if r["broker"] else 0
         n_rating += 1 if r["rating"].get("canonical") else 0
         n_tp += 1 if r["target_price"]["value"] is not None else 0
-        items.append({"stem": p.stem, "state": "OK", "ticker": r["ticker"]["ticker"], "method": m, "broker": r["broker"], "rating": r["rating"].get("canonical"), "tp": r["target_price"]["value"]})
+        items.append({"stem": p.stem, "state": "YELLOW" if r["broker_state"] == "YELLOW" else "OK", "broker_state": r["broker_state"], "ticker": r["ticker"]["ticker"], "method": m, "broker": r["broker"], "rating": r["rating"].get("canonical"), "tp": r["target_price"]["value"]})
     n = len(files) - n_err
-    rep.update(state="OK" if n > 0 else "FAIL", n=n, errors=n_err, roster=R["how"], out_dir=str(out_dir),
+    conflicts = sum(i.get("broker_state") == "YELLOW" for i in items)
+    rep.update(state="FAIL" if not n else ("YELLOW" if conflicts else "OK"), n=n, errors=n_err, broker_conflicts=conflicts, roster=R["how"], out_dir=str(out_dir),
                methods=methods, ticker_agree_filename_page=agree, broker_hit=n_broker, rating_hit=n_rating, tp_hit=n_tp, items=items,
                why=f"{n} 件 · 代碼法 {methods} · 檔名×首頁代碼一致 {agree}/{n} · 券商 {n_broker}/{n} · 評等 {n_rating}/{n} · 目標價 {n_tp}/{n}")
     (out_dir / "LOGIC86_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -1668,8 +2029,11 @@ def _emit(rep: dict, do_print: bool) -> None:
 def selftest() -> int:
     import tempfile
     fails = []
+    checks = 0
 
     def chk(name, cond, note=""):
+        nonlocal checks
+        checks += 1
         print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
         if not cond:
             fails.append(name)
@@ -1905,14 +2269,34 @@ def selftest() -> int:
         "每個撞上的表鍵都回正典鍵(v0110–v0112 只中 1/3:DAIWASECURITIES / J.P.MORGAN 漏網=同一家兩個名)",
         bool(_hits) and not _leak,
         f"(交集 {len(_hits)}:{_hits} · 漏 {_leak})")
-    print(f"  [計] 二十七檢 OK {27 - len(fails)} · FAIL {len(fails)}")
+    r = analyze_one(E, tf, "啟碁(6285)-CTBC260915.pdf", "啟碁", "", "EPS 3.37 元大致符合預期", "")
+    chk("券商來源：正文元大不得覆盖 CTBC 檔名", r["broker"] == "CTBC" and r["broker_how"] == "檔名")
+    r = analyze_one(E, tf, "report.pdf", "", "凱基投顧 研究部", "元大", "")
+    chk("券商來源：右側小字機構名稱可用", r["broker"] == "KGI" and r["broker_state"] == "GREEN")
+    r = analyze_one(E, tf, "report.pdf", "", "", "元大證券", "凱基投顧")
+    chk("券商來源：只有正文或頁尾必須 NODATA", r["broker"] is None and r["broker_state"] == "NODATA")
+    r = analyze_one(E, tf, "KGI-2330.pdf", "元大證券", "", "", "")
+    chk("券商來源：檔名優先但獨立首頁衝突不能假綠", r["broker"] == "KGI" and r["broker_state"] == "YELLOW" and r["broker_evidence"]["page_broker"] == "YUANTA" and r["xv_filename_vs_page"]["fields"]["broker"]["match"] is False)
+    r = analyze_one(E, tf, "Daiwa-1319.pdf", "Daiwa Securities", "analyst@daiwacm-cathay.com.tw", "國泰", "")
+    chk("券商來源：複合電郵網域不覆盖機構名稱", r["broker"] == "DAIWA" and r["broker_state"] == "GREEN")
+    r = analyze_one(E, tf, "report.pdf", "", "analyst@daiwacm-cathay.com.tw", "", "")
+    chk("券商來源：只有網域必須 NODATA", r["broker"] is None and r["broker_state"] == "NODATA")
+    r = analyze_one(E, tf, "report.pdf", "凱基投顧", "元大證券", "", "")
+    chk("券商來源：左右衝突保留兩份證據", r["broker"] is None and r["broker_state"] == "YELLOW" and len(r["broker_evidence"]["zones"]) == 2)
+    r = analyze_one(E, tf, "260914_ubs_parade.pdf", "", "", "", "")
+    chk("檔名切割：小寫短券商代碼正規化", r["broker"] == "UBS")
+    r = analyze_one(E, tf, "report.pdf", "元大證券", "凱基投顧", "", "", broker_zones={"left":"", "right":""})
+    chk("新版版面證據：空上方區不得退回舊正文混合區", r["broker"] is None and r["broker_state"] == "NODATA")
+    hub = _BROKER_RULE_HUB
+    chk("來源規則：券商拒用正文，其他欄位維持原優先序", hub.reconcile({"本文":"YUANTA"},field="broker")["state"] == "NODATA" and hub.reconcile({"本文":100,"檔名":90},field="target_price")["value"] == 100)
+    print(f"  [計] {checks} 檢 OK {checks - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0113)· 二十七檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
+        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0114)· 三十七檢自測(零網路;收容件 FirstPageEngine v0101 _b522;券商拒絕閘 CGC_MDL176)===")
         return selftest()
     verb = args[0] if args and not args[0].startswith("--") else "status"
     if verb == "status":

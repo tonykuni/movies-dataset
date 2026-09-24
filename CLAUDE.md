@@ -3,7 +3,7 @@
 **先讀骨架卡,不讀原始碼。** 本倉的單檔動輒上千行,整檔讀進來很耗 token。大檔(約 >200 行)或整個資料夾一律先走全景代讀:
 
 ```bash
-E="VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0105.py"   # 取尾版:ls …_v*.py | tail -1
+E=$(ls "VeritasIntelligenceAnalytics/supportive modules/registry/"CGC_MDL158_VIAPanoramaAuditRepair_v*.py | tail -1)   # 永遠取尾版
 python3 "$E" read <檔或夾…>            # 骨架卡:匯入 · 定義樹(行號/簽章/首行說明)· AST 錯誤;給夾=一檔一行全景
 python3 "$E" slice <檔> <名|Class.method>   # 只取一個定義的原始碼(帶行號)
 ```

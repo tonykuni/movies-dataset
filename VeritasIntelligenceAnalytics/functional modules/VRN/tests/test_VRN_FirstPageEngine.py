@@ -34,6 +34,20 @@ def def_load():
     return module
 
 
+def def_purge_tool():
+    """The mother's 批679 deny list (CGC_MDL177) through the evidence core; None when either is absent."""
+    core_path = HERE.parent / "engine" / "VRN_Evidence_Core.py"
+    if not core_path.is_file():
+        return None
+    try:
+        spec = importlib.util.spec_from_file_location("vrn_evidence_core_for_test", str(core_path))
+        core = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(core)  # type: ignore[union-attr]
+        return core.vcgc("purge")
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def def_chars(lines):
     """Synthetic char dicts (pdfplumber shape) from (text, size) pairs."""
     chars = []
@@ -114,10 +128,15 @@ class def_FirstPageEngineTests(unittest.TestCase):
     @unittest.skipUnless(ORACLE.is_file(), "audit package absent")
     def test_all_106_oracle_filenames_agree(self) -> None:
         rows = json.loads(ORACLE.read_text(encoding="utf-8-sig"))
+        purge = def_purge_tool()
         bad = []
+        purged = 0
         for row in rows:
             f = self.engine._filename_fields(row["filename"])
-            exp = ((row.get("ticker_candidates") or [""])[0], row.get("report_date") or "", (row.get("broker") or {}).get("value") or "")
+            broker = (row.get("broker") or {}).get("value") or ""
+            if broker and purge is not None and purge.is_cn_canon(broker):
+                broker, purged = "", purged + 1   # 批679/批702: a purged China broker never resolves from a name
+            exp = ((row.get("ticker_candidates") or [""])[0], row.get("report_date") or "", broker)
             got = (f["ticker"] or "", f["date"] or "", f["broker"] or "")
             if got != exp:
                 bad.append((row["filename"], got, exp))
@@ -148,9 +167,15 @@ class def_FirstPageEngineTests(unittest.TestCase):
         self.assertEqual(out["ticker"]["ticker"], "")
         self.assertIsNone(out["rating"]["canonical"])
         self.assertEqual(out["rating"]["body_hint"], "SELL")
-        self.assertEqual(out["report_date"], "2026-09-16", "filename date wins over the page date")
-        self.assertEqual(out["report_date_source"], "FILENAME")
+        # mother source priority (VRN_FieldRules_SSOT#rules.source_priority: 本文 > 首頁周邊 > 檔名):
+        # the printed date leads, the filename date stays in filename_fields and the conflict is flagged
+        self.assertEqual(out["report_date"], "2026-09-15", "the page date leads")
+        self.assertEqual(out["report_date_source"], "PAGE")
         self.assertEqual(out["page_date"], "2026-09-15")
+        self.assertEqual(out["filename_fields"]["date"], "2026-09-16")
+        self.assertTrue(out["date_conflict"])
+        self.assertEqual(out["xv_filename_vs_page"]["fields"]["date"]["verdict"], "CONFLICT")
+        self.assertNotEqual(out["xv_filename_vs_page"]["verdict"], "FAIL", "a date conflict is kept, never a FAIL")
         out = self.engine.run("市場觀察家.pdf", chars=def_chars(lines))
         self.assertEqual((out["report_date"], out["report_date_source"]), ("2026-09-15", "PAGE"))
 
@@ -168,8 +193,13 @@ class def_FirstPageEngineTests(unittest.TestCase):
         self.assertEqual(out["broker"], "KGI")
         self.assertEqual(out["tri_code"]["verdict"], "PASS")
         self.assertEqual(out["xv_filename_vs_page"]["verdict"], "PASS")
-        self.assertEqual(out["upside"]["status"], "DERIVED")
-        self.assertAlmostEqual(out["upside"]["upside_pct"], 30.23, places=2)
+        # mother 批729 (operator 2026-09-24): the upside is on the latest ADJ close (test_VRN_AdjBasis pins the
+        # numbers on a temporary market database); the page arithmetic 168 / 129 stays as upside_page
+        self.assertEqual(out["upside_page"]["status"], "DERIVED")
+        self.assertAlmostEqual(out["upside_page"]["upside_pct"], 30.23, places=2)
+        self.assertEqual(out["upside"]["basis"], "ADJ_LATEST")
+        self.assertIn(out["upside"]["status"], ("DERIVED_ADJ", "NO_ADJ"))
+        self.assertEqual(out["upside"]["page_price"], 129.0)
         self.assertTrue(out["summary_four_points"]["header"].startswith("神達(3706.TW)-") or "3706.TW" in out["summary_four_points"]["header"])
         self.assertIn("目標價 168.0", out["summary_four_points"]["points"][0]["text"])
 
