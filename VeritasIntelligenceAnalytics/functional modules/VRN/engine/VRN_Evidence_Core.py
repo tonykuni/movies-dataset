@@ -967,14 +967,16 @@ RATING_DEF_SIGNAL_RX = re.compile(
     r"(預期|報酬|表現|漲幅|跌幅|超越|落後|優於|劣於|大盤|指數|基準|%|％|expect|return|outperform|underperform|"
     r"benchmark|relative|upside|downside|appreciat|depreciat)", re.I)
 # 批730 (measured on 21 realistic appendix fixtures): a CJK word may carry an inner hyphen or middle dot
-# (元大 持有-超越同業); an English alt may read "O or Over" (Morgan Stanley); a dash separator needs a space before
-# it, so Equal-weight is never cut into "Equal" + "weight (E or Equal) - ..."
-_CJK_WORD = r"[\u4e00-\u9fff](?:[\u4e00-\u9fff]|[\-‐–・·](?=[\u4e00-\u9fff])){1,9}"
+# (元大 持有-超越同業); an English alt may read "O or Over" (Morgan Stanley); an ASCII hyphen separates only after a
+# space or a closing bracket, so Equal-weight is never cut into "Equal" + "weight (E or Equal) - ..."
+# 批730 review: each part of a CJK word stays 2-6 characters (a 10-character run let headings through:
+# 本報告投資評等之定義:...); an em dash always separates (Buy—expected ...), an en dash when a space touches it
+_CJK_WORD = r"[\u4e00-\u9fff]{2,6}(?:[\-‐–・·][\u4e00-\u9fff]{2,6})?"
 _RS_CJK = re.compile(r"^\s*(?P<word>" + _CJK_WORD + r")\s*(?:[(（]\s*(?P<alt>[A-Za-z][A-Za-z\- /]{0,24}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
                      r"\s*[:：]\s*(?P<def>.+)$")
 _RS_LAT = re.compile(r"^\s*(?P<word>[A-Za-z][A-Za-z\-]{0,20}(?:\s[A-Za-z\-]{1,12}){0,2})\s*"
                      r"(?:[(（]\s*(?P<alt>[A-Za-z0-9+\-]{1,10}(?:\s+or\s+[A-Za-z0-9+\-]{1,10})?|[\u4e00-\u9fff]{2,6})\s*[)）])?"
-                     r"(?:\s*[:：]|\s+[\-–—])\s*(?P<def>.+)$")
+                     r"(?:\s*[:：]|\s*—|\s*–(?=\s)|\s+–|(?:\s+|(?<=[)）])\s*)-)\s*(?P<def>.+)$")
 # a table row without a colon ("買進  預期未來12個月報酬率大於15%"): taken when the word is a known rating word,
 # or when the row sits next to an accepted definition row (the same table)
 _RS_BARE = re.compile(r"^\s*(?P<word>" + _CJK_WORD + r")\s+(?P<def>\S.+)$")
@@ -985,11 +987,19 @@ _RS_NOT_A_RATING = re.compile(
     r"^(?:註|說明|備註|資料來源|來源|note|notes|source|sources|disclaimer|analyst|分析師|定義|definition)$|"
     r"target|price|eps|目標|股價|價格|營收|盈餘|本益比|殖利率|yield|upside|downside|報酬率|"
     # 批730: section labels that also carry return words (Valuation: ... implying 15% upside)
-    r"valuation|估值|評價|^risks?$|風險|methodology|方法|catalysts?|催化|investment\s+thesis|投資論點", re.I)
+    r"valuation|估值|評價|^risks?$|風險|methodology|方法|catalysts?|催化|investment\s+thesis|投資論點|"
+    # 批730 review: table headers and footnotes next to a rating table (投資建議 未來12個月預期報酬率 · 評等類別 ... ·
+    # 過去績效 不代表未來表現 · 上述評等 ... · 本公司 ... · 投資評等之定義如下)
+    r"定義|如下|投資建議|類別|績效|上述|本公司|本報告|投資人", re.I)
+# 批730 review: a colon-less row taken only for sitting next to an accepted row must read like a definition (a threshold
+# or a comparison); a header or a footnote next to the table does not
+_RS_THRESHOLD_RX = re.compile(
+    r"(\d+(?:\.\d+)?\s*[%％]|大於|小於|超過|低於|高於|介於|優於|劣於|落後|相當|以上|以下|領先|"
+    r"more\s+than|less\s+than|above|below|exceed|between|within|in\s+line|outperform|underperform)", re.I)
 # 批730: an ISSUER line in the appendix names the company; a peer-table row names a broker next to a rating word or a
 # target price (同業評等彙整:富邦證券 中立 目標價1000元) and is not the issuer unless it carries the legal name
 _APPENDIX_TABLE_ROW_RX = re.compile(
-    r"(目標價|target\s*price|\bTP\b|NT\$|\d[\d,]*(?:\.\d+)?\s*元|買進|賣出|中立|持有|增加持股|減少持股|降低持股|區間操作|"
+    r"(目標價|target\s*price|\bTP\b|NT\$|\d[\d,]*(?:\.\d+)?\s*元(?![\u4e00-\u9fff])|買進|賣出|中立|持有|增加持股|減少持股|降低持股|區間操作|"
     r"(?<![A-Za-z])(?:buy|sell|hold|neutral|outperform|underperform|overweight|underweight)(?![A-Za-z]))", re.I)
 _LEGAL_ENTITY_RX = re.compile(r"(股份有限公司|有限公司|co\.?,?\s*ltd|limited|l\.?\s?l\.?\s?c\b|\binc\b|pte\.?\s*ltd|\bplc\b)", re.I)
 
@@ -1097,12 +1107,16 @@ def rating_scale(lines, rules=None, words=None):
         m = _RS_BARE.match(text)
         if m and RATING_DEF_SIGNAL_RX.search(m.group("def")) and not _rating_word_is_label(m.group("word")):
             bare[idx] = m
-    for _ in range(2):
+    for idx, m in list(bare.items()):
+        if normalize_rating_word(m.group("word"), words)[0] is not None:
+            matches[idx] = bare.pop(idx)
+    grew = True
+    while grew:                              # 批730 review: a neighbour must also read like a definition row
+        grew = False
         for idx, m in list(bare.items()):
-            known = normalize_rating_word(m.group("word"), words)[0] is not None
-            if known or (idx - 1) in matches or (idx + 1) in matches:
-                matches[idx] = m
-                del bare[idx]
+            if ((idx - 1) in matches or (idx + 1) in matches) and _RS_THRESHOLD_RX.search(m.group("def")):
+                matches[idx] = bare.pop(idx)
+                grew = True
     for idx in sorted(matches):
         item = (lines or [])[idx]
         page = item.get("page") if isinstance(item, dict) else None
@@ -2275,14 +2289,14 @@ def _adj_cli(a):
         k = a.index("--db")
         db = a[k + 1] if k + 1 < len(a) else None
         a = a[:k] + a[k + 2:]
-    if len(a) < 2:
-        print("[ADJ] 用法:python VRN_Evidence_Core.py adj <代號> <報告日> [目標價] [--db 庫] [--page 頁面現價]")
-        return 2
     page = None
     if "--page" in a:
         k = a.index("--page")
         page = a[k + 1] if k + 1 < len(a) else None
         a = a[:k] + a[k + 2:]
+    if len(a) < 2:                           # 批730 review: counted after both options are taken off
+        print("[ADJ] 用法:python VRN_Evidence_Core.py adj <代號> <報告日> [目標價] [--db 庫] [--page 頁面現價]")
+        return 2
     q = adj_basis(a[0], a[1], a[2] if len(a) > 2 else None, db=db, page_price=page)
     print("[ADJ] %s %s 目標價 %s → %s" % (q["ticker"], q["report_date"], q["target_price"], q["state"]))
     for key, label in (("target_price_adj", "目標價(ADJ)"), ("adj_factor", "因子"), ("adj_factor_date", "因子日"),

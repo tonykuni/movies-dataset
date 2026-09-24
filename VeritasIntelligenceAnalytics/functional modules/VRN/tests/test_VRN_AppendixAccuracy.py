@@ -189,6 +189,38 @@ HELDOUT = [
     ("exchange_source", ["資料來源:台灣證券交易所、公開資訊觀測站", "本資料僅供參考"], [], None, set()),
 ]
 
+# 批730 review set: shapes an independent review found the tuned parser getting wrong (headers and footnotes next to a
+# rating table, a long heading with a colon, dashes with no space, a dated 元大 line).  Written after the fixes as
+# regression cases; same rules as above (common shapes, no report content, no names).
+REVIEW = [
+    ("header_and_footnote_rows", ["統一證券投資顧問股份有限公司 版權所有",
+                                  "投資建議 未來12個月預期報酬率",
+                                  "買進 預期報酬率大於15%",
+                                  "中立 預期報酬率介於-5%至15%",
+                                  "賣出 預期報酬率低於-5%",
+                                  "過去績效 不代表未來表現,投資人應審慎評估"],
+     [], "PRESIDENT", {"買進", "中立", "賣出"}),
+    ("category_header_and_notes", ["凱基證券投資顧問股份有限公司 版權所有",
+                                   "評等類別 預期報酬率(相對大盤)",
+                                   "增加持股 預期報酬率大於10%",
+                                   "中立 預期報酬率介於-10%至10%",
+                                   "上述評等 係相對大盤之預期表現",
+                                   "本公司 不保證未來報酬"],
+     [], "KGI", {"增加持股", "中立"}),
+    ("definition_heading_with_colon", ["群益證券投資顧問股份有限公司 著作權所有",
+                                       "本報告投資評等之定義:以未來12個月預期報酬率為準",
+                                       "投資評等之定義如下:以未來12個月預期報酬率為準",
+                                       "買進(Buy):預期報酬率超過15%",
+                                       "中立(Neutral):預期報酬率介於-5%至15%"],
+     [], "CAPITAL", {"買進", "中立"}),
+    ("dashes_without_space", ["This report is issued by Daiwa Capital Markets Hong Kong Limited. Disclaimer.",
+                              "Buy—expected to outperform the local market by more than 15% over 12 months.",
+                              "Outperform– return more than 5% above the benchmark return.",
+                              "Overweight (OW)- Over the next 12 months, we expect the stock to outperform.",
+                              "Equal-weight (E or Equal) - The stock's total return is expected to be in line with the average."],
+     [], "DAIWA", {"Buy", "Outperform", "Overweight", "Equal-weight"}),
+]
+
 
 def def_load(name, filename):
     if name in sys.modules:
@@ -255,6 +287,17 @@ class AppendixAccuracyTest(unittest.TestCase):
     def test_heldout_set(self):
         wrong, extra, missed, n = self.measure(HELDOUT)
         self.assertEqual((wrong, extra, missed), ([], [], []), f"{len(HELDOUT)} pages · {n} rating words")
+
+    def test_review_set(self):
+        wrong, extra, missed, n = self.measure(REVIEW)
+        self.assertEqual((wrong, extra, missed), ([], [], []), f"{len(REVIEW)} pages · {n} rating words")
+
+    def test_the_issuer_guard_reads_yuanta_as_a_broker_not_a_price(self):
+        # "24 元大投顧" is a date and a broker name, not "24 元" (a price in a peer table)
+        for line in ("2026/09/24 元大投顧 研究部", "2026/09/24 元富投顧 研究部"):
+            self.assertTrue(self.C._appendix_issuer_line(line), line)
+        self.assertFalse(self.C._appendix_issuer_line("富邦證券 中立 目標價1000元"))
+        self.assertFalse(self.C._appendix_issuer_line("元大證券 買進 1200元"))
 
     def test_page1_grading_passes_no_guard(self):
         # the issuer guard is appendix-only: a page-1 line with a peer-table shape keeps its v0101 ISSUER tier

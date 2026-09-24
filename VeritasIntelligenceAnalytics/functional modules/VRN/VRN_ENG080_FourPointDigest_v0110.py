@@ -13,6 +13,11 @@ v0109→v0110(批730 操作員 2026-09-24 令「自測實測自AUDIT直到完工
   具名 YAHOO_CLOSE);Yahoo close ÷ 交易所 close ≠ 1(`retro_ratio`)本身就算一次股本事件,因子照乘。
   `f = factor_report / factor_latest` 那一行一字不動(㉗ 照釘);Z156 的「推不出因子時拿原始目標價算」仍候操作員裁。
   +㉛ 配股回調(1294 形:交易所 126.5 · Yahoo 95.7617)。
+  **修正(同批實測):** 拿同一批真庫樣本對 ENG073 v0138,293 筆裡 287 筆同答;差的 6 筆全是本支自己多留的那一份算法:
+  沒有 Yahoo 單日陳價的平滑、沒有「沒調到的公司行動」防呆(4950 減資 ×2.6185 被算成 −23.8%)、取報告日當天那列
+  (L99 是「報告日前一交易日」;除權息日剛好是報告日就少乘一次)。改成**因子與事件一律向 ENG073 要**(`_eng073()`,
+  尾版;同一件事一處算,LL404/L05),本支只接結果;ENG073 缺席才退本地算法並寫進 factor_basis。事件 → EVENT_UNADJUSTED、
+  不給因子、K1 上漲空間未算。報告頁面印的現價一併帶過去(交易所缺時當分母,同 ENG073)。+㉜。
 v0108→v0109(批685 操作員令「標題一開始之公司名稱加括號代碼…第一點標題 台積電(2330.TW)-本文標題」)
   量過:headline 一直是「標題:」標籤句或 title_head 原句,**沒有**名(代號.TW)前綴——操作員同日上傳的整合引擎
   (收容 _b685)也沒有:它的 ReportTitle 只取首頁前 12 行第一句。v0109 只加一層組字 compose_headline():
@@ -310,6 +315,32 @@ def _hub():
         mod = None
     _HUB_CACHE.append(mod)
     return mod
+
+
+_E73_CACHE: list = []
+
+
+def _eng073():
+    """批730 修正:L99 的因子與「沒調到的公司行動」一律向 ENG073(尾版)要——`_prev_basis`(前一交易日、交易所分母、
+    單日不一致取前後一致值、代號尾碼)與 `_unadjusted_events`。同一件事一處算(LL404/L05),本支只接結果。
+    缺席=誠實 None(呼叫端退回本地算法,並把退回寫進 factor_basis)。"""
+    if _E73_CACHE:
+        return _E73_CACHE[0]
+    mod = None
+    try:
+        import importlib.util as _ilu
+        hits = sorted(HERE.glob("VRN_ENG073_ReportStructuredDB_v*.py"))   # 尾版律
+        if hits:
+            sp = _ilu.spec_from_file_location("_vrn_eng073_for_eng080", hits[-1])
+            mod = _ilu.module_from_spec(sp)
+            sys.modules[sp.name] = mod
+            sp.loader.exec_module(mod)
+            if not all(hasattr(mod, k) for k in ("_prev_basis", "_unadjusted_events", "RETRO_SAME")):
+                mod = None                        # v0137 以前沒有這三樣 = 當缺席
+    except Exception:
+        mod = None
+    _E73_CACHE.append(mod)
+    return mod
 NUM_RX = re.compile(r"-?\d+(?:\.\d+)?%?")
 FACTOR_EPS = 1e-6
 YF_TW = re.compile(r"^\d{4}[A-Z0-9]{0,2}\.(TW|TWO)$")
@@ -587,8 +618,9 @@ def basis_state(days: int | None) -> str:
     return "CURRENT" if days <= STALE_DAYS else "STALE_BASIS"
 
 
-def price_context(con, code: str, report_date: str | None) -> dict:
-    """最新 adj close + 報告日因子 + 因子鏈(除權息事件=因子變動日)"""
+def price_context(con, code: str, report_date: str | None, page_price=None) -> dict:
+    """最新 adj close + 報告日因子 + 因子鏈(除權息事件=因子變動日)。
+    批730 修正:報告日因子與未調整事件向 ENG073 要(`_eng073()`);page_price = 報告頁面印的現價(交易所缺時當分母,同 ENG073)。"""
     out = {"ticker": "", "adj_date": "", "adj_close": None, "close_latest": None, "factor_latest": None, "factor_report": None,
            "report_px_date": "", "adjust_factor": None, "ex_dates": [], "adjust_method": "", "adjust_note": ""}
     have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
@@ -621,25 +653,37 @@ def price_context(con, code: str, report_date: str | None) -> dict:
         out["adjust_method"] = "NONE"
         out["adjust_note"] = "報告日缺=不除權息調整(目標價照列)"
         return out
-    rp = con.execute("SELECT CAST(date AS VARCHAR), close, adj_close FROM tw_daily_prices WHERE ticker = ? AND CAST(date AS VARCHAR) <= ? "
-                     "AND close IS NOT NULL AND close > 0 AND adj_close IS NOT NULL ORDER BY date DESC LIMIT 1", [out["ticker"], report_date]).fetchone()
+    e73 = _eng073()
+    if e73 is not None:
+        # 批730 修正:前一交易日(L99「報告日前一交易日」;v0110 初版取報告日當天那列,除權息日剛好是報告日就少乘一次)
+        _pb = e73._prev_basis(con, code, report_date, page_price=page_price)
+        rp = (_pb["factor_date"], _pb["close"], _pb["adj"]) if _pb.get("factor") is not None else None
+        if rp:
+            out["report_raw_close"], out["factor_basis"], out["retro_ratio"] = _pb["raw"], _pb["basis"], _pb["retro"]
+            out["report_px_date"], out["factor_report"] = rp[0], _pb["factor"]
+        retro_eps = e73.RETRO_SAME
+    else:
+        rp = con.execute("SELECT CAST(date AS VARCHAR), close, adj_close FROM tw_daily_prices WHERE ticker = ? AND CAST(date AS VARCHAR) <= ? "
+                         "AND close IS NOT NULL AND close > 0 AND adj_close IS NOT NULL ORDER BY date DESC LIMIT 1", [out["ticker"], report_date]).fetchone()
+        retro_eps = 0.005
+        if rp:
+            # 本地算法(ENG073 缺席才走):分母用交易所原始收盤;Yahoo 的 close 會事後按配股回調,只能當後備(具名)
+            raw_rp = None
+            if "tw_trading_daily" in have:
+                try:
+                    _rr = con.execute("SELECT close FROM tw_trading_daily WHERE code = ? AND CAST(date AS VARCHAR) = ? AND close > 0",
+                                      [re.sub(r"\.TWO?$", "", str(code)), rp[0]]).fetchone()
+                    raw_rp = float(_rr[0]) if _rr and _rr[0] else None
+                except Exception:
+                    raw_rp = None                 # 表形不合=這條路沒有,退 Yahoo(具名)
+            out["report_raw_close"] = raw_rp
+            out["factor_basis"] = ("RAW_EXCHANGE" if raw_rp else "YAHOO_CLOSE") + "(ENG073 缺席:本地算法,報告日當天列、無單日平滑、無事件防呆)"
+            out["retro_ratio"] = round(float(rp[1]) / raw_rp, 6) if raw_rp else None
+            out["report_px_date"], out["factor_report"] = rp[0], float(rp[2]) / (raw_rp or float(rp[1]))
     if not rp:
         out["adjust_method"] = "NONE"
         out["adjust_note"] = f"報告日 {report_date} 前無價列=無法推定因子(目標價照列)"
         return out
-    # 批730:分母用交易所原始收盤(成交當下的價);Yahoo 的 close 會事後按配股回調,只能當後備(具名)
-    raw_rp = None
-    if "tw_trading_daily" in have:
-        try:
-            _rr = con.execute("SELECT close FROM tw_trading_daily WHERE code = ? AND CAST(date AS VARCHAR) = ? AND close > 0",
-                              [str(code), rp[0]]).fetchone()
-            raw_rp = float(_rr[0]) if _rr and _rr[0] else None
-        except Exception:
-            raw_rp = None                     # 表形不合=這條路沒有,退 Yahoo(具名)
-    out["report_raw_close"] = raw_rp
-    out["factor_basis"] = "RAW_EXCHANGE" if raw_rp else "YAHOO_CLOSE"
-    out["retro_ratio"] = round(float(rp[1]) / raw_rp, 6) if raw_rp else None
-    out["report_px_date"], out["factor_report"] = rp[0], float(rp[2]) / (raw_rp or float(rp[1]))
     if not out["factor_latest"]:
         out["adjust_method"] = "NONE"
         out["adjust_note"] = "最新日因子缺"
@@ -655,8 +699,19 @@ def price_context(con, code: str, report_date: str | None) -> dict:
             ex.append(d)
         prev = float(fac) if fac is not None else prev
     out["ex_dates"] = ex
+    # 批730 修正:因子日到最新日之間有 Yahoo 沒調到的公司行動(減資 / 股本變動)→ 目標價與現價不在同一個股本基礎,
+    #   **不給因子**(呼叫端就不算上漲空間);ENG073 同一支判官判 ADJ_EVENT_UNADJUSTED。v0110 初版沒有這道,
+    #   4950(2025-11-03 減資 ×2.6185)會把 12 元的目標價直接對 15.75 元算出 −23.8%。
+    _ev = e73._unadjusted_events(con, code, rp[0]) if e73 is not None else []
+    if _ev:
+        out["adjust_factor"] = None
+        out["adjust_method"] = "EVENT_UNADJUSTED"
+        out["adjust_note"] = (f"報告日 {report_date} 之後有 Yahoo 沒調到的公司行動 "
+                              + " · ".join(f"{d} ×{r}({why})" for d, r, why in _ev[:3])
+                              + ";目標價與現價不在同一個股本基礎,上漲空間不算(ENG073 同判 ADJ_EVENT_UNADJUSTED)")
+        return out
     # 批730:Yahoo 回調比 ≠ 1 = 報告日之後有配股 / 拆股(adj/close 比值看不見它),本身就是一次事件
-    retro_ev = out.get("retro_ratio") is not None and abs(out["retro_ratio"] - 1.0) > 0.005
+    retro_ev = out.get("retro_ratio") is not None and abs(out["retro_ratio"] - 1.0) > retro_eps
     if abs(f - 1.0) <= FACTOR_EPS or (not ex and not retro_ev):
         out["adjust_factor"] = 1.0
         out["adjust_method"] = "NONE"
@@ -720,7 +775,9 @@ def build_digest(text: str, basic: dict, metrics: list, px: dict) -> dict:
     tp_adj = None
     if tp is not None and px.get("adjust_factor"):
         tp_adj = _round2(tp * px["adjust_factor"])
-    up_now = upside(tp_adj if tp_adj is not None else tp, adj) if (tp is not None and adj) else None
+    # 批730 修正:股本基礎不同(EVENT_UNADJUSTED)不生數字——不退回拿原始目標價算
+    _blocked = px.get("adjust_method") == "EVENT_UNADJUSTED"
+    up_now = upside(tp_adj if tp_adj is not None else tp, adj) if (tp is not None and adj and not _blocked) else None
     # 批419 兩道閘:合理性 + 基準日
     _tp_state, _tp_ratio = tp_sanity(tp_adj if tp_adj is not None else tp, adj)
     _days = basis_age(basic.get("report_date") or "", adj_date or "")
@@ -929,7 +986,7 @@ def run(db: Path | None = None, zones_dir: Path | None = None, ticker: str | Non
                      "yf": _yf_known(str(b.get("ticker") or ""), con),                                    # 批685:查得到市場才給 .TW/.TWO
                      "upside_at_report": (float(up_rep) / 100.0 if up_rep is not None and abs(float(up_rep)) > 1.5 else up_rep),
                      "raw_all": " ".join(str(m.get("raw") or "") for m in metrics.get(rf, []))}
-            px = price_context(con, str(b["ticker"]), b.get("report_date"))
+            px = price_context(con, str(b["ticker"]), b.get("report_date"), page_price=b.get("price"))
             d = build_digest(text, basic, metrics.get(rf, []), px)
             d.update({"report_file": rf, "ticker": b["ticker"], "broker": b.get("broker"), "report_date": b.get("report_date"), "text_src": text_src})
             # 批641 自訂正:第一版寫 startswith("樞紐"),把「樞紐無值·自家亦無」也算成命中
@@ -1139,6 +1196,11 @@ def selftest() -> int:
         for d, cl, adj in rows:
             c.execute("INSERT INTO tw_daily_prices VALUES (?, '3231.TW', ?, ?, ?, ?, ?, 1000)", [d, cl, cl, cl, cl, adj])
         c.execute("INSERT INTO tw_daily_prices VALUES ('2025-09-05', '2606.TW', 70, 70, 70, 70, 70, 100)")
+        # 批730:真庫有交易所日成交表;沒有它,因子分母會退到報告頁面價(Citi 列 price 114 ≠ 前一日 113.5)
+        c.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR, close DOUBLE)")
+        for d, cl, _adj in rows:
+            c.execute("INSERT INTO tw_trading_daily VALUES (?, '3231', 'TWSE', ?)", [d, cl])
+        c.execute("INSERT INTO tw_trading_daily VALUES ('2025-09-05', '2606', 'TWSE', 70)")
         c.execute("""CREATE TABLE vrn_report_basic(report_file VARCHAR, ticker VARCHAR, name_official VARCHAR, broker VARCHAR, report_date VARCHAR, rating_raw VARCHAR,
                      target_price DOUBLE, price DOUBLE, upside_report DOUBLE, upside_calc DOUBLE, upside_state VARCHAR, title_head VARCHAR, summary_head VARCHAR,
                      conflicts VARCHAR, extracted_at VARCHAR, price_db DOUBLE, upside_db DOUBLE, price_state VARCHAR)""")
@@ -1443,6 +1505,51 @@ def selftest() -> int:
         and _pc730["retro_ratio"] == round(95.7617 / 126.5, 6) and "配股/拆股" in _pc730["adjust_note"]
         and _pc730y["factor_basis"] == "YAHOO_CLOSE" and abs(_pc730y["factor_report"] - 87.532 / 95.7617) < 1e-12,
         f"(交易所 {_pc730['adjust_method']} × {_pc730['adjust_factor']:.6f} · Yahoo 後備 {_pc730y['factor_basis']} × {_pc730y['adjust_factor']})")
+    # ── 批730 修正 ㉜:因子與事件向 ENG073 要(同一件事一處算);前一交易日;沒調到的公司行動不生數字 ──
+    _e73 = _eng073()
+    _cx732 = duckdb.connect()
+    _cx732.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, adj_close DOUBLE, volume DOUBLE)")
+    _cx732.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR, close DOUBLE)")
+    # 4950 形:2025-11-03 減資 ×2.6185,Yahoo 沒調(close = adj 一路)
+    for _d, _p in (("2025-10-20", 10.4), ("2025-10-21", 10.35), ("2025-10-22", 10.3), ("2025-10-24", 10.3), ("2025-10-27", 10.45),
+                   ("2025-10-28", 10.2), ("2025-10-30", 10.1), ("2025-10-31", 10.0), ("2025-11-03", 26.1848), ("2026-09-22", 15.75)):
+        _cx732.execute("INSERT INTO tw_daily_prices VALUES (?, '4950.TWO', ?, ?, ?, ?, ?, 1000)", [_d, _p, _p, _p, _p, _p])
+    _cx732.execute("INSERT INTO tw_trading_daily VALUES ('2025-10-27','4950','TPEx',10.45),('2025-10-28','4950','TPEx',10.2),('2025-10-30','4950','TPEx',10.1)")
+    # 除息日 07-10(現金股利段 0.97 → 1.0 並持續);報告日 07-10 = 前一交易日 07-09 還沒除息 → 0.97;報告日 07-11 → 1.0
+    for _d, _p, _k in (("2025-07-03", 100.0, 0.97), ("2025-07-04", 101.0, 0.97), ("2025-07-07", 102.0, 0.97), ("2025-07-08", 101.0, 0.97),
+                       ("2025-07-09", 103.0, 0.97), ("2025-07-10", 100.0, 1.0), ("2025-07-11", 101.0, 1.0), ("2025-07-14", 100.5, 1.0),
+                       ("2026-09-22", 105.0, 1.0)):
+        _cx732.execute("INSERT INTO tw_daily_prices VALUES (?, '5904.TWO', ?, ?, ?, ?, ?, 1000)", [_d, _p, _p, _p, _p, round(_p * _k, 4)])
+        _cx732.execute("INSERT INTO tw_trading_daily VALUES (?, '5904', 'TPEx', ?)", [_d, _p])
+    # 7777:只配股、沒有現金股利(adj = close 一路,Yahoo 的 adj/close 比值永遠是 1 → ex_dates 空)——
+    #   只有 Yahoo 回調比 ≠ 1 這道閘能把因子拉出來(審查 12a:㉛ 的 fixture 本來就有現金除息日,拿掉這道閘它也照過)
+    for _d, _raw in (("2025-06-02", 100.0), ("2025-06-03", 101.0), ("2025-06-04", 100.5), ("2025-06-05", 100.0), ("2025-06-06", 100.0),
+                     ("2025-07-01", 91.0), ("2025-07-02", 92.0), ("2026-09-22", 95.0)):
+        _yc = round(_raw / 1.1, 4) if _d < "2025-07-01" else _raw
+        _cx732.execute("INSERT INTO tw_daily_prices VALUES (?, '7777.TWO', ?, ?, ?, ?, ?, 1000)", [_d, _yc, _yc, _yc, _yc, _yc])
+        _cx732.execute("INSERT INTO tw_trading_daily VALUES (?, '7777', 'TPEx', ?)", [_d, _raw])
+    _sd732 = price_context(_cx732, "7777", "2025-06-09")
+    _ev732 = price_context(_cx732, "4950", "2025-10-29")
+    _dg732 = build_digest("目標價 12 元", {"target_price": 12, "title_head": "x"}, [], _ev732)
+    _on_ex = price_context(_cx732, "5904", "2025-07-10")
+    _after_ex = price_context(_cx732, "5904", "2025-07-11")
+    _same = [(r, price_context(_cx732, "5904", r)["adjust_factor"],
+              _e73.adj_quote(_cx732, "5904", r, 100.0)["adj_factor"] if _e73 else None) for r in ("2025-07-10", "2025-07-11", "2025-07-15")]
+    _cx732.close()
+    chk("㉜ 批730 修正:因子與事件一律向 ENG073 要(同一件事一處算,本支不留第二份);4950 減資 ×2.6185 Yahoo 沒調 → "
+        "EVENT_UNADJUSTED、**不給因子、K1 上漲空間未算**(初版會拿 12 元對 15.75 元算出 −23.8%);前一交易日:"
+        "報告日剛好是除息日 07-10 → 用 07-09 的 0.97(目標價是除息前訂的),07-11 → 1.0;三個報告日兩支引擎逐位同答;"
+        "只配股、沒有現金除息日的 7777(Yahoo adj/close 永遠 1)→ 靠回調比那道閘照乘 1/1.1",
+        _e73 is not None and _ev732["adjust_method"] == "EVENT_UNADJUSTED" and _ev732["adjust_factor"] is None
+        and "×2.6185" in _ev732["adjust_note"] and _dg732["upside_now"] is None and "上漲空間未算" in _dg732["points"]["K1"]["text"]
+        and _on_ex["report_px_date"] == "2025-07-09" and abs(_on_ex["adjust_factor"] - 0.97) < 1e-9
+        and _after_ex["report_px_date"] == "2025-07-10" and _after_ex["adjust_factor"] == 1.0
+        and all(a is not None and b is not None and abs(a - b) < 1e-12 for _r, a, b in _same)
+        and _sd732["adjust_method"] == "PRICE_FACTOR_CHAIN" and _sd732["ex_dates"] == []
+        and abs(_sd732["adjust_factor"] - round(100.0 / 1.1, 4) / 100.0) < 1e-9,
+        f"(4950 {_ev732['adjust_method']} · 除息日報告 {_on_ex['report_px_date']} × {_on_ex['adjust_factor']} · "
+        f"隔日 × {_after_ex['adjust_factor']} · 只配股 {_sd732['adjust_method']} × {_sd732['adjust_factor']:.6f} · "
+        f"兩引擎 {[(r, a, b) for r, a, b in _same]})")
     print(f"  [計] {len(ran)} 檢 OK {len(ran) - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
@@ -1458,7 +1565,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== VRN 一題四點文摘(VRN_ENG080_FourPointDigest)· 三十一檢自測(零網路;臨時庫)===")
+        print("=== VRN 一題四點文摘(VRN_ENG080_FourPointDigest)· 三十二檢自測(零網路;臨時庫)===")
         return selftest()
     verb = next((x for x in a if x in ("run", "show")), "run")   # 批387:動詞白名單(--ticker 2330 不得誤判為動詞)
     try:

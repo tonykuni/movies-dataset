@@ -11,13 +11,15 @@ v0137→v0138(批730 操作員 2026-09-24 令「自測實測自AUDIT直到完工
   ① 因子分母改用交易所原始收盤:`_prev_basis` 取報告日前最近 5 個交易日,第一個有交易所價的那天
      因子 = adj_close ÷ 交易所 close(`RAW_EXCHANGE`);沒有交易所價 → 報告頁面印的現價(`PAGE_PRICE`,
      第二血統與 repair-price 都帶得到)→ 最後才是 Yahoo close(`YAHOO_CLOSE`,照舊值、但具名未核)。
-     因子日若是單日異常(Yahoo 調整日錯位,容器實量 154 例)而前幾天彼此一致,取近 5 日中位。
+     因子 = 現金股利段(那天 Yahoo adj ÷ Yahoo close)× 配股段(Yahoo close ÷ 交易所 close);某一段單日跟前後兩天都不一樣、
+     前後兩天彼此一樣 = 那天某一邊的價是陳的 → 取前後一致值(真的換階會持續,不會被抹掉)。代號帶 .TW/.TWO 一律先轉裸碼查交易所。
+     (初版用整個因子做近 5 日中位:真庫 1,848 次除權息裡 1,316 次落在因子日被當成異常抹掉——修正版改掉,自測 ⓴ 釘住。)
   ② 報告時價(批240 CLOSE 非 ADJ)`_prior_close` 的車道順序改成**交易所在前**,Yahoo 在後(改判,見 ㊺c)。
   ③ 未調整的公司行動:因子日到最新日之間,ADJ 序列若出現超過漲跌幅(±10.5%)的跳動,而交易所原始價同一天
      也同比例跳(真事件,Yahoo 沒調)、或跳幅超過 ±40%(4950 2025-11-03 減資 ×2.62)→ `ADJ_EVENT_UNADJUSTED`,
      **不生數字**;Yahoo 自己錯位(ADJ 跳、交易所不跳)不算。上市頭 5 個交易日沒有漲跌幅,不算。
   +四欄 price_prev_raw / adj_factor_basis / adj_retro_ratio / adj_event(只增不減);`adj_quote(..., page_price=)`。
-  +⓱ 配股回調(手算對交易所)· ⓲ 頁面價後備 · ⓳ 未調整事件與錯位 · ㊺c 車道改判;㊺ 的上櫃期望照改判更新。
+  +⓱ 配股回調(手算對交易所)· ⓲ 頁面價後備 · ⓳ 未調整事件與錯位 · ⓴ 單日不一致看前後兩天 · ㊺c 車道改判;㊺ 的上櫃期望照改判更新。
 
 v0136→v0137(批729 操作員 2026-09-24 令「所有目標價及各前一日的價格都要換成 ADJ CLOSE,上漲空間都要用最新的 ADJ CLOSE」):
   量過再動:目標價換 ADJ(target_price_adj)與上漲空間用最新 ADJ(upside_adj)是批659 L99 早就寫好的;
@@ -1089,13 +1091,16 @@ def _prior_close(con, ticker: str, rdate: str):
     現在是「這張表不合用就換下一張」,不是「查一次不中就收工」。"""
     if not ticker or not rdate:
         return None, ""
+    ticker = _bare_code(ticker)            # 批730:帶 .TWO 的代號也要先查交易所(裸碼),不安靜掉到 Yahoo
     stale = ""
     for tbl, col, forms, _why in PRICE_LANES:
         for f in forms:
             t = f.format(t=ticker)
             try:
+                # 批730 審查:沒成交的日子交易所列的 close 是 NULL(容器 7,505 列)——不濾掉,最新一列是空的,
+                #   這條車道就被跳過、掉到 Yahoo 回調過的 close(7,105 個報告日;1,679 個差超過 0.5%)
                 r = con.execute(
-                    f'SELECT date, close FROM "{tbl}" WHERE "{col}"=? AND date<? '
+                    f'SELECT date, close FROM "{tbl}" WHERE "{col}"=? AND date<? AND close IS NOT NULL AND close > 0 '
                     "ORDER BY date DESC LIMIT 1", [t, rdate]).fetchone()
             except Exception:
                 break                      # 表不在/欄不對 → 換下一張車道(不是整個放棄)
@@ -1584,22 +1589,8 @@ TARGET_EXPIRED = "EXPIRED_OVER_1Y"
 ADJ_RATIO_LO, ADJ_RATIO_HI = 0.2, 5.0        # 沿用批443 的荒謬比值守衛:目標價/現價 落在 0.2–5.0
 
 
-def _prev_close_adj(con, ticker: str, rdate: str):
-    """批729:報告日前一交易日那一列的 (close, adj_close, 日期);沒有回 (None, None, "")。
-    因子與「前一日價換 ADJ」都讀這一列——同一件事一處查。"""
-    for sfx in (".TW", ".TWO", ""):
-        t = f"{ticker}{sfx}"
-        try:
-            r = con.execute(
-                "SELECT date, close, adj_close FROM tw_daily_prices WHERE ticker=? AND date<? "
-                "AND close IS NOT NULL AND close<>0 AND adj_close IS NOT NULL "
-                "ORDER BY date DESC LIMIT 1", [t, rdate]).fetchone()
-        except Exception:
-            return None, None, ""             # 這張表不在=算不出,誠實回空(不編一個 1.0 出來)
-        if r:
-            return float(r[1]), float(r[2]), str(r[0])
-    return None, None, ""
-
+#: 批730:v0137 的 `_prev_close_adj`(回 Yahoo close / adj 那一列)拿掉了——它的 close 就是本批要換掉的分母,
+#:   留著等於留一顆會算錯的第二顆頭;前一日價與因子一律走 `_prev_basis`。
 
 #: 批730:未調整公司行動的判準。台股漲跌幅 ±10%,ADJ 序列單日跳出 [0.895, 1.105] 就是沒調到的事件或資料錯位
 #: (**算術對稱**:跌停是 ×0.900;第一版寫成乘法對稱 1/1.105=0.905,容器 120 筆抽樣把 82 筆普通跌停誤判成事件);
@@ -1607,17 +1598,47 @@ def _prev_close_adj(con, ticker: str, rdate: str):
 EVENT_LO, EVENT_HI = 0.895, 1.105
 EVENT_HARD = 1.40
 LISTING_FREE_DAYS = 5
-FACTOR_GLITCH = 0.02      # 因子日與近 5 日中位差過 2%、其餘彼此差不到 1% → 因子日是單日異常
+#: 兩天的配股段(Yahoo close ÷ 交易所 close)差不到 0.05% = 同一段股本基礎。台股一檔的最小跳動 ≥ 0.1%,
+#: 浮點誤差約 1e-7,所以 0.05% 兩邊都分得開。
+RETRO_SAME = 5e-4
+NEIGHBOR_DAYS = 15        # 單日不一致要看「前後鄰日」:限 15 個日曆天內(農曆年最長約 10 天)
+NEAR_DAYS = 45            # 前一交易日交易所缺時,配股段往前後找最近的交易所日:限 45 個日曆天內
+PAGE_BAND = 0.005         # 頁面價落在 Yahoo 近 5 日收盤 ±0.5% 內 = 看不出回調
+
+
+def _bare_code(ticker) -> str:
+    """交易所表的鍵是裸碼(`6147`)。呼叫端給 `6147.TWO` 也要查得到——
+    批730 實測:帶尾碼的代號 293/293 筆查不到交易所價,安靜地掉回 Yahoo close(本批要修的就是那個分母)。"""
+    return re.sub(r"\.TWO?$", "", str(ticker or "").strip(), flags=re.IGNORECASE)
+
+
+def _shift_day(day: str, n: int) -> str:
+    """'2026-09-15' 加減 n 個日曆天;解析不了照回原字串(比較時就不會擋掉任何一天)。"""
+    import datetime as _d
+    try:
+        return (_d.date.fromisoformat(str(day)[:10]) + _d.timedelta(days=n)).isoformat()
+    except ValueError:
+        return str(day)
+
+
+def _steady(v0, vb, va):
+    """那一天的值 v0 跟前一天 vb、後一天 va 都不一樣,而前後兩天彼此一樣 → 回 vb(那一天是單日不一致,某一邊的價是陳的);
+    其餘照回 v0。真的換階(除權息 / 配股那天)會持續到後一天,不會被這條抹掉。缺前或缺後 → 分不出來,照回 v0。"""
+    if vb is None or va is None or min(v0, vb, va) <= 0:
+        return v0
+    if abs(v0 / vb - 1) > RETRO_SAME and abs(v0 / va - 1) > RETRO_SAME and abs(va / vb - 1) <= RETRO_SAME:
+        return vb
+    return v0
 
 
 def _exchange_close(con, code: str, dates: list) -> dict:
-    """交易所日成交表在這幾天的收盤 {日期: 價};表不在或沒有 → {}。"""
+    """交易所日成交表在這幾天的收盤 {日期: 價};表不在或沒有 → {}。代號帶不帶 .TW/.TWO 都行。"""
     if not dates:
         return {}
     try:
         rows = con.execute(
             "SELECT CAST(date AS VARCHAR), close FROM tw_trading_daily WHERE code=? AND close > 0 "
-            f"AND CAST(date AS VARCHAR) IN ({','.join('?' * len(dates))})", [code] + list(dates)).fetchall()
+            f"AND CAST(date AS VARCHAR) IN ({','.join('?' * len(dates))})", [_bare_code(code)] + list(dates)).fetchall()
     except Exception:
         return {}
     return {str(d): float(c) for d, c in rows}
@@ -1625,47 +1646,88 @@ def _exchange_close(con, code: str, dates: list) -> dict:
 
 def _prev_basis(con, ticker: str, rdate: str, page_price=None) -> dict:
     """批730:報告日前一交易日那一列 + **因子的分母用哪一個原始價**。
-    因子 = adj_close ÷ 原始收盤;原始收盤依序取 交易所(RAW_EXCHANGE)→ 報告頁面價(PAGE_PRICE)→
-    Yahoo close(YAHOO_CLOSE,v0137 的算法,具名未核)。retro = Yahoo close ÷ 交易所 close(≠1 = Yahoo 事後回調過)。"""
+    因子 = 現金股利段 × 配股段:
+      現金股利段 = 前一交易日 Yahoo 的 adj_close ÷ Yahoo 的 close(同一天同一來源;那天的價若是陳的,兩個一起陳,比值不受影響);
+      配股段     = Yahoo 的 close ÷ 交易所 close(retro;Yahoo 事後按配股 / 拆股 / 減資回調的比例,≠1 = 回調過)。
+    配股段只在股本事件那天換階。前一交易日的配股段跟前後兩個交易所日都不一樣、而前後兩天彼此一樣 = 那天某一邊的價是陳的
+    (容器實量:單日不一致 ≤2% 的 2,770 列、>2% 的 1,235 列;4154 在 2024-08-16 Yahoo 那一天漏了回調)→ 取前後一致的值。
+    現金股利段不平滑:容器 1,848 次換階全部持續(真除權息),單日跳回的 0 次。
+    (v0138 初版拿整個因子做近 5 日中位——1,848 次真除權息裡有 1,316 次落在因子日就被當成異常抹掉,本版改掉。)
+    原始收盤依序取 交易所(RAW_EXCHANGE;前一交易日缺 → 45 天內最近的交易所日,前後一致才取)→ 報告頁面價(PAGE_PRICE,
+    只在它落在 Yahoo 近 5 日收盤之外時)→ Yahoo close(YAHOO_CLOSE,v0137 的算法,具名未核)。"""
     out = {"close": None, "adj": None, "date": "", "raw": None, "raw_date": "", "factor": None,
-           "factor_date": "", "basis": "", "retro": None, "spread": None}
-    rows = []
+           "factor_date": "", "basis": "", "retro": None}
+    code = _bare_code(ticker)
+    rows, tk = [], ""
     for sfx in (".TW", ".TWO", ""):
         try:
             rows = con.execute(
                 "SELECT CAST(date AS VARCHAR), close, adj_close FROM tw_daily_prices WHERE ticker=? AND date<? "
                 "AND close IS NOT NULL AND close<>0 AND adj_close IS NOT NULL "
-                "ORDER BY date DESC LIMIT 5", [f"{ticker}{sfx}", rdate]).fetchall()
+                "ORDER BY date DESC LIMIT 5", [f"{code}{sfx}", rdate]).fetchall()
         except Exception:
             return out                          # 這張表不在=算不出,誠實回空(不編一個 1.0 出來)
         if rows:
+            tk = f"{code}{sfx}"
             break
     if not rows:
         return out
     d0, c0, a0 = str(rows[0][0]), float(rows[0][1]), float(rows[0][2])
     out.update(close=c0, adj=a0, date=d0)
-    raw = _exchange_close(con, str(ticker), [str(r[0]) for r in rows])
-    fs = [(str(d), float(a) / raw[str(d)]) for d, _c, a in rows if str(d) in raw]
-    if fs:
-        rd0, f0 = fs[0]
-        vals = sorted(f for _d, f in fs)
-        med = vals[len(vals) // 2] if len(vals) % 2 else (vals[len(vals) // 2 - 1] + vals[len(vals) // 2]) / 2
-        out["spread"] = round(vals[-1] / vals[0] - 1, 6) if vals[0] > 0 else None
-        glitch = (len(fs) >= 3 and abs(f0 / med - 1) > FACTOR_GLITCH
-                  and all(abs(f / med - 1) <= FACTOR_GLITCH / 2 for _d, f in fs[1:]))
-        out.update(raw=raw[rd0], raw_date=rd0, factor=(med if glitch else f0), factor_date=rd0,
-                   basis="RAW_EXCHANGE(因子日單日異常,取近5日中位)" if glitch else "RAW_EXCHANGE")
-        if d0 in raw:
-            out["retro"] = round(c0 / raw[d0], 6)
+    # 報告日當天起的三個交易日只拿來判斷前一交易日是不是單日不一致(因子本身只用報告日以前的價);
+    #   前後鄰日限 15 個日曆天內(農曆年最長約 10 天)——稀疏的表不拿幾個月外的日子當「鄰日」
+    after = con.execute("SELECT CAST(date AS VARCHAR), close, adj_close FROM tw_daily_prices WHERE ticker=? AND date>=? "
+                        "AND CAST(date AS VARCHAR)<=? AND close IS NOT NULL AND close<>0 AND adj_close IS NOT NULL "
+                        "ORDER BY date LIMIT 3", [tk, rdate, _shift_day(d0, NEIGHBOR_DAYS)]).fetchall()
+    near = [r for r in rows[1:] if str(r[0]) >= _shift_day(d0, -NEIGHBOR_DAYS)]
+    yc = {str(d): float(c) for d, c, _a in list(rows) + list(after)}
+    # 現金股利段:只看 Yahoo 自己;單日跟前後都不一樣、前後彼此一樣 = 那天 adj 錯(真除權息會持續,不會被這條抹掉)
+    cash = _steady(a0 / c0, float(near[0][2]) / float(near[0][1]) if near else None,
+                   float(after[0][2]) / float(after[0][1]) if after else None)
+    raw = _exchange_close(con, code, sorted(yc))
+    xs = {d: yc[d] / raw[d] for d in yc if d in raw}
+    before = [str(d) for d, _c, _a in near if str(d) in xs]               # 由近而遠
+    nxt = [str(d) for d, _c, _a in after if str(d) in xs]                 # 由近而遠
+    xb, xa = (xs[before[0]] if before else None), (xs[nxt[0]] if nxt else None)
+    smoothed = "" if cash == a0 / c0 else "現金股利段"
+    if d0 in xs:
+        x = _steady(xs[d0], xb, xa)
+        smoothed = "、".join(s for s in (smoothed, "" if x == xs[d0] else "配股段") if s)
+        out.update(raw=raw[d0], raw_date=d0, factor=cash * x, factor_date=d0, retro=round(x, 6),
+                   basis=f"RAW_EXCHANGE(前一交易日單日不一致,{smoothed}取前後一致值)" if smoothed else "RAW_EXCHANGE")
+        return out
+    # 前一交易日交易所缺(容器:上櫃表缺 94 個 Yahoo 交易日,含 2026-09-08~09-22 整段;上市表只有 117 個零星日子):
+    #   配股段只在股本事件那天換階,取 45 個日曆天內最近的交易所日——前後兩邊都有就要一致
+    #   (不一致 = 中間換過股本基礎,分不出前一交易日在哪一邊 → 不猜,往下走)
+    fb = con.execute("SELECT CAST(date AS VARCHAR), close FROM tw_daily_prices WHERE ticker=? AND date<? AND CAST(date AS VARCHAR)>=? "
+                     "AND close IS NOT NULL AND close<>0 ORDER BY date DESC", [tk, d0, _shift_day(d0, -NEAR_DAYS)]).fetchall()
+    fa = con.execute("SELECT CAST(date AS VARCHAR), close FROM tw_daily_prices WHERE ticker=? AND date>? AND CAST(date AS VARCHAR)<=? "
+                     "AND close IS NOT NULL AND close<>0 ORDER BY date", [tk, d0, _shift_day(d0, NEAR_DAYS)]).fetchall()
+    yc2 = {str(d): float(c) for d, c in list(fb) + list(fa)}
+    raw2 = _exchange_close(con, code, sorted(yc2))
+    nb = next((str(d) for d, _c in fb if str(d) in raw2), None)
+    na = next((str(d) for d, _c in fa if str(d) in raw2), None)
+    xb2, xa2 = (yc2[nb] / raw2[nb] if nb else None), (yc2[na] / raw2[na] if na else None)
+    if (xb2 is not None or xa2 is not None) and not (xb2 is not None and xa2 is not None and abs(xa2 / xb2 - 1) > RETRO_SAME):
+        nd_ = nb if xb2 is not None else na
+        x = xb2 if xb2 is not None else xa2
+        out.update(raw=raw2[nd_], raw_date=nd_, factor=cash * x, factor_date=d0, retro=round(x, 6),
+                   basis=f"RAW_EXCHANGE(前一交易日交易所缺,配股段取最近交易所日 {nd_})")
         return out
     try:
         pp = float(page_price) if page_price not in (None, "") else 0.0
     except (TypeError, ValueError):
         pp = 0.0
     if pp > 0 and ADJ_RATIO_LO <= pp / c0 <= ADJ_RATIO_HI:
+        # 頁面價只在它**落在 Yahoo 近 5 日收盤之外**時才當分母(那才是 Yahoo 回調過的跡象);落在裡面 = 看不出回調,
+        #   Yahoo 那天的 close 日期是準的,頁面價的日期不一定(批730 審查:頁面印的是 09-11 的價、報告日 09-16)
+        ys = [float(r[1]) for r in rows]
+        if min(ys) * (1 - PAGE_BAND) <= pp <= max(ys) * (1 + PAGE_BAND):
+            out.update(factor=cash, factor_date=d0, basis="YAHOO_CLOSE(頁面價落在 Yahoo 近 5 日收盤內,看不出回調)")
+            return out
         out.update(factor=a0 / pp, factor_date=d0, basis="PAGE_PRICE")
         return out
-    out.update(factor=a0 / c0, factor_date=d0, basis="YAHOO_CLOSE")
+    out.update(factor=cash, factor_date=d0, basis="YAHOO_CLOSE")
     return out
 
 
@@ -1683,38 +1745,68 @@ def _missing_trading_days(con, d0: str, d1: str) -> int:
     return len(days)
 
 
+def _listing_until(con, code: str, rows: list) -> str:
+    """上市頭 5 個交易日(沒有漲跌幅)的最後一天;這天以前(含興櫃期)的跳動不算事件。
+    交易所表的第一筆**晚於該市場在表裡的第一天**,才是這一支的上市日(早於或等於 = 表是那天才開始收的,不是那天上市);
+    上市日起算第 5 個市場交易日(日曆 = 兩張表任一張當天有 ≥100 檔的日子;日曆不夠的小庫用這一支自己的交易所列)。
+    判不出 → Yahoo 自己的第 5 列(舊法)。
+    批730 審查:初版拿「交易所頭 5 列」——上市那張表只有 117 個零星日子、從 2024-09-20 起,
+    每一支上市股都被豁免到 2025-05-06,那段期間 ×1.6 的未調整跳動照樣不報。"""
+    fallback = str(rows[min(LISTING_FREE_DAYS - 1, len(rows) - 1)][0])
+    cols = {(str(t), str(c)) for t, c in con.execute(
+        "SELECT table_name, column_name FROM information_schema.columns").fetchall()}
+    if ("tw_trading_daily", "code") not in cols:
+        return fallback
+    has_mkt = ("tw_trading_daily", "market") in cols
+    first = con.execute("SELECT min(CAST(date AS VARCHAR))" + (", min(market)" if has_mkt else ", NULL")
+                        + " FROM tw_trading_daily WHERE code=? AND close > 0", [code]).fetchone()
+    if not first or not first[0]:
+        return fallback
+    table_first = con.execute("SELECT min(CAST(date AS VARCHAR)) FROM tw_trading_daily"
+                              + (" WHERE market IS NOT DISTINCT FROM ?" if has_mkt else ""),
+                              [first[1]] if has_mkt else []).fetchone()[0]
+    if not table_first or str(first[0]) <= str(table_first):
+        return fallback                       # 表開張那天就有這一支 = 早就上市了
+    days = set()
+    for tbl, extra in (("tw_trading_daily", " AND close > 0"), ("tw_daily_prices", "")):
+        if (tbl, "date") in cols:
+            days |= {str(r[0]) for r in con.execute(
+                f"SELECT CAST(date AS VARCHAR) FROM {tbl} WHERE CAST(date AS VARCHAR) >= ?{extra} "
+                f"GROUP BY 1 HAVING count(*) >= 100 ORDER BY 1 LIMIT ?", [str(first[0]), LISTING_FREE_DAYS]).fetchall()}
+    cal = sorted(days)[:LISTING_FREE_DAYS]
+    if len(cal) < LISTING_FREE_DAYS:
+        cal = [str(r[0]) for r in con.execute(
+            "SELECT CAST(date AS VARCHAR) FROM tw_trading_daily WHERE code=? AND close > 0 AND CAST(date AS VARCHAR) >= ? "
+            "ORDER BY date LIMIT ?", [code, str(first[0]), LISTING_FREE_DAYS]).fetchall()]
+    return cal[-1] if cal else fallback
+
+
 def _unadjusted_events(con, ticker: str, since: str) -> list:
     """批730:`since`(因子日)之後 ADJ 序列裡**沒調到的公司行動**。回 [(日期, 倍數, 依據)]。
     交易所兩天都有價:交易所也同比例跳(差不到 2%)才算(Yahoo 自己錯位不算);交易所缺:跳過 ±40% 才算。"""
     rows = []
-    tk = ""
+    tk, code = "", _bare_code(ticker)
     for sfx in (".TW", ".TWO", ""):
         try:
             rows = con.execute(
                 "SELECT CAST(date AS VARCHAR), adj_close FROM tw_daily_prices WHERE ticker=? AND adj_close > 0 "
-                "ORDER BY date", [f"{ticker}{sfx}"]).fetchall()
+                "ORDER BY date", [f"{code}{sfx}"]).fetchall()
         except Exception:
             return []
         if rows:
-            tk = f"{ticker}{sfx}"
+            tk = f"{code}{sfx}"
             break
     if len(rows) < 2 or not tk:
         return []
-    # 上市頭 5 個交易日沒有漲跌幅(第 6 日起受限)。有交易所列就以交易所第一筆起算——Yahoo 的序列可能含興櫃期
-    #   (容器實錄 6913 / 6925 / 6967 的跳動落在交易所第 2 個交易日;7772 落在交易所第一筆之前的興櫃期)
-    try:
-        _ex5 = [str(r[0]) for r in con.execute(
-            "SELECT CAST(date AS VARCHAR) FROM tw_trading_daily WHERE code=? AND close > 0 ORDER BY date LIMIT ?",
-            [str(ticker), LISTING_FREE_DAYS]).fetchall()]
-    except Exception:
-        _ex5 = []
-    free_until = _ex5[-1] if _ex5 else str(rows[min(LISTING_FREE_DAYS - 1, len(rows) - 1)][0])
+    # 上市頭 5 個交易日沒有漲跌幅(第 6 日起受限);上市日以前(Yahoo 的序列可能含興櫃期)也不算
+    #   (容器實錄 6913 / 6925 / 6967 的跳動落在上市第 2 個交易日;7772 落在上市日之前的興櫃期)
+    free_until = _listing_until(con, code, rows)
     span = [(str(d), float(a)) for d, a in rows if str(d) >= str(since)]
     cand = [(p, q) for p, q in zip(span, span[1:])
             if q[0] > free_until and not (EVENT_LO <= q[1] / p[1] <= EVENT_HI)]
     if not cand:
         return []
-    raw = _exchange_close(con, str(ticker), sorted({x[0] for p, q in cand for x in (p, q)}))
+    raw = _exchange_close(con, code, sorted({x[0] for p, q in cand for x in (p, q)}))
     ev = []
     for (d0, a0), (d1, a1) in cand:
         r = a1 / a0
@@ -1743,7 +1835,7 @@ def _adj_factor(con, ticker: str, rdate: str):
 def _latest_adj(con, ticker: str):
     """最新一筆 adj_close。回 (價, 日期);沒有回 (None, "")。"""
     for sfx in (".TW", ".TWO", ""):
-        t = f"{ticker}{sfx}"
+        t = f"{_bare_code(ticker)}{sfx}"
         try:
             r = con.execute(
                 "SELECT date, adj_close FROM tw_daily_prices WHERE ticker=? AND adj_close IS NOT NULL "
@@ -1790,7 +1882,7 @@ def _raw_latest(con, ticker: str):
             r = con.execute(
                 f"SELECT CAST(date AS VARCHAR), {pcol} FROM {tbl} "
                 f"WHERE {key}=? AND {pcol} IS NOT NULL AND {pcol}<>0 "
-                "ORDER BY date DESC LIMIT 1", [ticker]).fetchone()
+                "ORDER BY date DESC LIMIT 1", [_bare_code(ticker)]).fetchone()
         except Exception:
             continue                          # 表不在=這條路沒有,不是壞掉
         if r and (not best[1] or str(r[0]) > best[1]):
@@ -3324,41 +3416,146 @@ def selftest() -> int:
         and _old == 121.1 and _r1["upside_adj_state"] == "ADJ_OK",
         f"(因子 {_r1['adj_factor']:.5f} {_r1['adj_factor_basis']} · 回調比 {_r1['adj_retro_ratio']} · "
         f"本版 {_r1['upside_adj']:+.1f}% · v0137 算法 {_old:+.1f}%)")
-    _r2 = apply_adj_upside(_c4, {"ticker": "1294", "report_date": "2024-09-26", "target_price": 150.0,
-                                 "price": 128.0})     # 前一交易日 09-25 交易所沒有 → 頁面價
-    _r3 = apply_adj_upside(_c4, {"ticker": "1294", "report_date": "2024-09-26", "target_price": 150.0})
-    _q4 = adj_quote(_c4, "1294", "2024-09-26", 150.0, page_price=128.0)
-    chk("⓲ 批730 交易所沒有報告日前 5 日的價 → **報告頁面印的現價**當分母(PAGE_PRICE,因子 98.2572 ÷ 128.0);"
-        "頁面價也沒有 → 退回 Yahoo close 但**具名 YAHOO_CLOSE**(v0137 的值,不假裝核過);委派口 adj_quote 帶得進頁面價",
-        _r2["adj_factor_basis"] == "PAGE_PRICE" and abs(_r2["adj_factor"] - 98.2572 / 128.0) < 1e-9
+    # 5294:同 1294 的 Yahoo 價,但交易所在前後 45 天內都沒有價(只有兩年後那一天)
+    _c4.execute("INSERT INTO tw_daily_prices VALUES "
+                "('2024-09-24','5294.TWO',110.1449,100.679),('2024-09-25','5294.TWO',107.4953,98.2572),"
+                "('2024-09-26','5294.TWO',95.7617,87.532),('2026-09-22','5294.TWO',62.0,62.0)")
+    _c4.execute("INSERT INTO tw_trading_daily VALUES ('2026-09-22','5294','TPEx',62.0)")
+    _r2 = apply_adj_upside(_c4, {"ticker": "5294", "report_date": "2024-09-26", "target_price": 150.0,
+                                 "price": 128.0})     # 頁面價落在 Yahoo 近 5 日收盤之外 → 回調的跡象 → 頁面價
+    _r2b = apply_adj_upside(_c4, {"ticker": "5294", "report_date": "2024-09-26", "target_price": 150.0,
+                                  "price": 108.0})    # 落在裡面 → 看不出回調,Yahoo 那天的 close 日期才是準的
+    _r3 = apply_adj_upside(_c4, {"ticker": "5294", "report_date": "2024-09-26", "target_price": 150.0})
+    _q4 = adj_quote(_c4, "5294", "2024-09-26", 150.0, page_price=128.0)
+    _r2c = apply_adj_upside(_c4, {"ticker": "1294", "report_date": "2024-09-26", "target_price": 150.0,
+                                  "price": 128.0})    # 前一交易日 09-25 交易所缺,但 09-26 有 → 用交易所,不用頁面價
+    chk("⓲ 批730 前一交易日交易所缺:① 45 天內有交易所日(1294 的 09-26)→ 配股段取它(RAW_EXCHANGE,因子 = 手算 87.532 ÷ 126.5),"
+        "**不拿頁面價**(審查:上櫃表缺 94 天,頁面價的日期不一定是前一交易日);② 45 天內都沒有 → 頁面價落在 Yahoo 近 5 日收盤"
+        "之外才當分母(PAGE_PRICE 98.2572 ÷ 128.0),落在裡面(108)= 看不出回調 → Yahoo close;③ 頁面價也沒有 → **具名 YAHOO_CLOSE**;"
+        "委派口 adj_quote 帶得進頁面價",
+        _r2c["adj_factor_basis"] == "RAW_EXCHANGE(前一交易日交易所缺,配股段取最近交易所日 2024-09-26)"
+        and abs(_r2c["adj_factor"] - 87.532 / 126.5) < 1e-6
+        and _r2["adj_factor_basis"] == "PAGE_PRICE" and abs(_r2["adj_factor"] - 98.2572 / 128.0) < 1e-9
+        and _r2b["adj_factor_basis"].startswith("YAHOO_CLOSE(頁面價落在") and abs(_r2b["adj_factor"] - 98.2572 / 107.4953) < 1e-9
         and _r3["adj_factor_basis"] == "YAHOO_CLOSE" and abs(_r3["adj_factor"] - 98.2572 / 107.4953) < 1e-9
         and _q4["adj_factor_basis"] == "PAGE_PRICE" and _q4["upside_adj"] == _r2["upside_adj"],
-        f"(頁面 {_r2['adj_factor']:.5f} · Yahoo {_r3['adj_factor']:.5f} · 委派 {_q4['adj_factor_basis']})")
-    # 4950 形:減資 2025-11-03 ×2.62,Yahoo 沒調(close = adj 一路);另一支 4154 形:Yahoo 單日錯位,交易所平
+        f"(最近交易所日 {_r2c['adj_factor']:.5f} · 頁面 {_r2['adj_factor']:.5f} · 頁面落在內 {_r2b['adj_factor_basis'][:11]} · "
+        f"Yahoo {_r3['adj_factor']:.5f} · 委派 {_q4['adj_factor_basis']})")
+    # 4950 形:減資 2025-11-03 ×2.62,Yahoo 沒調(close = adj 一路);另一支 4154 代號的合成形:Yahoo 的 adj 單日錯(close 對),交易所平
     _c4.execute("INSERT INTO tw_daily_prices VALUES "
                 "('2025-10-20','4950.TWO',10.4,10.4),('2025-10-21','4950.TWO',10.35,10.35),('2025-10-22','4950.TWO',10.3,10.3),"
                 "('2025-10-24','4950.TWO',10.3,10.3),('2025-10-27','4950.TWO',10.45,10.45),('2025-10-28','4950.TWO',10.2,10.2),"
                 "('2025-10-30','4950.TWO',10.1,10.1),('2025-10-31','4950.TWO',10.0,10.0),('2025-11-03','4950.TWO',26.1848,26.1848),"
                 "('2026-09-22','4950.TWO',25.0,25.0),"
+                "('2024-08-05','4154.TWO',14.0,14.0),('2024-08-06','4154.TWO',14.1,14.1),('2024-08-07','4154.TWO',14.0,14.0),"
+                "('2024-08-08','4154.TWO',14.1,14.1),('2024-08-09','4154.TWO',14.2,14.2),"
                 "('2024-08-12','4154.TWO',14.2,14.2),('2024-08-13','4154.TWO',14.3,14.3),('2024-08-14','4154.TWO',14.5,14.5),"
                 "('2024-08-15','4154.TWO',14.6,21.147),('2024-08-16','4154.TWO',14.6,14.6),('2026-09-22','4154.TWO',15.0,15.0)")
     _c4.execute("INSERT INTO tw_trading_daily VALUES ('2025-10-27','4950','TPEx',10.45),('2025-10-28','4950','TPEx',10.2),"
                 "('2025-10-30','4950','TPEx',10.1),"
+                "('2024-08-05','4154','TPEx',14.0),('2024-08-06','4154','TPEx',14.1),('2024-08-07','4154','TPEx',14.0),"
+                "('2024-08-08','4154','TPEx',14.1),('2024-08-09','4154','TPEx',14.2),"
                 "('2024-08-12','4154','TPEx',14.2),('2024-08-13','4154','TPEx',14.3),('2024-08-14','4154','TPEx',14.5),"
                 "('2024-08-15','4154','TPEx',14.6),('2024-08-16','4154','TPEx',14.6)")
     _r5 = apply_adj_upside(_c4, {"ticker": "4950", "report_date": "2025-10-29", "target_price": 12.0})
     _r6 = apply_adj_upside(_c4, {"ticker": "4154", "report_date": "2024-08-16", "target_price": 16.0})
+    # 審查 12b:上一版的候選跳動剛好落在上市窗口裡,「交易所沒跳」那一支從來沒被走到——這裡直接點名那一步
+    _free6 = _listing_until(_c4, "4154", _c4.execute("SELECT date, adj_close FROM tw_daily_prices WHERE ticker='4154.TWO' ORDER BY date").fetchall())
     apply_raw_upside(_c4, _r5)                 # RAW 車道:股本基礎變了,一樣不給數字
     _c4.close()
     chk("⓳ 批730 沒調到的公司行動:4950 報告日 2025-10-29,之後 11-03 減資跳 ×2.6185(Yahoo 沒調,超過 ±40%)→ "
-        "**ADJ_EVENT_UNADJUSTED、不生數字**(v0137 會算出 12 ÷ 25 = −52%),RAW 車道也不給;4154 因子日 08-15 Yahoo 單日錯位"
-        "(adj 21.147 對交易所 14.6,前幾天因子都是 1)→ 取近 5 日中位、不當事件",
+        "**ADJ_EVENT_UNADJUSTED、不生數字**(v0137 會算出 12 ÷ 25 = −52%),RAW 車道也不給;合成形:因子日 08-15 Yahoo 的 adj "
+        "單日錯(21.147 對 close 14.6,前後兩天現金股利段都是 1)→ 現金股利段取前後一致值、不當事件",
         _r5["upside_adj_state"].startswith("ADJ_EVENT_UNADJUSTED(2025-11-03") and _r5["upside_adj"] is None
         and "×2.6185" in _r5["adj_event"] and _r5["upside_raw"] is None
         and str(_r5["upside_raw_state"]).startswith("RAW_SKIP(股本事件未調整")
         and _r6["upside_adj_state"] == "ADJ_OK(因子1;報告日後未除權息)"
-        and abs(_r6["adj_factor"] - 1.0) < 1e-9 and "中位" in _r6["adj_factor_basis"] and _r6["adj_event"] == "",
-        f"(4950 {_r5['upside_adj_state']} · 4154 因子 {_r6['adj_factor']} {_r6['adj_factor_basis']})")
+        and abs(_r6["adj_factor"] - 1.0) < 1e-9 and "現金股利段取前後一致值" in _r6["adj_factor_basis"]
+        and _r6["adj_event"] == "" and _free6 < "2024-08-15",
+        f"(4950 {_r5['upside_adj_state']} · 合成形 因子 {_r6['adj_factor']} {_r6['adj_factor_basis']})")
+    # ── ⓴ 批730 修正:單日不一致要看前後兩天,真的換階會持續(容器實量 1,848 次除權息全持續)──
+    _c5 = _dd.connect(":memory:")
+    _c5.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE, adj_close DOUBLE)")
+    _c5.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR, close DOUBLE)")
+    # 真 4154 形(容器實錄):減資後 Yahoo 把舊價全乘 1.4484;08-16 那一天漏乘(close = 交易所 14.6),08-13 也錯一天
+    _yc = {"2024-08-12": (20.857, 14.40), "2024-08-13": (22.668, 14.45), "2024-08-14": (21.509, 14.85),
+           "2024-08-15": (21.147, 14.60), "2024-08-16": (14.600, 14.60), "2024-08-19": (20.929, 14.45),
+           "2024-08-20": (20.929, 14.45)}
+    for _d, (_y, _x) in _yc.items():
+        _c5.execute("INSERT INTO tw_daily_prices VALUES (?, '4154.TWO', ?, ?)", [_d, _y, _y])
+        _c5.execute("INSERT INTO tw_trading_daily VALUES (?, '4154', 'TPEx', ?)", [_d, _x])
+    _c5.execute("INSERT INTO tw_daily_prices VALUES ('2026-09-22','4154.TWO',30.0,30.0)")
+    _c5.execute("INSERT INTO tw_trading_daily VALUES ('2026-09-22','4154','TPEx',30.0)")
+    # 除權息日剛好是因子日:07-10 除息 3%(adj ÷ close 由 0.97 換到 1.0,之後持續);close 沒回調
+    _cx = [("2025-07-03", 100.0, 0.97), ("2025-07-04", 101.0, 0.97), ("2025-07-07", 102.0, 0.97), ("2025-07-08", 101.0, 0.97),
+           ("2025-07-09", 103.0, 0.97), ("2025-07-10", 100.0, 1.0), ("2025-07-11", 101.0, 1.0), ("2025-07-14", 100.5, 1.0),
+           ("2026-09-22", 105.0, 1.0)]
+    for _d, _p, _k in _cx:
+        _c5.execute("INSERT INTO tw_daily_prices VALUES (?, '5904.TWO', ?, ?)", [_d, _p, round(_p * _k, 4)])
+        _c5.execute("INSERT INTO tw_trading_daily VALUES (?, '5904', 'TPEx', ?)", [_d, _p])
+    _r7 = apply_adj_upside(_c5, {"ticker": "4154", "report_date": "2024-08-19", "target_price": 16.0})
+    _r8 = apply_adj_upside(_c5, {"ticker": "5904", "report_date": "2025-07-11", "target_price": 120.0})
+    _q9, _q9b = adj_quote(_c5, "4154.TWO", "2024-08-19", 16.0), adj_quote(_c5, "4154", "2024-08-19", 16.0)
+    _pc9 = _prior_close(_c5, "4154.TWO", "2024-08-19")
+    _c5.close()
+    _k7 = 21.147 / 14.60
+    chk("⓴ 批730 修正:① 真 4154 形——前一交易日 08-16 Yahoo 漏回調(close = 交易所 14.6),前後兩天回調比都是 1.4484"
+        " → 配股段取 1.4484(v0138 初版的 5 日中位被 08-13 另一個錯價卡住、照用 1.0,上漲空間差 31%);"
+        "② 除息日剛好是因子日(07-10 現金股利段 0.97 → 1.0 並持續)→ **照用當天的 1.0**(初版中位會抹成 0.97,"
+        "容器 1,848 次除權息裡 1,316 次這樣錯);③ 代號帶 .TWO 跟裸碼同答、報告時價也先查交易所",
+        abs(_r7["adj_factor"] - _k7) < 1e-9 and "配股段取前後一致值" in _r7["adj_factor_basis"]
+        and _r7["adj_retro_ratio"] == round(_k7, 6) and _r7["upside_adj"] == round((round(16.0 * _k7, 4) / 30.0 - 1) * 100, 1)
+        and _r8["adj_factor"] == 1.0 and _r8["adj_factor_basis"] == "RAW_EXCHANGE" and _r8["upside_adj"] == 14.3
+        and _q9 == _q9b and _q9["adj_factor_basis"] != "YAHOO_CLOSE" and _pc9 == (14.6, "tw_trading_daily"),
+        f"(4154 因子 {_r7['adj_factor']:.6f} {_r7['adj_factor_basis']} {_r7['upside_adj']:+.1f}% · "
+        f"除息日 因子 {_r8['adj_factor']} {_r8['adj_factor_basis']} · 帶尾碼 {_q9['adj_factor_basis']} · 報告時價 {_pc9})")
+    # ── ⓴b/⓴c 批730 審查 ──
+    import datetime as _dt6
+    _c6 = _dd.connect(":memory:")
+    _c6.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE, adj_close DOUBLE)")
+    _c6.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR, close DOUBLE)")
+
+    def _bdays(a, b):
+        d, e = _dt6.date.fromisoformat(a), _dt6.date.fromisoformat(b)
+        while d <= e:
+            if d.weekday() < 5:
+                yield d.isoformat()
+            d += _dt6.timedelta(days=1)
+    # 上市表稀疏(2330 那張表 2024-09-20 才開張,零星五天):2025-03-03 Yahoo 沒調的 ×1.6 跳動
+    for _d in _bdays("2024-09-02", "2025-03-14"):
+        _p6 = 160.0 if _d >= "2025-03-03" else 100.0
+        _c6.execute("INSERT INTO tw_daily_prices VALUES (?, '2330.TW', ?, ?)", [_d, _p6, _p6])
+    for _d in ("2024-09-20", "2024-11-01", "2025-01-02", "2025-03-17", "2025-05-06"):
+        _c6.execute("INSERT INTO tw_trading_daily VALUES (?, '2330', 'TWSE', ?)", [_d, 160.0 if _d >= "2025-03-03" else 100.0])
+    # 上櫃表 2024-01-02 開張(1111 在);6999 在 2024-10-01 才上櫃(之前 Yahoo 有興櫃期),上市第 2 天 +30% 不是事件
+    _c6.execute("INSERT INTO tw_trading_daily VALUES ('2024-01-02','1111','TPEx',10.0)")
+    for _d in _bdays("2024-09-02", "2024-10-31"):
+        _p6 = 50.0 if _d < "2024-10-02" else 65.0
+        _c6.execute("INSERT INTO tw_daily_prices VALUES (?, '6999.TWO', ?, ?)", [_d, _p6, _p6])
+        if _d >= "2024-10-01":
+            _c6.execute("INSERT INTO tw_trading_daily VALUES (?, '6999', 'TPEx', ?)", [_d, _p6])
+    # 4156:兩天都有交易所價、交易所也同比例跳 ×1.5(減資,Yahoo 沒調)→ 事件
+    for _d in _bdays("2025-02-03", "2025-03-14"):
+        _p6 = 30.0 if _d >= "2025-03-03" else 20.0
+        _c6.execute("INSERT INTO tw_daily_prices VALUES (?, '4156.TWO', ?, ?)", [_d, _p6, _p6])
+        _c6.execute("INSERT INTO tw_trading_daily VALUES (?, '4156', 'TPEx', ?)", [_d, _p6])
+    # 4554 形:前一交易日沒成交(交易所 close 是 NULL)→ 報告時價要取最後一個有成交的交易所收盤,不掉到 Yahoo
+    _c6.execute("INSERT INTO tw_daily_prices VALUES ('2025-01-22','4554.TWO',22.316,22.316),('2025-02-03','4554.TWO',22.316,22.316)")
+    _c6.execute("INSERT INTO tw_trading_daily VALUES ('2025-01-22','4554','TPEx',28.3),('2025-02-03','4554','TPEx',NULL)")
+    _ev2330 = _unadjusted_events(_c6, "2330", "2024-11-29")
+    _ev6999 = _unadjusted_events(_c6, "6999", "2024-09-20")
+    _ev4156 = _unadjusted_events(_c6, "4156", "2025-02-20")
+    _pc4554 = _prior_close(_c6, "4554", "2025-02-04")
+    _c6.close()
+    chk("⓴b 批730 審查:上市窗口要從**真的上市日**算——那張表開張那天就有的股票不是那天上市;上市表只有零星日子時,"
+        "初版把「交易所頭 5 列」當窗口,2330 形被豁免到 2025-05-06、03-03 那次 ×1.6 沒報。改後:照報;"
+        "真的新上櫃(6999 10-01 上櫃、興櫃期在前)第 2 天 +30% 照舊不算;兩天都有交易所價且交易所同比例跳 ×1.5 = 事件",
+        [e[0] for e in _ev2330] == ["2025-03-03"] and _ev6999 == []
+        and [(e[0], e[2]) for e in _ev4156] == [("2025-03-03", "交易所同比例")],
+        f"(2330 {_ev2330} · 6999 {_ev6999} · 4156 {_ev4156})")
+    chk("⓴c 批730 審查:前一交易日沒成交(交易所 close 是 NULL,容器 7,505 列)→ 報告時價取最後一個有成交的交易所收盤 28.3,"
+        "不掉到 Yahoo 回調過的 22.316(容器 7,105 個報告日走過這條;1,679 個差超過 0.5%)",
+        _pc4554 == (28.3, "tw_trading_daily"), f"({_pc4554})")
     print(f"  [計] 四十四檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 

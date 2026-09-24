@@ -166,6 +166,9 @@ class AdjBasisTest(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(self.C.main(["adj", "3706"]), 2)
             self.assertEqual(self.C.main(["adj", "3706", "2025-08-22", "168", "--db", self.db + ".none"]), 2)
+            # 批730 review: --page is taken off before the argument count (was IndexError)
+            self.assertEqual(self.C.main(["adj", "1294", "--page", "126.5"]), 2)
+            self.assertEqual(self.C.main(["adj", "--page", "126.5", "2024-09-27"]), 2)
 
     # ── the first-page engine: upside = ADJ, the page arithmetic stays as evidence ─────────────
     def test_first_page_upside_is_on_the_latest_adj_close(self):
@@ -174,7 +177,9 @@ class AdjBasisTest(unittest.TestCase):
         self.assertEqual((up["status"], up["basis"], up["upside_pct"]), ("DERIVED_ADJ", "ADJ_LATEST", 8.6))
         self.assertEqual((up["target_price_adj"], up["current_price"], up["price_date"]), (162.96, 150.0, "2026-09-23"))
         self.assertEqual((up["price_prev_adj"], up["page_price"], up["page_price_adj"]), (125.13, 129.0, 125.13))
-        self.assertEqual(up["factor_basis"], "PAGE_PRICE", "no exchange table here: the printed price is the divisor")
+        # no exchange table here; the printed 129.0 sits inside Yahoo's last five closes, so nothing says Yahoo re-adjusted
+        # them and Yahoo's dated close is the divisor (批730 review: a printed price may be from another day)
+        self.assertTrue(up["factor_basis"].startswith("YAHOO_CLOSE(頁面價落在"), up["factor_basis"])
         self.assertAlmostEqual(out["upside_page"]["upside_pct"], 30.23, places=2)
         self.assertNotIn("adjusted", out["upside_page"]["formula"], "the page arithmetic is not labelled adjusted")
         self.assertIn("上漲空間 8.6% (ADJ;最新 adj close 2026-09-23)", out["summary_four_points"]["points"][0]["text"])
