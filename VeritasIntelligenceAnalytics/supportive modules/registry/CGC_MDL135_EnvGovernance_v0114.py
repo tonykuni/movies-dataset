@@ -4005,7 +4005,7 @@ def do_tools(rest: list) -> int:
 KNOWN_FLAGS = {"--offline", "--online", "--quiet", "--workers", "--task-timeout", "--rounds", "--roots", "--env-root", "--base-python", "--env",
                "--apply", "--roster", "--tool-env", "--sheet-only",
                "--approve", "--approve-remove", "--only", "--only-kind", "--open", "--no-open", "--install-plan", "--to", "--baseline", "--execute", "--from",
-               "--limit", "--json", "--selftest", "--help", "-h"}
+               "--limit", "--json", "--base-changed-ok", "--no-tools", "--selftest", "--help", "-h"}
 
 
 def unknown_flags(args: list) -> list:
@@ -4302,6 +4302,12 @@ def main() -> int:
         return do_conflicts(rest)
     if verb == "tools":
         return do_tools(rest)
+    if verb == "eight-hub":
+        ext = _load_by_path("VIA_env_eight_hub", REG / "CGC_MDL135_EnvGovernance_8Hub_v0100.py")
+        if ext is None:
+            print("[eight-hub] 附加檢查模組缺失或無法匯入，停止執行")
+            return 2
+        return ext.run(sys.modules[__name__], rest)
     if verb == "run":
         return do_run(rest, "run")
     if verb in ("panorama", "scan"):
