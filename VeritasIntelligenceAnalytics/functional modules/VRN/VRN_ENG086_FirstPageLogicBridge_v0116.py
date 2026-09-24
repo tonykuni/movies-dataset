@@ -1370,16 +1370,27 @@ _UPSIDE_RX = re.compile(  # 批727b:Codex P1 追因——舊表只有 upside,而
     # (v0115 回 100.0,我改完回 None)。只認**欄位標籤**形狀的 downside,不認散文裡的風險敘述。
 
 
-def _is_upside_context(text: str, pos: int, span: int = 26) -> bool:
+_PCT_UNIT_RX = re.compile(r"\(\s*[%％]\s*\)")            # 欄位單位標記 (%),不是行內的 15%
+_PCT_AFTER_RX = re.compile(r"[ \t\r\n\u3000]*[%％]")       # 數字之後(跳過版面空白)緊接 %
+
+
+def _is_upside_context(text: str, pos: int, span: int = 26, num_start: int | None = None) -> bool:
     """備用倉 via-vdf-vrn 對同一批 64 份報告的教訓:目標價與「潛在上漲空間」是兩個欄位;
     幅度(23%)不是價格。命中點前後有上漲空間字樣、或數字帶 %,一律不當目標價。"""
-    seg = text[max(0, pos - span): pos + span]
-    # 批727c(Codex P1):舊寫法固定用 seg[span:span+4] 當「pos 之後那幾個字」,
-    # 但 pos < span 時 seg 是從 0 起算的,那一段會落在完全無關的位置 ——
-    # 也就是這道「數字後面帶 %」的檢查**在短文裡從來沒生效過**(v0115 的
-    # `Target Price: 25%` 就回 25.0)。直接取 text[pos:pos+4],不再自己算偏移。
-    after = text[pos:pos + 4]
-    return bool(_UPSIDE_RX.search(seg)) or "%" in after or "％" in after
+    # 批727d:前三輪都在補「視窗」,每補一次就冒出新的邊緣形狀(4 字元切片放過
+    # `25\n   %`、標籤前的 `Downside (%)` 不在視窗裡)。改成兩條**確定性**判準,
+    # 不再用固定寬度去猜:
+    #   A 數字之後跳過任意版面空白就是 % → 這個數字本身是幅度。
+    #   B 同一行的標籤區出現 `(%)` 這種**欄位單位標記** → 整欄是百分比欄。
+    #     只認獨立的 `(%)`,**不認行內的 `15%`** —— 否則
+    #     `Revenue +15%, Target Price: 250` 這種一行兩值的會被誤殺。
+    if _PCT_AFTER_RX.match(text, pos):                      # A
+        return True
+    if num_start is not None:                               # B
+        line_start = text.rfind("\n", 0, num_start) + 1
+        if _PCT_UNIT_RX.search(text, line_start, num_start):
+            return True
+    return bool(_UPSIDE_RX.search(text[max(0, pos - span): pos + span]))
 
 
 def _plausible_tp(raw: str) -> bool:
@@ -1408,7 +1419,8 @@ def safe_target_price(text: str, E=None, exclude_code: str | None = None, exclud
         for m in rx.finditer(text or ""):
             # 批727b:除了數字周邊,**線索詞之前**也要看。`Up/downside to price target (%)\n38`
             # 的 downside 離數字太遠,只看數字周邊會漏;漏掉就把一個幅度當成目標價寫進庫。
-            if _is_upside_context(text or "", m.end(1)) or _is_upside_context(text or "", m.start()):
+            if (_is_upside_context(text or "", m.end(1), num_start=m.start(1))
+                    or _is_upside_context(text or "", m.start())):
                 continue
             v = _ok(m.group(1))
             if v is not None:
@@ -2391,7 +2403,12 @@ def selftest() -> int:
     # 批727c(Codex P2)正控:目標價旁邊出現 downside 散文,**不准**因此被誤殺
     for _s, _want in (("Target Price: 100; downside risks remain", 100.0),
                       ("目標價 100,下檔風險仍在", 100.0),
-                      ("Target Price: NT$250. Key downside risk is FX.", 250.0)):
+                      ("Target Price: NT$250. Key downside risk is FX.", 250.0),
+                      # 批727d:規則 B 只認欄位單位標記 `(%)`,**不認行內的 15%** ——
+                      # 認了的話這三式(一行同時有幅度與價)就會被誤殺。
+                      ("Revenue +15%, Target Price: 250", 250.0),
+                      ("Target Price: 250 (+15%)", 250.0),
+                      ("目標價 250(上漲空間 15%)", 250.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
@@ -2408,7 +2425,12 @@ def selftest() -> int:
                # 批727c(Codex P1):數字**後面**帶 % 的百分比欄。第三式 v0115 也錯 ——
                # _is_upside_context 的 seg[span:span+4] 在 pos < span 時算錯位置,
                # 那道 % 檢查在短文裡從來沒生效過,是既有 bug 不是本批造成的。
-               "Price Target (12M): 25%", "Price Target (Dec-25): 38%", "Target Price: 25%"):
+               "Price Target (12M): 25%", "Price Target (Dec-25): 38%", "Target Price: 25%",
+               # 批727d(Codex 第三輪 P1 ×2):固定寬度視窗放過的兩種版面 ——
+               # % 被換行與縮排推到第 5 個字元;以及 `(%)` 出現在**線索詞之前**的欄位標題。
+               "Price Target (12M): 25\n   %", "Price Target: 25\n\t%",
+               "Price Target (12M): 25  \n\n  ％",
+               "Downside (%) to Price Target (12M): 38", "Up/downside (%) to Target Price: 12"):
         _v, _ = safe_target_price(_s)
         chk(f"英文目標價負控:{_s} 不准生出價", _v is None)
     # ---- 批727 雙頭守衛:冊上的 cue_rx 與本橋 _TP_CUES 本來就是雙胞胎,漂了沒人知道 ----
