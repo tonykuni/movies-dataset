@@ -246,7 +246,7 @@ def run(core, args: list[str]) -> int:
     # Write a pre-action restore point even for a blocked or failed run.
     report["state"] = "READY" if base_ok and runnable else "BLOCKED"
     prepath = _save(core, report)
-    if execute and base_ok and core._consent():
+    if execute and base_ok and all(r["state"] == "PASS" for r in rows) and core._consent():
         report["provision"] = _provision_missing(core, before["toolplan"], env_root)
         if report["provision"]:
             refreshed = _snapshot(core, base_python, env_root)
