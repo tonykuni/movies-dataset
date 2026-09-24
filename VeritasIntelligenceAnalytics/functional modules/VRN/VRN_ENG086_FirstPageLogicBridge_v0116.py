@@ -1398,23 +1398,76 @@ _PCT_REL_BEFORE_RX = re.compile(                      # a:關係連接詞,不看
 # 所以 return 必須帶**標的相對**的修飾語才算;`Return on X` 沒有那種修飾語。
 # 這一小段詞表是目前無法再退的部分 —— 冒號只表示分欄,不帶繫屬資訊,
 # 只能靠語意分辨;正解是讀機構 SSOT 而非手寫(已記後續項)。
-_PCT_LABEL_BEFORE_RX = re.compile(                    # b:冒號分欄,要幅度/標的報酬詞
-    r"(?:up\s*/?\s*downside|upside|downside"
-    # 批727j(Codex 第八輪):兩個方向同時要顧,727i 只顧了一邊。
-    #   誤殺:`Target/Expected return on equity (%)` —— 修飾語中了,`[^()]{0,20}` 又把
-    #        ` on equity` 吃掉,ROE 被當成標的報酬。**`return on X` 是獲利率,一律排除**。
-    #   誤報:`Expected share price return (%)` —— 修飾語與 return 不相鄰就不中;
-    #        而這是 Citi 的真實欄位(ENG073 v0136 註記 `Expected share price return 44.7%`),
-    #        所以修飾語與 return 之間要容得下 `share price` 這種插入語。
-    r"|(?:potential|implied|total|expected|estimated|target)[^()\n]{0,20}?return(?!\s+on\b)"
-    r"|預期報酬|潛在報酬|上漲空間|下跌空間|上檔空間)"
-    r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
+def _ups_label_src() -> tuple:
+    """幅度/標的報酬標籤的**正本在 ENG073**(`UPS_PRICE_RX` / `UPS_TOTAL_RX`),本橋不抄第二份。
+
+    批727k 的根因:727g–727j 我在這裡手寫了一份 `potential|implied|total|expected|…return`
+    的清單,連續四輪被 Codex 找到漏(`ETR`、`Expected share price return`、
+    裸 `Share price return`……),而**同一個倉裡 ENG073 早就有這個概念的正本**,
+    連中文寫法(`股價報酬率` / `總報酬率` / `價格報酬率` / `整體報酬率`)都齊。
+    我手寫的那份就是第二顆頭 —— 這批一開頭(LL432)踩的就是同一個坑。
+
+    取值方式:**AST 取字面值,不執行那支引擎**(唯讀、零副作用,比照 CGC_MDL158)。
+    取不到就誠實退回「只認幅度詞」,不自己編一份補上。
+    """
+    if _UPS_SRC["done"]:
+        return _UPS_SRC["pats"], _UPS_SRC["why"]
+    _UPS_SRC["done"] = True
+    try:
+        import ast as _ast
+        eng = sorted((HERE).glob("VRN_ENG073_ReportStructuredDB_v*.py"))
+        if not eng:
+            _UPS_SRC["why"] = "ENG073 不在(誠實退回只認幅度詞)"
+            return (), _UPS_SRC["why"]
+        tree = _ast.parse(eng[-1].read_text(encoding="utf-8"))
+        want, got = {"UPS_PRICE_RX", "UPS_TOTAL_RX"}, {}
+        for node in tree.body:
+            if not isinstance(node, _ast.Assign):
+                continue
+            for tgt in node.targets:
+                if isinstance(tgt, _ast.Name) and tgt.id in want:
+                    call = node.value
+                    if isinstance(call, _ast.Call) and call.args:
+                        lit = call.args[0]
+                        if isinstance(lit, _ast.Constant) and isinstance(lit.value, str):
+                            got[tgt.id] = lit.value
+        if len(got) != len(want):
+            _UPS_SRC["why"] = f"ENG073 取不到全部樣式(只取到 {sorted(got)})"
+            return (), _UPS_SRC["why"]
+        _UPS_SRC["pats"] = tuple(got[k] for k in sorted(want))
+        _UPS_SRC["why"] = f"正本 {eng[-1].name} 的 {' / '.join(sorted(want))}"
+    except Exception as exc:                                  # noqa: BLE001
+        _UPS_SRC["why"] = f"ENG073 讀不動:{type(exc).__name__}"
+    return _UPS_SRC["pats"], _UPS_SRC["why"]
+
+
+_UPS_SRC = {"done": False, "pats": (), "why": "未取"}
+
+
+def _pct_label_before_rx():
+    """冒號路徑的標籤判準。幅度詞寫在本橋(它是本橋的判準),
+    標的報酬詞**向 ENG073 取**;`return on X` 是獲利率,一律結構性排除(批727j)。"""
+    if _PLB["rx"] is None:
+        pats, _why = _ups_label_src()
+        alts = [r"up\s*/?\s*downside", r"upside", r"downside",
+                r"上漲空間", r"下跌空間", r"上檔空間"]
+        alts += [f"(?:{p})" for p in pats]
+        # ENG073 正本只涵蓋 share price return / total return,**不是**我那份的超集:
+        # `potential return` / `implied return` 不在裡面。所以是**聯集**不是取代。
+        alts.append(r"(?:potential|implied|estimated|target)[^()\n]{0,20}?return")
+        _PLB["rx"] = re.compile("(?:" + "|".join(alts) + r")(?!\s+on\b)"
+                                r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
+    return _PLB["rx"]
+
+
+_PLB = {"rx": None}
 # 單位標記也可能落在**數字之後**(`Target Price: 38 (%)`);裸 % 的規則 A 看不到括號。
 _PCT_UNIT_AFTER_RX = re.compile(r"[ \t\u3000]*\(\s*[%％]\s*\)")
 
 
 def _is_upside_context(text: str, pos: int, span: int = 26,
-                       num_start: int | None = None, cue_start: int | None = None) -> bool:
+                       num_start: int | None = None, cue_start: int | None = None,
+                       vocab: bool = True) -> bool:
     """備用倉 via-vdf-vrn 對同一批 64 份報告的教訓:目標價與「潛在上漲空間」是兩個欄位;
     幅度(23%)不是價格。命中點前後有上漲空間字樣、或數字帶 %,一律不當目標價。"""
     # 批727d:前三輪都在補「視窗」,每補一次就冒出新的邊緣形狀(4 字元切片放過
@@ -1433,8 +1486,13 @@ def _is_upside_context(text: str, pos: int, span: int = 26,
             return True
         # B2 `(%)` 以連接詞繫在線索詞之前(`Downside (%) to Price Target`)
         _before = text[max(0, cue_start - 48): cue_start]
-        if _PCT_REL_BEFORE_RX.search(_before) or _PCT_LABEL_BEFORE_RX.search(_before):
+        if _PCT_REL_BEFORE_RX.search(_before) or _pct_label_before_rx().search(_before):
             return True
+    # vocab=False:只認「百分比單位」那組**有方向性**的結構規則。
+    # 對稱的詞彙視窗分不出「幅度詞在數字之後=註記」與「在線索詞之前=欄位標籤」——
+    # `目標價 250(上漲空間 15%)` 的 250 是價,`上漲空間(%): 目標價 NT$38` 的 38 是幅度。
+    if not vocab:
+        return False
     return bool(_UPSIDE_RX.search(text[max(0, pos - span): pos + span]))
 
 
@@ -1475,7 +1533,15 @@ def safe_target_price(text: str, E=None, exclude_code: str | None = None, exclud
     # (實測:MS-Thermal 這類產業報告被抓出 17382 = 誤抓,下游會吃到假資料)。
     if E is not None and re.search(r"目標價|Target\s*Price|Price\s*Target|(?<![A-Za-z])TP(?![A-Za-z])|(?<![A-Za-z])PT(?![A-Za-z])", text or "", re.I):
         try:
+            # 批727k:弱正則這條路**原本一道幅度守衛都沒有**(既有洞,v0115 亦然):
+            # `股價報酬率(%): 目標價 38` / `上漲空間(%): 目標價 NT$38` 在 v0115 就回 38.0。
+            # 強線索加嚴之後,這裡變成同型版面的主要漏法,所以同一道守衛也要套上來。
+            _cue = _TP_CUE_ANY.search(text or "")
+            _cue_at = _cue.start() if _cue else None
             for m in E.FieldValidation._TP.finditer(text or ""):
+                if _is_upside_context(text or "", m.end(1), num_start=m.start(1),
+                                      cue_start=_cue_at, vocab=False):
+                    continue
                 v = _ok(m.group(1))
                 if v is not None:
                     return v, "收容件 NT$ 正則(弱)"
@@ -2520,6 +2586,15 @@ def selftest() -> int:
                # 修飾語與 return 之間夾著 `share price`,727i 的相鄰式抓不到 → 曾把 38 當成價。
                "Expected share price return (%): Price Target: 38",
                "Expected total share price return (%): Price Target 22",
+               # 批727k:標的報酬詞表**向 ENG073 取正本**(UPS_PRICE_RX / UPS_TOTAL_RX),
+               # 不再手寫第二份 —— 手寫那份連續四輪被找到漏。下面前兩式是「Expected 可省」
+               # (ENG073 明文 `(?:Expected\s*)?`),後三式是向正本取才有的中文寫法。
+               "Share price return (%): Price Target (12M): 38",
+               "Share price return (%) to Target Price: 22",
+               "股價報酬率(%): 目標價 38", "總報酬率(%): Price Target 22",
+               "價格報酬(%): Target Price 19",
+               # 批727k:弱正則那條路原本一道幅度守衛都沒有(既有洞,v0115 回 38.0)
+               "上漲空間(%): 目標價 NT$38",
                "Total return (%) vs Price Target: 19", "Implied return (%): Price Target 22",
                "Downside (%) from Price Target (12M): 38", "Downside (%): Price Target (12M): 38",
                "Price Target (12M): 38 (%)"):
