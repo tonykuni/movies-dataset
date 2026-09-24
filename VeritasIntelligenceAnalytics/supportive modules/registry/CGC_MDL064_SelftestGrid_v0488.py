@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+v0487→v0488(批732;掉球 Z198;本批原擬 v0487,收尾時側線 PR #111 先併進 main 用了 v0487 → LL334 改號):
+  **只改站名裡的檢數**,站數不變、引擎 glob / 參數 / 期望一字不動。驗證共識庫 八 → **十三**(VRN_ENG069 v0106:自測改在暫存庫 ·
+  ⑨ ADJ 上漲空間夾具手算 · ⑩ ADJ 不冒充 · ⑪⑫ 正式庫唯讀兩檢 · ⑬ 正式庫沒被可寫地打開過)。別的尺拿站名當鑰匙,只換數字:「驗證共識庫」「(批176)」還在。
 v0486→v0487(側線 2026-09-24 第十段;主線批號由併線的手指定 L25;掉球 Z191「去重寫入私有份收回正典」· Z194):
   **只改站名裡的檢數**,站數不變、引擎 glob / 參數 / 期望一字不動。籌碼回補引擎 十 → **十一**(VDF_ENG056 v0104 +⑪ upsert 交正典)·
   FRED 巨觀 SSOT 十七 → **十八**(VDF_ENG074 v0103 +⑱ 新庫先記失敗不炸 · 序列冊整列換新)· 主動ETF持股史深 二十九 → **三十**
@@ -2699,7 +2702,7 @@ def battery(fast: bool):
     add("系統同步樞紐八檢(批168;批693 台股庫缺/0 列=NODATA rc2 不是壞)", newest("CGC_MDL090_SystemHub_v*.py", HERE), ["--selftest"], "nodata_ok", 300)
     add("每日觀察摘要八檢(批174;批689B 缺料 SKIP=rc2 不是壞)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "nodata_ok", 300)
     add("系統憲章對照八檢(批175)", newest("CGC_MDL091_CharterAudit_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("驗證共識庫八檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300)
+    add("驗證共識庫十三檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("調整後價格層九檢(批178;批690 原始價表不在=NODATA rc2 不是壞,⑦⑧ 不吃料照檢)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "nodata_ok", 600)
     add("引擎簡化稽核八檢(批179;批693 雙庫表少=NODATA rc2 不是壞)", newest("CGC_MDL092_ConsolidationAudit_v*.py", HERE), ["--selftest"], "nodata_ok", 600)
     add("工具升階梯十檢(批181/424)", newest("SUP_MDL742_ToolLadder_v*.py", VIA / "supportive modules" / "network"), ["--selftest"], "rc0", 300)
