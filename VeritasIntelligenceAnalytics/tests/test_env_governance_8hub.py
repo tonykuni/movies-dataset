@@ -35,6 +35,26 @@ class FakeCore:
 
 
 class EightHubTests(unittest.TestCase):
+    def test_execute_with_bad_base_does_not_invoke_install(self):
+        core = FakeCore()
+        core._arg_after = lambda args, key: None
+        core._consent = lambda: True
+        with tempfile.TemporaryDirectory() as tmp:
+            core.OUT = Path(tmp)
+            core.LKGC_LATEST = Path(tmp) / "LKGC_latest.json"
+            snap = {"rows": [{"env": "BASE", "state": "BLOCK", "checks": {
+                "interpreter_identity": {"state": "BLOCK", "detail": "changed"}}}],
+                "drift": {"state": "CHANGED", "why": "different interpreter"},
+                "toolplan": {"stages": [{"id": "T01", "kind": "INSTALL_TOOLS",
+                                        "env": "via_vrn", "pkgs": ["duckdb"]}]},
+                "base_analysis": {}, "diagnostics": {}, "runtime_commands": {},
+                "baseline": "baseline", "roster": "roster"}
+            with patch.object(EXT, "_snapshot", return_value=snap), patch.object(
+                EXT, "_apply_green", side_effect=AssertionError("must not install")):
+                rc = EXT.run(core, ["--execute"])
+        self.assertEqual(rc, 2)
+        self.assertFalse(core.applied)
+
     def test_conflicted_base_blocks(self):
         core = FakeCore()
         row = EXT._risk_row(core, {"env": {"name": "BASE", "py": "python"}, "ok": True,
