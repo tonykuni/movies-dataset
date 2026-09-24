@@ -1,4 +1,5 @@
 """Broker publisher geometry regression; no network or production data writes."""
+
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
