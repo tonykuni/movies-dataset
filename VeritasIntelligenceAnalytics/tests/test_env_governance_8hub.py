@@ -97,6 +97,32 @@ class EightHubTests(unittest.TestCase):
             self.assertEqual([r["state"] for r in rows], ["BLOCK", "BLOCK"])
             self.assertTrue((root / "via_existing").exists())
 
+    def test_canonical_installer_bootstrap_only_allows_install(self):
+        source = MODULE.with_name("CGC_MDL135_EnvGovernance_v0114.py")
+        if not source.exists():
+            self.skipTest("canonical MDL135 source is not in this isolated layout")
+        spec = importlib.util.spec_from_file_location("via_envgov_test", source)
+        gov = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gov)
+        stages = [
+            {"id": "R", "kind": "REPAIR_TOOLS", "env": "via_vrn", "py": "python",
+             "pkgs": ["broken"], "deps": [], "result": {}},
+            {"id": "I", "kind": "INSTALL_TOOLS", "env": "via_vrn", "py": "python",
+             "pkgs": ["duckdb"], "deps": [], "result": {}},
+        ]
+        with tempfile.TemporaryDirectory() as temp, patch.object(gov, "_consent", return_value=True), \
+             patch.object(gov, "unitest_gate", return_value=(False, "family missing")), \
+             patch.object(gov, "run_cmd", return_value={"rc": 0, "out": "ok", "err": "", "s": 0}), \
+             patch.object(gov, "log_event"), patch.object(gov, "OUT", Path(temp)):
+            plan = {"stages": [dict(s) for s in stages]}
+            result = gov.tools_apply(plan, True, bootstrap_prechecked=True)
+            self.assertEqual(result["ran"], 1)
+            self.assertEqual(plan["stages"][0]["result"]["state"], "SKIP")
+            self.assertEqual(plan["stages"][1]["result"]["state"], "OK")
+            blocked = {"stages": [dict(s) for s in stages]}
+            result = gov.tools_apply(blocked, True)
+            self.assertEqual(result["ran"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
