@@ -6,6 +6,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 MODULE = Path(__file__).with_name("CGC_MDL135_EnvGovernance_8Hub_v0100.py")
+if not MODULE.exists():
+    MODULE = (Path(__file__).resolve().parents[1] / "supportive modules" / "registry"
+              / "CGC_MDL135_EnvGovernance_8Hub_v0100.py")
 SPEC = importlib.util.spec_from_file_location("eight_hub", MODULE)
 EXT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(EXT)
