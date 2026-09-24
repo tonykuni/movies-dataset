@@ -177,4 +177,4 @@ $env:VIA_NET_CONSENT='YES'
 
 ## 八 · 掉球
 
-新增 Z120–Z140 · Z149–Z153(Z141–Z148 是 VRN 母線批728 先取的號,LL334 讓號)(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法(v0105 先在本檔做了,正主側仍待)· Celeritas 正主首載在自己的 StrictMode 下可能讀到未設變數(Z137,待工作站那一行)。
+新增 Z120–Z140 · Z149–Z154(Z141–Z148 是 VRN 母線批728 先取的號,LL334 讓號)(`docs/VIA_DroppedBalls_B507.md`):閘二三把尺 · 哨兵列 · 車道不建衍生層 · 三支出網走統包 · MDL006 去留 · 重疊與資料缺陷 · 短令與 Deck · 視窗限量 Register 行 · VRN 管理的 SSOT 燈 · MDL176 公開 collect() · MDL176 `apply` 無旗標就寫 · MDL115 沒有乾跑 · 格子重複站 · 逐期 EPS 河流圖 · MDL002 路徑與副本 · 開機鏈掛 `ssot verify` · 啟動器類 .ps1 的模板章接法(v0105 先在本檔做了,正主側仍待)· Celeritas 正主首載在自己的 StrictMode 下讀到未設變數(Z137,工作站 2026-09-23 已實證;正主三行修法待 Celeritas 線)· 總控頁 Plotly 面板判就緒只看本機檔在不在(Z154)。

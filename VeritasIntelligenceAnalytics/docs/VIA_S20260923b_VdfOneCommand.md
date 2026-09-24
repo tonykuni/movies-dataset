@@ -20,7 +20,7 @@ $VIA = "C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnal
 . (Get-ChildItem "$VIA\Open-VIA-VDF-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName
 ```
 
-- 這一行永遠開最新一版(今天是 `Open-VIA-VDF-v0101.ps1`;寫死版號也行,只是出新版要跟著改)。
+- 這一行永遠開最新一版(今天是 `Open-VIA-VDF-v0103.ps1`;寫死版號也行,只是出新版要跟著改)。
 - 最前面是**一個點、一個空白**(點源)。這樣短令冊才會留在這個視窗,跑完 `via-*` 照常能打。
   用 `&` 也能跑完四步,只是冊只活在腳本裡;沒有 `$PROFILE` 載冊的視窗,跑完會提醒你改用點源。
 - 新開的視窗還沒有 `$VIA`:把 `$VIA` 換成完整路徑(上面第一次那一行已經設好)。
@@ -185,6 +185,33 @@ NativeArgs        = (Get-Variable -Name PSNativeCommandArgumentPassing -ValueOnl
 
 ---
 
-## 八 · 還原
+## 八 · PR 審查兩件(Codex P2,2026-09-24)
 
-刪掉 `Open-VIA-VDF-v0100.ps1`~`v0102.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1` 與 `v0107.ps1`(短令冊自動退回 v0105)、`VDF_ENG093_LaunchConsole_v0101.py`、`VDF_ENG051_ActiveTWETF_Holdings_v0103.py`、`VRN_ENG071_CnyesFusion_v0101.py`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。既有檔一支都沒動。
+**① 不啟動不再一律回 rc 0 → `Open-VIA-VDF-v0103.ps1`**(v0102 留作版史 L04)
+- v0102 只要沒拿到「啟動」就印黃字、回 rc 0。問參數引擎起不來、寫決定檔前就炸、決定檔讀不懂,也跟你按「不啟動」一樣回 0:排程或外層腳本會把壞了當成成功。
+- v0103 分三種(L16 誠實 rc):
+
+| 情形 | 畫面 | rc |
+|---|---|---|
+| 你在頁上按「不啟動」 | 黃字「不啟動(你在頁上選的)」 | 0 |
+| 900 秒沒收到決定 | 黃字「逾時沒收到決定 → 不啟動(NODATA)」 | 2 |
+| 引擎沒交回可用的決定(沒寫檔、讀不懂、動作不認得) | 紅字 FAIL,附引擎 rc | 引擎自己的 rc,沒有就 1 |
+
+- 問參數頁的保底天花板從 960 秒拉到 1320 秒。引擎自己等 900 秒;逾時後還要收掉正在跑的那支自測(最多 305 秒)才寫「逾時」決定檔。
+  960 秒會先把引擎殺掉,決定檔沒寫成,逾時就被誤判成壞了。
+- 管線裡的 `via-open` 不會蓋掉引擎 rc:`Invoke-VIAPython` 最後一句才設 `$LASTEXITCODE`,晚於管線裡每一行的處理。
+- 括號絆線 OK · 模板章稽核 pass。
+
+**② 總控頁的 Plotly 面板回到空狀態**
+- 上一版的 `VIA_UI_MasterControl_v0100.html` 是在容器重生的。容器裡有一份被 `.gitignore` 擋掉的 `VIA_UI_StdDashboard_v0100.html`,
+  Manager 就把面板標成「已就緒」並連過去;乾淨拉下來的樹沒有那一頁,面板會連到不存在的檔。
+- 這次重生時先把那份本機檔移開,產完再放回(LL49)。和 main 比只剩產生時間、現役引擎族 107→108、多一列 VDF_ENG093;面板和 main 一樣是空狀態。
+- 本機照 CI 步驟重跑:Manager、DeckServer、SyncStatus、StdDashboardTemplate 四支自測 rc 0 · 總控契約測 OK · UAT 三種視窗寬 rc 0,頁面錯 0、外部請求 0。
+
+---
+
+## 九 · 還原
+
+刪掉 `Open-VIA-VDF-v0100.ps1`~`v0103.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1` 與 `v0107.ps1`(短令冊自動退回 v0105)、`VDF_ENG093_LaunchConsole_v0101.py`、`VDF_ENG051_ActiveTWETF_Holdings_v0103.py`、`VRN_ENG071_CnyesFusion_v0101.py`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。
+
+既有程式檔只動了一支:`functional modules/VRN/tests/test_broker_source_zones.py` 由正主 via_accel_injector 補上加速器橋(最高政策 PY 條;與 VRN 母線那一版逐位元相同),要退就取回 main 那一版。其餘改動是冊(法典 · 帳 · 元件冊 · 正則清冊 · 輸入台規格,照 L04 就地改,`git revert` 即回)與 Manager 重生的總控頁。
