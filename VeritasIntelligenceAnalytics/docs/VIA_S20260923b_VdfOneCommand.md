@@ -224,4 +224,4 @@ main 併入 PR #94(批727 系列)之後,這個 PR 在 GitHub 上顯示有衝突�
 
 刪掉 `Open-VIA-VDF-v0100.ps1`~`v0103.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1` 與 `v0107.ps1`(短令冊自動退回 v0105)、`VDF_ENG093_LaunchConsole_v0101.py`、`VDF_ENG051_ActiveTWETF_Holdings_v0103.py`、`VRN_ENG071_CnyesFusion_v0101.py`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。
 
-既有程式檔只動了一支:`functional modules/VRN/tests/test_broker_source_zones.py` 由正主 via_accel_injector 補上加速器橋(最高政策 PY 條;與 VRN 母線那一版逐位元相同),要退就取回 main 那一版。其餘改動是冊(法典 · 帳 · 元件冊 · 正則清冊 · 輸入台規格,照 L04 就地改,`git revert` 即回)與 Manager 重生的總控頁。
+既有程式檔一支都沒動:`functional modules/VRN/tests/test_broker_source_zones.py` 的加速器橋(最高政策 PY 條)與 VRN 母線同一個修法,已隨 main(PR #94)進來,併 main 後不在本線的差異裡。其餘改動是冊(法典 · 帳 · 元件冊 · 正則清冊 · 輸入台規格,照 L04 就地改,`git revert` 即回)與 Manager 重生的總控頁。
