@@ -136,7 +136,7 @@ Z156 / Z157 各補一句批730 的實量(只增不減,原文不動)。
 
 ## 十一 · 工作站(一貼即用)
 
-同批729 最後貼給你的那一段(先解卡、再切到最新 main),只換成認 v0138、多一行 1294 配股回調的例子。**main 併進本批之後**,這一段就會拉到 ENG073 v0138 / ENG080 v0110;main 還沒併,它會印「沒拉到批730」並停下,不會跑舊碼。容器用 pwsh 7 對四種卡法實跑過(再生冊衝突 → 解卡;合併中 → abort;本機 main 分岔 → 另開 main-latest-時間;人寫的台帳衝突 → 停下點名)。
+同批729 最後貼給你的那一段(先解卡、再切到最新 main),只換成認 v0138、多一行 1294 配股回調的例子。main 併進本批之後,這一段直接用 main;**main 還沒併的時候**(你第一次貼回的就是這個情況:停在「沒拉到批730」),它改拉批730 的分支(= main + 批730)到本機另開的 `b730-時間`,**不動 main**,然後照樣跑。容器用 pwsh 7 對六種情況實跑過(main 沒併 → 拉分支;main 已併 → 直接 main;再生冊衝突 → 解卡;合併中 → abort;本機 main 分岔 → 另開 main-latest-時間 且不動它;人寫的台帳衝突 → 停下點名、什麼都不拉)。
 
 ```powershell
 Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
@@ -155,6 +155,11 @@ if ($held.Count -eq 0) {
     git fetch https://github.com/tonykuni/movies-dataset main
     git merge-base --is-ancestor main FETCH_HEAD 2>$null; $ff = ($LASTEXITCODE -eq 0)
     if (-not (git rev-parse -q --verify refs/heads/main)) { git switch -c main FETCH_HEAD } elseif ($ff) { git switch main; git merge --ff-only FETCH_HEAD } else { git switch -c ("main-latest-" + (Get-Date -Format "MMddHHmm")) FETCH_HEAD }
+    if (-not (Test-Path ".\functional modules\VRN\VRN_ENG073_ReportStructuredDB_v0138.py")) {
+        "  [拉取] main 還沒併批730 → 改拉批730 的分支(它 = main + 批730,本機另開 b730-時間,不動 main)"
+        git fetch https://github.com/tonykuni/movies-dataset claude/awesome-bardeen-h0wm5v
+        if ($LASTEXITCODE -eq 0) { git switch -c ("b730-" + (Get-Date -Format "MMddHHmm")) FETCH_HEAD }
+    }
 } else { "  [解卡] 人寫件卡在衝突,不自動處理,先停:" + ($held -join " · ") }
 if ($held.Count -eq 0 -and $LASTEXITCODE -eq 0 -and (Test-Path .\Invoke-VIA-VRN-v0103.ps1) -and (Test-Path ".\functional modules\VRN\VRN_ENG073_ReportStructuredDB_v0138.py")) {
     "  [後] 分支 " + (git branch --show-current) + " · " + (git log --oneline -1)
@@ -164,7 +169,7 @@ if ($held.Count -eq 0 -and $LASTEXITCODE -eq 0 -and (Test-Path .\Invoke-VIA-VRN-
     Invoke-VIAPython -Family vrn ".\functional modules\VRN\engine\VRN_Evidence_Core.py" adj 1294 2024-09-27 150
     via-vrnrun 2>&1 | Tee-Object -FilePath "$env:TEMP\vrnrun_b730.txt"
     Select-String -Path "$env:TEMP\vrnrun_b730.txt" -Pattern '\[Celeritas\]|\[進度\] \d+/6|\[V[1-6]\]|\[ROUND|\[DONE\]|\[附錄\]|\[ADJ\]|FAIL G|WARN G|RED|rc=' | ForEach-Object { $_.Line }
-} else { Write-Host "  [拉取] 沒拉到批730(main 還沒併進本批,或上面幾行就是原因),先停" -ForegroundColor Red; git status --short | Select-Object -First 15 }
+} else { Write-Host "  [拉取] main 跟批730 分支都沒拉到(上面幾行就是原因),先停" -ForegroundColor Red; git status --short | Select-Object -First 15 }
 ```
 
 要貼回:`[前]` 幾行 · `[解卡]` 行 · `git stash list` 三行 · `[後]` 一行 · `appendix` 最後一行 · 兩個 `adj` 的前幾行(會多出「因子分母」;工作站庫若也有交易所 2024-09-26 那一列,1294 那一格應是 `RAW_EXCHANGE`、Yahoo 回調比約 0.757,上漲空間跟容器不同是因為最新價不同) · V3 的 `[ADJ 上漲空間…] 算得出 N 筆` 與各狀態行 · V6 的 `[ROUND …]`、`[附錄]`、`[ADJ]`、`[DONE]` 各一行 · 任何 `FAIL G..` 行。
