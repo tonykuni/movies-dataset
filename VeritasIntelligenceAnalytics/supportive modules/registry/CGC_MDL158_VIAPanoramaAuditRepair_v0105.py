@@ -1297,18 +1297,42 @@ def _ps_block_end(lines: list[str], start: int) -> int:
     return len(lines) - 1
 
 
+def _mask_herestrings(src: str) -> str:
+    """把 here-string(@' … '@ / @" … "@)的內容行換成空行(行數不變)。
+    批707 首跑實錄:14 件 PSDUPFN 全是誤報——內嵌在 here-string 裡的 JavaScript(fmt/render/done…)
+    與「產生另一支腳本」的模板(EnsureDir/def_Main)被當成 PowerShell 函式。"""
+    out, inside = [], None
+    for ln in src.split("\n"):
+        if inside is None:
+            out.append(ln)
+            t = ln.rstrip()
+            if t.endswith("@'") or t.endswith('@"'):
+                inside = t[-1]
+        else:
+            if ln.startswith(inside + "@"):
+                out.append(ln)
+                inside = None
+            else:
+                out.append("")
+    return "\n".join(out)
+
+
 def _read_ps1(src: str) -> tuple[list[dict], list[dict]]:
-    lines = src.splitlines()
+    masked = _mask_herestrings(src)
+    lines = masked.splitlines()
     rows, issues, seen = [], [], {}
-    for m in _PS_FN.finditer(src):
-        ln0 = src.count("\n", 0, m.start())
+    for m in _PS_FN.finditer(masked):
+        ln0 = masked.count("\n", 0, m.start())
         end = _ps_block_end(lines, ln0)
         name = m.group(1)
-        rows.append({"kind": "function", "name": name, "line": ln0 + 1, "end": end + 1, "sig": "", "doc": "", "depth": 0})
-        key = name.lower()
+        # 父作用域=包住它的最內層函式;巢狀在不同父函式裡的同名函式各是區域函式,互不覆蓋(批707 實錄 Test-Prot)
+        parent = next((r["name"] for r in reversed(rows) if r["line"] <= ln0 + 1 <= r["end"]), "")
+        rows.append({"kind": "function", "name": name, "line": ln0 + 1, "end": end + 1, "sig": "", "doc": "",
+                     "depth": 1 if parent else 0})
+        key = (parent.lower(), name.lower())
         if key in seen:
             issues.append({"cls": "PSDUPFN", "line": ln0 + 1, "how": "text",
-                           "detail": f"{name} 在第 {seen[key]} 行已定義,這裡蓋掉它"})
+                           "detail": f"{name} 在第 {seen[key]} 行已定義,這裡蓋掉它" + (f"(同在 {parent} 內)" if parent else "")})
         seen[key] = ln0 + 1
         body = "\n".join(lines[ln0:end + 1])
         inner = body.split("{", 1)[1].lstrip() if "{" in body else ""
@@ -1744,6 +1768,15 @@ def selftest() -> int:
         pc = read_file(psf)
         pcls = sorted(i["cls"] for i in pc["issues"])
         ps_sl = slice_def(str(psf), "via-b")
+        psf2 = T2 / "Gen-v0100.ps1"
+        psf2.write_text("function Outer-A {\n    function Test-Prot { 1 }\n    Test-Prot\n}\nfunction Outer-B {\n    function Test-Prot { 2 }\n}\n"
+                        "$tpl = @'\n<script>\nfunction render(){ return 1 }\nfunction render(){ return 2 }\n</script>\n'@\n"
+                        "$gen = @\"\nfunction EnsureDir { 1 }\n\"@\nfunction EnsureDir { 2 }\n", encoding="utf-8")
+        pc2 = read_file(psf2)
+        chk("㉛ 批707 PowerShell 誤報反例:here-string 裡的 JS/模板函式不算、不同父函式裡的同名區域函式不算"
+            "(首跑 14 件 PSDUPFN 全是這兩型);同一父函式內真重複照報",
+            not pc2["issues"] and {d["name"] for d in pc2["defs"]} == {"Outer-A", "Outer-B", "Test-Prot", "EnsureDir"},
+            f"(問題 {[i['detail'] for i in pc2['issues']]})")
         chk("㉙ 批707 PowerShell:同名 function(不分大小寫)=PSDUPFN;函式開頭三引號字串=PSDOCSTR(LL182);"
             "字串裡的大括號不打亂收尾;slice 取得到",
             pcls == ["PSDOCSTR", "PSDUPFN"] and [d["end"] for d in pc["defs"]] == [4, 5, 9]

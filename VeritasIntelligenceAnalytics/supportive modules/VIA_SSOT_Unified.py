@@ -6427,20 +6427,6 @@ VIA_FIN_SYNONYMS_V22 = {
     },
 }
 
-def via_fin_synonyms_count():
-    by_category = {}
-    total = 0
-    for key, spec in VIA_FIN_SYNONYMS_V22.items():
-        cat = spec.get("category", "UNKNOWN")
-        n = len(spec.get("aliases", []))
-        total += n
-        by_category[cat] = by_category.get(cat, 0) + n
-    return {
-        "canonical_keys": len(VIA_FIN_SYNONYMS_V22),
-        "total_synonyms": total,
-        "by_category": by_category,
-    }
-
 def via_fin_synonym(label):
     text = "" if label is None else str(label).strip()
     low = text.lower()
@@ -6460,47 +6446,6 @@ def via_fin_category_of(canonical_key):
         return ""
     spec = VIA_FIN_SYNONYMS_V22.get(str(canonical_key), {})
     return spec.get("category", "")
-
-def via_vrn_broker_alias(text):
-    low = "" if text is None else str(text).lower()
-    for canon, aliases in VRN_BROKER_ALIASES_V22.items():
-        for alias in aliases:
-            if str(alias).lower() in low:
-                return canon
-    return ""
-
-def via_vrn_rating_alias(text):
-    low = "" if text is None else str(text).lower()
-    for cat, aliases in VRN_RATING_ALIASES_V22.items():
-        for alias in aliases:
-            if str(alias).lower() in low:
-                return cat
-    return ""
-
-def via_vrn_basic_info_columns(include_db_generated=False):
-    cols = list(VRN_BASIC_INFO_V31_COLUMNS)
-    if include_db_generated:
-        cols.append("inserted_at")
-    return cols
-
-def via_vrn_financial_data_columns(include_db_generated=False):
-    cols = list(VRN_FINANCIAL_DATA_V31_COLUMNS)
-    if include_db_generated:
-        cols.extend(["id", "inserted_at"])
-    return cols
-
-def via_vrn_stock_report_terms():
-    return {
-        "positive": list(VRN_STOCK_REPORT_POSITIVE_TERMS_V22),
-        "reject": list(VRN_STOCK_REPORT_REJECT_TERMS_V22),
-    }
-
-def via_vrn_target_price_aliases():
-    return list(VRN_TARGET_PRICE_ALIASES_V22)
-
-def via_vrn_time_period_aliases():
-    return list(VRN_TIME_PERIOD_ALIASES_V22)
-
 
 
 # VIA_SSOT_Unified v22.1 CASHFLOW COMPAT EXTENSION
@@ -6532,46 +6477,6 @@ VRN_FIN_CANONICAL_COMPAT_V22_1 = {
 
 _VIA_FIN_SYNONYM_PREV_V22_1 = globals().get("via_fin_synonym", None)
 _VIA_FIN_CATEGORY_PREV_V22_1 = globals().get("via_fin_category_of", None)
-
-def via_fin_synonym(label):
-    text = "" if label is None else str(label).strip()
-    low = text.lower()
-    if not low:
-        return ""
-
-    if low in VRN_FIN_CANONICAL_COMPAT_V22_1:
-        return VRN_FIN_CANONICAL_COMPAT_V22_1[low]
-
-    if text in VRN_FIN_CANONICAL_COMPAT_V22_1:
-        return VRN_FIN_CANONICAL_COMPAT_V22_1[text]
-
-    if _VIA_FIN_SYNONYM_PREV_V22_1 is not None:
-        try:
-            got = _VIA_FIN_SYNONYM_PREV_V22_1(label)
-            if got:
-                got_low = str(got).lower()
-                return VRN_FIN_CANONICAL_COMPAT_V22_1.get(got_low, got)
-        except Exception:
-            pass
-
-    return ""
-
-def via_fin_category_of(canonical_key):
-    key = "" if canonical_key is None else str(canonical_key).strip()
-    key = VRN_FIN_CANONICAL_COMPAT_V22_1.get(key.lower(), key)
-
-    if key in ["operating_cashflow", "investing_cashflow", "financing_cashflow"]:
-        return "CF"
-
-    if _VIA_FIN_CATEGORY_PREV_V22_1 is not None:
-        try:
-            got = _VIA_FIN_CATEGORY_PREV_V22_1(key)
-            if got:
-                return got
-        except Exception:
-            pass
-
-    return ""
 
 def via_vrn_v22_1_compat_status():
     return {

@@ -227,38 +227,8 @@ if __name__ == "__main__":
     raise SystemExit(def_main())
 
 # === VIA_PATCH_RUNTIME_HEARTBEAT ===
-def via_runtime_heartbeat():
-    return {"status": "alive"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
 # === VIA_FINAL_PATCH_RUNTIME_INJECTOR_COMPAT ===
-def via_runtime_heartbeat():
-    return {"status": "alive", "module": "VIA_Panorama_AST_RuntimeInjector"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
-def inject_runtime(target=None, *args, **kwargs):
-    return {"status": "ok", "target": str(target)}
-
 # === VIA_FINAL_PATCH_RUNTIME_INJECTOR_COMPAT_V3 ===
-def via_runtime_heartbeat():
-    return {"status": "alive", "module": "VIA_Panorama_AST_RuntimeInjector"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
 def inject_runtime(target=None, *args, **kwargs):
     return {"status": "ok", "target": str(target)}
 

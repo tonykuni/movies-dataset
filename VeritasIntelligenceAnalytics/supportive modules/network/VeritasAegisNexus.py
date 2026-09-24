@@ -4565,18 +4565,6 @@ if __name__ == "__main__":
         print(f"\n✅ All {result['passed']} sections passed  ({result['duration_ms']}ms)")
 
 # === VIA_FINAL_PATCH_AEGIS_COMPAT ===
-def internet_health():
-    return {"status": "alive", "module": "VeritasAegisNexus"}
-
-def safe_get(url=None, *args, **kwargs):
-    return {"status": "stub", "method": "GET", "url": url}
-
-def safe_post(url=None, *args, **kwargs):
-    return {"status": "stub", "method": "POST", "url": url}
-
-def download_file(url=None, path=None, *args, **kwargs):
-    return {"status": "stub", "url": url, "path": path}
-
 # === VIA_FINAL_PATCH_AEGIS_COMPAT_V3 ===
 def internet_health():
     return {"status": "alive", "module": "VeritasAegisNexus"}
