@@ -9915,6 +9915,27 @@
       "code": "併後:registry-sync 活 9394 · 新 2;VCGC v0127 ssot 自動改委派 SUP_MDL749 v0113;正則清冊共用 704→705 交正主重建,驗收 PASS;VCGC 36/36;格子相關 9 站 OK 8 · FAIL 1 =「Celeritas 產出契約實跑」由 PR #75 新增的測試檔缺加速器橋造成,乾淨 main 同紅(Z138)。"
     },
     {
+      "ts": "2026-09-23 22:20",
+      "op": "ADD",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段(主線批號由併線的手指定 L25)操作員令「幫我開 PR · 給我一個指令含進入環境一件開啟 VDF 的 POWERSHELL CODE 實測 · 應先跳出 HTML U/I 問我要不要改參數啟動 · 然後看到資料庫狀況」:VDF_ENG093_LaunchConsole v0100(ask 本機頁:127.0.0.1 · 一次性權杖 · 同源送出 · 參數預設讀自啟動器 · 逐欄驗證;status 資料庫狀況頁:委派 CGC_MDL123 目錄 · CGC_MDL153 分類燈 · VDF_ENG089 缺口;同意閘只讀不寫;零 CDN)· Open-VIA-VDF-v0100.ps1(新檔;進環境 → ask → Invoke-VIA-VdfFetch 尾版 -NoEnter → status;L102 模板章不包裹接法)· Open-VIA-VDF.cmd(雙擊)· CGC_MDL064 v0477(+2 站 350→352)· 規格 +vdf_launch_console",
+      "code": "容器實測:ENG093 自測 8/8;無頭 Chromium 點過三條路(自訂 2024/100/只看計畫 · 預設模式忽略頁上亂填 · 不啟動)+ 錯權杖 403;狀況頁合成目錄 10 表 rc2、零外部資源;模板章稽核 pass、Celeritas 閘基線外新缺 0;VCGC 36/36;契約 19/19;registry-sync 活 9430 · 新 36;正則清冊交正主重建驗收 PASS。容器無 pwsh:.ps1/.cmd 待工作站第一次實跑(Z139)。"
+    },
+    {
+      "ts": "2026-09-23 22:40",
+      "op": "FIX",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 出貨前自修(主線批號由併線的手指定 L25):VDF_ENG093 v0100 兩行 flush(Invoke-VIAPython 把 stdout 導到暫存檔,區塊緩衝;不 flush 網址等行程結束才落檔)· status 頁路徑獨佔一行絕對路徑 · 自測 +⑨(照 Invoke-VIAPython 導檔、去 PYTHONUNBUFFERED)· Open-VIA-VDF-v0100.ps1 改從 stdout 取網址/頁路徑交短令冊 via-open(只走瀏覽器 exe;VIA_NO_OPEN=1 下 webbrowser 靜默不開,.html 預設程式=VS Code)· 一行指令與 .cmd 改點源(& 跑時 Invoke-VIAPython 不是 global:,跑完就消失)· -NoUi 時第 ④ 步頁只落檔不跳 · 改名 Open-VIA-VDF(functional modules/VDF 已有 Start-VIA-VDF-v0101~v0104 一族,免撞族名 L04;全部遠端分支無同名)· Z140",
+      "code": "容器實測:ENG093 自測 9/9(無回送介面 6 綠 + 2 NODATA);突變測拿掉 flush → ⑨ 轉紅;照工作站緩衝跑的無頭 Chromium 三條路決定檔完全相同、錯權杖 403;狀況頁「頁:」行以 Start 腳本同一條正則取得、路徑存在;模板章稽核 pass;正則清冊交 CGC_MDL115 重建 1282 條、ssot 驗收 PASS;registry-sync 變更 34(皆 ENG093 行號)。容器設 PYTHONUNBUFFERED=1 曾讓第一輪測試誤綠(Z140)。.ps1/.cmd 待工作站第一次實跑(Z139)。"
+    },
+    {
+      "ts": "2026-09-23 23:10",
+      "op": "FIX",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 工作站第一次實跑後自修(主線批號由併線的手指定 L25;操作員「實測自測自修自完成」):工作站畫面證實 ENG093 網址行即時到、via-open 叫起 msedge;模板章首載即炸(Z137 實證:Celeritas 正主 StrictMode 下讀還沒設的 $script:CeleritasPS7 → New-Module 失敗、紅字;第一個錯印成最後一個)。Open-VIA-VDF-v0101.ps1 · Invoke-VIA-VdfFetch-v0106.ps1(新版;v0100 / v0105 留作版史 L04)換同一段載法:模組 scope 先設 CeleritasPS7 / OFS / PSNativeCommandArgumentPassing · -RestoreOnly 只載函式 · 先試拍快照(拍不到不起跑)· 起跑後驗已套且有快照 · 失敗依快照還原 · 錯誤不噴紅字、印真正第一個;Open v0101 另包 try/finally(Ctrl+C 也還原)、開頁後講明去工作列找瀏覽器。正主不改(Celeritas 線;三行修法寫進 Z137)",
+      "code": "容器實測:兩支新 .ps1 模板章稽核 pass;Celeritas 產出契約閘 .ps1 帶模板章 5 · 基線外新缺 0;PowerShell 括號絆線(容器無 pwsh 的替代)工作站真跑過的 v0100 · v0105 · 短令冊 v0242 OK、兩負控抓到、v0101 · v0106 OK;兩支載法逐字相同(45 行);v0105→v0106 只差載法與檔頭;ENG093 9/9(③ 讀 v0106 param);門 31/31;門單元測 34/34。容器無 pwsh:Celeritas 是否真的「已套」待工作站再跑一次(Z137/Z139)。"
+    },
+    {
       "ts": "2026-09-23 23:42",
       "op": "ADD",
       "category": "VRN重整·SSOT同步",
@@ -9927,8 +9948,36 @@
       "category": "併線",
       "component": "批728 併入 main 6f89390d(PR #92 側線 2026-09-23:VDF 三支治理版 · VCGC v0126/v0127 ssot 門 · 格子 v0475/v0476);撞號(LL334)兩輪:① 併 main 時格子 v0475/v0476 與掉球 Z120 起被側線先用 ② 推前再查,批727 被 VIA Integration 線 4cdb368e、格子 v0477 與掉球 Z139–Z140 被 VDF 側線 ae13939b 先推 → 本線 批728 · 格子 v0478(含側線 v0477 兩站)· 掉球 Z141–Z146;冊同步兩處量同一件事→CGC_MDL185 拿掉 RegexDict 普查與聯集冊新鮮度兩條(門 ⑤ ③ 已委派同兩支正主,且有 python 版本只升不降護欄)",
       "code": "本線先 commit 再 git merge(不 rebase、不 force-push);衝突四檔:三本生成冊取 main 再由正主重生(registry-sync · CGC_MDL115 v0101 · manager)、掉球冊手併;test_broker_source_zones 與 VIA Integration 線的補法逐位元對齊(多一個空行),誰後併都不衝突。本批自犯兩錯格子/自測抓到:VCGC ㊲ 假正主寫成 class def check 蓋掉 source_guard 的 check 索引(⑳ 紅,改 SimpleNamespace);正則清冊萬用字元展開成 v0100+v0101 跑到舊版(改尾版重跑覆蓋)。"
+    },
+    {
+      "ts": "2026-09-23 23:58",
+      "op": "ADD",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 續二(主線批號由併線的手指定 L25)操作員令「每道上限檔數刪除 · 要抓就全抓 · 導入網路工具 · 起始日期 YYYY-MM-DD · 截止日期自動帶入今天 · 方便打勾方格自動 · 逐一引擎邊測邊修正到成功 · 輸入參數用大矩陣完整顯示」「PY檔都要導入加速器 VDF都要導入網路工具 PS都要導入模板工具列為最高政策」「自測自修正再測再修正直到成功」:VDF_ENG093 v0101(無檔數上限 · 起始日 YYYY-MM-DD + 日曆 · 截止=今天 · 要抓的資料矩陣委派 CGC_MDL125/134 · 逐一引擎自測台 · 狀況頁加本次輸入參數與各步結果)· Invoke-VIA-VdfFetch v0107(-Since · -Steps;步清單改名 $stepBook 免被 -Steps 蓋)· Open-VIA-VDF v0102 · VDF_ENG051 v0103(--selftest 別名)· VRN_ENG071 v0101(正主 sweeper 掛網路工具橋)· 法典 +L103 最高政策 rank 1(L50→2、L102→3,排序待操作員確認 Z141)· via_accel_injector 補 functional modules/VRN/tests/test_broker_source_zones.py 加速器橋(Z138 結)",
+      "code": "容器實測:ENG093 v0101 自測 12/12(突變測兩支轉紅);無頭 Chromium 三條路(自訂 2024-03-15 兩步決定檔完全相同 · 頁上逐一引擎自測 11/11 綠 · 不啟動)· 錯權杖 403;11 支擷取引擎離線自測 11/11 · 加速器橋 11/11 · 網路工具橋 10/11(datahome 不觸網,CGC 件);CGC_MDL156 37/37 · Celeritas 三站綠;VCGC 36/36 · 門 31/31 · 門單元測 34/34 · registry-sync 新 14 · 正則清冊 1284 條 SSOT 驗收 PASS · CI 本機照跑全過。容器無 pwsh:v0107/v0102 待工作站實跑。"
+    },
+    {
+      "ts": "2026-09-24 00:10",
+      "op": "RENUMBER",
+      "category": "掉球",
+      "component": "側線 2026-09-23 第三段 續三(主線批號由併線的手指定 L25):LL334 撞號讓號。VRN 母線(claude/awesome-bardeen-h0wm5v,批728)先取了掉球 Z141–Z148;本側線 4f58dedf 的 Z141–Z145 改號為 Z149–Z153(Z141→Z149 排序待確認 · Z142→Z150 PS 模板欠帳 · Z143→Z151 格子站名 · Z144→Z152 MDL183 律文 · Z145→Z153 PowerShell 大小寫),上一筆帳(2026-09-23 23:58)裡的「Z141」即今 Z149。Z138 那一列改用母線的原文(兩線用同一個正主注入器補的是同一個橋,test_broker_source_zones.py 也對齊成與母線逐位元相同,併線零衝突)。法典 L103 全樹唯一,不撞。",
+      "code": "全分支實查:掉球最大號 Z148(母線)· 法典最大號 L103(本線,別處最大 L102);test_broker_source_zones.py 與母線 cmp 相同,pytest 1 passed。"
+    },
+    {
+      "ts": "2026-09-24 00:10",
+      "op": "FIX",
+      "category": "一鍵啟動",
+      "component": "側線 2026-09-23 第三段 續四(主線批號由併線的手指定 L25)PR #93 Codex 審查兩件 P2:① Open-VIA-VDF-v0103.ps1(v0102 留作版史 L04)「不啟動」分三種 rc(L16):你按不啟動 = 0 · 逾時沒收到決定 = 2(NODATA)· 問參數引擎沒交回可用的決定(沒寫檔、讀不懂、動作不認得)= 紅字 FAIL,rc 取引擎自己的(沒有就 1);問參數頁保底天花板 960→1320s(引擎等 900s + 收尾自測最多 305s,免得逾時被誤判成壞了)。② 總控頁 VIA_UI_MasterControl_v0100.html 重生時先移開被 .gitignore 擋的本機 VIA_UI_StdDashboard_v0100.html、產完放回(LL49),Plotly 面板回空狀態;與 main 只差產生時間、現役引擎族 107→108、多一列 VDF_ENG093。掉球 +Z154(Manager 判就緒只看檔在不在;Manager 線)。",
+      "code": "容器實測:括號絆線 OK · 模板章稽核 pass(v0102 / v0103)· 本機照 CI 步驟:Manager / DeckServer / SyncStatus / StdDashboardTemplate 自測 rc 0 · 總控契約測 OK · UAT 三種視窗寬 rc 0(頁面錯 0 · 外部請求 0)· 掉球號全分支實查最大 Z153 → Z154。"
+    },
+    {
+      "ts": "2026-09-24 06:35",
+      "op": "MERGE",
+      "category": "併線",
+      "component": "側線 2026-09-23 第三段 續五(主線批號由併線的手指定 L25;操作員「#93 請修正」)main 併入 PR #94(批727 系列)後 PR #93 撞冊:併入 main 3710ba0b。唯一衝突是元件自動編號冊——兩邊各自編號,撞在 VIA-FNC-8303 / 8304(main 給 VRN_ENG086 的兩支函式)。取 main 那一版為底,交唯一寫入口 VCGC registry-sync --apply 重掃:新 50(全屬本側線:ENG093 v0101 48 · 輸入台規格項 1 · VRN_ENG071 v0101 1)· 變更 98 · 退役 0;main 的號不動,本側線的號接在後面(LL334):CLS 0391 · ENG 0097 · FNT 0105 · FNC 8305–8351。正則清冊交正主 CGC_MDL115 重建 1284→1291(多的 7 條來自 main 的 VRN_ENG086 v0116);MDL115 順手重寫的 UI 頁照 LL49 還原不提交。",
+      "code": "合併後容器實測:VCGC 三十六檢 36/36(⑬ 元件冊等式綠)· registry-sync 再掃 新 0 變更 0 退役 0 · 冊內重號 0 · ssot verify rc 0(正則清冊一致 1291)· 格子 Celeritas 兩站 / 一鍵啟動台 OK · ENG093 自測 12/12 · test_broker_source_zones 1 passed · 本機照 CI 步驟四支自測 rc 0 · 總控契約測 OK · UAT rc 0。"
     }
   ],
-  "updated_at": "2026-09-23 23:42",
+  "updated_at": "2026-09-24 06:35",
   "batch": "批728"
 }
