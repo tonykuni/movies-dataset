@@ -1,0 +1,335 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+v0106→v0107(側線 2026-09-24 第四段;主線批號由併線的手指定 L25;操作員令「自動進行實測自修正直到全部成功」· 掉球 Z173):
+  ① **因子具名基準**(Z173 主線給的第二條路):`factor` = Yahoo adj_close ÷ Yahoo close。Yahoo 的 close 事後回乘配股/拆股
+     (批730 實量:1294 在 2024-09-26 交易所 126.5、Yahoo 95.76,比值 0.757 = 兩次配股 1/1.1 × 1/1.2),所以這個因子**只含現金股利**;
+     拿它從交易所原始價(例:研報目標價)換到調整價,會少乘配股那一段 → 上漲空間高估。調整後 OHLC 本身是對的(Yahoo close 已含配股段,
+     再乘現金股利段=完整還原),**所以因子與價一個數字都不改**,只在表與正典視圖加一欄 `factor_basis`='YAHOO_ADJ÷YAHOO_CLOSE'(只增)。
+     要從交易所原始價換調整價的讀者:用 VRN_ENG073 `adj_quote`(兩段式 現金股利段 × 配股段、單日陳價平滑、事件防呆的**唯一實作**),
+     不要用本欄——本檔不另寫一份(Zero-Hydra)。
+  ② **自測只寫暫存**(L17):v0106 自測直接對正式庫 `build()`,每跑一次格子/審計閘就重建操作員的 tw_prices_adj 與視圖,
+     並行時撞 DuckDB 寫鎖(側線 2026-09-24 審計閘:ENG061/062 平行假紅「鎖撞」)。v0107 自測把正式庫**唯讀掛上**,
+     調整層建在暫存庫;讀的是真料、寫的是暫存。預設 build 路照舊寫正式庫(那是它的職責)。
+  ③ v0104 起 ③ 的「一個調整日都沒有」分支呼叫未定義的 `skp` → NameError;補上。自測 +⑨(factor_basis 在表與視圖;
+     合成配股例:交易所原始價 × factor 少了配股段、× factor × 配股段 = adj_close)。九檢。
+v0105→v0106(批690 PR #65 Codex P2):v0105 的 NODATA 早退把 ⑦ boot 接線與 ⑧ 紀律宣告一起退掉——那兩檢不吃料,
+  在沒有價表的境(容器=nodata_ok 站永遠走這條路)拿掉 boot 登記格子仍綠。v0106 把 ⑦⑧ 收成一處 `_chk78()`,有料/NODATA 兩條路都跑;
+  ⑦⑧ 紅=rc1,不被 NODATA 蓋住(早退不准把承諾一起退掉,批687 同律)。八檢不變。
+v0104→v0105(批690 Z92 誠實燈):`tw_daily_prices` 不在(容器/新機還沒跑價格增量)時自測第一句 SELECT 就丟 CatalogException,
+  整支炸掉、一行 FAIL 都不印(L16 缺料≠壞掉;LL51 缺件 Traceback=假紅)。v0105:先探表,不在 → [NODATA] ① + ②–⑧ 誠實 SKIP,rc=2;
+  預設 build 路同樣先探,缺=講因由 rc=2。表在、數字不合才是 FAIL。八檢不變。
+v0103→v0104(批538 VDF 實測):③ 把驗算標的寫死成 2330.TW,本境這支庫裡**沒有 2330.TW 的列**(892 檔全是別的),
+  於是「無調整日」報紅——紅的是**檢查只在某一台機器的資料上成立**,不是引擎算錯:
+  同一張表裡有 378,752 列 factor≠1,隨便挑一列都能驗。
+  v0104:優先用 2330.TW,沒有就挑**任何一支真的有調整日**的標的來驗數學(檢查因此與資料宇宙無關);
+  整張表一個調整日都沒有時才誠實 SKIP,並講出補法。
+VDF_ENG060_AdjPriceLayer v0103 — 調整後價格層(批178;操作員令;批346 旗標表缺 graceful;批349 原始層同式重算;批368 ① 相對門檻)
+====================================================================
+v0102→v0103(批368 雲端實錄:① 寫死 >1,200,000/45,000 列=史深 2022→ 宇宙 552 檔時 545,364 列假紅):改相對門檻 adj_rows≥95% src_rows(雙庫);其餘零觸碰。
+操作員令:「fetch adj close/close for the stock and transform OHLC into
+adj price data as input of everything」——調整後 OHLC 為下游一切輸入。
+遵交接報告 05.4:Adjusted 與原始 Price 不得混用;Derived 需標 data_class。
+機制(正本零觸碰;衍生層另表):
+  factor = adj_close / close(逐列;close<=0 或缺=誠實跳過計數)
+  adj_open/high/low = open/high/low × factor;adj_close 原欄直取
+  台股 tw_prices_adj+全球 gl_prices_adj;data_class='DERIVED_ADJ_FACTOR'
+  正典取數視圖 prices_canonical(=調整層)——下游(儀表板/共識/輪動/
+  分析)一律自此取數;原始表僅供 factor 重算與稽核
+不變量實證:因子同列同乘=保序——調整**不引入任何新異常**,原始
+空間既有之收盤競價 timing 異常(dq_ohlc_flags)在調整層數量守恆,
+續由旗標表標記供下游濾(QA:初版誤稱「歸零」,實測守恆=誠實修正)。
+v0100→v0101(批346 grid 紅燈逐站修):④ 保序不變量查 dq_ohlc_flags 於旗標表缺席之庫(雲端/新機)
+拋 CatalogException 致自測整段中斷(rc≠0 假紅);改 information_schema 先探,缺=旗標 0(誠實標「旗標表缺」),
+④ 仍以「調整層異常數=旗標數」守恆判;功能零變。
+v0101→v0102(批349):dq_ohlc_flags 全樹無建表者=永缺→④ 改以原始層 tw_daily_prices 同式(high<max(open,close) 或 low>min)重算異常數,與調整層對合=真守恆(工作站 3063 vs 0 假紅→真值對合)。
+用法:python3 VDF_ENG060_AdjPriceLayer_v0102.py build | --status | --selftest
+"""
+from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
+
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+VIA = HERE.parent.parent.parent
+DB_TW = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb"
+DB_GL = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_global_market.duckdb"
+
+_SQL_ADJ = """
+CREATE OR REPLACE TABLE {tbl} AS
+SELECT date, ticker,
+       adj_close / close AS factor,
+       open  * (adj_close / close) AS adj_open,
+       high  * (adj_close / close) AS adj_high,
+       low   * (adj_close / close) AS adj_low,
+       adj_close,
+       volume,
+       'DERIVED_ADJ_FACTOR' AS data_class,
+       'YAHOO_ADJ÷YAHOO_CLOSE' AS factor_basis
+FROM {src}
+WHERE close IS NOT NULL AND close > 0 AND adj_close IS NOT NULL
+"""
+FACTOR_BASIS = "YAHOO_ADJ÷YAHOO_CLOSE"     # v0107(Z173):只含現金股利段;配股段在 Yahoo 的 close 裡(事後回乘)
+
+
+def _build_one(db: Path, src: str, tbl: str, src_db: Path | None = None) -> dict:
+    """在 db 建調整層與正典視圖。v0107:給 src_db 時,原始表從那本庫**唯讀掛上**讀(自測用:讀真料、寫暫存,L17)。"""
+    import duckdb
+    con = duckdb.connect(str(db))
+    if src_db is not None:
+        con.execute(f"ATTACH '{str(src_db)}' AS s (READ_ONLY)")
+        src = f"s.{src}"
+    total = con.execute(f"SELECT count(*) FROM {src}").fetchone()[0]
+    con.execute(_SQL_ADJ.format(tbl=tbl, src=src))
+    n = con.execute(f"SELECT count(*) FROM {tbl}").fetchone()[0]
+    skipped = total - n  # close<=0/缺=誠實跳過(不猜因子)
+    con.execute(f"""
+        CREATE OR REPLACE VIEW prices_canonical AS
+        SELECT date, ticker, adj_open AS open, adj_high AS high,
+               adj_low AS low, adj_close AS close, volume, factor, data_class, factor_basis
+        FROM {tbl}""")
+    con.close()
+    return {"src_rows": total, "adj_rows": n, "skipped": skipped}
+
+
+def build(tw_out: Path | None = None, gl_out: Path | None = None) -> dict:
+    """預設寫正式庫(職責)。v0107:給 tw_out/gl_out 時改寫那兩本(自測的暫存庫),原始表從正式庫唯讀讀。"""
+    out = {"tw": _build_one(tw_out or DB_TW, "tw_daily_prices", "tw_prices_adj",
+                            src_db=DB_TW if tw_out else None)}
+    if DB_GL.exists():
+        out["gl"] = _build_one(gl_out or DB_GL, "global_daily", "gl_prices_adj",
+                               src_db=DB_GL if gl_out else None)
+    return out
+
+
+def _missing_tables(db, need) -> list:
+    """批690:表不在=缺料(NODATA rc2),不是壞掉(L16;批584/689B 同律)。回缺的表名;庫檔不在=全缺。"""
+    if not db.exists():
+        return list(need)
+    import duckdb
+    con = duckdb.connect(str(db), read_only=True)
+    try:
+        have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
+    finally:
+        con.close()
+    return [t for t in need if t not in have]
+
+NEED_TABLES = ("tw_daily_prices",)
+REMEDY = ("補料=`$env:VIA_NET_CONSENT='YES'; via-price`(VDF_ENG054 價格增量;boot ②;閘=操作員的手)後 "
+          "`VDF_ENG060 build`(boot ②b)")
+
+
+def status() -> int:
+    import duckdb
+    for label, db, tbl in (("台股", DB_TW, "tw_prices_adj"),
+                           ("全球", DB_GL, "gl_prices_adj")):
+        if not db.exists():
+            print(f"  [{label}] 庫缺(誠實)")
+            continue
+        con = duckdb.connect(str(db), read_only=True)
+        try:
+            n, mx, nf = con.execute(
+                f"SELECT count(*), max(date), "
+                f"sum(CASE WHEN abs(factor-1)>1e-9 THEN 1 ELSE 0 END) FROM {tbl}"
+            ).fetchone()
+            print(f"  [{label}] {n:,} 列 · 最新 {mx} · 因子≠1(有調整){nf:,} 列")
+        except Exception:
+            print(f"  [{label}] 未建(先 build)")
+        con.close()
+    return 0
+
+
+def selftest() -> int:
+    import duckdb
+    fails = []
+
+    def chk(name, cond, note=""):
+        print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
+        if not cond:
+            fails.append(name)
+
+    skips = []
+
+    def skp(name, note=""):          # v0107:v0104 起 ③ 分支呼叫它卻沒定義(NameError);SKIP 誠實計數,不算 OK 也不算 FAIL
+        print(f"  [SKIP] {name} {note}")
+        skips.append(name)
+
+    def _chk9():                     # v0107 ⑨:factor_basis 具名(Z173);合成暫存庫,不吃正式料
+        import tempfile
+        with tempfile.TemporaryDirectory() as td9:
+            db9 = Path(td9) / "t.duckdb"
+            c9 = duckdb.connect(str(db9))
+            # 合成配股例:交易所 D1 原始收 110、D2 配股 1:0.1 後 100;Yahoo 事後把 D1 回乘 1/1.1 → close 100、adj 同(無現金股利);
+            # D2 另有現金股利段 0.98(adj 98)。
+            c9.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, "
+                       "close DOUBLE, adj_close DOUBLE, volume DOUBLE)")
+            c9.execute("INSERT INTO tw_daily_prices VALUES ('2026-09-01','1294.TWO',100,101,99,100,98,1000),"
+                       "('2026-09-02','1294.TWO',100,102,98,100,100,1000)")
+            c9.close()
+            r9 = _build_one(db9, "tw_daily_prices", "tw_prices_adj")
+            c9 = duckdb.connect(str(db9), read_only=True)
+            tb = {x[0] for x in c9.execute("SELECT DISTINCT factor_basis FROM tw_prices_adj").fetchall()}
+            vw = [x[0] for x in c9.execute("DESCRIBE prices_canonical").fetchall()]
+            f1 = c9.execute("SELECT factor, adj_close FROM tw_prices_adj WHERE date='2026-09-01'").fetchone()
+            c9.close()
+        exch_raw = 110.0                          # 交易所 D1 原始收盤(配股前)
+        stock_seg = 100.0 / exch_raw              # 配股段 = Yahoo close ÷ 交易所 close
+        chk("⑨ v0107 因子具名基準(Z173):表與正典視圖都有 factor_basis='YAHOO_ADJ÷YAHOO_CLOSE';合成配股例 交易所原始 110 × factor "
+            "≠ adj_close(少了配股段),× factor × 配股段(100/110)= adj_close 98——拿本欄換原始價會高估,要用 VRN_ENG073 adj_quote",
+            tb == {FACTOR_BASIS} and vw[-1] == "factor_basis" and r9["adj_rows"] == 2
+            and abs(exch_raw * f1[0] - f1[1]) > 1.0 and abs(exch_raw * f1[0] * stock_seg - f1[1]) < 1e-9,
+            f"(基準 {sorted(tb)} · 視圖末欄 {vw[-1]} · 110×{f1[0]:.4f}={exch_raw * f1[0]:.2f} vs adj {f1[1]})")
+
+    def _chk78():                     # ⑦⑧ 不吃料:有料/NODATA 兩條路共用同一處判準(L05;PR #65 Codex P2)
+        boot = (VIA / "supportive modules" / "registry" /
+                "via_boot_update.sh").read_text(encoding="utf-8")
+        chk("⑦ boot 日更接線(價格增量後重建調整層)", "VDF_ENG060" in boot)
+        src = Path(__file__).read_text(encoding="utf-8")
+        chk("⑧ 紀律宣告(正本零觸碰/data_class 標記/不混用/誠實跳過)",
+            all(k in src for k in ("正本零觸碰", "DERIVED_ADJ_FACTOR",
+                                   "不得混用", "誠實跳過")))
+
+    miss = _missing_tables(DB_TW, NEED_TABLES)
+    if miss:                          # 批690:缺料誠實 NODATA,不炸不報紅;不吃料的 ⑦⑧⑨ 照檢
+        print(f"  [NODATA] ① 原始價表不在:{', '.join(miss)}(庫 {'在' if DB_TW.exists() else '不在'})")
+        print(f"           {REMEDY}")
+        print("  [SKIP] ②–⑥ 正本/因子數學/保序/正典視圖/冪等:上游沒料,誠實跳過(不是壞掉,也不假裝過)")
+        _chk78()
+        _chk9()
+        print(f"  [計] 九檢 OK {3 - len(fails)} · FAIL {len(fails)} · NODATA 1 · SKIP 5(誠實多態)")
+        return 1 if fails else 2
+    import tempfile
+    _td = tempfile.TemporaryDirectory()          # v0107(L17):調整層建在暫存庫,正式庫只唯讀掛上
+    T_TW, T_GL = Path(_td.name) / "tw_adj.duckdb", Path(_td.name) / "gl_adj.duckdb"
+    before = duckdb.connect(str(DB_TW), read_only=True).execute(
+        "SELECT count(*) FROM tw_daily_prices").fetchone()[0]
+    r = build(T_TW, T_GL)
+    chk("① 雙庫調整層建成(台股+全球;列數≥原始層 95%;跳過=誠實計數;批368 相對門檻=不因史深/宇宙大小假紅)",
+        r["tw"]["adj_rows"] > 0 and r["tw"]["adj_rows"] >= 0.95 * max(r["tw"]["src_rows"], 1) and "gl" in r
+        and r["gl"]["adj_rows"] > 0 and r["gl"]["adj_rows"] >= 0.95 * max(r["gl"]["src_rows"], 1),
+        f"(台 {r['tw']['adj_rows']:,}·跳 {r['tw']['skipped']}·"
+        f"全 {r['gl']['adj_rows']:,})")
+    after = duckdb.connect(str(DB_TW), read_only=True).execute(
+        "SELECT count(*) FROM tw_daily_prices").fetchone()[0]
+    chk("② 正本零觸碰(tw_daily_prices 列數不變)", before == after,
+        f"({after:,})")
+    con = duckdb.connect(str(T_TW))
+    con.execute(f"ATTACH '{str(DB_TW)}' AS s0 (READ_ONLY)")
+    con.execute("CREATE OR REPLACE TEMP VIEW tw_daily_prices AS SELECT * FROM s0.tw_daily_prices")
+    _SQL_ADJ = """
+        SELECT a.ticker, a.adj_open, s.open * s.adj_close / s.close
+        FROM tw_prices_adj a JOIN tw_daily_prices s
+          ON a.date=s.date AND a.ticker=s.ticker
+        WHERE abs(a.factor-1)>1e-6 {who}
+        ORDER BY a.date DESC LIMIT 1"""
+    row = con.execute(_SQL_ADJ.format(who="AND a.ticker='2330.TW'")).fetchall()
+    _who = "2330.TW"
+    if not row:                      # 批538:本庫沒有 2330.TW 就挑任何一支真有調整日的標的——檢查不該綁在某一台機器的資料宇宙
+        row = con.execute(_SQL_ADJ.format(who="")).fetchall()
+        _who = row[0][0] if row else "—"
+    if not row:
+        skp("③ 因子數學實證(adj_open=open×factor)",
+            "(整張 tw_prices_adj 一個調整日都沒有=上游未產生,非本引擎缺陷;補法 via-price run 後複判)")
+    else:
+        chk(f"③ 批538 因子數學實證({_who} 取任一真有調整日的標的:adj_open=open×factor)",
+            abs(row[0][1] - row[0][2]) < 1e-9, f"({_who} {row[0][1]} vs {row[0][2]})")
+    bad_adj = con.execute("""
+        SELECT count(*) FROM tw_prices_adj
+        WHERE adj_high < GREATEST(adj_open, adj_close) - 1e-9
+           OR adj_low  > LEAST(adj_open, adj_close) + 1e-9""").fetchone()[0]
+    has_flags = con.execute(
+        "SELECT count(*) FROM information_schema.tables WHERE table_name='dq_ohlc_flags'").fetchone()[0] > 0
+    if has_flags:
+        flagged = con.execute(
+            "SELECT count(*) FROM dq_ohlc_flags "
+            "WHERE flag_class='ADJUSTMENT_FACTOR'").fetchone()[0]
+        total_flagged = con.execute(
+            "SELECT count(*) FROM dq_ohlc_flags").fetchone()[0]
+    else:  # 批349:旗標表全樹無建表者(退役 DQ 引擎產物)→改以原始層同式重算=真不變量(調整不引入新異常)
+        flagged = 0
+        total_flagged = con.execute("""
+            SELECT count(*) FROM tw_daily_prices
+            WHERE high < GREATEST(open, close) - 1e-9
+               OR low  > LEAST(open, close) + 1e-9""").fetchone()[0]
+    chk("④ 保序不變量(調整不引入新異常:調整層異常數=原始層異常數守恆)",
+        bad_adj == total_flagged,
+        f"(調整層 {bad_adj} = {'旗標' if has_flags else '原始層同式重算'} {total_flagged};ADJ 類 {flagged}{'' if has_flags else ';旗標表缺→原始層重算(誠實)'})")
+    chk("⑤ 正典視圖 prices_canonical(下游一切輸入=調整層)",
+        con.execute("SELECT count(*) FROM prices_canonical").fetchone()[0]
+        == r["tw"]["adj_rows"]
+        and con.execute("SELECT data_class FROM prices_canonical LIMIT 1"
+                        ).fetchone()[0] == "DERIVED_ADJ_FACTOR")
+    con.close()
+    r2 = build(T_TW, T_GL)
+    chk("⑥ 冪等(重建列數不變)", r2["tw"]["adj_rows"] == r["tw"]["adj_rows"])
+    _td.cleanup()
+    _chk78()
+    _chk9()
+    print(f"  [計] 九檢 OK {9 - len(fails) - len(skips)} · FAIL {len(fails)}" + (f" · SKIP {len(skips)}" if skips else ""))
+    return 1 if fails else 0
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if "--selftest" in args:
+        print("=== 調整後價格層(VDF_ENG060 v0107)· 九檢自測(零網路;調整層建在暫存庫,正式庫唯讀)===")
+        return selftest()
+    if "--status" in args:
+        return status()
+    miss = _missing_tables(DB_TW, NEED_TABLES)
+    if miss:
+        print(f"[NODATA] 表不在:{', '.join(miss)} —— {REMEDY}。缺料不是壞掉(L16)")
+        return 2
+    r = build()
+    print(f"[調整層] 台股 {r['tw']['adj_rows']:,} 列(跳 {r['tw']['skipped']})"
+          + (f" · 全球 {r['gl']['adj_rows']:,} 列" if "gl" in r else "")
+          + " · prices_canonical 視圖在位(下游一切輸入)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
