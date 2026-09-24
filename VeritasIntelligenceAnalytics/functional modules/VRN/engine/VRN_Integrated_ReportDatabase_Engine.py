@@ -1677,7 +1677,7 @@ def adj_upside_columns(tw_ticker: str, report_date: str, target_price: Optional[
         cols["UpsideState"] = "ADJ_NO_CORE"
         return cols
     try:
-        q = core.adj_basis(tw_ticker or None, report_date or None, target_price, db=db)
+        q = core.adj_basis(tw_ticker or None, report_date or None, target_price, db=db, page_price=current_price)
     except Exception as exc:  # graceful by design
         cols["UpsideState"] = f"ADJ_ERROR({exc.__class__.__name__})"
         return cols

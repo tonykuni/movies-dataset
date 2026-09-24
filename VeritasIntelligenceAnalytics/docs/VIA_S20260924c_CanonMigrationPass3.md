@@ -37,7 +37,7 @@
 | `supportive modules/registry/CGC_MDL119_SystemAPI_v0106.py` | v0105→v0106 | 首頁庫表日期域:自帶那份先認、認不到補位;最早/最新日排除哨兵;只剩哨兵列=空白(不寫 `None`) | 13 檢 OK 10 · NODATA 3(同 v0105 基線) |
 | `supportive modules/registry/CGC_MDL128_SystemCharter_v0102.py` | v0101→v0102 | max_date 跨表比期末日;補位;哨兵;期別認不出的表不猜、記 note;⑨ regex 改正 | 10/10(+⑩) |
 | `supportive modules/registry/CGC_MDL064_SelftestGrid_v0480.py` | v0479→v0480 | 只改六站站名的檢數;別的尺拿站名當鑰匙的字一個不動(產品閘「(批376)」8 站、「月營收分析」、專案對映「擷取/回補/月營收」) | 相關八站 OK 8 |
-| 冊(就地) | — | 期別規則冊:`sentinel_rows` 讀者名單與 CAST 註 · census 九份全 BOUND · `private_copies_to_migrate` 補七條 · `focus_group_measured` · 冊內帳;元件冊(registry-sync 新 20 · 變更 273 · 退役 0);正則清冊(CGC_MDL115 重建,共用 724→725);自動編碼帳 +1;掉球 Z162 · Z169 結、Z163 註、+Z172 | — |
+| 冊(就地) | — | 期別規則冊:`sentinel_rows` 讀者名單與 CAST 註 · census 九份全 BOUND · `private_copies_to_migrate` 補七條 · `focus_group_measured` · 冊內帳;元件冊(registry-sync 新 20 · 變更 273 · 退役 0);正則清冊(CGC_MDL115 重建,共用 724→725);自動編碼帳 +1;掉球 Z162 · Z169 結、Z163 註、+Z177(原配 Z172,與 main 批730 撞號,LL334 改號) | — |
 
 主控頁(`VIA_UI_MasterControl_v0100.html`)再生後只差兩個時間戳,**不提交**;合約測試用現有那一頁照過。
 
@@ -78,9 +78,10 @@
 - **Z163 焦點外 41 支**:照帳只減不增,每支語料零差異才准,不在本段。
 - **MDL148 的中文檢數是寫死的**(「五十一檢」是全套;沒有 duckdb 的環境實跑 49):v0130 就是這種寫法,括號裡的阿拉伯數字才是實跑數,本段不改。
 - **MDL123 在沒有 duckdb 的 Python 下自測整支崩**:v0104 也一樣(實量),不是本段造成;記在這裡,下一版再處理。
-- **仍在等你的**:Z161(`$stepBook` 那一行要你逐支許可 L70,以及「當日已跑」要跳過還是強跑)· Z164(籌碼/成交值收不收 ETF)· Z165(MOPS 財報解析道)· Z168(`via-price --status`)· Z170(開同意閘驗真回包)· Z171(中央線合約尺)· Z172(本段判讀變化實量)。
+- **仍在等你的**:Z161(`$stepBook` 那一行要你逐支許可 L70,以及「當日已跑」要跳過還是強跑)· Z164(籌碼/成交值收不收 ETF)· Z165(MOPS 財報解析道)· Z168(`via-price --status`)· Z170(開同意閘驗真回包)· Z171(中央線合約尺)· Z177(本段判讀變化實量)。
+- **main 批730 新立、指派給 VDF 線的三件**(本段合併 main 時才看到,沒碰,排下一段):Z173(調整後價格層的因子沒含配股)· Z174(價表缺日:Yahoo 整天缺 · 交易所上櫃表缺 94 個交易日 · 上市表只有 117 個零星日子)· Z175(Yahoo 單日價不一致)。
 
-## 七 · 工作站要做的(依序)
+## 七 · 工作站要做的(依序;掉球 Z177)
 
 1. 本段併進 main 之後,拉到最新 main。
 2. 在 `VeritasIntelligenceAnalytics` 夾下各跑一次、把輸出貼回(全部唯讀、不觸網、**不用開同意閘**):

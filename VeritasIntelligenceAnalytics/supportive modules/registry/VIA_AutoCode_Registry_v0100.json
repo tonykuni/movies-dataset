@@ -10006,13 +10006,27 @@
       "component": "側線 2026-09-24 第二段(主線批號由併線的手指定 L25)操作員令「繼續完成」:期別正典第二回遷移——SUP_MDL753 v0106(fallback_date_columns · roc_to_iso 八碼 19xx · roc_to_iso_keep · roc_ym)· CGC_MDL139 v0111(主控台滯後讀正典、快照列當下重算)· VDF_ENG073 v0101(架構冊補位+滯後讀正典)· VDF_ENG055 v0113(民國/緊湊日期六處綁正典)· VDF_ENG063 v0106(_roc_ym 綁正典)· VDF_ENG054 v0106(日價表欄型明示 · 空跑不寫 _NOOP_ · --status 欄型行;新庫第一輪空跑會把價截成整數的洞)· 格子 v0479(九站檢數)· 期別規則冊 census 九份 · ROC_YM · 帳 +2 · 總控頁再生(LL49)· 掉球 Z161–Z167 更新、Z168–Z171 新開;說明 docs/VIA_S20260924b_CanonMigrationPass2.md"
     },
     {
+      "ts": "2026-09-24 10:37",
+      "op": "ADD",
+      "category": "VRN正確性·ADJ·附錄",
+      "component": "批730 操作員令「自測實測自AUDIT直到完工 結果也要實測正確性」:VRN_ENG073 v0138(L99 因子 = 現金股利段 Yahoo adj÷close × 配股段 Yahoo close÷交易所 close,單日不一致取前後一致值 · 前一交易日交易所缺 → 45 天內最近交易所日 → 頁面價(落在 Yahoo 近 5 日收盤之外才用)→ Yahoo 具名 · _prior_close 交易所在前且濾沒成交空列 · ADJ_EVENT_UNADJUSTED · 上市窗口從真的上市日算 · 尾碼轉裸碼 · 拿掉 _prev_close_adj · +price_prev_raw/adj_factor_basis/adj_retro_ratio/adj_event · adj_quote(page_price=))· VRN_ENG080 v0110(因子與事件向 ENG073 要;前一交易日;EVENT_UNADJUSTED 不生數字)· VRN_Evidence_Core(adj_basis page_price · 附錄發行人守門 · 評等法:連字號詞、O or Over、破折號規則、無冒號表格行、表頭註腳長標題不收、元大不當價格 · adj --page 參數)· 首頁引擎與資料庫引擎帶頁面現價 · 自測迴圈 [ADJ] 因子分母分佈 · +test_VRN_AdjOracle(真庫 7 條)· +test_VRN_AppendixAccuracy(36 份仿真附錄標準答案)",
+      "code": "拿交易所 tw_trading_daily 當獨立對照:Yahoo close 與交易所差 >0.5% 的 13.6% 列、796/893 檔(事後按配股回調);1294 v0137 +121.1% → 實際 +67.4%;115 筆可比 v0137 錯 58 筆、v0138 0 筆不符;3000 筆不變式 0 違反。同批自己的錯:第一版整個因子做 5 日中位,真庫 1,848 次除權息抹掉 1,316 次;拆兩段後分層 57/150 → 150/150、39/150 → 150/150;ENG080 對 ENG073 293/293 同答。事件防呆五版校準,全庫未調整事件 2 件(4542 · 4950)。附錄:調整集 21/21 · 54/54、保留集 11/11 · 21/21、審查集 4/4。ENG073 自測 64/64 · ENG080 32/32 · VRN/tests 97/97 · 合成一輪 PASS 358 WARN 1 FAIL 0 · VCGC 37/37 · 總控頁契約 19/19 · 全景稽核新增 0。獨立審查:12 條逐條拿現碼重跑:1–3 由因子拆兩段修掉(審查期望值逐位相同)、4–11 修(上市窗口 · 沒成交空列 · 頁面價 · 附錄四條 · CLI)、12 測試補強;全景稽核新增 0。全格子 v0479:v0478 第一跑 OK 338 FAIL 4(四紅皆再生鏈未跑)→ 併 main 後 v0479 OK 342 FAIL 0 SKIP 6 TIMEOUT 0 · 887s · GRID_20260924_102200.json"
+    },
+    {
+      "ts": "2026-09-24 10:37",
+      "op": "ADD",
+      "category": "併線",
+      "component": "批730 併入 main 89a7dd81(PR #97 本線批729 四 · PR #98 VDF 側線五組擷取引擎全景)與 851e6f81(PR #99 VDF 側線第二段:期別正典第二回遷移 · 格子 v0479 · SUP_MDL753 v0106);LL334 推前查所有分支:ENG073 v0138 · ENG080 v0110 無人用;掉球接 VDF 側線的 Z171 之後取 Z172–Z176",
+      "code": "git merge(不 rebase、不 force-push),兩次皆 0 衝突"
+    },
+    {
       "ts": "2026-09-24 11:16",
       "op": "FIX",
       "code": "容器實測:自測 39/15/51/20/11/27/10/13 檢(正典 · 資料家 · 匯流排 · 增量閘 · 市場清單 · 涵蓋閘 · 結構總冊 · 系統 API OK 10 + NODATA 3 同 v0105 基線)全綠;改壞測試全抓:正典 6(CAST ×2 · NULL 保留 · 民國五碼 · 期末日 · 凍結)· 資料家 4 · 匯流排 3 · 增量閘 4 · 市場清單 5 · 系統 API 3 · 結構總冊 5 · 涵蓋閘 6(結構總冊另一支等價改壞具名不計);回歸 LibCanon 7/7 · MDL139 19/19 · ENG073 10/10 · ENG093 13/13 · ENG055 11/11 · ENG063 10/10 · ENG054 12/12 · VRN_ENG070 9/9 · VRN_ENG071 10/10;py3.12(無 duckdb)與舊版基線同;格子 v0480 八站 OK 8;產品閘 9/9 · 完工矩陣 8/8;本機照 CI 綠(契約 OK · UAT rc0;主控頁只差時間戳,不提交);VCGC 37/37(同步前 ⑬ 缺 20 件);ssot verify PASS(共用正則 724→725);元件冊 新 20 · 變更 273 · 退役 0;真庫對照:結構總冊 max_date 兩本庫與 v0101 同值、另誠實記 factset_earnings=Q3 認不出;涵蓋閘容器無目錄=兩版同 ABSENT、roster 兩版同(容器庫無哨兵列)",
       "category": "期別正典遷移",
-      "component": "側線 2026-09-24 第三段(主線批號由併線的手指定 L25)操作員令「請繼續完成用中文說明」:期別正典第三回遷移——SUP_MDL753 v0107(period_bounds · cadence_of · sentinel_where[欄先 CAST] · _month_of 收民國五碼,月份解析只剩一份)· CGC_MDL123 v0105(補位差集呼叫正典 · 哨兵列不算)· CGC_MDL148 v0131(普查交 MDL123 · 跨度 period_bounds)· VDF_ENG089 v0102(月/季表照期限)· VDF_ENG087 v0103(補位 · 哨兵 · 只剩哨兵=NODATA · 起日寬限 7 天)· VDF_ENG090 v0106(Date 別名補位 · roster 哨兵 · revenue 月份讀正典、冊上月表照期限)· CGC_MDL119 v0106 · CGC_MDL128 v0102(跨表比期末日 · ⑨ 字階 regex 改正)· 格子 v0480(六站檢數)· 期別規則冊(sentinel_rows 讀者 · census 九份全 BOUND · 焦點組民國換算量測)· 掉球 Z162 · Z169 結、Z163 焦點組清、+Z172 工作站實量"
+      "component": "側線 2026-09-24 第三段(主線批號由併線的手指定 L25)操作員令「請繼續完成用中文說明」:期別正典第三回遷移——SUP_MDL753 v0107(period_bounds · cadence_of · sentinel_where[欄先 CAST] · _month_of 收民國五碼,月份解析只剩一份)· CGC_MDL123 v0105(補位差集呼叫正典 · 哨兵列不算)· CGC_MDL148 v0131(普查交 MDL123 · 跨度 period_bounds)· VDF_ENG089 v0102(月/季表照期限)· VDF_ENG087 v0103(補位 · 哨兵 · 只剩哨兵=NODATA · 起日寬限 7 天)· VDF_ENG090 v0106(Date 別名補位 · roster 哨兵 · revenue 月份讀正典、冊上月表照期限)· CGC_MDL119 v0106 · CGC_MDL128 v0102(跨表比期末日 · ⑨ 字階 regex 改正)· 格子 v0480(六站檢數)· 期別規則冊(sentinel_rows 讀者 · census 九份全 BOUND · 焦點組民國換算量測)· 掉球 Z162 · Z169 結、Z163 焦點組清、+Z177 工作站實量(原配 Z172 與批730 撞號,LL334 改號)"
     }
   ],
-  "updated_at": "2026-09-24 08:07",
-  "batch": "批729"
+  "updated_at": "2026-09-24 10:37",
+  "batch": "批730"
 }
