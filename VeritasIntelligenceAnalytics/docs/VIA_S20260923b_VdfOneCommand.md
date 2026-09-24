@@ -210,7 +210,17 @@ NativeArgs        = (Get-Variable -Name PSNativeCommandArgumentPassing -ValueOnl
 
 ---
 
-## 九 · 還原
+## 九 · 併 main(PR #94,2026-09-24)
+
+main 併入 PR #94(批727 系列)之後,這個 PR 在 GitHub 上顯示有衝突。已併入 main 3710ba0b:
+- 唯一衝突是元件自動編號冊:兩邊各自編號,撞在 `VIA-FNC-8303` / `8304`。
+- 不手改:取 main 那一版為底,交唯一寫入口 VCGC `registry-sync --apply` 重掃。main 的號一個不動,本線 50 件接在後面(CLS 0391 · ENG 0097 · FNT 0105 · FNC 8305–8351)。
+- 正則清冊交正主 CGC_MDL115 重建:1284 → 1291(多的 7 條來自 main 的 VRN_ENG086 v0116)。
+- 合併後重跑:VCGC 36/36 · ssot verify rc 0 · 格子三站 OK · ENG093 12/12 · 本機照 CI 全過。
+
+---
+
+## 十 · 還原
 
 刪掉 `Open-VIA-VDF-v0100.ps1`~`v0103.ps1`、`Invoke-VIA-VdfFetch-v0106.ps1` 與 `v0107.ps1`(短令冊自動退回 v0105)、`VDF_ENG093_LaunchConsole_v0101.py`、`VDF_ENG051_ActiveTWETF_Holdings_v0103.py`、`VRN_ENG071_CnyesFusion_v0101.py`、`Open-VIA-VDF.cmd`、`functional modules/VDF/VDF_ENG093_LaunchConsole_v0100.py`。
 
