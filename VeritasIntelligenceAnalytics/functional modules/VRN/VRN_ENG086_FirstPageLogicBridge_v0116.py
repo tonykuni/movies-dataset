@@ -1380,9 +1380,18 @@ _PCT_OWN_LINE_RX = re.compile(r"[ \t\u3000]*(?:\r?\n[ \t\u3000]*)+[%％][ \t\u30
 # `Downside (%) : Price Target 38` 的連接詞是冒號,舊式只認 to/vs 會漏;
 # 但**不能**因此把冒號加進「任何標籤」—— `Revenue growth (%): Target Price: 250`
 # 會被誤殺(第四輪 P2 的同型)。所以判準是「幅度詞 + (%) + 連接詞 + 線索詞」。
-_PCT_LABEL_BEFORE_RX = re.compile(
-    r"(?:up\s*/?\s*downside|upside|downside|上漲空間|下跌空間|上檔空間)"
-    r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*(?:to|vs\.?|versus|from|[:：])?\s*$", re.I)
+# 批727g(自查):分辨的關鍵**不是標籤的詞**,是連接詞的性質。
+#   a 關係連接詞(to/vs/versus/from):`X (%) to 目標價` 意思是「X 是相對於目標價的百分比」,
+#     後面那個數字就是 X 本身 —— 與 X 叫什麼無關,所以**不看詞表**
+#     (`Potential return (%) to Price Target: 38` / `ETR (%) to Target Price: 15` 都該擋,
+#      而它們在 v0115 就已經回值了,是既有誤報不是本批造成的)。
+#   b 冒號只是**分欄**,不表示繫屬,所以要再要求標籤本身是幅度/報酬詞
+#     —— 否則 `Revenue growth (%): Target Price: 250` 會被誤殺(第四輪 P2 同型)。
+_PCT_REL_BEFORE_RX = re.compile(                      # a:關係連接詞,不看詞表
+    r"\(\s*[%％]\s*\)\s*(?:to|vs\.?|versus|from)\s+$", re.I)
+_PCT_LABEL_BEFORE_RX = re.compile(                    # b:冒號分欄,要幅度/報酬詞
+    r"(?:up\s*/?\s*downside|upside|downside|return|報酬|上漲空間|下跌空間|上檔空間)"
+    r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
 # 單位標記也可能落在**數字之後**(`Target Price: 38 (%)`);裸 % 的規則 A 看不到括號。
 _PCT_UNIT_AFTER_RX = re.compile(r"[ \t\u3000]*\(\s*[%％]\s*\)")
 
@@ -1406,7 +1415,8 @@ def _is_upside_context(text: str, pos: int, span: int = 26,
         if _PCT_UNIT_RX.search(text, cue_start, num_start):
             return True
         # B2 `(%)` 以連接詞繫在線索詞之前(`Downside (%) to Price Target`)
-        if _PCT_LABEL_BEFORE_RX.search(text[max(0, cue_start - 40): cue_start]):
+        _before = text[max(0, cue_start - 48): cue_start]
+        if _PCT_REL_BEFORE_RX.search(_before) or _PCT_LABEL_BEFORE_RX.search(_before):
             return True
     return bool(_UPSIDE_RX.search(text[max(0, pos - span): pos + span]))
 
@@ -2434,7 +2444,10 @@ def selftest() -> int:
                       ("Target Price: 250\n% Revenue growth: 15", 250.0),
                       # 批727f:(%) 要繫在**幅度標籤**上才算。把冒號無條件加進連接詞的話,
                       # 這一式會被誤殺(Revenue growth 不是幅度標籤,那是另一欄)。
-                      ("Revenue growth (%): Target Price: 250", 250.0)):
+                      ("Revenue growth (%): Target Price: 250", 250.0),
+                      # 批727g:關係連接詞不看詞表,但**冒號/無連接詞**仍須看 —— 否則這三式被誤殺。
+                      ("Downside risk section ends here (%) Target Price: 250", 250.0),
+                      ("Revenue growth (%) and margin   Target Price: 250", 250.0)):
         _v, _ = safe_target_price(_s)
         chk(f"幅度守衛不得誤殺:{_s} → {_want}", _v == _want)
     for _s in ("營收 NT$17382 百萬,毛利率上升", "Price Target: n.a.", "Analyst Price Target Review",
@@ -2463,7 +2476,15 @@ def selftest() -> int:
                # 而 (%) 單位標記也可能落在**數字之後**,裸 % 的規則 A 看不到括號。
                "Downside (%) : Price Target 38", "Up/downside (%) vs Target Price: 12",
                "Target Price: 38 (%)", "Price Target 38 (%)",
-               "Downside vs. TP: 38", "Upside from Price Target: 12"):
+               "Downside vs. TP: 38", "Upside from Price Target: 12",
+               # 批727g(自查):**既有誤報**(v0115 也回值)。幅度欄位不只叫 upside/downside,
+               # 還叫 potential/implied/total return、ETR……補詞表永遠補不完(LL435)。
+               # 判準改看**連接詞的性質**:to/vs/from 是關係連接詞(X 是相對於目標價的百分比),
+               # 與 X 叫什麼無關;冒號只是分欄,才需要再看標籤是不是幅度/報酬詞。
+               "Potential return (%) to Price Target: 38", "ETR (%) to Target Price: 15",
+               "Total return (%) vs Price Target: 19", "Implied return (%): Price Target 22",
+               "Downside (%) from Price Target (12M): 38", "Downside (%): Price Target (12M): 38",
+               "Price Target (12M): 38 (%)"):
         _v, _ = safe_target_price(_s)
         chk(f"英文目標價負控:{_s} 不准生出價", _v is None)
     # ---- 批727 雙頭守衛:冊上的 cue_rx 與本橋 _TP_CUES 本來就是雙胞胎,漂了沒人知道 ----
