@@ -221,6 +221,13 @@ def run(core, args: list[str]) -> int:
     base_ok = rows[0]["state"] == "PASS" and before["drift"]["state"] != "CHANGED"
     gate_ok, gate_reason = core.unitest_gate() if execute else (False, "plan only")
     bootstrap, boot_reason = core.rungate_bootstrap_only() if execute and not gate_ok else (False, "")
+    previous = (core._read_json(core.LKGC_LATEST, {}) or {}) if core.LKGC_LATEST.exists() else {}
+    restore = {name: {"good_at": value.get("good_at"), "lock": value.get("lock_lkgc") or value.get("lock"),
+                      "stale_since": value.get("stale_since")}
+               for name, value in (previous.get("envs") or {}).items()}
+    rebuild = [r["env"] for r in rows if r["env"] != "BASE" and
+               any(r["checks"][h]["state"] == "BLOCK" for h in
+                   ("interpreter_identity", "native_abi", "distribution_shadow"))]
     report = {"schema": REPORT_SCHEMA, "at": datetime.now(timezone.utc).isoformat(),
               "mode": "execute" if execute else "plan", "base_python": base_python,
               "env_root": env_root, "baseline": before["baseline"], "roster": before["roster"],
@@ -231,6 +238,9 @@ def run(core, args: list[str]) -> int:
               "diagnostic_tools_missing": [k for k, v in before["diagnostics"].items() if not v],
               "runtime_commands": before["runtime_commands"],
               "envs": rows, "pending": _pending(before["toolplan"]), "uv_dry_run": dry,
+              "rebuild_required": rebuild, "restore_points": restore,
+              "routing": before["toolplan"].get("isolation", {}),
+              "multi_version_hubs": before["toolplan"].get("hubs", {}),
               "previous_success": str(core.LKGC_LATEST) if core.LKGC_LATEST.exists() else None,
               "provision": [], "execution": None, "postcheck": None, "state": "PLAN"}
     # Write a pre-action restore point even for a blocked or failed run.
@@ -279,6 +289,8 @@ def run(core, args: list[str]) -> int:
         report["state"] = "BLOCKED_CONSENT" if not core._consent() else "BLOCKED"
     finalpath = _save(core, report, lesson=True)
     print(f"[八路衝突+uv] {report['state']} · 境 {len(rows)} · 待裝 {len(report['pending'])} 段")
+    if report["rebuild_required"]:
+        print("  身分或 ABI 錯位，需先由現有 via-rebuild 重建: " + ", ".join(report["rebuild_required"]))
     for row in rows:
         if row["state"] != "PASS":
             issues = [f"{k}:{v['detail'][:50]}" for k, v in row["checks"].items() if v["state"] != "PASS"]
