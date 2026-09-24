@@ -683,7 +683,8 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
                        for r in ROLES)
     if upstream_same and pages_intact and all(v == "SAME" for v in states.values()):
         return {"state": "SAME", "rc": 0, "why": "上游、模板都沒變,頁都在 → 不重寫", "pages": prev.get("pages") or {},
-                "links": prev.get("counts") or {}, "new_items": [], "out": str(out_dir)}
+                "links": prev.get("counts") or {}, "new_items": [], "out": str(out_dir),
+                "central": str(ui_dir / names["centralUI"]), "synchronizer": str(ui_dir / names["synchronizer"])}
     counts = {s: sum(1 for v in states.values() if v == s) for s in ("NEW", "CHANGED", "GONE", "SAME")}
     rows = []
     for k, st in sorted(states.items(), key=lambda kv: ({"NEW": 0, "CHANGED": 1, "GONE": 2, "SAME": 3}[kv[1]], kv[0])):
@@ -1062,6 +1063,7 @@ def selftest() -> int:
         st5 = _read_links(out).get("states") or {}
         chk("⑥ 上下游連結冊:同一份再建 → 全 SAME 且頁不重寫(冪等);關卡狀態變 → CHANGED;拿掉一欄 → GONE",
             r1["links"].get("NEW", 0) > 0 and r3["state"] in ("SAME", "BUILT") and r4["state"] == "SAME" and pages_before == pages_after
+            and Path(r4.get("central", "")).is_file() and Path(r4.get("synchronizer", "")).is_file()
             and st5.get("關卡|G01 COMPILE|a.py") == "CHANGED" and st5.get("欄|brand_new_section") == "GONE",
             f"(首建 NEW {r1['links'].get('NEW')} · 再建 {r4['state']} · 關卡 {st5.get('關卡|G01 COMPILE|a.py')} · 欄 {st5.get('欄|brand_new_section')})")
 
