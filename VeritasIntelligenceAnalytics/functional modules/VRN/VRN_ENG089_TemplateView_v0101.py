@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-VRN_ENG089_TemplateView v0100 — VRN 模板(制式 U/I 套版)· synchronizer 控制 · 上下游自動連結與新增檢查(批735)
+VRN_ENG089_TemplateView v0101 — VRN 模板(制式 U/I 套版)· synchronizer 控制 · 上下游自動連結與新增檢查(批735)
+
+v0100→v0101(批735 收尾;PR #119 的 Codex 審查 P2 + 晚一分鐘沒趕上併入的 66268665):
+  ① 比對基準的說法一處定義 basis_text():自動找到的上一輪 =「對上一輪」· 同一個夾重建 =「對這個夾的上一版」·
+     都沒有 =「首建」。v0100 的新增段說明不分情況一律寫「對上一輪」(連結段標題本來就分對了),同一個夾手動重建時
+     會讓人把重建前後的差當成跨輪的差;頁 · CLI · 交接口 · 自測迴圈橫幅都改用這一支。build() / handover() 多回
+     compared_to · previous · basis,呼叫端照抄就對,不必自己猜。
+  ② build() 走「不重寫」(SAME)時也回中央頁 / synchronizer 路徑(v0100 少了這兩個鍵:`build --shot` 不截圖、
+     呼叫端會當成沒建成)。
+  ③ 自測 ⑥ +同一個夾重建 → 說法是「對這個夾的上一版」(頁上新增段說明也驗)且 SAME 回得出兩頁路徑;
+     ⑪ +跨輪 → 說法是「對上一輪」(頁上也驗)。仍十二檢。
+  版號律補記:v0100 隨 PR #118 併進 main 之後,PR #119 的 86336a94 又原地改了 v0100(當時還不知道 #118 已併)——
+  本版起照 L04 出新版,v0100 保持 main 上的位元組,不再動。
 
 操作員 2026-09-24:「用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接自適應式自動化」
                「上下的自動連結更新新增檢查機能建構須完成」「若成功跑一次測試文件的成果用我們使用的html u/i顯示」
@@ -286,16 +298,15 @@ def build_payload(report: dict, report_path: Path, links: dict | None = None) ->
     links = links or {}
     if links.get("rows"):
         c, cmp_, prev_at = links.get("counts") or {}, links.get("compared_to"), links.get("previous")
-        basis = (f"對上一輪({prev_at})" if cmp_ == "baseline" else f"對這個夾的上一版({prev_at})" if cmp_ == "self"
-                 else "首建:沒有上一輪可比")
+        basis = basis_text(cmp_, prev_at)
         add({"id": "links", "title": f"上下游連結(自動更新 · {basis} · 新增 {c.get('NEW', 0)} · 異動 {c.get('CHANGED', 0)} · "
                                      f"消失 {c.get('GONE', 0)} · 未變 {c.get('SAME', 0)})",
              "kind": "table", "columns": ["方向", "項目", "參照", "狀態"], "rows": links["rows"], "status_col": 3})
         news = [r for r in links.get("new_items") or []]
         lost = sum(1 for n in news if not n.get("on_page"))
         note = ("首建:沒有上一輪可比,每一項都算新增(下一輪起只列真的新出現的)" if not cmp_ else
-                "對上一輪沒有新增項目" if not news else
-                f"對上一輪新出現 {len(news)} 項" + (f",其中 {lost} 項沒上頁(建構判 rc1)" if lost else ",逐項驗過都上了頁"))
+                f"{basis_text(cmp_)}沒有新增項目" if not news else
+                f"{basis_text(cmp_)}新出現 {len(news)} 項" + (f",其中 {lost} 項沒上頁(建構判 rc1)" if lost else ",逐項驗過都上了頁"))
         add({"id": "new", "title": f"新增檢查({len(news)} 項)", "kind": "table", "columns": ["類別", "項目", "上了哪一段", "在頁上"],
              "rows": [[n["kind"], n["what"], n.get("home") or "—", "OK" if n.get("on_page") else "FAIL"] for n in news],
              "status_col": 3, "note": note})
@@ -360,6 +371,14 @@ def diff_items(prev: dict, now: dict) -> dict:
         if k not in now:
             out[k] = "GONE"
     return out
+
+
+def basis_text(compared_to, previous=None) -> str:
+    """比對基準的說法(一處定義;頁 · CLI · 交接口 · 自測迴圈橫幅都用這一支):
+    baseline =「對上一輪」(自動找到的上一輪)· self =「對這個夾的上一版」(同一個夾重建)· 其餘 =「首建」。"""
+    at = f"({previous})" if previous else ""
+    return (f"對上一輪{at}" if compared_to == "baseline" else f"對這個夾的上一版{at}" if compared_to == "self"
+            else "首建:沒有上一輪可比")
 
 
 def _read_links(out_dir: Path) -> dict:
@@ -672,6 +691,8 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
         prev = _read_links(Path(baseline))
         base_used = str(baseline) if prev else None
     prev_items = prev.get("items") or {}
+    compared = "baseline" if base_used else "self" if prev else None
+    basis = basis_text(compared, prev.get("built_at"))
     items = link_items(report, report_path, tpl)
     states = diff_items(prev_items, items)
     ui_dir = out_dir / "ui"
@@ -683,7 +704,9 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
                        for r in ROLES)
     if upstream_same and pages_intact and all(v == "SAME" for v in states.values()):
         return {"state": "SAME", "rc": 0, "why": "上游、模板都沒變,頁都在 → 不重寫", "pages": prev.get("pages") or {},
-                "links": prev.get("counts") or {}, "new_items": [], "out": str(out_dir)}
+                "links": prev.get("counts") or {}, "new_items": [], "out": str(out_dir),
+                "central": str(ui_dir / names["centralUI"]), "synchronizer": str(ui_dir / names["synchronizer"]),
+                "compared_to": compared, "previous": prev.get("built_at"), "basis": basis}
     counts = {s: sum(1 for v in states.values() if v == s) for s in ("NEW", "CHANGED", "GONE", "SAME")}
     rows = []
     for k, st in sorted(states.items(), key=lambda kv: ({"NEW": 0, "CHANGED": 1, "GONE": 2, "SAME": 3}[kv[1]], kv[0])):
@@ -693,7 +716,6 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
     rows += [["下游", "頁 · " + names[r], "ui/" + names[r], "REBUILT"] for r in ROLES]
     rows.append(["下游", "synchronizer 模組 · " + MODULE["id"], STATE_KEY, "REGISTERED"])
     new_keys = [k for k, st in states.items() if st == "NEW" and not k.startswith("上游|")]
-    compared = "baseline" if base_used else "self" if prev else None
     payload = build_payload(report, report_path, {"rows": rows, "counts": counts, "previous": prev.get("built_at"),
                                                   "compared_to": compared, "new_items": []})
     if _sections_hook:
@@ -749,7 +771,8 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
     return {"state": "BUILT", "rc": 1 if missing else 0, "why": ("新增項目沒上頁:" + " · ".join(rec["new_missing"][:5])) if missing else "",
             "pages": pages, "links": counts, "new_items": new_items, "out": str(out_dir),
             "central": str(ui_dir / names["centralUI"]), "synchronizer": str(ui_dir / names["synchronizer"]),
-            "crlf": [r["role"] for r in tpl["rows"] if r.get("crlf")]}
+            "crlf": [r["role"] for r in tpl["rows"] if r.get("crlf")],
+            "compared_to": compared, "previous": prev.get("built_at"), "basis": basis}
 
 
 def check(out_dir=None, template_root=None) -> dict:
@@ -796,6 +819,7 @@ def handover(roots=None) -> dict:
     return {"state": ck["state"], "why": ck["why"] + bad, "runs": len(rs), "unreadable": dict(UNREADABLE),
             "built_at": at, "out": str(d), "engine": rec.get("engine"),
             "report": rec.get("report"), "compared_to": rec.get("compared_to"), "baseline": rec.get("baseline"),
+            "previous": rec.get("previous"), "basis": basis_text(rec.get("compared_to"), rec.get("previous")),
             "counts": rec.get("counts") or {}, "new_items": len(rec.get("new_items") or []), "new_missing": rec.get("new_missing") or [],
             "summary": rec.get("summary") or {}, "module": MODULE["id"],
             "central": str(d / ent["centralUI"]) if ent.get("centralUI") else "",
@@ -969,6 +993,17 @@ def browser_probe(central: Path, synchronizer: Path, verdict: str, shot: str = "
         shutil.rmtree(probe_dir, ignore_errors=True)
 
 
+def _page_note(html_path: Path, sec_id: str = "new") -> str:
+    """從建好的頁讀回內嵌資料裡某一段的說明(瀏覽器實際會畫的那一句)。讀不到 = 空字串。"""
+    try:
+        html = Path(html_path).read_text(encoding="utf-8")
+        a = html.index('<script id="vrn-template-payload" type="application/json">') + len('<script id="vrn-template-payload" type="application/json">')
+        payload = json.loads(html[a:html.index("</script>", a)])
+        return next((x.get("note") or "" for x in payload.get("sections") or [] if x.get("id") == sec_id), "")
+    except (OSError, ValueError, StopIteration):
+        return ""
+
+
 def _sample_report(tmp: Path) -> dict:
     eng = tmp / "fake_engine.py"
     eng.write_text("# fake engine\n", encoding="utf-8")
@@ -1060,10 +1095,17 @@ def selftest() -> int:
         rp.write_text(json.dumps(rep3, ensure_ascii=False), encoding="utf-8")
         r5 = build(rp, out)
         st5 = _read_links(out).get("states") or {}
-        chk("⑥ 上下游連結冊:同一份再建 → 全 SAME 且頁不重寫(冪等);關卡狀態變 → CHANGED;拿掉一欄 → GONE",
+        note5 = _page_note(Path(r5["central"]))
+        chk("⑥ 上下游連結冊:同一份再建 → 全 SAME 且頁不重寫(冪等,照樣回兩頁路徑);關卡狀態變 → CHANGED;拿掉一欄 → GONE;"
+            "同一個夾重建的說法是「對這個夾的上一版」(頁上新增段說明也是),不冒充「對上一輪」",
             r1["links"].get("NEW", 0) > 0 and r3["state"] in ("SAME", "BUILT") and r4["state"] == "SAME" and pages_before == pages_after
-            and st5.get("關卡|G01 COMPILE|a.py") == "CHANGED" and st5.get("欄|brand_new_section") == "GONE",
-            f"(首建 NEW {r1['links'].get('NEW')} · 再建 {r4['state']} · 關卡 {st5.get('關卡|G01 COMPILE|a.py')} · 欄 {st5.get('欄|brand_new_section')})")
+            and Path(r4.get("central", "")).is_file() and Path(r4.get("synchronizer", "")).is_file()
+            and st5.get("關卡|G01 COMPILE|a.py") == "CHANGED" and st5.get("欄|brand_new_section") == "GONE"
+            and r1.get("compared_to") is None and r1.get("basis", "").startswith("首建")
+            and r4.get("compared_to") == "self" and r5.get("compared_to") == "self" and r5.get("basis", "").startswith("對這個夾的上一版")
+            and note5.startswith("對這個夾的上一版") and "對上一輪" not in note5,
+            f"(首建 NEW {r1['links'].get('NEW')} · 再建 {r4['state']} · 關卡 {st5.get('關卡|G01 COMPILE|a.py')} · 欄 {st5.get('欄|brand_new_section')} · "
+            f"說法 {r1.get('basis', '')[:4]} → {r5.get('basis', '')[:8]} · 頁上「{note5[:14]}」)")
 
         def drop(payload):
             payload["sections"] = [s for s in payload["sections"] if s["id"] != "extra-another-new"]
@@ -1143,20 +1185,23 @@ def selftest() -> int:
         rp_b.write_text(json.dumps(rep_b, ensure_ascii=False), encoding="utf-8")
         base_b = find_baseline(rp_b.parent)
         rb = build(rp_b, rp_b.parent / RUN_SUBDIR, baseline=base_b)
+        note_b = _page_note(Path(rb["central"]))
         lb = _read_links(rp_b.parent / RUN_SUBDIR)
         stb = lb.get("states") or {}
         ho = handover((runs_root,))
         items_now = link_items(rep_b, rp_b, template_check())
         chk("⑪ 跨輪自動連結:第二輪自動以第一輪為基準(不是全算新增)· 新欄 NEW · 關卡變 CHANGED · 其餘 SAME · 建構器 sha 列為上游 · "
-            "交接口報最新一版且 check 對得上",
+            "交接口報最新一版且 check 對得上 · 說法是「對上一輪」(建構回值 · 頁上 · 交接口三處一致)",
             ra["links"].get("SAME", 0) == 0 and base_b is not None and base_b.parent == rp_a.parent / RUN_SUBDIR
             and lb.get("compared_to") == "baseline" and stb.get("欄|next_round_field") == "NEW"
             and stb.get("關卡|G06 BATCH|x.pdf") == "CHANGED" and stb.get("上游|模板|centralUI") == "SAME"
             and rb["links"].get("SAME", 0) > 0 and items_now.get("上游|建構器", {}).get("sig") == _sha(Path(__file__).read_bytes())
             and ho.get("runs") == 2 and ho.get("state") == "OK" and Path(ho.get("out", "")).parent == rp_b.parent
-            and Path(ho.get("central", "")).is_file(),
+            and Path(ho.get("central", "")).is_file()
+            and rb.get("compared_to") == "baseline" and rb.get("basis", "").startswith("對上一輪") and note_b.startswith("對上一輪")
+            and ho.get("basis", "").startswith("對上一輪"),
             f"(基準 {base_b.parent.parent.name if base_b else '無'} · 第二輪 新增 {rb['links'].get('NEW')} · 異動 {rb['links'].get('CHANGED')} · "
-            f"未變 {rb['links'].get('SAME')} · 交接 {ho.get('state')} 共 {ho.get('runs')} 版)")
+            f"未變 {rb['links'].get('SAME')} · 交接 {ho.get('state')} 共 {ho.get('runs')} 版 · 說法 {rb.get('basis', '')[:4]} · 頁上「{note_b[:14]}」)")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     fp1 = (latest_links.stat().st_size, latest_links.stat().st_mtime_ns) if latest_links.is_file() else None
@@ -1187,8 +1232,8 @@ def main() -> int:
             return 2
         res = build(Path(a.report), out, baseline=a.baseline or None)
         lc = res.get("links") or {}
-        print(f"[VRN 模板] {res['state']} · 新增 {lc.get('NEW', 0)} · 異動 {lc.get('CHANGED', 0)} · 消失 {lc.get('GONE', 0)} · "
-              f"未變 {lc.get('SAME', 0)}" + (f" · {res['why']}" if res.get("why") else ""))
+        print(f"[VRN 模板] {res['state']} · {res.get('basis') or '-'} · 新增 {lc.get('NEW', 0)} · 異動 {lc.get('CHANGED', 0)} · "
+              f"消失 {lc.get('GONE', 0)} · 未變 {lc.get('SAME', 0)}" + (f" · {res['why']}" if res.get("why") else ""))
         if res.get("crlf"):
             print(f"[VRN 模板] 模板換行被改寫(內容一致,照建):{', '.join(res['crlf'])}")
         if res.get("central"):
@@ -1217,7 +1262,7 @@ def main() -> int:
         print(f"[VRN 模板] 還沒建過({out / LINKS_NAME} 不在)")
         return 2
     print(f"[VRN 模板] {rec.get('built_at')} · {rec.get('engine')} · 上游 {rec.get('report')}"
-          + (f" · 對上一輪 {rec.get('baseline')}" if rec.get("baseline") else ""))
+          + f" · {basis_text(rec.get('compared_to'), rec.get('previous'))}" + (f"(基準 {rec.get('baseline')})" if rec.get("baseline") else ""))
     print(f"           新增 {rec['counts'].get('NEW', 0)} · 異動 {rec['counts'].get('CHANGED', 0)} · 消失 {rec['counts'].get('GONE', 0)} · "
           f"未變 {rec['counts'].get('SAME', 0)} · 新增沒上頁 {len(rec.get('new_missing') or [])}")
     for n_ in (rec.get("new_items") or [])[:12]:
