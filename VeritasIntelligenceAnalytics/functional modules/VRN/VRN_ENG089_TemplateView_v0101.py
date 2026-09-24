@@ -12,6 +12,21 @@ v0100→v0101(批735 收尾;PR #119 的 Codex 審查 P2 + 晚一分鐘沒趕上�
      呼叫端會當成沒建成)。
   ③ 自測 ⑥ +同一個夾重建 → 說法是「對這個夾的上一版」(頁上新增段說明也驗)且 SAME 回得出兩頁路徑;
      ⑪ +跨輪 → 說法是「對上一輪」(頁上也驗)。仍十二檢。
+  ④ 找上一輪 / 交接最新一版改成先只 stat(檔案時間),真正打開的只有最新 OPEN_NEWEST=5 本(在其中取建構時間最大的):
+     v0100 每次把 vrn_autotest 底下每一輪的連結冊整本讀一遍——300 輪實量交接口 0.42 秒 / 開 301 本、找上一輪 0.38 秒 / 開 300 本,
+     且隨輪數線性長(v0101:0.02 秒 / 開 6 本、0.02 秒 / 開 5 本,結果相同);工作站的倉在 OneDrive 上,
+     舊檔可能只是雲端佔位,整夾讀會把它們一個個拉下來(掉球 Z29 同一類)。「共幾版」用 stat 數。⑪ +I/O 守門(25 輪只開 ≤5 本)。
+  ⑤ 使用者測試第二輪 ⑰ 抓到的自測缺口:容器裡模板是 LF,「工作站 git 換成 CRLF 仍照認」那條分支十二檢從沒跑過——
+     ③ +CRLF 模板正路(照認並點名 · 拿掉插入段 = CRLF 原檔 · check OK)· ⑦ +CRLF 之外內容也改 → BLOCKED。仍十二檢;
+     突變反測:拿掉 CRLF 分支 → 只有 ③ 紅;改成「有 CRLF 就放行」→ 只有 ⑦ 紅。
+  ⑥ PR #120 Codex 審查 P2(屬實):走「不重寫」(SAME)時回的是上一版記錄的數字,配的卻是這一次新算的「對這個夾的上一版」——
+     首建後原封再建會印「SAME · 對這個夾的上一版 · 新增 30」,頁上卻寫首建。同一根還有一處:上一版「新增沒上頁」(rc1),
+     原封再建走 SAME 會回 rc0 把問題洗掉(迴圈橫幅的「新增沒上頁」也跟著歸零)。SAME = 頁上仍是上一版 → 回值整組照上一版的記錄
+     (比對基準 · 數字 · 新增項 · rc)。⑥ +首建後原封再建仍說首建、同一組數字;⑦ +原封再建照樣 rc1。仍十二檢。
+  ⑦ 讀不動的根(UNREADABLE)是模組層字典、從來沒清過(v0100 就這樣):同一個行程裡某次讀不動,之後每次交接都照報「讀不動」。
+     交接口每次開頭清空重量;⑪ +上一次讀不動不黏到這一次。
+  ⑧ 總覽「檔案」格:報告沒有 file_count 時畫成「0 · 合成語料」(本輪驗收報告套版時看到)——沒有這一欄 ≠ 0 檔(L16)。
+     改成「—」並寫明「報告沒有這一欄」;⑤ +上游少一欄 → 頁上照實寫沒有。
   版號律補記:v0100 隨 PR #118 併進 main 之後,PR #119 的 86336a94 又原地改了 v0100(當時還不知道 #118 已併)——
   本版起照 L04 出新版,v0100 保持 main 上的位元組,不再動。
 
@@ -229,7 +244,8 @@ def build_payload(report: dict, report_path: Path, links: dict | None = None) ->
         {"label": "WARN", "value": counts.get("WARN", 0), "tone": "warn" if counts.get("WARN") else ""},
         {"label": "SKIP", "value": counts.get("SKIP", 0)},
         {"label": "FAIL", "value": counts.get("FAIL", 0), "tone": "bad" if counts.get("FAIL") else "ok"},
-        {"label": "檔案", "value": report.get("file_count", 0), "foot": "實檔" if report.get("real_mode") else "合成語料"},
+        {"label": "檔案", "value": "—" if report.get("file_count") is None else report["file_count"],     # 沒有這一欄 ≠ 0 檔(L16)
+         "foot": "報告沒有這一欄" if report.get("file_count") is None else "實檔" if report.get("real_mode") else "合成語料"},
         {"label": "輪數", "value": f"{report.get('rounds_run', '—')}/{report.get('rounds_max', '—')}"}]},
         ("verdict", "counts", "file_count", "real_mode", "rounds_run", "rounds_max"))
     add({"id": "run", "title": "這一輪", "kind": "kv", "rows": [
@@ -390,9 +406,12 @@ def _read_links(out_dir: Path) -> dict:
         return {}
 
 
-def runs(roots=None) -> list:
-    """找得到的每一版連結冊,新到舊 [(built_at, 夾, 冊)]。預設看自測迴圈每輪的 <工作夾>/template(PS 第六步在
-    VIA_Reports/vrn_autotest/<時間>/)與手建的 VIA_Reports/vrn/template;給 roots 就只看 roots 底下每個子夾。零寫檔。"""
+OPEN_NEWEST = 5   # 找最新一版只打開檔案時間最新的前幾本(時間偶有偏差也挑得對),其餘只 stat
+
+
+def _candidates(roots=None) -> list:
+    """連結冊候選,只 stat 不開檔:[(mtime_ns, 連結冊)],新到舊。工作站 vrn_autotest 一輪一夾會一直累積,而 OneDrive 上的
+    舊檔可能只是雲端佔位——整本讀會觸發下載(掉球 Z29 同一類);所以找最新的先看檔案時間,真正打開的只有最新幾本。"""
     dirs = []
     for root in (roots if roots is not None else (AUTOTEST_ROOT,)):
         if not Path(root).is_dir():                       # 還沒跑過第六步 = 這個根不在:沒有就是沒有
@@ -403,20 +422,39 @@ def runs(roots=None) -> list:
             UNREADABLE[str(root)] = type(exc).__name__
     if roots is None:
         dirs.append(LATEST_DIR)
-    found = []
+    out = []
     for d in dirs:
-        rec = _read_links(d)
+        f = d / LINKS_NAME
+        if f.is_file():                                   # 沒有連結冊(還沒建過 / 建到一半)= 不是候選
+            out.append((f.stat().st_mtime_ns, f))
+    return sorted(out, reverse=True)
+
+
+def runs(roots=None, limit=None) -> list:
+    """找得到的每一版連結冊,新到舊 [(built_at, 夾, 冊)]。預設看自測迴圈每輪的 <工作夾>/template(PS 第六步在
+    VIA_Reports/vrn_autotest/<時間>/)與手建的 VIA_Reports/vrn/template;給 roots 就只看 roots 底下每個子夾。
+    limit = 只打開檔案時間最新的前幾本(找最新一版用;None = 全部打開)。零寫檔。"""
+    cands = _candidates(roots)
+    found = []
+    for _mt, f in (cands if limit is None else cands[:limit]):
+        rec = _read_links(f)
         if rec.get("built_at"):
-            found.append((str(rec["built_at"]), d, rec))
+            found.append((str(rec["built_at"]), f.parent, rec))
     return sorted(found, key=lambda t: t[0], reverse=True)
 
 
 def find_baseline(run_dir) -> Path | None:
     """上一輪的連結冊:同一個上層夾裡、別的工作夾的 template/ 中建構時間最新的一本(自動連到前一輪);沒有 = None(首建全算新增)。"""
     run_dir = Path(run_dir).resolve()
-    for _at, d, _rec in runs((run_dir.parent,)):
-        if d.parent.resolve() != run_dir:
-            return d / LINKS_NAME
+    cands = [(mt, f) for mt, f in _candidates((run_dir.parent,)) if f.parent.parent.resolve() != run_dir]
+    for i in range(0, len(cands), OPEN_NEWEST):           # 先開最新幾本;全壞才往下一批(不整夾讀)
+        best = None
+        for _mt, f in cands[i:i + OPEN_NEWEST]:
+            at = str(_read_links(f).get("built_at") or "")
+            if at and (best is None or at > best[0]):
+                best = (at, f)
+        if best:
+            return best[1]
     return None
 
 
@@ -703,10 +741,16 @@ def build(report_path, out_dir=None, template_root=None, _sections_hook=None, ba
     pages_intact = all((ui_dir / names[r]).is_file() and _sha((ui_dir / names[r]).read_bytes()) == (prev.get("pages") or {}).get(names[r])
                        for r in ROLES)
     if upstream_same and pages_intact and all(v == "SAME" for v in states.values()):
-        return {"state": "SAME", "rc": 0, "why": "上游、模板都沒變,頁都在 → 不重寫", "pages": prev.get("pages") or {},
-                "links": prev.get("counts") or {}, "new_items": [], "out": str(out_dir),
-                "central": str(ui_dir / names["centralUI"]), "synchronizer": str(ui_dir / names["synchronizer"]),
-                "compared_to": compared, "previous": prev.get("built_at"), "basis": basis}
+        # 不重寫 = 頁上仍是上一版:回值整組照上一版的記錄(比對基準 · 數字 · 新增項 · 沒上頁的)——
+        # 不能拿上一版的數字配這一次新算的「對這個夾的上一版」,也不能把上一版的「新增沒上頁」(rc1)洗成 rc0
+        miss = prev.get("new_missing") or []
+        return {"state": "SAME", "rc": 1 if miss else 0,
+                "why": f"上游、模板都沒變,頁都在 → 不重寫(頁上仍是 {prev.get('built_at')} 那一版)"
+                       + (f";那一版新增項目沒上頁:{' · '.join(miss[:5])}" if miss else ""),
+                "pages": prev.get("pages") or {}, "links": prev.get("counts") or {}, "new_items": prev.get("new_items") or [],
+                "out": str(out_dir), "central": str(ui_dir / names["centralUI"]), "synchronizer": str(ui_dir / names["synchronizer"]),
+                "compared_to": prev.get("compared_to"), "previous": prev.get("previous"),
+                "basis": basis_text(prev.get("compared_to"), prev.get("previous"))}
     counts = {s: sum(1 for v in states.values() if v == s) for s in ("NEW", "CHANGED", "GONE", "SAME")}
     rows = []
     for k, st in sorted(states.items(), key=lambda kv: ({"NEW": 0, "CHANGED": 1, "GONE": 2, "SAME": 3}[kv[1]], kv[0])):
@@ -808,7 +852,9 @@ def check(out_dir=None, template_root=None) -> dict:
 def handover(roots=None) -> dict:
     """交接用(VCGC 一頁交接讀這一支,不自己找檔;一處定義):最新一版在哪 · 跟上游還對不對(check)·
     這一版對上一輪新增 / 異動 / 消失幾項 · 新增有沒有都上頁 · 共找到幾版。零寫檔。"""
-    rs = runs(roots)
+    UNREADABLE.clear()                                     # 每次交接重新量:上一次讀不動、這一次讀得動,不能黏著照報「讀不動」
+    n_runs = len(_candidates(roots))                       # 共幾版:只 stat
+    rs = runs(roots, limit=OPEN_NEWEST)                    # 最新一版:只開最新幾本
     bad = "".join(f" · 讀不動 {k}({v})" for k, v in UNREADABLE.items())
     if not rs:
         return {"state": "ABSENT", "runs": 0, "unreadable": dict(UNREADABLE),
@@ -816,7 +862,7 @@ def handover(roots=None) -> dict:
     at, d, rec = rs[0]
     ck = check(d)
     ent = rec.get("entry") or {}
-    return {"state": ck["state"], "why": ck["why"] + bad, "runs": len(rs), "unreadable": dict(UNREADABLE),
+    return {"state": ck["state"], "why": ck["why"] + bad, "runs": n_runs, "unreadable": dict(UNREADABLE),
             "built_at": at, "out": str(d), "engine": rec.get("engine"),
             "report": rec.get("report"), "compared_to": rec.get("compared_to"), "baseline": rec.get("baseline"),
             "previous": rec.get("previous"), "basis": basis_text(rec.get("compared_to"), rec.get("previous")),
@@ -1062,8 +1108,24 @@ def selftest() -> int:
             ((ui / Path(ent[role]).name).read_bytes() == (TEMPLATE_ROOT / ent[role]).read_bytes()) if role == "launcher" else
             (strip_injection((ui / Path(ent[role]).name).read_bytes().decode("utf-8")).encode("utf-8")
              == (TEMPLATE_ROOT / ent[role]).read_bytes()) for role in ROLES)
-        chk("③ 套版不改模板:啟動頁逐位元組 = 模板;中央 / synchronizer 拿掉插入段 = 模板逐位元組", exact,
-            f"({r1['state']} · {len(r1.get('pages') or {})} 張)")
+        # 工作站 git(core.autocrlf)把模板換成 CRLF、manifest 仍是 LF 的 sha256:照認並點名 · 拿掉插入段 = CRLF 原檔 · check OK
+        crlf_root, crlf_exact, crlf_note = tmp / "crlf_tpl", False, "模板入口讀不到"
+        if ent:
+            crlf_root.mkdir()
+            shutil.copy2(MANIFEST, crlf_root / "manifest.json")
+            for role in ROLES:
+                (crlf_root / ent[role]).parent.mkdir(parents=True, exist_ok=True)
+                (crlf_root / ent[role]).write_bytes((TEMPLATE_ROOT / ent[role]).read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+            rc3 = build(rp, tmp / "crlf_out", template_root=crlf_root)
+            ck3 = check(tmp / "crlf_out", template_root=crlf_root) if rc3["state"] == "BUILT" else {"state": "—"}
+            crlf_exact = (rc3["state"] == "BUILT" and sorted(rc3.get("crlf") or []) == sorted(ROLES) and ck3["state"] == "OK" and all(
+                ((tmp / "crlf_out" / "ui" / Path(ent[role]).name).read_bytes() == (crlf_root / ent[role]).read_bytes()) if role == "launcher" else
+                (strip_injection((tmp / "crlf_out" / "ui" / Path(ent[role]).name).read_bytes().decode("utf-8")).encode("utf-8")
+                 == (crlf_root / ent[role]).read_bytes()) for role in ROLES))
+            crlf_note = f"CRLF 模板 {rc3['state']} · 點名換行被改寫 {len(rc3.get('crlf') or [])} 支 · check {ck3['state']}"
+        chk("③ 套版不改模板:啟動頁逐位元組 = 模板;中央 / synchronizer 拿掉插入段 = 模板逐位元組"
+            "(工作站 git 換成 CRLF 的模板也一樣:照認並點名 · 拿掉插入段 = CRLF 原檔 · check OK)", exact and crlf_exact,
+            f"({r1['state']} · {len(r1.get('pages') or {})} 張 · {crlf_note})")
         m160 = _mdl160()
         if m160 is None or not hasattr(m160, "OFFLINE_RX"):
             skp("④ 頁上零連線(借 CGC_MDL160 離線四尺與「面」)", "CGC_MDL160 尾版載不到")
@@ -1082,13 +1144,27 @@ def selftest() -> int:
         r2 = build(rp, out)
         kinds = {(x["kind"], x["what"]): x for x in r2["new_items"]}
         want = [("欄", "brand_new_section"), ("關卡", "G99 NEWGATE · z.pdf"), ("檔", "z.pdf"), ("欄位規格", "target_price")]
-        chk("⑤ 自適應 + 新增檢查:上游多一個沒見過的頂層欄 · 新關卡 · 新檔 · 新欄位規格 → 逐項點名 NEW 且都上了頁",
-            r2["rc"] == 0 and all(k in kinds and kinds[k]["on_page"] for k in want),
-            f"(NEW {len(r2['new_items'])} 項:" + " · ".join(f"{k[0]}:{k[1]}→{(kinds.get(k) or {}).get('home')}" for k in want) + ")")
+        # 上游少一欄(驗收報告這類不跑語料的報告沒有 file_count):總覽照實寫「—」,不補 0、不冒充「合成語料」
+        kpi_nofc = next((it for sec in build_payload({k: v for k, v in rep2.items() if k != "file_count"}, rp)["sections"]
+                         if sec["id"] == "summary" for it in sec["items"] if it["label"] == "檔案"), {})
+        chk("⑤ 自適應 + 新增檢查:上游多一個沒見過的頂層欄 · 新關卡 · 新檔 · 新欄位規格 → 逐項點名 NEW 且都上了頁;"
+            "上游少一欄 → 頁上照實寫沒有(不補 0)",
+            r2["rc"] == 0 and all(k in kinds and kinds[k]["on_page"] for k in want)
+            and kpi_nofc.get("value") == "—" and kpi_nofc.get("foot") == "報告沒有這一欄",
+            f"(NEW {len(r2['new_items'])} 項:" + " · ".join(f"{k[0]}:{k[1]}→{(kinds.get(k) or {}).get('home')}" for k in want)
+            + f" · 少 file_count → 檔案「{kpi_nofc.get('value')}」{kpi_nofc.get('foot')})")
         r3 = build(rp, out)
         pages_before = {p.name: p.stat().st_mtime_ns for p in ui.iterdir()}
         r4 = build(rp, out)
         pages_after = {p.name: p.stat().st_mtime_ns for p in ui.iterdir()}
+        # 首建後原封再建 → SAME:回值照頁上那一版的記錄(首建 · 同一組數字 · 同一批新增項),
+        # 不拿這一次新算的「對這個夾的上一版」配上一版的數字(PR #120 Codex P2)
+        rf1, rf2 = build(rp, tmp / "same_fresh"), build(rp, tmp / "same_fresh")
+        note_f = _page_note(Path(rf2.get("central", "")))
+        same_fresh = (rf1["state"] == "BUILT" and rf2["state"] == "SAME" and rf1.get("compared_to") is None
+                      and rf2.get("compared_to") is None and rf2.get("basis") == rf1.get("basis")
+                      and rf2.get("links") == rf1.get("links") and len(rf2.get("new_items") or []) == len(rf1.get("new_items") or [])
+                      and note_f.startswith(basis_text(rf2.get("compared_to"))))
         rep3 = json.loads(json.dumps(rep2))
         rep3["rounds"][0]["rows"][0]["status"] = "FAIL"
         del rep3["brand_new_section"]
@@ -1097,15 +1173,17 @@ def selftest() -> int:
         st5 = _read_links(out).get("states") or {}
         note5 = _page_note(Path(r5["central"]))
         chk("⑥ 上下游連結冊:同一份再建 → 全 SAME 且頁不重寫(冪等,照樣回兩頁路徑);關卡狀態變 → CHANGED;拿掉一欄 → GONE;"
-            "同一個夾重建的說法是「對這個夾的上一版」(頁上新增段說明也是),不冒充「對上一輪」",
-            r1["links"].get("NEW", 0) > 0 and r3["state"] in ("SAME", "BUILT") and r4["state"] == "SAME" and pages_before == pages_after
+            "同一個夾重建的說法是「對這個夾的上一版」(頁上新增段說明也是),不冒充「對上一輪」;"
+            "SAME 回值照頁上那一版的記錄(首建後原封再建仍說首建、同一組數字)",
+            same_fresh and r1["links"].get("NEW", 0) > 0 and r3["state"] in ("SAME", "BUILT") and r4["state"] == "SAME" and pages_before == pages_after
             and Path(r4.get("central", "")).is_file() and Path(r4.get("synchronizer", "")).is_file()
             and st5.get("關卡|G01 COMPILE|a.py") == "CHANGED" and st5.get("欄|brand_new_section") == "GONE"
             and r1.get("compared_to") is None and r1.get("basis", "").startswith("首建")
             and r4.get("compared_to") == "self" and r5.get("compared_to") == "self" and r5.get("basis", "").startswith("對這個夾的上一版")
             and note5.startswith("對這個夾的上一版") and "對上一輪" not in note5,
             f"(首建 NEW {r1['links'].get('NEW')} · 再建 {r4['state']} · 關卡 {st5.get('關卡|G01 COMPILE|a.py')} · 欄 {st5.get('欄|brand_new_section')} · "
-            f"說法 {r1.get('basis', '')[:4]} → {r5.get('basis', '')[:8]} · 頁上「{note5[:14]}」)")
+            f"說法 {r1.get('basis', '')[:4]} → {r5.get('basis', '')[:8]} · 頁上「{note5[:14]}」· "
+            f"首建後原封再建 {rf2['state']}「{(rf2.get('basis') or '')[:10]}」新增 {(rf2.get('links') or {}).get('NEW')})")
 
         def drop(payload):
             payload["sections"] = [s for s in payload["sections"] if s["id"] != "extra-another-new"]
@@ -1114,6 +1192,8 @@ def selftest() -> int:
         rep4["another_new"] = [1, 2]
         rp.write_text(json.dumps(rep4, ensure_ascii=False), encoding="utf-8")
         r6 = build(rp, out, _sections_hook=drop)
+        r6b = build(rp, out, _sections_hook=drop)              # 原封再建 → SAME,但那一版的「新增沒上頁」照樣 rc1(不能被洗成 rc0)
+        same7 = r6b["state"] == "SAME" and r6b["rc"] == 1 and "another_new" in r6b.get("why", "")
         # 模板改版、找不到插入點(假模板:中央頁沒有 </body>,manifest 跟著改)→ BLOCKED,一張都不寫
         fake, man_f, files_f = tmp / "fake_tpl", json.loads(MANIFEST.read_text(encoding="utf-8")), []
         for role in ROLES:
@@ -1128,8 +1208,17 @@ def selftest() -> int:
         (fake / "manifest.json").write_text(json.dumps(man_f, ensure_ascii=False), encoding="utf-8")
         rb7 = build(rp, tmp / "blocked_out", template_root=fake)
         blocked7 = rb7["state"] == "BLOCKED" and "插不進去" in rb7["why"] and not (tmp / "blocked_out").exists()
-        chk("⑦ 反面控制:新增項目的落點段不在 → build rc1 並點名(新增不能被吞)· 模板找不到插入點 → BLOCKED 且一張都不寫",
-            r6["rc"] == 1 and "another_new" in r6["why"] and blocked7, f"({r6['why'][:80]} · 插入點不在 {rb7['state']})")
+        rb7c = {"state": "—"}                                  # CRLF 之外內容也被改 → 換回 LF 也對不上 manifest → BLOCKED
+        if crlf_root.is_dir():
+            shutil.copytree(crlf_root, tmp / "crlf_bad")
+            pbad = tmp / "crlf_bad" / ent["centralUI"]
+            pbad.write_bytes(pbad.read_bytes() + b"<!-- hand edit -->\r\n")
+            rb7c = build(rp, tmp / "crlf_bad_out", template_root=tmp / "crlf_bad")
+        blocked7c = rb7c["state"] == "BLOCKED" and "內容不同" in rb7c.get("why", "") and not (tmp / "crlf_bad_out").exists()
+        chk("⑦ 反面控制:新增項目的落點段不在 → build rc1 並點名(新增不能被吞;原封再建走 SAME 也照樣 rc1)"
+            "· 模板找不到插入點 → BLOCKED 且一張都不寫 · CRLF 模板除了換行內容也被改 → BLOCKED(換行照認不等於內容照認)",
+            r6["rc"] == 1 and "another_new" in r6["why"] and same7 and blocked7 and blocked7c,
+            f"({r6['why'][:80]} · 再建 {r6b['state']} rc{r6b['rc']} · 插入點不在 {rb7['state']} · CRLF 加改內容 {rb7c['state']})")
         chk_state = check(out)
         rep_v = json.loads(rp.read_text(encoding="utf-8"))
         rep_v["generated"] = "2099-01-01T00:00:00"             # 只改每輪必變的欄:內容簽章不變,但檔案重寫過
@@ -1189,9 +1278,33 @@ def selftest() -> int:
         lb = _read_links(rp_b.parent / RUN_SUBDIR)
         stb = lb.get("states") or {}
         ho = handover((runs_root,))
+        UNREADABLE["(上一次讀不動的根)"] = "PermissionError"    # 模擬上一次交接時某個根讀不動、這一次已經讀得動
+        ho_fresh = handover((runs_root,))
+        fresh_ok = not ho_fresh.get("unreadable") and "讀不動" not in ho_fresh.get("why", "")
         items_now = link_items(rep_b, rp_b, template_check())
+        # I/O 守門:夾裡累積 25 輪時,找上一輪 / 交接最新一版只打開最新幾本(其餘只 stat;OneDrive 佔位檔不會被整夾拉下來)
+        many = tmp / "many"
+        for i in range(25):
+            dd = many / f"old{i:02d}" / RUN_SUBDIR
+            dd.mkdir(parents=True)
+            (dd / LINKS_NAME).write_text(json.dumps({"built_at": f"2026-01-01T00:00:{i:02d}", "items": {}}), encoding="utf-8")
+            os.utime(dd / LINKS_NAME, (1_700_000_000 + i, 1_700_000_000 + i))
+        (many / "new").mkdir()
+        opened, real_read = [], globals()["_read_links"]
+        globals()["_read_links"] = lambda q: (opened.append(str(q)), real_read(q))[1]
+        try:
+            fb_many = find_baseline(many / "new")
+            n_fb = len(opened)
+            opened.clear()
+            ho_many = handover((many,))
+            n_ho = len(opened)
+        finally:
+            globals()["_read_links"] = real_read
+        io_ok = (fb_many is not None and fb_many.parent.parent.name == "old24" and n_fb <= OPEN_NEWEST
+                 and ho_many.get("runs") == 25 and n_ho <= OPEN_NEWEST + 1)
         chk("⑪ 跨輪自動連結:第二輪自動以第一輪為基準(不是全算新增)· 新欄 NEW · 關卡變 CHANGED · 其餘 SAME · 建構器 sha 列為上游 · "
-            "交接口報最新一版且 check 對得上 · 說法是「對上一輪」(建構回值 · 頁上 · 交接口三處一致)",
+            "交接口報最新一版且 check 對得上 · 說法是「對上一輪」(建構回值 · 頁上 · 交接口三處一致)· "
+            "累積 25 輪時找上一輪 / 交接只打開最新幾本(其餘只 stat)· 上一次讀不動的根不會黏到這一次交接",
             ra["links"].get("SAME", 0) == 0 and base_b is not None and base_b.parent == rp_a.parent / RUN_SUBDIR
             and lb.get("compared_to") == "baseline" and stb.get("欄|next_round_field") == "NEW"
             and stb.get("關卡|G06 BATCH|x.pdf") == "CHANGED" and stb.get("上游|模板|centralUI") == "SAME"
@@ -1199,9 +1312,10 @@ def selftest() -> int:
             and ho.get("runs") == 2 and ho.get("state") == "OK" and Path(ho.get("out", "")).parent == rp_b.parent
             and Path(ho.get("central", "")).is_file()
             and rb.get("compared_to") == "baseline" and rb.get("basis", "").startswith("對上一輪") and note_b.startswith("對上一輪")
-            and ho.get("basis", "").startswith("對上一輪"),
+            and ho.get("basis", "").startswith("對上一輪") and io_ok and fresh_ok,
             f"(基準 {base_b.parent.parent.name if base_b else '無'} · 第二輪 新增 {rb['links'].get('NEW')} · 異動 {rb['links'].get('CHANGED')} · "
-            f"未變 {rb['links'].get('SAME')} · 交接 {ho.get('state')} 共 {ho.get('runs')} 版 · 說法 {rb.get('basis', '')[:4]} · 頁上「{note_b[:14]}」)")
+            f"未變 {rb['links'].get('SAME')} · 交接 {ho.get('state')} 共 {ho.get('runs')} 版 · 說法 {rb.get('basis', '')[:4]} · 頁上「{note_b[:14]}」 · "
+            f"25 輪只開:找上一輪 {n_fb} 本 · 交接 {n_ho} 本 · 舊的讀不動 {'清掉' if fresh_ok else '還黏著'})")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     fp1 = (latest_links.stat().st_size, latest_links.stat().st_mtime_ns) if latest_links.is_file() else None

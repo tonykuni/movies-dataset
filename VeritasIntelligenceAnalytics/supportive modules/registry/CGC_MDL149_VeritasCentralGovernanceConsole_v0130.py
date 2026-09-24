@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 r"""
 CGC_MDL149_VeritasCentralGovernanceConsole v0130 — VCGC(批735:一頁交接 +十六段 VRN 模板 · 比對基準照抄 ENG089;批728:ssot 門 ⑥ 冊同步 CGC_MDL185 四格委派;側線 2026-09-23:不認得的動詞只印用法段;第四扇門 SSOT 連動口;版史自 批691B)
-v0129→v0130(批735 收尾;PR #119 的 Codex 審查 P2 同一類):十六段的「對上一輪」改照抄 VRN_ENG089 v0101 交接口回的
-  basis(對上一輪 / 對這個夾的上一版 / 首建)。v0129 是看「有沒有 baseline」自己猜:同一個夾重建(compared_to=self)
-  會被印成「首建:找不到上一輪」。交接口是舊版(沒有 basis)才退回用 compared_to 推,推法同 ENG089。㊳ 加驗三種說法,仍三十八檢。
+v0129→v0130(批735 收尾;PR #119 的 Codex 審查 P2 同一類):VRN 模板的比對基準說法改照抄 VRN_ENG089 v0101 交接口回的
+  basis(對上一輪 / 對這個夾的上一版 / 首建),一處定義 _vrn_template_basis(),十六段 · 頁卡 · status 行三處共用。
+  v0129 十六段是看「有沒有 baseline」自己猜(同一個夾重建被印成「首建:找不到上一輪」),頁卡與 status 行更是寫死「對上一輪」
+  (啟用演練實跑才抓到後兩處)。交接口是舊版(沒有 basis)才退回用 compared_to 推,推法同 ENG089。
+  ㊳ 加驗三種說法 + 原始碼裡不再有寫死「對上一輪」的頁卡 / status 行,仍三十八檢。
 v0128→v0129(批735 操作員令「用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接自適應式自動化」
              「上下的自動連結更新新增檢查機能建構須完成」;LL334:批734 與格子 v0492 已被側線取用,本線改號批735):
   +vrn_template() 段:讀 VRN_ENG089_TemplateView(尾版現解)的 handover()——最新一版 VRN 模板在哪、跟上游還對不對
@@ -705,12 +707,20 @@ def vrn_template(src=None) -> dict:
     return h
 
 
+def _vrn_template_basis(vt: dict) -> str:
+    """VRN 模板比對基準的說法(十六段 · 頁卡 · status 行共用,一處定義):照抄交接口的 basis;
+    舊版交接口沒有 basis 才靠 compared_to 推;還沒有任何一版(沒有 out)= 空字串。"""
+    if not vt.get("out"):
+        return ""
+    cmp_, prev_at = vt.get("compared_to"), vt.get("previous")
+    return vt.get("basis") or (f"對上一輪({prev_at or '-'};基準 {vt.get('baseline') or '-'})" if cmp_ == "baseline"
+                               else f"對這個夾的上一版({prev_at or '-'})" if cmp_ == "self" else "首建:找不到上一輪")
+
+
 def _vrn_template_md(vt: dict) -> list:
     """一頁交接第十六段(批735)。缺什麼印什麼,沒有的欄一律 .get 留白(批602 教訓)。"""
     c, sm = vt.get("counts") or {}, vt.get("summary") or {}
-    cmp_, prev_at = vt.get("compared_to"), vt.get("previous")
-    basis = vt.get("basis") or (f"對上一輪({prev_at or '-'};基準 {vt.get('baseline') or '-'})" if cmp_ == "baseline"
-                                else f"對這個夾的上一版({prev_at or '-'})" if cmp_ == "self" else "首建:找不到上一輪")
+    basis = _vrn_template_basis(vt)
     o = ["", "## 十六 · VRN 模板(制式 U/I · synchronizer 控制 · 上下游連結冊;批735;讀 VRN_ENG089 交接口,本台只翻譯)", "",
          f"- {vt.get('state')} · {vt.get('src') or '-'} · 最新一版 {vt.get('built_at') or '-'} · 共 {vt.get('runs', 0)} 版 · {vt.get('why') or ''}"]
     if vt.get("out"):
@@ -1757,7 +1767,7 @@ def page_html(s: dict) -> str:
              f"<div class='card'><b>邏輯庫</b><br>{chip(lo.get('state'))} 件 {esc(lo.get('files'))} · {esc(lo.get('verdicts'))}<br>壞後端 {esc(lo.get('broken'))}<br>同步 {esc(lo.get('sync'))}</div>",
              f"<div class='card'><b>因子庫</b><br>{chip(fa.get('state'))} {esc(fa.get('rows'))} 列 · {esc(fa.get('by_source'))}</div>",
              f"<div class='card'><b>VRN 子系統管理(批681)</b><br>{chip((s.get('vrn_system') or {}).get('state'))} {esc((s.get('vrn_system') or {}).get('src') or (s.get('vrn_system') or {}).get('why') or '')}<br>燈 {esc((s.get('vrn_system') or {}).get('lamps'))}<br>連結 {esc((s.get('vrn_system') or {}).get('links'))} {esc((s.get('vrn_system') or {}).get('link_counts'))} · 七處 {esc((s.get('vrn_system') or {}).get('seven_done'))}/7</div>",
-             f"<div class='card'><b>VRN 模板(批735)</b><br>{chip((s.get('vrn_template') or {}).get('state'))} 共 {esc((s.get('vrn_template') or {}).get('runs', 0))} 版 · 最新 {esc((s.get('vrn_template') or {}).get('built_at') or '-')}<br>對上一輪 {esc(' · '.join(f'{k} {v}' for k, v in ((s.get('vrn_template') or {}).get('counts') or {}).items()) or '-')}<br><small>{esc((s.get('vrn_template') or {}).get('why') or '')}</small></div>",
+             f"<div class='card'><b>VRN 模板(批735)</b><br>{chip((s.get('vrn_template') or {}).get('state'))} 共 {esc((s.get('vrn_template') or {}).get('runs', 0))} 版 · 最新 {esc((s.get('vrn_template') or {}).get('built_at') or '-')}<br>{esc(_vrn_template_basis(s.get('vrn_template') or {}) or '-')} {esc(' · '.join(f'{k} {v}' for k, v in ((s.get('vrn_template') or {}).get('counts') or {}).items()) or '-')}<br><small>{esc((s.get('vrn_template') or {}).get('why') or '')}</small></div>",
              f"<div class='card'><b>VDF 子系統管理(側線 2026-09-21)</b><br>{chip((s.get('vdf_system') or {}).get('state'))} {esc((s.get('vdf_system') or {}).get('src') or (s.get('vdf_system') or {}).get('why') or '')}<br>燈 {esc((s.get('vdf_system') or {}).get('lamps'))}<br>連結 {esc((s.get('vdf_system') or {}).get('links'))} {esc((s.get('vdf_system') or {}).get('link_counts'))} · 七處 {esc((s.get('vdf_system') or {}).get('seven_done'))}/7<br>橋 加速器 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('accel'))}/{esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('tails'))} · 網路 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('net'))}/{esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('tails'))} · 真擷取 {esc(((s.get('vdf_system') or {}).get('bridge') or {}).get('net_callers'))}</div>",
              f"<div class='card'><b>SSOT 正則·同義字連動(側線 2026-09-23)</b><br>{chip((s.get('ssot') or {}).get('state'))} {esc(' · '.join(f'{k} {v}' for k, v in ((s.get('ssot') or {}).get('counts') or {}).items()))}<br><small>via-vcgc ssot · ssot plan · ssot verify(逐格委派正主)</small></div>",
              f"<div class='card'><b>資料庫</b><br>庫表冊 {esc(db.get('n'))} 表({esc(db.get('batch'))})· 資料家 {chip(dh.get('state'))} {esc(dh.get('home') or dh.get('why'))} · 庫 {esc(dh.get('dbs') if dh.get('dbs') is not None else '-')} 湖 {esc(dh.get('lakes') if dh.get('lakes') is not None else '-')}</div>",
@@ -1810,7 +1820,7 @@ def status() -> int:
     vb = vd.get("bridge") or {}
     print(f"  VDF 系統管理 {vd.get('state')}:燈 {vd.get('lamps')} · 連結 {vd.get('links')} {vd.get('link_counts')} · 七處 {vd.get('seven_done')}/7 · 橋 加速器 {vb.get('accel')}/{vb.get('tails')} 網路 {vb.get('net')}/{vb.get('tails')} 真擷取 {vb.get('net_callers')} · {vd.get('src') or vd.get('why')}(側線 2026-09-21;VIA 往下讀 VDF 經此口)")
     vt = s.get("vrn_template") or {}
-    print(f"  VRN 模板 {vt.get('state')}:最新一版 {vt.get('built_at') or '-'} · 共 {vt.get('runs', 0)} 版 · 對上一輪 "
+    print(f"  VRN 模板 {vt.get('state')}:最新一版 {vt.get('built_at') or '-'} · 共 {vt.get('runs', 0)} 版 · {_vrn_template_basis(vt) or '-'} "
           f"{' · '.join(f'{k} {v}' for k, v in (vt.get('counts') or {}).items()) or '-'} · {vt.get('why') or ''}(批735;制式 U/I · synchronizer 控制)")
     so = s.get("ssot") or {}
     print(f"  SSOT 連動 {so.get('state')}:{' · '.join(f'{k} {v}' for k, v in (so.get('counts') or {}).items())}"
@@ -2472,6 +2482,7 @@ def selftest() -> int:
             red38 = vrn_template(src=_boom38)
             abs38 = vrn_template(src=Path(_d38) / "VRN_ENG089_TemplateView_v0000.py")
         md38, md_abs38 = "\n".join(_vrn_template_md(vt38)), "\n".join(_vrn_template_md(abs38))
+        _src38 = Path(__file__).read_text(encoding="utf-8")
         _b38 = {"state": "OK", "out": "x", "runs": 2}
         words38 = ["\n".join(_vrn_template_md(dict(_b38, **kw))) for kw in (
             {"compared_to": "self", "previous": "T1"},                                  # 舊版交接口:沒有 basis,靠 compared_to 推
@@ -2479,8 +2490,10 @@ def selftest() -> int:
             {"compared_to": None},
             {"compared_to": "self", "previous": "T1", "basis": "對這個夾的上一版(T1)"})]   # 新版交接口:照抄
         wording38 = ("對這個夾的上一版(T1)" in words38[0] and "首建" not in words38[0] and "對上一輪(T0" in words38[1]
-                     and "首建" in words38[2] and "對這個夾的上一版(T1)" in words38[3])
-        _src38 = Path(__file__).read_text(encoding="utf-8")
+                     and "首建" in words38[2] and "對這個夾的上一版(T1)" in words38[3]
+                     and _src38.count("_vrn_template_basis(") >= 4                     # 定義 + 十六段 · 頁卡 · status 行
+                     and ("· 對上" + "一輪 " + '"') not in _src38 and ("<br>" + "對上一輪 {esc(") not in _src38   # 從詞中間拆開拼,免得比到這一行自己
+                     and _vrn_template_basis({"state": "ABSENT"}) == "")
         live38 = vt38.get("state") in ("OK", "STALE", "DRIFT", "ABSENT") and (vt38.get("state") == "OK" or bool(vt38.get("why")))
         chk("㊳ 批735 VRN 模板交接段:讀 ENG089 交接口(最新一版 · 對不對得上 · 對上一輪增減 · 共幾版)· 本台只翻譯 · "
             "**反面控制**:建構器不在=ABSENT 有因由、載入就炸=RED 帶原因(不炸台)· 一頁第十六段 · snapshot 有這一格 · "
