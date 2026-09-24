@@ -1454,7 +1454,13 @@ def _pct_label_before_rx():
         alts += [f"(?:{p})" for p in pats]
         # ENG073 正本只涵蓋 share price return / total return,**不是**我那份的超集:
         # `potential return` / `implied return` 不在裡面。所以是**聯集**不是取代。
-        alts.append(r"(?:potential|implied|estimated|target)[^()\n]{0,20}?return")
+        # 批727L:**不可因為「正本有 total/expected」就把它們從這裡拿掉**。
+        # ENG073 要求的是**精確詞序**(`total return` / `Expected total return`),
+        # 而 `Total stock return` / `Total expected return` / 裸 `Expected return`
+        # 中間夾了字或少了字就不中 —— 727k 我正是在寫「正本不是超集」那一條教訓的
+        # 同一個 commit 裡,把 total 與 expected 從自己這份拿掉,又掉了覆蓋。
+        alts.append(r"(?:potential|implied|estimated|target|total|expected)"
+                    r"[^()\n]{0,20}?return")
         _PLB["rx"] = re.compile("(?:" + "|".join(alts) + r")(?!\s+on\b)"
                                 r"[^()\n]{0,20}\(\s*[%％]\s*\)\s*[:：]\s*$", re.I)
     return _PLB["rx"]
@@ -2593,6 +2599,11 @@ def selftest() -> int:
                "Share price return (%) to Target Price: 22",
                "股價報酬率(%): 目標價 38", "總報酬率(%): Price Target 22",
                "價格報酬(%): Target Price 19",
+               # 批727L:ENG073 要求精確詞序,這三式中間夾字/少字就不中 ——
+               # 727k 把 total/expected 從本橋那份拿掉時掉的覆蓋(v0115 也漏)。
+               "Total stock return (%): Price Target: 38",
+               "Total expected return (%): Price Target: 38",
+               "Expected return (%): Price Target: 38",
                # 批727k:弱正則那條路原本一道幅度守衛都沒有(既有洞,v0115 回 38.0)
                "上漲空間(%): 目標價 NT$38",
                "Total return (%) vs Price Target: 19", "Implied return (%): Price Target 22",
