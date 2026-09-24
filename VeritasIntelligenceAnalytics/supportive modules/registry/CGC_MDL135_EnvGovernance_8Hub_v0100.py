@@ -18,6 +18,10 @@ HUB_NAMES = (
     "family_isolation", "runtime_tools",
 )
 RUNTIME_COMMANDS = ("uv", "pwsh", "node", "npm", "pandoc", "tesseract", "java", "rustc", "go")
+RUNTIME_VERSION_ARGS = {"uv": ("--version",), "pwsh": ("-v",), "node": ("--version",),
+                        "npm": ("--version",), "pandoc": ("--version",),
+                        "tesseract": ("--version",), "java": ("-version",),
+                        "rustc": ("--version",), "go": ("version",)}
 RUN_TIMEOUT = 180
 UV_TIMEOUT = 300
 MAX_WORKERS = 8
@@ -155,12 +159,19 @@ def _snapshot(core, base_python: str | None, env_root: str) -> dict:
     if drift["state"] == "CHANGED":
         rows[0]["checks"][HUB_NAMES[0]] = _result("BLOCK", drift["why"])
         rows[0]["state"] = "BLOCK"
+    runtime = {}
+    for name in RUNTIME_COMMANDS:
+        path = shutil.which(name)
+        probe = core.run_cmd([path, *RUNTIME_VERSION_ARGS[name]], timeout=15) if path else None
+        runtime[name] = {"path": path, "version": (
+            ((probe.get("out", "") + probe.get("err", "")).strip().splitlines() or [""])[0][:160]
+            if probe and probe["rc"] == 0 else None)}
     return {"rows": rows, "toolplan": toolplan, "drift": drift,
             "base_analysis": {k: base_analysis.get(k) for k in
                               ("manifest_missing", "blocked_present", "extras", "os_managed")},
             "baseline": baseline.get("_src"), "roster": roster.get("_src"),
             "diagnostics": {n: (base.get("dists") or {}).get(n, {}).get("ver") for n in DIAGNOSTIC_TOOLS},
-            "runtime_commands": {name: shutil.which(name) for name in RUNTIME_COMMANDS}}
+            "runtime_commands": runtime}
 
 
 def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict,
