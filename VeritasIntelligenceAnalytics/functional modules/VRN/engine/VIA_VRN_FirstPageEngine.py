@@ -1366,7 +1366,8 @@ class FirstPageEngine:
             up.update(state="ADJ_CURRENCY(%s)" % cur, why="a %s target is not put on the TW adj close" % cur)
             return up
         try:
-            q = EVIDENCE_CORE.adj_basis(ticker, report_date, target_price, db=getattr(self, "adj_db", None))
+            q = EVIDENCE_CORE.adj_basis(ticker, report_date, target_price, db=getattr(self, "adj_db", None),
+                                        page_price=page_price)
         except Exception as exc:          # graceful: the page answer stays in upside_page
             q = {"state": "ADJ_ERROR", "why": "%s: %s" % (type(exc).__name__, exc)}
         fac = q.get("adj_factor")
@@ -1379,7 +1380,10 @@ class FirstPageEngine:
             "price_prev_date": q.get("price_prev_date"), "page_price": page_price,
             "page_price_adj": round(page_price * fac, 4) if (page_price and fac) else None,
             "report_age_days": q.get("report_age_days"), "target_freshness": q.get("target_freshness"),
-            "state": q.get("state"), "why": q.get("why") or "", "ticker": q.get("ticker"), "engine": q.get("engine")})
+            "state": q.get("state"), "why": q.get("why") or "", "ticker": q.get("ticker"), "engine": q.get("engine"),
+            # 批730: which raw close the factor divides by (exchange / page / Yahoo) and the checks behind it
+            "factor_basis": q.get("adj_factor_basis"), "price_prev_raw": q.get("price_prev_raw"),
+            "retro_ratio": q.get("adj_retro_ratio"), "event": q.get("adj_event")})
         return up
 
     def run(self, filename, chars=None, title_codes=None, table_chars=None,

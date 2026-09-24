@@ -9,6 +9,8 @@ v0102→v0103(母倉 批729;操作員 2026-09-24「報告後小字體不相關�
   操作員同日「所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE」:首頁引擎 v0104 的上漲空間
   改走 ENG073 adj_quote(最新 ADJ CLOSE);每檔記下 ADJ 狀態,報告多 adj 摘要(算出幾檔、其餘各卡在哪一種),
   主控台多印一行 [ADJ]。這一行是量測,不是關卡:缺價(例如上市所價還沒進庫)照實報名字,不判 FAIL。
+  批730:[ADJ] 那一行多印「因子分母」分佈(RAW_EXCHANGE 交易所 · PAGE_PRICE 報告頁面價 · YAHOO_CLOSE 未核)——
+  Yahoo 的 close 會事後按配股回調,分母用它的那幾份就是還沒被獨立價核過的。
 v0101→v0102(母倉 批728 收回:姊妹倉 festive-ptolemy 41ce6d4/34d91ac 的成果搬回母倉正位):
     +--selftest 自測門(VRN/tests 全部單元測試 + 合成語料 8 檔一輪):六層鏈與全格子都敲這一扇;
     G10 母倉模式(工具讀正本、三支自測、拒絕清單/負控/同義字對帳照跑);名冊讀收容副本;每檔印 [進度] k/K。
@@ -787,6 +789,7 @@ def def_gate_first_page(engines: Engines, truth: List[Dict[str, Any]], samples: 
         up = out.get("upside") or {}
         if up.get("basis") == "ADJ_LATEST":
             LAST_ADJ[name] = {"state": up.get("state"), "upside_adj": up.get("upside_pct"), "why": up.get("why") or "",
+                              "basis": up.get("factor_basis") or "",
                               "has_target": out["target_prices"].get("primary") is not None,
                               "upside_page": (out.get("upside_page") or {}).get("upside_pct")}
         status = "FAIL" if problems else ("WARN" if warns else "PASS")
@@ -1463,7 +1466,13 @@ def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             reason = str(a["why"])[:80]
             why[reason] = why.get(reason, 0) + 1
     vals = list(per_file.values())
+    bases: Dict[str, int] = {}
+    for a in vals:
+        if a.get("upside_adj") is not None:
+            key = str(a.get("basis") or "?").split("(")[0]
+            bases[key] = bases.get(key, 0) + 1
     return {"n_files": len(vals), "n_with_target": sum(1 for a in vals if a.get("has_target")),
+            "bases": dict(sorted(bases.items(), key=lambda kv: (-kv[1], kv[0]))),
             "n_adj": sum(1 for a in vals if a.get("upside_adj") is not None),
             "states": dict(sorted(states.items(), key=lambda kv: (-kv[1], kv[0]))),
             "why": [{"reason": r, "count": n} for r, n in sorted(why.items(), key=lambda kv: (-kv[1], kv[0]))[:6]],
@@ -1570,6 +1579,7 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
     if adj["n_files"] and not args.quiet:
         top = " · ".join(f"{k} {v}" for k, v in adj["states"].items() if k != "ADJ_OK")
         print(f"[ADJ] 上漲空間用最新 ADJ CLOSE:算出 {adj['n_adj']}/{adj['n_with_target']} 檔(有目標價者)"
+              + (f" · 因子分母 {' · '.join(f'{k} {v}' for k, v in adj['bases'].items())}" if adj["bases"] else "")
               + (f" · 其餘 {top}" if top else "") + (f" · 最多的因由:{adj['why'][0]['reason']}" if adj["why"] else ""))
     json_path = Path(args.json) if args.json else workdir / "VRN_AutoTest_Report.json"
     html_path = Path(args.html) if args.html else workdir / "VRN_AutoTest_Report.html"

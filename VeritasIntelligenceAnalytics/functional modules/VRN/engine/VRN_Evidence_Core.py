@@ -801,7 +801,7 @@ def _adjacent_to_code(low, start, end):
     return bool(_CODE_AFTER_RX.match(low[end:end + 12]) or _CODE_BEFORE_RX.search(low[max(0, start - 10):start]))
 
 
-def broker_evidence(lines, alias_table, filename_broker=None, rules=None, disclosure_rx=None):
+def broker_evidence(lines, alias_table, filename_broker=None, rules=None, disclosure_rx=None, issuer_guard=None):
     """Who issued this report, graded by evidence tier.
 
     alias_table: {canonical: [aliases]} from the calling engine (its dictionary + knowledge).
@@ -895,7 +895,7 @@ def broker_evidence(lines, alias_table, filename_broker=None, rules=None, disclo
             is_generic = alias in generic
             if disclosure or copyright_:
                 tier = "DISCLOSURE"
-            elif issuer and not source:
+            elif issuer and not source and (issuer_guard is None or issuer_guard(line)):
                 tier = "ISSUER"
             elif is_generic:
                 continue
@@ -966,16 +966,47 @@ APPENDIX_DISCLOSURE_RX = re.compile(
 RATING_DEF_SIGNAL_RX = re.compile(
     r"(預期|報酬|表現|漲幅|跌幅|超越|落後|優於|劣於|大盤|指數|基準|%|％|expect|return|outperform|underperform|"
     r"benchmark|relative|upside|downside|appreciat|depreciat)", re.I)
-_RS_CJK = re.compile(r"^\s*(?P<word>[\u4e00-\u9fff]{2,6})\s*(?:[(（]\s*(?P<alt>[A-Za-z][A-Za-z\- /]{0,24}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
+# 批730 (measured on 21 realistic appendix fixtures): a CJK word may carry an inner hyphen or middle dot
+# (元大 持有-超越同業); an English alt may read "O or Over" (Morgan Stanley); an ASCII hyphen separates only after a
+# space or a closing bracket, so Equal-weight is never cut into "Equal" + "weight (E or Equal) - ..."
+# 批730 review: each part of a CJK word stays 2-6 characters (a 10-character run let headings through:
+# 本報告投資評等之定義:...); an em dash always separates (Buy—expected ...), an en dash when a space touches it
+_CJK_WORD = r"[\u4e00-\u9fff]{2,6}(?:[\-‐–・·][\u4e00-\u9fff]{2,6})?"
+_RS_CJK = re.compile(r"^\s*(?P<word>" + _CJK_WORD + r")\s*(?:[(（]\s*(?P<alt>[A-Za-z][A-Za-z\- /]{0,24}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
                      r"\s*[:：]\s*(?P<def>.+)$")
-_RS_LAT = re.compile(r"^\s*(?P<word>[A-Za-z][A-Za-z\-]{0,20}(?:\s[A-Za-z\-]{1,12}){0,2})\s*(?:[(（]\s*(?P<alt>[A-Za-z0-9+\-]{1,8}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
-                     r"\s*[:：\-–—]\s*(?P<def>.+)$")
+_RS_LAT = re.compile(r"^\s*(?P<word>[A-Za-z][A-Za-z\-]{0,20}(?:\s[A-Za-z\-]{1,12}){0,2})\s*"
+                     r"(?:[(（]\s*(?P<alt>[A-Za-z0-9+\-]{1,10}(?:\s+or\s+[A-Za-z0-9+\-]{1,10})?|[\u4e00-\u9fff]{2,6})\s*[)）])?"
+                     r"(?:\s*[:：]|\s*—|\s*–(?=\s)|\s+–|(?:\s+|(?<=[)）])\s*)-)\s*(?P<def>.+)$")
+# a table row without a colon ("買進  預期未來12個月報酬率大於15%"): taken when the word is a known rating word,
+# or when the row sits next to an accepted definition row (the same table)
+_RS_BARE = re.compile(r"^\s*(?P<word>" + _CJK_WORD + r")\s+(?P<def>\S.+)$")
 _RS_ROW = re.compile(r"^\s*(?P<word>[\u4e00-\u9fff]{2,6})\s+(?P<alt>[A-Za-z][A-Za-z\-]{1,20}(?:\s[A-Za-z\-]{1,12})?)\s+(?P<def>.+)$")
 # headers and field labels that look like a definition row but are not a rating word
 _RS_NOT_A_RATING = re.compile(
     r"^(?:投資)?評[等級](?:定義|說明|標準|制度|方式)?$|^(?:stock\s+|investment\s+)?ratings?(?:\s+(?:definitions?|system|scale|key|guide))?$|"
     r"^(?:註|說明|備註|資料來源|來源|note|notes|source|sources|disclaimer|analyst|分析師|定義|definition)$|"
-    r"target|price|eps|目標|股價|價格|營收|盈餘|本益比|殖利率|yield|upside|downside|報酬率", re.I)
+    r"target|price|eps|目標|股價|價格|營收|盈餘|本益比|殖利率|yield|upside|downside|報酬率|"
+    # 批730: section labels that also carry return words (Valuation: ... implying 15% upside)
+    r"valuation|估值|評價|^risks?$|風險|methodology|方法|catalysts?|催化|investment\s+thesis|投資論點|"
+    # 批730 review: table headers and footnotes next to a rating table (投資建議 未來12個月預期報酬率 · 評等類別 ... ·
+    # 過去績效 不代表未來表現 · 上述評等 ... · 本公司 ... · 投資評等之定義如下)
+    r"定義|如下|投資建議|類別|績效|上述|本公司|本報告|投資人", re.I)
+# 批730 review: a colon-less row taken only for sitting next to an accepted row must read like a definition (a threshold
+# or a comparison); a header or a footnote next to the table does not
+_RS_THRESHOLD_RX = re.compile(
+    r"(\d+(?:\.\d+)?\s*[%％]|大於|小於|超過|低於|高於|介於|優於|劣於|落後|相當|以上|以下|領先|"
+    r"more\s+than|less\s+than|above|below|exceed|between|within|in\s+line|outperform|underperform)", re.I)
+# 批730: an ISSUER line in the appendix names the company; a peer-table row names a broker next to a rating word or a
+# target price (同業評等彙整:富邦證券 中立 目標價1000元) and is not the issuer unless it carries the legal name
+_APPENDIX_TABLE_ROW_RX = re.compile(
+    r"(目標價|target\s*price|\bTP\b|NT\$|\d[\d,]*(?:\.\d+)?\s*元(?![\u4e00-\u9fff])|買進|賣出|中立|持有|增加持股|減少持股|降低持股|區間操作|"
+    r"(?<![A-Za-z])(?:buy|sell|hold|neutral|outperform|underperform|overweight|underweight)(?![A-Za-z]))", re.I)
+_LEGAL_ENTITY_RX = re.compile(r"(股份有限公司|有限公司|co\.?,?\s*ltd|limited|l\.?\s?l\.?\s?c\b|\binc\b|pte\.?\s*ltd|\bplc\b)", re.I)
+
+
+def _appendix_issuer_line(line):
+    """批730: the appendix-only guard on the ISSUER tier (page-1 grading does not pass it)."""
+    return bool(_LEGAL_ENTITY_RX.search(line)) or not _APPENDIX_TABLE_ROW_RX.search(line)
 
 
 def pdf_page_count(path):
@@ -1060,18 +1091,38 @@ def rating_scale(lines, rules=None, words=None):
     Candidates only: this function never writes a book."""
     words = words or merged_rating_words(rules if rules is not None else load_rules())
     out, seen = [], set()
-    for idx, item in enumerate(lines or []):
-        text = item.get("text", "") if isinstance(item, dict) else str(item)
-        page = item.get("page") if isinstance(item, dict) else None
-        m = None
+    texts = [(item.get("text", "") if isinstance(item, dict) else str(item)) for item in (lines or [])]
+    matches = {}
+    for idx, text in enumerate(texts):
         for rx in (_RS_CJK, _RS_LAT, _RS_ROW):
             m = rx.match(text)
-            if m:
+            if m and RATING_DEF_SIGNAL_RX.search(m.group("def")) and not _rating_word_is_label(m.group("word")):
+                matches[idx] = m
                 break
-        if not m:
+    # 批730: colon-less table rows, anchored on a known rating word, then on a neighbour row of the same table
+    bare = {}
+    for idx, text in enumerate(texts):
+        if idx in matches:
             continue
+        m = _RS_BARE.match(text)
+        if m and RATING_DEF_SIGNAL_RX.search(m.group("def")) and not _rating_word_is_label(m.group("word")):
+            bare[idx] = m
+    for idx, m in list(bare.items()):
+        if normalize_rating_word(m.group("word"), words)[0] is not None:
+            matches[idx] = bare.pop(idx)
+    grew = True
+    while grew:                              # 批730 review: a neighbour must also read like a definition row
+        grew = False
+        for idx, m in list(bare.items()):
+            if ((idx - 1) in matches or (idx + 1) in matches) and _RS_THRESHOLD_RX.search(m.group("def")):
+                matches[idx] = bare.pop(idx)
+                grew = True
+    for idx in sorted(matches):
+        item = (lines or [])[idx]
+        page = item.get("page") if isinstance(item, dict) else None
+        m = matches[idx]
         word = re.sub(r"\s+", " ", m.group("word")).strip()
-        alt = re.sub(r"\s+", " ", (m.group("alt") or "")).strip() or None
+        alt = re.sub(r"\s+", " ", ((m.groupdict().get("alt") or ""))).strip() or None
         definition = m.group("def").strip()
         if not RATING_DEF_SIGNAL_RX.search(definition) or _rating_word_is_label(word) or (alt and _rating_word_is_label(alt)):
             continue
@@ -1100,7 +1151,7 @@ def appendix_evidence(path, alias_table=None, filename_broker=None, rules=None, 
     texts = [l["text"] for l in lines]
     if texts:
         ev = broker_evidence(texts, alias_table or {}, filename_broker=filename_broker, rules=rules,
-                             disclosure_rx=APPENDIX_DISCLOSURE_RX)
+                             disclosure_rx=APPENDIX_DISCLOSURE_RX, issuer_guard=_appendix_issuer_line)
         for e in ev.get("evidence", []):
             li = e.get("line")
             if isinstance(li, int) and 0 <= li < len(lines):
@@ -1210,12 +1261,15 @@ def _adj_date(value):
         return None
 
 
-def adj_basis(ticker, report_date, target_price, db=None, start=None):
+def adj_basis(ticker, report_date, target_price, db=None, start=None, page_price=None):
     """Target price and the day-before price in ADJ CLOSE terms; upside over the latest ADJ CLOSE.
     Delegates to ENG073 adj_quote() and returns its fields (adj_factor, target_price_adj, price_prev_close /
     price_prev_adj / price_prev_date, price_latest_adj / price_latest_date, upside_adj, upside_adj_state, ...).
     state = the engine's upside_adj_state (ADJ_OK / ADJ_NO_KEY / ADJ_NO_TARGET / ADJ_NO_FACTOR / ADJ_NO_LATEST /
-    ADJ_ABSURD(...)), or one of ADJ_MISS_STATES when the answer could not be asked for; never a made-up 1.0."""
+    ADJ_ABSURD(...) / ADJ_EVENT_UNADJUSTED(...)), or one of ADJ_MISS_STATES when the answer could not be asked for;
+    never a made-up 1.0.  page_price = the price printed on the report page: ENG073 v0138+ divides the adj close by the
+    exchange close of the day before the report, and by this page price when the exchange has no close for those days
+    (adj_factor_basis says which)."""
     tk, rd = _adj_ticker(ticker), _adj_date(report_date)
     try:
         tp = float(target_price) if target_price not in (None, "") else None
@@ -1243,7 +1297,10 @@ def adj_basis(ticker, report_date, target_price, db=None, start=None):
         out.update(state="ADJ_DB_BUSY", why="%s: %s" % (type(exc).__name__, str(exc)[:160]))
         return out
     try:
-        q = mod.adj_quote(con, tk, rd, tp)
+        try:
+            q = mod.adj_quote(con, tk, rd, tp, page_price=page_price)
+        except TypeError:             # an ENG073 before v0138 has no page_price
+            q = mod.adj_quote(con, tk, rd, tp)
     except Exception as exc:
         out.update(state="ADJ_ERROR", why="%s: %s" % (type(exc).__name__, str(exc)[:160]))
         return out
@@ -2232,12 +2289,19 @@ def _adj_cli(a):
         k = a.index("--db")
         db = a[k + 1] if k + 1 < len(a) else None
         a = a[:k] + a[k + 2:]
-    if len(a) < 2:
-        print("[ADJ] 用法:python VRN_Evidence_Core.py adj <代號> <報告日> [目標價] [--db 庫]")
+    page = None
+    if "--page" in a:
+        k = a.index("--page")
+        page = a[k + 1] if k + 1 < len(a) else None
+        a = a[:k] + a[k + 2:]
+    if len(a) < 2:                           # 批730 review: counted after both options are taken off
+        print("[ADJ] 用法:python VRN_Evidence_Core.py adj <代號> <報告日> [目標價] [--db 庫] [--page 頁面現價]")
         return 2
-    q = adj_basis(a[0], a[1], a[2] if len(a) > 2 else None, db=db)
+    q = adj_basis(a[0], a[1], a[2] if len(a) > 2 else None, db=db, page_price=page)
     print("[ADJ] %s %s 目標價 %s → %s" % (q["ticker"], q["report_date"], q["target_price"], q["state"]))
     for key, label in (("target_price_adj", "目標價(ADJ)"), ("adj_factor", "因子"), ("adj_factor_date", "因子日"),
+                       ("adj_factor_basis", "因子分母"), ("price_prev_raw", "前一日交易所收盤"), ("adj_retro_ratio", "Yahoo回調比"),
+                       ("adj_event", "未調整事件"),
                        ("price_prev_close", "前一日收盤"), ("price_prev_adj", "前一日 ADJ CLOSE"), ("price_prev_date", "前一日"),
                        ("price_latest_adj", "最新 ADJ CLOSE"), ("price_latest_date", "最新日"), ("upside_adj", "上漲空間 %")):
         if q.get(key) not in (None, ""):
@@ -2258,7 +2322,7 @@ def main(argv=None):
         return _adj_cli(a[1:])
     if not a or a[0] != "appendix":
         print("VRN_Evidence_Core " + CORE_VERSION + " · 用法:python VRN_Evidence_Core.py appendix <pdf|資料夾>... [--out 夾] [--last N]"
-              " | adj <代號> <報告日> [目標價] [--db 庫]")
+              " | adj <代號> <報告日> [目標價] [--db 庫] [--page 頁面現價]")
         return 0 if not a else 2
     out_dir, last, targets, i = None, APPENDIX_PAGES, [], 1
     while i < len(a):
