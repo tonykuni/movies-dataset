@@ -233,5 +233,164 @@ class BatchPathTest(unittest.TestCase):
         self.assertEqual((res["checked"], res["passed"]), (18, 18))
 
 
+def def_unruled_table_pdf(path, rows=TABLE, pages=8, table_page=6, width=595, x0=40, w0=110, w=68):
+    """批733(Z195):the same table printed WITHOUT ruling lines -- labels left, numbers right-aligned under their headers,
+    the way many broker reports print it -- on a later page (page 6 of 8, past the old four-page window)."""
+    import fitz
+    doc = fitz.open()
+    for p in range(1, pages + 1):
+        page = doc.new_page(width=width, height=842)
+        page.insert_text((60, 50), "兆豐國際投顧 訪談速報", fontsize=12, fontname="china-t")
+        if p != table_page:
+            page.insert_text((60, 90), f"神達(3706) 第 {p} 頁 內文", fontsize=10, fontname="china-t")
+            continue
+        page.insert_text((250, 90), "財務報表", fontsize=14, fontname="china-t")
+        page.insert_text((250, 115), "季度損益表", fontsize=12, fontname="china-t")
+        for r, row in enumerate(rows):
+            for c, cell in enumerate(row):
+                if not cell:
+                    continue
+                if c == 0:
+                    page.insert_text((x0, 150 + r * 18), cell, fontsize=9, fontname="china-t")
+                    continue
+                right = x0 + w0 + c * w - 6
+                page.insert_text((right - fitz.get_text_length(cell, fontname="china-t", fontsize=9), 150 + r * 18),
+                                 cell, fontsize=9, fontname="china-t")
+    doc.save(str(path))
+    doc.close()
+
+
+def def_truth(rows=TABLE):
+    header = rows[0]
+    return {(METRICS[row[0]], label): printed for row in rows[1:] for label, printed in zip(header[1:], row[1:]) if printed}
+
+
+@unittest.skipUnless(importlib.util.find_spec("fitz") and importlib.util.find_spec("pdfplumber"), "PDF libraries absent")
+class UnruledTableTest(unittest.TestCase):
+    """批733(Z195):工作站 105 份裡 7 份「no financial rows」—— 沒有框線的表。沒框線的表讀出來,一律要加得起來才入庫。"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.db = def_load("vrn_db_engine_fintable", "VRN_Integrated_ReportDatabase_Engine.py")
+        cls.core = def_load("vrn_engine_evidence_core", "VRN_Evidence_Core.py")
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.dir = Path(cls.tmp.name)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def _read(self, pdf):
+        tables = self.db.extract_document_tables(pdf)
+        return tables, self.db.parse_financial_tables_to_records(tables, {"ReportID": "R", "FileID": "F"}, "T")
+
+    def test_the_unruled_table_on_page_6_is_read_right(self):
+        pdf = self.dir / "unruled_p6.pdf"
+        def_unruled_table_pdf(pdf)
+        tables, recs = self._read(pdf)
+        self.assertEqual([(t["TableID"], t.get("Strategy")) for t in tables], [("P006_C001", "COLUMN_ALIGNED")])
+        cells = def_cells(recs)
+        for (metric, label), printed in def_truth().items():
+            r = cells.get((metric, label))
+            self.assertIsNotNone(r, (metric, label))
+            kind, year, quarter, est = PERIODS[label]
+            self.assertEqual((r["Value"], r["PeriodType"], r["FiscalYear"], r["FiscalQuarter"], r["EstimateFlag"], r["PageNumber"]),
+                             (float(printed.replace(",", "")), kind, year, quarter, est, 6), (metric, label))
+        self.assertEqual(len(recs), 36)
+        res = self.db.financial_identity_checks(recs)
+        self.assertEqual((res["checked"], res["passed"], res["periods_unclear"], res["estimate_rows"]), (18, 18, 0, 12))
+        kept, rejected = self.db.gate_fallback_tables(tables, recs)
+        self.assertEqual((len(kept), rejected), (36, []))
+
+    def test_unnamed_header_columns_are_not_guessed(self):
+        # a landscape page whose quarter headers are written Q1'25 (not a period form): only 2024 and 2025(F) are named
+        rows = [tuple("Q%d'25" % int(h[3]) + ("(F)" if "(F)" in h else "") if "Q" in h else h for h in TABLE[0])] + TABLE[1:]
+        pdf = self.dir / "unnamed_landscape.pdf"
+        def_unruled_table_pdf(pdf, rows=rows, pages=3, table_page=2, width=1190, x0=40, w0=460, w=100)
+        chars, _size = self.core.pdf_page_chars(str(pdf), 1)
+        guard = self.core._unnamed_columns
+        try:
+            self.core._unnamed_columns = lambda *a, **k: 0           # what the reader did without the guard
+            unguarded = self.core.column_tables(chars, 2)
+        finally:
+            self.core._unnamed_columns = guard
+        wrong = def_cells(self.db.parse_financial_tables_to_records(unguarded, {"ReportID": "R"}, "T"))
+        # without the guard the 25Q3 revenue lands under 2025(F) -- and that misread still adds up column by column
+        self.assertEqual(wrong[("Revenue", "2025(F)")]["Value"], 24762.0)
+        self.assertEqual(self.db.financial_identity_checks(list(wrong.values()))["failed"], [])
+        self.assertEqual(self.core.column_tables(chars, 2), [], "with the guard: a header that does not name every column is not read")
+
+    def test_a_table_that_does_not_add_up_is_not_stored(self):
+        typo = [list(r) for r in TABLE]
+        typo[3][1] = "7,468"                                      # gross profit 2024 printed (or read) 100 too high
+        src = self.dir / "in_typo"
+        src.mkdir()
+        def_unruled_table_pdf(src / "20251128兆豐訪談速報-神達(3706).pdf", rows=[tuple(r) for r in typo])
+        out = self.dir / "out_typo"
+        args = argparse.Namespace(input=str(src), output=str(out), ticker_ssot="", broker_ssot="", rating_ssot="",
+                                  online_name_update=False, csv=False, json=True, duckdb=False, google_sheet="",
+                                  google_credentials="", run_id="FIN733", self_test=False)
+        self.db.process_batch(args)
+        fin = json.loads((out / self.db.FINANCIALDATA_JSON_NAME).read_text(encoding="utf-8"))
+        basic = json.loads((out / self.db.BASICINFO_JSON_NAME).read_text(encoding="utf-8"))
+        self.assertEqual([r for r in fin if r.get("TableID") == "P006_C001"], [], "the table that does not add up is left out")
+        issues = " ".join(str(b.get("ValidationIssues") or "") for b in basic)
+        self.assertIn("FIN_TABLE_REJECTED(P006_C001", issues)
+        self.assertIn("毛利 = 營收 − 營業成本", issues)
+
+    def test_the_header_forms_the_column_reader_now_knows(self):
+        # 批733:年在前的季 / 半年 / 帶「年」的年,column reader 要認得(PERIOD_TOKEN_RX)、資料庫引擎要讀得對
+        want = {"25Q1": ("FQ", 2025, "Q1", ""), "2025Q1": ("FQ", 2025, "Q1", ""), "25Q4(F)": ("FQ", 2025, "Q4", "Estimate"),
+                "25Q4F": ("FQ", 2025, "Q4", "Estimate"), "25H1": ("FH", 2025, "H1", ""), "1H25": ("FH", 2025, "H1", ""),
+                "2024年": ("FY", 2024, "", ""), "2025年(F)": ("FY", 2025, "", "Estimate"), "1Q25(F)": ("FQ", 2025, "Q1", "Estimate")}
+        for token, (kind, year, sub, est) in want.items():
+            self.assertTrue(self.core.PERIOD_TOKEN_RX.match(token), token)
+            p = self.db.parse_period_label(token)
+            self.assertEqual((p.get("PeriodType"), p.get("FiscalYear"), p.get("FiscalQuarter"), p.get("EstimateFlag")),
+                             (kind, year, sub, est), token)
+        for token in ("25Q5", "25H3", "61,360", "3706神達"):
+            self.assertIsNone(self.core.PERIOD_TOKEN_RX.match(token), token)
+
+    def test_a_ruled_table_is_not_read_twice(self):
+        # the screenshot table is ruled and has no EPS row, so the column fallback also runs on its page; with the
+        # quarter headers now read it would read the same table again (72 rows for 36 cells) -- the copy is left out
+        pdf = self.dir / "ruled_p4.pdf"
+        def_table_pdf(pdf)
+        tables, recs = self._read(pdf)
+        self.assertEqual([t.get("Strategy", "RULED") for t in tables if t.get("PageNumber") == 4], ["RULED"])
+        self.assertEqual(len(recs), 36)
+
+    def test_a_table_with_nothing_to_check_is_kept(self):
+        eps_only = [("", "2024", "2025F", "2026F"), ("每股盈餘(元)", "12.35", "15.02", "17.44"), ("本益比(倍)", "18.2", "15.0", "12.9")]
+        pdf = self.dir / "eps_only.pdf"
+        def_unruled_table_pdf(pdf, rows=eps_only, pages=2, table_page=1)
+        tables, recs = self._read(pdf)
+        kept, rejected = self.db.gate_fallback_tables(tables, recs)
+        self.assertEqual(rejected, [])
+        self.assertEqual(len(kept), len(recs))
+        self.assertIn(("EPS", "2026F"), {(r["MetricName"], r["PeriodLabelRaw"]) for r in kept})
+
+    def test_the_later_page_scan_stops_at_the_last_page(self):
+        """PR #115 審查(Codex P2):過了最後一頁 pdf_page_chars 回 ([], 頁寬高) 不是 None——後段頁不能一路重開到第 40 頁。"""
+        calls = []
+        real = self.core._pdf_page_chars_parse
+
+        def counting(path, page_index=0, order=("pdfplumber", "fitz")):
+            calls.append(page_index)
+            return real(path, page_index, order)
+
+        for pages, table_page in ((2, 1), (8, 6)):
+            pdf = self.dir / f"later_scan_{pages}p.pdf"
+            def_unruled_table_pdf(pdf, pages=pages, table_page=table_page)
+            calls.clear()
+            self.core._PAGE_CACHE.clear()
+            self.core._pdf_page_chars_parse = counting
+            try:
+                self.core.pdf_column_tables_later(str(pdf), 4, self.core.LATER_PAGES_MAX)
+            finally:
+                self.core._pdf_page_chars_parse = real
+            self.assertEqual(sorted(set(calls)), list(range(4, pages)), (pages, calls))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1377,6 +1377,10 @@ def period_parts(token, start=None):
         return None
     try:
         p = mod.period_parts(raw)
+        # 批733(Z195):「2025年(F)」「2025年F」ENG074 讀不出(讀得出 2025(F) / 2025F)→ 拿掉年與記號之間的「年」再問一次
+        m = None if p.get("period_type") else re.fullmatch(r"((?:19|20)\d{2})\s*年\s*(\(?[AEF]\)?)", raw, re.I)
+        if m:
+            p = mod.period_parts(m.group(1) + m.group(2))
     except Exception:  # noqa: BLE001 -- one odd cell must not stop a table
         return None
     if not p.get("period_type"):
@@ -2214,7 +2218,11 @@ def canonical_cross_check(lines, filename, ticker=None):
 # =====================================================================
 PERIOD_TOKEN_RX = re.compile(
     r"^(?:FY)?(?:(?:19|20)\d{2}|\d{2})(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^\d{1,2}/\d{2}(?:A|E|F)?$|^[1-4]Q\d{2}(?:A|E|F)?$|"
-    r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?\d{2}(?:A|E|F)?$", re.I)
+    r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?\d{2}(?:A|E|F)?$|"
+    # 批733(Z195;只增不減):年在前的季與半年(25Q1 · 2025Q1 · 25Q4(F) · 25Q4F · 25H1 · 1H25)、帶「年」的年(2024年 · 2025年(F))、
+    #   季在前帶括號基準(1Q25(F))——兆豐神達那張季度表的表頭,舊式只認得 2024 與 2025(F),季欄的數字就沒有欄可歸
+    r"^(?:(?:19|20)\d{2}|\d{2})(?:Q[1-4]|H[12])(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^[12]H\d{2}(?:A|E|F|\(F\)|\(E\)|\(A\))?$|"
+    r"^(?:19|20)\d{2}年(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^[1-4]Q\d{2}\((?:A|E|F)\)$", re.I)
 _MONTH_YEAR_RX = re.compile(r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?(\d{2})(A|E|F)?$", re.I)
 _GROWTH_LABEL_RX = re.compile(r"yoy|成長|growth|增減|變動|chg|change", re.I)
 
@@ -2265,6 +2273,30 @@ def _period_columns(words):
     return cols if len(cols) >= 2 else []
 
 
+def _unnamed_columns(rows, i, centers, left_edge, right_edge, radius=8.0):
+    """批733(Z195):表頭第 i 列之下(到下一個表頭或 TABLE_MAX_ROWS 為止),數字排成的欄有幾個**不在任何表頭期別底下**。
+    欄 = 至少兩列的數字中心落在 radius 內的一群(跟 transposed_tables 同一個分群法);只算左右界之內的
+    (右邊界外的成長率欄照舊不算)。0 = 每一欄數字頭上都有期別。"""
+    clusters = []
+    j = i + 1
+    while j < len(rows) and j <= i + TABLE_MAX_ROWS:
+        if _period_columns(rows[j]):
+            break
+        for w in rows[j]:
+            cx = (w["x0"] + w["x1"]) / 2
+            if not (left_edge < cx <= right_edge) or not NUMERIC_TOKEN_RX.match(w["text"]):
+                continue
+            hit = next((c for c in clusters if abs(c["x"] - cx) <= radius), None)
+            if hit:
+                hit["n"] += 1
+                hit["x"] = (hit["x"] * (hit["n"] - 1) + cx) / hit["n"]
+            else:
+                clusters.append({"x": cx, "n": 1})
+        j += 1
+    tol = max(radius, (min((b - a) for a, b in zip(centers, centers[1:])) if len(centers) > 1 else 40.0) * 0.3)
+    return sum(1 for c in clusters if c["n"] >= 2 and min(abs(c["x"] - x) for x in centers) > tol)
+
+
 def column_tables(chars, page_number=1):
     """Unruled tables whose header row carries two or more period labels ('2024A 2025F 2026F',
     '12/25e 12/26e', 'FY25E').  Values are assigned to the nearest period column; the label is the
@@ -2283,6 +2315,11 @@ def column_tables(chars, page_number=1):
         left_edge = centers[0] - spacing * 0.6
         right_edge = centers[-1] + spacing * 0.6
         header = [""] + [normalize_period_label(w["text"]) for w in cols]
+        if _unnamed_columns(rows, i, centers, left_edge, right_edge) > 0:
+            # 批733(Z195):底下的數字排成的欄比表頭認得的期別多 = 有欄的表頭沒認出來(例:季欄);照最近的期別硬歸,
+            #   整張表會錯一欄而且恆等式照樣成立(每一列錯得一樣)——寧可不讀,不猜。
+            i += 1
+            continue
         body = []
         j = i + 1
         while j < len(rows) and j <= i + TABLE_MAX_ROWS:
@@ -2389,6 +2426,31 @@ def transposed_tables(chars, page_number=1):
                            "Rows": out_rows, "Strategy": "TRANSPOSED"})
         i = j
     return tables
+
+
+FIN_PAGE_RX = re.compile(r"營業收入|營收|營業毛利|毛利|營業利益|營業淨利|稅後淨利|淨利|每股盈餘|損益表|"
+                         r"Revenue|Sales|Gross profit|Operating (?:income|profit)|Net (?:income|profit)|EPS", re.I)
+LATER_PAGES_MAX = 40
+
+
+def pdf_column_tables_later(path, first=4, last=LATER_PAGES_MAX):
+    """批733(Z195):第 first+1 頁起(到 last 頁或最後一頁)也讀沒有框線的表——但只讀字面上像損益表的頁
+    (FIN_PAGE_RX)。長報告(初次評等)的財報常在後段,舊的只看前 4 頁就漏了;全讀每一頁又太慢,所以先看字。
+    圖片頁(沒有字)跳過、繼續往後;過了最後一頁就停。
+    PR #115 審查(Codex P2):頁碼超過最後一頁時 pdf_page_chars 回的是 ([], 頁寬高) 不是 None——只靠它停,短報告會被
+    重開重解析到第 last 頁(2 頁的 PDF 解析 36 次);改用有快取的 pdf_page_count 定上界,中間的圖片頁照舊跳過。"""
+    out = []
+    n = pdf_page_count(path)
+    for idx in range(first, min(last, n) if n else last):
+        got = pdf_page_chars(path, idx)
+        if not got:
+            break
+        chars, _size = got
+        if not chars or not FIN_PAGE_RX.search("".join(c.get("text", "") for c in chars)):
+            continue
+        out += column_tables(chars, idx + 1)
+        out += transposed_tables(chars, idx + 1)
+    return out
 
 
 def pdf_column_tables(path, pages=3):

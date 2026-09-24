@@ -722,6 +722,11 @@ def def_gate_batch(engines: Engines, samples: Path, out_dir: Path, truth: List[D
                 warns.append("no broker")
             if row.get("SourceFormat") == "pdf" and not fins and stock:
                 warns.append("no financial rows (no ruled table found)")
+            _rej = str(row.get("ValidationIssues") or "")
+            if "FIN_TABLE_REJECTED(" in _rej:
+                # 批733(Z195):沒有框線的表讀出來加不起來 → 不入庫,這裡點名是哪一張、哪一條
+                warns.append("unruled financial table left out (does not add up): "
+                             + _rej.split("FIN_TABLE_REJECTED(", 1)[1][:180])
             issues = str(row.get("ValidationIssues") or "")
             if "failed" in issues.lower() or "No PDF extraction engine" in issues:
                 problems.append(issues[:200])

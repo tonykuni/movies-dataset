@@ -101,7 +101,16 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
 SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
-ENGINE_VERSION = "v0105"
+ENGINE_VERSION = "v0106"
+# v0106 (批733; 掉球 Z195 -- the workstation run of 2026-09-24: 7 of 105 PDFs gave "no financial rows"):
+#   tables printed without ruling lines.  (1) the column reader (evidence core) now knows the year-first quarter
+#   headers of the screenshot table (25Q1 / 25Q4(F)), half years and 2024年; before, it saw only 2024 and 2025(F) in
+#   that header and read nothing -- in other layouts it would have put quarter numbers under the year columns.
+#   (2) when the ruled tables and the first four pages still give no income-statement row, later pages are read
+#   too, but only pages whose text looks like an income statement (long initiation reports carry their statements
+#   at the back).  (3) a table read without ruling lines is stored only if it adds up (gate_fallback_tables:
+#   the same identities as v0105); one that does not is left out and named in the report's ValidationIssues as
+#   FIN_TABLE_REJECTED(...).  Ruled tables are unchanged (their failures stay warnings, as in v0105).
 # v0105 (mother 批732; operator's screenshot 2026-09-24 of 20251128兆豐訪談速報-神達(3706) p.4 季度損益表):
 #   that table came out wrong three ways -- (1) quarter headers "25Q1".."26Q1(F)" lost their year (FiscalYear None,
 #   PERIOD_UNCLEAR), (2) "(F)" was not read as a forecast, (3) 營業成本 / 營業費用 had no metric, so both rows were
@@ -1290,6 +1299,44 @@ def extract_document_text_and_zones(path: Path) -> Dict[str, Any]:
 
 
 COLUMN_TABLE_PAGES = 4      # unruled summary tables are read from the first pages only
+PDF_COLUMN_LATER_MAX = 40   # v0106: ... and, when those give no income-statement row, up to this page (keyword-gated)
+INCOME_METRICS = ("Revenue", "GrossProfit", "OperatingProfit", "NetIncome", "EPS", "PretaxIncome")
+FALLBACK_STRATEGIES = ("COLUMN_ALIGNED", "TRANSPOSED")
+
+
+def _number_cells(table: Dict[str, Any]) -> set:
+    """The numbers printed in a table's body (label column and header left out), as printed minus commas."""
+    rows = table.get("Rows") or []
+    return {str(v).replace(",", "").strip() for row in rows[1:] for v in list(row)[1:]
+            if v and safe_float(str(v)) is not None}
+
+
+def drop_reread_tables(tables: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """v0106 (批733): the column reader also sees the text of a ruled table -- the fallback runs on any page when the
+    ruled tables give no EPS row (the screenshot table has none), and with the quarter headers now read it read that
+    table a second time (72 rows for 36 cells).  A fallback table whose numbers are mostly (>= 60 %) numbers of a
+    ruled table on the same page is the same table read twice: left out."""
+    ruled: Dict[Any, set] = {}
+    for t in tables:
+        if t.get("Strategy") not in FALLBACK_STRATEGIES:
+            ruled.setdefault(t.get("PageNumber"), set()).update(_number_cells(t))
+    out = []
+    for t in tables:
+        if t.get("Strategy") in FALLBACK_STRATEGIES:
+            nums = _number_cells(t)
+            if nums and len(nums & ruled.get(t.get("PageNumber"), set())) >= 0.6 * len(nums):
+                continue
+        out.append(t)
+    return out
+
+
+def _has_income_rows(tables: List[Dict[str, Any]]) -> bool:
+    """v0106: does any table already give an income-statement row (the trigger for reading later pages)?"""
+    try:
+        probe = parse_financial_tables_to_records(tables, {"ReportID": "probe", "FileID": "probe"}, "probe")
+    except Exception:  # noqa: BLE001 -- an unparseable probe counts as "no rows": the later pages are read
+        return False
+    return any(r.get("MetricName") in INCOME_METRICS for r in probe)
 
 
 def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -1308,7 +1355,13 @@ def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = No
                     tables += core.pdf_column_tables(str(path), COLUMN_TABLE_PAGES)
                 except Exception as exc:  # graceful: ruled tables stay as they are
                     print(f"[WARN] column tables failed: {path.name} -> {exc}", file=sys.stderr)
-        return tables
+                # v0106 (批733 Z195): still no income-statement row -> later pages, the ones whose text looks like one
+                if callable(getattr(core, "pdf_column_tables_later", None)) and not _has_income_rows(tables):
+                    try:
+                        tables += core.pdf_column_tables_later(str(path), COLUMN_TABLE_PAGES, PDF_COLUMN_LATER_MAX)
+                    except Exception as exc:  # graceful, as above
+                        print(f"[WARN] later-page column tables failed: {path.name} -> {exc}", file=sys.stderr)
+        return drop_reread_tables(tables)
     if extracted and extracted.get("tables"):
         return list(extracted["tables"])
     return []
@@ -2679,6 +2732,21 @@ tr.fail td:first-child {{ border-left:5px solid #dc2626; }}
 # def 13_PROCESSING_PIPELINE
 # ============================================================
 
+def gate_fallback_tables(tables: List[Dict[str, Any]], records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """v0106 (批733 Z195): a table read without ruling lines (column-aligned / transposed) is stored only if it adds
+    up -- the identities of financial_identity_checks, per table.  Returns (the records kept, one line per table
+    left out).  A table with nothing to check is kept (nothing says it is wrong); ruled tables are not gated."""
+    fallback = sorted({t.get("TableID") for t in tables if t.get("Strategy") in FALLBACK_STRATEGIES})
+    drop, rejected = set(), []
+    for tid in fallback:
+        check = financial_identity_checks([r for r in records if r.get("TableID") == tid])
+        if check["failed"]:
+            drop.add(tid)
+            more = f"(另 {len(check['failed']) - 1} 條)" if len(check["failed"]) > 1 else ""
+            rejected.append(f"{tid} " + identity_failure_text(check["failed"][0]) + more)
+    return [r for r in records if r.get("TableID") not in drop], rejected
+
+
 def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]], rating_alias: Dict[str, List[str]], run_id: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     basic = build_basicinfo_record(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
     extracted = None
@@ -2686,6 +2754,10 @@ def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], br
         extracted = extract_document_text_and_zones(pdf_path)
     tables = extract_document_tables(pdf_path, extracted)
     financial = parse_financial_tables_to_records(tables, basic, run_id)
+    financial, rejected = gate_fallback_tables(tables, financial)      # v0106 (批733 Z195)
+    if rejected:
+        issues = [x for x in str(basic.get("ValidationIssues") or "").split(" | ") if x]
+        basic["ValidationIssues"] = " | ".join(issues + ["FIN_TABLE_REJECTED(" + " ; ".join(rejected) + ")"])
     return basic, financial
 
 
