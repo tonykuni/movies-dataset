@@ -163,7 +163,8 @@ def _snapshot(core, base_python: str | None, env_root: str) -> dict:
             "runtime_commands": {name: shutil.which(name) for name in RUNTIME_COMMANDS}}
 
 
-def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict) -> dict:
+def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict,
+                 bootstrap_prechecked: bool = False) -> dict:
     """Delegate all installation to MDL135's existing guarded tools_apply."""
     allowed = {r["env"] for r in rows if r["state"] == "PASS"}
     allowed.intersection_update(d["env"] for d in dry if d["state"] == "PASS")
@@ -174,7 +175,7 @@ def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict) -> dict:
     # Never include a repair or destructive stage, including one indirectly
     # required by a VERIFY_TOOLS step.
     filtered = {"stages": stages, "state": "PLAN"}
-    summary = core.tools_apply(filtered, approve=True)
+    summary = core.tools_apply(filtered, approve=True, bootstrap_prechecked=bootstrap_prechecked)
     return {"summary": summary, "stages": stages, "state": filtered["state"]}
 
 
@@ -218,9 +219,13 @@ def run(core, args: list[str]) -> int:
     runnable = bool(dry) and all(d["state"] == "PASS" for d in dry) and all(
         r["state"] == "PASS" for r in rows)
     base_ok = rows[0]["state"] == "PASS" and before["drift"]["state"] != "CHANGED"
+    gate_ok, gate_reason = core.unitest_gate() if execute else (False, "plan only")
+    bootstrap, boot_reason = core.rungate_bootstrap_only() if execute and not gate_ok else (False, "")
     report = {"schema": REPORT_SCHEMA, "at": datetime.now(timezone.utc).isoformat(),
               "mode": "execute" if execute else "plan", "base_python": base_python,
               "env_root": env_root, "baseline": before["baseline"], "roster": before["roster"],
+              "unitest_gate": gate_reason, "bootstrap_prechecked": bootstrap,
+              "bootstrap_reason": boot_reason,
               "drift": before["drift"], "base_optimization": before["base_analysis"],
               "hubs": HUB_NAMES, "diagnostic_tools": before["diagnostics"],
               "diagnostic_tools_missing": [k for k, v in before["diagnostics"].items() if not v],
@@ -249,7 +254,8 @@ def run(core, args: list[str]) -> int:
     if any(r["state"] != "PASS" for r in rows):
         runnable = False
     if execute and base_ok and runnable and core._consent():
-        report["execution"] = _apply_green(core, rows, dry, before["toolplan"])
+        report["execution"] = _apply_green(core, rows, dry, before["toolplan"],
+                                           bootstrap_prechecked=bootstrap)
         after = _snapshot(core, base_python, env_root)
         report["postcheck"] = [{"env": x["env"], "state": x["state"], "checks": x["checks"]}
                                for x in after["rows"]]
