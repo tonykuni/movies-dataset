@@ -9,6 +9,7 @@ v0136→v0137(批729 操作員 2026-09-24 令「所有目標價及各前一日�
   +`adj_quote(con, 代號, 報告日, 目標價)`:L99 的唯一算法給別的引擎委派(第二血統首頁引擎 / 資料庫引擎不另寫一份,LL404)。
   既有欄與狀態字彙一個字不動;RAW 車道(批675)照舊只落自己的欄、基準具名 RAW_CLOSE,不冒充上漲空間。
   +⓯ 前一日價換 ADJ(手算逐位)· ⓰ 委派口與本體同答、算不出一律具名。
+  缺價因由的檔數改現場數(v0135 寫死「892 檔全是 .TWO」;庫有上市價時改說「這一檔不在」,下一步不同)。
 v0134→v0135(批675 操作員令「C」+「一起」:兩條車道合併,而且**分開統計**)
   題目:`upside_adj_state` 裡 **30 份 ADJ_NO_FACTOR**。逐件去看才知道那一個名字底下
   是**三個不同的洞**,而且三個的下一步完全不一樣:
@@ -1705,8 +1706,19 @@ def _adj_block_reason(con, ticker: str, rdate: str) -> str:
     except Exception:
         return "ADJ表不在(tw_daily_prices 缺)→ 先建價表"
     if not n_any:
-        return ("上市所整個不在 ADJ 表(tw_daily_prices 892 檔全是 .TWO 上櫃)"
-                "→ 補上市所價:via-market-lists 補名冊 + via-price 抓價(**要開同意閘**)")
+        # 批729:檔數與「有沒有上市所」是**庫的現況**,不是寫死的字(v0135 寫 892,容器現在 893;工作站的庫可能有上市價)。
+        #   現場數:整本沒有 .TW → 還是那句「上市所整個不在」;有 .TW → 是這一檔自己不在,下一步不一樣。
+        try:
+            n_all, n_tw = con.execute(
+                "SELECT count(DISTINCT ticker), count(DISTINCT ticker) FILTER (WHERE ticker LIKE '%.TW') "
+                "FROM tw_daily_prices").fetchone()
+        except Exception:
+            n_all, n_tw = None, None
+        if n_all and not n_tw:
+            return (f"上市所整個不在 ADJ 表(tw_daily_prices {n_all} 檔全是 .TWO 上櫃)"
+                    "→ 補上市所價:via-market-lists 補名冊 + via-price 抓價(**要開同意閘**)")
+        return (f"這一檔不在 ADJ 表(tw_daily_prices {n_all if n_all is not None else '?'} 檔,其中上市 {n_tw or 0} 檔)"
+                "→ 補這一檔的價:via-price 抓價(**要開同意閘**)")
     try:
         lo = con.execute(
             "SELECT min(date) FROM tw_daily_prices WHERE ticker IN (?,?,?)",

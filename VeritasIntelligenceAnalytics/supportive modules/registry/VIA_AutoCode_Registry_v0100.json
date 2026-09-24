@@ -9976,8 +9976,22 @@
       "category": "併線",
       "component": "側線 2026-09-23 第三段 續五(主線批號由併線的手指定 L25;操作員「#93 請修正」)main 併入 PR #94(批727 系列)後 PR #93 撞冊:併入 main 3710ba0b。唯一衝突是元件自動編號冊——兩邊各自編號,撞在 VIA-FNC-8303 / 8304(main 給 VRN_ENG086 的兩支函式)。取 main 那一版為底,交唯一寫入口 VCGC registry-sync --apply 重掃:新 50(全屬本側線:ENG093 v0101 48 · 輸入台規格項 1 · VRN_ENG071 v0101 1)· 變更 98 · 退役 0;main 的號不動,本側線的號接在後面(LL334):CLS 0391 · ENG 0097 · FNT 0105 · FNC 8305–8351。正則清冊交正主 CGC_MDL115 重建 1284→1291(多的 7 條來自 main 的 VRN_ENG086 v0116);MDL115 順手重寫的 UI 頁照 LL49 還原不提交。",
       "code": "合併後容器實測:VCGC 三十六檢 36/36(⑬ 元件冊等式綠)· registry-sync 再掃 新 0 變更 0 退役 0 · 冊內重號 0 · ssot verify rc 0(正則清冊一致 1291)· 格子 Celeritas 兩站 / 一鍵啟動台 OK · ENG093 自測 12/12 · test_broker_source_zones 1 passed · 本機照 CI 步驟四支自測 rc 0 · 總控契約測 OK · UAT rc 0。"
+    },
+    {
+      "ts": "2026-09-24 07:19",
+      "op": "ADD",
+      "category": "VRN重整·附錄·ADJ",
+      "component": "批729 操作員 09-24 七條擺放規則(資訊區 · 職稱上方姓名 · @ 左右 · 首頁頁尾小字 · 附錄小字 · 檔名縮寫 · 附錄評等法)逐條對表:五條既有,補附錄兩條——VRN_Evidence_Core v0102(appendix_lines / appendix_evidence / rating_scale / CLI appendix;adj_basis / CLI adj)· VIA_VRN_FirstPageEngine v0104(附錄只補弱首頁、與檔名衝突記 REVIEW;upside 改 ADJ 口徑,頁面算術留 upside_page)· VRN_Integrated_ReportDatabase_Engine v0103(schema 20260924_004;UpsideDownsidePct=ADJ,+12 欄只增不減)· VRN_AutoTestLoop v0103([附錄] [ADJ] 兩行量測 · RATING_SCALE_CANDIDATES.json)· VRN_ENG073 v0137(+price_prev_close/adj/date · +adj_quote 委派口 · 缺價因由改現場計數)· +test_VRN_Appendix 10 支 · +test_VRN_AdjBasis 10 支 · VDF_ENG093 v0102(母線代修 C 轉義道,整支 AST 與 v0101 相同)",
+      "code": "操作員中途令「所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE」:L99 唯一算法仍在 ENG073,第二血統委派不另寫(LL404);問不到的每一種具名(ADJ_NO_ENGINE/NO_DB/NO_DUCKDB/DB_BUSY/ERROR),永不編 1.0;v0103 首頁引擎把頁面價的算術標成 latest adjusted close——照實改標。附錄只在最後 3 頁、字級 < 0.9×首頁本文,同一道拒絕閘,中文揭露句式只在附錄放寬(首頁判法逐位不變);評等法只出候選不寫冊。下游稽核:母倉首頁引擎 v0127 早拒未復權價、ENG083 讀 ENG073 upside_adj;ENG080 原始目標價退路(Z156)、ENG069 共識同日 close(Z157)記掉球不越線改。VRN/tests 84/84 · 自測迴圈 --selftest 2/2 · 合成一輪 PASS 357 WARN 1 FAIL 0 · [ADJ] 10/58(NO_FACTOR 45 = 容器無上市所價 Z155)· ENG073 自測 57/57 · VCGC 37/37 · CGC_MDL185 24/24 · CGC_MDL184 19/19 · 契約 OK。全格子 v0478:OK 342 · FAIL 0 · SKIP 6 · TIMEOUT 0(884 秒;第一段平行紅 1 = PowerShell 閘 C 轉義道 VDF_ENG093 v0101、main 同紅 → 代修 v0102 → 序跑複判轉綠)"
+    },
+    {
+      "ts": "2026-09-24 07:19",
+      "op": "ADD",
+      "category": "併線",
+      "component": "批729 併入 main e81b0b5b(PR #93 VDF 側線第三段 · PR #94 VIA Integration 批727a–k:VRN_ENG086 v0116 · VRN_FieldRules_SSOT 改動);LL334 推前查 37 條分支:批729 · ENG073 v0137 · VDF_ENG093 v0102 無人用;掉球接 main 的 Z154 之後取 Z155–Z160",
+      "code": "先 commit 再 git merge(不 rebase、不 force-push);衝突六檔:四本生成冊取 main 再由正主重生(registry-sync 活 9510 · 六層冊 v0107 ENG073 尾版改指 v0137 · 正則清冊 CGC_MDL115 v0101 樣式 1369 · 總控頁 manager v0148)、AutoCode 台帳兩邊追加全留(1313+7+2)、掉球冊 Z137 兩份實證合一列(工作站 · 容器 pwsh 第 24/83 行)。全格子第一跑唯一的紅「PowerShell 語法與參數名閘」C 轉義道:VDF_ENG093 v0101 問參數頁內嵌 JS `\\d` 在非 raw f-string(main 同紅)→ 母線代修 v0102,側線下一版請出 v0103(Z160)。"
     }
   ],
-  "updated_at": "2026-09-24 06:35",
-  "batch": "批728"
+  "updated_at": "2026-09-24 07:19",
+  "batch": "批729"
 }

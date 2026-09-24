@@ -115,6 +115,9 @@ class AdjBasisTest(unittest.TestCase):
         self.assertEqual(absent["state"], "ADJ_NO_FACTOR")
         self.assertIsNone(absent["upside_adj"])
         self.assertTrue(absent["why"], "the block reason is carried")
+        # ENG073 v0137 counts the table live: this table HAS a listed (.TW) ticker, so the reason is about this code
+        self.assertIn("這一檔不在", absent["why"])
+        self.assertNotIn("上市所整個不在", absent["why"])
         missing = self.C.adj_basis("3706", "2025-08-22", 168.0, db=str(Path(self.tmp.name) / "none.duckdb"))
         self.assertEqual((missing["state"], missing["upside_adj"] if "upside_adj" in missing else None), ("ADJ_NO_DB", None))
 
