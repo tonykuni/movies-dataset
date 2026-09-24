@@ -193,8 +193,13 @@ class def_FirstPageEngineTests(unittest.TestCase):
         self.assertEqual(out["broker"], "KGI")
         self.assertEqual(out["tri_code"]["verdict"], "PASS")
         self.assertEqual(out["xv_filename_vs_page"]["verdict"], "PASS")
-        self.assertEqual(out["upside"]["status"], "DERIVED")
-        self.assertAlmostEqual(out["upside"]["upside_pct"], 30.23, places=2)
+        # mother 批729 (operator 2026-09-24): the upside is on the latest ADJ close (test_VRN_AdjBasis pins the
+        # numbers on a temporary market database); the page arithmetic 168 / 129 stays as upside_page
+        self.assertEqual(out["upside_page"]["status"], "DERIVED")
+        self.assertAlmostEqual(out["upside_page"]["upside_pct"], 30.23, places=2)
+        self.assertEqual(out["upside"]["basis"], "ADJ_LATEST")
+        self.assertIn(out["upside"]["status"], ("DERIVED_ADJ", "NO_ADJ"))
+        self.assertEqual(out["upside"]["page_price"], 129.0)
         self.assertTrue(out["summary_four_points"]["header"].startswith("神達(3706.TW)-") or "3706.TW" in out["summary_four_points"]["header"])
         self.assertIn("目標價 168.0", out["summary_four_points"]["points"][0]["text"])
 

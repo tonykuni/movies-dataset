@@ -100,8 +100,13 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
-SCHEMA_VERSION = "VRN_SCHEMA_20260923_003"
-ENGINE_VERSION = "v0102"
+SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
+ENGINE_VERSION = "v0103"
+# v0103 (mother 批729; operator 2026-09-24 "所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE"):
+# UpsideDownsidePct is the upside over the LATEST adj close (the mother's L99 through VRN_Evidence_Core.adj_basis ->
+# ENG073 adj_quote); the target and the day-before prices in ADJ CLOSE terms get their own columns (appended only);
+# the page arithmetic (target / printed price) is kept as UpsidePagePct and never promoted when ADJ is missing.
+# The first-page engine gets the file path, so the appendix small print can name the issuer (broker_tier APPENDIX_*).
 # v0101 (auto-test loop 2026-09-21): DOCX/TXT intake, boundary-safe broker/rating/target-price matching,
 # year-band and ETF aware tickers, calendar-validated dates, MM/YY period headers, typed Parquet columns,
 # NaN-safe JSON, VIA_NET consent gate for the optional online name table, first-page engine hook.
@@ -233,6 +238,19 @@ BASICINFO_COLUMNS = [
     "CompanyNamePage",
     "PageCodes",
     "EvidenceCore",
+    # v0103 (批729, ADJ CLOSE basis): appended only, nothing above moved or dropped
+    "UpsideBasis",
+    "UpsideState",
+    "UpsidePagePct",
+    "TargetPriceAdj",
+    "AdjFactor",
+    "AdjFactorDate",
+    "PrevClose",
+    "PrevCloseAdj",
+    "PrevCloseDate",
+    "CurrentPriceAdj",
+    "LatestAdjClose",
+    "LatestAdjDate",
 ]
 
 # FinancialData 欄位，採 long format。
@@ -299,7 +317,9 @@ BASICINFO_UPSERT_KEYS = ["ReportID"]
 FINANCIALDATA_UPSERT_KEYS = ["FinancialRowID"]
 
 # Parquet needs one type per column: these are numeric (NaN when missing), everything else is text.
-BASICINFO_NUMERIC_COLUMNS = ("TargetPrice", "CurrentPrice", "UpsideDownsidePct", "ConfidenceScore", "MarketCap", "ShareCapital")
+BASICINFO_NUMERIC_COLUMNS = ("TargetPrice", "CurrentPrice", "UpsideDownsidePct", "ConfidenceScore", "MarketCap", "ShareCapital",
+                             "UpsidePagePct", "TargetPriceAdj", "AdjFactor", "PrevClose", "PrevCloseAdj", "CurrentPriceAdj",
+                             "LatestAdjClose")
 FINANCIALDATA_NUMERIC_COLUMNS = (
     "Value", "Scale", "YoY", "QoQ", "PER", "PBR", "EV_EBITDA", "DividendYield", "ROE", "ROA", "Revenue",
     "GrossProfit", "GrossMargin", "OperatingProfit", "OperatingMargin", "NetIncome", "EPS", "TotalAssets",
@@ -1635,9 +1655,51 @@ def extract_current_price(text: str) -> Optional[float]:
 
 
 def calculate_upside_downside(target: Optional[float], current: Optional[float]) -> Optional[float]:
+    """Page arithmetic: target / printed price (v0103 keeps it as UpsidePagePct; the upside itself is ADJ)."""
     if target is None or current is None or current == 0:
         return None
     return round((target / current - 1.0) * 100.0, 4)
+
+
+def adj_upside_columns(tw_ticker: str, report_date: str, target_price: Optional[float],
+                       current_price: Optional[float], db: Optional[str] = None) -> Dict[str, Any]:
+    """v0103 (批729): the ADJ CLOSE columns of one report.  UpsideDownsidePct = the upside over the latest adj close
+    (VRN_Evidence_Core.adj_basis -> ENG073 adj_quote); CurrentPriceAdj = the printed price x the same adj factor;
+    UpsidePagePct = the page arithmetic.  When ADJ is missing the cells stay empty and UpsideState says why."""
+    page = calculate_upside_downside(target_price, current_price)
+    cols: Dict[str, Any] = {"UpsideDownsidePct": "", "UpsideBasis": "ADJ_LATEST", "UpsideState": "",
+                            "UpsidePagePct": page if page is not None else ""}
+    for col in ("TargetPriceAdj", "AdjFactor", "AdjFactorDate", "PrevClose", "PrevCloseAdj", "PrevCloseDate",
+                "CurrentPriceAdj", "LatestAdjClose", "LatestAdjDate"):
+        cols[col] = ""
+    core = optional_import_evidence_core()
+    if core is None or not hasattr(core, "adj_basis"):
+        cols["UpsideState"] = "ADJ_NO_CORE"
+        return cols
+    try:
+        q = core.adj_basis(tw_ticker or None, report_date or None, target_price, db=db)
+    except Exception as exc:  # graceful by design
+        cols["UpsideState"] = f"ADJ_ERROR({exc.__class__.__name__})"
+        return cols
+    fac = q.get("adj_factor")
+
+    def cell(value: Any) -> Any:
+        return "" if value is None else value
+
+    cols.update({
+        "UpsideDownsidePct": cell(q.get("upside_adj")),
+        "UpsideState": q.get("state") or "",
+        "TargetPriceAdj": cell(q.get("target_price_adj")),
+        "AdjFactor": cell(round(fac, 6) if fac is not None else None),
+        "AdjFactorDate": q.get("adj_factor_date") or "",
+        "PrevClose": cell(q.get("price_prev_close")),
+        "PrevCloseAdj": cell(q.get("price_prev_adj")),
+        "PrevCloseDate": q.get("price_prev_date") or "",
+        "CurrentPriceAdj": cell(round(current_price * fac, 4) if (current_price and fac) else None),
+        "LatestAdjClose": cell(q.get("price_latest_adj")),
+        "LatestAdjDate": q.get("price_latest_date") or "",
+    })
+    return cols
 
 # ============================================================
 # def 08_FINANCIAL_TABLE_EXTRACTION
@@ -1960,7 +2022,6 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
     target_price = extract_target_price(first_page_text + "\n" + top_zone_text)
     target_scenarios = extract_target_price_scenarios(first_page_text + "\n" + top_zone_text)
     current_price = extract_current_price(first_page_text + "\n" + top_zone_text)
-    upside = calculate_upside_downside(target_price, current_price)
     tri_code = tri_code_verdict(filename_ticker_candidates, page_ticker_candidates)
     first_page_engine = run_first_page_engine(pdf_path, source_filename)
     fn_ticker = next((c.get("ticker", "") for c in filename_ticker_candidates if c.get("ticker")), "")
@@ -1985,7 +2046,6 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         rating = ev.get("rating") or ""
         target_price = ev.get("tp")
         current_price = ev.get("cp")
-        upside = calculate_upside_downside(target_price, current_price)
         report_date = ev.get("page_date") or report_date
         tri_code = ev.get("tri") or tri_code
     else:
@@ -1996,7 +2056,6 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
             rating = first_page_engine["rating"]["canonical"]
         if target_price is None and (first_page_engine.get("target_prices") or {}).get("primary") is not None:
             target_price = first_page_engine["target_prices"]["primary"]
-            upside = calculate_upside_downside(target_price, current_price)
     confidence, status, validation_issues = score_basicinfo_confidence(
         filename_ticker_candidates,
         page_ticker_candidates,
@@ -2054,7 +2113,7 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         "RatingChange": rating_change,
         "TargetPrice": target_price if target_price is not None else "",
         "CurrentPrice": current_price if current_price is not None else "",
-        "UpsideDownsidePct": upside if upside is not None else "",
+        "UpsideDownsidePct": "",          # v0103: the ADJ upside, filled by adj_upside_columns() below
         "InvestmentThesis": first_non_empty(repaired_sentences[:2])[:800],
         "SourceFormat": pdf_path.suffix.lower().lstrip("."),
         "ReportDateDisplay": report_date.replace("-", "/") if report_date else "",
@@ -2078,6 +2137,8 @@ def build_basicinfo_record(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, An
         "RunID": run_id,
         "SchemaVersion": SCHEMA_VERSION,
     })
+    # v0103 (批729): the upside is on the latest ADJ close; the page arithmetic stays as UpsidePagePct
+    row.update(adj_upside_columns(tw_ticker, report_date, target_price, current_price))
     if ev and not ev.get("error"):
         names = [a.get("name", "") for a in ev.get("analysts", []) if a.get("name")]
         row.update({
@@ -2194,14 +2255,20 @@ def run_first_page_engine(path: Path, source_filename: str) -> Dict[str, Any]:
             got = None
         if got is not None:
             chars, size = got
-        result = engine.run(source_filename, chars=chars, page_width=size[0], page_height=size[1])
+        # 批729: the file path lets the first-page engine read the appendix small print (issuer when page 1 is weak)
+        result = engine.run(source_filename, chars=chars, page_width=size[0], page_height=size[1],
+                            source_path=str(path) if suffix == ".pdf" else None)
         return {
             "engine": result.get("engine", ""),
             "ticker": result.get("ticker", {}),
             "broker": result.get("broker", ""),
+            "broker_tier": result.get("broker_tier"),
+            "broker_conflict": result.get("broker_conflict"),
             "rating": {k: result.get("rating", {}).get(k) for k in ("canonical", "fine", "scope", "action")},
             "target_prices": result.get("target_prices", {}),
             "current_price": result.get("current_price"),
+            "upside": result.get("upside"),           # v0103 first-page engine v0104: ADJ basis (latest adj close)
+            "upside_page": result.get("upside_page"),
             "tri_code": result.get("tri_code", {}),
             "report_date": result.get("report_date", ""),
             "company_name": (result.get("layout") or {}).get("company_name", ""),

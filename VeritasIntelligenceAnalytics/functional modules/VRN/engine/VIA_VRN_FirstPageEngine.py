@@ -41,6 +41,19 @@ v0102 changes (auto-test loop, 2026-09-21):
   - Knowledge wiring: attachments/VRN_Broker_Dict_v0100.json, attachments/VRN_Rating_Dict_v0100.json,
     knowledge/SYNONYM_LIBRARY_v4.json, VIA_TW_Ticker_Master_v0210.py (all optional, all graceful).
   - CLI: --filename / --pdf / --docx / --json.
+
+v0104 (mother 批729; operator 2026-09-24 "報告後小字體不相關附錄可抓到局部識別券商"):
+  run(..., source_path=) reads the appendix small print of the last pages through VRN_Evidence_Core.appendix_evidence
+  (same deny gate).  It fills the broker ONLY when page 1 has no strong evidence (EMAIL / DISCLOSURE / ISSUER);
+  broker_tier then reads APPENDIX_<tier>.  An appendix issuer that disagrees with the filename broker is kept as
+  broker_conflict (REVIEW), never a silent win.  out["appendix"]["rating_scale"] carries the harvested rating
+  definitions (candidates only; no book is written).  --pdf passes its path.
+  Operator 2026-09-24 "所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE":
+  out["upside"] is now the mother's L99 answer through VRN_Evidence_Core.adj_basis (ENG073 adj_quote): target x
+  adj factor over the LATEST adj close, basis ADJ_LATEST, status DERIVED_ADJ or NO_ADJ with the reason; it also
+  carries the target and the day-before prices in ADJ CLOSE terms (target_price_adj, price_prev_adj, page_price_adj).
+  The page arithmetic (target / printed price) is kept as out["upside_page"], labelled as what it is (v0103 said
+  "latest adjusted close" but divided by the printed price).  A non-TWD target is never put on the TW adj close.
 """
 
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -61,7 +74,7 @@ except Exception:
 import re, os, sys, json, unicodedata, statistics, datetime
 from collections import defaultdict
 
-ENGINE_VERSION = "v0103"
+ENGINE_VERSION = "v0104"
 
 
 _CORE_MODNAME = "vrn_engine_evidence_core"
@@ -865,9 +878,10 @@ class PriceAdjustment:
         if target_currency != price_currency or target_basis != price_basis:
             return {"status": "BASIS_MISMATCH", "upside_pct": None, "target_price": target_price,
                     "current_price": current_price, "target_basis": target_basis, "price_basis": price_basis}
+        # v0104: the label says what was divided (run() passes the printed page price; the ADJ upside is separate)
         return {"status": "DERIVED", "upside_pct": round((target_price / current_price - 1.0) * 100.0, 2),
                 "target_price": target_price, "current_price": current_price, "price_date": price_date,
-                "formula": "(target / latest adjusted close - 1) * 100%"}
+                "price_basis": price_basis, "formula": "(target / current price given - 1) * 100%"}
 
 # =====================================================================
 # 8 · CROSS VALIDATION
@@ -1264,7 +1278,9 @@ class FourPointSummary:
             "header": header,
             "points": [
                 point(" / ".join(x for x in [rating and ("評等 " + rating), target and ("目標價 " + str(target)),
-                                            upside and upside.get("status") == "DERIVED" and ("上漲空間 %.2f%% (DERIVED)" % upside["upside_pct"])] if x),
+                                            upside and upside.get("status") == "DERIVED" and ("上漲空間 %.2f%% (DERIVED)" % upside["upside_pct"]),
+                                            upside and upside.get("status") == "DERIVED_ADJ" and
+                                            ("上漲空間 %.1f%% (ADJ;最新 adj close %s)" % (upside["upside_pct"], upside.get("price_date") or ""))] if x),
                       {"rating": rating, "target_price": target, "upside": upside}),
                 point(eps and ("稀釋 EPS " + str(eps)), {"eps_diluted": eps}),
                 point(momentum, {"momentum": momentum}),
@@ -1335,9 +1351,40 @@ class FirstPageEngine:
         except Exception:
             return None
 
+    def adj_upside(self, ticker, report_date, target_price, currency=None, page_price=None):
+        """v0104 (operator 2026-09-24): the upside over the LATEST adj close, with the target and the day-before
+        prices in ADJ CLOSE terms -- VRN_Evidence_Core.adj_basis (ENG073 adj_quote, the mother's one L99 formula).
+        status DERIVED_ADJ when the engine answers a number, else NO_ADJ with its state and reason.
+        self.adj_db names a market database explicitly (tests); self.use_adj = False switches the lookup off."""
+        up = {"status": "NO_ADJ", "basis": "ADJ_LATEST", "upside_pct": None, "target_price": target_price,
+              "formula": "(target x adj factor / latest adj close - 1) * 100%  [L99, ENG073 adj_quote]"}
+        cur = str(currency or "").upper()
+        if EVIDENCE_CORE is None or not hasattr(EVIDENCE_CORE, "adj_basis") or not getattr(self, "use_adj", True):
+            up.update(state="ADJ_OFF", why="the evidence core has no adj_basis (or use_adj is off)")
+            return up
+        if cur and cur not in ("TWD", "TWD?"):
+            up.update(state="ADJ_CURRENCY(%s)" % cur, why="a %s target is not put on the TW adj close" % cur)
+            return up
+        try:
+            q = EVIDENCE_CORE.adj_basis(ticker, report_date, target_price, db=getattr(self, "adj_db", None))
+        except Exception as exc:          # graceful: the page answer stays in upside_page
+            q = {"state": "ADJ_ERROR", "why": "%s: %s" % (type(exc).__name__, exc)}
+        fac = q.get("adj_factor")
+        up.update({
+            "status": "DERIVED_ADJ" if q.get("upside_adj") is not None else "NO_ADJ",
+            "upside_pct": q.get("upside_adj"), "target_price_adj": q.get("target_price_adj"),
+            "current_price": q.get("price_latest_adj"), "price_date": q.get("price_latest_date"),
+            "adj_factor": fac, "adj_factor_date": q.get("adj_factor_date"),
+            "price_prev_close": q.get("price_prev_close"), "price_prev_adj": q.get("price_prev_adj"),
+            "price_prev_date": q.get("price_prev_date"), "page_price": page_price,
+            "page_price_adj": round(page_price * fac, 4) if (page_price and fac) else None,
+            "report_age_days": q.get("report_age_days"), "target_freshness": q.get("target_freshness"),
+            "state": q.get("state"), "why": q.get("why") or "", "ticker": q.get("ticker"), "engine": q.get("engine")})
+        return up
+
     def run(self, filename, chars=None, title_codes=None, table_chars=None,
             per=None, eps=None, current_price=None, source_historical=None, report_historical=None,
-            official_name="", official_market=None, page_width=None, page_height=None):
+            official_name="", official_market=None, page_width=None, page_height=None, source_path=None):
         out = {"filename": filename, "engine": "VIA_VRN_FirstPageEngine " + ENGINE_VERSION,
                "governance": "append-only; raw+repaired coexist; LIVE off; no network"}
         if page_width or page_height:
@@ -1384,6 +1431,29 @@ class FirstPageEngine:
             out["broker_tier"] = ev.get("tier")
             out["broker_vs_filename"] = core.get("broker_vs_filename")
             out["broker_denied"] = ev.get("denied") or ({fnf["broker"]: 1} if denied else {})
+        # v0104 (mother 批729; operator 2026-09-24): the appendix small print on the last pages names the issuer.
+        # It fills the broker only when page 1 has no strong evidence; a strong page 1 is never overruled, and an
+        # appendix issuer that disagrees with the filename is flagged for review instead of silently winning.
+        if source_path and EVIDENCE_CORE is not None and hasattr(EVIDENCE_CORE, "appendix_evidence"):
+            try:
+                app = EVIDENCE_CORE.appendix_evidence(source_path, alias_table=self.brd.b, filename_broker=fnf["broker"])
+            except Exception as exc:          # graceful: the page-1 answer stands
+                app = {"state": "ERROR", "error": "%s: %s" % (type(exc).__name__, exc), "broker": {}, "rating_scale": []}
+            out["appendix"] = {"state": app.get("state"), "error": app.get("error"), "info": app.get("info"),
+                               "broker": (app.get("broker") or {}).get("broker"), "tier": (app.get("broker") or {}).get("tier"),
+                               "strong": bool((app.get("broker") or {}).get("strong")), "vs_filename": app.get("vs_filename"),
+                               "evidence": ((app.get("broker") or {}).get("evidence") or [])[:8],
+                               "denied": (app.get("broker") or {}).get("denied") or {},
+                               "rating_scale": app.get("rating_scale") or [], "n_lines": app.get("n_lines", 0)}
+            page_strong = out.get("broker_tier") in ("EMAIL", "DISCLOSURE", "ISSUER")
+            ab = out["appendix"]
+            if ab["strong"] and ab["broker"] and not page_strong:
+                if not fnf["broker"] or ab["broker"] == fnf["broker"]:
+                    out["broker_page"] = ab["broker"]
+                    out["broker"] = ab["broker"]
+                    out["broker_tier"] = "APPENDIX_" + str(ab["tier"])
+                else:
+                    out["broker_conflict"] = {"filename": fnf["broker"], "appendix": ab["broker"], "state": "REVIEW"}
         # spec section 4: a rating needs a structure, a rating label or the info zone; body prose alone is only a hint
         label_rx = re.compile(r"投資評等|投資評級|投資建議|評等|評級|rating|recommendation|目標價|target\s*price", re.I)
         evidence_lines = [l["text"] for l in lay.get("lines", [])
@@ -1456,6 +1526,14 @@ class FirstPageEngine:
         out["report_date_source"] = "PAGE" if page_date else ("FILENAME" if fnf["date"] else "")
         out["page_date"] = page_date
         out["date_conflict"] = bool(page_date and fnf["date"] and page_date != fnf["date"])
+        # v0104 (operator 2026-09-24): the upside is on the latest ADJ close; the page arithmetic stays as evidence
+        core_ok = bool(core and not core.get("error"))
+        adj_ticker = ((core.get("ticker") or {}).get("ticker") if core_ok else None) or res.get("ticker") or fnf["ticker"]
+        if core_ok and (core.get("report_type") or {}).get("type") not in (None, "", "STOCK"):
+            adj_ticker = None                 # industry / market / macro report: no covered company to price
+        out["upside_page"] = out["upside"]
+        out["upside"] = self.adj_upside(adj_ticker, out["report_date"], tp,
+                                        currency=out["target_prices"].get("currency"), page_price=cp)
 
         # cross validations
         out["xv_filename_vs_page"] = self.xv.filename_vs_page(
@@ -1630,7 +1708,7 @@ def main(argv=None):
         got = _chars_from_docx(args.docx)
         if got is not None:
             chars, size = got
-    result = engine.run(name, chars=chars, page_width=size[0], page_height=size[1])
+    result = engine.run(name, chars=chars, page_width=size[0], page_height=size[1], source_path=args.pdf)
     payload = json.dumps(result, ensure_ascii=False, indent=2, default=str)
     if args.json:
         with open(args.json, "w", encoding="utf-8") as handle:

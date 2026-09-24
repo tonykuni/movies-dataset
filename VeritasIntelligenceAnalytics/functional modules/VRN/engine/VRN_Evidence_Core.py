@@ -1,7 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-VRN_Evidence_Core v0101 -- one evidence rule set for both VRN engines.
+VRN_Evidence_Core v0102 -- one evidence rule set for both VRN engines.
+
+v0101 -> v0102 (mother 批729; operator 2026-09-24: "報告後小字體不相關附錄可抓到局部識別券商" and
+  "報告後方小字級附錄可抓到所有評等法可增加到同義字"):
+  appendix_lines() reads the small print of the LAST pages (page 1 excluded; small = glyph size below 0.9 x the
+  page-1 body size).  appendix_evidence() grades the issuer there with the SAME broker_evidence() and the same
+  deny gate; only the appendix call widens the disclosure test with the Chinese forms (版權所有 / 本報告由 /
+  免責聲明 ...), so page-1 grading is byte-identical to v0101 (the 106-report truth set was scored on it).
+  rating_scale() harvests the rating definitions printed there (買進(Buy):預期… / Outperform (OP): …) as
+  CANDIDATES: each word is KNOWN or NEW against the merged rating words; a NEW word gets a suggested key only when
+  its paired word is KNOWN (買進 ~ Buy).  Nothing is ever written to a book here (synonyms are only-add and go
+  through the hub).  CLI: python VRN_Evidence_Core.py appendix <pdf|folder>... [--out DIR] [--last N].
+  adj_basis() (operator 2026-09-24: "所有目標價及各前一日的價格都要換成 ADJ CLOSE,上漲空間都要用最新的 ADJ CLOSE"):
+  the target price and the day-before price in ADJ CLOSE terms and the upside over the latest ADJ CLOSE, delegated
+  to the ENG073 tail's adj_quote() (the mother's one L99 formula, 批659); the market database is opened read-only
+  and every miss has its own state (ADJ_NO_ENGINE / ADJ_NO_DB / ADJ_NO_DUCKDB / ADJ_DB_BUSY / the engine's own).
 
 v0100 -> v0101 (mother 批728: the sister's 2026-09-23 work brought home to its proper place):
   the two deny-listed CJK names are no longer spelled out in GENERIC_BROKER_ALIASES -- the mother's
@@ -65,7 +80,7 @@ import sys
 import unicodedata
 from collections import defaultdict
 
-CORE_VERSION = "v0101"
+CORE_VERSION = "v0102"
 
 # =====================================================================
 # PARAMETERS (all tunables live here; measured values say where they came from)
@@ -786,7 +801,7 @@ def _adjacent_to_code(low, start, end):
     return bool(_CODE_AFTER_RX.match(low[end:end + 12]) or _CODE_BEFORE_RX.search(low[max(0, start - 10):start]))
 
 
-def broker_evidence(lines, alias_table, filename_broker=None, rules=None):
+def broker_evidence(lines, alias_table, filename_broker=None, rules=None, disclosure_rx=None):
     """Who issued this report, graded by evidence tier.
 
     alias_table: {canonical: [aliases]} from the calling engine (its dictionary + knowledge).
@@ -864,7 +879,8 @@ def broker_evidence(lines, alias_table, filename_broker=None, rules=None):
         hits.sort()
         if not hits:
             continue
-        disclosure = bool(DISCLOSURE_RX.search(line))
+        # v0102: disclosure_rx is passed only by appendix_evidence(); page 1 keeps the v0101 test exactly
+        disclosure = bool(DISCLOSURE_RX.search(line)) or bool(disclosure_rx is not None and disclosure_rx.search(line))
         copyright_ = bool(COPYRIGHT_RX.search(line))
         source = bool(SOURCE_LINE_RX.search(line))
         zone = i < HEADER_LINES or i >= n - FOOTER_LINES
@@ -932,6 +948,311 @@ def compare_broker(filename_broker, page):
     if filename_broker in cands:
         return "PASS" if not (page or {}).get("strong") else "AMBIGUOUS"
     return "MISMATCH" if (page or {}).get("strong") else "INSUFFICIENT_EVIDENCE"
+
+
+# =====================================================================
+# APPENDIX SMALL PRINT (v0102, mother 批729)
+# =====================================================================
+# The last pages of a sell-side report carry the issuer's disclosures and the rating definitions in small print
+# (operator 2026-09-24).  Page 1 is never re-read here; the appendix only answers what page 1 could not.
+APPENDIX_PAGES = 3          # the last N pages (page 1 excluded) are read as the appendix
+SMALL_RATIO = 0.9           # small print = glyph size below SMALL_RATIO x the page-1 body size
+# Chinese / English disclosure forms, used ONLY for appendix lines (page-1 grading keeps DISCLOSURE_RX as it was)
+APPENDIX_DISCLOSURE_RX = re.compile(
+    r"(版權所有|著作權所有|本(?:研究)?報告(?:係|是)?由|免責聲明|重要聲明|揭露事項|利益衝突|分析師聲明|"
+    r"analyst\s+certification|important\s+disclosures?|disclaimer|all\s+rights\s+reserved|"
+    r"this\s+(?:research\s+)?report\s+(?:is|was|has\s+been)\s+(?:prepared|issued|published|produced)\s+by)", re.I)
+# a rating definition says what the word expects: return, relative performance, benchmark, a percentage
+RATING_DEF_SIGNAL_RX = re.compile(
+    r"(預期|報酬|表現|漲幅|跌幅|超越|落後|優於|劣於|大盤|指數|基準|%|％|expect|return|outperform|underperform|"
+    r"benchmark|relative|upside|downside|appreciat|depreciat)", re.I)
+_RS_CJK = re.compile(r"^\s*(?P<word>[\u4e00-\u9fff]{2,6})\s*(?:[(（]\s*(?P<alt>[A-Za-z][A-Za-z\- /]{0,24}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
+                     r"\s*[:：]\s*(?P<def>.+)$")
+_RS_LAT = re.compile(r"^\s*(?P<word>[A-Za-z][A-Za-z\-]{0,20}(?:\s[A-Za-z\-]{1,12}){0,2})\s*(?:[(（]\s*(?P<alt>[A-Za-z0-9+\-]{1,8}|[\u4e00-\u9fff]{2,6})\s*[)）])?"
+                     r"\s*[:：\-–—]\s*(?P<def>.+)$")
+_RS_ROW = re.compile(r"^\s*(?P<word>[\u4e00-\u9fff]{2,6})\s+(?P<alt>[A-Za-z][A-Za-z\-]{1,20}(?:\s[A-Za-z\-]{1,12})?)\s+(?P<def>.+)$")
+# headers and field labels that look like a definition row but are not a rating word
+_RS_NOT_A_RATING = re.compile(
+    r"^(?:投資)?評[等級](?:定義|說明|標準|制度|方式)?$|^(?:stock\s+|investment\s+)?ratings?(?:\s+(?:definitions?|system|scale|key|guide))?$|"
+    r"^(?:註|說明|備註|資料來源|來源|note|notes|source|sources|disclaimer|analyst|分析師|定義|definition)$|"
+    r"target|price|eps|目標|股價|價格|營收|盈餘|本益比|殖利率|yield|upside|downside|報酬率", re.I)
+
+
+def pdf_page_count(path):
+    """Number of pages of a PDF; 0 when no PDF library is installed or the file cannot be opened."""
+    try:
+        if importlib.util.find_spec("pdfplumber") is not None:
+            import pdfplumber
+            with pdfplumber.open(path) as pdf:
+                return len(pdf.pages)
+        if importlib.util.find_spec("fitz") is not None:
+            import fitz
+            doc = fitz.open(path)
+            try:
+                return len(doc)
+            finally:
+                doc.close()
+    except Exception:
+        return 0
+    return 0
+
+
+def _body_size(lines):
+    """Page-1 body size: the glyph size carrying the most characters (rounded to 0.5 pt); None without sizes."""
+    weight = defaultdict(int)
+    for l in lines or []:
+        size = float(l.get("size") or 0.0)
+        if size > 0:
+            weight[round(size * 2) / 2] += len(str(l.get("text", "")).strip())
+    return max(weight, key=lambda k: (weight[k], k)) if weight else None
+
+
+def appendix_lines(path, last_pages=APPENDIX_PAGES, small_only=True):
+    """Small-print lines of the report's last pages (page 1 excluded).
+    Returns (lines, info): lines = [{"page", "text", "size"}]; info says which pages were read, the page-1 body size
+    and the small-print threshold.  Not a PDF / one page only / no text layer = ([], info with the honest reason)."""
+    info = {"state": "NODATA", "pages": [], "n_pages": 0, "body_size": None, "threshold": None, "why": ""}
+    if not str(path).lower().endswith(".pdf"):
+        info["why"] = "appendix is read from PDF only"
+        return [], info
+    n = pdf_page_count(path)
+    info["n_pages"] = n
+    if n < 2:
+        info["why"] = "one page: no appendix" if n == 1 else "PDF unreadable or no PDF library"
+        return [], info
+    first = pdf_page_chars(path, 0)
+    body = _body_size(lines_from_chars(first[0])) if first else None
+    pages = list(range(max(1, n - int(last_pages)), n))
+    info["pages"] = [i + 1 for i in pages]
+    rows = []
+    for i in pages:
+        got = pdf_page_chars(path, i)
+        if not got:
+            continue
+        rows += [(i + 1, l) for l in lines_from_chars(got[0])]
+    if body is None:                         # page 1 without a text layer: fall back to the appendix pages themselves
+        body = _body_size([l for _, l in rows])
+    thr = round(body * SMALL_RATIO, 2) if body else None
+    info.update({"body_size": body, "threshold": thr})
+    out = []
+    for page, l in rows:
+        text = str(l.get("text", "")).strip()
+        if not text:
+            continue
+        size = float(l.get("size") or 0.0)
+        if small_only and (thr is None or size <= 0 or size >= thr):
+            continue
+        out.append({"page": page, "text": text, "size": size})
+    info["state"] = "OK" if out else "EMPTY"
+    if not out:
+        info["why"] = "no small print on the last pages" if rows else "no text layer on the last pages"
+    return out, info
+
+
+def _rating_word_is_label(word):
+    return bool(_RS_NOT_A_RATING.search(str(word or "").strip()))
+
+
+def rating_scale(lines, rules=None, words=None):
+    """Rating definitions printed in the appendix -> candidates [{word, alt, word_known, alt_known, canonical,
+    suggested, definition, page, line}].  KNOWN / NEW is judged against the merged rating words (the same words the
+    engines use); a NEW word is suggested a key ONLY through its KNOWN pair (買進(Buy) · Outperform (增加持股)).
+    Candidates only: this function never writes a book."""
+    words = words or merged_rating_words(rules if rules is not None else load_rules())
+    out, seen = [], set()
+    for idx, item in enumerate(lines or []):
+        text = item.get("text", "") if isinstance(item, dict) else str(item)
+        page = item.get("page") if isinstance(item, dict) else None
+        m = None
+        for rx in (_RS_CJK, _RS_LAT, _RS_ROW):
+            m = rx.match(text)
+            if m:
+                break
+        if not m:
+            continue
+        word = re.sub(r"\s+", " ", m.group("word")).strip()
+        alt = re.sub(r"\s+", " ", (m.group("alt") or "")).strip() or None
+        definition = m.group("def").strip()
+        if not RATING_DEF_SIGNAL_RX.search(definition) or _rating_word_is_label(word) or (alt and _rating_word_is_label(alt)):
+            continue
+        key = (word.lower(), (alt or "").lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        wc, _ = normalize_rating_word(word, words)
+        ac, _ = normalize_rating_word(alt, words) if alt else (None, None)
+        suggested = None
+        if wc is None and ac is not None:
+            suggested = ac
+        elif ac is None and wc is not None and alt:
+            suggested = wc
+        out.append({"word": word, "alt": alt, "word_known": wc is not None, "alt_known": ac is not None,
+                    "canonical": wc or ac, "suggested": suggested, "definition": definition[:160],
+                    "page": page, "line": idx})
+    return out
+
+
+def appendix_evidence(path, alias_table=None, filename_broker=None, rules=None, last_pages=APPENDIX_PAGES):
+    """Issuer and rating scale from the appendix small print.
+    broker = broker_evidence() on the small-print lines with the SAME deny gate; the appendix-only disclosure forms
+    make '本報告由凱基證券投資顧問…發佈' / '© … 版權所有' strong.  vs_filename = compare_broker() on that result."""
+    lines, info = appendix_lines(path, last_pages)
+    texts = [l["text"] for l in lines]
+    if texts:
+        ev = broker_evidence(texts, alias_table or {}, filename_broker=filename_broker, rules=rules,
+                             disclosure_rx=APPENDIX_DISCLOSURE_RX)
+        for e in ev.get("evidence", []):
+            li = e.get("line")
+            if isinstance(li, int) and 0 <= li < len(lines):
+                e["page"] = lines[li]["page"]
+    else:
+        ev = {"broker": None, "tier": "NONE", "strong": False, "candidates": {}, "evidence": [], "denied": {}}
+    return {"state": info["state"], "info": info, "broker": ev,
+            "vs_filename": compare_broker(filename_broker, ev) if filename_broker else "N/A",
+            "rating_scale": rating_scale(lines, rules=rules), "n_lines": len(lines)}
+
+
+def ssot_alias_table(start=None):
+    """{canonical: [names]} from the institution SSOT (for callers without an engine dictionary, e.g. the CLI)."""
+    inst = institution_ssot(start) or {}
+    regs = inst.get("registries") or {}
+    out = defaultdict(set)
+    for grp in ("domestic_brokers", "foreign_brokers"):
+        for key, spec in (regs.get(grp) or {}).items():
+            spec = spec if isinstance(spec, dict) else {}
+            for name in [key, spec.get("english_name"), spec.get("chinese_name")] + list(spec.get("aliases") or []):
+                if name and len(str(name).strip()) >= 2:
+                    out[str(key).upper()].add(str(name).strip())
+    return {k: sorted(v) for k, v in out.items()}
+
+
+# =====================================================================
+# 4c . ADJ CLOSE BASIS (mother 批729; operator 2026-09-24: "所有目標價及各前一日的價格都要換成 ADJ CLOSE,
+#      上漲空間都要用最新的 ADJ CLOSE")
+# =====================================================================
+# The formula is the mother's L99 (批659 operator ruling) and it lives in ONE place, the ENG073 tail's
+# adj_quote(): factor = adj_close / close on the trading day before the report date, target x factor,
+# upside over the latest adj_close.  This section only finds that tail and the market database and passes the
+# answer on (LL404: no second head).  Read-only: the database is opened read_only and nothing is written.
+ADJ_ENGINE_GLOB = ("functional modules/VRN", "VRN_ENG073_ReportStructuredDB_v*.py")
+ADJ_MISS_STATES = ("ADJ_NO_ENGINE", "ADJ_NO_DB", "ADJ_NO_DUCKDB", "ADJ_DB_BUSY", "ADJ_ERROR")
+_ADJ_CACHE = {}
+
+
+def adj_engine(start=None):
+    """(module | None, why): the newest ENG073 that carries adj_quote() (v0137+); loaded once per tree."""
+    root = repo_root(start)
+    key = ("engine", root)
+    if key in _ADJ_CACHE:
+        return _ADJ_CACHE[key]
+    folder, pattern = ADJ_ENGINE_GLOB
+    hits = sorted(glob.glob(os.path.join(root, folder, pattern)), key=_version_of)
+    mod, why = None, "no %s under %s" % (pattern, folder)
+    if hits:
+        name = os.path.basename(hits[-1])
+        try:
+            spec = importlib.util.spec_from_file_location("_vrn_adj_eng073", hits[-1])
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = mod
+            spec.loader.exec_module(mod)
+            why = name
+            if not hasattr(mod, "adj_quote"):
+                mod, why = None, "%s has no adj_quote() (v0137+)" % name
+        except Exception as exc:
+            sys.modules.pop("_vrn_adj_eng073", None)
+            mod, why = None, "%s failed to load: %s: %s" % (name, type(exc).__name__, str(exc)[:80])
+    _ADJ_CACHE[key] = (mod, why)
+    return mod, why
+
+
+def adj_db(db=None, start=None):
+    """(path | None, why).  An explicit db wins; otherwise the ENG073 resolver (VIA_DB_VDF_TW_MARKET >
+    VIA_DATA_HOME > the mega path > a tree search), resolved once per tree and environment; its console lines are
+    kept in `why` instead of printed."""
+    if db:
+        return (str(db), "explicit") if os.path.isfile(str(db)) else (None, "explicit db missing: %s" % db)
+    mod, why = adj_engine(start)
+    if mod is None or not hasattr(mod, "_resolve_db"):
+        return None, why if mod is None else "the engine has no database resolver"
+    key = ("db", repo_root(start), os.environ.get("VIA_DB_VDF_TW_MARKET"), os.environ.get("VIA_DATA_HOME"))
+    if key in _ADJ_CACHE:
+        return _ADJ_CACHE[key]
+    import contextlib
+    import io
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            path = mod._resolve_db(None)
+    except Exception as exc:
+        path = None
+        buf.write("%s: %s" % (type(exc).__name__, exc))
+    said = " ".join(buf.getvalue().split())[:240]
+    _ADJ_CACHE[key] = (str(path), said or "resolved") if path else (None, said or "not found")
+    return _ADJ_CACHE[key]
+
+
+def _adj_ticker(ticker):
+    """'2330' / '2330.TW' / '6147.TWO' / '2330 TT' / '00878' -> the bare code; None without one."""
+    m = re.search(r"(?<![0-9A-Za-z])(\d{4,6}[A-Z]?)(?=$|[^0-9A-Za-z]|\.TWO?\b|TT\b)", str(ticker or "").strip())
+    return m.group(1) if m else None
+
+
+def _adj_date(value):
+    """'2026-05-19' / '2026/5/19' / '20260519' / '2026年5月19日' -> '2026-05-19'; None when it is not a date."""
+    s = str(value or "").strip()
+    m = re.fullmatch(r"((?:19|20)\d{2})(\d{2})(\d{2})", s) or \
+        re.match(r"((?:19|20)\d{2})\s*[-/.年]\s*(\d{1,2})\s*[-/.月]\s*(\d{1,2})", s)
+    if not m:
+        return None
+    try:
+        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3))).isoformat()
+    except ValueError:
+        return None
+
+
+def adj_basis(ticker, report_date, target_price, db=None, start=None):
+    """Target price and the day-before price in ADJ CLOSE terms; upside over the latest ADJ CLOSE.
+    Delegates to ENG073 adj_quote() and returns its fields (adj_factor, target_price_adj, price_prev_close /
+    price_prev_adj / price_prev_date, price_latest_adj / price_latest_date, upside_adj, upside_adj_state, ...).
+    state = the engine's upside_adj_state (ADJ_OK / ADJ_NO_KEY / ADJ_NO_TARGET / ADJ_NO_FACTOR / ADJ_NO_LATEST /
+    ADJ_ABSURD(...)), or one of ADJ_MISS_STATES when the answer could not be asked for; never a made-up 1.0."""
+    tk, rd = _adj_ticker(ticker), _adj_date(report_date)
+    try:
+        tp = float(target_price) if target_price not in (None, "") else None
+    except (TypeError, ValueError):
+        tp = None
+    out = {"state": None, "why": "", "engine": None, "db": None, "ticker": tk, "report_date": rd, "target_price": tp}
+    mod, why = adj_engine(start)
+    if mod is None:
+        out.update(state="ADJ_NO_ENGINE", why=why)
+        return out
+    out["engine"] = why
+    path, why = adj_db(db, start)
+    out["db"] = path
+    if not path:
+        out.update(state="ADJ_NO_DB", why=why)
+        return out
+    try:
+        import duckdb
+    except ImportError:
+        out.update(state="ADJ_NO_DUCKDB", why="duckdb is not installed")
+        return out
+    try:
+        con = duckdb.connect(path, read_only=True)
+    except Exception as exc:          # a writer holds the file, or this process opened it read-write
+        out.update(state="ADJ_DB_BUSY", why="%s: %s" % (type(exc).__name__, str(exc)[:160]))
+        return out
+    try:
+        q = mod.adj_quote(con, tk, rd, tp)
+    except Exception as exc:
+        out.update(state="ADJ_ERROR", why="%s: %s" % (type(exc).__name__, str(exc)[:160]))
+        return out
+    finally:
+        con.close()
+    out.update(q)
+    out["state"] = q.get("upside_adj_state")
+    out["why"] = q.get("adj_block_reason") or ""
+    return out
 
 
 # =====================================================================
@@ -1884,3 +2205,129 @@ def pdf_column_tables(path, pages=3):
         out += column_tables(chars, idx + 1)
         out += transposed_tables(chars, idx + 1)
     return out
+
+
+# =====================================================================
+# CLI (v0102): appendix harvest.  Reads only; writes a report under VIA_Reports/vrn_appendix, never a book.
+# =====================================================================
+def _appendix_report_md(rep):
+    out = ["# VRN 附錄小字收割(VRN_Evidence_Core " + CORE_VERSION + ")", "",
+           f"- 產生:{rep['generated']} · 檔數 {rep['n_files']} · 讀到附錄小字 {rep['n_with_small_print']} · "
+           f"附錄強證定出券商 {rep['n_strong_broker']} · 評等定義 {rep['n_scale_lines']} 行 · 新詞 {len(rep['new_words'])} 個", "",
+           "## 新評等詞(候選;只增不減要經樞紐,這裡不寫任何冊)", "",
+           "| 詞 | 配對詞 | 建議鍵 | 出現 | 例 |", "|---|---|---|---|---|"]
+    for w in rep["new_words"]:
+        out.append(f"| {w['word']} | {' / '.join(w['alts']) or '-'} | {' / '.join(w['suggested']) or '待裁定'} | {w['count']} | "
+                   f"{(w['examples'][0] if w['examples'] else '')[:60]} |")
+    out += ["", "## 逐檔", "", "| 檔 | 頁 | 附錄小字行 | 附錄券商 | 層級 | 對檔名 | 評等定義 |", "|---|---|---|---|---|---|---|"]
+    for f in rep["files"]:
+        out.append(f"| {f['file']} | {f['n_pages']} | {f['n_lines']} | {f['broker'] or '-'} | {f['tier']} | {f['vs_filename']} | {f['n_scale']} |")
+    return "\n".join(out) + "\n"
+
+
+def _adj_cli(a):
+    """adj <ticker> <report date> [target] [--db path]: one ADJ CLOSE answer, printed (read-only)."""
+    db = None
+    if "--db" in a:
+        k = a.index("--db")
+        db = a[k + 1] if k + 1 < len(a) else None
+        a = a[:k] + a[k + 2:]
+    if len(a) < 2:
+        print("[ADJ] 用法:python VRN_Evidence_Core.py adj <代號> <報告日> [目標價] [--db 庫]")
+        return 2
+    q = adj_basis(a[0], a[1], a[2] if len(a) > 2 else None, db=db)
+    print("[ADJ] %s %s 目標價 %s → %s" % (q["ticker"], q["report_date"], q["target_price"], q["state"]))
+    for key, label in (("target_price_adj", "目標價(ADJ)"), ("adj_factor", "因子"), ("adj_factor_date", "因子日"),
+                       ("price_prev_close", "前一日收盤"), ("price_prev_adj", "前一日 ADJ CLOSE"), ("price_prev_date", "前一日"),
+                       ("price_latest_adj", "最新 ADJ CLOSE"), ("price_latest_date", "最新日"), ("upside_adj", "上漲空間 %")):
+        if q.get(key) not in (None, ""):
+            print("  %-16s %s" % (label, q[key]))
+    if q.get("why"):
+        print("  因由 " + q["why"])
+    print("  引擎 %s · 庫 %s" % (q.get("engine"), q.get("db")))
+    return 0 if q["state"] and q["state"] not in ADJ_MISS_STATES else 2
+
+
+def main(argv=None):
+    a = list(sys.argv[1:] if argv is None else argv)
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+    if a and a[0] == "adj":
+        return _adj_cli(a[1:])
+    if not a or a[0] != "appendix":
+        print("VRN_Evidence_Core " + CORE_VERSION + " · 用法:python VRN_Evidence_Core.py appendix <pdf|資料夾>... [--out 夾] [--last N]"
+              " | adj <代號> <報告日> [目標價] [--db 庫]")
+        return 0 if not a else 2
+    out_dir, last, targets, i = None, APPENDIX_PAGES, [], 1
+    while i < len(a):
+        if a[i] == "--out" and i + 1 < len(a):
+            out_dir, i = a[i + 1], i + 2
+        elif a[i] == "--last" and i + 1 < len(a):
+            last, i = max(1, int(a[i + 1])), i + 2
+        else:
+            targets.append(a[i])
+            i += 1
+    files = []
+    for t in targets:
+        p = os.path.abspath(t)
+        if os.path.isdir(p):
+            for root, _dirs, names in os.walk(p):
+                files += [os.path.join(root, n) for n in sorted(names) if n.lower().endswith(".pdf")]
+        elif p.lower().endswith(".pdf") and os.path.isfile(p):
+            files.append(p)
+    if not files:
+        print("[附錄] NODATA · 沒有 PDF(給檔或資料夾;附錄只讀 PDF)")
+        return 2
+    rules = load_rules()
+    table = ssot_alias_table()
+    rows, new = [], {}
+    for k, f in enumerate(files, 1):
+        print(f"[進度] {k}/{len(files)} 附錄 {os.path.basename(f)}", flush=True)
+        try:
+            ev = appendix_evidence(f, alias_table=table, rules=rules, last_pages=last)
+        except Exception as exc:
+            rows.append({"file": os.path.basename(f), "n_pages": 0, "n_lines": 0, "broker": None, "tier": "ERROR",
+                         "strong": False, "vs_filename": "N/A", "n_scale": 0, "error": f"{type(exc).__name__}: {exc}"[:160]})
+            continue
+        b = ev["broker"]
+        rows.append({"file": os.path.basename(f), "n_pages": ev["info"].get("n_pages"), "n_lines": ev["n_lines"],
+                     "broker": b.get("broker"), "tier": b.get("tier"), "strong": bool(b.get("strong")),
+                     "vs_filename": ev["vs_filename"], "n_scale": len(ev["rating_scale"]), "state": ev["state"],
+                     "why": ev["info"].get("why", "")})
+        for r in ev["rating_scale"]:
+            for word, known, other in ((r["word"], r["word_known"], r["alt"]), (r["alt"], r["alt_known"], r["word"])):
+                if not word or known:
+                    continue
+                w = new.setdefault(word, {"word": word, "count": 0, "alts": set(), "suggested": set(), "examples": [], "files": set()})
+                w["count"] += 1
+                if other:
+                    w["alts"].add(other)
+                if r["suggested"]:
+                    w["suggested"].add(r["suggested"])
+                if len(w["examples"]) < 2:
+                    w["examples"].append(r["definition"])
+                w["files"].add(os.path.basename(f))
+    new_words = sorted(({**w, "alts": sorted(w["alts"]), "suggested": sorted(w["suggested"]), "files": sorted(w["files"])[:5]}
+                        for w in new.values()), key=lambda x: (-x["count"], x["word"]))
+    rep = {"engine": "VRN_Evidence_Core " + CORE_VERSION, "generated": __import__("time").strftime("%Y-%m-%dT%H:%M:%S"),
+           "n_files": len(rows), "n_with_small_print": sum(1 for r in rows if r.get("n_lines")),
+           "n_strong_broker": sum(1 for r in rows if r.get("strong")), "n_scale_lines": sum(r.get("n_scale", 0) for r in rows),
+           "new_words": new_words, "files": rows, "last_pages": last}
+    root = repo_root() or os.getcwd()
+    target = out_dir or os.path.join(str(root), "VIA_Reports", "vrn_appendix")
+    os.makedirs(target, exist_ok=True)
+    stamp = __import__("time").strftime("%Y%m%d_%H%M%S")
+    for name in ("APPENDIX_" + stamp + ".json", "APPENDIX_latest.json"):
+        with open(os.path.join(target, name), "w", encoding="utf-8") as h:
+            h.write(json.dumps(rep, ensure_ascii=False, indent=1) + "\n")
+    with open(os.path.join(target, "APPENDIX_latest.md"), "w", encoding="utf-8") as h:
+        h.write(_appendix_report_md(rep))
+    print(f"[附錄] 檔 {rep['n_files']} · 讀到附錄小字 {rep['n_with_small_print']} · 附錄強證定出券商 {rep['n_strong_broker']} · "
+          f"評等定義 {rep['n_scale_lines']} 行 · 新詞 {len(new_words)} 個 → {os.path.join(target, 'APPENDIX_latest.md')}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-VRN_AutoTestLoop v0102 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+VRN_AutoTestLoop v0103 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
 
+v0102→v0103(母倉 批729;操作員 2026-09-24「報告後小字體不相關附錄可抓到局部識別券商」「報告後方小字級附錄可抓到所有評等法可增加到同義字」):
+  G07 把檔案路徑交給首頁引擎(PDF 才讀附錄);每檔記下附錄小字的券商、層級、是否用上、與檔名是否衝突與評等定義。
+  報告多 appendix 摘要與 appendix_new_rating_words;RATING_SCALE_CANDIDATES.json 落在本輪工作夾——候選而已,
+  同義字只增不減要經樞紐,迴圈不寫任何冊。主控台多印一行 [附錄]。
+  操作員同日「所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE」:首頁引擎 v0104 的上漲空間
+  改走 ENG073 adj_quote(最新 ADJ CLOSE);每檔記下 ADJ 狀態,報告多 adj 摘要(算出幾檔、其餘各卡在哪一種),
+  主控台多印一行 [ADJ]。這一行是量測,不是關卡:缺價(例如上市所價還沒進庫)照實報名字,不判 FAIL。
 v0101→v0102(母倉 批728 收回:姊妹倉 festive-ptolemy 41ce6d4/34d91ac 的成果搬回母倉正位):
     +--selftest 自測門(VRN/tests 全部單元測試 + 合成語料 8 檔一輪):六層鏈與全格子都敲這一扇;
     G10 母倉模式(工具讀正本、三支自測、拒絕清單/負控/同義字對帳照跑);名冊讀收容副本;每檔印 [進度] k/K。
@@ -85,7 +92,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-LOOP_VERSION = "v0102"
+LOOP_VERSION = "v0103"
 HERE = Path(__file__).resolve().parent
 VRN_ROOT = HERE.parent
 REPO_ROOT = VRN_ROOT.parent.parent if (VRN_ROOT.parent.name == "functional modules") else VRN_ROOT
@@ -100,6 +107,8 @@ ENGINE_FILES = {
 }
 VCGC_SYNC = REPO_ROOT / "scripts" / "VIA_VCGC_Sync.py"
 LAST_FIRST_PAGE: Dict[str, Dict[str, Any]] = {}      # per-file first-page answers of the current round (G11)
+LAST_APPENDIX: Dict[str, Dict[str, Any]] = {}        # v0103 (批729): per-file appendix small print (broker + rating scale)
+LAST_ADJ: Dict[str, Dict[str, Any]] = {}             # v0103 (批729): per-file ADJ CLOSE upside (state, value, reason)
 LAST_SAMPLES: Dict[str, Path] = {}                    # file name -> sample path of the current round
 TRUTH_CRITICAL = ("type", "ticker", "broker", "page_date", "rating", "target_price", "current_price")
 AUDIT_DIR = VRN_ROOT / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100"
@@ -722,7 +731,8 @@ def def_gate_first_page(engines: Engines, truth: List[Dict[str, Any]], samples: 
         try:
             got = module._chars_from_pdf(str(path)) if suffix == ".pdf" else module._chars_from_docx(str(path))
             chars, size = (got if got is not None else (None, (None, None)))
-            out = fpe.run(name, chars=chars, page_width=size[0], page_height=size[1])
+            out = fpe.run(name, chars=chars, page_width=size[0], page_height=size[1],
+                          source_path=str(path) if suffix == ".pdf" else None)
         except Exception as error:  # noqa: BLE001
             rows.append(def_row("G07 FIRSTPAGE", name, "FAIL", f"{error.__class__.__name__}: {error}"[:300], stage="S05 ACCEL_MOUNT"))
             continue
@@ -768,6 +778,17 @@ def def_gate_first_page(engines: Engines, truth: List[Dict[str, Any]], samples: 
             "current_price": out.get("current_price"), "company": out.get("company_name_page"),
             "analysts": [a.get("name") for a in out.get("analysts", []) or []] + [a.get("alias") for a in out.get("analysts", []) or [] if a.get("alias")],
             "text_layer": bool(chars)}
+        if out.get("appendix") is not None:
+            LAST_APPENDIX[name] = {"state": out["appendix"].get("state"), "broker": out["appendix"].get("broker"),
+                                   "tier": out["appendix"].get("tier"), "strong": out["appendix"].get("strong"),
+                                   "used": str(out.get("broker_tier") or "").startswith("APPENDIX_"),
+                                   "conflict": out.get("broker_conflict"), "n_lines": out["appendix"].get("n_lines", 0),
+                                   "rating_scale": out["appendix"].get("rating_scale") or []}
+        up = out.get("upside") or {}
+        if up.get("basis") == "ADJ_LATEST":
+            LAST_ADJ[name] = {"state": up.get("state"), "upside_adj": up.get("upside_pct"), "why": up.get("why") or "",
+                              "has_target": out["target_prices"].get("primary") is not None,
+                              "upside_page": (out.get("upside_page") or {}).get("upside_pct")}
         status = "FAIL" if problems else ("WARN" if warns else "PASS")
         rows.append(def_row("G07 FIRSTPAGE", name, status, "; ".join(problems + warns), ticker=out["ticker"]["ticker"],
                             rating=out["rating"]["canonical"], target=out["target_prices"]["primary"], broker=out["broker"],
@@ -1256,6 +1277,8 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
                   state: Dict[str, Any]) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     LAST_FIRST_PAGE.clear()
+    LAST_APPENDIX.clear()
+    LAST_ADJ.clear()
     LAST_SAMPLES.clear()
     def_say(f"[ROUND {round_no}] G01 編譯 · G02 自測 · G03 檔名 oracle" + ("" if args.no_audit else " · G04 稽核"))
     rows += def_gate_compile()
@@ -1401,6 +1424,52 @@ def def_selftest() -> int:
     return 1 if fails else 0
 
 
+def def_appendix_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """v0103 (批729): the appendix small print of the round, summed.  New rating words are CANDIDATES only --
+    synonyms are only-add and go through the hub; this loop never writes a book."""
+    new: Dict[str, Dict[str, Any]] = {}
+    for name, a in per_file.items():
+        for r in a.get("rating_scale") or []:
+            for word, known, other in ((r.get("word"), r.get("word_known"), r.get("alt")),
+                                       (r.get("alt"), r.get("alt_known"), r.get("word"))):
+                if not word or known:
+                    continue
+                w = new.setdefault(word, {"word": word, "count": 0, "alts": [], "suggested": [], "examples": [], "files": []})
+                w["count"] += 1
+                if other and other not in w["alts"]:
+                    w["alts"].append(other)
+                if r.get("suggested") and r["suggested"] not in w["suggested"]:
+                    w["suggested"].append(r["suggested"])
+                if len(w["examples"]) < 2:
+                    w["examples"].append(r.get("definition"))
+                if name not in w["files"] and len(w["files"]) < 5:
+                    w["files"].append(name)
+    vals = list(per_file.values())
+    return {"n_files": len(vals), "n_with_small_print": sum(1 for a in vals if a.get("n_lines")),
+            "n_used": sum(1 for a in vals if a.get("used")), "n_conflict": sum(1 for a in vals if a.get("conflict")),
+            "n_scale_lines": sum(len(a.get("rating_scale") or []) for a in vals),
+            "new_words": sorted(new.values(), key=lambda x: (-x["count"], x["word"]))}
+
+
+def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """v0103 (批729): the ADJ CLOSE upside of the round, counted by state (ADJ_OK(因子1…) counts as ADJ_OK,
+    ADJ_ABSURD(…) as ADJ_ABSURD).  A measurement, not a gate: a missing price row is named, never a FAIL."""
+    states: Dict[str, int] = {}
+    why: Dict[str, int] = {}
+    for a in per_file.values():
+        key = str(a.get("state") or "NONE").split("(")[0]
+        states[key] = states.get(key, 0) + 1
+        if a.get("why") and a.get("upside_adj") is None and a.get("has_target"):
+            reason = str(a["why"])[:80]
+            why[reason] = why.get(reason, 0) + 1
+    vals = list(per_file.values())
+    return {"n_files": len(vals), "n_with_target": sum(1 for a in vals if a.get("has_target")),
+            "n_adj": sum(1 for a in vals if a.get("upside_adj") is not None),
+            "states": dict(sorted(states.items(), key=lambda kv: (-kv[1], kv[0]))),
+            "why": [{"reason": r, "count": n} for r, n in sorted(why.items(), key=lambda kv: (-kv[1], kv[0]))[:6]],
+            "files": {name: a for name, a in sorted(per_file.items())}}
+
+
 def def_main(argv: Optional[Sequence[str]] = None) -> int:
     if argv is None and "--selftest" in sys.argv[1:]:
         try:
@@ -1486,6 +1555,22 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
         "truth_summary": state.get("truth_summary", {}), "fieldspec": state.get("fieldspec", []),
         "vcgc": (engines.core.vcgc_status() if engines.core is not None else {}),
     }
+    appendix = def_appendix_summary(LAST_APPENDIX)
+    report["appendix"] = {k: v for k, v in appendix.items() if k != "new_words"}
+    report["appendix_new_rating_words"] = appendix["new_words"]
+    if appendix["n_files"]:
+        (workdir / "RATING_SCALE_CANDIDATES.json").write_text(
+            json.dumps(appendix["new_words"], ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        if not args.quiet:
+            print(f"[附錄] 讀到附錄小字 {appendix['n_with_small_print']}/{appendix['n_files']} 檔 · "
+                  f"附錄定出券商 {appendix['n_used']} 檔 · 與檔名不一致待看 {appendix['n_conflict']} 檔 · "
+                  f"評等定義 {appendix['n_scale_lines']} 行 · 新詞 {len(appendix['new_words'])} 個(候選,不寫冊)")
+    adj = def_adj_summary(LAST_ADJ)
+    report["adj"] = adj
+    if adj["n_files"] and not args.quiet:
+        top = " · ".join(f"{k} {v}" for k, v in adj["states"].items() if k != "ADJ_OK")
+        print(f"[ADJ] 上漲空間用最新 ADJ CLOSE:算出 {adj['n_adj']}/{adj['n_with_target']} 檔(有目標價者)"
+              + (f" · 其餘 {top}" if top else "") + (f" · 最多的因由:{adj['why'][0]['reason']}" if adj["why"] else ""))
     json_path = Path(args.json) if args.json else workdir / "VRN_AutoTest_Report.json"
     html_path = Path(args.html) if args.html else workdir / "VRN_AutoTest_Report.html"
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
