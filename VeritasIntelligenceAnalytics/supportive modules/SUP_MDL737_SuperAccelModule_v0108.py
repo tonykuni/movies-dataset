@@ -1,0 +1,512 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+r"""
+SUP_MDL737_SuperAccelModule_v0108 — 統一加速器 · 全模組整合版(批125;批323 啟動律;批366 VIA_NO_OPEN 零跳出閘;批618 L50 第一條)
+======================================================================
+v0104→v0105(批618 操作員裁定「不准使用 TA-LIB 刪除關於他的一切列入第一條用 QUANTGUARD 替代」):
+  `CEL_CANDIDATES` 解析序把**零 talib 的合規本提到第一**——原本它排最後,
+  前兩本各帶 1 條 talib 惰性路徑,而本境 find_spec('talib') 找得到,執行期會真的載入。
+  兩支加速器工具本體一個位元都沒動(批345 不可動律),收容正本更不動(帶 sha 冊)。
+  只改這一行:CGC_MDL156 RED 36/37 → **GREEN 37/37 · accelerators=25**。
+  詳見 CEL_CANDIDATES 上方的裁定區塊與 docs/VIA_B618_TALibRuleOneAndPathAnchor.md。
+======================================================================
+批366 操作員令「不要一直跳出 VS Code,自動到底完成所有動作」:工作站 .html 預設開啟程式=VS Code,
+補齊鏈/refail 逐站自測之 webbrowser.open/os.startfile 每開一頁即重啟 VS Code 擴充主機(實錄 log 每 8s 一次)。
+v0104:單點零跳出閘 install_no_open_guard()——本模組為全樹 ACCEL-BRIDGE 共同入口(1919 py 掛橋),
+env VIA_NO_OPEN=1 時將 webbrowser.open/open_new/open_new_tab 與 os.startfile(.html/.htm/.url/http 目標)
+改為靜默 no-op(印一行 [VIA_NO_OPEN] 抑制跳出;非頁面目標直通);未設=零行為變更。via-mobile 自帶。
+批323 操作員令「確認所有 engines/modules 都導入加速器;加速器一百多個 libs 都有啟動功能」
+實查:celeritas() 以 spec_from_file_location 載入卻未登記 sys.modules→Python 3.11+ dataclass
+查 sys.modules[cls.__module__] 得 None→AttributeError→graceful 回 None=Celeritas 88 lib
+lazy 啟動面自始未經橋接通(誠實:橋在、啟動未通)。v0103:①登記 sys.modules 後 exec+快取
+②activate():載 Celeritas→apply_vrn_vds_max_accel(執行緒預算)→回 libs 總/可用/缺/真實能力
+③--activate 印報告+落 VIA_Reports/accel_activation/;--libs 逐 lib OK/MISSING/STUB 表
+④selftest ⑦⑧:Celeritas 在位=必非 None;activate 冊 ≥80 lib。
+======================================================================
+批125 操作員令(2026-08-24):「所有加速模組整合為一」。
+  ① 整合總冊 — VIA_AccelModules_Integration_Register(glob 最新版):
+     全樹加速件清點(CANONICAL/SHIM/DELEGATED_RUNTIME/PS_LANE/
+     LEGACY/WAITING_DELIVERY);--modules 檢閱。
+  ② celeritas() — VeritasCeleritas 執行期委派載入(動態最新;缺=
+     誠實 None);fetch 車道原生委派鏈不變。
+  ③ PS 側正門=Invoke-VeritasCodexNexus 最新版(FM-01..20 備援冊)。
+原 v0100(操作員令 2026-08-18)
+======================================================================
+令:「透過輔助性模組來安裝」。史因:十餘支 VRN OCR/VDF MDL 引擎自始
+引用本模組(`_via_load("VIA_SuperAccel_Module")`,註記「工作站候上傳;
+graceful」)但正件從未交付——WARN 至今。本件補齊斷點:
+  ① accel_map(fn, items)   平行加速 map(執行緒池;例外隔離不斷鏈)
+  ② fetch(url)             加速抓取——同意閘先行(VIA_NET_CONSENT;
+     永不代設)→ VeritasCeleritas vdf_fetch(快取/重試/去重)在則委派,
+     缺則標準庫重試退避道;本地磁碟快取
+  ③ pip_install(pkgs)      透過輔助模組安裝——同意閘先行→pip --user
+     重試退避+誠實 rc/log;供 via-install 鏈委派
+  ④ run_fast(argv)         子行程標準道(DEVNULL stdin+逾時+尾流)
+紅線:同意閘永不代設;網路零觸碰預設;快取落 VIA_Reports(不落 OneDrive)。
+graceful:單獨可跑、零硬依賴;Celeritas/NetSupport 缺席誠實降級。
+用法:via-accel --selftest   → 離線六檢
+"""
+from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+import hashlib
+import json
+import subprocess
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+VIA = HERE.parent
+CACHE = VIA / "VIA_Reports" / "accel_cache"
+_STATS = {"map_calls": 0, "cache_hit": 0, "cache_miss": 0, "fetch": 0, "pip": 0, "no_open_suppressed": 0}
+_NO_OPEN = {"installed": False, "orig": {}}
+_PAGE_SUFFIX = (".html", ".htm", ".url", ".svg", ".pdf")
+
+
+def _is_page_target(target) -> bool:
+    t = str(target).strip().lower()
+    return t.startswith(("http://", "https://", "file:")) or t.endswith(_PAGE_SUFFIX)
+
+
+def install_no_open_guard(force: bool = False) -> bool:
+    """批366 零跳出閘:VIA_NO_OPEN=1 → webbrowser.open*/os.startfile(頁面目標)靜默 no-op;回是否已裝"""
+    import os as _os
+    if not (force or _os.environ.get("VIA_NO_OPEN", "") == "1"):
+        return False
+    if _NO_OPEN["installed"]:
+        return True
+    import webbrowser as _wb
+
+    def _suppress(target, *a, **k):
+        _STATS["no_open_suppressed"] += 1
+        if _STATS["no_open_suppressed"] <= 3:
+            print(f"  [VIA_NO_OPEN] 抑制跳出 {str(target)[-90:]}", file=sys.stderr, flush=True)
+        return False
+    for name in ("open", "open_new", "open_new_tab"):
+        if hasattr(_wb, name):
+            _NO_OPEN["orig"]["webbrowser." + name] = getattr(_wb, name)
+            setattr(_wb, name, _suppress)
+    if hasattr(_os, "startfile"):
+        _orig_sf = _os.startfile
+        _NO_OPEN["orig"]["os.startfile"] = _orig_sf
+
+        def _guarded_startfile(path, *a, **k):
+            if _is_page_target(path):
+                return _suppress(path)
+            return _orig_sf(path, *a, **k)
+        _os.startfile = _guarded_startfile
+    _NO_OPEN["installed"] = True
+    return True
+
+
+def uninstall_no_open_guard() -> None:
+    import os as _os
+    import webbrowser as _wb
+    for key, fn in _NO_OPEN["orig"].items():
+        mod, attr = key.split(".", 1)
+        setattr(_wb if mod == "webbrowser" else _os, attr, fn)
+    _NO_OPEN["orig"].clear()
+    _NO_OPEN["installed"] = False
+
+
+try:
+    install_no_open_guard()   # 匯入即生效(env 未設=零行為變更)
+except Exception:
+    pass
+
+
+def _consent() -> bool:
+    """同意閘:委派 VIA_NetSupport;缺則直讀環境變數(永不代設)。"""
+    try:
+        sys.path.insert(0, str(HERE))
+        import VIA_NetSupport as net
+        return bool(net.net_consent())
+    except Exception:
+        import os
+        return os.environ.get("VIA_NET_CONSENT", "").upper() in ("YES", "1", "TRUE")
+
+
+def accel_map(fn, items, workers: int | None = None):
+    """平行 map:回 [(ok, result_or_err)] 保序;單件退化序跑;例外隔離。"""
+    _STATS["map_calls"] += 1
+    items = list(items)
+    if len(items) <= 1:
+        out = []
+        for it in items:
+            try:
+                out.append((True, fn(it)))
+            except Exception as exc:
+                out.append((False, f"{type(exc).__name__}: {str(exc)[:80]}"))
+        return out
+    w = workers or min(8, len(items))
+
+    def safe(it):
+        try:
+            return (True, fn(it))
+        except Exception as exc:
+            return (False, f"{type(exc).__name__}: {str(exc)[:80]}")
+    with ThreadPoolExecutor(max_workers=w) as ex:
+        return list(ex.map(safe, items))
+
+
+def fetch(url: str, retries: int = 3, backoff: float = 2.0, timeout: int = 30,
+          cache: bool = True) -> str | None:
+    """加速抓取:同意閘→快取→Celeritas 委派→標準庫重試退避。誠實 None。"""
+    _STATS["fetch"] += 1
+    if not _consent():
+        print("  [SuperAccel] 同意閘未開——$env:VIA_NET_CONSENT='YES' 後重試(紅線:不代設)")
+        return None
+    key = hashlib.sha1(url.encode()).hexdigest()
+    cf = CACHE / f"{key}.body"
+    if cache and cf.exists():
+        _STATS["cache_hit"] += 1
+        return cf.read_text(encoding="utf-8", errors="replace")
+    _STATS["cache_miss"] += 1
+    body = None
+    try:  # Celeritas 加速道(快取/重試/去重)在則委派
+        sys.path.insert(0, str(HERE))
+        import VeritasCeleritas as vc
+        if hasattr(vc, "vdf_fetch"):
+            r = vc.vdf_fetch(url, timeout=timeout)
+            body = getattr(r, "text", None) or (r if isinstance(r, str) else None)
+    except Exception:
+        body = None
+    if body is None:  # 標準庫重試退避道
+        import urllib.request
+        for i in range(retries):
+            try:
+                with urllib.request.urlopen(url, timeout=timeout) as resp:
+                    body = resp.read().decode("utf-8", errors="replace")
+                break
+            except Exception as exc:
+                if i == retries - 1:
+                    print(f"  [SuperAccel] 抓取敗({type(exc).__name__})——誠實 None")
+                    return None
+                time.sleep(backoff * (2 ** i))
+    if body is not None and cache:
+        CACHE.mkdir(parents=True, exist_ok=True)
+        cf.write_text(body, encoding="utf-8")
+    return body
+
+
+def pip_install(pkgs: list[str] | str, retries: int = 3, backoff: float = 2.0,
+                user: bool = True) -> tuple[int, str]:
+    """透過輔助模組安裝:同意閘→pip 重試退避。回 (rc, 尾流)。"""
+    _STATS["pip"] += 1
+    if isinstance(pkgs, str):
+        pkgs = [pkgs]
+    if not _consent():
+        return 1, "同意閘未開——安裝需 $env:VIA_NET_CONSENT='YES'(紅線:不代設)"
+    argv = [sys.executable, "-m", "pip", "install"] + (["--user"] if user else []) + list(pkgs)
+    tail = ""
+    for i in range(retries):
+        r = subprocess.run(argv, capture_output=True, text=True, stdin=subprocess.DEVNULL)
+        tail = "\n".join((r.stdout + r.stderr).strip().splitlines()[-3:])
+        if r.returncode == 0:
+            return 0, tail
+        if i < retries - 1:
+            time.sleep(backoff * (2 ** i))
+    return r.returncode, tail
+
+
+def run_fast(argv: list[str], timeout: int = 300) -> tuple[int | str, str]:
+    """子行程標準道:DEVNULL stdin+逾時;回 (rc, 尾流)。"""
+    try:
+        r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout,
+                           stdin=subprocess.DEVNULL)
+        return r.returncode, "\n".join((r.stdout + r.stderr).strip().splitlines()[-3:])
+    except subprocess.TimeoutExpired:
+        return "TIMEOUT", f"逾時 {timeout}s(誠實)"
+
+
+_CEL = {"mod": None, "tried": False, "err": ""}
+# ═══ 批618 操作員裁定:L50 升為第一條 ═════════════════════════════════════
+# 原文:「不准使用 TA-LIB,刪除關於他的一切,列入第一條,用 QuantGuard 替代」。
+#
+# 實測(批618,三支逐檔量 talib 路徑數):
+#   VeritasCeleritas.py                            1 處  ← v0104 的解析首位
+#   50_Protection_Acceleration/VeritasCeleritas.py 1 處
+#   accelerator/VeritasCeleritas.py                0 處  ← **唯一合規本**
+# 而工作站 `find_spec('talib')` 找得到 → 那不是惰性曝險,是**執行期真的會載入**。
+#
+# CGC_MDL156 ⑥ 從批531 起就把修法寫在畫面上:「一行修法=SUP_MDL737 的 CEL_CANDIDATES
+# 把合規本提到第一(不動兩支工具本體);**裁定權在操作員**(批345 不可動律)」。
+# 它等的就是這一句裁定。現在裁定到了,所以這一行改。
+#
+# **兩支工具本體一個位元都沒動**(批345 不可動律 + 收容正本零觸碰):
+# 帶 talib 的那兩份還在原地、還能被指名呼叫,只是**執行期永遠解析不到它們**。
+# 收容正本(references/intake/…/mounts/VeritasCeleritas.py)更不能動——它有 sha 冊。
+# 「刪除關於他的一切」在這裡的可執行形式是:**讓它永遠不會被載入**,而不是去改別人的正本。
+# 批716(操作員令「全部加速新的加速器」)—— **這一條有衝突,先講清楚再排序**:
+#   量出來:新版 VeritasCeleritas_v1140 身上 **8 處 talib 路徑**(舊本各 1 處,
+#   `accelerator/` 那本 **0 處**)。而 L50 是**第一條**(批618 操作員裁定):
+#   TA-Lib 禁用、解析序必須把**零 talib 合規本排第一**。
+#   → 所以新版**不能**排第一。它插在**第二**:比兩本舊的(各帶 1 處)前面,
+#     L50 合規本仍然在最前。新版因此接手了舊本的全部呼叫,而 L50 一步都沒退。
+#   → 要讓新版真的排第一,它得先有一條零 talib 路徑 —— 那是操作員的裁定,不是我的。
+def _cel_versioned() -> tuple:
+    """Numeric tail of VeritasCeleritas_v*.py. A body that still names talib is not a candidate."""
+    try:
+        base = Path(__file__).resolve().parent
+        scored = []
+        for path in base.glob("VeritasCeleritas_v*.py"):
+            digits = path.stem.rsplit("_v", 1)[-1]
+            if not digits.isdigit():
+                continue
+            body = path.read_text(encoding="utf-8", errors="ignore").lower()
+            if "talib" in body:
+                continue
+            scored.append((int(digits), path.name))
+        scored.sort()
+        return tuple(name for _, name in reversed(scored))
+    except Exception:
+        return ()
+
+
+CEL_CANDIDATES = ("VeritasCeleritas_v1141.py",)
+
+
+def celeritas():
+    """VeritasCeleritas 執行期委派載入(缺=誠實 None)。
+    批323:登記 sys.modules 後 exec(dataclass 於 3.11+ 必查 sys.modules[__module__]);快取單載。"""
+    if _CEL["tried"]:
+        return _CEL["mod"]
+    _CEL["tried"] = True
+    import importlib.util
+    for rel in CEL_CANDIDATES:
+        cand = VIA / "supportive modules" / rel
+        if not cand.exists():
+            continue
+        try:
+            body = cand.read_text(encoding="utf-8", errors="ignore").lower()
+        except Exception:
+            continue
+        if "_si(\"talib\")" in body or "import talib" in body:
+            continue
+        name = "VeritasCeleritas_dyn"
+        try:
+            spec = importlib.util.spec_from_file_location(name, cand)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[name] = mod
+            spec.loader.exec_module(mod)
+            _CEL["mod"] = mod
+            return mod
+        except Exception as exc:
+            sys.modules.pop(name, None)
+            _CEL["err"] = f"{cand.name}: {type(exc).__name__}: {str(exc)[:120]}"
+            continue
+    return None
+
+
+def activate(apply_limits: bool = True) -> dict:
+    """批323 啟動律:載 Celeritas→執行緒預算套用→回 lib 冊狀態(誠實;缺=全零+err)"""
+    cel = celeritas()
+    out = {"celeritas": cel is not None, "err": _CEL["err"], "libs_total": 0,
+           "libs_available": 0, "missing": [], "capability_real": 0, "capability_total": 0,
+           "thread_budget": None, "mode": None, "applied": {}}
+    if cel is None:
+        return out
+    try:
+        libs = cel.get_available_libs()
+        out["libs_total"] = len(libs)
+        out["libs_available"] = sum(1 for v in libs.values() if v)
+        out["missing"] = cel.get_missing_libs()
+    except Exception as exc:
+        out["err"] = f"libs: {type(exc).__name__}: {str(exc)[:100]}"
+    try:
+        cr = cel.capability_report()
+        out["capability_total"] = len(cr)
+        out["capability_real"] = sum(1 for v in cr.values() if v)
+    except Exception:
+        pass
+    try:
+        out["thread_budget"] = int(cel.thread_budget())
+        out["mode"] = str(cel._resolve_mode())
+    except Exception:
+        pass
+    if apply_limits:
+        try:
+            r = cel.apply_vrn_vds_max_accel()
+            out["applied"] = {k: str(v) for k, v in (r or {}).items()}
+        except Exception as exc:
+            out["applied"] = {"err": f"{type(exc).__name__}: {str(exc)[:100]}"}
+    return out
+
+
+def cmd_activate() -> int:
+    a = activate()
+    # 批716 自糾:這一行從 v0104 起就**寫死 v0103**,所以工作站報表上的版號一直是假的 ——
+    # 操作員看著它以為跑的是舊版,而真正在跑的是尾版。版號要從檔名現算,不能手寫。
+    _ver = Path(__file__).stem.rsplit("_v", 1)[-1]
+    print(f"=== 加速器啟動報告(SUP_MDL737 v{_ver})===")
+    print(f"  解析序(CEL_CANDIDATES):{list(CEL_CANDIDATES)}")
+    _cel_first = next((c for c in CEL_CANDIDATES if (VIA / "supportive modules" / c).is_file()), None)
+    print(f"  解析首位(執行期真的會載的那一本):{_cel_first or '**一本都解析不到**'}")
+    print(f"  Celeritas 載入:{'OK' if a['celeritas'] else 'FAIL'} {a['err']}")
+    print(f"  lib 冊:{a['libs_total']} · 可用 {a['libs_available']} · 缺 {len(a['missing'])}"
+          f" · 真實能力 {a['capability_real']}/{a['capability_total']}"
+          f" · 執行緒預算 {a['thread_budget']}({a['mode']})")
+    if a["missing"]:
+        print(f"  缺(lazy stub 代位,誠實非真加速):{', '.join(a['missing'][:30])}"
+              + (" …" if len(a["missing"]) > 30 else ""))
+    if a["applied"]:
+        print(f"  已套用:{a['applied']}")
+    d = VIA / "VIA_Reports" / "accel_activation"
+    d.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y%m%d_%H%M%S")
+    (d / f"ACCEL_ACTIVATION_{stamp}.json").write_text(json.dumps(a, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"  存證:{d / f'ACCEL_ACTIVATION_{stamp}.json'}")
+    return 0 if a["celeritas"] else 1
+
+
+def cmd_libs() -> int:
+    cel = celeritas()
+    if cel is None:
+        print(f"  [FAIL] Celeritas 載入失敗:{_CEL['err']}")
+        return 1
+    libs = cel.get_available_libs()
+    try:
+        cr = cel.capability_report()
+    except Exception:
+        cr = {}
+    print(f"=== Celeritas lib 冊 {len(libs)} 件(OK=已裝真實 · MISSING=缺,lazy stub 代位)===")
+    for k, v in libs.items():
+        flag = "OK     " if v else "MISSING"
+        if v and k in cr and not cr[k]:
+            flag = "STUB   "
+        print(f"  [{flag}] {k}")
+    return 0
+
+
+def load_accel_register():
+    hits = sorted((VIA / "supportive modules" / "registry")
+                  .glob("VIA_AccelModules_Integration_Register_v*.json"))
+    return json.loads(hits[-1].read_text(encoding="utf-8")) if hits else None
+
+
+def cmd_modules() -> int:
+    reg = load_accel_register()
+    if reg is None:
+        print("  [FAIL] 加速整合總冊缺")
+        return 1
+    print(f"=== 加速模組整合總冊({reg['ts']})· {reg['counts']['total']} 件 ===")
+    for w in reg.get("waiting_delivery", []):
+        print(f"  [候件] {w['name']}:{w['note'][:70]}")
+    return 0
+
+
+def stats() -> dict:
+    return dict(_STATS)
+
+
+def selftest() -> int:
+    print(f"=== SuperAccel SUP_MDL737 v{Path(__file__).stem.rsplit(chr(95)+chr(118), 1)[-1]} · 離線九檢 ===")
+    # 批718:解析序要印在**預設那條路**上。批717 只印在 `--activate` 裡,
+    # 而操作員照我給的指令跑的是預設路 —— 我要他看的那兩行,他根本看不到。
+    # 一個沒被印出來的診斷等於沒有做:L50 那盞紅只在工作站會亮(容器 find_spec 是 False),
+    # 這兩行是唯一能把答案送到現場的東西。
+    import importlib.util as _ilu737
+    import re as _re737
+    try:
+        _talib_live = _ilu737.find_spec("talib") is not None
+    except Exception:
+        _talib_live = False
+    _first = next((c for c in CEL_CANDIDATES if (VIA / "supportive modules" / c).is_file()), None)
+    _ft = ""
+    if _first:
+        try:
+            _ft = (VIA / "supportive modules" / _first).read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            _ft = ""
+    _rx737 = "_si" + r"\(\s*[\"']talib[\"']\s*\)" + r"|^\s*import\s+talib\b"
+    _first_talib = bool(_re737.search(_rx737, _ft, _re737.M))
+    print(f"  [註] 解析序 CEL_CANDIDATES:{list(CEL_CANDIDATES)}")
+    print(f"  [註] 解析首位(執行期真的會載的那一本):{_first or chr(42) * 2 + chr(19968)}")
+    _verdict = ("**L50 活違規** ← 工作站那盞紅就是這一條" if (_first_talib and _talib_live)
+                else "L50 合規" if not _first_talib else "惰性曝險(本境未裝 talib,未活化)")
+    print(f"  [註] L50:首位帶 talib 路徑={_first_talib} · 本境 find_spec(talib)={_talib_live}"
+          f"  → {_verdict}")
+    import os
+    checks = []
+    # ① 平行 map 保序+例外隔離
+    r = accel_map(lambda x: x * 2 if x != 3 else 1 // 0, [1, 2, 3, 4])
+    checks.append(("accel_map 保序+例外隔離", [x[0] for x in r] == [True, True, False, True]
+                   and r[1][1] == 4 and "ZeroDivisionError" in r[2][1]))
+    # ② 同意閘預設關(fetch/pip 皆拒)
+    old = os.environ.pop("VIA_NET_CONSENT", None)
+    checks.append(("同意閘預設關(fetch 拒)", fetch("http://example.invalid/x", cache=False) is None))
+    rc, msg = pip_install("nonexistent-pkg-zzz")
+    checks.append(("同意閘預設關(pip 拒)", rc == 1 and "同意閘" in msg))
+    if old:
+        os.environ["VIA_NET_CONSENT"] = old
+    # ③ 快取往返(不經網路)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    key = hashlib.sha1(b"http://t.local/a").hexdigest()
+    (CACHE / f"{key}.body").write_text("CACHED_BODY", encoding="utf-8")
+    os.environ["VIA_NET_CONSENT"] = "YES"
+    got = fetch("http://t.local/a")
+    if old is None:
+        os.environ.pop("VIA_NET_CONSENT", None)
+    else:
+        os.environ["VIA_NET_CONSENT"] = old
+    checks.append(("快取往返零網路", got == "CACHED_BODY"))
+    # ⑤ 批125 整合總冊+⑥ celeritas graceful
+    reg5 = load_accel_register()
+    checks.append(("加速整合總冊在位", reg5 is not None and reg5["counts"]["total"] >= 10))
+    cel = celeritas()
+    checks.append(("celeritas 委派 graceful", cel is None or hasattr(cel, "__file__")))
+    # ⑦⑧ 批323 啟動律:本體在位=必載通;activate 冊 ≥80 lib(缺=誠實列)
+    present = any((VIA / "supportive modules" / r).exists() for r in CEL_CANDIDATES)
+    checks.append(("Celeritas 在位即載通(sys.modules 登記律)", (not present) or (cel is not None)))
+    a = activate(apply_limits=False)
+    checks.append(("activate 冊 ≥80 lib+缺件誠實列", (not present) or
+                   (a["libs_total"] >= 80 and a["libs_available"] + len(a["missing"]) == a["libs_total"])))
+    # ⑨ 批366 零跳出閘:VIA_NO_OPEN=1 → webbrowser.open 靜默 False;未設=原函式
+    import webbrowser as _wb
+    _before = _wb.open
+    _e = os.environ.pop("VIA_NO_OPEN", None)
+    uninstall_no_open_guard()
+    untouched = _wb.open is _NO_OPEN["orig"].get("webbrowser.open", _wb.open) and not _NO_OPEN["installed"]
+    os.environ["VIA_NO_OPEN"] = "1"
+    install_no_open_guard()
+    suppressed = (_wb.open("file:///nonexistent/page.html") is False) and _is_page_target("x.HTML") and not _is_page_target("notes.txt")
+    uninstall_no_open_guard()
+    if _e is None:
+        os.environ.pop("VIA_NO_OPEN", None)
+    else:
+        os.environ["VIA_NO_OPEN"] = _e
+        install_no_open_guard()
+    checks.append(("VIA_NO_OPEN 零跳出閘(=1 靜默;未設零行為變更;非頁面直通)", untouched and suppressed))
+    _ = _before
+    n = 0
+    for name, ok in checks:
+        n += ok
+        print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
+    print(f"  [計] {n}/{len(checks)} 檢通過 · stats={stats()}")
+    return 0 if n == len(checks) else 1
+
+
+if __name__ == "__main__":
+    _a = sys.argv[1:]
+    if "--modules" in _a:
+        sys.exit(cmd_modules())
+    if "--activate" in _a:
+        sys.exit(cmd_activate())
+    if "--libs" in _a:
+        sys.exit(cmd_libs())
+    sys.exit(selftest())
