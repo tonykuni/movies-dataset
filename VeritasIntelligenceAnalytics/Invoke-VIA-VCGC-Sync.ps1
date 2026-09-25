@@ -14,7 +14,7 @@ try {
 }
 Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
 $env:VIA_FROM_VCGC = "YES"
-$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_Sync_v0101.py"
+$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_Sync_v0102.py"
 $raw = python $py
 $on = $false
 foreach ($line in $raw) {
