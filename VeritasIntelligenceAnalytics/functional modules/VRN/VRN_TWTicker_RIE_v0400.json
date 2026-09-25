@@ -1,0 +1,48 @@
+{
+  "registry": "tw.securities.rie.factor.v4",
+  "description": "Unified Regex Intelligence Engine and Factor Engine Module for Taiwan Securities",
+  "version": "4.0",
+  "display": {
+    "three": ["tw", "yf_twse", "yf_tpex"],
+    "tw": "bare exchange code, suffix letter kept",
+    "yf_twse": "{tw}.TW",
+    "yf_tpex": "{tw}.TWO",
+    "bb": "{tw} TT"
+  },
+  "modules": {
+    "detect_type": {
+      "logic": [
+        { "pattern": "^(00\\d{2,3}A)$", "type": "etf_equity_active" },
+        { "pattern": "^(00\\d{2,3}B)$", "type": "etf_bond_passive" },
+        { "pattern": "^(00\\d{2,3}D)$", "type": "etf_bond_active" },
+        { "pattern": "^(00\\d{2,3}L)$", "type": "etf_leverage" },
+        { "pattern": "^(00\\d{2,3}R)$", "type": "etf_inverse" },
+        { "pattern": "^(00\\d{2,3}[UV])$", "type": "etf_futures" },
+        { "pattern": "^(00\\d{2,3}T)$", "type": "etf_balanced" },
+        { "pattern": "^(00\\d{2,3})$", "type": "etf_equity_passive" },
+        { "pattern": "^([1-9]\\d{3})$", "type": "stock" }
+      ],
+      "auto_expand": "allow new ETF suffixes beyond A/B/D/L/R/U/V/T"
+    },
+    "normalize": {
+      "tw": { "yf_twse": "{tw}.TW", "yf_tpex": "{tw}.TWO", "bb": "{tw} TT" },
+      "yf": { "tw": "strip .TW or .TWO", "bb": "{tw} TT" },
+      "bb": { "tw": "strip trailing TT", "yf_twse": "{tw}.TW", "yf_tpex": "{tw}.TWO" }
+    },
+    "factor_engine": {
+      "detect_factor_applicability": {
+        "rules": [
+          { "type": "stock", "factors": ["intraday_microstructure", "volatility_cluster", "orderbook_pressure"] },
+          { "type": "etf_equity_passive", "factors": ["tracking_error", "basket_liquidity"] },
+          { "type": "etf_equity_active", "factors": ["manager_alpha", "active_rotation"] },
+          { "type": "etf_bond_passive", "factors": ["duration_shift", "yield_curve_beta"] },
+          { "type": "etf_bond_active", "factors": ["credit_alpha", "active_duration"] },
+          { "type": "etf_leverage", "factors": ["leverage_decay", "intraday_volatility"] },
+          { "type": "etf_inverse", "factors": ["inverse_tracking", "volatility_drag"] },
+          { "type": "etf_futures", "factors": ["roll_yield", "futures_basis"] },
+          { "type": "etf_balanced", "factors": ["allocation_shift", "rebalance_pressure"] }
+        ]
+      }
+    }
+  }
+}
