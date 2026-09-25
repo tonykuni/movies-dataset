@@ -3,6 +3,7 @@
 
 /**
  * VRN 交易所財報模板頁 · 瀏覽器使用者實測(側線 2026-09-24 第十五段;主線批號由併線的手指定 L25)
+ * v0102(2026-09-25 接手):空資料/有資料各驗同步規則；手機實際視窗 390px；中央模板所有 JS 錯誤都判敗。
  * v0100→v0101(第十五段(續),併 main 批735 時):引擎 LL334 讓號為 VRN_ENG090;+⑱⑲⑳ 跟批735 VRN 模板共存——
  *   同一份 SYNCHRONIZER 狀態裡有批735 掛的 vrn-report-template(你在 SYNCHRONIZER 關掉了)和你自建的模組,
  *   交接只增不減(ENG090 v0101):兩個原樣留著;你關掉的本頁模組,自動更新之後還是關的;中央 UI 側欄照啟用與否畫。
@@ -14,7 +15,7 @@
  *     「手動」規則擋交接 · 只往新的方向自動更新(舊 → 更新;新 → 不蓋回去)· 別的範本要確認 · 下載信封 ·
  *     SYNCHRONIZER 匯入信封 / 歷史 CSV · 手機寬度不橫捲 · 跟批735 VRN 模板共存(只增不減)。
  * 用法:先 `python "functional modules/VRN/VRN_ENG090_FinStatementsTemplate_v*.py" run`,再
- *       `node uxtest_vrn_finstatements_v0101.js`(需要 Playwright 與它的 Chromium;缺 = 丟錯講明,不假綠)。
+ *       `node uxtest_vrn_finstatements_v0102.js`(需要 Playwright 與它的 Chromium;缺 = 丟錯講明,不假綠)。
  * 環境:VIA_UX_ARTIFACT_DIR(截圖與報告)· VIA_VRN_FINSTAT_PAGE / VIA_VRN_FINSTAT_OUT(換頁或信封夾)。
  * 產出:uxtest_vrn_finstatements_report.json + uxtest_vrn_finstatements_report.html(單檔 HTML 結果報告:截圖內嵌、零外連,file:// 直開)。
  */
@@ -38,9 +39,7 @@ const ARTIFACT_DIR = process.env.VIA_UX_ARTIFACT_DIR ||
 const KEY = "via.sync.state.v2";
 const TID = "vrn-exchange-finstatements";
 const SYSTEM_IDS = ["overview", "topology", "endpoints", "events", "governance"];
-// 套件正本(VIA_HTML_UI)已知缺陷:中央 UI 同步段在另一個 <script> 作用域呼叫 toast(),解析到 window.toast(id="toast" 的元素)
-// → 每收到一次遠端狀態拋一次 TypeError。基線實量:不經本頁、只用 SYNCHRONIZER 套範本 + 套檢視,一樣拋 2 次;狀態照套用(寫入在前)。
-// 套件是正本(sha256 冊 · CGC_MDL160 閘)不能改,所以只放行這一句、別的錯照紅;本頁自己必須零錯誤。
+// 正典模板 toast 作用域已依操作員授權修復；不得沿用舊版錯誤放行名單。
 const KNOWN_PACKAGE_ERRORS = []; // authorized canonical template repair: all errors fail
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

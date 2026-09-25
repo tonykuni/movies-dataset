@@ -101,7 +101,11 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
 SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
-ENGINE_VERSION = "v0106"
+ENGINE_VERSION = "v0107"
+# v0107 (2026-09-25 real-report regression): percentages in New/Old/Chg columns are not amounts.
+# Header declarations, metric labels and individual cells determine units; data rows cannot set table units.
+# Expand only an unambiguous merged year/revision header, retain ambiguous periods for review, and expose
+# non-amount exclusions from financial identities. The original cell and table coordinates remain evidence.
 # v0106 (批733; 掉球 Z195 -- the workstation run of 2026-09-24: 7 of 105 PDFs gave "no financial rows"):
 #   tables printed without ruling lines.  (1) the column reader (evidence core) now knows the year-first quarter
 #   headers of the screenshot table (25Q1 / 25Q4(F)), half years and 2024年; before, it saw only 2024 and 2025(F) in
@@ -1868,29 +1872,48 @@ def normalize_metric_name(raw: str) -> str:
     return best
 
 
-def infer_unit_and_scale(metric_raw: str, table_context: str) -> Tuple[str, str, float]:
-    context = normalize_unicode_text(f"{metric_raw} {table_context}")
-    unit = ""
-    currency = "TWD"
-    scale = 1.0
-    if "%" in context or any(x in context for x in ["率", "Margin", "Yield", "ROE", "ROA"]):
-        unit = "%"
-    elif re.search(r"\b(x|X|倍)\b", context):
-        unit = "x"
-    elif any(x in context for x in ["百萬", "NT$m", "NTD m", "新台幣百萬元", "台幣百萬元"]):
-        unit = "NT$m"
-        scale = 1_000_000.0
-    elif any(x in context for x in ["十億", "bn", "billion", "NT$bn"]):
-        unit = "NT$bn"
-        scale = 1_000_000_000.0
-    elif any(x in context for x in ["千元", "仟元"]):
-        unit = "NT$000"
-        scale = 1_000.0
-    elif any(x in context for x in ["美元", "USD", "US$"]):
-        currency = "USD"
-    if not unit:
-        unit = "raw"
-    return unit, currency, scale
+def infer_unit_and_scale(metric_raw: str, table_context: str, value_raw: str = "") -> Tuple[str, str, float]:
+    """Use declared units and this cell, never another metric's percentage value."""
+    metric = normalize_unicode_text(metric_raw)
+    declared = normalize_unicode_text(table_context)
+    context = f"{metric} {declared}"
+    currency = "USD" if re.search(r"美元|USD|US\$", context, re.I) else "TWD"
+    symbol = "US$" if currency == "USD" else "NT$"
+    if ("%" in normalize_unicode_text(value_raw) or "%" in metric
+            or re.search(r"率|margin|yield|\bRO[EA]\b", metric, re.I)
+            or re.search(r"\(\s*%\s*\)|單位\s*[:：]\s*%", declared)):
+        return "%", currency, 1.0
+    if re.search(r"\b(?:P/?E|P/?B|EV/EBITDA)\b|倍|\(x\)", metric, re.I):
+        return "x", currency, 1.0
+    if re.search(r"每股|\bEPS\b|per share", metric, re.I):
+        return symbol, currency, 1.0
+    if re.search(r"百萬|(?:NT\$|NTD|US\$|USD)\s*m(?:n|illion)?\b", context, re.I):
+        return symbol + "m", currency, 1_000_000.0
+    if re.search(r"十億|\bbn\b|\bbillion\b|(?:NT\$|US\$)bn", context, re.I):
+        return symbol + "bn", currency, 1_000_000_000.0
+    if re.search(r"千元|仟元", context):
+        return symbol + "000", currency, 1_000.0
+    return "raw", currency, 1.0
+
+
+def expand_revision_header(header: List[str], data_rows: List[List[str]]) -> List[str]:
+    """Restore only explicit year × (New, Old, Chg.) groups collapsed into one PDF cell."""
+    if len(header) < 2 or any(normalize_unicode_text(c) for c in header[2:]):
+        return header
+    merged = normalize_unicode_text(header[1])
+    years = re.findall(r"\b(?:19|20)\d{2}[AEF]?\b", merged, re.I)
+    if len(years) < 2 or len(set(years)) != len(years):
+        return header
+    remainder = re.sub(r"\b(?:19|20)\d{2}[AEF]?\b", "", merged, flags=re.I).strip()
+    group = r"New\s+Old\s+Chg\.?(?:\s+|$)"
+    if not re.fullmatch(f"(?:{group}){{{len(years)}}}", remainder, re.I):
+        return header
+    count = len(years) * 3
+    if not any(len(r) > count and normalize_unicode_text(r[count]) for r in data_rows):
+        return header
+    if any(any(normalize_unicode_text(c) for c in r[count + 1:]) for r in data_rows):
+        return header
+    return [header[0]] + [f"{year} {role}" for year in years for role in ("New", "Old", "Chg.")]
 
 
 def _period_from_eng074(raw: str) -> Optional[Dict[str, Any]]:
@@ -1971,9 +1994,9 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
         header_idx = find_best_header_row(rows)
         if header_idx is None:
             continue
-        header = rows[header_idx]
         data_rows = rows[header_idx + 1:]
-        table_context = " ".join(" ".join(r) for r in rows[: min(len(rows), 3)])
+        header = expand_revision_header(rows[header_idx], data_rows)
+        table_context = " ".join(" ".join(r) for r in rows[:header_idx + 1])
         for r_idx, row in enumerate(data_rows, start=header_idx + 1):
             if not row:
                 continue
@@ -1982,7 +2005,6 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
             if not metric:
                 continue
             category = METRIC_CATEGORY_MAP.get(metric, "Other")
-            unit, currency, scale = infer_unit_and_scale(metric_raw, table_context)
             max_cols = max(len(row), len(header))
             for c_idx in range(1, max_cols):
                 value_raw = normalize_unicode_text(row[c_idx] if c_idx < len(row) else "")
@@ -1993,6 +2015,11 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
                     continue
                 period_label = normalize_unicode_text(header[c_idx] if c_idx < len(header) else "")
                 period = parse_period_label(period_label)
+                if len(set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", period_label))) > 1:
+                    period.update(PeriodType="", FiscalYear=None, FiscalQuarter="", EstimateFlag="")
+                unit, currency, scale = infer_unit_and_scale(metric_raw, table_context, value_raw)
+                percent_change = unit == "%" and bool(re.search(r"\b(?:Chg\.?|Change)\b", period_label, re.I))
+                issues = ([] if period.get("FiscalYear") else ["PERIOD_UNCLEAR"]) + (["PERCENT_CHANGE"] if percent_change else [])
                 source_text = f"{metric_raw} | {period_label} | {value_raw}"
                 fin_id = stable_hash([
                     basic_row.get("ReportID", ""),
@@ -2032,15 +2059,15 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
                     "ColumnIndex": c_idx,
                     "SourceText": source_text,
                     "ConfidenceScore": 0.72 if period.get("FiscalYear") else 0.62,
-                    "ValidationStatus": "PASS" if period.get("FiscalYear") else "REVIEW",
-                    "ValidationIssues": "" if period.get("FiscalYear") else "PERIOD_UNCLEAR",
+                    "ValidationStatus": "REVIEW" if issues else "PASS",
+                    "ValidationIssues": ";".join(issues),
                     "CreatedAt": now_iso(),
                     "UpdatedAt": now_iso(),
                     "RunID": run_id,
                     "SchemaVersion": SCHEMA_VERSION,
                 })
                 # 對常用寬欄也同步寫值，方便 dashboard 使用；long 欄仍以 MetricName/Value 為主。
-                if metric in record:
+                if metric in record and not percent_change:
                     record[metric] = value
                 records.append(record)
     return records
@@ -2068,19 +2095,25 @@ def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     read; nothing is filled in.  Returns counts, the failures in words, and two plain counts that say whether the
     period headers were read: quarter/half rows without a year, and rows marked as a forecast."""
     checks: List[Dict[str, Any]] = []
+    amounts = [r for r in records if r.get("Unit") not in ("%", "x") and "%" not in str(r.get("ValueRaw", ""))]
+    skipped_units = 0
     columns: Dict[Tuple[Any, Any], Dict[str, Dict[str, Any]]] = {}
-    for r in records:
+    for r in amounts:
         if r.get("MetricName") and isinstance(r.get("Value"), (int, float)):
             columns.setdefault((r.get("TableID"), r.get("ColumnIndex")), {}).setdefault(r["MetricName"], r)
     for (table, _col), m in sorted(columns.items(), key=lambda kv: (str(kv[0][0]), str(kv[0][1]))):
         for target, left, right, rule in IDENTITY_RULES:
             if target in m and left in m and right in m:
+                dimensions = {(m[k].get("Unit"), m[k].get("Currency"), m[k].get("Scale")) for k in (target, left, right)}
+                if len(dimensions) != 1:
+                    skipped_units += 1
+                    continue
                 got, expected = m[target]["Value"], m[left]["Value"] - abs(m[right]["Value"])
                 tol = 0.5 * sum(_printed_step(m[k].get("ValueRaw")) for k in (target, left, right)) + 1e-9
                 checks.append({"rule": rule, "table": table, "period": m[target].get("PeriodLabelRaw", ""),
                                "got": got, "expected": round(expected, 6), "tol": tol, "ok": abs(got - expected) <= tol})
     groups: Dict[Tuple[Any, str, Any], Dict[str, Dict[str, Any]]] = {}
-    for r in records:
+    for r in amounts:
         if r.get("MetricName") in QUARTER_SUM_METRICS and r.get("FiscalYear") and isinstance(r.get("Value"), (int, float)):
             key = "FY" if r.get("PeriodType") == "FY" else (r.get("FiscalQuarter") if r.get("PeriodType") == "FQ" else "")
             if key:
@@ -2088,6 +2121,10 @@ def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     for (table, metric, year), g in sorted(groups.items(), key=lambda kv: (str(kv[0][0]), kv[0][1], str(kv[0][2]))):
         if "FY" in g and all(q in g for q in ("Q1", "Q2", "Q3", "Q4")):
             parts = [g[q] for q in ("Q1", "Q2", "Q3", "Q4")]
+            dimensions = {(p.get("Unit"), p.get("Currency"), p.get("Scale")) for p in parts + [g["FY"]]}
+            if len(dimensions) != 1:
+                skipped_units += 1
+                continue
             total = sum(p["Value"] for p in parts)
             tol = 0.5 * sum(_printed_step(p.get("ValueRaw")) for p in parts + [g["FY"]]) + 1e-9
             checks.append({"rule": f"{metric} 四季和 = 全年", "table": table, "period": str(int(year)),
@@ -2095,6 +2132,7 @@ def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
                            "ok": abs(g["FY"]["Value"] - total) <= tol})
     failed = [c for c in checks if not c["ok"]]
     return {"checked": len(checks), "passed": len(checks) - len(failed), "failed": failed,
+            "excluded_non_amount_rows": len(records) - len(amounts), "skipped_unit_checks": skipped_units,
             "periods_unclear": sum(1 for r in records if r.get("PeriodType") in ("FQ", "FH") and not r.get("FiscalYear")),
             "estimate_rows": sum(1 for r in records if r.get("EstimateFlag") == "Estimate")}
 
@@ -2112,6 +2150,8 @@ def find_best_header_row(rows: List[List[str]]) -> Optional[int]:
     best_idx = None
     best_score = -1
     for idx, row in enumerate(rows[:6]):
+        if row and normalize_metric_name(row[0]):
+            continue  # A recognized financial metric is a data row, even when its values resemble years.
         score = 0
         joined = " ".join(row)
         if re.search(r"(?:19|20)\d{2}|\d{2}[EF](?![A-Za-z])|Q[1-4]|[1-4]Q|\d{1,2}/\d{2}", joined, re.IGNORECASE):
