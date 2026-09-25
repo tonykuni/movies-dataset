@@ -1,0 +1,16 @@
+{
+  "registry": "tw.financial.query.v1",
+  "consumer": "VRN",
+  "taiwan_source": "TWSE/TPEX",
+  "international_source": "yfinance",
+  "examples": ["2330", "3324"],
+  "views": ["quarter", "ytd", "year"],
+  "range": {"start": "editable", "end": "latest_fixed"},
+  "eps": {
+    "basic": ["基本每股盈餘（元）", "基本每股盈餘", "Basic EPS", "BasicEPS"],
+    "diluted": ["稀釋每股盈餘（元）", "稀釋每股盈餘", "Diluted EPS", "DilutedEPS"]
+  },
+  "eps_rule": "基本與稀釋不准併成 EPS。只有 EPS 字樣、分不出基本或稀釋的，留空。",
+  "mismatch": "科目或數字對不上時，用同一期間的歷史數列對照，對上才認。不改交易所原值。",
+  "forecast_check": "預估才可用加法或除法驗算。驗不過就標 FAIL，不回寫。"
+}
