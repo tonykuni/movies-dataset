@@ -381,7 +381,8 @@ def selftest() -> int:
     pairs = bilingual_pairs("稀釋每股盈餘 (Diluted EPS) 與基本每股盈餘 (Basic EPS)")
     checks.append(("bilingual pairs", [p["en"] for p in pairs] == ["Diluted EPS", "Basic EPS"], str(pairs)))
     lane = nltk_lane("Buy NVDA")
-    checks.append(("nltk stays optional and does not download", lane["state"] in ("ABSENT", "READY") and lane["download"] == "FORBIDDEN" and "nltk.download(" not in Path(__file__).read_text(encoding="utf-8"), lane["state"]))
+    banned = "nltk." + "download("
+    checks.append(("nltk stays optional and does not download", lane["state"] in ("ABSENT", "READY") and lane["download"] == "FORBIDDEN" and banned not in Path(__file__).read_text(encoding="utf-8"), lane["state"]))
     brief = brief_of({"state": "PASS", "kind": "prose", "markers": {}, "pairs": pairs, "code": None, "summary": {"key_points": ["one"]}, "nltk": lane, "adapter_policy": [{"id": "huge"}]})
     checks.append(("brief drops the hub dump", brief["brief"] is True and "adapter_policy" not in brief and brief["points"] == ["one"], str(brief)))
     checks.append(("VRN file bridge present", bool(list((VIA / "functional modules" / "VRN").glob("VRN_ENG087_NLPTextSummaryBridge_v*.py"))), "VRN_ENG087"))
