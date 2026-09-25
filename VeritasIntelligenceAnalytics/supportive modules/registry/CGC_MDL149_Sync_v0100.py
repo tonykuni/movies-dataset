@@ -94,8 +94,8 @@ def _one(path: Path, row: dict, market: str | None, name: str, page, texteng, ra
             hub = page._hub()
             for addr in hub.emails_of(info + "\n" + body) or []:
                 found = hub.analyst_from_email(addr) or {}
-                if found.get("name") or found.get("analyst"):
-                    analyst = found.get("name") or found.get("analyst")
+                if found.get("name_guess"):
+                    analyst = found.get("name_guess")
                     break
         except Exception:
             analyst = None
