@@ -12,7 +12,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 }
 
 $script:CeleritasTemplate = [ordered]@{
-    Version = '1.0.0'
+    Version = 'v1141'
     Marker  = 'CELERITAS-TEMPLATE-JOIN v1'
     Joined  = $false
 }
@@ -26,6 +26,7 @@ if (-not (Test-Path -LiteralPath $join)) {
 if (Test-Path -LiteralPath $join) {
     . $join
     if (-not $script:CeleritasPS7.Applied) { [void](Start-CeleritasPS7) }
+    $script:CeleritasTemplate.Version = [string]$script:CeleritasPS7.Version
     $script:CeleritasTemplate.Joined = $true
 }
 

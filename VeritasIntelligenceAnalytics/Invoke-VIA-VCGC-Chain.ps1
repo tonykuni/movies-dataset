@@ -1,31 +1,17 @@
 # CELERITAS-TEMPLATE-JOIN v1
 #Requires -Version 7.0
 Set-Location -LiteralPath (Split-Path $PSScriptRoot -Parent)
-$script:VIACel = $null
-$script:VIACelNote = "正主缺,略過"
+$script:VIAAccelPairNote = "正主缺,略過"
 try {
-    $celFile = Join-Path $PSScriptRoot "supportive modules\ps7\VeritasCeleritas.PS7.ps1"
-    if (Test-Path -LiteralPath $celFile) {
-        $script:VIACel = New-Module -Name "VIACeleritasPS7" -ArgumentList $celFile -ErrorAction SilentlyContinue -ScriptBlock {
-            param($CelFile)
-            $script:CeleritasPS7 = $null
-            $OFS = " "
-            if (-not (Get-Variable -Name PSNativeCommandArgumentPassing -ErrorAction SilentlyContinue)) { $PSNativeCommandArgumentPassing = $null }
-            $null = . $CelFile -RestoreOnly 2>$null
-            Export-ModuleMember -Function Restore-CeleritasPS7
-        }
-        $celOn = $false
-        $celSnap = $null
-        if ($script:VIACel) { try { $celSnap = & $script:VIACel { Get-CeleritasSnapshot } 2>$null } catch { $celSnap = $null } }
-        if ($script:VIACel -and ($null -ne $celSnap)) {
-            try { $null = & $script:VIACel { Start-CeleritasPS7 } 2>$null } catch { }
-            try { $celOn = [bool](& $script:VIACel { $script:CeleritasPS7.Applied -and ($null -ne $script:CeleritasPS7.Snapshot) } 2>$null) } catch { $celOn = $false }
-            if (-not $celOn) { try { & $script:VIACel { Restore-CeleritasPS7 } 2>$null } catch { } }
-        }
-        $script:VIACelNote = $(if ($celOn) { "本行程減壓已套" } else { "正主在但沒套上,略過" })
+    $join = Join-Path $PSScriptRoot "supportive modules\ps7\VeritasCeleritas.PS7.ps1"
+    if (Test-Path -LiteralPath $join) {
+        . $join
+        $script:VIAAccelPairNote = "套對 $($script:CeleritasPS7.Version) · 已套"
     }
-} catch { $script:VIACelNote = "正主載入失敗,略過" }
-Write-Host ("  [Celeritas] " + $script:VIACelNote)
+} catch {
+    $script:VIAAccelPairNote = "正主載入失敗,略過"
+}
+Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
 $reply = Join-Path $PSScriptRoot "VIA_Reports\vcgc\REPLY_latest.txt"
 $pending = ""
 if (Test-Path -LiteralPath $reply) {
