@@ -22,7 +22,8 @@
     "corrected_why": "兩份清單各缺對方有的欄:MDL123 沒有 ym,月營收三表(tw_monthly_revenue 等)在目錄裡量不到最新日 → 工作站 2026-09-24 狀況頁「營收 NODATA」;MDL139 沒有 trade_date/period/dt/ts。聯集只增不減",
     "corrected_add_2": "第二次全樹普查(見 census)補六欄,接在尾端、不動前十欄順序:data_date(ENG073)· datadate(ENG089)· asof(MDL119)· portfolio_date(ENG087 · MDL119;VDF_ENG051 v0103 holdings_daily / holdings_changes 唯一的日期欄——沒有它這兩張表永遠量不到新鮮度)· holding_date(MDL119;VDF_ENG085 VATETF 來源欄名,對映到 portfolio_date)· ymd(MDL128)。其中 data_date · datadate · asof · ymd 倉內查無建表語句(git grep 2026-09-24),照收是為了日後那幾支遷過來時一欄都不丟",
     "primary_first_rule": "既有讀者照舊先認自己原本那份(已量得到的表,日期欄一個都不換),原本一欄都認不到時才用聯集補——只增不減,不改既有量測",
-    "record_only": ["ts", "snapshot_at", "run_at"],
+    "record_only": ["ts", "snapshot_at", "run_at", "snapshot_date", "fetched_at_utc"],
+    "record_only_add_20260925": "consensus_observations.snapshot_date 是擷取快照日，fetched_at_utc 是傳輸時點；不得作來源估計生效日或原始經濟觀測日。provider_asof_raw 未正規化且可空，不憑抓取日補造。",
     "record_only_why": "ts 是寫入時間戳,不是資料日(VDF_ENG089 v0101 RECORD_DATE_COLS 同判);snapshot_at · run_at 同類:VDF_ENG051 v0103 寫 datetime.now()(active_tw_etf_universe.snapshot_at · fetch_status.run_at)。補位(fallback)一律跳過這三欄;snapshot_at · run_at 不進 corrected——進了,MDL123 v0104 的補位會把它們當資料日(那支不跳 record_only)。ts 留在 corrected 是因為 MDL123 原份就有它(primary-first 照舊)",
     "fallback_rule": "補位欄 = corrected − 讀者自己那份 − record_only,照 corrected 序;正典 SUP_MDL753 v0106 fallback_date_columns(own) 是唯一實作,讀者不自己做差集",
     "census": {
