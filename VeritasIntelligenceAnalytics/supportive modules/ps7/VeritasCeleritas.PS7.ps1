@@ -23,7 +23,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 
 if (-not (Get-Variable -Name 'CeleritasPS7' -Scope Script -ErrorAction Ignore)) {
     $script:CeleritasPS7 = [ordered]@{
-        Version     = '1.0.0'
+        Version     = 'v1141'
         Applied     = $false
         Depth       = 0
         Snapshot    = $null
@@ -38,6 +38,17 @@ if (-not (Get-Variable -Name 'CeleritasPS7' -Scope Script -ErrorAction Ignore)) 
         Sw          = [System.Diagnostics.Stopwatch]::StartNew()
     }
 }
+$pairDir = Split-Path -Parent $PSScriptRoot
+$pairN = -1
+foreach ($pairFile in @(Get-ChildItem -LiteralPath $pairDir -Filter 'VeritasCeleritas_v*.py' -File -ErrorAction SilentlyContinue)) {
+    $digits = $pairFile.BaseName.Substring($pairFile.BaseName.LastIndexOf('_v') + 2)
+    if ($digits -notmatch '^\d+$') { continue }
+    $sample = @(Get-Content -LiteralPath $pairFile.FullName -TotalCount 12 -ErrorAction SilentlyContinue) -join "`n"
+    if ($sample -match '(?i)talib') { continue }
+    $n = [int]$digits
+    if ($n -gt $pairN) { $pairN = $n }
+}
+if ($pairN -ge 0) { $script:CeleritasPS7.Version = 'v' + $pairN }
 
 function Write-CeleritasLog {
     param([string]$Code, [string]$Message)
