@@ -40,7 +40,7 @@ class FakeCore:
     def canon(self, name):
         return name.lower()
 
-    def tools_apply(self, plan, approve):
+    def tools_apply(self, plan, approve, bootstrap_prechecked=False):
         self.applied.extend(plan["stages"])
         return {"ran": len(plan["stages"]), "fails": 0}
 
@@ -52,6 +52,19 @@ class FakeCore:
 
 
 class EightHubTests(unittest.TestCase):
+    def test_preflight_is_offline_without_network_consent(self):
+        core = FakeCore()
+        core._consent = lambda: False
+        commands = []
+        core.run_cmd = lambda argv, timeout=0: (commands.append(argv) or
+                                                  {"rc": 1, "out": "cache miss", "err": ""})
+        rows = [{"env": "via_vrn", "state": "PASS", "interpreter": "python"}]
+        plan = {"stages": [{"env": "via_vrn", "kind": "INSTALL_TOOLS", "pkgs": ["duckdb"]}]}
+        with patch.object(EXT.shutil, "which", return_value="uv"):
+            result = EXT._uv_preflight(core, rows, plan)
+        self.assertIn("--offline", commands[0])
+        self.assertEqual(result[0]["state"], "NOT_RUN")
+
     def test_execute_with_bad_base_does_not_invoke_install(self):
         core = FakeCore()
         core._arg_after = lambda args, key: None
@@ -110,6 +123,32 @@ class EightHubTests(unittest.TestCase):
                 rows = EXT._provision_missing(core, plan, str(root))
             self.assertEqual([r["state"] for r in rows], ["BLOCK", "BLOCK"])
             self.assertTrue((root / "via_existing").exists())
+
+    def test_canonical_installer_bootstrap_only_allows_install(self):
+        source = MODULE.with_name("CGC_MDL135_EnvGovernance_v0114.py")
+        if not source.exists():
+            self.skipTest("canonical MDL135 source is not in this isolated layout")
+        spec = importlib.util.spec_from_file_location("via_envgov_test", source)
+        gov = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gov)
+        stages = [
+            {"id": "R", "kind": "REPAIR_TOOLS", "env": "via_vrn", "py": "python",
+             "pkgs": ["broken"], "deps": [], "result": {}},
+            {"id": "I", "kind": "INSTALL_TOOLS", "env": "via_vrn", "py": "python",
+             "pkgs": ["duckdb"], "deps": [], "result": {}},
+        ]
+        with tempfile.TemporaryDirectory() as temp, patch.object(gov, "_consent", return_value=True), \
+             patch.object(gov, "unitest_gate", return_value=(False, "family missing")), \
+             patch.object(gov, "run_cmd", return_value={"rc": 0, "out": "ok", "err": "", "s": 0}), \
+             patch.object(gov, "log_event"), patch.object(gov, "OUT", Path(temp)):
+            plan = {"stages": [dict(s) for s in stages]}
+            result = gov.tools_apply(plan, True, bootstrap_prechecked=True)
+            self.assertEqual(result["ran"], 1)
+            self.assertEqual(plan["stages"][0]["result"]["state"], "SKIP")
+            self.assertEqual(plan["stages"][1]["result"]["state"], "OK")
+            blocked = {"stages": [dict(s) for s in stages]}
+            result = gov.tools_apply(blocked, True)
+            self.assertEqual(result["ran"], 0)
 
 
 if __name__ == "__main__":

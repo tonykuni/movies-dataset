@@ -36,6 +36,10 @@ HUB_NAMES = (
     "family_isolation", "runtime_tools",
 )
 RUNTIME_COMMANDS = ("uv", "pwsh", "node", "npm", "pandoc", "tesseract", "java", "rustc", "go")
+RUNTIME_VERSION_ARGS = {"uv": ("--version",), "pwsh": ("-v",), "node": ("--version",),
+                        "npm": ("--version",), "pandoc": ("--version",),
+                        "tesseract": ("--version",), "java": ("-version",),
+                        "rustc": ("--version",), "go": ("version",)}
 RUN_TIMEOUT = 180
 UV_TIMEOUT = 300
 MAX_WORKERS = 8
@@ -106,6 +110,7 @@ def _pending(tools: dict) -> list[dict]:
 def _uv_preflight(core, rows: list[dict], tools: dict) -> list[dict]:
     """Resolve the full per-environment install set without changing the environment."""
     uv = shutil.which("uv")
+    online = core._consent()
     dry = []
     for row in rows:
         env = row["env"]
@@ -119,9 +124,12 @@ def _uv_preflight(core, rows: list[dict], tools: dict) -> list[dict]:
         if not uv or not row.get("interpreter"):
             dry.append({"env": env, "state": "NOT_RUN", "packages": packages, "reason": "uv or interpreter missing"})
             continue
-        args = [uv, "pip", "install", "--dry-run", "--python", row["interpreter"], *packages]
+        args = [uv, "pip", "install", "--dry-run", "--python", row["interpreter"]]
+        if not online:
+            args.append("--offline")
+        args.extend(packages)
         r = core.run_cmd(args, timeout=UV_TIMEOUT)
-        dry.append({"env": env, "state": "PASS" if r["rc"] == 0 else "BLOCK",
+        dry.append({"env": env, "state": "PASS" if r["rc"] == 0 else ("NOT_RUN" if not online else "BLOCK"),
                     "packages": packages, "reason": (r.get("out", "") + r.get("err", ""))[-400:]})
     return dry
 
@@ -173,15 +181,23 @@ def _snapshot(core, base_python: str | None, env_root: str) -> dict:
     if drift["state"] == "CHANGED":
         rows[0]["checks"][HUB_NAMES[0]] = _result("BLOCK", drift["why"])
         rows[0]["state"] = "BLOCK"
+    runtime = {}
+    for name in RUNTIME_COMMANDS:
+        path = shutil.which(name)
+        probe = core.run_cmd([path, *RUNTIME_VERSION_ARGS[name]], timeout=15) if path else None
+        runtime[name] = {"path": path, "version": (
+            ((probe.get("out", "") + probe.get("err", "")).strip().splitlines() or [""])[0][:160]
+            if probe and probe["rc"] == 0 else None)}
     return {"rows": rows, "toolplan": toolplan, "drift": drift,
             "base_analysis": {k: base_analysis.get(k) for k in
                               ("manifest_missing", "blocked_present", "extras", "os_managed")},
             "baseline": baseline.get("_src"), "roster": roster.get("_src"),
             "diagnostics": {n: (base.get("dists") or {}).get(n, {}).get("ver") for n in DIAGNOSTIC_TOOLS},
-            "runtime_commands": {name: shutil.which(name) for name in RUNTIME_COMMANDS}}
+            "runtime_commands": runtime}
 
 
-def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict) -> dict:
+def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict,
+                 bootstrap_prechecked: bool = False) -> dict:
     """Delegate all installation to MDL135's existing guarded tools_apply."""
     allowed = {r["env"] for r in rows if r["state"] == "PASS"}
     allowed.intersection_update(d["env"] for d in dry if d["state"] == "PASS")
@@ -192,7 +208,7 @@ def _apply_green(core, rows: list[dict], dry: list[dict], plan: dict) -> dict:
     # Never include a repair or destructive stage, including one indirectly
     # required by a VERIFY_TOOLS step.
     filtered = {"stages": stages, "state": "PLAN"}
-    summary = core.tools_apply(filtered, approve=True)
+    summary = core.tools_apply(filtered, approve=True, bootstrap_prechecked=bootstrap_prechecked)
     return {"summary": summary, "stages": stages, "state": filtered["state"]}
 
 
@@ -236,20 +252,34 @@ def run(core, args: list[str]) -> int:
     runnable = bool(dry) and all(d["state"] == "PASS" for d in dry) and all(
         r["state"] == "PASS" for r in rows)
     base_ok = rows[0]["state"] == "PASS" and before["drift"]["state"] != "CHANGED"
+    gate_ok, gate_reason = core.unitest_gate() if execute else (False, "plan only")
+    bootstrap, boot_reason = core.rungate_bootstrap_only() if execute and not gate_ok else (False, "")
+    previous = (core._read_json(core.LKGC_LATEST, {}) or {}) if core.LKGC_LATEST.exists() else {}
+    restore = {name: {"good_at": value.get("good_at"), "lock": value.get("lock_lkgc") or value.get("lock"),
+                      "stale_since": value.get("stale_since")}
+               for name, value in (previous.get("envs") or {}).items()}
+    rebuild = [r["env"] for r in rows if r["env"] != "BASE" and
+               any(r["checks"][h]["state"] == "BLOCK" for h in
+                   ("interpreter_identity", "native_abi", "distribution_shadow"))]
     report = {"schema": REPORT_SCHEMA, "at": datetime.now(timezone.utc).isoformat(),
               "mode": "execute" if execute else "plan", "base_python": base_python,
               "env_root": env_root, "baseline": before["baseline"], "roster": before["roster"],
+              "unitest_gate": gate_reason, "bootstrap_prechecked": bootstrap,
+              "bootstrap_reason": boot_reason,
               "drift": before["drift"], "base_optimization": before["base_analysis"],
               "hubs": HUB_NAMES, "diagnostic_tools": before["diagnostics"],
               "diagnostic_tools_missing": [k for k, v in before["diagnostics"].items() if not v],
               "runtime_commands": before["runtime_commands"],
               "envs": rows, "pending": _pending(before["toolplan"]), "uv_dry_run": dry,
+              "rebuild_required": rebuild, "restore_points": restore,
+              "routing": before["toolplan"].get("isolation", {}),
+              "multi_version_hubs": before["toolplan"].get("hubs", {}),
               "previous_success": str(core.LKGC_LATEST) if core.LKGC_LATEST.exists() else None,
               "provision": [], "execution": None, "postcheck": None, "state": "PLAN"}
     # Write a pre-action restore point even for a blocked or failed run.
     report["state"] = "READY" if base_ok and runnable else "BLOCKED"
     prepath = _save(core, report)
-    if execute and base_ok and core._consent():
+    if execute and base_ok and all(r["state"] == "PASS" for r in rows) and core._consent():
         report["provision"] = _provision_missing(core, before["toolplan"], env_root)
         if report["provision"]:
             refreshed = _snapshot(core, base_python, env_root)
@@ -267,7 +297,8 @@ def run(core, args: list[str]) -> int:
     if any(r["state"] != "PASS" for r in rows):
         runnable = False
     if execute and base_ok and runnable and core._consent():
-        report["execution"] = _apply_green(core, rows, dry, before["toolplan"])
+        report["execution"] = _apply_green(core, rows, dry, before["toolplan"],
+                                           bootstrap_prechecked=bootstrap)
         after = _snapshot(core, base_python, env_root)
         report["postcheck"] = [{"env": x["env"], "state": x["state"], "checks": x["checks"]}
                                for x in after["rows"]]
@@ -291,6 +322,8 @@ def run(core, args: list[str]) -> int:
         report["state"] = "BLOCKED_CONSENT" if not core._consent() else "BLOCKED"
     finalpath = _save(core, report, lesson=True)
     print(f"[八路衝突+uv] {report['state']} · 境 {len(rows)} · 待裝 {len(report['pending'])} 段")
+    if report["rebuild_required"]:
+        print("  身分或 ABI 錯位，需先由現有 via-rebuild 重建: " + ", ".join(report["rebuild_required"]))
     for row in rows:
         if row["state"] != "PASS":
             issues = [f"{k}:{v['detail'][:50]}" for k, v in row["checks"].items() if v["state"] != "PASS"]

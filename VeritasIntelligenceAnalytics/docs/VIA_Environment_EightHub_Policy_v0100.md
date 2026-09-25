@@ -18,7 +18,7 @@
 | 6 | 工具冊缺件、半拆件與重建段 | MDL135 tools plan |
 | 7 | BASE 禁放家族與 `_M`／`_H` 獨占境 | Baseline families／工具冊 |
 | 8 | 特殊語言執行檔、模型與支援工具 | roster external／PATH 探針 |
-| +uv | 待安裝全集解析，不寫入現況 | `uv pip install --dry-run --python <該境解譯器>` |
+| +uv | 待安裝全集解析，不寫入現況 | `uv pip install --dry-run --python <該境解譯器>`；網路同意閘未開時附加 `--offline`，快取不足標 `NOT_RUN` |
 
 診斷工具清單為 `pip`、`pipdeptree`、`deptry`、`pipgrip`、`johnnydep`、`pip-tools`、`pip-check-reqs`、`packaging`，由既有 Baseline 管理版本與安裝位置；不得為「湊足八路」直接灌入 BASE。後六種診斷工具提供相依圖、專案宣告及候選解析的加強證據，**不是每一種都能單獨證明環境無衝突**；未安裝時如實列為缺件，按工具冊路由。
 
