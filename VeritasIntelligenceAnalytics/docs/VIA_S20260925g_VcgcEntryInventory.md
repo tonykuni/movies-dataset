@@ -2,7 +2,7 @@
 
 進入就是 `via-vcgc`（預設 `status`）。政策正文不整本讀，先交給全景 `read`。盤點用 `registry-sync` 與 `ssot plan`，都不寫。
 
-這次載了欄位規則樞紐、同義收容件、VRN 與 VDF 的 System Manager。沒跑 `registry-sync --apply`。活元件 5929，冊上 ACTIVE 9975，差額是樹沒有整棵載進來，不是該退役的號。
+這次載了欄位規則樞紐、同義收容件、VRN 與 VDF 的 System Manager。自測 38 項過 37。剩下那一項是活元件 5929 對不上冊上 ACTIVE 9975：樹沒有整棵載進來，不是該退役的號。沒跑 `registry-sync --apply`。
 
 政策庫 `VIA_Policy_Laws_SSOT_v0100.json`：2726 行，全景卡約 102 token，原檔約 106862，省 99.9%。卡上是律 103、lessons 362。問題 0。
 
