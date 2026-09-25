@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-VRN_AutoTestLoop v0106 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+VRN_AutoTestLoop v0107 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+
+v0106→v0107(母倉 批735 收尾;PR #119 的 Codex 審查 P2):報告頁橫幅與主控台 [VRN 模板] 那一行的比對基準,改成照抄建構器
+  回的說法(VRN_ENG089 v0101 basis:對上一輪 / 對這個夾的上一版 / 首建)。v0106 是看「有沒有找到上一輪的連結冊」自己猜,
+  同一個 --out 重跑時建構器其實是對這個夾的上一版比,卻印成「對上一輪」。建構器是舊版(沒有 basis)才退回舊猜法。
 
 v0105→v0106(母倉 批735;操作員 2026-09-24「用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接自適應式自動化」
              「上下的自動連結更新新增檢查機能建構須完成」「若成功跑一次測試文件的成果用我們使用的html u/i顯示」):
@@ -121,7 +125,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-LOOP_VERSION = "v0106"
+LOOP_VERSION = "v0107"
 HERE = Path(__file__).resolve().parent
 VRN_ROOT = HERE.parent
 REPO_ROOT = VRN_ROOT.parent.parent if (VRN_ROOT.parent.name == "functional modules") else VRN_ROOT
@@ -1442,6 +1446,14 @@ def def_template(json_path: Path, workdir: Path, out_dir: Optional[Path] = None)
         return {"state": "ERROR", "rc": 1, "why": f"{error.__class__.__name__}: {str(error)[:200]}", "builder": cands[-1].name}
 
 
+def def_template_basis(template: Dict[str, Any]) -> str:
+    """v0107 (批735): what the counts are compared against -- the builder's own words (VRN_ENG089 v0101 `basis`:
+    對上一輪 / 對這個夾的上一版 / 首建); an older builder without `basis` falls back to the v0106 guess."""
+    if template.get("basis"):
+        return str(template["basis"])
+    return "對上一輪" if template.get("baseline") else "首建(找不到上一輪)"
+
+
 def def_template_banner(template: Dict[str, Any]) -> str:
     """v0106 (批735): one banner line at the top of the report page -- open the central page / the synchronizer, and
     what changed since the previous run.  Not built -> the banner says why (never silently missing)."""
@@ -1455,9 +1467,9 @@ def def_template_banner(template: Dict[str, Any]) -> str:
     missing = [n for n in template.get("new_items") or [] if not n.get("on_page")]
     central = html.escape(Path(template["central"]).resolve().as_uri(), quote=True)
     sync = html.escape(Path(template["synchronizer"]).resolve().as_uri(), quote=True)
-    since = "對上一輪" if template.get("baseline") else "首建(找不到上一輪)"
+    since = html.escape(def_template_basis(template))
     return (f"<div class='tpl'>VRN 模板(制式 U/I · synchronizer 控制):<a href='{central}'><b>開中央頁</b></a> · "
-            f"<a href='{sync}'>開 synchronizer</a> · {state} · {since} 新增 {lc.get('NEW', 0)} · 異動 {lc.get('CHANGED', 0)} · "
+            f"<a href='{sync}'>開 synchronizer</a> · {state} · {since} · 新增 {lc.get('NEW', 0)} · 異動 {lc.get('CHANGED', 0)} · "
             f"消失 {lc.get('GONE', 0)}" + (f" · <b>新增沒上頁 {len(missing)}</b>" if missing else "") + "</div>")
 
 
@@ -1908,7 +1920,7 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
         if not args.quiet:
             lc = template.get("links") or {}
             lost = [n for n in template.get("new_items") or [] if not n.get("on_page")]
-            print(f"[VRN 模板] {template.get('state')} · {'對上一輪' if template.get('baseline') else '首建'} 新增 {lc.get('NEW', 0)} · "
+            print(f"[VRN 模板] {template.get('state')} · {def_template_basis(template)} · 新增 {lc.get('NEW', 0)} · "
                   f"異動 {lc.get('CHANGED', 0)} · 消失 {lc.get('GONE', 0)}" + (f" · 新增沒上頁 {len(lost)}" if lost else "")
                   + (f" · 中央頁 {template['central']}" if template.get("central") else f" · {template.get('why')}"))
     html_path.write_text(def_render_html(report, template), encoding="utf-8")
