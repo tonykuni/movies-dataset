@@ -219,6 +219,16 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
+      - name: Verify ETF activity estimates and canonical template
+        shell: pwsh
+        run: |
+          $env:VIA_ETF_UAT_OUT = Join-Path $PWD "VIA_VRN_Test_Artifacts\etf-activity"
+          $env:VIA_SELFTEST = "1"
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\test_via_etf_activity_v0100.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_etf_activity_v0100.js" $env:VIA_ETF_UAT_OUT
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Upload VRN browser evidence
         if: always()
         uses: actions/upload-artifact@v4
