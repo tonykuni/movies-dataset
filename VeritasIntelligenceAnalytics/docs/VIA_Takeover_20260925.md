@@ -1,6 +1,6 @@
 # VCGC / VRN / VDF 接手驗收（2026-09-25）
 
-狀態：驗收進行中，尚未宣告正式環境啟用完成。
+狀態：PR #122 已合併 main（`2333185c`），最新 head `face9f2a` 的 Windows/Chromium UAT 全過；正式環境全面啟用仍未完成。新增每日資料要求及修正見 `VIA_DailyData_20260925.md`。
 
 ## 授權與基線
 
