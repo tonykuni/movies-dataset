@@ -19,14 +19,20 @@ def check() -> dict:
     raw = PARAMS.read_bytes()
     sha = hashlib.sha256(raw).hexdigest()
     linked = bool(hit) and hit[0].get("sha256") == sha
+    spec = importlib.util.spec_from_file_location("hub0110", HERE / "via_params_central_v0110.py")
+    hub = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(hub)
+    listed = any(b["id"] == "USMACRO_PARAMS" for b in hub.BOOKS)
     live = [r for r in book["parameters"] if r["state"] == "LIVE" and r["role"] == "method_series"]
+    ready = linked and listed
     return {
         "via": "vcgc", "door": "CGC_MDL192",
         "parameters": len(book["parameters"]), "method_series": len(live),
-        "indexed": bool(hit), "hash_match": linked, "books": index["books_total"],
+        "indexed": bool(hit), "hash_match": linked, "hub": "v0110" if listed else "MISSING",
+        "books": index["books_total"],
         "intake_edited": False,
-        "do_not": ["edit intake macro_ssot", "treat RRP billions as millions"],
-        "next": "none" if linked else "register",
+        "do_not": ["edit intake macro_ssot", "treat RRP billions as millions", "scan v0109 and drop this book"],
+        "next": "none" if ready else "register",
     }
 
 def main() -> int:
@@ -40,7 +46,7 @@ def selftest() -> int:
     card = check()
     book = json.loads(PARAMS.read_text(encoding="utf-8"))
     rrp = next(r for r in book["parameters"] if r["id"] == "RRPONTSYD")
-    ok = card["hash_match"] and card["method_series"] == 18 and rrp["scale_to_millions"] == 1000
+    ok = card["hash_match"] and card["hub"] == "v0110" and card["method_series"] == 18 and rrp["scale_to_millions"] == 1000
     print("  [OK]" if ok else "  [FAIL] " + json.dumps(card, ensure_ascii=False))
     return 0 if ok else 1
 
