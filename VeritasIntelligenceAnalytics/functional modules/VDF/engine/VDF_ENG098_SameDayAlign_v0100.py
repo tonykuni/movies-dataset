@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 """VDF_ENG098 — one Taiwan stock, one date.
 
-TWSE/TPEX owns the row. yfinance close is only a check against that close.
-The adjustment factor is adj_close / close, and it is applied only when the
-two closes overlap. QuantGuard uses volume and value after day-trade is
-removed. Display may ask for the gross figures instead.
+TWSE/TPEX owns price, volume, value, institutions, margin, and day-trade.
+yfinance is not that source. It has two jobs here: compare close with the
+exchange close, and after they overlap, adj_close / close adjusts the
+exchange open, high, low, and close. Volume from yfinance is ignored.
+English names are a different pull (shortName only). Global ETF AUM is
+another pull. QuantGuard uses volume and value after day-trade is removed.
+Display may ask for the gross figures instead.
 """
 from __future__ import annotations
 
@@ -90,7 +93,8 @@ def selftest() -> int:
         checks.append((name, bool(ok)))
 
     policy = json.loads(POLICY.read_text(encoding="utf-8"))
-    chk("policy", policy["rank"] == "major" and policy["quantguard"]["volume_value"].startswith("扣除當沖"))
+    chk("policy", policy["rank"] == "major" and policy["yfinance"]["pull"].endswith("/138")
+        and "成交量" in policy["yfinance"]["not_used_for"])
     row = {
         "date": "2026-09-25", "code": "2330",
         "open": 100, "high": 110, "low": 90, "close": 100,
