@@ -80,12 +80,12 @@ function Get-CeleritasSnapshot {
         WarningPref       = $WarningPreference
         InformationPref   = $InformationPreference
         ErrorPref         = $ErrorActionPreference
-        OFS               = $OFS
+        OFS               = $(if ($v = Get-Variable -Name 'OFS' -ErrorAction Ignore) { $v.Value })
         OutputEncoding    = $OutputEncoding
         ConsoleEncoding   = [Console]::OutputEncoding
         Culture           = [System.Threading.Thread]::CurrentThread.CurrentCulture
         UICulture         = [System.Threading.Thread]::CurrentThread.CurrentUICulture
-        NativeArgs        = $PSNativeCommandArgumentPassing
+        NativeArgs        = $(if ($v = Get-Variable -Name 'PSNativeCommandArgumentPassing' -ErrorAction Ignore) { $v.Value })
         DebugMode         = $dbg
         PSStyleProgress   = $(if (Get-Variable PSStyle -ErrorAction SilentlyContinue) { $PSStyle.Progress.View } else { $null })
     }
