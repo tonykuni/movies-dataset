@@ -1,6 +1,7 @@
-# Update the active Taiwan ETF master list, then today's holdings.
-# via-etfuniv and via-etfhist already choose the newest engine.
-# This file does not set consent. Those commands fill an unset gate only.
+# Active Taiwan ETFs only. Refresh the master list, then fill holdings
+# from listing without repeating days already stored.
+# A universe rc of 2 means a name left the official book. The csv of the
+# names that remain is still usable, so holdings continue.
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location -LiteralPath $root
@@ -9,6 +10,12 @@ $reg = Get-ChildItem -LiteralPath $root -Filter 'Register-VIA-Commands-v*.ps1' |
 if (-not $reg) { throw "Register-VIA-Commands not found under $root" }
 . $reg.FullName
 via-etfuniv
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-via-etfhist
+$rc = $LASTEXITCODE
+$csv = Join-Path $root 'functional modules\VDF\output_hub\active_tw_etf\active_tw_etf_ssot\ActiveTWETF_Latest.csv'
+if ($rc -eq 2 -and (Test-Path -LiteralPath $csv)) {
+    Write-Host '[宇宙] rc=2 官方冊有缺檔;已寫下的總清單照舊補持股'
+} elseif ($rc -ne 0) {
+    exit $rc
+}
+via-etfhist backfill
 exit $LASTEXITCODE
