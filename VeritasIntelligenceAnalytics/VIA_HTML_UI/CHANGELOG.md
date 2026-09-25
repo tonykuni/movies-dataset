@@ -1,3 +1,8 @@
+## 2026-09-25 同版本重送覆核
+
+- SYNCHRONIZER 在 latest 規則下忽略同時戳且同版本的重送，保留尚未存好的本機勾選；同時戳但較高 revision 仍接受。
+- 實測 storage 事件與跨頁 BroadcastChannel；local / remote / manual 規則保留。
+
 # 2026-09-25 · 接手修復
 
 - 中央 UI 明確共享通知函式，修復跨頁同步與自訂模組點擊的 toast 作用域錯誤。

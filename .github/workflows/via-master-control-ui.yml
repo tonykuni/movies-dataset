@@ -201,6 +201,13 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
+      - name: Verify pending edits survive duplicate synchronization
+        shell: pwsh
+        run: |
+          $env:VIA_UX_ARTIFACT_DIR = Join-Path $PWD "VIA_VRN_Test_Artifacts\sync-pending"
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\uxtest_via_sync_pending_v0100.js"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Upload VRN browser evidence
         if: always()
         uses: actions/upload-artifact@v4

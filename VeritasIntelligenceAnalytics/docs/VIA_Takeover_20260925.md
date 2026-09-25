@@ -56,3 +56,11 @@
 - GitHub Windows 第一次擴充驗收中，總控頁契約與瀏覽器、13 個接手回歸全部過；ENG089 跨輪自測失敗，因 TEMP 短路徑與正規化長路徑比較。v0102 僅正規化自測路徑，不改執行期建構／交接。用路徑別名負控重現：舊版⑪失敗、新版十二檢全過。
 - 同時明設測試用 NODE_PATH 指向 CI 已安裝的 node_modules，避免暫存夾中的 ENG089 瀏覽器探針找不到 Playwright 而 SKIP。Windows CI 將在新 head 重新驗證；最終結論須看該 head 的結果。
 - 非個股框架見 `VIA_NonStock_Database_Framework_20260925.md`，包含多主體、重點與證據、Evernote 連結、既有表對映及 migration 邊界。106 件中 61 件個股、44 件其他類型、1 件影像待 OCR；不把影像當成已解析文件。
+
+## 同步重送的真實操作修正
+
+Windows head `f5968206` 已通過整條擴充 CI（主控台、ENG089 12/12 且無 SKIP、ENG090 23/23、接手回歸 13/13、兩种財報瀏覽器各 20/20）。追加操作測試仍抓到 SYNCHRONIZER 既有的競態：同一 timestamp / revision 的重複通知會在 250ms 延遲存檔期間抹掉使用者剛切換的勾選。
+
+本輪修正 latest 判法：重複版本不重套，同時間的更高 revision 與更晚時間仍接受。storage 與真正跨頁 BroadcastChannel 兩條路均作負控，原版 2/4（兩個重送情境失敗），修正版 4/4。不是延長等待或忽略錯誤換綠；local / remote / manual 設定保留。唯一模板的 changelog、檔案大小與 sha256 同步更新，新增測試也接入 Windows CI。最後 head 的結果以 PR #122 的 checks 為準。
+
+追加五站中一次 VCGC mtime 保全檢失敗，是我同時還原正則冊時間戳造成，該次保留為失敗；停止所有寫入後獨立重跑 38/38 通過。這次干擾不可算成正式庫或 VCGC 程式缺陷。
