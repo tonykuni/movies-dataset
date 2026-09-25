@@ -1,0 +1,50 @@
+{
+ "schema": "vdf-usmacro-method-v1",
+ "probed": "2026-09-26",
+ "log": "docs/VIA_Handover_20260926_FedReserveMethod.md",
+ "table": "us_macro",
+ "since": "2020-01-01",
+ "units": {
+  "millions_usd": [
+   "WALCL",
+   "TREAST",
+   "WSHOMCB",
+   "WTREGEN",
+   "WRESBAL",
+   "WLCFLPCL",
+   "WCURCIR",
+   "WLRRAL",
+   "WLRRAFOIAL",
+   "WLRRAOL"
+  ],
+  "billions_usd": [
+   "RRPONTSYD",
+   "RRPONTTLD",
+   "RRPONTSYSAD"
+  ],
+  "percent": [
+   "RRPONTSYAWARD",
+   "RRPONTSYOFFR",
+   "IORB",
+   "EFFR"
+  ],
+  "dts_millions_usd": [
+   "DTS_TGA_CLOSE"
+  ]
+ },
+ "rules": [
+  "RRPONTSYD is billions. Multiply by 1000 before adding it to a millions series.",
+  "WSHOTSL tracked TREAST in this window. Do not treat it as total securities.",
+  "WTREGEN is the Wednesday Fed liability. DTS_TGA_CLOSE is the daily Treasury book and peaks earlier.",
+  "WLRRAOL is the domestic facility. WLRRAFOIAL is foreign official and did not drain with QT.",
+  "Weekly identity: change in reserves ≈ change in assets − change in TGA − change in RRP − change in currency.",
+  "2026 weekly correlation of TGA change and reserve change was -0.97. Mean residual after assets was about zero.",
+  "DISCBORR last printed in 2020. Do not refresh it as a live series."
+ ],
+ "do_not": [
+  "edit intake macro_ssot",
+  "commit the duckdb",
+  "commit the api key",
+  "divide RRPONTSYD by 1e6"
+ ]
+}
