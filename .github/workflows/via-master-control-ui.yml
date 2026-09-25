@@ -161,6 +161,7 @@ jobs:
           python -m pip install duckdb==1.5.5
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $env:VIA_SELFTEST = "1"
+          $env:NODE_PATH = Join-Path $PWD "node_modules"
           $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
           $vrn = Join-Path $via "functional modules\VRN"
           python (Join-Path $vrn "tests\test_VRN_TakeoverRegression.py")
