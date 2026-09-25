@@ -1,0 +1,102 @@
+{
+ "schema": "vdf-usmacro-agency-v1",
+ "policy": "supportive modules/registry/VIA_USMacro_SSOT_Process_v0100.json",
+ "probed": "2026-09-26",
+ "rule": "A government unit is a source only after one public call returns a value. IRS has no separate series API in this pass. Income-tax receipts are read from the Treasury Monthly Statement.",
+ "agencies": [
+  {
+   "id": "BLS",
+   "zh": "勞工部勞動統計局",
+   "api": "https://api.bls.gov/publicAPI/v1/timeseries/data/",
+   "key": "none for v1",
+   "rows": [
+    {
+     "bls_id": "LNS14000000",
+     "fred_id": "UNRATE",
+     "zh": "失業率",
+     "date": "2026-08",
+     "bls": "4.1",
+     "fred": "4.1",
+     "cross": "AGREE"
+    },
+    {
+     "bls_id": "CES0000000001",
+     "fred_id": "PAYEMS",
+     "zh": "非農就業",
+     "date": "2026-08",
+     "bls": "159075",
+     "fred": "159075",
+     "unit": "thousands",
+     "cross": "AGREE"
+    },
+    {
+     "bls_id": "CUSR0000SA0",
+     "fred_id": "CPIAUCSL",
+     "zh": "CPI",
+     "date": "2026-08",
+     "bls": "334.131",
+     "fred": "334.131",
+     "cross": "AGREE_THIS_MONTH",
+     "synonym": false,
+     "why": "CUSR is not seasonally adjusted and CPIAUCSL is. One matching month is not a synonym."
+    }
+   ]
+  },
+  {
+   "id": "TREASURY",
+   "zh": "財政部",
+   "api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/",
+   "rows": [
+    {
+     "endpoint": "v2/accounting/od/debt_to_penny",
+     "zh": "公眾持有債務",
+     "date": "2026-09-24",
+     "value": "40068807991924.84",
+     "unit": "USD"
+    },
+    {
+     "endpoint": "v1/accounting/mts/mts_table_1",
+     "zh": "八月赤字",
+     "date": "2026-08-31",
+     "value": "166796952277.38",
+     "unit": "USD",
+     "fred_id": "MTSDS133FMS",
+     "fred_value": "-166796.95227738",
+     "fred_unit": "millions",
+     "cross": "AGREE_MAGNITUDE",
+     "sign": "FRED is negative for a deficit. Do not add the two."
+    },
+    {
+     "endpoint": "v1/accounting/mts/mts_table_4",
+     "classification": "Withheld",
+     "zh": "扣繳個人所得稅",
+     "date": "2026-08-31",
+     "field": "current_month_gross_rcpt_amt",
+     "value": "170997354078.08"
+    },
+    {
+     "endpoint": "v1/accounting/mts/mts_table_4",
+     "classification": "Total -- Individual Income Taxes",
+     "zh": "個人所得稅總額",
+     "date": "2026-08-31",
+     "field": "current_month_gross_rcpt_amt",
+     "value": "187641032845.14"
+    },
+    {
+     "endpoint": "v1/accounting/mts/mts_table_4",
+     "classification": "Corporation Income Taxes",
+     "zh": "公司所得稅",
+     "date": "2026-08-31",
+     "field": "current_month_gross_rcpt_amt",
+     "value": "4884519555.54"
+    }
+   ]
+  },
+  {
+   "id": "IRS",
+   "zh": "國稅局",
+   "state": "THROUGH_TREASURY",
+   "why": "No IRS time-series endpoint was called. The tax lines above are collected by IRS and published by Treasury MTS table 4."
+  }
+ ]
+}
