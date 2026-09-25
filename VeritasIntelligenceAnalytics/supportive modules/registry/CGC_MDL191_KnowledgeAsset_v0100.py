@@ -66,7 +66,7 @@ def main() -> int:
 
 def selftest() -> int:
     card = check()
-    ok = (card["assets"] == 11 and card["lamps"]["RED"] == 0 and card["cycles"] == []
+    ok = (card["assets"] == 12 and card["lamps"]["RED"] == 0 and card["cycles"] == []
           and card["method_log_linked"] and card["order"][0] == "usmacro_process")
     print("  [OK]" if ok else "  [FAIL] " + json.dumps(card, ensure_ascii=False))
     return 0 if ok else 1
