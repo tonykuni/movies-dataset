@@ -1,0 +1,276 @@
+{
+ "schema": "vdf-usmacro-tree-v1",
+ "policy": "VIA_USMacro_SSOT_Process_v0100.json",
+ "parent_ssot": "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/macro_ssot.json",
+ "probed": "2026-09-26",
+ "families": [
+  {
+   "id": "pmi",
+   "zh": "採購經理人指數",
+   "kinds": [
+    "製造業",
+    "服務業"
+   ],
+   "parent_codes": [
+    "US.Business.ISM.Mfg.PMI",
+    "US.Business.ISM.Svc.PMI",
+    "US.Business.SPG.PMI.Mfg"
+   ],
+   "finer_on_file": [
+    "新訂單",
+    "生產",
+    "就業",
+    "價格",
+    "供應商交貨",
+    "存貨",
+    "服務業活動"
+   ],
+   "state": "PARKED",
+   "why": "NAPM, NMFCI, NAPMNOI, USMFGPMI returned HTTP 400 on 2026-09-26. The names stay. They are not fetched.",
+   "synonyms": [
+    "PMI",
+    "ISM",
+    "採購經理人指數",
+    "製造業PMI",
+    "非製造業PMI"
+   ]
+  },
+  {
+   "id": "labor",
+   "zh": "就業",
+   "parent_codes": [
+    "US.Labor.NFP",
+    "US.Labor.UnempRate.U3",
+    "US.Labor.UnempRate.U6"
+   ],
+   "synonyms": [
+    "非農",
+    "NFP",
+    "PAYEMS",
+    "失業率",
+    "U3",
+    "UNRATE",
+    "U6",
+    "U6RATE"
+   ],
+   "add": [
+    {
+     "code": "US.Labor.UnempRate.U4",
+     "fred_id": "U4RATE",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "4.4"
+    },
+    {
+     "code": "US.Labor.UnempRate.U5",
+     "fred_id": "U5RATE",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "5.1"
+    },
+    {
+     "code": "US.Labor.Duration.Mean",
+     "fred_id": "UEMPMEAN",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "26.3"
+    },
+    {
+     "code": "US.Labor.Duration.LT5",
+     "fred_id": "UEMPLT5",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "2000"
+    },
+    {
+     "code": "US.Labor.Duration.5TO14",
+     "fred_id": "UEMP5TO14",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "2077"
+    },
+    {
+     "code": "US.Labor.Duration.15TO26",
+     "fred_id": "UEMP15T26",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "1147"
+    },
+    {
+     "code": "US.Labor.Duration.27OV",
+     "fred_id": "UEMP27OV",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "1930"
+    }
+   ],
+   "declared": [
+    {
+     "code": "US.Labor.SampleResponse",
+     "fred_id": null,
+     "why": "BLS 樣本收取率沒有已實測的 FRED 代號，不發明"
+    }
+   ]
+  },
+  {
+   "id": "prices",
+   "zh": "通膨",
+   "parent_codes": [
+    "US.Prices.CPI.Headline",
+    "US.Prices.CPI.Core",
+    "US.Prices.PCE.Headline",
+    "US.Prices.PPI.FinalDemand"
+   ],
+   "note": "母冊已有 CPI 27 列與 PCE、PPI 分項。下面三列是母冊沒有、這次實測過的。",
+   "add": [
+    {
+     "code": "US.Prices.CPI.StickyCore",
+     "fred_id": "CORESTICKM159SFRBATL",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "2.700641247"
+    },
+    {
+     "code": "US.Prices.CPI.Median",
+     "fred_id": "MEDCPIM158SFRBCLE",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "2.1041087807"
+    },
+    {
+     "code": "US.Prices.PCE.TrimmedMean",
+     "fred_id": "PCETRIM12M159SFRBDAL",
+     "freq": "Monthly",
+     "date": "2026-07-01",
+     "value": "2.28"
+    }
+   ]
+  },
+  {
+   "id": "durable",
+   "zh": "耐久財訂單",
+   "parent_codes": [
+    "US.Growth.DurableGoods.Total",
+    "US.Growth.DurableGoods.Core"
+   ],
+   "add": [
+    {
+     "code": "US.Growth.DurableGoods.Unfilled",
+     "fred_id": "AMDMUO",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "1609423"
+    },
+    {
+     "code": "US.Growth.DurableGoods.Shipments",
+     "fred_id": "AMTMNO",
+     "freq": "Monthly",
+     "date": "2026-07-01",
+     "value": "663616.0"
+    },
+    {
+     "code": "US.Growth.DurableGoods.Inventories",
+     "fred_id": "AMTMTI",
+     "freq": "Monthly",
+     "date": "2026-07-01",
+     "value": "966871.0"
+    }
+   ],
+   "rejected": [
+    {
+     "fred_id": "AMDMNO",
+     "why": "HTTP 400"
+    }
+   ]
+  },
+  {
+   "id": "treasury",
+   "zh": "國債與期限",
+   "owner": "FRED",
+   "parent_codes": [
+    "US.Rates.Treasury.1M",
+    "US.Rates.Treasury.3M",
+    "US.Rates.Treasury.2Y",
+    "US.Rates.Treasury.5Y",
+    "US.Rates.Treasury.10Y",
+    "US.Rates.Treasury.30Y"
+   ],
+   "yfinance_cross": [
+    {
+     "ticker": "^IRX",
+     "fred_id": "DGS3MO",
+     "tenor": "3M"
+    },
+    {
+     "ticker": "^FVX",
+     "fred_id": "DGS5",
+     "tenor": "5Y"
+    },
+    {
+     "ticker": "^TNX",
+     "fred_id": "DGS10",
+     "tenor": "10Y"
+    },
+    {
+     "ticker": "^TYX",
+     "fred_id": "DGS30",
+     "tenor": "30Y"
+    }
+   ],
+   "rule": "yfinance is overlap only. It does not own the yield."
+  },
+  {
+   "id": "fiscal",
+   "zh": "美國政府收支",
+   "add": [
+    {
+     "code": "US.Fiscal.Receipts.Quarter",
+     "fred_id": "FGRECPT",
+     "freq": "Quarterly",
+     "date": "2026-04-01",
+     "value": "5980.631"
+    },
+    {
+     "code": "US.Fiscal.Outlays.Quarter",
+     "fred_id": "FGEXPND",
+     "freq": "Quarterly",
+     "date": "2026-04-01",
+     "value": "7764.988"
+    },
+    {
+     "code": "US.Fiscal.TaxReceipts.Quarter",
+     "fred_id": "W006RC1Q027SBEA",
+     "freq": "Quarterly",
+     "date": "2026-04-01",
+     "value": "3736.828"
+    },
+    {
+     "code": "US.Fiscal.Deficit.Month",
+     "fred_id": "MTSDS133FMS",
+     "freq": "Monthly",
+     "date": "2026-08-01",
+     "value": "-166796.95227738"
+    },
+    {
+     "code": "US.Fiscal.Receipts.Year",
+     "fred_id": "FYFR",
+     "freq": "Annual",
+     "date": "2025-09-30",
+     "value": "5236421.0"
+    },
+    {
+     "code": "US.Fiscal.Outlays.Year",
+     "fred_id": "FYONET",
+     "freq": "Annual",
+     "date": "2025-09-30",
+     "value": "7011105.0"
+    }
+   ],
+   "freq_rule": "Month, quarter, and year stay separate rows. Do not average them into one synonym."
+  }
+ ],
+ "akshare": {
+  "state": "LANE_ONLY",
+  "why": "No AKShare function was called in this pass, so none is recorded as a synonym source."
+ }
+}

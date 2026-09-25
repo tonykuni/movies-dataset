@@ -1,0 +1,24 @@
+{
+ "id": "USMACRO_SSOT_PROCESS",
+ "rank_note": "Does not rewrite VIA_Policy_Laws. This file is the process SSOT for US macro series.",
+ "owner": "FRED for US official series. yfinance may cross-check Treasury yields only. AKShare may cross-check, never replace FRED.",
+ "intake": "references/intake macro_ssot.json is not edited. New ids land in VDF_USMacro_Tree_v0100.json first.",
+ "order": [
+  "已有代號",
+  "同義字",
+  "單點實測",
+  "第二來源對照",
+  "頻率分開",
+  "寫入樹",
+  "才可進母冊"
+ ],
+ "rules": [
+  "Same fred_id is one series. A second name is a synonym, not a new row.",
+  "Monthly, quarterly, and annual are frequencies, not synonyms. Compare them only after the stated aggregation.",
+  "A finer child must name its parent code. A child is not a synonym of the parent.",
+  "No probe, no add. HTTP 400 is PARKED, not a live series.",
+  "yfinance tickers ^IRX ^FVX ^TNX ^TYX overlap DGS3MO DGS5 DGS10 DGS30. FRED owns the value.",
+  "AKShare is a cross-check lane. A function name is recorded only after one successful call.",
+  "Synonym updates go to the central synonym book only when two sources agree on the overlap window."
+ ]
+}
