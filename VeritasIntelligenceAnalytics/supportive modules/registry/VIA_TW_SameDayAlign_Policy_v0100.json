@@ -1,0 +1,25 @@
+{
+  "policy": "tw.sameday.align.v1",
+  "rank": "major",
+  "key": ["date", "code"],
+  "exchange": {
+    "source": "TWSE/TPEX",
+    "same_day": [
+      "open", "high", "low", "close", "volume", "value",
+      "foreign_net", "trust_net", "dealer_net", "total_net",
+      "foreign_holding_pct", "trust_holding_pct", "dealer_holding_pct",
+      "margin_bal", "short_bal", "short_margin_ratio",
+      "margin_maint_pct", "margin_usage_pct", "short_usage_pct",
+      "daytrade_volume", "daytrade_value"
+    ],
+    "note": "缺欄留空，不拿別的來源補。"
+  },
+  "yfinance": {
+    "close": "只和交易所收盤重疊核對。對不上就不乘調整係數。",
+    "adj_close": "係數 = adj_close / close。只乘到已對齊的交易所開高低收。"
+  },
+  "quantguard": {
+    "volume_value": "扣除當沖後的成交量與成交值",
+    "display": "可切換 gross 與 net。計算預設 net。"
+  }
+}
