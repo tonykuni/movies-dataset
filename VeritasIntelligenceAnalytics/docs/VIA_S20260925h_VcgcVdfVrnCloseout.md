@@ -1,17 +1,24 @@
 # 2026-09-25h · VCGC / VDF / VRN 收尾
 
-工作站樹：`C:\Users\tonyk\OneDrive\Documents\movies-dataset`。
+操作員裁：以已經驗證通過的為準。沒過的這輪不管。工作站樹是 `C:\Users\tonyk\OneDrive\Documents\movies-dataset`。
 
-## 這輪鎖住
+## 這輪完工
 
-工具燈轉綠。三份 `VeritasCeleritas.py` 同一份，sha12 `558377cd455d`，243092 字節。正典位是 `supportive modules/accelerator/`。旁邊兩份已對齊過來。`VeritasAegisNexus.py` 也是一份。加速器控制面綠。
+| 項 | 結果 |
+| --- | --- |
+| 門 | `via-vcgc status` rc 0 |
+| VCGC | 自測 37/37 rc 0 |
+| VDF | 自測 31/31 rc 0。啟動綠。引擎鏈 10 綠 |
+| VRN | 自測 27/27 rc 0。樣本夾綠，106 檔 |
+| 矩陣 | 105 份 rc 0。判對率 425/425 |
+| 橋 | 加速器四系 100%。VDF 網路橋 242/242。PS 尾版 846/846 |
+| 工具 | 綠。三份 `VeritasCeleritas.py` 同一份（sha12 `558377cd455d`）。`VeritasAegisNexus.py` 一份 |
+| 同意閘 | 該窗 `NET=YES` `SCRAPE=YES`。FRED 鑰長度 32，只在環境變數 |
 
-卡書由 `via-peis book --family vdf` 重建，不是手改。45 張變 46 張。`VDF_ENG091_VdfAuditGate` 已進書。
+卡書已由 `via-peis book --family vdf` 重建為 46 張。這是寫者寫的，不是手改。
 
-## 邏輯仍過期
+## 這輪不管
 
-寫者只掃 `functional modules/VDF/engine`。尺看的是全樹尾版。所以書外那 7 支不是寫失敗，是起點沒覆蓋：
+邏輯仍過期的那些：書外 7 支、沒有版號的三支、`candidates/` 裡的 `sector_rotation_capital_flow_engine`。不立版號、不加寬掃描起點。
 
-`VDF_ENG045_OutputHub`、`VDF_ENG092_TWFlowsAdjConsensus`、`VDF_ENG093_LaunchConsole`、`VDF_InjectAccelNetBridges`、`VDF_MDL004_TWFullMarketEngine`、`VDF_MDL006_FinancialModel`、`vdf_input_matrix`。
-
-另外不進尾版尺的：`sector_rotation_capital_flow_engine`（在 `candidates/`），以及沒有版號的 `VDF_ENG046_FetchMatrixRegistry`、`VDF_ENG049_FiveDayFetch`、`VDF_MDL007_SSOTResolver`。不代立版號。
+上漲空間整欄零綠、第二顆庫、SSOT 黃燈、中央治理家族紅燈、安裝核可未過。這些不是這輪已經通過的東西。
