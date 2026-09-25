@@ -107,6 +107,90 @@
   "fingerprint": "鎖定鍵 = 被量檔的 sha256(引擎自測)或 origin/main + 本批改動清單(整批閘)",
   "not_a_pass": "SKIP / NODATA / PARTIAL 不是過關;境缺照實記,不冒充綠"
  },
- "locks": [],
- "measured_by": "git show -s 四筆 commit 訊息逐一比對關鍵字(registry-sync / VCGC / 自測 / 實判 / 全格子 / 總控頁 / 還原);量出來的才寫進 seen_in"
+ "locks": [
+  {
+   "step": "S1",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S2",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S3",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S4",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S6",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S7",
+   "commit": "3c3e4a10",
+   "state": "PASS"
+  },
+  {
+   "step": "S5",
+   "commit": "3c3e4a10",
+   "state": "PASS_WITH_ENV_FAIL",
+   "note": "FAIL 4 = 3 件境缺 + 總控頁契約(S6 修好)"
+  }
+ ],
+ "measured_by": "git show -s 四筆 commit 訊息逐一比對關鍵字(registry-sync / VCGC / 自測 / 實判 / 全格子 / 總控頁 / 還原);量出來的才寫進 seen_in",
+ "best_current": {
+  "ruled_by": "操作員 2026-09-25「然後定位目前通過為最佳現況」",
+  "commit": "3c3e4a10",
+  "branch": "claude/busy-bell-97sa4f",
+  "pr": 126,
+  "base": "14bca8a4",
+  "results": {
+   "S1_registry_sync": "APPLIED · 新 4 · 變更 16 · 退役 0 · AST錯 0(第二次;第一次 新 9 · 變更 78)",
+   "S2_vcgc": "三十八檢 38/38",
+   "S3_selftests": {
+    "CGC_MDL187_v0101": "25/25",
+    "CGC_MDL156_v0110": "37/37",
+    "CGC_MDL064_v0498": "8/8",
+    "CGC_MDL039_v0106": "5/5",
+    "CGC_MDL038_v0103": "3/3",
+    "CGC_MDL036_v0101": "3/3",
+    "VRN_PanoramaProbe_unit": "14/14",
+    "VIA_ENG003_tombstone": "1/1"
+   },
+   "S4_kill_gate": "rc0 · 39 檔 · 11 條全過 · 10 件許可(位元吻合)",
+   "S5_grid": {
+    "ok": 340,
+    "fail": 4,
+    "skip": 17,
+    "timeout": 0,
+    "evidence": "GRID_20260925_063109.json",
+    "prod_db": "三本前後一致"
+   },
+   "S6_master_control": "正式任務 92 · 契約 19/19",
+   "S7_restore": "格子再生 38 支逐檔還原"
+  },
+  "expected_env_fail": [
+   {
+    "station": "工具升階梯十檢",
+    "why": "容器缺 OCR/QuantGuard 相依 → NONE_AVAILABLE 回 rc1(Z216 待改誠實 rc3)"
+   },
+   {
+    "station": "治理台 UI Matrix 八檢",
+    "why": "② 綠燈率讀最新格子存證(容器 SKIP 多、缺件站多 → <95%)"
+   },
+   {
+    "station": "CGC_MDL120_SystemUI",
+    "why": "⑥ 生成頁 VIA_UI_ETFConsensusAnalysis_v0100.html 在容器不在"
+   }
+  ],
+  "use": "三輪多面相沙盒引擎(via-vcgc tri)拿這一筆當預判基準:預判 = 這裡的結果;expected_env_fail 以外的紅才算意外"
+ }
 }
