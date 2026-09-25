@@ -1,0 +1,114 @@
+{
+ "schema": "via-knowledge-asset-v1",
+ "governor": "VCGC",
+ "entry": "via-vcgc",
+ "flag": "VIA_FROM_VCGC",
+ "note": "Files stay where the existing doors open them. This book is the structure. It does not move them and it does not edit the intake SSOT.",
+ "classes": [
+  "process",
+  "inventory",
+  "method",
+  "log",
+  "refresh"
+ ],
+ "assets": [
+  {
+   "id": "usmacro_process",
+   "class": "process",
+   "path": "supportive modules/registry/VIA_USMacro_SSOT_Process_v0100.json",
+   "role": "admission order",
+   "depends_on": []
+  },
+  {
+   "id": "coverage",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_Coverage_Map_v0100.json",
+   "role": "what the parent book already measures",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  },
+  {
+   "id": "roster",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_Detail_Fetch_Roster_v0100.json",
+   "role": "finer series proposed for fetch",
+   "depends_on": [
+    "coverage"
+   ]
+  },
+  {
+   "id": "gap",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_Gap_v0100.json",
+   "role": "roster ids missing from the parent",
+   "depends_on": [
+    "coverage",
+    "roster"
+   ]
+  },
+  {
+   "id": "tree",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_Tree_v0100.json",
+   "role": "probed children, not yet in the intake",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  },
+  {
+   "id": "agencies",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_Agencies_v0100.json",
+   "role": "BLS and Treasury lanes",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  },
+  {
+   "id": "fed_more",
+   "class": "inventory",
+   "path": "functional modules/VDF/VDF_USMacro_FedMore_v0100.json",
+   "role": "extra live Fed series",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  },
+  {
+   "id": "fed_method",
+   "class": "method",
+   "path": "functional modules/VDF/VDF_USMacro_Method_v0100.json",
+   "role": "units and the reserve identity",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  },
+  {
+   "id": "fed_method_log",
+   "class": "log",
+   "path": "docs/VIA_Handover_20260926_FedReserveMethod.md",
+   "role": "handover for the next project",
+   "depends_on": [
+    "fed_method"
+   ]
+  },
+  {
+   "id": "method_refresh",
+   "class": "refresh",
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0100.py",
+   "role": "reload the method series into us_macro",
+   "depends_on": [
+    "fed_method"
+   ]
+  },
+  {
+   "id": "fred_engine",
+   "class": "refresh",
+   "path": "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0103.py",
+   "role": "parent FRED fetch",
+   "depends_on": [
+    "usmacro_process"
+   ]
+  }
+ ]
+}
