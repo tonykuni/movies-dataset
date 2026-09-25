@@ -1,4 +1,4 @@
-﻿# Register-VIA-Commands-v0243.ps1 — 側線 2026-09-25 第十六段(操作員「Yes for all」「核准一切動作」= L70 這一次的許可;主線批號由併線的手指定 L25):+via-vrnfin(別名 財報模板;VRN_ENG090 交易所財報 VRN 模板頁:status|run|check|--selftest;讀 VDF_ENG082 交易所彙總財報 → 制式 U/I 模板頁 + SYNCHRONIZER 信封 v2 · 交接只增不減 · 上下自動燈號;零網路 · 唯讀庫 · 只落 VIA_Reports;掉球 Z212 結)。守門版:尾版不在就印 ABSENT、rc 2、不呼 python;預設動詞 status(只讀);要 duckdb → 走 vdf 家族境(同 via-finstat)。梭 via-vrnfin.cmd(根+bin)。其餘沿用 v0242。
+﻿# Register-VIA-Commands-v0243.ps1 — 側線 2026-09-25 第十六段(操作員「Yes for all」「核准一切動作」= L70 這一次的許可;主線批號由併線的手指定 L25):+via-vrnfin(別名 財報模板;VRN_ENG090 交易所財報 VRN 模板頁:status|run|check|--selftest;讀 VDF_ENG082 交易所彙總財報 → 制式 U/I 模板頁 + SYNCHRONIZER 信封 v2 · 交接只增不減 · 上下自動燈號;零網路 · 唯讀庫 · 只落 VIA_Reports;掉球 Z212 結)。守門版:尾版不在就印 ABSENT、rc 2、不呼 python;預設動詞 status(只讀);要 duckdb → 走 vdf 家族境(同 via-finstat)。L102 模板章(CELERITAS-TEMPLATE-JOIN v1 · 冊接法:冊本身不套,令在自己的呼叫裡套、呼完即還原;助手執行期才編譯,編不起來也不拖垮整本冊)。梭 via-vrnfin.cmd(根+bin)。其餘沿用 v0242。
 # Register-VIA-Commands-v0242.ps1 — 側線 2026-09-21 b(操作員「依你建議執行」= L70 這一次的許可;主線批號由併線的手指定 L25):+via-vdfsys(別名 資料對接口;VDF_SystemManager 子系統管理對接口:status|engines|bridges|tools|catalog|links|records|read <域> [key] [--full]|sync [--apply]|page|--selftest;上接 VCGC v0120,下管 政策/邏輯/因子/參數四庫 + 引擎面 + 橋/工具面(所有 PY 接加速器 · 真擷取走網路工具,尺=CGC_MDL124)+ 交接/紀錄;零網路 · 預設只讀 · sync --apply 只落 VIA_Reports\vdf_system)· +via-vrnsys(別名 研報對接口;VRN_SystemManager 批681/682 的 Z65 候准項,同一份契約)。兩支都是守門版:尾版不在就印 ABSENT、rc 2、不呼 python(18:01 工作站實錄:第一版把 status 當腳本餵給 python)。梭 via-vdfsys.cmd / via-vrnsys.cmd(根+bin)。其餘沿用 v0241。
 # Register-VIA-Commands-v0241.ps1 — 側線 2026-09-21(操作員令「註冊這些」;L70 逐次許可沿用本令;主線批號由併線的手指定 L25):+via-ssotadd(別名 增補審計;VRN_ENG088 SSOT 增補審計橋:status|tests|drift|candidates|--selftest;收容包自帶測試在暫存副本實跑+收容夾 sha256 前後對;包內尺 vs 正典落差每列帶下一步只列不裁;候選一律 PENDING_OPERATOR;零網路零寫庫只落 VIA_Reports)。via-vrnrules 多一個動詞 additive(SUP_MDL749 v0111 增補冊讀冊口:--in 詞 --scope 域 --source 來源;同詞多義無來源回全部候選;rc 0 RESOLVED·1 SOURCE_REQUIRED·2 UNKNOWN·3 ABSENT;43→48 檢)。其餘沿用 v0240。
 # Register-VIA-Commands-v0240.ps1 — 批677(操作員令「實測 VRN 驗證通過後給我一個啟動 VRN 的 POWERSHELL CODE」;L70 逐次許可沿用本令):+via-vrnrun(別名 跑VRN;Invoke-VIA-VRN-v0100.ps1)。為什麼要有這一支:VRN 的一輪實測是**五個動詞照順序**(冊重建 → 六層鏈 → 庫價重算 → 驗真矩陣 → 標準 U/I),少一個就會出現「量到的是另一棵樹」或「頁上的數字是上一輪的」;把順序寫死在一支裡,就不必每次去記(L97)。它開頭先印**本窗對著哪一棵樹**與點的是哪一本冊(批397 雙副本律:站的位置不決定落點,**本視窗點源的那一份 Register 才決定**——工作站實錄:人站在 C:\Users\tonyk\movies-dataset,頁卻寫進 OneDrive 那一棵)。**不裝套件、不設同意閘**:閘沒開就把可貼的一行印出來,貼不貼是操作員的事。其餘沿用 v0239。
@@ -1297,13 +1297,66 @@ Set-Alias -Name 資料對接口 -Value via-vdfsys -Scope Global -Force
 #   via-vrnsys catalog|links|read <policy|logic|factor|param|engine|handover|records|upstream> [key]|sync --apply|page|--selftest(廿五檢)
 function global:via-vrnsys { $a = ConvertTo-VIACleanArgs $args; $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_SystemManager_v*.py"; if (-not $eng) { Write-Host "  [via-vrnsys] ABSENT:functional modules\VRN\VRN_SystemManager_v*.py 不在這棵樹" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }; $py = Get-VIAEnvPython "vrn"; Invoke-VIAPython -Python $py $eng $(if ($a) { $a } else { "status" }) }
 Set-Alias -Name 研報對接口 -Value via-vrnsys -Scope Global -Force
+# ===== [VIA:CELERITAS-PS7:v0101] 模板章(L102;CELERITAS-TEMPLATE-JOIN v1 · 冊接法)=====
+# 冊接法(側線 2026-09-25 第十六段;L102「凡 AI 產出的 .ps1 必須接入模板,不得裸奔」):
+#   本冊是**點源進互動殼**的,不是跑完就結束的腳本——正主一套就把本行程調成 AboveNormal、改 GC / 執行緒池 / 編碼,
+#   冊本身套下去,整個工作階段都頂著,關窗之前還原不回來。所以冊本身**不套**,只提供 Invoke-VIACeleritasScoped:
+#   要加速的令在自己的呼叫裡套(只動本行程)、呼完即還原(finally)。正主關在動態模組裡,載法照抄
+#   Open-VIA-VDF-v0101 起 / Invoke-VIA-VdfFetch-v0106 起那一段(工作站實跑過;掉球 Z136 / Z137)。
+#   本版新增的 via-vrnfin 照此接;冊上其餘舊令沿用 v0242(既有債,不在這一版動)。
+#   保險:助手本體放在單引號 here-string 裡、執行期才編譯——它就算有語法錯,也只會退成「不套、令照跑」,
+#   不會讓整本冊點源失敗(冊一壞,所有短令與梭一起失效)。
+$VIACelScopedSrc = @'
+param([Parameter(Mandatory = $true)][scriptblock]$Body)
+$cel = $null
+$note = "正主缺(supportive modules\ps7\VeritasCeleritas.PS7.ps1),略過"
+try {
+    $celFile = Join-Path $VIA "supportive modules\ps7\VeritasCeleritas.PS7.ps1"
+    if (Test-Path -LiteralPath $celFile) {
+        $cel = New-Module -Name "VIACeleritasPS7Scoped" -ArgumentList $celFile -ErrorAction SilentlyContinue -ScriptBlock {
+            param($CelFile)
+            $script:CeleritasPS7 = $null
+            $OFS = " "
+            if (-not (Get-Variable -Name PSNativeCommandArgumentPassing -ErrorAction SilentlyContinue)) { $PSNativeCommandArgumentPassing = $null }
+            $null = . $CelFile -RestoreOnly 2>$null
+            Export-ModuleMember -Function Restore-CeleritasPS7
+        }
+        $snap = $null
+        if ($cel) { try { $snap = & $cel { Get-CeleritasSnapshot } 2>$null } catch { $snap = $null } }
+        $on = $false
+        if ($cel -and ($null -ne $snap)) {
+            try { $null = & $cel { Start-CeleritasPS7 } 2>$null } catch { }
+            try { $on = [bool](& $cel { $script:CeleritasPS7.Applied -and ($null -ne $script:CeleritasPS7.Snapshot) } 2>$null) } catch { $on = $false }
+            if (-not $on) { try { & $cel { Restore-CeleritasPS7 } 2>$null } catch { } }
+        }
+        if (-not $on) { $cel = $null }
+        $note = $(if ($on) { "本行程減壓已套(只動本行程;這個令跑完就還原)" } else { "正主在但沒套上,略過(令照跑)" })
+    }
+} catch {
+    $cel = $null
+    $note = "正主載入失敗,略過(令照跑):" + $_.Exception.Message
+}
+Write-Host ("  [Celeritas] " + $note) -ForegroundColor DarkGray
+try { & $Body }
+finally {
+    if ($cel) { $rc = $global:LASTEXITCODE; try { & $cel { Restore-CeleritasPS7 } 2>$null } catch { }; $global:LASTEXITCODE = $rc }
+}
+'@
+try {
+    Set-Item -Path function:global:Invoke-VIACeleritasScoped -Value ([scriptblock]::Create($VIACelScopedSrc)) -Force
+} catch {
+    $global:VIACelScopedError = $_.Exception.Message
+    function global:Invoke-VIACeleritasScoped { param([scriptblock]$Body) Write-Host ("  [Celeritas] 模板章助手編不起來,略過(令照跑):" + $global:VIACelScopedError) -ForegroundColor DarkGray; & $Body }
+}
+# ===== [VIA:CELERITAS-PS7:END] =====
 # ── 側線 2026-09-25 第十六段(掉球 Z212):via-vrnfin —— 交易所財報 VRN 模板頁(VRN_ENG090;讀 VDF_ENG082 交易所彙總財報 → 制式 U/I 模板頁 + SYNCHRONIZER 信封 v2;交接只增不減;上下自動燈號;零網路 · 唯讀庫)
 #   via-vrnfin                     status:頁在哪 · 跟庫同一時點嗎 · 上下燈(只讀;預設動詞)
 #   via-vrnfin run                 重產模板頁 + 信封 + 範本冊 + 歷史 CSV + JSON 報告(只落 VIA_Reports;唯讀庫、零網路)
 #   via-vrnfin check               頁與庫同一時點 · 頁內鍵名 · 頁零外連 · 信封 = 頁內嵌那一份(rc0 一致 / rc1 過期或漂移 / rc2 缺料)
 #   via-vrnfin --selftest          二十三檢(自測只寫暫存;沒有 node 照實 SKIP)
 #   守門:尾版不在就印 ABSENT、rc 2、不呼 python(同 via-vdfsys 的教訓)
-function global:via-vrnfin { $a = ConvertTo-VIACleanArgs $args; $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG090_FinStatementsTemplate_v*.py"; if (-not $eng) { Write-Host "  [via-vrnfin] ABSENT:functional modules\VRN\VRN_ENG090_FinStatementsTemplate_v*.py 不在這棵樹" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }; $py = Get-VIAEnvPython "vdf"; $v = @(if ($a) { $a } else { "status" }); Invoke-VIAPython -Python $py $eng @v }
+#   L102 模板章:python 那一段包在 Invoke-VIACeleritasScoped 裡(只動本行程、呼完即還原;冊接法見上一段)
+function global:via-vrnfin { $a = ConvertTo-VIACleanArgs $args; $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG090_FinStatementsTemplate_v*.py"; if (-not $eng) { Write-Host "  [via-vrnfin] ABSENT:functional modules\VRN\VRN_ENG090_FinStatementsTemplate_v*.py 不在這棵樹" -ForegroundColor Yellow; $global:LASTEXITCODE = 2; return }; $py = Get-VIAEnvPython "vdf"; $v = @(if ($a) { $a } else { "status" }); Invoke-VIACeleritasScoped { Invoke-VIAPython -Python $py $eng @v } }
 Set-Alias -Name 財報模板 -Value via-vrnfin -Scope Global -Force
 
 # ── 批529:via-nlpvrn —— NLP文字修復+證據型摘要→VRN ENG072/ENG073→VDF ENG087 唯讀狀態
