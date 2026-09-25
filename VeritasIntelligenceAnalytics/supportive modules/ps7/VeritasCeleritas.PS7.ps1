@@ -21,7 +21,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     throw "VeritasCeleritas.PS7 需要 PowerShell 7+。目前：$($PSVersionTable.PSVersion)"
 }
 
-if ($null -eq $script:CeleritasPS7) {
+if (-not (Get-Variable -Name 'CeleritasPS7' -Scope Script -ErrorAction Ignore)) {
     $script:CeleritasPS7 = [ordered]@{
         Version     = '1.0.0'
         Applied     = $false
