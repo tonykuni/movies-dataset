@@ -101,7 +101,32 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from urllib.request import Request, urlopen
 
 SCHEMA_VERSION = "VRN_SCHEMA_20260924_004"
-ENGINE_VERSION = "v0103"
+ENGINE_VERSION = "v0107"
+# v0107 (2026-09-25 real-report regression): percentages in New/Old/Chg columns are not amounts.
+# Header declarations, metric labels and individual cells determine units; data rows cannot set table units.
+# Expand only an unambiguous merged year/revision header, retain ambiguous periods for review, and expose
+# non-amount exclusions from financial identities. The original cell and table coordinates remain evidence.
+# v0106 (批733; 掉球 Z195 -- the workstation run of 2026-09-24: 7 of 105 PDFs gave "no financial rows"):
+#   tables printed without ruling lines.  (1) the column reader (evidence core) now knows the year-first quarter
+#   headers of the screenshot table (25Q1 / 25Q4(F)), half years and 2024年; before, it saw only 2024 and 2025(F) in
+#   that header and read nothing -- in other layouts it would have put quarter numbers under the year columns.
+#   (2) when the ruled tables and the first four pages still give no income-statement row, later pages are read
+#   too, but only pages whose text looks like an income statement (long initiation reports carry their statements
+#   at the back).  (3) a table read without ruling lines is stored only if it adds up (gate_fallback_tables:
+#   the same identities as v0105); one that does not is left out and named in the report's ValidationIssues as
+#   FIN_TABLE_REJECTED(...).  Ruled tables are unchanged (their failures stay warnings, as in v0105).
+# v0105 (mother 批732; operator's screenshot 2026-09-24 of 20251128兆豐訪談速報-神達(3706) p.4 季度損益表):
+#   that table came out wrong three ways -- (1) quarter headers "25Q1".."26Q1(F)" lost their year (FiscalYear None,
+#   PERIOD_UNCLEAR), (2) "(F)" was not read as a forecast, (3) 營業成本 / 營業費用 had no metric, so both rows were
+#   dropped.  Period headers now go to the mother's parser first (VRN_ENG074 period_parts, the one that already
+#   reads 24Q1 / 25Q1(F) / 2025(F) / 1H25 / FY25); what it cannot parse keeps the rules below.  Metrics: COGS,
+#   OperatingExpense (+ their ratios, so a percentage never becomes an amount), NonOperatingIncome, InterestIncome.
+#   financial_identity_checks(): the table must add up (gross = revenue - cost, operating = gross - expense, four
+#   quarters = the year) within the rounding the printed digits carry -- a read table that does not add up is
+#   named, not trusted.
+# v0104 (mother 批731; operator 2026-09-24「剛剛跑好慢」): process_batch takes an optional args.only_files (file names)
+#   -- the self-test loop's idempotency pass re-ingests a named sample instead of the whole folder; without it nothing
+#   changes.  The evidence core behind the first-page reader now parses each page / appendix once per file version.
 # v0103 (mother 批729; operator 2026-09-24 "所有目標價及各前一日的價格都要換成ADJ CLOSE 上漲空間都要用最新的ADJ CLOSE"):
 # UpsideDownsidePct is the upside over the LATEST adj close (the mother's L99 through VRN_Evidence_Core.adj_basis ->
 # ENG073 adj_quote); the target and the day-before prices in ADJ CLOSE terms get their own columns (appended only);
@@ -378,6 +403,15 @@ METRIC_ALIASES = {
     "MarketCap": ["Market Cap", "市值"],
     "TargetPrice": ["Target Price", "TP", "目標價"],
     "CurrentPrice": ["Current Price", "現價", "股價"],
+    # v0105 (批732): cost and expense rows were dropped whole (no metric).  Only added; the ratios are here so that
+    # 營業費用率 / 營業成本率 (a percentage) never lands in the amount (the longest alias wins).
+    "COGS": ["COGS", "Cost of Revenue", "Cost of Sales", "Cost of Goods Sold", "營業成本", "銷貨成本"],
+    "COGSRatio": ["營業成本率", "銷貨成本率"],
+    "OperatingExpense": ["Operating Expense", "Operating Expenses", "OPEX", "營業費用"],
+    "OperatingExpenseRatio": ["營業費用率", "費用率", "OPEX Ratio"],
+    "NonOperatingIncome": ["營業外收支", "營業外收入及支出", "營業外收入", "業外收支", "業外損益", "Non-operating Income",
+                           "Non-Operating Income"],
+    "InterestIncome": ["利息收入", "Interest Income"],
 }
 
 METRIC_CATEGORY_MAP = {
@@ -405,6 +439,12 @@ METRIC_CATEGORY_MAP = {
     "MarketCap": "Basic Info",
     "TargetPrice": "Valuation",
     "CurrentPrice": "Valuation",
+    "COGS": "Income Statement",
+    "COGSRatio": "Income Statement",
+    "OperatingExpense": "Income Statement",
+    "OperatingExpenseRatio": "Income Statement",
+    "NonOperatingIncome": "Income Statement",
+    "InterestIncome": "Income Statement",
 }
 
 # CSV 編碼。
@@ -1263,6 +1303,44 @@ def extract_document_text_and_zones(path: Path) -> Dict[str, Any]:
 
 
 COLUMN_TABLE_PAGES = 4      # unruled summary tables are read from the first pages only
+PDF_COLUMN_LATER_MAX = 40   # v0106: ... and, when those give no income-statement row, up to this page (keyword-gated)
+INCOME_METRICS = ("Revenue", "GrossProfit", "OperatingProfit", "NetIncome", "EPS", "PretaxIncome")
+FALLBACK_STRATEGIES = ("COLUMN_ALIGNED", "TRANSPOSED")
+
+
+def _number_cells(table: Dict[str, Any]) -> set:
+    """The numbers printed in a table's body (label column and header left out), as printed minus commas."""
+    rows = table.get("Rows") or []
+    return {str(v).replace(",", "").strip() for row in rows[1:] for v in list(row)[1:]
+            if v and safe_float(str(v)) is not None}
+
+
+def drop_reread_tables(tables: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """v0106 (批733): the column reader also sees the text of a ruled table -- the fallback runs on any page when the
+    ruled tables give no EPS row (the screenshot table has none), and with the quarter headers now read it read that
+    table a second time (72 rows for 36 cells).  A fallback table whose numbers are mostly (>= 60 %) numbers of a
+    ruled table on the same page is the same table read twice: left out."""
+    ruled: Dict[Any, set] = {}
+    for t in tables:
+        if t.get("Strategy") not in FALLBACK_STRATEGIES:
+            ruled.setdefault(t.get("PageNumber"), set()).update(_number_cells(t))
+    out = []
+    for t in tables:
+        if t.get("Strategy") in FALLBACK_STRATEGIES:
+            nums = _number_cells(t)
+            if nums and len(nums & ruled.get(t.get("PageNumber"), set())) >= 0.6 * len(nums):
+                continue
+        out.append(t)
+    return out
+
+
+def _has_income_rows(tables: List[Dict[str, Any]]) -> bool:
+    """v0106: does any table already give an income-statement row (the trigger for reading later pages)?"""
+    try:
+        probe = parse_financial_tables_to_records(tables, {"ReportID": "probe", "FileID": "probe"}, "probe")
+    except Exception:  # noqa: BLE001 -- an unparseable probe counts as "no rows": the later pages are read
+        return False
+    return any(r.get("MetricName") in INCOME_METRICS for r in probe)
 
 
 def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -1281,7 +1359,13 @@ def extract_document_tables(path: Path, extracted: Optional[Dict[str, Any]] = No
                     tables += core.pdf_column_tables(str(path), COLUMN_TABLE_PAGES)
                 except Exception as exc:  # graceful: ruled tables stay as they are
                     print(f"[WARN] column tables failed: {path.name} -> {exc}", file=sys.stderr)
-        return tables
+                # v0106 (批733 Z195): still no income-statement row -> later pages, the ones whose text looks like one
+                if callable(getattr(core, "pdf_column_tables_later", None)) and not _has_income_rows(tables):
+                    try:
+                        tables += core.pdf_column_tables_later(str(path), COLUMN_TABLE_PAGES, PDF_COLUMN_LATER_MAX)
+                    except Exception as exc:  # graceful, as above
+                        print(f"[WARN] later-page column tables failed: {path.name} -> {exc}", file=sys.stderr)
+        return drop_reread_tables(tables)
     if extracted and extracted.get("tables"):
         return list(extracted["tables"])
     return []
@@ -1788,35 +1872,72 @@ def normalize_metric_name(raw: str) -> str:
     return best
 
 
-def infer_unit_and_scale(metric_raw: str, table_context: str) -> Tuple[str, str, float]:
-    context = normalize_unicode_text(f"{metric_raw} {table_context}")
-    unit = ""
-    currency = "TWD"
-    scale = 1.0
-    if "%" in context or any(x in context for x in ["率", "Margin", "Yield", "ROE", "ROA"]):
-        unit = "%"
-    elif re.search(r"\b(x|X|倍)\b", context):
-        unit = "x"
-    elif any(x in context for x in ["百萬", "NT$m", "NTD m", "新台幣百萬元", "台幣百萬元"]):
-        unit = "NT$m"
-        scale = 1_000_000.0
-    elif any(x in context for x in ["十億", "bn", "billion", "NT$bn"]):
-        unit = "NT$bn"
-        scale = 1_000_000_000.0
-    elif any(x in context for x in ["千元", "仟元"]):
-        unit = "NT$000"
-        scale = 1_000.0
-    elif any(x in context for x in ["美元", "USD", "US$"]):
-        currency = "USD"
-    if not unit:
-        unit = "raw"
-    return unit, currency, scale
+def infer_unit_and_scale(metric_raw: str, table_context: str, value_raw: str = "") -> Tuple[str, str, float]:
+    """Use declared units and this cell, never another metric's percentage value."""
+    metric = normalize_unicode_text(metric_raw)
+    declared = normalize_unicode_text(table_context)
+    context = f"{metric} {declared}"
+    currency = "USD" if re.search(r"美元|USD|US\$", context, re.I) else "TWD"
+    symbol = "US$" if currency == "USD" else "NT$"
+    if ("%" in normalize_unicode_text(value_raw) or "%" in metric
+            or re.search(r"率|margin|yield|\bRO[EA]\b", metric, re.I)
+            or re.search(r"\(\s*%\s*\)|單位\s*[:：]\s*%", declared)):
+        return "%", currency, 1.0
+    if re.search(r"\b(?:P/?E|P/?B|EV/EBITDA)\b|倍|\(x\)", metric, re.I):
+        return "x", currency, 1.0
+    if re.search(r"每股|\bEPS\b|per share", metric, re.I):
+        return symbol, currency, 1.0
+    if re.search(r"百萬|(?:NT\$|NTD|US\$|USD)\s*m(?:n|illion)?\b", context, re.I):
+        return symbol + "m", currency, 1_000_000.0
+    if re.search(r"十億|\bbn\b|\bbillion\b|(?:NT\$|US\$)bn", context, re.I):
+        return symbol + "bn", currency, 1_000_000_000.0
+    if re.search(r"千元|仟元", context):
+        return symbol + "000", currency, 1_000.0
+    return "raw", currency, 1.0
+
+
+def expand_revision_header(header: List[str], data_rows: List[List[str]]) -> List[str]:
+    """Restore only explicit year × (New, Old, Chg.) groups collapsed into one PDF cell."""
+    if len(header) < 2 or any(normalize_unicode_text(c) for c in header[2:]):
+        return header
+    merged = normalize_unicode_text(header[1])
+    years = re.findall(r"\b(?:19|20)\d{2}[AEF]?\b", merged, re.I)
+    if len(years) < 2 or len(set(years)) != len(years):
+        return header
+    remainder = re.sub(r"\b(?:19|20)\d{2}[AEF]?\b", "", merged, flags=re.I).strip()
+    group = r"New\s+Old\s+Chg\.?(?:\s+|$)"
+    if not re.fullmatch(f"(?:{group}){{{len(years)}}}", remainder, re.I):
+        return header
+    count = len(years) * 3
+    if not any(len(r) > count and normalize_unicode_text(r[count]) for r in data_rows):
+        return header
+    if any(any(normalize_unicode_text(c) for c in r[count + 1:]) for r in data_rows):
+        return header
+    return [header[0]] + [f"{year} {role}" for year in years for role in ("New", "Old", "Chg.")]
+
+
+def _period_from_eng074(raw: str) -> Optional[Dict[str, Any]]:
+    """v0105 (批732): the mother's reading of one header cell (VRN_ENG074 period_parts, through the evidence core --
+    one period parser for the VRN), in this engine's columns; None = the local rules below decide."""
+    core = optional_import_evidence_core()
+    p = core.period_parts(raw) if core is not None and callable(getattr(core, "period_parts", None)) else None
+    if not p:
+        return None
+    quarter = f"Q{p['fiscal_quarter']}" if p.get("fiscal_quarter") else (f"H{p['half']}" if p.get("half") else "")
+    return {"PeriodType": p["period_type"], "FiscalYear": p.get("fiscal_year"), "FiscalQuarter": quarter,
+            "EstimateFlag": {"E": "Estimate", "F": "Estimate", "A": "Actual"}.get(str(p.get("estimate") or "").upper(), "")}
 
 
 def parse_period_label(label: str) -> Dict[str, Any]:
     raw = normalize_unicode_text(label)
     result = {"PeriodType": "", "FiscalYear": None, "FiscalQuarter": "", "EstimateFlag": "", "PeriodLabelRaw": raw}
     if not raw:
+        return result
+    canon = _period_from_eng074(raw)
+    if canon is not None:
+        if not canon["EstimateFlag"] and ("預估" in raw or "估" in raw or "FORECAST" in raw.upper() or "ESTIMATE" in raw.upper()):
+            canon["EstimateFlag"] = "Estimate"
+        result.update(canon)
         return result
     upper = raw.upper()
     if re.search(r"(?<![A-Z])(TTM|LTM)(?![A-Z])", upper):
@@ -1873,9 +1994,9 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
         header_idx = find_best_header_row(rows)
         if header_idx is None:
             continue
-        header = rows[header_idx]
         data_rows = rows[header_idx + 1:]
-        table_context = " ".join(" ".join(r) for r in rows[: min(len(rows), 3)])
+        header = expand_revision_header(rows[header_idx], data_rows)
+        table_context = " ".join(" ".join(r) for r in rows[:header_idx + 1])
         for r_idx, row in enumerate(data_rows, start=header_idx + 1):
             if not row:
                 continue
@@ -1884,7 +2005,6 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
             if not metric:
                 continue
             category = METRIC_CATEGORY_MAP.get(metric, "Other")
-            unit, currency, scale = infer_unit_and_scale(metric_raw, table_context)
             max_cols = max(len(row), len(header))
             for c_idx in range(1, max_cols):
                 value_raw = normalize_unicode_text(row[c_idx] if c_idx < len(row) else "")
@@ -1895,6 +2015,11 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
                     continue
                 period_label = normalize_unicode_text(header[c_idx] if c_idx < len(header) else "")
                 period = parse_period_label(period_label)
+                if len(set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", period_label))) > 1:
+                    period.update(PeriodType="", FiscalYear=None, FiscalQuarter="", EstimateFlag="")
+                unit, currency, scale = infer_unit_and_scale(metric_raw, table_context, value_raw)
+                percent_change = unit == "%" and bool(re.search(r"\b(?:Chg\.?|Change)\b", period_label, re.I))
+                issues = ([] if period.get("FiscalYear") else ["PERIOD_UNCLEAR"]) + (["PERCENT_CHANGE"] if percent_change else [])
                 source_text = f"{metric_raw} | {period_label} | {value_raw}"
                 fin_id = stable_hash([
                     basic_row.get("ReportID", ""),
@@ -1934,24 +2059,99 @@ def parse_financial_tables_to_records(tables: List[Dict[str, Any]], basic_row: D
                     "ColumnIndex": c_idx,
                     "SourceText": source_text,
                     "ConfidenceScore": 0.72 if period.get("FiscalYear") else 0.62,
-                    "ValidationStatus": "PASS" if period.get("FiscalYear") else "REVIEW",
-                    "ValidationIssues": "" if period.get("FiscalYear") else "PERIOD_UNCLEAR",
+                    "ValidationStatus": "REVIEW" if issues else "PASS",
+                    "ValidationIssues": ";".join(issues),
                     "CreatedAt": now_iso(),
                     "UpdatedAt": now_iso(),
                     "RunID": run_id,
                     "SchemaVersion": SCHEMA_VERSION,
                 })
                 # 對常用寬欄也同步寫值，方便 dashboard 使用；long 欄仍以 MetricName/Value 為主。
-                if metric in record:
+                if metric in record and not percent_change:
                     record[metric] = value
                 records.append(record)
     return records
+
+
+IDENTITY_RULES = (
+    ("GrossProfit", "Revenue", "COGS", "毛利 = 營收 − 營業成本"),
+    ("OperatingProfit", "GrossProfit", "OperatingExpense", "營業利益 = 毛利 − 營業費用"),
+)
+QUARTER_SUM_METRICS = ("Revenue", "COGS", "GrossProfit", "OperatingExpense", "OperatingProfit", "PretaxIncome",
+                       "NetIncome", "InterestIncome")
+
+
+def _printed_step(value_raw: Any) -> float:
+    """The last printed digit of a cell ("61,360" -> 1, "5.12" -> 0.01): the rounding the table itself carries."""
+    m = re.search(r"\.(\d+)", str(value_raw or ""))
+    return 10.0 ** -len(m.group(1)) if m else 1.0
+
+
+def financial_identity_checks(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """v0105 (批732): does one report's extracted table add up?  In each table column: gross profit = revenue - cost
+    and operating profit = gross profit - operating expense; in each table: four quarters = the year, for the flow
+    items.  Tolerance = half a last printed digit per number involved (the table's own rounding) -- nothing looser.
+    A cost printed as a negative number counts by its size.  A check runs only when every number it needs was
+    read; nothing is filled in.  Returns counts, the failures in words, and two plain counts that say whether the
+    period headers were read: quarter/half rows without a year, and rows marked as a forecast."""
+    checks: List[Dict[str, Any]] = []
+    amounts = [r for r in records if r.get("Unit") not in ("%", "x") and "%" not in str(r.get("ValueRaw", ""))]
+    skipped_units = 0
+    columns: Dict[Tuple[Any, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in amounts:
+        if r.get("MetricName") and isinstance(r.get("Value"), (int, float)):
+            columns.setdefault((r.get("TableID"), r.get("ColumnIndex")), {}).setdefault(r["MetricName"], r)
+    for (table, _col), m in sorted(columns.items(), key=lambda kv: (str(kv[0][0]), str(kv[0][1]))):
+        for target, left, right, rule in IDENTITY_RULES:
+            if target in m and left in m and right in m:
+                dimensions = {(m[k].get("Unit"), m[k].get("Currency"), m[k].get("Scale")) for k in (target, left, right)}
+                if len(dimensions) != 1:
+                    skipped_units += 1
+                    continue
+                got, expected = m[target]["Value"], m[left]["Value"] - abs(m[right]["Value"])
+                tol = 0.5 * sum(_printed_step(m[k].get("ValueRaw")) for k in (target, left, right)) + 1e-9
+                checks.append({"rule": rule, "table": table, "period": m[target].get("PeriodLabelRaw", ""),
+                               "got": got, "expected": round(expected, 6), "tol": tol, "ok": abs(got - expected) <= tol})
+    groups: Dict[Tuple[Any, str, Any], Dict[str, Dict[str, Any]]] = {}
+    for r in amounts:
+        if r.get("MetricName") in QUARTER_SUM_METRICS and r.get("FiscalYear") and isinstance(r.get("Value"), (int, float)):
+            key = "FY" if r.get("PeriodType") == "FY" else (r.get("FiscalQuarter") if r.get("PeriodType") == "FQ" else "")
+            if key:
+                groups.setdefault((r.get("TableID"), r["MetricName"], r["FiscalYear"]), {}).setdefault(key, r)
+    for (table, metric, year), g in sorted(groups.items(), key=lambda kv: (str(kv[0][0]), kv[0][1], str(kv[0][2]))):
+        if "FY" in g and all(q in g for q in ("Q1", "Q2", "Q3", "Q4")):
+            parts = [g[q] for q in ("Q1", "Q2", "Q3", "Q4")]
+            dimensions = {(p.get("Unit"), p.get("Currency"), p.get("Scale")) for p in parts + [g["FY"]]}
+            if len(dimensions) != 1:
+                skipped_units += 1
+                continue
+            total = sum(p["Value"] for p in parts)
+            tol = 0.5 * sum(_printed_step(p.get("ValueRaw")) for p in parts + [g["FY"]]) + 1e-9
+            checks.append({"rule": f"{metric} 四季和 = 全年", "table": table, "period": str(int(year)),
+                           "got": g["FY"]["Value"], "expected": round(total, 6), "tol": tol,
+                           "ok": abs(g["FY"]["Value"] - total) <= tol})
+    failed = [c for c in checks if not c["ok"]]
+    return {"checked": len(checks), "passed": len(checks) - len(failed), "failed": failed,
+            "excluded_non_amount_rows": len(records) - len(amounts), "skipped_unit_checks": skipped_units,
+            "periods_unclear": sum(1 for r in records if r.get("PeriodType") in ("FQ", "FH") and not r.get("FiscalYear")),
+            "estimate_rows": sum(1 for r in records if r.get("EstimateFlag") == "Estimate")}
+
+
+def _plain(x: float) -> str:
+    return f"{int(round(x)):,}" if abs(x - round(x)) < 1e-9 else f"{x:,.4f}".rstrip("0").rstrip(".")
+
+
+def identity_failure_text(check: Dict[str, Any]) -> str:
+    return (f"{check['rule']} · {check['period']} · 表 {check['table']}:印 {_plain(check['got'])} · "
+            f"算 {_plain(check['expected'])}(差 {_plain(abs(check['got'] - check['expected']))},容許 {_plain(check['tol'])})")
 
 
 def find_best_header_row(rows: List[List[str]]) -> Optional[int]:
     best_idx = None
     best_score = -1
     for idx, row in enumerate(rows[:6]):
+        if row and normalize_metric_name(row[0]):
+            continue  # A recognized financial metric is a data row, even when its values resemble years.
         score = 0
         joined = " ".join(row)
         if re.search(r"(?:19|20)\d{2}|\d{2}[EF](?![A-Za-z])|Q[1-4]|[1-4]Q|\d{1,2}/\d{2}", joined, re.IGNORECASE):
@@ -2572,6 +2772,21 @@ tr.fail td:first-child {{ border-left:5px solid #dc2626; }}
 # def 13_PROCESSING_PIPELINE
 # ============================================================
 
+def gate_fallback_tables(tables: List[Dict[str, Any]], records: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """v0106 (批733 Z195): a table read without ruling lines (column-aligned / transposed) is stored only if it adds
+    up -- the identities of financial_identity_checks, per table.  Returns (the records kept, one line per table
+    left out).  A table with nothing to check is kept (nothing says it is wrong); ruled tables are not gated."""
+    fallback = sorted({t.get("TableID") for t in tables if t.get("Strategy") in FALLBACK_STRATEGIES})
+    drop, rejected = set(), []
+    for tid in fallback:
+        check = financial_identity_checks([r for r in records if r.get("TableID") == tid])
+        if check["failed"]:
+            drop.add(tid)
+            more = f"(另 {len(check['failed']) - 1} 條)" if len(check["failed"]) > 1 else ""
+            rejected.append(f"{tid} " + identity_failure_text(check["failed"][0]) + more)
+    return [r for r in records if r.get("TableID") not in drop], rejected
+
+
 def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]], rating_alias: Dict[str, List[str]], run_id: str) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     basic = build_basicinfo_record(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
     extracted = None
@@ -2579,10 +2794,54 @@ def process_one_pdf(pdf_path: Path, ticker_lookup: Dict[str, Dict[str, Any]], br
         extracted = extract_document_text_and_zones(pdf_path)
     tables = extract_document_tables(pdf_path, extracted)
     financial = parse_financial_tables_to_records(tables, basic, run_id)
+    financial, rejected = gate_fallback_tables(tables, financial)      # v0106 (批733 Z195)
+    if rejected:
+        issues = [x for x in str(basic.get("ValidationIssues") or "").split(" | ") if x]
+        basic["ValidationIssues"] = " | ".join(issues + ["FIN_TABLE_REJECTED(" + " ; ".join(rejected) + ")"])
     return basic, financial
 
 
 process_one_document = process_one_pdf
+
+
+def batch_pool_results(files: List[Path], ticker_lookup: Dict[str, Dict[str, Any]], broker_alias: Dict[str, List[str]],
+                       rating_alias: Dict[str, List[str]], run_id: str) -> Dict[int, Tuple[Any, ...]]:
+    """v0104 (批731): the reports of one batch in worker processes (VRN_BatchPool, sized by the accelerator's thread
+    budget).  {idx: (status, basic | error, financial)} in the batch numbering, progress lines printed as reports
+    finish; {} = everything runs in this process (small batch, VRN_BATCH_WORKERS=1, or the pool could not run --
+    then the unfinished files go through the sequential loop and one line says why)."""
+    todo = [(idx, p) for idx, p in enumerate(files, start=1) if p.suffix.lower() not in OCR_SUFFIXES]
+    here = str(Path(__file__).resolve().parent)
+    try:
+        if here not in sys.path:
+            sys.path.insert(0, here)                 # the workers import the pool by this stable name
+        import VRN_BatchPool as pool
+    except ImportError:
+        return {}
+    workers = pool.workers_for(len(todo))
+    if workers <= 1:
+        return {}
+    done: Dict[int, Tuple[Any, ...]] = {}
+    count = [0]
+
+    def on_done(idx: int) -> None:
+        count[0] += 1
+        print(f"[{count[0]}/{len(files)}] VRN processing: {files[idx - 1].name}")
+
+    for idx, p in enumerate(files, start=1):         # image files are skipped at once; number them first
+        if p.suffix.lower() in OCR_SUFFIXES:
+            done[idx] = ("OCR", None, None)
+            on_done(idx)
+    why = pool.workers_reason(len(todo)) if callable(getattr(pool, "workers_reason", None)) else "VRN_BATCH_WORKERS=1 可改回序跑"
+    print(f"[VRN] 平行池 {workers} 個工作行程({len(todo)} 份;VRN_BatchPool {pool.POOL_VERSION};{why})",
+          file=sys.stderr)
+    try:
+        done.update(pool.map_reports(todo, Path(__file__).resolve(), (ticker_lookup, broker_alias, rating_alias),
+                                     run_id, workers, on_done))
+    except Exception as exc:  # noqa: BLE001 -- the pool is an accelerator, never a gate
+        print(f"[VRN] 平行池中斷,沒跑完的改在本行程序跑:{type(exc).__name__}: {exc!r}"[:220], file=sys.stderr)
+        done = {k: v for k, v in done.items() if v[0] != "OCR"}
+    return done
 
 
 def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
@@ -2601,6 +2860,10 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
     rating_alias = load_rating_alias_ssot(rating_ssot_path)
 
     files = scan_input_files(input_path)
+    only = getattr(args, "only_files", None)
+    if only:                                    # v0104: a named sample (the loop's idempotency pass)
+        keep = {str(name) for name in only}
+        files = [f for f in files if f.name in keep]
     basic_rows: List[Dict[str, Any]] = []
     financial_rows: List[Dict[str, Any]] = []
     checkpoint = {
@@ -2612,16 +2875,29 @@ def process_batch(args: argparse.Namespace) -> Dict[str, Any]:
         "SchemaVersion": SCHEMA_VERSION,
     }
 
+    pooled = batch_pool_results(files, ticker_lookup, broker_alias, rating_alias, run_id)   # v0104; {} = in this process
     for idx, pdf_path in enumerate(files, start=1):
-        print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
+        pre = pooled.get(idx)
+        if pre is None:
+            print(f"[{idx}/{len(files)}] VRN processing: {pdf_path.name}")
         item = {"path": str(pdf_path), "status": "", "error": ""}
         if pdf_path.suffix.lower() in OCR_SUFFIXES:
             item["status"] = "SKIP_OCR_REQUIRED"
             checkpoint["Files"].append(item)
             write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
             continue
+        if pre is not None and pre[0] == "FAIL":
+            item["status"] = "FAIL"
+            item["error"] = pre[1]
+            print(f"[ERROR] {pdf_path}: {str(pre[1]).splitlines()[0] if pre[1] else ''}", file=sys.stderr)
+            checkpoint["Files"].append(item)
+            write_json_file(output_dir / BATCH_CHECKPOINT_JSON_NAME, checkpoint)
+            continue
         try:
-            basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
+            if pre is not None:
+                basic, financial = pre[1], pre[2]
+            else:
+                basic, financial = process_one_pdf(pdf_path, ticker_lookup, broker_alias, rating_alias, run_id)
             basic_rows.append(basic)
             financial_rows.extend(financial)
             item["status"] = "OK"

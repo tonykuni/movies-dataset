@@ -145,9 +145,22 @@
   },
   "market_cap": {
     "zh": "市值",
-    "rule": "**交易所不直接給市值。** 市值 = 收盤價 × 發行股數;發行股數來自 Yahoo quoteSummary 的 sharesOutstanding(走統包 cookie+crumb 握手道)。",
+    "rule": "**交易所不直接給市值,但給發行股數。** 市值 = 交易所收盤 × 交易所發行股數(TWSE t187ap03_L「已發行普通股數或TDR原股發行股數」· TPEX t187ap03_O `IssueShares` · 上櫃每日收盤 `Capitals`);Yahoo quoteSummary 的 sharesOutstanding 只拿來核對,不當主數據。",
     "why": "操作員令「從 TWSE TPEX 擷取成交量 成交值 市值」—— 前兩項交易所直接有,第三項**沒有**。照實講:算出來的那一欄要標明是算的,不是抓的。",
-    "state": "DERIVED"
+    "state": "DERIVED",
+    "ruled_2026_09_24": "操作員令「所有數據都以交易所為主 但只有YFINANCE抓得到ADJ CLOSE所以可用他抓CLOSE ADJ CLOSE重複CLOSE是為了核對 成交量 成交值 市值都以交易所為主 可以跟其他看盤網站核對正確性」",
+    "impl": {
+      "shares": "VDF_ENG055 v0115+ L1 同一回包收發行股數 → tw_shares_issued(asof_date · code · market · shares_issued · src;一份出表日一份);`--shares-snapshot` 重放樹上交易所快照(t187ap03_L/_O 2026-08-05)",
+      "view": "VDF_ENG057 v0103+ `mcap` → 檢視表 tw_market_cap_daily:market_cap=交易所收盤×當天或之前最近一份股數(basis EXCHANGE_CLOSE×EXCHANGE_SHARES);第一份股數之前不填,另欄 market_cap_later_shares 用之後第一份近似(basis EXCHANGE_CLOSE×LATER_EXCHANGE_SHARES);全樹唯一一處",
+      "side_line": "側線 2026-09-24 第五段(主線批號由併線的手指定 L25)"
+    },
+    "rule_history": [
+      {
+        "until": "2026-09-24",
+        "by": "批720",
+        "rule": "**交易所不直接給市值。** 市值 = 收盤價 × 發行股數;發行股數來自 Yahoo quoteSummary 的 sharesOutstanding(走統包 cookie+crumb 握手道)。"
+      }
+    ]
   },
   "adj_ohlc": {
     "zh": "除權息調整後四價",

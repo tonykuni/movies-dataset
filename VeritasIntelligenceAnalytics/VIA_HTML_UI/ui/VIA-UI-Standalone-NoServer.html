@@ -1566,6 +1566,7 @@ td { color: #526276 !important; border-color: #d4dce6 !important; padding: 7px 5
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const toast = (message) => { const el = $('#toast'); $('#toastText').textContent = message; el.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2600); };
+      window.__viaToast = toast; // v2026-09-25: shared notification API, separate from id="toast".
       const settingsBackdrop = $('#settingsBackdrop');
       const connectionBackdrop = $('#connectionBackdrop');
       const searchSurface = $('.search');
@@ -1669,6 +1670,7 @@ td { color: #526276 !important; border-color: #d4dce6 !important; padding: 7px 5
 <script>
 (function () {
   'use strict';
+  const toast = window.__viaToast;
   const KEY = 'via.sync.state.v2';
   const LEGACY_KEY = 'via.sync.state.v1';
   const CHANNEL = 'via.sync.v2';

@@ -1,14 +1,28 @@
 """Focused safety tests for the MDL135 eight-hub extension."""
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-MODULE = Path(__file__).with_name("CGC_MDL135_EnvGovernance_8Hub_v0100.py")
-if not MODULE.exists():
-    MODULE = (Path(__file__).resolve().parents[1] / "supportive modules" / "registry"
-              / "CGC_MDL135_EnvGovernance_8Hub_v0100.py")
+# 批733(Z190):八樞紐改號 CGC_MDL135_EnvGovernance_8Hub → CGC_MDL186_EnvGovernance_8Hub;照尾版律 glob 取尾版
+_HERE_HUBS = sorted(Path(__file__).parent.glob("CGC_MDL186_EnvGovernance_8Hub_v*.py"))
+MODULE = _HERE_HUBS[-1] if _HERE_HUBS else sorted(
+    (Path(__file__).resolve().parents[1] / "supportive modules" / "registry").glob("CGC_MDL186_EnvGovernance_8Hub_v*.py"))[-1]
 SPEC = importlib.util.spec_from_file_location("eight_hub", MODULE)
 EXT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(EXT)

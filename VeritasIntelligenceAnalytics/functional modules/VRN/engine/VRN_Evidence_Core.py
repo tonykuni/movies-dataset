@@ -69,7 +69,9 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+import copy
 import datetime
+import functools
 import glob
 import importlib.util
 import json
@@ -78,7 +80,7 @@ import re
 import statistics
 import sys
 import unicodedata
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 
 CORE_VERSION = "v0102"
 
@@ -123,13 +125,20 @@ _RULES_CACHE = {}
 
 def repo_root(start=None):
     """The tree root that holds 'functional modules' (sister repo root = mother VeritasIntelligenceAnalytics/)."""
-    probe = os.path.dirname(os.path.abspath(start or __file__))
+    return _repo_root_from(os.path.dirname(os.path.abspath(start or __file__)))
+
+
+@functools.lru_cache(maxsize=64)
+def _repo_root_from(probe):
+    """批730 speed: the walk up is file-system calls (slow on a synced Windows folder) and ran ~30,000 times per
+    batch from the deny check; the tree does not move during a run, so each starting folder is walked once."""
+    start_dir = probe
     while True:
         if os.path.isdir(os.path.join(probe, "functional modules")):
             return probe
         parent = os.path.dirname(probe)
         if parent == probe:
-            return os.path.dirname(os.path.abspath(start or __file__))
+            return start_dir
         probe = parent
 
 
@@ -197,8 +206,26 @@ OVERLAY_GLOB = ("supportive modules/ssot", "VIA_FinancialInstitution_Overlay_v*.
 _DENY_CACHE = {}
 
 
+@functools.lru_cache(maxsize=256)
 def _deny_norm(value):
+    # 批730 speed: the same page text is checked once per broker alias (hundreds per file) -- normalise it once
     return re.sub(r"\s+", " ", unicodedata.normalize("NFKC", str(value or ""))).strip().casefold()
+
+
+_DENY_NORM_CACHE = {}
+
+
+def _deny_table(start=None):
+    """(normalised deny phrases, longest first · the same as a set): normalised once per tree.
+    批730 speed: the check used to re-normalise every deny phrase on every call (1.17 million times for 19 one-page
+    files); the answers are the same, only computed once."""
+    root = repo_root(start)
+    hit = _DENY_NORM_CACHE.get(root)
+    if hit is None:
+        norm = tuple(_deny_norm(k) for k in deny_phrases(start))
+        hit = (norm, frozenset(norm))
+        _DENY_NORM_CACHE[root] = hit
+    return hit
 
 
 def deny_phrases(start=None):
@@ -230,7 +257,7 @@ def deny_phrases(start=None):
 def is_denied_token(value, start=None):
     """True when the whole value IS a denied name (normalised exact match) -- the filename / canonical-key layer."""
     n = _deny_norm(value)
-    return bool(n) and any(_deny_norm(k) == n for k in deny_phrases(start))
+    return bool(n) and n in _deny_table(start)[1]
 
 
 def deny_shadowed(alias, text, start=None):
@@ -248,8 +275,7 @@ def deny_shadowed(alias, text, start=None):
     if not a_spans:
         return False
     d_spans = []
-    for d in deny_phrases(start):
-        dn = _deny_norm(d)
+    for dn in _deny_table(start)[0]:
         if len(dn) >= len(a) and a in dn:
             d_spans.extend(_alias_spans(dn, low))
     return bool(d_spans) and all(any(ds <= s0 and t0 <= dt for ds, dt in d_spans) for s0, t0 in a_spans)
@@ -408,9 +434,45 @@ def lines_from_chars(chars):
     return lines
 
 
+# 批730 speed (operator 2026-09-24「剛剛跑好慢」): one report's page 1 and its last pages were parsed again by every
+# reader (first page, appendix body size, appendix, column tables) and again in G07 / G08 -- 24 pdfplumber parses for a
+# 15-page file.  The same file (path · size · modified time) and page give the same glyphs, so they are parsed once;
+# callers get copies, and a file edited in place gets a new key.
+_PAGE_CACHE = OrderedDict()
+_PAGE_CACHE_MAX = 24
+_APPENDIX_CACHE = OrderedDict()
+_APPENDIX_CACHE_MAX = 512
+_PAGE_COUNT_CACHE = {}
+
+
+def _file_key(path):
+    """(absolute path, size, modified time in ns); None when the file cannot be stat'ed (then nothing is cached)."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return None
+    return os.path.abspath(str(path)), st.st_size, st.st_mtime_ns
+
+
 def pdf_page_chars(path, page_index=0, order=("pdfplumber", "fitz")):
     """Glyphs of one PDF page as dicts (text, x0, x1, top, bottom, size, fontname) plus (width, height).
     Returns None when no PDF library is installed or the file cannot be opened."""
+    key = _file_key(path)
+    k = key + (int(page_index), tuple(order)) if key is not None else None
+    if k is not None and k in _PAGE_CACHE:
+        _PAGE_CACHE.move_to_end(k)
+        chars, size = _PAGE_CACHE[k]
+        return [dict(c) for c in chars], size
+    got = _pdf_page_chars_parse(path, page_index, order)
+    if k is not None and got is not None:
+        _PAGE_CACHE[k] = ([dict(c) for c in got[0]], got[1])
+        while len(_PAGE_CACHE) > _PAGE_CACHE_MAX:
+            _PAGE_CACHE.popitem(last=False)
+    return got
+
+
+def _pdf_page_chars_parse(path, page_index=0, order=("pdfplumber", "fitz")):
+    """The uncached reader behind pdf_page_chars()."""
     for engine in order:
         if engine == "pdfplumber":
             try:
@@ -1011,6 +1073,17 @@ def _appendix_issuer_line(line):
 
 def pdf_page_count(path):
     """Number of pages of a PDF; 0 when no PDF library is installed or the file cannot be opened."""
+    key = _file_key(path)
+    if key is not None and key in _PAGE_COUNT_CACHE:
+        return _PAGE_COUNT_CACHE[key]
+    n = _pdf_page_count_open(path)
+    if key is not None and n:
+        _PAGE_COUNT_CACHE[key] = n
+    return n
+
+
+def _pdf_page_count_open(path):
+    """The uncached counter behind pdf_page_count()."""
     try:
         if importlib.util.find_spec("pdfplumber") is not None:
             import pdfplumber
@@ -1041,7 +1114,23 @@ def _body_size(lines):
 def appendix_lines(path, last_pages=APPENDIX_PAGES, small_only=True):
     """Small-print lines of the report's last pages (page 1 excluded).
     Returns (lines, info): lines = [{"page", "text", "size"}]; info says which pages were read, the page-1 body size
-    and the small-print threshold.  Not a PDF / one page only / no text layer = ([], info with the honest reason)."""
+    and the small-print threshold.  Not a PDF / one page only / no text layer = ([], info with the honest reason).
+    批730 speed: read once per file version (the batch, the first-page gate and the idempotency pass all ask)."""
+    key = _file_key(path)
+    k = key + (int(last_pages), bool(small_only)) if key is not None else None
+    if k is not None and k in _APPENDIX_CACHE:
+        _APPENDIX_CACHE.move_to_end(k)
+        return copy.deepcopy(_APPENDIX_CACHE[k])
+    got = _appendix_lines_read(path, last_pages, small_only)
+    if k is not None:
+        _APPENDIX_CACHE[k] = copy.deepcopy(got)
+        while len(_APPENDIX_CACHE) > _APPENDIX_CACHE_MAX:
+            _APPENDIX_CACHE.popitem(last=False)
+    return got
+
+
+def _appendix_lines_read(path, last_pages=APPENDIX_PAGES, small_only=True):
+    """The uncached reader behind appendix_lines()."""
     info = {"state": "NODATA", "pages": [], "n_pages": 0, "body_size": None, "threshold": None, "why": ""}
     if not str(path).lower().endswith(".pdf"):
         info["why"] = "appendix is read from PDF only"
@@ -1240,6 +1329,65 @@ def adj_db(db=None, start=None):
     said = " ".join(buf.getvalue().split())[:240]
     _ADJ_CACHE[key] = (str(path), said or "resolved") if path else (None, said or "not found")
     return _ADJ_CACHE[key]
+
+
+# ── period headers (批732) ───────────────────────────────────────────────────────────────────────────────────────
+# The operator's screenshot (20251128兆豐訪談速報-神達(3706) p.4) showed the batch engine reading 25Q1..25Q4(F) with no
+# year and 2025(F) as an actual; this lineage's first-page reader had a copy with the same blind spot.  The mother's
+# financial-pages engine (VRN_ENG074 period_parts) already reads 24Q1 / 25Q1(F) / 2025(F) / 1H25 / FY25 / TTM, so
+# both readers ask it here (one parser, LL404) and keep their own rules only for what it cannot read.
+PERIOD_ENGINE_GLOB = ("functional modules/VRN", "VRN_ENG074_FinancialPages_v*.py")
+_PERIOD_CACHE = {}
+_BARE_YEAR = re.compile(r"(?:19|20)\d{2}\s*年?\s*\(?[EFA]?\)?", re.I)
+
+
+def period_engine(start=None):
+    """(module | None, why): the newest ENG074 that carries period_parts(); loaded once per tree."""
+    root = repo_root(start)
+    if root in _PERIOD_CACHE:
+        return _PERIOD_CACHE[root]
+    folder, pattern = PERIOD_ENGINE_GLOB
+    hits = sorted(glob.glob(os.path.join(root, folder, pattern)), key=_version_of)
+    mod, why = None, "no %s under %s" % (pattern, folder)
+    if hits:
+        name = os.path.basename(hits[-1])
+        try:
+            spec = importlib.util.spec_from_file_location("_vrn_period_eng074", hits[-1])
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = mod
+            spec.loader.exec_module(mod)
+            why = name
+            if not callable(getattr(mod, "period_parts", None)):
+                mod, why = None, "%s has no period_parts()" % name
+        except Exception as exc:
+            sys.modules.pop("_vrn_period_eng074", None)
+            mod, why = None, "%s failed to load: %s: %s" % (name, type(exc).__name__, str(exc)[:80])
+    _PERIOD_CACHE[root] = (mod, why)
+    return mod, why
+
+
+def period_parts(token, start=None):
+    """ENG074's reading of one period header cell -- {period_type FY|FQ|FH|TTM, fiscal_year, fiscal_quarter, half,
+    estimate 'E'|'F'|'A'|'', why} -- or None when ENG074 is absent or cannot read it (the caller's own rules decide).
+    A bare 3-digit number is not taken for a (ROC) year here: data rows hold such numbers too, and a header finder
+    must not take a row of values for a row of years."""
+    mod, _why = period_engine(start)
+    raw = str(token or "").strip()
+    if mod is None or not raw:
+        return None
+    try:
+        p = mod.period_parts(raw)
+        # 批733(Z195):「2025年(F)」「2025年F」ENG074 讀不出(讀得出 2025(F) / 2025F)→ 拿掉年與記號之間的「年」再問一次
+        m = None if p.get("period_type") else re.fullmatch(r"((?:19|20)\d{2})\s*年\s*(\(?[AEF]\)?)", raw, re.I)
+        if m:
+            p = mod.period_parts(m.group(1) + m.group(2))
+    except Exception:  # noqa: BLE001 -- one odd cell must not stop a table
+        return None
+    if not p.get("period_type"):
+        return None
+    if str(p.get("why") or "").startswith("YEAR:") and not _BARE_YEAR.fullmatch(raw):
+        return None
+    return p
 
 
 def _adj_ticker(ticker):
@@ -2070,7 +2218,11 @@ def canonical_cross_check(lines, filename, ticker=None):
 # =====================================================================
 PERIOD_TOKEN_RX = re.compile(
     r"^(?:FY)?(?:(?:19|20)\d{2}|\d{2})(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^\d{1,2}/\d{2}(?:A|E|F)?$|^[1-4]Q\d{2}(?:A|E|F)?$|"
-    r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?\d{2}(?:A|E|F)?$", re.I)
+    r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?\d{2}(?:A|E|F)?$|"
+    # 批733(Z195;只增不減):年在前的季與半年(25Q1 · 2025Q1 · 25Q4(F) · 25Q4F · 25H1 · 1H25)、帶「年」的年(2024年 · 2025年(F))、
+    #   季在前帶括號基準(1Q25(F))——兆豐神達那張季度表的表頭,舊式只認得 2024 與 2025(F),季欄的數字就沒有欄可歸
+    r"^(?:(?:19|20)\d{2}|\d{2})(?:Q[1-4]|H[12])(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^[12]H\d{2}(?:A|E|F|\(F\)|\(E\)|\(A\))?$|"
+    r"^(?:19|20)\d{2}年(?:A|E|F|\(F\)|\(E\)|\(A\))?$|^[1-4]Q\d{2}\((?:A|E|F)\)$", re.I)
 _MONTH_YEAR_RX = re.compile(r"^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[-/ ]?(\d{2})(A|E|F)?$", re.I)
 _GROWTH_LABEL_RX = re.compile(r"yoy|成長|growth|增減|變動|chg|change", re.I)
 
@@ -2121,6 +2273,30 @@ def _period_columns(words):
     return cols if len(cols) >= 2 else []
 
 
+def _unnamed_columns(rows, i, centers, left_edge, right_edge, radius=8.0):
+    """批733(Z195):表頭第 i 列之下(到下一個表頭或 TABLE_MAX_ROWS 為止),數字排成的欄有幾個**不在任何表頭期別底下**。
+    欄 = 至少兩列的數字中心落在 radius 內的一群(跟 transposed_tables 同一個分群法);只算左右界之內的
+    (右邊界外的成長率欄照舊不算)。0 = 每一欄數字頭上都有期別。"""
+    clusters = []
+    j = i + 1
+    while j < len(rows) and j <= i + TABLE_MAX_ROWS:
+        if _period_columns(rows[j]):
+            break
+        for w in rows[j]:
+            cx = (w["x0"] + w["x1"]) / 2
+            if not (left_edge < cx <= right_edge) or not NUMERIC_TOKEN_RX.match(w["text"]):
+                continue
+            hit = next((c for c in clusters if abs(c["x"] - cx) <= radius), None)
+            if hit:
+                hit["n"] += 1
+                hit["x"] = (hit["x"] * (hit["n"] - 1) + cx) / hit["n"]
+            else:
+                clusters.append({"x": cx, "n": 1})
+        j += 1
+    tol = max(radius, (min((b - a) for a, b in zip(centers, centers[1:])) if len(centers) > 1 else 40.0) * 0.3)
+    return sum(1 for c in clusters if c["n"] >= 2 and min(abs(c["x"] - x) for x in centers) > tol)
+
+
 def column_tables(chars, page_number=1):
     """Unruled tables whose header row carries two or more period labels ('2024A 2025F 2026F',
     '12/25e 12/26e', 'FY25E').  Values are assigned to the nearest period column; the label is the
@@ -2139,6 +2315,11 @@ def column_tables(chars, page_number=1):
         left_edge = centers[0] - spacing * 0.6
         right_edge = centers[-1] + spacing * 0.6
         header = [""] + [normalize_period_label(w["text"]) for w in cols]
+        if _unnamed_columns(rows, i, centers, left_edge, right_edge) > 0:
+            # 批733(Z195):底下的數字排成的欄比表頭認得的期別多 = 有欄的表頭沒認出來(例:季欄);照最近的期別硬歸,
+            #   整張表會錯一欄而且恆等式照樣成立(每一列錯得一樣)——寧可不讀,不猜。
+            i += 1
+            continue
         body = []
         j = i + 1
         while j < len(rows) and j <= i + TABLE_MAX_ROWS:
@@ -2245,6 +2426,31 @@ def transposed_tables(chars, page_number=1):
                            "Rows": out_rows, "Strategy": "TRANSPOSED"})
         i = j
     return tables
+
+
+FIN_PAGE_RX = re.compile(r"營業收入|營收|營業毛利|毛利|營業利益|營業淨利|稅後淨利|淨利|每股盈餘|損益表|"
+                         r"Revenue|Sales|Gross profit|Operating (?:income|profit)|Net (?:income|profit)|EPS", re.I)
+LATER_PAGES_MAX = 40
+
+
+def pdf_column_tables_later(path, first=4, last=LATER_PAGES_MAX):
+    """批733(Z195):第 first+1 頁起(到 last 頁或最後一頁)也讀沒有框線的表——但只讀字面上像損益表的頁
+    (FIN_PAGE_RX)。長報告(初次評等)的財報常在後段,舊的只看前 4 頁就漏了;全讀每一頁又太慢,所以先看字。
+    圖片頁(沒有字)跳過、繼續往後;過了最後一頁就停。
+    PR #115 審查(Codex P2):頁碼超過最後一頁時 pdf_page_chars 回的是 ([], 頁寬高) 不是 None——只靠它停,短報告會被
+    重開重解析到第 last 頁(2 頁的 PDF 解析 36 次);改用有快取的 pdf_page_count 定上界,中間的圖片頁照舊跳過。"""
+    out = []
+    n = pdf_page_count(path)
+    for idx in range(first, min(last, n) if n else last):
+        got = pdf_page_chars(path, idx)
+        if not got:
+            break
+        chars, _size = got
+        if not chars or not FIN_PAGE_RX.search("".join(c.get("text", "") for c in chars)):
+            continue
+        out += column_tables(chars, idx + 1)
+        out += transposed_tables(chars, idx + 1)
+    return out
 
 
 def pdf_column_tables(path, pages=3):

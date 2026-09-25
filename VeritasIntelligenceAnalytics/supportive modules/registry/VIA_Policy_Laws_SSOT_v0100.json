@@ -1,6 +1,6 @@
 {
   "schema": "VIA.PolicyLaws.SSOT.v1",
-  "batch": "批715",
+  "batch": "側線 2026-09-25 第十六段",
   "ts": "2026-09-21T11:35:00",
   "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
   "laws": [
@@ -19,7 +19,7 @@
       "id": "L50",
       "batch": "B531 · 批595 補執法憑據",
       "cat": "指標",
-      "zh": "**【第一條】TA-Lib 禁用,QuantGuard 是唯一正主。**(操作員批618 裁定升為第一條)\n原文:「不准使用 TA-LIB,刪除關於他的一切,列入第一條,用 QUANTGUARD 替代」。\n落地三層,缺一不可:\n① **執行期解析不到**——加速器候選順序把**零 talib 路徑的合規本排第一**(批618:SUP_MDL737 `CEL_CANDIDATES` 改序,accelerator/VeritasCeleritas.py 提前;實測三支分別帶 1/1/0 處 talib 路徑,而工作站 find_spec('talib') 找得到=真的會載入)。\n② **兩支工具本體與收容正本一個位元都不動**(批345 不可動律 + 正本零觸碰,收容件有 sha 冊)。「刪除關於他的一切」的可執行形式是**讓它永遠不會被載入**,不是去改別人的正本——改正本會讓 sha 對不上,那是另一條律的紅燈。\n③ **閘要一直盯著**:CGC_MDL156 ⑥ 每跑必判「解析首位帶不帶可活化的 talib 路徑」,活違規=紅,惰性曝險=PENDING_OPERATOR 點名。批618 起本檢為 GREEN 37/37。\n—— 以下為原條文(批534 立,一字不改)——\nQuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。\n\n**批595 操作員複述並要求入冊(「不可使用 TA-LIB,用 QuantGuard 取代」),同時補執法憑據:**① **正典替代路徑具名**:`VDF_ENG086_QuantGuardOneBridge_v*.py`(引擎)· `via-quantguard`(短令)· `supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json`(政策冊)· `functional modules/VDF/references/intake/VIA_QuantGuard_v20260916`(收容正本)。② **實測(批595)**:活樹尾版含無版號 **2604 支**,真的 `import talib` / `from talib import` 的 **0 支**;另有 40 支**提到** talib,逐支看過**全是治理件在禁它**(MDL156 曝險檢、SelftestGrid 站名、ToolLadder 的排除清單…)。③ **量這條律不准用字串比對**:第一版我用 `talib` 當關鍵字全樹掃,得到 578 處「活件曝險」——那裡面絕大多數是**版本史**(自測格 180 個歷史版號各算一次)加上**因為在禁它才提到它**的治理件。禁用律的尺必須是 **import 語句**(`^\\s*import talib` / `^\\s*from talib import`)且**只看尾版**,否則 578 這個數字會逼人去「清理」自己的執法程式(LL142 同族:量的單位不對,數字就沒有意義)。",
+      "zh": "**【第一條】TA-Lib 禁用,QuantGuard 是唯一正主。**(操作員批618 裁定升為第一條)\n原文:「不准使用 TA-LIB,刪除關於他的一切,列入第一條,用 QUANTGUARD 替代」。\n落地三層,缺一不可:\n① **執行期解析不到**——加速器候選順序把**零 talib 路徑的合規本排第一**(批618:SUP_MDL737 `CEL_CANDIDATES` 改序,accelerator/VeritasCeleritas.py 提前;實測三支分別帶 1/1/0 處 talib 路徑,而工作站 find_spec('talib') 找得到=真的會載入)。\n② **兩支工具本體與收容正本一個位元都不動**(批345 不可動律 + 正本零觸碰,收容件有 sha 冊)。「刪除關於他的一切」的可執行形式是**讓它永遠不會被載入**,不是去改別人的正本——改正本會讓 sha 對不上,那是另一條律的紅燈。\n③ **閘要一直盯著**:CGC_MDL156 ⑥ 每跑必判「解析首位帶不帶可活化的 talib 路徑」,活違規=紅,惰性曝險=PENDING_OPERATOR 點名。批618 起本檢為 GREEN 37/37。\n—— 以下為原條文(批534 立,一字不改)——\nQuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。\n\n**批595 操作員複述並要求入冊(「不可使用 TA-LIB,用 QuantGuard 取代」),同時補執法憑據:**① **正典替代路徑具名**:`VDF_ENG086_QuantGuardOneBridge_v*.py`(引擎)· `via-quantguard`(短令)· `supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json`(政策冊)· `functional modules/VDF/references/intake/VIA_QuantGuard_v20260916`(收容正本)。② **實測(批595)**:活樹尾版含無版號 **2604 支**,真的 `import talib` / `from talib import` 的 **0 支**;另有 40 支**提到** talib,逐支看過**全是治理件在禁它**(MDL156 曝險檢、SelftestGrid 站名、ToolLadder 的排除清單…)。③ **量這條律不准用字串比對**:第一版我用 `talib` 當關鍵字全樹掃,得到 578 處「活件曝險」——那裡面絕大多數是**版本史**(自測格 180 個歷史版號各算一次)加上**因為在禁它才提到它**的治理件。禁用律的尺必須是 **import 語句**(`^\\s*import talib` / `^\\s*from talib import`)且**只看尾版**,否則 578 這個數字會逼人去「清理」自己的執法程式(LL142 同族:量的單位不對,數字就沒有意義)。\n\n**2026-09-25 操作員令「No ta-lib allowed」「NO TA-LIBS ALLOWED」「REMOVE ALL TA-LIB」——落地第四層:刪乾淨。**① 批345 對 supportive modules/VeritasCeleritas.py 與 50_Protection 那份的不可動,以本令解除一次:兩份(連同 VIA_Standalone_Package_v0102 包內與 new modules engines 三份副本)照 accelerator/ 合規本對齊,零 talib 路徑;CGC_MDL183 基線換 sha 並記裁定。② VeritasCeleritas_v1140(8 處 talib 路徑)刪除,由 v1141(同一份差異拿掉 TA-Lib)取代。③ 退役件 VIA_ENG003_TALibEngine 刪除(RETIRE_MANIFEST 記 purged);VIA_WorkflowEngine 的 talib 動詞、TheoryAudit 的 E 段、WorkOps 健檢的 TALib 項拿掉。④ VDF_TA_Engine_Spec 的 talib_policy 撤銷,指標價改指 L104(ADJ OHLC)。⑤ 收容正本(references/intake)照正本零觸碰律不動、不在任何載入路徑上;舊版號檔(版本史)與治理件裡「在禁它」的字樣照留。上面 ② 的「兩支工具本體一個位元都不動」自本令起不再適用。",
       "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
       "enforcement": "CGC_MDL156_VIAAcceleratorControl_v*(talib 曝險檢;尾版 glob 不釘版號) + VDF_ENG086_QuantGuardOneBridge_v*(正典替代路徑) + VIA_QuantGuard_TA_Lib_Policy_v0100.json;尺必須比 import 語句且只看尾版,不得用字串比對(批595 實測 0 支真曝險)",
       "status": "ACTIVE",
@@ -684,6 +684,20 @@
       "batch": "批649",
       "cat": "登錄",
       "zh": "**一個名字只能有一扇門;被同名後定義吃掉的那支,必須另開一扇自己的門。**PowerShell 的 `function global:X` 寫第二次是**後定義無聲覆蓋前定義**:沒有警告、沒有 rc、格子照綠、梭照在、樹上的檔照在——只有那支引擎從冊上永遠消失。一千四百行的冊長到後來,撞名不是會不會發生的問題,是什麼時候發生。**判的不是「有沒有被同名覆蓋」,而是「被覆蓋的那支引擎還到不到得了」**:活著的那支名字不動(操作員的手已經記住它),被吃掉的那支另開一扇門,兩邊都到得了就放行;一扇門都沒有=ORPHAN=紅。守門人:`CGC_MDL157 shadow`(批649 上線,第一件事是拿它掃自己的冊)。"
+    },
+    {
+      "id": "L104",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "價格",
+      "zh": "**股票的價格指標 = ADJ OHLC(VRN 只需要這一件)。**操作員 2026-09-25 令:「THE ONLY THING RELEVANT TO VRN IS TO USE CLOSE AND ADJ CLOSE TO CALCULATE ADJ OPEN / ADJ LOW / ADJ HIGH AND USE THEM FOR THE STOCK AS PRICE INDICATOR IN THE POLICY」。① factor = adj_close ÷ close(同一來源、同一天);② adj_open = open × factor · adj_high = high × factor · adj_low = low × factor · adj_close 原值;③ 股票的價格指標一律用這組 ADJ OHLC(VRN 目標價 / 上漲空間 / 價位對照、QuantGuard 指標);原始 OHLC 只給因子重算與稽核;④ 正典一處:VDF_ENG060_AdjPriceLayer → tw_prices_adj(配股段與現金股利段照 Z173),不另寫換算(Zero-Hydra);⑤ 交易所為主:open / high / low / close 與量值以交易所為準,yfinance 只取 adj_close 算因子;缺 adj_close = 因子缺 → 誠實 NODATA,不拿 raw 冒充 ADJ。TA-Lib 禁用(L50)。承接已被取代的 L41 裡「價」那一段。 ⑥ 流程(操作員令「WORKFLOW IS FROM VDF TO QUANTGUARD.」):VDF(VDF_ENG060 AdjPriceLayer → tw_prices_adj 的 ADJ OHLC)→ QuantGuard(VDF_ENG086_QuantGuardOneBridge)拿 ADJ OHLC 算指標 → VRN 取用;TA-Lib 不在流程裡任何一站(L50;操作員「WE'VE USE QUANTGUARD TO REPLACE TA-LIB ALREADY.」)。",
+      "policy_ref": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v*.py · tw_prices_adj · L50 · L41(已取代) · functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v*.py"
+    },
+    {
+      "id": "L105",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "驗證",
+      "zh": "**過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩三次紀錄…檢查 成功重疊者規則就鎖定」「將最佳還原點的自動建置放在系統政策 環境及工具管理 測試AUDIT都要建立最佳還原點機制 LESSON-LEARNED LOGGING」。① **驗證照鎖定冊跑一次**:VIA_Validation_Lock_v*.json 的七步——S1/S2/S3/S5 是四筆全綠紀錄(88d7a3e3 · 4cdb368e · 767d1f02 · adee3b1c)逐筆實量的**重疊**(至少兩筆都出現);S4 擊斃閘(批736 令)、S6 總控頁契約(CI)、S7 按清單還原(767d1f02 失誤教訓)是照規則列入,冊上逐步標 basis,不冒充重疊:S1 元件編號冊同步 → S2 VCGC 自測全過 → S3 改動引擎自測含正負控 → S4 擊斃閘實判 → S5 推前全格子一次 → S6 總控頁契約 → S7 只按清單還原再生檔。② **過關就鎖定、不重複**:同一份位元已經過關的閘不重跑;修了什麼只重跑受影響的站(--only);重跑不會讓綠更綠,只燒 token。③ **最佳還原點自動建置,兩面同一條律**——過關才晉升;沒過關只寫候選,**舊的最佳點一個位元不動**(那正是要拿來還原的):環境及工具管理 = CGC_MDL135 EnvGovernance 的 LKGC(VIA_Reports/env_governance/LKGC_latest.json,逐境晉升,壞的境不動舊紀錄);測試/AUDIT = CGC_MDL064 全面自測矩陣 v0498 起全跑過關(FAIL 0 · TIMEOUT 0 · 沒中斷 · 正式庫前後一致)自動建點(VIA_Reports/restore_points/BRP_test_audit_latest.json + 逐次歷史)。④ **壞了先退回最佳還原點再修**:碼 `git restore --source=<commit> -- <檔>` 逐檔退(不整棵覆蓋);環境照 LKGC 鎖檔;不在壞的上面疊修。⑤ **還原點要釘得出是哪一份**:commit + 分支 + 髒檔數;髒樹照建但 exact=False,不冒充精確。⑥ **Lesson-Learned logging**:每批付過的學費照記本冊 lessons(只增不減)。",
+      "policy_ref": "supportive modules/registry/VIA_Validation_Lock_v0100.json · CGC_MDL064_SelftestGrid_v0498 brp_record/⑧ · CGC_MDL135_EnvGovernance_v*.py lkgc_promote · LL459–LL462"
     }
   ],
   "lessons": [
@@ -2591,7 +2605,122 @@
       "batch": "批687",
       "cat": "誠實",
       "zh": "**早退分支不准把承諾一起退掉。**「不代設」這句誠實話只跟著走完全程的那條路,四條 ABSENT 早退分支沒帶,自己的檢在沒有價表的環境就必紅;補料後轉綠不是修好,是不再走那條路。承諾要放在初始值裡,四態全帶。"
+    },
+    {
+      "id": "LL444",
+      "batch": "批736",
+      "cat": "基線",
+      "zh": "**動手前要先問「這道令是不是已經有人做了」。** 本批在一個落後預設分支 89 個 commit 的基線上,把操作員的「所有目標價及各前一日的價格都要換成 ADJ CLOSE」從頭做了一遍——而預設分支上**批729 早就交付了**(新欄 price_prev_close / price_prev_adj / price_prev_date),批730 還拿真料把因子分母修得更對。一整批的工,做在一個已經被別人走完的路上。"
+    },
+    {
+      "id": "LL445",
+      "batch": "批736",
+      "cat": "基線",
+      "zh": "**落後的基線會讓「改得很乾淨」變成「完全是廢的」。** 本批開的 `VRN_ENG073_v0137` 撞上預設分支上**別的批做的同名 v0137**(那邊已到 v0138);擊斃閘的前十條條款一條都沒攔住,因為它們全部只問「這次改了什麼」,**沒有一條問「你改的是不是當下那一版」**。於是有了 KILL-11 基線時效:新出的 _vNNNN 必須正好接在預設分支當下的尾版之後,撞號 / 舊號 / 跳號一律擊斃。同一個病在 LL334(側線取用 v0492 → 本線跳號批735)就發作過一次。"
+    },
+    {
+      "id": "LL446",
+      "batch": "批736",
+      "cat": "量測",
+      "zh": "**差一步量測,改法會整個反向。** 我原本要把 `price_db` 的基準從原始 close 換成 ADJ——那會**回歸**批730 拿真料量出來的結論:Yahoo 的 close 會事後按配股回頭調整(容器實量 13.6% 的列、796/893 檔對不上交易所收盤),所以「報告時價」必須是交易所的原始成交收盤,ADJ 要另立新欄。我沒量那一層,就會用一個聽起來更一致的做法把已經修對的東西改壞。"
+    },
+    {
+      "id": "LL447",
+      "batch": "批736",
+      "cat": "閘",
+      "zh": "**擊斃 ≠ 報告。** 一整排會「報」的閘報了沒人擋,改動照樣進去。要擋就要 rc=1,而且要印出位置、犯的哪一條律、下一步怎麼辦。同時兩端都要守住:**fail-closed**(量不到回 ABSENT/PARTIAL,絕不回 PASS)與**棘輪**(既有債記帳不擊斃)——少了前者是假綠,少了後者第一天就把樹擋死,然後這道閘會被關掉,而被關掉的閘等於沒有閘。"
+    },
+    {
+      "id": "LL448",
+      "batch": "批736",
+      "cat": "閘",
+      "zh": "**`git diff` 從來不列未追蹤檔。** 一道判「改動」的閘若只看 diff,最該攔的那一類——「新出一支 _vNNNN」「整支全新的模組」——在 `git add` 之前一個都看不到。要把 `ls-files --others --exclude-standard` 一起看,而且未追蹤檔要整份當新增行判。這個漏是閘自己的第一輪自測當場咬出來的(五格同時紅,同一個根因)。"
+    },
+    {
+      "id": "LL449",
+      "batch": "批736",
+      "cat": "閘",
+      "zh": "**量文字不量碼。** 閘第一次真判就咬到自己兩次:KILL-06 咬中 `CLAUSES` 裡那句「不得 import ta·lib」的**說明文字**,KILL-09 咬中自測沙盒夾具裡那串 `chk(\"① a\", 1)` **字串字面**。註解裡提到相依不是相依,字串裡長得像呼叫的不是呼叫。檢號改走 AST、字面改走 tokenize 遮蔽。同 LL432 一族:量的是像那個東西的文字,不是那個東西。"
+    },
+    {
+      "id": "LL450",
+      "batch": "批736",
+      "cat": "閘",
+      "zh": "**「字串」不是一種東西,是兩種。** docstring / 裸字串=**散文**(說明),右值字串=**值**。一視同仁地遮只剩兩條爛路:全遮 → 同意閘的放行值也被遮掉,代設同意閘變成漏判(fail-open);全不遮 → 連「說明這條規則」的那句 docstring 都被判成違規。兩者都被本閘自己的正負控咬出來過,按語意分開遮才對——而不是為了讓自己過關把條款放鬆。"
+    },
+    {
+      "id": "LL451",
+      "batch": "批736",
+      "cat": "假綠",
+      "zh": "**檢名宣告的話一旦跟碼不一致,而檢只驗一個仍然存在的字串,就會錯著還綠。** 改碼時要連「檢在宣告什麼」一起讀:一格檢的名字說「price_db 仍是 raw close」,而它只驗一個仍然存在的字串,那麼把 price_db 換掉之後它照樣是綠的。宣告錯了燈還綠,比紅燈難發現得多。"
+    },
+    {
+      "id": "LL452",
+      "batch": "批736",
+      "cat": "報告",
+      "zh": "**報告的總判要取最差那一格,不取平均。** 五格裡四格綠一格紅,總判是 RED,不是「大致綠」。而且**量不到的格子要留在表上寫 ABSENT,不是從表上消失**——一張省略了量不到那幾格的報告,看起來會比實際情況漂亮(L57 誠實分母)。報告裡每一個數字都要在產頁當下現場量,抄自陳的數字不算實測。"
+    },
+    {
+      "id": "LL453",
+      "batch": "批736",
+      "cat": "接線",
+      "zh": "**不要造死梭。** 本樹所有 `via-*.cmd` 都 dot-source `Register-VIA-Commands-v*.ps1` 再按梭名呼叫;L70 下 `.ps1` 是操作員逐次許可的手。AI 單造一支 `.cmd` 而沒有 Register 段,等於宣告了一個背後沒有東西的動詞(批425 家族)。真接線走格子站,梭與冊列成一段讓操作員自己貼。"
+    },
+    {
+      "id": "LL454",
+      "batch": "批736",
+      "cat": "假綠",
+      "zh": "**一百條教訓只活在 docs 裡,而儀表板照報綠。** 實測:正典政策冊 `VIA_Policy_Laws_SSOT` 的 lessons 停在 LL343(批687),docs 已經寫到 LL443——LL344–LL443 共 **100 條**從來沒進冊,而 `vcgc status` 一直印「政策庫 OK:lessons 343」。冊只數自己有的;數不到的,它不知道要數。"
+    },
+    {
+      "id": "LL455",
+      "batch": "批736b",
+      "cat": "假綠",
+      "zh": "**一道閘可以通過自己的十八檢,而在它最重要的那條接線上從來沒生效過。** 批736 實測(Codex 審查 PR #121 抓出):KILL-08 整條關在 `--run-selftest` 後面,而兩個生產接法都沒帶那個旗標(格子站空參數、報告頁只給 `--json`)—— 於是那條條款在真判時從來沒跑過,而 `render()` 照樣印「11 條全過」。**條款的覆蓋率要按它實際會被怎麼呼叫來量,不是按自測怎麼呼叫。** 沒量到的條款要點名,不准併進「全過」。"
+    },
+    {
+      "id": "LL456",
+      "batch": "批736b",
+      "cat": "閘",
+      "zh": "**放寬一條字面規則,要同一次補上負控。** KILL-07 從「漏判三種最常見寫法」改成四形全中(`os.environ[鍵] = 值` / dict 冒號 / setdefault 逗號 / 裸賦值),同一次就要釘住「讀取比較(`== \"YES\"`)不是賦值」兩格負控 —— 不然下一輪就會為了擋得更寬而把讀取也判成代設。放寬與收緊要成對,一次做完。"
+    },
+    {
+      "id": "LL457",
+      "batch": "批736b",
+      "cat": "工序",
+      "zh": "**改完先提交,再跑任何會再生檔案的東西。** 批736 實錄:修完 Codex 六條之後,我用了一次太寬的 `git restore`(按「保留清單」還原其餘 ` M `),把六個修正全部還原掉 —— 因為那三支檔**已經在上一個 commit 裡**,我的修正因此顯示成 ` M `,跟格子再生物長得一模一樣,分不出來。**未提交的修正在 git 眼裡沒有備份。** 還原要按「明確要還原的那幾支」列,不是按「要保留的那幾支」反推。"
+    },
+    {
+      "id": "LL458",
+      "batch": "批736b",
+      "cat": "基線",
+      "zh": "**落後的參照會讓答案整個錯掉,不管你判得多仔細。** 批736 實測:`--base main` 解到容器裡**落後的本地 main**(`origin/main` 已往前走)→ `main...HEAD` 吐出 4,518 檔,把併進來的 89 個 commit 全算成「這次的改動」,連別的批動過的收容件都被 KILL-03 擊斃;`origin/main...HEAD` 只有 7 檔,正好是這次那一個 commit。**差 645 倍。** 這跟 KILL-11 是同一個病,只是換了個位置:凡是拿參照當尺的地方,都要先確認那把尺自己跟得上。"
+    },
+    {
+      "id": "LL459",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "閘",
+      "zh": "**一道沒有許可的擊斃閘,會把操作員親口下令的改動跟 AI 私改一起殺掉,閘就只剩兩條路:關掉它,或不照令辦——兩條都錯。**拔 TA-Lib 必然要動不可動清單上的 VeritasCeleritas.py(KILL-04)、.ps1(KILL-05)、刪帶 talib 的舊版 v1140(KILL-02),v0100 沒有許可這個東西。許可只能釘**位元**(modify 釘 sha256、delete 釘檔真的不在),不能釘說詞;只有條款本文就寫著「要操作員逐次許可」的三條能許可,L50/同意閘等八條沒有許可這回事;冊讀不到 = 沒有許可(fail-closed)。CGC_MDL187 v0101 + VIA_ModuleChange_Permits_v0100.json;五個突變全抓到(第一輪漏了「許可刪除、檔卻還在」,補負控⑤才抓到)。"
+    },
+    {
+      "id": "LL460",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "驗證",
+      "zh": "**過關就鎖定,不要一直重複。** 同一份位元已經過關的閘再跑一次,綠不會更綠,只燒 token 和操作員的耐心。驗證步驟不是每批重新想一次:取以前**真的全綠**的幾筆紀錄,留下它們**重疊**的步驟寫成冊(VIA_Validation_Lock),照冊各跑一次;之後修了什麼,只重跑受影響的那幾站(--only)。批713 已經用同一招量過「前兩次成功冊的標準」,這次是把它用到驗證本身。"
+    },
+    {
+      "id": "LL461",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "還原",
+      "zh": "**最佳還原點要自動建,而且壞的一跑不准蓋掉好的點。** 環境面早就做對了(CGC_MDL135 LKGC 批602 逐境晉升:「這一跑壞了,但舊的成功紀錄留著——那正是要拿來還原的東西」),測試/AUDIT 面一直沒有:格子每跑一次只留一份存證,壞掉的時候沒有人答得出「上一次全綠是哪一個 commit」。格子 v0498 起全跑過關才晉升、沒過關只寫候選;還原點要釘 commit + 髒檔數,髒樹照建但標 exact=False(只能退到 commit,不含未提交的改動),不冒充精確。"
+    },
+    {
+      "id": "LL462",
+      "batch": "側線 2026-09-25 第十六段",
+      "cat": "量測",
+      "zh": "**拔一個被禁的庫,要量「誰真的用它」,不是 grep 字面。** 全樹 575 支檔提到 talib,AST 量(import / from / 動態 import / find_spec)活碼裡真的 import 的是 0 支;其餘是禁令、歷史、收容正本(零觸碰)與偵測器。偵測器(find_spec 看有沒有裝)是 L50 的執法,不是使用;但 VRN 全景探針把 talib 列進「加速候選庫」、裝了就算進可用分母——那是把禁用庫當候選,拔掉。LL443 量不是推的又一例。"
     }
   ],
-  "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。 側線 2026-09-23:操作員令三條「列為最高政策」→ L103 置陣列首位 rank=1,L50 順延 2、L102 順延 3;id 不重編。排序待操作員確認(要 L50 仍居首=兩處對調)。"
+  "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。 側線 2026-09-23:操作員令三條「列為最高政策」→ L103 置陣列首位 rank=1,L50 順延 2、L102 順延 3;id 不重編。排序待操作員確認(要 L50 仍居首=兩處對調)。",
+  "lessons_gap_note_b736": "批736 實測:LL344–LL443 共 100 條只存在於 docs/,從未入冊(冊停在 LL343/批687),本批續號自 LL444 起。**冊上 lessons 的計數不等於樹上實有的教訓數**——回填那 100 條是獨立一批的事,待操作員裁定。"
 }

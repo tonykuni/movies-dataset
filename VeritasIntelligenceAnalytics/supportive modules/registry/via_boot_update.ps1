@@ -25,15 +25,19 @@ $REG  = Join-Path $VIA "supportive modules\registry"
 $GRP  = Join-Path $VIA "functional modules\GroupIndex\engine"
 $MEGA = Join-Path $VIA "functional modules\VDF\output_hub\mega"
 $MARK = Join-Path $MEGA ".last_boot_update"
+$VERIFIED = $MARK + ".verified"
+$LOCK = $MARK + ".lock"
 $LOGD = Join-Path $VIA "VIA_Reports\boot_update_logs"
-$TODAY = Get-Date -Format "yyyy-MM-dd"
+$TODAY = [TimeZoneInfo]::ConvertTimeBySystemTimeZoneId([DateTimeOffset]::UtcNow, 'Taipei Standard Time').ToString('yyyy-MM-dd')
 
 New-Item -ItemType Directory -Force -Path $LOGD, $MEGA | Out-Null
-if ((Test-Path $MARK) -and ((Get-Content $MARK -ErrorAction SilentlyContinue) -eq $TODAY)) {
+try { New-Item -ItemType Directory -Path $LOCK -ErrorAction Stop | Out-Null }
+catch { Write-Host "[boot-ps1] BUSY: $LOCK（另一輪尚未釋放；異常中斷須先核對工作站行程）"; exit 3 }
+try {
+if ((Test-Path $MARK) -and (Test-Path $VERIFIED) -and ((Get-Content $MARK -ErrorAction SilentlyContinue) -eq $TODAY) -and ((Get-Content $VERIFIED -ErrorAction SilentlyContinue) -eq $TODAY)) {
     Add-Content (Join-Path $LOGD "skip.log") "[boot-update] $TODAY 已更(marker)=SKIP(ps1)"
     exit 0
 }
-Set-Content $MARK $TODAY
 $LOG = Join-Path $LOGD ("BOOT_" + (Get-Date -Format "yyyyMMdd_HHmmss") + "_ps1.log")
 $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"
 
@@ -41,10 +45,18 @@ function Newest([string]$dir, [string]$pat) {
     (Get-ChildItem -Path $dir -Filter $pat -ErrorAction SilentlyContinue |
      Sort-Object Name | Select-Object -Last 1).FullName
 }
+$script:BootFailed = 0; $script:BootLastRc = 0
 function Step([string]$label, [string]$script, [string[]]$argv) {
     Add-Content $LOG "--- $label"
-    if (-not $script) { Add-Content $LOG "  [SKIP] 引擎缺(誠實)"; return }
-    & $PY $script @argv *>> $LOG
+    $script:BootLastRc = 3
+    if (-not $script -or -not (Test-Path -LiteralPath $script -PathType Leaf)) {
+        Add-Content $LOG "  [ABSENT] 引擎缺(誠實)"
+    } else {
+        try { & $PY $script @argv *>> $LOG; $script:BootLastRc = $LASTEXITCODE }
+        catch { Add-Content $LOG ("  [FAIL] " + $_.Exception.Message); $script:BootLastRc = 1 }
+    }
+    Add-Content $LOG ("[boot-step] rc=" + $script:BootLastRc + " script=" + $script)
+    if ($script:BootLastRc -ne 0) { $script:BootFailed++ }
 }
 # ⓪ 家族境 python(側線 2026-09-21 d;批384 律):尺=CGC_MDL136 EntryBridge envpy(Register 的 Get-VIAEnvPython 同一份正本);
 #   境未見=base 退路且**寫進 log**(能跑≠本位;缺套件時每一步的 ModuleNotFoundError 就是這一行的下文)。
@@ -61,6 +73,10 @@ if ($envpy) {
 
 Add-Content $LOG "=== VIA 開機更新 $TODAY(ps1 載體;節序=via_boot_update.sh 正主)==="
 Add-Content $LOG "--- ⓪ 家族境 python(尺=CGC_MDL136 envpy):$PY · $PYSTATE(本檔不裝套件;境缺=操作員的手)"
+Step "擷取前查庫（正主目錄；失敗即停）" (Newest $REG "CGC_MDL123_DataHome_v*.py") @("catalog")
+if ($script:BootLastRc -ne 0) { exit 2 }
+Step "增量缺口（不使用舊目錄猜）" (Newest $ENG "VDF_ENG089_IncrementalFetchGate_v*.py") @("plan", "--deep")
+if ($script:BootLastRc -ne 0) { exit 2 }
 Step "① OmniFetch 全車道"          (Newest $ENG "VDF_ENG055_OmniFetch_v*.py") @("run")
 Step "② 價格增量"                  (Newest $ENG "VDF_ENG054_TWDailyBackfill_v*.py") @("run")
 Step "②b 調整後價格層(批178)"    (Newest $ENG "VDF_ENG060_AdjPriceLayer_v*.py") @("build")
@@ -76,6 +92,7 @@ Step "⑦b 驗證共識庫(批176)"      (Newest $VRN "VRN_ENG069_ConsensusDB_v*
 Step "⑦c Yahoo 共識(批194)"      (Newest $VRN "VRN_ENG070_YahooConsensus_v*.py") @("run")
 Step "⑦d 月營收(批194)"          (Newest $ENG "VDF_ENG063_MonthlyRevenue_v*.py") @("run")
 Step "⑦e 鉅亨 FactSet 共識(批199)" (Newest $VRN "VRN_ENG071_CnyesFusion_v*.py") @("run")
+Step "⑦f 共識新快照 ADJ 重算(ENG069 正主)" (Newest $VRN "VRN_ENG069_ConsensusDB_v*.py") @("build")
 Step "⑧ 台股輪動日快照(批153)"   (Newest $GRP "GRP_ENG040_GroupingRotationRunner_v*.py") @("run", "tw")
 Step "⑧b 族群因子層(批193)"      (Newest $ENG "VDF_ENG062_GroupFeatureLayer_v*.py") @("build")
 Step "⑤ 對帳"                      (Newest $ENG "VDF_ENG055_OmniFetch_v*.py") @("--status")
@@ -110,5 +127,12 @@ Step "⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)" (Newe
 Step "⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.json;零網路)" (Newest $REG "CGC_MDL140_HandoverConsole_v*.py") @("build")
 Step "⑳ 收尾閘(批398;MDL141 all 只讀:VRN 逐份五段鏈+核對態、VAP 逐圖驗;無報告/無圖=誠實黃)" (Newest $REG "CGC_MDL141_ClosingGate_v*.py") @("all")
 Add-Content $LOG "=== 畢(誠實三態見上)==="
-Write-Host "[boot-ps1] 完成 · log=$LOG"
-exit 0
+if ($script:BootFailed -eq 0) {
+    Set-Content $MARK $TODAY -ErrorAction Stop
+    Set-Content $VERIFIED $TODAY -ErrorAction Stop
+    Write-Host "[boot-ps1] COMPLETE：子步 rc 全為 0；資料涵蓋仍以各閘為準 · log=$LOG"
+    exit 0
+}
+Write-Host "[boot-ps1] INCOMPLETE：$script:BootFailed 個子步非零；同日可重試 · log=$LOG"
+exit 1
+} finally { Remove-Item -LiteralPath $LOCK -Force -ErrorAction Stop }

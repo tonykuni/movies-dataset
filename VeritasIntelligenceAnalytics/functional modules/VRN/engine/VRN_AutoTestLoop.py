@@ -1,6 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-VRN_AutoTestLoop v0103 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+VRN_AutoTestLoop v0107 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）
+
+v0106→v0107(母倉 批735 收尾;PR #119 的 Codex 審查 P2):報告頁橫幅與主控台 [VRN 模板] 那一行的比對基準,改成照抄建構器
+  回的說法(VRN_ENG089 v0101 basis:對上一輪 / 對這個夾的上一版 / 首建)。v0106 是看「有沒有找到上一輪的連結冊」自己猜,
+  同一個 --out 重跑時建構器其實是對這個夾的上一版比,卻印成「對上一輪」。建構器是舊版(沒有 basis)才退回舊猜法。
+
+v0105→v0106(母倉 批735;操作員 2026-09-24「用制式模板html u/i套進去形成vrn模板都由synchonizer控制交接自適應式自動化」
+             「上下的自動連結更新新增檢查機能建構須完成」「若成功跑一次測試文件的成果用我們使用的html u/i顯示」):
+  ① 每輪跑完、報告 JSON 寫好之後,自動用 VRN_ENG089(尾版現解)把這一輪的成果套進制式 U/I(VIA_HTML_UI 三入口,
+     模板一個位元組都不動)——中央頁多一個 VRN 面板、synchronizer 模組冊只增不減多一個 VRN 模組,面板開關由 synchronizer 控制。
+  ② 模板預設建在 <--out>/template:永遠在這一輪自己的輸出夾底下 → 自測、單元測試、格子都只寫暫存(L17)。
+     比對基準自動找同一個上層夾裡上一輪的連結冊(PS 第六步每輪一夾 VIA_Reports/vrn_autotest/<時間>/)→
+     新增 / 異動 / 消失講的是「對上一輪」;新增項目要真的上了頁,沒上頁 = 建構 rc1 並點名。
+  ③ 報告頁(PS 跑完自動跳出來的那一頁)頂端一條橫幅:開中央頁 · 開 synchronizer · 對上一輪新增 / 異動 / 消失。
+  ④ 模板是成果的「看法」,不是關卡:建不成(建構器不在 / 模板對不上 manifest)照實印一行、橫幅寫原因,退出碼仍只看關卡。
+  ⑤ --template-out <夾> 指定別處(例:固定夾);--no-template 不建。自測門 +③(模板三頁 + 連結冊落在 --out 底下、報告頁有連結)。
+  版號補記:批732 / 批733 的改動(財報表格恆等式、沒有框線的表)在碼內註記為 v0105,但 LOOP_VERSION 沒跟著改,
+  報告一直印 v0104——本版一起補正,報告從此印 v0106。
+
+v0103→v0104(母倉 批731;操作員 2026-09-24「PS PY檔案都要依規定裝加速器  剛剛跑好慢」「自測報告要自動跳出來」):
+  工作站實錄:106 份實檔 G06 入庫 20 分、G07 6.6 分,G08 冪等把 106 份**整批再入庫一次**,第六步撞 1800 秒天花板被停。
+  ① G08 改抽樣:平均抽 12 檔(--g08-sample N;首尾兩檔必在,檔名以報告日開頭,尾檔 = 最新一份)再入庫一次,
+     列數仍必須不變——冪等是 upsert(ReportID)的性質,
+     不必把 106 份重新擷取一遍才驗得出;要全批:--g08-full。明細寫明「抽 12/106 檔」。G11 / G12 讀的是 G06 寫的 JSON,
+     G08 不重寫它,抽樣不影響它們看到的列。
+  ② 起跑先 VIA_ACCEL.activate()(批323 啟動律:載 Celeritas、套執行緒預算),印一行 [加速器] 在位 / 缺席與原因——
+     橋一直在,但從來沒有啟動過。
+  ③ 進度協定:一輪的總數改成 G06 n + G07 n + G08 抽樣數,百分比一路往上,不會在 G08 開頭倒退。
+  證據核心同批:每一頁、每一份附錄小字對同一個檔只解析一次(首頁、附錄、欄表、G07、G08 原本各自重讀)。
+  ④ --selftest 的單元測試改成一檔一個子行程並排跑(行程數同整批平行池:VRN_BATCH_WORKERS > 加速器執行緒預算 >
+     CPU−1;大檔先跑):六層鏈 V2 敲這扇門時節點天花板 180 秒(格子 60 秒),序跑 104 支會撞天花板 → 那一格
+     「沒跑完=沒有結論」,V2 整層陪它等。子行程在父行程被天花板砍掉時自己收(stdin 關了就走),不留著佔住庫。
 
 v0102→v0103(母倉 批729;操作員 2026-09-24「報告後小字體不相關附錄可抓到局部識別券商」「報告後方小字級附錄可抓到所有評等法可增加到同義字」):
   G07 把檔案路徑交給首頁引擎(PDF 才讀附錄);每檔記下附錄小字的券商、層級、是否用上、與檔名是否衝突與評等定義。
@@ -94,7 +125,7 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-LOOP_VERSION = "v0103"
+LOOP_VERSION = "v0107"
 HERE = Path(__file__).resolve().parent
 VRN_ROOT = HERE.parent
 REPO_ROOT = VRN_ROOT.parent.parent if (VRN_ROOT.parent.name == "functional modules") else VRN_ROOT
@@ -108,9 +139,11 @@ ENGINE_FILES = {
     "evidence_core": HERE / "VRN_Evidence_Core.py",
 }
 VCGC_SYNC = REPO_ROOT / "scripts" / "VIA_VCGC_Sync.py"
+TEMPLATE_GLOB = "VRN_ENG089_TemplateView_v*.py"       # v0106 (批735): VRN template builder (standard HTML U/I), newest version
 LAST_FIRST_PAGE: Dict[str, Dict[str, Any]] = {}      # per-file first-page answers of the current round (G11)
 LAST_APPENDIX: Dict[str, Dict[str, Any]] = {}        # v0103 (批729): per-file appendix small print (broker + rating scale)
 LAST_ADJ: Dict[str, Dict[str, Any]] = {}             # v0103 (批729): per-file ADJ CLOSE upside (state, value, reason)
+LAST_FIN: Dict[str, Dict[str, Any]] = {}             # v0105 (批732): per-file financial table read-back (identities)
 LAST_SAMPLES: Dict[str, Path] = {}                    # file name -> sample path of the current round
 TRUTH_CRITICAL = ("type", "ticker", "broker", "page_date", "rating", "target_price", "current_price")
 AUDIT_DIR = VRN_ROOT / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100"
@@ -171,6 +204,19 @@ def def_say(text: str) -> None:
 
 
 PASS_INDEX = {"G06": 0, "G07": 1, "G08": 2}    # 三批逐檔:入庫 · 首頁 · 冪等第二批
+G08_SAMPLE = 12                                 # v0104:冪等抽樣檔數(--g08-sample;--g08-full 全批)
+
+
+def def_g08_pick(names: Sequence[str], sample: int, full: bool) -> List[str]:
+    """v0104: the idempotency pass re-ingests an evenly spread, fixed sample of the batch (sorted names).  The first
+    and the last file are always in it -- names start with the report date, so the last one is the newest report."""
+    names = sorted(names)
+    if full or sample <= 0 or len(names) <= sample:
+        return list(names)
+    if sample == 1:
+        return [names[-1]]
+    last = len(names) - 1
+    return [names[round(i * last / (sample - 1))] for i in range(sample)]
 
 
 def def_tick(prefix: str, i: int, n: int, name: str) -> None:
@@ -181,9 +227,13 @@ def def_tick(prefix: str, i: int, n: int, name: str) -> None:
     def_say(f"   [{prefix} {i}/{n}] {name}")
     if PROGRESS["quiet"] or n <= 0:
         return
-    k = PASS_INDEX.get(prefix, 0) * n + i
+    total, offsets = PROGRESS.get("round_total"), PROGRESS.get("round_offsets") or {}
+    if total and prefix in offsets:              # v0104: the round declared its real total (G08 is a sample)
+        k, kk = min(offsets[prefix] + i, total), total
+    else:
+        k, kk = PASS_INDEX.get(prefix, 0) * n + i, 3 * n
     stream = PROGRESS.get("stream") or sys.__stdout__ or sys.stdout
-    stream.write(f"[進度] {k}/{3 * n} {prefix} {name}\n")
+    stream.write(f"[進度] {k}/{kk} {prefix} {name}\n")
     stream.flush()
 
 
@@ -690,13 +740,36 @@ def def_gate_batch(engines: Engines, samples: Path, out_dir: Path, truth: List[D
                 warns.append("no broker")
             if row.get("SourceFormat") == "pdf" and not fins and stock:
                 warns.append("no financial rows (no ruled table found)")
+            _rej = str(row.get("ValidationIssues") or "")
+            if "FIN_TABLE_REJECTED(" in _rej:
+                # 批733(Z195):沒有框線的表讀出來加不起來 → 不入庫,這裡點名是哪一張、哪一條
+                warns.append("unruled financial table left out (does not add up): "
+                             + _rej.split("FIN_TABLE_REJECTED(", 1)[1][:180])
             issues = str(row.get("ValidationIssues") or "")
             if "failed" in issues.lower() or "No PDF extraction engine" in issues:
                 problems.append(issues[:200])
+        fin_check = ""
+        if fins and callable(getattr(db, "financial_identity_checks", None)):
+            # v0105 (批732): the extracted table has to add up (gross = revenue - cost, operating = gross - expense,
+            # four quarters = the year, within the printed rounding); a header whose year was not read is counted
+            ident = db.financial_identity_checks(fins)
+            LAST_FIN[name] = {"rows": len(fins), "checked": ident["checked"], "passed": ident["passed"],
+                              "n_failed": len(ident["failed"]), "periods_unclear": ident["periods_unclear"],
+                              "estimate_rows": ident["estimate_rows"],
+                              "failed": [db.identity_failure_text(f) for f in ident["failed"][:5]]}
+            fin_check = f"{ident['passed']}/{ident['checked']}"
+            if ident["failed"]:
+                warns.append(f"財報恆等式 {len(ident['failed'])}/{ident['checked']} 不過:"
+                             + db.identity_failure_text(ident["failed"][0]))
+            if ident["periods_unclear"]:
+                warns.append(f"季別缺年 {ident['periods_unclear']} 列(表頭年度沒讀到)")
+        elif row.get("SourceFormat") == "pdf":
+            LAST_FIN[name] = {"rows": 0, "checked": 0, "passed": 0, "n_failed": 0, "periods_unclear": 0,
+                              "estimate_rows": 0, "failed": []}
         status = "FAIL" if problems else ("WARN" if warns else "PASS")
         rows.append(def_row("G06 BATCH", name, status, "; ".join(problems + warns),
                             ticker=row.get("TW_TICKER"), date=row.get("ReportDate"), broker=row.get("Broker"),
-                            rating=row.get("Rating"), target=row.get("TargetPrice"), fin_rows=len(fins),
+                            rating=row.get("Rating"), target=row.get("TargetPrice"), fin_rows=len(fins), fin_identity=fin_check,
                             tri_code=row.get("TriCodeVerdict"), confidence=row.get("ConfidenceScore"),
                             stage="S09 FINANCIAL_SSOT" if problems else "S10 SUMMARIZER"))
     parquet_rows = []
@@ -800,22 +873,27 @@ def def_gate_first_page(engines: Engines, truth: List[Dict[str, Any]], samples: 
     return rows
 
 
-def def_gate_idempotent(engines: Engines, samples: Path, out_dir: Path, run_id: str) -> List[Dict[str, Any]]:
+def def_gate_idempotent(engines: Engines, samples: Path, out_dir: Path, run_id: str,
+                        sample: int = G08_SAMPLE, full: bool = False) -> List[Dict[str, Any]]:
     db = engines.database
     if db is None or not (def_has("pandas") and def_has("pyarrow")):
         return [def_row("G08 IDEMPOTENT", "second batch", "SKIP", "DEPENDENCY_MISSING")]
     try:
         import pandas as pd  # type: ignore
         before = len(pd.read_parquet(out_dir / "vrn_db" / db.BASICINFO_PARQUET_NAME))
+        names = [f.name for f in db.scan_input_files(Path(samples)) if f.suffix.lower() not in db.OCR_SUFFIXES]
+        pick = def_g08_pick(names, sample, full)
         args = argparse.Namespace(input=str(samples), output=str(out_dir / "vrn_db"), ticker_ssot="", broker_ssot="", rating_ssot="",
                                   online_name_update=False, csv=False, json=False, duckdb=False, google_sheet="", google_credentials="",
-                                  run_id=run_id + "_R2", self_test=False)
+                                  run_id=run_id + "_R2", self_test=False, only_files=pick)
         import contextlib
         with contextlib.redirect_stdout(def_ProgressTee("G08")):
             db.process_batch(args)
         after = len(pd.read_parquet(out_dir / "vrn_db" / db.BASICINFO_PARQUET_NAME))
         ok = before == after
-        return [def_row("G08 IDEMPOTENT", "second batch keeps one row per ReportID", "PASS" if ok else "FAIL", f"before={before} after={after}")]
+        how = "" if len(pick) == len(names) else f" · 抽 {len(pick)}/{len(names)} 檔再入庫(要全批:--g08-full)"
+        return [def_row("G08 IDEMPOTENT", "second batch keeps one row per ReportID", "PASS" if ok else "FAIL",
+                        f"before={before} after={after}{how}")]
     except Exception as error:  # noqa: BLE001
         return [def_row("G08 IDEMPOTENT", "second batch", "FAIL", f"{error.__class__.__name__}: {error}"[:300])]
 
@@ -1282,6 +1360,7 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
     LAST_FIRST_PAGE.clear()
     LAST_APPENDIX.clear()
     LAST_ADJ.clear()
+    LAST_FIN.clear()
     LAST_SAMPLES.clear()
     def_say(f"[ROUND {round_no}] G01 編譯 · G02 自測 · G03 檔名 oracle" + ("" if args.no_audit else " · G04 稽核"))
     rows += def_gate_compile()
@@ -1317,6 +1396,14 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
             shutil.rmtree(out_dir)
         out_dir.mkdir(parents=True)
         run_id = f"VRN_AUTOTEST_R{round_no}"
+        g08_full, g08_n = bool(getattr(args, "g08_full", False)), int(getattr(args, "g08_sample", G08_SAMPLE))
+        db_eng = engines.database
+        files_in = db_eng.scan_input_files(Path(samples)) if db_eng is not None else []
+        n_in = len(files_in) if db_eng is not None else len(before)
+        n_g08 = len(def_g08_pick([f.name for f in files_in if f.suffix.lower() not in db_eng.OCR_SUFFIXES]
+                                 if db_eng is not None else [], g08_n, g08_full))
+        PROGRESS["round_total"] = 2 * n_in + n_g08            # v0104:G06 n + G07 n + G08 抽樣,百分比一路往上
+        PROGRESS["round_offsets"] = {"G06": 0, "G07": n_in, "G08": 2 * n_in}
         def_say(f"[ROUND {round_no}] G06 資料庫引擎整批入庫（{len(before)} 檔；每檔一行進度）")
         batch_rows, summary = def_gate_batch(engines, samples, out_dir, truth, real_mode, run_id)
         rows += batch_rows
@@ -1325,8 +1412,8 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
         def_say(f"[ROUND {round_no}] G07 首頁引擎逐檔")
         rows += def_gate_first_page(engines, truth, samples, real_mode)
         if summary:
-            def_say(f"[ROUND {round_no}] G08 冪等：同一批再入庫一次，列數必須不變")
-            rows += def_gate_idempotent(engines, samples, out_dir, run_id)
+            def_say(f"[ROUND {round_no}] G08 冪等：抽 {n_g08} 檔再入庫一次（--g08-full 全批），列數必須不變")
+            rows += def_gate_idempotent(engines, samples, out_dir, run_id, g08_n, g08_full)
         rows += def_gate_read_only(samples, before)
         def_say(f"[ROUND {round_no}] G09 唯讀 · G11 真值" + ("" if getattr(args, "truth", "") else "（未給 --truth，略過）") + " · G12 15 欄六態")
         truth_rows, truth_summary = def_gate_truth(engines, getattr(args, "truth", ""), out_dir if summary else None, run_id)
@@ -1340,15 +1427,63 @@ def def_run_round(engines: Engines, args: argparse.Namespace, workdir: Path, rou
     return rows
 
 
-def def_render_html(report: Dict[str, Any]) -> str:
+def def_template(json_path: Path, workdir: Path, out_dir: Optional[Path] = None) -> Dict[str, Any]:
+    """v0106 (批735): this round's results in the standard HTML U/I (VRN_ENG089, newest version), built from the report
+    JSON.  Default output <workdir>/template -- always inside --out, so self-tests and unit tests only write scratch.
+    Baseline found automatically (newest links book of a sibling run folder: PS step V6 makes one folder per run), so
+    NEW / CHANGED / GONE mean 'since the previous run'.  Honest states: builder missing -> ABSENT, builder raising ->
+    ERROR; the loop's verdict stays the gates' (the template is a view of the results, not a gate)."""
+    cands = sorted(VRN_ROOT.glob(TEMPLATE_GLOB))
+    if not cands:
+        return {"state": "ABSENT", "rc": 3, "why": f"{TEMPLATE_GLOB} 不在(functional modules/VRN/)"}
+    try:
+        eng = def_load_module("vrn_template_view", cands[-1])
+        base = eng.find_baseline(workdir)
+        res = eng.build(json_path, Path(out_dir) if out_dir else workdir / eng.RUN_SUBDIR, baseline=base)
+        res.update({"builder": cands[-1].name, "baseline": str(base) if base else ""})
+        return res
+    except Exception as error:  # noqa: BLE001
+        return {"state": "ERROR", "rc": 1, "why": f"{error.__class__.__name__}: {str(error)[:200]}", "builder": cands[-1].name}
+
+
+def def_template_basis(template: Dict[str, Any]) -> str:
+    """v0107 (批735): what the counts are compared against -- the builder's own words (VRN_ENG089 v0101 `basis`:
+    對上一輪 / 對這個夾的上一版 / 首建); an older builder without `basis` falls back to the v0106 guess."""
+    if template.get("basis"):
+        return str(template["basis"])
+    return "對上一輪" if template.get("baseline") else "首建(找不到上一輪)"
+
+
+def def_template_banner(template: Dict[str, Any]) -> str:
+    """v0106 (批735): one banner line at the top of the report page -- open the central page / the synchronizer, and
+    what changed since the previous run.  Not built -> the banner says why (never silently missing)."""
+    if not template:
+        return ""
+    state = html.escape(str(template.get("state")))
+    if not template.get("central"):
+        return (f"<div class='tpl warn'>VRN 模板(制式 U/I)沒建成:{state} · {html.escape(str(template.get('why') or ''))}"
+                f"({html.escape(str(template.get('builder') or TEMPLATE_GLOB))})</div>")
+    lc = template.get("links") or {}
+    missing = [n for n in template.get("new_items") or [] if not n.get("on_page")]
+    central = html.escape(Path(template["central"]).resolve().as_uri(), quote=True)
+    sync = html.escape(Path(template["synchronizer"]).resolve().as_uri(), quote=True)
+    since = html.escape(def_template_basis(template))
+    return (f"<div class='tpl'>VRN 模板(制式 U/I · synchronizer 控制):<a href='{central}'><b>開中央頁</b></a> · "
+            f"<a href='{sync}'>開 synchronizer</a> · {state} · {since} · 新增 {lc.get('NEW', 0)} · 異動 {lc.get('CHANGED', 0)} · "
+            f"消失 {lc.get('GONE', 0)}" + (f" · <b>新增沒上頁 {len(missing)}</b>" if missing else "") + "</div>")
+
+
+def def_render_html(report: Dict[str, Any], template: Optional[Dict[str, Any]] = None) -> str:
     colour = {"PASS": "#16a34a", "WARN": "#f59e0b", "SKIP": "#6b7280", "FAIL": "#dc2626"}
     parts = ["<!doctype html><html lang='zh-Hant'><head><meta charset='utf-8'><title>VRN AutoTest</title>",
              "<style>body{font-family:-apple-system,Segoe UI,sans-serif;margin:24px;color:#1f2937;font-size:13px;background:#fbfaf7}",
              "table{border-collapse:collapse;width:100%;background:#fff}th,td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left;vertical-align:top}",
              "th{background:#f3f4f6;position:sticky;top:0}.pill{display:inline-block;padding:1px 8px;border-radius:999px;color:#fff;font-weight:600}",
              ".cards{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:10px;margin:14px 0}.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px}",
-             ".card b{display:block;font-size:20px}</style></head><body>",
+             ".card b{display:block;font-size:20px}.tpl{margin:10px 0;padding:10px 12px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px}",
+             ".tpl.warn{border-color:#fcd34d;background:#fffbeb}</style></head><body>",
              f"<h1>VRN 自動測試迴圈 {html.escape(LOOP_VERSION)} · {html.escape(report['verdict'])}</h1>",
+             def_template_banner(template or {}),
              f"<div>樣本：{html.escape(str(report.get('samples')))} · 模式：{'實檔' if report.get('real_mode') else '合成語料'} · 輪數：{report['rounds_run']}/{report['rounds_max']} · {html.escape(report['generated'])}</div>",
              "<div class='cards'>"]
     for key in ("PASS", "WARN", "SKIP", "FAIL"):
@@ -1373,6 +1508,18 @@ def def_render_html(report: Dict[str, Any]) -> str:
                 parts.append(f"<tr><td>{html.escape(kind)}</td><td>{html.escape(fld)}</td><td>{st.get('OK', 0)}</td><td>{st.get('BAD', 0)}</td>"
                              f"<td>{st.get('FALSE_POSITIVE', 0)}</td><td>{st.get('NOT_ON_PAGE1', 0)}</td></tr>")
         parts.append("</tbody></table>")
+    fin = report.get("financial") or {}
+    if fin.get("n_files"):
+        parts.append(f"<h2>財報表格讀得對不對(批732:表自己要加得起來)</h2><p>表格抽到 {fin['n_with_rows']}/{fin['n_files']} 份 PDF · "
+                     f"恆等式 {fin['passed']}/{fin['checked']} 成立({fin['files_checked']} 份有可驗的表)· 不成立 {fin['n_failed']} 條 · "
+                     f"季別缺年 {fin['periods_unclear']} 列 · 預估欄 {fin['estimate_rows']} 列</p>")
+        bad = [(n, a) for n, a in (fin.get("files") or {}).items() if a.get("n_failed") or a.get("periods_unclear")]
+        if bad:
+            parts.append("<table><thead><tr><th>檔</th><th>成立</th><th>季別缺年</th><th>不成立(前幾條)</th></tr></thead><tbody>")
+            for n, a in bad:
+                parts.append(f"<tr><td>{html.escape(n)}</td><td>{a.get('passed', 0)}/{a.get('checked', 0)}</td><td>{a.get('periods_unclear', 0)}</td>"
+                             f"<td>{'<br>'.join(html.escape(t) for t in a.get('failed') or [])}</td></tr>")
+            parts.append("</tbody></table>")
     for rnd in report["rounds"]:
         parts.append(f"<h2>第 {rnd['round']} 輪 · {html.escape(rnd['verdict'])}</h2><table><thead><tr><th>閘門</th><th>項目</th><th>狀態</th><th>段</th><th>細節</th></tr></thead><tbody>")
         for r in rnd["rows"]:
@@ -1384,9 +1531,144 @@ def def_render_html(report: Dict[str, Any]) -> str:
     return "".join(parts)
 
 
+UNIT_MARK = "[UNIT-JSON] "
+UNIT_FILE_TIMEOUT = 900        # v0104:單一測試檔的天花板(秒);逾時 = 那一檔 FAIL,不拖住整扇門
+
+
+def def_flatten(suite: Any) -> List[Any]:
+    import unittest
+    out: List[Any] = []
+    for item in suite:
+        out += def_flatten(item) if isinstance(item, unittest.TestSuite) else [item]
+    return out
+
+
+def def_unit_file(spec: str) -> int:
+    """v0104 (--unit-file FILE[::k/n]): one VRN/tests file in this process -- or part k of n of it: the file is
+    discovered whole and its test classes are dealt out in name order, so every test runs in exactly one part (inherited
+    tests too) and a class's shared set-up runs once per part.  One ASCII JSON line on stdout.  Started by the
+    self-test with VRN_UNIT_WATCH_STDIN=1: when that parent is gone (killed by an outer ceiling) its end of our stdin
+    closes and this process exits too -- an orphaned test must not keep the market database open for the next station."""
+    import threading
+    import unittest
+    path, _, part = spec.partition("::")
+    if os.environ.get("VRN_UNIT_WATCH_STDIN") == "1" and sys.stdin is not None:
+        def watch_parent() -> None:
+            try:
+                sys.stdin.buffer.read()
+            except (OSError, ValueError):
+                return
+            os._exit(3)
+        threading.Thread(target=watch_parent, daemon=True).start()
+    target = Path(path).resolve()
+    suite = unittest.TestLoader().discover(str(target.parent), pattern=target.name, top_level_dir=str(target.parent))
+    if part:
+        k, n = (int(x) for x in part.split("/"))
+        cases = def_flatten(suite)
+        names = sorted({f"{type(c).__module__}.{type(c).__qualname__}" for c in cases})
+        mine = set(names[k::n])
+        suite = unittest.TestSuite([c for c in cases if f"{type(c).__module__}.{type(c).__qualname__}" in mine])
+    res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)
+    print(UNIT_MARK + json.dumps({"file": target.name + (f"[{part}]" if part else ""), "run": res.testsRun,
+                                  "skipped": len(res.skipped), "bad": [str(t[0]) for t in res.failures + res.errors]}),
+          flush=True)
+    return 0
+
+
+def def_unit_specs(tests_dir: Path, workers: int) -> List[str]:
+    """v0104: the self-test's work units, costliest first -- a file, or FILE::k/n parts when it holds several classes
+    (the ADJ oracle's three classes then run side by side instead of one after another).  Cost = the file's own
+    `SELFTEST_SECONDS = N` (read from its source, not run) shared by its parts; otherwise its size (~1 s per 4 KB).
+    Nothing is timed and written back: a self-test writes only to its scratch folder."""
+    import ast
+    weighted: List[Tuple[float, str, str]] = []
+    for f in sorted(tests_dir.glob("test_*.py")):
+        try:
+            body = ast.parse(f.read_text(encoding="utf-8", errors="replace")).body
+        except SyntaxError:
+            body = []                               # its own run reports the error
+        n_cls = sum(isinstance(n, ast.ClassDef) for n in body) or 1
+        hint = next((float(n.value.value) for n in body if isinstance(n, ast.Assign)
+                     and any(isinstance(t, ast.Name) and t.id == "SELFTEST_SECONDS" for t in n.targets)
+                     and isinstance(n.value, ast.Constant) and isinstance(n.value.value, (int, float))), None)
+        parts = min(n_cls, workers)
+        cost = (hint if hint is not None else f.stat().st_size / 4000) / max(parts, 1)
+        units = [f"{f}::{k}/{parts}" for k in range(parts)] if parts > 1 else [str(f)]
+        weighted += [(cost, f.name, u) for u in units]
+    return [u for _, _, u in sorted(weighted, key=lambda w: (-w[0], w[1], w[2]))]
+
+
+def def_unit_child(spec: str, timeout: int = UNIT_FILE_TIMEOUT) -> Dict[str, Any]:
+    """v0104: one work unit (a test file or FILE::k/n) in a child process of this script -> {file, run, skipped, bad,
+    secs}.  No answer line (crash, timeout) = that unit is a failure, with the last lines of its output."""
+    import threading
+    t0 = time.time()
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", VRN_UNIT_WATCH_STDIN="1")
+    proc = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--unit-file", spec],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    timer = threading.Timer(timeout, proc.kill)
+    timer.start()
+    try:
+        raw = proc.stdout.read() if proc.stdout else b""
+        rc = proc.wait()
+    finally:
+        timer.cancel()
+        if proc.stdin:
+            proc.stdin.close()
+    text = raw.decode("utf-8", errors="replace")
+    secs = round(time.time() - t0, 1)
+    for line in reversed(text.splitlines()):
+        if line.startswith(UNIT_MARK):
+            out = json.loads(line[len(UNIT_MARK):])
+            out["secs"] = secs
+            return out
+    why = f"逾時 {timeout}s" if secs >= timeout else f"rc={rc}"
+    tail = " / ".join(text.strip().splitlines()[-2:])[:200]
+    name = Path(spec.partition("::")[0]).name + (f"[{spec.partition('::')[2]}]" if "::" in spec else "")
+    return {"file": name, "run": 0, "skipped": 0, "bad": [f"{name} 沒有回報({why}){tail}"], "secs": secs}
+
+
+def def_unit_all(tests_dir: Path) -> Tuple[int, int, List[str], str]:
+    """v0104: all VRN/tests files -> (run, skipped, bad, how).  Work units (def_unit_specs) run side by side, one
+    process each (the batch pool's worker count: VRN_BATCH_WORKERS > the accelerator's thread budget > CPUs - 1); one
+    worker = the whole suite in this process, as before.  Each unit keeps its own main process, so the tests that
+    start the batch pool still start it."""
+    import unittest
+    files = sorted(tests_dir.glob("test_*.py"), key=lambda f: (-f.stat().st_size, f.name))
+    workers, why = 1, ""
+    try:
+        if str(HERE) not in sys.path:
+            sys.path.insert(0, str(HERE))
+        import VRN_BatchPool as pool  # type: ignore
+        workers = pool.workers_for(len(files))
+    except ImportError as exc:
+        why = f"(平行池載不到:{exc.name or exc})"
+    if workers <= 1:
+        suite = unittest.TestLoader().discover(str(tests_dir), pattern="test_*.py", top_level_dir=str(tests_dir))
+        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)
+        return res.testsRun, len(res.skipped), [str(t[0]) for t in res.failures + res.errors], "本行程序跑" + why
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    specs = def_unit_specs(tests_dir, workers)
+    t0 = time.time()
+    done: Dict[str, Dict[str, Any]] = {}
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futures = {ex.submit(def_unit_child, spec): spec for spec in specs}
+        for future in as_completed(futures):
+            g = done[futures[future]] = future.result()
+            # 批732: one line per unit as it finishes -- when an outer ceiling cuts the self-test, the lines already
+            # printed still say which units were done and how long each took (the workstation's V2 cut it at 180 s)
+            print(f"     · {time.time() - t0:6.1f}s 完成 {g['file']} {g['secs']}s · {g['run']} 支"
+                  + (f" · 壞 {len(g['bad'])}" if g["bad"] else ""), flush=True)
+    got = [done[spec] for spec in specs]
+    slow = max(got, key=lambda g: g["secs"])
+    return (sum(g["run"] for g in got), sum(g["skipped"] for g in got), [b for g in got for b in g["bad"]],
+            f"{len(files)} 檔 {len(specs)} 份 · 平行 {workers} 行程 · 最慢 {slow['file']} {slow['secs']}s")
+
+
 def def_selftest() -> int:
     """母倉 批728 自測門(六層鏈 CGC_MDL172 與全格子都敲這扇門):
-    ① VRN/tests 全部單元測試(unittest,不需 pytest);② 合成語料小批(--limit 8,一輪)跑到底,不得有 FAIL。
+    ① VRN/tests 全部單元測試(unittest,不需 pytest);② 合成語料小批(--limit 8,一輪)跑到底,不得有 FAIL;
+    ③ v0106(批735):那一小批跑完自動建了 VRN 模板(制式 U/I 三頁 + 連結冊)在暫存夾底下,報告頁有連結。
     輸出寫暫存夾、跑完刪掉;不連網、不設同意閘、不動樣本。rc 0 = 兩段都沒有 FAIL。"""
     import unittest
     t0 = time.time()
@@ -1402,17 +1684,18 @@ def def_selftest() -> int:
 
     tests_dir = VRN_ROOT / "tests"
     if tests_dir.is_dir():
-        suite = unittest.TestLoader().discover(str(tests_dir), pattern="test_*.py", top_level_dir=str(tests_dir))
-        buf = io.StringIO()
-        res = unittest.TextTestRunner(stream=buf, verbosity=0).run(suite)
-        bad = [str(t[0]) for t in res.failures + res.errors]
-        chk(f"① VRN/tests 單元測試 {res.testsRun} 支(跳過 {len(res.skipped)})", not bad and res.testsRun > 0,
+        n_run, n_skip, bad, how = def_unit_all(tests_dir)
+        chk(f"① VRN/tests 單元測試 {n_run} 支(跳過 {n_skip};{how})", not bad and n_run > 0,
             ("壞:" + " | ".join(bad[:3])) if bad else "")
     else:
         chk("① VRN/tests 單元測試", False, "tests 夾不在")
     tmp = Path(tempfile.mkdtemp(prefix="vrn_autotest_selftest_"))
     try:
-        rc = def_main(["--synthetic", "--limit", "8", "--rounds", "1", "--quiet", "--out", str(tmp)])
+        import contextlib
+        # v0104: the pool's one-line notes go to stderr; the six-layer chain reads stdout then stderr and shows the
+        # last two lines, so keep them in stdout here -- the [計] summary stays the last line it shows
+        with contextlib.redirect_stderr(sys.stdout):
+            rc = def_main(["--synthetic", "--limit", "8", "--rounds", "1", "--quiet", "--out", str(tmp)])
         rep = tmp / "VRN_AutoTest_Report.json"
         verdict, n_fail = "?", -1
         if rep.is_file():
@@ -1421,6 +1704,14 @@ def def_selftest() -> int:
             last = (data.get("rounds") or [{}])[-1]
             n_fail = sum(1 for r in (last.get("rows") or data.get("rows") or []) if r.get("status") == "FAIL")
         chk(f"② 合成語料小批(8 檔 · 1 輪)跑到底無 FAIL", rc == 0 and n_fail == 0, f"(rc={rc} · {verdict} · FAIL {n_fail})")
+        # v0106 (批735): the round's results in the standard HTML U/I, under --out (scratch), linked from the report page
+        tdir = tmp / "template"
+        pages = sorted(p.name for p in (tdir / "ui").glob("*.html")) if (tdir / "ui").is_dir() else []
+        page = tmp / "VRN_AutoTest_Report.html"
+        banner = page.is_file() and "開中央頁" in page.read_text(encoding="utf-8")
+        chk("③ 跑完自動建 VRN 模板:制式 U/I 三頁 + 連結冊落在 --out 底下(暫存)· 報告頁頂端有連結",
+            len(pages) == 3 and (tdir / "VRN_TEMPLATE_LINKS.json").is_file() and banner,
+            f"(頁 {len(pages)} · 連結冊 {'在' if (tdir / 'VRN_TEMPLATE_LINKS.json').is_file() else '不在'} · 橫幅 {'有' if banner else '無'})")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"  [計] 自測 {len(ran)} 檢 OK {len(ran) - len(fails)} · FAIL {len(fails)} · {round(time.time() - t0, 1)}s")
@@ -1454,6 +1745,20 @@ def def_appendix_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             "new_words": sorted(new.values(), key=lambda x: (-x["count"], x["word"]))}
 
 
+def def_fin_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """v0105 (批732): the financial tables of the round, summed -- how many PDFs gave rows, how many identities were
+    checked and held, which files did not add up, how many quarter/half rows came without a year."""
+    vals = list(per_file.values())
+    return {"n_files": len(vals), "n_with_rows": sum(1 for a in vals if a.get("rows")),
+            "rows": sum(a.get("rows", 0) for a in vals), "checked": sum(a.get("checked", 0) for a in vals),
+            "passed": sum(a.get("passed", 0) for a in vals), "n_failed": sum(a.get("n_failed", 0) for a in vals),
+            "files_failed": sorted(n for n, a in per_file.items() if a.get("n_failed")),
+            "files_checked": sum(1 for a in vals if a.get("checked")),
+            "periods_unclear": sum(a.get("periods_unclear", 0) for a in vals),
+            "estimate_rows": sum(a.get("estimate_rows", 0) for a in vals),
+            "files": {name: a for name, a in sorted(per_file.items())}}
+
+
 def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     """v0103 (批729): the ADJ CLOSE upside of the round, counted by state (ADJ_OK(因子1…) counts as ADJ_OK,
     ADJ_ABSURD(…) as ADJ_ABSURD).  A measurement, not a gate: a missing price row is named, never a FAIL."""
@@ -1480,6 +1785,9 @@ def def_adj_summary(per_file: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def def_main(argv: Optional[Sequence[str]] = None) -> int:
+    if argv is None and "--unit-file" in sys.argv[1:]:
+        at = sys.argv.index("--unit-file")
+        return def_unit_file(sys.argv[at + 1]) if at + 1 < len(sys.argv) else 2
     if argv is None and "--selftest" in sys.argv[1:]:
         try:
             sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
@@ -1498,7 +1806,11 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--json", default="", help="報告 JSON 路徑")
     parser.add_argument("--html", default="", help="報告 HTML 路徑")
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument("--template-out", default="", help="v0106:VRN 模板(制式 U/I)輸出夾(預設 <--out>/template;自動接上一輪)")
+    parser.add_argument("--no-template", action="store_true", help="v0106:不建 VRN 模板")
     parser.add_argument("--truth", default="", help="人工真值 JSON（schema 見 docs/VIA_VRN_AUTOTEST.md；只放操作員手上，不入庫）")
+    parser.add_argument("--g08-sample", type=int, default=G08_SAMPLE, help="G08 冪等抽幾檔再入庫(預設 12;0=全批)")
+    parser.add_argument("--g08-full", action="store_true", help="G08 冪等把整批再入庫一次(舊行為;慢)")
     parser.add_argument("--canonical-crosscheck", action="store_true",
                         help="G11 另量母倉正本 ENG086（經 SUP_MDL749）在同一份真值上的表現（僅供參考，不影響判定）")
     args = parser.parse_args(argv)
@@ -1511,6 +1823,16 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
     # pdfminer logs 'Could not get FontBBox from font descriptor …' for fonts without a bounding box; the text
     # is still extracted.  The warning floods the console on real reports, so only its errors are shown.
     logging.getLogger("pdfminer").setLevel(logging.ERROR)
+    # v0104 批323 啟動律:橋一直在,但從來沒有啟動過——載 Celeritas、套執行緒預算,在位 / 缺席照實印一行
+    if VIA_ACCEL is not None and hasattr(VIA_ACCEL, "activate"):
+        try:
+            act = VIA_ACCEL.activate()
+            def_say(f"[加速器] Celeritas {'在位' if act.get('celeritas') else '缺席'} · lib {act.get('libs_available')}/"
+                    f"{act.get('libs_total')} · 執行緒預算 {act.get('thread_budget')}" + (f" · {act['err']}" if act.get("err") else ""))
+        except Exception as error:  # noqa: BLE001
+            def_say(f"[加速器] 啟動失敗(不擋跑):{error.__class__.__name__}: {str(error)[:80]}")
+    else:
+        def_say("[加速器] 橋缺席(不擋跑;supportive modules/VIA_SuperAccel_Module.py 找不到)")
     if not args.samples and os.name == "nt" and Path(DEFAULT_SAMPLES_WINDOWS).is_dir():
         args.samples = DEFAULT_SAMPLES_WINDOWS
     workdir = Path(args.out) if args.out else Path(tempfile.gettempdir()) / f"VRN_AutoTest_{time.strftime('%Y%m%dT%H%M%S')}"
@@ -1581,10 +1903,27 @@ def def_main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"[ADJ] 上漲空間用最新 ADJ CLOSE:算出 {adj['n_adj']}/{adj['n_with_target']} 檔(有目標價者)"
               + (f" · 因子分母 {' · '.join(f'{k} {v}' for k, v in adj['bases'].items())}" if adj["bases"] else "")
               + (f" · 其餘 {top}" if top else "") + (f" · 最多的因由:{adj['why'][0]['reason']}" if adj["why"] else ""))
+    fin = def_fin_summary(LAST_FIN)
+    report["financial"] = fin
+    if fin["n_files"] and not args.quiet:
+        print(f"[財報] 表格抽到 {fin['n_with_rows']}/{fin['n_files']} 份 PDF · 恆等式 {fin['passed']}/{fin['checked']} 成立"
+              f"({fin['files_checked']} 份有可驗的表)· 不成立 {fin['n_failed']} 條"
+              + (f"({len(fin['files_failed'])} 份:{' · '.join(fin['files_failed'][:3])}"
+                 + (" …" if len(fin["files_failed"]) > 3 else "") + ")" if fin["files_failed"] else "")
+              + f" · 季別缺年 {fin['periods_unclear']} 列 · 預估欄 {fin['estimate_rows']} 列")
     json_path = Path(args.json) if args.json else workdir / "VRN_AutoTest_Report.json"
     html_path = Path(args.html) if args.html else workdir / "VRN_AutoTest_Report.html"
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
-    html_path.write_text(def_render_html(report), encoding="utf-8")
+    template: Dict[str, Any] = {}
+    if not args.no_template:          # v0106 (批735): the report JSON is the template's upstream -- written first, never touched after
+        template = def_template(json_path, workdir, Path(args.template_out) if args.template_out else None)
+        if not args.quiet:
+            lc = template.get("links") or {}
+            lost = [n for n in template.get("new_items") or [] if not n.get("on_page")]
+            print(f"[VRN 模板] {template.get('state')} · {def_template_basis(template)} · 新增 {lc.get('NEW', 0)} · "
+                  f"異動 {lc.get('CHANGED', 0)} · 消失 {lc.get('GONE', 0)}" + (f" · 新增沒上頁 {len(lost)}" if lost else "")
+                  + (f" · 中央頁 {template['central']}" if template.get("central") else f" · {template.get('why')}"))
+    html_path.write_text(def_render_html(report, template), encoding="utf-8")
     if not args.quiet:
         print(f"[DONE] {verdict} · rounds={len(rounds)} · {json_path} · {html_path}")
     if state.get("samples") is None and not engines.errors and counts["FAIL"] == 0:

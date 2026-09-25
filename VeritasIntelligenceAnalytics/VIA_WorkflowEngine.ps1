@@ -14,7 +14,6 @@ WRAPPER 動詞
   setup chipwar  安裝 ChipWar/MultiFactor 依賴 duckdb+scipy+scikit-learn+statsmodels
   all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
   vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest|columns）
-  talib …    透傳 TALib 指標引擎（probe|list|sample|compute|signals|chart|selftest;adj 鐵律）
   theory     今日五引擎理論稽核 — PS 獨立甲骨文 14 斷言（自算期望值對質,非引擎自證）
   chipwar    跑 ChipWar 13 階段全鏈（籌碼戰五 lane + 報告 + harness + VAP 儀表板；可加 --dry-run）
   mf         跑 MultiFactor 共振引擎（= multifactor；可加 --dry-run）
@@ -185,7 +184,6 @@ $MFParams      = Join-Path $PSScriptRoot 'functional modules\MultiFactor\mf_para
 $MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines\VIA_MF_ENGINE_SHA256_MANIFEST_v0100.json'
 $FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
 $FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
-$TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_ENG003_TALibEngine.py'
 $TheoryAudit   = Join-Path $PSScriptRoot 'Test-VIA-TheoryAudit.ps1'
 
 function Invoke-VapHost {
@@ -338,16 +336,6 @@ function Get-RestArgs {
     return @()
 }
 
-if ($Verb -eq 'talib') {
-    if (-not (Test-Path -LiteralPath $TALibEngine)) {
-        Write-Tag 'FAIL' 'TALib 引擎缺席（git pull 取回分支最新版）'
-        exit 1
-    }
-    $full = @($PyPre) + @($TALibEngine) + @(Get-RestArgs)
-    & $PyExe $full
-    exit $LASTEXITCODE
-}
-
 if ($Verb -eq 'theory') {
     if (-not (Test-Path -LiteralPath $TheoryAudit)) {
         Write-Tag 'FAIL' '理論稽核腳本缺席:Test-VIA-TheoryAudit.ps1（git pull 取回分支最新版）'
@@ -419,7 +407,6 @@ if ($Verb -eq 'status') {
         @{ n = 'MultiFactor 參數檔';               p = $MFParams },
         @{ n = 'MultiFactor SHA256 manifest';      p = $MFManifest },
         @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch },
-        @{ n = 'TALib 指標引擎(adj 鐵律)';          p = $TALibEngine },
         @{ n = '理論稽核 Test-VIA-TheoryAudit.ps1'; p = $TheoryAudit }
     )
     foreach ($r in $rows) {
@@ -497,7 +484,7 @@ if ($Verb -eq 'everything') {
 if ($Verb -eq '') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Host (' VIA_WorkflowEngine 啟動器（Python {0} @ {1}）' -f $Py.Ver, $PyExe)
-    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|talib …|theory|chipwar|mf|dashboard|flowsystem|status|everything'
+    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|theory|chipwar|mf|dashboard|flowsystem|status|everything'
     Write-Host '════════════════════════════════════════════════════════'
     $code = Invoke-EngineHost @()
     exit $code
