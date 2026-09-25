@@ -9,7 +9,7 @@
         產物清單自此永不缺席。人工 gold_set 到件即覆蓋為正式 kind=gold_measured。
 ------------------------------------------------------------------------------------------
  v0110(操作員整併重整令 2026/08/12:非必要案件全部自動化 · 起始時間跑到底):
-   [2e5] 擴充模組健檢(自動,秒級):WorkflowEngine/ChipWar/TALib/MultiFactor/FlowSystem
+   [2e5] 擴充模組健檢(自動,秒級):WorkflowEngine/ChipWar/MultiFactor/FlowSystem
         在位盤點 + Python 視覺/ML 庫 importability → out\module_probe.json(板⑥矩陣吸收);
         缺席=誠實列缺不中斷。
    [2h]  VAP 自動出圖(非必要自動化):VDF db 有資料即以最新 chartlib --auto 出前 6 張
@@ -319,12 +319,11 @@ Invoke-Stage "2e3 ML 迴圈:adopt(冪等)→train→suggest(絕不自動 cluster
 }
 
 # ---------- [2e5] 擴充模組健檢(v0110;秒級盤點,缺席誠實列缺不中斷)----------
-Invoke-Stage "2e5 擴充模組健檢(WF/ChipWar/TALib/MF/FlowSystem 在位+Python 庫)" {
+Invoke-Stage "2e5 擴充模組健檢(WF/ChipWar/MF/FlowSystem 在位+Python 庫)" {
     $probe = [ordered]@{ ts = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss"); modules = [ordered]@{}; pylibs = [ordered]@{} }
     $modMap = [ordered]@{
         WorkflowEngine = (Join-Path $ViaRoot "VIA_WorkflowEngine.py")
         ChipWar        = (Join-Path $ViaRoot "functional modules\ChipWar\engines\CHW_ENG015_ChipwarEngine.py")
-        TALib          = (Join-Path $ViaRoot "functional modules\TALib\VIA_ENG003_TALibEngine.py")
         MultiFactor    = (Join-Path $ViaRoot "functional modules\MultiFactor\engines\VIA_ENG001_MultiFactorTestValidateSimEngine_v0100.py")
         FlowSystemV2   = (Join-Path $ViaRoot "supportive modules\VIA_FlowSystem\FlowSystem_v2\Activate-VIAFlowSystem.ps1")
         VAP_chartlib   = $(if (Get-NewestScript (Join-Path $ViaRoot "functional modules\VAP\engine") "VAP_ENG001_AutoplotEngineChartlib_v0*.py") { "OK" } else { "" })

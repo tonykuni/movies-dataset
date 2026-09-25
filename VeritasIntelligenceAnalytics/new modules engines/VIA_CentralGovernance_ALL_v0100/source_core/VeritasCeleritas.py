@@ -19,6 +19,36 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 # ===== [VIA:ANCHOR:SAFE-STATE:START] =====
+# Bridged by VDF_MDL001_Supportive_Bridge_v4 on 2026-04-26 02:33 for VeritasCeleritas
+
+# =============================================================================
+# VDF Accelerator integration · injected by VDF_MDL001_Supportive_Bridge_v4
+# =============================================================================
+# Provides cached/retried/deduped HTTP fetch via VDF_MDL000_Accelerator_Core_v4.
+# Original module behavior is preserved; this only adds optional shortcuts:
+#   vdf_fetch / vdf_fetch_json / vdf_fetch_many / vdf_accelerated / vdf_stats
+# Bridge marker: VDF_MDL000_Accelerator_Core_v4
+try:
+    import sys as _vdf_sys
+    import pathlib as _vdf_pathlib
+    _VDF_PROBE = _vdf_pathlib.Path(__file__).resolve()
+    while _VDF_PROBE.parent != _VDF_PROBE:
+        _candidate = _VDF_PROBE / "VeritasDataForge" / "accelerator"
+        if _candidate.exists():
+            _vdf_sys.path.insert(0, str(_VDF_PROBE / "VeritasDataForge"))
+            break
+        _VDF_PROBE = _VDF_PROBE.parent
+    from accelerator.VDF_MDL000_Accelerator_Core_v4 import (
+        fetch as vdf_fetch,
+        fetch_json as vdf_fetch_json,
+        fetch_many as vdf_fetch_many,
+        accelerated as vdf_accelerated,
+        stats as vdf_stats,
+    )
+    _VDF_BRIDGE_OK = True
+except Exception:
+    _VDF_BRIDGE_OK = False
+# =============================================================================
 import threading as _via_threading
 
 class _VIAStateBox:
@@ -647,10 +677,13 @@ Levenshtein = _si("Levenshtein")
 chardet     = _si("chardet")
 
 # ── Finance ───────────────────────────────────────────────────────────────────
-talib       = _si("talib")
-pandas_ta   = _si("pandas_ta")
-ta_lib      = _si("ta")
-ffn         = _si("ffn")
+# TA-Lib is prohibited. QuantGuard owns the active indicator path; the
+# deterministic fallback below is kept only for compatibility with generic
+# Celeritas callers and never imports or loads a TA-Lib package.
+quantguard_indicators = None
+pandas_ta             = _si("pandas_ta")
+ta_lib                = _si("ta")
+ffn                   = _si("ffn")
 
 # ── Network ───────────────────────────────────────────────────────────────────
 requests_m  = _si("requests")
@@ -703,7 +736,7 @@ _LIB_MAP: Dict[str, Any] = {
     "diskcache": diskcache, "cachetools": cachetools,
     "cachebox": cachebox, "redis": redis_m, "lmdb": lmdb,
     "regex": regex_m, "rapidfuzz": rapidfuzz, "Levenshtein": Levenshtein,
-    "talib": talib, "pandas_ta": pandas_ta, "ta": ta_lib, "ffn": ffn,
+    "quantguard": quantguard_indicators, "pandas_ta": pandas_ta, "ta": ta_lib, "ffn": ffn,
     "requests": requests_m, "httpx": httpx_m, "aiohttp": aiohttp_m,
     "urllib3": urllib3_m,
     "rich": rich, "tqdm": tqdm_m, "loguru": loguru,
@@ -2998,7 +3031,7 @@ def detect_libraries() -> Dict[str, bool]:
             "requests", "httpx", "aiohttp", "urllib3", "aiofiles",
         ],
         "finance": [
-            "yfinance", "talib", "pandas_ta", "ta", "ffn",
+            "yfinance", "pandas_ta", "ta", "ffn",
         ],
         "async": [
             "winloop", "uvloop", "anyio", "trio",
@@ -4601,9 +4634,9 @@ class _TqdmStub:
 if tqdm_m is None:
     tqdm_m = _TqdmStub()  # type: ignore[assignment]
 
-# ── talib stub ────────────────────────────────────────────────────────────────
-class _TalibStub:
-    """Stub for TA-Lib — pure-Python fallbacks for common indicators."""
+# ── QuantGuard indicator fallback ─────────────────────────────────────────────
+class _QuantGuardIndicatorFallback:
+    """Deterministic pure-Python fallback; the active policy owner is QuantGuard."""
     @staticmethod
     def SMA(data, timeperiod=14):
         return FinanceEngine.moving_average(list(data), timeperiod)
@@ -4655,8 +4688,8 @@ def _si_np_array(data, ma, period):
     """Helper for stub std computation."""
     return ma   # simplified
 
-if talib is None:
-    talib = _TalibStub()  # type: ignore[assignment]
+if quantguard_indicators is None:
+    quantguard_indicators = _QuantGuardIndicatorFallback()
 
 # ── pandas_ta stub ────────────────────────────────────────────────────────────
 class _PandasTaStub:
@@ -4671,11 +4704,11 @@ class _PandasTaStub:
 
     @staticmethod
     def rsi(close, length=14, **kw):
-        return _TalibStub.RSI(list(close), timeperiod=length)
+        return _QuantGuardIndicatorFallback.RSI(list(close), timeperiod=length)
 
     @staticmethod
     def macd(close, fast=12, slow=26, signal=9, **kw):
-        return _TalibStub.MACD(list(close), fast, slow, signal)
+        return _QuantGuardIndicatorFallback.MACD(list(close), fast, slow, signal)
 
 if pandas_ta is None:
     pandas_ta = _PandasTaStub()  # type: ignore[assignment]
@@ -4868,7 +4901,7 @@ _STUB_CLASSES = (
     _Blake3Stub, _RapidFuzzStub, _DiskCacheStub, _CacheToolsStub,
     _RayStub, _JoblibStub, _LoopStub, _AioFilesStub, _PsutilStub,
     _TorchStub, _OnnxRunTimeStub, _ScipyStub, _PyArrowStub, _DuckDBStub,
-    _CV2Stub, _PILStub, _RichStub, _TqdmStub, _TalibStub, _PandasTaStub,
+    _CV2Stub, _PILStub, _RichStub, _TqdmStub, _QuantGuardIndicatorFallback, _PandasTaStub,
     _RequestsStub, _MsgpackStub, _CloudPickleStub, _AnyIoStub, _TrioStub,
     _SnappyStub, _BrotliStub,
 )
@@ -5437,3 +5470,241 @@ if __name__ == "__main__":
 
 # [VIA:ANCHOR:ACCEL-ERR-FALLBACK-001]
 accel_err = None
+
+# === VIA_PATCH_XBATCH ===
+def xbatch(func, iterable, max_workers=4):
+    """
+    Safe compatibility wrapper for batch execution
+    """
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            return list(ex.map(func, iterable))
+    except Exception:
+        return [func(x) for x in iterable]
+
+# === VIA_FINAL_PATCH_CELERITAS_COMPAT ===
+def xbatch(func, iterable, max_workers=4):
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            return list(ex.map(func, iterable))
+    except Exception:
+        return [func(x) for x in iterable]
+
+def celeritas_health():
+    return {"status": "alive", "module": "VeritasCeleritas"}
+
+def accelerate(func=None, *args, **kwargs):
+    if callable(func):
+        return func(*args, **kwargs)
+    return {"status": "ready", "module": "VeritasCeleritas"}
+
+# === VIA_FINAL_PATCH_CELERITAS_XRUN_XSUBMIT ===
+def xrun(func=None, *args, **kwargs):
+    """
+    Safe single-task runner compatibility alias.
+    """
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xrun"}
+    except Exception as e:
+        return {"status": "error", "runner": "xrun", "msg": str(e)}
+
+def xsubmit(func=None, *args, **kwargs):
+    """
+    Safe submit compatibility alias.
+    """
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
+    except Exception as e:
+        return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
+
+# ===== [VIA:ANCHOR:PATCH:Xbatch-Compat-20260424:START] =====
+# Compatibility shim: append-only xbatch fallback for coverage/runtime bridge.
+def xbatch(items, batch_size=20):
+    try:
+        if items is None:
+            return []
+        batch_size = int(batch_size or 20)
+        if batch_size <= 0:
+            batch_size = 20
+        seq = list(items)
+        return [seq[i:i + batch_size] for i in range(0, len(seq), batch_size)]
+    except Exception:
+        try:
+            return [list(items)]
+        except Exception:
+            return []
+try:
+    __all__
+except Exception:
+    __all__ = []
+try:
+    if "xbatch" not in __all__:
+        __all__.append("xbatch")
+except Exception:
+    pass
+# ===== [VIA:ANCHOR:PATCH:Xbatch-Compat-20260424:END] =====
+
+
+# === VIA_FORCE_PATCH_CELERITAS_XRUN_XSUBMIT_V2 ===
+def xrun(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xrun"}
+    except Exception as e:
+        return {"status": "error", "runner": "xrun", "msg": str(e)}
+
+def xsubmit(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
+    except Exception as e:
+        return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
+# === VIA_FINAL_PATCH_CELERITAS_FULL_COMPAT_V3 ===
+def xrun(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xrun"}
+    except Exception as e:
+        return {"status": "error", "runner": "xrun", "msg": str(e)}
+
+def xsubmit(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas", "runner": "xsubmit"}
+    except Exception as e:
+        return {"status": "error", "runner": "xsubmit", "msg": str(e)}
+
+def xbatch(func, iterable, max_workers=4):
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            return list(ex.map(func, iterable))
+    except Exception:
+        return [func(x) for x in iterable]
+
+def celeritas_health():
+    return {"status": "alive", "module": "VeritasCeleritas"}
+
+def accelerate(func=None, *args, **kwargs):
+    try:
+        if callable(func):
+            return func(*args, **kwargs)
+        return {"status": "ready", "module": "VeritasCeleritas"}
+    except Exception as e:
+        return {"status": "error", "module": "VeritasCeleritas", "msg": str(e)}
+
+# =============================================================================
+# [VIA:ANCHOR:SUPPORTIVE_SELF_GOVERNANCE:START]
+# Auto injected by VIA Supportive Self-Governance.
+# Policy: append-only, metadata + smoke only, no core logic overwrite.
+# Module: VeritasCeleritas
+# =============================================================================
+
+MODULE_METADATA = globals().get("MODULE_METADATA", {
+    "module_id": "VeritasCeleritas",
+    "module_name": "VeritasCeleritas",
+    "asset_type": "supportive_module",
+    "version": "self-governed",
+    "input_contract": [],
+    "output_contract": [],
+    "deliverables": [],
+    "doc_paths": [],
+    "required_support_tools": [
+        "VIA_SSOT_Unified",
+        "VeritasAegisNexus",
+        "VeritasCeleritas",
+        "VIA_EnvManager",
+        "VIA_Panorama_AST_RuntimeInjector",
+        "VIA_RegistryCore_v1",
+        "VIA_Runtime_Bridge_All_in_One"
+    ]
+})
+
+VIA_SUPPORTIVE_MODULES = globals().get("VIA_SUPPORTIVE_MODULES", {
+    "VIA_SSOT_Unified": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_SSOT_Unified.py",
+    "VeritasAegisNexus": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VeritasAegisNexus.py",
+    "VeritasCeleritas": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VeritasCeleritas.py",
+    "VIA_EnvManager": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_EnvManager.py",
+    "VIA_Panorama_AST_RuntimeInjector": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_Panorama_AST_RuntimeInjector.py",
+    "VIA_RegistryCore_v1": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_RegistryCore_v1.py",
+    "VIA_Runtime_Bridge_All_in_One": r"C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_Runtime_Bridge_All_in_One.py",
+})
+
+def via_supportive_health():
+    return {
+        "status": "alive",
+        "module": "VeritasCeleritas",
+        "asset_type": "supportive_module",
+        "metadata": bool(MODULE_METADATA),
+        "support_tools_declared": len(MODULE_METADATA.get("required_support_tools", [])),
+    }
+
+def via_runtime_heartbeat():
+    return {"status": "alive", "module": "VeritasCeleritas"}
+
+def via_runtime_smoke():
+    try:
+        return via_supportive_health()
+    except Exception as e:
+        return {"status": "error", "module": "VeritasCeleritas", "msg": str(e)}
+
+def def_main():
+    return via_runtime_smoke()
+
+# [VIA:ANCHOR:SUPPORTIVE_SELF_GOVERNANCE:END]
+# =============================================================================
+
+
+# ===== [VIA:ANCHOR:PATCH:XBATCH-FINAL-GLOBAL-SHIM-20260506:START] =====
+# Final hard global shim. Appended at EOF so xbatch exists in module globals.
+def xbatch(items, batch_size=20):
+    """
+    VIA final compatibility shim.
+    Returns list-of-batches and never raises on normal iterable input.
+    """
+    try:
+        if items is None:
+            return []
+        try:
+            bs = int(batch_size)
+        except Exception:
+            bs = 20
+        if bs <= 0:
+            bs = 20
+        if isinstance(items, list):
+            seq = items
+        else:
+            seq = list(items)
+        return [seq[i:i + bs] for i in range(0, len(seq), bs)]
+    except Exception:
+        try:
+            return [list(items)]
+        except Exception:
+            return []
+
+try:
+    __all__
+except Exception:
+    __all__ = []
+try:
+    if "xbatch" not in __all__:
+        __all__.append("xbatch")
+except Exception:
+    pass
+try:
+    globals()["xbatch"] = xbatch
+except Exception:
+    pass
+# ===== [VIA:ANCHOR:PATCH:XBATCH-FINAL-GLOBAL-SHIM-20260506:END] =====

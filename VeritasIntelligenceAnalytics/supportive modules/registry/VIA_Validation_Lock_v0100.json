@@ -1,0 +1,112 @@
+{
+ "schema": "VIA_Validation_Lock/v1",
+ "law": "L105",
+ "batch": "側線 2026-09-25 第十六段",
+ "orders": [
+  "檢視VCGC及測試要求過關就鎖定不要一直重複",
+  "之前最成功的兩三次紀錄 … 檢查 成功重疊者規則就鎖定",
+  "將最佳還原點的自動建置放在系統政策 環境及工具管理 測試AUDIT都要建立最佳還原點機制 LESSON-LEARNED LOGGING"
+ ],
+ "source_records": [
+  {
+   "commit": "88d7a3e3",
+   "what": "批727k(續):registry-sync --apply → VCGC 三十六檢 OK 36 · 全格子 v0476 OK 345 · FAIL 0 · SKIP 5 · TIMEOUT 0"
+  },
+  {
+   "commit": "4cdb368e",
+   "what": "批727:改動引擎自測 56/56(正負控)· registry-sync 後 32 檢全綠 · 全格子(LL117 推前跑完)OK 339 · FAIL 0 · SKIP 5 · TIMEOUT 0"
+  },
+  {
+   "commit": "767d1f02",
+   "what": "批736b:擊斃閘 23/23 · 報告頁 9/9 · 閘對本批實判 --base main --run-selftest rc0 · 總控頁契約 19 測全過;自承太寬的 git restore 把六個修正還原掉"
+  },
+  {
+   "commit": "adee3b1c",
+   "what": "批726:全格子 v0474 GREEN 真 FAIL 0 · SKIP 5;VCGC 量系統狀態、格子量引擎自測,兩把尺各量各的"
+  }
+ ],
+ "overlap_rule": "四筆全綠紀錄裡至少兩筆都出現的步驟才進鎖定;只出現一筆的不算重疊,不進冊",
+ "protocol": [
+  {
+   "step": "S1",
+   "name": "元件自動編號冊同步(LL272 第一步)",
+   "cmd": "python3 \"supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py(尾版)\" registry-sync --apply",
+   "pass": "新增/變更/退役照實、AST 錯 0;之後 VCGC ⑬ 綠",
+   "seen_in": [
+    "88d7a3e3",
+    "4cdb368e"
+   ],
+   "basis": "overlap"
+  },
+  {
+   "step": "S2",
+   "name": "VCGC 自測全過",
+   "cmd": "python3 \"supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py(尾版)\" --selftest",
+   "pass": "全檢 OK、FAIL 0",
+   "seen_in": [
+    "88d7a3e3",
+    "adee3b1c"
+   ],
+   "basis": "overlap"
+  },
+  {
+   "step": "S3",
+   "name": "改動過的引擎自測全過(含正負控;新判準要有突變證明)",
+   "cmd": "python3 <每支改動引擎> --selftest",
+   "pass": "每支 rc0;新加的檢要有正負成對",
+   "seen_in": [
+    "4cdb368e",
+    "adee3b1c"
+   ],
+   "basis": "overlap"
+  },
+  {
+   "step": "S4",
+   "name": "擊斃閘對本批實判",
+   "cmd": "python3 \"supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v*.py(尾版)\" --base origin/main --run-selftest",
+   "pass": "rc0;操作員許可件照印 [許可](位元吻合)",
+   "seen_in": [
+    "767d1f02"
+   ],
+   "basis": "rule:批736 操作員令「更新模組或修正模組都要有嚴格的把關擊斃機制」(前三筆時擊斃閘還沒出生,只出現一筆,不是重疊)"
+  },
+  {
+   "step": "S5",
+   "name": "推前全格子一次(LL117)",
+   "cmd": "python3 \"supportive modules/registry/CGC_MDL064_SelftestGrid_v*.py(尾版)\"",
+   "pass": "FAIL 0 · TIMEOUT 0(境缺照實 SKIP)· 平行敗序跑複判 · 過關自動建最佳還原點(L105③)",
+   "seen_in": [
+    "88d7a3e3",
+    "4cdb368e",
+    "adee3b1c"
+   ],
+   "basis": "overlap"
+  },
+  {
+   "step": "S6",
+   "name": "總控頁再生 + 契約(LL49/LL272;與 CI 同一支)",
+   "cmd": "VIA_SYSTEM_MANAGER 尾版 --no-open 再生總控頁 → 總控頁契約測",
+   "pass": "契約測全過",
+   "seen_in": [],
+   "basis": "rule:CI 契約(PR #125 實錄:tracked 總控頁與正主管理器輸出不同步 → CI 紅一次;四筆紀錄都沒寫到,不是重疊)"
+  },
+  {
+   "step": "S7",
+   "name": "只按清單還原再生檔",
+   "cmd": "git status 列出格子/自測再生的已追蹤檔 → 逐檔 git checkout -- <檔>",
+   "pass": "工作樹只剩本批的改動;不用寬的 git restore(767d1f02 自承一次把六個修正一起還原掉)",
+   "seen_in": [
+    "767d1f02"
+   ],
+   "basis": "rule:767d1f02 自承的失誤(寬的 git restore 把六個修正一起還原掉)——是失敗的教訓,不是成功的重疊"
+  }
+ ],
+ "lock_policy": {
+  "run_once": "每步各跑一次;過關就鎖定(記在 locks),同一份位元不重跑",
+  "rerun_only": "之後改了什麼,只重跑受影響的引擎自測與格子站(--only <站名子字串>),不重跑整套",
+  "fingerprint": "鎖定鍵 = 被量檔的 sha256(引擎自測)或 origin/main + 本批改動清單(整批閘)",
+  "not_a_pass": "SKIP / NODATA / PARTIAL 不是過關;境缺照實記,不冒充綠"
+ },
+ "locks": [],
+ "measured_by": "git show -s 四筆 commit 訊息逐一比對關鍵字(registry-sync / VCGC / 自測 / 實判 / 全格子 / 總控頁 / 還原);量出來的才寫進 seen_in"
+}
