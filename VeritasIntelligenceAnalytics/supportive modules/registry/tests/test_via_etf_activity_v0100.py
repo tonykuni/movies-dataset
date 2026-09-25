@@ -164,7 +164,9 @@ class ActivityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             p=Path(td)/"test.duckdb";duckdb.connect(str(p)).close()
             a=fixture();a["source_revision_at"]="2026-09-02T12:00:00Z"
-            first=M.build(p,[a,a],apply=True)
+            with patch.object(M,"analyze",wraps=M.analyze) as compute:
+                first=M.build(p,[a,a],apply=True)
+                self.assertEqual(compute.call_count,1)
             self.assertEqual(first["computed"],1)
             with patch.object(M,"analyze",side_effect=AssertionError("cached input recalculated")):
                 second=M.build(p,apply=True)

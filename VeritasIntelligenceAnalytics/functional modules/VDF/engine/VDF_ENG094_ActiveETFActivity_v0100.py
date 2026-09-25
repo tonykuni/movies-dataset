@@ -330,7 +330,7 @@ def build(db=DB, inputs=None, *, apply=False) -> dict:
     unique, selected = {}, {}
     for bundle in source_rows:
         sha = digest(bundle)
-        result = cached.get(sha) or analyze(bundle)
+        result = unique[sha][1] if sha in unique else cached.get(sha) or analyze(bundle)
         unique[sha] = (bundle, result)
         # A source revision timestamp, never hash ordering or fetch ordering, selects a revision.
         key = (result["etf_ticker"], result["start"], result["end"])
