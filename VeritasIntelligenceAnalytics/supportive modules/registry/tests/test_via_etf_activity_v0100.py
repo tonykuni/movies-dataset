@@ -185,6 +185,70 @@ class ActivityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"Conflicting source revisions"):
                 M.build(Path(td)/"absent.duckdb",[a,b])
 
+    def test_retrieval_time_is_not_a_data_revision(self):
+        import duckdb
+        a=fixture();b=copy.deepcopy(a)
+        def refreshed(item):
+            if isinstance(item,dict):
+                for key,value in item.items():
+                    if key=="fetched_at_utc":item[key]="2026-09-03T13:00:00+00:00"
+                    else:refreshed(value)
+            elif isinstance(item,list):
+                for value in item:refreshed(value)
+        refreshed(b)
+        self.assertNotEqual(M.digest(a),M.digest(b))
+        self.assertEqual(M.data_digest(a),M.data_digest(b))
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)/"test.duckdb";duckdb.connect(str(p)).close()
+            M.build(p,[a],apply=True)
+            with patch.object(M,"analyze",side_effect=AssertionError("unchanged data recalculated")):
+                r=M.build(p,[b],apply=True)
+            self.assertEqual((r["computed"],r["cached"]),(0,1))
+            self.assertEqual(M.build(p)["state"],"ESTIMATE")
+            with duckdb.connect(str(p),read_only=True) as con:
+                self.assertEqual(con.execute("SELECT count(*) FROM etf_activity_inputs").fetchone()[0],2)
+                self.assertEqual(con.execute("SELECT count(*) FROM etf_activity_results").fetchone()[0],1)
+            for invalid in ("INVALID", "VALID_FETCH_TIMESTAMP", [True,None], None):
+                b["fund_current"]["fetched_at_utc"]=invalid
+                self.assertNotEqual(M.data_digest(a),M.data_digest(b))
+                self.assertEqual(M.analyze(b)["state"],"REVIEW")
+                with self.assertRaisesRegex(ValueError,"Conflicting source revisions"):
+                    M.build(p,[b],apply=True)
+
+    def test_incremental_conflict_is_rejected_before_persistence(self):
+        import duckdb
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)/"test.duckdb";duckdb.connect(str(p)).close()
+            a=fixture();b=copy.deepcopy(a);b["prices"]["2330"]["price"]=30
+            M.build(p,[a],apply=True)
+            with self.assertRaisesRegex(ValueError,"Conflicting source revisions"):
+                M.build(p,[b],apply=True)
+            with duckdb.connect(str(p),read_only=True) as con:
+                self.assertEqual(con.execute("SELECT count(*) FROM etf_activity_inputs").fetchone()[0],1)
+                self.assertEqual(con.execute("SELECT count(*) FROM etf_activity_results").fetchone()[0],1)
+            self.assertEqual(M.build(p)["state"],"ESTIMATE")
+
+    def test_position_order_and_numeric_json_format_are_not_revisions(self):
+        import duckdb
+        a=fixture()
+        for key,shares in (("holdings_previous",10),("holdings_current",20)):
+            a[key]["positions"].append({"code":"2454","shares":shares})
+        for key in ("holding_adjustments","prices"):
+            a[key]["2454"]=copy.deepcopy(a[key]["2330"])
+        b=copy.deepcopy(a)
+        for key in ("holdings_previous","holdings_current"):
+            b[key]["positions"].reverse()
+            for row in b[key]["positions"]:row["shares"]=float(row["shares"])
+        for key in ("fund_previous","fund_current"):
+            for field in ("nav","units","aum"):b[key][field]=float(b[key][field])
+        self.assertNotEqual(M.digest(a),M.digest(b))
+        self.assertEqual(M.data_digest(a),M.data_digest(b))
+        with tempfile.TemporaryDirectory() as td:
+            p=Path(td)/"test.duckdb";duckdb.connect(str(p)).close();M.build(p,[a],apply=True)
+            with patch.object(M,"analyze",side_effect=AssertionError("equivalent data recalculated")):
+                r=M.build(p,[b],apply=True)
+            self.assertEqual((r["computed"],r["cached"],r["state"]),(0,1,"ESTIMATE"))
+
     def test_result_failure_rolls_back_inputs(self):
         import duckdb
         with tempfile.TemporaryDirectory() as td:

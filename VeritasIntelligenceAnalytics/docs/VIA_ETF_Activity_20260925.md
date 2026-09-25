@@ -23,10 +23,10 @@
 |---|---|---|
 | 既有 `holdings_daily`、`fetch_status`、`active_tw_etf_registry` | 由各正主持有 | plan 唯讀檢查列數與欄位，不改原表 |
 | `etf_activity_inputs` | `input_sha256` | 保存正規化來源區間 JSON 與 `ingested_at_utc`，相同輸入去重 |
-| `etf_activity_results` | `input_sha256 + engine_version` | 結果 JSON 與 `computed_at_utc`；同雜湊／同引擎直接用快取，來源修訂保留舊版 |
+| `etf_activity_results` | `data_sha256 + engine_version` | 結果 JSON 與 `computed_at_utc`；保留實際計算依據的 input_sha256；資料相同／引擎相同直接用快取，來源修訂保留舊版 |
 | `ETF_ACTIVITY.json` | 本次區間視圖 | 來源、缺項、估算法、原始数量、摘要及正式啟用狀態 |
 
-去重落庫交 SUP_MDL753 `upsert_select`，輸入／結果同一個交易提交，結果失敗時輸入一併回滾。同區間有不同來源版本，必須有不同且含時區的 `source_revision_at` 才能選新版；不能用雜湊排序或抓取順序猜。`as_of`、`fetched_at_utc`、`ingested_at_utc`、`computed_at_utc` 分開，後兩者加入 SSOT 的 record_only。
+去重落庫交 SUP_MDL753 `upsert_select`，輸入／結果同一個交易提交，結果失敗時輸入一併回滾。原始取樣以 input_sha256 保存，data_sha256 正規化有效抓取時間、持股列序與等值整數／浮點表示；只更新抓取時點不重算、不冒稱資料修訂，缺漏／無效時間不能命中有效資料的快取。快取結果保留首次計算的來源證據，當次取樣對照另列 source_observations。同區間有不同資料內容，必須有不同且含時區的 `source_revision_at` 才能選新版；不能用雜湊排序或抓取順序猜。`as_of`、`fetched_at_utc`、`ingested_at_utc`、`computed_at_utc` 分開，後兩者加入 SSOT 的 record_only。
 
 `plan` 不寫庫；正式庫缺席回 `FORMAL_DATABASE_ABSENT`，`--apply` 不會在錯路徑建空庫。引擎零網路、零 LLM 呼叫。現版會讀取已保存的正規化區間及快取結果，尚非大量持股明細的串流查詢器；原始持股與行情仍由各正主增量擷取。
 
@@ -48,12 +48,12 @@ python "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0100.py" pla
 python "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0100.py" build --input verified_intervals.json --db <既有 ActiveTWETF.duckdb> --apply --out <報告夾>
 ```
 
-`build` 不帶 `--input` 時，讀該庫已收容的區間。`--apply` 才存結果；不帶即乾跑。回碼 0 表示來源區間可估計，2 表示 NODATA／REVIEW。**未有已驗的官方正規化器時，先用 plan 查缺，不把合成夾具當正式進件。**
+`build` 不帶 `--input` 時，讀該庫已收容的區間。`--apply` 才存結果；不帶即乾跑。回碼 0 表示來源區間可估計，2 表示 NODATA／REVIEW；契約錯誤或修訂衝突回碼 1，拒收新批次並保留原庫。**未有已驗的官方正規化器時，先用 plan 查缺，不把合成夾具當正式進件。**
 
 ## 唯一 UI 與驗證
 
 輸出從 `VIA_HTML_UI` 取三支正式頁，先委派 ENG090 → CGC_MDL160 驗正典套件；只在中央頁插入 `VIA_REGISTER_ADDON` 模組，不另造版面、不改正本。入口為報告夾 `ui/VIA-Complete-System.html`。所有原始來源文字以 JSON 跳脫並用 DOM textContent 呈現。
 
-本機回歸 **20／20**：基金／成分流量分離、基金與股票分割、未知公司行動、AUM／NAV 衝突、價格區間與幣別、完整／缺漏快照、進出場、負數／重複股數、期間加權、缺口／重疊、股數不連續、跨分割均價、雜湊去重／修訂、交易回滾、缺庫不建、正典模板與 HTML 注入防護。
+本機回歸 **23／23**：基金／成分流量分離、基金與股票分割、未知公司行動、AUM／NAV 衝突、價格區間與幣別、完整／缺漏快照、進出場、負數／重複股數、期間加權、缺口／重疊、股數不連續、跨分割均價、取樣／資料版本分離、跨批次衝突拒收、持股排序／數字格式去重、雜湊去重／修訂、交易回滾、缺庫不建、正典模板與 HTML 注入防護。
 
 真 Chromium 桌機 1440 與手機 390 共 **12／12**：模組只註冊一次、來源文字不執行、估算標示可见、無頁面錯誤、無外部請求、無整頁橫捲。測試輸入全為合成，Windows CI 執行同套測試並上傳畫面，與正式資料驗收分開。

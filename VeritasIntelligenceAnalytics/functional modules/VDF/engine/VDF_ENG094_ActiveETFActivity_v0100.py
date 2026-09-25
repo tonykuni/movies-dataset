@@ -95,6 +95,34 @@ def digest(value) -> str:
     return hashlib.sha256(canonical(value).encode("utf-8")).hexdigest()
 
 
+def valid_fetch_time(value) -> bool:
+    try:
+        return datetime.fromisoformat(value or "").utcoffset() is not None
+    except (ValueError, TypeError):
+        return False
+
+
+def data_digest(value) -> str:
+    """Keep raw observations separately; valid transport timestamps are not data revisions.
+
+    Invalid/missing timestamps do not collide with valid evidence and must be
+    re-assessed. Provider as-of dates, source URLs and revision dates remain keys.
+    """
+    def scrub(item):
+        if isinstance(item, dict):
+            cleaned = {k: [valid_fetch_time(v), None if valid_fetch_time(v) else scrub(v)] if k == "fetched_at_utc" else scrub(v)
+                       for k, v in item.items()}
+            if isinstance(cleaned.get("positions"), list):
+                cleaned["positions"] = sorted(cleaned["positions"], key=canonical)
+            return cleaned
+        if isinstance(item, list):
+            return [scrub(v) for v in item]
+        if isinstance(item, float) and math.isfinite(item) and item.is_integer():
+            return int(item)
+        return item
+    return digest(scrub(value))
+
+
 def number(value, *, positive=False):
     if isinstance(value, bool):
         return None
@@ -117,11 +145,7 @@ def evidence(record) -> bool:
     """A URL plus an explicit provider observation date; a fetch day is insufficient."""
     if not isinstance(record, dict):
         return False
-    try:
-        fetched = datetime.fromisoformat(record.get("fetched_at_utc") or "")
-        if fetched.utcoffset() is None:
-            return False
-    except (ValueError, TypeError):
+    if not valid_fetch_time(record.get("fetched_at_utc")):
         return False
     return bool(isinstance(record, dict) and str(record.get("source_url", "")).startswith(("https://", "http://"))
                 and iso(record.get("as_of")))
@@ -241,7 +265,7 @@ def analyze(bundle) -> dict:
     holdings = holding_intervals(bundle)
     snapshot_issues = sorted({v for r in holdings for v in r["issues"] if v.startswith(("previous:", "current:"))})
     state = "ESTIMATE" if fund["state"] == "ESTIMATE" and all(r["state"] == "ESTIMATE" for r in holdings) else "REVIEW"
-    return {"schema": "VIA.ETFActivityResult.v1", "engine_version": VERSION, "input_sha256": fingerprint,
+    return {"schema": "VIA.ETFActivityResult.v1", "engine_version": VERSION, "input_sha256": fingerprint, "data_sha256": data_digest(bundle),
             "etf_ticker": bundle["etf_ticker"], "start": start, "end": end, "currency": "TWD", "state": state,
             "source_revision_at": bundle.get("source_revision_at"), "fund": fund, "holdings": holdings,
             "holdings_snapshot_issues": snapshot_issues,
@@ -322,20 +346,25 @@ def build(db=DB, inputs=None, *, apply=False) -> dict:
         with duckdb.connect(str(db), read_only=True) as con:
             if "etf_activity_results" in status["tables"]:
                 cached = {r[0]: json.loads(r[1]) for r in con.execute(
-                    "SELECT input_sha256,payload_json FROM etf_activity_results WHERE engine_version=?", [VERSION]).fetchall()}
-            if inputs is None and "etf_activity_inputs" in status["tables"]:
+                    "SELECT data_sha256,payload_json FROM etf_activity_results WHERE engine_version=?", [VERSION]).fetchall()}
+            if "etf_activity_inputs" in status["tables"]:
                 source_rows = [json.loads(r[0]) for r in con.execute("SELECT payload_json FROM etf_activity_inputs ORDER BY ingested_at_utc,input_sha256").fetchall()]
     if inputs is not None:
-        source_rows = inputs if isinstance(inputs, list) else [inputs]
-    unique, selected = {}, {}
+        source_rows.extend(inputs if isinstance(inputs, list) else [inputs])
+    unique, selected, computed, requested = {}, {}, {}, set()
     for bundle in source_rows:
         sha = digest(bundle)
-        result = unique[sha][1] if sha in unique else cached.get(sha) or analyze(bundle)
+        data_sha = data_digest(bundle)
+        requested.add(data_sha)
+        result = computed.get(data_sha) or cached.get(data_sha)
+        if result is None:
+            result = analyze(bundle)
+            computed[data_sha] = result
         unique[sha] = (bundle, result)
         # A source revision timestamp, never hash ordering or fetch ordering, selects a revision.
         key = (result["etf_ticker"], result["start"], result["end"])
         old = selected.get(key)
-        if old and old["input_sha256"] != sha:
+        if old and old["data_sha256"] != data_sha:
             try:
                 prior = datetime.fromisoformat(old.get("source_revision_at") or "")
                 current = datetime.fromisoformat(result.get("source_revision_at") or "")
@@ -360,7 +389,7 @@ def build(db=DB, inputs=None, *, apply=False) -> dict:
             try:
                 for table, rows, keys in (
                     ("etf_activity_inputs", [{"input_sha256": sha, "ingested_at_utc": stamp, "payload_json": canonical(pair[0])} for sha, pair in unique.items()], ["input_sha256"]),
-                    ("etf_activity_results", [{"input_sha256": sha, "engine_version": VERSION, "computed_at_utc": stamp, "payload_json": canonical(pair[1])} for sha, pair in unique.items() if sha not in cached], ["input_sha256", "engine_version"])):
+                    ("etf_activity_results", [{"data_sha256": sha, "input_sha256": result["input_sha256"], "engine_version": VERSION, "computed_at_utc": stamp, "payload_json": canonical(result)} for sha, result in computed.items()], ["data_sha256", "engine_version"])):
                     if rows:
                         con.register("_activity_input", pd.DataFrame(rows))
                         _LIB.UTILS.upsert_select(con, table, "_activity_input", keys)
@@ -370,7 +399,8 @@ def build(db=DB, inputs=None, *, apply=False) -> dict:
                 con.execute("ROLLBACK")
                 raise
     return {"schema": "VIA.ETFActivityReport.v1", "state": state, "database": status, "intervals": results,
-            "summary": summary, "computed": sum(sha not in cached for sha in unique), "cached": sum(sha in cached for sha in unique),
+            "summary": summary, "computed": len(computed), "cached": len(requested - set(computed)),
+            "source_observations": [{"input_sha256": sha, "data_sha256": pair[1]["data_sha256"]} for sha, pair in unique.items()],
             "production_ready": False, "activation_note": "Official source normalization and workstation coverage still require validation."}
 
 
