@@ -5,11 +5,10 @@
 v0100 stayed. It only kept 4–5 digits, so 00981A never parsed, and it
 printed one yfinance suffix. This version always shows three codes:
 the bare exchange code, the TWSE yfinance form (.TW), and the TPEX
-yfinance form (.TWO). Bloomberg ({code} TT) stays as an extra, not
-instead of one of the three. Market picks which yfinance form is
-primary: a typed .TW/.TWO wins; otherwise a 4-digit prefix hint.
-ETF letters come from VRN_TWTicker_RIE_v0400.json. An unknown single
-letter after 00xxx is still accepted and marked etf_unlisted_suffix.
+yfinance form (.TWO). Bloomberg ({code} TT) stays as an extra.
+The primary form is chosen only from a typed suffix or an explicit
+market. A leading digit is not a market. 3008 is TWSE even though it
+starts with 3.
 """
 from __future__ import annotations
 
@@ -33,7 +32,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 BOOK = HERE / "VRN_TWTicker_RIE_v0400.json"
-OTC_PREFIXES = ("3", "4", "5", "6", "8")
 TAIL = re.compile(r"(?i)(?P<tail>\.TWO|\.TW|\s*TT)\s*$")
 BODY = re.compile(r"(?i)^(?P<code>00\d{2,3}[A-Z]|[1-9]\d{3}|00\d{2,3})$")
 
@@ -61,41 +59,36 @@ def _classify(code: str) -> tuple[str, list[str]]:
     return "", []
 
 
-def _hint(code: str) -> str:
-    digits = re.match(r"\d+", code).group(0)
-    if len(digits) == 5 or not digits.startswith(OTC_PREFIXES):
-        return "TWSE"
-    return "TPEX"
-
-
 def parse_taiwan_ticker(input_ticker, market: str | None = None):
-    """Return the three codes for one Taiwan ticker, or is_valid False."""
+    """Return the three codes. Primary yfinance is set only by a suffix or market."""
     clean = str(input_ticker).strip()
     tail_m = TAIL.search(clean)
     tail = tail_m.group("tail").upper().replace(" ", "") if tail_m else ""
     body = clean[: tail_m.start()].strip() if tail_m else clean
     body = re.sub(r"\s+", "", body).upper()
+    empty = {
+        "is_valid": False, "original_input": input_ticker, "core_ticker": None,
+        "tw": None, "yf_twse": None, "yf_tpex": None, "bb": None,
+        "market_type": None, "yfinance_format": None, "bloomberg_format": None,
+        "type": None, "factors": [], "was_corrected": False, "market_source": None,
+    }
     if not BODY.fullmatch(body):
-        return {
-            "is_valid": False, "original_input": input_ticker, "core_ticker": None,
-            "tw": None, "yf_twse": None, "yf_tpex": None, "bb": None,
-            "market_type": None, "yfinance_format": None, "bloomberg_format": None,
-            "type": None, "factors": [], "was_corrected": False,
-        }
+        return empty
     kind, factors = _classify(body)
-    typed = "TPEX" if tail == ".TWO" else ("TWSE" if tail == ".TW" else "")
+    from_suffix = "TPEX" if tail == ".TWO" else ("TWSE" if tail == ".TW" else "")
     asked = str(market or "").upper()
-    if asked in {"TWSE", "上市", "TSE"}:
-        typed = typed or "TWSE"
-    elif asked in {"TPEX", "OTC", "上櫃", "TWO"}:
-        typed = typed or "TPEX"
-    picked = typed or _hint(body)
+    from_arg = "TWSE" if asked in {"TWSE", "上市", "TSE"} else (
+        "TPEX" if asked in {"TPEX", "OTC", "上櫃", "TWO"} else "")
+    corrected = bool(from_arg and from_suffix and from_arg != from_suffix)
+    if from_arg:
+        picked, source = from_arg, "argument"
+    elif from_suffix:
+        picked, source = from_suffix, "suffix"
+    else:
+        picked, source = "", "unknown"
     yf_twse = f"{body}.TW"
     yf_tpex = f"{body}.TWO"
-    primary = yf_tpex if picked == "TPEX" else yf_twse
-    corrected = False
-    if tail in {".TW", ".TWO"} and not market:
-        corrected = (tail == ".TW" and picked == "TPEX") or (tail == ".TWO" and picked == "TWSE")
+    primary = yf_tpex if picked == "TPEX" else (yf_twse if picked == "TWSE" else None)
     return {
         "is_valid": True,
         "original_input": input_ticker,
@@ -104,12 +97,13 @@ def parse_taiwan_ticker(input_ticker, market: str | None = None):
         "yf_twse": yf_twse,
         "yf_tpex": yf_tpex,
         "bb": f"{body} TT",
-        "market_type": "上市 (TWSE)" if picked == "TWSE" else "上櫃 (TPEX)",
+        "market_type": ("上市 (TWSE)" if picked == "TWSE" else "上櫃 (TPEX)") if picked else None,
         "yfinance_format": primary,
         "bloomberg_format": f"{body} TT",
         "type": kind,
         "factors": factors,
         "was_corrected": corrected,
+        "market_source": source,
     }
 
 
@@ -120,21 +114,27 @@ def selftest() -> int:
         checks.append((name, bool(ok)))
 
     a = parse_taiwan_ticker("2330")
-    chk("2330 three", a["tw"] == "2330" and a["yf_twse"] == "2330.TW" and a["yf_tpex"] == "2330.TWO" and a["yfinance_format"] == "2330.TW")
-    b = parse_taiwan_ticker("5347")
-    chk("5347 tpex", b["yfinance_format"] == "5347.TWO" and b["yf_twse"] == "5347.TW")
-    c = parse_taiwan_ticker("00981A")
-    chk("active etf", c["is_valid"] and c["type"] == "etf_equity_active" and c["tw"] == "00981A" and c["yf_twse"] == "00981A.TW" and c["yf_tpex"] == "00981A.TWO")
-    d = parse_taiwan_ticker("00631L.TWO")
-    chk("lev typed", d["type"] == "etf_leverage" and d["yfinance_format"] == "00631L.TWO" and d["bb"] == "00631L TT")
-    e = parse_taiwan_ticker("0050")
-    chk("passive", e["type"] == "etf_equity_passive" and e["yf_twse"] == "0050.TW")
-    f = parse_taiwan_ticker("00981Q")
-    chk("new suffix", f["is_valid"] and f["type"] == "etf_unlisted_suffix" and f["yf_tpex"] == "00981Q.TWO")
-    g = parse_taiwan_ticker("abc")
-    chk("reject", not g["is_valid"] and g["yf_twse"] is None)
-    h = parse_taiwan_ticker("2330", market="TPEX")
-    chk("market arg", h["yfinance_format"] == "2330.TWO" and h["yf_twse"] == "2330.TW")
+    chk("2330 three", a["tw"] == "2330" and a["yf_twse"] == "2330.TW" and a["yf_tpex"] == "2330.TWO" and a["yfinance_format"] is None)
+    b = parse_taiwan_ticker("3008")
+    chk("3008 not guessed", b["yfinance_format"] is None and b["yf_twse"] == "3008.TW" and b["yf_tpex"] == "3008.TWO")
+    c = parse_taiwan_ticker("3008.TW")
+    chk("3008 listed", c["yfinance_format"] == "3008.TW" and c["market_type"] == "上市 (TWSE)" and not c["was_corrected"])
+    d = parse_taiwan_ticker("5347.TWO")
+    chk("5347 suffix", d["yfinance_format"] == "5347.TWO" and d["market_type"] == "上櫃 (TPEX)")
+    e = parse_taiwan_ticker("00981A")
+    chk("active etf", e["is_valid"] and e["type"] == "etf_equity_active" and e["yf_twse"] == "00981A.TW" and e["yf_tpex"] == "00981A.TWO")
+    f = parse_taiwan_ticker("00631L.TWO")
+    chk("lev typed", f["type"] == "etf_leverage" and f["yfinance_format"] == "00631L.TWO" and f["bb"] == "00631L TT")
+    g = parse_taiwan_ticker("0050")
+    chk("passive", g["type"] == "etf_equity_passive" and g["yf_twse"] == "0050.TW" and g["yfinance_format"] is None)
+    h = parse_taiwan_ticker("00981Q")
+    chk("new suffix", h["is_valid"] and h["type"] == "etf_unlisted_suffix" and h["yf_tpex"] == "00981Q.TWO")
+    i = parse_taiwan_ticker("abc")
+    chk("reject", not i["is_valid"] and i["yf_twse"] is None)
+    j = parse_taiwan_ticker("3008.TWO", market="TWSE")
+    chk("conflict", j["yfinance_format"] == "3008.TW" and j["was_corrected"] and j["yf_tpex"] == "3008.TWO")
+    k = parse_taiwan_ticker("2330", market="TPEX")
+    chk("market arg", k["yfinance_format"] == "2330.TWO" and k["market_source"] == "argument")
     bad = [n for n, ok in checks if not ok]
     print(f"[VRN_OperatorRegex_TWTicker v0101] {len(checks) - len(bad)}/{len(checks)}" + (f" FAIL {bad}" if bad else " OK"))
     return 1 if bad else 0
