@@ -1599,16 +1599,6 @@ if __name__ == "__main__":
     def_run_cli()
 
 # === VIA_FINAL_PATCH_ENVMANAGER_COMPAT ===
-def env_health():
-    return {"status": "alive", "module": "VIA_EnvManager"}
-
-def detect_python():
-    import sys
-    return {"python": sys.executable, "version": sys.version}
-
-def pip_check():
-    return {"status": "not_run", "reason": "safe compatibility mode"}
-
 # === VIA_FINAL_PATCH_ENVMANAGER_COMPAT_V3 ===
 def env_health():
     return {"status": "alive", "module": "VIA_EnvManager"}

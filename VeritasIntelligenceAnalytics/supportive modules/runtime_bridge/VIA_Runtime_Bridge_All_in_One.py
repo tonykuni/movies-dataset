@@ -523,32 +523,7 @@ if __name__ == "__main__":
     def_run_cli()
 
 # === VIA_PATCH_RUNTIME_HEARTBEAT ===
-def via_runtime_heartbeat():
-    return {"status": "alive"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
 # === VIA_FINAL_PATCH_RUNTIME_BRIDGE_COMPAT ===
-def via_runtime_heartbeat():
-    return {"status": "alive", "module": "VIA_Runtime_Bridge_All_in_One"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
-def bridge_health():
-    return {"status": "alive", "module": "VIA_Runtime_Bridge_All_in_One"}
-
-def run_bridge(*args, **kwargs):
-    return {"status": "ok", "args_count": len(args), "kwargs": list(kwargs.keys())}
-
-
 # ===== [VIA:ANCHOR:PATCH:SevenToolCoverageBridge-20260424:START] =====
 # Runtime coverage extender for all 7 supportive modules. Original runtime APIs unchanged.
 def_PARAM_SEVEN_TOOL_MODULE_NAMES = [
@@ -593,15 +568,6 @@ def def_bootstrap_seven_tool_coverage():
 
 
 # === VIA_FINAL_PATCH_RUNTIME_BRIDGE_COMPAT_V3 ===
-def via_runtime_heartbeat():
-    return {"status": "alive", "module": "VIA_Runtime_Bridge_All_in_One"}
-
-def via_runtime_smoke():
-    try:
-        return via_runtime_heartbeat()
-    except Exception as e:
-        return {"status": "error", "msg": str(e)}
-
 def bridge_health():
     return {"status": "alive", "module": "VIA_Runtime_Bridge_All_in_One"}
 

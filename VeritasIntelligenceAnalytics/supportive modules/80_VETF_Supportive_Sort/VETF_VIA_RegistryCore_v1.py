@@ -1082,16 +1082,6 @@ if __name__ == "__main__":
 # === VIA_FINAL_PATCH_REGISTRY_COMPAT ===
 _VIA_REGISTRY = {}
 
-def register_module(name, payload=None):
-    _VIA_REGISTRY[str(name)] = payload or {}
-    return {"status": "registered", "name": str(name)}
-
-def get_registry():
-    return dict(_VIA_REGISTRY)
-
-def registry_health():
-    return {"status": "alive", "count": len(_VIA_REGISTRY)}
-
 # === VIA_FINAL_PATCH_REGISTRY_COMPAT_V3 ===
 _VIA_REGISTRY = globals().get("_VIA_REGISTRY", {})
 
