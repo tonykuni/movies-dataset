@@ -1,0 +1,51 @@
+diff --git a/src/components/console-deck.tsx b/src/components/console-deck.tsx
+index 7327893..760b580 100644
+--- a/src/components/console-deck.tsx
++++ b/src/components/console-deck.tsx
+@@ -14,6 +14,7 @@ import { ingestRunCommand, ingestRunNote } from "@/lib/via/via-ingest-ps";
+ import { govZoneRows, libTableHealth } from "@/lib/via/gov-env";
+ import { GOV_ACCEL, GOV_ROUNDS, LKGC_UV } from "@/lib/via/gov-spec";
+ import { GOV_TOOLS } from "@/lib/via/catalog";
++import { MOTHER_STATUS_ROWS, motherStatusLight, motherStatusOpen, motherStatusSummary } from "@/lib/via/mother-status";
+ import { GOV_LESSONS, runEnvManager } from "@/lib/via/env-manager";
+ import { runCentralEntry } from "@/lib/via/central-entry";
+ import { raceMirrors, runClashTools } from "@/lib/via/uv-clash";
+@@ -151,6 +152,38 @@ export function ConsoleDeck() {
+         <Pillar icon={Shield} code="04" title="VAR" desc="審計／修復" light={varLight} onOpen={() => setDeck("var")} />
+       </div>
+ 
++      {/* 母倉現況(批407–413)· 唯讀鏡面:不跑不抓,數字全來自母倉實跑與工作站實錄。
++          操作員令「所有狀況都到導入 GROK VIA CENTRAL GOVERNANCE CONSOLE 面板顯示」。 */}
++      <section className="space-y-2">
++        <div className="flex flex-wrap items-center gap-2">
++          <h3 className="text-xs font-medium uppercase tracking-wide text-subtle">
++            母倉現況 · movies-dataset PR #30(批407–413)
++          </h3>
++          <StatusLight status={tri(motherStatusLight())} />
++          <Badge tone={motherStatusLight() === "ok" ? "ok" : "warn"}>
++            {`了結 ${motherStatusSummary().ok}/${motherStatusSummary().total} · 未了結 ${motherStatusSummary().open}`}
++          </Badge>
++          <Button size="sm" variant="outline" onClick={() => setDeck("mother")}>
++            母倉詳情
++          </Button>
++        </div>
++        <p className="font-mono text-xs text-subtle">
++          唯讀鏡面 · 誠實三態 · 未了結先列(ETF 覆蓋 3/23 · VRN 尚無真報告)
++        </p>
++        <Matrix
++          columns={["燈", "批", "面", "項目", "量", "註"]}
++          empty="無現況"
++          rows={[...motherStatusOpen(), ...MOTHER_STATUS_ROWS.filter((r) => r.light === "ok")].map((r) => [
++            <StatusLight key="l" status={tri(r.light)} />,
++            r.batch,
++            r.area,
++            r.title,
++            r.metric,
++            r.note,
++          ])}
++        />
++      </section>
++
+       <section className="space-y-2">
+         <h3 className="text-xs font-medium uppercase tracking-wide text-subtle">實測矩陣 · 封印</h3>
+         <p className="font-mono text-xs text-subtle">六程同步 · 無九頭龍 · L2／L6 寫區互斥 · DCT 不動</p>

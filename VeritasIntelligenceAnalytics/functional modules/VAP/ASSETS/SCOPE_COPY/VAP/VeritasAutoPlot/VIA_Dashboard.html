@@ -1,0 +1,3077 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritaIntelligenceAnalytics — Enterprise Financial Intelligence Platform</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    
+    <!-- Fonts: Notion-style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VERITA INTELLIGENCE ANALYTICS - ENTERPRISE CSS
+   Design: Notion-inspired, Seaborn color palette, Professional Grade
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* === SEABORN COLOR PALETTE === */
+    --sb-blue: #4C72B0;
+    --sb-orange: #DD8452;
+    --sb-green: #55A868;
+    --sb-red: #C44E52;
+    --sb-purple: #8172B3;
+    --sb-brown: #937860;
+    --sb-pink: #DA8BC3;
+    --sb-gray: #8C8C8C;
+    --sb-yellow: #CCB974;
+    --sb-cyan: #64B5CD;
+    
+    /* === NOTION-STYLE BACKGROUNDS === */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F7F6F3;
+    --bg-tertiary: #EFEEE9;
+    --bg-hover: #E8E7E4;
+    --bg-active: #DFDDD8;
+    --bg-dark: #191919;
+    --bg-code: #F7F6F3;
+    
+    /* === TEXT COLORS === */
+    --text-primary: #37352F;
+    --text-secondary: #6B6B6B;
+    --text-tertiary: #9B9A97;
+    --text-light: #B4B4B4;
+    --text-inverse: #FFFFFF;
+    
+    /* === BORDER COLORS === */
+    --border-light: #E8E7E4;
+    --border-medium: #DFDDD8;
+    --border-dark: #C7C5C0;
+    
+    /* === SEMANTIC COLORS === */
+    --success: #2E7D32;
+    --success-bg: #E8F5E9;
+    --warning: #ED6C02;
+    --warning-bg: #FFF4E5;
+    --error: #D32F2F;
+    --error-bg: #FDEDED;
+    --info: #0288D1;
+    --info-bg: #E5F6FD;
+    
+    /* === RISK COLORS === */
+    --risk-low: #55A868;
+    --risk-medium: #CCB974;
+    --risk-high: #DD8452;
+    --risk-critical: #C44E52;
+    
+    /* === CHART COLORS (Seaborn Deep) === */
+    --chart-1: #4C72B0;
+    --chart-2: #DD8452;
+    --chart-3: #55A868;
+    --chart-4: #C44E52;
+    --chart-5: #8172B3;
+    --chart-6: #937860;
+    --chart-7: #DA8BC3;
+    --chart-8: #8C8C8C;
+    
+    /* === TYPOGRAPHY SCALE === */
+    --font-xs: 0.6875rem;   /* 11px */
+    --font-sm: 0.75rem;     /* 12px */
+    --font-base: 0.875rem;  /* 14px */
+    --font-md: 1rem;        /* 16px */
+    --font-lg: 1.125rem;    /* 18px */
+    --font-xl: 1.25rem;     /* 20px */
+    --font-2xl: 1.5rem;     /* 24px */
+    --font-3xl: 1.875rem;   /* 30px */
+    --font-4xl: 2.25rem;    /* 36px */
+    
+    /* === SPACING SCALE === */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    
+    /* === LAYOUT === */
+    --sidebar-width: 260px;
+    --header-height: 52px;
+    --border-radius: 6px;
+    --border-radius-lg: 10px;
+    
+    /* === SHADOWS === */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+    --shadow-xl: 0 8px 32px rgba(0,0,0,0.16);
+    
+    /* === TRANSITIONS === */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+}
+
+/* === RESET & BASE === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { 
+    font-size: 16px; 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body { 
+    font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--font-base);
+    line-height: 1.5;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    overflow-x: hidden;
+}
+
+/* === TYPOGRAPHY HIERARCHY === */
+h1, .h1 { font-size: var(--font-3xl); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+h2, .h2 { font-size: var(--font-2xl); font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+h3, .h3 { font-size: var(--font-xl); font-weight: 600; line-height: 1.3; }
+h4, .h4 { font-size: var(--font-lg); font-weight: 600; line-height: 1.4; }
+h5, .h5 { font-size: var(--font-md); font-weight: 600; line-height: 1.4; }
+h6, .h6 { font-size: var(--font-base); font-weight: 600; line-height: 1.5; }
+
+.text-xs { font-size: var(--font-xs); }
+.text-sm { font-size: var(--font-sm); }
+.text-base { font-size: var(--font-base); }
+.text-md { font-size: var(--font-md); }
+.text-lg { font-size: var(--font-lg); }
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+/* === APP LAYOUT === */
+.via-app {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: var(--header-height) 1fr;
+    min-height: 100vh;
+}
+
+/* === HEADER === */
+.via-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-6);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.via-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.via-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--sb-blue) 0%, var(--sb-purple) 100%);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: var(--font-sm);
+}
+
+.via-logo-text {
+    font-size: var(--font-md);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.via-logo-badge {
+    font-size: var(--font-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-radius: 12px;
+}
+
+.via-header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.via-nav-item {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.via-nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.via-nav-item.active {
+    background: var(--sb-blue);
+    color: white;
+}
+
+.via-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* === SIDEBAR === */
+.via-sidebar {
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border-light);
+    overflow-y: auto;
+    padding: var(--space-4);
+}
+
+.via-sidebar-section {
+    margin-bottom: var(--space-6);
+}
+
+.via-sidebar-title {
+    font-size: var(--font-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.via-sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.via-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.via-menu-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.via-menu-item.active {
+    background: var(--bg-active);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.via-menu-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-base);
+}
+
+.via-menu-badge {
+    margin-left: auto;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    padding: 2px 6px;
+    background: var(--sb-blue);
+    color: white;
+    border-radius: 10px;
+}
+
+/* === MAIN CONTENT === */
+.via-main {
+    padding: var(--space-6);
+    overflow-y: auto;
+    background: var(--bg-secondary);
+}
+
+.via-page {
+    display: none;
+    animation: fadeIn 0.2s ease;
+}
+
+.via-page.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === CARDS === */
+.via-card {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.via-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.via-card-title {
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.via-card-title .icon {
+    color: var(--text-tertiary);
+}
+
+.via-card-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.via-card-body {
+    padding: var(--space-5);
+}
+
+.via-card-footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+}
+
+/* === GRID LAYOUTS === */
+.via-grid {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.via-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.via-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.via-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.via-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+.via-grid-dashboard {
+    grid-template-columns: repeat(12, 1fr);
+}
+
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-6 { grid-column: span 6; }
+.col-span-8 { grid-column: span 8; }
+.col-span-12 { grid-column: span 12; }
+
+/* === METRIC CARDS === */
+.via-metric {
+    padding: var(--space-5);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-light);
+}
+
+.via-metric-label {
+    font-size: var(--font-xs);
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+}
+
+.via-metric-value {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.2;
+}
+
+.via-metric-change {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    margin-top: var(--space-2);
+}
+
+.via-metric-change.positive { color: var(--success); }
+.via-metric-change.negative { color: var(--error); }
+.via-metric-change.neutral { color: var(--text-tertiary); }
+
+.via-metric-sparkline {
+    height: 40px;
+    margin-top: var(--space-3);
+}
+
+/* === RISK INDICATOR === */
+.via-risk-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.via-risk-gauge {
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+
+.via-risk-level {
+    display: flex;
+    flex-direction: column;
+}
+
+.via-risk-score {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.via-risk-label {
+    font-size: var(--font-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.risk-low { color: var(--risk-low); }
+.risk-medium { color: var(--risk-medium); }
+.risk-high { color: var(--risk-high); }
+.risk-critical { color: var(--risk-critical); }
+
+/* === BUTTONS === */
+.via-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.via-btn-primary {
+    background: var(--sb-blue);
+    color: white;
+    border-color: var(--sb-blue);
+}
+
+.via-btn-primary:hover {
+    background: #3D5A8A;
+    border-color: #3D5A8A;
+}
+
+.via-btn-secondary {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+}
+
+.via-btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-dark);
+}
+
+.via-btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.via-btn-ghost:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.via-btn-success { background: var(--success); color: white; border-color: var(--success); }
+.via-btn-warning { background: var(--warning); color: white; border-color: var(--warning); }
+.via-btn-danger { background: var(--error); color: white; border-color: var(--error); }
+
+.via-btn-sm { padding: var(--space-1) var(--space-3); font-size: var(--font-xs); }
+.via-btn-lg { padding: var(--space-3) var(--space-6); font-size: var(--font-base); }
+.via-btn-icon { padding: var(--space-2); aspect-ratio: 1; }
+
+/* === FORM ELEMENTS === */
+.via-form-group {
+    margin-bottom: var(--space-4);
+}
+
+.via-label {
+    display: block;
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.via-input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-sm);
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--border-radius);
+    transition: var(--transition-fast);
+}
+
+.via-input:focus {
+    outline: none;
+    border-color: var(--sb-blue);
+    box-shadow: 0 0 0 3px rgba(76, 114, 176, 0.15);
+}
+
+.via-input:disabled {
+    background: var(--bg-tertiary);
+    cursor: not-allowed;
+}
+
+.via-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B6B6B' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+}
+
+/* === TOGGLE SWITCH === */
+.via-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+}
+
+.via-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.via-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border-medium);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.via-toggle-track::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    top: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.via-toggle input:checked + .via-toggle-track {
+    background: var(--sb-blue);
+}
+
+.via-toggle input:checked + .via-toggle-track::before {
+    transform: translateX(16px);
+}
+
+/* === TABLES === */
+.via-table-container {
+    overflow-x: auto;
+}
+
+.via-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-sm);
+}
+
+.via-table th,
+.via-table td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.via-table th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.via-table tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.via-table .number {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+}
+
+.via-table .positive { color: var(--success); }
+.via-table .negative { color: var(--error); }
+
+/* === TABS === */
+.via-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    gap: 0;
+}
+
+.via-tab {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-bottom: -1px;
+}
+
+.via-tab:hover {
+    color: var(--text-primary);
+}
+
+.via-tab.active {
+    color: var(--sb-blue);
+    border-bottom-color: var(--sb-blue);
+    font-weight: 600;
+}
+
+.via-tab-content {
+    display: none;
+    padding: var(--space-5) 0;
+}
+
+.via-tab-content.active {
+    display: block;
+}
+
+/* === BADGES & TAGS === */
+.via-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.via-badge-success { background: var(--success-bg); color: var(--success); }
+.via-badge-warning { background: var(--warning-bg); color: var(--warning); }
+.via-badge-error { background: var(--error-bg); color: var(--error); }
+.via-badge-info { background: var(--info-bg); color: var(--info); }
+
+.via-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-xs);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+/* === PROGRESS BARS === */
+.via-progress {
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.via-progress-bar {
+    height: 100%;
+    background: var(--sb-blue);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.via-progress-bar.success { background: var(--success); }
+.via-progress-bar.warning { background: var(--warning); }
+.via-progress-bar.error { background: var(--error); }
+
+/* === CHARTS === */
+.via-chart {
+    width: 100%;
+    min-height: 300px;
+}
+
+.via-chart-sm { min-height: 200px; }
+.via-chart-lg { min-height: 450px; }
+.via-chart-xl { min-height: 600px; }
+
+/* === VALUATION TABLE === */
+.via-valuation-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.via-valuation-cell {
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-primary);
+}
+
+.via-valuation-label {
+    font-size: var(--font-xs);
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-1);
+}
+
+.via-valuation-value {
+    font-size: var(--font-md);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* === HEATMAP === */
+.via-heatmap {
+    display: grid;
+    gap: 2px;
+}
+
+.via-heatmap-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 4px;
+    color: white;
+}
+
+/* === LOADING === */
+.via-loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.via-loading.show {
+    display: flex;
+}
+
+.via-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-medium);
+    border-top-color: var(--sb-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* === TOAST NOTIFICATIONS === */
+.via-toast-container {
+    position: fixed;
+    top: calc(var(--header-height) + var(--space-4));
+    right: var(--space-4);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.via-toast {
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--sb-blue);
+    box-shadow: var(--shadow-lg);
+    min-width: 300px;
+    animation: slideIn 0.3s ease;
+}
+
+.via-toast-success { border-left-color: var(--success); }
+.via-toast-warning { border-left-color: var(--warning); }
+.via-toast-error { border-left-color: var(--error); }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* === MODAL === */
+.via-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.via-modal-overlay.show {
+    display: flex;
+}
+
+.via-modal {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+}
+
+.via-modal-header {
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.via-modal-title {
+    font-size: var(--font-lg);
+    font-weight: 600;
+}
+
+.via-modal-body {
+    padding: var(--space-5);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.via-modal-footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    background: var(--bg-secondary);
+}
+
+/* === EMPTY STATE === */
+.via-empty {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+    color: var(--text-tertiary);
+}
+
+.via-empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+}
+
+.via-empty-title {
+    font-size: var(--font-lg);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.via-empty-text {
+    font-size: var(--font-sm);
+    line-height: 1.6;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+    .via-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .via-grid-6 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .via-app {
+        grid-template-columns: 1fr;
+    }
+    
+    .via-sidebar {
+        display: none;
+    }
+    
+    .via-grid-2,
+    .via-grid-3 { grid-template-columns: 1fr; }
+    
+    .col-span-4,
+    .col-span-6,
+    .col-span-8 { grid-column: span 12; }
+}
+
+/* === UTILITY CLASSES === */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-5 { margin-bottom: var(--space-5); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-5 { margin-top: var(--space-5); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+    </style>
+</head>
+<body>
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     VERITA INTELLIGENCE ANALYTICS - MAIN APPLICATION
+═══════════════════════════════════════════════════════════════════════════════ -->
+
+<div class="via-app">
+    <!-- HEADER -->
+    <header class="via-header">
+        <div class="via-logo">
+            <div class="via-logo-icon">VIA</div>
+            <span class="via-logo-text">VeritaIntelligenceAnalytics</span>
+            <span class="via-logo-badge">Enterprise v1.0</span>
+        </div>
+        
+        <nav class="via-header-nav">
+            <button class="via-nav-item active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+            <button class="via-nav-item" data-page="risk" onclick="showPage('risk')">⚠️ 風險分析</button>
+            <button class="via-nav-item" data-page="backtest" onclick="showPage('backtest')">🔄 回測</button>
+            <button class="via-nav-item" data-page="valuation" onclick="showPage('valuation')">💰 估值</button>
+            <button class="via-nav-item" data-page="sector" onclick="showPage('sector')">🏭 族群比較</button>
+        </nav>
+        
+        <div class="via-header-actions">
+            <button class="via-btn via-btn-ghost via-btn-icon" onclick="syncData()" title="同步資料">🔄</button>
+            <button class="via-btn via-btn-ghost via-btn-icon" onclick="showSettings()" title="設定">⚙️</button>
+            <button class="via-btn via-btn-ghost via-btn-icon" onclick="runDiagnostics()" title="診斷測試">🧪</button>
+            <button class="via-btn via-btn-primary" onclick="generateReport()">📄 生成報告</button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="via-sidebar">
+        <!-- Data Sources -->
+        <div class="via-sidebar-section">
+            <div class="via-sidebar-title">📁 資料來源</div>
+            <div class="via-sidebar-menu">
+                <button class="via-menu-item active" onclick="setDataSource('db')">
+                    <span class="via-menu-icon">🗄️</span>
+                    <span>資料庫</span>
+                    <span class="via-menu-badge">3</span>
+                </button>
+                <button class="via-menu-item" onclick="setDataSource('local')">
+                    <span class="via-menu-icon">📁</span>
+                    <span>本機檔案</span>
+                </button>
+                <button class="via-menu-item" onclick="setDataSource('api')">
+                    <span class="via-menu-icon">🌐</span>
+                    <span>API 來源</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stock Selection -->
+        <div class="via-sidebar-section">
+            <div class="via-sidebar-title">📈 股票選擇</div>
+            <div class="via-form-group">
+                <input type="text" class="via-input" id="stockSearch" placeholder="搜尋股票代碼..." oninput="searchStock(this.value)">
+            </div>
+            <div class="via-sidebar-menu" id="stockList">
+                <button class="via-menu-item active" onclick="selectStock('2330')">
+                    <span class="via-menu-icon">📊</span>
+                    <span>2330 台積電</span>
+                </button>
+                <button class="via-menu-item" onclick="selectStock('2317')">
+                    <span class="via-menu-icon">📊</span>
+                    <span>2317 鴻海</span>
+                </button>
+                <button class="via-menu-item" onclick="selectStock('2454')">
+                    <span class="via-menu-icon">📊</span>
+                    <span>2454 聯發科</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Analysis Modules -->
+        <div class="via-sidebar-section">
+            <div class="via-sidebar-title">🔬 分析模組</div>
+            <div class="via-sidebar-menu">
+                <button class="via-menu-item" onclick="showModule('fundamental')">
+                    <span class="via-menu-icon">📑</span>
+                    <span>基本面分析</span>
+                </button>
+                <button class="via-menu-item" onclick="showModule('technical')">
+                    <span class="via-menu-icon">📈</span>
+                    <span>技術面分析</span>
+                </button>
+                <button class="via-menu-item" onclick="showModule('chip')">
+                    <span class="via-menu-icon">🎯</span>
+                    <span>籌碼面分析</span>
+                </button>
+                <button class="via-menu-item" onclick="showModule('revenue')">
+                    <span class="via-menu-icon">💹</span>
+                    <span>月營收分析</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="via-sidebar-section">
+            <div class="via-sidebar-title">⚡ 快速操作</div>
+            <div class="flex flex-col gap-2">
+                <button class="via-btn via-btn-secondary w-full" onclick="loadDemoData()">📥 載入範例資料</button>
+                <button class="via-btn via-btn-secondary w-full" onclick="exportConfig()">📤 匯出設定</button>
+                <button class="via-btn via-btn-secondary w-full" onclick="importConfig()">📥 匯入設定</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="via-main">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════════════════
+             PAGE: DASHBOARD
+        ═══════════════════════════════════════════════════════════════════════════════ -->
+        <div class="via-page active" id="page-dashboard">
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h1 class="h2">智能分析儀表板</h1>
+                    <p class="text-secondary">一覽所有關鍵指標與分析結果</p>
+                </div>
+                <div class="flex gap-3">
+                    <select class="via-input via-select" id="dashboardPeriod" onchange="updateDashboard()" style="width:150px;">
+                        <option value="1d">今日</option>
+                        <option value="1w">本週</option>
+                        <option value="1m" selected>本月</option>
+                        <option value="3m">季度</option>
+                        <option value="1y">年度</option>
+                    </select>
+                    <button class="via-btn via-btn-primary" onclick="refreshDashboard()">🔄 更新</button>
+                </div>
+            </div>
+
+            <!-- Key Metrics Row -->
+            <div class="via-grid via-grid-6 mb-5" id="metricsRow">
+                <div class="via-metric">
+                    <div class="via-metric-label">當前股價</div>
+                    <div class="via-metric-value" id="metricPrice">$595.00</div>
+                    <div class="via-metric-change positive" id="metricPriceChange">↑ +2.35%</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">本益比 P/E</div>
+                    <div class="via-metric-value" id="metricPE">25.6x</div>
+                    <div class="via-metric-change neutral">歷史中位數: 22.4x</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">股價淨值比 P/B</div>
+                    <div class="via-metric-value" id="metricPB">6.82x</div>
+                    <div class="via-metric-change neutral">產業平均: 4.2x</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">風險評分</div>
+                    <div class="via-metric-value risk-medium" id="metricRisk">62</div>
+                    <div class="via-metric-change neutral">中等風險</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">VaR (95%)</div>
+                    <div class="via-metric-value" id="metricVaR">-4.2%</div>
+                    <div class="via-metric-change neutral">日報酬</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">Sharpe Ratio</div>
+                    <div class="via-metric-value" id="metricSharpe">1.85</div>
+                    <div class="via-metric-change positive">優於基準</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="via-grid via-grid-dashboard mb-5">
+                <!-- Price Chart -->
+                <div class="via-card col-span-8">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">📈</span>
+                            <span>價格走勢與技術指標</span>
+                        </div>
+                        <div class="via-card-actions">
+                            <button class="via-btn via-btn-ghost via-btn-sm" onclick="toggleIndicator('sma')">SMA</button>
+                            <button class="via-btn via-btn-ghost via-btn-sm" onclick="toggleIndicator('bb')">BB</button>
+                            <button class="via-btn via-btn-ghost via-btn-sm" onclick="toggleIndicator('volume')">Vol</button>
+                        </div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="priceChart" class="via-chart via-chart-lg"></div>
+                    </div>
+                </div>
+
+                <!-- Risk Gauge -->
+                <div class="via-card col-span-4">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">⚠️</span>
+                            <span>風險儀表板</span>
+                        </div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="riskGaugeChart" class="via-chart via-chart-sm mb-4"></div>
+                        
+                        <div class="via-valuation-table">
+                            <div class="via-valuation-cell">
+                                <div class="via-valuation-label">波動率 (30D)</div>
+                                <div class="via-valuation-value">28.5%</div>
+                            </div>
+                            <div class="via-valuation-cell">
+                                <div class="via-valuation-label">Beta</div>
+                                <div class="via-valuation-value">1.15</div>
+                            </div>
+                            <div class="via-valuation-cell">
+                                <div class="via-valuation-label">最大回撤</div>
+                                <div class="via-valuation-value negative">-18.3%</div>
+                            </div>
+                            <div class="via-valuation-cell">
+                                <div class="via-valuation-label">夏普比率</div>
+                                <div class="via-valuation-value positive">1.85</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Panels Row -->
+            <div class="via-grid via-grid-3 mb-5">
+                <!-- Fundamental -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">📑</span>
+                            <span>基本面摘要</span>
+                        </div>
+                        <button class="via-btn via-btn-ghost via-btn-sm" onclick="showPage('valuation')">詳細 →</button>
+                    </div>
+                    <div class="via-card-body">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex justify-between">
+                                <span class="text-secondary">營收成長 (YoY)</span>
+                                <span class="font-semibold positive">+15.2%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">毛利率</span>
+                                <span class="font-semibold">53.4%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">淨利率</span>
+                                <span class="font-semibold">38.2%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">ROE</span>
+                                <span class="font-semibold positive">28.6%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">負債比率</span>
+                                <span class="font-semibold">32.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">📈</span>
+                            <span>技術面摘要</span>
+                        </div>
+                        <button class="via-btn via-btn-ghost via-btn-sm" onclick="showModule('technical')">詳細 →</button>
+                    </div>
+                    <div class="via-card-body">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-secondary">RSI (14)</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold">58.2</span>
+                                    <span class="via-badge">中性</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-secondary">MACD</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold positive">+2.35</span>
+                                    <span class="via-badge via-badge-success">看多</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-secondary">KD 值</span>
+                                <span class="font-semibold">K:65 D:58</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-secondary">布林位置</span>
+                                <span class="font-semibold">中軌上方</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-secondary">趨勢</span>
+                                <span class="via-badge via-badge-success">上升趨勢</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chip Analysis -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">🎯</span>
+                            <span>籌碼面摘要</span>
+                        </div>
+                        <button class="via-btn via-btn-ghost via-btn-sm" onclick="showModule('chip')">詳細 →</button>
+                    </div>
+                    <div class="via-card-body">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex justify-between">
+                                <span class="text-secondary">外資持股</span>
+                                <span class="font-semibold">76.2%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">外資買賣超 (5D)</span>
+                                <span class="font-semibold positive">+12,543張</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">投信買賣超 (5D)</span>
+                                <span class="font-semibold positive">+2,156張</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">融資餘額變化</span>
+                                <span class="font-semibold negative">-856張</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-secondary">券資比</span>
+                                <span class="font-semibold">8.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue & Sector Comparison -->
+            <div class="via-grid via-grid-2">
+                <!-- Monthly Revenue -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">💹</span>
+                            <span>月營收趨勢</span>
+                        </div>
+                        <div class="via-card-actions">
+                            <button class="via-btn via-btn-ghost via-btn-sm" onclick="showModule('revenue')">完整分析 →</button>
+                        </div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="revenueChart" class="via-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Sector Heatmap -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">
+                            <span class="icon">🏭</span>
+                            <span>同業績效比較</span>
+                        </div>
+                        <div class="via-card-actions">
+                            <button class="via-btn via-btn-ghost via-btn-sm" onclick="showPage('sector')">詳細 →</button>
+                        </div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="sectorHeatmap" class="via-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════════
+             PAGE: RISK ANALYSIS
+        ═══════════════════════════════════════════════════════════════════════════════ -->
+        <div class="via-page" id="page-risk">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h1 class="h2">風險分析中心</h1>
+                    <p class="text-secondary">全面風險評估與監控</p>
+                </div>
+            </div>
+
+            <!-- Risk Overview -->
+            <div class="via-grid via-grid-4 mb-5">
+                <div class="via-metric">
+                    <div class="via-metric-label">綜合風險評分</div>
+                    <div class="via-metric-value risk-medium" id="riskScore">62</div>
+                    <div class="via-metric-change">中等風險</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">VaR (1D, 95%)</div>
+                    <div class="via-metric-value">-4.2%</div>
+                    <div class="via-metric-change">約 $25,000</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">CVaR (ES)</div>
+                    <div class="via-metric-value">-6.8%</div>
+                    <div class="via-metric-change">極端情境</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">最大回撤</div>
+                    <div class="via-metric-value negative">-18.3%</div>
+                    <div class="via-metric-change">過去 1 年</div>
+                </div>
+            </div>
+
+            <div class="via-grid via-grid-2 mb-5">
+                <!-- Risk Distribution -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📊 報酬分佈與 VaR</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="returnDistChart" class="via-chart via-chart-lg"></div>
+                    </div>
+                </div>
+
+                <!-- Risk Decomposition -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">🔍 風險因子分解</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="riskDecompChart" class="via-chart via-chart-lg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Correlation Matrix -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">🔗 資產相關性矩陣</div>
+                </div>
+                <div class="via-card-body">
+                    <div id="correlationMatrix" class="via-chart via-chart-lg"></div>
+                </div>
+            </div>
+
+            <!-- Risk Metrics Table -->
+            <div class="via-card">
+                <div class="via-card-header">
+                    <div class="via-card-title">📋 詳細風險指標</div>
+                </div>
+                <div class="via-card-body">
+                    <div class="via-table-container">
+                        <table class="via-table" id="riskMetricsTable">
+                            <thead>
+                                <tr>
+                                    <th>指標</th>
+                                    <th class="number">1 週</th>
+                                    <th class="number">1 月</th>
+                                    <th class="number">3 月</th>
+                                    <th class="number">1 年</th>
+                                    <th>評級</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>波動率 (年化)</td>
+                                    <td class="number">24.5%</td>
+                                    <td class="number">28.5%</td>
+                                    <td class="number">26.2%</td>
+                                    <td class="number">25.8%</td>
+                                    <td><span class="via-badge via-badge-warning">中等</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Beta</td>
+                                    <td class="number">1.12</td>
+                                    <td class="number">1.15</td>
+                                    <td class="number">1.08</td>
+                                    <td class="number">1.10</td>
+                                    <td><span class="via-badge">正常</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sharpe Ratio</td>
+                                    <td class="number positive">2.15</td>
+                                    <td class="number positive">1.85</td>
+                                    <td class="number positive">1.62</td>
+                                    <td class="number positive">1.45</td>
+                                    <td><span class="via-badge via-badge-success">優良</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sortino Ratio</td>
+                                    <td class="number positive">3.25</td>
+                                    <td class="number positive">2.85</td>
+                                    <td class="number positive">2.42</td>
+                                    <td class="number positive">2.15</td>
+                                    <td><span class="via-badge via-badge-success">優良</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Information Ratio</td>
+                                    <td class="number">0.85</td>
+                                    <td class="number">0.72</td>
+                                    <td class="number">0.68</td>
+                                    <td class="number">0.55</td>
+                                    <td><span class="via-badge">正常</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════════
+             PAGE: BACKTESTING
+        ═══════════════════════════════════════════════════════════════════════════════ -->
+        <div class="via-page" id="page-backtest">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h1 class="h2">策略回測引擎</h1>
+                    <p class="text-secondary">嚴格回測標準與策略驗證</p>
+                </div>
+                <button class="via-btn via-btn-primary" onclick="runBacktest()">▶️ 執行回測</button>
+            </div>
+
+            <!-- Backtest Config -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">⚙️ 回測參數設定</div>
+                </div>
+                <div class="via-card-body">
+                    <div class="via-grid via-grid-4 gap-4">
+                        <div class="via-form-group">
+                            <label class="via-label">起始日期</label>
+                            <input type="date" class="via-input" id="btStartDate" value="2020-01-01">
+                        </div>
+                        <div class="via-form-group">
+                            <label class="via-label">結束日期</label>
+                            <input type="date" class="via-input" id="btEndDate" value="2024-12-31">
+                        </div>
+                        <div class="via-form-group">
+                            <label class="via-label">初始資金</label>
+                            <input type="number" class="via-input" id="btCapital" value="1000000">
+                        </div>
+                        <div class="via-form-group">
+                            <label class="via-label">交易成本 (%)</label>
+                            <input type="number" class="via-input" id="btCost" value="0.1425" step="0.0001">
+                        </div>
+                    </div>
+                    <div class="via-grid via-grid-3 gap-4 mt-4">
+                        <div class="via-form-group">
+                            <label class="via-label">策略類型</label>
+                            <select class="via-input via-select" id="btStrategy">
+                                <option value="ma_cross">均線交叉</option>
+                                <option value="rsi">RSI 策略</option>
+                                <option value="macd">MACD 策略</option>
+                                <option value="bb">布林通道</option>
+                                <option value="momentum">動量策略</option>
+                                <option value="custom">自訂策略</option>
+                            </select>
+                        </div>
+                        <div class="via-form-group">
+                            <label class="via-label">基準指數</label>
+                            <select class="via-input via-select" id="btBenchmark">
+                                <option value="taiex">加權指數</option>
+                                <option value="otc">櫃買指數</option>
+                                <option value="sp500">S&P 500</option>
+                            </select>
+                        </div>
+                        <div class="via-form-group">
+                            <label class="via-label">滑價設定 (%)</label>
+                            <input type="number" class="via-input" id="btSlippage" value="0.05" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backtest Results -->
+            <div class="via-grid via-grid-6 mb-5" id="btResults">
+                <div class="via-metric">
+                    <div class="via-metric-label">累積報酬</div>
+                    <div class="via-metric-value positive" id="btReturn">+156.8%</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">年化報酬</div>
+                    <div class="via-metric-value positive" id="btCAGR">+26.4%</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">最大回撤</div>
+                    <div class="via-metric-value negative" id="btMaxDD">-18.3%</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">夏普比率</div>
+                    <div class="via-metric-value" id="btSharpe">1.85</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">勝率</div>
+                    <div class="via-metric-value" id="btWinRate">62.5%</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">盈虧比</div>
+                    <div class="via-metric-value" id="btProfitRatio">2.15</div>
+                </div>
+            </div>
+
+            <!-- Equity Curve -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">📈 權益曲線</div>
+                </div>
+                <div class="via-card-body">
+                    <div id="equityCurveChart" class="via-chart via-chart-lg"></div>
+                </div>
+            </div>
+
+            <!-- Drawdown & Monthly Returns -->
+            <div class="via-grid via-grid-2 mb-5">
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📉 回撤分析</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="drawdownChart" class="via-chart"></div>
+                    </div>
+                </div>
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📅 月度報酬熱圖</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="monthlyReturnHeatmap" class="via-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Log -->
+            <div class="via-card">
+                <div class="via-card-header">
+                    <div class="via-card-title">📋 交易記錄</div>
+                    <div class="via-card-actions">
+                        <button class="via-btn via-btn-secondary via-btn-sm" onclick="exportTrades()">📤 匯出</button>
+                    </div>
+                </div>
+                <div class="via-card-body">
+                    <div class="via-table-container" style="max-height: 400px; overflow-y: auto;">
+                        <table class="via-table" id="tradeLogTable">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>類型</th>
+                                    <th class="number">價格</th>
+                                    <th class="number">數量</th>
+                                    <th class="number">成本</th>
+                                    <th class="number">損益</th>
+                                    <th class="number">報酬率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tradeLogBody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════════
+             PAGE: VALUATION
+        ═══════════════════════════════════════════════════════════════════════════════ -->
+        <div class="via-page" id="page-valuation">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h1 class="h2">估值分析</h1>
+                    <p class="text-secondary">多維度估值模型與比較</p>
+                </div>
+            </div>
+
+            <!-- Valuation Summary -->
+            <div class="via-grid via-grid-4 mb-5">
+                <div class="via-metric">
+                    <div class="via-metric-label">目標價 (DCF)</div>
+                    <div class="via-metric-value">$685</div>
+                    <div class="via-metric-change positive">+15.1% 上漲空間</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">目標價 (相對估值)</div>
+                    <div class="via-metric-value">$640</div>
+                    <div class="via-metric-change positive">+7.6% 上漲空間</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">估值評級</div>
+                    <div class="via-metric-value">合理偏低</div>
+                    <div class="via-metric-change">目前位於 P/E -0.5σ</div>
+                </div>
+                <div class="via-metric">
+                    <div class="via-metric-label">安全邊際</div>
+                    <div class="via-metric-value positive">12.5%</div>
+                    <div class="via-metric-change">相對保守估值</div>
+                </div>
+            </div>
+
+            <!-- Valuation Models -->
+            <div class="via-grid via-grid-2 mb-5">
+                <!-- Valuation Table -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📊 估值倍數比較</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div class="via-table-container">
+                            <table class="via-table">
+                                <thead>
+                                    <tr>
+                                        <th>指標</th>
+                                        <th class="number">目前</th>
+                                        <th class="number">5年平均</th>
+                                        <th class="number">產業平均</th>
+                                        <th>評估</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>P/E (TTM)</td>
+                                        <td class="number">25.6x</td>
+                                        <td class="number">22.4x</td>
+                                        <td class="number">28.2x</td>
+                                        <td><span class="via-badge via-badge-success">低估</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Forward P/E</td>
+                                        <td class="number">21.2x</td>
+                                        <td class="number">—</td>
+                                        <td class="number">24.5x</td>
+                                        <td><span class="via-badge via-badge-success">低估</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>P/B</td>
+                                        <td class="number">6.82x</td>
+                                        <td class="number">5.45x</td>
+                                        <td class="number">4.20x</td>
+                                        <td><span class="via-badge via-badge-warning">高估</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>P/S</td>
+                                        <td class="number">9.85x</td>
+                                        <td class="number">8.20x</td>
+                                        <td class="number">7.50x</td>
+                                        <td><span class="via-badge">合理</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EV/EBITDA</td>
+                                        <td class="number">12.5x</td>
+                                        <td class="number">11.2x</td>
+                                        <td class="number">14.8x</td>
+                                        <td><span class="via-badge via-badge-success">低估</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>PEG Ratio</td>
+                                        <td class="number">1.42</td>
+                                        <td class="number">1.35</td>
+                                        <td class="number">1.85</td>
+                                        <td><span class="via-badge via-badge-success">低估</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PE Band Chart -->
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📈 P/E Band</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="peBandChart" class="via-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Statements Summary -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">📑 財務報表摘要</div>
+                    <div class="via-card-actions">
+                        <div class="via-tabs" style="border:none;">
+                            <button class="via-tab active" onclick="showFinancialTab('income')">損益表</button>
+                            <button class="via-tab" onclick="showFinancialTab('balance')">資產負債表</button>
+                            <button class="via-tab" onclick="showFinancialTab('cashflow')">現金流量表</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="via-card-body">
+                    <div class="via-table-container">
+                        <table class="via-table" id="financialTable">
+                            <thead>
+                                <tr>
+                                    <th>項目</th>
+                                    <th class="number">2024 Q3</th>
+                                    <th class="number">2024 Q2</th>
+                                    <th class="number">2024 Q1</th>
+                                    <th class="number">2023 Q4</th>
+                                    <th class="number">YoY</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financialBody">
+                                <tr>
+                                    <td>營業收入</td>
+                                    <td class="number">759,692</td>
+                                    <td class="number">673,515</td>
+                                    <td class="number">592,643</td>
+                                    <td class="number">625,528</td>
+                                    <td class="number positive">+33.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>營業毛利</td>
+                                    <td class="number">405,382</td>
+                                    <td class="number">359,626</td>
+                                    <td class="number">312,446</td>
+                                    <td class="number">334,032</td>
+                                    <td class="number positive">+35.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>毛利率</td>
+                                    <td class="number">53.4%</td>
+                                    <td class="number">53.4%</td>
+                                    <td class="number">52.7%</td>
+                                    <td class="number">53.4%</td>
+                                    <td class="number">+0.0pp</td>
+                                </tr>
+                                <tr>
+                                    <td>營業淨利</td>
+                                    <td class="number">325,258</td>
+                                    <td class="number">286,985</td>
+                                    <td class="number">241,562</td>
+                                    <td class="number">265,428</td>
+                                    <td class="number positive">+38.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>稅後淨利</td>
+                                    <td class="number">290,258</td>
+                                    <td class="number">247,845</td>
+                                    <td class="number">225,486</td>
+                                    <td class="number">238,325</td>
+                                    <td class="number positive">+32.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>EPS</td>
+                                    <td class="number">11.20</td>
+                                    <td class="number">9.56</td>
+                                    <td class="number">8.70</td>
+                                    <td class="number">9.21</td>
+                                    <td class="number positive">+34.2%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════════════
+             PAGE: SECTOR COMPARISON
+        ═══════════════════════════════════════════════════════════════════════════════ -->
+        <div class="via-page" id="page-sector">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h1 class="h2">同業族群比較</h1>
+                    <p class="text-secondary">產業競爭分析與相對表現</p>
+                </div>
+                <div class="flex gap-3">
+                    <select class="via-input via-select" id="sectorSelect" onchange="updateSectorComparison()" style="width:200px;">
+                        <option value="semiconductor">半導體</option>
+                        <option value="ic_design">IC 設計</option>
+                        <option value="foundry">晶圓代工</option>
+                        <option value="memory">記憶體</option>
+                        <option value="passive">被動元件</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sector Performance -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">📊 族群績效比較</div>
+                </div>
+                <div class="via-card-body">
+                    <div id="sectorPerformanceChart" class="via-chart via-chart-lg"></div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="via-card mb-5">
+                <div class="via-card-header">
+                    <div class="via-card-title">📋 關鍵指標比較</div>
+                    <div class="via-card-actions">
+                        <button class="via-btn via-btn-secondary via-btn-sm" onclick="exportSectorData()">📤 匯出</button>
+                    </div>
+                </div>
+                <div class="via-card-body">
+                    <div class="via-table-container">
+                        <table class="via-table" id="sectorComparisonTable">
+                            <thead>
+                                <tr>
+                                    <th>股票</th>
+                                    <th class="number">股價</th>
+                                    <th class="number">漲跌%</th>
+                                    <th class="number">市值 (億)</th>
+                                    <th class="number">P/E</th>
+                                    <th class="number">P/B</th>
+                                    <th class="number">ROE</th>
+                                    <th class="number">毛利率</th>
+                                    <th class="number">營收成長</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background:var(--info-bg);">
+                                    <td><strong>2330 台積電</strong></td>
+                                    <td class="number">595.00</td>
+                                    <td class="number positive">+2.35%</td>
+                                    <td class="number">154,233</td>
+                                    <td class="number">25.6x</td>
+                                    <td class="number">6.82x</td>
+                                    <td class="number">28.6%</td>
+                                    <td class="number">53.4%</td>
+                                    <td class="number positive">+33.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>2454 聯發科</td>
+                                    <td class="number">1,285.00</td>
+                                    <td class="number positive">+1.82%</td>
+                                    <td class="number">20,356</td>
+                                    <td class="number">18.2x</td>
+                                    <td class="number">4.25x</td>
+                                    <td class="number">24.5%</td>
+                                    <td class="number">48.2%</td>
+                                    <td class="number positive">+28.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>3711 日月光投控</td>
+                                    <td class="number">158.50</td>
+                                    <td class="number negative">-0.94%</td>
+                                    <td class="number">6,892</td>
+                                    <td class="number">14.5x</td>
+                                    <td class="number">2.15x</td>
+                                    <td class="number">15.2%</td>
+                                    <td class="number">18.5%</td>
+                                    <td class="number positive">+12.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>2303 聯電</td>
+                                    <td class="number">52.80</td>
+                                    <td class="number positive">+0.57%</td>
+                                    <td class="number">6,528</td>
+                                    <td class="number">12.8x</td>
+                                    <td class="number">1.85x</td>
+                                    <td class="number">14.8%</td>
+                                    <td class="number">32.5%</td>
+                                    <td class="number negative">-5.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>3034 聯詠</td>
+                                    <td class="number">485.00</td>
+                                    <td class="number positive">+2.11%</td>
+                                    <td class="number">2,956</td>
+                                    <td class="number">15.2x</td>
+                                    <td class="number">3.65x</td>
+                                    <td class="number">26.2%</td>
+                                    <td class="number">45.8%</td>
+                                    <td class="number positive">+18.5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Chart Comparison -->
+            <div class="via-grid via-grid-2">
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">🎯 多維度比較雷達圖</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="radarChart" class="via-chart"></div>
+                    </div>
+                </div>
+                <div class="via-card">
+                    <div class="via-card-header">
+                        <div class="via-card-title">📊 估值散佈圖</div>
+                    </div>
+                    <div class="via-card-body">
+                        <div id="valuationScatter" class="via-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Toast Container -->
+<div class="via-toast-container" id="toastContainer"></div>
+
+<!-- Loading Overlay -->
+<div class="via-loading" id="loading">
+    <div class="via-spinner"></div>
+    <div class="text-secondary" id="loadingText">載入中...</div>
+</div>
+
+<!-- Settings Modal -->
+<div class="via-modal-overlay" id="settingsModal">
+    <div class="via-modal" style="max-width:700px;">
+        <div class="via-modal-header">
+            <div class="via-modal-title">⚙️ 系統設定</div>
+            <button class="via-btn via-btn-ghost via-btn-icon" onclick="closeModal('settingsModal')">✕</button>
+        </div>
+        <div class="via-modal-body">
+            <div class="via-tabs mb-4">
+                <button class="via-tab active" onclick="showSettingsTab('general')">一般</button>
+                <button class="via-tab" onclick="showSettingsTab('data')">資料</button>
+                <button class="via-tab" onclick="showSettingsTab('display')">顯示</button>
+                <button class="via-tab" onclick="showSettingsTab('sync')">同步</button>
+            </div>
+            <div id="settingsContent">
+                <!-- General Settings -->
+                <div class="via-form-group">
+                    <label class="via-label">資料庫路徑</label>
+                    <input type="text" class="via-input" id="settingDbPath" value="./data/database">
+                </div>
+                <div class="via-form-group">
+                    <label class="via-label">匯出路徑</label>
+                    <input type="text" class="via-input" id="settingExportPath" value="./exports">
+                </div>
+                <div class="via-form-group">
+                    <div class="flex items-center justify-between">
+                        <label class="via-label" style="margin:0;">自動儲存</label>
+                        <label class="via-toggle">
+                            <input type="checkbox" id="settingAutoSave" checked>
+                            <span class="via-toggle-track"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="via-form-group">
+                    <div class="flex items-center justify-between">
+                        <label class="via-label" style="margin:0;">高效能模式</label>
+                        <label class="via-toggle">
+                            <input type="checkbox" id="settingHighPerf">
+                            <span class="via-toggle-track"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="via-modal-footer">
+            <button class="via-btn via-btn-secondary" onclick="closeModal('settingsModal')">取消</button>
+            <button class="via-btn via-btn-primary" onclick="saveSettings()">💾 儲存設定</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     JAVASCRIPT - CORE APPLICATION LOGIC
+═══════════════════════════════════════════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VERITA INTELLIGENCE ANALYTICS - CORE ENGINE
+// Version: 1.0.0 Enterprise
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// === SEABORN COLOR PALETTE ===
+const SEABORN = {
+    deep: ['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B3', '#937860', '#DA8BC3', '#8C8C8C'],
+    muted: ['#4878D0', '#EE854A', '#6ACC64', '#D65F5F', '#956CB4', '#8C613C', '#DC7EC0', '#797979'],
+    bright: ['#003FFF', '#FFC400', '#00D302', '#FF0000', '#8B00FF', '#9F4800', '#FF2C98', '#4D4D4D'],
+    pastel: ['#A1C9F4', '#FFB482', '#8DE5A1', '#FF9F9B', '#D0BBFF', '#DEBB9B', '#FAB0E4', '#CFCFCF'],
+    colorblind: ['#0173B2', '#DE8F05', '#029E73', '#D55E00', '#CC78BC', '#CA9161', '#FBAFE4', '#949494']
+};
+
+// === APPLICATION STATE ===
+const VIA = {
+    version: '1.0.0',
+    state: {
+        currentPage: 'dashboard',
+        currentStock: '2330',
+        dataSource: 'db',
+        settings: {},
+        cache: {},
+        modules: {}
+    },
+    
+    // Module registry for dynamic loading
+    modules: {
+        fundamental: { loaded: false, render: null },
+        technical: { loaded: false, render: null },
+        chip: { loaded: false, render: null },
+        revenue: { loaded: false, render: null },
+        risk: { loaded: false, render: null },
+        backtest: { loaded: false, render: null },
+        valuation: { loaded: false, render: null },
+        sector: { loaded: false, render: null }
+    },
+    
+    // Configuration schema for PowerShell sync
+    configSchema: {
+        paths: {
+            data: './data',
+            exports: './exports',
+            config: './config',
+            logs: './logs',
+            cache: './cache'
+        },
+        display: {
+            theme: 'light',
+            chartHeight: 400,
+            animationsEnabled: true
+        },
+        analysis: {
+            riskFreeRate: 0.02,
+            tradingDays: 252,
+            confidenceLevel: 0.95
+        }
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('VIA Enterprise v' + VIA.version + ' initializing...');
+    loadSettings();
+    initializeCharts();
+    updateStatus('ready');
+    console.log('VIA Enterprise ready');
+});
+
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem('via_settings');
+        if (saved) {
+            VIA.state.settings = JSON.parse(saved);
+        } else {
+            VIA.state.settings = VIA.configSchema;
+        }
+    } catch (e) {
+        console.warn('Failed to load settings:', e);
+        VIA.state.settings = VIA.configSchema;
+    }
+}
+
+function saveSettings() {
+    try {
+        localStorage.setItem('via_settings', JSON.stringify(VIA.state.settings));
+        showToast('設定已儲存', 'success');
+        closeModal('settingsModal');
+    } catch (e) {
+        showToast('儲存設定失敗', 'error');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════════
+function showPage(pageId) {
+    VIA.state.currentPage = pageId;
+    
+    // Update nav
+    document.querySelectorAll('.via-nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === pageId);
+    });
+    
+    // Show page
+    document.querySelectorAll('.via-page').forEach(page => {
+        page.classList.toggle('active', page.id === 'page-' + pageId);
+    });
+    
+    // Initialize page charts if needed
+    switch(pageId) {
+        case 'dashboard':
+            initDashboardCharts();
+            break;
+        case 'risk':
+            initRiskCharts();
+            break;
+        case 'backtest':
+            initBacktestCharts();
+            break;
+        case 'valuation':
+            initValuationCharts();
+            break;
+        case 'sector':
+            initSectorCharts();
+            break;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+function initializeCharts() {
+    initDashboardCharts();
+}
+
+function initDashboardCharts() {
+    renderPriceChart();
+    renderRiskGaugeChart();
+    renderRevenueChart();
+    renderSectorHeatmap();
+}
+
+function renderPriceChart() {
+    const dates = generateDateRange('2024-01-01', '2024-12-31');
+    const prices = generateRandomWalk(100, dates.length, 0.02);
+    const sma20 = calcSMA(prices, 20);
+    const sma60 = calcSMA(prices, 60);
+    const { upper, lower } = calcBollingerBands(prices, 20, 2);
+    
+    const traces = [
+        {
+            x: dates,
+            y: prices,
+            type: 'scatter',
+            mode: 'lines',
+            name: '股價',
+            line: { color: SEABORN.deep[0], width: 2 }
+        },
+        {
+            x: dates,
+            y: sma20,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'SMA20',
+            line: { color: SEABORN.deep[2], width: 1 }
+        },
+        {
+            x: dates,
+            y: sma60,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'SMA60',
+            line: { color: SEABORN.deep[4], width: 1 }
+        },
+        {
+            x: dates,
+            y: upper,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'BB Upper',
+            line: { color: SEABORN.pastel[0], width: 1, dash: 'dot' }
+        },
+        {
+            x: dates,
+            y: lower,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'BB Lower',
+            line: { color: SEABORN.pastel[0], width: 1, dash: 'dot' },
+            fill: 'tonexty',
+            fillcolor: 'rgba(161, 201, 244, 0.2)'
+        }
+    ];
+    
+    const layout = getChartLayout('', true);
+    layout.height = 450;
+    layout.legend = { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center' };
+    
+    Plotly.newPlot('priceChart', traces, layout, { responsive: true });
+}
+
+function renderRiskGaugeChart() {
+    const riskScore = 62;
+    
+    const trace = {
+        type: 'indicator',
+        mode: 'gauge+number',
+        value: riskScore,
+        gauge: {
+            axis: { range: [0, 100], tickwidth: 1 },
+            bar: { color: getRiskColor(riskScore) },
+            bgcolor: 'white',
+            borderwidth: 0,
+            steps: [
+                { range: [0, 30], color: 'rgba(85, 168, 104, 0.2)' },
+                { range: [30, 60], color: 'rgba(204, 185, 116, 0.2)' },
+                { range: [60, 80], color: 'rgba(221, 132, 82, 0.2)' },
+                { range: [80, 100], color: 'rgba(196, 78, 82, 0.2)' }
+            ],
+            threshold: {
+                line: { color: 'black', width: 2 },
+                thickness: 0.75,
+                value: riskScore
+            }
+        }
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 200,
+        margin: { t: 20, b: 20, l: 30, r: 30 }
+    };
+    
+    Plotly.newPlot('riskGaugeChart', [trace], layout, { responsive: true });
+}
+
+function renderRevenueChart() {
+    const months = ['2024/01', '2024/02', '2024/03', '2024/04', '2024/05', '2024/06', 
+                   '2024/07', '2024/08', '2024/09', '2024/10', '2024/11', '2024/12'];
+    const revenue = [592643, 618245, 598562, 625528, 652384, 673515, 
+                    698452, 721536, 759692, 785423, 812564, 845231];
+    const yoy = [15.2, 18.5, 12.3, 16.8, 22.4, 28.5, 32.1, 35.8, 33.2, 28.5, 25.2, 22.8];
+    
+    const traces = [
+        {
+            x: months,
+            y: revenue,
+            type: 'bar',
+            name: '月營收',
+            marker: { color: SEABORN.deep[0] },
+            yaxis: 'y'
+        },
+        {
+            x: months,
+            y: yoy,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'YoY%',
+            line: { color: SEABORN.deep[1], width: 2 },
+            marker: { size: 6 },
+            yaxis: 'y2'
+        }
+    ];
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 300,
+        yaxis: { title: '營收 (百萬)', showgrid: true, gridcolor: '#E8E7E4' },
+        yaxis2: { title: 'YoY %', overlaying: 'y', side: 'right', showgrid: false },
+        legend: { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center' },
+        bargap: 0.3
+    };
+    
+    Plotly.newPlot('revenueChart', traces, layout, { responsive: true });
+}
+
+function renderSectorHeatmap() {
+    const stocks = ['台積電', '聯發科', '日月光', '聯電', '聯詠'];
+    const metrics = ['報酬率', 'P/E', 'ROE', '毛利率', '成長率'];
+    
+    // Normalized values for heatmap
+    const values = [
+        [0.8, 0.6, 0.9, 0.85, 0.9],   // 台積電
+        [0.7, 0.75, 0.8, 0.75, 0.8],  // 聯發科
+        [0.4, 0.8, 0.5, 0.3, 0.5],    // 日月光
+        [0.3, 0.85, 0.45, 0.55, 0.2], // 聯電
+        [0.6, 0.8, 0.8, 0.7, 0.65]    // 聯詠
+    ];
+    
+    const trace = {
+        type: 'heatmap',
+        x: metrics,
+        y: stocks,
+        z: values,
+        colorscale: [
+            [0, '#C44E52'],
+            [0.5, '#FFFFFF'],
+            [1, '#55A868']
+        ],
+        showscale: true,
+        hoverongaps: false
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 300,
+        xaxis: { side: 'top' },
+        margin: { t: 60, b: 20, l: 80, r: 60 }
+    };
+    
+    Plotly.newPlot('sectorHeatmap', [trace], layout, { responsive: true });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RISK ANALYSIS CHARTS
+// ═══════════════════════════════════════════════════════════════════════════════
+function initRiskCharts() {
+    renderReturnDistribution();
+    renderRiskDecomposition();
+    renderCorrelationMatrix();
+}
+
+function renderReturnDistribution() {
+    const returns = generateNormalDistribution(0.0005, 0.02, 252);
+    const sortedReturns = [...returns].sort((a, b) => a - b);
+    const var95 = sortedReturns[Math.floor(0.05 * sortedReturns.length)];
+    const cvar95 = sortedReturns.slice(0, Math.floor(0.05 * sortedReturns.length))
+                                 .reduce((a, b) => a + b, 0) / Math.floor(0.05 * sortedReturns.length);
+    
+    const trace = {
+        x: returns,
+        type: 'histogram',
+        nbinsx: 50,
+        marker: { color: SEABORN.deep[0] },
+        name: '日報酬分佈'
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 400,
+        shapes: [
+            {
+                type: 'line',
+                x0: var95, x1: var95, y0: 0, y1: 1,
+                yref: 'paper',
+                line: { color: SEABORN.deep[3], width: 2, dash: 'dash' }
+            },
+            {
+                type: 'line',
+                x0: cvar95, x1: cvar95, y0: 0, y1: 1,
+                yref: 'paper',
+                line: { color: SEABORN.deep[1], width: 2, dash: 'dash' }
+            }
+        ],
+        annotations: [
+            {
+                x: var95, y: 0.95, yref: 'paper',
+                text: `VaR 95%: ${(var95 * 100).toFixed(2)}%`,
+                showarrow: true, arrowhead: 2
+            }
+        ]
+    };
+    
+    Plotly.newPlot('returnDistChart', [trace], layout, { responsive: true });
+}
+
+function renderRiskDecomposition() {
+    const factors = ['市場風險', '個股風險', '產業風險', '流動性風險', '匯率風險'];
+    const contributions = [45, 25, 15, 10, 5];
+    
+    const trace = {
+        type: 'pie',
+        labels: factors,
+        values: contributions,
+        hole: 0.4,
+        marker: { colors: SEABORN.deep },
+        textinfo: 'label+percent'
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 400,
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.1 }
+    };
+    
+    Plotly.newPlot('riskDecompChart', [trace], layout, { responsive: true });
+}
+
+function renderCorrelationMatrix() {
+    const assets = ['2330', '2454', '3711', '2303', '3034', 'TAIEX'];
+    const n = assets.length;
+    
+    // Generate correlation matrix
+    const corrMatrix = [];
+    for (let i = 0; i < n; i++) {
+        corrMatrix[i] = [];
+        for (let j = 0; j < n; j++) {
+            if (i === j) {
+                corrMatrix[i][j] = 1;
+            } else if (j > i) {
+                corrMatrix[i][j] = 0.3 + Math.random() * 0.5;
+            } else {
+                corrMatrix[i][j] = corrMatrix[j][i];
+            }
+        }
+    }
+    
+    const trace = {
+        type: 'heatmap',
+        x: assets,
+        y: assets,
+        z: corrMatrix,
+        colorscale: [
+            [0, SEABORN.deep[0]],
+            [0.5, '#FFFFFF'],
+            [1, SEABORN.deep[3]]
+        ],
+        zmin: -1,
+        zmax: 1,
+        showscale: true
+    };
+    
+    // Add annotations
+    const annotations = [];
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            annotations.push({
+                x: assets[j],
+                y: assets[i],
+                text: corrMatrix[i][j].toFixed(2),
+                font: { color: Math.abs(corrMatrix[i][j]) > 0.5 ? 'white' : 'black', size: 10 },
+                showarrow: false
+            });
+        }
+    }
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 450,
+        annotations: annotations
+    };
+    
+    Plotly.newPlot('correlationMatrix', [trace], layout, { responsive: true });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BACKTEST CHARTS
+// ═══════════════════════════════════════════════════════════════════════════════
+function initBacktestCharts() {
+    renderEquityCurve();
+    renderDrawdownChart();
+    renderMonthlyReturnHeatmap();
+    populateTradeLog();
+}
+
+function renderEquityCurve() {
+    const dates = generateDateRange('2020-01-01', '2024-12-31');
+    const equity = generateRandomWalk(1000000, dates.length, 0.001);
+    const benchmark = generateRandomWalk(1000000, dates.length, 0.0008);
+    
+    const traces = [
+        {
+            x: dates,
+            y: equity,
+            type: 'scatter',
+            mode: 'lines',
+            name: '策略淨值',
+            line: { color: SEABORN.deep[0], width: 2 }
+        },
+        {
+            x: dates,
+            y: benchmark,
+            type: 'scatter',
+            mode: 'lines',
+            name: '基準指數',
+            line: { color: SEABORN.deep[7], width: 1.5, dash: 'dash' }
+        }
+    ];
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 400,
+        legend: { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center' },
+        yaxis: { title: '淨值', tickformat: ',.0f' }
+    };
+    
+    Plotly.newPlot('equityCurveChart', traces, layout, { responsive: true });
+}
+
+function renderDrawdownChart() {
+    const dates = generateDateRange('2020-01-01', '2024-12-31');
+    const drawdown = dates.map(() => -Math.random() * 0.2);
+    
+    const trace = {
+        x: dates,
+        y: drawdown,
+        type: 'scatter',
+        mode: 'lines',
+        fill: 'tozeroy',
+        fillcolor: 'rgba(196, 78, 82, 0.3)',
+        line: { color: SEABORN.deep[3], width: 1 },
+        name: '回撤'
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 280,
+        yaxis: { title: '回撤 %', tickformat: '.1%' }
+    };
+    
+    Plotly.newPlot('drawdownChart', [trace], layout, { responsive: true });
+}
+
+function renderMonthlyReturnHeatmap() {
+    const years = ['2020', '2021', '2022', '2023', '2024'];
+    const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    
+    const returns = years.map(() => 
+        months.map(() => (Math.random() - 0.4) * 0.2)
+    );
+    
+    const trace = {
+        type: 'heatmap',
+        x: months,
+        y: years,
+        z: returns,
+        colorscale: [
+            [0, SEABORN.deep[3]],
+            [0.5, '#FFFFFF'],
+            [1, SEABORN.deep[2]]
+        ],
+        zmin: -0.15,
+        zmax: 0.15,
+        showscale: true
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 280,
+        xaxis: { side: 'top' }
+    };
+    
+    Plotly.newPlot('monthlyReturnHeatmap', [trace], layout, { responsive: true });
+}
+
+function populateTradeLog() {
+    const tbody = document.getElementById('tradeLogBody');
+    const trades = [
+        { date: '2024-12-20', type: '買進', price: 585, qty: 1000, cost: 834, pnl: 9166, ret: 1.54 },
+        { date: '2024-12-15', type: '賣出', price: 592, qty: 500, cost: 422, pnl: 3578, ret: 1.22 },
+        { date: '2024-12-10', type: '買進', price: 578, qty: 1000, cost: 824, pnl: -2176, ret: -0.37 },
+        { date: '2024-12-05', type: '賣出', price: 588, qty: 1500, cost: 1258, pnl: 15742, ret: 1.79 },
+        { date: '2024-12-01', type: '買進', price: 572, qty: 2000, cost: 1632, pnl: 28368, ret: 2.48 }
+    ];
+    
+    tbody.innerHTML = trades.map(t => `
+        <tr>
+            <td>${t.date}</td>
+            <td><span class="via-badge ${t.type === '買進' ? 'via-badge-success' : 'via-badge-error'}">${t.type}</span></td>
+            <td class="number">$${t.price.toFixed(2)}</td>
+            <td class="number">${t.qty.toLocaleString()}</td>
+            <td class="number">$${t.cost.toLocaleString()}</td>
+            <td class="number ${t.pnl >= 0 ? 'positive' : 'negative'}">$${t.pnl.toLocaleString()}</td>
+            <td class="number ${t.ret >= 0 ? 'positive' : 'negative'}">${t.ret >= 0 ? '+' : ''}${t.ret.toFixed(2)}%</td>
+        </tr>
+    `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VALUATION CHARTS
+// ═══════════════════════════════════════════════════════════════════════════════
+function initValuationCharts() {
+    renderPEBandChart();
+}
+
+function renderPEBandChart() {
+    const dates = generateDateRange('2019-01-01', '2024-12-31');
+    const price = generateRandomWalk(400, dates.length, 0.015);
+    
+    const peRatios = [15, 20, 25, 30, 35];
+    const eps = 23.5;
+    
+    const traces = [
+        {
+            x: dates,
+            y: price,
+            type: 'scatter',
+            mode: 'lines',
+            name: '股價',
+            line: { color: SEABORN.deep[0], width: 2 }
+        },
+        ...peRatios.map((pe, i) => ({
+            x: dates,
+            y: dates.map(() => pe * eps),
+            type: 'scatter',
+            mode: 'lines',
+            name: `P/E ${pe}x`,
+            line: { color: SEABORN.pastel[i], width: 1, dash: 'dash' }
+        }))
+    ];
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 300,
+        legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' }
+    };
+    
+    Plotly.newPlot('peBandChart', traces, layout, { responsive: true });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTOR CHARTS
+// ═══════════════════════════════════════════════════════════════════════════════
+function initSectorCharts() {
+    renderSectorPerformanceChart();
+    renderRadarChart();
+    renderValuationScatter();
+}
+
+function renderSectorPerformanceChart() {
+    const dates = generateDateRange('2024-01-01', '2024-12-31');
+    const stocks = ['2330 台積電', '2454 聯發科', '3711 日月光', '2303 聯電', '3034 聯詠'];
+    
+    const traces = stocks.map((stock, i) => ({
+        x: dates,
+        y: generateRandomWalk(100, dates.length, 0.02).map(v => (v / 100 - 1) * 100),
+        type: 'scatter',
+        mode: 'lines',
+        name: stock,
+        line: { color: SEABORN.deep[i], width: 2 }
+    }));
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 400,
+        yaxis: { title: '累積報酬 %', ticksuffix: '%' },
+        legend: { orientation: 'h', y: 1.15, x: 0.5, xanchor: 'center' }
+    };
+    
+    Plotly.newPlot('sectorPerformanceChart', traces, layout, { responsive: true });
+}
+
+function renderRadarChart() {
+    const categories = ['獲利能力', '成長性', '安全性', '估值', '籌碼'];
+    
+    const trace1 = {
+        type: 'scatterpolar',
+        r: [85, 90, 75, 70, 80],
+        theta: categories,
+        fill: 'toself',
+        fillcolor: 'rgba(76, 114, 176, 0.3)',
+        line: { color: SEABORN.deep[0] },
+        name: '台積電'
+    };
+    
+    const trace2 = {
+        type: 'scatterpolar',
+        r: [75, 85, 65, 80, 70],
+        theta: categories,
+        fill: 'toself',
+        fillcolor: 'rgba(221, 132, 82, 0.3)',
+        line: { color: SEABORN.deep[1] },
+        name: '聯發科'
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 300,
+        polar: {
+            radialaxis: { visible: true, range: [0, 100] }
+        },
+        showlegend: true
+    };
+    
+    Plotly.newPlot('radarChart', [trace1, trace2], layout, { responsive: true });
+}
+
+function renderValuationScatter() {
+    const stocks = ['台積電', '聯發科', '日月光', '聯電', '聯詠'];
+    const pe = [25.6, 18.2, 14.5, 12.8, 15.2];
+    const roe = [28.6, 24.5, 15.2, 14.8, 26.2];
+    const marketCap = [154233, 20356, 6892, 6528, 2956];
+    
+    const trace = {
+        x: pe,
+        y: roe,
+        mode: 'markers+text',
+        type: 'scatter',
+        text: stocks,
+        textposition: 'top center',
+        marker: {
+            size: marketCap.map(m => Math.sqrt(m) / 10),
+            color: SEABORN.deep,
+            opacity: 0.7
+        }
+    };
+    
+    const layout = {
+        ...getChartLayout(''),
+        height: 300,
+        xaxis: { title: 'P/E Ratio' },
+        yaxis: { title: 'ROE %' }
+    };
+    
+    Plotly.newPlot('valuationScatter', [trace], layout, { responsive: true });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CALCULATION UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════════
+function calcSMA(data, period) {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) {
+            result.push(null);
+        } else {
+            const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+            result.push(sum / period);
+        }
+    }
+    return result;
+}
+
+function calcBollingerBands(data, period, std) {
+    const sma = calcSMA(data, period);
+    const upper = [], lower = [];
+    
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) {
+            upper.push(null);
+            lower.push(null);
+        } else {
+            const slice = data.slice(i - period + 1, i + 1);
+            const mean = slice.reduce((a, b) => a + b, 0) / period;
+            const variance = slice.reduce((a, b) => a + (b - mean) ** 2, 0) / period;
+            const stdDev = Math.sqrt(variance);
+            upper.push(mean + std * stdDev);
+            lower.push(mean - std * stdDev);
+        }
+    }
+    return { upper, lower, middle: sma };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA GENERATION UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════════
+function generateDateRange(start, end) {
+    const dates = [];
+    let current = new Date(start);
+    const endDate = new Date(end);
+    
+    while (current <= endDate) {
+        if (current.getDay() !== 0 && current.getDay() !== 6) {
+            dates.push(current.toISOString().split('T')[0]);
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    return dates;
+}
+
+function generateRandomWalk(start, length, volatility) {
+    const result = [start];
+    for (let i = 1; i < length; i++) {
+        const change = (Math.random() - 0.48) * volatility * result[i - 1];
+        result.push(result[i - 1] + change);
+    }
+    return result;
+}
+
+function generateNormalDistribution(mean, std, count) {
+    const result = [];
+    for (let i = 0; i < count; i++) {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        result.push(mean + std * z);
+    }
+    return result;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI UTILITIES
+// ═══════════════════════════════════════════════════════════════════════════════
+function getChartLayout(title, showRangeslider = false) {
+    return {
+        title: title,
+        font: { family: 'Inter, Noto Sans TC, sans-serif', size: 11, color: '#37352F' },
+        paper_bgcolor: '#FFFFFF',
+        plot_bgcolor: '#FFFFFF',
+        margin: { t: 40, r: 40, b: showRangeslider ? 80 : 40, l: 50 },
+        xaxis: {
+            showgrid: true,
+            gridcolor: '#E8E7E4',
+            linecolor: '#E8E7E4',
+            rangeslider: { visible: showRangeslider }
+        },
+        yaxis: {
+            showgrid: true,
+            gridcolor: '#E8E7E4',
+            linecolor: '#E8E7E4'
+        },
+        hovermode: 'x unified'
+    };
+}
+
+function getRiskColor(score) {
+    if (score < 30) return SEABORN.deep[2]; // Green - Low
+    if (score < 60) return SEABORN.deep[5]; // Brown/Yellow - Medium
+    if (score < 80) return SEABORN.deep[1]; // Orange - High
+    return SEABORN.deep[3]; // Red - Critical
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'via-toast via-toast-' + type;
+    toast.innerHTML = `
+        <span style="font-size:16px;">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+        <span>${message}</span>
+    `;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function showLoading(text = '載入中...') {
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loading').classList.add('show');
+}
+
+function hideLoading() {
+    document.getElementById('loading').classList.remove('show');
+}
+
+function openModal(id) {
+    document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+}
+
+function updateStatus(status) {
+    console.log('Status:', status);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ACTION HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════════
+function showSettings() {
+    openModal('settingsModal');
+}
+
+function syncData() {
+    showLoading('同步資料中...');
+    setTimeout(() => {
+        hideLoading();
+        showToast('資料同步完成', 'success');
+    }, 1500);
+}
+
+function runDiagnostics() {
+    showToast('執行診斷測試...', 'info');
+    setTimeout(() => {
+        showToast('所有測試通過', 'success');
+    }, 2000);
+}
+
+function generateReport() {
+    showLoading('生成報告中...');
+    setTimeout(() => {
+        hideLoading();
+        showToast('報告已生成', 'success');
+    }, 2000);
+}
+
+function setDataSource(source) {
+    VIA.state.dataSource = source;
+    document.querySelectorAll('.via-sidebar-menu .via-menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    showToast('資料來源已切換', 'info');
+}
+
+function selectStock(ticker) {
+    VIA.state.currentStock = ticker;
+    showToast('已選擇 ' + ticker, 'info');
+    refreshDashboard();
+}
+
+function searchStock(query) {
+    // Implement stock search
+    console.log('Searching:', query);
+}
+
+function showModule(module) {
+    showToast('開啟 ' + module + ' 模組', 'info');
+}
+
+function refreshDashboard() {
+    showLoading('更新儀表板...');
+    setTimeout(() => {
+        initDashboardCharts();
+        hideLoading();
+    }, 1000);
+}
+
+function updateDashboard() {
+    refreshDashboard();
+}
+
+function toggleIndicator(indicator) {
+    showToast('切換 ' + indicator + ' 指標', 'info');
+}
+
+function runBacktest() {
+    showLoading('執行回測中...');
+    setTimeout(() => {
+        initBacktestCharts();
+        hideLoading();
+        showToast('回測完成', 'success');
+    }, 2000);
+}
+
+function exportTrades() {
+    showToast('交易記錄已匯出', 'success');
+}
+
+function showFinancialTab(tab) {
+    showToast('切換至 ' + tab, 'info');
+}
+
+function updateSectorComparison() {
+    showLoading('載入族群資料...');
+    setTimeout(() => {
+        initSectorCharts();
+        hideLoading();
+    }, 1000);
+}
+
+function exportSectorData() {
+    showToast('族群資料已匯出', 'success');
+}
+
+function showSettingsTab(tab) {
+    // Implement settings tab switching
+}
+
+function loadDemoData() {
+    showLoading('載入範例資料...');
+    setTimeout(() => {
+        hideLoading();
+        showToast('範例資料已載入', 'success');
+        refreshDashboard();
+    }, 1500);
+}
+
+function exportConfig() {
+    const config = JSON.stringify(VIA.state.settings, null, 2);
+    const blob = new Blob([config], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'via_config.json';
+    a.click();
+    showToast('設定檔已匯出', 'success');
+}
+
+function importConfig() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                VIA.state.settings = JSON.parse(event.target.result);
+                saveSettings();
+                showToast('設定檔已匯入', 'success');
+            } catch (err) {
+                showToast('設定檔格式錯誤', 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+{
+ "generated_at": "2026-08-30 19:00",
+ "engine": "VAP_ENG010_ChartLibrarySSOT_v0100",
+ "sources": {
+  "chart_library": {
+   "file": "VAP_Chart_Library (1).json",
+   "state": "OK",
+   "via_code": "VIA-M-VAPLIB"
+  },
+  "workflow_spec": {
+   "file": "VIA_VAP_User_Workflow_Spec_v023.json",
+   "state": "OK",
+   "via_code": null
+  }
+ },
+ "validation": {
+  "chart_library": {
+   "rows": [
+    {
+     "scope": "defaults",
+     "key": "palette",
+     "val": "via",
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "lineWidth",
+     "val": 1,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "lineOpacity",
+     "val": 0.9,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "fillOpacity",
+     "val": 0.4,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "frame",
+     "val": true,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "grid",
+     "val": true,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "zoom",
+     "val": true,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "evtLw",
+     "val": 0.8,
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "evtV",
+     "val": "red-grey",
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "evtH",
+     "val": "grey-red",
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "dateMode",
+     "val": "normalized",
+     "state": "OK"
+    },
+    {
+     "scope": "defaults",
+     "key": "smallMultiples",
+     "val": "2x2",
+     "state": "OK"
+    }
+   ],
+   "violations": 0
+  },
+  "workflow_spec": {
+   "rows": [],
+   "violations": 0
+  }
+ },
+ "runtime": {
+  "defaults": {
+   "palette": "via",
+   "lineWidth": 1,
+   "lineOpacity": 0.9,
+   "fillOpacity": 0.4,
+   "frame": true,
+   "grid": true,
+   "zoom": true,
+   "evtLw": 0.8,
+   "evtV": "red-grey",
+   "evtH": "grey-red",
+   "dateMode": "normalized",
+   "smallMultiples": "2x2"
+  },
+  "lock": {
+   "visual": true,
+   "charts": []
+  },
+  "layout": {
+   "preset": "standard",
+   "cols": "auto",
+   "height": 150
+  },
+  "db": [
+   "TWSE 台灣證交所",
+   "TPEX 櫃買中心",
+   "SITCA 投信投顧公會",
+   "MOPS 公開資訊觀測站",
+   "yfinance",
+   "FactSet (keyed)",
+   "FRED",
+   "EPFR",
+   "HKEX 港交所"
+  ],
+  "compose": {
+   "mode": "single",
+   "form": "line",
+   "L": [
+    "cpi"
+   ],
+   "Rr": [
+    "ust10"
+   ],
+   "stack": [
+    "ismm",
+    "isms",
+    "unrate"
+   ],
+   "saved": []
+  },
+  "sap_msp_align_locked": [
+   {
+    "ext": "Plotly graph_objects",
+    "tcode": "go.* / make_subplots",
+    "lock": true,
+    "via": "VAP-CH-01..24",
+    "note": "生產渲染引擎 · 對齊不改寫"
+   },
+   {
+    "ext": "SAP GRAPH_MATRIX",
+    "tcode": "SE38/GRAL",
+    "lock": true,
+    "via": "VAP-CH-01..16",
+    "note": "圖型庫對齊 · VIA 別名"
+   },
+   {
+    "ext": "SAP LIST_VIEWER (ALV)",
+    "tcode": "SALV",
+    "lock": true,
+    "via": "VAP-CH-03/04/07",
+    "note": "條狀/堆疊對齊"
+   },
+   {
+    "ext": "MSP Gantt/Timeline",
+    "tcode": "MSP-VIEW-01",
+    "lock": true,
+    "via": "VAP-CH-09",
+    "note": "個別小圖對齊"
+   }
+  ]
+ },
+ "qa_report": {
+  "file": "VIA_VAP_v023_QA_Report.json",
+  "state": "PRESENT"
+ },
+ "verdict": "GREEN"
+}

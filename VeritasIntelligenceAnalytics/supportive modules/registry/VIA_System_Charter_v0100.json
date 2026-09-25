@@ -1,0 +1,180 @@
+{
+ "schema": "VIA_SYSTEM_CHARTER_V1",
+ "version": "v0100",
+ "append_only": true,
+ "source": "操作員批175 口述定義正典(2026-08-26;原文照錄+繁中正規化;零發明)",
+ "policy": "四系統憲章=能力面單一正主。往後新引擎歸屬/能力宣告以本冊為準;能力對照稽核(CGC_MDL091)逐項誠實標 COVERED/PARTIAL/GAP,GAP 入問題台帳不假綠。",
+ "systems": {
+  "CGC": {
+   "name": "VIA Central Governance",
+   "operator_text": "VIA Central Governance is a mother system platform which controlled subsystem, supportive toolkit modules, SSOT regex 同意字, and automatically downward to review and synchronize SSOT connection between all modules and virtual environment libs conflicts in a gate to all the following module.",
+   "zh": "母系統平台:控制子系統與支援工具模組、SSOT regex 同意字;自動向下審查並同步全模組間 SSOT 連結;虛擬環境庫衝突閘=後續一切模組之門。",
+   "capabilities": [
+    {
+     "id": "CGC-1",
+     "zh": "子系統控制",
+     "engines": [
+      "CGC_MDL081_SubsystemManagerV2",
+      "CGC_MDL082_MasterAutorun",
+      "CGC_MDL075_CentralGov"
+     ]
+    },
+    {
+     "id": "CGC-2",
+     "zh": "支援工具模組治理",
+     "engines": [
+      "CGC_MDL068_SupportImportAudit",
+      "via_bridge_sweeper"
+     ]
+    },
+    {
+     "id": "CGC-3",
+     "zh": "SSOT regex 同意字冊",
+     "engines": [
+      "via_ssot_evolve 引擎(bin/via-ssot-evolve 動詞)",
+      "CGC_MDL084_GovTriage 議題分圈",
+      "VRN_ENG063_Lexicon 字庫知識樹"
+     ]
+    },
+    {
+     "id": "CGC-4",
+     "zh": "向下審查+SSOT 連結同步",
+     "engines": [
+      "CGC_MDL054_IfaceContract",
+      "xcheck SSOT 對齊",
+      "CGC_MDL064_SelftestGrid"
+     ]
+    },
+    {
+     "id": "CGC-5",
+     "zh": "虛擬環境庫衝突閘",
+     "engines": [
+      "CGC_MDL056_InstallGate",
+      "CGC_MDL046_DepSuper 依賴統包",
+      "via_conflict_guard 衝突哨兵",
+      "via_boot_update.sh ⓪環境自補"
+     ]
+    }
+   ]
+  },
+  "VDF": {
+   "name": "VDF 資料工廠",
+   "operator_text": "VDF is macro economic investment, and finance database controlling system, which ensure API connection maintain data automatically and you can add data if you want by this platform and display the status of api and database.",
+   "zh": "總體經濟×投資×金融資料庫控制系統:確保 API 連線、自動維護資料;可經平台自行加資料;顯示 API 與資料庫狀態。",
+   "capabilities": [
+    {
+     "id": "VDF-1",
+     "zh": "API 連線確保+自動維護資料",
+     "engines": [
+      "VDF_ENG055_OmniFetch",
+      "VDF_ENG054",
+      "VDF_ENG056",
+      "VDF_ENG057",
+      "SUP_MDL740",
+      "SUP_MDL741",
+      "via_boot_update.sh 日更①-⑧"
+     ]
+    },
+    {
+     "id": "VDF-2",
+     "zh": "平台加資料(操作員自加)",
+     "engines": [
+      "VRN_ENG050_ContentStore 落庫",
+      "CGC_MDL057_Intake 收編管線",
+      "VDF_ENG052_MegaFetch"
+     ]
+    },
+    {
+     "id": "VDF-3",
+     "zh": "API+資料庫狀態顯示",
+     "engines": [
+      "VDF_ENG055 --status 對帳",
+      "CGC_MDL090_SystemHub ②資料面",
+      "VRN_ENG068_DailyBrief ②鮮度"
+     ]
+    }
+   ]
+  },
+  "VRN": {
+   "name": "VRN 報告智能",
+   "operator_text": "VRN is system which can read fetch content of data from PDF and word of stock report, and transform them into validated database in two groups: basic info and financial data.",
+   "zh": "讀取擷取 PDF/Word 個股報告內容,轉換為經驗證之資料庫,分兩群:基本資訊、財務數據。",
+   "capabilities": [
+    {
+     "id": "VRN-1",
+     "zh": "PDF/Word 內容讀取擷取",
+     "engines": [
+      "VRN_ENG056_PdfForensics",
+      "VRN_ENG052_DocxEngine",
+      "VRN_ENG057_ScanOcrRescue",
+      "PLG_ENG001_SuperExtract(SuperDocExtractor)"
+     ]
+    },
+    {
+     "id": "VRN-2",
+     "zh": "基本資訊群(驗證入庫)",
+     "engines": [
+      "vrn_report_digest 十一欄(官方名/代碼/市場/券商/評等/目標價)",
+      "TW01 代碼橋"
+     ]
+    },
+    {
+     "id": "VRN-3",
+     "zh": "財務數據群(驗證入庫)",
+     "engines": [
+      "vrn_finaudit 財務驗算稽核",
+      "vrn_fin_extract 年度擷取器",
+      "VRN_ENG050_ContentStore content_canon/table_cells"
+     ]
+    }
+   ]
+  },
+  "VAP": {
+   "name": "VAP 自動繪圖",
+   "operator_text": "VAP is a visual manager system with analytic functions. It connect to database of PDF and connected with Talib module to create one axis and two axis plots from plotly and seaborn, and maintain or output the analysis plots we created and keep connecting with database.",
+   "zh": "視覺管理系統含分析函數:連接 PDF 資料庫、接 Talib 模組;以 plotly 與 seaborn 產單軸/雙軸圖;維護/輸出既有分析圖並持續連接資料庫。",
+   "capabilities": [
+    {
+     "id": "VAP-1",
+     "zh": "資料庫連接(PDF 庫+行情庫)",
+     "engines": [
+      "VAP v007 DuckDB/Parquet mount --sql",
+      "VAP_ENG009 Dashboard 三層"
+     ]
+    },
+    {
+     "id": "VAP-2",
+     "zh": "TA 模組(Talib 車道)",
+     "engines": [
+      "VAP_ENG004_TAFactory indicator_roster 11 指標(自建正主)",
+      "talib C 庫=候裝(via-install 閘;缺=誠實 GAP 側)"
+     ]
+    },
+    {
+     "id": "VAP-3",
+     "zh": "單軸/雙軸圖(plotly+seaborn)",
+     "engines": [
+      "VAP_ENG003_AutoplotSeabornPlotly",
+      "VAP_ENG001_AutoplotEngineChartlib 38 函數",
+      "VAP_ENG002 --panels 雙軸共時軸"
+     ]
+    },
+    {
+     "id": "VAP-4",
+     "zh": "圖維護/輸出+資料庫常連",
+     "engines": [
+      "VAP_ENG005_TemplateRunner",
+      "VAP_ENG006_AcceptanceAudit",
+      "vap_spec_guard 圖規鎖守衛"
+     ]
+    }
+   ]
+  }
+ },
+ "platform_doctrine": {
+  "batch": 176,
+  "operator_text": "VDF VRN VAP provide a solid infrastructure for data analyzing, they fetch data and create database, transform data in the stock report into verified consensus database, and provide professional plotting functions like macromicro. Supportive toolkits enable them, and VIA centrally managed and synchronized them. All the template is not the topic we have to do now; in the future the templates all get data from this database to do the analysis.",
+  "zh": "三功能系統=資料分析堅實基礎設施:擷取資料建庫→報告資料轉『驗證共識資料庫』→MacroMicro 級專業繪圖函數。支援工具賦能之,VIA 中央管理並同步之。模板非當前工作重點;未來一切模板皆自本資料庫取數進行分析。",
+  "priority_ruling": "庫優先(schema/驗證/共識/日更)>分析函數>模板 UI(凍結現狀,只維持同步不擴建)"
+ }
+}

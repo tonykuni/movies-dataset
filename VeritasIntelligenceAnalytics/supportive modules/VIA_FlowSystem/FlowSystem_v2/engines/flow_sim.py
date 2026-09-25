@@ -5,6 +5,20 @@ README v0111-v0116:自含 SVG(零 Plotly/CDN)· 三維合一(區域/風險層/�
 84 步時間軸插值 · 區間累積(prefix-sum)· 評價 V=(ER−λ·風險)/成本 · 自動結論。
 FM#1/#2:ground_loadings() 由真實 FIS panel 回歸估 RISK 載荷(標 estimated/prior)。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json
 import math
 from pathlib import Path

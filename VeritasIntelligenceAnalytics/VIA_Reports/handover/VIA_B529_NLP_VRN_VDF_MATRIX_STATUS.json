@@ -1,0 +1,31 @@
+{
+  "schema": "VIA.B529.NLPVRNVDFMatrixStatus.v1",
+  "batch": "B529",
+  "as_of": "2026-09-16T10:53:30Z",
+  "engine": "VRN_ENG087_NLPTextSummaryBridge_v0100",
+  "run_id": "B529-20260916T105325-68faf473",
+  "verdict": "YELLOW",
+  "gates": {
+    "input": {"state": "PASS", "count": 2},
+    "eng072": {"state": "PASS", "returncode": 0, "sidecars": 2},
+    "nlp": {"state": "PASS", "hub": "VERIFIED", "services": "6/6", "processed": 2, "summary_ok": 2, "evidence_spans_valid": true},
+    "eng073": {"state": "PASS", "returncode": 0},
+    "duckdb": {"state": "GREEN", "path": "functional modules/VRN/db/vrn_reports.duckdb", "vrn_nlp_text_summary": 2, "vrn_pipeline_runs": 4},
+    "vdf": {"state": "BLOCKED", "verdict": "RED", "stock_universe": "2024-01-02 > required 2023-01-01", "active_etf": "GREEN", "hot_story_groups": "GREEN"}
+  },
+  "reports": {
+    "latest_html": "VIA_Reports/vrn/nlp_pipeline/NLP_VRN_VDF_latest.html",
+    "latest_json": "VIA_Reports/vrn/nlp_pipeline/NLP_VRN_VDF_latest.json",
+    "latest_markdown": "VIA_Reports/vrn/nlp_pipeline/NLP_VRN_VDF_latest.md",
+    "run_dir": "VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473"
+  },
+  "central_registration": {
+    "input_console_item": "vrn_nlp_vrn_vdf_pipeline",
+    "workflow": "vrn_nlp_vdf_pipeline",
+    "interface_state": "OK_FOR_NEW_ITEM; 6 PREEXISTING DRIFT ITEMS REMAIN",
+    "vcgc_registry_sync": {"active_components": 4983, "new": 5, "changed": 23, "retired": 0, "ast_errors": 0},
+    "workflow_selftest": "12/12",
+    "vcgc_selftest": "19/19"
+  },
+  "policy": "VDF non-GREEN remains YELLOW; no false-green; report outputs are HTML+JSON+Markdown; network OFF_BY_DEFAULT"
+}

@@ -1,0 +1,1161 @@
+<!doctype html>
+<!--
+================================================================================
+ VIA DASHBOARD · D01 Home · v2 · Global Overview (Two-Screen Layered)
+================================================================================
+ ASSET_ID         : AST-HTML-TPL-VIA-800-001  (revision: v2.0.0)
+ DISPLAY          : SYS_VIA.MDL800.DASH-HOME-P1
+ VERSION          : 2.0.0          STATUS : stable
+ LANGUAGE         : HTML5 / CSS3 / Vanilla JS (ES2020)
+ ANCHORS          : D01-HEAD / D01-STYLE / D01-TOPBAR / D01-RISKBAR
+                    D01-MARKET / D01-REASON / D01-MACRO / D01-EVENTS
+                    D01-WATCHLIST / D01-FOOTER / D01-SCRIPT
+ LOCK ANCESTOR    : AST-HTML-TPL-VIA-700-001 (T08 Watchlist)
+                    VAP_MultiCompare / VAP_NVDA_VDF / VAP_SMH_Flow
+ PATTERN PARENT   : T05_VerticalStack · T06_Dashboard · T07_EventMatrix
+ INFORMATION HIERARCHY (per VIA dashboard ordering doctrine):
+   control & status  →  core market trend  →  cause analysis
+   →  watchlist (sidebar)  →  macro monitor  →  events & news
+================================================================================
+-->
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440, initial-scale=1.0" />
+
+  <!-- ANCHOR[VIA:ANCHOR:D01-HEAD] -->
+  <meta name="vaos-asset-id"       content="AST-HTML-TPL-VIA-800-001" />
+  <meta name="vaos-display"        content="SYS_VIA.MDL800.DASH-HOME-P1" />
+  <meta name="vaos-version"        content="2.0.0" />
+  <meta name="vaos-status"         content="stable" />
+  <meta name="vaos-lang"           content="HTML" />
+  <meta name="vaos-family"         content="VIA_D01_Home" />
+  <meta name="vaos-lock-ancestor"  content="AST-HTML-TPL-VIA-700-001,VAP_MultiCompare,VAP_NVDA_VDF,VAP_SMH_Flow" />
+  <meta name="vaos-pattern-parent" content="T05_VerticalStack,T06_Dashboard,T07_EventMatrix" />
+  <meta name="vaos-checksum"       content="FP-D01H8002" />
+  <meta name="vaos-data-locked"    content="true" />
+  <meta name="vaos-info-hierarchy" content="control,market,cause,watchlist,macro,events" />
+  <meta name="vaos-chart-rules"    content="tw-color-inversion,one-asset-per-chart,axes-locked,adj-price-stocks,forward-fill-holiday,no-overlapping-charts" />
+  <meta name="vaos-support-tools"  content="VIA_SSOT_Unified,VeritasAegisNexus,VeritasCeleritas,VIA_EnvManager,VIA_Panorama_AST_RuntimeInjector,VIA_RegistryCore_v1,VIA_Runtime_Bridge_All_in_One" />
+
+  <title>VIA · D01 Global Home Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ANCHOR[VIA:ANCHOR:D01-STYLE] -->
+  <style>
+    :root, [data-theme="light"]{
+      --bl:#1166c2; --tl:#01696f; --gn:#2f8f57; --am:#b35318;
+      --co:#9b2c7b; --vi:#5b3a99; --ro:#d84c4c;
+      --bg:#f7f6f2; --surface:#fbfbf9; --surface2:#f1efe9; --surface3:#ecebe5;
+      --border:#d7d2c9; --border-strong:#b9b3a8;
+      --text:#25211b; --muted:#726f68; --muted2:#9a948b;
+      --primary:var(--tl);
+      --up:var(--ro);   --up-fill:rgba(216,76,76,.18);   --up-soft:rgba(216,76,76,.08);
+      --down:var(--gn); --down-fill:rgba(47,143,87,.18); --down-soft:rgba(47,143,87,.08);
+      --hold:var(--co); --potential:var(--bl); --observe:#6e7781;
+      --shadow:0 12px 32px rgba(0,0,0,.08);
+      --shadow-sm:0 4px 12px rgba(0,0,0,.05);
+      --radius:14px; --radius-lg:18px;
+    }
+    [data-theme="dark"]{
+      --bl:#7ab7ff; --tl:#4f98a3; --gn:#65c884; --am:#f3a15d;
+      --co:#e48ac7; --vi:#a98ff0; --ro:#ff7b7b;
+      --bg:#0f0e0c; --surface:#181715; --surface2:#1f1d1b; --surface3:#262422;
+      --border:#332f2b; --border-strong:#4a4540;
+      --text:#ece7df; --muted:#a59f95; --muted2:#7a746a;
+      --primary:var(--tl);
+      --up:var(--ro);   --up-fill:rgba(255,123,123,.22);   --up-soft:rgba(255,123,123,.08);
+      --down:var(--gn); --down-fill:rgba(101,200,132,.22); --down-soft:rgba(101,200,132,.08);
+      --hold:var(--co); --potential:var(--bl); --observe:#b7b7b7;
+      --shadow:0 16px 40px rgba(0,0,0,.45);
+      --shadow-sm:0 4px 12px rgba(0,0,0,.3);
+    }
+
+    *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:'DM Sans', system-ui, sans-serif;
+      background:var(--bg); color:var(--text);
+      min-height:100vh; min-width:1360px;
+      letter-spacing:-.005em;
+    }
+    .mono, .price, .chg, .v, .symbol, .num, .ts, .k, .kpi-v,
+    .ix-val, .ix-chg, .risk-val { font-family:'DM Mono', ui-monospace, monospace; }
+
+    /* ════════════════════════════════════════════════════════════════════
+       Layout root — desktop two-screen layered
+       ──────────────────────────────────────────────────────────────────── */
+    .app{
+      max-width:1680px; margin:0 auto; padding:16px 20px 22px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+
+    /* ─── TOPBAR · D01-TOPBAR ─────────────────────────────────────────── */
+    .topbar{
+      display:grid;
+      grid-template-columns:auto 1fr auto auto auto auto;
+      gap:14px; align-items:center;
+      padding:11px 16px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow-sm);
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-mark{
+      width:34px;height:34px;border-radius:9px;
+      background:linear-gradient(135deg, var(--tl), var(--bl));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'DM Mono',monospace;font-weight:700;font-size:14px;
+      color:#fff;letter-spacing:-.02em;
+    }
+    .brand-title{font-size:15px;font-weight:700;line-height:1}
+    .brand-sub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.04em}
+
+    .badge-locked{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 11px;border-radius:999px;
+      font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;
+      background:rgba(216,76,76,.10);color:var(--ro);
+      border:1px solid rgba(216,76,76,.30);
+    }
+    [data-theme="dark"] .badge-locked{background:rgba(255,123,123,.10);border-color:rgba(255,123,123,.30)}
+    .badge-locked::before{
+      content:"";width:6px;height:6px;border-radius:50%;
+      background:currentColor;box-shadow:0 0 0 3px rgba(216,76,76,.18);
+      animation:pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(216,76,76,0)}}
+
+    .ts{font-size:11px;color:var(--muted);text-align:right;line-height:1.4}
+    .ts b{color:var(--text);font-weight:500;font-size:12px;display:block}
+
+    .seg{display:inline-flex;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px}
+    .seg button{
+      border:0;background:transparent;color:var(--muted);
+      padding:5px 11px;border-radius:999px;cursor:pointer;
+      font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.04em;
+    }
+    .seg button.on{background:var(--primary);color:#fff}
+    .pill{
+      font-family:'DM Mono',monospace;font-size:10px;
+      padding:3px 8px;border-radius:6px;background:var(--surface2);color:var(--muted);
+      border:1px solid var(--border);
+    }
+    .icon-btn{
+      width:34px;height:34px;border-radius:50%;
+      border:1px solid var(--border);background:var(--surface2);color:var(--text);
+      cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center;
+    }
+
+    /* ─── RISK BAR · D01-RISKBAR · global temperature ─────────────────── */
+    .riskbar{
+      display:grid; grid-template-columns: auto repeat(6, 1fr) auto;
+      gap:8px; align-items:stretch;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:10px 14px; box-shadow:var(--shadow-sm);
+    }
+    .rb-mode{
+      display:flex;flex-direction:column;justify-content:center;
+      padding-right:14px;border-right:1px solid var(--border);
+      min-width:128px;
+    }
+    .rb-mode .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace}
+    .rb-mode .v{font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:4px}
+    .rb-dot{width:9px;height:9px;border-radius:50%;background:var(--up);box-shadow:0 0 0 3px rgba(216,76,76,.2)}
+    .rb-cell{
+      display:flex;flex-direction:column;justify-content:space-between;
+      padding:4px 8px;border-radius:9px;background:var(--surface2);
+    }
+    .rb-cell .k{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace}
+    .rb-cell .row{display:flex;justify-content:space-between;align-items:center;margin-top:3px}
+    .rb-cell .v{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;line-height:1}
+    .rb-cell .d{font-size:10px;font-family:'DM Mono',monospace}
+    .rb-time{
+      display:flex;flex-direction:column;justify-content:center;
+      padding-left:14px;border-left:1px solid var(--border);
+      min-width:96px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:right;
+    }
+    .rb-time b{color:var(--text);font-weight:500;font-size:12px;display:block;margin-bottom:2px}
+
+    /* ════════════════════════════════════════════════════════════════════
+       Two-column layout: main analysis | sticky watchlist sidebar
+       ──────────────────────────────────────────────────────────────────── */
+    .main-grid{
+      display:grid; grid-template-columns: 1fr 360px; gap:12px; align-items:start;
+    }
+
+    .card{
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:14px; box-shadow:var(--shadow-sm);
+    }
+    .card-head{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border);
+    }
+    .card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+    .card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--primary)}
+    .card-actions{display:flex;gap:5px}
+
+    /* ─── MARKET · D01-MARKET · global index matrix ───────────────────── */
+    .region-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .ix-card{
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:11px; padding:11px;
+      display:flex; flex-direction:column; gap:6px;
+      min-height:148px; position:relative; overflow:hidden;
+    }
+    .ix-region{
+      position:absolute;top:8px;right:10px;
+      font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);
+      text-transform:uppercase;letter-spacing:.08em;
+    }
+    .ix-head{display:flex;flex-direction:column;gap:2px}
+    .ix-name{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.04em}
+    .ix-symbol{font-size:13px;font-weight:700}
+    .ix-val-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px}
+    .ix-val{font-size:18px;font-weight:700;font-feature-settings:"tnum";line-height:1}
+    .ix-chg{font-size:11px}
+    .ix-plot{flex:1;min-height:50px;position:relative;border-radius:6px;overflow:hidden;margin-top:4px}
+    .ix-plot svg{position:absolute;inset:0;width:100%;height:100%}
+
+    /* ─── REASON · D01-REASON · 4 cause modules grid ──────────────────── */
+    .reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .rsn-card{
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; padding:12px; display:flex;flex-direction:column;gap:8px;
+      min-height:180px;
+    }
+    .rsn-head{display:flex;justify-content:space-between;align-items:center}
+    .rsn-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+    .rsn-title .dot{width:5px;height:5px;border-radius:50%}
+    .rsn-tag{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.05em}
+
+    .rsn-stack{display:flex;flex-direction:column;gap:6px}
+    .rsn-row{
+      display:grid;grid-template-columns:48px 1fr auto auto;gap:9px;align-items:center;
+      padding:6px 8px;background:var(--surface);border-radius:7px;border:1px solid var(--border);
+    }
+    .rsn-row .lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .rsn-row .nm{font-size:11px;color:var(--text)}
+    .rsn-row svg.spk{width:64px;height:22px}
+    .rsn-row .vl{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;text-align:right;min-width:60px}
+
+    /* yield curve mini */
+    .yc-card{display:flex;flex-direction:column;gap:6px}
+    .yc-plot{flex:1;min-height:100px;background:var(--surface);border-radius:8px;border:1px solid var(--border);position:relative;overflow:hidden}
+    .yc-plot svg{position:absolute;inset:0;width:100%;height:100%}
+    .yc-foot{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted)}
+
+    /* ─── MACRO · D01-MACRO · global macroeconomic monitor ────────────── */
+    .macro-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+    .macro-tab{
+      padding:5px 10px;border-radius:7px;
+      background:var(--surface2);border:1px solid var(--border);
+      font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);
+      cursor:pointer;transition:.15s;
+    }
+    .macro-tab.on{background:var(--primary);color:#fff;border-color:transparent}
+
+    .macro-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .mc-tile{
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:10px; padding:9px 11px;
+      display:flex;flex-direction:column;gap:5px;
+      position:relative;overflow:hidden;min-height:96px;
+    }
+    .mc-tile::after{
+      content:"";position:absolute;top:0;left:0;width:3px;height:100%;
+      background:var(--accent, var(--primary));
+    }
+    .mc-tile[data-tone="up"]   { --accent: var(--up); }
+    .mc-tile[data-tone="down"] { --accent: var(--down); }
+    .mc-tile[data-tone="flat"] { --accent: var(--muted2); }
+    .mc-tile[data-tone="warn"] { --accent: var(--am); }
+
+    .mc-head{display:flex;justify-content:space-between;align-items:center}
+    .mc-country{
+      font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);
+      letter-spacing:.08em;text-transform:uppercase;
+      padding:2px 6px;background:var(--surface3);border-radius:4px;
+    }
+    .mc-name{font-size:11px;font-weight:600}
+    .mc-val{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;font-feature-settings:"tnum"}
+    .mc-foot{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace}
+    .mc-foot .next{color:var(--muted)}
+    .mc-foot .chg{font-weight:500}
+
+    /* ─── EVENTS · D01-EVENTS · footer 2-col events + news ────────────── */
+    .events-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .ev-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-lg);padding:14px;
+    }
+    .ev-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border-radius:9px;overflow:hidden}
+    .ev-row{
+      display:grid;grid-template-columns:64px 56px 1fr auto auto;gap:10px;align-items:center;
+      padding:8px 10px;background:var(--surface);font-size:12px;
+    }
+    .ev-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+    .ev-flag{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);
+             background:var(--surface2);padding:2px 6px;border-radius:4px;text-align:center;border:1px solid var(--border)}
+    .ev-name{font-size:12px}
+    .ev-imp{display:inline-flex;gap:1px}
+    .ev-imp i{width:5px;height:9px;background:var(--muted2);opacity:.3;border-radius:1px;display:inline-block}
+    .ev-imp.high i{background:var(--up);opacity:1}
+    .ev-imp.mid  i:nth-child(-n+2){background:var(--am);opacity:1}
+    .ev-imp.low  i:nth-child(-n+1){background:var(--muted);opacity:1}
+    .ev-fcst{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:64px;text-align:right}
+
+    .nw-list{display:flex;flex-direction:column;gap:8px}
+    .nw-row{
+      display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:start;
+      padding:9px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+    }
+    .nw-src{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+    .nw-headline{font-size:12px;line-height:1.4;font-weight:500}
+    .nw-tag{font-size:9px;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace;letter-spacing:.05em;white-space:nowrap}
+    .nw-tag.bull{background:var(--up-fill);color:var(--up)}
+    .nw-tag.bear{background:var(--down-fill);color:var(--down)}
+    .nw-tag.neut{background:var(--surface3);color:var(--muted)}
+
+    /* ════════════════════════════════════════════════════════════════════
+       SIDEBAR · D01-WATCHLIST · sticky right rail
+       ──────────────────────────────────────────────────────────────────── */
+    .sidebar{
+      position:sticky; top:14px; max-height:calc(100vh - 28px);
+      display:flex;flex-direction:column;gap:10px;
+      overflow-y:auto;
+    }
+    .wl-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);padding:11px;box-shadow:var(--shadow-sm);
+    }
+    .wl-head{
+      display:flex;justify-content:space-between;align-items:center;gap:6px;
+      padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid var(--border);
+    }
+    .wl-title{
+      font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;
+    }
+    .wl-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent, var(--primary))}
+    .wl-card[data-class="hold"]      .dot{background:var(--hold)}
+    .wl-card[data-class="potential"] .dot{background:var(--potential)}
+    .wl-card[data-class="observe"]   .dot{background:var(--observe)}
+    .wl-count{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+    .wl-list{display:flex;flex-direction:column;gap:5px}
+    .wl-row{
+      display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;
+      padding:7px 9px;background:var(--surface2);border:1px solid var(--border);
+      border-radius:8px;cursor:pointer;transition:.15s;
+    }
+    .wl-row:hover{border-color:var(--border-strong);transform:translateX(-1px)}
+    .wl-sym{font-size:11px;font-weight:700;min-width:48px}
+    .wl-nm{font-size:10px;color:var(--muted);line-height:1.3}
+    .wl-right{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+    .wl-px{font-size:11px;font-family:'DM Mono',monospace;font-weight:600}
+    .wl-pct{font-size:10px;font-family:'DM Mono',monospace;font-weight:500}
+    .wl-add{
+      width:100%;padding:7px;margin-top:8px;border-radius:8px;
+      border:1px dashed var(--border-strong);background:transparent;
+      color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;
+      cursor:pointer;letter-spacing:.05em;
+    }
+    .wl-add:hover{color:var(--primary);border-color:var(--primary)}
+
+    /* ─── FOOTER ──────────────────────────────────────────────────────── */
+    .foot{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:9px 16px; font-size:10px;color:var(--muted);
+      font-family:'DM Mono',monospace;letter-spacing:.05em;
+    }
+    .foot .l, .foot .r{display:flex;gap:14px}
+    .foot b{color:var(--text);font-weight:500}
+
+    .up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- ╔══════════════════════════════════════════════════════════════╗ -->
+    <!-- LAYER 1 · CONTROL & STATUS                                       -->
+    <!-- ╚══════════════════════════════════════════════════════════════╝ -->
+
+    <!-- ANCHOR[VIA:ANCHOR:D01-TOPBAR] -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">V</div>
+        <div>
+          <div class="brand-title">Veritas Intelligence Analytics</div>
+          <div class="brand-sub">D01 · GLOBAL OVERVIEW · master dashboard</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="badge-locked">DATA-LOCKED</span>
+        <span class="pill">AST-HTML-TPL-VIA-800-001 · v2.0.0</span>
+      </div>
+
+      <div class="seg" id="scopeSeg">
+        <button class="on">GLOBAL</button><button>US</button><button>EU</button><button>JP</button><button>TW</button><button>EM</button>
+      </div>
+
+      <div class="seg" id="periodSeg">
+        <button>1D</button><button class="on">5D</button><button>20D</button><button>60D</button><button>YTD</button><button>1Y</button>
+      </div>
+
+      <div class="ts">
+        <b id="tsClock">2026-05-18 23:47:12 TPE</b>
+        <span>NYSE pre-mkt · TWSE close · LSE pre-mkt</span>
+      </div>
+
+      <button class="icon-btn" data-theme-toggle aria-label="切換主題">☼</button>
+    </header>
+
+    <!-- ANCHOR[VIA:ANCHOR:D01-RISKBAR] -->
+    <!-- [VAOS-FILL-SLOT:SLOT_RISK_BAR] -->
+    <section class="riskbar">
+      <div class="rb-mode">
+        <div class="k">market mode</div>
+        <div class="v"><span class="rb-dot"></span>RISK-ON · 偏多</div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">VIX</div>
+        <div class="row"><span class="v">17.9</span><span class="d up">+4.12%</span></div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">DXY</div>
+        <div class="row"><span class="v">98.89</span><span class="d up">+0.16%</span></div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">US10Y</div>
+        <div class="row"><span class="v">4.29%</span><span class="d up">+3bp</span></div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">10Y-2Y</div>
+        <div class="row"><span class="v">-0.29</span><span class="d down">-2bp</span></div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">WTI</div>
+        <div class="row"><span class="v">104.6</span><span class="d down">-1.12%</span></div>
+      </div>
+      <div class="rb-cell">
+        <div class="k">GOLD</div>
+        <div class="row"><span class="v">2,431</span><span class="d up">+0.88%</span></div>
+      </div>
+      <div class="rb-time">
+        <b>UTC+8 / 23:47</b>
+        <span>auto-refresh 5s</span>
+      </div>
+    </section>
+    <!-- [VAOS-FILL-SLOT:SLOT_RISK_BAR:END] -->
+
+    <!-- ╔══════════════════════════════════════════════════════════════╗ -->
+    <!-- LAYER 2-4 · main analysis (left) + sticky watchlist (right)      -->
+    <!-- ╚══════════════════════════════════════════════════════════════╝ -->
+    <div class="main-grid">
+
+      <!-- ─── MAIN COLUMN ───────────────────────────────────────────── -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- LAYER 2 · CORE MARKET TREND -->
+        <!-- ANCHOR[VIA:ANCHOR:D01-MARKET] -->
+        <!-- [VAOS-FILL-SLOT:SLOT_MARKET_GLOBAL] -->
+        <article class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="dot"></span>Global Index Matrix · 主要市場</div>
+            <div class="card-actions">
+              <span class="pill">spot · forward-fill</span>
+              <span class="pill">axes locked</span>
+              <span class="pill">tw: up=red</span>
+            </div>
+          </div>
+          <div class="region-grid">
+
+            <div class="ix-card">
+              <span class="ix-region">americas</span>
+              <div class="ix-head"><span class="ix-name">s&amp;p 500 · usa</span><span class="ix-symbol">SPX</span></div>
+              <div class="ix-val-row"><span class="ix-val">5,872</span><span class="ix-chg up">+0.33%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,46 L35,42 L70,40 L105,36 L140,32 L175,28 L210,24 L245,20 L280,16 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,46 35,42 70,40 105,36 140,32 175,28 210,24 245,20 280,16"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">americas</span>
+              <div class="ix-head"><span class="ix-name">nasdaq 100 · tech</span><span class="ix-symbol">NDX</span></div>
+              <div class="ix-val-row"><span class="ix-val">20,914</span><span class="ix-chg up">+0.62%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,50 L35,44 L70,38 L105,34 L140,30 L175,24 L210,18 L245,12 L280,8 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,50 35,44 70,38 105,34 140,30 175,24 210,18 245,12 280,8"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">europe</span>
+              <div class="ix-head"><span class="ix-name">stoxx 600 · eu</span><span class="ix-symbol">SXXP</span></div>
+              <div class="ix-val-row"><span class="ix-val">521.4</span><span class="ix-chg up">+0.21%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,42 L35,40 L70,38 L105,36 L140,34 L175,30 L210,28 L245,26 L280,24 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,42 35,40 70,38 105,36 140,34 175,30 210,28 245,26 280,24"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">europe</span>
+              <div class="ix-head"><span class="ix-name">ftse 100 · uk</span><span class="ix-symbol">UKX</span></div>
+              <div class="ix-val-row"><span class="ix-val">8,412</span><span class="ix-chg down">-0.18%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,30 L35,32 L70,34 L105,36 L140,38 L175,40 L210,42 L245,44 L280,46 L280,60 L0,60 Z" fill="var(--down-fill)"/>
+                <polyline fill="none" stroke="var(--down)" stroke-width="2" points="0,30 35,32 70,34 105,36 140,38 175,40 210,42 245,44 280,46"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">asia · jp</span>
+              <div class="ix-head"><span class="ix-name">nikkei 225</span><span class="ix-symbol">N225</span></div>
+              <div class="ix-val-row"><span class="ix-val">38,924</span><span class="ix-chg up">+0.84%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,48 L35,42 L70,40 L105,34 L140,28 L175,24 L210,20 L245,16 L280,12 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,48 35,42 70,40 105,34 140,28 175,24 210,20 245,16 280,12"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">asia · tw</span>
+              <div class="ix-head"><span class="ix-name">taiwan weighted</span><span class="ix-symbol">TWII</span></div>
+              <div class="ix-val-row"><span class="ix-val">21,315</span><span class="ix-chg up">+0.38%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,44 L35,42 L70,38 L105,40 L140,36 L175,32 L210,28 L245,24 L280,20 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,44 35,42 70,38 105,40 140,36 175,32 210,28 245,24 280,20"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">asia · hk</span>
+              <div class="ix-head"><span class="ix-name">hang seng</span><span class="ix-symbol">HSI</span></div>
+              <div class="ix-val-row"><span class="ix-val">19,847</span><span class="ix-chg down">-0.46%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,28 L35,30 L70,32 L105,30 L140,34 L175,36 L210,40 L245,42 L280,46 L280,60 L0,60 Z" fill="var(--down-fill)"/>
+                <polyline fill="none" stroke="var(--down)" stroke-width="2" points="0,28 35,30 70,32 105,30 140,34 175,36 210,40 245,42 280,46"/>
+              </svg></div>
+            </div>
+
+            <div class="ix-card">
+              <span class="ix-region">emerging</span>
+              <div class="ix-head"><span class="ix-name">msci em · index</span><span class="ix-symbol">EEM</span></div>
+              <div class="ix-val-row"><span class="ix-val">42.18</span><span class="ix-chg up">+0.24%</span></div>
+              <div class="ix-plot"><svg viewBox="0 0 280 60" preserveAspectRatio="none">
+                <path d="M0,40 L35,38 L70,40 L105,36 L140,34 L175,32 L210,28 L245,26 L280,22 L280,60 L0,60 Z" fill="var(--up-fill)"/>
+                <polyline fill="none" stroke="var(--up)" stroke-width="2" points="0,40 35,38 70,40 105,36 140,34 175,32 210,28 245,26 280,22"/>
+              </svg></div>
+            </div>
+
+          </div>
+        </article>
+        <!-- [VAOS-FILL-SLOT:SLOT_MARKET_GLOBAL:END] -->
+
+        <!-- LAYER 3 · CAUSE / REASON MODULES (4 dimensions) -->
+        <!-- ANCHOR[VIA:ANCHOR:D01-REASON] -->
+        <!-- [VAOS-FILL-SLOT:SLOT_REASON_MODULES] -->
+        <article class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="dot" style="background:var(--bl)"></span>Cause Analysis · 原因模組</div>
+            <div class="card-actions">
+              <span class="pill">currency · rates · commodity · credit</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+
+            <!-- 匯率 -->
+            <div class="rsn-card">
+              <div class="rsn-head">
+                <div class="rsn-title"><span class="dot" style="background:var(--bl)"></span>FX · 匯率傳導</div>
+                <span class="rsn-tag">vs USD</span>
+              </div>
+              <div class="rsn-stack">
+                <div class="rsn-row">
+                  <span class="lbl">dxy</span><span class="nm">美元指數</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,16 9,14 18,12 27,11 36,9 45,8 54,6 64,5"/></svg>
+                  <span class="vl up">98.89 +0.16%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">eurusd</span><span class="nm">歐元</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,7 9,8 18,10 27,12 36,14 45,15 54,17 64,18"/></svg>
+                  <span class="vl down">1.082 -0.24%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">usdjpy</span><span class="nm">日圓</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,17 9,15 18,13 27,11 36,10 45,8 54,7 64,5"/></svg>
+                  <span class="vl up">155.3 +0.41%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">usdtwd</span><span class="nm">台幣</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,14 9,13 18,12 27,11 36,10 45,9 54,8 64,7"/></svg>
+                  <span class="vl up">32.14 +0.08%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 利率/殖利率 -->
+            <div class="rsn-card yc-card">
+              <div class="rsn-head">
+                <div class="rsn-title"><span class="dot" style="background:var(--am)"></span>Rates · 殖利率曲線</div>
+                <span class="rsn-tag">US treasury</span>
+              </div>
+              <div class="yc-plot">
+                <svg viewBox="0 0 320 110" preserveAspectRatio="none">
+                  <line x1="20" y1="100" x2="310" y2="100" stroke="var(--border)" stroke-width="1"/>
+                  <line x1="20" y1="20" x2="20" y2="100" stroke="var(--border)" stroke-width="1"/>
+                  <!-- inverted curve: 2Y(4.00) high, 10Y(4.29) higher slight, 30Y(4.55) slowly up -->
+                  <polyline fill="none" stroke="var(--up)" stroke-width="2.2"
+                    points="40,52 80,48 120,46 160,42 200,38 240,34 280,30"/>
+                  <!-- previous week dashed -->
+                  <polyline fill="none" stroke="var(--muted2)" stroke-width="1.4" stroke-dasharray="3 3"
+                    points="40,56 80,52 120,50 160,46 200,42 240,38 280,34"/>
+                  <!-- markers -->
+                  <circle cx="40"  cy="52" r="3" fill="var(--up)"/><text x="40"  y="72" font-size="9" font-family="DM Mono" fill="var(--muted)" text-anchor="middle">2Y 4.00</text>
+                  <circle cx="120" cy="46" r="3" fill="var(--up)"/><text x="120" y="72" font-size="9" font-family="DM Mono" fill="var(--muted)" text-anchor="middle">5Y 4.18</text>
+                  <circle cx="200" cy="38" r="3" fill="var(--up)"/><text x="200" y="72" font-size="9" font-family="DM Mono" fill="var(--muted)" text-anchor="middle">10Y 4.29</text>
+                  <circle cx="280" cy="30" r="3" fill="var(--up)"/><text x="280" y="72" font-size="9" font-family="DM Mono" fill="var(--muted)" text-anchor="middle">30Y 4.55</text>
+                </svg>
+              </div>
+              <div class="yc-foot">
+                <span>2Y-10Y spread: <b class="down">-0.29</b></span>
+                <span>shape: <b>flat → steepening</b></span>
+              </div>
+            </div>
+
+            <!-- 商品 -->
+            <div class="rsn-card">
+              <div class="rsn-head">
+                <div class="rsn-title"><span class="dot" style="background:var(--co)"></span>Commodities · 大宗商品</div>
+                <span class="rsn-tag">energy + metals</span>
+              </div>
+              <div class="rsn-stack">
+                <div class="rsn-row">
+                  <span class="lbl">wti</span><span class="nm">原油 west texas</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,6 9,8 18,10 27,12 36,14 45,15 54,17 64,18"/></svg>
+                  <span class="vl down">104.6 -1.12%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">brent</span><span class="nm">布蘭特原油</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,16 9,14 18,13 27,11 36,9 45,7 54,6 64,4"/></svg>
+                  <span class="vl up">109.1 +2.49%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">gold</span><span class="nm">黃金</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,15 9,13 18,12 27,11 36,10 45,9 54,8 64,7"/></svg>
+                  <span class="vl up">2,431 +0.88%</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">copper</span><span class="nm">銅</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--up)" stroke-width="1.6" points="0,13 9,12 18,11 27,10 36,9 45,8 54,7 64,6"/></svg>
+                  <span class="vl up">4.62 +1.20%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 信用 -->
+            <div class="rsn-card">
+              <div class="rsn-head">
+                <div class="rsn-title"><span class="dot" style="background:var(--vi)"></span>Credit · 信用價差</div>
+                <span class="rsn-tag">HY · IG · CDS</span>
+              </div>
+              <div class="rsn-stack">
+                <div class="rsn-row">
+                  <span class="lbl">hy oas</span><span class="nm">高收益價差</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,8 9,9 18,10 27,11 36,12 45,13 54,14 64,15"/></svg>
+                  <span class="vl down">312bp -8bp</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">ig oas</span><span class="nm">投資級價差</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,11 9,11 18,12 27,12 36,13 45,13 54,14 64,15"/></svg>
+                  <span class="vl down">94bp -2bp</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">itrx</span><span class="nm">iTraxx EU</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,10 9,11 18,11 27,12 36,12 45,13 54,13 64,14"/></svg>
+                  <span class="vl down">58bp -1bp</span>
+                </div>
+                <div class="rsn-row">
+                  <span class="lbl">cdx hy</span><span class="nm">CDX HY</span>
+                  <svg class="spk" viewBox="0 0 64 22" preserveAspectRatio="none"><polyline fill="none" stroke="var(--down)" stroke-width="1.6" points="0,9 9,10 18,11 27,11 36,12 45,13 54,13 64,14"/></svg>
+                  <span class="vl down">348bp -6bp</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </article>
+        <!-- [VAOS-FILL-SLOT:SLOT_REASON_MODULES:END] -->
+
+        <!-- LAYER 5 · MACRO MONITOR · global macroeconomic data -->
+        <!-- ANCHOR[VIA:ANCHOR:D01-MACRO] -->
+        <!-- [VAOS-FILL-SLOT:SLOT_MACRO_MONITOR] -->
+        <article class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="dot" style="background:var(--am)"></span>Global Macro Monitor · 全球總體經濟數據監管</div>
+            <div class="card-actions">
+              <span class="pill">5 categories · 30 indicators</span>
+              <span class="pill">latest releases</span>
+            </div>
+          </div>
+
+          <div class="macro-tabs" id="macroTabs">
+            <span class="macro-tab on" data-cat="all">ALL</span>
+            <span class="macro-tab" data-cat="gdp">GDP · 成長</span>
+            <span class="macro-tab" data-cat="inf">通膨</span>
+            <span class="macro-tab" data-cat="emp">就業</span>
+            <span class="macro-tab" data-cat="pmi">PMI · 景氣</span>
+            <span class="macro-tab" data-cat="cb">貨幣政策</span>
+          </div>
+
+          <div class="macro-grid" id="macroGrid">
+
+            <!-- ── GDP ── -->
+            <div class="mc-tile" data-cat="gdp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">GDP YoY</span><span class="mc-country">US</span></div>
+              <div class="mc-val">2.8%</div>
+              <div class="mc-foot"><span class="next">next: 7/30</span><span class="chg up">+0.2pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="gdp" data-tone="flat">
+              <div class="mc-head"><span class="mc-name">GDP YoY</span><span class="mc-country">EU</span></div>
+              <div class="mc-val">0.4%</div>
+              <div class="mc-foot"><span class="next">next: 7/30</span><span class="chg flat">±0.0</span></div>
+            </div>
+            <div class="mc-tile" data-cat="gdp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">GDP YoY</span><span class="mc-country">CN</span></div>
+              <div class="mc-val">5.2%</div>
+              <div class="mc-foot"><span class="next">next: 7/15</span><span class="chg up">+0.1pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="gdp" data-tone="flat">
+              <div class="mc-head"><span class="mc-name">GDP YoY</span><span class="mc-country">JP</span></div>
+              <div class="mc-val">1.2%</div>
+              <div class="mc-foot"><span class="next">next: 8/15</span><span class="chg down">-0.3pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="gdp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">GDP YoY</span><span class="mc-country">TW</span></div>
+              <div class="mc-val">3.8%</div>
+              <div class="mc-foot"><span class="next">next: 7/31</span><span class="chg up">+0.4pp</span></div>
+            </div>
+
+            <!-- ── 通膨 ── -->
+            <div class="mc-tile" data-cat="inf" data-tone="warn">
+              <div class="mc-head"><span class="mc-name">CPI YoY</span><span class="mc-country">US</span></div>
+              <div class="mc-val">3.2%</div>
+              <div class="mc-foot"><span class="next">next: 6/12</span><span class="chg up">+0.1pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="inf" data-tone="down">
+              <div class="mc-head"><span class="mc-name">HICP YoY</span><span class="mc-country">EU</span></div>
+              <div class="mc-val">2.4%</div>
+              <div class="mc-foot"><span class="next">next: 6/18</span><span class="chg down">-0.2pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="inf" data-tone="down">
+              <div class="mc-head"><span class="mc-name">CPI YoY</span><span class="mc-country">CN</span></div>
+              <div class="mc-val">0.3%</div>
+              <div class="mc-foot"><span class="next">next: 6/10</span><span class="chg flat">±0.0</span></div>
+            </div>
+            <div class="mc-tile" data-cat="inf" data-tone="warn">
+              <div class="mc-head"><span class="mc-name">CPI YoY</span><span class="mc-country">JP</span></div>
+              <div class="mc-val">2.7%</div>
+              <div class="mc-foot"><span class="next">next: 6/21</span><span class="chg up">+0.1pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="inf" data-tone="down">
+              <div class="mc-head"><span class="mc-name">CPI YoY</span><span class="mc-country">TW</span></div>
+              <div class="mc-val">1.9%</div>
+              <div class="mc-foot"><span class="next">next: 6/5</span><span class="chg down">-0.1pp</span></div>
+            </div>
+
+            <!-- ── 就業 ── -->
+            <div class="mc-tile" data-cat="emp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">NFP</span><span class="mc-country">US</span></div>
+              <div class="mc-val">+187k</div>
+              <div class="mc-foot"><span class="next">next: 6/6</span><span class="chg up">beat est.</span></div>
+            </div>
+            <div class="mc-tile" data-cat="emp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Unemp</span><span class="mc-country">US</span></div>
+              <div class="mc-val">3.9%</div>
+              <div class="mc-foot"><span class="next">next: 6/6</span><span class="chg flat">±0.0</span></div>
+            </div>
+            <div class="mc-tile" data-cat="emp" data-tone="flat">
+              <div class="mc-head"><span class="mc-name">Unemp</span><span class="mc-country">EU</span></div>
+              <div class="mc-val">6.4%</div>
+              <div class="mc-foot"><span class="next">next: 6/4</span><span class="chg down">-0.1pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="emp" data-tone="warn">
+              <div class="mc-head"><span class="mc-name">Unemp</span><span class="mc-country">CN</span></div>
+              <div class="mc-val">5.1%</div>
+              <div class="mc-foot"><span class="next">next: 6/17</span><span class="chg up">+0.1pp</span></div>
+            </div>
+            <div class="mc-tile" data-cat="emp" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Unemp</span><span class="mc-country">TW</span></div>
+              <div class="mc-val">3.4%</div>
+              <div class="mc-foot"><span class="next">next: 6/22</span><span class="chg flat">±0.0</span></div>
+            </div>
+
+            <!-- ── PMI ── -->
+            <div class="mc-tile" data-cat="pmi" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Mfg PMI</span><span class="mc-country">US</span></div>
+              <div class="mc-val">51.2</div>
+              <div class="mc-foot"><span class="next">next: 6/3</span><span class="chg up">expansion</span></div>
+            </div>
+            <div class="mc-tile" data-cat="pmi" data-tone="down">
+              <div class="mc-head"><span class="mc-name">Mfg PMI</span><span class="mc-country">EU</span></div>
+              <div class="mc-val">47.8</div>
+              <div class="mc-foot"><span class="next">next: 6/3</span><span class="chg down">contract</span></div>
+            </div>
+            <div class="mc-tile" data-cat="pmi" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Caixin PMI</span><span class="mc-country">CN</span></div>
+              <div class="mc-val">50.8</div>
+              <div class="mc-foot"><span class="next">next: 6/3</span><span class="chg up">+0.6</span></div>
+            </div>
+            <div class="mc-tile" data-cat="pmi" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Jibun PMI</span><span class="mc-country">JP</span></div>
+              <div class="mc-val">50.4</div>
+              <div class="mc-foot"><span class="next">next: 6/3</span><span class="chg up">+0.2</span></div>
+            </div>
+            <div class="mc-tile" data-cat="pmi" data-tone="up">
+              <div class="mc-head"><span class="mc-name">Mfg PMI</span><span class="mc-country">TW</span></div>
+              <div class="mc-val">52.4</div>
+              <div class="mc-foot"><span class="next">next: 6/3</span><span class="chg up">+1.2</span></div>
+            </div>
+
+            <!-- ── 貨幣政策 ── -->
+            <div class="mc-tile" data-cat="cb" data-tone="warn">
+              <div class="mc-head"><span class="mc-name">Fed Funds</span><span class="mc-country">US</span></div>
+              <div class="mc-val">5.25%</div>
+              <div class="mc-foot"><span class="next">FOMC: 6/12</span><span class="chg flat">hold</span></div>
+            </div>
+            <div class="mc-tile" data-cat="cb" data-tone="down">
+              <div class="mc-head"><span class="mc-name">ECB depo</span><span class="mc-country">EU</span></div>
+              <div class="mc-val">3.75%</div>
+              <div class="mc-foot"><span class="next">next: 6/6</span><span class="chg down">cut prob 78%</span></div>
+            </div>
+            <div class="mc-tile" data-cat="cb" data-tone="flat">
+              <div class="mc-head"><span class="mc-name">LPR 1Y</span><span class="mc-country">CN</span></div>
+              <div class="mc-val">3.45%</div>
+              <div class="mc-foot"><span class="next">next: 6/20</span><span class="chg flat">hold</span></div>
+            </div>
+            <div class="mc-tile" data-cat="cb" data-tone="up">
+              <div class="mc-head"><span class="mc-name">BOJ rate</span><span class="mc-country">JP</span></div>
+              <div class="mc-val">0.10%</div>
+              <div class="mc-foot"><span class="next">next: 6/14</span><span class="chg up">hike risk</span></div>
+            </div>
+            <div class="mc-tile" data-cat="cb" data-tone="flat">
+              <div class="mc-head"><span class="mc-name">Discount</span><span class="mc-country">TW</span></div>
+              <div class="mc-val">2.00%</div>
+              <div class="mc-foot"><span class="next">next: 6/13</span><span class="chg flat">hold</span></div>
+            </div>
+
+          </div>
+        </article>
+        <!-- [VAOS-FILL-SLOT:SLOT_MACRO_MONITOR:END] -->
+
+        <!-- LAYER 6 · EVENTS & NEWS (bottom) -->
+        <!-- ANCHOR[VIA:ANCHOR:D01-EVENTS] -->
+        <!-- [VAOS-FILL-SLOT:SLOT_EVENTS_NEWS] -->
+        <section class="events-grid">
+
+          <article class="ev-card">
+            <div class="card-head" style="margin-bottom:10px;padding-bottom:9px">
+              <div class="card-title"><span class="dot" style="background:var(--am)"></span>Economic Calendar · 經濟事件曆</div>
+              <span class="pill">today + tomorrow</span>
+            </div>
+            <div class="ev-list">
+              <div class="ev-row">
+                <span class="ev-time">22:30</span>
+                <span class="ev-flag">US</span>
+                <span class="ev-name">CPI YoY (May)</span>
+                <span class="ev-imp high"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">est 3.2 · prev 3.4</span>
+              </div>
+              <div class="ev-row">
+                <span class="ev-time">21:30</span>
+                <span class="ev-flag">US</span>
+                <span class="ev-name">Initial Jobless Claims</span>
+                <span class="ev-imp mid"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">est 218k</span>
+              </div>
+              <div class="ev-row">
+                <span class="ev-time">17:00</span>
+                <span class="ev-flag">EU</span>
+                <span class="ev-name">ECB Lagarde Speech</span>
+                <span class="ev-imp high"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">—</span>
+              </div>
+              <div class="ev-row">
+                <span class="ev-time">08:30</span>
+                <span class="ev-flag">JP</span>
+                <span class="ev-name">BoJ Minutes</span>
+                <span class="ev-imp mid"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">—</span>
+              </div>
+              <div class="ev-row">
+                <span class="ev-time">16:30</span>
+                <span class="ev-flag">TW</span>
+                <span class="ev-name">M2 Money Supply</span>
+                <span class="ev-imp low"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">est 5.8%</span>
+              </div>
+              <div class="ev-row">
+                <span class="ev-time">tmr 02:00</span>
+                <span class="ev-flag">US</span>
+                <span class="ev-name">FOMC Minutes</span>
+                <span class="ev-imp high"><i></i><i></i><i></i></span>
+                <span class="ev-fcst">—</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="ev-card">
+            <div class="card-head" style="margin-bottom:10px;padding-bottom:9px">
+              <div class="card-title"><span class="dot" style="background:var(--co)"></span>News Pulse · 重要新聞</div>
+              <span class="pill">last 4h</span>
+            </div>
+            <div class="nw-list">
+              <div class="nw-row">
+                <span class="nw-src">REUTERS<br>23:12</span>
+                <span class="nw-headline">Fed officials signal patience on rate path as inflation moderates; September cut odds rise to 62%</span>
+                <span class="nw-tag bull">RATES↓</span>
+              </div>
+              <div class="nw-row">
+                <span class="nw-src">BLOOMBERG<br>22:48</span>
+                <span class="nw-headline">NVIDIA earnings beat triggers semiconductor rally; SOX index up 2.1% pre-market</span>
+                <span class="nw-tag bull">TECH+</span>
+              </div>
+              <div class="nw-row">
+                <span class="nw-src">FT<br>21:55</span>
+                <span class="nw-headline">ECB seen cutting rates June 6th, Lagarde to telegraph dovish forward guidance</span>
+                <span class="nw-tag bull">EU+</span>
+              </div>
+              <div class="nw-row">
+                <span class="nw-src">WSJ<br>20:30</span>
+                <span class="nw-headline">Middle East tensions push Brent past $109; analysts warn of supply premium re-pricing</span>
+                <span class="nw-tag bear">OIL↑</span>
+              </div>
+              <div class="nw-row">
+                <span class="nw-src">CNYES<br>19:20</span>
+                <span class="nw-headline">TSMC 法說會在即，市場關注 2nm 量產時程與 AI 訂單能見度</span>
+                <span class="nw-tag neut">WATCH</span>
+              </div>
+            </div>
+          </article>
+
+        </section>
+        <!-- [VAOS-FILL-SLOT:SLOT_EVENTS_NEWS:END] -->
+
+      </div>
+      <!-- ─── /MAIN COLUMN ──────────────────────────────────────────── -->
+
+      <!-- ╔══════════════════════════════════════════════════════════╗ -->
+      <!-- LAYER 4 · WATCHLIST SIDEBAR (sticky)                          -->
+      <!-- ANCHOR[VIA:ANCHOR:D01-WATCHLIST]                              -->
+      <!-- ╚══════════════════════════════════════════════════════════╝ -->
+      <!-- [VAOS-FILL-SLOT:SLOT_WATCHLIST_SIDEBAR] -->
+      <aside class="sidebar">
+
+        <!-- 持有標的 -->
+        <div class="wl-card" data-class="hold">
+          <div class="wl-head">
+            <div class="wl-title"><span class="dot"></span>持有標的</div>
+            <span class="wl-count">5 positions · top picks</span>
+          </div>
+          <div class="wl-list">
+            <div class="wl-row"><span class="wl-sym">NVDA</span>
+              <div><div class="wl-sym" style="font-size:11px">NVIDIA</div><div class="wl-nm">accel · ai · us</div></div>
+              <div class="wl-right"><span class="wl-px">1,241</span><span class="wl-pct up">+3.02%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">2330</span>
+              <div><div class="wl-sym" style="font-size:11px">台積電</div><div class="wl-nm">tsmc · semi · tw</div></div>
+              <div class="wl-right"><span class="wl-px">982.0</span><span class="wl-pct up">+2.18%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">0050</span>
+              <div><div class="wl-sym" style="font-size:11px">元大台灣50</div><div class="wl-nm">tw beta · etf</div></div>
+              <div class="wl-right"><span class="wl-px">187.2</span><span class="wl-pct up">+0.96%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">DXY</span>
+              <div><div class="wl-sym" style="font-size:11px">美元指數</div><div class="wl-nm">us dollar · fx</div></div>
+              <div class="wl-right"><span class="wl-px">98.89</span><span class="wl-pct up">+0.16%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">BRN1!</span>
+              <div><div class="wl-sym" style="font-size:11px">Brent</div><div class="wl-nm">crude · commodity</div></div>
+              <div class="wl-right"><span class="wl-px">109.1</span><span class="wl-pct up">+2.49%</span></div>
+            </div>
+          </div>
+          <button class="wl-add">+ ADD HOLDING</button>
+        </div>
+
+        <!-- 潛在個股 -->
+        <div class="wl-card" data-class="potential">
+          <div class="wl-head">
+            <div class="wl-title"><span class="dot"></span>潛在個股</div>
+            <span class="wl-count">4 candidates · today</span>
+          </div>
+          <div class="wl-list">
+            <div class="wl-row"><span class="wl-sym">QQQ</span>
+              <div><div class="wl-sym" style="font-size:11px">Invesco QQQ</div><div class="wl-nm">ndx tracker · etf</div></div>
+              <div class="wl-right"><span class="wl-px">492.2</span><span class="wl-pct down">-0.74%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">USDJPY</span>
+              <div><div class="wl-sym" style="font-size:11px">日圓匯率</div><div class="wl-nm">fx · risk proxy</div></div>
+              <div class="wl-right"><span class="wl-px">155.3</span><span class="wl-pct up">+0.41%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">CL1!</span>
+              <div><div class="wl-sym" style="font-size:11px">WTI Crude</div><div class="wl-nm">crude · energy</div></div>
+              <div class="wl-right"><span class="wl-px">104.6</span><span class="wl-pct down">-1.12%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">N225</span>
+              <div><div class="wl-sym" style="font-size:11px">日經 225</div><div class="wl-nm">index · jp</div></div>
+              <div class="wl-right"><span class="wl-px">38,924</span><span class="wl-pct up">+0.84%</span></div>
+            </div>
+          </div>
+          <button class="wl-add">+ ADD POTENTIAL</button>
+        </div>
+
+        <!-- 觀察清單 -->
+        <div class="wl-card" data-class="observe">
+          <div class="wl-head">
+            <div class="wl-title"><span class="dot"></span>觀察清單</div>
+            <span class="wl-count">5 watchers · global</span>
+          </div>
+          <div class="wl-list">
+            <div class="wl-row"><span class="wl-sym">TWII</span>
+              <div><div class="wl-sym" style="font-size:11px">加權指數</div><div class="wl-nm">tw broad market</div></div>
+              <div class="wl-right"><span class="wl-px">21,315</span><span class="wl-pct up">+0.38%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">SOX</span>
+              <div><div class="wl-sym" style="font-size:11px">費半指數</div><div class="wl-nm">semi beta</div></div>
+              <div class="wl-right"><span class="wl-px">5,041</span><span class="wl-pct down">-0.29%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">TLT</span>
+              <div><div class="wl-sym" style="font-size:11px">20+Y Treasury</div><div class="wl-nm">duration · bond</div></div>
+              <div class="wl-right"><span class="wl-px">89.4</span><span class="wl-pct up">+0.52%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">VIX</span>
+              <div><div class="wl-sym" style="font-size:11px">恐慌指數</div><div class="wl-nm">volatility</div></div>
+              <div class="wl-right"><span class="wl-px">17.9</span><span class="wl-pct up">+4.12%</span></div>
+            </div>
+            <div class="wl-row"><span class="wl-sym">HSI</span>
+              <div><div class="wl-sym" style="font-size:11px">恆生指數</div><div class="wl-nm">hk · china proxy</div></div>
+              <div class="wl-right"><span class="wl-px">19,847</span><span class="wl-pct down">-0.46%</span></div>
+            </div>
+          </div>
+          <button class="wl-add">+ ADD WATCH</button>
+        </div>
+
+      </aside>
+      <!-- [VAOS-FILL-SLOT:SLOT_WATCHLIST_SIDEBAR:END] -->
+
+    </div>
+    <!-- ─── /main-grid ────────────────────────────────────────────── -->
+
+    <!-- ANCHOR[VIA:ANCHOR:D01-FOOTER] -->
+    <footer class="foot">
+      <div class="l">
+        <span>VIA · D01 · master · v2.0.0</span>
+        <span>data: <b>VIA_Runtime_Bridge</b> · <b>VeritasAegisNexus</b></span>
+      </div>
+      <div class="r">
+        <span>plotly 2.35 ready</span>
+        <span>fixedrange · dragmode:false</span>
+        <span id="footStatus">heartbeat: <b>alive</b></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ANCHOR[VIA:ANCHOR:D01-SCRIPT] -->
+  <script>
+    (function(){
+      const $  = (s,r=document)=>r.querySelector(s);
+      const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+
+      /* segmented controls */
+      ['#scopeSeg','#periodSeg'].forEach(id=>{
+        const el = $(id);
+        if (!el) return;
+        el.addEventListener('click', e=>{
+          if (e.target.tagName !== 'BUTTON') return;
+          $$('button', el).forEach(b=>b.classList.remove('on'));
+          e.target.classList.add('on');
+        });
+      });
+
+      /* macro tabs */
+      const macroTabs = $('#macroTabs');
+      const macroGrid = $('#macroGrid');
+      if (macroTabs && macroGrid){
+        macroTabs.addEventListener('click', e=>{
+          const tab = e.target.closest('.macro-tab');
+          if (!tab) return;
+          $$('.macro-tab', macroTabs).forEach(t=>t.classList.remove('on'));
+          tab.classList.add('on');
+          const cat = tab.dataset.cat;
+          $$('.mc-tile', macroGrid).forEach(tile=>{
+            tile.style.display = (cat==='all' || tile.dataset.cat===cat) ? '' : 'none';
+          });
+        });
+      }
+
+      /* watchlist row click */
+      $$('.wl-row').forEach(r=>{
+        r.addEventListener('click', ()=>{
+          $$('.wl-row').forEach(x=>x.style.borderColor='var(--border)');
+          r.style.borderColor = 'var(--primary)';
+        });
+      });
+
+      /* watchlist add buttons (placeholder) */
+      $$('.wl-add').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const card = btn.closest('.wl-card');
+          const cls  = card.dataset.class;
+          console.log(`[VIA] add to ${cls} (hook for VIA_Runtime_Bridge)`);
+        });
+      });
+
+      /* theme toggle */
+      let theme = 'dark';
+      const themeBtn = $('[data-theme-toggle]');
+      if (themeBtn){
+        themeBtn.addEventListener('click', ()=>{
+          theme = theme==='dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+          themeBtn.textContent = theme==='dark' ? '☼' : '☾';
+        });
+      }
+
+      /* live clock */
+      function pad(n){return String(n).padStart(2,'0')}
+      function tick(){
+        const d = new Date();
+        const s = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} `
+                + `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} TPE`;
+        const el = $('#tsClock'); if (el) el.textContent = s;
+      }
+      tick(); setInterval(tick, 1000);
+
+      /* runtime handshake for VIA_Runtime_Bridge_All_in_One */
+      window.VIA_D01 = {
+        asset_id : 'AST-HTML-TPL-VIA-800-001',
+        version  : '2.0.0',
+        slots    : [
+          'SLOT_RISK_BAR','SLOT_MARKET_GLOBAL','SLOT_REASON_MODULES',
+          'SLOT_MACRO_MONITOR','SLOT_WATCHLIST_SIDEBAR','SLOT_EVENTS_NEWS'
+        ],
+        info_hierarchy: ['control','market','cause','watchlist','macro','events'],
+        support_tools : [
+          'VIA_SSOT_Unified','VeritasAegisNexus','VeritasCeleritas',
+          'VIA_EnvManager','VIA_Panorama_AST_RuntimeInjector',
+          'VIA_RegistryCore_v1','VIA_Runtime_Bridge_All_in_One'
+        ],
+        heartbeat: ()=>({status:'alive', module:'VIA_D01_Home_Dashboard', version:'2.0.0'})
+      };
+    })();
+  </script>
+</body>
+</html>

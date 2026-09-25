@@ -1,0 +1,247 @@
+name: VIA Master Control UI (b305 adapt · 批338 尾版律)
+
+on:
+  push:
+    branches:
+      - main
+      - claude/via-system-followup-tz7k9t
+    paths:
+      - ".github/workflows/via-master-control-ui.yml"
+      - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py"
+      - "VeritasIntelligenceAnalytics/VIA.ps1"
+      - "VeritasIntelligenceAnalytics/VIA_HTML_UI/**"
+      - "VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1"
+      - "VeritasIntelligenceAnalytics/docs/**"
+      - "VeritasIntelligenceAnalytics/functional modules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.*"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/tests/**"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_StdDashboard_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_SyncStatus_v0100.html"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/via-master-control-ui.yml"
+      - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py"
+      - "VeritasIntelligenceAnalytics/VIA.ps1"
+      - "VeritasIntelligenceAnalytics/VIA_HTML_UI/**"
+      - "VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1"
+      - "VeritasIntelligenceAnalytics/docs/**"
+      - "VeritasIntelligenceAnalytics/functional modules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.*"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/tests/**"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_StdDashboard_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_SyncStatus_v0100.html"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 批338b CI 實錄:Windows runner 主控台 cp1252 印中文 UnicodeEncodeError→全域 UTF-8
+env:
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  windows-uat:
+    name: Windows bundled Chromium UAT
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py
+            /VeritasIntelligenceAnalytics/Register-VIA-Commands-v*.ps1
+            /VeritasIntelligenceAnalytics/supportive modules/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/references/intake/**/manifest.json
+            /VeritasIntelligenceAnalytics/VIA.ps1
+            /VeritasIntelligenceAnalytics/VIA_HTML_UI/**
+            /VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pinned Playwright and bundled Chromium
+        shell: pwsh
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx playwright install chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Resolve tail versions (glob 尾版律)
+        shell: pwsh
+        run: |
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $reg = Join-Path $via "supportive modules\registry"
+          function Tail($dir, $pat) { (Get-ChildItem -Path $dir -Filter $pat -File | Sort-Object Name | Select-Object -Last 1).FullName }
+          $mgr = Tail $via "VIA_SYSTEM_MANAGER_v*.py"
+          $deck = Tail $reg "CGC_MDL095_DeckServer_v*.py"
+          $sync = Tail $reg "CGC_MDL096_SyncStatus_v*.py"
+          $std = Tail (Join-Path $via "functional modules\VAP\engine") "VAP_ENG014_StdDashboardTemplate_v*.py"
+          $test = Tail (Join-Path $reg "tests") "test_master_control_contract_v*.py"
+          $ux = Tail (Join-Path $reg "tests") "uxtest_master_control_v*.js"
+          foreach ($p in @($mgr, $deck, $sync, $std, $test, $ux)) { if (-not $p) { Write-Host "尾版缺(誠實)"; exit 1 } }
+          "VIA_MGR=$mgr`nVIA_DECK=$deck`nVIA_SYNC=$sync`nVIA_STD=$std`nVIA_TEST=$test`nVIA_UX=$ux" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "尾版:`n  $mgr`n  $deck`n  $sync`n  $std`n  $test`n  $ux"
+
+      - name: Compile Python and JavaScript
+        shell: pwsh
+        run: |
+          python -m py_compile "$env:VIA_MGR" "$env:VIA_DECK" "$env:VIA_SYNC" "$env:VIA_STD" "$env:VIA_TEST"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --check "$env:VIA_UX"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $tokens = $null; $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path ".\VeritasIntelligenceAnalytics\VIA.ps1").Path, [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -ne 0) { $parseErrors | ForEach-Object { Write-Host $_.Message }; exit 1 }
+
+      - name: Run isolated product self-tests
+        shell: pwsh
+        run: |
+          python "$env:VIA_MGR" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$env:VIA_DECK" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$env:VIA_SYNC" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "$env:VIA_STD" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run isolated MasterControl contract tests
+        shell: pwsh
+        run: |
+          python "$env:VIA_TEST"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run desktop and mobile browser UAT
+        shell: pwsh
+        run: |
+          $env:VIA_UX_ARTIFACT_DIR = "$PWD\VIA_UI_Test_Artifacts"
+          node "$env:VIA_UX"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload UAT screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: via-master-control-ui-screenshots
+          path: VIA_UI_Test_Artifacts
+          if-no-files-found: warn
+
+      - name: Run VRN value and template regressions
+        shell: pwsh
+        run: |
+          python -m pip install duckdb==1.5.5 pandas==2.2.3
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:VIA_SELFTEST = "1"
+          $env:NODE_PATH = Join-Path $PWD "node_modules"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $vrn = Join-Path $via "functional modules\VRN"
+          python (Join-Path $vrn "tests\test_VRN_TakeoverRegression.py")
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($pattern in @("VRN_ENG089_TemplateView_v*.py", "VRN_ENG090_FinStatementsTemplate_v*.py")) {
+            $engine = (Get-ChildItem $vrn -Filter $pattern -File | Sort-Object Name | Select-Object -Last 1).FullName
+            if (-not $engine) { throw "VRN template engine absent: $pattern" }
+            python $engine --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          $launcher = (Get-ChildItem $via -Filter "Invoke-VIA-VRN-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          $tokens = $null; $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile($launcher, [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -ne 0) { $errors | ForEach-Object { Write-Host $_.Message }; exit 1 }
+          # 短令冊尾版:整本用 PowerShell 解析器解析(不點源、不執行);冊內「執行期才編譯」的 here-string 助手也編一次
+          $register = (Get-ChildItem $via -Filter "Register-VIA-Commands-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          $tokens = $null; $errors = $null
+          $ast = [System.Management.Automation.Language.Parser]::ParseFile($register, [ref]$tokens, [ref]$errors)
+          if ($errors.Count -ne 0) { $errors | ForEach-Object { Write-Host $_.Message }; exit 1 }
+          $late = $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and "$($n.Left)" -eq '$VIACelScopedSrc' }, $true)
+          foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
+          Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
+
+      - name: Exercise VRN HTML with empty and synthetic populated databases
+        shell: pwsh
+        run: |
+          $env:VIA_SELFTEST = "1"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $vrn = Join-Path $via "functional modules\VRN"
+          $reg = Join-Path $via "supportive modules\registry\tests"
+          $engine = (Get-ChildItem $vrn -Filter "VRN_ENG090_FinStatementsTemplate_v*.py" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          $ux = (Get-ChildItem $reg -Filter "uxtest_vrn_finstatements_v*.js" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          $art = Join-Path $PWD "VIA_VRN_Test_Artifacts"
+          python (Join-Path $vrn "tests\test_VRN_TakeoverRegression.py") --emit-fixture (Join-Path $art "fixture")
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($mode in @("empty", "synthetic")) {
+            $dir = Join-Path $art $mode
+            $db = if ($mode -eq "empty") { Join-Path $art "deliberately_absent.duckdb" } else { Join-Path $art "fixture\synthetic_finstat.duckdb" }
+            $env:VIA_VRN_FINSTAT_PAGE = Join-Path $dir "page.html"
+            $env:VIA_VRN_FINSTAT_OUT = Join-Path $dir "out"
+            $env:VIA_UX_ARTIFACT_DIR = Join-Path $dir "browser"
+            python $engine run --db $db --today 2026-09-24 --page $env:VIA_VRN_FINSTAT_PAGE --out $env:VIA_VRN_FINSTAT_OUT
+            if ($LASTEXITCODE -ne 0 -and -not ($mode -eq "empty" -and $LASTEXITCODE -eq 2)) { exit $LASTEXITCODE }
+            node $ux
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Verify pending edits survive duplicate synchronization
+        shell: pwsh
+        run: |
+          $env:VIA_UX_ARTIFACT_DIR = Join-Path $PWD "VIA_VRN_Test_Artifacts\sync-pending"
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\uxtest_via_sync_pending_v0100.js"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify daily database-first orchestration and provider contracts
+        shell: pwsh
+        run: |
+          $tests = ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests"
+          foreach ($case in @('test_via_boot_daily_v0100.py', 'test_via_consensus_daily_v0100.py', 'test_via_monthly_scope_v0100.py', 'test_via_global_incremental_v0100.py', 'test_via_etf_universe_daily_v0100.py')) {
+            python (Join-Path $tests $case)
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Verify ETF activity estimates and canonical template
+        shell: pwsh
+        run: |
+          $env:VIA_ETF_UAT_OUT = Join-Path $PWD "VIA_VRN_Test_Artifacts\etf-activity"
+          $env:VIA_SELFTEST = "1"
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\test_via_etf_activity_v0100.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_etf_activity_v0100.js" $env:VIA_ETF_UAT_OUT
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload VRN browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: via-vrn-template-browser-evidence
+          path: VIA_VRN_Test_Artifacts
+          if-no-files-found: warn
+          retention-days: 14

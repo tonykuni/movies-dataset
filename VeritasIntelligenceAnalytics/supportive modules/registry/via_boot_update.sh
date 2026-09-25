@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# via_boot_update.sh — VIA 開機自動更新器(批150;操作員令:不用固定時間,開啟系統即更新)
+# 批687(Z81):⓪ 環境自補改逐件退路(整份一件建輪失敗不再全部放棄;jieba --use-pep517;覆寫鍵 VIA_ENV_REQ 只給合成檢)
+# SessionStart hook 背景喚起;每日首開才實跑(marker 防重複);log 落 VIA_Reports/boot_update_logs/
+# 同意閘:操作員批123/137/150 自動更新常令授權,本腳本屬該令執行面。
+set -u
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"   # repo 根
+VIA="$ROOT/VeritasIntelligenceAnalytics"; export VIA
+ENG="$VIA/functional modules/VDF/engine"
+MARK="$VIA/functional modules/VDF/output_hub/mega/.last_boot_update"
+VERIFIED="${MARK}.verified"
+LOCK="${MARK}.lock"
+LOGDIR="$VIA/VIA_Reports/boot_update_logs"
+TODAY="$(TZ=Asia/Taipei date +%Y-%m-%d)"
+
+mkdir -p "$LOGDIR" "$(dirname "$MARK")"
+# 完成標記和互斥鎖分開；舊版開跑就寫的 marker 不足以證明完成。
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "[boot-update] BUSY: $LOCK（另一輪尚未釋放；異常中斷須先核對工作站行程）" >&2
+  exit 3
+fi
+trap 'rmdir "$LOCK" 2>/dev/null || true' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+if [ -f "$MARK" ] && [ -f "$VERIFIED" ] && [ "$(cat "$MARK" 2>/dev/null)" = "$TODAY" ] && [ "$(cat "$VERIFIED" 2>/dev/null)" = "$TODAY" ]; then
+  echo "[boot-update] $TODAY 已更(marker)=SKIP" >> "$LOGDIR/skip.log"
+  exit 0
+fi
+LOG="$LOGDIR/BOOT_$(date +%Y%m%d_%H%M%S).log"
+export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES
+
+newest() { ls "$ENG"/$1 2>/dev/null | sort | tail -1; }
+BOOT_FAILED=0
+python3() {
+  command python3 "$@"
+  local rc=$?
+  echo "[boot-step] rc=$rc script=${1:-environment}"
+  if [ "$rc" -ne 0 ]; then BOOT_FAILED=$((BOOT_FAILED + 1)); fi
+  return "$rc"
+}
+{
+  echo "=== VIA 開機更新 $TODAY(批150)==="
+  # ⓪ 批164 環境自補(容器非持久=每日檢缺才裝;等效根+套件冊)
+  echo "--- ⓪ 環境自補(批164)"
+  mkdir -p /root/Downloads "/root/OneDrive/VeritasIntelligenceAnalytics/module"
+  python3 - <<'PYENV'
+import importlib.util, os, subprocess, sys
+from pathlib import Path
+need = [("networkx","networkx"),("dateparser","dateparser"),("spacy","spacy"),
+        ("sumy","sumy"),("yake","yake"),("quantulum3","quantulum3")]
+missing = [pip for mod,pip in need if importlib.util.find_spec(mod) is None]
+# 批300 EnvManager:核心冊自癒(容器收割機兩度吃套件實錄=每日自檢自補)
+core = ["pandas","numpy","duckdb","plotly","pyarrow","yfinance","fitz",
+        "jieba","markitdown","openpyxl","matplotlib","psutil"]
+core_missing = [m for m in core if importlib.util.find_spec(m) is None]
+req_override = os.environ.get("VIA_ENV_REQ")   # 批687(Z81):覆寫鍵,只給合成檢用;真機器不設
+req = Path(req_override) if req_override else Path(os.environ["VIA"]) / "supportive modules/registry/VIA_Env_Requirements_v0100.txt"
+if core_missing or req_override:
+    print(f"[env] 核心缺 {len(core_missing)}:{','.join(core_missing) or '-'} → 冊補裝 {req.name}")
+    pip = [sys.executable,"-m","pip","install","--quiet","--disable-pip-version-check"]
+    r = subprocess.run([*pip,"-r",str(req)],check=False)
+    if r.returncode != 0:
+        # 批687(Z81):整份一起裝,一件建輪失敗 pip 就把整份放棄(jieba 在 Debian setuptools 68 撞 install_layout),
+        # 29 條 No module named 全是假敗。退回逐件裝;失敗的再試 --use-pep517;還是失敗只列名,不放棄其餘。
+        pkgs = [l.split("#",1)[0].strip() for l in req.read_text(encoding="utf-8").splitlines()]
+        pkgs = [x for x in pkgs if x]
+        bad = []
+        for x in pkgs:
+            r1 = subprocess.run([*pip,x],check=False,capture_output=True,text=True)
+            if r1.returncode != 0:
+                r2 = subprocess.run([*pip,"--use-pep517",x],check=False,capture_output=True,text=True)
+                if r2.returncode != 0:
+                    bad.append(x)
+        print(f"[env] 整份補裝 rc={r.returncode} → 逐件補裝 {len(pkgs)} 件 · 失敗 {len(bad)}" + (f":{','.join(bad)}" if bad else ""))
+if missing:
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","docopt-ng"],check=False)
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","--no-deps",*missing],check=False)
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","segtok","jellyfish","regex","tzlocal"],check=False)
+if importlib.util.find_spec("spacy") is not None:
+    try:
+        import spacy; spacy.load("zh_core_web_sm")
+    except Exception:
+        subprocess.run([sys.executable,"-m","pip","install","--quiet",
+          "https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.8.0/zh_core_web_sm-3.8.0-py3-none-any.whl"],check=False)
+try:
+    import duckdb
+    p="/root/OneDrive/VeritasIntelligenceAnalytics/module/via.duckdb"
+    if not Path(p).exists():
+        duckdb.connect(p).close()
+except Exception: pass
+print("[env] 檢缺自補畢(pkuseg=C 輪誠實除外)")
+PYENV
+  cd "$ENG" || exit 1
+  REG="$VIA/supportive modules/registry"
+  echo "--- 擷取前查庫（正主目錄 → 增量缺口；失敗即停，不用舊快照猜）"
+  python3 "$(ls "$REG"/CGC_MDL123_DataHome_v*.py | sort | tail -1)" catalog || exit 2
+  python3 "$(newest 'VDF_ENG089_IncrementalFetchGate_v*.py')" plan --deep || exit 2
+  echo "--- ① OmniFetch 全車道";        python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" run
+  echo "--- ② 價格增量";                python3 "$(newest 'VDF_ENG054_TWDailyBackfill_v*.py')" run
+  echo "--- ②b 調整後價格層(批178)";   python3 "$(newest 'VDF_ENG060_AdjPriceLayer_v*.py')" build
+  echo "--- ②c 因子庫(批188)";         python3 "$(newest 'VDF_ENG061_FeatureStore_v*.py')" build
+  echo "--- ③ 籌碼增量+衍生";           python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" run
+  python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" --derive
+  echo "--- ④a 主動 ETF 宇宙日更(批374;A 碼律+國內成分揭露律;ENG077)"; python3 "$(newest 'VDF_ENG077_ActiveETFUniverse_v*.py')" run
+  echo "--- ④ 主動 ETF 持股(PARTIAL 屬常態)"; python3 "$ENG/VDF_ENG051_ActiveTWETF_Holdings.py"
+  echo "--- ④b 主動 ETF 每日持股史深覆蓋+缺口回補(批375;ENG078;IPO 起)"; python3 "$(newest 'VDF_ENG078_ActiveETFHoldingsHistory_v*.py')" daily
+  # 批161 update:日更管線收編批154-155 引擎(checkpoint 增量制=每日只補新)
+  echo "--- ⑥ 逐股成交值增量(批154)";  python3 "$(newest 'VDF_ENG057_TradingValueBackfill_v*.py')" run
+  echo "--- ⑦ 分析師估值快照(批155)";  python3 "$(newest 'VDF_ENG059_EstimateBands_v*.py')" run
+  echo "--- ⑦b 驗證共識庫(批176)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG069_ConsensusDB_v*.py | sort | tail -1)" build
+  echo "--- ⑦c Yahoo 共識(批194)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG070_YahooConsensus_v*.py | sort | tail -1)" run
+  echo "--- ⑦d 月營收(批194)";         python3 "$(newest 'VDF_ENG063_MonthlyRevenue_v*.py')" run
+  echo "--- ⑦e 鉅亨 FactSet 共識(批199)"; python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG071_CnyesFusion_v*.py | sort | tail -1)" run
+  echo "--- ⑦f 共識新快照 ADJ 重算(ENG069 正主)"; python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG069_ConsensusDB_v*.py | sort | tail -1)" build
+  echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
+  echo "--- ⑧b 族群因子層(批193;於輪動快照後=成員冊當日鮮)"; python3 "$(newest 'VDF_ENG062_GroupFeatureLayer_v*.py')" build
+  echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status
+  # 批168:⑨ 同步 UI 重生(樞紐+五系統分頁=存證/庫/冊 join,與系統連動)
+  echo "--- ⑨ 同步 UI 重生(批168)"
+  REG="$VIA/supportive modules/registry"
+  python3 "$(ls "$REG"/CGC_MDL088_SystemTestPages_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL090_SystemHub_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL116_UnifiedShell_v*.py | sort | tail -1)"   # ⑨b2 統一殼四頁(批324)
+  python3 "$(ls "$REG"/CGC_MDL120_SystemUI_v*.py | sort | tail -1)"   # ⑨b4 系統總台六主體(批332;內嵌快照)
+  python3 "$(ls "$REG"/CGC_MDL105_GovernanceConsole_v*.py | sort | tail -1)"   # ⑨b3 治理主控台(批324)
+  python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG009_DashboardUI_v*.py | sort | tail -1)" run
+  python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG068_DailyBrief_v*.py | sort | tail -1)" run
+  # 批270:⑩ 上線分析組——新功能掛日更(資料鮮→分析頁自動鮮;零網路在庫 join)
+  echo "--- ⑩ 上線分析組(批270)"
+  python3 "$(newest 'VDF_ENG067_ConsensusEnrichment_v*.py')" run
+  python3 "$(newest 'VDF_ENG068_ETFConsensusAnalysis_v*.py')" run
+  python3 "$(newest 'VDF_ENG069_RevenueConsensusAnalysis_v*.py')" run
+  python3 "$(newest 'VDF_ENG076_ETFRevenueMomentum_v*.py')" run
+  python3 "$(ls "$REG"/CGC_MDL104_TestResultsHub_v*.py | sort | tail -1)"
+  python3 "$(ls "$REG"/CGC_MDL110_TriTestMatrix_v*.py | sort | tail -1)"
+  python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG014_StdDashboardTemplate_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL113_UnifiedRegistry_v*.py | sort | tail -1)"
+  python3 "$(ls "$REG"/CGC_MDL114_CommandCenterBridge_v*.py | sort | tail -1)" run
+  echo "--- ⑪ 四專案完工矩陣(批368;MDL131)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL131_ProjectCompletion_v*.py | sort | tail -1)" build
+  echo "--- ⑫ 產品資格閘(批376;MDL133;九閘;只讀存證)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL133_ProductGate_v*.py | sort | tail -1)" build
+  echo "--- ⑬ 環境治理全景(批381;MDL135;唯讀 run --offline;LKGC 快照;log logs/env_governance.log)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL135_EnvGovernance_v*.py | sort | tail -1)" run --offline --quiet
+  echo "--- ⑭ 單一入口燈板(批383;MDL136;零網路;VIA_Reports/entry)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL136_EntryBridge_v*.py | sort | tail -1)" status --quiet
+  echo "--- ⑮ 本機三庫整併盤點(批383;ENG079;scan 唯讀;雲端無本機三庫=誠實 RED 不寫)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG079_LocalDbConsolidate_v*.py | sort | tail -1)" scan || true
+  echo "--- ⑯ 能跑閘(批384;MDL137;家族境 python 真跑引擎自測 --fast;雲端無境=base 退路誠實黃)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL137_RunGate_v*.py | sort | tail -1)" run --fast --quiet || true
+echo "--- ⑰ 台股日交易×籌碼數量對齊核對(批390;VDF_ENG081 check;唯讀;庫缺/籌碼落後=誠實不假綠)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG081_UniverseAlign_v*.py | sort | tail -1)" check || true
+echo "--- ⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL139_InputConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.json → 15 類堆疊矩陣+Markdown;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL140_HandoverConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑳ 收尾閘(批398;MDL141 vrn,vap 只讀:VRN 逐份五段鏈+核對態、VAP 逐圖驗;無報告/無圖=誠實黃)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL141_ClosingGate_v*.py | sort | tail -1)" all || true
+  echo "=== 畢(誠實三態見上)==="
+  if [ "$BOOT_FAILED" -eq 0 ]; then
+    echo "$TODAY" > "$MARK" || exit 1
+    echo "$TODAY" > "$VERIFIED" || exit 1
+    echo "[boot-update] COMPLETE: 子步 rc 全為 0；資料涵蓋仍以各閘為準"
+  else
+    echo "[boot-update] INCOMPLETE: $BOOT_FAILED 個子步非零；不寫今天完成標記，同日可重試"
+  fi
+} >> "$LOG" 2>&1
+[ "$BOOT_FAILED" -eq 0 ]

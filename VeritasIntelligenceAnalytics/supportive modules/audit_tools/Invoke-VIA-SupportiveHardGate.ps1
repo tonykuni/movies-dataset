@@ -1,4 +1,14 @@
 # def PARAMETERS
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $def_SUPPORTIVE_ROOT = "C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module"
 $def_BRIDGE = Join-Path $def_SUPPORTIVE_ROOT "VIA_Supportive_Runtime_HardGate_Bridge.py"
 $def_RUN_ID = "VIA_SUPPORTIVE_GATE_" + (Get-Date -Format "yyyyMMdd_HHmmss")
@@ -54,3 +64,4 @@ Write-Host "[PASS] VIA Supportive HardGate passed" -ForegroundColor Green
 Write-Host "[JSON] $def_REPORT_JSON" -ForegroundColor Green
 Write-Host "[HTML] $def_REPORT_HTML" -ForegroundColor Green
 return $true
+

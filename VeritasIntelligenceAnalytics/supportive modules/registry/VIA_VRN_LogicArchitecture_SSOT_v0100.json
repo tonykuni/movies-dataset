@@ -1,0 +1,745 @@
+{
+ "schema": "VIA.VRN.LogicArchitecture.SSOT.v1",
+ "version": "v0110",
+ "built_by": "via_vrn_logic_book_v0110",
+ "built_at": "2026-09-25 04:27",
+ "from_batch": "批641",
+ "batch": "批666",
+ "ts": "2026-09-20",
+ "purpose": "操作員令「把今天的 VRN 邏輯整合一遍不要遺漏」。本冊是**索引**不是內容:每一層只記『正典在哪一支』,規則本身留在原處。複製一份規則出來就是開第二顆頭(零 Hydra),而且它一定會比正本先過期。",
+ "how_built": "本冊由 docs 附的建冊腳本 glob 尾版解析、逐支讀出檔頭第一句職責後產生——**指標是量出來的,職責是讀出來的**,不是我寫的(LL180)。解析不到任何一支就整本不寫(半本冊比沒有冊危險)。",
+ "law_bindings": [
+  "L90 VRN 正典儲存層=DuckDB(批615 操作員裁定)",
+  "L30 一功能一主(擷取文字修復的擁有者=ENG082)",
+  "L54 尾版律(本冊所有指標一律 glob 尾版,不寫死版號)"
+ ],
+ "layers": {
+  "L0_輸入識別": {
+   "why": "檔名 → 股號/券商/日期;識別錯了後面全錯",
+   "nodes": [
+    {
+     "family": "SUP_MDL030_VISVRNTickerFilenameSSOT",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py",
+     "head": "VIS_VRN_TickerFilenameSSOT (reference build for review)",
+     "role": "檔名→股號正本",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "SUP_MDL031_VISVRNTickerRegexShim",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL031_VISVRNTickerRegexShim_v0100.py",
+     "head": "VIS_VRN_TickerRegexShim_v0100 - P2 runtime shim (operator-approved 2026-08-04)",
+     "role": "regex 橋",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "SUP_MDL015_VISVRNBrokerAliasFullList",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL015_VISVRNBrokerAliasFullList_v0102.py",
+     "head": "VIS_VRN_BrokerAlias_FullList_v0100",
+     "role": "券商別名全表",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG084_FilenameTokenParse",
+     "tail": "functional modules/VRN/VRN_ENG084_FilenameTokenParse_v0100.py",
+     "head": "VRN_ENG084_FilenameTokenParse v0100 — 檔名切分與三來源合流(批634)",
+     "role": "檔名切分×三來源合流(批634 操作員規格)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    }
+   ]
+  },
+  "L1_擷取": {
+   "why": "非 OCR 優先,抓不到才退 OCR;由簡到繁(批493 操作員令)",
+   "owner": "VRN_ENG082_ExtractionLogic(L30:文字修復只寫在這一支)",
+   "nodes": [
+    {
+     "family": "VRN_ENG082_ExtractionLogic",
+     "tail": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py",
+     "head": "VRN_ENG082_ExtractionLogic v0110 — VRN 擷取**中央邏輯庫**(批515 +fix_contents:TAB3「FIXED CONTENTS」修正識別)",
+     "role": "擷取中央邏輯庫(擁有者)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG060_TextOmni",
+     "tail": "functional modules/VRN/VRN_ENG060_TextOmni_v0100.py",
+     "head": "vrn_text_omni_v0100 — 文字統包引擎(TOOL-050;操作員令 2026-08-18)",
+     "role": "文字道",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG058_TableOmni",
+     "tail": "functional modules/VRN/VRN_ENG058_TableOmni_v0105.py",
+     "head": "vrn_table_omni_v0105 — 本地免費表格函式庫統包引擎(TOOL-029)",
+     "role": "表格道(需 poppler)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG057_ScanOcrRescue",
+     "tail": "functional modules/VRN/VRN_ENG057_ScanOcrRescue_v0104.py",
+     "head": "vrn_scan_ocr_rescue_v0104 — 純影像掃描件 OCR 救援(mobile 模型加速版)",
+     "role": "掃描件 OCR 救援",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG056_PdfForensics",
+     "tail": "functional modules/VRN/VRN_ENG056_PdfForensics_v0100.py",
+     "head": "vrn_pdf_forensics_v0100 — PDF 法醫探針(唯讀;零輸出檔死因判定)",
+     "role": "PDF 取證",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG059_GapMultirescue",
+     "tail": "functional modules/VRN/VRN_ENG059_GapMultirescue_v0101.py",
+     "head": "vrn_gap_multirescue_v0101 — 表格缺口多方案總攻指揮(TOOL-049;操作員令 2026-08-18)",
+     "role": "缺口多重救援",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG075_DocToMarkdown",
+     "tail": "functional modules/VRN/VRN_ENG075_DocToMarkdown_v0101.py",
+     "head": "VRN_ENG075_DocToMarkdown — 文件→Markdown→JSON 引擎(批249 立;批258 JSON 道)",
+     "role": "文件→Markdown",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG077_OmniFormatBridge",
+     "tail": "functional modules/VRN/VRN_ENG077_OmniFormatBridge_v0100.py",
+     "head": "VRN_ENG077_OmniFormatBridge — VOFIE 全格式引擎橋(批256;操作員令)",
+     "role": "多格式橋",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "SUP_MDL747_OcrLaneRunner",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL747_OcrLaneRunner_v0102.py",
+     "head": "SUP_MDL747_OcrLaneRunner v0102 — OCR 車道執行器(批495;v0101 批499;v0102 批501)",
+     "role": "OCR 車道調度(需 poppler/tesseract)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "SUP_MDL746_PDFPlumberPlusHub",
+     "tail": "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v0101.py",
+     "head": "SUP_MDL746 · PDFPlumberPlusHub v0101 —— PDFPlumber-Plus 收容件統轄橋",
+     "role": "pdfplumber 樞紐",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG017_MDL004OCRFetchingPDFTable",
+     "tail": "functional modules/VRN/VRN_ENG017_MDL004OCRFetchingPDFTable.py",
+     "head": "from __future__ import annotations",
+     "role": "OCR 退路:PDF 表格",
+     "placed_by": "批662",
+     "evidence": "docstring 首句 `VRN_MDL004_OCR_FetchingPDFTable`(無格子站)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG018_MDL005OCRFetchingPDFText",
+     "tail": "functional modules/VRN/VRN_ENG018_MDL005OCRFetchingPDFText.py",
+     "head": "from __future__ import annotations",
+     "role": "OCR 退路:PDF 純文字",
+     "placed_by": "批662",
+     "evidence": "docstring 首句 `VRN_MDL005_OCRFetchingPDFText`(無格子站)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG023_MDL011DailyFetcher",
+     "tail": "functional modules/VRN/VRN_ENG023_MDL011DailyFetcher.py",
+     "head": "from __future__ import annotations",
+     "role": "對外取料(法遵雙閘)",
+     "placed_by": "批662",
+     "evidence": "docstring「統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT)」(無格子站)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG052_DocxEngine",
+     "tail": "functional modules/VRN/VRN_ENG052_DocxEngine_v0101.py",
+     "head": "vrn_docx_engine_v0101 — DOCX 深度解析引擎(10 地雷硬化版)",
+     "role": "DOCX 深度解析",
+     "placed_by": "批662",
+     "evidence": "格子站名「docx 引擎(doc)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG070_YahooConsensus",
+     "tail": "functional modules/VRN/VRN_ENG070_YahooConsensus_v0104.py",
+     "head": "v0104（2026-09-25）：全名冊 .TW/.TWO、查庫後分批補缺、EPS-only、完整來源與時間旁表。",
+     "role": "對外取共識資料",
+     "placed_by": "批662",
+     "evidence": "格子站名「Yahoo 共識八檢(批194)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    }
+   ]
+  },
+  "L2_結構與知識": {
+   "why": "把抽出來的字變成有欄位的東西",
+   "nodes": [
+    {
+     "family": "VRN_ENG072_FirstPageText",
+     "tail": "functional modules/VRN/VRN_ENG072_FirstPageText_v0139.py",
+     "head": "v0137→v0139(側線 2026-09-25 第十六段;主線批號由併線的手指定 L25。LL334:v0138 在 PR #104 批734 的分支 upbeat-feynman 上,未併;",
+     "role": "首頁文字",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG073_ReportStructuredDB",
+     "tail": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py",
+     "head": "v0137→v0138(批730 操作員 2026-09-24 令「自測實測自AUDIT直到完工 結果也要實測正確性」):",
+     "role": "研報結構庫",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)",
+     "also_layers": [
+      "L5_儲存"
+     ],
+     "also_layers_evidence": "CREATE TABLE IF NOT EXISTS vrn_report_basic / vrn_report_analyst / vrn_report_metrics -> vdf_tw_market.duckdb;正是 L90 裁定的「正典 = vdf_tw_market.duckdb 的 vrn_* 七張表」。**L5 的正典儲存那一格不是空的,承載者被歸在 L2**(它真的跨兩層)"
+    },
+    {
+     "family": "VRN_ENG074_FinancialPages",
+     "tail": "functional modules/VRN/VRN_ENG074_FinancialPages_v0114.py",
+     "head": "(讀不到抬頭;誠實)",
+     "role": "財報頁(批615 期間/單位/幣別)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG063_Lexicon",
+     "tail": "functional modules/VRN/VRN_ENG063_Lexicon_v0101.py",
+     "head": "vrn_lexicon_v0101 — 中英文字庫+知識樹引擎(TOOL-059;品質閘版)",
+     "role": "詞庫",
+     "role_kind": "參考",
+     "role_kind_why": "詞庫:被查的冊,不產出新料"
+    },
+    {
+     "family": "VRN_ENG064_KnowledgeStack",
+     "tail": "functional modules/VRN/VRN_ENG064_KnowledgeStack_v0103.py",
+     "head": "v0102→v0103(批689B 缺件不是壞掉 L16):⑦ jieba 不在=NODATA(不代裝)· ⑧ pytest 不在=NODATA(不代裝);裝了才真驗。",
+     "role": "知識堆疊(批611 零依賴簡→繁)",
+     "role_kind": "參考",
+     "role_kind_why": "知識堆疊:被查的冊(批611 凍結對照表 2,784 筆)"
+    },
+    {
+     "family": "VRN_ENG085_MarkdownRestore",
+     "tail": "functional modules/VRN/VRN_ENG085_MarkdownRestore_v0106.py",
+     "head": "VRN_ENG085_MarkdownRestore v0100 — 本文還原與分類標註(批636)",
+     "role": "本文還原(不刪除;類別/次類別/頁數;批636–640)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG086_FirstPageLogicBridge",
+     "tail": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0116.py",
+     "head": "v0115→v0116(批727 #85 英文版面目標價缺口)",
+     "role": "首頁邏輯橋",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG087_NLPTextSummaryBridge",
+     "tail": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+     "head": "VRN_ENG087_NLPTextSummaryBridge v0100",
+     "role": "NLP 文摘橋(072→MDL744→073 編排)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG055_OfficeMerge",
+     "tail": "functional modules/VRN/VRN_ENG055_OfficeMerge_v0101.py",
+     "head": "vrn_office_merge_v0101 — Office(xlsx/csv/docx)併主表橋(TOOL-044)",
+     "role": "Office 併主表",
+     "placed_by": "批662",
+     "evidence": "格子站名「office 併表橋(dry)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG066_NLPSupportHub",
+     "tail": "functional modules/VRN/VRN_ENG066_NLPSupportHub_v0100.py",
+     "head": "VRN_ENG066_NLPSupportHub — NLP 工具統一整合×Summarizer 支援樞紐(批157;via-nlphub)",
+     "role": "NLP 工具樞紐",
+     "placed_by": "批662",
+     "evidence": "格子站名「NLP 支援樞紐九檢(批157)」",
+     "role_kind": "參考",
+     "role_kind_why": "NLP 工具樞紐:被叫的工具面,不是管線站"
+    },
+    {
+     "family": "VRN_ENG067_MindMapSSOT",
+     "tail": "functional modules/VRN/VRN_ENG067_MindMapSSOT_v0103.py",
+     "head": "VRN_ENG067_MindMapSSOT — 三語關鍵字 SSOT×分類×漸進知識體 Mind map(批158;via-mindmap)",
+     "role": "三語關鍵字 SSOT×分類",
+     "placed_by": "批662",
+     "evidence": "格子站名「三語 SSOT×MindMap 九檢(批158)」",
+     "role_kind": "參考",
+     "role_kind_why": "三語關鍵字 SSOT x 分類:被查的冊"
+    },
+    {
+     "family": "VRN_ENG071_CnyesFusion",
+     "tail": "functional modules/VRN/VRN_ENG071_CnyesFusion_v0103.py",
+     "head": "v0103（2026-09-25）：全名冊／正確市場、來源 rateDate 與抓取時點分存、完整回包、當年/次年 EPS 對映與同日增量。",
+     "role": "共識融合",
+     "placed_by": "批662",
+     "evidence": "格子站名「鉅亨 FactSet 共識九檢(批199)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG078_NLPOneBridge",
+     "tail": "functional modules/VRN/VRN_ENG078_NLPOneBridge_v0102.py",
+     "head": "v0101→v0102(批538 VRN 實測):①② 把版號與模組數寫死(v1.5.0 / 35 模組),而收容夾裡已經有 v1.6.1(36 模組)——",
+     "role": "NLP 正主橋",
+     "placed_by": "批662",
+     "evidence": "格子站名「NLP OneEngine 橋自測(批283)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    }
+   ]
+  },
+  "L3_驗證": {
+   "why": "「有值」不等於「對」——驗過才准進矩陣(批569)",
+   "nodes": [
+    {
+     "family": "VRN_ENG083_VerifiedMatrix",
+     "tail": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0119.py",
+     "head": "VRN_ENG083_VerifiedMatrix v0100 — 驗證矩陣(批569)",
+     "role": "驗證矩陣",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG076_RegressionGate",
+     "tail": "functional modules/VRN/VRN_ENG076_RegressionGate_v0101.py",
+     "head": "VRN_ENG076_RegressionGate v0101 — 抽取鏈迴歸閘(批251;操作員「完成所有工作",
+     "role": "回歸閘",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "CGC_MDL141_ClosingGate",
+     "tail": "supportive modules/registry/CGC_MDL141_ClosingGate_v0111.py",
+     "head": "CGC_MDL141_ClosingGate v0100 — 收尾閘(批398 操作員令「將 VRN VAL 收個尾吧」;via-closeout / via-vrnval / via-vapval)",
+     "role": "收尾閘(VRN 驗證收尾)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_AutoTestLoop",
+     "tail": "functional modules/VRN/engine/VRN_AutoTestLoop.py",
+     "head": "VRN_AutoTestLoop v0107 — 自動測試、自動修正、直到成功（或說清楚卡在哪一段）",
+     "role": "實檔自測迴圈(第二血統總驗 12 閘;--selftest=VRN/tests 全部單元測試+合成小批;批728 自姊妹倉收回正位)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG049_ContentReconcile",
+     "tail": "functional modules/VRN/VRN_ENG049_ContentReconcile_v0102.py",
+     "head": "vrn_content_reconcile_v0102 — OCR 擷取產物 × SSOT v2 內容級對帳(唯讀;批244 認得首頁道)",
+     "role": "內容級對帳(唯讀)",
+     "placed_by": "批662",
+     "evidence": "格子站名「reconcile 對帳」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    }
+   ]
+  },
+  "L4_產出": {
+   "why": "給人看的那一層",
+   "nodes": [
+    {
+     "family": "VRN_ENG080_FourPointDigest",
+     "tail": "functional modules/VRN/VRN_ENG080_FourPointDigest_v0110.py",
+     "head": "v0109→v0110(批730 操作員 2026-09-24 令「自測實測自AUDIT直到完工 結果也要實測正確性」):",
+     "role": "一題四點文摘",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG068_DailyBrief",
+     "tail": "functional modules/VRN/VRN_ENG068_DailyBrief_v0106.py",
+     "head": "v0105→v0106(批689B 操作員令「測試修正各引擎…避免傷害引擎跟系統」:缺料不是壞掉 L16)",
+     "role": "每日簡報",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG079_ControlTowerDashboard",
+     "tail": "functional modules/VRN/VRN_ENG079_ControlTowerDashboard_v0101.py",
+     "head": "v0100→v0101(批732;操作員 09-24「上漲空間都要用最新的ADJ CLOSE」;Z157 共識線的 VRN 讀者段)",
+     "role": "控制塔",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG089_TemplateView",
+     "tail": "functional modules/VRN/VRN_ENG089_TemplateView_v0103.py",
+     "head": "VRN_ENG089_TemplateView v0103 — VRN 模板(制式 U/I 套版)· synchronizer 控制 · 上下游自動連結與新增檢查(批735)",
+     "role": "VRN 模板(自測成果套進制式 U/I;synchronizer 控制;上下游連結冊對上一輪 + 新增上頁檢查;批735)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG090_FinStatementsTemplate",
+     "tail": "functional modules/VRN/VRN_ENG090_FinStatementsTemplate_v0102.py",
+     "head": "VRN_ENG090_FinStatementsTemplate v0102 — 交易所財報 VRN 模板頁(制式 HTML U/I · SYNCHRONIZER 交接 · 上下自動燈號)",
+     "role": "交易所財報模板；上游 VDF_ENG082 唯讀；2026-09-25 操作員核准接手，歸 L4 產出(Z213)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG062_SummarizerV1",
+     "tail": "functional modules/VRN/VRN_ENG062_SummarizerV1_v0102.py",
+     "head": "import sys as _sa_sys",
+     "role": "摘要 v1",
+     "placed_by": "批662",
+     "evidence": "docstring 首句 `VRN_ENG062_SummarizerV1`(無格子站)",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    },
+    {
+     "family": "VRN_ENG065_MailIntel",
+     "tail": "functional modules/VRN/VRN_ENG065_MailIntel_v0100.py",
+     "head": "VRN_ENG065_MailIntel — NLP×郵件追蹤×報告摘要整合管線(批143;via-mail)",
+     "role": "郵件情報管線",
+     "placed_by": "批662",
+     "evidence": "格子站名「郵件情報管線八檢(批143)」",
+     "role_kind": "加工",
+     "role_kind_why": "把料變成另一種料(預設)"
+    }
+   ]
+  },
+  "L5_儲存": {
+   "why": "L90:正典=DuckDB;其餘全是派生層,單向永不回灌",
+   "canonical": "**DuckDB** —— `vdf_tw_market.duckdb` 的 `vrn_*` 七張表(L90;批615 操作員裁定)",
+   "nodes": [
+    {
+     "family": "VRN_ENG081_ParquetMainDB",
+     "tail": "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0101.py",
+     "head": "VRN_ENG081_ParquetMainDB v0101 — VRN 交付派生庫(Parquet;正典是 DuckDB)",
+     "role": "Parquet 派生車道(**非正典**;批615 正名)",
+     "role_kind": "落庫",
+     "role_kind_why": "Parquet 派生車道(批615 正名:非正典)"
+    },
+    {
+     "family": "VRN_ENG050_ContentStore",
+     "tail": "functional modules/VRN/VRN_ENG050_ContentStore_v0106.py",
+     "head": "vrn_content_store_v0106 — 對帳綠燈內容落庫 via.duckdb(Windows 自鎖根因修)",
+     "role": "對帳綠燈內容落庫(**專用庫 via.duckdb,非正典**)",
+     "placed_by": "批662",
+     "evidence": "格子站名「store 落庫(dry)」",
+     "role_kind": "落庫",
+     "role_kind_why": "對帳綠燈內容落庫(專用庫 via.duckdb,非正典)"
+    },
+    {
+     "family": "VRN_ENG069_ConsensusDB",
+     "tail": "functional modules/VRN/VRN_ENG069_ConsensusDB_v0107.py",
+     "head": "v0107（2026-09-25）：共識擷取共用正式名冊、台灣快照日、增量清單與完整來源旁表。",
+     "role": "共識庫(**專用表,非正典**)",
+     "placed_by": "批662",
+     "evidence": "格子站名「驗證共識庫八檢(批176)」",
+     "role_kind": "落庫",
+     "role_kind_why": "共識庫(專用表,非正典)"
+    }
+   ]
+  }
+ },
+ "placed_by_batch662": [
+  {
+   "family": "VRN_ENG017_MDL004OCRFetchingPDFTable",
+   "layer": "L1_擷取",
+   "role": "OCR 退路:PDF 表格",
+   "evidence": "docstring 首句 `VRN_MDL004_OCR_FetchingPDFTable`(無格子站)",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG017_MDL004OCRFetchingPDFTable.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG018_MDL005OCRFetchingPDFText",
+   "layer": "L1_擷取",
+   "role": "OCR 退路:PDF 純文字",
+   "evidence": "docstring 首句 `VRN_MDL005_OCRFetchingPDFText`(無格子站)",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG018_MDL005OCRFetchingPDFText.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG023_MDL011DailyFetcher",
+   "layer": "L1_擷取",
+   "role": "對外取料(法遵雙閘)",
+   "evidence": "docstring「統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT)」(無格子站)",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG023_MDL011DailyFetcher.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG049_ContentReconcile",
+   "layer": "L3_驗證",
+   "role": "內容級對帳(唯讀)",
+   "evidence": "格子站名「reconcile 對帳」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG049_ContentReconcile_v0102.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG050_ContentStore",
+   "layer": "L5_儲存",
+   "role": "對帳綠燈內容落庫(**專用庫 via.duckdb,非正典**)",
+   "evidence": "格子站名「store 落庫(dry)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG050_ContentStore_v0106.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG052_DocxEngine",
+   "layer": "L1_擷取",
+   "role": "DOCX 深度解析",
+   "evidence": "格子站名「docx 引擎(doc)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG052_DocxEngine_v0101.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG055_OfficeMerge",
+   "layer": "L2_結構與知識",
+   "role": "Office 併主表",
+   "evidence": "格子站名「office 併表橋(dry)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG055_OfficeMerge_v0101.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG062_SummarizerV1",
+   "layer": "L4_產出",
+   "role": "摘要 v1",
+   "evidence": "docstring 首句 `VRN_ENG062_SummarizerV1`(無格子站)",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG062_SummarizerV1_v0102.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG065_MailIntel",
+   "layer": "L4_產出",
+   "role": "郵件情報管線",
+   "evidence": "格子站名「郵件情報管線八檢(批143)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG065_MailIntel_v0100.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG066_NLPSupportHub",
+   "layer": "L2_結構與知識",
+   "role": "NLP 工具樞紐",
+   "evidence": "格子站名「NLP 支援樞紐九檢(批157)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG066_NLPSupportHub_v0100.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG067_MindMapSSOT",
+   "layer": "L2_結構與知識",
+   "role": "三語關鍵字 SSOT×分類",
+   "evidence": "格子站名「三語 SSOT×MindMap 九檢(批158)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG067_MindMapSSOT_v0103.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG069_ConsensusDB",
+   "layer": "L5_儲存",
+   "role": "共識庫(**專用表,非正典**)",
+   "evidence": "格子站名「驗證共識庫八檢(批176)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG069_ConsensusDB_v0107.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG070_YahooConsensus",
+   "layer": "L1_擷取",
+   "role": "對外取共識資料",
+   "evidence": "格子站名「Yahoo 共識八檢(批194)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG070_YahooConsensus_v0104.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG071_CnyesFusion",
+   "layer": "L2_結構與知識",
+   "role": "共識融合",
+   "evidence": "格子站名「鉅亨 FactSet 共識九檢(批199)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG071_CnyesFusion_v0103.py",
+   "state": "PLACED"
+  },
+  {
+   "family": "VRN_ENG078_NLPOneBridge",
+   "layer": "L2_結構與知識",
+   "role": "NLP 正主橋",
+   "evidence": "格子站名「NLP OneEngine 橋自測(批283)」",
+   "placed_by": "批662",
+   "tail": "functional modules/VRN/VRN_ENG078_NLPOneBridge_v0102.py",
+   "state": "PLACED"
+  }
+ ],
+ "off_book_pending": [
+  {
+   "family": "VRN_ENG088_SsotAdditiveBridge",
+   "state": "PENDING_OPERATOR",
+   "head": "VRN_ENG088_SsotAdditiveBridge v0100 — SSOT 增補審計橋(側線 2026-09-21)",
+   "tail": "functional modules/VRN/VRN_ENG088_SsotAdditiveBridge_v0100.py",
+   "why": "樹上活著但未列入六層;是否上架構冊=架構裁定,待操作員"
+  }
+ ],
+ "rule_canons": {
+  "方法冊_def01_21": {
+   "family": "vrn_method_kernel",
+   "tail": "functional modules/VRN/vrn_method_kernel_v0102.py",
+   "head": "vrn_method_kernel_v0102 — VRN 方法核(TOOL-071)",
+   "role": "方法核:def01–def21(含期間解析)"
+  },
+  "六欄規則": {
+   "family": "SUP_MDL749_VRNFieldRuleHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0114.py",
+   "head": "v0113→v0114(批728 操作員令「VCGC 相關工具 SSOT REGEX 同步自動相互更新檢查」):",
+   "role": "研報六欄規則正本樞紐"
+  },
+  "財務邏輯": {
+   "family": "SUP_MDL748_FinancialLogicHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v0100.py",
+   "head": "SUP_MDL748_FinancialLogicHub v0100 — 財務邏輯統轄橋(批504)",
+   "role": "財務邏輯樞紐"
+  },
+  "版面樞紐": {
+   "family": "SUP_MDL743_GenericLayoutHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0100.py",
+   "head": "SUP_MDL743_GenericLayoutHub — GLE 全後端統轄橋(批421;操作員令)",
+   "role": "通用版面樞紐"
+  },
+  "NLP 應用": {
+   "family": "SUP_MDL744_NLPApplicationHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+   "head": "SUP_MDL744_NLPApplicationHub v0102 — NLP 應用系統統轄橋(批517 操作員令「VRN 實測 NLP 工具要導入」)",
+   "role": "NLP 應用樞紐"
+  },
+  "Markdown 結構": {
+   "family": "SUP_MDL745_MarkdownStructureHub",
+   "tail": "supportive modules/70_VRN_Rules/SUP_MDL745_MarkdownStructureHub_v0100.py",
+   "head": "SUP_MDL745 · MarkdownStructureHub v0100 —— Markdown 結構重組收容件統轄橋",
+   "role": "Markdown 結構樞紐"
+  },
+  "階段別名": {
+   "book": "supportive modules/registry/VIA_VRN_StageAlias_Map_v0100.json",
+   "exists": true
+  },
+  "繁簡轉換": {
+   "book": "supportive modules/registry/VIA_ZhConvert_S2TWP_CharMap_v0100.json",
+   "exists": true,
+   "why": "批611:opencc 缺席時的凍結對照表;**函式消失不是降級,是斷線**"
+  },
+  "基本資料欄": {
+   "book": "functional modules/VRN/StockReportBasicInfo.json",
+   "exists": true
+  },
+  "Sheet 產出計畫": {
+   "book": "functional modules/VRN/StockReport_GoogleSheet_OutputPlan.json",
+   "exists": true
+  }
+ },
+ "external_tools": {
+  "why": "批618 量過:pdf2image 靠 PATH 找 pdftoppm;剝掉 = VRN 取表道當場斷線",
+  "anchors_book": "supportive modules/registry/VIA_BadEnv_Blacklist_v0102.json#path_tool_anchors",
+  "tools": [
+   "poppler(pdftoppm/pdfinfo/pdftocairo)",
+   "tesseract"
+  ]
+ },
+ "rulings_today": [
+  {
+   "batch": "批611",
+   "what": "簡→繁不再依賴 opencc:凍結對照表 2,784 筆",
+   "landed_in": [
+    "functional modules/VRN/VRN_ENG064_KnowledgeStack_v0102.py",
+    "supportive modules/registry/VIA_ZhConvert_S2TWP_CharMap_v0100.json"
+   ],
+   "why": "一個套件缺席讓三站同時紅;shim 把函式變成 None=**函式消失**,不是降級"
+  },
+  {
+   "batch": "批615",
+   "what": "操作員裁定:VRN 正典儲存層 = DuckDB(L90)",
+   "landed_in": [
+    "supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json#L90",
+    "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0101.py"
+   ],
+   "why": "批472 原令寫 Parquet 當唯一真值;批615 覆蓋。兩令並存,時序為準,不刪舊令"
+  },
+  {
+   "batch": "批615",
+   "what": "數值入正典必須帶**宣告出來的**單位,不得由數值大小反推(LL178)",
+   "landed_in": [
+    "supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json#L90 配套②",
+    "functional modules/VRN/VRN_ENG074_FinancialPages_v0111.py"
+   ],
+   "why": ""
+  },
+  {
+   "batch": "批615",
+   "what": "期間拆解:1Q25 與 25Q1 同義(ENG074 檢㉑ 只比三個結構欄,不比 why)",
+   "landed_in": [
+    "functional modules/VRN/VRN_ENG074_FinancialPages_v0111.py"
+   ],
+   "why": ""
+  },
+  {
+   "batch": "批618",
+   "what": "poppler 是 VRN 的活相依,列入 PATH 搬家白名單(不得盲剝)",
+   "landed_in": [
+    "supportive modules/registry/VIA_BadEnv_Blacklist_v0102.json#path_tool_anchors",
+    "supportive modules/registry/via_conflict_guard_v0101.py"
+   ],
+   "why": ""
+  }
+ ],
+ "known_gaps": [
+  {
+   "item": "財報欄位清單(FinancialData)沒有與 StockReportBasicInfo.json 對稱的正本冊",
+   "state": "PENDING_OPERATOR",
+   "why": "量過:VRN 夾內有 StockReportBasicInfo.json,沒有 StockReportFinancialData.json。欄位清單目前散在 ENG074 的程式碼裡。要不要獨立成冊是裁定,不是我能決定的(LL90)"
+  },
+  {
+   "item": "L0-L5 六層的層名(本冊第一次寫下來的那六個名字)",
+   "state": "REVIEWED_B665",
+   "why": "操作員批665 授權「你決定 你覆核 你完成」。**裁定:六層層名與層數維持。**改名/改層數要重做 50 個指標與 15 支歸位,換不到任何一個新的判斷力。原本提的兩個怪處,量過之後錯的不是層名,是『一支引擎只能站一層』這個假設:① L2 混著加工站與參考書 -> 補 role_kind(加工/參考/落庫),不動層;② L5 正典儲存看起來是空的 -> **不是空的**,ENG073 建 vrn_report_basic/analyst/metrics 進 vdf_tw_market.duckdb,正是 L90 的正典七表;它跨 L2+L5,補 also_layers。兩個欄位都只增不減,沒有搬動任何一支的歸屬。要推翻哪一支,看它的 role_kind_why / also_layers_evidence 那一行就夠",
+   "ruled_by": "AI 代裁(批665 操作員授權)"
+  }
+ ],
+ "layer_review_b665": {
+  "ruled_by": "AI 代裁(批665 操作員授權「你決定 你覆核 你完成」)",
+  "verdict": "六層層名維持,層數維持;不搬動任何一支的歸屬",
+  "why": "改層名/改層數要重做 50 個指標與 15 支歸位,換不到任何一個新的判斷力。原本提的兩個怪處,量過之後錯的不是層名,是『一支引擎只能站一層』這個假設",
+  "added_fields": [
+   "role_kind",
+   "role_kind_why",
+   "also_layers",
+   "also_layers_evidence"
+  ],
+  "role_kind_tagged": 47,
+  "also_layers_tagged": 1,
+  "canonical_store_holder": [
+   "VRN_ENG073_ReportStructuredDB"
+  ],
+  "note": "L5『儲存』的正典那一格**不是空的**:ENG073 建 vrn_report_basic/analyst/metrics 進 vdf_tw_market.duckdb,正是 L90 的正典七表。它跨 L2+L5。"
+ }
+}

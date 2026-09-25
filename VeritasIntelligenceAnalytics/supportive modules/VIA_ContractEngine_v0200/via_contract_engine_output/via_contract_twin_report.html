@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Digital Twin Report</title><style>:root {
+  color-scheme: light;
+  --via-ink: #2f4554;
+  --via-muted: #657786;
+  --via-line: #d9e3ea;
+  --via-panel: #ffffff;
+  --via-bg: #f4f8fb;
+  --via-blue: #4c78a8;
+  --via-blue-soft: #dbe9f4;
+  --via-green: #59a14f;
+  --via-red: #e15759;
+  --via-yellow: #f2cf5b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--via-bg);
+  color: var(--via-ink);
+  font: 13px/1.45 Inter, "Noto Sans TC", "Segoe UI", sans-serif;
+}
+.via-shell { width: min(1180px, 96vw); margin: 24px auto; }
+.via-header, .via-card {
+  background: var(--via-panel);
+  border: 1px solid var(--via-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(76, 120, 168, .08);
+}
+.via-header { padding: 16px 18px; margin-bottom: 14px; }
+.via-header h1 { margin: 0 0 4px; font-size: 20px; color: var(--via-blue); }
+.via-header p { margin: 0; color: var(--via-muted); }
+.via-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.via-card { padding: 16px; min-width: 0; }
+.via-card h2 { margin: 0 0 4px; font-size: 16px; overflow-wrap: anywhere; }
+.via-meta { color: var(--via-muted); font-size: 11px; margin-bottom: 14px; overflow-wrap: anywhere; }
+.via-field { margin: 0 0 12px; min-width: 0; }
+.via-field label { display: block; font-weight: 650; margin-bottom: 4px; }
+.via-help { color: var(--via-muted); font-size: 11px; margin: 4px 0 0; overflow-wrap: anywhere; }
+.via-required { color: var(--via-red); }
+input, select, textarea, button {
+  width: 100%; border: 1px solid #bdccd7; border-radius: 7px;
+  color: var(--via-ink); background: #fff; font: inherit;
+}
+input, select, textarea { padding: 8px 9px; }
+textarea { min-height: 86px; resize: vertical; }
+input[type="checkbox"] { width: auto; margin-right: 7px; }
+input[type="color"] { min-height: 38px; padding: 3px; }
+button { padding: 9px 12px; border-color: var(--via-blue); background: var(--via-blue); color: white; cursor: pointer; }
+button:hover { filter: brightness(1.05); }
+.via-result { margin-top: 10px; padding: 9px; border-radius: 7px; background: #eef5fa; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 34px; }
+.via-status { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--via-blue-soft); font-size: 10px; }
+@media (max-width: 620px) { .via-shell { width: 94vw; margin: 12px auto; } .via-grid { grid-template-columns: 1fr; } }
+table { width:100%; border-collapse:collapse; table-layout:fixed; }
+th,td { border:1px solid #d9e3ea; padding:6px; text-align:left; vertical-align:top; overflow-wrap:anywhere; }
+th { background:#dbe9f4; color:#2f4554; }
+</style></head><body><main class="via-shell"><header class="via-header">
+<h1>VIA Digital Twin Contract Report</h1><p>Gate: PASS · PASS 19 · FAIL 0</p>
+</header><section class="via-card"><table><thead><tr><th>Check</th><th>Module</th><th>Category</th><th>Expected</th><th>Actual</th><th>Status</th><th>Detail</th></tr></thead>
+<tbody><tr><td>VALID_BASELINE</td><td>OrderProcessor</td><td>CONTRACT</td><td>ACCEPT</td><td>ACCEPT</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>MISSING_REQUIRED_order_id</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>order_id: missing</td></tr><tr><td>MISSING_REQUIRED_amount</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>amount: missing</td></tr><tr><td>BELOW_MIN_LENGTH_order_id</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>order_id: string_too_short</td></tr><tr><td>ABOVE_MAX_LENGTH_order_id</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>order_id: string_too_long</td></tr><tr><td>EXCLUSIVE_MIN_amount</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>amount: greater_than</td></tr><tr><td>ABOVE_MAX_amount</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>amount: less_than_equal</td></tr><tr><td>INVALID_TYPE_amount</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>amount: float_parsing</td></tr><tr><td>INVALID_ENUM_currency</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>currency: literal_error</td></tr><tr><td>EXTRA_FIELD</td><td>OrderProcessor</td><td>CONTRACT</td><td>REJECT</td><td>REJECT</td><td style="color:#59a14f;font-weight:700">PASS</td><td>__via_unregistered_field__: extra_forbidden</td></tr><tr><td>UI_FIELD_order_id</td><td>OrderProcessor</td><td>UI_BINDING</td><td>PRESENT</td><td>PRESENT</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_REQUIRED_order_id</td><td>OrderProcessor</td><td>UI_BINDING</td><td>REQUIRED</td><td>REQUIRED</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_CONSTRAINT_order_id_minlength</td><td>OrderProcessor</td><td>UI_CONSTRAINT</td><td>3</td><td>3</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_CONSTRAINT_order_id_maxlength</td><td>OrderProcessor</td><td>UI_CONSTRAINT</td><td>40</td><td>40</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_CONSTRAINT_order_id_pattern</td><td>OrderProcessor</td><td>UI_CONSTRAINT</td><td>^[A-Za-z0-9_-]+$</td><td>^[A-Za-z0-9_-]+$</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_FIELD_amount</td><td>OrderProcessor</td><td>UI_BINDING</td><td>PRESENT</td><td>PRESENT</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_REQUIRED_amount</td><td>OrderProcessor</td><td>UI_BINDING</td><td>REQUIRED</td><td>REQUIRED</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_CONSTRAINT_amount_max</td><td>OrderProcessor</td><td>UI_CONSTRAINT</td><td>100000000</td><td>100000000</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr><tr><td>UI_FIELD_currency</td><td>OrderProcessor</td><td>UI_BINDING</td><td>PRESENT</td><td>PRESENT</td><td style="color:#59a14f;font-weight:700">PASS</td><td></td></tr></tbody></table></section></main></body></html>

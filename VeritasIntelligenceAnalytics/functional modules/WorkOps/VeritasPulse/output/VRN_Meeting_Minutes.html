@@ -1,0 +1,44 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<title>Meeting Minutes · VRN Fetch v4 — 設計審查會議</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:18mm 16mm 16mm;
+  @bottom-right{content:"VeritasPulse · 機密 Confidential · 第 " counter(page) " 頁";
+    font-family:'DM Mono','Noto Sans CJK TC';font-size:8pt;color:#8f897c}}
+*{box-sizing:border-box}
+body{font-family:'DM Sans','Noto Sans CJK TC',sans-serif;color:#1a1916;font-size:10.5pt;line-height:1.6;margin:0}
+.eyebrow{font-family:'DM Mono','Noto Sans CJK TC';font-size:8.5pt;letter-spacing:.22em;text-transform:uppercase;color:#5e7032}
+h1{font-family:'Syne','Noto Sans CJK TC';font-weight:800;font-size:25pt;letter-spacing:-.01em;margin:6px 0 10px}
+.head{border-left:5px solid #5e7032;padding-left:16px;margin-bottom:18px}
+.meta{font-family:'DM Mono','Noto Sans CJK TC';font-size:9pt;color:#56524a}
+.meta b{color:#1a1916;font-weight:500}
+.badge{display:inline-block;font-family:'DM Mono','Noto Sans CJK TC';font-size:8pt;letter-spacing:.1em;text-transform:uppercase;
+  background:#e2e6d0;color:#5e7032;padding:3px 10px;border-radius:20px;margin-left:8px}
+.summary{background:#fbfaf7;border:1px solid #e2dfd6;border-left:4px solid #5e7032;border-radius:8px;padding:13px 16px;margin:14px 0 22px;font-size:11pt}
+h2{font-family:'Syne','Noto Sans CJK TC';font-weight:700;font-size:14pt;margin:22px 0 9px;display:flex;align-items:center;gap:9px}
+h2 .num{width:22px;height:22px;border-radius:6px;background:#5e7032;color:#fff;font-family:'DM Mono';font-size:11pt;display:inline-grid;place-items:center}
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:10pt}
+th{background:#f0eee8;text-align:left;font-family:'DM Mono','Noto Sans CJK TC';font-size:8pt;letter-spacing:.08em;text-transform:uppercase;color:#8f897c;padding:7px 9px;border-bottom:1px solid #cfcabd}
+td{padding:8px 9px;border-bottom:1px solid #e2dfd6;vertical-align:top}
+td.n{font-family:'DM Mono';color:#8f897c;width:26px}
+td.owner{font-family:'DM Mono','Noto Sans CJK TC';color:#5e7032;white-space:nowrap}
+ol{margin:6px 0 0;padding-left:22px}li{margin:6px 0}
+.dlog li::marker{color:#35506b;font-weight:700}
+.risk li::marker{color:#9a6b2f}
+.seg{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efeee9;font-size:9.5pt}
+.seg .t{font-family:'DM Mono';color:#8f897c;width:42px;flex:none}
+.seg .sp{font-weight:600;width:90px;flex:none}
+.seg .ct{font-family:'DM Mono';font-size:7.5pt;padding:1px 6px;border-radius:10px;height:fit-content;white-space:nowrap}
+.foot{margin-top:26px;padding-top:10px;border-top:1px solid #e2dfd6;font-family:'DM Mono','Noto Sans CJK TC';font-size:8pt;color:#8f897c;display:flex;justify-content:space-between}
+</style></head><body>
+<div class="head"><div class="eyebrow">Meeting Minutes · 會議紀錄</div>
+<h1>VRN Fetch v4 — 設計審查會議</h1>
+<div class="meta"><b>日期</b> 2026-05-31 &nbsp;·&nbsp; <b>出席</b> Tony, VRN Maintainer, Reviewer
+<span class="badge">全面 Comprehensive</span></div></div>
+<div class="summary">本次會議共 10 段,含 3 項決議、3 項行動、2 項風險。</div>
+<h2><span class="num">1</span>Action Items 行動項目</h2>
+<table><tr><th>#</th><th>行動</th><th>負責人</th><th>期限</th></tr><tr><td class="n">1</td><td>ControlCenter 的即時狀態燈號需要補上 error 重試計數。</td><td class="owner">Reviewer</td><td class="owner">+7d</td></tr><tr><td class="n">2</td><td>下週前要完成 ControlCenter 重試計數並補單元測試。</td><td class="owner">VRN Maintainer</td><td class="owner">+7d</td></tr><tr><td class="n">3</td><td>Action:Reviewer 補寫 ControlCenter 的 e2e 測試腳本。</td><td class="owner">Reviewer</td><td class="owner">+7d</td></tr></table>
+<h2><span class="num">2</span>Decision Log 決議</h2><ol class="dlog"><li>MDL010 到 MDL014 已全部接上 BRIDGE,測試 21/21 PASS。</li><li>我們決定 M01 維持 PDF 流程,TIFF 不再保留 fallback。</li><li>決議:重試上限預設 3,可由設定檔覆寫。</li></ol>
+<h2><span class="num">4</span>Discussion 討論</h2><ol><li>今天審查 VRN Fetch v4 的 BRIDGE 整合與 ControlCenter UI。</li><li>討論是否把 Fetch 重試上限做成可設定參數。</li></ol><h2><span class="num">5</span>Risks 風險</h2><ol class="risk"><li>風險:numpy 2.0 若洩漏進 vpl_core 會破壞相依。</li><li>風險:Google API 配額在大量同步時可能受限。</li></ol><h2><span class="num">6</span>完整逐字稿 Transcript</h2><div><div class="seg"><span class="t">00:00</span><span class="sp">Tony</span><span class="ct" style="background:#8f897c22;color:#8f897c">討論</span><span>今天審查 VRN Fetch v4 的 BRIDGE 整合與 ControlCenter UI。</span></div><div class="seg"><span class="t">00:42</span><span class="sp">VRN Maintainer</span><span class="ct" style="background:#35506b22;color:#35506b">決議</span><span>MDL010 到 MDL014 已全部接上 BRIDGE,測試 21/21 PASS。</span></div><div class="seg"><span class="t">01:30</span><span class="sp">Tony</span><span class="ct" style="background:#35506b22;color:#35506b">決議</span><span>我們決定 M01 維持 PDF 流程,TIFF 不再保留 fallback。</span></div><div class="seg"><span class="t">02:15</span><span class="sp">Reviewer</span><span class="ct" style="background:#8a3b2e22;color:#8a3b2e">行動</span><span>ControlCenter 的即時狀態燈號需要補上 error 重試計數。</span></div><div class="seg"><span class="t">03:05</span><span class="sp">Tony</span><span class="ct" style="background:#9a6b2f22;color:#9a6b2f">風險</span><span>風險:numpy 2.0 若洩漏進 vpl_core 會破壞相依。</span></div><div class="seg"><span class="t">03:48</span><span class="sp">VRN Maintainer</span><span class="ct" style="background:#8a3b2e22;color:#8a3b2e">行動</span><span>下週前要完成 ControlCenter 重試計數並補單元測試。</span></div><div class="seg"><span class="t">04:30</span><span class="sp">Reviewer</span><span class="ct" style="background:#8f897c22;color:#8f897c">討論</span><span>討論是否把 Fetch 重試上限做成可設定參數。</span></div><div class="seg"><span class="t">05:12</span><span class="sp">Tony</span><span class="ct" style="background:#35506b22;color:#35506b">決議</span><span>決議:重試上限預設 3,可由設定檔覆寫。</span></div><div class="seg"><span class="t">05:55</span><span class="sp">Reviewer</span><span class="ct" style="background:#8a3b2e22;color:#8a3b2e">行動</span><span>Action:Reviewer 補寫 ControlCenter 的 e2e 測試腳本。</span></div><div class="seg"><span class="t">06:40</span><span class="sp">VRN Maintainer</span><span class="ct" style="background:#9a6b2f22;color:#9a6b2f">風險</span><span>風險:Google API 配額在大量同步時可能受限。</span></div></div>
+<div class="foot"><span>VIA Visual Lock v1 · VeritasPulse</span><span>generated 2026-08-18 10:41 · 發言人對齊</span></div>
+</body></html>

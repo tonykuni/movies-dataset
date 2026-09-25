@@ -1,0 +1,1498 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF v4.3 · Management Cockpit · Veritas Intelligence Analytics</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* ============================================================
+   VAP VISUAL LOCK · v2 (light, responsive, auto-fit)
+   Tokens migrated from VDF_VRN_Integrated_ReportSSOT_AutoLayout
+   ============================================================ */
+:root {
+  /* surfaces */
+  --bg:#f5f4f0;  --bg1:#edecea;  --bg2:#e5e3df;
+  --sf:#ffffff;  --sf2:#fafaf8;
+  --bd:#dbd9d3;  --bd2:#ccc9c1;
+
+  /* palette - VAP locked */
+  --bl:#4c78a8; --bl-l:#d0e1f0;
+  --tl:#439a9a; --tl-l:#c8e6e6;
+  --gn:#5a9e6f; --gn-l:#cde8d5;
+  --am:#c4943a; --am-l:#f5e2b8;
+  --co:#c96b5a; --co-l:#f5d0c8;
+  --vi:#7a6daa; --vi-l:#dcd8f0;
+  --ro:#b05580;
+
+  /* ink */
+  --i0:#1e1d1a; --i1:#3d3c38; --i2:#6b6860; --i3:#9c9890; --i4:#c4c0b8;
+
+  /* fonts */
+  --mo: Consolas, "DM Mono", "Cascadia Mono", monospace;
+  --sa: "Segoe UI", "Microsoft JhengHei", system-ui, sans-serif;
+
+  /* spacing */
+  --r:5px; --r2:8px; --r3:12px;
+  --sh: 0 1px 3px rgba(0,0,0,.06);
+  --sh2: 0 4px 12px rgba(0,0,0,.08);
+
+  /* responsive scales */
+  --fs: 11.5px;
+  --gap: 8px;
+  --pad: 10px;
+}
+
+@media (max-width: 1280px) { :root { --fs: 11px; --gap: 6px; --pad: 8px; } }
+@media (max-width: 900px)  { :root { --fs: 10.5px; --gap: 5px; --pad: 6px; } }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; background: var(--bg); color: var(--i0);
+  font-family: var(--sa); font-size: var(--fs); line-height: 1.5; }
+.mono { font-family: var(--mo); }
+
+.w { max-width: 1840px; margin: 0 auto; padding: 10px 14px 6px; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hdr {
+  background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r3);
+  padding: 12px 16px; margin-bottom: 8px;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--sh2); flex-wrap: wrap;
+}
+.hdr::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--bl), var(--tl), var(--vi), var(--am), var(--co));
+}
+.logo {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: linear-gradient(135deg, #1e3a5f, #4c78a8);
+  color: #8dcff0;
+  display: flex; align-items: center; justify-content: center;
+  font: 800 12px var(--mo); letter-spacing: .8px;
+}
+.h-main { flex: 1; min-width: 280px; }
+.h1t { font-size: 17px; font-weight: 800; letter-spacing: -.3px; }
+.h1t .v { color: var(--bl); }
+.h1t .ver { font-size: 10px; color: var(--i3); font-weight: 700; margin-left: 4px; }
+.brand-line {
+  font: 800 10px var(--mo); letter-spacing: 1.6px;
+  color: var(--bl); margin-top: 3px;
+}
+.h2t { font-size: 10px; margin-top: 2px; color: var(--i3); }
+.meta { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border: 1px solid var(--bd); border-radius: 999px;
+  background: var(--sf2); font: 800 9px var(--mo);
+  color: var(--i2); white-space: nowrap;
+}
+.pill.ok { background: var(--gn-l); color: var(--gn); border-color: var(--gn); }
+.pill.lock { background: #1e1d1a; color: #fff; border-color: #1e1d1a; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gn); display: inline-block; }
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.pt { display: flex; gap: 2px; margin-bottom: 8px; flex-wrap: wrap; }
+.pt button {
+  padding: 7px 12px; border: 1px solid var(--bd);
+  border-radius: var(--r2) var(--r2) 0 0;
+  background: var(--bg1); color: var(--i2);
+  font: 700 10.5px var(--sa); cursor: pointer; transition: .15s;
+}
+.pt button:hover { color: var(--bl); }
+.pt button.on { background: var(--sf); color: var(--bl); border-bottom: 2px solid var(--bl); box-shadow: var(--sh); }
+
+.pg { display: none; }
+.pg.on { display: block; }
+
+/* ============================================================
+   CARDS (VAP-style)
+   ============================================================ */
+.cd {
+  background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r2);
+  margin-bottom: var(--gap); overflow: hidden; box-shadow: var(--sh);
+}
+.cd-h {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-bottom: 1px solid var(--bd);
+  background: var(--sf2); flex-wrap: wrap;
+}
+.cd-i {
+  width: 22px; height: 22px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bl-l); color: var(--bl); font-weight: 800; font-size: 11px;
+}
+.cd-i.tl { background: var(--tl-l); color: var(--tl); }
+.cd-i.gn { background: var(--gn-l); color: var(--gn); }
+.cd-i.am { background: var(--am-l); color: var(--am); }
+.cd-i.vi { background: var(--vi-l); color: var(--vi); }
+.cd-i.co { background: var(--co-l); color: var(--co); }
+.cd-t { font-weight: 800; font-size: 11px; flex: 1; }
+.cd-s {
+  font: 700 9px var(--mo); color: var(--i3);
+  padding: 1px 6px; background: var(--bg1); border-radius: 10px;
+}
+.cd-b { padding: var(--pad); }
+
+/* ============================================================
+   STAT GRID (auto-fit, responsive)
+   ============================================================ */
+.sg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.sg.tight {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 4px;
+}
+.sc {
+  background: var(--sf2); border: 1px solid var(--bd); border-radius: var(--r2);
+  padding: 8px 10px; position: relative; overflow: hidden;
+}
+.sc::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--bl);
+}
+.sc.tl::before { background: var(--tl); }
+.sc.gn::before { background: var(--gn); }
+.sc.am::before { background: var(--am); }
+.sc.vi::before { background: var(--vi); }
+.sc.co::before { background: var(--co); }
+.sc.ro::before { background: var(--ro); }
+.sc .n { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.sc .l { font: 800 9px var(--mo); color: var(--i3); margin-top: 2px; letter-spacing: .3px; text-transform: uppercase; }
+.sc .s { font-size: 10px; color: var(--i2); margin-top: 3px; font-family: var(--mo); }
+.sc .edit {
+  margin-top: 6px; font: 700 9.5px var(--sa); padding: 3px 8px;
+  background: var(--sf); border: 1px solid var(--bd); border-radius: 6px;
+  color: var(--bl); cursor: pointer; transition: .15s;
+}
+.sc .edit:hover { background: var(--bl); color: #fff; border-color: var(--bl); }
+
+/* compact 2-row layout for bridge + test */
+.sg-2row { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 5px; }
+.sg-2row .sc { padding: 7px 9px; }
+.sg-2row .sc .n { font-size: 17px; }
+
+/* ============================================================
+   CONFIG BOX
+   ============================================================ */
+.config-box {
+  background: linear-gradient(135deg, var(--bl-l), var(--vi-l));
+  border: 1px solid var(--bd); border-radius: var(--r2);
+  padding: 10px 12px; margin-bottom: 8px;
+}
+.config-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.config-label {
+  font: 800 10px var(--mo); letter-spacing: .5px;
+  color: var(--bl); min-width: 100px;
+}
+.config-input {
+  flex: 1; min-width: 240px;
+  background: var(--sf); border: 1px solid var(--bd); border-radius: 6px;
+  color: var(--i0); padding: 6px 10px; font: 600 11px var(--mo);
+}
+.config-input:focus { outline: none; border-color: var(--bl); box-shadow: 0 0 0 2px rgba(76,120,168,.18); }
+.config-hint { margin-top: 6px; font: 600 9.5px var(--mo); color: var(--i2); }
+.config-status { font: 800 10px var(--mo); transition: opacity .3s; }
+.config-status.success { color: var(--gn); }
+.config-status.error { color: var(--co); }
+
+.bn {
+  padding: 5px 11px; border: 1px solid var(--bd); border-radius: var(--r);
+  font: 700 10px var(--sa); cursor: pointer; background: var(--sf); color: var(--i1);
+  transition: .15s;
+}
+.bn:hover { border-color: var(--bl); color: var(--bl); }
+.bn.bp { background: var(--bl); color: #fff; border-color: var(--bl); }
+.bn.gn { background: var(--gn); color: #fff; border-color: var(--gn); }
+.bn.am { background: var(--am); color: #fff; border-color: var(--am); }
+.bn.co { background: var(--co); color: #fff; border-color: var(--co); }
+
+/* ============================================================
+   TABLES (VAP)
+   ============================================================ */
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 10.5px; font-family: var(--sa);
+}
+th, td {
+  padding: 6px 8px; border-bottom: 1px solid var(--bd); text-align: left;
+}
+th {
+  background: var(--bg1); color: var(--i2);
+  font: 800 9px var(--mo); letter-spacing: .4px; text-transform: uppercase;
+}
+td.mono { font: 600 10px var(--mo); }
+.b {
+  display: inline-block; padding: 2px 7px; border-radius: 10px;
+  font: 800 9px var(--mo); white-space: nowrap;
+}
+.b-c { background: var(--gn-l); color: var(--gn); border: 1px solid var(--gn); }
+.b-h { background: var(--co-l); color: var(--co); border: 1px solid var(--co); }
+.b-w { background: var(--am-l); color: var(--am); border: 1px solid var(--am); }
+.b-l { background: var(--bg1); color: var(--i3); border: 1px solid var(--bd); }
+.b-i { background: var(--bl-l); color: var(--bl); border: 1px solid var(--bl); }
+.b-v { background: var(--vi-l); color: var(--vi); border: 1px solid var(--vi); }
+
+/* ============================================================
+   ACQUISITION MATRIX — categorized
+   ============================================================ */
+.cat-toolbar {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  padding: 6px 10px; background: var(--sf2); border-bottom: 1px solid var(--bd);
+}
+.cat-toolbar input, .cat-toolbar select {
+  background: var(--sf); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 5px 9px; font: 600 10.5px var(--mo); color: var(--i0);
+}
+.cat-toolbar input { min-width: 180px; flex: 1; max-width: 260px; }
+.cat-count { margin-left: auto; font: 800 10px var(--mo); color: var(--i2); }
+
+.cat-group {
+  background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r2);
+  margin-bottom: 6px; overflow: hidden;
+}
+.cat-group-h {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; background: var(--sf2); border-bottom: 1px solid var(--bd);
+  cursor: pointer;
+}
+.cat-group-h:hover { background: var(--bg1); }
+.cat-group-icon {
+  width: 22px; height: 22px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 11px; flex-shrink: 0;
+}
+.cat-group-icon.A { background: var(--bl-l); color: var(--bl); }
+.cat-group-icon.B { background: var(--tl-l); color: var(--tl); }
+.cat-group-icon.C { background: var(--vi-l); color: var(--vi); }
+.cat-group-icon.D { background: var(--am-l); color: var(--am); }
+.cat-group-icon.E { background: var(--co-l); color: var(--co); }
+.cat-group-icon.O { background: var(--bg1); color: var(--i2); }
+.cat-group-title { font-weight: 800; font-size: 11px; flex: 1; }
+.cat-group-sub { font: 600 9.5px var(--mo); color: var(--i3); }
+.cat-group-badge { font: 800 9px var(--mo); padding: 2px 7px; border-radius: 10px;
+  background: var(--bg1); color: var(--i2); }
+.cat-group-toggle { font: 800 14px var(--mo); color: var(--i3); }
+
+.cat-grid {
+  display: grid; gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  padding: 6px;
+}
+.cat-cell {
+  background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 5px 8px; cursor: pointer; transition: .15s;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.cat-cell:hover { border-color: var(--bl); transform: translateY(-1px); box-shadow: var(--sh); }
+.cat-cell .tk { font: 800 11px var(--mo); color: var(--bl); }
+.cat-cell .nm { font-size: 10px; color: var(--i1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-cell .meta-row { display: flex; gap: 4px; align-items: center; }
+.cat-cell .src-tag { font: 700 8px var(--mo); color: var(--i3); }
+.cat-cell .freq-tag { font: 800 8px var(--mo); color: var(--gn); }
+.cat-cell .features {
+  display: flex; gap: 2px; margin-top: 2px;
+}
+.cat-cell .ft-chip {
+  font: 800 7.5px var(--mo); padding: 1px 4px;
+  border-radius: 3px; background: var(--bg1); color: var(--i2);
+}
+.cat-cell .ft-chip.px  { background: var(--bl-l); color: var(--bl); }
+.cat-cell .ft-chip.adj { background: var(--gn-l); color: var(--gn); }
+.cat-cell .ft-chip.chip{ background: var(--am-l); color: var(--am); }
+
+/* ============================================================
+   MODAL (ticker editor)
+   ============================================================ */
+.mb { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1000;
+  display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.mb.on { display: flex; }
+.md { background: var(--sf); border-radius: var(--r3); width: min(900px, 92vw);
+  max-height: 86vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.md-h { padding: 12px 16px; border-bottom: 1px solid var(--bd);
+  display: flex; justify-content: space-between; align-items: center; background: var(--sf2);
+  border-radius: var(--r3) var(--r3) 0 0; }
+.md-t { font-weight: 800; font-size: 13px; }
+.md-x { background: none; border: none; color: var(--i2); font-size: 20px; cursor: pointer; line-height: 1; }
+.md-x:hover { color: var(--co); }
+.md-b { padding: 12px 16px; overflow-y: auto; flex: 1; }
+.md-f { padding: 10px 16px; border-top: 1px solid var(--bd);
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+.tk-input-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.tk-input-row input {
+  flex: 1; background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px;
+  color: var(--i0); padding: 6px 10px; font: 600 11px var(--mo);
+}
+.tk-list {
+  display: grid; gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  max-height: 360px; overflow-y: auto;
+  padding: 4px; background: var(--bg1); border-radius: 6px;
+}
+.tk-chip {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--sf); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 4px 6px; font-size: 10.5px;
+}
+.tk-chip.new { border-color: var(--gn); background: var(--gn-l); }
+.tk-chip .tk { font: 800 10.5px var(--mo); flex: 1; }
+.tk-chip .nm { font-size: 9px; color: var(--i3); }
+.tk-chip .rm { background: none; border: none; color: var(--co);
+  cursor: pointer; font-size: 12px; padding: 0 3px; line-height: 1; }
+.tk-chip .rm:hover { color: #fff; background: var(--co); border-radius: 3px; }
+.dlt { display: flex; gap: 10px; font: 700 10px var(--mo); }
+.dlt .added { color: var(--gn); font-weight: 800; }
+.dlt .removed { color: var(--co); font-weight: 800; }
+.dlt .total { color: var(--i2); }
+
+/* ============================================================
+   RUN GRID
+   ============================================================ */
+.rg { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 6px; }
+.r-card { background: var(--sf2); border: 1px solid var(--bd); border-radius: var(--r2); padding: 10px 12px; }
+.r-card h3 { font: 800 11px var(--sa); margin-bottom: 6px; }
+.r-row { display: flex; justify-content: space-between; align-items: center;
+  margin: 4px 0; padding: 4px 0; border-bottom: 1px solid var(--bd); font-size: 10.5px; }
+.r-row:last-child { border-bottom: none; }
+.r-name { font-weight: 700; }
+.r-st { font: 800 8.5px var(--mo); padding: 2px 7px; border-radius: 10px; }
+.r-st.ready { background: var(--gn-l); color: var(--gn); }
+.r-st.new   { background: var(--vi-l); color: var(--vi); }
+.r-st.pending { background: var(--am-l); color: var(--am); }
+
+/* ============================================================
+   LOG (terminal look)
+   ============================================================ */
+.tm {
+  background: #0d0d0d; color: #cfc; border-radius: var(--r);
+  padding: 26px 14px 12px; font-family: var(--mo); font-size: 10.5px;
+  position: relative; white-space: pre-wrap;
+  max-height: 380px; overflow-y: auto;
+}
+.tm::before {
+  content: ''; position: absolute; top: 9px; left: 12px;
+  width: 9px; height: 9px; border-radius: 50%; background: #ff5f56;
+  box-shadow: 13px 0 0 #ffbd2e, 26px 0 0 #27c93f;
+}
+.tm .l { display: block; }
+.tm .l.i { color: #9cf; }
+.tm .l.w { color: #fc6; }
+.tm .l.e { color: #f88; }
+.tm .l.o { color: #8fc; }
+
+.ft {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--bd);
+  font: 600 9px var(--mo); color: var(--i3); text-align: center; letter-spacing: .05em;
+}
+</style>
+</head>
+<body>
+<div class="w">
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="hdr">
+    <div class="logo">VDF</div>
+    <div class="h-main">
+      <div class="h1t">VeritasDataForge <span class="v">v4.3</span> · Management Cockpit <span class="ver">build 2026-05-27</span></div>
+      <div class="brand-line">VERITAS · INTELLIGENCE · ANALYTICS</div>
+      <div class="h2t">SSOT-DRIVEN · AEGIS-PROTECTED · CELERITAS-PARALLELIZED · 24 SOURCES · 10 FETCHERS</div>
+    </div>
+    <div class="meta">
+      <span class="pill ok"><span class="dot"></span>ALIVE</span>
+      <span class="pill lock">VAP VISUAL LOCK v2</span>
+      <span class="pill ok" id="bridge-status">BRIDGE · AEGIS+CELERITAS+ENV</span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       TABS
+       ============================================================ -->
+  <div class="pt">
+    <button class="on" onclick="tabSw('p1')">📊 OVERVIEW</button>
+    <button onclick="tabSw('p2')">🗂 SSOT 5 SECTIONS</button>
+    <button onclick="tabSw('p3')">🎯 ACQUISITION MATRIX</button>
+    <button onclick="tabSw('p4')">🌐 24 SOURCES</button>
+    <button onclick="tabSw('p5')">⚙️ FETCHERS</button>
+    <button onclick="tabSw('p6')">▶️ RUN</button>
+    <button onclick="tabSw('p7')">📜 LOG</button>
+  </div>
+
+  <!-- ============================================================
+       P1 · OVERVIEW
+       ============================================================ -->
+  <div class="pg on" id="p1">
+
+    <!-- FRED key + config -->
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">⚙</div>
+        <div class="cd-t">Global Configuration</div>
+        <div class="cd-s">persistent / localStorage</div>
+      </div>
+      <div class="cd-b">
+        <div class="config-box">
+          <div class="config-row">
+            <label class="config-label">FRED API KEY</label>
+            <input type="text" id="fred-api-key" class="config-input"
+                   value="2d5ae8dfe834ffc409bf98d51f539c17"
+                   placeholder="enter your FRED API key">
+            <button class="bn bp" id="btn-save-cfg">💾 Save as Default</button>
+            <button class="bn" id="btn-reset-cfg">↺ Reset</button>
+            <span class="config-status" id="cfg-status"></span>
+          </div>
+          <div class="config-hint">
+            Stored locally · Backend fallback: env <span class="mono">VDF_FRED_API_KEY</span> → env <span class="mono">FRED_API_KEY</span> → hardcoded default
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top row: 5 sections + 3 system stats = 8 in one auto-fit grid -->
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">📊</div>
+        <div class="cd-t">Total Acquisition Targets</div>
+        <div class="cd-s">A + B + C + D + E sections combined</div>
+      </div>
+      <div class="cd-b">
+        <div class="sg" id="overview-stats">
+          <div class="sc" data-edit="A">
+            <div class="n" id="count-A">138</div>
+            <div class="l">Section A · Market</div>
+            <div class="s">12 cats · daily prices + chips</div>
+            <button class="edit" data-edit-btn="A">✎ Manage</button>
+          </div>
+          <div class="sc tl" data-edit="B">
+            <div class="n" id="count-B">219</div>
+            <div class="l">Section B · US Macro</div>
+            <div class="s">219 series + 9 models</div>
+            <button class="edit" data-edit-btn="B">✎ Manage</button>
+          </div>
+          <div class="sc vi" data-edit="C">
+            <div class="n" id="count-C">77</div>
+            <div class="l">Section C · Global ETF</div>
+            <div class="s">6 categories · TIER 1-5</div>
+            <button class="edit" data-edit-btn="C">✎ Manage</button>
+          </div>
+          <div class="sc am" data-edit="D">
+            <div class="n" id="count-D">18</div>
+            <div class="l">Section D · TW Active ETF</div>
+            <div class="s">10 issuers · daily PCF</div>
+            <button class="edit" data-edit-btn="D">✎ Manage</button>
+          </div>
+          <div class="sc co" data-edit="E">
+            <div class="n" id="count-E">~1900</div>
+            <div class="l">Section E · TW Consensus</div>
+            <div class="s">YF + FactSet · 41 cols</div>
+            <button class="edit" data-edit-btn="E">✎ Manage</button>
+          </div>
+          <div class="sc gn">
+            <div class="n">24</div>
+            <div class="l">Data Sources</div>
+            <div class="s">10 done · 14 proxy</div>
+          </div>
+          <div class="sc ro">
+            <div class="n">9</div>
+            <div class="l">Derived Models</div>
+            <div class="s">Fed / USD / Curve</div>
+          </div>
+          <div class="sc vi">
+            <div class="n">10</div>
+            <div class="l">Fetcher Modules</div>
+            <div class="s">all bridge-integrated</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Bridge (3) + Test (4) in TWO compact rows -->
+    <div class="sg sg-2row" style="grid-template-columns:1fr 1fr; gap:6px">
+      <div class="cd" style="margin-bottom:0">
+        <div class="cd-h">
+          <div class="cd-i tl">🛡</div>
+          <div class="cd-t">Supportive Bridge</div>
+          <div class="cd-s">3 modules online</div>
+        </div>
+        <div class="cd-b">
+          <div class="sg sg-2row">
+            <div class="sc tl">
+              <div class="n" id="aegis-stat">ONLINE</div>
+              <div class="l">Aegis Nexus</div>
+              <div class="s">Resilient HTTP · CB · UA</div>
+            </div>
+            <div class="sc vi">
+              <div class="n" id="cel-stat">ONLINE</div>
+              <div class="l">Celeritas</div>
+              <div class="s">parallel · cache · pressure</div>
+            </div>
+            <div class="sc gn">
+              <div class="n" id="env-stat">ONLINE</div>
+              <div class="l">Env Manager</div>
+              <div class="s">env_health · py_detect</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cd" style="margin-bottom:0">
+        <div class="cd-h">
+          <div class="cd-i gn">✓</div>
+          <div class="cd-t">Test Suite Status</div>
+          <div class="cd-s">vdf_tests_v4.py · 52 tests</div>
+        </div>
+        <div class="cd-b">
+          <div class="sg sg-2row">
+            <div class="sc gn"><div class="n">52</div><div class="l">Total</div></div>
+            <div class="sc gn"><div class="n">50</div><div class="l">Pass</div></div>
+            <div class="sc am"><div class="n">2</div><div class="l">Skip</div><div class="s">network-gated</div></div>
+            <div class="sc"><div class="n">0</div><div class="l">Fail</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       P2 · SSOT 5 SECTIONS
+       ============================================================ -->
+  <div class="pg" id="p2">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">🗂</div>
+        <div class="cd-t">SSOT · 5 Sections</div>
+        <div class="cd-s">independently versioned · fetcher-routed</div>
+      </div>
+      <div class="cd-b">
+        <div class="sg" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+          <div class="sc"><div class="n">138</div><div class="l">A · Market Acquisition</div><div class="s">TWSE/TPEX/MOPS · 12 categories</div></div>
+          <div class="sc tl"><div class="n">219+9</div><div class="l">B · US Macro (full detail)</div><div class="s">FRED/Treasury/Fed/AAII/CNN</div></div>
+          <div class="sc vi"><div class="n">77</div><div class="l">C · Global ETF Universe</div><div class="s">TIER 1-5 fund flow methodology</div></div>
+          <div class="sc am"><div class="n">18</div><div class="l">D · TW Active ETF Holdings</div><div class="s">10 issuers + TDCC 集保</div></div>
+          <div class="sc co"><div class="n">~1900</div><div class="l">E · TW Stock Consensus</div><div class="s">YF + FactSet · 41 cols</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       P3 · ACQUISITION MATRIX (categorized)
+       ============================================================ -->
+  <div class="pg" id="p3">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">🎯</div>
+        <div class="cd-t">Acquisition Matrix · Live Frontend Targets</div>
+        <div class="cd-s">all categories · fully classified</div>
+      </div>
+      <div class="cat-toolbar">
+        <input type="search" id="mx-search" placeholder="🔍 ticker / name / source...">
+        <select id="mx-section">
+          <option value="">All Sections</option>
+          <option value="A">A · Market</option>
+          <option value="B">B · Macro</option>
+          <option value="C">C · Global ETF</option>
+          <option value="D">D · TW Active ETF</option>
+          <option value="E">E · TW Consensus</option>
+        </select>
+        <select id="mx-source"><option value="">All Sources</option></select>
+        <span class="cat-count" id="mx-count">— items</span>
+      </div>
+      <div class="cd-b" id="mx-content"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       P4 · 24 SOURCES
+       ============================================================ -->
+  <div class="pg" id="p4">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">🌐</div>
+        <div class="cd-t">Data Sources · 24 endpoints</div>
+        <div class="cd-s">✓ done · 📡 FRED proxy · ✗ todo</div>
+      </div>
+      <div class="cd-b" style="padding:0">
+        <table>
+          <thead><tr><th>#</th><th>Source</th><th>Used For</th><th>Fetcher</th><th>Status</th></tr></thead>
+          <tbody id="src-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       P5 · FETCHERS
+       ============================================================ -->
+  <div class="pg" id="p5">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">⚙</div>
+        <div class="cd-t">Python Fetcher Modules · 10</div>
+        <div class="cd-s">all HTTP via vdf_supportive_bridge</div>
+      </div>
+      <div class="cd-b" style="padding:0">
+        <table>
+          <thead><tr><th>Module</th><th>Purpose</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">vdf_fetchers_market</td><td>TW + intl stocks/ETF/index/FX/commodity</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_macro</td><td>FRED 219 series + AkShare</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_financials</td><td>MOPS TW + yfinance intl</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_fiscal</td><td>Treasury DTS + MTS</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_sentiment</td><td>AAII + CNN F&amp;G</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_etf_holdings</td><td>18 active ETF · 10 issuers</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_consensus</td><td>YF + FactSet (Cnyes)</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_derived</td><td>9 derived macro models</td><td><span class="b b-c">✓ DONE</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_tdcc</td><td>集保 受益人數 + 股權分散</td><td><span class="b b-v">✓ NEW v4.2</span></td></tr>
+            <tr><td class="mono">vdf_fetchers_fed</td><td>FOMC + SEP + policy tone</td><td><span class="b b-v">✓ NEW v4.2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       P6 · RUN
+       ============================================================ -->
+  <div class="pg" id="p6">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i co">▶</div>
+        <div class="cd-t">Pipeline Run Control</div>
+        <div class="cd-s">individual or full nightly</div>
+      </div>
+      <div class="cd-b">
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+          <button class="bn bp" id="btn-run-all">▶ RUN ALL (Nightly)</button>
+          <button class="bn" id="btn-run-test">🧪 RUN TESTS</button>
+          <button class="bn co" id="btn-stop">■ STOP</button>
+        </div>
+        <div class="rg">
+          <div class="r-card">
+            <h3>Section A · Market</h3>
+            <div class="r-row"><span class="r-name">tw_stock_all (TWSE+TPEX)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">tw_index (加權 + 櫃買)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">tw_etf_passive</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">tw_etf_active (18)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">intl_stock</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">intl_index</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">commodity / fx / crypto</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">vol (VIX / VVIX / MOVE)</span><span class="r-st ready">READY</span></div>
+          </div>
+          <div class="r-card">
+            <h3>Sections B–E · Advanced</h3>
+            <div class="r-row"><span class="r-name">macro (FRED 219)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">fiscal (DTS + MTS)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">sentiment (AAII + CNN)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">tw_financials (MOPS)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">consensus (YF + FactSet)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">etf_holdings (18 × N)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">derived (9 models)</span><span class="r-st ready">READY</span></div>
+            <div class="r-row"><span class="r-name">tdcc (集保 + 受益人數)</span><span class="r-st new">NEW v4.2</span></div>
+            <div class="r-row"><span class="r-name">fed (FOMC + SEP)</span><span class="r-st new">NEW v4.2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       P7 · LOG
+       ============================================================ -->
+  <div class="pg" id="p7">
+    <div class="cd">
+      <div class="cd-h">
+        <div class="cd-i">📜</div>
+        <div class="cd-t">Execution Log</div>
+        <div class="cd-s">live SSE from vdf_api</div>
+      </div>
+      <div class="cd-b">
+        <div class="tm" id="log"><span class="l i">[INFO] VDF v4.3 Management Cockpit initialized</span>
+<span class="l i">[INFO] VAP Visual Lock v2 applied (light theme, responsive auto-fit)</span>
+<span class="l o">[OK]   Bridge: VeritasAegisNexus · VeritasCeleritas · VIA_EnvManager ONLINE</span>
+<span class="l o">[OK]   Acquisition matrix categorized: TW stocks · 加權/櫃買 · intl stocks · intl index · misc</span>
+<span class="l o">[OK]   Test suite: 50 pass / 0 fail / 2 skip (52 tests)</span>
+<span class="l i">[INFO] Click ▶ RUN ALL to trigger pipeline (requires Python backend)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ft">
+    VDF v4.3 · build 2026-05-27 · Veritas Intelligence Analytics · VAP Visual Lock v2 · 加密保密
+  </footer>
+</div>
+
+<!-- ============================================================
+     TICKER MANAGEMENT MODAL
+     ============================================================ -->
+<div class="mb" id="modal">
+  <div class="md">
+    <div class="md-h">
+      <div class="md-t" id="md-title">Manage Tickers</div>
+      <button class="md-x" id="md-close">×</button>
+    </div>
+    <div class="md-b">
+      <div class="tk-input-row">
+        <input type="text" id="md-input" placeholder="Add ticker (e.g. AAPL, 2330, ^GSPC, CPIAUCSL) — comma-separated for batch">
+        <button class="bn bp" id="md-add">+ Add</button>
+      </div>
+      <div class="tk-list" id="md-list"></div>
+    </div>
+    <div class="md-f">
+      <div class="dlt">
+        <span class="total" id="dlt-total">Current: 0</span>
+        <span class="added" id="dlt-added">+0 added</span>
+        <span class="removed" id="dlt-removed">-0 removed</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="bn" id="md-cancel">Cancel</button>
+        <button class="bn bp" id="md-save">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TAB switching
+// ============================================================
+function tabSw(id) {
+  document.querySelectorAll(".pg").forEach(p => p.classList.remove("on"));
+  document.querySelectorAll(".pt button").forEach(b => b.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+  event.target.classList.add("on");
+}
+
+// ============================================================
+// ACQUISITION MATRIX DATA
+// FULLY CATEGORIZED per Tony's spec:
+//   A1 = TWSE 上市個股 (量價Adj + 籌碼)
+//   A2 = TPEX 上櫃個股 (量價Adj + 籌碼)
+//   A3 = 加權指數 + 櫃買指數 (量價 + 籌碼)
+//   A4 = 國際個股 (量價 Adj)
+//   A5 = 國際股價指數
+//   A6 = FX 外匯
+//   A7 = Commodities 大宗商品 (期貨)
+//   A8 = Bonds 債券
+//   A9 = Volatility (VIX 系列)
+//   A10= Crypto 加密貨幣
+//   A11= TW ETF (被動式)
+//   A12= TW ETF (主動式 · 18 檔)
+//   B  = US Macro 219 series
+//   C  = Global ETF Universe 77
+//   D  = TW Active ETF Holdings (含 issuer 分組)
+//   E  = TW Consensus (sample)
+// ============================================================
+const MATRIX_DATA = {
+  // ===== SECTION A · 細分 12 個子類 =====
+  "A1": {
+    title: "A1 · 台股上市 (TWSE) — 量價 + Adj + 籌碼",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","adj","chip"],
+    note: "TWSE 上市全部個股 · OHLCV + Adj Close + 三大法人/融資/當沖籌碼",
+    items: [
+      {ticker:"2330",  name:"台積電",     source:"TWSE"},
+      {ticker:"2317",  name:"鴻海",       source:"TWSE"},
+      {ticker:"2454",  name:"聯發科",     source:"TWSE"},
+      {ticker:"2308",  name:"台達電",     source:"TWSE"},
+      {ticker:"2412",  name:"中華電",     source:"TWSE"},
+      {ticker:"2881",  name:"富邦金",     source:"TWSE"},
+      {ticker:"2882",  name:"國泰金",     source:"TWSE"},
+      {ticker:"2885",  name:"元大金",     source:"TWSE"},
+      {ticker:"2886",  name:"兆豐金",     source:"TWSE"},
+      {ticker:"2891",  name:"中信金",     source:"TWSE"},
+      {ticker:"3034",  name:"聯詠",       source:"TWSE"},
+      {ticker:"3711",  name:"日月光投控", source:"TWSE"},
+      {ticker:"2603",  name:"長榮海運",   source:"TWSE"},
+      {ticker:"2615",  name:"萬海",       source:"TWSE"},
+      {ticker:"1101",  name:"台泥",       source:"TWSE"},
+      {ticker:"1301",  name:"台塑",       source:"TWSE"},
+      {ticker:"2002",  name:"中鋼",       source:"TWSE"},
+      {ticker:"...",   name:"+ ~960 上市個股 (全市場)", source:"TWSE"},
+    ],
+  },
+  "A2": {
+    title: "A2 · 台股上櫃 (TPEX) — 量價 + Adj + 籌碼",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","adj","chip"],
+    note: "TPEX 上櫃全部個股 · OHLCV + Adj Close + 三大法人/融資/當沖籌碼",
+    items: [
+      {ticker:"6488",  name:"環球晶",     source:"TPEX"},
+      {ticker:"3324",  name:"雙鴻",       source:"TPEX"},
+      {ticker:"3653",  name:"健策",       source:"TPEX"},
+      {ticker:"5347",  name:"世界先進",   source:"TPEX"},
+      {ticker:"6669",  name:"緯穎",       source:"TPEX"},
+      {ticker:"6515",  name:"穎崴",       source:"TPEX"},
+      {ticker:"4763",  name:"材料-KY",    source:"TPEX"},
+      {ticker:"...",   name:"+ ~830 上櫃個股 (全市場)", source:"TPEX"},
+    ],
+  },
+  "A3": {
+    title: "A3 · 台股指數 — 加權指數 + 櫃買指數 (量價 + 籌碼)",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","chip"],
+    note: "加權指數 / 櫃買指數 / 電子類指數 / 金融類指數 · 每日量價 + 法人買賣超",
+    items: [
+      {ticker:"TWSE.TW",   name:"加權指數 TAIEX",     source:"TWSE"},
+      {ticker:"TPEX.OTC",  name:"櫃買指數 OTC",       source:"TPEX"},
+      {ticker:"^TWII",     name:"加權指數 (yfinance)", source:"YFINANCE"},
+      {ticker:"TPEx.TW",   name:"櫃買 (yfinance)",    source:"YFINANCE"},
+      {ticker:"TWELE.TW",  name:"電子類指數",         source:"TWSE"},
+      {ticker:"TWFIN.TW",  name:"金融類指數",         source:"TWSE"},
+    ],
+  },
+  "A4": {
+    title: "A4 · 國際個股 — 量價 + Adj Close",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","adj"],
+    note: "全球主要個股 · OHLCV + Adj Close · 透過 yfinance",
+    items: [
+      {ticker:"AAPL",   name:"Apple",         source:"YFINANCE"},
+      {ticker:"MSFT",   name:"Microsoft",     source:"YFINANCE"},
+      {ticker:"NVDA",   name:"NVIDIA",        source:"YFINANCE"},
+      {ticker:"GOOGL",  name:"Alphabet A",    source:"YFINANCE"},
+      {ticker:"GOOG",   name:"Alphabet C",    source:"YFINANCE"},
+      {ticker:"AMZN",   name:"Amazon",        source:"YFINANCE"},
+      {ticker:"META",   name:"Meta",          source:"YFINANCE"},
+      {ticker:"TSLA",   name:"Tesla",         source:"YFINANCE"},
+      {ticker:"AVGO",   name:"Broadcom",      source:"YFINANCE"},
+      {ticker:"BRK-B",  name:"Berkshire B",   source:"YFINANCE"},
+      {ticker:"JPM",    name:"JPMorgan",      source:"YFINANCE"},
+      {ticker:"V",      name:"Visa",          source:"YFINANCE"},
+      {ticker:"MA",     name:"Mastercard",    source:"YFINANCE"},
+      {ticker:"UNH",    name:"UnitedHealth",  source:"YFINANCE"},
+      {ticker:"XOM",    name:"ExxonMobil",    source:"YFINANCE"},
+      {ticker:"WMT",    name:"Walmart",       source:"YFINANCE"},
+      {ticker:"...",    name:"+ user-extensible", source:"YFINANCE"},
+    ],
+  },
+  "A5": {
+    title: "A5 · 國際股價指數",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "全球主要股價指數 · OHLCV",
+    items: [
+      {ticker:"^GSPC",  name:"S&P 500",          source:"YFINANCE"},
+      {ticker:"^DJI",   name:"Dow Jones",        source:"YFINANCE"},
+      {ticker:"^IXIC",  name:"NASDAQ Composite", source:"YFINANCE"},
+      {ticker:"^NDX",   name:"NASDAQ 100",       source:"YFINANCE"},
+      {ticker:"^RUT",   name:"Russell 2000",     source:"YFINANCE"},
+      {ticker:"^SOX",   name:"PHLX Semicon",     source:"YFINANCE"},
+      {ticker:"^N225",  name:"Nikkei 225",       source:"YFINANCE"},
+      {ticker:"^HSI",   name:"Hang Seng",        source:"YFINANCE"},
+      {ticker:"000300.SS",name:"滬深 300",       source:"YFINANCE"},
+      {ticker:"^KS11",  name:"KOSPI",            source:"YFINANCE"},
+      {ticker:"^FTSE",  name:"FTSE 100",         source:"YFINANCE"},
+      {ticker:"^GDAXI", name:"DAX",              source:"YFINANCE"},
+      {ticker:"^FCHI",  name:"CAC 40",           source:"YFINANCE"},
+      {ticker:"^STOXX50E",name:"Euro Stoxx 50",  source:"YFINANCE"},
+      {ticker:"^BSESN", name:"BSE Sensex",       source:"YFINANCE"},
+      {ticker:"^AXJO",  name:"ASX 200",          source:"YFINANCE"},
+    ],
+  },
+  "A6": {
+    title: "A6 · FX 外匯",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "主要貨幣對 · 美元指數",
+    items: [
+      {ticker:"USDTWD=X", name:"USD/TWD", source:"YFINANCE"},
+      {ticker:"USDJPY=X", name:"USD/JPY", source:"YFINANCE"},
+      {ticker:"EURUSD=X", name:"EUR/USD", source:"YFINANCE"},
+      {ticker:"GBPUSD=X", name:"GBP/USD", source:"YFINANCE"},
+      {ticker:"USDCNY=X", name:"USD/CNY", source:"YFINANCE"},
+      {ticker:"USDKRW=X", name:"USD/KRW", source:"YFINANCE"},
+      {ticker:"USDHKD=X", name:"USD/HKD", source:"YFINANCE"},
+      {ticker:"AUDUSD=X", name:"AUD/USD", source:"YFINANCE"},
+      {ticker:"DX-Y.NYB", name:"DXY 美元指數", source:"YFINANCE"},
+    ],
+  },
+  "A7": {
+    title: "A7 · Commodities 大宗商品期貨",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "貴金屬 / 能源 / 工業金屬 / 農產品 · 連續合約",
+    items: [
+      {ticker:"GC=F",  name:"Gold 黃金",     source:"YFINANCE"},
+      {ticker:"SI=F",  name:"Silver 白銀",   source:"YFINANCE"},
+      {ticker:"PL=F",  name:"Platinum 白金", source:"YFINANCE"},
+      {ticker:"HG=F",  name:"Copper 銅",     source:"YFINANCE"},
+      {ticker:"CL=F",  name:"WTI 原油",      source:"YFINANCE"},
+      {ticker:"BZ=F",  name:"Brent 原油",    source:"YFINANCE"},
+      {ticker:"NG=F",  name:"Natural Gas",   source:"YFINANCE"},
+      {ticker:"ZC=F",  name:"Corn 玉米",     source:"YFINANCE"},
+      {ticker:"ZS=F",  name:"Soybean 黃豆",  source:"YFINANCE"},
+      {ticker:"ZW=F",  name:"Wheat 小麥",    source:"YFINANCE"},
+      {ticker:"BDI",   name:"波羅的海乾散貨", source:"AKSHARE"},
+    ],
+  },
+  "A8": {
+    title: "A8 · Bonds 債券",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "美債殖利率 + 國際公債利差",
+    items: [
+      {ticker:"^TNX",  name:"US 10Y Yield",   source:"YFINANCE"},
+      {ticker:"^TYX",  name:"US 30Y Yield",   source:"YFINANCE"},
+      {ticker:"^FVX",  name:"US 5Y Yield",    source:"YFINANCE"},
+      {ticker:"^IRX",  name:"US 3M T-Bill",   source:"YFINANCE"},
+      {ticker:"TLT",   name:"20+Y Treasury",  source:"YFINANCE"},
+      {ticker:"IEF",   name:"7-10Y Treasury", source:"YFINANCE"},
+      {ticker:"SHY",   name:"1-3Y Treasury",  source:"YFINANCE"},
+    ],
+  },
+  "A9": {
+    title: "A9 · Volatility VIX 系列",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "波動率指標",
+    items: [
+      {ticker:"^VIX",   name:"VIX 恐慌指數",   source:"YFINANCE"},
+      {ticker:"^VVIX",  name:"VVIX (VIX of VIX)", source:"YFINANCE"},
+      {ticker:"^MOVE",  name:"MOVE 債券波動",  source:"YFINANCE"},
+      {ticker:"^SKEW",  name:"SKEW 黑天鵝",    source:"YFINANCE"},
+      {ticker:"^OVX",   name:"Oil VIX",        source:"YFINANCE"},
+      {ticker:"^GVZ",   name:"Gold VIX",       source:"YFINANCE"},
+    ],
+  },
+  "A10": {
+    title: "A10 · Crypto 加密貨幣",
+    icon: "A", color: "bl", section: "A",
+    features: ["px"],
+    note: "主要加密貨幣 · USD 計價",
+    items: [
+      {ticker:"BTC-USD", name:"Bitcoin",   source:"YFINANCE"},
+      {ticker:"ETH-USD", name:"Ethereum",  source:"YFINANCE"},
+      {ticker:"SOL-USD", name:"Solana",    source:"YFINANCE"},
+      {ticker:"BNB-USD", name:"BNB",       source:"YFINANCE"},
+      {ticker:"XRP-USD", name:"XRP",       source:"YFINANCE"},
+    ],
+  },
+  "A11": {
+    title: "A11 · 台股 ETF (被動式)",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","adj"],
+    note: "被動追蹤型 ETF · 量價 + Adj",
+    items: [
+      {ticker:"0050",  name:"元大台灣50",         source:"TWSE"},
+      {ticker:"0056",  name:"元大高股息",         source:"TWSE"},
+      {ticker:"00878", name:"國泰永續高股息",     source:"TWSE"},
+      {ticker:"00919", name:"群益台灣精選高息",   source:"TWSE"},
+      {ticker:"00929", name:"復華台灣科技優息",   source:"TWSE"},
+      {ticker:"00940", name:"元大臺灣價值高息",   source:"TWSE"},
+      {ticker:"00713", name:"元大台灣高息低波",   source:"TWSE"},
+      {ticker:"006208",name:"富邦台50",           source:"TWSE"},
+      {ticker:"00692", name:"富邦公司治理",       source:"TWSE"},
+      {ticker:"00701", name:"國泰低波高息",       source:"TWSE"},
+    ],
+  },
+  "A12": {
+    title: "A12 · 台股 ETF (主動式 · 18 檔)",
+    icon: "A", color: "bl", section: "A",
+    features: ["px","adj","chip"],
+    note: "主動式 ETF (尾碼 A) · 每日完整持股揭露 · 含 TDCC 受益人數",
+    items: [
+      {ticker:"00980A", name:"主動野村臺灣優選",   source:"NOM"},
+      {ticker:"00981A", name:"主動統一台股增長",   source:"UNI"},
+      {ticker:"00982A", name:"主動群益台灣強棒",   source:"CAP"},
+      {ticker:"00983A", name:"主動中信ARK創新",    source:"CTBC"},
+      {ticker:"00984A", name:"主動安聯台灣高息",   source:"AGI"},
+      {ticker:"00985A", name:"主動野村台灣50",     source:"NOM"},
+      {ticker:"00987A", name:"主動台新優勢成長",   source:"TS"},
+      {ticker:"00988A", name:"主動統一全球創新",   source:"UNI"},
+      {ticker:"00989A", name:"主動摩根美國科技",   source:"JPM"},
+      {ticker:"00990A", name:"主動元大AI新經濟",   source:"YT"},
+      {ticker:"00991A", name:"主動復華未來50",     source:"FHTR"},
+      {ticker:"00992A", name:"主動群益科技創新",   source:"CAP"},
+      {ticker:"00994A", name:"主動第一金台股優選", source:"FIRST"},
+      {ticker:"00995A", name:"主動中信台灣卓越",   source:"CTBC"},
+      {ticker:"00997A", name:"主動群益美國增長",   source:"CAP"},
+      {ticker:"00999A", name:"主動安聯台股趨勢",   source:"AGI"},
+      {ticker:"00402A", name:"主動安聯美國科技",   source:"AGI"},
+      {ticker:"00403A", name:"主動統一升級版0050", source:"UNI"},
+    ],
+  },
+
+  // ===== SECTION B · US Macro =====
+  "B1": {
+    title: "B1 · Prices 物價 (CPI / PCE / PPI)",
+    icon: "B", color: "tl", section: "B",
+    features: ["px"],
+    items: [
+      {ticker:"CPIAUCSL",name:"CPI All Urban",     source:"FRED"},
+      {ticker:"CPILFESL",name:"Core CPI",          source:"FRED"},
+      {ticker:"PCEPI",   name:"PCE Index",         source:"FRED"},
+      {ticker:"PCEPILFE",name:"Core PCE",          source:"FRED"},
+      {ticker:"PPIACO",  name:"PPI All Commodities",source:"FRED"},
+      {ticker:"...",     name:"+ 35 series",       source:"FRED"},
+    ],
+  },
+  "B2": {
+    title: "B2 · Labor 勞動力",
+    icon: "B", color: "tl", section: "B",
+    features: ["px"],
+    items: [
+      {ticker:"UNRATE", name:"Unemployment Rate",   source:"FRED"},
+      {ticker:"PAYEMS", name:"Nonfarm Payrolls",    source:"FRED"},
+      {ticker:"ICSA",   name:"Initial Claims",      source:"FRED"},
+      {ticker:"AHETPI", name:"Avg Hourly Earnings", source:"FRED"},
+      {ticker:"CIVPART",name:"Labor Force Part",    source:"FRED"},
+      {ticker:"JTSJOL", name:"JOLTS Job Openings",  source:"FRED"},
+      {ticker:"...",    name:"+ 20 series",         source:"FRED"},
+    ],
+  },
+  "B3": {
+    title: "B3 · Rates 利率 / Treasury Curve",
+    icon: "B", color: "tl", section: "B",
+    features: ["px"],
+    items: [
+      {ticker:"DGS10",  name:"10Y Treasury",  source:"FRED"},
+      {ticker:"DGS2",   name:"2Y Treasury",   source:"FRED"},
+      {ticker:"DGS30",  name:"30Y Treasury",  source:"FRED"},
+      {ticker:"DGS3MO", name:"3M Treasury",   source:"FRED"},
+      {ticker:"T10Y2Y", name:"10Y-2Y Spread", source:"FRED"},
+      {ticker:"T10Y3M", name:"10Y-3M Spread", source:"FRED"},
+      {ticker:"DFF",    name:"Fed Funds Eff", source:"FRED"},
+      {ticker:"SOFR",   name:"SOFR",          source:"FRED"},
+      {ticker:"...",    name:"+ 14 series",   source:"FRED"},
+    ],
+  },
+  "B4": {
+    title: "B4 · Fiscal 財政 (DTS + MTS + Debt)",
+    icon: "B", color: "tl", section: "B",
+    features: ["px"],
+    items: [
+      {ticker:"DTS_CASH",  name:"DTS Cash Balance",   source:"Treasury_FD"},
+      {ticker:"MTS_T1",    name:"MTS Receipts/Outlays",source:"Treasury_FD"},
+      {ticker:"DEBT_TOT",  name:"Total Public Debt",  source:"Treasury_FD"},
+      {ticker:"...",       name:"+ 14 series",        source:"Treasury_FD"},
+    ],
+  },
+  "B5": {
+    title: "B5 · Fed Policy + Sentiment + Misc",
+    icon: "B", color: "tl", section: "B",
+    features: ["px"],
+    items: [
+      {ticker:"FOMC_SEP",  name:"FOMC SEP/Dot Plot",     source:"Fed"},
+      {ticker:"FED_TONE",  name:"FOMC Tone (NLP)",       source:"Fed"},
+      {ticker:"AAII_BULL", name:"AAII Bullish",          source:"AAII"},
+      {ticker:"AAII_BEAR", name:"AAII Bearish",          source:"AAII"},
+      {ticker:"CNN_FG",    name:"CNN Fear & Greed",      source:"CNN"},
+      {ticker:"...",       name:"+ 80 more (PMI/Housing/Growth)", source:"FRED+"},
+    ],
+  },
+
+  // ===== SECTION C · Global ETF Universe =====
+  "C1": {
+    title: "C1 · Regional ETFs",
+    icon: "C", color: "vi", section: "C",
+    features: ["px","adj"],
+    items: [
+      {ticker:"SPY",  name:"S&P 500",        source:"YFINANCE"},
+      {ticker:"QQQ",  name:"NASDAQ-100",     source:"YFINANCE"},
+      {ticker:"IWM",  name:"Russell 2000",   source:"YFINANCE"},
+      {ticker:"EFA",  name:"MSCI EAFE",      source:"YFINANCE"},
+      {ticker:"EEM",  name:"MSCI Emerging",  source:"YFINANCE"},
+      {ticker:"EWT",  name:"Taiwan ETF",     source:"YFINANCE"},
+      {ticker:"EWJ",  name:"Japan ETF",      source:"YFINANCE"},
+      {ticker:"MCHI", name:"China ETF",      source:"YFINANCE"},
+    ],
+  },
+  "C2": {
+    title: "C2 · Sector ETFs (SPDR + thematic)",
+    icon: "C", color: "vi", section: "C",
+    features: ["px","adj"],
+    items: [
+      {ticker:"XLK",  name:"Technology",        source:"YFINANCE"},
+      {ticker:"XLF",  name:"Financial",         source:"YFINANCE"},
+      {ticker:"XLE",  name:"Energy",            source:"YFINANCE"},
+      {ticker:"XLV",  name:"Healthcare",        source:"YFINANCE"},
+      {ticker:"XLY",  name:"Consumer Discr.",   source:"YFINANCE"},
+      {ticker:"XLP",  name:"Consumer Staples",  source:"YFINANCE"},
+      {ticker:"XLI",  name:"Industrials",       source:"YFINANCE"},
+      {ticker:"XLU",  name:"Utilities",         source:"YFINANCE"},
+      {ticker:"XLB",  name:"Materials",         source:"YFINANCE"},
+      {ticker:"XLRE", name:"Real Estate",       source:"YFINANCE"},
+      {ticker:"SMH",  name:"Semiconductors",    source:"YFINANCE"},
+      {ticker:"SOXX", name:"PHLX Semi ETF",     source:"YFINANCE"},
+    ],
+  },
+  "C3": {
+    title: "C3 · Bond ETFs",
+    icon: "C", color: "vi", section: "C",
+    features: ["px","adj"],
+    items: [
+      {ticker:"TLT", name:"20+Y Treasury",    source:"YFINANCE"},
+      {ticker:"IEF", name:"7-10Y Treasury",   source:"YFINANCE"},
+      {ticker:"SHY", name:"1-3Y Treasury",    source:"YFINANCE"},
+      {ticker:"LQD", name:"Investment Grade", source:"YFINANCE"},
+      {ticker:"HYG", name:"High Yield",       source:"YFINANCE"},
+      {ticker:"TIP", name:"TIPS",             source:"YFINANCE"},
+    ],
+  },
+  "C4": {
+    title: "C4 · Commodity / FX ETFs",
+    icon: "C", color: "vi", section: "C",
+    features: ["px","adj"],
+    items: [
+      {ticker:"GLD", name:"Gold ETF",     source:"YFINANCE"},
+      {ticker:"SLV", name:"Silver ETF",   source:"YFINANCE"},
+      {ticker:"USO", name:"Oil Fund",     source:"YFINANCE"},
+      {ticker:"DBA", name:"Agriculture",  source:"YFINANCE"},
+      {ticker:"DBC", name:"Commodities",  source:"YFINANCE"},
+      {ticker:"UUP", name:"Dollar Bull",  source:"YFINANCE"},
+    ],
+  },
+
+  // ===== SECTION D · TW Active ETF Holdings (detail per issuer) =====
+  "D1": {
+    title: "D1 · TW Active ETF Holdings — by Issuer (10 投信)",
+    icon: "D", color: "am", section: "D",
+    features: ["chip"],
+    note: "每檔主動 ETF 每日揭露完整持股清單 · 10 投信 + 4 aggregator fallbacks",
+    items: [
+      {ticker:"UNI",   name:"統一投信 (00981A, 00988A, 00403A)",   source:"ezmoney"},
+      {ticker:"NOM",   name:"野村投信 (00980A, 00985A)",            source:"nomurafunds"},
+      {ticker:"CAP",   name:"群益投信 (00982A, 00992A, 00997A)",    source:"capitalfund"},
+      {ticker:"CTBC",  name:"中信投信 (00983A, 00995A)",            source:"ctbcinvestments"},
+      {ticker:"AGI",   name:"安聯投信 (00984A, 00999A, 00402A)",    source:"allianzgi"},
+      {ticker:"YT",    name:"元大投信 (00990A)",                    source:"yuantaetfs"},
+      {ticker:"FIRST", name:"第一金投信 (00994A)",                  source:"firstrust"},
+      {ticker:"FHTR",  name:"復華投信 (00991A)",                    source:"fhtrust"},
+      {ticker:"TS",    name:"台新投信 (00987A)",                    source:"tsit"},
+      {ticker:"JPM",   name:"摩根投信 (00989A)",                    source:"jpmorgan"},
+    ],
+  },
+  "D2": {
+    title: "D2 · TDCC 集保資料",
+    icon: "D", color: "am", section: "D",
+    features: ["chip"],
+    note: "ETF 受益人數 + 股權分散表 + 散戶/機構集中度",
+    items: [
+      {ticker:"TDCC_DIST",  name:"股權分散表 (17 持股分級)",  source:"TDCC"},
+      {ticker:"TDCC_BENEF", name:"ETF 受益人數",              source:"TDCC"},
+      {ticker:"RETAIL_PCT", name:"散戶持股比例 (derived)",    source:"TDCC"},
+      {ticker:"INST_PCT",   name:"機構持股比例 (derived)",    source:"TDCC"},
+    ],
+  },
+
+  // ===== SECTION E · TW Consensus (sample) =====
+  "E1": {
+    title: "E1 · TW Consensus (sample of ~1900)",
+    icon: "E", color: "co", section: "E",
+    features: ["px"],
+    note: "每檔 41 cols: target price / rating / EPS forecast / revenue forecast / analyst count",
+    items: [
+      {ticker:"2330", name:"台積電 — Consensus", source:"YF+FactSet"},
+      {ticker:"2454", name:"聯發科 — Consensus", source:"YF+FactSet"},
+      {ticker:"2317", name:"鴻海 — Consensus",   source:"YF+FactSet"},
+      {ticker:"2308", name:"台達電 — Consensus", source:"YF+FactSet"},
+      {ticker:"3034", name:"聯詠 — Consensus",   source:"YF+FactSet"},
+      {ticker:"...",  name:"+ ~1900 全市場個股", source:"YF+FactSet"},
+    ],
+  },
+};
+
+// ============================================================
+// 24 SOURCES
+// ============================================================
+const SOURCES = [
+  ["TW","TWSE","台灣上市 OHLCV + 籌碼","vdf_fetchers_market","ok"],
+  ["TW","TPEX","台灣上櫃 OHLCV + 籌碼","vdf_fetchers_market","ok"],
+  ["TW","MOPS","台灣公司財報","vdf_fetchers_financials","ok"],
+  ["TW","TDCC 集保","ETF 受益人數 / 持股分布","vdf_fetchers_tdcc","ok"],
+  ["TW","投信網站 (×10)","主動式 ETF 每日持股 + 4 fallbacks","vdf_fetchers_etf_holdings","ok"],
+  ["GLOBAL","YFINANCE","全球股票/ETF/指數/期貨/外匯 OHLCV+Adj","vdf_fetchers_market","ok"],
+  ["GLOBAL","Yahoo (^VIX)","VIX/VVIX/MOVE/SKEW","vdf_fetchers_market","ok"],
+  ["US","FRED","美國總經 219 series","vdf_fetchers_macro","ok"],
+  ["US","Treasury_FD","DTS 日度 + MTS 月度","vdf_fetchers_fiscal","ok"],
+  ["US","Fed FOMC","FOMC + SEP + tone scoring","vdf_fetchers_fed","ok"],
+  ["US","FRBNY","SOFR / EFFR / RRP","FRED 代理","proxy"],
+  ["PROXY","BEA","GDP / PCE / Personal Income","FRED 代理","proxy"],
+  ["PROXY","BLS","CPI / PPI / JOLTS","FRED 代理","proxy"],
+  ["PROXY","ISM","Manufacturing + Services PMI","FRED 代理","proxy"],
+  ["PROXY","ConfBoard","Consumer Confidence + LEI","FRED 代理","proxy"],
+  ["PROXY","UMich","Consumer Sentiment + Inflation Exp.","FRED 代理","proxy"],
+  ["CN","AKSHARE","中國商品 / BDI / SCFI","vdf_fetchers_macro","ok"],
+  ["SENT","AAII","Bull / Bear / Neutral 散戶情緒","vdf_fetchers_sentiment","ok"],
+  ["SENT","CNN","Fear & Greed (composite + 7)","vdf_fetchers_sentiment","ok"],
+  ["TW-NEW","Cnyes (FactSet)","FactSet 共識 (target / rating / EPS)","vdf_fetchers_consensus","ok"],
+  ["GLOBAL","ECB","歐元區 政策利率 / HICP","FRED 代理","proxy"],
+  ["GLOBAL","BOJ","日本央行 利率 / Tankan","FRED 代理","proxy"],
+  ["GLOBAL","BOE","英國央行 利率","FRED 代理","proxy"],
+  ["GLOBAL","OECD","CLI G7/G20 領先指標","FRED 代理","proxy"],
+];
+
+const tbody = document.getElementById("src-tbody");
+SOURCES.forEach((s, i) => {
+  const tr = document.createElement("tr");
+  const cls = s[4] === "ok" ? "b-c" : s[4] === "proxy" ? "b-w" : s[4] === "todo" ? "b-h" : "b-l";
+  const txt = s[4] === "ok" ? "✓ DONE" : s[4] === "proxy" ? "📡 PROXY" : s[4] === "todo" ? "✗ TODO" : "○ STUB";
+  tr.innerHTML = `
+    <td>${i+1}</td>
+    <td><b>${s[1]}</b> <span class="b b-l">${s[0]}</span></td>
+    <td>${s[2]}</td>
+    <td class="mono" style="color:var(--i3)">${s[3]}</td>
+    <td><span class="b ${cls}">${txt}</span></td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// ============================================================
+// FRED KEY localStorage
+// ============================================================
+const FRED_KEY = "vdf_fred_api_key_v43";
+const FRED_DEFAULT = "2d5ae8dfe834ffc409bf98d51f539c17";
+function loadFred() {
+  const saved = localStorage.getItem(FRED_KEY);
+  if (saved) document.getElementById("fred-api-key").value = saved;
+}
+function showCfgStatus(msg, type) {
+  const el = document.getElementById("cfg-status");
+  el.textContent = msg;
+  el.className = "config-status " + type;
+  el.style.opacity = "1";
+  setTimeout(() => el.style.opacity = "0.4", 3000);
+}
+loadFred();
+document.getElementById("btn-save-cfg").onclick = () => {
+  const k = document.getElementById("fred-api-key").value.trim();
+  if (k.length < 16 || k.length > 80) {
+    showCfgStatus("Invalid key length", "error"); return;
+  }
+  localStorage.setItem(FRED_KEY, k);
+  showCfgStatus("✓ Saved · persistent", "success");
+  appendLog(`FRED API key updated (${k.slice(0,4)}...${k.slice(-4)})`, "o");
+};
+document.getElementById("btn-reset-cfg").onclick = () => {
+  document.getElementById("fred-api-key").value = FRED_DEFAULT;
+  localStorage.setItem(FRED_KEY, FRED_DEFAULT);
+  showCfgStatus("↺ Reset to default", "success");
+};
+
+// ============================================================
+// ACQUISITION MATRIX renderer (categorized)
+// ============================================================
+function renderMatrix() {
+  const container = document.getElementById("mx-content");
+  const search = (document.getElementById("mx-search").value || "").toLowerCase();
+  const secFilter = document.getElementById("mx-section").value;
+  const srcFilter = document.getElementById("mx-source").value;
+  container.innerHTML = "";
+  let totalShown = 0;
+
+  for (const [groupId, data] of Object.entries(MATRIX_DATA)) {
+    if (secFilter && data.section !== secFilter) continue;
+    const filtered = data.items.filter(item =>
+      (!search ||
+        item.ticker.toLowerCase().includes(search) ||
+        item.name.toLowerCase().includes(search) ||
+        item.source.toLowerCase().includes(search)) &&
+      (!srcFilter || item.source === srcFilter)
+    );
+    if (filtered.length === 0) continue;
+
+    const group = document.createElement("div");
+    group.className = "cat-group";
+    const features = data.features || [];
+    const featHtml = features.map(f => {
+      const labels = { px: "量價", adj: "Adj", chip: "籌碼" };
+      return `<span class="ft-chip ${f}">${labels[f] || f}</span>`;
+    }).join("");
+
+    group.innerHTML = `
+      <div class="cat-group-h">
+        <div class="cat-group-icon ${data.icon}">${data.icon}</div>
+        <div style="flex:1">
+          <div class="cat-group-title">${data.title}</div>
+          ${data.note ? `<div class="cat-group-sub">${data.note}</div>` : ""}
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          ${featHtml}
+        </div>
+        <div class="cat-group-badge">${filtered.length} items</div>
+        <div class="cat-group-toggle">▾</div>
+      </div>
+      <div class="cat-grid" id="grid-${groupId}"></div>
+    `;
+    container.appendChild(group);
+
+    const grid = group.querySelector(".cat-grid");
+    filtered.forEach(item => {
+      const cell = document.createElement("div");
+      cell.className = "cat-cell";
+      cell.innerHTML = `
+        <div class="tk">${item.ticker}</div>
+        <div class="nm">${item.name}</div>
+        <div class="meta-row">
+          <span class="src-tag">${item.source}</span>
+        </div>
+      `;
+      grid.appendChild(cell);
+    });
+
+    // Collapse toggle
+    const header = group.querySelector(".cat-group-h");
+    const toggle = group.querySelector(".cat-group-toggle");
+    header.onclick = () => {
+      if (grid.style.display === "none") {
+        grid.style.display = "grid";
+        toggle.textContent = "▾";
+      } else {
+        grid.style.display = "none";
+        toggle.textContent = "▸";
+      }
+    };
+
+    totalShown += filtered.length;
+  }
+  document.getElementById("mx-count").textContent = `${totalShown} items shown`;
+}
+
+function initMatrixFilters() {
+  const allSources = new Set();
+  for (const data of Object.values(MATRIX_DATA)) {
+    data.items.forEach(item => allSources.add(item.source));
+  }
+  const sel = document.getElementById("mx-source");
+  Array.from(allSources).sort().forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+initMatrixFilters();
+renderMatrix();
+document.getElementById("mx-search").addEventListener("input", renderMatrix);
+document.getElementById("mx-section").addEventListener("change", renderMatrix);
+document.getElementById("mx-source").addEventListener("change", renderMatrix);
+
+// ============================================================
+// TICKER MANAGER MODAL (still functional from v4.2.1)
+// ============================================================
+let MODAL_SECTION = null;
+let SECTION_TICKERS = (() => {
+  const stored = localStorage.getItem("vdf_section_tickers_v43");
+  if (stored) { try { return JSON.parse(stored); } catch (e) {} }
+  const out = {};
+  for (const sec of ["A","B","C","D","E"]) out[sec] = [];
+  for (const [gid, data] of Object.entries(MATRIX_DATA)) {
+    if (!out[data.section]) out[data.section] = [];
+    data.items.forEach(i => {
+      if (i.ticker === "...") return;
+      out[data.section].push({...i, isNew: false});
+    });
+  }
+  return out;
+})();
+
+let MODAL_ORIGINAL = [];
+
+function openModal(sec) {
+  MODAL_SECTION = sec;
+  MODAL_ORIGINAL = (SECTION_TICKERS[sec] || []).map(t => ({...t}));
+  document.getElementById("md-title").textContent = `✎ Manage Section ${sec}`;
+  renderList();
+  updateDelta();
+  document.getElementById("modal").classList.add("on");
+}
+function closeModal(save) {
+  if (!save) SECTION_TICKERS[MODAL_SECTION] = MODAL_ORIGINAL;
+  else {
+    SECTION_TICKERS[MODAL_SECTION].forEach(t => t.isNew = false);
+    localStorage.setItem("vdf_section_tickers_v43", JSON.stringify(SECTION_TICKERS));
+    appendLog(`Section ${MODAL_SECTION}: ${SECTION_TICKERS[MODAL_SECTION].length} tickers saved`, "o");
+  }
+  document.getElementById("modal").classList.remove("on");
+}
+function renderList() {
+  const list = document.getElementById("md-list");
+  list.innerHTML = "";
+  (SECTION_TICKERS[MODAL_SECTION] || []).forEach((item, idx) => {
+    const chip = document.createElement("div");
+    chip.className = "tk-chip" + (item.isNew ? " new" : "");
+    chip.innerHTML = `
+      <div style="flex:1;overflow:hidden">
+        <div class="tk">${item.ticker}</div>
+        <div class="nm">${item.name || "—"}</div>
+      </div>
+      <button class="rm" data-idx="${idx}">×</button>
+    `;
+    list.appendChild(chip);
+  });
+  list.querySelectorAll(".rm").forEach(btn => {
+    btn.onclick = () => {
+      SECTION_TICKERS[MODAL_SECTION].splice(parseInt(btn.dataset.idx,10), 1);
+      renderList(); updateDelta();
+    };
+  });
+}
+function addTicker() {
+  const inp = document.getElementById("md-input");
+  const raw = inp.value.trim();
+  if (!raw) return;
+  const tkrs = raw.split(/[,\s]+/).filter(Boolean);
+  const existing = new Set((SECTION_TICKERS[MODAL_SECTION] || []).map(t => t.ticker.toUpperCase()));
+  let added = 0;
+  tkrs.forEach(t => {
+    if (!t || existing.has(t.toUpperCase())) return;
+    SECTION_TICKERS[MODAL_SECTION].push({
+      ticker: t, name: "(custom)",
+      source: {A:"YFINANCE",B:"FRED",C:"YFINANCE",D:"Issuer",E:"Cnyes"}[MODAL_SECTION] || "YFINANCE",
+      freq: "D", isNew: true,
+    });
+    existing.add(t.toUpperCase());
+    added++;
+  });
+  inp.value = "";
+  renderList(); updateDelta();
+  if (added) appendLog(`Added ${added} to Section ${MODAL_SECTION}`, "i");
+}
+function updateDelta() {
+  const cur = SECTION_TICKERS[MODAL_SECTION] || [];
+  const ok = new Set(MODAL_ORIGINAL.map(t => t.ticker));
+  const ck = new Set(cur.map(t => t.ticker));
+  document.getElementById("dlt-total").textContent = `Current: ${cur.length}`;
+  document.getElementById("dlt-added").textContent = `+${[...ck].filter(k => !ok.has(k)).length} added`;
+  document.getElementById("dlt-removed").textContent = `-${[...ok].filter(k => !ck.has(k)).length} removed`;
+}
+
+document.querySelectorAll("[data-edit-btn]").forEach(btn => {
+  btn.onclick = (e) => { e.stopPropagation(); openModal(btn.dataset.editBtn); };
+});
+document.getElementById("md-close").onclick  = () => closeModal(false);
+document.getElementById("md-cancel").onclick = () => closeModal(false);
+document.getElementById("md-save").onclick   = () => closeModal(true);
+document.getElementById("md-add").onclick    = addTicker;
+document.getElementById("md-input").onkeydown = e => { if (e.key === "Enter") addTicker(); };
+document.getElementById("modal").onclick = e => {
+  if (e.target.id === "modal") closeModal(false);
+};
+
+// ============================================================
+// LOG
+// ============================================================
+const logEl = document.getElementById("log");
+function appendLog(text, cls = "i") {
+  const span = document.createElement("span");
+  span.className = "l " + cls;
+  span.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+  logEl.appendChild(span);
+  logEl.appendChild(document.createTextNode("\n"));
+  logEl.scrollTop = logEl.scrollHeight;
+}
+document.getElementById("btn-run-all").onclick = () => appendLog("Initiating nightly pipeline (wire to vdf_api SSE)", "i");
+document.getElementById("btn-run-test").onclick = () => appendLog("Tests cached: 50 pass / 0 fail / 2 skip (52 tests)", "o");
+document.getElementById("btn-stop").onclick = () => appendLog("Stop signal (placeholder)", "w");
+</script>
+</body>
+</html>

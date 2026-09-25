@@ -1,0 +1,286 @@
+pdf_extraction_engine:
+  version: "2.1.0"
+  strategy: light_to_heavy_fallback
+  mode: auto
+  required_capabilities: [text, bbox, layout]
+  stop_on_accept: true
+  run_core_layout: true
+  use_cache: true
+  cache_subdirectory: .gle_cache
+
+  engines:
+    - name: pdfplumber
+      enabled: true
+      priority: 10
+      strength: 4.5
+      type: light
+      role: primary_layout_extractor
+      handles: [text, tables, bbox, font, layout]
+      fallback_if: [empty_output, low_quality, missing_required_capability]
+    - name: pypdf
+      enabled: true
+      priority: 20
+      strength: 4.0
+      type: light
+      role: raw_text_backup
+      handles: [text, metadata]
+      fallback_if: [layout_needed, low_quality]
+    - name: poppler_pdftotext
+      enabled: true
+      priority: 30
+      strength: 5.0
+      type: light
+      role: fast_physical_layout_text
+      handles: [text, layout]
+      fallback_if: [bbox_needed, tables_needed]
+    - name: pdf_parse_node
+      enabled: true
+      priority: 40
+      strength: 3.5
+      type: light
+      role: node_text_backup
+      handles: [text, metadata]
+      fallback_if: [layout_needed]
+    - name: pymupdf
+      enabled: true
+      priority: 50
+      strength: 5.0
+      type: medium
+      role: geometry_and_image_recovery
+      handles: [text, bbox, font, images, layout]
+      fallback_if: [character_geometry_needed]
+    - name: pdfminer_six
+      enabled: true
+      priority: 60
+      strength: 5.0
+      type: medium
+      role: character_coordinate_extractor
+      handles: [text, bbox, font, multi_column]
+      fallback_if: [deep_layout_needed]
+    - name: apache_pdfbox
+      enabled: true
+      priority: 70
+      strength: 4.0
+      type: medium
+      role: java_text_backup
+      handles: [text, metadata]
+      fallback_if: [layout_needed]
+    - name: pdfjs_node
+      enabled: true
+      priority: 80
+      strength: 4.0
+      type: medium
+      role: javascript_geometry_backup
+      handles: [text, bbox]
+      fallback_if: [layout_needed]
+    - name: mupdf_cli
+      enabled: true
+      priority: 90
+      strength: 4.5
+      type: medium
+      role: native_cli_text_layout
+      handles: [text, layout]
+      fallback_if: [markdown_needed]
+    - name: pymupdf4llm
+      enabled: true
+      priority: 95
+      strength: 4.5
+      type: medium
+      role: rag_markdown
+      handles: [text, markdown, layout, rag]
+      fallback_if: [tables_needed]
+    - name: camelot
+      enabled: true
+      priority: 96
+      strength: 4.0
+      type: medium
+      role: ruled_table_extractor
+      handles: [table, csv, bbox]
+      fallback_if: [borderless_or_scanned_table]
+    - name: tabula_py
+      enabled: true
+      priority: 97
+      strength: 4.0
+      type: medium
+      role: java_table_backup
+      handles: [table, csv]
+      fallback_if: [deep_table_needed]
+    - name: docling
+      enabled: true
+      priority: 110
+      strength: 5.0
+      type: heavy
+      role: structured_markdown
+      handles: [markdown, table, figure, rag]
+      fallback_if: [reconstruction_needed]
+    - name: unstructured
+      enabled: true
+      priority: 120
+      strength: 4.5
+      type: heavy
+      role: semantic_element_parser
+      handles: [text, layout, table, semantic, rag]
+      fallback_if: [multi_format_needed]
+    - name: apache_tika
+      enabled: true
+      priority: 130
+      strength: 4.0
+      type: heavy
+      role: multi_format_text_backup
+      handles: [text, metadata, multi_format]
+      fallback_if: [layout_needed]
+    - name: pdfsharp_dotnet
+      enabled: true
+      priority: 140
+      strength: 3.5
+      type: heavy
+      role: dotnet_pdf_backup
+      handles: [text, layout]
+      fallback_if: [deep_layout_needed]
+    - name: marker
+      enabled: true
+      priority: 210
+      strength: 5.0
+      type: heavy
+      role: formula_and_document_reconstruction
+      handles: [markdown, formula, table, figure]
+      fallback_if: [scanned_document]
+    - name: mineru
+      enabled: true
+      priority: 220
+      strength: 5.0
+      type: heavy
+      role: formula_document_reconstruction
+      handles: [markdown, formula, table, figure]
+      fallback_if: [vision_layout_needed]
+    - name: layoutparser
+      enabled: true
+      priority: 230
+      strength: 4.5
+      type: heavy
+      role: configurable_vision_layout
+      handles: [layout, bbox, table, figure]
+      fallback_if: [document_ai_needed]
+    - name: deepdoctection
+      enabled: true
+      priority: 240
+      strength: 4.5
+      type: heavy
+      role: document_ai_layout_table
+      handles: [layout, bbox, table, ocr]
+      fallback_if: [reading_order_needed]
+    - name: huridocs_vgt
+      enabled: true
+      priority: 250
+      strength: 4.5
+      type: heavy
+      role: visual_geometry_transformer
+      handles: [layout, bbox, reading_order]
+      fallback_if: [table_detection_needed]
+    - name: table_transformer
+      enabled: true
+      priority: 260
+      strength: 4.5
+      type: heavy
+      role: deep_table_detection
+      handles: [table, bbox, table_structure]
+      fallback_if: [ocr_needed]
+    - name: tesseract
+      enabled: true
+      priority: 310
+      strength: 4.5
+      type: ocr
+      role: local_ocr_first
+      handles: [ocr_text, bbox, multilingual]
+      fallback_if: [cjk_accuracy_needed]
+    - name: paddleocr
+      enabled: true
+      priority: 320
+      strength: 5.0
+      type: ocr
+      role: multilingual_scanned_document
+      handles: [ocr_text, bbox, cjk]
+      fallback_if: [document_structure_needed]
+    - name: paddle_ppstructure
+      enabled: true
+      priority: 330
+      strength: 5.0
+      type: heavy
+      role: ppstructure_v2_v3_compatibility
+      handles: [ocr, layout, table, figure, bbox]
+      fallback_if: [layout_only_needed]
+    - name: paddle_layout
+      enabled: true
+      priority: 340
+      strength: 5.0
+      type: heavy
+      role: deep_layout_analysis
+      handles: [paragraphs, titles, multi_column, image_positions]
+      fallback_if: [table_structure_needed]
+    - name: paddle_detection
+      enabled: true
+      priority: 350
+      strength: 5.0
+      type: heavy
+      role: custom_object_and_table_detection
+      handles: [tables, merged_cells, complex_layout]
+      fallback_if: [full_document_reconstruction_needed]
+    - name: paddle_pdf_pipeline
+      enabled: true
+      priority: 345
+      strength: 5.0
+      type: heavy
+      role: ppstructurev3_document_reconstruction
+      handles: [markdown, formulas, images, text, reading_order]
+      fallback_if: [ocr_text_needed]
+    - name: easyocr
+      enabled: true
+      priority: 360
+      strength: 4.0
+      type: ocr
+      role: torch_multilingual_ocr_backup
+      handles: [ocr_text, bbox, multilingual]
+      fallback_if: [searchable_pdf_needed]
+    - name: ocrmypdf
+      enabled: true
+      priority: 370
+      strength: 4.5
+      type: ocr
+      role: searchable_pdf_preprocessor
+      handles: [searchable_pdf, deskew, preprocess]
+      fallback_if: [historical_handwriting]
+    - name: transkribus_core
+      enabled: true
+      priority: 380
+      strength: 4.5
+      type: ocr
+      role: historical_handwriting_ocr
+      handles: [ocr, handwriting, layout]
+      fallback_if: [none]
+    - name: adobe_extract_api
+      enabled: false
+      priority: 900
+      strength: 5.0
+      type: cloud
+      role: registered_external_boundary
+      handles: [text, table, figure, structured_json]
+      fallback_if: [none]
+
+  adapter:
+    timeout_seconds: 300
+    heavy_timeout_seconds: 900
+    min_text_characters: 40
+    min_readable_ratio: 0.70
+    max_replacement_ratio: 0.03
+    max_duplicate_ratio: 0.40
+    min_bbox_element_ratio: 0.50
+    min_structural_elements: 1
+    min_free_memory_gb_heavy: 4.0
+    max_output_characters: 8000000
+    ocr_languages: chi_tra+chi_sim+eng
+    dpi: 180
+    device: cpu
+    model_cache_dir: null
+    allow_model_downloads: false
+    allow_cloud_backends: false
+    environment: {}

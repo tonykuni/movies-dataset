@@ -1,4 +1,4 @@
-﻿<#
+<#
 VIA_WorkflowEngine.ps1 — Windows 一鍵啟動器（ONE POWERSHELL TO HANDLE ALL）
 ===========================================================================
 包辦 Windows 上執行 VIA_WorkflowEngine.py 的全部前置：
@@ -14,7 +14,6 @@ WRAPPER 動詞
   setup chipwar  安裝 ChipWar/MultiFactor 依賴 duckdb+scipy+scikit-learn+statsmodels
   all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
   vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest|columns）
-  talib …    透傳 TALib 指標引擎（probe|list|sample|compute|signals|chart|selftest;adj 鐵律）
   theory     今日五引擎理論稽核 — PS 獨立甲骨文 14 斷言（自算期望值對質,非引擎自證）
   chipwar    跑 ChipWar 13 階段全鏈（籌碼戰五 lane + 報告 + harness + VAP 儀表板；可加 --dry-run）
   mf         跑 MultiFactor 共振引擎（= multifactor；可加 --dry-run）
@@ -41,6 +40,16 @@ USAGE
   被 ExecutionPolicy 擋時：
   powershell -ExecutionPolicy Bypass -File .\VIA_WorkflowEngine.ps1 all
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Stop'
 $BranchHint = 'claude/workflow-engine-libs-integration-pxsyv3'
 
@@ -163,19 +172,18 @@ function Invoke-EngineHost {
 
 # ── VAP seaborn+plotly 繪圖引擎（新平行引擎線;動態解析鐵律:取最新版,嚴禁寫死版號）──
 $VapEngineDir = Join-Path $PSScriptRoot 'functional modules\VAP\engine'
-$VapEngine = Get-ChildItem -LiteralPath $VapEngineDir -Filter 'via_autoplot_seaborn_plotly_v0*.py' -ErrorAction SilentlyContinue |
+$VapEngine = Get-ChildItem -LiteralPath $VapEngineDir -Filter 'VAP_ENG003_AutoplotSeabornPlotly_v0*.py' -ErrorAction SilentlyContinue |
     Sort-Object Name | Select-Object -Last 1 -ExpandProperty FullName
-if (-not $VapEngine) { $VapEngine = Join-Path $VapEngineDir 'via_autoplot_seaborn_plotly_v0100.py' }
+if (-not $VapEngine) { $VapEngine = Join-Path $VapEngineDir 'VAP_ENG003_AutoplotSeabornPlotly_v0100.py' }
 
 # ── 本 session 各模組定位 ──────────────────────────────────────────────────
 $ChipWarParams = Join-Path $PSScriptRoot 'functional modules\ChipWar\chipwar_params.json'
-$ChipWarDash   = Join-Path $PSScriptRoot 'functional modules\ChipWar\engines\via_chipwar_vap_dashboard.py'
+$ChipWarDash   = Join-Path $PSScriptRoot 'functional modules\ChipWar\engines\CHW_ENG016_ChipwarVapDashboard.py'
 $ChipWarIndex  = Join-Path $PSScriptRoot 'functional modules\ChipWar\_generated\reports\vap_dashboard\index.html'
 $MFParams      = Join-Path $PSScriptRoot 'functional modules\MultiFactor\mf_params.json'
 $MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines\VIA_MF_ENGINE_SHA256_MANIFEST_v0100.json'
 $FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
 $FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
-$TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_TALibEngine.py'
 $TheoryAudit   = Join-Path $PSScriptRoot 'Test-VIA-TheoryAudit.ps1'
 
 function Invoke-VapHost {
@@ -328,16 +336,6 @@ function Get-RestArgs {
     return @()
 }
 
-if ($Verb -eq 'talib') {
-    if (-not (Test-Path -LiteralPath $TALibEngine)) {
-        Write-Tag 'FAIL' 'TALib 引擎缺席（git pull 取回分支最新版）'
-        exit 1
-    }
-    $full = @($PyPre) + @($TALibEngine) + @(Get-RestArgs)
-    & $PyExe $full
-    exit $LASTEXITCODE
-}
-
 if ($Verb -eq 'theory') {
     if (-not (Test-Path -LiteralPath $TheoryAudit)) {
         Write-Tag 'FAIL' '理論稽核腳本缺席:Test-VIA-TheoryAudit.ps1（git pull 取回分支最新版）'
@@ -409,7 +407,6 @@ if ($Verb -eq 'status') {
         @{ n = 'MultiFactor 參數檔';               p = $MFParams },
         @{ n = 'MultiFactor SHA256 manifest';      p = $MFManifest },
         @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch },
-        @{ n = 'TALib 指標引擎(adj 鐵律)';          p = $TALibEngine },
         @{ n = '理論稽核 Test-VIA-TheoryAudit.ps1'; p = $TheoryAudit }
     )
     foreach ($r in $rows) {
@@ -487,7 +484,7 @@ if ($Verb -eq 'everything') {
 if ($Verb -eq '') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Host (' VIA_WorkflowEngine 啟動器（Python {0} @ {1}）' -f $Py.Ver, $PyExe)
-    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|talib …|theory|chipwar|mf|dashboard|flowsystem|status|everything'
+    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|theory|chipwar|mf|dashboard|flowsystem|status|everything'
     Write-Host '════════════════════════════════════════════════════════'
     $code = Invoke-EngineHost @()
     exit $code
@@ -497,3 +494,4 @@ if ($Verb -eq '') {
 $Full = @($PyPre) + @($EnginePath) + @($EngineArgs)
 & $PyExe $Full
 exit $LASTEXITCODE
+

@@ -1,0 +1,112 @@
+{
+  "catalog_version": "2.0",
+  "commands": [
+    {
+      "injected_dependencies": [
+        {
+          "annotation": "DBConnection",
+          "lifetime": "REQUEST",
+          "parameter": "db",
+          "provider": "db"
+        },
+        {
+          "annotation": "CoreLogger",
+          "lifetime": "REQUEST",
+          "parameter": "logger",
+          "provider": "logger"
+        }
+      ],
+      "input_parameter": "input_data",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "description": "訂單金額，必須大於 0",
+            "exclusiveMinimum": 0,
+            "maximum": 100000000,
+            "title": "Amount",
+            "type": "number"
+          },
+          "currency": {
+            "default": "TWD",
+            "description": "幣別",
+            "enum": [
+              "TWD",
+              "USD",
+              "JPY"
+            ],
+            "title": "Currency",
+            "type": "string",
+            "ui_widget": "select"
+          },
+          "order_id": {
+            "description": "訂單的全域唯一編號",
+            "maxLength": 40,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Order Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "amount"
+        ],
+        "title": "ProcessOrderInput",
+        "type": "object"
+      },
+      "manifest": {
+        "author": "VIA",
+        "capability": "ORDER",
+        "dependencies": [],
+        "description": "Typed order-processing reference module",
+        "enabled": true,
+        "engine_compat": ">=0.2,<1.0",
+        "language": "PY",
+        "name": "OrderProcessor",
+        "permissions": [
+          "db:write:orders"
+        ],
+        "subsystem": "VIA_DEMO",
+        "tags": [
+          "contract",
+          "di",
+          "demo"
+        ],
+        "version": "2.0.0"
+      },
+      "module_name": "OrderProcessor",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "normalized_amount": {
+            "title": "Normalized Amount",
+            "type": "number"
+          },
+          "status": {
+            "pattern": "^(SUCCESS|REJECTED)$",
+            "title": "Status",
+            "type": "string"
+          },
+          "transaction_id": {
+            "title": "Transaction Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "transaction_id",
+          "normalized_amount",
+          "currency"
+        ],
+        "title": "ProcessOrderOutput",
+        "type": "object"
+      },
+      "resource_urn": "VIA-MOD-PY-ORDER-20260817-0001"
+    }
+  ]
+}

@@ -1,0 +1,781 @@
+{
+ "schema": "VIA.UnifiedSSOT.AutoCode.v0100",
+ "ts": "2026-09-19T23:43:31Z",
+ "policy": {
+  "source_of_truth": "existing VIA registries remain canonical",
+  "append_only": true,
+  "physical_rename": false,
+  "quarantine_execution": "FORBIDDEN",
+  "network": "OFF_BY_DEFAULT",
+  "conflict": "RED until canonical owner resolves"
+ },
+ "protocols": [
+  "CodeChain",
+  "KNO",
+  "IDX",
+  "PRD"
+ ],
+ "namespaces": {
+  "central_via": "VIA_Naming_Registry_v0100 + VIA_Component_Inventory_SSOT_v0100",
+  "vcg_auxiliary": "VIA-AutoCodeGenerator_v0100 isolated/coexisting CodeChain-KNO-IDX-PRD",
+  "collision_rule": "never renumber existing VIA IDs; reject conflicting aliases or codes"
+ },
+ "sources": {
+  "regex_synonym": [
+   {
+    "key": "central_regex_synonym",
+    "path": "supportive modules/registry/VIA_Central_Synonym_Regex_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "001179a734f41b65c49f9a7fafa09c832d6d36e506b2d7011fee91cb94ea56be",
+    "bytes": 5437
+   },
+   {
+    "key": "regex_dict",
+    "path": "supportive modules/registry/VIA_SSOT_RegexDict_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "f1b042881f06623cf97994fb682612dacb1a5cc93690a3fb5e2d5873d77f57b8",
+    "bytes": 11718
+   },
+   {
+    "key": "regex_census",
+    "path": "supportive modules/ssot/VIA_RegexSynonym_Census_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "060772e8d807c10663f15009669f763506818241eb2e639a915b5b1def25a29e",
+    "bytes": 2290
+   },
+   {
+    "key": "synonym_seed",
+    "path": "supportive modules/ssot/VIA_Synonym_Seed_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "dbe5e8603c3b3fdefb6f0a62149ced1a8fce1de8c5d677e46fb40ff4fabea701",
+    "bytes": 5226
+   },
+   {
+    "key": "vrn_financial_synonym",
+    "path": "supportive modules/ssot/VRN_FinancialSynonym_BidirectionalIndex.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "eb8c8f715c15c4e64ff7e77859843d703e15ae34792d2167f82c15df57ba1bb7",
+    "bytes": 30596
+   }
+  ],
+  "logic": [
+   {
+    "key": "vrn_extraction_logic",
+    "path": "supportive modules/registry/VRN_ExtractionLogic_SSOT_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "2231965ca6d3fddd943be8fa9c3d14a0848e9a720de243728f8929c6ab02e78c",
+    "bytes": 5661
+   },
+   {
+    "key": "vrn_financial_regex",
+    "path": "supportive modules/ssot/VRN_FinancialRegex_SSOT.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "5d946f90d273b9e21d97bc0d9aa85d779e1961db27b700fc5d07e29f6318a792",
+    "bytes": 6501
+   }
+  ],
+  "parameters": [
+   {
+    "key": "parameter_pointer",
+    "path": "supportive modules/ssot/VIA_FinalParameters_OneInterface_ActivePointer.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "02f4ecd6e7db35ef7a1b4386fc091580159bc279dbc7e49041aceb29bb5419e1",
+    "bytes": 1732
+   },
+   {
+    "key": "parameter_summary",
+    "path": "supportive modules/ssot/VIA_FinalParameters_OneInterface_Summary.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "9b44c1132d670040c785f16b0e607e41851b31034d71878e9548212ef1e3df23",
+    "bytes": 3961
+   },
+   {
+    "key": "parameter_canonical",
+    "path": "supportive modules/registry/VIA_FinalParameters_CanonicalRegistry.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "6a0b665788efa5ac1e859ba1e15106d3eb704b888aa5b47d4adadb3f15e2410d",
+    "bytes": 27374475
+   },
+   {
+    "key": "parameter_ssot",
+    "path": "supportive modules/ssot/VIA_Parameters_SSOT.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "105059fe21cf6d34f6bad4c527b11570556bce39e0d76b9999ac8ac57d94c150",
+    "bytes": 20022236
+   }
+  ],
+  "factors": [
+   {
+    "key": "factor_spec",
+    "path": "supportive modules/specs/VIA_TW_StockFlow_Indicators_v001.md",
+    "exists": true,
+    "kind": "md",
+    "sha256": "fbd4135e76596b468b5f4ed7e684585bfda4c581e8955e0c39f7d51b46973af3",
+    "bytes": 8004
+   },
+   {
+    "key": "factor_matrix",
+    "path": "supportive modules/ui_support/VIA_Factor_Dict_Matrix.html",
+    "exists": true,
+    "kind": "html",
+    "sha256": "aee4ee5065f6a28051531cb9ab5604d208404408253f766dcd7f5e7e1ee2d24b",
+    "bytes": 111654
+   },
+   {
+    "key": "quantguard_ssot",
+    "path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/ssot/quant_engine_ssot.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "f2b9aacd1f2245c06269134f3772c1fff87780b18e47f750bb9cd34693806e7f",
+    "bytes": 13409
+   }
+  ],
+  "databases": [
+   {
+    "key": "stock_duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "exists": true,
+    "kind": "duckdb",
+    "sha256": "05224f9efab962ec3950fc72330b0a86315e44209b244b73d00c9b4acbc515d1",
+    "bytes": 195571712
+   },
+   {
+    "key": "active_etf_duckdb",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "exists": true,
+    "kind": "duckdb",
+    "sha256": "6e6534bdf7ad0727a229a2bf45ab8f2d05c9a7d99b648769d040803cd8aae38b",
+    "bytes": 3944448
+   },
+   {
+    "key": "vrn_report_db",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "exists": true,
+    "kind": "duckdb",
+    "sha256": "4a2f05722cd282a69e70e8bb9d664a3177014f5bc1ad3f4940cd707c71a466e3",
+    "bytes": 1847296
+   }
+  ],
+  "modules": [
+   {
+    "key": "vcg_autocode_gateway",
+    "path": "supportive modules/registry/VIA_AutoCodeGenerator_v0100.py",
+    "exists": true,
+    "kind": "py",
+    "sha256": "bb20bf7855a37bb8314d9306ed14c8aead53c92530f6918217855bc44320c280",
+    "bytes": 46910
+   },
+   {
+    "key": "vcg_ssot_root",
+    "path": "supportive modules/registry/vcg/ssot",
+    "exists": true,
+    "kind": "directory",
+    "sha256": null,
+    "bytes": null
+   },
+   {
+    "key": "naming_registry",
+    "path": "supportive modules/registry/VIA_Naming_Registry_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "179d767c855c147d1948c185f4e47e03c5f48d9a19691831f16be297b34aa7c7",
+    "bytes": 2000553
+   },
+   {
+    "key": "component_inventory",
+    "path": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "230b4b926786945fa196101cb5f348a811f3b17b6e221b7380e3ceacdbe6cda6",
+    "bytes": 1961218
+   },
+   {
+    "key": "interface_registry",
+    "path": "supportive modules/registry/VIA_Interface_Contract_Registry_v0100.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "35f4ca59c0f0335c1a435b47eed46fc2ee8bc8283a2c5b594298c7b9180d7a4d",
+    "bytes": 6379227
+   },
+   {
+    "key": "supportive_registry",
+    "path": "supportive modules/registry/supportive_modules_registry.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "6e687635d419d37e425971cd185201afbe2c3629fac5e8fbb8d32a981c464e03",
+    "bytes": 1685
+   },
+   {
+    "key": "vrn_registry",
+    "path": "supportive modules/registry/VRN_Verified_Module_Registry.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "6e8edffedf1f319fb399e6f96928c29759752c711b6a71270bd579c9c4fa2143",
+    "bytes": 246173
+   },
+   {
+    "key": "vdf_registry",
+    "path": "supportive modules/registry/VDF_NexusCore_ModuleRegistry.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "a90bdedfe3588ba21360d1ea1cd72b97065be7ffe3154c959c4c3ced470c6e0f",
+    "bytes": 9626
+   }
+  ],
+  "states": [
+   {
+    "key": "nexuscore_runtime",
+    "path": "supportive modules/ssot/VIA_SSOT_NexusCoreStatus_Runtime_v029SSOT1A.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "78315e95e6e6df0010f054bedd3215e1e35814e3adfb8d75e6d3885bc39b9802",
+    "bytes": 3130
+   },
+   {
+    "key": "bridge_status",
+    "path": "supportive modules/runtime_bridge/BRIDGE_STATUS_NORMALIZED.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "fcbb5e6ea80ede0b7e90244b4ac4c19d229396f5aa02a778fde710b824d6df3a",
+    "bytes": 4691
+   },
+   {
+    "key": "functional_acceptance",
+    "path": "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.json",
+    "exists": true,
+    "kind": "json",
+    "sha256": "e603ccbd599e67fae8d4e9b7d40d035df0f1f794bb3fbad7fe84736d32c5b5ce",
+    "bytes": 10947
+   }
+  ],
+  "quarantine": [
+   {
+    "key": "quality_rules_quarantine",
+    "path": "supportive modules/ssot/SUP_MDL676_MDL269VRNQualityRulesQuarantineDryRunMODULEV00.py",
+    "exists": true,
+    "kind": "py",
+    "sha256": "8abf699103841e5609029363478ad3d9e9a15b2089ac73947ee3bdc1e60a6d88",
+    "bytes": 5581
+   },
+   {
+    "key": "quarantine_vendor_root",
+    "path": "functional modules/VRN/_quarantine_pip_vendor",
+    "exists": true,
+    "kind": "directory",
+    "sha256": null,
+    "bytes": null
+   }
+  ]
+ },
+ "counts": {
+  "regex_synonym": {
+   "declared": 5,
+   "present": 5,
+   "missing": []
+  },
+  "logic": {
+   "declared": 2,
+   "present": 2,
+   "missing": []
+  },
+  "parameters": {
+   "declared": 4,
+   "present": 4,
+   "missing": []
+  },
+  "factors": {
+   "declared": 3,
+   "present": 3,
+   "missing": []
+  },
+  "databases": {
+   "declared": 3,
+   "present": 3,
+   "missing": []
+  },
+  "modules": {
+   "declared": 8,
+   "present": 8,
+   "missing": []
+  },
+  "states": {
+   "declared": 3,
+   "present": 3,
+   "missing": []
+  },
+  "quarantine": {
+   "declared": 2,
+   "present": 2,
+   "missing": []
+  }
+ },
+ "regex_synonym": {
+  "regex_count": 12,
+  "synonym_count": 310,
+  "conflict_count": 0,
+  "conflicts": [],
+  "semantic_merges": [
+   {
+    "alias": "目標股價",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "目標價",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "合理價",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "評價目標",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Price Target",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "PRICE_TARGET",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "PT",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Target Price",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "TP",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "每股盈餘",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "每股稅後盈餘",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "基本每股盈餘",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "基本EPS",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Basic Earnings Per Share",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Basic EPS",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "BASIC_EPS",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Earnings Per Share",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "EPS",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "完全稀釋每股盈餘",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "稀釋每股盈餘",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "稀釋後EPS",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Diluted Earnings Per Share",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Diluted EPS",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "DILUTED_EPS",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "Fully Diluted EPS",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\b(price|target)\\s+(target|price)\\b",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\b(tp|pt)\\b",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "目標價|目標股價|合理價|評價目標",
+    "from": "PRICE_TARGET",
+    "to": "TARGET_PRICE",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\bbasic\\s+eps\\b",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\bearnings\\s+per\\s+share\\b",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\beps\\b",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "基本每股盈餘|每股盈餘|每股稅後盈餘|基本EPS",
+    "from": "BASIC_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\bdiluted\\s+earnings\\s+per\\s+share\\b",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "(?i)\\bdiluted\\s+eps\\b",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   },
+   {
+    "alias": "稀釋每股盈餘|稀釋後EPS|完全稀釋每股盈餘",
+    "from": "DILUTED_EPS",
+    "to": "EPS",
+    "source": "vrn_financial_synonym"
+   }
+  ],
+  "sample_aliases": [
+   {
+    "alias": "(?i)\\b(last|close)\\s+price\\b",
+    "canonical": "LATEST_ADJ_CLOSE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\b(latest\\s+)?adj(usted)?\\s+close\\b",
+    "canonical": "LATEST_ADJ_CLOSE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\b(price|target)\\s+(target|price)\\b",
+    "canonical": "TARGET_PRICE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\b(total\\s+)?revenue(s)?\\b",
+    "canonical": "REVENUE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\b(tp|pt)\\b",
+    "canonical": "TARGET_PRICE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\b(upside|downside|potential\\s+return|implied\\s+return)\\b",
+    "canonical": "UPSIDE_DOWNSIDE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\badjusted\\s+close\\b",
+    "canonical": "LATEST_ADJ_CLOSE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bbasic\\s+eps\\b",
+    "canonical": "EPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bbook\\s+value\\s+per\\s+share\\b",
+    "canonical": "BVPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bbvps\\b",
+    "canonical": "BVPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bcash\\s+yield\\b",
+    "canonical": "DIVIDEND_YIELD",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bcogs\\b",
+    "canonical": "COST_OF_REVENUE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bcost\\s+of\\s+(revenue|sales|goods\\s+sold)\\b",
+    "canonical": "COST_OF_REVENUE",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bdiluted\\s+earnings\\s+per\\s+share\\b",
+    "canonical": "EPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bdiluted\\s+eps\\b",
+    "canonical": "EPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bdividend\\s+per\\s+share\\b",
+    "canonical": "DPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bdividend\\s+yield\\b",
+    "canonical": "DIVIDEND_YIELD",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bdps\\b",
+    "canonical": "DPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bearnings\\s+per\\s+share\\b",
+    "canonical": "EPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bebit\\b",
+    "canonical": "OPERATING_INCOME",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bebit\\s+margin\\b",
+    "canonical": "OPERATING_MARGIN",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bebitda\\b",
+    "canonical": "EBITDA",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\benterprise\\s+value\\s+.*ebitda\\b",
+    "canonical": "EV_EBITDA",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\beps\\b",
+    "canonical": "EPS",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   },
+   {
+    "alias": "(?i)\\bev\\s*\\/\\s*ebitda\\b",
+    "canonical": "EV_EBITDA",
+    "sources": [
+     "vrn_financial_synonym"
+    ]
+   }
+  ]
+ },
+ "states": {
+  "system_state": "GREEN",
+  "engine_state": "GREEN",
+  "data_state": "GREEN",
+  "missing_data_sources": [],
+  "subsystem_state": {
+   "VRN": "GREEN",
+   "VDF": "GREEN",
+   "VAP": "GREEN",
+   "CGC": "GREEN"
+  },
+  "module_state": {
+   "collected": 8,
+   "quarantine_collected": 2,
+   "quarantine_execution": "FORBIDDEN"
+  }
+ },
+ "central_registry": {
+  "naming_registry": "supportive modules/registry/VIA_Naming_Registry_v0100.json",
+  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
+  "interface_registry": "supportive modules/registry/VIA_Interface_Contract_Registry_v0100.json",
+  "auto_code_generator": "supportive modules/registry/VIA_AutoCodeGenerator_v0100.py",
+  "naming_resolution": [
+   {
+    "family": "supportive modules/registry/CGC_MDL155_VIAUnifiedSSOTAutoCode",
+    "canonical": "CGC_MDL182_CGCMDL155VIAUnifiedSSOTAutoCode",
+    "num": 182,
+    "iface_urn": "VIA-IFACE-3753",
+    "members": [
+     "supportive modules/registry/CGC_MDL155_VIAUnifiedSSOTAutoCode_v0100.py"
+    ]
+   },
+   {
+    "family": "supportive modules/registry/VIA_AutoCodeGenerator",
+    "canonical": "CGC_MDL183_AutoCodeGenerator",
+    "num": 183,
+    "iface_urn": "VIA-IFACE-3754",
+    "members": [
+     "supportive modules/registry/VIA_AutoCodeGenerator_v0100.py"
+    ]
+   }
+  ]
+ },
+ "result_rule": "GREEN only when source inventory has no missing database, conflict scan is clean, protocol test passes, and central registry links are verified; otherwise YELLOW",
+ "protocol_test": {
+  "codechain": "VIA-VRN-MDL001-FNC001-VIA_CENTRAL-V1.0",
+  "kno": "KNO-TA-TW-MOMENTUM-RSI-VIA-D-V1-0001",
+  "index": "IDX-TW-TW-EQUITY-2330-TWSE-D-V1-0001",
+  "product": "PRD-EQUITY-TW-STOCK-2330-TWSE-D-V1-0001",
+  "link_id": "LNK-0001",
+  "health": {
+   "status": "GREEN",
+   "codechain_count": 1,
+   "kno_count": 1,
+   "index_count": 1,
+   "product_count": 1,
+   "link_count": 1,
+   "lib_count": 1,
+   "issues": []
+  },
+  "pass": true
+ },
+ "verdict": "GREEN"
+}

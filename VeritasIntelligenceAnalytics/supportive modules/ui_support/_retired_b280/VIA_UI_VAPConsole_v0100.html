@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VAP 主控台 v0100</title><style>
+:root{--fs:clamp(10.5px,1.15vw,12.5px)}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1f2937;font:var(--fs)/1.5 'Segoe UI','Noto Sans TC',sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:clamp(8px,1.6vw,18px)}
+h1{font-size:clamp(.95rem,2vw,1.25rem);margin:.3em 0 .05em}
+h2{font-size:clamp(.8rem,1.6vw,1rem);margin:1em 0 .3em;color:#334155}
+.meta{color:#64748b;font-size:.86em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:10px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;
+overflow-wrap:anywhere;min-width:0}
+.row{display:flex;gap:8px;align-items:baseline;padding:3px 0;border-bottom:1px dashed #eef2f7;flex-wrap:wrap}
+.st{color:#fff;border-radius:4px;padding:0 6px;font-size:.82em}
+.mut{color:#94a3b8;font-size:.85em}
+.note{color:#64748b;font-size:.85em;flex-basis:100%}
+table{width:100%;border-collapse:collapse;font-size:.92em}
+th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #eef2f7}
+th{color:#475569;font-weight:600}
+.tablewrap{overflow-x:auto}
+.chip{display:inline-block;background:#eff6ff;color:#1d4ed8;border-radius:5px;
+padding:1px 7px;margin:2px;font-size:.85em}
+.chip.c2{background:#f0fdf4;color:#15803d}
+.chip.c3{background:#fff7ed;color:#b45309}
+.kpi{display:flex;gap:14px;margin:.4em 0}
+.kpi b{font-size:1.5em}
+</style></head><body><div class="wrap">
+<h1>VAP 主控台(測試報告×自動繪圖規格)</h1>
+<div class="meta">批162 · 生成 2026-08-26 09:40 · 淺色小字級響應式 · 收割源:VAP_Template_Registry_v0100.json、VIA_VAP_40_Structural_Snapshots_v017.json、VAP_ENG001_AutoplotEngineChartlib_v007.py、VAP_ENG004_TAFactory_v0100.py</div>
+<div class="kpi"><span><b style="color:#15803d">7</b> OK</span>
+<span><b style="color:#b91c1c">0</b> FAIL</span>
+<span><b style="color:#a16207">0</b> SKIP/編譯檢</span></div>
+<div class="grid">
+<div class="card"><h2>測試報告(誠實三態)</h2><div class="row"><span class="st" style="background:#15803d">OK</span><b>TAFactory selftest</b><span class="mut">VAP_ENG004_TAFactory_v0100.py</span><span class="note">  [計] 十二檢 OK 12 · FAIL 0</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>TemplateRunner 十檢</b><span class="mut">VAP_ENG005_TemplateRunner_v0100.py</span><span class="note">  [計] 十檢 OK 10 · FAIL 0</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>寬表刷新六檢</b><span class="mut">VAP_ENG007_RawWideRefresh_v0100.py</span><span class="note">  [計] 六檢 OK 6 · FAIL 0</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>圖規鎖守衛(TOOL-083)</b><span class="mut">vap_spec_guard_v0100.py</span><span class="note">  [計] 八檢 OK 8 · FAIL 0 · 0.0s</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>chartlib 編譯檢</b><span class="mut">VAP_ENG001_AutoplotEngineChartlib_v007.py</span><span class="note">COMPILE_ONLY(無 selftest 介面=誠實標記)</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>Seaborn/Plotly 編譯檢</b><span class="mut">VAP_ENG003_AutoplotSeabornPlotly_v0100.py</span><span class="note">COMPILE_ONLY(無 selftest 介面=誠實標記)</span></div><div class="row"><span class="st" style="background:#15803d">OK</span><b>Autoplot v001 編譯檢</b><span class="mut">VAP_ENG002_AutoplotEngine_v001.py</span><span class="note">COMPILE_ONLY(無 selftest 介面=誠實標記)</span></div></div>
+<div class="card"><h2>自動繪圖模板冊(6)</h2>
+<div class="tablewrap"><table><tr><th>模板</th><th>中文</th><th>型</th><th>chart_ref</th><th>資料源</th></tr><tr><td>twii_gspc_dual</td><td>台股加權 × 標普500 雙軸</td><td>dual</td><td>dual/dline</td><td>rawwide</td></tr><tr><td>unemp_duration_stack</td><td>美國失業持續期組成 堆疊面積</td><td>stack</td><td>stack/sarea</td><td>rawwide</td></tr><tr><td>rates_panels</td><td>美債 2Y/10Y × 10Y-2Y 利差 同軸多面板</td><td>panels</td><td>single/line(VAP-CH-09 變體)</td><td>rawwide</td></tr><tr><td>macro_corrheat</td><td>跨資產報酬相關熱力圖</td><td>corrheat</td><td>adv/corrheat</td><td>rawwide</td></tr><tr><td>twii_ta_overlay</td><td>台股加權 × SMA 週期輪疊圖(TradingView 式)</td><td>ta_overlay</td><td>ta/candle(收盤+SMA 變體)</td><td>rawwide</td></tr><tr><td>world_indices_map</td><td>全球主要指數 地圖 × 數據</td><td>map</td><td>adv/map(leaflet)</td><td>rawwide</td></tr></table></div></div>
+<div class="card"><h2>圖規冊 v017(40 規格)</h2><span class="chip">line</span><span class="chip">area</span><span class="chip">bar</span><span class="chip">hbar</span><span class="chip">scatter</span><span class="chip">sarea</span><span class="chip">sbar</span><span class="chip">sbar100</span><span class="chip">multi</span><span class="chip">gbar</span><span class="chip">dline</span><span class="chip">dbarline</span><span class="chip">evtmx</span><span class="chip">corrheat</span><span class="chip">brush</span><span class="chip">map</span><span class="chip">roll</span><span class="chip">rollcorr</span><span class="chip">rollsharpe</span><span class="chip">sortino</span><span class="chip">radar</span><span class="chip">alpha</span><span class="chip">econcal</span><span class="chip">consensus</span><span class="chip">backtest</span><span class="chip">intraday</span><span class="chip">candle</span><span class="chip">spotfut</span><span class="chip">hist</span><span class="chip">box</span><span class="chip">violin</span><span class="chip">kde</span><span class="chip">reg</span><span class="chip">density</span><span class="chip">pairgrid</span><span class="chip">facet</span><span class="chip">ecdf</span><span class="chip">rug</span><span class="chip">resid</span><span class="chip">joint</span></div>
+<div class="card"><h2>chartlib 函數面(38)</h2><span class="chip c2">apply_transform</span><span class="chip c2">axis_domain</span><span class="chip c2">build_multi_chart</span><span class="chip c2">build_pair_chart</span><span class="chip c2">build_panels_chart</span><span class="chip c2">build_stack_chart</span><span class="chip c2">chart_code</span><span class="chip c2">discover_db_files</span><span class="chip c2">format_tick</span><span class="chip c2">format_tick_fixed</span><span class="chip c2">ladder</span><span class="chip c2">load_tables</span><span class="chip c2">log</span><span class="chip c2">main</span><span class="chip c2">nice_ticks</span><span class="chip c2">numeric_columns</span><span class="chip c2">parse_bands</span><span class="chip c2">parse_number</span><span class="chip c2">parse_panels</span><span class="chip c2">parse_x</span><span class="chip c2">render_chart_svg</span><span class="chip c2">render_multi_svg</span><span class="chip c2">render_page</span><span class="chip c2">render_page_multi</span><span class="chip c2">render_panels_svg</span><span class="chip c2">render_stack_svg</span><span class="chip c2">run_sql</span><span class="chip c2">series_marks</span><span class="chip c2">tick_decimals</span><span class="chip c2">write_demo_db</span><span class="chip c2">write_index</span><span class="chip c2">write_workbench</span><span class="chip c2">x_center</span><span class="chip c2">x_column</span><span class="chip c2">xc</span><span class="chip c2">y_left</span><span class="chip c2">y_of</span><span class="chip c2">y_right</span></div>
+<div class="card"><h2>TA 工廠(11)</h2><span class="chip c3">bench_options</span><span class="chip c3">canonical</span><span class="chip c3">canonical_params</span><span class="chip c3">close_wheel</span><span class="chip c3">mode</span><span class="chip c3">ohlc</span><span class="chip c3">periods</span><span class="chip c3">rf_options</span><span class="chip c3">risk</span><span class="chip c3">stat_bench</span><span class="chip c3">talib_total</span></div>
+</div></div></body></html>

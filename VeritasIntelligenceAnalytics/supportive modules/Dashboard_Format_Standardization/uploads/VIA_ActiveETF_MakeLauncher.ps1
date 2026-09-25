@@ -70,3 +70,11 @@ if ($LASTEXITCODE -eq 0 -and (Test-Path $Out)) {
     Write-Status INFO "EXE 旁請保留 VIA_ActiveETF_Console.html；雙擊 EXE 即以 Edge app 視窗開啟。"
     Write-Status INFO "若仍被誤判：把整夾移出 OneDrive（如 C:\\VIA\\vetf），或在 Defender 排除該資料夾。"
 } else { Write-Status FAIL "編譯失敗。可改直接雙擊 VIA_ActiveETF_Console.html。" }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

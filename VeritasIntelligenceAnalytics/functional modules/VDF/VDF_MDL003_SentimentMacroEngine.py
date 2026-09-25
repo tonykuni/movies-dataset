@@ -31,7 +31,7 @@ ROLE (高度整合的市場情緒 + 宏觀數據引擎)
 
     [API-3] FRED (Federal Reserve Economic Data) - 50+ key series
             - 利率/通膨/就業/GDP/信用/外匯/PMI 等聖經級宏觀指標
-            - API Key: 2d5ae8dfe834ffc409bf98d51f539c17 (內建)
+            - API Key: <REDACTED:VDF_FRED_API_KEY> (內建)
             - 用途: 宏觀基本面 + 利率/通膨/景氣循環判定
             - 來源: api.stlouisfed.org/fred/series/observations
 
@@ -62,6 +62,64 @@ USAGE
   python VDF_MDL003_SentimentMacroEngine.py --menu           # 互動式
   python VDF_MDL003_SentimentMacroEngine.py --no-pause       # 不暫停 (CI/批次)
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 # ===== [VIA:ANCHOR:SUPPORT:BOOTSTRAP:START] =====
 # 接橋補丁 v2(2026-08-12 令:引擎統一導入 輔助/加速器/網路/自動編號;
@@ -139,6 +197,14 @@ except Exception:
 # =====================================================================================
 
 # 🔧 [PARAM-1/10] 基本設定
+# ===== [VIA:EARLYIMPORT-FIX:v0100] 批610 模組層早用修（只增不減）=====
+# 實測：本檔 PARAM 段在 `import os` / `from pathlib import Path`（檔尾那批）**之前**就先用了它們：
+#   · FRED_API_KEY = os.environ...      → NameError，本檔 import 即死（整支引擎跑不起來）
+#   · _via_fred_keyfile() 內 Path(...) → 被 try/except 吞掉，鑰匙檔車道**默默失效**（假綠）
+# 补法：在首次使用前補上標準庫 import；檔尾重複 import 無害，既有行一行未改。
+import os
+from pathlib import Path
+# ===== [VIA:EARLYIMPORT-FIX:END] =====
 PROJECT_NAME = "1-4-SentimentMacro"
 # 歸檔可攜補丁(2026-08-12 整合去重歸戶;工作站正本路徑優先,缺席退本地 db — 內容零改):
 import os as _os
@@ -149,7 +215,21 @@ BASE_DIR     = _PROD_BASE if _os.path.isdir(_PROD_BASE) else str(_P(__file__).pa
 OUTPUT_DIR   = "1-4-SentimentMacro"
 
 # 🔑 [PARAM-2/10] API Keys (FRED 必填)
-FRED_API_KEY = "2d5ae8dfe834ffc409bf98d51f539c17"   # 使用者提供
+def _via_fred_keyfile() -> str:
+    """批376:鑰匙檔 output_hub/mega/.fred_api_key(ENG074 同址;gitignored);缺=空字串=誠實 SKIP"""
+    try:
+        _p = Path(__file__).resolve()
+        while _p.parent != _p:
+            _kf = _p / "functional modules" / "VDF" / "output_hub" / "mega" / ".fred_api_key"
+            if _kf.exists():
+                return _kf.read_text(encoding="utf-8").strip()
+            _p = _p.parent
+    except Exception:
+        pass
+    return ""
+
+
+FRED_API_KEY = (os.environ.get("FRED_API_KEY", "").strip() or _via_fred_keyfile())   # 批376 鑰匙守衛:永不內建明文鑰;讀 env / output_hub/mega/.fred_api_key(gitignored)
 # AAII 不需 key (公開頁面 scrape)
 # CNN 不需 key (公開 dataviz API)
 # AKShare 不需 key (Python lib 直連)
@@ -1522,6 +1602,73 @@ def interactive_menu():
                   "--no-csv" in sys.argv, "--no-json" in sys.argv, "--gsheet" in sys.argv))
         elif c == '7': print("👋 再見!"); break
 
+
+# ===== [VIA:SELFTEST-VERB:v0100] L53 自測動詞統一律(批610;只增不減,既有呼叫方一行未改)=====
+# 本段**零連線、零寫檔、不呼叫 main()**:只驗結構。
+# rc 誠實多態:0=GREEN · 1=RED · 2=NODATA(套件缺席不是壞掉) · 3=ABSENT
+_VIA_ST_NEED = ['main', 'AAIIFetcher', 'CNNFearGreedFetcher', 'FREDFetcher']
+
+
+def _via_selftest() -> int:
+    import os as _o, socket as _sk
+    g = globals()
+    okn = []; bad = []; nod = []
+
+    def chk(n, c, why=""):
+        (okn if c else bad).append(n)
+        print(("  \u2713 " + n) if c else "  [FAIL] {} \u2014 {}".format(n, why))
+
+    print("\U0001f9ea {} --selftest(L53 \u52d5\u8a5e\uff1b\u7d50\u69cb\u6aa2\uff0c\u96f6\u9023\u7dda)".format(_o.path.basename(__file__)))
+    try:
+        src = _o.path.abspath(__file__)
+        text = open(src, encoding="utf-8", errors="replace").read()
+    except Exception as e:
+        print("  [FAIL] \u8b80\u4e0d\u5230\u672c\u6a94\u539f\u59cb\u78bc \u2014 {}".format(e))
+        return 1
+
+    # \u2462 \u96f6\u9023\u7dda\u5be6\u8b49:\u6aa2\u671f\u9593\u4efb\u4f55 connect \u90fd\u88ab\u651c\u4e0b\u4f86
+    hit = []
+    _orig = _sk.socket.connect
+
+    def _blocked(self, *a, **k):
+        hit.append(a[0] if a else "?")
+        raise OSError("VIA selftest: \u96f6\u9023\u7dda\u95d8\u651c\u622a")
+
+    _sk.socket.connect = _blocked
+    try:
+        chk("\u2460 \u6a21\u7d44\u8f09\u5165\u7121\u4f8b\u5916", True)
+        miss = [n for n in _VIA_ST_NEED if g.get(n) is None]
+        chk("\u2461 \u5ba3\u544a\u7b26\u865f\u9f4a\u5099({} \u500b)".format(len(_VIA_ST_NEED)), not miss, "\u7f3a {}".format(miss))
+        i_st = text.find("[VIA:SELFTEST-VERB:v0100]")
+        i_mn = text.rfind('if __name__ == "__main__":')
+        chk("\u2463 \u52d5\u8a5e\u8def\u7531\u5728 main \u4e4b\u524d", 0 <= i_st < i_mn, "selftest \u6bb5 @{} \u4e0d\u5728 main \u5b88\u885b @{} \u4e4b\u524d".format(i_st, i_mn))
+        chk("\u2464 \u6a4b\u63a5\u4ef6\u5b8c\u597d(ACCEL/NET)",
+            ("[VIA:ACCEL-BRIDGE:" in text) and ("[VIA:NET-BRIDGE:" in text), "\u6a94\u982d\u6a4b\u6a19\u8a18\u4e0d\u5168")
+    finally:
+        _sk.socket.connect = _orig
+    chk("\u2462 \u96f6\u9023\u7dda\u5be6\u8b49", not hit, "\u81ea\u6e2c\u671f\u9593\u5617\u8a66\u9023\u7dda {}".format(hit[:2]))
+
+    # \u2465 \u5957\u4ef6\u65d7\u6a19\u76e4\u9ede:\u7f3a\u4ef6 = NODATA\uff0c\u4e0d\u662f\u7d05\u71c8
+    flags = sorted(k for k in g if k.endswith("_AVAILABLE"))
+    off = [k for k in flags if not g.get(k)]
+    if flags:
+        print("  \u25b8 \u5957\u4ef6\u65d7\u6a19 {}/{} \u5230\u4f4d{}".format(len(flags) - len(off), len(flags),
+              ("\uff1b\u7f3a " + ", ".join(off)) if off else ""))
+    if off:
+        nod.append("\u2465")
+    print("  \u2465 \u5957\u4ef6\u65d7\u6a19\u76e4\u9ede \u2014 {}".format("NODATA(\u7f3a\u4ef6\u4e0d\u662f\u58de\u6389)" if off else "\u5168\u5230\u4f4d"))
+
+    rc = 1 if bad else (2 if nod else 0)
+    print("[\u8a08] OK {} \u00b7 FAIL {} \u00b7 NODATA {} \u2192 rc={} ({})".format(
+        len(okn), len(bad), len(nod), rc, {0: "GREEN", 1: "RED", 2: "NODATA"}[rc]))
+    return rc
+
+
+if __name__ == "__main__":
+    import sys as _via_st_sys
+    if ("--selftest" in _via_st_sys.argv) or ("--self-test" in _via_st_sys.argv):
+        _via_st_sys.exit(_via_selftest())
+# ===== [VIA:SELFTEST-VERB:END] =====
 
 if __name__ == "__main__":
     try:

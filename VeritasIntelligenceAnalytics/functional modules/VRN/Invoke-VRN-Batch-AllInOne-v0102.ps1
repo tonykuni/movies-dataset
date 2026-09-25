@@ -21,6 +21,16 @@ param(
     [int]$Workers = 0,
     [switch]$Fresh
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $vrn = $PSScriptRoot
@@ -53,8 +63,8 @@ $matched | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $sol
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe", "py", "python", "python3") |
       Where-Object { (($_ -match '\\') -and (Test-Path $_)) -or (($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 function Run-Solo([string]$Name, [string]$Eng, [string[]]$EngArgs) {
     $log = Join-Path $repDir "solo_$($Name)_$ts.log"
@@ -120,3 +130,4 @@ foreach ($pair in @(
 }
 Write-Host "`n=== 單檔補擷完成 · 建議續跑:via-reconcile(驗 64/64)===" -ForegroundColor Cyan
 exit $(if ($ok5 -and $ok4) { 0 } else { 1 })
+

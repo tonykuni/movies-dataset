@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Active ETF Console</title>
+<meta name="theme-color" content="#4c78a8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VIA Active ETF">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="VIA Active ETF Console — 績效 Matrix + 持股 Flow 單檔多頁">
+<link rel="manifest" href="VIA_ActiveETF.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--pane:#fbfaf7;--sf:#fff;--line:#dbd9d3;--line2:#e7e5df;--ink:#2b2b29;--sub:#6f6d66;--mut:#9a978f;
+--bl:#4c78a8;--tl:#439a9a;--rd:#c0584e;--gn:#4f8a5b;--am:#c8902f;--pp:#7a6cae;--sb1:#4c72b0;--sb2:#439a9a;--sb3:#55a868;--sb4:#64b5cd;
+--syne:'Syne',sans-serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',ui-monospace,monospace;--side:236px;--rail:46px;--t:.3s cubic-bezier(.2,.7,.3,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:11px;overflow:hidden;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}.hidden{display:none!important}
+.wrap{display:flex;flex-direction:column;height:100vh}
+.wm{position:fixed;inset:0;z-index:50;display:grid;place-items:center;pointer-events:none}.wm img{width:min(42vw,520px);opacity:.05;filter:grayscale(1)}
+/* header */
+.brand{position:relative;background:var(--pane);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 18px;z-index:3}
+.brand::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sb1),var(--sb2),var(--sb3),var(--am),var(--rd),var(--pp));background-size:200% 100%;animation:ribbon 10s linear infinite}
+@keyframes ribbon{to{background-position:200% 0}}
+.bl{display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 auto}
+.crest{height:64px;width:auto;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.1))}
+.titles{display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden}
+.h1{font-family:var(--syne);font-weight:800;font-size:clamp(15px,1.5vw+6px,22px);letter-spacing:-.4px;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(92deg,var(--sb1),var(--sb4) 38%,var(--sb2) 64%,var(--sb3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--sb1)}
+.h2{font-family:var(--syne);font-weight:700;font-size:10px;letter-spacing:2.4px;color:var(--sub);text-transform:uppercase;white-space:nowrap}
+.h3{font-family:var(--mono);font-size:10px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none}.rrow{display:flex;align-items:center;gap:8px}
+.osbox{display:flex;align-items:center;gap:6px}.logo-os{width:24px;height:24px}.ostx{font-family:var(--mono);font-size:8px;color:var(--mut);line-height:1.25}
+.meta{font-family:var(--mono);font-size:8.5px;color:var(--mut);text-align:right;white-space:nowrap;line-height:1.5}
+.btn{font-family:var(--sans);font-weight:700;font-size:10px;border:1px solid var(--line);border-radius:7px;padding:6px 11px;cursor:pointer;background:var(--sf);color:var(--ink);transition:transform .08s,border-color .15s,color .15s;position:relative;overflow:hidden;white-space:nowrap}
+.btn:hover{border-color:var(--bl);color:var(--bl)}.btn:active{transform:scale(.95)}
+.btn .rp{position:absolute;border-radius:50%;background:rgba(76,120,168,.3);transform:scale(0);animation:ripple .55s ease-out;pointer-events:none}@keyframes ripple{to{transform:scale(2.6);opacity:0}}
+.btn.primary{background:linear-gradient(92deg,var(--bl),var(--tl));color:#fff;border-color:transparent}.btn.primary:hover{filter:brightness(1.06);color:#fff}
+.btn .ic{display:inline-block;margin-right:5px}.btn.busy{pointer-events:none}.btn.busy .ic{animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.btn.lock.on{background:var(--rd);color:#fff;border-color:var(--rd)}
+/* io */
+.io{background:var(--pane);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:7px 18px;z-index:3;flex-wrap:wrap}
+.io label{font-family:var(--mono);font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px}
+.io input{font-family:var(--mono);font-size:10px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:var(--sf);color:var(--ink);width:300px;max-width:38vw}
+.io input:focus{outline:none;border-color:var(--bl)}.io input.frozen{background:#f0efe9;color:var(--sub);border-style:dashed}
+.io .iobtn{font-family:var(--sans);font-weight:700;font-size:9.5px;border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;background:var(--sf)}.io .iobtn:hover{border-color:var(--bl);color:var(--bl)}
+.io .frz{display:none;font-family:var(--mono);font-size:9px;color:var(--gn)}.io.frozen .frz{display:inline}
+.io .hint{font-family:var(--mono);font-size:8.5px;color:var(--mut);margin-left:auto}
+/* tabs */
+.tabs{display:flex;gap:2px;background:var(--pane);border-bottom:1px solid var(--line);padding:0 14px;position:relative;z-index:3}
+.tab{font-family:var(--syne);font-weight:700;font-size:12px;padding:9px 16px 10px;cursor:pointer;color:var(--sub);border:none;background:none;position:relative}
+.tab:hover{color:var(--ink)}.tab.on{color:var(--bl)}
+.tabink{position:absolute;bottom:0;height:2.5px;background:linear-gradient(90deg,var(--bl),var(--tl));border-radius:2px;transition:left .3s,width .3s}
+/* body grid */
+.body{flex:1;display:grid;grid-template-columns:var(--side) 1fr;min-height:0;position:relative;z-index:1;transition:grid-template-columns var(--t)}
+.body.collapsed{grid-template-columns:var(--rail) 1fr}
+.side{background:var(--pane);border-right:1px solid var(--line);position:relative;display:flex;flex-direction:column;min-height:0}
+.side-top{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line2)}
+.side-top .bd2{font-family:var(--syne);font-weight:800;font-size:12px}.side-top .bd2 small{display:block;font-family:var(--mono);font-weight:400;font-size:8px;color:var(--mut)}
+.collapse{margin-left:auto;width:26px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--sf);cursor:pointer;display:grid;place-items:center;color:var(--sub);transition:var(--t);flex:none}
+.collapse:hover{border-color:var(--bl);color:var(--bl)}.collapse svg{width:13px;height:13px;transition:var(--t)}.collapsed .collapse svg{transform:rotate(180deg)}
+.scroll{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:14px}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:#ccc9c1;border-radius:3px}
+.collapsed .side-top .bd2,.collapsed .scroll{display:none}.collapsed .side-top{justify-content:center;padding:9px 0}
+.sec .sl{font-family:var(--mono);font-size:8.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;display:flex;align-items:center;gap:6px}.sec .sl i{width:6px;height:6px;border-radius:2px;flex:none}
+.hcol{display:flex;flex-direction:column;gap:4px}
+.hbtn{font-family:var(--mono);font-weight:500;font-size:10.5px;background:var(--sf);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer;color:var(--sub);text-align:left}.hbtn:hover{border-color:var(--tl)}.hbtn.on{background:var(--tl);color:#fff;border-color:var(--tl)}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}.seg button{flex:1;border:none;background:var(--sf);padding:6px 4px;font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--sub);border-right:1px solid var(--line)}.seg button:last-child{border-right:none}.seg button.on{background:var(--bl);color:#fff}
+.fchips{display:flex;flex-wrap:wrap;gap:4px}.fchips .c{font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:var(--sf);color:var(--mut)}
+.fchips .c.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.fchips .c.NEW.on{background:var(--rd)}.fchips .c.加碼.on{background:var(--rd)}.fchips .c.減碼.on{background:var(--gn)}.fchips .c.出清.on{background:#2f6b43}.fchips .c.持平.on{background:var(--mut)}
+.selrow{display:flex;gap:4px;margin-bottom:6px}.selrow .bn{flex:1;font-family:var(--sans);font-weight:700;font-size:9px;background:var(--sf);border:1px solid var(--line);border-radius:5px;padding:4px 0;cursor:pointer;color:var(--ink)}.selrow .bn:hover{border-color:var(--bl);color:var(--bl)}
+.etflist{display:flex;flex-direction:column;gap:2px;max-height:330px;overflow-y:auto}.etflist::-webkit-scrollbar{width:5px}.etflist::-webkit-scrollbar-thumb{background:#ccc9c1;border-radius:3px}
+.etfrow{display:flex;align-items:center;gap:7px;padding:3px 6px;border-radius:5px;cursor:pointer;font-family:var(--mono);font-size:9.5px;color:var(--sub)}.etfrow:hover{background:var(--sf)}.etfrow.on{color:var(--ink)}
+.etfrow .ck{width:12px;height:12px;border:1.5px solid var(--line);border-radius:3px;flex:none;display:grid;place-items:center;color:#fff;font-size:8px}.etfrow.on .ck{background:var(--bl);border-color:var(--bl)}
+/* main + tables */
+.main{overflow:auto;padding:12px 14px 16px;min-height:0}
+.grid{display:grid;gap:10px}.g-kpi{grid-template-columns:repeat(5,1fr)}
+.cd{background:var(--pane);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cd-h{padding:7px 11px;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:space-between;gap:8px}.cd-h .t{font-family:var(--syne);font-weight:700;font-size:11px}.cd-h .u{font-family:var(--mono);font-size:8.5px;color:var(--mut)}
+.cd-i{padding:9px 11px}
+.kpi .k{font-family:var(--mono);font-size:8.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}.kpi .v{font-family:var(--syne);font-weight:800;font-size:18px;margin-top:3px}.kpi .d{font-family:var(--mono);font-size:9px;margin-top:2px}
+.up{color:var(--rd)}.dn{color:var(--gn)}.mut{color:var(--mut)}
+.bd{display:inline-block;font-family:var(--mono);font-size:8px;font-weight:500;padding:1px 5px;border-radius:4px;background:#eee;color:var(--sub)}
+.bd.tech{background:#e8eff6;color:var(--bl)}.bd.semi{background:#efeaf6;color:var(--pp)}.bd.growth{background:#e4f0ef;color:var(--tl)}.bd.balanced{background:#f6efe2;color:var(--am)}.bd.income{background:#eaf2ea;color:var(--gn)}.bd.value{background:#f6e9e7;color:var(--rd)}
+.newbadge{display:inline-block;font-family:var(--syne);font-weight:800;font-size:8px;background:var(--rd);color:#fff;padding:1px 6px;border-radius:4px;margin-right:5px;animation:pulse 1.5s ease-in-out infinite}
+.st{display:inline-block;font-family:var(--syne);font-weight:800;font-size:8px;letter-spacing:.5px;padding:1.5px 7px;border-radius:4px;color:#fff}
+.st.NEW{background:var(--rd);animation:pulse 1.5s ease-in-out infinite}.st.加碼{background:var(--rd)}.st.減碼{background:var(--gn)}.st.出清{background:#2f6b43}.st.持平{background:#b7b4ac}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,88,78,.45)}50%{box-shadow:0 0 0 5px rgba(192,88,78,0)}}
+tr.is-new td{background:linear-gradient(90deg,rgba(192,88,78,.07),transparent 40%)}
+.tbl-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:10px}
+th{font-family:var(--mono);font-size:8.5px;color:var(--mut);text-transform:uppercase;text-align:right;padding:6px 7px;border-bottom:1px solid var(--line);font-weight:500;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--pane);z-index:2}
+th:hover{color:var(--bl)}th.lft,td.lft{text-align:left}th.sorted{color:var(--bl)}th .ar{font-size:7px;margin-left:2px}
+body.locked th{cursor:default}body.locked .scroll{pointer-events:none;opacity:.5}
+td{padding:5px 7px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;white-space:nowrap}td.num{font-family:var(--mono);text-align:right}tr:hover td{background:var(--sf)}
+td.rank{font-family:var(--mono);font-weight:700;color:var(--mut);text-align:center}td.tk{font-family:var(--mono);font-size:9.5px;color:var(--sub)}td.mgr{font-size:9.5px;color:var(--sub)}td.hi{outline:1.5px solid var(--bl);outline-offset:-1.5px}
+.flow-in{color:var(--rd)}.flow-out{color:var(--gn)}
+.note{font-family:var(--mono);font-size:9px;margin-top:10px;padding:7px 11px;background:#f6efe2;border:1px solid var(--am);border-radius:6px;color:var(--am)}
+.lockstamp{display:none;font-family:var(--mono);font-size:8.5px;color:var(--rd)}body.locked .lockstamp{display:inline}
+.ov{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(245,244,240,.86)}
+.ov.show{display:flex;animation:ovf .25s}@keyframes ovf{from{opacity:0}to{opacity:1}}
+.ov img{width:120px;animation:beat 1.1s ease-in-out infinite}@keyframes beat{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.08);opacity:1}}
+.ov .ovt{font-family:var(--syne);font-weight:800;font-size:15px;color:var(--bl)}.ov .bar{width:220px;height:4px;border-radius:3px;background:var(--line2);overflow:hidden}.ov .bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--bl),var(--tl));animation:sl 1s ease-in-out infinite}@keyframes sl{0%{margin-left:-40%}100%{margin-left:100%}}
+@media print{.side,.io .iobtn,.btn,.collapse,.tabs{display:none!important}.body{grid-template-columns:0 1fr}.wm img{opacity:.08}.main{overflow:visible}}
+/* ===== 響應式設計 ===== */
+.scrim{display:none}
+.hamburger{display:none;width:34px;height:34px;border:1px solid var(--line);border-radius:7px;background:var(--sf);cursor:pointer;color:var(--bl);font-size:16px;align-items:center;justify-content:center;flex:none}
+@media (max-width:900px){
+ .hamburger{display:inline-flex}
+ .body{grid-template-columns:1fr}
+ .side{position:fixed;top:0;left:0;height:100vh;width:268px;z-index:40;transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.7,.3,1);box-shadow:2px 0 18px rgba(0,0,0,.18)}
+ .body.navopen .side{transform:none}
+ .body.navopen .scrim{display:block;position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.28)}
+ .collapsed .side{transform:translateX(-100%)}
+ .brand{flex-wrap:wrap;gap:8px;padding:8px 12px}.crest{height:50px}
+ .br{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+ .g-kpi{grid-template-columns:repeat(2,1fr)}
+ .io{gap:6px;padding:6px 12px}.io input{width:150px;max-width:42vw}.io .hint{display:none}
+ .tabs{padding:0 8px}.tab{font-size:11px;padding:8px 11px}
+ .main{padding:10px 8px 14px}
+}
+@media (max-width:540px){
+ .g-kpi{grid-template-columns:1fr}.h2{display:none}.h3{display:none}
+ .h1{font-size:16px}.crest{height:42px}
+ .br .rrow .ostx{display:none}.meta{font-size:8px}
+ .btn{padding:5px 8px;font-size:9px}
+}
+</style>
+</head>
+<body>
+<div class="wm"><img data-vlogo alt=""></div>
+<div class="wrap">
+  <header class="brand">
+    <div class="bl"><button class="hamburger" id="hamburger" aria-label="選單">☰</button><img class="crest" data-vlogo alt="VERITAS">
+      <div class="titles"><div class="h1" id="h1">VIA Active ETF Console</div>
+        <div class="h2">VERITAS INTELLIGENCE ANALYTICS</div>
+        <div class="h3" id="h3">績效排行 Matrix ＋ 持股異動 Holdings Flow · 單檔多頁整合</div></div></div>
+    <div class="br">
+      <div class="rrow"><span class="lockstamp" id="lockStamp"></span>
+        <div class="osbox"><svg class="logo-os" viewBox="0 0 48 48"><g fill="#4c78a8"><rect x="5" y="6" width="16" height="16" rx="1"/><rect x="25" y="6" width="18" height="16" rx="1"/><rect x="5" y="26" width="16" height="16" rx="1"/><rect x="25" y="26" width="18" height="16" rx="1"/></g></svg><div class="ostx">Windows 11<br>PowerShell 7</div></div>
+        <div class="meta" id="hMeta"></div></div>
+      <div class="rrow"><button class="btn primary" id="btnActivate"><span class="ic">⚡</span>ACTIVATE</button><button class="btn" id="btnRefresh"><span class="ic">↻</span>REFRESH</button></div>
+      <div class="rrow"><button class="btn" id="btnHtml">HTML</button><button class="btn" id="btnPdf">PDF</button><button class="btn" id="btnPng">PNG</button><button class="btn lock" id="btnLock">🔒 鎖定</button></div>
+    </div>
+  </header>
+  <div class="io" id="ioBar">
+    <label>BASE</label><input id="inBase" placeholder="C:\\...\\active_etf\\_base" value="__BASE__">
+    <label>DICT</label><input id="inDict" placeholder="C:\\...\\_dict\\active_etf" value="__DICT__">
+    <button class="iobtn" id="btnFreeze">🔍 確認凍結</button><span class="frz" id="frz">🔒 已凍結·唯讀</span>
+    <span class="hint">PS7 啟動時以 Windows 檔案對話框搜尋確認後注入並凍結</span>
+  </div>
+  <div class="tabs" id="tabs"><button class="tab on" data-p="mx">績效排行 · Matrix</button><button class="tab" data-p="fl">持股異動 · Holdings Flow</button><span class="tabink" id="tabink"></span></div>
+  <div class="body" id="body">
+    <aside class="side">
+      <div class="side-top"><div class="bd2">Active ETF<small id="sideSub">VIA MATRIX</small></div>
+        <button class="collapse" id="collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+      <div class="scroll">
+        <!-- MATRIX controls -->
+        <div id="mxCtrl">
+          <div class="sec"><div class="sl"><i style="background:var(--tl)"></i>Sort Horizon 排序期間</div>
+            <div class="hcol" id="mxHz">
+              <button class="hbtn" data-h="1">1D · 前一日</button><button class="hbtn" data-h="5">5D</button><button class="hbtn" data-h="10">10D</button><button class="hbtn" data-h="20">20D</button><button class="hbtn" data-h="60">60D</button><button class="hbtn" data-h="120">120D</button><button class="hbtn" data-h="240">240D</button><button class="hbtn on" data-h="ytd">YTD</button></div></div>
+          <div class="sec"><div class="sl"><i style="background:var(--pp)"></i>Style 風格</div><div class="fchips" id="mxStyle"></div></div>
+          <div class="sec"><div class="sl"><i style="background:var(--bl)"></i>ETF Select <span id="mxCount" style="margin-left:auto;color:var(--bl)"></span></div>
+            <div class="selrow"><button class="bn" id="mxAll">全選</button><button class="bn" id="mxNone">清除</button><button class="bn" id="mxInv">反選</button></div>
+            <div class="etflist" id="mxList"></div></div>
+        </div>
+        <!-- FLOW controls -->
+        <div id="flCtrl" class="hidden">
+          <div class="sec"><div class="sl"><i style="background:var(--bl)"></i>View 檢視</div><div class="seg" id="flMode"><button data-m="ind" class="on">個別</button><button data-m="sub">數個加總</button><button data-m="agg">全部加總</button></div></div>
+          <div class="sec"><div class="sl"><i style="background:var(--tl)"></i>Change Window 異動期間</div><div class="seg" id="flPer"><button data-p="1">1日</button><button data-p="5" class="on">5日</button><button data-p="20">20日</button></div></div>
+          <div class="sec"><div class="sl"><i style="background:var(--rd)"></i>Status 狀態</div><div class="fchips" id="flStatus"></div></div>
+          <div class="sec" id="flSel"><div class="sl"><i style="background:var(--pp)"></i>ETF Select <span id="flCount" style="margin-left:auto;color:var(--bl)"></span></div>
+            <div class="selrow" id="flSelRow" style="display:none"><button class="bn" id="flAll">全選</button><button class="bn" id="flNone">清除</button><button class="bn" id="flInv">反選</button></div>
+            <div class="etflist" id="flList"></div></div>
+        </div>
+      </div>
+    </aside>
+    <main class="main">
+      <div id="mxPane"><div class="grid g-kpi" id="mxKpi"></div>
+        <div class="cd" style="margin-top:10px"><div class="cd-h"><span class="t" id="mxTitle">Performance Ranking</span><span class="u">Adj Close 總報酬（含配息）</span></div>
+        <div class="cd-i tbl-wrap" style="padding:0 0 6px"><table id="mxTbl"></table></div></div><div class="note" id="mxNote"></div></div>
+      <div id="flPane" class="hidden"><div class="grid g-kpi" id="flKpi"></div>
+        <div class="cd" style="margin-top:10px"><div class="cd-h"><span class="t" id="flTitle">持股異動</span><span class="u">張數變化 · 紅加碼/綠減碼</span></div>
+        <div class="cd-i tbl-wrap" style="padding:0 0 6px"><table id="flTbl"></table></div></div><div class="note" id="flNote"></div></div>
+    </main>
+    <div class="scrim" id="scrim"></div>
+  </div>
+</div>
+<div class="ov" id="ov"><img data-vlogo alt=""><div class="ovt" id="ovt">ACTIVATING…</div><div class="bar"><i></i></div></div>
+<script>
+const VLOGO='__LOGO__';const PERF=__PERF__, HOLD=__HOLD__;
+document.querySelectorAll('[data-vlogo]').forEach(i=>i.src=VLOGO);
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const fmt=(v,d=2)=>(v==null||isNaN(v))?'—':Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fpct=(v,d=2)=>(v==null||isNaN(v))?'—':(v>=0?'+':'')+fmt(v,d)+'%';
+const sgn=v=>v>0?'+':'';const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const LOCKED=()=>document.body.classList.contains('locked');
+let page='mx';
+
+/* ============ MATRIX 頁 ============ */
+const MX=(function(){
+ const D=PERF.etfs,M=PERF.meta,L=M.dates.length-1,YTD=M.ytd_idx;
+ const HZ=[1,5,10,20,60,120,240];
+ const retN=(a,n)=>{const j=L-n;return j<0?null:(a[L]/a[j]-1)*100;};
+ const retYTD=a=>{const b=YTD-1<0?0:YTD-1;return (a[L]/a[b]-1)*100;};
+ const flowN=(f,n)=>{let s=0;for(let i=Math.max(1,L-n+1);i<=L;i++)s+=f[i];return s;};
+ const flowYTD=f=>{let s=0;for(let i=YTD;i<=L;i++)s+=f[i];return s;};
+ function mkrow(e){const r={tk:e.ticker,name:e.name,style:e.style,manager:e.manager||'—',is_new:!!e.is_new,adj:e.adj[L],aum:e.aum[L]};
+  HZ.forEach(n=>r['r'+n]=retN(e.adj,n));r.ytd=retYTD(e.adj);HZ.forEach(n=>r['f'+n]=flowN(e.flow,n));r.fytd=flowYTD(e.flow);return r;}
+ let ROWS=D.map(mkrow),sel=new Set(D.map(e=>e.ticker)),styleF=new Set(),hz='ytd',sk='ytd',sd=-1;
+ const rk=h=>h==='ytd'?'ytd':'r'+h,fk=h=>h==='ytd'?'fytd':'f'+h,hl=h=>h==='ytd'?'YTD':h+'D';
+ function heat(v,m){if(v==null||isNaN(v))return '';const t=Math.min(1,Math.abs(v)/(m||1));return v>=0?`background:rgba(192,88,78,${(0.05+t*0.28).toFixed(3)})`:`background:rgba(79,138,91,${(0.05+t*0.28).toFixed(3)})`;}
+ function vis(){return ROWS.filter(r=>sel.has(r.tk)&&(styleF.size===0||styleF.has(r.style)));}
+ function render(){const rows=vis(),k=rk(hz),f=fk(hz),mr=Math.max(.01,...rows.map(r=>Math.abs(r[k]||0)));
+  rows.sort((a,b)=>{let va=a[sk],vb=b[sk];if(sk==='tk'||sk==='name'||sk==='manager')return (va>vb?1:va<vb?-1:0)*sd;va=va==null?-1e9:va;vb=vb==null?-1e9:vb;return (va-vb)*sd;});
+  const best=rows.reduce((m,r)=>r[k]>(m?m[k]:-1e9)?r:m,null),worst=rows.reduce((m,r)=>r[k]<(m?m[k]:1e9)?r:m,null);
+  const aum=rows.reduce((a,r)=>a+r.aum,0),nf=rows.reduce((a,r)=>a+r[f],0),inf=rows.filter(r=>r[f]>0).length,nw=rows.filter(r=>r.is_new).length;
+  $('#mxKpi').innerHTML=[['選取檔數',fmt(rows.length,0)+' / '+fmt(ROWS.length,0),nw?('含 '+nw+' 檔 NEW'):'納入',nw?'up':'mut'],
+   [hl(hz)+' 最強',best?best.tk:'—',best?best.name:'',best&&best[k]>=0?'up':'dn'],[hl(hz)+' 最弱',worst?worst.tk:'—',worst?worst.name:'',worst&&worst[k]>=0?'up':'dn'],
+   ['選取總 AUM',fmt(aum)+' 億','合計','mut'],[hl(hz)+' 淨資金流',(nf>=0?'+':'')+fmt(nf)+' 億',(nf>=0?'淨流入 ':'淨流出 ')+inf+'/'+rows.length,nf>=0?'up':'dn']]
+   .map(([kk,v,d,c])=>`<div class="cd kpi"><div class="cd-i"><div class="k">${kk}</div><div class="v ${kk.includes('最')?'':c}">${v}</div><div class="d ${c}">${esc(d)}</div></div></div>`).join('');
+  const cols=[{k:'rank',t:'#',ns:1},{k:'tk',t:'代號',c:'lft'},{k:'name',t:'名稱',c:'lft'},{k:'manager',t:'經理人',c:'lft'},{k:'r1',t:'1D'},{k:'r5',t:'5D'},{k:'r10',t:'10D'},{k:'r20',t:'20D'},{k:'r60',t:'60D'},{k:'r120',t:'120D'},{k:'r240',t:'240D'},{k:'ytd',t:'YTD'},{k:'adj',t:'Adj Close'},{k:'aum',t:'AUM 億'},{k:'flow',t:hl(hz)+' 淨流'}];
+  let h='<thead><tr>';cols.forEach(c=>{const sx=c.k==='flow'?f:c.k,is=sk===sx;h+=`<th class="${c.c||''} ${is?'sorted':''}" data-k="${sx}" ${c.ns?'data-ns=1':''}>${c.t}<span class="ar">${is?(sd<0?'▼':'▲'):''}</span></th>`;});h+='</tr></thead><tbody>';
+  rows.forEach((r,i)=>{h+=`<tr class="${r.is_new?'is-new':''}"><td class="rank">${i+1}</td><td class="tk lft">${r.is_new?'<span class="newbadge">NEW</span>':''}${r.tk}</td><td class="lft">${esc(r.name)}<span class="bd ${r.style}" style="margin-left:5px">${r.style}</span></td><td class="mgr lft">${esc(r.manager)}</td>`;
+   HZ.forEach(n=>{const v=r['r'+n];h+=`<td class="num ${k==='r'+n?'hi':''}" style="${heat(v,mr)}"><span class="${v>=0?'up':'dn'}">${fpct(v)}</span></td>`;});
+   const vy=r.ytd;h+=`<td class="num ${hz==='ytd'?'hi':''}" style="${heat(vy,mr)}"><span class="${vy>=0?'up':'dn'}">${fpct(vy)}</span></td><td class="num">${fmt(r.adj)}</td><td class="num">${fmt(r.aum)}</td>`;
+   const fv=r[f];h+=`<td class="num"><span class="${fv>=0?'flow-in':'flow-out'}">${(fv>=0?'+':'')+fmt(fv)}</span></td></tr>`;});
+  $('#mxTbl').innerHTML=h+'</tbody>';$('#mxTitle').textContent='Performance Ranking · '+hl(hz)+' 高→低';$('#mxCount').textContent=sel.size+'/'+ROWS.length;
+  if(!LOCKED())$$('#mxTbl th').forEach(th=>{if(th.dataset.ns)return;th.onclick=()=>{const kk=th.dataset.k;if(sk===kk)sd*=-1;else{sk=kk;sd=(kk==='tk'||kk==='name'||kk==='manager')?1:-1;}render();};});}
+ function buildList(){$('#mxList').innerHTML=ROWS.map(r=>`<div class="etfrow ${sel.has(r.tk)?'on':''}" data-tk="${r.tk}"><span class="ck">${sel.has(r.tk)?'✓':''}</span>${r.is_new?'<span class="newbadge">NEW</span>':''}${r.tk} ${esc(r.name)}</div>`).join('');
+  $$('#mxList .etfrow').forEach(el=>el.onclick=()=>{if(LOCKED())return;const tk=el.dataset.tk;sel.has(tk)?sel.delete(tk):sel.add(tk);buildList();render();});}
+ $('#mxHz').querySelectorAll('.hbtn').forEach(b=>b.onclick=()=>{if(LOCKED())return;hz=b.dataset.h;sk=rk(hz);sd=-1;$$('#mxHz .hbtn').forEach(x=>x.classList.toggle('on',x===b));render();});
+ const STY=[...new Set(ROWS.map(r=>r.style))];$('#mxStyle').innerHTML=STY.map(s=>`<span class="c" data-s="${s}">${s}</span>`).join('');
+ $$('#mxStyle .c').forEach(c=>c.onclick=()=>{if(LOCKED())return;const s=c.dataset.s;styleF.has(s)?styleF.delete(s):styleF.add(s);c.classList.toggle('on',styleF.has(s));render();});
+ $('#mxAll').onclick=()=>{if(LOCKED())return;sel=new Set(ROWS.map(r=>r.tk));buildList();render();};
+ $('#mxNone').onclick=()=>{if(LOCKED())return;sel=new Set();buildList();render();};
+ $('#mxInv').onclick=()=>{if(LOCKED())return;const n=new Set();ROWS.forEach(r=>{if(!sel.has(r.tk))n.add(r.tk);});sel=n;buildList();render();};
+ $('#mxNote').textContent='註：'+M.return_basis+'。1D=前一交易日。經理人隨資料更新。NEW=近期上市。';
+ return {render,buildList,meta:M};
+})();
+
+/* ============ FLOW 頁 ============ */
+const FL=(function(){
+ const M=HOLD.meta,DATES=M.dates,L=DATES.length-1,NM=M.names,SEC=M.sectors;
+ let mode='ind',period=5,curTk=HOLD.etfs[0].ticker,sub=new Set(HOLD.etfs.slice(0,5).map(e=>e.ticker)),stF=new Set(),sk='dP',sd=-1;
+ const STAT=['NEW','加碼','減碼','出清','持平'];
+ function classify(t,p,b){if(b===0&&t>0)return 'NEW';if(t===0&&b>0)return '出清';const d=t-b;if(d>0&&d/Math.max(1,b)>0.005)return '加碼';if(d<0&&(-d)/Math.max(1,b)>0.005)return '減碼';return '持平';}
+ function indRows(e){const per=Math.min(period,L),today=e.hold.map(o=>o.s[L]),tot=today.reduce((a,b)=>a+b,0)||1;
+  return e.hold.map(o=>{const t=o.s[L],p=o.s[L-1]||0,b=o.s[L-per]||0;return {h:o.h,name:NM[o.h]||o.h,sec:SEC[o.h]||'—',shares:t,weight:t/tot*100,d1:t-p,dP:t-b,status:classify(t,p,b)};});}
+ function aggRows(ts){const per=Math.min(period,L),map={},set=new Set(ts||HOLD.etfs.map(e=>e.ticker));
+  HOLD.etfs.filter(e=>set.has(e.ticker)).forEach(e=>e.hold.forEach(o=>{if(!map[o.h])map[o.h]={s:new Array(DATES.length).fill(0),cnt:0};for(let i=0;i<o.s.length;i++)map[o.h].s[i]+=o.s[i];if(o.s[L]>0)map[o.h].cnt++;}));
+  return Object.entries(map).map(([h,o])=>{const t=o.s[L],p=o.s[L-1]||0,b=o.s[L-per]||0;return {h,name:NM[h]||h,sec:SEC[h]||'—',shares:t,cnt:o.cnt,d1:t-p,dP:t-b,status:classify(t,p,b)};});}
+ const cur=()=>mode==='ind'?indRows(HOLD.etfs.find(e=>e.ticker===curTk)):mode==='sub'?aggRows([...sub]):aggRows();
+ const scN=()=>mode==='sub'?sub.size:HOLD.etfs.length,pl=()=>period+'日';
+ function render(){const isA=mode!=='ind';let rows=cur();if(stF.size)rows=rows.filter(r=>stF.has(r.status));
+  rows.sort((a,b)=>{let va=a[sk],vb=b[sk];if(typeof va==='string')return (va>vb?1:va<vb?-1:0)*sd;return (va-vb)*sd;});
+  const all=cur(),cnt=s=>all.filter(r=>r.status===s).length,mA=all.filter(r=>r.dP>0).sort((a,b)=>b.dP-a.dP)[0],mR=all.filter(r=>r.dP<0).sort((a,b)=>a.dP-b.dP)[0];
+  $('#flKpi').innerHTML=[[isA?'成分檔數':'持股檔數',fmt(all.length,0),isA?(mode==='sub'?('選取 '+scN()+' 檔'):'全部成分'):'本檔','mut'],
+   ['NEW 新增',fmt(cnt('NEW'),0),'本期新進','up'],[pl()+' 加碼',fmt(cnt('加碼'),0),mA?('最多 '+mA.h+' '+sgn(mA.dP)+fmt(mA.dP,0)+'張'):'—','up'],
+   [pl()+' 減碼',fmt(cnt('減碼'),0),mR?('最多 '+mR.h+' '+fmt(mR.dP,0)+'張'):'—','dn'],['出清',fmt(cnt('出清'),0),'降為 0','dn']]
+   .map(([k,v,d,c])=>`<div class="cd kpi"><div class="cd-i"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="d ${c}">${esc(d)}</div></div></div>`).join('');
+  const cols=isA?[{k:'rank',t:'#',ns:1},{k:'h',t:'代號',c:'lft'},{k:'name',t:'名稱',c:'lft'},{k:'sec',t:'產業',c:'lft'},{k:'cnt',t:'持有檔數'},{k:'shares',t:'總張數'},{k:'d1',t:'1日Δ'},{k:'dP',t:pl()+'Δ'},{k:'status',t:'狀態',c:'lft'}]
+   :[{k:'rank',t:'#',ns:1},{k:'h',t:'代號',c:'lft'},{k:'name',t:'名稱',c:'lft'},{k:'sec',t:'產業',c:'lft'},{k:'weight',t:'權重%'},{k:'shares',t:'張數'},{k:'d1',t:'1日Δ'},{k:'dP',t:pl()+'Δ'},{k:'status',t:'狀態',c:'lft'}];
+  let h='<thead><tr>';cols.forEach(c=>{const is=sk===c.k;h+=`<th class="${c.c||''} ${is?'sorted':''}" data-k="${c.k}" ${c.ns?'data-ns=1':''}>${c.t}<span class="ar">${is?(sd<0?'▼':'▲'):''}</span></th>`;});h+='</tr></thead><tbody>';
+  const mD=Math.max(1,...rows.map(r=>Math.abs(r.dP)));
+  rows.forEach((r,i)=>{h+='<tr><td class="rank">'+(i+1)+'</td>'+`<td class="tk lft">${r.h}</td><td class="lft">${esc(r.name)}</td><td class="lft"><span class="bd">${esc(r.sec)}</span></td>`;
+   h+=isA?`<td class="num">${fmt(r.cnt,0)} / ${fmt(scN(),0)}</td>`:`<td class="num">${fmt(r.weight,2)}%</td>`;
+   h+=`<td class="num">${fmt(r.shares,0)}</td><td class="num"><span class="${r.d1>=0?'up':'dn'}">${sgn(r.d1)+fmt(r.d1,0)}</span></td>`;
+   const t=Math.min(1,Math.abs(r.dP)/mD),bg=r.dP>=0?`rgba(192,88,78,${(0.05+t*0.28).toFixed(3)})`:`rgba(79,138,91,${(0.05+t*0.28).toFixed(3)})`;
+   h+=`<td class="num" style="background:${bg}"><span class="${r.dP>=0?'up':'dn'}">${sgn(r.dP)+fmt(r.dP,0)}</span></td><td class="lft"><span class="st ${r.status}">${r.status}</span></td></tr>`;});
+  if(!rows.length)h+='<tr><td colspan="9" style="text-align:center;color:var(--mut);padding:18px">數個模式：請於左側選取至少一檔 ETF</td></tr>';
+  $('#flTbl').innerHTML=h+'</tbody>';const en=HOLD.etfs.find(e=>e.ticker===curTk).name;
+  $('#flTitle').textContent=mode==='ind'?(curTk+' '+en+' · '+pl()):mode==='sub'?('數個加總 ('+sub.size+' 檔) · '+pl()):('全部加總 ('+HOLD.etfs.length+' 檔) · '+pl());
+  if(!LOCKED())$$('#flTbl th').forEach(th=>{if(th.dataset.ns)return;th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=(k==='h'||k==='name'||k==='sec'||k==='status')?1:-1;}render();};});}
+ function buildList(){const ms=mode==='sub';$('#flList').innerHTML=HOLD.etfs.map(e=>{const on=ms?sub.has(e.ticker):e.ticker===curTk;return `<div class="etfrow ${on?'on':''}" data-tk="${e.ticker}">${ms?`<span class="ck">${on?'✓':''}</span>`:''}${e.ticker} ${esc(e.name)}</div>`;}).join('');
+  $$('#flList .etfrow').forEach(el=>el.onclick=()=>{if(LOCKED())return;const tk=el.dataset.tk;if(mode==='sub'){sub.has(tk)?sub.delete(tk):sub.add(tk);}else curTk=tk;buildList();render();});$('#flCount').textContent=ms?(sub.size+'/'+HOLD.etfs.length):'';}
+ $('#flStatus').innerHTML=STAT.map(s=>`<span class="c ${s}" data-s="${s}">${s}</span>`).join('');
+ $$('#flStatus .c').forEach(c=>c.onclick=()=>{if(LOCKED())return;const s=c.dataset.s;stF.has(s)?stF.delete(s):stF.add(s);c.classList.toggle('on',stF.has(s));render();});
+ $('#flMode').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(LOCKED())return;mode=b.dataset.m;$$('#flMode button').forEach(x=>x.classList.toggle('on',x===b));$('#flSel').style.display=mode==='agg'?'none':'';$('#flSelRow').style.display=mode==='sub'?'flex':'none';sk='dP';sd=-1;buildList();render();});
+ $('#flPer').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(LOCKED())return;period=+b.dataset.p;$$('#flPer button').forEach(x=>x.classList.toggle('on',x===b));render();});
+ $('#flAll').onclick=()=>{if(LOCKED())return;sub=new Set(HOLD.etfs.map(e=>e.ticker));buildList();render();};
+ $('#flNone').onclick=()=>{if(LOCKED())return;sub=new Set();buildList();render();};
+ $('#flInv').onclick=()=>{if(LOCKED())return;const n=new Set();HOLD.etfs.forEach(e=>{if(!sub.has(e.ticker))n.add(e.ticker);});sub=n;buildList();render();};
+ $('#flNote').textContent='註：'+M.note+' 1日Δ=較前一交易日；N日Δ=較 N 交易日前。';
+ return {render,buildList};
+})();
+
+/* ============ 共用：分頁 / 鎖定 / 匯出 / BASE-DICT / Activate ============ */
+function meta(){$('#hMeta').innerHTML='GEN '+(PERF.meta.generated||'—')+'<br>AS-OF '+(PERF.meta.as_of||PERF.meta.dates[PERF.meta.dates.length-1]||'—');}
+const tabs=$$('.tab');
+function ink(){const t=$('.tab.on');$('#tabink').style.left=t.offsetLeft+'px';$('#tabink').style.width=t.offsetWidth+'px';}
+function setPage(p){page=p;tabs.forEach(t=>t.classList.toggle('on',t.dataset.p===p));ink();
+ $('#mxPane').classList.toggle('hidden',p!=='mx');$('#flPane').classList.toggle('hidden',p!=='fl');
+ $('#mxCtrl').classList.toggle('hidden',p!=='mx');$('#flCtrl').classList.toggle('hidden',p!=='fl');
+ $('#sideSub').textContent=p==='mx'?'VIA MATRIX':'HOLDINGS FLOW';
+ $('#h3').textContent=p==='mx'?'績效排行 · 多期報酬（含配息）· 高→低':'持股異動 · 個別/數個/全部 · 新增/加碼/減碼';}
+tabs.forEach(t=>t.onclick=()=>setPage(t.dataset.p));
+/* ripple */
+$$('.btn,.iobtn,.tab').forEach(b=>b.addEventListener('click',e=>{const r=document.createElement('span');r.className='rp';const d=Math.max(b.offsetWidth,b.offsetHeight);r.style.width=r.style.height=d+'px';r.style.left=(e.offsetX-d/2)+'px';r.style.top=(e.offsetY-d/2)+'px';b.appendChild(r);setTimeout(()=>r.remove(),550);}));
+/* collapse */
+$('#collapse').onclick=()=>{if(window.matchMedia('(max-width:900px)').matches)$('#body').classList.toggle('navopen');else $('#body').classList.toggle('collapsed');};
+$('#scrim').onclick=()=>$('#body').classList.remove('navopen');
+$('#hamburger').onclick=()=>$('#body').classList.toggle('navopen');
+/* lock */
+function applyLock(s){document.body.classList.add('locked');$('#btnLock').classList.add('on');$('#btnLock').textContent='🔒 已鎖定';$('#lockStamp').textContent='🔒 LOCKED · '+(s||new Date().toISOString().slice(0,19).replace('T',' '));MX.render();FL.render();}
+function unlock(){document.body.classList.remove('locked');$('#btnLock').classList.remove('on');$('#btnLock').textContent='🔒 鎖定';$('#lockStamp').textContent='';MX.render();FL.render();}
+$('#btnLock').onclick=()=>document.body.classList.contains('locked')?unlock():applyLock();
+/* export */
+$('#btnHtml').onclick=()=>{const w=LOCKED();if(!w)applyLock();document.documentElement.setAttribute('data-locked',$('#lockStamp').textContent.replace('🔒 LOCKED · ',''));const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;document.documentElement.removeAttribute('data-locked');if(!w)unlock();const b=new Blob([html],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='VIA_ActiveETF_Console_snapshot.html';a.click();URL.revokeObjectURL(a.href);};
+$('#btnPdf').onclick=()=>{if(!LOCKED())applyLock();window.print();};
+$('#btnPng').onclick=async()=>{if(!LOCKED())applyLock();const b=$('#btnPng');b.textContent='PNG…';try{if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}const pane=page==='mx'?$('#mxPane'):$('#flPane');const c=await window.html2canvas(pane,{backgroundColor:'#f5f4f0',scale:2});const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='VIA_ActiveETF_'+page+'.png';a.click();b.textContent='PNG';}catch(e){b.textContent='PNG';alert('PNG 需連線載入 html2canvas；離線請改用 HTML/PDF。');}};
+/* base/dict */
+let frozen=false;function freeze(on){frozen=on;$('#ioBar').classList.toggle('frozen',on);['#inBase','#inDict'].forEach(s=>{$(s).readOnly=on;$(s).classList.toggle('frozen',on);});$('#btnFreeze').textContent=on?'✎ 解凍編輯':'🔍 確認凍結';}
+$('#btnFreeze').onclick=()=>freeze(!frozen);
+/* activate / refresh */
+function overlay(on,t){if(t)$('#ovt').textContent=t;$('#ov').classList.toggle('show',on);}
+$('#btnActivate').onclick=function(){this.classList.add('busy');overlay(true,'ACTIVATING SYSTEM…');setTimeout(()=>{MX.buildList();MX.render();FL.buildList();FL.render();ink();},120);setTimeout(()=>{overlay(false);this.classList.remove('busy');},900);};
+$('#btnRefresh').onclick=function(){this.classList.add('busy');overlay(true,'REFRESHING · '+(page==='mx'?'MATRIX':'FLOW'));setTimeout(()=>{(page==='mx'?MX:FL).render();},100);setTimeout(()=>{overlay(false);this.classList.remove('busy');},600);};
+/* init */
+meta();MX.buildList();MX.render();FL.buildList();FL.render();setPage('mx');
+function fit(el,mx,mn){if(!el)return;el.style.fontSize=mx+'px';let s=mx;while(s>mn&&el.scrollWidth>el.clientWidth+1){s-=.5;el.style.fontSize=s+'px';}}
+function fitH(){fit($('#h1'),22,12);fit($('#h3'),10,7);}
+fitH();window.addEventListener('resize',()=>{ink();fitH();});
+const v=$('#inBase').value;if(v && !v.includes('__BASE__')){freeze(true);}else{$('#inBase').value='';$('#inDict').value='';}
+const _lk=document.documentElement.getAttribute('data-locked');if(_lk)applyLock(_lk);
+/* PWA：以 http(s) 提供時註冊 service worker（離線可裝）；file:// 自動略過 */
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>

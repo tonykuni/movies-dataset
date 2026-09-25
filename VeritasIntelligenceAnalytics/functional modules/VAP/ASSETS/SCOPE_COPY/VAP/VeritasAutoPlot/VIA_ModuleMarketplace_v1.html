@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA Module Marketplace - 模組商城組合器</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIA MODULE MARKETPLACE v1.0
+   ─────────────────────────────────────────────────────────────────────────────
+   
+   def ARCHITECTURE (樹枝狀重整)
+   ═════════════════════════════════════════════════════════════════════════════
+   
+   VIA Platform
+   │
+   ├── 📦 Core Modules (必選)
+   │   ├── VDF_M12_01: TWStockList
+   │   ├── VDF_M12_02: TWFinancialData
+   │   └── VDF_M12_03: TWStockListGenerator
+   │
+   ├── 🔧 Auxiliary Tools (輔助)
+   │   ├── VIS_Accelerator: 加速器
+   │   ├── VIS_AutoDeploy: 自動布建
+   │   └── SynonymEngine: 同義詞引擎
+   │
+   ├── 📊 Analysis Modules (分析)
+   │   ├── AutoPlot: K線繪圖
+   │   ├── AI_OEM_Valuation: 估值矩陣
+   │   └── TechnicalAnalysis: 技術指標
+   │
+   ├── 📑 Output Modules (輸出)
+   │   ├── ReportNova: 報告生成
+   │   ├── ExcelExporter: Excel 輸出
+   │   └── DashboardBuilder: 儀表板
+   │
+   └── ☁️ Cloud Integration (雲端)
+       ├── GoogleDrive: 雲端硬碟
+       ├── OneDrive: 微軟雲端
+       └── LocalStorage: 本地儲存
+   
+   def DESIGN PRINCIPLES
+   ═════════════════════════════════════════════════════════════════════════════
+   
+   1. 商品組合概念 - 模組即商品，自由組合
+   2. 關聯連結 - 選定後自動連結依賴
+   3. 統一介面 - 所有模組統一 Config Panel
+   4. Default + 可改 - 預設值 + 下拉選單
+   5. Windows 搜尋風格 - 即時搜尋過濾
+   6. 矩陣式佈局 - 自動最佳化 Grid
+   7. 權限控管 - 管理者授權輸出
+   8. 插拔式 - 可新增/修改/移除
+   9. 前後端分離 - UI Signal ↔ Backend Logic
+   10. 樹枝狀架構 - 清晰層次結構
+   
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Seaborn Palette */
+    --sb-blue: #4C72B0;
+    --sb-orange: #DD8452;
+    --sb-green: #55A868;
+    --sb-red: #C44E52;
+    --sb-purple: #8172B3;
+    --sb-cyan: #64B5CD;
+    --sb-yellow: #CCB974;
+    
+    /* Notion/Muji Dark */
+    --bg-0: #191919;
+    --bg-1: #1e1e1e;
+    --bg-2: #252525;
+    --bg-3: #2d2d2d;
+    --bg-card: #222222;
+    --bg-hover: rgba(255,255,255,0.04);
+    --bg-selected: rgba(72,114,176,0.15);
+    
+    --text-0: #ebebeb;
+    --text-1: #d4d4d4;
+    --text-2: #a0a0a0;
+    --text-3: #6b6b6b;
+    
+    --border: #333333;
+    --border-light: #404040;
+    --border-focus: var(--sb-blue);
+    
+    /* Layout */
+    --sidebar-width: 280px;
+    --config-width: 320px;
+    --radius: 10px;
+    --radius-sm: 6px;
+    
+    /* Typography */
+    --font: 'Inter', 'Noto Sans TC', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font);
+    font-size: 13px;
+    background: var(--bg-0);
+    color: var(--text-0);
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT: 3-Column Grid (Tree | Modules | Config)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr var(--config-width);
+    grid-template-rows: 60px 1fr 48px;
+    height: 100vh;
+    gap: 0;
+}
+
+.app-header { grid-column: 1 / -1; }
+.app-tree { grid-row: 2; }
+.app-modules { grid-row: 2; overflow: hidden; }
+.app-config { grid-row: 2; }
+.app-footer { grid-column: 1 / -1; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HEADER (Windows Search Style)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.header {
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--sb-blue), var(--sb-purple));
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 12px;
+    color: white;
+}
+
+.brand-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* Windows-style Search */
+.search-box {
+    flex: 1;
+    max-width: 500px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-0);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--sb-blue);
+    background: var(--bg-3);
+}
+
+.search-input::placeholder { color: var(--text-3); }
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-3);
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.header-btn {
+    padding: 8px 16px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-1);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+}
+
+.header-btn:hover { background: var(--bg-3); }
+.header-btn.primary { background: var(--sb-blue); border-color: var(--sb-blue); color: white; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TREE SIDEBAR (樹枝狀架構)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.tree-panel {
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tree-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.tree-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* Tree Node */
+.tree-node {
+    user-select: none;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    gap: 8px;
+}
+
+.tree-item:hover { background: var(--bg-hover); }
+.tree-item.active { background: var(--bg-selected); }
+
+.tree-expand {
+    width: 16px; height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-3);
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.tree-expand.open { transform: rotate(90deg); }
+
+.tree-icon {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.tree-label {
+    flex: 1;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: var(--bg-3);
+    border-radius: 8px;
+    color: var(--text-3);
+}
+
+.tree-children {
+    padding-left: 24px;
+    display: none;
+}
+
+.tree-children.open { display: block; }
+
+/* Tree Category Colors */
+.cat-core .tree-icon { background: var(--sb-blue); color: white; }
+.cat-aux .tree-icon { background: var(--sb-orange); color: white; }
+.cat-analysis .tree-icon { background: var(--sb-green); color: white; }
+.cat-output .tree-icon { background: var(--sb-purple); color: white; }
+.cat-cloud .tree-icon { background: var(--sb-cyan); color: white; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODULES PANEL (矩陣式商品陳列)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modules-panel {
+    background: var(--bg-0);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modules-toolbar {
+    padding: 12px 20px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.view-toggle {
+    display: flex;
+    background: var(--bg-2);
+    border-radius: 6px;
+    padding: 2px;
+}
+
+.view-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.15s;
+}
+
+.view-btn.active { background: var(--bg-3); color: var(--text-0); }
+
+.filter-dropdown {
+    padding: 6px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-1);
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.selected-count {
+    font-size: 12px;
+    color: var(--text-2);
+}
+
+.selected-count strong { color: var(--sb-green); }
+
+/* Module Grid (矩陣式) */
+.modules-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    align-content: start;
+}
+
+/* Module Card (商品卡片) */
+.module-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.module-card:hover {
+    border-color: var(--border-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.module-card.selected {
+    border-color: var(--sb-green);
+    background: rgba(85,168,104,0.08);
+}
+
+.module-card.required {
+    border-color: var(--sb-blue);
+    background: rgba(72,114,176,0.08);
+}
+
+.module-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Checkbox */
+.module-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.module-card.selected .module-check {
+    background: var(--sb-green);
+    border-color: var(--sb-green);
+    color: white;
+}
+
+.module-card.required .module-check {
+    background: var(--sb-blue);
+    border-color: var(--sb-blue);
+    color: white;
+}
+
+.module-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.module-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.module-code {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--sb-blue);
+    margin-bottom: 8px;
+}
+
+.module-desc {
+    font-size: 11px;
+    color: var(--text-2);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.module-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.module-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: var(--bg-3);
+    border-radius: 4px;
+    color: var(--text-2);
+}
+
+.module-tag.dep { background: rgba(221,132,82,0.2); color: var(--sb-orange); }
+
+/* Dependencies Indicator */
+.module-deps {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--text-3);
+}
+
+.module-deps strong { color: var(--sb-orange); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CONFIG PANEL (統一配置介面)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.config-panel {
+    background: var(--bg-1);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.config-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.config-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.config-toggle {
+    font-size: 10px;
+    color: var(--sb-blue);
+    cursor: pointer;
+}
+
+.config-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* Config Sections */
+.config-section {
+    margin-bottom: 20px;
+}
+
+.config-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Unified Input Components */
+.config-field {
+    margin-bottom: 12px;
+}
+
+.config-label {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.config-label .default {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--mono);
+}
+
+/* Dropdown Select */
+.config-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-0);
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.config-select:focus { border-color: var(--sb-blue); }
+
+/* Input */
+.config-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-0);
+    font-size: 12px;
+    outline: none;
+}
+
+.config-input:focus { border-color: var(--sb-blue); }
+
+/* Checkbox Toggle */
+.config-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.config-checkbox:hover { background: var(--bg-3); }
+
+.config-checkbox.checked {
+    border-color: var(--sb-green);
+    background: rgba(85,168,104,0.1);
+}
+
+.checkbox-toggle {
+    width: 36px; height: 20px;
+    background: var(--bg-3);
+    border-radius: 10px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.checkbox-toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+
+.config-checkbox.checked .checkbox-toggle {
+    background: var(--sb-green);
+}
+
+.config-checkbox.checked .checkbox-toggle::after {
+    left: 18px;
+}
+
+.checkbox-label {
+    flex: 1;
+    font-size: 12px;
+}
+
+/* Cloud Integration */
+.cloud-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.cloud-option {
+    padding: 12px;
+    background: var(--bg-2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.cloud-option:hover { border-color: var(--border-light); }
+.cloud-option.selected { border-color: var(--sb-cyan); background: rgba(100,181,205,0.1); }
+
+.cloud-icon { font-size: 20px; margin-bottom: 4px; }
+.cloud-name { font-size: 10px; color: var(--text-2); }
+
+/* Selected Modules Summary */
+.selected-modules {
+    background: var(--bg-2);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.selected-module-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.selected-module-item:last-child { border-bottom: none; }
+
+.selected-module-icon {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+.selected-module-name { flex: 1; }
+
+.selected-module-remove {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.selected-module-remove:hover { background: var(--sb-red); color: white; }
+
+/* Action Buttons */
+.config-actions {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, var(--sb-green), var(--sb-cyan));
+    color: white;
+}
+
+.action-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(85,168,104,0.3); }
+
+.action-btn.secondary {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FOOTER (Status Bar)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.footer {
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-3);
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--sb-green);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CONNECTION LINES (模組關聯視覺化)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.connection-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 4px;
+}
+
+.connection-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--sb-orange);
+    opacity: 0.6;
+}
+
+.connection-dot.connected { background: var(--sb-green); opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ADMIN MODE INDICATOR
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.admin-badge {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    padding: 6px 12px;
+    background: var(--sb-purple);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    z-index: 1000;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header">
+            <div class="header-brand">
+                <div class="brand-logo">VIA</div>
+                <span class="brand-title">Module Marketplace</span>
+            </div>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="搜尋模組... (Ctrl+K)" id="searchInput">
+            </div>
+            
+            <div class="header-actions">
+                <button class="header-btn" onclick="resetSelection()">🔄 重置</button>
+                <button class="header-btn" onclick="toggleAdmin()">👤 權限</button>
+                <button class="header-btn primary" onclick="exportBundle()">📦 輸出組合</button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Tree Sidebar -->
+    <aside class="app-tree">
+        <div class="tree-panel">
+            <div class="tree-header">📁 模組架構</div>
+            <div class="tree-content" id="treeContent">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Modules Grid -->
+    <main class="app-modules">
+        <div class="modules-panel">
+            <div class="modules-toolbar">
+                <div class="toolbar-left">
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('grid')">▦ 格狀</button>
+                        <button class="view-btn" onclick="setView('list')">☰ 列表</button>
+                    </div>
+                    <select class="filter-dropdown" id="categoryFilter" onchange="filterModules()">
+                        <option value="all">所有類別</option>
+                        <option value="core">📦 Core 核心</option>
+                        <option value="auxiliary">🔧 Auxiliary 輔助</option>
+                        <option value="analysis">📊 Analysis 分析</option>
+                        <option value="output">📑 Output 輸出</option>
+                        <option value="cloud">☁️ Cloud 雲端</option>
+                    </select>
+                </div>
+                <div class="toolbar-right">
+                    <span class="selected-count">已選 <strong id="selectedCount">0</strong> / 15 模組</span>
+                </div>
+            </div>
+            <div class="modules-grid" id="modulesGrid">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- Config Panel -->
+    <aside class="app-config">
+        <div class="config-panel">
+            <div class="config-header">
+                <span class="config-title">⚙️ 組合配置</span>
+                <span class="config-toggle" onclick="resetConfig()">重置預設</span>
+            </div>
+            <div class="config-content">
+                <!-- Selected Modules -->
+                <div class="config-section">
+                    <div class="config-section-title">📦 已選模組</div>
+                    <div class="selected-modules" id="selectedModules">
+                        <div style="color: var(--text-3); font-size: 12px; text-align: center; padding: 20px;">
+                            尚未選擇模組
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Global Settings -->
+                <div class="config-section">
+                    <div class="config-section-title">🌐 全域設定</div>
+                    
+                    <div class="config-field">
+                        <div class="config-label">
+                            <span>環境名稱</span>
+                            <span class="default">default: vis_venv</span>
+                        </div>
+                        <input type="text" class="config-input" value="vis_venv" id="envName">
+                    </div>
+                    
+                    <div class="config-field">
+                        <div class="config-label">
+                            <span>Python 版本</span>
+                            <span class="default">default: 3.10</span>
+                        </div>
+                        <select class="config-select" id="pythonVersion">
+                            <option value="3.9">Python 3.9</option>
+                            <option value="3.10" selected>Python 3.10</option>
+                            <option value="3.11">Python 3.11</option>
+                            <option value="3.12">Python 3.12</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-field">
+                        <div class="config-label">
+                            <span>鏡像源</span>
+                            <span class="default">default: 清華</span>
+                        </div>
+                        <select class="config-select" id="mirrorSource">
+                            <option value="tsinghua" selected>🎓 清華鏡像</option>
+                            <option value="aliyun">☁️ 阿里雲</option>
+                            <option value="pypi">📦 PyPI 官方</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Cloud Integration -->
+                <div class="config-section">
+                    <div class="config-section-title">☁️ 雲端整合</div>
+                    <div class="cloud-options">
+                        <div class="cloud-option selected" data-cloud="gdrive" onclick="selectCloud(this)">
+                            <div class="cloud-icon">📁</div>
+                            <div class="cloud-name">Google Drive</div>
+                        </div>
+                        <div class="cloud-option" data-cloud="onedrive" onclick="selectCloud(this)">
+                            <div class="cloud-icon">☁️</div>
+                            <div class="cloud-name">OneDrive</div>
+                        </div>
+                        <div class="cloud-option" data-cloud="local" onclick="selectCloud(this)">
+                            <div class="cloud-icon">💾</div>
+                            <div class="cloud-name">本地</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Options -->
+                <div class="config-section">
+                    <div class="config-section-title">🔧 選項</div>
+                    
+                    <div class="config-checkbox checked" onclick="toggleCheckbox(this)">
+                        <div class="checkbox-toggle"></div>
+                        <span class="checkbox-label">自動安裝依賴</span>
+                    </div>
+                    
+                    <div class="config-checkbox checked" onclick="toggleCheckbox(this)">
+                        <div class="checkbox-toggle"></div>
+                        <span class="checkbox-label">版本相容性檢查</span>
+                    </div>
+                    
+                    <div class="config-checkbox" onclick="toggleCheckbox(this)">
+                        <div class="checkbox-toggle"></div>
+                        <span class="checkbox-label">開發者模式</span>
+                    </div>
+                    
+                    <div class="config-checkbox" onclick="toggleCheckbox(this)">
+                        <div class="checkbox-toggle"></div>
+                        <span class="checkbox-label">顯示後端指令</span>
+                    </div>
+                </div>
+                
+                <!-- Output Path -->
+                <div class="config-section">
+                    <div class="config-section-title">📂 輸出路徑</div>
+                    <div class="config-field">
+                        <input type="text" class="config-input" value="C:\Users\tonyk\OneDrive\Desktop\VIA" id="outputPath">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-actions">
+                <button class="action-btn primary" onclick="deployBundle()">
+                    🚀 部署組合
+                </button>
+                <button class="action-btn secondary" onclick="previewBundle()">
+                    👁️ 預覽配置
+                </button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer">
+            <div class="footer-left">
+                <div class="status-item">
+                    <span class="status-dot"></span>
+                    <span>系統就緒</span>
+                </div>
+                <span>VIA Module Marketplace v1.0</span>
+            </div>
+            <div class="footer-right">
+                <span>前後端分離模式</span>
+                <span>插拔式架構</span>
+                <span>15 模組可用</span>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- Admin Badge (權限指示) -->
+<div class="admin-badge" id="adminBadge" style="display: none;">
+    🔓 管理者模式
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIA MODULE MARKETPLACE ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// def MODULE REGISTRY (商品目錄)
+const MODULES = {
+    // Core Modules (必選)
+    'TWStockList': {
+        id: 'TWStockList',
+        code: 'VDF_M12_01',
+        name: 'TWStockList',
+        desc: '台灣股票清單基礎模組，TWSE/TPEx 資料擷取',
+        category: 'core',
+        icon: '📋',
+        required: true,
+        dependencies: [],
+        tags: ['必選', '基礎']
+    },
+    'TWFinancialData': {
+        id: 'TWFinancialData',
+        code: 'VDF_M12_02',
+        name: 'TWFinancialData',
+        desc: '金融數據擷取引擎，支援 DB1-DB11 資料庫',
+        category: 'core',
+        icon: '📊',
+        required: true,
+        dependencies: ['TWStockList'],
+        tags: ['必選', '數據']
+    },
+    'TWStockListGenerator': {
+        id: 'TWStockListGenerator',
+        code: 'VDF_M12_03',
+        name: 'TWStockListGenerator',
+        desc: '股票清單生成器，Polars 加速版',
+        category: 'core',
+        icon: '⚡',
+        required: false,
+        dependencies: ['TWStockList'],
+        tags: ['Polars', '加速']
+    },
+    
+    // Auxiliary Tools
+    'VIS_Accelerator': {
+        id: 'VIS_Accelerator',
+        code: 'VIS_V10',
+        name: 'VIS Accelerator',
+        desc: '90+ Libraries 加速器，25 Methods + 20 Engines',
+        category: 'auxiliary',
+        icon: '🚀',
+        required: false,
+        dependencies: [],
+        tags: ['加速', '90+ libs']
+    },
+    'VIS_AutoDeploy': {
+        id: 'VIS_AutoDeploy',
+        code: 'VIS_DEPLOY',
+        name: 'AutoDeploy',
+        desc: '全自動環境布建，50 內建解決方案',
+        category: 'auxiliary',
+        icon: '🔧',
+        required: false,
+        dependencies: ['VIS_Accelerator'],
+        tags: ['部署', '自動化']
+    },
+    'SynonymEngine': {
+        id: 'SynonymEngine',
+        code: 'VSE_01',
+        name: 'SynonymEngine',
+        desc: '金融術語同義詞引擎，智能搜尋',
+        category: 'auxiliary',
+        icon: '🔤',
+        required: false,
+        dependencies: [],
+        tags: ['NLP', '搜尋']
+    },
+    
+    // Analysis Modules
+    'AutoPlot': {
+        id: 'AutoPlot',
+        code: 'VAP_V3',
+        name: 'AutoPlot v3.0',
+        desc: 'K線繪圖系統，台美股對齊，技術指標',
+        category: 'analysis',
+        icon: '📈',
+        required: false,
+        dependencies: ['TWFinancialData'],
+        tags: ['圖表', 'K線']
+    },
+    'AI_OEM_Valuation': {
+        id: 'AI_OEM_Valuation',
+        code: 'VVAL_01',
+        name: 'AI OEM Valuation',
+        desc: '財務預估矩陣，多維度估值分析',
+        category: 'analysis',
+        icon: '💰',
+        required: false,
+        dependencies: ['TWFinancialData'],
+        tags: ['估值', '矩陣']
+    },
+    'TechnicalAnalysis': {
+        id: 'TechnicalAnalysis',
+        code: 'VTA_01',
+        name: 'TechnicalAnalysis',
+        desc: '技術指標引擎，MA/BB/RSI/MACD',
+        category: 'analysis',
+        icon: '📉',
+        required: false,
+        dependencies: ['AutoPlot'],
+        tags: ['TA', '指標']
+    },
+    
+    // Output Modules
+    'ReportNova': {
+        id: 'ReportNova',
+        code: 'VRN_01',
+        name: 'ReportNova',
+        desc: '報告生成系統，自動化文件輸出',
+        category: 'output',
+        icon: '📑',
+        required: false,
+        dependencies: ['TWFinancialData'],
+        tags: ['報告', '文件']
+    },
+    'ExcelExporter': {
+        id: 'ExcelExporter',
+        code: 'VEX_01',
+        name: 'ExcelExporter',
+        desc: 'Excel 輸出模組，格式化報表',
+        category: 'output',
+        icon: '📗',
+        required: false,
+        dependencies: [],
+        tags: ['Excel', '輸出']
+    },
+    'DashboardBuilder': {
+        id: 'DashboardBuilder',
+        code: 'VDB_01',
+        name: 'DashboardBuilder',
+        desc: '儀表板建構器，視覺化呈現',
+        category: 'output',
+        icon: '📊',
+        required: false,
+        dependencies: ['AutoPlot'],
+        tags: ['儀表板', 'UI']
+    },
+    
+    // Cloud Integration
+    'GoogleDrive': {
+        id: 'GoogleDrive',
+        code: 'VGD_01',
+        name: 'GoogleDrive',
+        desc: 'Google 雲端硬碟整合連結',
+        category: 'cloud',
+        icon: '📁',
+        required: false,
+        dependencies: [],
+        tags: ['雲端', 'Google']
+    },
+    'OneDrive': {
+        id: 'OneDrive',
+        code: 'VOD_01',
+        name: 'OneDrive',
+        desc: '微軟 OneDrive 雲端整合',
+        category: 'cloud',
+        icon: '☁️',
+        required: false,
+        dependencies: [],
+        tags: ['雲端', 'Microsoft']
+    },
+    'LocalStorage': {
+        id: 'LocalStorage',
+        code: 'VLS_01',
+        name: 'LocalStorage',
+        desc: '本地儲存管理，路徑設定',
+        category: 'cloud',
+        icon: '💾',
+        required: false,
+        dependencies: [],
+        tags: ['本地', '儲存']
+    }
+};
+
+// def TREE STRUCTURE (樹枝狀架構)
+const TREE_STRUCTURE = [
+    {
+        id: 'core',
+        label: 'Core Modules',
+        icon: '📦',
+        category: 'core',
+        children: ['TWStockList', 'TWFinancialData', 'TWStockListGenerator']
+    },
+    {
+        id: 'auxiliary',
+        label: 'Auxiliary Tools',
+        icon: '🔧',
+        category: 'aux',
+        children: ['VIS_Accelerator', 'VIS_AutoDeploy', 'SynonymEngine']
+    },
+    {
+        id: 'analysis',
+        label: 'Analysis Modules',
+        icon: '📊',
+        category: 'analysis',
+        children: ['AutoPlot', 'AI_OEM_Valuation', 'TechnicalAnalysis']
+    },
+    {
+        id: 'output',
+        label: 'Output Modules',
+        icon: '📑',
+        category: 'output',
+        children: ['ReportNova', 'ExcelExporter', 'DashboardBuilder']
+    },
+    {
+        id: 'cloud',
+        label: 'Cloud Integration',
+        icon: '☁️',
+        category: 'cloud',
+        children: ['GoogleDrive', 'OneDrive', 'LocalStorage']
+    }
+];
+
+// def STATE (前端狀態)
+const STATE = {
+    selectedModules: new Set(),
+    isAdmin: false,
+    currentFilter: 'all',
+    searchQuery: '',
+    config: {
+        envName: 'vis_venv',
+        pythonVersion: '3.10',
+        mirror: 'tsinghua',
+        cloud: 'gdrive',
+        autoInstallDeps: true,
+        versionCheck: true,
+        devMode: false,
+        showBackend: false,
+        outputPath: 'C:\\Users\\tonyk\\OneDrive\\Desktop\\VIA'
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderTree();
+    renderModules();
+    initSearch();
+    
+    // Auto-select required modules
+    Object.values(MODULES).forEach(m => {
+        if (m.required) STATE.selectedModules.add(m.id);
+    });
+    updateSelection();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TREE RENDERING (樹枝狀)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderTree() {
+    const container = document.getElementById('treeContent');
+    container.innerHTML = TREE_STRUCTURE.map(cat => `
+        <div class="tree-node">
+            <div class="tree-item cat-${cat.category}" onclick="toggleTreeNode(this)" data-category="${cat.id}">
+                <span class="tree-expand">▶</span>
+                <span class="tree-icon">${cat.icon}</span>
+                <span class="tree-label">${cat.label}</span>
+                <span class="tree-badge">${cat.children.length}</span>
+            </div>
+            <div class="tree-children">
+                ${cat.children.map(moduleId => {
+                    const m = MODULES[moduleId];
+                    return `
+                        <div class="tree-item" onclick="selectModuleFromTree('${m.id}')" data-module="${m.id}">
+                            <span class="tree-expand" style="visibility: hidden;">▶</span>
+                            <span class="tree-icon" style="background: var(--bg-3); color: var(--text-2);">${m.icon}</span>
+                            <span class="tree-label">${m.name}</span>
+                            ${m.required ? '<span class="tree-badge" style="background: var(--sb-blue); color: white;">必選</span>' : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleTreeNode(item) {
+    const expand = item.querySelector('.tree-expand');
+    const children = item.nextElementSibling;
+    
+    expand.classList.toggle('open');
+    children.classList.toggle('open');
+}
+
+function selectModuleFromTree(moduleId) {
+    toggleModuleSelection(moduleId);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODULES GRID RENDERING (矩陣式)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderModules() {
+    const container = document.getElementById('modulesGrid');
+    const filter = STATE.currentFilter;
+    const query = STATE.searchQuery.toLowerCase();
+    
+    const filteredModules = Object.values(MODULES).filter(m => {
+        const matchesFilter = filter === 'all' || m.category === filter;
+        const matchesSearch = !query || 
+            m.name.toLowerCase().includes(query) || 
+            m.desc.toLowerCase().includes(query) ||
+            m.code.toLowerCase().includes(query);
+        return matchesFilter && matchesSearch;
+    });
+    
+    container.innerHTML = filteredModules.map(m => {
+        const isSelected = STATE.selectedModules.has(m.id);
+        const isRequired = m.required;
+        const hasDeps = m.dependencies.length > 0;
+        const depsConnected = m.dependencies.every(d => STATE.selectedModules.has(d));
+        
+        return `
+            <div class="module-card ${isSelected ? 'selected' : ''} ${isRequired ? 'required' : ''}" 
+                 onclick="toggleModuleSelection('${m.id}')" data-module="${m.id}">
+                <div class="module-check">${isSelected || isRequired ? '✓' : ''}</div>
+                <div class="module-icon" style="background: linear-gradient(135deg, var(--sb-${getCategoryColor(m.category)}), var(--sb-purple));">
+                    ${m.icon}
+                </div>
+                <div class="module-name">${m.name}</div>
+                <div class="module-code">${m.code}</div>
+                <div class="module-desc">${m.desc}</div>
+                <div class="module-tags">
+                    ${m.tags.map(t => `<span class="module-tag">${t}</span>`).join('')}
+                    ${hasDeps ? `<span class="module-tag dep">需要依賴</span>` : ''}
+                </div>
+                ${hasDeps ? `
+                    <div class="module-deps">
+                        依賴: <strong>${m.dependencies.join(', ')}</strong>
+                    </div>
+                ` : ''}
+                <div class="connection-indicator">
+                    ${m.dependencies.map(d => `
+                        <span class="connection-dot ${STATE.selectedModules.has(d) ? 'connected' : ''}"></span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        core: 'blue',
+        auxiliary: 'orange',
+        analysis: 'green',
+        output: 'purple',
+        cloud: 'cyan'
+    };
+    return colors[category] || 'blue';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODULE SELECTION (關聯連結)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleModuleSelection(moduleId) {
+    const module = MODULES[moduleId];
+    if (!module) return;
+    
+    // Required modules cannot be deselected
+    if (module.required) return;
+    
+    if (STATE.selectedModules.has(moduleId)) {
+        // Check if other modules depend on this
+        const dependents = Object.values(MODULES).filter(m => 
+            m.dependencies.includes(moduleId) && STATE.selectedModules.has(m.id)
+        );
+        
+        if (dependents.length > 0) {
+            alert(`無法取消選擇：以下模組依賴此模組:\n${dependents.map(d => d.name).join(', ')}`);
+            return;
+        }
+        
+        STATE.selectedModules.delete(moduleId);
+    } else {
+        // Auto-select dependencies
+        module.dependencies.forEach(depId => {
+            if (!STATE.selectedModules.has(depId)) {
+                STATE.selectedModules.add(depId);
+            }
+        });
+        STATE.selectedModules.add(moduleId);
+    }
+    
+    updateSelection();
+}
+
+function updateSelection() {
+    renderModules();
+    renderSelectedModules();
+    document.getElementById('selectedCount').textContent = STATE.selectedModules.size;
+}
+
+function renderSelectedModules() {
+    const container = document.getElementById('selectedModules');
+    
+    if (STATE.selectedModules.size === 0) {
+        container.innerHTML = '<div style="color: var(--text-3); font-size: 12px; text-align: center; padding: 20px;">尚未選擇模組</div>';
+        return;
+    }
+    
+    container.innerHTML = Array.from(STATE.selectedModules).map(id => {
+        const m = MODULES[id];
+        return `
+            <div class="selected-module-item">
+                <div class="selected-module-icon" style="background: linear-gradient(135deg, var(--sb-${getCategoryColor(m.category)}), var(--sb-purple)); color: white;">
+                    ${m.icon}
+                </div>
+                <span class="selected-module-name">${m.name}</span>
+                ${!m.required ? `
+                    <span class="selected-module-remove" onclick="event.stopPropagation(); removeModule('${m.id}')">✕</span>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function removeModule(moduleId) {
+    toggleModuleSelection(moduleId);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SEARCH & FILTER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function initSearch() {
+    const input = document.getElementById('searchInput');
+    input.addEventListener('input', (e) => {
+        STATE.searchQuery = e.target.value;
+        renderModules();
+    });
+    
+    // Ctrl+K shortcut
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            input.focus();
+        }
+    });
+}
+
+function filterModules() {
+    STATE.currentFilter = document.getElementById('categoryFilter').value;
+    renderModules();
+}
+
+function setView(view) {
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    // View mode implementation
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIG HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleCheckbox(el) {
+    el.classList.toggle('checked');
+}
+
+function selectCloud(el) {
+    document.querySelectorAll('.cloud-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    STATE.config.cloud = el.dataset.cloud;
+}
+
+function resetConfig() {
+    document.getElementById('envName').value = 'vis_venv';
+    document.getElementById('pythonVersion').value = '3.10';
+    document.getElementById('mirrorSource').value = 'tsinghua';
+    document.querySelectorAll('.config-checkbox').forEach((cb, i) => {
+        cb.classList.toggle('checked', i < 2);
+    });
+}
+
+function resetSelection() {
+    STATE.selectedModules.clear();
+    Object.values(MODULES).forEach(m => {
+        if (m.required) STATE.selectedModules.add(m.id);
+    });
+    updateSelection();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN MODE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleAdmin() {
+    STATE.isAdmin = !STATE.isAdmin;
+    document.getElementById('adminBadge').style.display = STATE.isAdmin ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXPORT & DEPLOY (前後端分離 - 輸出 Signal)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function exportBundle() {
+    const bundle = {
+        modules: Array.from(STATE.selectedModules),
+        config: {
+            envName: document.getElementById('envName').value,
+            pythonVersion: document.getElementById('pythonVersion').value,
+            mirror: document.getElementById('mirrorSource').value,
+            cloud: STATE.config.cloud,
+            outputPath: document.getElementById('outputPath').value
+        },
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('📦 Bundle Export Signal:', bundle);
+    alert(`組合已輸出！\n\n模組: ${bundle.modules.length}\n環境: ${bundle.config.envName}\n鏡像: ${bundle.config.mirror}`);
+}
+
+function deployBundle() {
+    const modules = Array.from(STATE.selectedModules);
+    console.log('🚀 Deploy Signal:', modules);
+    alert(`開始部署 ${modules.length} 個模組...\n\n${modules.map(id => MODULES[id].name).join('\n')}`);
+}
+
+function previewBundle() {
+    const modules = Array.from(STATE.selectedModules);
+    const config = {
+        envName: document.getElementById('envName').value,
+        pythonVersion: document.getElementById('pythonVersion').value,
+        mirror: document.getElementById('mirrorSource').value
+    };
+    
+    const preview = `
+=== VIA Module Bundle Preview ===
+
+📦 Selected Modules (${modules.length}):
+${modules.map(id => `  - ${MODULES[id].name} (${MODULES[id].code})`).join('\n')}
+
+⚙️ Configuration:
+  - Environment: ${config.envName}
+  - Python: ${config.pythonVersion}
+  - Mirror: ${config.mirror}
+
+🔗 Dependencies Graph:
+${modules.map(id => {
+    const m = MODULES[id];
+    return m.dependencies.length > 0 
+        ? `  ${m.name} ← ${m.dependencies.join(', ')}`
+        : `  ${m.name} (no deps)`;
+}).join('\n')}
+    `.trim();
+    
+    alert(preview);
+}
+</script>
+</body>
+</html>

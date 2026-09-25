@@ -1,0 +1,62 @@
+{
+  "def_schema": "VIA_SSOT_RISKFLOW_FORMULA_REGISTRY_V023",
+  "def_generated": "2026-08-16",
+  "def_note": "公式單一事實來源。IMPLEMENTED=MDL009 已實作；SPEC=登錄待實作。z 一律 robust-MAD、樣本一律 T-1（不含當日），禁止對自身分數校準（反循環）。",
+
+  "def_core": [
+    { "mcfl": "MCFL-M00-C01-F001", "id": "robust_z",   "formula": "(x − median(S)) / (1.4826 × MAD(S))，clip ±3；MAD=0 退回 std", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M00-C01-F002", "id": "fis_scale",  "formula": "fis = 100 × tanh(mean_z / 2) → ±100（與 MDL008 FIS 同式）", "status": "IMPLEMENTED" },
+    { "mcfl": "—",                 "id": "risk_0_100", "formula": "risk = 50 + fis/2；分級 <30低 <60中 <80高 ≤100極端", "status": "IMPLEMENTED" }
+  ],
+
+  "def_scores": [
+    { "mcfl": "MCFL-M20-C21-F201", "id": "usd_stress",          "formula": "z[ret20(UUP)] + z[Δ20(DFII10)] + z[ret20(IEF)−ret20(HYG)] + z[ret20(IEF)−ret20(EMB)] + 0.5·z[−ret20(EMLC)] → 加權均 → FIS", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M20-C21-F202", "id": "rate_shock",          "formula": "z[Δ20(DGS2)] + z[Δ20(DGS10)] + z[Δ20(DFII10)] + z[−ret20(TLT)]", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M20-C21-F203", "id": "credit_stress",       "formula": "z[dd60(HYG/IEF)] + z[dd60(LQD/IEF)] + z[dd60(EMB)]", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M20-C21-F204", "id": "commodity_inflation", "formula": "z[ret60(USO)] + z[ret60(CPER)] + z[ret60(DBC)]", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M20-C21-F206", "id": "fiscal_fragility",    "formula": "mean(跨國百分位：debt/GDP↑, 利息/歲入↑, 外債/GNI↑, CPI↑, 財政餘額↓, 經常帳↓, 外儲月數↓, GDP成長↓)；雙弱 = composite≥55 且 ETF ret20<0", "status": "IMPLEMENTED" }
+  ],
+
+  "def_rotation_sync": [
+    { "mcfl": "MCFL-M22-C22-F220", "id": "rrg_axes",     "formula": "X = robust_z(ln(P/ACWI), 60d)；Y = X(t) − X(t−10)；accel = Y(t) − Y(t−5)；Q1(X+,Y+)領先 Q2(X−,Y+)改善★ Q3(X−,Y−)落後 Q4(X+,Y−)轉弱⚠", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M25-C25-F251", "id": "sync_matrix",  "formula": "corr(ETF日報酬, 因子{UUP, ΔDGS10, ln(HYG/IEF)差, DBC, ACWI}, 窗20/60/120)", "status": "IMPLEMENTED" },
+    { "mcfl": "—",                 "id": "lead_lag",     "formula": "corr(leader[t−k], follower[t])，k∈{0,1,5,10,20}，窗120，取 |corr| 最大 k", "status": "IMPLEMENTED" },
+    { "mcfl": "—",                 "id": "drawdown_sync","formula": "count(區域ETF：60d高點回落 ≥5%)", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M00-C01-F004", "id": "pc1_share",    "formula": "相關矩陣冪迭代 λ1/m（60d 股票宇宙）→ 全球共振占比", "status": "IMPLEMENTED" }
+  ],
+
+  "def_cross_asset": [
+    { "mcfl": "MCFL-M20-C28-F250", "id": "macro_risk_pulse", "formula": "pulse = (ret1(SPY) + 1.5·ret1(IBIT)) − (ret1(IEF) + 0.8·ret1(VNQ))，5d平滑 → 60d robust-z", "status": "IMPLEMENTED" },
+    { "mcfl": "MCFL-M20-C26-F230", "id": "regional_potential", "formula": "potential = (local_10y − US10Y) × ret20(fx_etf) × 100；正=利差×匯率同向流入勢能", "status": "IMPLEMENTED（demo 用靜態 local_10y，正式版接每日殖利率）" }
+  ],
+
+  "def_earnings": [
+    { "mcfl": "MCFL-M35-C35-F350", "id": "implied_forward_eps", "formula": "EPS_implied = Index_Level_pub / Forward_PE_pub；evidence=Der；status=Calculated_NotOriginal", "status": "IMPLEMENTED" },
+    { "mcfl": "—", "id": "carry_forward", "formula": "EPS 凍結至下次來源更新；staleness ≤7 FRESH ≤21 USABLE ≤45 STALE_WARNING ≤90 NEEDS_REFRESH >90 REJECT", "status": "IMPLEMENTED" },
+    { "mcfl": "—", "id": "daily_repriced_pe", "formula": "PE_daily = PE_pub × (Proxy_now / Proxy_pub)；禁止 Daily_EPS = Level_now / PE_pub（會把價格變動誤當盈餘修正）", "status": "IMPLEMENTED" },
+    { "mcfl": "—", "id": "erp", "formula": "EY = 100/PE_daily；ERP = EY − Local_10Y；USD_adj_ERP = ERP − fx_dep_risk_pp − usd_stress_risk/100 × funding_pp", "status": "IMPLEMENTED" }
+  ],
+
+  "def_spec_only": [
+    { "id": "vpin_volume_bucket", "formula": "等量桶（固定成交量切分）內非對稱方向流：flow = (close−open)/(high−low) × bucket_size", "source": "對話 2026-08-16", "status": "SPEC（屬 MDL010 即時層，需 tick 資料）" },
+    { "id": "ofi_l2", "formula": "最佳五檔委買賣 Delta 失衡 + 成交價位於 spread 分位", "source": "對話 2026-08-16", "status": "SPEC（需券商 SDK L2）" },
+    { "id": "direction_flux", "formula": "dir=(C−O)/(H−L)；flux = dir × ln(1+(H−L)/L) × V → 滾動z", "source": "對話 2026-08-16 [MCFL-M20-C25-F220]", "status": "SPEC（需 OHLCV，ETF 日級可先行）" },
+    { "id": "flow_acceleration", "formula": "accel = flow(t) − flow(t−1)，映射箭頭粗細/亮度/脈動", "source": "Markdown 2026-08-12", "status": "SPEC（視覺層，接 MDL008 真流後啟用）" },
+    { "id": "t1_true_flow", "formula": "ΔSharesOutstanding × NAV（唯一可寫成金額的流）", "source": "MDL008", "status": "EXTERNAL_T1（本引擎不產生）" }
+  ],
+
+  "def_error_factor_registry": [
+    ["G01", "美元計價假弱勢", "當地幣貶讓 USD ETF 弱但本幣指數不弱", "對照 fx_etf 與本幣指數；fragility 面板併看匯率", "T1"],
+    ["G02", "ETF 折溢價污染", "價格≠NAV，壓力期溢價擴大", "接 MDL008 NAV/申贖驗證；雙證對(HYG/JNK, MCHI/FXI, EEM/VWO)", "T1"],
+    ["G03", "調倉/除息被動流", "rebalance 與配息造成假流向", "對照調倉日曆；用還原價；流量層在 MDL008 扣除", "T1"],
+    ["G04", "forward P/E 四捨五入", "倒算 EPS 帶入捨入誤差", "rounding gate（>0.05% 掛旗）；保留原始小數與 URL", "SSOT"],
+    ["G05", "EPS 鈍化（stale）", "沿用過期共識當現值", "staleness 五級 + REJECT gate", "SSOT"],
+    ["G06", "proxy 錯位", "用 ETF 總報酬近似指數位移", "proxy_repricing 永遠掛 Der 旗，不冒充官方指數", "SSOT"],
+    ["G07", "價漲EPS凍結的估值幻覺", "只看P/E不看EPS來源日", "valuation_expansion_warning（>+8% 未更新）", "T2"],
+    ["G08", "危機相關性坍縮", "崩盤期輪動訊號失效", "PC1 共振占比 + 回撤同步計數，過高時降權輪動", "T2"],
+    ["G09", "廣度幻覺", "市值加權指數強掩蓋內部弱", "RSP−SPY 廣度差 + IWM RS 進 regime 規則", "T1"],
+    ["G10", "前視偏誤", "z 樣本含當日、訊號當日可用", "z 樣本一律截至 t−1；T-1 紀律", "紀律"],
+    ["G11", "循環優化", "對自身分數調權重/門檻", "權重/門檻只在 SSOT config，校準只對外部標籤", "紀律"],
+    ["G12", "合成資料誤用", "T4 demo 被當實盤判讀", "provenance 全鏈掛標 + 儀表板 critical 橫幅 + 惡魔面板置頂", "SSOT"]
+  ]
+}

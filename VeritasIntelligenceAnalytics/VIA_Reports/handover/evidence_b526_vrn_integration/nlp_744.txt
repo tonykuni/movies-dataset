@@ -1,0 +1,16 @@
+=== nlp_744 ===
+=== SUP_MDL744 NLPApplicationHub · 十二檢自測(零網路;含尾版律/字母序陷阱/缺席對照組;+證據型摘要)===
+  [OK] ① 收容件在位且掛的就是尾版(非 MOUNTED_STALE) (VERIFIED;夾=VIA_NLP_Application_System_v1.8.0;版=1.8.0;無異)
+  [OK] ② 尾版律跨兩家族(對照組:字母序取 OneEngine 系,語意序取 Application_System v1.8.0) (候選 5;字母序=VIA_NLP_OneEngine_v1.6.1;語意序=VIA_NLP_Application_System_v1.8.0)
+  [OK] ③ 語意版號不踩字母序陷阱(v1.10.0 > v1.9.0) ((1, 10, 0) > (1, 9, 0);字串比較則相反)
+  [OK] ④ 模組冊 41 支且 __main__ 被排除(它 import 即跑 argparse 會中斷宿主) (共 41;可載入 39)
+  [OK] ⑤ 升版實得(對 v1.1.0 淨增 21 支且六項研報服務全在位;舊版一支不少) (v1.1.0 18 支 → 尾版 39 支;研報服務 6/6)
+  [OK] ⑥ TextProcessor 正掛且 nfkc 真走正主(判別輸入:連續空白 stdlib 不併、正主會併;並驗載入檔就在尾版夾內) (正主='台積電 的的的營收' vs stdlib='台積電  的的的營收';載自 via_nlp_engine)
+  [OK] ⑦ 表格服務抽得出研報要件(管線表 稀釋EPS 三期值 + key:value 目標價/評等) (2 張;md 列 1;kv 列 2)
+  [OK] ⑧ 逐格照抄不補值(cell_policy=verbatim_only_no_silent_fill)
+  [OK] ⑨ 版面分塊在位且完整覆蓋(每字元歸屬一塊;table 塊被認出) (3 塊;['paragraph', 'table', 'paragraph'])
+  [OK] ⑩ 收容缺席=ABSENT 說得出為何,且表格退空清單、切段退整篇一段(誠實無表,絕不編表)
+  [OK] ⑪ 紀律宣告(只增不減/收容件原地不動/尾版律/雙掛防制/零網路 在檔)
+  [OK] ⑫ 批517 證據型摘要(尾版 summarization):點數 ≤ 3、每點帶 source_span 且切回原文相符(evidence_spans_valid);模組缺=ABSENT 誠實 (OK · 3 點 · '台積電 2026 年營收預估年增 20%,達 3 兆元。')
+  [計] 十二檢 OK 12 · FAIL 0
+RC=0

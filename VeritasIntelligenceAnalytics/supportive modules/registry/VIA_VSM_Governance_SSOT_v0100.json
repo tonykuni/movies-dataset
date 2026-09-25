@@ -1,0 +1,56 @@
+{
+ "schema": "via-vsm-governance-v1",
+ "source": "操作員批84核定文(2026-08-20):Stafford Beer Viable System Model 中央治理架構+System 3* 稽核協定全文;令「儘量與原本指令整合強化」——對映 VIA 實存模組,不另起爐灶",
+ "principles": {
+  "recursion": "遞迴原則:每個 System 1 單元(子系統→引擎→工具)自身都是完整 S1-S5 可存活系統;子系統管理者對『單元可存活』負責,不只執行命令",
+  "variety_engineering": "Ashby 定律:管理端 variety 必須匹配被管運營端 variety(=grid 站數跟引擎數同步擴張)",
+  "autonomy_with_accountability": "最大局部自由+整體一致(=引擎自帶 selftest,台帳統一記帳)",
+  "algedonic_channel": "緊急例外通道可繞過層級直達 S5(=異常置頂矩陣/QA 凍結異常直報操作員)",
+  "audit_independence": "S3* 獨立稽核受保護,發現不可被受稽單位壓下(=finaudit/vapguard/oldscan 唯讀對帳,證據 JSON 存證)"
+ },
+ "systems": {
+  "S1": {"role": "主要運營/交付", "gov_actors": "各部會/署/前線單位",
+         "via_mapping": ["VRN 研報管線", "VDF 數據鍛造", "VAP 自動繪圖", "FLOW/GroupIndex 族群流", "VME/ChipWar/WorkOps 等熱插拔子系統"]},
+  "S2": {"role": "協調與抗震盪", "gov_actors": "協調祕書處/跨部會委員會/共享服務平台",
+         "via_mapping": ["via_ui_kit 母子統一 U/I", "via-params 中央參數樞紐", "介面合約冊 TOOL-037", "via-ifsync 介面自湊(TOOL-089)", "中央同義字/Regex 治理中心"]},
+  "S3": {"role": "內部調節與資源配置(運營管理)", "gov_actors": "內閣府/中央管理單位/財政人事控制/績效管理",
+         "via_mapping": ["via-center 指揮中心儀表板總線", "CentralGov 主控台(TOOL-063)", "自動碼台帳 AutoCode Registry", "selftest grid 全站矩陣(績效契約)"]},
+  "S3star": {"role": "獨立稽核/情報(支援性,突擊深潛)", "gov_actors": "特別稽核組/監察/突襲檢視",
+         "via_mapping": ["vrn-finaudit 財務驗算稽核(異常置頂矩陣)", "via-vapguard 圖規鎖守衛", "via-oldscan 舊根對帳(hash 定生死)", "spec guard 家族/QA 凍結異常程序"]},
+  "S4": {"role": "情報與未來導向(外部與未來)", "gov_actors": "政策規劃/前瞻/創新實驗室/情報分析",
+         "via_mapping": ["Flow & Rotation 模擬(情境推演)", "VDF 每日市場數據攝入(環境掃描)", "via-net 統包網路工具(同意閘內外情蒐)", "40 型報告分類器/摘要引擎(文獻情報)"]},
+  "S5": {"role": "政策與身份(終極權威)", "gov_actors": "政府首長/內閣/憲政原則",
+         "via_mapping": ["操作員=終極權威(候令堆/三選裁決)", "鐵律紅線=身份憲章(零刪除/不爬站/零 CDN/誠實三態)", "freeze.lock 凍結鎖=憲政保留", "S3(現在)與 S4(未來)衝突之最終仲裁"]}
+ },
+ "supportive_modules_min_spec": [
+  {"spec": "共享數位骨幹(身份/資料交換/工作流)", "via": "bin 動詞群+registry 台帳+via-run 留痕"},
+  {"spec": "共同績效量測與儀表板", "via": "selftest grid+via-center+CentralGov UI Matrix"},
+  {"spec": "標準化資源配置與預算協定", "via": "via-params 中央參數 SSOT+VDF 統一參數"},
+  {"spec": "危機應變與持續運作協定", "via": "oldscan --undo/manifest 可逆+統包器看門狗+git 版控回滾"},
+  {"spec": "知識與能力發展框架", "via": "knowledge 冊群(finlex/SSOT/MegaPrompt 收容)+教訓帳本"},
+  {"spec": "公民/利害關係人回饋迴路", "via": "操作員真跑貼文=回饋直饋 S4/S1(每批入台帳)"}
+ ],
+ "s3star_audit_protocol": {
+  "types": [
+   {"t": "例行績效與合規稽核(S3)", "via": "grid 全站矩陣定期跑+誠實三態"},
+   {"t": "深潛診斷稽核(S3*)", "via": "finaudit 全鏈驗算/oldscan 全倉 hash 對帳(風險旗標觸發)"},
+   {"t": "主題式橫向稽核(S3*)", "via": "CentralGov 六流程跨子系統掃描(AST/SSOT/死碼)"},
+   {"t": "鑑識調查稽核(S3*)", "via": "QA 凍結異常程序(如 QA-20260819N:鎖記不符=補證候三選)"},
+   {"t": "追蹤稽核", "via": "台帳候令堆+批次復驗(wrapup battery)"}
+  ],
+  "lifecycle": {
+   "A_planning": "風險選案:重大性/複雜度/歷史/外部訊號/控制成熟度;觸發準則=績效偏差連兩期/預算超容差/投訴量/新大型變更/隨機抽樣;ToR 需 S3 核(敏感案 S5 核)——VIA 對映:grid FAIL/異常矩陣/操作員貼文=觸發源",
+   "B_execution": "無限制取閱權(範圍內)+方法工具箱(資料分析/流程走查/抽樣/訪談/文件測試/實地/標竿)+工作底稿留痕+重大即時 algedonic 升報——VIA 對映:唯讀掃描+JSON 存證+異常置頂",
+   "C_reporting": "報告結構=摘要/發現與證據/根因(非症狀)/建議(優先序)/受稽方回應/總體保證評等(Substantial/Moderate/Limited/No);分級分發 S1/S3/S5——VIA 對映:HTML Matrix+JSON 存證+繁中報告分級",
+   "D_followup": "受稽方行動計畫(負責人+期限)→S3 追蹤→S3* 復驗→拒不改善升報 S5——VIA 對映:候令堆+復驗站+操作員裁決"
+  },
+  "safeguards": [
+   "S3* 首長功能上直報 S5(行政上掛 S3);任免須 S5 核可",
+   "S3* 預算員額非經 S5 同意不得由 S3 刪減",
+   "利益迴避:冷卻期內不得稽核曾管單位",
+   "稽核人員受保護免報復;吹哨通道饋入觸發程序",
+   "稽核職能本身每 3-5 年外部同儕複評"
+  ]
+ },
+ "integration_with_originals": "與原本指令整合強化:誠實三態=稽核保證評等的日常化;hash 定生死=S3* 證據鏈標準;版本前進+manifest undo=追蹤稽核可逆性;凍結鎖零觸碰=S5 憲政保留;台帳 append-only=工作底稿留痕;操作員三選裁決=S5 終極仲裁"
+}

@@ -1,0 +1,205 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA 用戶測試除錯台 v0100</title><style>
+:root{--fs:clamp(11px,2.6vw,12.5px);--ok:#15803d;--fail:#b91c1c;--skip:#a16207;
+--untested:#64748b;--panel:260px}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1f2937;
+font:var(--fs)/1.5 'Segoe UI','Noto Sans TC',sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(8px,1.5vw,16px)}
+h1{font-size:clamp(.95rem,2vw,1.2rem);margin:.3em 0 .1em}
+h2{font-size:clamp(.85rem,1.7vw,1.05rem);margin:.2em 0 .3em}
+.mut{color:#94a3b8}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.layout{display:flex;gap:10px;align-items:flex-start}
+.gatep{flex:0 0 var(--panel);background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;
+padding:8px;transition:flex-basis .15s}
+.layout.folded .gatep{flex-basis:44px;overflow:hidden}
+.layout.folded .gatep .gbody{display:none}
+.main{flex:1 1 auto;min-width:0}
+.foldbtn{font:inherit;border:1px solid #e5e7eb;background:#ffffff;border-radius:7px;
+padding:3px 8px;cursor:pointer;min-height:32px;width:100%}
+details.gate{border:1px solid #f1f5f9;border-radius:8px;margin:.4em 0;padding:4px 6px}
+details.gate summary{cursor:pointer;font-weight:600;color:#475569}
+.sw{display:flex;align-items:center;gap:6px;margin:.3em 0;cursor:pointer}
+.sw input{width:16px;height:16px}
+.lock{color:#94a3b8;font-size:.88em}
+.lamp{margin-left:auto;font-size:.85em;font-weight:600}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:.5em 0}
+.tab{font:inherit;border:1px solid #e5e7eb;background:#ffffff;border-radius:7px;
+padding:4px 10px;cursor:pointer;min-height:40px}
+.tab b{margin-left:5px;color:#94a3b8;font-weight:600}
+.tab.on{background:#111827;color:#ffffff}.tab.on b{color:#e5e7eb}
+.page{display:none;background:#ffffff;border:1px solid #e5e7eb;border-radius:10px;
+padding:10px 12px;overflow-wrap:anywhere}
+.page.on{display:block}
+.kpi{display:flex;gap:16px;margin:.4em 0;font-weight:600;flex-wrap:wrap}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.93em}
+th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+th{color:#475569}
+pre.cmd{background:#111827;color:#e5e7eb;border-radius:8px;padding:8px 10px;
+overflow-x:auto;font-size:.92em;line-height:1.55;margin:.3em 0}
+.warn{background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:6px 10px;margin:.4em 0}
+.copy{font:inherit;border:1px solid #e5e7eb;background:#ffffff;border-radius:7px;
+padding:3px 10px;cursor:pointer;min-height:32px}
+.foot{color:#94a3b8;font-size:.88em;margin-top:.6em;border-top:1px solid #f1f5f9;padding-top:5px}
+@media (max-width:640px){
+  .layout{flex-direction:column}
+  .gatep{flex-basis:auto;width:100%}
+  .layout.folded .gatep{flex-basis:auto;height:44px}
+}
+</style></head>
+<body><div class="wrap">
+<h1><span class="dot" style="background:var(--ok)"></span>VIA 用戶測試除錯台(批: 9hh5to 會話)</h1>
+<div class="mut">token 冊=VIA_UI_TemplateSSOT_v0100 · 存證=GRID_20260827_075329.json · 憲章稽核 齊14/部分1/缺0 · 零 CDN 實料嵌入 · 行動優先</div>
+<div class="warn">本台=唯讀展示+指令產生器。閘門開關只改「產生的指令」,真正執行在您的終端貼跑——破壞性動作永遠候裁(紅線)。</div>
+
+<div class="layout" id="layout">
+<aside class="gatep" id="gatep">
+  <button class="foldbtn" id="foldbtn" onclick="fold()">⟨ 收合閘門面板</button>
+  <div class="gbody">
+  <h2>閘門功能(可收放)</h2>
+  <details class="gate" open><summary>① 網路同意閘</summary>
+    <label class="sw"><input type="checkbox" id="g_consent" onchange="rend()">
+      VIA_NET_CONSENT<span class="lamp" id="l_consent" style="color:var(--untested)">關</span></label>
+    <div class="mut">開=准測速+dry-run 連 PyPI 解析</div>
+  </details>
+  <details class="gate" open><summary>② 受令執行閘</summary>
+    <label class="sw"><input type="checkbox" id="g_exec" onchange="rend()">
+      -Execute 代跑 GREEN 執行檔<span class="lamp" id="l_exec" style="color:var(--untested)">關</span></label>
+    <div class="mut">關=只出計畫與執行檔,候裁不跑</div>
+  </details>
+  <details class="gate"><summary>③ 離線快巡閘</summary>
+    <label class="sw"><input type="checkbox" id="g_off" onchange="rend()">
+      -Offline 零網路<span class="lamp" id="l_off" style="color:var(--untested)">關</span></label>
+  </details>
+  <details class="gate"><summary>④ 鏡像閘(三源實測)</summary>
+    <label class="sw"><input type="radio" name="mir" value="" checked onchange="rend()">隨現況(不切)</label>
+    <label class="sw"><input type="radio" name="mir" value="official" onchange="rend()">official(容器 74ms)</label>
+    <label class="sw"><input type="radio" name="mir" value="aliyun" onchange="rend()">aliyun(您機 95ms 勝)</label>
+    <label class="sw"><input type="radio" name="mir" value="tsinghua" onchange="rend()">tsinghua</label>
+  </details>
+  <details class="gate"><summary>⑤ 拒裝名單閘(鎖定)</summary>
+    <div class="lock">🔒 恆開:enum34·opencv-python·opencv-python-headless(全域)/opencv-contrib-python(拒入 base)——重建配方自動剔「拒:」</div>
+  </details>
+  <details class="gate"><summary>⑥ 破壞性候裁閘(鎖定)</summary>
+    <div class="lock">🔒 恆開:刪境/移件/切換一律候裁令,永不入執行檔</div>
+  </details>
+  </div>
+</aside>
+
+<div class="main">
+<div class="tabs">
+<button class="tab on" id="tab-CMD" onclick="show('CMD')">指令台</button>
+<button class="tab" id="tab-TEST" onclick="show('TEST')">測試全景<b>124</b></button>
+<button class="tab" id="tab-UI" onclick="show('UI')">UI 驗證<b>6</b></button>
+<button class="tab" id="tab-PROB" onclick="show('PROB')">問題台帳<b>20</b></button>
+</div>
+
+<section id="CMD" class="page on">
+<h2>閘門 → 即時產生指令(貼進 PowerShell)</h2>
+<pre class="cmd" id="cmdout"></pre>
+<button class="copy" onclick="cp()">複製指令</button><span class="mut" id="cpmsg"></span>
+<h2>五件套速查</h2>
+<div class="tablewrap"><table>
+<tr><th>指令</th><th>作用</th></tr>
+<tr><td>via-deps</td><td>全景:十械三防線+衝突掃描+pip check 印證+鏡像現況</td></tr>
+<tr><td>via-rebuild</td><td>七段:盤點→風險→旁建計畫→uv 秒級實測→GREEN 出執行檔</td></tr>
+<tr><td>via-rebuild --split 境名</td><td>拆分:混居境按家族路由隔離+slim 核心(根治)</td></tr>
+<tr><td>via-depsone</td><td>一鍵五段統包(左側閘門決定行為)</td></tr>
+<tr><td>via-lessons</td><td>教訓帳本:RESULT MATRIX+根因解法+GOLDEN 基線</td></tr>
+<tr><td>via-ocrsuper 圖.png --extract</td><td>OCR 階梯(輕先重後)+認知抽取</td></tr>
+</table></div>
+</section>
+
+<section id="TEST" class="page">
+<h2>整合測試終輪(124 站)</h2>
+<div class="kpi"><span style="color:var(--ok)">OK 107</span>
+<span style="color:var(--fail)">FAIL 14</span>
+<span style="color:var(--skip)">SKIP 3</span>
+<span class="mut">首跑 82 綠 → 除錯 +25</span></div>
+<div class="tablewrap"><table>
+<tr><th>系統</th><th>綠/總</th><th>紅因</th></tr>
+<tr><td>FLOW</td><td style="color:var(--ok)">7/7</td><td>—全綠</td></tr>
+<tr><td>VIA 治理/支援</td><td>58/62</td><td>讓位夾 sha/雙庫 schema(機上綁定)</td></tr>
+<tr><td>VDF 資料工廠</td><td>15/20</td><td>tw_daily_prices/features_daily 等 DuckDB 表</td></tr>
+<tr><td>VRN 報告智能</td><td>22/28</td><td>analyst_estimates/prices_canonical/庫內冊</td></tr>
+<tr><td>VAP 自動繪圖</td><td>5/7</td><td>features_daily 因子快照</td></tr>
+</table></div>
+<div class="warn">殘紅 14 站=100% 資料庫綁定(誠實紅)。工作站 git pull + via-selftest 即點亮。</div>
+</section>
+
+<section id="UI" class="page">
+<h2>UI 層瀏覽器實測(Chromium 無頭 · file:// 零網路)</h2>
+<div class="tablewrap"><table>
+<tr><th>頁面</th><th>JS錯</th><th>console錯</th><th>互動模擬</th></tr>
+<tr><td>Mother 母頁</td><td>0</td><td>0</td><td>10 次點擊/切換</td></tr>
+<tr><td>Dashboard 儀表板</td><td>0</td><td>0</td><td>5</td></tr>
+<tr><td>SystemHub 樞紐</td><td>0</td><td>0</td><td>—(純檢視)</td></tr>
+<tr><td>SystemTestPages</td><td>0</td><td>0</td><td>6</td></tr>
+<tr><td>Grand Summary</td><td>0</td><td>0</td><td>—</td></tr>
+<tr><td>VDF DB 矩陣</td><td>0</td><td>0</td><td>—</td></tr>
+</table></div>
+</section>
+
+<section id="PROB" class="page">
+<h2>問題台帳(教訓帳本 RC-01~20 摘錄)</h2>
+<div class="tablewrap"><table>
+<tr><th>#</th><th>象</th><th>解</th></tr>
+<tr><td>RC-01</td><td>cv2 多變體+0xC0000005 崩</td><td>錨 contrib&lt;5 單變體;OCR 走隔離境</td></tr>
+<tr><td>RC-02</td><td>WinError5 系統層拒寫</td><td>管理員窗或 --user 遮蔽</td></tr>
+<tr><td>RC-03</td><td>enum34 出現在缺件表</td><td>永不裝;退役 bezier</td></tr>
+<tr><td>RC-09</td><td>PATH 同名先佔</td><td>新 bin 前置</td></tr>
+<tr><td>RC-16</td><td>numpy1.26 無 cp313 輪</td><td>np1 支架錨 py312</td></tr>
+<tr><td>RC-17</td><td>旁建境 Python 漂移</td><td>uv venv --python 保真</td></tr>
+<tr><td>RC-18</td><td>混居重建後仍紅</td><td>--split 拆分才根治</td></tr>
+<tr><td>RC-19</td><td>uv venv 無 pip 驗證炸</td><td>uv pip check --python</td></tr>
+<tr><td>RC-20</td><td>容器整測 36 紅</td><td>三波補件轉綠 25;餘=DB 綁定</td></tr>
+</table></div>
+<div class="mut">全文:via-lessons(20 條+SKIP 4+GOLDEN 基線)</div>
+</section>
+</div></div>
+
+<div class="foot">存證連動:selftest_runs/GRID_20260827_075329.json · lessons_runs/LESSON_*.log · 誠實三態(OK/FAIL=真敗/SKIP=環境缺件) · 本頁改冊不改引擎</div>
+</div>
+<script>
+function show(k){
+  ['CMD','TEST','UI','PROB'].forEach(function(x){
+    document.getElementById(x).classList.toggle('on', x===k);
+    document.getElementById('tab-'+x).classList.toggle('on', x===k);
+  });
+}
+function fold(){
+  var L=document.getElementById('layout');
+  L.classList.toggle('folded');
+  document.getElementById('foldbtn').textContent =
+    L.classList.contains('folded') ? '⟩' : '⟨ 收合閘門面板';
+}
+function rend(){
+  var c=document.getElementById('g_consent').checked;
+  var e=document.getElementById('g_exec').checked;
+  var o=document.getElementById('g_off').checked;
+  var m=(document.querySelector('input[name=mir]:checked')||{}).value||'';
+  function lamp(id,on,txt){var el=document.getElementById(id);
+    el.textContent=on?(txt||'開'):'關';
+    el.style.color=on?'var(--ok)':'var(--untested)';}
+  lamp('l_consent',c);lamp('l_exec',e);lamp('l_off',o);
+  var L=[];
+  if(o){L.push('via-depsone -Offline   # 零網路快巡');}
+  else{
+    if(c){L.push('$env:VIA_NET_CONSENT="YES"');}
+    var f=[]; if(c){f.push('-Consent');} if(e){f.push('-Execute');}
+    L.push('via-depsone'+(f.length?' '+f.join(' '):'')+
+      (e?'   # 實測綠後受令代跑+回驗':(c?'   # 測速+實測,執行檔候裁':'   # 全程唯讀')));
+  }
+  if(m){L.push('via-deps --mirror-set '+m+'   # 切源執行令(不代寫)');}
+  document.getElementById('cmdout').textContent=L.join('\n');
+}
+function cp(){
+  var t=document.getElementById('cmdout').textContent;
+  try{navigator.clipboard.writeText(t);}catch(e){}
+  document.getElementById('cpmsg').textContent=' 已複製';
+  setTimeout(function(){document.getElementById('cpmsg').textContent='';},1500);
+}
+rend();
+</script></body></html>

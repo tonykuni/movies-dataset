@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { GOV_TOOLS } from "./catalog.ts";
+import { githubPushScript, pathPlan, runCentralEntry } from "./central-entry.ts";
+import { motherPathScript } from "./gov-env.ts";
+import { toolTable } from "./inventory.ts";
+
+test("central entry plans PATH, gov tools, github without force or secrets", () => {
+  assert.equal(GOV_TOOLS.length, 10);
+  assert.ok(toolTable().some((r) => r.id === "GOV-ENV"));
+  assert.ok(toolTable().some((r) => r.id === "GOV-GH"));
+  const p = pathPlan();
+  assert.equal(p.find((x) => x.id === "VENV")?.on, true);
+  assert.equal(p.find((x) => x.id === "ISO")?.on, false);
+  const gh = githubPushScript();
+  assert.match(gh, /Test-Path/);
+  assert.match(gh, /VIA-ALL\.cmd/);
+  assert.match(gh, /VIA_GH_HTML/);
+  assert.match(gh, /foreach \(\$p in \$add\)/);
+  assert.match(gh, /禁止強制推送/);
+  assert.doesNotMatch(gh, /git push --force|git push -f/);
+  assert.doesNotMatch(gh, /ghp_|GITHUB_TOKEN|AKIA/);
+  assert.match(gh, /public\/via/);
+  assert.match(gh, /\.venv/);
+  const entry = runCentralEntry({ consent: false });
+  assert.match(entry.note, /中央唯一入口/);
+  assert.equal(entry.github, gh);
+  assert.match(entry.launch, /venv-via_vdf/);
+  assert.doesNotMatch(entry.launch.split("\n").filter((l) => !l.startsWith("#")).join("\n"), /conda remove|pip uninstall/);
+  assert.match(motherPathScript(), /不進 PATH/);
+});

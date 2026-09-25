@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 族群分類完善化 v1.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 22px 60px;}
+  .bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;}
+  header{position:relative;padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink);}
+  .kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;}
+  h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink);}
+  h1 span{color:var(--up);}
+  .sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:980px;}
+  .sub b{color:var(--ink2);}
+  .gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0;}
+  .gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;}
+  .gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf;}
+  .gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;}
+  .note{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.5 'DM Mono',monospace;color:var(--mut);}
+  .note b{color:var(--ink2);}
+  .tag{font:700 7.5px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px;}
+  h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:26px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px;}
+  h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase;}
+  .scards{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 4px;}
+  .sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:104px;}
+  .sc .v{font:800 21px 'Syne',sans-serif;line-height:1;}
+  .sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(298px,1fr));gap:11px;margin-top:13px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;break-inside:avoid;}
+  .card .hd{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);}
+  .card .gn{font:800 13px 'Syne',sans-serif;color:var(--ink);}
+  .card .ge{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.8px;margin-top:1px;}
+  .card .cnt{font:700 8px 'DM Mono',monospace;color:#fff;border-radius:10px;padding:2px 8px;}
+  .swatch{width:7px;align-self:stretch;}
+  .row{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid var(--soft);}
+  .row:last-child{border-bottom:none;}
+  .cls{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:2px 5px;min-width:48px;text-align:center;letter-spacing:.4px;}
+  .nm{font:600 11px 'Noto Sans TC',sans-serif;color:var(--ink2);}
+  .tk{font:500 9.5px 'DM Mono',monospace;color:var(--mut);}
+  .mkt{font:500 7.5px 'DM Mono',monospace;color:var(--mut2);}
+  .chg{margin-left:auto;font:600 10px 'DM Mono',monospace;}
+  .new{font:700 6.5px 'DM Mono',monospace;color:#fff;background:var(--teal);border-radius:2px;padding:1px 4px;letter-spacing:.4px;}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font:500 10px 'DM Mono',monospace;background:var(--paper);}
+  th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);text-align:left;padding:7px 9px;border-bottom:2px solid var(--ink);background:var(--paper2);position:sticky;top:0;}
+  td{padding:5px 9px;border-bottom:1px solid var(--soft);}
+  tr:hover td{background:var(--paper2);}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:13px;}
+  .panel.dev{border-left:3px solid var(--co);}
+  .panel.err{border-left:3px solid var(--am);}
+  .panel.add{border-left:3px solid var(--teal);}
+  .panel h3{font:800 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+  .panel ul{list-style:none;}
+  .panel li{padding:6px 0;border-bottom:1px solid var(--soft);font:400 10.5px/1.55 'Noto Sans TC',sans-serif;color:var(--ink2);}
+  .panel li:last-child{border-bottom:none;}
+  .panel li b{color:var(--co);font-family:'DM Mono',monospace;font-size:10px;}
+  .panel li .why{color:var(--mut);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font:600 9px 'DM Mono',monospace;color:var(--mut);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:2px;}
+  .pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer;}
+  @media print{@page{size:A4;margin:11mm}html,body{background:#fff!important}.pdf{display:none!important}*{box-shadow:none!important}th{position:static!important}.card,table,.panel,section{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · 族群自動分類 + 代碼對照 · 完善化</div>
+    <h1>族群分類 <span>完善化</span> · Stock Grouping Completion</h1>
+    <p class="sub">族群引擎以 <b>hotness × leadership</b>（非勝率）將個股分為 Leader / Peer / Laggard；單一類別無別 → <b>歸一</b> 視為無效族群。代碼一律由 <b>TW_TICKER</b> 四碼衍生 yfinance(.TW / .TWO) 與 Bloomberg(TT)。本版於 v1.0 之上 <b>只增不減（append-only）</b>：保留原 24 族群全部成員，新增 7 個族群，並附「魔鬼代言人」未納清單與 v1.0 資料勘誤。紅漲綠跌。</p>
+  </header>
+
+  <div class="gov">
+    <span class="lk">🔒 APPEND-ONLY · 只增不減</span>
+    <span class="pill">v1.0 LOCKED 2026-06-22 → v1.1 COMPLETION</span>
+    <span class="pill">分類層級 T2/T3（策展參照）</span>
+    <span class="pill">hot/lead/chg = T4 佔位（待 VDF 回填）</span>
+    <span class="ver">v1.1 · +7 群 / +29 檔</span>
+  </div>
+
+  <div class="note">
+    <span class="tag" style="background:var(--co)">Normalized Extraction Block</span>
+    <span><b>誠實標註：</b>族群歸屬與 L/P/G 角色屬<b>策展參照層（T2/T3）</b>，依公開產業歸屬與龍頭領先性人工編列；右側 <b>hot / lead / chg 數值為 v1.0 合成佔位（T4）</b>，非實證指標，新增檔以「—」表示，須由 VDF 引擎（同步性 / CCF 領先 / 前瞻單調性）回算後才可寫入 SSOT。</span>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--co)"></span>LEADER 龍頭（hot×lead 高、先動）</span>
+    <span><span class="dot" style="background:var(--blue)"></span>PEER 第二梯隊（同步跟動）</span>
+    <span><span class="dot" style="background:var(--mut2)"></span>LAGGARD 落後（廣度補位）</span>
+    <span><span class="dot" style="background:var(--up)"></span>紅 = 漲</span>
+    <span><span class="dot" style="background:var(--down)"></span>綠 = 跌</span>
+    <span><span class="new" style="position:static">NEW</span> = v1.1 新增</span>
+  </div>
+
+  <div class="scards" id="scards"></div>
+
+  <h2>族群分類矩陣 <span class="en">grouping matrix · leader → peer → laggard</span></h2>
+  <div class="grid" id="grid"></div>
+
+  <div class="panel add">
+    <h3>🧬 完善化新增族群 <span class="en" style="font:600 8px 'DM Mono'">7 GROUPS · CODES VERIFIED</span></h3>
+    <ul>
+      <li><b>ASIC 設計服務</b> — 世芯-KY 3661 / 創意 3443（雙龍頭）· 智原 3035 · 揚智 2569。<span class="why"> AI 客製晶片主線，與 IC 設計分立（服務型 vs 標準品）。</span></li>
+      <li><b>矽智財 IP</b> — 力旺 3529（龍頭）· 晶心科 6533 · M31 6643。<span class="why"> RISC-V / IP 授權，文件列為中長線題材；三檔皆上櫃。</span></li>
+      <li><b>網通設備</b> — 智邦 2345（龍頭）· 智易 3596 · 中磊 5388 · 明泰 3380。<span class="why"> 800G 交換器 / 資料中心網通，文件強調但 v1.0 缺漏。</span></li>
+      <li><b>電動車</b> — 貿聯-KY 3665（龍頭）· 和大 1536 · 為升 2231 · 朋程 8255。<span class="why"> 文件列長線主流；v1.0 完全未涵蓋。</span></li>
+      <li><b>觀光餐飲</b> — 雄獅 2731 / 王品 2727（雙龍頭）· 瓦城 2729 · 晶華 2707 · 鳳凰 5706。<span class="why"> 內需 + 匯率題材，法人下半年布局核心。</span></li>
+      <li><b>半導體設備</b> — 致茂 2360 / 家登 3680（雙龍頭）· 辛耘 3583 · 萬潤 6187 · 志聖 2467。<span class="why"> 與「台積電擴廠（廠務）」分立；先進封裝設備需求。</span></li>
+      <li><b>資安／系統整合</b> — 安碁資訊 6690（龍頭）· 敦陽科 2480 · 精誠 6214 · 零壹 3029。<span class="why"> 純資安上市標的稀薄，併入 SI 以滿足族群廣度，分類信心較低（已標 T3）。</span></li>
+    </ul>
+  </div>
+
+  <div class="panel dev">
+    <h3>😈 魔鬼代言人 · 刻意「未納入」清單 <span class="en" style="font:600 8px 'DM Mono'">why NOT added</span></h3>
+    <ul>
+      <li><b>量子科技</b> — 台股無乾淨上市純概念龍頭，曝險散落於 2330 / 2303 / 鴻海。<span class="why"> 強行成群 → 無 Leader 領先性差 → 觸發「無別→歸一」失效規則，反而污染矩陣。</span></li>
+      <li><b>矽光子</b> — 成員與 CPO 共封裝光學高度重疊（聯亞 / 光聖 / 上詮）。<span class="why"> 分立會稀釋兩群的群內同步性（synchrony），降低分類有效性。</span></li>
+      <li><b>HDD / SSD 儲存</b> — 群聯 8299、威剛 3260 已歸記憶體。<span class="why"> 另立會造成雙重歸屬，污染廣度（breadth）計數；維持於記憶體族群。</span></li>
+      <li><b>無人機</b> — 雷虎 8033 已在軍工航太，其餘多為興櫃。<span class="why"> 上市純標的稀薄，不足以構成 L/P/G 三層，暫留軍工航太子群。</span></li>
+      <li><b>智慧眼鏡 / AR / AI PC</b> — 純概念標的多為現有族群（光學 / PCB / ODM）子集。<span class="why"> 併入既有族群，避免重複計數與題材稀釋。</span></li>
+    </ul>
+  </div>
+
+  <div class="panel err">
+    <h3>⚠ v1.0 資料勘誤（falsification-first） <span class="en" style="font:600 8px 'DM Mono'">errata · do not silently overwrite</span></h3>
+    <ul>
+      <li><b>電源管理 · 代碼 2301</b> — v1.0 標為「台達電(光寶)」，但 2301 實為 <b style="color:var(--ink2)">光寶科 LITE-ON</b>，非台達電。建議更名為「光寶科」，台達電應僅以 2308 出現。</li>
+      <li><b>台達電 2308 多群歸屬</b> — 同時出現於 機器人(P) 與 電源管理(L)。多主題歸屬合理，但計算族群廣度時須<b style="color:var(--ink2)">去重</b>，否則 breadth 重複計數。</li>
+      <li><b>族群顏色表</b> — v1.0 rotation 分頁的 groupHex 含「航運」鍵，但矩陣使用「貨櫃航運 / 散裝航運」兩鍵，rotation 對映會 fallback 灰色。建議統一鍵名。</li>
+    </ul>
+  </div>
+
+  <h2>代碼對照表 <span class="en">code mapping · yfinance / bloomberg</span></h2>
+  <div style="overflow-x:auto;border:1px solid var(--line);border-radius:6px;margin-top:12px;">
+    <table id="codetab"><thead><tr>
+      <th>族群</th><th>名稱</th><th>TW</th><th>市場</th><th>yfinance</th><th>Bloomberg</th><th>角色</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+
+</div>
+
+<script>
+// ====== 完善化資料集 (append-only over v1.0) ======
+// [name, tw, mkt(上市/上櫃), group, cls(L/P/G), hot, lead, chg, isNew]
+// hot/lead/chg: v1.0 合成佔位 (T4); 新增檔以 null 表示 "待 VDF 回填"。
+const G='上市', T='上櫃';
+const D = [
+  // ---------- v1.0 既有 (保留) ----------
+  ['台積電','2330',G,'半導體','L',0.92,0.88,1.34],
+  ['聯發科','2454',G,'半導體','P',0.61,0.54,0.82],
+  ['聯電','2303',G,'半導體','P',0.48,0.41,-0.45],
+  ['世界先進','5347',T,'半導體','G',0.22,0.18,-1.12],
+  ['力積電','6770',G,'半導體','G',0.18,0.12,-1.55],
+  ['日月光投控','3711',G,'半導體','L',0.70,0.64,0.96],
+  ['環球晶','6488',T,'半導體','P',0.58,0.52,0.60],
+  ['鴻海','2317',G,'AI 伺服器','L',0.85,0.79,2.10],
+  ['廣達','2382',G,'AI 伺服器','P',0.64,0.58,1.42],
+  ['緯創','3231',G,'AI 伺服器','P',0.52,0.49,0.95],
+  ['緯穎','6669',G,'AI 伺服器','L',0.78,0.71,1.88],
+  ['技嘉','2376',G,'AI 伺服器','G',0.31,0.24,-0.62],
+  ['英業達','2356',G,'AI 伺服器','P',0.50,0.45,0.52],
+  ['勤誠','8210',G,'AI 伺服器','P',0.47,0.42,0.44],
+  ['長榮','2603',G,'貨櫃航運','L',0.71,0.66,1.24],
+  ['陽明','2609',G,'貨櫃航運','P',0.55,0.47,0.88],
+  ['萬海','2615',G,'貨櫃航運','G',0.28,0.21,-0.74],
+  ['富邦金','2881',G,'金融','L',0.58,0.62,0.42],
+  ['國泰金','2882',G,'金融','P',0.44,0.48,0.31],
+  ['兆豐金','2886',G,'金融','P',0.39,0.42,0.18],
+  ['玉山金','2884',G,'金融','G',0.24,0.27,-0.22],
+  ['國巨','2327',G,'被動元件','L',0.69,0.63,1.05],
+  ['華新科','2492',G,'被動元件','P',0.47,0.44,0.36],
+  ['禾伸堂','3026',T,'被動元件','G',0.26,0.19,-0.58],
+  ['信昌電','6173',T,'被動元件','P',0.40,0.36,0.22],
+  ['大立光','3008',G,'光學','L',0.66,0.71,0.92],
+  ['玉晶光','3406',G,'光學','P',0.43,0.46,0.24],
+  ['亞光','3019',G,'光學','G',0.21,0.17,-0.81],
+  ['先進光','3362',G,'光學','P',0.38,0.34,0.18],
+  ['上銀','2049',G,'機器人','L',0.74,0.68,1.62],
+  ['台達電','2308',G,'機器人','P',0.59,0.55,0.78],
+  ['所羅門','2359',G,'機器人','P',0.51,0.48,0.66],
+  ['直得','1597',T,'機器人','G',0.29,0.22,-0.44],
+  ['亞德客-KY','1590',G,'機器人','L',0.67,0.61,0.84],
+  ['盟立','2464',G,'機器人','P',0.46,0.41,0.36],
+  ['雙鴻','3324',G,'散熱','L',0.81,0.74,1.78],
+  ['奇鋐','3017',G,'散熱','L',0.79,0.71,1.66],
+  ['建準','2421',G,'散熱','P',0.54,0.49,0.62],
+  ['泰碩','3338',T,'散熱','G',0.27,0.20,-0.55],
+  ['元山','6275',T,'散熱','P',0.45,0.40,0.34],
+  ['力致','3483',G,'散熱','P',0.50,0.45,0.48],
+  ['動力-KY','6591',G,'散熱','P',0.48,0.43,0.42],
+  ['廣運','6125',G,'散熱','G',0.28,0.22,-0.38],
+  ['新盛力','4931',G,'BBU 備援電池','L',0.70,0.64,1.32],
+  ['AES-KY','6781',G,'BBU 備援電池','P',0.56,0.50,0.74],
+  ['加百裕','3323',G,'BBU 備援電池','P',0.48,0.43,0.41],
+  ['順達','3211',G,'BBU 備援電池','G',0.25,0.19,-0.62],
+  ['聯亞','3081',T,'CPO 共封裝光學','L',0.76,0.70,1.54],
+  ['光聖','6442',T,'CPO 共封裝光學','P',0.52,0.47,0.58],
+  ['上詮','3363',G,'CPO 共封裝光學','P',0.46,0.41,0.33],
+  ['華星光','4979',T,'CPO 共封裝光學','G',0.24,0.18,-0.68],
+  ['波若威','3163',T,'CPO 共封裝光學','P',0.44,0.39,0.31],
+  ['眾達-KY','4977',T,'CPO 共封裝光學','P',0.42,0.37,0.28],
+  ['昇達科','3491',T,'低軌衛星','L',0.72,0.66,1.41],
+  ['台揚','2314',G,'低軌衛星','P',0.50,0.45,0.47],
+  ['啟碁','6285',G,'低軌衛星','P',0.47,0.42,0.39],
+  ['同欣電','6271',G,'低軌衛星','G',0.23,0.17,-0.71],
+  ['慧洋-KY','2637',G,'散裝航運','L',0.64,0.59,0.96],
+  ['裕民','2606',G,'散裝航運','P',0.49,0.44,0.42],
+  ['新興','2605',G,'散裝航運','P',0.43,0.38,0.28],
+  ['四維航','5608',G,'散裝航運','G',0.22,0.16,-0.66],
+  ['中航','2612',G,'散裝航運','P',0.46,0.41,0.38],
+  ['台航','2617',G,'散裝航運','P',0.42,0.37,0.26],
+  ['正德','2641',G,'散裝航運','G',0.24,0.18,-0.50],
+  ['長榮航','2618',G,'航空','L',0.63,0.58,0.88],
+  ['華航','2610',G,'航空','P',0.51,0.46,0.44],
+  ['星宇','2646',G,'航空','G',0.30,0.24,-0.38],
+  ['中鋼','2002',G,'鋼鐵','L',0.55,0.60,0.34],
+  ['中鴻','2014',G,'鋼鐵','P',0.42,0.45,0.20],
+  ['燁輝','2023',G,'鋼鐵','P',0.38,0.41,0.14],
+  ['官田鋼','2017',G,'鋼鐵','G',0.23,0.26,-0.31],
+  ['燁聯','9957',G,'鋼鐵','P',0.36,0.39,0.16],
+  ['盛餘','2029',G,'鋼鐵','G',0.25,0.28,-0.24],
+  ['豐興','2015',G,'條鋼','L',0.58,0.62,0.46],
+  ['東和鋼鐵','2006',G,'條鋼','P',0.44,0.47,0.26],
+  ['威致','2028',G,'條鋼','P',0.36,0.39,0.12],
+  ['春雨','2012',G,'條鋼','G',0.24,0.27,-0.28],
+  ['華城','1519',G,'重電','L',0.83,0.76,1.92],
+  ['士電','1503',G,'重電','P',0.57,0.52,0.71],
+  ['中興電','1513',G,'重電','P',0.50,0.46,0.48],
+  ['亞力','1514',G,'重電','G',0.26,0.20,-0.50],
+  ['東元','1504',G,'重電','P',0.55,0.50,0.60],
+  ['大同','2371',G,'重電','P',0.48,0.43,0.42],
+  ['漢翔','2634',G,'軍工航太','L',0.68,0.62,1.18],
+  ['雷虎','8033',G,'軍工航太','P',0.49,0.44,0.40],
+  ['寶一','8222',G,'軍工航太','P',0.44,0.39,0.30],
+  ['千附','8383',G,'軍工航太','G',0.24,0.18,-0.52],
+  ['欣興','3037',G,'ABF 載板','L',0.75,0.69,1.46],
+  ['南電','8046',G,'ABF 載板','P',0.56,0.51,0.60],
+  ['景碩','3189',G,'ABF 載板','P',0.48,0.43,0.36],
+  ['大量','3167',T,'ABF 載板','G',0.25,0.19,-0.58],
+  ['南亞科','2408',G,'記憶體','L',0.69,0.63,1.22],
+  ['華邦電','2344',G,'記憶體','P',0.55,0.50,0.56],
+  ['旺宏','2337',G,'記憶體','P',0.49,0.44,0.38],
+  ['群聯','8299',T,'記憶體','G',0.31,0.25,-0.34],
+  ['威剛','3260',G,'記憶體','P',0.45,0.40,0.30],
+  ['台光電','2383',G,'PCB','L',0.74,0.68,1.28],
+  ['臻鼎-KY','4958',G,'PCB','L',0.66,0.60,0.84],
+  ['健鼎','3044',G,'PCB','P',0.52,0.47,0.50],
+  ['金像電','2368',G,'PCB','P',0.55,0.50,0.72],
+  ['燿華','2367',G,'PCB','G',0.27,0.21,-0.40],
+  ['帆宣','6196',G,'台積電擴廠','L',0.72,0.66,1.16],
+  ['漢唐','2404',G,'台積電擴廠','L',0.70,0.64,1.04],
+  ['亞翔','6139',G,'台積電擴廠','P',0.54,0.49,0.58],
+  ['信紘科','6667',T,'台積電擴廠','P',0.50,0.45,0.46],
+  ['京鼎','3413',T,'台積電擴廠','P',0.52,0.47,0.54],
+  ['弘塑','3131',T,'台積電擴廠','G',0.30,0.24,-0.30],
+  ['保瑞','6472',T,'生技醫療','L',0.72,0.66,1.34],
+  ['藥華藥','6446',G,'生技醫療','L',0.68,0.62,1.12],
+  ['美時','1795',G,'生技醫療','P',0.52,0.47,0.50],
+  ['智擎','4162',T,'生技醫療','G',0.26,0.20,-0.52],
+  ['聯亞藥','6562',T,'生技醫療','G',0.22,0.16,-0.66],
+  ['聯詠','3034',G,'IC設計','L',0.74,0.68,1.18],
+  ['瑞昱','2379',G,'IC設計','P',0.58,0.53,0.62],
+  ['矽力-KY','6415',G,'IC設計','P',0.50,0.45,0.44],
+  ['敦泰','3545',G,'IC設計','G',0.27,0.21,-0.50],
+  ['台達電','2308',G,'電源管理','L',0.73,0.67,1.06],
+  ['光寶科','2301',G,'電源管理','P',0.55,0.50,0.58],  // v1.0 誤標「台達電(光寶)」→ 正名光寶科
+  ['全漢','3015',G,'電源管理','P',0.47,0.42,0.40],
+  ['僑威','5263',T,'電源管理','G',0.25,0.19,-0.48],
+
+  // ---------- v1.1 新增 7 群 (hot/lead/chg = null → 待 VDF) ----------
+  ['世芯-KY','3661',G,'ASIC 設計服務','L',null,null,null,1],
+  ['創意','3443',G,'ASIC 設計服務','L',null,null,null,1],
+  ['智原','3035',G,'ASIC 設計服務','P',null,null,null,1],
+  ['揚智','2569',G,'ASIC 設計服務','G',null,null,null,1],
+  ['力旺','3529',T,'矽智財 IP','L',null,null,null,1],
+  ['晶心科','6533',T,'矽智財 IP','P',null,null,null,1],
+  ['M31','6643',T,'矽智財 IP','P',null,null,null,1],
+  ['智邦','2345',G,'網通設備','L',null,null,null,1],
+  ['智易','3596',G,'網通設備','P',null,null,null,1],
+  ['中磊','5388',G,'網通設備','P',null,null,null,1],
+  ['明泰','3380',G,'網通設備','G',null,null,null,1],
+  ['貿聯-KY','3665',G,'電動車','L',null,null,null,1],
+  ['和大','1536',G,'電動車','P',null,null,null,1],
+  ['為升','2231',G,'電動車','P',null,null,null,1],
+  ['朋程','8255',T,'電動車','G',null,null,null,1],
+  ['雄獅','2731',G,'觀光餐飲','L',null,null,null,1],
+  ['王品','2727',G,'觀光餐飲','L',null,null,null,1],
+  ['瓦城','2729',G,'觀光餐飲','P',null,null,null,1],
+  ['晶華','2707',G,'觀光餐飲','P',null,null,null,1],
+  ['鳳凰','5706',G,'觀光餐飲','G',null,null,null,1],
+  ['致茂','2360',G,'半導體設備','L',null,null,null,1],
+  ['家登','3680',T,'半導體設備','L',null,null,null,1],
+  ['辛耘','3583',G,'半導體設備','P',null,null,null,1],
+  ['萬潤','6187',T,'半導體設備','P',null,null,null,1],
+  ['志聖','2467',G,'半導體設備','G',null,null,null,1],
+  ['安碁資訊','6690',T,'資安/系統整合','L',null,null,null,1],
+  ['敦陽科','2480',G,'資安/系統整合','P',null,null,null,1],
+  ['精誠','6214',T,'資安/系統整合','P',null,null,null,1],
+  ['零壹','3029',G,'資安/系統整合','G',null,null,null,1],
+];
+
+const CM = { L:{label:'LEADER',css:'var(--co)'}, P:{label:'PEER',css:'var(--blue)'}, G:{label:'LAGGARD',css:'var(--mut2)'} };
+const PALETTE=['var(--co)','var(--blue)','var(--teal)','var(--vi)','var(--am)','var(--ro)','var(--gn)'];
+const EN={'半導體':'semiconductor','AI 伺服器':'ai server','貨櫃航運':'container ship','金融':'financials','被動元件':'passive comp','光學':'optics','機器人':'robotics','散熱':'cooling','BBU 備援電池':'bbu','CPO 共封裝光學':'cpo','低軌衛星':'leo sat','散裝航運':'dry bulk','航空':'airlines','鋼鐵':'steel','條鋼':'bar steel','重電':'heavy electric','軍工航太':'defense','ABF 載板':'abf substrate','記憶體':'memory','PCB':'pcb','台積電擴廠':'tsmc capex','生技醫療':'biotech','IC設計':'ic design','電源管理':'power mgmt','ASIC 設計服務':'asic design','矽智財 IP':'silicon ip','網通設備':'networking','電動車':'ev / auto','觀光餐飲':'tourism / dining','半導體設備':'semi equipment','資安/系統整合':'cyber / si'};
+
+// build order + colors
+const order=[]; D.forEach(d=>{ if(order.indexOf(d[3])<0) order.push(d[3]); });
+const COLOR={}; order.forEach((g,i)=>COLOR[g]=PALETTE[i%PALETTE.length]);
+const NEWGROUPS=new Set(['ASIC 設計服務','矽智財 IP','網通設備','電動車','觀光餐飲','半導體設備','資安/系統整合']);
+const rank={L:0,P:1,G:2};
+
+// score cards
+const nGroup=order.length, nLead=D.filter(d=>d[4]==='L').length, nNew=D.filter(d=>d[8]).length;
+const sc=document.getElementById('scards');
+[['族群數',nGroup,'groups (+7)','var(--teal)'],['個股數',D.length,'tickers','var(--ink)'],['Leader 數',nLead,'leaders','var(--co)'],['新增檔',nNew,'new in v1.1','var(--blue)'],['上市/上櫃',D.filter(d=>d[2]===G).length+' / '+D.filter(d=>d[2]===T).length,'TW / TWO','var(--vi)']]
+.forEach(([l,v,s,c])=>{ sc.insertAdjacentHTML('beforeend',`<div class="sc"><div class="v" style="color:${c}">${v}</div><div class="l">${l} · ${s}</div></div>`); });
+
+// matrix cards
+const grid=document.getElementById('grid');
+order.forEach(g=>{
+  const mem=D.filter(d=>d[3]===g).slice().sort((a,b)=>rank[a[4]]-rank[b[4]] || (b[5]||0)-(a[5]||0));
+  const col=COLOR[g], isNew=NEWGROUPS.has(g);
+  let rows='';
+  mem.forEach(d=>{
+    const chg = d[5]==null ? `<span class="chg" style="color:var(--mut2)">—</span>`
+      : `<span class="chg" style="color:${d[7]>=0?'var(--up)':'var(--down)'}">${d[7]>0?'+':''}${d[7].toFixed(2)}%</span>`;
+    rows+=`<div class="row"><span class="cls" style="background:${CM[d[4]].css}">${CM[d[4]].label}</span>`
+      +`<span class="nm">${d[0]}${d[8]?' <span class="new">NEW</span>':''}</span>`
+      +`<span class="tk">${d[1]}</span><span class="mkt">${d[2]==G?'TW':'TWO'}</span>${chg}</div>`;
+  });
+  grid.insertAdjacentHTML('beforeend',
+    `<div class="card"><div style="display:flex"><div class="swatch" style="background:${col}"></div><div style="flex:1">`
+    +`<div class="hd"><div><div class="gn">${g}${isNew?' <span class="new">NEW</span>':''}</div><div class="ge">${EN[g]||''}</div></div>`
+    +`<span class="cnt" style="background:${col}">${mem.length}</span></div>${rows}</div></div></div>`);
+});
+
+// code table
+const tb=document.querySelector('#codetab tbody');
+D.slice().sort((a,b)=> a[3]<b[3]?-1:a[3]>b[3]?1: rank[a[4]]-rank[b[4]])
+.forEach(d=>{
+  const yf=d[1]+(d[2]==G?'.TW':'.TWO'), bb=d[1]+' TT';
+  tb.insertAdjacentHTML('beforeend',
+    `<tr><td style="color:${COLOR[d[3]]};font-weight:700">${d[3]}</td>`
+    +`<td style="font-family:'Noto Sans TC';color:var(--ink2)">${d[0]}${d[8]?' <span class="new">NEW</span>':''}</td>`
+    +`<td>${d[1]}</td><td>${d[2]}</td><td>${yf}</td><td>${bb}</td>`
+    +`<td><span class="cls" style="background:${CM[d[4]].css};display:inline-block">${CM[d[4]].label}</span></td></tr>`);
+});
+</script>
+</body>
+</html>

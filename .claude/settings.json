@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'R=\"${CLAUDE_PROJECT_DIR:-$(pwd)}\"; S=\"$R/VeritasIntelligenceAnalytics/supportive modules/registry/via_boot_update.sh\"; [ -f \"$S\" ] && nohup bash \"$S\" >/dev/null 2>&1 & disown' || true",
+            "async": true,
+            "timeout": 20,
+            "statusMessage": "VIA 開機更新檢查(批150:開啟系統即更新;每日首開實跑,當日已更即跳過)"
+          }
+        ]
+      }
+    ]
+  }
+}

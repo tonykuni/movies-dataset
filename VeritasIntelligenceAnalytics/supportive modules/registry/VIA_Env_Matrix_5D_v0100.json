@@ -1,0 +1,106 @@
+{
+  "module_id": "VIS-ENV-MATRIX-5D-000001",
+  "version": "0100",
+  "owner": "VIA_ENV_MANAGER",
+  "updated_at_utc": "2026-08-23T23:30:00+00:00",
+  "doc": "docs/via-env-matrix-5d.md",
+  "principles": {
+    "append_only": true,
+    "respect_existing_healthy_envs": true,
+    "existing_untouched": ["via_core"],
+    "gatekeeper": "base 擋 M 以上;via_core 僅白名單;新工具先過 EnvManager plan-install",
+    "blacklist_rule": "D1=H 或 D4=R3 永久禁入 via_core/base",
+    "quarantine_env": "via_iso_quarantine"
+  },
+  "five_d_model": {
+    "D1_risk": ["L", "M", "MH", "H"],
+    "D2_ecosystem": ["PY", "C", "RS", "CU", "JVM", "NODE", "BIN", "SYSC"],
+    "D3_pyband": ["312", "311", "310down", "ANY"],
+    "D4_rot": ["R1_stable", "R2_quarterly", "R3_weekly"],
+    "D5_affinity": ["CORE", "MIX", "ISO", "POLY", "MULTI"]
+  },
+  "multi_version_axes": {
+    "numpy": ["1.26.x @ via_mix_ds_np1_M", "2.x @ via_mix_ds_np2_M"],
+    "pydantic": ["v1 @ via_mix_web_v1_M", "v2 @ via_mix_api_v2_M"],
+    "sqlalchemy": ["1.4 @ via_iso_legacy_H", "2.0 @ via_mix_api_v2_M"],
+    "django": ["3.x-4.x @ via_mix_web_v1_M / via_iso_legacy_H", "5.x @ via_mix_api_v2_M"],
+    "protobuf": ["3.x @ via_iso_legacy_H", "4.x-5.x @ via_iso_net_H"],
+    "python": ["3.9 legacy", "3.10 舊資料帶", "3.11 二進位主力帶", "3.12 現代帶"]
+  },
+  "lib_index": {
+    "0": "numpy", "1": "torch", "2": "tensorflow", "3": "jax", "4": "onnxruntime",
+    "5": "opencv-python", "6": "pandas", "7": "scikit-learn", "8": "dask", "9": "pyspark",
+    "10": "polars", "11": "grpcio", "12": "aiohttp", "13": "fastapi", "14": "celery",
+    "15": "twisted", "16": "selenium", "17": "playwright", "18": "scrapy", "19": "pyo3-pyjnius",
+    "20": "appium-python-client", "21": "cryptography", "22": "paramiko", "23": "pyyaml", "24": "sqlalchemy",
+    "25": "lxml", "26": "boto3", "27": "langchain", "28": "pillow", "29": "protobuf",
+    "30": "psycopg2", "31": "cython", "32": "numba", "33": "pyopenssl", "34": "gevent",
+    "35": "ujson", "36": "confluent-kafka", "37": "redis", "38": "h5py", "39": "pyarrow",
+    "40": "tables", "41": "django", "42": "authlib-pyjwt", "43": "pydantic-settings", "44": "gunicorn-uvicorn",
+    "45": "flower", "46": "graphviz", "47": "beautifulsoup4", "48": "scrapy-redis", "49": "faker",
+    "50": "docker", "51": "flask", "52": "marshmallow", "53": "httpx", "54": "djangorestframework",
+    "55": "graphene-strawberry", "56": "pytest", "57": "hypothesis", "58": "locust", "59": "robotframework",
+    "60": "behave", "61": "python-docx-pptx", "62": "reportlab", "63": "openpyxl-xlsxwriter", "64": "pymupdf",
+    "65": "pandocfilters", "66": "apscheduler", "67": "rq", "68": "prefect-dagster", "69": "schedule",
+    "70": "tenacity", "71": "colorama-rich", "72": "joblib", "73": "networkx", "74": "fmpy",
+    "75": "watchdog", "76": "inquirer", "77": "arrow", "78": "msgpack", "79": "simplejson",
+    "80": "click", "81": "cerberus", "82": "voluptuous", "83": "schema", "84": "dictor",
+    "85": "glom", "86": "google-cloud", "87": "azure-storage-blob", "88": "firebase-admin", "89": "fabric",
+    "90": "invoke", "91": "psutil", "92": "gputil", "93": "memory-profiler", "94": "py-spy",
+    "95": "logbook", "96": "pyproj", "97": "shapely", "98": "fiona", "99": "tabulate",
+    "100": "humanize"
+  },
+  "network_rosters": {
+    "N-A_accelerators": ["uvloop", "orjson", "msgspec", "python-rapidjson", "pysimdjson", "faust-cchardet", "charset-normalizer", "aiodns", "pycares", "brotli", "brotlicffi", "zstandard", "lz4", "cramjam", "blosc2", "pycurl", "asyncpg", "aiomcache", "hiredis", "ciso8601"],
+    "N-S_scraping": ["pyppeteer", "requests-html", "autoscraper", "parsel", "selectolax", "html5lib", "extruct", "feedparser", "trafilatura", "newspaper3k", "mechanicalsoup", "splinter", "drissionpage", "crawlee", "gazpacho", "scrapling", "selenium", "playwright", "scrapy", "scrapy-redis"],
+    "N-H_http": ["requests", "urllib3", "httpcore", "h11", "h2", "hyperframe", "yarl", "multidict", "frozenlist", "aiosignal", "treq", "grequests", "requests-toolbelt", "requests-cache", "niquests", "websockets", "websocket-client", "httplib2", "aiohttp", "httpx"],
+    "N-F_stealth": ["fake-useragent", "fake-headers", "latest-user-agents", "scrapy-fake-useragent", "requests-random-user-agent", "undetected-chromedriver", "selenium-stealth", "selenium-wire", "playwright-stealth", "nodriver", "botasaurus", "camoufox", "cloudscraper", "cfscrape", "curl-cffi", "tls-client", "hrequests", "primp", "browser-cookie3", "browserforge"],
+    "N-P_proxy": ["pysocks", "socksio", "python-socks", "aiohttp-socks", "httpx-socks", "requests[socks]", "proxy-py", "mitmproxy", "proxybroker2", "scrapy-rotating-proxies", "scrapy-proxies", "rotating-free-proxies", "free-proxy", "proxyscrape", "swiftshadow", "stem", "torpy", "pproxy", "proxy-checker", "requests-ip-rotator"]
+  },
+  "environments": [
+    {"via_name": "via_iso_ml_cuda_H", "cluster": 1, "python": "3.11", "libs": [1, 2, 3, 4], "ecosystem": "CU+C", "risk_level": "H", "strategy": "ISO"},
+    {"via_name": "via_mix_ds_np1_M", "cluster": 1, "python": "3.10", "libs": [0, 6, 7, 8, 38, 40, 72], "ecosystem": "C+Fortran", "risk_level": "MH", "strategy": "MIX", "note": "numpy==1.26.*"},
+    {"via_name": "via_mix_ds_np2_M", "cluster": 1, "python": "3.12", "libs": [0, 6, 7, 10, 39], "ecosystem": "C+RS", "risk_level": "MH", "strategy": "MIX", "note": "numpy>=2"},
+    {"via_name": "via_iso_spark_H", "cluster": 1, "python": "3.11", "libs": [9, 36], "ecosystem": "JVM+C", "risk_level": "H", "strategy": "ISO"},
+    {"via_name": "via_iso_viz_M", "cluster": 1, "python": "3.11", "libs": [5, 28, 62], "extra_libs": ["matplotlib"], "ecosystem": "C+SYSC", "risk_level": "M", "strategy": "ISO"},
+    {"via_name": "via_mix_api_v2_M", "cluster": 2, "python": "3.12", "libs": [13, 43, 44, 55], "ecosystem": "PY+Asyncio", "risk_level": "M", "strategy": "MIX", "note": "pydantic v2 軸"},
+    {"via_name": "via_mix_web_v1_M", "cluster": 2, "python": "3.10", "libs": [41, 51, 52, 54, 81, 82, 83], "ecosystem": "PY+WSGI", "risk_level": "M", "strategy": "MIX", "note": "pydantic v1 軸"},
+    {"via_name": "via_iso_cloud_H", "cluster": 2, "python": "3.11", "libs": [26, 42, 86, 87, 88], "ecosystem": "PY+Auth", "risk_level": "H", "strategy": "ISO"},
+    {"via_name": "via_iso_net_H", "cluster": 2, "python": "3.11", "libs": [11, 29, 30, 37], "ecosystem": "C", "risk_level": "H", "strategy": "ISO", "note": "protobuf 4/5 軸"},
+    {"via_name": "via_poly_node_M", "cluster": 2, "python": "3.12", "libs": [20], "extra_libs": ["nodeenv", "pyppeteer"], "ecosystem": "NODE+BIN", "risk_level": "M", "strategy": "POLY"},
+    {"via_name": "via_poly_rust_H", "cluster": 3, "python": "3.11", "libs": [19, 21, 33, 94], "ecosystem": "RS+SYSC", "risk_level": "H", "strategy": "POLY"},
+    {"via_name": "via_iso_compilers_H", "cluster": 3, "python": "3.11", "libs": [31, 32], "extra_libs": ["ccache"], "ecosystem": "C+LLVM", "risk_level": "H", "strategy": "ISO"},
+    {"via_name": "via_iso_gis_H", "cluster": 3, "python": "3.10", "libs": [96, 97, 98], "ecosystem": "SYSC", "risk_level": "H", "strategy": "POLY", "note": "micromamba + GDAL/GEOS/PROJ"},
+    {"via_name": "via_iso_ops_M", "cluster": 3, "python": "3.12", "libs": [22, 50, 75, 89, 90, 91, 92, 93], "ecosystem": "C+OS", "risk_level": "MH", "strategy": "ISO"},
+    {"via_name": "via_iso_test_M", "cluster": 3, "python": "3.12", "libs": [49, 56, 57, 58, 59, 60], "ecosystem": "PY+BIN", "risk_level": "M", "strategy": "ISO"},
+    {"via_name": "via_mix_task_M", "cluster": 4, "python": "3.11", "libs": [14, 34, 45, 66, 67, 68, 69, 70], "ecosystem": "PY+MQ", "risk_level": "MH", "strategy": "MIX"},
+    {"via_name": "via_mix_etl_M", "cluster": 4, "python": "3.12", "libs": [23, 25, 46, 47, 61, 63, 64, 65], "ecosystem": "C+SYSC", "risk_level": "M", "strategy": "MIX"},
+    {"via_name": "via_iso_llm_H", "cluster": 4, "python": "3.11", "libs": [27, 84, 85], "ecosystem": "PY", "risk_level": "H", "strategy": "ISO", "note": "R3 極快更新,可整艙重建"},
+    {"via_name": "via_iso_legacy_H", "cluster": 4, "python": "3.9", "libs": [15, 24, 41], "ecosystem": "PY", "risk_level": "H", "strategy": "ISO", "note": "sqlalchemy 1.4 / django 3.x / numpy 1.x 舊件"},
+    {"via_name": "via_audit_L", "cluster": 4, "python": "3.12", "libs": [35, 78, 79], "extra_libs": ["uv", "pipdeptree", "deptry", "pipgrip", "johnnydep", "pip-tools", "pip-check-reqs", "micromamba", "poetry"], "ecosystem": "PY", "risk_level": "L", "strategy": "ISO", "note": "品管/安全沙盒,跑 Top 8 檢測"},
+    {"via_name": "via_iso_accel_H", "cluster": 5, "python": "3.12", "roster": "N-A_accelerators", "ecosystem": "C+RS", "risk_level": "H", "strategy": "ISO", "note": "會替換事件迴圈/編解碼器"},
+    {"via_name": "via_iso_scrape_H", "cluster": 5, "python": "3.11", "libs": [16, 17, 18, 48], "roster": "N-S_scraping", "ecosystem": "BIN", "risk_level": "H", "strategy": "ISO"},
+    {"via_name": "via_mix_http_M", "cluster": 5, "python": "3.12", "libs": [12, 53], "roster": "N-H_http", "ecosystem": "PY+TLS", "risk_level": "M", "strategy": "MIX", "note": "yarl/multidict 三位一體同艙"},
+    {"via_name": "via_iso_stealth_H", "cluster": 5, "python": "3.11", "roster": "N-F_stealth", "ecosystem": "BIN+TLS", "risk_level": "H", "strategy": "ISO", "note": "R3 腐爛率最高,鎖版"},
+    {"via_name": "via_iso_proxy_H", "cluster": 5, "python": "3.11", "roster": "N-P_proxy", "ecosystem": "PY+OS", "risk_level": "H", "strategy": "ISO"}
+  ],
+  "base_env_policy": {
+    "via_core": {
+      "status": "existing-untouched",
+      "python": "3.12",
+      "whitelist_candidates": [71, 76, 77, 80, 91, 99, 100],
+      "rule": "候選僅表可申請;實際進入須經 VIA_EnvManager plan-install 審批"
+    },
+    "via_iso_quarantine": {
+      "status": "new-standing-empty",
+      "python": "3.12",
+      "rule": "未分類新工具先進此黑環境,envcheck full + mamba dry-run 通過後依本表歸艙"
+    }
+  },
+  "mirror_chain": {
+    "order": ["https://pypi.tuna.tsinghua.edu.cn/simple", "https://mirrors.aliyun.com/pypi/simple/", "https://pypi.org/simple"],
+    "fallback": "官方 PyPI(default = true 兜底)",
+    "config": "uv.toml(repo 根)+ scripts/envcheck.{sh,ps1} 自動探測"
+  },
+  "assignments": []
+}

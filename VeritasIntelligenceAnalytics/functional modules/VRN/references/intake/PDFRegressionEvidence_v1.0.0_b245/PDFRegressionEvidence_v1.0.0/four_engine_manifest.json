@@ -1,0 +1,162 @@
+{
+  "schema": "VRN-FOUR-ENGINE/1.0",
+  "suite": "VRNFourEngineSuite",
+  "suite_version": "1.0.0",
+  "run_id": "VRN4-FFB97CB17E29FAB5",
+  "started_utc": "2026-08-29T10:15:03Z",
+  "finished_utc": "2026-08-29T10:15:04Z",
+  "input_file": "/workspace/scratch/4596cd1a0b4d/four_engine_work/regression_input/synthetic_financial_report.pdf",
+  "input_sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+  "input_type": "pdf_or_image",
+  "status": "PASS",
+  "stages": [
+    {
+      "stage_id": "STAGE-0DE0653065F15E13",
+      "name": "repair",
+      "engine": "VRNTextRepairEngine",
+      "version": "1.0.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:15:04Z",
+      "finished_utc": "2026-08-29T10:15:04Z",
+      "duration_ms": 5,
+      "input_sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+      "output_sha256": "96514c8729540270e2c13df9160e2a0449a54fb3a2c7f727e2c49e1258d24bf9",
+      "counts": {
+        "pages": 2,
+        "changes": 0,
+        "financial_data": 0,
+        "summary_sentences": 2
+      },
+      "quality": {
+        "numeric_preservation_failures": 0
+      },
+      "artifacts": {
+        "repair_manifest": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/01_repair/pdf_repair_manifest.json",
+        "repaired_text": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/repaired_text.txt"
+      },
+      "warnings": [],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-D2F1C52B6B380AC0",
+      "name": "layout",
+      "engine": "GenericLayoutEngine",
+      "version": "2.1.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:15:04Z",
+      "finished_utc": "2026-08-29T10:15:04Z",
+      "duration_ms": 490,
+      "input_sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+      "output_sha256": null,
+      "counts": {
+        "pages": 2,
+        "elements": 32
+      },
+      "quality": {
+        "page_count": 2,
+        "element_count": 32,
+        "type_counts": {
+          "FIGURE": 3,
+          "META": 4,
+          "NOISE": 2,
+          "TABLE": 15,
+          "TEXT": 8
+        },
+        "subtype_counts": {
+          "FIGURE.CAPTION": 1,
+          "FIGURE.CONTENT": 1,
+          "FIGURE.SOURCE": 1,
+          "META.PAGE_NUMBER": 2,
+          "META.RUNNING_HEADER": 2,
+          "NOISE.END_DISCLAIMER": 2,
+          "TABLE.CAPTION": 1,
+          "TABLE.CONTENT": 1,
+          "TABLE.DATA": 6,
+          "TABLE.HEADER": 4,
+          "TABLE.SOURCE": 1,
+          "TABLE.STUB": 2,
+          "TEXT.BODY": 4,
+          "TEXT.H1": 1,
+          "TEXT.H2": 2,
+          "TEXT.H3": 1
+        },
+        "ocr_page_count": 0,
+        "warning_count": 0
+      },
+      "artifacts": {
+        "json": "layout_document.json",
+        "jsonl": "layout_elements.jsonl",
+        "csv": "layout_elements.csv",
+        "sqlite": "layout.sqlite",
+        "parquet": "layout_elements.parquet",
+        "html": "layout_report.html",
+        "document_id": "GLE-AA6B5D11",
+        "created_utc": "2026-08-29T10:15:04Z",
+        "manifest": "manifest.json"
+      },
+      "warnings": [],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-28C4E9B1E741E094",
+      "name": "text",
+      "engine": "VRNPDFTextFetcher",
+      "version": "1.0.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:15:03Z",
+      "finished_utc": "2026-08-29T10:15:04Z",
+      "duration_ms": 128,
+      "input_sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+      "output_sha256": "12b7b559fb57d48f8c2d6bf0141311a04a4caceb16918a086aa31a2a54f9a179",
+      "counts": {
+        "pages": 2,
+        "characters": 684
+      },
+      "quality": {
+        "source_adapter": "pdfplumber",
+        "scanned_or_image": false
+      },
+      "artifacts": {
+        "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/text_fetch_manifest.json",
+        "pages_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/pages.jsonl",
+        "raw_text": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/raw_text.txt",
+        "repaired_text": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/repaired_text.txt",
+        "backend_run": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/03_text/backend/multi_engine_run.json"
+      },
+      "warnings": [],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-6674047C9EA74FE4",
+      "name": "table",
+      "engine": "VRNPDFTableFetcher",
+      "version": "1.0.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:15:04Z",
+      "finished_utc": "2026-08-29T10:15:04Z",
+      "duration_ms": 76,
+      "input_sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+      "output_sha256": "0556a1f3b7de0e6ea35918d3a1a5adb31ac900ffadbf2656c0e0ae77af72cdcf",
+      "counts": {
+        "tables": 1,
+        "cells": 12
+      },
+      "quality": {},
+      "artifacts": {
+        "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/table_fetch_manifest.json",
+        "tables_csv_dir": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/tables_csv",
+        "cells_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/table_cells.jsonl",
+        "audit_csv": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/table_audit.csv",
+        "backend_run": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/backend/multi_engine_run.json",
+        "sqlite": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/04_table/tables.sqlite3"
+      },
+      "warnings": [],
+      "error": null
+    }
+  ],
+  "artifacts": {
+    "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/four_engine_manifest.json",
+    "execution_summary": "/workspace/scratch/4596cd1a0b4d/four_engine_work/pdf_four_engine_regression_release/EXECUTION_SUMMARY.md"
+  },
+  "warnings": []
+}

@@ -37,6 +37,16 @@ param(
     [switch]$NoOpenHtml,
     [switch]$ForceLocalCopy
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 # param 必須在最頂端，以下才開始一般指令 ─────────────────
 [System.Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
@@ -1108,3 +1118,4 @@ Write-Stage 'DONE' ('Synonyms:       {0} → {1}' -f $script:STAT.synonym_before
 Write-Stage 'DONE' ('Tests:          {0}/{1} passed' -f $script:STAT.tests_pass, $script:TESTS.Count) Cyan
 Write-Stage 'DONE' ('HTML Report:    {0}' -f $reportFile) Cyan
 Write-Stage 'DONE' ('Total elapsed:  {0:N2}s' -f $script:SW.Elapsed.TotalSeconds) Yellow
+

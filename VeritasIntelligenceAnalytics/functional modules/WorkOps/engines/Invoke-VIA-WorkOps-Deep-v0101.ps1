@@ -19,6 +19,16 @@ param(
     [int]$BodyChars = 1200,
     [switch]$NoOpen
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Here   = $PSScriptRoot                       # engines/
 $WorkOps = Split-Path $Here -Parent
@@ -38,19 +48,19 @@ $scan = Join-Path $Here "Invoke-VIA-Outlook-TimeRange-ReadOnly.ps1"
         -OutputRoot (Join-Path $Deep "scanrange") -IncludeBodySnippet $true -BodySnippetLength $BodyChars
 
 Write-Host "[2/5] 語料橋(schema 統一)..." -ForegroundColor Yellow
-& py (Join-Path $Here "workops_corpus_bridge.py") --inputs (Join-Path $Deep "scanrange") (Join-Path $WorkOps "out") --outdir (Join-Path $Deep "corpus")
+& py (Join-Path $Here "VIA_ENG066_WorkopsCorpusBridge.py") --inputs (Join-Path $Deep "scanrange") (Join-Path $WorkOps "out") --outdir (Join-Path $Deep "corpus")
 
 Write-Host "[3/5] 郵件智能超級引擎..." -ForegroundColor Yellow
-& py (Join-Path $Here "email_super_engine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
+& py (Join-Path $Here "VIA_ENG056_EmailSuperEngine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
 
 Write-Host "[4/5] NLP/DM/PM 分析層..." -ForegroundColor Yellow
 $VPy = Join-Path $Here ".venv_pm\Scripts\python.exe"
 $PyCmd = if (Test-Path -LiteralPath $VPy) { $VPy } else { "py" }
 Push-Location $Deep
-try { & $PyCmd (Join-Path $Here "engine_analytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
+try { & $PyCmd (Join-Path $Here "VIA_ENG057_EngineAnalytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
 
 Write-Host "[5/5] 命名提議(編號不變;核對表 out\naming_review.csv)..." -ForegroundColor Yellow
-& py (Join-Path $Here "workops_namer.py") propose
+& py (Join-Path $Here "VIA_ENG076_WorkopsNamer.py") propose
 
 $report = Join-Path $Deep "engine_out\engine_report.html"
 $aReport = Join-Path $Deep "engine_out\analytics_report.html"
@@ -59,3 +69,4 @@ if (-not $NoOpen) {
     if (Test-Path -LiteralPath $aReport) { Start-Process $aReport | Out-Null }
 }
 Write-Host ("[總結] 深度鏈完成 · 產物:{0}(Outlook 唯讀,原件零觸碰)· 名稱核對:via-workops names" -f $Deep) -ForegroundColor Green
+

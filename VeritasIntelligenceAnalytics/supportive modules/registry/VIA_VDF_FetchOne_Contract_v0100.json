@@ -1,0 +1,132 @@
+{
+ "schema": "VIA.VDFFetchOne.Contract.v1",
+ "batch": 228,
+ "append_only": true,
+ "provenance": "操作員批228 貼入 VDF FETCH ONE 總冊;原件收容於 functional modules/VDF/references/intake/VIA_VDF_FetchOne_Registry_paste_20260828.md",
+ "declared_totals": {
+  "items": 390,
+  "domains": 17,
+  "sources": 187,
+  "fetchers": 10,
+  "engines": 20,
+  "done": 296,
+  "proxy": 75,
+  "todo": 19
+ },
+ "params": {
+  "P1": {
+   "zh": "國際股票清單",
+   "note": "唯一可增減;字典解析;38 檔預置",
+   "suffix_rules": [
+    ".TW",
+    ".TWO",
+    ".HK",
+    ".T",
+    ".KS",
+    ".KQ",
+    ".AS",
+    ".L",
+    ".DE",
+    ".PA"
+   ],
+   "digit4_rule": "純數字 4 碼=台股自動補綴"
+  },
+  "P2": {
+   "zh": "財報預設標的",
+   "default": [
+    "2330.TW",
+    "3324.TWO",
+    "NVDA"
+   ]
+  },
+  "P3": {
+   "zh": "起始日期 START_DATE",
+   "default": "2018-01-01",
+   "note": "暫定可改;改值=重抓全域歷史;台股回補仍受批212 終止令下限 2022-01-01"
+  },
+  "P4": {
+   "zh": "FRED API KEY",
+   "spec": "32 字元小寫英數",
+   "note": "雲端 key 在位(output_hub/mega/.fred_api_key gitignored chmod600 絕不入 git);工作站候操作員自放同路徑"
+  }
+ },
+ "rules": {
+  "adj_priority": "有 adjClose 一律優先;Adj 全序列算報酬/正規化/技術指標;split 同步調整 volume",
+  "missing_freq": "價格缺值取前一交易日;成交量不補;混頻以低頻對齊",
+  "required_fields": [
+   "date",
+   "value"
+  ],
+  "optional_fields": [
+   "series",
+   "unit",
+   "freq",
+   "adjClose",
+   "volume",
+   "source",
+   "asof"
+  ],
+  "status_semantics": {
+   "DONE": "fetcher 實作且例行跑通",
+   "PROXY": "代理源近似須標記",
+   "TODO": "未接線=不可得"
+  },
+  "authority_order": [
+   "官方(政府/交易所/央行)",
+   "授權商業源",
+   "代理(FRED proxy)",
+   "推導模型"
+  ],
+  "declared_vs_verified": "本冊狀態=宣告值;實際可用性候 vdf_api 健康檢查回寫;不得視為已驗證"
+ },
+ "credential_tiers": [
+  {
+   "tier": "免憑證公開端點",
+   "n": 261
+  },
+  {
+   "tier": "FRED API KEY",
+   "n": 78
+  },
+  {
+   "tier": "授權訂閱源",
+   "n": 19
+  },
+  {
+   "tier": "爬取無公開 API",
+   "n": 13
+  },
+  {
+   "tier": "TODO 未接線",
+   "n": 19
+  }
+ ],
+ "domain_counts": {
+  "價格": 48,
+  "商品": 25,
+  "匯率利率": 7,
+  "美國領先": 22,
+  "美國同時": 28,
+  "美國落後": 21,
+  "財政公債": 6,
+  "聯準會": 6,
+  "全球區域": 41,
+  "AI概念股": 17,
+  "擷取矩陣": 25,
+  "資金流品質": 13,
+  "加密貨幣": 10,
+  "情緒部位": 13,
+  "ETF資金流": 80,
+  "共識評價": 6,
+  "財報": 22
+ },
+ "alignment_state": {
+  "note": "VIA 現役 vs 總冊宣告之落差=分波接線候令;本批對齊項:",
+  "aligned_batch228": [
+   "P3=2018-01-01→ENG066 v0101 DEFAULT_START 對齊+全球段 2018-2019 增量補抓",
+   "ADJ 優先=現役 tw_prices_adj/ENG060 已行;global_daily 帶 adj_close",
+   "原件收容+契約落錨(本檔)"
+  ],
+  "pending_waves": "390 項逐碼接線=依總冊碼(PX/CM/FX/US/FI/FD/GL/AI/MX/FQ/CY/SE/EF/CS/FN)分波;每波經 grid 站+誠實三態"
+ }
+}

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "via-contract-interface-engine"
+version = "0.2.0"
+description = "VIA typed modules, Singleton SSOT registry, DAG, DI, governed discovery, UI, and Digital Twin"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.12,<3",
+]
+
+[project.scripts]
+via-contract-engine = "via_interface_engine.cli:def_main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

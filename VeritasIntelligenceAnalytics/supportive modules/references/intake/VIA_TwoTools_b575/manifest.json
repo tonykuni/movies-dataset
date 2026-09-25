@@ -1,0 +1,82 @@
+{
+ "intake_id": "VIA_TwoTools_b575",
+ "ts": "2026-09-17",
+ "batch": 575,
+ "origin": "操作員上傳兩支獨立工具並問「是不是沒按我要求所有PY檔案裝這個加速器 所有VDF檔案沒有裝這網路工具」",
+ "rule": "正本零觸碰 · 只收不掛線 · byte-exact 收容(CRLF 原樣)",
+ "files": {
+  "VeritasCeleritas.py": {
+   "sha256_raw": "20c4878f6a60ed2ba3967522bc1e504928ad316b4fffdd7f997142e88937df16",
+   "bytes_raw": 242770,
+   "sha256_lf": "4ce66aa9f763bd447ed0934364585cc5ff236a0db3a33704bd6ab0947b57c5f8",
+   "bytes_lf": 237062,
+   "line_endings": "CRLF"
+  },
+  "VeritasAegisNexus.py": {
+   "sha256_raw": "e4fd43b3c4407427074c5a85bde1f4804368ae3190488494284204eae5cc55b6",
+   "bytes_raw": 209138,
+   "sha256_lf": "f5f81f04479d63b9fd25c820373c4061200442ae4856805590a9ce5ef5664444",
+   "bytes_lf": 203952,
+   "line_endings": "CRLF"
+  }
+ },
+ "census_lf_normalised": {
+  "VeritasCeleritas.py": {
+   "identical_to_intake": [
+    "supportive modules/50_Protection_Acceleration/VeritasCeleritas.py",
+    "supportive modules/VIA_Standalone_Package_v0102/_supportive_bundle/python/VeritasCeleritas.py",
+    "supportive modules/VeritasCeleritas.py"
+   ],
+   "different": {
+    "ef2398ce9fea": [
+     "functional modules/VDF/references/intake/VIA_Hybrid_TW_Flow_Engine_v1.5.0_b245/FinMind_TW_Flow_Engine/VeritasCeleritas.py",
+     "supportive modules/references/intake/VIA_GrokConsole_AuroraAcorn_b383/attachments/VeritasCeleritas.py",
+     "supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/attachments/VeritasCeleritas__cherrylagoon.py",
+     "supportive modules/references/intake/VIA_TwoTools_b345/VeritasCeleritas.py"
+    ],
+    "e9951cdf3bed": [
+     "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasCeleritas.py"
+    ],
+    "231f82cd79b4": [
+     "new modules engines/VDF_final/supportive_module/VeritasCeleritas.py"
+    ],
+    "efbf0ddbf90d": [
+     "new modules engines/VIA_CentralGovernance_ALL_v0100/complete/VIA_CentralGovernance_AdaptiveDownward_v0100_Delivery/sandbox/VeritasCeleritas.py",
+     "new modules engines/VIA_CentralGovernance_ALL_v0100/source_core/VeritasCeleritas.py"
+    ],
+    "464f6c14bf28": [
+     "supportive modules/accelerator/VeritasCeleritas.py"
+    ]
+   }
+  },
+  "VeritasAegisNexus.py": {
+   "identical_to_intake": [
+    "supportive modules/50_Protection_Acceleration/VeritasAegisNexus.py",
+    "supportive modules/VIA_Standalone_Package_v0102/_supportive_bundle/python/VeritasAegisNexus.py",
+    "supportive modules/VeritasAegisNexus.py",
+    "supportive modules/network/VeritasAegisNexus.py"
+   ],
+   "different": {
+    "25973bfd1e8b": [
+     "functional modules/VDF/references/intake/VIA_Hybrid_TW_Flow_Engine_v1.5.0_b245/FinMind_TW_Flow_Engine/VeritasAegisNexus.py",
+     "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasAegisNexus.py",
+     "supportive modules/references/intake/VIA_GrokConsole_AuroraAcorn_b383/attachments/VeritasAegisNexus.py",
+     "supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/attachments/VeritasAegisNexus__cherrylagoon.py",
+     "supportive modules/references/intake/VIA_TwoTools_b345/VeritasAegisNexus.py"
+    ],
+    "3f9da2ffb437": [
+     "new modules engines/VDF_final/supportive_module/VeritasAegisNexus.py"
+    ],
+    "9a078c4942a5": [
+     "new modules engines/VIA_CentralGovernance_ALL_v0100/complete/VIA_CentralGovernance_AdaptiveDownward_v0100_Delivery/sandbox/VeritasAegisNexus.py",
+     "new modules engines/VIA_CentralGovernance_ALL_v0100/source_core/VeritasAegisNexus.py"
+    ]
+   }
+  }
+ },
+ "verdicts": [
+  "上傳兩件經**行尾正規化(CRLF→LF)**後,與庫內執行期掛載本 byte-exact 相同:VeritasCeleritas.py=supportive modules/VeritasCeleritas.py;VeritasAegisNexus.py=supportive modules/network/VeritasAegisNexus.py。**沒有版本漂移**。",
+  "與批345 凍結原件的唯一差異=批102 注入的 14 行 [VIA:ACCEL-BRIDGE] graceful 塊(與 b345 manifest 記載一致)。",
+  "唯一真差異在 supportive modules/accelerator/VeritasCeleritas.py:那一份把 talib 整條路徑換成 QuantGuard(L50 合規),但 SUP_MDL737 的 CEL_CANDIDATES 把它排第三,執行期永遠解析到第一名=帶 talib 的那一份。此為 L50 曝險,裁定權在操作員。"
+ ]
+}

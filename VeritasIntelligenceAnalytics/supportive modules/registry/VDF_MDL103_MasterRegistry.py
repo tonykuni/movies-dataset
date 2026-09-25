@@ -35,6 +35,20 @@ USAGE
   python VDF_MDL103_MasterRegistry.py --filter VDF       # 篩 VDF 系列
   python VDF_MDL103_MasterRegistry.py --no-pause         # CI 模式
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 # =====================================================================================
 # 📋 ALL PARAMETERS ON TOP
@@ -108,7 +122,7 @@ MODULE_REGISTRY = [
      "lines": 1466, "last_updated": "2026-06-01"},
 
     {"mdl_id": "VDF-MDL004",     "category": "VDF Active",  "subcategory": "FullMarket",
-     "name": "TW Full Market Engine",   "file": "VDF_MDL004_TWFullMarketEngine.py",
+     "name": "TW Full Market Engine",   "file": "VDF_ENG006_MDL004TWFullMarketEngine.py",
      "version": "2.0.0",                "status": "Production",
      "role": "TW 全市場 ~1,900 檔 · Daily Quote + SMA + AvgVol + MCap + Consensus",
      "registry_items": "TWSE/TPEX OpenAPI + YF bulk + YF consensus + FactSet stub",
@@ -267,7 +281,7 @@ MODULE_REGISTRY = [
      "lines": 471, "last_updated": "Earlier"},
 
     {"mdl_id": "VRN-MDL011",     "category": "VRN Active",  "subcategory": "Daily",
-     "name": "Daily Fetcher",       "file": "VRN_MDL011_DailyFetcher.py",
+     "name": "Daily Fetcher",       "file": "VRN_ENG023_MDL011DailyFetcher.py",
      "version": "1.0.0",            "status": "Stable",
      "role": "BRIDGE.aegis_* + Celeritas parallel + yfinance fallback",
      "registry_items": "—",

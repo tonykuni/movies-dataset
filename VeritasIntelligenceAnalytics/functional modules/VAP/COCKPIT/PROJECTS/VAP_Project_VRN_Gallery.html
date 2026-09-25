@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VAP · VRN Project Icons</title>
+<style>
+body{margin:0;background:#f5f4f0;font-family:"Segoe UI","Microsoft JhengHei",sans-serif;color:#1e1d1a}
+.header{background:#fff;border-bottom:1px solid #ddd;padding:16px 20px;position:sticky;top:0;z-index:10}
+.header:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4c78a8,#5a9e6f,#c4943a,#c96b5a)}
+h1{margin:0;font-size:22px}.sub{font-family:Consolas,monospace;color:#777;font-size:11px;margin-top:4px}
+.toolbar{display:flex;gap:8px;padding:10px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:70px;z-index:9}
+input,select,button{border:1px solid #ddd;border-radius:8px;padding:7px 9px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:12px}
+.card{background:#fff;border:1px solid #ddd;border-radius:14px;overflow:hidden}
+.thumb{height:108px;display:flex;align-items:center;justify-content:center;background:#fbfbfa;border-bottom:1px solid #eee;padding:10px}
+.thumb img{max-width:84px;max-height:84px;object-fit:contain}
+.meta{padding:8px}.name{font-weight:900;font-size:11px;word-break:break-all}.path{font-family:Consolas,monospace;font-size:9px;color:#777;word-break:break-all}
+.badge{display:inline-block;font-family:Consolas,monospace;font-size:8px;border-radius:999px;padding:2px 6px;border:1px solid #ddd;background:#fff;margin:2px}
+.sha{background:#cde8d5}.src{background:#d0e1f0}.size{background:#f5e2b8}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VAP · VRN Project Icons</h1>
+<div class="sub">VAP_PANORAMA_3R_PROJECT_LINK_SYNC_MASTER_v1.0.0 · Count: 7 · file:/// visual asset mode</div>
+</div>
+<div class="toolbar">
+<input id="q" placeholder="Search VRN icons" oninput="render()" style="min-width:320px">
+<select id="gt" onchange="render()"><option value="">All Groups</option><option>Same SHA</option><option>Same Source</option><option>Same Source + Same Size</option><option>Same Size</option><option>Unique</option></select>
+<button onclick="downloadJson()">Download JSON</button>
+<span id="shown"></span>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const ICONS = [{"ID":"ICON_000055","ProjectHint":"VAP;VRN;VIA-Core","Role":"Chart / Visualization","FileName":"time_table.svg","BaseName":"time_table","Extension":".svg","RelativePath":"03_chart_visualization_vap_core\\time_table.svg","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\03_chart_visualization_vap_core\\time_table.svg","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/03_chart_visualization_vap_core/time_table.svg","SizeBytes":3699,"SizeKB":3.61,"Sha256":"A510D0046D8EF4447D7C515D227EC090F08730F7E9AF639464A09C899647516A","ShaShort":"A510D0046D8E","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"","GroupType":"Unique","ModifiedAt":"2026-06-06 08:03:16","Status":"OK"},{"ID":"ICON_000074","ProjectHint":"VRN","Role":"File / Export","FileName":"icon_extraction_pipeline.svg","BaseName":"icon_extraction_pipeline","Extension":".svg","RelativePath":"04_file_format_export\\icon_extraction_pipeline.svg","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\04_file_format_export\\icon_extraction_pipeline.svg","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/04_file_format_export/icon_extraction_pipeline.svg","SizeBytes":25806,"SizeKB":25.2,"Sha256":"41059271FCFB82AAD4E0FC4FD09382CE2717B4DC6AB99019511C44C4A7192253","ShaShort":"41059271FCFB","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"SRC_icon_extraction_pipeline","GroupType":"Same Source","ModifiedAt":"2026-03-23 17:27:07","Status":"OK"},{"ID":"ICON_000083","ProjectHint":"VRN","Role":"File / Export","FileName":"picture_as_pdf_36dp_EA3323_FILL0_wght400_GRAD0_opsz40.svg","BaseName":"picture_as_pdf_36dp_ea3323_fill0_wght400_grad0_opsz40","Extension":".svg","RelativePath":"04_file_format_export\\picture_as_pdf_36dp_EA3323_FILL0_wght400_GRAD0_opsz40.svg","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\04_file_format_export\\picture_as_pdf_36dp_EA3323_FILL0_wght400_GRAD0_opsz40.svg","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/04_file_format_export/picture_as_pdf_36dp_EA3323_FILL0_wght400_GRAD0_opsz40.svg","SizeBytes":814,"SizeKB":0.79,"Sha256":"237F83917B2B26FC5C630F1D8C5FACB7F3A796D9C403599F9DA77901F18BB65C","ShaShort":"237F83917B2B","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"","GroupType":"Unique","ModifiedAt":"2026-03-23 10:54:30","Status":"OK"},{"ID":"ICON_000451","ProjectHint":"VRN","Role":"File / Export","FileName":"new-google-icons-vector-illustration-image-available-vector-eps-format-fully-editable-new-google-icons-vector-illustration-200783934__9C1AEC5F5A.webp","BaseName":"new-google-icons-vector-illustration-image-available-vector-eps-format-fully-editable-new-google-icons-vector-illustration-200783934","Extension":".webp","RelativePath":"managed_icons\\MISC_ICON_STYLE\\05_file_format_export\\new-google-icons-vector-illustration-image-available-vector-eps-format-fully-editable-new-google-icons-vector-illustration-200783934__9C1AEC5F5A.webp","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\managed_icons\\MISC_ICON_STYLE\\05_file_format_export\\new-google-icons-vector-illustration-image-available-vector-eps-format-fully-editable-new-google-icons-vector-illustration-200783934__9C1AEC5F5A.webp","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/managed_icons/MISC_ICON_STYLE/05_file_format_export/new-google-icons-vector-illustration-image-available-vector-eps-format-fully-editable-new-google-icons-vector-illustration-200783934__9C1AEC5F5A.webp","SizeBytes":16008,"SizeKB":15.63,"Sha256":"9C1AEC5F5AD9201A30B77B36E914D19B7D0F2E6A346F27F0AAF95382D9F7AA8F","ShaShort":"9C1AEC5F5AD9","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"","GroupType":"Unique","ModifiedAt":"2026-03-23 10:27:20","Status":"OK"},{"ID":"ICON_000622","ProjectHint":"VAP;VRN","Role":"Chart / Visualization","FileName":"icon_extraction_pipeline_(1)__EE9784019C.svg","BaseName":"icon_extraction_pipeline","Extension":".svg","RelativePath":"managed_icons\\VAP_CHART_TYPE_SVG_LIBRARY\\04_vap_chart_visualization\\icon_extraction_pipeline_(1)__EE9784019C.svg","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\managed_icons\\VAP_CHART_TYPE_SVG_LIBRARY\\04_vap_chart_visualization\\icon_extraction_pipeline_(1)__EE9784019C.svg","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/managed_icons/VAP_CHART_TYPE_SVG_LIBRARY/04_vap_chart_visualization/icon_extraction_pipeline_(1)__EE9784019C.svg","SizeBytes":25819,"SizeKB":25.21,"Sha256":"EE9784019C3D1FA2EFEB5B9AF2E86A76B7B7B0FE2956C6FAC04B15D5CCDAEEF3","ShaShort":"EE9784019C3D","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"SRC_icon_extraction_pipeline","GroupType":"Same Source","ModifiedAt":"2026-03-23 20:33:59","Status":"OK"},{"ID":"ICON_001046","ProjectHint":"VRN","Role":"File / Export","FileName":"PDF_Image_0__DUP__0E764DC9BD.png","BaseName":"pdf_image_0__dup","Extension":".png","RelativePath":"_duplicates_review\\PNG_MISC_STYLE_UNKNOWN_SIZE\\PDF_Image_0__DUP__0E764DC9BD.png","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\_duplicates_review\\PNG_MISC_STYLE_UNKNOWN_SIZE\\PDF_Image_0__DUP__0E764DC9BD.png","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/_duplicates_review/PNG_MISC_STYLE_UNKNOWN_SIZE/PDF_Image_0__DUP__0E764DC9BD.png","SizeBytes":157435,"SizeKB":153.75,"Sha256":"0E764DC9BDF411A0532A27F46E247230BD198B2E6AC85158E32BDAEA8FB6BBBB","ShaShort":"0E764DC9BDF4","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"","GroupType":"Unique","ModifiedAt":"2025-10-14 13:09:04","Status":"OK"},{"ID":"ICON_001059","ProjectHint":"VRN","Role":"File / Export","FileName":"VRN_TriTrack_Flow__DUP__92C66ADF59.png","BaseName":"vrn_tritrack_flow__dup","Extension":".png","RelativePath":"_duplicates_review\\PNG_MISC_STYLE_UNKNOWN_SIZE\\VRN_TriTrack_Flow__DUP__92C66ADF59.png","FullPath":"C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VAP\\ASSETS\\ICON_BASE_MANAGED\\_duplicates_review\\PNG_MISC_STYLE_UNKNOWN_SIZE\\VRN_TriTrack_Flow__DUP__92C66ADF59.png","FileUri":"file:///C:/Users/tonyk/Downloads/VeritasIntelligenceAnalytics/functional%20modules/VAP/ASSETS/ICON_BASE_MANAGED/_duplicates_review/PNG_MISC_STYLE_UNKNOWN_SIZE/VRN_TriTrack_Flow__DUP__92C66ADF59.png","SizeBytes":415387,"SizeKB":405.65,"Sha256":"92C66ADF59E475EB9C8255CD7DFCD093A04B2D53954F3FF617513ECBD9AECF50","ShaShort":"92C66ADF59E4","SameShaGroup":"","SameSizeGroup":"","SameSourceGroup":"","GroupType":"Unique","ModifiedAt":"2026-01-23 22:18:01","Status":"OK"}];
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function render(){
+ const qq=q.value.toLowerCase().trim();
+ const gg=gt.value;
+ const rows=ICONS.filter(x=>{
+   if(gg && x.GroupType!==gg)return false;
+   if(qq){
+     const hay=[x.FileName,x.RelativePath,x.Role,x.GroupType,x.ShaShort].join(' ').toLowerCase();
+     if(!hay.includes(qq))return false;
+   }
+   return true;
+ });
+ shown.innerText='Showing '+rows.length+' / '+ICONS.length;
+ grid.innerHTML=rows.map(x=>{
+   const badges=[x.SameShaGroup?'<span class="badge sha">SHA</span>':'',x.SameSourceGroup?'<span class="badge src">SRC</span>':'',x.SameSizeGroup?'<span class="badge size">SIZE</span>':''].join('');
+   return '<div class="card"><div class="thumb"><img loading="lazy" src="'+x.FileUri+'" onerror="this.parentElement.innerHTML=<span class=path>Image load failed</span>"></div><div class="meta"><div class="name">'+esc(x.FileName)+'</div>'+badges+'<div class="path">'+esc(x.RelativePath)+'</div></div></div>';
+ }).join('');
+}
+function downloadJson(){
+ const blob=new Blob([JSON.stringify(ICONS,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VAP_VRN_Icon_Assignment.json';a.click();URL.revokeObjectURL(a.href);
+}
+render();
+</script>
+</body>
+</html>

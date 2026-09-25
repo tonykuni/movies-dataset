@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generic-layout-engine"
+version = "2.1.0"
+description = "Resource-aware multi-engine PDF and image extraction and layout OS"
+requires-python = ">=3.10"
+dependencies = [
+  "PyMuPDF>=1.24",
+  "pdfplumber>=0.11",
+  "pdfminer.six>=20231228",
+  "pypdf>=5",
+  "Pillow>=9,<13",
+  "psutil>=6",
+  "PyYAML>=6.0.2",
+]
+
+[project.scripts]
+generic-layout = "generic_layout_engine:main"
+generic-layout-os = "multi_engine_orchestrator:main"
+
+[tool.setuptools]
+py-modules = ["generic_layout_engine", "adapter_sdk", "all_backend_engines", "multi_engine_orchestrator"]

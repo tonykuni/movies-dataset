@@ -1,0 +1,12 @@
+# 監測環境衝突 local free libs Top 8(免費、本地執行、以速度排序)
+# 一鍵安裝:
+#   uv pip install -r requirements-envcheck.txt          (走 uv.toml 鏡像:清華→阿里→官方兜底)
+#   pip install -r requirements-envcheck.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 註:Top 1 的 uv 與 Top 3 的 pip check 免列——uv 是安裝器本身,pip check 為 pip 內建。
+
+pipdeptree>=2.23     # Top 2:依賴樹 + 衝突警告 + 反向查詢(--warn fail / -r -p)
+deptry>=0.23         # Top 4:Rust 核心,掃缺依賴/幽靈依賴/未用依賴(DEP001~DEP004)
+pipgrip>=0.10        # Top 5:PubGrub 解析器,免安裝預測衝突(--tree)
+johnnydep>=1.25      # Top 6:裝前 metadata 需求樹預檢
+pip-tools>=7.4       # Top 7:pip-compile 鎖定,衝突於編譯期現形
+pip-check-reqs>=2.5  # Top 8:pip-missing-reqs / pip-extra-reqs,程式碼 vs 需求清單漂移

@@ -1,0 +1,29 @@
+{
+ "schema": "vrn-threebroker-testlist-v1",
+ "ts": "2026-08-24",
+ "source": "批111 操作員令:「VRN 的清單抓取三份不同券商的報告」",
+ "policy": "測試清單=三份互不相同券商之個股研究報告 PDF;入 VRN 收件夾即自動起批(via-batch 全鏈:收件→鑑識→OCR→對帳→SSOT→落庫)",
+ "selection_rules": [
+  "R1 三份報告之券商必須互異(VRN_Broker_Dict 29 家內)",
+  "R2 優先選有評等+目標價之個股報告(digest 雙閘可全鏈驗證)",
+  "R3 至少一份台股標的(TW01 三代號橋+MOPS 對帳道全測)",
+  "R4 語言不拘(digest v0106 中文簡稱/BROKER 縮寫道具備)"
+ ],
+ "container_scan": {
+  "vrn_tree_pdfs": 0,
+  "note": "容器樹 VRN 收件夾零 PDF(誠實);全樹 18 件 PDF 均為規格/文件類,非券商個股報告;券商報告在工作站 OneDrive 側候入夾"
+ },
+ "slots": [
+  {"slot": 1, "broker": "中國信託證券(CTBC)", "file": "貿聯_3665B_CTBC260824.pdf + 台積電_2330B_CTBC240612.pdf", "status": "TESTED",
+   "result": "3665:TP 2775/買進/許哲豪/2026-08-24 全符;2330:TP 1230/買進/竺貽根/2024-06-12 全符;潛在漲幅驗算 21.98%/39.30% 與報告載值自洽"},
+  {"slot": 2, "broker": "Daiwa 大和", "file": "Daiwa1815_20260821.pdf", "status": "TESTED",
+   "result": "1815 富喬英文快訊:broker 檔名 token 識別中;Target price n.a.=TP/評等誠實留空(disclosure 分布表 Buy 雜訊抗噪閘拒);analyst Sheng Cheng(EMAIL);日期 2026-08-21"},
+  {"slot": 3, "broker": "(無券商名法說 Memo)", "file": "華夏_1305_Memo20250821.docx", "status": "TESTED",
+   "result": "1305 華夏投顧觀點 memo:內文無券商名=broker 誠實留空;「反傾銷稅(ADD)」評等雜訊抗噪閘拒;日期 2025-08-21"}
+ ],
+ "workstation_next": "已由批121 操作員附件真件完測(digest v0111 二十六檢+4/4 與真值全符);工作站 via-batch 全鏈(OCR/對帳/落庫)候件加測",
+ "changelog": [
+  {"ts": "2026-08-24", "op": "INIT", "note": "批111 建冊;三槽候件"},
+  {"ts": "2026-08-24", "op": "TESTED", "note": "批121 三槽回填:中信×2/大和/華夏memo;digest v0111 六債修後 4/4 全符真值(run DIGEST_20260824_170557)"}
+ ]
+}

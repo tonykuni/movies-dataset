@@ -1,0 +1,114 @@
+{
+  "fixture_id": "VIA-QUANTGUARD-PERFORMANCE-001",
+  "description": "Small deterministic daily return fixture for CI numerical regression.",
+  "risk": {
+    "returns": [0.01, -0.02, 0.015, 0.005, -0.01, 0.02],
+    "window": 5,
+    "min_samples": 5,
+    "periods_per_year": 252,
+    "annual_risk_free_rate": 0.0,
+    "annual_mar": 0.0,
+    "expected_last": {
+      "rolling_sharpe": 1.88895251208715,
+      "equity_curve": 1.019565003303,
+      "rolling_max_drawdown": -0.01
+    },
+    "tolerances": {
+      "rolling_sharpe": 1e-10,
+      "equity_curve": 1e-12,
+      "rolling_max_drawdown": 1e-12
+    }
+  },
+  "feature": {
+    "prices": [
+      100.0, 101.0, 99.0, 102.0, 103.0,
+      101.0, 104.0, 105.0, 103.0, 106.0,
+      107.0, 105.0, 108.0, 109.0, 107.0,
+      110.0, 111.0, 109.0, 112.0, 113.0
+    ],
+    "expected_last": {
+      "sma_5": 111.0,
+      "ema_5": 111.00090218597947,
+      "trend_regime": null,
+      "momentum_confirmation": null,
+      "volume_flow_confirmation": 0
+    },
+    "tolerances": {
+      "sma_5": 1e-12,
+      "ema_5": 1e-10
+    }
+  },
+  "factor": {
+    "rows": 140,
+    "ticker": "AAA",
+    "base": 100.0,
+    "slope": 0.001,
+    "periodic_adjustment": 0.001,
+    "weights": {
+      "trend_regime": 0.4,
+      "momentum_confirmation": 0.3,
+      "volume_flow_confirmation": 0.3
+    },
+    "expected_last": {
+      "trend_regime": 1,
+      "momentum_confirmation": 1,
+      "volume_flow_confirmation": 0,
+      "volatility_ratio_20_60": 1.0173926082384652,
+      "rolling_sharpe": 7.9061969494306945,
+      "rolling_max_drawdown": -0.0029880478087654927,
+      "feature_quality_count": 6,
+      "factor_composite": 0.7,
+      "factor_composite_quality_count": 3
+    },
+    "tolerances": {
+      "volatility_ratio_20_60": 1e-10,
+      "rolling_sharpe": 1e-10,
+      "rolling_max_drawdown": 1e-12,
+      "factor_composite": 1e-12
+    }
+  },
+  "stress": [
+    {
+      "scenario_id": "flash_crash",
+      "returns": [0.01, 0.005, -0.25, 0.08, -0.04, 0.02],
+      "window": 5,
+      "min_samples": 5,
+      "expected_last": {
+        "rolling_sharpe": -4.640563700745219,
+        "rolling_sortino": -5.187498472830255,
+        "rolling_var": 0.20799999999999996,
+        "rolling_cvar": 0.25,
+        "rolling_max_drawdown": -0.25,
+        "equity_curve": 0.8050889376
+      }
+    },
+    {
+      "scenario_id": "volatility_spike",
+      "returns": [0.001, -0.001, 0.002, -0.002, 0.003, -0.003, 0.12, -0.1, 0.08, -0.06],
+      "window": 5,
+      "min_samples": 5,
+      "expected_last": {
+        "rolling_sharpe": 1.2716299846932253,
+        "rolling_sortino": 2.2516655603300535,
+        "rolling_var": 0.092,
+        "rolling_cvar": 0.1,
+        "rolling_max_drawdown": -0.09999999999999987,
+        "equity_curve": 1.0233072735477429
+      }
+    },
+    {
+      "scenario_id": "missing_observations",
+      "returns": [0.01, null, -0.03, 0.02, null, 0.01, -0.02],
+      "window": 5,
+      "min_samples": 3,
+      "expected_last": {
+        "rolling_sharpe": -3.334313581357267,
+        "rolling_sortino": -4.402796314232057,
+        "rolling_var": 0.028499999999999998,
+        "rolling_cvar": 0.03,
+        "rolling_max_drawdown": -0.020000000000000018,
+        "equity_curve": 0.9891012012
+      }
+    }
+  ]
+}

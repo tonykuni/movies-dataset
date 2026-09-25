@@ -1,0 +1,544 @@
+{
+  "schema": "VIA_SystemCharter/1.0",
+  "batch": "批343 操作員令「以中央治理台統管全規則 SSOT 與所有引擎模組;輸入參數最少化並自動化;左輸入右顯示;多頁籤指標;工作流圖」 · 批347 整併:治理核納入 MDL124/125/126 與 via-charter/via-loop/via-ui",
+  "authority": "本冊=系統結構單一真相。引擎/頁/任務只可引用樹上實存物;生成器逐項驗在位,缺=誠實標 PLANNED/NOT_GENERATED,零發明。",
+  "input_policy": {
+    "rule": "每域最多三個人工輸入;其餘一律自動推導並標明來源(COMPUTED/SOURCED)。人工輸入僅限:資料視窗起訖(僅回補/全球擷取需要)、VRN 收件檔、操作員裁決旗標。",
+    "auto_sources": {
+      "start_date": "DATABASE 末日+1(vdf_tw_market.duckdb max(date));缺=今日-30",
+      "end_date": "今日",
+      "categories": "DeckServer GLOBAL_CATEGORIES(11 類)",
+      "universe": "vdf_tw_market.duckdb 上市上櫃全表",
+      "broker_date": "VRN 檔名判讀(民國 7 碼→西元)",
+      "thresholds": "VIA_ShellValidation_Thresholds_v*.json(SOURCED)"
+    }
+  },
+  "core": {
+    "id": "CGC",
+    "zh": "中央治理台",
+    "en": "CENTRAL GOVERNANCE CONSOLE",
+    "rule_ssot": [
+      {
+        "zh": "同義字/Regex 字典",
+        "path": "supportive modules/registry/CGC_MDL115_SSOTRegexDict_v*.py"
+      },
+      {
+        "zh": "驗證門檻冊",
+        "path": "supportive modules/registry/VIA_ShellValidation_Thresholds_v*.json"
+      },
+      {
+        "zh": "自動編號冊",
+        "path": "supportive modules/registry/VIA_AutoCode_Registry_v*.json"
+      },
+      {
+        "zh": "統一編號冊",
+        "path": "supportive modules/registry/CGC_MDL113_UnifiedRegistry_v*.py"
+      },
+      {
+        "zh": "任務白名單(37)",
+        "path": "supportive modules/registry/CGC_MDL095_DeckServer_v*.py"
+      },
+      {
+        "zh": "上船件冊",
+        "path": "supportive modules/registry/CGC_MDL122_IntakeRoster_v*.py"
+      },
+      {
+        "zh": "VDF 參數冊(678)",
+        "path": "functional modules/VDF/VDF_Param_Registry_v*.json"
+      },
+      {
+        "zh": "VDF 擷取總冊(390)",
+        "path": "functional modules/VDF/VDF_FetchOne_Matrix_Registry_v*.json"
+      },
+      {
+        "zh": "UI 參數冊",
+        "path": "supportive modules/registry/VIA_UISpec_v*.json"
+      },
+      {
+        "zh": "生命週期 RACI",
+        "path": "supportive modules/registry/VIA_LifecycleRACI_v*.json"
+      },
+      {
+        "zh": "系統結構總冊",
+        "path": "supportive modules/registry/VIA_SystemCharter_v*.json"
+      }
+    ],
+    "engines": [
+      "supportive modules/registry/CGC_MDL095_DeckServer_v*.py",
+      "supportive modules/registry/CGC_MDL105_GovernanceConsole_v*.py",
+      "supportive modules/registry/CGC_MDL116_UnifiedShell_v*.py",
+      "supportive modules/registry/CGC_MDL120_SystemUI_v*.py",
+      "supportive modules/registry/CGC_MDL123_SixStreams_v*.py",
+      "VIA_SYSTEM_MANAGER_v*.py",
+      "supportive modules/registry/CGC_MDL124_SystemCharter_v*.py",
+      "supportive modules/registry/CGC_MDL125_LifecycleRACI_v*.py",
+      "supportive modules/registry/CGC_MDL126_UIBridge_v*.py"
+    ],
+    "pages": [
+      "VIA_UI_GovernanceConsole_v0100.html",
+      "VIA_UI_System_v0100.html",
+      "VIA_UI_Shell_CGC_v0100.html",
+      "VIA_UI_MasterControl_v0100.html",
+      "VIA_UI_SSOTRegexDict_v0100.html",
+      "VIA_UI_IntakeRoster_v0100.html",
+      "VIA_UI_SystemCharter_v0100.html",
+      "VIA_UI_LifecycleRACI_v0100.html",
+      "VIA_UI_Consolidated_v0100.html"
+    ],
+    "tasks": [
+      "govcon",
+      "system_ui",
+      "ui",
+      "unified_register",
+      "selftest_fast",
+      "complete_all"
+    ],
+    "minimal_inputs": [],
+    "auto_params": [
+      "all rules above"
+    ],
+    "cmds": [
+      "via",
+      "via-six",
+      "via-manager",
+      "via-ssot",
+      "via-register",
+      "via-intake-roster",
+      "via-charter",
+      "via-loop",
+      "via-ui"
+    ]
+  },
+  "domains": [
+    {
+      "id": "VDF",
+      "zh": "資料鍛造",
+      "en": "DATA FORGE",
+      "seal": "庫",
+      "engines": [
+        "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v*.py",
+        "functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v*.py",
+        "functional modules/VDF/engine/VDF_ENG065_DbImport_v*.py"
+      ],
+      "pages": [
+        "VIA_UI_Shell_VDF_v0100.html",
+        "VIA_UI_DataCatalog_v0100.html",
+        "VIA_UI_GlobalMarkets_v0100.html"
+      ],
+      "standalone_pages": [
+        "functional modules/VDF/VIA_VDF_Fetch_ONE__Standalone.html"
+      ],
+      "tasks": [
+        "backfill",
+        "global",
+        "boot"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+        "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb"
+      ],
+      "minimal_inputs": [
+        {
+          "key": "start",
+          "zh": "起始日",
+          "auto": "DB 末日+1",
+          "needed_for": [
+            "backfill",
+            "global"
+          ]
+        },
+        {
+          "key": "end",
+          "zh": "結束日",
+          "auto": "今日",
+          "needed_for": [
+            "backfill",
+            "global"
+          ]
+        },
+        {
+          "key": "cats",
+          "zh": "全球類別",
+          "auto": "GLOBAL_CATEGORIES 全選",
+          "needed_for": [
+            "global"
+          ]
+        }
+      ],
+      "auto_params": [
+        "universe",
+        "adjust layer",
+        "factor library",
+        "group aggregation (boot 全鏈)"
+      ],
+      "metrics": [
+        "tw_rows",
+        "tw_max_date",
+        "global_rows",
+        "global_max_date",
+        "fetch_matrix DONE/PROXY/TODO"
+      ],
+      "probe_2day": [
+        [
+          "backfill",
+          "--start",
+          "{D-2}",
+          "--end",
+          "{D}"
+        ],
+        [
+          "global",
+          "--start",
+          "{D-2}",
+          "--end",
+          "{D}"
+        ]
+      ]
+    },
+    {
+      "id": "VRN",
+      "zh": "報告新星",
+      "en": "REPORT NOVA",
+      "seal": "牘",
+      "engines": [
+        "functional modules/VRN/VRN_ENG072_FirstPageText_v*.py",
+        "functional modules/VRN/VRN_ENG060_TextOmni_v*.py",
+        "functional modules/VRN/references/intake/VIA_NLP_OneEngine_v1.4.0/pyproject.toml"
+      ],
+      "pages": [
+        "VIA_UI_Shell_VRN_v0100.html",
+        "VIA_UI_ReportCards_v0100.html",
+        "VIA_UI_VRNControlTower_v0100.html"
+      ],
+      "tasks": [
+        "firstpage",
+        "structdb",
+        "finpages",
+        "nlp",
+        "mdconvert",
+        "chat2doc"
+      ],
+      "db": [
+        "functional modules/VRN/input/incoming"
+      ],
+      "minimal_inputs": [
+        {
+          "key": "files",
+          "zh": "券商報告(拖曳)",
+          "auto": "券商/日期=檔名判讀",
+          "needed_for": [
+            "firstpage",
+            "structdb"
+          ]
+        }
+      ],
+      "auto_params": [
+        "broker",
+        "report_date",
+        "extraction ladder L01-L06",
+        "dedup by sha256"
+      ],
+      "metrics": [
+        "docs",
+        "fin_rows",
+        "unverified",
+        "quality_median",
+        "ticker_coverage"
+      ],
+      "probe_2day": [
+        [
+          "firstpage"
+        ],
+        [
+          "structdb"
+        ]
+      ]
+    },
+    {
+      "id": "VAP",
+      "zh": "視覺分析",
+      "en": "AUTOPLOT",
+      "seal": "觀",
+      "engines": [
+        "functional modules/VAP/engine/VAP_ENG014_StdDashboardTemplate_v*.py",
+        "functional modules/VAP/references/intake/VAP_v025_Complete_Package/package.json"
+      ],
+      "pages": [
+        "VIA_UI_Shell_VAP_v0100.html",
+        "VIA_UI_StdDashboard_v0100.html",
+        "VIA_UI_VapStack_v0100.html",
+        "VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html"
+      ],
+      "tasks": [
+        "std_dashboard",
+        "vofie",
+        "uispec"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb"
+      ],
+      "minimal_inputs": [],
+      "auto_params": [
+        "chart registry (vap_chart_registry_v025)",
+        "visual lock tokens",
+        "render_max_points=5000"
+      ],
+      "metrics": [
+        "charts_rendered",
+        "template_freshness"
+      ],
+      "probe_2day": [
+        [
+          "std_dashboard"
+        ]
+      ]
+    },
+    {
+      "id": "TWSTOCK",
+      "zh": "台股本體",
+      "en": "TAIWAN STOCK",
+      "seal": "股",
+      "engines": [
+        "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v*.py",
+        "functional modules/VDF/engine/VDF_ENG062_GroupFeatureLayer_v*.py"
+      ],
+      "pages": [
+        "VIA_UI_GroupClassIndex_v0100.html"
+      ],
+      "tasks": [
+        "group_class"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb"
+      ],
+      "minimal_inputs": [],
+      "auto_params": [
+        "universe (全上市櫃)",
+        "adj_close 三層真相梯",
+        "group index (價格加權)"
+      ],
+      "metrics": [
+        "symbols",
+        "groups",
+        "index_max_date"
+      ],
+      "probe_2day": [
+        [
+          "group_class"
+        ]
+      ]
+    },
+    {
+      "id": "REVENUE",
+      "zh": "月營收分析",
+      "en": "MONTHLY REVENUE",
+      "seal": "營",
+      "engines": [
+        "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v*.py",
+        "functional modules/VDF/engine/VDF_ENG069_RevenueConsensusAnalysis_v*.py"
+      ],
+      "pages": [
+        "VIA_UI_RevenueConsensusAnalysis_v0100.html"
+      ],
+      "tasks": [
+        "revenue",
+        "revenue_consensus",
+        "revenue_groups"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb"
+      ],
+      "minimal_inputs": [],
+      "auto_params": [
+        "MOPS 官方 L1 正源",
+        "農曆新年 Jan-Feb 合併 YoY",
+        "低基期 Gate",
+        "族群月營收榜"
+      ],
+      "metrics": [
+        "revenue_rows",
+        "latest_month",
+        "yoy_coverage",
+        "consensus_join"
+      ],
+      "probe_2day": [
+        [
+          "revenue"
+        ],
+        [
+          "revenue_groups"
+        ]
+      ]
+    },
+    {
+      "id": "ETF",
+      "zh": "主動式台股 ETF",
+      "en": "ACTIVE TW ETF",
+      "seal": "基",
+      "engines": [
+        "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings.py",
+        "functional modules/VDF/engine/VDF_ENG067_ConsensusEnrichment_v*.py",
+        "functional modules/VDF/engine/VDF_ENG068_ETFConsensusAnalysis_v*.py"
+      ],
+      "pages": [
+        "VIA_UI_ETFConsensusAnalysis_v0100.html"
+      ],
+      "standalone_pages": [
+        "VIA_Taiwan_Active_ETF_Matrix_Standalone.html"
+      ],
+      "tasks": [
+        "etf_fetch",
+        "etf_enrich",
+        "etf_analysis",
+        "consensus"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/ActiveTWETF.duckdb"
+      ],
+      "minimal_inputs": [],
+      "auto_params": [
+        "ETF 清單(後綴 A)",
+        "持股聚合",
+        "經理人動作五階段",
+        "yf/FactSet 目標價共識"
+      ],
+      "metrics": [
+        "etf_count",
+        "aum_total",
+        "holdings_rows",
+        "consensus_coverage"
+      ],
+      "probe_2day": [
+        [
+          "etf_fetch"
+        ],
+        [
+          "etf_enrich"
+        ],
+        [
+          "etf_analysis"
+        ]
+      ]
+    },
+    {
+      "id": "ROTATION",
+      "zh": "族群分類與輪動",
+      "en": "GROUP ROTATION",
+      "seal": "輪",
+      "engines": [
+        "functional modules/VDF/engine/VDF_ENG070_GroupClassificationIndex_v*.py",
+        "functional modules/VDF/engine/VDF_ENG071_GroupBacktest_v*.py",
+        "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v*.py",
+        "supportive modules/references/intake/VIA_GroupClassification_b307/VIA_TW10Y_AdaptiveRiskFree_BacktestEngine_v0200.py"
+      ],
+      "pages": [
+        "VIA_UI_StoryRotation_v0100.html",
+        "VIA_UI_GroupBacktest_v0100.html",
+        "VIA_UI_GroupClassIndex_v0100.html"
+      ],
+      "tasks": [
+        "group_class",
+        "group_backtest",
+        "story_rotation"
+      ],
+      "db": [
+        "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb"
+      ],
+      "minimal_inputs": [],
+      "auto_params": [
+        "LEAD/PEER/LAG/UNRELATED 族群驗證(殘差化+LOO+區塊置換)",
+        "LARGE/MID/SMALL 動態三群聚",
+        "TW10Y 無風險利率",
+        "story 故事族群冊"
+      ],
+      "metrics": [
+        "groups",
+        "lead_count",
+        "rotation_signal_date",
+        "backtest_paths"
+      ],
+      "probe_2day": [
+        [
+          "group_class"
+        ],
+        [
+          "story_rotation"
+        ]
+      ]
+    }
+  ],
+  "workflow": {
+    "nodes": [
+      "CGC",
+      "VDF",
+      "TWSTOCK",
+      "REVENUE",
+      "ETF",
+      "ROTATION",
+      "VAP",
+      "VRN"
+    ],
+    "edges": [
+      [
+        "CGC",
+        "VDF",
+        "規則/白名單"
+      ],
+      [
+        "CGC",
+        "VRN",
+        "規則/白名單"
+      ],
+      [
+        "VDF",
+        "TWSTOCK",
+        "價格庫"
+      ],
+      [
+        "VDF",
+        "REVENUE",
+        "MOPS"
+      ],
+      [
+        "VDF",
+        "ETF",
+        "持股/共識"
+      ],
+      [
+        "TWSTOCK",
+        "ROTATION",
+        "族群指數"
+      ],
+      [
+        "REVENUE",
+        "ROTATION",
+        "族群月營收"
+      ],
+      [
+        "TWSTOCK",
+        "VAP",
+        "圖"
+      ],
+      [
+        "REVENUE",
+        "VAP",
+        "圖"
+      ],
+      [
+        "ETF",
+        "VAP",
+        "圖"
+      ],
+      [
+        "ROTATION",
+        "VAP",
+        "圖"
+      ],
+      [
+        "VRN",
+        "REVENUE",
+        "報告財務數據(待驗證)"
+      ]
+    ]
+  }
+}

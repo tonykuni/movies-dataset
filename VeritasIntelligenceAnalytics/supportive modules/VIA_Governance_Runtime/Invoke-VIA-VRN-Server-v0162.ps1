@@ -21,6 +21,16 @@
 #>
 # requires PowerShell 7 (pwsh). 本檔「整支貼進主控台」或「以檔案執行」皆可 —— 無 param()，貼上不會壞。
 
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 
@@ -1375,3 +1385,4 @@ finally {
     Write-Host ''
     Write-Host 'def VRN Workbench 伺服器已停止。Parent PowerShell remains open.' -ForegroundColor Cyan
 }
+

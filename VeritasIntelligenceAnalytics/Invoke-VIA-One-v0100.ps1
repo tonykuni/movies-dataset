@@ -6,6 +6,16 @@ Invoke-VIA-One v0100 — 最終整合版總啟動器(依 VIA_MegaPrompt_Official
 不關閉、不阻塞、不卡斷:無 Read-Host、無 exit;UI 以 Start-Process 非阻塞開啟;
 每階段動態進度條(Write-Progress)+ 動態說明;單一階段失敗誠實記錄後續行。
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = $PSScriptRoot
 $Bin = Join-Path $Root "bin"
@@ -23,11 +33,11 @@ Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor Dark
 
 $Stages = @(
     @{ Name = "SYNC 同步 repo";              Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
-    @{ Name = "MEGA 三輪全景分析(分區 Matrix)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\via_mega_engine_v0103.py") },
-    @{ Name = "VMT 總指揮 9 階段";            Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\via_master_engine_v0102.py"); Args = @("--no-open") },
-    @{ Name = "CGE 中央治理 dry-run";         Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
-    @{ Name = "VRN 內容探測(唯讀 GO gate)";   Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
-    @{ Name = "VRN 內容擷取 dry-run";         Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_candidate_v0100.py") },
+    @{ Name = "MEGA 三輪全景分析(分區 Matrix)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\SUP_MDL142_MegaEngine_v0103.py") },
+    @{ Name = "VMT 總指揮 9 階段";            Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\VIA_ENG021_MasterEngine_v0102.py"); Args = @("--no-open") },
+    @{ Name = "CGE 中央治理 dry-run";         Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\CGC_MDL001_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Name = "VRN 內容探測(唯讀 GO gate)";   Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG048_ContentProbe_v0100.py"); Args = @("--no-open") },
+    @{ Name = "VRN 內容擷取 dry-run";         Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG046_ContentExtractCandidate_v0100.py") },
     @{ Name = "UI HUB 開啟七介面樞紐";        Kind = "open"; Target = (Join-Path $Root "supportive modules\ui_support\VIA_UI_Hub_v0100.html") }
 )
 
@@ -59,3 +69,4 @@ Write-Host ("=" * 70) -ForegroundColor DarkCyan
 $Results | Format-Table -AutoSize
 $okN = ($Results | Where-Object 結果 -eq "OK").Count
 Write-Host ("[總結] {0}/{1} 階段 OK · Matrix/儀表板/UI Hub 已非阻塞開啟 · PowerShell 保持開啟" -f $okN, $total) -ForegroundColor Green
+

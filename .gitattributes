@@ -12,3 +12,17 @@ VeritasIntelligenceAnalytics/supportive*modules/VIA_Governance_Runtime/v0160C/**
 *.dc.html -text
 VeritasIntelligenceAnalytics/VIA_Mother.html -text
 "VeritasIntelligenceAnalytics/supportive modules/ui_support/subsystem_pages/*.html" -text
+
+# 批546 收容件位元鎖(md5 冊比對的是**原始位元**;Windows 上 core.autocrlf 會把 LF 轉成 CRLF,
+# 同一個檔就多出「行數」個位元組 → md5 對不上 → 報成「正本被改過」。那是判錯的紅燈。
+# 倉庫裡 VTR / v0160A 早就因為同一個理由鎖過位元,收容件當初漏了。收容件的定義就是逐位元保存。
+VeritasIntelligenceAnalytics/**/references/intake/** -text
+
+# 批650 正典 U/I TEMPLATE 位元鎖(操作員實機實錄):
+# 批647 我把 VIA_HTML_UI 整包 223 件帶進來,每一件都有 manifest.json 的 sha256。
+# 那份 sha 算的是**原始位元**。Windows 上 core.autocrlf 會把 LF 轉成 CRLF,
+# 同一個檔就多出「行數」個位元組 → sha 對不上 → 我的檢⑳報「漂移 173」。
+# 操作員機器實跑:對得上 50 · 漂移 173。容器量:二進位 42 + 本來就 CRLF 8 = **正好 50**,
+# 純 LF 文字件 **正好 173** —— 一個不多一個不少,那不是漂移,是 git 改寫了正本。
+# 倉庫裡 VTR / v0160A / 收容件(批546)早就因為同一個理由鎖過位元,這一包當初漏了。
+VeritasIntelligenceAnalytics/VIA_HTML_UI/** -text

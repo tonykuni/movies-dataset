@@ -1,0 +1,107 @@
+{
+  "schema": "VIA.UnifiedNLP.AttachmentManifest.v1",
+  "batch": "B532",
+  "state": "REGISTERED_INTAKE_ONLY",
+  "policy": "SUP_MDL744 provides NLP semantics; non-NLP attachments are adapters or governance lanes and must not be relabeled as NLP capability.",
+  "quantguard_data_flow": {
+    "direction": "VDF_DUCKDB_TO_QUANTGUARD",
+    "source_mutation": "FORBIDDEN",
+    "outputs": "features/factors/SSOT/evidence only",
+    "reverse_edges_forbidden": ["QuantGuard -> VDF source overwrite", "QuantGuard -> database schema mutation", "QuantGuard -> network fetch", "QuantGuard -> silent consent"]
+  },
+  "unified_orchestrator": {
+    "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "source": "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0100.py",
+    "nlp_provider": "SUP_MDL744_NLPApplicationHub_v0102.py",
+    "vrn_vdf_bridge": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0100.py",
+    "network_mode": "OFFLINE_ONLY",
+    "ta_policy": "QuantGuard-only; TA-Lib forbidden_not_used"
+  },
+  "attachments": [
+    {
+      "id": "vake_ps",
+      "name": "Invoke-VIA-AKShareSuperEngine.ps1",
+      "kind": "VDF data adapter launcher",
+      "source_path": "functional modules/VDF/references/intake/VIA_AKShare_VAKE_b367/Invoke-VIA-AKShareSuperEngine.ps1",
+      "sha256": "57574caf9c6fc1ab96adf05cc6c033ff7a91cdb0b009e8992f8bad80e54d71fb",
+      "nlp_role": "NO_NLP_DATA_ADAPTER",
+      "route": "VDF_AKSHARE_CANDIDATE",
+      "execution_state": "COLLECTED_NOT_RUN",
+      "network": true,
+      "consent_required": true,
+      "note": "Exact match to existing VAKE b367 intake; not executed because data replenishment and network pulls are stopped."
+    },
+    {
+      "id": "vake_py",
+      "name": "VDF_AkshareFetcher.py",
+      "kind": "VDF data fetcher",
+      "source_path": "functional modules/VDF/references/intake/VIA_AKShare_VAKE_b367/VDF_AkshareFetcher.py",
+      "sha256": "c158aa33cc25dc9e00cf8ad9f2ce4b25db2f94b3ac33e40f61ebbb8e66c34c9d",
+      "nlp_role": "NO_NLP_DATA_ADAPTER",
+      "route": "VDF_AKSHARE_CANDIDATE",
+      "execution_state": "COLLECTED_NOT_RUN",
+      "network": true,
+      "consent_required": true,
+      "offline_test": "scan --offline blocked by absent akshare package; no installation performed"
+    },
+    {
+      "id": "ves_ps",
+      "name": "Invoke-VIA-EngineStandardizer.ps1",
+      "kind": "VES launcher",
+      "source_path": "supportive modules/references/intake/VIA_VES_EngineStandardizer_b370/Invoke-VIA-EngineStandardizer.ps1",
+      "sha256": "d843f5c37c9addd714f96588aea8f756a08aeee1817c4eb46f5ac7db44e12fab",
+      "nlp_role": "NLP_SUPPORT_GOVERNANCE",
+      "route": "VES_READONLY_LANE",
+      "execution_state": "INTAKE_ONLY",
+      "network": false,
+      "selftest": "PowerShell runtime pending; Python VES selftest 103/103 PASS"
+    },
+    {
+      "id": "ves_py",
+      "name": "via_engine_standardizer.py",
+      "kind": "engine standardizer and AI handoff governance",
+      "source_path": "supportive modules/references/intake/VIA_VES_EngineStandardizer_b370/via_engine_standardizer.py",
+      "sha256": "88aff36e3be04d2265b2e256667714e2c2c334de914ea37ca3c9d91060895eb7",
+      "nlp_role": "NLP_SUPPORT_GOVERNANCE",
+      "route": "VES_READONLY_LANE",
+      "execution_state": "INTAKE_ONLY",
+      "network": false,
+      "selftest": "103/103 PASS; no --apply or activation token used"
+    },
+    {
+      "id": "ves_collab",
+      "name": "VES_AI_COLLAB.md",
+      "kind": "AI collaboration protocol",
+      "source_path": "supportive modules/references/intake/VIA_VES_EngineStandardizer_b370/VES_AI_COLLAB.md",
+      "sha256": "af878a85c455e8c9270eca2555ea8d4b64209d8556d6b8324c9479be2deccc93",
+      "nlp_role": "NLP_HANDOVER_PROTOCOL",
+      "route": "VES_READONLY_LANE",
+      "execution_state": "INTAKE_ONLY",
+      "network": false
+    },
+    {
+      "id": "vcaf",
+      "name": "VIA_CGC_ABC_AutoFixEngine_v0100.py",
+      "kind": "central governance auto-fix candidate",
+      "source_path": "supportive modules/references/intake/VIA_CGC_ABC_AutoFixEngine_b532/VIA_CGC_ABC_AutoFixEngine_v0100.py",
+      "sha256": "c4806bc7fece8181188e9ba4a2bb3128e648a3c2c6789c824d66d7f2d273c44b",
+      "nlp_role": "NO_NLP_GOVERNANCE_AUTOFIX",
+      "route": "CGC_ABC_INTAKE",
+      "execution_state": "INTAKE_ONLY",
+      "network": false,
+      "dry_run": "temporary fixture dry-run completed; source tree untouched; commit/overwrite disabled"
+    },
+    {
+      "id": "cge_adaptive",
+      "name": "via_cge_adaptive.py",
+      "kind": "adaptive interface registry candidate",
+      "source_path": "supportive modules/references/intake/VIA_CGE_AdaptiveInterface_b532/via_cge_adaptive.py",
+      "sha256": "83a4097b1e30967f4e3d3faa46fe37636f1dde1e51f3f090d612f89dbd1f2450",
+      "nlp_role": "NO_NLP_INTERFACE_GOVERNANCE",
+      "route": "CGE_ADAPTIVE_INTAKE",
+      "execution_state": "INTAKE_ONLY",
+      "network": false,
+      "selftest": "25/25 PASS; temporary selftest fixtures only"
+    }
+  ]
+}

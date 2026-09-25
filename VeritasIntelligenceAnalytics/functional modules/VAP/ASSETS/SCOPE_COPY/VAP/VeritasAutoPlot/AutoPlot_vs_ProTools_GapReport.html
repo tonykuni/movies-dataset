@@ -1,0 +1,1388 @@
+﻿<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>AutoPlot Gap Analysis</title>
+  <style>
+    :root {
+      --bg:#0f1218; --card:#151a22; --line:#263046;
+      --text:#e9eef7; --muted:#a8b3c7;
+      --ok:#2ecc71; --warn:#f1c40f; --fail:#ff5c7a; --na:#8c98b3;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body {
+      margin:0; padding:24px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans TC", Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 20% 0%, rgba(106,169,255,0.18), transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(46,204,113,0.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .wrap{max-width:1200px; margin:0 auto}
+    .header {
+      display:flex; gap:16px; align-items:flex-end; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .h-title{font-size:22px; font-weight:800; letter-spacing:.2px}
+    .h-sub{color:var(--muted); font-size:13px; margin-top:6px}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .chip{
+      border:1px solid var(--line); background: rgba(255,255,255,0.04);
+      padding:6px 10px; border-radius:999px; font-size:12px; color:var(--muted)
+    }
+    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin: 12px 0 18px}
+    .kpi{
+      border:1px solid var(--line); background: rgba(255,255,255,0.03);
+      border-radius: var(--radius); padding:14px;
+    }
+    .kpi .k{color:var(--muted); font-size:12px}
+    .kpi .v{font-size:20px; font-weight:800; margin-top:6px}
+    .kpi .s{color:var(--muted); font-size:12px; margin-top:6px}
+    .card{
+      border:1px solid var(--line); background: rgba(255,255,255,0.03);
+      border-radius: var(--radius); padding: 12px; margin: 12px 0;
+    }
+    .card-h{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:4px 4px 10px}
+    .title{font-weight:800; font-size:16px}
+    .meta{color:var(--muted); font-size:12px}
+    .table-wrap{overflow:auto; border-radius: 12px; border:1px solid var(--line)}
+    table{width:100%; border-collapse:collapse; min-width: 860px; background: rgba(0,0,0,0.12)}
+    th, td{padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:top}
+    th{text-align:left; font-size:12px; color:var(--muted); background: rgba(255,255,255,0.04)}
+    td.item{font-weight:650}
+    td.note{color:var(--muted)}
+    td.mark{text-align:center; width: 120px; font-weight:900}
+    .ok{color:var(--ok)}
+    .warn{color:var(--warn)}
+    .fail{color:var(--fail)}
+    .na{color:var(--na)}
+    td.num{text-align:right}
+    .footer{color:var(--muted); font-size:12px; margin:18px 4px 0}
+    .hr{height:1px; background: rgba(255,255,255,0.06); margin: 14px 0}
+    @media (max-width: 900px) {
+      .grid{grid-template-columns:1fr}
+      .chips{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <div class="h-title">📊 AutoPlot vs 專業繪圖工具 功能差距分析</div>
+        <div class="h-sub">矩陣來源：你提供的清單（✅/⚠️/❌），本報告會自動統計覆蓋率與缺口優先序。</div>
+      </div>
+      <div class="chips">
+        <span class="chip">總條目：103</span>
+        <span class="chip">TradingView 覆蓋率：99.51%</span>
+        <span class="chip">MacroMicro 覆蓋率：85.44%</span>
+        <span class="chip"><b>AutoPlot 覆蓋率：1.46%</b></span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="kpi">
+        <div class="k">AutoPlot 缺少（❌）</div>
+        <div class="v fail">100</div>
+        <div class="s">代表目前完全未提供的功能條目數</div>
+      </div>
+      <div class="kpi">
+        <div class="k">AutoPlot 部分（⚠️）</div>
+        <div class="v warn">3</div>
+        <div class="s">代表只有基礎版本、或固定/不足的功能條目數</div>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="card-h">
+        <div class="title">🔥 缺口優先序（先做哪些分類最划算）</div>
+        <div class="meta">priority_score = (missing + 0.5*partial) * category_weight</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>分類</th>
+              <th style="text-align:right">條目</th>
+              <th style="text-align:right">缺少❌</th>
+              <th style="text-align:right">部分⚠️</th>
+              <th style="text-align:right">AutoPlot覆蓋率</th>
+              <th style="text-align:right">權重</th>
+              <th style="text-align:right">priority_score</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+          <tr>
+            <td class="item">圖表類型</td>
+            <td class="num">17</td>
+            <td class="num fail">15</td>
+            <td class="num warn">2</td>
+            <td class="num">5.88%</td>
+            <td class="num">1.05</td>
+            <td class="num"><b>16.8</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">繪圖工具</td>
+            <td class="num">14</td>
+            <td class="num fail">14</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.2</td>
+            <td class="num"><b>16.8</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">圖表互動功能</td>
+            <td class="num">8</td>
+            <td class="num fail">8</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.4</td>
+            <td class="num"><b>11.2</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">經濟數據視覺化</td>
+            <td class="num">10</td>
+            <td class="num fail">10</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">0.9</td>
+            <td class="num"><b>9.0</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">警報系統</td>
+            <td class="num">7</td>
+            <td class="num fail">7</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.25</td>
+            <td class="num"><b>8.75</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">圖表樣式設定</td>
+            <td class="num">9</td>
+            <td class="num fail">9</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">0.95</td>
+            <td class="num"><b>8.55</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">時間週期</td>
+            <td class="num">7</td>
+            <td class="num fail">6</td>
+            <td class="num warn">1</td>
+            <td class="num">7.14%</td>
+            <td class="num">1.25</td>
+            <td class="num"><b>8.125</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">技術指標</td>
+            <td class="num">6</td>
+            <td class="num fail">6</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.35</td>
+            <td class="num"><b>8.1</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">數據源與即時更新</td>
+            <td class="num">7</td>
+            <td class="num fail">7</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.15</td>
+            <td class="num"><b>8.05</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">匯出與分享</td>
+            <td class="num">7</td>
+            <td class="num fail">7</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.0</td>
+            <td class="num"><b>7.0</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">多圖表功能</td>
+            <td class="num">6</td>
+            <td class="num fail">6</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">1.1</td>
+            <td class="num"><b>6.6</b></td>
+          </tr>
+        
+          <tr>
+            <td class="item">自訂腳本</td>
+            <td class="num">5</td>
+            <td class="num fail">5</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num">0.95</td>
+            <td class="num"><b>4.75</b></td>
+          </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="hr"></div>
+
+    
+        <section class="card">
+          <div class="card-h">
+            <div class="title">圖表類型</div>
+            <div class="meta">
+              條目：17
+              ／ AutoPlot 覆蓋率：5.88%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">K線圖 (Candlestick)</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">OHLC Bar Chart</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Line Chart 折線圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark warn">⚠️</td>
+            <td class="note">基本</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Area Chart 面積圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Bar Chart 柱狀圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark warn">⚠️</td>
+            <td class="note">基本</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Heikin Ashi</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Renko</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Point &amp; Figure</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Kagi</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Line Break</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Hollow Candles</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Baseline</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Mountain / Step Line</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Scatter Plot 散點圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Histogram 直方圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Heatmap 熱力圖</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Pie/Donut 圓餅圖</td>
+            <td class="mark warn">⚠️</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">技術指標</div>
+            <div class="meta">
+              條目：6
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">MA / EMA / SMA / WMA / VWMA / DEMA / TEMA</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">RSI / MACD / Stochastic / CCI / Williams%R / MFI</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Bollinger Bands / ATR / Keltner / Donchian</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Volume / OBV / VWAP / Volume Profile / CMF</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Pivot Points / Fibonacci / Support&amp;Resistance</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Ichimoku / Parabolic SAR / ADX / Aroon</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">全部缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">繪圖工具</div>
+            <div class="meta">
+              條目：14
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Trend Line 趨勢線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Trend Angle 角度線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Horizontal Line 水平線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Vertical Line 垂直線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Ray 射線 / Extended Line 延長線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Parallel Channel 平行通道</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Regression Trend 回歸趨勢</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Fibonacci Retracement/Extension/Fan/TimeZone/Arcs</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Rectangle / Circle(Ellipse) / Triangle / Arc / Polyline</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Head&amp;Shoulders / DoubleTopBottom / Triangle Patterns</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">XABCD(諧波) / Elliott Wave / Cypher</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Price Range / Date Range / Date&amp;Price Range / Bars Pattern</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Text / Anchored Text / Note / Callout / Price Label / Arrow / Emoji</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Fixed Range Volume Profile / Anchored VWAP</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">圖表互動功能</div>
+            <div class="meta">
+              條目：8
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Zoom 縮放</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Pan 平移</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Crosshair 十字準線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Tooltip 懸停提示（OHLCV 詳細）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Range Slider 範圍滑桿</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Date Range Selector（1D/1W/1M/…）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Click to Select / Drag to Move / Snap to Data</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Multi-touch 多點觸控</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">時間週期</div>
+            <div class="meta">
+              條目：7
+              ／ AutoPlot 覆蓋率：7.14%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">秒級 1s/5s/10s/15s/30s</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">分鐘級 1m/3m/5m/15m/30m/45m</td>
+            <td class="mark ok">✅</td>
+            <td class="mark warn">⚠️</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">小時級 1H/2H/3H/4H</td>
+            <td class="mark ok">✅</td>
+            <td class="mark warn">⚠️</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">日級 1D</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark warn">⚠️</td>
+            <td class="note">固定/不足</td>
+          </tr>
+        
+          <tr>
+            <td class="item">週/月/季/年 1W/1M/3M/6M/12M</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">自訂週期（任意設定）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Range Bars</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">多圖表功能</div>
+            <div class="meta">
+              條目：6
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Split Screen 分割畫面</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Sync Crosshair / Sync Time / Sync Drawings</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Compare 疊加多商品</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Overlay 疊加圖表</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Multi Y-Axis 左右軸</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Subplots 指標獨立面板</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">數據源與即時更新</div>
+            <div class="meta">
+              條目：7
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Real-time（WebSocket）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Historical（長年歷史）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">多數據源（多交易所）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">API 串接（REST+WebSocket）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">CSV/Excel 匯入</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Auto-refresh 自動更新</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Caching 數據快取</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">圖表樣式設定</div>
+            <div class="meta">
+              條目：9
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Theme Light/Dark</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Background 自訂漸層</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Grid 網格線可開關/自訂</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">K線顏色（空心/實心、漲跌）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">線條樣式/粗細</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">字體設定</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">軸標籤格式（價格/百分比/對數）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Legend 可拖動/隱藏</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Watermark 浮水印</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">匯出與分享</div>
+            <div class="meta">
+              條目：7
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">Screenshot PNG/JPG</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">SVG 匯出</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">PDF 匯出</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">分享連結 Public URL</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Embed iframe</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">社群分享</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">數據匯出 CSV</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">警報系統</div>
+            <div class="meta">
+              條目：7
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">價格警報（突破/跌破）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">指標警報（RSI&gt;70 等）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">繪圖警報（觸及趨勢線）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Webhook 通知</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Email 通知</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">手機推播</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">多條件 AND/OR</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">自訂腳本</div>
+            <div class="meta">
+              條目：5
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">腳本語言（Pine Script 類）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">自訂指標（社群/市場）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">策略回測 Backtesting</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">策略測試器</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">腳本編輯器（內建 IDE）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="card">
+          <div class="card-h">
+            <div class="title">經濟數據視覺化</div>
+            <div class="meta">
+              條目：10
+              ／ AutoPlot 覆蓋率：0.0%
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>TradingView</th>
+                  <th>MacroMicro</th>
+                  <th>AutoPlot</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td class="item">GDP/CPI/PMI/就業（經濟指標圖表）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">央行利率追蹤</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">殖利率曲線</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">經濟週期分析（Leading/Lagging）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">景氣循環指標</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">商品追蹤（原油/黃金/銅…）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">地緣政治風險</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">AI 情緒分析（鷹派/鴿派）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">Dashboard 儀表板（自訂組合）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+          <tr>
+            <td class="item">收藏夾系統（Collections）</td>
+            <td class="mark ok">✅</td>
+            <td class="mark ok">✅</td>
+            <td class="mark fail">❌</td>
+            <td class="note">缺少</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+
+    <div class="footer">
+      你可以直接在 DATASET() 裡增刪條目；也可以調整 CONFIG()["category_weight"] 來改「優先序」策略。
+    </div>
+  </div>
+</body>
+</html>

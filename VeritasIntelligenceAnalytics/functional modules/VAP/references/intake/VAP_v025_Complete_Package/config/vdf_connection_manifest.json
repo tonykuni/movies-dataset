@@ -1,0 +1,46 @@
+{
+  "schema": "VIA-VDF-VAP-CONNECTION-MANIFEST/1.0",
+  "version": "v025",
+  "policy": "VDF_AUTHORIZED_READ_ONLY_FAIL_CLOSED",
+  "connections": [
+    {
+      "contractId": "VDF-DEMO-MARKET-v1",
+      "sourceId": "VAP-DEMO-MARKET",
+      "state": "AUTHORIZED",
+      "readOnly": true,
+      "engine": "CSV",
+      "assetClass": "STOCK_INDEX",
+      "sourceSystem": "VDF_DEMO_EXPORT",
+      "adjustedPriceField": "adjClose",
+      "volumeField": "volume",
+      "splitAdjustedVolume": true,
+      "taLibEvidence": {
+        "engine": "TA-Lib",
+        "status": "PASS",
+        "priceInput": "adjClose",
+        "volumeInput": "splitAdjustedVolume"
+      },
+      "fingerprint": "d65309e49fe7384a21a67809388a0c234a41e7456bcf794ee3d74c6dc507ddfa",
+      "asofPolicy": "SOURCE_TIMESTAMP",
+      "authorizedAt": "2026-08-31T00:00:00.000Z"
+    }
+  ],
+  "stockConnectionTemplate": {
+    "contractId": "VDF-STOCK-ADJ-TALIB-v1",
+    "sourceId": "REPLACE_WITH_SOURCE_ID",
+    "state": "DRAFT",
+    "readOnly": true,
+    "engine": "PARQUET",
+    "assetClass": "STOCK",
+    "sourceSystem": "VDF",
+    "adjustedPriceField": "adjClose",
+    "volumeField": "volume",
+    "splitAdjustedVolume": true,
+    "taLibEvidence": {
+      "engine": "TA-Lib",
+      "status": "PENDING",
+      "priceInput": "adjClose",
+      "volumeInput": "splitAdjustedVolume"
+    }
+  }
+}

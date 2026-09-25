@@ -18,7 +18,7 @@ $def_Paths = @(
     "C:\Users\tonyk\Downloads\BOM_Template_Blank.csv"
     "C:\Users\tonyk\Downloads\BOM_Template_Sample (1).csv"
     "C:\Users\tonyk\Downloads\BOM_Template_Sample.csv"
-    "C:\Users\tonyk\Downloads\fetch_mailbox.py"
+    "C:\Users\tonyk\Downloads\SUP_MDL048_FetchMailbox.py"
     "C:\Users\tonyk\Downloads\image_thumb51.png"
     "C:\Users\tonyk\Downloads\launcher_minimal (1).html"
     "C:\Users\tonyk\Downloads\launcher_minimal.html"
@@ -102,7 +102,7 @@ $def_Paths = @(
     "C:\Users\tonyk\Downloads\VIA_Industry360_Intelligence_Suite_Professional.html"
     "C:\Users\tonyk\Downloads\VIA_Integrated_Platform.html"
     "C:\Users\tonyk\Downloads\VIS_Global_Crude_Oil_Market_v0111.html"
-    "C:\Users\tonyk\Downloads\vpns_ast_symbol_engine.py"
+    "C:\Users\tonyk\Downloads\SUP_MDL166_VpnsAstSymbolEngine.py"
     "C:\Users\tonyk\Downloads\vpns_rename_map.SAMPLE.json"
     "C:\Users\tonyk\Downloads\一鍵讀信箱.bat"
     "C:\Users\tonyk\Downloads\台達電.docx"
@@ -320,3 +320,11 @@ try {
     Write-Host ""
     Write-Host "PowerShell remains open. No destructive action was executed." -ForegroundColor Yellow
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

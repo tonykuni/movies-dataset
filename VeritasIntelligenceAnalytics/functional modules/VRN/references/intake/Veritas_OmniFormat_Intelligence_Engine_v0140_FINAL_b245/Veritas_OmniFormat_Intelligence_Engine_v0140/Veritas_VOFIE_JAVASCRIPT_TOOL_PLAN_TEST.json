@@ -1,0 +1,91 @@
+{
+  "contract": "veritas.vofie-tool-execution-plan/1.2",
+  "engine_version": "1.4.0",
+  "execute_safe": true,
+  "executions": [
+    {
+      "exit_code": 0,
+      "external_process_started": true,
+      "function": "syntax_parse",
+      "gate": "PASS",
+      "message": "",
+      "runner": "JS-TOOL-001"
+    },
+    {
+      "external_process_started": false,
+      "function": "static_analysis",
+      "gate": "PLAN_ONLY",
+      "message": "explicit tool-specific opt-in required; no source mutation performed",
+      "runner": "JS-TOOL-003"
+    },
+    {
+      "external_process_started": false,
+      "function": "dependency_graph",
+      "gate": "PLAN_ONLY",
+      "message": "explicit tool-specific opt-in required; no source mutation performed",
+      "runner": "JS-TOOL-011"
+    }
+  ],
+  "external_process_started": true,
+  "functions": [
+    "syntax_parse",
+    "static_analysis",
+    "dependency_graph"
+  ],
+  "gate": "PASS",
+  "language": "javascript",
+  "plan": [
+    {
+      "alternates": [
+        "JS-TOOL-002"
+      ],
+      "cpu_supported": true,
+      "fallback": "python_js_structural_scan",
+      "function": "syntax_parse",
+      "language": "javascript",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-JAVASCRIPT-01",
+      "primary": "JS-TOOL-001",
+      "read_only": true,
+      "selected": "JS-TOOL-001",
+      "status": "READY_PRIMARY"
+    },
+    {
+      "alternates": [
+        "JS-TOOL-004",
+        "JS-TOOL-010"
+      ],
+      "cpu_supported": true,
+      "fallback": "node_check_then_structural_rules",
+      "function": "static_analysis",
+      "language": "javascript",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-JAVASCRIPT-02",
+      "primary": "JS-TOOL-003",
+      "read_only": true,
+      "selected": "JS-TOOL-003",
+      "status": "READY_FALLBACK"
+    },
+    {
+      "alternates": [
+        "JS-TOOL-012"
+      ],
+      "cpu_supported": true,
+      "fallback": "regex_import_graph",
+      "function": "dependency_graph",
+      "language": "javascript",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-JAVASCRIPT-06",
+      "primary": "JS-TOOL-011",
+      "read_only": true,
+      "selected": "JS-TOOL-011",
+      "status": "READY_FALLBACK"
+    }
+  ],
+  "safe_execution_functions": [
+    "syntax_parse"
+  ],
+  "source_mutated": false,
+  "source_policy": "READ_ONLY_NO_DELETE_NO_MOVE_NO_CANONICAL_MUTATION",
+  "target": "/workspace/scratch/69bab2b31199/Veritas_OmniFormat_Intelligence_Engine_v0140/adapters/vofie_polyglot_tool_probe.mjs"
+}

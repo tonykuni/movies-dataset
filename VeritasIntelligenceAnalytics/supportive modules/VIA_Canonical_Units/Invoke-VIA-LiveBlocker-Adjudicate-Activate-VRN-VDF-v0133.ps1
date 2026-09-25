@@ -8,6 +8,16 @@ param(
     [int]$UiPortStart = 8765,
     [string]$ApprovalPhrase = "I_APPROVE_VIA_v0133_ADJUDICATE_QUARANTINE_AND_ACTIVATE_VRN_VDF_20260725"
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -30,7 +40,7 @@ $RuntimeDeployDir = Join-Path $BaseDir "supportive modules\VIA_AutoSandbox20_Run
 
 $GatePath = Join-Path $JsonDir "activation_gate.v0133.json"
 $ManifestPath = Join-Path $RuntimeCandidateDir "VIA_LibraryManifest.v0133.json"
-$PythonEnginePath = Join-Path $RuntimeCandidateDir "VIA_UnifiedPythonEngine_v0133.py"
+$PythonEnginePath = Join-Path $RuntimeCandidateDir "SUP_MDL114_UnifiedPythonEngine_v0133.py"
 $SupportiveLoadListPath = Join-Path $RuntimeCandidateDir "supportive_loaded_modules.v0133.json"
 $VrnBootstrapPath = Join-Path $RuntimeCandidateDir "Start-VIA-VRN-With-Supportive-v0133.ps1"
 $VdfBootstrapPath = Join-Path $RuntimeCandidateDir "Start-VIA-VDF-With-Supportive-v0133.ps1"
@@ -1014,3 +1024,4 @@ finally {
     Write-Host ""
     Write-Host "def PowerShell remains open." -ForegroundColor Cyan
 }
+

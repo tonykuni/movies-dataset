@@ -1,0 +1,103 @@
+{
+  "contract": "veritas.vofie-tool-execution-plan/1.2",
+  "engine_version": "1.4.0",
+  "execute_safe": true,
+  "executions": [
+    {
+      "details": {
+        "errors": [],
+        "fallback": "PYTHON_STRUCTURAL_ONLY_USE_PS7_AST_WHEN_AVAILABLE",
+        "function_count": 6,
+        "functions": [
+          "Write-VOFIEProgress",
+          "Test-VOFIEPythonCandidate",
+          "Resolve-VOFIEPython",
+          "Resolve-VOFIEInput",
+          "Invoke-VOFIEPython",
+          "Start-VeritasVOFIE"
+        ],
+        "gate": "PASS",
+        "source_mutated": false,
+        "top_parameter_block": true
+      },
+      "external_process_started": false,
+      "function": "syntax_parse",
+      "gate": "PASS",
+      "message": "",
+      "runner": "python_powershell_structural_scan"
+    },
+    {
+      "external_process_started": false,
+      "function": "unit_test",
+      "gate": "PLAN_ONLY",
+      "message": "explicit tool-specific opt-in required; no source mutation performed",
+      "runner": "PS-TOOL-004"
+    },
+    {
+      "external_process_started": false,
+      "function": "build_automation",
+      "gate": "PLAN_ONLY",
+      "message": "explicit tool-specific opt-in required; no source mutation performed",
+      "runner": "PS-TOOL-009"
+    }
+  ],
+  "external_process_started": false,
+  "functions": [
+    "syntax_parse",
+    "unit_test",
+    "build_automation"
+  ],
+  "gate": "PASS",
+  "language": "powershell",
+  "plan": [
+    {
+      "alternates": [
+        "PS-TOOL-001"
+      ],
+      "cpu_supported": true,
+      "fallback": "python_powershell_structural_scan",
+      "function": "syntax_parse",
+      "language": "powershell",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-POWERSHELL-01",
+      "primary": "PS-TOOL-002",
+      "read_only": true,
+      "selected": "PS-TOOL-002",
+      "status": "READY_FALLBACK"
+    },
+    {
+      "alternates": [],
+      "cpu_supported": true,
+      "fallback": "python_contract_test_bridge",
+      "function": "unit_test",
+      "language": "powershell",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-POWERSHELL-04",
+      "primary": "PS-TOOL-004",
+      "read_only": true,
+      "selected": "PS-TOOL-004",
+      "status": "READY_FALLBACK"
+    },
+    {
+      "alternates": [
+        "PS-TOOL-010"
+      ],
+      "cpu_supported": true,
+      "fallback": "python_stage_runner",
+      "function": "build_automation",
+      "language": "powershell",
+      "machine_readable": true,
+      "matrix_id": "MATRIX-POWERSHELL-10",
+      "primary": "PS-TOOL-009",
+      "read_only": true,
+      "selected": "PS-TOOL-009",
+      "status": "READY_FALLBACK"
+    }
+  ],
+  "safe_execution_functions": [
+    "syntax_parse"
+  ],
+  "source_mutated": false,
+  "source_policy": "READ_ONLY_NO_DELETE_NO_MOVE_NO_CANONICAL_MUTATION",
+  "target": "/workspace/scratch/69bab2b31199/Veritas_OmniFormat_Intelligence_Engine_v0140/Invoke-Veritas-VOFIE.ps1"
+}

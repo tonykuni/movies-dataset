@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>VIA · US Macro Matrix Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;
+--bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;
+--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;--up:#c0392b;--dn:#2e7d52;--yoy:#2e7d52;
+--mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--display:var(--sa);
+--r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);--ease:cubic-bezier(.22,.68,0,1.2);}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1480px;margin:0 auto;padding:10px 16px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:12px 16px;margin-bottom:10px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));animation:hs 8s linear infinite;background-size:200% 100%}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo-wrap{width:42px;height:42px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mo);font-weight:500;font-size:13px;box-shadow:0 2px 8px rgba(76,120,168,.35)}
+.hdr-titles{flex:1}.hdr-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.5px}.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9px;color:var(--i3);font-family:var(--mo);margin-top:2px}
+.hdr-r{font-family:var(--mo);font-size:8.5px;text-align:right;color:var(--i2);line-height:1.7}
+.winb{background:var(--gn-l);color:var(--gn);padding:2px 9px;border-radius:10px}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--i3)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mo);font-size:9px;color:var(--i2);margin-bottom:10px;align-items:center}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:-1px}
+.dot.g{background:var(--gn)}.dot.c{background:var(--tl)}.dot.y{background:var(--am)}.dot.r{background:var(--co)}
+.sec-t{font-family:var(--display);font-weight:700;font-size:13px;margin:4px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-t .sm{font-family:var(--mo);font-size:8px;color:var(--am);background:var(--am-l);padding:1px 7px;border-radius:8px;font-weight:400}
+.charts2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(max-width:820px){.charts2{grid-template-columns:1fr}}
+.ch{border:1px solid var(--bd);border-radius:var(--r2);background:var(--sf);padding:10px 12px;box-shadow:var(--sh)}
+.ch-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.ch-t{font-weight:600;font-size:11px}.ch-s{font-family:var(--mo);font-size:8px;color:var(--i3)}
+.ch-leg{display:flex;gap:9px;font-family:var(--mo);font-size:8px;color:var(--i2);margin-bottom:3px;flex-wrap:wrap}
+.ch-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+.ch svg{width:100%;height:auto;display:block}
+.mblock{margin-bottom:8px;border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf)}
+.mb-h{padding:7px 12px;background:var(--sf2);border-bottom:1px solid var(--bd);border-left:3px solid var(--tc);font-weight:700;font-size:12px;font-family:var(--display)}
+.mb-b{padding:8px 10px}
+.msub{margin-bottom:6px}
+.msub-t{font-family:var(--mo);font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.05em;margin:2px 0 4px}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:5px}
+.cl{border:1px solid var(--bd);border-radius:var(--r);padding:6px 8px;background:var(--sf2);transition:.12s}
+.cl:hover{box-shadow:var(--sh);border-color:var(--bd2)}
+.cl-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.cl-n{font-weight:600;font-size:10px;flex:1;line-height:1.2}
+.cl-v{font-family:var(--mo);font-size:14px;font-weight:500;line-height:1.1}
+.cl-v .ar{font-size:11px;font-weight:700;margin-left:3px}
+.cl-s{font-family:var(--mo);font-size:7.5px;color:var(--i3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ft{font-family:var(--mo);font-size:8.5px;color:var(--i3);padding:12px 2px 8px;border-top:1px solid var(--bd);margin-top:10px;line-height:1.7}
+</style></head><body><div class="w">
+<div class="hdr"><div class="logo-wrap">M</div><div class="hdr-titles">
+<div class="hdr-title">VIA · <span>US Macro Matrix</span> Dashboard</div><div class="hdr-sub" id="sub"></div></div>
+<div class="hdr-r"><span class="up">▲ UP=RED</span> · <span class="dn">▼ DOWN=GREEN</span><br><span class="winb" id="win"></span><br><span style="color:var(--am)">最新數值 SAMPLE</span></div></div>
+<div class="legend" id="leg"></div>
+<div class="sec-t">重點圖 Featured <span class="sm">SAMPLE</span></div>
+<div class="charts2">
+ <div class="ch"><div class="ch-h"><span class="ch-t">非農就業月增(左) + 失業率(右)</span><span class="ch-s">PAYEMS · UNRATE</span></div>
+  <div class="ch-leg"><span><i style="background:var(--up)"></i>月增↑</span><span><i style="background:var(--dn)"></i>月增↓</span><span style="color:var(--am)">— 失業率%(右軸)</span></div><svg id="c-nfp" viewBox="0 0 420 210"></svg></div>
+ <div class="ch"><div class="ch-h"><span class="ch-t">失業時間長短區隔</span><span class="ch-s">UEMPLT5/UEMP14-26/27OV</span></div>
+  <div class="ch-leg"><span><i style="background:var(--gn-l)"></i>&lt;5週</span><span><i style="background:var(--am-l)"></i>5-14</span><span><i style="background:var(--am)"></i>15-26</span><span><i style="background:var(--co)"></i>27週+</span></div><svg id="c-dur" viewBox="0 0 420 210"></svg></div>
+ <div class="ch"><div class="ch-h"><span class="ch-t">零售銷售值(左) + 年增率(右)</span><span class="ch-s">RSAFS</span></div>
+  <div class="ch-leg"><span><i style="background:var(--bl)"></i>零售值$bn</span><span style="color:var(--yoy)">— 年增%(右軸)</span></div><svg id="c-ret" viewBox="0 0 420 210"></svg></div>
+ <div class="ch"><div class="ch-h"><span class="ch-t">消費者信心指數</span><span class="ch-s">UMCSENT · Conf. Board</span></div>
+  <div class="ch-leg"><span><i style="background:var(--bl)"></i>UMich</span><span><i style="background:var(--vi)"></i>Conference Board</span></div><svg id="c-conf" viewBox="0 0 420 210"></svg></div>
+</div>
+<div class="sec-t">全資料矩陣 Full Matrix <span class="sm" id="cellcount"></span></div>
+<div id="matrix"></div>
+<div class="ft" id="ft"></div></div>
+<script>
+const D={"title": "VIA · US Macro Matrix Dashboard", "version": "v1", "anchor": "AST-PS-MOD-VIA-MACRO-MATRIX-001", "window": "1995-01-01 ~ 最新", "lock": "Visual Lock v1 · UP=RED ▲ / DOWN=GREEN ▼", "lights": {"g": "FRED 官方可抓", "c": "替代源 yf/ak", "y": "待複核", "r": "缺口/質化"}, "note": "矩陣結構=《美國總經數據矩陣》文件 · 來源燈號=v3 registry 真狀態 · 最新數值/趨勢=SAMPLE · 窗 1995-01-01~最新", "matrix": [{"cat": "成長 Growth", "color": "bl", "subs": [{"sub": "產出", "cells": [{"n": "GDP 實質", "src": "FRED GDPC1", "l": "g", "v": "+2.3% q/ann", "t": "up"}, {"n": "GDI", "src": "FRED A261RX1Q020SBEA", "l": "y", "v": "+1.9%", "t": "up"}, {"n": "工業生產", "src": "FRED INDPRO", "l": "g", "v": "102.4", "t": "fl"}]}, {"sub": "支出結構", "cells": [{"n": "消費 C", "src": "FRED PCEC/BEA", "l": "g", "v": "$19.7tn", "t": "up"}, {"n": "投資 I", "src": "FRED GPDI", "l": "g", "v": "$5.2tn", "t": "dn"}, {"n": "政府 G", "src": "FRED GCE", "l": "g", "v": "$4.9tn", "t": "up"}, {"n": "淨出口 NX", "src": "FRED NETEXP", "l": "g", "v": "−$0.8tn", "t": "dn"}]}]}, {"cat": "勞動 Labor", "color": "tl", "subs": [{"sub": "就業", "cells": [{"n": "非農 NFP", "src": "FRED PAYEMS · ak non_farm", "l": "g", "v": "+150k", "t": "dn"}, {"n": "ADP", "src": "FRED ADPMNUSNERSA · ak", "l": "g", "v": "+122k", "t": "dn"}, {"n": "JOLTS 職缺", "src": "FRED JTSJOL", "l": "g", "v": "7.7M", "t": "dn"}]}, {"sub": "失業", "cells": [{"n": "失業率 U3", "src": "FRED UNRATE", "l": "g", "v": "4.2%", "t": "up"}, {"n": "U6", "src": "FRED U6RATE", "l": "g", "v": "7.9%", "t": "up"}, {"n": "初領失業金", "src": "FRED ICSA · ak", "l": "g", "v": "223k", "t": "up"}]}, {"sub": "工資", "cells": [{"n": "平均時薪", "src": "FRED CES0500000003", "l": "g", "v": "+3.9% yoy", "t": "dn"}, {"n": "單位勞動成本 ULC", "src": "FRED PRS85006112", "l": "y", "v": "+1.8%", "t": "dn"}]}]}, {"cat": "通膨 Inflation", "color": "co", "subs": [{"sub": "整體物價", "cells": [{"n": "CPI", "src": "FRED CPIAUCSL · ak cpi_yoy", "l": "g", "v": "+2.9% yoy", "t": "up"}, {"n": "PPI", "src": "FRED PPIACO · ak", "l": "g", "v": "+2.4% yoy", "t": "up"}]}, {"sub": "核心物價", "cells": [{"n": "Core CPI", "src": "FRED CPILFESL", "l": "g", "v": "+3.2% yoy", "t": "fl"}, {"n": "Core PCE (Fed)", "src": "FRED PCEPILFE", "l": "g", "v": "+2.8% yoy", "t": "dn"}]}, {"sub": "通膨預期", "cells": [{"n": "10Y Breakeven", "src": "FRED T10YIE", "l": "g", "v": "2.34%", "t": "up"}, {"n": "UMich 預期", "src": "FRED MICH", "l": "g", "v": "3.1%", "t": "up"}]}]}, {"cat": "利率 Rates", "color": "vi", "subs": [{"sub": "政策利率", "cells": [{"n": "Fed Funds 上限", "src": "FRED DFEDTARU", "l": "g", "v": "4.50%", "t": "fl"}, {"n": "Dot Plot", "src": "Fed SEP 質化", "l": "r", "v": "2 cuts '26", "t": "fl"}]}, {"sub": "市場利率", "cells": [{"n": "2Y", "src": "FRED DGS2 · yf", "l": "g", "v": "3.98%", "t": "dn"}, {"n": "10Y", "src": "FRED DGS10 · yf ^TNX", "l": "g", "v": "4.29%", "t": "up"}, {"n": "30Y", "src": "FRED DGS30 · yf ^TYX", "l": "g", "v": "4.52%", "t": "up"}, {"n": "10Y 實質", "src": "FRED DFII10", "l": "g", "v": "1.95%", "t": "up"}]}, {"sub": "曲線結構", "cells": [{"n": "2s10s", "src": "FRED T10Y2Y", "l": "g", "v": "−0.29", "t": "up"}, {"n": "3m10y", "src": "FRED T10Y3M", "l": "g", "v": "−0.42", "t": "up"}]}]}, {"cat": "消費 Consumption", "color": "gn", "subs": [{"sub": "家計部門", "cells": [{"n": "零售銷售", "src": "FRED RSAFS · ak", "l": "g", "v": "+3.5% yoy", "t": "up"}, {"n": "PCE", "src": "FRED PCEC", "l": "g", "v": "+2.6% yoy", "t": "up"}, {"n": "循環信用卡餘額", "src": "FRED CCLACBW027SBOG", "l": "y", "v": "$1.32tn", "t": "up"}]}, {"sub": "信心", "cells": [{"n": "UMich 信心", "src": "FRED UMCSENT · ak", "l": "g", "v": "71.2", "t": "dn"}, {"n": "Conference Board", "src": "FRED CSCICP03USM665S · ak", "l": "y", "v": "104.3", "t": "dn"}]}]}, {"cat": "投資/房市 Investment", "color": "tl", "subs": [{"sub": "企業投資", "cells": [{"n": "非住宅投資", "src": "FRED PNFI", "l": "y", "v": "$3.9tn", "t": "up"}, {"n": "設備投資", "src": "FRED Y033RC1Q027SBEA", "l": "y", "v": "$1.5tn", "t": "up"}, {"n": "耐久財訂單", "src": "FRED DGORDER · ak", "l": "g", "v": "$289bn", "t": "dn"}]}, {"sub": "建築/房市", "cells": [{"n": "新屋開工", "src": "FRED HOUST · ak", "l": "g", "v": "1.35M", "t": "dn"}, {"n": "建築許可", "src": "FRED PERMIT · ak", "l": "g", "v": "1.42M", "t": "dn"}, {"n": "新屋銷售", "src": "FRED HSN1F · ak", "l": "g", "v": "664k", "t": "fl"}, {"n": "Case-Shiller", "src": "FRED CSUSHPISA · ak spcs20", "l": "y", "v": "+4.1% yoy", "t": "up"}]}]}, {"cat": "財政 Fiscal", "color": "am", "subs": [{"sub": "收支", "cells": [{"n": "財政赤字(月)", "src": "FRED MTSDS133FMS", "l": "g", "v": "−$1.9tn ttm", "t": "up"}, {"n": "稅收", "src": "FRED FGRECPT", "l": "g", "v": "$4.9tn", "t": "up"}, {"n": "支出", "src": "FRED FGEXPND", "l": "g", "v": "$6.8tn", "t": "up"}]}, {"sub": "債務", "cells": [{"n": "公債總額", "src": "FRED GFDEBTN", "l": "g", "v": "$36.2tn", "t": "up"}, {"n": "債務/GDP", "src": "FRED GFDEGDQ188S", "l": "g", "v": "122%", "t": "up"}]}]}, {"cat": "貿易/外部 External", "color": "bl", "subs": [{"sub": "貿易", "cells": [{"n": "貿易差額", "src": "FRED BOPGSTB", "l": "g", "v": "−$78bn", "t": "dn"}, {"n": "出口", "src": "FRED EXPGS", "l": "g", "v": "$3.1tn", "t": "up"}, {"n": "進口", "src": "FRED IMPGS", "l": "g", "v": "$3.9tn", "t": "up"}]}, {"sub": "經常帳", "cells": [{"n": "經常帳餘額", "src": "FRED IEABC", "l": "y", "v": "−$1.1tn", "t": "dn"}]}]}, {"cat": "金融條件 Financial", "color": "vi", "subs": [{"sub": "金融環境", "cells": [{"n": "Chicago Fed NFCI", "src": "FRED NFCI", "l": "g", "v": "−0.42", "t": "dn"}, {"n": "StL 金融壓力", "src": "FRED STLFSI4", "l": "g", "v": "−0.55", "t": "dn"}]}, {"sub": "信貸", "cells": [{"n": "SLOOS 貸款標準", "src": "FRED DRTSCILM", "l": "g", "v": "+8.5%", "t": "dn"}, {"n": "HY 信用利差", "src": "FRED BAMLH0A0HYM2", "l": "g", "v": "3.12%", "t": "dn"}, {"n": "IG 信用利差", "src": "FRED BAMLC0A0CM", "l": "g", "v": "0.88%", "t": "dn"}]}]}, {"cat": "金融市場 Markets", "color": "co", "subs": [{"sub": "股市", "cells": [{"n": "S&P 500", "src": "FRED SP500 · yf ^GSPC", "l": "g", "v": "5870", "t": "up"}, {"n": "Nasdaq", "src": "FRED NASDAQCOM · yf", "l": "g", "v": "19200", "t": "up"}, {"n": "VIX", "src": "FRED VIXCLS · yf ^VIX", "l": "g", "v": "16.4", "t": "dn"}]}, {"sub": "匯率", "cells": [{"n": "DXY", "src": "yf DX-Y.NYB", "l": "c", "v": "98.89", "t": "dn"}, {"n": "主要貨幣對", "src": "yf EURUSD/JPY/TWD=X", "l": "c", "v": "EUR 1.09", "t": "up"}]}, {"sub": "商品", "cells": [{"n": "WTI 原油", "src": "FRED DCOILWTICO · yf CL=F", "l": "g", "v": "$71", "t": "dn"}, {"n": "Brent", "src": "FRED DCOILBRENTEU", "l": "g", "v": "$75", "t": "dn"}, {"n": "黃金", "src": "yf GC=F · ak", "l": "c", "v": "$2640", "t": "up"}]}]}], "feat": {"nfp": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "nfp": [185, 142, 89, 254, 36, 212, 256, 143, 151, 228, 177, 150], "ur": [4.1, 4.3, 4.2, 4.1, 4.1, 4.2, 4.1, 4.0, 4.1, 4.2, 4.2, 4.2]}, "dur": {"lab": ["3Q24", "4Q24", "1Q25", "2Q25", "3Q25", "4Q25", "1Q26"], "b1": [2150, 2090, 2210, 2180, 2240, 2300, 2280], "b2": [2480, 2520, 2460, 2510, 2560, 2600, 2620], "b3": [1180, 1210, 1240, 1260, 1330, 1380, 1410], "b4": [1320, 1360, 1410, 1450, 1520, 1610, 1690]}, "retail": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "lvl": [702, 705, 704, 709, 713, 718, 726, 719, 722, 728, 731, 734], "yoy": [2.1, 2.4, 2.0, 2.8, 3.0, 3.1, 3.6, 2.9, 3.0, 3.4, 3.5, 3.5]}, "conf": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "umich": [68.2, 66.4, 67.9, 70.1, 71.8, 71.0, 74.0, 71.7, 72.5, 72.9, 71.4, 71.2], "cb": [100.3, 98.7, 103.3, 98.7, 109.5, 112.8, 104.7, 105.6, 104.1, 104.0, 103.5, 104.3]}}},M=D.matrix,F=D.feat;
+const A=t=>`<span class="ar ${t}">${t==='up'?'▲':t==='dn'?'▼':'▬'}</span>`;
+document.getElementById('sub').textContent=D.title+' '+D.version+' · '+D.anchor;
+document.getElementById('win').textContent='資料窗 '+D.window;
+document.getElementById('ft').innerHTML=D.note+'<br>'+D.lock;
+document.getElementById('leg').innerHTML='來源燈號:'+Object.entries(D.lights).map(([k,v])=>`<span><span class="dot ${k}"></span>${v}</span>`).join('');
+let nc=0;
+document.getElementById('matrix').innerHTML=M.map(b=>{
+ const subs=b.subs.map(s=>{const cells=s.cells.map(c=>{nc++;return `<div class="cl"><div class="cl-top"><span class="dot ${c.l}" title="${D.lights[c.l]}"></span><span class="cl-n">${c.n}</span></div>
+   <div class="cl-v">${c.v}${A(c.t)}</div><div class="cl-s" title="${c.src}">${c.src}</div></div>`;}).join('');
+   return `<div class="msub"><div class="msub-t">${s.sub}</div><div class="cells">${cells}</div></div>`;}).join('');
+ return `<div class="mblock"><div class="mb-h" style="--tc:var(--${b.color})">${b.cat}</div><div class="mb-b">${subs}</div></div>`;}).join('');
+document.getElementById('cellcount').textContent=nc+' 指標';
+
+// ── SVG helpers ──
+function NS(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function T(svg,x,y,t,an,sz,col){const e=NS('text',{x,y,'text-anchor':an,'font-size':sz,fill:cv(col),'font-family':'DM Mono, monospace'});e.textContent=t;svg.append(e);}
+function PL(svg,pts,col,w){svg.append(NS('polyline',{points:pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '),fill:'none',stroke:cv(col),'stroke-width':w,'stroke-linejoin':'round','stroke-linecap':'round'}));}
+function gridY(svg,L,R,vals,Y,col){vals.forEach(v=>{svg.append(NS('line',{x1:L,x2:R,y1:Y(v),y2:Y(v),stroke:cv('--bg1'),'stroke-width':1}));});}
+
+function chNFP(){const svg=document.getElementById('c-nfp'),W=420,H=210,L=34,Rr=34,Tp=10,B=24,pw=W-L-Rr,ph=H-Tp-B;
+ const d=F.nfp,n=d.lab.length,bw=pw/n*0.6;
+ const top=Math.max(...d.nfp)*1.12,Y=v=>Tp+ph*(top-v)/top,cx=i=>L+pw*(i+0.5)/n;
+ for(let t=0;t<=4;t++){const v=top*t/4;svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(v),y2:Y(v),stroke:cv('--bg1')}));T(svg,L-4,Y(v)+3,Math.round(v),'end',7.5,'--i3');}
+ const ur=d.ur,ulo=Math.min(...ur)-0.2,uhi=Math.max(...ur)+0.2,UY=v=>Tp+ph*(uhi-v)/((uhi-ulo)||1);
+ [ulo,(ulo+uhi)/2,uhi].forEach(v=>T(svg,W-Rr+4,UY(v)+3,v.toFixed(1)+'%','start',7.5,'--am'));
+ d.nfp.forEach((v,i)=>{const col=i===0?'--bl':(v>=d.nfp[i-1]?'--up':'--dn');svg.append(NS('rect',{x:cx(i)-bw/2,y:Y(v),width:bw,height:ph-(Y(v)-Tp),fill:cv(col),opacity:.9}));
+   if(i%2===0)T(svg,cx(i),H-8,d.lab[i],'middle',7,'--i3');});
+ PL(svg,ur.map((v,i)=>[cx(i),UY(v)]),'--am',2);
+ ur.forEach((v,i)=>svg.append(NS('circle',{cx:cx(i),cy:UY(v),r:2.2,fill:cv('--am')})));
+}
+function chDur(){const svg=document.getElementById('c-dur'),W=420,H=210,L=40,Rr=10,Tp=10,B=24,pw=W-L-Rr,ph=H-Tp-B;
+ const d=F.dur,n=d.lab.length,bw=pw/n*0.62,segs=[['b1','--gn-l'],['b2','--am-l'],['b3','--am'],['b4','--co']];
+ const tot=d.lab.map((_,i)=>segs.reduce((a,[k])=>a+d[k][i],0)),top=Math.max(...tot)*1.08,Y=v=>Tp+ph*(top-v)/top,cx=i=>L+pw*(i+0.5)/n;
+ for(let t=0;t<=4;t++){const v=top*t/4;svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(v),y2:Y(v),stroke:cv('--bg1')}));T(svg,L-4,Y(v)+3,(v/1000).toFixed(1)+'M','end',7,'--i3');}
+ d.lab.forEach((l,i)=>{let acc=0;const x=cx(i)-bw/2;segs.forEach(([k,c])=>{const v=d[k][i];svg.append(NS('rect',{x,y:Y(acc+v),width:bw,height:Math.max(0,Y(acc)-Y(acc+v)),fill:cv(c),opacity:.95}));acc+=v;});T(svg,cx(i),H-8,l,'middle',7,'--i3');});
+}
+function chRet(){const svg=document.getElementById('c-ret'),W=420,H=210,L=38,Rr=32,Tp=10,B=24,pw=W-L-Rr,ph=H-Tp-B;
+ const d=F.retail,n=d.lab.length,bw=pw/n*0.6;
+ const lo=Math.min(...d.lvl)*0.985,hi=Math.max(...d.lvl)*1.01,Y=v=>Tp+ph*(hi-v)/((hi-lo)||1),cx=i=>L+pw*(i+0.5)/n;
+ [lo,(lo+hi)/2,hi].forEach(v=>{svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(v),y2:Y(v),stroke:cv('--bg1')}));T(svg,L-4,Y(v)+3,Math.round(v),'end',7,'--i3');});
+ d.lvl.forEach((v,i)=>{svg.append(NS('rect',{x:cx(i)-bw/2,y:Y(v),width:bw,height:ph-(Y(v)-Tp),fill:cv('--bl'),opacity:.85}));if(i%2===0)T(svg,cx(i),H-8,d.lab[i],'middle',7,'--i3');});
+ const yo=d.yoy,ylo=Math.min(...yo)-0.5,yhi=Math.max(...yo)+0.5,YY=v=>Tp+ph*(yhi-v)/((yhi-ylo)||1);
+ [ylo,(ylo+yhi)/2,yhi].forEach(v=>T(svg,W-Rr+4,YY(v)+3,v.toFixed(1)+'%','start',7,'--yoy'));
+ PL(svg,yo.map((v,i)=>[cx(i),YY(v)]),'--yoy',2);yo.forEach((v,i)=>svg.append(NS('circle',{cx:cx(i),cy:YY(v),r:2.2,fill:cv('--yoy')})));
+}
+function chConf(){const svg=document.getElementById('c-conf'),W=420,H=210,L=34,Rr=10,Tp=10,B=24,pw=W-L-Rr,ph=H-Tp-B;
+ const d=F.conf,n=d.lab.length,all=d.umich.concat(d.cb),lo=Math.min(...all)-3,hi=Math.max(...all)+3,Y=v=>Tp+ph*(hi-v)/((hi-lo)||1),X=i=>L+pw*i/(n-1);
+ [lo,(lo+hi)/2,hi].forEach(v=>{svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(v),y2:Y(v),stroke:cv('--bg1')}));T(svg,L-4,Y(v)+3,Math.round(v),'end',7,'--i3');});
+ d.lab.forEach((l,i)=>{if(i%2===0)T(svg,X(i),H-8,l,'middle',7,'--i3');});
+ PL(svg,d.umich.map((v,i)=>[X(i),Y(v)]),'--bl',1.8);PL(svg,d.cb.map((v,i)=>[X(i),Y(v)]),'--vi',1.8);
+ [['--bl',d.umich],['--vi',d.cb]].forEach(([c,a])=>{const i=a.length-1;svg.append(NS('circle',{cx:X(i),cy:Y(a[i]),r:2.4,fill:cv(c)}));});
+}
+chNFP();chDur();chRet();chConf();
+</script></body></html>

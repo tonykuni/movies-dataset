@@ -1,0 +1,145 @@
+{
+  "schema": "via-central-synonym-regex-v1",
+  "policy": "append-only;LOCKED 不改;衝突=RED 燈;新規先入此冊再落引擎",
+  "regex": {
+    "TW_TICKER_LOCKED": {
+      "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+      "owner": "VRN_Summarizer_v1",
+      "locked": true,
+      "note": "台股代碼;年區 2021-2030 排除",
+      "defect_note": "批472 實測:`^(?:[1-9]\\d{3})$` 這個選項已經全收,後面 `^(?!202[1-9]|2030)\\d{4}$` 的負向前瞻永遠輪不到=死碼。所以本式對 2026 照收。式子原樣保留,判年份請改綁 YEAR_BY_ROSTER(需帶冊),本式只負責字形。"
+    },
+    "YEAR_SUSPECT": {
+      "pattern": "^(?:202[1-9]|2030)$",
+      "owner": "vrn_lexicon_v0101",
+      "locked": true,
+      "note": "年份疑碼——收割不自動抓",
+      "superseded_by": "YEAR_BY_ROSTER",
+      "defect_note": "批472 實測:此式把 2023 燁輝 / 2027 大成鋼 / 2030 彰源 三支**真代號**判成年份,而真正該擋的 2026 它擋不住上游(TW_TICKER_LOCKED 第一個選項 ^[1-9]\\d{3}$ 已全收,第二個選項的負向前瞻是死碼)。年份與代號在字形上無法分辨,只能拿冊對帳。式子依 locked 律原樣保留,消費者請改綁 YEAR_BY_ROSTER。"
+    },
+    "TW_YFINANCE": {
+      "pattern": "^[1-9]\\d{3}\\.(TW|TWO)$",
+      "owner": "VRN_Summarizer_v1",
+      "locked": true
+    },
+    "TW_BLOOMBERG": {
+      "pattern": "^[1-9]\\d{3}\\s*TT$",
+      "owner": "VRN_Summarizer_v1",
+      "locked": true
+    },
+    "VERSION_SUFFIX": {
+      "pattern": "[_-]v?\\d{2,4}[a-z]?$",
+      "owner": "via_namereg(TOOL-047)",
+      "locked": true,
+      "note": "家族鍵版尾剝離"
+    },
+    "PRODUCT_CODE": {
+      "pattern": "^VIA-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+      "owner": "via_product_ui(TOOL-048)",
+      "locked": true,
+      "note": "商品號綁一機"
+    },
+    "TW_ACTIVE_ETF": {
+      "pattern": "^\\d{5}A$",
+      "owner": "flow_tw_active_etf(TOOL-060)",
+      "locked": false,
+      "note": "主動式台股 ETF 代號尾 A+名稱含「主動」"
+    },
+    "TWEquityTicker": {
+      "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+      "locked": true,
+      "owner": "VIA 三代號政策(批118 正名)",
+      "alias_of": "TW_TICKER_LOCKED",
+      "note": "台股官方代碼(四碼;年區 2021-2030 排除);批118 正名=台股個股專用,與全球碼區隔"
+    },
+    "TWEquityYFTicker": {
+      "pattern": "^([1-9]\\d{3})\\.(TW|TWO)$",
+      "locked": true,
+      "owner": "VIA 三代號政策(批118 正名)",
+      "alias_of": "TW_YFINANCE_REGEX(canonical 冊)",
+      "note": "台股個股 yfinance 碼(上市 .TW/上櫃 .TWO);YF 全域碼含全球商品,本式僅驗台股個股=命名分層目的"
+    },
+    "TWEquityBBGTicker": {
+      "pattern": "^([1-9]\\d{3})\\s+TT$",
+      "locked": true,
+      "owner": "VIA 三代號政策(批118 正名)",
+      "alias_of": "TW_BLOOMBERG_REGEX(canonical 冊)",
+      "note": "台股個股 Bloomberg 碼(四碼+空格+TT)"
+    },
+    "ActiveTWETFTicker": {
+      "pattern": "^00\\d{2,3}[AD]$",
+      "locked": true,
+      "owner": "VIA 主動式台股 ETF 政策(批118 升格 LOCKED)",
+      "note": "主動式台股 ETF 代碼:00+2~3 位數+尾碼 A(股票/海外)或 D(債券);ENG046/ENG051 共用"
+    },
+    "YEAR_BY_ROSTER": {
+      "pattern": "^[1-9]\\d{3}$",
+      "owner": "VIA_VRN_FirstPageEngine.is_valid_bare",
+      "locked": false,
+      "supersedes": "YEAR_SUSPECT",
+      "kind": "ROSTER_ADJUDICATED",
+      "note": "年份 vs 代號:**字形判不了,只能拿冊對帳**(操作員批472 裁示 A)",
+      "rule": [
+        "① 不是四碼(首位非 0)→ 不是代號,也不是年份形狀,不判",
+        "② 代號冊不可得 → **不判年份**,並把 roster_state 標成「未經庫對帳」(不假裝驗過)",
+        "③ 冊在 且 值落在 1990–2100 且 **不在冊上** → 年份",
+        "④ 其餘 → 代號"
+      ],
+      "roster_source": "tw_listings_industry(VDF 每日雙所官方冊;批465c CGC_MDL142 正主)",
+      "why_not_range": "**不能用排除區間修**。實測 1,978 檔名冊:2002 中鋼 · 2015 豐興 · 2023 燁輝 · 2027 大成鋼 · 2030 彰源——整個鋼鐵類股都住在 2000–2030 裡。舊 YEAR_SUSPECT 的 202[1-9]|2030 會一次誤殺其中三支。",
+      "evidence": "操作員 64 份真檔名實測(批472):有冊時「第一場 2026年投資大趨勢」等三份研討會全部不給代號,而 2002/2015/2023/2027/2030 一支沒誤殺;分類 64/64、代號 42/42、日期 61/64(缺 3 是檔名本來就沒日期)、誤判 0。"
+    }
+  },
+  "synonyms": {
+    "RATING_BUY": [
+      "買進",
+      "Buy",
+      "加碼",
+      "Overweight",
+      "強烈買進",
+      "優於大盤",
+      "Outperform"
+    ],
+    "RATING_SELL": [
+      "賣出",
+      "Sell",
+      "減碼",
+      "Underweight",
+      "落後大盤",
+      "Underperform"
+    ],
+    "RATING_HOLD": [
+      "持有",
+      "Hold",
+      "中立",
+      "Neutral",
+      "維持"
+    ],
+    "FLOW_IN": [
+      "流入",
+      "淨申購",
+      "吸金",
+      "inflow"
+    ],
+    "FLOW_OUT": [
+      "流出",
+      "淨贖回",
+      "失血",
+      "outflow"
+    ],
+    "EPS": [
+      "每股盈餘",
+      "EPS",
+      "basic_eps",
+      "diluted_eps",
+      "earnings_per_share"
+    ],
+    "TARGET_PRICE": [
+      "目標價",
+      "Target Price",
+      "target_price",
+      "TP",
+      "合理價"
+    ]
+  }
+}

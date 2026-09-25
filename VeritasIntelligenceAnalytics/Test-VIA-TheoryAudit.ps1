@@ -1,4 +1,4 @@
-﻿<#
+<#
 Test-VIA-TheoryAudit.ps1 — 今日五引擎「理論正確性」獨立稽核(ONE PS CODE)
 ===========================================================================
 與各引擎 selftest 的差異:selftest 是引擎自證;本稽核是 PowerShell 端的
@@ -12,11 +12,20 @@ Test-VIA-TheoryAudit.ps1 — 今日五引擎「理論正確性」獨立稽核(ON
                C3 FOMO 四閘門 PS 重導出 · C4 Walk-Forward 誠實缺口≥0
   D MultiFactor:D1 SHA256 manifest 獨立重算 · D2 投影不得 Confirmed
                D3 模型准入規則(allow ⇒ 領先+增量+樣本外)
-  E TALib:     E1 SMA 甲骨文(PS 自算均值對質)· E2 Adj 鐵律雙態(adj/raw)
                E3 BBANDS 恆等式(mid=SMA20 · upper=mid+2σ)
 
 用法:  .\Test-VIA-TheoryAudit.ps1        (或經啟動器:.\VIA_WorkflowEngine.ps1 theory)
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Stop'
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -47,11 +56,10 @@ if ($PyExe -eq '') { Write-Host '誠實 FAIL:找不到 Python 3'; exit 1 }
 
 $Root = $PSScriptRoot
 $WF   = Join-Path $Root 'VIA_WorkflowEngine.py'
-$VAP  = Join-Path $Root 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+$VAP  = Join-Path $Root 'functional modules\VAP\engine\VAP_ENG003_AutoplotSeabornPlotly_v0100.py'
 $SPEC = Join-Path $Root 'functional modules\VAP\spec\ssot\vap_spec.json'
 $CW   = Join-Path $Root 'functional modules\ChipWar'
 $MF   = Join-Path $Root 'functional modules\MultiFactor'
-$TA   = Join-Path $Root 'functional modules\TALib\VIA_TALibEngine.py'
 $Tmp  = Join-Path ([System.IO.Path]::GetTempPath()) ("via_theory_" + (Get-Date -Format 'HHmmss'))
 New-Item -ItemType Directory -Path $Tmp -Force | Out-Null
 
@@ -241,57 +249,10 @@ Check 'D3' '模型准入規則(allow ⇒ 領先+增量+樣本外顯著)' {
     Assert ($allowN -ge 1) 'ledger 無任何 allow 列可稽核'
 }
 
-# ═══ E TALib(PS 甲骨文自算)═══════════════════════════════════════════════
-Check 'E1' 'SMA 甲骨文(PS 自算 3 期均值對質)' {
-    $src = Join-Path $Tmp 'tiny.csv'
-    "date,close`nD1,1`nD2,2`nD3,3`nD4,4`nD5,5`nD6,6" | Set-Content -Path $src -Encoding UTF8
-    $out = Join-Path $Tmp 'tiny_sma.csv'
-    $r = Invoke-Py @($TA, 'compute', '--file', $src, '--indicators', 'sma', '--period', '3', '--out', $out)
-    Assert ($r.code -eq 0) ("compute 失敗:" + $r.out)
-    $rows = Import-Csv $out
-    for ($i = 2; $i -lt $rows.Count; $i++) {
-        $expect = ([double]$rows[$i - 2].close + [double]$rows[$i - 1].close + [double]$rows[$i].close) / 3.0
-        Assert ([math]::Abs([double]$rows[$i].sma - $expect) -lt 1e-9) ("第 {0} 列 SMA {1} ≠ PS 自算 {2}" -f $i, $rows[$i].sma, $expect)
-    }
-}
-
-Check 'E2' 'Adj 鐵律雙態(有 adj 全轉 adj;缺則 raw)' {
-    $adj = Join-Path $Tmp 'adj.csv'
-    "date,close,adj_close`nD1,10,5`nD2,10,5`nD3,10,5" | Set-Content -Path $adj -Encoding UTF8
-    $o1 = Join-Path $Tmp 'adj_out.csv'
-    $r1 = Invoke-Py @($TA, 'compute', '--file', $adj, '--indicators', 'sma', '--period', '2', '--out', $o1)
-    Assert ($r1.out -match 'price_basis=adj') ('adj 欄在位卻未走 adj:' + $r1.out)
-    $row = (Import-Csv $o1)[0]
-    Assert ([math]::Abs([double]$row.close - 5.0) -lt 1e-9) ("close 應=adj(5),得到 " + $row.close)
-    $raw = Join-Path $Tmp 'raw.csv'
-    "date,close`nD1,10`nD2,10`nD3,10" | Set-Content -Path $raw -Encoding UTF8
-    $r2 = Invoke-Py @($TA, 'compute', '--file', $raw, '--indicators', 'sma', '--period', '2', '--out', (Join-Path $Tmp 'raw_out.csv'))
-    Assert ($r2.out -match 'price_basis=raw') ('無 adj 欄應誠實 raw:' + $r2.out)
-}
-
-Check 'E3' 'BBANDS 恆等式(mid≡SMA20 · upper≡mid+2σ)' {
-    $s = Join-Path $Tmp 'ohlcv.csv'
-    $null = Invoke-Py @($TA, 'sample', '-o', $s)
-    $out = Join-Path $Tmp 'bb.csv'
-    $r = Invoke-Py @($TA, 'compute', '--file', $s, '--indicators', 'sma,stddev,bbands', '--period', '20', '--out', $out)
-    Assert ($r.code -eq 0) ("compute 失敗:" + $r.out)
-    $rows = Import-Csv $out
-    $checked = 0
-    foreach ($row in $rows) {
-        if (($row.sma -ne '') -and ($row.bb_mid -ne '') -and ($row.stddev -ne '')) {
-            Assert ([math]::Abs([double]$row.bb_mid - [double]$row.sma) -lt 1e-4) '中軌≠SMA20'
-            $up = [double]$row.sma + 2.0 * [double]$row.stddev
-            Assert ([math]::Abs([double]$row.bb_upper - $up) -lt 1e-3) ("上軌 {0} ≠ SMA+2σ {1}" -f $row.bb_upper, $up)
-            $checked++
-        }
-    }
-    Assert ($checked -gt 100) ("有效檢核列僅 " + $checked)
-}
-
 # ═══ 總結 ═══════════════════════════════════════════════════════════════════
 Write-Host ''
 Write-Host '════════════════════════════════════════════════════════════════'
-Write-Host ' VIA 今日五引擎理論稽核(PowerShell 獨立甲骨文)'
+Write-Host ' VIA 今日四引擎理論稽核(PowerShell 獨立甲骨文)'
 Write-Host '════════════════════════════════════════════════════════════════'
 $fails = 0
 foreach ($r in $Results) {
@@ -310,3 +271,4 @@ if ($fails -eq 0) {
 }
 Remove-Item -Recurse -Force $Tmp -ErrorAction SilentlyContinue
 exit $(if ($fails -eq 0) { 0 } else { 1 })
+

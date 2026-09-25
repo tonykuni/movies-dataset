@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VIA Contract-Driven Command Console</title>
+  <style>:root {
+  color-scheme: light;
+  --via-ink: #2f4554;
+  --via-muted: #657786;
+  --via-line: #d9e3ea;
+  --via-panel: #ffffff;
+  --via-bg: #f4f8fb;
+  --via-blue: #4c78a8;
+  --via-blue-soft: #dbe9f4;
+  --via-green: #59a14f;
+  --via-red: #e15759;
+  --via-yellow: #f2cf5b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--via-bg);
+  color: var(--via-ink);
+  font: 13px/1.45 Inter, "Noto Sans TC", "Segoe UI", sans-serif;
+}
+.via-shell { width: min(1180px, 96vw); margin: 24px auto; }
+.via-header, .via-card {
+  background: var(--via-panel);
+  border: 1px solid var(--via-line);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(76, 120, 168, .08);
+}
+.via-header { padding: 16px 18px; margin-bottom: 14px; }
+.via-header h1 { margin: 0 0 4px; font-size: 20px; color: var(--via-blue); }
+.via-header p { margin: 0; color: var(--via-muted); }
+.via-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.via-card { padding: 16px; min-width: 0; }
+.via-card h2 { margin: 0 0 4px; font-size: 16px; overflow-wrap: anywhere; }
+.via-meta { color: var(--via-muted); font-size: 11px; margin-bottom: 14px; overflow-wrap: anywhere; }
+.via-field { margin: 0 0 12px; min-width: 0; }
+.via-field label { display: block; font-weight: 650; margin-bottom: 4px; }
+.via-help { color: var(--via-muted); font-size: 11px; margin: 4px 0 0; overflow-wrap: anywhere; }
+.via-required { color: var(--via-red); }
+input, select, textarea, button {
+  width: 100%; border: 1px solid #bdccd7; border-radius: 7px;
+  color: var(--via-ink); background: #fff; font: inherit;
+}
+input, select, textarea { padding: 8px 9px; }
+textarea { min-height: 86px; resize: vertical; }
+input[type="checkbox"] { width: auto; margin-right: 7px; }
+input[type="color"] { min-height: 38px; padding: 3px; }
+button { padding: 9px 12px; border-color: var(--via-blue); background: var(--via-blue); color: white; cursor: pointer; }
+button:hover { filter: brightness(1.05); }
+.via-result { margin-top: 10px; padding: 9px; border-radius: 7px; background: #eef5fa; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 34px; }
+.via-status { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--via-blue-soft); font-size: 10px; }
+@media (max-width: 620px) { .via-shell { width: 94vw; margin: 12px auto; } .via-grid { grid-template-columns: 1fr; } }</style>
+</head>
+<body>
+  <main class="via-shell">
+    <header class="via-header">
+      <h1>VIA Contract-Driven Command Console</h1>
+      <p>Contract-Driven UI · Pydantic Schema SSOT · Stable Semantic Selectors</p>
+    </header>
+    <div class="via-grid"><section class="via-card" data-via-module="OrderProcessor" data-via-urn="VIA-MOD-PY-ORDER-20260817-0001">
+  <h2>OrderProcessor</h2>
+  <div class="via-meta"><span class="via-status">VIA_DEMO</span> · v2.0.0 · VIA-MOD-PY-ORDER-20260817-0001<br>Typed order-processing reference module</div>
+  <form method="post" action="/via/commands/OrderProcessor/execute" data-via-command="OrderProcessor" data-via-urn="VIA-MOD-PY-ORDER-20260817-0001" data-via-result-target="via-result-orderprocessor">
+    <div class="via-field" data-via-field-wrap="order_id"><label for="via-orderprocessor-order_id">Order Id <span class="via-required" aria-hidden="true">*</span></label><input id="via-orderprocessor-order_id" type="text" name="order_id" data-via-field="order_id" data-via-json-type="string" required minlength="3" maxlength="40" pattern="^[A-Za-z0-9_-]+$"><p class="via-help">訂單的全域唯一編號</p></div>
+<div class="via-field" data-via-field-wrap="amount"><label for="via-orderprocessor-amount">Amount <span class="via-required" aria-hidden="true">*</span></label><input id="via-orderprocessor-amount" type="number" name="amount" data-via-field="amount" data-via-json-type="number" required max="100000000" min="1e-06"><p class="via-help">訂單金額，必須大於 0</p></div>
+<div class="via-field" data-via-field-wrap="currency"><label for="via-orderprocessor-currency">Currency </label><select id="via-orderprocessor-currency" name="currency" data-via-field="currency" data-via-json-type="string"><option value="TWD" selected>TWD</option><option value="USD">USD</option><option value="JPY">JPY</option></select><p class="via-help">幣別</p></div>
+    <button type="submit" data-via-action="submit" aria-label="執行指令">執行指令</button>
+  </form>
+  <pre id="via-result-orderprocessor" class="via-result" role="status" aria-live="polite">尚未執行</pre>
+</section></div>
+  </main>
+  <script>document.addEventListener("submit", async (event) => {
+  const form = event.target.closest("form[data-via-command]");
+  if (!form) return;
+  event.preventDefault();
+  const result = document.getElementById(form.dataset.viaResultTarget);
+  const payload = {};
+  for (const field of form.elements) {
+    if (!field.name || field.disabled || field.type === "submit") continue;
+    const kind = field.dataset.viaJsonType || "string";
+    if (kind === "boolean") payload[field.name] = Boolean(field.checked);
+    else if (kind === "integer") payload[field.name] = Number.parseInt(field.value, 10);
+    else if (kind === "number") payload[field.name] = Number.parseFloat(field.value);
+    else if (kind === "array" || kind === "object") payload[field.name] = JSON.parse(field.value);
+    else payload[field.name] = field.value;
+  }
+  result.textContent = "執行中…";
+  try {
+    const response = await fetch(form.action, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    const body = await response.json();
+    result.textContent = JSON.stringify(body, null, 2);
+    result.dataset.viaStatus = response.ok ? "SUCCESS" : "REJECTED";
+  } catch (error) {
+    result.textContent = `連線失敗：${error.message}`;
+    result.dataset.viaStatus = "ERROR";
+  }
+});</script>
+</body>
+</html>

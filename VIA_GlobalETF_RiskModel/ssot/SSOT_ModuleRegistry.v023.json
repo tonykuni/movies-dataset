@@ -1,0 +1,89 @@
+{
+  "def_schema": "VIA_SSOT_MODULE_REGISTRY_V023",
+  "def_family": "GLOBAL_MARKET_RADAR",
+  "def_generated": "2026-08-16",
+  "def_note": "把 2026-07-04（ETF全球風險模型）、2026-08-11/12 兩份 Markdown（全球指數地圖/Flow視覺層）、2026-08-16 輪動方法論與 Forward P/E 倒算討論，整併為單一模組登錄簿。狀態非 ACTIVE 者一律不得啟動（對齊 FlowSystem Activation Gate 紀律）。",
+
+  "def_engines": {
+    "MDL008_ETFFLOW": {
+      "name": "VIA_GlobalETFFlow（全球 ETF 真流監控）",
+      "location": "使用者本機（本 repo 外）",
+      "truth_tier": "T1（ΔSharesOutstanding×NAV）+ T3（FIS_pv）",
+      "status": "EXISTING_EXTERNAL",
+      "interface": "etf_matrix.json → MDL009 def_flow_overlay（選配輸入）"
+    },
+    "MDL009_ETFRISK": {
+      "name": "VIA_GlobalETF_RiskModel（本 repo，風險同步觀測層）",
+      "location": "VIA_GlobalETF_RiskModel/",
+      "truth_tier": "T3（價量估算）；demo=T4 SYNTHETIC 全程掛標",
+      "status": "ACTIVE_DEMO_VERIFIED",
+      "evidence": "selftest 15/15 + unittest 22/22 (2026-08-16)",
+      "modules": [
+        { "mcfl": "MCFL-M00", "file": "engine/mathkit.py",    "purpose": "robust-z/MAD、FIS tanh、corr、lead-lag、PC1（與 MDL008 FIS 同式）" },
+        { "mcfl": "MCFL-M10", "file": "engine/data_layer.py", "purpose": "CSV 載入、T4 demo 世界、SSOT/資料檔載入" },
+        { "mcfl": "MCFL-M15", "file": "engine/factors.py",    "purpose": "因子面板 + 指標 id 解析器（SSOT 文法）" },
+        { "mcfl": "MCFL-M20", "file": "engine/scores.py",     "purpose": "五大風險分數、跨資產 Pulse、區域勢能、財政脆弱度" },
+        { "mcfl": "MCFL-M22", "file": "engine/rotation.py",   "purpose": "RRG 象限輪動（RS 水位 × RS 動能，Q1領先/Q2改善★/Q3落後/Q4轉弱⚠）" },
+        { "mcfl": "MCFL-M25", "file": "engine/sync.py",       "purpose": "同步矩陣、領先滯後、回撤同步、離散度、PC1" },
+        { "mcfl": "MCFL-M28", "file": "engine/regime.py",     "purpose": "9 態規則 Regime（可稽核基線）" },
+        { "mcfl": "MCFL-M35", "file": "engine/earnings.py",   "purpose": "Forward P/E 倒算 EPS 結轉 + ERP + 惡魔驗證" },
+        { "mcfl": "MCFL-M40", "file": "engine/report.py",     "purpose": "JSON 輸出 + Visual Lock 儀表板 + run_ledger" }
+      ]
+    }
+  },
+
+  "def_spec_registry": [
+    {
+      "id": "GLOBAL_INDEX_MAP_DASHBOARD",
+      "source": "Markdown 2026-08-12（Crash 卡片/Risk Heatmap/Flow 箭頭/時間軸/脈動）",
+      "layers": ["crash_score_card_border", "risk_heatmap_canvas", "flow_arrows",
+                 "flow_labels", "flow_timeseries_playback", "flow_acceleration_pulse"],
+      "status": "SPEC_READY_NOT_ACTIVATED",
+      "gate_reason": "Flow 金額視覺層必須接 MDL008 T1 真流；T3 估算值不得畫成金額箭頭（防 T4 偽裝 T1）",
+      "reuse_now": "Crash 分級 0-30/60/80/100 已被 MDL009 def_score_scaling.bands 採用"
+    },
+    {
+      "id": "TW_ETF_GROUP_FLOW",
+      "source": "Markdown 2026-08-11（台股 ETF 資金流/族群主控台）+ TWSE OpenAPI 矩陣",
+      "status": "SPEC_READY_NOT_ACTIVATED",
+      "gate_reason": "資料源（TWSE BFI82U/3BI/MI_MARG、TPEX）需在本機帶網路環境實測限速與欄位",
+      "sibling": "VIA_ActiveStockETF / SectorWhale / RotationEngine 已覆蓋部分（台股側）"
+    },
+    {
+      "id": "TW_BRANCH_FETCHER",
+      "source": "對話 2026-08-16（券商分點逆向解析）",
+      "status": "SPEC_ONLY_GOVERNANCE_REVIEW",
+      "gate_reason": "非官方 API 之網頁解析：需限速（random sleep）、服務條款確認、IP 阻斷風險自負；不得進入無人值守排程前先過人工閘"
+    },
+    {
+      "id": "REALTIME_L2_STREAMER",
+      "source": "對話 2026-08-16（OFI/VPIN 等量桶即時層）",
+      "status": "SPEC_ONLY",
+      "gate_reason": "需券商 SDK（Shioaji/Fubon）憑證與盤中運行環境；等量桶/OFI 公式已登錄於 FormulaRegistry 供屆時實作"
+    },
+    {
+      "id": "REGIME_TIER2_HMM",
+      "source": "對話 2026-08-16（HMM/MS-VAR/DTW/Optimal Transport 方法論）",
+      "status": "TIER2_GATED",
+      "gate_reason": "需 numpy/hmmlearn 等依賴；且必須在同一外部標籤上打贏 M28 規則基線（反循環：不得對自身分數校準）才可取代"
+    },
+    {
+      "id": "FACTSET_EARNINGS_CALIBRATION",
+      "source": "對話 2026-08（FactSet/LSEG/MSCI 月度 Earnings 校準 M01-M10 流程）",
+      "status": "SPEC_READY_PARTIAL_ACTIVE",
+      "gate_reason": "M35 已實作倒算/結轉/staleness/ERP；index/sector ledger 全欄位需訂閱資料，license_status gate 未過前僅用公開引述值"
+    },
+    {
+      "id": "FLOW_OVERLAY_MDL008",
+      "source": "本 repo config def_flow_overlay",
+      "status": "INTERFACE_DEFINED",
+      "gate_reason": "MDL008 etf_matrix.json 放入後於儀表板疊加 FIS/flow_usd；缺檔時 MDL009 獨立運作"
+    },
+    {
+      "id": "VIA_FLOWSYSTEM_TRUEHIGH_x5",
+      "source": "對話 2026-08（v021/v022 安全掃描）",
+      "status": "HOLD_LOCAL_MACHINE",
+      "gate_reason": "5 條 TrueHigh 逐行覆核在使用者本機進行，與本 repo 無涉；未降級前不得啟動 Activate-VIAFlowSystem.ps1"
+    }
+  ]
+}

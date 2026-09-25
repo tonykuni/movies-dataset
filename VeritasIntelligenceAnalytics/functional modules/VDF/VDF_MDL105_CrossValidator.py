@@ -37,6 +37,50 @@ r"""
     cv.print_rich_summary()
     cv.write_outputs()
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import os, sys, json, time
 from datetime import datetime
@@ -341,6 +385,30 @@ class CrossValidator:
 # 🎯 Entry
 # =====================================================================================
 
+def _find_registry(name: str = "VDF_MDL403_RegistryFull.json"):
+    """批610:冊在樹上卻找不到,和冊真的不在,是兩件事。
+
+    v0100 的自測寫 `RegistryLoader("VDF_MDL403_RegistryFull.json")` —— **裸相對路徑**,
+    對 cwd 解析。而這本冊的正典位置是 `supportive modules/registry/`(本夾只有 MDL401 schema),
+    於是不管從倉根還是從 VIA 根跑,都是 `FileNotFoundError` 裸噴 traceback。
+    兩個缺陷疊在一起:① 找錯地方 ② 找不到就裸炸(缺料要誠實停,不是 RED)。
+    這裡逐個候選找,找到就用;真的都沒有,回 None 讓呼叫端誠實停(rc3 ABSENT)。
+    """
+    here = Path(__file__).resolve().parent
+    via = here
+    while via.parent != via and not (via / "supportive modules").is_dir():
+        via = via.parent
+    for c in (here / name,
+              via / "supportive modules" / "registry" / name,
+              Path.cwd() / name):
+        try:
+            if c.is_file():
+                return c
+        except Exception:
+            pass
+    return None
+
+
 def _selftest():
     """Self-test with mock data exercising all 5 consensus methods + traffic lights."""
     if not PANDAS_OK:
@@ -351,8 +419,13 @@ def _selftest():
                             "及 5 種 consensus method", title="🧪 Self-Test", border_style="blue"))
 
     from VDF_MDL104_RegistryLoader import RegistryLoader
-    loader = RegistryLoader("VDF_MDL403_RegistryFull.json")
-    print(f"   ✓ Loader loaded {len(loader.items)} items")
+    reg = _find_registry()
+    if reg is None:
+        print("  [ABSENT] 冊 VDF_MDL403_RegistryFull.json 不在(本夾 / supportive modules/registry / cwd 都找過)")
+        print("           **缺冊不是壞掉**:先把冊放回正典位置再跑本自測。誠實停,不裸噴 traceback。")
+        return 3
+    loader = RegistryLoader(str(reg))
+    print(f"   ✓ Loader loaded {len(loader.items)} items  (冊 {reg})")
 
     # Build mock fetched_data
     dates = pd.date_range("2026-05-01", periods=5)

@@ -1,0 +1,38 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<title>VeritasPulse · Env Arrangement</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+body{font-family:'DM Sans',sans-serif;background:#F5F4F0;color:#1A1916;margin:0;padding:34px 30px;max-width:1080px;margin:auto}
+.mono{font-family:'DM Mono',monospace;font-size:12px}
+header{display:flex;align-items:flex-end;gap:14px;border-bottom:2px solid #1A1916;padding-bottom:16px;margin-bottom:22px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.dot{width:11px;height:11px;border-radius:3px;background:#5E7032;box-shadow:0 0 0 4px #5E703222}
+.badge{margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;color:#fff;background:#9A6B2F;padding:5px 11px;border-radius:6px}
+.lead{display:flex;gap:12px;margin-bottom:22px}
+.b{background:#FBFAF7;border:1px solid #E2DFD6;border-radius:10px;padding:13px 16px;flex:1}
+.b .k{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#8F897C}
+.b .v{font-family:'Syne',sans-serif;font-weight:700;font-size:24px;margin-top:4px}
+h2{font-family:'Syne',sans-serif;font-size:15px;margin:26px 0 10px}
+table{width:100%;border-collapse:collapse;background:#FBFAF7;border:1px solid #E2DFD6;border-radius:10px;overflow:hidden;font-size:13px}
+th{background:#F0EEE8;text-align:left;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#8F897C;padding:9px 12px}
+td{padding:9px 12px;border-top:1px solid #E2DFD6}
+.note{background:#5E703214;border:1px solid #5E703255;border-left:4px solid #5E7032;border-radius:6px;padding:12px 14px;font-size:12.5px;margin-top:18px;color:#2a4430}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid #E2DFD6;font-family:'DM Mono',monospace;font-size:9.5px;color:#8F897C}
+</style></head><body>
+<header><div class="logo"><span class="dot"></span>VeritasPulse</div>
+<span class="badge">FALLBACK · VERITAS NOT REACHABLE</span></header>
+<div class="lead">
+<div class="b"><div class="k">Dependencies</div><div class="v">7</div></div>
+<div class="b"><div class="k">Approved</div><div class="v" style="color:#5E7032">7</div></div>
+<div class="b"><div class="k">On hold</div><div class="v" style="color:#9A6B2F">0</div></div>
+<div class="b"><div class="k">Mode</div><div class="v" style="font-size:15px">PLAN-ONLY</div></div>
+</div>
+<h2>Supportive modules · lock posture</h2>
+<table><tr><th>Module</th><th>Role</th><th>Lock</th><th>State</th></tr><tr><td class='mono'>VIA_EnvManager</td><td>ENV_HEALTH_GATE</td><td style='color:#8F897C'>—</td><td style='color:#8A3B2E'>missing</td></tr><tr><td class='mono'>VIS_InstallHealthRegistry</td><td>HEALTH_REGISTRY</td><td style='color:#8F897C'>—</td><td style='color:#8A3B2E'>missing</td></tr><tr><td class='mono'>VeritasCeleritas</td><td>ACCELERATOR</td><td style='color:#8A3B2E'>PARALLEL_LOCKED</td><td style='color:#8A3B2E'>missing</td></tr><tr><td class='mono'>VeritasAegisNexus</td><td>NETWORK</td><td style='color:#8A3B2E'>NETWORK_LOCKED</td><td style='color:#8A3B2E'>missing</td></tr></table>
+<h2>Dependency plan · gated by EnvManager</h2>
+<table><tr><th>Package</th><th>Risk</th><th>Target env</th><th>Decision</th><th>Note</th></tr><tr><td class='mono'>numpy>=1.24,<2.0</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>array core · golden rule</td></tr><tr><td class='mono'>python-pptx==1.0.2</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>PPT generation engine</td></tr><tr><td class='mono'>matplotlib>=3.7,<3.11</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>chart auto-optimize</td></tr><tr><td class='mono'>Pillow>=10.0</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>image sizing for deck</td></tr><tr><td class='mono'>duckdb>=1.0,<2.0</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>warehouse query engine</td></tr><tr><td class='mono'>pyarrow>=14,<25</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>Parquet columnar storage</td></tr><tr><td class='mono'>openpyxl>=3.1</td><td>LOW</td><td class='mono'>vpl_core</td><td style='color:#5E7032;font-weight:700'>APPROVED</td><td>Excel transcript template</td></tr></table>
+<div class="note">Network I/O (Aegis) and parallel accelerator (Celeritas) remain <b>LOCKED</b>.
+This is a plan recorded to the
+install-health registry; nothing is patched automatically.</div>
+<footer>VeritasPulse · arranged with Veritas supportive tools · 2026-08-18T10:41:50 · VIA Visual Lock v1</footer>
+</body></html>

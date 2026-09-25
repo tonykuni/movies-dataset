@@ -23,6 +23,16 @@ param(
     [int]$Workers = 0,
     [switch]$Fresh
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $vrn = $PSScriptRoot
@@ -49,8 +59,8 @@ foreach ($d in @($stageRt,$t005,$t004,$tdocx,$repDir)) { New-Item -ItemType Dire
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe","py","python","python3") |
       Where-Object { ($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue) -or (($_ -match '\\') -and (Test-Path $_)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 $pdfs = @(Get-ChildItem -LiteralPath $inbox -Filter *.pdf  -File -ErrorAction SilentlyContinue)
 $docx = @(Get-ChildItem -LiteralPath $inbox -Filter *.doc* -File -ErrorAction SilentlyContinue)
@@ -190,3 +200,4 @@ Write-Host "  報告:$rep" -ForegroundColor Cyan
 Write-Host "  存證:$evi" -ForegroundColor Cyan
 if (-not $NoOpen) { Start-Process $rep }
 exit $(if ($failN -eq 0 -and $toN -eq 0) { 0 } else { 1 })
+

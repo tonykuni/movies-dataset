@@ -1,0 +1,43 @@
+{
+  "schema": "VIA_LifecycleRACI/1.0",
+  "batch": "批344 操作員令「GitHub／PC／引擎／資料 之間的角色與責任;回測→優化→測→修→測→整併→測→除錯→使用者測→除錯→啟用→測→除錯→至完美;最低 token」",
+  "actors": {
+    "GITHUB":   {"zh": "遠端正史", "owns": ["origin/main 歷史", "CI 綠燈", "公開可見性"], "never": ["本機 DB", "憑證", "未 commit 工作區"]},
+    "PC":       {"zh": "本機執行", "owns": ["工作樹", "DuckDB(output_hub/mega)", "venvs(via_vrn4 等)", "樞紐 127.0.0.1:8765", "GO 權杖執行"], "never": ["改寫 GitHub 歷史", "OneDrive 讀寫"]},
+    "ENGINE":   {"zh": "引擎模組", "owns": ["CGC_MDL*/ENG* 版本檔", "--selftest [計] 行", "再生物 VIA_UI_*", "只增不減版本"], "never": ["覆寫舊版", "無 GO 寫母樹", "假綠燈"]},
+    "DATA":     {"zh": "資料真相", "owns": ["vdf_tw_market/vdf_global_market/ActiveTWETF .duckdb", "8 本規則冊", "VRN/input/incoming"], "never": ["被引擎就地改寫(只增)", "進 GitHub(大檔/敏感)"]},
+    "OPERATOR": {"zh": "操作員", "owns": ["GO_v1 權杖", "commit/push 決定", "使用者測", "正本裁決(漂移家族)", "FRED key 輪換"], "never": ["貼整段 log(貼 digest)"]},
+    "ASSISTANT":{"zh": "助理", "owns": ["出新版本檔(vNNNN+1)", "沙盒實跑驗證", "讀 digest 判下一步", "誠實標缺"], "never": ["直接動 PC", "宣稱未驗證之通過", "要求整段 log"]}
+  },
+  "token_rule": "每回合只交換一個 digest(≤25 行):via-loop 產出。整段 log 只在 digest 標 NEED_LOG:<path> 時才貼那一檔的尾 30 行。",
+  "stages": [
+    {"id": "S0", "zh": "上船 INTAKE",      "R": "PC",       "A": "OPERATOR", "C": ["GITHUB"],  "I": ["ASSISTANT"],
+     "evidence": ["git status 乾淨或已知差異", "版本檔在 registry", "DB 三檔在位"],
+     "gate": "charter DB 3/3 present 且 engines ≥ 90%", "next_on_pass": "S1", "next_on_fail": "S0(補上船)"},
+    {"id": "S1", "zh": "回測 BACKTEST",    "R": "ENGINE",   "A": "DATA",     "C": ["PC"],      "I": ["OPERATOR"],
+     "evidence": ["charter --probe --go 兩日試鏈 probe.json", "ENG071 group_backtest / TW10Y v0200 輸出"],
+     "gate": "probe 步全 OK 或 FAIL 皆有 log;零 TIMEOUT", "next_on_pass": "S2", "next_on_fail": "S5"},
+    {"id": "S2", "zh": "優化 OPTIMIZE",    "R": "ENGINE",   "A": "OPERATOR", "C": ["DATA"],    "I": ["ASSISTANT"],
+     "evidence": ["參數分類冊(COMPUTED/SOURCED/CONSTANT)", "門檻冊 review 條件"],
+     "gate": "無新增 CONSTANT 散落程式碼(MDL116 ㉓ 綠)", "next_on_pass": "S3", "next_on_fail": "S2"},
+    {"id": "S3", "zh": "修改 MODIFY",      "R": "ASSISTANT","A": "OPERATOR", "C": ["ENGINE"],  "I": ["GITHUB"],
+     "evidence": ["新版本檔 vNNNN+1(舊版原地不動)", ".viafix.bak/.predeftest.bak 在位"],
+     "gate": "新版 --selftest 全綠且舊版檔未變(hash)", "next_on_pass": "S4", "next_on_fail": "S3"},
+    {"id": "S4", "zh": "整併 CONSOLIDATE", "R": "ENGINE",   "A": "OPERATOR", "C": ["DATA"],    "I": ["ASSISTANT"],
+     "evidence": ["drift_ledger.csv(漂移家族)", "MDL122 上船件冊 INTEGRATED", "MDL113 統一編號冊"],
+     "gate": "漂移家族數不增;新收容全 INTEGRATED", "next_on_pass": "S5", "next_on_fail": "S4"},
+    {"id": "S5", "zh": "除錯 DEBUG",       "R": "ENGINE",   "A": "ASSISTANT","C": ["PC"],      "I": ["OPERATOR"],
+     "evidence": ["via-six 矩陣(九子行程)", "Unified Verify pytest 真失敗(非 ENV_GAP)"],
+     "gate": "six_streams overall ≠ RED;真失敗檔數 ≤ 上一輪", "next_on_pass": "S6", "next_on_fail": "S3"},
+    {"id": "S6", "zh": "使用者測 USERTEST","R": "OPERATOR", "A": "OPERATOR", "C": ["ASSISTANT"],"I": ["ENGINE"],
+     "evidence": ["file:// 開四殼+總冊", "拖曳收件實測", "頁籤/燈號/工作流肉眼驗"],
+     "gate": "操作員回 digest:USERTEST=PASS 或列缺陷", "next_on_pass": "S7", "next_on_fail": "S5"},
+    {"id": "S7", "zh": "啟用 ACTIVATE",    "R": "PC",       "A": "OPERATOR", "C": ["GITHUB"],  "I": ["ASSISTANT"],
+     "evidence": ["git commit(分批)", "git push(公開 repo 自覺)", "regen-all 再生物一致"],
+     "gate": "origin/main == 本機 HEAD;via-six 重跑 overall ≠ RED", "next_on_pass": "S8", "next_on_fail": "S5"},
+    {"id": "S8", "zh": "完美 PERFECT",     "R": "ENGINE",   "A": "OPERATOR", "C": ["DATA","GITHUB"], "I": ["ASSISTANT"],
+     "evidence": ["連續 3 輪 via-six overall GREEN", "charter 七域 GREEN", "零 CONSTANT 散落"],
+     "gate": "三連綠;否則回 S5", "next_on_pass": "S8(維持)", "next_on_fail": "S5"}
+  ],
+  "digest_fields": ["stage", "overall", "gate_result", "blockers(≤3)", "next_action(1 行)", "need_log(path 或 none)", "head", "dirty_files", "db_present", "last_six_streams", "last_probe"]
+}

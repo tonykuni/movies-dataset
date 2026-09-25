@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA 台股族群分類與資金流模擬系統</title>
+<!-- 引入 Chart.js 作為視覺化引擎 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* 繼承您提供的優雅 Muji/Notion 風格配色 */
+:root {
+  --paper: #f5f3ec; --panel: #fffdf8; --panel2: #eef3ee; 
+  --ink: #20354b; --muted: #6e7e87; --line: #d7ded8; 
+  --blue: #376d8f; --teal: #3b8b83; --red: #c45055; 
+  --green: #39856b; --gold: #be8b31; --purple: #78699c; 
+  --shadow: 0 12px 32px rgba(55,74,78,.10);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Inter", "Microsoft JhengHei", sans-serif; }
+button, select, input { font: inherit; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+button:hover, select:hover { border-color: var(--blue); }
+
+.app { min-height: 100vh; display: grid; grid-template-columns: 260px minmax(0, 1fr); }
+.sidebar { position: sticky; top: 0; height: 100vh; overflow: auto; background: #e8eee9; border-right: 1px solid var(--line); padding: 20px 15px; }
+.brand { font-family: Georgia, serif; font-size: 19px; color: #284e64; font-weight: bold; }
+.motto { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin: 5px 0 20px; }
+
+.section { margin: 20px 0; }
+.section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.view-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.view-switch button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.control { margin-bottom: 10px; }
+.control label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.control select { width: 100%; font-size: 12px; }
+
+.main { padding: 20px 30px; overflow-y: auto; height: 100vh; }
+.masthead { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+h1 { font-family: Georgia, serif; font-size: 28px; margin: 0; color: #284e64; }
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 5px; }
+
+/* 頂部數據摘要卡片 */
+.summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.summary-item { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow); }
+.summary-item span { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; }
+.summary-item b { display: block; font-size: 22px; font-weight: 600; margin-top: 4px; color: var(--ink); }
+.summary-item small { font-size: 10px; color: var(--green); font-weight: bold; }
+
+/* 面板切換 */
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* 圖表卡片 */
+.chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+.chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+.chart-card h2 { margin: 0 0 15px 0; font-size: 15px; color: var(--ink); }
+.chart-container { position: relative; height: 320px; width: 100%; }
+
+/* 數據表格 */
+table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+th { color: var(--muted); text-transform: uppercase; padding: 10px; border-bottom: 2px solid var(--line); font-size: 10px; letter-spacing: 0.05em; }
+td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+tr:hover { background: var(--panel2); }
+.tag-leader { background: #e7f1ed; color: #2f705e; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
+.tag-peer { background: #fff2d6; color: #806122; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 10px; }
+.positive { color: var(--red); font-weight: bold; }
+.negative { color: var(--green); font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- 側邊欄 -->
+  <aside class="sidebar">
+    <div class="brand">VIA Quant Engine</div>
+    <div class="motto">Macro Filter · Capital Flow</div>
+    
+    <div class="section">
+      <div class="section-title">System View</div>
+      <div class="view-switch">
+        <button id="btn-flow" class="active" onclick="switchTab('flow')">資金動能 (Flows)</button>
+        <button id="btn-class" onclick="switchTab('class')">分類覆核 (Class)</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Sector Filters</div>
+      <div class="control">
+        <label>目標族群選擇</label>
+        <select id="sectorSelect" onchange="updateCharts()">
+          <option value="G01">G01 先進封裝與設備</option>
+          <option value="G02">G02 散熱模組與液冷</option>
+          <option value="G04">G04 光通訊與 CPO</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>動能視窗</label>
+        <select>
+          <option>3日高敏感測</option>
+          <option selected>5日均量平滑</option>
+          <option>20日波段確認</option>
+        </select>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 主內容區 -->
+  <main class="main">
+    <header class="masthead">
+      <div>
+        <h1>台股族群資金流與量化模擬系統</h1>
+        <div class="subtitle">結合 Flows-to-AUM Ratio 與無斷裂鏈接指數之高敏追蹤</div>
+      </div>
+      <div style="text-align: right; color: var(--muted); font-size: 12px;">
+        <div>宏觀壓力指數 $S_t$: <b>0.45 (順風)</b></div>
+        <div>曝險乘數 $M_t$: <b>1.0 (滿倉)</b></div>
+      </div>
+    </header>
+
+    <!-- 頂部摘要 -->
+    <section class="summary-strip">
+      <div class="summary-item">
+        <span>族群鏈接點位 (Base 100)</span>
+        <b id="kpi-index">107.26</b>
+        <small class="positive">▲ +2.45% (3D)</small>
+      </div>
+      <div class="summary-item">
+        <span>實質成交額 (億)</span>
+        <b id="kpi-vol">285.5</b>
+        <small class="positive">▲ 1.65x 突波</small>
+      </div>
+      <div class="summary-item">
+        <span>資金位移流速 (ΔShare)</span>
+        <b id="kpi-velocity" class="positive">+2.85%</b>
+        <small style="color:var(--muted)">橫截面 PR: 92</small>
+      </div>
+      <div class="summary-item">
+        <span>Flows-to-AUM Ratio</span>
+        <b id="kpi-flowratio" class="positive">+3.20%</b>
+        <small style="color:var(--muted)">強力吸納動能</small>
+      </div>
+    </section>
+
+    <!-- 資金動能面版 -->
+    <section id="panel-flow" class="panel active">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h2>族群無跳空鏈接指數 vs 實質成交量</h2>
+          <div class="chart-container"><canvas id="priceVolChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h2>主力法人實質淨流 (億元)</h2>
+          <div class="chart-container"><canvas id="flowChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 分類覆核面版 -->
+    <section id="panel-class" class="panel">
+      <div class="chart-card">
+        <h2>族群成分股動態角色標定 (Leader / Peer)</h2>
+        <table id="constituentsTable">
+          <thead>
+            <tr>
+              <th>代號 / 名稱</th>
+              <th>動態角色</th>
+              <th>特質 Alpha (60D)</th>
+              <th>Numba Lead-Lag τ*</th>
+              <th>資金位移貢獻度</th>
+              <th>投信 Z-Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// --- 模擬後端資料 (修復被截斷的資料並加入時間序列) ---
+const mockData = {
+  "G01": {
+    name: "先進封裝與設備",
+    index: 107.26, vol: 285.5, velocity: "+2.85%", flowRatio: "+3.20%",
+    labels: ['08-01', '08-02', '08-05', '08-06', '08-07', '08-08', '08-09', '08-12', '08-13', '08-14'],
+    priceData: [100.5, 101.2, 100.8, 102.5, 103.8, 103.5, 105.1, 104.8, 106.2, 107.26],
+    volData: [150, 160, 140, 210, 250, 220, 280, 260, 275, 285.5],
+    foreignNet: [10, 15, -5, 25, 30, -10, 35, 12, 28, 32.5],
+    trustNet: [5, 8, 12, 15, 18, 10, 20, 15, 16, 18.2],
+    constituents: [
+      { name: "辛耘 (3583)", role: "LEADER", alpha: "+15.2%", tau: "+1", flow: "22%", zscore: "2.8" },
+      { name: "弘塑 (3131)", role: "LEADER", alpha: "+12.8%", tau: "+1", flow: "18%", zscore: "2.5" },
+      { name: "萬潤 (6187)", role: "PEER", alpha: "+8.5%", tau: "0", flow: "12%", zscore: "1.4" },
+      { name: "均華 (6640)", role: "PEER", alpha: "+5.4%", tau: "0", flow: "8%", zscore: "1.1" }
+    ]
+  },
+  "G02": {
+    name: "散熱模組與液冷",
+    index: 94.50, vol: 210.4, velocity: "+1.45%", flowRatio: "+1.85%",
+    labels: ['08-01', '08-02', '08-05', '08-06', '08-07', '08-08', '08-09', '08-12', '08-13', '08-14'],
+    priceData: [92.1, 91.8, 92.5, 93.0, 93.5, 93.2, 94.1, 93.8, 94.2, 94.5],
+    volData: [120, 110, 130, 145, 160, 155, 180, 190, 200, 210.4],
+    foreignNet: [-5, -10, 2, 5, 8, -2, 10, 8, -4, -4.5],
+    trustNet: [15, 18, 20, 22, 25, 20, 28, 24, 25, 24.8],
+    constituents: [
+      { name: "奇鋐 (3017)", role: "LEADER", alpha: "+8.2%", tau: "+2", flow: "30%", zscore: "3.1" },
+      { name: "雙鴻 (3324)", role: "LEADER", alpha: "+7.5%", tau: "+1", flow: "25%", zscore: "2.8" },
+      { name: "健策 (3653)", role: "PEER", alpha: "+4.1%", tau: "0", flow: "15%", zscore: "1.2" }
+    ]
+  }
+};
+
+let priceChart, flowChart;
+
+// --- 初始化圖表 ---
+function initCharts() {
+  const ctxPrice = document.getElementById('priceVolChart').getContext('2d');
+  priceChart = new Chart(ctxPrice, {
+    type: 'line',
+    data: { datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { type: 'linear', display: true, position: 'left', grid: { color: 'rgba(215,222,216,0.5)' } },
+        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+
+  const ctxFlow = document.getElementById('flowChart').getContext('2d');
+  flowChart = new Chart(ctxFlow, {
+    type: 'bar',
+    data: { datasets: [] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, grid: { color: 'rgba(215,222,216,0.5)' } }
+      }
+    }
+  });
+}
+
+// --- 更新畫面資料與圖表 ---
+function updateCharts() {
+  const sector = document.getElementById('sectorSelect').value;
+  const data = mockData[sector] || mockData['G01']; // Fallback
+
+  // 更新 KPI 卡片
+  document.getElementById('kpi-index').innerText = data.index;
+  document.getElementById('kpi-vol').innerText = data.vol;
+  document.getElementById('kpi-velocity').innerText = data.velocity;
+  document.getElementById('kpi-flowratio').innerText = data.flowRatio;
+
+  // 更新價量圖表
+  priceChart.data = {
+    labels: data.labels,
+    datasets: [
+      {
+        label: '無斷裂動能指數 (Base 100)',
+        data: data.priceData,
+        borderColor: '#376d8f',
+        backgroundColor: '#376d8f',
+        yAxisID: 'y',
+        tension: 0.3,
+        borderWidth: 3
+      },
+      {
+        label: '實質成交額 (億元)',
+        data: data.volData,
+        type: 'bar',
+        backgroundColor: 'rgba(110, 126, 135, 0.2)',
+        yAxisID: 'y1'
+      }
+    ]
+  };
+  priceChart.update();
+
+  // 更新資金流圖表
+  flowChart.data = {
+    labels: data.labels,
+    datasets: [
+      { label: '外資淨流', data: data.foreignNet, backgroundColor: '#376d8f' },
+      { label: '投信淨流', data: data.trustNet, backgroundColor: '#39856b' }
+    ]
+  };
+  flowChart.update();
+
+  // 更新分類表格
+  const tbody = document.querySelector('#constituentsTable tbody');
+  tbody.innerHTML = '';
+  data.constituents.forEach(c => {
+    const tr = document.createElement('tr');
+    const roleClass = c.role === 'LEADER' ? 'tag-leader' : 'tag-peer';
+    tr.innerHTML = `
+      <td><b>${c.name}</b></td>
+      <td><span class="${roleClass}">${c.role}</span></td>
+      <td class="positive">${c.alpha}</td>
+      <td>${c.tau}</td>
+      <td>${c.flow}</td>
+      <td>${c.zscore}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// --- 頁籤切換 ---
+function switchTab(tabId) {
+  document.querySelectorAll('.view-switch button').forEach(b => b.classList.remove('active'));
+  document.getElementById(`btn-${tabId}`).classList.add('active');
+  
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${tabId}`).classList.add('active');
+}
+
+// 啟動執行
+window.onload = () => {
+  initCharts();
+  updateCharts();
+};
+</script>
+</body>
+</html>

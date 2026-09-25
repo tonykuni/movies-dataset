@@ -1,0 +1,140 @@
+name: VIA Master Control UI
+
+on:
+  push:
+    branches:
+      - main
+      - claude/via-system-followup-tz7k9t
+    paths:
+      - ".github/workflows/via-master-control-ui.yml"
+      - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0108.py"
+      - "VeritasIntelligenceAnalytics/VIA.ps1"
+      - "VeritasIntelligenceAnalytics/docs/**"
+      - "VeritasIntelligenceAnalytics/functional modules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/test_master_control_contract_v0100.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/uxtest_master_control_v0100.js"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_StdDashboard_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_SyncStatus_v0100.html"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/via-master-control-ui.yml"
+      - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0108.py"
+      - "VeritasIntelligenceAnalytics/VIA.ps1"
+      - "VeritasIntelligenceAnalytics/docs/**"
+      - "VeritasIntelligenceAnalytics/functional modules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/test_master_control_contract_v0100.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/uxtest_master_control_v0100.js"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_StdDashboard_v0100.html"
+      - "VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_SyncStatus_v0100.html"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-uat:
+    name: Windows bundled Chromium UAT
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v0108.py
+            /VeritasIntelligenceAnalytics/VIA.ps1
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pinned Playwright and bundled Chromium
+        shell: pwsh
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx playwright install chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Compile Python and JavaScript
+        shell: pwsh
+        run: |
+          python -m py_compile `
+            ".\VeritasIntelligenceAnalytics\VIA_SYSTEM_MANAGER_v0108.py" `
+            ".\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL095_DeckServer_v0114.py" `
+            ".\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL096_SyncStatus_v0102.py" `
+            ".\VeritasIntelligenceAnalytics\functional modules\VAP\engine\VAP_ENG014_StdDashboardTemplate_v0101.py" `
+            ".\VeritasIntelligenceAnalytics\supportive modules\registry\test_master_control_contract_v0100.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --check ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_master_control_v0100.js"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $tokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ".\VeritasIntelligenceAnalytics\VIA.ps1").Path,
+            [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -ne 0) {
+            $parseErrors | ForEach-Object { Write-Host $_.Message }
+            exit 1
+          }
+
+      - name: Run isolated product self-tests
+        shell: pwsh
+        run: |
+          python ".\VeritasIntelligenceAnalytics\VIA_SYSTEM_MANAGER_v0108.py" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL095_DeckServer_v0114.py" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL096_SyncStatus_v0102.py" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python ".\VeritasIntelligenceAnalytics\functional modules\VAP\engine\VAP_ENG014_StdDashboardTemplate_v0101.py" --selftest
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run isolated MasterControl contract tests
+        shell: pwsh
+        run: |
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\test_master_control_contract_v0100.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run desktop and mobile browser UAT
+        shell: pwsh
+        run: |
+          $env:VIA_UX_ARTIFACT_DIR = "$PWD\VIA_UI_Test_Artifacts"
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_master_control_v0100.js"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload UAT screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: via-master-control-ui-screenshots
+          path: VIA_UI_Test_Artifacts
+          if-no-files-found: warn
+          retention-days: 14

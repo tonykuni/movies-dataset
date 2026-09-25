@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA B531 · 25 Accelerator Control</title>
+<style>
+:root{--paper:#f7f5ef;--ink:#25313b;--muted:#6b747b;--line:#d9ddd8;--teal:#2a7886;--blue:#4878a8;--green:#3d8b70;--amber:#bd7a32;--red:#a9574f;--wash:#e9efec;--wash2:#e7edf4}
+*{box-sizing:border-box} body{margin:0;background:#dfe3df;color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Noto Sans TC",sans-serif}
+.page{width:min(1120px,calc(100vw - 48px));min-height:92vh;margin:24px auto;padding:54px 64px;background:var(--paper);box-shadow:0 8px 28px #24342b18;page-break-after:always}.page:last-child{page-break-after:auto}
+h1{font-size:34px;letter-spacing:.02em;margin:0 0 8px;font-weight:650}h2{font-size:22px;margin:30px 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}h3{font-size:16px;margin:20px 0 7px}.kicker{text-transform:uppercase;color:var(--teal);font-size:12px;letter-spacing:.16em}.sub{color:var(--muted);margin:0 0 24px}.pill{display:inline-block;padding:3px 12px;border-radius:18px;font-weight:700}.green{background:#dceee6;color:#21664f}.amber{background:#f6e8d5;color:#8c5b22}.red{background:#f3dfdc;color:#8d3e38}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.card{border:1px solid var(--line);background:#fbfaf6;padding:15px 16px}.metric{font-size:26px;font-weight:650;color:var(--teal)}.label{color:var(--muted);font-size:12px}.bar{height:10px;background:#e6e9e6;border-radius:8px;overflow:hidden;margin:7px 0}.bar>i{display:block;height:100%;background:var(--teal)}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:8px 7px;vertical-align:top}th{color:var(--muted);font-weight:600}.ok{color:var(--green);font-weight:700}.warn{color:var(--amber);font-weight:700}code{background:#edf0ed;padding:2px 5px;border-radius:3px;font-size:.9em}.note{border-left:4px solid var(--teal);background:var(--wash);padding:12px 16px;margin:16px 0}.warnbox{border-left-color:var(--amber);background:#f7eee1}.footer{color:var(--muted);font-size:12px;margin-top:36px;border-top:1px solid var(--line);padding-top:10px}@media print{body{background:white}.page{width:100%;margin:0;box-shadow:none;min-height:100vh}}
+</style>
+</head>
+<body>
+<section class="page">
+  <div class="kicker">VIA central governance · B531 · 2026-09-16</div>
+  <h1>25 項加速器中央線控</h1>
+  <p class="sub">PowerShell roster · Python sitecustomize · SuperAccel · VeritasCeleritas · VeritasAegisNexus · QuantGuard</p>
+  <p><span class="pill green">GREEN</span> <strong>READY_FOR_25</strong>　CGC_MDL156 <strong>21/21</strong></p>
+  <div class="grid">
+    <div class="card"><div class="metric">25</div><div class="label">SSOT roster IDs 01–25</div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="card"><div class="metric">21/21</div><div class="label">CGC156 control checks</div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="card"><div class="metric">4,996</div><div class="label">VCGC active components</div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="card"><div class="metric">OFF</div><div class="label">network default</div><div class="bar"><i style="width:18%;background:var(--amber)"></i></div></div>
+  </div>
+  <h2>控制面通過項目</h2>
+  <table><thead><tr><th>層級</th><th>驗證</th><th>結果</th></tr></thead><tbody>
+    <tr><td>SSOT</td><td>25 個 ID 唯一且連續，ID 23 明確標示 network capability</td><td class="ok">PASS</td></tr>
+    <tr><td>PowerShell</td><td>roster 25 entries；VIA_ACCEL20 相容保留；VIA_ACCEL25 與 Get-VIAAccelRoster 在位</td><td class="ok">PASS（靜態）</td></tr>
+    <tr><td>Python</td><td>sitecustomize 設定 roster/control identity，並以單點掛載接入全樹</td><td class="ok">PASS</td></tr>
+    <tr><td>Mounts</td><td>SuperAccel、Celeritas、Aegis canonical path 存在且已登錄</td><td class="ok">PASS</td></tr>
+    <tr><td>Policy</td><td>QuantGuard allowed；canonical active mounts 無 TA-Lib path</td><td class="ok">PASS</td></tr>
+  </tbody></table>
+  <div class="note"><strong>判讀：</strong>25 是治理 roster／route／evidence contract，不是 25 套獨立第三方演算法已全部安裝；現行技術分析政策為 QuantGuard-only，TA-Lib/talib 永久禁止。</div>
+  <div class="footer">Source: VIA_ACCELERATOR_CONTROL_latest.json · evidence_b531_accelerator_control/SHA256SUMS.json</div>
+</section>
+<section class="page">
+  <div class="kicker">Empirical runtime evidence</div>
+  <h1>實際啟動與 QuantGuard</h1>
+  <p class="sub">離線、確定性、自動落證；沒有重新啟動資料補庫。</p>
+  <h2>Bootstrap probe</h2>
+  <table><thead><tr><th>環境身份</th><th>實測值</th><th>結果</th></tr></thead><tbody>
+    <tr><td>VIA_ACCELERATOR_ROSTER</td><td><code>VIA_PS_Accelerators_25_Roster_v0100:25</code></td><td class="ok">PASS</td></tr>
+    <tr><td>VIA_ACCELERATOR_CONTROL</td><td><code>CGC_MDL156_VIAAcceleratorControl_v0100</code></td><td class="ok">PASS</td></tr>
+    <tr><td>VIA_ACCEL_BOOT</td><td><code>cache:9/88:17env</code></td><td class="ok">PASS／誠實缺件</td></tr>
+    <tr><td>VIA_NET_BOOT</td><td><code>1</code>，僅因 <code>VIA_FAMILY=vdf</code> 掛載；consent 未被改寫</td><td class="ok">PASS</td></tr>
+    <tr><td>Tools</td><td>Celeritas/Aegis lazy mount；sitecustomize=True；via_net=True</td><td class="ok">PASS</td></tr>
+  </tbody></table>
+  <h2>QuantGuard regression</h2>
+  <div class="grid">
+    <div class="card"><div class="metric">8/8</div><div class="label">QuantGuard selftest</div></div>
+    <div class="card"><div class="metric">adj_close</div><div class="label">price basis</div></div>
+    <div class="card"><div class="metric">ex-day</div><div class="label">volume basis</div></div>
+    <div class="card"><div class="metric">FORBIDDEN</div><div class="label">legacy indicator library</div></div>
+  </div>
+  <div class="note"><strong>TA-Lib 政策：</strong>TA-Lib 不安裝、不 import、不復活、不路由、不作活動 benchmark。政策 SSOT L50 將 QuantGuard 指定為唯一活動技術分析／因子路徑；Canonical Celeritas 與 QuantGuard intake mount 已移除可選 TA-Lib 載入。</div>
+  <h2>SuperAccel 能力狀態</h2>
+  <p>Catalogued <strong>88</strong> libraries；available <strong>9</strong>；missing／stub <strong>79</strong>；套用 <strong>17</strong> 個執行緒預算環境值。這是環境能力報告，不是把缺少的套件宣稱為已可用。</p>
+  <div class="footer">Evidence: accel_boot_probe_b531_final.txt · superaccel_activate_b531.txt · quantguard_selftest_b531.txt</div>
+</section>
+<section class="page">
+  <div class="kicker">Governance handover · honest status</div>
+  <h1>中央同步與接棒限制</h1>
+  <p class="sub"><span class="pill amber">YELLOW LIMITATION</span> 控制面 GREEN，不等於全域歷史 contract 零漂移或 Windows 真檔已解析。</p>
+  <h2>Central sync summary</h2>
+  <table><thead><tr><th>站點</th><th>exit</th><th>解讀</th></tr></thead><tbody>
+    <tr><td>CGC156 selftest</td><td class="ok">0</td><td>25 項中央線控 GREEN</td></tr>
+    <tr><td>Interface scan</td><td class="ok">0</td><td>new 0；drift 0；stable 2,784</td></tr>
+    <tr><td>Interface sync/apply</td><td class="warn">1</td><td>6 個既有 InputConsole contract drift，未盲改</td></tr>
+    <tr><td>Naming / registry / VCGC</td><td class="ok">0</td><td>命名冊、4,996 active components、237 families 均完成中央登錄</td></tr>
+    <tr><td>Final CGC156</td><td class="ok">0</td><td>21/21、READY_FOR_25；L50 QuantGuard-only ACTIVE</td></tr>
+  </tbody></table>
+  <h2>接棒規則</h2>
+  <div class="note warnbox"><strong>不要把 iface_sync=1 改寫成 B531 失敗：</strong>它指出的是既有六項歷史契約差異，必須逐一對照真實 CLI 後 version-forward。B531 的新 25-roster contract 已可在 InputConsole、Workflow、Interface、Naming、Component、Tool registries 搜尋到。</div>
+  <ul>
+    <li>Sandbox 沒有 pwsh、powershell 或 PSScriptAnalyzer；Windows 首次 probe 發現 dot-source scope bug（20 項回退），已修正 global state，需 pull 後重跑。</li>
+    <li><code>C:\測試樣本報告</code> 原始 PDF/DOCX 未掛載；不可宣稱內容級解析。</li>
+    <li>ENG054 全市場補庫仍停止；network consent 保持 operator-owned／fail-closed。</li>
+    <li>退休目錄與歷史 intake 的 TA-Lib 字串未刪除，但不屬於活動路由；QuantGuard 是唯一活動技術分析路徑。</li>
+  </ul>
+  <h2>Windows 一貼式 probe</h2>
+  <pre><code>Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+. .\VIA_Reports\handover\VIA_B531_25_ACCELERATOR_CONTROL.ps1</code></pre>
+  <div class="footer">Handover: VIA_B531_25_ACCELERATOR_CONTROL_HANDOVER.md · Status: VIA_B531_25_ACCELERATOR_CONTROL_STATUS.json</div>
+</section>
+</body>
+</html>

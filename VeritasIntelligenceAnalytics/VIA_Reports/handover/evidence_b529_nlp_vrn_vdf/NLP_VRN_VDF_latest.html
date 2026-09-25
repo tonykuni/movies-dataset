@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>VIA NLP→VRN→VDF 矩陣報告</title>
+<style>
+body{font-family:Arial,'Noto Sans TC',sans-serif;background:#f4f1eb;color:#202322;margin:0}
+.page{width:1120px;min-height:720px;margin:24px auto;padding:38px 46px;background:#fffdf9;box-sizing:border-box;page-break-after:always;box-shadow:0 2px 10px #0001}
+h1{font-size:30px;margin:0 0 12px;color:#163b42} h2{color:#24636c;margin-top:24px}
+.hero{border-left:8px solid #2f8f83;padding:18px 22px;background:#e9f4ef;margin:18px 0}
+.verdict{font-size:34px;font-weight:800;color:#a45a16}
+.meta{color:#65706c;font-size:13px;line-height:1.7} table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#244e58;color:white;text-align:left;padding:9px} td{border-bottom:1px solid #ddd4c7;padding:8px;vertical-align:top}
+tr:nth-child(even){background:#fbf8f2} .pass{color:#13734e;background:#e8f5ed} .blocked{color:#9b4b1d;background:#fff0df}
+code{white-space:pre-wrap;word-break:break-word} .small{font-size:12px;color:#5d6864}
+.nav{position:fixed;right:24px;top:12px;font-size:12px} a{color:#176c76;margin-left:10px}
+</style></head><body>
+<div class="nav"><a href="#p1">第1頁</a><a href="#p2">第2頁</a><a href="#p3">第3頁</a></div>
+<section class="page" id="p1"><h1>第 1 頁｜VIA NLP → VRN → VDF 實測矩陣報告</h1>
+<div class="hero"><div class="verdict">YELLOW</div><div>VRN_ENG087_NLPTextSummaryBridge v0100</div></div>
+<p class="meta">Run ID：B529-20260916T105325-68faf473<br>開始：2026-09-16T10:53:25.558358+00:00<br>完成：2026-09-16T10:53:29.926519+00:00<br>輸入：2 件；sidecar：2 件；NLP：2 件；摘要通過：2 件<br>資料庫：<code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb</code></p>
+<h2>總覽裁決</h2><table><tr><th>站點</th><th>實測值</th><th>狀態</th></tr>
+<tr><td>ENG072 首頁擷取</td><td>rc=0; sidecar=2</td><td>PASS</td></tr>
+<tr><td>NLP 文字修復／證據摘要</td><td>2/2；evidence span</td><td>PASS</td></tr>
+<tr><td>ENG073／DuckDB</td><td>{&#x27;vrn_report_basic&#x27;: 2, &#x27;vrn_report_metrics&#x27;: 0, &#x27;vrn_report_analyst&#x27;: 0, &#x27;vrn_nlp_text_summary&#x27;: 2, &#x27;vrn_pipeline_runs&#x27;: 4}</td><td>PASS</td></tr>
+<tr><td>VDF 三清單</td><td>RED</td><td>BLOCKED</td></tr></table>
+<p class="small">此頁是給操作員與下一位 AI 的裁決摘要；詳細逐站證據見第 2、3 頁及同批 JSON/Markdown。</p></section>
+<section class="page" id="p2"><h1>第 2 頁｜完整測試矩陣</h1><p class="small">每一列都有 expected、actual、state 與 evidence；BLOCKED 不轉成 PASS。</p>
+<table><tr><th>序</th><th>階段</th><th>元件</th><th>預期</th><th>實際</th><th>結果</th><th>證據</th></tr><tr><td>1</td><td>輸入樣本</td><td>PDF/DOCX/Image intake</td><td>&gt;=1 個可支援檔案</td><td>2 個</td><td class='pass'><strong>PASS</strong></td><td><code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf; /home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx</code></td></tr>
+<tr><td>2</td><td>首頁擷取</td><td>VRN ENG072</td><td>returncode=0；sidecar 齊全</td><td>rc=0; sidecar=2</td><td class='pass'><strong>PASS</strong></td><td><code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/eng072.stdout.txt</code></td></tr>
+<tr><td>3</td><td>NLP 文字與摘要</td><td>SUP_MDL744 NLPApplicationHub</td><td>Hub VERIFIED；摘要可回溯</td><td>processed=2; summary_ok=2</td><td class='pass'><strong>PASS</strong></td><td><code>vrn_nlp_text_summary.summary_points_json + normalized_text</code></td></tr>
+<tr><td>4</td><td>VRN 結構化入庫</td><td>VRN ENG073</td><td>returncode=0；DB 可讀</td><td>rc=0; DB=GREEN</td><td class='pass'><strong>PASS</strong></td><td><code>[&#x27;/home/ubuntu/work/quantguard_venv/bin/python&#x27;, &#x27;/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0127.py&#x27;, &#x27;run&#x27;, &#x27;--dir&#x27;, &#x27;/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/sidecars&#x27;, &#x27;--db&#x27;, &#x27;/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb&#x27;]</code></td></tr>
+<tr><td>5</td><td>資料庫驗證</td><td>vrn_reports.duckdb</td><td>NLP 表與 pipeline runs 在位</td><td>{&quot;vrn_report_basic&quot;: 2, &quot;vrn_report_metrics&quot;: 0, &quot;vrn_report_analyst&quot;: 0, &quot;vrn_nlp_text_summary&quot;: 2, &quot;vrn_pipeline_runs&quot;: 4}</td><td class='pass'><strong>PASS</strong></td><td><code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb</code></td></tr>
+<tr><td>6</td><td>VDF 中央狀態</td><td>VDF ENG087 / MARKET_LISTS</td><td>三清單 GREEN</td><td>RED</td><td class='blocked'><strong>BLOCKED</strong></td><td><code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json</code></td></tr></table>
+<h2>VDF 阻擋原因</h2><ul><li><b>tw_stock_universe</b>：價格資料最早日 2024-01-02 晚於要求起始日 2023-01-01；需補齊 2023 起資料</li></ul><p class="small">VDF 結果檔：<code>/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json</code></p></section>
+<section class="page" id="p3"><h1>第 3 頁｜逐件依序結果</h1><p class="small">順序：輸入 → ENG072 → NLP 正規化／摘要 → ENG073 → DuckDB → VDF。</p>
+<table><tr><th>序</th><th>報告 sidecar</th><th>正規化字數</th><th>TextProcessor</th><th>摘要</th><th>span 可回溯</th><th>證據型摘要點</th></tr><tr><td>1</td><td>synthetic_financial_report</td><td>441</td><td>VERIFIED</td><td>OK</td><td>True</td><td>Generic Layout Engine Test Annual Research Report 1.<br>Executive Overview This is the main body paragraph used to establish the body font size.<br>A second body line confirms paragraph-level classification.<br>1.1 Key Observation The document contains a table and one figure for layout testing.<br>Table 1: Quarterly Data Metric Q1 Q2 Q3 Revenue 100 120 150 Profit 20 25 31 Source: Synthetic data Figure 1: Trend Overview Source: Generated locally</td></tr>
+<tr><td>2</td><td>Veritas_VOFIE_Reconstructed</td><td>998</td><td>VERIFIED</td><td>OK</td><td>True</td><td>VOFIE_Sample_Input · 全格式讀取、主題重構與模板生成報告<br>AI candidates never auto-apply / 來源唯讀;<br>VOFIE_Sample_Input.md — markdown, 724 bytes, d5e4960d8292a363.<br>完整來源內容、重複主題、行號與雜湊仍保留在後續章節與 Component Specs JSON。<br>policy=STRUCTURAL_CANDIDATE_ONLY;</td></tr></table>
+<h2>可重跑與 AI 轉換檔</h2><ul><li>JSON：<code>NLP_VRN_VDF_RESULT.json</code>，機器裁決正本。</li><li>Markdown：<code>NLP_VRN_VDF_RESULT.md</code>，方便 AI 低額度接手。</li><li>DuckDB：<code>vrn_nlp_text_summary</code> 保存 normalized_text、source hash、summary_points_json。</li></ul>
+<p class="small">加速器：VIA_SuperAccel_AVAILABLE；執行模式：OFFLINE_FILE_INPUT；網路閘：OFF_BY_DEFAULT</p></section>
+</body></html>

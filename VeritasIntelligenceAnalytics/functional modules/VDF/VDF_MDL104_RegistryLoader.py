@@ -35,6 +35,50 @@ r"""
     python VDF_MDL104_RegistryLoader.py --themes Rates,Inflation --dry-run
     python VDF_MDL104_RegistryLoader.py --filter "US.Rates.Treasury.10Y"
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
+VIA_NET_TOOL_PATH = None
+try:
+    from pathlib import Path as _nb_Path
+    _nb_p = _nb_Path(__file__).resolve()
+    while _nb_p.parent != _nb_p:
+        _nb_dir = _nb_p / "supportive modules" / "network"
+        if _nb_dir.exists():
+            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
+            if _nb_hits:
+                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
+            break
+        _nb_p = _nb_p.parent
+except Exception:
+    VIA_NET_TOOL_PATH = None
+
+
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
+# ===== [VIA:NET-BRIDGE:END] =====
 
 import os, sys, json, time, importlib.util
 from datetime import datetime
@@ -398,6 +442,73 @@ def main():
     loader.print_rich_summary()
     return 0
 
+
+# ===== [VIA:SELFTEST-VERB:v0100] L53 自測動詞統一律(批610;只增不減,既有呼叫方一行未改)=====
+# 本段**零連線、零寫檔、不呼叫 main()**:只驗結構。
+# rc 誠實多態:0=GREEN · 1=RED · 2=NODATA(套件缺席不是壞掉) · 3=ABSENT
+_VIA_ST_NEED = ['main', 'RegistryLoader']
+
+
+def _via_selftest() -> int:
+    import os as _o, socket as _sk
+    g = globals()
+    okn = []; bad = []; nod = []
+
+    def chk(n, c, why=""):
+        (okn if c else bad).append(n)
+        print(("  \u2713 " + n) if c else "  [FAIL] {} \u2014 {}".format(n, why))
+
+    print("\U0001f9ea {} --selftest(L53 \u52d5\u8a5e\uff1b\u7d50\u69cb\u6aa2\uff0c\u96f6\u9023\u7dda)".format(_o.path.basename(__file__)))
+    try:
+        src = _o.path.abspath(__file__)
+        text = open(src, encoding="utf-8", errors="replace").read()
+    except Exception as e:
+        print("  [FAIL] \u8b80\u4e0d\u5230\u672c\u6a94\u539f\u59cb\u78bc \u2014 {}".format(e))
+        return 1
+
+    # \u2462 \u96f6\u9023\u7dda\u5be6\u8b49:\u6aa2\u671f\u9593\u4efb\u4f55 connect \u90fd\u88ab\u651c\u4e0b\u4f86
+    hit = []
+    _orig = _sk.socket.connect
+
+    def _blocked(self, *a, **k):
+        hit.append(a[0] if a else "?")
+        raise OSError("VIA selftest: \u96f6\u9023\u7dda\u95d8\u651c\u622a")
+
+    _sk.socket.connect = _blocked
+    try:
+        chk("\u2460 \u6a21\u7d44\u8f09\u5165\u7121\u4f8b\u5916", True)
+        miss = [n for n in _VIA_ST_NEED if g.get(n) is None]
+        chk("\u2461 \u5ba3\u544a\u7b26\u865f\u9f4a\u5099({} \u500b)".format(len(_VIA_ST_NEED)), not miss, "\u7f3a {}".format(miss))
+        i_st = text.find("[VIA:SELFTEST-VERB:v0100]")
+        i_mn = text.rfind('if __name__ == "__main__":')
+        chk("\u2463 \u52d5\u8a5e\u8def\u7531\u5728 main \u4e4b\u524d", 0 <= i_st < i_mn, "selftest \u6bb5 @{} \u4e0d\u5728 main \u5b88\u885b @{} \u4e4b\u524d".format(i_st, i_mn))
+        chk("\u2464 \u6a4b\u63a5\u4ef6\u5b8c\u597d(ACCEL/NET)",
+            ("[VIA:ACCEL-BRIDGE:" in text) and ("[VIA:NET-BRIDGE:" in text), "\u6a94\u982d\u6a4b\u6a19\u8a18\u4e0d\u5168")
+    finally:
+        _sk.socket.connect = _orig
+    chk("\u2462 \u96f6\u9023\u7dda\u5be6\u8b49", not hit, "\u81ea\u6e2c\u671f\u9593\u5617\u8a66\u9023\u7dda {}".format(hit[:2]))
+
+    # \u2465 \u5957\u4ef6\u65d7\u6a19\u76e4\u9ede:\u7f3a\u4ef6 = NODATA\uff0c\u4e0d\u662f\u7d05\u71c8
+    flags = sorted(k for k in g if k.endswith("_AVAILABLE"))
+    off = [k for k in flags if not g.get(k)]
+    if flags:
+        print("  \u25b8 \u5957\u4ef6\u65d7\u6a19 {}/{} \u5230\u4f4d{}".format(len(flags) - len(off), len(flags),
+              ("\uff1b\u7f3a " + ", ".join(off)) if off else ""))
+    if off:
+        nod.append("\u2465")
+    print("  \u2465 \u5957\u4ef6\u65d7\u6a19\u76e4\u9ede \u2014 {}".format("NODATA(\u7f3a\u4ef6\u4e0d\u662f\u58de\u6389)" if off else "\u5168\u5230\u4f4d"))
+
+    rc = 1 if bad else (2 if nod else 0)
+    print("[\u8a08] OK {} \u00b7 FAIL {} \u00b7 NODATA {} \u2192 rc={} ({})".format(
+        len(okn), len(bad), len(nod), rc, {0: "GREEN", 1: "RED", 2: "NODATA"}[rc]))
+    return rc
+
+
+if __name__ == "__main__":
+    import sys as _via_st_sys
+    if ("--selftest" in _via_st_sys.argv) or ("--self-test" in _via_st_sys.argv):
+        _via_st_sys.exit(_via_selftest())
+# ===== [VIA:SELFTEST-VERB:END] =====
 
 if __name__ == "__main__":
     try:

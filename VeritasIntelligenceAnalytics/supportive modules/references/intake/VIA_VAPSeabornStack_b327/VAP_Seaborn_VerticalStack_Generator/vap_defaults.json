@@ -1,0 +1,301 @@
+{
+  "schema": "VIA-VAP-SEABORN-DEFAULTS/2.3",
+  "version": "2.3.1",
+  "policy": "append-only; changes require version and changelog",
+  "project": {
+    "title": "Veritas Intelligence Analytics",
+    "subtitle": "Seaborn Visual Intelligence Generator",
+    "source_label": "資料來源",
+    "width_inch": 15.5,
+    "panel_height_inch": 2.55,
+    "standard_panel_height_px": 420,
+    "dpi": 300,
+    "style": "whitegrid",
+    "context": "notebook",
+    "palette": "deep",
+    "shared_x": true,
+    "figure_face_color": "#F5F7FA",
+    "axes_face_color": "#FFFFFF",
+    "output_directory": "output",
+    "output_name": "vap_seaborn_chart",
+    "output_formats": [
+      "png",
+      "pdf",
+      "svg",
+      "html"
+    ],
+    "watermark": "理 · VAP",
+    "series_colors": {
+      "AdjClose": "#4C78A8",
+      "Adj Close": "#4C78A8",
+      "MA20": "#F28E2B",
+      "Volume": "#76B7B2",
+      "Foreign": "#59A14F",
+      "Trust": "#F28E2B",
+      "Dealer": "#8FA6CF"
+    },
+    "max_rows": 500000,
+    "render_max_points": 5000,
+    "sample_rows": 5000,
+    "date_column": "Date",
+    "max_x_ticks": 10,
+    "layout_profile": "compact_desktop",
+    "html_renderer": "plotly"
+  },
+  "chart": {
+    "axis_mode": "auto",
+    "tick_policy": "vap_locked",
+    "tick_count": 5,
+    "missing": "none",
+    "y_format": "auto",
+    "secondary_y_format": "auto",
+    "secondary_type": "line",
+    "palette": null,
+    "alpha": 0.82,
+    "line_width": 1.65,
+    "secondary_alpha": 0.88,
+    "secondary_line_width": 1.35,
+    "height_ratio": 1.0,
+    "price_height_fraction": 0.75,
+    "volume_height_fraction": 0.25,
+    "stack_mode": "absolute",
+    "show_legend": true,
+    "show_zero_line": false,
+    "axis_zero_policy": "auto",
+    "bar_gap_ratio": 0.22,
+    "show_latest_label": false,
+    "show_outliers": false,
+    "quality_mode": "audit",
+    "invalid_date_policy": "fail",
+    "duplicate_date_policy": "fail",
+    "outlier_policy": "report",
+    "outlier_iqr_multiplier": 3.0,
+    "max_x_ticks": 10,
+    "auto_optimize": true,
+    "open": "Adj Open",
+    "high": "Adj High",
+    "low": "Adj Low",
+    "close": "Adj Close",
+    "volume": "Volume",
+    "normalized_y": [],
+    "bar_alpha": 0.75,
+    "area_alpha": 0.5,
+    "bar_width_ratio": 0.92,
+    "candle_width_ratio": 0.88,
+    "up_color": "#D62728",
+    "down_color": "#2CA02C"
+  },
+  "presets": {
+    "candlestick_volume": {
+      "type": "candlestick",
+      "axis_mode": "single",
+      "missing": "ffill",
+      "open": "Adj Open",
+      "high": "Adj High",
+      "low": "Adj Low",
+      "close": "Adj Close",
+      "volume": "Volume",
+      "y": [],
+      "secondary_y": [],
+      "y_format": "number",
+      "secondary_y_format": "magnitude",
+      "secondary_type": "bar",
+      "height_ratio": 1.5,
+      "price_height_fraction": 0.75,
+      "volume_height_fraction": 0.25,
+      "bar_alpha": 0.75,
+      "bar_width_ratio": 0.92,
+      "candle_width_ratio": 0.88,
+      "up_color": "#D62728",
+      "down_color": "#2CA02C",
+      "axis_zero_policy": "exclude",
+      "secondary_axis_zero_policy": "include",
+      "price_basis": "adjusted",
+      "derive_adjusted_prices": false
+    },
+    "price": {
+      "type": "line",
+      "axis_mode": "single",
+      "missing": "ffill",
+      "y_format": "number",
+      "height_ratio": 1.25,
+      "palette": "deep",
+      "axis_zero_policy": "exclude"
+    },
+    "price_volume_dual": {
+      "type": "line",
+      "axis_mode": "dual",
+      "missing": "none",
+      "y_format": "number",
+      "secondary_y_format": "magnitude",
+      "secondary_type": "bar",
+      "height_ratio": 1.25,
+      "secondary_unit": "Volume"
+    },
+    "volume": {
+      "type": "bar",
+      "axis_mode": "single",
+      "missing": "none",
+      "y_format": "magnitude",
+      "height_ratio": 0.75,
+      "show_legend": false,
+      "axis_zero_policy": "include"
+    },
+    "signed_flow": {
+      "type": "bar",
+      "axis_mode": "single",
+      "missing": "zero",
+      "y_format": "magnitude",
+      "height_ratio": 1.0,
+      "show_zero_line": true,
+      "positive_negative_colors": true,
+      "axis_zero_policy": "include"
+    },
+    "composition": {
+      "type": "stacked_area",
+      "axis_mode": "single",
+      "missing": "zero",
+      "y_format": "percent",
+      "stack_mode": "percent100",
+      "height_ratio": 1.0,
+      "palette": "Set2",
+      "axis_zero_policy": "include"
+    },
+    "multi_series": {
+      "type": "line",
+      "axis_mode": "single",
+      "missing": "none",
+      "y_format": "auto",
+      "height_ratio": 1.0,
+      "palette": "deep"
+    },
+    "heatmap": {
+      "type": "heatmap",
+      "axis_mode": "single",
+      "height_ratio": 1.25,
+      "cmap": "RdYlGn",
+      "show_legend": false
+    }
+  },
+  "semantic_aliases": {
+    "datetime": [
+      "date",
+      "datetime",
+      "time",
+      "timestamp",
+      "trade_date",
+      "日期",
+      "時間"
+    ],
+    "price": [
+      "adj close",
+      "adjclose",
+      "close",
+      "open",
+      "high",
+      "low",
+      "price",
+      "nav",
+      "價格",
+      "收盤",
+      "淨值"
+    ],
+    "volume": [
+      "volume",
+      "turnover_volume",
+      "shares",
+      "成交量",
+      "成交股數"
+    ],
+    "currency": [
+      "amount",
+      "value",
+      "turnover",
+      "turnover_value",
+      "revenue",
+      "sales",
+      "market_cap",
+      "成交值",
+      "金額",
+      "營收",
+      "市值"
+    ],
+    "percentage": [
+      "pct",
+      "percent",
+      "ratio",
+      "rate",
+      "yield",
+      "return",
+      "yoy",
+      "mom",
+      "比率",
+      "殖利率",
+      "報酬",
+      "年增",
+      "月增"
+    ],
+    "flow": [
+      "flow",
+      "net_buy",
+      "foreign",
+      "trust",
+      "dealer",
+      "買賣超",
+      "外資",
+      "投信",
+      "自營商"
+    ],
+    "identifier": [
+      "ticker",
+      "symbol",
+      "code",
+      "id",
+      "股票代碼",
+      "代碼"
+    ]
+  },
+  "changelog": [
+    {
+      "version": "2.3.1",
+      "changes": [
+        "Added chart-aware bounded rendering for large datasets with an explicit audit trail",
+        "Hardened concurrent config, gallery and output writes with cross-process transactions",
+        "Fixed UI context isolation, unsaved-form preview, right-axis controls and output opening",
+        "Corrected decimal tick labels, single-axis contracts and Windows launcher behavior"
+      ]
+    },
+    {
+      "version": "2.3.0",
+      "changes": [
+        "Added a local single-chart gallery and drag-reorder stack workflow",
+        "Split candlestick price and volume into 75/25 single-axis rows",
+        "Locked interactive standard panel height to 420 px multiples"
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "changes": [
+        "Added adjusted-OHLC candlestick and volume defaults with Taiwan red-up/green-down colors",
+        "Added Plotly HTML renderer, normalized-series controls and dedicated bar/area opacity defaults",
+        "Kept Seaborn palettes configurable for stacked and static chart color combinations"
+      ]
+    },
+    {
+      "version": "2.1.0",
+      "changes": [
+        "Added structured data-quality diagnostics and explicit repair policies",
+        "Added configurable layout optimizer parameters",
+        "Kept financial outliers report-only unless users explicitly enable clipping"
+      ]
+    },
+    {
+      "version": "2.0.0",
+      "changes": [
+        "Centralized editable project and chart defaults",
+        "Added visual presets and semantic aliases",
+        "Added VAP locked five-tick axis policy"
+      ]
+    }
+  ]
+}

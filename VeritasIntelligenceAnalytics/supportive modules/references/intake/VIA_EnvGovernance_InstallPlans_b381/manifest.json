@@ -1,0 +1,23 @@
+{
+ "intake_id": "VIA_EnvGovernance_InstallPlans_b381",
+ "ts": "2026-09-07",
+ "batch": 381,
+ "source": "操作員上傳三份 via-provision --check 體檢 JSON(VIA.InstallPlan.v1;machine 8e89047809597c08;Python 3.13.7;pwsh 7.6.5)",
+ "n_files_kept": 3,
+ "files": {
+  "VIA_Install_Plan_20260820_062418.json": "f7e09bb68fb273cb3235f27509747f10600dc4ca8b2c4c5e56d9b8cfaabfa563",
+  "VIA_Install_Plan_20260820_230001.json": "eb523b76f243032fd7c01c108e0286ae67760a243a4d3a8e28c354a7faa11b6d",
+  "VIA_Install_Plan_20260820_235933.json": "f2ae05f3ca054d0ea938b503802e5799c3af6472de5701e7f8984c332be9d717"
+ },
+ "evidence": "三次同狀(06:24/23:00/23:59):libs·核心 9/9、DOCX 2/2、OCR(選配)2/2 在位;唯一 FAIL=pip 衝突掃描『albucore 0.0.24 requires opencv-python-headless, which is not installed.』=衝突持續未閉環",
+ "root_cause": "OCR 家族(paddleocr/paddlex/albumentations/albucore/cv2)住 base;InstallGate doctor 拔 headless 錨 contrib 後 albucore metadata 需求懸空;既有工具(EnvFix/InstallGate)無拉出動作",
+ "integration": {
+  "engine": "supportive modules/registry/CGC_MDL135_EnvGovernance_v*.py(ingest_install_plans 自動攝入本冊)",
+  "baseline": "supportive modules/registry/VIA_EnvGovernance_Baseline_v*.json",
+  "cmds": [
+   "via-envgov",
+   "via-envgov-auto"
+  ],
+  "task": "envgov"
+ }
+}

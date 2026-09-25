@@ -1,0 +1,372 @@
+{
+  "schema": "VIA.VDF.TWMarketEndpoints.SSOT.v1",
+  "batch": "批720",
+  "ruled_by": "操作員 2026-09-23 逐項給定:「FACTSET/YFINANCE CONSENSUS 存一個資料庫 · 不用算移動平均量價 · 三大法人買賣超 · 融資融券 · 當沖交易 · ADJ OPEN/HIGH/LOW/CLOSE · 從 TWSE TPEX 擷取成交量 成交值 市值」;SMA 欄位『保留好了』、ADJ『四欄全給』為操作員 2026-09-23 逐題裁定",
+  "why": "端點清單放**冊**不放碼。批720 只有兩條是**實測驗過**的(MDL004 在工作站真的抓到料),其餘一律標 CANDIDATE 或 UNKNOWN —— **沒量過的不寫成事實**。探針跑過之後把 state 改成 VERIFIED/DEAD,改的是冊不是碼。",
+  "state_rule": {
+    "VERIFIED": "實測抓到料(誰在哪一天抓到,記在 evidence)",
+    "CANDIDATE": "依官方 OpenAPI 命名慣例推出來的路徑 —— **未經實測**,探針要去證實或證偽",
+    "UNKNOWN": "我不知道正確路徑,**不編一個** —— 空著等實測或操作員給",
+    "TREE_EVIDENCE": "樹上**已經在用**且有產物為證(快照檔/設定檔),但**不是本批探針親自打通的**。與 VERIFIED 分開記:別人量過 ≠ 我量過,兩者都是憑據但來源不同。"
+  },
+  "twse": {
+    "base": "https://openapi.twse.com.tw/v1",
+    "datasets": {
+      "daily_quote": {
+        "path": "/exchangeReport/STOCK_DAY_ALL",
+        "state": "VERIFIED",
+        "gives": [
+          "成交量",
+          "成交值",
+          "成交筆數",
+          "開高低收"
+        ],
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1381 列",
+        "rows_probed": 1381
+      },
+      "per_pbr_yield": {
+        "path": "/exchangeReport/BWIBBU_ALL",
+        "state": "VERIFIED",
+        "gives": [
+          "本益比",
+          "股價淨值比",
+          "殖利率"
+        ],
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1082 列",
+        "rows_probed": 1082
+      },
+      "institutional": {
+        "path": "/fund/T86",
+        "state": "DEAD",
+        "zh": "三大法人買賣超日報",
+        "gives": [
+          "外資",
+          "投信",
+          "自營商",
+          "買賣超"
+        ],
+        "probe_error": "Expecting value: line 1 column 1 (char 0)(回的不是 JSON —— 空的或 HTML)",
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):0 列,證偽",
+        "why_dead": "**這一道是我推的路徑,探針把它打掉了 —— 這就是 CANDIDATE 存在的意義。**推錯不丟臉,推錯又寫成事實才丟臉。原路徑原樣留著當留痕,不刪。",
+        "next_candidates": [
+          {
+            "path": "/fund/BFI82U",
+            "zh": "三大法人買賣金額統計表(市場合計)",
+            "state": "CANDIDATE",
+            "note": "若 T86 是個股別、BFI82U 是市場合計,兩者給的粒度不同 —— 要的是個股別買賣超"
+          },
+          {
+            "path": "/fund/T86",
+            "zh": "同一路徑帶日期參數再試",
+            "state": "CANDIDATE",
+            "note": "多數 TWSE 報表端點要 `?date=YYYYMMDD`;空參數回非 JSON 是這一類的典型症狀"
+          }
+        ],
+        "honest": "**下一輪探針要去打這兩條。** 在打通之前,三大法人這一欄一律 NOT_WIRED,不可以拿市場合計去冒充個股別。"
+      },
+      "margin": {
+        "path": "/exchangeReport/MI_MARGN",
+        "state": "VERIFIED",
+        "zh": "融資融券餘額",
+        "gives": [
+          "融資餘額",
+          "融券餘額",
+          "增減"
+        ],
+        "rows_probed": 1297,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1297 列"
+      },
+      "day_trade": {
+        "path": "/exchangeReport/TWTB4U",
+        "state": "VERIFIED",
+        "zh": "當日沖銷交易標的及統計",
+        "gives": [
+          "當沖張數",
+          "當沖金額"
+        ],
+        "rows_probed": 1233,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):1233 列"
+      },
+      "market_total": {
+        "path": "/exchangeReport/FMTQIK",
+        "state": "VERIFIED",
+        "zh": "市場成交資訊(全市場合計)",
+        "gives": [
+          "成交金額",
+          "成交股數",
+          "發行量加權股價指數"
+        ],
+        "rows_probed": 16,
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):16 列"
+      }
+    }
+  },
+  "tpex": {
+    "base": "https://www.tpex.org.tw/openapi/v1",
+    "datasets": {
+      "daily_quote": {
+        "path": "/tpex_mainboard_daily_close_quotes",
+        "state": "VERIFIED",
+        "gives": [
+          "成交量",
+          "成交值",
+          "開高低收"
+        ],
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):11696 列",
+        "rows_probed": 11696
+      },
+      "per_pbr": {
+        "path": "/tpex_mainboard_peratio_analysis",
+        "state": "VERIFIED",
+        "gives": [
+          "本益比",
+          "股價淨值比"
+        ],
+        "evidence": "批721 工作站探針實跑 2026-09-23(操作員雙閘開;經本機 127.0.0.1 代理):889 列",
+        "rows_probed": 889
+      },
+      "institutional": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "三大法人買賣超",
+        "why_unknown": "我不知道 TPEX 這一道的正確路徑,**不編一個**。探針會去 base 撈清單,撈不到就誠實 UNKNOWN。"
+      },
+      "margin": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "融資融券"
+      },
+      "day_trade": {
+        "path": "",
+        "state": "UNKNOWN",
+        "zh": "當沖交易"
+      }
+    }
+  },
+  "market_cap": {
+    "zh": "市值",
+    "rule": "**交易所不直接給市值,但給發行股數。** 市值 = 交易所收盤 × 交易所發行股數(TWSE t187ap03_L「已發行普通股數或TDR原股發行股數」· TPEX t187ap03_O `IssueShares` · 上櫃每日收盤 `Capitals`);Yahoo quoteSummary 的 sharesOutstanding 只拿來核對,不當主數據。",
+    "why": "操作員令「從 TWSE TPEX 擷取成交量 成交值 市值」—— 前兩項交易所直接有,第三項**沒有**。照實講:算出來的那一欄要標明是算的,不是抓的。",
+    "state": "DERIVED",
+    "ruled_2026_09_24": "操作員令「所有數據都以交易所為主 但只有YFINANCE抓得到ADJ CLOSE所以可用他抓CLOSE ADJ CLOSE重複CLOSE是為了核對 成交量 成交值 市值都以交易所為主 可以跟其他看盤網站核對正確性」",
+    "impl": {
+      "shares": "VDF_ENG055 v0115+ L1 同一回包收發行股數 → tw_shares_issued(asof_date · code · market · shares_issued · src;一份出表日一份);`--shares-snapshot` 重放樹上交易所快照(t187ap03_L/_O 2026-08-05)",
+      "view": "VDF_ENG057 v0103+ `mcap` → 檢視表 tw_market_cap_daily:market_cap=交易所收盤×當天或之前最近一份股數(basis EXCHANGE_CLOSE×EXCHANGE_SHARES);第一份股數之前不填,另欄 market_cap_later_shares 用之後第一份近似(basis EXCHANGE_CLOSE×LATER_EXCHANGE_SHARES);全樹唯一一處",
+      "side_line": "側線 2026-09-24 第五段(主線批號由併線的手指定 L25)"
+    },
+    "rule_history": [
+      {
+        "until": "2026-09-24",
+        "by": "批720",
+        "rule": "**交易所不直接給市值。** 市值 = 收盤價 × 發行股數;發行股數來自 Yahoo quoteSummary 的 sharesOutstanding(走統包 cookie+crumb 握手道)。"
+      }
+    ]
+  },
+  "adj_ohlc": {
+    "zh": "除權息調整後四價",
+    "cols": [
+      "adj_open",
+      "adj_high",
+      "adj_low",
+      "adj_close"
+    ],
+    "ruled_by": "操作員 2026-09-23 逐題裁定「四欄全給」",
+    "rule": "yfinance history(auto_adjust=True)四價皆為調整後;auto_adjust=False 時只有 Adj Close 一欄,其餘三價要自行乘上 adj_close/close 的比例。",
+    "honest": "比例法是**近似**(股息與分割的處理次序會有尾差),所以要另存 `adj_method` 欄講明這一列是哪一種來的。"
+  },
+  "consensus_db": {
+    "zh": "共識獨立庫",
+    "ruled_by": "操作員 2026-09-23「FACTSET/YFINANCE CONSENSUS 存一個資料庫」",
+    "file": "vdf_consensus.duckdb",
+    "tables": [
+      "yf_consensus",
+      "factset_consensus"
+    ],
+    "why": "共識的更新節奏與日行情不同(分析師改預估不是每天),混在同一庫裡會讓「今天沒更新」看起來像「今天沒有料」。"
+  },
+  "sma_note": {
+    "ruling_1": "操作員 2026-09-23 逐題裁定:**「保留好了」** —— 既有欄位照留,新庫不算。",
+    "ruling_2": "操作員 2026-09-23 同日改令:**「SMA AVERAGE+VOL 全數刪除欄位也刪除」** —— 推翻 ruling_1。",
+    "applied": "依 ruling_2 辦理:VDF_MDL004 的 SMA_WINDOWS / AVG_VOL_WINDOWS 清空,`sma_*` 與 `avg_vol_*` **停算且不產欄位**;摘要表與樣本表的那兩組也拿掉。",
+    "why_both_kept": "**兩次裁定都留著。** 只記最後一次,下一個人會看不出這裡曾經有過欄位、也看不出它是被裁掉的還是從來沒有過。留痕的重點不是誰對,是**這裡發生過一次改變**。",
+    "reduction_check": "這是**減**,所以動手前先量:全樹 grep `sma_20|sma_60|sma_240|avg_vol_*`,排除收容/快照/退役後,**只有 MDL004 自己**在讀 —— 零下游。量完才刪,不是刪完才說沒人在用。",
+    "kept": "ytd_pct 與 market_cap / shares_outstanding **不在這道令裡**,照留。"
+  },
+  "probe_log": {
+    "b721": {
+      "ts": "2026-09-23",
+      "who": "操作員工作站(雙閘開)",
+      "result": {
+        "VERIFIED": 7,
+        "DEAD": 1,
+        "UNKNOWN": 3
+      },
+      "gained": "CANDIDATE 4 道裡 **3 道證實**:融資融券(MI_MARGN 1297 列)· 當沖(TWTB4U 1233 列)· 市場成交資訊(FMTQIK 16 列)。這三道從此是有憑據的,不是我推的。",
+      "lost": "三大法人(T86)證偽 —— 回的不是 JSON。",
+      "note": "工作站流量經本機 127.0.0.1 代理(urllib3 InsecureRequestWarning);這不影響本探針的判讀,但記一筆:**那些警告不是引擎發的**。"
+    }
+  },
+  "b723_spec": {
+    "ruled_by": "操作員 2026-09-23:「加權/櫃買指數價格 三大法人 融資融券 當沖交易統一由 TWSE/TPEX 擷取 · 單獨一庫 · 全部台股清單為輸入 · 月營收抓全部 · 特定個股先以 2330 3325 透過 TWSE TPEX 抓財報 · 外股 NVDA 抓財報用 YFINANCE」",
+    "db": {
+      "file": "vdf_tw_flows.duckdb",
+      "holds": [
+        "指數(加權/櫃買)",
+        "三大法人",
+        "融資融券",
+        "當沖"
+      ],
+      "why": "操作員令「單獨一庫」。這四類是**市場面/籌碼面**,與個股日行情、與共識各自一庫 —— 三種更新節奏不同,混庫會讓「今天沒更新」看起來像「今天沒有料」。"
+    },
+    "universe": {
+      "zh": "全部台股清單(輸入)",
+      "twse": "/opendata/t187ap03_L",
+      "tpex": "/opendata/t187ap03_O",
+      "state": "TREE_EVIDENCE",
+      "evidence": "樹上快照 tw_source_snapshots/t187ap03_L_20260805.json **1093 筆**,欄位含 公司代號/公司名稱/公司簡稱/產業別;65 處程式在引用這條路徑",
+      "note": "**這就是操作員要的輸入清單** —— 不必另外造一份。"
+    },
+    "monthly_revenue": {
+      "zh": "月營收(抓全部)",
+      "twse": "/opendata/t187ap05_L",
+      "tpex": "/opendata/t187ap05_O",
+      "state": "TREE_EVIDENCE",
+      "evidence": "樹上設定明寫 output_name=VDF_MOPS_Raw_MonthlyRevenue_Listed / _OTC",
+      "note": "操作員令「抓全部」=不設 ticker 白名單,整張表收。"
+    },
+    "indices": {
+      "zh": "加權指數 / 櫃買指數",
+      "twse": {
+        "path": "/exchangeReport/MI_INDEX",
+        "state": "CANDIDATE",
+        "note": "每日收盤行情-大盤統計。**未經實測**,下一跑探針去打。"
+      },
+      "tpex": {
+        "path": "",
+        "state": "UNKNOWN",
+        "why_unknown": "櫃買指數的 OpenAPI 路徑我不知道,**不編一個**。"
+      }
+    },
+    "financials_tw": {
+      "zh": "個股財報(先做 2330 · 3325)",
+      "state": "UNKNOWN",
+      "why_unknown": "MOPS 財報(綜合損益表/資產負債表)的 OpenAPI 路徑我沒有可靠的。`t187ap03`(基本資料)、`t187ap05`(月營收)、`t187ap47`(ETF 清單)是樹上有實證的三條,**財報不在其中**。編一條出來,打不通時會看起來像交易所壞了(LL425)。",
+      "pilot": [
+        "2330",
+        "3325"
+      ],
+      "next": "要嘛操作員給路徑,要嘛探針去 MOPS opendata 清單撈。"
+    },
+    "financials_foreign": {
+      "zh": "外股財報(先做 NVDA)",
+      "symbol": "NVDA",
+      "route": "統包 SUP_MDL740.yahoo_quote_summary_raw(cookie+crumb 握手道,批719 修 401 那條)",
+      "modules": "incomeStatementHistory,balanceSheetHistory,cashflowStatementHistory",
+      "state": "CANDIDATE",
+      "note": "握手道**已驗**(批719 共識 792/1968 走的就是它);但這組 modules 回什麼**未經實測**。"
+    }
+  },
+  "daily_universe": {
+    "ruled_by": "操作員 2026-09-23:「台股每日更新總清單 如何驗證 TWSE+TPEX · DATE / TICKER / YFINANCE TICKER / BLOOMBERG TICKER / NAME / 台灣產業分類 / YFINANCE 產業 / YFINANCE 次產業 / YFINANCE BETA / EXCHANGE」",
+    "alias_source": "三平台代號規格的正本在 supportive modules/registry/VRN_FieldRules_SSOT_v0100.json#rules.ticker.platform(批628/634)——**本冊不抄第二份**",
+    "columns": {
+      "date": {
+        "from": "t187ap03 的『出表日期』+ 本跑日期",
+        "provenance": "EXCHANGE"
+      },
+      "ticker": {
+        "from": "t187ap03『公司代號』",
+        "provenance": "EXCHANGE",
+        "rx": "正本 TW_TICKER"
+      },
+      "yf_ticker": {
+        "from": "code + 市場後綴",
+        "provenance": "DERIVED",
+        "rule": "TWSE→`.TW` · TPEX→`.TWO`(正本 market_map)"
+      },
+      "bb_ticker": {
+        "from": "code + ` TT`",
+        "provenance": "DERIVED",
+        "caveat": "**Bloomberg 的 TT 判不出上市/上櫃**(正本原話)。所以它**不能**拿來回推 EXCHANGE —— 回推就是憑空造一個市場別。",
+        "ruled_by": "操作員 2026-09-23 明令:**「全部台灣股市全部加 \" TT\"」**",
+        "applied": "上市與上櫃**兩所一律** `code + ' TT'`(實測:程式裡兩條產出路徑各加一次,V4 檢 4/4 唯一)。這與正本 market_map 的「TT = Bloomberg 台股統一市場碼(TWSE+TPEX 不分)」一致 —— 原本是**從正本推的**,現在是**操作員親口裁的**。",
+        "why_record": "推出來的和裁下來的要分得開(與 LL426 同一條)。行為沒變,但憑據升級了:下一個人問「為什麼上櫃也加 TT」,答案從「我照正本推的」變成「操作員 2026-09-23 明令」。"
+      },
+      "name": {
+        "from": "t187ap03『公司名稱』/『公司簡稱』",
+        "provenance": "EXCHANGE"
+      },
+      "tw_industry": {
+        "from": "t187ap03『產業別』",
+        "provenance": "EXCHANGE",
+        "note": "**這一欄交易所直接有**,不必去 Yahoo 拿。"
+      },
+      "yf_sector": {
+        "from": "Yahoo assetProfile.sector",
+        "provenance": "YAHOO",
+        "state": "CANDIDATE"
+      },
+      "yf_industry": {
+        "from": "Yahoo assetProfile.industry",
+        "provenance": "YAHOO",
+        "state": "CANDIDATE"
+      },
+      "yf_beta": {
+        "from": "Yahoo defaultKeyStatistics.beta",
+        "provenance": "YAHOO",
+        "state": "CANDIDATE"
+      },
+      "exchange": {
+        "from": "來自哪一張清單(t187ap03_L=TWSE · _O=TPEX)",
+        "provenance": "EXCHANGE",
+        "note": "**用來源決定,不用代號猜。** 四碼代號本身分不出上市上櫃。"
+      }
+    },
+    "how_to_verify": {
+      "why": "操作員問的是「如何驗證」。答案不是一個數字,是**一組會紅的檢** —— 每一條都要寫得出『它紅的時候,是什麼壞了』。",
+      "checks": [
+        {
+          "id": "V1",
+          "zh": "兩所不重疊,且聯集=名冊筆數",
+          "fail_means": "同一檔同時出現在上市與上櫃清單 → 來源抓錯或轉板當天重複收"
+        },
+        {
+          "id": "V2",
+          "zh": "代號↔市場自洽:`.TW` 只能來自 TWSE 清單,`.TWO` 只能來自 TPEX",
+          "fail_means": "後綴是用猜的,不是用來源決定的"
+        },
+        {
+          "id": "V3",
+          "zh": "名稱兩源對得上:t187ap03 的公司名 vs 日行情表的名稱",
+          "fail_means": "清單與行情不同步(改名/新上市當天),或對到了不同的公司"
+        },
+        {
+          "id": "V4",
+          "zh": "Bloomberg 欄**不可回推市場別**:`TT` 那一格的 EXCHANGE 只能來自來源",
+          "fail_means": "有人拿 TT 去回推上市/上櫃 —— 正本明寫那是 UNKNOWN 不是猜"
+        },
+        {
+          "id": "V5",
+          "zh": "YF 代號真的存在:quoteSummary 回得出 price;回不出標 NOT_ON_YF",
+          "fail_means": "把『Yahoo 沒有這一檔』寫成『這一檔沒有資料』"
+        },
+        {
+          "id": "V6",
+          "zh": "每日更新要看得出 diff:與前一份比新增/退市/改名,**不是只比筆數**",
+          "fail_means": "筆數一樣就當成沒變 —— 一進一出剛好抵銷時完全看不見"
+        },
+        {
+          "id": "V7",
+          "zh": "缺值分三態:NODATA(來源有這一檔但這一欄空)· NOT_FETCHED(沒去拿)· NOT_ON_YF(Yahoo 沒有這一檔)",
+          "fail_means": "三種都寫成空白,下游分不出該補哪一種"
+        },
+        {
+          "id": "V8",
+          "zh": "新鮮度:出表日期距今幾個交易日,超過門檻要紅",
+          "fail_means": "抓到的是上週的清單而沒有人發現"
+        }
+      ],
+      "honest": "V1–V4、V6、V8 **零網路就驗得了**(兩張清單自己對自己);V5、V7 的 Yahoo 那部分要觸網,雙閘未開時那幾條是 GATED 不是 FAIL。"
+    }
+  }
+}

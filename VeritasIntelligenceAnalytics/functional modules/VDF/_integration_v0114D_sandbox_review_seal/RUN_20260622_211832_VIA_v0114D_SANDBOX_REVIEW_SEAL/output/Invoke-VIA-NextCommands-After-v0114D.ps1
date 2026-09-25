@@ -1,0 +1,12 @@
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\report\VIA_v0114D_SandboxReviewSeal_Report.html" Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\output" Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\_review_seal_package" Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\_manual_release_gate_draft" Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\output\VIA_v0114D_ReadinessGate.csv" | Format-Table -AutoSize Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\output\VIA_v0114D_ValidationMatrix.csv" | Format-Table -AutoSize Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\_manual_release_gate_draft\VIA_v0114D_USER_EDIT_ManualReleaseDecision.csv" pwsh -NoProfile -NoExit -ExecutionPolicy Bypass -File "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114D_sandbox_review_seal\RUN_20260622_211832_VIA_v0114D_SANDBOX_REVIEW_SEAL\output\Invoke-VIA-v0114E-Precheck-After-v0114D.ps1" # Next: v0114E manual release approval gate only. # No source mutation. No canonical merge. No DB write.
+

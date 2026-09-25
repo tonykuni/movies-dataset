@@ -1,0 +1,72 @@
+{
+  "schema_id": "VETF_CONSENSUS_ENRICHED/1.0",
+  "version": "v001",
+  "status": "SANDBOX_CANDIDATE",
+  "write_policy": {
+    "default_mode": "candidate",
+    "canonical_write_enabled": false,
+    "append_only": true,
+    "overwrite": false,
+    "canonical_requirements": [
+      "P0_ACCEPTED",
+      "P1_ACCEPTED",
+      "DUAL_AUTH_DISTINCT",
+      "DOUBLE_IDENTITY_VERIFIED",
+      "NO_LOOKAHEAD",
+      "PROVENANCE_HASH_PRESENT"
+    ]
+  },
+  "grain": [
+    "analysis_date",
+    "etf_code",
+    "holding_ticker",
+    "holding_isin"
+  ],
+  "source_priority": {
+    "price": ["TWSE", "TPEX", "YFINANCE"],
+    "target": ["FACTSET", "YFINANCE"],
+    "eps": ["FACTSET"]
+  },
+  "source_combination_policy": "VALUES_ARE_NEVER_AVERAGED_ACROSS_SOURCES",
+  "asof_policy": {
+    "price": "MAX(price_date) WHERE price_date <= analysis_date",
+    "factset": "MAX(snapshot_date) WHERE snapshot_date <= analysis_date",
+    "yfinance": "MAX(snapshot_date) WHERE snapshot_date <= analysis_date",
+    "holdings": "MAX(holding_date) PER etf_code WHERE holding_date <= analysis_date"
+  },
+  "identity_policy": {
+    "primary": "canonical_ticker",
+    "secondary_any_of": ["isin", "company_name", "provider_id"],
+    "canonical_write_on_failure": "DENY"
+  },
+  "target_fields": {
+    "providers": ["fs", "yf"],
+    "statistics": ["low", "mean", "median", "high"],
+    "derived": "target_upside_pct = (target / price_adj_close - 1) * 100"
+  },
+  "eps_fields": {
+    "provider": "fs",
+    "horizons": ["n", "n1", "n2"],
+    "statistics": ["low", "mean", "median", "high"],
+    "required_metadata": ["fiscal_year", "fiscal_period_end", "analyst_count"]
+  },
+  "forward_pe": {
+    "primary_eps_stat": "mean",
+    "formula": "price_adj_close / fs_eps_{horizon}_mean",
+    "secondary_formula": "price_adj_close / fs_eps_{horizon}_median",
+    "zero_eps": "NULL_WITH_ZERO_EPS",
+    "negative_eps": "NULL_WITH_NEGATIVE_EPS",
+    "currency_mismatch": "NULL_AND_REVIEW"
+  },
+  "quality_thresholds": {
+    "max_price_stale_calendar_days": 7,
+    "max_consensus_age_calendar_days": 120,
+    "provider_divergence_review_pct": 30.0
+  },
+  "outputs": {
+    "mart": "mart_tw_active_etf_holdings_consensus_enriched",
+    "candidate_partition": "asof=YYYY-MM-DD",
+    "formats": ["json", "csv", "parquet_if_backend_available", "candidate_duckdb_if_backend_available"],
+    "audit": ["manifest", "content_sha256", "input_provenance", "coverage", "quality_flags"]
+  }
+}

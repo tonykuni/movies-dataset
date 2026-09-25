@@ -1,0 +1,779 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · VAP 最佳圖庫建構器 · Chart Library Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}html{scrollbar-gutter:stable}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1560px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:14px 22px 8px;margin:0 -22px 12px;border-bottom:2px solid var(--ink);position:sticky;top:0;z-index:40;background:var(--bg);box-shadow:0 2px 0 rgba(245,244,240,1),0 6px 14px rgba(31,42,42,.06)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1080px}
+.layout{display:grid;grid-template-columns:290px 1fr;gap:16px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+/* settings panel */
+.layout.scol{grid-template-columns:34px 1fr}
+.settings .stog{position:absolute;top:8px;right:8px;font:800 11px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--line);background:var(--paper2);color:var(--vi);border-radius:4px;padding:3px 7px}
+/* sticky 固定；高度隨內容延展；超出視窗仍可捲動但隱藏滾輪軸(醜) */
+.settings{scrollbar-width:none}
+.settings::-webkit-scrollbar{display:none}
+.settings.scol2{padding:10px 6px}
+.settings.scol2>*:not(.stog){display:none}
+.settings{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--vi);border-radius:8px;padding:14px 16px;position:sticky;top:calc(var(--hdrh,0px) + 10px);max-height:calc(100vh - var(--hdrh,0px) - 20px);overflow:auto;overscroll-behavior:contain}
+.settings h2{font:800 12px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);margin-bottom:2px;position:sticky;top:-14px;background:var(--paper);z-index:5;padding-top:14px;margin-top:-14px}
+.settings .st{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;position:sticky;top:14px;background:var(--paper);z-index:5;padding-bottom:4px;border-bottom:1px solid var(--soft)}
+.fld{margin-bottom:11px}
+.fld label{display:block;font:700 8px 'DM Mono',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
+.fld input[type=number],.fld select{width:100%;font:600 11px 'DM Mono',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)}
+.pals{display:flex;flex-direction:column;gap:4px}
+.pal{display:flex;align-items:center;gap:7px;cursor:pointer;border:1px solid var(--line);border-radius:5px;padding:5px 8px;background:var(--paper2)}
+.pal.on{border-color:var(--vi);background:#f2effa}
+.pal .pn{font:700 9px 'DM Mono',monospace;color:var(--ink2);min-width:46px}
+.pal .sw{display:flex;gap:2px}.pal .sw i{width:12px;height:12px;border-radius:2px;display:block}
+.chk{display:flex;align-items:center;gap:7px;font:600 10px 'DM Mono',monospace;color:var(--ink2);cursor:pointer;margin-bottom:7px}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+.stat{margin-top:11px;font:600 9px/1.7 'DM Mono',monospace;color:var(--mut)}
+.stat b{color:var(--vi)}
+/* gallery */
+h3.grp{font:800 13px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);margin:4px 0 8px;padding:6px 0 5px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline}
+/* 牆壁式固定標題：永不移動 · 瞬間換字 */
+#grpWall{position:sticky;top:var(--hdrh,0px);z-index:25;background:var(--bg);font:800 13px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);padding:6px 0 5px;border-bottom:2px solid var(--ink);min-height:26px}
+#grpWall .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase;margin-left:8px}
+.grpslot{position:sticky;top:calc(var(--hdrh,0px) + 44px);z-index:15;background:var(--bg);font:800 13px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);min-height:24px;padding:4px 0 5px;border-bottom:1px solid var(--line)}
+.grpslot .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase;margin-left:8px}
+.grpslot.snap .w{display:inline-block;animation:snapIn .18s cubic-bezier(.2,.8,.2,1)}
+@keyframes snapIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h3.grp .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h3.grp:not(:first-child){margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.chart{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.chart.sel{border-color:var(--vi);box-shadow:0 0 0 2px rgba(122,109,170,.25)}
+.chd{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--soft);min-width:0}
+.chd>div{min-width:0}
+.chd input{width:15px;height:15px;accent-color:#7a6daa;cursor:pointer}
+.chd .t{font:700 11px 'Noto Sans TC',sans-serif;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chd .code{font:600 7.5px 'DM Mono',monospace;color:var(--vi)}
+.chd .ov{margin-left:auto;font:700 8px 'DM Mono',monospace;cursor:pointer;color:var(--mut);border:1px solid var(--line);border-radius:3px;padding:3px 8px;background:var(--paper2);flex-shrink:0;white-space:nowrap}
+.chd .ov.mod{color:#fff;background:var(--am);border-color:var(--am)}
+.cbody{padding:8px 10px 10px;overflow:hidden}
+.cbody svg{display:block;max-width:100%;overflow:hidden}
+.ovp{display:none;padding:9px 12px;border-top:1px dashed var(--line);background:var(--paper2)}
+.ovp.on{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ovp .fld{margin-bottom:0}
+.ovp .hint{grid-column:1/-1;font:500 8px 'DM Mono',monospace;color:var(--mut2)}
+</style></head><body>
+<div class="bar"></div>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · VAP (VERITASAUTOPLOT) · CHART LIBRARY BUILDER · UNIFIED SPEC STORE</div>
+ <h1>VAP 最佳圖庫建構器 <span>·</span> 堆疊 × 個別 × 單軸 × 雙軸</h1>
+ <p class="sub">同主題去重後之圖型註冊表:每種圖型唯一註冊(VAP-CH-xx)、<b>可勾選</b>組成最佳圖庫並儲存。所有規格存於<b>統一位置</b>(localStorage · vap_chartlib_v1),含 <b>DEFAULT 值</b>:調色(Seaborn COMBOS 自動導入)、線粗、透明度、外框、格線 — 每張圖可<b>單獨覆寫</b>,留白即回預設。雙軸圖皆有左右軸刻度。</p>
+<p class="sub" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+  <a href="VIA Master Console.html" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🎛 主控台</a>
+  <a href="VIA Intelligence Asset Management Platform.html" title="?tab=&q=" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🧱 智慧資產 IAMP</a>
+  <a href="VIA Auto-Coder.html" title="?type=&name=&gen=1" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">⚙ 自動編號器</a>
+  <a href="VIA Lexicon Registry.html" title="?kind=&q=" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📚 詞彙登錄</a>
+  <input id="gSearch" placeholder="🔍 搜尋 指標/圖型/代碼…" style="flex:1;min-width:160px;font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:var(--paper);color:var(--ink)">
+  <select id="gFilter" style="font:700 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:var(--paper);color:var(--ink)"></select>
+ </p>
+</header>
+<div class="layout">
+ <aside class="settings">
+  <button class="stog" id="sideTog" title="統一設定向左收縮">⟨</button>
+  <h2>統一設定 · Unified Defaults</h2>
+  <div class="st">single source · per-chart override 可空</div>
+  <label class="chk" style="background:#f2effa;border:1px solid var(--vi);border-radius:5px;padding:6px 8px"><input type="checkbox" id="dVL"> 🔒 視覺鎖定 Visual Lock — 全數統一固定 VIA 配色(報告書模組除外)</label>
+  <div class="fld"><label>調色組合 Colors Combos (Seaborn)</label><div class="pals" id="pals"></div></div>
+  <div class="fld"><label>資料庫 Data Sources(VDF · 可搜尋勾選)</label>
+   <input id="dbSearch" placeholder="搜尋資料庫…" style="width:100%;font:600 10px 'DM Mono',monospace;border:1px solid var(--line);border-radius:4px;padding:5px 8px;background:var(--paper2);color:var(--ink);margin-bottom:5px">
+   <div id="dbList" style="max-height:118px;overflow:auto;border:1px solid var(--soft);border-radius:4px;padding:4px 6px;background:var(--paper2)"></div></div>
+  <div class="fld"><label>線粗 Line Width (default 1)</label><input type="number" id="dLw" min="0.5" max="6" step="0.5"></div>
+  <div class="fld"><label>折線透明度 Line Opacity (default 0.9)</label><input type="number" id="dLOp" min="0" max="1" step="0.05"></div>
+  <div class="fld"><label>底部填色透明度 Fill Opacity (default 0.4)</label><input type="number" id="dOp" min="0" max="1" step="0.05"></div>
+  <label class="chk"><input type="checkbox" id="dFrame"> 外框 Frame</label>
+  <label class="chk"><input type="checkbox" id="dGrid"> 格線 Grid</label>
+  <label class="chk"><input type="checkbox" id="dZoom"> ZOOM · 水平最大展開</label>
+  <div class="fld" style="border-top:1px solid var(--soft);padding-top:10px"><label>版面 LAYOUT · 自動最佳化美感(可備存)</label>
+   <div style="display:flex;gap:5px;flex-wrap:wrap">
+    <button class="btn o lp" data-lp="compact">密集</button><button class="btn o lp" data-lp="standard">標準</button><button class="btn o lp" data-lp="wide">寬幅</button><button class="btn o lp" data-lp="full">全寬到底</button>
+   </div>
+  </div>
+  <div class="fld"><label>每列圖數(auto=自動最佳化 · 左右均分)</label><select id="dCols"><option value="auto">auto</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+  <div class="fld"><label>個別小圖 數量組合(列x欄 · 水平均分)</label><select id="dSM"><option>1x2</option><option>1x3</option><option>1x4</option><option>2x2</option><option>2x3</option><option>3x2</option><option>3x3</option></select></div>
+  <div class="fld"><label>標準高度 px(堆疊以此為基準)</label><input type="number" id="dHgt" min="90" max="360" step="10"></div>
+  <div class="fld"><label>事件線寬(default 0.8)</label><input type="number" id="dELw" min="0.4" max="3" step="0.1"></div>
+  <div class="fld"><label>垂直事件線 色序</label><select id="dEV"><option value="red-grey">紅/灰 交替</option><option value="grey-red">灰/紅 交替</option></select></div>
+  <div class="fld"><label>水平 BENCHMARK 線色(實線0.8·透明0.8)</label><select id="dEH"><option value="grey-red">灰</option><option value="red-grey">紅</option></select></div>
+  <div class="btnrow">
+   <button class="btn" id="save">💾 儲存圖庫</button>
+   <button class="btn o" id="exp">⤓ 匯出 JSON</button>
+   <button class="btn o" id="exphtml">⤓ 動態 HTML</button>
+   <button class="btn o" id="reset">↺ 回預設</button>
+  </div>
+  <div class="stat" id="stat"></div>
+  <details style="margin-top:13px;border-top:1px solid var(--soft);padding-top:9px">
+   <summary style="cursor:pointer;font:700 8px 'DM Mono',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase">SSOT 治理 · REGEX 對照檢查</summary>
+   <div id="ssotChk" style="font:500 8.5px/1.8 'DM Mono',monospace;color:var(--ink2);padding-top:6px"></div>
+  </details>
+  <details style="margin-top:8px">
+   <summary style="cursor:pointer;font:700 8px 'DM Mono',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase">SAP / MSP 對齊 · 資料規則</summary>
+   <div id="alignTbl" style="font:500 8.5px/1.7 'DM Mono',monospace;color:var(--ink2);padding-top:6px"></div>
+  </details>
+ </aside>
+ <main id="gallery"></main>
+</div>
+</div>
+<script>
+// ── Seaborn color combos (自動導入 · uploads/seaborn_color_combos.html) + VIA house
+const PALS={
+ via:{n:"VIA",c:["#c96b5a","#c4943a","#5a9e6f","#439a9a","#4c78a8","#7a6daa"]},
+ deep:{n:"deep",c:["#4c78a8","#e45756","#f58518","#72b7b2","#54a24b","#b279a2"]},
+ set2:{n:"Set2",c:["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f"]},
+ tab10:{n:"tab10",c:["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"]},
+ paired:{n:"Paired",c:["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00"]},
+ muted:{n:"muted · 低對比",c:["#4878d0","#ee854a","#6acc64","#d65f5f","#956cb4","#8c613c"]},
+ pastel:{n:"pastel · 柔和",c:["#a1c9f4","#ffb482","#8de5a1","#ff9f9b","#d0bbff","#debb9b"]},
+ cb:{n:"colorblind",c:["#0173b2","#de8f05","#029e73","#d55e00","#cc78bc","#ca9161"]}
+};
+const DEFAULTS={palette:"via",lineWidth:1,lineOpacity:0.9,fillOpacity:0.4,frame:true,grid:true,zoom:true,evtLw:0.8,evtV:"red-grey",evtH:"grey-red",dateMode:"normalized",smallMultiples:"2x2"};
+// ── SSOT 治理：每個設定一條 REGEX 規則；新設定加入 DEFAULTS 即自動納入對照檢查(持續演化) ──
+const RULES={
+ palette:{re:/^(via|deep|set2|tab10|paired|muted|pastel|cb)$/,d:"Seaborn combo key(只增不減)"},
+ lineWidth:{re:/^(0\.5|[1-5](\.5)?|6)$/,d:"0.5–6 · step .5"},
+ lineOpacity:{re:/^(0(\.\d{1,2})?|1(\.0{1,2})?)$/,d:"折線透明度 · default 0.9"},
+ fillOpacity:{re:/^(0(\.\d{1,2})?|1(\.0{1,2})?)$/,d:"底部填色 · default 0.4"},
+ frame:{re:/^(true|false)$/,d:"boolean"},
+ grid:{re:/^(true|false)$/,d:"boolean"},
+ zoom:{re:/^(true|false)$/,d:"ZOOM · 水平最大展開"},
+ evtLw:{re:/^\d(\.\d+)?$/,d:"事件線寬 · default 0.8"},
+ evtV:{re:/^(red-grey|grey-red)$/,d:"垂直事件線色序"},
+ evtH:{re:/^(red-grey|grey-red)$/,d:"BENCHMARK 線色(實緝0.8/0.8)"},
+ dateMode:{re:/^(normalized|start|end|now)$/,d:"日期軸模式 · 圖上點選"},
+ smallMultiples:{re:/^[1-4]x[1-6]$/,d:"個別小圖 列x欄 · 水平均分"}
+};
+function ruleFor(k){return RULES[k]||{re:/^.{0,80}$/,d:"auto-registered · 待定義"};} // 自動增加：未定義鍵亦受檢
+// SAP / MS Project 對齊：原碼鎖定不改(尊重既有系統)；智慧化對照在 VIA 方
+const ALIGN=[
+ {ext:"Plotly graph_objects",tcode:"go.* / make_subplots",lock:true,via:"VAP-CH-01..24",note:"生產渲染引擎 · 對齊不改寫"},
+ {ext:"SAP GRAPH_MATRIX",tcode:"SE38/GRAL",lock:true,via:"VAP-CH-01..16",note:"圖型庫對齊 · VIA 別名"},
+ {ext:"SAP LIST_VIEWER (ALV)",tcode:"SALV",lock:true,via:"VAP-CH-03/04/07",note:"條狀/堆疊對齊"},
+ {ext:"MSP Gantt/Timeline",tcode:"MSP-VIEW-01",lock:true,via:"VAP-CH-09",note:"個別小圖對齊"}
+];
+// Plotly 對照表(只增不減)
+const PLOTLY_MAP=[
+ "01 折線→go.Scatter(mode='lines') · 02 面積→fill='tozeroy'",
+ "03 直條→go.Bar · 04 橫條→go.Bar(orientation='h') · 05 散點→mode='markers'",
+ "06 堆疊面積→stackgroup · 07/08 堆疊條→barmode='stack'/'relative'",
+ "09 個別小圖→make_subplots · 10 並列→barmode='group'",
+ "11/12 雙軸→make_subplots(secondary_y=True)",
+ "13 事件→add_vline/add_vrect · 14 相關→go.Heatmap(zmid=0)+mask",
+ "15 區間量測→dragmode='select' · 16 地圖→Leaflet/scattergeo",
+ "17-20 滾動→rolling().apply+go.Scatter · 21 雷達→go.Scatterpolar",
+ "22 Alpha→fill='tonexty' · 23 日曆→economic-calendar feed · 24 共識→go.Indicator/bullet",
+ "25 回測→Rank-IC 衰減 go.Bar+go.Scatter · null band add_hrect · 星號 annotations",
+ "26 當日走勢→make_subplots(rows=2,row_heights=[.72,.28],shared_xaxes=True) · 價 go.Scatter · 量 go.Bar 漲紅跌綠",
+ "27 K線→go.Candlestick + SMA/EMA go.Scatter + BB fill='tonexty' · TA-Lib 以 ADJ PRICE 計算 · 量 go.Bar",
+ "28 現貨×期貨→Normalized go.Scatter 現貨實線/期貨虛線 · basis 基差 add_hrect · BZ=F/CL=F/GC=F × spot"
+];
+// 資料/搭配規則(只增不減)
+const DATARULES=[
+ "ADJ CLOSE：股票/指數一律換算全欄位 ADJ PRICE 使用",
+ "VOLUME：遇 STOCK SPLIT 依拆分比反向調整(×ratio)",
+ "上漲紅 · 下跌綠(台股慣例)",
+ "雙軸搭配：一者底色面積、一者對比色虛線；條+線用互補色 — 顯著不亂",
+ "軸刻度：左右軸間隔數相同；間隔值為 2/2.5/5/10 倍數；小數位數統一(0.20/0.25)",
+ "事件矩陣：垂直虛線 0.8 · 間隔區塊透明度 0.3 · 無水平線",
+ "水平線僅作 BENCHMARK：實線 · 線粗 0.8 · 透明度 0.8",
+ "相關熱力：seaborn 雙向色階 #3f7f93→#f2f2f2→#d93a46 · zmid=0 · 遮罩上三角",
+ "日期軸：Normalized/Start/End/Now 圖上點選(⚙)，確認後自動隱藏",
+ "地圖數據：區域+代碼+▲紅/▼綠+走勢長條(預設可改)",
+ "輸出：白底頁高畫質 PNG(4×) · 動態 HTML · JSON · 常用格式",
+ "堆疊圖：時間軸絕對對齊(同一 index) · 全圖庫共用 ax()/x(i,n) 同一映射 · T0/T25/T50/T75/T100 統一刻度",
+ "頻率校正：日×月資料雙軸並列→自動重採樣對齊(期末)",
+ "空值價格：前一交易日遞補 ffill(兩日均值會洩未來 · 禁用)",
+ "空值成交量：不可遞補 — 缺值即 0/NaN",
+ "共識數據：yfinance/FactSet(keyed) → Diluted EPS · 目標價 · 評等 · 分析師家數；EPS 適用 ADJ 規則",
+ "物件不重疊：數據備註自動避讓",
+ "HEATMAP：以實際波動區間正規化 → 最顯著化；相關矩陣遮罩上三角(mask)",
+ "ZOOM/水平最大展開：預設開啟，鎖定後凍結",
+ "台美時差：台股滯後美股一交易日 — 相關/回測 TW(t) 對齊 US(t−1) lead-lag",
+ "共識數據佐證 BENCHMARK：目標價/評等區間/共識 EPS → 畫作水平虛線 線粗 0.8 · 透明度 0.8",
+ "TA-Lib 技術指標：一律以 ADJ PRICE 計算(MA/RSI/MACD/BB/KD…)；量能指標用 SPLIT 反向調整後 VOLUME",
+ "CARDS 版面：一律 CSS GRID + gap(auto-fill minmax) · 去框(無外框 · 以留白/底色分隔) · 內容展開到邊",
+ "物件不可突出格子：圖卡/標籤/文字一律 overflow:hidden + ellipsis · SVG max-width:100% · 數據備註不重疊",
+ "商品×匯率×波動：原物料現貨×期貨並列(BRENT/WTI) · 貴金屬/大宗/匯率/VIX/BDI/^TWII 統一 Ticker 清單(LEX) · 現貨期貨同圖用雙軸或 Normalized",
+ "國旗：一律圓形旗標 circular flags · 略大尺寸 · 左右自動分散對齊 · 全模組統一(VDF/VRN/VAP 同規)"
+];
+const KEY="vap_chartlib_v1";
+let STORE={defaults:{...DEFAULTS},overrides:{},selected:[],lock:{visual:true,charts:[]}};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.defaults)STORE={defaults:{...DEFAULTS,...s.defaults},overrides:s.overrides||{},selected:s.selected||[],lock:{visual:!s.lock||s.lock.visual!==false,charts:(s.lock&&s.lock.charts)||[]}};}catch(e){}
+if(STORE.lock.visual)STORE.defaults.palette="via";
+const isLocked=id=>STORE.lock.charts.includes(id);
+// ── 資料庫清單(VDF 契約) ──
+const DBS=["TWSE 台灣證交所","TPEX 櫃買中心","SITCA 投信投顧公會","MOPS 公開資訊觀測站","yfinance","FactSet (keyed)","FRED","EPFR","HKEX 港交所"];
+let DBQ="";
+function renderDB(){const el=document.getElementById("dbList");if(!el)return;
+ if(!Array.isArray(STORE.db))STORE.db=DBS.slice();
+ el.innerHTML=DBS.filter(d=>!DBQ||d.toLowerCase().includes(DBQ)).map(d=>'<label class="chk" style="margin-bottom:4px"><input type="checkbox" data-db="'+d+'"'+(STORE.db.includes(d)?" checked":"")+'> '+d+'</label>').join("")||'<div style="font:500 8px \'DM Mono\',monospace;color:var(--mut2)">無符合</div>';
+ el.querySelectorAll("[data-db]").forEach(cb=>cb.onchange=()=>{const d=cb.dataset.db;STORE.db=cb.checked?[...new Set([...STORE.db,d])]:STORE.db.filter(x=>x!==d);persist();});}
+if(!STORE.layout)STORE.layout={preset:"standard",cols:"auto",height:150};
+const LPRESETS={compact:{cols:"4",height:120},standard:{cols:"auto",height:150},wide:{cols:"2",height:180},full:{cols:"1",height:220}};
+// ── chart registry (同主題去重 · 每型唯一) ──
+const GROUPS=[
+ {id:"single",t:"單軸 · Single-Axis",charts:[
+  {id:"line",t:"折線圖 Line",code:"VAP-CH-01"},
+  {id:"area",t:"面積折線 Area(下方填色)",code:"VAP-CH-02"},
+  {id:"bar",t:"直條圖 Bar",code:"VAP-CH-03"},
+  {id:"hbar",t:"橫條圖 H-Bar",code:"VAP-CH-04"},
+  {id:"scatter",t:"散點圖 Scatter",code:"VAP-CH-05"}]},
+ {id:"stack",t:"堆疊 · Stacked",charts:[
+  {id:"sarea",t:"堆疊面積 Stacked Area",code:"VAP-CH-06"},
+  {id:"sbar",t:"堆疊直條 Stacked Bar",code:"VAP-CH-07"},
+  {id:"sbar100",t:"百分比堆疊 100% Stacked",code:"VAP-CH-08"}]},
+ {id:"indiv",t:"個別 · Small Multiples",charts:[
+  {id:"multi",t:"個別小圖 2×2 Small Multiples",code:"VAP-CH-09"},
+  {id:"gbar",t:"並列直條 Grouped Bar",code:"VAP-CH-10"}]},
+ {id:"dual",t:"雙軸 · Dual-Axis(左右皆有軸 · 底色×折線先設定)",charts:[
+  {id:"dline",t:"雙軸 底色面積×對比折線 Dual Area×Line",code:"VAP-CH-11"},
+  {id:"dbarline",t:"條+線 雙軸 Bar × Line",code:"VAP-CH-12"}]},
+ {id:"adv",t:"進階 · 事件矩陣 × 熱力 × 量測 × 地圖",charts:[
+  {id:"evtmx",t:"事件矩陣 Event Matrix(下展開·虛線可選可改)",code:"VAP-CH-13"},
+  {id:"corrheat",t:"相關熱力圖 Masked Corr(下三角)",code:"VAP-CH-14"},
+  {id:"brush",t:"區間量測 滑鼠拉選→高低/MaxDD/時間",code:"VAP-CH-15"},
+  {id:"map",t:"地圖×數據×圖 Map(Leaflet 引擎)",code:"VAP-CH-16"}]},
+ {id:"rolling",t:"滾動績效 · Rolling Performance Toolkit",charts:[
+  {id:"roll",t:"滾動報酬 Rolling Returns",code:"VAP-CH-17"},
+  {id:"rollcorr",t:"滾動相關 Rolling Correlation",code:"VAP-CH-18"},
+  {id:"rollsharpe",t:"移動夏普 Trailing Sharpe",code:"VAP-CH-19"},
+  {id:"sortino",t:"Sharpe × Sortino 比較",code:"VAP-CH-20"},
+  {id:"radar",t:"風險雷達 Risk Radar",code:"VAP-CH-21"},
+  {id:"alpha",t:"Alpha 策略 策略vs基準+超額報酬",code:"VAP-CH-22"},
+  {id:"econcal",t:"經濟日曆 Economic Calendar",code:"VAP-CH-23"},
+  {id:"backtest",t:"回測驗證 Rank-IC 衰減 × 顯著性",code:"VAP-CH-25"},
+  {id:"intraday",t:"當日走勢×下方成交量 Intraday × Volume",code:"VAP-CH-26"},
+  {id:"candle",t:"K線×SMA/EMA/BB×Volume Candlestick TA",code:"VAP-CH-27"},
+  {id:"spotfut",t:"商品現貨×期貨 BRENT·WTI·GOLD Spot×Futures",code:"VAP-CH-28"}]},
+ {id:"fund",t:"基本面 · 共識數據 Consensus(yfinance/FactSet)",charts:[
+  {id:"consensus",t:"共識總覽 Diluted EPS · 目標價 · 評等 · 分析師",code:"VAP-CH-24"}]}
+];
+const ALL=GROUPS.flatMap(g=>g.charts.map(c=>c.id));
+// ── data (deterministic) ──
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+function ser(seed,n,a,b){const r=rng(seed);const o=[];for(let i=0;i<n;i++){const t=i/(n-1);o.push(a+(b-a)*t+(r()-0.5)*(b-a)*0.35+Math.sin(i*0.7+seed)*(b-a)*0.08);}return o;}
+const BRUSH_S=ser(101,48,30,72);
+// ── spec resolution: default ← override ──
+function spec(id){const o=STORE.overrides[id]||{};const s={
+ palette:o.palette||STORE.defaults.palette,
+ lineWidth:o.lineWidth!=null&&o.lineWidth!==""?+o.lineWidth:STORE.defaults.lineWidth,
+ lineOpacity:o.lineOpacity!=null&&o.lineOpacity!==""?+o.lineOpacity:(STORE.defaults.lineOpacity!=null?STORE.defaults.lineOpacity:0.9),
+ fillOpacity:o.fillOpacity!=null&&o.fillOpacity!==""?+o.fillOpacity:STORE.defaults.fillOpacity,
+ dual:o.dual!=null?o.dual:false,
+ frame:o.frame!=null?o.frame:STORE.defaults.frame,
+ grid:o.grid!=null?o.grid:STORE.defaults.grid,
+ zoom:STORE.defaults.zoom,evtLw:+STORE.defaults.evtLw||0.8,evtV:STORE.defaults.evtV,evtH:STORE.defaults.evtH,dateMode:STORE.defaults.dateMode||"normalized",sm:STORE.defaults.smallMultiples||"2x2"};
+ if(STORE.lock.visual)s.palette="via"; // 🔒 視覺鎖定：統一固定 VIA 配色(報告書模組除外)
+ return s;}
+// ── SVG renderers ──
+const W=320,H=150,mL=34,mR=30,mT=10,mB=20;
+function ax(sp,lo,hi,rlo,rhi){// frame+grid+left ticks(+right if rlo!=null)
+ if(rlo==null&&sp.dual){rlo=lo;rhi=hi;} // 單軸加另一軸→雙軸(鏡像刻度)
+ let h="";const X0=mL,X1=W-mR,Y0=mT,Y1=H-mB;
+ // 左右軸間隔數相同(各 5 刻度 · 4 間隔)；間隔值為 2/2.5/5/10 的倍數；小數位數統一顯示
+ const step=(hi-lo)/4;const dec=step%1===0?0:((step*10)%1===0?1:2);
+ let rstep=0,rdec=0;if(rlo!=null){rstep=(rhi-rlo)/4;rdec=rstep%1===0?0:((rstep*10)%1===0?1:2);}
+ if(sp.grid)for(let k=0;k<=4;k++){const yv=Y1-(Y1-Y0)*k/4;h+=`<line x1="${X0}" x2="${X1}" y1="${yv}" y2="${yv}" stroke="#ecebe6" stroke-width="1"/>`;}
+ if(sp.frame)h+=`<rect x="${X0}" y="${Y0}" width="${X1-X0}" height="${Y1-Y0}" fill="none" stroke="#dbd9d3" stroke-width="1"/>`;
+ else h+=`<line x1="${X0}" x2="${X1}" y1="${Y1}" y2="${Y1}" stroke="#dbd9d3" stroke-width="1"/>`;
+ for(let k=0;k<=4;k++){const f=k/4,yv=Y1-(Y1-Y0)*f;
+  h+=`<text x="${X0-4}" y="${yv+2.5}" text-anchor="end" fill="#9c9890" style="font:500 7px 'DM Mono',monospace">${(lo+step*k).toFixed(dec)}</text>`;
+  if(rlo!=null)h+=`<text x="${X1+4}" y="${yv+2.5}" text-anchor="start" fill="#33403f" style="font:500 7px 'DM Mono',monospace">${(rlo+rstep*k).toFixed(rdec)}</text>`;}
+ // 時間軸統一刻度：全圖庫同一映射 x(i,n) → 堆疊/並排時間軸絕對對齊(同一 index)
+ for(let k=0;k<=4;k++){const xx=X0+(X1-X0)*k/4;
+  h+=`<line x1="${xx}" x2="${xx}" y1="${Y1}" y2="${Y1+3}" stroke="#c4c0b8" stroke-width="1"/>`;
+  h+=`<text x="${xx}" y="${Y1+11}" text-anchor="middle" fill="#9c9890" style="font:500 6px 'DM Mono',monospace">T${k*25}</text>`;}
+ return h;}
+const x=(i,n)=>mL+(W-mL-mR)*(i/(n-1));
+const y=(v,lo,hi)=>mT+(H-mT-mB)*(1-(v-lo)/(hi-lo));
+function pathOf(s,lo,hi){return s.map((v,i)=>(i?"L":"M")+x(i,s.length).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ");}
+const R={
+ line(sp){const C=PALS[sp.palette].c;const s1=ser(3,24,20,80),s2=ser(7,24,60,35);const lo=0,hi=100;
+  const bmCol=sp.evtH==="red-grey"?"#c96b5a":"#9c9890";
+  return ax(sp,lo,hi)+`<line x1="${mL}" x2="${W-mR}" y1="${y(50,lo,hi)}" y2="${y(50,lo,hi)}" stroke="${bmCol}" stroke-width="0.8" stroke-opacity="0.8"/>`+[s1,s2].map((s,i)=>`<path d="${pathOf(s,lo,hi)}" fill="none" stroke="${C[i]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`).join("")+`<text x="${W-mR-3}" y="${y(50,lo,hi)-3}" text-anchor="end" fill="${bmCol}" style="font:500 6.5px 'DM Mono',monospace">BENCHMARK</text>`;},
+ area(sp){const C=PALS[sp.palette].c;const s=ser(5,24,25,78);const lo=0,hi=100;const p=pathOf(s,lo,hi);
+  return ax(sp,lo,hi)+`<path d="${p} L ${x(23,24)} ${H-mB} L ${mL} ${H-mB} Z" fill="${C[0]}" fill-opacity="${sp.fillOpacity}"/><path d="${p}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;},
+ bar(sp){const C=PALS[sp.palette].c;const s=ser(11,10,20,85);const lo=0,hi=100;const bw=(W-mL-mR)/10*0.86;
+  return ax(sp,lo,hi)+s.map((v,i)=>`<rect x="${x(i,10)-bw/2}" y="${y(v,lo,hi)}" width="${bw}" height="${H-mB-y(v,lo,hi)}" fill="${C[i%C.length]}" fill-opacity="${sp.fillOpacity+0.3>1?1:sp.fillOpacity+0.3}"/>`).join("");},
+ hbar(sp){const C=PALS[sp.palette].c;const s=ser(13,6,30,90);const lo=0,hi=100;const bh=(H-mT-mB)/6*0.86;
+  let h=ax(sp,lo,hi);s.forEach((v,i)=>{const yy=mT+(H-mT-mB)*(i/6)+((H-mT-mB)/6-bh)/2;const ww=(W-mL-mR)*(v-lo)/(hi-lo);
+   h+=`<rect x="${mL}" y="${yy}" width="${ww}" height="${bh}" fill="${C[i%C.length]}" fill-opacity="${sp.fillOpacity+0.3>1?1:sp.fillOpacity+0.3}"/>`;});return h;},
+ scatter(sp){const C=PALS[sp.palette].c;const r=rng(17);let h=ax(sp,0,100);
+  for(let i=0;i<40;i++){h+=`<circle cx="${mL+r()*(W-mL-mR)}" cy="${mT+r()*(H-mT-mB)}" r="${1.5+sp.lineWidth}" fill="${C[i%2]}" fill-opacity="${sp.fillOpacity+0.2>1?1:sp.fillOpacity+0.2}"/>`;}return h;},
+ sarea(sp){const C=PALS[sp.palette].c;const n=24;const a=ser(21,n,10,25),b=ser(22,n,15,30),c=ser(23,n,10,22);const lo=0,hi=90;
+  let acc=new Array(n).fill(0);let h=ax(sp,lo,hi);
+  [a,b,c].forEach((s,si)=>{const top=s.map((v,i)=>acc[i]+v);
+   const p=top.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ");
+   const back=acc.map((v,i)=>"L "+x(n-1-i,n).toFixed(1)+" "+y(acc[n-1-i],lo,hi).toFixed(1)).join(" ");
+   h+=`<path d="${p} ${back} Z" fill="${C[si]}" fill-opacity="${sp.fillOpacity}"/><path d="${p}" fill="none" stroke="${C[si]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;acc=top;});return h;},
+ sbar(sp){const C=PALS[sp.palette].c;const n=8;const a=ser(31,n,15,30),b=ser(32,n,10,25),c=ser(33,n,8,20);const lo=0,hi=90;const bw=(W-mL-mR)/n*0.86;
+  let h=ax(sp,lo,hi);for(let i=0;i<n;i++){let base=0;[a[i],b[i],c[i]].forEach((v,si)=>{
+   h+=`<rect x="${x(i,n)-bw/2}" y="${y(base+v,lo,hi)}" width="${bw}" height="${y(base,lo,hi)-y(base+v,lo,hi)}" fill="${C[si]}" fill-opacity="${sp.fillOpacity+0.25>1?1:sp.fillOpacity+0.25}"/>`;base+=v;});}return h;},
+ sbar100(sp){const C=PALS[sp.palette].c;const n=8;const a=ser(41,n,15,30),b=ser(42,n,10,25),c=ser(43,n,8,20);const bw=(W-mL-mR)/n*0.86;
+  let h=ax(sp,0,100);for(let i=0;i<n;i++){const tot=a[i]+b[i]+c[i];let base=0;[a[i],b[i],c[i]].forEach((v,si)=>{const pct=v/tot*100;
+   h+=`<rect x="${x(i,n)-bw/2}" y="${y(base+pct,0,100)}" width="${bw}" height="${y(base,0,100)-y(base+pct,0,100)}" fill="${C[si]}" fill-opacity="${sp.fillOpacity+0.25>1?1:sp.fillOpacity+0.25}"/>`;base+=pct;});}return h;},
+ multi(sp){const C=PALS[sp.palette].c;let h="";
+  // 個別小圖：列x欄可改 · 水平分散均分對齊
+  const m=/^(\d+)x(\d+)$/.exec(sp.sm||"2x2");const rows=m?+m[1]:2,cols=m?+m[2]:2;const G=8;
+  const cw=(W-G*(cols-1))/cols,ch=(H-G*(rows-1))/rows;
+  for(let k=0;k<rows*cols;k++){const ox=(k%cols)*(cw+G),oy=Math.floor(k/cols)*(ch+G);const s=ser(50+k,16,20,80);
+   const pp=s.map((v,i)=>(i?"L":"M")+(ox+7+(cw-14)*(i/15)).toFixed(1)+" "+(oy+5+(ch-14)*(1-v/100)).toFixed(1)).join(" ");
+   h+=`<rect x="${ox.toFixed(1)}" y="${oy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" fill="none" stroke="#dbd9d3" stroke-width="${sp.frame?1:0}"/>`;
+   h+=`<path d="${pp} L ${(ox+7+(cw-14)).toFixed(1)} ${(oy+ch-9).toFixed(1)} L ${(ox+7).toFixed(1)} ${(oy+ch-9).toFixed(1)} Z" fill="${C[k%C.length]}" fill-opacity="${sp.fillOpacity*0.7}"/>`;
+   h+=`<path d="${pp}" fill="none" stroke="${C[k%C.length]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;}
+  return h;},
+ gbar(sp){const C=PALS[sp.palette].c;const n=6;const a=ser(61,n,20,80),b=ser(62,n,30,60);const lo=0,hi=100;const bw=(W-mL-mR)/n*0.44;
+  let h=ax(sp,lo,hi);for(let i=0;i<n;i++){[a[i],b[i]].forEach((v,si)=>{
+   h+=`<rect x="${x(i,n)+(si?2:-bw-2)}" y="${y(v,lo,hi)}" width="${bw}" height="${H-mB-y(v,lo,hi)}" fill="${C[si]}" fill-opacity="${sp.fillOpacity+0.25>1?1:sp.fillOpacity+0.25}"/>`;});}return h;},
+ dline(sp){const C=PALS[sp.palette].c;const s1=ser(71,24,20,80),s2=ser(72,24,40,55);const lo=0,hi=100,rlo=40,rhi=60;
+  const p1=pathOf(s1,lo,hi);
+  const p2=s2.map((v,i)=>(i?"L":"M")+x(i,24).toFixed(1)+" "+y((v-rlo)/(rhi-rlo)*100,0,100).toFixed(1)).join(" ");
+  let h=ax(sp,lo,hi,rlo,rhi);
+  h+=`<path d="${p1} L ${x(23,24)} ${H-mB} L ${mL} ${H-mB} Z" fill="${C[0]}" fill-opacity="${sp.fillOpacity*0.55}"/>`;
+  h+=`<path d="${p1}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+  h+=`<path d="${p2}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}" stroke-dasharray="5 3"/>`;
+  let yA=y(s1[23],lo,hi),yB=y((s2[23]-rlo)/(rhi-rlo)*100,0,100);
+  if(Math.abs(yA-yB)<11){const push=(11-Math.abs(yA-yB))/2;if(yA<yB){yA-=push;yB+=push;}else{yA+=push;yB-=push;}}
+  h+=`<text x="${W-mR-3}" y="${yA-3}" text-anchor="end" fill="${C[0]}" style="font:700 7px 'DM Mono',monospace">${s1[23].toFixed(0)}</text>`;
+  h+=`<text x="${W-mR-3}" y="${yB-3}" text-anchor="end" fill="${C[1]}" style="font:700 7px 'DM Mono',monospace">${s2[23].toFixed(1)}</text>`;
+  return h;},
+ dbarline(sp){const C=PALS[sp.palette].c;const n=10;const s1=ser(81,n,20,85),s2=ser(82,n,45,55);const lo=0,hi=100,rlo=40,rhi=60;const bw=(W-mL-mR)/n*0.8;
+  let h=ax(sp,lo,hi,rlo,rhi);s1.forEach((v,i)=>{h+=`<rect x="${x(i,n)-bw/2}" y="${y(v,lo,hi)}" width="${bw}" height="${H-mB-y(v,lo,hi)}" fill="${C[0]}" fill-opacity="${sp.fillOpacity}"/>`;});
+  const p2=s2.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+y((v-rlo)/(rhi-rlo)*100,0,100).toFixed(1)).join(" ");
+  h+=`<path d="${p2}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;return h;},
+ evtmx(sp){const C=PALS[sp.palette].c;const s=ser(91,36,25,75);const lo=0,hi=100;
+  let h=ax(sp,lo,hi);
+  // 間隔區塊透明度 0.3(事件區間陰影) · 無水平線
+  [[6,14],[22,30]].forEach(pr=>{h+=`<rect x="${x(pr[0],36).toFixed(1)}" y="${mT}" width="${(x(pr[1],36)-x(pr[0],36)).toFixed(1)}" height="${H-mT-mB}" fill="#dbd9d3" fill-opacity="0.3"/>`;});
+  h+=`<path d="${pathOf(s,lo,hi)}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+  const vc=sp.evtV==="grey-red"?["#9c9890","#c96b5a"]:["#c96b5a","#9c9890"];
+  [6,14,22,30].forEach((i,k)=>{h+=`<line x1="${x(i,36)}" x2="${x(i,36)}" y1="${mT}" y2="${H-mB}" stroke="${vc[k%2]}" stroke-width="${sp.evtLw}" stroke-dasharray="4 3"/>`;
+   h+=`<rect x="${x(i,36)-3}" y="${H-mB+8}" width="6" height="6" rx="1" fill="${vc[k%2]}"/>`;});
+  return h;},
+ corrheat(sp){const n=7;const r=rng(97);const M=[];for(let i=0;i<n;i++){M[i]=[];for(let j=0;j<n;j++)M[i][j]=i===j?1:r()*2-1;}
+  // seaborn 雙向色階(zmid=0)：#3f7f93 → #f2f2f2 → #d93a46
+  const lerpC=(a,b,t)=>a.map((v,k)=>Math.round(v+(b[k]-v)*t));
+  const BLU=[63,127,147],WHT=[242,242,242],RED=[217,58,70];
+  const colOf=v=>{const t=Math.max(-1,Math.min(1,v));const c=t<0?lerpC(WHT,BLU,-t):lerpC(WHT,RED,t);return c;};
+  const lum=c=>0.299*c[0]+0.587*c[1]+0.114*c[2]; // 中間自動臨界：深色白字、淺色深字
+  const cw=(W-mL-mR)/n,ch=(H-mT-mB)/n;
+  let h=sp.frame?`<rect x="${mL}" y="${mT}" width="${W-mL-mR}" height="${H-mT-mB}" fill="none" stroke="#dbd9d3"/>`:"";
+  for(let i=0;i<n;i++)for(let j=0;j<=i;j++){const v=M[i][j];
+   const cc=i===j?[236,235,230]:colOf(v);
+   h+=`<rect x="${(mL+j*cw+1).toFixed(1)}" y="${(mT+i*ch+1).toFixed(1)}" width="${(cw-2).toFixed(1)}" height="${(ch-2).toFixed(1)}" rx="1.5" fill="rgb(${cc[0]},${cc[1]},${cc[2]})"/>`;
+   if(i!==j)h+=`<text x="${(mL+j*cw+cw/2).toFixed(1)}" y="${(mT+i*ch+ch/2+2.5).toFixed(1)}" text-anchor="middle" fill="${lum(cc)<150?"#fff":"#1e1d1a"}" style="font:500 6px 'DM Mono',monospace">${v.toFixed(1)}</text>`;}
+  return h;},
+ brush(sp){const C=PALS[sp.palette].c;const s=BRUSH_S;const lo=0,hi=100;const p=pathOf(s,lo,hi);
+  let h=ax(sp,lo,hi);
+  h+=`<path d="${p} L ${x(s.length-1,s.length)} ${H-mB} L ${mL} ${H-mB} Z" fill="${C[0]}" fill-opacity="${sp.fillOpacity*0.6}"/>`;
+  h+=`<path d="${p}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+  h+=`<text x="${mL+3}" y="${mT+7}" fill="#9c9890" style="font:500 6.5px 'DM Mono',monospace">拖拉選取區間 → 最高/最低/MaxDD/時間</text>`;
+  // 日期軸模式：圖上點選⚙ → Normalized/Start/End/Now → 確認後隱藏
+  const DM=[["normalized","Normalized"],["start","Start Date"],["end","End Date"],["now","Now"]];
+  const cur=DM.find(d=>d[0]===sp.dateMode)||DM[0];
+  const dmUI=`<g class="dmUI"><text class="dmGear" x="${W-mR-4}" y="${H-mB-5}" text-anchor="end" fill="#7a6daa" style="cursor:pointer;font:700 8px 'DM Mono',monospace">⚙ ${cur[1]}</text><g class="dmChips" style="display:none">${DM.map((d,k)=>`<g class="dmChip" data-dm="${d[0]}" style="cursor:pointer"><rect x="${mL+4+k*66}" y="${H-mB-16}" width="62" height="13" rx="3" fill="${d[0]===sp.dateMode?"#7a6daa":"#ecebe6"}"/><text x="${mL+35+k*66}" y="${H-mB-7}" text-anchor="middle" fill="${d[0]===sp.dateMode?"#fff":"#33403f"}" style="font:700 6.5px 'DM Mono',monospace">${d[1]}</text></g>`).join("")}</g></g>`;
+  h+=`<g class="brushSel"></g><rect class="brushHit" x="${mL}" y="${mT}" width="${W-mL-mR}" height="${H-mT-mB}" fill="transparent" style="cursor:crosshair"/>`;
+  h+=dmUI;
+  return h;},
+ map(sp){const C=PALS[sp.palette].c;const r=rng(113);
+  let h=`<rect x="2" y="2" width="${W-4}" height="${H-4}" rx="4" fill="none" stroke="#dbd9d3" stroke-dasharray="5 4"/>`;
+  for(let i=0;i<70;i++)h+=`<circle cx="${(8+r()*(W-16)).toFixed(1)}" cy="${(8+r()*(H-34)).toFixed(1)}" r="0.8" fill="#dbd9d3"/>`;
+  // 地圖數據面板:左=代號/名稱/漲跌▲▼ · 右=折線圖(下有成交量)
+  const NODES=[["SPX","美國",0.4],["SX5E","歐洲",-0.2],["N225","東亞",0.6],["TWII","台灣",0.5],["ASEAN","東南亞",0.2],["TASI","中東",0.3]];
+  const PW=100,PH=40,GX=6,GY=6;
+  NODES.forEach((nd,k)=>{const up=nd[2]>=0;const cc=up?"#c96b5a":"#5a9e6f";
+   const ox=8+(k%3)*(PW+GX),oy=12+Math.floor(k/3)*(PH+GY+8);
+   h+=`<rect x="${ox}" y="${oy}" width="${PW}" height="${PH}" rx="3" fill="#fff" fill-opacity="0.92" stroke="#dbd9d3" stroke-width="0.8"/>`;
+   h+=`<text x="${ox+5}" y="${oy+11}" fill="#1e1d1a" style="font:700 7px 'DM Mono',monospace">${nd[0]}</text>`;
+   h+=`<text x="${ox+5}" y="${oy+21}" fill="#6b6860" style="font:600 6.5px 'Noto Sans TC',sans-serif">${nd[1]}</text>`;
+   h+=`<text x="${ox+5}" y="${oy+33}" fill="${cc}" style="font:700 7px 'DM Mono',monospace">${up?"▲":"▼"}${Math.abs(nd[2]).toFixed(1)}%</text>`;
+   const s=ser(120+k,14,20,up?70:30),cx0=ox+42,cw2=PW-48,ly0=oy+4,lh=20;
+   const lp=s.map((v,i)=>(i?"L":"M")+(cx0+cw2*(i/13)).toFixed(1)+" "+(ly0+lh*(1-v/100)).toFixed(1)).join(" ");
+   h+=`<path d="${lp}" fill="none" stroke="${cc}" stroke-width="1" stroke-opacity="0.9"/>`;
+   const rv=rng(140+k);for(let b=0;b<14;b++){const bh=2+rv()*8;h+=`<rect x="${(cx0+cw2*(b/13)-1).toFixed(1)}" y="${(oy+PH-4-bh).toFixed(1)}" width="2" height="${bh.toFixed(1)}" fill="${cc}" fill-opacity="0.45"/>`;}});
+  h+=`<text x="${W/2}" y="${H-6}" text-anchor="middle" fill="#9c9890" style="font:500 7px 'DM Mono',monospace">LEAFLET · 全球·美·歐·東亞·台·東南亞·澳·中東 · 折線+成交量 · ZOOM ${sp.zoom?"ON":"OFF"}</text>`;return h;}
+};
+// ── Rolling Performance Toolkit ──
+R.roll=function(sp){const C=PALS[sp.palette].c;const lo=-20,hi=20;const s=ser(141,36,-8,12);
+ let h=ax(sp,lo,hi);
+ h+=`<line x1="${mL}" x2="${W-mR}" y1="${y(0,lo,hi)}" y2="${y(0,lo,hi)}" stroke="#9c9890" stroke-width="0.8" stroke-opacity="0.8"/>`;
+ h+=`<path d="${pathOf(s,lo,hi)}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;return h;};
+R.rollcorr=function(sp){const C=PALS[sp.palette].c;const lo=-1,hi=1;const s=ser(143,36,-0.4,0.8).map(v=>Math.max(-0.95,Math.min(0.95,v/12)));
+ let h=ax(sp,lo,hi);
+ h+=`<text x="${mL+3}" y="${mT+8}" fill="#6b6860" style="font:700 6px 'DM Mono',monospace">滾動相關 · 台美對齊 TW(t)↔US(t−1)</text>`;
+ h+=`<line x1="${mL}" x2="${W-mR}" y1="${y(0,lo,hi)}" y2="${y(0,lo,hi)}" stroke="#9c9890" stroke-width="0.8" stroke-opacity="0.8"/>`;
+ h+=`<path d="${pathOf(s,lo,hi)}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;return h;};
+R.rollsharpe=function(sp){const C=PALS[sp.palette].c;const lo=-2,hi=8;const s=ser(145,36,0.5,2.6);
+ let h=ax(sp,lo,hi);
+ h+=`<line x1="${mL}" x2="${W-mR}" y1="${y(1,lo,hi)}" y2="${y(1,lo,hi)}" stroke="#c96b5a" stroke-width="0.8" stroke-opacity="0.8"/>`;
+ h+=`<text x="${W-mR-3}" y="${y(1,lo,hi)-3}" text-anchor="end" fill="#c96b5a" style="font:500 6px 'DM Mono',monospace">SR=1</text>`;
+ h+=`<path d="${pathOf(s,lo,hi)}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;return h;};
+R.sortino=function(sp){const C=PALS[sp.palette].c;const lo=-2,hi=8;const s1=ser(145,36,0.5,2.6),s2=ser(146,36,0.9,3.4);
+ let h=ax(sp,lo,hi);
+ h+=`<path d="${pathOf(s1,lo,hi)}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+ h+=`<path d="${pathOf(s2,lo,hi)}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}" stroke-dasharray="5 3"/>`;
+ h+=`<text x="${W-mR-3}" y="${y(s1[35],lo,hi)-4}" text-anchor="end" fill="${C[0]}" style="font:700 6px 'DM Mono',monospace">SHARPE</text>`;
+ h+=`<text x="${W-mR-3}" y="${y(s2[35],lo,hi)+9}" text-anchor="end" fill="${C[1]}" style="font:700 6px 'DM Mono',monospace">SORTINO</text>`;return h;};
+R.radar=function(sp){const C=PALS[sp.palette].c;const cx=W/2,cy=H/2+4,R0=46;const AX=["波動","回撤","流動性","集中","槓桿","相關"];const n=AX.length;
+ const vals=[0.7,0.55,0.8,0.45,0.6,0.65],vals2=[0.5,0.75,0.6,0.7,0.4,0.5];
+ const pt=(k,r0)=>{const a=-Math.PI/2+k*2*Math.PI/n;return [cx+Math.cos(a)*R0*r0,cy+Math.sin(a)*R0*r0];};
+ let h="";
+ [0.33,0.66,1].forEach(r0=>{h+=`<polygon points="${AX.map((_,k)=>pt(k,r0).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#ecebe6" stroke-width="1"/>`;});
+ AX.forEach((a,k)=>{const p=pt(k,1);h+=`<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#ecebe6"/>`;const lp=pt(k,1.22);h+=`<text x="${lp[0].toFixed(1)}" y="${(lp[1]+2).toFixed(1)}" text-anchor="middle" fill="#6b6860" style="font:600 6.5px 'Noto Sans TC',sans-serif">${a}</text>`;});
+ [[vals,C[0]],[vals2,C[1]]].forEach(pr=>{const pts=pr[0].map((v,k)=>pt(k,v).map(q=>q.toFixed(1)).join(",")).join(" ");
+  h+=`<polygon points="${pts}" fill="${pr[1]}" fill-opacity="${sp.fillOpacity*0.6}" stroke="${pr[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;});
+ return h;};
+R.alpha=function(sp){const C=PALS[sp.palette].c;const lo=0,hi=100;const st=ser(151,30,30,85),bm=ser(152,30,30,60);
+ let h=ax(sp,lo,hi);
+ const top=st.map((v,i)=>(i?"L":"M")+x(i,30).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ");
+ const back=bm.map((v,i)=>"L "+x(29-i,30).toFixed(1)+" "+y(bm[29-i],lo,hi).toFixed(1)).join(" ");
+ h+=`<path d="${top} ${back} Z" fill="#c96b5a" fill-opacity="0.18"/>`;
+ h+=`<path d="${pathOf(st,lo,hi)}" fill="none" stroke="${C[0]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+ h+=`<path d="${pathOf(bm,lo,hi)}" fill="none" stroke="#9c9890" stroke-width="0.8" stroke-opacity="0.8"/>`;
+ h+=`<text x="${W-mR-3}" y="${y(st[29],lo,hi)-4}" text-anchor="end" fill="${C[0]}" style="font:700 6px 'DM Mono',monospace">STRAT</text>`;
+ h+=`<text x="${W-mR-3}" y="${y(bm[29],lo,hi)+9}" text-anchor="end" fill="#9c9890" style="font:700 6px 'DM Mono',monospace">BENCH</text>`;return h;};
+R.econcal=function(sp){const rows=[["08:30","美 非農就業",3,"+18.5萬","+16.0萬",1],["10:00","歐 CPI YoY",2,"2.4%","2.5%",0],["14:00","台 外銷訂單",2,"+5.2%","+3.8%",1],["16:30","中 PMI",3,"50.8","50.4",1],["22:00","美 ISM 服務",3,"52.6","52.1",1]];
+ const rh=(H-mT-10)/rows.length;let h=`<line x1="${mL}" x2="${W-mR}" y1="${mT}" y2="${mT}" stroke="#dbd9d3"/>`;
+ rows.forEach((r0,i)=>{const yy=mT+rh*i;const up=r0[5];
+  h+=`<text x="${mL}" y="${yy+rh/2+2}" fill="#9c9890" style="font:500 6.5px 'DM Mono',monospace">${r0[0]}</text>`;
+  for(let s2=0;s2<3;s2++)h+=`<circle cx="${mL+34+s2*6}" cy="${yy+rh/2}" r="2.2" fill="${s2<r0[2]?"#c4943a":"#ecebe6"}"/>`;
+  h+=`<text x="${mL+58}" y="${yy+rh/2+2}" fill="#1e1d1a" style="font:700 7px 'Noto Sans TC',sans-serif">${r0[1]}</text>`;
+  h+=`<text x="${W-mR-56}" y="${yy+rh/2+2}" text-anchor="end" fill="${up?"#c96b5a":"#5a9e6f"}" style="font:700 7px 'DM Mono',monospace">${r0[3]}</text>`;
+  h+=`<text x="${W-mR}" y="${yy+rh/2+2}" text-anchor="end" fill="#9c9890" style="font:500 6.5px 'DM Mono',monospace">前 ${r0[4]}</text>`;
+  h+=`<line x1="${mL}" x2="${W-mR}" y1="${yy+rh}" y2="${yy+rh}" stroke="#ecebe6"/>`;});
+ h+=`<text x="${mL}" y="${H-4}" fill="#9c9890" style="font:500 6px 'DM Mono',monospace">重要性 ●●● · 實際 vs 前值 · 漲紅跌綠</text>`;return h;};
+// ── 共識數據 Consensus (yfinance/FactSet keyed) ──
+R.consensus=function(sp){const C=PALS[sp.palette].c;let h="";
+ // ① Diluted EPS 季度長條(左上)
+ const eps=[2.1,2.4,2.2,2.8,3.0,3.4];const emax=4;const bx0=mL;const eh=48,ey=mT+12;
+ h+=`<text x="${bx0}" y="${mT+5}" fill="#6b6860" style="font:700 6.5px 'DM Mono',monospace">DILUTED EPS · 季</text>`;
+ eps.forEach((v,i)=>{const bh=eh*(v/emax);const up=i===0||v>=eps[i-1];
+  h+=`<rect x="${bx0+i*15}" y="${(ey+eh-bh).toFixed(1)}" width="11" height="${bh.toFixed(1)}" rx="1" fill="${up?"#c96b5a":"#5a9e6f"}" fill-opacity="0.8"/>`;
+  h+=`<text x="${bx0+i*15+5.5}" y="${(ey+eh-bh-2.5).toFixed(1)}" text-anchor="middle" fill="#33403f" style="font:500 5.5px 'DM Mono',monospace">${v.toFixed(1)}</text>`;});
+ // ② FORWARD PER / PBR(中上)
+ const fx0=mL+108;
+ h+=`<text x="${fx0}" y="${mT+5}" fill="#6b6860" style="font:700 6.5px 'DM Mono',monospace">FORWARD 預估</text>`;
+ [["FWD PER","18.2×","歷史 12–28×"],["FWD PBR","3.1×","歷史 1.8–4.6×"]].forEach((r0,i)=>{const yy=mT+21+i*23;
+  h+=`<text x="${fx0}" y="${yy}" fill="#33403f" style="font:600 6px 'DM Mono',monospace">${r0[0]}</text>`;
+  h+=`<text x="${fx0}" y="${yy+11}" fill="#1e1d1a" style="font:800 10px 'DM Mono',monospace">${r0[1]}</text>`;
+  h+=`<text x="${fx0+38}" y="${yy+11}" fill="#9c9890" style="font:500 5.5px 'DM Mono',monospace">${r0[2]}</text>`;});
+ // ③ 評等 + 分析師(右上)
+ const rx0=W-mR-96;const RT=[["買進",14,"#c96b5a"],["持有",6,"#c4943a"],["賣出",2,"#5a9e6f"]];const rmax=14;
+ h+=`<text x="${rx0}" y="${mT+5}" fill="#6b6860" style="font:700 6.5px 'DM Mono',monospace">評等 · 分析師 ${RT.reduce((a,b)=>a+b[1],0)} 家</text>`;
+ RT.forEach((r0,i)=>{const yy=mT+13+i*17;const ww=50*(r0[1]/rmax);
+  h+=`<text x="${rx0}" y="${yy+7}" fill="#33403f" style="font:600 6.5px 'Noto Sans TC',sans-serif">${r0[0]}</text>`;
+  h+=`<rect x="${rx0+22}" y="${yy}" width="${ww.toFixed(1)}" height="9" rx="2" fill="${r0[2]}" fill-opacity="0.8"/>`;
+  h+=`<text x="${rx0+25+ww}" y="${yy+7}" fill="#1e1d1a" style="font:700 6.5px 'DM Mono',monospace">${r0[1]}</text>`;});
+ // ④ 目標價 spectrum bullet(下 · 左右最長 · 綠黃紅 透明度 0.5)
+ const ty=H-32;const tx0=mL,tw=W-mL-mR;const lo2=40,hi2=90,cur=62,tgt=78,tlo=55,thi=88;
+ const tX=v=>tx0+tw*(v-lo2)/(hi2-lo2);
+ h+=`<defs><linearGradient id="cgSpec" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a9e6f"/><stop offset="0.5" stop-color="#c4943a"/><stop offset="1" stop-color="#c96b5a"/></linearGradient></defs>`;
+ h+=`<text x="${tx0}" y="${ty-7}" fill="#6b6860" style="font:700 6.5px 'DM Mono',monospace">目標價 TARGET · 綠→黃→紅 SPECTRUM</text>`;
+ h+=`<text x="${tx0+tw}" y="${ty-7}" text-anchor="end" fill="#9c9890" style="font:500 5.5px 'DM Mono',monospace">區間 ${tlo}–${thi}</text>`;
+ h+=`<rect x="${tx0}" y="${ty}" width="${tw}" height="12" rx="6" fill="url(#cgSpec)" fill-opacity="0.5"/>`;
+ h+=`<rect x="${tX(tlo).toFixed(1)}" y="${ty}" width="${(tX(thi)-tX(tlo)).toFixed(1)}" height="12" rx="6" fill="none" stroke="#1e1d1a" stroke-opacity="0.35" stroke-dasharray="2 2"/>`;
+ h+=`<line x1="${tX(cur).toFixed(1)}" x2="${tX(cur).toFixed(1)}" y1="${ty-4}" y2="${ty+16}" stroke="#1e1d1a" stroke-width="1.6"/>`;
+ h+=`<line x1="${tX(tgt).toFixed(1)}" x2="${tX(tgt).toFixed(1)}" y1="${ty-4}" y2="${ty+16}" stroke="#c96b5a" stroke-width="1.6" stroke-dasharray="3 2"/>`;
+ h+=`<text x="${tX(cur).toFixed(1)}" y="${ty+25}" text-anchor="middle" fill="#1e1d1a" style="font:600 6px 'DM Mono',monospace">現價 ${cur}</text>`;
+ h+=`<text x="${tX(tgt).toFixed(1)}" y="${ty+25}" text-anchor="middle" fill="#c96b5a" style="font:700 6px 'DM Mono',monospace">目標 ${tgt} (+${(100*(tgt/cur-1)).toFixed(0)}%)</text>`;
+ return h;};
+// ── 回測驗證 Backtest · Rank-IC 衰減 × 顯著性 ──
+R.backtest=function(sp){const C=PALS[sp.palette].c;const lo=-10,hi=30;
+ const ic=[18,15,12,9,6,4,2,1];const st=["***","***","**","**","*","*","",""];const n=ic.length;
+ let h=ax(sp,lo,hi);
+ h+=`<rect x="${mL}" y="${y(3,lo,hi).toFixed(1)}" width="${W-mL-mR}" height="${(y(-3,lo,hi)-y(3,lo,hi)).toFixed(1)}" fill="#9c9890" fill-opacity="0.15"/>`;
+ h+=`<line x1="${mL}" x2="${W-mR}" y1="${y(0,lo,hi)}" y2="${y(0,lo,hi)}" stroke="#9c9890" stroke-width="0.8" stroke-opacity="0.8"/>`;
+ const bw=(W-mL-mR)/n*0.5;
+ ic.forEach((v,i)=>{const xx=x(i,n);
+  h+=`<rect x="${(xx-bw/2).toFixed(1)}" y="${y(v,lo,hi).toFixed(1)}" width="${bw.toFixed(1)}" height="${(y(0,lo,hi)-y(v,lo,hi)).toFixed(1)}" fill="${C[0]}" fill-opacity="${sp.fillOpacity}"/>`;
+  if(st[i])h+=`<text x="${xx.toFixed(1)}" y="${(y(v,lo,hi)-3).toFixed(1)}" text-anchor="middle" fill="#c96b5a" style="font:700 6px 'DM Mono',monospace">${st[i]}</text>`;});
+ h+=`<path d="${ic.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ")}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+ h+=`<text x="${mL+3}" y="${mT+8}" fill="#6b6860" style="font:700 6px 'DM Mono',monospace">RANK-IC×100 衰減 · 灰帶=null≈0 · ***p<.01 **p<.05 *p<.1 · TW(t)↔US(t−1)</text>`;
+ return h;};
+// ── 當日走勢 × 下方成交量(shared x · 時間軸對齊) ──
+R.intraday=function(sp){const C=PALS[sp.palette].c;let h="";
+ const n=48;const px=ser(161,n,96,104);const prev=100; // 昨收基準
+ const split=Math.round((H-mT-mB)*0.68);const Y1p=mT+split;const Y1v=H-mB;
+ const lo=Math.min(...px)-1,hi=Math.max(...px)+1;
+ const yp=v=>mT+split*(1-(v-lo)/(hi-lo));
+ // 上:價格區(框+昨收虛線 0.8/0.8)
+ if(sp.frame)h+=`<rect x="${mL}" y="${mT}" width="${W-mL-mR}" height="${split}" fill="none" stroke="#dbd9d3" stroke-width="1"/>`;
+ if(sp.grid)for(let k=1;k<4;k++){const yy=mT+split*k/4;h+=`<line x1="${mL}" x2="${W-mR}" y1="${yy}" y2="${yy}" stroke="#ecebe6"/>`;}
+ h+=`<line x1="${mL}" x2="${W-mR}" y1="${yp(prev).toFixed(1)}" y2="${yp(prev).toFixed(1)}" stroke="#9c9890" stroke-width="0.8" stroke-opacity="0.8" stroke-dasharray="4 3"/>`;
+ h+=`<text x="${W-mR-2}" y="${(yp(prev)-3).toFixed(1)}" text-anchor="end" fill="#9c9890" style="font:500 6px 'DM Mono',monospace">昨收 ${prev}</text>`;
+ for(let k=0;k<=4;k++){const f=k/4;h+=`<text x="${mL-4}" y="${(mT+split*(1-f)+2.5).toFixed(1)}" text-anchor="end" fill="#9c9890" style="font:500 6.5px 'DM Mono',monospace">${(lo+(hi-lo)*f).toFixed(1)}</text>`;}
+ const up=px[n-1]>=prev;const pc=up?"#c96b5a":"#5a9e6f";
+ const pp=px.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+yp(v).toFixed(1)).join(" ");
+ h+=`<path d="${pp} L ${x(n-1,n).toFixed(1)} ${Y1p} L ${mL} ${Y1p} Z" fill="${pc}" fill-opacity="${Math.min(sp.fillOpacity,0.25)}"/>`;
+ h+=`<path d="${pp}" fill="none" stroke="${pc}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+ // 下:成交量(漲紅跌綠 · 空值不遞補)
+ const gap=6;const v0=Y1p+gap;const vh=Y1v-v0;
+ if(sp.frame)h+=`<rect x="${mL}" y="${v0}" width="${W-mL-mR}" height="${vh}" fill="none" stroke="#dbd9d3" stroke-width="1"/>`;
+ const r=rng(163);const bw=(W-mL-mR)/n*0.7;
+ for(let i=0;i<n;i++){const vv=0.15+r()*0.85;const hh2=vh*vv;const cu=i===0||px[i]>=px[i-1];
+  h+=`<rect x="${(x(i,n)-bw/2).toFixed(1)}" y="${(Y1v-hh2).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh2.toFixed(1)}" fill="${cu?"#c96b5a":"#5a9e6f"}" fill-opacity="0.75"/>`;}
+ h+=`<text x="${mL+2}" y="${v0+9}" fill="#9c9890" style="font:700 6px 'DM Mono',monospace">VOLUME · SPLIT 調整 · 缺值不遞補</text>`;
+ // 統一時間刻度(與全庫同映射)
+ const LBL=["09:00","10:07","11:15","12:22","13:30"];
+ for(let k=0;k<=4;k++){const xx=mL+(W-mL-mR)*k/4;
+  h+=`<line x1="${xx}" x2="${xx}" y1="${Y1v}" y2="${Y1v+3}" stroke="#c4c0b8"/>`;
+  h+=`<text x="${xx}" y="${Y1v+11}" text-anchor="middle" fill="#9c9890" style="font:500 6px 'DM Mono',monospace">${LBL[k]}</text>`;}
+ return h;};
+// ── K線 × SMA/EMA/BB × Volume(TA-Lib · ADJ PRICE · shared x) ──
+R.candle=function(sp){const C=PALS[sp.palette].c;let h="";
+ const n=32;const r=rng(171);
+ // OHLC 合成(ADJ)
+ const cl=ser(173,n,90,112);const o=[],hi2=[],lo2=[];
+ for(let i=0;i<n;i++){o.push(i?cl[i-1]:cl[0]-0.5);const a=Math.max(o[i],cl[i]),b=Math.min(o[i],cl[i]);hi2.push(a+r()*1.4);lo2.push(b-r()*1.4);}
+ // SMA5 / EMA10 / BB(10,2)
+ const sma=cl.map((_,i)=>{const s=cl.slice(Math.max(0,i-4),i+1);return s.reduce((x2,y2)=>x2+y2,0)/s.length;});
+ const ema=[];cl.forEach((v,i)=>ema.push(i?ema[i-1]+(2/11)*(v-ema[i-1]):v));
+ const mid=cl.map((_,i)=>{const s=cl.slice(Math.max(0,i-9),i+1);return s.reduce((x2,y2)=>x2+y2,0)/s.length;});
+ const sd=cl.map((_,i)=>{const s=cl.slice(Math.max(0,i-9),i+1);const m=mid[i];return Math.sqrt(s.reduce((x2,y2)=>x2+(y2-m)*(y2-m),0)/s.length);});
+ const bbU=mid.map((m,i)=>m+2*sd[i]),bbL=mid.map((m,i)=>m-2*sd[i]);
+ const lo=Math.min(...lo2,...bbL)-1,hi=Math.max(...hi2,...bbU)+1;
+ const split=Math.round((H-mT-mB)*0.68);const Y1p=mT+split;const Y1v=H-mB;
+ const yp=v=>mT+split*(1-(v-lo)/(hi-lo));
+ if(sp.frame)h+=`<rect x="${mL}" y="${mT}" width="${W-mL-mR}" height="${split}" fill="none" stroke="#dbd9d3" stroke-width="1"/>`;
+ if(sp.grid)for(let k=1;k<4;k++){const yy=mT+split*k/4;h+=`<line x1="${mL}" x2="${W-mR}" y1="${yy}" y2="${yy}" stroke="#ecebe6"/>`;}
+ for(let k=0;k<=4;k++){const f=k/4;h+=`<text x="${mL-4}" y="${(mT+split*(1-f)+2.5).toFixed(1)}" text-anchor="end" fill="#9c9890" style="font:500 6.5px 'DM Mono',monospace">${(lo+(hi-lo)*f).toFixed(0)}</text>`;}
+ // BB 帶(填色 · 透明度依規範折半)
+ const bu=bbU.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+yp(v).toFixed(1)).join(" ");
+ const bl=bbL.map((v,i)=>"L "+x(n-1-i,n).toFixed(1)+" "+yp(bbL[n-1-i]).toFixed(1)).join(" ");
+ h+=`<path d="${bu} ${bl} Z" fill="${C[4]||C[0]}" fill-opacity="${Math.min(sp.fillOpacity*0.35,0.2)}"/>`;
+ h+=`<path d="${bu}" fill="none" stroke="${C[4]||C[0]}" stroke-width="0.8" stroke-opacity="0.8" stroke-dasharray="3 2"/>`;
+ h+=`<path d="${bbL.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+yp(v).toFixed(1)).join(" ")}" fill="none" stroke="${C[4]||C[0]}" stroke-width="0.8" stroke-opacity="0.8" stroke-dasharray="3 2"/>`;
+ // K 線(漲紅跌綠)
+ const bw=(W-mL-mR)/n*0.55;
+ for(let i=0;i<n;i++){const up=cl[i]>=o[i];const c=up?"#c96b5a":"#5a9e6f";const xx=x(i,n);
+  h+=`<line x1="${xx.toFixed(1)}" x2="${xx.toFixed(1)}" y1="${yp(hi2[i]).toFixed(1)}" y2="${yp(lo2[i]).toFixed(1)}" stroke="${c}" stroke-width="1"/>`;
+  const t2=yp(Math.max(o[i],cl[i])),b2=yp(Math.min(o[i],cl[i]));
+  h+=`<rect x="${(xx-bw/2).toFixed(1)}" y="${t2.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(b2-t2,0.8).toFixed(1)}" fill="${c}" fill-opacity="${up?0.9:0.9}"/>`;}
+ // SMA / EMA 均線
+ h+=`<path d="${sma.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+yp(v).toFixed(1)).join(" ")}" fill="none" stroke="${C[1]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+ h+=`<path d="${ema.map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+yp(v).toFixed(1)).join(" ")}" fill="none" stroke="${C[5]||C[2]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}" stroke-dasharray="5 3"/>`;
+ h+=`<text x="${mL+2}" y="${mT+8}" fill="#6b6860" style="font:700 6px 'DM Mono',monospace">K線(ADJ) · <tspan fill="${C[1]}">SMA5</tspan> · <tspan fill="${C[5]||C[2]}">EMA10</tspan> · <tspan fill="${C[4]||C[0]}">BB(10,2σ)</tspan> · TA-Lib ADJ PRICE</text>`;
+ // 下:Volume(shared x · SPLIT 調整 · 缺值不遞補)
+ const gap=6;const v0=Y1p+gap;const vh=Y1v-v0;
+ if(sp.frame)h+=`<rect x="${mL}" y="${v0}" width="${W-mL-mR}" height="${vh}" fill="none" stroke="#dbd9d3" stroke-width="1"/>`;
+ const vbw=(W-mL-mR)/n*0.55;
+ for(let i=0;i<n;i++){const vv=0.15+r()*0.85;const hh2=vh*vv;const up=cl[i]>=o[i];
+  h+=`<rect x="${(x(i,n)-vbw/2).toFixed(1)}" y="${(Y1v-hh2).toFixed(1)}" width="${vbw.toFixed(1)}" height="${hh2.toFixed(1)}" fill="${up?"#c96b5a":"#5a9e6f"}" fill-opacity="0.75"/>`;}
+ h+=`<text x="${mL+2}" y="${v0+9}" fill="#9c9890" style="font:700 6px 'DM Mono',monospace">VOLUME</text>`;
+ // 統一時間刻度
+ for(let k=0;k<=4;k++){const xx=mL+(W-mL-mR)*k/4;
+  h+=`<line x1="${xx}" x2="${xx}" y1="${Y1v}" y2="${Y1v+3}" stroke="#c4c0b8"/>`;
+  h+=`<text x="${xx}" y="${Y1v+11}" text-anchor="middle" fill="#9c9890" style="font:500 6px 'DM Mono',monospace">T${k*25}</text>`;}
+ return h;};
+// ── 商品 現貨×期貨(BRENT/WTI/GOLD · Normalized · 現貨實線/期貨虛線) ──
+R.spotfut=function(sp){const C=PALS[sp.palette].c;const lo=90,hi=130;let h=ax(sp,lo,hi); // step 10 · 合法間隔(2/2.5/5/10 倍數)
+ const n=36;
+ const mk=(seed,a,b)=>ser(seed,n,a,b);
+ const PAIRS=[
+  ["BRENT",mk(181,96,109),mk(182,97,111),C[0]],
+  ["WTI",mk(183,95,106),mk(184,96,108),C[1]],
+  ["GOLD",mk(185,98,112),mk(186,98,113),C[2]]
+ ];
+ // 基差標籤：由上往下堆疊固定間距 ≥ 9px — 不重疊不突出(DATARULE)
+ PAIRS.forEach(p=>{
+  h+=`<path d="${p[1].map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ")}" fill="none" stroke="${p[3]}" stroke-width="${sp.lineWidth}" stroke-opacity="${sp.lineOpacity}"/>`;
+  h+=`<path d="${p[2].map((v,i)=>(i?"L":"M")+x(i,n).toFixed(1)+" "+y(v,lo,hi).toFixed(1)).join(" ")}" fill="none" stroke="${p[3]}" stroke-width="${sp.lineWidth}" stroke-opacity="${Math.max(sp.lineOpacity-0.15,0.5)}" stroke-dasharray="5 3"/>`;});
+ // 標籤堆疊配置(避免碰撞)
+ let ly=mT+18;
+ PAIRS.forEach(p=>{const last=p[2][n-1]-p[1][n-1];
+  h+=`<text x="${W-mR-2}" y="${ly}" text-anchor="end" fill="${p[3]}" style="font:700 6px 'DM Mono',monospace">${p[0]} 基差${last>=0?"+":""}${last.toFixed(2)}</text>`;ly+=9;});;
+ h+=`<text x="${mL+2}" y="${mT+8}" fill="#6b6860" style="font:700 6px 'DM Mono',monospace">現貨=實線 · 期貨=虛線(BZ=F/CL=F/GC=F) · Normalized T0=100 · 基差=期貨−現貨</text>`;
+ return h;};
+// ── UI ──
+const $=s=>document.querySelector(s);
+function persist(){localStorage.setItem(KEY,JSON.stringify(STORE));updStat();renderSSOT();}
+function renderSSOT(){
+ const rows=Object.keys(STORE.defaults).map(k=>{
+  const v=String(STORE.defaults[k]);const r=ruleFor(k);const ok=r.re.test(v);
+  return `<div>${ok?'<span style="color:var(--down);font-weight:700">✓</span>':'<span style="color:var(--up);font-weight:700">✕</span>'} <b>${k}</b>=${v} <span style="color:var(--mut2)">· ${r.d}</span></div>`;}).join("");
+ const el=document.getElementById("ssotChk");if(el)el.innerHTML=rows;
+ const al=document.getElementById("alignTbl");if(al)al.innerHTML=ALIGN.map(a=>`<div>🔒 <b>${a.ext}</b> <span style="color:var(--mut2)">${a.tcode}</span> → <span style="color:var(--vi);font-weight:700">${a.via}</span></div>`).join("")+
+  '<div style="font:700 8px \'DM Mono\',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase;margin:10px 0 4px">資料/搭配規則(只增不減)</div>'+DATARULES.map(d=>'<div>• '+d+'</div>').join("")+
+  '<div style="font:700 8px \'DM Mono\',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase;margin:10px 0 4px">PLOTLY 對照(plotly.com/python)</div>'+PLOTLY_MAP.map(d=>'<div>▸ '+d+'</div>').join("");
+}
+function updStat(){const ov=Object.keys(STORE.overrides).filter(k=>Object.values(STORE.overrides[k]).some(v=>v!==""&&v!=null)).length;
+ $("#stat").innerHTML="已勾選 <b>"+STORE.selected.length+"</b> / "+ALL.length+" 圖型入庫<br>單獨覆寫 <b>"+ov+"</b> 張 · 其餘用 DEFAULT<br>🔒 已鎖定 <b>"+STORE.lock.charts.length+"</b> 張(逐步鎖住) · 視覺鎖定 <b>"+(STORE.lock.visual?"ON":"OFF")+"</b><br>儲存位置 <b>"+KEY+"</b>";}
+// 白底高畫質 PNG 匯出(4×)
+function exportPNG(id){const sv=document.querySelector(`svg[data-ch="${id}"]`);if(!sv)return;
+ const clone=sv.cloneNode(true);clone.setAttribute("xmlns","http://www.w3.org/2000/svg");
+ const s=new XMLSerializer().serializeToString(clone);
+ const img=new Image();
+ img.onload=()=>{const SC=4;const cv=document.createElement("canvas");cv.width=W*SC;cv.height=H*SC;const cx=cv.getContext("2d");
+  cx.fillStyle="#ffffff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(img,0,0,cv.width,cv.height);
+  cv.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VeritasAutoPlot_"+id+".png";a.click();});};
+ img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(s);}
+function drawAll(){document.querySelectorAll("svg[data-ch]").forEach(sv=>{sv.innerHTML=R[sv.dataset.ch](spec(sv.dataset.ch));if(sv.dataset.ch==="brush")attachBrush(sv);});}
+function attachBrush(sv){
+ const s=BRUSH_S,n=s.length,lo=0,hi=100;
+ const hit=sv.querySelector(".brushHit");if(!hit)return;
+ const sel=()=>sv.querySelector(".brushSel");
+ const toVB=e=>{const r=sv.getBoundingClientRect();return (e.clientX-r.left)/r.width*W;};
+ const idxOf=px=>Math.max(0,Math.min(n-1,Math.round((px-mL)/(W-mL-mR)*(n-1))));
+ let x0=null;
+ function draw(a,b){const i0=Math.min(a,b),i1=Math.max(a,b);if(i1-i0<1){sel().innerHTML="";return;}
+  const seg=s.slice(i0,i1+1);
+  let mxv=-1e9,mnv=1e9,mxI=0,mnI=0;seg.forEach((v,k)=>{if(v>mxv){mxv=v;mxI=k;}if(v<mnv){mnv=v;mnI=k;}});
+  let peak=seg[0],dd=0,ddLen=0,pI=0;seg.forEach((v,k)=>{if(v>peak){peak=v;pI=k;}const d=(peak-v)/peak;if(d>dd){dd=d;ddLen=k-pI;}});
+  const bx=x(i0,n),bw2=x(i1,n)-bx;
+  sel().innerHTML=`<rect x="${bx.toFixed(1)}" y="${mT}" width="${bw2.toFixed(1)}" height="${H-mT-mB}" fill="rgba(122,109,170,.14)" stroke="#7a6daa" stroke-width="0.8" stroke-dasharray="3 2"/>`+
+   `<circle cx="${x(i0+mxI,n).toFixed(1)}" cy="${y(mxv,lo,hi).toFixed(1)}" r="2.5" fill="#c96b5a"/><circle cx="${x(i0+mnI,n).toFixed(1)}" cy="${y(mnv,lo,hi).toFixed(1)}" r="2.5" fill="#5a9e6f"/>`+
+   `<g transform="translate(${Math.max(mL,Math.min(bx,W-mR-120)).toFixed(1)},${mT+10})"><rect width="116" height="34" rx="3" fill="#1e1d1a" opacity="0.88"/>`+
+   `<text x="6" y="10" fill="#fff" style="font:500 7px 'DM Mono',monospace">最高 ${mxv.toFixed(1)} · 最低 ${mnv.toFixed(1)}</text>`+
+   `<text x="6" y="20" fill="#e39a8f" style="font:500 7px 'DM Mono',monospace">MaxDD −${(dd*100).toFixed(1)}% · ${ddLen} bars</text>`+
+   `<text x="6" y="30" fill="#a49f92" style="font:500 7px 'DM Mono',monospace">區間 ${i1-i0} bars</text></g>`;}
+ hit.onpointerdown=e=>{x0=idxOf(toVB(e));try{hit.setPointerCapture(e.pointerId);}catch(_){}};
+ hit.onpointermove=e=>{if(x0==null)return;draw(x0,idxOf(toVB(e)));};
+ hit.onpointerup=e=>{if(x0!=null)draw(x0,idxOf(toVB(e)));x0=null;};
+ // ⚙ 日期軸模式點選 · 確認後隱藏
+ const gear=sv.querySelector(".dmGear"),chips=sv.querySelector(".dmChips");
+ if(gear&&chips){gear.style.pointerEvents="auto";
+  gear.onclick=()=>{chips.style.display=chips.style.display==="none"?"":"none";};
+  chips.querySelectorAll(".dmChip").forEach(ch=>{ch.onclick=()=>{STORE.defaults.dateMode=ch.dataset.dm;persist();drawAll();};});}
+}
+function renderPals(){$("#pals").innerHTML=Object.entries(PALS).map(([k,p])=>
+ `<div class="pal${STORE.defaults.palette===k?" on":""}" data-p="${k}"><span class="pn">${p.n}</span><span class="sw">${p.c.slice(0,8).map(c=>`<i style="background:${c}"></i>`).join("")}</span></div>`).join("");
+ document.querySelectorAll(".pal").forEach(el=>el.onclick=()=>{
+  if(STORE.lock.visual&&el.dataset.p!=="via"){el.style.outline="2px solid var(--up)";setTimeout(()=>el.style.outline="",600);return;}
+  STORE.defaults.palette=el.dataset.p;renderPals();drawAll();persist();});}
+function ovPanel(id){const o=STORE.overrides[id]||{};
+ return `<div class="ovp" id="ovp-${id}">
+  <div class="fld"><label>調色(空=預設)</label><select data-ov="palette" data-id="${id}"><option value="">DEFAULT</option>${Object.entries(PALS).map(([k,p])=>`<option value="${k}"${o.palette===k?" selected":""}>${p.n}</option>`).join("")}</select></div>
+  <div class="fld"><label>線粗(空=預設)</label><input type="number" step="0.5" min="0.5" max="6" data-ov="lineWidth" data-id="${id}" value="${o.lineWidth??""}" placeholder="DEFAULT"></div>
+  <div class="fld"><label>透明度(空=預設)</label><input type="number" step="0.05" min="0" max="1" data-ov="fillOpacity" data-id="${id}" value="${o.fillOpacity??""}" placeholder="DEFAULT"></div>
+  <div class="fld"><label>折線透明度(空=預設)</label><input type="number" step="0.05" min="0" max="1" data-ov="lineOpacity" data-id="${id}" value="${o.lineOpacity??""}" placeholder="DEFAULT"></div>
+  <div class="fld"><label>加另一軸(雙軸)</label><select data-ov="dual" data-id="${id}"><option value="">DEFAULT 單軸</option><option value="1"${o.dual===true?" selected":""}>雙軸</option><option value="0"${o.dual===false?" selected":""}>單軸</option></select></div>
+  <div class="fld"><label>數列 Series(單獨圖)</label><select data-ov="series" data-id="${id}"><option value="">ADJ PRICE(預設)</option><option value="ret"${o.series==="ret"?" selected":""}>報酬率 %</option><option value="vol"${o.series==="vol"?" selected":""}>成交量</option><option value="norm"${o.series==="norm"?" selected":""}>Normalized</option></select></div>
+  <div class="fld"><label>堆疊組成 Components</label><select data-ov="stackComp" data-id="${id}"><option value="">全部組成(預設)</option><option value="top3"${o.stackComp==="top3"?" selected":""}>前 3 大</option><option value="top5"${o.stackComp==="top5"?" selected":""}>前 5 大</option><option value="custom"${o.stackComp==="custom"?" selected":""}>自選清單</option></select></div>
+  <div class="fld"><label>外框</label><select data-ov="frame" data-id="${id}"><option value="">DEFAULT</option><option value="1"${o.frame===true?" selected":""}>有框</option><option value="0"${o.frame===false?" selected":""}>無框</option></select></div>
+  <div class="hint">留白 = 使用統一 DEFAULT;改值僅影響此圖(單獨存在)。</div></div>`;}
+function hasOv(id){const o=STORE.overrides[id]||{};return Object.values(o).some(v=>v!==""&&v!=null);}
+let GFILTER="",GSEARCH="";
+let COLL={};try{COLL=JSON.parse(localStorage.getItem("vap_grp_collapsed"))||{};}catch(e){}
+function renderGallery(){
+ const gcss=STORE.layout.cols==="auto"?"":"grid-template-columns:repeat("+STORE.layout.cols+",1fr);";
+ $("#gallery").innerHTML='<div id="grpWall"></div>'+GROUPS.map(g=>{
+  return `<section id="sec-${g.id}"><h3 class="grp" id="grp-${g.id}" data-cg="${g.id}" style="cursor:pointer" title="點擊折疊/展開"><span class="caret" style="font:700 10px 'DM Mono',monospace;color:var(--mut2)">${COLL[g.id]?"▸":"▾"}</span>${g.t}<span class="en">${g.id}</span></h3><div class="grid" id="grid-${g.id}" style="${gcss}${COLL[g.id]?"display:none;":""}">`+
+  g.charts.map(c=>`<div class="chart${STORE.selected.includes(c.id)?" sel":""}" id="card-${c.id}">
+   <div class="chd"><input type="checkbox" data-sel="${c.id}"${STORE.selected.includes(c.id)?" checked":""} title="勾選入庫">
+    <div><div class="t">${c.t}</div><div class="code">${c.code}</div></div>
+    <span class="ov${isLocked(c.id)?" mod":""}" data-lock="${c.id}" style="margin-left:auto${isLocked(c.id)?";background:var(--ink);color:#fff;border-color:var(--ink)":""}">${isLocked(c.id)?"🔒 LOCKED":"🔓 鎖定"}</span>
+    <span class="ov" data-png="${c.id}" title="白底高畫質PNG" style="margin-left:0">⤓PNG</span>
+    <span class="ov${hasOv(c.id)?" mod":""}" data-tog="${c.id}" style="margin-left:0">規格${hasOv(c.id)?" ●":""}</span></div>
+   <div class="cbody"><svg data-ch="${c.id}" viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" style="display:block;height:${STORE.layout.height}px"></svg></div>
+   ${ovPanel(c.id)}</div>`).join("")+"</div></section>";}).join("");
+ document.querySelectorAll("[data-sel]").forEach(el=>el.onchange=()=>{const id=el.dataset.sel;
+  STORE.selected=el.checked?[...new Set([...STORE.selected,id])]:STORE.selected.filter(x=>x!==id);
+  document.getElementById("card-"+id).classList.toggle("sel",el.checked);persist();});
+ const gs=$("#gSearch"),gf=$("#gFilter");
+ if(gs)gs.oninput=()=>{GSEARCH=gs.value.trim().toLowerCase();applyFilter();};
+ if(gf)gf.onchange=()=>{GFILTER=gf.value;applyFilter();};
+ applyFilter();
+ // 分群標題：點擊折疊/向下展開(狀態持久)
+ document.querySelectorAll("[data-cg]").forEach(el=>el.onclick=ev=>{
+  if(ev.target.closest("input,select,.ov"))return;
+  const id=el.dataset.cg;COLL[id]=!COLL[id];
+  localStorage.setItem("vap_grp_collapsed",JSON.stringify(COLL));
+  const gr=document.getElementById("grid-"+id);if(gr)gr.style.display=COLL[id]?"none":"";
+  const c=el.querySelector(".caret");if(c)c.textContent=COLL[id]?"▸":"▾";});
+ document.querySelectorAll("[data-tog]").forEach(el=>el.onclick=()=>{if(isLocked(el.dataset.tog))return;document.getElementById("ovp-"+el.dataset.tog).classList.toggle("on");});
+ document.querySelectorAll("[data-png]").forEach(el=>el.onclick=()=>exportPNG(el.dataset.png));
+ document.querySelectorAll("[data-lock]").forEach(el=>el.onclick=()=>{const id=el.dataset.lock;
+  if(isLocked(id)){STORE.lock.charts=STORE.lock.charts.filter(x=>x!==id);}
+  else{STORE.overrides[id]={...spec(id)};STORE.lock.charts.push(id);const p=document.getElementById("ovp-"+id);if(p)p.classList.remove("on");}
+  persist();renderGallery();});
+ document.querySelectorAll("[data-ov]").forEach(el=>{if(isLocked(el.dataset.id)){el.disabled=true;return;}el.onchange=()=>{const id=el.dataset.id,k=el.dataset.ov;
+  STORE.overrides[id]=STORE.overrides[id]||{};
+  let v=el.value;
+  if(k==="frame"||k==="dual")v=v===""?null:v==="1";
+  STORE.overrides[id][k]=v===""?null:v;
+  if(v===null||v==="")delete STORE.overrides[id][k];
+  const tog=document.querySelector(`[data-tog="${id}"]`);tog.classList.toggle("mod",hasOv(id));tog.textContent="規格"+(hasOv(id)?" ●":"");
+  drawAll();persist();};});
+ drawAll();}
+// 在地篩選(不重繪 · 無佈局抖動)
+function applyFilter(){GROUPS.forEach(g=>{let any=0;g.charts.forEach(c=>{
+  const show=(!GFILTER||g.id===GFILTER)&&(!GSEARCH||(c.t+" "+c.code+" "+c.id).toLowerCase().includes(GSEARCH));
+  const el=document.getElementById("card-"+c.id);if(el)el.style.display=show?"":"none";if(show)any++;});
+ const h3=document.getElementById("sec-"+g.id),gr=document.getElementById("grid-"+g.id);
+ if(h3)h3.style.display=any?"":"none";if(gr&&any)gr.style.display=COLL[g.id]?"none":"";});updWall();}
+// 牆壁標題：固定不動 · 依捲動位置瞬間換字(無任何位移/動畫)
+function updWall(){const w=document.getElementById("grpWall");if(!w)return;
+ const hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hdrh"))||0;
+ let cur=GROUPS[0];GROUPS.forEach(g=>{const el=document.getElementById("sec-"+g.id);
+  if(el&&el.style.display!=="none"&&el.getBoundingClientRect().top<=hh+30)cur=g;});
+ const html=cur?cur.t+'<span class="en">'+cur.id+'</span>':"";
+ if(w.dataset.k!==cur.id){w.dataset.k=cur.id;w.innerHTML=html;}}
+window.addEventListener("scroll",updWall,{passive:true});
+function updSlot(){}
+// defaults panel wiring
+$("#dLw").value=STORE.defaults.lineWidth;$("#dOp").value=STORE.defaults.fillOpacity;
+$("#dFrame").checked=STORE.defaults.frame;$("#dGrid").checked=STORE.defaults.grid;
+$("#dVL").checked=STORE.lock.visual;
+$("#dVL").onchange=e=>{STORE.lock.visual=e.target.checked;if(e.target.checked)STORE.defaults.palette="via";renderPals();drawAll();persist();};
+$("#dLw").onchange=e=>{STORE.defaults.lineWidth=+e.target.value||1;drawAll();persist();};
+$("#dOp").onchange=e=>{STORE.defaults.fillOpacity=Math.max(0,Math.min(1,+e.target.value));drawAll();persist();};
+$("#dLOp").value=STORE.defaults.lineOpacity;
+$("#dLOp").onchange=e=>{STORE.defaults.lineOpacity=Math.max(0,Math.min(1,+e.target.value));drawAll();persist();};
+$("#dFrame").onchange=e=>{STORE.defaults.frame=e.target.checked;drawAll();persist();};
+$("#dGrid").onchange=e=>{STORE.defaults.grid=e.target.checked;drawAll();persist();};
+$("#dZoom").checked=STORE.defaults.zoom;$("#dELw").value=STORE.defaults.evtLw;$("#dEV").value=STORE.defaults.evtV;$("#dEH").value=STORE.defaults.evtH;
+$("#dZoom").onchange=e=>{STORE.defaults.zoom=e.target.checked;drawAll();persist();};
+$("#dCols").value=STORE.layout.cols;$("#dHgt").value=STORE.layout.height;
+$("#dSM").value=STORE.defaults.smallMultiples||"2x2";
+$("#dSM").onchange=e=>{STORE.defaults.smallMultiples=e.target.value;drawAll();persist();};
+$("#dCols").onchange=e=>{STORE.layout.cols=e.target.value;STORE.layout.preset="custom";renderGallery();persist();};
+$("#dHgt").onchange=e=>{STORE.layout.height=Math.max(90,Math.min(360,+e.target.value||150));STORE.layout.preset="custom";renderGallery();persist();};
+document.querySelectorAll(".lp").forEach(b=>b.onclick=()=>{const p=LPRESETS[b.dataset.lp];STORE.layout={preset:b.dataset.lp,cols:p.cols,height:p.height};$("#dCols").value=p.cols;$("#dHgt").value=p.height;renderGallery();persist();});
+$("#dELw").onchange=e=>{STORE.defaults.evtLw=+e.target.value||0.8;drawAll();persist();};
+$("#dEV").onchange=e=>{STORE.defaults.evtV=e.target.value;drawAll();persist();};
+$("#dEH").onchange=e=>{STORE.defaults.evtH=e.target.value;drawAll();persist();};
+$("#save").onclick=()=>{
+ // 先確認規格無誤(REGEX 全過)才可儲存
+ const bad=Object.keys(STORE.defaults).filter(k=>!ruleFor(k).re.test(String(STORE.defaults[k])));
+ if(bad.length){$("#save").textContent="✕ 規格有誤:"+bad.join(",");setTimeout(()=>$("#save").textContent="💾 儲存圖庫",2000);return;}
+ persist();$("#save").textContent="✓ 規格無誤 · 已儲存";setTimeout(()=>$("#save").textContent="💾 儲存圖庫",1600);};
+$("#exp").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"vap_chart_library",system:"VeritasAutoPlot",via_code:"VIA-M-VAPLIB",ssot_rules:Object.fromEntries(Object.keys(STORE.defaults).map(k=>[k,ruleFor(k).re.source])),sap_msp_align_locked:ALIGN,saved_at:new Date().toISOString()},...STORE},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VAP_Chart_Library.json";u.click();};
+$("#exphtml").onclick=()=>{const html="<!DOCTYPE html>\n"+document.documentElement.outerHTML.replace("</body>",`<script>try{localStorage.setItem(${JSON.stringify(KEY)},${JSON.stringify(JSON.stringify(STORE))})}catch(e){}<\/script></body>`);
+ const b=new Blob([html],{type:"text/html"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VeritasAutoPlot_ChartLibrary.html";a.click();};
+$("#reset").onclick=()=>{STORE={defaults:{...DEFAULTS},overrides:{},selected:[],lock:{visual:true,charts:[]}};renderPals();renderGallery();persist();
+ $("#dLw").value=DEFAULTS.lineWidth;$("#dOp").value=DEFAULTS.fillOpacity;$("#dFrame").checked=DEFAULTS.frame;$("#dGrid").checked=DEFAULTS.grid;$("#dVL").checked=true;};
+renderPals();renderGallery();updStat();renderSSOT();renderDB();
+// header 搜尋/類別選單(固定於凍結 header 內)
+(function(){const gf=$("#gFilter");if(gf&&!gf.options.length){gf.innerHTML='<option value="">所有類別</option>'+GROUPS.map(g=>'<option value="'+g.id+'">'+g.t.split("·")[0].trim()+'</option>').join("");}})();
+// 頁面自動連結 · URL 參數可選(?cat=single|stack|indiv|dual|adv|rolling|fund&q=…)
+const PURL=new URLSearchParams(location.search);
+if(PURL.get("cat")&&GROUPS.some(g=>g.id===PURL.get("cat")))GFILTER=PURL.get("cat");
+if(PURL.get("q"))GSEARCH=PURL.get("q").toLowerCase();
+if(PURL.get("cat")||PURL.get("q"))renderGallery();
+const dbsIn=document.getElementById("dbSearch");if(dbsIn)dbsIn.oninput=()=>{DBQ=dbsIn.value.trim().toLowerCase();renderDB();};
+// 統一設定向左收縮
+const layEl=document.querySelector(".layout"),settEl=document.querySelector(".settings");
+function applySide(c){layEl.classList.toggle("scol",c);settEl.classList.toggle("scol2",c);$("#sideTog").textContent=c?"⟩":"⟨";}
+$("#sideTog").onclick=()=>{STORE.layout.sideCollapsed=!STORE.layout.sideCollapsed;applySide(STORE.layout.sideCollapsed);persist();};
+if(STORE.layout.sideCollapsed)applySide(true);
+// header 鎖定：量測高度供 sticky 堆疊使用
+function setHdrH(){const hd=document.querySelector("header");if(hd)document.documentElement.style.setProperty("--hdrh",hd.offsetHeight+"px");}
+window.addEventListener("resize",setHdrH);window.addEventListener("load",setHdrH);setHdrH();
+</script>
+</body></html>

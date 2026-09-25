@@ -5,6 +5,20 @@ README 流程:train/OOS 切分 → grid 掃描(window×kappa×min_tier)→ DEBUG
 → best=train 通過且 ICIR 最高 → OOS 確認(G009)→ PROVED_VALID / NOT_VALID。
 反證保證:synthetic.alpha=0 時必須 NOT_VALID。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json
 from collections import Counter
 from pathlib import Path

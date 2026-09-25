@@ -1,0 +1,151 @@
+{
+ "schema": "via-codexnexus-failuremodes-v1",
+ "source": "批105 操作員令(2026-08-23):「想 20 個它最可能失敗的原因及解決方案帶入備用」;儲存維護並遵守",
+ "scope": "Invoke-VeritasCodexNexus(-v0101) → Celeritas 啟動鏈 → py 引擎 全鏈失敗模式",
+ "policy": "帶碼備援=已寫入 v0101 實碼;程序備援=操作手冊級;誠實三態,備援降級一律 WARN 不假綠",
+ "modes": [
+  {
+   "id": "FM-01",
+   "cause": "via_py_celeritas_launcher 缺(克隆不全/舊樹)",
+   "solution": "git pull 補齊 registry/",
+   "fallback": "裸 python 降級執行+WARN(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-02",
+   "cause": "VeritasCeleritas.py 缺或壞",
+   "solution": "還原 supportive modules/VeritasCeleritas.py",
+   "fallback": "launcher 內 graceful:Celeritas 缺席零影響直跑目標",
+   "in_code": true
+  },
+  {
+   "id": "FM-03",
+   "cause": "python 不在 PATH(Windows 常態)",
+   "solution": "安裝 Python 或 -Python 指定完整路徑",
+   "fallback": "解析鏈 python→py→python3(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-04",
+   "cause": "PATH 指向舊克隆 bin(指令跑到舊版)",
+   "solution": "PATH 換錨指令(母根 bin 前插)",
+   "fallback": "$Root 由 $PSScriptRoot 動態解析,不吃 PATH(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-05",
+   "cause": "母根搬遷後寫死路徑失效",
+   "solution": "R2 鐵律:全部動態解析,嚴禁寫死",
+   "fallback": "工具路徑 Join-Path $Root 相對解析;缺=誠實 tool-missing(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-06",
+   "cause": "OneDrive On-Demand 占位檔(0-byte 假檔)",
+   "solution": "資料夾右鍵「一律保留在此裝置」",
+   "fallback": "0-byte 偵測→紅燈+指引,不執行假檔(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-07",
+   "cause": "路徑超 260 字元(Filename too long)",
+   "solution": "git config core.longpaths true+系統 LongPathsEnabled",
+   "fallback": "-LiteralPath/\\\\?\\ 前綴(oldscan _lp 同法)",
+   "in_code": false
+  },
+  {
+   "id": "FM-08",
+   "cause": "accelerator/subprocess.py 遮蔽標準庫(循環匯入炸)",
+   "solution": "已 git mv 隔離 pip_subprocess_shaaf8f816b.py(QA-20260820C)",
+   "fallback": "launcher spec 直載 Celeritas,絕不把 accelerator/ 入 sys.path(帶碼於 launcher)",
+   "in_code": true
+  },
+  {
+   "id": "FM-09",
+   "cause": "工作目錄錯(相對路徑引擎讀不到冊)",
+   "solution": "psi.WorkingDirectory=$Root 固定",
+   "fallback": "引擎內部亦以 __file__ 向上解析 VIA 根(雙保險)",
+   "in_code": true
+  },
+  {
+   "id": "FM-10",
+   "cause": "中文輸出亂碼(cp950 主控台)",
+   "solution": "[Console]::OutputEncoding=UTF8",
+   "fallback": "PYTHONIOENCODING=utf-8 env(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-11",
+   "cause": "引數含空白/引號被拆爛",
+   "solution": "ArgumentList 逐項 Add(不串字串)",
+   "fallback": "PS5.1 無 ArgumentList 時轉義字串 ConvertTo-ArgString(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-12",
+   "cause": "rc≠0 被當成功(假綠)",
+   "solution": "ExitCode 檢查+ok 欄位傳遞",
+   "fallback": "SUMMARY 黃燈+RunLog append-only 存證(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-13",
+   "cause": "大輸出雙管 ReadToEnd 死鎖",
+   "solution": "非同步 ReadToEndAsync 雙管",
+   "fallback": "TimeoutSec 硬逾時可解鎖殭屍(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-14",
+   "cause": "引擎卡死(envmgr 類小時級掃描)",
+   "solution": "-TimeoutSec 硬逾時 kill",
+   "fallback": "誠實 TIMEOUT 記錄續跑他務,不卡斷(帶碼;VDF ENG001 v0101 同型)",
+   "in_code": true
+  },
+  {
+   "id": "FM-15",
+   "cause": "相依缺件(yfinance/pandas ImportError)",
+   "solution": "pip install(可用加速器 pip_install)",
+   "fallback": "stderr 樣式偵測→提示指令(帶碼);引擎側 graceful skip",
+   "in_code": true
+  },
+  {
+   "id": "FM-16",
+   "cause": "寫入權限拒絕/freeze.lock 目標",
+   "solution": "輸出一律入 VIA_Reports/_out 執行區;凍結件零觸碰",
+   "fallback": "UnauthorizedAccess catch→改道 temp+誠實記(程序)",
+   "in_code": false
+  },
+  {
+   "id": "FM-17",
+   "cause": "ExecutionPolicy 擋 ps1",
+   "solution": "powershell -NoProfile -ExecutionPolicy Bypass -File …",
+   "fallback": "文件化於 FreshPC 引導鏈/安裝器(程序)",
+   "in_code": false
+  },
+  {
+   "id": "FM-18",
+   "cause": "PS 5.1 vs 7 API 差(ArgumentList/編碼)",
+   "solution": "裝 PS7(安裝器 v0101 自動升級)",
+   "fallback": "Get-Member 探測+雙路徑碼(帶碼)",
+   "in_code": true
+  },
+  {
+   "id": "FM-19",
+   "cause": "並行跑撞同一輸出檔/RunLog",
+   "solution": "時戳檔名 CodexRunLog_yyyyMMdd_HHmmss",
+   "fallback": "O_EXCL 鎖(ifsync 同型)+per-run 目錄(帶碼:時戳檔名)",
+   "in_code": true
+  },
+  {
+   "id": "FM-20",
+   "cause": "Celeritas 掛載成功但引擎期望的加速器函式缺(版本漂移)",
+   "solution": "橋一律 try/except+VIA_ACCEL=None graceful",
+   "fallback": "引擎零行為變更續跑;M4 加速器稽核波定期比對(帶碼於橋)",
+   "in_code": true
+  }
+ ],
+ "in_code_count": 17,
+ "procedural_count": 3,
+ "verification": "工作站波:pwsh 實跑 -Mode Governance(零外部工具任務)煙測+PSScriptAnalyzer 過檔;容器側無 pwsh=靜態一致性檢(誠實邊界)"
+}

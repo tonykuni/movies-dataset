@@ -1,0 +1,649 @@
+{
+  "Version": "VRN_HEADER_ORDER_CONSENSUS_DATA_ANCHOR_PREVIEW_v1.0.0",
+  "GeneratedAt": "2026-05-31 08:31:39",
+  "ReadOnly": true,
+  "Mutation": false,
+  "DbWrite": false,
+  "Delete": false,
+  "Purpose": "Header order + Consensus Data anchor preview; no redo; no mutation",
+  "Decision": {
+    "Status": "READY_FOR_CONSENSUS_HEADER_APPEND_ONLY_PATCH",
+    "Risk": "GREEN",
+    "Score": 90,
+    "EvidenceFails": 0,
+    "HardAnchorMissing": 2,
+    "ConsensusDataAlreadyExists": false,
+    "PatchPlanRows": 6,
+    "CanonicalMaster": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+    "PolicyModule": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_HistoricalValidationPolicy_v0100.py",
+    "HeaderOrder": "Source Manifest → BasicInfo → Consensus Data → FinancialData → Historical Data → SSOT Normalized Data → Trust Matrix → Quarantine / Review Queue → Canonical Output",
+    "FinancialCsvRows": 2087,
+    "FinancialRestoredRows": 2100,
+    "TrustMatrixRows": 2087,
+    "Next1": "Review Header Order + Consensus Data Anchor Matrix",
+    "Next2": "執行 Append-only Patch：新增 Consensus Data header block 與 Trust Matrix consensus 欄位",
+    "Next3": "Post-patch validation：確認 Consensus Data 不覆寫 BasicInfo，也不當 FinancialData truth"
+  },
+  "EvidenceCheck": [
+    {
+      "Key": "CANONICAL_MASTER",
+      "Type": "CODE",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "ECD6B912AF249AEEB90603D58E99BE3AFD048A49C6948C41E20A56CD0C42F180",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "POLICY_MODULE",
+      "Type": "CODE",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_HistoricalValidationPolicy_v0100.py",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "9A3D88F76AD637A3CCBDDC50FDFF8B8285C0976187C423C75FCF953776D5380D",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "POLICY_MARKDOWN",
+      "Type": "DOC",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VRN_HistoricalValidationPolicy_v0100.md",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "86CD82B6DC92EBDCECBF3D84F70F1829C6060BE048D6BF10D3EA90BA059526B3",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_CSV",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_FinancialData.csv",
+      "Exists": true,
+      "ExpectedRows": 2087,
+      "ActualRows": 2087,
+      "SHA256": "54F6C8BE1C9728B28CDED76AE2DA532CEC07A3295371151FE16B6F934513891E",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_RESTORED_CSV",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_Financial_Restored.csv",
+      "Exists": true,
+      "ExpectedRows": 2100,
+      "ActualRows": 2100,
+      "SHA256": "AECC46400AE0BF19DD9A28C43539649BA6FD9BFD80DC213407A8F8630D894A85",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_PARQUET",
+      "Type": "PARQUET",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_FinancialData.parquet",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "E8D23324E09FABFAC10454D3B9DFD61DEAC4633130C10E958B4803C1B4F48840",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "TRUST_MATRIX",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_Trust_Matrix.csv",
+      "Exists": true,
+      "ExpectedRows": 2087,
+      "ActualRows": 2087,
+      "SHA256": "54F6C8BE1C9728B28CDED76AE2DA532CEC07A3295371151FE16B6F934513891E",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    }
+  ],
+  "HeaderOrderSpec": [
+    {
+      "Order": 1,
+      "HeaderBlock": "Source Manifest",
+      "Role": "PDF 來源清單與來源識別",
+      "SourcePriority": "input pdf / source manifest",
+      "ValidationRole": "Source hygiene",
+      "MustExistBeforePatch": true,
+      "PatchAction": "NO_CHANGE"
+    },
+    {
+      "Order": 2,
+      "HeaderBlock": "BasicInfo",
+      "Role": "報告基本資料與 broker 觀點",
+      "SourcePriority": "broker_report P1",
+      "ValidationRole": "不被外部覆寫，只做差異揭露",
+      "MustExistBeforePatch": true,
+      "PatchAction": "KEEP"
+    },
+    {
+      "Order": 3,
+      "HeaderBlock": "Consensus Data",
+      "Role": "yfinance / FactSet / 外部共識資料",
+      "SourcePriority": "external consensus P2",
+      "ValidationRole": "Cross validation / reference only",
+      "MustExistBeforePatch": false,
+      "PatchAction": "APPEND_ONLY_INSERT_AFTER_BASICINFO"
+    },
+    {
+      "Order": 4,
+      "HeaderBlock": "FinancialData",
+      "Role": "PDF 擷取財務資料",
+      "SourcePriority": "pdf table observation",
+      "ValidationRole": "Observation only，不當 validation truth",
+      "MustExistBeforePatch": true,
+      "PatchAction": "KEEP_AFTER_CONSENSUS"
+    },
+    {
+      "Order": 5,
+      "HeaderBlock": "Historical Data",
+      "Role": "歷史真值資料",
+      "SourcePriority": "TWSE / TPEX / MOPS / yfinance / VDF DuckDB / FactSet if authorized",
+      "ValidationRole": "Historical validation truth",
+      "MustExistBeforePatch": true,
+      "PatchAction": "REFERENCE_ONLY"
+    },
+    {
+      "Order": 6,
+      "HeaderBlock": "SSOT Normalized Data",
+      "Role": "財務科目與 ticker 正規化",
+      "SourcePriority": "Financial SSOT / Broker Alias / Master Registry",
+      "ValidationRole": "Canonical mapping",
+      "MustExistBeforePatch": true,
+      "PatchAction": "REFERENCE_ONLY"
+    },
+    {
+      "Order": 7,
+      "HeaderBlock": "Trust Matrix",
+      "Role": "歷史核對、加減法核對、除法核對、Consensus cross validation",
+      "SourcePriority": "historical / official / market-derived / external consensus reference",
+      "ValidationRole": "GREEN / YELLOW / RED",
+      "MustExistBeforePatch": true,
+      "PatchAction": "APPEND_ONLY_CONSENSUS_COLUMNS"
+    },
+    {
+      "Order": 8,
+      "HeaderBlock": "Quarantine / Review Queue",
+      "Role": "需人工檢查資料",
+      "SourcePriority": "validation result",
+      "ValidationRole": "不入主庫",
+      "MustExistBeforePatch": true,
+      "PatchAction": "REFERENCE_ONLY"
+    },
+    {
+      "Order": 9,
+      "HeaderBlock": "Canonical Output",
+      "Role": "通過驗證後輸出",
+      "SourcePriority": "PASS / trusted records",
+      "ValidationRole": "parquet / csv / duckdb / google sheet",
+      "MustExistBeforePatch": true,
+      "PatchAction": "REFERENCE_ONLY"
+    }
+  ],
+  "ConsensusDataHeaderFields": [
+    {
+      "Order": 1,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Source",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 2,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Provider",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 3,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Provider ID",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 4,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Date",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 5,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Period",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 6,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Currency",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 7,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Rating",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 8,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Target Mean",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 9,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Target Median",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 10,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Target High",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 11,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Target Low",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 12,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Analyst Count",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 13,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus EPS Current Year",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 14,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus EPS Next Year",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 15,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Revenue Current Year",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 16,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Revenue Next Year",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 17,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Revision Direction",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 18,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Last Updated",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 19,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Fetch Status",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 20,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Confidence",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 21,
+      "HeaderBlock": "Consensus Data",
+      "Field": "Consensus Note",
+      "Required": true,
+      "Role": "External consensus / cross validation / reference only",
+      "Source": "yfinance / FactSet if authorized",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    }
+  ],
+  "TrustMatrixConsensusFields": [
+    {
+      "Order": 1,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Check Status",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 2,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Trust Score",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 3,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Gap Type",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 4,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Gap Value",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 5,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Review Signal",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 6,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Provider",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 7,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Data Date",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 8,
+      "HeaderBlock": "Trust Matrix",
+      "Field": "Consensus Note",
+      "Required": true,
+      "Role": "Consensus cross validation result",
+      "Source": "Consensus Data block",
+      "Mutation": "APPEND_ONLY",
+      "Risk": "GREEN"
+    }
+  ],
+  "AnchorPreview": [
+    {
+      "Anchor": "IMPORT_ZONE",
+      "Status": "FOUND",
+      "Line": 16,
+      "PatchType": "APPEND_ONLY_IMPORT",
+      "Need": "可 append-only import consensus/header policy helper",
+      "ContextPreview": "def   SUMMARY independent matrix HTML page\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport csv\nimport importlib.util",
+      "MutationNow": false,
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Anchor": "BASICINFO_BLOCK",
+      "Status": "FOUND",
+      "Line": 8,
+      "PatchType": "ANCHOR_BEFORE_INSERT",
+      "Need": "Consensus Data 必須接在 BasicInfo 後面",
+      "ContextPreview": "def Input:\ndef   repaired_first_page_text\ndef   financial_data / financial_rows / financial_data_csv\ndef   basicinfo fields\ndef Output:\ndef   summary_matrix.json\ndef   summary_matrix.csv\ndef   db_ready_summary.csv",
+      "MutationNow": false,
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Anchor": "CONSENSUS_DATA_BLOCK",
+      "Status": "CONSENSUS_DATA_NOT_FOUND_READY_TO_APPEND",
+      "Line": 0,
+      "PatchType": "EXISTENCE_CHECK",
+      "Need": "檢查是否已存在 Consensus Data",
+      "ContextPreview": "",
+      "MutationNow": false,
+      "Risk": "GREEN",
+      "Note": "Consensus Data 尚未存在，符合本次 preview 目的"
+    },
+    {
+      "Anchor": "FINANCIALDATA_BLOCK",
+      "Status": "FOUND",
+      "Line": 7,
+      "PatchType": "ANCHOR_AFTER_INSERT",
+      "Need": "Consensus Data 必須在 FinancialData 前面",
+      "ContextPreview": "def Independent Summary Matrix page generator.\ndef Input:\ndef   repaired_first_page_text\ndef   financial_data / financial_rows / financial_data_csv\ndef   basicinfo fields\ndef Output:\ndef   summary_matrix.json\ndef   summary_matrix.csv",
+      "MutationNow": false,
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Anchor": "TRUST_MATRIX_BLOCK",
+      "Status": "ANCHOR_NOT_FOUND_APPEND_ZONE_REQUIRED",
+      "Line": 0,
+      "PatchType": "APPEND_ONLY_SCHEMA",
+      "Need": "Trust Matrix append-only 加入 Consensus Check 欄位",
+      "ContextPreview": "",
+      "MutationNow": false,
+      "Risk": "YELLOW",
+      "Note": "需要 append-only 新增 section / helper"
+    },
+    {
+      "Anchor": "NO_REPORT_AS_TRUTH_RULE",
+      "Status": "FOUND",
+      "Line": 605,
+      "PatchType": "POLICY_GATE_REFERENCE",
+      "Need": "FinancialData validation 不可使用 report data 當 truth",
+      "ContextPreview": "# VRN_V139O_SUPPORTIVE_BRIDGE_APPEND_ONLY END\n\n# [VRN:ANCHOR:HISTORICAL_VALIDATION_POLICY:BEGIN]\n# Append-only hookup of VIS_VRN_HistoricalValidationPolicy_v0100.\n# Added by VRN Finalize AIO. Does not modify any existing line above.\n# Financial validation truth is delegated to this policy; broker report /\n# pdf_table / report_text are NOT treated as financial validation truth.\ntry:",
+      "MutationNow": false,
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Anchor": "CANONICAL_OUTPUT_BLOCK",
+      "Status": "ANCHOR_NOT_FOUND_APPEND_ZONE_REQUIRED",
+      "Line": 0,
+      "PatchType": "REFERENCE_ONLY",
+      "Need": "Canonical output 不直接吃 Consensus Data，只吃 Trust decision",
+      "ContextPreview": "",
+      "MutationNow": false,
+      "Risk": "YELLOW",
+      "Note": "需要 append-only 新增 section / helper"
+    }
+  ],
+  "AppendOnlyPatchPlan": [
+    {
+      "Order": 1,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "Header Order Registry",
+      "Anchor": "APPEND_SAFE_ZONE",
+      "Action": "新增 def_VRN_HEADER_ORDER_V110，順序固定 Source Manifest → BasicInfo → Consensus Data → FinancialData → Historical Data → SSOT → Trust Matrix → Quarantine → Canonical Output",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY",
+      "Risk": "GREEN",
+      "Reason": "先固定 header order，避免 Consensus Data 被塞進 FinancialData"
+    },
+    {
+      "Order": 2,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "Consensus Data Schema",
+      "Anchor": "After BasicInfo around line 8",
+      "Action": "新增 Consensus Data header block，共 21 欄",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY",
+      "Risk": "GREEN",
+      "Reason": "Consensus Data 是 external consensus / reference layer"
+    },
+    {
+      "Order": 3,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "FinancialData Position Guard",
+      "Anchor": "Before FinancialData around line 7",
+      "Action": "新增 guard：Consensus Data 必須在 FinancialData 前面；FinancialData 只當 observation",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY",
+      "Risk": "GREEN",
+      "Reason": "防止 report / consensus 資料混入 FinancialData truth"
+    },
+    {
+      "Order": 4,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "Trust Matrix Consensus Fields",
+      "Anchor": "Trust Matrix around line 0",
+      "Action": "Trust Matrix append-only 新增 Consensus Check Status / Score / Gap / Review Signal 欄位，共 8 欄",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY_SCHEMA",
+      "Risk": "YELLOW",
+      "Reason": "Schema 只能增加欄位，不可改舊欄位"
+    },
+    {
+      "Order": 5,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "No Consensus As Financial Truth",
+      "Anchor": "HistoricalValidationPolicy",
+      "Action": "新增 rule：Consensus Data 只做 cross validation，不做 FinancialData validation truth",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY_POLICY_GATE",
+      "Risk": "GREEN",
+      "Reason": "FactSet / yfinance consensus 是 reference layer，不是 historical truth layer"
+    },
+    {
+      "Order": 6,
+      "PatchTarget": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "PatchName": "Canonical Output Guard",
+      "Anchor": "Canonical Output",
+      "Action": "Canonical Output 只收 Trust Matrix PASS / trusted records，不直接吃 Consensus Data",
+      "MutationNow": false,
+      "MutationNext": "APPEND_ONLY_GUARD",
+      "Risk": "GREEN",
+      "Reason": "避免 external consensus 直接污染 canonical"
+    }
+  ],
+  "Outputs": {
+    "RunDir": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136",
+    "Html": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_HeaderOrder_ConsensusData_AnchorPreview.html",
+    "Json": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_HeaderOrder_ConsensusData_AnchorPreview.json",
+    "EvidenceCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_Evidence_Check.csv",
+    "HeaderCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_Header_Order_Spec.csv",
+    "ConsensusCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_Consensus_Data_Header_Fields.csv",
+    "TrustConsensusCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_Trust_Matrix_Consensus_Fields.csv",
+    "AnchorCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_HeaderOrder_Consensus_Anchor_Matrix.csv",
+    "PatchPlanCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\VRN_HeaderOrder_Consensus_AppendOnly_PatchPlan.csv",
+    "NextPatch": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_header_order_consensus_runs\\RUN_20260531_083136\\NEXT_Invoke_VRN_HeaderOrder_ConsensusData_AppendOnlyPatch_AFTER_PREVIEW.txt"
+  }
+}

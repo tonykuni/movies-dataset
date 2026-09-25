@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T06 — Multi-Chart Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --up:#55A868;--dn:#C44E52;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:20px}
+
+/* ═══ Header ═══ */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.header h1{font-size:clamp(15px,2.2vw,20px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:12px;color:var(--tx3)}
+.header .meta{font-size:11px;color:var(--tx3);font-family:var(--mono)}
+
+/* ═══ KPI Cards ═══ */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--bg);border:1px solid var(--bd);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .label{font-size:11px;color:var(--tx3);margin-bottom:4px}
+.kpi .value{font-size:clamp(18px,2.5vw,26px);font-weight:700;font-family:var(--mono);line-height:1.1}
+.kpi .delta{font-size:12px;margin-top:4px;font-weight:600}
+.kpi .delta.up{color:var(--up)}.kpi .delta.dn{color:var(--dn)}
+
+/* ═══ Chart Grid ═══ */
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.chart-card{background:var(--bg);border:1px solid var(--bd);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);min-height:300px}
+.chart-card.full{grid-column:1/-1}
+.chart-card h3{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.chart-card h3 .badge{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--tx2)}
+.chart-box{width:100%;height:280px}
+.chart-box.tall{height:380px}
+
+/* ═══ Footer ═══ */
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:14px;padding-top:10px;border-top:1px solid var(--bd)}
+
+@media(max-width:900px){.chart-grid{grid-template-columns:1fr}.chart-box{height:250px}}
+@media(max-width:600px){body{padding:10px}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<div class="header">
+  <div>
+    <h1>VeritasAutoPlot™ T06 — Dashboard</h1>
+    <div class="sub">Multi-Chart Grid · KPI + K線 + 雙軸 + 堆疊 + 熱力圖 組合面板</div>
+  </div>
+  <div class="meta" id="metaTime"></div>
+</div>
+
+<!-- ═══ KPI Row ═══ -->
+<div class="kpi-row" id="kpiRow"></div>
+
+<!-- ═══ Chart Grid ═══ -->
+<div class="chart-grid">
+  <div class="chart-card full">
+    <h3>Candlestick + MA + Volume <span class="badge">K線</span></h3>
+    <div class="chart-box tall" id="chCandle"></div>
+  </div>
+  <div class="chart-card">
+    <h3>Dual Axis — Price vs Sentiment <span class="badge">雙軸</span></h3>
+    <div class="chart-box" id="chDual"></div>
+  </div>
+  <div class="chart-card">
+    <h3>RSI + MACD Stack <span class="badge">堆疊</span></h3>
+    <div class="chart-box" id="chStack"></div>
+  </div>
+  <div class="chart-card">
+    <h3>Correlation Heatmap <span class="badge">熱力圖</span></h3>
+    <div class="chart-box" id="chHeat"></div>
+  </div>
+  <div class="chart-card">
+    <h3>Calendar Returns <span class="badge">月曆</span></h3>
+    <div class="chart-box" id="chCal"></div>
+  </div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · T06 Dashboard · Notion × MUJI × Seaborn · Data: Demo</div>
+
+<script>
+/* ═══ Seaborn Palette ═══ */
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',br:'#937860',pk:'#DA8BC3',gy:'#8C8C8C',yl:'#CCB974',cy:'#64B5CD'};
+const CFG={responsive:true,displayModeBar:false};
+
+/* ═══ Base Layout ═══ */
+function BL(title,extra={}){
+  return Object.assign({
+    title:{text:title,font:{family:'Inter,Noto Sans TC',size:13,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:40,r:40,b:40,l:50},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9,color:'#6B6B6B'}},
+    yaxis:{showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:9,color:'#6B6B6B'},separatethousands:true},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11}},
+    legend:{orientation:'h',y:1.12,x:0,font:{size:9}},
+    shapes:[],annotations:[]
+  },extra);
+}
+
+/* ═══ Demo Data ═══ */
+function genOHLCV(n=200){
+  const dates=[],open=[],high=[],low=[],close=[],vol=[];
+  let c=500,d=new Date('2024-01-02');
+  for(let i=0;i<n;i++){
+    const o=c+c*(Math.random()-.5)*0.008;
+    const chg=c*(Math.random()-.48)*0.02;
+    const cl=o+chg;const h=Math.max(o,cl)+Math.abs(chg)*Math.random()*.5;const l=Math.min(o,cl)-Math.abs(chg)*Math.random()*.5;
+    dates.push(d.toISOString().slice(0,10));open.push(+o.toFixed(2));high.push(+h.toFixed(2));low.push(+l.toFixed(2));close.push(+cl.toFixed(2));
+    vol.push(Math.round(4e6+Math.random()*1e7));c=cl;
+    d=new Date(d.getTime()+864e5);if(d.getDay()===0)d=new Date(d.getTime()+864e5);if(d.getDay()===6)d=new Date(d.getTime()+2*864e5);
+  }
+  return{dates,open,high,low,close,vol};
+}
+const D=genOHLCV();
+
+/* ═══ Indicators ═══ */
+function sma(a,p){return a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((s,v)=>s+v,0)/p);}
+function ema(a,p){const k=2/(p+1);const r=[a[0]];for(let i=1;i<a.length;i++)r.push(a[i]*k+r[i-1]*(1-k));return r;}
+function rsi(a,p=14){const g=[0],l=[0];for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];g.push(d>0?d:0);l.push(d<0?-d:0);}let ag=g.slice(1,p+1).reduce((s,v)=>s+v,0)/p;let al=l.slice(1,p+1).reduce((s,v)=>s+v,0)/p;const r=Array(p).fill(null);r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));for(let i=p+1;i<a.length;i++){ag=(ag*(p-1)+g[i])/p;al=(al*(p-1)+l[i])/p;r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));}return r;}
+function macd(a,f=12,s=26,sig=9){const ef=ema(a,f),es=ema(a,s);const line=ef.map((v,i)=>+(v-es[i]).toFixed(4));const signal=ema(line,sig);const hist=line.map((v,i)=>+(v-signal[i]).toFixed(4));return{line,signal,hist};}
+
+/* ═══ Render All ═══ */
+function renderAll(){
+  document.getElementById('metaTime').textContent='Updated: '+new Date().toLocaleString('zh-TW');
+
+  const last=D.close[D.close.length-1];
+  const prev=D.close[D.close.length-2];
+  const chg=last-prev;const chgPct=(chg/prev*100);
+  const hi=Math.max(...D.high);const lo=Math.min(...D.low);
+  const avgVol=Math.round(D.vol.reduce((s,v)=>s+v,0)/D.vol.length);
+  const latestRSI=rsi(D.close).filter(v=>v!==null).pop();
+
+  /* KPI */
+  const kpis=[
+    {label:'Last Close',value:last.toLocaleString(undefined,{minimumFractionDigits:2}),delta:chg>=0?'+'+chgPct.toFixed(2)+'%':chgPct.toFixed(2)+'%',up:chg>=0},
+    {label:'Period High',value:hi.toLocaleString(undefined,{minimumFractionDigits:2}),delta:'Max',up:true},
+    {label:'Period Low',value:lo.toLocaleString(undefined,{minimumFractionDigits:2}),delta:'Min',up:false},
+    {label:'Avg Volume',value:(avgVol/1e6).toFixed(1)+'M',delta:'Daily Avg',up:true},
+    {label:'RSI(14)',value:latestRSI.toFixed(1),delta:latestRSI>70?'Overbought':latestRSI<30?'Oversold':'Neutral',up:latestRSI<=70},
+  ];
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`
+    <div class="kpi">
+      <div class="label">${k.label}</div>
+      <div class="value">${k.value}</div>
+      <div class="delta ${k.up?'up':'dn'}">${k.delta}</div>
+    </div>`).join('');
+
+  /* ═══ Chart 1: Candlestick + SMA + Volume ═══ */
+  const trCandle=[
+    {type:'candlestick',x:D.dates,open:D.open,high:D.high,low:D.low,close:D.close,name:'OHLC',yaxis:'y',
+      increasing:{line:{color:SB.gn},fillcolor:SB.gn},decreasing:{line:{color:SB.rd},fillcolor:SB.rd}},
+    {type:'scatter',mode:'lines',x:D.dates,y:sma(D.close,5),name:'SMA5',yaxis:'y',line:{color:SB.or,width:1.1},connectgaps:true},
+    {type:'scatter',mode:'lines',x:D.dates,y:sma(D.close,20),name:'SMA20',yaxis:'y',line:{color:SB.bl,width:1.1},connectgaps:true},
+    {type:'bar',x:D.dates,y:D.vol,name:'Vol',yaxis:'y2',marker:{color:D.close.map((c,i)=>c>=D.open[i]?SB.gn+'77':SB.rd+'77')},showlegend:false},
+  ];
+  const lyCandle=BL('',{
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9},rangeslider:{visible:false},dtick:'M2',tickformat:'%Y-%m'},
+    yaxis:{domain:[0.18,1],showgrid:true,gridcolor:'#F0EFEC',tickfont:{size:9},separatethousands:true},
+    yaxis2:{domain:[0,0.14],showgrid:false,tickfont:{size:8,color:SB.gy}},
+  });
+  /* H/L annotation */
+  const mx=D.high.indexOf(hi),mn=D.low.indexOf(lo);
+  lyCandle.annotations=[
+    {x:D.dates[mx],y:hi,text:'▲ '+hi.toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:-25,font:{size:9,color:SB.gn,weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.gn,borderwidth:1,borderpad:2},
+    {x:D.dates[mn],y:lo,text:'▼ '+lo.toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:25,font:{size:9,color:SB.rd,weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.rd,borderwidth:1,borderpad:2},
+  ];
+  Plotly.newPlot('chCandle',trCandle,lyCandle,CFG);
+
+  /* ═══ Chart 2: Dual Axis ═══ */
+  const bear=D.dates.map(()=>+(20+Math.random()*35).toFixed(1));
+  Plotly.newPlot('chDual',[
+    {x:D.dates,y:D.close,type:'scatter',mode:'lines',name:'Price',yaxis:'y',line:{color:SB.bl,width:1.8}},
+    {x:D.dates,y:bear,type:'scatter',mode:'lines',name:'Bearish%',yaxis:'y2',line:{color:SB.or,width:1},opacity:.5},
+  ],BL('',{
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,tickfont:{size:9,color:SB.or},title:{text:'Bearish %',font:{size:10,color:SB.or}}},
+    yaxis:{title:{text:'Price',font:{size:10,color:SB.bl}},tickfont:{color:SB.bl}},
+  }),CFG);
+
+  /* ═══ Chart 3: RSI + MACD Stack ═══ */
+  const rv=rsi(D.close);const m=macd(D.close);
+  const hc=m.hist.map(v=>v>=0?SB.gn+'99':SB.rd+'99');
+  Plotly.newPlot('chStack',[
+    {type:'scatter',mode:'lines',x:D.dates,y:rv,name:'RSI(14)',yaxis:'y',line:{color:SB.pu,width:1.3}},
+    {type:'bar',x:D.dates,y:m.hist,name:'MACD Hist',yaxis:'y2',marker:{color:hc},showlegend:false},
+    {type:'scatter',mode:'lines',x:D.dates,y:m.line,name:'MACD',yaxis:'y2',line:{color:SB.bl,width:1}},
+    {type:'scatter',mode:'lines',x:D.dates,y:m.signal,name:'Signal',yaxis:'y2',line:{color:SB.or,width:.9,dash:'dash'}},
+  ],BL('',{
+    yaxis:{domain:[0.55,1],range:[0,100],showgrid:true,gridcolor:'#F0EFEC',title:{text:'RSI',font:{size:9}},tickfont:{size:8}},
+    yaxis2:{domain:[0,0.48],showgrid:true,gridcolor:'#F0EFEC',title:{text:'MACD',font:{size:9}},tickfont:{size:8}},
+    shapes:[
+      {type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:70,y1:70,line:{color:SB.rd,width:.7,dash:'dot'}},
+      {type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:30,y1:30,line:{color:SB.gn,width:.7,dash:'dot'}},
+    ],
+  }),CFG);
+
+  /* ═══ Chart 4: Correlation Heatmap ═══ */
+  const labels=['S&P500','DJI','NASDAQ','SOX','TWII','USD','Gold','Oil'];
+  const z=[[1,.97,.95,.85,.72,.15,-.12,.45],[.97,1,.92,.80,.70,.18,-.10,.42],[.95,.92,1,.90,.75,.10,-.15,.40],[.85,.80,.90,1,.78,.05,-.18,.35],[.72,.70,.75,.78,1,-.05,-.08,.30],[.15,.18,.10,.05,-.05,1,-.55,.20],[-.12,-.10,-.15,-.18,-.08,-.55,1,-.10],[.45,.42,.40,.35,.30,.20,-.10,1]];
+  const annots=[];
+  for(let yi=0;yi<z.length;yi++)for(let xi=0;xi<z[yi].length;xi++)annots.push({x:xi,y:yi,text:z[yi][xi].toFixed(2),showarrow:false,font:{size:9,color:Math.abs(z[yi][xi])>.6?'#FFF':'#37352F'}});
+  Plotly.newPlot('chHeat',[{
+    type:'heatmap',x:labels,y:labels,z:z,
+    colorscale:[[0,'#4C72B0'],[0.5,'#FFFFFF'],[1,'#C44E52']],
+    zmin:-1,zmax:1,showscale:true,
+    hovertemplate:'%{x} ↔ %{y}: %{z:.2f}<extra></extra>',
+    colorbar:{thickness:12,len:0.6,tickfont:{size:9}},xgap:2,ygap:2,
+  }],BL('',{margin:{t:30,r:70,b:70,l:70},annotations:annots,
+    xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{autorange:'reversed',tickfont:{size:9}}}),CFG);
+
+  /* ═══ Chart 5: Calendar Returns ═══ */
+  const years=['2020','2021','2022','2023','2024'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const cz=years.map(()=>months.map(()=>+(Math.random()*18-6).toFixed(1)));
+  cz[0][1]=-8.4;cz[0][2]=-12.5;cz[0][3]=12.7;cz[2][0]=-5.3;cz[2][5]=-8.4;
+  const ca=[];for(let yi=0;yi<cz.length;yi++)for(let xi=0;xi<cz[yi].length;xi++)ca.push({x:months[xi],y:years[yi],text:cz[yi][xi].toFixed(1)+'%',showarrow:false,font:{size:9,color:Math.abs(cz[yi][xi])>8?'#FFF':'#37352F'}});
+  Plotly.newPlot('chCal',[{
+    type:'heatmap',x:months,y:years,z:cz,
+    colorscale:[[0,'#C44E52'],[0.5,'#F7F6F3'],[1,'#55A868']],
+    zmin:-15,zmax:15,showscale:true,
+    colorbar:{thickness:12,len:0.6,ticksuffix:'%',tickfont:{size:9}},xgap:2,ygap:2,
+  }],BL('',{margin:{t:30,r:70,b:50,l:60},annotations:ca,
+    xaxis:{tickfont:{size:9}},yaxis:{tickfont:{size:9}}}),CFG);
+}
+
+renderAll();
+</script>
+</body>
+</html>

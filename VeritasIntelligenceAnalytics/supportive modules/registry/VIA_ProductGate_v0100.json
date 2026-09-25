@@ -1,0 +1,131 @@
+{
+ "engine": "CGC_MDL133_ProductGate v0101",
+ "stamp": "2026-09-23 23:47",
+ "grid": {
+  "name": "GRID_20260923_232815.json",
+  "ok": 341,
+  "fail": 0,
+  "skip": 7
+ },
+ "gates": [
+  {
+   "id": "G1",
+   "name": "矩陣存證",
+   "state": "FAIL",
+   "evidence": "grid GRID_20260923_232815.json · OK 341 FAIL 0 SKIP 7 · 核心站 14/14(批376 站 7/8)· 碼紅 0 料紅 0 · 存證早於 v0225(批376 八站未入)",
+   "next": "via-selftest"
+  },
+  {
+   "id": "G2",
+   "name": "短令↔梭",
+   "state": "OK",
+   "evidence": "函式 169 · 梭 166 · 讓位 via-all,via-rootcheck,via-tower-reset",
+   "next": ""
+  },
+  {
+   "id": "G3",
+   "name": "樞紐任務",
+   "state": "OK",
+   "evidence": "任務冊 92 · 產品任務 13/13",
+   "next": ""
+  },
+  {
+   "id": "G4",
+   "name": "產品頁衛生",
+   "state": "WARN",
+   "evidence": "頁 6/8 衛生綠 · 缺頁 VIA_UI_ETFRevenueMomentum_v0100.html→via-etfrev; VIA_UI_RevenueConsensusAnalysis_v0100.html→via-analysis",
+   "next": "缺頁再生:via-analysis / via-etfrev"
+  },
+  {
+   "id": "G5",
+   "name": "再生物讓位",
+   "state": "OK",
+   "evidence": ".gitignore 規則 191 · 再生頁 6/6 已讓位",
+   "next": ""
+  },
+  {
+   "id": "G6",
+   "name": "鑰匙守衛",
+   "state": "FAIL",
+   "evidence": "掃描 /home/user/movies-dataset · 命中 10 · 32.9s · VeritasIntelligenceAnalytics/new modules engines/VDF_MDL003_SentimentMacroEngine.py, VeritasIntelligenceAnalytics/new modules engines/VDF_final/README.md, VeritasIntelligenceAnalytics/new modules engines/VDF_final/cockpit/index.html, VeritasIntelligenceAnalytics/new modules engines/VDF_final/config/macro_ssot.json, VeritasIntelligenceAnalytics/new modules engines/VDF_final/config/vdf_fetch_matrix.json",
+   "next": "遮罩 <REDACTED:VDF_FRED_API_KEY>"
+  },
+  {
+   "id": "G7",
+   "name": "引擎尾版",
+   "state": "OK",
+   "evidence": "尾版 19/19 可編譯 · Register Register-VIA-Commands-v0242.ps1 · CGC_MDL131_ProjectCompletion_v0106.py, CGC_MDL132_VesBridge_v0104.py, CGC_MDL133_ProductGate_v0101.py, CGC_MDL134_ParallelLanes_v0101.py",
+   "next": ""
+  },
+  {
+   "id": "G8",
+   "name": "短令在位",
+   "state": "OK",
+   "evidence": "產品短令 15/15",
+   "next": ""
+  },
+  {
+   "id": "G9",
+   "name": "用法文件",
+   "state": "OK",
+   "evidence": "usage 7 條 · 頁 VIA_UI_ProductGate_v0100.html · 本頁零 CDN/手機單欄",
+   "next": ""
+  }
+ ],
+ "projects": [
+  {
+   "key": "VDF",
+   "zh": "資料鍛造 VeritasDataForge",
+   "OK": 65,
+   "CODE": 0,
+   "DATA": 0,
+   "n": 67,
+   "state": "GREEN"
+  },
+  {
+   "key": "VRN",
+   "zh": "報告新星 VeritasReportNova",
+   "OK": 74,
+   "CODE": 0,
+   "DATA": 0,
+   "n": 76,
+   "state": "GREEN"
+  },
+  {
+   "key": "AETF",
+   "zh": "VIA 台灣主動式 ETF 分析",
+   "OK": 16,
+   "CODE": 0,
+   "DATA": 0,
+   "n": 16,
+   "state": "GREEN"
+  },
+  {
+   "key": "REVENUE",
+   "zh": "VIA 台灣股票月營收分析",
+   "OK": 8,
+   "CODE": 0,
+   "DATA": 0,
+   "n": 8,
+   "state": "GREEN"
+  }
+ ],
+ "usage": [
+  "手機一句:via-reload; via-mobile(六流程 dry-run → 紅站補齊鏈 → 四專案矩陣 → 產品閘 digest;零跳出)",
+  "看頁:via-productgate(build --open)/ via-projects / via-vdfarch / via-ui",
+  "全矩陣:via-selftest;只重跑紅站:via-selftest --refail;只八站:via-selftest --only 批376",
+  "資料側:via-fred(FRED 190 序列)/ via-revfill(月營收史深)/ via-etfuniv(主動 ETF 宇宙)/ via-etfhist(持股史深)/ via-etfrev(ETF×營收)",
+  "標準化掃描:via-ves(唯讀;--apply 永不經短令)",
+  "並行補齊:via-lanes run(十道;Hydra 哨兵)/ via-mobile --lanes",
+  "日更:boot(via_boot_update.sh)①–⑫ 含本閘"
+ ],
+ "rules": [
+  "零重測零發明:每閘只讀既有 GRID/REFAIL 存證與磁碟真相,逐字引用;本閘不重跑任何站",
+  "誠實三態 OK/WARN/FAIL → QUALIFIED/CONDITIONAL/NOT_QUALIFIED;任一 FAIL 即不合格,永不假綠",
+  "只增不減:頁/冊 version-forward;本閘零刪除零改寫他檔",
+  "尾版律:引擎/冊/Register 皆 glob 尾版動態解析,永不寫死版號",
+  "鑰匙守衛以 SHA-256 指紋比對;本檔永不含明文鑰"
+ ],
+ "verdict": "NOT_QUALIFIED",
+ "elapsed_s": 33.3
+}

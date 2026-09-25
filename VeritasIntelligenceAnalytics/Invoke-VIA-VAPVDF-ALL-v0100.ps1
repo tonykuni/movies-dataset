@@ -5,6 +5,16 @@
 # 站表:V1 VDF 契約盤點 · V2 VDF 302 全系統驗證 · V3 VDF 303 Registry 活化
 #       A1 VAP 引擎探測 · A2 VAP chartlib 零依賴出圖 · A3 VAP seaborn/plotly selftest
 param([switch]$Quick, [switch]$SkipVDF, [switch]$SkipVAP)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent $PSCommandPath
 $VDF = Join-Path $Root "functional modules\VDF"
@@ -28,17 +38,17 @@ $py = Get-Py
 Write-Host "=== VIA VAP+VDF 統包 v0100 · python=$py · $(if($Quick){'QUICK'}else{'FULL'}) ==="
 $stages = @()
 if (-not $SkipVDF) {
-    $stages += , @("V1 VDF 契約盤點", @((Get-Newest $VDF "VDF_MDL501_FetchContractManager.py"), "check"), $VDF)
+    $stages += , @("V1 VDF 契約盤點", @((Get-Newest $VDF "VDF_ENG019_MDL501FetchContractManager.py"), "check"), $VDF)
     if (-not $Quick) {
-        $stages += , @("V2 VDF 302 全系統驗證", @((Get-Newest $VDF "VDF_MDL302_FinalActivation.py"), "--no-pause"), $VDF)
+        $stages += , @("V2 VDF 302 全系統驗證", @((Get-Newest $VDF "VDF_ENG017_MDL302FinalActivation.py"), "--no-pause"), $VDF)
         $stages += , @("V3 VDF 303 Registry 活化", @((Get-Newest $VDF "VDF_MDL303_RegistryActivation.py"), "--no-pause"), $VDF)
     }
 }
 if (-not $SkipVAP) {
-    $stages += , @("A1 VAP 引擎探測", @((Get-Newest $VAPE "via_autoplot_seaborn_plotly_v0*.py"), "probe"), $Root)
+    $stages += , @("A1 VAP 引擎探測", @((Get-Newest $VAPE "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "probe"), $Root)
     if (-not $Quick) {
-        $stages += , @("A2 VAP chartlib 出圖", @((Get-Newest $VAPE "via_autoplot_engine_chartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
-        $stages += , @("A3 VAP selftest 全譜", @((Get-Newest $VAPE "via_autoplot_seaborn_plotly_v0*.py"), "selftest"), $Root)
+        $stages += , @("A2 VAP chartlib 出圖", @((Get-Newest $VAPE "VAP_ENG001_AutoplotEngineChartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
+        $stages += , @("A3 VAP selftest 全譜", @((Get-Newest $VAPE "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "selftest"), $Root)
     }
 }
 
@@ -83,3 +93,4 @@ $ev = Join-Path $evDir ("vapvdf_all_{0}.json" -f (Get-Date -Format "yyyyMMdd_HHm
 } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $ev -Encoding UTF8
 Write-Host ("  存證:{0}" -f $ev)
 exit $nFail
+

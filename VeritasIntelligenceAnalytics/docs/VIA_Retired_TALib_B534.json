@@ -1,0 +1,95 @@
+{
+ "schema": "VIA.RetireManifest.v1",
+ "batch": "批534",
+ "ts": "2026-09-16 16:22",
+ "reason": "政策 L50(批531):QuantGuard 為唯一活動技術分析/因子路徑;TA-Lib 不得安裝、import、載入、復活或掛入活動路由。歷史 L36/L41/L42 標記 SUPERSEDED。",
+ "how_removed": "commit fd51913f(B526 Manus AI)直接 delete,未進 functional modules/VIA_RetiredEngines/,亦無退役冊 → 批534 補記(只增不減要有帳;LL54)",
+ "recover": "git show fd51913f^:'<path>' 可取回任一版;**取回僅供稽核,禁止掛回活動路由**(L50)",
+ "removed_paths": [
+  ".../functional modules/TALib/README.md",
+  ".../TALib/VIA_TALib_OneEngine.via.config.json",
+  ".../TALib/VIA_TALib_Policy_v0100.json",
+  ".../TALib/VIA_TALib_requirements.via.txt",
+  ".../Invoke-VIA-TALib-OneEngine.ps1",
+  ".../VIA_TALib_OneEngine_v0100/MIGRATION_MATRIX.md",
+  ".../VIA_TALib_OneEngine_v0100/README.md",
+  ".../VIA_TALib_OneEngine_v0100/TEST_REPORT.md",
+  ".../VIA_TALib_OneEngine.config.json",
+  ".../VIA_TALib_OneEngine.py",
+  ".../VIA_TALib_OneEngine_v0100/requirements.txt",
+  ".../ssot/VIA_TALib_Registry.json",
+  ".../ssot/talib_indicators_classification.md",
+  ".../tests/test_via_talib_one_engine.py",
+  ".../TALib/ssot/talib_indicators_classification.md",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/__init__.py",
+  ".../talib/_abstract.pxi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_common.pxi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_func.pxi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_stream.pxi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_ta_lib.c",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_ta_lib.pxd",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_ta_lib.pyi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/_ta_lib.pyx",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/abstract.py",
+  ".../talib/abstract.pyi",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/common.pxd",
+  ".../talib/deprecated.py",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/py.typed",
+  ".../TA-Lib-ta-lib-python-2384b72/talib/stream.py",
+  ".../tools/build_talib_linux.sh",
+  ".../tools/build_talib_macos.sh",
+  ".../tools/build_talib_windows.cmd",
+  ".../tools/perf_talib.py",
+  ".../tools/threads_talib.py",
+  ".../VDF/engine/VDF_ENG083_TALibOneBridge_v0100.py",
+  ".../VDF/engine/VDF_ENG083_TALibOneBridge_v0101.py",
+  ".../VDF/engine/VDF_ENG083_TALibOneBridge_v0102.py",
+  ".../VDF/engine/VDF_ENG083_TALibOneBridge_v0103.py"
+ ],
+ "successor": "VDF_ENG086_QuantGuardOneBridge(正主橋)+ 收容件 VIA_QuantGuard_v20260916",
+ "retired_match": [
+  "talib",
+  "ta-lib",
+  "ta lib"
+ ],
+ "batch_note_b538": "批538:+retired_match/successor(只增不減);CGC_MDL091 v0101 依此把退役件一律判 missing(即使本境 import 得到 talib——那是我裝來稽核用的,不是活動路由)",
+ "successor_ref": {
+  "zh": "VDF_ENG086_QuantGuardOneBridge(正主橋)+ 收容件 VIA_QuantGuard_v20260916",
+  "dir": "functional modules/VDF/engine",
+  "glob": "VDF_ENG086_QuantGuardOneBridge_v*.py",
+  "note": "批538:批534 的 successor 是給人看的一句話;這一筆是給稽核器查樹用的(dir+glob 尾版律)。憲章原文零觸碰,接班關係記在退役冊這一側。"
+ },
+ "wave2_b539": {
+  "ts": "2026-09-17 05:22",
+  "order": "操作員令(批539):「禁止使用 TA-LIB 將 TA-LIB 刪除 該境改用 QUANTGUARD」",
+  "why": "批534 只刪了檔,**接線沒拔乾淨**:名冊、站點、稽核冊、家族成員、工具階梯還指著已不存在的 CGC_MDL151 / VDF_ENG083 / VAP_ENG004_TAFactory / VDF_ENG048_TAFactory。留著的後果不是「缺件誠實」,是把人帶回退役路——操作員今天貼回一份含 `pip install TA-Lib` 與 `via-taone` 的舊區塊,而那些短令與引擎早就不存在了。",
+  "cut": [
+   {
+    "where": "VIA_SYSTEM_MANAGER v0140",
+    "what": "ENGINE_NAMES 拔掉 CGC_MDL151_TaLibGate / VDF_ENG083_TALibOneBridge / VAP_ENG004_TAFactory / VDF_ENG048_TAFactory 四筆"
+   },
+   {
+    "where": "CGC_MDL064_SelftestGrid v0319",
+    "what": "拔掉四個指向已刪引擎的 TA 站(233→229 站);技術分析只留 QuantGuard 正主橋八檢"
+   },
+   {
+    "where": "CGC_MDL118_PlotDataLaw v0102",
+    "what": "稽核冊兩個 TA 工廠目標 → 改列 VDF_ENG086 QuantGuard 正主橋"
+   },
+   {
+    "where": "CGC_MDL152_VtmraGate v0102",
+    "what": "家族拔掉 talib / talib_one 兩員(八員→六員);verdict 一併拔掉『talib 軟缺席=YELLOW』豁免,不留後門給不存在的成員"
+   },
+   {
+    "where": "SUP_MDL742_ToolLadder v0102 + VIA_Tool_Escalation_Ladder",
+    "what": "TA_INDICATOR 兩級(lv1 已刪的 TAFactory、lv2 talib C 庫)→ 單級 QuantGuard;舊級原文存 retired_rungs_b539"
+   },
+   {
+    "where": "本境 python",
+    "what": "pip uninstall TA-Lib(0.8.0)——那是我先前為了稽核自己裝的,L50 明令不得安裝;拔掉後稽核器不會再把它讀成『在位』"
+   }
+  ],
+  "successor_now": "VDF_ENG086_QuantGuardOneBridge(via-quantguard;動詞 status|probe|run|selftest)",
+  "law": "L50:QuantGuard 為唯一活動技術分析/因子路徑;TA-Lib 不得安裝、import、載入、復活或掛入活動路由。"
+ }
+}

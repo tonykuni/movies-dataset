@@ -1,0 +1,55 @@
+{
+ "schema": "vdf-twequity-dailyrow-schema-v1",
+ "source": "批104 操作員核定 header(2026-08-23):Date·ticker·yfinance ticker·bloomberg ticker·name·open low high close volume turnover·三大法人買賣超·融資融券·券資比·融資維持率·融券維持率·當沖交易·當沖比;yfinance 抓 Date·yfinance ticker·name·close·adj close·volume 然後串成一行;加權指數/櫃買指數都用 TWSE/TPEX 存另一資料庫",
+ "policy": "一檔一日=一行(TWSE/TPEX 官方段+yfinance 段串成同一行);ticker 三碼對照(FQ-09 T+1 ASOF JOIN 紀律);零刪除=欄只增不減",
+ "join_keys": ["date", "ticker"],
+ "yfinance_join": {"on": ["date", "yfinance_ticker"], "discipline": "ASOF JOIN;籌碼類 T+1 可用性依 FQ-09"},
+ "columns": [
+  {"name": "date", "zh": "日期", "dtype": "DATE", "source": "TWSE/TPEX", "required": true},
+  {"name": "ticker", "zh": "台股代碼", "dtype": "VARCHAR", "source": "TWSE/TPEX", "required": true},
+  {"name": "yfinance_ticker", "zh": "yfinance 代碼(####.TW/.TWO)", "dtype": "VARCHAR", "source": "VDF 對照(TW_YFINANCE_REGEX)", "required": true},
+  {"name": "bloomberg_ticker", "zh": "Bloomberg 代碼(#### TT)", "dtype": "VARCHAR", "source": "VDF 對照(TW_BLOOMBERG_REGEX)", "required": true},
+  {"name": "name", "zh": "名稱", "dtype": "VARCHAR", "source": "TWSE/TPEX 官方冊", "required": true},
+  {"name": "open", "zh": "開盤", "dtype": "DOUBLE", "source": "TWSE STOCK_DAY_ALL / TPEX daily close", "required": true},
+  {"name": "low", "zh": "最低", "dtype": "DOUBLE", "source": "TWSE/TPEX", "required": true},
+  {"name": "high", "zh": "最高", "dtype": "DOUBLE", "source": "TWSE/TPEX", "required": true},
+  {"name": "close", "zh": "收盤", "dtype": "DOUBLE", "source": "TWSE/TPEX", "required": true},
+  {"name": "volume", "zh": "成交量(股)", "dtype": "BIGINT", "source": "TWSE/TPEX", "required": true},
+  {"name": "turnover", "zh": "成交值", "dtype": "DOUBLE", "source": "TWSE/TPEX", "required": true},
+  {"name": "inst_foreign_net", "zh": "外資買賣超", "dtype": "BIGINT", "source": "TWSE T86(FQ-01;T+1)", "required": false},
+  {"name": "inst_trust_net", "zh": "投信買賣超", "dtype": "BIGINT", "source": "TWSE T86(FQ-01;T+1)", "required": false},
+  {"name": "inst_dealer_net", "zh": "自營商買賣超", "dtype": "BIGINT", "source": "TWSE T86(FQ-01;T+1)", "required": false},
+  {"name": "inst_total_net", "zh": "三大法人合計買賣超", "dtype": "BIGINT", "source": "VDF 推導(三欄加總)", "required": false},
+  {"name": "margin_balance", "zh": "融資餘額", "dtype": "BIGINT", "source": "TWSE MI_MARGN(FQ-02;T+1)", "required": false},
+  {"name": "short_balance", "zh": "融券餘額", "dtype": "BIGINT", "source": "TWSE MI_MARGN(FQ-02;T+1)", "required": false},
+  {"name": "short_to_margin_ratio", "zh": "券資比", "dtype": "DOUBLE", "source": "VDF 推導(FQ-03)", "required": false},
+  {"name": "margin_maintenance_ratio", "zh": "融資維持率", "dtype": "DOUBLE", "source": "VDF 推導(FQ-03;非 TWSE 原生=以融資餘額成本基礎推估,帶 isEstimate)", "required": false},
+  {"name": "short_maintenance_ratio", "zh": "融券維持率", "dtype": "DOUBLE", "source": "VDF 推導(FQ-03;推估標記同上)", "required": false},
+  {"name": "day_trade_volume", "zh": "當沖成交量", "dtype": "BIGINT", "source": "TWSE 當沖統計(FQ-04)", "required": false},
+  {"name": "day_trade_value", "zh": "當沖成交值", "dtype": "DOUBLE", "source": "TWSE 當沖統計(FQ-04)", "required": false},
+  {"name": "day_trade_ratio", "zh": "當沖比", "dtype": "DOUBLE", "source": "TWSE 當沖統計(FQ-04)", "required": false},
+  {"name": "yf_close", "zh": "yfinance 收盤", "dtype": "DOUBLE", "source": "yfinance(串行段)", "required": false},
+  {"name": "yf_adj_close", "zh": "yfinance 還原收盤", "dtype": "DOUBLE", "source": "yfinance(串行段;Adj 優先原則)", "required": false},
+  {"name": "yf_volume", "zh": "yfinance 成交量", "dtype": "BIGINT", "source": "yfinance(串行段)", "required": false}
+ ],
+ "database": {
+  "equity_db": "VDF_TWEquity_Daily.duckdb(路徑=DYNAMIC 自 VIA 根 output_hub;嚴禁寫死)",
+  "table": "tw_equity_daily",
+  "formats": ["parquet", "csv", "duckdb", "sqlite", "sql"]
+ },
+ "indices": {
+  "separate_database": true,
+  "db": "VDF_TWIndex_Daily.duckdb(獨立庫=批104 令;路徑 DYNAMIC)",
+  "table": "tw_index_daily",
+  "source_rule": "加權指數(TAIEX)用 TWSE 官方、櫃買指數(OTC)用 TPEX 官方;不以 ^TWII/^TWOII yfinance 值冒充官方層(權威層級:官方>代理)",
+  "columns": ["date", "index_code", "index_name", "open", "low", "high", "close", "volume", "turnover", "inst_foreign_net", "inst_trust_net", "inst_dealer_net"]
+ },
+ "validation": {
+  "universe_autolist": "台股個股自動清單=FN-00(TWSE t187ap03_L + TPEX mopsfin_t187ap03_O 全上市櫃);狀態=待驗證(批104);實連比對候工作站/via-net 同意閘",
+  "active_etf_roster": "37 檔主動式 ETF 清冊自動驗證維護=ENG046 --sync-etf + TWSE OpenAPI 實連驗證(候工作站)",
+  "honesty": "容器側零外呼;所有 verified=false 直到實連驗證波;模擬值強制 _SIM 後綴"
+ },
+ "changelog": [
+  {"ts": "2026-08-23", "op": "INIT", "note": "批104 header 令落冊;欄序依操作員原文 open low high close"}
+ ]
+}

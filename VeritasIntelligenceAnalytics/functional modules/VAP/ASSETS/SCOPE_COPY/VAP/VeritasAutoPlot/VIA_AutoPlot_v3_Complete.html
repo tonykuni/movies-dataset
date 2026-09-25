@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA AutoPlot v3.0 - Professional Financial Charting</title>
+    
+    <!-- Plotly.js for charting -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIA AUTOPLOT v3.0 COMPLETE
+   
+   PARAMETERS (Top Only - All configurable values)
+   
+   def CRITICAL RULES:
+   1. Price data: Forward fill (ffill) for holidays/missing days
+   2. Volume data: NO fill - avoid double counting
+   3. MA periods: Based on TRADING DAYS, not calendar days
+   4. Different market holidays (TW Chinese New Year vs US) → unified timeline
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* def Theme Colors */
+    --bg-0: #0b0f14;
+    --bg-1: #111825;
+    --bg-2: #1a2332;
+    --bg-3: #243042;
+    --bg-hover: rgba(255,255,255,0.04);
+    --bg-active: rgba(255,255,255,0.08);
+    --bg-selected: rgba(59,130,246,0.15);
+    
+    --text-0: #e9eef7;
+    --text-1: #c8d1e0;
+    --text-2: #8b9ab5;
+    --text-3: #5a6a85;
+    
+    --border: #223046;
+    --border-light: #2d3f5a;
+    
+    /* def Accent Colors */
+    --blue: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --purple: #8b5cf6;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+    --lime: #84cc16;
+    
+    /* def Candlestick Colors */
+    --candle-up: #26a69a;
+    --candle-down: #ef5350;
+    --candle-up-fill: rgba(38,166,154,0.8);
+    --candle-down-fill: rgba(239,83,80,0.8);
+    
+    /* def MA Line Colors */
+    --ma5: #f59e0b;
+    --ma10: #3b82f6;
+    --ma20: #8b5cf6;
+    --ma60: #ec4899;
+    --ma120: #06b6d4;
+    --ma240: #84cc16;
+    
+    /* def Bollinger Bands */
+    --bb-line: rgba(139,92,246,0.6);
+    --bb-fill: rgba(139,92,246,0.1);
+    
+    /* def Layout */
+    --sidebar-w: 360px;
+    --header-h: 56px;
+    --radius: 14px;
+    --radius-sm: 8px;
+    
+    /* def Typography */
+    --font-sans: 'Inter', 'Noto Sans TC', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* def Animation */
+    --anim: 150ms ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BASE STYLES
+═══════════════════════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    background: var(--bg-0);
+    color: var(--text-0);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--header-h) 1fr;
+    height: 100vh;
+}
+
+/* Header */
+.header {
+    grid-column: 1 / -1;
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+
+.logo-text { font-weight: 700; font-size: 16px; }
+.logo-version { 
+    font-size: 10px; 
+    color: var(--text-3); 
+    font-family: var(--font-mono);
+    background: var(--bg-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.header-sep { width: 1px; height: 32px; background: var(--border); }
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-2);
+}
+
+.status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.header-actions { margin-left: auto; display: flex; gap: 10px; }
+
+/* Buttons */
+.btn {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--anim);
+    font-family: var(--font-sans);
+}
+
+.btn:hover { background: var(--bg-3); border-color: var(--border-light); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: white; }
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.success { background: var(--green); border-color: var(--green); color: white; }
+.btn.danger { background: var(--red); border-color: var(--red); color: white; }
+.btn.icon-only { padding: 10px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Sidebar */
+.sidebar {
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-title {
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+}
+
+/* Form Sections */
+.form-section {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: var(--bg-2);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.form-section-title {
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.form-row.full { grid-template-columns: 1fr; }
+.form-row:last-child { margin-bottom: 0; }
+
+.form-group { margin-bottom: 12px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    margin-bottom: 6px;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-0);
+    font-size: 13px;
+    font-family: var(--font-sans);
+    transition: all var(--anim);
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.form-input::placeholder { color: var(--text-3); }
+.form-select { cursor: pointer; }
+
+.form-hint {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 5px;
+    font-family: var(--font-mono);
+}
+
+.form-hint.warning { color: var(--orange); }
+.form-hint.success { color: var(--green); }
+
+/* Toggle Switch */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.toggle-row:last-child { border-bottom: none; }
+
+.toggle-label { 
+    font-size: 12px; 
+    color: var(--text-1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle {
+    width: 44px; height: 24px;
+    background: var(--bg-3);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--anim);
+}
+
+.toggle.active { background: var(--green); }
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px; left: 2px;
+    transition: left var(--anim);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle.active::after { left: 22px; }
+
+/* Template Cards */
+.template-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.template-card {
+    padding: 14px;
+    background: var(--bg-1);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    transition: all var(--anim);
+}
+
+.template-card:hover { 
+    border-color: var(--border-light); 
+    transform: translateY(-2px);
+}
+
+.template-card.active { 
+    border-color: var(--blue); 
+    background: var(--bg-selected);
+    box-shadow: 0 4px 12px rgba(59,130,246,0.2);
+}
+
+.template-icon { font-size: 28px; margin-bottom: 8px; }
+.template-name { font-weight: 700; font-size: 12px; }
+.template-desc { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+
+/* Main Content */
+.main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-0);
+}
+
+/* Chart Container */
+.chart-wrapper {
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+}
+
+.chart-panel {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+}
+
+.chart-panel.main { flex: 3; min-height: 300px; }
+.chart-panel.volume { flex: 1; min-height: 100px; max-height: 160px; }
+
+.chart-panel-title {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    z-index: 10;
+    background: var(--bg-1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Stats Panel */
+.stats-panel {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+}
+
+.stat-card {
+    padding: 14px;
+    background: var(--bg-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+.stat-label { 
+    font-size: 10px; 
+    color: var(--text-3); 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.stat-value { 
+    font-size: 20px; 
+    font-weight: 700; 
+    color: var(--text-0); 
+    font-family: var(--font-mono);
+}
+
+.stat-change { font-size: 11px; margin-top: 4px; }
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+.stat-change.neutral { color: var(--text-2); }
+
+/* Logs Panel */
+.logs-panel {
+    padding: 14px;
+    background: var(--bg-0);
+    border-top: 1px solid var(--border);
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.logs-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-line {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.log-line:last-child { border-bottom: none; }
+.log-line .time { color: var(--text-3); }
+.log-line .ok { color: var(--green); font-weight: 600; }
+.log-line .warn { color: var(--orange); font-weight: 600; }
+.log-line .error { color: var(--red); font-weight: 600; }
+.log-line .info { color: var(--blue); font-weight: 600; }
+
+/* Quick Presets */
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.preset-btn {
+    padding: 8px;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 10px;
+    color: var(--text-1);
+    cursor: pointer;
+    text-align: center;
+    transition: all var(--anim);
+}
+
+.preset-btn:hover { 
+    background: var(--bg-hover); 
+    border-color: var(--border-light);
+}
+
+/* Axis Indicator */
+.axis-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+}
+
+.axis-badge.left { background: rgba(59,130,246,0.2); color: var(--blue); }
+.axis-badge.right { background: rgba(139,92,246,0.2); color: var(--purple); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .stats-panel { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1100px) {
+    .app { grid-template-columns: 320px 1fr; }
+    .stats-panel { grid-template-columns: repeat(2, 1fr); }
+}
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">VIA</div>
+            <span class="logo-text">AutoPlot</span>
+            <span class="logo-version">v3.0</span>
+        </div>
+        
+        <div class="header-sep"></div>
+        
+        <div class="header-status">
+            <div class="status-dot"></div>
+            <span>Ready</span>
+        </div>
+        
+        <div class="header-actions">
+            <button class="btn" onclick="exportCSV()" title="Export Data">📥 Export</button>
+            <button class="btn success" onclick="runSelfTest()" title="Run Self-Test">🧪 Self-Test</button>
+            <button class="btn primary" onclick="generateChart()" title="Generate Chart">▶ Generate</button>
+        </div>
+    </header>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">📊 Chart Builder</div>
+        </div>
+        
+        <div class="sidebar-body">
+            <!-- Template Selection -->
+            <div class="form-section">
+                <div class="form-section-title">📋 Template</div>
+                <div class="template-grid">
+                    <div class="template-card active" data-template="tech" onclick="selectTemplate('tech')">
+                        <div class="template-icon">📈</div>
+                        <div class="template-name">Technical</div>
+                        <div class="template-desc">K線+MA+BB+Volume</div>
+                    </div>
+                    <div class="template-card" data-template="compare" onclick="selectTemplate('compare')">
+                        <div class="template-icon">⚖️</div>
+                        <div class="template-name">Compare</div>
+                        <div class="template-desc">雙軸+相關+領先</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Time Range -->
+            <div class="form-section">
+                <div class="form-section-title">📅 Time Range</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-input" id="startDate" value="2023-01-01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-input" id="endDate">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LEFT AXIS -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="axis-badge left">L</span> Left Axis (Primary)
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Symbol / Ticker</label>
+                    <input type="text" class="form-input" id="leftSymbol" value="2330.TW" placeholder="e.g., 2330.TW, AAPL, ^TWII">
+                    <div class="form-hint">台積電 TSMC</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Data Type</label>
+                        <select class="form-select" id="leftKind">
+                            <option value="price">Price (Adj Close)</option>
+                            <option value="close">Close (原始)</option>
+                            <option value="ohlc">OHLC (K線)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Frequency</label>
+                        <select class="form-select" id="leftFreq">
+                            <option value="d">Daily</option>
+                            <option value="w">Weekly</option>
+                            <option value="m">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT AXIS -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="axis-badge right">R</span> Right Axis (Compare)
+                </div>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">Enable Right Axis</span>
+                    <div class="toggle active" id="rightToggle" onclick="toggleRightAxis()"></div>
+                </div>
+                
+                <div id="rightAxisFields">
+                    <div class="form-group">
+                        <label class="form-label">Symbol / Ticker</label>
+                        <input type="text" class="form-input" id="rightSymbol" value="^TWII" placeholder="e.g., ^TWII, ^GSPC, VIX">
+                        <div class="form-hint">台灣加權指數</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Data Type</label>
+                            <select class="form-select" id="rightKind">
+                                <option value="price">Price (Adj Close)</option>
+                                <option value="close">Close (原始)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" id="rightFreq">
+                                <option value="d">Daily</option>
+                                <option value="w">Weekly</option>
+                                <option value="m">Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Technical Indicators -->
+            <div class="form-section">
+                <div class="form-section-title">📐 Indicators (Default Values)</div>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">📊 Moving Averages</span>
+                    <div class="toggle active" id="maToggle" onclick="toggleIndicator('ma')"></div>
+                </div>
+                <div class="form-hint">MA(5,10,20,60,120,240) Trading Days</div>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">📈 Bollinger Bands</span>
+                    <div class="toggle active" id="bbToggle" onclick="toggleIndicator('bb')"></div>
+                </div>
+                <div class="form-hint">BB(20, 2σ)</div>
+                
+                <div class="toggle-row">
+                    <span class="toggle-label">📊 Volume Panel</span>
+                    <div class="toggle active" id="volToggle" onclick="toggleIndicator('vol')"></div>
+                </div>
+                <div class="form-hint warning">⚠️ Volume 不補值（避免 double count）</div>
+            </div>
+            
+            <!-- Quick Presets -->
+            <div class="form-section">
+                <div class="form-section-title">⚡ Quick Presets</div>
+                <div class="preset-grid">
+                    <div class="preset-btn" onclick="loadPreset('tsmc')">🇹🇼 TSMC</div>
+                    <div class="preset-btn" onclick="loadPreset('twii')">📊 TWII</div>
+                    <div class="preset-btn" onclick="loadPreset('sp500')">🇺🇸 S&P500</div>
+                    <div class="preset-btn" onclick="loadPreset('cement')">🏗️ 台泥</div>
+                    <div class="preset-btn" onclick="loadPreset('auras')">💡 翔名</div>
+                    <div class="preset-btn" onclick="loadPreset('vix')">⚡ VIX</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main">
+        <div class="chart-wrapper">
+            <div class="chart-panel main" id="mainChartPanel">
+                <div class="chart-panel-title">Price Chart</div>
+                <div id="mainChart" style="width:100%;height:100%"></div>
+            </div>
+            <div class="chart-panel volume" id="volumeChartPanel">
+                <div class="chart-panel-title">Volume (No Interpolation)</div>
+                <div id="volumeChart" style="width:100%;height:100%"></div>
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">Latest Price</div>
+                <div class="stat-value" id="statPrice">--</div>
+                <div class="stat-change neutral" id="statPriceChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Correlation</div>
+                <div class="stat-value" id="statCorr">--</div>
+                <div class="stat-change neutral">Left vs Right</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Best Lag</div>
+                <div class="stat-value" id="statLag">--</div>
+                <div class="stat-change neutral" id="statLagNote">days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Data Points</div>
+                <div class="stat-value" id="statRows">--</div>
+                <div class="stat-change neutral">Trading days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Aligned Days</div>
+                <div class="stat-value" id="statAligned">--</div>
+                <div class="stat-change neutral" id="statAlignedNote">TW+US unified</div>
+            </div>
+        </div>
+        
+        <div class="logs-panel">
+            <div class="logs-title">📋 System Logs</div>
+            <div id="logsContainer"></div>
+        </div>
+    </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIA AUTOPLOT v3.0 ENGINE
+// 
+// def CRITICAL RULES:
+// 1. Price: ffill for holidays → continuous timeline
+// 2. Volume: NO fill → avoid double counting
+// 3. MA: Based on TRADING DAYS only
+// 4. Different market holidays → unified calendar
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// def CONFIGURATION
+const CONFIG = {
+    // def Technical Indicators (Default Values)
+    MA_PERIODS: [5, 10, 20, 60, 120, 240],
+    BB_PERIOD: 20,
+    BB_STD: 2,
+    
+    // def Timeline Alignment
+    ALIGN_CALENDAR: 'D',
+    WEEK_ANCHOR: 'FRI',
+    
+    // def Fill Policy (CRITICAL!)
+    PRICE_FILL: 'ffill',     // Forward fill for price
+    VOLUME_FILL: 'none',     // NO fill for volume - avoid double counting!
+    
+    // def Lead/Lag Analysis
+    MAX_LAG_DAYS: 60,
+    MIN_CORRELATION_POINTS: 30,
+    
+    // def Chart Colors
+    COLORS: {
+        candleUp: '#26a69a',
+        candleDown: '#ef5350',
+        leftLine: '#3b82f6',
+        rightLine: '#8b5cf6',
+        ma5: '#f59e0b',
+        ma10: '#3b82f6',
+        ma20: '#8b5cf6',
+        ma60: '#ec4899',
+        ma120: '#06b6d4',
+        ma240: '#84cc16',
+        bbLine: 'rgba(139,92,246,0.5)',
+        bbFill: 'rgba(139,92,246,0.1)',
+        volumeUp: 'rgba(38,166,154,0.7)',
+        volumeDown: 'rgba(239,83,80,0.7)'
+    },
+    
+    // def Demo Settings
+    DEMO_DAYS: 600
+};
+
+// def STATE
+const STATE = {
+    template: 'tech',
+    rightAxisEnabled: true,
+    indicators: { ma: true, bb: true, vol: true },
+    data: {
+        left: null,
+        right: null,
+        aligned: null,
+        volume: null
+    },
+    analytics: {
+        corr: null,
+        bestLag: null
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    log('INFO', 'VIA AutoPlot v3.0 initialized');
+    log('INFO', 'Critical: Price=ffill, Volume=NO fill');
+    
+    // Set default end date
+    document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
+    
+    // Render empty charts
+    renderEmptyCharts();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOGGING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function log(type, message) {
+    const container = document.getElementById('logsContainer');
+    const time = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+    const typeClass = type.toLowerCase();
+    
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML = `<span class="time">[${time}]</span> <span class="${typeClass}">[${type}]</span> ${message}`;
+    
+    container.insertBefore(line, container.firstChild);
+    
+    // Keep only last 100 logs
+    while (container.children.length > 100) {
+        container.removeChild(container.lastChild);
+    }
+    
+    console.log(`[${type}] ${message}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI CONTROLS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function selectTemplate(template) {
+    STATE.template = template;
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.template === template);
+    });
+    log('INFO', `Template: ${template}`);
+}
+
+function toggleRightAxis() {
+    const toggle = document.getElementById('rightToggle');
+    const fields = document.getElementById('rightAxisFields');
+    STATE.rightAxisEnabled = !STATE.rightAxisEnabled;
+    toggle.classList.toggle('active', STATE.rightAxisEnabled);
+    fields.style.display = STATE.rightAxisEnabled ? 'block' : 'none';
+}
+
+function toggleIndicator(type) {
+    const toggle = document.getElementById(`${type}Toggle`);
+    STATE.indicators[type] = !STATE.indicators[type];
+    toggle.classList.toggle('active', STATE.indicators[type]);
+}
+
+function loadPreset(preset) {
+    const presets = {
+        'tsmc': { left: '2330.TW', right: '^TWII', hint: '台積電 vs 加權指數' },
+        'twii': { left: '^TWII', right: '^GSPC', hint: 'TWII vs S&P500' },
+        'sp500': { left: '^GSPC', right: '^VIX', hint: 'S&P500 vs VIX' },
+        'cement': { left: '1101.TW', right: '^TWII', hint: '台泥 vs 加權指數' },
+        'auras': { left: '3324.TWO', right: '^TWII', hint: '翔名 vs 加權指數' },
+        'vix': { left: '^VIX', right: '^GSPC', hint: 'VIX vs S&P500' }
+    };
+    
+    const p = presets[preset];
+    if (p) {
+        document.getElementById('leftSymbol').value = p.left;
+        document.getElementById('rightSymbol').value = p.right;
+        log('INFO', `Preset loaded: ${p.hint}`);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA GENERATION (Demo Mode with realistic patterns)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function generateDemoOHLCV(symbol, startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const data = [];
+    
+    // Seeded random for consistent demo data
+    let seed = symbol.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    const random = () => {
+        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+        return seed / 0x7fffffff;
+    };
+    
+    // Base price based on symbol
+    let basePrice = symbol.includes('2330') ? 550 : 
+                   symbol.includes('1101') ? 42 :
+                   symbol.includes('3324') ? 180 :
+                   symbol.includes('^TWII') ? 17500 :
+                   symbol.includes('^GSPC') ? 4800 :
+                   symbol.includes('^VIX') ? 18 : 100;
+    
+    let price = basePrice;
+    let baseVolume = symbol.includes('^') ? 0 : 15000000; // Indices have no volume
+    let volume = baseVolume;
+    
+    // TW market holidays (Chinese New Year approximation)
+    const twHolidays = new Set();
+    for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+        // Chinese New Year (approximate dates)
+        for (let d = 20; d <= 28; d++) {
+            twHolidays.add(`${y}-01-${String(d).padStart(2,'0')}`);
+            twHolidays.add(`${y}-02-${String(d).padStart(2,'0')}`);
+        }
+    }
+    
+    // Generate trading days
+    let current = new Date(start);
+    while (current <= end) {
+        const dayOfWeek = current.getDay();
+        const dateStr = current.toISOString().split('T')[0];
+        const isTW = symbol.includes('.TW') || symbol.includes('.TWO') || symbol.includes('^TWII');
+        
+        // Skip weekends
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            current.setDate(current.getDate() + 1);
+            continue;
+        }
+        
+        // Skip TW holidays for TW stocks
+        if (isTW && twHolidays.has(dateStr)) {
+            current.setDate(current.getDate() + 1);
+            continue;
+        }
+        
+        // Random walk with trend
+        const trend = 0.0002; // slight upward bias
+        const volatility = symbol.includes('^VIX') ? 0.04 : 0.018;
+        const change = (random() - 0.5 + trend) * basePrice * volatility;
+        price = Math.max(price * 0.8, Math.min(price * 1.2, price + change));
+        
+        // OHLC generation
+        const dayRange = price * (0.005 + random() * 0.015);
+        const open = price * (1 + (random() - 0.5) * 0.008);
+        const close = price;
+        const high = Math.max(open, close) + dayRange * random();
+        const low = Math.min(open, close) - dayRange * random();
+        
+        // Volume with variation (0 for indices)
+        if (baseVolume > 0) {
+            volume = baseVolume * (0.5 + random() * 1.0);
+        } else {
+            volume = 0;
+        }
+        
+        data.push({
+            Date: dateStr,
+            Open: parseFloat(open.toFixed(2)),
+            High: parseFloat(high.toFixed(2)),
+            Low: parseFloat(low.toFixed(2)),
+            Close: parseFloat(close.toFixed(2)),
+            AdjClose: parseFloat(close.toFixed(2)),
+            Volume: Math.round(volume)
+        });
+        
+        current.setDate(current.getDate() + 1);
+    }
+    
+    return data;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TIMELINE ALIGNMENT (Critical for TW/US markets)
+// 
+// def Rules:
+// 1. Create unified daily calendar
+// 2. Price: Forward fill (ffill) for missing days
+// 3. Volume: NO fill - keep null for non-trading days
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function alignTimelines(leftData, rightData, leftKind, rightKind) {
+    log('INFO', 'Aligning timelines (Price=ffill, Volume=NO fill)...');
+    
+    // Create unified date set
+    const allDates = new Set();
+    leftData.forEach(d => allDates.add(d.Date));
+    if (rightData) rightData.forEach(d => allDates.add(d.Date));
+    
+    const sortedDates = Array.from(allDates).sort();
+    log('INFO', `Unified calendar: ${sortedDates.length} days`);
+    
+    // Create lookup maps
+    const leftMap = new Map(leftData.map(d => [d.Date, d]));
+    const rightMap = rightData ? new Map(rightData.map(d => [d.Date, d])) : null;
+    
+    // Align with fill policy
+    const aligned = [];
+    let lastLeft = null;
+    let lastRight = null;
+    let filledLeftCount = 0;
+    let filledRightCount = 0;
+    
+    for (const date of sortedDates) {
+        const leftRow = leftMap.get(date);
+        const rightRow = rightMap ? rightMap.get(date) : null;
+        
+        const row = { Date: date };
+        
+        // Left axis data
+        if (leftRow) {
+            lastLeft = leftRow;
+            row.L_Open = leftRow.Open;
+            row.L_High = leftRow.High;
+            row.L_Low = leftRow.Low;
+            row.L_Close = leftRow.Close;
+            row.L_AdjClose = leftRow.AdjClose;
+            // Volume: actual trading day value only
+            row.L_Volume = leftRow.Volume;
+            row.L_IsTradingDay = true;
+        } else if (lastLeft) {
+            // Forward fill PRICE only (not volume!)
+            row.L_Open = lastLeft.Open;
+            row.L_High = lastLeft.High;
+            row.L_Low = lastLeft.Low;
+            row.L_Close = lastLeft.Close;
+            row.L_AdjClose = lastLeft.AdjClose;
+            row.L_Volume = null; // NO fill for volume!
+            row.L_IsTradingDay = false;
+            filledLeftCount++;
+        }
+        
+        // Right axis data
+        if (rightRow) {
+            lastRight = rightRow;
+            row.R_Close = rightRow.Close;
+            row.R_AdjClose = rightRow.AdjClose;
+            row.R_Volume = rightRow.Volume;
+            row.R_IsTradingDay = true;
+        } else if (lastRight) {
+            // Forward fill PRICE only
+            row.R_Close = lastRight.Close;
+            row.R_AdjClose = lastRight.AdjClose;
+            row.R_Volume = null; // NO fill for volume!
+            row.R_IsTradingDay = false;
+            filledRightCount++;
+        }
+        
+        aligned.push(row);
+    }
+    
+    log('OK', `Aligned: ${aligned.length} days (L filled: ${filledLeftCount}, R filled: ${filledRightCount})`);
+    
+    return aligned;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TECHNICAL INDICATORS (Based on TRADING DAYS)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calculateMA(data, field, period) {
+    // MA based on trading days only (skip filled days)
+    const tradingDaysOnly = data.filter(d => d.L_IsTradingDay !== false);
+    const result = new Array(data.length).fill(null);
+    
+    // Create index mapping
+    const tradingIndices = [];
+    data.forEach((d, i) => {
+        if (d.L_IsTradingDay !== false) tradingIndices.push(i);
+    });
+    
+    // Calculate MA on trading days
+    for (let ti = 0; ti < tradingIndices.length; ti++) {
+        if (ti < period - 1) continue;
+        
+        let sum = 0;
+        let count = 0;
+        for (let j = 0; j < period; j++) {
+            const idx = tradingIndices[ti - j];
+            const val = data[idx][field];
+            if (val !== null && val !== undefined && !isNaN(val)) {
+                sum += val;
+                count++;
+            }
+        }
+        
+        if (count >= period * 0.7) {
+            result[tradingIndices[ti]] = sum / count;
+        }
+    }
+    
+    // Forward fill MA for display
+    let lastMA = null;
+    for (let i = 0; i < result.length; i++) {
+        if (result[i] !== null) {
+            lastMA = result[i];
+        } else if (lastMA !== null) {
+            result[i] = lastMA;
+        }
+    }
+    
+    return result;
+}
+
+function calculateBB(data, field, period, stdDev) {
+    const ma = calculateMA(data, field, period);
+    const upper = new Array(data.length).fill(null);
+    const lower = new Array(data.length).fill(null);
+    
+    // Get trading day indices
+    const tradingIndices = [];
+    data.forEach((d, i) => {
+        if (d.L_IsTradingDay !== false) tradingIndices.push(i);
+    });
+    
+    for (let ti = period - 1; ti < tradingIndices.length; ti++) {
+        const idx = tradingIndices[ti];
+        if (ma[idx] === null) continue;
+        
+        // Calculate std dev
+        let sumSq = 0;
+        let count = 0;
+        for (let j = 0; j < period; j++) {
+            const jIdx = tradingIndices[ti - j];
+            const val = data[jIdx][field];
+            if (val !== null && val !== undefined && !isNaN(val)) {
+                sumSq += Math.pow(val - ma[idx], 2);
+                count++;
+            }
+        }
+        
+        if (count > 0) {
+            const std = Math.sqrt(sumSq / count);
+            upper[idx] = ma[idx] + stdDev * std;
+            lower[idx] = ma[idx] - stdDev * std;
+        }
+    }
+    
+    // Forward fill for display
+    let lastUpper = null, lastLower = null;
+    for (let i = 0; i < upper.length; i++) {
+        if (upper[i] !== null) lastUpper = upper[i];
+        else if (lastUpper !== null) upper[i] = lastUpper;
+        
+        if (lower[i] !== null) lastLower = lower[i];
+        else if (lastLower !== null) lower[i] = lastLower;
+    }
+    
+    return { ma, upper, lower };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS (Correlation & Lead/Lag)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calculateCorrelation(x, y) {
+    const pairs = [];
+    for (let i = 0; i < Math.min(x.length, y.length); i++) {
+        if (x[i] !== null && y[i] !== null && !isNaN(x[i]) && !isNaN(y[i])) {
+            pairs.push([x[i], y[i]]);
+        }
+    }
+    
+    if (pairs.length < CONFIG.MIN_CORRELATION_POINTS) return null;
+    
+    const n = pairs.length;
+    const sumX = pairs.reduce((a, p) => a + p[0], 0);
+    const sumY = pairs.reduce((a, p) => a + p[1], 0);
+    const sumXY = pairs.reduce((a, p) => a + p[0] * p[1], 0);
+    const sumX2 = pairs.reduce((a, p) => a + p[0] * p[0], 0);
+    const sumY2 = pairs.reduce((a, p) => a + p[1] * p[1], 0);
+    
+    const num = n * sumXY - sumX * sumY;
+    const den = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    
+    return den === 0 ? 0 : num / den;
+}
+
+function findBestLag(x, y, maxLag) {
+    let bestLag = 0;
+    let bestCorr = 0;
+    
+    for (let lag = -maxLag; lag <= maxLag; lag++) {
+        let xSlice, ySlice;
+        if (lag >= 0) {
+            xSlice = x.slice(lag);
+            ySlice = y.slice(0, y.length - lag || undefined);
+        } else {
+            xSlice = x.slice(0, x.length + lag);
+            ySlice = y.slice(-lag);
+        }
+        
+        const corr = calculateCorrelation(xSlice, ySlice);
+        if (corr !== null && Math.abs(corr) > Math.abs(bestCorr)) {
+            bestCorr = corr;
+            bestLag = lag;
+        }
+    }
+    
+    return { lag: bestLag, corr: bestCorr };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART RENDERING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderEmptyCharts() {
+    const emptyLayout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { family: 'Inter, sans-serif', color: '#8b9ab5' },
+        margin: { t: 40, r: 60, b: 40, l: 60 },
+        xaxis: { gridcolor: '#223046', linecolor: '#223046', showgrid: true },
+        yaxis: { gridcolor: '#223046', linecolor: '#223046', showgrid: true },
+        annotations: [{
+            text: 'Select symbols and click Generate',
+            showarrow: false,
+            font: { size: 14, color: '#5a6a85' },
+            xref: 'paper', yref: 'paper',
+            x: 0.5, y: 0.5
+        }]
+    };
+    
+    Plotly.newPlot('mainChart', [], emptyLayout, { responsive: true });
+    Plotly.newPlot('volumeChart', [], emptyLayout, { responsive: true });
+}
+
+function renderMainChart(aligned, template) {
+    const dates = aligned.map(d => d.Date);
+    const traces = [];
+    
+    const leftKind = document.getElementById('leftKind').value;
+    
+    // Candlestick or Line for left axis
+    if (leftKind === 'ohlc' && aligned[0]?.L_Open !== undefined) {
+        // Candlestick chart
+        traces.push({
+            type: 'candlestick',
+            name: document.getElementById('leftSymbol').value,
+            x: dates,
+            open: aligned.map(d => d.L_Open),
+            high: aligned.map(d => d.L_High),
+            low: aligned.map(d => d.L_Low),
+            close: aligned.map(d => d.L_Close),
+            increasing: { line: { color: CONFIG.COLORS.candleUp }, fillcolor: CONFIG.COLORS.candleUp },
+            decreasing: { line: { color: CONFIG.COLORS.candleDown }, fillcolor: CONFIG.COLORS.candleDown },
+            yaxis: 'y'
+        });
+    } else {
+        // Line chart
+        const yField = leftKind === 'close' ? 'L_Close' : 'L_AdjClose';
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            name: document.getElementById('leftSymbol').value,
+            x: dates,
+            y: aligned.map(d => d[yField]),
+            line: { color: CONFIG.COLORS.leftLine, width: 2 },
+            yaxis: 'y'
+        });
+    }
+    
+    // Technical Indicators (only for tech template)
+    if (template === 'tech') {
+        const priceField = leftKind === 'close' ? 'L_Close' : 'L_AdjClose';
+        
+        // Moving Averages
+        if (STATE.indicators.ma) {
+            const maColors = [CONFIG.COLORS.ma5, CONFIG.COLORS.ma10, CONFIG.COLORS.ma20, 
+                            CONFIG.COLORS.ma60, CONFIG.COLORS.ma120, CONFIG.COLORS.ma240];
+            
+            CONFIG.MA_PERIODS.forEach((period, idx) => {
+                const ma = calculateMA(aligned, priceField, period);
+                traces.push({
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: `MA${period}`,
+                    x: dates,
+                    y: ma,
+                    line: { color: maColors[idx], width: period > 60 ? 1 : 1.5, dash: period > 60 ? 'dot' : 'solid' },
+                    yaxis: 'y',
+                    visible: period <= 60 ? true : 'legendonly'
+                });
+            });
+        }
+        
+        // Bollinger Bands
+        if (STATE.indicators.bb) {
+            const bb = calculateBB(aligned, priceField, CONFIG.BB_PERIOD, CONFIG.BB_STD);
+            
+            traces.push({
+                type: 'scatter',
+                mode: 'lines',
+                name: 'BB Upper',
+                x: dates,
+                y: bb.upper,
+                line: { color: CONFIG.COLORS.bbLine, width: 1 },
+                yaxis: 'y'
+            });
+            
+            traces.push({
+                type: 'scatter',
+                mode: 'lines',
+                name: 'BB Lower',
+                x: dates,
+                y: bb.lower,
+                line: { color: CONFIG.COLORS.bbLine, width: 1 },
+                fill: 'tonexty',
+                fillcolor: CONFIG.COLORS.bbFill,
+                yaxis: 'y'
+            });
+        }
+    }
+    
+    // Right axis (if enabled)
+    if (STATE.rightAxisEnabled && aligned[0]?.R_AdjClose !== undefined) {
+        const rightKind = document.getElementById('rightKind').value;
+        const yField = rightKind === 'close' ? 'R_Close' : 'R_AdjClose';
+        
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            name: document.getElementById('rightSymbol').value + ' (R)',
+            x: dates,
+            y: aligned.map(d => d[yField]),
+            line: { color: CONFIG.COLORS.rightLine, width: 2 },
+            yaxis: 'y2'
+        });
+    }
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { family: 'Inter, sans-serif', color: '#8b9ab5', size: 11 },
+        margin: { t: 40, r: 70, b: 50, l: 70 },
+        showlegend: true,
+        legend: { 
+            orientation: 'h', 
+            y: 1.12, 
+            x: 0.5, 
+            xanchor: 'center',
+            bgcolor: 'rgba(17,24,37,0.8)',
+            bordercolor: '#223046',
+            borderwidth: 1
+        },
+        hovermode: 'x unified',
+        xaxis: { 
+            gridcolor: '#223046', 
+            linecolor: '#223046',
+            tickformat: '%Y-%m-%d',
+            rangeslider: { visible: false }
+        },
+        yaxis: { 
+            title: { text: document.getElementById('leftSymbol').value, font: { size: 11 } },
+            gridcolor: '#223046', 
+            linecolor: '#223046',
+            side: 'left'
+        },
+        yaxis2: {
+            title: { text: document.getElementById('rightSymbol').value, font: { size: 11 } },
+            overlaying: 'y',
+            side: 'right',
+            showgrid: false,
+            visible: STATE.rightAxisEnabled
+        }
+    };
+    
+    Plotly.newPlot('mainChart', traces, layout, { responsive: true });
+}
+
+function renderVolumeChart(aligned) {
+    if (!STATE.indicators.vol) {
+        Plotly.purge('volumeChart');
+        return;
+    }
+    
+    // Filter to actual trading days only (Volume != null)
+    const tradingDays = aligned.filter(d => d.L_Volume !== null && d.L_Volume > 0);
+    
+    if (tradingDays.length === 0) {
+        log('WARN', 'No volume data available');
+        return;
+    }
+    
+    const dates = tradingDays.map(d => d.Date);
+    const volumes = tradingDays.map(d => d.L_Volume);
+    
+    // Color based on price change
+    const colors = tradingDays.map((d, i) => {
+        if (i === 0) return CONFIG.COLORS.volumeUp;
+        const prevClose = tradingDays[i-1].L_Close;
+        return d.L_Close >= prevClose ? CONFIG.COLORS.volumeUp : CONFIG.COLORS.volumeDown;
+    });
+    
+    const trace = {
+        type: 'bar',
+        name: 'Volume',
+        x: dates,
+        y: volumes,
+        marker: { color: colors }
+    };
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { family: 'Inter, sans-serif', color: '#8b9ab5', size: 10 },
+        margin: { t: 30, r: 70, b: 30, l: 70 },
+        showlegend: false,
+        xaxis: { 
+            gridcolor: '#223046', 
+            linecolor: '#223046',
+            tickformat: '%m-%d'
+        },
+        yaxis: { 
+            title: { text: 'Volume', font: { size: 10 } },
+            gridcolor: '#223046', 
+            linecolor: '#223046'
+        },
+        bargap: 0.15
+    };
+    
+    Plotly.newPlot('volumeChart', [trace], layout, { responsive: true });
+    
+    log('OK', `Volume chart: ${tradingDays.length} trading days (no interpolation)`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN ACTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function generateChart() {
+    log('INFO', '═══════════════════════════════════════');
+    log('INFO', 'Generating chart...');
+    
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const leftSymbol = document.getElementById('leftSymbol').value;
+    const rightSymbol = document.getElementById('rightSymbol').value;
+    const leftKind = document.getElementById('leftKind').value;
+    const rightKind = document.getElementById('rightKind').value;
+    
+    try {
+        // Generate demo data
+        log('INFO', `Loading ${leftSymbol}...`);
+        const leftData = generateDemoOHLCV(leftSymbol, startDate, endDate);
+        log('OK', `Left: ${leftData.length} trading days`);
+        
+        let rightData = null;
+        if (STATE.rightAxisEnabled) {
+            log('INFO', `Loading ${rightSymbol}...`);
+            rightData = generateDemoOHLCV(rightSymbol, startDate, endDate);
+            log('OK', `Right: ${rightData.length} trading days`);
+        }
+        
+        // Align timelines (CRITICAL: Price ffill, Volume no fill)
+        const aligned = alignTimelines(leftData, rightData, leftKind, rightKind);
+        STATE.data.aligned = aligned;
+        
+        // Calculate analytics
+        if (rightData) {
+            const leftPrices = aligned.map(d => d.L_AdjClose);
+            const rightPrices = aligned.map(d => d.R_AdjClose);
+            
+            const corr = calculateCorrelation(leftPrices, rightPrices);
+            const lagResult = findBestLag(leftPrices, rightPrices, CONFIG.MAX_LAG_DAYS);
+            
+            STATE.analytics.corr = corr;
+            STATE.analytics.bestLag = lagResult;
+            
+            log('OK', `Correlation: ${corr?.toFixed(4) || 'N/A'}`);
+            log('OK', `Best Lag: ${lagResult.lag} days (corr: ${lagResult.corr.toFixed(4)})`);
+        }
+        
+        // Render charts
+        renderMainChart(aligned, STATE.template);
+        renderVolumeChart(aligned);
+        
+        // Update stats
+        updateStats(aligned);
+        
+        log('OK', 'Chart generated successfully');
+        log('INFO', '═══════════════════════════════════════');
+        
+    } catch (error) {
+        log('ERROR', `Failed: ${error.message}`);
+        console.error(error);
+    }
+}
+
+function updateStats(aligned) {
+    const lastIdx = aligned.length - 1;
+    const lastRow = aligned[lastIdx];
+    
+    // Find previous trading day for change calculation
+    let prevRow = null;
+    for (let i = lastIdx - 1; i >= 0; i--) {
+        if (aligned[i].L_IsTradingDay !== false) {
+            prevRow = aligned[i];
+            break;
+        }
+    }
+    
+    // Latest price
+    const price = lastRow?.L_AdjClose || lastRow?.L_Close;
+    document.getElementById('statPrice').textContent = price ? price.toFixed(2) : '--';
+    
+    // Price change
+    if (price && prevRow) {
+        const prevPrice = prevRow.L_AdjClose || prevRow.L_Close;
+        const change = ((price - prevPrice) / prevPrice * 100);
+        const changeEl = document.getElementById('statPriceChange');
+        changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+        changeEl.className = `stat-change ${change >= 0 ? 'up' : 'down'}`;
+    }
+    
+    // Correlation
+    document.getElementById('statCorr').textContent = 
+        STATE.analytics.corr !== null ? STATE.analytics.corr.toFixed(4) : '--';
+    
+    // Best lag
+    if (STATE.analytics.bestLag) {
+        document.getElementById('statLag').textContent = STATE.analytics.bestLag.lag;
+        document.getElementById('statLagNote').textContent = 
+            `corr: ${STATE.analytics.bestLag.corr.toFixed(3)}`;
+    }
+    
+    // Data points
+    const tradingDays = aligned.filter(d => d.L_IsTradingDay !== false).length;
+    document.getElementById('statRows').textContent = tradingDays;
+    
+    // Aligned days
+    document.getElementById('statAligned').textContent = aligned.length;
+    const filledDays = aligned.length - tradingDays;
+    document.getElementById('statAlignedNote').textContent = `${filledDays} filled (holidays)`;
+}
+
+async function runSelfTest() {
+    log('INFO', '🧪 ═══════════════════════════════════════');
+    log('INFO', '🧪 Running Self-Test...');
+    
+    // Test 1: Data generation
+    log('INFO', 'Test 1: Data generation');
+    const testData = generateDemoOHLCV('2330.TW', '2024-01-01', '2024-06-30');
+    if (testData.length > 80) {
+        log('OK', `Generated ${testData.length} trading days`);
+    } else {
+        log('ERROR', 'Data generation failed');
+        return;
+    }
+    
+    // Test 2: Timeline alignment
+    log('INFO', 'Test 2: Timeline alignment (TW vs US holidays)');
+    const twData = generateDemoOHLCV('2330.TW', '2024-01-01', '2024-03-31');
+    const usData = generateDemoOHLCV('^GSPC', '2024-01-01', '2024-03-31');
+    const aligned = alignTimelines(twData, usData, 'price', 'price');
+    
+    // Check that alignment worked
+    const twTradingDays = twData.length;
+    const usTradingDays = usData.length;
+    const alignedDays = aligned.length;
+    
+    if (alignedDays >= Math.max(twTradingDays, usTradingDays)) {
+        log('OK', `TW: ${twTradingDays}, US: ${usTradingDays}, Aligned: ${alignedDays}`);
+    } else {
+        log('ERROR', 'Alignment failed');
+        return;
+    }
+    
+    // Test 3: Volume no-fill verification
+    log('INFO', 'Test 3: Volume NO fill verification');
+    const filledVolumes = aligned.filter(d => d.L_IsTradingDay === false && d.L_Volume !== null);
+    if (filledVolumes.length === 0) {
+        log('OK', 'Volume correctly NOT filled for holidays');
+    } else {
+        log('ERROR', `Volume incorrectly filled: ${filledVolumes.length} days`);
+        return;
+    }
+    
+    // Test 4: Technical indicators
+    log('INFO', 'Test 4: MA/BB calculation (trading days only)');
+    const ma5 = calculateMA(aligned, 'L_AdjClose', 5);
+    const validMA = ma5.filter(v => v !== null).length;
+    if (validMA > 0) {
+        log('OK', `MA5 calculated: ${validMA} valid points`);
+    } else {
+        log('ERROR', 'MA calculation failed');
+        return;
+    }
+    
+    // Test 5: Correlation
+    log('INFO', 'Test 5: Correlation analysis');
+    const corr = calculateCorrelation(
+        aligned.map(d => d.L_AdjClose),
+        aligned.map(d => d.R_AdjClose)
+    );
+    if (corr !== null) {
+        log('OK', `Correlation: ${corr.toFixed(4)}`);
+    } else {
+        log('WARN', 'Correlation could not be calculated (insufficient data)');
+    }
+    
+    // Test 6: Full chart render
+    log('INFO', 'Test 6: Full chart rendering');
+    STATE.data.aligned = aligned;
+    STATE.analytics.corr = corr;
+    STATE.analytics.bestLag = findBestLag(
+        aligned.map(d => d.L_AdjClose),
+        aligned.map(d => d.R_AdjClose),
+        30
+    );
+    
+    renderMainChart(aligned, 'tech');
+    renderVolumeChart(aligned);
+    updateStats(aligned);
+    
+    log('OK', 'Charts rendered successfully');
+    log('INFO', '🧪 ═══════════════════════════════════════');
+    log('OK', '🎉 All tests passed! System ready.');
+}
+
+function exportCSV() {
+    if (!STATE.data.aligned || STATE.data.aligned.length === 0) {
+        log('WARN', 'No data to export');
+        return;
+    }
+    
+    const headers = ['Date', 'L_Open', 'L_High', 'L_Low', 'L_Close', 'L_AdjClose', 'L_Volume', 'L_IsTradingDay', 'R_Close', 'R_AdjClose'];
+    const rows = STATE.data.aligned.map(d => 
+        [d.Date, d.L_Open, d.L_High, d.L_Low, d.L_Close, d.L_AdjClose, d.L_Volume, d.L_IsTradingDay, d.R_Close, d.R_AdjClose].join(',')
+    );
+    
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VIA_AutoPlot_${document.getElementById('leftSymbol').value}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    log('OK', `Exported ${STATE.data.aligned.length} rows to CSV`);
+}
+</script>
+</body>
+</html>

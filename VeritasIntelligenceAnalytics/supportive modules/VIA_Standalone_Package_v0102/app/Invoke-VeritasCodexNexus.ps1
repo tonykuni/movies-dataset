@@ -22,6 +22,16 @@ param(
     [int]$Port = 8770,
     [string]$Python = 'python'
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -43,7 +53,7 @@ $Engines = [ordered]@{
         registry = 'UnifiedSpec.json'
         output   = 'UnifiedSpec.json'
         tasks    = [ordered]@{
-            ExtractAll      = @{ tool='VHS_Reader.py';          args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'vhs_specs.json'),'--registry',$Registry) } }
+            ExtractAll      = @{ tool='SUP_MDL164_VHSReader.py';          args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'vhs_specs.json'),'--registry',$Registry) } }
             ThreeBucket     = @{ tool='VAP_TemplateIngestor.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'VAP_template_index.json')) } }
         }
     }
@@ -51,14 +61,14 @@ $Engines = [ordered]@{
         registry = 'VisualRegistry.json'
         output   = 'VisualRegistry.json'
         tasks    = [ordered]@{
-            ExtractChartSpec = @{ tool='VVX_Extractor.py';       args={ param($s,$o) @('--scan',$s,'--out',$o,'--recurse') } }
+            ExtractChartSpec = @{ tool='SUP_MDL165_VVXExtractor.py';       args={ param($s,$o) @('--scan',$s,'--out',$o,'--recurse') } }
         }
     }
     Layout = @{
         registry = 'LayoutRegistry.json'
         output   = 'LayoutRegistry.json'
         tasks    = [ordered]@{
-            ExtractLayout = @{ tool='VHS_Reader.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'layout_specs.json'),'--registry',$Registry) } }
+            ExtractLayout = @{ tool='SUP_MDL164_VHSReader.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'layout_specs.json'),'--registry',$Registry) } }
         }
     }
     Interaction = @{
@@ -196,3 +206,4 @@ foreach ($r in $summary) {
 Write-Step ('RunLog -> {0}' -f $runlogPath) 'DarkGray'
 
 if ($Serve) { Start-CodexServer -ServeDir $Out -P $Port }
+

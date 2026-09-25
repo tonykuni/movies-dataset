@@ -1,0 +1,56 @@
+{
+  "schema": "VIA-VAP-USER-JOURNEY-SPEC/1.0",
+  "system": "VeritasAutoPlot",
+  "version": "v023",
+  "specVersion": "1.20.0",
+  "generatedAt": "2026-08-30T18:45:00.000Z",
+  "purpose": "User-oriented Plotly-style dashboard workflow for connection refresh, chart creation, governed image saving, specific-image extraction, shared-time stacking and explicit export.",
+  "workflow": [
+    {"step": 1, "id": "refreshRequest", "label": "連線與更新", "success": "A read-only refresh request ID is appended to the ledger.", "truthBoundary": "REQUESTED_RUNTIME is not CONNECTED or UPDATED."},
+    {"step": 2, "id": "addChart", "label": "新增圖", "success": "A loaded Catalog table and numeric fields are selected."},
+    {"step": 3, "id": "renderChart", "label": "繪好圖", "success": "A single-axis or dual-axis governed SVG is rendered with semantic metadata."},
+    {"step": 4, "id": "saveGovernedImage", "label": "儲存圖像", "success": "SVG, chart contract and SHA-256 are stored in IndexedDB; LocalStorage stores metadata only."},
+    {"step": 5, "id": "selectSpecificSavedImage", "label": "擷取特定圖", "success": "Search, filtered select-all, exact single extraction and SHA verification are available."},
+    {"step": 6, "id": "composeSharedTimeStack", "label": "堆圖編排", "success": "Selected images are deduplicated, ordered, height-scaled from 0.5x to 4x and aligned to a strict shared timeline."},
+    {"step": 7, "id": "explicitUserExport", "label": "預覽與匯出", "success": "The stack is previewed; HTML, PNG, PDF or JSON export starts only after an explicit user action."}
+  ],
+  "plotWorkspace": {
+    "layout": "LEFT_LARGE_CHART_RIGHT_PARAMETER_RAIL",
+    "largeChartMinimumHeightPx": {"desktop": 500, "compact": 430},
+    "parameterRail": {"collapsible": true, "sticky": true, "preserveValuesOnCollapse": true},
+    "sidebar": {"collapsible": true, "persistPreference": true},
+    "visualTokens": {"blue": "#636EFA", "green": "#00CC96", "red": "#EF553B", "purple": "#AB63FA", "background": "#F7F8FC"}
+  },
+  "savedImageSelection": {
+    "searchFields": ["id", "title", "table", "subject", "unit", "axisLayout", "chartForm"],
+    "multiSelect": true,
+    "selectAllScope": "FILTERED_RESULTS_ONLY",
+    "batchStack": true,
+    "deduplicateBy": "savedImageId",
+    "exactExtract": "EXACTLY_ONE_SELECTION",
+    "selectionManifestExport": true
+  },
+  "refreshContract": {
+    "requestEvent": "vap:refresh-request",
+    "responseEvent": "vap:catalog",
+    "matchingKey": "requestId",
+    "requestState": "REQUESTED_RUNTIME",
+    "successState": "UPDATED",
+    "successCondition": "At least one response table passes the Catalog quality gate.",
+    "failureState": "RESPONSE_REJECTED",
+    "readOnly": true
+  },
+  "preservedContracts": {
+    "canonicalCharts": 40,
+    "compositeRecipes": 5,
+    "physicalYAxisMaximum": 2,
+    "axisIntervals": 4,
+    "ticksPerAxis": 5,
+    "legalAxisStepFamily": "2 / 2.5 / 5 x 10^n",
+    "missingPrice": "previousTradingDay",
+    "missingVolume": "zeroNoCarry",
+    "marketTiming": "US T to next TW trading day",
+    "activation": "FAIL_CLOSED_CANDIDATE_ONLY_NO_RUNTIME_PROMOTION"
+  },
+  "testGate": {"fullDefinitions": 128, "userAcceptanceDefinitions": 64, "browserRequiredForFinalActivation": true}
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>VIA v0113F Test Debug Hardening</title>
+<style>
+body{margin:0;background:#f7f6f2;color:#24231f;font-family:"Microsoft JhengHei",Arial,sans-serif;font-size:8.4px;line-height:1.32}
+.wrap{max-width:1800px;margin:0 auto;padding:15px}
+h1{font-size:14.5px;margin:0 0 4px;font-weight:650}
+.sub{font-size:8.2px;color:#706d64;margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-bottom:10px}
+.card{background:#fffefa;border:1px solid #dedbd2;border-radius:9px;padding:6px 7px;min-height:41px}
+.k{font-size:7.6px;color:#706d64}.v{font:650 10.6px Consolas,monospace;margin-top:4px;word-break:break-word}
+.sec{background:#fffefa;border:1px solid #dedbd2;border-radius:11px;padding:8px;margin-bottom:9px;overflow:hidden}
+h2{font-size:9.5px;margin:0 0 6px;font-weight:650}
+.note{font-size:8.1px;color:#706d64;margin:0 0 7px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.8px}
+th,td{border-bottom:1px solid #ebe8df;padding:3px 4px;vertical-align:top;word-break:break-word;overflow-wrap:anywhere}
+th{background:#f0eee8;text-align:left;font-weight:650;color:#555149}
+.tag{display:inline-block;border:1px solid #dedbd2;border-radius:999px;padding:2px 6px;background:#fff;margin-right:4px;color:#706d64}
+.footer{margin-top:11px;color:#706d64;font-size:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>def VIA v0113F · Test Debug Hardening Until Pass</h1>
+<div class="sub">15 accelerators · no stall · no close · no secret print · secret gate convergence</div>
+<div class="cards"><div class='card'><div class='k'>Status</div><div class='v'>VIA_v0113F_TEST_DEBUG_HARDENING_READY</div></div><div class='card'><div class='k'>Final</div><div class='v'>PASS_SECRET_GATE_CLEARED_P0P1_MANUAL_REQUIRED</div></div><div class='card'><div class='k'>Test Pass</div><div class='v'>15</div></div><div class='card'><div class='k'>Test Fail</div><div class='v'>0</div></div><div class='card'><div class='k'>Secret</div><div class='v'>3 / 3</div></div><div class='card'><div class='k'>P0 YES</div><div class='v'>0 / 150</div></div><div class='card'><div class='k'>P1 YES</div><div class='v'>0 / 12</div></div><div class='card'><div class='k'>NoClose</div><div class='v'>true</div></div></div>
+
+<div class="sec">
+<h2>def Executive Judgment</h2>
+<div class="note">
+v0113F 的完美狀態不是直接進 canonical，也不是 P0/P1 全 YES；正確完美狀態是 Secret Gate 清除、Direct Smoke OK、P0/P1 繼續維持人工接受門檻。
+</div>
+<span class="tag">NoClose</span>
+<span class="tag">No Stop-Process</span>
+<span class="tag">No Secret Print</span>
+<span class="tag">No Source Mutation</span>
+<span class="tag">P0/P1 Manual</span>
+</div>
+
+<div class="sec"><h2>def Readiness Gate</h2><table><thead><tr><th>def_gate_status</th><th>def_allow_v0114</th><th>def_reason</th><th>def_direct_ok</th><th>def_direct_review</th><th>def_secret_resolved</th><th>def_secret_total</th><th>def_p0_yes</th><th>def_p0_total</th><th>def_p1_yes</th><th>def_p1_total</th><th>def_next_allowed_phase</th></tr></thead><tbody><tr><td>BLOCKED_MANUAL_ACCEPT_REQUIRED_SECRET_RESOLVED</td><td>false</td><td>Secret gate resolved. P0/P1 manual acceptance still pending.</td><td>3</td><td>0</td><td>3</td><td>3</td><td>0</td><td>150</td><td>0</td><td>12</td><td>v0114 sandbox patch candidate only after P0/P1 manual YES</td></tr></tbody></table></div>
+<div class="sec"><h2>def Three-Round Test Matrix</h2><table><thead><tr><th>def_round</th><th>def_name</th><th>def_status</th><th>def_risk</th><th>def_message</th><th>def_path</th></tr></thead><tbody><tr><td>Round1</td><td>Direct smoke 3/3 OK</td><td>PASS</td><td>LOW</td><td>Direct OK=3 / 3</td><td></td></tr><tr><td>Round1</td><td>Secret rows all resolved</td><td>PASS</td><td>LOW</td><td>Secret resolved=3 / 3</td><td></td></tr><tr><td>Round1</td><td>P0 not auto accepted</td><td>PASS</td><td>LOW</td><td>P0 YES=0 / 150</td><td></td></tr><tr><td>Round1</td><td>P1 not auto accepted</td><td>PASS</td><td>LOW</td><td>P1 YES=0 / 12</td><td></td></tr><tr><td>Round1</td><td>FRED UI runtime secret policy</td><td>PASS</td><td>LOW</td><td>Canonical stores policy only, not raw value.</td><td></td></tr><tr><td>Round1</td><td>Env audit no value print</td><td>PASS</td><td>LOW</td><td>Presence/length only.</td><td></td></tr><tr><td>Round1</td><td>UI contract JSON exists</td><td>PASS</td><td>LOW</td><td>UI contract JSON exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\_unified_html_ui_secret_parameter_contract\VIA_UnifiedHtmlUI_SecretParameterContract_v0113...</td></tr><tr><td>Round1</td><td>UI bridge PS1 exists</td><td>PASS</td><td>LOW</td><td>Runtime bridge candidate exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\_unified_html_ui_secret_parameter_contract\VIA_RuntimeSecretParameterBridge_Candidate_v011...</td></tr><tr><td>Round1</td><td>UI prototype HTML exists</td><td>PASS</td><td>LOW</td><td>Password-input prototype exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\_unified_html_ui_secret_parameter_contract\VIA_UnifiedHtmlUI_FRED_RuntimeSecretParameter_v...</td></tr><tr><td>Round1</td><td>UI password input guard</td><td>PASS</td><td>LOW</td><td>type=password and autocomplete=off.</td><td></td></tr><tr><td>Round1</td><td>UI forbidden sink scanner</td><td>PASS</td><td>LOW</td><td>No obvious raw-value sink pattern.</td><td></td></tr><tr><td>Round1</td><td>NoClose safety scanner</td><td>PASS</td><td>LOW</td><td>No exit / Stop-Process / Remove-Item in generated critical scripts.</td><td></td></tr><tr><td>Round1</td><td>PowerShell AST syntax gate</td><td>PASS</td><td>LOW</td><td>Parser OK.</td><td></td></tr><tr><td>Round1</td><td>v0114 precheck expected result</td><td>PASS</td><td>LOW</td><td>Expected manual P0/P1 block; secret gate cleared.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\output\Invoke-VIA-v0114-Precheck-After-v0113F.ps1</td></tr><tr><td>Round1</td><td>Report path prepared</td><td>PASS</td><td>LOW</td><td>Report path allocated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\report\VIA_v0113F_TestDebugHardening_Report.html</td></tr></tbody></table></div>
+<div class="sec"><h2>def Secret Resolution Final</h2><table><thead><tr><th>def_normalized_key</th><th>def_user_secret_resolved</th><th>def_selected_safe_canonical_value</th><th>def_ui_secret_policy</th><th>def_value_printed</th><th>def_rotate_if_raw_was_real</th><th>def_manual_resolution_note</th></tr></thead><tbody><tr><td>ticker_tokens</td><td>YES</td><td>FALSE_POSITIVE_CODE_TOKEN_LIST; NO_SECRET; DO_NOT_TREAT_AS_CREDENTIAL</td><td>not_applicable_false_positive</td><td>false</td><td>false</td><td>Resolved by v0113F deterministic classifier: ticker_tokens is an internal code/list token, not a credential.</td></tr><tr><td>FRED_API_KEY</td><td>YES</td><td>UI_RUNTIME_SECRET_PARAMETER:FRED_API_KEY; INPUT_TYPE=password; RAW_VALUE_FORBIDDEN; NO_LOG; NO_CSV; NO_JSON; NO_LOCALSTORAGE</td><td>unified_html_ui_runtime_password_parameter</td><td>false</td><td>true</td><td>Resolved by user policy: FRED_API_KEY will be entered as Unified HTML UI runtime password parameter. Canonical stores policy only, never raw value.</td></tr><tr><td>fred_api_key_env</td><td>YES</td><td>UI_PARAMETER_NAME:FRED_API_KEY; OPTIONAL_ENV_FALLBACK_NAME_ONLY; RAW_VALUE_FORBIDDEN</td><td>ui_parameter_name_with_optional_env_fallback</td><td>false</td><td>false</td><td>Resolved by user policy: UI parameter name is FRED_API_KEY. Env fallback may exist by name only; raw value cannot be printed or persisted.</td></tr></tbody></table></div>
+<div class="sec"><h2>def Env Presence Only</h2><table><thead><tr><th>def_env_name</th><th>def_exists</th><th>def_value_length</th><th>def_value_printed</th><th>def_policy</th></tr></thead><tbody><tr><td>FRED_API_KEY</td><td>True</td><td>32</td><td>false</td><td>presence_only_no_secret_output</td></tr><tr><td>VDF_FRED_API_KEY</td><td>False</td><td>0</td><td>false</td><td>presence_only_no_secret_output</td></tr><tr><td>VIA_FRED_API_KEY</td><td>False</td><td>0</td><td>false</td><td>presence_only_no_secret_output</td></tr></tbody></table></div>
+<div class="sec"><h2>def 15 Accelerators</h2><table><thead><tr><th>def_no</th><th>def_accelerator</th></tr></thead><tbody><tr><td>1</td><td>A01 latest-v0113D auto discovery</td></tr><tr><td>2</td><td>A02 same-session NoClose execution</td></tr><tr><td>3</td><td>A03 no child process required</td></tr><tr><td>4</td><td>A04 no BASE re-scan</td></tr><tr><td>5</td><td>A05 direct smoke reuse</td></tr><tr><td>6</td><td>A06 deterministic ticker_tokens false-positive resolution</td></tr><tr><td>7</td><td>A07 FRED runtime password parameter contract</td></tr><tr><td>8</td><td>A08 no secret value print</td></tr><tr><td>9</td><td>A09 forbidden sink scanner</td></tr><tr><td>10</td><td>A10 UI prototype scanner</td></tr><tr><td>11</td><td>A11 precheck expected-block validation</td></tr><tr><td>12</td><td>A12 P0/P1 no-auto-YES guard</td></tr><tr><td>13</td><td>A13 PowerShell AST syntax gate</td></tr><tr><td>14</td><td>A14 three-round convergence test</td></tr><tr><td>15</td><td>A15 compact HTML matrix report</td></tr></tbody></table></div>
+
+<div class="footer">
+Run: RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING<br/>
+Latest v0113D: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113D_manual_secret_resolution\RUN_20260622_185821_VIA_v0113D_MANUAL_SECRET_RESOLUTION<br/>
+Output: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\output<br/>
+User edit: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\_user_edit_after_secret_gate_cleared<br/>
+UI contract: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\_unified_html_ui_secret_parameter_contract<br/>
+Report: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113F_test_debug_hardening\RUN_20260622_190742_VIA_v0113F_TEST_DEBUG_HARDENING\report\VIA_v0113F_TestDebugHardening_Report.html
+</div>
+</div>
+</body>
+</html>

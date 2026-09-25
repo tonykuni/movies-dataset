@@ -4,6 +4,20 @@
 v0100R:依 FlowSystem_v2/README.md(至 v0120)規格重建;原 session 檔到件時依整合去重裁定替換。
 硬化(README v0109):#1 分割守衛 · #7 新生排除 · #13 z 外露 · #14 權重上限 · #2 stale-shares 雙估計器。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json
 import math
 from pathlib import Path

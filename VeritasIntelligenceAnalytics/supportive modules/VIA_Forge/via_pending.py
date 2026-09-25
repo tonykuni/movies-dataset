@@ -10,6 +10,20 @@ VIA Pending  ——  via_pending.py   (\u5f85 \u00b7 \u6838\u51c6\u4f47\u5217)
   \u2022 PENDING \u9805\u76ee\u7acb\u5373\u8655\u7406 \u2192 \u5217\u51fa + \u6838\u51c6\uff08\u72c0\u614b\u8f49\u63db\u9644\u52a0\uff0c\u4e0d\u8986\u5beb\uff09
 ================================================================================
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import os, sys, re, json, hashlib
 from datetime import datetime, timezone
 from collections import defaultdict

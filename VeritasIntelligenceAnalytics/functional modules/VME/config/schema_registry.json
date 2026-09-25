@@ -1,0 +1,80 @@
+{
+ "schema": "VIA.VME.SchemaRegistry.v1",
+ "dialect": "JSON-Schema-2020-12(描述式;Test-Json 可驗)",
+ "entities": {
+  "evidence_record": {
+   "pk": "evidence_id",
+   "required": [
+    "evidence_id",
+    "evidence_type",
+    "source_ref",
+    "sha256",
+    "run_id"
+   ],
+   "version": "1.0.0",
+   "note": "evidence lineage 主鍵表(深研報告最重要新增)"
+  },
+  "state_transition": {
+   "pk": "transition_id",
+   "required": [
+    "transition_id",
+    "entity_type",
+    "entity_id",
+    "from_state",
+    "to_state",
+    "trigger",
+    "run_id"
+   ],
+   "version": "1.0.0",
+   "note": "current_state 由最新 transition 推導,永不覆寫"
+  },
+  "lesson_record": {
+   "pk": "lesson_id",
+   "required": [
+    "lesson_id",
+    "title",
+    "run_id"
+   ],
+   "version": "1.0.0"
+  },
+  "hypothesis_record": {
+   "pk": "hypothesis_id",
+   "required": [
+    "hypothesis_id",
+    "claim",
+    "run_id"
+   ],
+   "version": "1.0.0"
+  },
+  "error_event": {
+   "pk": "error_id",
+   "required": [
+    "error_id",
+    "severity",
+    "run_id"
+   ],
+   "version": "1.0.0"
+  },
+  "test_run": {
+   "pk": "test_id",
+   "required": [
+    "test_id",
+    "target",
+    "verdict",
+    "run_id"
+   ],
+   "version": "1.0.0"
+  },
+  "run_manifest": {
+   "pk": "part_file",
+   "required": [
+    "part_file",
+    "entity",
+    "sha256",
+    "rows",
+    "run_id"
+   ],
+   "version": "1.0.0"
+  }
+ }
+}

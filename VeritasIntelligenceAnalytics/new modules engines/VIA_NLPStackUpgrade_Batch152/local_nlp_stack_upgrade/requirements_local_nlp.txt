@@ -1,0 +1,17 @@
+# Core local pipeline
+spacy>=3.7,<4
+opencc-python-reimplemented>=0.1.7
+
+# Optional native adapters; the application has deterministic fallbacks
+jieba>=0.42.1
+regex>=2024.0.0
+rapidfuzz>=3.0.0
+dateparser>=1.2.0
+quantulum3>=0.9.0
+scikit-learn>=1.4,<2
+networkx>=3.0
+
+# pkuseg is a legacy optional package and is skipped on Python 3.12+ because
+# current releases may not build in isolated environments. spaCy's Chinese
+# model can still use its own pkuseg adapter when configured.
+pkuseg==0.0.25; python_version < "3.12"

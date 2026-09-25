@@ -1,4 +1,14 @@
 #requires -Version 7.0
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Stop"
 
 function Invoke-VDF-Fetch {
@@ -13,7 +23,7 @@ function Invoke-VDF-Fetch {
     $FetchManifest = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\registry\\VDF_ProductionFetchManifest_v016.json"
     $FetchResult = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\vdf_production_fetch_result_v016.json"
     $HtmlReport = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\report\\VDF_ProductionFetchController_Report_v016.html"
-    $PythonController = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\vdf_production_fetch_controller_v016.py"
+    $PythonController = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\SUP_MDL631_ProductionFetchController_v016.py"
 
     if ($Action -eq "status") {
         [pscustomobject]@{
@@ -56,3 +66,4 @@ function Invoke-VDF-Fetch {
 }
 
 Invoke-VDF-Fetch @args
+

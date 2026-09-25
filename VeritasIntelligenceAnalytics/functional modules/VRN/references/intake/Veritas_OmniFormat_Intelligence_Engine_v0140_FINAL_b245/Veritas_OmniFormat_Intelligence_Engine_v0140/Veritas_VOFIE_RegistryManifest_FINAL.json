@@ -1,0 +1,563 @@
+{
+  "capabilities": [
+    {
+      "action": "detect_and_read",
+      "baseline_position": "INPUT_CORE",
+      "capability_id": "ST-FMT-001",
+      "description": "來源唯讀與雜湊前後一致。",
+      "flexibility": "FORMAT_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "topic_segment",
+      "baseline_position": "SEMANTIC_CORE",
+      "capability_id": "ST-FMT-002",
+      "description": "主題含來源行號與雜湊。",
+      "flexibility": "ANCHOR_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "code_component_ir",
+      "baseline_position": "POLYGLOT_CORE",
+      "capability_id": "ST-FMT-003",
+      "description": "跨語言元件寫入 Markdown。",
+      "flexibility": "AST_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "markdown_emit",
+      "baseline_position": "CANONICAL_OUTPUT",
+      "capability_id": "ST-FMT-004",
+      "description": "所有格式共用 Markdown／IR 中介層。",
+      "flexibility": "TEMPLATE_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "office_emit",
+      "baseline_position": "DOCUMENT_ADAPTER",
+      "capability_id": "ST-FMT-005",
+      "description": "格式特性不同但來源追溯欄位不變。",
+      "flexibility": "DOCX_PPTX_XLSX_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "web_template_emit",
+      "baseline_position": "UI_OUTPUT",
+      "capability_id": "ST-FMT-006",
+      "description": "三檔分離、無 CDN、無來源 script 執行。",
+      "flexibility": "HTML_CSS_JS_TOKEN_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "audit_chain",
+      "baseline_position": "GOVERNANCE",
+      "capability_id": "ST-FMT-007",
+      "description": "每次輸出以 hash chain 記錄。",
+      "flexibility": "APPEND_ONLY",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "vsis_bridge",
+      "baseline_position": "VIA_INTEGRATION",
+      "capability_id": "ST-FMT-008",
+      "description": "沿用 VSIS 1.2 能力，缺少時本地降級。",
+      "flexibility": "OPTIONAL_OVERLAY",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "text_merge",
+      "baseline_position": "CONSOLIDATION",
+      "capability_id": "ST-FMT-009",
+      "description": "文字依主題分類合併成視圖，原區塊仍完整保留。",
+      "flexibility": "CATEGORY_VIEW_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "code_merge",
+      "baseline_position": "POLYGLOT_CONSOLIDATION",
+      "capability_id": "ST-FMT-010",
+      "description": "跨語言元件依語言／符號整合，API 簽章不變。",
+      "flexibility": "LANGUAGE_SYMBOL_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "restructure",
+      "baseline_position": "STRUCTURAL_CANDIDATE",
+      "capability_id": "ST-FMT-011",
+      "description": "只重排輸出視圖，保留來源順序與行號。",
+      "flexibility": "ORDER_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "deduplicate",
+      "baseline_position": "ADD_ONLY_DEDUP",
+      "capability_id": "ST-FMT-012",
+      "description": "標記 canonical／duplicate，不刪除任何內容。",
+      "flexibility": "CANONICAL_RULE_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "optimize",
+      "baseline_position": "EQUIVALENCE_GATE",
+      "capability_id": "ST-FMT-013",
+      "description": "優化只形成候選視圖，不直接改寫來源或 API。",
+      "flexibility": "CANDIDATE_ONLY",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "simple_five_outputs",
+      "baseline_position": "USER_PROFILE",
+      "capability_id": "ST-FMT-014",
+      "description": "簡易模式固定 MD／HTML／Component JSON／Word／CSV 五個主要檔。",
+      "flexibility": "FIXED_PRIMARY_CONTRACT",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "engine_system_roles",
+      "baseline_position": "ROLE_BOUNDARY",
+      "capability_id": "ST-FMT-015",
+      "description": "ENGINE 只輸出五檔；SYSTEM 另在 _system 保留治理資料。",
+      "flexibility": "SYSTEM_SIDECAR_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "failure_recovery",
+      "baseline_position": "RESILIENCE_GATE",
+      "capability_id": "ST-FMT-016",
+      "description": "八個環節各 Top 20 failure，且每項有多個已實作復原處理器。",
+      "flexibility": "HANDLER_REGISTRY",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "window_drag_drop",
+      "baseline_position": "WINDOW_IO",
+      "capability_id": "ST-FMT-017",
+      "description": "Windows 視窗可選檔或拖放，最多五檔，拖放模組缺少時降級。",
+      "flexibility": "DND_OR_FILE_DIALOG",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "ui_spec_extract",
+      "baseline_position": "UI_CORE",
+      "capability_id": "ST-UI-001",
+      "description": "HTML 與 Markdown 雙軌保留。",
+      "flexibility": "DOM_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "state_machine",
+      "baseline_position": "UI_LOGIC",
+      "capability_id": "ST-UI-002",
+      "description": "事件與狀態分離。",
+      "flexibility": "GENERATED_SPEC",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "interaction_graph",
+      "baseline_position": "UI_LOGIC",
+      "capability_id": "ST-UI-003",
+      "description": "元件、事件、目標可追溯。",
+      "flexibility": "GENERATED_SPEC",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "test_cases",
+      "baseline_position": "UI_QA",
+      "capability_id": "ST-UI-004",
+      "description": "每個互動元件至少一個測試。",
+      "flexibility": "RULE_EXTENSIBLE",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "usability",
+      "baseline_position": "UI_QA",
+      "capability_id": "ST-UI-005",
+      "description": "標籤、錯誤回饋與鍵盤路徑。",
+      "flexibility": "RULE_EXTENSIBLE",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "accessibility",
+      "baseline_position": "UI_QA",
+      "capability_id": "ST-UI-006",
+      "description": "語意元素、ARIA、對比與焦點。",
+      "flexibility": "WCAG_RULE_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "security",
+      "baseline_position": "UI_GATE",
+      "capability_id": "ST-UI-007",
+      "description": "不執行來源 script，不信任外部資源。",
+      "flexibility": "FAIL_CLOSED",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "layout_optimize",
+      "baseline_position": "UI_ENHANCEMENT",
+      "capability_id": "ST-UI-008",
+      "description": "PC／Mobile 響應式。",
+      "flexibility": "TOKEN_DRIVEN",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "component_refactor",
+      "baseline_position": "UI_ENHANCEMENT",
+      "capability_id": "ST-UI-009",
+      "description": "不直接覆寫來源 UI。",
+      "flexibility": "CANDIDATE_ONLY",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "performance",
+      "baseline_position": "UI_ENHANCEMENT",
+      "capability_id": "ST-UI-010",
+      "description": "離線與資源預算。",
+      "flexibility": "BUDGET_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "STANDARD",
+      "version": "1.4.0"
+    },
+    {
+      "action": "responsive",
+      "baseline_position": "UI_ENHANCEMENT",
+      "capability_id": "ST-UI-011",
+      "description": "單欄與多欄斷點。",
+      "flexibility": "CSS_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    },
+    {
+      "action": "dark_mode",
+      "baseline_position": "UI_OPTIONAL",
+      "capability_id": "ST-UI-012",
+      "description": "預設淺色，支援系統深色。",
+      "flexibility": "TOKEN_ADAPTER",
+      "mutates_source": false,
+      "test_profile": "SIMPLE",
+      "version": "1.4.0"
+    },
+    {
+      "action": "telemetry",
+      "baseline_position": "UI_OPS",
+      "capability_id": "ST-UI-013",
+      "description": "本地、匿名、預設關閉。",
+      "flexibility": "OPT_IN",
+      "mutates_source": false,
+      "test_profile": "CRITICAL",
+      "version": "1.4.0"
+    }
+  ],
+  "contract": "via.subsystem-registration/1.0",
+  "failure_framework": {
+    "recovery_handlers": 26,
+    "stages": 8,
+    "top_failures_per_stage": 20
+  },
+  "hydra_risk_governance": {
+    "canonical_source": "READ_ONLY",
+    "high_risk_action": "HOLD",
+    "max_rounds": 3,
+    "runtime_copy": "PROPOSAL_FIRST",
+    "st": "ST-HYDRA",
+    "top_risks": 20
+  },
+  "input_formats": {
+    "code": {
+      "baseline": "CODE_TO_COMPONENT_MARKDOWN",
+      "extensions": [
+        ".py",
+        ".pyw",
+        ".ps1",
+        ".psm1",
+        ".js",
+        ".mjs",
+        ".cjs",
+        ".ts",
+        ".tsx",
+        ".jsx",
+        ".java",
+        ".c",
+        ".h",
+        ".cpp",
+        ".hpp",
+        ".cs",
+        ".go",
+        ".rs",
+        ".rb",
+        ".php",
+        ".swift",
+        ".kt",
+        ".kts",
+        ".sql",
+        ".sh",
+        ".bash",
+        ".r",
+        ".lua",
+        ".css",
+        ".scss",
+        ".vue",
+        ".svelte"
+      ],
+      "flexibility": "LANGUAGE_AST_ADAPTER",
+      "reader": "read_code",
+      "st": "ST-CORE"
+    },
+    "csv": {
+      "baseline": "TABULAR_ROUND_TRIP",
+      "extensions": [
+        ".csv",
+        ".tsv"
+      ],
+      "flexibility": "DELIMITER_AND_ENCODING_ADAPTER",
+      "reader": "read_csv",
+      "st": "ST-CORE"
+    },
+    "document": {
+      "baseline": "WORD_TEXT_AND_TABLE_EXTRACTION",
+      "extensions": [
+        ".docx"
+      ],
+      "flexibility": "OOXML_OR_EXTERNAL_READER",
+      "reader": "read_docx",
+      "st": "ST-ADAPTER"
+    },
+    "html": {
+      "baseline": "HTML_SEMANTIC_AND_UI_DUAL_LANE",
+      "extensions": [
+        ".html",
+        ".htm",
+        ".xhtml"
+      ],
+      "flexibility": "DOM_PARSER_ADAPTER",
+      "reader": "read_html",
+      "st": "ST-CORE"
+    },
+    "markdown": {
+      "baseline": "MARKDOWN_AST_PRESERVING",
+      "extensions": [
+        ".md",
+        ".markdown",
+        ".mdown"
+      ],
+      "flexibility": "ANCHOR_AND_FENCE_NORMALIZER",
+      "reader": "read_text",
+      "st": "ST-CORE"
+    },
+    "pdf": {
+      "baseline": "PAGE_ORDER_TEXT_EXTRACTION",
+      "extensions": [
+        ".pdf"
+      ],
+      "flexibility": "PYDPF_OR_PYPDF_READER",
+      "reader": "read_pdf",
+      "st": "ST-ADAPTER"
+    },
+    "presentation": {
+      "baseline": "SLIDE_ORDER_AND_TEXT_EXTRACTION",
+      "extensions": [
+        ".pptx"
+      ],
+      "flexibility": "OOXML_OR_EXTERNAL_READER",
+      "reader": "read_pptx",
+      "st": "ST-ADAPTER"
+    },
+    "spreadsheet": {
+      "baseline": "SHEET_CELL_AND_FORMULA_EXTRACTION",
+      "extensions": [
+        ".xlsx",
+        ".xlsm"
+      ],
+      "flexibility": "OOXML_OR_EXTERNAL_READER",
+      "reader": "read_xlsx",
+      "st": "ST-ADAPTER"
+    },
+    "structured": {
+      "baseline": "TREE_TO_MARKDOWN",
+      "extensions": [
+        ".json",
+        ".jsonl",
+        ".xml",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".ini"
+      ],
+      "flexibility": "SCHEMA_ADAPTER",
+      "reader": "read_structured",
+      "st": "ST-CORE"
+    },
+    "text": {
+      "baseline": "TEXT_TO_TOPIC_MARKDOWN",
+      "extensions": [
+        ".txt",
+        ".text",
+        ".log"
+      ],
+      "flexibility": "ENCODING_ADAPTER",
+      "reader": "read_text",
+      "st": "ST-CORE"
+    }
+  },
+  "legacy_compatibility": "VSIS-1.2-OVERLAY-NO-MUTATION",
+  "output_formats": {
+    "css": {
+      "adapter": "emit_web_template",
+      "baseline": "RESPONSIVE_THEME",
+      "st": "ST-CORE"
+    },
+    "csv": {
+      "adapter": "emit_csv",
+      "baseline": "TOPIC_MATRIX",
+      "st": "ST-CORE"
+    },
+    "docx": {
+      "adapter": "emit_docx",
+      "baseline": "WORD_REFERENCE_GUIDE",
+      "st": "ST-ADAPTER"
+    },
+    "html": {
+      "adapter": "emit_web_template",
+      "baseline": "SEMANTIC_TEMPLATE",
+      "st": "ST-CORE"
+    },
+    "js": {
+      "adapter": "emit_web_template",
+      "baseline": "SAFE_LOCAL_INTERACTION",
+      "st": "ST-CORE"
+    },
+    "json": {
+      "adapter": "emit_ir_json",
+      "baseline": "CANONICAL_MACHINE_OUTPUT",
+      "st": "ST-CORE"
+    },
+    "md": {
+      "adapter": "emit_markdown",
+      "baseline": "CANONICAL_HUMAN_OUTPUT",
+      "st": "ST-CORE"
+    },
+    "pptx": {
+      "adapter": "artifact-tool",
+      "baseline": "EXECUTIVE_TOPIC_DECK",
+      "st": "ST-ADAPTER"
+    },
+    "xlsx": {
+      "adapter": "artifact-tool",
+      "baseline": "AUDITABLE_TOPIC_WORKBOOK",
+      "st": "ST-ADAPTER"
+    }
+  },
+  "polyglot_tool_support": {
+    "capability_matrix_rows": 30,
+    "cpu_only_supported": true,
+    "environment_routes": {
+      "javascript": "via-ui",
+      "powershell": "via-ps"
+    },
+    "installation_policy": "DETECT_ONLY_NO_AUTO_INSTALL",
+    "javascript_top20": 20,
+    "powershell_top20": 20
+  },
+  "registry_namespace": "veritas.omniformat",
+  "runtime_copy_governance": {
+    "approval_token_required": true,
+    "canonical_promotion": "DENIED_NOT_IMPLEMENTED",
+    "contract": "veritas.vofie-runtime-copy/1.0",
+    "hash_state_machine": "MISSING/APPLY; PROPOSED/SKIP; ORIGINAL/BACKUP_APPLY; OTHER/FAIL_CLOSED",
+    "rollback_dry_run_required": true
+  },
+  "runtime_endpoints": [
+    "build_ir",
+    "convert",
+    "convert_simple",
+    "gui",
+    "manifest",
+    "self_test",
+    "user_test",
+    "activate",
+    "tool_audit",
+    "tool_plan",
+    "hydra_risk_audit",
+    "create_runtime_copy",
+    "rollback_dry_run",
+    "web_template"
+  ],
+  "simple_profile": {
+    "max_inputs": 5,
+    "primary_outputs": {
+      "component_json": "Veritas_VOFIE_ComponentSpecs.json",
+      "csv": "Veritas_VOFIE_TopicMatrix.csv",
+      "docx": "Veritas_VOFIE_Reconstructed.docx",
+      "html": "Veritas_VOFIE.html",
+      "md": "Veritas_VOFIE_Reconstructed.md"
+    },
+    "roles": [
+      "ENGINE",
+      "SYSTEM"
+    ]
+  },
+  "st_levels": {
+    "ST-ADAPTER": "可替換工具，但輸入輸出契約不可變。",
+    "ST-CORE": "不可缺少的核心契約；缺少即 FAIL。",
+    "ST-FROZEN": "來源與舊結果不可改寫；任何轉換均另存新產物。",
+    "ST-GATE": "品質或安全閘門；不通過即 HOLD／FAIL。",
+    "ST-HYDRA": "多點連動風險硬閘門；高風險只可 HOLD，不得自動修正或啟用。",
+    "ST-OPTIONAL": "可停用的增強功能；停用不得影響核心產物。"
+  },
+  "subsystem_id": "VIA-SUBSYS-VOFIE-001",
+  "subsystem_name": "Veritas OmniFormat Intelligence Engine",
+  "subsystem_version": "1.4.0"
+}

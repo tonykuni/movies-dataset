@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>VIA vs Notion 功能差距分析</title>
+    <style>
+        :root {
+            --bg:#0f1218; --card:#151a22; --line:#263046;
+            --text:#e9eef7; --muted:#a8b3c7;
+            --ok:#2ecc71; --warn:#f1c40f; --fail:#ff5c7a; --na:#8c98b3;
+            --radius:16px;
+        }
+        * { box-sizing:border-box }
+        body {
+            margin:0; padding:24px;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans TC", sans-serif;
+            background: radial-gradient(1200px 700px at 20% 0%, rgba(106,169,255,0.18), transparent 60%),
+                        radial-gradient(900px 500px at 90% 10%, rgba(46,204,113,0.10), transparent 55%),
+                        var(--bg);
+            color: var(--text);
+        }
+        .wrap { max-width:1200px; margin:0 auto }
+        .header { display:flex; gap:16px; align-items:flex-end; justify-content:space-between; margin-bottom:16px }
+        .h-title { font-size:22px; font-weight:800 }
+        .h-sub { color:var(--muted); font-size:13px; margin-top:6px }
+        .chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end }
+        .chip { border:1px solid var(--line); background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:999px; font-size:12px; color:var(--muted) }
+        .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:12px 0 18px }
+        .kpi { border:1px solid var(--line); background:rgba(255,255,255,0.03); border-radius:var(--radius); padding:14px }
+        .kpi .k { color:var(--muted); font-size:12px }
+        .kpi .v { font-size:24px; font-weight:800; margin-top:6px }
+        .kpi .s { color:var(--muted); font-size:11px; margin-top:4px }
+        .card { border:1px solid var(--line); background:rgba(255,255,255,0.03); border-radius:var(--radius); padding:12px; margin:12px 0 }
+        .card-h { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:4px 4px 10px }
+        .title { font-weight:800; font-size:16px }
+        .meta { color:var(--muted); font-size:12px }
+        .table-wrap { overflow:auto; border-radius:12px; border:1px solid var(--line) }
+        table { width:100%; border-collapse:collapse; min-width:600px; background:rgba(0,0,0,0.12) }
+        th, td { padding:10px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:top }
+        th { text-align:left; font-size:12px; color:var(--muted); background:rgba(255,255,255,0.04) }
+        td.item { font-weight:600 }
+        td.note { color:var(--muted) }
+        td.mark { text-align:center; width:80px; font-weight:900 }
+        .ok { color:var(--ok) }
+        .warn { color:var(--warn) }
+        .fail { color:var(--fail) }
+        td.num { text-align:right }
+        .hr { height:1px; background:rgba(255,255,255,0.06); margin:14px 0 }
+        @media (max-width:900px) { .grid { grid-template-columns:1fr 1fr } }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div>
+                <div class="h-title">📋 VIA vs Notion 功能差距分析</div>
+                <div class="h-sub">完整分析 Notion 的 105 項核心功能，找出 VIA 需要補齊的部分</div>
+            </div>
+            <div class="chips">
+                <span class="chip">總功能：105</span>
+                <span class="chip">VIA 完整：18</span>
+                <span class="chip">VIA 部分：9</span>
+                <span class="chip fail">VIA 缺少：78</span>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="kpi">
+                <div class="k">VIA 覆蓋率</div>
+                <div class="v" style="color:var(--warn)">21.4%</div>
+                <div class="s">相對於 Notion 100%</div>
+            </div>
+            <div class="kpi">
+                <div class="k">完整實現</div>
+                <div class="v ok">18</div>
+                <div class="s">功能完全對標</div>
+            </div>
+            <div class="kpi">
+                <div class="k">部分實現</div>
+                <div class="v warn">9</div>
+                <div class="s">需要加強</div>
+            </div>
+            <div class="kpi">
+                <div class="k">完全缺少</div>
+                <div class="v fail">78</div>
+                <div class="s">需要新增</div>
+            </div>
+        </div>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">🔥 優先開發序（依影響權重排序）</div>
+                <div class="meta">priority = (missing + 0.5×partial) × weight</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>分類</th>
+                            <th style="text-align:right">總數</th>
+                            <th style="text-align:right">缺少❌</th>
+                            <th style="text-align:right">部分⚠️</th>
+                            <th style="text-align:right">VIA覆蓋率</th>
+                            <th style="text-align:right">優先度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        <tr>
+            <td class="item">Database 資料庫</td>
+            <td class="num">15</td>
+            <td class="num fail">15</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num"><b>21.75</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">協作功能</td>
+            <td class="num">10</td>
+            <td class="num fail">10</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num"><b>14.0</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">Block 編輯系統</td>
+            <td class="num">10</td>
+            <td class="num fail">8</td>
+            <td class="num warn">2</td>
+            <td class="num">10.0%</td>
+            <td class="num"><b>13.5</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">頁面與導航</td>
+            <td class="num">12</td>
+            <td class="num fail">8</td>
+            <td class="num warn">2</td>
+            <td class="num">25.0%</td>
+            <td class="num"><b>11.7</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">內容塊類型</td>
+            <td class="num">18</td>
+            <td class="num fail">8</td>
+            <td class="num warn">2</td>
+            <td class="num">50.0%</td>
+            <td class="num"><b>11.25</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">嵌入與整合</td>
+            <td class="num">10</td>
+            <td class="num fail">10</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num"><b>10.5</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">搜尋與組織</td>
+            <td class="num">7</td>
+            <td class="num fail">6</td>
+            <td class="num warn">1</td>
+            <td class="num">7.1%</td>
+            <td class="num"><b>7.8</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">AI 功能</td>
+            <td class="num">6</td>
+            <td class="num fail">6</td>
+            <td class="num warn">0</td>
+            <td class="num">0.0%</td>
+            <td class="num"><b>6.0</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">匯入匯出</td>
+            <td class="num">7</td>
+            <td class="num fail">4</td>
+            <td class="num warn">1</td>
+            <td class="num">35.7%</td>
+            <td class="num"><b>5.17</b></td>
+        </tr>
+        
+        <tr>
+            <td class="item">樣式與主題</td>
+            <td class="num">10</td>
+            <td class="num fail">3</td>
+            <td class="num warn">1</td>
+            <td class="num">65.0%</td>
+            <td class="num"><b>3.85</b></td>
+        </tr>
+        </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <div class="hr"></div>
+        
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">Block 編輯系統</div>
+                <div class="meta">條目：10 ／ VIA 覆蓋率：10.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Block-based 架構</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">VIA Notes 有基本支援</td>
+            </tr>
+            
+            <tr>
+                <td class="item">拖拽重排 Drag & Drop</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Slash 命令 /command</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Block 轉換 Turn into</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Block 複製/刪除</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">部分</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Block 顏色/背景</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Column 多欄佈局</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Synced Blocks 同步塊</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Block 連結 Link to block</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Block 評論</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">Database 資料庫</div>
+                <div class="meta">條目：15 ／ VIA 覆蓋率：0.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Table 表格視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Board 看板視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Calendar 日曆視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Gallery 畫廊視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">List 列表視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Timeline 時間軸視圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Filter 篩選器</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Sort 排序</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Group 分組</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Properties 屬性欄位</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Relation 關聯</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Rollup 匯總</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Formula 公式屬性</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Linked Database</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Database Templates</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">協作功能</div>
+                <div class="meta">條目：10 ／ VIA 覆蓋率：0.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">即時協作編輯</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">評論系統</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">@ 提及人員</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">@ 提及頁面</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">@ 提及日期</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">分享連結</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">權限管理</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Guest 訪客</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">頁面鎖定</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">活動記錄 Activity</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">頁面與導航</div>
+                <div class="meta">條目：12 ／ VIA 覆蓋率：25.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">無限子頁面</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">VIA Notes 有基本支援</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Sidebar 側邊欄</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Breadcrumb 麵包屑</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Favorites 收藏</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Recent 最近訪問</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Quick Find 快速搜尋</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">Command Palette 部分</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Page Icon 頁面圖標</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Page Cover 封面圖</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Full Width 全寬模式</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Table of Contents 目錄</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Back Links 反向連結</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Page History 歷史版本</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">內容塊類型</div>
+                <div class="meta">條目：18 ／ VIA 覆蓋率：50.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Paragraph 段落</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Heading 1/2/3</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Bulleted List</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Numbered List</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">To-do Checkbox</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Toggle 折疊</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Quote 引用</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Divider 分隔線</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Callout 標註</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Code Block 代碼塊</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Code 語法高亮</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">部分語言</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Math Equation 數學公式</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Image 圖片</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">基本支援</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Video 影片</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Audio 音訊</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">File 檔案</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Bookmark 書籤卡片</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Table 簡易表格</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">搜尋與組織</div>
+                <div class="meta">條目：7 ／ VIA 覆蓋率：7.1%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">全局搜尋</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">部分</td>
+            </tr>
+            
+            <tr>
+                <td class="item">篩選搜尋結果</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Tags 標籤</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Templates 模板</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Duplicate 複製頁面</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Move to 移動頁面</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Trash 垃圾桶</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">匯入匯出</div>
+                <div class="meta">條目：7 ／ VIA 覆蓋率：35.7%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Markdown 匯入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">部分</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Markdown 匯出</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">HTML 匯出</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">PDF 匯出</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">CSV 匯入/匯出</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Evernote 匯入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Trello 匯入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">樣式與主題</div>
+                <div class="meta">條目：10 ／ VIA 覆蓋率：65.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Dark Mode 深色模式</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Light Mode 淺色模式</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Font 字型選擇</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Small Text 小字模式</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Text Color 文字顏色</td>
+                <td class="mark ok">✅</td>
+                <td class="mark warn">⚠️</td>
+                <td class="note">部分</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Background Color 背景色</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Bold/Italic/Underline</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Strikethrough 刪除線</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Inline Code</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Link 超連結</td>
+                <td class="mark ok">✅</td>
+                <td class="mark ok">✅</td>
+                <td class="note">已實現</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">嵌入與整合</div>
+                <div class="meta">條目：10 ／ VIA 覆蓋率：0.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">Embed 嵌入網頁</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Google Drive</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Figma 嵌入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">GitHub 嵌入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">YouTube 嵌入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Twitter 嵌入</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Mermaid 圖表</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">API 整合</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Zapier/Automation</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">Slack 整合</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="card">
+            <div class="card-h">
+                <div class="title">AI 功能</div>
+                <div class="meta">條目：6 ／ VIA 覆蓋率：0.0%</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>功能</th><th>Notion</th><th>VIA</th><th>備註</th></tr>
+                    </thead>
+                    <tbody>
+            <tr>
+                <td class="item">AI 寫作助手</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">AI 摘要</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">AI 翻譯</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">AI 改善寫作</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">AI 問答</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            
+            <tr>
+                <td class="item">AI Autofill</td>
+                <td class="mark ok">✅</td>
+                <td class="mark fail">❌</td>
+                <td class="note">缺少</td>
+            </tr>
+            </tbody>
+                </table>
+            </div>
+        </section>
+        
+    </div>
+</body>
+</html>

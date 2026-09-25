@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "industry": "smart-manufacturing",
+  "artifacts": "/tmp/via_ci_matrix/smart-manufacturing",
+  "steps": [
+    {
+      "name": "01_vsx_extract",
+      "command": "/usr/bin/python3 /home/ubuntu/upload/pasted_file_rrpIsK_via_spec_extractor.py --in /home/ubuntu/VIA-SYNCHRONIZER-Standalone.html --out /tmp/via_ci_matrix/smart-manufacturing/vsx --title smart-manufacturing",
+      "returncode": 0,
+      "duration_s": 0.177,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/01_vsx_extract.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/01_vsx_extract.stderr.log"
+    },
+    {
+      "name": "02_generate_validators",
+      "command": "/usr/bin/python3 /home/ubuntu/skills/via-ucc-triengine-workbench/scripts/generate_module_validation.py --ir /tmp/via_ci_matrix/smart-manufacturing/vsx/via_spec_ir.json --html /home/ubuntu/VIA-SYNCHRONIZER-Standalone.html --profile /home/ubuntu/skills/via-ucc-triengine-workbench/templates/industry-profile.json --industry smart-manufacturing --out /tmp/via_ci_matrix/smart-manufacturing/validation",
+      "returncode": 0,
+      "duration_s": 0.046,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/02_generate_validators.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/02_generate_validators.stderr.log"
+    },
+    {
+      "name": "03_module_validation",
+      "command": "/usr/bin/python3 /tmp/via_ci_matrix/smart-manufacturing/validation/validate_smart-manufacturing.py --html /home/ubuntu/VIA-SYNCHRONIZER-Standalone.html --ir /tmp/via_ci_matrix/smart-manufacturing/vsx/via_spec_ir.json --report /tmp/via_ci_matrix/smart-manufacturing/validation/module-validation-report.json",
+      "returncode": 0,
+      "duration_s": 0.047,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/03_module_validation.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/03_module_validation.stderr.log"
+    },
+    {
+      "name": "04_hub_selftest",
+      "command": "/usr/bin/python3 /home/ubuntu/upload/pasted_file_eOqLr5_via_triengine_hub.py selftest",
+      "returncode": 0,
+      "duration_s": 2.176,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/04_hub_selftest.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/04_hub_selftest.stderr.log"
+    },
+    {
+      "name": "05_hub_route",
+      "command": "/usr/bin/python3 /home/ubuntu/upload/pasted_file_eOqLr5_via_triengine_hub.py route --root /home/ubuntu --in /home/ubuntu/VIA-SYNCHRONIZER-Standalone.html",
+      "returncode": 0,
+      "duration_s": 0.064,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/05_hub_route.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/05_hub_route.stderr.log"
+    },
+    {
+      "name": "06_hub_pipeline",
+      "command": "/usr/bin/python3 /home/ubuntu/upload/pasted_file_eOqLr5_via_triengine_hub.py pipeline --root /home/ubuntu --in /home/ubuntu/VIA-SYNCHRONIZER-Standalone.html --out /tmp/via_ci_matrix/smart-manufacturing/hub-pipeline",
+      "returncode": 0,
+      "duration_s": 5.864,
+      "stdout_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/06_hub_pipeline.stdout.log",
+      "stderr_log": "/tmp/via_ci_matrix/smart-manufacturing/logs/06_hub_pipeline.stderr.log"
+    }
+  ],
+  "failed_steps": []
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0.0",
+  "policy_id": "VCG-POL-ADAPTIVE-DOWNSTREAM-0100",
+  "authority": "VIA Central Governance",
+  "status": "STAGE_READY_NOT_ACTIVATED",
+  "source_of_truth": [
+    "Central SSOT Registry",
+    "Synonym and Regex Governance",
+    "Append-only Module Registry",
+    "Environment Route and Health Overlay"
+  ],
+  "default_mode": "STAGE",
+  "allowed_modes": ["AUDIT", "STAGE"],
+  "round_limit": 3,
+  "gate_sequence": [
+    "FILE_DISCOVERED",
+    "AST_PASS",
+    "CONTRACT_PASS",
+    "READ_ONLY_DATA_PASS",
+    "DATA_QUALITY_PASS",
+    "SANDBOX_RUNTIME_PASS",
+    "INTEGRATION_PASS",
+    "USER_TEST_PASS",
+    "ACTIVATED",
+    "POST_ACTIVATION_STABLE"
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "name": "Comprehensive Parallel-Safe Fix",
+      "allowed": ["read-only discovery", "AST validation", "contract inference", "Hydra detection", "safe copy-on-write formatting fixes"],
+      "forbidden": ["high-risk repair", "canonical write", "activation"]
+    },
+    {
+      "round": 2,
+      "name": "Dependency-Ordered Contract And Routing Governance",
+      "allowed": ["topological ordering", "contract sidecars", "path binding overlay", "interface compatibility matrix", "sequential repair plan"],
+      "forbidden": ["source overwrite", "automatic import", "environment install"]
+    },
+    {
+      "round": 3,
+      "name": "Final Re-Analysis And Stability Hardening",
+      "allowed": ["full re-verification", "quantity validation", "RYG matrix", "manual user-test readiness decision"],
+      "forbidden": ["new high-risk mutation", "automatic production activation"]
+    }
+  ],
+  "lanes": [
+    "L01_STRUCTURE_AST",
+    "L02_CONTRACT_SSOT",
+    "L03_DEPENDENCY_ROUTING",
+    "L04_HYDRA_IDENTITY",
+    "L05_SECURITY_GOVERNANCE",
+    "L06_QUALITY_OPTIMIZATION"
+  ],
+  "accelerators": [
+    "A01_SHORT_PATH_RUNTIME",
+    "A02_INCREMENTAL_HASH_SCAN",
+    "A03_BOUNDED_READONLY_PARALLELISM",
+    "A04_AST_CACHE",
+    "A05_SEMANTIC_HASH_DEDUP",
+    "A06_DEPENDENCY_DAG",
+    "A07_CONTRACT_FINGERPRINT",
+    "A08_ADAPTIVE_RISK_DEPTH",
+    "A09_RESOURCE_PRESSURE_BUDGET",
+    "A10_SANDBOX_COPY_ON_WRITE",
+    "A11_EXPECTED_HASH_GUARD",
+    "A12_APPEND_ONLY_LEDGER",
+    "A13_RESUME_CHECKPOINT",
+    "A14_HTML_RYG_MATRIX",
+    "A15_FAILURE_CIRCUIT_BREAKER"
+  ],
+  "adaptive_risk_depth": {
+    "LIGHT": {"downstream_horizon": 1, "validation_scope": ["syntax", "format"]},
+    "STANDARD": {"downstream_horizon": 3, "validation_scope": ["syntax", "contract", "dependency", "security"]},
+    "DEEP": {"downstream_horizon": 5, "validation_scope": ["syntax", "contract", "dependency", "security", "hydra", "downstream"]}
+  },
+  "failure_circuit_breaker": {
+    "threshold": 3,
+    "trigger": "consecutive runs containing HIGH or CRITICAL open issues",
+    "open_action": "HUMAN_REVIEW_ONLY",
+    "automatic_repair_after_open": false
+  },
+  "universal_interface_envelope": {
+    "request": ["contract_version", "trace_id", "source_module", "target_module", "operation", "parameters", "payload", "payload_format", "schema_id"],
+    "response": ["ok", "status", "data", "data_format", "schema_id", "warnings", "evidence", "timing"],
+    "error": ["error_code", "severity", "message", "retryable", "fallback_route", "evidence"],
+    "supported_payload_formats": ["dict", "list", "JSON", "JSONL", "CSV", "Parquet", "Arrow", "DuckDB relation", "Pandas DataFrame", "Polars DataFrame", "bytes", "text", "path reference"]
+  },
+  "safe_fix_whitelist": [
+    "ENC_UTF8_BOM",
+    "FMT_TRAILING_WHITESPACE",
+    "FMT_FINAL_NEWLINE",
+    "FMT_MIXED_NEWLINES"
+  ],
+  "hash_state_machine": {
+    "original": "create run-local proposal",
+    "same_proposal": "restage or skip without canonical mutation",
+    "different_source_hash": "fail expected-hash guard and create a new review item",
+    "history": "append-only"
+  },
+  "root_policy": {
+    "default_mother_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+    "onedrive_as_mother_root": false,
+    "output_scope": "%LOCALAPPDATA%\\VIA\\CentralGovernanceRuns"
+  },
+  "forbidden_actions": [
+    "canonical mutation",
+    "automatic activation",
+    "target module import or dot-source during analysis",
+    "network access",
+    "package installation or environment rebuild",
+    "delete or rename",
+    "high-risk Hydra automatic repair",
+    "shared output file writes across lanes"
+  ],
+  "required_outputs_each_round": [
+    "Error Matrix",
+    "Optimization Matrix",
+    "Hydra Risk Matrix",
+    "Dependency Matrix",
+    "Dependency Cycle Matrix",
+    "Interface Contract Matrix",
+    "Fix Order Matrix",
+    "Adaptive Risk-Depth Matrix",
+    "Failure Circuit-Breaker Matrix",
+    "RYG Health Indicators",
+    "Quantity Validation",
+    "SSOT Contract Comparison",
+    "Multi-System Comparison"
+  ]
+}

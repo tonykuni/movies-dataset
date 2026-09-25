@@ -1,0 +1,63 @@
+{
+  "schema": "VIA.CGC157.UniqueEntryDispatch.v1",
+  "timestamp": "2026-09-16T15:19:44+00:00",
+  "gate": {
+    "engine": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+    "verdict": "GREEN",
+    "control_state": "ONLY_VIA_ENTRY"
+  },
+  "family": "all",
+  "routes": [
+    {
+      "family": "vrn",
+      "engine": "VRN_ENG087_NLP",
+      "argv": [
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0100.py",
+        "selftest"
+      ],
+      "returncode": 0,
+      "state": "GREEN",
+      "output_tail": "[OK] NLP Hub mount VERIFIED\n  [OK] 六項研報 NLP 服務在位 6/6\n  [OK] TextProcessor 正規化 台積電 2330 買進, 需求強勁。風險為匯率波動。\n  [OK] 證據型摘要 OK\n  [OK] 摘要 span 可回溯 source_span\n  [OK] DuckDB 套件在位 \n  [OK] ENG072 正主在位 \n  [OK] ENG073 v0127 正主在位 \n  [OK] VDF ENG087 正主在位 \n  [OK] 網路預設關閉 \n  [OK] 加速器橋已宣告 VIA_SuperAccel_AVAILABLE\n  [計] 十一檢 OK 11 · FAIL 0"
+    },
+    {
+      "family": "vdf",
+      "engine": "VDF_ENG073_DataArchitecture",
+      "argv": [
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py",
+        "--selftest"
+      ],
+      "returncode": 0,
+      "state": "GREEN",
+      "output_tail": "=== VDF 資料架構(VDF_ENG073)· 九檢自測 ===\n  [OK] ① 對映冊 12 類齊(=SSOT fetch_matrix 12 類;每類 headers/gap 在) \n  [OK] ② SSOT 尾版動態載入(12 類/5 欄群/macro 219·FRED 190)或誠實缺 VIA_VDF_SSOT_b360 12 190\n  [OK] ③ 盤點(rows/date 欄/型別/min→max/lag;缺庫誠實 exists=False) \n  [OK] ④ 誠實狀態(有列+缺口=PARTIAL;us_macro 零列=PENDING_KEY;無表=PLANNED;候鑰/白名單分流) PARTIAL/PENDING_KEY/PLANNED/PLANNED\n  [OK] ⑤ 最佳化計畫只增不減(VARCHAR 日期→*_typed 並存;零 DROP;預設 dry-run) \n  [OK] ⑥ --go 落地(typed 鏡 DATE;原表列數不變) \n  [OK] ⑦ 頁+冊(四分區 MODULE/DATA/FUNCTION-LIB/PLAN;小字;導航 整/冊/環) \n  [OK] ⑧ 20 擷取加速器燈(ENG074 F01–F20 動態載入) 20\n  [OK] ⑨ 鑰匙紅線+Zero-Hydra 宣告(源碼零明文鑰;vdf_api 不啟用;不合併現役) \n  [計] 九檢 OK 9 · FAIL 0"
+    },
+    {
+      "family": "vdf",
+      "engine": "VDF_ENG087_MarketListGovernance",
+      "argv": [
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0101.py",
+        "--selftest"
+      ],
+      "returncode": 0,
+      "state": "GREEN",
+      "output_tail": "[OK] 跨族群重複代號允許\n  [OK] 成交值按(date,ticker)去重\n  [OK] 重複未被靜默相加\n  [OK] 熱門族群正本可解析 · 跨族群重複允許；跨族群成交值彙總必須以 (date,ticker) 去重\n  [OK] 熱門族群可跨組重複\n  [OK] 中央調度正主均在位\n  [OK] 股票引擎有 selftest\n  [OK] 主動ETF宇宙引擎有 selftest\n  [OK] 主動ETF史深引擎有 selftest\n  [OK] 熱門族群索引拒絕同組重複\n  [OK] 不含禁用技術指標執行接線\n  [計] OK 10 · FAIL 0"
+    },
+    {
+      "family": "quantguard",
+      "engine": "VDF_ENG086_QuantGuard",
+      "argv": [
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v0100.py",
+        "selftest"
+      ],
+      "returncode": 0,
+      "state": "GREEN",
+      "output_tail": "=== VDF_ENG086_QuantGuardOneBridge v0100· QuantGuard 自測(零網路;無禁用依賴)===\n  [OK] features state GREEN\n  [OK] feature row count preserved\n  [OK] complete factor rows present\n  [OK] adjusted price policy\n  [OK] ex-day-trade volume policy\n  [OK] forbidden dependency policy\n  [OK] feature parquet exists\n  [OK] factor parquet exists\n  [計] OK 8 · FAIL 0"
+    }
+  ],
+  "network": {
+    "default": "OFF",
+    "consent": "OFF",
+    "silent_open": false
+  },
+  "data_flow": "VDF_DUCKDB_TO_QUANTGUARD",
+  "verdict": "GREEN"
+}

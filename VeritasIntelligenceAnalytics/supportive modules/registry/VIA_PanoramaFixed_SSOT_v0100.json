@@ -1,0 +1,229 @@
+{
+ "schema": "VIA.PanoramaFixed.SSOT.v1",
+ "batch": "批658",
+ "ts": "2026-09-20T12:38:53",
+ "owner": "CGC_MDL158_VIAPanoramaAuditRepair",
+ "purpose": "全景稽核『已修冊』。不是功勞簿:每一筆都帶可複驗的憑據,本器每次跑都拿活樹重量一次。冊說修好、現在也還是修好=GREEN;冊說修好、現在又量到=RED(回歸,尾版律下最容易發生:有人切了新版卻沒把修帶過去);量不了=ABSENT,誠實講量不了,不當綠。",
+ "verify_kinds": {
+  "class_zero": "活樹掃描該範疇件數必須為 0",
+  "coverage_pct": "覆蓋率欄位必須 ≥ expect",
+  "tail_contains": "該族尾版檔(glob 取最新)必須含 markers、且不得含 markers_absent"
+ },
+ "entries": [
+  {
+   "id": "F535-ACCEL",
+   "batch": "批535",
+   "cls": "ACCEL",
+   "n": 1426,
+   "what": "全樹 .py 補指令加速器橋([VIA:ACCEL-BRIDGE];純增量、import 時零行為變更)",
+   "verify": [
+    {
+     "kind": "coverage_pct",
+     "field": "accel_pct",
+     "expect": 100.0
+    },
+    {
+     "kind": "class_zero",
+     "cls": "ACCEL"
+    }
+   ]
+  },
+  {
+   "id": "F535-NET",
+   "batch": "批535",
+   "cls": "NET",
+   "n": 44,
+   "what": "VDF 引擎補網路工具橋([VIA:NET-BRIDGE];惰性載入=import 時零網路)",
+   "verify": [
+    {
+     "kind": "coverage_pct",
+     "field": "net_pct",
+     "expect": 100.0
+    },
+    {
+     "kind": "class_zero",
+     "cls": "NET"
+    }
+   ]
+  },
+  {
+   "id": "F536-PINVER",
+   "batch": "批536",
+   "cls": "PINVER",
+   "n": 7,
+   "what": "中央路由的釘死版號改 newest-glob(L54 尾版律):VDF_ENG087 四~五處路徑、CGC_MDL156 PS 名冊與 QuantGuard",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "functional modules/VDF/engine",
+     "glob": "VDF_ENG087_MarketListGovernance_v*.py",
+     "markers": [
+      "_newest_rel"
+     ]
+    },
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL156_VIAAcceleratorControl_v*.py",
+     "markers": [
+      "PS_ROSTER",
+      ".glob("
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F536-VERB",
+   "batch": "批536",
+   "cls": "VERB",
+   "n": 2,
+   "what": "自測動詞統一(L53):VAP_ENG003 v0101、CGC_MDL055 v0101 讓 --selftest 與位置動詞等價",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "functional modules/VAP/engine",
+     "glob": "VAP_ENG003_AutoplotSeabornPlotly_v*.py",
+     "markers": [
+      "--selftest"
+     ]
+    },
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL055_InputPrecheck_v*.py",
+     "markers": [
+      "--selftest"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F536-ZERO",
+   "batch": "批536",
+   "cls": "SYSEXE/TALIB/SYNTAX",
+   "n": 0,
+   "what": "三條零線:家族境律 L51(裸 sys.executable 派子行程)、TA-Lib 退役 L50(活動接線)、語法零錯——維持 0 才算沒破",
+   "verify": [
+    {
+     "kind": "class_zero",
+     "cls": "SYSEXE"
+    },
+    {
+     "kind": "class_zero",
+     "cls": "TALIB"
+    },
+    {
+     "kind": "class_zero",
+     "cls": "SYNTAX"
+    }
+   ]
+  },
+  {
+   "id": "F537-VRN86",
+   "batch": "批537",
+   "cls": "內容級",
+   "n": 4,
+   "what": "VRN 第一頁邏輯 ENG086 v0102:券商證據分級(挖掉 email/URL)、標的公司名否決(不靠庫)、本土評等尺度、評等/目標價誠實四態",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "functional modules/VRN",
+     "glob": "VRN_ENG086_FirstPageLogicBridge_v*.py",
+     "markers": [
+      "strip_contacts",
+      "subject_names",
+      "rating_local_scale",
+      "def tp_state",
+      "def rating_state"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F537-MGR",
+   "batch": "批537",
+   "cls": "內容級",
+   "n": 2,
+   "what": "總管理器 v0139 退役對齊:TA-Lib 退役(L50)後正式名稱冊移出 talib_probe/talib_one,--selftest ⑥ 由 83≠81 的 FAIL 回綠",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": ".",
+     "glob": "VIA_SYSTEM_MANAGER_v*.py",
+     "markers": [
+      "TASK_FORMAL_NAMES"
+     ],
+     "markers_absent": [
+      "\"talib_probe\":",
+      "\"talib_one\":"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-VERB",
+   "batch": "批658",
+   "cls": "內容級",
+   "n": 3,
+   "what": "VERB 等價轉換第一回(修復器補第二型 `main(argv=None)` + `X.parse_args(argv)`):VIA_WorkflowEngine / twrevenue.cli / superextract.cli 三支開始認 `--selftest`;舊位置動詞照常可用(只增不減),三支改前改後各雙跑驗過",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": ".",
+     "glob": "VIA_WorkflowEngine.py",
+     "markers": [
+      "_normalise_argv_b535",
+      "parse_args(_normalise_argv_b535(argv if argv is not None else sys.argv[1:]))"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-SYSEXE",
+   "batch": "批658",
+   "cls": "範疇級",
+   "what": "L51 家族境律:VRN_ENG083 的 `_call` 從裸 sys.executable 改走匯流排家族 python(CGC_MDL148 python_for,匯流排不在則 graceful 退回本行程);全樹 SYSEXE 1 → 0;ENG083 自測 55/55 綠",
+   "verify": [
+    {
+     "kind": "class_zero",
+     "cls": "SYSEXE"
+    }
+   ]
+  },
+  {
+   "id": "F658-EXEMPT",
+   "batch": "批658",
+   "cls": "尺級",
+   "what": "第四把掃描器補上批647 正典 TEMPLATE 豁免(LL297):CGC_MDL158 v0104 不抄第二份名冊,以 ast.literal_eval 讀 CGC_MDL156 尾版的 _ACCEL_EXEMPT+_TREE_EXEMPT(36 條)並把出處寫進報告;豁免只擋修不擋掃(L57),閘擺在唯一寫檔出口 fix_one();自測附反向對照",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+     "markers": [
+      "_load_exempt_roster",
+      "_EXEMPT_ROSTER",
+      "template_exempt",
+      "exempt_source"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "F658-PINVER",
+   "batch": "批658",
+   "cls": "尺級",
+   "what": "L93 先疑尺不疑樹:跨行寫的尾版 glob 後備(`sorted(D.glob(...)) or [D/'X_v0100.py']`)不再誤判成釘死版號;改看同一個簡單陳述式(刻意不含 def/if/for,免得尺放太寬);PINVER 24 → 22;自測 ㉓ 附反例",
+   "verify": [
+    {
+     "kind": "tail_contains",
+     "dir": "supportive modules/registry",
+     "glob": "CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+     "markers": [
+      "glob_stmt_lines"
+     ]
+    }
+   ]
+  }
+ ]
+}

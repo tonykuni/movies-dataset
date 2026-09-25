@@ -1,0 +1,86 @@
+{
+  "schema": "VIA.VRN.B528.RealSampleDatabaseAcceptance.v1",
+  "as_of": "2026-09-16T10:26:52.170509+00:00",
+  "engines": {
+    "eng072": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG072_FirstPageText_v0129.py",
+    "eng073": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0126.py"
+  },
+  "samples": [
+    {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+      "size": 204429
+    },
+    {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx",
+      "size": 40661
+    }
+  ],
+  "report_output": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/first_page_text",
+  "database": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb",
+  "sidecar_count": 2,
+  "runs": [
+    {
+      "label": "eng072_run",
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG072_FirstPageText_v0129.py",
+        "run",
+        "--in",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+        "--in",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx"
+      ],
+      "returncode": 0,
+      "started": "2026-09-16T10:26:40.116000+00:00",
+      "output_file": "/home/ubuntu/work/vrn_db_b528/eng072_run.txt"
+    },
+    {
+      "label": "eng073_run",
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0126.py",
+        "run",
+        "--dir",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/first_page_text",
+        "--db",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb"
+      ],
+      "returncode": 0,
+      "started": "2026-09-16T10:26:44.112320+00:00",
+      "output_file": "/home/ubuntu/work/vrn_db_b528/eng073_run.txt"
+    },
+    {
+      "label": "eng073_status",
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0126.py",
+        "--status"
+      ],
+      "returncode": 0,
+      "started": "2026-09-16T10:26:46.612446+00:00",
+      "output_file": "/home/ubuntu/work/vrn_db_b528/eng073_status.txt"
+    },
+    {
+      "label": "eng073_selftest",
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0126.py",
+        "--selftest"
+      ],
+      "returncode": 0,
+      "started": "2026-09-16T10:26:47.045772+00:00",
+      "output_file": "/home/ubuntu/work/vrn_db_b528/eng073_selftest.txt"
+    },
+    {
+      "label": "verify_duckdb",
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/vrn_db_b528/verify_duckdb.py"
+      ],
+      "returncode": 0,
+      "started": "2026-09-16T10:26:51.866013+00:00",
+      "output_file": "/home/ubuntu/work/vrn_db_b528/verify_duckdb.txt"
+    }
+  ],
+  "verdict": "GREEN"
+}

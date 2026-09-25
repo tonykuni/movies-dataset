@@ -1,0 +1,76 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-030",
+  "server": {"host": "127.0.0.1", "port": 8775, "open_browser": true},
+  "status_levels": {
+    "1": {"code": "STABLE", "label_zh": "穩定", "label_en": "Stable", "color": "#4C72B0", "flash": false},
+    "2": {"code": "MONITOR", "label_zh": "觀察", "label_en": "Monitor", "color": "#64B5CD", "flash": false},
+    "3": {"code": "ATTENTION", "label_zh": "注意", "label_en": "Attention", "color": "#E5C849", "flash": false},
+    "4": {"code": "WARNING", "label_zh": "警示", "label_en": "Warning", "color": "#DD8452", "flash": true},
+    "5": {"code": "CRITICAL", "label_zh": "重大", "label_en": "Critical", "color": "#C44E52", "flash": true}
+  },
+  "timing": {
+    "reply_attention_hours": 24,
+    "reply_warning_hours": 48,
+    "reply_critical_hours": 72,
+    "due_attention_hours": 24,
+    "stale_project_hours": 72,
+    "flash_warning_seconds": 2.8,
+    "flash_critical_seconds": 2.0
+  },
+  "risk_scoring": {
+    "waiting_24h": 1, "waiting_48h": 2, "waiting_72h": 3,
+    "overdue": 2, "blocked": 3, "need_help": 2,
+    "missing_owner": 2, "missing_eta": 1, "missing_reason": 1,
+    "missing_plan_b": 2, "material_issue": 2, "escalated": 2,
+    "score_to_level": [
+      {"min": 0, "max": 0, "level": 1},
+      {"min": 1, "max": 2, "level": 2},
+      {"min": 3, "max": 4, "level": 3},
+      {"min": 5, "max": 6, "level": 4},
+      {"min": 7, "max": 999, "level": 5}
+    ]
+  },
+  "reply_status_map": {
+    "進行中": "IN_PROGRESS", "已完成": "DONE_CANDIDATE", "卡關": "BLOCKED",
+    "需要協助": "NEED_HELP", "已口頭說明": "ACKNOWLEDGED", "未解析": "UNKNOWN"
+  },
+  "required_fields_by_status": {
+    "IN_PROGRESS": ["owner", "eta", "next_action"],
+    "WAITING": ["owner", "eta", "next_action"],
+    "BLOCKED": ["owner", "reason", "eta", "recovery_plan", "plan_b"],
+    "NEED_HELP": ["owner", "reason", "eta", "requested_help", "plan_b"],
+    "AT_RISK": ["owner", "reason", "eta", "recovery_plan", "plan_b"],
+    "OVERDUE": ["owner", "reason", "revised_eta", "recovery_plan", "plan_b"],
+    "DONE_CANDIDATE": ["evidence", "human_close_confirmation"]
+  },
+  "watchlist": {"minimum_level": 4, "include_close_candidates": true, "max_visible": 12},
+  "materiality": {
+    "keywords": ["customer", "shipment", "validation", "approval", "production", "quality", "safety", "客戶", "出貨", "驗證", "核准", "量產", "品質", "安全", "material", "critical", "urgent", "重大", "緊急"]
+  },
+  "reply_choices": {
+    "progress": [
+      {"key": "DONE", "zh": "已完成", "en": "Completed", "requires": ["evidence"]},
+      {"key": "IN_PROGRESS", "zh": "進行中", "en": "In progress", "requires": ["eta"]},
+      {"key": "WAITING", "zh": "等待資訊", "en": "Waiting for information", "requires": ["waiting_for", "eta"]},
+      {"key": "BLOCKED", "zh": "卡關", "en": "Blocked", "requires": ["reason", "eta", "plan_b"]},
+      {"key": "NEED_CLARIFICATION", "zh": "需要澄清", "en": "Need clarification", "requires": ["question"]}
+    ],
+    "delay_reason": [
+      {"key": "RESOURCE", "zh": "人力", "en": "Resource"}, {"key": "MATERIAL", "zh": "材料", "en": "Material"},
+      {"key": "TECHNICAL", "zh": "技術", "en": "Technical"}, {"key": "APPROVAL", "zh": "核准", "en": "Approval"},
+      {"key": "INFORMATION", "zh": "資訊不足", "en": "Information"}, {"key": "DEPENDENCY", "zh": "外部相依", "en": "External dependency"},
+      {"key": "OTHER", "zh": "其他", "en": "Other"}
+    ],
+    "plan_b": [
+      {"key": "ADD_RESOURCE", "zh": "增加資源", "en": "Add resource"}, {"key": "PARALLEL", "zh": "平行處理", "en": "Parallel processing"},
+      {"key": "ALTERNATIVE", "zh": "替代方案", "en": "Alternative solution"}, {"key": "TEMP_WORKAROUND", "zh": "暫時替代措施", "en": "Temporary workaround"},
+      {"key": "ESCALATE", "zh": "升級協助", "en": "Escalate for support"}, {"key": "RESCHEDULE", "zh": "重新排程", "en": "Reschedule"}
+    ],
+    "closure": [
+      {"key": "ISSUE_RESOLVED", "zh": "問題已解決", "en": "Issue resolved"}, {"key": "DELIVERABLE_RECEIVED", "zh": "交付物已收到", "en": "Deliverable received"},
+      {"key": "DECISION_COMPLETED", "zh": "決策已完成", "en": "Decision completed"}, {"key": "NO_FURTHER_ACTION", "zh": "無後續行動", "en": "No further action"},
+      {"key": "CANCELLED", "zh": "取消", "en": "Cancelled"}
+    ]
+  }
+}

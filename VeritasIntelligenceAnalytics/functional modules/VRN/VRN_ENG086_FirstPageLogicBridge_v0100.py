@@ -1,0 +1,652 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+r"""
+VRN_ENG086_FirstPageLogicBridge v0100 — 第一頁邏輯補缺正主橋(批522 操作員上傳 VIA_VRN_FirstPageEngine v0101 ALL-IN-ONE;「附件看能否修第一頁邏輯缺失部分」)
+
+收容件:functional modules/VRN/references/intake/VIA_VRN_FirstPageEngine_v0101_b522/VIA_VRN_FirstPageEngine_2.py(零觸碰;md5 冊 _INTAKE_MANIFEST_b522.json)
+本橋(正主;Zero-Hydra 一功能一主):
+  ① 以 importlib 載入收容件,拿它的 TickerFilename(檔名→代碼階梯:FILE_SUFFIX→FILE_BARE→SECTOR→TITLE_SUFFIX→TITLE_SYNONYM→BODY_SUFFIX→年段回收→BODY_BARE)、
+     FieldValidation(email/電話/目標價)、CrossValidation(檔名×首頁四欄互核、資訊區/本文區在不在)、FinancialValidation(加減/乘除/YoY 容差帶);
+  ② 名冊不再靠收容件的 SSOT 區塊(VIA 正典 SSOT 無 _RAW_REGEX/_RAW_SYNONYMS)→ 自 VDF 庫 tw_listings(code/name;唯讀;庫解析律 LL27/LL30)灌 official_set + 名→碼;
+  ③ 橋側防呆(收容件已知毛病,不改它):券商別名短拉丁字(gs/ms/mq)須大寫獨立詞、一般拉丁詞要詞界、泛用英文字(capital/president)要跟 securities/invest;
+     評等要線索詞(評等/建議/Rating)或獨立短行,buy 不撞 buyback、hold 不撞 holdings、add 不單獨算;目標價先認「目標價/TP/Target Price」線索,再退收容件 NT$ 正則;
+     台灣本土券商補冊(兆豐/國泰/永豐/玉山/元富/華南/日盛/康和/宏遠/台新/第一金/合庫/新光/國票/亞東/大昌/福邦/德信;外資 匯豐/法巴/瑞信/巴克萊/Jefferies/海通/中金/瑞穗/日興);
+     民國 7 碼日期(1140822)補認;
+  ④ enrich:讀 ENG072 的 sidecar(VIA_Reports/first_page_text/<stem>.json;header/right/body/footer)→ 每件寫 VIA_Reports/first_page_logic/<stem>.logic86.json
+     (append-only;ENG072 正本與其 sidecar 零觸碰;律 L46)+ LOGIC86_latest.json 摘要(代碼法分布/檔名×首頁一致率/券商/評等/目標價命中率);
+  ⑤ bench:拿 functional modules/VRN/StockReportBasicInfo.json(76 份真檔名,57 份有 Ticker/Broker/ReportDate 正解)量檔名階梯命中率,漏的逐件印(小數量實測);
+  ⑥ gap:收容件八模組對 VRN 現況的補缺表(已接線/未接線誠實:版面字級階層與隱藏格線表格重建要 chars 幾何,本批不接)。
+誠實四態:收容件缺=ABSENT;sidecar 零件=NODATA;名冊庫缺=名冊 ABSENT 仍可跑(命中率打折並標明)。零網路。
+用法:python3 VRN_ENG086_FirstPageLogicBridge_v0100.py [status|gap|bench [--limit N]|enrich [--in DIR] [--out DIR] [--limit N]] | --selftest
+"""
+from __future__ import annotations
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+
+import datetime as _dt
+import hashlib
+import importlib.util
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+VIA = HERE.parent.parent
+INTAKE_ROOT = HERE / "references" / "intake"
+INTAKE_GLOB = "VIA_VRN_FirstPageEngine_v*_b*"
+ENGINE_GLOB = "VIA_VRN_FirstPageEngine*.py"
+FP_OUT = VIA / "VIA_Reports" / "first_page_text"       # ENG072 sidecar(只讀)
+OUT = VIA / "VIA_Reports" / "first_page_logic"         # 本橋產物(append-only)
+BASICINFO = HERE / "StockReportBasicInfo.json"
+OLD_DB = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb"
+
+EXTRA_BROKER = {
+    "MEGA": ["兆豐", "mega securities", "mega sec"], "CATHAY": ["國泰證期", "國泰證券", "國泰投顧", "cathay securities", "cathay sec"],
+    "SINOPAC": ["永豐", "sinopac"], "ESUN": ["玉山", "e.sun", "esun"], "MASTERLINK": ["元富", "masterlink"],
+    "HUANAN": ["華南永昌", "華南", "hua nan"], "JIHSUN": ["日盛", "jih sun", "jihsun"], "CONCORD": ["康和", "concord securities"],
+    "HONGYUAN": ["宏遠", "hong yuan"], "TAISHIN": ["台新", "taishin"], "FIRSTSEC": ["第一金", "first securities"],
+    "TCB": ["合庫", "合作金庫"], "SKS": ["新光", "shin kong"], "IBF": ["國票", "ibf securities"], "ORIENTAL": ["亞東", "oriental securities"],
+    "DACHANG": ["大昌", "ta chang"], "FUBANG": ["福邦"], "TACHING": ["德信"],
+    "HSBC": ["匯豐", "hsbc"], "BNP": ["法巴", "bnp paribas", "bnp"], "CREDITSUISSE": ["瑞信", "credit suisse"], "BARCLAYS": ["巴克萊", "barclays"],
+    "JEFFERIES": ["jefferies"], "HAITONG": ["海通", "haitong"], "CICC": ["中金", "cicc"], "MIZUHO": ["瑞穗", "mizuho"], "NIKKO": ["日興", "smbc nikko", "nikko"],
+    "BERNSTEIN": ["bernstein"], "JPMORGAN": ["jp", "小摩"], "MORGANSTANLEY": ["大摩"], "KGI": ["凱基投顧", "凱基證券"], "CAPITAL": ["群益投顧", "群益證券"], "PRESIDENT": ["統一投顧", "統一證券"], "CTBC": ["中信投顧", "中信證券"],
+}
+GENERIC_LATIN = {"capital", "president", "first", "oriental", "concord", "mega", "add"}     # 泛用英文字:要跟 securities/invest 才算券商
+_RATING_CUE = re.compile(r"(投資評等|評等|評級|建議|Rating|Recommendation|Rec\.)\s*[:：]?\s*(強力買進|買進|加碼|逢低|中立|持有|區間|賣出|減碼|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)", re.I)
+_TP_CUES = (re.compile(r"目標價[^\d]{0,14}?(\d[\d,]*\.?\d*)"),
+            re.compile(r"(?<![A-Za-z])(?:(?i:target\s*price|price\s*target)|TP|PT)(?![A-Za-z])\s*[:：]?\s*(?:\(?NT\$?\)?|NTD|TWD)?\s*\$?\s*(\d[\d,]*\.?\d*)"))
+
+
+# ---------------------------------------------------------------- 收容件
+def intake_home() -> Path | None:
+    hits = sorted(p for p in INTAKE_ROOT.glob(INTAKE_GLOB) if p.is_dir())
+    return hits[-1] if hits else None
+
+
+def intake_engine_file(home: Path | None = None) -> Path | None:
+    home = home or intake_home()
+    if home is None:
+        return None
+    fs = sorted(home.glob(ENGINE_GLOB))
+    return fs[-1] if fs else None
+
+
+def intake_md5_ok(home: Path | None = None) -> tuple[bool, str]:
+    home = home or intake_home()
+    if home is None:
+        return False, "收容件缺"
+    mans = sorted(home.glob("_INTAKE_MANIFEST_*.json"))
+    f = intake_engine_file(home)
+    if not mans or f is None:
+        return False, "冊或引擎檔缺"
+    try:
+        m = json.loads(mans[-1].read_text(encoding="utf-8"))
+        want = next((x["md5"] for x in m.get("files", []) if x.get("name") == f.name), None)
+        got = hashlib.md5(f.read_bytes()).hexdigest()
+        return (want == got), f"md5 {got[:8]}{'=' if want == got else '≠'}{(want or '?')[:8]}"
+    except Exception as exc:
+        return False, f"冊讀不了 {type(exc).__name__}"
+
+
+_E = {"mod": None, "why": ""}
+
+
+def load_intake():
+    """收容件模組(importlib;零觸碰);缺=None+因由。"""
+    if _E["mod"] is not None or _E["why"]:
+        return _E["mod"], _E["why"]
+    f = intake_engine_file()
+    if f is None:
+        _E["why"] = f"收容件缺:{INTAKE_ROOT / INTAKE_GLOB}"
+        return None, _E["why"]
+    try:
+        spec = importlib.util.spec_from_file_location("via_vrn_firstpage_intake", f)
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["via_vrn_firstpage_intake"] = m
+        spec.loader.exec_module(m)
+        for need in ("TickerFilename", "BrokerRatingDict", "FieldValidation", "CrossValidation", "FinancialValidation", "FirstPageEngine"):
+            if not hasattr(m, need):
+                _E["why"] = f"收容件無 {need}"
+                return None, _E["why"]
+        _E["mod"] = m
+        return m, ""
+    except Exception as exc:
+        _E["why"] = f"收容件載入失敗 {type(exc).__name__}:{str(exc)[:60]}"
+        return None, _E["why"]
+
+
+# ---------------------------------------------------------------- 名冊(VDF tw_listings 唯讀)
+def resolve_vdf_db() -> tuple[Path | None, str]:
+    p = os.environ.get("VIA_DB_VDF_TW_MARKET")
+    if p and Path(p).is_file():
+        return Path(p), "VIA_DB_VDF_TW_MARKET"
+    home = os.environ.get("VIA_DATA_HOME")
+    if home and Path(home).is_dir():
+        hits = sorted(Path(home).rglob("vdf_tw_market.duckdb"))
+        if hits:
+            return hits[0], "VIA_DATA_HOME rglob"
+    if OLD_DB.is_file():
+        return OLD_DB, "舊主路徑 output_hub/mega"
+    return None, "庫缺(先 via-vdffetch / via-datahome)"
+
+
+_R = {"tried": False, "codes": set(), "names": {}, "how": ""}
+
+
+def roster() -> dict:
+    """official_set(四碼)+ 名→碼;庫缺/表缺=空集誠實(命中率打折並標明)。"""
+    if _R["tried"]:
+        return _R
+    _R["tried"] = True
+    db, how = resolve_vdf_db()
+    _R["how"] = how
+    if db is None:
+        return _R
+    try:
+        import duckdb
+        con = duckdb.connect(str(db), read_only=True)
+        try:
+            rows = con.execute("SELECT code, name FROM tw_listings WHERE code IS NOT NULL").fetchall()
+        finally:
+            con.close()
+        for code, name in rows:
+            c = str(code).strip()
+            if len(c) == 4 and c.isdigit():
+                _R["codes"].add(c)
+                n = str(name or "").strip()
+                if len(n) >= 2:
+                    _R["names"][n] = c
+        _R["how"] = f"{how} · tw_listings {len(_R['codes'])} 檔"
+    except Exception as exc:
+        _R["how"] = f"{how} · tw_listings 讀不了 {type(exc).__name__}"
+    return _R
+
+
+# ---------------------------------------------------------------- 橋側防呆
+def _has_cjk(s: str) -> bool:
+    return bool(re.search(r"[一-鿿]", s or ""))
+
+
+def broker_tables(E=None) -> dict:
+    """收容件 BROKER 字典 + VIA 補冊(canon → 別名集)。"""
+    E = E or load_intake()[0]
+    base = dict(getattr(E, "BrokerRatingDict").BROKER) if E is not None else {}
+    out = {k: list(v) for k, v in base.items()}
+    for k, v in EXTRA_BROKER.items():
+        out.setdefault(k, [])
+        out[k] = list(dict.fromkeys(out[k] + list(v)))
+    return out
+
+
+def safe_broker(text: str, E=None) -> str | None:
+    """券商正典:CJK 別名子字串;拉丁別名詞界;≤3 字拉丁(gs/ms/mq/ubs)須大寫獨立詞;泛用英文字要跟 securities/invest。最長別名優先。"""
+    if not text:
+        return None
+    low = text.lower()
+    best = None
+    for canon, aliases in broker_tables(E).items():
+        for a in aliases:
+            al = a.lower().strip()
+            if not al:
+                continue
+            hit = False
+            if _has_cjk(al):
+                hit = al in text
+            elif len(al) <= 3:
+                hit = re.search(r"(?<![A-Za-z])" + re.escape(a.upper()) + r"(?![A-Za-z])", text) is not None
+            elif al in GENERIC_LATIN:
+                hit = re.search(r"(?<![a-z])" + re.escape(al) + r"(?![a-z])\s+(securities|sec\b|investment|invest)", low) is not None
+            else:
+                hit = re.search(r"(?<![a-z])" + re.escape(al) + r"(?![a-z])", low) is not None
+            if hit and (best is None or len(al) > best[1]):
+                best = (canon, len(al))
+    return best[0] if best else None
+
+
+def safe_rating(text: str, E=None) -> dict:
+    """評等正典:線索詞(評等/建議/Rating)後的詞優先;否則獨立短行(≤8 字)剛好是別名;拉丁詞界(buy≠buyback、hold≠holdings);add 不單獨算。"""
+    E = E or load_intake()[0]
+    RAT = dict(getattr(E, "BrokerRatingDict").RATING) if E is not None else {}
+    if not text:
+        return {"raw": None, "canonical": None, "in_dict": False, "how": "空文"}
+
+    def canon_of(word: str) -> str | None:
+        w = word.lower().strip()
+        for k, al in RAT.items():
+            for a in al:
+                a = a.lower()
+                if _has_cjk(a):
+                    if a in w:
+                        return k
+                elif re.fullmatch(re.escape(a), w) or re.search(r"(?<![a-z])" + re.escape(a) + r"(?![a-z])", w):
+                    return k
+        return None
+    m = _RATING_CUE.search(text)
+    if m:
+        c = canon_of(m.group(2))
+        return {"raw": m.group(0)[:40], "canonical": c, "in_dict": c is not None, "how": "線索詞"}
+    for ln in text.splitlines():
+        s = ln.strip()
+        if 0 < len(s) <= 8:
+            c = canon_of(s)
+            if c is not None and s.lower() not in ("add",):
+                return {"raw": s, "canonical": c, "in_dict": True, "how": "獨立短行"}
+    for k, al in RAT.items():
+        for a in al:
+            if not _has_cjk(a) and len(a) >= 5 and a.lower() not in ("accumulate",):
+                if re.search(r"(?<![a-z])" + re.escape(a.lower()) + r"(?![a-z])", text.lower()):
+                    return {"raw": a, "canonical": k, "in_dict": True, "how": "拉丁詞界"}
+    return {"raw": None, "canonical": None, "in_dict": False, "how": "無線索"}
+
+
+def _plausible_tp(raw: str) -> bool:
+    """數字字串至少兩位數或帶小數(「1」「5」這種單碼多半是頁碼/序號)。"""
+    digits = re.sub(r"[^\d]", "", raw or "")
+    return len(digits) >= 2 or "." in (raw or "")
+
+
+def safe_target_price(text: str, E=None, exclude_code: str | None = None, exclude_codes: set | None = None) -> tuple[float | None, str]:
+    """目標價:線索詞(目標價/Target Price/TP/PT 詞界)優先,退收容件 NT$ 弱正則;候選過濾:至少兩位數或帶小數、不得是代碼(解析到的代碼或名冊內且出現在文中的四碼)。"""
+    ex = set(exclude_codes or set())
+    if exclude_code:
+        ex.add(str(exclude_code))
+
+    def _ok(raw: str):
+        if not _plausible_tp(raw):
+            return None
+        try:
+            v = float(raw.replace(",", ""))
+        except ValueError:
+            return None
+        if v == float(int(v)) and str(int(v)) in ex:
+            return None
+        return v
+    for i, rx in enumerate(_TP_CUES):
+        for m in rx.finditer(text or ""):
+            v = _ok(m.group(1))
+            if v is not None:
+                return v, ("目標價線索" if i == 0 else "TP 線索")
+    E = E or load_intake()[0]
+    if E is not None:
+        try:
+            for m in E.FieldValidation._TP.finditer(text or ""):
+                v = _ok(m.group(1))
+                if v is not None:
+                    return v, "收容件 NT$ 正則(弱)"
+        except Exception:
+            pass
+    return None, "無"
+
+
+def roc7_to_iso(tok: str) -> str | None:
+    t = str(tok or "")
+    if len(t) == 7 and t.isdigit() and t[0] == "1":
+        y, mo, d = 1911 + int(t[:3]), int(t[3:5]), int(t[5:])
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+    return None
+
+
+def make_tf(E, codes: set | None = None, names: dict | None = None):
+    tf = E.TickerFilename(None, codes or None)
+    if names:
+        tf.alias2tk = dict(names)
+        tf.tk2name = {c: n for n, c in names.items()}
+    return tf
+
+
+def filename_fields(E, tf, filename: str) -> dict:
+    p = tf.parse_filename(filename)
+    ticker = p["tickers"][0] if p["tickers"] else None
+    date = p["dates"][0] if p["dates"] else None
+    if date is None:
+        for tok, kind in tf.tokenize(filename):
+            if kind == "DIGIT" and roc7_to_iso(tok):
+                date = roc7_to_iso(tok)
+                break
+    broker = safe_broker(re.sub(r"\.(pdf|docx?|pptx?)$", "", filename, flags=re.I), E)
+    return {"ticker": ticker, "broker": broker, "date": date, "parse": p}
+
+
+# ---------------------------------------------------------------- 逐件邏輯
+def analyze_one(E, tf, filename: str, header: str, right: str, body: str, footer: str) -> dict:
+    fnf = filename_fields(E, tf, filename)
+    title = (header or "").strip() or (body or "").strip().splitlines()[0][:120] if (header or body) else ""
+    full = "\n".join(x for x in (header, right, body, footer) if x)
+    zone = "\n".join(x for x in (header, right) if x) + "\n" + (body or "")[:400]
+    res = tf.resolve(filename, title, body or "")
+    emails = tf.parse_email(full)
+    fv = E.FieldValidation()
+    page_broker = safe_broker(zone, E) or safe_broker(full, E)
+    rating = safe_rating(zone, E)
+    codes_in_text = {c for c in re.findall(r"(?<!\d)([1-9]\d{3})(?!\d)", full) if c in roster()["codes"]} | ({res.get("ticker")} if res.get("ticker") else set())
+    digest = bool(re.search(r"晨會|早報|週報|周報|日報|摘要|盤勢|大趨勢|策略|展望", filename)) and res.get("method") in ("BODY_BARE", "BODY_SUFFIX", "NONE", "SECTOR_FILE", "SECTOR_TITLE")
+    if digest:                                                      # 多公司摘要/晨會:目標價與評等不屬單一公司,不取(誠實)
+        tp, tp_how = None, "多公司摘要不取"
+        rating = {"raw": None, "canonical": None, "in_dict": False, "how": "多公司摘要不取"}
+    else:
+        tp, tp_how = safe_target_price(zone, E, exclude_codes=codes_in_text)
+        if tp is None:
+            tp, tp_how = safe_target_price(full, E, exclude_codes=codes_in_text)
+    xv = E.CrossValidation()
+    page = {"ticker": res.get("ticker") or None, "broker": page_broker, "date": fnf["date"]}
+    out = {
+        "schema": "VIA.FirstPageLogic86.v1", "filename": filename,
+        "filename_fields": {k: fnf[k] for k in ("ticker", "broker", "date")},
+        "ticker": res, "broker": page_broker, "rating": rating,
+        "target_price": {"value": tp, "how": tp_how, "validation": (fv.validate_target_price(tp) if tp is not None else {"target_price": None, "verdict": "N/A"})},
+        "emails": emails, "tel": fv.extract_tel(full)[:3],
+        "xv_filename_vs_page": xv.filename_vs_page(fnf, page),
+        "xv_zone_presence": xv.zone_presence([x for x in (tp, rating.get("canonical"), page_broker) if x], [s for s in re.split(r"(?<=[。.!?！？])\s*", body or "") if s.strip()][:50]),
+        "governance": "append-only;ENG072 正本與 sidecar 零觸碰;收容件零觸碰(橋側防呆)",
+    }
+    if emails:
+        e0 = emails[0]["analyst_id"] + "@" + emails[0]["broker_domain"]
+        out["email_validation"] = fv.validate_email(e0, page_broker)
+    return out
+
+
+def _read_sidecar(p: Path) -> dict:
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return {"_err": f"{type(exc).__name__}"}
+    if not isinstance(d, dict):
+        return {"_err": "非物件"}
+    body = d.get("body") or ""
+    if not body and (p.with_suffix(".txt")).exists():
+        try:
+            body = p.with_suffix(".txt").read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            body = ""
+    src = d.get("source") or {}
+    fn = None
+    if isinstance(src, dict):
+        fn = src.get("file") or src.get("name") or src.get("path")
+    elif isinstance(src, str):
+        fn = src
+    fn = Path(fn).name if fn and re.search(r"\.(pdf|docx?|pptx?|png|jpe?g|tiff?)$", str(fn), re.I) else None     # source 多半是方法描述字串,不是檔名
+    fn = fn or (p.stem + ".pdf")
+    return {"filename": fn, "header": d.get("header") or "", "right": d.get("right") or "", "body": body, "footer": d.get("footer") or ""}
+
+
+def enrich(args: list, do_print: bool = True) -> dict:
+    E, why = load_intake()
+    rep = {"schema": "VIA.FirstPageLogic86.summary.v1", "verb": "enrich", "ts": _dt.datetime.now().isoformat(timespec="seconds"), "state": "ABSENT", "why": why, "n": 0}
+    if E is None:
+        _emit(rep, do_print)
+        return rep
+    src = Path(_arg(args, "--in", str(FP_OUT)))
+    out_dir = Path(_arg(args, "--out", str(OUT)))
+    limit = int(_arg(args, "--limit", "0") or 0)
+    files = sorted(p for p in src.glob("*.json") if not p.name.endswith(".logic86.json") and not p.name.startswith("LOGIC86"))
+    if limit > 0:
+        files = files[:limit]
+    if not files:
+        rep.update(state="NODATA", why=f"sidecar 零件:{src}(先 via-firstpage)")
+        _emit(rep, do_print)
+        return rep
+    R = roster()
+    tf = make_tf(E, R["codes"], R["names"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    methods, agree, n_broker, n_rating, n_tp, n_err, items = {}, 0, 0, 0, 0, 0, []
+    for p in files:
+        sc = _read_sidecar(p)
+        if sc.get("_err"):
+            n_err += 1
+            items.append({"stem": p.stem, "state": "FAIL", "why": sc["_err"]})
+            continue
+        try:
+            r = analyze_one(E, tf, sc["filename"], sc["header"], sc["right"], sc["body"], sc["footer"])
+        except Exception as exc:
+            n_err += 1
+            items.append({"stem": p.stem, "state": "FAIL", "why": f"{type(exc).__name__}:{str(exc)[:60]}"})
+            continue
+        r["source_sidecar"] = str(p)
+        r["ts"] = rep["ts"]
+        (out_dir / (p.stem + ".logic86.json")).write_text(json.dumps(r, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        m = r["ticker"]["method"]
+        methods[m] = methods.get(m, 0) + 1
+        if r["xv_filename_vs_page"]["verdict"] == "PASS" and r["xv_filename_vs_page"]["fields"]["ticker"]["match"] is not None:
+            agree += 1
+        n_broker += 1 if r["broker"] else 0
+        n_rating += 1 if r["rating"].get("canonical") else 0
+        n_tp += 1 if r["target_price"]["value"] is not None else 0
+        items.append({"stem": p.stem, "state": "OK", "ticker": r["ticker"]["ticker"], "method": m, "broker": r["broker"], "rating": r["rating"].get("canonical"), "tp": r["target_price"]["value"]})
+    n = len(files) - n_err
+    rep.update(state="OK" if n > 0 else "FAIL", n=n, errors=n_err, roster=R["how"], out_dir=str(out_dir),
+               methods=methods, ticker_agree_filename_page=agree, broker_hit=n_broker, rating_hit=n_rating, tp_hit=n_tp, items=items,
+               why=f"{n} 件 · 代碼法 {methods} · 檔名×首頁代碼一致 {agree}/{n} · 券商 {n_broker}/{n} · 評等 {n_rating}/{n} · 目標價 {n_tp}/{n}")
+    (out_dir / "LOGIC86_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    _emit(rep, do_print)
+    return rep
+
+
+def bench(args: list, do_print: bool = True) -> dict:
+    """小數量實測:StockReportBasicInfo.json 的真檔名 vs 記錄的 Ticker/Broker/ReportDate。"""
+    E, why = load_intake()
+    rep = {"verb": "bench", "state": "ABSENT", "why": why, "n": 0}
+    if E is None:
+        _emit(rep, do_print)
+        return rep
+    if not BASICINFO.exists():
+        rep.update(state="NODATA", why=f"{BASICINFO.name} 缺")
+        _emit(rep, do_print)
+        return rep
+    recs = [r for r in json.loads(BASICINFO.read_text(encoding="utf-8")) if r.get("SourceFile")]
+    limit = int(_arg(args, "--limit", "0") or 0)
+    if limit > 0:
+        recs = recs[:limit]
+    R = roster()
+    tf = make_tf(E, R["codes"], R["names"])
+    t_hit = t_tot = b_hit = b_tot = d_hit = d_tot = 0
+    misses = []
+    for r in recs:
+        fn = r["SourceFile"]
+        res = tf.resolve(fn)
+        ff = filename_fields(E, tf, fn)
+        want_t = str(r.get("Ticker") or "").strip()
+        if want_t:
+            t_tot += 1
+            if res.get("ticker") == want_t:
+                t_hit += 1
+            else:
+                misses.append(f"代碼 {fn[:48]} → {res.get('ticker') or '-'}({res.get('method')}) ≠ {want_t}")
+        want_b = str(r.get("Broker") or "").strip()
+        if want_b:
+            b_tot += 1
+            wb = safe_broker(want_b, E)
+            if ff["broker"] and wb and ff["broker"] == wb:
+                b_hit += 1
+            else:
+                misses.append(f"券商 {fn[:48]} → {ff['broker'] or '-'} ≠ {want_b}({wb or '冊無'})")
+        want_d = str(r.get("ReportDate") or "").strip()
+        if want_d:
+            d_tot += 1
+            if ff["date"] == want_d:
+                d_hit += 1
+            else:
+                misses.append(f"日期 {fn[:48]} → {ff['date'] or '-'} ≠ {want_d}")
+    rep.update(state="OK", n=len(recs), roster=R["how"], ticker=f"{t_hit}/{t_tot}", broker=f"{b_hit}/{b_tot}", date=f"{d_hit}/{d_tot}", misses=misses,
+               why=f"{len(recs)} 份真檔名 · 代碼 {t_hit}/{t_tot} · 券商 {b_hit}/{b_tot} · 日期 {d_hit}/{d_tot} · 名冊 {R['how']}")
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "BENCH_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    _emit(rep, do_print)
+    if do_print:
+        for m in misses[:40]:
+            print("  [漏] " + m)
+    return rep
+
+
+GAP_TABLE = [
+    ("TickerFilename 檔名→代碼階梯(FILE_SUFFIX/FILE_BARE/SECTOR/TITLE_SUFFIX/TITLE_SYNONYM/BODY_SUFFIX/年段回收/BODY_BARE)+ 三碼互核", "已接線(enrich/bench)"),
+    ("BrokerRatingDict 券商/評等正典(+VIA 本土券商補冊;橋側詞界防呆)", "已接線"),
+    ("FieldValidation email/電話/目標價 + 目標價合理性(TP=PER×EPS、上漲空間 ≤200%)", "已接線(PER/EPS 有料時才驗)"),
+    ("CrossValidation 檔名×首頁四欄互核、資訊區/本文區在不在、歷史值對交易所來源", "已接線(檔名×首頁、區在不在);歷史值對來源=候(要 ENG074 表格)"),
+    ("NLPRepair 句修復(可掛 via_nlp)", "未接線(ENG072 自有句級修復 ⑭;不疊床)"),
+    ("Layout 字級階層(MAIN_TITLE/HEADLINE/H2/BODY/FOOTER)+ 公司名=最大且粗體", "未接線(要 chars 幾何;ENG072 sidecar 無 chars)=候"),
+    ("TableGeometry 隱藏格線表格重建 + 期別表頭正典(12/24A→2024-12)", "未接線(要 chars 幾何)=候;期別正典可供 ENG074"),
+    ("FinancialValidation 加減/乘除/YoY 容差帶(PASS/PASS-SOFT/WARN/FAIL)", "庫可用;接 ENG074/ENG080 = 候"),
+    ("PriceAdjustment 還原價一致性/上漲空間", "庫可用;ENG080 已有除權息因子鏈(不疊床)"),
+]
+
+
+def gap(do_print: bool = True) -> dict:
+    E, why = load_intake()
+    rep = {"verb": "gap", "state": "OK" if E is not None else "ABSENT", "why": why or f"{len(GAP_TABLE)} 模組補缺表", "rows": GAP_TABLE}
+    if do_print:
+        print(f"=== [via-fplogic gap] 收容件八模組 vs VRN 現況 · {rep['state']} · {rep['why'][:100]} ===")
+        for a, b in GAP_TABLE:
+            print(f"  [{'接' if b.startswith('已') else '候'}] {a} → {b}")
+    return rep
+
+
+def status(do_print: bool = True) -> dict:
+    home = intake_home()
+    ok, md = intake_md5_ok(home)
+    R = roster()
+    n_sc = len(list(FP_OUT.glob("*.json"))) if FP_OUT.exists() else 0
+    last = None
+    if (OUT / "LOGIC86_latest.json").exists():
+        try:
+            last = json.loads((OUT / "LOGIC86_latest.json").read_text(encoding="utf-8"))
+        except Exception:
+            last = None
+    rep = {"verb": "status", "state": "OK" if home is not None and ok else "ABSENT", "intake": str(home) if home else None, "md5": md, "roster": R["how"],
+           "sidecars": n_sc, "last": {k: last.get(k) for k in ("ts", "state", "n", "why")} if last else None,
+           "why": f"收容件 {'在' if home else '缺'} {md} · 名冊 {R['how']} · ENG072 sidecar {n_sc} 件 · 最近 enrich {(last or {}).get('ts') or '尚未'}"}
+    _emit(rep, do_print)
+    return rep
+
+
+def _arg(args: list, key: str, default=None):
+    if key in args and args.index(key) + 1 < len(args):
+        return args[args.index(key) + 1]
+    return default
+
+
+def _emit(rep: dict, do_print: bool) -> None:
+    if not do_print:
+        return
+    print(f"=== [via-fplogic {rep.get('verb')}] 第一頁邏輯補缺正主橋 · {rep['state']} · {str(rep.get('why', ''))[:170]} ===")
+    for it in (rep.get("items") or [])[:12]:
+        print(f"  [{it.get('state'):<4}] {it.get('stem', '')[:44]:<44} 代碼 {it.get('ticker') or '-'}({it.get('method') or it.get('why', '')[:30]}) 券商 {it.get('broker') or '-'} 評等 {it.get('rating') or '-'} 目標價 {it.get('tp') if it.get('tp') is not None else '-'}")
+    if rep.get("out_dir"):
+        print(f"  [產物] {rep['out_dir']}/<stem>.logic86.json + LOGIC86_latest.json(append-only)")
+
+
+# ---------------------------------------------------------------- 自測
+def selftest() -> int:
+    import tempfile
+    fails = []
+
+    def chk(name, cond, note=""):
+        print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
+        if not cond:
+            fails.append(name)
+
+    home = intake_home()
+    ok, md = intake_md5_ok(home)
+    chk("① 收容件在位(尾版 glob)且 md5 對冊(零觸碰)", home is not None and ok, f"({home.name if home else '缺'} {md})")
+    E, why = load_intake()
+    chk("② importlib 載入收容件:TickerFilename/BrokerRatingDict/FieldValidation/CrossValidation/FinancialValidation/FirstPageEngine 齊", E is not None, why)
+    if E is None:
+        print(f"  [計] 十檢 OK {10 - len(fails) - 8} · FAIL {len(fails) + 8}(收容件缺,後八檢略)")
+        return 1
+    tf = make_tf(E, {"3706", "2330", "6873"}, {"台積電": "2330", "神達": "3706", "泓德能源": "6873"})
+    fn1 = "【國泰證期研究部】神達(3706 TT)-初次評等買進(+30.4_)-大顯神威，營運騰達-20250822.pdf"
+    ff1 = filename_fields(E, tf, fn1)
+    r1 = tf.resolve(fn1)
+    chk("③ 真檔名:代碼 3706(FILE_SUFFIX 「3706 TT」)· 日期 2025-08-22 · 券商 CATHAY(VIA 補冊「國泰證期」)", r1["ticker"] == "3706" and r1["method"] == "FILE_SUFFIX" and ff1["date"] == "2025-08-22" and ff1["broker"] == "CATHAY", f"({r1['method']} {ff1['date']} {ff1['broker']})")
+    r2 = tf.resolve("20250819兆豐個股報告-泓德能源(6873).pdf")
+    r3 = tf.resolve("2025 台積電 研究報告.pdf", title="台積電(2330 TT)", body="")
+    r4 = tf.resolve("半導體產業展望 2025.pdf")
+    r5 = tf.resolve("2025 台積電.pdf", title="台積電 法說會重點", body="")
+    ff5 = filename_fields(E, tf, "凱基投顧-1140822-台積電.pdf")
+    chk("④ 階梯:FILE_BARE 6873 · 年段 2025 不當代碼→TITLE_SUFFIX 2330 · 產業檔=SECTOR · 名→碼 TITLE_SYNONYM 2330 · 民國 7 碼 1140822→2025-08-22 · 兆豐=MEGA",
+        r2["ticker"] == "6873" and r2["method"] == "FILE_BARE" and r3["ticker"] == "2330" and r3["method"] == "TITLE_SUFFIX" and r4["is_sector"] and r5["ticker"] == "2330" and r5["method"] == "TITLE_SYNONYM"
+        and ff5["date"] == "2025-08-22" and ff5["broker"] == "KGI" and filename_fields(E, tf, "20250819兆豐個股報告-泓德能源(6873).pdf")["broker"] == "MEGA",
+        f"({r2['method']} {r3['method']} {r4['method']} {r5['method']} {ff5['date']})")
+    naive = E.BrokerRatingDict()
+    chk("⑤ 券商防呆(收容件 broker_normalize 子字串撞詞;橋側詞界):earnings guidance→None(收容件會說 GOLDMAN)· 凱基投顧→KGI · Goldman Sachs→GOLDMAN · 獨立 MS→MORGANSTANLEY · terms→None · capital expenditure→None",
+        naive.broker_normalize("earnings guidance") == "GOLDMAN" and safe_broker("earnings guidance", E) is None and safe_broker("凱基投顧 研究部", E) == "KGI"
+        and safe_broker("Goldman Sachs Equity Research", E) == "GOLDMAN" and safe_broker("MS Research 2330", E) == "MORGANSTANLEY" and safe_broker("terms of use", E) is None
+        and safe_broker("capital expenditure rose", E) is None and safe_broker("Capital Securities Corp", E) == "CAPITAL")
+    chk("⑥ 評等防呆:buyback 計畫→None(收容件會說 BUY)· 評等:買進→BUY · Rating: Overweight→BUY · holdings 30%→None · 維持中立(線索)→HOLD · 獨立短行「賣出」→SELL",
+        naive.rating_normalize("buyback 計畫") == "BUY" and safe_rating("庫藏股 buyback 計畫", E)["canonical"] is None and safe_rating("投資評等:買進 目標價 1,250", E)["canonical"] == "BUY"
+        and safe_rating("Rating: Overweight", E)["canonical"] == "BUY" and safe_rating("holdings 30% of assets", E)["canonical"] is None
+        and safe_rating("建議:中立", E)["canonical"] == "HOLD" and safe_rating("台積電\n賣出\n目標價 900", E)["canonical"] == "SELL")
+    tp1, how1 = safe_target_price("目標價:NT$1,250 元(前 1,100)", E)
+    tp2, how2 = safe_target_price("Target Price NT$ 1,300 ; current 1,000", E)
+    tp3, _ = safe_target_price("營收 NT$ 12,345 百萬", E)
+    tp4, _ = safe_target_price("目標價 4441 公司訪談", E, exclude_code="4441")
+    tp5, _ = safe_target_price("TP 1 頁", E)
+    tp6, _ = safe_target_price("HTTP 200 ok", E)
+    fv = E.FieldValidation()
+    v = fv.validate_target_price(1250.0, per=20, eps=62.5, current=1000.0, fin=E.FinancialValidation())
+    chk("⑦ 目標價:線索詞優先(目標價/Target Price/TP/PT 詞界)1250/1300;無線索退收容件弱正則(營收 NT$ 會誤中=標「弱」)· 目標價旁四碼=代碼不算 · 單碼不算 · HTTP 不算 · 合理性 TP=PER×EPS PASS · 上漲 25% sane",
+        tp1 == 1250.0 and how1 == "目標價線索" and tp2 == 1300.0 and v["verdict"] == "PASS" and any(c["name"] == "upside_sane" and c["ok"] for c in v["checks"])
+        and tp4 is None and tp5 is None and tp6 is None, f"({tp1} {tp2} 弱={tp3} 代碼旁={tp4} 單碼={tp5} HTTP={tp6})")
+    xv = E.CrossValidation()
+    a = xv.filename_vs_page({"ticker": "2330", "broker": "KGI", "date": "2025-08-22"}, {"ticker": "2330", "broker": "KGI", "date": "2025-08-22"})
+    b = xv.filename_vs_page({"ticker": "2330", "broker": "KGI", "date": None}, {"ticker": "2317", "broker": None, "date": None})
+    z = xv.zone_presence([1250, "BUY"], ["句一", "句二"])
+    chk("⑧ 互核:三欄同=PASS · 代碼異=FAIL(缺欄=None 不判)· 區在不在 PASS", a["verdict"] == "PASS" and b["verdict"] == "FAIL" and b["fields"]["broker"]["match"] is None and z["verdict"] == "PASS")
+    with tempfile.TemporaryDirectory() as td:
+        T = Path(td)
+        sc = T / "in"
+        sc.mkdir()
+        raw = json.dumps({"header": "凱基投顧 研究部 台積電(2330 TT) 投資評等:買進 目標價:NT$1,250", "right": "analyst@kgi.com.tw 02-2181-8888", "body": "台積電第二季營收年增 30%。毛利率 58%。", "footer": "免責聲明", "tables": []}, ensure_ascii=False)
+        (sc / "凱基投顧-20250822-台積電(2330).json").write_text(raw, encoding="utf-8")
+        (sc / "壞件.json").write_text("{not json", encoding="utf-8")
+        rep = enrich(["--in", str(sc), "--out", str(T / "out")], do_print=False)
+        j = json.loads((T / "out" / "凱基投顧-20250822-台積電(2330).logic86.json").read_text(encoding="utf-8"))
+        same = (sc / "凱基投顧-20250822-台積電(2330).json").read_text(encoding="utf-8") == raw
+    chk("⑨ enrich:ENG072 sidecar → .logic86.json(代碼 2330 FILE_BARE · 券商 KGI · 評等 BUY · 目標價 1250 · email 驗 KGI 網域 · 檔名×首頁 PASS)· 壞件計 errors 不炸 · 來源 sidecar 位元零變(append-only)",
+        rep["state"] == "OK" and rep["n"] == 1 and rep["errors"] == 1 and j["ticker"]["ticker"] == "2330" and j["broker"] == "KGI" and j["rating"]["canonical"] == "BUY"
+        and j["target_price"]["value"] == 1250.0 and j.get("email_validation", {}).get("domain_broker") == "KGI" and j["xv_filename_vs_page"]["verdict"] == "PASS" and same,
+        f"({rep['why'][:80]})")
+    src = Path(__file__).read_text(encoding="utf-8").split("def selftest")[0]
+    chk("⑩ 律:零網路 · 收容件零觸碰(橋內無對收容件路徑的寫入)· 產物夾與 ENG072 分開(first_page_logic)· 名冊只讀(read_only=True)· 檔名 .logic86.json",
+        all(("import " + k) not in src for k in ("requests", "httpx", "urllib")) and "read_only=True" in src and 'VIA / "VIA_Reports" / "first_page_logic"' in src
+        and ".logic86.json" in src and "INTAKE_ROOT" in src and src.count("write_text") <= 4)
+    print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
+    return 1 if fails else 0
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if "--selftest" in args:
+        print("=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0100)· 十檢自測(零網路;收容件 FirstPageEngine v0101 _b522)===")
+        return selftest()
+    verb = args[0] if args and not args[0].startswith("--") else "status"
+    if verb == "status":
+        return 0 if status()["state"] == "OK" else 1
+    if verb == "gap":
+        return 0 if gap()["state"] == "OK" else 1
+    if verb == "bench":
+        return 0 if bench(args[1:])["state"] == "OK" else 1
+    if verb == "enrich":
+        return 0 if enrich(args[1:])["state"] == "OK" else 1
+    print(__doc__)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

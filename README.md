@@ -17,3 +17,7 @@ A simple Streamlit app showing movie data from [The Movie Database (TMDB)](https
    ```
    $ streamlit run streamlit_app.py
    ```
+
+## VIA HTML UI
+
+The repository also contains the tested, local-only VIA standardized HTML UI package in [`VIA_HTML_UI/`](./VIA_HTML_UI/). Open [`VIA_HTML_UI/ui/VIA-Complete-System.html`](./VIA_HTML_UI/ui/VIA-Complete-System.html) directly from `file://` to access the central management UI and SYNCHRONIZER. The package includes the cross-device E2E runner, cross-page synchronization test, offline smoke test, and complete-system quality gate documented in [`VIA_HTML_UI/REPOSITORY-INTEGRATION.md`](./VIA_HTML_UI/REPOSITORY-INTEGRATION.md).

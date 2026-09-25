@@ -9,9 +9,19 @@
  file-level SHA256 gate - per-replacement exact-count gate (fail-closed).
 ===================================================================== #>
 param(
-    [string]$Candidate = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\via_autoplot_engine_v001.py",
+    [string]$Candidate = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\VAP_ENG002_AutoplotEngine_v001.py",
     [string]$ExpectedSha = "2AE164B5082B2113E12C4D1BCD8D73E97C66010F602E01F4A81D8E4B53689EEC"
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $ts = Get-Date -Format "yyyyMMdd_HHmmss"
@@ -91,3 +101,4 @@ finally {
     Write-Host "[RUNDIR] $runDir" -ForegroundColor Cyan
     Write-Host "PowerShell session remains open." -ForegroundColor Cyan
 }
+

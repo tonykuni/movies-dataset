@@ -1,0 +1,80 @@
+{
+ "schema": "VIA.EnvRestore.Methodology.SSOT.v1",
+ "version": "v0100",
+ "batch": "批623",
+ "ts": "2026-09-19",
+ "purpose": "操作員令(批623)「整理環境若正確則將方法論導入 VIA 存檔」。批621 那條路是**真的把環境從死結裡拉出來的**(工作站實錄 APPLIED 跑 42 失敗 0),所以把它從一次性的處置升格成**可重複、可稽核的方法**。",
+ "when_to_use": [
+  "環境半殘:該有的件缺了一批,但**前一次成功的樣子有紀錄**",
+  "L19 這類「要綠才准裝、而黃的原因就是沒裝」的死結",
+  "**不適用**:直譯器本身換版/壞掉(那是 via-rebuild 的事,不是補件的事)"
+ ],
+ "steps": [
+  {
+   "n": 1,
+   "name": "找",
+   "what": "前一次成功的逐境紀錄",
+   "how": "LKGC per-env lock(批602 起逐境入冊)",
+   "why": "「成功過」必須是**有紀錄的事實**,不是印象;沒有紀錄就不要開始"
+  },
+  {
+   "n": 2,
+   "name": "還原",
+   "what": "照那份 lock 補齊",
+   "how": "uv pip install -r <lock>",
+   "why": "**只增不減**。`uv pip sync` 會移除 lock 以外的件=破壞,一律註解候裁"
+  },
+  {
+   "n": 3,
+   "name": "新增",
+   "what": "工具冊有、境裡沒有的件",
+   "how": "走正典 tools_plan,不自己重查一遍冊",
+   "why": "還原只回到過去;要往前得看冊(零 Hydra:不另寫一套查法)"
+  },
+  {
+   "n": 4,
+   "name": "衝突檢查",
+   "what": "還原集 + 新增集一起解析",
+   "how": "uv pip install --dry-run(零安裝)",
+   "why": "**只有 CLEAN 才准裝**;uv 不在就 NOT_RUN 不猜——沒檢查過不等於沒衝突"
+  },
+  {
+   "n": 5,
+   "name": "裝",
+   "what": "依計畫執行",
+   "how": "via-envgov resume --approve",
+   "why": "指令是操作員自己打的;同意閘**不代設**"
+  }
+ ],
+ "red_lines": [
+  "只增不減:全程只有 `uv pip install`,沒有 sync / uninstall / remove / 改名",
+  "破壞段(境重建、改名、退役)一律不進這條路,仍走候裁",
+  "同意閘不代設:VIA_NET_CONSENT 未開 = BLOCKED_CONSENT 零動作",
+  "CONFLICT 的境一律 SKIP,不裝",
+  "不複驗要**寫進資料**(reverified=false + 理由),不能靠沒提到(LL196)"
+ ],
+ "l19_exemption": {
+  "law": "L19 安裝核可律",
+  "scope": "只有 resume --approve 這一條路",
+  "why": "L19 要 RunGate 綠才准裝,而 RunGate 黃的原因就是這些件沒裝——擋住的那一件事正是解開它的那一件事(死結;LL195)。",
+  "bounded_by": "上面 red_lines 五條;任何一條破了就不該走這條路",
+  "not_a_precedent": "這是**這一種死結**的出口,不是 L19 普遍可以繞過"
+ },
+ "evidence": {
+  "workstation": "批622 實錄:`via-envgov resume --approve` → APPLIED · 跑 42 · 失敗 0;via_core +10 件、via_vap_312 +3 件(pandas/pyarrow/seaborn);衝突檢查 CLEAN 42 · CONFLICT 0 · NOT_RUN 0",
+  "after": "同一台機器接著跑 `via-rungate run --family 'vdf,vrn,vap'`:**vrn GREEN 8/8 · vap GREEN 8/8**(VAP_ENG015 從 ENV_BROKEN 轉 OK);vdf 仍 RED,但紅在 VDF_ENG088 的資料面,不是環境面",
+  "engine": "CGC_MDL135_EnvGovernance v0113 · 自測 50 檢(㊿ 四道紅線各撞一次)"
+ },
+ "next_after": "via-rungate run --family 'vdf,vrn,vap'(本方法不複驗,驗要另跑)",
+ "known_limits": [
+  {
+   "item": "本方法補得了件,補不了**直譯器身分**",
+   "why": "名實不符(NAME_LIES/HOME_DRIFT/ABI_MISMATCH)要 via-rebuild,見 L94 與 MDL135 v0112"
+  },
+  {
+   "item": "「全境成功紀錄」至今從未有過(逐境紀錄 42 · full_set 無)",
+   "state": "PENDING_OPERATOR",
+   "why": "逐境還原可行;整組一致的基線還沒出現過。要不要以整組為目標是裁定"
+  }
+ ]
+}

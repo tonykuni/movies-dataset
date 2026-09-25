@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA Notes Pro - Notion-Style Workspace</title>
+    
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <!-- Highlight.js for Code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIA NOTES PRO - NOTION-STYLE WORKSPACE
+   Complete Block-based Editor with Database, Slash Commands, and More
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Notion Light Theme */
+    --bg-main: #FFFFFF;
+    --bg-sidebar: #FBFBFA;
+    --bg-hover: rgba(55, 53, 47, 0.04);
+    --bg-active: rgba(55, 53, 47, 0.08);
+    --bg-selected: rgba(35, 131, 226, 0.14);
+    --bg-code: #F7F6F3;
+    --bg-callout: rgba(241, 241, 239, 0.6);
+    
+    --text-primary: #37352F;
+    --text-secondary: #787774;
+    --text-tertiary: #9B9A97;
+    --text-placeholder: #C4C4C0;
+    
+    --border: rgba(55, 53, 47, 0.09);
+    --border-dark: rgba(55, 53, 47, 0.16);
+    
+    /* Notion Colors */
+    --red: #EB5757;
+    --orange: #FA8F54;
+    --yellow: #FAC710;
+    --green: #6FCF97;
+    --blue: #2F80ED;
+    --purple: #9B51E0;
+    --pink: #E255A1;
+    --brown: #A87B5F;
+    --gray: #9B9A97;
+    
+    --red-bg: #FDEBEC;
+    --orange-bg: #FEF3E8;
+    --yellow-bg: #FEF9E8;
+    --green-bg: #EDF9F0;
+    --blue-bg: #E8F1FC;
+    --purple-bg: #F4EBFC;
+    --pink-bg: #FCE8F4;
+    --brown-bg: #F5F0EB;
+    --gray-bg: #EBECED;
+    
+    /* Sizing */
+    --sidebar-width: 240px;
+    --content-width: 900px;
+    --topbar-height: 45px;
+    
+    --font-sans: 'Inter', 'Noto Sans TC', -apple-system, sans-serif;
+    --font-serif: 'Noto Serif TC', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-main: #191919;
+    --bg-sidebar: #202020;
+    --bg-hover: rgba(255, 255, 255, 0.055);
+    --bg-active: rgba(255, 255, 255, 0.1);
+    --bg-selected: rgba(35, 131, 226, 0.25);
+    --bg-code: #2F2F2F;
+    --bg-callout: rgba(47, 47, 47, 0.8);
+    
+    --text-primary: rgba(255, 255, 255, 0.81);
+    --text-secondary: rgba(255, 255, 255, 0.54);
+    --text-tertiary: rgba(255, 255, 255, 0.4);
+    --text-placeholder: rgba(255, 255, 255, 0.25);
+    
+    --border: rgba(255, 255, 255, 0.09);
+    --border-dark: rgba(255, 255, 255, 0.13);
+    
+    --red-bg: rgba(235, 87, 87, 0.2);
+    --orange-bg: rgba(250, 143, 84, 0.2);
+    --yellow-bg: rgba(250, 199, 16, 0.2);
+    --green-bg: rgba(111, 207, 151, 0.2);
+    --blue-bg: rgba(47, 128, 237, 0.2);
+    --purple-bg: rgba(155, 81, 224, 0.2);
+    --pink-bg: rgba(226, 85, 161, 0.2);
+    --brown-bg: rgba(168, 123, 95, 0.2);
+    --gray-bg: rgba(155, 154, 151, 0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.workspace-icon {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.workspace-name {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.sidebar-actions {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: left;
+}
+
+.sidebar-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.sidebar-btn kbd {
+    margin-left: auto;
+    padding: 2px 5px;
+    background: var(--bg-hover);
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.nav-section {
+    margin-bottom: 16px;
+}
+
+.nav-section-title {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.nav-item:hover {
+    background: var(--bg-hover);
+}
+
+.nav-item.active {
+    background: var(--bg-active);
+    color: var(--text-primary);
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+}
+
+.nav-item .toggle {
+    margin-left: auto;
+    opacity: 0;
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.nav-item:hover .toggle { opacity: 1; }
+
+.nav-children {
+    margin-left: 22px;
+    border-left: 1px solid var(--border);
+    padding-left: 8px;
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Topbar */
+.topbar {
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-main);
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.breadcrumb-item {
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.breadcrumb-item:hover {
+    background: var(--bg-hover);
+}
+
+.breadcrumb-sep {
+    color: var(--text-tertiary);
+}
+
+.topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.topbar-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.topbar-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* Page Content */
+.page-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.page-content {
+    width: 100%;
+    max-width: var(--content-width);
+    padding: 0 96px 100px;
+}
+
+/* Page Cover */
+.page-cover {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, var(--blue-bg), var(--purple-bg));
+    position: relative;
+    margin-bottom: -60px;
+}
+
+.page-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cover-actions {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.page-cover:hover .cover-actions { opacity: 1; }
+
+.cover-btn {
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Page Header */
+.page-header {
+    padding-top: 80px;
+    margin-bottom: 24px;
+}
+
+.page-icon {
+    font-size: 72px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.page-icon:hover {
+    transform: scale(1.05);
+}
+
+.page-title {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    outline: none;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    width: 100%;
+}
+
+.page-title:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-placeholder);
+}
+
+.page-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BLOCKS
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.block {
+    position: relative;
+    padding: 3px 0;
+}
+
+.block:hover .block-handle {
+    opacity: 1;
+}
+
+.block-handle {
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.block-handle button {
+    width: 18px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.block-handle button:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+}
+
+/* Block Content */
+.block-content {
+    outline: none;
+    min-height: 1.5em;
+}
+
+.block-content:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-placeholder);
+}
+
+/* Paragraph */
+.block-paragraph .block-content {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Headings */
+.block-h1 .block-content {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1em 0 4px;
+}
+
+.block-h2 .block-content {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 1.4em 0 1px;
+}
+
+.block-h3 .block-content {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 1em 0 1px;
+}
+
+/* Lists */
+.block-bullet, .block-numbered, .block-todo {
+    display: flex;
+    gap: 8px;
+}
+
+.block-bullet .list-marker::before {
+    content: "•";
+    color: var(--text-primary);
+}
+
+.block-numbered .list-marker {
+    min-width: 24px;
+    color: var(--text-primary);
+}
+
+.block-todo .checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--text-tertiary);
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.block-todo .checkbox:hover {
+    border-color: var(--blue);
+}
+
+.block-todo .checkbox.checked {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.block-todo .checkbox.checked::after {
+    content: "✓";
+    color: white;
+    font-size: 11px;
+}
+
+.block-todo.completed .block-content {
+    text-decoration: line-through;
+    color: var(--text-tertiary);
+}
+
+/* Quote */
+.block-quote {
+    border-left: 3px solid var(--text-primary);
+    padding-left: 16px;
+    margin: 8px 0;
+}
+
+/* Divider */
+.block-divider {
+    padding: 12px 0;
+}
+
+.block-divider hr {
+    border: none;
+    height: 1px;
+    background: var(--border-dark);
+}
+
+/* Callout */
+.block-callout {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-callout);
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+.callout-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.callout-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Toggle */
+.block-toggle .toggle-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.toggle-arrow {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.block-toggle.open .toggle-arrow {
+    transform: rotate(90deg);
+}
+
+.toggle-children {
+    margin-left: 24px;
+    display: none;
+}
+
+.block-toggle.open .toggle-children {
+    display: block;
+}
+
+/* Code Block */
+.block-code {
+    background: var(--bg-code);
+    border-radius: 4px;
+    margin: 4px 0;
+    overflow: hidden;
+}
+
+.code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.code-content {
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.code-content code {
+    background: transparent;
+}
+
+/* Math Block */
+.block-math {
+    padding: 16px;
+    text-align: center;
+    background: var(--bg-code);
+    border-radius: 4px;
+    margin: 4px 0;
+    overflow-x: auto;
+}
+
+/* Image Block */
+.block-image {
+    margin: 8px 0;
+}
+
+.block-image img {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.image-caption {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+/* Table Block */
+.block-table {
+    margin: 8px 0;
+    overflow-x: auto;
+}
+
+.block-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.block-table th, .block-table td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.block-table th {
+    background: var(--bg-code);
+    font-weight: 600;
+}
+
+/* Bookmark/Embed */
+.block-bookmark {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    margin: 8px 0;
+}
+
+.bookmark-content {
+    flex: 1;
+    padding: 12px;
+}
+
+.bookmark-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.bookmark-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.bookmark-url {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bookmark-image {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.bookmark-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DATABASE VIEW
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.database {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.database-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-sidebar);
+}
+
+.database-title {
+    font-weight: 600;
+    flex: 1;
+}
+
+.database-views {
+    display: flex;
+    gap: 4px;
+}
+
+.view-tab {
+    padding: 4px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.view-tab:hover { background: var(--bg-hover); }
+.view-tab.active { background: var(--bg-active); color: var(--text-primary); font-weight: 500; }
+
+.database-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.toolbar-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toolbar-btn:hover { background: var(--bg-hover); }
+
+/* Table View */
+.db-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.db-table th, .db-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 14px;
+}
+
+.db-table th {
+    background: var(--bg-sidebar);
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.db-table tr:hover td {
+    background: var(--bg-hover);
+}
+
+.db-row-new {
+    color: var(--text-tertiary);
+    cursor: pointer;
+}
+
+/* Board View */
+.db-board {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+.board-column {
+    min-width: 260px;
+    max-width: 260px;
+    background: var(--bg-sidebar);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.board-column-header {
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.column-count {
+    background: var(--bg-active);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.board-cards {
+    flex: 1;
+    padding: 0 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.board-card {
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.board-card:hover {
+    border-color: var(--border-dark);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.card-props {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.card-tag {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+/* Gallery View */
+.db-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.gallery-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.gallery-card:hover {
+    border-color: var(--border-dark);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.gallery-cover {
+    height: 120px;
+    background: var(--bg-code);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+.gallery-content {
+    padding: 12px;
+}
+
+.gallery-title {
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+/* Calendar View */
+.db-calendar {
+    padding: 12px;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.calendar-nav {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.calendar-nav:hover { background: var(--bg-hover); }
+
+.calendar-month {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: var(--border);
+}
+
+.calendar-day-header {
+    padding: 8px;
+    background: var(--bg-sidebar);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.calendar-day {
+    min-height: 80px;
+    padding: 4px;
+    background: var(--bg-main);
+}
+
+.calendar-day.other-month {
+    background: var(--bg-sidebar);
+}
+
+.calendar-day.today {
+    background: var(--blue-bg);
+}
+
+.day-number {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.day-event {
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-size: 11px;
+    background: var(--blue-bg);
+    color: var(--blue);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SLASH COMMAND MENU
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.slash-menu {
+    position: fixed;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.slash-menu.active { display: block; }
+
+.slash-section {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.slash-section:last-child { border-bottom: none; }
+
+.slash-section-title {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.slash-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.slash-item:hover, .slash-item.selected {
+    background: var(--bg-hover);
+}
+
+.slash-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-code);
+    border-radius: 4px;
+    font-size: 20px;
+}
+
+.slash-info { flex: 1; }
+.slash-name { font-size: 14px; font-weight: 500; }
+.slash-desc { font-size: 12px; color: var(--text-secondary); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   QUICK FIND (CMD+K)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.quick-find-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 15, 0.6);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s;
+}
+
+.quick-find-overlay.active { opacity: 1; visibility: visible; }
+
+.quick-find {
+    background: var(--bg-main);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.quick-find-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: var(--text-primary);
+    outline: none;
+}
+
+.quick-find-input::placeholder { color: var(--text-placeholder); }
+
+.quick-find-results {
+    border-top: 1px solid var(--border);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.result-section {
+    padding: 8px 0;
+}
+
+.result-section-title {
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.result-item:hover, .result-item.selected {
+    background: var(--bg-hover);
+}
+
+.result-icon { font-size: 18px; }
+.result-title { flex: 1; font-size: 14px; }
+.result-hint { font-size: 12px; color: var(--text-tertiary); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODALS & OVERLAYS
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 15, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal {
+    background: var(--bg-main);
+    border-radius: 8px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title { font-size: 16px; font-weight: 600; }
+
+.modal-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modal-close:hover { background: var(--bg-hover); }
+
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Emoji Picker */
+.emoji-picker {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+}
+
+.emoji-item {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.emoji-item:hover { background: var(--bg-hover); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.hidden { display: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* Selection */
+::selection {
+    background: var(--bg-selected);
+}
+
+/* Inline formatting */
+.text-bold { font-weight: 600; }
+.text-italic { font-style: italic; }
+.text-underline { text-decoration: underline; }
+.text-strike { text-decoration: line-through; }
+.text-code {
+    background: var(--bg-code);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 85%;
+}
+
+/* Colors */
+.color-red { color: var(--red); }
+.color-orange { color: var(--orange); }
+.color-yellow { color: var(--yellow); }
+.color-green { color: var(--green); }
+.color-blue { color: var(--blue); }
+.color-purple { color: var(--purple); }
+.color-pink { color: var(--pink); }
+.color-brown { color: var(--brown); }
+.color-gray { color: var(--gray); }
+
+.bg-red { background: var(--red-bg); }
+.bg-orange { background: var(--orange-bg); }
+.bg-yellow { background: var(--yellow-bg); }
+.bg-green { background: var(--green-bg); }
+.bg-blue { background: var(--blue-bg); }
+.bg-purple { background: var(--purple-bg); }
+.bg-pink { background: var(--pink-bg); }
+.bg-brown { background: var(--brown-bg); }
+.bg-gray { background: var(--gray-bg); }
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    padding: 10px 16px;
+    background: var(--text-primary);
+    color: var(--bg-main);
+    border-radius: 6px;
+    font-size: 13px;
+    animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="workspace-icon">📚</div>
+            <span class="workspace-name">VIA Workspace</span>
+        </div>
+        
+        <div class="sidebar-actions">
+            <button class="sidebar-btn" onclick="openQuickFind()">
+                <span>🔍</span>
+                <span>Quick Find</span>
+                <kbd>⌘K</kbd>
+            </button>
+            <button class="sidebar-btn" onclick="createNewPage()">
+                <span>➕</span>
+                <span>New Page</span>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Favorites</div>
+                <div class="nav-item" data-page="getting-started">
+                    <span class="nav-icon">⭐</span>
+                    <span>Getting Started</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Private</div>
+                <div class="nav-item active" data-page="demo">
+                    <span class="nav-icon">📄</span>
+                    <span>Demo Page</span>
+                    <span class="toggle">›</span>
+                </div>
+                <div class="nav-item" data-page="database-demo">
+                    <span class="nav-icon">📊</span>
+                    <span>Database Demo</span>
+                </div>
+                <div class="nav-item" data-page="project-board">
+                    <span class="nav-icon">📋</span>
+                    <span>Project Board</span>
+                </div>
+                <div class="nav-item" data-page="calendar">
+                    <span class="nav-icon">📅</span>
+                    <span>Calendar</span>
+                </div>
+            </div>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item">📚 VIA Workspace</span>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-item">📄 Demo Page</span>
+            </div>
+            
+            <div class="topbar-actions">
+                <button class="topbar-btn" onclick="toggleTheme()">🌙</button>
+                <button class="topbar-btn">Share</button>
+                <button class="topbar-btn">⋯</button>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <div class="page-wrapper">
+            <div class="page-content">
+                <!-- Page Cover -->
+                <div class="page-cover">
+                    <div class="cover-actions">
+                        <button class="cover-btn">Change cover</button>
+                        <button class="cover-btn">Reposition</button>
+                    </div>
+                </div>
+                
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-icon" onclick="showEmojiPicker()">📝</div>
+                    <div class="page-title" contenteditable="true" data-placeholder="Untitled">VIA Notes Pro Demo</div>
+                    <div class="page-meta">
+                        <span>Created Dec 28, 2024</span>
+                        <span>•</span>
+                        <span>Edited just now</span>
+                    </div>
+                </div>
+                
+                <!-- Blocks Container -->
+                <div id="blocksContainer">
+                    <!-- Demo blocks will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Slash Command Menu -->
+<div class="slash-menu" id="slashMenu">
+    <div class="slash-section">
+        <div class="slash-section-title">Basic blocks</div>
+        <div class="slash-item" data-type="paragraph"><div class="slash-icon">📝</div><div class="slash-info"><div class="slash-name">Text</div><div class="slash-desc">Just start writing with plain text.</div></div></div>
+        <div class="slash-item" data-type="h1"><div class="slash-icon">H1</div><div class="slash-info"><div class="slash-name">Heading 1</div><div class="slash-desc">Big section heading.</div></div></div>
+        <div class="slash-item" data-type="h2"><div class="slash-icon">H2</div><div class="slash-info"><div class="slash-name">Heading 2</div><div class="slash-desc">Medium section heading.</div></div></div>
+        <div class="slash-item" data-type="h3"><div class="slash-icon">H3</div><div class="slash-info"><div class="slash-name">Heading 3</div><div class="slash-desc">Small section heading.</div></div></div>
+        <div class="slash-item" data-type="bullet"><div class="slash-icon">•</div><div class="slash-info"><div class="slash-name">Bulleted list</div><div class="slash-desc">Create a simple bulleted list.</div></div></div>
+        <div class="slash-item" data-type="numbered"><div class="slash-icon">1.</div><div class="slash-info"><div class="slash-name">Numbered list</div><div class="slash-desc">Create a list with numbering.</div></div></div>
+        <div class="slash-item" data-type="todo"><div class="slash-icon">☑️</div><div class="slash-info"><div class="slash-name">To-do list</div><div class="slash-desc">Track tasks with a to-do list.</div></div></div>
+        <div class="slash-item" data-type="toggle"><div class="slash-icon">▶</div><div class="slash-info"><div class="slash-name">Toggle list</div><div class="slash-desc">Toggles can hide and show content.</div></div></div>
+    </div>
+    <div class="slash-section">
+        <div class="slash-section-title">Media</div>
+        <div class="slash-item" data-type="image"><div class="slash-icon">🖼️</div><div class="slash-info"><div class="slash-name">Image</div><div class="slash-desc">Upload or embed with a link.</div></div></div>
+        <div class="slash-item" data-type="code"><div class="slash-icon">📄</div><div class="slash-info"><div class="slash-name">Code</div><div class="slash-desc">Capture a code snippet.</div></div></div>
+        <div class="slash-item" data-type="math"><div class="slash-icon">∑</div><div class="slash-info"><div class="slash-name">Math equation</div><div class="slash-desc">Display a math equation.</div></div></div>
+    </div>
+    <div class="slash-section">
+        <div class="slash-section-title">Advanced</div>
+        <div class="slash-item" data-type="callout"><div class="slash-icon">💡</div><div class="slash-info"><div class="slash-name">Callout</div><div class="slash-desc">Make writing stand out.</div></div></div>
+        <div class="slash-item" data-type="quote"><div class="slash-icon">❝</div><div class="slash-info"><div class="slash-name">Quote</div><div class="slash-desc">Capture a quote.</div></div></div>
+        <div class="slash-item" data-type="divider"><div class="slash-icon">—</div><div class="slash-info"><div class="slash-name">Divider</div><div class="slash-desc">Visually divide blocks.</div></div></div>
+        <div class="slash-item" data-type="table"><div class="slash-icon">📊</div><div class="slash-info"><div class="slash-name">Table</div><div class="slash-desc">Add a simple table.</div></div></div>
+    </div>
+    <div class="slash-section">
+        <div class="slash-section-title">Database</div>
+        <div class="slash-item" data-type="database-table"><div class="slash-icon">📋</div><div class="slash-info"><div class="slash-name">Table view</div><div class="slash-desc">Create a database with table view.</div></div></div>
+        <div class="slash-item" data-type="database-board"><div class="slash-icon">📌</div><div class="slash-info"><div class="slash-name">Board view</div><div class="slash-desc">Create a Kanban-style board.</div></div></div>
+        <div class="slash-item" data-type="database-gallery"><div class="slash-icon">🖼️</div><div class="slash-info"><div class="slash-name">Gallery view</div><div class="slash-desc">Create a gallery of cards.</div></div></div>
+        <div class="slash-item" data-type="database-calendar"><div class="slash-icon">📅</div><div class="slash-info"><div class="slash-name">Calendar view</div><div class="slash-desc">Create a calendar database.</div></div></div>
+    </div>
+</div>
+
+<!-- Quick Find -->
+<div class="quick-find-overlay" id="quickFindOverlay">
+    <div class="quick-find">
+        <input type="text" class="quick-find-input" placeholder="Search or type a command..." id="quickFindInput">
+        <div class="quick-find-results" id="quickFindResults">
+            <div class="result-section">
+                <div class="result-section-title">Recent</div>
+                <div class="result-item"><span class="result-icon">📄</span><span class="result-title">Demo Page</span></div>
+                <div class="result-item"><span class="result-icon">📊</span><span class="result-title">Database Demo</span></div>
+                <div class="result-item"><span class="result-icon">📋</span><span class="result-title">Project Board</span></div>
+            </div>
+            <div class="result-section">
+                <div class="result-section-title">Actions</div>
+                <div class="result-item" onclick="createNewPage()"><span class="result-icon">➕</span><span class="result-title">New page</span><span class="result-hint">Create a new page</span></div>
+                <div class="result-item" onclick="toggleTheme()"><span class="result-icon">🌙</span><span class="result-title">Toggle dark mode</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Emoji Picker Modal -->
+<div class="modal-overlay" id="emojiModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Choose an icon</div>
+            <button class="modal-close" onclick="closeModal('emojiModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="emoji-picker" id="emojiPicker">
+                <!-- Emoji items generated by JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIA NOTES PRO - NOTION-STYLE BLOCK EDITOR
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const APP = {
+    theme: 'light',
+    currentPage: 'demo',
+    blocks: [],
+    slashMenuOpen: false,
+    slashMenuIndex: 0
+};
+
+// Sample Data
+const SAMPLE_BLOCKS = [
+    { type: 'h1', content: 'Welcome to VIA Notes Pro 🎉' },
+    { type: 'paragraph', content: 'This is a Notion-style block editor with slash commands, databases, and more.' },
+    { type: 'callout', icon: '💡', content: 'Try typing <strong>/</strong> to see the slash command menu!' },
+    { type: 'h2', content: 'Basic Blocks' },
+    { type: 'paragraph', content: 'VIA Notes Pro supports all the blocks you need:' },
+    { type: 'bullet', content: 'Headings (H1, H2, H3)' },
+    { type: 'bullet', content: 'Lists (bulleted, numbered, to-do)' },
+    { type: 'bullet', content: 'Toggle blocks for collapsible content' },
+    { type: 'bullet', content: 'Code blocks with syntax highlighting' },
+    { type: 'bullet', content: 'Math equations using KaTeX' },
+    { type: 'toggle', content: 'Click to expand this toggle', children: [
+        { type: 'paragraph', content: 'Hidden content inside the toggle!' },
+        { type: 'bullet', content: 'You can nest any blocks inside toggles' }
+    ]},
+    { type: 'h2', content: 'Code & Math' },
+    { type: 'code', language: 'javascript', content: `// Calculate Fibonacci
+function fib(n) {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+
+console.log(fib(10)); // 55` },
+    { type: 'math', content: 'E = mc^2 \\quad \\text{and} \\quad \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}' },
+    { type: 'h2', content: 'Database Views' },
+    { type: 'paragraph', content: 'VIA Notes Pro includes multiple database views:' },
+    { type: 'database', view: 'table', title: 'Task Tracker', data: [
+        { name: 'Build UI', status: 'Done', priority: 'High', date: '2024-12-25' },
+        { name: 'Add slash commands', status: 'Done', priority: 'High', date: '2024-12-26' },
+        { name: 'Database views', status: 'In Progress', priority: 'Medium', date: '2024-12-27' },
+        { name: 'Collaboration', status: 'To Do', priority: 'Low', date: '2024-12-28' }
+    ]},
+    { type: 'divider' },
+    { type: 'quote', content: '"The best way to predict the future is to invent it." — Alan Kay' },
+    { type: 'todo', checked: true, content: 'Create block-based editor ✓' },
+    { type: 'todo', checked: true, content: 'Add slash commands ✓' },
+    { type: 'todo', checked: true, content: 'Implement database views ✓' },
+    { type: 'todo', checked: false, content: 'Add real-time collaboration' }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    initBlocks();
+    initSlashMenu();
+    initKeyboardShortcuts();
+    initEmojiPicker();
+});
+
+function initBlocks() {
+    APP.blocks = SAMPLE_BLOCKS;
+    renderBlocks();
+}
+
+function renderBlocks() {
+    const container = document.getElementById('blocksContainer');
+    container.innerHTML = APP.blocks.map((block, idx) => renderBlock(block, idx)).join('');
+    
+    // Initialize code highlighting
+    document.querySelectorAll('.code-content code').forEach(el => hljs.highlightElement(el));
+    
+    // Initialize math
+    document.querySelectorAll('.math-content').forEach(el => {
+        try {
+            katex.render(el.dataset.formula, el, { displayMode: true, throwOnError: false });
+        } catch (e) {}
+    });
+    
+    // Make blocks editable
+    document.querySelectorAll('.block-content[contenteditable]').forEach(el => {
+        el.addEventListener('keydown', handleBlockKeydown);
+        el.addEventListener('input', handleBlockInput);
+    });
+}
+
+function renderBlock(block, idx) {
+    const handle = `
+        <div class="block-handle">
+            <button title="Drag">⋮⋮</button>
+            <button title="Add block" onclick="addBlockAfter(${idx})">+</button>
+        </div>
+    `;
+    
+    switch (block.type) {
+        case 'paragraph':
+            return `<div class="block block-paragraph" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true" data-placeholder="Type '/' for commands">${block.content || ''}</div></div>`;
+        
+        case 'h1':
+            return `<div class="block block-h1" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true" data-placeholder="Heading 1">${block.content || ''}</div></div>`;
+        
+        case 'h2':
+            return `<div class="block block-h2" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true" data-placeholder="Heading 2">${block.content || ''}</div></div>`;
+        
+        case 'h3':
+            return `<div class="block block-h3" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true" data-placeholder="Heading 3">${block.content || ''}</div></div>`;
+        
+        case 'bullet':
+            return `<div class="block block-bullet" data-idx="${idx}">${handle}<div class="list-marker"></div><div class="block-content" contenteditable="true">${block.content || ''}</div></div>`;
+        
+        case 'numbered':
+            return `<div class="block block-numbered" data-idx="${idx}">${handle}<div class="list-marker">${(block.num || idx + 1)}.</div><div class="block-content" contenteditable="true">${block.content || ''}</div></div>`;
+        
+        case 'todo':
+            return `<div class="block block-todo ${block.checked ? 'completed' : ''}" data-idx="${idx}">${handle}<div class="checkbox ${block.checked ? 'checked' : ''}" onclick="toggleTodo(${idx})"></div><div class="block-content" contenteditable="true">${block.content || ''}</div></div>`;
+        
+        case 'toggle':
+            const childrenHtml = (block.children || []).map((c, ci) => renderBlock(c, `${idx}-${ci}`)).join('');
+            return `<div class="block block-toggle ${block.open ? 'open' : ''}" data-idx="${idx}">${handle}<div class="toggle-header" onclick="toggleToggle(${idx})"><div class="toggle-arrow">›</div><div class="block-content" contenteditable="true">${block.content || ''}</div></div><div class="toggle-children">${childrenHtml}</div></div>`;
+        
+        case 'quote':
+            return `<div class="block block-quote" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true" data-placeholder="Quote">${block.content || ''}</div></div>`;
+        
+        case 'divider':
+            return `<div class="block block-divider" data-idx="${idx}"><hr></div>`;
+        
+        case 'callout':
+            return `<div class="block block-callout bg-${block.bg || 'yellow'}" data-idx="${idx}">${handle}<div class="callout-icon">${block.icon || '💡'}</div><div class="callout-content"><div class="block-content" contenteditable="true">${block.content || ''}</div></div></div>`;
+        
+        case 'code':
+            return `<div class="block block-code" data-idx="${idx}"><div class="code-header"><span>${block.language || 'plain'}</span><button onclick="copyCode(${idx})">Copy</button></div><div class="code-content"><code class="language-${block.language || 'plaintext'}">${escapeHtml(block.content || '')}</code></div></div>`;
+        
+        case 'math':
+            return `<div class="block block-math" data-idx="${idx}"><div class="math-content" data-formula="${escapeHtml(block.content || '')}"></div></div>`;
+        
+        case 'database':
+            return renderDatabase(block, idx);
+        
+        default:
+            return `<div class="block block-paragraph" data-idx="${idx}">${handle}<div class="block-content" contenteditable="true">${block.content || ''}</div></div>`;
+    }
+}
+
+function renderDatabase(block, idx) {
+    const views = `
+        <div class="database-views">
+            <button class="view-tab ${block.view === 'table' ? 'active' : ''}" onclick="setDbView(${idx}, 'table')">Table</button>
+            <button class="view-tab ${block.view === 'board' ? 'active' : ''}" onclick="setDbView(${idx}, 'board')">Board</button>
+            <button class="view-tab ${block.view === 'gallery' ? 'active' : ''}" onclick="setDbView(${idx}, 'gallery')">Gallery</button>
+            <button class="view-tab ${block.view === 'calendar' ? 'active' : ''}" onclick="setDbView(${idx}, 'calendar')">Calendar</button>
+        </div>
+    `;
+    
+    let content = '';
+    if (block.view === 'table') {
+        content = renderTableView(block.data);
+    } else if (block.view === 'board') {
+        content = renderBoardView(block.data);
+    } else if (block.view === 'gallery') {
+        content = renderGalleryView(block.data);
+    } else if (block.view === 'calendar') {
+        content = renderCalendarView(block.data);
+    }
+    
+    return `
+        <div class="database" data-idx="${idx}">
+            <div class="database-header">
+                <div class="database-title">${block.title || 'Untitled Database'}</div>
+                ${views}
+            </div>
+            <div class="database-toolbar">
+                <button class="toolbar-btn">+ New</button>
+                <button class="toolbar-btn">⊞ Filter</button>
+                <button class="toolbar-btn">↕ Sort</button>
+            </div>
+            ${content}
+        </div>
+    `;
+}
+
+function renderTableView(data) {
+    if (!data || !data.length) return '<div style="padding:20px;color:var(--text-secondary)">No data</div>';
+    
+    const headers = Object.keys(data[0]);
+    return `
+        <table class="db-table">
+            <thead>
+                <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+                ${data.map(row => `<tr>${headers.map(h => `<td>${formatCell(row[h], h)}</td>`).join('')}</tr>`).join('')}
+                <tr class="db-row-new"><td colspan="${headers.length}">+ New</td></tr>
+            </tbody>
+        </table>
+    `;
+}
+
+function renderBoardView(data) {
+    const groups = { 'To Do': [], 'In Progress': [], 'Done': [] };
+    (data || []).forEach(item => {
+        const status = item.status || 'To Do';
+        if (!groups[status]) groups[status] = [];
+        groups[status].push(item);
+    });
+    
+    return `
+        <div class="db-board">
+            ${Object.entries(groups).map(([status, items]) => `
+                <div class="board-column">
+                    <div class="board-column-header">
+                        <span>${status}</span>
+                        <span class="column-count">${items.length}</span>
+                    </div>
+                    <div class="board-cards">
+                        ${items.map(item => `
+                            <div class="board-card">
+                                <div class="card-title">${item.name}</div>
+                                <div class="card-props">
+                                    <span class="card-tag bg-${item.priority === 'High' ? 'red' : item.priority === 'Medium' ? 'yellow' : 'gray'}">${item.priority}</span>
+                                    <span class="card-tag bg-blue">${item.date}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div class="board-card" style="background:transparent;border:1px dashed var(--border);color:var(--text-tertiary);text-align:center;">+ New</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderGalleryView(data) {
+    return `
+        <div class="db-gallery">
+            ${(data || []).map(item => `
+                <div class="gallery-card">
+                    <div class="gallery-cover">${item.name[0]}</div>
+                    <div class="gallery-content">
+                        <div class="gallery-title">${item.name}</div>
+                        <div class="card-props">
+                            <span class="card-tag bg-${item.priority === 'High' ? 'red' : item.priority === 'Medium' ? 'yellow' : 'gray'}">${item.priority}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderCalendarView(data) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    let days = [];
+    // Previous month padding
+    for (let i = 0; i < firstDay; i++) days.push({ day: '', other: true });
+    // Current month
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const events = (data || []).filter(d => d.date === dateStr);
+        days.push({ day: i, today: i === today.getDate(), events });
+    }
+    
+    return `
+        <div class="db-calendar">
+            <div class="calendar-header">
+                <button class="calendar-nav">‹</button>
+                <span class="calendar-month">${monthNames[month]} ${year}</span>
+                <button class="calendar-nav">›</button>
+            </div>
+            <div class="calendar-grid">
+                ${dayNames.map(d => `<div class="calendar-day-header">${d}</div>`).join('')}
+                ${days.map(d => `
+                    <div class="calendar-day ${d.other ? 'other-month' : ''} ${d.today ? 'today' : ''}">
+                        <div class="day-number">${d.day}</div>
+                        <div class="day-events">
+                            ${(d.events || []).map(e => `<div class="day-event">${e.name}</div>`).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function formatCell(value, key) {
+    if (key === 'status') {
+        const colors = { 'Done': 'green', 'In Progress': 'yellow', 'To Do': 'gray' };
+        return `<span class="card-tag bg-${colors[value] || 'gray'}">${value}</span>`;
+    }
+    if (key === 'priority') {
+        const colors = { 'High': 'red', 'Medium': 'yellow', 'Low': 'gray' };
+        return `<span class="card-tag bg-${colors[value] || 'gray'}">${value}</span>`;
+    }
+    return value;
+}
+
+function setDbView(idx, view) {
+    APP.blocks[idx].view = view;
+    renderBlocks();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SLASH MENU
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function initSlashMenu() {
+    const menu = document.getElementById('slashMenu');
+    const items = menu.querySelectorAll('.slash-item');
+    
+    items.forEach((item, idx) => {
+        item.addEventListener('click', () => {
+            insertBlock(item.dataset.type);
+            closeSlashMenu();
+        });
+        
+        item.addEventListener('mouseenter', () => {
+            items.forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+            APP.slashMenuIndex = idx;
+        });
+    });
+}
+
+function showSlashMenu(x, y) {
+    const menu = document.getElementById('slashMenu');
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.classList.add('active');
+    APP.slashMenuOpen = true;
+    APP.slashMenuIndex = 0;
+    updateSlashMenuSelection();
+}
+
+function closeSlashMenu() {
+    document.getElementById('slashMenu').classList.remove('active');
+    APP.slashMenuOpen = false;
+}
+
+function updateSlashMenuSelection() {
+    const items = document.querySelectorAll('.slash-item');
+    items.forEach((item, idx) => {
+        item.classList.toggle('selected', idx === APP.slashMenuIndex);
+    });
+}
+
+function handleBlockKeydown(e) {
+    const content = e.target.textContent;
+    
+    // Slash command
+    if (e.key === '/' && content === '') {
+        e.preventDefault();
+        const rect = e.target.getBoundingClientRect();
+        showSlashMenu(rect.left, rect.bottom + 4);
+        return;
+    }
+    
+    // Slash menu navigation
+    if (APP.slashMenuOpen) {
+        const items = document.querySelectorAll('.slash-item');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            APP.slashMenuIndex = (APP.slashMenuIndex + 1) % items.length;
+            updateSlashMenuSelection();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            APP.slashMenuIndex = (APP.slashMenuIndex - 1 + items.length) % items.length;
+            updateSlashMenuSelection();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const selected = items[APP.slashMenuIndex];
+            if (selected) insertBlock(selected.dataset.type);
+            closeSlashMenu();
+        } else if (e.key === 'Escape') {
+            closeSlashMenu();
+        }
+        return;
+    }
+    
+    // Enter to create new block
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const idx = parseInt(e.target.closest('.block').dataset.idx);
+        addBlockAfter(idx);
+    }
+    
+    // Backspace to delete empty block
+    if (e.key === 'Backspace' && content === '') {
+        e.preventDefault();
+        const idx = parseInt(e.target.closest('.block').dataset.idx);
+        if (idx > 0) {
+            APP.blocks.splice(idx, 1);
+            renderBlocks();
+            // Focus previous block
+            const blocks = document.querySelectorAll('.block-content[contenteditable]');
+            if (blocks[idx - 1]) blocks[idx - 1].focus();
+        }
+    }
+}
+
+function handleBlockInput(e) {
+    const content = e.target.textContent;
+    const idx = parseInt(e.target.closest('.block').dataset.idx);
+    
+    // Update block content
+    if (APP.blocks[idx]) {
+        APP.blocks[idx].content = e.target.innerHTML;
+    }
+    
+    // Close slash menu if typing
+    if (APP.slashMenuOpen && !content.startsWith('/')) {
+        closeSlashMenu();
+    }
+}
+
+function insertBlock(type) {
+    const selection = window.getSelection();
+    let idx = APP.blocks.length;
+    
+    // Find current block index
+    const focusedBlock = document.activeElement?.closest('.block');
+    if (focusedBlock) {
+        idx = parseInt(focusedBlock.dataset.idx) + 1;
+    }
+    
+    const newBlock = { type, content: '' };
+    
+    // Special defaults
+    if (type === 'callout') newBlock.icon = '💡';
+    if (type === 'code') newBlock.language = 'javascript';
+    if (type === 'math') newBlock.content = 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}';
+    if (type === 'toggle') newBlock.children = [{ type: 'paragraph', content: '' }];
+    if (type.startsWith('database-')) {
+        newBlock.type = 'database';
+        newBlock.view = type.replace('database-', '');
+        newBlock.title = 'New Database';
+        newBlock.data = [];
+    }
+    
+    APP.blocks.splice(idx, 0, newBlock);
+    renderBlocks();
+    
+    // Focus new block
+    setTimeout(() => {
+        const blocks = document.querySelectorAll('.block-content[contenteditable]');
+        if (blocks[idx]) blocks[idx].focus();
+    }, 10);
+}
+
+function addBlockAfter(idx) {
+    insertBlock('paragraph');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleTodo(idx) {
+    APP.blocks[idx].checked = !APP.blocks[idx].checked;
+    renderBlocks();
+}
+
+function toggleToggle(idx) {
+    APP.blocks[idx].open = !APP.blocks[idx].open;
+    renderBlocks();
+}
+
+function copyCode(idx) {
+    const code = APP.blocks[idx].content;
+    navigator.clipboard.writeText(code);
+    toast('Copied to clipboard');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// QUICK FIND
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function initKeyboardShortcuts() {
+    document.addEventListener('keydown', e => {
+        // Cmd/Ctrl + K
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            openQuickFind();
+        }
+        // Escape
+        if (e.key === 'Escape') {
+            closeQuickFind();
+            closeSlashMenu();
+            closeAllModals();
+        }
+    });
+    
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.slash-menu') && !e.target.closest('.block-content')) {
+            closeSlashMenu();
+        }
+    });
+}
+
+function openQuickFind() {
+    document.getElementById('quickFindOverlay').classList.add('active');
+    document.getElementById('quickFindInput').focus();
+}
+
+function closeQuickFind() {
+    document.getElementById('quickFindOverlay').classList.remove('active');
+}
+
+document.getElementById('quickFindOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeQuickFind();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EMOJI PICKER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function initEmojiPicker() {
+    const emojis = ['📝', '📄', '📋', '📊', '📈', '📉', '💡', '⭐', '🎯', '🚀', '💻', '🔧', '📁', '📂', '🗂️', '📌', '📎', '🔗', '💾', '🖼️', '🎨', '🎭', '🎪', '🎬', '🎤', '🎧', '🎹', '🎸', '🎺', '🥁', '📚', '📖', '📰', '🗞️', '📕', '📗', '📘', '📙', '✏️', '✒️'];
+    
+    const picker = document.getElementById('emojiPicker');
+    picker.innerHTML = emojis.map(e => `<div class="emoji-item" onclick="setPageIcon('${e}')">${e}</div>`).join('');
+}
+
+function showEmojiPicker() {
+    document.getElementById('emojiModal').classList.add('active');
+}
+
+function setPageIcon(emoji) {
+    document.querySelector('.page-icon').textContent = emoji;
+    closeModal('emojiModal');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// THEME & UTILS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function toggleTheme() {
+    APP.theme = APP.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', APP.theme);
+    toast(`${APP.theme === 'dark' ? '🌙' : '☀️'} ${APP.theme === 'dark' ? 'Dark' : 'Light'} mode`);
+}
+
+function createNewPage() {
+    toast('Creating new page...');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+}
+
+function toast(msg) {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "def_schema": "VIA_SSOT_ACTIVATION_GATE_MATRIX_V023",
+  "def_generated": "2026-08-16",
+  "def_policy": "fail-closed：任一 gate 非 PASS 之模組不得進入無人值守排程；升級沿 next_gate 逐級走，不得跨階。",
+
+  "def_rows": [
+    {
+      "module": "MDL009_ETFRISK 核心管線",
+      "gate": "PASS_SELFTEST_15_15_UNITTEST_22_22",
+      "evidence": "run_monitor.py --selftest（S01-S15）+ tests/（22 案例），2026-08-16",
+      "boundary": "read-only source · append-only runs · network 0（demo/csv 皆離線可跑）· UTF-8 no BOM",
+      "next_gate": "REAL_DATA_READINESS：--prices/--macro 接真實 CSV（stooq/yahoo 由 MDL008 抓）→ 對照 MDL008 FIS 交叉驗證一週"
+    },
+    {
+      "module": "MDL009 demo 世界（T4）",
+      "gate": "PERMANENT_WARNING_SYNTHETIC",
+      "evidence": "provenance.data_source=synthetic_demo；儀表板橫幅 + 惡魔面板 critical",
+      "boundary": "禁止投資判讀；僅供管線/UI 驗證",
+      "next_gate": "無（demo 永不升級）"
+    },
+    {
+      "module": "財政/外部收支 fundamentals",
+      "gate": "HOLD_NEEDS_VERIFY",
+      "evidence": "data/demo_macro_fundamentals.json 全欄 Demo_Estimate_NeedsVerify",
+      "boundary": "只影響 fragility 面板與 ERP local_10y",
+      "next_gate": "以 IMF WEO / World Bank WDI / BIS 官方值覆寫並附 source_url → 改標 V"
+    },
+    {
+      "module": "Forward P/E 倒算結轉（M35）",
+      "gate": "PASS_WITH_DEVIL_FLAGS",
+      "evidence": "rounding/staleness/divergence/proxy 四類旗標全部驗證觸發",
+      "boundary": "倒算值恆為 Calculated_NotOriginal；license_status=public_quote 才可入庫",
+      "next_gate": "接 FactSet/MSCI/LSEG 月度更新流程（M01-M10 校準循環），舊版本 append-only 封存"
+    },
+    {
+      "module": "GLOBAL_INDEX_MAP_DASHBOARD（Flow 箭頭/脈動視覺層）",
+      "gate": "BLOCK_UNTIL_T1_FLOW",
+      "evidence": "SSOT_ModuleRegistry.v023 spec_registry",
+      "boundary": "金額箭頭只能畫 T1（MDL008）；T3 估算禁畫金額（防 T4 偽裝 T1）",
+      "next_gate": "MDL008 etf_matrix.json 接入 def_flow_overlay 後開發"
+    },
+    {
+      "module": "TW_BRANCH_FETCHER（券商分點爬取）",
+      "gate": "GOVERNANCE_REVIEW_REQUIRED",
+      "evidence": "非官方 API；限速/條款/IP 風險未審",
+      "boundary": "人工閘未過前不得排程",
+      "next_gate": "人工審核服務條款 + random sleep 1.5-3.5s + 失敗退避後，先以單一個股試跑一週"
+    },
+    {
+      "module": "REGIME_TIER2（HMM/MS-VAR/DTW/OT）",
+      "gate": "TIER2_GATED_BASELINE_FIRST",
+      "evidence": "M28 規則基線已上線且全訊號可稽核",
+      "boundary": "升級判準＝外部標籤上勝過規則基線（勝率/召回/FPR），禁對自身分數校準",
+      "next_gate": "本機 numpy/hmmlearn 環境 + LOEO 跨事件驗證（沿 GovFundEngine E1 手法）"
+    },
+    {
+      "module": "VIA_FlowSystem TrueHigh × 5（本機）",
+      "gate": "HOLD_LOCAL_TRIAGE",
+      "evidence": "v021 掃描 166 findings → 5 TrueHigh；v022 逐行抽證器已交付",
+      "boundary": "未降級/隔離/修補前不得跑 Activate-VIAFlowSystem.ps1 或 engine sync",
+      "next_gate": "v022 輸出 5 條逐行證據 → 按刪除類/kill類/HTML字串分流處置"
+    }
+  ]
+}

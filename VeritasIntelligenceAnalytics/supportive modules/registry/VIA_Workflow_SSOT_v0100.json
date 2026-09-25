@@ -1,0 +1,186 @@
+{
+ "schema": "VIA.Workflow.SSOT.v1",
+ "batch": "批535",
+ "note": "工作流=冊上項(VIA_InputConsole_Spec 家族項)依序重組;執行只經匯流排 call --item(閘不變:net 項要操作員同意閘);L40 工作流重組律",
+ "workflows": [
+  {
+   "id": "vrn_report_chain",
+   "zh": "VRN 研報鏈(首頁擷取→基本資訊入庫→財報頁→一題四點→頁面再生)",
+   "profile": "run",
+   "nodes": [
+    "vrn_firstpage",
+    "vrn_structdb",
+    "vrn_finpages",
+    "vrn_fourpoint",
+    "vrn_ui"
+   ]
+  },
+  {
+   "id": "vrn_logic_nlp",
+   "zh": "VRN 邏輯庫×財務邏輯×NLP 摘要(零網路;小數量實測)",
+   "profile": "test",
+   "nodes": [
+    "vrn_logic",
+    "fin_logic",
+    "vrn_nlp"
+   ]
+  },
+  {
+   "id": "vdf_daily_update",
+   "zh": "VDF 日更(價量增量→籌碼→成交值→對齊核對→架構矩陣)",
+   "profile": "run",
+   "nodes": [
+    "tw_prices_inc",
+    "tw_chips",
+    "tw_trading_value",
+    "tw_align",
+    "db_arch"
+   ]
+  },
+  {
+   "id": "vatetf_pipeline",
+   "zh": "VATETF 主動 ETF 應用(宇宙→持股史深→ETF×營收動能→持股×Consensus)",
+   "profile": "run",
+   "nodes": [
+    "etf_universe",
+    "etf_holdings_daily",
+    "etf_revenue",
+    "vdf_vetf_consensus"
+   ]
+  },
+  {
+   "id": "vtmra_family",
+   "zh": "VTMRA 月營收家族(月營收→史深→ETF 營收動能→TWREV→族群相位)",
+   "profile": "run",
+   "nodes": [
+    "tw_revenue_codes",
+    "tw_revenue_backfill",
+    "etf_revenue",
+    "vdf_twrev",
+    "vdf_revphase"
+   ]
+  },
+  {
+   "id": "vdf_db_governance",
+   "zh": "VDF 資料庫治理(三庫盤點→覆蓋摘要→缺口清單→架構矩陣;零網路)",
+   "profile": "run",
+   "nodes": [
+    "db_localdb_scan",
+    "db_coverage",
+    "tw_need",
+    "db_arch"
+   ]
+  },
+  {
+   "id": "vdf_quantguard_features",
+   "zh": "QuantGuard 技術指標特徵鏈(資料架構→ENG086 Polars 技術分析與因子;零網路；當沖輸入另走收容鏈)",
+   "profile": "test",
+   "nodes": [
+    "db_arch",
+    "vdf_quantguard_one"
+   ]
+  },
+  {
+   "id": "vap_charts",
+   "zh": "VAP 圖表(儀表板→標準儀表板→Seaborn 垂直圖組)",
+   "profile": "run",
+   "nodes": [
+    "vap_dashboard",
+    "vap_std_dashboard",
+    "vap_stack"
+   ]
+  },
+  {
+   "id": "vrn_firstpage_logic_chain",
+   "zh": "首頁擷取→第一頁邏輯補缺(ENG072 sidecar → ENG086 .logic86.json;代碼階梯/券商/評等/目標價/檔名×首頁互核;批522)",
+   "profile": "run",
+   "nodes": [
+    "vrn_firstpage",
+    "vrn_firstpage_logic"
+   ]
+  },
+  {
+   "id": "vdf_daytrade_file_chain",
+   "zh": "當沖檔案收容→資料架構重建→QuantGuard 狀態檢查(真實計算另走 vdf_quantguard_run 並明給 --in)",
+   "profile": "run",
+   "nodes": [
+    "tw_daytrade_files",
+    "db_arch",
+    "vdf_quantguard_status"
+   ]
+  },
+  {
+   "id": "vdf_market_lists_acceptance",
+   "zh": "VDF 中央市場清單驗收(股票全集/主動 ETF/熱門族群去重；2023-01-01 起；離線可驗收)",
+   "profile": "test",
+   "nodes": [
+    "vdf_market_lists"
+   ]
+  },
+  {
+   "id": "via_functional_acceptance",
+   "zh": "VIA 功能級整合驗收(中央 gate；逐站 rc/裁決/證據)",
+   "profile": "test",
+   "nodes": [
+    "via_functional_acceptance"
+   ]
+  },
+  {
+   "id": "via_ssot_autocode_governance",
+   "zh": "VIA 統一 SSOT 治理(Regex／同義字／邏輯／參數／因子／資料庫／模組／狀態／收容；自動編碼隔離協定)",
+   "profile": "test",
+   "nodes": [
+    "via_ssot_autocode"
+   ]
+  },
+  {
+   "id": "vrn_nlp_vdf_pipeline",
+   "zh": "NLP文字修復／證據型摘要→VRN→VDF中央鏈(B529；三頁HTML矩陣；VDF阻擋不假綠)",
+   "profile": "run",
+   "nodes": [
+    "vrn_nlp_vrn_vdf_pipeline"
+   ]
+  },
+  {
+   "id": "via_accelerator_control",
+   "zh": "VIA 25 項加速器線控(PS roster→Python bootstrap→Celeritas/Aegis mount→證據矩陣)",
+   "profile": "test",
+   "nodes": [
+    "via_accelerator_control"
+   ]
+  },
+  {
+   "id": "via_unified_nlp_pipeline",
+   "zh": "VIA 統一 NLP 強化鏈(Hub→文字正規化／表格／版面／角色／證據摘要→VRN→VDF；附件 adapter 受控)",
+   "profile": "test",
+   "nodes": [
+    "via_unified_nlp",
+    "vrn_nlp_vrn_vdf_pipeline"
+   ],
+   "network": "OFFLINE_ONLY",
+   "gate": "SUP_MDL866 selftest GREEN before any adapter execution"
+  },
+  {
+   "id": "via_unique_entry_control",
+   "zh": "VIA 唯一接觸口控制(VIA command book→CGC157→VRN/VDF/QuantGuard)",
+   "profile": "test",
+   "nodes": [
+    "via_unique_entry_control",
+    "vrn_dispatch",
+    "vdf_dispatch",
+    "quantguard_dispatch"
+   ],
+   "network": "OFFLINE_ONLY",
+   "gate": "CGC_MDL157 GREEN before any child-system dispatch"
+  },
+  {
+   "id": "via_panorama_chain",
+   "zh": "全景稽核修復鏈(唯一接觸口閘 → 全景 AST 稽核與純增量修 → 中央三家族派送;批535)",
+   "profile": "run",
+   "nodes": [
+    "via_unique_entry_control",
+    "via_panorama_audit"
+   ]
+  }
+ ]
+}

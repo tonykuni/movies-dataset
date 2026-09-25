@@ -1,0 +1,305 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://via.local/vdf_extraction_registry.schema.json",
+  "title": "VDF Extraction Registry Schema",
+  "description": "VERITAS DATA FRAMEWORK · 擷取項目登錄表 Schema v1.0 · SSOT for 'what to fetch'. Each item describes ONE conceptual indicator and its multi-source fetch routing, cross-validation rules, transforms, and downstream consumption.",
+  "type": "object",
+  "required": ["meta", "items"],
+  "additionalProperties": false,
+  "properties": {
+
+    "meta": {
+      "type": "object",
+      "description": "Registry-level metadata",
+      "required": ["version", "owner", "updated"],
+      "additionalProperties": false,
+      "properties": {
+        "version":     { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$",
+                         "description": "Semantic version e.g. 1.0.0" },
+        "owner":       { "type": "string", "description": "Maintainer (e.g. tony)" },
+        "updated":     { "type": "string", "format": "date" },
+        "description": { "type": "string" },
+        "ssot_locks": {
+          "type": "object",
+          "description": "Locked SSOT constants referenced by items",
+          "additionalProperties": { "type": "string" }
+        },
+        "fred_api_key_env": {
+          "type": "string",
+          "description": "Env var name where FRED key is stored (e.g. FRED_API_KEY)",
+          "default": "FRED_API_KEY"
+        }
+      }
+    },
+
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Array of extraction items",
+      "items": { "$ref": "#/definitions/ExtractionItem" }
+    }
+  },
+
+  "definitions": {
+
+    "ExtractionItem": {
+      "type": "object",
+      "required": ["via_code", "indicator_name", "theme", "freq", "sources", "active"],
+      "additionalProperties": false,
+      "properties": {
+
+        "via_code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9._-]+$",
+          "description": "SSOT identifier in dotted hierarchy. Format: <Region>.<Category>.<Sub>.<Detail>. Examples: US.Rates.Treasury.10Y · TW.Equity.2330 · CN.Futures.Copper.Continuous"
+        },
+
+        "indicator_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable name (English + 中文 OK)"
+        },
+
+        "theme": {
+          "type": "string",
+          "enum": [
+            "Rates", "Inflation", "Employment", "Growth", "Credit",
+            "Fed", "FinCond", "Housing", "Trade", "Commodity",
+            "FX", "Equity", "Index", "Bond", "Crypto", "Futures",
+            "Shipping", "Sentiment", "Macro", "Global", "Custom"
+          ]
+        },
+
+        "sub_theme":   { "type": "string", "description": "Optional sub-grouping" },
+        "unit":        { "type": "string", "description": "%, USD, count, index, etc." },
+
+        "freq": {
+          "type": "string",
+          "enum": ["D", "W", "M", "Q", "Y", "intraday", "irregular"],
+          "description": "D=daily, W=weekly, M=monthly, Q=quarterly, Y=yearly"
+        },
+
+        "region":  { "type": "string", "examples": ["US", "TW", "CN", "Global", "JP", "EU"] },
+        "tags":    { "type": "array", "items": { "type": "string" } },
+
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Multi-source fetch routing. Index 0 = primary by default; use 'priority' to override.",
+          "items": { "$ref": "#/definitions/Source" }
+        },
+
+        "validation": { "$ref": "#/definitions/ValidationConfig" },
+
+        "downstream_modules": {
+          "type": "array",
+          "description": "Which VDF modules consume this item",
+          "items": {
+            "type": "string",
+            "pattern": "^(VDF|VRN)-[A-Z0-9-]+$",
+            "examples": ["VDF-MDL003", "VDF-MDL005", "VDF-MDL006"]
+          }
+        },
+
+        "active":  { "type": "boolean", "default": true,
+                     "description": "Whether to fetch in current run" },
+        "added":   { "type": "string", "format": "date" },
+        "updated": { "type": "string", "format": "date" },
+        "owner":   { "type": "string" },
+        "notes":   { "type": "string" }
+      }
+    },
+
+    "Source": {
+      "type": "object",
+      "required": ["priority", "name", "fetcher", "trust"],
+      "additionalProperties": false,
+      "properties": {
+
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9,
+          "description": "1 = primary, 2 = first fallback, etc."
+        },
+
+        "name": {
+          "type": "string",
+          "enum": [
+            "FRED", "yfinance", "akshare", "AAII", "CNN_FearGreed",
+            "TWSE_OpenAPI", "TPEX_OpenAPI", "MOPS", "histock", "wantgoo",
+            "cnyes", "FactSet", "manual_csv", "manual_json", "custom"
+          ]
+        },
+
+        "source_id": {
+          "type": "string",
+          "description": "Source-specific identifier. e.g. FRED 'DGS10' · YF '^TNX' · AKShare 'cn_copper_continuous'"
+        },
+
+        "func": {
+          "type": "string",
+          "description": "AKShare function name (e.g. futures_main_sina, macro_china_pmi)"
+        },
+
+        "sym": {
+          "type": ["string", "null"],
+          "description": "AKShare symbol arg (e.g. CU0, AL0). null if function takes no symbol."
+        },
+
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "For HTTP-scrape sources (AAII xls URL, CNN dataviz URL)"
+        },
+
+        "path": {
+          "type": "string",
+          "description": "For manual_csv / manual_json fallback. Relative to BASE_DIR."
+        },
+
+        "fetcher": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$",
+          "description": "Dotted Python ref: module.Class.method (e.g. VDF_MDL003.FREDFetcher._fetch_one)"
+        },
+
+        "trust": {
+          "type": "string",
+          "enum": ["official", "high", "medium", "low", "low_emergency"],
+          "description": "Trust tier. 'official' = primary regulator (FRED, TWSE OpenAPI). 'high' = reliable aggregator. 'medium' = derivative/scrape (yfinance). 'low_emergency' = manual fallback."
+        },
+
+        "license": {
+          "type": "string",
+          "enum": ["public_domain", "free_with_attribution", "freemium", "commercial", "scraped", "unknown"]
+        },
+
+        "rate_limit_per_min": { "type": "integer", "minimum": 0 },
+        "timeout_seconds":    { "type": "number", "minimum": 1, "default": 15 },
+        "retry_attempts":     { "type": "integer", "minimum": 0, "default": 3 },
+
+        "transform": { "$ref": "#/definitions/Transform" },
+
+        "note":   { "type": "string", "description": "Caveats / quirks for this specific source" },
+        "active": { "type": "boolean", "default": true }
+      }
+    },
+
+    "Transform": {
+      "type": "object",
+      "description": "Post-fetch transforms to align this source with the canonical via_code value",
+      "additionalProperties": false,
+      "properties": {
+
+        "scale": {
+          "type": "number",
+          "description": "Multiply raw value by this. Example: YF ^TNX returns 4.5 to mean 4.5% but FRED DGS10 returns 4.5 directly, so YF needs scale=1. For yfinance options data quoted in cents → scale=0.01."
+        },
+
+        "offset": {
+          "type": "number",
+          "description": "Add this to raw value after scaling"
+        },
+
+        "lag_days": {
+          "type": "integer",
+          "description": "Shift dates by this many days (e.g. AAII Thursday survey applies to following Wed)"
+        },
+
+        "freq_resample": {
+          "type": "string",
+          "enum": ["D", "W", "M", "Q", "Y", "BD"],
+          "description": "Resample to this freq using last-known-value forward fill"
+        },
+
+        "yoy_pct": {
+          "type": "boolean",
+          "description": "Compute YoY % change from raw level series"
+        },
+
+        "diff": {
+          "type": "boolean",
+          "description": "Compute first difference from raw level"
+        },
+
+        "custom_fn": {
+          "type": "string",
+          "description": "Dotted ref to a Python callable (df) -> df"
+        }
+      }
+    },
+
+    "ValidationConfig": {
+      "type": "object",
+      "description": "Cross-source validation rules. Applied after all sources have been fetched.",
+      "additionalProperties": false,
+      "properties": {
+
+        "cross_check": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cross-source pairwise comparison"
+        },
+
+        "tolerance_pct": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Pairwise abs(a-b)/avg <= tolerance_pct/100 → AGREE. Example: 0.5 means 0.5%"
+        },
+
+        "tolerance_abs": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Alternative: |a-b| <= tolerance_abs (use when % doesn't make sense, e.g. yields in pp)"
+        },
+
+        "outlier_z_threshold": {
+          "type": "number",
+          "minimum": 1,
+          "default": 4,
+          "description": "Flag if rolling z-score > threshold"
+        },
+
+        "outlier_window_days": {
+          "type": "integer",
+          "minimum": 5,
+          "default": 60,
+          "description": "Rolling window for z-score"
+        },
+
+        "consensus_min_sources": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Min successful sources required to mark item GREEN"
+        },
+
+        "consensus_method": {
+          "type": "string",
+          "enum": ["primary_first", "median", "mean", "majority_vote", "highest_trust"],
+          "default": "primary_first",
+          "description": "How to derive consensus value when multiple sources agree"
+        },
+
+        "on_disagreement": {
+          "type": "string",
+          "enum": ["use_primary", "use_highest_trust", "manual_review", "flag_red"],
+          "default": "use_highest_trust"
+        },
+
+        "allow_single_source": {
+          "type": "boolean",
+          "default": true,
+          "description": "If false, item is RED when only 1/N sources succeed"
+        },
+
+        "weekend_holiday_policy": {
+          "type": "string",
+          "enum": ["skip", "forward_fill", "strict"],
+          "default": "forward_fill"
+        }
+      }
+    }
+  }
+}

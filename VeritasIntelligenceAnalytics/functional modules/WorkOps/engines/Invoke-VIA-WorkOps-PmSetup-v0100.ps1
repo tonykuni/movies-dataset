@@ -12,6 +12,16 @@
 ==========================================================================================
 #>
 param([switch]$Recreate)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Here = $PSScriptRoot
 $Venv = Join-Path $Here ".venv_pm"
@@ -51,3 +61,4 @@ if ($LASTEXITCODE -ne 0) { Write-Host "  [VERIFY-FAIL] pm4py import 未過 — a
 
 Write-Host ("[總結] 成功 {0} / 失敗 {1} · 基底環境零觸碰 · analytics/deep 之後自動優先用此 venv" -f $ok.Count, $fail.Count) -ForegroundColor Green
 if ($fail.Count) { Write-Host ("[誠實清單] 未成:{0}" -f ($fail -join ", ")) -ForegroundColor Yellow }
+

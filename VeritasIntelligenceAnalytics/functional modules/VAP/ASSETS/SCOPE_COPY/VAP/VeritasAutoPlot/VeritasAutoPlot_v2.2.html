@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritasAutoPlot v2.2</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VERITAS AUTOPLOT v2.2 - MUJI × Seaborn
+   VDF Database Ready - No Pre-written Data
+═══════════════════════════════════════════════════════════════════════════════ */
+:root {
+    --sb-blue: #4C72B0;
+    --sb-orange: #DD8452;
+    --sb-green: #55A868;
+    --sb-red: #C44E52;
+    --sb-purple: #8172B3;
+    --c-up: #26A69A;
+    --c-down: #EF5350;
+    --bg: #FAFAFA;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F5F5F5;
+    --text: #37352F;
+    --text-2: #6B6B6B;
+    --text-3: #9B9B9B;
+    --border: #EBEBEB;
+    --radius: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.logo {
+    width: 28px;
+    height: 28px;
+    background: var(--sb-blue);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.db-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 16px;
+}
+
+.db-status.connected { background: rgba(38, 166, 154, 0.1); color: var(--c-up); }
+.db-status.disconnected { background: rgba(239, 83, 80, 0.1); color: var(--c-down); }
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tab:hover { background: var(--bg-hover); }
+.tab.active { background: var(--text); color: white; border-color: var(--text); }
+
+/* Card */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-title { font-size: 14px; font-weight: 600; }
+
+.card-body { padding: 16px; }
+
+/* Chart Container */
+.chart-container {
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-hover);
+    border-radius: var(--radius);
+    color: var(--text-3);
+}
+
+.chart-container.loaded { background: transparent; }
+
+/* Axis Config */
+.axis-config {
+    display: flex;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--bg-hover);
+    border-bottom: 1px solid var(--border);
+}
+
+.axis-group {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.axis-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.axis-label.L { color: var(--sb-blue); }
+.axis-label.R { color: var(--sb-orange); }
+
+.axis-select {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-card);
+}
+
+/* Vertical Stack */
+.v-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.v-panel { background: var(--bg-card); }
+
+.v-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-hover);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+}
+
+.v-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px;
+    color: var(--text-3);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--sb-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Stats */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.stat {
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.stat-label { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+.stat-value { font-size: 18px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+@media (max-width: 768px) {
+    .grid-2, .stats { grid-template-columns: 1fr; }
+    .axis-config { flex-direction: column; }
+}
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <div class="logo">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-3 3"/>
+                </svg>
+            </div>
+            <span>AutoPlot v2.2</span>
+        </div>
+        <div class="db-status disconnected" id="dbStatus">
+            <span class="status-dot"></span>
+            <span id="dbStatusText">等待 VDF 連線...</span>
+        </div>
+    </header>
+    
+    <!-- Tabs -->
+    <nav class="tabs">
+        <button class="tab active" onclick="showPage('tech')">技術線圖</button>
+        <button class="tab" onclick="showPage('dual')">雙軸比較</button>
+        <button class="tab" onclick="showPage('stack')">堆疊多圖</button>
+        <button class="tab" onclick="showPage('heat')">熱力圖</button>
+    </nav>
+    
+    <!-- Page 1: Technical -->
+    <div class="page active" id="page-tech">
+        <div class="card">
+            <div class="card-head">
+                <span class="card-title">技術線圖</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" id="chartTech">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>等待 VDF 資料...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page 2: Dual Axis -->
+    <div class="page" id="page-dual">
+        <div class="card">
+            <div class="card-head">
+                <span class="card-title">雙軸比較</span>
+            </div>
+            <div class="axis-config">
+                <div class="axis-group">
+                    <span class="axis-label L">◀ 左軸</span>
+                    <select class="axis-select" id="selL" onchange="renderDual()">
+                        <!-- VDF 連線後動態填入 -->
+                    </select>
+                </div>
+                <div class="axis-group">
+                    <span class="axis-label R">右軸 ▶</span>
+                    <select class="axis-select" id="selR" onchange="renderDual()">
+                        <!-- VDF 連線後動態填入 -->
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" id="chartDual">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>等待 VDF 資料...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat"><div class="stat-label">相關係數</div><div class="stat-value" id="sCorr">--</div></div>
+            <div class="stat"><div class="stat-label">領先天數</div><div class="stat-value" id="sLead">--</div></div>
+            <div class="stat"><div class="stat-label">R²</div><div class="stat-value" id="sR2">--</div></div>
+            <div class="stat"><div class="stat-label">顯著性</div><div class="stat-value" id="sSig">--</div></div>
+        </div>
+    </div>
+    
+    <!-- Page 3: Stack -->
+    <div class="page" id="page-stack">
+        <div class="v-stack" id="stackContainer">
+            <div class="loading" style="padding: 60px;">
+                <div class="spinner"></div>
+                <span>等待 VDF 資料...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page 4: Heatmap -->
+    <div class="page" id="page-heat">
+        <div class="card">
+            <div class="card-head">
+                <span class="card-title">熱力圖</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" id="chartHeat">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>等待 VDF 資料...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VERITAS AUTOPLOT v2.2 - VDF DATABASE INTERFACE
+// No Pre-written Data - All Dynamic from VDF
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const SB = {
+    blue: '#4C72B0',
+    orange: '#DD8452',
+    green: '#55A868',
+    red: '#C44E52',
+    purple: '#8172B3',
+};
+
+const LAYOUT = {
+    paper_bgcolor: '#FFFFFF',
+    plot_bgcolor: '#FFFFFF',
+    font: { family: 'Inter, Noto Sans TC', size: 11, color: '#37352F' },
+    margin: { t: 10, r: 50, b: 30, l: 50 },
+    showlegend: false,
+    hovermode: 'x unified',
+    xaxis: { gridcolor: '#EBEBEB', linecolor: '#EBEBEB', tickfont: { size: 10, color: '#9B9B9B' } },
+    yaxis: { gridcolor: '#EBEBEB', linecolor: '#EBEBEB', tickfont: { size: 10, color: '#9B9B9B' } },
+};
+
+const CFG = { responsive: true, displayModeBar: false };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VDF INTERFACE - Connect to Database
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const VDF = {
+    connected: false,
+    ticker: null,
+    availableFields: [],
+    data: {},
+    
+    // Connect to VDF Database
+    async connect(config) {
+        console.log('🔗 VDF: Connecting...', config);
+        
+        // TODO: Replace with actual VDF connection
+        // Example: const conn = await fetch(`${config.host}/api/connect`);
+        
+        this.connected = true;
+        this.updateStatus(true, 'VDF Connected');
+        return true;
+    },
+    
+    // Fetch available fields for a ticker
+    async fetchFields(ticker) {
+        console.log('📋 VDF: Fetching fields for', ticker);
+        
+        // TODO: Replace with actual VDF API call
+        // Example: const fields = await fetch(`${host}/api/fields/${ticker}`);
+        
+        this.ticker = ticker;
+        this.availableFields = []; // Will be populated from VDF
+        return this.availableFields;
+    },
+    
+    // Fetch data for specific fields
+    async fetchData(ticker, fields, dateRange) {
+        console.log('📊 VDF: Fetching data', { ticker, fields, dateRange });
+        
+        // TODO: Replace with actual VDF API call
+        // Example: const data = await fetch(`${host}/api/data/${ticker}`, { body: { fields, dateRange } });
+        
+        return this.data;
+    },
+    
+    // Update UI status
+    updateStatus(connected, text) {
+        const el = document.getElementById('dbStatus');
+        const textEl = document.getElementById('dbStatusText');
+        el.className = `db-status ${connected ? 'connected' : 'disconnected'}`;
+        textEl.textContent = text;
+    },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART RENDERERS - Will use VDF data when connected
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderTech(data) {
+    if (!data || !data.dates) {
+        console.log('⚠️ No data for Technical chart');
+        return;
+    }
+    
+    const el = document.getElementById('chartTech');
+    el.innerHTML = '';
+    el.classList.add('loaded');
+    
+    const traces = [];
+    
+    // Add candlestick if OHLC available
+    if (data.open && data.high && data.low && data.close) {
+        traces.push({
+            type: 'candlestick',
+            x: data.dates,
+            open: data.open,
+            high: data.high,
+            low: data.low,
+            close: data.close,
+            increasing: { line: { color: '#26A69A' } },
+            decreasing: { line: { color: '#EF5350' } },
+        });
+    }
+    
+    // Add volume if available
+    if (data.volume) {
+        traces.push({
+            type: 'bar',
+            x: data.dates,
+            y: data.volume,
+            marker: { color: 'rgba(76, 114, 176, 0.3)' },
+            yaxis: 'y2',
+        });
+    }
+    
+    Plotly.newPlot(el, traces, {
+        ...LAYOUT,
+        height: 450,
+        xaxis: { ...LAYOUT.xaxis, rangeslider: { visible: false } },
+        yaxis: { ...LAYOUT.yaxis, domain: [0.25, 1], side: 'right' },
+        yaxis2: { domain: [0, 0.2], side: 'right' },
+    }, CFG);
+}
+
+function renderDual(data) {
+    if (!data) {
+        console.log('⚠️ No data for Dual Axis chart');
+        return;
+    }
+    
+    const el = document.getElementById('chartDual');
+    el.innerHTML = '';
+    el.classList.add('loaded');
+    
+    // Get selected fields
+    const leftField = document.getElementById('selL').value;
+    const rightField = document.getElementById('selR').value;
+    
+    if (!leftField || !rightField || !data[leftField] || !data[rightField]) {
+        el.innerHTML = '<div class="loading"><span>請選擇欄位</span></div>';
+        return;
+    }
+    
+    Plotly.newPlot(el, [
+        { type: 'scatter', mode: 'lines', x: data.dates, y: data[leftField], line: { color: SB.blue, width: 2 }, yaxis: 'y' },
+        { type: 'scatter', mode: 'lines', x: data.dates, y: data[rightField], line: { color: SB.orange, width: 2 }, yaxis: 'y2' },
+    ], {
+        ...LAYOUT,
+        height: 400,
+        yaxis: { ...LAYOUT.yaxis, side: 'left' },
+        yaxis2: { overlaying: 'y', side: 'right', gridcolor: 'transparent' },
+    }, CFG);
+}
+
+function renderStack(data) {
+    if (!data || !data.dates) {
+        console.log('⚠️ No data for Stack chart');
+        return;
+    }
+    
+    const container = document.getElementById('stackContainer');
+    container.innerHTML = '';
+    
+    // Dynamically create panels based on available data
+    const panels = [];
+    
+    if (data.close) panels.push({ id: 'stPrice', label: '股價', color: SB.blue, data: data.close, type: 'line' });
+    if (data.volume) panels.push({ id: 'stVol', label: '成交量', color: SB.green, data: data.volume, type: 'bar' });
+    if (data.macd) panels.push({ id: 'stMACD', label: 'MACD', color: SB.red, data: data.macd, type: 'bar' });
+    if (data.rsi) panels.push({ id: 'stRSI', label: 'RSI', color: SB.purple, data: data.rsi, type: 'line' });
+    
+    if (panels.length === 0) {
+        container.innerHTML = '<div class="loading"><span>無可用資料</span></div>';
+        return;
+    }
+    
+    // Create panel HTML
+    panels.forEach(panel => {
+        const div = document.createElement('div');
+        div.className = 'v-panel';
+        div.innerHTML = `
+            <div class="v-head">
+                <span class="v-dot" style="background: ${panel.color};"></span>
+                ${panel.label}
+            </div>
+            <div id="${panel.id}" style="height: ${panel.id === 'stPrice' ? 200 : 100}px;"></div>
+        `;
+        container.appendChild(div);
+    });
+    
+    // Render each panel
+    const SL = { ...LAYOUT, margin: { t: 5, r: 45, b: 20, l: 45 } };
+    
+    panels.forEach(panel => {
+        const trace = panel.type === 'bar' 
+            ? { type: 'bar', x: data.dates, y: panel.data, marker: { color: panel.color, opacity: 0.7 } }
+            : { type: 'scatter', mode: 'lines', x: data.dates, y: panel.data, line: { color: panel.color, width: 1.5 } };
+        
+        Plotly.newPlot(panel.id, [trace], { ...SL, yaxis: { ...SL.yaxis, side: 'right' } }, CFG);
+    });
+}
+
+function renderHeat(data) {
+    if (!data || !data.matrix) {
+        console.log('⚠️ No data for Heatmap');
+        return;
+    }
+    
+    const el = document.getElementById('chartHeat');
+    el.innerHTML = '';
+    el.classList.add('loaded');
+    
+    Plotly.newPlot(el, [{
+        type: 'heatmap',
+        x: data.labels,
+        y: data.labels,
+        z: data.matrix,
+        colorscale: [[0, SB.blue], [0.5, '#FFFFFF'], [1, SB.red]],
+        showscale: true,
+        text: data.matrix.map(row => row.map(v => v.toFixed(2))),
+        texttemplate: '%{text}',
+        textfont: { size: 10 },
+    }], {
+        ...LAYOUT,
+        height: 450,
+        margin: { t: 20, r: 80, b: 80, l: 80 },
+        xaxis: { ...LAYOUT.xaxis, tickangle: -45 },
+    }, CFG);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// POPULATE DROPDOWNS FROM VDF
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function populateSelects(fields) {
+    const selL = document.getElementById('selL');
+    const selR = document.getElementById('selR');
+    
+    selL.innerHTML = '';
+    selR.innerHTML = '';
+    
+    if (!fields || fields.length === 0) {
+        selL.innerHTML = '<option value="">等待 VDF...</option>';
+        selR.innerHTML = '<option value="">等待 VDF...</option>';
+        return;
+    }
+    
+    fields.forEach(field => {
+        const optL = document.createElement('option');
+        optL.value = field.key;
+        optL.textContent = field.label;
+        selL.appendChild(optL);
+        
+        const optR = document.createElement('option');
+        optR.value = field.key;
+        optR.textContent = field.label;
+        selR.appendChild(optR);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION - Wait for VDF Connection
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function init() {
+    console.log('🚀 AutoPlot v2.2 starting...');
+    console.log('📋 Waiting for VDF connection');
+    console.log('');
+    console.log('To connect VDF, call:');
+    console.log('  await VDF.connect({ host: "your-vdf-host" })');
+    console.log('  await VDF.fetchFields("2330.TW")');
+    console.log('  renderTech(await VDF.fetchData("2330.TW", ["open","high","low","close","volume"]))');
+}
+
+// Expose to global for VDF integration
+window.VDF = VDF;
+window.renderTech = renderTech;
+window.renderDual = renderDual;
+window.renderStack = renderStack;
+window.renderHeat = renderHeat;
+window.populateSelects = populateSelects;
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+{
+  "schema_version": "VDF_SentimentStrength_Input_v0100",
+  "generated_at": "2026-06-19T13:15:10",
+  "run_id": "RUN_20260619_131457_VDF_SENTIMENT_STRENGTH_v0100",
+  "project": "VeritasDataForge",
+  "module": "VDF",
+  "router_name": "VDF Sentiment Strength Router",
+  "priority_rule": "YFINANCE_FIRST_AAII_HTML_OR_LOCAL_CSV_SECOND_PROXY_ENGINE_THIRD",
+  "paths": {
+    "via_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+    "vdf_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF",
+    "engine_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\_vdf_engines\\sentiment_strength",
+    "input_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\_vdf_inputs",
+    "output_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\_vdf_outputs\\sentiment_strength",
+    "log_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\_vdf_logs\\RUN_20260619_131457_VDF_SENTIMENT_STRENGTH_v0100"
+  },
+  "tasks": {
+    "aaii": {
+      "enabled": true,
+      "provider": "aaii_html_or_local_csv",
+      "url": "https://www.aaii.com/sentimentsurvey/sent_results",
+      "local_csv": "",
+      "timeout": 30,
+      "note": "If AAII blocks HTML reading, set local_csv to a downloaded CSV with date/bullish/neutral/bearish columns."
+    },
+    "cnn_proxy": {
+      "enabled": true,
+      "provider": "yfinance_cnn_fear_greed_proxy",
+      "period": "5y",
+      "interval": "1d",
+      "percentile_window": 252,
+      "min_periods": 60,
+      "symbols": {
+        "SPY": "SPY",
+        "QQQ": "QQQ",
+        "RSP": "RSP",
+        "IWM": "IWM",
+        "VIX": "^VIX",
+        "IEF": "IEF",
+        "TLT": "TLT",
+        "HYG": "HYG"
+      },
+      "factor_definition": {
+        "market_momentum": "SPY versus 125-day moving average percentile",
+        "stock_price_strength": "QQQ versus SPY 63-day relative return percentile",
+        "stock_price_breadth_proxy": "RSP or IWM versus SPY 63-day relative return percentile",
+        "put_call_proxy": "inverse VIX percentile proxy",
+        "market_volatility": "inverse VIX versus 50-day average percentile",
+        "safe_haven_demand": "SPY versus IEF 20-day relative return percentile",
+        "junk_bond_demand": "HYG versus IEF 63-day relative return percentile"
+      }
+    }
+  },
+  "blend_weights": {
+    "cnn_proxy": 0.6,
+    "aaii": 0.4
+  },
+  "output_policy": {
+    "csv": true,
+    "parquet": true,
+    "json": true,
+    "html": true,
+    "csv_encoding": "utf-8-sig"
+  },
+  "validation_policy": {
+    "no_delete": true,
+    "no_stop_process": true,
+    "no_global_path_pollution": true,
+    "raw_cnn_scrape_disabled": true,
+    "cnn_proxy_not_exact_cnn_score": true,
+    "commercial_safe_proxy_first": true
+  }
+}

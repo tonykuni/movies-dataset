@@ -7,7 +7,7 @@ def Purpose: Launch VIA MultiFactor testing-validating-simulating engine.
 ================================================================================
 #>
 param(
-    [string]$EnginePath = "$env:USERPROFILE\Downloads\VIA_MultiFactor_TestValidateSim_Engine_v0100.py",
+    [string]$EnginePath = "$env:USERPROFILE\Downloads\VIA_ENG001_MultiFactorTestValidateSimEngine_v0100.py",
     [string]$SSOTPath = "$env:USERPROFILE\Downloads\SSOT_VPT_ingest.json",
     [string]$OutBase = "$env:USERPROFILE\Downloads\VIA_MF_ENGINE_RUNS",
     [string]$PythonExe = "python",
@@ -15,6 +15,16 @@ param(
     [switch]$NoOpen,
     [switch]$KeepPowerShellOpen
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -66,3 +76,4 @@ finally {
         [void][System.Console]::ReadLine()
     }
 }
+

@@ -1,0 +1,62 @@
+diff --git a/src/components/shell.tsx b/src/components/shell.tsx
+index af14b27..73d6f5f 100644
+--- a/src/components/shell.tsx
++++ b/src/components/shell.tsx
+@@ -6,6 +6,7 @@ import { IntakeDeck } from "@/components/intake-deck";
+ import { LeftEngine } from "@/components/left-engine";
+ import { VarDeck } from "@/components/var-deck";
+ import { MotherDeck } from "@/components/mother-deck";
++import { RunDeck } from "@/components/run-deck";
+ import { VdfDeck } from "@/components/vdf-deck";
+ import { Button } from "@/components/ui/button";
+ import { StatusLight } from "@/components/status-light";
+@@ -17,11 +18,12 @@ import type { Deck, Light } from "@/lib/via/types";
+ 
+ const NAV: Array<{ id: Deck; label: string; kicker: string }> = [
+   { id: "console", label: "總管", kicker: "00" },
+-  { id: "vdf", label: "VDF", kicker: "01" },
+-  { id: "vrn", label: "VRN", kicker: "02" },
+-  { id: "engine", label: "引擎", kicker: "03" },
+-  { id: "var", label: "VAR", kicker: "04" },
+-  { id: "mother", label: "母倉", kicker: "05" },
++  { id: "run", label: "整合台", kicker: "01" },
++  { id: "vdf", label: "VDF", kicker: "02" },
++  { id: "vrn", label: "VRN", kicker: "03" },
++  { id: "engine", label: "引擎", kicker: "04" },
++  { id: "var", label: "VAR", kicker: "05" },
++  { id: "mother", label: "母倉", kicker: "06" },
+ ];
+ 
+ function worst(rows: { light: Light }[], fallback: Light): Light {
+@@ -51,7 +53,9 @@ export function Shell() {
+   const varLight: Light = auditBusy ? "run" : activated.var ? "ok" : "warn";
+   const govLight: Light = worst(autoRows.filter((r) => r.system === "VIA" || r.system === "GOV"), "warn");
+   const motherLight: Light = psrOverall();   // 母倉成果台:PS 三輪最壞燈(R3a 5 個不可解析腳本=紅)
+-  const lights: Record<Deck, Light> = { console: govLight, vdf: vdfLight, vrn: vrnLight, engine: engLight, var: varLight, mother: motherLight };
++    // 批417 整合台:燈=VDF 與 VRN 取較壞的那一個(它一頁跑兩族,不能只報好消息)
++  const runLight: Light = worst([{ light: vdfLight }, { light: vrnLight }], "pending");
++  const lights: Record<Deck, Light> = { console: govLight, run: runLight, vdf: vdfLight, vrn: vrnLight, engine: engLight, var: varLight, mother: motherLight };
+   const live = activated.vdf && activated.vrn && activated.engine && activated.var;
+ 
+   const lampRows = autoRows.map((r) => ({ light: lamp(r.light) }));
+@@ -118,6 +122,7 @@ export function Shell() {
+         />
+         <main className="min-w-0 flex-1 overflow-y-auto px-3 py-4 sm:px-5 lg:px-7">
+           {deck === "console" ? <ConsoleDeck /> : null}
++          {deck === "run" ? <RunDeck /> : null}
+           {deck === "vdf" ? <VdfDeck /> : null}
+           {deck === "vrn" ? <IntakeDeck /> : null}
+           {deck === "engine" ? <EngineDeck /> : null}
+diff --git a/src/lib/via/types.ts b/src/lib/via/types.ts
+index cff3dcf..03f1026 100644
+--- a/src/lib/via/types.ts
++++ b/src/lib/via/types.ts
+@@ -163,7 +163,7 @@ export type FetchMetrics = {
+   parquetRoundtrip: boolean;
+ };
+ 
+-export type Deck = "console" | "vdf" | "vrn" | "engine" | "var" | "mother";
++export type Deck = "console" | "run" | "vdf" | "vrn" | "engine" | "var" | "mother";
+ 
+ export type Activated = {
+   vdf: boolean;

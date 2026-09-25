@@ -1,0 +1,372 @@
+{
+ "contract": "VIA_VAP_ONE_SELFTEST/0100",
+ "engine": "VAP_ENG016_AutoplotOne",
+ "version": "v0100",
+ "ts": "2026-09-07T11:24:24Z",
+ "passed": 71,
+ "failed": 0,
+ "skipped": 1,
+ "total": 72,
+ "verdict": "PASS",
+ "lanes": {
+  "svg": {
+   "available": true,
+   "note": "零依賴,永遠可用"
+  },
+  "plotly": {
+   "available": false,
+   "install": "pip install plotly",
+   "error": "ModuleNotFoundError"
+  },
+  "matplotlib": {
+   "available": true,
+   "version": "3.10.8"
+  },
+  "seaborn": {
+   "available": true,
+   "version": "0.13.2"
+  },
+  "pandas": {
+   "available": true,
+   "version": "3.0.2"
+  },
+  "duckdb": {
+   "available": false,
+   "install": "pip install duckdb",
+   "error": "ModuleNotFoundError"
+  },
+  "pyarrow": {
+   "available": false,
+   "install": "pip install pyarrow",
+   "error": "ModuleNotFoundError"
+  }
+ },
+ "profile_default": "vap_spec_v1",
+ "family_default": "v23",
+ "registry": {
+  "charts": 40,
+  "groups": 9
+ },
+ "provenance": {
+  "note": "上傳原件 SHA256 前 16 碼;原件零改動(canonical_mutation=false);本檔為整合新檔",
+  "sources": {
+   "VAP_ENG001_AutoplotEngineChartlib_v007.py": "E7D6ACC96A15EE42",
+   "VAP_ENG002_AutoplotEngine_v001.py": "DC5697DB529F9E72",
+   "VAP_ENG003_AutoplotSeabornPlotly_v0100.py": "EACF35E0274C83A4",
+   "via_autoplot_engine_v001.py": "C7D7CA8A6DDD2503",
+   "vap_seaborn_stack_generator.py(v2.3.1)": "E6C448BD72E8C1B7",
+   "vap_panel_model.py(v2.3.1)": "5F42DB2C3B9F1FEB",
+   "vap_render_optimizer.py(v2.3.1)": "32273B98CA8DA7F4",
+   "vap_chart_library.py(v2.3.1)": "E9E11A7C7B0E029F",
+   "vap_atomic_io.py(v2.3.1)": "2935AA15402A7C2D",
+   "vap_defaults.json(v2.3.1)": "2F552A0DF3EF906E",
+   "vap_data_runtime_v025.py": "DD1AD427CED59933",
+   "vap_chart_registry_v025.json": "0BE85177F71E4A41"
+  },
+  "promotion_record": {
+   "unit": "UNIT03_v0113_PROMOTION",
+   "repair": "eight-site 0.4->0.75 (v0111R2 adjudication, v0112 guarded trial all green)",
+   "canonical_mutation": false,
+   "scope": "new file only"
+  },
+  "harmonization": "ChartSpecONE ↔ vap_spec 併軌案 v001 方案 A 已核准 2026-08-04(vap_spec v1.0.x 唯一視覺真相;Macro Seaborn 0.80 獨立域;Seaborn 圖組 v2.3.1 獨立域)",
+  "uat_v231": {
+   "date": "2026-09-02",
+   "tests": "155 passed / 0 failed / 3 skipped",
+   "png": "4720×4905 @300DPI",
+   "concurrency": "12-way config+gallery append OK",
+   "render_max_points": 5000
+  }
+ },
+ "checks": [
+  {
+   "name": "圖規冊 40",
+   "status": "PASS"
+  },
+  {
+   "name": "code 唯一",
+   "status": "PASS"
+  },
+  {
+   "name": "9 群",
+   "status": "PASS"
+  },
+  {
+   "name": "SINGLE26/DUAL9/NONE5",
+   "status": "PASS"
+  },
+  {
+   "name": "stack type→code 全在冊",
+   "status": "PASS"
+  },
+  {
+   "name": "0..97 → [0,25,50,75,100]",
+   "status": "PASS"
+  },
+  {
+   "name": "13..14 → step 0.25",
+   "status": "PASS"
+  },
+  {
+   "name": "v23 家族含 1.25(0..4.6→step 1.25)",
+   "status": "PASS"
+  },
+  {
+   "name": "v018 家族不用 1.25",
+   "status": "PASS"
+  },
+  {
+   "name": "-3..97 → step 50(25 無法 4 間隔覆蓋;與總控台一致)",
+   "status": "PASS"
+  },
+  {
+   "name": "include_zero 非負→起點 0",
+   "status": "PASS"
+  },
+  {
+   "name": "include_zero 非正→終點 0",
+   "status": "PASS"
+  },
+  {
+   "name": "min>max 交換",
+   "status": "PASS"
+  },
+  {
+   "name": "min==max 退化",
+   "status": "PASS"
+  },
+  {
+   "name": "NaN 回 0..1",
+   "status": "PASS"
+  },
+  {
+   "name": "200 隨機樣本 四檢全真(合規 PropertySamples 200)",
+   "status": "PASS"
+  },
+  {
+   "name": "尾零 1.25 / 2.50",
+   "status": "PASS"
+  },
+  {
+   "name": "小數 offset 不顯示成整數(v018 0..4.6 → -1.5…6.5)",
+   "status": "PASS"
+  },
+  {
+   "name": "magnitude 1.2M",
+   "status": "PASS"
+  },
+  {
+   "name": "1.0×=420px",
+   "status": "PASS"
+  },
+  {
+   "name": "1.5×=630px",
+   "status": "PASS"
+  },
+  {
+   "name": "0.3 非法(步進)",
+   "status": "PASS"
+  },
+  {
+   "name": "normalize 0.3→0.25",
+   "status": "PASS"
+  },
+  {
+   "name": "normalize 9→4.0 夾",
+   "status": "PASS"
+  },
+  {
+   "name": "K 線展開 2 列 75/25",
+   "status": "PASS"
+  },
+  {
+   "name": "K 線 volume 列 axis include zero",
+   "status": "PASS"
+  },
+  {
+   "name": "fractions 不合 1 拒",
+   "status": "PASS"
+  },
+  {
+   "name": "拖曳重排",
+   "status": "PASS"
+  },
+  {
+   "name": "pick_price 只認 adj",
+   "status": "PASS"
+  },
+  {
+   "name": "裸 close 無 allow_raw 拒",
+   "status": "PASS"
+  },
+  {
+   "name": "裸 close allow_raw 可",
+   "status": "PASS"
+  },
+  {
+   "name": "volume 未標示→WARN",
+   "status": "PASS"
+  },
+  {
+   "name": "volume 標示 ExDT→OK",
+   "status": "PASS"
+  },
+  {
+   "name": "ffill 價格補、Volume 不補",
+   "status": "PASS"
+  },
+  {
+   "name": "interpolate 價格 2、Volume 不補",
+   "status": "PASS"
+  },
+  {
+   "name": "zero 不補 Volume",
+   "status": "PASS"
+  },
+  {
+   "name": "drop 刪缺列",
+   "status": "PASS"
+  },
+  {
+   "name": "quality audit 重複日期",
+   "status": "PASS"
+  },
+  {
+   "name": "envelope 縮減 ≤ max 且保極值",
+   "status": "PASS"
+  },
+  {
+   "name": "envelope 不需縮減時原樣",
+   "status": "PASS"
+  },
+  {
+   "name": "candlestick 桶聚合 O首H最大L最小C尾",
+   "status": "PASS"
+  },
+  {
+   "name": "candlestick 桶含缺值 Volume→缺值",
+   "status": "PASS"
+  },
+  {
+   "name": "spec single 殘留 secondary 拒",
+   "status": "PASS"
+  },
+  {
+   "name": "spec candlestick 裸 close 拒",
+   "status": "PASS"
+  },
+  {
+   "name": "spec candlestick adj 可",
+   "status": "PASS"
+  },
+  {
+   "name": "圖規 JSON 最小合格",
+   "status": "PASS"
+  },
+  {
+   "name": "圖規 JSON 缺方法論拒",
+   "status": "PASS"
+  },
+  {
+   "name": "圖規 JSON code=candle→CH-27",
+   "status": "PASS"
+  },
+  {
+   "name": "圖規 JSON 裸 close 警",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫加入(資料無涉)",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫拒 records",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫拒 >64 數值陣列",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫遮蔽 secret",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫搜尋",
+   "status": "PASS"
+  },
+  {
+   "name": "圖庫→堆疊 新 ID",
+   "status": "PASS"
+  },
+  {
+   "name": "堆疊複製 副本",
+   "status": "PASS"
+  },
+  {
+   "name": "堆疊停用不刪",
+   "status": "PASS"
+  },
+  {
+   "name": "原子寫入 + 鎖 + jsonl 只增",
+   "status": "PASS"
+  },
+  {
+   "name": "SVG 產生且合法",
+   "status": "PASS"
+  },
+  {
+   "name": "實體列 4(K線2+堆疊+雙軸)",
+   "status": "PASS"
+  },
+  {
+   "name": "每軸四檢全真",
+   "status": "PASS"
+  },
+  {
+   "name": "K 線紅綠色出現",
+   "status": "PASS"
+  },
+  {
+   "name": "雙軸右軸標籤出現",
+   "status": "PASS"
+  },
+  {
+   "name": "HTML 自包含零 CDN(無外部 script/link)",
+   "status": "PASS"
+  },
+  {
+   "name": "事件帶 opacity 0.3",
+   "status": "PASS"
+  },
+  {
+   "name": "方案 A 線 0.9 / 柱 0.6 / 面積 0.75 常數",
+   "status": "PASS"
+  },
+  {
+   "name": "config 驗證通過",
+   "status": "PASS"
+  },
+  {
+   "name": "render_stack svg+html+audit+ledger",
+   "status": "PASS"
+  },
+  {
+   "name": "lane 狀態可探",
+   "status": "PASS"
+  },
+  {
+   "name": "matplotlib PNG300/PDF 產出可驗",
+   "status": "PASS"
+  },
+  {
+   "name": "plotly 自包含 HTML",
+   "status": "SKIP",
+   "note": "plotly 缺席(誠實 SKIP)"
+  },
+  {
+   "name": "parquet 缺依賴誠實 FAIL",
+   "status": "PASS"
+  }
+ ]
+}

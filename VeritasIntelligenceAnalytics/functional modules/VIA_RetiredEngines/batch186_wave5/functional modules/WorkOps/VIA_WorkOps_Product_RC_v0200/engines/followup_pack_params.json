@@ -1,0 +1,45 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-034",
+  "purpose": "Build one batch of follow-up draft specifications before end of day. ENG-031 remains the question/draft primitive.",
+  "sources": [
+    "followup_state.json",
+    "project_registry.jsonl",
+    "template_registry.json"
+  ],
+  "schedule_defaults": {
+    "prepare_hour_local": 16,
+    "prepare_minute_local": 30,
+    "timezone": "Asia/Taipei"
+  },
+  "selection": {
+    "include_levels": [
+      3,
+      4,
+      5
+    ],
+    "include_close_candidates": true,
+    "include_due_within_hours": 24,
+    "max_items": 80
+  },
+  "template_selection": {
+    "state_defaults": {
+      "IN_PROGRESS": "progress_followup",
+      "WAITING": "progress_followup",
+      "UNKNOWN": "progress_followup",
+      "BLOCKED": "blocked_recovery",
+      "NEED_HELP": "blocked_recovery",
+      "AT_RISK": "blocked_recovery",
+      "OVERDUE": "blocked_recovery",
+      "DONE_CANDIDATE": "closure_confirmation",
+      "READY_TO_CLOSE": "closure_confirmation"
+    },
+    "allow_project_override": true,
+    "allow_run_override": true
+  },
+  "governance": {
+    "draft_only": true,
+    "outlook_send": false,
+    "human_send_confirmation": true
+  }
+}

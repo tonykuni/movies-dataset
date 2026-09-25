@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VEGN Step 1 v3.2 — VIA Env Governance</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;
+  --am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+  --ro:#b05580;--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--hf:'Syne',system-ui,sans-serif;
+  --r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+.w{max-width:1600px;margin:0 auto;padding:10px 14px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co))}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px;font-family:var(--hf)}
+.h1t .ac{color:var(--bl)}.h1t .at{color:var(--tl)}.h1t .av{color:var(--vi)}.h1t .aa{color:var(--am)}
+.h2t{color:var(--am);font-size:11px;font-weight:700;font-family:var(--hf);letter-spacing:.3px;margin-top:2px}
+.h3t{color:var(--i3);font-size:10px;margin-top:2px}
+.hdr-meta{margin-left:auto;text-align:right;font:400 9px var(--mo);color:var(--i3)}
+.pt{display:flex;gap:2px;margin-bottom:8px;flex-wrap:wrap}
+.pt button{padding:8px 18px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:var(--sh)}
+.pt button:hover:not(.on){background:var(--bg2);color:var(--i1)}
+.pg{display:none}.pg.on{display:block}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:4px;margin-bottom:8px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:5px 6px;text-align:center;transition:.2s}
+.sc:hover{border-color:var(--bl);box-shadow:var(--sh)}
+.sc .n{font-size:13px;font-weight:700;font-family:var(--mo);letter-spacing:-.2px}
+.sc .l{font-size:8px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px}
+.sc.g .n{color:var(--gn)}.sc.r .n{color:var(--co)}.sc.a .n{color:var(--am)}.sc.t .n{color:var(--tl)}.sc.b .n{color:var(--bl)}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:6px;overflow:hidden;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-i{width:24px;height:24px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.cd-t{font-weight:600;font-size:11px;flex:1}
+.cd-s{font-family:var(--mo);font-size:9px;color:var(--i3);padding:1px 5px;background:var(--bg1);border-radius:10px}
+.cd-b{padding:8px 10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.mx{width:100%;border-collapse:collapse;font-size:10px}
+.mx th{background:var(--bg1);padding:4px 5px;text-align:left;font-weight:600;color:var(--i2);border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:1;white-space:nowrap}
+.mx td{padding:3px 5px;border-bottom:1px solid var(--bd);vertical-align:top}
+.mx tr:hover{background:rgba(76,120,168,.03)}
+.mx code{font-family:var(--mo);font-size:9.5px;background:var(--bg1);padding:0 3px;border-radius:3px}
+.mw{max-height:380px;overflow:auto;border:1px solid var(--bd);border-radius:var(--r)}
+.bd{display:inline-block;padding:1px 5px;border-radius:4px;font-family:var(--mo);font-size:8.5px;font-weight:600;letter-spacing:.2px}
+.bd.ok{background:var(--gn-l);color:var(--gn)}.bd.er{background:var(--co-l);color:var(--co)}
+.bd.wn{background:var(--am-l);color:var(--am)}.bd.na{background:var(--bg2);color:var(--i3)}
+.bd.tl{background:var(--tl-l);color:var(--tl)}.bd.vi{background:var(--vi-l);color:var(--vi)}
+.bd.bl{background:var(--bl-l);color:var(--bl)}
+.pi{width:100%;padding:6px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);font:11px var(--mo);color:var(--i0);transition:.15s}
+.pi:focus{border-color:var(--bl);outline:none;box-shadow:0 0 0 2px rgba(76,120,168,.1)}
+.bn{padding:5px 10px;border:1px solid var(--bd);border-radius:var(--r);font:500 10px var(--sa);cursor:pointer;transition:.15s;background:var(--sf)}
+.bn:hover{border-color:var(--bl);color:var(--bl)}.bn.bp{background:var(--bl);color:#fff;border-color:var(--bl)}
+.bn.bp:hover{background:#3b6790}
+.tm{background:#1e1d1a;border-radius:var(--r2);overflow:hidden;border:1px solid #333;font-family:var(--mo);font-size:10px}
+.tm-bar{display:flex;align-items:center;padding:6px 10px;background:#2a2924;gap:6px;border-bottom:1px solid #333}
+.tm-dot{width:8px;height:8px;border-radius:50%}.td1{background:#e5534b}.td2{background:#d29922}.td3{background:#3fb950}
+.tm-title{flex:1;color:#8b949e;font-size:9px;text-align:center;text-transform:uppercase;letter-spacing:1px}
+.tm-body{padding:8px 10px;max-height:300px;overflow-y:auto;color:#c9d1d9;line-height:1.7}
+.tm-body .ok{color:#3fb950}.tm-body .wn{color:#d29922}.tm-body .er{color:#f85149}.tm-body .dim{color:#6e7681}
+.prm{background:#1e1d1a;border-radius:var(--r2);padding:12px;font:10px var(--mo);color:#c9d1d9;
+  white-space:pre-wrap;word-break:break-word;max-height:480px;overflow-y:auto;border:1px solid #333;line-height:1.7}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- Header -->
+<div class="hdr">
+  <div style="flex:1">
+    <div class="h1t"><span>Veritas</span><span class="ac">Intelligence</span><span>Analytics · </span><span class="at">Environment</span><span class="av"> Governance Nexus</span> <span class="aa">(VEGN)</span></div>
+    <div class="h2t">VERITAS INTELLIGENCE SYSTEM</div>
+    <div class="h3t">Step 1 v3.2 · Base Guardian → 環境健康 → 5D 分類 → 8工具衝突守門人 → 政策計劃 → AI Prompt · 100% 唯讀</div>
+  </div>
+  <div class="hdr-meta">
+    <div>Run: TEST_20260409_120000</div>
+    <div style="margin-top:2px">Mode: READ_ONLY</div>
+  </div>
+</div>
+
+<!-- KPI Stats -->
+<div class="sg">
+  <div class="sc b"><div class="n">3</div><div class="l">Via Envs</div></div>
+  <div class="sc g"><div class="n">1</div><div class="l">Healthy</div></div>
+  <div class="sc r"><div class="n">2</div><div class="l">Risk Env</div></div>
+  <div class="sc a"><div class="n">0</div><div class="l">Base Polluted</div></div>
+  <div class="sc t"><div class="n">116</div><div class="l">Unique Libs</div></div>
+  <div class="sc r"><div class="n">1</div><div class="l">Sandbox FAIL</div></div>
+  <div class="sc"><div class="n" style="font-size:11px">28122</div><div class="l">Files Scanned</div></div>
+  <div class="sc"><div class="n" style="font-size:9px">CLEAN</div><div class="l">Base Status</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="pt" id="tabs">
+  <button class="on" onclick="pg(1)">P1 · Base Guardian</button>
+  <button onclick="pg(2)">P2 · 環境健康</button>
+  <button onclick="pg(3)">P3 · Lib 5D 分類</button>
+  <button onclick="pg(4)">P4 · 缺口分析</button>
+  <button onclick="pg(5)">P5 · 衝突守門人</button>
+  <button onclick="pg(6)">P6 · 安裝計劃</button>
+  <button onclick="pg(7)">P7 · AI Prompt</button>
+</div>
+
+<!-- P1: Base Guardian -->
+<div id="p1" class="pg on">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--co-l)">🛡</div><div class="cd-t">Base Guardian — 污染偵測與分流計劃</div><span class="cd-s">PHASE 1</span></div>
+  <div class="cd-b">
+    <div class="mw">
+    <table class="mx">
+      <thead><tr><th>套件</th><th>版本</th><th>污染位置</th><th>應路由至</th><th>狀態</th><th>行動</th></tr></thead>
+      <tbody><tr><td colspan="6" style="color:#5a9e6f">✓ Base 無污染</td></tr></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+<div class="g2">
+  <div class="cd">
+    <div class="cd-h"><div class="cd-i" style="background:var(--bl-l)">🗺</div><div class="cd-t">Via_* 路由表</div></div>
+    <div class="cd-b" style="font-size:10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <div>🔵 <b>via_core</b> — Risk=LOW 專屬</div>
+      <div>🟡 <b>via_governance</b> — 治理工具</div>
+      <div>🟠 <b>via_browser</b> — playwright/selenium</div>
+      <div>🟠 <b>via_render</b> — weasyprint/cairosvg</div>
+      <div>🔴 <b>via_ai_bg</b> — opencv/rembg/onnx</div>
+      <div>🔴 <b>via_core_ml</b> — torch/transformers</div>
+      <div>⛔ <b>via_ocr_surya</b> — surya 完全隔離</div>
+      <div>⚠ <b>numba/ortools</b> — MaxPy 3.12</div>
+    </div>
+  </div>
+  <div class="cd">
+    <div class="cd-h"><div class="cd-i" style="background:var(--gn-l)">⚙</div><div class="cd-t">8 工具衝突守門人</div></div>
+    <div class="cd-b" style="font-size:10px">
+      <table class="mx">
+        <thead><tr><th>工具</th><th>角色</th></tr></thead>
+        <tbody>
+          <tr><td><code>uv pip compile</code></td><td>核心解析 — 依賴可解性測試</td></tr>
+          <tr><td><code>pipdeptree</code></td><td>依賴樹 + --warn conflict</td></tr>
+          <tr><td><code>pip check</code></td><td>安裝一致性驗證</td></tr>
+          <tr><td><code>pip-compile</code></td><td>dry-run 模擬解析</td></tr>
+          <tr><td><code>packaging</code></td><td>版本/約束解析驗證</td></tr>
+          <tr><td><code>resolvelib</code></td><td>低階解析引擎偵測</td></tr>
+          <tr><td><code>pip-audit</code></td><td>安全漏洞掃描（加分）</td></tr>
+          <tr><td><code>pipgrip</code></td><td>解析壓力測試（加分）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- P2: 環境健康 -->
+<div id="p2" class="pg">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--tl-l)">🏥</div><div class="cd-t">環境健康矩陣</div><span class="cd-s">PHASE 2 · ENV_HEALTH</span></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>環境</th><th>Python</th><th>套件數</th><th>健康</th><th>污染</th><th>衝突</th><th>pip check</th><th>Risk</th><th>說明</th></tr></thead>
+    <tbody><tr><td><b>via_core</b></td><td>Python 3.13.7</td><td>51</td><td><span class="bd ok">OK</span></td><td><span class="bd ok">NO</span></td><td><span class="bd ok">NO</span></td><td><span class="bd ok">YES</span></td><td><span class="bd na">LOW</span></td><td></td></tr></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- P3: Lib 5D 分類 -->
+<div id="p3" class="pg">
+<div class="cd">
+  <div class="cd-h">
+    <div class="cd-i" style="background:var(--vi-l)">🧬</div>
+    <div class="cd-t">VIA Lib 5D 分類總表</div>
+    <span class="cd-s">PHASE 3-4 · 5D_REGISTRY</span>
+    <input class="pi" id="srch" placeholder="搜尋 lib / cluster / risk…" oninput="flt()" style="max-width:200px;padding:3px 7px;font-size:10px;margin-left:8px">
+    <span style="font:9px var(--mo);color:var(--i3);margin-left:6px" id="cnt"></span>
+  </div>
+  <div class="mw">
+  <table class="mx" id="tLib">
+    <thead><tr><th>ID</th><th>LIB-CODE</th><th>套件</th><th>Spec</th><th>D1</th><th>D5</th><th>Cluster</th><th>目標環境</th><th>Risk</th><th>來源</th></tr></thead>
+    <tbody><tr><td>A1B2C3D4</td><td>LIB-MATRIX-0001</td><td><b>numpy</b></td><td>numpy>=1.26</td><td>FMAT</td><td>IMGF</td><td>CL_MATRIX</td><td>via_core</td><td><span class="bd na">NONE</span></td><td>requirements.txt</td></tr></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- P4: 缺口分析 -->
+<div id="p4" class="pg">
+<div class="g2">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--co-l)">📭</div><div class="cd-t">NOT_INSTALLED 缺口</div><span class="cd-s">$(@($Gap.missing).Count) 個</span></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>套件</th><th>Spec</th><th>目標環境</th><th>Risk</th></tr></thead>
+    <tbody><tr><td><b>httpx</b></td><td>httpx>=0.28</td><td>via_core</td><td><span class="bd er">NOT_INSTALLED</span></td></tr></tbody>
+  </table>
+  </div>
+</div>
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--am-l)">📍</div><div class="cd-t">風險 Lib 清單</div><span class="cd-s">$(@($Gap.risk_libs).Count) 個</span></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>套件</th><th>Risk</th><th>目標環境</th><th>已安裝</th><th>位置正確</th></tr></thead>
+    <tbody><tr><td><b>torch</b></td><td><span class="bd er">HIGH</span></td><td>via_core_ml</td><td><span class="bd er">NO</span></td><td><span class="bd na">NO</span></td></tr></tbody>
+  </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- P5: 衝突守門人 -->
+<div id="p5" class="pg">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--am-l)">⚔</div><div class="cd-t">衝突守門人結果（8 工具）</div><span class="cd-s">PHASE 6</span></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>環境</th><th>uv compile</th><th>pip check</th><th>pipdeptree</th><th>pip-compile</th><th>packaging</th><th>resolvelib</th><th>套件數</th><th>耗時(s)</th><th>錯誤</th></tr></thead>
+    <tbody><tr><td><b>via_core</b></td><td><span class="bd ok">PASS</span></td><td><span class="bd ok">OK</span></td><td><span class="bd ok">OK</span></td><td><span class="bd ok">OK</span></td><td><span class="bd ok">OK</span></td><td><span class="bd na">MISS</span></td><td>47</td><td>1.8</td><td></td></tr></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- P6: 安裝計劃 -->
+<div id="p6" class="pg">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--gn-l)">📋</div><div class="cd-t">安裝計劃矩陣</div><span class="cd-s">PHASE 7 · 8 待安裝</span></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>套件</th><th>Spec</th><th>Risk</th><th>目標環境</th><th>狀態</th><th>行動</th></tr></thead>
+    <tbody><tr><td><b>httpx</b></td><td>httpx>=0.28</td><td>—</td><td>via_core</td><td><span class="bd ok">PLAN_INSTALL</span></td><td>安裝至核准低風險環境</td></tr></tbody>
+  </table>
+  </div>
+</div>
+<div class="g2">
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--co-l)">🔧</div><div class="cd-t">環境重建計劃</div></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>環境</th><th>健康</th><th>原因</th><th>行動</th></tr></thead>
+    <tbody><tr><td><b>via_ml</b></td><td><span class="bd er">EMPTY</span></td><td>pip 遺失或環境損壞</td><td style="font:8px var(--mo);color:var(--tl)">uv venv via_ml --python 3.12</td></tr></tbody>
+  </table>
+  </div>
+</div>
+<div class="cd">
+  <div class="cd-h"><div class="cd-i" style="background:var(--vi-l)">➕</div><div class="cd-t">缺失環境建立</div></div>
+  <div class="mw">
+  <table class="mx">
+    <thead><tr><th>環境名稱</th><th>觸發套件</th><th>Risk</th><th>建立指令</th></tr></thead>
+    <tbody><tr><td><b>via_browser</b></td><td>playwright</td><td><span class="bd er">HIGH</span></td><td style="font:8px var(--mo)">uv venv via_browser --python 3.12</td></tr></tbody>
+  </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- P7: AI Prompt -->
+<div id="p7" class="pg">
+<div class="cd">
+  <div class="cd-h">
+    <div class="cd-i" style="background:var(--bl-l)">🤖</div>
+    <div class="cd-t">AI 安裝計劃 Prompt（Step 1 v3.2）</div>
+    <button class="bn bp" onclick="copyPrompt()" style="font-size:10px;padding:4px 10px">📋 複製 Prompt</button>
+  </div>
+  <div class="prm" id="prm">VIA VEGN Step 1 v3.2 AI Prompt
+# 測試 Prompt 內容</div>
+</div>
+</div>
+
+</div><!-- .w -->
+
+<script>
+function pg(n){
+  document.querySelectorAll('.pg').forEach((p,i)=>p.classList.toggle('on',i===n-1));
+  document.querySelectorAll('#tabs button').forEach((b,i)=>b.classList.toggle('on',i===n-1));
+}
+function flt(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  let v=0,t=0;
+  document.querySelectorAll('#tLib tbody tr').forEach(tr=>{
+    t++; const show=!q||tr.textContent.toLowerCase().includes(q);
+    tr.style.display=show?'':'none'; if(show)v++;
+  });
+  document.getElementById('cnt').textContent=v+'/'+t+' 個';
+}
+function copyPrompt(){
+  const txt=document.getElementById('prm').textContent;
+  navigator.clipboard.writeText(txt).then(()=>alert('Prompt 已複製！')).catch(()=>alert('請手動複製'));
+}
+window.onload=function(){flt()};
+</script>
+</body></html>

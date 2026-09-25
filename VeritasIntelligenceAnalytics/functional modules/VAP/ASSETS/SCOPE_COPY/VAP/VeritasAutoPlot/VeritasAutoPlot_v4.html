@@ -1,0 +1,2785 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeritasAutoPlot™ v4.0 | VIA Ecosystem</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+/* ===== M01: CSS VARIABLES & RESET ===== */
+:root {
+  /* Notion/MUJI Color System */
+  --bg-primary: #F7F6F3;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #EFEDE8;
+  --bg-panel: #FAFAF8;
+  --border: #E8E5DF;
+  --border-strong: #D4D0C8;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B6860;
+  --text-muted: #9B9890;
+  --text-code: #374151;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --panel-width: 280px;
+  --topbar-height: 52px;
+  --statusbar-height: 28px;
+  /* Seaborn Deep Color Palette */
+  --clr-0: #4C72B0; /* Blue */
+  --clr-1: #DD8452; /* Orange */
+  --clr-2: #55A868; /* Green */
+  --clr-3: #C44E52; /* Red */
+  --clr-4: #8172B2; /* Purple */
+  --clr-5: #937860; /* Brown */
+  --clr-6: #DA8BC3; /* Pink */
+  --clr-7: #8C8C8C; /* Gray */
+  --clr-8: #CCB974; /* Olive */
+  --clr-9: #64B5CD; /* Cyan */
+  /* Seaborn Muted */
+  --muted-0: #4878D0;
+  --muted-1: #EE854A;
+  --muted-2: #6ACC65;
+  --muted-3: #D65F5F;
+  --muted-4: #956CB4;
+  --muted-5: #8C613C;
+  --muted-6: #DC7EC0;
+  --muted-7: #797979;
+  --muted-8: #D5BB67;
+  --muted-9: #82C6E2;
+  /* K-line colors (Asia: Up=Red, Down=Green) */
+  --kline-up: #E53E3E;
+  --kline-down: #38A169;
+  --kline-up-fill: rgba(229,62,62,0.85);
+  --kline-down-fill: rgba(56,161,105,0.85);
+  /* Accent */
+  --accent: #4C72B0;
+  --accent-hover: #3A5A96;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== M02: TOP BAR ===== */
+#topbar {
+  height: var(--topbar-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 8px;
+}
+
+.brand-logo {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  color: white; font-size: 14px; font-weight: 700;
+}
+
+.brand-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 15px;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.brand-ver {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.topbar-divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+
+/* Ticker Input */
+#ticker-input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  width: 130px;
+  outline: none;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+#ticker-input:focus { border-color: var(--accent); background: #fff; }
+
+/* Period chips */
+.period-chips { display: flex; gap: 3px; }
+.chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Btn */
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn:hover { background: var(--bg-tertiary); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn.icon-btn { padding: 5px 8px; font-size: 14px; }
+
+#topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* Mode selector */
+.mode-tabs { display: flex; background: var(--bg-tertiary); border-radius: var(--radius-sm); padding: 2px; gap: 2px; }
+.mode-tab {
+  font-size: 11px; font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.mode-tab.active { background: var(--bg-secondary); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+
+/* ===== M03: MAIN LAYOUT ===== */
+#main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== M04: LEFT PANEL ===== */
+#left-panel {
+  width: var(--panel-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s ease;
+}
+#left-panel.collapsed { width: 0; overflow: hidden; }
+
+#panel-toggle-left {
+  position: absolute;
+  left: var(--panel-width);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 48px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  transition: left 0.25s ease;
+  font-size: 10px; color: var(--text-muted);
+}
+#panel-toggle-left.collapsed-mode { left: 0; }
+
+.panel-section {
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-header {
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  user-select: none;
+  background: var(--bg-panel);
+}
+.panel-header:hover { color: var(--text-secondary); }
+.panel-body { padding: 10px 14px; }
+
+.panel-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.panel-scrollable::-webkit-scrollbar { width: 4px; }
+.panel-scrollable::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Form controls */
+.form-group { margin-bottom: 10px; }
+.form-label {
+  font-size: 11px; font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  display: block;
+}
+.form-select, .form-input {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+}
+.form-select:focus, .form-input:focus { border-color: var(--accent); }
+
+/* Toggle switches */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 0;
+}
+.toggle-label { font-size: 12px; color: var(--text-primary); }
+.toggle-switch {
+  position: relative; width: 32px; height: 18px;
+  cursor: pointer;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--border-strong);
+  border-radius: 9px;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  left: 3px; top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(14px); }
+
+/* Stack builder */
+.stack-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+  cursor: grab;
+}
+.stack-item:active { cursor: grabbing; }
+.stack-drag { color: var(--text-muted); font-size: 11px; }
+.stack-label { flex: 1; font-size: 12px; }
+.stack-type-select {
+  font-size: 11px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 4px;
+  background: white;
+  cursor: pointer;
+}
+.stack-remove {
+  color: var(--text-muted); cursor: pointer; font-size: 14px; line-height: 1;
+  padding: 0 2px;
+}
+.stack-remove:hover { color: #E53E3E; }
+
+.add-panel-btn {
+  width: 100%;
+  padding: 6px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: all 0.15s;
+  margin-top: 4px;
+}
+.add-panel-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(76,114,176,0.04); }
+
+/* MA config */
+.ma-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 0;
+}
+.ma-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent); }
+.ma-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; width: 60px; }
+.ma-swatch {
+  width: 20px; height: 4px; border-radius: 2px; flex-shrink: 0;
+}
+.ma-period-input {
+  width: 42px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  border: 1px solid var(--border); border-radius: 3px; padding: 2px 4px;
+  text-align: center;
+}
+
+/* Slider */
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; width: 36px; text-align: right;
+  color: var(--text-secondary);
+}
+input[type=range] {
+  flex: 1; height: 4px; cursor: pointer;
+  accent-color: var(--accent);
+}
+
+/* ===== M05: RIGHT PANEL ===== */
+#right-panel {
+  width: var(--panel-width);
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.25s ease;
+}
+#right-panel.collapsed { width: 0; overflow: hidden; }
+
+#panel-toggle-right {
+  position: absolute;
+  right: var(--panel-width);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 48px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  transition: right 0.25s ease;
+  font-size: 10px; color: var(--text-muted);
+}
+#panel-toggle-right.collapsed-mode { right: 0; }
+
+/* ===== M06: CHART AREA ===== */
+#chart-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+#chart-toolbar {
+  height: 38px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chart-title-area {
+  display: flex; align-items: baseline; gap: 8px;
+}
+.chart-ticker-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px; font-weight: 700;
+  color: var(--text-primary);
+}
+.chart-price-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--text-primary);
+}
+.chart-change-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+.chart-change-display.up { color: var(--kline-up); }
+.chart-change-display.down { color: var(--kline-down); }
+
+#chart-toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+/* Feature chips in toolbar */
+.feat-chip {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  transition: all 0.12s;
+  user-select: none;
+  font-family: 'JetBrains Mono', monospace;
+}
+.feat-chip:hover { border-color: var(--accent); color: var(--accent); }
+.feat-chip.on { background: rgba(76,114,176,0.12); border-color: var(--accent); color: var(--accent); }
+
+#chart-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  padding: 8px;
+}
+
+#plotly-chart { width: 100%; height: 100%; }
+
+/* Loading overlay */
+#loading-overlay {
+  position: absolute; inset: 0;
+  background: rgba(247,246,243,0.92);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+.loading-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--text-secondary);
+}
+
+/* ===== M07: STATUS BAR ===== */
+#statusbar {
+  height: var(--statusbar-height);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 14px;
+  gap: 16px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.status-item { display: flex; align-items: center; gap: 4px; }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: #55A868; }
+.status-dot.loading { background: #CCB974; }
+.status-dot.error { background: #E53E3E; }
+#statusbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+
+/* ===== M08: ANNOTATION MARKERS ===== */
+.event-marker { cursor: pointer; }
+
+/* ===== M09: STAT CARDS (Dual Axis) ===== */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 0 8px 8px;
+}
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+.stat-card-label {
+  font-size: 9px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+.stat-card-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; font-weight: 700;
+  color: var(--text-primary);
+}
+.stat-card-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  margin-top: 1px;
+}
+
+/* ===== M10: MODALS ===== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: none;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  min-width: 400px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px; margin-bottom: 16px;
+}
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ===== M11: ANNOTATIONS PANEL ===== */
+.annotation-list { display: flex; flex-direction: column; gap: 4px; }
+.annotation-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-size: 11px;
+}
+.ann-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.ann-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+.ann-remove { margin-left: auto; cursor: pointer; color: var(--text-muted); }
+.ann-remove:hover { color: #E53E3E; }
+
+/* ===== M12: RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  :root { --panel-width: 240px; }
+}
+@media (max-width: 900px) {
+  #left-panel, #right-panel { display: none; }
+  #panel-toggle-left, #panel-toggle-right { display: none; }
+}
+
+/* Collapse chevrons */
+.chevron { transition: transform 0.2s; display: inline-block; }
+.collapsed-section .chevron { transform: rotate(-90deg); }
+
+/* Color picker swatches row */
+.color-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.color-swatch {
+  width: 16px; height: 16px; border-radius: 3px; cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.1s;
+}
+.color-swatch.selected { border-color: var(--text-primary); }
+
+/* Number badge */
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-size: 9px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--text-primary);
+  color: white;
+  font-size: 10px; padding: 3px 7px;
+  border-radius: 3px; white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 999;
+}
+.tooltip:hover::after { opacity: 1; }
+
+/* Normalized note */
+.norm-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(76,114,176,0.12);
+  color: var(--accent);
+  border: 1px solid rgba(76,114,176,0.3);
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+/* Separator intervals display */
+.interval-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text-muted);
+  padding: 3px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-logo">V</div>
+    <div class="brand-name">VeritasAutoPlot™</div>
+    <div class="brand-ver">v4.0</div>
+  </div>
+  <div class="topbar-divider"></div>
+
+  <!-- Ticker -->
+  <input id="ticker-input" type="text" value="^GSPC" placeholder="Ticker" title="Enter ticker (e.g. ^GSPC, 2330.TW)">
+
+  <!-- Period chips -->
+  <div class="period-chips">
+    <div class="chip" data-period="1mo">1M</div>
+    <div class="chip" data-period="3mo">3M</div>
+    <div class="chip" data-period="6mo">6M</div>
+    <div class="chip active" data-period="1y">1Y</div>
+    <div class="chip" data-period="2y">2Y</div>
+    <div class="chip" data-period="5y">5Y</div>
+    <div class="chip" data-period="10y">10Y</div>
+    <div class="chip" data-period="max">ALL</div>
+  </div>
+
+  <div class="topbar-divider"></div>
+
+  <!-- Chart Mode -->
+  <div class="mode-tabs">
+    <div class="mode-tab active" data-mode="single">單圖</div>
+    <div class="mode-tab" data-mode="stack">堆疊</div>
+    <div class="mode-tab" data-mode="dual">雙軸</div>
+    <div class="mode-tab" data-mode="compare">比較</div>
+  </div>
+
+  <div class="topbar-divider"></div>
+
+  <!-- Normalized toggle -->
+  <div id="norm-toggle" class="feat-chip tooltip" data-tip="Index=100 Normalized" onclick="toggleNormalized()">
+    IDX=100
+  </div>
+
+  <div id="topbar-right">
+    <button class="btn" onclick="addCompare()" title="Add comparison ticker">＋ 比較</button>
+    <button class="btn" onclick="openAnnotationModal()" title="Add event annotation">📌 事件</button>
+    <button class="btn" onclick="exportChart()" title="Export HTML">💾 匯出</button>
+    <button class="btn primary" onclick="loadData()">📊 繪圖</button>
+  </div>
+</div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div id="main-layout">
+
+  <!-- LEFT PANEL TOGGLE -->
+  <div id="panel-toggle-left" onclick="toggleLeftPanel()" title="Toggle left panel">‹</div>
+
+  <!-- ===== LEFT PANEL ===== -->
+  <div id="left-panel">
+    <div class="panel-scrollable">
+
+      <!-- Stacking Builder -->
+      <div class="panel-section" id="sec-stack">
+        <div class="panel-header" onclick="toggleSection('sec-stack')">
+          <span>堆疊面板 <span class="badge" id="stack-count">1</span></span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div id="stack-list">
+            <div class="stack-item" data-indicator="price" draggable="true">
+              <span class="stack-drag">⠿</span>
+              <span class="stack-label">Price / K線</span>
+              <select class="stack-type-select" onchange="onStackTypeChange(this)">
+                <option value="candlestick">K線</option>
+                <option value="line">折線</option>
+                <option value="bar">長條</option>
+                <option value="area">面積</option>
+              </select>
+              <span class="stack-remove" onclick="removeStackItem(this)">×</span>
+            </div>
+          </div>
+          <button class="add-panel-btn" onclick="showAddPanelMenu()">
+            ＋ 新增子圖
+          </button>
+          <!-- Add panel submenu -->
+          <div id="add-panel-menu" style="display:none;margin-top:6px;">
+            <div class="form-group">
+              <select class="form-select" id="add-indicator-select">
+                <optgroup label="Volume">
+                  <option value="volume">成交量 Volume</option>
+                </optgroup>
+                <optgroup label="Momentum">
+                  <option value="rsi">RSI</option>
+                  <option value="macd">MACD</option>
+                  <option value="stoch">Stochastics %K%D</option>
+                  <option value="roc">ROC 變動率</option>
+                  <option value="cci">CCI</option>
+                  <option value="williams">Williams %R</option>
+                  <option value="mfi">MFI 資金流量</option>
+                  <option value="ppo">PPO</option>
+                </optgroup>
+                <optgroup label="Trend">
+                  <option value="adx">ADX</option>
+                  <option value="dmi">DMI +DI/-DI</option>
+                  <option value="aroon">Aroon</option>
+                </optgroup>
+                <optgroup label="Volatility">
+                  <option value="atr">ATR</option>
+                  <option value="bb_width">BB Width</option>
+                  <option value="hvol">Historical Volatility</option>
+                </optgroup>
+                <optgroup label="Volume Flow">
+                  <option value="obv">OBV</option>
+                  <option value="cmf">CMF</option>
+                  <option value="vwap">VWAP</option>
+                </optgroup>
+                <optgroup label="Custom">
+                  <option value="custom">自訂欄位</option>
+                </optgroup>
+              </select>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <select class="form-select" id="add-chart-type" style="flex:1">
+                <option value="line">折線</option>
+                <option value="bar">長條</option>
+                <option value="stack_bar">堆疊長條</option>
+                <option value="area">面積</option>
+                <option value="scatter">散點</option>
+              </select>
+              <button class="btn primary" onclick="addStackPanel()" style="flex-shrink:0">加入</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compare Tickers -->
+      <div class="panel-section" id="sec-compare">
+        <div class="panel-header" onclick="toggleSection('sec-compare')">
+          <span>比較標的</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div id="compare-list"></div>
+          <div style="display:flex;gap:4px;margin-top:6px;">
+            <input class="form-input" id="compare-input" type="text" placeholder="如 QQQ, 0050.TW" style="flex:1">
+            <button class="btn" onclick="addCompareTicker()" style="flex-shrink:0">＋</button>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="toggle-row">
+              <span class="toggle-label">Normalize 100</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="norm-compare" checked onchange="redrawChart()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moving Averages -->
+      <div class="panel-section" id="sec-ma">
+        <div class="panel-header" onclick="toggleSection('sec-ma')">
+          <span>均線 MA/EMA</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <!-- MA Type toggle -->
+          <div class="form-group">
+            <div class="mode-tabs" style="width:fit-content">
+              <div class="mode-tab active" data-matype="SMA" onclick="setMAType('SMA',this)">SMA</div>
+              <div class="mode-tab" data-matype="EMA" onclick="setMAType('EMA',this)">EMA</div>
+            </div>
+          </div>
+          <div id="ma-rows">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bollinger Bands -->
+      <div class="panel-section" id="sec-bb">
+        <div class="panel-header" onclick="toggleSection('sec-bb')">
+          <span>布林通道 BB</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row" style="margin-bottom:8px;">
+            <span class="toggle-label">顯示 BB</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="bb-enabled" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Period <span class="slider-val" id="bb-period-val">20</span></label>
+            <div class="slider-row">
+              <input type="range" id="bb-period" min="5" max="100" value="20" step="1" oninput="document.getElementById('bb-period-val').textContent=this.value;redrawChart()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Std Dev <span class="slider-val" id="bb-std-val">2.0</span></label>
+            <div class="slider-row">
+              <input type="range" id="bb-std" min="0.5" max="4.0" value="2.0" step="0.1" oninput="document.getElementById('bb-std-val').textContent=parseFloat(this.value).toFixed(1);redrawChart()">
+            </div>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">顯示填充</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="bb-fill" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Options -->
+      <div class="panel-section" id="sec-visual">
+        <div class="panel-header" onclick="toggleSection('sec-visual')">
+          <span>視覺設定</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row">
+            <span class="toggle-label">Log Scale</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="log-scale" onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">顯示 H/L 標註</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="hl-marks" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">Range Slider</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="range-slider" onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">網格線</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="show-grid" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">危機陰影</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="crisis-shading" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:8px;">
+            <label class="form-label">上漲顏色</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="color" id="color-up" value="#E53E3E" onchange="redrawChart()">
+              <span style="font-size:11px;color:var(--text-muted)">紅漲</span>
+              <button class="btn" style="font-size:10px;padding:2px 7px;" onclick="swapColors()">⇄ 互換</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">下跌顏色</label>
+            <input type="color" id="color-down" value="#38A169" onchange="redrawChart()">
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-scrollable -->
+  </div><!-- /left-panel -->
+
+  <!-- ===== CHART AREA ===== -->
+  <div id="chart-area">
+    <!-- Chart Toolbar -->
+    <div id="chart-toolbar">
+      <div class="chart-title-area">
+        <span class="chart-ticker-display" id="ct-ticker">^GSPC</span>
+        <span class="chart-price-display" id="ct-price">—</span>
+        <span class="chart-change-display" id="ct-change"></span>
+        <span class="norm-badge" id="norm-badge" style="display:none">IDX=100</span>
+      </div>
+      <div id="chart-toolbar-right">
+        <span class="feat-chip on" id="fc-kline" onclick="toggleFeat('kline')" data-tip="K線/折線">K線</span>
+        <span class="feat-chip on" id="fc-vol" onclick="toggleFeat('vol')" data-tip="成交量">VOL</span>
+        <span class="feat-chip on" id="fc-ma" onclick="toggleFeat('ma')" data-tip="移動平均線">MA</span>
+        <span class="feat-chip on" id="fc-bb" onclick="toggleFeat('bb')" data-tip="布林通道">BB</span>
+        <span class="feat-chip" id="fc-hl" onclick="toggleFeat('hl')" data-tip="高低點標註">H/L</span>
+        <span class="feat-chip" id="fc-events" onclick="toggleFeat('events')" data-tip="事件標記">EVT</span>
+        <span class="interval-note" id="interval-note">Δ 5·10·20·25·50·100·200·250</span>
+      </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div id="chart-container">
+      <div id="plotly-chart"></div>
+      <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在載入資料... Loading data</div>
+      </div>
+    </div>
+
+    <!-- Stat cards (shown in dual axis mode) -->
+    <div id="stat-cards-area" style="display:none;">
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-label">Correlation</div>
+          <div class="stat-card-val" id="stat-corr">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">L-Axis Chg</div>
+          <div class="stat-card-val" id="stat-lchg">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">R-Axis Chg</div>
+          <div class="stat-card-val" id="stat-rchg">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Beta</div>
+          <div class="stat-card-val" id="stat-beta">—</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /chart-area -->
+
+  <!-- RIGHT PANEL TOGGLE -->
+  <div id="panel-toggle-right" onclick="toggleRightPanel()" title="Toggle right panel">›</div>
+
+  <!-- ===== RIGHT PANEL ===== -->
+  <div id="right-panel">
+    <div class="panel-scrollable">
+
+      <!-- Data Source -->
+      <div class="panel-section" id="sec-datasource">
+        <div class="panel-header" onclick="toggleSection('sec-datasource')">
+          <span>資料來源</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">來源</label>
+            <select class="form-select" id="data-source">
+              <option value="yfinance">yfinance (即時)</option>
+              <option value="duckdb">DuckDB (本地快取)</option>
+              <option value="manual">手動輸入</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">DuckDB 路徑</label>
+            <input class="form-input" id="duckdb-path" type="text" value="C:\VIA\VDF\market.duckdb" placeholder="DuckDB file path">
+          </div>
+          <div class="form-group">
+            <label class="form-label">頻率</label>
+            <select class="form-select" id="data-interval">
+              <option value="1d" selected>日線 1D</option>
+              <option value="1wk">週線 1W</option>
+              <option value="1mo">月線 1M</option>
+              <option value="1h">時線 1H</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">ADJ Close 優先</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="use-adj" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="margin-top:8px;">
+            <div id="datasource-status" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);padding:4px 6px;background:var(--bg-tertiary);border-radius:3px;">
+              ⬤ 待連線
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Y-Axis Intervals -->
+      <div class="panel-section" id="sec-intervals">
+        <div class="panel-header" onclick="toggleSection('sec-intervals')">
+          <span>Y軸間隔設定</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.6;">
+            間隔倍數: <span style="font-family:'JetBrains Mono',monospace;font-size:10px;">5·10·20·25·50·100·200·250·500·1000·2000·2500·5000</span>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">自動選擇間隔</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="auto-interval" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:8px;">
+            <label class="form-label">手動覆寫 dtick</label>
+            <input class="form-input" type="number" id="manual-dtick" placeholder="留空=自動" style="font-family:'JetBrains Mono',monospace;">
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">等框數 (左右對稱)</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="symmetric-margin" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">邊框量 (格數) <span class="slider-val" id="margin-bars-val">3</span></label>
+            <div class="slider-row">
+              <input type="range" id="margin-bars" min="1" max="10" value="3" step="1" oninput="document.getElementById('margin-bars-val').textContent=this.value;redrawChart()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dual Axis Settings -->
+      <div class="panel-section" id="sec-dual" style="display:none;">
+        <div class="panel-header" onclick="toggleSection('sec-dual')">
+          <span>雙軸設定</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">左軸資料</label>
+            <select class="form-select" id="dual-left">
+              <option value="price">價格</option>
+              <option value="volume">成交量</option>
+              <option value="rsi">RSI</option>
+              <option value="macd">MACD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">左軸圖形</label>
+            <select class="form-select" id="dual-left-type">
+              <option value="line">折線</option>
+              <option value="bar">長條</option>
+              <option value="area">面積</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">右軸資料</label>
+            <select class="form-select" id="dual-right">
+              <option value="rsi">RSI</option>
+              <option value="volume">成交量</option>
+              <option value="macd">MACD</option>
+              <option value="price2">比較標的價格</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">右軸圖形</label>
+            <select class="form-select" id="dual-right-type">
+              <option value="line">折線</option>
+              <option value="bar">長條</option>
+              <option value="area">面積</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- RSI Settings -->
+      <div class="panel-section" id="sec-rsi">
+        <div class="panel-header" onclick="toggleSection('sec-rsi')">
+          <span>RSI 設定</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Period <span class="slider-val" id="rsi-period-val">14</span></label>
+            <div class="slider-row">
+              <input type="range" id="rsi-period" min="2" max="50" value="14" step="1" oninput="document.getElementById('rsi-period-val').textContent=this.value">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">超買線 <span class="slider-val" id="rsi-ob-val">70</span></label>
+            <div class="slider-row">
+              <input type="range" id="rsi-ob" min="50" max="90" value="70" step="1" oninput="document.getElementById('rsi-ob-val').textContent=this.value">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">超賣線 <span class="slider-val" id="rsi-os-val">30</span></label>
+            <div class="slider-row">
+              <input type="range" id="rsi-os" min="10" max="50" value="30" step="1" oninput="document.getElementById('rsi-os-val').textContent=this.value">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACD Settings -->
+      <div class="panel-section" id="sec-macd">
+        <div class="panel-header" onclick="toggleSection('sec-macd')">
+          <span>MACD 設定</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Fast / Slow / Signal</label>
+            <div style="display:flex;gap:4px;">
+              <input class="form-input" id="macd-fast" type="number" value="12" min="2" max="50" style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;">
+              <input class="form-input" id="macd-slow" type="number" value="26" min="5" max="100" style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;">
+              <input class="form-input" id="macd-signal" type="number" value="9" min="2" max="30" style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events / Annotations -->
+      <div class="panel-section" id="sec-events">
+        <div class="panel-header" onclick="toggleSection('sec-events')">
+          <span>事件標記</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row" style="margin-bottom:8px;">
+            <span class="toggle-label">顯示內建危機</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="show-crises" checked onchange="redrawChart()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="annotation-list" class="annotation-list"></div>
+          <button class="btn" style="width:100%;margin-top:6px;justify-content:center;" onclick="openAnnotationModal()">＋ 新增事件</button>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="panel-section" id="sec-export">
+        <div class="panel-header" onclick="toggleSection('sec-export')">
+          <span>匯出</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">格式</label>
+            <select class="form-select" id="export-format">
+              <option value="html">HTML (互動)</option>
+              <option value="png">PNG (靜態)</option>
+              <option value="svg">SVG</option>
+              <option value="json">JSON (資料)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">解析度 (PNG)</label>
+            <select class="form-select" id="export-dpi">
+              <option value="1">72 DPI (螢幕)</option>
+              <option value="2">150 DPI</option>
+              <option value="3" selected>300 DPI (印刷)</option>
+            </select>
+          </div>
+          <button class="btn primary" style="width:100%;justify-content:center;" onclick="exportChart()">💾 匯出圖表</button>
+        </div>
+      </div>
+
+    </div><!-- /panel-scrollable -->
+  </div><!-- /right-panel -->
+
+</div><!-- /main-layout -->
+
+<!-- ===== STATUS BAR ===== -->
+<div id="statusbar">
+  <div class="status-item">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">就緒 Ready</span>
+  </div>
+  <div class="status-item">
+    <span id="status-ticker-info" style="font-family:'JetBrains Mono',monospace;font-size:10px;"></span>
+  </div>
+  <div id="statusbar-right">
+    <span id="status-datapoints" style="font-size:10px;"></span>
+    <span id="status-datetime" style="font-size:10px;"></span>
+    <span style="color:var(--text-muted)">VIA Ecosystem © 2026</span>
+  </div>
+</div>
+
+<!-- ===== ANNOTATION MODAL ===== -->
+<div class="modal-overlay" id="annotation-modal">
+  <div class="modal">
+    <div class="modal-title">📌 新增事件標記</div>
+    <div class="form-group">
+      <label class="form-label">日期</label>
+      <input class="form-input" type="date" id="ann-date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">標題</label>
+      <input class="form-input" type="text" id="ann-title" placeholder="如：Fed 升息 0.75%">
+    </div>
+    <div class="form-group">
+      <label class="form-label">說明</label>
+      <input class="form-input" type="text" id="ann-desc" placeholder="選填詳細說明">
+    </div>
+    <div class="form-group">
+      <label class="form-label">類型</label>
+      <select class="form-select" id="ann-type">
+        <option value="event">一般事件</option>
+        <option value="crisis">危機/警示</option>
+        <option value="bullish">利多</option>
+        <option value="custom">自訂</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('annotation-modal')">取消</button>
+      <button class="btn primary" onclick="saveAnnotation()">確認新增</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   VeritasAutoPlot™ v4.0 — JavaScript Core
+   LEGO M-C-F Architecture
+   ================================================================ */
+
+// ===== M01: GLOBAL STATE =====
+const VAP = {
+  // C01: Chart State
+  chart: {
+    mode: 'single',    // single | stack | dual | compare
+    ticker: '^GSPC',
+    period: '1y',
+    interval: '1d',
+    normalized: false,
+    panels: ['price'],  // stack panels
+    compareTickers: [],
+    annotations: [],
+    features: {
+      kline: true, vol: true, ma: true, bb: true, hl: false, events: false
+    }
+  },
+
+  // C02: Data State
+  data: {
+    main: null,         // { dates, open, high, low, close, volume, adjClose }
+    indicators: {},     // computed TA indicators
+    compare: {}         // ticker: { dates, close }
+  },
+
+  // C03: MA Config
+  maConfig: [
+    { period: 5,    enabled: true,  color: '#EE854A', width: 1.0, label: 'MA5'   },
+    { period: 10,   enabled: true,  color: '#6ACC65', width: 1.0, label: 'MA10'  },
+    { period: 20,   enabled: true,  color: '#4878D0', width: 1.2, label: 'MA20'  },
+    { period: 25,   enabled: false, color: '#D65F5F', width: 1.0, label: 'MA25'  },
+    { period: 50,   enabled: true,  color: '#956CB4', width: 1.4, label: 'MA50'  },
+    { period: 60,   enabled: false, color: '#8C613C', width: 2.0, label: 'MA60'  },
+    { period: 100,  enabled: false, color: '#DC7EC0', width: 1.4, label: 'MA100' },
+    { period: 120,  enabled: false, color: '#797979', width: 1.2, label: 'MA120' },
+    { period: 200,  enabled: true,  color: '#D5BB67', width: 1.6, label: 'MA200' },
+    { period: 240,  enabled: false, color: '#82C6E2', width: 1.2, label: 'MA240' },
+    { period: 250,  enabled: false, color: '#4C72B0', width: 1.4, label: 'MA250' },
+  ],
+  maType: 'SMA',
+
+  // C04: Crisis Periods (built-in)
+  crises: [
+    { start: '2000-03-01', end: '2002-10-09', label: 'Dot-com Bubble', color: 'rgba(127,127,127,0.12)' },
+    { start: '2007-10-09', end: '2009-03-09', label: '金融海嘯 GFC', color: 'rgba(88,124,217,0.12)' },
+    { start: '2011-07-22', end: '2011-10-03', label: 'EU 債務危機', color: 'rgba(127,127,127,0.10)' },
+    { start: '2015-08-18', end: '2015-09-29', label: '中國股災', color: 'rgba(127,127,127,0.10)' },
+    { start: '2018-10-01', end: '2018-12-24', label: 'Fed 緊縮', color: 'rgba(127,127,127,0.10)' },
+    { start: '2020-02-19', end: '2020-03-23', label: 'COVID-19 崩盤', color: 'rgba(229,62,62,0.12)' },
+    { start: '2022-01-03', end: '2022-10-13', label: '升息熊市', color: 'rgba(88,124,217,0.10)' },
+  ],
+
+  // C05: Y-axis interval steps
+  intervalSteps: [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000],
+
+  // C06: Panel configs
+  panelConfigs: {
+    price:    { label: 'Price / K線', height: 4 },
+    volume:   { label: 'Volume 成交量', height: 1.2 },
+    rsi:      { label: 'RSI', height: 1.2 },
+    macd:     { label: 'MACD', height: 1.5 },
+    stoch:    { label: 'Stoch %K%D', height: 1.2 },
+    roc:      { label: 'ROC', height: 1.2 },
+    cci:      { label: 'CCI', height: 1.2 },
+    williams: { label: 'Williams %R', height: 1.2 },
+    mfi:      { label: 'MFI', height: 1.2 },
+    adx:      { label: 'ADX', height: 1.2 },
+    dmi:      { label: 'DMI', height: 1.2 },
+    aroon:    { label: 'Aroon', height: 1.2 },
+    atr:      { label: 'ATR', height: 1.2 },
+    bb_width: { label: 'BB Width', height: 1.0 },
+    hvol:     { label: 'Hist. Volatility', height: 1.0 },
+    obv:      { label: 'OBV', height: 1.2 },
+    cmf:      { label: 'CMF', height: 1.0 },
+    vwap:     { label: 'VWAP', height: 1.0 },
+    custom:   { label: '自訂', height: 1.0 },
+  },
+
+  // C07: Stack panel types
+  stackTypes: {}   // panelKey: 'line'|'bar'|'stack_bar'|'area'|'candlestick'|'scatter'
+};
+
+// ===== M02: SEABORN COLOR PALETTE =====
+const SEABORN_DEEP = ['#4C72B0','#DD8452','#55A868','#C44E52','#8172B2','#937860','#DA8BC3','#8C8C8C','#CCB974','#64B5CD'];
+const SEABORN_MUTED = ['#4878D0','#EE854A','#6ACC65','#D65F5F','#956CB4','#8C613C','#DC7EC0','#797979','#D5BB67','#82C6E2'];
+
+// ===== M03: INITIALIZATION =====
+function init() {
+  buildMARows();
+  updateClock();
+  setInterval(updateClock, 1000);
+  // Auto-load demo data
+  loadData();
+}
+
+// ===== M04: UI CONTROLS =====
+function toggleLeftPanel() {
+  const panel = document.getElementById('left-panel');
+  const toggle = document.getElementById('panel-toggle-left');
+  panel.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed-mode');
+  toggle.textContent = panel.classList.contains('collapsed') ? '›' : '‹';
+  const pw = panel.classList.contains('collapsed') ? '0px' : 'var(--panel-width)';
+  document.getElementById('panel-toggle-left').style.left = pw;
+  setTimeout(() => Plotly.relayout('plotly-chart', {}), 280);
+}
+
+function toggleRightPanel() {
+  const panel = document.getElementById('right-panel');
+  const toggle = document.getElementById('panel-toggle-right');
+  panel.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed-mode');
+  toggle.textContent = panel.classList.contains('collapsed') ? '‹' : '›';
+  const pw = panel.classList.contains('collapsed') ? '0px' : 'var(--panel-width)';
+  document.getElementById('panel-toggle-right').style.right = pw;
+  setTimeout(() => Plotly.relayout('plotly-chart', {}), 280);
+}
+
+function toggleSection(id) {
+  const sec = document.getElementById(id);
+  sec.classList.toggle('collapsed-section');
+  const body = sec.querySelector('.panel-body');
+  if (body) body.style.display = sec.classList.contains('collapsed-section') ? 'none' : 'block';
+}
+
+function setMode(mode) {
+  VAP.chart.mode = mode;
+  document.querySelectorAll('.mode-tab[data-mode]').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === mode);
+  });
+  // Show/hide dual axis section
+  const dualSec = document.getElementById('sec-dual');
+  dualSec.style.display = (mode === 'dual') ? 'block' : 'none';
+  const statCards = document.getElementById('stat-cards-area');
+  statCards.style.display = (mode === 'dual') ? 'block' : 'none';
+  redrawChart();
+}
+
+// Period chips
+document.querySelectorAll('.chip[data-period]').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip[data-period]').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    VAP.chart.period = c.dataset.period;
+    loadData();
+  });
+});
+
+// Mode tabs
+document.querySelectorAll('.mode-tab[data-mode]').forEach(t => {
+  t.addEventListener('click', () => setMode(t.dataset.mode));
+});
+
+function toggleNormalized() {
+  VAP.chart.normalized = !VAP.chart.normalized;
+  const el = document.getElementById('norm-toggle');
+  const badge = document.getElementById('norm-badge');
+  el.classList.toggle('on', VAP.chart.normalized);
+  badge.style.display = VAP.chart.normalized ? 'inline-flex' : 'none';
+  document.getElementById('norm-compare').checked = VAP.chart.normalized;
+  redrawChart();
+}
+
+function toggleFeat(feat) {
+  VAP.chart.features[feat] = !VAP.chart.features[feat];
+  document.getElementById('fc-'+feat).classList.toggle('on', VAP.chart.features[feat]);
+  redrawChart();
+}
+
+function swapColors() {
+  const up = document.getElementById('color-up').value;
+  const dn = document.getElementById('color-down').value;
+  document.getElementById('color-up').value = dn;
+  document.getElementById('color-down').value = up;
+  redrawChart();
+}
+
+function setMAType(type, el) {
+  VAP.maType = type;
+  document.querySelectorAll('[data-matype]').forEach(t => t.classList.toggle('active', t.dataset.matype === type));
+  redrawChart();
+}
+
+function showAddPanelMenu() {
+  const menu = document.getElementById('add-panel-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function addStackPanel() {
+  const select = document.getElementById('add-indicator-select');
+  const typeSelect = document.getElementById('add-chart-type');
+  const indicator = select.value;
+  const chartType = typeSelect.value;
+  const cfg = VAP.panelConfigs[indicator];
+  if (!cfg) return;
+
+  VAP.chart.panels.push(indicator);
+  VAP.stackTypes[indicator] = chartType;
+
+  const list = document.getElementById('stack-list');
+  const item = document.createElement('div');
+  item.className = 'stack-item';
+  item.draggable = true;
+  item.dataset.indicator = indicator;
+  item.innerHTML = `
+    <span class="stack-drag">⠿</span>
+    <span class="stack-label">${cfg.label}</span>
+    <select class="stack-type-select" onchange="VAP.stackTypes['${indicator}']=this.value;redrawChart()">
+      <option value="line" ${chartType==='line'?'selected':''}>折線</option>
+      <option value="bar" ${chartType==='bar'?'selected':''}>長條</option>
+      <option value="stack_bar" ${chartType==='stack_bar'?'selected':''}>堆疊長條</option>
+      <option value="area" ${chartType==='area'?'selected':''}>面積</option>
+      <option value="scatter" ${chartType==='scatter'?'selected':''}>散點</option>
+    </select>
+    <span class="stack-remove" onclick="removeStackItem(this)">×</span>
+  `;
+  list.appendChild(item);
+  updateStackCount();
+  document.getElementById('add-panel-menu').style.display = 'none';
+  redrawChart();
+}
+
+function removeStackItem(el) {
+  const item = el.closest('.stack-item');
+  const indicator = item.dataset.indicator;
+  if (indicator === 'price') return; // can't remove price panel
+  VAP.chart.panels = VAP.chart.panels.filter(p => p !== indicator);
+  item.remove();
+  updateStackCount();
+  redrawChart();
+}
+
+function onStackTypeChange(select) {
+  const item = select.closest('.stack-item');
+  VAP.stackTypes[item.dataset.indicator] = select.value;
+  redrawChart();
+}
+
+function updateStackCount() {
+  document.getElementById('stack-count').textContent = VAP.chart.panels.length;
+}
+
+// ===== M05: MA ROW BUILDER =====
+function buildMARows() {
+  const container = document.getElementById('ma-rows');
+  container.innerHTML = '';
+  VAP.maConfig.forEach((ma, idx) => {
+    const row = document.createElement('div');
+    row.className = 'ma-row';
+    row.innerHTML = `
+      <input type="checkbox" class="ma-check" ${ma.enabled?'checked':''} onchange="VAP.maConfig[${idx}].enabled=this.checked;redrawChart()">
+      <span class="ma-label">${ma.label}</span>
+      <div class="ma-swatch" style="background:${ma.color}"></div>
+      <input type="number" class="ma-period-input" value="${ma.period}" min="2" max="1000"
+        onchange="VAP.maConfig[${idx}].period=parseInt(this.value);VAP.maConfig[${idx}].label='MA'+this.value;redrawChart()">
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ===== M06: COMPARE TICKERS =====
+function addCompareTicker() {
+  const input = document.getElementById('compare-input');
+  const ticker = input.value.trim().toUpperCase();
+  if (!ticker || VAP.chart.compareTickers.includes(ticker)) return;
+  VAP.chart.compareTickers.push(ticker);
+  input.value = '';
+  renderCompareList();
+  loadData();
+}
+
+function addCompare() {
+  document.getElementById('compare-input').focus();
+}
+
+function renderCompareList() {
+  const list = document.getElementById('compare-list');
+  list.innerHTML = '';
+  VAP.chart.compareTickers.forEach((t, i) => {
+    const color = SEABORN_DEEP[(i+1) % SEABORN_DEEP.length];
+    const item = document.createElement('div');
+    item.className = 'stack-item';
+    item.innerHTML = `
+      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+      <span class="stack-label" style="font-family:'JetBrains Mono',monospace;">${t}</span>
+      <span class="stack-remove" onclick="removeCompare(${i})">×</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function removeCompare(i) {
+  VAP.chart.compareTickers.splice(i, 1);
+  renderCompareList();
+  redrawChart();
+}
+
+// ===== M07: DATA SIMULATION (yfinance/DuckDB simulation) =====
+// F07-01: Generate synthetic OHLCV data (demo when no backend)
+function generateSyntheticData(ticker, period) {
+  const periodDays = { '1mo':22,'3mo':66,'6mo':132,'1y':252,'2y':504,'5y':1260,'10y':2520,'max':5040 };
+  const n = periodDays[period] || 252;
+
+  // Starting price by ticker
+  const startPrices = { '^GSPC':3800,'^DJI':33000,'^IXIC':12000,'AAPL':140,'MSFT':260,'NVDA':200,'SPY':380,'QQQ':280,'2330.TW':500,'0050.TW':110,'VIX':20,'GLD':170 };
+  let basePrice = startPrices[ticker] || 100;
+  const volatility = ticker === '^VIX' ? 0.05 : (ticker.endsWith('.TW') ? 0.015 : 0.012);
+
+  const today = new Date();
+  const dates = [], opens = [], highs = [], lows = [], closes = [], volumes = [];
+  let price = basePrice;
+  let trend = 0.0003; // slight upward drift
+
+  for (let i = n; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    // Skip weekends
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    dates.push(d.toISOString().split('T')[0]);
+
+    const daily_ret = trend + (Math.random()-0.48)*volatility*2;
+    const open = price;
+    price = price * (1 + daily_ret);
+    const intraday = Math.abs(daily_ret) + volatility*0.5*Math.random();
+    const high = Math.max(open, price) * (1 + intraday*0.3);
+    const low  = Math.min(open, price) * (1 - intraday*0.3);
+    const vol = Math.round((3e6 + Math.random()*2e6) * (1 + Math.abs(daily_ret)*10));
+
+    opens.push(parseFloat(open.toFixed(2)));
+    highs.push(parseFloat(high.toFixed(2)));
+    lows.push(parseFloat(low.toFixed(2)));
+    closes.push(parseFloat(price.toFixed(2)));
+    volumes.push(vol);
+
+    // slight regime changes
+    if (Math.random() < 0.003) trend = -trend;
+    if (Math.random() < 0.002) trend += (Math.random()-0.5)*0.0005;
+  }
+
+  return { dates, open: opens, high: highs, low: lows, close: closes, volume: volumes, adjClose: closes };
+}
+
+// F07-02: Normalize to base 100
+function normalizeToBase100(arr) {
+  if (!arr || arr.length === 0) return arr;
+  const base = arr[0];
+  return arr.map(v => parseFloat((v / base * 100).toFixed(4)));
+}
+
+// ===== M08: TECHNICAL INDICATORS (JS Implementation) =====
+// F08-01: SMA
+function calcSMA(data, period) {
+  return data.map((_, i) => {
+    if (i < period - 1) return null;
+    const sum = data.slice(i - period + 1, i + 1).reduce((a,b) => a+b, 0);
+    return parseFloat((sum / period).toFixed(4));
+  });
+}
+
+// F08-02: EMA
+function calcEMA(data, period) {
+  const k = 2 / (period + 1);
+  const ema = [];
+  let prev = null;
+  data.forEach((v, i) => {
+    if (i < period - 1) { ema.push(null); return; }
+    if (i === period - 1) {
+      prev = data.slice(0, period).reduce((a,b)=>a+b,0) / period;
+      ema.push(parseFloat(prev.toFixed(4)));
+      return;
+    }
+    prev = v * k + prev * (1 - k);
+    ema.push(parseFloat(prev.toFixed(4)));
+  });
+  return ema;
+}
+
+// F08-03: Bollinger Bands
+function calcBB(data, period, stdDev) {
+  const sma = calcSMA(data, period);
+  const upper = [], lower = [], bandwidth = [];
+  data.forEach((_, i) => {
+    if (i < period - 1) { upper.push(null); lower.push(null); bandwidth.push(null); return; }
+    const slice = data.slice(i - period + 1, i + 1);
+    const mean = sma[i];
+    const variance = slice.reduce((a,b) => a + (b-mean)**2, 0) / period;
+    const sd = Math.sqrt(variance);
+    upper.push(parseFloat((mean + stdDev*sd).toFixed(4)));
+    lower.push(parseFloat((mean - stdDev*sd).toFixed(4)));
+    bandwidth.push(parseFloat(((upper[upper.length-1] - lower[lower.length-1]) / mean * 100).toFixed(4)));
+  });
+  return { upper, lower, middle: sma, bandwidth };
+}
+
+// F08-04: RSI
+function calcRSI(data, period) {
+  const rsi = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i < period) { rsi.push(null); continue; }
+    const changes = data.slice(i-period+1, i+1).map((v,j,a) => j===0?0:v-a[j-1]);
+    const gains = changes.filter(c=>c>0).reduce((a,b)=>a+b,0)/period;
+    const losses = changes.filter(c=>c<0).reduce((a,b)=>a+Math.abs(b),0)/period;
+    if (losses === 0) { rsi.push(100); continue; }
+    const rs = gains / losses;
+    rsi.push(parseFloat((100 - 100/(1+rs)).toFixed(2)));
+  }
+  return rsi;
+}
+
+// F08-05: MACD
+function calcMACD(data, fast, slow, signal) {
+  const emaFast = calcEMA(data, fast);
+  const emaSlow = calcEMA(data, slow);
+  const macdLine = data.map((_,i) => emaFast[i]!==null&&emaSlow[i]!==null ? parseFloat((emaFast[i]-emaSlow[i]).toFixed(4)) : null);
+  const validMacd = macdLine.filter(v=>v!==null);
+  const macdForSignal = macdLine.map(v => v===null ? 0 : v);
+  const signalLine = calcEMA(macdForSignal, signal);
+  const histogram = macdLine.map((v,i) => v!==null&&signalLine[i]!==null ? parseFloat((v-signalLine[i]).toFixed(4)) : null);
+  return { macd: macdLine, signal: signalLine, histogram };
+}
+
+// F08-06: Stochastic
+function calcStoch(high, low, close, kPeriod, dPeriod) {
+  const kArr = [], dArr = [];
+  close.forEach((c, i) => {
+    if (i < kPeriod-1) { kArr.push(null); dArr.push(null); return; }
+    const hSlice = high.slice(i-kPeriod+1, i+1);
+    const lSlice = low.slice(i-kPeriod+1, i+1);
+    const hh = Math.max(...hSlice);
+    const ll = Math.min(...lSlice);
+    const k = hh===ll ? 50 : parseFloat(((c-ll)/(hh-ll)*100).toFixed(2));
+    kArr.push(k);
+    if (i >= kPeriod+dPeriod-2) {
+      const dSlice = kArr.slice(-dPeriod).filter(v=>v!==null);
+      dArr.push(dSlice.length ? parseFloat((dSlice.reduce((a,b)=>a+b,0)/dSlice.length).toFixed(2)) : null);
+    } else { dArr.push(null); }
+  });
+  return { k: kArr, d: dArr };
+}
+
+// F08-07: ATR
+function calcATR(high, low, close, period) {
+  const tr = high.map((_,i) => {
+    if (i===0) return high[i]-low[i];
+    return Math.max(high[i]-low[i], Math.abs(high[i]-close[i-1]), Math.abs(low[i]-close[i-1]));
+  });
+  return calcSMA(tr, period);
+}
+
+// F08-08: OBV
+function calcOBV(close, volume) {
+  const obv = [0];
+  for (let i=1; i<close.length; i++) {
+    if (close[i] > close[i-1]) obv.push(obv[i-1]+volume[i]);
+    else if (close[i] < close[i-1]) obv.push(obv[i-1]-volume[i]);
+    else obv.push(obv[i-1]);
+  }
+  return obv;
+}
+
+// F08-09: CCI
+function calcCCI(high, low, close, period) {
+  return close.map((_,i) => {
+    if (i < period-1) return null;
+    const tp = close.slice(i-period+1,i+1).map((_,j)=>(high[i-period+1+j]+low[i-period+1+j]+close[i-period+1+j])/3);
+    const mean = tp.reduce((a,b)=>a+b,0)/period;
+    const md = tp.reduce((a,b)=>a+Math.abs(b-mean),0)/period;
+    return parseFloat(((tp[tp.length-1]-mean)/(0.015*md)).toFixed(2));
+  });
+}
+
+// F08-10: Williams %R
+function calcWR(high, low, close, period) {
+  return close.map((_,i) => {
+    if (i < period-1) return null;
+    const hh = Math.max(...high.slice(i-period+1,i+1));
+    const ll = Math.min(...low.slice(i-period+1,i+1));
+    return hh===ll ? -50 : parseFloat(((hh-close[i])/(hh-ll)*-100).toFixed(2));
+  });
+}
+
+// F08-11: ADX
+function calcADX(high, low, close, period) {
+  const tr=[], pDM=[], nDM=[];
+  for(let i=0;i<high.length;i++){
+    if(i===0){tr.push(0);pDM.push(0);nDM.push(0);continue;}
+    tr.push(Math.max(high[i]-low[i],Math.abs(high[i]-close[i-1]),Math.abs(low[i]-close[i-1])));
+    const upMove=high[i]-high[i-1], downMove=low[i-1]-low[i];
+    pDM.push(upMove>downMove&&upMove>0?upMove:0);
+    nDM.push(downMove>upMove&&downMove>0?downMove:0);
+  }
+  const atr=calcEMA(tr,period), pDI14=calcEMA(pDM,period).map((v,i)=>atr[i]?parseFloat((v/atr[i]*100).toFixed(2)):null);
+  const nDI14=calcEMA(nDM,period).map((v,i)=>atr[i]?parseFloat((v/atr[i]*100).toFixed(2)):null);
+  const dx=pDI14.map((p,i)=>p!==null&&nDI14[i]!==null?parseFloat((Math.abs(p-nDI14[i])/(p+nDI14[i])*100).toFixed(2)):null);
+  const adx=calcEMA(dx.map(v=>v===null?0:v),period);
+  return { adx, pDI: pDI14, nDI: nDI14 };
+}
+
+// F08-12: ROC
+function calcROC(data, period) {
+  return data.map((v,i) => i<period||!data[i-period] ? null : parseFloat(((v-data[i-period])/data[i-period]*100).toFixed(2)));
+}
+
+// F08-13: Aroon
+function calcAroon(high, low, period) {
+  const up=[], down=[];
+  high.forEach((_,i) => {
+    if (i<period){up.push(null);down.push(null);return;}
+    const hSlice=high.slice(i-period,i+1);
+    const lSlice=low.slice(i-period,i+1);
+    const hMax=hSlice.indexOf(Math.max(...hSlice));
+    const lMin=lSlice.indexOf(Math.min(...lSlice));
+    up.push(parseFloat(((hMax/period)*100).toFixed(2)));
+    down.push(parseFloat(((lMin/period)*100).toFixed(2)));
+  });
+  return { up, down };
+}
+
+// F08-14: Historical Volatility
+function calcHVol(close, period) {
+  const logRet = close.map((v,i) => i===0?null:Math.log(v/close[i-1]));
+  return logRet.map((_,i) => {
+    if(i<period) return null;
+    const slice=logRet.slice(i-period+1,i+1).filter(v=>v!==null);
+    const mean=slice.reduce((a,b)=>a+b,0)/slice.length;
+    const variance=slice.reduce((a,b)=>a+(b-mean)**2,0)/(slice.length-1);
+    return parseFloat((Math.sqrt(variance)*Math.sqrt(252)*100).toFixed(2));
+  });
+}
+
+// F08-15: CMF (Chaikin Money Flow)
+function calcCMF(high, low, close, volume, period) {
+  return close.map((_,i) => {
+    if(i<period-1) return null;
+    let mfvSum=0, volSum=0;
+    for(let j=i-period+1;j<=i;j++){
+      const hl=high[j]-low[j];
+      const mf=hl===0?0:((close[j]-low[j])-(high[j]-close[j]))/hl*volume[j];
+      mfvSum+=mf; volSum+=volume[j];
+    }
+    return volSum===0?0:parseFloat((mfvSum/volSum).toFixed(4));
+  });
+}
+
+// F08-16: MFI (Money Flow Index)
+function calcMFI(high, low, close, volume, period) {
+  const tp=close.map((_,i)=>(high[i]+low[i]+close[i])/3);
+  return close.map((_,i) => {
+    if(i<period) return null;
+    let posFlow=0, negFlow=0;
+    for(let j=i-period+1;j<=i;j++){
+      const mf=tp[j]*volume[j];
+      if(j>0 && tp[j]>=tp[j-1]) posFlow+=mf; else negFlow+=mf;
+    }
+    return negFlow===0?100:parseFloat((100-100/(1+posFlow/negFlow)).toFixed(2));
+  });
+}
+
+// ===== M09: AUTO Y-AXIS INTERVAL =====
+// F09-01: Find best interval from allowed steps
+function findBestInterval(dataRange, targetTicks) {
+  const steps = VAP.intervalSteps;
+  // Raw ideal step
+  const rawStep = dataRange / targetTicks;
+  // Find best matching step
+  let best = steps[0];
+  let bestDiff = Infinity;
+  for (const s of steps) {
+    const diff = Math.abs(Math.log(s) - Math.log(rawStep));
+    if (diff < bestDiff) { bestDiff = diff; best = s; }
+  }
+  return best;
+}
+
+// F09-02: Calculate symmetric axis range with equal bars on both sides
+function calcSymmetricRange(data, dtick, marginBars) {
+  const validData = data.filter(v => v !== null && !isNaN(v));
+  if (!validData.length) return [0, 100];
+  const dMin = Math.min(...validData);
+  const dMax = Math.max(...validData);
+  // Round to nearest tick boundary
+  const tickMin = Math.floor(dMin / dtick) * dtick;
+  const tickMax = Math.ceil(dMax / dtick) * dtick;
+  // Add symmetric margins
+  return [tickMin - marginBars*dtick, tickMax + marginBars*dtick];
+}
+
+// ===== M10: DATA LOADING =====
+async function loadData() {
+  setStatus('loading', '正在載入資料...');
+  document.getElementById('loading-overlay').style.display = 'flex';
+
+  const ticker = document.getElementById('ticker-input').value.trim().toUpperCase() || '^GSPC';
+  const period = VAP.chart.period;
+  VAP.chart.ticker = ticker;
+
+  // Simulate loading delay
+  await new Promise(r => setTimeout(r, 400 + Math.random()*300));
+
+  // Generate main data
+  const d = generateSyntheticData(ticker, period);
+  VAP.data.main = d;
+
+  // Generate compare data
+  VAP.data.compare = {};
+  for (const ct of VAP.chart.compareTickers) {
+    VAP.data.compare[ct] = generateSyntheticData(ct, period);
+  }
+
+  // Compute all indicators
+  computeIndicators(d);
+
+  // Update display info
+  const last = d.close[d.close.length-1];
+  const prev = d.close[d.close.length-2] || last;
+  const chg = last - prev;
+  const chgPct = ((chg/prev)*100);
+  document.getElementById('ct-ticker').textContent = ticker;
+  document.getElementById('ct-price').textContent = last.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const chgEl = document.getElementById('ct-change');
+  chgEl.textContent = `${chg>=0?'+':''}${chg.toFixed(2)} (${chgPct>=0?'+':''}${chgPct.toFixed(2)}%)`;
+  chgEl.className = 'chart-change-display ' + (chg>=0?'up':'down');
+
+  document.getElementById('status-datapoints').textContent = `${d.dates.length} 筆資料`;
+  document.getElementById('status-ticker-info').textContent = `${ticker} · ${d.dates[0]} ~ ${d.dates[d.dates.length-1]}`;
+  document.getElementById('datasource-status').textContent = '⬤ yfinance 模擬資料 (demo)';
+  document.getElementById('datasource-status').style.color = '#55A868';
+
+  document.getElementById('loading-overlay').style.display = 'none';
+  setStatus('ok', '就緒 Ready');
+
+  redrawChart();
+}
+
+// F10-01: Compute all TA indicators
+function computeIndicators(d) {
+  const close = d.close, high = d.high, low = d.low, vol = d.volume;
+  const rsiP = parseInt(document.getElementById('rsi-period').value);
+  const bbP = parseInt(document.getElementById('bb-period').value);
+  const bbS = parseFloat(document.getElementById('bb-std').value);
+  const macdFast = parseInt(document.getElementById('macd-fast').value);
+  const macdSlow = parseInt(document.getElementById('macd-slow').value);
+  const macdSig = parseInt(document.getElementById('macd-signal').value);
+
+  VAP.data.indicators = {
+    rsi: calcRSI(close, rsiP),
+    macd: calcMACD(close, macdFast, macdSlow, macdSig),
+    bb: calcBB(close, bbP, bbS),
+    stoch: calcStoch(high, low, close, 14, 3),
+    roc: calcROC(close, 12),
+    cci: calcCCI(high, low, close, 20),
+    williams: calcWR(high, low, close, 14),
+    mfi: calcMFI(high, low, close, vol, 14),
+    adx: calcADX(high, low, close, 14),
+    aroon: calcAroon(high, low, 25),
+    atr: calcATR(high, low, close, 14),
+    bb_width: calcBB(close, bbP, bbS).bandwidth,
+    hvol: calcHVol(close, 20),
+    obv: calcOBV(close, vol),
+    cmf: calcCMF(high, low, close, vol, 20),
+    // MA/EMA computed per config in drawMA()
+  };
+}
+
+// ===== M11: CHART DRAWING ENGINE =====
+function redrawChart() {
+  if (!VAP.data.main) return;
+  const mode = VAP.chart.mode;
+  if (mode === 'single') drawSingleChart();
+  else if (mode === 'stack') drawStackChart();
+  else if (mode === 'dual') drawDualChart();
+  else if (mode === 'compare') drawCompareChart();
+}
+
+// F11-01: Get color settings
+function getColors() {
+  return {
+    up: document.getElementById('color-up').value,
+    down: document.getElementById('color-down').value
+  };
+}
+
+// F11-02: Base Plotly layout
+function baseLayout(title) {
+  const showGrid = document.getElementById('show-grid').checked;
+  return {
+    paper_bgcolor: '#F7F6F3',
+    plot_bgcolor: '#FFFFFF',
+    font: { family: "'JetBrains Mono', monospace", size: 11, color: '#6B6860' },
+    title: title ? {
+      text: title,
+      font: { family: "'DM Serif Display', serif", size: 14, color: '#1A1A1A' },
+      x: 0.02, xanchor: 'left'
+    } : null,
+    margin: { l: 60, r: 70, t: title?36:12, b: 36 },
+    xaxis: {
+      showgrid: showGrid,
+      gridcolor: '#EBEBEB',
+      gridwidth: 1,
+      zeroline: false,
+      type: 'date',
+      rangeslider: { visible: document.getElementById('range-slider').checked },
+      showline: true,
+      linecolor: '#E8E5DF',
+      tickfont: { size: 10 }
+    },
+    yaxis: {
+      showgrid: showGrid,
+      gridcolor: '#EBEBEB',
+      side: 'right',
+      zeroline: false,
+      type: document.getElementById('log-scale').checked ? 'log' : 'linear',
+      showline: false,
+      tickfont: { family: "'JetBrains Mono', monospace", size: 10 },
+    },
+    hovermode: 'x unified',
+    hoverlabel: {
+      bgcolor: '#1A1A1A',
+      bordercolor: '#1A1A1A',
+      font: { family: "'JetBrains Mono', monospace", size: 11, color: '#FFFFFF' },
+    },
+    legend: {
+      orientation: 'h',
+      x: 0, y: 1.02,
+      xanchor: 'left', yanchor: 'bottom',
+      font: { size: 10 },
+      bgcolor: 'rgba(255,255,255,0.8)',
+    },
+    dragmode: 'zoom',
+    showlegend: true,
+    transition: { duration: 200 }
+  };
+}
+
+// F11-03: Compute Y-axis range with symmetric margins
+function computeYRange(dataArrays, panel) {
+  const autoInterval = document.getElementById('auto-interval').checked;
+  const marginBars = parseInt(document.getElementById('margin-bars').value);
+  const manualDtick = document.getElementById('manual-dtick').value;
+
+  const allVals = dataArrays.flat().filter(v => v !== null && !isNaN(v));
+  if (!allVals.length) return { range: [0,100], dtick: 10 };
+
+  let dtick;
+  if (!autoInterval && manualDtick) {
+    dtick = parseFloat(manualDtick);
+  } else {
+    const range = Math.max(...allVals) - Math.min(...allVals);
+    dtick = findBestInterval(range, 8);
+  }
+
+  const [rMin, rMax] = calcSymmetricRange(allVals, dtick, marginBars);
+  return { range: [rMin, rMax], dtick };
+}
+
+// F11-04: Build candlestick trace
+function buildCandlestick(d, name, normalized) {
+  const col = getColors();
+  let c = normalized ? normalizeToBase100(d.close) : d.close;
+  let o = normalized ? d.open.map((v,i)=>v/d.open[0]*100) : d.open;
+  let h = normalized ? d.high.map((v,i)=>v/d.open[0]*100) : d.high;
+  let l = normalized ? d.low.map((v,i)=>v/d.open[0]*100) : d.low;
+
+  return {
+    type: 'candlestick',
+    x: d.dates, open: o, high: h, low: l, close: c,
+    name: name || VAP.chart.ticker,
+    increasing: { line: { color: col.up, width: 1 }, fillcolor: col.up+'CC' },
+    decreasing: { line: { color: col.down, width: 1 }, fillcolor: col.down+'CC' },
+    hoverinfo: 'x+y',
+    xaxis: 'x', yaxis: 'y',
+    whiskerwidth: 0.3,
+  };
+}
+
+// F11-05: Build line trace
+function buildLine(dates, values, name, color, opts) {
+  return {
+    type: 'scatter',
+    mode: 'lines',
+    x: dates, y: values,
+    name, line: { color, width: opts?.width||1.5, dash: opts?.dash||'solid' },
+    hoverinfo: 'x+y',
+    xaxis: opts?.xaxis||'x',
+    yaxis: opts?.yaxis||'y',
+    opacity: opts?.opacity||1,
+    showlegend: opts?.showlegend!==false,
+    ...( opts?.fill ? { fill: 'tonexty', fillcolor: opts.fillcolor||color+'14' } : {} )
+  };
+}
+
+// F11-06: Build volume trace
+function buildVolume(d, colors, normalized, yaxis) {
+  const col = getColors();
+  const barColors = d.close.map((c,i) => i===0||c>=d.open[i] ? col.up+'AA' : col.down+'AA');
+  return {
+    type: 'bar',
+    x: d.dates, y: d.volume,
+    name: 'Volume',
+    marker: { color: barColors, line: { width: 0 } },
+    hoverinfo: 'x+y',
+    opacity: 0.75,
+    xaxis: 'x', yaxis: yaxis||'y2',
+    showlegend: false,
+  };
+}
+
+// F11-07: Build MA traces
+function buildMATraces(d, normalized, yaxis, xaxis) {
+  if (!VAP.chart.features.ma) return [];
+  const traces = [];
+  const closes = normalized ? normalizeToBase100(d.close) : d.close;
+  VAP.maConfig.forEach(ma => {
+    if (!ma.enabled) return;
+    const vals = VAP.maType === 'EMA' ? calcEMA(closes, ma.period) : calcSMA(closes, ma.period);
+    traces.push(buildLine(d.dates, vals, ma.label, ma.color, {
+      width: ma.period === 60 ? 2.0 : (ma.period >= 200 ? 1.6 : 1.0),
+      yaxis: yaxis||'y', xaxis: xaxis||'x'
+    }));
+  });
+  return traces;
+}
+
+// F11-08: Build BB traces
+function buildBBTraces(d, normalized, yaxis, xaxis) {
+  if (!VAP.chart.features.bb || !document.getElementById('bb-enabled').checked) return [];
+  const bbP = parseInt(document.getElementById('bb-period').value);
+  const bbS = parseFloat(document.getElementById('bb-std').value);
+  const closes = normalized ? normalizeToBase100(d.close) : d.close;
+  const bb = calcBB(closes, bbP, bbS);
+  const traces = [];
+  traces.push(buildLine(d.dates, bb.upper, 'BB Upper', '#8172B2', { dash:'dot', width:1, yaxis: yaxis||'y', xaxis: xaxis||'x', opacity:0.8, showlegend:false }));
+  if (document.getElementById('bb-fill').checked) {
+    traces.push({
+      type:'scatter', mode:'lines', x:d.dates, y:bb.lower,
+      name:'BB Lower', line:{ color:'#8172B2', width:1, dash:'dot' },
+      fill:'tonexty', fillcolor:'rgba(129,114,178,0.06)',
+      xaxis: xaxis||'x', yaxis: yaxis||'y', opacity:0.8, showlegend:false, hoverinfo:'skip'
+    });
+  } else {
+    traces.push(buildLine(d.dates, bb.lower, 'BB Lower', '#8172B2', { dash:'dot', width:1, yaxis: yaxis||'y', xaxis: xaxis||'x', opacity:0.8, showlegend:false }));
+  }
+  return traces;
+}
+
+// F11-09: H/L annotations
+function buildHLAnnotations(d, normalized, yaxis) {
+  if (!VAP.chart.features.hl && !document.getElementById('hl-marks').checked) return [];
+  const closes = normalized ? normalizeToBase100(d.close) : d.close;
+  const maxV = Math.max(...closes);
+  const minV = Math.min(...closes);
+  const maxI = closes.indexOf(maxV);
+  const minI = closes.indexOf(minV);
+  return [
+    {
+      x: d.dates[maxI], y: maxV, xref:'x', yref: yaxis||'y',
+      text: `▲ ${maxV.toLocaleString(undefined,{maximumFractionDigits:2})}`, showarrow:true,
+      arrowhead:2, arrowsize:0.8, ax:0, ay:-32,
+      font:{ family:"'JetBrains Mono',monospace", size:10, color:'#E53E3E' },
+      bgcolor:'rgba(255,255,255,0.85)', bordercolor:'#E53E3E', borderwidth:1, borderpad:3
+    },
+    {
+      x: d.dates[minI], y: minV, xref:'x', yref: yaxis||'y',
+      text: `▼ ${minV.toLocaleString(undefined,{maximumFractionDigits:2})}`, showarrow:true,
+      arrowhead:2, arrowsize:0.8, ax:0, ay:32,
+      font:{ family:"'JetBrains Mono',monospace", size:10, color:'#38A169' },
+      bgcolor:'rgba(255,255,255,0.85)', bordercolor:'#38A169', borderwidth:1, borderpad:3
+    }
+  ];
+}
+
+// F11-10: Crisis shading shapes
+function buildCrisisShapes(d) {
+  if (!document.getElementById('crisis-shading').checked) return [];
+  const startDate = d.dates[0];
+  const endDate = d.dates[d.dates.length-1];
+  const shapes = [];
+  VAP.crises.forEach(crisis => {
+    if (crisis.end < startDate || crisis.start > endDate) return;
+    shapes.push({
+      type:'rect', xref:'x', yref:'paper',
+      x0: Math.max(crisis.start, startDate),
+      x1: Math.min(crisis.end, endDate),
+      y0: 0, y1: 1,
+      fillcolor: crisis.color,
+      line:{ width:0 },
+      layer:'below'
+    });
+  });
+  return shapes;
+}
+
+// F11-11: Custom event annotations
+function buildEventAnnotations(d) {
+  if (!VAP.chart.features.events) return [];
+  return VAP.chart.annotations.map(ann => ({
+    x: ann.date, y: 1, xref:'x', yref:'paper',
+    text: ann.title, showarrow:true,
+    arrowhead:1, ax:0, ay:-20,
+    font:{ family:"'JetBrains Mono',monospace", size:9, color:'#4C72B0' },
+    bgcolor:'rgba(76,114,176,0.1)', bordercolor:'#4C72B0', borderwidth:1, borderpad:3
+  }));
+}
+
+// F11-12: Indicator trace builders
+function buildIndicatorTrace(indicator, d, yaxisKey, xaxis) {
+  const ind = VAP.data.indicators;
+  const dates = d.dates;
+  const col = getColors();
+  const chartType = VAP.stackTypes[indicator] || 'line';
+
+  function makeBar(dates, vals, name, colorFn) {
+    const colors = vals.map((v,i) => colorFn ? colorFn(v,i) : (v>=0?col.up+'AA':col.down+'AA'));
+    return [{ type:'bar', x:dates, y:vals, name, marker:{color:colors,line:{width:0}}, xaxis, yaxis:yaxisKey, showlegend:false, hoverinfo:'x+y' }];
+  }
+
+  function makeLine(dates, vals, name, color, opts) {
+    if (chartType === 'bar') {
+      return makeBar(dates, vals, name, (v)=>v>=0?col.up+'AA':col.down+'AA');
+    }
+    if (chartType === 'area') {
+      return [{ type:'scatter', mode:'lines', x:dates, y:vals, name, fill:'tozeroy', fillcolor:(color||'#4C72B0')+'22', line:{color:color||'#4C72B0', width:1.2}, xaxis, yaxis:yaxisKey, showlegend:false }];
+    }
+    return [buildLine(dates, vals, name, color||'#4C72B0', {...opts, yaxis:yaxisKey, xaxis, showlegend:false})];
+  }
+
+  switch(indicator) {
+    case 'volume':
+      return [buildVolume(d, null, false, yaxisKey)].map(t=>({...t, xaxis, yaxis:yaxisKey}));
+    case 'rsi':
+      return makeLine(dates, ind.rsi, 'RSI', '#4878D0');
+    case 'macd': {
+      const m = ind.macd;
+      const barColors = m.histogram.map(v => v>=0 ? col.up+'CC' : col.down+'CC');
+      return [
+        {type:'bar', x:dates, y:m.histogram, name:'MACD Hist', marker:{color:barColors,line:{width:0}}, xaxis, yaxis:yaxisKey, showlegend:false},
+        buildLine(dates, m.macd, 'MACD', '#4C72B0', {width:1.2, yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, m.signal, 'Signal', '#DD8452', {width:1.0, dash:'dot', yaxis:yaxisKey, xaxis, showlegend:false}),
+      ];
+    }
+    case 'stoch':
+      return [
+        buildLine(dates, ind.stoch.k, '%K', '#4C72B0', {yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, ind.stoch.d, '%D', '#DD8452', {dash:'dot', yaxis:yaxisKey, xaxis, showlegend:false}),
+      ];
+    case 'roc': return makeLine(dates, ind.roc, 'ROC', '#55A868');
+    case 'cci': return makeLine(dates, ind.cci, 'CCI', '#C44E52');
+    case 'williams': return makeLine(dates, ind.williams, 'Williams %R', '#8172B2');
+    case 'mfi': return makeLine(dates, ind.mfi, 'MFI', '#937860');
+    case 'adx':
+      return [
+        buildLine(dates, ind.adx.adx, 'ADX', '#4C72B0', {width:1.4, yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, ind.adx.pDI, '+DI', '#55A868', {width:1.0, yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, ind.adx.nDI, '-DI', '#C44E52', {width:1.0, yaxis:yaxisKey, xaxis, showlegend:false}),
+      ];
+    case 'dmi':
+      return [
+        buildLine(dates, ind.adx.pDI, '+DI', '#55A868', {yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, ind.adx.nDI, '-DI', '#C44E52', {yaxis:yaxisKey, xaxis, showlegend:false}),
+      ];
+    case 'aroon':
+      return [
+        buildLine(dates, ind.aroon.up, 'Aroon Up', '#55A868', {yaxis:yaxisKey, xaxis, showlegend:false}),
+        buildLine(dates, ind.aroon.down, 'Aroon Down', '#C44E52', {yaxis:yaxisKey, xaxis, showlegend:false}),
+      ];
+    case 'atr': return makeLine(dates, ind.atr, 'ATR', '#8C8C8C');
+    case 'bb_width': return makeLine(dates, ind.bb_width, 'BB Width', '#8172B2');
+    case 'hvol': return makeLine(dates, ind.hvol, 'HV%', '#64B5CD');
+    case 'obv': return makeLine(dates, ind.obv, 'OBV', '#4878D0');
+    case 'cmf': return makeLine(dates, ind.cmf, 'CMF', '#6ACC65');
+    case 'vwap': {
+      const vwap = d.close.map((_,i) => {
+        const s = Math.max(0,i-20);
+        const slice = d.close.slice(s,i+1);
+        const vslice = d.volume.slice(s,i+1);
+        const pv = slice.reduce((a,v,j)=>a+v*vslice[j],0);
+        return parseFloat((pv/vslice.reduce((a,b)=>a+b,0)).toFixed(4));
+      });
+      return makeLine(dates, vwap, 'VWAP', '#CCB974');
+    }
+    default: return makeLine(dates, d.close, indicator, '#4C72B0');
+  }
+}
+
+// ===== M12: SINGLE CHART =====
+function drawSingleChart() {
+  const d = VAP.data.main;
+  const norm = VAP.chart.normalized;
+  const traces = [];
+  const annotations = [];
+
+  // Price trace (K线 or line)
+  const priceStackType = VAP.stackTypes['price'] || 'candlestick';
+  if (VAP.chart.features.kline) {
+    if (priceStackType === 'candlestick' || priceStackType === 'bar' || !priceStackType) {
+      traces.push(buildCandlestick(d, VAP.chart.ticker, norm));
+    } else {
+      const closes = norm ? normalizeToBase100(d.close) : d.close;
+      traces.push(buildLine(d.dates, closes, VAP.chart.ticker, '#4C72B0', { width: 1.5 }));
+    }
+  }
+
+  // MA traces
+  traces.push(...buildMATraces(d, norm, 'y', 'x'));
+
+  // BB traces
+  traces.push(...buildBBTraces(d, norm, 'y', 'x'));
+
+  // H/L annotations
+  if (VAP.chart.features.hl || document.getElementById('hl-marks').checked) {
+    annotations.push(...buildHLAnnotations(d, norm, 'y'));
+  }
+
+  // Event annotations
+  annotations.push(...buildEventAnnotations(d));
+
+  // Volume (sub-plot via y2)
+  let yaxisConfig = {};
+  if (VAP.chart.features.vol) {
+    traces.push({ ...buildVolume(d, null, false, 'y2'), yaxis:'y2' });
+    yaxisConfig.yaxis2 = {
+      overlaying:'y', side:'right', showgrid:false,
+      showticklabels:false, zeroline:false,
+      domain:[0, 0.18], opacity:0.7
+    };
+  }
+
+  // Compute Y range
+  const closes = norm ? normalizeToBase100(d.close) : d.close;
+  const { range: yRange, dtick } = computeYRange([closes], 'price');
+
+  // Crisis shapes
+  const shapes = buildCrisisShapes(d);
+
+  const layout = {
+    ...baseLayout(),
+    shapes,
+    annotations,
+    yaxis: {
+      ...baseLayout().yaxis,
+      range: yRange,
+      dtick,
+      tickformat: norm ? '.1f' : ',',
+      title: norm ? { text: 'Index (Base=100)', font:{size:10} } : undefined,
+    },
+    ...yaxisConfig,
+  };
+
+  Plotly.react('plotly-chart', traces, layout, {
+    responsive: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ['toImage','sendDataToCloud'],
+    scrollZoom: true,
+    displayModeBar: true
+  });
+}
+
+// ===== M13: STACK CHART =====
+function drawStackChart() {
+  const d = VAP.data.main;
+  const norm = VAP.chart.normalized;
+  const panels = VAP.chart.panels; // ['price', 'volume', 'rsi', ...]
+
+  if (!VAP.data.indicators || !Object.keys(VAP.data.indicators).length) {
+    computeIndicators(d);
+  }
+
+  const n = panels.length;
+  if (n === 0) return;
+
+  // Calculate height ratios
+  const heights = panels.map(p => VAP.panelConfigs[p]?.height || 1.2);
+  const totalH = heights.reduce((a,b)=>a+b,0);
+
+  // Build domains (bottom to top, but we display top to bottom)
+  const gap = 0.03;
+  const domains = [];
+  let cumH = 0;
+  for (let i = n-1; i >= 0; i--) {
+    const frac = heights[i] / totalH;
+    const bottom = cumH + (cumH > 0 ? gap : 0);
+    const top = bottom + frac * (1 - gap*(n-1));
+    domains.unshift([bottom, top]);
+    cumH = top;
+  }
+
+  const traces = [];
+  const annotations = [];
+  const shapes = buildCrisisShapes(d);
+
+  // Build layout axes
+  const layoutAxes = {};
+  const xaxisShared = {
+    showgrid: document.getElementById('show-grid').checked,
+    gridcolor:'#EBEBEB', type:'date', zeroline:false,
+    showline:true, linecolor:'#E8E5DF',
+    tickfont:{ size:10 }, rangeslider:{ visible:false }
+  };
+
+  panels.forEach((panel, pi) => {
+    const yKey = pi === 0 ? 'y' : `y${pi+1}`;
+    const xKey = 'x';
+    const domain = domains[pi];
+    const isBottom = pi === n-1;
+
+    // X axis: only show ticks on bottom
+    const xAxisKey = `xaxis${pi===0?'':pi+1}`;
+    layoutAxes[xAxisKey] = {
+      ...xaxisShared,
+      domain,
+      anchor: yKey,
+      showticklabels: isBottom,
+      matches: pi===0 ? undefined : 'x'
+    };
+
+    // Y axis
+    const yAxisKey = pi === 0 ? 'yaxis' : `yaxis${pi+1}`;
+
+    // Build traces for this panel
+    if (panel === 'price') {
+      const priceType = VAP.stackTypes['price'] || 'candlestick';
+      if (priceType === 'candlestick' || !priceType) {
+        const cs = buildCandlestick(d, VAP.chart.ticker, norm);
+        traces.push({ ...cs, xaxis: xKey, yaxis: yKey });
+      } else {
+        const closes = norm ? normalizeToBase100(d.close) : d.close;
+        traces.push(buildLine(d.dates, closes, VAP.chart.ticker, '#4C72B0', { yaxis: yKey, xaxis: xKey }));
+      }
+      // MA & BB on price panel
+      buildMATraces(d, norm, yKey, xKey).forEach(t => traces.push(t));
+      buildBBTraces(d, norm, yKey, xKey).forEach(t => traces.push(t));
+      // H/L
+      if (document.getElementById('hl-marks').checked) {
+        annotations.push(...buildHLAnnotations(d, norm, yKey));
+      }
+
+      const closes = norm ? normalizeToBase100(d.close) : d.close;
+      const { range, dtick } = computeYRange([closes], 'price');
+      layoutAxes[yAxisKey] = {
+        showgrid: document.getElementById('show-grid').checked, gridcolor:'#EBEBEB',
+        side:'right', domain, anchor: xKey, zeroline:false, showline:false,
+        tickfont:{ family:"'JetBrains Mono',monospace", size:9 },
+        range, dtick, tickformat: norm?'.1f':',',
+      };
+    } else {
+      const indTraces = buildIndicatorTrace(panel, d, yKey, xKey);
+      indTraces.forEach(t => traces.push(t));
+
+      // Y range for indicator
+      const { range, dtick } = getIndicatorYRange(panel);
+      layoutAxes[yAxisKey] = {
+        showgrid: document.getElementById('show-grid').checked, gridcolor:'#EBEBEB',
+        side:'right', domain, anchor: xKey, zeroline:false, showline:false,
+        tickfont:{ family:"'JetBrains Mono',monospace", size:9 },
+        range: range||undefined, dtick: dtick||undefined,
+      };
+
+      // Panel label annotation
+      annotations.push({
+        x:0.01, y: (domain[0]+domain[1])/2, xref:'paper', yref:'paper',
+        text: VAP.panelConfigs[panel]?.label||panel,
+        font:{ family:"'DM Sans',sans-serif", size:9, color:'#9B9890' },
+        showarrow:false, textangle: -90, bgcolor:'rgba(255,255,255,0.5)'
+      });
+
+      // Reference lines for some indicators
+      const refLines = getIndicatorRefLines(panel, domain, xKey, yKey);
+      shapes.push(...refLines);
+    }
+  });
+
+  const layout = {
+    ...baseLayout(),
+    shapes, annotations,
+    ...layoutAxes,
+    hovermode:'x unified',
+    dragmode:'zoom',
+    showlegend:true,
+    legend:{ orientation:'h', x:0, y:1.01, xanchor:'left', yanchor:'bottom', font:{size:9}, bgcolor:'rgba(255,255,255,0.8)' },
+    paper_bgcolor:'#F7F6F3', plot_bgcolor:'#FFFFFF',
+    font:{ family:"'JetBrains Mono',monospace", size:10, color:'#6B6860' },
+    margin:{ l:10, r:70, t:16, b:36 },
+    hoverlabel:{ bgcolor:'#1A1A1A', bordercolor:'#1A1A1A', font:{family:"'JetBrains Mono',monospace",size:10,color:'#FFFFFF'} },
+  };
+
+  Plotly.react('plotly-chart', traces, layout, { responsive:true, displaylogo:false, scrollZoom:true });
+}
+
+// F13-01: Get indicator Y range
+function getIndicatorYRange(indicator) {
+  const ind = VAP.data.indicators;
+  const boundsMap = {
+    rsi: { range:[0,100], dtick:20 },
+    stoch: { range:[0,100], dtick:25 },
+    williams: { range:[-100,0], dtick:25 },
+    mfi: { range:[0,100], dtick:25 },
+    aroon: { range:[0,100], dtick:25 },
+    cmf: { range:[-1,1], dtick:0.5 },
+  };
+  return boundsMap[indicator] || {};
+}
+
+// F13-02: Reference lines (overbought/oversold etc)
+function getIndicatorRefLines(indicator, domain, xKey, yKey) {
+  const refMap = {
+    rsi: [{v:70,c:'#E53E3E88'},{v:30,c:'#38A16988'},{v:50,c:'#8C8C8C44'}],
+    stoch:[{v:80,c:'#E53E3E88'},{v:20,c:'#38A16988'}],
+    williams:[{v:-20,c:'#E53E3E88'},{v:-80,c:'#38A16988'}],
+    mfi:[{v:80,c:'#E53E3E88'},{v:20,c:'#38A16988'}],
+    cci:[{v:100,c:'#E53E3E88'},{v:-100,c:'#38A16988'},{v:0,c:'#8C8C8C44'}],
+    cmf:[{v:0,c:'#8C8C8C44'}],
+    macd:[{v:0,c:'#8C8C8C44'}],
+    roc:[{v:0,c:'#8C8C8C44'}],
+    adx:[{v:25,c:'#CCB97488'}],
+    aroon:[{v:50,c:'#8C8C8C44'}],
+  };
+  const refs = refMap[indicator] || [];
+  return refs.map(r => ({
+    type:'line', xref:'paper', yref: yKey,
+    x0:0, x1:1, y0:r.v, y1:r.v,
+    line:{ color:r.c, width:1, dash:'dash' }, layer:'below'
+  }));
+}
+
+// ===== M14: DUAL AXIS CHART =====
+function drawDualChart() {
+  const d = VAP.data.main;
+  const norm = VAP.chart.normalized;
+
+  const leftData = document.getElementById('dual-left').value;
+  const leftType = document.getElementById('dual-left-type').value;
+  const rightData = document.getElementById('dual-right').value;
+  const rightType = document.getElementById('dual-right-type').value;
+
+  if (!VAP.data.indicators || !Object.keys(VAP.data.indicators).length) {
+    computeIndicators(d);
+  }
+
+  const traces = [];
+
+  // Left axis traces
+  const leftTraces = buildDualAxisData(leftData, d, norm, 'y', leftType);
+  const rightTraces = buildDualAxisData(rightData, d, norm, 'y2', rightType);
+  traces.push(...leftTraces, ...rightTraces);
+
+  // Compute correlations
+  const lVals = getAxisValues(leftData, d, norm);
+  const rVals = getAxisValues(rightData, d, norm);
+  updateStatCards(lVals, rVals);
+
+  const shapes = buildCrisisShapes(d);
+
+  const layout = {
+    ...baseLayout(),
+    shapes,
+    yaxis: {
+      showgrid: document.getElementById('show-grid').checked, gridcolor:'#EBEBEB',
+      side:'left', zeroline:false, showline:false,
+      tickfont:{ family:"'JetBrains Mono',monospace", size:10 }
+    },
+    yaxis2: {
+      overlaying:'y', side:'right', showgrid:false,
+      zeroline:false, showline:false,
+      tickfont:{ family:"'JetBrains Mono',monospace", size:10 }
+    },
+    legend:{ orientation:'h', x:0, y:1.02, font:{size:10} },
+  };
+
+  Plotly.react('plotly-chart', traces, layout, { responsive:true, displaylogo:false, scrollZoom:true });
+}
+
+function buildDualAxisData(dataKey, d, norm, yaxis, chartType) {
+  const ind = VAP.data.indicators;
+  const col = getColors();
+  const colorMap = { y:'#4C72B0', y2:'#DD8452' };
+  const color = colorMap[yaxis] || '#4C72B0';
+
+  let vals, name;
+  switch(dataKey) {
+    case 'price': vals = norm ? normalizeToBase100(d.close) : d.close; name='Price'; break;
+    case 'volume': vals = d.volume; name='Volume'; break;
+    case 'rsi': vals = ind.rsi; name='RSI'; break;
+    case 'macd': vals = ind.macd.macd; name='MACD'; break;
+    default: vals = d.close; name=dataKey;
+  }
+
+  if (chartType === 'bar') {
+    const colors = vals.map((v,i)=>i===0?col.up+'AA':(v>=vals[i-1]?col.up+'AA':col.down+'AA'));
+    return [{type:'bar', x:d.dates, y:vals, name, marker:{color:colors,line:{width:0}}, yaxis, hoverinfo:'x+y'}];
+  } else if (chartType === 'area') {
+    return [{type:'scatter', mode:'lines', x:d.dates, y:vals, name, fill:'tozeroy', fillcolor:color+'20', line:{color, width:1.5}, yaxis}];
+  } else {
+    return [{type:'scatter', mode:'lines', x:d.dates, y:vals, name, line:{color, width:1.5}, yaxis}];
+  }
+}
+
+function getAxisValues(dataKey, d, norm) {
+  const ind = VAP.data.indicators;
+  switch(dataKey) {
+    case 'price': return norm ? normalizeToBase100(d.close) : d.close;
+    case 'volume': return d.volume;
+    case 'rsi': return ind.rsi;
+    case 'macd': return ind.macd.macd;
+    default: return d.close;
+  }
+}
+
+function updateStatCards(lVals, rVals) {
+  const valid = lVals.filter((_,i)=>lVals[i]!==null&&rVals[i]!==null);
+  const lv = lVals.filter(v=>v!==null);
+  const rv = rVals.filter(v=>v!==null);
+  if (!lv.length||!rv.length) return;
+
+  // Correlation
+  const n = Math.min(lv.length, rv.length);
+  const lm = lv.slice(-n).reduce((a,b)=>a+b,0)/n;
+  const rm = rv.slice(-n).reduce((a,b)=>a+b,0)/n;
+  const cov = lv.slice(-n).reduce((s,v,i)=>s+(v-lm)*(rv[rv.length-n+i]-rm),0)/n;
+  const ls = Math.sqrt(lv.slice(-n).reduce((s,v)=>s+(v-lm)**2,0)/n);
+  const rs = Math.sqrt(rv.slice(-n).reduce((s,v)=>s+(v-rm)**2,0)/n);
+  const corr = ls*rs===0?0:cov/(ls*rs);
+
+  const lChg = (lv[lv.length-1]-lv[0])/lv[0]*100;
+  const rChg = (rv[rv.length-1]-rv[0])/rv[0]*100;
+  const beta = rs===0?0:(cov/(ls*ls));
+
+  document.getElementById('stat-corr').textContent = corr.toFixed(3);
+  document.getElementById('stat-corr').style.color = corr>0.5?'#E53E3E':corr<-0.5?'#38A169':'#1A1A1A';
+  document.getElementById('stat-lchg').textContent = `${lChg>=0?'+':''}${lChg.toFixed(2)}%`;
+  document.getElementById('stat-lchg').style.color = lChg>=0?'#E53E3E':'#38A169';
+  document.getElementById('stat-rchg').textContent = `${rChg>=0?'+':''}${rChg.toFixed(2)}%`;
+  document.getElementById('stat-rchg').style.color = rChg>=0?'#E53E3E':'#38A169';
+  document.getElementById('stat-beta').textContent = beta.toFixed(3);
+}
+
+// ===== M15: COMPARE CHART =====
+function drawCompareChart() {
+  const d = VAP.data.main;
+  const norm = VAP.chart.normalized || document.getElementById('norm-compare').checked;
+  const traces = [];
+
+  // Main ticker
+  const closes = norm ? normalizeToBase100(d.close) : d.close;
+  traces.push(buildLine(d.dates, closes, VAP.chart.ticker, SEABORN_DEEP[0], { width:2.0 }));
+
+  // Compare tickers
+  VAP.chart.compareTickers.forEach((ct, i) => {
+    const cd = VAP.data.compare[ct];
+    if (!cd) return;
+    const cv = norm ? normalizeToBase100(cd.close) : cd.close;
+    traces.push(buildLine(cd.dates, cv, ct, SEABORN_DEEP[(i+1)%SEABORN_DEEP.length], { width:1.5 }));
+  });
+
+  // H/L for main
+  const annotations = [];
+  if (document.getElementById('hl-marks').checked) {
+    annotations.push(...buildHLAnnotations(d, norm, 'y'));
+  }
+
+  const allVals = [closes, ...VAP.chart.compareTickers.map(ct=>{
+    const cd = VAP.data.compare[ct];
+    return cd ? (norm?normalizeToBase100(cd.close):cd.close) : [];
+  })];
+  const { range: yRange, dtick } = computeYRange(allVals, 'price');
+
+  const shapes = buildCrisisShapes(d);
+
+  const layout = {
+    ...baseLayout(),
+    shapes, annotations,
+    yaxis: {
+      ...baseLayout().yaxis,
+      range: yRange, dtick,
+      tickformat: norm?'.1f':',',
+    }
+  };
+
+  Plotly.react('plotly-chart', traces, layout, { responsive:true, displaylogo:false, scrollZoom:true });
+}
+
+// ===== M16: ANNOTATIONS =====
+function openAnnotationModal() {
+  document.getElementById('annotation-modal').classList.add('open');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ann-date').value = today;
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function saveAnnotation() {
+  const date = document.getElementById('ann-date').value;
+  const title = document.getElementById('ann-title').value.trim();
+  if (!date || !title) return;
+  const ann = {
+    date, title,
+    desc: document.getElementById('ann-desc').value,
+    type: document.getElementById('ann-type').value,
+    id: Date.now()
+  };
+  VAP.chart.annotations.push(ann);
+  renderAnnotationList();
+  closeModal('annotation-modal');
+  redrawChart();
+}
+
+function renderAnnotationList() {
+  const list = document.getElementById('annotation-list');
+  list.innerHTML = '';
+  const typeColors = { event:'#4C72B0', crisis:'#E53E3E', bullish:'#38A169', custom:'#8172B2' };
+  VAP.chart.annotations.forEach((ann, i) => {
+    const item = document.createElement('div');
+    item.className = 'annotation-item';
+    item.innerHTML = `
+      <div class="ann-color" style="background:${typeColors[ann.type]||'#4C72B0'}"></div>
+      <span class="ann-date">${ann.date}</span>
+      <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ann.title}</span>
+      <span class="ann-remove" onclick="removeAnnotation(${i})">×</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function removeAnnotation(i) {
+  VAP.chart.annotations.splice(i, 1);
+  renderAnnotationList();
+  redrawChart();
+}
+
+// ===== M17: EXPORT =====
+function exportChart() {
+  const format = document.getElementById('export-format').value;
+  const ticker = VAP.chart.ticker.replace(/[^a-zA-Z0-9.^]/g,'_');
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const filename = `VeritasAutoPlot_${ticker}_${date}`;
+
+  if (format === 'html') {
+    // Export full self-contained HTML
+    const plotDiv = document.getElementById('plotly-chart');
+    Plotly.toImage(plotDiv, {format:'svg', width:1600, height:900}).then(svgData => {
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${filename}</title></head><body style="margin:0;background:#F7F6F3;">${document.getElementById('plotly-chart').innerHTML}</body></html>`;
+      const blob = new Blob([html], {type:'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename + '.html';
+      a.click();
+    });
+  } else if (format === 'png') {
+    const scale = parseInt(document.getElementById('export-dpi').value);
+    Plotly.downloadImage('plotly-chart', { format:'png', filename, width:1600, height:900, scale });
+  } else if (format === 'svg') {
+    Plotly.downloadImage('plotly-chart', { format:'svg', filename, width:1600, height:900 });
+  } else if (format === 'json') {
+    const json = JSON.stringify(VAP.data.main, null, 2);
+    const blob = new Blob([json], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename + '.json';
+    a.click();
+  }
+}
+
+// ===== M18: STATUS & CLOCK =====
+function setStatus(type, text) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot' + (type==='loading'?' loading':type==='error'?' error':'');
+  document.getElementById('status-text').textContent = text;
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('status-datetime').textContent =
+    now.toLocaleDateString('zh-TW') + ' ' + now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ===== M19: KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement === document.getElementById('ticker-input')) {
+    loadData();
+  }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// ===== M20: RESIZE OBSERVER =====
+const resizeObserver = new ResizeObserver(() => {
+  if (VAP.data.main) {
+    Plotly.relayout('plotly-chart', {autosize: true});
+  }
+});
+resizeObserver.observe(document.getElementById('chart-container'));
+
+// Ticker input: enter to load
+document.getElementById('ticker-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') loadData();
+});
+
+// ===== INIT =====
+init();
+</script>
+</body>
+</html>

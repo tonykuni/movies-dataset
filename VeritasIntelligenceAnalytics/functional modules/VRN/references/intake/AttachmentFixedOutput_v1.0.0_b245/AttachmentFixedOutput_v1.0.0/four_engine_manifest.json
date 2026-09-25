@@ -1,0 +1,132 @@
+{
+  "schema": "VRN-FOUR-ENGINE/1.0",
+  "suite": "VRNFourEngineSuite",
+  "suite_version": "1.0.0",
+  "run_id": "VRN4-70E4EB9FF1227BCF",
+  "started_utc": "2026-08-29T10:14:28Z",
+  "finished_utc": "2026-08-29T10:14:29Z",
+  "input_file": "/workspace/scratch/4596cd1a0b4d/upload/fetched text to be fixed..txt",
+  "input_sha256": "9150e7fb3fb405f8e48212516dc450465fe549a862ee8c2086fc4abf35573598",
+  "input_type": "prefetched_text_corpus",
+  "status": "WARN",
+  "stages": [
+    {
+      "stage_id": "STAGE-0ECB6F2CC478668C",
+      "name": "repair",
+      "engine": "VRNTextRepairEngine",
+      "version": "1.0.0",
+      "status": "WARN",
+      "started_utc": "2026-08-29T10:14:28Z",
+      "finished_utc": "2026-08-29T10:14:29Z",
+      "duration_ms": 461,
+      "input_sha256": "9150e7fb3fb405f8e48212516dc450465fe549a862ee8c2086fc4abf35573598",
+      "output_sha256": "2243a2d39fdf6730bfb1675599b4ba044438dc94b83fae8084df9d0516127c6a",
+      "counts": {
+        "records": 64,
+        "financial_data": 189,
+        "summary_sentences": 285,
+        "PASS": 63,
+        "NEEDS_OCR": 1
+      },
+      "quality": {
+        "average_before": 98.555,
+        "average_after": 98.574,
+        "numeric_preservation_failures": 0
+      },
+      "artifacts": {
+        "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/repair_manifest.json",
+        "documents_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/repaired_documents.jsonl",
+        "audit_csv": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/repair_audit.csv",
+        "corpus_txt": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/repaired_corpus.txt",
+        "documents_dir": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/documents",
+        "summaries_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/extractive_summaries.jsonl",
+        "financial_data_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/01_repair/financial_data.jsonl"
+      },
+      "warnings": [
+        "one or more records require source-PDF OCR"
+      ],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-211FE77063DBFE5A",
+      "name": "layout",
+      "engine": "GenericLayoutEngine",
+      "version": "2.1.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:14:29Z",
+      "finished_utc": "2026-08-29T10:14:29Z",
+      "duration_ms": 3,
+      "input_sha256": "9150e7fb3fb405f8e48212516dc450465fe549a862ee8c2086fc4abf35573598",
+      "output_sha256": "461ad8a119bf7e9d407ffacf2a5ceb71328f6cfb77b5f89708f8ffb3d161b562",
+      "counts": {
+        "documents": 64,
+        "elements": 232
+      },
+      "quality": {},
+      "artifacts": {
+        "logical_layout_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/02_layout/logical_layout.json"
+      },
+      "warnings": [
+        "physical page/bbox unavailable in pre-fetched text attachment"
+      ],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-4174B465A7C36DDC",
+      "name": "text",
+      "engine": "VRNPDFTextFetcher",
+      "version": "1.0.0",
+      "status": "PASS",
+      "started_utc": "2026-08-29T10:14:29Z",
+      "finished_utc": "2026-08-29T10:14:29Z",
+      "duration_ms": 0,
+      "input_sha256": "9150e7fb3fb405f8e48212516dc450465fe549a862ee8c2086fc4abf35573598",
+      "output_sha256": "f835dde9f8e8d57ac90b544bd8c6e500d2b594a7ec5f337c2a9dec366954bbd7",
+      "counts": {
+        "records": 64
+      },
+      "quality": {},
+      "artifacts": {
+        "prefetched_text_manifest": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/03_text/prefetched_text_manifest.json"
+      },
+      "warnings": [
+        "input is already fetched text; no PDF backend was rerun"
+      ],
+      "error": null
+    },
+    {
+      "stage_id": "STAGE-FA210F4E24CBEE8A",
+      "name": "table",
+      "engine": "VRNPDFTableFetcher",
+      "version": "1.0.0",
+      "status": "WARN",
+      "started_utc": "2026-08-29T10:14:29Z",
+      "finished_utc": "2026-08-29T10:14:29Z",
+      "duration_ms": 14,
+      "input_sha256": "9150e7fb3fb405f8e48212516dc450465fe549a862ee8c2086fc4abf35573598",
+      "output_sha256": "a8442a97b7a4ea4e24431b29a1f359e93b8dd2f85d9b41690438c1e2152fcae5",
+      "counts": {
+        "tables": 0,
+        "cells": 0
+      },
+      "quality": {},
+      "artifacts": {
+        "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/table_fetch_manifest.json",
+        "tables_csv_dir": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/tables_csv",
+        "cells_jsonl": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/table_cells.jsonl",
+        "audit_csv": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/table_audit.csv",
+        "backend_run": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/backend/multi_engine_run.json",
+        "sqlite": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/04_table/tables.sqlite3"
+      },
+      "warnings": [
+        "no conservative aligned-text table candidate detected"
+      ],
+      "error": null
+    }
+  ],
+  "artifacts": {
+    "manifest_json": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/four_engine_manifest.json",
+    "execution_summary": "/workspace/scratch/4596cd1a0b4d/four_engine_work/attachment_four_engine_run_release2/EXECUTION_SUMMARY.md"
+  },
+  "warnings": []
+}

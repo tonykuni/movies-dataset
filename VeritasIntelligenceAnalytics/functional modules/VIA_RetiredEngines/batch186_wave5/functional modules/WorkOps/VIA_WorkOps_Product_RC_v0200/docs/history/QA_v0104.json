@@ -1,0 +1,44 @@
+{
+  "version": "v0104",
+  "compile": "PASS",
+  "validated": {
+    "ENG-041 Daily Operating Rhythm": "PASS",
+    "ENG-043 Commitment scan": "PASS",
+    "ENG-043 human confirm + CMT autocode": "PASS",
+    "ENG-043 evaluate": "PASS",
+    "ENG-043 revise due with reason/evidence": "PASS",
+    "ENG-043 fulfill with evidence": "PASS",
+    "ENG-040 recognizes ENG-041/043": "PASS",
+    "trilingual Daily Rhythm UI": "STATIC_CHECK_PASS"
+  },
+  "bug_found_and_fixed": {
+    "engine": "ENG-041",
+    "issue": "unique() originally attempted to hash the recommended_action dictionary",
+    "fix": "stable dedupe key now uses project/case key + kind/state string",
+    "retest": "PASS"
+  },
+  "observed_smoke_results": {
+    "commitment_candidates": 2,
+    "sample_commitment_id": "CMT-20260809-000001",
+    "commitment_final_status": "FULFILLED",
+    "eod_phase_counts": {
+      "morning": 2,
+      "pre_noon": 4,
+      "afternoon": 1,
+      "eod": 2
+    },
+    "module_health": {
+      "ENG-041": "PASS",
+      "ENG-043": "PASS"
+    }
+  },
+  "governance": {
+    "auto_send_mail": false,
+    "auto_escalate": false,
+    "auto_close": false,
+    "auto_register_derived_commitment": false,
+    "human_confirmation_required_for_commitment_registration": true,
+    "human_confirmation_required_for_due_revision": true,
+    "evidence_required_for_fulfillment": true
+  }
+}

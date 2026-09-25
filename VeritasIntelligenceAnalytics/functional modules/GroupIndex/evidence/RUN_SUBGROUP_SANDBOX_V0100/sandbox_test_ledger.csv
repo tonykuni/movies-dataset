@@ -1,0 +1,18 @@
+﻿TestID,TestName,Status,Severity,Evidence
+S01,SSOT 成員名冊列數契約,PASS,HARD,rows=378
+S02,L2 次族群數契約,PASS,HARD,groups=77
+S03,四碼 ticker contract,PASS,HARD,invalid=0
+S04,YFinance suffix 與市場一致,PASS,HARD,conflicts=0
+S05,COUNT 列無重複計數,PASS,HARD,duplicates=0
+S06,一股多族群 SECONDARY 均為 DISPLAY_ONLY,PASS,HARD,"{'COUNT': 298, 'DISPLAY_ONLY': 80}"
+S07,v0201 executable AST 無固定市場門檻,PASS,HARD,findings=[]
+S08,動態 Criteria 全數非固定紅線,PASS,HARD,"[{""Scenario"":""ROTATION"",""Seed"":17,""FixedThresholdRows"":0},{""Scenario"":""ROTATION"",""Seed"":20260817,""FixedThresholdRows"":0},{""Scenario"":""MARKET_TIDE"",""Seed"":17,""FixedThresholdRows"":0},{""Scenario"":""MARKET_TIDE"",""Seed"":20260817,""FixedThresholdRows"":0}]"
+S09,動態 Criteria 跨情境/種子變動,PASS,HARD,"{""ROTATION"": [""97041af802fcac6f"", ""ad2303adb49e9d31""], ""MARKET_TIDE"": [""df96b81c2e49855b"", ""f657100a6e19da4b""]}"
+S10,Market Tide 殘差化壓低假相關,PASS,HARD,"[{""Seed"":17,""RawMedianWithinCorr"":0.7283297559,""ResidualMedianWithinCorr"":0.0046319655},{""Seed"":20260817,""RawMedianWithinCorr"":0.686553033,""ResidualMedianWithinCorr"":-0.0047455232}]"
+S11,Full Index 覆蓋所有 COUNT 族群,PASS,HARD,index_groups=72 eligible=72
+S12,會員角色指標覆蓋,PASS,HARD,metrics=298 expected=298
+S13,DynamicRole 僅允許授權狀態,PASS,HARD,"['LEADER', 'MEMBER', 'MIXED_ROLE', 'OUTLIER', 'PEER', 'TRUE_LAGGARD']"
+S14,交易容量動態分類覆蓋,PASS,HARD,capacity=301
+S15,各族群 residual heatmap 生成,PASS,HARD,heatmaps=67 eligible=67
+S16,無 COUNT 成員之 L2 族群保留為 Review Warning,WARN,REVIEW,"groups_without_count_members=['D1 HBM / 高頻寬記憶體', 'G6 浸沒式 / 兩相散熱', 'K4 AI PC 零組件 · 散熱機構', 'K6 AI PC 零組件 · 記憶體模組', 'Z1 待歸類 / 來源殘留']"
+S17,單一 COUNT 成員族群無法計算 within-corr(保留警告),WARN,REVIEW,"single_member_groups=['B2 BT 載板 / 記憶體載板', 'G5 熱交換器 / 漏液感測', 'I1 CPO 共封裝光學 / 光引擎', 'J7 LTCC / 高頻被動模組', 'K3 AI PC 零組件 · IC']"

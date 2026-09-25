@@ -1,0 +1,96 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-039",
+  "weights": {
+    "level": 10,
+    "waiting_24h": 2,
+    "waiting_48h": 5,
+    "waiting_72h": 8,
+    "missing_control_point": 4,
+    "close_candidate": 1,
+    "followup_ready": 2,
+    "overdue_state": 8,
+    "blocked_state": 7
+  },
+  "queues": {
+    "today_max": 12,
+    "watchlist_max": 20,
+    "watchlist_min_level": 4
+  },
+  "action_rules": {
+    "BLOCKED": [
+      "REQUEST_REASON",
+      "REQUEST_ETA",
+      "REQUEST_PLAN_B",
+      "FOLLOW_UP"
+    ],
+    "NEED_HELP": [
+      "REQUEST_SUPPORT",
+      "REQUEST_PLAN_B",
+      "FOLLOW_UP"
+    ],
+    "OVERDUE": [
+      "REQUEST_REVISED_ETA",
+      "REQUEST_RECOVERY_PLAN",
+      "REQUEST_PLAN_B",
+      "ESCALATE"
+    ],
+    "WAITING": [
+      "FOLLOW_UP",
+      "REQUEST_ETA"
+    ],
+    "IN_PROGRESS": [
+      "FOLLOW_UP"
+    ],
+    "DONE_CANDIDATE": [
+      "CONFIRM_CLOSE"
+    ]
+  },
+  "labels": {
+    "REQUEST_REASON": {
+      "zh-TW": "要求原因",
+      "zh-CN": "要求原因",
+      "en": "Request Reason"
+    },
+    "REQUEST_ETA": {
+      "zh-TW": "要求 ETA",
+      "zh-CN": "要求 ETA",
+      "en": "Request ETA"
+    },
+    "REQUEST_PLAN_B": {
+      "zh-TW": "要求 Plan B",
+      "zh-CN": "要求 Plan B",
+      "en": "Request Plan B"
+    },
+    "REQUEST_SUPPORT": {
+      "zh-TW": "安排協助",
+      "zh-CN": "安排协助",
+      "en": "Arrange Support"
+    },
+    "REQUEST_REVISED_ETA": {
+      "zh-TW": "要求新 ETA",
+      "zh-CN": "要求新 ETA",
+      "en": "Request Revised ETA"
+    },
+    "REQUEST_RECOVERY_PLAN": {
+      "zh-TW": "要求復原方案",
+      "zh-CN": "要求恢复方案",
+      "en": "Request Recovery Plan"
+    },
+    "FOLLOW_UP": {
+      "zh-TW": "跟進",
+      "zh-CN": "跟进",
+      "en": "Follow Up"
+    },
+    "ESCALATE": {
+      "zh-TW": "升級",
+      "zh-CN": "升级",
+      "en": "Escalate"
+    },
+    "CONFIRM_CLOSE": {
+      "zh-TW": "確認結案",
+      "zh-CN": "确认结案",
+      "en": "Confirm Close"
+    }
+  }
+}

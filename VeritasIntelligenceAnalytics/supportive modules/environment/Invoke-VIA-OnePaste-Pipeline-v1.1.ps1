@@ -38,6 +38,16 @@ param(
     [switch]$NoOpenHtml,
     [switch]$VerifyOnly
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Continue"
@@ -66,7 +76,7 @@ $script:DELIVERY_FILES = @(
         Description = "SSOT v22 同義字 auto-append PS7 wrapper"
     },
     @{
-        Name        = "VIA_SSOT_Unified_v22_synonyms_patch.py"
+        Name        = "SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
         Role        = "ssot_patch"
         Required    = $true
         Description = "SSOT 同義字 patch(55 keys / 361 synonyms)"
@@ -219,7 +229,7 @@ function Invoke-SSOTStep {
     }
 
     $wrapper = $script:PIPELINE_STATE.found_files["Invoke-VIA-SSOT-v22-Append-v2.ps1"]
-    $patch   = $script:PIPELINE_STATE.found_files["VIA_SSOT_Unified_v22_synonyms_patch.py"]
+    $patch   = $script:PIPELINE_STATE.found_files["SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"]
 
     Write-Section "STEP 1/2 · Applying SSOT v22 Synonyms"
 
@@ -631,3 +641,4 @@ try {
     } catch {}
     Write-Host "PowerShell session remains open." -ForegroundColor Yellow
 }
+

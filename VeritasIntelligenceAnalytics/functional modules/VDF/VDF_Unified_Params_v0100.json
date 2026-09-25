@@ -1,0 +1,54 @@
+{
+ "schema": "VIA.VDF.UnifiedParams.v1",
+ "note": "VDF 全引擎統一參數 SSOT——參數集中此檔,引擎讀此不各自散置",
+ "time": {
+  "start_date": "2018-01-01",
+  "end_date": "TODAY",
+  "use_current_as_end": true
+ },
+ "fetch": {
+  "batch_size": 5,
+  "max_retries": 3,
+  "retry_delay_s": 2,
+  "timeout_s": 30,
+  "http_headers": {
+   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+   "Accept": "application/json, text/plain, */*"
+  }
+ },
+ "markets": {
+  "US_INDICES": [
+   "^GSPC",
+   "^DJI",
+   "^IXIC",
+   "^VIX"
+  ],
+  "TAIWAN_INDICES": [
+   "^TWII",
+   "^TWOII"
+  ],
+  "INTERNATIONAL": [
+   "^HSI",
+   "^N225"
+  ],
+  "CURRENCIES": [
+   "EURUSD=X",
+   "JPYUSD=X"
+  ]
+ },
+ "output": {
+  "formats": [
+   "parquet",
+   "csv",
+   "duckdb",
+   "sqlite",
+   "sql"
+  ],
+  "csv_encoding": "utf-8-sig",
+  "root": "functional modules/VDF/output_hub",
+  "gsheet": "REGISTERED(真 API=雲端道:VIA_NET_CONSENT+OAuth 憑證到位才實連;先出相容 csv)"
+ },
+ "honesty": {
+  "simulation_data": "禁——模擬值必須欄名帶 _SIM 後綴且摘要標註,絕不冒充真值"
+ }
+}

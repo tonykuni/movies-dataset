@@ -1,9 +1,19 @@
-﻿#requires -Version 7.0
+#requires -Version 7.0
 param(
     [switch]$AllowNetworkInstall,
     [switch]$RunAcceptanceTest = $true,
     [switch]$ForceRebuildEnvironment
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -15,7 +25,7 @@ $ErrorActionPreference = "Stop"
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvRoot = Join-Path $env:USERPROFILE "envs\via_meeting_data_312"
 $Requirements = Join-Path $BaseDir "requirements-data-lock.txt"
-$Acceptance = Join-Path $BaseDir "via_duck_parquet_acceptance.py"
+$Acceptance = Join-Path $BaseDir "VIA_ENG018_DuckParquetAcceptance.py"
 $StatePath = Join-Path $EnvRoot ".via_environment_state.json"
 $PythonCandidates = @(
     "C:\Python312\python.exe",
@@ -139,3 +149,4 @@ catch {
     Write-Host "def No canonical production data was modified." -ForegroundColor Yellow
     exit 1
 }
+

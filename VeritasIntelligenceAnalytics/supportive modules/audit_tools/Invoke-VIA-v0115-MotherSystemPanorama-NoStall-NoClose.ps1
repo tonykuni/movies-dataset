@@ -1,9 +1,19 @@
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
 
 $Base = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics"
-$ManagerPy = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\_via_mother_system_manager\VIA_MotherSystemManager_v0115.py"
+$ManagerPy = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\_via_mother_system_manager\SUP_MDL506_MotherSystemManager_v0115.py"
 $RunRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_integration_v0115_mother_system_panorama"
 $RunId = "RUN_{0}_VIA_v0115_MOTHER_SYSTEM_PANORAMA_IAM" -f (Get-Date -Format "yyyyMMdd_HHmmss")
 $RunDir = Join-Path $RunRoot $RunId
@@ -86,3 +96,4 @@ try {
     Write-Host "def VIA · PowerShell remains open" -ForegroundColor Cyan
     Write-Host "================================================================================" -ForegroundColor DarkCyan
 }
+

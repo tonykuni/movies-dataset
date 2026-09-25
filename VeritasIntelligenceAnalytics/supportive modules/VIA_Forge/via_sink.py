@@ -20,6 +20,20 @@ Veritas Intelligence Analytics \u00b7 VeritasDataForge subsystem \u00b7 \u5100
 \u6cbb\u7406\uff1aappend-only\uff1bDuckDB \u53ea upsert \u4e0d delete\uff1b\u53ea\u589e\u4e0d\u6e1b\u3002
 ================================================================================
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import os
 import sys

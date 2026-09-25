@@ -1,0 +1,23 @@
+{
+  "ssot_id": "VIA_FLOWROT_METHOD_THRESHOLDS_V0300",
+  "version": "0.3.0",
+  "asof": "2026-08-18",
+  "evidence_tier": "SOURCE_REPORTED_SOURCED_UNVERIFIED",
+  "rolling_policy": "APPEND_ONLY_CALIBRATION_HISTORY",
+  "controls": [
+    {"id": "C-01", "name": "PCA 吸收率下限", "value": 0.40, "unit": "ratio", "affects": ["VALIDATE", "INDEX"]},
+    {"id": "C-02", "name": "置換檢定 p 上限", "value": 0.05, "unit": "p_value", "affects": ["VALIDATE"]},
+    {"id": "C-03", "name": "族群資金聚焦度門檻", "value": 0.80, "unit": "percentile_score", "affects": ["CLASSIFY", "INDEX"]},
+    {"id": "C-04", "name": "族群領先性門檻", "value": 0.75, "unit": "score", "affects": ["CLASSIFY", "INDEX"]},
+    {"id": "C-05", "name": "LEADER 複合分下限", "value": 0.75, "unit": "score", "affects": ["CLASSIFY"]},
+    {"id": "C-06", "name": "PEER 複合分下限", "value": 0.40, "unit": "score", "affects": ["CLASSIFY"]},
+    {"id": "C-07", "name": "熱度閘量能倍數", "value": 1.25, "unit": "multiple", "affects": ["VALIDATE", "BACKTEST"]},
+    {"id": "C-08", "name": "CCF 掃描範圍", "value": 5, "unit": "plus_minus_days", "affects": ["VALIDATE"]},
+    {"id": "C-09", "name": "置換重排次數", "value": 200, "unit": "iterations", "affects": ["VALIDATE"]},
+    {"id": "C-10", "name": "VPVI 過熱界", "value": 65, "unit": "score", "affects": ["OBSERVE"]},
+    {"id": "C-11", "name": "VPVI 冷卻界", "value": 35, "unit": "score", "affects": ["OBSERVE"]},
+    {"id": "C-12", "name": "VPVI 量能衝擊權重", "value": 0.40, "unit": "weight", "affects": ["OBSERVE"]},
+    {"id": "C-13", "name": "分階中領先性權重", "value": 0.45, "unit": "weight", "affects": ["CLASSIFY"]},
+    {"id": "C-14", "name": "台灣 10Y 無風險利率", "value": 0.0215, "unit": "annual_rate", "affects": ["BACKTEST"], "runtime_policy": "FETCH_OFFICIAL_BEFORE_REAL_ACTIVATION"}
+  ]
+}

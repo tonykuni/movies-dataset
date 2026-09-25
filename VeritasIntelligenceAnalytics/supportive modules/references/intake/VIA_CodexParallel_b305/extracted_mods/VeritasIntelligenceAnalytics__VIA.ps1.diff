@@ -1,0 +1,98 @@
+index 3a90d0d..8d18bec 100644
+--- a/VeritasIntelligenceAnalytics/VIA.ps1
++++ b/VeritasIntelligenceAnalytics/VIA.ps1
+@@ -77,38 +77,71 @@ function Register-Profile {
+ }
+ 
+ function Sync-Repo {
+-    # 批213:啟動先同步;批214:工作站實錄雙修——
+-    # ①再生頁=衍生物(引擎每跑必重生)→pull 前還原本地副本,消結構性衝突
+-    # ②舊版回補進程先收束(中斷安全=checkpoint 零損失),隨後由尾版重啟
+-    try {
+-        Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction Stop |
+-          Where-Object { $_.CommandLine -match "VDF_ENG064_HistoryBackfill" } |
+-          ForEach-Object { Stop-Process -Id $_.ProcessId -Force
+-                           Write-Host "  [同步] 收束舊回補進程 PID $($_.ProcessId)(斷點在=零損失)" -ForegroundColor Yellow }
+-    } catch { }
+-    git -C $VIA checkout -- "supportive modules/ui_support" 2>$null   # 再生頁還原(pull 後引擎重生最新)
+-    # 批231:運行時登記冊留痕(升階梯/整併冊等)擋 pull→stash 保存後拉
+-    # (不丟留痕;stash list 可查;誠實列印)
+-    $dirty = git -C $VIA status --porcelain 2>$null | Where-Object { $_ -match "^ M" }
+-    if ($dirty) {
+-        git -C $VIA stash push -m "VIA-local-traces-$(Get-Date -Format yyyyMMdd_HHmmss)" | Out-Null
+-        Write-Host "  [同步] 本地運行留痕 $($dirty.Count) 件已 stash 保存(git stash list 可查)" -ForegroundColor Yellow
++    # 同步不得強制終止任何 Python 程序，也不得丟棄或永久藏起工作樹內容。
++    # 全部 staged/unstaged/untracked 變更先以可追蹤 stash 保存，pull 後再套回。
++    $stashHash = $null
++    $stashMessage = "VIA-sync-preserve-$(Get-Date -Format yyyyMMdd_HHmmss_fff)"
++    $dirty = @(git -C $VIA status --porcelain --untracked-files=all 2>$null)
++    if ($dirty.Count -gt 0) {
++        $stashBefore = (git -C $VIA rev-parse --verify refs/stash 2>$null |
++                        Select-Object -First 1)
++        git -C $VIA stash push --include-untracked -m $stashMessage | Out-Null
++        if ($LASTEXITCODE -ne 0) {
++            Write-Host "  [同步] 無法安全保存本地變更，已停止同步；工作樹未覆寫" -ForegroundColor Red
++            return $false
++        }
++        $stashAfter = (git -C $VIA rev-parse --verify refs/stash 2>$null |
++                       Select-Object -First 1)
++        $stashSubject = if ($stashAfter) {
++            git -C $VIA show -s --format=%s $stashAfter 2>$null | Select-Object -First 1
++        } else { "" }
++        if ($stashAfter -and $stashAfter -ne $stashBefore -and
++            $stashSubject -like "*$stashMessage*") {
++            $stashHash = $stashAfter
++            Write-Host "  [同步] 本地變更 $($dirty.Count) 件已暫存，完成後自動回復" -ForegroundColor Yellow
++        } else {
++            Write-Host "  [同步] 工作樹在暫存期間發生併發變化，已停止同步；既有 stash 未動" -ForegroundColor Red
++            return $false
++        }
+     }
+-    try {
+-        $out = git -C $VIA pull --ff-only 2>&1
++
++    $out = @(git -C $VIA pull --ff-only 2>&1)
++    $pullOk = ($LASTEXITCODE -eq 0)
++    if ($pullOk) {
+         Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan
+-    } catch {
+-        Write-Host "  [同步] pull 失敗(離線/本地改動)=誠實續用現版" -ForegroundColor Yellow
++    } else {
++        Write-Host "  [同步] pull 未達(離線/非快轉)=誠實續用現版" -ForegroundColor Yellow
++    }
++
++    if ($stashHash) {
++        $restore = @(git -C $VIA stash apply --index $stashHash 2>&1)
++        if ($LASTEXITCODE -eq 0) {
++            # 不依可變的 stash@{n} 自動 drop，避免另一同步程序移動 stack 後誤刪。
++            Write-Host "  [同步] 本地變更已完整回復；安全備份 $stashHash 仍保留，可人工確認後刪除" -ForegroundColor Green
++        } else {
++            Write-Host "  [同步] 本地變更套回發生衝突；原 stash $stashHash 仍保留，請人工合併" -ForegroundColor Red
++            return $false
++        }
+     }
+     $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
+-    if ($bf) { python "$bf" --rebuild-ckpt }   # 真斷點重建(批212 債修;零網路)
+-    Register-Profile   # 批224:短指令註冊(冪等)
++    if ($bf) {
++        python "$bf" --rebuild-ckpt | Out-Host # 真斷點重建(批212 債修;零網路)
++        if ($LASTEXITCODE -ne 0) {
++            Write-Host "  [同步] 回補斷點重建未通過；本輪停止啟動後續工作" -ForegroundColor Red
++            return $false
++        }
++    }
++    $null = Register-Profile   # 批224:短指令註冊(冪等)
++    return $true
+ }
+ 
+ function Invoke-All {
+     $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"
+     Write-Host "[VIA] 全自動模式:同步+日更全鏈+回補續跑+開 UI(全背景不卡)" -ForegroundColor Yellow
+-    Sync-Repo
++    if (-not (Sync-Repo)) {
++        Write-Host "[VIA] 同步保護閘未通過；本輪不啟動日更、回補或 UI，請先處理上方訊息" -ForegroundColor Red
++        return
++    }
+     Start-Background "日更全鏈(boot ①-⑨)" (Join-Path $VIA "supportive modules\registry\via_boot_update.ps1") @()
+     # 批208:指揮台執行橋(按下=直接執行;127.0.0.1 白名單)
+     $ds = Get-ChildItem (Join-Path $VIA "supportive modules\registry") -Filter "CGC_MDL095_DeckServer_v*.py" | Sort-Object Name | Select-Object -Last 1

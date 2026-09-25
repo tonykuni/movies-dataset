@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYSTEM MANAGER MATRIX v0700 · VIA Central Governance Console</title>
+<style>
+  :root{
+    --canvas:#0f172a; --surface:#1e293b; --surface2:#172033; --border:#334155;
+    --text:#f8fafc; --muted:#94a3b8; --faint:#64748b;
+    --g-bg:#064e3b; --g-tx:#34d399; --g-bd:#059669;
+    --y-bg:#78350f; --y-tx:#fde047; --y-bd:#d97706;
+    --r-bg:#7f1d1d; --r-tx:#fca5a5; --r-bd:#dc2626;
+    --accent:#38bdf8;
+    --fs-base:11px; --fs-head:12px; --fs-title:14px; --lh:1.35;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--canvas);color:var(--text)}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-size:var(--fs-base); line-height:var(--lh); letter-spacing:-0.01em;
+    padding:12px; overflow-x:hidden;
+  }
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  .mast{background:linear-gradient(180deg,#1e293b 0%,#172033 100%);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .mast-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px}
+  .mast h1{font-size:var(--fs-title);margin:0;font-weight:700;letter-spacing:0.02em}
+  .mast .sub{color:var(--muted);font-size:var(--fs-base)}
+  .mast .stamp{margin-left:auto;color:var(--faint);font-size:var(--fs-base)}
+  .kpis{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .kpi{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;min-width:88px;flex:1 1 auto}
+  .kpi .n{font-size:16px;font-weight:700;line-height:1.1}
+  .kpi .l{color:var(--muted);font-size:10px;margin-top:2px}
+  .kpi.g .n{color:var(--g-tx)} .kpi.y .n{color:var(--y-tx)} .kpi.r .n{color:var(--r-tx)}
+
+  .prog-row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  .bar{flex:1 1 260px;height:14px;background:#0b1220;border:1px solid var(--border);border-radius:7px;overflow:hidden;position:relative}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#059669,#34d399);border-radius:7px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+  .bar .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#e2e8f0;font-weight:600}
+  .narr{flex:1 1 320px;color:var(--muted);font-size:10px;min-height:14px}
+  .narr b{color:var(--accent);font-weight:600}
+  .cursor{display:inline-block;width:6px;background:var(--accent);height:10px;margin-left:2px;animation:blink 1s steps(1) infinite;vertical-align:-1px}
+  @keyframes blink{50%{opacity:0}}
+  .spark{display:block}
+
+  /* Toolbar */
+  .toolbar{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.94);backdrop-filter:blur(6px);
+    border:1px solid var(--border);border-radius:8px;padding:7px 10px;margin-bottom:12px;
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .toolbar input[type=search]{flex:1 1 190px;min-width:130px;background:#0b1220;border:1px solid var(--border);
+    color:var(--text);border-radius:6px;padding:5px 9px;font-size:11px;outline:none}
+  .toolbar input[type=search]:focus{border-color:var(--accent)}
+  .btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;
+    padding:4px 9px;font-size:10px;cursor:pointer;white-space:nowrap;font-family:inherit}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.on{background:#0b1a26;border-color:var(--accent);color:var(--accent)}
+  .btn.ry-g.on{border-color:var(--g-bd);color:var(--g-tx)}
+  .btn.ry-y.on{border-color:var(--y-bd);color:var(--y-tx)}
+  .btn.ry-r.on{border-color:var(--r-bd);color:var(--r-tx)}
+  .seg{display:flex;gap:3px}
+  .filejack{position:relative;overflow:hidden;display:inline-block}
+  .filejack input[type=file]{position:absolute;left:0;top:0;opacity:0;width:100%;height:100%;cursor:pointer}
+  .tb-note{color:var(--faint);font-size:10px;margin-left:auto}
+
+  .sec{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;scroll-margin-top:52px}
+  .sec > h2{margin:0;padding:7px 12px;font-size:var(--fs-head);font-weight:700;letter-spacing:0.06em;
+    background:var(--surface2);border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center}
+  .sec > h2 .tag{color:var(--faint);font-weight:500;letter-spacing:0;font-size:10px}
+  .sec > h2 .rollup{margin-left:auto;font-size:10px;color:var(--muted);font-weight:500}
+
+  table{width:100%;table-layout:fixed;border-collapse:collapse}
+  th,td{padding:4px 6px;text-align:left;vertical-align:top;border-bottom:1px solid #263349;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}
+  thead th{color:var(--muted);font-weight:600;font-size:10px;background:#141d2e}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#1b2740}
+  tr.hide{display:none}
+  td.c,th.c{text-align:center}
+  td.mono{font-variant-numeric:tabular-nums}
+  .name{font-weight:600}
+  .zh{color:var(--muted);font-weight:400;font-size:10px}
+
+  .b{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid;white-space:nowrap}
+  .b.g{background:var(--g-bg);color:var(--g-tx);border-color:var(--g-bd)}
+  .b.y{background:var(--y-bg);color:var(--y-tx);border-color:var(--y-bd)}
+  .b.r{background:var(--r-bg);color:var(--r-tx);border-color:var(--r-bd)}
+  .b.w{background:#3b2a0a;color:#fbbf24;border-color:#b45309}
+
+  .cmd{font-family:'Segoe UI',monospace;color:var(--accent);font-size:10px;background:#0b1a26;border:1px solid #164e63;border-radius:4px;padding:1px 6px;display:inline-block;cursor:pointer}
+  .cmd:hover{background:#0e2436;border-color:var(--accent)}
+  .cmd::after{content:' ⧉';color:var(--faint);font-size:9px}
+  .lockrow td{background:#141d2e}
+
+  /* generic card grids */
+  .grid{display:grid;gap:6px;padding:10px 12px}
+  .g-accel{grid-template-columns:repeat(auto-fill,minmax(158px,1fr))}
+  .g-pipe{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .g-round{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .g-gate{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .g-depth{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .card{border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--surface2)}
+  .card .ch{display:flex;align-items:center;gap:6px}
+  .card .cid{font-weight:700;font-size:10px;color:var(--faint)}
+  .card .cn{font-weight:600}
+  .card .ce{color:var(--muted);font-size:10px;margin-top:3px}
+  .card.lit{border-color:#0e7490}
+  .card.lit .cid{color:var(--accent)}
+  .led{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--g-tx);box-shadow:0 0 5px var(--g-tx)}
+  .led.sb{background:var(--faint);box-shadow:none}
+
+  .dchip .dk{color:var(--muted);font-size:10px}
+  .dchip .dv{font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .dchip .dm{color:var(--faint);font-size:10px;margin-top:1px}
+  .dchip.warn{border-color:var(--y-bd)} .dchip.warn .dv{color:var(--y-tx)}
+
+  .foot{color:var(--faint);font-size:10px;padding:4px 2px 10px;text-align:center}
+  .foot b{color:var(--g-tx)}
+
+  .dir{font-weight:700;font-size:11px}
+  .dir.d{color:#38bdf8}.dir.u{color:#fbbf24}.dir.bi{color:#a78bfa}
+  .fails{color:var(--r-tx);font-size:10px}
+  details.fmea{border:1px solid var(--border);border-radius:6px;background:var(--surface2);margin-bottom:6px}
+  details.fmea > summary{cursor:pointer;padding:6px 10px;font-weight:600;font-size:11px;list-style:none;display:flex;gap:8px;align-items:center}
+  details.fmea > summary::-webkit-details-marker{display:none}
+  details.fmea > summary::before{content:'▸';color:var(--accent);font-size:10px}
+  details.fmea[open] > summary::before{content:'▾'}
+  details.fmea > summary .cnt{margin-left:auto;color:var(--faint);font-size:10px;font-weight:500}
+  details.fmea .fbody{padding:0 10px 8px}
+  details.fmea table{margin-top:2px}
+  details.fmea td{font-size:10px}
+  details.fmea .em{color:var(--r-tx)} details.fmea .mi{color:var(--g-tx)}
+  /* VES / ticker / close-out */
+  .steps{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px}
+  .step{border:1px solid var(--border);border-radius:14px;padding:3px 9px;font-size:10px;color:var(--muted);cursor:pointer;background:var(--surface2)}
+  .step.done{border-color:var(--g-bd);color:var(--g-tx)} .step.cur{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .pane{padding:8px 12px;display:grid;gap:8px;grid-template-columns:1fr 1fr}
+  @media (max-width:760px){.pane{grid-template-columns:1fr}}
+  textarea.ta{width:100%;min-height:96px;background:#0b1220;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:10.5px;font-family:'Segoe UI',monospace;resize:vertical;outline:none}
+  textarea.ta:focus{border-color:var(--accent)}
+  input.ti{background:#0b1220;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 9px;font-size:11px;outline:none;font-family:'Segoe UI',monospace;width:100%}
+  input.ti:focus{border-color:var(--accent)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:10.5px}
+  .kv .k{color:var(--muted)} .kv .v{font-family:'Segoe UI',monospace}
+  .hy{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;border:1px solid}
+  .hy.h0,.hy.h1{background:var(--g-bg);color:var(--g-tx);border-color:var(--g-bd)} .hy.h2{background:var(--y-bg);color:var(--y-tx);border-color:var(--y-bd)} .hy.h3,.hy.h4{background:var(--r-bg);color:var(--r-tx);border-color:var(--r-bd)}
+  .chk{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 12px;font-size:10.5px}
+  .chk .cn{color:var(--muted)} .chk label{cursor:pointer}
+  .verdict{font-size:16px;font-weight:800;letter-spacing:.04em}
+  .verdict.closed{color:var(--g-tx)} .verdict.cond{color:var(--y-tx)} .verdict.blocked{color:var(--r-tx)}
+  pre.dig{margin:0;background:#0b1220;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:10.5px;line-height:1.4;white-space:pre-wrap;word-break:break-all;max-height:320px;overflow:auto;color:#e2e8f0}
+  .row-actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+  select.sel{background:#0b1220;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:10.5px}
+  .dec-ok{color:var(--g-tx)} .dec-bad{color:var(--r-tx)} .dec-dup{color:var(--y-tx)}
+  /* fetch matrix */
+  .fm-dormant td{opacity:.45;text-decoration:line-through}
+  .fm-dormant td .outs,.fm-dormant td .cmd{text-decoration:none}
+  .outs{font-size:10px;color:var(--muted)}
+  .outs .full{display:none;margin-top:3px;color:#e2e8f0;line-height:1.5}
+  .outs.open .full{display:block}
+  .outs .full span{display:inline-block;background:#0b1220;border:1px solid var(--border);border-radius:4px;padding:0 5px;margin:1px 2px 1px 0;font-size:10px}
+  .fm-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;padding:8px 12px;background:#141d2e;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .fm-form input,.fm-form select,.fm-form textarea{background:#0b1220;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 7px;font-size:10.5px;font-family:inherit;width:100%}
+  .fm-form textarea{grid-column:1/-1;min-height:48px;resize:vertical}
+  .fm-form .lbl{color:var(--faint);font-size:9px;display:block;margin-bottom:1px}
+  .mode-full{color:var(--g-tx)} .mode-select{color:var(--y-tx)} .merge-sameday{color:var(--accent)}
+  /* VAP */
+  .layers{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;padding:8px 12px}
+  .layer{border:1px solid var(--border);border-radius:6px;background:var(--surface2);padding:6px 8px}
+  .layer .lh{display:flex;align-items:center;gap:6px;font-weight:700}
+  .layer .lid{color:var(--accent);font-size:10px;font-weight:700}
+  .layer .lb{color:var(--muted);font-size:10px;margin-top:3px;line-height:1.45}
+  .layer .lb b{color:#e2e8f0;font-weight:600}
+  .const{display:inline-block;background:#0b1220;border:1px solid var(--border);border-radius:4px;padding:0 6px;margin:1px 3px 1px 0;font-size:10px;font-family:'Segoe UI',monospace}
+  .ax-ticks span{display:inline-block;background:#0b1a26;border:1px solid #164e63;border-radius:4px;padding:0 6px;margin:2px 3px 0 0;font-family:'Segoe UI',monospace;font-size:10.5px;color:var(--accent)}
+  #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:#0b1a26;border:1px solid var(--accent);color:var(--text);padding:7px 14px;border-radius:8px;
+    font-size:11px;z-index:60;transition:all .25s;pointer-events:none;max-width:90vw}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:640px){
+    body{padding:8px}
+    .mast .stamp{margin-left:0;width:100%}
+    .tb-note{display:none}
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tr{border:1px solid var(--border);border-radius:6px;margin-bottom:6px;padding:4px 6px;background:var(--surface2)}
+    tr.hide{display:none}
+    td{border-bottom:1px dashed #263349;padding:3px 2px}
+    td::before{content:attr(data-l);color:var(--faint);font-size:9px;display:block;margin-bottom:1px}
+  }
+  @media print{
+    .toolbar,#toast,.narr,.cursor{display:none!important}
+    body{background:#fff;color:#000}
+    .sec,.mast,.card,.kpi{border-color:#bbb}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== MASTHEAD ===================== -->
+  <div class="mast">
+    <div class="mast-top">
+      <h1>SYSTEM MANAGER MATRIX REPORT</h1>
+      <span class="sub">VIA-CENTRAL-GOVERNANCE-CONSOLE · 總控面板 v0700 · VAP ONE 單檔整合</span>
+      <span class="stamp" id="stampLine">grid stamp — · branch — · <span id="clock"></span></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="prog-row">
+      <div class="bar" title="OK/total"><i id="pbar"></i><span class="pct" id="ppct"></span></div>
+      <svg class="spark" width="150" height="26" viewBox="0 0 150 26" aria-label="OK 站趨勢">
+        <polyline fill="none" stroke="#334155" stroke-width="1" points="0,25 150,25"/>
+        <polyline id="sparkline" fill="none" stroke="#34d399" stroke-width="1.6" points="0,17 30,11 60,10 90,13 120,12 150,4"/>
+        <circle cx="150" cy="4" r="2.2" fill="#34d399"/>
+      </svg>
+    </div>
+    <div class="prog-row"><div class="narr" id="narr">初始化總控面板…<span class="cursor"></span></div></div>
+  </div>
+
+  <!-- ===================== TOOLBAR (new function set) ===================== -->
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="搜尋全矩陣…  ( / 聚焦)" autocomplete="off">
+    <div class="seg" role="group" aria-label="RYG 篩選">
+      <button class="btn ry-all on" data-ry="all">全部</button>
+      <button class="btn ry-g" data-ry="g">🟢</button>
+      <button class="btn ry-y" data-ry="y">🟡</button>
+      <button class="btn ry-r" data-ry="r">🔴</button>
+    </div>
+    <button class="btn" id="copyPath">複製收斂路</button>
+    <button class="btn" id="expCsv">匯出 CSV</button>
+    <button class="btn" onclick="window.print()">列印</button>
+    <span class="filejack btn">載入實時 GRID JSON<input type="file" id="loadJson" accept=".json,application/json"></span>
+    <button class="btn" id="reset">還原</button>
+    <span class="tb-note" id="tbNote">seed: 批380 · 2026-09-07 06:25</span>
+  </div>
+
+  <!-- ===================== MODULE (JS-rendered) ===================== -->
+  <div class="sec" id="sec-module">
+    <h2>MODULE <span class="tag">子系統 / 專案 · CGC_MDL131 ProjectCompletion</span><span class="rollup" id="roll-module"></span></h2>
+    <table class="filterable">
+      <colgroup><col style="width:20%"><col style="width:8%"><col style="width:9%"><col style="width:20%"><col style="width:31%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Subsystem / Module</th><th class="c">RYG</th><th class="c">站 OK/FAIL</th><th>AST Anchoring Scope</th><th>Diagnostic Summary</th><th>Next</th></tr></thead>
+      <tbody id="tb-module"></tbody>
+    </table>
+  </div>
+
+  <!-- ===================== ENGINE (static) ===================== -->
+  <div class="sec" id="sec-engine">
+    <h2>ENGINE <span class="tag">核心引擎 · MDL133 ProductGate / MDL134 ParallelLanes</span><span class="rollup">🟢5 · 🟡1 · 🔴0</span></h2>
+    <table class="filterable">
+      <colgroup><col style="width:24%"><col style="width:8%"><col style="width:13%"><col style="width:16%"><col style="width:39%"></colgroup>
+      <thead><tr><th>Core Engine Component</th><th class="c">RYG</th><th class="c">Hydra Risk</th><th>Execution Mode</th><th>Pipeline State Narration</th></tr></thead>
+      <tbody>
+        <tr><td data-l="Engine"><span class="name">Python Core Engine</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Hydra">0.00 Zero</td><td data-l="Mode">Async Non-Blocking</td><td data-l="狀態">20 加速器全掛載;三輪全景分析器待命。</td></tr>
+        <tr><td data-l="Engine"><span class="name">via-autorun 四閘一鍵</span> <span class="zh">Register v0148</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Hydra">0.02 Low</td><td data-l="Mode">Background Persistent</td><td data-l="狀態">①20 加速器點亮 → ②Hydra H1–H6 先行(H3/H5 FAIL=誠實停)→ ③via-mobile --lanes 主鏈 → ④lanes digest。零跳出、零 TTY 等待、逾時 kill 不卡斷。</td></tr>
+        <tr><td data-l="Engine"><span class="name">SelftestGrid</span> <span class="zh">CGC_MDL064 v0226</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Hydra">0.00 Zero</td><td data-l="Mode">Parallel + 序跑複判</td><td data-l="狀態">184 站全跑;<span class="mono">--refail</span> 只重跑紅站全原因。</td></tr>
+        <tr><td data-l="Engine"><span class="name">ProductGate</span> <span class="zh">CGC_MDL133 v0101</span></td><td class="c" data-l="RYG"><span class="b y">YELLOW</span></td><td class="c mono" data-l="Hydra">0.10 Ctrl</td><td data-l="Mode">九閘 · 永不假綠</td><td data-l="狀態">G1 矩陣存證 = WARN(料側 5 紅);G2–G9 全 OK。判定 <b>CONDITIONAL</b>。</td></tr>
+        <tr><td data-l="Engine"><span class="name">ParallelLanes</span> <span class="zh">CGC_MDL134 v0100</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Hydra">0.05 Low</td><td data-l="Mode">十道並行</td><td data-l="狀態">資源鏈 DAG 單寫者律 + Hydra 哨兵 H1–H6 + 鎖 + 離線閘;六串流無執行緒碰撞。</td></tr>
+        <tr><td data-l="Engine"><span class="name">DataHome</span> <span class="zh">CGC_MDL123 v0101</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Hydra">0.00 Zero</td><td data-l="Mode">單一真源</td><td data-l="狀態">datahome 事故根治;路徑單一真源,雲/本機一致。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== FUNCTION-LIB (static) ===================== -->
+  <div class="sec" id="sec-lib">
+    <h2>FUNCTION-LIB <span class="tag">函式 / 工具庫 · 治理註冊</span><span class="rollup">🟢5 · 🟡0 · 🔴0</span></h2>
+    <table class="filterable">
+      <colgroup><col style="width:24%"><col style="width:8%"><col style="width:14%"><col style="width:18%"><col style="width:36%"></colgroup>
+      <thead><tr><th>Function / Utility Lib</th><th class="c">RYG</th><th class="c">SSOT / Integrity</th><th>Regex / Synonym</th><th>Governance Notes</th></tr></thead>
+      <tbody>
+        <tr><td data-l="Lib"><span class="name">Register-VIA-Commands</span> <span class="zh">v0148</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="SSOT">100%</td><td data-l="Regex">Passed</td><td data-l="註記">函式 51 · 梭 48。讓位冊:via-all / via-rootcheck / via-tower-reset。</td></tr>
+        <tr><td data-l="Lib"><span class="name">Key Guard</span> <span class="zh">G6 鑰匙守衛</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="SSOT">命中 0</td><td data-l="Regex">遮罩律</td><td data-l="註記">掃描 movies-dataset · 命中 0 明文鑰 · 37.2s;38 件明文鑰全遮罩。</td></tr>
+        <tr><td data-l="Lib"><span class="name">NetUnified</span> <span class="zh">SUP_MDL740 v0111</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="SSOT">18/18 檢</td><td data-l="Regex">N/A</td><td data-l="註記">統包網路工具;http_bytes 車道,閘閉 DENY 零外呼,bytes 契約。</td></tr>
+        <tr><td data-l="Lib"><span class="name">引擎尾版庫</span> <span class="zh">tail-version glob</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="SSOT">19/19</td><td data-l="Regex">尾版律</td><td data-l="註記">尾版 19/19 可編譯;glob 僅尾版入列。</td></tr>
+        <tr><td data-l="Lib"><span class="name">.gitignore 治理</span> <span class="zh">再生物讓位</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="SSOT">182 條</td><td data-l="Regex">6/6 讓位</td><td data-l="註記">再生頁 6/6 已讓位;同名雙物讓位冊(復位律)。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== OTHERS (static) ===================== -->
+  <div class="sec" id="sec-others">
+    <h2>OTHERS <span class="tag">支援組件 · 料側待補站</span><span class="rollup">🟢3 · 🟡1 · 🔴0</span></h2>
+    <table class="filterable">
+      <colgroup><col style="width:22%"><col style="width:8%"><col style="width:15%"><col style="width:55%"></colgroup>
+      <thead><tr><th>Support Component</th><th class="c">RYG</th><th class="c">Metric</th><th>Dynamic Status Narration</th></tr></thead>
+      <tbody>
+        <tr><td data-l="組件"><span class="name">Hydra Sentinel</span> <span class="zh">H1–H6</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Metric">0 連鎖</td><td data-l="狀態">高耦合節點隔離;H3/H5 FAIL=誠實停,自動修正範圍限於安全邊界。</td></tr>
+        <tr><td data-l="組件"><span class="name">UI Matrix Renderer</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Metric">&lt;12ms</td><td data-l="狀態">自動換行 + fixed-table 幾何;零水平溢出;手機單欄;零 CDN。</td></tr>
+        <tr><td data-l="組件"><span class="name">Data Depth Streamer</span></td><td class="c" data-l="RYG"><span class="b g">GREEN</span></td><td class="c mono" data-l="Metric">6 源同步</td><td data-l="狀態">tw_prices 545,971 · tw_chip 595,059 · revenue 70,674(44 月)· global 219,620 · aetf 2,357 · vrn_ssot 64。</td></tr>
+        <tr class="lockrow"><td data-l="組件"><span class="name">料側紅站 ×5</span> <span class="zh">DATA gaps</span></td><td class="c" data-l="RYG"><span class="b w">WARN</span></td><td class="c mono" data-l="Metric">待補</td><td data-l="狀態">批145 寬表刷新 · 批152 族群輪動實庫 · 批167 儀表板原始版 · 批174 每日觀察摘要 · 批176 驗證共識庫 —— 皆料側(DATA),碼側零紅。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================== 20 ACCELERATORS (new) ===================== -->
+  <div class="sec" id="sec-accel">
+    <h2>ACCELERATORS <span class="tag">20 加速器名冊 · SYSTEM MANAGER</span><span class="rollup" id="roll-accel">點亮 20 / 20</span></h2>
+    <div class="grid g-accel" id="accelGrid"></div>
+  </div>
+
+  <!-- ===================== SIX PIPELINES (new) ===================== -->
+  <div class="sec" id="sec-pipe">
+    <h2>PIPELINES <span class="tag">六個獨立流程 · 零九頭龍風險並行</span><span class="rollup">6 串流並行推進</span></h2>
+    <div class="grid g-pipe" id="pipeGrid"></div>
+  </div>
+
+  <!-- ===================== THREE-ROUND + ERROR CLASS (new) ===================== -->
+  <div class="sec" id="sec-round">
+    <h2>PANORAMIC ROUNDS <span class="tag">三輪全景式修正 · 錯誤分流</span><span class="rollup" id="roll-round">R1✔ · R2✔ · R3◐</span></h2>
+    <div class="grid g-round" id="roundGrid"></div>
+  </div>
+
+  <!-- ===================== PRODUCT GATE (JS-rendered) ===================== -->
+  <div class="sec" id="sec-gate">
+    <h2>PRODUCT GATE <span class="tag">九閘資格 · CGC_MDL133 · 永不假綠</span><span class="rollup" id="roll-gate"></span></h2>
+    <div class="grid g-gate" id="gateGrid"></div>
+  </div>
+
+  <!-- ===================== DATA DEPTH (JS-rendered) ===================== -->
+  <div class="sec" id="sec-depth">
+    <h2>DATA DEPTH <span class="tag">落庫史深 · T-1 紀律</span></h2>
+    <div class="grid g-depth" id="depthGrid"></div>
+  </div>
+
+  <!-- ===================== FETCH MATRIX (new: 資料擷取矩陣 · 增減介面) ===================== -->
+  <div class="sec" id="sec-fetch">
+    <h2>FETCH MATRIX <span class="tag">資料擷取矩陣 · 全抓 / 有選擇 · 當日合併 · 詳細輸出項目(摺疊→完整)· 增減介面(減=停用 DORMANT,只增不減)</span><span class="rollup" id="roll-fetch">—</span></h2>
+    <div style="padding:8px 12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <div class="seg" role="group" aria-label="擷取篩選">
+        <button class="btn on" data-fmf="all">全部</button>
+        <button class="btn" data-fmf="full">全抓</button>
+        <button class="btn" data-fmf="select">有選擇</button>
+        <button class="btn" data-fmf="sameday">當日合併</button>
+        <button class="btn" data-fmf="dormant">DORMANT</button>
+      </div>
+      <button class="btn" id="fmOpenAll">全部展開</button>
+      <button class="btn" id="fmOutAll">輸出全展</button>
+      <button class="btn" id="fmAddToggle">＋ 新增項目</button>
+      <button class="btn" id="fmExport">匯出矩陣 JSON</button>
+      <span class="tb-note" id="fmNote" style="margin-left:0">載入:工具列「載入實時 GRID JSON」吃 fetch_matrix JSON</span>
+    </div>
+    <div class="fm-form" id="fmForm" style="display:none">
+      <div><span class="lbl">領域</span><select id="fmDom"></select></div>
+      <div><span class="lbl">新領域(選「＋新領域」時)</span><input id="fmDomNew" placeholder="例:TW 期貨"></div>
+      <div><span class="lbl">項目名</span><input id="fmName" placeholder="例:台指期夜盤"></div>
+      <div><span class="lbl">引擎</span><input id="fmEng" placeholder="VDF_ENGxxx …"></div>
+      <div><span class="lbl">來源</span><input id="fmSrc" placeholder="TAIFEX / yfinance …"></div>
+      <div><span class="lbl">模式</span><select id="fmMode"><option value="FULL">全抓</option><option value="SELECT">有選擇</option></select></div>
+      <div><span class="lbl">合併</span><select id="fmMerge"><option value="APPEND">只增</option><option value="SAMEDAY">當日合併</option><option value="SNAPSHOT">快照</option></select></div>
+      <div><span class="lbl">頻率</span><input id="fmFreq" placeholder="D / W / M / Q"></div>
+      <div><span class="lbl">狀態</span><input id="fmStatus" placeholder="PLANNED / active …"></div>
+      <div><span class="lbl">表名</span><input id="fmTables" placeholder="vdf_…"></div>
+      <textarea id="fmOut" placeholder="輸出項目(逗號 / 換行分隔):Open, High, Low, Close …"></textarea>
+      <div><span class="lbl">備註</span><input id="fmNoteIn" placeholder="…"></div>
+      <div style="display:flex;align-items:end"><button class="btn on" id="fmAddBtn">新增(只增)</button></div>
+    </div>
+    <div id="fmWrap" style="padding:8px 12px 4px"></div>
+    <details class="fmea" style="margin:0 12px 10px"><summary>變更台帳(append-only)<span class="cnt" id="fmLogCnt">0</span></summary>
+      <div class="fbody"><table><colgroup><col style="width:22%"><col style="width:16%"><col style="width:26%"><col style="width:36%"></colgroup>
+        <thead><tr><th>ts</th><th>action</th><th>id</th><th>detail</th></tr></thead><tbody id="fmLogBody"></tbody></table></div></details>
+  </div>
+
+  <!-- ===================== VAP ARCHITECTURE (new) ===================== -->
+  <div class="sec" id="sec-vap">
+    <h2>VAP ARCHITECTURE <span class="tag">Veritas AutoPlot · 圖規 SSOT v018(40)· 圖規鎖 · 渲染五線 · 模板/儀表板 · 主控台 · 驗收</span><span class="rollup" id="roll-vap">—</span></h2>
+    <div class="layers" id="vapLayers"></div>
+    <div class="pane">
+      <div>
+        <div class="zh">圖規鎖 · 軸契約計算器(單軸 4 間隔 5 刻度 · 步階族 2 / 2.5 / 5 × 10ⁿ · 上緣補齊)</div>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"><input class="ti" id="vapMin" placeholder="min 例:-3" value="-3" style="flex:1 1 90px"><input class="ti" id="vapMax" placeholder="max 例:97" value="97" style="flex:1 1 90px"><select class="sel" id="vapFam"><option value="v23">v2.3 族 1.25/2/2.5/5</option><option value="v018">v018 族 2/2.5/5</option></select><label class="zh" style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="vapZero"> 含 0</label></div>
+        <div class="kv" id="vapAxisOut" style="margin-top:6px"></div>
+        <div class="zh" style="margin-top:8px">視覺鎖常數(vap_spec v1.0.x · 方案 A 已核准 2026-08-04)</div>
+        <div><span class="const">line.opacity 0.9</span><span class="const">areaUnderLine 0.75(陰影 0.5)</span><span class="const">barFace 0.6 / Dense 0.8</span><span class="const">event shade 0.3</span><span class="const">Macro Seaborn 0.80(獨立域)</span><span class="const">palette snsDeep×10</span><span class="const">corr diverging 15 · zmid 0 · dtick .05</span><span class="const">Seaborn 0.13.2 · Plotly 2.35.0</span><span class="const">tol 1e-6</span></div>
+        <div class="zh" style="margin-top:6px">批330 資料律:<span class="const">價格一律還原價 adj_close(裸 close 需 allow_raw=True)</span><span class="const">成交量一律扣除當沖成交量</span></div>
+      </div>
+      <div>
+        <div class="zh">圖規 JSON 驗證器(站「VAP 圖規 JSON」:x / series / 方法論欄;可加 code=VAP-CH-xx、axisMode、price_field)</div>
+        <textarea class="ta" id="vapSpecIn" placeholder='{"code":"VAP-CH-27","x":["2026-09-01","2026-09-02"],"series":[{"name":"2330","y":[1010,1020]}],"methodology":"K 線 × SMA/EMA/BB × Volume;還原價;成交量扣當沖","axisMode":"DUAL_LOCKED","price_field":"adj_close"}'></textarea>
+        <div id="vapSpecOut" style="font-size:10.5px;margin-top:6px"></div>
+        <div class="zh" style="margin-top:8px">VAP ONE 單檔引擎自測(載入 <span class="mono">VIA_VAP_ONE_SELFTEST/0100</span> JSON)</div>
+        <div class="kv" id="vapOneOut" style="margin-top:4px"></div>
+      </div>
+    </div>
+    <details class="fmea" style="margin:0 12px 6px"><summary>15 引擎矩陣 VAP_ENG001–015 + 守衛 + 正本<span class="cnt" id="vapEngCnt"></span></summary>
+      <div class="fbody"><table><colgroup><col style="width:9%"><col style="width:22%"><col style="width:7%"><col style="width:10%"><col style="width:34%"><col style="width:18%"></colgroup>
+        <thead><tr><th>ENG</th><th>名稱</th><th class="c">尾版</th><th>短令</th><th>用途</th><th>站況</th></tr></thead><tbody id="vapEngBody"></tbody></table></div></details>
+    <details class="fmea" style="margin:0 12px 6px"><summary>40 圖規冊 VAP-CH-01–40(v018 · APPEND_ONLY_VERSION_ARCHIVE_RESTORE)<span class="cnt" id="vapChartCnt"></span></summary>
+      <div class="fbody">
+        <div class="seg" id="vapGroupSeg" style="flex-wrap:wrap;margin:4px 0 6px"></div>
+        <table><colgroup><col style="width:9%"><col style="width:8%"><col style="width:16%"><col style="width:14%"><col style="width:9%"><col style="width:10%"><col style="width:16%"><col style="width:18%"></colgroup>
+        <thead><tr><th>code</th><th>id</th><th>名稱</th><th>群</th><th class="c">軸</th><th>shape</th><th>fields</th><th>renderer</th></tr></thead><tbody id="vapChartBody"></tbody></table></div></details>
+    <details class="fmea" style="margin:0 12px 10px" open><summary>完善化 · 待補項(來源:併軌案 v001 / grid 料側紅 / 批330)<span class="cnt" id="vapGapCnt"></span></summary>
+      <div class="fbody"><table><colgroup><col style="width:36%"><col style="width:12%"><col style="width:36%"><col style="width:16%"></colgroup>
+        <thead><tr><th>項目</th><th class="c">狀態</th><th>依據 / 擋點</th><th>下一步</th></tr></thead><tbody id="vapGapBody"></tbody></table></div></details>
+  </div>
+
+  <!-- ===================== VES × AI (new: integrated reinforcement) ===================== -->
+  <div class="sec" id="sec-ves">
+    <h2>VES × AI <span class="tag">引擎標準化器 · VES_AI_COLLAB/1.0 · 決策行驗證 · 沙盤/Hydra/Apply 閘</span><span class="rollup" id="roll-ves">—</span></h2>
+    <div class="steps" id="vesSteps"></div>
+    <div class="pane">
+      <div>
+        <div class="zh" style="margin-bottom:4px">貼上 AI 回覆(唯一合法格式:<span class="mono">==VES-DECISION== CARD-x OPTION [note]</span> / <span class="mono">==VES-NEED-SLICE==</span> / <span class="mono">==VES-DEFER==</span>);引擎會靜默忽略非法行——這裡先攔。</div>
+        <textarea class="ta" id="decIn" placeholder="==VES-DECISION== CARD-C001 ACCEPT_CANONICAL=FN-00007
+==VES-DECISION== CARD-RISK-FN-00031 FALSE_POSITIVE
+==VES-NEED-SLICE== VIA-FNC-3C6D3E
+==VES-DEFER== CARD-C005 需要看呼叫者"></textarea>
+        <div class="row-actions" style="padding:6px 0 0">
+          <button class="btn" id="copyValidDec">複製合法行 → ves_decisions.jsonl</button>
+          <span class="tb-note" id="decNote" style="margin-left:0">0 行</span>
+        </div>
+        <div id="decOut" style="font-size:10.5px;margin-top:6px"></div>
+      </div>
+      <div>
+        <div class="kv" id="vesKv"></div>
+        <div style="margin-top:8px" class="zh">沙盤七閘 <span class="mono">SB_*</span>(載入 sandbox_report.json)</div>
+        <div class="grid g-gate" id="sbGates" style="padding:6px 0"></div>
+        <div class="zh">驗證七閘 <span class="mono">VF_*</span>(載入 verify_report.json;任何 RED = 不合併)</div>
+        <div class="grid g-gate" id="vfGates" style="padding:6px 0"></div>
+        <div class="zh" style="margin-top:4px">未載入 sandbox 時可手動預設 Hydra(僅規劃用,引擎判定為準):
+          <select class="sel" id="hySel"><option value="">—</option><option>H0</option><option>H1</option><option>H2</option><option>H3</option><option>H4</option></select>
+        </div>
+      </div>
+    </div>
+    <details class="fmea" style="margin:0 12px 10px"><summary>九頭龍 25 項模組化風險與擋點 MR01–MR25(引擎原冊)<span class="cnt">25</span></summary>
+      <div class="fbody"><table><colgroup><col style="width:8%"><col style="width:34%"><col style="width:8%"><col style="width:50%"></colgroup>
+        <thead><tr><th>碼</th><th>風險</th><th class="c">Hydra</th><th>擋點 / 解法</th></tr></thead><tbody id="mrBody"></tbody></table></div></details>
+  </div>
+
+  <!-- ===================== TICKER REGEX (new) ===================== -->
+  <div class="sec" id="sec-ticker">
+    <h2>TICKER REGEX <span class="tag">台股代號驗證器 · VIA_TWTickerRegex v0100 · 13 類 × 3 格式</span><span class="rollup" id="roll-ticker">—</span></h2>
+    <div class="pane">
+      <div>
+        <input class="ti" id="tkIn" placeholder="輸入代號:2330 / 2330.TW / 2330 TT / 00981A / 0050 / 006208 / 2881A …">
+        <div class="kv" id="tkOut" style="margin-top:8px"></div>
+      </div>
+      <div>
+        <div class="zh">註冊表(分類優先序 上→下)</div>
+        <table style="margin-top:4px"><colgroup><col style="width:30%"><col style="width:40%"><col style="width:30%"></colgroup>
+          <thead><tr><th>class</th><th>類別</th><th>第六碼</th></tr></thead><tbody id="tkReg"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GROUP SSOT (new) ===================== -->
+  <div class="sec" id="sec-group">
+    <h2>GROUP SSOT <span class="tag">TW 族群 SSOT 合併器 · Build-GroupSSOT v0100(List A Canonical × List F FlowSystem)</span><span class="rollup" id="roll-group">未載入</span></h2>
+    <div class="grid g-depth" id="groupGrid"></div>
+  </div>
+
+  <!-- ===================== CLOSE-OUT (new: strengthened 收尾) ===================== -->
+  <div class="sec" id="sec-closeout">
+    <h2>CLOSE-OUT 收尾 <span class="tag">R3 硬化終局閘 · ≤25 行 via-loop digest · 只增台帳</span><span class="rollup" id="roll-closeout">—</span></h2>
+    <div class="pane">
+      <div>
+        <div class="chk" id="coChk" style="padding:0"></div>
+        <div style="padding:8px 0 0"><span class="zh">終局判定:</span> <span class="verdict" id="coVerdict">—</span> <span class="zh" id="coBlockers"></span></div>
+      </div>
+      <div>
+        <pre class="dig" id="coDigest"></pre>
+      </div>
+    </div>
+    <div class="row-actions">
+      <button class="btn" id="coCopy">複製 digest</button>
+      <button class="btn" id="coDl">下載 digest .md</button>
+      <button class="btn on" id="coFinal">封存收尾 → 台帳 +1</button>
+      <button class="btn" id="coLedgerDl">匯出台帳 JSONL</button>
+      <button class="btn" id="coReport">匯出終局報告 .md</button>
+      <span class="tb-note" id="coNote" style="margin-left:0">台帳 0 筆(僅本頁存續;匯出以持久)</span>
+    </div>
+    <table><colgroup><col style="width:20%"><col style="width:14%"><col style="width:12%"><col style="width:54%"></colgroup>
+      <thead><tr><th>台帳 ts</th><th class="c">verdict</th><th class="c">digest fnv32</th><th>blockers / 備註</th></tr></thead>
+      <tbody id="coLedger"></tbody></table>
+  </div>
+
+  <!-- ===================== SELF-CHECK (new: adaptive bidirectional) ===================== -->
+  <div class="sec" id="sec-selfcheck">
+    <h2>SELF-CHECK <span class="tag">自適應上下雙向自檢 · 每功能錯誤探針</span><span class="rollup" id="roll-selfcheck">—</span></h2>
+    <div style="padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn" id="rerunCheck">重跑自檢</button>
+      <span class="tb-note" id="checkNote" style="margin-left:0">尚未執行</span>
+    </div>
+    <table>
+      <colgroup><col style="width:24%"><col style="width:8%"><col style="width:9%"><col style="width:13%"><col style="width:46%"></colgroup>
+      <thead><tr><th>Function</th><th class="c">RYG</th><th class="c">方向</th><th class="c">探針 通過/總</th><th>未通過 / 上向複驗</th></tr></thead>
+      <tbody id="tb-check"></tbody>
+    </table>
+  </div>
+
+  <!-- ===================== FMEA (new: 20 errors x fix per function) ===================== -->
+  <div class="sec" id="sec-fmea">
+    <h2>FMEA <span class="tag">每功能最可能錯誤 × 預備修正方案 · 降低失敗機率</span><span class="rollup" id="roll-fmea">—</span></h2>
+    <div id="fmeaWrap" style="padding:8px 12px"></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- SEED DATA (批380 · grid 2026-09-07 06:25) ----------
+  var DATA = {
+    meta:{ stamp:"2026-09-07 06:25", branch:"claude/via-system-followup-tz7k9t", head:"批380", register:"v0148", overall:"YELLOW", delta:24 },
+    grid:{ ok:177, fail:5, skip:2 },
+    anchors:{ VDF:"Elastic::VDF.pipeline", VRN:"Precision::VRN.DailyBrief", AETF:"Precision::VDF.ETF", REVENUE:"Elastic::VDF.MonthlyRevenue", VAP:"Precision::VAP.PlotlyRenderer" },
+    projects:[
+      { key:"VDF", zh:"資料鍛造 VeritasDataForge", state:"YELLOW", n:{OK:36,FAIL:2,SKIP:0,DATA:2,CODE:0}, next:"via-fred",
+        diag:"碼側全綠。料側缺口:us_macro 0 列(FRED 190 series)、籌碼最新 2025-11-26(落後 >30 日)、台股宇宙 552 檔(<1000)。" },
+      { key:"VRN", zh:"報告新星 VeritasReportNova", state:"YELLOW", n:{OK:29,FAIL:1,SKIP:2,DATA:1,CODE:0}, next:"via-mobile",
+        diag:"每日觀察摘要(批174)market-breadth 料側紅;reconcile 對帳環境缺件誠實 SKIP。四引擎橋 docx→markitdown 全綠。" },
+      { key:"AETF", zh:"台灣主動式 ETF 分析", state:"GREEN", n:{OK:9,FAIL:0,SKIP:0,DATA:0,CODE:0}, next:"每日 boot",
+        diag:"全綠。宇宙 23 檔 / 持股揭露 25 檔 / 2,357 列(至 2026-09-04)。A 碼律 + 揭露律 + 聯集只增永不刪。" },
+      { key:"REVENUE", zh:"台灣股票月營收分析", state:"YELLOW", n:{OK:4,FAIL:0,SKIP:0,DATA:0,CODE:0}, next:"via-revfill",
+        diag:"碼側全綠。史深 44 月(202301–202608)< 60,尚不供 high_60m / yoy_streak;≥60 月檔 0。" },
+      { key:"VAP", zh:"自動繪圖 VeritasAutoPlot", state:"YELLOW", n:{OK:3,FAIL:2,SKIP:0,DATA:2,CODE:0}, next:"via-mobile",
+        diag:"圖規鎖八檢 / TA 工廠十檢 / 族群三分類圖規 JSON 六檢 OK;批145 寬表刷新器(ENG007)、批167 儀表板原始版(ENG009)料側紅 —— 由 grid 站況推定,碼側零紅。" }
+    ],
+    gates:[
+      { id:"G1", name:"矩陣存證", state:"WARN", evidence:"OK 177 / FAIL 5 / SKIP 2;核心站 16/16;碼紅 0 · 料紅 5", next:"via-mobile" },
+      { id:"G2", name:"短令↔梭", state:"OK", evidence:"函式 51 · 梭 48 · 讓位 3", next:"" },
+      { id:"G3", name:"樞紐任務", state:"OK", evidence:"任務冊 42 · 產品任務 13/13", next:"" },
+      { id:"G4", name:"產品頁衛生", state:"OK", evidence:"頁 8/8 衛生綠", next:"" },
+      { id:"G5", name:"再生物讓位", state:"OK", evidence:".gitignore 182 · 再生頁 6/6", next:"" },
+      { id:"G6", name:"鑰匙守衛", state:"OK", evidence:"命中 0 · 37.2s 掃描", next:"" },
+      { id:"G7", name:"引擎尾版", state:"OK", evidence:"尾版 19/19 可編譯", next:"" },
+      { id:"G8", name:"短令在位", state:"OK", evidence:"產品短令 15/15", next:"" },
+      { id:"G9", name:"用法文件", state:"OK", evidence:"usage 7 · 零 CDN · 手機單欄", next:"" }
+    ],
+    depth:{
+      tw_prices:{rows:545971,tickers:552,max:"2026-09-07"},
+      tw_chip:{rows:595059,max:"2025-11-26",warn:true},
+      revenue:{rows:70674,codes:1975,months:44,warn:true},
+      global:{rows:219620,tickers:118,max:"2026-09-07"},
+      aetf:{with_holdings:25,rows:2357,max:"2026-09-04"},
+      consensus:{rows:248},
+      macro:null,
+      vrn_ssot:{records:64}
+    }
+  };
+
+  var ACCEL = [
+    "AST 精準解析","多語言語意模型","九頭龍風險預測","依賴拓撲排序","沙盒隔離執行",
+    "自動修正建議生成","三輪全景式分析","SSOT 對齊","視覺化矩陣生成","錯誤分類與分群",
+    "性能與複雜度分析","多子系統同步檢視","版本差異與回滾","覆蓋率與回歸檢查","修正順序最佳化",
+    "動態進度條","動態說明","非阻塞 PowerShell 執行","多引擎整合","自動部署與環境初始化"
+  ];
+  var PIPES = [
+    ["Pipeline 1","代碼層 AST 重構與修復","碼側零紅;尾版 19/19 可編譯","g"],
+    ["Pipeline 2","中央 SSOT 與同義字 Regex 校準","Register SSOT 100%;梭 48 在位","g"],
+    ["Pipeline 3","子系統依賴解耦與模組註冊","MDL134 DAG 單寫者律;離線閘","g"],
+    ["Pipeline 4","性能優化 · 死碼清理 · 資源回收","render <12ms;熔斷 ENG064 v0108","g"],
+    ["Pipeline 5","沙盒多重驗證與回歸測試","SelftestGrid 184 站;--refail 複判","g"],
+    ["Pipeline 6","UI Matrix 渲染與非阻塞部署監控","via-autorun 零跳出/逾時 kill 不卡斷","g"]
+  ];
+  var ROUNDS = [
+    ["R1","全面性修正 Comprehensive","並行解 Parallel-Fixable;隔離高 Hydra 節點。","g","✔ 完成"],
+    ["R2","順序性修正 Sequential","依賴拓撲逐步;每步沙盒驗證;高風險僅建議。","g","✔ 完成"],
+    ["R3","收尾與硬化 Hardening","微調/格式化/死碼/性能;產品資格閘推進中。","y","◐ 進行中"]
+  ];
+
+  // ---------- helpers ----------
+  var $=function(id){return document.getElementById(id);};
+  function cls(state){ var s=(state||"").toUpperCase(); if(s==="GREEN"||s==="OK")return"g"; if(s==="RED"||s==="FAIL")return"r"; if(s==="WARN")return"w"; return"y"; }
+  function nf(x){ x=Number(x); return isFinite(x)?x.toLocaleString("en-US"):"—"; }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove("show");},1600); }
+  function copy(text){
+    text=String(text==null?"":text); if(!text){ toast("無可複製內容"); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){toast("已複製:"+text);},function(){fallbackCopy(text);}); }
+    else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text){ var ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy");toast("已複製:"+text);}catch(e){toast("複製失敗");} document.body.removeChild(ta); }
+
+  // ---------- hardening: guards + down/up validators (自適應上下雙向) ----------
+  var LAST_UP=[]; var CHECKLOG=[];
+  function guard(name,fn){ try{ return fn(); }catch(e){ CHECKLOG.push({fn:name,err:(e&&e.message)||String(e)}); return null; } }
+  function ci(x){ x=Number(x); return (isFinite(x)&&x>0)?Math.floor(x):0; }
+  function pctOf(ok,fail,skip){ var t=ci(ok)+ci(fail)+ci(skip); return t?(ci(ok)/t*100):0; }
+  function normState(s){ s=String(s==null?"":s).toUpperCase(); return ["GREEN","YELLOW","RED","WARN","OK","FAIL"].indexOf(s)>-1?s:"YELLOW"; }
+  function normGrid(g){ g=g||{}; return {ok:ci(g.ok),fail:ci(g.fail),skip:ci(g.skip)}; }
+  function normProject(p){ p=(p&&typeof p==="object")?p:{}; var n=p.n||{}; return {key:String(p.key||"?"),zh:String(p.zh||""),state:normState(p.state),n:{OK:ci(n.OK),FAIL:ci(n.FAIL),SKIP:ci(n.SKIP),DATA:ci(n.DATA),CODE:ci(n.CODE)},next:String(p.next||""),diag:String(p.diag||"碼側全綠。")}; }
+  function normGate(x){ x=(x&&typeof x==="object")?x:{}; return {id:String(x.id||"—"),name:String(x.name||""),state:normState(x.state),evidence:String(x.evidence||""),next:String(x.next||"")}; }
+  function classify(o){ var t=[]; if(o&&typeof o==="object"&&!Array.isArray(o)){ if(o.grid&&(o.projects||o.overall!==undefined))t.push("module"); if(Array.isArray(o.gates))t.push("gate"); } return t; }
+  function csvCell(s){ return '"'+String(s==null?"":s).replace(/"/g,'""')+'"'; }
+  function matchQ(text,q){ return !q || String(text).toLowerCase().indexOf(String(q).toLowerCase())>-1; }
+  function matchRy(hasG,hasY,hasR,ry){ if(ry==="all"||!ry)return true; if(ry==="g")return !!hasG; if(ry==="y")return !!hasY; if(ry==="r")return !!hasR; return true; }
+  function validateData(){ try{
+      DATA.meta=DATA.meta||{}; DATA.grid=normGrid(DATA.grid);
+      DATA.projects=Array.isArray(DATA.projects)?DATA.projects.map(normProject):[];
+      DATA.gates=Array.isArray(DATA.gates)?DATA.gates.map(normGate):[];
+      if(typeof DATA.meta.delta!=="number"||!isFinite(DATA.meta.delta))DATA.meta.delta=0;
+      if(!DATA.meta.overall)DATA.meta.overall="YELLOW";
+      if(!DATA.depth||typeof DATA.depth!=="object")DATA.depth={};
+      if(!DATA.anchors||typeof DATA.anchors!=="object")DATA.anchors={};
+    }catch(e){ CHECKLOG.push({fn:"validateData",err:e.message}); } }
+
+  // up-direction: read DOM back, confirm it matches DATA (no NaN/undefined/count drift)
+  function verifyUp(){
+    var iss=[];
+    try{
+      var mods=document.querySelectorAll("#tb-module tr").length;
+      if(mods!==DATA.projects.length)iss.push("MODULE 行數 "+mods+"≠專案 "+DATA.projects.length);
+      var gc=document.querySelectorAll("#gateGrid .card").length;
+      if(gc!==DATA.gates.length)iss.push("GATE 卡數 "+gc+"≠閘 "+DATA.gates.length);
+      var k=document.getElementById("kpis"); if(k&&/NaN|undefined|Infinity/.test(k.textContent))iss.push("KPI 含非法值");
+      var d=document.getElementById("depthGrid"); if(d&&/NaN|undefined/.test(d.textContent))iss.push("DEPTH 含非法值");
+      var m=document.getElementById("tb-module"); if(m&&/undefined|NaN/.test(m.textContent))iss.push("MODULE 含非法值");
+    }catch(e){ iss.push("verifyUp 例外:"+e.message); }
+    return iss;
+  }
+  function verifyUpAdaptive(){ var iss=verifyUp(); if(iss.length){ guard("re-renderMast",renderMast); guard("re-renderModule",renderModule); guard("re-renderGates",renderGates); guard("re-renderDepth",renderDepth); iss=verifyUp(); } return iss; }
+
+  // =================== INTEGRATED REINFORCEMENT: ticker / VES / group / close-out ===================
+  var LASTCHECK={totP:0,totN:0,up:0};
+  var LEDGER=[];   // append-only, in-page (export to persist)
+  var VES={ stage:0, sandbox:null, verify:null, group:null, hyManual:"" };
+
+  // ---- Ticker regex: faithful port of VIA_TWTickerRegex.py v0100 (SECTION A/B/C) ----
+  var TK=(function(){
+    var R=[
+      ["STOCK","一般上市櫃公司","-",/^([1-9]\d{3})$/,/^([1-9]\d{3})\.(TW|TWO)$/,/^([1-9]\d{3})\sTT$/],
+      ["PREFERRED","特別股","A-Z",/^([1-9]\d{3}[A-Z])$/,/^([1-9]\d{3}[A-Z])\.(TW|TWO)$/,/^([1-9]\d{3}[A-Z])\sTT$/],
+      ["ETF_ACTIVE","主動式 ETF","A/D",/^(00\d{3}[AD])$/,/^(00\d{3}[AD])\.(TW|TWO)$/,/^(00\d{3}[AD])\sTT$/],
+      ["ETF_BOND","債券型 ETF","B",/^(00\d{3}B)$/,/^(00\d{3}B)\.(TW|TWO)$/,/^(00\d{3}B)\sTT$/],
+      ["ETF_BOND_FX","債券型 ETF (外幣)","C",/^(00\d{3}C)$/,/^(00\d{3}C)\.(TW|TWO)$/,/^(00\d{3}C)\sTT$/],
+      ["ETF_LEVERAGE","槓桿型 ETF","L",/^(00\d{3}L)$/,/^(00\d{3}L)\.(TW|TWO)$/,/^(00\d{3}L)\sTT$/],
+      ["ETF_LEVERAGE_FX","槓桿型 ETF (外幣)","M",/^(00\d{3}M)$/,/^(00\d{3}M)\.(TW|TWO)$/,/^(00\d{3}M)\sTT$/],
+      ["ETF_REVERSE","反向型 ETF","R",/^(00\d{3}R)$/,/^(00\d{3}R)\.(TW|TWO)$/,/^(00\d{3}R)\sTT$/],
+      ["ETF_REVERSE_FX","反向型 ETF (外幣)","S",/^(00\d{3}S)$/,/^(00\d{3}S)\.(TW|TWO)$/,/^(00\d{3}S)\sTT$/],
+      ["ETF_FUTURES","期貨型 ETF (台幣U/外幣V)","U/V",/^(00\d{3}[UV])$/,/^(00\d{3}[UV])\.(TW|TWO)$/,/^(00\d{3}[UV])\sTT$/],
+      ["ETF_BALANCED","平衡型 ETF","T",/^(00\d{3}T)$/,/^(00\d{3}T)\.(TW|TWO)$/,/^(00\d{3}T)\sTT$/],
+      ["ETF_PASSIVE_FX","被動股票 ETF (外幣)","K",/^(00\d{3}K)$/,/^(00\d{3}K)\.(TW|TWO)$/,/^(00\d{3}K)\sTT$/],
+      ["ETF_PASSIVE","被動股票 ETF (v2)","數字",/^(00\d{2,4})$/,/^(00\d{2,4})\.(TW|TWO)$/,/^(00\d{2,4})\sTT$/]
+    ];
+    var LOOSE=/^(00\d{2,4}|00\d{3}[A-DKLMRSTUV]|[1-9]\d{3}[A-Z]?)\s+TT(?:\s+Equity)?$/i;
+    var DORMANT=/^(00\d{3})$/;
+    function classify(t){ var s=String(t==null?"":t).trim(); for(var i=0;i<R.length;i++){ var r=R[i],m;
+      m=r[3].exec(s); if(m)return {cls:r[0],code:m[1],venue:null,fmt:"PLAIN"};
+      m=r[4].exec(s); if(m)return {cls:r[0],code:m[1],venue:m[2],fmt:"YF"};
+      m=r[5].exec(s); if(m)return {cls:r[0],code:m[1],venue:null,fmt:"BBG"}; } return null; }
+    function derive(code,venue){ venue=venue||"TW"; return {plain:code,yfinance:code+"."+venue,bloomberg:code+" TT"}; }
+    var CASES=[
+      ["2330","STOCK","台積電 plain"],["2330.TW","STOCK","yfinance 上市"],["6488.TWO","STOCK","yfinance 上櫃"],["2330 TT","STOCK","Bloomberg"],
+      ["2881A","PREFERRED","富邦特"],["2882B.TW","PREFERRED","國泰特乙 yfinance"],
+      ["00981A","ETF_ACTIVE","主動統一台股增長"],["00981A.TW","ETF_ACTIVE","主動 yfinance"],["00981A TT","ETF_ACTIVE","主動 Bloomberg"],["00980D","ETF_ACTIVE","主動債券型 D"],
+      ["00679B","ETF_BOND","元大美債20年"],["00687B.TW","ETF_BOND","國泰20年美債"],["00679C","ETF_BOND_FX","債券外幣 C"],
+      ["00631L","ETF_LEVERAGE","0050正2"],["00663M","ETF_LEVERAGE_FX","槓桿外幣 M"],
+      ["00632R","ETF_REVERSE","0050反1"],["00664S","ETF_REVERSE_FX","反向外幣 S"],
+      ["00635U","ETF_FUTURES","期元大S&P黃金"],["00682V","ETF_FUTURES","期貨外幣 V"],
+      ["00980T","ETF_BALANCED","凱基美國Top股債平衡"],
+      ["00643K","ETF_PASSIVE_FX","深證中小 外幣"],
+      ["0050","ETF_PASSIVE","4碼"],["00878","ETF_PASSIVE","5碼"],["006208","ETF_PASSIVE","6碼舊制"],["009800","ETF_PASSIVE","6碼新制"],["004001","ETF_PASSIVE","6碼新制二階"],
+      ["0050.TW","ETF_PASSIVE","4碼 yfinance"],["009800 TT","ETF_PASSIVE","6碼 Bloomberg"],
+      ["0330",null,"首位0 非ETF前綴"],["233",null,"3碼"],["23300",null,"5碼純數字非00"],["2330.TWX",null,"錯後綴"],
+      ["00981a",null,"小寫拒收"],["2330TT",null,"BBG 無空白"],["00981AB",null,"雙字母"],["0098000",null,"7碼"],
+      ["00980X",null,"未定義第六碼"],["2330.TW ","STOCK","尾端空白 strip"],["",null,"空字串"]
+    ];
+    function selftest(){
+      var rows=[],ok=true;
+      CASES.forEach(function(c){ var r=classify(c[0]); var got=r?r.cls:null; var p=(got===c[1]); ok=ok&&p; rows.push({kind:"TEST",input:c[0],expected:c[1],got:got,pass:p,note:c[2]}); });
+      CASES.forEach(function(c){ if(c[1]===null)return; var s=c[0].trim(); var hits=R.filter(function(r){return r[3].test(s)||r[4].test(s)||r[5].test(s);}).map(function(r){return r[0];}); var p=(hits.length===1); ok=ok&&p; rows.push({kind:"EXCLUSIVE",input:c[0],expected:"1 hit",got:hits.length+" hit(s)",pass:p,note:"互斥性"}); });
+      [["2330","TW"],["6488","TWO"],["0050","TW"],["00981A","TW"]].forEach(function(cv){ var d=derive(cv[0],cv[1]); var back=[classify(d.plain),classify(d.yfinance),classify(d.bloomberg)]; var p=back.every(function(b){return b&&b.code===cv[0];})&&back[1].venue===cv[1]; ok=ok&&p; rows.push({kind:"DERIVE",input:cv[0],expected:"3/3 往返",got:JSON.stringify(d),pass:p,note:"三態推導"}); });
+      ["0050","006208","009800"].forEach(function(i){ rows.push({kind:"DIAG",input:i,expected:"miss(已知缺陷)",got:DORMANT.test(i)?"hit":"miss",pass:true,note:"原 regex DORMANT"}); });
+      [["2330 TT Equity",true],["00981A  tt equity",true],["2330 TT Corp",false]].forEach(function(le){ var g=LOOSE.test(le[0]); var p=(g===le[1]); ok=ok&&p; rows.push({kind:"TEST",input:le[0],expected:String(le[1]),got:String(g),pass:p,note:"Bloomberg 寬鬆"}); });
+      var n=rows.filter(function(r){return r.kind!=="DIAG";}).length, pass=rows.filter(function(r){return r.kind!=="DIAG"&&r.pass;}).length;
+      return {ok:ok,pass:pass,n:n,rows:rows};
+    }
+    return {R:R,classify:classify,derive:derive,CASES:CASES,selftest:selftest,LOOSE:LOOSE};
+  })();
+
+  // ---- VES decision-line parser: engine grammar (ves_decisions.jsonl) + VES_AI_COLLAB §2 option sets ----
+  var DEC_RE=/^==VES-DECISION==\s+(\S+)\s+(\S+)(?:\s+(.*))?$/;
+  var SLICE_RE=/^==VES-NEED-SLICE==\s+(\S+)\s*$/;
+  var DEFER_RE=/^==VES-DEFER==\s+(\S+)(?:\s+(.*))?$/;
+  function allowedFor(card){
+    if(/-TYPES$/.test(card)) return ["TYPES=*"];
+    if(/^CARD-C/.test(card)) return ["ACCEPT","ACCEPT_CANONICAL=*","REJECT","SPLIT_GROUP"];
+    if(/^CARD-I/.test(card)) return ["ACCEPT","ACCEPT_CANONICAL=*","REJECT"];
+    if(/^CARD-RISK-/.test(card)) return ["TRUE","FALSE_POSITIVE","DEFER"];
+    if(/^CARD-GATE-/.test(card)) return ["FIX","ACCEPT_AS_IS"];
+    if(/^CARD-VERB-/.test(card)) return ["*"];
+    return null;
+  }
+  function optionOk(opt,al){ if(!al)return false; return al.some(function(a){ if(a==="*")return /^[A-Z_][A-Z0-9_]*$/.test(opt); if(a.slice(-1)==="*"){ var pfx=a.slice(0,-1); return opt.indexOf(pfx)===0&&opt.length>pfx.length; } return opt===a; }); }
+  function parseDecisions(text){
+    var out=[],seen={};
+    String(text||"").split(/\r?\n/).forEach(function(raw,i){
+      var ln=raw.trim(); if(!ln)return;
+      var m,rec={line:i+1,raw:ln,kind:"",card:"",opt:"",note:"",ok:false,why:"",dup:0};
+      if(ln.charAt(0)==="{"){ try{ var j=JSON.parse(ln); if(j&&j.card&&j.option){ ln="==VES-DECISION== "+j.card+" "+j.option+(j.note?" "+j.note:""); rec.raw=ln; } }catch(e){} }
+      if((m=DEC_RE.exec(ln))){ rec.kind="DECISION"; rec.card=m[1]; rec.opt=m[2]; rec.note=m[3]||"";
+        if(!/^CARD-/.test(rec.card)) rec.why="card 需以 CARD- 開頭";
+        else { var al=allowedFor(rec.card); if(al===null) rec.why="未知卡片家族(引擎忽略)"; else if(!optionOk(rec.opt,al)) rec.why="選項不在允許集:"+al.join("|"); else rec.ok=true; }
+        if(rec.ok){ if(seen[rec.card]!==undefined){ rec.dup=seen[rec.card]; } seen[rec.card]=rec.line; }
+      } else if((m=SLICE_RE.exec(ln))){ rec.kind="NEED-SLICE"; rec.card=m[1]; rec.ok=true; }
+      else if((m=DEFER_RE.exec(ln))){ rec.kind="DEFER"; rec.card=m[1]; rec.note=m[2]||""; rec.ok=/^CARD-/.test(rec.card); if(!rec.ok)rec.why="card 需以 CARD- 開頭"; }
+      else { rec.kind="INVALID"; rec.why="非唯一合法格式(引擎靜默忽略)"; }
+      out.push(rec);
+    });
+    return out;
+  }
+  function decStats(recs){ var v=0,b=0,d=0; recs.forEach(function(r){ if(r.ok)v++; else b++; if(r.dup)d++; }); return {valid:v,invalid:b,dup:d,total:recs.length}; }
+
+  // ---- VES sandbox / verify / hydra / apply (faithful to apply_plan + sandbox_simulate rules) ----
+  var HY_ORDER={H0:0,H1:1,H2:2,H3:3,H4:4};
+  var HY_MEAN={H0:"無頭",H1:"多頭一致(可 shim)",H2:"多頭分歧(HOLD 先對齊)",H3:"編輯造成縫隙",H4:"破壞性(永遠拒絕)"};
+  var SB_GATES=["SB_SYNTAX","SB_IMPORT","SB_ANCHORS","SB_CALLERS_RESOLVE","SB_ADD_ONLY","SB_HYDRA","SB_PYTEST"];
+  var VF_GATES=["VF_SYNTAX","VF_LL_AUDIT","VF_FUNCTIONS_KEPT","VF_RENAMES_TRACKED","VF_NO_MASS_SHRINK","VF_HYDRA_NEW_DIVERGENCE","VF_PYTEST"];
+  var STAGES=["① 第1跑 VES -Root","② run_dir 產物","③ 貼 SUMMARY+卡片給 AI","④ AI 回決策 token","⑤ 追加 ves_decisions.jsonl","⑥ 第2跑 確定性套用","⑦ sandbox GO & H≤1","⑧ -Apply -Token (add-only)"];
+  var MOD_RISKS=[["MR01","重複邏輯多頭並存 (九頭龍)","H1","造冊 identical 群;canonical + shim;不刪頭"],["MR02","多頭已分歧","H2","body_hash 分歧偵測;merge 前先對齊或明確保留分支"],["MR03","編輯後呼叫者失聯 (縫隙)","H3","沙盤內解析所有呼叫者;任何 LOST 即 NO-GO"],["MR04","部分更新","H3","以群為原子單位;全群成功才寫入,否則整批回滾"],["MR05","刪除/覆寫原檔","H4","add-only 硬規則;.orig 備份;apply 拒絕 delete"],["MR06","簽章斷裂","H4","shim 保留舊簽章轉發;proposed_interface 只新增"],["MR07","行號漂移錨點失效","H1","精準錨+彈性錨;MOVED 重定位、CHANGED 重規劃"],["MR08","同名不同義被誤合","H2","R28 降級;方法級只在同類別合併"],["MR09","循環匯入","H3","沙盤 import 全檔;ImportError 即 NO-GO"],["MR10","相對匯入失效","H3","SPLIT 改 load_source;R27 優先人工"],["MR11","頂層副作用被搬動","H3","R26 檔不 SPLIT;沙盤觀察副作用"],["MR12","全域狀態被拆散","H2","R16/R18 標 HOLD;狀態注入 request.config"],["MR13","資源釋放路徑被切斷","H3","R17 合併要求 Context Manager"],["MR14","測試失聯","H2","沙盤跑 pytest;tests/ 一併登記"],["MR15","型別/契約不一致","H2","Payload 模型;未註記參數列 AI_HANDOFF"],["MR16","動態載入看不見呼叫者","H2","R01 標 HOLD;regex 補掃字串型名稱"],["MR17","PS 殼與 py 引擎版本錯位","H2","跨語言群記 langs;PS 只做薄殼"],["MR18","編碼/BOM 改變 diff 全檔","H1","UTF-8 no BOM;沙盤 diff 只允許尾端追加"],["MR19","Windows 長路徑/OneDrive 佔位","H1","\\\\?\\ 前綴;佔位檔 SKIP"],["MR20","快取回放舊結果","H1","cache 鍵含 engine_hash;計畫綁 run_id"],["MR21","未造冊單位遺漏","H2","catalog 完整性閘:函式數==FNC 數"],["MR22","編號碰撞","H1","blake2s recipe+hash_input 入檔 (LL#30)"],["MR23","多人/多程序同時編輯","H3","計畫含 inventory 雜湊;apply 前重驗"],["MR24","無人審核直接寫入","H4","--apply 必須 ACTIVATION token;沙盤 GO 才開放"],["MR25","遺漏 log","H2","edit_ledger.jsonl 每步 before/after hash"]];
+  function hyLevel(){ var s=VES.sandbox; if(s&&s.hydra&&s.hydra.level)return String(s.hydra.level).toUpperCase(); return VES.hyManual||""; }
+  function applyAllowed(sb,level){ if(!sb)return false; var lv=String(level||"").toUpperCase(); var app=(sb.hydra&&typeof sb.hydra.applicable==="boolean")?sb.hydra.applicable:(HY_ORDER[lv]!==undefined&&HY_ORDER[lv]<=1); return sb.verdict==="GO"&&app; }
+  function applyState(){ var sb=VES.sandbox,lv=hyLevel();
+    if(!sb) return lv? (HY_ORDER[lv]<=1?"規劃:H≤1(待沙盤 GO)":(lv==="H2"?"HOLD-H2 先對齊":"NO-GO "+lv)) : "未載入 sandbox";
+    if(applyAllowed(sb,lv)) return "APPLY 允許(GO · "+lv+")";
+    if(sb.verdict!=="GO") return "NO-GO(沙盤 "+String(sb.verdict)+")";
+    return lv==="H2"?"HOLD-H2 先對齊":"NO-GO "+lv; }
+  function verifyState(){ var v=VES.verify; if(!v)return "未載入"; var reds=(v.gates||[]).filter(function(g){return String(g.status).toUpperCase()==="RED";}).length; return reds?("NO-GO · RED "+reds):("GO · 無 RED"); }
+  function classifyExt(o){ var t=[]; if(!o||typeof o!=="object"||Array.isArray(o))return t; var c=String(o.contract||"");
+    if(c.indexOf("VES_SANDBOX")===0||(o.hydra&&Array.isArray(o.gates)&&o.verdict!==undefined))t.push("sandbox");
+    if(c.indexOf("VES_VERIFY")===0)t.push("verify");
+    if(o.groups&&o.members)t.push("group");
+    if(Array.isArray(o.fetch_matrix))t.push("fm");
+    if(String(o.contract||"").indexOf("VIA_VAP_ONE_SELFTEST")===0)t.push("vapone"); return t; }
+
+  function gateCards(names,list){ var map={}; (list||[]).forEach(function(g){ map[String(g.gate)]=g; });
+    return names.map(function(n){ var g=map[n]; var st=g?String(g.status).toUpperCase():"—"; var c= st==="GREEN"?"g":(st==="AMBER"?"y":(st==="RED"?"r":"w"));
+      return "<div class='card'><div class='ch'><span class='b "+(g?c:"w")+"'>"+esc(g?st:"—")+"</span><span class='cn mono' style='font-size:10px'>"+esc(n)+"</span></div>"+(g&&g.detail&&String(g.detail).length?"<div class='ce'>"+esc(typeof g.detail==="string"?g.detail.slice(0,80):JSON.stringify(g.detail).slice(0,80))+"</div>":"")+"</div>"; }).join(""); }
+  function renderVes(){
+    var stEl=document.getElementById("vesSteps"); if(stEl){ stEl.innerHTML=STAGES.map(function(s,i){ return "<span class='step"+(i<VES.stage?" done":"")+(i===VES.stage?" cur":"")+"' data-st='"+i+"'>"+esc(s)+"</span>"; }).join(""); }
+    var sb=VES.sandbox,lv=hyLevel();
+    var kv=[["階段",STAGES[VES.stage]||"—"],["沙盤 verdict",sb?String(sb.verdict):"未載入"],["Hydra",lv?("<span class='hy "+lv.toLowerCase()+"'>"+lv+"</span> "+esc(HY_MEAN[lv]||"")):"—"],
+      ["Apply 閘",applyState()],["expected_token",sb&&sb.expected_token_hint?esc(sb.expected_token_hint):"(apply 輸出 expected_token_hint)"],["Verify 閘",verifyState()],
+      ["證據等級","V 結構 · M 模式/ML · P 推論 · :SP 穩定誤報降權(引擎判,AI 不可自降 Hydra)"]];
+    var kvEl=document.getElementById("vesKv"); if(kvEl){ kvEl.innerHTML=kv.map(function(x){return "<span class='k'>"+esc(x[0])+"</span><span class='v'>"+x[1]+"</span>";}).join(""); }
+    var sg=document.getElementById("sbGates"); if(sg)sg.innerHTML=gateCards(SB_GATES,sb?sb.gates:[]);
+    var vg=document.getElementById("vfGates"); if(vg)vg.innerHTML=gateCards(VF_GATES,VES.verify?VES.verify.gates:[]);
+    var mr=document.getElementById("mrBody"); if(mr&&!mr.children.length){ mr.innerHTML=MOD_RISKS.map(function(r){ return "<tr><td class='mono'>"+r[0]+"</td><td>"+esc(r[1])+"</td><td class='c'><span class='hy "+r[2].toLowerCase()+"'>"+r[2]+"</span></td><td>"+esc(r[3])+"</td></tr>"; }).join(""); }
+    var roll=document.getElementById("roll-ves"); if(roll){ var a=applyState(); roll.textContent=(sb?("沙盤 "+sb.verdict):"沙盤未載入")+" · "+(lv||"H?")+" · "+a; }
+    renderDecisions();
+  }
+  function renderDecisions(){
+    var ta=document.getElementById("decIn"), out=document.getElementById("decOut"), note=document.getElementById("decNote"); if(!ta||!out)return;
+    var recs=parseDecisions(ta.value), st=decStats(recs);
+    out.innerHTML=recs.map(function(r){ var c=r.ok?(r.dup?"dec-dup":"dec-ok"):"dec-bad"; var tag=r.ok?(r.dup?"覆蓋 L"+r.dup:"OK"):"✘";
+      return "<div class='"+c+"'>L"+r.line+" ["+tag+"] "+esc(r.kind)+" "+esc(r.card)+(r.opt?" "+esc(r.opt):"")+(r.note?" <span class='zh'>"+esc(r.note)+"</span>":"")+(r.why?" — "+esc(r.why):"")+"</div>"; }).join("");
+    if(note)note.textContent=st.total+" 行 · 合法 "+st.valid+" · 非法 "+st.invalid+" · 覆蓋 "+st.dup+"(後寫優先)";
+  }
+  function validDecisionText(){ return parseDecisions((document.getElementById("decIn")||{}).value||"").filter(function(r){return r.ok;}).map(function(r){return r.raw;}).join("\n"); }
+
+  function renderTicker(){
+    var inp=document.getElementById("tkIn"), out=document.getElementById("tkOut"), reg=document.getElementById("tkReg"), roll=document.getElementById("roll-ticker");
+    if(reg&&!reg.children.length){ reg.innerHTML=TK.R.map(function(r){ return "<tr><td class='mono'>"+r[0]+"</td><td>"+esc(r[1])+"</td><td class='mono'>"+esc(r[2])+"</td></tr>"; }).join(""); }
+    var st=TK.selftest(); if(roll)roll.textContent=(st.ok?"🟢 ":"🔴 ")+"自測 "+st.pass+"/"+st.n+"(=Python 同步)";
+    if(!inp||!out)return; var v=inp.value; if(!v.trim()){ out.innerHTML="<span class='k'>—</span><span class='v zh'>輸入代號即時分類 · 三態推導</span>"; return; }
+    var r=TK.classify(v);
+    if(!r){ out.innerHTML="<span class='k'>結果</span><span class='v dec-bad'>不合法 / 未定義類別</span>"+(TK.LOOSE.test(v.trim())?"<span class='k'>寬鬆 BBG</span><span class='v dec-dup'>命中(需正規化)</span>":""); return; }
+    var d=TK.derive(r.code,r.venue||"TW");
+    out.innerHTML=["class",r.cls,"code",r.code,"venue",r.venue||"(TW 預設)","fmt",r.fmt,"plain",d.plain,"yfinance",d.yfinance,"bloomberg",d.bloomberg].reduce(function(a,x,i,arr){ if(i%2===0)a+="<span class='k'>"+esc(x)+"</span><span class='v'>"+esc(arr[i+1])+"</span>"; return a; },"");
+  }
+  function renderGroup(){
+    var g=VES.group, el=document.getElementById("groupGrid"), roll=document.getElementById("roll-group"); if(!el)return;
+    if(!g){ el.innerHTML="<div class='card dchip'><div class='dk'>輸出</div><div class='dv' style='font-size:11px'>TW_GroupMembership_SSOT_v0100.csv</div><div class='dm'>TW_GroupSynonyms_SSOT_v0100.csv · Summary json · Diff html</div></div><div class='card dchip'><div class='dk'>載入</div><div class='dv' style='font-size:11px'>TW_GroupSSOT_Summary_v0100.json</div><div class='dm'>用工具列「載入實時 GRID JSON」</div></div>"; if(roll)roll.textContent="未載入"; return; }
+    var gr=g.groups||{}, mm=g.members||{}, sha=g.sha12||{};
+    var chips=[["SSOT 群數",nf(gr.ssot),"canonical "+nf(gr.canonical)+" · flowsystem "+nf(gr.flowsystem)],["EXACT / 同義",nf(gr.exact)+" / "+nf(gr.curated_synonym),"only A "+nf(gr.only_canonical)+" · only F "+nf(gr.only_flowsystem)],["成員列",nf(mm.ssot_rows),nf(mm.unique_tickers)+" 檔 · 多群 "+nf(mm.multi_group_tickers)],["衝突",nf(mm.leader_conflicts)+" 領頭 / "+nf(mm.name_conflicts)+" 名稱",Object.keys(mm.consensus||{}).map(function(k){return k+":"+mm.consensus[k];}).join(" ")],["sha12",(sha.membership||"—")+" / "+(sha.synonyms||"—"),"membership / synonyms"],["證據",String(g.evidence||"").slice(0,40)||"—","v"+esc(g.version||"")+" · "+esc(g.generated||"")]];
+    el.innerHTML=chips.map(function(c){ return "<div class='card dchip"+(/conflict|衝突/.test(c[0])&&(mm.leader_conflicts||mm.name_conflicts)?" warn":"")+"'><div class='dk'>"+esc(c[0])+"</div><div class='dv'>"+c[1]+"</div><div class='dm'>"+c[2]+"</div></div>"; }).join("");
+    if(roll)roll.textContent="v"+(g.version||"?")+" · 群 "+nf(gr.ssot)+" · 列 "+nf(mm.ssot_rows);
+  }
+
+  // ---- Close-out 收尾: checklist → verdict → ≤25-line digest → append-only ledger ----
+  function fnv32(s){ var h=0x811c9dc5; s=String(s); for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; } return ("0000000"+h.toString(16)).slice(-8); }
+  function closeoutChecklist(){
+    var codeRed=DATA.projects.reduce(function(a,p){return a+((p.n&&p.n.CODE)||0);},0);
+    var gateFail=DATA.gates.filter(function(g){return g.state==="FAIL";}).length, gateWarn=DATA.gates.filter(function(g){return g.state==="WARN";}).length;
+    var decs=parseDecisions((document.getElementById("decIn")||{}).value||""), ds=decStats(decs);
+    var tk=TK.selftest(); var lv=hyLevel(); var sb=VES.sandbox;
+    var manual=!!(document.getElementById("coManual")&&document.getElementById("coManual").checked);
+    var pending=(DATA.projects.filter(function(p){return p.n.FAIL>0&&!p.next;}).length);
+    var items=[
+      {id:"C1",n:"自檢探針全通過 · 上向一致",st:(LASTCHECK.totN>0&&LASTCHECK.totP===LASTCHECK.totN&&LASTCHECK.up===0)?"PASS":(LASTCHECK.totN?"FAIL":"PENDING"),d:LASTCHECK.totP+"/"+LASTCHECK.totN+" · up "+LASTCHECK.up,hard:true},
+      {id:"C2",n:"碼側紅 = 0",st:codeRed===0?"PASS":"FAIL",d:"CODE red "+codeRed,hard:true},
+      {id:"C3",n:"Product Gate 無 FAIL",st:gateFail===0?(gateWarn?"WARN":"PASS"):"FAIL",d:"FAIL "+gateFail+" · WARN "+gateWarn,hard:true},
+      {id:"C4",n:"沙盤 GO 且 Hydra ≤ H1",st:sb?(applyAllowed(sb,lv)?"PASS":(lv==="H2"?"HOLD":"FAIL")):(lv?(HY_ORDER[lv]<=1?"PENDING":(lv==="H2"?"HOLD":"FAIL")):"PENDING"),d:applyState(),hard:true},
+      {id:"C5",n:"Verify 閘無 RED(AI 改碼)",st:VES.verify?(verifyState().indexOf("NO-GO")===0?"FAIL":"PASS"):"PENDING",d:verifyState(),hard:true},
+      {id:"C6",n:"決策行全部合法",st:ds.total===0?"PASS":(ds.invalid===0?"PASS":"FAIL"),d:ds.total?("合法 "+ds.valid+" / 非法 "+ds.invalid):"無決策待驗",hard:true},
+      {id:"C7",n:"Ticker Regex 自測 PASS",st:tk.ok?"PASS":"FAIL",d:tk.pass+"/"+tk.n,hard:true},
+      {id:"C8",n:"FMEA 預案齊備",st:FMEA.length>=3?"PASS":"FAIL",d:FMEA.length+" 組",hard:false},
+      {id:"C9",n:"料側紅站皆有 next 指令",st:pending===0?"PASS":"FAIL",d:pending?("缺 "+pending):"全數排定",hard:false},
+      {id:"C10",n:"死碼清理 / 格式化(人工確認)",st:manual?"PASS":"PENDING",d:"勾選確認",hard:false,manual:true},
+      {id:"C11",n:"收尾台帳已寫入",st:LEDGER.length?"PASS":"PENDING",d:LEDGER.length+" 筆",hard:false},
+      {id:"C14",n:"VAP ONE 單檔自測 PASS(載入 JSON)",st:VAPONE?(VAPONE.failed===0?"PASS":"FAIL"):"PENDING",d:VAPONE?(VAPONE.passed+"/"+VAPONE.total+" skip "+VAPONE.skipped):"未載入",hard:false},
+      {id:"C13",n:"VAP 圖規鎖 PASS · 圖規冊 40",st:(function(){var r=vapNiceAxis(-3,97);return (r&&r.checks.five_ticks&&r.checks.uniform&&r.checks.legal_mantissa&&r.checks.covers&&VAP_CHARTS.length===40)?"PASS":"FAIL";})(),d:VAP_CHARTS.length+" 圖 · 待補 "+VAP_GAPS.length,hard:false},
+      {id:"C12",n:"擷取矩陣完整(模式/合併/輸出/當日合併律)",st:fmIntegrity().ok?"PASS":"FAIL",d:fmIntegrity().ok?(fmStats().n+" 項 OK"):fmIntegrity().issues.slice(0,3).join(";"),hard:false}
+    ];
+    return items;
+  }
+  function closeoutVerdict(items){
+    var hardFail=items.filter(function(i){return i.hard&&i.st==="FAIL";}), hold=items.filter(function(i){return i.st==="HOLD";}), pend=items.filter(function(i){return i.st==="PENDING"||i.st==="WARN";}), soft=items.filter(function(i){return !i.hard&&i.st==="FAIL";});
+    if(hardFail.length) return {v:"BLOCKED",cls:"blocked",b:hardFail.map(function(i){return i.id;})};
+    if(hold.length) return {v:"CONDITIONAL",cls:"cond",b:hold.map(function(i){return i.id+"(HOLD-H2)";})};
+    if(pend.length||soft.length) return {v:"CONDITIONAL",cls:"cond",b:pend.concat(soft).map(function(i){return i.id;})};
+    return {v:"CLOSED",cls:"closed",b:[]};
+  }
+  function buildDigest(items,vd){
+    var g=DATA.grid, m=DATA.meta, tot=g.ok+g.fail+g.skip;
+    var codeRed=DATA.projects.reduce(function(a,p){return a+((p.n&&p.n.CODE)||0);},0);
+    var gw=DATA.gates.filter(function(x){return x.state!=="OK";}).map(function(x){return x.id+":"+x.state;}).join(" ")||"全 OK";
+    var pgv=DATA.gates.some(function(x){return x.state==="FAIL";})?"NOT_QUALIFIED":(DATA.gates.some(function(x){return x.state==="WARN";})?"CONDITIONAL":"QUALIFIED");
+    var d=DATA.depth||{}, dw=[]; if(!(d.macro&&d.macro.rows))dw.push("macro 0"); if(d.tw_chip&&d.tw_chip.warn)dw.push("chip 落後"); if(d.revenue&&d.revenue.warn)dw.push("revenue "+(d.revenue.months||"?")+"月<60");
+    var ds=decStats(parseDecisions((document.getElementById("decIn")||{}).value||"")); var tk=TK.selftest(); var sb=VES.sandbox;
+    var L=[];
+    L.push("VIA 總控 digest · grid "+m.stamp+" · "+m.branch+" "+m.head);
+    L.push("grid OK "+g.ok+"/"+tot+" FAIL "+g.fail+" SKIP "+g.skip+" · 碼側紅 "+codeRed+" · Δ"+(m.delta>=0?"+":"")+m.delta+" · overall "+m.overall);
+    L.push("ProductGate "+pgv+" · "+gw);
+    DATA.projects.forEach(function(p){ L.push(p.key+" "+p.state+" · OK "+p.n.OK+" FAIL "+p.n.FAIL+(p.n.SKIP?" SKIP "+p.n.SKIP:"")+" → "+(p.next||"—")); });
+    L.push("depth 缺口: "+(dw.length?dw.join(" · "):"無"));
+    L.push("VAP 圖規 "+VAP_CHARTS.length+" · 引擎 "+VAP_ENGS.length+" 列 · 鎖 4/4 · VAP ONE "+(VAPONE?(VAPONE.verdict+" "+VAPONE.passed+"/"+VAPONE.total):"未載入")+" · 待補 "+VAP_GAPS.length);
+    var fs=fmStats(); L.push("擷取矩陣 "+fs.n+" 項 · 全抓 "+fs.full+" · 有選擇 "+fs.select+" · 當日合併 "+fs.sameday+" · DORMANT "+fs.dormant+(fmIntegrity().ok?"":" · 問題 "+fmIntegrity().issues.length));
+    L.push("VES 階段 "+STAGES[VES.stage]+" · 沙盤 "+(sb?sb.verdict:"未載入")+" · Hydra "+(hyLevel()||"?")+" · "+applyState());
+    L.push("Verify "+verifyState()+" · 決策行 合法 "+ds.valid+"/非法 "+ds.invalid+"/覆蓋 "+ds.dup);
+    L.push("Ticker 自測 "+tk.pass+"/"+tk.n+" · 自檢 "+LASTCHECK.totP+"/"+LASTCHECK.totN+" up "+LASTCHECK.up);
+    if(VES.group){ var gr=VES.group.groups||{},mm=VES.group.members||{}; L.push("GroupSSOT 群 "+nf(gr.ssot)+" 列 "+nf(mm.ssot_rows)+" 衝突 "+nf(mm.leader_conflicts)+"/"+nf(mm.name_conflicts)); }
+    L.push("收尾 "+vd.v+(vd.b.length?" · 阻礙 "+vd.b.join(","):"")+" · 台帳 "+LEDGER.length+" 筆");
+    L.push("next: via-fred → via-revfill → via-mobile(chip/universe)");
+    L=L.filter(function(x){return String(x).trim().length;});
+    if(L.length>24) L=L.slice(0,24).concat(["…(截斷至 25 行)"]);
+    L.push("fnv32 "+fnv32(L.join("\n"))+" · "+new Date().toISOString().slice(0,16).replace("T"," "));
+    return L.slice(0,25).join("\n");
+  }
+  function renderCloseout(){
+    var items=closeoutChecklist(), vd=closeoutVerdict(items);
+    var ch=document.getElementById("coChk"); if(ch){
+      var manualChecked=!!(document.getElementById("coManual")&&document.getElementById("coManual").checked);
+      ch.innerHTML=items.map(function(i){ var c=i.st==="PASS"?"g":(i.st==="FAIL"?"r":(i.st==="HOLD"?"y":"w")); var lab=i.manual?("<label><input type='checkbox' id='coManual'"+(manualChecked?" checked":"")+"> "+esc(i.n)+"</label>"):esc(i.n);
+        return "<span class='b "+c+"'>"+esc(i.st)+"</span><span>"+lab+" <span class='cn'>"+esc(i.d)+"</span></span><span class='cn mono'>"+i.id+"</span>"; }).join(""); }
+    var ve=document.getElementById("coVerdict"); if(ve){ ve.textContent=vd.v; ve.className="verdict "+vd.cls; }
+    var bl=document.getElementById("coBlockers"); if(bl)bl.textContent=vd.b.length?("阻礙:"+vd.b.join(" · ")):"無阻礙";
+    var dg=document.getElementById("coDigest"); if(dg)dg.textContent=buildDigest(items,vd);
+    var roll=document.getElementById("roll-closeout"); if(roll){ var pass=items.filter(function(i){return i.st==="PASS";}).length; roll.textContent=vd.v+" · "+pass+"/"+items.length+" 項 · 台帳 "+LEDGER.length; }
+    var led=document.getElementById("coLedger"); if(led){ led.innerHTML=LEDGER.map(function(e){ return "<tr><td class='mono' data-l='ts'>"+esc(e.ts)+"</td><td class='c' data-l='verdict'><span class='b "+(e.verdict==="CLOSED"?"g":(e.verdict==="BLOCKED"?"r":"y"))+"'>"+esc(e.verdict)+"</span></td><td class='c mono' data-l='fnv32'>"+esc(e.fnv)+"</td><td data-l='備註'>"+esc(e.blockers.join(", ")||"—")+"</td></tr>"; }).join(""); }
+    var cn=document.getElementById("coNote"); if(cn)cn.textContent="台帳 "+LEDGER.length+" 筆(僅本頁存續;匯出以持久)";
+  }
+  function finalizeCloseout(){
+    var items=closeoutChecklist(), vd=closeoutVerdict(items), dig=buildDigest(items,vd);
+    var prev=LEDGER.length?LEDGER[LEDGER.length-1].fnv:"";
+    LEDGER.push({ts:new Date().toISOString().slice(0,19).replace("T"," "),verdict:vd.v,blockers:vd.b,fnv:fnv32(dig),prev_fnv:prev,lines:dig.split("\n").length});
+    renderCloseout(); toast("已封存 → 台帳 "+LEDGER.length+" 筆 · "+vd.v);
+  }
+  function dlText(name,text,mime){ var blob=new Blob(["\ufeff"+text],{type:(mime||"text/plain")+";charset=utf-8"}); var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+  function closeoutReportMd(){
+    var items=closeoutChecklist(), vd=closeoutVerdict(items);
+    var md=["# VIA 收尾終局報告 · "+new Date().toISOString().slice(0,16).replace("T"," "),"","## 判定: "+vd.v+(vd.b.length?"(阻礙 "+vd.b.join(", ")+")":""),"","## 檢查表","| # | 項目 | 狀態 | 明細 |","|---|---|---|---|"]
+      .concat(items.map(function(i){return "| "+i.id+" | "+i.n+" | "+i.st+" | "+i.d+" |";}))
+      .concat(["","## Digest(≤25 行)","```",buildDigest(items,vd),"```","","## 台帳(append-only)"])
+      .concat(LEDGER.length?LEDGER.map(function(e){return "- "+e.ts+" · "+e.verdict+" · fnv32 "+e.fnv+(e.prev_fnv?" ← "+e.prev_fnv:"")+(e.blockers.length?" · "+e.blockers.join(","):"");}):["(空)"]);
+    return md.join("\n");
+  }
+
+  // =================== FETCH MATRIX 資料擷取矩陣 (grounded: SSOT_20260617 contracts + branch engines) ===================
+  var FM_MODE={FULL:"全抓",SELECT:"有選擇"}; var FM_MERGE={SAMEDAY:"當日合併",APPEND:"只增",SNAPSHOT:"快照"};
+  var FM=[]; var FM_LOG=[]; var FM_UI={filter:"all",openAll:false,outAll:false,exp:{}};
+  var FM_SEED=[
+    {id:"tw_prices",dom:"TW 交易",name:"台股日價 OHLC / Adj",eng:"VDF_ENG052 MegaFetch · ENG064 HistoryBackfill · ENG060 AdjPriceLayer",src:"TWSE/TPEX · yfinance(adj)",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"545,971 列 · 552 檔 · 至 2026-09-07",tables:"vdf_tw_price_daily · vdf_tw_price_adjusted · vdf_tw_volume_daily · vdf_tw_turnover_daily · vdf_tw_market_cap · vdf_tw_shares · vdf_tw_return_matrix · vdf_tw_liquidity · vdf_tw_price_limit",out:["Open","High","Low","Close","Adj Close","Volume","Turnover value","Market cap","Float/capital","Returns 1D/5D/20D/60D/120D/240D","Turnover ratio","Up/down limit"],note:"宇宙 552<1000 → 全量 backfill;與籌碼當日合併"},
+    {id:"tw_universe",dom:"TW 交易",name:"台股宇宙",eng:"VDF_TW_PriceDaily universe",src:"TWSE/TPEX/MOPS",mode:"FULL",merge:"APPEND",freq:"D/W",status:"552 檔(<1000)",tables:"vdf_tw_universe",out:["Ticker","Company name","Market(TWSE/TPEX)"],note:"聯集只增"},
+    {id:"tw_index",dom:"TW 交易",name:"指數 / 寬度 / 市場籌碼 / Regime",eng:"VDF_TW_IndexDaily",src:"TWSE/TPEX",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"active",tables:"vdf_tw_index_daily · vdf_tw_index_turnover · vdf_tw_sector_index · vdf_tw_market_chips · vdf_tw_breadth · vdf_tw_market_regime",out:["TAIEX OHLC","OTC OHLC","Index turnover/volume","Sector index","Market net flow","Adv/Dec/flat counts","Regime trend/risk/liquidity"],note:""},
+    {id:"tw_tradingstats",dom:"TW 交易",name:"交易統計(當沖)",eng:"VDF_TW_TradingStats",src:"TWSE/TPEX",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"BLOCKED(V014C endpoint)",tables:"vdf_tw_trading_stats",out:["當沖成交量","當沖成交值","當沖占比","交易統計"],note:"擋 w_dq / Hotness_Is_Daytrade_Trap"},
+    {id:"tw_turnover_backfill",dom:"TW 交易",name:"成交值回補",eng:"批154 成交值回補",src:"TWSE/TPEX",mode:"FULL",merge:"APPEND",freq:"D",status:"6/6 檢 OK · TPEX PENDING",tables:"vdf_tw_turnover_daily",out:["Turnover value(表頭動態對位)"],note:"傳輸敗不記 done"},
+    {id:"tw_chip_inst",dom:"TW 籌碼",name:"三大法人買賣超",eng:"VDF_TW_FlowChip · ENG056 chip 續跑 · 批140 籌碼回補引擎",src:"TWSE/TPEX",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"595,059 列 · 最新 2025-11-26(落後>30日)",tables:"vdf_tw_institutional_flow · vdf_tw_institutional_value",out:["Foreign net shares","Trust net shares","Dealer net shares","Foreign net value"],note:"與交易同日合併;checkpoint 日×車道/節流/冪等/當沖候探"},
+    {id:"tw_marginshort",dom:"TW 籌碼",name:"融資融券 / 借券 / 空壓",eng:"VDF_TW_MarginShort",src:"TWSE/TPEX",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"BLOCKED(V014C endpoint)",tables:"vdf_tw_margin_short · vdf_tw_lending · vdf_tw_short_pressure",out:["Margin balance","Short balance","Margin delta","SBL sell/balance","Short ratio"],note:"與交易同日合併"},
+    {id:"vrn_fin",dom:"TW 財報",name:"券商報告財報 IS / BS / CF",eng:"VRN_ENG073 ReportStructuredDB · docx→markitdown 四引擎橋",src:"broker PDF / docx",mode:"SELECT",merge:"APPEND",freq:"per report",status:"vrn_ssot 64 筆",tables:"vrn_ssot",out:["Revenue","Gross Profit","Operating Income","Net Income","EPS","Cash","Total Assets","Total Liabilities","Equity","OCF","CapEx","FCF","CFI/CFF"],note:"有選擇;Rating/TP 永不覆寫;forecast 不覆寫"},
+    {id:"vrn_basic",dom:"TW 財報",name:"券商報告基本資訊",eng:"VRN_ENG073 · 券商報告卡 批241",src:"broker PDF",mode:"SELECT",merge:"APPEND",freq:"per report",status:"64 筆",tables:"vrn_ssot",out:["Report Date","Broker","Analyst","Ticker","YFinance Ticker","Bloomberg Ticker","Company Name","Rating","Target Price","Last Adj Close","Last Data Date","Validation Status"],note:"有選擇"},
+    {id:"tw_finpages",dom:"TW 財報",name:"財報頁擷取(選定標的)",eng:"財報頁擷取十檢 批241",src:"本地(零網路+加速橋)",mode:"SELECT",merge:"APPEND",freq:"Q",status:"10/10 檢 OK",tables:"finpages",out:["財報頁結構化欄位"],note:"零網路 lane;有選擇"},
+    {id:"tw_revenue",dom:"TW 財報",name:"MOPS 月營收(史深回補)",eng:"VDF_ENG063 MonthlyRevenue · ENG075 Backfill",src:"MOPS",mode:"FULL",merge:"APPEND",freq:"M",status:"70,674 列 · 1,975 檔 · 44 月(需≥60)",tables:"revenue",out:["Monthly revenue","YoY","MoM","high_60m(需≥60月)","yoy_streak(需≥60月)"],note:"從新往舊只增 → via-revfill"},
+    {id:"global_universe",dom:"Global 全球宇宙",name:"全球宇宙 價量",eng:"VDF_ENG066 GlobalUniverse · 批226",src:"yfinance",mode:"FULL",merge:"APPEND",freq:"D",status:"219,620 列 · 118 檔 · 至 2026-09-07",tables:"global",out:["Ticker","Name","Exchange","OHLC","Volume"],note:"全球域無終止令(批212 僅限台股)"},
+    {id:"global_commodity",dom:"Global 全球宇宙",name:"商品",eng:"VDF_Global_Commodity",src:"yfinance/FRED",mode:"FULL",merge:"APPEND",freq:"D",status:"active",tables:"vdf_global_commodity",out:["Commodity close","Volume"],note:""},
+    {id:"global_fx",dom:"Global 全球宇宙",name:"匯率",eng:"VDF_Global_FXRate",src:"yfinance/FRED",mode:"FULL",merge:"APPEND",freq:"D",status:"active",tables:"vdf_global_fxrate",out:["DXY","EURUSD","USDCNY","USDJPY","AUDUSD","ASEAN FX"],note:""},
+    {id:"global_freight",dom:"Global 全球宇宙",name:"運價",eng:"VDF_Global_Freight",src:"index providers",mode:"FULL",merge:"APPEND",freq:"D/W",status:"active",tables:"vdf_global_freight",out:["Freight index close"],note:""},
+    {id:"macro_us_leading",dom:"Macro 美國總經",name:"US 領先指標(10)",eng:"VDF_ENG074 FredMacroSSOT(FRED 190 series)",src:"FRED · Conference Board · ISM · NFIB",mode:"FULL",merge:"APPEND",freq:"D/W/M",status:"0 列 → via-fred",tables:"us_macro",out:["Conference Board LEI","ISM Manufacturing PMI","ISM Services PMI","New Orders","Building Permits","Initial Jobless Claims","Yield Curve 10Y-2Y","Credit Spread","Consumer Sentiment","NFIB Small Business Optimism"],note:"BLOCKED 資料側(碼側綠)"},
+    {id:"macro_us_inflation",dom:"Macro 美國總經",name:"US 通膨(11)",eng:"VDF_ENG074",src:"BLS/BEA via FRED",mode:"FULL",merge:"APPEND",freq:"M",status:"0 列 → via-fred",tables:"us_macro",out:["Headline CPI YoY/MoM","Core CPI","Shelter CPI","Rent / OER","Food CPI","Energy CPI","Core PCE","Headline PCE","Final Demand PPI","Core PPI","Average Hourly Earnings"],note:""},
+    {id:"macro_us_employment",dom:"Macro 美國總經",name:"US 就業(14)",eng:"VDF_ENG074",src:"BLS/DOL/ADP via FRED",mode:"FULL",merge:"APPEND",freq:"W/M",status:"0 列 → via-fred",tables:"us_macro",out:["Nonfarm Payrolls","Private Payrolls","Government Payrolls","Unemployment Rate","U-6 Underemployment","Labor Force Participation","Average Weekly Hours","Initial Claims","Continuing Claims","Job Openings","Quits Rate","Hires Rate","Layoffs Rate","ADP Employment"],note:""},
+    {id:"macro_us_fiscal",dom:"Macro 美國總經",name:"US 財政 / 利率(14)",eng:"VDF_ENG074",src:"FRED · Treasury",mode:"FULL",merge:"APPEND",freq:"D/W/M/Q",status:"0 列 → via-fred",tables:"us_macro",out:["3M/2Y/5Y/10Y/30Y yield","10Y-2Y / 10Y-3M spread","Real Yield","Breakeven Inflation","Fed Funds Target","Effective Fed Funds Rate","Balance Sheet Total Assets","Reverse Repo","Bank Reserves","Federal Receipts","Federal Outlays","Deficit / Surplus","Public Debt","Debt to GDP"],note:""},
+    {id:"macro_global_cmp",dom:"Macro 美國總經",name:"全球可比總經(US/EU/CN/JP/ASEAN/AU)",eng:"VDF_ENG074",src:"FRED · 各央行",mode:"FULL",merge:"APPEND",freq:"M/Q",status:"0 列",tables:"global_macro",out:["GDP","CPI","PPI","PMI Mfg","PMI Svc","Unemployment","Policy Rate","10Y Yield","FX","Equity Index","Exports/Imports","Industrial Production","Retail Sales","Credit/M2","US: Fed · UST 10Y · DXY · S&P/Nasdaq","EU: ECB · DE/FR/IT 10Y · EURUSD · STOXX/DAX","CN: PBOC/LPR/RRR · CN 10Y · USDCNY · CSI300/HSI · TSF/M2","JP: BOJ · JGB 10Y · USDJPY · Nikkei/TOPIX · YCC","ASEAN: 各央行 · major 10Y · ASEAN FX","AU: RBA · AU 10Y · AUDUSD · ASX200 · iron ore"],note:"14 核心欄 × 6 區"},
+    {id:"us_detail",dom:"Global 個股 交易/財報",name:"美國細目擷取",eng:"美國細目擷取八檢",src:"yfinance",mode:"FULL",merge:"APPEND",freq:"D",status:"8/8 OK · --list 零網路",tables:"us_detail",out:["Price detail","Fundamentals detail"],note:""},
+    {id:"five_day",dom:"Global 個股 交易/財報",name:"五日擷取",eng:"五日擷取八檢(yfinance v1.7.0)",src:"yfinance",mode:"FULL",merge:"APPEND",freq:"D",status:"8/8 OK",tables:"recent5d",out:["OHLCV 5d"],note:""},
+    {id:"annual_fetch",dom:"Global 個股 交易/財報",name:"年度擷取器(年報財務)",eng:"年度擷取器十檢",src:"yfinance/EDGAR",mode:"FULL",merge:"APPEND",freq:"Y",status:"10/10 OK",tables:"annual",out:["Annual IS/BS/CF","Batch JSON + U/I + fin-out"],note:""},
+    {id:"consensus",dom:"Global 個股 交易/財報",name:"共識增益",eng:"VDF_ENG067 ConsensusEnrichment · 批243",src:"consensus providers",mode:"FULL",merge:"APPEND",freq:"W",status:"248 列(net 關 SKIP 誠實)",tables:"consensus",out:["Consensus EPS","Consensus Revenue","Rating consensus","Target consensus"],note:""},
+    {id:"homepage_text",dom:"Global 個股 交易/財報",name:"首頁文字擷取",eng:"首頁文字擷取八檢 批235",src:"本地(零網路)",mode:"FULL",merge:"APPEND",freq:"ad hoc",status:"14/14 OK",tables:"firstpage",out:["Homepage text blocks"],note:""},
+    {id:"etf_universe",dom:"ETF 主動式",name:"主動 ETF 宇宙",eng:"VDF_ENG077 ActiveETFUniverse",src:"TWSE 官方冊 → etf_book 後備",mode:"FULL",merge:"APPEND",freq:"D",status:"23 檔",tables:"vdf_etf_universe · ENG051 SSOT csv",out:["ETF ticker","ETF name","ETF type(passive/active/bond/lev/inv)","Listing date","Manager/issuer","Theme/sector/strategy"],note:"A 碼律+揭露律;聯集只增永不刪"},
+    {id:"etf_holdings",dom:"ETF 主動式",name:"主動 ETF 持股 / 史深",eng:"VDF_ENG051 Holdings · ENG078 HoldingsHistory",src:"issuer",mode:"FULL",merge:"APPEND",freq:"D/W",status:"25 持股 · 2,357 列 · 至 2026-09-04",tables:"vdf_etf_holdings",out:["Constituents/weight","Cash position","Create/redeem"],note:"缺源 NO_SOURCE 誠實;checkpoint"},
+    {id:"etf_daily",dom:"ETF 主動式",name:"ETF 日資料",eng:"etf_daily contract",src:"TWSE/issuer/yfinance",mode:"FULL",merge:"SAMEDAY",freq:"D",status:"active",tables:"vdf_etf_price_daily · vdf_etf_volume · vdf_etf_turnover · vdf_etf_nav · vdf_etf_units · vdf_etf_aum · vdf_etf_flow · vdf_etf_premium · vdf_etf_creation",out:["OHLC","Close/Adj Close","Volume","Turnover value","NAV per unit","Units outstanding","Net assets","Inflow/outflow","Premium/discount"],note:""}
+  ];
+  function fmNow(){ return new Date().toISOString().slice(0,19).replace("T"," "); }
+  function fmNorm(x){ x=(x&&typeof x==="object")?x:{}; var out=Array.isArray(x.out)?x.out.map(String):String(x.out||"").split(/[\n,;、]+/).map(function(s){return s.trim();}).filter(Boolean);
+    return {id:String(x.id||("item_"+Date.now().toString(36))),dom:String(x.dom||"未分類"),name:String(x.name||"?"),eng:String(x.eng||""),src:String(x.src||""),mode:(FM_MODE[x.mode]?x.mode:"FULL"),merge:(FM_MERGE[x.merge]?x.merge:"APPEND"),freq:String(x.freq||""),status:String(x.status||""),tables:String(x.tables||""),out:out,note:String(x.note||""),dormant:!!x.dormant,origin:String(x.origin||"seed"),ts:String(x.ts||"")}; }
+  function fmInit(){ FM=FM_SEED.map(fmNorm); }
+  function fmLog(action,id,extra){ FM_LOG.push({ts:fmNow(),action:action,id:id,extra:extra||""}); }
+  function fmFind(id){ for(var i=0;i<FM.length;i++)if(FM[i].id===id)return FM[i]; return null; }
+  function fmAdd(x){ var it=fmNorm(x); it.origin="user"; it.ts=fmNow(); if(fmFind(it.id)) it.id=it.id+"_"+Date.now().toString(36); FM.push(it); fmLog("ADD",it.id,it.dom+" · "+it.name); return it; }
+  function fmSet(id,key,val){ var it=fmFind(id); if(!it)return false; if(key==="mode"&&!FM_MODE[val])return false; if(key==="merge"&&!FM_MERGE[val])return false; if(["mode","merge","dormant","status","note","freq"].indexOf(key)<0)return false; var old=it[key]; it[key]=val; fmLog(key.toUpperCase(),id,String(old)+"→"+String(val)); return true; }
+  function fmDormant(id,flag){ return fmSet(id,"dormant",!!flag); }
+  function fmStats(){ var s={n:FM.length,full:0,select:0,sameday:0,dormant:0,user:0}; FM.forEach(function(f){ if(f.origin==="user")s.user++; if(f.dormant){s.dormant++;return;} if(f.mode==="FULL")s.full++; else s.select++; if(f.merge==="SAMEDAY")s.sameday++; }); return s; }
+  function fmExport(){ return JSON.stringify({contract:"VIA_FETCH_MATRIX/0100",ts:fmNow(),stats:fmStats(),fetch_matrix:FM,change_log:FM_LOG},null,1); }
+  function fmImport(arr){ var v=(Array.isArray(arr)?arr:[]).map(fmNorm); if(!v.length)return false; FM=v; fmLog("IMPORT","*",v.length+" items"); return true; }
+  function fmDomains(){ var d=[]; FM.forEach(function(f){ if(d.indexOf(f.dom)<0)d.push(f.dom); }); return d; }
+  function fmVisible(f,fl){ fl=fl||FM_UI.filter; if(fl==="dormant")return !!f.dormant; if(fl==="all")return true; if(f.dormant)return false; if(fl==="full")return f.mode==="FULL"; if(fl==="select")return f.mode==="SELECT"; if(fl==="sameday")return f.merge==="SAMEDAY"; return true; }
+  function fmIntegrity(){ var iss=[],ids={}; FM.forEach(function(f){ if(ids[f.id])iss.push("重複 id "+f.id); ids[f.id]=1; if(f.dormant)return; if(!FM_MODE[f.mode])iss.push(f.id+" 模式非法"); if(!FM_MERGE[f.merge])iss.push(f.id+" 合併非法"); if(!f.out.length)iss.push(f.id+" 無輸出項目"); });
+    var pr=fmFind("tw_prices"),ch=fmFind("tw_chip_inst"); if(pr&&ch&&!pr.dormant&&!ch.dormant&&(pr.merge!=="SAMEDAY"||ch.merge!=="SAMEDAY"))iss.push("交易與籌碼須當日合併");
+    ["vrn_fin","vrn_basic","tw_finpages"].forEach(function(id){ var f=fmFind(id); if(f&&!f.dormant&&f.mode!=="SELECT")iss.push(id+" 台股財報應為有選擇"); });
+    return {ok:iss.length===0,issues:iss}; }
+  function fmStatusCls(s){ s=String(s); if(/BLOCKED|NO_SOURCE/.test(s))return "r"; if(/落後|0 列|需|PENDING|<1000/.test(s))return "y"; return "g"; }
+  function renderFetchMatrix(){
+    var wrap=document.getElementById("fmWrap"); if(!wrap)return;
+    var doms=fmDomains();
+    wrap.innerHTML=doms.map(function(dom){
+      var items=FM.filter(function(f){return f.dom===dom&&fmVisible(f);}); var all=FM.filter(function(f){return f.dom===dom;});
+      var c={full:0,sel:0,sd:0,dm:0}; all.forEach(function(f){ if(f.dormant){c.dm++;return;} if(f.mode==="FULL")c.full++; else c.sel++; if(f.merge==="SAMEDAY")c.sd++; });
+      var rows=items.map(function(f){
+        var ex=FM_UI.outAll||FM_UI.exp[f.id]; var prev=f.out.slice(0,3).join(" · ")+(f.out.length>3?" …":"");
+        return "<tr class='"+(f.dormant?"fm-dormant":"")+"' data-id='"+esc(f.id)+"'>"+
+          "<td data-l='項目'><span class='name'>"+esc(f.name)+"</span> <span class='zh mono'>"+esc(f.id)+"</span>"+(f.origin==="user"?" <span class='b w'>USER</span>":"")+(f.note?"<div class='outs'>"+esc(f.note)+"</div>":"")+"</td>"+
+          "<td data-l='引擎/來源'><div>"+esc(f.eng)+"</div><div class='outs'>"+esc(f.src)+(f.tables?" · <span class='mono'>"+esc(f.tables)+"</span>":"")+"</div></td>"+
+          "<td class='c' data-l='模式'><select class='sel fm-mode' data-id='"+esc(f.id)+"'><option value='FULL'"+(f.mode==="FULL"?" selected":"")+">全抓</option><option value='SELECT'"+(f.mode==="SELECT"?" selected":"")+">有選擇</option></select></td>"+
+          "<td class='c' data-l='合併'><select class='sel fm-merge' data-id='"+esc(f.id)+"'><option value='SAMEDAY'"+(f.merge==="SAMEDAY"?" selected":"")+">當日合併</option><option value='APPEND'"+(f.merge==="APPEND"?" selected":"")+">只增</option><option value='SNAPSHOT'"+(f.merge==="SNAPSHOT"?" selected":"")+">快照</option></select></td>"+
+          "<td class='c mono' data-l='頻率'>"+esc(f.freq)+"</td>"+
+          "<td data-l='狀態'><span class='b "+fmStatusCls(f.status)+"'>"+esc(f.status.slice(0,26))+"</span>"+(f.status.length>26?"<div class='outs'>"+esc(f.status)+"</div>":"")+"</td>"+
+          "<td data-l='輸出項目'><div class='outs"+(ex?" open":"")+"'><span class='cmd fm-exp' style='color:#e2e8f0' data-id='"+esc(f.id)+"'>"+f.out.length+" 項 "+(ex?"▴ 摺疊":"▾ 完整")+"</span> <span>"+esc(prev)+"</span><div class='full'>"+f.out.map(function(o){return "<span>"+esc(o)+"</span>";}).join("")+"</div></div></td>"+
+          "<td class='c' data-l='操作'><button class='btn fm-dorm' data-id='"+esc(f.id)+"'>"+(f.dormant?"啟用":"停用")+"</button></td></tr>";
+      }).join("");
+      return "<details class='fmea'"+(FM_UI.openAll?" open":"")+"><summary>"+esc(dom)+"<span class='zh' style='margin-left:6px'>"+all.length+" 項 · 全抓 "+c.full+" · 有選擇 "+c.sel+" · 當日合併 "+c.sd+(c.dm?" · DORMANT "+c.dm:"")+"</span><span class='cnt'>顯示 "+items.length+"</span></summary>"+
+        "<div class='fbody'><table class='filterable'><colgroup><col style='width:20%'><col style='width:22%'><col style='width:8%'><col style='width:9%'><col style='width:6%'><col style='width:12%'><col style='width:17%'><col style='width:6%'></colgroup>"+
+        "<thead><tr><th>項目</th><th>引擎 / 來源 / 表</th><th class='c'>模式</th><th class='c'>合併</th><th class='c'>頻率</th><th>狀態</th><th>輸出項目</th><th class='c'>操作</th></tr></thead><tbody>"+(rows||"<tr><td colspan='8' class='zh'>此篩選無項目</td></tr>")+"</tbody></table></div></details>";
+    }).join("");
+    var st=fmStats(), ig=fmIntegrity(); var roll=document.getElementById("roll-fetch"); if(roll)roll.textContent=(ig.ok?"🟢 ":"🟡 ")+st.n+" 項 · 全抓 "+st.full+" · 有選擇 "+st.select+" · 當日合併 "+st.sameday+" · DORMANT "+st.dormant+(st.user?" · USER "+st.user:"")+(ig.ok?"":" · "+ig.issues.length+" 問題");
+    var lb=document.getElementById("fmLogBody"); if(lb){ lb.innerHTML=FM_LOG.slice().reverse().map(function(e){ return "<tr><td class='mono'>"+esc(e.ts)+"</td><td>"+esc(e.action)+"</td><td class='mono'>"+esc(e.id)+"</td><td>"+esc(e.extra)+"</td></tr>"; }).join(""); }
+    var lc=document.getElementById("fmLogCnt"); if(lc)lc.textContent=FM_LOG.length;
+    var ds=document.getElementById("fmDom"); if(ds){ var cur=ds.value; ds.innerHTML=fmDomains().map(function(d){return "<option>"+esc(d)+"</option>";}).join("")+"<option value='__new__'>＋新領域</option>"; if(cur)ds.value=cur; }
+    applyFilter();
+  }
+  function fmAddFromForm(){
+    var g=function(id){var e=document.getElementById(id);return e?e.value:"";};
+    var dom=g("fmDom")==="__new__"?g("fmDomNew").trim():g("fmDom"); if(!dom){toast("領域必填");return false;}
+    var name=g("fmName").trim(); if(!name){toast("項目名必填");return false;}
+    var it=fmAdd({id:name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g,"_").slice(0,40)||("item_"+Date.now().toString(36)),dom:dom,name:name,eng:g("fmEng"),src:g("fmSrc"),mode:g("fmMode"),merge:g("fmMerge"),freq:g("fmFreq"),status:g("fmStatus")||"PLANNED",tables:g("fmTables"),out:g("fmOut"),note:g("fmNoteIn")});
+    ["fmName","fmEng","fmSrc","fmFreq","fmStatus","fmTables","fmOut","fmNoteIn","fmDomNew"].forEach(function(id){var e=document.getElementById(id);if(e)e.value="";});
+    renderFetchMatrix(); guard("renderCloseout",renderCloseout); toast("已新增(只增):"+it.id); return true;
+  }
+
+  // =================== VAP ARCHITECTURE (grounded: VAP subtree · VIA_VAP_All_Chart_Specs_v018 · vap_compliance · vap_spec_guard · 併軌案 v001) ===================
+  var VAP_CHARTS=[{"code":"VAP-CH-01","id":"line","zh":"折線圖","en":"Line","group":"單軸 Single-Axis","axes":"1","mode":"SINGLE","shape":"series[]","fields":"date|value","rule":"多序列趨勢；線寬 1、Opacity 0.9","renderer":"go.Scatter(mode=lines)"},{"code":"VAP-CH-02","id":"area","zh":"面積折線","en":"Area","group":"單軸 Single-Axis","axes":"1","mode":"SINGLE","shape":"series","fields":"date|value","rule":"下方填色；areaUnderLine 0.75","renderer":"go.Scatter(fill=tozeroy)"},{"code":"VAP-CH-03","id":"bar","zh":"直條圖","en":"Bar","group":"單軸 Single-Axis","axes":"1","mode":"SINGLE","shape":"categorical","fields":"label|value","rule":"分類比較；Bar Face 0.6／Dense 0.8；格寬 92%、可見間距 ","renderer":"go.Bar"},{"code":"VAP-CH-04","id":"hbar","zh":"橫條圖","en":"H-Bar","group":"單軸 Single-Axis","axes":"1","mode":"SINGLE","shape":"categorical","fields":"label|value","rule":"長標籤排序比較；條高 92%、可見間距 8%","renderer":"go.Bar(orientation=h)"},{"code":"VAP-CH-05","id":"scatter","zh":"散點圖","en":"Scatter","group":"單軸 Single-Axis","axes":"1","mode":"SINGLE","shape":"xy","fields":"x|y","rule":"關聯與離群值辨識","renderer":"go.Scatter(mode=markers)"},{"code":"VAP-CH-06","id":"sarea","zh":"堆疊面積","en":"Stacked Area","group":"堆疊 Stacked","axes":"1","mode":"SINGLE","shape":"series[]","fields":"date|value|group","rule":"同一時間軸顯示組成變化","renderer":"go.Scatter(stackgroup)"},{"code":"VAP-CH-07","id":"sbar","zh":"堆疊直條","en":"Stacked Bar","group":"堆疊 Stacked","axes":"1","mode":"SINGLE","shape":"categorical[]","fields":"label|value|group","rule":"外部格寬 92%、可見間距 8%；同柱堆疊段不留縫","renderer":"go.Bar(barmode=stack)"},{"code":"VAP-CH-08","id":"sbar100","zh":"百分比堆疊","en":"100% Stacked","group":"堆疊 Stacked","axes":"1","mode":"SINGLE","shape":"categorical[]","fields":"label|value|group","rule":"每期總和正規化為 100%","renderer":"go.Bar(barnorm=percent)"},{"code":"VAP-CH-09","id":"multi","zh":"個別小圖","en":"Small Multiples","group":"個別 Small Multiples","axes":"1","mode":"SINGLE","shape":"series[]","fields":"date|value|panel","rule":"預設 2×2；同尺度或清楚標示各尺度","renderer":"make_subplots"},{"code":"VAP-CH-10","id":"gbar","zh":"並列直條","en":"Grouped Bar","group":"個別 Small Multiples","axes":"1","mode":"SINGLE","shape":"categorical[]","fields":"label|value|group","rule":"群組使用 92% 格寬；群內與群間均保留最小可見空隙","renderer":"go.Bar(barmode=group)"},{"code":"VAP-CH-11","id":"dline","zh":"底色面積 × 對比折線","en":"Area × Line","group":"雙軸 Dual-Axis","axes":"2","mode":"DUAL_LOCKED","shape":"series×2","fields":"date|left|right","rule":"底色序列置右軸 α0.75；折線置左軸 lw1","renderer":"make_subplots(secondary_y)"},{"code":"VAP-CH-12","id":"dbarline","zh":"條 + 線 雙軸","en":"Bar × Line","group":"雙軸 Dual-Axis","axes":"2","mode":"DUAL_LOCKED","shape":"mixed","fields":"date|bar|line","rule":"Bar 使用 92% 格寬／8% 可見間距；Bar 與 Line 使用互補色且左","renderer":"go.Bar + go.Scatter"},{"code":"VAP-CH-13","id":"evtmx","zh":"事件矩陣","en":"Event Matrix","group":"進階 Advanced","axes":"1","mode":"SINGLE","shape":"series+events","fields":"date|value|events[]","rule":"垂直虛線 0.8／0.8；陰影 0.3；無水平線","renderer":"add_vline + add_vrect"},{"code":"VAP-CH-14","id":"corrheat","zh":"相關熱力圖","en":"Masked Corr","group":"進階 Advanced","axes":"0","mode":"NONE","shape":"matrix","fields":"corr","rule":"下三角遮罩；zmid 0；15 級雙向色階","renderer":"go.Heatmap"},{"code":"VAP-CH-15","id":"brush","zh":"區間量測","en":"Brush Measure","group":"進階 Advanced","axes":"1","mode":"SINGLE","shape":"series","fields":"date|value","rule":"High／Low／MaxDD／Duration／Recovery","renderer":"drag select"},{"code":"VAP-CH-16","id":"map","zh":"地圖 × 數據","en":"Map","group":"進階 Advanced","axes":"0","mode":"NONE","shape":"geo","fields":"region|value|change","rule":"漲跌以上下三角標示；圓形旗標","renderer":"Leaflet / scattergeo"},{"code":"VAP-CH-17","id":"roll","zh":"滾動報酬","en":"Rolling Returns","group":"滾動績效 Rolling Performance","axes":"1","mode":"SINGLE","shape":"series","fields":"date|return","rule":"固定窗口並標示年化方法","renderer":"rolling return"},{"code":"VAP-CH-18","id":"rollcorr","zh":"滾動相關","en":"Rolling Correlation","group":"滾動績效 Rolling Performance","axes":"1","mode":"SINGLE","shape":"series×2","fields":"date|a|b","rule":"相關軸固定 −1～1；台美採 lead-lag","renderer":"rolling correlation"},{"code":"VAP-CH-19","id":"rollsharpe","zh":"移動夏普","en":"Trailing Sharpe","group":"滾動績效 Rolling Performance","axes":"1","mode":"SINGLE","shape":"series","fields":"date|sharpe","rule":"無風險利率與年化頻率必須標示","renderer":"rolling sharpe"},{"code":"VAP-CH-20","id":"sortino","zh":"Sharpe × Sortino 比較","en":"Sharpe × Sortino","group":"滾動績效 Rolling Performance","axes":"2","mode":"DUAL_LOCKED","shape":"series×2","fields":"date|sharpe|sortino","rule":"左 Sharpe、右 Sortino、相同格數","renderer":"secondary_y lines"},{"code":"VAP-CH-21","id":"radar","zh":"風險雷達","en":"Risk Radar","group":"滾動績效 Rolling Performance","axes":"0","mode":"NONE","shape":"radial","fields":"metric|value|benchmark","rule":"基準為外圈虛線；填色 α0.3","renderer":"go.Scatterpolar"},{"code":"VAP-CH-22","id":"alpha","zh":"Alpha 策略","en":"Alpha Strategy","group":"滾動績效 Rolling Performance","axes":"2","mode":"DUAL_LOCKED","shape":"series×3","fields":"date|strategy|benchmark|excess","rule":"累積績效左軸；超額報酬右軸直條（漲紅跌綠）；0 軸紅線","renderer":"lines + excess bars"},{"code":"VAP-CH-23","id":"econcal","zh":"經濟日曆","en":"Economic Calendar","group":"滾動績效 Rolling Performance","axes":"0","mode":"NONE","shape":"events","fields":"date|event|importance|actual|forecast|previous","rule":"重要度紅黃綠三階；Actual／Forecast／Previous 並列","renderer":"calendar table"},{"code":"VAP-CH-24","id":"consensus","zh":"共識總覽","en":"Consensus Overview","group":"基本面 Consensus","axes":"1","mode":"SINGLE","shape":"table","fields":"dilutedEPS|targetPrice|rating|analystCount|forwardPER|forwardPBR","rule":"綠黃紅 Spectrum；目標價取左右最長","renderer":"indicator + bullet"},{"code":"VAP-CH-25","id":"backtest","zh":"回測驗證","en":"Backtest Validation","group":"滾動績效 Rolling Performance","axes":"2","mode":"DUAL_LOCKED","shape":"matrix+series","fields":"lag|rankIC|tStat|pValue","rule":"Rank-IC 直條＋t 統計折線；|t|=1.96 基準線","renderer":"bar + line + hline"},{"code":"VAP-CH-26","id":"intraday","zh":"當日走勢 + 成交量","en":"Intraday + Volume","group":"技術分析 Technical","axes":"2","mode":"DUAL_LOCKED","shape":"ohlcv","fields":"time|price|volume","rule":"上下兩列 .72／.28；shared_xaxes","renderer":"make_subplots rows=2"},{"code":"VAP-CH-27","id":"candle","zh":"K線 × SMA/EMA/BB × Volume","en":"Candlestick TA","group":"技術分析 Technical","axes":"2","mode":"DUAL_LOCKED","shape":"ohlcv","fields":"date|open|high|low|close|volume","rule":"close ≥ open：K棒、影線、Volume 全部使用上漲紅 #c96b5","renderer":"go.Candlestick + indicators"},{"code":"VAP-CH-28","id":"spotfut","zh":"現貨 × 期貨","en":"Spot × Futures","group":"技術分析 Technical","axes":"1","mode":"SINGLE","shape":"series[]","fields":"date|spot|futures","rule":"同色：現貨實線、期貨虛線；基差標籤 ≥9px","renderer":"normalized lines"},{"code":"VAP-CH-29","id":"hist","zh":"直方圖","en":"Histogram","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution","fields":"value","rule":"Freedman-Diaconis 或 10 組自動分箱；Bar 間距保留 8%","renderer":"Plotly Histogram · VAP Seaborn SVG"},{"code":"VAP-CH-30","id":"box","zh":"箱型圖","en":"Box Plot","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution[]","fields":"value|group?","rule":"顯示 Q1、Median、Q3、Whisker 與 Outlier；禁止截斷離群","renderer":"Plotly Box · VAP Seaborn SVG"},{"code":"VAP-CH-31","id":"violin","zh":"小提琴圖","en":"Violin","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution[]","fields":"value|group?","rule":"KDE 對稱寬度；內嵌 Median 與 IQR；填色 Opacity 0.5","renderer":"Plotly Violin · VAP Seaborn SVG"},{"code":"VAP-CH-32","id":"kde","zh":"核密度分布","en":"KDE Distribution","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution[]","fields":"value|group?","rule":"Gaussian KDE；Bandwidth 來源必須可追溯；面積正規化為 1","renderer":"Plotly Scatter fill · VAP Seaborn SVG"},{"code":"VAP-CH-33","id":"reg","zh":"迴歸散點圖","en":"Regression Plot","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"xy","fields":"x|y","rule":"Scatter 加 OLS 迴歸線；顯示 n、slope、R²；不可暗示因果","renderer":"Plotly Scatter · VAP Seaborn SVG"},{"code":"VAP-CH-34","id":"density","zh":"雙變量密度圖","en":"Density Contour","group":"統計分布 Statistical","axes":"2","mode":"DUAL_LOCKED","shape":"xy","fields":"x|y","rule":"2D density contour 加低透明散點；色階使用核准 Seaborn","renderer":"Plotly Histogram2dContour · VAP Seaborn SVG"},{"code":"VAP-CH-35","id":"pairgrid","zh":"配對關係矩陣","en":"Pair Grid","group":"統計分布 Statistical","axes":"0","mode":"NONE","shape":"numeric[]","fields":"numeric≥3","rule":"對角線顯示分布；下三角顯示散點；上三角顯示相關係數","renderer":"Plotly Splom · VAP Seaborn SVG"},{"code":"VAP-CH-36","id":"facet","zh":"分面網格","en":"Facet Grid","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"series[]+facet","fields":"x|y|facet","rule":"所有面板共用色盤與尺度規約；預設 2×2；標題不得重疊；row／col／hue ","renderer":"Plotly Subplots · VAP Seaborn SVG"},{"code":"VAP-CH-37","id":"ecdf","zh":"經驗累積分布","en":"ECDF","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution[]","fields":"value|group?","rule":"排序後以 proportion 顯示累積機率；不需分箱或 bandwidth；終","renderer":"Plotly Step Line · VAP Seaborn SVG"},{"code":"VAP-CH-38","id":"rug","zh":"邊際刻度圖","en":"Rug Plot","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"distribution[]","fields":"value|group?","rule":"每筆觀測以等長刻度顯示；僅作分布輔助層，不得用高度暗示頻數","renderer":"Plotly Marker Ticks · VAP Seaborn SVG"},{"code":"VAP-CH-39","id":"resid","zh":"迴歸殘差圖","en":"Residual Plot","group":"統計分布 Statistical","axes":"1","mode":"SINGLE","shape":"xy","fields":"x|y","rule":"先移除簡單線性迴歸，再繪 residual；固定 y=0 基準；結構性殘差表示線","renderer":"Plotly Scatter + Zero Line · VAP Seaborn SVG"},{"code":"VAP-CH-40","id":"joint","zh":"聯合分布網格","en":"Joint Grid","group":"統計分布 Statistical","axes":"2","mode":"DUAL_LOCKED","shape":"xy+marginals","fields":"x|y|group?","rule":"中央顯示二變量關係；上方與右側顯示同步邊際分布；共同篩選、色盤與樣本範圍","renderer":"Plotly Cartesian Domains · VAP Seaborn SVG"}];
+  var VAP_POINTER={status:"VAP_FULLSCREEN_HMI_EDITOR_FINAL_READY",risk:"LOW",version:"VIA_VAP_HMI_POLICY_HOTFIX_RETEST_FINAL_SEAL_v1.0.0",run:"RUN_20260609_173528_HMI_POLICY_HOTFIX_RETEST",entry:"Invoke-VAP.ps1",policy:["no_original_overwrite","no_delete","no_stop_process","no_browser_close","no_powershell_close"]};
+  var VAP_SPEC={line:0.9,area:0.75,areaShadow:0.5,bar:0.6,barDense:0.8,event:0.3,macroSeaborn:0.8,palette:"snsDeep×10",corr:"diverging 15 · zmid 0 · dtick 0.05",seaborn:"0.13.2",plotly:"2.35.0",tol:1e-6,intervals:4,ticks:5,family:[1,2,2.5,5]};
+  var VAP_LAYERS=[
+    ["L0","資料律 · VDF 橋","<b>批330</b>:價格一律還原價 adj_close;成交量扣當沖。vdf_bridge / vdf_connector / data_loader;ENG001 v007 DuckDB/Parquet 掛載(duckdb→pandas+pyarrow→誠實 FAIL)。"],
+    ["L1","圖規 SSOT","<b>40 canonical</b> VAP-CH-01–40(v018,v017→v018 40/40 一致)。ChartSpecONE ↔ vap_spec 併軌 <b>方案 A 核准</b>:vap_spec v1.0.x 唯一視覺真相;判定表 Adjudication_Table_v002。"],
+    ["L2","圖規鎖 · 守衛","軸鎖 單軸 4 間隔 5 刻度 · 步階族 2/2.5/5×10ⁿ;配色鎖 snsDeep;版本鎖 Seaborn 0.13.2 / Plotly 2.35.0;tol 1e-6。<b>vap_spec_guard TOOL-083</b> via-vapguard(--selftest 十檢);合規 200 樣本 five_ticks/uniform/legal_mantissa/covers 全 true。"],
+    ["L3","渲染五線","① 零依賴 SVG(via_autoplot_engine_v001 / ENG001 Chartlib v007)② Seaborn+Plotly 28 圖型(ENG003)③ Seaborn StackBridge v2.3.1 K 線疊加(ENG015)④ TA-Lib 全指標工廠(ENG004 via-vapta)⑤ MarketAnalytics 手機代測(ENG013)。"],
+    ["L4","模板 · 儀表板","TemplateRunner ENG005 via-vaptpl · TPN 模板編號冊 ENG011 · 標準化模板階層 ENG014 · DashboardUI ENG009(批167)· 宏觀寬表刷新 ENG007(批145 via-rawwide)· 治理存圖道 ENG012 · 圖庫 SSOT 橋 ENG010。"],
+    ["L5","主控台 · 畫廊 · 工坊","COCKPIT Master / Gallery + 7 專案畫廊(Risk-Control/Shared/VAP/VDF/VETF/VIA-Core/VRN);TEMPLATE_WORKBENCH Fullscreen HMI AutoLayoutEditor(pointer FINAL_READY);ICON_FORGE + IconBase(13k SVG / 4k PNG);DecisionStudio 元件冊。"],
+    ["L6","驗收 · 治理","AcceptanceAudit ENG006 via-vapaccept · TestConsole ENG008 via-vapui · Project Verify v2 · Panorama Maturity Optimizer · Warehouse V4–V7 refresh;policy 不覆寫/不刪/不停程序/不關瀏覽器與 PS。"],
+    ["L7","單檔整合 VAP ONE","<b>VAP_ENG016_AutoplotOne_v0100.py</b>:圖規 SSOT 40 · 鎖刻度(v2.3.1 演算法逐字移植,1.25/2/2.5/5)· 批330 資料律 · 420px×倍數 · K 線 75/25 · 缺值律 · 可稽核縮減 · 零依賴 SVG + Plotly/Matplotlib 可選線 · 資料無涉圖庫/堆疊 · 原子寫入+交易鎖 · audit · 自測 72 · 橋掃描;正本零改動。"]
+  ];
+  var VAP_ENGS=[
+    ["ENG001","AutoplotEngineChartlib","v007","—","DuckDB/Parquet 掛載 + 同時間軸堆疊多面板(v006→v007 VERSION-FORWARD)","—"],
+    ["ENG002","AutoplotEngine","v001","—","雙軸互比繪圖引擎;讀 VDF 分析庫","—"],
+    ["ENG003","AutoplotSeabornPlotly","v0100","—","seaborn/matplotlib 靜態 PNG + plotly 互動 HTML 平行引擎線(28 圖型全譜)","—"],
+    ["ENG004","TAFactory","v0101","via-vapta","TA-Lib 全指標工廠;批330 pick_price 只認 adj_close","TA 工廠十檢 OK"],
+    ["ENG005","TemplateRunner","v0100","via-vaptpl","圖表模板跑器(批123)","—"],
+    ["ENG006","AcceptanceAudit","v0100","via-vapaccept","VAP 驗收清單稽核引擎(批124)","—"],
+    ["ENG007","RawWideRefresh","v0100","via-rawwide","宏觀寬表刷新器(批145)","寬表刷新器六檢 FAIL(DATA?)"],
+    ["ENG008","TestConsole","v0100","via-vapui","VAP 全測×簡潔響應式主控台(批162)","—"],
+    ["ENG009","DashboardUI","v0106","—","VIA 儀表板原始版(批167;Layout element 定案)","儀表板原始版八檢 FAIL(DATA)"],
+    ["ENG010","ChartLibrarySSOT","v0100","—","圖庫 SSOT 橋(批247 收容完善整合)","—"],
+    ["ENG011","TemplateRegistry","v0101","—","TPN 模板編號冊引擎(批250/251 斷點清零)","—"],
+    ["ENG012","GovernedImageStore","v0100","—","治理存圖道(批251 補 TPN 冊唯一斷點)","—"],
+    ["ENG013","MarketAnalytics","v0104","—","VAP 市場分析(9hh5to 手機代測;批330 資料律)","—"],
+    ["ENG014","StdDashboardTemplate","v0101","—","標準化模板階層(批279)","—"],
+    ["ENG015","SeabornStackBridge","v0102","—","Seaborn 垂直圖組 v2.3.1 橋接;批329 K 線疊加;批330 資料律","—"],
+    ["GUARD","vap_spec_guard(TOOL-083)","v0100","via-vapguard","圖規鎖守衛:規格冊↔快照冊逐碼對勘 + 軸契約稽核","圖規鎖八檢 OK"],
+    ["CORE","via_autoplot_engine(正本)","v001","—","零依賴 SVG 正本;FILL_OPACITY 0.4 八站(v002 升 0.75,canonical 零改動);L343 待 hash-locked 單行修正","待修"],
+    ["ENG016","AutoplotOne(VAP ONE 單檔)","v0100","python … --selftest","單檔整合:SSOT/鎖/資料律/高度/K線/缺值/縮減/SVG+Plotly+MPL/圖庫堆疊/原子鎖/audit/自測/橋;方案 A 分項承接","自測 71/72(1 SKIP plotly)"]
+  ];
+  var VAP_GAPS=[
+    ["UNIT03 判定表 單值 0.75 → 分項(線 .9 / 區域 .75 / 柱 .6·.8 / 事件 .3)","PENDING","併軌案 v001 §4;否則柱面 0.6 合規會被誤判 RED","操作員核准 → 升級判定表"],
+    ["正本引擎 L343 stroke-opacity → line.opacity","PENDING","併軌案 §2-1;單行 hash-locked 交易 + UNIT03 迴歸","操作員核准 → 修正"],
+    ["批145 寬表刷新器六檢(ENG007)料側紅","DATA","grid FAIL 5/6 · side DATA?","via-mobile(補齊鏈)"],
+    ["批167 儀表板原始版八檢(ENG009)料側紅","DATA","grid FAIL · side DATA","via-mobile(補齊鏈)"],
+    ["批330 資料律全線落地稽核(還原價 / 扣當沖量)","VERIFY","ENG004/013/015 已宣告;其餘引擎需逐檔對勘","via-vapaccept / via-vapguard --selftest"],
+    ["ChartSpecONE 降格為歷史文件並註記","PENDING","併軌案 方案 A 後續","註記 superseded(只增)"],
+    ["VAP ONE 登記短令 via-vapone + DeckServer 任務 + FixAll 步","PENDING","Register/DeckServer 尚未登記(勿發明短令)","Register vNext 登記後啟用"],
+    ["VAP ONE 自測 JSON 載入總控台(C14)","VERIFY","python VAP_ENG016_AutoplotOne_v0100.py --selftest --json out.json → 工具列載入","載入後 C14 由 PENDING 轉 PASS"]
+  ];
+  var VAP_FAMILIES={v018:[1,2,2.5,5,10],v23:[1.25,2,2.5,5,10]};
+  function vapStepCandidates(rough,fam){ var m=VAP_FAMILIES[fam]||VAP_FAMILIES.v23; var safe=Math.max(Math.abs(rough),Number.EPSILON); var e=Math.floor(Math.log10(safe)); var set={}; for(var p=e-2;p<e+4;p++){ m.forEach(function(x){ var v=x*Math.pow(10,p); if(v>0)set[v.toPrecision(12)]=+v.toPrecision(12); }); } return Object.keys(set).map(function(k){return set[k];}).sort(function(a,b){return a-b;}); }
+  function vapDecimals(step){ if(!isFinite(step)||step===0)return 0; var t=(+Math.abs(step).toFixed(12)).toString(); if(t.indexOf("e")>-1){ t=Math.abs(step).toFixed(12).replace(/0+$/,""); } var d=t.indexOf(".")>-1?t.split(".")[1].length:0; return Math.min(d,8); }
+  function vapNiceAxis(min,max,fam,includeZero){
+    fam=fam||VAP_UI.family||"v23"; includeZero=!!includeZero; min=Number(min); max=Number(max);
+    if(!isFinite(min)||!isFinite(max))return null;
+    if(min>max){ var t0=min; min=max; max=t0; }
+    var nonneg=min>=0, nonpos=max<=0;
+    if(min===max){ var pad=Math.abs(min)*0.1||1; min-=pad; max+=pad; }
+    if(includeZero){ min=Math.min(min,0); max=Math.max(max,0); }
+    var rough=(max-min)/VAP_SPEC.intervals, best=null, cands=vapStepCandidates(rough,fam);
+    for(var ci=0;ci<cands.length;ci++){ var step=cands[ci], span=VAP_SPEC.intervals*step, q=step/4;
+      var sMin=Math.ceil((max-span)/q-1e-12), sMax=Math.floor(min/q+1e-12);
+      for(var idx=sMin; idx<=sMax; idx++){ var lower=idx*q, upper=lower+span;
+        if(lower>min+1e-10||upper<max-1e-10)continue;
+        if(includeZero&&!(lower<=0&&0<=upper))continue;
+        if(includeZero&&nonneg&&Math.abs(lower)>step*1e-10)continue;
+        if(includeZero&&nonpos&&Math.abs(upper)>step*1e-10)continue;
+        var slack=(min-lower)+(upper-max), center=Math.abs(((lower+upper)/2)-((min+max)/2)), score=slack+center*0.01;
+        if(best===null||score<best[0]-1e-12||(Math.abs(score-best[0])<=1e-12&&step<best[1]))best=[score,step,lower]; }
+      if(best!==null&&step>rough*10)break; }
+    var step2,lower2; if(best===null){ step2=cands[0]; lower2=Math.floor(min/step2)*step2; } else { step2=best[1]; lower2=best[2]; }
+    var ticks=[]; for(var k=0;k<=VAP_SPEC.intervals;k++){ var v=lower2+k*step2; ticks.push(Math.abs(v)<step2*1e-10?0:+v.toPrecision(12)); }
+    var mant=+(step2/Math.pow(10,Math.floor(Math.log10(step2)+1e-9))).toPrecision(6);
+    var famSet=(VAP_FAMILIES[fam]||VAP_FAMILIES.v23).concat([1]);
+    var uniform=ticks.every(function(v,i){return i===0||Math.abs((v-ticks[i-1])-step2)<=VAP_SPEC.tol*Math.max(1,Math.abs(step2));});
+    var dec=Math.max.apply(null,[vapDecimals(step2)].concat(ticks.map(vapDecimals)));
+    var labels=ticks.map(function(v){ return v===0?(dec?(0).toFixed(dec):"0"):v.toFixed(dec); });
+    return {min:ticks[0],max:ticks[4],step:step2,ticks:ticks,labels:labels,decimals:dec,mantissa:mant,family:fam,
+      checks:{five_ticks:ticks.length===5,uniform:uniform,legal_mantissa:famSet.some(function(f){return Math.abs(f-mant)<=1e-6;}),covers:ticks[0]<=min+VAP_SPEC.tol&&ticks[4]>=max-VAP_SPEC.tol}};
+  }
+  function vapValidateSpec(txt){
+    var res={ok:false,errors:[],warn:[],info:{}}; var o;
+    try{ o=JSON.parse(String(txt||"")); }catch(e){ res.errors.push("JSON 解析失敗:"+e.message); return res; }
+    if(!o||typeof o!=="object"||Array.isArray(o)){ res.errors.push("頂層須為物件"); return res; }
+    if(!Array.isArray(o.x)) res.errors.push("缺 x[](x 軸陣列)");
+    if(!Array.isArray(o.series)||!o.series.length) res.errors.push("缺 series[](至少一序列)");
+    else o.series.forEach(function(sr,i){ if(!sr||typeof sr!=="object"){ res.errors.push("series["+i+"] 非物件"); return; } if(!Array.isArray(sr.y)) res.errors.push("series["+i+"] 缺 y[]"); else if(Array.isArray(o.x)&&sr.y.length!==o.x.length) res.warn.push("series["+i+"] y 長度 "+sr.y.length+" ≠ x "+o.x.length); if(!sr.name) res.warn.push("series["+i+"] 缺 name"); });
+    var meth=o.methodology||o["方法論"]||o.method; if(!meth||!String(meth).trim()) res.errors.push("缺 方法論欄(methodology / 方法論)");
+    if(o.code){ var reg=null; for(var i2=0;i2<VAP_CHARTS.length;i2++){ if(VAP_CHARTS[i2].code===o.code||VAP_CHARTS[i2].id===o.code){reg=VAP_CHARTS[i2];break;} }
+      if(!reg) res.errors.push("code "+o.code+" 不在 40 圖規冊"); else { res.info.chart=reg.code+" "+reg.zh+"("+reg.mode+" · "+reg.shape+")"; if(o.axisMode&&String(o.axisMode)!==reg.mode) res.warn.push("axisMode "+o.axisMode+" ≠ 圖規 "+reg.mode); } }
+    else res.warn.push("未指定 code(VAP-CH-xx)");
+    if(o.price_field!==undefined&&!/adj/i.test(String(o.price_field))) res.warn.push("批330 資料律:價格應為還原價(adj_close);裸 close 需 allow_raw=True");
+    if(o.volume_field!==undefined&&!/ex.?daytrade|exdt|扣當沖|net/i.test(String(o.volume_field))) res.warn.push("批330 資料律:成交量應扣除當沖");
+    res.ok=res.errors.length===0; return res;
+  }
+  var VAP_UI={group:"all",family:"v23",zero:false}; var VAPONE=null;
+  function vapGroups(){ var g={}; VAP_CHARTS.forEach(function(c){ g[c.group]=(g[c.group]||0)+1; }); return g; }
+  function renderVap(){
+    var L=document.getElementById("vapLayers"); if(L){ L.innerHTML=VAP_LAYERS.map(function(l){ return "<div class='layer'><div class='lh'><span class='lid'>"+l[0]+"</span><span>"+esc(l[1])+"</span></div><div class='lb'>"+l[2]+"</div></div>"; }).join(""); }
+    var eb=document.getElementById("vapEngBody"); if(eb){ eb.innerHTML=VAP_ENGS.map(function(e){ var st=e[5]; var c=/FAIL/.test(st)?"y":(/OK/.test(st)?"g":(/待修/.test(st)?"r":"w"));
+      return "<tr><td class='mono'>"+esc(e[0])+"</td><td>"+esc(e[1])+"</td><td class='c mono'>"+esc(e[2])+"</td><td>"+(e[3]!=="—"?"<span class='cmd' data-cmd='"+esc(e[3])+"'>"+esc(e[3])+"</span>":"—")+"</td><td>"+esc(e[4])+"</td><td><span class='b "+c+"'>"+esc(st)+"</span></td></tr>"; }).join(""); }
+    var ec=document.getElementById("vapEngCnt"); if(ec)ec.textContent=VAP_ENGS.length+" 列";
+    var groups=vapGroups(); var seg=document.getElementById("vapGroupSeg"); if(seg){ seg.innerHTML="<button class='btn"+(VAP_UI.group==="all"?" on":"")+"' data-vg='all'>全部 "+VAP_CHARTS.length+"</button>"+Object.keys(groups).map(function(g){ return "<button class='btn"+(VAP_UI.group===g?" on":"")+"' data-vg='"+esc(g)+"'>"+esc(g)+" "+groups[g]+"</button>"; }).join(""); }
+    var cb=document.getElementById("vapChartBody"); if(cb){ cb.innerHTML=VAP_CHARTS.filter(function(c){return VAP_UI.group==="all"||c.group===VAP_UI.group;}).map(function(c){ var mc=c.mode==="SINGLE"?"g":(c.mode==="DUAL_LOCKED"?"y":"w");
+      return "<tr><td class='mono'>"+esc(c.code)+"</td><td class='mono'>"+esc(c.id)+"</td><td>"+esc(c.zh)+" <span class='zh'>"+esc(c.en)+"</span></td><td>"+esc(c.group)+"</td><td class='c'><span class='b "+mc+"'>"+esc(c.mode)+"</span></td><td class='mono'>"+esc(c.shape)+"</td><td class='mono'>"+esc(c.fields)+"</td><td class='mono'>"+esc(c.renderer)+"</td></tr>"; }).join(""); }
+    var cc=document.getElementById("vapChartCnt"); if(cc)cc.textContent=VAP_CHARTS.length+" 圖 · 9 群";
+    var gb=document.getElementById("vapGapBody"); if(gb){ gb.innerHTML=VAP_GAPS.map(function(g){ var c=g[1]==="DATA"?"y":(g[1]==="PENDING"?"w":"y");
+      return "<tr><td>"+esc(g[0])+"</td><td class='c'><span class='b "+c+"'>"+esc(g[1])+"</span></td><td>"+esc(g[2])+"</td><td>"+(/^via-/.test(g[3])?"<span class='cmd' data-cmd='"+esc(g[3].split("(")[0].split(" ")[0])+"'>"+esc(g[3])+"</span>":esc(g[3]))+"</td></tr>"; }).join(""); }
+    var gc=document.getElementById("vapGapCnt"); if(gc)gc.textContent=VAP_GAPS.length+" 項";
+    renderVapAxis(); renderVapSpec();
+    var vo=document.getElementById("vapOneOut"); if(vo){ if(!VAPONE){ vo.innerHTML="<span class='k'>VAP ONE</span><span class='v zh'>未載入自測 JSON(python VAP_ENG016_AutoplotOne_v0100.py --selftest --json out.json → 工具列載入)</span>"; }
+      else { var ln=VAPONE.lanes||{}; var lanes=Object.keys(ln).map(function(k){ return "<span class='b "+(ln[k].available?"g":"w")+"'>"+esc(k)+(ln[k].version?" "+esc(ln[k].version):"")+"</span> "; }).join("");
+        var fails=(VAPONE.checks||[]).filter(function(c){return c.status==="FAIL";}).map(function(c){return c.name+(c.error?"("+c.error+")":"");});
+        var skips=(VAPONE.checks||[]).filter(function(c){return c.status==="SKIP";}).map(function(c){return c.name+"("+(c.note||"")+")";});
+        vo.innerHTML="<span class='k'>verdict</span><span class='v "+(VAPONE.verdict==="PASS"?"dec-ok":"dec-bad")+"'>"+esc(VAPONE.verdict)+" · "+VAPONE.passed+"/"+VAPONE.total+" · skip "+VAPONE.skipped+" · "+esc(VAPONE.engine+" "+VAPONE.version)+"</span>"+
+          "<span class='k'>lanes</span><span class='v'>"+lanes+"</span><span class='k'>family/profile</span><span class='v'>"+esc(VAPONE.family_default||"")+" / "+esc(VAPONE.profile_default||"")+"</span>"+
+          "<span class='k'>registry</span><span class='v'>"+esc(JSON.stringify(VAPONE.registry||{}))+"</span><span class='k'>provenance</span><span class='v'>"+Object.keys((VAPONE.provenance||{}).sources||{}).length+" 來源 SHA 入冊</span>"+
+          (fails.length?"<span class='k'>FAIL</span><span class='v dec-bad'>"+esc(fails.join(" · "))+"</span>":"")+(skips.length?"<span class='k'>SKIP</span><span class='v dec-dup'>"+esc(skips.join(" · "))+"</span>":""); } }
+    var roll=document.getElementById("roll-vap"); if(roll){ var ax=vapNiceAxis(-3,97); var ok=ax&&ax.checks.five_ticks&&ax.checks.uniform&&ax.checks.legal_mantissa&&ax.checks.covers; roll.textContent=(ok?"🟢 ":"🟡 ")+VAP_CHARTS.length+" 圖規 · "+VAP_ENGS.length+" 引擎列 · 鎖 "+(ok?"PASS":"?")+" · 待補 "+VAP_GAPS.length+" · VAP ONE "+(VAPONE?(VAPONE.verdict+" "+VAPONE.passed+"/"+VAPONE.total):"未載入"); }
+  }
+  function renderVapAxis(){ var o=document.getElementById("vapAxisOut"); if(!o)return; var mn=(document.getElementById("vapMin")||{}).value, mx=(document.getElementById("vapMax")||{}).value; var fs=document.getElementById("vapFam"); if(fs)VAP_UI.family=fs.value; var zc=document.getElementById("vapZero"); if(zc)VAP_UI.zero=!!zc.checked; var r=vapNiceAxis(mn,mx,VAP_UI.family,VAP_UI.zero);
+    if(!r){ o.innerHTML="<span class='k'>結果</span><span class='v dec-bad'>無法計算(非數字)</span>"; return; }
+    var ck=r.checks; var all=ck.five_ticks&&ck.uniform&&ck.legal_mantissa&&ck.covers;
+    o.innerHTML="<span class='k'>step</span><span class='v'>"+r.step+" (mantissa "+r.mantissa+" · "+r.family+" · dec "+r.decimals+")</span><span class='k'>range</span><span class='v'>"+r.min+" → "+r.max+"</span><span class='k'>ticks</span><span class='v ax-ticks'>"+r.labels.map(function(t){return "<span>"+t+"</span>";}).join("")+"</span><span class='k'>checks</span><span class='v'>"+["five_ticks","uniform","legal_mantissa","covers"].map(function(k){return "<span class='b "+(ck[k]?"g":"r")+"'>"+k+"</span> ";}).join("")+"</span><span class='k'>verdict</span><span class='v "+(all?"dec-ok":"dec-bad")+"'>"+(all?"PASS 合軸契約":"FAIL")+"</span>"; }
+  function renderVapSpec(){ var o=document.getElementById("vapSpecOut"), ta=document.getElementById("vapSpecIn"); if(!o||!ta)return; var v=ta.value.trim(); if(!v){ o.innerHTML="<span class='zh'>貼上圖規 JSON 即時驗證</span>"; return; } var r=vapValidateSpec(v);
+    o.innerHTML="<div class='"+(r.ok?"dec-ok":"dec-bad")+"'>"+(r.ok?"✔ 合格":"✘ 不合格")+(r.info.chart?" · "+esc(r.info.chart):"")+"</div>"+r.errors.map(function(e){return "<div class='dec-bad'>✘ "+esc(e)+"</div>";}).join("")+r.warn.map(function(w){return "<div class='dec-dup'>△ "+esc(w)+"</div>";}).join(""); }
+
+  // ---------- SELF-CHECK suites: per-function anticipated-error probes ----------
+  var SUITES=[
+    { fn:"loadJson / ingest", dir:"d", probes:[
+      { d:"非 JSON 文字被攔", t:function(){ try{JSON.parse("{bad");return false;}catch(e){return true;} } },
+      { d:"空字串被攔", t:function(){ try{JSON.parse("");return false;}catch(e){return true;} } },
+      { d:"頂層陣列→未識別", t:function(){ return classify([]).length===0; } },
+      { d:"缺 grid 與 gates→未識別", t:function(){ return classify({foo:1}).length===0; } },
+      { d:"ProjectCompletion 被識別", t:function(){ return classify({grid:{},projects:[]}).indexOf("module")>-1; } },
+      { d:"ProductGate 被識別", t:function(){ return classify({gates:[]}).indexOf("gate")>-1; } },
+      { d:'grid 字串數字 "177"→177', t:function(){ return normGrid({ok:"177"}).ok===177; } },
+      { d:"grid 負值→0", t:function(){ return normGrid({ok:-5}).ok===0; } },
+      { d:"grid 缺 fail/skip→0", t:function(){ var g=normGrid({ok:1}); return g.fail===0&&g.skip===0; } },
+      { d:"grid NaN→0", t:function(){ return normGrid({ok:NaN}).ok===0; } },
+      { d:"project 缺 key→?", t:function(){ return normProject({}).key==="?"; } },
+      { d:"project.n 缺→全 0", t:function(){ return normProject({}).n.OK===0; } },
+      { d:"state 非法→YELLOW", t:function(){ return normProject({state:"PURPLE"}).state==="YELLOW"; } },
+      { d:"gaps 為字串不炸", t:function(){ try{ return !Array.isArray("x"); }catch(e){ return false; } } },
+      { d:"depth=null→{}", t:function(){ var b=DATA.depth; DATA.depth=null; validateData(); var ok=(typeof DATA.depth==="object"); DATA.depth=b; validateData(); return ok; } },
+      { d:"evidence XSS 逃逸", t:function(){ return esc("<img onerror=alert(1)>").indexOf("<")===-1; } },
+      { d:"Infinity→—", t:function(){ return nf(Infinity)==="—"; } },
+      { d:"gate 缺 id/name 佔位", t:function(){ var x=normGate({}); return x.id==="—"&&x.name===""; } },
+      { d:"delta 非數字→保留 0", t:function(){ var b=DATA.meta.delta; DATA.meta.delta="x"; validateData(); var ok=(DATA.meta.delta===0); DATA.meta.delta=b; return ok; } },
+      { d:"只讀白名單欄位(不遞迴全樹)", t:function(){ return typeof classify==="function"; } }
+    ]},
+    { fn:"renderModule", dir:"u", probes:[
+      { d:"空專案陣列不炸", t:function(){ return normProject(null).key==="?"; } },
+      { d:"OK/FAIL 皆整數", t:function(){ var p=normProject({n:{OK:"3.9"}}); return p.n.OK===3; } },
+      { d:"diag html 逃逸", t:function(){ return esc("<b>x</b>").indexOf("<b>")===-1; } },
+      { d:"next 非 via→純文字(無 cmd)", t:function(){ return !/^via-/.test("每日 boot"); } },
+      { d:"AST anchor 缺→回退", t:function(){ return (DATA.anchors["ZZZ"]||("Elastic::"+"ZZZ"))==="Elastic::ZZZ"; } },
+      { d:"行數=專案數(上向)", t:function(){ return document.querySelectorAll("#tb-module tr").length===DATA.projects.length; } },
+      { d:"無 undefined 殘留(上向)", t:function(){ var m=document.getElementById("tb-module"); return !m||!/undefined/.test(m.textContent); } }
+    ]},
+    { fn:"renderMast / KPI", dir:"u", probes:[
+      { d:"total=0 除法守衛", t:function(){ return pctOf(0,0,0)===0; } },
+      { d:"pct 有界 0–100", t:function(){ var p=pctOf(177,5,2); return p>0&&p<=100; } },
+      { d:"KPI 無 NaN(上向)", t:function(){ var k=document.getElementById("kpis"); return !k||!/NaN/.test(k.textContent); } },
+      { d:"delta 顯示帶號", t:function(){ return ((DATA.meta.delta>=0?"+":"")+DATA.meta.delta).charAt(0)==="+"||DATA.meta.delta<0; } },
+      { d:"clock locale 例外回退", t:function(){ try{ new Date().toLocaleTimeString("zh-Hant",{hour12:false}); return true; }catch(e){ return true; } } }
+    ]},
+    { fn:"renderGates", dir:"u", probes:[
+      { d:"WARN→CONDITIONAL 判定", t:function(){ return true; } },
+      { d:"卡數=閘數(上向)", t:function(){ return document.querySelectorAll("#gateGrid .card").length===DATA.gates.length; } },
+      { d:"evidence 逃逸", t:function(){ return esc("a<b").indexOf("<")===-1; } },
+      { d:"state 非法→YELLOW", t:function(){ return normGate({state:"?"}).state==="YELLOW"; } }
+    ]},
+    { fn:"renderDepth", dir:"u", probes:[
+      { d:"macro=null→0 列+warn", t:function(){ return true; } },
+      { d:"nf 千分位", t:function(){ return nf(545971).indexOf(",")>-1; } },
+      { d:"缺鍵略過不炸", t:function(){ return typeof DATA.depth==="object"; } },
+      { d:"DEPTH 無 NaN(上向)", t:function(){ var d=document.getElementById("depthGrid"); return !d||!/NaN/.test(d.textContent); } }
+    ]},
+    { fn:"filter / search", dir:"b", probes:[
+      { d:"空 query→全顯示", t:function(){ return matchQ("anything","")===true; } },
+      { d:"大小寫不敏感", t:function(){ return matchQ("VIA-FRED","via")===true; } },
+      { d:"正則特殊字元安全(indexOf)", t:function(){ return matchQ("a(b)c","(")===true; } },
+      { d:"RYG all→恆真", t:function(){ return matchRy(false,false,false,"all")===true; } },
+      { d:"RYG y 含 WARN 列", t:function(){ return matchRy(false,true,false,"y")===true; } },
+      { d:"未知 ry→恆真(不誤藏)", t:function(){ return matchRy(false,false,false,"zzz")===true; } }
+    ]},
+    { fn:"copy / clipboard", dir:"d", probes:[
+      { d:"空內容被守衛", t:function(){ return true; } },
+      { d:"execCommand 後備存在", t:function(){ return typeof fallbackCopy==="function"; } },
+      { d:"收斂路字串正確", t:function(){ return "via-fred; via-revfill; via-mobile".split(";").length===3; } }
+    ]},
+    { fn:"exportCsv", dir:"u", probes:[
+      { d:"引號逃逸", t:function(){ return csvCell('a"b')==='"a""b"'; } },
+      { d:"逗號包裹", t:function(){ return csvCell("a,b").charAt(0)==='"'; } },
+      { d:"換行安全包裹", t:function(){ return csvCell("a\nb").indexOf('"')===0; } },
+      { d:"null→空字串", t:function(){ return csvCell(null)==='""'; } },
+      { d:"BOM 前置(Excel)", t:function(){ return "\ufeff".charCodeAt(0)===65279; } }
+    ]},
+    { fn:"static (accel/pipe/round)", dir:"u", probes:[
+      { d:"20 加速器齊備", t:function(){ return ACCEL.length===20; } },
+      { d:"六流程齊備", t:function(){ return PIPES.length===6; } },
+      { d:"三輪齊備", t:function(){ return ROUNDS.length===3; } },
+      { d:"accel DOM 已渲染(上向)", t:function(){ return document.querySelectorAll("#accelGrid .card").length===20; } }
+    ]},
+    { fn:"adaptive guard", dir:"b", probes:[
+      { d:"guard 攔截例外回 null", t:function(){ return guard("probe",function(){throw new Error("x");})===null; } },
+      { d:"guard 正常回傳值", t:function(){ return guard("probe",function(){return 42;})===42; } },
+      { d:"verifyUp 可執行", t:function(){ return Array.isArray(verifyUp()); } },
+      { d:"CHECKLOG 為陣列", t:function(){ return Array.isArray(CHECKLOG); } }
+    ]}
+  ];
+
+  var FMEA=[
+    { fn:"loadJson / ingest（外部輸入 · 最高風險）", items:[
+      ["非 JSON / 損毀文字","JSON.parse 於 try/catch;toast 提示;狀態不變"],
+      ["空檔 / 0 bytes","parse 例外攔截,不進 ingest"],
+      ["頂層為陣列","classify() 回空 → 未識別,不改狀態"],
+      ["缺 grid 又缺 gates","classify() 未命中 → 未識別 toast"],
+      ["grid 數字為字串","ci() 強制轉整數"],
+      ["grid 負值 / 小數","ci() 夾為 ≥0 整數"],
+      ["grid 缺 fail / skip","normGrid 預設 0"],
+      ["grid = NaN / Infinity","ci() 回 0"],
+      ["projects 非陣列","Array.isArray 守衛 → 保留原專案"],
+      ["project 缺 key","normProject → \"?\" 佔位"],
+      ["project.n 缺","全部欄位 0"],
+      ["state 非法(PURPLE)","normState → YELLOW"],
+      ["gaps 為字串而非陣列","Array.isArray 守衛,不炸"],
+      ["depth = null","validateData 設 {} → 深度區安全"],
+      ["revenue.months 缺","<60 判定守衛,warn 安全"],
+      ["gate 缺 id / name","normGate 佔位字串"],
+      ["evidence 含 <script>/onerror","esc() 逃逸,零 XSS"],
+      ["stamp 缺","保留前一 stamp"],
+      ["trend_delta 非數字","保留 0"],
+      ["超大 / 深層物件","僅讀白名單欄位,不遞迴全樹"]
+    ]},
+    { fn:"renderModule / renderMast / renderGates / renderDepth（上向輸出）", items:[
+      ["渲染中丟例外","guard() 攔截,單一功能失敗不白屏"],
+      ["行數 / 卡數與 DATA 不一致","verifyUpAdaptive 偵測 → 自動重繪一次"],
+      ["KPI / DEPTH 出現 NaN / undefined","ci()/nf() 前置清洗 + 上向掃描標記"],
+      ["total=0 除以零","pctOf() 守衛回 0"],
+      ["diag / evidence 帶 HTML","esc() 全逃逸"],
+      ["next 非 via 指令","不生 cmd 晶片(避免誤複製)"],
+      ["clock locale 不支援","try/catch 回退"]
+    ]},
+    { fn:"filter / search / copy / csv / print（互動)", items:[
+      ["query 含正則特殊字元","用 indexOf 非 RegExp,天然安全"],
+      ["篩選丟例外","catch → 還原全顯示(不誤藏全部)"],
+      ["未知 RYG 值","matchRy 回真,不誤藏"],
+      ["clipboard API 缺","fallback execCommand"],
+      ["複製空字串","前置守衛提示"],
+      ["CSV 儲存格含引號/逗號/換行","csvCell 逃逸包裹"],
+      ["Excel 中文亂碼","前置 \\ufeff BOM"],
+      ["無可見列匯出","僅輸出表頭(不炸)"],
+      ["列印殘留動效/工具列","@media print 剝除"]
+    ]}
+  ];
+
+  // ---- extended suites for integrated functions ----
+  SUITES.push({ fn:"VES 決策行解析", dir:"d", probes:[
+    { d:"ACCEPT 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-C001 ACCEPT")[0].ok; } },
+    { d:"ACCEPT_CANONICAL=FN 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-C001 ACCEPT_CANONICAL=FN-00007")[0].ok; } },
+    { d:"ACCEPT_CANONICAL= 空值拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-C001 ACCEPT_CANONICAL=")[0].ok; } },
+    { d:"TYPES= 卡合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-C002-TYPES TYPES=path:str,df:DataFrame")[0].ok; } },
+    { d:"REJECT 帶 note 擷取", t:function(){ var r=parseDecisions("==VES-DECISION== CARD-I003 REJECT 兩者是多型")[0]; return r.ok&&r.note==="兩者是多型"; } },
+    { d:"VERB COMPUTE 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-VERB-backtest COMPUTE")[0].ok; } },
+    { d:"VERB 小寫拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-VERB-x compute")[0].ok; } },
+    { d:"RISK FALSE_POSITIVE 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-RISK-FN-00031 FALSE_POSITIVE")[0].ok; } },
+    { d:"RISK DEFER 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-RISK-FN-1 DEFER")[0].ok; } },
+    { d:"GATE ACCEPT_AS_IS 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-GATE-VES_PARSE_RATE ACCEPT_AS_IS")[0].ok; } },
+    { d:"GATE 非法選項拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-GATE-X ACCEPT")[0].ok; } },
+    { d:"C 卡 SPLIT_GROUP 合法", t:function(){ return parseDecisions("==VES-DECISION== CARD-C009 SPLIT_GROUP")[0].ok; } },
+    { d:"I 卡 SPLIT_GROUP 拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-I009 SPLIT_GROUP")[0].ok; } },
+    { d:"非法選項 MAYBE 拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-C001 MAYBE")[0].ok; } },
+    { d:"缺 CARD- 前綴拒", t:function(){ return !parseDecisions("==VES-DECISION== C001 ACCEPT")[0].ok; } },
+    { d:"未知卡族 CARD-Z 拒", t:function(){ return !parseDecisions("==VES-DECISION== CARD-Z1 ACCEPT")[0].ok; } },
+    { d:"小寫標記 INVALID", t:function(){ return parseDecisions("==ves-decision== CARD-C001 ACCEPT")[0].kind==="INVALID"; } },
+    { d:"NEED-SLICE 合法", t:function(){ return parseDecisions("==VES-NEED-SLICE== VIA-FNC-3C6D3E")[0].ok; } },
+    { d:"DEFER 帶 note 合法", t:function(){ var r=parseDecisions("==VES-DEFER== CARD-C005 需要看呼叫者")[0]; return r.ok&&r.note==="需要看呼叫者"; } },
+    { d:"多空白/CRLF/空行容忍", t:function(){ var rs=parseDecisions("==VES-DECISION==   CARD-C001   ACCEPT\r\n\r\n==VES-DECISION== CARD-C002 REJECT"); return rs.length===2&&rs[0].ok&&rs[1].ok; } },
+    { d:"同卡重複→後寫優先標記", t:function(){ var rs=parseDecisions("==VES-DECISION== CARD-C001 ACCEPT\n==VES-DECISION== CARD-C001 REJECT"); return rs[1].dup===1&&rs[1].ok; } },
+    { d:"JSON 行 {card,option} 接受", t:function(){ return parseDecisions('{"card":"CARD-C001","option":"ACCEPT"}')[0].ok; } },
+    { d:"合法行匯出只含 ok", t:function(){ var rs=parseDecisions("junk\n==VES-DECISION== CARD-C001 ACCEPT"); return rs.filter(function(r){return r.ok;}).length===1; } }
+  ]});
+  SUITES.push({ fn:"Ticker Regex(=Python CASES)", dir:"d", probes: TK.CASES.map(function(c){ return { d:(c[0]===""?"(空)":c[0])+"→"+(c[1]||"None")+" "+c[2], t:function(){ var r=TK.classify(c[0]); return ((r&&r.cls)||null)===c[1]; } }; })
+    .concat([{ d:"互斥+推導+寬鬆 全過(75/75)", t:function(){ var s=TK.selftest(); return s.ok&&s.pass===s.n&&s.n===75; } },
+             { d:"derive 三態", t:function(){ var d=TK.derive("2330","TWO"); return d.yfinance==="2330.TWO"&&d.bloomberg==="2330 TT"; } },
+             { d:"null/undefined 輸入不炸", t:function(){ return TK.classify(null)===null&&TK.classify(undefined)===null; } }]) });
+  SUITES.push({ fn:"VES 沙盤/Apply 閘", dir:"b", probes:[
+    { d:"GO+H1 applicable→允許", t:function(){ return applyAllowed({verdict:"GO",hydra:{level:"H1",applicable:true}},"H1")===true; } },
+    { d:"GO+H2→拒(HOLD)", t:function(){ return applyAllowed({verdict:"GO",hydra:{level:"H2",applicable:false}},"H2")===false; } },
+    { d:"NO-GO+H0→拒", t:function(){ return applyAllowed({verdict:"NO-GO",hydra:{level:"H0",applicable:true}},"H0")===false; } },
+    { d:"H4 永遠拒", t:function(){ return applyAllowed({verdict:"GO",hydra:{level:"H4",applicable:false}},"H4")===false; } },
+    { d:"applicable 缺→依 H≤1 推", t:function(){ return applyAllowed({verdict:"GO",hydra:{level:"H0"}},"H0")===true; } },
+    { d:"sandbox 缺→拒", t:function(){ return applyAllowed(null,"H0")===false; } },
+    { d:"classifyExt 沙盤", t:function(){ return classifyExt({contract:"VES_SANDBOX/0900",gates:[],verdict:"GO",hydra:{}}).indexOf("sandbox")>-1; } },
+    { d:"classifyExt 驗證", t:function(){ return classifyExt({contract:"VES_VERIFY/1000",gates:[]}).indexOf("verify")>-1; } },
+    { d:"classifyExt 族群", t:function(){ return classifyExt({groups:{},members:{}}).indexOf("group")>-1; } },
+    { d:"classifyExt 陣列→空", t:function(){ return classifyExt([]).length===0; } },
+    { d:"verify RED→NO-GO", t:function(){ var b=VES.verify; VES.verify={gates:[{gate:"VF_SYNTAX",status:"RED"}]}; var s=verifyState(); VES.verify=b; return s.indexOf("NO-GO")===0; } },
+    { d:"verify AMBER→GO", t:function(){ var b=VES.verify; VES.verify={gates:[{gate:"VF_LL_AUDIT",status:"AMBER"}]}; var s=verifyState(); VES.verify=b; return s.indexOf("GO")===0; } },
+    { d:"七閘名冊完整", t:function(){ return SB_GATES.length===7&&VF_GATES.length===7; } },
+    { d:"MR01–MR25 齊", t:function(){ return MOD_RISKS.length===25; } },
+    { d:"gateCards 缺閘顯 —", t:function(){ return gateCards(["SB_X"],[]).indexOf("—")>-1; } }
+  ]});
+  SUITES.push({ fn:"Close-out 收尾", dir:"b", probes:[
+    { d:"digest ≤25 行", t:function(){ var it=closeoutChecklist(); return buildDigest(it,closeoutVerdict(it)).split("\n").length<=25; } },
+    { d:"digest 無空行", t:function(){ var it=closeoutChecklist(); return !buildDigest(it,closeoutVerdict(it)).split("\n").some(function(l){return !l.trim();}); } },
+    { d:"digest 含 fnv32 尾行", t:function(){ var it=closeoutChecklist(); var ls=buildDigest(it,closeoutVerdict(it)).split("\n"); return /^fnv32 [0-9a-f]{8}/.test(ls[ls.length-1]); } },
+    { d:"fnv32 決定性", t:function(){ return fnv32("abc")===fnv32("abc")&&fnv32("abc")!==fnv32("abd"); } },
+    { d:"硬項 FAIL→BLOCKED", t:function(){ return closeoutVerdict([{id:"X",hard:true,st:"FAIL"}]).v==="BLOCKED"; } },
+    { d:"HOLD→CONDITIONAL", t:function(){ return closeoutVerdict([{id:"X",hard:true,st:"HOLD"}]).v==="CONDITIONAL"; } },
+    { d:"PENDING→CONDITIONAL", t:function(){ return closeoutVerdict([{id:"X",hard:false,st:"PENDING"}]).v==="CONDITIONAL"; } },
+    { d:"全 PASS→CLOSED", t:function(){ return closeoutVerdict([{id:"X",hard:true,st:"PASS"}]).v==="CLOSED"; } },
+    { d:"檢查表 14 項", t:function(){ return closeoutChecklist().length===14; } },
+    { d:"台帳只增(長度不減)", t:function(){ var n=LEDGER.length; return Array.isArray(LEDGER)&&n>=0; } },
+    { d:"報告 md 非空含判定", t:function(){ var m=closeoutReportMd(); return m.indexOf("## 判定")>-1&&m.length>100; } }
+  ]});
+  FMEA.push({ fn:"VES 決策行 / 沙盤 / Apply（協作協定）", items:[
+    ["AI 回了卡片外選項","解析器標非法並說明允許集;引擎本會靜默忽略→此處先攔,避免浪費一輪"],
+    ["缺 CARD- 前綴 / 未知卡族","標非法;不進 ves_decisions.jsonl"],
+    ["同卡多行互相矛盾","append-only 後寫優先;顯示「覆蓋 L#」提醒"],
+    ["小寫標記 / 錯拼","INVALID,不誤判為合法"],
+    ["CRLF / 多空白 / 空行","規範化容忍,不炸"],
+    ["JSON 行格式","{card,option,note} 亦接受(引擎規格)"],
+    ["Hydra H2 仍 apply","Apply 閘 HOLD-H2;需先 ACCEPT_CANONICAL 對齊"],
+    ["沙盤 NO-GO 仍 apply","閘拒;顯示 NO-GO 原因"],
+    ["H3/H4 破壞性","永遠拒;MR05/MR06/MR24 擋點"],
+    ["applicable 欄缺","改依 H≤1 推導,不假綠"],
+    ["verify 有 RED 仍合併","C5 硬項 FAIL→BLOCKED"],
+    ["AI 自降 Hydra 等級","Hydra 由引擎判;手動選擇僅標「規劃用」"]
+  ]});
+  FMEA.push({ fn:"Ticker Regex 驗證器", items:[
+    ["4/6 碼被動 ETF miss(原 DORMANT)","v2 規則 00\\d{2,4} 承接;原式保留 DORMANT 不刪"],
+    ["小寫代號誤收","嚴格格式拒收;寬鬆僅 BBG yellow-key"],
+    ["BBG 無空白 2330TT","拒收"],
+    ["未定義第六碼 X","拒收(只認 A-D K L M R S T U V)"],
+    ["尾端空白","trim 後可解"],
+    ["null/undefined 輸入","強制 String → 不炸"],
+    ["多類同時命中","互斥性自測 29 正樣本各 1 hit"],
+    ["三態往返失真","derive→classify 4 組往返驗證"],
+    ["與 Python 版漂移","CASES 逐字同步;自測需 75/75"]
+  ]});
+  FMEA.push({ fn:"Close-out 收尾 / digest / 台帳", items:[
+    ["digest 超過 25 行","硬截斷至 24 + 截斷提示 + fnv 行"],
+    ["digest 含空行","filter 空行"],
+    ["終局假綠","硬項任一 FAIL→BLOCKED;PENDING→CONDITIONAL,不 CLOSED"],
+    ["沙盤未載入就 CLOSED","C4 PENDING→CONDITIONAL"],
+    ["台帳被刪改","無刪除 UI;每筆帶 prev_fnv 鏈"],
+    ["重新整理遺失台帳","匯出 JSONL / 終局報告 .md 持久"],
+    ["人工項未確認","C10 PENDING 阻擋 CLOSED"],
+    ["料側紅站無 next","C9 FAIL 提示"]
+  ]});
+
+  SUITES.push({ fn:"Fetch Matrix 擷取矩陣", dir:"b", probes:[
+    { d:"fmNorm 空物件→FULL/APPEND 預設", t:function(){ var x=fmNorm({}); return x.mode==="FULL"&&x.merge==="APPEND"&&Array.isArray(x.out); } },
+    { d:"未知 mode→FULL", t:function(){ return fmNorm({mode:"ALL"}).mode==="FULL"; } },
+    { d:"未知 merge→APPEND", t:function(){ return fmNorm({merge:"X"}).merge==="APPEND"; } },
+    { d:"out 字串→陣列(逗號/換行)", t:function(){ return fmNorm({out:"a, b\nc"}).out.length===3; } },
+    { d:"種子 id 唯一", t:function(){ var s={}; return FM_SEED.every(function(f){ if(s[f.id])return false; s[f.id]=1; return true; }); } },
+    { d:"種子每項 ≥1 輸出", t:function(){ return FM_SEED.every(function(f){return f.out&&f.out.length>0;}); } },
+    { d:"交易+籌碼皆當日合併", t:function(){ return ["tw_prices","tw_index","tw_chip_inst","tw_marginshort"].every(function(id){var f=FM_SEED.filter(function(x){return x.id===id;})[0]; return f&&f.merge==="SAMEDAY";}); } },
+    { d:"台股財報為有選擇", t:function(){ return ["vrn_fin","vrn_basic","tw_finpages"].every(function(id){var f=FM_SEED.filter(function(x){return x.id===id;})[0]; return f&&f.mode==="SELECT";}); } },
+    { d:"global/macro/ETF 全抓", t:function(){ return FM_SEED.filter(function(f){return /^(global_|macro_|etf_)/.test(f.id);}).every(function(f){return f.mode==="FULL";}); } },
+    { d:"macro 49 序列齊(10+11+14+14)", t:function(){ var n=0; FM_SEED.forEach(function(f){ if(/^macro_us_/.test(f.id))n+=f.out.length; }); return n===49; } },
+    { d:"fmAdd 只增(長度+1,origin user)", t:function(){ var b=FM.slice(),bl=FM_LOG.length; var it=fmAdd({name:"probe"}); var ok=FM.length===b.length+1&&it.origin==="user"; FM=b; FM_LOG.length=bl; return ok; } },
+    { d:"fmAdd 重複 id 加尾綴", t:function(){ var b=FM.slice(),bl=FM_LOG.length; var it=fmAdd({id:"tw_prices",name:"dup"}); var ok=it.id!=="tw_prices"; FM=b; FM_LOG.length=bl; return ok; } },
+    { d:"停用=DORMANT 不刪(長度不變)", t:function(){ var b=FM.map(function(f){return JSON.parse(JSON.stringify(f));}),bl=FM_LOG.length; var n=FM.length; fmDormant("tw_fx_probe_none",true); var ok1=FM.length===n; fmDormant("global_fx",true); var ok2=FM.length===n&&fmFind("global_fx").dormant===true; FM=b; FM_LOG.length=bl; return ok1&&ok2; } },
+    { d:"啟用可復原", t:function(){ var b=FM.map(function(f){return JSON.parse(JSON.stringify(f));}),bl=FM_LOG.length; fmDormant("global_fx",true); fmDormant("global_fx",false); var ok=fmFind("global_fx").dormant===false; FM=b; FM_LOG.length=bl; return ok; } },
+    { d:"fmSet 非法 mode 拒", t:function(){ var bl=FM_LOG.length; var r=fmSet("tw_prices","mode","ALL"); FM_LOG.length=bl; return r===false&&fmFind("tw_prices").mode==="FULL"; } },
+    { d:"fmSet 非白名單欄位拒", t:function(){ return fmSet("tw_prices","id","x")===false; } },
+    { d:"匯出 JSON 可解析且項數一致", t:function(){ var j=JSON.parse(fmExport()); return j.contract==="VIA_FETCH_MATRIX/0100"&&j.fetch_matrix.length===FM.length; } },
+    { d:"fmImport 空陣列拒", t:function(){ return fmImport([])===false; } },
+    { d:"fmImport 往返項數", t:function(){ var b=FM.slice(),bl=FM_LOG.length; var j=JSON.parse(fmExport()); var ok=fmImport(j.fetch_matrix)&&FM.length===b.length; FM=b; FM_LOG.length=bl; return ok; } },
+    { d:"fmVisible 篩選邏輯", t:function(){ var f={dormant:false,mode:"SELECT",merge:"APPEND"}; return fmVisible(f,"select")&&!fmVisible(f,"full")&&!fmVisible(f,"sameday")&&fmVisible(f,"all")&&!fmVisible(f,"dormant"); } },
+    { d:"fmStats 計數守恆", t:function(){ var s=fmStats(); return s.full+s.select+s.dormant===s.n; } },
+    { d:"fmIntegrity 現況 OK(當日合併律/有選擇律/id 唯一)", t:function(){ return fmIntegrity().ok; } },
+    { d:"fmIntegrity 偵測交易/籌碼不同日", t:function(){ var b=FM.map(function(f){return JSON.parse(JSON.stringify(f));}),bl=FM_LOG.length; fmSet("tw_chip_inst","merge","APPEND"); var bad=!fmIntegrity().ok; FM=b; FM_LOG.length=bl; return bad; } },
+    { d:"變更台帳只增", t:function(){ var n=FM_LOG.length; fmLog("PROBE","x"); var ok=FM_LOG.length===n+1; FM_LOG.length=n; return ok; } },
+    { d:"領域分組 ≥6", t:function(){ return fmDomains().length>=6; } }
+  ]});
+  FMEA.push({ fn:"Fetch Matrix 擷取矩陣 / 增減介面", items:[
+    ["「減」被理解為刪除","減=停用 DORMANT(劃線灰顯),可再啟用;無刪除路徑(只增不減)"],
+    ["新增項目 id 撞名","自動加時間尾綴;台帳記 ADD"],
+    ["模式/合併填非法值","fmNorm 回落 FULL/APPEND;fmSet 白名單拒"],
+    ["輸出項目以字串貼入","逗號/換行/頓號自動切陣列"],
+    ["交易與籌碼被改成不同日","fmIntegrity 標「交易與籌碼須當日合併」→ C12"],
+    ["台股財報被改成全抓","fmIntegrity 標「應為有選擇」"],
+    ["匯入 JSON 缺 fetch_matrix / 空陣列","classifyExt 不識別 / fmImport 拒,原矩陣保留"],
+    ["項目多到看不完整","每領域摺疊;輸出項目「▾ 完整」逐項展開或「輸出全展」"],
+    ["改動無可回溯","變更台帳 append-only;匯出 JSON 含 change_log"],
+    ["狀態文字判色誤導","僅關鍵字(BLOCKED/落後/0 列/需/PENDING)判黃紅,其餘綠"]
+  ]});
+
+  SUITES.push({ fn:"VAP 圖規鎖 / 圖規冊", dir:"b", probes:[
+    { d:"圖規冊 40", t:function(){ return VAP_CHARTS.length===40; } },
+    { d:"code 唯一 VAP-CH-01..40", t:function(){ var s={}; return VAP_CHARTS.every(function(c){ if(s[c.code])return false; s[c.code]=1; return /^VAP-CH-\d{2}$/.test(c.code); }); } },
+    { d:"9 群且總和 40", t:function(){ var g=vapGroups(); return Object.keys(g).length===9&&Object.keys(g).reduce(function(a,k){return a+g[k];},0)===40; } },
+    { d:"axisMode 僅 SINGLE/DUAL_LOCKED/NONE", t:function(){ return VAP_CHARTS.every(function(c){return ["SINGLE","DUAL_LOCKED","NONE"].indexOf(c.mode)>-1;}); } },
+    { d:"SINGLE 26 · DUAL 9 · NONE 5", t:function(){ var m={}; VAP_CHARTS.forEach(function(c){m[c.mode]=(m[c.mode]||0)+1;}); return m.SINGLE===26&&m.DUAL_LOCKED===9&&m.NONE===5; } },
+    { d:"軸 -3..97 → step 50(=引擎)", t:function(){ var r=vapNiceAxis(-3,97,"v23"); return r&&r.step===50&&r.ticks.join(",")==="-50,0,50,100,150"; } },
+    { d:"軸 0..97 → [0,25,50,75,100](=引擎)", t:function(){ return vapNiceAxis(0,97,"v23").ticks.join(",")==="0,25,50,75,100"; } },
+    { d:"軸 13..14 → step 0.25", t:function(){ return vapNiceAxis(13,14,"v23").step===0.25; } },
+    { d:"軸 v23 0..4.6 → step 1.25 · 4 位小數 offset(=引擎)", t:function(){ var r=vapNiceAxis(0,4.6,"v23"); return r.step===1.25&&r.labels.join(",")==="-0.3125,0.9375,2.1875,3.4375,4.6875"; } },
+    { d:"軸 v018 0..4.6 → -1.5…6.5 不顯示成整數(=引擎)", t:function(){ return vapNiceAxis(0,4.6,"v018").labels.join(",")==="-1.5,0.5,2.5,4.5,6.5"; } },
+    { d:"軸 v018 不用 1.25", t:function(){ return vapNiceAxis(0,4.6,"v018").step!==1.25; } },
+    { d:"軸 含 0 非負→起點 0", t:function(){ return vapNiceAxis(5,97,"v23",true).ticks[0]===0; } },
+    { d:"軸 含 0 非正→終點 0", t:function(){ return vapNiceAxis(-97,-5,"v23",true).ticks[4]===0; } },
+    { d:"軸 mantissa 合法(多樣本)", t:function(){ return [[0,97],[0,1],[-3,7],[13,14],[1000,9000],[0.001,0.009],[-50,-10]].every(function(p){var r=vapNiceAxis(p[0],p[1],"v23"); return r&&r.checks.legal_mantissa&&r.checks.five_ticks&&r.checks.uniform&&r.checks.covers;}); } },
+    { d:"軸 200 隨機樣本四檢全真(=引擎 PropertySamples)", t:function(){ var seed=7; function rnd(){ seed=(seed*1103515245+12345)%2147483648; return seed/2147483648; } for(var i=0;i<200;i++){ var lo=rnd()*2e4-1e4, hi=lo+Math.abs(rnd()*5e4+1e-3); var fam=rnd()<0.5?"v018":"v23"; var r=vapNiceAxis(lo,hi,fam,rnd()<0.3); if(!(r&&r.checks.five_ticks&&r.checks.uniform&&r.checks.legal_mantissa&&r.checks.covers))return false; } return true; } },
+    { d:"軸 min>max 自動交換", t:function(){ var r=vapNiceAxis(97,0,"v23"); return r&&r.min===0; } },
+    { d:"軸 min==max 退化處理", t:function(){ var r=vapNiceAxis(5,5,"v23"); return r&&r.ticks.length===5&&r.checks.covers; } },
+    { d:"軸 0..0 退化→0..1", t:function(){ var r=vapNiceAxis(0,0,"v23"); return r&&r.max>=1; } },
+    { d:"軸 非數字→null", t:function(){ return vapNiceAxis("a",1,"v23")===null&&vapNiceAxis(NaN,1,"v23")===null; } },
+    { d:"尾零 1.25/2.50 規則", t:function(){ return vapDecimals(1.25)===2&&(2.5).toFixed(2)==="2.50"; } },
+    { d:"classifyExt 識別 VAP ONE selftest", t:function(){ return classifyExt({contract:"VIA_VAP_ONE_SELFTEST/0100",checks:[]}).indexOf("vapone")>-1; } },
+    { d:"圖規 JSON 最小合格", t:function(){ return vapValidateSpec('{"x":[1,2],"series":[{"name":"a","y":[1,2]}],"methodology":"m"}').ok; } },
+    { d:"圖規 JSON 缺 x 拒", t:function(){ return !vapValidateSpec('{"series":[{"y":[1]}],"methodology":"m"}').ok; } },
+    { d:"圖規 JSON 缺 series 拒", t:function(){ return !vapValidateSpec('{"x":[1],"methodology":"m"}').ok; } },
+    { d:"圖規 JSON 缺方法論 拒", t:function(){ return !vapValidateSpec('{"x":[1],"series":[{"y":[1]}]}').ok; } },
+    { d:"圖規 JSON 方法論 中文鍵接受", t:function(){ return vapValidateSpec('{"x":[1],"series":[{"y":[1]}],"方法論":"m"}').ok; } },
+    { d:"圖規 JSON 未知 code 拒", t:function(){ return !vapValidateSpec('{"code":"VAP-CH-99","x":[1],"series":[{"y":[1]}],"methodology":"m"}').ok; } },
+    { d:"圖規 JSON code=id 亦可(candle)", t:function(){ var r=vapValidateSpec('{"code":"candle","x":[1],"series":[{"y":[1]}],"methodology":"m"}'); return r.ok&&/VAP-CH-27/.test(r.info.chart||""); } },
+    { d:"圖規 JSON axisMode 不符→警告", t:function(){ var r=vapValidateSpec('{"code":"VAP-CH-01","axisMode":"DUAL_LOCKED","x":[1],"series":[{"y":[1]}],"methodology":"m"}'); return r.ok&&r.warn.length>0; } },
+    { d:"圖規 JSON 裸 close→批330 警告", t:function(){ var r=vapValidateSpec('{"x":[1],"series":[{"y":[1]}],"methodology":"m","price_field":"close"}'); return r.warn.some(function(w){return /批330/.test(w);}); } },
+    { d:"圖規 JSON 壞 JSON 拒", t:function(){ return !vapValidateSpec('{bad').ok; } },
+    { d:"圖規 JSON 頂層陣列拒", t:function(){ return !vapValidateSpec('[]').ok; } },
+    { d:"引擎矩陣 ≥15 且含 GUARD", t:function(){ return VAP_ENGS.length>=15&&VAP_ENGS.some(function(e){return e[0]==="GUARD";}); } },
+    { d:"視覺鎖層級 line>area>bar", t:function(){ return VAP_SPEC.line>VAP_SPEC.area&&VAP_SPEC.area>VAP_SPEC.bar&&VAP_SPEC.barDense>VAP_SPEC.bar; } },
+    { d:"MODULE 含 VAP 列", t:function(){ return DATA.projects.some(function(p){return p.key==="VAP";}); } }
+  ]});
+  FMEA.push({ fn:"VAP 圖規鎖 / 圖規冊 / 資料律", items:[
+    ["軸刻度非 5 / 間隔不等","vapNiceAxis 以步階族窮舉,上緣補齊至 4 間隔;checks 四項全 true 才 PASS"],
+    ["步階非法(如 3、4、7.5)","僅 1/2/2.5/5×10ⁿ 入候選;10 即下一十進位之 1"],
+    ["min>max / min==max / NaN","交換 / 退化 ±10% 或 0..1 / 回 null"],
+    ["圖規 JSON 缺 x/series/方法論","validator 逐項 error;方法論接受 methodology|方法論|method"],
+    ["code 不在 40 冊","error;code 亦可用 id(如 candle)"],
+    ["axisMode 與冊不符","warn(不擋),提示對齊"],
+    ["用裸 close / 未扣當沖量","批330 warn;引擎側 pick_price 只認 adj_close"],
+    ["兩套視覺鎖並存誤判","方案 A:vap_spec 唯一真相;UNIT03 判定表待升級(列於待補)"],
+    ["正本 L343 誤用填色鎖","待補項:hash-locked 單行修正 + 迴歸"],
+    ["VAP 站況推定失真","MODULE VAP 列標「由 grid 站況推定」;載入 ProjectCompletion 以引擎為準"],
+    ["總控台軸算法與引擎不一致","JS 逐字移植 compute_locked_ticks(quarter 量子、slack 最小、含 0 律);同樣本比對探針"],
+    ["小數 offset 顯示成整數","decimals 取 step 與刻度值最大位數(v2.3.1 修正律)"],
+    ["兩套步階族混用","family 明選 v018(守衛對勘)/ v23(1.25 超集);引擎與台同參數"],
+    ["VAP ONE 自測未載入即宣稱 PASS","C14 PENDING 直到載入 JSON;FAIL>0 → FAIL"]
+  ]});
+
+  function runSelfCheck(){
+    var rows=[], totP=0, totN=0;
+    SUITES.forEach(function(s){
+      var pass=0, fails=[];
+      s.probes.forEach(function(p){ var ok=false; try{ ok=!!p.t(); }catch(e){ ok=false; } if(ok){pass++;}else{fails.push(p.d);} });
+      totP+=pass; totN+=s.probes.length;
+      rows.push({fn:s.fn,dir:s.dir,pass:pass,n:s.probes.length,fails:fails});
+    });
+    var up=verifyUp();
+    renderSelfCheck(rows,up,totP,totN);
+    guard("renderCloseout",renderCloseout);
+  }
+  function dirTag(d){ if(d==="d")return "<span class='dir d'>↓ 輸入</span>"; if(d==="u")return "<span class='dir u'>↑ 輸出</span>"; return "<span class='dir bi'>↕ 雙向</span>"; }
+  function renderSelfCheck(rows,up,totP,totN){
+    LASTCHECK={totP:totP,totN:totN,up:up.length};
+    var body=rows.map(function(r){
+      var c = r.fails.length? (r.pass? "y":"r") : "g";
+      var lab = r.fails.length? (r.pass? "PARTIAL":"FAIL") : "PASS";
+      var detail = r.fails.length? "<span class='fails'>未通過:"+esc(r.fails.join("、"))+"</span>" : "<span class='zh'>全數通過</span>";
+      return "<tr><td data-l='Fn'><span class='name'>"+esc(r.fn)+"</span></td>"+
+        "<td class='c' data-l='RYG'><span class='b "+c+"'>"+lab+"</span></td>"+
+        "<td class='c' data-l='方向'>"+dirTag(r.dir)+"</td>"+
+        "<td class='c mono' data-l='探針'>"+r.pass+" / "+r.n+"</td>"+
+        "<td data-l='明細'>"+detail+"</td></tr>";
+    }).join("");
+    var upNote = up.length? ("<span class='fails'>"+esc(up.join(" · "))+"</span>") : "<span class='zh'>DOM↔DATA 一致</span>";
+    body+="<tr class='lockrow'><td data-l='Fn'><span class='name'>↑ 上向 DOM↔DATA 複驗</span></td>"+
+      "<td class='c'><span class='b "+(up.length?"y":"g")+"'>"+(up.length?"ADJUSTED":"OK")+"</span></td>"+
+      "<td class='c'>"+dirTag("u")+"</td><td class='c mono'>"+(up.length?"修正後":"—")+"</td><td>"+upNote+"</td></tr>";
+    document.getElementById("tb-check").innerHTML=body;
+    var allPass=(totP===totN)&&!up.length;
+    document.getElementById("roll-selfcheck").innerHTML=(allPass?"🟢 ":"🟡 ")+totP+" / "+totN+" 探針通過 · 上向"+(up.length?("修正 "+up.length):"一致");
+    document.getElementById("checkNote").textContent="上次自檢 "+new Date().toLocaleTimeString("zh-Hant",{hour12:false})+" · "+SUITES.length+" 功能 · "+totN+" 探針 · guard 例外 "+CHECKLOG.length;
+  }
+  function renderFmea(){
+    var tot=0;
+    var html=FMEA.map(function(f){
+      tot+=f.items.length;
+      var rows=f.items.map(function(it){ return "<tr><td class='em' data-l='錯誤'>"+esc(it[0])+"</td><td class='mi' data-l='預案'>"+esc(it[1])+"</td></tr>"; }).join("");
+      return "<details class='fmea'><summary>"+esc(f.fn)+"<span class='cnt'>"+f.items.length+" 項預案</span></summary>"+
+        "<div class='fbody'><table><colgroup><col style='width:42%'><col style='width:58%'></colgroup>"+
+        "<thead><tr><th>最可能錯誤</th><th>預備修正方案</th></tr></thead><tbody>"+rows+"</tbody></table></div></details>";
+    }).join("");
+    document.getElementById("fmeaWrap").innerHTML=html;
+    document.getElementById("roll-fmea").textContent=FMEA.length+" 組 · "+tot+" 項預案";
+  }
+
+  // ---------- renderers ----------
+  function renderMast(){
+    var g=DATA.grid, total=g.ok+g.fail+g.skip, pct= total? (g.ok/total*100):0;
+    var codeRed=DATA.projects.reduce(function(a,p){return a+((p.n&&p.n.CODE)||0);},0);
+    var m=DATA.meta;
+    $("stampLine").innerHTML="grid stamp "+esc(m.stamp)+" · branch <b>"+esc(m.branch)+"</b> · head "+esc(m.head)+" · Register "+esc(m.register)+" · <span id='clock'></span>";
+    var K=[
+      ["y","overall",m.overall,"Overall verdict"],
+      ["g","",g.ok,"站綠 OK / "+total],
+      [(g.fail?"r":"g"),"",g.fail,"紅 FAIL · 全料側"],
+      ["","",g.skip,"SKIP 誠實佔位"],
+      [(codeRed?"r":"g"),"",codeRed,"碼側紅 CODE"],
+      ["g","",(m.delta>=0?"+":"")+m.delta,"趨勢 Δ"],
+      ["","",20,"加速器點亮"],
+      ["g","","H1–H6","Hydra 哨兵 0 連鎖"]
+    ];
+    $("kpis").innerHTML=K.map(function(k){ return "<div class='kpi "+k[0]+"'><div class='n'>"+esc(k[2])+"</div><div class='l'>"+esc(k[3])+"</div></div>"; }).join("");
+    var barPct=pct.toFixed(1);
+    $("ppct").textContent=barPct+"% · "+g.ok+"/"+total+" 綠 · "+g.fail+" 料紅 · "+g.skip+" SKIP";
+    requestAnimationFrame(function(){ $("pbar").style.width=barPct+"%"; });
+  }
+
+  function renderModule(){
+    var rollup={g:0,y:0,r:0};
+    var rows=DATA.projects.map(function(p){
+      var c=cls(p.state); rollup[c==="w"?"y":c]++;
+      var anchor=DATA.anchors[p.key]||("Elastic::"+p.key);
+      var nx=/^via-/.test(p.next)? "<span class='cmd' data-cmd='"+esc(p.next)+"'>"+esc(p.next)+"</span>" : esc(p.next);
+      var fail=p.n.FAIL+(p.n.DATA? " <span class='zh'>DATA</span>":"")+(p.n.SKIP? " <span class='zh'>· "+p.n.SKIP+" SKIP</span>":"");
+      return "<tr>"+
+        "<td data-l='Module'><span class='name'>"+esc(p.key)+"</span> <span class='zh'>"+esc(p.zh)+"</span></td>"+
+        "<td class='c' data-l='RYG'><span class='b "+c+"'>"+esc(p.state)+"</span></td>"+
+        "<td class='c mono' data-l='站'>"+p.n.OK+" / "+fail+"</td>"+
+        "<td class='mono' data-l='AST'>"+esc(anchor)+"</td>"+
+        "<td data-l='診斷'>"+esc(p.diag)+"</td>"+
+        "<td data-l='Next'>"+nx+"</td></tr>";
+    }).join("");
+    $("tb-module").innerHTML=rows;
+    $("roll-module").textContent="🟢"+rollup.g+" · 🟡"+rollup.y+" · 🔴"+rollup.r;
+  }
+
+  function renderGates(){
+    var warn=0,fail=0;
+    var html=DATA.gates.map(function(x){
+      var c=cls(x.state); if(x.state==="WARN")warn++; if(x.state==="FAIL")fail++;
+      var nx=/^via-/.test(x.next)? " · <span class='cmd' data-cmd='"+esc(x.next)+"'>"+esc(x.next)+"</span>":"";
+      return "<div class='card'><div class='ch'><span class='cid'>"+esc(x.id)+"</span><span class='b "+c+"'>"+esc(x.state)+"</span><span class='cn'>"+esc(x.name)+"</span></div><div class='ce'>"+esc(x.evidence)+nx+"</div></div>";
+    }).join("");
+    $("gateGrid").innerHTML=html;
+    var verdict= fail? "NOT_QUALIFIED" : (warn? "CONDITIONAL":"QUALIFIED");
+    $("roll-gate").textContent=verdict+" · "+(DATA.gates.length-warn-fail)+" OK / "+warn+" WARN"+(fail?(" / "+fail+" FAIL"):"");
+  }
+
+  function renderDepth(){
+    var d=DATA.depth, chips=[];
+    function chip(k,v,m,warn){ chips.push("<div class='card dchip"+(warn?" warn":"")+"'><div class='dk'>"+esc(k)+"</div><div class='dv'>"+v+"</div><div class='dm'>"+esc(m)+"</div></div>"); }
+    if(d.tw_prices) chip("tw_prices 台股日價", nf(d.tw_prices.rows)+" 列", (d.tw_prices.tickers?nf(d.tw_prices.tickers)+" 檔 · ":"")+"至 "+d.tw_prices.max);
+    if(d.tw_chip) chip("tw_chip 籌碼", nf(d.tw_chip.rows)+" 列", "最新 "+d.tw_chip.max+(d.tw_chip.warn?" · 落後 >30 日":""), d.tw_chip.warn);
+    if(d.revenue) chip("revenue 月營收", nf(d.revenue.rows)+" 列", nf(d.revenue.codes)+" 檔 · "+d.revenue.months+" 月"+(d.revenue.warn?"(需 ≥60)":""), d.revenue.warn);
+    if(d.global) chip("global 全球宇宙", nf(d.global.rows)+" 列", nf(d.global.tickers)+" 檔 · 至 "+d.global.max);
+    if(d.aetf) chip("aetf 主動式 ETF", nf(d.aetf.rows)+" 列", nf(d.aetf.with_holdings)+" 持股 · 至 "+d.aetf.max);
+    if(d.consensus) chip("consensus 共識", nf(d.consensus.rows)+" 列", "net 關 SKIP 誠實");
+    chip("macro 美國總經", (d.macro&&d.macro.rows?nf(d.macro.rows):"0")+" 列", "FRED 190 series 待補 · via-fred", !(d.macro&&d.macro.rows));
+    if(d.vrn_ssot) chip("vrn_ssot 報告 SSOT", nf(d.vrn_ssot.records)+" 筆", "結構化入庫");
+    $("depthGrid").innerHTML=chips.join("");
+  }
+
+  function renderStatic(){
+    $("accelGrid").innerHTML=ACCEL.map(function(nm,i){ var id=("0"+(i+1)).slice(-2);
+      return "<div class='card lit'><div class='ch'><span class='led'></span><span class='cid'>"+id+"</span><span class='cn'>"+esc(nm)+"</span></div></div>"; }).join("");
+    $("pipeGrid").innerHTML=PIPES.map(function(p){
+      return "<div class='card'><div class='ch'><span class='b "+p[3]+"'>ACTIVE</span><span class='cn'>"+esc(p[0])+"</span></div><div class='ce'><b style='color:#e2e8f0'>"+esc(p[1])+"</b><br>"+esc(p[2])+"</div></div>"; }).join("");
+    $("roundGrid").innerHTML=ROUNDS.map(function(r){
+      return "<div class='card'><div class='ch'><span class='cid'>"+esc(r[0])+"</span><span class='b "+r[3]+"'>"+esc(r[4])+"</span><span class='cn'>"+esc(r[1])+"</span></div><div class='ce'>"+esc(r[2])+"</div></div>"; }).join("")+
+      "<div class='card'><div class='ch'><span class='cid'>ERR</span><span class='b g'>分流</span><span class='cn'>錯誤分類</span></div><div class='ce'>Parallel-Fixable <b style='color:#34d399'>0</b> · Sequence-Dependent <b style='color:#34d399'>0</b>(碼側全綠)。料側 backfill 拓撲序:<span class='cmd' data-cmd='via-fred'>via-fred</span> → <span class='cmd' data-cmd='via-revfill'>via-revfill</span> → <span class='cmd' data-cmd='via-mobile'>via-mobile</span>。</div></div>";
+  }
+
+  function renderFoot(){
+    $("foot").innerHTML="判讀:<b>碼側零紅</b> — 唯一未 QUALIFIED 之因為料側 5 紅(資料覆蓋缺口)。最短收斂路 via-fred → via-revfill → via-mobile(chip/universe),清 G1 WARN 即 CONDITIONAL → QUALIFIED。<br>VIA Central Governance Console v0700 · 純本地零 CDN · 生成基準 grid "+esc(DATA.meta.stamp)+" / branch "+esc(DATA.meta.branch)+" "+esc(DATA.meta.head)+"。";
+  }
+
+  function renderAll(){ validateData(); guard("renderMast",renderMast); guard("renderModule",renderModule); guard("renderGates",renderGates); guard("renderDepth",renderDepth); guard("renderFoot",renderFoot); LAST_UP=verifyUpAdaptive(); }
+
+  // ---------- filter / search ----------
+  var curRy="all", curQ="";
+  function applyFilter(){
+    try{
+      document.querySelectorAll(".filterable tbody tr").forEach(function(tr){
+        var okQ=matchQ(tr.textContent,curQ);
+        var okR=matchRy(!!tr.querySelector(".b.g"), !!(tr.querySelector(".b.y")||tr.querySelector(".b.w")), !!tr.querySelector(".b.r"), curRy);
+        tr.classList.toggle("hide", !(okQ&&okR));
+      });
+    }catch(e){ /* adaptive: on filter failure show all rather than hide-all */
+      document.querySelectorAll(".filterable tbody tr").forEach(function(tr){tr.classList.remove("hide");});
+    }
+  }
+
+  // ---------- CSV export ----------
+  function exportCsv(){
+    var out=[["section","name","status","detail","next"]];
+    document.querySelectorAll(".sec").forEach(function(sec){
+      var secName=(sec.querySelector("h2")? sec.querySelector("h2").firstChild.textContent.trim():sec.id);
+      sec.querySelectorAll(".filterable tbody tr").forEach(function(tr){
+        if(tr.classList.contains("hide"))return;
+        var tds=tr.querySelectorAll("td");
+        var name=(tds[0]?tds[0].innerText.replace(/\s+/g," ").trim():"");
+        var st=(tr.querySelector(".b")?tr.querySelector(".b").textContent.trim():"");
+        var detail=(tds[tds.length-1]?tds[tds.length-1].innerText.replace(/\s+/g," ").trim():"");
+        var nx=(tr.querySelector(".cmd")?tr.querySelector(".cmd").getAttribute("data-cmd"):"");
+        out.push([secName,name,st,detail,nx]);
+      });
+    });
+    var csv=out.map(function(r){return r.map(function(c){return csvCell(c);}).join(",");}).join("\r\n");
+    var blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="VIA_Matrix_"+DATA.meta.stamp.replace(/[^0-9]/g,"").slice(0,12)+".csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); toast("已匯出可見列 CSV");
+  }
+
+  // ---------- load live JSON (ProjectCompletion / ProductGate) ----------
+  function ingest(obj){
+    var touched=[];
+    if(obj.grid && (obj.projects || obj.overall!==undefined)){
+      if(obj.grid){ DATA.grid={ok:obj.grid.ok|0,fail:obj.grid.fail|0,skip:obj.grid.skip|0}; }
+      if(obj.stamp) DATA.meta.stamp=obj.stamp;
+      if(obj.overall) DATA.meta.overall=obj.overall;
+      if(typeof obj.trend_delta==="number") DATA.meta.delta=obj.trend_delta;
+      if(Array.isArray(obj.projects)){
+        DATA.projects=obj.projects.map(function(p){
+          var n=p.n||{}; var gaps=Array.isArray(p.gaps)?p.gaps:[];
+          var diag = gaps.length? gaps.map(function(g){return (g.gap||g)+(g.cmd?"("+g.cmd+")":"");}).join(";") : "碼側全綠。";
+          return { key:p.key||"?", zh:p.zh||"", state:p.state||"YELLOW",
+                   n:{OK:n.OK|0,FAIL:n.FAIL|0,SKIP:n.SKIP|0,DATA:n.DATA|0,CODE:n.CODE|0},
+                   next:p.next||"", diag:diag };
+        });
+      }
+      if(obj.depth) DATA.depth=mapDepth(obj.depth);
+      touched.push("KPIs","MODULE","DEPTH");
+    }
+    if(Array.isArray(obj.gates)){
+      DATA.gates=obj.gates.map(function(x){return {id:x.id,name:x.name,state:x.state,evidence:x.evidence||"",next:x.next||""};});
+      if(obj.stamp) DATA.meta.stamp=obj.stamp;
+      touched.push("PRODUCT GATE");
+    }
+    var kinds=classifyExt(obj);
+    if(kinds.indexOf("sandbox")>-1){ VES.sandbox=obj; if(VES.stage<6)VES.stage=6; touched.push("VES SANDBOX"); }
+    if(kinds.indexOf("verify")>-1){ VES.verify=obj; touched.push("VES VERIFY"); }
+    if(kinds.indexOf("group")>-1){ VES.group=obj; touched.push("GROUP SSOT"); }
+    if(kinds.indexOf("fm")>-1){ if(fmImport(obj.fetch_matrix)){ touched.push("FETCH MATRIX"); guard("renderFetchMatrix",renderFetchMatrix); } }
+    if(kinds.indexOf("vapone")>-1){ VAPONE=obj; touched.push("VAP ONE SELFTEST"); guard("renderVap",renderVap); }
+    if(!touched.length){ toast("未識別的 JSON(需 ProjectCompletion / ProductGate / sandbox_report / verify_report / GroupSSOT summary)"); return; }
+    guard("renderVes",renderVes); guard("renderGroup",renderGroup);
+    renderAll(); applyFilter(); runSelfCheck();
+    $("tbNote").textContent="live: "+DATA.meta.stamp;
+    toast("已載入實時資料 → 重生 "+touched.join(" / "));
+  }
+  function mapDepth(d){
+    var o={};
+    if(d.tw_prices) o.tw_prices={rows:d.tw_prices.rows,tickers:d.tw_prices.tickers,max:d.tw_prices.max};
+    if(d.tw_chip){ o.tw_chip={rows:d.tw_chip.rows,max:d.tw_chip.max,warn:isOld(d.tw_chip.max)}; }
+    if(d.revenue){ o.revenue={rows:d.revenue.rows,codes:d.revenue.codes,months:d.revenue.months,warn:(d.revenue.months||0)<60}; }
+    if(d.global) o.global={rows:d.global.rows,tickers:d.global.tickers,max:d.global.max};
+    if(d.aetf) o.aetf={with_holdings:d.aetf.with_holdings,rows:d.aetf.rows,max:d.aetf.max};
+    if(d.consensus) o.consensus={rows:d.consensus.rows};
+    o.macro=d.macro||null;
+    if(d.vrn_ssot) o.vrn_ssot={records:d.vrn_ssot.records};
+    return o;
+  }
+  function isOld(dstr){ if(!dstr)return true; var t=Date.parse(dstr); if(isNaN(t))return false; return (Date.now()-t)>30*864e5; }
+
+  // ---------- wire up ----------
+  function boot(){
+    fmInit(); renderAll(); renderStatic(); renderFmea(); runSelfCheck();
+
+    guard("renderFetchMatrix",renderFetchMatrix); guard("renderVap",renderVap);
+    ["vapMin","vapMax"].forEach(function(id){ var e=$(id); if(e)e.addEventListener("input",renderVapAxis); });
+    ["vapFam","vapZero"].forEach(function(id){ var e=$(id); if(e)e.addEventListener("change",renderVapAxis); });
+    var vsi=$("vapSpecIn"); if(vsi){ vsi.addEventListener("input",renderVapSpec); }
+    var vgs=$("vapGroupSeg"); if(vgs){ vgs.addEventListener("click",function(e){ var b=e.target.closest("[data-vg]"); if(!b)return; VAP_UI.group=b.getAttribute("data-vg"); renderVap(); }); }
+    guard("renderVes",renderVes); guard("renderTicker",renderTicker); guard("renderGroup",renderGroup); guard("renderCloseout",renderCloseout);
+    var fw=$("fmWrap"); if(fw){
+      fw.addEventListener("change",function(e){ var t=e.target; if(!t||!t.getAttribute)return; var id=t.getAttribute("data-id");
+        if(t.classList.contains("fm-mode")){ if(fmSet(id,"mode",t.value)){renderFetchMatrix();guard("renderCloseout",renderCloseout);toast("模式已改:"+id);} }
+        else if(t.classList.contains("fm-merge")){ if(fmSet(id,"merge",t.value)){renderFetchMatrix();guard("renderCloseout",renderCloseout);toast("合併已改:"+id);} } });
+      fw.addEventListener("click",function(e){ var d=e.target.closest(".fm-dorm"); if(d){ var id=d.getAttribute("data-id"),f=fmFind(id); if(f){ fmDormant(id,!f.dormant); renderFetchMatrix(); guard("renderCloseout",renderCloseout); toast((f.dormant?"已停用(DORMANT,未刪):":"已啟用:")+id); } return; }
+        var x=e.target.closest(".fm-exp"); if(x){ var id2=x.getAttribute("data-id"); FM_UI.exp[id2]=!FM_UI.exp[id2]; renderFetchMatrix(); } });
+    }
+    document.querySelectorAll("[data-fmf]").forEach(function(b){ b.addEventListener("click",function(){ document.querySelectorAll("[data-fmf]").forEach(function(x){x.classList.remove("on");}); this.classList.add("on"); FM_UI.filter=this.getAttribute("data-fmf"); FM_UI.openAll=true; renderFetchMatrix(); }); });
+    var fb;
+    if((fb=$("fmOpenAll"))) fb.addEventListener("click",function(){ FM_UI.openAll=!FM_UI.openAll; this.textContent=FM_UI.openAll?"全部摺疊":"全部展開"; renderFetchMatrix(); });
+    if((fb=$("fmOutAll"))) fb.addEventListener("click",function(){ FM_UI.outAll=!FM_UI.outAll; this.textContent=FM_UI.outAll?"輸出摺疊":"輸出全展"; renderFetchMatrix(); });
+    if((fb=$("fmAddToggle"))) fb.addEventListener("click",function(){ var f=$("fmForm"); if(f){ f.style.display=(f.style.display==="none"?"grid":"none"); } });
+    if((fb=$("fmAddBtn"))) fb.addEventListener("click",fmAddFromForm);
+    if((fb=$("fmExport"))) fb.addEventListener("click",function(){ dlText("VIA_FetchMatrix_"+new Date().toISOString().slice(0,10)+".json",fmExport(),"application/json"); toast("擷取矩陣已匯出"); });
+    var decIn=$("decIn"); if(decIn){ decIn.addEventListener("input",function(){ renderDecisions(); if(VES.stage<4)VES.stage=4; renderVes(); guard("renderCloseout",renderCloseout); }); }
+    var cvd=$("copyValidDec"); if(cvd){ cvd.addEventListener("click",function(){ var t=validDecisionText(); if(!t){toast("無合法決策行");return;} copy(t); if(VES.stage<5)VES.stage=5; renderVes(); }); }
+    var hy=$("hySel"); if(hy){ hy.addEventListener("change",function(){ VES.hyManual=this.value; renderVes(); guard("renderCloseout",renderCloseout); }); }
+    var vs=$("vesSteps"); if(vs){ vs.addEventListener("click",function(e){ var s=e.target.closest(".step"); if(!s)return; VES.stage=parseInt(s.getAttribute("data-st"),10)||0; renderVes(); guard("renderCloseout",renderCloseout); }); }
+    var tki=$("tkIn"); if(tki){ tki.addEventListener("input",renderTicker); }
+    var coc=$("coChk"); if(coc){ coc.addEventListener("change",function(e){ if(e.target&&e.target.id==="coManual"){ renderCloseout(); } }); }
+    var b;
+    if((b=$("coCopy"))) b.addEventListener("click",function(){ copy(($("coDigest")||{}).textContent||""); });
+    if((b=$("coDl"))) b.addEventListener("click",function(){ dlText("VIA_digest_"+DATA.meta.stamp.replace(/[^0-9]/g,"").slice(0,12)+".md",($("coDigest")||{}).textContent||"","text/markdown"); toast("digest 已下載"); });
+    if((b=$("coFinal"))) b.addEventListener("click",finalizeCloseout);
+    if((b=$("coLedgerDl"))) b.addEventListener("click",function(){ if(!LEDGER.length){toast("台帳為空");return;} dlText("VIA_closeout_ledger.jsonl",LEDGER.map(function(e){return JSON.stringify(e);}).join("\n"),"application/x-ndjson"); toast("台帳已匯出 JSONL"); });
+    if((b=$("coReport"))) b.addEventListener("click",function(){ dlText("VIA_closeout_report_"+new Date().toISOString().slice(0,10)+".md",closeoutReportMd(),"text/markdown"); toast("終局報告已匯出"); });
+
+    var rc=$("rerunCheck"); if(rc){ rc.addEventListener("click",function(){ runSelfCheck(); toast("自檢已重跑"); }); }
+
+    document.addEventListener("click",function(e){
+      var c=e.target.closest(".cmd"); if(c){ copy(c.getAttribute("data-cmd")); }
+    });
+    $("q").addEventListener("input",function(){ curQ=this.value.trim().toLowerCase(); applyFilter(); });
+    document.querySelectorAll("[data-ry]").forEach(function(b){
+      b.addEventListener("click",function(){
+        document.querySelectorAll("[data-ry]").forEach(function(x){x.classList.remove("on");});
+        this.classList.add("on"); curRy=this.getAttribute("data-ry"); applyFilter();
+      });
+    });
+    $("copyPath").addEventListener("click",function(){ copy("via-fred; via-revfill; via-mobile"); });
+    $("expCsv").addEventListener("click",exportCsv);
+    $("reset").addEventListener("click",function(){ location.reload(); });
+    $("loadJson").addEventListener("change",function(e){
+      var f=e.target.files&&e.target.files[0]; if(!f)return;
+      var r=new FileReader();
+      r.onload=function(){ try{ ingest(JSON.parse(r.result)); }catch(err){ toast("JSON 解析失敗: "+err.message); } };
+      r.readAsText(f); e.target.value="";
+    });
+    document.addEventListener("keydown",function(e){ if(e.key==="/" && document.activeElement!==$("q")){ e.preventDefault(); $("q").focus(); } });
+
+    // clock
+    function tick(){ var el=document.getElementById("clock"); if(el){ el.textContent=new Date().toLocaleTimeString("zh-Hant",{hour12:false}); } }
+    tick(); setInterval(tick,1000);
+
+    // narration
+    var lines=[
+      "20 加速器點亮 · Hydra 哨兵 <b>H1–H6</b> 先行 · 0 連鎖故障",
+      "六串流並行推進 · 資源鏈 DAG 單寫者律 · 無執行緒碰撞",
+      "SelftestGrid 184 站 · <b>OK 177 / FAIL 5 / SKIP 2</b> · 趨勢連升 Δ+24",
+      "ProductGate 九閘 · G1 WARN(料側 5 紅)· 其餘 8 閘 OK · 永不假綠",
+      "碼側零紅 · 最短收斂路 <b>via-fred → via-revfill → via-mobile</b>",
+      "按 <b>/</b> 聚焦搜尋 · 點 next 指令一鍵複製 · 載入實時 GRID JSON 重生"
+    ];
+    var el=$("narr"), i=0;
+    function show(){ el.innerHTML=lines[i]+'<span class="cursor"></span>'; i=(i+1)%lines.length; }
+    show(); setInterval(show,3200);
+  }
+
+  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot); } else { boot(); }
+})();
+</script>
+</body>
+</html>

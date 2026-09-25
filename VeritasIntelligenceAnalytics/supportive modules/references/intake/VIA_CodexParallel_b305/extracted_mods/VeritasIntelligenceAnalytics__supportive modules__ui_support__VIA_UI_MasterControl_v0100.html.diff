@@ -1,0 +1,1580 @@
+index efbed9f..a5a9242 100644
+--- a/VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html	
++++ b/VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100.html	
+@@ -1,330 +1,1255 @@
+ <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1">
+-<title>VIA 總控台 Master Control</title><style>
+-:root{--bg:#f5f5f2;--paper:#ffffff;--paper2:#fafaf8;--ink:#1f2530;
+---ink2:#3c4658;--mut:#6d7688;--mut2:#9aa2b1;--line:#dcdfe6;
+---soft:#eef0ee;--acc:#3e6b8f;--ok:#4f8f6b;--warn:#b58a3e;--bad:#b05c4d}
+-@media (prefers-color-scheme: dark){:root{--bg:#10151b;--paper:#171e26;
+---paper2:#1c242e;--ink:#dbe3ea;--ink2:#b9c3cf;--mut:#8a97a5;
+---mut2:#6d7a88;--line:#2a333d;--soft:#20293380;--acc:#7ba3cc;
+---ok:#79b58c;--warn:#d4a95c;--bad:#d98a7c}}
+-*{box-sizing:border-box;margin:0}
+-body{background:var(--bg);color:var(--ink);display:flex;min-height:100vh;
+-font:11.5px/1.45 "Segoe UI","Noto Sans TC",system-ui,sans-serif}
+-code{font-family:Consolas,"SFMono-Regular",ui-monospace,monospace}
+-.rail{width:232px;min-width:232px;background:var(--paper);
+-border-right:1px solid var(--line);padding:13px 0 8px;display:flex;
+-flex-direction:column;gap:4px;max-height:100vh;position:sticky;top:0}
+-.brand{padding:0 14px 9px;border-bottom:1px solid var(--line)}
+-.brand .latin{font-size:9px;letter-spacing:.22em;color:var(--mut);
+-font-weight:700}
+-.brand h1{font-size:16px;margin:4px 0 2px}
+-.brand .en{font-size:10px;letter-spacing:.14em;color:var(--acc);
+-font-weight:700}
+-.brand .badge{display:inline-block;margin-top:6px;font-size:9.5px;
+-font-weight:700;padding:2px 8px;border:1px solid var(--line);
+-border-radius:4px;color:var(--mut);letter-spacing:.06em}
+-.seal{float:right;width:26px;height:26px;border:2px solid var(--ink2);
+-border-radius:6px;display:grid;place-items:center;font-size:14px;
+-font-weight:700}
+-.navsec{font-size:9px;letter-spacing:.2em;color:var(--mut2);
+-font-weight:700;padding:9px 14px 3px}
+-.nav a{display:grid;grid-template-columns:24px 1fr;gap:8px;
+-align-items:baseline;padding:4px 14px;color:var(--ink2);
+-text-decoration:none;cursor:pointer}
+-.nav a:hover{background:var(--paper2)}
+-.nav a.active{background:var(--soft);border-right:3px solid var(--acc);
+-color:var(--ink);font-weight:700}
+-.nav .no{font-size:10px;color:var(--mut2);font-weight:700}
+-.nav .lb small{display:block;font-size:9px;letter-spacing:.14em;
+-color:var(--mut2);font-weight:600}
+-.railbody{flex:1;overflow:auto;padding:3px 14px}
+-.railbody input{width:100%;border:1px solid var(--line);border-radius:6px;
+-padding:4px 7px;background:var(--paper);color:var(--ink);margin-bottom:6px;
+-font:11px "Segoe UI","Noto Sans TC",sans-serif}
+-.item{padding:1px 4px;font-size:10px;color:var(--mut)}
+-.item.hide{display:none}
+-details{margin-bottom:4px}summary{cursor:pointer;padding:3px 0;
+-font-size:12px}
+-.tag{float:right;font-size:9px;border-radius:999px;padding:1px 7px;
+-background:var(--soft);color:var(--mut)}
+-.railfoot{border-top:1px solid var(--line);padding:7px 14px 0;
+-display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+-.railfoot .k{font-size:8.5px;letter-spacing:.16em;color:var(--mut2);
+-font-weight:700}
+-.railfoot .v{font-size:11.5px;font-weight:700;
+-font-variant-numeric:tabular-nums}
+-.main{flex:1;padding:15px 20px;max-width:1160px}
+-.crumb{font-size:10px;color:var(--mut);margin-bottom:7px}
+-.crumb b{color:var(--acc)}
+-.crumb .lock{letter-spacing:.16em;font-weight:700;font-size:10px}
+-.head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;
+-border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:11px}
+-.head h2{font-size:clamp(16px,2.3vw,21px)}
+-.head h2 small{font-size:11px;color:var(--mut);font-weight:400;
+-margin-left:8px;letter-spacing:.12em}
+-.head .sub{width:100%;font-size:10.5px;color:var(--mut)}
+-.spec{margin-left:auto;display:flex;gap:13px;flex-wrap:wrap}
+-.spec .k{font-size:8.5px;letter-spacing:.18em;color:var(--mut2);
+-font-weight:700}
+-.spec .v{font-size:11px;font-weight:700}
+-.spec .v.ok{color:var(--ok)}
+-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+-gap:7px;margin-bottom:10px}
+-.stat{background:var(--paper);border:1px solid var(--line);
+-border-radius:7px;padding:8px 11px}
+-.stat .n{font-size:clamp(16px,2vw,20px);font-weight:800;
+-font-variant-numeric:tabular-nums}
+-.stat .zh{font-size:10px;color:var(--ink2);margin-top:2px}
+-.stat .en{font-size:8.5px;letter-spacing:.18em;color:var(--mut2);
+-font-weight:700}
+-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+-.card{background:var(--paper);border:1px solid var(--line);
+-border-radius:7px;padding:11px 13px;margin-bottom:10px}
+-.card h3{font-size:12px}
+-.card h3 small{font-size:9px;letter-spacing:.16em;color:var(--mut2);
+-font-weight:700;margin-left:8px}
+-.card .note{font-size:9.5px;color:var(--mut);margin:3px 0 7px}
+-select,input[type=text]{width:100%;border:1px solid var(--line);
+-border-radius:6px;padding:5px 8px;background:var(--paper);
+-color:var(--ink);margin-bottom:6px;
+-font:11.5px "Segoe UI","Noto Sans TC",sans-serif}
+-.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+-button{border:1px solid var(--acc);background:var(--acc);color:#fff;
+-border-radius:6px;padding:6px 11px;cursor:pointer;flex:1;
+-font:11.5px "Segoe UI","Noto Sans TC",sans-serif}
+-button.ghost{background:var(--paper);color:var(--acc)}
+-.ck{display:block;padding:2px 0;font-size:11px}
+-@keyframes viaflow{to{background-position:32px 0}}
+-#log{white-space:pre-wrap;font:11px ui-monospace,Consolas,monospace;
+-background:var(--bg);border:1px solid var(--line);border-radius:6px;
+-padding:8px;min-height:100px;margin-top:10px;max-height:200px;
+-overflow:auto}
+-#result{white-space:pre-wrap;font:11px ui-monospace,Consolas,monospace;
+-background:var(--bg);border:1px solid var(--line);border-radius:6px;
+-padding:8px;min-height:90px;overflow-wrap:anywhere}
+-#drop{border:2px dashed var(--line);border-radius:8px;padding:18px 10px;
+-text-align:center;color:var(--mut)}
+-#drop.on{border-color:var(--acc);color:var(--acc)}
+-#matrix{font-size:10.5px}
+-.foot{font-size:10px;color:var(--mut2);margin-top:6px}
+-@media(max-width:900px){
+- body{flex-direction:column}
+- .rail{width:100%;min-width:0;position:static;max-height:none;
+-  padding:12px 0 8px}
+- .nav{display:flex;overflow-x:auto;gap:2px;padding:0 10px;
+-  -webkit-overflow-scrolling:touch}
+- .nav a{grid-template-columns:auto;white-space:nowrap;padding:7px 10px;
+-  border-radius:6px}
+- .nav a.active{border-right:0;border-bottom:3px solid var(--acc)}
+- .nav .no,.nav .lb small{display:none}
+- .railbody{max-height:200px}
+- .railfoot{grid-template-columns:repeat(4,1fr)}
+- .main{padding:14px 12px}
+- .spec{margin-left:0;gap:12px}
+- .grid2{grid-template-columns:1fr}
+-}
+-</style></head><body>
+-<aside class="rail">
+-<div class="brand"><span class="seal">總</span>
+-<div class="latin">VERITAS INTELLIGENCE ANALYTICS</div>
+-<h1>總控台</h1>
+-<div class="en">MASTER CONTROL</div>
+-<span class="badge">MANAGER · LIVE · 2026-09-01 15:20</span></div>
+-<div class="navsec">系統 SYSTEMS</div><div class="nav">
+-<a class="active"><span class="no">00</span><span class="lb">總控台
+-<small>MASTER CONTROL</small></span></a>
+-<a href="VIA_UI_Shell_CGC_v0100.html"><span class="no">01</span>
+-<span class="lb">中央治理 · CGC<small>GOVERNANCE</small></span></a>
+-<a href="VIA_UI_Shell_VDF_v0100.html"><span class="no">02</span>
+-<span class="lb">資料鍛造 · VDF<small>DATA FORGE</small></span></a>
+-<a href="VIA_UI_Shell_VRN_v0100.html"><span class="no">03</span>
+-<span class="lb">報告新星 · VRN<small>REPORT NOVA</small></span></a>
+-<a href="VIA_UI_Shell_VAP_v0100.html"><span class="no">04</span>
+-<span class="lb">自動繪圖 · VAP<small>AUTO PLOT</small></span></a>
+-</div>
+-<div class="navsec">引擎 / 模組 ENGINE · MODULE LIST</div>
+-<div class="railbody">
+-<input type="text" id="q" placeholder="搜尋引擎/模組…">
+-<details open><summary><b>ChipWar</b><span class='tag'>1</span></summary><div class="item" data-n="chw_eng005_rotationengine">CHW_ENG005_RotationEngine</div></details><details open><summary><b>GroupIndex</b><span class='tag'>2</span></summary><div class="item" data-n="grp_eng040_groupingrotationrunner">GRP_ENG040_GroupingRotationRunner</div><div class="item" data-n="grp_eng041_rotationmethodlab">GRP_ENG041_RotationMethodLab</div></details><details open><summary><b>SuperDocExtractor</b><span class='tag'>1</span></summary><div class="item" data-n="plg_eng001_superextract">PLG_ENG001_SuperExtract</div></details><details open><summary><b>VAP</b><span class='tag'>14</span></summary><div class="item" data-n="vap_eng001_autoplotenginechartlib">VAP_ENG001_AutoplotEngineChartlib</div><div class="item" data-n="vap_eng002_autoplotengine">VAP_ENG002_AutoplotEngine</div><div class="item" data-n="vap_eng003_autoplotseabornplotly">VAP_ENG003_AutoplotSeabornPlotly</div><div class="item" data-n="vap_eng004_tafactory">VAP_ENG004_TAFactory</div><div class="item" data-n="vap_eng005_templaterunner">VAP_ENG005_TemplateRunner</div><div class="item" data-n="vap_eng006_acceptanceaudit">VAP_ENG006_AcceptanceAudit</div><div class="item" data-n="vap_eng007_rawwiderefresh">VAP_ENG007_RawWideRefresh</div><div class="item" data-n="vap_eng008_testconsole">VAP_ENG008_TestConsole</div><div class="item" data-n="vap_eng009_dashboardui">VAP_ENG009_DashboardUI</div><div class="item" data-n="vap_eng010_chartlibraryssot">VAP_ENG010_ChartLibrarySSOT</div><div class="item" data-n="vap_eng011_templateregistry">VAP_ENG011_TemplateRegistry</div><div class="item" data-n="vap_eng012_governedimagestore">VAP_ENG012_GovernedImageStore</div><div class="item" data-n="vap_eng013_marketanalytics">VAP_ENG013_MarketAnalytics</div><div class="item" data-n="vap_eng014_stddashboardtemplate">VAP_ENG014_StdDashboardTemplate</div></details><details open><summary><b>VDF</b><span class='tag'>27</span></summary><div class="item" data-n="vdf_eng019_mdl501fetchcontractmanager">VDF_ENG019_MDL501FetchContractManager</div><div class="item" data-n="vdf_eng044_mdlxxxyfinanceglobaldatafetcher">VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher</div><div class="item" data-n="vdf_eng045_outputhub">VDF_ENG045_OutputHub</div><div class="item" data-n="vdf_eng046_fetchmatrixregistry">VDF_ENG046_FetchMatrixRegistry</div><div class="item" data-n="vdf_eng047_usmacrodetailfetcher">VDF_ENG047_USMacroDetailFetcher</div><div class="item" data-n="vdf_eng048_tafactory">VDF_ENG048_TAFactory</div><div class="item" data-n="vdf_eng049_fivedayfetch">VDF_ENG049_FiveDayFetch</div><div class="item" data-n="vdf_eng050_orderfetch">VDF_ENG050_OrderFetch</div><div class="item" data-n="vdf_eng051_activetwetf_holdings">VDF_ENG051_ActiveTWETF_Holdings</div><div class="item" data-n="vdf_eng052_megafetch">VDF_ENG052_MegaFetch</div><div class="item" data-n="vdf_eng053_paramenginemap">VDF_ENG053_ParamEngineMap</div><div class="item" data-n="vdf_eng054_twdailybackfill">VDF_ENG054_TWDailyBackfill</div><div class="item" data-n="vdf_eng055_omnifetch">VDF_ENG055_OmniFetch</div><div class="item" data-n="vdf_eng056_chipbackfill">VDF_ENG056_ChipBackfill</div><div class="item" data-n="vdf_eng057_tradingvaluebackfill">VDF_ENG057_TradingValueBackfill</div><div class="item" data-n="vdf_eng058_industryunifiedmap">VDF_ENG058_IndustryUnifiedMap</div><div class="item" data-n="vdf_eng059_estimatebands">VDF_ENG059_EstimateBands</div><div class="item" data-n="vdf_eng060_adjpricelayer">VDF_ENG060_AdjPriceLayer</div><div class="item" data-n="vdf_eng061_featurestore">VDF_ENG061_FeatureStore</div><div class="item" data-n="vdf_eng062_groupfeaturelayer">VDF_ENG062_GroupFeatureLayer</div><div class="item" data-n="vdf_eng063_monthlyrevenue">VDF_ENG063_MonthlyRevenue</div><div class="item" data-n="vdf_eng064_historybackfill">VDF_ENG064_HistoryBackfill</div><div class="item" data-n="vdf_eng065_dbimport">VDF_ENG065_DbImport</div><div class="item" data-n="vdf_eng066_globaluniverse">VDF_ENG066_GlobalUniverse</div><div class="item" data-n="vdf_eng067_consensusenrichment">VDF_ENG067_ConsensusEnrichment</div><div class="item" data-n="vdf_eng068_etfconsensusanalysis">VDF_ENG068_ETFConsensusAnalysis</div><div class="item" data-n="vdf_eng069_revenueconsensusanalysis">VDF_ENG069_RevenueConsensusAnalysis</div></details><details open><summary><b>VIA_RetiredEngines</b><span class='tag'>119</span></summary><div class="item" data-n="chw_eng003_foreigngameengine">CHW_ENG003_ForeignGameEngine</div><div class="item" data-n="chw_eng006_rotationdashboard">CHW_ENG006_RotationDashboard</div><div class="item" data-n="chw_eng008_purifiedsectorrotationaccuracyenginev2">CHW_ENG008_PurifiedSectorRotationAccuracyEngineV2</div><div class="item" data-n="chw_eng010_ssotmatchingtestingengine">CHW_ENG010_SsotMatchingTestingEngine</div><div class="item" data-n="chw_eng011_viaengineverificationsuite">CHW_ENG011_ViaEngineVerificationSuite</div><div class="item" data-n="chw_eng012_viaexactdatasettestengine">CHW_ENG012_ViaExactDatasetTestEngine</div><div class="item" data-n="chw_eng013_viasystemintegrationtestsuite">CHW_ENG013_ViaSystemIntegrationTestSuite</div><div class="item" data-n="chw_eng014_blocengine">CHW_ENG014_BlocEngine</div><div class="item" data-n="chw_eng015_chipwarengine">CHW_ENG015_ChipwarEngine</div><div class="item" data-n="chw_eng016_chipwarvapdashboard">CHW_ENG016_ChipwarVapDashboard</div><div class="item" data-n="chw_eng017_fomoindexengine">CHW_ENG017_FomoIndexEngine</div><div class="item" data-n="chw_eng018_fomoindexreport">CHW_ENG018_FomoIndexReport</div><div class="item" data-n="chw_eng019_macroengine">CHW_ENG019_MacroEngine</div><div class="item" data-n="chw_eng020_rotationpluginengine">CHW_ENG020_RotationPlugInEngine</div><div class="item" data-n="chw_eng021_socialengine">CHW_ENG021_SocialEngine</div><div class="item" data-n="chw_eng022_socialreport">CHW_ENG022_SocialReport</div><div class="item" data-n="chw_eng023_testharness">CHW_ENG023_TestHarness</div><div class="item" data-n="chw_eng024_xmktengine">CHW_ENG024_XmktEngine</div><div class="item" data-n="chw_eng025_xmktreport">CHW_ENG025_XmktReport</div><div class="item" data-n="chw_eng026_codeartifact3">CHW_ENG026_CodeArtifact3</div><div class="item" data-n="grp_eng002_activestocketfmocktest">GRP_ENG002_ActiveStockETFMocktest</div><div class="item" data-n="grp_eng004_chipwarrevenueevidence">GRP_ENG004_ChipWarRevenueEvidence</div><div class="item" data-n="grp_eng005_etfconsolesevidence">GRP_ENG005_ETFConsolesEvidence</div><div class="item" data-n="grp_eng010_groupindexmastervalidation">GRP_ENG010_GroupIndexMasterValidation</div><div class="item" data-n="grp_eng011_livewirecontractadapter">GRP_ENG011_LiveWireContractAdapter</div><div class="item" data-n="grp_eng012_sectorflowadaptivechainedindex">GRP_ENG012_SectorFlowAdaptiveChainedIndex</div><div class="item" data-n="grp_eng013_sectorflowdashboardbuilder">GRP_ENG013_SectorFlowDashboardBuilder</div><div class="item" data-n="grp_eng014_sectorflowsignaltradebacktest">GRP_ENG014_SectorFlowSignalTradeBacktest</div><div class="item" data-n="grp_eng016_threelistgroupingdynamicvalidationpipeline">GRP_ENG016_ThreeListGroupingDynamicValidationPipeline</div><div class="item" data-n="grp_eng038_subgroupsandboxvalidation">GRP_ENG038_SubgroupSandboxValidation</div><div class="item" data-n="vap_eng001_autoplotenginechartlib">VAP_ENG001_AutoplotEngineChartlib</div><div class="item" data-n="vdf_eng001_datahuborchestrator">VDF_ENG001_DataHubOrchestrator</div><div class="item" data-n="vdf_eng006_mdl004twfullmarketengine">VDF_ENG006_MDL004TWFullMarketEngine</div><div class="item" data-n="vdf_eng011_mdl102formatupgrader">VDF_ENG011_MDL102FormatUpgrader</div><div class="item" data-n="vdf_eng017_mdl302finalactivation">VDF_ENG017_MDL302FinalActivation</div><div class="item" data-n="vdf_eng020_mdl097vrnfinancialdatafinalevidenceselectorv06149financialdatav06149">VDF_ENG020_MDL097VrnFinancialdataFinalEvidenceSelectorV06149FINANCIALDATAV06149</div><div class="item" data-n="vdf_eng021_mdl215vrnfinancialdatatriflowstagingv06153financialdatav06153">VDF_ENG021_MDL215VrnFinancialdataTriflowStagingV06153FINANCIALDATAV06153</div><div class="item" data-n="vdf_eng022_mdl218vrnfinancialdataconfirmverifyv06125financialdatav06125">VDF_ENG022_MDL218VrnFinancialDataConfirmVerifyV06125FINANCIALDATAV06125</div><div class="item" data-n="vdf_eng023_mdl252vrnfinancialfinalsealv06127financialdatav06127">VDF_ENG023_MDL252VrnFinancialFinalSealV06127FINANCIALDATAV06127</div><div class="item" data-n="vdf_eng024_mdl253vrnfinancialfinalsealv06127financialdatav06127">VDF_ENG024_MDL253VrnFinancialFinalSealV06127FINANCIALDATAV06127</div><div class="item" data-n="vdf_eng031_mdl001twuniverseverify">VDF_ENG031_MDL001TWUniverseVerify</div><div class="item" data-n="vdf_eng039_inject">VDF_ENG039_Inject</div><div class="item" data-n="vdf_eng040_twuniversebuilder">VDF_ENG040_TWUniverseBuilder</div><div class="item" data-n="vdf_eng042_moviesintake">VDF_ENG042_MoviesIntake</div><div class="item" data-n="vdf_eng043_mdl201forecastmatrixintegratedv1">VDF_ENG043_MDL201ForecastMatrixIntegratedV1</div><div class="item" data-n="via_eng001_multifactortestvalidatesimengine">VIA_ENG001_MultiFactorTestValidateSimEngine</div><div class="item" data-n="via_eng003_talibengine">VIA_ENG003_TALibEngine</div><div class="item" data-n="via_eng018_duckparquetacceptance">VIA_ENG018_DuckParquetAcceptance</div><div class="item" data-n="via_eng019_meetingloopengine">VIA_ENG019_MeetingloopEngine</div><div class="item" data-n="via_eng020_superbomcontentparser">VIA_ENG020_SuperBOMContentParser</div><div class="item" data-n="via_eng021_masterengine">VIA_ENG021_MasterEngine</div><div class="item" data-n="via_eng022_vmtconvergence">VIA_ENG022_VmtConvergence</div><div class="item" data-n="via_eng023_vmtplanningcpm">VIA_ENG023_VmtPlanningCpm</div><div class="item" data-n="via_eng024_vmtprocessmining">VIA_ENG024_VmtProcessMining</div><div class="item" data-n="via_eng025_vmtreplyingest">VIA_ENG025_VmtReplyIngest</div><div class="item" data-n="via_eng026_vmtsuperbomattachrouter">VIA_ENG026_VmtSuperbomAttachRouter</div><div class="item" data-n="via_eng027_vmtsuperbombridge">VIA_ENG027_VmtSuperbomBridge</div><div class="item" data-n="via_eng028_vmtsuperbomeventstream">VIA_ENG028_VmtSuperbomEventstream</div><div class="item" data-n="via_eng029_vmtsurvey">VIA_ENG029_VmtSurvey</div><div class="item" data-n="via_eng047_validatelexicon">VIA_ENG047_ValidateLexicon</div><div class="item" data-n="via_eng048_buildmanifest">VIA_ENG048_BuildManifest</div><div class="item" data-n="via_eng055_emailactiondb">VIA_ENG055_EmailActionDb</div><div class="item" data-n="via_eng056_emailsuperengine">VIA_ENG056_EmailSuperEngine</div><div class="item" data-n="via_eng057_engineanalytics">VIA_ENG057_EngineAnalytics</div><div class="item" data-n="via_eng059_workopsaccuracyharness">VIA_ENG059_WorkopsAccuracyHarness</div><div class="item" data-n="via_eng060_workopsauditbundle">VIA_ENG060_WorkopsAuditBundle</div><div class="item" data-n="via_eng061_workopsbackup">VIA_ENG061_WorkopsBackup</div><div class="item" data-n="via_eng066_workopscorpusbridge">VIA_ENG066_WorkopsCorpusBridge</div><div class="item" data-n="via_eng067_workopsdailytodo">VIA_ENG067_WorkopsDailyTodo</div><div class="item" data-n="via_eng068_workopsdecisionlog">VIA_ENG068_WorkopsDecisionLog</div><div class="item" data-n="via_eng069_workopsenvmanagerbridge">VIA_ENG069_WorkopsEnvmanagerBridge</div><div class="item" data-n="via_eng070_workopsgraphvizsetup">VIA_ENG070_WorkopsGraphvizSetup</div><div class="item" data-n="via_eng073_workopsmeetingloopbridge">VIA_ENG073_WorkopsMeetingloopBridge</div><div class="item" data-n="via_eng075_workopsmllab">VIA_ENG075_WorkopsMlLab</div><div class="item" data-n="via_eng076_workopsnamer">VIA_ENG076_WorkopsNamer</div><div class="item" data-n="via_eng081_workopsselftest">VIA_ENG081_WorkopsSelftest</div><div class="item" data-n="via_eng082_workopsslides">VIA_ENG082_WorkopsSlides</div><div class="item" data-n="via_eng083_workopssummarymatrix">VIA_ENG083_WorkopsSummaryMatrix</div><div class="item" data-n="via_eng087_workopswopidentifier">VIA_ENG087_WorkopsWopIdentifier</div><div class="item" data-n="via_eng105_workopsapiserver">VIA_ENG105_WorkopsApiServer</div><div class="item" data-n="via_eng106_workopsattachmentintelligence">VIA_ENG106_WorkopsAttachmentIntelligence</div><div class="item" data-n="via_eng110_workopscommitmentfulfillment">VIA_ENG110_WorkopsCommitmentFulfillment</div><div class="item" data-n="via_eng111_workopsconfidencecalibrator">VIA_ENG111_WorkopsConfidenceCalibrator</div><div class="item" data-n="via_eng112_workopsdailyoperatingrhythm">VIA_ENG112_WorkopsDailyOperatingRhythm</div><div class="item" data-n="via_eng113_workopsdiagnostics">VIA_ENG113_WorkopsDiagnostics</div><div class="item" data-n="via_eng114_workopsevidenceintegrityguard">VIA_ENG114_WorkopsEvidenceIntegrityGuard</div><div class="item" data-n="via_eng115_workopsfeedbackweightoptimizer">VIA_ENG115_WorkopsFeedbackWeightOptimizer</div><div class="item" data-n="via_eng119_workopsmaileventbridge">VIA_ENG119_WorkopsMailEventBridge</div><div class="item" data-n="via_eng120_workopsmandatoryreplybuilder">VIA_ENG120_WorkopsMandatoryReplyBuilder</div><div class="item" data-n="via_eng121_workopsmeetingt2guard">VIA_ENG121_WorkopsMeetingT2Guard</div><div class="item" data-n="via_eng123_workopsmissinginformationguard">VIA_ENG123_WorkopsMissingInformationGuard</div><div class="item" data-n="via_eng126_workopsorchestrator">VIA_ENG126_WorkopsOrchestrator</div><div class="item" data-n="via_eng128_workopsprocessminingkpibridge">VIA_ENG128_WorkopsProcessMiningKpiBridge</div><div class="item" data-n="via_eng135_workopssmartescalation">VIA_ENG135_WorkopsSmartEscalation</div><div class="item" data-n="via_eng136_workopsssotstore">VIA_ENG136_WorkopsSsotStore</div><div class="item" data-n="via_eng139_workopstopicepisode">VIA_ENG139_WorkopsTopicEpisode</div><div class="item" data-n="via_eng142_workopswatchlistprioritizer">VIA_ENG142_WorkopsWatchlistPrioritizer</div><div class="item" data-n="via_eng144_rcacceptance">VIA_ENG144_RcAcceptance</div><div class="item" data-n="via_eng151_vpldesktop">VIA_ENG151_VplDesktop</div><div class="item" data-n="vrn_eng001_activateandcrossvalidate">VRN_ENG001_ACTIVATEANDCROSSVALIDATE</div><div class="item" data-n="vrn_eng006_completeocrengineregistry">VRN_ENG006_CompleteOCREngineRegistry</div><div class="item" data-n="vrn_eng007_finalizecorev21">VRN_ENG007_FinalizeCoreV21</div><div class="item" data-n="vrn_eng008_healthcheck">VRN_ENG008_HealthCheck</div><div class="item" data-n="vrn_eng009_m03chineseocrlegoultra">VRN_ENG009_M03ChineseOCRLEGOUltra</div><div class="item" data-n="vrn_eng010_m03layoutocrultra">VRN_ENG010_M03LayoutOCRUltra</div><div class="item" data-n="vrn_eng011_m03tiffocrultra">VRN_ENG011_M03TIFFOCRUltra</div><div class="item" data-n="vrn_eng012_m04ocrpostprocessorlegoultra">VRN_ENG012_M04OCRPostProcessorLEGOUltra</div><div class="item" data-n="vrn_eng014_mdl001stockreportpipeline">VRN_ENG014_MDL001StockReportPipeline</div><div class="item" data-n="vrn_eng024_mdl239vrnnewreportformatsystemdefaultinstallerv06155reportv06155">VRN_ENG024_MDL239VrnNewReportFormatSystemDefaultInstallerV06155REPORTV06155</div><div class="item" data-n="vrn_eng025_mdl259vrnreportdatewindowtablerestorev0597report">VRN_ENG025_MDL259VrnReportDateWindowTableRestoreV0597REPORT</div><div class="item" data-n="vrn_eng026_ocrpostprocessingvalidationsystem">VRN_ENG026_OCRPostProcessingValidationSystem</div><div class="item" data-n="vrn_eng027_pipelinerunner">VRN_ENG027_PipelineRunner</div><div class="item" data-n="vrn_eng028_smoketest">VRN_ENG028_SmokeTest</div><div class="item" data-n="vrn_eng036_finalizecorev2">VRN_ENG036_FinalizeCoreV2</div><div class="item" data-n="vrn_eng046_contentextractcandidate">VRN_ENG046_ContentExtractCandidate</div><div class="item" data-n="vrn_eng047_contentextract">VRN_ENG047_ContentExtract</div><div class="item" data-n="vrn_eng048_contentprobe">VRN_ENG048_ContentProbe</div><div class="item" data-n="vrn_eng053_docxmerge">VRN_ENG053_DocxMerge</div><div class="item" data-n="vrn_eng054_inputmatrixvalidator">VRN_ENG054_InputMatrixValidator</div></details><details open><summary><b>VRN</b><span class='tag'>29</span></summary><div class="item" data-n="vrn_eng017_mdl004ocrfetchingpdftable">VRN_ENG017_MDL004OCRFetchingPDFTable</div><div class="item" data-n="vrn_eng018_mdl005ocrfetchingpdftext">VRN_ENG018_MDL005OCRFetchingPDFText</div><div class="item" data-n="vrn_eng023_mdl011dailyfetcher">VRN_ENG023_MDL011DailyFetcher</div><div class="item" data-n="vrn_eng049_contentreconcile">VRN_ENG049_ContentReconcile</div><div class="item" data-n="vrn_eng050_contentstore">VRN_ENG050_ContentStore</div><div class="item" data-n="vrn_eng052_docxengine">VRN_ENG052_DocxEngine</div><div class="item" data-n="vrn_eng055_officemerge">VRN_ENG055_OfficeMerge</div><div class="item" data-n="vrn_eng056_pdfforensics">VRN_ENG056_PdfForensics</div><div class="item" data-n="vrn_eng057_scanocrrescue">VRN_ENG057_ScanOcrRescue</div><div class="item" data-n="vrn_eng058_tableomni">VRN_ENG058_TableOmni</div><div class="item" data-n="vrn_eng059_gapmultirescue">VRN_ENG059_GapMultirescue</div><div class="item" data-n="vrn_eng060_textomni">VRN_ENG060_TextOmni</div><div class="item" data-n="vrn_eng062_summarizerv1">VRN_ENG062_SummarizerV1</div><div class="item" data-n="vrn_eng063_lexicon">VRN_ENG063_Lexicon</div><div class="item" data-n="vrn_eng064_knowledgestack">VRN_ENG064_KnowledgeStack</div><div class="item" data-n="vrn_eng065_mailintel">VRN_ENG065_MailIntel</div><div class="item" data-n="vrn_eng066_nlpsupporthub">VRN_ENG066_NLPSupportHub</div><div class="item" data-n="vrn_eng067_mindmapssot">VRN_ENG067_MindMapSSOT</div><div class="item" data-n="vrn_eng068_dailybrief">VRN_ENG068_DailyBrief</div><div class="item" data-n="vrn_eng069_consensusdb">VRN_ENG069_ConsensusDB</div><div class="item" data-n="vrn_eng070_yahooconsensus">VRN_ENG070_YahooConsensus</div><div class="item" data-n="vrn_eng071_cnyesfusion">VRN_ENG071_CnyesFusion</div><div class="item" data-n="vrn_eng072_firstpagetext">VRN_ENG072_FirstPageText</div><div class="item" data-n="vrn_eng073_reportstructureddb">VRN_ENG073_ReportStructuredDB</div><div class="item" data-n="vrn_eng074_financialpages">VRN_ENG074_FinancialPages</div><div class="item" data-n="vrn_eng075_doctomarkdown">VRN_ENG075_DocToMarkdown</div><div class="item" data-n="vrn_eng076_regressiongate">VRN_ENG076_RegressionGate</div><div class="item" data-n="vrn_eng077_omniformatbridge">VRN_ENG077_OmniFormatBridge</div><div class="item" data-n="vrn_eng078_nlponebridge">VRN_ENG078_NLPOneBridge</div></details><details open><summary><b>WorkOps</b><span class='tag'>2</span></summary><div class="item" data-n="via_eng150_builddeck">VIA_ENG150_BuildDeck</div><div class="item" data-n="via_eng170_workpulseunified">VIA_ENG170_WorkPulseUnified</div></details><details><summary><b>CGC 治理模組</b><span class='tag'>85</span></summary><div class="item" data-n="cgc_mdl023_autocoderegistryengine">CGC_MDL023_AutoCodeRegistryEngine</div><div class="item" data-n="cgc_mdl028_manifestfetchadapter">CGC_MDL028_ManifestFetchAdapter</div><div class="item" data-n="cgc_mdl034_mdl015vrnfinalproductionlockregistryv061573supportrulev061573">CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573</div><div class="item" data-n="cgc_mdl035_mdl256restorevisvrnmasterregistrybridgev0611manifestgovernance">CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE</div><div class="item" data-n="cgc_mdl036_buildpkgpointers">CGC_MDL036_BuildPkgPointers</div><div class="item" data-n="cgc_mdl037_buildspecmaster">CGC_MDL037_BuildSpecMaster</div><div class="item" data-n="cgc_mdl038_buildsubsystempages">CGC_MDL038_BuildSubsystemPages</div><div class="item" data-n="cgc_mdl039_buildviamother">CGC_MDL039_BuildViaMother</div><div class="item" data-n="cgc_mdl040_pyaudit7ae60dd6d6134056bfab27bb6751e35d">CGC_MDL040_PyAudit7ae60dd6d6134056bfab27bb6751e35d</div><div class="item" data-n="cgc_mdl041_articleintake">CGC_MDL041_ArticleIntake</div><div class="item" data-n="cgc_mdl042_autopilot">CGC_MDL042_AutoPilot</div><div class="item" data-n="cgc_mdl043_autocoderengine">CGC_MDL043_AutocoderEngine</div><div class="item" data-n="cgc_mdl044_cmdlog">CGC_MDL044_Cmdlog</div><div class="item" data-n="cgc_mdl045_dedupindex">CGC_MDL045_DedupIndex</div><div class="item" data-n="cgc_mdl046_depsuper">CGC_MDL046_DepSuper</div><div class="item" data-n="cgc_mdl047_downloadsorganizer">CGC_MDL047_DownloadsOrganizer</div><div class="item" data-n="cgc_mdl048_downloadsregisterallcrossanalysisbuilderv20260702">CGC_MDL048_DownloadsRegisterAllCrossAnalysisBuilderV20260702</div><div class="item" data-n="cgc_mdl049_envplan">CGC_MDL049_EnvPlan</div><div class="item" data-n="cgc_mdl050_envrebuild">CGC_MDL050_EnvRebuild</div><div class="item" data-n="cgc_mdl051_envmgrnostall">CGC_MDL051_EnvmgrNostall</div><div class="item" data-n="cgc_mdl052_envmgrrouter">CGC_MDL052_EnvmgrRouter</div><div class="item" data-n="cgc_mdl053_governanceconsole">CGC_MDL053_GovernanceConsole</div><div class="item" data-n="cgc_mdl054_ifacecontract">CGC_MDL054_IfaceContract</div><div class="item" data-n="cgc_mdl055_inputprecheck">CGC_MDL055_InputPrecheck</div><div class="item" data-n="cgc_mdl056_installgate">CGC_MDL056_InstallGate</div><div class="item" data-n="cgc_mdl057_intake">CGC_MDL057_Intake</div><div class="item" data-n="cgc_mdl058_lessons">CGC_MDL058_Lessons</div><div class="item" data-n="cgc_mdl059_masterhub">CGC_MDL059_MasterHub</div><div class="item" data-n="cgc_mdl060_numberengine">CGC_MDL060_NumberEngine</div><div class="item" data-n="cgc_mdl061_panoramasix">CGC_MDL061_PanoramaSix</div><div class="item" data-n="cgc_mdl062_provision">CGC_MDL062_Provision</div><div class="item" data-n="cgc_mdl063_registryunionmerge">CGC_MDL063_RegistryUnionmerge</div><div class="item" data-n="cgc_mdl064_selftestgrid">CGC_MDL064_SelftestGrid</div><div class="item" data-n="cgc_mdl065_ssotevolve">CGC_MDL065_SsotEvolve</div><div class="item" data-n="cgc_mdl066_structureforge">CGC_MDL066_StructureForge</div><div class="item" data-n="cgc_mdl067_supportbridgeinject">CGC_MDL067_SupportBridgeInject</div><div class="item" data-n="cgc_mdl068_supportimportaudit">CGC_MDL068_SupportImportAudit</div><div class="item" data-n="cgc_mdl069_systemmanager">CGC_MDL069_SystemManager</div><div class="item" data-n="cgc_mdl070_t0audit">CGC_MDL070_T0Audit</div><div class="item" data-n="cgc_mdl071_namereg">CGC_MDL071_Namereg</div><div class="item" data-n="cgc_mdl072_productui">CGC_MDL072_ProductUi</div><div class="item" data-n="cgc_mdl073_enginecatalog">CGC_MDL073_EngineCatalog</div><div class="item" data-n="cgc_mdl074_accelbridge">CGC_MDL074_AccelBridge</div><div class="item" data-n="cgc_mdl075_centralgov">CGC_MDL075_CentralGov</div><div class="item" data-n="cgc_mdl076_syntaxrescue">CGC_MDL076_SyntaxRescue</div><div class="item" data-n="cgc_mdl077_renameengine">CGC_MDL077_RenameEngine</div><div class="item" data-n="cgc_mdl078_treeatlas">CGC_MDL078_TreeAtlas</div><div class="item" data-n="cgc_mdl079_matrixconsole">CGC_MDL079_MatrixConsole</div><div class="item" data-n="cgc_mdl080_wrapup">CGC_MDL080_Wrapup</div><div class="item" data-n="cgc_mdl081_subsystemmanagerv2">CGC_MDL081_SubsystemManagerV2</div><div class="item" data-n="cgc_mdl082_masterautorun">CGC_MDL082_MasterAutorun</div><div class="item" data-n="cgc_mdl083_centralgovernment">CGC_MDL083_CentralGovernment</div><div class="item" data-n="cgc_mdl084_govtriage">CGC_MDL084_GovTriage</div><div class="item" data-n="cgc_mdl085_issuearbiter">CGC_MDL085_IssueArbiter</div><div class="item" data-n="cgc_mdl086_canonarbiter">CGC_MDL086_CanonArbiter</div><div class="item" data-n="cgc_mdl087_testpyramid">CGC_MDL087_TestPyramid</div><div class="item" data-n="cgc_mdl088_systemtestpages">CGC_MDL088_SystemTestPages</div><div class="item" data-n="cgc_mdl089_uibasetemplate">CGC_MDL089_UIBaseTemplate</div><div class="item" data-n="cgc_mdl090_systemhub">CGC_MDL090_SystemHub</div><div class="item" data-n="cgc_mdl091_charteraudit">CGC_MDL091_CharterAudit</div><div class="item" data-n="cgc_mdl092_consolidationaudit">CGC_MDL092_ConsolidationAudit</div><div class="item" data-n="cgc_mdl093_governancematrix">CGC_MDL093_GovernanceMatrix</div><div class="item" data-n="cgc_mdl094_commanddeck">CGC_MDL094_CommandDeck</div><div class="item" data-n="cgc_mdl095_deckserver">CGC_MDL095_DeckServer</div><div class="item" data-n="cgc_mdl096_syncstatus">CGC_MDL096_SyncStatus</div><div class="item" data-n="cgc_mdl097_portalui">CGC_MDL097_PortalUI</div><div class="item" data-n="cgc_mdl098_datacatalog">CGC_MDL098_DataCatalog</div><div class="item" data-n="cgc_mdl099_globalmarkets">CGC_MDL099_GlobalMarkets</div><div class="item" data-n="cgc_mdl100_reportcards">CGC_MDL100_ReportCards</div><div class="item" data-n="cgc_mdl101_psastrepair">CGC_MDL101_PSAstRepair</div><div class="item" data-n="cgc_mdl102_commandroster">CGC_MDL102_CommandRoster</div><div class="item" data-n="cgc_mdl103_accelcoverage">CGC_MDL103_AccelCoverage</div><div class="item" data-n="cgc_mdl104_testresultshub">CGC_MDL104_TestResultsHub</div><div class="item" data-n="cgc_mdl105_governanceconsole">CGC_MDL105_GovernanceConsole</div><div class="item" data-n="cgc_mdl106_govconsole">CGC_MDL106_GovConsole</div><div class="item" data-n="cgc_mdl107_uispecmanager">CGC_MDL107_UISpecManager</div><div class="item" data-n="cgc_mdl108_chattodoc">CGC_MDL108_ChatToDoc</div><div class="item" data-n="cgc_mdl109_promptmanager">CGC_MDL109_PromptManager</div><div class="item" data-n="cgc_mdl110_tritestmatrix">CGC_MDL110_TriTestMatrix</div><div class="item" data-n="cgc_mdl111_uicomponentroster">CGC_MDL111_UIComponentRoster</div><div class="item" data-n="cgc_mdl112_systematlas">CGC_MDL112_SystemAtlas</div><div class="item" data-n="cgc_mdl113_unifiedregistry">CGC_MDL113_UnifiedRegistry</div><div class="item" data-n="cgc_mdl114_commandcenterbridge">CGC_MDL114_CommandCenterBridge</div><div class="item" data-n="cgc_mdl115_ssotregexdict">CGC_MDL115_SSOTRegexDict</div><div class="item" data-n="cgc_mdl116_unifiedshell">CGC_MDL116_UnifiedShell</div></details>
+-</div>
+-<div class="railfoot">
+-<div><div class="k">TASKS</div><div class="v">32</div></div>
+-<div><div class="k">ENGINES</div><div class="v">195</div></div>
+-<div><div class="k">MODULES</div><div class="v">85</div></div>
+-<div><div class="k">STATE</div><div class="v">LIVE</div></div>
+-</div></aside>
+-<main class="main">
+-<div class="crumb"><b>VIA 母系統</b> → <b>總控台</b> →
+-<b>輸入 · 執行 · 三顯</b> · <span class="lock">LAYOUT SPEC(批302)</span></div>
+-<div class="head"><h2>總控台<small>MASTER CONTROL</small></h2>
+-<div class="spec">
+-<div><div class="k">BUILD</div><div class="v">VIA_SYSTEM_MANAGER_v0107.py</div></div>
+-<div><div class="k">TASKS</div><div class="v">32</div></div>
+-<div><div class="k">BRIDGE</div><div class="v ok">127.0.0.1:8765</div></div>
+-<div><div class="k">GATE</div><div class="v ok">WHITELIST</div></div>
+-</div>
+-<div class="sub">單一總管四職:sync · list · run · ui;任務經指揮台
+-白名單真跑;誠實三態不假綠。</div></div>
+-<div class="stats">
+-<div class="stat"><div class="n">32</div>
+-<div class="zh">一鍵任務</div><div class="en">DECK TASKS</div></div>
+-<div class="stat"><div class="n">195</div>
+-<div class="zh">引擎族</div><div class="en">ENGINE FAMILIES</div></div>
+-<div class="stat"><div class="n">85</div>
+-<div class="zh">治理模組</div><div class="en">CGC MODULES</div></div>
+-<div class="stat"><div class="n">4</div>
+-<div class="zh">子系統殼頁</div><div class="en">SYSTEM SHELLS</div></div>
+-</div>
+-<div class="grid2">
+-<div class="card"><h3>參數契約<small>PARAMETER CONTRACT</small></h3>
+-<div class="note">P1 任務(下拉;預設首項=零打字)· P2 codes(可空;
+-如 2330,2317)· 儲存於 localStorage:via_master_params(僅本機瀏覽器)。</div>
+-<select id="task"><option value="boot">boot · 全自動日更(boot 全鏈)</option><option value="backfill">backfill · 歷史回補 2022~(續跑;2020/21 終止批212)</option><option value="consensus">consensus · 鉅亨 FactSet 共識</option><option value="revenue">revenue · 月營收全市場(MOPS)</option><option value="revenue_groups">revenue_groups · 族群月營收榜</option><option value="global">global · 全球宇宙擷取(11 類;批226)</option><option value="firstpage">firstpage · 報告首頁文字擷取(批235)</option><option value="structdb">structdb · 報告結構化入庫(批237)</option><option value="finpages">finpages · 財報頁表格擷取(批241)</option><option value="etf_enrich">etf_enrich · ETF 持股×共識增益(批243;ENG067)</option><option value="etf_analysis">etf_analysis · 主動 ETF×共識分析(批264;ENG068)</option><option value="unified_register">unified_register · 統一編號冊刷新(批287;MDL113)</option><option value="cmdcenter">cmdcenter · AIO 健康圖刷新(批288;MDL114)</option><option value="nlp">nlp · NLP OneEngine 橋(批283;ENG078)</option><option value="revenue_consensus">revenue_consensus · 月營收×共識分析(批264;ENG069)</option><option value="mdconvert">mdconvert · 文件→Markdown(批249)</option><option value="regression">regression · 抽取鏈迴歸閘(批251)</option><option value="vofie">vofie · VOFIE 全格式重構(批256)</option><option value="deps_scan">deps_scan · 依賴全景掃描(via-deps)</option><option value="deps_mirror">deps_mirror · 三鏡像測速</option><option value="rebuild_scan">rebuild_scan · 重建計畫快巡(--offline)</option><option value="rebuild_full">rebuild_full · 重建七段(uv 實測+出執行檔)</option><option value="lessons">lessons · 教訓帳本(矩陣+基線)</option><option value="ocr_probe">ocr_probe · OCR 車道探測</option><option value="ocr_plan">ocr_plan · OCR 隔離安裝計畫</option><option value="selftest_fast">selftest_fast · 全矩陣自測(--fast)</option><option value="etf_fetch">etf_fetch · 主動式ETF持股抓取(ENG051)</option><option value="chat2doc">chat2doc · 對話→文章/程式(NLP)</option><option value="uispec">uispec · UI 元件三語轉碼</option><option value="govcon">govcon · 中央治理台(六管線)</option><option value="std_dashboard">std_dashboard · VAP 標準儀表板(三頁 Plotly;批279)</option><option value="ui">ui · 重生全部 UI</option></select>
+-<input type="text" id="codes" placeholder="參數 codes(可空;如 2330,2317)">
+-<div class="btnrow">
+-<button onclick="runOne()">▶ 執行選定任務</button>
+-<button class="ghost" onclick="saveParams()">儲存參數</button>
+-<button class="ghost" onclick="resetParams()">回復預設</button>
+-</div></div>
+-<div class="card"><h3>多任務勾選<small>BATCH · SEQUENTIAL</small></h3>
+-<div class="note">勾選後依序執行(單例防重=執行中再按誠實拒)。</div>
+-<label class="ck"><input type="checkbox" value="boot">boot</label><label class="ck"><input type="checkbox" value="revenue">revenue</label><label class="ck"><input type="checkbox" value="consensus">consensus</label><label class="ck"><input type="checkbox" value="etf_analysis">etf_analysis</label><label class="ck"><input type="checkbox" value="revenue_consensus">revenue_consensus</label><label class="ck"><input type="checkbox" value="regression">regression</label><label class="ck"><input type="checkbox" value="selftest_fast">selftest_fast</label>
+-<div class="btnrow">
+-<button onclick="runChecked()">▶ 依序執行勾選任務</button>
+-<button class="ghost" onclick="ping()">⟳ 指揮台連線檢測</button>
+-</div>
+-<div id="log">待命。任務經指揮台 127.0.0.1:8765 白名單真跑;
+-指揮台未開=打 via(或 VIA-ALL)帶起後再按。</div></div>
+-</div>
+-<div class="card"><h3>狀態的顯現<small>STATUS MATRIX · 每 4s 自動刷新
+-</small></h3>
+-<div id="matrix" class="note">樞紐連線中…</div></div>
+-<div class="card"><h3>運作結果的顯現<small>RESULT</small></h3>
+-<pre id="result">點上方狀態列任一任務 → 顯示其 log 尾(真運作結果)</pre></div>
+-<div class="grid2">
+-<div class="card"><h3>拖曳收件<small>DRAG &amp; DROP · 真收 v2</small></h3>
+-<div id="drop">把檔案拖到這裡<br><small>真收 v2:落盤 Downloads+sha256 回執
+-(樞紐未開=誠實列名+指引)</small></div>
+-<div id="files" class="note"></div></div>
+-<div class="card"><h3>API 連結冊<small>ENDPOINTS · 唯一樞紐</small></h3>
+-<div class="note">GET /ping 健檢 · /run?task=名[&codes=] 白名單真跑 ·
+-POST /intake 拖曳真收(name+b64→Downloads;hash 定生死)·
+-/status 全任務 RYG · / 指揮台頁 · /govdeck 治理台 · /govmatrix 矩陣 ·
+-/vapdeck 分析台 · /vap_revenue /vap_groups /vap_etflist /vap_etf
+-/vap_kline /vap_check /vap_flows 分析端點<br>
+-帶起樞紐:<code>python VIA_SYSTEM_MANAGER_v0107.py serve</code>(或 via 自動帶起)<br>
+-同步:雙擊 VIA-ALL 或 <code>python VIA_SYSTEM_MANAGER_v0107.py sync</code>
+-(stash 留痕→對齊雲端;分流自動備份分支)</div></div>
+-</div>
+-<div class="foot">VIA · MASTER CONTROL · 版型=批302 統一殼語言 ·
+-真值直取零發明 · 零 CDN 零外網 · 響應雙態(PC 水平/手機垂直)</div>
+-</main><script>
+-const q=document.getElementById("q");
+-q.oninput=()=>{const v=q.value.toLowerCase();
+-document.querySelectorAll(".item").forEach(i=>
+-i.classList.toggle("hide",v&&!i.dataset.n.includes(v)));};
+-const log=m=>{const el=document.getElementById("log");
+-el.textContent+="\n"+m;el.scrollTop=el.scrollHeight;};
+-async function call(t,codes){
+- try{const u="http://127.0.0.1:8765/run?task="+encodeURIComponent(t)
+-  +(codes?"&codes="+encodeURIComponent(codes):"");
+-  const r=await(await fetch(u)).json();
+-  log((r.ok?"[起跑] ":"[拒/忙] ")+t+" "+(r.err||""));return r.ok;
+- }catch(e){log("[誠實] 指揮台未開("+t+"):先打 via 帶起 127.0.0.1:8765");
+-  return false;}}
+-function runOne(){call(document.getElementById("task").value,
+- document.getElementById("codes").value.trim());}
+-async function runChecked(){
+- for(const c of document.querySelectorAll('.ck input:checked'))
+-   await call(c.value,"");}
+-async function ping(){try{
+- const r=await(await fetch("http://127.0.0.1:8765/ping")).json();
+- log("[指揮台] 在線 ✓ v="+(r.v||"?"));}
+- catch(e){log("[指揮台] 未開=誠實(打 via 帶起)");}}
++<meta name="viewport" content="width=device-width,initial-scale=1">
++<meta name="color-scheme" content="light">
++<meta name="via-csrf" content="">
++<title>VIA 系統運轉與分析總控台</title><style>
++:root{--bg:#f4f6f8;--paper:#fff;--paper2:#f9fafb;--ink:#202833;
++--ink2:#465365;--mut:#596778;--mut2:#5d6a7b;--line:#dfe4ea;
++--line2:#edf0f3;--soft:#eef3f6;--acc:#315f7d;--acc2:#dce9f1;
++--ok:#2f7652;--warn:#765418;--bad:#a64f46;--retired:#6e6077;
++--header-h:48px;--footer-h:28px;--rail-w:260px;--radius:8px;
++--shadow:0 8px 24px rgba(32,40,51,.07)}
++*{box-sizing:border-box}
++[hidden]{display:none!important}
++[inert]{pointer-events:none;user-select:none}
++html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
++body{overflow-x:hidden;font:11px/1.45 "Segoe UI","Noto Sans TC",Inter,
++system-ui,sans-serif}
++button,input,select{font:inherit;color:inherit}
++button,input,select,[role=tab],#drop{outline:none}
++button:focus-visible,input:focus-visible,select:focus-visible,[role=tab]:focus-visible,
++#drop:focus-visible,a:focus-visible{box-shadow:0 0 0 3px rgba(49,95,125,.22);
++border-color:var(--acc)!important}
++button{min-height:38px;border:1px solid var(--line);border-radius:7px;
++background:var(--paper);cursor:pointer;padding:6px 10px}
++button:hover{border-color:#aeb9c5;background:var(--paper2)}
++button.primary{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
++button.primary:hover{background:#264f6a}
++button.quiet{min-height:32px;color:var(--acc);background:transparent}
++button:disabled{opacity:.55;cursor:not-allowed}
++code,pre,.tech-id{font-family:"DM Mono",Consolas,"SFMono-Regular",monospace}
++code{font-size:10px;color:var(--acc);overflow-wrap:anywhere}
++.app-header{position:fixed;z-index:80;inset:0 0 auto 0;height:var(--header-h);
++display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(255,255,255,.97);
++border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
++.rail-toggle{display:flex;align-items:center;gap:7px;min-height:32px;padding:4px 9px;
++border-color:var(--line);background:var(--paper2);font-weight:700}
++.identity{display:flex;align-items:center;gap:8px;min-width:0}
++.seal{width:27px;height:27px;display:grid;place-items:center;background:#9b3d35;
++color:#fff;border-radius:5px;font:700 14px/1 "Noto Serif TC",serif;flex:none}
++.product{font-size:12px;font-weight:800;letter-spacing:.025em;white-space:nowrap}
++.motto{font-size:9px;color:var(--mut);letter-spacing:.1em}
++.header-meta{margin-left:auto;display:flex;align-items:center;gap:7px}
++.build,.connection,.honesty{display:inline-flex;align-items:center;min-height:23px;
++padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);
++font-size:9.5px;font-weight:700;color:var(--mut);white-space:nowrap}
++.connection::before{content:"";width:7px;height:7px;border-radius:50%;margin-right:5px;
++background:var(--mut2)}
++.connection.online{color:var(--ok);border-color:#b8d7c6;background:#f1f8f4}
++.connection.online::before{background:var(--ok)}
++.connection.offline{color:var(--bad);border-color:#e3c0bc;background:#fff5f3}
++.connection.offline::before{background:var(--bad)}
++.connection.invalid{color:var(--bad);border-color:#e3c0bc;background:#fff5f3}
++.connection.invalid::before{background:var(--bad)}
++.honesty.ok{color:var(--ok);border-color:#b8d7c6;background:#f1f8f4}
++.honesty.running{color:var(--warn);border-color:#e2cfaa;background:#fff9eb}
++.honesty.fail,.honesty.blocked,.honesty.offline{color:var(--bad);border-color:#e3c0bc;
++background:#fff5f3}
++.honesty.stale{color:var(--mut);border-color:#cbd2da;background:#f1f3f5}
++.app-shell{min-height:100vh}
++.control-rail{position:fixed;z-index:60;left:0;top:var(--header-h);bottom:var(--footer-h);
++width:var(--rail-w);display:flex;flex-direction:column;background:var(--paper);
++border-right:1px solid var(--line);transition:transform .22s ease,width .22s ease;
++box-shadow:4px 0 18px rgba(32,40,51,.03)}
++.rail-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:9px}
++.rail-section{margin:0 0 8px;padding:10px;border:1px solid var(--line);
++border-radius:var(--radius);background:var(--paper)}
++.rail-section h1{font-size:14px;line-height:1.25;margin:2px 0 3px}
++.section-kicker,.eyebrow{font-size:8.5px;font-weight:800;letter-spacing:.17em;
++text-transform:uppercase;color:var(--mut2)}
++.rail-note{font-size:9.5px;color:var(--mut);margin:4px 0 8px}
++.rail-section>label,.conditional-field label,.date-pair label{display:block;margin:7px 0 3px;
++font-size:9.5px;font-weight:700;color:var(--ink2)}
++.rail-section select,.rail-section input[type=text],.rail-section input[type=search],
++.rail-section input[type=date]{width:100%;min-height:36px;border:1px solid var(--line);
++border-radius:6px;background:var(--paper);padding:6px 8px}
++.conditional-field small,#drop small{display:block;color:var(--mut);font-size:9px;margin-top:3px}
++.validation-message{margin-top:7px;padding:6px 7px;border:1px solid #e3c0bc;
++border-radius:6px;background:#fff5f3;color:var(--bad);font-size:9.5px;font-weight:700}
++[aria-invalid=true]{border-color:var(--bad)!important;background:#fff8f7!important}
++.date-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
++.rail-actions{display:grid;grid-template-columns:1.35fr .8fr;gap:6px;margin-top:9px}
++.rail-actions.compact{grid-template-columns:1fr 1fr;margin-top:6px}
++.rail-section summary{cursor:pointer;font-weight:750;color:var(--ink2);padding:1px 0;
++list-style-position:outside}
++.rail-section summary span{float:right;color:var(--mut2);font-size:8.5px;
++letter-spacing:.08em;text-transform:uppercase}
++.check-row{display:flex!important;align-items:flex-start;gap:7px;margin:5px 0!important;
++font-size:10px!important;font-weight:500!important;cursor:pointer}
++.check-row input{accent-color:var(--acc);margin:2px 0 0;flex:none}
++.full{width:100%;margin-top:8px}
++#drop{border:1.5px dashed #b9c3cd;border-radius:7px;padding:13px 8px;text-align:center;
++color:var(--ink2);cursor:pointer;background:var(--paper2)}
++#drop.on{border-color:var(--acc);background:#eef6fa;color:var(--acc)}
++.file-results{list-style:none;padding:0;margin:7px 0 0;max-height:120px;overflow:auto}
++.file-results li{padding:4px 0;border-bottom:1px solid var(--line2);font-size:9.5px;
++overflow-wrap:anywhere}
++.system-links{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:1px}
++.system-links a{display:flex;align-items:center;min-height:34px;padding:6px 7px;
++border:1px solid var(--line);border-radius:6px;color:var(--ink2);text-decoration:none;
++font-size:9.5px;background:var(--paper)}
++.system-links a:hover{border-color:#b7c3ce;color:var(--acc)}
++.rail-log{flex:none;padding:8px 9px;border-top:1px solid var(--line);background:var(--paper2)}
++#log{margin:4px 0 0;max-height:92px;overflow:auto;white-space:pre-wrap;
++font-size:9px;color:var(--ink2)}
++.workspace{min-width:0;width:auto;margin-left:var(--rail-w);padding:calc(var(--header-h) + 14px)
++16px calc(var(--footer-h) + 16px);transition:margin-left .22s ease}
++body[data-rail=collapsed] .control-rail{transform:translateX(-100%)}
++body[data-rail=collapsed] .workspace{margin-left:0}
++.rail-backdrop{display:none;position:fixed;z-index:50;inset:var(--header-h) 0 var(--footer-h) 0;
++width:100%;height:auto;border:0;border-radius:0;background:rgba(32,40,51,.18);padding:0}
++.rail-backdrop:focus-visible{box-shadow:inset 0 0 0 3px rgba(49,95,125,.55)}
++.workspace-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
++padding:0 2px 10px}
++.design-template-banner{margin:0 0 9px;padding:8px 10px;border:1px solid #d7bd86;
++border-radius:7px;background:#fff8e7;color:#785a20;font-weight:750}
++.workspace-heading h2{font-size:18px;margin:2px 0 1px}
++.workspace-heading p{margin:0;color:var(--mut);font-size:10px}
++.snapshot{text-align:right;white-space:nowrap;color:var(--mut);font-size:9px}
++.snapshot b{display:block;color:var(--ink2);font-size:10.5px}
++.view-tabs{position:sticky;z-index:40;top:var(--header-h);display:flex;gap:3px;
++overflow-x:auto;padding:5px;background:rgba(244,246,248,.96);border:1px solid var(--line);
++border-radius:8px;margin-bottom:9px;backdrop-filter:blur(8px)}
++.view-tabs button{min-height:32px;flex:0 0 auto;border-color:transparent;background:transparent;
++padding:5px 10px;color:var(--mut);font-weight:700}
++.view-tabs button[aria-selected=true]{background:var(--paper);border-color:var(--line);
++color:var(--ink);box-shadow:0 2px 7px rgba(32,40,51,.05)}
++.tab-panel[hidden]{display:none}
++.stats{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;margin-bottom:8px}
++.stat{display:flex;align-items:baseline;gap:8px;background:var(--paper);border:1px solid var(--line);
++border-radius:var(--radius);padding:8px 10px;box-shadow:0 2px 8px rgba(32,40,51,.025)}
++.stat b{font-size:20px;font-variant-numeric:tabular-nums}
++.stat span{font-size:9.5px;color:var(--mut)}
++.stat.muted b{color:var(--retired)}
++.overview-grid,.link-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
++.card{min-width:0;margin-bottom:8px;padding:11px 12px;background:var(--paper);
++border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
++.card h3{font-size:12px;margin:2px 0;color:var(--ink)}
++.card p{color:var(--ink2)}
++.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
++padding-bottom:7px;border-bottom:1px solid var(--line2);margin-bottom:7px}
++.card-head>span:not(.honesty){font-size:9px;color:var(--mut);white-space:nowrap}
++.table-wrap{width:100%;max-width:100%;overflow:auto;overscroll-behavior:contain}
++table{width:100%;border-collapse:collapse;font-size:10px}
++th,td{padding:6px 7px;text-align:left;border-bottom:1px solid var(--line2);
++vertical-align:top;overflow-wrap:anywhere}
++thead th{position:sticky;top:0;background:var(--paper2);z-index:2;color:var(--mut);
++font-size:8.5px;letter-spacing:.04em;white-space:nowrap}
++tbody tr:hover{background:#fafcfd}
++.summary-table th{width:100px;color:var(--mut);font-weight:650}
++.summary-table td{font-weight:650;color:var(--ink2)}
++.status-distribution{display:grid;gap:6px;margin-top:6px}
++.dist-row{display:grid;grid-template-columns:62px 1fr 30px;align-items:center;gap:7px}
++.dist-label{font-size:9.5px;color:var(--ink2)}
++.dist-track{height:8px;background:var(--line2);border-radius:99px;overflow:hidden}
++.dist-fill{height:100%;min-width:0;border-radius:99px;transition:width .35s ease}
++.dist-fill.idle{background:var(--mut2)}.dist-fill.running{background:var(--warn)}
++.dist-fill.ok{background:var(--ok)}.dist-fill.fail{background:var(--bad)}
++.status-distribution.stale .dist-fill{background:var(--mut)!important}
++.dist-count{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
++.inline-empty,.empty-state{color:var(--mut);text-align:center;padding:22px 12px}
++#result{min-height:96px;max-height:260px;margin:0;overflow:auto;white-space:pre-wrap;
++background:var(--paper2);border:1px solid var(--line);border-radius:6px;padding:9px;
++font-size:9.5px;color:var(--ink2)}
++.notice{padding:7px 9px;margin:6px 0;background:var(--paper2);border:1px solid var(--line);
++border-radius:6px;color:var(--mut);font-size:9.5px}
++.matrix-table{min-width:1040px}
++.matrix-table tbody tr{cursor:pointer}
++.matrix-table tbody tr:focus-within{outline:2px solid var(--acc);outline-offset:-2px}
++.task-link{min-height:28px;padding:2px 5px;border:0;background:transparent;color:var(--acc);
++font-weight:700;text-align:left}
++.state-pill{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-weight:750}
++.state-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mut2)}
++.state-pill.running{color:var(--warn)}.state-pill.running::before{background:var(--warn)}
++.state-pill.ok{color:var(--ok)}.state-pill.ok::before{background:var(--ok)}
++.state-pill.fail{color:var(--bad)}.state-pill.fail::before{background:var(--bad)}
++.state-pill.stale{color:var(--mut)}.state-pill.stale::before{background:var(--mut)}
++.matrix-table tbody tr.stale{background:#f3f5f7;color:var(--mut)}
++.matrix-table tbody tr.stale .task-link{color:var(--mut)}
++.matrix-table tbody tr.stale .progress-fill{background:var(--mut)!important}
++.progress-cell{min-width:110px}.progress-track{height:5px;background:var(--line2);
++border-radius:9px;overflow:hidden;margin-top:3px}.progress-fill{height:100%;background:var(--acc)}
++.roster-wrap{max-height:calc(100vh - 225px)}
++.roster-table{min-width:780px}.roster-table td:first-child{font-weight:700;color:var(--ink2)}
++.tech-id{display:none!important;font-size:8.5px;color:var(--mut)}
++body.show-tech .tech-id{display:table-cell!important}
++.plotly-card{min-height:calc(100vh - 155px)}
++#plotlyFrame{width:100%;height:calc(100vh - 205px);min-height:520px;border:1px solid var(--line);
++border-radius:7px;background:#fff}
++.plotly-ready-note{font-size:9px;color:var(--mut);margin-bottom:6px}
++.empty-state{max-width:620px;margin:6vh auto}.empty-state h3{font-size:15px}
++.empty-state p{font-size:10.5px;line-height:1.65}.empty-icon{display:block;font-size:30px;color:var(--mut2)}
++.plan-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 0 10px}
++.plan-flow span{padding:5px 8px;border:1px solid var(--line);border-radius:999px;
++background:var(--paper2);font-size:9.5px;font-weight:700}.plan-flow i{color:var(--mut2)}
++.plan-table{min-width:780px}.plan-table td:first-child{font-weight:800;color:var(--acc)}
++.app-footer{position:fixed;z-index:90;inset:auto 0 0 0;height:var(--footer-h);
++display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px;
++background:#eef1f4;border-top:1px solid var(--line);color:var(--ink2);font-size:8.5px;
++letter-spacing:.025em}
++body[data-preview-only=true] #drop{cursor:not-allowed;opacity:.72}
++body[data-preview-only=true] .design-template-banner{border-color:#bd8743;background:#fff6dd;
++color:#684b15}
++@media(max-width:960px){.stats{grid-template-columns:1fr 1fr}.overview-grid,.link-grid{grid-template-columns:1fr}}
++@media(max-width:768px){
++ :root{--rail-w:min(320px,calc(100vw - 42px))}
++ .control-rail{box-shadow:10px 0 28px rgba(32,40,51,.18)}
++ .workspace{margin-left:0;padding-left:9px;padding-right:9px}
++ body[data-rail=open]{overflow:hidden}
++ body[data-rail=open] .rail-backdrop{display:block;left:var(--rail-w);width:calc(100vw - var(--rail-w))}
++ .header-meta .build{display:none}.product{font-size:10.5px}.motto{display:none}
++ .workspace-heading{align-items:flex-start}.snapshot{display:none}
++ .view-tabs{margin-left:-2px;margin-right:-2px}
++ .app-footer span:first-child{display:none}.app-footer{justify-content:space-between}
++}
++@media(max-width:460px){
++ .rail-toggle span:last-child{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
++  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
++ .identity{gap:6px}.connection{max-width:105px;overflow:hidden}
++ .stats{grid-template-columns:1fr 1fr}.stat{display:block}.stat b{font-size:17px;display:block}
++ .workspace-heading h2{font-size:15px}.workspace-heading p{font-size:9px}
++ .date-pair{grid-template-columns:1fr}.app-footer{font-size:8.5px}
++}
++@media(max-width:360px){.product{max-width:92px;overflow:hidden;text-overflow:ellipsis}
++ .app-header{gap:8px;padding-left:8px;padding-right:8px}.header-meta{gap:3px}}
++@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
++@media print{.app-header,.control-rail,.app-footer,.view-tabs{position:static!important;display:none!important}
++ .workspace{margin:0;padding:0}.tab-panel[hidden]{display:block}.card{box-shadow:none;break-inside:avoid}}
++</style></head>
++<body data-rail="open">
++<header class="app-header" id="appHeader">
++ <button type="button" id="railToggle" class="rail-toggle" aria-controls="controlRail"
++  aria-label="開啟或關閉執行輸入"
++  aria-expanded="true"><span aria-hidden="true">☰</span><span>執行輸入</span></button>
++ <div class="identity"><span class="seal">理</span><div>
++  <div class="product">Veritas Intelligence Analytics</div>
++  <div class="motto">判天地之美，析萬物之理。</div></div></div>
++ <div class="header-meta"><span class="build">總控台 v0108</span>
++  <span id="bridgeState" class="connection unknown" aria-live="polite">連線尚未檢測</span></div>
++</header>
++<div class="app-shell">
++<aside class="control-rail" id="controlRail" aria-label="執行輸入"
++ aria-hidden="false">
++ <div class="rail-scroll">
++  <section class="rail-section primary-input">
++   <div class="section-kicker">執行輸入</div><h1>選擇要完成的工作</h1>
++   <p class="rail-note" id="parameterHint">系統只顯示該任務真正需要的參數。</p>
++   <label for="task">工作項目</label>
++   <select id="task" data-testid="task"><option value="boot" data-codes="false" data-range="false" data-cats="false">全系統每日資料更新</option><option value="backfill" data-codes="false" data-range="true" data-cats="false">歷史資料增量回補</option><option value="consensus" data-codes="true" data-range="false" data-cats="false">鉅亨 FactSet 市場共識更新</option><option value="revenue" data-codes="false" data-range="false" data-cats="false">台股全市場月營收更新</option><option value="revenue_groups" data-codes="false" data-range="false" data-cats="false">台股族群月營收排行榜</option><option value="global" data-codes="false" data-range="true" data-cats="true">全球金融商品資料更新</option><option value="firstpage" data-codes="false" data-range="false" data-cats="false">研究報告首頁文字擷取</option><option value="structdb" data-codes="false" data-range="false" data-cats="false">研究報告結構化入庫</option><option value="finpages" data-codes="false" data-range="false" data-cats="false">財務報表頁面與表格擷取</option><option value="etf_enrich" data-codes="false" data-range="false" data-cats="false">ETF 持股與市場共識資料增益</option><option value="etf_analysis" data-codes="false" data-range="false" data-cats="false">主動式 ETF 與市場共識分析</option><option value="unified_register" data-codes="false" data-range="false" data-cats="false">統一編號註冊表更新</option><option value="cmdcenter" data-codes="false" data-range="false" data-cats="false">全系統健康狀態圖更新</option><option value="nlp" data-codes="false" data-range="false" data-cats="false">自然語言單引擎橋接</option><option value="revenue_consensus" data-codes="false" data-range="false" data-cats="false">月營收與市場共識交叉分析</option><option value="mdconvert" data-codes="false" data-range="false" data-cats="false">文件轉 Markdown</option><option value="regression" data-codes="false" data-range="false" data-cats="false">文件抽取鏈迴歸驗證</option><option value="vofie" data-codes="false" data-range="false" data-cats="false">全格式文件重構</option><option value="deps_scan" data-codes="false" data-range="false" data-cats="false">相依性全景掃描</option><option value="deps_mirror" data-codes="false" data-range="false" data-cats="false">套件鏡像速度檢測</option><option value="rebuild_scan" data-codes="false" data-range="false" data-cats="false">環境重建規劃快巡</option><option value="rebuild_full" data-codes="false" data-range="false" data-cats="false">環境完整重建與執行檔產出</option><option value="lessons" data-codes="false" data-range="false" data-cats="false">教訓台帳與基線檢視</option><option value="ocr_probe" data-codes="false" data-range="false" data-cats="false">OCR 執行車道探測</option><option value="ocr_plan" data-codes="false" data-range="false" data-cats="false">OCR 隔離環境安裝規劃</option><option value="selftest_fast" data-codes="false" data-range="false" data-cats="false">全系統矩陣快速自我測試</option><option value="etf_fetch" data-codes="false" data-range="false" data-cats="false">主動式台股 ETF 每日持股更新</option><option value="chat2doc" data-codes="false" data-range="false" data-cats="false">對話轉文章與程式規格</option><option value="uispec" data-codes="false" data-range="false" data-cats="false">使用者介面元件三語轉碼</option><option value="govcon" data-codes="false" data-range="false" data-cats="false">中央治理六管線控制台</option><option value="std_dashboard" data-codes="false" data-range="false" data-cats="false">標準 Plotly 分析儀表板</option><option value="ui" data-codes="false" data-range="false" data-cats="false">全系統使用者介面再生</option></select>
++   <div id="codesField" class="conditional-field" hidden>
++    <label for="codes">股票代號</label>
++    <input type="text" id="codes" inputmode="numeric" autocomplete="off"
++     maxlength="349" aria-describedby="codesHelp inputValidation"
++     placeholder="例如 2330, 2317"><small id="codesHelp">可輸入最多 50 個 4–6 位數代號，以逗號分隔。</small>
++   </div>
++   <div id="dateRangeField" class="conditional-field date-pair" hidden>
++    <div><label for="dateStart">開始日期</label><input type="date" id="dateStart"
++     aria-describedby="inputValidation"></div>
++    <div><label for="dateEnd">結束日期</label><input type="date" id="dateEnd"
++     aria-describedby="inputValidation"></div>
++   </div>
++   <div id="categoriesField" class="conditional-field" hidden>
++    <label for="categories">資料分類</label>
++    <input type="text" id="categories" autocomplete="off" maxlength="80"
++     aria-describedby="inputValidation"
++     placeholder="例如 idx,etf,us_macro"><small>可用分類：idx、etf、us_jp、fin_reports、oil、fx、cmdty、crypto、us_macro、fed、us_fiscal_rates。</small>
++   </div>
++   <div id="inputValidation" class="validation-message" role="alert" hidden></div>
++   <div class="rail-actions">
++    <button type="button" id="runOneButton" class="primary">執行選定工作</button>
++    <button type="button" id="pingButton">檢測連線</button>
++   </div>
++   <div class="rail-actions compact">
++    <button type="button" id="saveParamsButton" class="quiet">儲存</button>
++    <button type="button" id="resetParamsButton" class="quiet">回復預設</button>
++   </div>
++  </section>
++  <details class="rail-section">
++   <summary>依序執行多項工作 <span>進階</span></summary>
++   <p class="rail-note">下一項會等上一項完成後才啟動；任一項失敗即停止佇列。</p>
++   <div id="batchChecks"><label class="check-row"><input type="checkbox" value="boot"><span>全系統每日資料更新</span></label><label class="check-row"><input type="checkbox" value="revenue"><span>台股全市場月營收更新</span></label><label class="check-row"><input type="checkbox" value="consensus"><span>鉅亨 FactSet 市場共識更新</span></label><label class="check-row"><input type="checkbox" value="etf_analysis"><span>主動式 ETF 與市場共識分析</span></label><label class="check-row"><input type="checkbox" value="revenue_consensus"><span>月營收與市場共識交叉分析</span></label><label class="check-row"><input type="checkbox" value="regression"><span>文件抽取鏈迴歸驗證</span></label><label class="check-row"><input type="checkbox" value="selftest_fast"><span>全系統矩陣快速自我測試</span></label></div>
++   <button type="button" id="runBatchButton" class="primary full">依序執行勾選工作</button>
++  </details>
++  <details class="rail-section">
++   <summary>文件與資料收件 <span>選用</span></summary>
++   <div id="drop" tabindex="0" role="button" aria-controls="filePicker">
++    拖曳檔案到這裡，或按 Enter 選擇檔案
++    <small>單檔上限 50 MB；指揮台未開時只列檔名，不假裝入庫。</small>
++   </div>
++   <input type="file" id="filePicker" multiple hidden>
++   <ul id="files" class="file-results" aria-live="polite"></ul>
++  </details>
++  <details class="rail-section">
++   <summary>清單篩選 <span>維運</span></summary>
++   <label for="catalogSearch">搜尋正式名稱或技術識別碼</label>
++   <input type="search" id="catalogSearch" placeholder="搜尋引擎或模組">
++   <label class="check-row"><input type="checkbox" id="showTechnicalIds">
++    <span>顯示技術識別碼</span></label>
++  </details>
++  <nav class="system-links" aria-label="子系統入口">
++   <a href="VIA_UI_Shell_CGC_v0100.html">中央治理系統</a>
++   <a href="VIA_UI_Shell_VDF_v0100.html">資料擷取與鍛造系統</a>
++   <a href="VIA_UI_Shell_VRN_v0100.html">研究報告解析系統</a>
++   <a href="VIA_UI_Shell_VAP_v0100.html">視覺分析與自動繪圖系統</a>
++  </nav>
++ </div>
++ <div class="rail-log"><div class="section-kicker">操作紀錄</div>
++  <pre id="log" aria-live="polite">待命。尚未執行任何工作。</pre></div>
++</aside>
++<button type="button" id="railBackdrop" class="rail-backdrop"
++ aria-label="關閉執行輸入" hidden></button>
++<main class="workspace" id="workspace">
++ <div class="workspace-heading"><div>
++  <div class="eyebrow">VIA 母系統 / 系統運轉與分析</div>
++  <h2>現況輸入與運轉結果</h2>
++  <p>真實狀態取自本機指揮台；沒有來源資料時顯示待命或缺料，不顯示假綠。</p></div>
++  <div class="snapshot"><span>畫面產生時間</span><b>2026-09-02 01:02</b></div>
++ </div>
++ <nav class="view-tabs" id="viewTabs" role="tablist" aria-label="總控台報告分頁">
++  <button role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">運轉總覽</button>
++  <button role="tab" id="tab-matrix" aria-controls="panel-matrix" aria-selected="false" tabindex="-1">結果矩陣</button>
++  <button role="tab" id="tab-plotly" aria-controls="panel-plotly" aria-selected="false" tabindex="-1">分析圖表</button>
++  <button role="tab" id="tab-engines" aria-controls="panel-engines" aria-selected="false" tabindex="-1">引擎清單</button>
++  <button role="tab" id="tab-modules" aria-controls="panel-modules" aria-selected="false" tabindex="-1">模組清單</button>
++  <button role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false" tabindex="-1">讀取規劃</button>
++  <button role="tab" id="tab-links" aria-controls="panel-links" aria-selected="false" tabindex="-1">系統連線</button>
++ </nav>
++ <section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
++  <div class="stats">
++   <article class="stat"><b>32</b><span>正式工作項目</span></article>
++   <article class="stat"><b>76</b><span>現役引擎族</span></article>
++   <article class="stat"><b>85</b><span>中央治理模組</span></article>
++   <article class="stat muted"><b>119</b><span>退役存證引擎</span></article>
++  </div>
++  <div class="overview-grid">
++   <article class="card"><div class="card-head"><div><span class="section-kicker">目前輸入</span>
++    <h3>送入引擎前的參數摘要</h3></div>
++    <span id="inputStateBadge" class="honesty">尚未送出</span></div>
++    <div class="table-wrap"><table class="summary-table"><tbody>
++     <tr><th>工作項目</th><td id="summaryTask">—</td></tr>
++     <tr><th>股票代號</th><td id="summaryCodes">不適用</td></tr>
++     <tr><th>日期範圍</th><td id="summaryDates">不適用</td></tr>
++     <tr><th>資料分類</th><td id="summaryCategories">不適用</td></tr>
++     <tr><th>批次工作</th><td id="summaryBatch">未勾選</td></tr>
++     <tr><th>待收文件</th><td id="summaryFiles">0 件</td></tr>
++    </tbody></table></div>
++   </article>
++   <article class="card"><div class="card-head"><div><span class="section-kicker">運轉分布</span>
++    <h3>本機指揮台即時狀態</h3></div><span id="statusSource" class="honesty">等待連線</span></div>
++    <div id="statusDistribution" class="status-distribution" aria-label="任務狀態分布"></div>
++    <div id="overviewEmpty" class="inline-empty">尚未取得運轉狀態。</div>
++   </article>
++  </div>
++  <article class="card"><div class="card-head"><div><span class="section-kicker">選定結果</span>
++   <h3 id="selectedResultTitle">尚未選取工作</h3></div><span id="selectedResultState" class="honesty">待命</span></div>
++   <pre id="result">請在「結果矩陣」選取工作，或從左側執行一項工作。</pre>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-matrix" role="tabpanel" aria-labelledby="tab-matrix" hidden>
++  <article class="card"><div class="card-head"><div><span class="section-kicker">矩陣報告</span>
++   <h3>工作狀態、進度、結果與解決建議</h3></div><span>每 4 秒更新</span></div>
++   <div id="matrixNotice" class="notice" aria-live="polite">正在連接本機指揮台…</div>
++   <div class="table-wrap"><table class="matrix-table" id="statusMatrix">
++    <thead><tr><th>正式工作名稱</th><th>狀態</th><th>開始</th><th>經過</th>
++     <th>心跳延遲</th><th>紀錄</th><th>完成／進度</th><th>回傳碼</th><th>解決建議</th></tr></thead>
++    <tbody id="statusMatrixBody"><tr><td colspan="9">尚未取得資料。</td></tr></tbody>
++   </table></div>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-plotly" role="tabpanel" aria-labelledby="tab-plotly" hidden>
++  <article class="card plotly-card"><div class="card-head"><div><span class="section-kicker">Plotly Dashboard</span>
++   <h3>標準金融分析儀表板</h3></div><span class="honesty">等待來源資料</span></div>
++   <div class="empty-state" id="plotlyEmpty"><span class="empty-icon">◇</span><h3>Plotly 分析儀表板尚未產生</h3><p>目前共識或月營收資料尚未完成。請先在左側執行「全系統每日資料更新」，資料表建立後再執行「標準 Plotly 分析儀表板」。本頁不顯示模擬行情或假圖。</p><code>via → via-analysis → via-manager</code></div>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-engines" role="tabpanel" aria-labelledby="tab-engines" hidden>
++  <article class="card"><div class="card-head"><div><span class="section-kicker">引擎表列</span>
++   <h3>現役與退役引擎治理清單</h3></div><span>76 現役 · 119 存證</span></div>
++   <p class="notice">「已盤點」只代表 Atlas 找到檔案，不代表已註冊、通過測試或本次執行成功；
++    真實運轉結果請見結果矩陣。候核名稱及候核序號只供人工核定，不冒充正式名稱。
++    退役存證共 119 族，其中 1 族與現役正本同識別碼，主清單去重後列 118 族。</p>
++   <div class="table-wrap roster-wrap"><table class="roster-table" id="engineTable">
++    <thead><tr><th>正式名稱／候核名稱</th><th>所屬系統</th><th>功能分類</th><th>治理狀態</th><th class="tech-id">技術識別碼</th></tr></thead>
++    <tbody><tr data-search="市場輪動判讀引擎 市場籌碼與輪動分析 族群與資金流 已盤點・尚未執行 surveyed chw_eng005_rotationengine"><td>市場輪動判讀引擎</td><td>市場籌碼與輪動分析</td><td>族群與資金流</td><td>已盤點・尚未執行</td><td class="tech-id">CHW_ENG005_RotationEngine</td></tr><tr data-search="台股族群輪動執行引擎 台股族群指數與輪動 族群與資金流 已盤點・尚未執行 surveyed grp_eng040_groupingrotationrunner"><td>台股族群輪動執行引擎</td><td>台股族群指數與輪動</td><td>族群與資金流</td><td>已盤點・尚未執行</td><td class="tech-id">GRP_ENG040_GroupingRotationRunner</td></tr><tr data-search="族群輪動方法驗證實驗室 台股族群指數與輪動 族群與資金流 已盤點・尚未執行 surveyed grp_eng041_rotationmethodlab"><td>族群輪動方法驗證實驗室</td><td>台股族群指數與輪動</td><td>族群與資金流</td><td>已盤點・尚未執行</td><td class="tech-id">GRP_ENG041_RotationMethodLab</td></tr><tr data-search="泛用文件內容擷取引擎 泛用文件智慧擷取 系統協調與支援 已盤點・尚未執行 surveyed plg_eng001_superextract"><td>泛用文件內容擷取引擎</td><td>泛用文件智慧擷取</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">PLG_ENG001_SuperExtract</td></tr><tr data-search="自動繪圖元件庫引擎 視覺分析與自動繪圖 圖表與使用者介面 現役位置已盤點・另有退役副本・尚未執行 surveyed vap_eng001_autoplotenginechartlib"><td>自動繪圖元件庫引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>現役位置已盤點・另有退役副本・尚未執行</td><td class="tech-id">VAP_ENG001_AutoplotEngineChartlib</td></tr><tr data-search="自動繪圖核心引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng002_autoplotengine"><td>自動繪圖核心引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG002_AutoplotEngine</td></tr><tr data-search="seaborn 與 plotly 雙渲染引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng003_autoplotseabornplotly"><td>Seaborn 與 Plotly 雙渲染引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG003_AutoplotSeabornPlotly</td></tr><tr data-search="技術分析圖表工廠 視覺分析與自動繪圖 系統協調與支援 已盤點・尚未執行 surveyed vap_eng004_tafactory"><td>技術分析圖表工廠</td><td>視覺分析與自動繪圖</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG004_TAFactory</td></tr><tr data-search="圖表模板執行引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng005_templaterunner"><td>圖表模板執行引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG005_TemplateRunner</td></tr><tr data-search="視覺輸出驗收稽核引擎 視覺分析與自動繪圖 測試與驗證 已盤點・尚未執行 surveyed vap_eng006_acceptanceaudit"><td>視覺輸出驗收稽核引擎</td><td>視覺分析與自動繪圖</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG006_AcceptanceAudit</td></tr><tr data-search="寬表資料更新引擎 視覺分析與自動繪圖 系統協調與支援 已盤點・尚未執行 surveyed vap_eng007_rawwiderefresh"><td>寬表資料更新引擎</td><td>視覺分析與自動繪圖</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG007_RawWideRefresh</td></tr><tr data-search="繪圖測試與除錯控制台 視覺分析與自動繪圖 測試與驗證 已盤點・尚未執行 surveyed vap_eng008_testconsole"><td>繪圖測試與除錯控制台</td><td>視覺分析與自動繪圖</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG008_TestConsole</td></tr><tr data-search="視覺分析儀表板介面引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng009_dashboardui"><td>視覺分析儀表板介面引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG009_DashboardUI</td></tr><tr data-search="圖表規格單一真實來源引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng010_chartlibraryssot"><td>圖表規格單一真實來源引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG010_ChartLibrarySSOT</td></tr><tr data-search="圖表模板註冊引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng011_templateregistry"><td>圖表模板註冊引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG011_TemplateRegistry</td></tr><tr data-search="治理式圖像儲存引擎 視覺分析與自動繪圖 資料擷取與儲存 已盤點・尚未執行 surveyed vap_eng012_governedimagestore"><td>治理式圖像儲存引擎</td><td>視覺分析與自動繪圖</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG012_GovernedImageStore</td></tr><tr data-search="金融市場分析引擎 視覺分析與自動繪圖 系統協調與支援 已盤點・尚未執行 surveyed vap_eng013_marketanalytics"><td>金融市場分析引擎</td><td>視覺分析與自動繪圖</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG013_MarketAnalytics</td></tr><tr data-search="標準儀表板模板引擎 視覺分析與自動繪圖 圖表與使用者介面 已盤點・尚未執行 surveyed vap_eng014_stddashboardtemplate"><td>標準儀表板模板引擎</td><td>視覺分析與自動繪圖</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">VAP_ENG014_StdDashboardTemplate</td></tr><tr data-search="資料擷取契約管理引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng019_mdl501fetchcontractmanager"><td>資料擷取契約管理引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG019_MDL501FetchContractManager</td></tr><tr data-search="全球金融行情擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng044_mdlxxxyfinanceglobaldatafetcher"><td>全球金融行情擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher</td></tr><tr data-search="資料輸出中樞引擎 資料擷取與鍛造 系統協調與支援 已盤點・尚未執行 surveyed vdf_eng045_outputhub"><td>資料輸出中樞引擎</td><td>資料擷取與鍛造</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG045_OutputHub</td></tr><tr data-search="資料擷取矩陣註冊引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng046_fetchmatrixregistry"><td>資料擷取矩陣註冊引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG046_FetchMatrixRegistry</td></tr><tr data-search="美國總體經濟明細擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng047_usmacrodetailfetcher"><td>美國總體經濟明細擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG047_USMacroDetailFetcher</td></tr><tr data-search="技術分析資料工廠 資料擷取與鍛造 系統協調與支援 已盤點・尚未執行 surveyed vdf_eng048_tafactory"><td>技術分析資料工廠</td><td>資料擷取與鍛造</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG048_TAFactory</td></tr><tr data-search="五日行情增量擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng049_fivedayfetch"><td>五日行情增量擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG049_FiveDayFetch</td></tr><tr data-search="排程式資料擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng050_orderfetch"><td>排程式資料擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG050_OrderFetch</td></tr><tr data-search="主動式台股 etf 每日持股擷取引擎 資料擷取與鍛造 etf 與持股 已盤點・尚未執行 surveyed vdf_eng051_activetwetf_holdings"><td>主動式台股 ETF 每日持股擷取引擎</td><td>資料擷取與鍛造</td><td>ETF 與持股</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG051_ActiveTWETF_Holdings</td></tr><tr data-search="多來源資料整合擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng052_megafetch"><td>多來源資料整合擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG052_MegaFetch</td></tr><tr data-search="參數與引擎映射管理引擎 資料擷取與鍛造 系統協調與支援 已盤點・尚未執行 surveyed vdf_eng053_paramenginemap"><td>參數與引擎映射管理引擎</td><td>資料擷取與鍛造</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG053_ParamEngineMap</td></tr><tr data-search="台股日資料歷史回補引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng054_twdailybackfill"><td>台股日資料歷史回補引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG054_TWDailyBackfill</td></tr><tr data-search="全域資料擷取協調引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng055_omnifetch"><td>全域資料擷取協調引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG055_OmniFetch</td></tr><tr data-search="台股籌碼資料歷史回補引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng056_chipbackfill"><td>台股籌碼資料歷史回補引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG056_ChipBackfill</td></tr><tr data-search="台股成交值歷史回補引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng057_tradingvaluebackfill"><td>台股成交值歷史回補引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG057_TradingValueBackfill</td></tr><tr data-search="產業分類統一映射引擎 資料擷取與鍛造 系統協調與支援 已盤點・尚未執行 surveyed vdf_eng058_industryunifiedmap"><td>產業分類統一映射引擎</td><td>資料擷取與鍛造</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG058_IndustryUnifiedMap</td></tr><tr data-search="共識估值區間計算引擎 資料擷取與鍛造 財務與市場共識 已盤點・尚未執行 surveyed vdf_eng059_estimatebands"><td>共識估值區間計算引擎</td><td>資料擷取與鍛造</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG059_EstimateBands</td></tr><tr data-search="調整後價格標準層引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng060_adjpricelayer"><td>調整後價格標準層引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG060_AdjPriceLayer</td></tr><tr data-search="市場特徵儲存引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng061_featurestore"><td>市場特徵儲存引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG061_FeatureStore</td></tr><tr data-search="族群特徵計算層引擎 資料擷取與鍛造 族群與資金流 已盤點・尚未執行 surveyed vdf_eng062_groupfeaturelayer"><td>族群特徵計算層引擎</td><td>資料擷取與鍛造</td><td>族群與資金流</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG062_GroupFeatureLayer</td></tr><tr data-search="台股月營收擷取與分析引擎 資料擷取與鍛造 財務與市場共識 已盤點・尚未執行 surveyed vdf_eng063_monthlyrevenue"><td>台股月營收擷取與分析引擎</td><td>資料擷取與鍛造</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG063_MonthlyRevenue</td></tr><tr data-search="跨市場歷史資料回補引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng064_historybackfill"><td>跨市場歷史資料回補引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG064_HistoryBackfill</td></tr><tr data-search="資料庫匯入與對帳引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng065_dbimport"><td>資料庫匯入與對帳引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG065_DbImport</td></tr><tr data-search="全球金融商品清單擷取引擎 資料擷取與鍛造 資料擷取與儲存 已盤點・尚未執行 surveyed vdf_eng066_globaluniverse"><td>全球金融商品清單擷取引擎</td><td>資料擷取與鍛造</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG066_GlobalUniverse</td></tr><tr data-search="etf 持股共識資料增益引擎 資料擷取與鍛造 財務與市場共識 已盤點・尚未執行 surveyed vdf_eng067_consensusenrichment"><td>ETF 持股共識資料增益引擎</td><td>資料擷取與鍛造</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG067_ConsensusEnrichment</td></tr><tr data-search="主動式 etf 共識分析引擎 資料擷取與鍛造 財務與市場共識 已盤點・尚未執行 surveyed vdf_eng068_etfconsensusanalysis"><td>主動式 ETF 共識分析引擎</td><td>資料擷取與鍛造</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG068_ETFConsensusAnalysis</td></tr><tr data-search="月營收與共識交叉分析引擎 資料擷取與鍛造 財務與市場共識 已盤點・尚未執行 surveyed vdf_eng069_revenueconsensusanalysis"><td>月營收與共識交叉分析引擎</td><td>資料擷取與鍛造</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VDF_ENG069_RevenueConsensusAnalysis</td></tr><tr data-search="pdf 表格 ocr 擷取引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng017_mdl004ocrfetchingpdftable"><td>PDF 表格 OCR 擷取引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG017_MDL004OCRFetchingPDFTable</td></tr><tr data-search="pdf 文字 ocr 擷取引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng018_mdl005ocrfetchingpdftext"><td>PDF 文字 OCR 擷取引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG018_MDL005OCRFetchingPDFText</td></tr><tr data-search="研究報告每日擷取引擎 研究報告解析與知識化 資料擷取與儲存 已盤點・尚未執行 surveyed vrn_eng023_mdl011dailyfetcher"><td>研究報告每日擷取引擎</td><td>研究報告解析與知識化</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG023_MDL011DailyFetcher</td></tr><tr data-search="文件內容對帳引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng049_contentreconcile"><td>文件內容對帳引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG049_ContentReconcile</td></tr><tr data-search="文件內容儲存引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng050_contentstore"><td>文件內容儲存引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG050_ContentStore</td></tr><tr data-search="word 文件處理引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng052_docxengine"><td>Word 文件處理引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG052_DocxEngine</td></tr><tr data-search="office 文件合併引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng055_officemerge"><td>Office 文件合併引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG055_OfficeMerge</td></tr><tr data-search="pdf 結構鑑識引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng056_pdfforensics"><td>PDF 結構鑑識引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG056_PdfForensics</td></tr><tr data-search="掃描文件 ocr 救援引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng057_scanocrrescue"><td>掃描文件 OCR 救援引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG057_ScanOcrRescue</td></tr><tr data-search="泛用表格擷取引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng058_tableomni"><td>泛用表格擷取引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG058_TableOmni</td></tr><tr data-search="內容缺口多路救援引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng059_gapmultirescue"><td>內容缺口多路救援引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG059_GapMultirescue</td></tr><tr data-search="泛用文字擷取與還原引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng060_textomni"><td>泛用文字擷取與還原引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG060_TextOmni</td></tr><tr data-search="研究內容摘要引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng062_summarizerv1"><td>研究內容摘要引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG062_SummarizerV1</td></tr><tr data-search="金融語彙管理引擎 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng063_lexicon"><td>金融語彙管理引擎</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG063_Lexicon</td></tr><tr data-search="研究知識庫管理引擎 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng064_knowledgestack"><td>研究知識庫管理引擎</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG064_KnowledgeStack</td></tr><tr data-search="郵件內容智慧分析引擎 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng065_mailintel"><td>郵件內容智慧分析引擎</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG065_MailIntel</td></tr><tr data-search="自然語言處理支援中樞 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng066_nlpsupporthub"><td>自然語言處理支援中樞</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG066_NLPSupportHub</td></tr><tr data-search="心智圖單一真實來源引擎 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng067_mindmapssot"><td>心智圖單一真實來源引擎</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG067_MindMapSSOT</td></tr><tr data-search="每日研究摘要引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng068_dailybrief"><td>每日研究摘要引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG068_DailyBrief</td></tr><tr data-search="市場共識資料庫引擎 研究報告解析與知識化 財務與市場共識 已盤點・尚未執行 surveyed vrn_eng069_consensusdb"><td>市場共識資料庫引擎</td><td>研究報告解析與知識化</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG069_ConsensusDB</td></tr><tr data-search="yahoo finance 共識擷取引擎 研究報告解析與知識化 財務與市場共識 已盤點・尚未執行 surveyed vrn_eng070_yahooconsensus"><td>Yahoo Finance 共識擷取引擎</td><td>研究報告解析與知識化</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG070_YahooConsensus</td></tr><tr data-search="鉅亨 factset 與 yahoo 共識融合引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng071_cnyesfusion"><td>鉅亨 FactSet 與 Yahoo 共識融合引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG071_CnyesFusion</td></tr><tr data-search="研究報告首頁文字擷取引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng072_firstpagetext"><td>研究報告首頁文字擷取引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG072_FirstPageText</td></tr><tr data-search="研究報告結構化入庫引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng073_reportstructureddb"><td>研究報告結構化入庫引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG073_ReportStructuredDB</td></tr><tr data-search="財務報表頁面與表格擷取引擎 研究報告解析與知識化 財務與市場共識 已盤點・尚未執行 surveyed vrn_eng074_financialpages"><td>財務報表頁面與表格擷取引擎</td><td>研究報告解析與知識化</td><td>財務與市場共識</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG074_FinancialPages</td></tr><tr data-search="文件轉 markdown 引擎 研究報告解析與知識化 文件與研究報告 已盤點・尚未執行 surveyed vrn_eng075_doctomarkdown"><td>文件轉 Markdown 引擎</td><td>研究報告解析與知識化</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG075_DocToMarkdown</td></tr><tr data-search="文件抽取鏈迴歸驗證引擎 研究報告解析與知識化 測試與驗證 已盤點・尚未執行 surveyed vrn_eng076_regressiongate"><td>文件抽取鏈迴歸驗證引擎</td><td>研究報告解析與知識化</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG076_RegressionGate</td></tr><tr data-search="全格式文件轉接引擎 研究報告解析與知識化 系統協調與支援 已盤點・尚未執行 surveyed vrn_eng077_omniformatbridge"><td>全格式文件轉接引擎</td><td>研究報告解析與知識化</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG077_OmniFormatBridge</td></tr><tr data-search="泛用自然語言單引擎橋接器 研究報告解析與知識化 語意與知識管理 已盤點・尚未執行 surveyed vrn_eng078_nlponebridge"><td>泛用自然語言單引擎橋接器</td><td>研究報告解析與知識化</td><td>語意與知識管理</td><td>已盤點・尚未執行</td><td class="tech-id">VRN_ENG078_NLPOneBridge</td></tr><tr data-search="簡報自動建置引擎 工作流程與專案治理 系統協調與支援 已盤點・尚未執行 surveyed via_eng150_builddeck"><td>簡報自動建置引擎</td><td>工作流程與專案治理</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VIA_ENG150_BuildDeck</td></tr><tr data-search="工作脈動統一分析引擎 工作流程與專案治理 系統協調與支援 已盤點・尚未執行 surveyed via_eng170_workpulseunified"><td>工作脈動統一分析引擎</td><td>工作流程與專案治理</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">VIA_ENG170_WorkPulseUnified</td></tr><tr data-search="外資級聯博弈引擎（候核序號 e001） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng003_foreigngameengine"><td>外資級聯博弈引擎（候核序號 E001）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG003_ForeignGameEngine</td></tr><tr data-search="族群資金相對強弱輪動象限圖引擎（候核序號 e002） 已退役引擎存證區 族群與資金流 已退役存證 retired chw_eng006_rotationdashboard"><td>族群資金相對強弱輪動象限圖引擎（候核序號 E002）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">CHW_ENG006_RotationDashboard</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e003） 已退役引擎存證區 族群與資金流 已退役存證 retired chw_eng008_purifiedsectorrotationaccuracyenginev2"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E003）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">CHW_ENG008_PurifiedSectorRotationAccuracyEngineV2</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e004） 已退役引擎存證區 測試與驗證 已退役存證 retired chw_eng010_ssotmatchingtestingengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E004）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">CHW_ENG010_SsotMatchingTestingEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e005） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng011_viaengineverificationsuite"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E005）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG011_ViaEngineVerificationSuite</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e006） 已退役引擎存證區 資料擷取與儲存 已退役存證 retired chw_eng012_viaexactdatasettestengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E006）</td><td>已退役引擎存證區</td><td>資料擷取與儲存</td><td>已退役存證</td><td class="tech-id">CHW_ENG012_ViaExactDatasetTestEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e007） 已退役引擎存證區 測試與驗證 已退役存證 retired chw_eng013_viasystemintegrationtestsuite"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E007）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">CHW_ENG013_ViaSystemIntegrationTestSuite</td></tr><tr data-search="科技與傳統產業比較引擎（候核序號 e008） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng014_blocengine"><td>科技與傳統產業比較引擎（候核序號 E008）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG014_BlocEngine</td></tr><tr data-search="跨市場情境合成分析引擎（候核序號 e009） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng015_chipwarengine"><td>跨市場情境合成分析引擎（候核序號 E009）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG015_ChipwarEngine</td></tr><tr data-search="全鏈成果視覺圖庫引擎（候核序號 e010） 已退役引擎存證區 圖表與使用者介面 已退役存證 retired chw_eng016_chipwarvapdashboard"><td>全鏈成果視覺圖庫引擎（候核序號 E010）</td><td>已退役引擎存證區</td><td>圖表與使用者介面</td><td>已退役存證</td><td class="tech-id">CHW_ENG016_ChipwarVapDashboard</td></tr><tr data-search="錯失恐懼綜合指數引擎（候核序號 e011） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng017_fomoindexengine"><td>錯失恐懼綜合指數引擎（候核序號 E011）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG017_FomoIndexEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e012） 已退役引擎存證區 文件與研究報告 已退役存證 retired chw_eng018_fomoindexreport"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E012）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">CHW_ENG018_FomoIndexReport</td></tr><tr data-search="資金盤根因層 引擎（候核序號 e013） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng019_macroengine"><td>資金盤根因層 引擎（候核序號 E013）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG019_MacroEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e014） 已退役引擎存證區 族群與資金流 已退役存證 retired chw_eng020_rotationpluginengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E014）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">CHW_ENG020_RotationPlugInEngine</td></tr><tr data-search="社群情緒錯失恐懼分析引擎（候核序號 e015） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng021_socialengine"><td>社群情緒錯失恐懼分析引擎（候核序號 E015）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG021_SocialEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e016） 已退役引擎存證區 文件與研究報告 已退役存證 retired chw_eng022_socialreport"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E016）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">CHW_ENG022_SocialReport</td></tr><tr data-search="跑全鏈與驗證每支輸出與魔鬼批判檢查 引擎（候核序號 e017） 已退役引擎存證區 測試與驗證 已退役存證 retired chw_eng023_testharness"><td>跑全鏈與驗證每支輸出與魔鬼批判檢查 引擎（候核序號 E017）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">CHW_ENG023_TestHarness</td></tr><tr data-search="台美市場錯失恐懼因子引擎（候核序號 e018） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng024_xmktengine"><td>台美市場錯失恐懼因子引擎（候核序號 E018）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG024_XmktEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e019） 已退役引擎存證區 文件與研究報告 已退役存證 retired chw_eng025_xmktreport"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E019）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">CHW_ENG025_XmktReport</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e020） 已退役引擎存證區 系統協調與支援 已退役存證 retired chw_eng026_codeartifact3"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E020）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">CHW_ENG026_CodeArtifact3</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e021） 已退役引擎存證區 etf 與持股 已退役存證 retired grp_eng002_activestocketfmocktest"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E021）</td><td>已退役引擎存證區</td><td>ETF 與持股</td><td>已退役存證</td><td class="tech-id">GRP_ENG002_ActiveStockETFMocktest</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e022） 已退役引擎存證區 財務與市場共識 已退役存證 retired grp_eng004_chipwarrevenueevidence"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E022）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">GRP_ENG004_ChipWarRevenueEvidence</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e023） 已退役引擎存證區 etf 與持股 已退役存證 retired grp_eng005_etfconsolesevidence"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E023）</td><td>已退役引擎存證區</td><td>ETF 與持股</td><td>已退役存證</td><td class="tech-id">GRP_ENG005_ETFConsolesEvidence</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e024） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng010_groupindexmastervalidation"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E024）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG010_GroupIndexMasterValidation</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e025） 已退役引擎存證區 系統協調與支援 已退役存證 retired grp_eng011_livewirecontractadapter"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E025）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">GRP_ENG011_LiveWireContractAdapter</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e026） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng012_sectorflowadaptivechainedindex"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E026）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG012_SectorFlowAdaptiveChainedIndex</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e027） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng013_sectorflowdashboardbuilder"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E027）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG013_SectorFlowDashboardBuilder</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e028） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng014_sectorflowsignaltradebacktest"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E028）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG014_SectorFlowSignalTradeBacktest</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e029） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng016_threelistgroupingdynamicvalidationpipeline"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E029）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG016_ThreeListGroupingDynamicValidationPipeline</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e030） 已退役引擎存證區 族群與資金流 已退役存證 retired grp_eng038_subgroupsandboxvalidation"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E030）</td><td>已退役引擎存證區</td><td>族群與資金流</td><td>已退役存證</td><td class="tech-id">GRP_ENG038_SubgroupSandboxValidation</td></tr><tr data-search="防停滯版 引擎（候核序號 e031） 已退役引擎存證區 資料擷取與儲存 已退役存證 retired vdf_eng001_datahuborchestrator"><td>防停滯版 引擎（候核序號 E031）</td><td>已退役引擎存證區</td><td>資料擷取與儲存</td><td>已退役存證</td><td class="tech-id">VDF_ENG001_DataHubOrchestrator</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e032） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng006_mdl004twfullmarketengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E032）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG006_MDL004TWFullMarketEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e033） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng011_mdl102formatupgrader"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E033）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG011_MDL102FormatUpgrader</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e034） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng017_mdl302finalactivation"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E034）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG017_MDL302FinalActivation</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e035） 已退役引擎存證區 財務與市場共識 已退役存證 retired vdf_eng020_mdl097vrnfinancialdatafinalevidenceselectorv06149financialdatav06149"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E035）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">VDF_ENG020_MDL097VrnFinancialdataFinalEvidenceSelectorV06149FINANCIALDATAV06149</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e036） 已退役引擎存證區 財務與市場共識 已退役存證 retired vdf_eng021_mdl215vrnfinancialdatatriflowstagingv06153financialdatav06153"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E036）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">VDF_ENG021_MDL215VrnFinancialdataTriflowStagingV06153FINANCIALDATAV06153</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e037） 已退役引擎存證區 財務與市場共識 已退役存證 retired vdf_eng022_mdl218vrnfinancialdataconfirmverifyv06125financialdatav06125"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E037）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">VDF_ENG022_MDL218VrnFinancialDataConfirmVerifyV06125FINANCIALDATAV06125</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e038） 已退役引擎存證區 財務與市場共識 已退役存證 retired vdf_eng023_mdl252vrnfinancialfinalsealv06127financialdatav06127"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E038）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">VDF_ENG023_MDL252VrnFinancialFinalSealV06127FINANCIALDATAV06127</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e039） 已退役引擎存證區 財務與市場共識 已退役存證 retired vdf_eng024_mdl253vrnfinancialfinalsealv06127financialdatav06127"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E039）</td><td>已退役引擎存證區</td><td>財務與市場共識</td><td>已退役存證</td><td class="tech-id">VDF_ENG024_MDL253VrnFinancialFinalSealV06127FINANCIALDATAV06127</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e040） 已退役引擎存證區 資料擷取與儲存 已退役存證 retired vdf_eng031_mdl001twuniverseverify"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E040）</td><td>已退役引擎存證區</td><td>資料擷取與儲存</td><td>已退役存證</td><td class="tech-id">VDF_ENG031_MDL001TWUniverseVerify</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e041） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng039_inject"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E041）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG039_Inject</td></tr><tr data-search="第一階段：建出「全台股」基礎宇宙 引擎（候核序號 e042） 已退役引擎存證區 資料擷取與儲存 已退役存證 retired vdf_eng040_twuniversebuilder"><td>第一階段：建出「全台股」基礎宇宙 引擎（候核序號 E042）</td><td>已退役引擎存證區</td><td>資料擷取與儲存</td><td>已退役存證</td><td class="tech-id">VDF_ENG040_TWUniverseBuilder</td></tr><tr data-search="電影資料集收件與鍛造引擎（候核序號 e043） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng042_moviesintake"><td>電影資料集收件與鍛造引擎（候核序號 E043）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG042_MoviesIntake</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e044） 已退役引擎存證區 系統協調與支援 已退役存證 retired vdf_eng043_mdl201forecastmatrixintegratedv1"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E044）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VDF_ENG043_MDL201ForecastMatrixIntegratedV1</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e045） 已退役引擎存證區 測試與驗證 已退役存證 retired via_eng001_multifactortestvalidatesimengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E045）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VIA_ENG001_MultiFactorTestValidateSimEngine</td></tr><tr data-search="技術分析指標計算引擎（候核序號 e046） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng003_talibengine"><td>技術分析指標計算引擎（候核序號 E046）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG003_TALibEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e047） 已退役引擎存證區 測試與驗證 已退役存證 retired via_eng018_duckparquetacceptance"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E047）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VIA_ENG018_DuckParquetAcceptance</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e048） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng019_meetingloopengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E048）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG019_MeetingloopEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e049） 已退役引擎存證區 文件與研究報告 已退役存證 retired via_eng020_superbomcontentparser"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E049）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VIA_ENG020_SuperBOMContentParser</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e050） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng021_masterengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E050）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG021_MasterEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e051） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng022_vmtconvergence"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E051）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG022_VmtConvergence</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e052） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng023_vmtplanningcpm"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E052）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG023_VmtPlanningCpm</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e053） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng024_vmtprocessmining"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E053）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG024_VmtProcessMining</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e054） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng025_vmtreplyingest"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E054）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG025_VmtReplyIngest</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e055） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng026_vmtsuperbomattachrouter"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E055）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG026_VmtSuperbomAttachRouter</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e056） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng027_vmtsuperbombridge"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E056）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG027_VmtSuperbomBridge</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e057） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng028_vmtsuperbomeventstream"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E057）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG028_VmtSuperbomEventstream</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e058） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng029_vmtsurvey"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E058）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG029_VmtSurvey</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e059） 已退役引擎存證區 語意與知識管理 已退役存證 retired via_eng047_validatelexicon"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E059）</td><td>已退役引擎存證區</td><td>語意與知識管理</td><td>已退役存證</td><td class="tech-id">VIA_ENG047_ValidateLexicon</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e060） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng048_buildmanifest"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E060）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG048_BuildManifest</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e061） 已退役引擎存證區 語意與知識管理 已退役存證 retired via_eng055_emailactiondb"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E061）</td><td>已退役引擎存證區</td><td>語意與知識管理</td><td>已退役存證</td><td class="tech-id">VIA_ENG055_EmailActionDb</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e062） 已退役引擎存證區 語意與知識管理 已退役存證 retired via_eng056_emailsuperengine"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E062）</td><td>已退役引擎存證區</td><td>語意與知識管理</td><td>已退役存證</td><td class="tech-id">VIA_ENG056_EmailSuperEngine</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e063） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng057_engineanalytics"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E063）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG057_EngineAnalytics</td></tr><tr data-search="操作員「大幅提高正確率各類方法」令 引擎（候核序號 e064） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng059_workopsaccuracyharness"><td>操作員「大幅提高正確率各類方法」令 引擎（候核序號 E064）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG059_WorkopsAccuracyHarness</td></tr><tr data-search="工作機制研究稽核成果包引擎（候核序號 e065） 已退役引擎存證區 測試與驗證 已退役存證 retired via_eng060_workopsauditbundle"><td>工作機制研究稽核成果包引擎（候核序號 E065）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VIA_ENG060_WorkopsAuditBundle</td></tr><tr data-search="工作流程安全車道驗收引擎（候核序號 e066） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng061_workopsbackup"><td>工作流程安全車道驗收引擎（候核序號 E066）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG061_WorkopsBackup</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e067） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng066_workopscorpusbridge"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E067）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG066_WorkopsCorpusBridge</td></tr><tr data-search="同類工作一口氣,三時間錨 引擎（候核序號 e068） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng067_workopsdailytodo"><td>同類工作一口氣,三時間錨 引擎（候核序號 E068）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG067_WorkopsDailyTodo</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e069） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng068_workopsdecisionlog"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E069）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG068_WorkopsDecisionLog</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e070） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng069_workopsenvmanagerbridge"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E070）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG069_WorkopsEnvmanagerBridge</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e071） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng070_workopsgraphvizsetup"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E071）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG070_WorkopsGraphvizSetup</td></tr><tr data-search="操作員「合為對帳」令 引擎（候核序號 e072） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng073_workopsmeetingloopbridge"><td>操作員「合為對帳」令 引擎（候核序號 E072）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG073_WorkopsMeetingloopBridge</td></tr><tr data-search="機器學習與深度學習實驗引擎（候核序號 e073） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng075_workopsmllab"><td>機器學習與深度學習實驗引擎（候核序號 E073）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG075_WorkopsMlLab</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e074） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng076_workopsnamer"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E074）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG076_WorkopsNamer</td></tr><tr data-search="整合與系統測試一鍵引擎（候核序號 e075） 已退役引擎存證區 測試與驗證 已退役存證 retired via_eng081_workopsselftest"><td>整合與系統測試一鍵引擎（候核序號 E075）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VIA_ENG081_WorkopsSelftest</td></tr><tr data-search="板資料 → 週報簡報 引擎（候核序號 e076） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng082_workopsslides"><td>板資料 → 週報簡報 引擎（候核序號 E076）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG082_WorkopsSlides</td></tr><tr data-search="詳細摘要結果與資料庫矩陣引擎（候核序號 e077） 已退役引擎存證區 語意與知識管理 已退役存證 retired via_eng083_workopssummarymatrix"><td>詳細摘要結果與資料庫矩陣引擎（候核序號 E077）</td><td>已退役引擎存證區</td><td>語意與知識管理</td><td>已退役存證</td><td class="tech-id">VIA_ENG083_WorkopsSummaryMatrix</td></tr><tr data-search="多訊號融合與工作專案化引擎（候核序號 e078） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng087_workopswopidentifier"><td>多訊號融合與工作專案化引擎（候核序號 E078）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG087_WorkopsWopIdentifier</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e079） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng105_workopsapiserver"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E079）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG105_WorkopsApiServer</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e080） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng106_workopsattachmentintelligence"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E080）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG106_WorkopsAttachmentIntelligence</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e081） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng110_workopscommitmentfulfillment"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E081）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG110_WorkopsCommitmentFulfillment</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e082） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng111_workopsconfidencecalibrator"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E082）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG111_WorkopsConfidenceCalibrator</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e083） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng112_workopsdailyoperatingrhythm"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E083）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG112_WorkopsDailyOperatingRhythm</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e084） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng113_workopsdiagnostics"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E084）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG113_WorkopsDiagnostics</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e085） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng114_workopsevidenceintegrityguard"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E085）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG114_WorkopsEvidenceIntegrityGuard</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e086） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng115_workopsfeedbackweightoptimizer"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E086）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG115_WorkopsFeedbackWeightOptimizer</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e087） 已退役引擎存證區 語意與知識管理 已退役存證 retired via_eng119_workopsmaileventbridge"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E087）</td><td>已退役引擎存證區</td><td>語意與知識管理</td><td>已退役存證</td><td class="tech-id">VIA_ENG119_WorkopsMailEventBridge</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e088） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng120_workopsmandatoryreplybuilder"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E088）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG120_WorkopsMandatoryReplyBuilder</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e089） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng121_workopsmeetingt2guard"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E089）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG121_WorkopsMeetingT2Guard</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e090） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng123_workopsmissinginformationguard"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E090）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG123_WorkopsMissingInformationGuard</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e091） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng126_workopsorchestrator"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E091）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG126_WorkopsOrchestrator</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e092） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng128_workopsprocessminingkpibridge"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E092）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG128_WorkopsProcessMiningKpiBridge</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e093） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng135_workopssmartescalation"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E093）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG135_WorkopsSmartEscalation</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e094） 已退役引擎存證區 資料擷取與儲存 已退役存證 retired via_eng136_workopsssotstore"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E094）</td><td>已退役引擎存證區</td><td>資料擷取與儲存</td><td>已退役存證</td><td class="tech-id">VIA_ENG136_WorkopsSsotStore</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e095） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng139_workopstopicepisode"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E095）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG139_WorkopsTopicEpisode</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e096） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng142_workopswatchlistprioritizer"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E096）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG142_WorkopsWatchlistPrioritizer</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e097） 已退役引擎存證區 測試與驗證 已退役存證 retired via_eng144_rcacceptance"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E097）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VIA_ENG144_RcAcceptance</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e098） 已退役引擎存證區 系統協調與支援 已退役存證 retired via_eng151_vpldesktop"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E098）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VIA_ENG151_VplDesktop</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e099） 已退役引擎存證區 測試與驗證 已退役存證 retired vrn_eng001_activateandcrossvalidate"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E099）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VRN_ENG001_ACTIVATEANDCROSSVALIDATE</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e100） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng006_completeocrengineregistry"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E100）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG006_CompleteOCREngineRegistry</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e101） 已退役引擎存證區 系統協調與支援 已退役存證 retired vrn_eng007_finalizecorev21"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E101）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VRN_ENG007_FinalizeCoreV21</td></tr><tr data-search="生產資料夾健檢 引擎（候核序號 e102） 已退役引擎存證區 系統協調與支援 已退役存證 retired vrn_eng008_healthcheck"><td>生產資料夾健檢 引擎（候核序號 E102）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VRN_ENG008_HealthCheck</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e103） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng009_m03chineseocrlegoultra"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E103）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG009_M03ChineseOCRLEGOUltra</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e104） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng010_m03layoutocrultra"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E104）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG010_M03LayoutOCRUltra</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e105） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng011_m03tiffocrultra"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E105）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG011_M03TIFFOCRUltra</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e106） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng012_m04ocrpostprocessorlegoultra"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E106）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG012_M04OCRPostProcessorLEGOUltra</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e107） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng014_mdl001stockreportpipeline"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E107）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG014_MDL001StockReportPipeline</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e108） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng024_mdl239vrnnewreportformatsystemdefaultinstallerv06155reportv06155"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E108）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG024_MDL239VrnNewReportFormatSystemDefaultInstallerV06155REPORTV06155</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e109） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng025_mdl259vrnreportdatewindowtablerestorev0597report"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E109）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG025_MDL259VrnReportDateWindowTableRestoreV0597REPORT</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e110） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng026_ocrpostprocessingvalidationsystem"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E110）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG026_OCRPostProcessingValidationSystem</td></tr><tr data-search="研究報告生產管線執行引擎（候核序號 e111） 已退役引擎存證區 系統協調與支援 已退役存證 retired vrn_eng027_pipelinerunner"><td>研究報告生產管線執行引擎（候核序號 E111）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VRN_ENG027_PipelineRunner</td></tr><tr data-search="部署後快速煙霧測試 引擎（候核序號 e112） 已退役引擎存證區 測試與驗證 已退役存證 retired vrn_eng028_smoketest"><td>部署後快速煙霧測試 引擎（候核序號 E112）</td><td>已退役引擎存證區</td><td>測試與驗證</td><td>已退役存證</td><td class="tech-id">VRN_ENG028_SmokeTest</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e113） 已退役引擎存證區 系統協調與支援 已退役存證 retired vrn_eng036_finalizecorev2"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E113）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VRN_ENG036_FinalizeCoreV2</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e114） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng046_contentextractcandidate"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E114）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG046_ContentExtractCandidate</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e115） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng047_contentextract"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E115）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG047_ContentExtract</td></tr><tr data-search="歷史功能引擎（正式名稱待治理 · 候核序號 e116） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng048_contentprobe"><td>歷史功能引擎（正式名稱待治理 · 候核序號 E116）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG048_ContentProbe</td></tr><tr data-search="word 產物主表合併引擎（候核序號 e117） 已退役引擎存證區 文件與研究報告 已退役存證 retired vrn_eng053_docxmerge"><td>Word 產物主表合併引擎（候核序號 E117）</td><td>已退役引擎存證區</td><td>文件與研究報告</td><td>已退役存證</td><td class="tech-id">VRN_ENG053_DocxMerge</td></tr><tr data-search="研究報告輸入矩陣驗證引擎（候核序號 e118） 已退役引擎存證區 系統協調與支援 已退役存證 retired vrn_eng054_inputmatrixvalidator"><td>研究報告輸入矩陣驗證引擎（候核序號 E118）</td><td>已退役引擎存證區</td><td>系統協調與支援</td><td>已退役存證</td><td class="tech-id">VRN_ENG054_InputMatrixValidator</td></tr></tbody></table></div>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-modules" role="tabpanel" aria-labelledby="tab-modules" hidden>
++  <article class="card"><div class="card-head"><div><span class="section-kicker">模組表列</span>
++   <h3>中央治理與支援模組清單</h3></div><span>85 個模組</span></div>
++   <p class="notice">模組狀態只代表 Atlas 已盤點到檔案，不證明註冊、測試或啟用；
++    未有人工核定名稱者顯示清洗後候核名稱及唯一候核序號。</p>
++   <div class="table-wrap roster-wrap"><table class="roster-table" id="moduleTable">
++    <thead><tr><th>正式名稱／候核名稱</th><th>功能分類</th><th>治理狀態</th><th class="tech-id">技術識別碼</th></tr></thead>
++    <tbody><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m001） 系統協調與支援 已盤點・尚未執行 cgc_mdl023_autocoderegistryengine"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M001）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL023_AutoCodeRegistryEngine</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m002） 資料擷取與儲存 已盤點・尚未執行 cgc_mdl028_manifestfetchadapter"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M002）</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL028_ManifestFetchAdapter</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m003） 系統協調與支援 已盤點・尚未執行 cgc_mdl034_mdl015vrnfinalproductionlockregistryv061573supportrulev061573"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M003）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m004） 資料擷取與儲存 已盤點・尚未執行 cgc_mdl035_mdl256restorevisvrnmasterregistrybridgev0611manifestgovernance"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M004）</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE</td></tr><tr data-search="商品指針產生器 治理模組（候核序號 m005） 系統協調與支援 已盤點・尚未執行 cgc_mdl036_buildpkgpointers"><td>商品指針產生器 治理模組（候核序號 M005）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL036_BuildPkgPointers</td></tr><tr data-search="via 母版最後一頁 · 全系統規格總覽生成器 治理模組（候核序號 m006） 系統協調與支援 已盤點・尚未執行 cgc_mdl037_buildspecmaster"><td>VIA 母版最後一頁 · 全系統規格總覽生成器 治理模組（候核序號 M006）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL037_BuildSpecMaster</td></tr><tr data-search="子系統分開模板產生器 治理模組（候核序號 m007） 系統協調與支援 已盤點・尚未執行 cgc_mdl038_buildsubsystempages"><td>子系統分開模板產生器 治理模組（候核序號 M007）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL038_BuildSubsystemPages</td></tr><tr data-search="via 母頁產生器 治理模組（候核序號 m008） 系統協調與支援 已盤點・尚未執行 cgc_mdl039_buildviamother"><td>VIA 母頁產生器 治理模組（候核序號 M008）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL039_BuildViaMother</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m009） 測試與驗證 已盤點・尚未執行 cgc_mdl040_pyaudit7ae60dd6d6134056bfab27bb6751e35d"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M009）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL040_PyAudit7ae60dd6d6134056bfab27bb6751e35d</td></tr><tr data-search="文章攝入引擎 治理模組（候核序號 m010） 系統協調與支援 已盤點・尚未執行 cgc_mdl041_articleintake"><td>文章攝入引擎 治理模組（候核序號 M010）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL041_ArticleIntake</td></tr><tr data-search="全面自動化巡航 治理模組（候核序號 m011） 系統協調與支援 已盤點・尚未執行 cgc_mdl042_autopilot"><td>全面自動化巡航 治理模組（候核序號 M011）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL042_AutoPilot</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m012） 系統協調與支援 已盤點・尚未執行 cgc_mdl043_autocoderengine"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M012）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL043_AutocoderEngine</td></tr><tr data-search="指令執行留痕包裝器 治理模組（候核序號 m013） 系統協調與支援 已盤點・尚未執行 cgc_mdl044_cmdlog"><td>指令執行留痕包裝器 治理模組（候核序號 M013）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL044_Cmdlog</td></tr><tr data-search="操作員「整合優化」令 治理模組（候核序號 m014） 系統協調與支援 已盤點・尚未執行 cgc_mdl045_dedupindex"><td>操作員「整合優化」令 治理模組（候核序號 M014）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL045_DedupIndex</td></tr><tr data-search="依賴衝突統包引擎 治理模組（候核序號 m015） 系統協調與支援 已盤點・尚未執行 cgc_mdl046_depsuper"><td>依賴衝突統包引擎 治理模組（候核序號 M015）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL046_DepSuper</td></tr><tr data-search="下載資料夾整理歸納去重引擎 治理模組（候核序號 m016） 系統協調與支援 已盤點・尚未執行 cgc_mdl047_downloadsorganizer"><td>下載資料夾整理歸納去重引擎 治理模組（候核序號 M016）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL047_DownloadsOrganizer</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m017） 系統協調與支援 已盤點・尚未執行 cgc_mdl048_downloadsregisterallcrossanalysisbuilderv20260702"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M017）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL048_DownloadsRegisterAllCrossAnalysisBuilderV20260702</td></tr><tr data-search="環境暨安裝計畫引擎 治理模組（候核序號 m018） 系統協調與支援 已盤點・尚未執行 cgc_mdl049_envplan"><td>環境暨安裝計畫引擎 治理模組（候核序號 M018）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL049_EnvPlan</td></tr><tr data-search="多環境隔離重建計畫引擎 治理模組（候核序號 m019） 系統協調與支援 已盤點・尚未執行 cgc_mdl050_envrebuild"><td>多環境隔離重建計畫引擎 治理模組（候核序號 M019）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL050_EnvRebuild</td></tr><tr data-search="環境管理防停滯加速包覆器 治理模組（候核序號 m020） 系統協調與支援 已盤點・尚未執行 cgc_mdl051_envmgrnostall"><td>環境管理防停滯加速包覆器 治理模組（候核序號 M020）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL051_EnvmgrNostall</td></tr><tr data-search="環境管理路由器 治理模組（候核序號 m021） 系統協調與支援 已盤點・尚未執行 cgc_mdl052_envmgrrouter"><td>環境管理路由器 治理模組（候核序號 M021）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL052_EnvmgrRouter</td></tr><tr data-search="中央治理台輔助工具 治理模組（候核序號 m022） 系統協調與支援 已盤點・尚未執行 cgc_mdl053_governanceconsole"><td>中央治理台輔助工具 治理模組（候核序號 M022）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL053_GovernanceConsole</td></tr><tr data-search="介面合約自適應註冊引擎 治理模組（候核序號 m023） 系統協調與支援 已盤點・尚未執行 cgc_mdl054_ifacecontract"><td>介面合約自適應註冊引擎 治理模組（候核序號 M023）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL054_IfaceContract</td></tr><tr data-search="輸入前檢查共用件 治理模組（候核序號 m024） 系統協調與支援 已盤點・尚未執行 cgc_mdl055_inputprecheck"><td>輸入前檢查共用件 治理模組（候核序號 M024）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL055_InputPrecheck</td></tr><tr data-search="安裝治理閘 治理模組（候核序號 m025） 系統協調與支援 已盤點・尚未執行 cgc_mdl056_installgate"><td>安裝治理閘 治理模組（候核序號 M025）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL056_InstallGate</td></tr><tr data-search="自動化收編管線 治理模組（候核序號 m026） 系統協調與支援 已盤點・尚未執行 cgc_mdl057_intake"><td>自動化收編管線 治理模組（候核序號 M026）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL057_Intake</td></tr><tr data-search="教訓帳本引擎 治理模組（候核序號 m027） 系統協調與支援 已盤點・尚未執行 cgc_mdl058_lessons"><td>教訓帳本引擎 治理模組（候核序號 M027）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL058_Lessons</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m028） 系統協調與支援 已盤點・尚未執行 cgc_mdl059_masterhub"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M028）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL059_MasterHub</td></tr><tr data-search="via 自動編號引擎 治理模組（候核序號 m029） 系統協調與支援 已盤點・尚未執行 cgc_mdl060_numberengine"><td>VIA 自動編號引擎 治理模組（候核序號 M029）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL060_NumberEngine</td></tr><tr data-search="全景式分析 · 六獨立流程 治理模組（候核序號 m030） 系統協調與支援 已盤點・尚未執行 cgc_mdl061_panoramasix"><td>全景式分析 · 六獨立流程 治理模組（候核序號 M030）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL061_PanoramaSix</td></tr><tr data-search="首啟布建精靈與機況體檢 治理模組（候核序號 m031） 系統協調與支援 已盤點・尚未執行 cgc_mdl062_provision"><td>首啟布建精靈與機況體檢 治理模組（候核序號 M031）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL062_Provision</td></tr><tr data-search="帳本結構化資料聯集解衝突助手 治理模組（候核序號 m032） 系統協調與支援 已盤點・尚未執行 cgc_mdl063_registryunionmerge"><td>帳本結構化資料聯集解衝突助手 治理模組（候核序號 M032）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL063_RegistryUnionmerge</td></tr><tr data-search="全面自測矩陣 治理模組（候核序號 m033） 測試與驗證 已盤點・尚未執行 cgc_mdl064_selftestgrid"><td>全面自測矩陣 治理模組（候核序號 M033）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL064_SelftestGrid</td></tr><tr data-search="單一真實來源自動演化引擎 治理模組（候核序號 m034） 系統協調與支援 已盤點・尚未執行 cgc_mdl065_ssotevolve"><td>單一真實來源自動演化引擎 治理模組（候核序號 M034）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL065_SsotEvolve</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m035） 系統協調與支援 已盤點・尚未執行 cgc_mdl066_structureforge"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M035）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL066_StructureForge</td></tr><tr data-search="支援模組接橋注入器 治理模組（候核序號 m036） 系統協調與支援 已盤點・尚未執行 cgc_mdl067_supportbridgeinject"><td>支援模組接橋注入器 治理模組（候核序號 M036）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL067_SupportBridgeInject</td></tr><tr data-search="功能性引擎 × 支援性模組導入稽核 治理模組（候核序號 m037） 資料擷取與儲存 已盤點・尚未執行 cgc_mdl068_supportimportaudit"><td>功能性引擎 × 支援性模組導入稽核 治理模組（候核序號 M037）</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL068_SupportImportAudit</td></tr><tr data-search="系統管理三輪全景協議 治理模組（候核序號 m038） 系統協調與支援 已盤點・尚未執行 cgc_mdl069_systemmanager"><td>系統管理三輪全景協議 治理模組（候核序號 M038）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL069_SystemManager</td></tr><tr data-search="凍結與身份稽核引擎 治理模組（候核序號 m039） 測試與驗證 已盤點・尚未執行 cgc_mdl070_t0audit"><td>凍結與身份稽核引擎 治理模組（候核序號 M039）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL070_T0Audit</td></tr><tr data-search="自動編號註冊命名冊 治理模組（候核序號 m040） 系統協調與支援 已盤點・尚未執行 cgc_mdl071_namereg"><td>自動編號註冊命名冊 治理模組（候核序號 M040）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL071_Namereg</td></tr><tr data-search="五系統產品門面產生器 治理模組（候核序號 m041） 系統協調與支援 已盤點・尚未執行 cgc_mdl072_productui"><td>五系統產品門面產生器 治理模組（候核序號 M041）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL072_ProductUi</td></tr><tr data-search="引擎總目錄產生器 治理模組（候核序號 m042） 系統協調與支援 已盤點・尚未執行 cgc_mdl073_enginecatalog"><td>引擎總目錄產生器 治理模組（候核序號 M042）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL073_EngineCatalog</td></tr><tr data-search="全引擎加速器橋 治理模組（候核序號 m043） 系統協調與支援 已盤點・尚未執行 cgc_mdl074_accelbridge"><td>全引擎加速器橋 治理模組（候核序號 M043）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL074_AccelBridge</td></tr><tr data-search="中央治理功能模組（正式名稱待治理 · 候核序號 m044） 系統協調與支援 已盤點・尚未執行 cgc_mdl075_centralgov"><td>中央治理功能模組（正式名稱待治理 · 候核序號 M044）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL075_CentralGov</td></tr><tr data-search="語法敗三輪沙盒救援引擎 治理模組（候核序號 m045） 系統協調與支援 已盤點・尚未執行 cgc_mdl076_syntaxrescue"><td>語法敗三輪沙盒救援引擎 治理模組（候核序號 M045）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL076_SyntaxRescue</td></tr><tr data-search="引擎模組實體更名引擎 治理模組（候核序號 m046） 系統協調與支援 已盤點・尚未執行 cgc_mdl077_renameengine"><td>引擎模組實體更名引擎 治理模組（候核序號 M046）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL077_RenameEngine</td></tr><tr data-search="via 向右樹枝狀圖譜與環境工具矩陣與六級測試梯 治理模組（候核序號 m047） 系統協調與支援 已盤點・尚未執行 cgc_mdl078_treeatlas"><td>VIA 向右樹枝狀圖譜與環境工具矩陣與六級測試梯 治理模組（候核序號 M047）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL078_TreeAtlas</td></tr><tr data-search="三大矩陣網頁使用者介面主控台 治理模組（候核序號 m048） 系統協調與支援 已盤點・尚未執行 cgc_mdl079_matrixconsole"><td>三大矩陣網頁使用者介面主控台 治理模組（候核序號 M048）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL079_MatrixConsole</td></tr><tr data-search="加速收尾系統 治理模組（候核序號 m049） 系統協調與支援 已盤點・尚未執行 cgc_mdl080_wrapup"><td>加速收尾系統 治理模組（候核序號 M049）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL080_Wrapup</td></tr><tr data-search="三大分析子系統子系統治理器 · 整合轉接版 治理模組（候核序號 m050） 系統協調與支援 已盤點・尚未執行 cgc_mdl081_subsystemmanagerv2"><td>三大分析子系統子系統治理器 · 整合轉接版 治理模組（候核序號 M050）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL081_SubsystemManagerV2</td></tr><tr data-search="母系統自動總跑器 治理模組（候核序號 m051） 系統協調與支援 已盤點・尚未執行 cgc_mdl082_masterautorun"><td>母系統自動總跑器 治理模組（候核序號 M051）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL082_MasterAutorun</td></tr><tr data-search="中央治理引擎 · 整合轉接版 治理模組（候核序號 m052） 系統協調與支援 已盤點・尚未執行 cgc_mdl083_centralgovernment"><td>中央治理引擎 · 整合轉接版 治理模組（候核序號 M052）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL083_CentralGovernment</td></tr><tr data-search="中央治理議題分圈歸類器 治理模組（候核序號 m053） 系統協調與支援 已盤點・尚未執行 cgc_mdl084_govtriage"><td>中央治理議題分圈歸類器 治理模組（候核序號 M053）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL084_GovTriage</td></tr><tr data-search="活動圈重大議題仲裁器 治理模組（候核序號 m054） 系統協調與支援 已盤點・尚未執行 cgc_mdl085_issuearbiter"><td>活動圈重大議題仲裁器 治理模組（候核序號 M054）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL085_IssueArbiter</td></tr><tr data-search="真雙位置正典裁定器 治理模組（候核序號 m055） 系統協調與支援 已盤點・尚未執行 cgc_mdl086_canonarbiter"><td>真雙位置正典裁定器 治理模組（候核序號 M055）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL086_CanonArbiter</td></tr><tr data-search="三級測試金字塔與系統主控台使用者介面 治理模組（候核序號 m056） 測試與驗證 已盤點・尚未執行 cgc_mdl087_testpyramid"><td>三級測試金字塔與系統主控台使用者介面 治理模組（候核序號 M056）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL087_TestPyramid</td></tr><tr data-search="五系統測試結果分頁使用者介面 治理模組（候核序號 m057） 測試與驗證 已盤點・尚未執行 cgc_mdl088_systemtestpages"><td>五系統測試結果分頁使用者介面 治理模組（候核序號 M057）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL088_SystemTestPages</td></tr><tr data-search="原始使用者介面模板引擎 治理模組（候核序號 m058） 圖表與使用者介面 已盤點・尚未執行 cgc_mdl089_uibasetemplate"><td>原始使用者介面模板引擎 治理模組（候核序號 M058）</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL089_UIBaseTemplate</td></tr><tr data-search="系統同步樞紐使用者介面 治理模組（候核序號 m059） 系統協調與支援 已盤點・尚未執行 cgc_mdl090_systemhub"><td>系統同步樞紐使用者介面 治理模組（候核序號 M059）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL090_SystemHub</td></tr><tr data-search="系統憲章對照稽核 治理模組（候核序號 m060） 圖表與使用者介面 已盤點・尚未執行 cgc_mdl091_charteraudit"><td>系統憲章對照稽核 治理模組（候核序號 M060）</td><td>圖表與使用者介面</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL091_CharterAudit</td></tr><tr data-search="引擎簡化工程稽核 治理模組（候核序號 m061） 測試與驗證 已盤點・尚未執行 cgc_mdl092_consolidationaudit"><td>引擎簡化工程稽核 治理模組（候核序號 M061）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL092_ConsolidationAudit</td></tr><tr data-search="治理台使用者介面矩陣 治理模組（候核序號 m062） 系統協調與支援 已盤點・尚未執行 cgc_mdl093_governancematrix"><td>治理台使用者介面矩陣 治理模組（候核序號 M062）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL093_GovernanceMatrix</td></tr><tr data-search="via 指揮台 治理模組（候核序號 m063） 系統協調與支援 已盤點・尚未執行 cgc_mdl094_commanddeck"><td>VIA 指揮台 治理模組（候核序號 M063）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL094_CommandDeck</td></tr><tr data-search="指揮台本地安全執行橋 治理模組（候核序號 m064） 系統協調與支援 已盤點・尚未執行 cgc_mdl095_deckserver"><td>指揮台本地安全執行橋 治理模組（候核序號 M064）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL095_DeckServer</td></tr><tr data-search="全景同步狀態台與完成度儀表 治理模組（候核序號 m065） 系統協調與支援 已盤點・尚未執行 cgc_mdl096_syncstatus"><td>全景同步狀態台與完成度儀表 治理模組（候核序號 M065）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL096_SyncStatus</td></tr><tr data-search="使用者介面總入口 治理模組（候核序號 m066） 系統協調與支援 已盤點・尚未執行 cgc_mdl097_portalui"><td>使用者介面總入口 治理模組（候核序號 M066）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL097_PortalUI</td></tr><tr data-search="資料庫目錄與擷取細則台 治理模組（候核序號 m067） 資料擷取與儲存 已盤點・尚未執行 cgc_mdl098_datacatalog"><td>資料庫目錄與擷取細則台 治理模組（候核序號 M067）</td><td>資料擷取與儲存</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL098_DataCatalog</td></tr><tr data-search="全球市場觀測頁 治理模組（候核序號 m068） 系統協調與支援 已盤點・尚未執行 cgc_mdl099_globalmarkets"><td>全球市場觀測頁 治理模組（候核序號 M068）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL099_GlobalMarkets</td></tr><tr data-search="券商報告卡總覽頁 治理模組（候核序號 m069） 文件與研究報告 已盤點・尚未執行 cgc_mdl100_reportcards"><td>券商報告卡總覽頁 治理模組（候核序號 M069）</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL100_ReportCards</td></tr><tr data-search="powershell 多輪語法樹語法修正引擎 治理模組（候核序號 m070） 系統協調與支援 已盤點・尚未執行 cgc_mdl101_psastrepair"><td>PowerShell 多輪語法樹語法修正引擎 治理模組（候核序號 M070）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL101_PSAstRepair</td></tr><tr data-search="新舊指令整合冊 治理模組（候核序號 m071） 系統協調與支援 已盤點・尚未執行 cgc_mdl102_commandroster"><td>新舊指令整合冊 治理模組（候核序號 M071）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL102_CommandRoster</td></tr><tr data-search="加速器全覆蓋引擎 治理模組（候核序號 m072） 系統協調與支援 已盤點・尚未執行 cgc_mdl103_accelcoverage"><td>加速器全覆蓋引擎 治理模組（候核序號 M072）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL103_AccelCoverage</td></tr><tr data-search="工具測試結果總表 治理模組（候核序號 m073） 測試與驗證 已盤點・尚未執行 cgc_mdl104_testresultshub"><td>工具測試結果總表 治理模組（候核序號 M073）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL104_TestResultsHub</td></tr><tr data-search="中央治理主控台 治理模組（候核序號 m074） 系統協調與支援 已盤點・尚未執行 cgc_mdl105_governanceconsole"><td>中央治理主控台 治理模組（候核序號 M074）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL105_GovernanceConsole</td></tr><tr data-search="via 中央治理台 治理模組（候核序號 m075） 系統協調與支援 已盤點・尚未執行 cgc_mdl106_govconsole"><td>VIA 中央治理台 治理模組（候核序號 M075）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL106_GovConsole</td></tr><tr data-search="使用者介面元件三語轉碼系統管理器 治理模組（候核序號 m076） 系統協調與支援 已盤點・尚未執行 cgc_mdl107_uispecmanager"><td>使用者介面元件三語轉碼系統管理器 治理模組（候核序號 M076）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL107_UISpecManager</td></tr><tr data-search="對話紀錄→編排文章/程式 治理模組（候核序號 m077） 文件與研究報告 已盤點・尚未執行 cgc_mdl108_chattodoc"><td>對話紀錄→編排文章/程式 治理模組（候核序號 M077）</td><td>文件與研究報告</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL108_ChatToDoc</td></tr><tr data-search="提示詞儲存管理 治理模組（候核序號 m078） 系統協調與支援 已盤點・尚未執行 cgc_mdl109_promptmanager"><td>提示詞儲存管理 治理模組（候核序號 M078）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL109_PromptManager</td></tr><tr data-search="三軌測試矩陣報告 治理模組（候核序號 m079） 測試與驗證 已盤點・尚未執行 cgc_mdl110_tritestmatrix"><td>三軌測試矩陣報告 治理模組（候核序號 M079）</td><td>測試與驗證</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL110_TriTestMatrix</td></tr><tr data-search="統一使用者介面元件盤點冊 治理模組（候核序號 m080） 系統協調與支援 已盤點・尚未執行 cgc_mdl111_uicomponentroster"><td>統一使用者介面元件盤點冊 治理模組（候核序號 M080）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL111_UIComponentRoster</td></tr><tr data-search="via 系統現況總圖 治理模組（候核序號 m081） 系統協調與支援 已盤點・尚未執行 cgc_mdl112_systematlas"><td>VIA 系統現況總圖 治理模組（候核序號 M081）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL112_SystemAtlas</td></tr><tr data-search="全冊統一編號註冊器 治理模組（候核序號 m082） 系統協調與支援 已盤點・尚未執行 cgc_mdl113_unifiedregistry"><td>全冊統一編號註冊器 治理模組（候核序號 M082）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL113_UnifiedRegistry</td></tr><tr data-search="整合式指揮中心收容橋 治理模組（候核序號 m083） 系統協調與支援 已盤點・尚未執行 cgc_mdl114_commandcenterbridge"><td>整合式指揮中心收容橋 治理模組（候核序號 M083）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL114_CommandCenterBridge</td></tr><tr data-search="中央單一真實來源正規表示式/同義字治理中心 治理模組（候核序號 m084） 系統協調與支援 已盤點・尚未執行 cgc_mdl115_ssotregexdict"><td>中央單一真實來源正規表示式/同義字治理中心 治理模組（候核序號 M084）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL115_SSOTRegexDict</td></tr><tr data-search="統一版型殼引擎 治理模組（候核序號 m085） 系統協調與支援 已盤點・尚未執行 cgc_mdl116_unifiedshell"><td>統一版型殼引擎 治理模組（候核序號 M085）</td><td>系統協調與支援</td><td>已盤點・尚未執行</td><td class="tech-id">CGC_MDL116_UnifiedShell</td></tr></tbody></table></div>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-plan" role="tabpanel" aria-labelledby="tab-plan" hidden>
++  <article class="card"><div class="card-head"><div><span class="section-kicker">讀取與銜接規劃</span>
++   <h3>從現況盤點到人工啟用的十階段治理流程</h3></div><span>待人工啟用審查</span></div>
++   <div class="plan-flow" aria-label="系統讀取規劃">
++    <span>環境確認</span><i>→</i><span>自動盤點</span><i>→</i><span>契約分類</span>
++    <i>→</i><span>介面銜接</span><i>→</i><span>驗證矩陣</span><i>→</i><span>人工審查</span>
++   </div>
++   <div class="table-wrap"><table class="plan-table"><thead><tr><th>階段</th><th>正式名稱</th>
++    <th>輸入／處理／輸出</th><th>目前狀態</th></tr></thead><tbody><tr><td>01</td><td>執行環境與根目錄確認</td><td>確認 VIA 正本、權限、Python 與 PowerShell；僅讀取，不變更。</td><td>唯讀前置檢查</td></tr><tr><td>02</td><td>引擎與模組自動盤點</td><td>掃描功能模組、支援模組、任務冊與頁面清單。</td><td>現況真值盤點</td></tr><tr><td>03</td><td>功能與資料契約分類</td><td>依子系統、輸入、輸出、相依性與風險標準化分類。</td><td>待執行結果</td></tr><tr><td>04</td><td>介面與資料流銜接</td><td>建立模組對模組、參數對引擎及支援工具的契約關係。</td><td>待執行結果</td></tr><tr><td>05</td><td>正本與正式名稱校準</td><td>統一正式中文名稱、識別碼、版本與單一真實來源。</td><td>規格已定義</td></tr><tr><td>06</td><td>中央註冊表同步</td><td>將通過契約的項目同步至 append-only 註冊表。</td><td>待執行結果</td></tr><tr><td>07</td><td>二十道治理閘驗證</td><td>執行語法、依賴、資料、介面、回歸與安全驗證。</td><td>待執行結果</td></tr><tr><td>08</td><td>矩陣報告輸出</td><td>產生輸入、狀態、結果、問題與解決方案矩陣。</td><td>本頁已提供容器</td></tr><tr><td>09</td><td>HTML 使用者介面再生</td><td>由正本管理器產生固定頁首、可收輸入與多分頁結果頁。</td><td>已建置</td></tr><tr><td>10</td><td>人工啟用審查</td><td>所有驗證通過後仍由操作員人工核准；系統不自行啟用。</td><td>待人工啟用審查</td></tr></tbody></table></div>
++  </article>
++ </section>
++ <section class="tab-panel" id="panel-links" role="tabpanel" aria-labelledby="tab-links" hidden>
++  <div class="link-grid">
++   <article class="card"><span class="section-kicker">本機指揮台</span><h3>白名單執行橋</h3>
++    <div class="table-wrap"><table><tbody>
++     <tr><th>健康檢測</th><td><code>GET /ping</code></td></tr>
++     <tr><th>工作執行</th><td><code>POST /run</code></td></tr>
++     <tr><th>狀態矩陣</th><td><code>GET /status</code></td></tr>
++     <tr><th>文件收件</th><td><code>POST /intake</code></td></tr>
++    </tbody></table></div></article>
++   <article class="card"><span class="section-kicker">啟動方式</span><h3>Windows 與 PowerShell</h3>
++    <p>先執行 <code>via</code> 或 <code>VIA-ALL</code> 帶起本機指揮台，
++    再使用左側工作項目。總控頁再生：<code>via-manager</code>。</p>
++    <p class="notice">執行閘只接受任務冊白名單；本頁不接受任意命令。</p></article>
++  </div>
++ </section>
++</main></div>
++<footer class="app-footer" id="appFooter">
++ <span>VIA · 真值直取 · 零 CDN · 本機白名單</span>
++ <span id="footerConnection">指揮台：尚未檢測</span>
++ <span>啟用狀態：待人工啟用審查</span>
++</footer>
++<script>
++"use strict";
++const BRIDGE_ORIGIN="http://127.0.0.1:8765";
++const API_BASE=location.origin===BRIDGE_ORIGIN?location.origin:BRIDGE_ORIGIN;
+ const PKEY="via_master_params";
+-function saveParams(){try{
+- const ck=[...document.querySelectorAll(".ck input:checked")]
+-  .map(c=>c.value);
+- localStorage.setItem(PKEY,JSON.stringify({
+-  task:document.getElementById("task").value,
+-  codes:document.getElementById("codes").value,checked:ck}));
+- log("[參數] 已儲存(localStorage:"+PKEY+";僅本機瀏覽器)");
+-}catch(e){log("[參數] 儲存失敗(瀏覽器封存區不可用=誠實)");}}
+-function resetParams(){try{localStorage.removeItem(PKEY);}catch(e){}
+- document.getElementById("task").selectedIndex=0;
+- document.getElementById("codes").value="";
+- document.querySelectorAll(".ck input").forEach(c=>c.checked=false);
+- log("[參數] 已回復預設(首項任務+codes 空+勾選全清)");}
+-(function(){try{
+- const s=JSON.parse(localStorage.getItem(PKEY)||"null");
+- if(!s)return;
+- if(s.task)document.getElementById("task").value=s.task;
+- if(s.codes)document.getElementById("codes").value=s.codes;
+- (s.checked||[]).forEach(v=>{
+-  const el=document.querySelector('.ck input[value="'+v+'"]');
+-  if(el)el.checked=true;});
+- log("[參數] 已回填上次儲存值");
+-}catch(e){}})();
++const RAIL_KEY="via_master_rail";
++const TAB_KEY="via_master_tab";
++const TASK_IDS=new Set([...document.querySelectorAll("#task option")].map(item=>item.value));
++const EDITABLE_PREVIEW=document.body.dataset.editableTemplate==="true";
++const LIVE_SAME_ORIGIN=location.origin===BRIDGE_ORIGIN;
++const CSRF_TOKEN=(document.querySelector('meta[name="via-csrf"]')?.content||"").trim();
++const HAS_LIVE_TOKEN=/^[A-Za-z0-9_-]{20,200}$/.test(CSRF_TOKEN)
++ && !CSRF_TOKEN.startsWith("__VIA_");
++const DEFAULT_RUN_TIMEOUT_MS=45*60*1000;
++const LONG_RUN_TIMEOUTS={boot:2*60*60*1000,backfill:2*60*60*1000,
++ rebuild_full:90*60*1000,ocr_plan:60*60*1000};
++const GLOBAL_CATEGORIES=new Set(["idx","etf","us_jp","fin_reports","oil","fx",
++ "cmdty","crypto","us_macro","fed","us_fiscal_rates"]);
++let pendingFileCount=0;
++let executionMutex=null;
++let lastSubmittedTask=null;
++let connectionRevision=0;
++let appliedConnectionRevision=0;
++let railIsMobile=matchMedia("(max-width:768px)").matches;
++
++function byId(id){return document.getElementById(id);}
++function plainObject(value){
++ return Boolean(value)&&typeof value==="object"&&!Array.isArray(value)
++  && Object.getPrototypeOf(value)===Object.prototype;
++}
++class ApiError extends Error{
++ constructor(kind,message,status=0){super(message);this.name="ApiError";this.kind=kind;this.status=status;}
++}
++function logLine(message){
++ const el=byId("log");
++ const stamp=new Date().toLocaleTimeString("zh-TW",{hour12:false});
++ el.textContent+=(el.textContent?"\n":"")+"["+stamp+"] "+message;
++ el.scrollTop=el.scrollHeight;
++}
++function taskFormalName(taskId){
++ const option=[...byId("task").options].find(item=>item.value===taskId);
++ return option?option.textContent.trim():"未命名工作";
++}
++function beginConnectionObservation(){return ++connectionRevision;}
++function updateConnectionState(state,detail,revision=connectionRevision){
++ if(revision<appliedConnectionRevision)return;
++ appliedConnectionRevision=revision;
++ const head=byId("bridgeState");
++ const foot=byId("footerConnection");
++ head.className="connection "+state;
++ if(state==="online"){
++  head.textContent="本機指揮台在線";
++  foot.textContent="指揮台：在線"+(detail?" · "+detail:"");
++ }else if(state==="offline"){
++  head.textContent="本機指揮台離線";
++  foot.textContent="指揮台：離線 · 狀態可能過期";
++ }else if(state==="invalid"){
++  head.textContent="指揮台回應異常";
++  foot.textContent="指揮台：回應格式異常 · 不採信";
++ }else{
++  head.textContent="連線尚未檢測";
++  foot.textContent="指揮台：尚未檢測";
++ }
++}
++function isMobileRail(){return matchMedia("(max-width:768px)").matches;}
++function applyRailIsolation(open,moveFocus=false){
++ const mobile=isMobileRail();
++ const rail=byId("controlRail");
++ const backdrop=byId("railBackdrop");
++ rail.inert=!open;
++ rail.setAttribute("aria-hidden",String(!open));
++ if(mobile&&open){
++  rail.setAttribute("role","dialog");rail.setAttribute("aria-modal","true");
++  byId("workspace").inert=true;byId("appFooter").inert=true;
++  backdrop.hidden=false;
++  if(moveFocus)setTimeout(()=>byId("task").focus(),0);
++ }else{
++  rail.removeAttribute("role");rail.removeAttribute("aria-modal");
++  byId("workspace").inert=false;byId("appFooter").inert=false;
++  backdrop.hidden=true;
++ }
++}
++function toggleRail(force,persist=true,moveFocus=false){
++ const body=document.body;
++ const open=force!==undefined?Boolean(force):body.dataset.rail!=="open";
++ body.dataset.rail=open?"open":"collapsed";
++ byId("railToggle").setAttribute("aria-expanded",String(open));
++ applyRailIsolation(open,moveFocus&&open);
++ if(persist){try{localStorage.setItem(RAIL_KEY,open?"open":"collapsed");}catch(_) {}}
++ if(!open&&moveFocus)byId("railToggle").focus();
++ resizePlotlyFrame();
++}
++function activateTab(tabId,moveFocus=false){
++ const tab=byId(tabId);
++ if(!tab||tab.getAttribute("role")!=="tab")return;
++ document.querySelectorAll('[role="tab"]').forEach(item=>{
++  const active=item===tab;
++  item.setAttribute("aria-selected",String(active));
++  item.tabIndex=active?0:-1;
++  const panel=byId(item.getAttribute("aria-controls"));
++  if(panel)panel.hidden=!active;
++ });
++ if(moveFocus)tab.focus();
++ try{localStorage.setItem(TAB_KEY,tabId);}catch(_) {}
++ if(tabId==="tab-plotly")resizePlotlyFrame();
++}
++function setupTabs(){
++ const tabs=[...document.querySelectorAll('[role="tab"]')];
++ tabs.forEach((tab,index)=>{
++  tab.addEventListener("click",()=>activateTab(tab.id));
++  tab.addEventListener("keydown",event=>{
++   let next=index;
++   if(event.key==="ArrowRight")next=(index+1)%tabs.length;
++   else if(event.key==="ArrowLeft")next=(index-1+tabs.length)%tabs.length;
++   else if(event.key==="Home")next=0;
++   else if(event.key==="End")next=tabs.length-1;
++   else return;
++   event.preventDefault();activateTab(tabs[next].id,true);
++  });
++ });
++ try{activateTab(localStorage.getItem(TAB_KEY)||"tab-overview");}
++ catch(_){activateTab("tab-overview");}
++}
++function selectedTaskContract(){
++ const option=byId("task").selectedOptions[0];
++ return {codes:option?.dataset.codes==="true",range:option?.dataset.range==="true",
++  cats:option?.dataset.cats==="true"};
++}
++function taskContract(taskId){
++ const option=[...byId("task").options].find(item=>item.value===taskId);
++ return {codes:option?.dataset.codes==="true",range:option?.dataset.range==="true",
++  cats:option?.dataset.cats==="true"};
++}
++function setInputBadge(text,state=""){
++ const badge=byId("inputStateBadge");badge.textContent=text;
++ badge.className="honesty"+(state?" "+state:"");
++}
++function markInputEdited(){
++ if(!executionMutex)setInputBadge("已修改・尚未送出");
++ clearValidation();
++}
++function updateParameterVisibility(){
++ const contract=selectedTaskContract();
++ byId("codesField").hidden=!contract.codes;
++ byId("dateRangeField").hidden=!contract.range;
++ byId("categoriesField").hidden=!contract.cats;
++ byId("parameterHint").textContent=contract.codes||contract.range||contract.cats
++  ?"以下只顯示此工作需要的參數。":"此工作不需要額外輸入，可直接執行。";
++ syncInputSummary();
++}
++function collectParams(){
++ const contract=selectedTaskContract();
++ return {task:byId("task").value,
++  codes:contract.codes?byId("codes").value.trim():"",
++  start:contract.range?byId("dateStart").value:"",
++  end:contract.range?byId("dateEnd").value:"",
++  cats:contract.cats?byId("categories").value.trim():""};
++}
++function syncInputSummary(){
++ const params=collectParams();
++ const checked=[...document.querySelectorAll('#batchChecks input:checked')]
++  .map(item=>taskFormalName(item.value));
++ byId("summaryTask").textContent=taskFormalName(params.task);
++ byId("summaryCodes").textContent=params.codes||"不適用";
++ byId("summaryDates").textContent=params.start||params.end
++  ?(params.start||"未設定")+" 至 "+(params.end||"未設定"):"不適用";
++ byId("summaryCategories").textContent=params.cats||"不適用";
++ byId("summaryBatch").textContent=checked.length?checked.join("、"):"未勾選";
++ byId("summaryFiles").textContent=pendingFileCount+" 件";
++}
++function clearValidation(){
++ const message=byId("inputValidation");message.hidden=true;message.textContent="";
++ for(const id of ["task","codes","dateStart","dateEnd","categories"])
++  byId(id).removeAttribute("aria-invalid");
++}
++function showValidation(errors){
++ clearValidation();if(!errors.length)return;
++ const message=byId("inputValidation");message.textContent=errors.map(x=>x.message).join("；");
++ message.hidden=false;
++ errors.forEach(error=>byId(error.id)?.setAttribute("aria-invalid","true"));
++ byId(errors[0].id)?.focus();
++}
++function validateTaskParams(taskId,source){
++ const contract=taskContract(taskId);const errors=[];
++ const params={task:taskId,codes:"",start:"",end:"",cats:""};
++ if(!TASK_IDS.has(taskId))errors.push({id:"task",message:"工作項目不在本頁白名單"});
++ if(contract.codes){
++  const raw=String(source.codes||"").trim();
++  if(raw){
++   const tokens=raw.split(/[\s,，]+/).filter(Boolean);
++   if(raw.length>349||tokens.length>50||tokens.some(token=>!/^\d{4,6}$/.test(token)))
++    errors.push({id:"codes",message:"股票代號須為最多 50 個 4–6 位數字"});
++   else params.codes=[...new Set(tokens)].join(",");
++  }
++ }
++ if(contract.range){
++  params.start=String(source.start||"");params.end=String(source.end||"");
++  if(Boolean(params.start)!==Boolean(params.end)){
++   errors.push({id:params.start?"dateEnd":"dateStart",message:"日期範圍必須同時填寫開始與結束"});
++  }else if(params.start&&(!validIsoDate(params.start)||!validIsoDate(params.end)
++    ||params.start>params.end)){
++   errors.push({id:"dateStart",message:"日期格式不正確，或開始日期晚於結束日期"});
++  }
++ }
++ if(contract.cats){
++  const raw=String(source.cats||"").trim().toLowerCase();
++  const tokens=raw?raw.split(",").map(item=>item.trim()).filter(Boolean):[];
++  if(raw&&(raw.length>80||!tokens.length||tokens.some(item=>
++    !/^[a-z_]+$/.test(item)||!GLOBAL_CATEGORIES.has(item))))
++   errors.push({id:"categories",message:"資料分類不在允許清單，或格式不正確"});
++  else params.cats=[...new Set(tokens)].join(",");
++ }
++ return {ok:errors.length===0,params,errors};
++}
++function validIsoDate(value){
++ if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
++ const parsed=new Date(value+"T00:00:00Z");
++ return !Number.isNaN(parsed.getTime())&&parsed.toISOString().slice(0,10)===value;
++}
++function validateCurrentParams(){return validateTaskParams(byId("task").value,collectParams());}
++function applyNormalizedParams(params){
++ if(params.task!==byId("task").value)return;
++ byId("codes").value=params.codes;byId("dateStart").value=params.start;
++ byId("dateEnd").value=params.end;byId("categories").value=params.cats;
++ syncInputSummary();
++}
++function validatePing(payload){
++ const allowed=new Set(["ok","via","v","accel"]);
++ if(!plainObject(payload)||Object.keys(payload).some(key=>!allowed.has(key))
++   ||payload.ok!==true||payload.via!=="deck-bridge"||typeof payload.v!=="string"
++   ||payload.v.length>40||typeof payload.accel!=="boolean")
++  throw new ApiError("schema","健康檢測回應格式不符");
++ return payload;
++}
++function validRunId(value){return typeof value==="string"&&/^[A-Za-z0-9._:-]{8,128}$/.test(value);}
++function validateRunResponse(payload,expectedParams){
++ if(!plainObject(payload)||typeof payload.ok!=="boolean")
++  throw new ApiError("schema","執行回應格式不符");
++ const allowed=new Set(["ok","run_id","accepted_params","err"]);
++ if(Object.keys(payload).some(key=>!allowed.has(key)))
++  throw new ApiError("schema","執行回應含契約外欄位");
++ if(payload.ok&&!validRunId(payload.run_id))
++  throw new ApiError("schema","執行回應缺少有效 run_id，為避免誤判已停止監看");
++ if(payload.ok){
++  const accepted=payload.accepted_params;
++  const fields=["task","codes","start","end","cats"];
++  if(!plainObject(accepted)||Object.keys(accepted).length!==fields.length
++    ||fields.some(key=>typeof accepted[key]!=="string"))
++   throw new ApiError("schema","執行回應缺少完整 accepted_params");
++  if(fields.some(key=>accepted[key]!==String(expectedParams[key]||"")))
++   throw new ApiError("policy","指揮台接受參數與畫面送出參數不一致，已停止監看");
++ }
++ if(!payload.ok&&typeof payload.err!=="string")
++  throw new ApiError("schema","拒絕回應缺少原因");
++ if(typeof payload.err==="string"&&payload.err.length>800)
++  throw new ApiError("schema","拒絕原因超過安全上限");
++ return payload;
++}
++function boundedNumber(value,min,max){
++ return typeof value==="number"&&Number.isFinite(value)&&value>=min&&value<=max;
++}
++function validateStatus(payload){
++ if(!plainObject(payload)||Object.keys(payload).length>TASK_IDS.size)
++  throw new ApiError("schema","狀態矩陣外層格式不符");
++ const allowed=new Set(["zh","state","run_id","started","started_epoch","updated_at",
++  "elapsed","beat","kb","done","pct","rc","fix","tail"]);
++ for(const [taskId,item] of Object.entries(payload)){
++  if(!TASK_IDS.has(taskId)||!plainObject(item)
++    ||Object.keys(item).some(key=>!allowed.has(key)))
++   throw new ApiError("schema","狀態矩陣含未知工作或欄位");
++  if(!["idle","running","ok","fail"].includes(item.state))
++   throw new ApiError("schema","狀態值不在契約內");
++  if(item.state!=="idle"&&!validRunId(item.run_id))
++   throw new ApiError("schema","運轉列缺少有效 run_id");
++  for(const key of ["elapsed","beat","kb"])
++   if(item[key]!=null&&!boundedNumber(item[key],0,1e12))
++    throw new ApiError("schema",key+" 欄位格式不符");
++  if(item.started_epoch!=null&&!boundedNumber(item.started_epoch,0,1e12))
++   throw new ApiError("schema","started_epoch 欄位格式不符");
++  if(item.pct!=null&&!boundedNumber(item.pct,0,100))
++   throw new ApiError("schema","進度欄位超出 0–100");
++  if(item.rc!=null&&(!Number.isInteger(item.rc)||Math.abs(item.rc)>1e9))
++   throw new ApiError("schema","回傳碼格式不符");
++  for(const key of ["zh","started","updated_at","fix","tail"])
++   if(item[key]!=null&&(typeof item[key]!=="string"||item[key].length>(key==="tail"?2000:800)))
++    throw new ApiError("schema",key+" 文字欄位格式不符");
++  if(item.done!=null&&!(typeof item.done==="string"||boundedNumber(item.done,0,1e9)))
++   throw new ApiError("schema","完成數欄位格式不符");
++ }
++ return payload;
++}
++function validateIntake(payload){
++ const allowed=new Set(["ok","saved","sha256","skip","err"]);
++ if(!plainObject(payload)||Object.keys(payload).some(key=>!allowed.has(key))
++   ||typeof payload.ok!=="boolean")
++  throw new ApiError("schema","收件回應格式不符");
++ if(payload.ok&&(!/^[0-9a-f]{64}$/i.test(String(payload.sha256||""))
++   ||typeof payload.saved!=="string"||payload.saved.length>1000
++   ||(payload.skip!=null&&typeof payload.skip!=="string")))
++  throw new ApiError("schema","收件成功回應缺少檔案證據");
++ if(!payload.ok&&typeof payload.err!=="string")
++  throw new ApiError("schema","收件拒絕回應缺少原因");
++ if(typeof payload.err==="string"&&payload.err.length>800)
++  throw new ApiError("schema","收件拒絕原因超過安全上限");
++ return payload;
++}
++async function fetchJson(path,options={},timeoutMs=8000,validator=value=>value){
++ const url=new URL(path,API_BASE+"/");
++ if(url.origin!==BRIDGE_ORIGIN)throw new ApiError("policy","API 來源不在本機白名單");
++ const controller=new AbortController();
++ const timeout=setTimeout(()=>controller.abort(),timeoutMs);
++ try{
++  const response=await fetch(url,{cache:"no-store",credentials:"same-origin",
++   redirect:"error",...options,signal:controller.signal});
++  const text=await response.text();
++  if(text.length>2_000_000)throw new ApiError("schema","API 回應超過安全上限");
++  let value;try{value=JSON.parse(text);}catch(_){throw new ApiError("schema","回應不是有效 JSON");}
++  if(!response.ok){
++   const detail=plainObject(value)&&typeof value.err==="string"?value.err:"HTTP "+response.status;
++   throw new ApiError("http",detail,response.status);
++  }
++  return validator(value);
++ }catch(error){
++  if(error?.name==="AbortError")throw new ApiError("timeout","本機指揮台回應逾時");
++  if(error instanceof ApiError)throw error;
++  throw new ApiError("network",error?.message||"本機指揮台無法連線");
++ }finally{clearTimeout(timeout);}
++}
++function mutationAllowed(){return LIVE_SAME_ORIGIN&&HAS_LIVE_TOKEN&&!EDITABLE_PREVIEW;}
++function setMutationControls(){
++ const allowed=mutationAllowed();const busy=Boolean(executionMutex);
++ for(const id of ["runOneButton","runBatchButton"])
++  byId(id).disabled=!allowed||busy;
++ byId("filePicker").disabled=!allowed||busy;
++ byId("drop").setAttribute("aria-disabled",String(!allowed||busy));
++ byId("drop").tabIndex=!allowed||busy?-1:0;
++ document.body.dataset.previewOnly=String(!allowed);
++}
++function acquireExecution(owner){
++ if(executionMutex){logLine("同頁已有工作或收件進行中，未重複送出。");return false;}
++ executionMutex=owner;setMutationControls();return true;
++}
++function releaseExecution(owner){
++ if(executionMutex===owner)executionMutex=null;
++ setMutationControls();
++}
++function connectionStateForError(error,revision){
++ updateConnectionState(["network","timeout"].includes(error.kind)?"offline":"invalid",
++  error.message,revision);
++}
++async function callTask(taskId,params={},owner=executionMutex){
++ if(!mutationAllowed()){
++  const err="此頁是離線／設計預覽；請由本機指揮台 /master 開啟後操作";
++  logLine(err);return {ok:false,err,policy:true};
++ }
++ if(!owner||executionMutex!==owner){
++  const err="同頁執行鎖未取得，工作未送出";logLine(err);return {ok:false,err,policy:true};
++ }
++ const revision=beginConnectionObservation();
++ try{
++  const body={task:taskId,codes:params.codes||"",start:params.start||"",
++   end:params.end||"",cats:params.cats||""};
++  const result=await fetchJson("/run",{method:"POST",headers:{"Accept":"application/json",
++   "Content-Type":"application/json","X-VIA-CSRF":CSRF_TOKEN},body:JSON.stringify(body)},
++   10000,value=>validateRunResponse(value,body));
++  updateConnectionState("online","",revision);
++  logLine((result.ok?"已接受：":"拒絕：")+taskFormalName(taskId)
++   +(result.err?" · "+result.err:""));
++  return result;
++ }catch(error){
++  connectionStateForError(error,revision);
++  logLine("無法送出「"+taskFormalName(taskId)+"」："+error.message+"。");
++  return {ok:false,err:error.message,offline:["network","timeout"].includes(error.kind)};
++ }
++}
++async function runOne(){
++ const checked=validateCurrentParams();
++ if(!checked.ok){showValidation(checked.errors);setInputBadge("輸入未通過驗證","fail");return;}
++ clearValidation();const owner="single";if(!acquireExecution(owner))return;
++ const params=checked.params;applyNormalizedParams(params);
++ lastSubmittedTask=params.task;currentTask=params.task;
++ setInputBadge("已送出・等待指揮台接受","running");syncInputSummary();
++ try{
++  const accepted=await callTask(params.task,params,owner);
++  if(!accepted.ok){setInputBadge("未接受・請查看紀錄","fail");return;}
++  setInputBadge("執行中・監看 run_id","running");
++  showPendingResult(params.task,accepted.run_id);
++  const terminal=await waitForTerminal(params.task,accepted.run_id,
++   LONG_RUN_TIMEOUTS[params.task]||DEFAULT_RUN_TIMEOUT_MS);
++  finishObservedExecution(params.task,terminal);
++ }finally{releaseExecution(owner);}
++}
++function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
++async function waitForTerminal(taskId,runId,timeoutMs=DEFAULT_RUN_TIMEOUT_MS){
++ if(!validRunId(runId))return {state:"unknown",observation_error:true,
++  tail:"run_id 無效，未開始監看"};
++ const started=Date.now();let consecutiveErrors=0;
++ while(Date.now()-started<timeoutMs){
++  const revision=beginConnectionObservation();
++  try{
++   const status=await fetchJson("/status",{},8000,validateStatus);
++   consecutiveErrors=0;updateConnectionState("online","",revision);
++   const item=status&&status[taskId];
++   if(item&&item.run_id===runId&&["ok","fail"].includes(item.state))return item;
++   if(item&&item.run_id!==runId&&item.state!=="idle")
++    return {state:"unknown",observation_error:true,
++     tail:"指揮台回傳另一個 run_id，為避免串錯執行已停止監看"};
++  }catch(error){
++   consecutiveErrors+=1;connectionStateForError(error,revision);
++   logLine("等待工作完成時連線異常("+consecutiveErrors+"/3)："+error.message);
++   if(consecutiveErrors>=3)return {state:"unknown",observation_error:true,
++    tail:"連續三次無法可靠讀取狀態；工作可能仍在執行，請稍後重新檢測"};
++  }
++  await sleep(Date.now()-started<20000?1500:3000);
++ }
++ return {state:"unknown",observation_error:true,
++  tail:"監看已達合理逾時上限；不判定工作失敗，請在結果矩陣重新確認"};
++}
++function showPendingResult(taskId,runId){
++ byId("selectedResultTitle").textContent=taskFormalName(taskId);
++ byId("selectedResultState").textContent="執行中";
++ byId("selectedResultState").className="honesty running";
++ byId("result").textContent="正式工作："+taskFormalName(taskId)+
++  "\n狀態：已接受，等待 run_id 對應終態\n執行識別："+runId;
++}
++function finishObservedExecution(taskId,item){
++ if(item.observation_error){
++  setInputBadge("監看停止・狀態待確認","stale");
++  byId("selectedResultTitle").textContent=taskFormalName(taskId);
++  byId("selectedResultState").textContent="狀態待確認";
++  byId("selectedResultState").className="honesty stale";
++  byId("result").textContent="正式工作："+taskFormalName(taskId)+"\n\n"+item.tail;
++  return;
++ }
++ setInputBadge(item.state==="ok"?"執行完成":"執行失敗",item.state);
++ if(typeof lastStatus!=="undefined")lastStatus[taskId]=item;
++ if(typeof selectResult==="function")selectResult(taskId);
++}
++async function runChecked(){
++ const queue=[...document.querySelectorAll('#batchChecks input:checked')].map(item=>item.value);
++ if(!queue.length){logLine("尚未勾選批次工作。");return;}
++ const owner="batch";if(!acquireExecution(owner))return;
++ setInputBadge("批次佇列執行中","running");
++ logLine("依序佇列開始，共 "+queue.length+" 項；任一項失敗即停止。");
++ try{
++  for(const taskId of queue){
++   logLine("準備執行："+taskFormalName(taskId));
++   const source=taskId===byId("task").value?collectParams():{task:taskId};
++   const checked=validateTaskParams(taskId,source);
++   if(!checked.ok){
++    showValidation(checked.errors);setInputBadge("批次停止・輸入未通過驗證","fail");
++    logLine("佇列停止：輸入未通過驗證。");break;
++   }
++   applyNormalizedParams(checked.params);
++   lastSubmittedTask=taskId;currentTask=taskId;
++   const accepted=await callTask(taskId,checked.params,owner);
++   if(!accepted.ok){
++    setInputBadge("批次停止・工作未被接受","fail");
++    logLine("佇列停止：工作未被接受。");break;
++   }
++   showPendingResult(taskId,accepted.run_id);
++   const terminal=await waitForTerminal(taskId,accepted.run_id,
++    LONG_RUN_TIMEOUTS[taskId]||DEFAULT_RUN_TIMEOUT_MS);
++   finishObservedExecution(taskId,terminal);
++   logLine("工作結束："+taskFormalName(taskId)+" · "+terminal.state);
++   if(terminal.state!=="ok"){
++    logLine("佇列依安全政策停止，後續工作未執行。");break;
++   }
++  }
++ }finally{releaseExecution(owner);}
++}
++async function ping(){
++ if(!LIVE_SAME_ORIGIN){
++  logLine(EDITABLE_PREVIEW?"設計模板為預覽模式，不連接執行橋。":"離線頁僅供檢視；正在探測同源 /master。");
++  if(!EDITABLE_PREVIEW)await preferSameOriginBridge();return;
++ }
++ const revision=beginConnectionObservation();
++ try{
++  const result=await fetchJson("/ping",{},5000,validatePing);
++  updateConnectionState("online",result.v?"版本 "+result.v:"",revision);
++  window.VIA_STATUS?.resume();
++  logLine("本機指揮台連線正常"+(result.v?"，版本 "+result.v:"")+"。");
++ }catch(error){
++  connectionStateForError(error,revision);
++  logLine("本機指揮台未連線："+error.message+"。請先執行 via 或 VIA-ALL。");
++ }
++}
++function saveParams(){
++ try{
++  const checked=[...document.querySelectorAll('#batchChecks input:checked')]
++   .map(item=>item.value);
++  localStorage.setItem(PKEY,JSON.stringify({...collectParams(),checked}));
++  logLine("參數已儲存於本機瀏覽器。");
++ }catch(_){logLine("瀏覽器封存區不可用，參數未儲存。");}
++}
++function resetParams(){
++ try{localStorage.removeItem(PKEY);}catch(_) {}
++ byId("task").selectedIndex=0;
++ for(const id of ["codes","dateStart","dateEnd","categories"])byId(id).value="";
++ document.querySelectorAll('#batchChecks input').forEach(item=>item.checked=false);
++ updateParameterVisibility();markInputEdited();logLine("已回復預設值。");
++}
++function restoreParams(){
++ try{
++  const saved=JSON.parse(localStorage.getItem(PKEY)||"null");
++  if(!saved)return;
++  if(saved.task)byId("task").value=saved.task;
++  for(const [key,id] of [["codes","codes"],["start","dateStart"],["end","dateEnd"],
++   ["cats","categories"]])if(saved[key])byId(id).value=saved[key];
++  (saved.checked||[]).forEach(value=>{
++   const item=document.querySelector('#batchChecks input[value="'+CSS.escape(value)+'"]');
++   if(item)item.checked=true;
++  });
++  logLine("已回填上次儲存的參數。");
++ }catch(_){logLine("已忽略無法解析的舊參數。");}
++}
++function filterCatalog(){
++ const value=byId("catalogSearch").value.trim().toLowerCase();
++ document.querySelectorAll('.roster-table tbody tr').forEach(row=>{
++  row.hidden=Boolean(value)&&!row.dataset.search.includes(value);
++ });
++}
++function toggleTechnicalIds(){
++ document.body.classList.toggle("show-tech",byId("showTechnicalIds").checked);
++}
++function resizePlotlyFrame(){
++ const frame=byId("plotlyFrame");if(!frame)return;
++ setTimeout(()=>{try{
++  const target=frame.contentWindow;
++  if(target?.Plotly)target.document.querySelectorAll('.js-plotly-plot')
++   .forEach(plot=>target.Plotly.Plots.resize(plot));
++ }catch(_){}},260);
++}
++async function preferSameOriginBridge(){
++ if(EDITABLE_PREVIEW||location.protocol!=="file:")return false;
++ const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),1400);
++ try{
++  await fetch(BRIDGE_ORIGIN+"/master",{mode:"no-cors",cache:"no-store",
++   redirect:"follow",signal:controller.signal});
++  location.replace(BRIDGE_ORIGIN+"/master");return true;
++ }catch(_){return false;}finally{clearTimeout(timeout);}
++}
++function handleViewportChange(){
++ const mobile=isMobileRail();
++ if(mobile!==railIsMobile){
++  railIsMobile=mobile;
++  if(mobile)toggleRail(false,false,false);
++  else{
++   let saved="open";try{saved=localStorage.getItem(RAIL_KEY)||"open";}catch(_){}
++   toggleRail(saved==="open",false,false);
++  }
++ }else applyRailIsolation(document.body.dataset.rail==="open",false);
++ resizePlotlyFrame();
++}
++async function initialize(){
++ setupTabs();restoreParams();updateParameterVisibility();syncInputSummary();
++ let savedRail=null;try{savedRail=localStorage.getItem(RAIL_KEY);}catch(_) {}
++ toggleRail(railIsMobile?false:(savedRail?savedRail==="open":true),false,false);
++ byId("railToggle").addEventListener("click",()=>toggleRail(undefined,true,true));
++ byId("railBackdrop").addEventListener("click",()=>toggleRail(false,true,true));
++ document.addEventListener("keydown",event=>{
++  if(event.key==="Escape"&&isMobileRail()&&document.body.dataset.rail==="open"){
++   event.preventDefault();toggleRail(false,true,true);
++  }
++ });
++ byId("task").addEventListener("change",()=>{updateParameterVisibility();markInputEdited();});
++ for(const id of ["codes","dateStart","dateEnd","categories"])
++  byId(id).addEventListener("input",()=>{syncInputSummary();markInputEdited();});
++ document.querySelectorAll('#batchChecks input').forEach(item=>
++  item.addEventListener("change",()=>{syncInputSummary();markInputEdited();}));
++ byId("runOneButton").addEventListener("click",runOne);
++ byId("runBatchButton").addEventListener("click",runChecked);
++ byId("pingButton").addEventListener("click",ping);
++ byId("saveParamsButton").addEventListener("click",saveParams);
++ byId("resetParamsButton").addEventListener("click",resetParams);
++ byId("catalogSearch").addEventListener("input",filterCatalog);
++ byId("showTechnicalIds").addEventListener("change",toggleTechnicalIds);
++ window.addEventListener("resize",handleViewportChange,{passive:true});
++ setMutationControls();
++ if(EDITABLE_PREVIEW){
++  setInputBadge("設計預覽・禁止執行","stale");
++  logLine("可編輯模板只供版面預覽；任務執行與文件收件已停用。");
++ }else if(!mutationAllowed()){
++  setInputBadge("離線檢視・請由 /master 操作","stale");
++  await preferSameOriginBridge();
++ }
++}
++initialize();
++window.VIA_UI={activateTab,toggleRail,collectParams,callTask,waitForTerminal,
++ updateConnectionState,syncInputSummary,filterCatalog,validateTaskParams,
++ preferSameOriginBridge,getExecutionMutex:()=>executionMutex};
+ 
+ 
+-const DOT={idle:"var(--muted)",running:"#c4943a",ok:"var(--green)",fail:"var(--red)"};
+-let hubDown=false,curTask=null,lastStatus={};
+-async function poll(){try{
+- const r=await(await fetch("http://127.0.0.1:8765/status")).json();
+- lastStatus=r;hubDown=false;
+- document.getElementById("matrix").innerHTML=Object.entries(r).map(([k,v])=>{
+-  const pct=(v.pct!=null)?(" "+v.pct+"%"):"";
+-  const el=(v.elapsed!=null&&v.state!=="idle")?(" "+v.elapsed+"s"):"";
+-  return '<div style="cursor:pointer;padding:2px 0" onclick="showTail(\''+k+'\')">'
+-   +'<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'
+-   +(DOT[v.state]||DOT.idle)+';margin-right:6px"></span>'+k
+-   +" <small>"+(v.zh||"")+el+pct+"</small>"
+-   +'<div style="height:5px;border-radius:3px;background:var(--line);margin:3px 0 2px 15px;overflow:hidden">'
+-   +'<div style="height:100%;border-radius:3px;transition:width .6s;'
+-   +(v.state==="running"
+-     ?(v.pct!=null
+-       ?('width:'+v.pct+'%;background:#c4943a')
+-       :'width:100%;background:repeating-linear-gradient(45deg,#c4943a 0 8px,transparent 8px 16px);animation:viaflow 1s linear infinite')
+-     :('width:'+((v.state==="ok"||v.state==="fail")?100:0)+'%;background:'+(v.state==="fail"?"var(--red)":"var(--green)")))
+-   +'"></div></div></div>';}).join("");
+- if(curTask)showTail(curTask);
+-}catch(e){if(!hubDown){hubDown=true;
+- document.getElementById("matrix").textContent="樞紐未開=誠實(打 via 或 VIA-ALL 帶起後自動接上)";}}}
+-function showTail(k){curTask=k;const v=lastStatus[k]||{};
+- document.getElementById("result").textContent=
+-  "["+k+"] state="+(v.state||"?")+((v.rc!=null)?(" rc="+v.rc):"")+"\n"+(v.tail||"(尚無 log)");}
+-setInterval(poll,4000);poll();
++const STATE_LABELS={idle:"待命",running:"執行中",ok:"完成",fail:"失敗",
++ skip:"略過",blocked:"受阻",offline:"離線","no-data":"無資料"};
++let hubDown=false;
++let currentTask=null;
++let lastStatus={};
++let pollInFlight=false;
++let statusIsStale=true;
++let lastStatusSuccessAt=null;
++let consecutivePollErrors=0;
++let pollTimer=null;
+ 
++function cleanState(value){
++ const state=String(value||"idle").toLowerCase();
++ return Object.prototype.hasOwnProperty.call(STATE_LABELS,state)?state:"idle";
++}
++function clampPercent(value){
++ const number=Number(value);return Number.isFinite(number)?Math.max(0,Math.min(100,number)):null;
++}
++function createCell(text){const cell=document.createElement("td");cell.textContent=text;return cell;}
++function formatMetric(value,suffix=""){
++ return value===undefined||value===null||value===""?"—":String(value)+suffix;
++}
++function renderStatusDistribution(status){
++ const container=byId("statusDistribution");container.replaceChildren();
++ container.classList.remove("stale");
++ const entries=Object.values(status||{});
++ const total=entries.length;
++ const counts={idle:0,running:0,ok:0,fail:0};
++ entries.forEach(item=>{const state=cleanState(item.state);counts[state]=(counts[state]||0)+1;});
++ byId("overviewEmpty").hidden=total>0;
++ for(const state of ["running","ok","fail","idle"]){
++  const row=document.createElement("div");row.className="dist-row";
++  const label=document.createElement("span");label.className="dist-label";
++  label.textContent=STATE_LABELS[state];
++  const track=document.createElement("div");track.className="dist-track";
++  const fill=document.createElement("div");fill.className="dist-fill "+state;
++  fill.style.width=(total?counts[state]/total*100:0)+"%";track.append(fill);
++  const count=document.createElement("span");count.className="dist-count";
++  count.textContent=String(counts[state]);row.append(label,track,count);container.append(row);
++ }
++}
++function renderStatusMatrix(status){
++ const body=byId("statusMatrixBody");body.replaceChildren();
++ const entries=Object.entries(status||{});
++ if(!entries.length){
++  const row=document.createElement("tr");const cell=createCell("指揮台目前沒有任務狀態資料。");
++  cell.colSpan=9;row.append(cell);body.append(row);renderStatusDistribution({});return;
++ }
++ for(const [taskId,item] of entries){
++  const state=cleanState(item.state);const pct=clampPercent(item.pct);
++  const row=document.createElement("tr");row.dataset.taskId=taskId;
++  const nameCell=document.createElement("td");const select=document.createElement("button");
++  select.type="button";select.className="task-link";select.textContent=taskFormalName(taskId);
++  select.addEventListener("click",()=>selectResult(taskId));nameCell.append(select);row.append(nameCell);
++  const stateCell=document.createElement("td");const pill=document.createElement("span");
++  pill.className="state-pill "+state;pill.textContent=STATE_LABELS[state];stateCell.append(pill);row.append(stateCell);
++  row.append(createCell(formatMetric(item.started)),createCell(formatMetric(item.elapsed," 秒")),
++   createCell(formatMetric(item.beat," 秒前")),createCell(formatMetric(item.kb," KB")));
++  const progressCell=document.createElement("td");progressCell.className="progress-cell";
++  const progressLabel=document.createElement("span");
++  progressLabel.textContent=item.done!=null?String(item.done)+(pct!=null?" · "+pct+"%":""):
++   (pct!=null?pct+"%":"—");
++  const track=document.createElement("div");track.className="progress-track";
++  const fill=document.createElement("div");fill.className="progress-fill";
++  fill.style.width=(pct!=null?pct:(state==="ok"?100:0))+"%";
++  track.setAttribute("role","progressbar");track.setAttribute("aria-label","工作完成進度");
++  track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");
++  if(pct!=null)track.setAttribute("aria-valuenow",String(pct));
++  else track.setAttribute("aria-valuetext",state==="ok"?"工作已完成":"未回報可量化進度");
++  if(state==="fail")fill.style.background="var(--bad)";
++  else if(state==="ok")fill.style.background="var(--ok)";
++  else if(state==="running")fill.style.background="var(--warn)";
++  track.append(fill);progressCell.append(progressLabel,track);row.append(progressCell);
++  row.append(createCell(formatMetric(item.rc)),createCell(item.fix||"—"));body.append(row);
++ }
++ renderStatusDistribution(status);
++}
++function selectResult(taskId){
++ currentTask=taskId;const item=lastStatus[taskId]||{};const state=cleanState(item.state);
++ byId("selectedResultTitle").textContent=taskFormalName(taskId);
++ byId("selectedResultState").textContent=statusIsStale
++  ?STATE_LABELS[state]+"・資料過期":STATE_LABELS[state];
++ byId("selectedResultState").className="honesty "+(statusIsStale?"stale":state);
++ const lines=["正式工作："+taskFormalName(taskId),"狀態："+STATE_LABELS[state]];
++ if(item.run_id)lines.push("執行識別："+item.run_id);
++ if(item.started)lines.push("開始："+item.started);
++ if(item.elapsed!=null)lines.push("經過："+item.elapsed+" 秒");
++ if(item.beat!=null)lines.push("心跳延遲："+item.beat+" 秒前");
++ if(item.rc!=null)lines.push("回傳碼："+item.rc);
++ if(statusIsStale)lines.push("資料註記：本列為上次成功取得的快照，不代表目前狀態。");
++ lines.push("",item.tail||"尚無執行紀錄。");
++ if(item.fix)lines.push("","建議處理："+item.fix);
++ byId("result").textContent=lines.join("\n");
++}
++function markStatusRowsStale(reason){
++ statusIsStale=true;
++ byId("statusDistribution").classList.add("stale");
++ document.querySelectorAll("#statusMatrixBody tr[data-task-id]").forEach(row=>{
++  row.classList.add("stale");
++  const pill=row.querySelector(".state-pill");
++  if(pill){
++   const original=STATE_LABELS[cleanState(lastStatus[row.dataset.taskId]?.state)];
++   pill.className="state-pill stale";pill.textContent=original+"・資料過期";
++  }
++ });
++ byId("statusSource").textContent="資料過期・不作狀態裁決";
++ byId("statusSource").className="honesty stale";
++ if(currentTask)selectResult(currentTask);
++ if(reason)byId("matrixNotice").textContent=reason;
++}
++async function poll(){
++ if(!LIVE_SAME_ORIGIN){
++  markStatusRowsStale(EDITABLE_PREVIEW
++   ?"設計模板為預覽模式，不讀取本機執行狀態。"
++   :"目前為離線檔案檢視；請由本機指揮台 /master 開啟即時狀態。");
++  return;
++ }
++ if(pollInFlight||document.hidden)return;pollInFlight=true;
++ const revision=beginConnectionObservation();
++ try{
++  const status=await fetchJson("/status",{},8000,validateStatus);
++  lastStatus=status;hubDown=false;statusIsStale=false;consecutivePollErrors=0;
++  lastStatusSuccessAt=new Date();updateConnectionState("online","",revision);
++  byId("matrixNotice").textContent=Object.keys(status).length
++   ?"狀態取自本機指揮台；最後成功更新 "+lastStatusSuccessAt.toLocaleTimeString("zh-TW",{hour12:false})+
++    "。點選正式工作名稱可查看紀錄。"
++   :"指揮台在線，但目前沒有工作狀態資料。";
++  byId("statusSource").textContent="本機即時資料";
++  byId("statusSource").className="honesty";
++  renderStatusMatrix(status);if(currentTask)selectResult(currentTask);
++  if(lastSubmittedTask&&status[lastSubmittedTask]){
++   const submitted=status[lastSubmittedTask];
++   if(submitted.state==="running")setInputBadge("執行中・run_id 已核對","running");
++   else if(["ok","fail"].includes(submitted.state)&&!executionMutex)
++    setInputBadge(submitted.state==="ok"?"執行完成":"執行失敗",submitted.state);
++  }
++ }catch(error){
++  consecutivePollErrors+=1;connectionStateForError(error,revision);
++  const stopped=consecutivePollErrors>=3;
++  markStatusRowsStale("本機指揮台離線或回應異常："+error.message+
++   "。既有列已中性化為過期快照。"+(stopped?" 連續三次錯誤，自動輪詢已暫停。":""));
++  if(!hubDown){hubDown=true;logLine("狀態輪詢中斷："+error.message);}
++  if(stopped&&pollTimer){clearInterval(pollTimer);pollTimer=null;}
++ }
++ finally{pollInFlight=false;}
++}
++function resumePolling(){
++ if(!LIVE_SAME_ORIGIN)return;
++ consecutivePollErrors=0;
++ if(!pollTimer)pollTimer=setInterval(poll,4000);
++ poll();
++}
++document.addEventListener("visibilitychange",()=>{if(!document.hidden)resumePolling();});
++if(LIVE_SAME_ORIGIN)resumePolling();else poll();
++window.VIA_STATUS={poll,resume:resumePolling,renderStatusMatrix,selectResult,
++ markStatusRowsStale,getLast:()=>lastStatus};
+ 
+-const dz=document.getElementById("drop");
+-dz.ondragover=e=>{e.preventDefault();dz.classList.add("on");};
+-dz.ondragleave=()=>dz.classList.remove("on");
+-dz.ondrop=async e=>{e.preventDefault();dz.classList.remove("on");
+- const fl=[...e.dataTransfer.files];
+- const out=document.getElementById("files");
+- out.innerHTML="收件 "+fl.length+" 件…";
+- const lines=[];
+- for(const f of fl){
+-  if(f.size>50*1024*1024){
+-   lines.push("✗ "+f.name+"(逾 50MB 上限=誠實拒)");continue;}
+-  try{
+-   const b64=await new Promise((ok,bad)=>{const r=new FileReader();
+-    r.onload=()=>ok((r.result||"").split(",")[1]||"");
+-    r.onerror=bad;r.readAsDataURL(f);});
+-   const rs=await(await fetch("http://127.0.0.1:8765/intake",
+-    {method:"POST",body:JSON.stringify({name:f.name,b64:b64})})).json();
+-   lines.push(rs.ok
+-    ?"✓ "+f.name+(rs.skip?"(SKIP 同 hash=冪等)":" → 已落 "+rs.saved)
+-      +" · sha "+(rs.sha256||"").slice(0,8)
+-    :"✗ "+f.name+"("+(rs.err||"拒")+")");
+-  }catch(_){
+-   lines.push("· "+f.name+"(樞紐未開=誠實列名;放 Downloads 後打 via-intake)");
++
++const dropZone=byId("drop");
++const filePicker=byId("filePicker");
++
++function appendFileResult(message){
++ const item=document.createElement("li");item.textContent=message;byId("files").append(item);
++}
++async function readFileBase64(file){
++ return new Promise((resolve,reject)=>{
++  const reader=new FileReader();
++  reader.onload=()=>resolve(String(reader.result||"").split(",")[1]||"");
++  reader.onerror=()=>reject(reader.error||new Error("檔案讀取失敗"));
++  reader.readAsDataURL(file);
++ });
++}
++async function processFiles(fileList){
++ const files=[...fileList];
++ byId("files").replaceChildren();
++ if(!files.length){appendFileResult("沒有選取檔案。");return;}
++ const owner="intake";
++ if(!mutationAllowed()){
++  appendFileResult("預覽頁禁止收件；請由本機指揮台 /master 開啟正式操作頁。");return;
++ }
++ if(!acquireExecution(owner)){
++  appendFileResult("同頁已有工作或收件進行中，本次未送出。");return;
++ }
++ setInputBadge("文件收件處理中","running");
++ pendingFileCount=files.length;syncInputSummary();
++ appendFileResult("準備處理 "+files.length+" 件檔案…");
++ try{
++  for(const file of files){
++   const revision=beginConnectionObservation();
++   try{
++    if(file.size>50*1024*1024){
++     appendFileResult("拒絕："+file.name+"（超過 50 MB 上限）");continue;
++    }
++    const b64=await readFileBase64(file);
++    const result=await fetchJson("/intake",{method:"POST",headers:{
++     "Accept":"application/json","Content-Type":"application/json",
++     "X-VIA-CSRF":CSRF_TOKEN},body:JSON.stringify({name:file.name,b64})},30000,
++     validateIntake);
++    const action=result.skip?"相同內容已存在，略過":"已存入 "+String(result.saved);
++    appendFileResult("完成："+file.name+" · "+action+" · SHA "+result.sha256.slice(0,8));
++    updateConnectionState("online","",revision);
++   }catch(error){
++    if(error.kind==="http")updateConnectionState("online","請求已被安全拒絕",revision);
++    else connectionStateForError(error,revision);
++    appendFileResult("未入庫："+file.name+" · "+error.message+"。");
++   }finally{
++    pendingFileCount=Math.max(0,pendingFileCount-1);syncInputSummary();
++   }
+   }
++ }finally{
++  filePicker.value="";setInputBadge("文件收件處理完成");releaseExecution(owner);
++ }
++}
++dropZone.addEventListener("dragover",event=>{
++ event.preventDefault();
++ if(dropZone.getAttribute("aria-disabled")!=="true")dropZone.classList.add("on");
++});
++dropZone.addEventListener("dragleave",()=>dropZone.classList.remove("on"));
++dropZone.addEventListener("drop",event=>{
++ event.preventDefault();dropZone.classList.remove("on");
++ if(dropZone.getAttribute("aria-disabled")!=="true")processFiles(event.dataTransfer.files);
++});
++dropZone.addEventListener("click",()=>{
++ if(dropZone.getAttribute("aria-disabled")!=="true")filePicker.click();
++});
++dropZone.addEventListener("keydown",event=>{
++ if((event.key==="Enter"||event.key===" ")
++  &&dropZone.getAttribute("aria-disabled")!=="true"){
++  event.preventDefault();filePicker.click();
+  }
+- out.innerHTML="真收 v2(hash 定生死;樞紐未開=誠實降級):<br>"
+-  +lines.join("<br>")
+-  +"<br><b>收容入冊</b>:已落 Downloads 者打 <code>via-intake</code>"
+-  +" 一鍵 hash 冪等收容自動雙推。";};
++});
++filePicker.addEventListener("change",()=>processFiles(filePicker.files));
++window.VIA_FILES={processFiles};
+ 
+ </script></body></html>
+\ No newline at end of file

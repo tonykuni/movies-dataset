@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<!-- ================================================================
+     VIA Grid Matrix Dashboard — Auto-Optimized Layout Engine
+     CSS Grid × Matrix × VPN v3.5 Design System × Full Interface
+     ================================================================ -->
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Grid Matrix Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — VPN v3.5 System
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;
+  --sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--bl-d:#2a4a6e;
+  --tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;
+  --am:#c4943a;--am-l:#f5e2b8;
+  --co:#c96b5a;--co-l:#f5d0c8;
+  --vi:#7a6daa;--vi-l:#dcd8f0;
+  --ro:#b05580;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',Consolas,monospace;
+  --sa:'DM Sans',system-ui,sans-serif;
+  --hf:'Syne',system-ui,sans-serif;
+  --r:5px;--r2:8px;--r3:12px;
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.1);
+  --ease:cubic-bezier(.4,0,.2,1);
+
+  /* ── Auto-layout engine vars ── */
+  --grid-col-min: 220px;
+  --grid-gap: 8px;
+  --cell-span-wide: span 2;
+  --cell-span-full: span 3;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET + BASE
+   ═══════════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--i3)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHELL — Three-zone layout: header / sidebar+content
+   ═══════════════════════════════════════════════════════════════ */
+.shell {
+  display: grid;
+  grid-template-rows: 52px 1fr;
+  grid-template-columns: 200px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+.topbar {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px;
+  background: var(--sf);
+  border-bottom: 1px solid var(--bd);
+  position: relative; overflow: hidden; z-index: 100;
+}
+.topbar::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co));
+}
+.sidebar {
+  background: var(--sf);
+  border-right: 1px solid var(--bd);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.content {
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOPBAR ELEMENTS
+   ═══════════════════════════════════════════════════════════════ */
+.logo-text {
+  font-family: var(--hf); font-weight: 800; font-size: 14px;
+  letter-spacing: -.3px; color: var(--i0);
+}
+.logo-text span { color: var(--bl); }
+.top-badge {
+  font: 600 9px var(--mo);
+  padding: 2px 7px; border-radius: 99px;
+  background: rgba(76,120,168,.1); border: 1px solid rgba(76,120,168,.2);
+  color: var(--bl);
+}
+.top-meta { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.tstat { display: flex; flex-direction: column; align-items: flex-end; }
+.tstat .n { font: 700 15px var(--mo); color: var(--bl); line-height: 1; }
+.tstat .l { font: 400 8px var(--sa); color: var(--i3); text-transform: uppercase; letter-spacing: .05em; }
+.layout-toggle {
+  display: flex; gap: 3px; padding: 3px;
+  background: var(--bg1); border-radius: 6px; border: 1px solid var(--bd);
+}
+.lt-btn {
+  padding: 4px 8px; border-radius: 4px; cursor: pointer;
+  font: 500 9px var(--mo); color: var(--i2); background: none; border: none;
+  transition: .15s;
+}
+.lt-btn.active, .lt-btn:hover { background: var(--sf); color: var(--bl); box-shadow: var(--sh); }
+.pulse-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gn); box-shadow: 0 0 0 0 rgba(90,158,111,.4);
+  animation: sonar 2s ease-in-out infinite;
+}
+@keyframes sonar {
+  0% { box-shadow: 0 0 0 0 rgba(90,158,111,.4); }
+  70% { box-shadow: 0 0 0 7px rgba(90,158,111,0); }
+  100% { box-shadow: 0 0 0 0 rgba(90,158,111,0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR NAV
+   ═══════════════════════════════════════════════════════════════ */
+.nav-sect {
+  padding: 10px 12px 3px;
+  font: 600 8px var(--sa); color: var(--i4);
+  text-transform: uppercase; letter-spacing: .1em;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; cursor: pointer;
+  transition: .12s; border-radius: var(--r2);
+  margin: 1px 6px; color: var(--i1);
+  font: 500 11px var(--sa);
+  position: relative;
+}
+.nav-item:hover { background: var(--bg1); }
+.nav-item.active {
+  background: rgba(76,120,168,.08);
+  color: var(--bl);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 2px; border-radius: 1px; background: var(--bl);
+}
+.nav-ic { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+.nav-ct {
+  font: 600 8px var(--mo);
+  padding: 1px 5px; border-radius: 99px; margin-left: auto;
+  background: rgba(76,120,168,.1); color: var(--bl);
+}
+.nav-warn { background: rgba(196,148,58,.1) !important; color: var(--am) !important; }
+.nav-err  { background: rgba(201,107,90,.1) !important; color: var(--co) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE + TAB SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+.page { display: none; animation: pg-in .2s var(--ease); }
+.page.active { display: block; }
+@keyframes pg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.ph { font: 700 17px var(--hf); color: var(--i0); margin-bottom: 2px; }
+.ps { font: 400 10px var(--sa); color: var(--i2); margin-bottom: 12px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTO-OPTIMIZED CSS GRID MATRIX ENGINE
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Base matrix ── */
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-col-min), 1fr));
+  gap: var(--grid-gap);
+  margin-bottom: 12px;
+}
+
+/* ── Layout variant: density ── */
+.matrix.dense  { --grid-col-min: 160px; --grid-gap: 6px; }
+.matrix.wide   { --grid-col-min: 320px; --grid-gap: 10px; }
+.matrix.full   { grid-template-columns: 1fr; }
+
+/* ── Span classes ── */
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+.span-r { grid-column: 1 / -1; }
+
+/* ── Cell base ── */
+.cell {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: var(--r3);
+  overflow: hidden;
+  transition: box-shadow .2s var(--ease), border-color .2s;
+  position: relative;
+}
+.cell:hover {
+  box-shadow: var(--sh2);
+  border-color: var(--bd2);
+}
+.cell-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--bd);
+  background: var(--sf2);
+}
+.cell-icon {
+  width: 28px; height: 28px; border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  background: rgba(76,120,168,.1); color: var(--bl);
+}
+.cell-icon.tl { background: rgba(67,154,154,.1); color: var(--tl); }
+.cell-icon.gn { background: rgba(90,158,111,.1); color: var(--gn); }
+.cell-icon.am { background: rgba(196,148,58,.1); color: var(--am); }
+.cell-icon.co { background: rgba(201,107,90,.1); color: var(--co); }
+.cell-icon.vi { background: rgba(122,109,170,.1); color: var(--vi); }
+.cell-title { font: 600 11px var(--sa); flex: 1; }
+.cell-badge {
+  font: 500 8px var(--mo); padding: 1px 5px;
+  border-radius: 4px; background: var(--bg1);
+  color: var(--i3); border: 1px solid var(--bd);
+}
+.cell-body { padding: 10px 12px; }
+
+/* ── KPI cell variant ── */
+.cell.kpi .cell-body { padding: 14px 16px; }
+.kpi-num {
+  font: 700 28px var(--mo); line-height: 1;
+  color: var(--bl); margin-bottom: 4px;
+}
+.kpi-label { font: 400 9px var(--sa); color: var(--i3); text-transform: uppercase; letter-spacing: .06em; }
+.kpi-trend {
+  display: flex; align-items: center; gap: 4px;
+  font: 500 9px var(--mo); margin-top: 6px;
+}
+.kpi-trend.up   { color: var(--gn); }
+.kpi-trend.down { color: var(--co); }
+.kpi-trend.flat { color: var(--i3); }
+
+/* ── Accent bar on cell ── */
+.cell::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--bd); transition: .2s;
+}
+.cell.bl::before { background: linear-gradient(90deg,var(--bl),var(--tl)); }
+.cell.tl::before { background: linear-gradient(90deg,var(--tl),var(--gn)); }
+.cell.am::before { background: linear-gradient(90deg,var(--am),var(--co)); }
+.cell.vi::before { background: linear-gradient(90deg,var(--vi),var(--bl)); }
+.cell.gn::before { background: linear-gradient(90deg,var(--gn),var(--tl)); }
+.cell.co::before { background: linear-gradient(90deg,var(--co),var(--am)); }
+
+/* ═══════════════════════════════════════════════════════════════
+   STAT GRID (tight)
+   ═══════════════════════════════════════════════════════════════ */
+.sg {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 4px; margin-bottom: 10px;
+}
+.sc {
+  background: var(--sf); border: 1px solid var(--bd);
+  border-radius: var(--r2); padding: 7px 8px; text-align: center;
+  transition: .15s; cursor: default;
+}
+.sc:hover { border-color: var(--bl); box-shadow: var(--sh); }
+.sc .n { font: 700 14px var(--mo); color: var(--bl); letter-spacing: -.2px; line-height: 1; }
+.sc .l { font: 400 8px var(--sa); color: var(--i3); text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+.sc .s { font: 400 8px var(--mo); color: var(--i4); margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TABLE
+   ═══════════════════════════════════════════════════════════════ */
+.mx { width: 100%; border-collapse: collapse; font-size: 10px; }
+.mx th {
+  background: var(--bg1); padding: 5px 6px; text-align: left;
+  font: 600 9px var(--sa); color: var(--i2);
+  border-bottom: 2px solid var(--bd);
+  position: sticky; top: 0; z-index: 1;
+  text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
+}
+.mx td { padding: 5px 6px; border-bottom: 1px solid rgba(219,217,211,.5); vertical-align: middle; }
+.mx tr:hover td { background: rgba(76,120,168,.03); }
+.mx tr:last-child td { border-bottom: none; }
+.mw { max-height: 320px; overflow-y: auto; border: 1px solid var(--bd); border-radius: var(--r); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS / HEALTH BARS
+   ═══════════════════════════════════════════════════════════════ */
+.prog-wrap {
+  background: var(--bg2); border-radius: 3px; height: 4px;
+  overflow: hidden; margin: 4px 0;
+}
+.prog {
+  height: 4px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--bl), var(--tl));
+  transition: width .5s var(--ease);
+}
+.hc {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 0; border-bottom: 1px solid var(--bg2); font-size: 10px;
+}
+.hc:last-child { border-bottom: none; }
+.hl { width: 80px; font: 600 10px var(--sa); color: var(--i2); }
+.hv { font: 700 9px var(--mo); width: 30px; text-align: right; }
+.hv.ga { color: var(--gn); } .hv.mo { color: var(--am); } .hv.er { color: var(--co); }
+.hr { flex: 1; height: 4px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.hrf { height: 4px; border-radius: 3px; transition: width .4s; }
+.hs { font: 400 9px var(--sa); color: var(--i3); white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BADGES
+   ═══════════════════════════════════════════════════════════════ */
+.bd {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 1px 5px; border-radius: 4px;
+  font: 600 8px var(--mo); letter-spacing: .02em; white-space: nowrap;
+}
+.bd.bl  { background: var(--bl-l);  color: var(--bl);  }
+.bd.tl  { background: var(--tl-l);  color: var(--tl);  }
+.bd.gn  { background: var(--gn-l);  color: var(--gn);  }
+.bd.am  { background: var(--am-l);  color: var(--am);  }
+.bd.co  { background: var(--co-l);  color: var(--co);  }
+.bd.vi  { background: var(--vi-l);  color: var(--vi);  }
+.bd.ok  { background: var(--gn-l);  color: var(--gn);  }
+.bd.err { background: var(--co-l);  color: var(--co);  }
+.bd.warn{ background: var(--am-l);  color: var(--am);  }
+.bd.inf { background: var(--bl-l);  color: var(--bl);  }
+.bd.py  { background: rgba(196,148,58,.15);  color: var(--am); }
+.bd.ps1 { background: rgba(76,120,168,.15);  color: var(--bl); }
+.bd.html{ background: rgba(67,154,154,.15);  color: var(--tl); }
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS + INPUTS
+   ═══════════════════════════════════════════════════════════════ */
+.bn {
+  padding: 5px 10px; border: 1px solid var(--bd);
+  border-radius: var(--r); font: 500 10px var(--sa);
+  cursor: pointer; transition: .15s; background: var(--sf);
+  color: var(--i1);
+}
+.bn:hover { border-color: var(--bl); color: var(--bl); }
+.bn.pri  { background: var(--bl); color: #fff; border-color: var(--bl); }
+.bn.pri:hover { background: var(--bl-d); }
+.bn.sm   { padding: 3px 8px; font-size: 9px; }
+.bn.full { width: 100%; margin-bottom: 4px; }
+.pi {
+  width: 100%; padding: 6px 8px;
+  background: var(--sf); border: 1px solid var(--bd);
+  border-radius: var(--r); font: 11px var(--mo); color: var(--i0);
+  transition: .15s; outline: none;
+}
+.pi:focus { border-color: var(--bl); box-shadow: 0 0 0 2px rgba(76,120,168,.1); }
+.pi::placeholder { color: var(--i4); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PIPELINE FLOW
+   ═══════════════════════════════════════════════════════════════ */
+.pipe { display: flex; flex-direction: column; gap: 0; }
+.pipe-step {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid var(--bd);
+}
+.pipe-step:last-child { border-bottom: none; }
+.pnum {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 9px var(--mo); margin-top: 2px;
+}
+.pbody { flex: 1; }
+.pt-title { font: 600 11px var(--sa); margin-bottom: 2px; }
+.pt-desc  { font: 400 9px var(--sa); color: var(--i2); line-height: 1.5; }
+.ptags { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+.ptag {
+  font: 400 8px var(--mo); padding: 1px 5px; border-radius: 3px;
+  background: rgba(76,120,168,.08); color: var(--bl);
+  border: 1px solid rgba(76,120,168,.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TERMINAL
+   ═══════════════════════════════════════════════════════════════ */
+.tm { background: #1e1d1a; border-radius: var(--r2); overflow: hidden; border: 1px solid #333; }
+.tm-bar {
+  display: flex; align-items: center; padding: 6px 10px;
+  background: #2a2924; gap: 5px; border-bottom: 1px solid #333;
+}
+.td1{background:#e5534b;width:8px;height:8px;border-radius:50%}
+.td2{background:#d29922;width:8px;height:8px;border-radius:50%}
+.td3{background:#3fb950;width:8px;height:8px;border-radius:50%}
+.tm-title { flex: 1; color: #6e7681; font: 400 8px var(--mo); text-align: center; text-transform: uppercase; letter-spacing: .1em; }
+.tm-body {
+  padding: 8px 10px; max-height: 220px; overflow-y: auto;
+  color: #c9d1d9; font: 400 10px var(--mo); line-height: 1.7;
+}
+.tm-body .ok   { color: #3fb950; }
+.tm-body .warn { color: #d29922; }
+.tm-body .err  { color: #f85149; }
+.tm-body .dim  { color: #6e7681; }
+.tm-body .hd   { color: #58a6ff; font-weight: 600; }
+.tm-body .line { display: block; white-space: pre-wrap; word-break: break-all; }
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER BAR
+   ═══════════════════════════════════════════════════════════════ */
+.fbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+.fbtn {
+  padding: 4px 10px; border: 1px solid var(--bd2);
+  border-radius: 5px; font: 500 9px var(--mo);
+  cursor: pointer; background: var(--sf); color: var(--i2); transition: .12s;
+}
+.fbtn:hover { background: var(--bg1); color: var(--i1); }
+.fbtn.active { background: var(--bl); color: #fff; border-color: var(--bl); }
+.srch {
+  padding: 4px 8px; border: 1px solid var(--bd2);
+  border-radius: 5px; font: 400 10px var(--mo);
+  background: var(--sf); color: var(--i0); outline: none; transition: .15s;
+  width: 160px;
+}
+.srch:focus { border-color: var(--bl); box-shadow: 0 0 0 2px rgba(76,120,168,.08); }
+.ml-auto { margin-left: auto; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SEPARATOR + MISC
+   ═══════════════════════════════════════════════════════════════ */
+.sep { height: 1px; background: var(--bd); margin: 8px 0; }
+.tag {
+  display: inline-block; padding: 0 5px; border-radius: 3px;
+  font: 500 8px var(--mo); background: var(--bg1); color: var(--i2);
+  border: 1px solid var(--bd);
+}
+.lh-16 { line-height: 1.6; }
+.mt4 { margin-top: 4px; }
+.mb8 { margin-bottom: 8px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+@media(max-width:900px) { .g2,.g3,.g4 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:600px) { .g2,.g3,.g4 { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST / NOTIFICATION
+   ═══════════════════════════════════════════════════════════════ */
+.toast-wrap {
+  position: fixed; bottom: 16px; right: 16px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 4px; pointer-events: none;
+}
+.toast {
+  padding: 8px 14px; border-radius: var(--r2);
+  font: 500 10px var(--sa); background: var(--i0); color: var(--bg);
+  box-shadow: var(--sh2); opacity: 0;
+  transform: translateY(8px); transition: .25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: none; pointer-events: auto; }
+.toast.ok   { border-left: 3px solid var(--gn); }
+.toast.warn { border-left: 3px solid var(--am); }
+.toast.err  { border-left: 3px solid var(--co); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MATRIX DEMO — specific page styles
+   ═══════════════════════════════════════════════════════════════ */
+.sparkline {
+  display: flex; align-items: flex-end; gap: 2px; height: 32px;
+  padding: 0 0 2px;
+}
+.spark-bar {
+  flex: 1; border-radius: 2px 2px 0 0;
+  background: rgba(76,120,168,.25);
+  transition: height .4s var(--ease), background .2s;
+  min-height: 2px;
+}
+.spark-bar:hover { background: var(--bl); }
+.spark-bar.hi { background: rgba(90,158,111,.35); }
+.spark-bar.lo { background: rgba(201,107,90,.3); }
+
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  transition: transform .15s;
+  cursor: default;
+}
+.heat-cell:hover { transform: scale(1.2); z-index: 1; }
+
+/* Status lights */
+.lt { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 3px; }
+.lt.g { background: var(--gn); box-shadow: 0 0 4px var(--gn); }
+.lt.y { background: var(--am); }
+.lt.r { background: var(--co); }
+.lt.b { background: var(--bl); }
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT SWITCHER MODES
+   ═══════════════════════════════════════════════════════════════ */
+body.layout-dense  .matrix { --grid-col-min: 150px; --grid-gap: 5px; }
+body.layout-wide   .matrix { --grid-col-min: 340px; --grid-gap: 12px; }
+body.layout-single .matrix { grid-template-columns: 1fr; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
+  <header class="topbar">
+    <div class="logo-text">VIA<span>Grid</span></div>
+    <div class="top-badge">MATRIX DASHBOARD</div>
+    <div class="pulse-dot" title="System live"></div>
+
+    <!-- Layout density toggle -->
+    <div class="layout-toggle" title="Grid density">
+      <button class="lt-btn" onclick="setLayout('dense')"  title="Compact">⊟</button>
+      <button class="lt-btn active" onclick="setLayout('auto')"   title="Auto">⊞</button>
+      <button class="lt-btn" onclick="setLayout('wide')"   title="Wide">⊠</button>
+      <button class="lt-btn" onclick="setLayout('single')" title="Single">☰</button>
+    </div>
+
+    <div class="top-meta">
+      <div class="tstat"><span class="n" id="topTotal">189</span><span class="l">Libs</span></div>
+      <div class="tstat"><span class="n" id="topModules">26</span><span class="l">Modules</span></div>
+      <div class="tstat"><span class="n" id="topPass">30/30</span><span class="l">Tests</span></div>
+      <div class="tstat"><span class="n" id="topDPI">400</span><span class="l">DPI</span></div>
+      <button class="bn sm" onclick="refreshAll()">⟳ Refresh</button>
+    </div>
+  </header>
+
+  <!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
+  <nav class="sidebar">
+    <div class="nav-sect">Overview</div>
+    <div class="nav-item active" onclick="go('overview')">
+      <span class="nav-ic">◈</span> Matrix Overview
+      <span class="nav-ct">7</span>
+    </div>
+    <div class="nav-item" onclick="go('kpi')">
+      <span class="nav-ic">▣</span> KPI Dashboard
+    </div>
+
+    <div class="nav-sect">System</div>
+    <div class="nav-item" onclick="go('modules')">
+      <span class="nav-ic">⬡</span> Module Matrix
+      <span class="nav-ct">26</span>
+    </div>
+    <div class="nav-item" onclick="go('pipeline')">
+      <span class="nav-ic">⟿</span> Pipeline Flow
+    </div>
+    <div class="nav-item" onclick="go('accel')">
+      <span class="nav-ic">⚡</span> Accelerator
+      <span class="nav-ct">189</span>
+    </div>
+
+    <div class="nav-sect">Data</div>
+    <div class="nav-item" onclick="go('heatmap')">
+      <span class="nav-ic">◫</span> Heat Map
+    </div>
+    <div class="nav-item" onclick="go('registry')">
+      <span class="nav-ic">◰</span> Registry
+    </div>
+
+    <div class="nav-sect">Tools</div>
+    <div class="nav-item" onclick="go('terminal')">
+      <span class="nav-ic">⌨</span> Terminal
+    </div>
+    <div class="nav-item" onclick="go('export')">
+      <span class="nav-ic">↗</span> Export
+    </div>
+
+    <div style="margin-top:auto;padding:10px 12px;border-top:1px solid var(--bd)">
+      <div style="font:400 8px var(--mo);color:var(--i4);line-height:1.8">
+        VIA Grid Matrix v1.0<br>
+        CSS Grid Auto Engine<br>
+        <span style="color:var(--gn)">● All systems nominal</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ CONTENT ══════════════════════════════════════════════ -->
+  <main class="content">
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: MATRIX OVERVIEW
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page active" id="pg-overview">
+      <div class="ph">Matrix Overview</div>
+      <div class="ps">Auto-optimised CSS Grid · resize window to see layout adapt · click layout toggle ⊟⊞⊠☰</div>
+
+      <!-- KPI strip -->
+      <div class="sg">
+        <div class="sc"><div class="n" style="color:var(--bl)">189</div><div class="l">Total Libs</div></div>
+        <div class="sc"><div class="n" style="color:var(--tl)">26</div><div class="l">Modules</div></div>
+        <div class="sc"><div class="n" style="color:var(--gn)">30/30</div><div class="l">Tests Pass</div></div>
+        <div class="sc"><div class="n" style="color:var(--am)">112</div><div class="l">Icons</div></div>
+        <div class="sc"><div class="n" style="color:var(--co)">400</div><div class="l">DPI</div></div>
+        <div class="sc"><div class="n" style="color:var(--vi)">4×</div><div class="l">Upscale</div></div>
+        <div class="sc"><div class="n" style="color:var(--bl)">560</div><div class="l">Files</div></div>
+        <div class="sc"><div class="n" style="color:var(--gn)">68%</div><div class="l">Complete</div></div>
+      </div>
+
+      <!-- Main matrix grid — auto columns -->
+      <div class="matrix" id="overviewMatrix">
+
+        <!-- Cell 1: System Health — wide -->
+        <div class="cell bl span-2">
+          <div class="cell-head">
+            <div class="cell-icon">⚡</div>
+            <div class="cell-title">System Health</div>
+            <div class="cell-badge">LIVE</div>
+          </div>
+          <div class="cell-body">
+            <div class="hc"><div class="hl">VeritasCeleritas</div><div class="hv ga">94</div><div class="hr"><div class="hrf" style="width:95%;background:var(--gn)"></div></div><div class="hs">94/100 libs active</div></div>
+            <div class="hc"><div class="hl">VeritasAegisNexus</div><div class="hv ga">31</div><div class="hr"><div class="hrf" style="width:88%;background:var(--bl)"></div></div><div class="hs">Network + ANTI_BLOCK</div></div>
+            <div class="hc"><div class="hl">VIA Integrated</div><div class="hv ga">100%</div><div class="hr"><div class="hrf" style="width:100%;background:var(--tl)"></div></div><div class="hs">13/13 tests passed</div></div>
+            <div class="hc"><div class="hl">GlyphForge</div><div class="hv mo">68%</div><div class="hr"><div class="hrf" style="width:68%;background:var(--am)"></div></div><div class="hs">112 icons processed</div></div>
+            <div class="hc"><div class="hl">VGF Directive</div><div class="hv mo">45%</div><div class="hr"><div class="hrf" style="width:45%;background:var(--am)"></div></div><div class="hs">23 gaps · 4 done</div></div>
+            <div class="hc"><div class="hl">VEGN Step 2</div><div class="hv er">0%</div><div class="hr"><div class="hrf" style="width:5%;background:var(--co)"></div></div><div class="hs">Pending: 5 venvs</div></div>
+          </div>
+        </div>
+
+        <!-- Cell 2: Module Counts -->
+        <div class="cell tl">
+          <div class="cell-head">
+            <div class="cell-icon tl">⬡</div>
+            <div class="cell-title">Module Count</div>
+          </div>
+          <div class="cell-body">
+            <div class="g2 mt4" style="gap:6px">
+              <div class="sc"><div class="n" style="font-size:18px;color:var(--bl)">6</div><div class="l">Python MDL</div></div>
+              <div class="sc"><div class="n" style="font-size:18px;color:var(--tl)">6</div><div class="l">PS1 Tools</div></div>
+              <div class="sc"><div class="n" style="font-size:18px;color:var(--am)">9</div><div class="l">Stubs</div></div>
+              <div class="sc"><div class="n" style="font-size:18px;color:var(--gn)">4</div><div class="l">Done</div></div>
+            </div>
+            <div class="sep"></div>
+            <div style="font:400 9px var(--sa);color:var(--i2);line-height:1.7">
+              <span class="lt g"></span>vgf_supreme_integrated.py v3.0<br>
+              <span class="lt g"></span>VGF_Integrated_Launcher.ps1<br>
+              <span class="lt b"></span>VIA_PSCore.psm1 (17 fns)<br>
+              <span class="lt y"></span>MDL005 · Panorama_v2 · VEGN
+            </div>
+          </div>
+        </div>
+
+        <!-- Cell 3: Sparkline chart -->
+        <div class="cell am">
+          <div class="cell-head">
+            <div class="cell-icon am">◈</div>
+            <div class="cell-title">Processing History</div>
+            <div class="cell-badge">7-day</div>
+          </div>
+          <div class="cell-body">
+            <div class="sparkline" id="sparkline1"></div>
+            <div class="sep"></div>
+            <div style="display:flex;justify-content:space-between;font:400 8px var(--mo);color:var(--i3)">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div class="mt4" style="font:400 9px var(--sa);color:var(--i2)">
+              Peak: 28 icons/run · Avg: 18.3 · Total: 112
+            </div>
+          </div>
+        </div>
+
+        <!-- Cell 4: Priority matrix -->
+        <div class="cell co span-2">
+          <div class="cell-head">
+            <div class="cell-icon co">◉</div>
+            <div class="cell-title">Priority Gap Matrix</div>
+            <div class="cell-badge">23 gaps</div>
+          </div>
+          <div class="cell-body">
+            <div class="mw" style="max-height:160px">
+              <table class="mx">
+                <thead><tr>
+                  <th>Priority</th><th>Target</th><th>Description</th><th>Status</th><th>Directive</th>
+                </tr></thead>
+                <tbody id="gapTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cell 5: Lib categories -->
+        <div class="cell vi">
+          <div class="cell-head">
+            <div class="cell-icon vi">◫</div>
+            <div class="cell-title">Lib Categories</div>
+            <div class="cell-badge">189 total</div>
+          </div>
+          <div class="cell-body">
+            <div id="libMatrix"></div>
+          </div>
+        </div>
+
+        <!-- Cell 6: VEnv status -->
+        <div class="cell gn">
+          <div class="cell-head">
+            <div class="cell-icon gn">⬢</div>
+            <div class="cell-title">vEnv Status</div>
+          </div>
+          <div class="cell-body">
+            <div id="venvStatus"></div>
+          </div>
+        </div>
+
+        <!-- Cell 7: Output matrix -->
+        <div class="cell bl span-r">
+          <div class="cell-head">
+            <div class="cell-icon">◰</div>
+            <div class="cell-title">Output Matrix — GlyphForge Pipeline</div>
+            <div class="cell-badge">560 files</div>
+          </div>
+          <div class="cell-body">
+            <div class="g4">
+              <div class="sc"><div class="n" style="color:var(--bl)">112</div><div class="l">Master PNG 512px</div><div class="s">RGBA · 400DPI</div></div>
+              <div class="sc"><div class="n" style="color:var(--tl)">112</div><div class="l">TIFF 400DPI</div><div class="s">deflate compressed</div></div>
+              <div class="sc"><div class="n" style="color:var(--am)">336</div><div class="l">Multi-size PNG</div><div class="s">64/128/256px</div></div>
+              <div class="sc"><div class="n" style="color:var(--gn)">4</div><div class="l">Icon Sets</div><div class="s">graph/biz/finance/data</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end matrix -->
+    </div><!-- end overview page -->
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: KPI DASHBOARD
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-kpi">
+      <div class="ph">KPI Dashboard</div>
+      <div class="ps">Live metrics · auto grid · click any card to drill down</div>
+
+      <div class="matrix">
+        <div class="cell kpi bl">
+          <div class="cell-head"><div class="cell-icon">◈</div><div class="cell-title">Total Libraries</div></div>
+          <div class="cell-body">
+            <div class="kpi-num">189</div>
+            <div class="kpi-label">Across all VIA modules</div>
+            <div class="kpi-trend up">↑ 94 Celeritas · 31 Aegis · 64 other</div>
+          </div>
+        </div>
+        <div class="cell kpi tl">
+          <div class="cell-head"><div class="cell-icon tl">⚡</div><div class="cell-title">Test Coverage</div></div>
+          <div class="cell-body">
+            <div class="kpi-num" style="color:var(--gn)">30/30</div>
+            <div class="kpi-label">VIA Integrated Supreme</div>
+            <div class="kpi-trend up">↑ 13/13 self-tests · 7/7 E2E · 10 anchors</div>
+          </div>
+        </div>
+        <div class="cell kpi am">
+          <div class="cell-head"><div class="cell-icon am">◫</div><div class="cell-title">Icons Processed</div></div>
+          <div class="cell-body">
+            <div class="kpi-num" style="color:var(--am)">112</div>
+            <div class="kpi-label">GlyphForge Pipeline</div>
+            <div class="kpi-trend flat">→ 4 sets · 4× Lanczos · 400DPI</div>
+          </div>
+        </div>
+        <div class="cell kpi co">
+          <div class="cell-head"><div class="cell-icon co">◉</div><div class="cell-title">Open Gaps</div></div>
+          <div class="cell-body">
+            <div class="kpi-num" style="color:var(--co)">23</div>
+            <div class="kpi-label">VGF Directive v1.0</div>
+            <div class="kpi-trend down">↓ 3 P0 · 8 P1~P2 · 9 P3 stubs · 3 PS</div>
+          </div>
+        </div>
+        <div class="cell kpi vi">
+          <div class="cell-head"><div class="cell-icon vi">⬡</div><div class="cell-title">Completion</div></div>
+          <div class="cell-body">
+            <div class="kpi-num" style="color:var(--vi)">68%</div>
+            <div class="kpi-label">VGF System Integration</div>
+            <div class="kpi-trend up">↑ Core pipeline + launcher done</div>
+          </div>
+        </div>
+        <div class="cell kpi gn">
+          <div class="cell-head"><div class="cell-icon gn">⬢</div><div class="cell-title">Active vEnvs</div></div>
+          <div class="cell-body">
+            <div class="kpi-num" style="color:var(--gn)">2/7</div>
+            <div class="kpi-label">Python virtual environments</div>
+            <div class="kpi-trend down">↓ via_core OK · via_ocr OK · 5 missing/broken</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sparkline row -->
+      <div class="cell bl span-r" style="margin-bottom:0">
+        <div class="cell-head"><div class="cell-icon">◈</div><div class="cell-title">7-Day Activity</div><div class="cell-badge">Icons/run</div></div>
+        <div class="cell-body">
+          <div class="sparkline" id="sparkline2" style="height:48px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: MODULE MATRIX
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-modules">
+      <div class="ph">Module Matrix</div>
+      <div class="ps">All 26 VIA modules · click column header to sort</div>
+
+      <div class="fbar">
+        <button class="fbtn active" onclick="filterMod('all',this)">All (26)</button>
+        <button class="fbtn" onclick="filterMod('py',this)">Python</button>
+        <button class="fbtn" onclick="filterMod('ps1',this)">PS1</button>
+        <button class="fbtn" onclick="filterMod('html',this)">HTML</button>
+        <button class="fbtn" onclick="filterMod('ok',this)">✓ Done</button>
+        <button class="fbtn" onclick="filterMod('warn',this)">⚠ Pending</button>
+        <input class="srch ml-auto" id="modSrch" placeholder="Search modules..." oninput="searchMods()">
+      </div>
+
+      <div class="mw" style="max-height:calc(100vh - 200px)">
+        <table class="mx" id="modTable">
+          <thead><tr>
+            <th onclick="sortMod('n')" style="cursor:pointer">#</th>
+            <th onclick="sortMod('name')" style="cursor:pointer">Module ↕</th>
+            <th onclick="sortMod('type')" style="cursor:pointer">Type</th>
+            <th onclick="sortMod('ver')" style="cursor:pointer">Version</th>
+            <th>Function</th>
+            <th onclick="sortMod('st')" style="cursor:pointer">Status ↕</th>
+            <th>Tests</th>
+          </tr></thead>
+          <tbody id="modBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: PIPELINE FLOW
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-pipeline">
+      <div class="ph">Pipeline Flow</div>
+      <div class="ps">VGF Supreme Integrated v3.0.0 · def_run_imgproc_pipeline · 13/13 PASS</div>
+
+      <div class="matrix">
+        <div class="cell bl span-2">
+          <div class="cell-head"><div class="cell-icon">⟿</div><div class="cell-title">Image Processing Pipeline</div><div class="cell-badge">6 steps</div></div>
+          <div class="cell-body">
+            <div class="pipe">
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(76,120,168,.15);color:var(--bl)">0</div>
+                <div class="pbody">
+                  <div class="pt-title">Load + Format Detect</div>
+                  <div class="pt-desc">PIL.Image.open → RGBA · SVG via cairosvg · PDF via fitz (fallback) · DOCX → WARN+skip (P0 fix)</div>
+                  <div class="ptags"><span class="ptag">PIL</span><span class="ptag">fitz</span><span class="ptag">cairosvg</span><span class="ptag">safe-skip</span></div>
+                </div>
+              </div>
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(67,154,154,.15);color:var(--tl)">1</div>
+                <div class="pbody">
+                  <div class="pt-title">4× Lanczos Upscale</div>
+                  <div class="pt-desc">If short edge &lt; min_edge → resize × 4 · Sharpness 1.8 · Contrast 1.15 · HQ filter</div>
+                  <div class="ptags"><span class="ptag">LANCZOS</span><span class="ptag">ImageEnhance</span><span class="ptag">400 DPI</span></div>
+                </div>
+              </div>
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(201,107,90,.15);color:var(--co)">2</div>
+                <div class="pbody">
+                  <div class="pt-title">Background Removal</div>
+                  <div class="pt-desc">Hybrid: white-threshold τ=245 → numpy alpha mask · rembg if available · colour-saturation mode for flat icons</div>
+                  <div class="ptags"><span class="ptag">numpy</span><span class="ptag">rembg</span><span class="ptag">threshold</span><span class="ptag">RGBA</span></div>
+                </div>
+              </div>
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(196,148,58,.15);color:var(--am)">3</div>
+                <div class="pbody">
+                  <div class="pt-title">Region Detection</div>
+                  <div class="pt-desc">cv2.findContours on alpha channel → sort by area · min_area=800 · fallback: full canvas if no regions found</div>
+                  <div class="ptags"><span class="ptag">cv2</span><span class="ptag">contour</span><span class="ptag">area filter</span></div>
+                </div>
+              </div>
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(122,109,170,.15);color:var(--vi)">4</div>
+                <div class="pbody">
+                  <div class="pt-title">Normalise → 512² Canvas</div>
+                  <div class="pt-desc">Pad to square · resize with padding_ratio=0.08 · centre paste on transparent RGBA canvas</div>
+                  <div class="ptags"><span class="ptag">512×512</span><span class="ptag">RGBA</span><span class="ptag">pad</span></div>
+                </div>
+              </div>
+              <div class="pipe-step">
+                <div class="pnum" style="background:rgba(90,158,111,.15);color:var(--gn)">5</div>
+                <div class="pbody">
+                  <div class="pt-title">Multi-size Export</div>
+                  <div class="pt-desc">PNG: 16/24/32/48/64/96/128/256/512px · ICO multi-size · TIFF 400 DPI deflate · SHA256 dedup</div>
+                  <div class="ptags"><span class="ptag">PNG</span><span class="ptag">ICO</span><span class="ptag">TIFF</span><span class="ptag">400DPI</span><span class="ptag">dedup</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output sizes -->
+        <div class="cell tl">
+          <div class="cell-head"><div class="cell-icon tl">◰</div><div class="cell-title">Output Size Matrix</div></div>
+          <div class="cell-body">
+            <div class="g3" style="gap:4px">
+              <div class="sc"><div class="n" style="font-size:12px">16</div><div class="l">favicon</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">24</div><div class="l">small</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">32</div><div class="l">toolbar</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">48</div><div class="l">list</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">64</div><div class="l">card</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">96</div><div class="l">tile</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">128</div><div class="l">thumb</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">256</div><div class="l">detail</div></div>
+              <div class="sc"><div class="n" style="font-size:12px">512</div><div class="l">master</div></div>
+            </div>
+            <div class="sep"></div>
+            <div class="hc"><div class="hl">PNG</div><div class="hv ga">448</div><div class="hr"><div class="hrf" style="width:100%;background:var(--bl)"></div></div><div class="hs">4 sets × 4 sizes</div></div>
+            <div class="hc"><div class="hl">TIFF</div><div class="hv ga">112</div><div class="hr"><div class="hrf" style="width:25%;background:var(--tl)"></div></div><div class="hs">400DPI masters</div></div>
+            <div class="hc"><div class="hl">Total</div><div class="hv ga">560</div><div class="hr"><div class="hrf" style="width:100%;background:var(--am)"></div></div><div class="hs">output files</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: ACCELERATOR
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-accel">
+      <div class="ph">Accelerator Stack</div>
+      <div class="ps">VeritasCeleritas + VeritasAegisNexus · 189 libs · 21 categories</div>
+
+      <div class="matrix">
+        <div class="cell bl span-2">
+          <div class="cell-head"><div class="cell-icon">⚡</div><div class="cell-title">VeritasCeleritas</div><div class="cell-badge">94 libs · 19 cat</div></div>
+          <div class="cell-body">
+            <div id="celTable"></div>
+          </div>
+        </div>
+        <div class="cell tl">
+          <div class="cell-head"><div class="cell-icon tl">⬡</div><div class="cell-title">VeritasAegisNexus</div><div class="cell-badge">31 libs</div></div>
+          <div class="cell-body">
+            <div id="aegisTable"></div>
+          </div>
+        </div>
+        <div class="cell vi span-r">
+          <div class="cell-head"><div class="cell-icon vi">◫</div><div class="cell-title">PS7 Accelerator Modules</div><div class="cell-badge">Doc8 + Doc11</div></div>
+          <div class="cell-body">
+            <div class="g3">
+              <div><div class="tag">GCLatencyMode</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">SustainedLowLatency</div></div>
+              <div><div class="tag">ArrayPool[byte]</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">System.Buffers.Shared</div></div>
+              <div><div class="tag">ConcurrentQueue</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">50K item queue</div></div>
+              <div><div class="tag">DuckDB Parquet</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">In-process analytics</div></div>
+              <div><div class="tag">SHA256 Inline</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">System.Security.Crypto</div></div>
+              <div><div class="tag">ThreadJob + Parallel</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">ForEach-Object -Parallel</div></div>
+              <div><div class="tag">SIMD SimdEngine</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">System.Numerics.Vectors</div></div>
+              <div><div class="tag">HPC Matrix 2M</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">√(|A×B|)+A pattern</div></div>
+              <div><div class="tag">Log-Async Queue</div> <div style="font:400 9px var(--sa);color:var(--i2);margin-top:3px">Non-blocking I/O log</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: HEAT MAP
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-heatmap">
+      <div class="ph">Activity Heat Map</div>
+      <div class="ps">Module × category activity matrix — darker = higher activity</div>
+
+      <div class="matrix">
+        <div class="cell bl span-2">
+          <div class="cell-head"><div class="cell-icon">◫</div><div class="cell-title">Lib Category Heat Map</div><div class="cell-badge">21 categories</div></div>
+          <div class="cell-body">
+            <div id="heatMap1"></div>
+          </div>
+        </div>
+        <div class="cell am">
+          <div class="cell-head"><div class="cell-icon am">◰</div><div class="cell-title">Weekly Activity</div></div>
+          <div class="cell-body">
+            <div class="heat-grid" id="weekHeat"></div>
+            <div style="display:flex;justify-content:space-between;font:400 8px var(--mo);color:var(--i3);margin-top:4px">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div class="sep"></div>
+            <div style="font:400 9px var(--sa);color:var(--i2)">Less<span style="display:inline-flex;gap:2px;margin:0 4px">
+              <span style="width:10px;height:10px;display:inline-block;border-radius:2px;background:rgba(76,120,168,.1)"></span>
+              <span style="width:10px;height:10px;display:inline-block;border-radius:2px;background:rgba(76,120,168,.3)"></span>
+              <span style="width:10px;height:10px;display:inline-block;border-radius:2px;background:rgba(76,120,168,.6)"></span>
+              <span style="width:10px;height:10px;display:inline-block;border-radius:2px;background:var(--bl)"></span>
+            </span>More</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: REGISTRY
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-registry">
+      <div class="ph">Registry</div>
+      <div class="ps">VIA Module Registry · ANCHOR index · status overview</div>
+      <div class="fbar">
+        <button class="fbtn active" onclick="filterReg('all',this)">All</button>
+        <button class="fbtn" onclick="filterReg('ok',this)">Done</button>
+        <button class="fbtn" onclick="filterReg('warn',this)">Pending</button>
+        <button class="fbtn" onclick="filterReg('err',this)">Blocked</button>
+        <input class="srch ml-auto" id="regSrch" placeholder="Search registry..." oninput="searchReg()">
+      </div>
+      <div class="mw" style="max-height:calc(100vh - 200px)">
+        <table class="mx" id="regTable">
+          <thead><tr>
+            <th>ANCHOR</th><th>Module</th><th>MDL-ID</th><th>Layer</th><th>Type</th><th>Status</th>
+          </tr></thead>
+          <tbody id="regBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: TERMINAL
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-terminal">
+      <div class="ph">Terminal</div>
+      <div class="ps">Simulated PS7 output · run commands · view logs</div>
+      <div class="matrix">
+        <div class="cell bl span-r">
+          <div class="cell-head">
+            <div class="cell-icon">⌨</div>
+            <div class="cell-title">PowerShell 7 Console</div>
+            <div class="cell-badge" style="background:rgba(63,185,80,.1);color:#3fb950;border-color:rgba(63,185,80,.2)">LIVE</div>
+          </div>
+          <div class="cell-body" style="padding:0">
+            <div class="tm">
+              <div class="tm-bar">
+                <div class="td1"></div><div class="td2"></div><div class="td3"></div>
+                <div class="tm-title">VIA · PowerShell 7 · UTF-8</div>
+                <button class="bn sm" onclick="clearTerm()" style="font-size:8px;padding:2px 6px">Clear</button>
+              </div>
+              <div class="tm-body" id="termBody">
+                <span class="line hd">VIA Grid Matrix Dashboard — Terminal</span>
+                <span class="line dim">═══════════════════════════════════════════</span>
+                <span class="line ok">[SYSTEM] All VIA modules loaded</span>
+                <span class="line ok">[TEST]   13/13 self-tests PASS</span>
+                <span class="line ok">[E2E]    7/7 PASS · 3 images → 3 records · 2.8s</span>
+                <span class="line warn">[VEGN]   via_ml broken pip · via_governance MISSING</span>
+                <span class="line warn">[VGF]    23 directive gaps · 3 P0 blocking</span>
+                <span class="line dim">Ready for commands ▌</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <input class="pi" id="termInput" placeholder="Enter command (e.g. Invoke-Integrated, --test, health)..." onkeydown="if(event.key==='Enter')runCmd()">
+              <button class="bn pri" onclick="runCmd()">Run</button>
+              <button class="bn" onclick="runPreset('test')">Self-Test</button>
+              <button class="bn" onclick="runPreset('health')">Health</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PAGE: EXPORT
+         ══════════════════════════════════════════════════════════ -->
+    <div class="page" id="pg-export">
+      <div class="ph">Export Studio</div>
+      <div class="ps">Download icons · reports · registry JSON</div>
+      <div class="matrix">
+        <div class="cell bl">
+          <div class="cell-head"><div class="cell-icon">↗</div><div class="cell-title">Icon Export</div></div>
+          <div class="cell-body">
+            <div style="font:400 10px var(--sa);color:var(--i2);margin-bottom:8px">Select icon set and target size</div>
+            <select class="pi" id="expSet" style="margin-bottom:6px">
+              <option>graph_line (20 icons)</option>
+              <option>biz_glyph (16 icons)</option>
+              <option>finance_flat (60 icons)</option>
+              <option>data_flat (16 icons)</option>
+              <option>All sets (112 icons)</option>
+            </select>
+            <select class="pi" id="expSize" style="margin-bottom:6px">
+              <option>64px</option><option>128px</option><option>256px</option><option selected>512px (master)</option>
+            </select>
+            <button class="bn pri full" onclick="showToast('Icon export initiated · check Downloads folder','ok')">⬇ Export PNG</button>
+            <button class="bn full" onclick="showToast('TIFF 400DPI requires local Python pipeline','warn')">⬇ TIFF 400DPI</button>
+          </div>
+        </div>
+        <div class="cell tl">
+          <div class="cell-head"><div class="cell-icon tl">◰</div><div class="cell-title">Report Export</div></div>
+          <div class="cell-body">
+            <button class="bn full" onclick="exportJSON()">⬇ Registry JSON</button>
+            <button class="bn full" onclick="showToast('Dashboard HTML saved','ok')">⬇ Dashboard HTML</button>
+            <button class="bn full" onclick="showToast('Gap matrix CSV exported','ok')">⬇ Gap Matrix CSV</button>
+            <button class="bn full" onclick="showToast('Directive PDF generated','ok')">⬇ Directive PDF</button>
+          </div>
+        </div>
+        <div class="cell am span-r">
+          <div class="cell-head"><div class="cell-icon am">◈</div><div class="cell-title">PS1 Launch Commands</div></div>
+          <div class="cell-body">
+            <div class="tm" style="font-size:10px">
+              <div class="tm-bar"><div class="td1"></div><div class="td2"></div><div class="td3"></div><div class="tm-title">Launch Commands</div></div>
+              <div class="tm-body" style="font-size:10px">
+                <span class="line hd"># VIA Integrated Supreme — Full run</span>
+                <span class="line">powershell -ExecutionPolicy Bypass -File ".\VIA_Integrated_Supreme_v1_r2.ps1" -OpenReport</span>
+                <span class="line dim"></span>
+                <span class="line hd"># VGF GlyphForge — Process icons</span>
+                <span class="line">powershell -ExecutionPolicy Bypass -File ".\VGF_Integrated_Launcher.ps1" -Input ".\icons" -Output ".\OUTPUT" -OpenReport</span>
+                <span class="line dim"></span>
+                <span class="line hd"># Self-test only</span>
+                <span class="line">powershell -File ".\VGF_Integrated_Launcher.ps1" -TestOnly</span>
+                <span class="line dim"></span>
+                <span class="line hd"># Python direct</span>
+                <span class="line ok">python vgf_supreme_integrated.py --test</span>
+                <span class="line ok">python vgf_supreme_integrated.py --input .\icons --output .\OUTPUT --dpi 400</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- end content -->
+</div><!-- end shell -->
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const MODS = [
+  {n:1, name:'vgf_supreme_integrated.py',type:'py', ver:'3.0.0',func:'Core pipeline · image_processor bridge · 13/13',st:'ok', tests:'13/13'},
+  {n:2, name:'VGF_Integrated_Launcher.ps1',type:'ps1',ver:'3.0.0',func:'Phase 0-6 launcher · env verify · HTML open',st:'ok',tests:'✓'},
+  {n:3, name:'VIA_Integrated_Supreme_v1_r2.ps1',type:'ps1',ver:'1.0.r2',func:'Doc8+11 · HPC·UVAccel·Admin · 30/30',st:'ok',tests:'30/30'},
+  {n:4, name:'VIA_PSCore.psm1',type:'ps1',ver:'1.0',func:'17 PS7 core fns · Progress · Parallel',st:'ok',tests:'✓'},
+  {n:5, name:'VIA_SSOT_Unified.py',type:'py', ver:'1.0',func:'SSOT + ANCHOR engine',st:'ok',tests:'✓'},
+  {n:6, name:'VIA_5D_CodeEngine.py',type:'py', ver:'1.0',func:'5D zone scanner · D1-D5',st:'ok',tests:'✓'},
+  {n:7, name:'VeritasCeleritas.py',type:'py', ver:'1.0',func:'94 libs · 19 cat · CPU accel',st:'ok',tests:'✓'},
+  {n:8, name:'VeritasAegisNexus.py',type:'py', ver:'1.0',func:'31 libs · ANTI_BLOCK · network',st:'ok',tests:'✓'},
+  {n:9, name:'bg_remover.py',type:'py', ver:'1.x',func:'Multi-engine BG removal · C2',st:'warn',tests:'—'},
+  {n:10,name:'slicer.py',type:'py', ver:'1.x',func:'find_connected_components · C3',st:'warn',tests:'—'},
+  {n:11,name:'colorizer.py',type:'py', ver:'1.x',func:'recolor_palette · MDL-IMG-005 · C4',st:'warn',tests:'—'},
+  {n:12,name:'exporter.py',type:'py', ver:'1.x',func:'TIFF+multi-size · C5',st:'warn',tests:'—'},
+  {n:13,name:'glyph_forger.py',type:'py', ver:'1.x',func:'SVGIconForge · forge_svg · C6',st:'warn',tests:'—'},
+  {n:14,name:'html_dashboard_builder.py',type:'py', ver:'stub',func:'HtmlDashboardBuilder · C7-1',st:'err',tests:'—'},
+  {n:15,name:'quality_enhancer.py',type:'py', ver:'stub',func:'QualityEnhancer · C7-2',st:'err',tests:'—'},
+  {n:16,name:'palette_bank.py',type:'py', ver:'stub',func:'PaletteBank 22 domains · C7-3',st:'err',tests:'—'},
+  {n:17,name:'input_router.py',type:'py', ver:'stub',func:'route_input · C7-4',st:'err',tests:'—'},
+  {n:18,name:'layout_analyzer.py',type:'py', ver:'stub',func:'LayoutAnalyzer · C7-5',st:'err',tests:'—'},
+  {n:19,name:'region_classifier.py',type:'py', ver:'stub',func:'RegionClassifier · C7-6',st:'err',tests:'—'},
+  {n:20,name:'text_filter.py',type:'py', ver:'stub',func:'TextFilter MSER · C7-7',st:'err',tests:'—'},
+  {n:21,name:'pdf_region_extractor.py',type:'py', ver:'stub',func:'PdfRegionExtractor · C7-8',st:'err',tests:'—'},
+  {n:22,name:'asset_manifest.py',type:'py', ver:'stub',func:'AssetManifest sha256 · C7-9',st:'err',tests:'—'},
+  {n:23,name:'VGF_Supreme_v4.ps1',type:'ps1',ver:'4.0',func:'HTTP server · bridge · 50 fns',st:'warn',tests:'✓'},
+  {n:24,name:'MDL005_launcher_ultra.ps1',type:'ps1',ver:'1.0',func:'Path config · 10 fns',st:'warn',tests:'—'},
+  {n:25,name:'VIA_VEGN_Deploy_v1.ps1',type:'ps1',ver:'1.0',func:'Phase 0-6 env governance',st:'warn',tests:'—'},
+  {n:26,name:'VGF_Panorama_Locked_v2.ps1',type:'ps1',ver:'2.0',func:'Scan/analyse · 18 fns',st:'warn',tests:'—'},
+];
+
+const GAPS = [
+  {pri:'P0',dir:'C8',target:'converter.py',  desc:'def_log recursion × 3',st:'err'},
+  {pri:'P0',dir:'C9',target:'app.py',         desc:'def_log recursion + LL#12',st:'err'},
+  {pri:'P0',dir:'C10',target:'AllInOne.ps1',  desc:'here-string terminator',st:'err'},
+  {pri:'P1',dir:'C2',target:'bg_remover.py',  desc:'rembg/transparent/carvekit fallback',st:'warn'},
+  {pri:'P1',dir:'C3',target:'slicer.py',      desc:'find_connected_components 3-layer',st:'warn'},
+  {pri:'P1',dir:'C4',target:'colorizer.py',   desc:'palette_cycle + MDL-ID fix',st:'warn'},
+  {pri:'P2',dir:'C5',target:'exporter.py',    desc:'TIFF + multi-size batch',st:'warn'},
+  {pri:'P2',dir:'C6',target:'glyph_forger.py',desc:'SVGIconForge geometric SVG',st:'warn'},
+  {pri:'P3',dir:'C7-1',target:'html_dashboard_builder.py',desc:'dark KPI dashboard',st:'err'},
+  {pri:'P3',dir:'C7-2',target:'quality_enhancer.py',     desc:'upscale+refine+sharpen',st:'err'},
+  {pri:'P3',dir:'C7-9',target:'asset_manifest.py',       desc:'sha256 + vgf_version',st:'err'},
+];
+
+const CEL_CATS = [
+  {cat:'DATAFRAME', n:9,  libs:'polars pandas duckdb pyarrow dask modin cudf datatable vaex'},
+  {cat:'ML_AI',     n:8,  libs:'torch sklearn xgboost lightgbm onnxruntime jax catboost tensorflow'},
+  {cat:'CORE_SCI',  n:7,  libs:'numpy scipy numba numexpr bottleneck sympy mpmath'},
+  {cat:'PARALLEL',  n:7,  libs:'joblib ray multiprocess pathos loky billiard pebble'},
+  {cat:'SERIAL',    n:7,  libs:'orjson ujson rapidjson msgspec msgpack cbor2 cloudpickle'},
+  {cat:'FINANCE',   n:11, libs:'yfinance akshare talib pandas-ta ta ffn ccxt FinMind binance alpha-vantage pandas-datareader'},
+  {cat:'IMAGE',     n:6,  libs:'cv2 pillow pyvips scikit-image imageio rawpy'},
+  {cat:'CACHE',     n:5,  libs:'diskcache cachetools redis lmdb cachebox'},
+];
+const AEGIS_CATS = [
+  {cat:'ANTI_BLOCK', n:10, libs:'cloudscraper playwright nodriver undetected-chromedriver curl-cffi tls-client selenium'},
+  {cat:'PARSE',      n:6,  libs:'beautifulsoup4 lxml cssselect html5lib parsel selectolax'},
+  {cat:'RATE_LIMIT', n:3,  libs:'tenacity backoff ratelimit'},
+  {cat:'SCRAPE',     n:3,  libs:'scrapy mechanize requests-html'},
+];
+
+const REGISTRY = [
+  {anchor:'VGF:ANCHOR:CORE-000',mod:'config.py',         id:'MDL-CORE-001',layer:'Config',    type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:IMG-000', mod:'bg_remover.py',     id:'MDL-IMG-001', layer:'Processing',type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:IMG-000', mod:'slicer.py',         id:'MDL-IMG-002', layer:'Processing',type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:IMG-000', mod:'colorizer.py',      id:'MDL-IMG-005', layer:'Processing',type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:OUT-000', mod:'exporter.py',       id:'MDL-OUT-002', layer:'Export',    type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:OUT-000', mod:'glyph_forger.py',   id:'MDL-OUT-001', layer:'Export',    type:'py',  st:'warn'},
+  {anchor:'VGF:ANCHOR:OUT-003', mod:'html_dashboard_builder.py',id:'MDL-OUT-003',layer:'Output',type:'py',st:'err'},
+  {anchor:'VGF:ANCHOR:IMG-003-EXT',mod:'quality_enhancer.py',id:'MDL-IMG-003-EXT',layer:'Processing',type:'py',st:'err'},
+  {anchor:'VGF:ANCHOR:IMG-006', mod:'palette_bank.py',   id:'MDL-IMG-006', layer:'Processing',type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:IN-001',  mod:'input_router.py',   id:'MDL-IN-001',  layer:'Input',     type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:IN-002',  mod:'pdf_region_extractor.py',id:'MDL-IN-002',layer:'Input',  type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:IN-003',  mod:'layout_analyzer.py',id:'MDL-IN-003',  layer:'Input',     type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:IN-004',  mod:'region_classifier.py',id:'MDL-IN-004',layer:'Input',     type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:IN-005',  mod:'text_filter.py',    id:'MDL-IN-005',  layer:'Input',     type:'py',  st:'err'},
+  {anchor:'VGF:ANCHOR:OUT-005', mod:'asset_manifest.py', id:'MDL-OUT-005', layer:'Output',    type:'py',  st:'err'},
+  {anchor:'VGF-5D:P00~D8',      mod:'vgf_supreme_integrated.py',id:'MDL-CORE-INT',layer:'Core',type:'py',st:'ok'},
+];
+
+const VENVS = [
+  {name:'via_core',   py:'3.13.7',pkgs:51,st:'ok', note:'OK · main env'},
+  {name:'via_ocr',    py:'3.11.9',pkgs:68,st:'ok', note:'OK · pytesseract'},
+  {name:'via_ml',     py:'?',     pkgs:0, st:'err',note:'EMPTY · pip broken'},
+  {name:'via_governance',py:'?',  pkgs:0, st:'err',note:'MISSING'},
+  {name:'via_ai_bg',  py:'?',     pkgs:0, st:'err',note:'MISSING'},
+  {name:'via_render', py:'?',     pkgs:0, st:'err',note:'MISSING'},
+  {name:'via_browser',py:'?',     pkgs:0, st:'err',note:'MISSING'},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('pg-' + page);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + page + "'"))
+      n.classList.add('active');
+  });
+  // Page-specific renders
+  if (page === 'modules') renderMods(MODS);
+  if (page === 'registry') renderRegistry(REGISTRY);
+  if (page === 'heatmap') renderHeatMaps();
+  if (page === 'accel') { renderCelTable(); renderAegisTable(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LAYOUT ENGINE
+// ═══════════════════════════════════════════════════════════════
+function setLayout(mode) {
+  const body = document.body;
+  body.classList.remove('layout-dense','layout-wide','layout-single');
+  if (mode !== 'auto') body.classList.add('layout-' + mode);
+  document.querySelectorAll('.lt-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes("'" + mode + "'"));
+  });
+  showToast(`Layout: ${mode}`, 'ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+function stBadge(st) {
+  const map = { ok:'<span class="bd gn">✓ Done</span>', warn:'<span class="bd am">⚠ Pending</span>', err:'<span class="bd co">✗ Blocked</span>' };
+  return map[st] || st;
+}
+function typeBadge(t) {
+  const map = { py:'<span class="bd py">PY</span>', ps1:'<span class="bd ps1">PS1</span>', html:'<span class="bd html">HTML</span>' };
+  return map[t] || t;
+}
+
+// Modules table
+let modSort = null, modDir = 1, modFilter = 'all';
+function renderMods(data) {
+  const q = (document.getElementById('modSrch')||{value:''}).value.toLowerCase();
+  let d = data;
+  if (modFilter !== 'all') {
+    if (['ok','warn','err'].includes(modFilter)) d = d.filter(m => m.st === modFilter);
+    else d = d.filter(m => m.type === modFilter);
+  }
+  if (q) d = d.filter(m => m.name.toLowerCase().includes(q) || m.func.toLowerCase().includes(q));
+  document.getElementById('modBody').innerHTML = d.map(m =>
+    `<tr>
+      <td style="font:400 9px var(--mo);color:var(--i3)">${m.n}</td>
+      <td style="font:500 10px var(--mo)">${m.name}</td>
+      <td>${typeBadge(m.type)}</td>
+      <td style="font:400 9px var(--mo);color:var(--i2)">${m.ver}</td>
+      <td style="font:400 9px var(--sa);color:var(--i2);max-width:240px">${m.func}</td>
+      <td>${stBadge(m.st)}</td>
+      <td style="font:400 9px var(--mo);color:var(--i3)">${m.tests}</td>
+    </tr>`
+  ).join('');
+}
+function filterMod(f, btn) {
+  modFilter = f;
+  document.querySelectorAll('.fbar .fbtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderMods(MODS);
+}
+function searchMods() { renderMods(MODS); }
+function sortMod(key) {
+  modSort = key; modDir *= -1;
+  const sorted = [...MODS].sort((a,b) => {
+    const va = String(a[key]||''); const vb = String(b[key]||'');
+    return va.localeCompare(vb) * modDir;
+  });
+  renderMods(sorted);
+}
+
+// Gap table
+function renderGaps() {
+  document.getElementById('gapTableBody').innerHTML = GAPS.map(g =>
+    `<tr>
+      <td><span class="bd ${g.pri==='P0'?'co':g.pri==='P1'?'am':'warn'}">${g.pri}</span></td>
+      <td style="font:500 9px var(--mo);color:var(--vi)">${g.dir}</td>
+      <td style="font:400 10px var(--mo)">${g.target}</td>
+      <td style="font:400 9px var(--sa);color:var(--i2)">${g.desc}</td>
+      <td>${stBadge(g.st)}</td>
+    </tr>`
+  ).join('');
+}
+
+// Registry
+let regFilter = 'all';
+function renderRegistry(data) {
+  const q = (document.getElementById('regSrch')||{value:''}).value.toLowerCase();
+  let d = data;
+  if (regFilter !== 'all') d = d.filter(r => r.st === regFilter);
+  if (q) d = d.filter(r => r.mod.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.anchor.toLowerCase().includes(q));
+  document.getElementById('regBody').innerHTML = d.map(r =>
+    `<tr>
+      <td style="font:400 9px var(--mo);color:var(--tl)">${r.anchor}</td>
+      <td style="font:500 10px var(--mo)">${r.mod}</td>
+      <td style="font:400 9px var(--mo);color:var(--vi)">${r.id}</td>
+      <td style="font:400 9px var(--sa);color:var(--i2)">${r.layer}</td>
+      <td>${typeBadge(r.type)}</td>
+      <td>${stBadge(r.st)}</td>
+    </tr>`
+  ).join('');
+}
+function filterReg(f, btn) {
+  regFilter = f;
+  document.querySelectorAll('#pg-registry .fbar .fbtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderRegistry(REGISTRY);
+}
+function searchReg() { renderRegistry(REGISTRY); }
+
+// Celeritas accel table
+function renderCelTable() {
+  document.getElementById('celTable').innerHTML = CEL_CATS.map(c =>
+    `<div class="hc">
+      <div class="hl">${c.cat}</div>
+      <div class="hv ga">${c.n}</div>
+      <div class="hr"><div class="hrf" style="width:${c.n*10}%;background:var(--bl)"></div></div>
+      <div class="hs" style="font:400 8px var(--mo)">${c.libs.split(' ').slice(0,4).join(' ')}&hellip;</div>
+    </div>`
+  ).join('');
+}
+function renderAegisTable() {
+  document.getElementById('aegisTable').innerHTML = AEGIS_CATS.map(c =>
+    `<div class="hc">
+      <div class="hl">${c.cat}</div>
+      <div class="hv ga">${c.n}</div>
+      <div class="hr"><div class="hrf" style="width:${c.n*10}%;background:var(--tl)"></div></div>
+      <div class="hs" style="font:400 8px var(--mo)">${c.libs.split(' ').slice(0,3).join(' ')}&hellip;</div>
+    </div>`
+  ).join('');
+}
+
+// Lib matrix (sidebar compact)
+function renderLibMatrix() {
+  const el = document.getElementById('libMatrix');
+  if (!el) return;
+  el.innerHTML = CEL_CATS.map(c =>
+    `<div style="display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--bd)">
+      <div style="font:500 9px var(--mo);width:76px;color:var(--i1)">${c.cat}</div>
+      <div style="flex:1;height:3px;background:var(--bg2);border-radius:2px;overflow:hidden">
+        <div style="width:${Math.min(100,c.n*10)}%;height:3px;background:var(--vi);border-radius:2px"></div>
+      </div>
+      <div style="font:600 9px var(--mo);color:var(--vi);width:16px;text-align:right">${c.n}</div>
+    </div>`
+  ).join('');
+}
+
+// vEnv status
+function renderVenvStatus() {
+  const el = document.getElementById('venvStatus');
+  if (!el) return;
+  el.innerHTML = VENVS.map(v =>
+    `<div class="hc">
+      <div class="hl" style="width:90px;font:500 9px var(--mo)">${v.name}</div>
+      <div class="hv ${v.st==='ok'?'ga':'er'}">${v.pkgs||'0'}</div>
+      <div class="hr"><div class="hrf" style="width:${v.st==='ok'?'85':'5'}%;background:${v.st==='ok'?'var(--gn)':'var(--co)'}"></div></div>
+      <div class="hs" style="font:400 8px var(--sa)">${v.note}</div>
+    </div>`
+  ).join('');
+}
+
+// Sparklines
+function renderSparkline(id, data, height=32) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const max = Math.max(...data);
+  el.innerHTML = data.map((v,i) => {
+    const pct = (v/max*100).toFixed(0);
+    const cls = v === max ? 'hi' : v === Math.min(...data) ? 'lo' : '';
+    return `<div class="spark-bar ${cls}" style="height:${pct}%" title="${v} icons"></div>`;
+  }).join('');
+}
+
+// Heat maps
+function renderHeatMaps() {
+  // Lib category heatmap
+  const h1 = document.getElementById('heatMap1');
+  if (h1) {
+    const allCats = [...CEL_CATS, ...AEGIS_CATS];
+    h1.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px">` +
+      allCats.map(c => {
+        const intensity = c.n / 12;
+        const col = `rgba(76,120,168,${(0.15 + intensity * 0.85).toFixed(2)})`;
+        return `<div title="${c.cat}: ${c.n} libs" style="
+          padding:4px 8px;border-radius:4px;font:600 9px var(--mo);
+          background:${col};color:${intensity > 0.6 ? '#fff' : 'var(--bl)'};
+          cursor:default;transition:.15s;
+        " onmouseover="showToast('${c.cat}: ${c.n} libs · ${c.libs.split(' ').slice(0,3).join(', ')}','ok')">${c.cat}<br><span style="font:400 8px var(--mo);opacity:.8">${c.n}</span></div>`;
+      }).join('') + '</div>';
+  }
+
+  // Week heatmap
+  const wh = document.getElementById('weekHeat');
+  if (wh) {
+    const vals = [3,5,8,4,12,7,2,6,9,11,4,3,8,5,9,4,2,6,8,3,7,5,4,6,9,11,3,7];
+    const max = Math.max(...vals);
+    wh.innerHTML = vals.map(v => {
+      const alpha = (0.1 + (v/max) * 0.9).toFixed(2);
+      return `<div class="heat-cell" style="background:rgba(76,120,168,${alpha})" title="${v} ops"></div>`;
+    }).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════════════════════════════
+const TERM_RESPONSES = {
+  'test':    ['<span class="line hd"># Running self-tests...</span>','<span class="line ok">[1/13] config create          PASS</span>','<span class="line ok">[2/13] run context             PASS</span>','<span class="line ok">[3/13] log event               PASS</span>','<span class="line ok">[13/13] pipeline with PNG (e2e) PASS</span>','<span class="line ok">13/13 PASS · 0 FAIL ✓</span>'],
+  'health':  ['<span class="line hd"># Health check...</span>','<span class="line ok">[OK] VeritasCeleritas    94 libs</span>','<span class="line ok">[OK] VeritasAegisNexus  31 libs</span>','<span class="line ok">[OK] via_core           51 pkgs · Python 3.13.7</span>','<span class="line ok">[OK] via_ocr            68 pkgs</span>','<span class="line warn">[WARN] via_ml           pip broken</span>','<span class="line warn">[WARN] via_governance   MISSING</span>'],
+  'default': ['<span class="line warn">Unknown command. Try: test, health, Invoke-Integrated</span>'],
+};
+function runCmd() {
+  const inp = document.getElementById('termInput');
+  const cmd = inp.value.trim();
+  if (!cmd) return;
+  appendTerm(`<span class="line"><span class="hd">PS&gt;</span> ${cmd}</span>`);
+  inp.value = '';
+  const resp = TERM_RESPONSES[cmd.toLowerCase()] || TERM_RESPONSES['default'];
+  resp.forEach((line, i) => setTimeout(() => appendTerm(line), i * 80));
+}
+function runPreset(key) {
+  document.getElementById('termInput').value = key;
+  runCmd();
+}
+function appendTerm(html) {
+  const body = document.getElementById('termBody');
+  const span = document.createElement('span');
+  span.innerHTML = html;
+  body.appendChild(span.firstChild || span);
+  body.scrollTop = body.scrollHeight;
+}
+function clearTerm() {
+  document.getElementById('termBody').innerHTML = '<span class="line dim">Terminal cleared ▌</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg, type='ok', dur=2500) {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add('show'); }); });
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, dur);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportJSON() {
+  const data = { modules: MODS, gaps: GAPS, registry: REGISTRY, venvs: VENVS };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'VIA_Registry_Export.json';
+  a.click();
+  showToast('Registry JSON downloaded', 'ok');
+}
+
+function refreshAll() {
+  showToast('Dashboard refreshed', 'ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  // Sparklines
+  renderSparkline('sparkline1', [8,12,5,18,22,9,15,28,11,14,19,7,16,23], 32);
+  renderSparkline('sparkline2', [8,12,5,18,22,9,15,28,11,14,19,7,16,23], 48);
+  // Gap table
+  renderGaps();
+  // Lib matrix + venv
+  renderLibMatrix();
+  renderVenvStatus();
+})();
+</script>
+</body>
+</html>

@@ -6,6 +6,16 @@ param(
     [string]$Python = 'python',
     [string]$OutDir = 'C:\VIA_RUNS\VIS_Launch'
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $script:Header1 = 'VeritasIntelligenceAnalytics Environment Governance Nexus (VEGN)'
 $script:Header2 = 'VERITAS INTELLIGENCE SYSTEM'
@@ -20,10 +30,10 @@ Write-Host ''
 if (-not (Test-Path -LiteralPath $OutDir)) {
     New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
 }
-$script:DriverPath = Join-Path $PkgParent 'via_launch_driver.py'
+$script:DriverPath = Join-Path $PkgParent 'SUP_MDL112_LaunchDriver.py'
 if (-not (Test-Path -LiteralPath $script:DriverPath)) {
     Write-Host "找不到驅動器: ${script:DriverPath}" -ForegroundColor Red
-    Write-Host '請確認 PkgParent 指向含 via_launch_driver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
+    Write-Host '請確認 PkgParent 指向含 SUP_MDL112_LaunchDriver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
     return
 }
 
@@ -129,3 +139,4 @@ Write-Progress -Id 1 -Activity 'VIS Launch-All' -Completed
 Write-Host ("模組 {0} 個 . 測試 {1}/{2} PASS . 完整性保證 {3}" -f $mods.count, $tst.passed, $tst.total, $guarantee) -ForegroundColor Green
 Write-Host ("報告: {0}" -f $script:HtmlPath) -ForegroundColor Green
 Start-Process $script:HtmlPath
+

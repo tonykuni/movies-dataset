@@ -239,6 +239,7 @@ VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL403_RegistryFull.json
 VeritasIntelligenceAnalytics/functional modules/VDF/registry_output/
 !VeritasIntelligenceAnalytics/VIA_Reports/VDF_Database_Status_Matrix_v0100.html
 !VeritasIntelligenceAnalytics/VIA_Reports/VIA_Grand_Summary_Matrix_v0100.html
+!VeritasIntelligenceAnalytics/VIA_Reports/VIA_SectorFlow_AllInOne_Dashboard_v0100.html
 _via_envmanager_output/
 # VRN OCR 批次車道產物(重擷取 staging;可再生)
 VeritasIntelligenceAnalytics/functional modules/VRN/staging/ocr_out/
@@ -247,3 +248,113 @@ VeritasIntelligenceAnalytics/functional modules/VAP/tools/RUN_*/
 VeritasIntelligenceAnalytics/VIA_Deploy_Config.json
 VeritasIntelligenceAnalytics/supportive modules/registry/VIA_MasterGovernance_SSOT_v0100.local.json
 VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Lib_Registry_v0100.json
+
+# GroupIndex M10 煙霧測試本機工具(OneClick [S3] 產生,可再生)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/smoke_tooling/
+
+# 月營收引擎生成物(demo/live 皆可再生)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/data/
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/output/
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/**/__pycache__/
+
+# VIA_GlobalETF_RiskModel run outputs (append-only, local)
+VIA_GlobalETF_RiskModel/output/
+
+# VMT 工作區 (帳本 / 報告 / 信稿 一律不進版控)
+VeritasMailTracker/
+vmt_workspace/
+**/data/*.jsonl
+**/reports/VMT_*.html
+
+# 稽核運行殘檔(勘誤 94c1396 制度化:runtime 存證只留本機,永不入庫)
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_Panorama_Six_*.html
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_Panorama_Six_*.json
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_SupportImport_Audit_*.json
+
+# VDF 輸出樞紐執行期產物(via-vdfout 每跑重生;樣本源檔已入 package_samples)
+VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/
+
+# 批68:族群流模擬系統 v0400 產物圈(28MB dashboard html+13MB csv 可再生,不入版控)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/flow_simulation_v0400/data/output/
+
+# 批88:母根對帳回滾快照=產物存證,留本地不入 git(GH001 100MB 上限實證)
+VeritasIntelligenceAnalytics/_via_mother_root_reconciliation_runs/
+
+# 批123:VAP TA 工廠 run 資料產物(本地存證,不入版控)
+VeritasIntelligenceAnalytics/functional modules/VAP/DATABASE/ta_runs/
+
+# 批124:VAP 正典 duckdb(二進位本機追溯庫,不入版控)
+VeritasIntelligenceAnalytics/functional modules/VAP/DATABASE/*.duckdb
+
+# 批128:總擷取 mega 產物圈(parquet/duckdb/run 存證,本地不入版控)
+VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/
+
+# 批152:族群輪動實跑產物圈(GRP_ENG040 每跑重生;heatmap/csv/html,不入版控)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/output_hub/
+
+# 批152:v0202 收容包內送達方樣跑產物 40MB(再生件;循批125 排除政策——
+# 本地保留存證,hash 由包內 PACKAGE_SHA256_MANIFEST_v0202.json 錄冊)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/VIA_TW_Grouping_LatestCommand_v0202/RUN_FINAL_V0201/
+VeritasIntelligenceAnalytics/VIA_Reports/md_out/
+VeritasIntelligenceAnalytics/VIA_Reports/vap_images/
+VeritasIntelligenceAnalytics/VIA_Reports/vofie_out/
+
+# 批269:工作站執行期再生存證(本機分流類;永不入雲端 git)
+VeritasIntelligenceAnalytics/functional modules/SubsystemsConsole/evidence/
+
+# 批279:標準儀表板頁=plotly 內嵌 4.8MB 日更再生類(引擎現產,不入 git)
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_StdDashboard_v*.html
+
+# 批288:AIO 指揮中心 runtime 產物(再生類不入 git)
+VeritasIntelligenceAnalytics/runtime_command_center/
+# 批303:兩專題 Plotly Dashboard 頁=日更再生類(plotly 內嵌 4MB+;判例=批279 StdDashboard)
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_ETFConsensusAnalysis_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_RevenueConsensusAnalysis_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_ETFRevenueMomentum_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_ActiveETFHoldingsHistory_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_ProductGate_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_ParallelLanes_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_AccelImport_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_VRNControlTower_v*.html
+# 側線 2026-09-24 第十五段:VRN 交易所財報模板頁=引擎現產再生類(VRN_ENG090 run / via-vrnui;不入 git;LL334 由 089 讓號)
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_VRNFinStatements_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_GroupClassIndex_v*.html
+VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_GroupBacktest_v*.html
+
+# VIA data governance 20260903_140524: data lives in C:\Users\tonyk\Github (never in git / never in AI context)
+/data/*
+!/data/WHERE_IS_DATA.md
+*.parquet
+*.duckdb
+*.feather
+*.h5
+*.hdf5
+*.sqlite
+*.sqlite3
+*.pkl
+*.pickle
+
+# VIA 2026-09-06 瘦身 · 不追蹤大檔 · 保留實體(批367 收窄:*.jsonl/*.zip 撤——VRN SSOT jsonl 為 16 引擎輸入、zip 為收容原件=只增不減;jpg/mp4 圖像資產 50.9MB 維持不追蹤)
+raw/
+processed/
+models/
+cache/
+*.mp4
+*.jpg
+
+# 批383 Grok 主控台收容:Python 模板 lib/ 規則不得吞掉前端 src/lib(TypeScript 主控台程式庫=收容原件只增不減)
+!VeritasIntelligenceAnalytics/supportive modules/references/intake/VIA_GrokConsole_AuroraAcorn_b383/src/lib/
+
+# 批511:EnvManager 執行期狀態(runs/snapshots 163MB)不入倉;快照留在側枝 local/parallel-b508-*
+VeritasIntelligenceAnalytics/.via_envmanager/
+
+# 批514 中央治理家族(VIA-SYS-MGR-001 主控台)產出:<root>/output/SYS 快照與 configs 預覽/參數(執行期;--commit 台帳 urn_registry.json 等仍可入倉)
+VeritasIntelligenceAnalytics/output/
+VeritasIntelligenceAnalytics/configs/*.preview.json
+VeritasIntelligenceAnalytics/configs/system_parameters.json
+VeritasIntelligenceAnalytics/_governance/
+# 批560:治理家族的成員自己會在**自己旁邊**產 _governance/ 輸出(實測:via-cgrouter 跑一次就在
+# supportive modules/VIA_Central_Governance/VIA_CentralGovernanceFamily_b514/ 底下生五個檔)。
+# 上一行只擋根目錄那一個,擋不住巢狀的 → 跑一次家族就會把執行產物混進正本夾(正本零觸碰破口)。
+VeritasIntelligenceAnalytics/**/_governance/
+ves_trace.jsonl

@@ -1,4 +1,18 @@
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 # Bridged by VDF_MDL001_Supportive_Bridge_v4 on 2026-04-26 02:33 for VIA_EnvManager
 
@@ -575,7 +589,7 @@ def def_load_route_table() -> List[Dict[str, Any]]:
             return payload
     return [
         {"pattern": "VIA_IntegrationSystem.py", "alias": "via_core", "reason": "core integration entry"},
-        {"pattern": "VDF_DataHub_Orchestrator.py", "alias": "via_vdf", "reason": "VDF orchestration"},
+        {"pattern": "VDF_ENG001_DataHubOrchestrator.py", "alias": "via_vdf", "reason": "VDF orchestration"},
         {"pattern": "vrn_mdl_003_table_extraction_engine_v_1.py", "alias": "camelot_311", "reason": "table extraction"},
         {"pattern": "vrn_mdl_004_layout_semantic_engine_v_1.py", "alias": "paddle_311", "reason": "layout semantic"},
         {"pattern": "vrn_mdl_005_ocrtext_fusion_engine_v_1.py", "alias": "paddle_311", "reason": "ocr fusion"},

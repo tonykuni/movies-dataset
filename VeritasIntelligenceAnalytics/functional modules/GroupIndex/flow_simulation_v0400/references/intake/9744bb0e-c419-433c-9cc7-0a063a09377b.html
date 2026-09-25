@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · 族群資金移動與板塊輪動監控 (時間序列升級版)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0; --sf: #fff; --bd: #dbd9d3; --ink: #1e1d1a; --sub: #6b6a66; --gr: #9c9890;
+    --up: #c96b5a; --dn: #5a9e6f; --bl: #4c78a8; --tl: #439a9a; --amber: #c4943a; --seal: #b5291a;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); margin: 0; padding: 22px; font-family: "DM Sans", "Noto Sans TC", sans-serif; font-size: 13px; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  .eyebrow { font-family: "DM Mono", monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--sub); }
+  h1 { font-family: "Syne"; font-weight: 800; font-size: 22px; margin: 6px 0 12px; }
+  .seal { display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 7px; background: var(--seal); color: #fff; font-weight: 900; margin-right: 8px; vertical-align: middle; }
+  .strip { height: 6px; border-radius: 2px; margin: 12px 0; background: linear-gradient(90deg, #b5291a, #c4943a, #439a9a, #4c78a8); }
+  .card { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; padding: 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; background: #faf9f6; padding: 12px; border-radius: 6px; border: 1px solid #eceae2; }
+  .controls label { font-weight: 600; color: var(--ink); font-size: 13px; }
+  select, input[type="range"] { padding: 6px; border: 1px solid var(--bd); border-radius: 4px; font-family: inherit; font-size: 13px; outline: none; }
+  
+  /* Table Styles */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { padding: 10px 8px; border-bottom: 1px solid #eceae2; text-align: left; vertical-align: middle; }
+  th { font-size: 10.5px; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; }
+  .mono { font-family: "DM Mono", monospace; font-size: 12px; }
+  .up { color: var(--up); font-weight: 600; }
+  .dn { color: var(--dn); font-weight: 600; }
+  .amber { color: var(--amber); font-weight: 700; }
+  
+  /* Visual Bars */
+  .bar-container { width: 80px; height: 6px; background: #eceae2; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 8px; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease, background 0.4s ease; }
+  
+  /* Multiple Tag */
+  .mul-tag { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; font-family: "DM Mono", monospace; }
+  .mul-hot { background: #fdf2f2; color: var(--seal); border: 1px solid var(--seal); }
+  .mul-warm { background: #f0f6fc; color: var(--bl); border: 1px solid var(--bl); }
+  .mul-cold { background: #faf9f6; color: var(--gr); border: 1px solid var(--bd); }
+
+  /* Alert Banner */
+  .alert-banner { padding: 12px; border-radius: 6px; font-weight: 600; margin-bottom: 16px; display: none; border-left: 4px solid transparent; }
+  .alert-danger { background: #fdf2f2; color: var(--seal); border-left-color: var(--seal); display: block; }
+  .alert-warning { background: #fffbf0; color: var(--amber); border-left-color: var(--amber); display: block; }
+  .alert-info { background: #f0f6fc; color: var(--bl); border-left-color: var(--bl); display: block; }
+
+  .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; color: white; background: var(--gr); }
+  .badge.lead { background: var(--bl); }
+  .badge.warn { background: var(--amber); }
+  .badge.danger { background: var(--seal); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="eyebrow">VERITAS INTELLIGENCE · TIME-SERIES FLOW EXPANSION ENGINE</div>
+  <h1><span class="seal">擴</span>VIA · 族群資金移動與板塊輪動 (含時間序列比較)</h1>
+  <div class="strip"></div>
+
+  <div class="card">
+    <div class="controls">
+      <label for="regime">🌏 總體市場情境 (Macro Regime)：</label>
+      <select id="regime">
+        <option value="AI_BULL">🚀 AI與半導體集中擴張 (Tech/AI Bull Run)</option>
+        <option value="ROTATION">🔄 資金輪動防禦與金融 (Rotation to Value/Financials)</option>
+        <option value="PANIC">⚠️ 系統性恐慌與多殺多 (Broad Panic & Margin Liquidation)</option>
+      </select>
+      
+      <label for="intensity" style="margin-left:auto;">⚡ 資金流動乘數：</label>
+      <input type="range" id="intensity" min="0.5" max="3" step="0.1" value="1">
+      <span id="intensityVal" class="mono">1.0x</span>
+    </div>
+    
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <table id="sectorTable">
+      <thead>
+        <tr>
+          <th>族群板塊 (Sector)</th>
+          <th>滾動歷史基準 (20d Median TS)</th>
+          <th>今日成交比重 (Today's TS)</th>
+          <th>資金擴張倍數 (TS Multiple)</th>
+          <th>法人淨流向 (Inst Flow)</th>
+          <th>融資淨增減 (Margin)</th>
+          <th>籌碼健康度診斷</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JS 動態生成 -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// 1. 模擬萃取自本地資料庫的歷史常態基準 (滾動20日中位數成交比重)
+const historicalBase = {
+  "半導體": { baseTS: 32.5, baseInst: 15.0, baseMargin: 2.0 },
+  "AI 伺服器": { baseTS: 18.0, baseInst: 8.0, baseMargin: 1.5 },
+  "貨櫃航運": { baseTS: 4.5, baseInst: 2.0, baseMargin: 0.8 },
+  "金融": { baseTS: 8.0, baseInst: 5.0, baseMargin: 0.5 },
+  "重電": { baseTS: 3.2, baseInst: 1.2, baseMargin: 0.6 },
+  "散熱": { baseTS: 2.8, baseInst: 1.0, baseMargin: 0.4 },
+  "CPO 共封裝光學": { baseTS: 1.5, baseInst: 0.5, baseMargin: 0.3 }
+};
+
+// 2. 定義情境矩陣 (Simulation Tensors)
+const scenarios = {
+  "AI_BULL": {
+    alert: "alert-info",
+    msg: "【政權診斷：科技牛市】資金高度集中於「半導體」與「AI 伺服器」，其成交比重擴張至歷史常態的 1.5 倍以上，法人大舉湧入。",
+    sectors: {
+      "半導體": { tsM: 1.4, instM: 3.5, margM: 0.5, diag: "💪 法人長效建倉" },
+      "AI 伺服器": { tsM: 1.8, instM: 4.0, margM: 0.8, diag: "🚀 強勢吸金中" },
+      "金融": { tsM: 0.5, instM: -0.5, margM: 0.1, diag: "💤 資金排擠觀望" },
+      "散熱": { tsM: 1.5, instM: 2.0, margM: 0.6, diag: "💪 次族群外溢效應" },
+      "CPO 共封裝光學": { tsM: 2.2, instM: 1.5, margM: 1.8, diag: "⚠️ 投機微過熱" }
+    },
+    default: { tsM: 0.8, instM: 0.2, margM: 0.5, diag: "⚖️ 中性平穩" }
+  },
+  "ROTATION": {
+    alert: "alert-warning",
+    msg: "【政權診斷：防禦輪動】資金自高位階電子權值撤出，傳產與金融的成交比重出現「翻倍式擴張 (>2.0x)」，這是標準的板塊輪動訊號。",
+    sectors: {
+      "半導體": { tsM: 0.7, instM: -3.5, margM: 2.5, diag: "🚨 法人高位派發" },
+      "AI 伺服器": { tsM: 0.6, instM: -4.0, margM: 3.0, diag: "🚨 籌碼鬆動" },
+      "金融": { tsM: 2.5, instM: 3.0, margM: 0.2, diag: "🛡️ 避險資金湧入" },
+      "重電": { tsM: 2.8, instM: 2.5, margM: 0.5, diag: "🛡️ 防禦性建倉" },
+      "貨櫃航運": { tsM: 3.2, instM: 1.5, margM: 0.4, diag: "📈 價值輪動回補" }
+    },
+    default: { tsM: 0.9, instM: 0, margM: 1.0, diag: "⚖️ 區間震盪" }
+  },
+  "PANIC": {
+    alert: "alert-danger",
+    msg: "【政權診斷：系統性解體】美元流動性收緊，全市場遭到無差別提款。請注意高槓桿族群（擴張倍數高但法人大賣）的融資斷頭壓力。",
+    sectors: {
+      "半導體": { tsM: 1.2, instM: -5.0, margM: -4.0, diag: "💥 法人恐慌拋售" },
+      "AI 伺服器": { tsM: 1.5, instM: -6.0, margM: -5.5, diag: "🩸 融資踩踏斷頭" },
+      "CPO 共封裝光學": { tsM: 0.4, instM: -3.0, margM: -6.0, diag: "🩸 流動性枯竭" },
+      "重電": { tsM: 1.1, instM: -2.0, margM: -3.0, diag: "📉 多殺多平倉" }
+    },
+    default: { tsM: 0.8, instM: -2.5, margM: -2.0, diag: "🔻 系統性去槓桿" }
+  }
+};
+
+const formatVal = (val, isMoney = false) => {
+  const sign = val > 0 ? '+' : '';
+  const cls = val > 0 ? 'up' : (val < 0 ? 'dn' : 'mono');
+  const unit = isMoney ? ' 億' : '';
+  return `<span class="${cls}">${sign}${val.toFixed(1)}${unit}</span>`;
+};
+
+// 3. 渲染邏輯
+function render() {
+  const regimeKey = document.getElementById("regime").value;
+  const intensity = parseFloat(document.getElementById("intensity").value);
+  document.getElementById("intensityVal").innerText = intensity.toFixed(1) + "x";
+  
+  const state = scenarios[regimeKey];
+  
+  // 更新警示 Banner
+  const banner = document.getElementById("alertBanner");
+  banner.className = `alert-banner ${state.alert}`;
+  banner.innerText = state.msg;
+
+  let html = "";
+  let totalTS = 0;
+
+  // 計算並排序
+  const results = Object.keys(historicalBase).map(grp => {
+    const base = historicalBase[grp];
+    const mod = state.sectors[grp] || state.default;
+    
+    // 計算今日模擬的成交比重與籌碼
+    let todayTS = Math.max(0.2, (base.baseTS * mod.tsM * intensity));
+    const inst = (base.baseInst * mod.instM * intensity);
+    const marg = (base.baseMargin * mod.margM * intensity);
+    
+    totalTS += todayTS;
+    
+    // 核心邏輯：計算時間序列擴張倍數 (Expansion Multiple)
+    const expansionMultiple = todayTS / base.baseTS;
+    
+    let mulClass = "mul-cold";
+    if (expansionMultiple > 2.0) mulClass = "mul-hot";
+    else if (expansionMultiple > 1.2) mulClass = "mul-warm";
+
+    // Badge 邏輯
+    let badge = `<span class="badge">NORMAL</span>`;
+    if (mod.diag.includes("🚀") || mod.diag.includes("💪") || mod.diag.includes("🛡️")) badge = `<span class="badge lead">STRATEGIC</span>`;
+    if (mod.diag.includes("⚠️") || mod.diag.includes("🚨")) badge = `<span class="badge warn">WARNING</span>`;
+    if (mod.diag.includes("💥") || mod.diag.includes("🩸")) badge = `<span class="badge danger">DANGER</span>`;
+
+    return { 
+      grp, baseTS: base.baseTS, todayTS, expansionMultiple, mulClass, 
+      inst, marg, diag: mod.diag, badge 
+    };
+  });
+
+  // 正規化 Turnover Share (總和不超過 100%)
+  const normFactor = totalTS > 90 ? (90 / totalTS) : 1;
+  
+  // 依據「資金擴張倍數」或「今日比重」排序 (此處以今日比重降冪，最符合看盤軟體習慣)
+  results.sort((a, b) => b.todayTS - a.todayTS); 
+
+  results.forEach(r => {
+    const finalTS = r.todayTS * normFactor;
+    const tsColor = finalTS > 15 ? "var(--up)" : (finalTS > 8 ? "var(--amber)" : "var(--bl)");
+    
+    html += `
+      <tr>
+        <td><b>${r.grp}</b></td>
+        <td class="mono" style="color:var(--gr)">${r.baseTS.toFixed(1)}%</td>
+        <td>
+          <div class="bar-container">
+            <div class="bar-fill" style="width: ${finalTS}%; background: ${tsColor};"></div>
+          </div>
+          <span class="mono">${finalTS.toFixed(1)}%</span>
+        </td>
+        <td><span class="mul-tag ${r.mulClass}">${r.expansionMultiple.toFixed(2)}x 均值</span></td>
+        <td class="mono">${formatVal(r.inst, true)}</td>
+        <td class="mono">${formatVal(r.marg, true)}</td>
+        <td style="font-size: 11.5px;">${r.badge} ${r.diag}</td>
+      </tr>
+    `;
+  });
+
+  document.querySelector("#sectorTable tbody").innerHTML = html;
+}
+
+// 綁定事件
+document.getElementById("regime").addEventListener("change", render);
+document.getElementById("intensity").addEventListener("input", render);
+
+// 初始渲染
+render();
+</script>
+</body>
+</html>

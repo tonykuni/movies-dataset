@@ -16,6 +16,20 @@ v1(2026/08/12):固定權重四因子 — 已依鐵律廢除,config 不再有 wei
 缺=合成 demo(注入與 FIS 相關結構供權重推導示範,明標 synthetic)。
 產物:data/output/macro_overlay.json — rows[].weights(前 N 主導因子)+ 全權重表。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json
 import math
 import random

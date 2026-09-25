@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeritasArchivum • 智能專案平台</title>
+  <link id="favicon" rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232d5a45' width='100' height='100' rx='12'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='36' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f7f6f3;
+      --bg-tertiary: #f1f1ef;
+      --bg-hover: #ebebea;
+      --border: #e3e2de;
+      --border-light: #ebebea;
+      --text: #37352f;
+      --text-secondary: #6b6b6b;
+      --text-tertiary: #9b9a97;
+      --text-placeholder: #c7c6c4;
+      
+      --header-bg: #2d5a45;
+      --header-bg-dark: #1e3d2f;
+      --header-text: #ffffff;
+      --header-text-secondary: rgba(255,255,255,0.8);
+      --header-text-tertiary: rgba(255,255,255,0.6);
+      
+      --accent: #2eaadc;
+      --accent-light: rgba(46,170,220,0.1);
+      --green: #0f7b6c;
+      --green-light: rgba(15,123,108,0.1);
+      --orange: #d9730d;
+      --red: #e03e3e;
+      --purple: #9065b0;
+      --blue: #2f80ed;
+      --yellow: #dfab01;
+      
+      --sans: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', 'Consolas', monospace;
+      --display: 'Playfair Display', Georgia, serif;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+      --shadow-xl: 0 24px 48px rgba(0,0,0,0.16);
+      
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      
+      --transition-fast: 0.1s ease;
+      --transition-normal: 0.2s ease;
+      --transition-slow: 0.3s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    @keyframes checkmark {
+      0% { stroke-dashoffset: 20; }
+      100% { stroke-dashoffset: 0; }
+    }
+    
+    @keyframes ripple {
+      0% { transform: scale(0); opacity: 0.5; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    
+    @keyframes skeleton {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .animate-fade { animation: fadeIn 0.3s ease forwards; }
+    .animate-slide { animation: slideIn 0.25s ease forwards; }
+    .animate-scale { animation: scaleIn 0.2s ease forwards; }
+    .animate-bounce { animation: bounce 0.3s ease; }
+    
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, var(--header-bg) 0%, var(--header-bg-dark) 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .header-main {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-wrap {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform var(--transition-fast);
+    }
+    
+    .logo-wrap:hover { transform: scale(1.05); }
+    
+    .logo {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    .logo-upload-trigger {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .brand-name {
+      font-family: var(--display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--header-text);
+      letter-spacing: 0.01em;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    
+    .brand-tm {
+      font-size: 12px;
+      color: var(--header-text-secondary);
+    }
+    
+    .brand-tagline {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: var(--header-text-tertiary);
+      text-transform: uppercase;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .h-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: var(--header-text);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--sans);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .h-btn:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-1px);
+    }
+    
+    .h-btn:active { transform: scale(0.98); }
+    
+    /* Ripple Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      animation: ripple 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+    
+    .h-btn .kbd {
+      font-size: 10px;
+      padding: 2px 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      font-family: var(--mono);
+    }
+    
+    /* ===== LAYOUT ===== */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 80px);
+    }
+    
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: transform var(--transition-normal);
+    }
+    
+    .sidebar-section {
+      padding: 12px 8px;
+    }
+    
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .sidebar-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all var(--transition-fast);
+    }
+    
+    .sidebar-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 14px;
+      transition: all var(--transition-fast);
+    }
+    
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+    
+    .nav-item.active {
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .nav-icon { font-size: 18px; }
+    
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .project-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .project-item:hover {
+      background: var(--bg-hover);
+    }
+    
+    .project-item.active {
+      background: var(--bg);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .project-icon { font-size: 20px; }
+    
+    .project-info { flex: 1; min-width: 0; }
+    
+    .project-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .project-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      gap: 6px;
+    }
+    
+    /* ===== MAIN ===== */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+    
+    .main-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 64px;
+    }
+    
+    /* ===== PAGE ===== */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+    
+    .breadcrumb-item {
+      cursor: pointer;
+      transition: color var(--transition-fast);
+    }
+    
+    .breadcrumb-item:hover { color: var(--text); }
+    
+    .page-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    
+    .page-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .page-icon { font-size: 36px; }
+    
+    .page-title {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    
+    .page-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    
+    .action-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--sans);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-btn:hover {
+      background: var(--bg-secondary);
+      border-color: var(--text-tertiary);
+    }
+    
+    .action-btn:active { transform: scale(0.98); }
+    
+    .action-btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+    
+    .action-btn.primary:hover { background: #0a6b5d; }
+    
+    .action-btn.danger {
+      color: var(--red);
+      border-color: var(--red);
+    }
+    
+    .action-btn.danger:hover {
+      background: rgba(224,62,62,0.1);
+    }
+    
+    /* Properties */
+    .properties {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 24px;
+    }
+    
+    .prop {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .prop-label {
+      color: var(--text-tertiary);
+      min-width: 80px;
+    }
+    
+    .prop-value {
+      color: var(--text);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-badge.active {
+      background: var(--green-light);
+      color: var(--green);
+    }
+    
+    /* ===== BLOCKS ===== */
+    .blocks {
+      min-height: 200px;
+    }
+    
+    .block {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 3px 0;
+      margin: 0 -44px;
+      padding-left: 44px;
+      border-radius: var(--radius-sm);
+      position: relative;
+      transition: background var(--transition-fast);
+    }
+    
+    .block:hover {
+      background: var(--bg-secondary);
+    }
+    
+    .block.selected {
+      background: var(--accent-light);
+    }
+    
+    .block.dragging {
+      opacity: 0.5;
+      background: var(--accent-light);
+    }
+    
+    .block.drag-over::before {
+      content: '';
+      position: absolute;
+      left: 44px;
+      right: 0;
+      top: -2px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    
+    /* Block Handle */
+    .block-handle {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-placeholder);
+      cursor: grab;
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      transition: all var(--transition-fast);
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+    
+    .block:hover .block-handle {
+      opacity: 1;
+    }
+    
+    .block-handle:hover {
+      background: var(--bg-hover);
+      color: var(--text-secondary);
+    }
+    
+    .block-handle:active {
+      cursor: grabbing;
+      background: var(--bg-tertiary);
+    }
+    
+    /* Block Actions (Right side) */
+    .block-actions {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+    
+    .block:hover .block-actions {
+      opacity: 1;
+    }
+    
+    .block-action-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: var(--bg);
+      color: var(--text-tertiary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .block-action-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+    
+    /* Block Content */
+    .block-content {
+      flex: 1;
+      min-width: 0;
+      outline: none;
+      word-break: break-word;
+    }
+    
+    .block-content:empty::before {
+      content: attr(data-placeholder);
+      color: var(--text-placeholder);
+    }
+    
+    .block-content:focus {
+      outline: none;
+    }
+    
+    /* Block Types */
+    .block-text {
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 3px 2px;
+    }
+    
+    .block-h1 {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-top: 24px;
+      padding: 3px 2px;
+    }
+    
+    .block-h2 {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-top: 20px;
+      padding: 3px 2px;
+    }
+    
+    .block-h3 {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-top: 16px;
+      padding: 3px 2px;
+    }
+    
+    .block-bullet {
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 3px 2px;
+      padding-left: 24px;
+      position: relative;
+    }
+    
+    .block-bullet::before {
+      content: '•';
+      position: absolute;
+      left: 8px;
+      color: var(--text);
+    }
+    
+    .block-numbered {
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 3px 2px;
+      padding-left: 24px;
+      position: relative;
+    }
+    
+    .block-numbered::before {
+      content: attr(data-number) '.';
+      position: absolute;
+      left: 2px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+    }
+    
+    .block-todo {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+      padding: 3px 2px;
+    }
+    
+    .todo-checkbox {
+      width: 18px;
+      height: 18px;
+      margin-top: 4px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+    
+    .todo-checkbox:hover {
+      border-color: var(--accent);
+    }
+    
+    .todo-checkbox.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .todo-checkbox.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .block-todo.completed .todo-text {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+    
+    /* Toggle */
+    .block-toggle {
+      padding: 4px 0;
+      width: 100%;
+    }
+    
+    .toggle-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      cursor: pointer;
+    }
+    
+    .toggle-arrow {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      transition: transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+    
+    .block-toggle.open .toggle-arrow {
+      transform: rotate(90deg);
+    }
+    
+    .toggle-title {
+      flex: 1;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    .toggle-content {
+      display: none;
+      padding: 4px 0 4px 28px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .block-toggle.open .toggle-content {
+      display: block;
+    }
+    
+    /* Code */
+    .block-code-wrap {
+      background: #282c34;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: 8px 0;
+      width: 100%;
+    }
+    
+    .block-code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.2);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .code-lang {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+    }
+    
+    .code-number {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+    }
+    
+    .block-code-content {
+      padding: 16px;
+      overflow-x: auto;
+    }
+    
+    .block-code-content pre {
+      margin: 0;
+    }
+    
+    .block-code-content code {
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* Quote */
+    .block-quote {
+      border-left: 3px solid var(--text);
+      padding-left: 16px;
+      margin: 8px 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    
+    /* Callout */
+    .block-callout {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      margin: 8px 0;
+      width: 100%;
+    }
+    
+    .callout-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .callout-content {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    /* Divider */
+    .block-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+      width: 100%;
+    }
+    
+    /* Page Link */
+    .block-page {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      margin: 4px 0;
+    }
+    
+    .block-page:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .page-link-icon { font-size: 18px; }
+    
+    .page-link-title {
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .page-link-number {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+    
+    /* Add Block */
+    .add-block-area {
+      padding: 16px 0;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+    
+    .page-body:hover .add-block-area { opacity: 1; }
+    
+    .add-block-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-placeholder);
+      font-size: 14px;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .add-block-btn:hover {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+    
+    /* ===== SLASH COMMANDS MENU ===== */
+    .slash-menu {
+      position: fixed;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 8px;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 300;
+      display: none;
+      animation: slideUp 0.15s ease;
+    }
+    
+    .slash-menu.show { display: block; }
+    
+    .slash-menu-header {
+      padding: 8px 12px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .slash-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    
+    .slash-menu-item:hover,
+    .slash-menu-item.selected {
+      background: var(--bg-secondary);
+    }
+    
+    .slash-menu-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      font-size: 20px;
+    }
+    
+    .slash-menu-text { flex: 1; }
+    .slash-menu-title { font-size: 14px; font-weight: 500; }
+    .slash-menu-desc { font-size: 12px; color: var(--text-tertiary); }
+    
+    .slash-menu-shortcut {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      font-family: var(--mono);
+    }
+    
+    /* ===== FLOATING TOOLBAR ===== */
+    .floating-toolbar {
+      position: fixed;
+      display: none;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      background: var(--text);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 250;
+      animation: scaleIn 0.15s ease;
+    }
+    
+    .floating-toolbar.show { display: flex; }
+    
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      color: var(--bg);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background var(--transition-fast);
+    }
+    
+    .toolbar-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .toolbar-btn.active {
+      background: rgba(255,255,255,0.25);
+    }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.2);
+      margin: 0 4px;
+    }
+    
+    /* ===== CONTEXT MENU ===== */
+    .context-menu {
+      position: fixed;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 6px;
+      min-width: 200px;
+      z-index: 400;
+      display: none;
+      animation: scaleIn 0.12s ease;
+    }
+    
+    .context-menu.show { display: block; }
+    
+    .context-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      transition: background var(--transition-fast);
+    }
+    
+    .context-menu-item:hover {
+      background: var(--bg-secondary);
+    }
+    
+    .context-menu-item.danger {
+      color: var(--red);
+    }
+    
+    .context-menu-item.danger:hover {
+      background: rgba(224,62,62,0.1);
+    }
+    
+    .context-menu-icon {
+      width: 20px;
+      text-align: center;
+    }
+    
+    .context-menu-text { flex: 1; }
+    
+    .context-menu-shortcut {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-family: var(--mono);
+    }
+    
+    .context-menu-divider {
+      height: 1px;
+      background: var(--border-light);
+      margin: 6px 0;
+    }
+    
+    /* Turn Into Submenu */
+    .turn-into-menu {
+      position: absolute;
+      left: 100%;
+      top: 0;
+      margin-left: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 6px;
+      min-width: 180px;
+      display: none;
+    }
+    
+    .context-menu-item:hover .turn-into-menu {
+      display: block;
+    }
+    
+    /* ===== TOAST SYSTEM ===== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 500;
+      pointer-events: none;
+    }
+    
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--text);
+      color: var(--bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 14px;
+      pointer-events: auto;
+      animation: slideUp 0.3s ease;
+      max-width: 400px;
+    }
+    
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+    .toast.warning { background: var(--orange); }
+    .toast.info { background: var(--blue); }
+    
+    .toast-icon { font-size: 18px; }
+    .toast-message { flex: 1; }
+    
+    .toast-action {
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    
+    .toast-action:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .toast-close {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: opacity var(--transition-fast);
+    }
+    
+    .toast-close:hover { opacity: 1; }
+    
+    .toast.hiding {
+      animation: fadeOut 0.2s ease forwards;
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(8px); }
+    }
+    
+    /* ===== COMMAND PALETTE ===== */
+    .command-palette-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 600;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15vh;
+      backdrop-filter: blur(2px);
+    }
+    
+    .command-palette-overlay.show {
+      display: flex;
+    }
+    
+    .command-palette {
+      width: 560px;
+      max-height: 400px;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      animation: scaleIn 0.15s ease;
+    }
+    
+    .command-input-wrap {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .command-input {
+      width: 100%;
+      padding: 8px 0;
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      font-family: var(--sans);
+      color: var(--text);
+      outline: none;
+    }
+    
+    .command-input::placeholder {
+      color: var(--text-placeholder);
+    }
+    
+    .command-results {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    
+    .command-section {
+      padding: 8px 12px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+    
+    .command-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    
+    .command-item:hover,
+    .command-item.selected {
+      background: var(--bg-secondary);
+    }
+    
+    .command-icon { font-size: 18px; width: 24px; text-align: center; }
+    .command-text { flex: 1; font-size: 14px; }
+    .command-shortcut {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      font-family: var(--mono);
+    }
+    
+    /* ===== MODALS ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      width: 480px;
+      max-width: 90vw;
+      max-height: 85vh;
+      overflow: hidden;
+      animation: scaleIn 0.2s ease;
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all var(--transition-fast);
+    }
+    
+    .modal-close:hover {
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+    
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-secondary);
+    }
+    
+    /* Forms */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg);
+      transition: all var(--transition-fast);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    
+    .form-input.error {
+      border-color: var(--red);
+    }
+    
+    .form-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 4px;
+    }
+    
+    /* ===== KEYBOARD HINTS ===== */
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text-secondary);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* ===== SKELETON LOADING ===== */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.5s ease infinite;
+      border-radius: var(--radius-sm);
+    }
+    
+    /* ===== WELCOME ===== */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .welcome-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+      animation: pulse 2s ease infinite;
+    }
+    
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .welcome-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    
+    .welcome-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .welcome-btn {
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+    
+    .welcome-btn.primary {
+      background: var(--green);
+      color: white;
+    }
+    
+    .welcome-btn.primary:hover {
+      background: #0a6b5d;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .welcome-btn.secondary {
+      background: var(--bg-secondary);
+      color: var(--text);
+    }
+    
+    .welcome-btn.secondary:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    /* ===== SETTINGS ===== */
+    .settings-section {
+      margin-bottom: 32px;
+    }
+    
+    .settings-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .settings-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    
+    .settings-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .settings-hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 80px;
+        height: calc(100vh - 80px);
+        transform: translateX(-100%);
+        z-index: 50;
+      }
+      
+      .sidebar.open { transform: translateX(0); }
+      
+      .main-content {
+        padding: 24px 16px;
+      }
+      
+      .page-title { font-size: 28px; }
+      
+      .block {
+        margin: 0 -16px;
+        padding-left: 36px;
+      }
+      
+      .command-palette {
+        width: 100%;
+        max-width: 95vw;
+      }
+    }
+    
+    /* ===== FOCUS VISIBLE ===== */
+    *:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    
+    /* Hidden for screen readers only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-main">
+      <div class="header-left">
+        <div class="logo-wrap" title="Click to upload logo">
+          <img class="logo" id="siteLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232d5a45' width='100' height='100' rx='16'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='36' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E" alt="Logo">
+          <input type="file" class="logo-upload-trigger" accept="image/*" onchange="uploadLogo(event)">
+        </div>
+        <div class="brand">
+          <div class="brand-name">VeritasArchivum<span class="brand-tm">™</span></div>
+          <div class="brand-tagline">智能專案平台 • Smart Archive</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="h-btn" onclick="openCommandPalette()" title="Quick Search">
+          🔍 <span>Search</span> <span class="kbd">⌘K</span>
+        </button>
+        <button class="h-btn" onclick="undo()" title="Undo (⌘Z)">↩️</button>
+        <button class="h-btn" onclick="redo()" title="Redo (⌘⇧Z)">↪️</button>
+        <button class="h-btn" onclick="showSettings()">⚙️</button>
+        <button class="h-btn" onclick="toggleSidebar()">☰</button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="nav-item active" onclick="goHome()">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="showSettings()">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-header">
+          <span>Projects</span>
+          <button class="sidebar-btn" onclick="openModal('project')" title="New Project">+</button>
+        </div>
+        <div class="project-list" id="projectList"></div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main">
+      <div class="main-content" id="mainContent"></div>
+    </main>
+  </div>
+  
+  <!-- Slash Commands Menu -->
+  <div class="slash-menu" id="slashMenu">
+    <div class="slash-menu-header">Basic Blocks</div>
+    <div class="slash-menu-item" data-type="text" onclick="insertBlock('text')">
+      <div class="slash-menu-icon">📝</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Text</div>
+        <div class="slash-menu-desc">Just start writing with plain text</div>
+      </div>
+    </div>
+    <div class="slash-menu-item" data-type="h1" onclick="insertBlock('h1')">
+      <div class="slash-menu-icon">H1</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Heading 1</div>
+        <div class="slash-menu-desc">Big section heading</div>
+      </div>
+      <span class="slash-menu-shortcut">#</span>
+    </div>
+    <div class="slash-menu-item" data-type="h2" onclick="insertBlock('h2')">
+      <div class="slash-menu-icon">H2</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Heading 2</div>
+        <div class="slash-menu-desc">Medium section heading</div>
+      </div>
+      <span class="slash-menu-shortcut">##</span>
+    </div>
+    <div class="slash-menu-item" data-type="h3" onclick="insertBlock('h3')">
+      <div class="slash-menu-icon">H3</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Heading 3</div>
+        <div class="slash-menu-desc">Small section heading</div>
+      </div>
+      <span class="slash-menu-shortcut">###</span>
+    </div>
+    
+    <div class="slash-menu-header">Lists</div>
+    <div class="slash-menu-item" data-type="bullet" onclick="insertBlock('bullet')">
+      <div class="slash-menu-icon">•</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Bulleted List</div>
+        <div class="slash-menu-desc">Create a simple bullet list</div>
+      </div>
+      <span class="slash-menu-shortcut">-</span>
+    </div>
+    <div class="slash-menu-item" data-type="numbered" onclick="insertBlock('numbered')">
+      <div class="slash-menu-icon">1.</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Numbered List</div>
+        <div class="slash-menu-desc">Create a numbered list</div>
+      </div>
+      <span class="slash-menu-shortcut">1.</span>
+    </div>
+    <div class="slash-menu-item" data-type="todo" onclick="insertBlock('todo')">
+      <div class="slash-menu-icon">☑️</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">To-do</div>
+        <div class="slash-menu-desc">Track tasks with a checkbox</div>
+      </div>
+      <span class="slash-menu-shortcut">[]</span>
+    </div>
+    <div class="slash-menu-item" data-type="toggle" onclick="insertBlock('toggle')">
+      <div class="slash-menu-icon">▸</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Toggle</div>
+        <div class="slash-menu-desc">Collapsible content section</div>
+      </div>
+    </div>
+    
+    <div class="slash-menu-header">Media & Code</div>
+    <div class="slash-menu-item" data-type="code" onclick="insertBlock('code')">
+      <div class="slash-menu-icon">💻</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Code</div>
+        <div class="slash-menu-desc">Capture a code snippet</div>
+      </div>
+      <span class="slash-menu-shortcut">```</span>
+    </div>
+    <div class="slash-menu-item" data-type="quote" onclick="insertBlock('quote')">
+      <div class="slash-menu-icon">❝</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Quote</div>
+        <div class="slash-menu-desc">Capture a quote</div>
+      </div>
+      <span class="slash-menu-shortcut">"</span>
+    </div>
+    <div class="slash-menu-item" data-type="callout" onclick="insertBlock('callout')">
+      <div class="slash-menu-icon">💡</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Callout</div>
+        <div class="slash-menu-desc">Make text stand out</div>
+      </div>
+    </div>
+    <div class="slash-menu-item" data-type="divider" onclick="insertBlock('divider')">
+      <div class="slash-menu-icon">—</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Divider</div>
+        <div class="slash-menu-desc">Visual separator</div>
+      </div>
+      <span class="slash-menu-shortcut">---</span>
+    </div>
+    <div class="slash-menu-item" data-type="page" onclick="insertBlock('page')">
+      <div class="slash-menu-icon">📄</div>
+      <div class="slash-menu-text">
+        <div class="slash-menu-title">Page</div>
+        <div class="slash-menu-desc">Link to another page</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Floating Toolbar (for text selection) -->
+  <div class="floating-toolbar" id="floatingToolbar">
+    <button class="toolbar-btn" onclick="formatText('bold')" title="Bold (⌘B)"><b>B</b></button>
+    <button class="toolbar-btn" onclick="formatText('italic')" title="Italic (⌘I)"><i>I</i></button>
+    <button class="toolbar-btn" onclick="formatText('underline')" title="Underline (⌘U)"><u>U</u></button>
+    <button class="toolbar-btn" onclick="formatText('strikethrough')" title="Strikethrough (⌘⇧S)"><s>S</s></button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn" onclick="formatText('code')" title="Code (⌘E)">&lt;&gt;</button>
+    <button class="toolbar-btn" onclick="formatText('link')" title="Link (⌘K)">🔗</button>
+    <div class="toolbar-divider"></div>
+    <button class="toolbar-btn" onclick="formatText('highlight')" title="Highlight">🎨</button>
+  </div>
+  
+  <!-- Context Menu -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="deleteBlock()">
+      <span class="context-menu-icon">🗑️</span>
+      <span class="context-menu-text">Delete</span>
+      <span class="context-menu-shortcut">Del</span>
+    </div>
+    <div class="context-menu-item" onclick="duplicateBlock()">
+      <span class="context-menu-icon">📋</span>
+      <span class="context-menu-text">Duplicate</span>
+      <span class="context-menu-shortcut">⌘D</span>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" style="position:relative">
+      <span class="context-menu-icon">🔄</span>
+      <span class="context-menu-text">Turn into</span>
+      <span class="context-menu-shortcut">▸</span>
+      <div class="turn-into-menu">
+        <div class="context-menu-item" onclick="turnInto('text')">📝 Text</div>
+        <div class="context-menu-item" onclick="turnInto('h1')">H1 Heading 1</div>
+        <div class="context-menu-item" onclick="turnInto('h2')">H2 Heading 2</div>
+        <div class="context-menu-item" onclick="turnInto('h3')">H3 Heading 3</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="turnInto('bullet')">• Bullet list</div>
+        <div class="context-menu-item" onclick="turnInto('numbered')">1. Numbered list</div>
+        <div class="context-menu-item" onclick="turnInto('todo')">☑️ To-do</div>
+        <div class="context-menu-item" onclick="turnInto('quote')">❝ Quote</div>
+        <div class="context-menu-item" onclick="turnInto('callout')">💡 Callout</div>
+      </div>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" onclick="moveBlockUp()">
+      <span class="context-menu-icon">⬆️</span>
+      <span class="context-menu-text">Move up</span>
+      <span class="context-menu-shortcut">⌘⇧↑</span>
+    </div>
+    <div class="context-menu-item" onclick="moveBlockDown()">
+      <span class="context-menu-icon">⬇️</span>
+      <span class="context-menu-text">Move down</span>
+      <span class="context-menu-shortcut">⌘⇧↓</span>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" onclick="copyBlockLink()">
+      <span class="context-menu-icon">🔗</span>
+      <span class="context-menu-text">Copy link</span>
+    </div>
+  </div>
+  
+  <!-- Command Palette -->
+  <div class="command-palette-overlay" id="commandPalette">
+    <div class="command-palette">
+      <div class="command-input-wrap">
+        <input type="text" class="command-input" id="commandInput" placeholder="Type a command or search..." oninput="filterCommands()" onkeydown="handleCommandKey(event)">
+      </div>
+      <div class="command-results" id="commandResults">
+        <div class="command-section">Recent</div>
+        <div class="command-item" onclick="executeCommand('new-project')">
+          <span class="command-icon">📁</span>
+          <span class="command-text">New Project</span>
+          <span class="command-shortcut">⌘N</span>
+        </div>
+        <div class="command-section">Commands</div>
+        <div class="command-item" onclick="executeCommand('settings')">
+          <span class="command-icon">⚙️</span>
+          <span class="command-text">Open Settings</span>
+        </div>
+        <div class="command-item" onclick="executeCommand('export')">
+          <span class="command-icon">💾</span>
+          <span class="command-text">Export Current Project</span>
+        </div>
+        <div class="command-item" onclick="executeCommand('toggle-sidebar')">
+          <span class="command-icon">📋</span>
+          <span class="command-text">Toggle Sidebar</span>
+          <span class="command-shortcut">⌘\</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- Modals -->
+  <div class="modal-overlay" id="modalProject">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Create New Project</span>
+        <button class="modal-close" onclick="closeModal('project')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Project Name</label>
+          <input class="form-input" id="inputProjName" placeholder="My Project" autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon</label>
+          <input class="form-input" id="inputProjIcon" value="📁" style="width: 80px;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description (optional)</label>
+          <input class="form-input" id="inputProjDesc" placeholder="Brief description...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeModal('project')">Cancel</button>
+        <button class="action-btn primary" onclick="saveProject()">Create Project</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // VeritasArchivum - Enhanced UX Version
+    // ============================================================
+    
+    const $ = id => document.getElementById(id);
+    const CONFIG_KEY = 'va-config';
+    const PROJECTS_KEY = 'va-projects';
+    
+    const DEFAULT_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232d5a45' width='100' height='100' rx='16'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='36' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E";
+    
+    const STATE = {
+      config: { basePath: '', logo: null, logoName: 'Default Logo' },
+      projects: [],
+      currentProject: null,
+      currentView: 'home',
+      counters: { project: 0 },
+      selectedBlockId: null,
+      undoStack: [],
+      redoStack: [],
+      slashMenuFilter: ''
+    };
+    
+    // ===== STORAGE =====
+    const Store = {
+      saveConfig() {
+        localStorage.setItem(CONFIG_KEY, JSON.stringify({
+          basePath: STATE.config.basePath,
+          logo: STATE.config.logo,
+          logoName: STATE.config.logoName,
+          counters: STATE.counters
+        }));
+      },
+      loadConfig() {
+        const d = localStorage.getItem(CONFIG_KEY);
+        if (d) {
+          const p = JSON.parse(d);
+          STATE.config = { ...STATE.config, ...p };
+          STATE.counters = p.counters || { project: 0 };
+          if (STATE.config.logo) applyLogo(STATE.config.logo);
+        }
+      },
+      saveProjects() {
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(STATE.projects));
+      },
+      loadProjects() {
+        const d = localStorage.getItem(PROJECTS_KEY);
+        if (d) STATE.projects = JSON.parse(d) || [];
+      }
+    };
+    
+    // ===== UTILS =====
+    const U = {
+      id: () => 'id' + Date.now() + Math.random().toString(36).substr(2, 6),
+      now: () => new Date().toISOString(),
+      date: s => s ? new Date(s).toLocaleDateString('zh-TW') : '--',
+      esc: t => { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+    };
+    
+    // ===== TOAST SYSTEM =====
+    const Toast = {
+      show(message, type = 'default', options = {}) {
+        const container = $('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ', default: '💬' };
+        
+        toast.innerHTML = `
+          <span class="toast-icon">${icons[type] || icons.default}</span>
+          <span class="toast-message">${message}</span>
+          ${options.action ? `<button class="toast-action" onclick="${options.action.callback}">${options.action.label}</button>` : ''}
+          <button class="toast-close" onclick="Toast.dismiss(this.parentElement)">✕</button>
+        `;
+        
+        container.appendChild(toast);
+        
+        const duration = options.duration || 4000;
+        setTimeout(() => Toast.dismiss(toast), duration);
+        
+        return toast;
+      },
+      dismiss(toast) {
+        if (!toast || !toast.parentElement) return;
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 200);
+      },
+      success(msg, opts) { return this.show(msg, 'success', opts); },
+      error(msg, opts) { return this.show(msg, 'error', opts); },
+      warning(msg, opts) { return this.show(msg, 'warning', opts); },
+      info(msg, opts) { return this.show(msg, 'info', opts); }
+    };
+    
+    // ===== UNDO/REDO =====
+    function saveState() {
+      if (!STATE.currentProject) return;
+      const state = JSON.stringify(STATE.currentProject.blocks);
+      STATE.undoStack.push(state);
+      if (STATE.undoStack.length > 50) STATE.undoStack.shift();
+      STATE.redoStack = [];
+    }
+    
+    function undo() {
+      if (STATE.undoStack.length === 0) {
+        Toast.warning('Nothing to undo');
+        return;
+      }
+      if (STATE.currentProject) {
+        STATE.redoStack.push(JSON.stringify(STATE.currentProject.blocks));
+        STATE.currentProject.blocks = JSON.parse(STATE.undoStack.pop());
+        Store.saveProjects();
+        renderProject();
+        Toast.info('Undone');
+      }
+    }
+    
+    function redo() {
+      if (STATE.redoStack.length === 0) {
+        Toast.warning('Nothing to redo');
+        return;
+      }
+      if (STATE.currentProject) {
+        STATE.undoStack.push(JSON.stringify(STATE.currentProject.blocks));
+        STATE.currentProject.blocks = JSON.parse(STATE.redoStack.pop());
+        Store.saveProjects();
+        renderProject();
+        Toast.info('Redone');
+      }
+    }
+    
+    // ===== LOGO =====
+    function applyLogo(src) {
+      $('siteLogo').src = src;
+      $('favicon').href = src;
+    }
+    
+    function uploadLogo(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = ev => {
+        STATE.config.logo = ev.target.result;
+        STATE.config.logoName = file.name;
+        applyLogo(STATE.config.logo);
+        Store.saveConfig();
+        Toast.success('Logo updated');
+        if (STATE.currentView === 'settings') renderSettings();
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    // ===== SIDEBAR =====
+    function toggleSidebar() {
+      $('sidebar').classList.toggle('open');
+    }
+    
+    function closeSidebarMobile() {
+      if (window.innerWidth <= 768) {
+        $('sidebar').classList.remove('open');
+      }
+    }
+    
+    function renderProjects() {
+      const list = $('projectList');
+      
+      if (STATE.projects.length === 0) {
+        list.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--text-tertiary);font-size:13px;">
+          No projects yet<br><small>Click + to create one</small>
+        </div>`;
+        return;
+      }
+      
+      list.innerHTML = STATE.projects.map((p, i) => `
+        <div class="project-item ${STATE.currentProject?.id === p.id ? 'active' : ''} animate-slide" 
+             style="animation-delay:${i * 0.03}s" 
+             onclick="selectProject('${p.id}')"
+             oncontextmenu="showProjectContext(event, '${p.id}')">
+          <span class="project-icon">${p.icon}</span>
+          <div class="project-info">
+            <div class="project-name">${U.esc(p.name)}</div>
+            <div class="project-meta">
+              <span>${p.code}</span>
+              <span>·</span>
+              <span>${p.blocks?.length || 0} blocks</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // ===== VIEWS =====
+    function goHome() {
+      STATE.currentProject = null;
+      STATE.currentView = 'home';
+      renderProjects();
+      renderHome();
+      closeSidebarMobile();
+    }
+    
+    function renderHome() {
+      $('mainContent').innerHTML = `
+        <div class="welcome">
+          <div class="welcome-icon">📜</div>
+          <div class="welcome-title">Welcome to VeritasArchivum</div>
+          <div class="welcome-desc">
+            智能專案管理平台 Smart Project Archive<br>
+            Create and organize your projects with flowcharts, code, and notes.<br>
+            <small style="color:var(--text-tertiary)">Press <kbd class="kbd">⌘K</kbd> for quick search • <kbd class="kbd">/</kbd> for commands</small>
+          </div>
+          <div class="welcome-actions">
+            <button class="welcome-btn primary" onclick="openModal('project')">＋ Create Project</button>
+            <button class="welcome-btn secondary" onclick="showSettings()">⚙️ Settings</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function showSettings() {
+      STATE.currentProject = null;
+      STATE.currentView = 'settings';
+      renderProjects();
+      renderSettings();
+      closeSidebarMobile();
+    }
+    
+    function renderSettings() {
+      const totalBlocks = STATE.projects.reduce((s, p) => s + (p.blocks?.length || 0), 0);
+      const storageUsed = new Blob([JSON.stringify(STATE.projects)]).size;
+      const formatSize = b => b < 1024 ? b + ' B' : b < 1024 * 1024 ? (b / 1024).toFixed(1) + ' KB' : (b / 1024 / 1024).toFixed(2) + ' MB';
+      
+      $('mainContent').innerHTML = `
+        <div class="page-header">
+          <div class="page-breadcrumb">
+            <span class="breadcrumb-item" onclick="goHome()">🏠 Home</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-item">⚙️ Settings</span>
+          </div>
+          <div class="page-title-row">
+            <div class="page-title-wrap">
+              <span class="page-icon">⚙️</span>
+              <h1 class="page-title">Settings</h1>
+            </div>
+          </div>
+        </div>
+        
+        <div class="page-body">
+          <div class="settings-section">
+            <div class="settings-title">Appearance</div>
+            <div class="settings-card">
+              <div class="settings-row">
+                <div>
+                  <div class="settings-label">Logo</div>
+                  <div class="settings-hint">Current: ${U.esc(STATE.config.logoName)}</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <label class="action-btn" style="cursor:pointer;">
+                    📤 Upload
+                    <input type="file" accept="image/*" onchange="uploadLogo(event)" style="display:none;">
+                  </label>
+                  <button class="action-btn" onclick="resetLogo()">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <div class="settings-title">Keyboard Shortcuts</div>
+            <div class="settings-card">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
+                <div><kbd class="kbd">⌘K</kbd> Command Palette</div>
+                <div><kbd class="kbd">⌘Z</kbd> Undo</div>
+                <div><kbd class="kbd">⌘⇧Z</kbd> Redo</div>
+                <div><kbd class="kbd">/</kbd> Slash Commands</div>
+                <div><kbd class="kbd">⌘B</kbd> Bold</div>
+                <div><kbd class="kbd">⌘I</kbd> Italic</div>
+                <div><kbd class="kbd">⌘U</kbd> Underline</div>
+                <div><kbd class="kbd">⌘⇧S</kbd> Strikethrough</div>
+                <div><kbd class="kbd">Enter</kbd> New Block</div>
+                <div><kbd class="kbd">Tab</kbd> Indent</div>
+                <div><kbd class="kbd">⌘D</kbd> Duplicate Block</div>
+                <div><kbd class="kbd">Del</kbd> Delete Block</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <div class="settings-title">Storage</div>
+            <div class="settings-card">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+                <div>
+                  <div style="font-size:24px;font-weight:600;">${STATE.projects.length}</div>
+                  <div style="font-size:12px;color:var(--text-tertiary);">Projects</div>
+                </div>
+                <div>
+                  <div style="font-size:24px;font-weight:600;">${totalBlocks}</div>
+                  <div style="font-size:12px;color:var(--text-tertiary);">Blocks</div>
+                </div>
+                <div>
+                  <div style="font-size:24px;font-weight:600;">${formatSize(storageUsed)}</div>
+                  <div style="font-size:12px;color:var(--text-tertiary);">Used</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <div class="settings-title">Data Management</div>
+            <div style="display:flex;gap:12px;">
+              <button class="action-btn" onclick="exportAll()">📤 Export All</button>
+              <label class="action-btn" style="cursor:pointer;">
+                📥 Import
+                <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
+              </label>
+              <button class="action-btn danger" onclick="clearAllData()">🗑️ Clear All</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function resetLogo() {
+      STATE.config.logo = null;
+      STATE.config.logoName = 'Default Logo';
+      applyLogo(DEFAULT_LOGO);
+      Store.saveConfig();
+      Toast.info('Logo reset to default');
+      if (STATE.currentView === 'settings') renderSettings();
+    }
+    
+    // ===== PROJECTS =====
+    function openModal(type) {
+      $(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('show');
+      const input = $('inputProjName');
+      if (input) setTimeout(() => input.focus(), 100);
+    }
+    
+    function closeModal(type) {
+      $(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.remove('show');
+    }
+    
+    function saveProject() {
+      const name = $('inputProjName').value.trim() || 'Untitled';
+      const icon = $('inputProjIcon').value.trim() || '📁';
+      const desc = $('inputProjDesc').value.trim();
+      
+      STATE.counters.project++;
+      const code = `${STATE.counters.project.toString().padStart(2, '0')}`;
+      
+      const project = {
+        id: U.id(),
+        code: code,
+        name: name,
+        icon: icon,
+        desc: desc,
+        blocks: [],
+        createdAt: U.now(),
+        updatedAt: U.now()
+      };
+      
+      STATE.projects.push(project);
+      Store.saveProjects();
+      Store.saveConfig();
+      
+      closeModal('project');
+      $('inputProjName').value = '';
+      $('inputProjDesc').value = '';
+      
+      selectProject(project.id);
+      Toast.success(`Project "${name}" created`);
+    }
+    
+    function selectProject(id) {
+      STATE.currentProject = STATE.projects.find(p => p.id === id);
+      STATE.currentView = 'project';
+      STATE.undoStack = [];
+      STATE.redoStack = [];
+      renderProjects();
+      renderProject();
+      closeSidebarMobile();
+    }
+    
+    function renderProject() {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      $('mainContent').innerHTML = `
+        <div class="page-header">
+          <div class="page-breadcrumb">
+            <span class="breadcrumb-item" onclick="goHome()">🏠 Home</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-item">${p.icon} ${U.esc(p.name)}</span>
+          </div>
+          <div class="page-title-row">
+            <div class="page-title-wrap">
+              <span class="page-icon">${p.icon}</span>
+              <h1 class="page-title">${U.esc(p.name)}</h1>
+            </div>
+            <div class="page-actions">
+              <button class="action-btn" onclick="saveProjectFile()">💾 Export</button>
+              <button class="action-btn danger" onclick="deleteProject()">🗑️</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="page-body">
+          <div class="properties animate-fade">
+            <div class="prop">
+              <span class="prop-label">Status</span>
+              <span class="status-badge active">● Active</span>
+            </div>
+            <div class="prop">
+              <span class="prop-label">Code</span>
+              <span class="prop-value" style="font-family:var(--mono);">${p.code}</span>
+            </div>
+            <div class="prop">
+              <span class="prop-label">Created</span>
+              <span class="prop-value">${U.date(p.createdAt)}</span>
+            </div>
+            ${p.desc ? `<div class="prop"><span class="prop-label">Description</span><span class="prop-value">${U.esc(p.desc)}</span></div>` : ''}
+          </div>
+          
+          <div class="blocks" id="blocksContainer">
+            ${renderBlocks(p.blocks)}
+          </div>
+          
+          <div class="add-block-area">
+            <button class="add-block-btn" onclick="addNewBlock()">
+              ＋ Add a block or type <kbd class="kbd" style="margin-left:4px">/</kbd> for commands
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Initialize block content editables
+      initializeBlocks();
+      hljs.highlightAll();
+    }
+    
+    function renderBlocks(blocks) {
+      if (!blocks || blocks.length === 0) {
+        return `<div class="block" data-id="placeholder">
+          <div class="block-content block-text" 
+               contenteditable="true" 
+               data-placeholder="Type '/' for commands, or just start typing..."
+               onkeydown="handleBlockKeydown(event, this)"
+               oninput="handleBlockInput(event, this)"
+               onfocus="handleBlockFocus(event, this)"
+               onblur="handleBlockBlur(event, this)"></div>
+        </div>`;
+      }
+      
+      let numberedCount = 0;
+      
+      return blocks.map((b, i) => {
+        if (b.type === 'numbered') numberedCount++;
+        else if (b.type !== 'numbered') numberedCount = 0;
+        
+        const handle = `
+          <div class="block-handle" 
+               draggable="true" 
+               ondragstart="handleDragStart(event, '${b.id}')"
+               ondragend="handleDragEnd(event)">⋮⋮</div>
+        `;
+        
+        const actions = `
+          <div class="block-actions">
+            <button class="block-action-btn" onclick="showBlockMenu(event, '${b.id}')" title="More options">⋯</button>
+          </div>
+        `;
+        
+        let content = '';
+        
+        switch (b.type) {
+          case 'text':
+            content = `<div class="block-content block-text" contenteditable="true" data-placeholder="Type something...">${U.esc(b.content || '')}</div>`;
+            break;
+          case 'h1':
+            content = `<h1 class="block-content block-h1" contenteditable="true" data-placeholder="Heading 1">${U.esc(b.content || '')}</h1>`;
+            break;
+          case 'h2':
+            content = `<h2 class="block-content block-h2" contenteditable="true" data-placeholder="Heading 2">${U.esc(b.content || '')}</h2>`;
+            break;
+          case 'h3':
+            content = `<h3 class="block-content block-h3" contenteditable="true" data-placeholder="Heading 3">${U.esc(b.content || '')}</h3>`;
+            break;
+          case 'bullet':
+            content = `<div class="block-content block-bullet" contenteditable="true" data-placeholder="List item">${U.esc(b.content || '')}</div>`;
+            break;
+          case 'numbered':
+            content = `<div class="block-content block-numbered" contenteditable="true" data-placeholder="List item" data-number="${numberedCount}">${U.esc(b.content || '')}</div>`;
+            break;
+          case 'todo':
+            content = `
+              <div class="block-todo ${b.checked ? 'completed' : ''}">
+                <div class="todo-checkbox ${b.checked ? 'checked' : ''}" onclick="toggleTodo('${b.id}')"></div>
+                <div class="todo-text" contenteditable="true" data-placeholder="To-do">${U.esc(b.content || '')}</div>
+              </div>
+            `;
+            break;
+          case 'toggle':
+            content = `
+              <div class="block-toggle ${b.open ? 'open' : ''}">
+                <div class="toggle-header" onclick="toggleToggle(this)">
+                  <div class="toggle-arrow">▸</div>
+                  <div class="toggle-title" contenteditable="true" data-placeholder="Toggle title">${U.esc(b.title || '')}</div>
+                </div>
+                <div class="toggle-content" contenteditable="true" data-placeholder="Toggle content">${U.esc(b.content || '')}</div>
+              </div>
+            `;
+            break;
+          case 'code':
+            content = `
+              <div class="block-code-wrap">
+                <div class="block-code-header">
+                  <span class="code-lang">${b.lang || 'python'}</span>
+                  <span class="code-number">${b.blockCode || ''}</span>
+                </div>
+                <div class="block-code-content">
+                  <pre><code class="language-${b.lang || 'python'}" contenteditable="true">${U.esc(b.content || '')}</code></pre>
+                </div>
+              </div>
+            `;
+            break;
+          case 'quote':
+            content = `<blockquote class="block-quote" contenteditable="true" data-placeholder="Quote">${U.esc(b.content || '')}</blockquote>`;
+            break;
+          case 'callout':
+            content = `
+              <div class="block-callout">
+                <div class="callout-icon">${b.icon || '💡'}</div>
+                <div class="callout-content" contenteditable="true" data-placeholder="Callout content">${U.esc(b.content || '')}</div>
+              </div>
+            `;
+            break;
+          case 'divider':
+            content = `<div class="block-divider"></div>`;
+            break;
+          case 'page':
+            content = `
+              <div class="block-page">
+                <span class="page-link-icon">📄</span>
+                <span class="page-link-title" contenteditable="true" data-placeholder="Page title">${U.esc(b.title || 'Untitled')}</span>
+              </div>
+            `;
+            break;
+          default:
+            content = `<div class="block-content block-text" contenteditable="true">${U.esc(b.content || '')}</div>`;
+        }
+        
+        return `
+          <div class="block animate-fade" 
+               data-id="${b.id}" 
+               data-type="${b.type}"
+               style="animation-delay:${i * 0.02}s"
+               oncontextmenu="showBlockContext(event, '${b.id}')"
+               ondragover="handleDragOver(event, '${b.id}')"
+               ondragleave="handleDragLeave(event)"
+               ondrop="handleDrop(event, '${b.id}')">
+            ${handle}
+            ${content}
+            ${actions}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function initializeBlocks() {
+      const container = $('blocksContainer');
+      if (!container) return;
+      
+      container.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        el.addEventListener('keydown', e => handleBlockKeydown(e, el));
+        el.addEventListener('input', e => handleBlockInput(e, el));
+        el.addEventListener('focus', e => handleBlockFocus(e, el));
+        el.addEventListener('blur', e => handleBlockBlur(e, el));
+      });
+    }
+    
+    // ===== BLOCK EDITING =====
+    function handleBlockKeydown(e, el) {
+      const block = el.closest('.block');
+      const blockId = block?.dataset.id;
+      
+      // Slash command
+      if (e.key === '/' && el.textContent === '') {
+        e.preventDefault();
+        showSlashMenu(el);
+        return;
+      }
+      
+      // Enter - create new block
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        saveBlockContent(blockId);
+        addBlockAfter(blockId);
+        return;
+      }
+      
+      // Backspace on empty - delete block
+      if (e.key === 'Backspace' && el.textContent === '' && blockId !== 'placeholder') {
+        e.preventDefault();
+        deleteBlockById(blockId);
+        return;
+      }
+      
+      // Tab - indent (for future nested blocks)
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        // TODO: Implement indentation
+        Toast.info('Indentation coming soon');
+        return;
+      }
+      
+      // Cmd+B - bold
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+        e.preventDefault();
+        document.execCommand('bold');
+        return;
+      }
+      
+      // Cmd+I - italic
+      if ((e.metaKey || e.ctrlKey) && e.key === 'i') {
+        e.preventDefault();
+        document.execCommand('italic');
+        return;
+      }
+      
+      // Cmd+U - underline
+      if ((e.metaKey || e.ctrlKey) && e.key === 'u') {
+        e.preventDefault();
+        document.execCommand('underline');
+        return;
+      }
+      
+      // Markdown shortcuts
+      const text = el.textContent;
+      if (e.key === ' ') {
+        if (text === '#') { e.preventDefault(); turnBlockInto(blockId, 'h1'); el.textContent = ''; }
+        else if (text === '##') { e.preventDefault(); turnBlockInto(blockId, 'h2'); el.textContent = ''; }
+        else if (text === '###') { e.preventDefault(); turnBlockInto(blockId, 'h3'); el.textContent = ''; }
+        else if (text === '-' || text === '*') { e.preventDefault(); turnBlockInto(blockId, 'bullet'); el.textContent = ''; }
+        else if (text === '1.') { e.preventDefault(); turnBlockInto(blockId, 'numbered'); el.textContent = ''; }
+        else if (text === '[]') { e.preventDefault(); turnBlockInto(blockId, 'todo'); el.textContent = ''; }
+        else if (text === '>') { e.preventDefault(); turnBlockInto(blockId, 'quote'); el.textContent = ''; }
+        else if (text === '---') { e.preventDefault(); turnBlockInto(blockId, 'divider'); }
+      }
+    }
+    
+    function handleBlockInput(e, el) {
+      const block = el.closest('.block');
+      const blockId = block?.dataset.id;
+      
+      // Check for slash at start
+      if (el.textContent === '/') {
+        showSlashMenu(el);
+      }
+    }
+    
+    function handleBlockFocus(e, el) {
+      const block = el.closest('.block');
+      if (block) {
+        block.classList.add('selected');
+        STATE.selectedBlockId = block.dataset.id;
+      }
+    }
+    
+    function handleBlockBlur(e, el) {
+      const block = el.closest('.block');
+      if (block) {
+        block.classList.remove('selected');
+        saveBlockContent(block.dataset.id);
+      }
+      
+      // Hide slash menu after delay
+      setTimeout(() => {
+        if (!document.activeElement.closest('.slash-menu')) {
+          hideSlashMenu();
+        }
+      }, 200);
+    }
+    
+    function saveBlockContent(blockId) {
+      if (!STATE.currentProject || blockId === 'placeholder') return;
+      
+      const block = STATE.currentProject.blocks.find(b => b.id === blockId);
+      if (!block) return;
+      
+      const blockEl = document.querySelector(`.block[data-id="${blockId}"]`);
+      if (!blockEl) return;
+      
+      const contentEl = blockEl.querySelector('[contenteditable="true"]');
+      if (contentEl) {
+        if (block.type === 'toggle') {
+          const titleEl = blockEl.querySelector('.toggle-title');
+          const contentElToggle = blockEl.querySelector('.toggle-content');
+          block.title = titleEl?.textContent || '';
+          block.content = contentElToggle?.textContent || '';
+        } else if (block.type === 'todo') {
+          block.content = blockEl.querySelector('.todo-text')?.textContent || '';
+        } else if (block.type === 'page') {
+          block.title = contentEl.textContent || '';
+        } else {
+          block.content = contentEl.textContent || '';
+        }
+        
+        STATE.currentProject.updatedAt = U.now();
+        Store.saveProjects();
+      }
+    }
+    
+    // ===== SLASH COMMANDS =====
+    function showSlashMenu(el) {
+      const menu = $('slashMenu');
+      const rect = el.getBoundingClientRect();
+      
+      menu.style.left = rect.left + 'px';
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.classList.add('show');
+      
+      STATE.slashMenuFilter = '';
+      filterSlashMenu();
+      
+      // Select first item
+      const firstItem = menu.querySelector('.slash-menu-item');
+      if (firstItem) firstItem.classList.add('selected');
+    }
+    
+    function hideSlashMenu() {
+      $('slashMenu').classList.remove('show');
+    }
+    
+    function filterSlashMenu() {
+      const filter = STATE.slashMenuFilter.toLowerCase();
+      const items = $('slashMenu').querySelectorAll('.slash-menu-item');
+      
+      items.forEach(item => {
+        const title = item.querySelector('.slash-menu-title').textContent.toLowerCase();
+        const desc = item.querySelector('.slash-menu-desc').textContent.toLowerCase();
+        item.style.display = (title.includes(filter) || desc.includes(filter)) ? '' : 'none';
+      });
+    }
+    
+    function insertBlock(type) {
+      hideSlashMenu();
+      
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      saveState();
+      
+      // Check if we're replacing placeholder
+      const placeholderEl = document.querySelector('.block[data-id="placeholder"]');
+      if (placeholderEl && p.blocks.length === 0) {
+        // Create first block
+        const newBlock = createBlockData(type);
+        p.blocks.push(newBlock);
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProject();
+        
+        // Focus new block
+        setTimeout(() => {
+          const el = document.querySelector(`.block[data-id="${newBlock.id}"] [contenteditable="true"]`);
+          if (el) el.focus();
+        }, 50);
+        return;
+      }
+      
+      // Add after selected block
+      addBlockAfter(STATE.selectedBlockId, type);
+    }
+    
+    function createBlockData(type) {
+      const block = {
+        id: U.id(),
+        type: type,
+        content: '',
+        createdAt: U.now()
+      };
+      
+      if (type === 'toggle') {
+        block.title = '';
+        block.open = true;
+      }
+      if (type === 'todo') {
+        block.checked = false;
+      }
+      if (type === 'page') {
+        block.title = 'Untitled';
+      }
+      if (type === 'code') {
+        block.lang = 'python';
+      }
+      if (type === 'callout') {
+        block.icon = '💡';
+      }
+      
+      return block;
+    }
+    
+    function addBlockAfter(afterId, type = 'text') {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      saveState();
+      
+      const newBlock = createBlockData(type);
+      
+      if (!afterId || afterId === 'placeholder') {
+        p.blocks.push(newBlock);
+      } else {
+        const index = p.blocks.findIndex(b => b.id === afterId);
+        if (index !== -1) {
+          p.blocks.splice(index + 1, 0, newBlock);
+        } else {
+          p.blocks.push(newBlock);
+        }
+      }
+      
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderProject();
+      
+      // Focus new block
+      setTimeout(() => {
+        const el = document.querySelector(`.block[data-id="${newBlock.id}"] [contenteditable="true"]`);
+        if (el) el.focus();
+      }, 50);
+    }
+    
+    function addNewBlock() {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      saveState();
+      
+      const newBlock = createBlockData('text');
+      p.blocks.push(newBlock);
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderProject();
+      
+      setTimeout(() => {
+        const el = document.querySelector(`.block[data-id="${newBlock.id}"] [contenteditable="true"]`);
+        if (el) el.focus();
+      }, 50);
+    }
+    
+    // ===== BLOCK ACTIONS =====
+    function turnBlockInto(blockId, newType) {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      const block = p.blocks.find(b => b.id === blockId);
+      if (!block) return;
+      
+      saveState();
+      
+      block.type = newType;
+      if (newType === 'toggle') {
+        block.title = block.content || '';
+        block.content = '';
+        block.open = true;
+      }
+      if (newType === 'todo') {
+        block.checked = false;
+      }
+      
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderProject();
+      
+      setTimeout(() => {
+        const el = document.querySelector(`.block[data-id="${blockId}"] [contenteditable="true"]`);
+        if (el) el.focus();
+      }, 50);
+    }
+    
+    function deleteBlockById(blockId) {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      saveState();
+      
+      const index = p.blocks.findIndex(b => b.id === blockId);
+      if (index !== -1) {
+        p.blocks.splice(index, 1);
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProject();
+        
+        // Focus previous block
+        if (index > 0) {
+          const prevBlock = p.blocks[index - 1];
+          setTimeout(() => {
+            const el = document.querySelector(`.block[data-id="${prevBlock.id}"] [contenteditable="true"]`);
+            if (el) el.focus();
+          }, 50);
+        }
+      }
+    }
+    
+    function toggleTodo(blockId) {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      const block = p.blocks.find(b => b.id === blockId);
+      if (!block || block.type !== 'todo') return;
+      
+      saveState();
+      block.checked = !block.checked;
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderProject();
+    }
+    
+    function toggleToggle(header) {
+      const toggle = header.closest('.block-toggle');
+      if (toggle) {
+        toggle.classList.toggle('open');
+        
+        const blockEl = toggle.closest('.block');
+        const blockId = blockEl?.dataset.id;
+        const p = STATE.currentProject;
+        if (p && blockId) {
+          const block = p.blocks.find(b => b.id === blockId);
+          if (block) {
+            block.open = toggle.classList.contains('open');
+            Store.saveProjects();
+          }
+        }
+      }
+    }
+    
+    // ===== CONTEXT MENU =====
+    function showBlockContext(e, blockId) {
+      e.preventDefault();
+      STATE.selectedBlockId = blockId;
+      
+      const menu = $('contextMenu');
+      menu.style.left = e.clientX + 'px';
+      menu.style.top = e.clientY + 'px';
+      menu.classList.add('show');
+    }
+    
+    function hideContextMenu() {
+      $('contextMenu').classList.remove('show');
+    }
+    
+    function deleteBlock() {
+      hideContextMenu();
+      if (STATE.selectedBlockId) {
+        deleteBlockById(STATE.selectedBlockId);
+        Toast.success('Block deleted');
+      }
+    }
+    
+    function duplicateBlock() {
+      hideContextMenu();
+      const p = STATE.currentProject;
+      if (!p || !STATE.selectedBlockId) return;
+      
+      const block = p.blocks.find(b => b.id === STATE.selectedBlockId);
+      if (!block) return;
+      
+      saveState();
+      
+      const index = p.blocks.findIndex(b => b.id === STATE.selectedBlockId);
+      const newBlock = JSON.parse(JSON.stringify(block));
+      newBlock.id = U.id();
+      newBlock.createdAt = U.now();
+      
+      p.blocks.splice(index + 1, 0, newBlock);
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderProject();
+      Toast.success('Block duplicated');
+    }
+    
+    function turnInto(type) {
+      hideContextMenu();
+      if (STATE.selectedBlockId) {
+        turnBlockInto(STATE.selectedBlockId, type);
+      }
+    }
+    
+    function moveBlockUp() {
+      hideContextMenu();
+      const p = STATE.currentProject;
+      if (!p || !STATE.selectedBlockId) return;
+      
+      const index = p.blocks.findIndex(b => b.id === STATE.selectedBlockId);
+      if (index > 0) {
+        saveState();
+        [p.blocks[index - 1], p.blocks[index]] = [p.blocks[index], p.blocks[index - 1]];
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProject();
+      }
+    }
+    
+    function moveBlockDown() {
+      hideContextMenu();
+      const p = STATE.currentProject;
+      if (!p || !STATE.selectedBlockId) return;
+      
+      const index = p.blocks.findIndex(b => b.id === STATE.selectedBlockId);
+      if (index < p.blocks.length - 1) {
+        saveState();
+        [p.blocks[index], p.blocks[index + 1]] = [p.blocks[index + 1], p.blocks[index]];
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProject();
+      }
+    }
+    
+    function copyBlockLink() {
+      hideContextMenu();
+      const url = `${window.location.href}#${STATE.selectedBlockId}`;
+      navigator.clipboard.writeText(url);
+      Toast.success('Link copied to clipboard');
+    }
+    
+    // ===== DRAG & DROP =====
+    let draggedBlockId = null;
+    
+    function handleDragStart(e, blockId) {
+      draggedBlockId = blockId;
+      e.target.closest('.block').classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    
+    function handleDragEnd(e) {
+      document.querySelectorAll('.block').forEach(b => {
+        b.classList.remove('dragging', 'drag-over');
+      });
+      draggedBlockId = null;
+    }
+    
+    function handleDragOver(e, blockId) {
+      e.preventDefault();
+      if (blockId !== draggedBlockId) {
+        e.target.closest('.block')?.classList.add('drag-over');
+      }
+    }
+    
+    function handleDragLeave(e) {
+      e.target.closest('.block')?.classList.remove('drag-over');
+    }
+    
+    function handleDrop(e, targetId) {
+      e.preventDefault();
+      const block = e.target.closest('.block');
+      if (block) block.classList.remove('drag-over');
+      
+      if (!draggedBlockId || draggedBlockId === targetId) return;
+      
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      saveState();
+      
+      const fromIndex = p.blocks.findIndex(b => b.id === draggedBlockId);
+      const toIndex = p.blocks.findIndex(b => b.id === targetId);
+      
+      if (fromIndex !== -1 && toIndex !== -1) {
+        const [moved] = p.blocks.splice(fromIndex, 1);
+        p.blocks.splice(toIndex, 0, moved);
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProject();
+        Toast.success('Block moved');
+      }
+    }
+    
+    // ===== FLOATING TOOLBAR =====
+    function showFloatingToolbar() {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) {
+        hideFloatingToolbar();
+        return;
+      }
+      
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      const toolbar = $('floatingToolbar');
+      toolbar.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+      toolbar.style.top = (rect.top - 44) + 'px';
+      toolbar.classList.add('show');
+    }
+    
+    function hideFloatingToolbar() {
+      $('floatingToolbar').classList.remove('show');
+    }
+    
+    function formatText(format) {
+      switch (format) {
+        case 'bold': document.execCommand('bold'); break;
+        case 'italic': document.execCommand('italic'); break;
+        case 'underline': document.execCommand('underline'); break;
+        case 'strikethrough': document.execCommand('strikethrough'); break;
+        case 'code':
+          const selection = window.getSelection();
+          if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const code = document.createElement('code');
+            code.style.background = '#f1f1ef';
+            code.style.padding = '2px 4px';
+            code.style.borderRadius = '3px';
+            code.style.fontFamily = 'var(--mono)';
+            code.appendChild(range.extractContents());
+            range.insertNode(code);
+          }
+          break;
+        case 'link':
+          const url = prompt('Enter URL:');
+          if (url) document.execCommand('createLink', false, url);
+          break;
+        case 'highlight':
+          document.execCommand('hiliteColor', false, '#fff3bf');
+          break;
+      }
+    }
+    
+    // ===== COMMAND PALETTE =====
+    function openCommandPalette() {
+      $('commandPalette').classList.add('show');
+      $('commandInput').value = '';
+      $('commandInput').focus();
+      filterCommands();
+    }
+    
+    function closeCommandPalette() {
+      $('commandPalette').classList.remove('show');
+    }
+    
+    function filterCommands() {
+      const query = $('commandInput').value.toLowerCase();
+      const items = $('commandResults').querySelectorAll('.command-item');
+      
+      items.forEach(item => {
+        const text = item.querySelector('.command-text').textContent.toLowerCase();
+        item.style.display = text.includes(query) ? '' : 'none';
+      });
+      
+      // Update selected
+      const visible = [...items].filter(i => i.style.display !== 'none');
+      items.forEach(i => i.classList.remove('selected'));
+      if (visible.length > 0) visible[0].classList.add('selected');
+    }
+    
+    function handleCommandKey(e) {
+      if (e.key === 'Escape') {
+        closeCommandPalette();
+        return;
+      }
+      
+      if (e.key === 'Enter') {
+        const selected = $('commandResults').querySelector('.command-item.selected');
+        if (selected) selected.click();
+        return;
+      }
+      
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const items = [...$('commandResults').querySelectorAll('.command-item')].filter(i => i.style.display !== 'none');
+        const currentIndex = items.findIndex(i => i.classList.contains('selected'));
+        
+        items.forEach(i => i.classList.remove('selected'));
+        
+        let newIndex = currentIndex;
+        if (e.key === 'ArrowDown') newIndex = (currentIndex + 1) % items.length;
+        else newIndex = (currentIndex - 1 + items.length) % items.length;
+        
+        if (items[newIndex]) items[newIndex].classList.add('selected');
+      }
+    }
+    
+    function executeCommand(cmd) {
+      closeCommandPalette();
+      
+      switch (cmd) {
+        case 'new-project':
+          openModal('project');
+          break;
+        case 'settings':
+          showSettings();
+          break;
+        case 'export':
+          saveProjectFile();
+          break;
+        case 'toggle-sidebar':
+          toggleSidebar();
+          break;
+      }
+    }
+    
+    // ===== DATA MANAGEMENT =====
+    function saveProjectFile() {
+      const p = STATE.currentProject;
+      if (!p) {
+        Toast.warning('No project selected');
+        return;
+      }
+      
+      const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${p.code}-${p.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`;
+      a.click();
+      Toast.success('Project exported');
+    }
+    
+    function deleteProject() {
+      if (!STATE.currentProject) return;
+      if (!confirm('Delete this project? This cannot be undone.')) return;
+      
+      STATE.projects = STATE.projects.filter(p => p.id !== STATE.currentProject.id);
+      Store.saveProjects();
+      goHome();
+      Toast.success('Project deleted');
+    }
+    
+    function exportAll() {
+      const data = {
+        config: STATE.config,
+        projects: STATE.projects,
+        exportedAt: U.now()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `veritas-archivum-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      Toast.success('All data exported');
+    }
+    
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          
+          if (data.projects) {
+            STATE.projects = data.projects;
+            Store.saveProjects();
+          }
+          if (data.config) {
+            STATE.config = { ...STATE.config, ...data.config };
+            Store.saveConfig();
+            if (STATE.config.logo) applyLogo(STATE.config.logo);
+          }
+          
+          renderProjects();
+          goHome();
+          Toast.success('Data imported successfully');
+        } catch (err) {
+          Toast.error('Failed to import: Invalid file');
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    function clearAllData() {
+      if (!confirm('⚠️ Delete ALL data? This cannot be undone!')) return;
+      if (!confirm('Are you absolutely sure? All projects will be permanently deleted.')) return;
+      
+      localStorage.clear();
+      STATE.projects = [];
+      STATE.currentProject = null;
+      STATE.counters = { project: 0 };
+      
+      renderProjects();
+      goHome();
+      Toast.success('All data cleared');
+    }
+    
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', e => {
+      // Cmd+K - Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openCommandPalette();
+        return;
+      }
+      
+      // Cmd+Z - Undo
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+        return;
+      }
+      
+      // Cmd+Shift+Z - Redo
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'z') {
+        e.preventDefault();
+        redo();
+        return;
+      }
+      
+      // Cmd+D - Duplicate block
+      if ((e.metaKey || e.ctrlKey) && e.key === 'd' && STATE.selectedBlockId) {
+        e.preventDefault();
+        duplicateBlock();
+        return;
+      }
+      
+      // Cmd+Shift+Up - Move block up
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'ArrowUp' && STATE.selectedBlockId) {
+        e.preventDefault();
+        moveBlockUp();
+        return;
+      }
+      
+      // Cmd+Shift+Down - Move block down
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'ArrowDown' && STATE.selectedBlockId) {
+        e.preventDefault();
+        moveBlockDown();
+        return;
+      }
+      
+      // Cmd+\ - Toggle sidebar
+      if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+        e.preventDefault();
+        toggleSidebar();
+        return;
+      }
+      
+      // Escape - Close menus
+      if (e.key === 'Escape') {
+        hideSlashMenu();
+        hideContextMenu();
+        hideFloatingToolbar();
+        closeCommandPalette();
+        return;
+      }
+    });
+    
+    // Click outside to close menus
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.slash-menu') && !e.target.closest('[contenteditable]')) {
+        hideSlashMenu();
+      }
+      if (!e.target.closest('.context-menu') && !e.target.closest('.block-action-btn')) {
+        hideContextMenu();
+      }
+      if (!e.target.closest('.floating-toolbar')) {
+        setTimeout(hideFloatingToolbar, 100);
+      }
+      if (e.target.classList.contains('command-palette-overlay')) {
+        closeCommandPalette();
+      }
+      if (e.target.classList.contains('modal-overlay')) {
+        const modal = e.target.id.replace('modal', '').toLowerCase();
+        closeModal(modal);
+      }
+    });
+    
+    // Text selection for floating toolbar
+    document.addEventListener('mouseup', () => {
+      setTimeout(showFloatingToolbar, 10);
+    });
+    
+    // ===== INIT =====
+    function init() {
+      Store.loadConfig();
+      Store.loadProjects();
+      renderProjects();
+      renderHome();
+      
+      console.log('🚀 VeritasArchivum Enhanced UX loaded');
+      console.log('Shortcuts: ⌘K (search), ⌘Z (undo), / (commands)');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

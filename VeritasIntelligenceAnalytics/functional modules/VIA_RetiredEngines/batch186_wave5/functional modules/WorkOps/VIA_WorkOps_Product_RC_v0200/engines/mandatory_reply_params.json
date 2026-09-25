@@ -1,0 +1,166 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-031",
+  "purpose": "Mouse-first Mandatory Reply Builder. Draft payload only; never send automatically.",
+  "followup_eligibility": {
+    "include_state_codes": [
+      "IN_PROGRESS",
+      "WAITING",
+      "BLOCKED",
+      "NEED_HELP",
+      "AT_RISK",
+      "OVERDUE",
+      "UNKNOWN"
+    ],
+    "minimum_level": 2,
+    "exclude_closed": true,
+    "max_items": 50
+  },
+  "mandatory_questions": {
+    "status": {
+      "label_zh": "目前狀態",
+      "label_en": "Current status",
+      "options": [
+        {
+          "key": "DONE",
+          "zh": "已完成",
+          "en": "Completed",
+          "requires": [
+            "evidence"
+          ]
+        },
+        {
+          "key": "IN_PROGRESS",
+          "zh": "進行中",
+          "en": "In progress",
+          "requires": [
+            "eta"
+          ]
+        },
+        {
+          "key": "WAITING",
+          "zh": "等待資訊",
+          "en": "Waiting for information",
+          "requires": [
+            "waiting_for",
+            "eta"
+          ]
+        },
+        {
+          "key": "BLOCKED",
+          "zh": "卡關",
+          "en": "Blocked",
+          "requires": [
+            "reason",
+            "eta",
+            "plan_b"
+          ]
+        },
+        {
+          "key": "NEED_HELP",
+          "zh": "需要協助",
+          "en": "Need help",
+          "requires": [
+            "requested_help",
+            "eta",
+            "plan_b"
+          ]
+        }
+      ]
+    },
+    "delay_reason": {
+      "label_zh": "若延遲，主要原因",
+      "label_en": "If delayed, primary reason",
+      "required_when": [
+        "BLOCKED",
+        "OVERDUE"
+      ],
+      "options": [
+        {
+          "key": "RESOURCE",
+          "zh": "人力",
+          "en": "Resource"
+        },
+        {
+          "key": "MATERIAL",
+          "zh": "材料",
+          "en": "Material"
+        },
+        {
+          "key": "TECHNICAL",
+          "zh": "技術",
+          "en": "Technical"
+        },
+        {
+          "key": "APPROVAL",
+          "zh": "核准",
+          "en": "Approval"
+        },
+        {
+          "key": "INFORMATION",
+          "zh": "資訊不足",
+          "en": "Information"
+        },
+        {
+          "key": "DEPENDENCY",
+          "zh": "外部相依",
+          "en": "External dependency"
+        },
+        {
+          "key": "OTHER",
+          "zh": "其他",
+          "en": "Other"
+        }
+      ]
+    },
+    "plan_b": {
+      "label_zh": "若原計畫無法如期完成，Plan B",
+      "label_en": "Plan B if original plan cannot finish on time",
+      "required_when": [
+        "BLOCKED",
+        "NEED_HELP",
+        "AT_RISK",
+        "OVERDUE"
+      ],
+      "options": [
+        {
+          "key": "ADD_RESOURCE",
+          "zh": "增加資源",
+          "en": "Add resource"
+        },
+        {
+          "key": "PARALLEL",
+          "zh": "平行處理",
+          "en": "Parallel processing"
+        },
+        {
+          "key": "ALTERNATIVE",
+          "zh": "替代方案",
+          "en": "Alternative solution"
+        },
+        {
+          "key": "WORKAROUND",
+          "zh": "暫時替代措施",
+          "en": "Temporary workaround"
+        },
+        {
+          "key": "ESCALATE",
+          "zh": "升級協助",
+          "en": "Escalate for support"
+        },
+        {
+          "key": "RESCHEDULE",
+          "zh": "重新排程",
+          "en": "Reschedule"
+        }
+      ]
+    }
+  },
+  "draft_policy": {
+    "human_confirm_required": true,
+    "outlook_send": false,
+    "write_outlook_folder": false,
+    "subject_prefix": "[VIA Follow-up]",
+    "include_machine_token": true
+  }
+}

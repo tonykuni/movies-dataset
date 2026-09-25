@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VIA Activation Gateway v02 Gateway Hotfix</title>
+<style>
+body{margin:0;background:#f5f4f0;color:#1e1d1a;font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:12px}
+.header{padding:28px 34px;background:linear-gradient(135deg,#0f172a,#263b6f);color:white}
+.header h1{margin:0;font-size:32px}.line2{margin-top:6px;font-size:15px;font-weight:800;letter-spacing:1.8px}.line3{margin-top:8px;font-size:14px;opacity:.92}
+.wrap{padding:24px 34px}.grid{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:14px;margin-bottom:18px}
+.card{background:white;border:1px solid #dbd9d3;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(16,24,40,.06)}
+.kpi{font-size:30px;font-weight:900;font-family:Consolas,monospace}.label{color:#9c9890;font-size:12px;margin-top:4px}.badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:900}
+.badge.low{background:#cde8d5;color:#5a9e6f}.badge.medium{background:#f5e2b8;color:#c4943a}.badge.high{background:#f5d0c8;color:#c96b5a}
+.lock{font-family:Consolas,monospace;white-space:pre-wrap;background:#0b1020;color:#dbeafe;padding:14px;border-radius:12px;line-height:1.5;overflow:auto}
+table{width:100%;border-collapse:collapse;background:white;border:1px solid #dbd9d3;border-radius:12px;overflow:hidden}
+th{text-align:left;background:#eef2f8;color:#334155;font-size:12px;padding:10px;border-bottom:1px solid #dbd9d3;position:sticky;top:0}
+td{font-size:12px;padding:9px 10px;border-bottom:1px solid #eef1f6;vertical-align:top}
+tr.ok td:first-child{border-left:4px solid #5a9e6f}tr.warn td:first-child{border-left:4px solid #c4943a}tr.fail td:first-child{border-left:4px solid #c96b5a}
+.path{font-family:Consolas,monospace;font-size:10px;color:#475467;word-break:break-all}.mw{max-height:680px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VERITAS INTELLIGENCE ANALYTICS</h1>
+<div class="line2">VIA Activation Gateway v02 · Gateway Hotfix</div>
+<div class="line3">Fix child gateway WARN only · Frozen core unchanged · Hardened wrapper · Matrix Report</div>
+</div>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="badge high">VIA_ACTIVATION_GATEWAY_FROM_UNIFIED_INPUT_V02_WITH_REVIEW</div><div class="label">Risk HIGH</div></div>
+<div class="card"><div class="kpi">3</div><div class="label">OK</div></div>
+<div class="card"><div class="kpi">3</div><div class="label">WARN</div></div>
+<div class="card"><div class="kpi">3</div><div class="label">FAIL</div></div>
+<div class="card"><div class="kpi">9</div><div class="label">Rows</div></div>
+<div class="card"><div class="kpi">2.74</div><div class="label">Seconds</div></div>
+</div>
+
+<h2>def Gateway Hotfix Scope</h2>
+<div class="lock">Unified Input SSOT:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json
+
+Hardened Gateway:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\gateway\Invoke-VIA-ActivationGateway-Hardened.ps1
+
+Manifest:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\registry\VIA_ActivationGateway_v02_Hotfix_Manifest.json
+
+stdout:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\logs\HardenedGateway_stdout.txt
+
+stderr:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\logs\HardenedGateway_stderr.txt
+
+Policy:
+def frozen core not modified
+def add-only wrapper
+def no delete
+def no Stop-Process
+def no exit
+def only gateway child WARN is targeted</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Action</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>
+<tr class='ok'><td>Round0</td><td>UNIFIED_INPUT_SSOT</td><td>VIA_UnifiedInput_SSOT.json</td><td>OK</td><td>LOW</td><td>READY</td><td>load</td><td>ok</td><td>Unified input SSOT loaded.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json</td></tr>
+<tr class='ok'><td>Round0</td><td>FROZEN_GATEWAY</td><td>Invoke-VIA-UnifiedInputGateway.ps1</td><td>OK</td><td>LOW</td><td>READY</td><td>exists_non_empty</td><td>2374</td><td>File exists and is non-empty.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_freeze\VIA_UNIFIED_INPUT_SSOT_FREEZE_GATEWAY_20260609_034130\gateway\Invoke-VIA-UnifiedInputGateway.ps1</td></tr>
+<tr class='warn'><td>Round0</td><td>PRIOR_GATEWAY_LOG</td><td>Gateway_Status_stdout.txt</td><td>WARN</td><td>MEDIUM</td><td>OPTIONAL_REVIEW</td><td>missing</td><td>not_found</td><td>Prior stdout log not found. Continue with wrapper test.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_freeze\VIA_UNIFIED_INPUT_SSOT_FREEZE_GATEWAY_20260609_034130\logs\Gateway_Status_stdout.txt</td></tr>
+<tr class='warn'><td>Round0</td><td>PRIOR_GATEWAY_LOG</td><td>Gateway_Status_stderr.txt</td><td>WARN</td><td>MEDIUM</td><td>OPTIONAL_REVIEW</td><td>missing</td><td>not_found</td><td>Prior stderr log not found. Continue with wrapper test.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_freeze\VIA_UNIFIED_INPUT_SSOT_FREEZE_GATEWAY_20260609_034130\logs\Gateway_Status_stderr.txt</td></tr>
+<tr class='ok'><td>Round1</td><td>HARDENED_GATEWAY</td><td>Invoke-VIA-ActivationGateway-Hardened.ps1</td><td>OK</td><td>LOW</td><td>ADD_ONLY_WRITE</td><td>write</td><td>complete</td><td>Hardened gateway wrapper written.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\gateway\Invoke-VIA-ActivationGateway-Hardened.ps1</td></tr>
+<tr class='fail'><td>Round1</td><td>HARDENED_GATEWAY_AST</td><td>Invoke-VIA-ActivationGateway-Hardened.ps1</td><td>FAIL</td><td>HIGH</td><td>REVIEW_REQUIRED</td><td>ast_parse</td><td>1</td><td>PowerShell AST parse errors found.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\gateway\Invoke-VIA-ActivationGateway-Hardened.ps1</td></tr>
+<tr class='fail'><td>Round2</td><td>HARDENED_GATEWAY_STATUS</td><td>Gateway status</td><td>FAIL</td><td>HIGH</td><td>REVIEW_REQUIRED</td><td>exit_code</td><td>1</td><td>Hardened gateway returned non-ready. Review stdout/stderr.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\gateway\Invoke-VIA-ActivationGateway-Hardened.ps1</td></tr>
+<tr class='warn'><td>Round2</td><td>HARDENED_GATEWAY_STDERR</td><td>stderr</td><td>WARN</td><td>MEDIUM</td><td>OPTIONAL_REVIEW</td><td>stderr_length</td><td>853</td><td>stderr has content.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V02_GATEWAY_HOTFIX_20260609_035258\logs\HardenedGateway_stderr.txt</td></tr>
+<tr class='fail'><td>Round3</td><td>CORE_STILL_READY</td><td>Invoke-VeritasNexusCore.ps1 def_SafeString</td><td>FAIL</td><td>HIGH</td><td>REVIEW_REQUIRED</td><td>missing</td><td>required</td><td>Required file missing.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1 def_SafeString</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+ "schema": "VIA.IntakeManifest.v1",
+ "batch": "批522",
+ "ts": "2026-09-15 15:16",
+ "upload": "VIA_VRN_FirstPageEngine_2.py(操作員上傳;檔頭自稱 VIA_VRN_FirstPageEngine v0101 ALL-IN-ONE)",
+ "law": "收容件零觸碰(原名原字節);正主橋 VRN_ENG086_FirstPageLogicBridge 以 importlib 載入並在橋側加防呆;ENG072 正本零觸碰,產物為 append-only sidecar",
+ "files": [
+  {
+   "name": "VIA_VRN_FirstPageEngine_2.py",
+   "bytes": 30115,
+   "md5": "d4cdaedf949d78d062a12c0a779b2fb0",
+   "sha256": "05029fc07d6679b5ca5d55e351610a7c812eaef755cc59900dc716060699b906"
+  }
+ ],
+ "modules": [
+  "SSOT loader",
+  "TickerFilename",
+  "Layout",
+  "TableGeometry",
+  "NLPRepair",
+  "FinancialValidation",
+  "PriceAdjustment",
+  "BrokerRatingDict",
+  "FieldValidation",
+  "CrossValidation",
+  "FirstPageEngine"
+ ],
+ "known_defects_absorbed_by_bridge": [
+  "broker_normalize 子字串比對:短拉丁別名 gs/ms/mq 會撞 earnings/terms(橋側改詞界+大寫獨立)",
+  "rating_normalize 的 `or a in low` 讓詞界失效:buy 撞 buyback、hold 撞 holdings、add 撞 added(橋側改線索詞+詞界)",
+  "load_ssot_blocks 期望 _RAW_REGEX/_RAW_SYNONYMS json.loads(r''')區塊;VIA 正典 SSOT 無此區塊 → 回空 → 名冊改自 VDF tw_listings(唯讀)",
+  "cross_check 內未用的 core lambda 寫法可疑(不呼叫)",
+  "券商字典缺台灣多數本土券商(兆豐/國泰/永豐/玉山…;橋側 extra_broker 補)",
+  "日期 token 只認 6/8 碼西元;民國 7 碼(橋側補)"
+ ]
+}

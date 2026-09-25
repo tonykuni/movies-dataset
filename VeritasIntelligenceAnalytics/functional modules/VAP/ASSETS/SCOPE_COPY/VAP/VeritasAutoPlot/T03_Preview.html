@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T03 — K線 Preview (台積電風格)</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{--sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;--sb-purple:#8172B3;--sb-gray:#8C8C8C;--sb-cyan:#64B5CD;--sb-yellow:#CCB974;--sb-pink:#DA8BC3;--sb-brown:#937860;--up:#C44E52;--dn:#55A868;--bg:#FFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;--font:'Inter','Noto Sans TC',-apple-system,sans-serif;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:24px}
+.header{text-align:center;margin-bottom:16px}.header h1{font-size:clamp(15px,2.4vw,21px);font-weight:600;letter-spacing:-.3px}.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:18px;margin-bottom:14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:18px;font-size:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+label{font-size:11px;color:var(--tx2)}
+input[type=color]{width:26px;height:26px;padding:1px;cursor:pointer;border:1px solid var(--bd);border-radius:4px}
+input[type=number]{font-family:var(--font);font-size:11px;width:50px;border:1px solid var(--bd);border-radius:4px;padding:3px 5px}
+#chart{width:100%;height:clamp(520px,70vh,840px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:10px}
+@media(max-width:768px){body{padding:10px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>VeritasAutoPlot™ T03 — K線圖 (台積電 2330.TW 風格)</h1>
+  <div class="sub">2024-06 ~ 2025-02 · SMA/EMA + BB + Volume · 台股上漲紅下跌綠</div>
+</div>
+<div class="card">
+  <div class="ctrl-row">
+    <label>SMA:</label>
+    <span class="chip active" id="sma5" onclick="toggle(this);render()">5</span>
+    <span class="chip active" id="sma10" onclick="toggle(this);render()">10</span>
+    <span class="chip active" id="sma20" onclick="toggle(this);render()">20</span>
+    <span class="chip" id="sma60" onclick="toggle(this);render()">60</span>
+    <div class="sep"></div>
+    <label>EMA:</label>
+    <span class="chip" id="ema12" onclick="toggle(this);render()">12</span>
+    <span class="chip" id="ema26" onclick="toggle(this);render()">26</span>
+    <div class="sep"></div>
+    <span class="chip active" id="cBB" onclick="toggle(this);render()">BB(20,2)</span>
+    <span class="chip active" id="cVol" onclick="toggle(this);render()">Volume</span>
+    <span class="chip active" id="cHL" onclick="toggle(this);render()">H/L</span>
+    <div class="sep"></div>
+    <label>Up</label><input type="color" id="clrUp" value="#C44E52" onchange="render()">
+    <label>Dn</label><input type="color" id="clrDn" value="#55A868" onchange="render()">
+  </div>
+  <div id="chart"></div>
+</div>
+<div class="footer">VeritasAutoPlot™ · T03 K線圖 · 台股慣例: 漲紅跌綠 · Demo Data</div>
+
+<script>
+/* ═══ Realistic TSMC-style OHLCV ═══ */
+function genTSMC(){
+  // Approximate TSMC daily path anchors (TWD)
+  const anchors=[
+    ['2024-06-03',840],['2024-06-14',920],['2024-06-28',960],
+    ['2024-07-01',965],['2024-07-11',1080],['2024-07-19',1035],['2024-07-31',935],
+    ['2024-08-05',850],['2024-08-12',920],['2024-08-30',960],
+    ['2024-09-02',955],['2024-09-13',930],['2024-09-30',985],
+    ['2024-10-01',990],['2024-10-15',1025],['2024-10-28',1040],['2024-10-31',1020],
+    ['2024-11-01',1025],['2024-11-12',1055],['2024-11-29',1050],
+    ['2024-12-02',1065],['2024-12-13',1090],['2024-12-20',1070],['2024-12-31',1060],
+    ['2025-01-02',1065],['2025-01-10',1100],['2025-01-17',1085],['2025-01-22',1120],
+    ['2025-02-03',1035],['2025-02-07',1060],['2025-02-14',1050],
+  ];
+
+  const dates=[],open=[],high=[],low=[],close=[],vol=[];
+  for(let ai=0;ai<anchors.length-1;ai++){
+    const d0=new Date(anchors[ai][0]),d1=new Date(anchors[ai+1][0]);
+    const v0=anchors[ai][1],v1=anchors[ai+1][1];
+    let d=new Date(d0);
+    while(d<d1){
+      if(d.getDay()!==0&&d.getDay()!==6){
+        const t=(d-d0)/(d1-d0);
+        const c0=v0+(v1-v0)*t;
+        const noise=c0*(Math.random()-.5)*0.015;
+        const cl=+(c0+noise).toFixed(0);
+        const op=+(cl+(Math.random()-.5)*cl*0.012).toFixed(0);
+        const hi=Math.max(op,cl)+Math.round(Math.random()*cl*0.008);
+        const lo=Math.min(op,cl)-Math.round(Math.random()*cl*0.008);
+        dates.push(d.toISOString().slice(0,10));
+        open.push(op);high.push(hi);low.push(lo);close.push(cl);
+        // TSMC volume: ~20k-60k lots (千張)
+        const baseVol=25000+Math.random()*35000;
+        const volSpike=(cl<880||cl>1070)?baseVol*1.8:baseVol;
+        vol.push(Math.round(volSpike));
+      }
+      d=new Date(d.getTime()+864e5);
+    }
+  }
+  dates.push(anchors[anchors.length-1][0]);
+  const lastC=anchors[anchors.length-1][1];
+  open.push(lastC-5);high.push(lastC+8);low.push(lastC-12);close.push(lastC);vol.push(32000);
+  return{dates,open,high,low,close,vol};
+}
+const D=genTSMC();
+
+function sma(a,p){return a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((s,v)=>s+v,0)/p);}
+function ema(a,p){const k=2/(p+1);const r=[a[0]];for(let i=1;i<a.length;i++)r.push(a[i]*k+r[i-1]*(1-k));return r;}
+function bb(a,p,s){const m=sma(a,p);const u=[],l=[];for(let i=0;i<a.length;i++){if(m[i]===null){u.push(null);l.push(null);continue;}const sl=a.slice(Math.max(0,i-p+1),i+1);const avg=sl.reduce((s,v)=>s+v,0)/sl.length;const sd=Math.sqrt(sl.reduce((s,v)=>s+(v-avg)**2,0)/sl.length);u.push(+(m[i]+s*sd).toFixed(0));l.push(+(m[i]-s*sd).toFixed(0));}return{mid:m,upper:u,lower:l};}
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',br:'#937860',pk:'#DA8BC3',gy:'#8C8C8C',yl:'#CCB974',cy:'#64B5CD'};
+const MA_COLORS={5:SB.or,10:SB.bl,20:SB.pu,60:SB.br,12:SB.cy,26:SB.pk};
+const CFG={responsive:true,displayModeBar:false};
+
+function render(){
+  const clrUp=document.getElementById('clrUp').value;
+  const clrDn=document.getElementById('clrDn').value;
+  const showVol=gc('cVol'),showBB=gc('cBB'),showHL=gc('cHL');
+  const mainDomain=showVol?[0.20,1]:[0,1];
+
+  const traces=[];
+  // Candlestick — 台股慣例: 漲紅跌綠
+  traces.push({type:'candlestick',x:D.dates,open:D.open,high:D.high,low:D.low,close:D.close,
+    name:'台積電 2330',yaxis:'y',
+    increasing:{line:{color:clrUp},fillcolor:clrUp},
+    decreasing:{line:{color:clrDn},fillcolor:clrDn}});
+
+  [5,10,20,60].forEach(p=>{if(gc('sma'+p)){
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:sma(D.close,p),name:'SMA'+p,yaxis:'y',
+      line:{color:MA_COLORS[p],width:1.2},connectgaps:true});}});
+  [12,26].forEach(p=>{if(gc('ema'+p)){
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:ema(D.close,p),name:'EMA'+p,yaxis:'y',
+      line:{color:MA_COLORS[p],width:1.2,dash:'dot'},connectgaps:true});}});
+
+  if(showBB){const b=bb(D.close,20,2);
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.upper,name:'BB+',yaxis:'y',line:{color:SB.gy,width:.8,dash:'dash'},showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.lower,name:'BB-',yaxis:'y',line:{color:SB.gy,width:.8,dash:'dash'},fill:'tonexty',fillcolor:'rgba(140,140,140,.07)',showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.mid,name:'BB(20,2)',yaxis:'y',line:{color:SB.gy,width:1}});}
+
+  if(showVol){
+    const vc=D.close.map((c,i)=>c>=D.open[i]?clrUp+'88':clrDn+'88');
+    traces.push({type:'bar',x:D.dates,y:D.vol,name:'Volume',yaxis:'y2',marker:{color:vc},showlegend:false});}
+
+  const layout={
+    title:{text:'台積電 (2330.TW) — K線 + 技術指標',font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',margin:{t:55,r:50,b:50,l:60},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:10,color:'#6B6B6B'},rangeslider:{visible:false},dtick:'M1',tickformat:'%Y-%m-%d'},
+    yaxis:{domain:mainDomain,showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:10},separatethousands:true,title:{text:'Price (TWD)',font:{size:11}}},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11}},
+    legend:{orientation:'h',y:1.10,x:0,font:{size:10}},
+    annotations:[]
+  };
+  if(showVol){layout.yaxis2={domain:[0,0.16],showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9,color:SB.gy},title:{text:'Vol(張)',font:{size:9,color:SB.gy}}};}
+
+  if(showHL){
+    const mx=D.high.indexOf(Math.max(...D.high)),mn=D.low.indexOf(Math.min(...D.low));
+    const dd=((D.low[mn]-D.high[mx])/D.high[mx]*100).toFixed(1);
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.high[mx],text:'▲ '+D.high[mx].toLocaleString()+' TWD\n'+D.dates[mx],
+       showarrow:true,arrowhead:0,ax:45,ay:-30,font:{size:10,color:clrUp,weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:clrUp,borderwidth:1,borderpad:3},
+      {x:D.dates[mn],y:D.low[mn],text:'▼ '+D.low[mn].toLocaleString()+' TWD\n'+D.dates[mn]+'\nDD: '+dd+'%',
+       showarrow:true,arrowhead:0,ax:-45,ay:35,font:{size:10,color:clrDn,weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:clrDn,borderwidth:1,borderpad:3}
+    );
+  }
+
+  Plotly.react('chart',traces,layout,CFG);
+}
+render();
+</script>
+</body>
+</html>

@@ -1,13 +1,27 @@
 """Command-line interface.
 
-    python super_extract.py doctor
-    python super_extract.py extract  FILE  [-o OUTDIR] [--engine E] [--encoding ENC] ...
-    python super_extract.py validate FILE
-    python super_extract.py compare  OLD NEW [--key COL] [-o OUTDIR] [--html]
-    python super_extract.py crosscheck FILE.docx
-    python super_extract.py selftest [--keep DIR]
+    python PLG_ENG001_SuperExtract.py doctor
+    python PLG_ENG001_SuperExtract.py extract  FILE  [-o OUTDIR] [--engine E] [--encoding ENC] ...
+    python PLG_ENG001_SuperExtract.py validate FILE
+    python PLG_ENG001_SuperExtract.py compare  OLD NEW [--key COL] [-o OUTDIR] [--html]
+    python PLG_ENG001_SuperExtract.py crosscheck FILE.docx
+    python PLG_ENG001_SuperExtract.py selftest [--keep DIR]
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import argparse
 import os
@@ -185,8 +199,24 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+
+# ===== [VIA:VERB-ALIAS:v0100] 批535:全樹以 `--selftest` 呼叫自測(格子站/匯流排/Deck/總控頁契約;律 L53)=====
+# 本引擎原只認位置動詞;等價轉換,只增不減,既有呼叫方零影響。
+_FLAG_VERBS_B535 = {"--selftest": "selftest", "--status": "status", "--manifest": "manifest", "--routes": "routes"}
+
+
+def _normalise_argv_b535(argv):
+    out, verb = [], None
+    for a in argv:
+        if a in _FLAG_VERBS_B535 and verb is None:
+            verb = _FLAG_VERBS_B535[a]
+        else:
+            out.append(a)
+    return ([verb] + out) if verb else out
+
+
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    args = build_parser().parse_args(_normalise_argv_b535(argv if argv is not None else sys.argv[1:]))
     try:
         return args.func(args)
     except ExtractionError as exc:

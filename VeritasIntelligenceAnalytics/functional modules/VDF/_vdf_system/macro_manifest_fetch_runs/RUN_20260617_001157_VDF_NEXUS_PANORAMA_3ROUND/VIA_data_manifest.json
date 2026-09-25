@@ -1,0 +1,879 @@
+{
+  "meta": {
+    "schema": "VIA.DataManifest",
+    "version": "v1.0",
+    "title": "VERITAS 2026 總體經濟投資風險引擎 — 資料需求清單",
+    "generated": "2026-06-16",
+    "consumer": [
+      "macro_dashboard.py",
+      "engine_v10.py"
+    ],
+    "fetcher": "VDF (VDF_MDL002_YFinanceFetchingEngine / VDF_MDL003_SentimentMacroEngine)",
+    "auth": {
+      "fred": "環境變數 FRED_API_KEY",
+      "yfinance": "無需金鑰"
+    },
+    "disclaimer": "非投資建議。沙箱無法連 Yahoo/FRED,須於本機(VDF)執行擷取。",
+    "total_series": 62,
+    "yfinance_count": 31,
+    "fred_count": 19
+  },
+  "config": {
+    "data_start": "2024-01-02",
+    "sector_chart_start": "2023-01-01",
+    "norm_date": "2025-01-02",
+    "fred_lookback_years": 1,
+    "note_fred_lookback": "FRED 序列須多抓前一年以計算 YoY",
+    "periods": [
+      "60D",
+      "120D",
+      "240D",
+      "YTD",
+      "1Y",
+      "2023",
+      "2022",
+      "2021",
+      "10Y",
+      "15Y",
+      "20Y",
+      "ALL"
+    ],
+    "period_starts": {
+      "60D": "今日-60交易日",
+      "120D": "今日-120交易日",
+      "240D": "今日-240交易日",
+      "YTD": "2025-01-02",
+      "2023": "2023-01-02",
+      "2021": "2021-01-02",
+      "ALL": "2005-01-03"
+    },
+    "time_axis": "交易日序軸(移除週末/假日無資料日)",
+    "missing_value": "聯集→刪全空日→缺值取前一交易日的『值』;量不前值填補"
+  },
+  "datasets": {
+    "equity_indices_主要與群組": [
+      {
+        "key": "GSPC",
+        "name_zh": "美國標普500指數",
+        "source": "yfinance",
+        "id": "^GSPC",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "主要,粗1.2"
+      },
+      {
+        "key": "TWII",
+        "name_zh": "台灣加權股價指數",
+        "source": "yfinance",
+        "id": "^TWII",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "主要,粗1.2"
+      },
+      {
+        "key": "KOSPI",
+        "name_zh": "南韓綜合股價指數",
+        "source": "yfinance",
+        "id": "^KS11",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "主要,粗1.2"
+      },
+      {
+        "key": "DJI",
+        "name_zh": "美國道瓊工業指數",
+        "source": "yfinance",
+        "id": "^DJI",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "美股群"
+      },
+      {
+        "key": "IXIC",
+        "name_zh": "美國那斯達克綜合指數",
+        "source": "yfinance",
+        "id": "^IXIC",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "美股群"
+      },
+      {
+        "key": "SOX",
+        "name_zh": "費城半導體指數",
+        "source": "yfinance",
+        "id": "^SOX",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "美股群"
+      },
+      {
+        "key": "N225",
+        "name_zh": "日經225指數",
+        "source": "yfinance",
+        "id": "^N225",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "亞股群"
+      },
+      {
+        "key": "SSEC",
+        "name_zh": "上證綜合指數",
+        "source": "yfinance",
+        "id": "000001.SS",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "亞股群"
+      },
+      {
+        "key": "HSI",
+        "name_zh": "香港恆生指數",
+        "source": "yfinance",
+        "id": "^HSI",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "亞股群"
+      },
+      {
+        "key": "STOXX",
+        "name_zh": "歐洲STOXX50指數",
+        "source": "yfinance",
+        "id": "^STOXX50E",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "normalize",
+        "panels": [
+          "①"
+        ],
+        "note": "歐股群"
+      }
+    ],
+    "sp500_sectors_圖2": [
+      {
+        "key": "XLK",
+        "name_zh": "資訊科技類股",
+        "source": "yfinance",
+        "id": "XLK",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": "起點2023-01-01,正規化2025-01-02,Plotly動態"
+      },
+      {
+        "key": "XLF",
+        "name_zh": "金融類股",
+        "source": "yfinance",
+        "id": "XLF",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLV",
+        "name_zh": "醫療保健類股",
+        "source": "yfinance",
+        "id": "XLV",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLY",
+        "name_zh": "非必需消費類股",
+        "source": "yfinance",
+        "id": "XLY",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLP",
+        "name_zh": "必需消費類股",
+        "source": "yfinance",
+        "id": "XLP",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLE",
+        "name_zh": "能源類股",
+        "source": "yfinance",
+        "id": "XLE",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLI",
+        "name_zh": "工業類股",
+        "source": "yfinance",
+        "id": "XLI",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLB",
+        "name_zh": "原物料類股",
+        "source": "yfinance",
+        "id": "XLB",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLU",
+        "name_zh": "公用事業類股",
+        "source": "yfinance",
+        "id": "XLU",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLRE",
+        "name_zh": "房地產類股",
+        "source": "yfinance",
+        "id": "XLRE",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      },
+      {
+        "key": "XLC",
+        "name_zh": "通訊服務類股",
+        "source": "yfinance",
+        "id": "XLC",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "normalize",
+        "panels": [
+          "②"
+        ],
+        "note": ""
+      }
+    ],
+    "commodities_fx": [
+      {
+        "key": "BRENT",
+        "name_zh": "布蘭特原油期貨",
+        "source": "yfinance",
+        "id": "BZ=F",
+        "frequency": "daily",
+        "unit": "美元/桶",
+        "transform": "raw",
+        "panels": [
+          "③",
+          "⑨"
+        ],
+        "note": ""
+      },
+      {
+        "key": "WTI",
+        "name_zh": "西德州中級原油期貨",
+        "source": "yfinance",
+        "id": "CL=F",
+        "frequency": "daily",
+        "unit": "美元/桶",
+        "transform": "raw",
+        "panels": [
+          "③",
+          "⑨"
+        ],
+        "note": ""
+      },
+      {
+        "key": "GOLD",
+        "name_zh": "黃金期貨",
+        "source": "yfinance",
+        "id": "GC=F",
+        "frequency": "daily",
+        "unit": "美元/盎司",
+        "transform": "raw",
+        "panels": [
+          "⑤"
+        ],
+        "note": ""
+      },
+      {
+        "key": "DXY",
+        "name_zh": "美元指數",
+        "source": "yfinance",
+        "id": "DX-Y.NYB",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "③",
+          "④",
+          "⑤"
+        ],
+        "note": ""
+      }
+    ],
+    "volatility_rates": [
+      {
+        "key": "VIX",
+        "name_zh": "CBOE 波動率指數 VIX",
+        "source": "yfinance",
+        "id": "^VIX",
+        "frequency": "daily",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "④"
+        ],
+        "note": ""
+      },
+      {
+        "key": "TNX",
+        "name_zh": "美國十年期公債殖利率(yfinance)",
+        "source": "yfinance",
+        "id": "^TNX",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "divide10",
+        "panels": [
+          "④"
+        ],
+        "note": "^TNX=殖利率×10,需÷10"
+      }
+    ],
+    "bond_etfs": [
+      {
+        "key": "SHY",
+        "name_zh": "iShares 1-3年期美國公債ETF",
+        "source": "yfinance",
+        "id": "SHY",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "raw",
+        "panels": [],
+        "note": "備用"
+      },
+      {
+        "key": "IEI",
+        "name_zh": "iShares 3-7年期美國公債ETF",
+        "source": "yfinance",
+        "id": "IEI",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "raw",
+        "panels": [],
+        "note": "備用"
+      },
+      {
+        "key": "IEF",
+        "name_zh": "iShares 7-10年期美國公債ETF",
+        "source": "yfinance",
+        "id": "IEF",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "raw",
+        "panels": [],
+        "note": "備用"
+      },
+      {
+        "key": "TLT",
+        "name_zh": "iShares 20年期以上美國公債ETF",
+        "source": "yfinance",
+        "id": "TLT",
+        "frequency": "daily",
+        "unit": "美元",
+        "transform": "raw",
+        "panels": [],
+        "note": "備用"
+      }
+    ],
+    "fred_yields_spreads": [
+      {
+        "key": "T10Y2Y",
+        "name_zh": "美國10年期減2年期公債利差",
+        "source": "fred",
+        "id": "T10Y2Y",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑥"
+        ],
+        "note": ""
+      },
+      {
+        "key": "T10Y3M",
+        "name_zh": "美國10年期減3個月公債利差",
+        "source": "fred",
+        "id": "T10Y3M",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑦"
+        ],
+        "note": ""
+      },
+      {
+        "key": "DGS10",
+        "name_zh": "美國10年期公債殖利率",
+        "source": "fred",
+        "id": "DGS10",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑥",
+          "⑦"
+        ],
+        "note": "兩張利差圖皆同藍"
+      },
+      {
+        "key": "DGS2",
+        "name_zh": "美國2年期公債殖利率",
+        "source": "fred",
+        "id": "DGS2",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑥"
+        ],
+        "note": ""
+      },
+      {
+        "key": "DGS3MO",
+        "name_zh": "美國3個月期公債殖利率",
+        "source": "fred",
+        "id": "DGS3MO",
+        "frequency": "daily",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑦"
+        ],
+        "note": ""
+      }
+    ],
+    "fred_inflation": [
+      {
+        "key": "CPI",
+        "name_zh": "美國消費者物價指數",
+        "source": "fred",
+        "id": "CPIAUCSL",
+        "frequency": "monthly",
+        "unit": "年增率%",
+        "transform": "yoy",
+        "panels": [
+          "⑨"
+        ],
+        "note": ""
+      },
+      {
+        "key": "PPI",
+        "name_zh": "美國生產者物價指數",
+        "source": "fred",
+        "id": "PPIACO",
+        "frequency": "monthly",
+        "unit": "年增率%",
+        "transform": "yoy",
+        "panels": [
+          "⑨"
+        ],
+        "note": ""
+      }
+    ],
+    "fred_activity": [
+      {
+        "key": "PMI_MFG",
+        "name_zh": "美國ISM製造業採購經理人指數",
+        "source": "fred",
+        "id": "NAPM",
+        "frequency": "monthly",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "⑧"
+        ],
+        "note": "FRED NAPM 可能停更,VDF 可改 ISM 來源"
+      },
+      {
+        "key": "PMI_NMF",
+        "name_zh": "美國ISM非製造業採購經理人指數",
+        "source": "fred",
+        "id": "NMFBAI",
+        "frequency": "monthly",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "⑧"
+        ],
+        "note": "同上"
+      },
+      {
+        "key": "RETAIL",
+        "name_zh": "美國零售銷售",
+        "source": "fred",
+        "id": "RSAFS",
+        "frequency": "monthly",
+        "unit": "年增率%",
+        "transform": "yoy",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      }
+    ],
+    "fred_employment": [
+      {
+        "key": "NFP",
+        "name_zh": "美國非農就業人數",
+        "source": "fred",
+        "id": "PAYEMS",
+        "frequency": "monthly",
+        "unit": "千人(月變動)",
+        "transform": "diff",
+        "panels": [
+          "⑩"
+        ],
+        "note": "取月變動 diff"
+      },
+      {
+        "key": "UNRATE",
+        "name_zh": "美國失業率",
+        "source": "fred",
+        "id": "UNRATE",
+        "frequency": "monthly",
+        "unit": "%",
+        "transform": "raw",
+        "panels": [
+          "⑩"
+        ],
+        "note": ""
+      },
+      {
+        "key": "ICSA",
+        "name_zh": "美國初次申請失業救濟金人數",
+        "source": "fred",
+        "id": "ICSA",
+        "frequency": "weekly",
+        "unit": "千人",
+        "transform": "div1000",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      },
+      {
+        "key": "U_LT5",
+        "name_zh": "失業未滿5週人數",
+        "source": "fred",
+        "id": "UEMPLT5",
+        "frequency": "monthly",
+        "unit": "千人→比重%",
+        "transform": "share",
+        "panels": [
+          "⑪"
+        ],
+        "note": "÷總和×100,堆疊,≤100%"
+      },
+      {
+        "key": "U_5_14",
+        "name_zh": "失業5至14週人數",
+        "source": "fred",
+        "id": "UEMP5TO14",
+        "frequency": "monthly",
+        "unit": "千人→比重%",
+        "transform": "share",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      },
+      {
+        "key": "U_15_26",
+        "name_zh": "失業15至26週人數",
+        "source": "fred",
+        "id": "UEMP15T26",
+        "frequency": "monthly",
+        "unit": "千人→比重%",
+        "transform": "share",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      },
+      {
+        "key": "U_27",
+        "name_zh": "失業27週以上人數",
+        "source": "fred",
+        "id": "UEMP27OV",
+        "frequency": "monthly",
+        "unit": "千人→比重%",
+        "transform": "share",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      }
+    ],
+    "fred_sentiment": [
+      {
+        "key": "UMCSENT",
+        "name_zh": "美國密西根大學消費者信心指數",
+        "source": "fred",
+        "id": "UMCSENT",
+        "frequency": "monthly",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      },
+      {
+        "key": "OECDCC",
+        "name_zh": "美國OECD消費者信心指數",
+        "source": "fred",
+        "id": "CSCICP03USM665S",
+        "frequency": "monthly",
+        "unit": "指數",
+        "transform": "raw",
+        "panels": [
+          "⑪"
+        ],
+        "note": ""
+      }
+    ]
+  },
+  "engine_inputs_風險引擎因子": {
+    "note": "engine_v10.py 之 trigger/fragility 因子來源;部分需專業資料源(VDF 若無則維持人工輸入或代理)。",
+    "triggers": [
+      {
+        "key": "yield_curve_10y3m",
+        "name_zh": "殖利率曲線10年-3月",
+        "source": "fred",
+        "id": "T10Y3M",
+        "frequency": "daily",
+        "unit": "bp",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.25"
+      },
+      {
+        "key": "hy_oas",
+        "name_zh": "高收益債信用利差",
+        "source": "fred",
+        "id": "BAMLH0A0HYM2",
+        "frequency": "daily",
+        "unit": "bp",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.30,ICE BofA HY OAS"
+      },
+      {
+        "key": "sahm",
+        "name_zh": "Sahm 衰退指標",
+        "source": "fred",
+        "id": "SAHMREALTIME",
+        "frequency": "monthly",
+        "unit": "ppt",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.15"
+      },
+      {
+        "key": "earnings_rev",
+        "name_zh": "盈餘修正方向",
+        "source": "vdf/manual",
+        "id": "—",
+        "frequency": "monthly",
+        "unit": "±",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.20,需賣方共識(VDF/I/B/E/S 或人工)"
+      },
+      {
+        "key": "oil_infl_shock",
+        "name_zh": "油價通膨衝擊",
+        "source": "derived",
+        "id": "BRENT/WTI",
+        "frequency": "daily",
+        "unit": "norm",
+        "transform": "scenario",
+        "panels": [],
+        "note": "權重0.10,由原油情境推導"
+      },
+      {
+        "key": "move_repo",
+        "name_zh": "MOVE/回購壓力",
+        "source": "manual/vendor",
+        "id": "^MOVE",
+        "frequency": "daily",
+        "unit": "idx",
+        "transform": "overlay",
+        "panels": [],
+        "note": "覆蓋層,MOVE 指數需 ICE/Bloomberg"
+      }
+    ],
+    "fragility": [
+      {
+        "key": "valuation_cape",
+        "name_zh": "CAPE 估值",
+        "source": "vendor",
+        "id": "Shiller CAPE",
+        "frequency": "monthly",
+        "unit": "x",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.40,Shiller 官網/multpl"
+      },
+      {
+        "key": "concentration",
+        "name_zh": "市值集中度(前10大)",
+        "source": "vdf/manual",
+        "id": "—",
+        "frequency": "monthly",
+        "unit": "%",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.25,需成分權重"
+      },
+      {
+        "key": "leverage_margin",
+        "name_zh": "融資保證金債務",
+        "source": "fred",
+        "id": "BOGZ1FL663067003Q",
+        "frequency": "quarterly",
+        "unit": "$",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.20,FINRA margin debt"
+      },
+      {
+        "key": "liquidity_basis",
+        "name_zh": "流動性基差",
+        "source": "vendor",
+        "id": "—",
+        "frequency": "daily",
+        "unit": "bp",
+        "transform": "level",
+        "panels": [],
+        "note": "權重0.15,需專業流動性指標"
+      },
+      {
+        "key": "policy_space",
+        "name_zh": "政策空間",
+        "source": "derived",
+        "id": "DGS10/UNRATE",
+        "frequency": "monthly",
+        "unit": "idx",
+        "transform": "overlay",
+        "panels": [],
+        "note": "覆蓋層"
+      },
+      {
+        "key": "sovereign_debt",
+        "name_zh": "主權債務壓力",
+        "source": "fred",
+        "id": "GFDEGDQ188S",
+        "frequency": "quarterly",
+        "unit": "%GDP",
+        "transform": "overlay",
+        "panels": [],
+        "note": "覆蓋層,債務/GDP"
+      }
+    ]
+  },
+  "transforms_說明": {
+    "raw": "原值",
+    "normalize": "標準化=100 @ norm_date(壓起始/正規化日)",
+    "yoy": "年增率 = s/s.shift(12)-1,須多抓前一年",
+    "diff": "月變動 = s.diff()",
+    "div1000": "÷1000(化為千人)",
+    "divide10": "÷10(^TNX 還原為%)",
+    "share": "÷同組總和×100(比重%,≤100,可堆疊)",
+    "scenario": "由情境參數推導(engine scenario_analysis)",
+    "level": "引擎因子原始水準",
+    "overlay": "覆蓋層(權重0,僅監看)"
+  },
+  "fetch_interface_建議簽章": {
+    "vdf_fetch_prices": "def vdf_fetch_prices(tickers:list[str], start:str) -> dict[str,pandas.Series]",
+    "vdf_fetch_fred": "def vdf_fetch_fred(series_id:str, start:str, api_key:str) -> pandas.Series",
+    "output": "回傳以 manifest.key 為鍵的 dict,值為 DatetimeIndex 的 pandas.Series",
+    "align": "交付前不需對齊;對齊由 macro_dashboard.align_daily 處理"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "VIA-VAP-COMPLETE-SYSTEM-SPEC/1.0",
+  "version": "v025",
+  "specVersion": "1.22.0",
+  "name": "VeritasAutoPlot Complete System Package",
+  "authority": "SSOT_APPEND_ONLY_FAIL_CLOSED",
+  "topology": {
+    "launcher": "PowerShell",
+    "frontend": "Standalone Plotly-style Dashboard Workbench",
+    "backend": "Python Loopback HTTP Runtime",
+    "dataAuthority": "VDF Authorized Manifest",
+    "host": "127.0.0.1",
+    "defaultPort": 8765
+  },
+  "modules": [
+    {"id":"VAP-MOD-CORE","file":"js/vap-core-engine-v025.js","role":"data semantics, time alignment, refresh and stack contracts"},
+    {"id":"VAP-MOD-RENDERER","file":"js/vap-plotly-renderer-v025.js","role":"Plotly figure and dashboard tokens"},
+    {"id":"VAP-MOD-BRIDGE","file":"js/vap-runtime-bridge-v025.js","role":"loopback health, catalog, refresh and image calls"},
+    {"id":"VAP-MOD-RUNTIME","file":"runtime/vap_data_runtime_v025.py","role":"VDF gate, read-only adapters, cache, checkpoint and filesystem persistence"}
+  ],
+  "adapters": ["CSV", "TSV", "JSON", "JSON_ENDPOINT", "PARQUET", "SQLITE", "DUCKDB"],
+  "vdfGate": {
+    "required": true,
+    "schema": "VIA-VDF-VAP-CONNECTION-MANIFEST/1.0",
+    "identity": "sourceId + contractId + engine + fingerprint",
+    "statesAccepted": ["AUTHORIZED"],
+    "readOnlyRequired": true
+  },
+  "stockPolicy": {
+    "assetClasses": ["STOCK", "EQUITY", "ETF", "STOCK_INDEX"],
+    "priceInput": "ADJUSTED_PRICE_ONLY",
+    "rawCloseFallback": false,
+    "taLibEvidenceRequired": true,
+    "technicalIndicators": ["SMA", "EMA", "RSI", "MACD", "BBANDS"],
+    "volume": "SPLIT_ADJUSTED_ZERO_NO_CARRY"
+  },
+  "missingData": {
+    "price": "PREVIOUS_TRADING_DAY_FORWARD_FILL",
+    "volume": "ZERO_NO_CARRY",
+    "futureLookingInterpolation": false
+  },
+  "marketTiming": "US_T_TO_NEXT_TW_TRADING_DAY",
+  "chartSystem": {
+    "canonicalCharts": 40,
+    "compositeRecipes": 5,
+    "physicalYAxisMaximum": 2,
+    "axisIntervals": 4,
+    "axisTicks": 5,
+    "axisStepFamily": [2, 2.5, 5, 10],
+    "savedImage": "SVG + Contract + SHA-256",
+    "stackAlignment": "STRICT_INTERSECTION_SHARED_DOMAIN_BOTTOM_AXIS_ONLY",
+    "heightMultipliers": [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4]
+  },
+  "observationEngine": {
+    "schema": "VIA-VAP-OBSERVATION-SPEC/1.0",
+    "uxReference": "MACROMICRO_INTERACTION_MODEL_NOT_BRAND_COPY",
+    "timeRanges": ["1Y", "3Y", "5Y", "ALL"],
+    "frequencies": ["native", "weekly", "monthly", "quarterly", "yearly"],
+    "valueModes": ["level", "change_pct", "rebase_100", "yoy_pct"],
+    "aggregation": "LAST_OBSERVATION_IN_BUCKET",
+    "transformOrder": ["resample", "transform", "timeWindow", "finiteFilter"],
+    "latestValueStrip": true,
+    "evidence": ["source", "asOf", "fingerprint", "VDF", "Adjusted Price", "TA-Lib", "proxyDisclosure"],
+    "bookmarkPolicy": "APPEND_ONLY_IDEMPOTENT_SHA256",
+    "savedImagePropagation": true,
+    "stackPropagation": true
+  },
+  "userJourney": ["Sync Connect", "Add Chart", "Render", "Save", "Select or Extract", "Stack", "Explicit Export"],
+  "exports": ["HTML", "PNG", "PDF", "JSON"],
+  "security": ["LOOPBACK_ONLY", "PATH_ALLOWLIST", "HOST_ALLOWLIST", "DATABASE_READ_ONLY", "SVG_ACTIVE_CONTENT_REJECTED", "APPEND_ONLY_IMAGE_ID"],
+  "qualityGate": {
+    "workbenchFullDiagnostics": 136,
+    "workbenchUserTests": 72,
+    "packageTests": "tests/run_all_tests_v025.py",
+    "browserRule": "MUST_REPORT_NOT_EXECUTED_WHEN_EXECUTABLE_IS_ABSENT"
+  }
+}

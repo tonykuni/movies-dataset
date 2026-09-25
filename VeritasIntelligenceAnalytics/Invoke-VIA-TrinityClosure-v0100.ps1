@@ -15,6 +15,16 @@
 ==========================================================================================
 #>
 param([switch]$NoOpen)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = $PSScriptRoot
 $FM = Join-Path $Root "functional modules"
@@ -114,8 +124,8 @@ if ($vmOk) {
 }
 Check "VAP" "子系統 manifest JSON" $vmOk
 Check "VAP" "manifest artifacts 在位" $artOk $artDetail
-$e1 = Join-Path $vap "engine\via_autoplot_engine_v001.py"
-$e2 = Join-Path $vap "engine\via_autoplot_engine_chartlib_v002.py"
+$e1 = Join-Path $vap "engine\VAP_ENG002_AutoplotEngine_v001.py"
+$e2 = Join-Path $vap "engine\VAP_ENG001_AutoplotEngineChartlib_v002.py"
 Check "VAP" "繪圖引擎編譯" ((Test-PyCompile $e1) -and (Test-PyCompile $e2)) "v001 + chartlib v002"
 Check "VAP" "spec SSOT JSON" ((Test-Json (Join-Path $vap "spec\ssot\vap_spec.json")) -and (Test-Json (Join-Path $vap "spec\ssot\vap_chartlib.json"))) "vap_spec + vap_chartlib"
 $promOk = $false
@@ -184,3 +194,4 @@ Write-Host ("[報告] " + $htmlP)
 Write-Host ("[結案] FinalGate = " + $final + "(VDF " + $gates["VDF"] + " · VRN " + $gates["VRN"] + " · VAP " + $gates["VAP"] + " · 紅線 " + $gates["共通"] + ")") -ForegroundColor $(if ($final -eq "PASS") { "Green" } else { "Red" })
 if (-not $NoOpen) { try { Start-Process $htmlP | Out-Null } catch { } }
 if ($final -eq "PASS") { exit 0 } else { exit 1 }
+

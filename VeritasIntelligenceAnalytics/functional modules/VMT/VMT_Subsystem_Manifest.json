@@ -1,0 +1,169 @@
+{
+  "subsystem": "VMT",
+  "role": "VeritasMailTracker · AI 高智慧自動 Outlook 郵箱及工作管理系統 — mail intake, AI triage, meeting minutes, task SSOT, SLA escalation, follow-up mail, reply closure",
+  "integration_state": "ANCHOR_REGISTERED_WITH_ENGINE_ARTIFACTS",
+  "canonical_tree": "This anchor carries the VMT engine set (engines/) plus samples and tests; operator workstation data (ssot.json / *.jsonl / reports) lives under $VMT_ROOT and is never committed.",
+  "discovery_root": "functional modules/VMT",
+  "engine_family": "VMT",
+  "version": "v1.0",
+  "runtime": {
+    "python": ">=3.11",
+    "required_packages": [],
+    "optional_packages": {
+      "pywin32": "Outlook 收信與建立草稿 (win32com); 無此套件時自動改用 mail_inbox/ 資料夾",
+      "opencc": "簡繁轉換 s2twp; 無此套件時保持原文",
+      "rapidfuzz": "重複任務偵測加速; 無此套件時退回標準庫 difflib",
+      "ollama": "本地 LLM 補位判讀 (HTTP, 無需 Python 套件); 無法連線時全程規則判讀"
+    },
+    "entrypoint": "engines/vmt_pipeline.py",
+    "workspace_env": "VMT_ROOT",
+    "entrypoint_windows": "Start-VMT.ps1 (PowerShell 7+)"
+  },
+  "artifacts": [
+    {
+      "filename": "engines/vmt_core.py",
+      "role": "共用基座 · 工作區 / add-only 帳本 / 事件流 / Q01 隔離 / Visual Lock 報告",
+      "bytes": 21353,
+      "sha256": "9ea4ce130a4e9881aef9f221c692622295b66ca0ebf1e9d650745b59e39cf6e5"
+    },
+    {
+      "filename": "engines/vmt_lang.py",
+      "role": "中文判讀共用層 · 切句 / 相對期限換算 / 郵件意圖 / 句子性質 / 同音字校正",
+      "bytes": 19934,
+      "sha256": "478a232d2d64654e2e898371b14806e8e4a6fa1d779474672be1f95d33a27565"
+    },
+    {
+      "filename": "engines/vmt_outlook_intake.py",
+      "role": "收信引擎 · 來源只讀 · MD5 去重 · Outlook / 資料夾 / 範例三級降級",
+      "bytes": 13430,
+      "sha256": "e0cc4429733b2f0d51f5b235d63232f93841dc440bde9410bc4e65f2820d76b9"
+    },
+    {
+      "filename": "engines/vmt_ai_triage.py",
+      "role": "AI 判讀引擎 · 意圖 / 緊急度 / 期限 / 歸案 · 規則優先 LLM 補位 · 低信心進 Q01",
+      "bytes": 9313,
+      "sha256": "f16d37cf05b47407c186cc838bc23e3889ee15c2d3c4beb61b032f2b5f97878c"
+    },
+    {
+      "filename": "engines/vmt_meeting_minutes.py",
+      "role": "會議記錄引擎 · 標主詞 / 標性質 / 議程對照 / 引用反查 / 幻覺過濾",
+      "bytes": 33912,
+      "sha256": "239c89f6f85a7bfdb197ae47e18b90af00db8023af140f4a51bf7610f7c3c620"
+    },
+    {
+      "filename": "engines/vmt_extract_tasks.py",
+      "role": "任務抽取引擎 · 郵件會話 + 會議待辦 -> 任務候選 · provenance 必填",
+      "bytes": 11414,
+      "sha256": "6e19ddc3611bc847633e9379aa1b8628a99ea847f05b3037a1f9a17f41765823"
+    },
+    {
+      "filename": "engines/vmt_projects.py",
+      "role": "專案自動編碼 · workspace 資料夾 -> [PRJ-###] · 只改名不刪除 · add-only 建檔 · 郵件/任務精準歸戶金鑰",
+      "bytes": 8986,
+      "sha256": "7cbeae9bf35bbdbd5869e5f7e0920b514e83bda778c9e1c2543337c08e38815d"
+    },
+    {
+      "filename": "engines/vmt_task_ssot.py",
+      "role": "工作管理 SSOT · 宣告 add-only · 狀態由事件 replay 推導",
+      "bytes": 9788,
+      "sha256": "c942a19edeb96fec651ba4e53b5bbbae46017288a2f8c4b02a47f0783c399c49"
+    },
+    {
+      "filename": "engines/vmt_sla_engine.py",
+      "role": "SLA 引擎 · 逾期推導 / 冪等升級 / 催辦排程 · 不自行填期限",
+      "bytes": 9696,
+      "sha256": "15c59d048fa81a8442ddd19db3d7773cfc8ab4b2de4f99456575bdcf936595aa"
+    },
+    {
+      "filename": "engines/vmt_mail_composer.py",
+      "role": "追蹤信引擎 · 有限選項回覆 · 預設不寄送 · 對外/自己/待指派三流分開",
+      "bytes": 12546,
+      "sha256": "cbc7bbccdf3dfa59d65db9ec05e1b08b8517be2ca7a4620f098ba757b310e4a5"
+    },
+    {
+      "filename": "engines/vmt_reply_parser.py",
+      "role": "回覆解析引擎 · 追蹤編號 + 勾選 -> 事件 · 無法對應者進 Q01",
+      "bytes": 8932,
+      "sha256": "5ea01a0f78a301a214df4bcf083606a514a61e7a3955c534cfbeca63024f7f92"
+    },
+    {
+      "filename": "engines/vmt_dashboard.py",
+      "role": "戰情總覽 · 純讀推導 · 待人工判斷區置前",
+      "bytes": 8273,
+      "sha256": "55cb6f5445535c3223fd6eed181532fe1d4b89b10c841e1f12345221a6d4f124"
+    },
+    {
+      "filename": "engines/vmt_pipeline.py",
+      "role": "管線編排 · 收信 -> 判讀 -> 會議 -> 抽任務 -> 收回覆 -> SLA -> 信稿 -> 總覽",
+      "bytes": 6097,
+      "sha256": "4a0b79e8c296af99b1ca26e8280236cf24222d3b20d78f3814f1f53601bc5600"
+    },
+    {
+      "filename": "Start-VMT.ps1",
+      "role": "唯讀 PowerShell 啟動器 · Python 自動偵測 (venv vmt_pm 優先) · 預設 dry-run · 不寫 DB / 不 Stop-Process",
+      "bytes": 10159,
+      "sha256": "a0d01a37580518c4261430800a0186fbf0923d75d2d75ddaa7f403da31d33407"
+    }
+  ],
+  "ledgers": {
+    "data/mails.jsonl": "已入帳郵件 (add-only, MD5 去重)",
+    "data/triage.jsonl": "AI 判讀結果 (add-only, 冪等於 mail_uid + 引擎版本)",
+    "data/minutes.jsonl": "會議記錄含標記逐字稿 (add-only, 冪等於 minute_uid)",
+    "data/tasks.jsonl": "任務宣告 (add-only, 冪等於 fingerprint; 不含任何可變狀態欄位)",
+    "data/events.jsonl": "事件流 — 所有狀態的唯一真相, 永不 UPDATE",
+    "data/quarantine.jsonl": "Q01 隔離帳 (低信心判讀 / 無法對應的回覆), 去重",
+    "data/projects.jsonl": "專案宣告 (add-only, 冪等於 [PRJ-###]; 資料夾自動編碼建檔)"
+  },
+  "governance": {
+    "source_read_only": "Outlook 與逐字稿全程唯讀: 不標已讀、不搬移、不刪除、不回寫。",
+    "append_only": "所有 *.jsonl 只 append, 永不 UPDATE / DELETE。",
+    "state_derivation": "任務狀態、逾期與否一律由 events.jsonl replay 推導, 不存可變狀態欄位; SLA 規則調整只需重跑, 歷史資料不需遷移。",
+    "default_dry_run": "所有引擎預設 propose/dry-run, 只產報告不落帳; 需 --commit 才寫入。",
+    "mail_send_gate": "寄送階梯: dry-run 不產檔 -> --commit 只寫 .txt 信稿 -> --draft 建 Outlook 草稿 -> --send 直接寄出 (不可逆, 預設永遠關閉)。",
+    "idempotency": "郵件以內容 MD5、任務以來源指紋、隔離以 q_uid 去重; 整條管線重跑不產生第二筆。",
+    "low_confidence_isolation": "判讀信心不足或規則與 LLM 不一致者送 Q01 隔離, 交人工判斷, 主線不阻斷。",
+    "no_fabrication": [
+      "主詞判不出來標 [?], 不猜。",
+      "待辦缺負責人或期限填 [?] 並列入待確認, 不丟棄也不臆測。",
+      "系統不替沒有期限的任務自行填期限, 改以追蹤信向對方索取 ETA。",
+      "議程有而未討論者明寫「本次未討論」, 不靜默略過。",
+      "摘要有列數上限時明寫「另有 N 句未列入」, 不靜默截斷。"
+    ],
+    "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
+    "canonical_mutation_by_system_manager": false,
+    "sandbox_repair_only": true,
+    "crash_safe_write": "事件帳追加以 fsync 落地; 整檔覆寫用原子寫入 (.tmp -> os.replace) 加滾動備份; 損毀主檔可從 .bak 自我修復。",
+    "folder_ssot": "workspace/ 資料夾即專案單一真相; 自動編碼只重新命名最外層資料夾, 內容完全不動、從不刪除。"
+  },
+  "interfaces": {
+    "VMT_v1": "沿用既有 CASE-XX 案號規則與『有限選項回覆』郵件格式; 本引擎組自持 tasks.jsonl / events.jsonl, 不改寫 VMT v1 的 ssot.json。",
+    "SuperBOM": "與 vmt_superbom_bridge / vmt_superbom_attach_router 共用 CASE 命名與 Q01 隔離精神; 兩邊 SSOT 不合併, 僅於橋接處對接。"
+  },
+  "tests": {
+    "path": "tests/test_vmt_engines.py",
+    "runner": "python3 tests/test_vmt_engines.py",
+    "count": 44,
+    "coverage": [
+      "治理紅線",
+      "相對期限換算",
+      "決議 vs 提議",
+      "主詞標示",
+      "會議完整性稽核",
+      "郵件會話合併",
+      "冪等重跑",
+      "回覆閉環",
+      "逾期推導",
+      "升級冪等"
+    ]
+  },
+  "system_manager": {
+    "version": "v0162B",
+    "analyzed_sections": [
+      "MODULE",
+      "ENGINE",
+      "FUNCTION-LIB",
+      "OTHERS"
+    ],
+    "round_limit": 3
+  }
+}

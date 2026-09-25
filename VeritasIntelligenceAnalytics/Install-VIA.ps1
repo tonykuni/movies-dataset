@@ -17,6 +17,16 @@
  Optional: -AutoStart registers a logon task for the Tower (default off).
 ===================================================================== #>
 param([switch]$AutoStart, [switch]$NoWinget)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $viaHome = $PSScriptRoot
@@ -103,3 +113,4 @@ Write-Host "開新終端機後直接輸入:  via   |   via-tower   |   via-all  
 Write-Host "注意:若本安裝器是以 pwsh -File 從另一個視窗啟動,母視窗需開新終端機才會生效;" -ForegroundColor Yellow
 Write-Host ('      或在母視窗貼:  $env:Path += ";' + $binDir + '"') -ForegroundColor Yellow
 Write-Host "PowerShell session remains open." -ForegroundColor Cyan
+

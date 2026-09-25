@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>VAP 分析台 v0101</title><style>
+:root{--fs:clamp(11.5px,2.8vw,13px);--ok:#15803d;--fail:#b91c1c;--skip:#a16207;--run:#1d4ed8}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1f2937;font:var(--fs)/1.55 'Segoe UI','Noto Sans TC',sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:clamp(8px,1.5vw,16px)}
+h1{font-size:clamp(1rem,2.2vw,1.25rem);margin:.3em 0 .1em}
+.mut{color:#94a3b8}.lane{display:inline-block;background:#fef9c3;border:1px solid #fde047;
+border-radius:6px;padding:1px 8px;font-size:.85em;margin:.3em 0}
+.lane.db{background:#dcfce7;border-color:#86efac}
+.tabs{display:flex;gap:6px;margin:.6em 0;position:sticky;top:0;background:#f6f7f9;padding:4px 0;z-index:5}
+.tab{flex:1;font:inherit;border:1px solid #e5e7eb;background:#fff;border-radius:9px;
+padding:9px 4px;cursor:pointer;min-height:42px;font-weight:600;color:#475569}
+.tab.on{background:#111827;color:#e5e7eb;border-color:#111827}
+section{display:none}section.on{display:block}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #e5e7eb;padding:5px 7px;text-align:right;overflow-wrap:anywhere}
+th{background:#eef2f7}
+td:first-child,th:first-child,td:nth-child(2),th:nth-child(2){text-align:left}
+.tblbox{overflow-x:auto;border-radius:9px;border:1px solid #e5e7eb;margin:.4em 0}
+.up{color:var(--ok)}.dn{color:var(--fail)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:.5em 0}
+.chip{font:inherit;border:1px solid #cbd5e1;background:#fff;border-radius:999px;
+padding:7px 13px;cursor:pointer;min-height:38px}
+.chip.sel{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.chip:disabled{opacity:.4}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:.4em 0}
+.act{font:inherit;border:1px solid #e5e7eb;background:#111827;color:#e5e7eb;
+border-radius:9px;padding:8px 16px;cursor:pointer;min-height:40px}
+.act:disabled{opacity:.45}
+.note{background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:6px 10px;margin:.4em 0}
+.off{background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:6px 10px;margin:.4em 0;display:none}
+.foot{color:#94a3b8;font-size:.85em;margin-top:.8em;border-top:1px solid #f1f5f9;padding-top:5px}
+
+</style></head>
+<body><div class="wrap">
+<h1>VAP 分析台(月營收 · 族群 · ETF · K線)</h1>
+<div class="mut">本機橋 127.0.0.1:8765 · 唯讀誠實雙道(庫直讀↔fixture 示範) · 點分頁即載</div>
+<div class="off" id="offline">⚠ 本機橋未連線——於倉庫根跑:<b>python "VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL095_DeckServer_v0106.py" serve</b></div>
+
+<div class="tabs">
+<button class="tab on" id="tb-rev" onclick="show('rev')">月營收分析</button>
+<button class="tab" id="tb-grp" onclick="show('grp')">族群分析</button>
+<button class="tab" id="tb-etf" onclick="show('etf')">ETF 持股</button>
+<button class="tab" id="tb-k" onclick="show('k')">個股 K線</button>
+</div>
+
+<section id="s-rev" class="on"><div id="rev">載入中…</div></section>
+<section id="s-grp"><div id="grp"></div></section>
+<section id="s-k">
+  <div class="bar">
+    <input id="kcode" inputmode="numeric" placeholder="代號(如 2330)" style="font:inherit;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;width:9em;min-height:40px">
+    <button class="act" onclick="loadK()">畫 K線+量</button>
+    <span class="mut">紅漲綠跌(台股慣例) · 三道:庫→TWSE 官方→降級</span>
+  </div>
+  <div class="chips" id="kpresets"></div>
+  <div id="kout"></div><div id="kcheck"></div>
+</section>
+<section id="s-etf">
+  <div class="bar">
+    <button class="act" id="combo-toggle" onclick="toggleCombo()">組合模式:關</button>
+    <button class="act" id="combo-go" onclick="runCombo()" disabled>持股加總(0)</button>
+    <span class="mut" id="etf-hint">點一檔=個別持股;開組合模式=多選再加總</span>
+  </div>
+  <div class="chips" id="chips">載入中…</div>
+  <div id="etfout"></div>
+</section>
+
+<div class="foot">VAP_ENG013 × DeckServer v0106 · 唯讀零改動 · lane 必標(示範道≠實庫) · 誠實三態</div>
+<script>
+var comboOn=false, picked=[];
+function el(i){return document.getElementById(i)}
+function show(k){['rev','grp','etf','k'].forEach(function(x){
+  el('s-'+x).classList.toggle('on',x===k);el('tb-'+x).classList.toggle('on',x===k);});
+  if(k==='rev'&&!el('rev').dataset.done)loadRev();
+  if(k==='grp'&&!el('grp').dataset.done)loadGrp();
+  if(k==='etf'&&!el('chips').dataset.done)loadChips();
+ if(k==='k'&&!el('kpresets').dataset.done)kPresets();
+}
+function J(u){return fetch(u).then(function(r){return r.json()})
+ .catch(function(){el('offline').style.display='block';throw 0;});}
+function laneTag(t){var db=(t||'').indexOf('庫直讀')===0;
+ return '<span class="lane'+(db?' db':'')+'">'+(t||'—')+'</span>';}
+function num(v,d){return (v===null||v===undefined||v==='')?'—':Number(v).toFixed(d===undefined?1:d);}
+function loadRev(){J('/vap_revenue').then(function(d){
+ var h=laneTag(d.lane)+' <b>'+(d.ym||'')+'</b>';
+ if(d.top_yoy&&d.top_yoy.length){
+  h+='<div class="tblbox"><table><tr><th>代號</th><th>族群</th><th>營收(億)</th><th>MoM%</th><th>YoY%</th><th>動能分</th></tr>';
+  d.top_yoy.forEach(function(r){h+='<tr><td>'+r[0]+'</td><td>'+(r[4]||'—')+'</td><td>'+num(r[1]/1e8)+
+   '</td><td>'+num(r[2])+'</td><td class="'+((r[3]||0)>=0?'up':'dn')+'">'+num(r[3])+'</td><td>'+num(r[5])+'</td></tr>';});
+  h+='</table></div>';}
+ if(d.sectors&&d.sectors.length){h+='<div class="mut">族群彙總(檔數/合計億)</div><div class="tblbox"><table><tr><th>族群</th><th>檔數</th><th>合計(億)</th></tr>';
+  d.sectors.forEach(function(s){h+='<tr><td>'+s[0]+'</td><td>'+s[1]+'</td><td>'+s[2]+'</td></tr>';});h+='</table></div>';}
+ if(d.note)h+='<div class="note">'+d.note+'</div>';
+ el('rev').innerHTML=h;el('rev').dataset.done=1;});}
+function loadGrp(){J('/vap_groups').then(function(d){
+ var h=laneTag(d.lane)+' <b>'+(d.date||'')+'</b> <span class="mut">vs '+(d.prev||'—')+' · 族群 '+(d.total_groups||0)+'</span>';
+ h+='<div class="tblbox"><table><tr><th>族群</th><th>家數</th><th>漲</th><th>跌</th><th>量能(億)</th><th>均PE</th><th>殖利率%</th></tr>';
+ (d.groups||[]).forEach(function(g){h+='<tr><td>'+g[0]+'</td><td>'+g[1]+'</td><td class="up">'+g[2]+
+  '</td><td class="dn">'+g[3]+'</td><td>'+num(g[4])+'</td><td>'+num(g[5])+'</td><td>'+num(g[6],2)+'</td></tr>';});
+ h+='</table></div>';
+ el('grp').innerHTML=h;el('grp').dataset.done=1;});}
+function loadChips(){J('/vap_etflist').then(function(d){
+ var h='';(d.etfs||[]).forEach(function(e){
+  h+='<button class="chip" id="c-'+e[0]+'" '+(e[2]?'':'disabled title="持股源無此檔(誠實)"')+
+   ' onclick="tapEtf(\''+e[0]+'\')">'+e[0]+' '+e[1]+(e[2]?'':' ∅')+'</button>';});
+ el('chips').innerHTML=h+'<div class="mut" style="flex-basis:100%">冊 '+(d.n_book||0)+' 檔 · 可點 '+
+  (d.n_holdable||0)+' · 持股源:'+(d.lane_hold||'—')+'</div>';
+ el('chips').dataset.done=1;});}
+function toggleCombo(){comboOn=!comboOn;picked=[];refreshSel();
+ el('combo-toggle').textContent='組合模式:'+(comboOn?'開':'關');}
+function refreshSel(){document.querySelectorAll('.chip').forEach(function(c){
+  c.classList.toggle('sel',picked.indexOf(c.id.slice(2))>=0);});
+ el('combo-go').disabled=picked.length<2;
+ el('combo-go').textContent='持股加總('+picked.length+')';}
+function tapEtf(id){
+ if(comboOn){var i=picked.indexOf(id);if(i>=0)picked.splice(i,1);else picked.push(id);
+  refreshSel();return;}
+ J('/vap_etf?ids='+id).then(function(d){renderH(d);});}
+function runCombo(){J('/vap_etf?ids='+picked.join(',')).then(function(d){renderH(d);});}
+function renderH(d){
+ var h=laneTag(d.lane);
+ if(d.err||d.note&&!d.per&&!d.combo){h+='<div class="note">'+(d.err||d.note)+'</div>';el('etfout').innerHTML=h;return;}
+ if(d.mode==='individual'){var k=Object.keys(d.per)[0];
+  h+='<div class="mut">個別持股:'+k+'(權重榜)</div><div class="tblbox"><table><tr><th>股</th><th>名稱</th><th>權重%</th></tr>';
+  d.per[k].forEach(function(r){h+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+num(r[2],2)+'</td></tr>';});
+  h+='</table></div>';}
+ if(d.mode==='combo'){
+  h+='<div class="mut">組合加總('+d.ids.join('+')+' · '+d.n_etf+' 檔等權)</div>'+
+   '<div class="tblbox"><table><tr><th>股</th><th>名稱</th><th>組合權重%</th><th>出現檔數</th></tr>';
+  d.combo.forEach(function(r){h+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+num(r[2],2)+
+   '</td><td>'+r[3]+'/'+d.n_etf+'</td></tr>';});
+  h+='</table></div><div class="note">'+(d.note||'')+'</div>';}
+ el('etfout').innerHTML=h;}
+function kPresets(){var P=['2330','2317','2454','2308','2382','2891','3711','2303'];
+ el('kpresets').innerHTML=P.map(function(c){return '<button class="chip" onclick="el(\'kcode\').value=\''+c+'\';loadK()">'+c+'</button>';}).join('');
+ el('kpresets').dataset.done=1;}
+function loadK(){var c=el('kcode').value.trim();if(!c)return;
+ el('kout').innerHTML='<div class="note">K線載入中…(TWSE 官方道約 2~4 秒)</div>';el('kcheck').innerHTML='';
+ J('/vap_kline?code='+c).then(function(d){renderK(d);});
+ J('/vap_check?codes='+c).then(function(d){renderCk(d);});}
+function renderK(d){
+ if(d.err||!d.bars||!d.bars.length){el('kout').innerHTML=laneTag(d.lane)+'<div class="note">'+(d.err||d.note||'無資料(誠實)')+'</div>';return;}
+ var B=d.bars.slice(-90),W=Math.max(340,Math.min(1000,el('kout').clientWidth-8)),H=260,VH=70,PAD=44;
+ var hi=-1e18,lo=1e18,vmax=1;
+ B.forEach(function(b){var h=(b[2]==null?b[4]:b[2]),l=(b[3]==null?b[4]:b[3]);
+  if(h>hi)hi=h;if(l<lo)lo=l;if(b[5]>vmax)vmax=b[5];});
+ var span=(hi-lo)||1,cw=(W-PAD-6)/B.length,bw=Math.max(1.6,cw*0.62);
+ function X(i){return PAD+i*cw+cw/2}function Y(v){return 8+(hi-v)/span*(H-16)}
+ var sv='<svg viewBox="0 0 '+W+' '+(H+VH+34)+'" style="width:100%;background:#fff;border:1px solid #e5e7eb;border-radius:9px">';
+ for(var g=0;g<5;g++){var vy=lo+span*g/4;sv+='<line x1="'+PAD+'" y1="'+Y(vy)+'" x2="'+W+'" y2="'+Y(vy)+'" stroke="#f1f5f9"/>'
+  +'<text x="4" y="'+(Y(vy)+3)+'" font-size="9" fill="#94a3b8">'+vy.toFixed(0)+'</text>';}
+ if(d.mode==='close_only'){var pts=B.map(function(b,i){return X(i)+','+Y(b[4])}).join(' ');
+  sv+='<polyline points="'+pts+'" fill="none" stroke="#1d4ed8" stroke-width="1.6"/>';}
+ else B.forEach(function(b,i){var up=b[4]>=b[1],col=up?'#dc2626':'#16a34a';
+  sv+='<line x1="'+X(i)+'" y1="'+Y(b[2])+'" x2="'+X(i)+'" y2="'+Y(b[3])+'" stroke="'+col+'" stroke-width="1"/>'
+   +'<rect x="'+(X(i)-bw/2)+'" y="'+Math.min(Y(b[1]),Y(b[4]))+'" width="'+bw+'" height="'+Math.max(1,Math.abs(Y(b[1])-Y(b[4])))+'" fill="'+col+'"/>';});
+ B.forEach(function(b,i){var up=(b[1]==null)||b[4]>=b[1],vh=b[5]/vmax*(VH-6);
+  sv+='<rect x="'+(X(i)-bw/2)+'" y="'+(H+VH-vh)+'" width="'+bw+'" height="'+vh+'" fill="'+(up?'#fca5a5':'#86efac')+'"/>';});
+ var st=B[0][0].slice(5),en=B[B.length-1][0].slice(5);
+ sv+='<text x="'+PAD+'" y="'+(H+VH+26)+'" font-size="10" fill="#64748b">'+st+'</text>'
+  +'<text x="'+(W-40)+'" y="'+(H+VH+26)+'" font-size="10" fill="#64748b">'+en+'</text></svg>';
+ var last=B[B.length-1];
+ el('kout').innerHTML=laneTag(d.lane)+' <b>'+d.code+' '+(d.name||'')+'</b> <span class="mut">'+B.length+' 根 · 末 '+last[0]+' 收 '+last[4]+' 量 '+(last[5]/1e3).toFixed(0)+'張</span>'
+  +(d.mode==='close_only'?'<div class="note">本境無 OHLC=收盤折線+量(誠實降級;工作站/開網=真蠟燭)</div>':'')+sv;}
+function renderCk(d){
+ if(!d.rows||!d.rows.length){el('kcheck').innerHTML='<div class="note">共識:'+((d.verdicts&&d.verdicts[0]&&d.verdicts[0][2])||'無庫值')+'</div>';return;}
+ var h='<div class="mut" style="margin-top:.5em">共識核對('+d.lane+')</div><div class="tblbox"><table><tr><th>源</th><th>日期</th><th>中位</th><th>高</th><th>低</th><th>分析師</th></tr>';
+ d.rows.forEach(function(r){h+='<tr><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+num(r[3])+'</td><td>'+num(r[4])+'</td><td>'+num(r[5])+'</td><td>'+r[6]+'</td></tr>';});
+ h+='</table></div>';
+ (d.verdicts||[]).forEach(function(v){var ok=v[1]==='核對無誤';
+  h+='<div class="note" style="border-color:'+(ok?'#86efac':'#fde047')+'"><b>'+v[0]+' '+v[1]+'</b> · '+v[2]+'</div>';});
+ el('kcheck').innerHTML=h;}
+loadRev();
+fetch('/ping').then(function(r){return r.json()}).then(function(){el('offline').style.display='none';})
+ .catch(function(){el('offline').style.display='block';});
+</script></body></html>

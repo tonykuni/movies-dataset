@@ -1,0 +1,29 @@
+{
+ "schema": "VIA_FEATURE_CATALOG_V1",
+ "version": "v0100",
+ "append_only": true,
+ "batch": 188,
+ "policy": "Roadmap Phase 2 Feature Store 目錄冊=因子單一 SSOT:公式明載零發明;唯一輸入=prices_canonical(調整價正典層,批178);視窗不足=NULL 誠實不外插;新因子=append 不改舊;實作=DuckDB SQL 庫內原地(批181 階梯 DATAFRAME L1 輕型)。",
+ "input_contract": {
+  "source": "prices_canonical(date,ticker,open,high,low,close,volume,factor,data_class)",
+  "data_class_out": "DERIVED_FEATURE",
+  "grain": ["date", "ticker"]
+ },
+ "features": {
+  "ret_1d":     {"zh": "日報酬",        "formula": "close/lag(close,1)-1",                          "window": 2},
+  "ret_5d":     {"zh": "五日報酬",      "formula": "close/lag(close,5)-1",                          "window": 6},
+  "ret_20d":    {"zh": "二十日報酬",    "formula": "close/lag(close,20)-1",                         "window": 21},
+  "ret_60d":    {"zh": "六十日報酬",    "formula": "close/lag(close,60)-1",                         "window": 61},
+  "vol_20d_ann":{"zh": "20日年化波動",  "formula": "stddev_samp(ret_1d) over 20d * sqrt(252)",      "window": 21},
+  "ma20_ratio": {"zh": "20日均線乖離",  "formula": "close/avg(close) over 20d - 1",                 "window": 20},
+  "ma60_ratio": {"zh": "60日均線乖離",  "formula": "close/avg(close) over 60d - 1",                 "window": 60},
+  "hi252_dist": {"zh": "252日高點距離", "formula": "close/max(high) over 252d - 1",                 "window": 252},
+  "lo252_dist": {"zh": "252日低點距離", "formula": "close/min(low) over 252d - 1",                  "window": 252},
+  "volu_z20":   {"zh": "20日量能Z分數", "formula": "(volume-avg(volume) over 20d)/stddev_samp(volume) over 20d", "window": 20},
+  "rng_1d":     {"zh": "日內振幅比",    "formula": "(high-low)/close",                              "window": 1}
+ },
+ "storage": {
+  "tw": {"db": "vdf_tw_market.duckdb", "table": "features_daily"},
+  "gl": {"db": "vdf_global_market.duckdb", "table": "features_daily"}
+ }
+}
