@@ -591,7 +591,7 @@ def def_probe_environment(repo_root: Path = PROJECT_ROOT, vrn_root: Path | None 
         "super_accel_entry": "PRESENT" if accel_entry and accel_entry.is_file() else "ABSENT",
         "ps20_module": "PRESENT" if ps20_entry and ps20_entry.is_file() else "ABSENT",
         "net_unified": net_hits[-1].name if net_hits else "ABSENT",
-        "lib_candidates": {name: def_find_spec(name) for name in ("polars", "pyarrow", "duckdb", "numpy", "pandas", "regex", "rapidfuzz", "pydantic", "psutil", "watchfiles", "talib")},
+        "lib_candidates": {name: def_find_spec(name) for name in ("polars", "pyarrow", "duckdb", "numpy", "pandas", "regex", "rapidfuzz", "pydantic", "psutil", "watchfiles")},  # talib 已拔(L50 禁用、QuantGuard 唯一正主;2026-09-25 操作員令)
     }
     accel["lib_available"] = sum(1 for v in accel["lib_candidates"].values() if v)
     return {

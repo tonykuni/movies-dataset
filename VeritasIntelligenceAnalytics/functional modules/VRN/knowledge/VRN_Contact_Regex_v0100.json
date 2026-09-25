@@ -1,0 +1,20 @@
+{
+ "schema": "VIA.VRN.ContactRegex.v1",
+ "registry": "global.contact.research.v1",
+ "policy": "擷取式。券商是哪一家仍以 VRN_Broker_Dict_v0100 為準，這裡的 broker 只圈出一段文字，不當正名。",
+ "source": "operator global.contact.research.v1 2026-09-25",
+ "patterns": {
+  "target_price": "\\b(TP|Target Price|目標價)\\s*[:：]?\\s*(\\d+(?:\\.\\d+)?)\\b",
+  "rating_en": "\\b(Buy|Strong Buy|Add|Accumulate|Outperform|Neutral|Hold|Reduce|Underperform|Sell|Not Rated|NR)\\b",
+  "rating_zh": "(買進|強烈買進|加碼|優於大盤|中立|持有|減碼|劣於大盤|賣出)",
+  "broker_span": "([0-9A-Za-z\\u4e00-\\u9fff .&()-]{0,40}?(?:證券|投顧|資本|Capital|Securities|Research|Investment))",
+  "email": "\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b",
+  "phone_tw_mobile": "\\b09\\d{2}[- ]?\\d{3}[- ]?\\d{3}\\b",
+  "phone_tw_fixed": "\\b0\\d{1,2}[- ]?\\d{3,4}[- ]?\\d{3,4}\\b",
+  "phone_hk_with_cc": "\\b\\+?852[- ]?[2-9]\\d{3}[- ]?\\d{4}\\b"
+ },
+ "held_back": {
+  "pattern": "\\b[2-9]\\d{3}[- ]?\\d{4}\\b",
+  "why": "沒有 852 時會吃到股價和四位數代號。有國碼的那條才收。"
+ }
+}

@@ -8,19 +8,36 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"   # repo 根
 VIA="$ROOT/VeritasIntelligenceAnalytics"; export VIA
 ENG="$VIA/functional modules/VDF/engine"
 MARK="$VIA/functional modules/VDF/output_hub/mega/.last_boot_update"
+VERIFIED="${MARK}.verified"
+LOCK="${MARK}.lock"
 LOGDIR="$VIA/VIA_Reports/boot_update_logs"
-TODAY="$(date +%Y-%m-%d)"
+TODAY="$(TZ=Asia/Taipei date +%Y-%m-%d)"
 
 mkdir -p "$LOGDIR" "$(dirname "$MARK")"
-if [ -f "$MARK" ] && [ "$(cat "$MARK" 2>/dev/null)" = "$TODAY" ]; then
+# 完成標記和互斥鎖分開；舊版開跑就寫的 marker 不足以證明完成。
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "[boot-update] BUSY: $LOCK（另一輪尚未釋放；異常中斷須先核對工作站行程）" >&2
+  exit 3
+fi
+trap 'rmdir "$LOCK" 2>/dev/null || true' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+if [ -f "$MARK" ] && [ -f "$VERIFIED" ] && [ "$(cat "$MARK" 2>/dev/null)" = "$TODAY" ] && [ "$(cat "$VERIFIED" 2>/dev/null)" = "$TODAY" ]; then
   echo "[boot-update] $TODAY 已更(marker)=SKIP" >> "$LOGDIR/skip.log"
   exit 0
 fi
-echo "$TODAY" > "$MARK"    # 先佔位防並發雙跑
 LOG="$LOGDIR/BOOT_$(date +%Y%m%d_%H%M%S).log"
 export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES
 
 newest() { ls "$ENG"/$1 2>/dev/null | sort | tail -1; }
+BOOT_FAILED=0
+python3() {
+  command python3 "$@"
+  local rc=$?
+  echo "[boot-step] rc=$rc script=${1:-environment}"
+  if [ "$rc" -ne 0 ]; then BOOT_FAILED=$((BOOT_FAILED + 1)); fi
+  return "$rc"
+}
 {
   echo "=== VIA 開機更新 $TODAY(批150)==="
   # ⓪ 批164 環境自補(容器非持久=每日檢缺才裝;等效根+套件冊)
@@ -74,6 +91,10 @@ except Exception: pass
 print("[env] 檢缺自補畢(pkuseg=C 輪誠實除外)")
 PYENV
   cd "$ENG" || exit 1
+  REG="$VIA/supportive modules/registry"
+  echo "--- 擷取前查庫（正主目錄 → 增量缺口；失敗即停，不用舊快照猜）"
+  python3 "$(ls "$REG"/CGC_MDL123_DataHome_v*.py | sort | tail -1)" catalog || exit 2
+  python3 "$(newest 'VDF_ENG089_IncrementalFetchGate_v*.py')" plan --deep || exit 2
   echo "--- ① OmniFetch 全車道";        python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" run
   echo "--- ② 價格增量";                python3 "$(newest 'VDF_ENG054_TWDailyBackfill_v*.py')" run
   echo "--- ②b 調整後價格層(批178)";   python3 "$(newest 'VDF_ENG060_AdjPriceLayer_v*.py')" build
@@ -90,6 +111,7 @@ PYENV
   echo "--- ⑦c Yahoo 共識(批194)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG070_YahooConsensus_v*.py | sort | tail -1)" run
   echo "--- ⑦d 月營收(批194)";         python3 "$(newest 'VDF_ENG063_MonthlyRevenue_v*.py')" run
   echo "--- ⑦e 鉅亨 FactSet 共識(批199)"; python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG071_CnyesFusion_v*.py | sort | tail -1)" run
+  echo "--- ⑦f 共識新快照 ADJ 重算(ENG069 正主)"; python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG069_ConsensusDB_v*.py | sort | tail -1)" build
   echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
   echo "--- ⑧b 族群因子層(批193;於輪動快照後=成員冊當日鮮)"; python3 "$(newest 'VDF_ENG062_GroupFeatureLayer_v*.py')" build
   echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status
@@ -135,5 +157,12 @@ echo "--- ⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.js
 echo "--- ⑳ 收尾閘(批398;MDL141 vrn,vap 只讀:VRN 逐份五段鏈+核對態、VAP 逐圖驗;無報告/無圖=誠實黃)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL141_ClosingGate_v*.py | sort | tail -1)" all || true
   echo "=== 畢(誠實三態見上)==="
+  if [ "$BOOT_FAILED" -eq 0 ]; then
+    echo "$TODAY" > "$MARK" || exit 1
+    echo "$TODAY" > "$VERIFIED" || exit 1
+    echo "[boot-update] COMPLETE: 子步 rc 全為 0；資料涵蓋仍以各閘為準"
+  else
+    echo "[boot-update] INCOMPLETE: $BOOT_FAILED 個子步非零；不寫今天完成標記，同日可重試"
+  fi
 } >> "$LOG" 2>&1
-exit 0
+[ "$BOOT_FAILED" -eq 0 ]

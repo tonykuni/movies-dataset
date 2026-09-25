@@ -42,7 +42,29 @@
   "DATE_EN_FULL_MDY": "\\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{1,2},?\\s+\\d{4}\\b",
   "ROC_DATE_NUMERIC": "\\b(1\\d{2}|2\\d{2})[\\/\\-\\.](\\d{1,2})[\\/\\-\\.](\\d{1,2})\\b",
   "ROC_DATE_ZH": "民國\\s*(\\d{2,3})\\s*年\\s*(\\d{1,2})\\s*月\\s*(\\d{1,2})\\s*日",
-  "ISO_DATETIME": "\\b\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?\\b"
+  "ISO_DATETIME": "\\b\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?\\b",
+  "YEAR_MONTH": "\\b(19[7-9]\\d|20[0-4]\\d)-(0[1-9]|1[0-2])\\b",
+  "YEAR_MONTH_2D": "\\b(\\d{2})-(0[1-9]|1[0-2])\\b",
+  "ROC_DATE_FLEX": "民國\\s*([12]\\d{2})\\s*[-./年]\\s*(0?[1-9]|1[0-2])\\s*[-./月]\\s*(0?[1-9]|[12]\\d|3[01])\\s*日?",
+  "FY_ESTIMATE": "\\bFY[- ]?(\\d{2,4})[eE]\\b",
+  "DATE_COMPACT_YMD": "\\b(19[7-9]\\d|20[0-4]\\d)(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\b"
  },
- "source": "financial_classification_rules.py"
+ "source": "financial_classification_rules.py",
+ "normalization_notes_20260925": {
+  "source": "operator global.date.rie.factor.v4",
+  "rule": "只加新式；既有式不改不刪",
+  "year_two_digit": "20xx if xx < 50 else 19xx",
+  "quarter_two_digit": "20xx if xx < 50 else 19xx",
+  "minguo": "民國年 + 1911",
+  "held_back": {
+   "year_two_digit_bare": {
+    "pattern": "^\\d{2}$",
+    "why": "任何兩位數都會中，含月份、季別、代號。兩位數年只留在 YEAR_MONTH_2D 與 FY，並用 50 為界：小於 50 視為 20xx，否則 19xx。"
+   },
+   "phone_hk_without_country": {
+    "pattern": "\\b[2-9]\\d{3}[- ]?\\d{4}\\b",
+    "why": "沒有 852 時會吃到股價和四位數代號。有國碼的那條才收。"
+   }
+  }
+ }
 }
