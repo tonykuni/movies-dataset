@@ -1,0 +1,32 @@
+{
+  "policy": "tw.sameday.align.v1",
+  "rank": "major",
+  "key": ["date", "code"],
+  "exchange": {
+    "source": "TWSE/TPEX",
+    "same_day": [
+      "open", "high", "low", "close", "volume", "value",
+      "foreign_net", "trust_net", "dealer_net", "total_net",
+      "foreign_holding_pct", "trust_holding_pct", "dealer_holding_pct",
+      "margin_bal", "short_bal", "short_margin_ratio",
+      "margin_maint_pct", "margin_usage_pct", "short_usage_pct",
+      "daytrade_volume", "daytrade_value"
+    ],
+    "note": "缺欄留空，不拿別的來源補。"
+  },
+  "yfinance": {
+    "pull": "https://github.com/tonykuni/movies-dataset/pull/138",
+    "used_for": ["close 與交易所收盤重疊核對", "重疊後才用 adj_close / close 當調整係數"],
+    "not_used_for": ["成交量", "成交值", "三大法人", "融資融券", "當沖", "中文名"],
+    "close": "只和交易所收盤比。差距超過 0.1% 就不乘調整係數。",
+    "adj_close": "係數 = adj_close / close。只乘到已對齊的交易所開高低收。",
+    "other_pulls": {
+      "english_short_name_only": "https://github.com/tonykuni/movies-dataset/pull/133",
+      "global_etf_flow_not_tw_price": "https://github.com/tonykuni/movies-dataset/pull/137"
+    }
+  },
+  "quantguard": {
+    "volume_value": "扣除當沖後的成交量與成交值",
+    "display": "可切換 gross 與 net。計算預設 net。"
+  }
+}
