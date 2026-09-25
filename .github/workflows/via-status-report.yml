@@ -1,0 +1,41 @@
+name: VIA VCGC status report
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/via-status-report.yml"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL193_StatusLock_v0100.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL194_ReportUpdate_v0100.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_StatusLock_v0100.json"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_KnowledgeAsset_Book_v0100.json"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_USMacro_Params_v0100.json"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/via_params_central_v0110.py"
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Write the report from the lock check
+        env:
+          VIA_FROM_VCGC: "YES"
+        run: python "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL194_ReportUpdate_v0100.py"
+      - name: Publish the report when it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "VeritasIntelligenceAnalytics/docs/VIA_VCGC_StatusReport.md"
+          if git diff --cached --quiet; then
+            echo "unchanged"
+          else
+            git commit -m "vcgc: refresh status report [skip ci]"
+            git push
+          fi
