@@ -677,10 +677,13 @@ Levenshtein = _si("Levenshtein")
 chardet     = _si("chardet")
 
 # ── Finance ───────────────────────────────────────────────────────────────────
-talib       = _si("talib")
-pandas_ta   = _si("pandas_ta")
-ta_lib      = _si("ta")
-ffn         = _si("ffn")
+# TA-Lib is prohibited. QuantGuard owns the active indicator path; the
+# deterministic fallback below is kept only for compatibility with generic
+# Celeritas callers and never imports or loads a TA-Lib package.
+quantguard_indicators = None
+pandas_ta             = _si("pandas_ta")
+ta_lib                = _si("ta")
+ffn                   = _si("ffn")
 
 # ── Network ───────────────────────────────────────────────────────────────────
 requests_m  = _si("requests")
@@ -733,7 +736,7 @@ _LIB_MAP: Dict[str, Any] = {
     "diskcache": diskcache, "cachetools": cachetools,
     "cachebox": cachebox, "redis": redis_m, "lmdb": lmdb,
     "regex": regex_m, "rapidfuzz": rapidfuzz, "Levenshtein": Levenshtein,
-    "talib": talib, "pandas_ta": pandas_ta, "ta": ta_lib, "ffn": ffn,
+    "quantguard": quantguard_indicators, "pandas_ta": pandas_ta, "ta": ta_lib, "ffn": ffn,
     "requests": requests_m, "httpx": httpx_m, "aiohttp": aiohttp_m,
     "urllib3": urllib3_m,
     "rich": rich, "tqdm": tqdm_m, "loguru": loguru,
@@ -3028,7 +3031,7 @@ def detect_libraries() -> Dict[str, bool]:
             "requests", "httpx", "aiohttp", "urllib3", "aiofiles",
         ],
         "finance": [
-            "yfinance", "talib", "pandas_ta", "ta", "ffn",
+            "yfinance", "pandas_ta", "ta", "ffn",
         ],
         "async": [
             "winloop", "uvloop", "anyio", "trio",
@@ -4631,9 +4634,9 @@ class _TqdmStub:
 if tqdm_m is None:
     tqdm_m = _TqdmStub()  # type: ignore[assignment]
 
-# ── talib stub ────────────────────────────────────────────────────────────────
-class _TalibStub:
-    """Stub for TA-Lib — pure-Python fallbacks for common indicators."""
+# ── QuantGuard indicator fallback ─────────────────────────────────────────────
+class _QuantGuardIndicatorFallback:
+    """Deterministic pure-Python fallback; the active policy owner is QuantGuard."""
     @staticmethod
     def SMA(data, timeperiod=14):
         return FinanceEngine.moving_average(list(data), timeperiod)
@@ -4685,8 +4688,8 @@ def _si_np_array(data, ma, period):
     """Helper for stub std computation."""
     return ma   # simplified
 
-if talib is None:
-    talib = _TalibStub()  # type: ignore[assignment]
+if quantguard_indicators is None:
+    quantguard_indicators = _QuantGuardIndicatorFallback()
 
 # ── pandas_ta stub ────────────────────────────────────────────────────────────
 class _PandasTaStub:
@@ -4701,11 +4704,11 @@ class _PandasTaStub:
 
     @staticmethod
     def rsi(close, length=14, **kw):
-        return _TalibStub.RSI(list(close), timeperiod=length)
+        return _QuantGuardIndicatorFallback.RSI(list(close), timeperiod=length)
 
     @staticmethod
     def macd(close, fast=12, slow=26, signal=9, **kw):
-        return _TalibStub.MACD(list(close), fast, slow, signal)
+        return _QuantGuardIndicatorFallback.MACD(list(close), fast, slow, signal)
 
 if pandas_ta is None:
     pandas_ta = _PandasTaStub()  # type: ignore[assignment]
@@ -4898,7 +4901,7 @@ _STUB_CLASSES = (
     _Blake3Stub, _RapidFuzzStub, _DiskCacheStub, _CacheToolsStub,
     _RayStub, _JoblibStub, _LoopStub, _AioFilesStub, _PsutilStub,
     _TorchStub, _OnnxRunTimeStub, _ScipyStub, _PyArrowStub, _DuckDBStub,
-    _CV2Stub, _PILStub, _RichStub, _TqdmStub, _TalibStub, _PandasTaStub,
+    _CV2Stub, _PILStub, _RichStub, _TqdmStub, _QuantGuardIndicatorFallback, _PandasTaStub,
     _RequestsStub, _MsgpackStub, _CloudPickleStub, _AnyIoStub, _TrioStub,
     _SnappyStub, _BrotliStub,
 )
@@ -5705,4 +5708,3 @@ try:
 except Exception:
     pass
 # ===== [VIA:ANCHOR:PATCH:XBATCH-FINAL-GLOBAL-SHIM-20260506:END] =====
-
