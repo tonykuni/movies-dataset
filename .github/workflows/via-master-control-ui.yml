@@ -178,6 +178,14 @@ jobs:
           $tokens = $null; $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile($launcher, [ref]$tokens, [ref]$errors) | Out-Null
           if ($errors.Count -ne 0) { $errors | ForEach-Object { Write-Host $_.Message }; exit 1 }
+          # 短令冊尾版:整本用 PowerShell 解析器解析(不點源、不執行);冊內「執行期才編譯」的 here-string 助手也編一次
+          $register = (Get-ChildItem $via -Filter "Register-VIA-Commands-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          $tokens = $null; $errors = $null
+          $ast = [System.Management.Automation.Language.Parser]::ParseFile($register, [ref]$tokens, [ref]$errors)
+          if ($errors.Count -ne 0) { $errors | ForEach-Object { Write-Host $_.Message }; exit 1 }
+          $late = $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and "$($n.Left)" -eq '$VIACelScopedSrc' }, $true)
+          foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
+          Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
 
       - name: Exercise VRN HTML with empty and synthetic populated databases
         shell: pwsh

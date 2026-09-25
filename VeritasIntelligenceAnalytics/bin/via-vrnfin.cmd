@@ -1,10 +1,10 @@
 @echo off
 rem =====================================================================
-rem via-vrnsys.cmd - VIA 短指令 cmd 直通梭
+rem via-vrnfin.cmd - VIA 短指令 cmd 直通梭
 rem =====================================================================
-rem 背後:VRN_SystemManager_v*.py(批681/682 VRN 子系統管理對接口;Z65 候准 → 側線 2026-09-21 b 准)。
-rem   status(七域燈+連結表+七處自審)| catalog | links | read <域> [key] | sync [--apply] | page | --selftest(廿五檢)。
-rem   零網路、預設只讀;尾版不在冊上函式印 ABSENT rc2。
+rem 背後:VRN_ENG090_FinStatementsTemplate_v*.py(側線 2026-09-25 第十六段;掉球 Z212 交易所財報 VRN 模板頁)。
+rem   status(預設;只讀)/ run(重產頁,只落 VIA_Reports)/ check / --selftest(二十三檢)。
+rem   零網路、唯讀庫;尾版不在冊上函式印 ABSENT rc2。
 rem 梭因(批266 實錄):操作員殼常為 cmd,PS global 函式在 cmd 永不可見。
 rem   每短指令配同名 .cmd:任何殼在本夾直打即通。**梭不得釘死版號**(CGC_MDL157)。
 rem =====================================================================
