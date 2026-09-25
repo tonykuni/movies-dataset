@@ -119,9 +119,17 @@ class MasterControlContractTests(unittest.TestCase):
         self.assertGreaterEqual(len(engines), 194)
         self.assertEqual(len({row["identifier"] for row in engines}), len(engines))
         self.assertGreaterEqual(sum(row["state_class"] == "surveyed" for row in engines), 76)
-        # 批515a:退役存證 119 族中 2 族與現役正本同識別碼(VAP_ENG001_AutoplotEngineChartlib · VRN_ENG036_FinalizeCoreV2;後者
-        #   隨批511 併入操作員主線 functional modules/VRN/20260804/ 而成為現役),去重後 117;只增不減的是識別碼,不是這個差值
-        self.assertGreaterEqual(sum(row["state_class"] == "retired" for row in engines), 117)
+        # 只增不減的是退役識別碼,不是去重後的列數。第三個重疊是 VDF_ENG090_DataCoverageGate
+        # (現役正本與退役副本同識別碼),去重列因此是 116,不是盤點變少。
+        retire = self.manager.RETIRE_SUBSYSTEM
+        raw = self.atlas["engines"].get(retire, {})
+        active_ids = {identifier for subsystem, family in self.atlas["engines"].items()
+                      if subsystem != retire for identifier in family}
+        overlap = set(raw) & active_ids
+        unique_retired = sum(row["state_class"] == "retired" for row in engines)
+        self.assertGreaterEqual(len(raw), 119)
+        self.assertEqual(unique_retired, len(raw) - len(overlap))
+        self.assertIn("VDF_ENG090_DataCoverageGate", overlap)
         self.assertGreaterEqual(len(modules), 85)
 
     def test_02_dom_ids_roles_labels_and_drawer_controls(self):
