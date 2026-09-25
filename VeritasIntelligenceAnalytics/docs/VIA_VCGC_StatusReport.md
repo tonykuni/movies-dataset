@@ -1,7 +1,6 @@
 # VIA VCGC status report
 
 Door: VCGC only (`VIA_FROM_VCGC=YES`). This file is generated. Do not edit it by hand.
-Generated: 2026-09-25 21:49:09 UTC
 Lock measured: 2026-09-25 21:47:28
 
 State: GREEN

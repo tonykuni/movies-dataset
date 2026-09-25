@@ -22,7 +22,6 @@ def render(card: dict, lock: dict) -> str:
         "# VIA VCGC status report",
         "",
         "Door: VCGC only (`VIA_FROM_VCGC=YES`). This file is generated. Do not edit it by hand.",
-        f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC",
         f"Lock measured: {lock.get('measured_at', '')}",
         "",
         f"State: {state}",
