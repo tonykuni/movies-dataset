@@ -1,6 +1,6 @@
 # CELERITAS-TEMPLATE-JOIN v1
 #Requires -Version 7.0
-# 不接自動下一步。紅字錯誤留在原指令。文末這一段用黃色，只貼這一段。
+# 只讀已同步的結果。不叫 VDF，不重跑報告。
 Set-Location -LiteralPath (Split-Path $PSScriptRoot -Parent)
 $script:VIAAccelPairNote = "正主缺,略過"
 try {
@@ -13,16 +13,5 @@ try {
     $script:VIAAccelPairNote = "正主載入失敗,略過"
 }
 Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
-$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_WorkflowMatrix_v0100.py"
-$env:VIA_FROM_VCGC = 'YES'
-$raw = python $py
-$rc = $LASTEXITCODE
-$on = $false
-foreach ($line in $raw) {
-    if ($line -eq "BEGIN_PASTE") { $on = $true; Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow; continue }
-    if ($line -eq "END_PASTE") { Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow; $on = $false; continue }
-    if ($line.StartsWith("GREEN ")) { Write-Host $line.Substring(6) -ForegroundColor Green; continue }
-    if ($on) { Write-Host $line -ForegroundColor Yellow }
-}
-if ($script:VIACel) { try { & $script:VIACel { Restore-CeleritasPS7 } 2>$null } catch { } }
-exit $rc
+$env:VIA_FROM_VCGC = "YES"
+python (Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_GreenMatrix_v0100.py")
