@@ -1,0 +1,732 @@
+{
+  "scope": "Read-only VRN audit; original VCGC token tools; isolated component replay, not a Windows end-to-end rerun.",
+  "repository": "https://github.com/tonykuni/movies-dataset",
+  "commit": "be5f7b2477214284ee60169edcc89f52cc2cd5c5",
+  "entry": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0144.py",
+  "target_mutations": 0,
+  "production_database_writes": 0,
+  "local_evidence_files_created": true,
+  "user_supplied_run": {
+    "door": "VRN_ENG110_TabReport_v0107",
+    "pdf": 97,
+    "text": 87,
+    "readers": {
+      "ENG072_FITZ_LAYOUT": 81,
+      "none": 10,
+      "ENG072_PYPDF": 6
+    },
+    "reader_error": "NEEDS_VISUAL:few_chars",
+    "logic_error": "",
+    "ticker_mismatch": 7,
+    "why": {
+      "basic_status": 89,
+      "page_empty": 87,
+      "financial_empty": 97,
+      "page_not_1": 10,
+      "basic_blank:companyName": 8
+    },
+    "written": 0,
+    "verified": 0,
+    "pymupdf4llm": "ABSENT",
+    "rapidocr": "ABSENT",
+    "docling": "ABSENT",
+    "ocr_budget": "not called"
+  },
+  "tool_receipts": {
+    "engine": "CGC_MDL158_VIAPanoramaAuditRepair_v0113.py",
+    "verbs": [
+      "pack",
+      "read",
+      "slice",
+      "digest"
+    ],
+    "etag": {
+      "value": "71a91bd2b0cba9d8",
+      "status": "304_NOT_MODIFIED"
+    },
+    "digest": {
+      "exit_code": 2,
+      "state": "NODATA",
+      "reason": "Component log has no native [計] station summary; this is a log-format limitation."
+    },
+    "nlp": {
+      "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0103.py",
+      "command": "nlp text --brief",
+      "state": "PASS",
+      "nltk": "ABSENT",
+      "points": []
+    }
+  },
+  "limitations": [
+    "Only four actual PDFs replayed; 97-file Windows batch not rerun.",
+    "No VDF database/roster data audited.",
+    "Seven original ticker mismatch filenames not supplied; one concrete wrong-ticker mechanism reproduced.",
+    "NLP v1.9.0 tested only via pure def_normalize/def_facts; no OCR/model/full pipeline run.",
+    "Original source content hashes checked; no forensic attestation of all remote system state."
+  ],
+  "findings": [
+    {
+      "id": "RISK-01",
+      "severity": "High",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0103.py:_one:110-111",
+      "finding": "summary_page1 is always empty; financial argument is always []."
+    },
+    {
+      "id": "RISK-02",
+      "severity": "High",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0103.py:_one:95-107; VIA_VRNLogic_AllInOne_v0201.py:build_basic_info:782-793",
+      "finding": "official/company-name evidence is never passed; separate filename_facts is only used for mismatch counting."
+    },
+    {
+      "id": "RISK-03",
+      "severity": "High",
+      "system": "VRN",
+      "location": "VIA_VRNLogic_AllInOne_v0201.py:extract_ticker:327-338; reconcile_field:706-720",
+      "finding": "Unrestricted first four-digit candidate selects year2025 as ticker for actual company2606; conflict is caught and not verified."
+    },
+    {
+      "id": "RISK-04",
+      "severity": "Medium",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0103.py:_one:100",
+      "finding": "pages argument hardcoded1; actual sample page counts8,15,13,10."
+    },
+    {
+      "id": "RISK-05",
+      "severity": "Medium",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0107.py:read_page1:98-130",
+      "finding": "Provided Windows environment has RAPIDOCR absent and10 unread PDFs. Per-file causes not all confirmed."
+    },
+    {
+      "id": "RISK-06",
+      "severity": "Medium",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0103.py:run:174-177,201-206; VRN_ENG110_TabReport_v0107.py:run:143",
+      "finding": "written/verified/ocr_budget hardcoded; HTML actually written by run; aggregate counters cannot identify individual failures."
+    },
+    {
+      "id": "RISK-07",
+      "severity": "Medium",
+      "system": "VCGC",
+      "location": "CGC_MDL149_VeritasCentralGovernanceConsole_v0144.py:systems:44-46",
+      "finding": "systems command unconditionally writes snapshot; not executed during this audit."
+    },
+    {
+      "id": "RISK-08",
+      "severity": "Info",
+      "system": "VRN",
+      "location": "VRN_ENG110_TabReport_v0103.py:run:173",
+      "finding": "PDF-only, nonrecursive input selection;9 non-PDF items in test folder are outside this command's coverage."
+    }
+  ],
+  "component_replay": {
+    "route": [
+      "VCGC v0144",
+      "VRN_SystemManager_v0105.py",
+      "VRN_ENG110_TabReport_v0107",
+      "v0103 dependencies"
+    ],
+    "kind": "read-only component replay; not Windows 97-file rerun",
+    "original_tool": "CGC_MDL158_VIAPanoramaAuditRepair_v0113.py",
+    "rows": [
+      {
+        "file": "華南投顧-2606-裕民-1141202.pdf",
+        "sha256": "1f5ead19721877611a80e68a0587b07baad4f2af3f5d61a656ed8d290f9a714a",
+        "reader": "ENG072_FITZ_LAYOUT",
+        "reader_errors": [],
+        "chars": 2744,
+        "actual_pages": 8,
+        "passed_pages": 1,
+        "basic": {
+          "ticker": "2025",
+          "companyName": "—",
+          "reportDate": "2025-12-02",
+          "brokerAbbr": "—",
+          "validationStatus": "FAIL_CLOSED",
+          "validationRisk": "RED",
+          "status": "bad"
+        },
+        "validation": {
+          "status": "RED",
+          "fields": {
+            "ticker": {
+              "field": "ticker",
+              "value": "2025",
+              "status": "CONFLICT",
+              "confidence": 0.6,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "2606"
+                },
+                {
+                  "source": "first_page",
+                  "value": "2025"
+                }
+              ]
+            },
+            "reportDate": {
+              "field": "reportDate",
+              "value": "2025-12-02",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "2025-12-02"
+                },
+                {
+                  "source": "first_page",
+                  "value": "2025-12-02"
+                }
+              ]
+            },
+            "brokerAbbr": {
+              "field": "brokerAbbr",
+              "value": null,
+              "status": "MISSING",
+              "confidence": 0.0,
+              "observations": []
+            },
+            "rating": {
+              "field": "rating",
+              "value": "BUY",
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": "BUY"
+                }
+              ]
+            },
+            "targetPrice": {
+              "field": "targetPrice",
+              "value": 70.0,
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": 70.0
+                }
+              ]
+            }
+          },
+          "blocking": [
+            "ticker"
+          ],
+          "warnings": [
+            "brokerAbbr"
+          ],
+          "sourceCount": 2,
+          "digest": "3F6CAA0F4E9A78119E3905A6F912944DE603F780248F6478F4224FD5C96675A0"
+        },
+        "gate": {
+          "ready": false,
+          "why": [
+            "basic_status",
+            "page_empty",
+            "financial_empty"
+          ],
+          "report": null
+        },
+        "nlp_pure_normalize": {
+          "chars": 2698,
+          "changed": true,
+          "facts_preserved": true,
+          "reviews": []
+        }
+      },
+      {
+        "file": "晶心科(6533,N,中立)-CTBC251208.pdf",
+        "sha256": "13d6c7db1d7017bb410cf6ae1825cfdbf2712e64b61094394c9cd21a60380d3e",
+        "reader": "ENG072_FITZ_LAYOUT",
+        "reader_errors": [],
+        "chars": 3922,
+        "actual_pages": 15,
+        "passed_pages": 1,
+        "basic": {
+          "ticker": "6533",
+          "companyName": "—",
+          "reportDate": "2025-12-06",
+          "brokerAbbr": "CTBC",
+          "validationStatus": "REVIEW_REQUIRED",
+          "validationRisk": "YELLOW",
+          "status": "warn"
+        },
+        "validation": {
+          "status": "YELLOW",
+          "fields": {
+            "ticker": {
+              "field": "ticker",
+              "value": "6533",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "6533"
+                },
+                {
+                  "source": "first_page",
+                  "value": "6533"
+                }
+              ]
+            },
+            "reportDate": {
+              "field": "reportDate",
+              "value": "2025-12-06",
+              "status": "CONFLICT",
+              "confidence": 0.6,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "2025-12-08"
+                },
+                {
+                  "source": "first_page",
+                  "value": "2025-12-06"
+                }
+              ]
+            },
+            "brokerAbbr": {
+              "field": "brokerAbbr",
+              "value": "CTBC",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "CTBC"
+                },
+                {
+                  "source": "first_page",
+                  "value": "CTBC"
+                }
+              ]
+            },
+            "rating": {
+              "field": "rating",
+              "value": "HOLD",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "HOLD"
+                },
+                {
+                  "source": "first_page",
+                  "value": "HOLD"
+                }
+              ]
+            },
+            "targetPrice": {
+              "field": "targetPrice",
+              "value": 300.0,
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": 300.0
+                }
+              ]
+            }
+          },
+          "blocking": [],
+          "warnings": [
+            "reportDate"
+          ],
+          "sourceCount": 2,
+          "digest": "377E5989F684DB5E694409C815DC1627C1388B776CBD2E3CD2E4775841033D72"
+        },
+        "gate": {
+          "ready": false,
+          "why": [
+            "basic_status",
+            "page_empty",
+            "financial_empty"
+          ],
+          "report": null
+        },
+        "nlp_pure_normalize": {
+          "chars": 3922,
+          "changed": true,
+          "facts_preserved": true,
+          "reviews": []
+        }
+      },
+      {
+        "file": "Citi-3231 20250604.pdf",
+        "sha256": "3bd909165b536b7f1cf45d409cbe047e527bb3a8d5013569424d441d1be86a64",
+        "reader": "ENG072_FITZ_LAYOUT",
+        "reader_errors": [],
+        "chars": 4170,
+        "actual_pages": 13,
+        "passed_pages": 1,
+        "basic": {
+          "ticker": "3231",
+          "companyName": "—",
+          "reportDate": "2025-06-04",
+          "brokerAbbr": "CITI",
+          "validationStatus": "PHASE2_OK",
+          "validationRisk": "GREEN",
+          "status": "ok"
+        },
+        "validation": {
+          "status": "GREEN",
+          "fields": {
+            "ticker": {
+              "field": "ticker",
+              "value": "3231",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "3231"
+                },
+                {
+                  "source": "first_page",
+                  "value": "3231"
+                }
+              ]
+            },
+            "reportDate": {
+              "field": "reportDate",
+              "value": "2025-06-04",
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "2025-06-04"
+                }
+              ]
+            },
+            "brokerAbbr": {
+              "field": "brokerAbbr",
+              "value": "CITI",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "CITI"
+                },
+                {
+                  "source": "first_page",
+                  "value": "CITI"
+                }
+              ]
+            },
+            "rating": {
+              "field": "rating",
+              "value": "BUY",
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": "BUY"
+                }
+              ]
+            },
+            "targetPrice": {
+              "field": "targetPrice",
+              "value": 165.0,
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": 165.0
+                }
+              ]
+            }
+          },
+          "blocking": [],
+          "warnings": [],
+          "sourceCount": 2,
+          "digest": "7F934F45B6FA938172E7D525697AA7FFAAFB565831810E9A06DEBAE38FC6BF8D"
+        },
+        "gate": {
+          "ready": false,
+          "why": [
+            "basic_blank:companyName",
+            "page_empty",
+            "financial_empty"
+          ],
+          "report": null
+        },
+        "nlp_pure_normalize": {
+          "chars": 4170,
+          "changed": false,
+          "facts_preserved": true,
+          "reviews": []
+        }
+      },
+      {
+        "file": "凱基投顧_3665 貿聯-KY_李承泰_20260519.pdf",
+        "sha256": "92a0caf1f25ed0dcc42d9cbd98f2f883da4ec4c265e403b85ac5852c8c3ed5cd",
+        "reader": "ENG072_FITZ_LAYOUT",
+        "reader_errors": [],
+        "chars": 4147,
+        "actual_pages": 10,
+        "passed_pages": 1,
+        "basic": {
+          "ticker": "3665",
+          "companyName": "—",
+          "reportDate": "2026-05-19",
+          "brokerAbbr": "KGI",
+          "validationStatus": "PHASE2_OK",
+          "validationRisk": "GREEN",
+          "status": "ok"
+        },
+        "validation": {
+          "status": "GREEN",
+          "fields": {
+            "ticker": {
+              "field": "ticker",
+              "value": "3665",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "3665"
+                },
+                {
+                  "source": "first_page",
+                  "value": "3665"
+                }
+              ]
+            },
+            "reportDate": {
+              "field": "reportDate",
+              "value": "2026-05-19",
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "2026-05-19"
+                }
+              ]
+            },
+            "brokerAbbr": {
+              "field": "brokerAbbr",
+              "value": "KGI",
+              "status": "MATCH",
+              "confidence": 0.95,
+              "observations": [
+                {
+                  "source": "filename",
+                  "value": "KGI"
+                },
+                {
+                  "source": "first_page",
+                  "value": "KGI"
+                }
+              ]
+            },
+            "rating": {
+              "field": "rating",
+              "value": "HOLD",
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": "HOLD"
+                }
+              ]
+            },
+            "targetPrice": {
+              "field": "targetPrice",
+              "value": 2600.0,
+              "status": "SINGLE_SOURCE",
+              "confidence": 0.8,
+              "observations": [
+                {
+                  "source": "first_page",
+                  "value": 2600.0
+                }
+              ]
+            }
+          },
+          "blocking": [],
+          "warnings": [],
+          "sourceCount": 2,
+          "digest": "D3F6264BE63E939B32FC4A15A709A8A636291092A221EB2791BD890A6A806B6B"
+        },
+        "gate": {
+          "ready": false,
+          "why": [
+            "basic_blank:companyName",
+            "page_empty",
+            "financial_empty"
+          ],
+          "report": null
+        },
+        "nlp_pure_normalize": {
+          "chars": 4114,
+          "changed": true,
+          "facts_preserved": true,
+          "reviews": []
+        }
+      }
+    ]
+  },
+  "verified_sources": [
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VIA_VRN_FirstPageEngine_v0129.py",
+      "bytes": 373827,
+      "git_blob_sha": "a0a85e809d552fada3dd865f7ba9abc46ea3a8d5",
+      "expected": "a0a85e809d552fada3dd865f7ba9abc46ea3a8d5",
+      "match": true,
+      "sha256": "15bc14b83c1ab27c0754aa482bd683ff839ec0bfd27eb960207ba5b330034747"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG109_GateMap_v0100.py",
+      "bytes": 5184,
+      "git_blob_sha": "b88a32d40a23de428acdbc0284d2eda8fab7b296",
+      "expected": "b88a32d40a23de428acdbc0284d2eda8fab7b296",
+      "match": true,
+      "sha256": "cd63ef281df4fe492094d7eae2fcd954862e742b67215a49a1e21fad85c33085"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG109_TabStore_v0100.py",
+      "bytes": 5823,
+      "git_blob_sha": "1b970dd2e511c4813d0008f539cd5ead8139e6f8",
+      "expected": "1b970dd2e511c4813d0008f539cd5ead8139e6f8",
+      "match": true,
+      "sha256": "baacc30ed4730fe9b4ad0f32380fa779d962ce5917bd11f2a41af09a517d4ad6"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG110_TabReport_v0103.py",
+      "bytes": 9353,
+      "git_blob_sha": "8c6abc975f8110ab8c1b1f1a427aa07498d951d8",
+      "expected": "8c6abc975f8110ab8c1b1f1a427aa07498d951d8",
+      "match": true,
+      "sha256": "b76efb504b96696e14a114651078ff3997d1ba31c934f92101fd23ce1b3dcf5f"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG110_TabReport_v0107.py",
+      "bytes": 6161,
+      "git_blob_sha": "9f6bd32e5bfef5811fda35f97936475295f669dc",
+      "expected": "9f6bd32e5bfef5811fda35f97936475295f669dc",
+      "match": true,
+      "sha256": "1ead61d528c1c566ac0083815776d5dbd633c67a07325d55d4fe64a733ef4c65"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_SystemManager_v0104.py",
+      "bytes": 81215,
+      "git_blob_sha": "9bb308e2706d258403ad384b741a07c5d21817bd",
+      "expected": "9bb308e2706d258403ad384b741a07c5d21817bd",
+      "match": true,
+      "sha256": "ae1fc565c2e2274bf0af3a144115256ad7b2157ccf858c22971797144cca3d21"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/VRN_SystemManager_v0105.py",
+      "bytes": 1038,
+      "git_blob_sha": "d71fb1eae532a2eb84afa7cd512f0caf946ee23e",
+      "expected": "d71fb1eae532a2eb84afa7cd512f0caf946ee23e",
+      "match": true,
+      "sha256": "6825682e2558be2a3dd577713cbdf69c50347ab835d7f7f0a907a7f250c82452"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_VRNLogic_AllInOne_v0201_b504/VIA_VRNLogic_AllInOne_v0201.py",
+      "bytes": 71260,
+      "git_blob_sha": "c231c0c021fb92362e7f94545c6e2483100f1410",
+      "expected": "c231c0c021fb92362e7f94545c6e2483100f1410",
+      "match": true,
+      "sha256": "187ad19fbbde830e72124caa2f4ff2d3bf8efcc64749a4e0b2daefa5ff2a3776"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+      "bytes": 26669,
+      "git_blob_sha": "51efba1e5cf472af4409c3f2d70744bb947d238e",
+      "expected": "51efba1e5cf472af4409c3f2d70744bb947d238e",
+      "match": true,
+      "sha256": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0103.py",
+      "bytes": 19884,
+      "git_blob_sha": "ba20a2af7f000cd27ae3894756be6bddd5303c07",
+      "expected": "ba20a2af7f000cd27ae3894756be6bddd5303c07",
+      "match": true,
+      "sha256": "692795ee6f5be99f142541b994e509f2f8026f68971621b38c7229d90e24875a"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/SUP_MDL751_VIATailPick_v0102.py",
+      "bytes": 22317,
+      "git_blob_sha": "b4e625b5753eaca45720d5d1f5cb1c46a93e176c",
+      "expected": "b4e625b5753eaca45720d5d1f5cb1c46a93e176c",
+      "match": true,
+      "sha256": "90f942d70f342c938374cb3011ceedf0ed84eec342891025dde342b9125aac15"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/SUP_MDL752_VIAJsonIO_v0100.py",
+      "bytes": 19282,
+      "git_blob_sha": "33b8da362cb4f1a1919db1ece0b4364c46eecd4f",
+      "expected": "33b8da362cb4f1a1919db1ece0b4364c46eecd4f",
+      "match": true,
+      "sha256": "7f300d24f5af728c021c32e720eb3a22804137dbe7bd3ad5748e77a1750288ce"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0142.py",
+      "bytes": 253025,
+      "git_blob_sha": "c66ac27b765790e6a6316859e8fee8bfe95329b0",
+      "expected": "c66ac27b765790e6a6316859e8fee8bfe95329b0",
+      "match": true,
+      "sha256": "e734d247ee192d420bf5f18a13353cc795cf91e597c1b3fc3aaf7d6d91324882"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0143.py",
+      "bytes": 3175,
+      "git_blob_sha": "129810653db3b1ac0c27fdf4a1a46ed5ba3bccf3",
+      "expected": "129810653db3b1ac0c27fdf4a1a46ed5ba3bccf3",
+      "match": true,
+      "sha256": "b1a81337cfc540cd72e4188f0240d30dbb9041bcda45857b23541b6da26a5254"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0144.py",
+      "bytes": 2361,
+      "git_blob_sha": "24360e53b029acab9eb1daddc0873ee4703dbb64",
+      "expected": "24360e53b029acab9eb1daddc0873ee4703dbb64",
+      "match": true,
+      "sha256": "92b8c71bce913e1f8d65dad86842031c365ee08d9a1ba3ede022387e5c77ee79"
+    },
+    {
+      "path": "VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0113.py",
+      "bytes": 149725,
+      "git_blob_sha": "5178cc15fbb4e71504f83bafacf80915cd22d901",
+      "expected": "5178cc15fbb4e71504f83bafacf80915cd22d901",
+      "match": true,
+      "sha256": "36cef6f56dc99cf5c6c83d8342855121022cfc23b03699a7ee2f663a952991ee"
+    }
+  ],
+  "sample_inventory": {
+    "total": 106,
+    "extensions": {
+      ".pdf": 97,
+      ".txt": 1,
+      ".jpg": 1,
+      ".docx": 7
+    }
+  },
+  "external_nlp": {
+    "file": "VIA_NLP_OneEngine_v1_9_0.py",
+    "sha256": "8a02d0474c3bf472e47133b8ea91ad726b746e540f5f3ae7bc87fa5f19d05eb3",
+    "component": "def_normalize + def_facts",
+    "samples": 4,
+    "fact_fingerprint_equal": 4
+  }
+}
