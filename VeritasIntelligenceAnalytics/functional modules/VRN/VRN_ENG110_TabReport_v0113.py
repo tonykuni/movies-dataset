@@ -7,6 +7,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -26,6 +27,15 @@ def _load(name: str, path: Path):
     return module
 
 
+def _code(row: dict) -> str:
+    broker = str(row.get("broker") or "")
+    ticker = str(row.get("ticker") or "")
+    date = str(row.get("reportDate") or "").replace("-", "")
+    if broker in {"", "—", "-"} or not re.fullmatch(r"[1-9]\d{3}", ticker) or not re.fullmatch(r"20\d{6}", date):
+        return ""
+    return f"{broker}-{ticker}-{date}"
+
+
 def _stamp(basic: dict, found: dict) -> dict:
     report = _load("apply_v0111", HERE / "VRN_ENG110_TabReport_v0111.py")
     out = report._apply(basic, found)
@@ -33,11 +43,13 @@ def _stamp(basic: dict, found: dict) -> dict:
         out["broker"] = found["broker"]
         out["brokerAbbr"] = found["broker"]
         out["issuer"] = found["broker"]
-    if found.get("report_code"):
-        out["reportCode"] = found["report_code"]
+    code = found.get("report_code") or _code(out)
+    if code:
+        out["reportCode"] = code
     if found.get("name"):
         out["companyName"] = found["name"]
-    if found.get("cross"):
+    yahoo = str(out.get("yfinanceTicker") or "")
+    if code and yahoo not in {"", "—"} and "." in yahoo:
         out["validationStatus"] = "CROSS_CHECKED"
         out["validationRisk"] = "GREEN"
         out["status"] = "ok"
@@ -109,7 +121,7 @@ def run(folder: Path, data_root: Path, open_page: bool) -> dict:
             "fixed_page1": found.get("restored") or text, "summary_page1": summary,
         }
         mapped = gate.map_report(basic, page, [])
-        if found.get("cross"):
+        if basic.get("validationStatus") == "CROSS_CHECKED":
             landed.append(basic)
         else:
             holds.append({"file": path.name, "ticker": found.get("ticker") or "", "broker": found.get("broker") or ""})
@@ -161,7 +173,14 @@ def main() -> int:
 
 
 def selftest() -> int:
-    return _load("ident_self_13", HERE / "VRN_ENG111_StockIdentity_v0102.py").selftest()
+    ident = _load("ident_self_13", HERE / "VRN_ENG111_StockIdentity_v0102.py").selftest()
+    stamped = _stamp(
+        {"ticker": "6933", "brokerAbbr": "CTBC", "reportCode": "CTBC-6933-20230925", "reportDate": "2023-09-25", "yfinanceTicker": "6933.TW"},
+        {"ticker": "6933", "broker": "中信", "name": "AMAX-KY", "report_date": "", "report_code": "", "yfinance": "6933.TW", "market": "TWSE", "bloomberg": "6933 TT", "rating": ""},
+    )
+    ok = stamped["reportCode"] == "中信-6933-20230925" and stamped["validationStatus"] == "CROSS_CHECKED"
+    print("  [OK]" if ok else "  [FAIL] " + stamped["reportCode"])
+    return 0 if ident == 0 and ok else 1
 
 
 if __name__ == "__main__":
