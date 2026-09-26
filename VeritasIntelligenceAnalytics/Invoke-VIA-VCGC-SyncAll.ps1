@@ -1,5 +1,5 @@
 #Requires -Version 7.0
-# 依序：本倉 autocrlf、參數雜湊、知識資產、狀態鎖、探測鎖、行情鎖、前瞻鎖。不套用 registry，不改母冊。
+# 依序：本倉 autocrlf、參數雜湊、知識資產、狀態鎖、探測鎖、行情鎖、前瞻鎖、三管理器。不套用 registry，不改母冊。
 $ErrorActionPreference = "Stop"
 $via = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent $via
@@ -15,12 +15,23 @@ $steps = @(
     (Join-Path $reg "CGC_MDL191_KnowledgeAsset_v0100.py"),
     (Join-Path $reg "CGC_MDL193_StatusLock_v0105.py"),
     (Join-Path $reg "CGC_MDL193_ProbeLock_v0100.py"),
-    (Join-Path $reg "CGC_MDL193_MarketSync_v0100.py"),
-    (Join-Path $reg "CGC_MDL193_ForwardVintageLock_v0101.py")
+    (Join-Path $reg "CGC_MDL193_MarketSync_v0101.py"),
+    (Join-Path $reg "CGC_MDL193_ForwardVintageLock_v0101.py"),
+    (Join-Path $reg "CGC_SystemManager_v0100.py")
 )
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
 foreach ($py in $steps) {
     & python $py
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
+        exit $LASTEXITCODE
+    }
+}
+foreach ($py in @(
+    (Join-Path $via "functional modules\VDF\VDF_SystemManager_v0105.py"),
+    (Join-Path $via "functional modules\VRN\VRN_SystemManager_v0105.py")
+)) {
+    & python $py --selftest
     if ($LASTEXITCODE -ne 0) {
         Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
         exit $LASTEXITCODE
