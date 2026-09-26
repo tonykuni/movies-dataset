@@ -54,9 +54,14 @@ def _store(root: Path, rows: list) -> int:
         (root / "vrn_basic_v0100.jsonl").write_text(
             "\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n", encoding="utf-8")
         return len(rows)
-    frame = [{key: row.get(key, "") for key in KEEP} for row in rows]
+    cols = ", ".join(f"{key} VARCHAR" for key in KEEP)
     con = duckdb.connect(str(root / "vrn_basic.duckdb"))
-    con.execute("CREATE OR REPLACE TABLE basic_info AS SELECT * FROM frame")
+    con.execute(f"CREATE OR REPLACE TABLE basic_info ({cols})")
+    marks = ", ".join("?" for _ in KEEP)
+    con.executemany(
+        f"INSERT INTO basic_info VALUES ({marks})",
+        [tuple(str(row.get(key) or "") for key in KEEP) for row in rows],
+    )
     con.execute(f"COPY basic_info TO '{(root / 'vrn_basic_v0100.parquet').as_posix()}' (FORMAT PARQUET)")
     con.close()
     return len(rows)
