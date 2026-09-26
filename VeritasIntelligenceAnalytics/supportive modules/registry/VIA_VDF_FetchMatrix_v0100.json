@@ -1,0 +1,36 @@
+{
+  "schema": "VIA.VDF.FetchMatrix.v1",
+  "default_since": "2023-01-01",
+  "store": {
+    "parquet": "output_hub/parquet/{class_id}/part-*.parquet",
+    "duckdb": "output_hub/mega/vdf_global_market.duckdb",
+    "watermark": "vdf_watermark",
+    "read": "one watermark row per class and symbol",
+    "write": "append a parquet part; do not rewrite an old part",
+    "batch": "stage the part, then commit the watermark in one transaction"
+  },
+  "classes": [
+    {"id": "VDF-TW-EQ", "name": "台灣個股", "since": null, "symbol_since": false, "on": true},
+    {"id": "VDF-TW-IDX", "name": "台灣股價指數", "since": null, "symbol_since": false, "on": true},
+    {"id": "VDF-GL-EQ", "name": "國際個股", "since": null, "symbol_since": false, "on": true},
+    {"id": "VDF-GL-IDX", "name": "國際股價指數", "since": null, "symbol_since": false, "on": true},
+    {"id": "VDF-TW-FIN", "name": "台灣財報", "since": null, "symbol_since": true, "forms": ["quarter", "ytd", "annual"], "on": true},
+    {"id": "VDF-US-MACRO", "name": "美國總體", "since": "2020-01-01", "symbol_since": false, "locked": true, "on": true},
+    {"id": "VDF-SENT", "name": "情緒", "since": null, "symbol_since": false, "on": true},
+    {"id": "VDF-SHIP", "name": "運價", "since": null, "symbol_since": false, "on": true}
+  ],
+  "tests": [
+    {"id": "2330", "name": "台積電", "class_id": "VDF-TW-EQ", "market": "TWSE", "yfinance": "2330.TW", "bloomberg": "2330 TT"},
+    {"id": "3324", "name": "雙鴻", "class_id": "VDF-TW-EQ", "market": "TWSE", "yfinance": "3324.TW", "bloomberg": "3324 TT"},
+    {"id": "NVDA", "name": "NVIDIA", "class_id": "VDF-GL-EQ", "market": "US", "yfinance": "NVDA", "bloomberg": "NVDA US"}
+  ],
+  "knobs": ["class.on", "class.since", "tw_fin.symbol_since", "tw_fin.forms"],
+  "do_not": [
+    "edit intake macro_ssot",
+    "move the US macro since off 2020-01-01",
+    "give a price class its own per-symbol since",
+    "paste parquet rows into a prompt",
+    "registry-sync --apply",
+    "commit the duckdb"
+  ]
+}
