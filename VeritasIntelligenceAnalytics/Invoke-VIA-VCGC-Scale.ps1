@@ -1,6 +1,6 @@
 # CELERITAS-TEMPLATE-JOIN v1
 #Requires -Version 7.0
-# 從 VCGC 往下。只跑刻度自測和上次實測的基本資訊矩陣。不重抓、不改政策冊。
+# 從 VCGC 往下。上漲空間用調整後收盤，不看報告放了多久。不重抓、不改政策冊。
 # 紅字錯誤留在原指令。文末這一段用黃色，只貼這一段。
 Set-Location -LiteralPath (Split-Path $PSScriptRoot -Parent)
 $script:VIAAccelPairNote = "正主缺,略過"
@@ -15,7 +15,7 @@ try {
 }
 Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
 $env:VIA_FROM_VCGC = "YES"
-$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_UnitScale_v0100.py"
+$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_UnitScale_v0101.py"
 $raw = python $py
 $on = $false
 foreach ($line in $raw) {
