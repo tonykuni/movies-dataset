@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>VDF 輸入 / 顯示</title>
+<style>
+body { margin:0; background:#121418; color:#d7dde6; font:13px/1.4 "Segoe UI",sans-serif; }
+header { padding:10px 14px; border-bottom:1px solid #2a3140; }
+main { display:grid; grid-template-columns:1fr 1fr; min-height:calc(100vh - 42px); }
+section { padding:12px 14px; }
+section + section { border-left:1px solid #2a3140; }
+table { width:100%; border-collapse:collapse; }
+th,td { border-bottom:1px solid #2a3140; padding:4px 6px; text-align:left; }
+input { background:#0e1116; color:#d7dde6; border:1px solid #3a4458; padding:2px 4px; }
+small { color:#8b97a8; }
+</style></head><body>
+<header>VDF 對接準備 · 左輸入 / 右顯示 · 不抓數 · 不推 GitHub</header>
+<main>
+<section><h2>輸入</h2>
+<table><tr><th>選</th><th>編碼</th><th>類別</th><th>起始</th><th>鎖</th></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-TW-EQ</td><td>台灣個股</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-TW-IDX</td><td>台灣股價指數</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-GL-EQ</td><td>國際個股</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-GL-IDX</td><td>國際股價指數</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-TW-FIN</td><td>台灣財報</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-US-MACRO</td><td>美國總體</td><td><input value='2020-01-01' readonly></td><td>已鎖</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-SENT</td><td>情緒</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+<tr><td><input type='checkbox' checked disabled></td><td>VDF-SHIP</td><td>運價</td><td><input value='2023-01-01' readonly></td><td>可改</td></tr>
+</table>
+<p><small>預設 2023-01-01。個股起始只給台灣財報。要收窄輸出，改 VIA_VDF_FetchOverride_v0100.json，再跑 via-export。</small></p>
+</section>
+<section><h2>顯示</h2>
+<p>右面板讀 export 目錄的水位與 20 列，不把整表放進這頁。</p>
+<table><tr><th>輸出</th><th>檔</th></tr>
+<tr><td>CSV / Google 試算表匯入</td><td>VDF_Export_gsheet.csv</td></tr>
+<tr><td>JSON</td><td>VDF_Export_status.json</td></tr>
+<tr><td>Markdown</td><td>VDF_Export_status.md</td></tr>
+</table>
+<p><small>編碼 utf-8-sig。這頁是快照，按鈕不在這裡啟動下載。</small></p>
+</section>
+</main></body></html>
