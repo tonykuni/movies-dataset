@@ -13,7 +13,7 @@ try {
     $script:VIAAccelPairNote = "正主載入失敗,略過"
 }
 Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
-$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_EntryLock_v0100.py"
+$py = Join-Path $PSScriptRoot "supportive modules\registry\CGC_MDL149_EntryLock_v0101.py"
 $env:VIA_FROM_VCGC = 'YES'
 $raw = python $py
 $rc = $LASTEXITCODE
