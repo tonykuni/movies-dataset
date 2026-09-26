@@ -1,9 +1,10 @@
 #Requires -Version 7.0
-# 依序：參數雜湊、知識資產、狀態鎖、探測鎖、行情鎖。不套用 registry，不改母冊。
+# 依序：本倉 autocrlf、參數雜湊、知識資產、狀態鎖、探測鎖、行情鎖、前瞻鎖。不套用 registry，不改母冊。
 $ErrorActionPreference = "Stop"
 $via = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = Split-Path -Parent $via
 Set-Location -LiteralPath $root
+git config core.autocrlf true
 git pull --ff-only origin main
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Set-Location -LiteralPath $via
