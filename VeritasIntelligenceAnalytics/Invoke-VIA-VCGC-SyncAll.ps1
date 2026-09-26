@@ -26,7 +26,7 @@ foreach ($py in $steps) {
         exit $LASTEXITCODE
     }
 }
-$refresh = Join-Path $via "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0100.py"
+$refresh = Join-Path $via "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0101.py"
 if ([string]::IsNullOrWhiteSpace($env:FRED_API_KEY)) {
     Write-Host '{"via":"vcgc","refresh":"SKIP","why":"FRED_API_KEY is not set"}'
 } else {
