@@ -10,6 +10,11 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
     exit $LASTEXITCODE
 }
+& python (Join-Path $via "supportive modules/registry/CGC_MDL197_NlpRoster_v0100.py")
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
+    exit $LASTEXITCODE
+}
 & python $engine health
 $code = $LASTEXITCODE
 Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
