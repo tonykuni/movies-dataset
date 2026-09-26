@@ -2,7 +2,7 @@
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $env:VIA_FROM_VCGC = "YES"
-$py = Join-Path $here "supportive modules/registry/CGC_MDL194_ReportUpdate_v0100.py"
+$py = Join-Path $here "supportive modules/registry/CGC_MDL194_ReportUpdate_v0101.py"
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
 & python $py
 Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
