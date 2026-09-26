@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $env:VIA_FROM_VCGC = "YES"
-$py = Join-Path (Get-Location) "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v0100.py"
+$py = Join-Path (Get-Location) "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v0101.py"
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
 & python $py
 Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
