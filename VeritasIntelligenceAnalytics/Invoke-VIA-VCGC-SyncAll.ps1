@@ -34,7 +34,8 @@ $steps = @(
     (Join-Path $reg "CGC_MDL193_FinancialReadLock_v0100.py"),
     (Join-Path $reg "CGC_MDL193_FinancialShownLock_v0100.py"),
     (Join-Path $reg "CGC_MDL199_SupportTier_v0100.py"),
-    (Join-Path $reg "CGC_MDL199_NlpUses_v0100.py")
+    (Join-Path $reg "CGC_MDL199_NlpUses_v0100.py"),
+    (Join-Path $reg "CGC_MDL200_RelatedIntake_v0100.py")
 )
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
 foreach ($py in $steps) {

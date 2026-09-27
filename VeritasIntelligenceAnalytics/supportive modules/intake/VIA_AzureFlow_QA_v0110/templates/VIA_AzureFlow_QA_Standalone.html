@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="via-azureflow-light-compact">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA 天青智流 AzureFlow QA Plug-in</title>
+<style>
+:root{--paper:#f7faf9;--panel:#fff;--ink:#24343a;--muted:#6f7f83;--line:#dce8e5;--cyan:#2b9db0;--cyan-dark:#197789;--cyan-soft:#e7f5f6;--teal:#4c9f86;--yellow:#e8b04e;--red:#c96868;--shadow:0 8px 24px rgba(32,74,80,.08);--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif}
+button,input{font:inherit}button{cursor:pointer}.shell{max-width:1180px;margin:0 auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:24px}.eyebrow{margin:0 0 5px;color:var(--cyan-dark);font-size:12px;font-weight:700;letter-spacing:.12em}.hero h1{margin:0;font-size:clamp(24px,3vw,36px);line-height:1.15;letter-spacing:-.03em}.hero p{max-width:640px;margin:10px 0 0;color:var(--muted)}.badge{padding:8px 12px;border:1px solid var(--line);border-radius:99px;color:var(--teal);background:#f0f8f4;white-space:nowrap;font-size:12px;font-weight:700}.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}.panel h2{margin:0 0 4px;font-size:18px}.panel h3{margin:20px 0 8px;font-size:14px}.sub{margin:0 0 16px;color:var(--muted);font-size:13px}.field{display:grid;gap:6px;margin:12px 0}.field label{font-weight:700;font-size:13px}.field small{color:var(--muted);font-size:12px}.field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fbfdfc;color:var(--ink);outline:none}.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-soft)}.drop{display:grid;place-items:center;min-height:112px;padding:18px;border:1.5px dashed #a9d3d6;border-radius:12px;background:linear-gradient(180deg,#fbfefe,#f0faf9);text-align:center;transition:.15s}.drop.drag{border-color:var(--cyan);background:var(--cyan-soft);transform:translateY(-1px)}.drop strong{display:block;color:var(--cyan-dark)}.drop span{display:block;margin-top:4px;color:var(--muted);font-size:12px}.file-input{display:none}.pick{display:inline-flex;align-items:center;justify-content:center;margin-top:12px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--cyan-dark);font-weight:700}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}.action{border:0;border-radius:10px;padding:12px 8px;background:var(--cyan);color:#fff;font-weight:800;box-shadow:0 4px 10px rgba(43,157,176,.2)}.action:hover{background:var(--cyan-dark)}.action.secondary{background:#edf7f5;color:#267c6b;border:1px solid #c9e4dd;box-shadow:none}.action:active{transform:translateY(1px)}.notice{display:flex;gap:8px;align-items:flex-start;margin-top:16px;padding:10px 12px;border-radius:10px;background:#fff8e8;color:#76561a;border:1px solid #f1dfb5;font-size:12px}.status{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;border-radius:10px;background:#f3f8f7;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex:0 0 auto}.dot.warn{background:var(--yellow)}.dot.bad{background:var(--red)}.preview{min-height:136px;margin:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:#f8fbfa;color:#375056;white-space:pre-wrap;word-break:break-word;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.preview-wrap{position:relative}.copy{position:absolute;right:8px;top:8px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--cyan-dark);padding:5px 8px;font-size:12px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.metric{padding:12px;border-radius:10px;background:#f5faf9;border:1px solid var(--line)}.metric b{display:block;color:var(--cyan-dark);font-size:18px}.metric span{color:var(--muted);font-size:11px}.log{max-height:230px;overflow:auto;border-top:1px solid var(--line);padding-top:8px;color:var(--muted);font:12px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}.log div{padding:2px 0}.foot{margin:18px 0 0;color:var(--muted);font-size:12px;text-align:center}.kbd{padding:2px 5px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--cyan-dark)}@media(max-width:820px){.shell{padding:16px}.hero{display:block}.badge{display:inline-block;margin-top:14px}.layout{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="hero">
+  <div><p class="eyebrow">VIA 天青智流 AZUREFLOW</p><h1>QA Plug-in 子引擎</h1><p>把 AzureFlow 引擎／Job 檢查與 VIA ZIP／E2E 驗證收斂成一個獨立、可插入母系統的滑鼠優先控制台。</p></div>
+  <div class="badge">LOCAL · READ-ONLY · REVIEW GATED</div>
+</header>
+<section class="layout">
+  <div class="panel">
+    <h2>輸入設定</h2><p class="sub">可拖曳 ZIP；Windows 完整路徑請貼入欄位，瀏覽器不會擅自讀取本機完整路徑。</p>
+    <div id="drop" class="drop" tabindex="0"><div><strong>將 VIA ZIP 拖曳到這裡</strong><span id="zipLabel">尚未選取 ZIP</span><label class="pick" for="zipFile">選取 ZIP 檔案</label><input id="zipFile" class="file-input" type="file" accept=".zip,.ZIP"></div></div>
+    <div class="field"><label for="zipPath">ZIP Windows 路徑</label><input id="zipPath" placeholder="C:\\VIA\\delivery\\VIA-All-Latest.zip"><small>verify／all 會傳給 PowerShell launcher；若只用 UI 先產生命令即可。</small></div>
+    <div class="field"><label for="rootPath">AzureFlow 工作區 Windows 路徑</label><input id="rootPath" placeholder="C:\\VIA\\reconstruction" value="."></div>
+    <div class="grid2"><div class="field"><label for="runsDir">Runs 資料夾（可選）</label><input id="runsDir" placeholder="C:\\VIA\\reconstruction\\app\\runs"></div><div class="field"><label for="checksum">SHA-256 檔案（可選）</label><input id="checksum" placeholder="C:\\VIA\\delivery\\VIA-All-Latest.zip.sha256"></div></div>
+    <div class="grid2"><div class="field"><label for="baseUrl">AzureFlow API URL</label><input id="baseUrl" value="http://127.0.0.1:8766"></div><div class="field"><label for="outDir">輸出資料夾</label><input id="outDir" value="VIA_AzureFlow_QA_Output"></div></div>
+    <label class="field" style="display:flex;align-items:center;gap:8px;margin-top:16px"><input id="e2e" type="checkbox" style="width:auto"> <span><b>執行 extracted E2E</b><small style="display:block">只有明確勾選才會執行 ZIP 內的測試 runner。</small></span></label>
+    <div class="actions"><button class="action" data-action="inspect">只檢查 AzureFlow</button><button class="action secondary" data-action="verify">只驗證 ZIP</button><button class="action" data-action="all">完整 QA</button></div>
+    <div class="notice"><span>●</span><span>瀏覽器 UI 只產生命令，不會自動執行所選檔案。請按「複製命令」後在 PowerShell 執行 `Invoke-VIA-AzureFlowQA.ps1`。</span></div>
+    <div id="status" class="status"><i class="dot"></i><span>待命：請選擇輸入，或直接按任一動作產生命令。</span></div>
+  </div>
+  <div class="panel">
+    <h2>命令與結果</h2><p class="sub">整合後固定三個動作：inspect、verify、all。命令可直接貼到 Windows PowerShell。</p>
+    <div class="summary"><div class="metric"><b>3</b><span>整併動作</span></div><div class="metric"><b>2</b><span>核心驗證器</span></div><div class="metric"><b>0</b><span>預設外連</span></div></div>
+    <h3>PowerShell 命令預覽</h3><div class="preview-wrap"><button id="copy" class="copy">複製命令</button><pre id="command" class="preview">請先按左側任一動作。</pre></div>
+    <h3>本地操作紀錄</h3><div id="log" class="log"><div>• UI ready · file:// standalone</div><div>• source_write=false · source_delete=false · human_review_required=true</div></div>
+    <h3>輸出位置</h3><p id="outputHint" class="sub">完成後會在輸出資料夾建立 `inspect/`、`verify/` 與 `VIA_AzureFlow_QA_Run_Summary.json`。</p>
+  </div>
+</section>
+<p class="foot">VIA 天青智流 AzureFlow · Muji-style light surface · Seaborn-compatible cyan / teal / amber palette · no CDN</p>
+</main>
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id)};
+  var state={action:"",zipFile:"",zipPath:"",rootPath:".",runsDir:"",checksum:"",baseUrl:"http://127.0.0.1:8766",outDir:"VIA_AzureFlow_QA_Output",e2e:false};
+  window.__VIA_AZUREFLOW_QA_STATE__=state;
+  function log(text){var row=document.createElement("div");row.textContent="• "+new Date().toLocaleTimeString()+" · "+text;$("log").appendChild(row);$("log").scrollTop=$("log").scrollHeight}
+  function sync(){state.zipPath=$("zipPath").value.trim();state.rootPath=$("rootPath").value.trim()||".";state.runsDir=$("runsDir").value.trim();state.checksum=$("checksum").value.trim();state.baseUrl=$("baseUrl").value.trim()||"http://127.0.0.1:8766";state.outDir=$("outDir").value.trim()||"VIA_AzureFlow_QA_Output";state.e2e=$("e2e").checked;return state}
+  function quote(v){return '"'+String(v).replace(/"/g,'\\"')+'"'}
+  function command(action){sync();state.action=action;var parts=['.\\Invoke-VIA-AzureFlowQA.ps1','-Action',action.charAt(0).toUpperCase()+action.slice(1),'-BaseUrl',quote(state.baseUrl),'-Output',quote(state.outDir)];if(action!=="verify")parts.push('-Root',quote(state.rootPath));if(state.runsDir&&action!=="verify")parts.push('-RunsDir',quote(state.runsDir));if(action!=="inspect"&&state.zipPath)parts.push('-Zip',quote(state.zipPath));if(state.checksum&&action!=="inspect")parts.push('-ChecksumFile',quote(state.checksum));if(state.e2e&&action!=="inspect")parts.push('-RunExtractedE2E');if(action==="inspect"&&state.zipPath){}return parts.join(" ")}
+  function setStatus(text,kind){$("status").lastElementChild.textContent=text;$("status").firstElementChild.className="dot"+(kind?" "+kind:"")}
+  function run(action){var cmd=command(action);$("command").textContent=cmd;setStatus("已產生 "+action+" 命令；請複製到 PowerShell 執行。","");log("prepared action="+action);$("outputHint").textContent="輸出："+state.outDir+"\\inspect\\、"+state.outDir+"\\verify\\ 與 combined summary"}
+  ["zipPath","rootPath","runsDir","checksum","baseUrl","outDir"].forEach(function(id){$(id).addEventListener("input",sync)});$("e2e").addEventListener("change",sync);
+  $("zipFile").addEventListener("change",function(){var f=this.files&&this.files[0];if(!f)return;state.zipFile=f.name;$("zipLabel").textContent=f.name+"（已選取；完整 Windows 路徑請貼到上方欄位）";log("selected ZIP="+f.name);setStatus("已選取 ZIP；請補上 Windows 完整路徑以便 launcher 執行。","warn")});
+  $("drop").addEventListener("dragover",function(e){e.preventDefault();$("drop").classList.add("drag")});$("drop").addEventListener("dragleave",function(){$("drop").classList.remove("drag")});$("drop").addEventListener("drop",function(e){e.preventDefault();$("drop").classList.remove("drag");var f=e.dataTransfer.files&&e.dataTransfer.files[0];if(!f)return;state.zipFile=f.name;$("zipLabel").textContent=f.name+"（已拖曳；完整 Windows 路徑請貼到上方欄位）";log("dropped ZIP="+f.name);setStatus("已拖曳 ZIP；請補上 Windows 完整路徑。","warn")});
+  document.querySelectorAll("button[data-action]").forEach(function(btn){btn.addEventListener("click",function(){run(btn.getAttribute("data-action"))})});
+  $("copy").addEventListener("click",function(){var text=$("command").textContent;if(!text||text.indexOf("請先")===0){setStatus("請先按一個動作產生命令。","warn");return}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){setStatus("命令已複製。"," ");log("command copied")}).catch(function(){setStatus("瀏覽器阻擋剪貼簿；請手動選取命令。","warn")})}else{setStatus("請手動選取命令。","warn")}});
+})();
+</script>
+</body>
+</html>

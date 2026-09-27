@@ -1,0 +1,48 @@
+{
+  "schema": "VIA.VCGC.RelatedIntake.v1",
+  "called": false,
+  "wired_to_report": false,
+  "rule": "add only; skip a file that is already registered; do not start these tools from SyncAll",
+  "imported": [
+    {
+      "id": "azureflow_qa",
+      "name_zh": "天青智流品保",
+      "role": "support_qa",
+      "path": "supportive modules/intake/VIA_AzureFlow_QA_v0110",
+      "source": "VIA_AzureFlow_QA_Plugin_Standalone (4), plus two files only in (3)",
+      "files": 20,
+      "reads": "a selected zip or a local AzureFlow tree",
+      "writes": "its own QA summary only",
+      "ui": "Show the name, the path, and that it does not touch a stock report."
+    },
+    {
+      "id": "azureflow_review",
+      "name_zh": "天青智流報告覆核",
+      "role": "support_qa",
+      "path": "supportive modules/intake/VIA_AzureFlow_ReportReview_v0100",
+      "source": "via-azureflow-system-report-review-20260920 (2)",
+      "files": 3,
+      "reads": "one AzureFlow system report",
+      "writes": "a review note only",
+      "ui": "Show this beside the QA plugin. It is a reviewer, not a second copy of the plugin."
+    },
+    {
+      "id": "mother_inspector",
+      "name_zh": "母系統檢視",
+      "role": "readonly_qa",
+      "path": "supportive modules/intake/VIA_MotherInspector_v0100/VIA_MotherSystemInspector.py",
+      "source": "c99dYOrFl9o72QoT-grok-workspace.zip artifacts/VIA_MotherSystemInspector.py",
+      "files": 1,
+      "reads": "a chosen source tree, offline",
+      "writes": "an inspection report only",
+      "ui": "Show it as read-only QA. It is not a second VCGC governor."
+    }
+  ],
+  "skipped_duplicate": [
+    "NLP 1.8, unified v7, consolidated v8, and v5: already registered under the NLP roster",
+    "discussion reconstruction JSON: output of the registered NLP package, not a new engine",
+    "ActiveETF launchers: VDF_ENG077 and VDF_ENG078 already own that lane",
+    "broker evidence zip: evidence, not an engine; broker locks already hold the rule",
+    "VIA_CentralGovernance.py inside the inspector selftest: a fixture, not the live governor"
+  ]
+}
