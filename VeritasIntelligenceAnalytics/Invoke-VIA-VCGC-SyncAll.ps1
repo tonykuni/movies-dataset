@@ -1,3 +1,20 @@
+# CELERITAS-TEMPLATE-JOIN v1
+#Requires -Version 7.0
+# ===== [VIA:PS-TEMPLATE:v0100] Celeritas 模板章(L102 ②;不包裹接法 L103 ③:不 cd、不動 param()、只動 $PID、關閉即還原;模板 StrictMode 不外溢) =====
+try {
+    $VIACelProbe = $PSScriptRoot
+    while ($VIACelProbe -and (Split-Path $VIACelProbe -Parent)) {
+        $VIACelPS7 = Join-Path $VIACelProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+        if (Test-Path -LiteralPath $VIACelPS7) { . $VIACelPS7 -RestoreOnly; break }
+        $VIACelProbe = Split-Path $VIACelProbe -Parent
+    }
+    Set-StrictMode -Off
+    if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) {
+        if (-not (Get-EventSubscriber -SourceIdentifier PowerShell.Exiting -ErrorAction SilentlyContinue)) { $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action { try { Restore-CeleritasPS7 } catch { } } }
+        [void](Start-CeleritasPS7)
+    }
+} catch { }
+# ===== [VIA:PS-TEMPLATE:END] =====
 #Requires -Version 7.0
 # 依序：本倉 autocrlf、參數雜湊、知識資產、狀態鎖、探測鎖、行情鎖、前瞻鎖、三管理器。不套用 registry，不改母冊。
 $ErrorActionPreference = "Stop"
@@ -50,6 +67,7 @@ foreach ($py in $steps) {
     & python $py
     if ($LASTEXITCODE -ne 0) {
         Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
+        if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] 關閉即還原
         exit $LASTEXITCODE
     }
 }
@@ -61,6 +79,7 @@ foreach ($py in @(
     & python $py --selftest
     if ($LASTEXITCODE -ne 0) {
         Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
+        if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] 關閉即還原
         exit $LASTEXITCODE
     }
 }
@@ -71,4 +90,6 @@ if ([string]::IsNullOrWhiteSpace($env:FRED_API_KEY)) {
     & python $refresh --refresh
 }
 Write-Host "======== 黃色到此 ========" -ForegroundColor Yellow
+if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] 關閉即還原
 exit $LASTEXITCODE
+if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] 關閉即還原
