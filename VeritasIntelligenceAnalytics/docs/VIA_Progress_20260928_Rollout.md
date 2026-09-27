@@ -15,3 +15,5 @@
 | R5 | Z230 用最新版(layout v0109 · 既有加速橋 · 網路 v0117/v0116)+ P6 主控台 v0162(`layout --selftest` 走樞紐)+ 附件適度採用:全景 v0114 多 COMPILE / TAILAPI 兩類 + 沙盒驗收測試 + layout 登冊 | 70db2d47 | 完成 | v0162 `layout --selftest` → 樞紐 v0109 [OK] rc0、status 照舊;全景 v0114 正控(MDL749 v0114→COMPILE、MANAGER v0149→TAILAPI)負控(v0115、v0150 無);測試 5 passed(unittest 與 pytest);全景自測 43/44(⑭ 與 v0113 同,既有 Z234);layout 登冊 1/5/0 → APPLIED → 0/0/0,元件冊 10995→10996 |
 
 **附件(Gemini 對話)採用對照**:採用 = `__future__` 以 compile 驗(COMPILE)、尾版公開 API 不退化(TAILAPI)、每步還原點、沙盒驗收測試;**不採用**(與樹不符或風險高)= 七支新腳本(`via_ast_bridge_*`、`via_uat_b305_ast_healer`、`via_patch_mdl179_synchub`、`via_ssot_sdd_hydrator`、`via_vcgc_mcp_server`、`Invoke-VcgcMasterGate.ps1`)—— 它們的橋標記(`cross_init`/`clean_for_duckdb_x`/`ScrapeGate`)在本樹不存在,批次注入會把假橋與替身類別寫進幾百支檔;樹上已有正主(via_accel_injector · CGC_MDL183 · CGC_MDL156 · CGC_MDL158),另造 = 第二把尺(L05)。MCP 伺服器、git hook、CI 工作流改動列為之後可議,不在本批。
+
+| 收尾 | 全格子(容器)OK 300 · FAIL 46 → **OK 306 · FAIL 40**(無新紅,6 站轉綠;再生件 stash 未 commit)· PR [tonykuni/movies-dataset#328](https://github.com/tonykuni/movies-dataset/pull/328) 已開(不 approve、不 merge) | e3149646 | 完成 | 主控台 status 會自動提交並推送 SubsystemSeat 同步(57199124);之後量測一律設 `VIA_VCGC_PUSH=NO` |
