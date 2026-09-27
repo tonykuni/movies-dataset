@@ -42,7 +42,7 @@ $steps = @(
     (Join-Path $reg "CGC_MDL204_NlpCodes_v0100.py"),
     (Join-Path $reg "CGC_MDL205_TalibBan_v0100.py"),
     (Join-Path $reg "CGC_MDL206_TalibPolicy_v0101.py"),
-    (Join-Path $reg "CGC_MDL207_PolicyRun_v0100.py"),
+    (Join-Path $reg "CGC_MDL207_PolicyRun_v0101.py"),
     (Join-Path $reg "CGC_MDL208_VdfMeasure_v0100.py")
 )
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
