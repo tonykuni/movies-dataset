@@ -1,0 +1,34 @@
+{
+  "schema": "VIA.VCGC.SuccessLedger.v1",
+  "policy": "append only. an older lock is not rewritten. a later green does not delete the earlier open list.",
+  "book_edited": false,
+  "kept": [
+    {"id": "stock_sync", "file": "VIA_VCGC_Sync_Success_v0100.json", "sealed": true},
+    {"id": "status_lock", "file": "VIA_StatusLock_v0100.json", "ids": ["knowledge_assets", "usmacro_params", "method_selftest"]},
+    {"id": "probe", "file": "VIA_USMacroProbeLock_v0100.json", "live": 51, "parked": 5},
+    {"id": "backfill", "file": "VIA_TWBackfillLock_v0100.json", "checks": "12/12"},
+    {"id": "forward", "file": "VIA_ForwardVintageLock_v0101.json", "selftest": "pass"},
+    {"id": "entry", "file": "VIA_EntryLock_v0100.json", "policy_sha16": "c7aab42f7ebfd283"},
+    {"id": "book_pointer", "file": "VIA_VCGC_BookPointer_v0100.json"},
+    {"id": "lexicon", "file": "VIA_VCGC_RegexParamRecord_v0100.json", "aligned": 12}
+  ],
+  "later_green": [
+    {"id": "vdf_logic", "was_open_in": "VIA_StatusLock_v0100.json"},
+    {"id": "vdf_bridge", "was_open_in": "VIA_StatusLock_v0100.json"},
+    {"id": "vdf_handover", "was_open_in": "VIA_StatusLock_v0100.json"},
+    {"id": "vrn_logic", "was_open_in": "VIA_StatusLock_v0100.json"}
+  ],
+  "added_tail": [
+    {
+      "cited": "VDF_ENG119_StartTestRegister_v0101.py",
+      "tree_tail": "functional modules/VDF/engine/VDF_ENG119_StartTestRegister_v0102.py",
+      "why": "v0102 only adds the bridge and calls v0101"
+    }
+  ],
+  "held": [
+    {"id": "vdf_engine", "state": "NODATA"},
+    {"id": "synonym_conflicts", "n": 5},
+    {"id": "probe_parked", "n": 5},
+    {"id": "DISCBORR", "refresh": false}
+  ]
+}
