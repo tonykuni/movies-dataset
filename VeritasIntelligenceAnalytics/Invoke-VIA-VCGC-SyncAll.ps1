@@ -32,6 +32,7 @@ $steps = @(
     (Join-Path $reg "CGC_MDL193_BrokerMarketLock_v0100.py"),
     (Join-Path $reg "CGC_MDL193_BrokerShowLock_v0100.py"),
     (Join-Path $reg "CGC_MDL193_FinancialReadLock_v0100.py"),
+    (Join-Path $reg "CGC_MDL193_FinancialShownLock_v0100.py"),
     (Join-Path $reg "CGC_MDL199_SupportTier_v0100.py"),
     (Join-Path $reg "CGC_MDL199_NlpUses_v0100.py")
 )
