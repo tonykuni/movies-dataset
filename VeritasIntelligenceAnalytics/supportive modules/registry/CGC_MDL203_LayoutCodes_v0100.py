@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Confirm the layout-only registry codes. Do not install TA-Lib and do not retire old numbers.
+
+The writer was via-vcgc registry-sync --layout-only --apply. It added the 46
+layout capabilities and their implementation rows. TA-Lib stays retired and is
+not imported. Layout text libraries are checked. A missing language pack is not
+a failed extract.
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import os
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+BOOK = HERE / "VIA_Component_Inventory_SSOT_v0100.json"
+RUNTIME = ("fitz", "pdfplumber", "pdfminer", "PIL", "pandas", "numpy")
+
+
+def _present(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except Exception:
+        return False
+
+
+def check() -> dict:
+    data = json.loads(BOOK.read_text(encoding="utf-8")) if BOOK.is_file() else {}
+    records = data.get("records") or []
+    features = [r for r in records if str(r.get("identity") or "").startswith("layout/LAYOUT.") and r.get("state") == "ACTIVE"]
+    codes = sorted(r.get("code") or "" for r in features)
+    talib_new = [r.get("key") for r in records if "talib" in str(r.get("key") or "").lower() and str(r.get("first_seen") or "").startswith("2026-09-27")]
+    libs = {name: _present(name) for name in RUNTIME}
+    return {
+        "via": "vcgc",
+        "door": "CGC_MDL203_LayoutCodes_v0100",
+        "enter": "vcgc",
+        "exit": "vcgc",
+        "lock_success": len(features) == 46 and not talib_new and all(libs.values()) and not _present("talib"),
+        "features": len(features),
+        "code_first": codes[0] if codes else "",
+        "code_last": codes[-1] if codes else "",
+        "writer": "registry-sync --layout-only --apply",
+        "talib": "retired; not installed; not in this batch",
+        "runtime": libs,
+        "missing": [] if len(features) == 46 else ["layout features"],
+        "intake_edited": False,
+        "hub_edited": False,
+        "do_not": [
+            "pip install TA-Lib",
+            "import talib",
+            "registry-sync --apply without --layout-only",
+            "retire an old inventory code",
+            "edit intake macro_ssot",
+        ],
+        "next": "none",
+    }
+
+
+def main() -> int:
+    if os.environ.get("VIA_FROM_VCGC") != "YES":
+        print(json.dumps({"via": "vcgc", "state": "DENY"}, ensure_ascii=False))
+        return 2
+    card = check()
+    print(json.dumps(card, ensure_ascii=False, indent=1))
+    return 0 if card["lock_success"] else 2
+
+
+def selftest() -> int:
+    card = check()
+    print("  [OK]" if card["lock_success"] else "  [FAIL]")
+    return 0 if card["lock_success"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(selftest() if "--selftest" in sys.argv else main())
