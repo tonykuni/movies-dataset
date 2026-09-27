@@ -5,9 +5,9 @@
  ],
  "batch": 588,
  "ts": "2026-09-24 20:05",
- "engines": 46,
+ "engines": 77,
  "store": "VIA_Capability_Store__vdf.sqlite",
- "note": "一族一本,一引擎一張卡,只收尾版。全部欄位由 AST 與能力庫推導;推不出來就留空,不補話。AI 讀這本就不必再掃原始碼。",
+ "note": "一族一本,一引擎一張卡,只收尾版。這次以樹上尾版為準;能力庫不在,新卡的 owns 留空。",
  "cards": [
   {
    "engine": "VDF_ENG046_FetchMatrixRegistry",
@@ -232,10 +232,10 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG054_TWDailyBackfill_v0107",
-   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0107.py",
-   "version": "0107",
-   "purpose": "VDF_ENG054_TWDailyBackfill — 台股全市場日線回補工人(批136;via-tw-backfill)",
+   "engine": "VDF_ENG054_TWDailyBackfill_v0110",
+   "path": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0110.py",
+   "version": "0110",
+   "purpose": "Backfill tail. An empty ticker starts at 2022-07-01. v0109 is not rewritten.",
    "verbs": [],
    "flags": [
     "--full",
@@ -274,9 +274,9 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG055_OmniFetch_v0117",
-   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0117.py",
-   "version": "0117",
+   "engine": "VDF_ENG055_OmniFetch_v0118",
+   "path": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py",
+   "version": "0118",
    "purpose": "VDF_ENG055_OmniFetch — 單 004 總擷取執行器(批137;via-omni)",
    "verbs": [],
    "flags": [
@@ -541,7 +541,7 @@
    "engine": "VDF_ENG062_GroupFeatureLayer_v0104",
    "path": "functional modules/VDF/engine/VDF_ENG062_GroupFeatureLayer_v0104.py",
    "version": "0104",
-   "purpose": "group_features_daily,平行格子時拿著寫鎖。v0104:自測先把輸入表 features_daily **唯讀**複製進暫存庫(ATTACH … READ_ONLY),",
+   "purpose": "v0103→v0104(批733;掉球 Z189「自測只寫暫存庫」L17):v0103 的自測直接呼叫 build(),在**正式庫**上 CREATE OR REPLACE",
    "verbs": [],
    "flags": [
     "--status"
@@ -571,9 +571,9 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG063_MonthlyRevenue_v0106",
-   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0106.py",
-   "version": "0106",
+   "engine": "VDF_ENG063_MonthlyRevenue_v0107",
+   "path": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+   "version": "0107",
    "purpose": "VDF_ENG063_MonthlyRevenue v0106 — 月營收分析模組(批194;操作員令)",
    "verbs": [
     "run"
@@ -1085,10 +1085,10 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG077_ActiveETFUniverse_v0100",
-   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
-   "version": "0100",
-   "purpose": "VDF_ENG077_ActiveETFUniverse — 主動式 ETF 宇宙日更器(批374;via-etfuniv)",
+   "engine": "VDF_ENG077_ActiveETFUniverse_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
+   "version": "0101",
+   "purpose": "v0101（2026-09-25）：官方新抓與後備分態；後備不刷新 last_seen。官方缺名單以本次回包核對，不用既有聯集自證存在。保留歷史，當日 CSV 不列官方缺席者。",
    "verbs": [
     "status"
    ],
@@ -1282,9 +1282,9 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG082_FinStatements_v0103",
-   "path": "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0103.py",
-   "version": "0103",
+   "engine": "VDF_ENG082_FinStatements_v0105",
+   "path": "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0105.py",
+   "version": "0105",
    "purpose": "VDF_ENG082_FinStatements v0103 — 三大報表擷取引擎(側線 2026-09-24 第十三段:交易所 MOPS 彙總財報車道)",
    "verbs": [
     "mops",
@@ -1409,10 +1409,10 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG087_MarketListGovernance_v0103",
-   "path": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0103.py",
-   "version": "0103",
-   "purpose": "VDF_ENG087 — Central market-list governance bridge.",
+   "engine": "VDF_ENG087_MarketListGovernance_v0104",
+   "path": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0104.py",
+   "version": "0104",
+   "purpose": "VDF_ENG087 v0104 — two daily lists, both checked.",
    "verbs": [
     "run",
     "selftest",
@@ -1617,9 +1617,9 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_MDL002_YFinanceFetchingEngine",
-   "path": "functional modules/VDF/engine/VDF_MDL002_YFinanceFetchingEngine.py",
-   "version": "",
+   "engine": "VDF_MDL002_YFinanceFetchingEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_v0100.py",
+   "version": "0100",
    "purpose": "VDF_MDL002_YFinanceFetchingEngine.py",
    "verbs": [],
    "flags": [
@@ -1649,9 +1649,9 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_MDL003_SentimentMacroEngine",
-   "path": "functional modules/VDF/engine/VDF_MDL003_SentimentMacroEngine.py",
-   "version": "",
+   "engine": "VDF_MDL003_SentimentMacroEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py",
+   "version": "0100",
    "purpose": "VDF_MDL003_SentimentMacroEngine.py",
    "verbs": [
     "cnn_subindicators",
@@ -1720,20 +1720,487 @@
    "has_selftest": true
   },
   {
-   "engine": "sector_rotation_capital_flow_engine",
-   "path": "functional modules/VDF/engine/candidates/sector_rotation_capital_flow_engine.py",
-   "version": "",
+   "engine": "VDF_ENG045_OutputHub_v0101",
+   "path": "functional modules/VDF/VDF_ENG045_OutputHub_v0101.py",
+   "version": "0101",
+   "purpose": "vdf_output_hub_v0100 — VDF 統一參數+全格式輸出樞紐(TOOL-058;操作員令 2026-08-18)",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG092_TWFlowsAdjConsensus_v0100",
+   "path": "functional modules/VDF/VDF_ENG092_TWFlowsAdjConsensus_v0100.py",
+   "version": "0100",
    "purpose": "",
    "verbs": [],
    "flags": [],
-   "contract": [],
-   "owns": [
-    "build.noisy_market",
-    "compute.comovement",
-    "misc.compare_raw_vs_pruned_performance",
-    "misc.prune_sector_members"
+   "contract": [
+    "selftest"
    ],
-   "owns_n": 4,
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG093_LaunchConsole_v0103",
+   "path": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py",
+   "version": "0103",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG094_ActiveETFActivity_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0100.py",
+   "version": "0100",
+   "purpose": "Active ETF interval analytics; offline, source-backed, explicit estimates.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG095_InstrumentIdentity_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG095_InstrumentIdentity_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG095 — display identity for a Taiwan ticker.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG096_ActiveETFMeasures_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG096_ActiveETFMeasures_v0100.py",
+   "version": "0100",
+   "purpose": "Measures from rows already stored. This file does not fetch.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG097_GlobalETFFlow_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG097_GlobalETFFlow_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG097 — classify global ETFs and compute net cash flow.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG098_SameDayAlign_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG098_SameDayAlign_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG098 — one Taiwan stock, one date.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG099_IndexSameDay_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG099_IndexSameDay_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG099 — TAIEX and TPEx index rows follow the stock day.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG100_FinStatementQuery_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG100_FinStatementQuery_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG100 v0101 — bare EPS, actuals, and display dates.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG101_SourceProbe_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG101_SourceProbe_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG101 — who is allowed into the next live test.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG102_SourceLane_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG102_SourceLane_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG102 v0101 — live check of two names. No database write.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG103_ListingName_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG103_ListingName_v0100.py",
+   "version": "0100",
+   "purpose": "Short names for tickers already cut from a filename. Uses ENG054's listing read.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG109_USMacroList_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG109_USMacroList_v0100.py",
+   "version": "0100",
+   "purpose": "VCGC door into the US macro lists. Read-only. Does not fetch and does not edit the intake SSOT.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG110_AKShareProbe_v0102",
+   "path": "functional modules/VDF/engine/VDF_ENG110_AKShareProbe_v0102.py",
+   "version": "0102",
+   "purpose": "AKShare probe. Refuses a raw python call. The central launcher must enter first.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG110_USMacroProbe_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v0101.py",
+   "version": "0101",
+   "purpose": "Same one-point probe. The key comes from the environment or the local key file, never from git.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG110_USMacroTree_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG110_USMacroTree_v0100.py",
+   "version": "0100",
+   "purpose": "VCGC door for the US macro tree. Checks the process SSOT. Does not fetch.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG111_USMacroAgency_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG111_USMacroAgency_v0100.py",
+   "version": "0100",
+   "purpose": "VCGC door for agency sources. Read-only. Does not fetch.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG112_FedMore_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG112_FedMore_v0100.py",
+   "version": "0100",
+   "purpose": "VCGC door for the extra Fed series. Read-only.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG113_MacroMethod_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0101.py",
+   "version": "0101",
+   "purpose": "Same Fed-method refresh. The live us_macro table has three columns; add fetched_at, do not rebuild it.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG114_PmiPair_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG114_PmiPair_v0100.py",
+   "version": "0100",
+   "purpose": "Two PMI prints per economy that this AKShare actually has. Does not invent the rest.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG115_SentimentFetch_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0101.py",
+   "version": "0101",
+   "purpose": "AAII: spreadsheet first, survey page second. A block page still yields no percentages.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG116_AAIIWorkbook_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+   "version": "0101",
+   "purpose": "Load the AAII workbook. Dates must be YYYY-MM-DD and numbers must be plain Python floats.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG117_ForwardVintage_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v0101.py",
+   "version": "0101",
+   "purpose": "Point-in-time forward valuation vintage reference implementation v2.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG117_ForwardVintageDoor_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v0100.py",
+   "version": "0100",
+   "purpose": "Run the VDF copy of the forward-vintage engine. Does not edit intake or the hub.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG118_ExportDesk_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG118_ExportDesk_v0100.py",
+   "version": "0100",
+   "purpose": "Show the fetch inputs and database inventory. Export a short slice, not the whole table.",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG118_TWMarket_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG118_TWMarket_v0100.py",
+   "version": "0100",
+   "purpose": "One TWSE list and one TPEX list. A code that answers decides .TW or .TWO.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
+  },
+  {
+   "engine": "VDF_ENG119_StartTestRegister_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG119_StartTestRegister_v0101.py",
+   "version": "0101",
+   "purpose": "VDF_ENG119_StartTestRegister_v0101 — 四張矩陣，一頁 HTML。",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL004_TWFullMarketEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py",
+   "version": "0100",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL006_FinancialModel_v0100",
+   "path": "functional modules/VDF/VDF_MDL006_FinancialModel_v0100.py",
+   "version": "0100",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "vdf_input_matrix_v0100",
+   "path": "functional modules/VDF/vdf_input_matrix_v0100.py",
+   "version": "0100",
+   "purpose": "vdf_input_matrix_v0100 — VDF 整合輸入介面清單矩陣(TOOL-093,批88)",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_InjectAccelNetBridges_v0104",
+   "path": "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py",
+   "version": "0104",
+   "purpose": "VDF_InjectAccelNetBridges_v0104 — 只增不減錨點注入器",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
    "tables": [],
    "deps": [],
    "has_selftest": false
