@@ -1,0 +1,46 @@
+{
+  "schema": "VIA.VDF.StartTestRegister.v1",
+  "version": "0100",
+  "only_add": true,
+  "canonical_books_readonly": [
+    "VIA_SSOT_SynonymUnion_v0100.json",
+    "VIA_SSOT_RegexDict_v0100.json",
+    "VIA_Policy_Laws_SSOT_v0100.json"
+  ],
+  "logic_order": ["deny", "canonical", "addendum"],
+  "policy_ids": ["L04", "L50"],
+  "verbs": {
+    "vdf.verb.start": {
+      "argv": "start",
+      "synonyms": ["start", "啟動", "via-vdf-start"],
+      "regex": "^(start|啟動|via-vdf-start)$",
+      "does": "status through the VCGC mark",
+      "fetches": false
+    },
+    "vdf.verb.test": {
+      "argv": "test",
+      "synonyms": ["test", "測試", "selftest", "via-vdf-test"],
+      "regex": "^(test|測試|selftest|via-vdf-test)$",
+      "does": "one newest tail, --selftest only",
+      "fetches": false
+    },
+    "vdf.verb.register": {
+      "argv": "register",
+      "synonyms": ["register", "註冊", "via-vdf-register"],
+      "regex": "^(register|註冊|via-vdf-register)$",
+      "does": "record the three verbs in this book",
+      "fetches": false
+    }
+  },
+  "deny": ["talib", "import talib", "registry-sync --apply", "edit intake macro_ssot"],
+  "do_not": [
+    "write the synonym union",
+    "write the regex harvest",
+    "rewrite a policy law",
+    "start VDF without the VCGC mark",
+    "fetch from these verbs",
+    "registry-sync --apply",
+    "pip install TA-Lib",
+    "import talib"
+  ]
+}
