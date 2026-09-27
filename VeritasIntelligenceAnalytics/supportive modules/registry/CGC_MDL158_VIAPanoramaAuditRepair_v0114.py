@@ -155,7 +155,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 ENGINE_ID = "CGC_MDL158_VIAPanoramaAuditRepair"
-VERSION = "v0113"
+VERSION = "v0114"
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent
 OUT = VIA / "VIA_Reports" / "panorama_audit"      # 批535:自己的命名空間。`VIA_Reports/panorama` 是 CGC_MDL135/CGC_MDL149
@@ -1353,16 +1353,27 @@ def _tail_api_checks_py(tree, path: Path) -> list[dict]:
             prior.append((int(mq.group("ver")), q))
     if not prior:
         return []
-    pv, pq = max(prior)
-    try:
-        ptree = ast.parse(pq.read_text(encoding="utf-8-sig", errors="replace"))
-    except (SyntaxError, ValueError, OSError):
-        return []
-    dropped = sorted(_public_top_names(ptree) - _public_top_names(tree))
+    # Codex #328:前一版若只是薄尾(原始碼裡點名同族別的版號檔來載),它的公開面其實是更前面那一版的;
+    # 往回走到第一個不再點名同族版號檔的**具體實作**,沿途公開名稱取聯集再比(最多 12 版)。
+    sib = re.compile(re.escape(m.group("stem")) + r"_v\d{4}\.py")
+    surface: set[str] = set()
+    walked: list[int] = []
+    for pv_i, pq_i in sorted(prior, reverse=True)[:12]:
+        try:
+            ptxt = pq_i.read_text(encoding="utf-8-sig", errors="replace")
+            ptree = ast.parse(ptxt)
+        except (SyntaxError, ValueError, OSError):
+            break
+        surface |= _public_top_names(ptree)
+        walked.append(pv_i)
+        if not sib.search(ptxt):
+            break
+    dropped = sorted(surface - _public_top_names(tree))
     if not dropped:
         return []
+    span = f"v{walked[0]:04d}" + (f"…v{walked[-1]:04d}" if len(walked) > 1 else "")
     return [{"cls": "TAILAPI", "line": 1, "how": "ast",
-             "detail": f"比前版 v{pv:04d} 少了公開名稱且沒有轉接:{', '.join(dropped[:8])}{' …' if len(dropped) > 8 else ''}"}]
+             "detail": f"比前版 {span}(薄尾往回到具體實作)少了公開名稱且沒有轉接:{', '.join(dropped[:8])}{' …' if len(dropped) > 8 else ''}"}]
 
 
 def _outline_py(tree) -> list[dict]:

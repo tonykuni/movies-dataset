@@ -49,7 +49,7 @@ import sys
 from pathlib import Path
 
 ENGINE_ID = "CGC_MDL183_CeleritasPolicyGate"
-VERSION = "v0100"
+VERSION = "v0101"
 BATCH = "批715"
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parent.parent
@@ -255,7 +255,7 @@ def selftest() -> int:
         f"(唯讀本 {len(ro_f)} 支 · 身上無橋 {ro_ok} · 掃到 {s.get('py', {}).get('readonly')})")
 
     # ⑧ 唯讀零網路
-    src = (HERE / f"{ENGINE_ID}_{VERSION}.py").read_text(encoding="utf-8", errors="ignore")
+    src = Path(__file__).read_text(encoding="utf-8", errors="ignore")  # v0101:審自己這一支(Codex #328)
     code = "\n".join(ln for ln in src.splitlines() if not ln.strip().startswith("#"))
     banned = [w for w in ("url" + "open", "requests." + "get", "write_" + "text(", "socket." + "socket")
               if w in code]

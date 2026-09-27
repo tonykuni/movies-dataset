@@ -77,6 +77,14 @@ class PanoramaCompileTailApi(unittest.TestCase):
             body = "exec(compile('', 'x', 'exec'), globals())\n\ndef main():\n    return 0\n"
             self.assertNotIn("TAILAPI", self._classes(root, "MGR_v0003.py", body))
 
+    def test_thin_predecessor_walks_back_to_concrete(self):
+        # Codex #328:v2 只是把 v1 載進來的薄尾;v3 丟掉 v1 的 do_list,光比 v2 會漏
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "MGR_v0001.py").write_text("def do_list():\n    return {}\n\ndef main():\n    return 0\n", encoding="utf-8")
+            (root / "MGR_v0002.py").write_text('PRIOR = "MGR_v0001.py"\n\ndef main():\n    return 0\n', encoding="utf-8")
+            self.assertIn("TAILAPI", self._classes(root, "MGR_v0003.py", 'PRIOR = "MGR_v0002.py"\n\ndef main():\n    return 0\n'))
+
     def test_unversioned_file_is_not_compared(self):
         with tempfile.TemporaryDirectory() as d:
             self.assertNotIn("TAILAPI", self._classes(Path(d), "plain.py", "def main():\n    return 0\n"))
