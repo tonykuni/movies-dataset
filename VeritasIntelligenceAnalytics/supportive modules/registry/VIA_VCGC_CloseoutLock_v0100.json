@@ -75,6 +75,109 @@
     {
       "id": "ssot_linkage_broken4",
       "why": "VCGC status SSOT 連動 BROKEN 4 · YELLOW 4,本線未動。"
+    },
+    {
+      "id": "py_bridge_missing91",
+      "why": "CGC_MDL183 [PY ] 缺橋 91;ENG110 v0114 是 layout 鎖 sha,另 8 支被證據冊引用 —— 盲注破鎖;逐支裁(掉球 Z223)"
+    },
+    {
+      "id": "ps_template_parse_evidence",
+      "why": "59 支 .ps1 模板章是工作站線接的(04:30 矩陣寫「接上 0 支 · 解析錯還原 0」,這 59 支的 ParseFile 證據沒寫在冊上);容器無 pwsh 量不到;另有加固提案 P3(掉球 Z224)"
+    },
+    {
+      "id": "vcgc_layout_selftest_swallowed",
+      "why": "via-vcgc layout --selftest 被主控台 --selftest 攔走,量到的不是樞紐;樞紐 v0109 自測另量 rc0(提案 P6 · 掉球 Z225)"
+    },
+    {
+      "id": "future_bridge_syntaxerror",
+      "why": "b12e82ff 加速橋在 from __future__ 之前:SUP_MDL749 v0114 · VDF_ENG088 v0103 · CGC_MDL180 v0100 import 即 SyntaxError → SSOT BROKEN 4 的根因;修補 P1 已實測,待 via 審核(掉球 Z226)"
+    },
+    {
+      "id": "two_daily_lists_daily_run",
+      "why": "兩清單引擎在位且容器自測綠(ENG087 v0104 7/7 · ENG077 v0103 [OK]);每日實跑要真資料 + 工作站排程(掉球 Z227)"
+    },
+    {
+      "id": "inputconsole_layout_item",
+      "why": "附件 layout v0104 包的 InputConsole 冊多 vcgc_layout_review 一項,但全格子會重生這本冊把它洗掉;根因在產生器(提案 P5 · 掉球 Z228)"
+    },
+    {
+      "id": "ci_manager_v0149_forward",
+      "why": "VIA_SYSTEM_MANAGER_v0149 沒轉 do_list/_build_page → CI Windows UAT 紅(main 同病);提案 P2 待 via 審核,且還有 test_11 頁不同步(掉球 Z229)"
+    },
+    {
+      "id": "master_prompt_version_conflict",
+      "why": "Master Prompt 寫 layout 必須載入 SUP_MDL743 v0108 並 import VIA_SuperAccel_ModuleLayout;樹上尾版是 v0109(6f772b92,已在 main),VIA_SuperAccel_ModuleLayout 全樹 0 支 —— 政策與樹衝突,依 Master Prompt 不部署 layout,等操作員裁(掉球 Z230)"
+    },
+    {
+      "id": "vrn_handover_stale",
+      "why": "一頁交接 批715 舊;via-vcgc page --publish 未跑(會重寫倉根一頁交接)"
     }
-  ]
+  ],
+  "remeasure_20260928_0525": {
+    "env": "sandbox",
+    "tree": "15b7e409(工作站線)+ 本筆只增紀錄;容器沒有套任何修補(Master Prompt:修補先經 via 審核)",
+    "why": "舊鎖不改寫(本冊 policy)。這一段是容器對同一棵樹的重量,燈照實;與上面 locked 的燈不同處就並列,由操作員看。",
+    "cells": [
+      {
+        "id": "celeritas_gate",
+        "lamp": "RED",
+        "evidence": "CGC_MDL183:[PS ] 基線外新缺 0 · 自測 8 檢 OK 7 · FAIL 1(⑤)—— 但 scan() 整體 state RED:[PY ] 缺橋 91。上面 locked 的 GREEN 只量了 PS 半邊"
+      },
+      {
+        "id": "success_ledger",
+        "lamp": "GREEN",
+        "evidence": "CGC_MDL220 rc0 · lock_success true · missing [](工作站 04:30 矩陣記 false;容器同一棵樹量 true —— 兩邊不同,工作站要再量一次)"
+      },
+      {
+        "id": "layout_registry_sync",
+        "lamp": "GREEN",
+        "evidence": "registry-sync --layout-only 乾跑 new 0 · changed 0 · stale 0(本筆未 apply)"
+      },
+      {
+        "id": "layout_lock_hashes",
+        "lamp": "GREEN",
+        "evidence": "VIA_Layout_Reuse_SSOT locked_sources 11/11 原位元相符,容器全 LF(工作站 CRLF 工作複本要去 \\r 再比,Master Prompt 第 5 步)"
+      },
+      {
+        "id": "talib_zero_import",
+        "lamp": "GREEN",
+        "evidence": "CGC_MDL190 rc0 · imports 0;status L50 全景 import 0 · 已裝 False"
+      },
+      {
+        "id": "ssot_linkage",
+        "lamp": "RED",
+        "evidence": "status:SSOT 連動 BROKEN 4 · YELLOW 4 · ABSENT 2 · GREEN 2。根因:SUP_MDL749 v0114 import 即 SyntaxError(加速橋在 from __future__ 之前)—— 修補 P1 待 via 審核"
+      },
+      {
+        "id": "logic_book",
+        "lamp": "RED",
+        "evidence": "status 邏輯庫 RED:索引冊指標過期(SUP_MDL743 冊寫 v0105 · 尾版 v0109)—— 修補 P4 待 via 審核"
+      },
+      {
+        "id": "vrn_manager_status",
+        "lamp": "RED",
+        "evidence": "status VRN 系統管理 RED(logic RED · engine RED · handover STALE);VRN_SystemManager_v0108 --selftest rc0 [OK]"
+      },
+      {
+        "id": "vdf_manager_status",
+        "lamp": "GREEN",
+        "evidence": "status VDF 系統管理 GREEN(engine 子燈 RED);VDF_SystemManager_v0118 --selftest rc0 [OK](工作站 04:30 記 rc2)"
+      },
+      {
+        "id": "vrn_engines_and_locks",
+        "lamp": "GREEN",
+        "evidence": "VRN_ENG111 v0104 / ENG112 v0100 / ENG110 v0116 --selftest rc0 [OK](工作站記 ENG110 rc1);CGC_MDL193 七鎖 lock_success true"
+      },
+      {
+        "id": "ci_windows_uat",
+        "lamp": "RED",
+        "evidence": "PR #327 Windows bundled Chromium UAT 紅:VIA_SYSTEM_MANAGER_v0149 沒轉 do_list(main 同病,不是本 PR)—— 修補 P2 待 via 審核;單推 P2 仍有 test_11 頁不同步"
+      },
+      {
+        "id": "grid_container",
+        "lamp": "RED",
+        "evidence": "CGC_MDL064 v0498 全格子(容器,修補前的工作樹)OK 300 · FAIL 46 · SKIP 15 · 存證 GRID_20260927_210820.json;再生件已 stash「grid regen」未 commit;沒有 base 對照,不宣稱是本 PR 造成"
+      }
+    ]
+  }
 }

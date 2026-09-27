@@ -265,3 +265,21 @@
 | Z220 | registry-sync --layout-only --apply(乾跑 new 1 changed 61) | 候 | 操作員貼區塊 | 工作站跑 |
 | Z221 | 加速器家族登冊 source 指舊版(SUP_MDL737 v0106 · SUP_MDL740 v0114);要一個 --accel-only 範圍 | 候 | AI | CGC_MDL149 v0162 |
 | Z222 | VCGC status SSOT 連動 BROKEN 4 · YELLOW 4(via-vcgc ssot verify) | 未做 | AI | 下一線 |
+
+## 側線 2026-09-28 b 追記(容器;併工作站線 15b7e409 只增不減;Z218–Z222 續記進度,新編 Z223–Z230;修補一律只寫提案待 via 審核 —— 操作員 VCGC Master Prompt;來源 docs/VIA_Closeout_Matrix_20260928_0525.md · docs/VIA_Patch_Proposals_20260928.md)
+
+| # | 掉的球 | 狀態 | 誰的手 | 備註 |
+|---|---|---|---|---|
+| Z218(續) | 批345 正本缺席 | 未做 | 操作員 | 容器同量:CGC_MDL183 自測 8 檢 OK 7 · FAIL 1,只剩 ⑤ |
+| Z219(續) | SUP_MDL753 SCAN_EXCLUDE 缺 supportive modules/intake | 候 | AI(新版號,待 via 審核) | 5 支 intake .ps1 已記 ps1_debt(n 843) |
+| Z220(續) | layout 登冊 | layout 段 0/0/0(容器再量);全樹未 apply | 操作員 | 全樹 registry-sync 乾跑 PLAN 新 817 · 變更 296 · 退役 854;Master Prompt:未經 VCGC 批准不 --apply |
+| Z221(續) | 加速器家族登冊 source 指舊版 | 候 | AI | 元件冊實查:SUP_MDL737 指 v0106(尾 v0108)· SUP_MDL740 指 v0114(尾 v0117) |
+| Z222(續) | SSOT 連動 BROKEN 4 | 根因已找到,修補待審 | 操作員裁 P1 | 根因 = SUP_MDL749 v0114 import 即 SyntaxError(見 Z226);容器套 P1 後實測 BROKEN 0 · YELLOW 7 · GREEN 5,但依 Master Prompt 未套 |
+| Z223 | CGC_MDL183 [PY ] 缺橋 91,閘整體 RED(CloseoutLock 上 celeritas_gate GREEN 只量了 PS 半邊) | 未做 | 操作員逐支裁 | ENG110 v0114 是 layout 鎖 sha;另 8 支被 VRN_Audit_Evidence / SuccessLedger / CardBook / Layout_Capabilities 冊引用 —— 盲注破鎖破證據 |
+| Z224 | 59 支 .ps1 模板章(工作站線接的)的 ParseFile 證據沒上冊;容器無 pwsh | 候 | 操作員(工作站一貼) | 另有加固提案 P3:-RestoreOnly 回傳漏到管線 · 點源蓋掉宿主 $Report/$Body/$RestoreOnly · StrictMode 不在 finally · Register 鏈重載 17 次 · Get-EventSubscriber 不帶 -Force 看不到 SupportEvent → 重複掛 |
+| Z225 | `via-vcgc layout --selftest` 被主控台 --selftest 攔走(看起來綠的另一件事) | 候 | AI(提案 P6) | 樞紐 SUP_MDL743 v0109 自測直接量 rc0 [OK] |
+| Z226 | 加速橋注在 `from __future__` 之前(b12e82ff):SUP_MDL749 v0114 · VDF_ENG088 v0103 · CGC_MDL180 v0100 import 即 SyntaxError;`ast.parse` 不報、`compile` 才報,所以全景與導入器後驗都沒抓到 | 修補 P1 已實測,待 via 審核 | 操作員裁 | v0115 50/50 · v0101 7/7 · v0104 5/2(同 v0102,缺來源庫);導入器 / 全景後驗改用 compile() 另列 |
+| Z227 | 操作員令:VDF 引擎各自獨立可獨立測;台股全部個股清單 + 主動式台股 ETF(REGEX 與邏輯定義、可擷取每日公布台股持股者)兩清單每天更新全部,作後面引擎輸入 | 引擎在位(容器自測綠);每日實跑未量 | 操作員(工作站排程)+ AI | VDF_ENG087 v0104 7/7 · VDF_ENG077 v0103 [OK];持股走 Update-VIA-ETFHoldings.ps1;排程是留在操作員機器上的東西(L70) |
+| Z228 | 附件 VCGC_LAYOUT_ENGINE_v0104.zip 的 VIA_InputConsole_Spec 多 `vcgc_layout_review` 一項(CGC_MDL149 v0148 的 layout 登冊也指名它),樹上沒有;手貼會被全格子重生洗掉 | 候 | AI(先找產生器,提案 P5) | 附件其餘:9 支 .py 去掉加速橋後與樹位元同;NLP OneEngine v1.9.0 .py/.html 與樹同;Celeritas 1.14.0 40/41 同(og.jpg 被 .gitignore *.jpg 擋)|
+| Z229 | PR #327 CI「Windows bundled Chromium UAT」紅:VIA_SYSTEM_MANAGER_v0149(ffeaa945)沒轉 `do_list` / `_build_page`,test_master_control_contract_v0102 setUpClass 就炸;main 同病 | 提案 P2 待審;PR 已留言 | 操作員裁 | P2 讓 19 檢都跑到,但還剩 test_11 追蹤頁與產生器不同步(131 vs 146)—— 單推 P2 不會轉綠 |
+| Z230 | Master Prompt 與樹版號衝突:要求 layout 載入 SUP_MDL743 v0108 並 import `VIA_SuperAccel_ModuleLayout`;樹上尾版 v0109(6f772b92,已在 main),`VIA_SuperAccel_ModuleLayout` 全樹 0 支 | 未做 | 操作員裁 | 依 Master Prompt「政策衝突即停」「缺模組不得執行 layout」:本線不部署 layout、不改版號;SUP_MDL740 尾版 v0117 ≥ v0115 · VeritasAegisNexus v0116 在 · NLP SUP_MDL866 v0105 在 |
