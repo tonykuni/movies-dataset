@@ -384,3 +384,32 @@ index b7c91b6e..071a4d27 100644
 +}
 ```
 
+
+## P7 · 換行假紅:三個「按原位元算 sha」的檔補進 .gitattributes 的 -text(追記 2026-09-28 05:50;待 via 審核)
+
+**實錄**(操作員工作站 04:30 貼回):`SuccessLedger check · RED · rc=2 "lock_success": false`;同一棵樹 15b7e409 在容器量 `lock_success true`。
+
+**根因(容器實證)**:CGC_MDL220 拿 `VIA_Policy_Laws_SSOT_v0100.json` 的**原位元** sha 前 16 碼去比 `VIA_EntryLock_v0100.json` 的 `policy_sha16`。
+冊上釘的是 LF 版本:`c7aab42f7ebfd283`(LF 相符);同一份轉成 CRLF 是 `43b2de1213c987e7`(不符)。
+`.gitattributes` 已經替收容件 / VTR / v0160A 鎖了位元(批546 同理由),**律冊沒有鎖** → Windows `core.autocrlf` 一轉就回報 `policy_sha` 缺 → `lock_success false`。這是判錯的紅燈(L16),不是律冊被改。
+
+同病:layout 鎖冊 `VIA_Layout_Reuse_SSOT` 用**原位元** sha 鎖 11 個來源,SUP_MDL743 v0104 系一不相符就 `LOCK_MISMATCH`。Master Prompt 第 5 步說的「2 個 CRLF 工作複本(VRN_ENG112、VRN_ENG110)」就是這兩支沒被 `-text` 鎖住。工作站 `layout 批跑 C:\測試樣本報告 · RED` 很可能就是這一條(要看那一次的輸出才能定)。
+
+**提案(只加三行,不改任何引擎、不改鎖冊哈希)**:
+
+```diff
+--- a/.gitattributes
++++ b/.gitattributes
+@@
+ VeritasIntelligenceAnalytics/**/references/intake/** -text
++
++# 側線 2026-09-28 P7:這三支被「原位元 sha」鎖住(EntryLock policy_sha16 / Layout_Reuse locked_sources);
++# Windows core.autocrlf 會轉 CRLF → sha 對不上 → 判錯的紅燈(SuccessLedger lock_success false、layout LOCK_MISMATCH)
++"VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json" -text
++"VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py" -text
++"VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG110_TabReport_v0114.py" -text
+```
+
+**套上之後工作站要做的一步**:屬性改了,已經是 CRLF 的工作複本不會自己變回來;用 `git checkout -- <那三支>` 從索引重寫一次(不是 Remove-Item)。倉裡的位元本來就是 LF,鎖冊哈希一個字都不用動。
+
+**驗**:`python CGC_MDL220_SuccessLedger_v0100.py` → `lock_success true`;`via-vcgc layout --dir "C:\測試樣本報告" --out "C:\測試樣本報告\_核對"` → 不再 LOCK_MISMATCH。
