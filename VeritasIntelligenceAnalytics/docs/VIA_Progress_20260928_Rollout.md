@@ -9,3 +9,4 @@
 |---|---|---|---|---|
 | R0 | 起點(PR #327 已併;本分支多 3 筆紀錄 commit) | 83613315 | — | — |
 | R1 | P7:`.gitattributes` 補三支原位元 sha 鎖的 `-text` | 83613315 | 完成 | `git check-attr text` 三支 unset、對照檔 unspecified |
+| R2 | P1:`__future__` 橋位三支新版號(SUP_MDL749 v0115 · VDF_ENG088 v0104 · CGC_MDL180 v0101)+ P4:VRN 邏輯索引冊 build | 5cd370c2 | 完成 | MDL749 v0115 50/50 · MDL180 v0101 7/7;邏輯冊 53/53 過期 0;status SSOT 連動 BROKEN 4→0(YELLOW 7 · GREEN 5)、邏輯庫 RED→OK、VRN 系統管理 RED→STALE/NODATA |
