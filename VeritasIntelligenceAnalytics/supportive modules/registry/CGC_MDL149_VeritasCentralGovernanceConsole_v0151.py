@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Policy tail. L50's amendment is read after the panoramic ban. The locked book is not rewritten."""
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+PREVIOUS = HERE / "CGC_MDL149_VeritasCentralGovernanceConsole_v0150.py"
+NOTE = HERE / "VIA_Policy_TalibBan_v0100.json"
+
+
+def _load(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+prev = _load(PREVIOUS, "vcgc_v0150_for_v0151")
+body = prev.body
+_policy = body.policy_step
+
+
+def policy_step() -> int:
+    rc = _policy()
+    note = json.loads(NOTE.read_text(encoding="utf-8"))
+    print(f"[政策] L50 附冊 {note['id']} · rank {note['rank']} · 替代 {note['replacement']} · 正本未改")
+    return rc or (0 if note.get("book_edited") is False and note.get("rank") == 2 else 2)
+
+
+body.policy_step = policy_step
+
+
+def __getattr__(name: str):
+    return getattr(prev, name)
+
+
+def main(argv=None):
+    return prev.main(argv)
+
+
+def selftest() -> int:
+    note = json.loads(NOTE.read_text(encoding="utf-8"))
+    ok = note["id"] == "L50" and note["rank"] == 2 and note["book_edited"] is False and "talib" not in note["replacement"].lower()
+    print("  [OK]" if ok else "  [FAIL]")
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(selftest() if "--selftest" in sys.argv else main())
