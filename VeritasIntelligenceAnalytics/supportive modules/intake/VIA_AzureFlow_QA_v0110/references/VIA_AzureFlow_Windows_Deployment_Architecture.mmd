@@ -1,0 +1,64 @@
+flowchart TB
+    A[Windows 開發主機] --> B[下載 Plug-in ZIP 與 SHA-256 sidecar]
+    B --> C{SHA-256 是否一致}
+    C -->|否| X[停止安裝並重新取得]
+    C -->|是| D[Expand-Archive 解壓]
+    D --> E[VIA 天青智流 AzureFlow QA Plug-in]
+
+    subgraph P[Plug-in 目錄]
+        E1[plugin_manifest.json]
+        E2[Invoke-VIA-AzureFlowQA.ps1]
+        E3[scripts/via_azureflow_qa.py]
+        E4[Standalone HTML UI]
+        E5[Windows 安裝／部署手冊]
+    end
+    E --> E1
+    E --> E2
+    E --> E3
+    E --> E4
+    E --> E5
+
+    E2 --> F{PowerShell 找到 python 或 py}
+    F -->|否| Y[安裝 Python 3 並重新開啟 PowerShell]
+    F -->|是| G[Python orchestrator]
+    E4 -.產生命令，不直接執行.-> E2
+
+    subgraph ACT[三個 QA Actions]
+        I[inspect：AzureFlow API、SSOT、runs、jobs]
+        J[verify：SHA、path safety、CRC、package contract]
+        K[all：inspect 加 verify combined handoff]
+    end
+    G --> I
+    G --> J
+    G --> K
+
+    J --> L{Package kind}
+    L -->|VIA all-in-one| M[validate_via_zip.py]
+    L -->|standardized| N[validate_standardized_zip.py]
+    I --> O[AzureFlow localhost API 與 local run fallback]
+    K --> Q[VIA_AzureFlow_QA_Run_Summary.json]
+    M --> Q
+    N --> Q
+    O --> Q
+
+    subgraph T[Windows Task Scheduler]
+        T1[Task action：PowerShell.exe]
+        T2[Invoke-VIA-AzureFlowQA-Scheduled.ps1]
+        T3[timestamped output directory]
+        T4[task_scheduler.log 與 task_result.json]
+        T1 --> T2 --> T3 --> T4
+    end
+    T2 --> E2
+    T4 --> Q
+
+    Q --> R[人工 review／母系統 handoff]
+    R --> S[不得自動 promotion、不得自動 command activation]
+
+    classDef install fill:#e7f5f6,stroke:#2b9db0,color:#173f49
+    classDef core fill:#f0f8f4,stroke:#4c9f86,color:#214a3d
+    classDef action fill:#edf7f5,stroke:#267c6b,color:#214a3d
+    classDef safety fill:#fff8e8,stroke:#e8b04e,color:#76561a
+    classDef fail fill:#fff0f0,stroke:#c96868,color:#6d2b2b
+    class A,B,C,D,E,E1,E2,E3,E4,E5,F,G,T1,T2,T3,T4 install
+    class I,J,K,L,M,N,O,Q,R core
+    class S,Y,X fail
