@@ -38,10 +38,11 @@ $steps = @(
     (Join-Path $reg "CGC_MDL200_RelatedIntake_v0100.py"),
     (Join-Path $reg "CGC_MDL201_VrnManagerRead_v0100.py"),
     (Join-Path $reg "CGC_MDL202_LayoutEngine_v0100.py"),
-    (Join-Path $reg "CGC_MDL203_LayoutCodes_v0100.py"),
+    (Join-Path $reg "CGC_MDL203_LayoutCodes_v0101.py"),
     (Join-Path $reg "CGC_MDL204_NlpCodes_v0100.py"),
     (Join-Path $reg "CGC_MDL205_TalibBan_v0100.py"),
-    (Join-Path $reg "CGC_MDL206_TalibPolicy_v0100.py")
+    (Join-Path $reg "CGC_MDL206_TalibPolicy_v0100.py"),
+    (Join-Path $reg "CGC_MDL207_PolicyRun_v0100.py")
 )
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
 foreach ($py in $steps) {
