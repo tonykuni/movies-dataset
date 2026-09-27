@@ -1,0 +1,80 @@
+{
+  "schema": "VIA.VCGC.CloseoutLock.v1",
+  "policy": "append only. 每格寫明在哪個環境量到(workstation=操作員機器 git 實證 · sandbox=AI 容器實跑);沒量到的不寫綠。",
+  "book_edited": false,
+  "line": "側線 2026-09-28(主線批號由併線的手指定 L25)· PR #327 claude/vcgc-vrn-read-forward",
+  "locked": [
+    {
+      "id": "vrn_manager_read_collect",
+      "env": "workstation",
+      "evidence": "commit cd2b324 · VRN_SystemManager_v0108.py 接回 read()/collect() 轉發(v0107 不動)",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "newborn_tails_bridged",
+      "env": "workstation",
+      "evidence": "commit cd2b324 · CGC_MDL149 v0161 / CGC_MDL224 / CGC_MDL226 由 via_accel_injector.inject_py 補橋",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "py_readonly_plus10",
+      "env": "workstation",
+      "evidence": "commit 4f0d4cd · py_readonly 1→11(ENG112 layout sha 鎖 · accelerator/VeritasCeleritas.py L50 合規本 · 8 支 supportive modules/intake)",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "readonly_ssot_restored",
+      "env": "workstation",
+      "evidence": "commit 4f0d4cd · VIA_Financial_Institution_SSOT_v0100.py 還原到 #322 之前位元(批715 重犯)",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "talib_zero_import",
+      "env": "sandbox",
+      "evidence": "AST 掃 4407 支 .py 0 命中 · CGC_MDL190 GREEN imports 0 · VCGC L50 全景 尾版 516 import 0",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "bundle_v0104_is_main",
+      "env": "sandbox",
+      "evidence": "VCGC_LAYOUT_ENGINE_v0104 46 檔:35 逐位元同 main;9 只差 main 多 14 行橋;2 JSON main 登錄更多;尾版已進 hub v0109 / VCGC v0161",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "accel_installed_loaded",
+      "env": "sandbox",
+      "evidence": "SUP_MDL737 v0108 · VIA_SuperAccel_Module · VeritasCeleritas_v1141 與包內一字不差;VCGC status 引擎 v1141 由 SUP_MDL737 v0108 載入",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "manager_and_lock_selftests",
+      "env": "sandbox",
+      "evidence": "VDF v0118 · VRN v0108 · ENG110 v0116 · ENG111 v0104 · ENG112 v0100 自測 OK;MDL193 六鎖 lock_success 真",
+      "lamp": "GREEN"
+    },
+    {
+      "id": "celeritas_gate",
+      "env": "sandbox",
+      "evidence": "CGC_MDL183 自測 5→7 OK(④ PS 新缺 64→0 · ⑦ 唯讀本 11 無橋);剩 ⑤ 批345 正本缺席=操作員的手",
+      "lamp": "GREEN"
+    }
+  ],
+  "held": [
+    {
+      "id": "b345_immutable_absent",
+      "why": "supportive modules/VeritasCeleritas.py 樹上不在;同 sha 副本在 new modules engines/… 與 VIA_Standalone_Package_v0102。退役或放回是操作員的手。"
+    },
+    {
+      "id": "layout_registry_drift",
+      "why": "registry-sync --layout-only 乾跑 new 1 changed 61;--apply 在工作站跑(本區塊)。"
+    },
+    {
+      "id": "accel_family_registry_old_source",
+      "why": "SUP_MDL737 家族 source 指 v0106、SUP_MDL740 指 v0114;不在 layout/nlp sync 範圍。"
+    },
+    {
+      "id": "ssot_linkage_broken4",
+      "why": "VCGC status SSOT 連動 BROKEN 4 · YELLOW 4,本線未動。"
+    }
+  ]
+}

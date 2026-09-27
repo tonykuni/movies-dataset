@@ -260,3 +260,8 @@
 |---|---|---|---|---|
 | Z216 | 格子「工具升階梯十檢」在缺件環境判紅:③ OCR 階(容器 L2 vs 期望 NONE_AVAILABLE)與 ⑧ TA 階梯只剩 QuantGuard 一級(容器 QuantGuard 相依不在 → NONE_AVAILABLE)兩檢回 rc1——量到的是**缺件**不是壞掉(L16),該回 rc3 讓格子收 SKIP;工作站有裝時照舊全驗 | 待修(SUP_MDL742 新版) | AI | PR #125 與本批全格子都記成環境 FAIL;修好後容器全格子才可能 FAIL 0、測試/AUDIT 最佳還原點(L105③)才建得起來 |
 | Z217 | B 批:VCGC 唯一向下入口(先過政策 → 再過輔助工具知道有何可用 → 自動註冊/自動編號 → 上下交互檢查回報,自適應)· VCGC / VDF / VRN / SYSTEM MANAGER 都寫現況還原交接紀錄 · 不透過管理器不可讀取個別引擎工具 · CGC_MDL157 新版 AST 向下入口探針(由上而下:VCGC→管理器→引擎;由下而上:冊上每支引擎被誰管、有沒有繞過管理器的門) | 施工中(下一批) | AI | 操作員 2026-09-25 四道令原文記在 docs/VIA_S20260925b 四 |
+| Z218 | 批345 不可動正本 supportive modules/VeritasCeleritas.py 樹上不在(閘 ⑤ 紅);同 sha 副本在 new modules engines/… 與 VIA_Standalone_Package_v0102 | 未做 | 操作員的手 | 退役或放回,你裁 |
+| Z219 | SUP_MDL753 SCAN_EXCLUDE 補 supportive modules/intake(現只擋 references/intake;已用唯讀本/基線擋這 8+5 支) | 候 | AI | 尾版 v0113 |
+| Z220 | registry-sync --layout-only --apply(乾跑 new 1 changed 61) | 候 | 操作員貼區塊 | 工作站跑 |
+| Z221 | 加速器家族登冊 source 指舊版(SUP_MDL737 v0106 · SUP_MDL740 v0114);要一個 --accel-only 範圍 | 候 | AI | CGC_MDL149 v0162 |
+| Z222 | VCGC status SSOT 連動 BROKEN 4 · YELLOW 4(via-vcgc ssot verify) | 未做 | AI | 下一線 |
