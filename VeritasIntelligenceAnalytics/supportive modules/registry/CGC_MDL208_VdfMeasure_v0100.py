@@ -17,7 +17,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parents[1]
-VDF = VIA / "functional modules" / "VDF" / "VDF_SystemManager_v0106.py"
+VDF = VIA / "functional modules" / "VDF" / "VDF_SystemManager_v0107.py"
 
 
 def _load():
