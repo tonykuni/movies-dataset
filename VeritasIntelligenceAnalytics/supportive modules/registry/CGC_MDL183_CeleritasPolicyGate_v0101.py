@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-v0100→v0101(側線 2026-09-28;操作員裁定 Z218「退役」):只改 ⑤ —— 基線冊 immutable_b345.retired_20260928 在且舊正本不在 = 合規;舊正本若又出現,位元必須仍是冊上 sha。其餘一字不動(v0100 留作版史 L04)。
 CGC_MDL183_CeleritasPolicyGate v0100 — Celeritas 產出契約閘(批715 · 執法 L102)
+v0100→v0101(側線 2026-09-28;操作員裁定 Z218「退役」):只改 ⑤ —— 基線冊 immutable_b345.retired_20260928 在且舊正本不在 = 合規;舊正本若又出現,位元必須仍是冊上 sha。其餘一字不動(v0100 留作版史 L04)。
 
 操作員 2026-09-23 令:「測試整合優化這個新加入棄標註版本取代現有,所有 PY 黨都要加入,
 AI 若生成 PS 檔都要加入其功能模板,INTO ONE PY ENGINE REGISTER AND

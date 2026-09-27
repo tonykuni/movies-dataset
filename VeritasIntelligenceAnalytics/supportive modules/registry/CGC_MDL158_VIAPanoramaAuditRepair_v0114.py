@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
+CGC_MDL158_VIAPanoramaAuditRepair v0108 — PowerShell 代讀誤報修正(批734;原在 PR #104 的 v0105 上,main 已升 v0106,改號重套)
 v0113→v0114(側線 2026-09-28;操作員令「適度採用附件架構、不大幅修正」):read 骨架卡多兩類,只報位置不改 ——
   COMPILE:ast.parse 過、compile 不過(Z226:加速橋注在 from __future__ 前);TAILAPI:尾版比前版少了公開名稱又沒轉接(Z229:VIA_SYSTEM_MANAGER_v0149)。其餘一字不動(v0113 留作版史 L04)。
-CGC_MDL158_VIAPanoramaAuditRepair v0108 — PowerShell 代讀誤報修正(批734;原在 PR #104 的 v0105 上,main 已升 v0106,改號重套)
 
 v0106→v0107:全樹首跑 14 件 PSDUPFN **全是誤報**——here-string(@' … '@)裡內嵌的 JavaScript(fmt/render/done…)、
   產生另一支腳本的模板(EnsureDir/def_Main)、以及不同父函式裡的同名區域函式(Test-Prot)。
