@@ -5,7 +5,7 @@
 # 做的事:git pull --ff-only → 找 VeritasIntelligenceAnalytics\Invoke-VIA-RunAll-v*.ps1 最新一支 → 跑它
 #        (VCGC 流程閘 → 政策同步 sync-db → 網路同意閘(問你一次 YES)→ 財報 --mops · CNN 恐懼貪婪 · Forward PER · 每日台股清單
 #         → 全景實測)→ 一包貼回自動放進剪貼簿,回 Claude 對話框 Ctrl+V。
-# 參數原樣轉:-Consent(不問,直接開本次同意閘)· -SkipSweep · -NoClipboard · -Days N · -NoPull(啟動器也不拉)。
+# 參數原樣轉:-Consent(不問,直接開本次同意閘)· -SkipSweep · -NoClipboard · -NoOpen(跑完不自動開多頁矩陣)· -NoDiag(不跑 RED 節點診斷)· -Days N · -NoPull(啟動器也不拉)。
 # AI 不代開網路同意閘(L07/L08):只有你加 -Consent 或提示時親手打 YES 才開,而且只這一次執行、跑完關回。
 # 政策附冊 PSGATE-1:第一步一定先從 VCGC 跑過流程(沒過就停)。
 $here = $PSScriptRoot
@@ -34,10 +34,10 @@ $pass = @{}
 for ($i = 0; $i -lt $args.Count; $i++) {
     $tok = ("" + $args[$i]).TrimStart("-")
     if ($tok -eq "NoPull") { continue }
-    $hit = @("Consent", "SkipSweep", "NoClipboard") | Where-Object { $_ -ieq $tok } | Select-Object -First 1
+    $hit = @("Consent", "SkipSweep", "NoClipboard", "NoOpen", "NoDiag") | Where-Object { $_ -ieq $tok } | Select-Object -First 1
     if ($hit) { $pass[$hit] = $true; continue }
     if ($tok -ieq "Days" -and ($i + 1) -lt $args.Count) { $pass["Days"] = [int]$args[$i + 1]; $i++; continue }
-    Write-Host ("  [啟動器] 不認得的參數:" + $args[$i] + "(可用 -Consent -SkipSweep -NoClipboard -Days N -NoPull)") -ForegroundColor Yellow
+    Write-Host ("  [啟動器] 不認得的參數:" + $args[$i] + "(可用 -Consent -SkipSweep -NoClipboard -NoOpen -NoDiag -Days N -NoPull)") -ForegroundColor Yellow
 }
 Write-Host ("  [啟動器] " + $runner.Name) -ForegroundColor Cyan
 & $runner.FullName @pass
