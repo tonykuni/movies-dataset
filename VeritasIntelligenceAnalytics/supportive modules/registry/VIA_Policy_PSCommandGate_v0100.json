@@ -1,0 +1,60 @@
+{
+ "schema": "VIA.Policy.PSCommandGate.v1",
+ "id": "PSGATE-1",
+ "status": "ACTIVE",
+ "book": "VIA_Policy_Laws_SSOT_v0100.json",
+ "book_edited": false,
+ "book_sha256_16": "c7aab42f7ebfd283",
+ "second_book": false,
+ "date": "2026-09-28",
+ "operator": [
+  "剛才指令你是否沒加入ps加速指令模板及detailed summary matrix summary by rich. 把它加上",
+  "將這個只另寫入政策包含一定要從vcgc跑過流程才可生成os指令幫我加入更新同步"
+ ],
+ "rule": "A PowerShell command or script is handed to the operator only after the VCGC flow has run: policy read, subsystems aligned, then the script. Every such script carries the PS accelerator template and ends with a rich detailed summary matrix report.",
+ "flow_first": {
+  "ai_side": "Before writing or changing any PowerShell for the operator, the AI enters VCGC (console tail `status`, seat push off) in the same session and reads the flow lines: [流程] 政策過 · 子系統已對齊 · 才執行.",
+  "script_side": "The script's first step runs the VCGC console tail `status`. If the line '[流程] 政策過' is absent, the script stops before any other step (exit 3) and says why.",
+  "evidence": "The side-car JSON records the flow line and the time; CGC_MDL229 shows it as KPI row 政策 / VCGC 流程 and turns the verdict RED when it is missing."
+ },
+ "template": {
+  "stamp": "# CELERITAS-TEMPLATE-JOIN v1 (first line) and #Requires -Version 7.0",
+  "dot_source": "supportive modules\\ps7\\VeritasCeleritas.PS7.ps1 inside try/catch",
+  "scoped": "each Python step wrapped in Invoke-VIACeleritasScoped when the profile defines it (VCGC flow: [加速] PS 用 Invoke-VIACeleritasScoped); otherwise say so and run the step as is",
+  "functions": [
+   "Get-CeleritasRegex",
+   "Read-CeleritasText / Write-CeleritasText",
+   "Get-CeleritasStatus",
+   "Write-CeleritasReport",
+   "Restore-CeleritasPS7 in finally"
+  ],
+  "python": "only through Invoke-VIAPython; if the helper is missing, stop (fail-closed)"
+ },
+ "report": {
+  "renderer": [
+   "CGC_MDL229_SweepReport (newest) for the sweep",
+   "CGC_MDL228_VIADBManager report (newest) for the DB panel"
+  ],
+  "form": "rich detailed summary matrix: verdict KPI, accelerator, per-step matrices, and a to-do matrix ranked by severity; plain-text fallback with the same matrices when rich is missing; never install rich",
+  "outputs": "HTML + TXT + a paste bundle placed on the clipboard"
+ },
+ "operator_side": [
+  "Run by full path or from the repo root launcher; one command per line.",
+  "Paste the bundle into the Claude chat, never back into PowerShell.",
+  "Network consent gates and package installs stay the operator's hands."
+ ],
+ "sync": {
+  "enforced_by": [
+   "Invoke-VIA-Sweep-v0101.ps1 (step ① flow gate)",
+   "CGC_MDL229_SweepReport_v0100 (policy row and verdict)"
+  ],
+  "applies_to": "every new or changed .ps1 handed to the operator from 2026-09-28 on; existing scripts join when they are next versioned (L04)",
+  "check": "CGC_MDL229 reads the newest VIA_Policy_PSCommandGate_v*.json and verifies book_sha256_16 against the locked book"
+ },
+ "do_not": [
+  "hand over a PowerShell command before the VCGC flow ran",
+  "ship a .ps1 without the template stamp, the Celeritas join and the rich summary report",
+  "call python directly from PowerShell",
+  "rewrite the locked policy book"
+ ]
+}
