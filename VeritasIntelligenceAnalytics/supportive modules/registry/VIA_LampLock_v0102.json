@@ -1,0 +1,103 @@
+{
+ "schema": "VIA.LampLock.v2",
+ "measured_at": "2026-09-28 16:20:01",
+ "measured_by": "容器實跑(Invoke-VIA-Sweep-v0103 · HEAD a1e81465 · 同意閘未開;VRN 鏈另於 ENG067 v0104 / ENG068 v0108 後重跑)",
+ "door": "via-vcgc",
+ "prior": "VIA_LampLock_v0101.json(2026-09-28 19:58 工作站;不動)",
+ "why": "R24 實測收尾:VRN_ENG052_DocxEngine 本次轉綠 → 加鎖。VRN_AutoTestLoop 容器綠(26s)但工作站 900s 逾時(Z260 未結)→ 暫不鎖,工作站貼回綠再鎖(鎖了就會在工作站立刻判回歸)。其餘照 v0101。",
+ "rule": "已鎖項目 RED / ABSENT / NODATA / CRASH = 回歸;GATED / SKIP = 未量(同意閘沒開或本次略過),不算回歸。新轉綠的項目由 AI 依貼回實錄開下一版冊加鎖(工作站不自己寫冊,避免 git pull 衝突)。",
+ "locked": [
+  "vdf_policy",
+  "vdf_logic",
+  "vdf_factor",
+  "vdf_param",
+  "vdf_engine",
+  "vdf_bridge",
+  "vdf_tool",
+  "vdf_handover",
+  "vdf_records",
+  "vrn_policy",
+  "vrn_logic",
+  "vrn_factor",
+  "vrn_param",
+  "vrn_handover",
+  "vrn_records",
+  "vrn_ssot"
+ ],
+ "open": [
+  "vrn_engine"
+ ],
+ "nodes": {
+  "vdf": [
+   "0a",
+   "0b",
+   "0c",
+   "1",
+   "2",
+   "3a",
+   "3b",
+   "4a",
+   "4b",
+   "4c"
+  ],
+  "vrn": [
+   "加速器掛載",
+   "網路工具掛載",
+   "SUP_MDL030_VISVRNTickerFilenameSSOT",
+   "SUP_MDL031_VISVRNTickerRegexShim",
+   "SUP_MDL015_VISVRNBrokerAliasFullList",
+   "VRN_ENG084_FilenameTokenParse",
+   "VRN_ENG082_ExtractionLogic",
+   "VRN_ENG060_TextOmni",
+   "VRN_ENG058_TableOmni",
+   "VRN_ENG056_PdfForensics",
+   "VRN_ENG059_GapMultirescue",
+   "VRN_ENG075_DocToMarkdown",
+   "VRN_ENG077_OmniFormatBridge",
+   "SUP_MDL747_OcrLaneRunner",
+   "SUP_MDL746_PDFPlumberPlusHub",
+   "VRN_ENG017_MDL004OCRFetchingPDFTable",
+   "VRN_ENG018_MDL005OCRFetchingPDFText",
+   "VRN_ENG023_MDL011DailyFetcher",
+   "VRN_ENG070_YahooConsensus",
+   "VRN_ENG057_ScanOcrRescue",
+   "VRN_ENG074_FinancialPages",
+   "VRN_ENG063_Lexicon",
+   "VRN_ENG085_MarkdownRestore",
+   "VRN_ENG086_FirstPageLogicBridge",
+   "VRN_ENG087_NLPTextSummaryBridge",
+   "VRN_ENG055_OfficeMerge",
+   "VRN_ENG066_NLPSupportHub",
+   "VRN_ENG071_CnyesFusion",
+   "VRN_ENG078_NLPOneBridge",
+   "VRN_ENG073_ReportStructuredDB",
+   "VRN_ENG067_MindMapSSOT",
+   "VRN_ENG083_VerifiedMatrix",
+   "VRN_ENG076_RegressionGate",
+   "CGC_MDL141_ClosingGate",
+   "VRN_ENG049_ContentReconcile",
+   "VRN_ENG080_FourPointDigest",
+   "VRN_ENG079_ControlTowerDashboard",
+   "VRN_ENG089_TemplateView",
+   "VRN_ENG090_FinStatementsTemplate",
+   "VRN_ENG062_SummarizerV1",
+   "VRN_ENG065_MailIntel",
+   "VRN_ENG081_ParquetMainDB",
+   "VRN_ENG050_ContentStore",
+   "VRN_ENG069_ConsensusDB",
+   "VRN_ENG052_DocxEngine"
+  ]
+ },
+ "nodes_open": {
+  "vdf": [],
+  "vrn": [
+   "VRN_ENG072_FirstPageText",
+   "VRN_ENG064_KnowledgeStack",
+   "VRN_AutoTestLoop",
+   "VRN_ENG068_DailyBrief"
+  ]
+ },
+ "pending_lock": {
+  "VRN_AutoTestLoop": "容器綠;工作站逾時(Z260)未結 → 工作站綠才鎖"
+ }
+}
