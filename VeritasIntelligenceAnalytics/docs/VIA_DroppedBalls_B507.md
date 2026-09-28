@@ -350,3 +350,6 @@
 | Z279 | 版號異形尾版(非四碼 `_v1` / `_v001` / `_v112` / `_v02783`…)不歸 VCGC 尾版律管,註冊冊不收:VCGC 2 · VRN 5 · SUP 37(CGC_MDL242 v0101 涵蓋稽核 C3 逐支列)。要收進註冊冊 = 各自出四碼版號新檔(L04)並遷呼叫者;哪些要收由操作員定 | 開 | — | R29 |
 | Z280 | `vdf_akshare_dedup_invalid_quarantine_gate_v02783.py`(五碼版號)編號冊沒號(CGC_MDL237 只認四碼)。同 Z279 一併處理 | 開 | — | R29 |
 | Z281 | 沒版號後綴的 .py:VCGC 18 · VDF 50 · VRN 74 · SUP 699(多為輔助檔 / 套件 / __init__)— 不是尾版族,沒有引擎號與註冊時間。要逐支判定哪些其實是引擎、需要換成版號檔名(L04) | 開 | — | R29 |
+| Z282 | Codex 對已併 PR #356 的四個 P2(都成立):① 唯一入口 v0104 全景實測沿用只該收 rc 0(現在 rc 2 也沿用)② 資料家指紋只掃三層,消費端全遞迴 ③ CGC_MDL237 v0102 把自己的產出 VIA_Numbering_SSOT 也算 content_sha(寫完就對不上)④ CGC_MDL242 v0101 C6 漏小寫 *ssot*.json。四支都已合併 → 各出新版修(入口 v0105 · MDL237 v0103 · MDL242 v0102) | 開 | — | R30 |
+| Z283 | TA-Lib 全面偵測修復引擎 CGC_MDL243(AST 定位局部指令 → 新版號 → compile + 自測審核 → 受影響家族舊版刪除新版接手;守衛冊 VIA_Policy_TalibPurge)已寫、自測 8/8,依操作員「暫停」未上倉;全樹乾跑 >10 分(被點名反查太慢,要先建索引)。還在的 TA-Lib 指令只在舊版史檔(Register v0205–0207 · UserTest v0100 · WorkOps v0110 · RunGate v0100–0108 · VtmraGate v0100–0102 死分支 · PlotDataLaw v0100–0101),尾版都已淨 | 開 | — | R30 |
+| Z284 | VRN 實測樣本夾 C:\測試樣本報告 在工作站,容器照實 ABSENT;容器以合成樣本 + 倉內真 PDF 實測 ENG392。掃描影像頁要 OCR(本機沒有 pytesseract / tesseract)= IMAGE_NO_OCR 黃燈;第二讀法 pdfplumber 缺件。工作站跑 `via-vcgc go` 即以樣本夾實測 | 開 | — | R30 |
