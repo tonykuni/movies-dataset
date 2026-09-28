@@ -17,7 +17,8 @@
   "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
   "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
   "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
-  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN"
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN",
+  "fail_cause_rule": "fail_cause:FAIL 由驗證器讀正主本輪存證追因(dbpanel_absent · pathverify_dbpanel);追得到操作員端成因才標操作員的手,追不到仍是 FAIL"
  },
  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
  "workflows": [
@@ -251,7 +252,8 @@
        "CGC_MDL242_PathVerify",
        "run"
       ]
-     ]
+     ],
+     "fail_cause": "pathverify_dbpanel"
     },
     {
      "code": "VCGC-WKF002-STP003",

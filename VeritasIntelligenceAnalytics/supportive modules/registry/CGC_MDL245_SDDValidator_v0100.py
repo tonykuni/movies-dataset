@@ -671,6 +671,27 @@ def _act(e: dict) -> tuple:
     return e.get("verb"), f"{e.get('verb')} {args[0]}" if args else e.get("verb")
 
 
+def fail_cause(kind: str, since: str) -> str:
+    """A step's FAIL traced to its cause in the owner's own report of this run (not a hand-written excuse):
+    dbpanel_absent — the DB panel's reconcile has no RED row, only whole DBs absent from the catalog (data home without those DBs);
+    pathverify_dbpanel — the path verify's only red step is the DB panel, and that panel is dbpanel_absent."""
+    d = _json(VIA / "VIA_Reports" / "dbmanager" / "DBM_PANEL_latest.json", {}) or {}
+    fresh = str(d.get("ts") or "").replace("T", " ")[:19] >= since[:19] if since else False
+    rows = (d.get("reconcile") or {}).get("rows") or []
+    errs = d.get("errors") or []
+    absent_only = fresh and rows and not any(r.get("state") == "RED" for r in rows) and not any(e.get("state") == "RED" for e in errs)
+    n_abs = sum(1 for r in rows if r.get("state") == "ABSENT")
+    why = f"資料家缺庫:DB 面板核對 ABSENT {n_abs} 列、沒有真正 RED(整本庫不在目錄;有庫的資料家才量得到)" if absent_only else ""
+    if kind == "dbpanel_absent":
+        return why
+    if kind == "pathverify_dbpanel" and why:
+        pv = _json(VIA / "VIA_Reports" / "path_verify" / "PATH_VERIFY_latest.json", {}) or {}
+        red = [s for s in pv.get("steps") or [] if s.get("state") == "RED"]
+        if red and all("DB 面板" in str(s.get("step")) for s in red):
+            return "單一路徑驗證只因 DB 面板紅 → " + why
+    return ""
+
+
 def real(run: str | None = None, write: bool = True, ai_run: str | None = None) -> dict:
     state = load_books()
     selfrep = _json(OUT / "SDD_SELF_latest.json", {}) or {}
@@ -702,6 +723,10 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
                     steps[st["code"]] = {"state": worst["outcome"], "rc": worst["rc"], "at": worst["ts"], "secs": worst.get("secs"), "runs": len(hit)}
                     if worst["outcome"] == "FINDING" and st.get("finding_hand"):
                         steps[st["code"]]["hand"] = st["finding_hand"]
+                    if worst["outcome"] == "FAIL" and st.get("fail_cause"):
+                        c = fail_cause(st["fail_cause"], (mine[0].get("ts") if mine else "") or "")
+                        if c:
+                            steps[st["code"]]["hand"] = c
                 else:
                     steps[st["code"]] = {"state": "NOT_RUN"}
             elif st.get("evidence"):
@@ -725,6 +750,8 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
                 out["hand"] = src["hand"]
         elif kind == "self":
             eng = [e for e in selfrep.get("engines") or [] if arg == "all" or stem_of(e.get("tail") or "") == arg] if self_fresh else []
+            if arg == "all":                     # engines whose gaps are declared (known_open / canon) are counted there, not here
+                eng = [e for e in eng if e.get("tail") not in known_tails and e.get("outcome") != "CANON"]
             outs = {e.get("outcome") for e in eng}
             out = {"state": ("NOT_RUN" if not eng else "FAIL" if "FAIL" in outs else "FINDING" if "FINDING" in outs else
                              "NOSELFTEST" if "NOSELFTEST" in outs else "OK"), "by": ev + ("" if self_fresh else "(自測存證不是當前 HEAD)")}
@@ -749,6 +776,7 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
         return out
 
     known = {st["code"]: st["known_open"] for _, w in state["wkfs"] for st in w.get("steps") or [] if st.get("known_open")}
+    known_tails = {t[3].name for t in step_targets(state) if t[3] is not None and t[1] in known}
     for code, s in flat.items():
         if s.get("state") == "CANON":
             s["hand"] = OPERATOR_HAND["CANON"]
@@ -1010,7 +1038,10 @@ def main(argv=None) -> int:
     if verb == "selftests":
         only = a[a.index("--wkf") + 1] if "--wkf" in a else None
         rep = selftests(only)
-        bad = [e for e in rep["engines"] if e["outcome"] == "FAIL"]
+        st = load_books()
+        known = {s["code"] for _, w in st["wkfs"] for s in w.get("steps") or [] if s.get("known_open")}
+        known_tails = {x[3].name for x in step_targets(st) if x[3] is not None and x[1] in known}
+        bad = [e for e in rep["engines"] if e["outcome"] == "FAIL" and e["tail"] not in known_tails]      # declared gaps are counted on their steps
         print(f"[SDD 自測] 引擎 {len(rep['engines'])} · OK {sum(1 for e in rep['engines'] if e['outcome'] == 'OK')} · FAIL {len(bad)}"
               f" · FINDING {sum(1 for e in rep['engines'] if e['outcome'] == 'FINDING')} · 無自測 {sum(1 for e in rep['engines'] if e['outcome'] == 'NOSELFTEST')} · 輪 {rep['run']}")
         return 1 if bad else 0
