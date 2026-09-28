@@ -328,3 +328,4 @@
 | Z259 | VRN_ENG072_FirstPageText 自測 ㉜(後端健康閘)在工作站 FAIL,原因字串被截斷(容器沒有 OCR 後端,重現不了)。R19 起一鍵 ⑨ 會對 RED 節點開 VIA_OCR_TRACE=1 重跑,全文落 runall\diag\VRN_ENG072_FirstPageText.log,[FAIL] 行進貼回包 → 下一跑帶回全文再修 | 候 | 操作員貼回 → AI | R19 |
 | Z260 | VRN_AutoTestLoop 放寬到 900s 仍逾時(工作站 19:58)。R19 起鏈跑器 v0107 對逾時冊節點:子行程不緩衝 + 被停掉時把已輸出全文寫 vrn_chain\timeout\VRN_AutoTestLoop.log,結果附最後一行([進度] k/K)→ 下一跑看得出卡在哪一段再決定(縮自測範圍 / 分段 / 再放寬;VRN 步總長要守 1800s 天花板) | 候 | 操作員貼回 → AI | R19 |
 | ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |
+| Z261 | 組件總冊 `VIA_Component_Inventory_SSOT_v0100` 的 source 仍寫 `CGC_MDL156_VIAAcceleratorControl_v0110`(R20a 新尾版 v0111 · MDL737 v0109 · MDL230 v0101 · 兩本名冊 v0101 未進總冊)。總冊只由 `registry-sync --apply` 寫,Master Prompt:未經 VCGC 明確批准不得執行 → 容器只列計畫、不套用 | 候 | 操作員批准 → VCGC registry-sync | R20a |
