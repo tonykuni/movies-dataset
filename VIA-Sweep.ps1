@@ -3,8 +3,9 @@
 # VIA-Sweep.ps1 — 倉根啟動器:VCGC 全景實測一鍵(操作員令 2026-09-28「照流程 · 全自動 · 最後要通過實測」)
 # 站在倉根(movies-dataset)打:  .\VIA-Sweep.ps1
 # 做的事:git pull --ff-only → 找 VeritasIntelligenceAnalytics\Invoke-VIA-Sweep-v*.ps1 最新一支 → 跑它
-#        (VCGC 入口 → VDF/VRN 兩條鏈 → 橋掃乾跑 → 全景 → DB 面板)→ 實測貼回包自動放進剪貼簿,回 Claude 對話框 Ctrl+V。
-# 參數原樣轉:-SkipChains · -SkipPanel · -NoClipboard · -PlainReport · -Rows N · -NoPull(啟動器也不拉)。只量不修;不代開網路同意閘。
+#        (VCGC 入口 → VDF/VRN 兩條鏈 → 橋掃乾跑 → 全景 → DB 面板 → 工具註冊/覆蓋/舊副本)→ 實測貼回包自動放進剪貼簿,回 Claude 對話框 Ctrl+V。
+# 參數原樣轉:-SkipChains · -SkipPanel · -SkipTools · -Zip <上傳的 zip> · -RetireOld · -NoClipboard · -PlainReport · -Rows N · -NoPull(啟動器也不拉)。
+# 只量不修(-RetireOld 例外:只 git rm 探針判「沒有任何引用」的舊副本);不代開網路同意閘。
 # 政策附冊 PSGATE-1:實測腳本第一步一定先從 VCGC 跑過流程(沒過就停);PS 加速模板 + rich 詳細摘要矩陣。
 $here = $PSScriptRoot
 try {
@@ -32,10 +33,11 @@ $pass = @{}
 for ($i = 0; $i -lt $args.Count; $i++) {
     $tok = ("" + $args[$i]).TrimStart("-")
     if ($tok -eq "NoPull") { continue }
-    $hit = @("SkipChains", "SkipPanel", "NoClipboard", "PlainReport") | Where-Object { $_ -ieq $tok } | Select-Object -First 1
+    $hit = @("SkipChains", "SkipPanel", "SkipTools", "RetireOld", "NoClipboard", "PlainReport") | Where-Object { $_ -ieq $tok } | Select-Object -First 1
     if ($hit) { $pass[$hit] = $true; continue }
     if ($tok -ieq "Rows" -and ($i + 1) -lt $args.Count) { $pass["Rows"] = [int]$args[$i + 1]; $i++; continue }
-    Write-Host ("  [啟動器] 不認得的參數:" + $args[$i] + "(可用 -SkipChains -SkipPanel -NoClipboard -PlainReport -Rows N -NoPull)") -ForegroundColor Yellow
+    if ($tok -ieq "Zip" -and ($i + 1) -lt $args.Count) { $pass["Zip"] = "" + $args[$i + 1]; $i++; continue }
+    Write-Host ("  [啟動器] 不認得的參數:" + $args[$i] + "(可用 -SkipChains -SkipPanel -SkipTools -Zip <zip> -RetireOld -NoClipboard -PlainReport -Rows N -NoPull)") -ForegroundColor Yellow
 }
 Write-Host ("  [啟動器] " + $sweep.Name) -ForegroundColor Cyan
 & $sweep.FullName @pass
