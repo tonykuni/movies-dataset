@@ -9,6 +9,7 @@
 | P3 | PS 模板章加固(工作站那版 → 容器這版) | ① 正主 `-RestoreOnly` 回傳的 dict 會漏到管線(每支腳本多印一段)② 點源正主會蓋掉宿主同名變數 `$RestoreOnly/$Report/$Body` ③ `Set-StrictMode -Off` 不在 finally,正主中途丟例外時嚴格度會外溢 ④ Register 鏈 17 層每層重載 ⑤ `Get-EventSubscriber` 不帶 `-Force` 看不到 Start 以 `-SupportEvent` 掛的訂閱 → 重複掛 | 容器沒有 pwsh:只做了括號平衡結構檢 59/59 0 問題,**ParseFile 沒量** | via 審核 + 工作站 ParseFile |
 | P4 | VRN 邏輯索引冊重建(`via_vrn_logic_book_v0110 build`) | 冊上指標過期:SUP_MDL743 寫 v0105、樹上尾版 v0109 → 守門 RED → status 邏輯庫 RED、VRN 系統管理 logic RED | build 後 53/53 · 過期 0 · GREEN;邏輯庫 OK(若同時套 P1,冊上 SUP_MDL749 也要跟著指 v0115,build 會自己處理) | via 審核(冊的自有 build,一條指令) |
 | P5 | InputConsole 冊補 `vcgc_layout_review` 一項 | 附件 VCGC_LAYOUT_ENGINE_v0104.zip(操作員指定的最新版)的這本冊比樹上多這一項;CGC_MDL149 v0148 的 layout 範圍登冊也指名 `central/vcgc_layout_review`。**但全格子會重生這本冊,又把它拿掉** → 手貼會被洗回去,根因在產生器 | 手貼之後 layout 登冊 0/0/0;跑格子後被洗掉(容器實證) | via 審核 + 先找產生器 |
+| P5(結) | **R10 已套用** | 容器實證推翻「全格子會洗掉」:加 Python 稽核鉤子記錄所有寫這本冊的行程,跑整張格子(346 站)—— 7 次寫入全在 /tmp 沙盒,**樹上零寫入**,跑完這一項仍在。當初「被洗掉」是我把格子重生件整批 stash 時,連手貼的冊一起收進去了。沒有產生器要修 | 有項 vs 無項 A/B:EngineBus 在位 72/72 vs 71/71,其餘 MDL054/139/153/157 輸出逐字同;layout 登冊乾跑 new 0 · changed 0 · stale 0(不必 --apply);console layout --selftest OK;契約測 OK;Deck 26/26;總管 rc0 | 操作員裁定 3「LAYOUT 都用最新版 · 只增不減」 |
 | P6 | 主控台 `layout --selftest` 路由 | v0150 起主控台尾版先攔 `--selftest`,`via-vcgc layout --selftest` 量到的是主控台自己,不是版面樞紐 → 看起來綠的另一件事 | 樞紐 SUP_MDL743 v0109 自身 selftest 直接量 rc0 [OK] | via 審核(主控台新版號;先掃全部遠端版號 LL334) |
 
 ## 驗證方式(每件)
