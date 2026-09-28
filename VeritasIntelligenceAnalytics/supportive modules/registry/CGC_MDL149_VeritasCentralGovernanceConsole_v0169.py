@@ -180,9 +180,28 @@ def selftest() -> int:
     chk("同步檢查帶 SDD 靜態燈", "sdd" in s and ("lamp" in s["sdd"] or "error" in s["sdd"]), s.get("sdd", {}).get("lamp"))
     body = Path(__file__).read_text(encoding="utf-8")
     chk("抬頭 raw · 帶 VIA_FROM_VCGC 標記(座位探針要)", body.split("\n", 3)[2].startswith('r"""') and "VIA_FROM_VCGC" in body)
+    # v0168's own checks, redone on events generated from the composed book (v0168 lists them by hand, so every new step
+    # declared in the SSOT made its "follows the book = GREEN" check go stale — the books are the ruler, not a hand list)
+    chk("結果類:0=OK · 2/3/4=FINDING · 其他=FAIL", [PRIOR.outcome(x) for x in (0, 2, 3, 4, 1, 9)] == ["OK", "FINDING", "FINDING", "FINDING", "FAIL", "FAIL"])
+    chk("run 找尾版 / 找不到 = ABSENT", (PRIOR._tail("CGC_MDL237_NumberingSystem") or Path("x")).name.startswith("CGC_MDL237_") and PRIOR._tail("NO_SUCH_ZZZ") is None)
+    chk("教訓簽名帶目標", PRIOR.lesson_verb({"verb": "run", "target": "X_ENG001", "args": []}) == "run X_ENG001")
+
+    def ev(st):
+        tgt, vb = st["match"][0]
+        return {"verb": vb or "x", "target": tgt, "act": vb} if tgt == _STEM else {"verb": "run", "target": tgt, "act": vb}
+    secs = [book["hub"], book["loop_vdf"]["steps"], book["loop_vrn"]["steps"], book["exit"]]
+    ordered = [st for sec in secs for st in sec if st.get("match")]
+    gate = next(st for st in book["hub"] if any(m[1] == "status" for m in st.get("match") or []))
+    good = [ev(gate)] + [ev(st) for st in ordered if st is not gate]
+    r = PRIOR.conformance(book, good)
+    chk("實跑照冊(事件由組成冊生成;閘第一 · after_gate 在閘後)= 綠", r["lamp"] == "GREEN", r["red"] + r["yellow"])
+    chk("第一筆不是閘 = 紅", PRIOR.conformance(book, good[1:])["lamp"] == "RED")
+    swapped = good[:2] + [good[3], good[2]] + good[4:]
+    chk("中樞段兩步倒置 = 紅", PRIOR.conformance(book, swapped)["lamp"] == "RED")
+    chk("宣告步沒出現 = 黃不紅", PRIOR.conformance(book, good[:3])["lamp"] == "YELLOW")
     if not all(ok):
         return 1
-    return PRIOR.selftest()
+    return PRIOR.PRIOR.selftest()
 
 
 if __name__ == "__main__":

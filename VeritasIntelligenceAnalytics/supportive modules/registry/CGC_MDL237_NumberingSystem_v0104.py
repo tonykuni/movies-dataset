@@ -124,7 +124,7 @@ def sdd_items() -> list:
             wkey = "wkf|" + w["code"]
             out.append(_BASE.item("WKF", wkey, f"{w['code']} {w.get('name', '')}"[:120], "工作流/" + sub, rel, w.get("kind") or "—", upd, sub,
                                   "v0100", "GREEN", "", declared=w["code"], alias=w.get("alias"), book=p.stem))
-            for s in w.get("steps") or []:
+            for s in sorted(w.get("steps") or [], key=lambda x: x.get("code") or ""):   # code = identity; list order is the plan
                 out.append(_BASE.item("STP", "stp|" + s["code"], f"{s['code']} {s.get('name') or s.get('alias') or ''}"[:120],
                                       "工作流步/" + w["code"], rel, s.get("verb") or s.get("item") or s.get("station") or s.get("layer") or "—",
                                       upd, sub, "v0100", "GREEN", "", declared=s["code"], alias=s.get("alias"), parent_key=wkey, book=p.stem))

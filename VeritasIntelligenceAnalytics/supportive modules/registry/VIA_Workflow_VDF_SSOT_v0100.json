@@ -15,7 +15,9 @@
    "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
   ],
   "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
-  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+  "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN"
  },
  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
  "workflows": [
@@ -41,14 +43,14 @@
      "separate_test:VDF-WKF002 各站可單測",
      "資料庫無缺漏(VDF-WKF003)",
      "每本 .duckdb 每張表 → parquet",
-     "D4 之後 L14 全庫同步(目錄庫也帶四表;DB 面板核對不因目錄庫缺表而紅)"
+     "D4 之前 L14 全庫同步(目錄快照含每本庫的四表;DB 面板核對不因缺表而紅)"
     ]
    },
    "plan": {
     "enter": "VCGC → VDF(建庫計畫或 VRN 經中介要料)",
     "exit": "VDF → VCGC(庫表 · Parquet · 燈號)",
     "separate_test": true,
-    "order": "照 STP 序;與 VRN-WKF001 互不排序"
+    "order": "照清單順序(代碼是身分、只增;STP005 L14 排在 STP004 之前);與 VRN-WKF001 互不排序"
    },
    "steps": [
     {
@@ -92,7 +94,22 @@
      ],
      "verb": "panel · plan --deep · roster",
      "what": "庫表冊 × 目錄核對 · 交易日缺口 · 代號缺漏",
-     "inside": "D2 鏈內(ENG090 站)+ 全景實測 ⑥ DB 面板(PowerShell)"
+     "inside": "D2 鏈內(ENG090 站)+ 全景實測 ⑥ DB 面板(PowerShell)",
+     "evidence": "step:VDF-WKF003-STP001"
+    },
+    {
+     "code": "VDF-WKF001-STP005",
+     "alias": "L14",
+     "name": "L14 全庫同步",
+     "engine": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
+     "verb": "sync-db",
+     "what": "資料家每本 .duckdb 寫同一份政策 / 交接 / 因子 / 同步對帳四表(L14);排在 D4 之前:DB 面板讀 D4 建的目錄快照,快照要含每本庫(含目錄庫)的四表",
+     "match": [
+      [
+       "VRN_ENG082_ExtractionLogic",
+       "sync-db"
+      ]
+     ]
     },
     {
      "code": "VDF-WKF001-STP004",
@@ -105,20 +122,6 @@
       [
        "CGC_MDL238_OperatorConsole",
        "parquet"
-      ]
-     ]
-    },
-    {
-     "code": "VDF-WKF001-STP005",
-     "alias": "D5",
-     "name": "L14 全庫同步",
-     "engine": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
-     "verb": "sync-db",
-     "what": "資料家每本 .duckdb 寫同一份政策 / 交接 / 因子 / 同步對帳四表(L14;D4 新產生的目錄庫也要有)",
-     "match": [
-      [
-       "VRN_ENG082_ExtractionLogic",
-       "sync-db"
       ]
      ]
     }
@@ -161,52 +164,62 @@
     {
      "code": "VDF-WKF002-STP001",
      "alias": "0a",
-     "station": "0a"
+     "station": "0a",
+     "evidence": "chain:vdf:0a"
     },
     {
      "code": "VDF-WKF002-STP002",
      "alias": "0b",
-     "station": "0b"
+     "station": "0b",
+     "evidence": "chain:vdf:0b"
     },
     {
      "code": "VDF-WKF002-STP003",
      "alias": "0c",
-     "station": "0c"
+     "station": "0c",
+     "evidence": "chain:vdf:0c"
     },
     {
      "code": "VDF-WKF002-STP004",
      "alias": "1",
-     "station": "1"
+     "station": "1",
+     "evidence": "chain:vdf:1"
     },
     {
      "code": "VDF-WKF002-STP005",
      "alias": "2",
-     "station": "2"
+     "station": "2",
+     "evidence": "chain:vdf:2"
     },
     {
      "code": "VDF-WKF002-STP006",
      "alias": "3a",
-     "station": "3a"
+     "station": "3a",
+     "evidence": "chain:vdf:3a"
     },
     {
      "code": "VDF-WKF002-STP007",
      "alias": "3b",
-     "station": "3b"
+     "station": "3b",
+     "evidence": "chain:vdf:3b"
     },
     {
      "code": "VDF-WKF002-STP008",
      "alias": "4a",
-     "station": "4a"
+     "station": "4a",
+     "evidence": "chain:vdf:4a"
     },
     {
      "code": "VDF-WKF002-STP009",
      "alias": "4b",
-     "station": "4b"
+     "station": "4b",
+     "evidence": "chain:vdf:4b"
     },
     {
      "code": "VDF-WKF002-STP010",
      "alias": "4c",
-     "station": "4c"
+     "station": "4c",
+     "evidence": "chain:vdf:4c"
     }
    ],
    "tests": {
@@ -264,7 +277,8 @@
      "engine": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py",
      "verb": "plan --deep",
      "what": "交易日缺口",
-     "inside": "VDF-WKF002 站 4b"
+     "inside": "VDF-WKF002 站 4b",
+     "evidence": "chain:vdf:4b"
     },
     {
      "code": "VDF-WKF003-STP003",
@@ -273,7 +287,8 @@
      "engine": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v*.py",
      "verb": "roster",
      "what": "代號缺漏",
-     "inside": "VDF-WKF002 站 4a"
+     "inside": "VDF-WKF002 站 4a",
+     "evidence": "chain:vdf:4a"
     }
    ],
    "tests": {
@@ -528,7 +543,12 @@
     {
      "code": "VDF-WKF008-STP002",
      "alias": "vdf_quantguard_one",
-     "item": "vdf_quantguard_one"
+     "item": "vdf_quantguard_one",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝;裝件是操作員的手)",
+      "ref": "VCGC-WKF001-STP004"
+     }
     }
    ],
    "tests": {
@@ -573,7 +593,12 @@
     {
      "code": "VDF-WKF009-STP003",
      "alias": "vdf_quantguard_status",
-     "item": "vdf_quantguard_status"
+     "item": "vdf_quantguard_status",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝)",
+      "ref": "VCGC-WKF001-STP004"
+     }
     }
    ],
    "tests": {

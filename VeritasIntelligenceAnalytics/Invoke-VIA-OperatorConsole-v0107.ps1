@@ -4,7 +4,8 @@
 # Invoke-VIA-OperatorConsole-v0107.ps1 — **唯一入口**(R33)
 #   v0106→v0107(操作員 R33 SDD 驗證實錄 · VDF-WKF001-STP005):④ 輸出統一 Parquet 會在資料家產生 / 更新 VIA_Parquet_Catalog.duckdb,
 #   但 L14 全庫同步律要「資料家每本 .duckdb 都有同一份政策 / 交接 / 因子 / 同步對帳四表」—— 目錄庫沒有 → 下一輪 DB 面板核對紅 4 列、
-#   單一路徑驗證跟著紅(容器實跑 go-20260928-231332 抓到;工作站同理)。本版在 ④ 之後加 ④b:VRN_ENG082 尾版 sync-db(L14 正主)經中樞跑。
+#   單一路徑驗證跟著紅(容器實跑 go-20260928-231332 抓到;工作站同理)。本版在 ④ 之前加 ④a:VRN_ENG082 尾版 sync-db(L14 正主)經中樞跑 —— 要在 ④ 之前,因為 DB 面板讀的是 ④ 建的目錄快照
+#   (_via_catalog);新資料家第一輪目錄庫才剛建,第二輪起收斂(容器實測兩輪)。
 #   其餘照 v0106。
 # (v0106 起)
 #   v0105→v0106(操作員 R32「AI 任何動作 · 審閱 · 修改都經 VCGC;經中樞的每個動作與回饋都觸發自動同步;失敗記進教訓帳」):
@@ -499,6 +500,18 @@ try {
     }
     Set-OcLap "③b VRN 邏輯總檢"
 
+    # ④a L14 全庫同步(VRN_ENG082 尾版 sync-db;在 ④ 之前:④ 建的目錄快照才含每本庫(含目錄庫本身)的四表)
+    $l14 = Get-ChildItem -LiteralPath (Join-Path $VIA "functional modules\VRN") -Filter "VRN_ENG082_ExtractionLogic_v*.py" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+    if ($null -eq $l14) {
+        Write-Host "  ④a L14 全庫同步 · ABSENT(VRN_ENG082 尾版不在)" -ForegroundColor Yellow
+    } else {
+        $sd = Invoke-OcPy $l14.FullName @("sync-db")
+        Write-Host ("  ④a L14 全庫同步 · rc=" + $sd.rc + " · " + $l14.Name) -ForegroundColor $(if ($sd.rc -eq 0) { "Green" } else { "Yellow" })
+        $sd.lines | Select-Object -Last 3 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        if ($sd.rc -eq 1) { $exitCode = 2 }
+    }
+    Set-OcLap "④a L14 全庫同步"
+
     # ④ 輸出統一 Parquet(DuckDB 管家)
     $p = Invoke-OcPy $engine.FullName @("parquet", "--apply")
     Write-Host ("  ④ 輸出統一 Parquet · rc=" + $p.rc) -ForegroundColor $(if ($p.rc -eq 0) { "Green" } else { "Yellow" })
@@ -506,17 +519,6 @@ try {
     if ($p.rc -eq 1) { $exitCode = 2 }
     Set-OcLap "④ Parquet"
 
-    # ④b L14 全庫同步(VRN_ENG082 尾版 sync-db;④ 新產生的目錄庫也要有四表)
-    $l14 = Get-ChildItem -LiteralPath (Join-Path $VIA "functional modules\VRN") -Filter "VRN_ENG082_ExtractionLogic_v*.py" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
-    if ($null -eq $l14) {
-        Write-Host "  ④b L14 全庫同步 · ABSENT(VRN_ENG082 尾版不在)" -ForegroundColor Yellow
-    } else {
-        $sd = Invoke-OcPy $l14.FullName @("sync-db")
-        Write-Host ("  ④b L14 全庫同步 · rc=" + $sd.rc + " · " + $l14.Name) -ForegroundColor $(if ($sd.rc -eq 0) { "Green" } else { "Yellow" })
-        $sd.lines | Select-Object -Last 3 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
-        if ($sd.rc -eq 1) { $exitCode = 2 }
-    }
-    Set-OcLap "④b L14 全庫同步"
 
     # ⑤ 操作台頁 + 總覽三色燈
     $pg = Invoke-OcPy $engine.FullName @("page")

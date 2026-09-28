@@ -15,7 +15,9 @@
    "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
   ],
   "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
-  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+  "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN"
  },
  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
  "workflows": [
@@ -272,7 +274,8 @@
      "engine": "Invoke-VIA-OperatorConsole-v*.ps1",
      "verb": "⑦",
      "what": "只 commit + push 紀錄冊;對 GitHub 也只經 VCGC",
-     "inside": "入口 ⑦(git 在 PowerShell 裡,不是 python 步)"
+     "inside": "入口 ⑦(git 在 PowerShell 裡,不是 python 步)",
+     "evidence": "git:pushed"
     }
    ],
    "tests": {
@@ -374,7 +377,8 @@
      "engine": "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
      "verb": "--subsystems(乾跑核對)",
      "what": "L04 新版檔;加速器橋 · 網路橋 · PS 模板章(橋掃核對 100%)",
-     "inside": "AI 編修;由 STP003 橋掃與 CGC_MDL245 X-ACCEL 核對"
+     "inside": "AI 編修;由 STP003 橋掃與 CGC_MDL245 X-ACCEL 核對",
+     "evidence": "step:VCGC-WKF001-STP006"
     },
     {
      "code": "VCGC-WKF003-STP004",
@@ -383,7 +387,8 @@
      "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
      "verb": "run <引擎> --selftest",
      "what": "每支改過的引擎自測 rc 0;失敗自動進教訓帳",
-     "inside": "via-vcgc run(事件記目標引擎)"
+     "inside": "via-vcgc run(事件記目標引擎)",
+     "evidence": "self:all"
     },
     {
      "code": "VCGC-WKF003-STP005",
@@ -434,7 +439,8 @@
      "engine": "supportive modules/registry/CGC_MDL058_Lessons_v*.py",
      "verb": "(FAIL 自動)· --record",
      "what": "重複出錯要留因與解法",
-     "inside": "VCGC v0168 起 FAIL 事件自動記"
+     "inside": "VCGC v0168 起 FAIL 事件自動記",
+     "evidence": "step:VCGC-WKF002-STP003"
     },
     {
      "code": "VCGC-WKF003-STP009",
@@ -443,7 +449,8 @@
      "engine": "git · GitHub PR",
      "verb": "commit · push · PR · merge",
      "what": "只在 CI 綠 · 無衝突 · 無未結討論時合併;零 force push;VIA_Reports 永不 commit",
-     "inside": "GitHub(AI 端;不是 python 步)"
+     "inside": "GitHub(AI 端;不是 python 步)",
+     "evidence": "git:pushed"
     }
    ],
    "tests": {
@@ -595,7 +602,12 @@
     {
      "code": "VCGC-WKF005-STP001",
      "alias": "via_functional_acceptance",
-     "item": "via_functional_acceptance"
+     "item": "via_functional_acceptance",
+     "known_open": {
+      "hand": "operator",
+      "why": "功能驗收紅:股票價史只到 2024-01-02(驗收要 2023-01-01 起;回補要網路 → 操作員開同意閘)· QuantGuard 缺 polars(裝件是操作員的手)",
+      "ref": "VDF-REQ004 · VCGC-REQ046"
+     }
     }
    ],
    "tests": {
@@ -703,22 +715,42 @@
     {
      "code": "VCGC-WKF008-STP001",
      "alias": "via_unique_entry_control",
-     "item": "via_unique_entry_control"
+     "item": "via_unique_entry_control",
+     "known_open": {
+      "hand": "ai",
+      "why": "唯一接觸口 21/29:命令冊內容 5 條(.ps1 逐支許可 L70)+ 文件裡的幽靈 via-* 指令 + 引擎撞號(CGC_MDL135/149 同號多名)→ AI 下一輪整理文件與撞號、命令冊交操作員",
+      "ref": "VCGC-REQ068"
+     }
     },
     {
      "code": "VCGC-WKF008-STP002",
      "alias": "vrn_dispatch",
-     "item": "vrn_dispatch"
+     "item": "vrn_dispatch",
+     "known_open": {
+      "hand": "ai",
+      "why": "唯一接觸口 21/29:命令冊內容 5 條(.ps1 逐支許可 L70)+ 文件裡的幽靈 via-* 指令 + 引擎撞號(CGC_MDL135/149 同號多名)→ AI 下一輪整理文件與撞號、命令冊交操作員",
+      "ref": "VCGC-REQ068"
+     }
     },
     {
      "code": "VCGC-WKF008-STP003",
      "alias": "vdf_dispatch",
-     "item": "vdf_dispatch"
+     "item": "vdf_dispatch",
+     "known_open": {
+      "hand": "ai",
+      "why": "唯一接觸口 21/29:命令冊內容 5 條(.ps1 逐支許可 L70)+ 文件裡的幽靈 via-* 指令 + 引擎撞號(CGC_MDL135/149 同號多名)→ AI 下一輪整理文件與撞號、命令冊交操作員",
+      "ref": "VCGC-REQ068"
+     }
     },
     {
      "code": "VCGC-WKF008-STP004",
      "alias": "quantguard_dispatch",
-     "item": "quantguard_dispatch"
+     "item": "quantguard_dispatch",
+     "known_open": {
+      "hand": "ai",
+      "why": "唯一接觸口 21/29:命令冊內容 5 條(.ps1 逐支許可 L70)+ 文件裡的幽靈 via-* 指令 + 引擎撞號(CGC_MDL135/149 同號多名)→ AI 下一輪整理文件與撞號、命令冊交操作員",
+      "ref": "VCGC-REQ068"
+     }
     }
    ],
    "tests": {
@@ -756,7 +788,12 @@
     {
      "code": "VCGC-WKF009-STP001",
      "alias": "via_unique_entry_control",
-     "item": "via_unique_entry_control"
+     "item": "via_unique_entry_control",
+     "known_open": {
+      "hand": "ai",
+      "why": "唯一接觸口 21/29:命令冊內容 5 條(.ps1 逐支許可 L70)+ 文件裡的幽靈 via-* 指令 + 引擎撞號(CGC_MDL135/149 同號多名)→ AI 下一輪整理文件與撞號、命令冊交操作員",
+      "ref": "VCGC-REQ068"
+     }
     },
     {
      "code": "VCGC-WKF009-STP002",

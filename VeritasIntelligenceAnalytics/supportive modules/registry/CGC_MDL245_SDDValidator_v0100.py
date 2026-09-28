@@ -86,9 +86,11 @@ WKF_RX = re.compile(r"^(VCGC|VDF|VRN|VAP)-WKF(\d{3})$")
 REQ_RX = re.compile(r"^(VCGC|VDF|VRN|VAP|SUP|CORE)-REQ(\d{3})$")
 LAW_RX = re.compile(r"^L\d{2,3}$")
 WKF_COLS = ("code", "alias", "name", "kind", "spec", "plan", "steps", "tests")
+EVIDENCE_RX = re.compile(r"^(step:[A-Z]+-WKF\d{3}-STP\d{3}|self:(all|[A-Za-z0-9_]+)|chain:(vdf|vrn):\S+|git:pushed)$")
+CHAIN_STATE = {"GREEN": "OK", "INFO": "OK", "GATED": "FINDING", "ABSENT": "FINDING", "NODATA": "FINDING", "SKIP": "FINDING"}
 SPEC_COLS = ("goal", "requirements", "acceptance")
 TEST_COLS = ("self", "cross", "real")
-OPERATOR_HAND = {"GATED": "同意閘沒開(L07/L08:只有操作員能開)", "ABSENT": "缺套件或缺件(裝件是操作員的手)",
+OPERATOR_HAND = {"CANON": "正本唯讀(不改、無獨立自測門;實測走匯流排 call --item,需資料家)","GATED": "同意閘沒開(L07/L08:只有操作員能開)", "ABSENT": "缺套件或缺件(裝件是操作員的手)",
                  "NODATA": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)", "SKIP": "本次略過"}
 
 
@@ -238,6 +240,8 @@ def check_columns(state, rows):
                 miss.append(f"{st.get('code')}.engine|item|station|layer")
             if st.get("engine") and not (st.get("verb") and st.get("what") and (st.get("match") or st.get("inside"))):
                 miss.append(f"{st.get('code')}.verb/what/match|inside")
+            if (st.get("inside") or st.get("station") or st.get("layer")) and not EVIDENCE_RX.match(str(st.get("evidence") or "")):
+                miss.append(f"{st.get('code')}.evidence(step:|self:|chain:|git:pushed)")
         if miss:
             _row(rows, "RED", "X-COL", f"{w.get('code')} 欄位不齊:{', '.join(miss[:6])}", w.get("code"))
     if not any(r["rule"] == "X-COL" for r in rows):
@@ -253,9 +257,10 @@ def check_codes(state, rows):
             if not m or m.group(1) != sub or int(m.group(2)) != i:
                 bad.append(f"{c}(冊 {sub} 第 {i} 條)")
         for w in b.get("workflows") or []:
-            for j, st in enumerate(w.get("steps") or [], 1):
-                if st.get("code") != f"{w.get('code')}-STP{j:03d}":
-                    bad.append(f"{st.get('code')}(應為 {w.get('code')}-STP{j:03d})")
+            got = sorted(st.get("code") or "" for st in w.get("steps") or [])      # codes are identity (append-only); list order is the plan
+            want = [f"{w.get('code')}-STP{j:03d}" for j in range(1, len(w.get("steps") or []) + 1)]
+            if got != want:
+                bad.append(f"{w.get('code')} 步代碼不連續 {sorted(set(want) ^ set(got))[:3]}")
             for c in [w.get("code")] + [st.get("code") for st in w.get("steps") or []]:
                 if c in seen:
                     bad.append(f"{c} 重複({seen[c]} · {sub})")
@@ -267,7 +272,7 @@ def check_codes(state, rows):
     if bad:
         _row(rows, "RED", "X-CODE", "代碼不合格式 / 跳號 / 重複:" + " · ".join(bad[:6]))
     else:
-        _row(rows, "GREEN", "X-CODE", f"代碼 {len(seen)} 個:<子系統>-WKF### 各冊從 001 連續 · 步 -STP### 連續 · 全域唯一 · alias 唯一")
+        _row(rows, "GREEN", "X-CODE", f"代碼 {len(seen)} 個:<子系統>-WKF### 各冊從 001 連續 · 步 -STP### 集合連續(代碼是身分,清單順序是執行序)· 全域唯一 · alias 唯一")
 
 
 def check_composition(state, rows):
@@ -363,7 +368,7 @@ def _registers():
 def check_registration(state, rows, targets, versions: dict):
     by_id, num = _registers()
     unreg, stale, unnum, canon = [], [], [], []
-    for wkf, stp, pat, p, fam in {(None, None, t[2], t[3], t[4]) for t in targets if t[3]}:
+    for wkf, stp, pat, p, fam in {(None, None, None, t[3], None) for t in targets if t[3]}:
         r = rel(p)
         if exemption(p) and not by_id.get(stem_of(p)) and not num.get(r):
             canon.append(p.name)
@@ -604,9 +609,8 @@ def selftests(only: str | None = None, timeout: int = 600, write: bool = True) -
     for wkf, stp, pat, p, fam in targets:
         key = str(p)
         if key not in done:
-            txt = p.read_text(encoding="utf-8", errors="replace")
-            if "--selftest" not in txt and "selftest" not in txt:
-                done[key] = {"tail": p.name, "rc": None, "outcome": "NOSELFTEST", "secs": 0}
+            if exemption(p):                      # read-only canon: not run standalone, not changed (its item runs through the bus)
+                done[key] = {"tail": p.name, "rel": rel(p), "rc": None, "outcome": "CANON", "secs": 0, "last": exemption(p)}
             else:
                 t0 = time.time()
                 try:
@@ -669,9 +673,17 @@ def _act(e: dict) -> tuple:
 
 def real(run: str | None = None, write: bool = True, ai_run: str | None = None) -> dict:
     state = load_books()
+    selfrep = _json(OUT / "SDD_SELF_latest.json", {}) or {}
     run, evs = run_events(run)
     ai_run, ai_evs = run_events(ai_run, "ai-")
-    selfrep = _json(OUT / "SDD_SELF_latest.json", {}) or {}
+    head = _head()[:12]
+    self_fresh = bool(selfrep) and selfrep.get("head") == head
+    start = (evs[0].get("ts") if evs else "") or "9999"
+    chains_full = {}
+    for name, f in (("vdf", "vdf_chain/VDFCHAIN_latest.json"), ("vrn", "vrn_chain/VRNCHAIN_latest.json")):
+        d = _json(VIA / "VIA_Reports" / f, {}) or {}
+        gen = str(d.get("generated") or "").replace("T", " ")[:19]
+        chains_full[name] = {"fresh": bool(evs) and gen >= start[:19], "rows": d.get("stages") or d.get("nodes") or []}
     chains = _chain_states()
     res = {}
     skip = set((state["comp"].get("scope") or {}).get("registered_only") or [])
@@ -692,16 +704,75 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
                         steps[st["code"]]["hand"] = st["finding_hand"]
                 else:
                     steps[st["code"]] = {"state": "NOT_RUN"}
-            elif st.get("inside"):
-                steps[st["code"]] = {"state": "INSIDE", "by": st["inside"]}
+            elif st.get("evidence"):
+                steps[st["code"]] = {"state": "EVIDENCE", "evidence": st["evidence"], "hand_hint": st.get("finding_hand")}
             else:
-                steps[st["code"]] = {"state": "SELF", "by": (selfrep.get("per_step") or {}).get(w["code"], {}).get(st["code"], "NOT_RUN")}
-        states = [s["state"] if s["state"] != "SELF" else s["by"] for s in steps.values()]
+                got = (selfrep.get("per_step") or {}).get(w["code"], {}).get(st["code"]) if self_fresh else None
+                steps[st["code"]] = {"state": got or "NOT_RUN", "by": "selftest" if got else ("自測存證不是當前 HEAD" if selfrep else "沒有自測存證")}
+        res[w["code"]] = {"alias": w.get("alias"), "steps": steps, "_w": w}
+    flat = {c: s for r in res.values() for c, s in (r.get("steps") or {}).items()}
+
+    def resolve(code: str, depth: int = 0) -> dict:
+        s = flat.get(code) or {"state": "NOT_RUN", "why": "沒有這一步"}
+        if s.get("state") != "EVIDENCE" or depth > 5:
+            return s
+        ev = s["evidence"]
+        kind, _, arg = ev.partition(":")
+        if kind == "step":
+            src = resolve(arg, depth + 1)
+            out = {"state": src.get("state"), "by": ev}
+            if src.get("hand"):
+                out["hand"] = src["hand"]
+        elif kind == "self":
+            eng = [e for e in selfrep.get("engines") or [] if arg == "all" or stem_of(e.get("tail") or "") == arg] if self_fresh else []
+            outs = {e.get("outcome") for e in eng}
+            out = {"state": ("NOT_RUN" if not eng else "FAIL" if "FAIL" in outs else "FINDING" if "FINDING" in outs else
+                             "NOSELFTEST" if "NOSELFTEST" in outs else "OK"), "by": ev + ("" if self_fresh else "(自測存證不是當前 HEAD)")}
+        elif kind == "chain":
+            name, _, node = arg.partition(":")
+            ch = chains_full.get(name) or {}
+            if not ch.get("fresh"):
+                out = {"state": "NOT_RUN", "by": ev + "(鏈報告不是本輪)"}
+            else:
+                rows = [r for r in ch["rows"] if str(r.get("id")) == node or str(r.get("layer", "")).startswith(node)]
+                sts = [CHAIN_STATE.get(r.get("state"), "FAIL") for r in rows]
+                out = {"state": "NOT_RUN" if not rows else "FAIL" if "FAIL" in sts else "FINDING" if "FINDING" in sts else "OK", "by": ev}
+                if out["state"] == "FINDING":
+                    out["hand"] = " · ".join(sorted({OPERATOR_HAND[r.get("state")] for r in rows if r.get("state") in OPERATOR_HAND}))
+        elif ev == "git:pushed":
+            r = subprocess.run(["git", "branch", "-r", "--contains", "HEAD"], cwd=VIA, capture_output=True, text=True)
+            out = {"state": "OK" if r.stdout.strip() else "NOT_RUN", "by": ev + ("" if r.stdout.strip() else "(HEAD 還沒推上遠端)")}
+        else:
+            out = {"state": "NOT_RUN", "by": ev}
+        if out.get("state") == "FINDING" and not out.get("hand") and s.get("hand_hint"):
+            out["hand"] = s["hand_hint"]
+        return out
+
+    known = {st["code"]: st["known_open"] for _, w in state["wkfs"] for st in w.get("steps") or [] if st.get("known_open")}
+    for code, s in flat.items():
+        if s.get("state") == "CANON":
+            s["hand"] = OPERATOR_HAND["CANON"]
+        k = known.get(code)
+        if k and s.get("state") in ("FAIL", "FINDING", "NOSELFTEST", "CANON"):
+            s["known_open"] = k
+            if k.get("hand") == "operator":
+                s["hand"] = k.get("why")
+            else:
+                s.pop("hand", None)
+                s["ai_open"] = k.get("why")
+    for code in [c for c, s in flat.items() if s.get("state") == "EVIDENCE"]:
+        flat[code].update(resolve(code))
+        flat[code].pop("hand_hint", None)
+    for code, r in res.items():
+        if r.get("state") == "REGISTERED_ONLY":
+            continue
+        w = r.pop("_w")
+        steps = r["steps"]
+        states = [s["state"] for s in steps.values()]
         level = "real" if any(st.get("match") for st in w.get("steps") or []) else "selftest"
         lamp = ("FAIL" if "FAIL" in states else "NOT_RUN" if "NOT_RUN" in states else "FINDING" if "FINDING" in states
-                else "NOSELFTEST" if "NOSELFTEST" in states else "OK")
-        res[w["code"]] = {"alias": w.get("alias"), "level": level, "state": lamp, "steps": steps,
-                          "run": ai_run if (w.get("tests") or {}).get("real_run") == "ai" else run}
+                else "NOSELFTEST" if "NOSELFTEST" in states else "CANON" if "CANON" in states else "OK")
+        r.update({"level": level, "state": lamp, "run": ai_run if (w.get("tests") or {}).get("real_run") == "ai" else run})
     for code, chain in (("VDF-WKF001", "vdf"), ("VRN-WKF001", "vrn")):
         if code in res:
             res[code]["chain"] = chains.get(chain)
@@ -709,9 +780,12 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
                 for s in res[code]["steps"].values():
                     s.pop("hand", None)
     for code, r in res.items():
-        bad = [s for s in r["steps"].values() if s.get("state") not in ("OK", "INSIDE") and s.get("by") != "OK"]
-        if r["state"] == "FINDING" and bad and all(s.get("hand") for s in bad):
+        bad = [s for s in r["steps"].values() if s.get("state") != "OK"]
+        if r["state"] in ("FINDING", "FAIL", "CANON", "NOSELFTEST") and bad and all(s.get("hand") for s in bad):
             r["operator_hand"] = True
+        ai = [s.get("ai_open") for s in bad if s.get("ai_open")]
+        if ai:
+            r["ai_open"] = sorted(set(ai))
     rep = {"schema": "VIA.SDD.Real.v1", "engine": ENGINE, "ts": _now(), "head": _head()[:12], "run": run, "events": len(evs), "ai_run": ai_run, "ai_events": len(ai_evs),
            "self_run": selfrep.get("run"), "wkf": res}
     if write:
@@ -737,17 +811,36 @@ def plan_lock(chk: dict, rl: dict) -> dict:
                             "registered": {k: (vers.get(k) or {}).get("changed_at") or (vers.get(k) or {}).get("first_seen") for k in mine}}
         else:
             why = "靜態驗證紅" if not ok_static else r["state"]
-            opened[code] = {"state": why, "operator_hand": bool(r.get("operator_hand")),
+            opened[code] = {"state": why, "operator_hand": bool(r.get("operator_hand")), "ai_open": r.get("ai_open"),
                             "open": ((r.get("chain") or {}).get("open") or [])[:12],
                             "steps": {k: v for k, v in r["steps"].items() if v.get("state") not in ("OK", "INSIDE") and v.get("by") not in ("OK",)}}
     return {"wkf": locked, "wkf_open": opened}
 
 
+def stale_reasons(chk: dict, rl: dict) -> list:
+    """Evidence must be about the code that is here now: same HEAD for check · real · selftests, and no uncommitted code."""
+    head, why = _head()[:12], []
+    selfrep = _json(OUT / "SDD_SELF_latest.json", {}) or {}
+    if not chk or not rl:
+        why.append("check / real 存證不齊")
+    for name, rep_ in (("check", chk), ("real", rl), ("selftests", selfrep)):
+        if rep_ and rep_.get("head") != head:
+            why.append(f"{name} 存證是 {rep_.get('head')} 不是當前 HEAD {head}")
+    if not selfrep:
+        why.append("沒有自測存證")
+    dirty = subprocess.run(["git", "status", "--porcelain", "--", "*.py", "*.ps1", "*Workflow*_SSOT_v*.json", "*Requirements_SSOT_v*.json"],
+                           cwd=VIA, capture_output=True, text=True).stdout.strip().splitlines()
+    if dirty:
+        why.append(f"有未提交的程式 / 冊改動 {len(dirty)} 個(例 {dirty[0][3:][:60]})")
+    return why
+
+
 def lock(apply: bool = False) -> dict:
     chk, rl = _json(OUT / "SDD_CHECK_latest.json", {}) or {}, _json(OUT / "SDD_REAL_latest.json", {}) or {}
-    if not chk or not rl:
-        print("  [SDD] 先跑 check 與 real(兩份存證都要在)")
-        return {}
+    why = stale_reasons(chk, rl)
+    if why:
+        print("  [鎖] 拒寫:" + " · ".join(why))
+        return None
     plan = plan_lock(chk, rl)
     prev_p = newest("VIA_LampLock_v*.json")
     book = _json(prev_p, {}) or {}
@@ -756,7 +849,8 @@ def lock(apply: bool = False) -> dict:
     keep = {c: r for c, r in old.items() if c not in plan["wkf"] and c not in plan["wkf_open"]}
     book.update({"schema": book.get("schema") or "VIA.LampLock.v2", "prior": prev_p.name if prev_p else None,
                  "wkf_rule": "SDD 工作流過關(CGC_MDL245:靜態不紅 · 自測 / 實測 OK)= 鎖:記步正主的尾版 · 編號 · 註冊時間;之後尾版換了 = X-LOCK 要重驗,狀態退步 = 回歸紅",
-                 "wkf_measured_at": _now(), "wkf": {**keep, **plan["wkf"]}, "wkf_open": plan["wkf_open"]})
+                 "wkf_measured_at": _now(), "wkf_head": chk.get("head"), "wkf_run": rl.get("run"), "wkf_ai_run": rl.get("ai_run"),
+                 "wkf": {**keep, **plan["wkf"]}, "wkf_open": plan["wkf_open"]})
     target = HERE / f"VIA_LampLock_{new_v}.json"
     print(f"  [鎖] 可鎖 {len(plan['wkf'])} 條 · 未鎖 {len(plan['wkf_open'])} 條 → {'寫 ' + target.name if apply else '乾跑(--apply 才寫下一版燈鎖冊)'}")
     if apply:
@@ -768,16 +862,26 @@ def closeout(apply: bool = False) -> dict:
     chk, rl = _json(OUT / "SDD_CHECK_latest.json", {}) or {}, _json(OUT / "SDD_REAL_latest.json", {}) or {}
     lk = _json(newest("VIA_LampLock_v*.json"), {}) or {}
     wk, op = lk.get("wkf") or {}, lk.get("wkf_open") or {}
+    state = load_books()
+    scope = set((state["comp"].get("scope") or {}).get("closeout") or [s for s in state["books"]])
+    in_scope = [w["code"] for s, w in state["wkfs"] if s in scope]
+    uncovered = [c for c in in_scope if c not in wk and c not in op]
+    why = [x for x in stale_reasons(chk, rl) if not x.startswith("有未提交")]
+    if lk.get("wkf_head") and lk.get("wkf_head") != chk.get("head"):
+        why.append(f"燈鎖冊 wkf 區是 {lk.get('wkf_head')} 驗的,不是這次 check {chk.get('head')}")
     red = [r for r in chk.get("rows") or [] if r["lamp"] == "RED"]
-    fail = {c: r for c, r in op.items() if not r.get("operator_hand") and r.get("state") not in ("NOT_RUN",)}
+    fail = {c: r for c, r in op.items() if not r.get("operator_hand")}
     not_run = [c for c, r in op.items() if r.get("state") == "NOT_RUN"]
-    if red or fail or not chk:
+    if red or fail or not chk or not rl or why or uncovered:
         verdict = "OPEN"
     elif op:
-        verdict = "CLOSED_WITH_OPERATOR_ITEMS" if all(r.get("operator_hand") or r.get("state") == "NOT_RUN" for r in op.values()) else "OPEN"
+        verdict = "CLOSED_WITH_OPERATOR_ITEMS" if all(r.get("operator_hand") for r in op.values()) else "OPEN"
     else:
         verdict = "CLOSED"
-    rep = {"verdict": verdict, "check": chk.get("lamp"), "locked": len(wk), "open": len(op), "red_rows": red, "fail": list(fail), "not_run": not_run}
+    rep = {"verdict": verdict, "check": chk.get("lamp"), "locked": len(wk), "open": len(op), "red_rows": red, "fail": list(fail), "not_run": not_run,
+           "stale": why, "uncovered": uncovered}
+    for x in why + ([f"範圍內沒加鎖也沒列未鎖:{uncovered[:6]}"] if uncovered else []):
+        print(f"  [收尾] 不成立:{x}")
     print(f"  [收尾] {verdict} · 靜態 {chk.get('lamp')} · 已鎖 {len(wk)} · 未鎖 {len(op)}(操作員端 {sum(1 for r in op.values() if r.get('operator_hand'))} · 本輪沒跑 {len(not_run)} · 要修 {len(fail)})")
     if apply:
         doc = VIA / "docs" / "VIA_SDD_Closeout_R33_v0100.md"
@@ -875,6 +979,17 @@ def selftest() -> int:
     ev = [{"verb": "status", "target": CONSOLE, "act": "status", "outcome": "OK", "rc": 0, "ts": "t"}]
     hit = [e for e in ev for tgt, vb in [[CONSOLE, "status"]] if e["target"] == tgt and vb == e["verb"]]
     chk("實測對事件:主控台動詞以動詞比 · run 以目標引擎 + 子動詞比", hit)
+    r0 = real("no-such-run-zzz", write=False, ai_run="ai-no-such-run-zzz")
+    chained = ((r0["wkf"].get("VDF-WKF003") or {}).get("steps") or {}).get("VDF-WKF003-STP002") or {}
+    selfed = ((r0["wkf"].get("VRN-WKF003") or {}).get("steps") or {}).get("VRN-WKF003-STP002") or {}
+    chk("Codex #365 P1:inside 步要有證據 — 鏈證據沒有本輪 = NOT_RUN;自測證據只認當前 HEAD 的存證",
+        chained.get("state") == "NOT_RUN" and (selfed.get("state") == "NOT_RUN" or selfed.get("by", "").startswith("self:")),
+        f"{chained.get('state')} · {selfed.get('state')} {selfed.get('by', '')}")
+    chk("Codex #365 P2:不存在的輪 → 範圍內工作流是 NOT_RUN(CLI 回非 0)",
+        any(w["state"] == "NOT_RUN" for c, w in r0["wkf"].items() if c.startswith(("VCGC-WKF001", "VDF-WKF001", "VRN-WKF001"))))
+    stale = stale_reasons({"head": "000000000000"}, {"head": "000000000000"})
+    chk("Codex #365 P1:存證不是當前 HEAD = 拒絕加鎖", any("不是當前 HEAD" in x for x in stale), stale[:1])
+    chk("Codex #365 P1:沒有實測 / 鎖 = 收尾不成立", "check / real 存證不齊" in stale_reasons({}, {}))
     body = Path(__file__).read_text(encoding="utf-8")
     chk("本支帶加速器橋 · VIA_FROM_VCGC 標記", "[VIA:ACCEL-BRIDGE" in body and "VIA_FROM_VCGC" in body)
     return 0 if all(ok) else 1
@@ -904,7 +1019,8 @@ def main(argv=None) -> int:
         for c, r in rep["wkf"].items():
             print(f"  {r['state']:<10} {c:<11} {r['alias']:<30} 層級 {r['level']}" + (" · 操作員端" if r.get("operator_hand") else ""))
         print(f"[SDD 實測] 輪 {rep['run']} · 事件 {rep['events']} · 自測輪 {rep['self_run']}")
-        return 1 if any(r["state"] == "FAIL" for r in rep["wkf"].values()) else 0
+        states = {r["state"] for r in rep["wkf"].values()}
+        return 1 if "FAIL" in states else (2 if states & {"NOT_RUN", "NOSELFTEST"} else 0)
     if verb == "lock":
         return 0 if lock("--apply" in a) is not None else 1
     if verb == "closeout":

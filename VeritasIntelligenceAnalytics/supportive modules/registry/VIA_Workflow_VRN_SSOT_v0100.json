@@ -15,7 +15,9 @@
    "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
   ],
   "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
-  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+  "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+  "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN"
  },
  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
  "workflows": [
@@ -57,7 +59,8 @@
      "engine": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py",
      "verb": "request / route",
      "what": "讀庫或轉交 VDF 迴圈,結果經 VCGC 回 VRN",
-     "inside": "R2 鏈內(VRN 引擎在行程內向 CGC_MDL239 要料)"
+     "inside": "R2 鏈內(VRN 引擎在行程內向 CGC_MDL239 要料)",
+     "evidence": "step:VRN-WKF001-STP002"
     },
     {
      "code": "VRN-WKF001-STP002",
@@ -81,7 +84,8 @@
      "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
      "verb": "run",
      "what": "個股報告只取第 1 頁 · 年度財報全頁先拆左右再拆上下(規則冊 VIA_Policy_VRNTextScope_v0100);完整才摘要",
-     "inside": "R2 鏈內(VRN 邏輯架構冊的節點)"
+     "inside": "R2 鏈內(VRN 邏輯架構冊的節點)",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
     },
     {
      "code": "VRN-WKF001-STP004",
@@ -135,32 +139,38 @@
     {
      "code": "VRN-WKF002-STP001",
      "alias": "L0",
-     "layer": "L0"
+     "layer": "L0",
+     "evidence": "chain:vrn:L0"
     },
     {
      "code": "VRN-WKF002-STP002",
      "alias": "L1",
-     "layer": "L1"
+     "layer": "L1",
+     "evidence": "chain:vrn:L1"
     },
     {
      "code": "VRN-WKF002-STP003",
      "alias": "L2",
-     "layer": "L2"
+     "layer": "L2",
+     "evidence": "chain:vrn:L2"
     },
     {
      "code": "VRN-WKF002-STP004",
      "alias": "L3",
-     "layer": "L3"
+     "layer": "L3",
+     "evidence": "chain:vrn:L3"
     },
     {
      "code": "VRN-WKF002-STP005",
      "alias": "L4",
-     "layer": "L4"
+     "layer": "L4",
+     "evidence": "chain:vrn:L4"
     },
     {
      "code": "VRN-WKF002-STP006",
      "alias": "L5",
-     "layer": "L5"
+     "layer": "L5",
+     "evidence": "chain:vrn:L5"
     }
    ],
    "tests": {
@@ -204,7 +214,8 @@
      "engine": "supportive modules/registry/VIA_Policy_VRNTextScope_v*.json",
      "verb": "(規則冊)",
      "what": "個股 = 第 1 頁 · 年報 = 全頁",
-     "inside": "VRN_ENG392 讀規則冊"
+     "inside": "VRN_ENG392 讀規則冊",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
     },
     {
      "code": "VRN-WKF003-STP002",
@@ -213,7 +224,8 @@
      "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
      "verb": "run",
      "what": "先左右再上下(XY-cut)",
-     "inside": "VRN-WKF002 L1 節點"
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
     },
     {
      "code": "VRN-WKF003-STP003",
@@ -222,7 +234,8 @@
      "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
      "verb": "run",
      "what": "修復狀態分類 · 品質分數 · 依品質再修",
-     "inside": "VRN-WKF002 L1 節點"
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
     },
     {
      "code": "VRN-WKF003-STP004",
@@ -231,7 +244,8 @@
      "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
      "verb": "run",
      "what": "摘要只用原文;缺 = 原文未提及",
-     "inside": "VRN-WKF002 L1 節點"
+     "inside": "VRN-WKF002 L1 節點",
+     "evidence": "self:VRN_ENG392_TextCompleteness"
     }
    ],
    "tests": {
@@ -267,12 +281,22 @@
     {
      "code": "VRN-WKF004-STP001",
      "alias": "vrn_firstpage",
-     "item": "vrn_firstpage"
+     "item": "vrn_firstpage",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     }
     },
     {
      "code": "VRN-WKF004-STP002",
      "alias": "vrn_structdb",
-     "item": "vrn_structdb"
+     "item": "vrn_structdb",
+     "known_open": {
+      "hand": "ai",
+      "why": "ENG073 自測 60/64:㉑㉒㉓ 缺 pydantic(操作員裝件)+ ⓬ 只讀命令冊尾版字面、看不見 v0244 起的薄尾 dot-source 鏈(via-repairprice 執行期仍在;與全景 v0116 同類假紅)→ AI 下一輪開 ENG073 新版改沿鏈",
+      "ref": "Z262 同類"
+     }
     },
     {
      "code": "VRN-WKF004-STP003",
@@ -367,7 +391,12 @@
     {
      "code": "VRN-WKF006-STP001",
      "alias": "vrn_firstpage",
-     "item": "vrn_firstpage"
+     "item": "vrn_firstpage",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     }
     },
     {
      "code": "VRN-WKF006-STP002",
