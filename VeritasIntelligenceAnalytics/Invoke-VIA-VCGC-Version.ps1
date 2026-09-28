@@ -23,7 +23,9 @@ Set-Location -LiteralPath (Split-Path -Parent $via)
 $env:VIA_FROM_VCGC = "YES"
 $env:VIA_VCGC_PUSH = "NO"
 Write-Host "======== 只貼黃色 ========" -ForegroundColor Yellow
-& python (Join-Path $via "supportive modules/registry/CGC_MDL225_VersionPanorama_v0100.py")
+# 尾版律(L04/L54):取 CGC_MDL225 最新一版(v0101 起載入器照尾版、網路載入器尾版有版號);不釘檔名
+$panorama = Get-ChildItem -LiteralPath (Join-Path $via "supportive modules/registry") -Filter "CGC_MDL225_VersionPanorama_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+& python $panorama.FullName
 $code = $LASTEXITCODE
 $page = Join-Path $via "VIA_Reports/vcgc/VIA_Version_Matrix_v0100.html"
 if (Test-Path -LiteralPath $page) {

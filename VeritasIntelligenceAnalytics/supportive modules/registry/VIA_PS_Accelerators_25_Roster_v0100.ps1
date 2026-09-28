@@ -1,5 +1,44 @@
 # VIA PowerShell 25 Accelerator Roster v0100
 # 只定義能力與治理責任；實際執行仍經 VIA 中央命令冊與同意閘。
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
 $VIA_PS_ACCELERATORS_25 = [ordered]@{
     '01' = 'AST 精準解析加速器 (AST Precision Parser Accelerator)'
     '02' = '多語言語意模型加速器 (Multi-Language Semantic Model Accelerator)'
@@ -31,3 +70,4 @@ $VIA_PS_ACCELERATORS_25 = [ordered]@{
 # 舊名稱相容：既有 PS 命令仍可讀到前 20 項；新命令讀取完整 25 項。
 $Accelerators = @($VIA_PS_ACCELERATORS_25.GetEnumerator() | ForEach-Object { "{0}. {1}" -f $_.Key, $_.Value })
 $VIA_ACCELERATOR_ROSTER_VERSION = 'VIA_PS_Accelerators_25_Roster_v0100'
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

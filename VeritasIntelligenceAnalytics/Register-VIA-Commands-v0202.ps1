@@ -12,6 +12,8 @@
 #   ③當場生效:. "<本檔路徑>"(不用新視窗不用 via)
 # =====================================================================
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+# CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; batch R16-9)
+# ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
     while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {

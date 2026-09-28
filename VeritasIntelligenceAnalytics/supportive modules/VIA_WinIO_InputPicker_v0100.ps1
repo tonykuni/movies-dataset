@@ -46,6 +46,46 @@ param(
     [switch]$FromPipe,
     [switch]$Selftest
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 $ErrorActionPreference = "Continue"
 Set-StrictMode -Off
 
@@ -320,7 +360,7 @@ function Invoke-VIAPickerSelftest {
 if ($Selftest) {
     Write-Host ""
     Write-Host "=== Windows 原生 I/O 輸入器(VIA_WinIO_InputPicker v0100)· 十一檢自測(零彈窗)==="
-    exit (Invoke-VIAPickerSelftest)
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit (Invoke-VIAPickerSelftest)
 }
 
 Write-Host ""
@@ -357,21 +397,21 @@ if ($Pick) {
 
 if (-not $raw.Count) {
     Say "FAIL" "沒有輸入。三條道擇一:-Pick File / -Pick Folder / -Path <檔或夾>,或把檔拖到 via-vrnin.cmd 上"
-    exit 2
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 
 $res = Resolve-VIAInput $raw $ext
 foreach ($n in $res.notes) { Say "OK" $n }
 if (-not $res.files.Count) {
     Say "FAIL" "解析後零報告件(誠實;不假跑)"
-    exit 2
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 Say "OK" ("就地讀 " + $res.files.Count + " 件(零複製;不進 incoming、不進任何指定位置)")
 
 if ($ListOnly) {
     foreach ($f in $res.files) { Write-Host ("    " + $f) }
     Say "OK" "-ListOnly=只列不跑"
-    exit 0
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 }
 
 $rc = Invoke-VIAVrnIntake $res.files -NoInc:$NoIncoming -OpenAfter:$Open -Timeout $TimeoutSec
@@ -379,4 +419,5 @@ Write-Host ""
 if ($rc -eq 0) { Say "OK" "總判 GREEN · 首頁擷取完成" }
 elseif ($rc -eq 2) { Say "WARN" "總判 AMBER · 引擎回無報告件(看上面逐行因由)" }
 else { Say "FAIL" ("總判 RED · rc=" + $rc) }
-exit $rc
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $rc
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

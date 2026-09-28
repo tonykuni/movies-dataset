@@ -5,6 +5,8 @@
 # 提供:$VIA_ACCEL20/$VIA_ACCEL25 冊 + Invoke-VIAGuarded(18 非阻塞看門狗)
 #       + Write-VIAProgress(16 動態進度/17 動態說明)+ Invoke-VIAParallel(并行)
 # =============================================================================
+# CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; batch R16-9)
+# ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
 $VIAPSAccelRoster = Join-Path $PSScriptRoot "registry\VIA_PS_Accelerators_25_Roster_v0100.ps1"
 if (Test-Path -LiteralPath $VIAPSAccelRoster) { . $VIAPSAccelRoster }
 

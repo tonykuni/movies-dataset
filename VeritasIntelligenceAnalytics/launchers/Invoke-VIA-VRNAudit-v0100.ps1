@@ -31,6 +31,46 @@ param(
     [int]$ProgressEverySec = 0,
     [string]$ViaRoot = ''
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -60,7 +100,7 @@ if (-not $ViaRoot) {
     $ViaRoot = Split-Path -Parent $here          # launchers\ 的上一層 = 母資料夾
 }
 if (-not (Test-Path -LiteralPath $ViaRoot -PathType Container)) {
-    Write-Line "  [FAIL] 母資料夾不存在:$ViaRoot" 'Red'; exit 2
+    Write-Line "  [FAIL] 母資料夾不存在:$ViaRoot" 'Red'; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 Set-Location -LiteralPath $ViaRoot
 
@@ -76,7 +116,7 @@ Write-Line "  存證     : $RunDir"
 # ── 1 指令冊(家族境解析要靠它)────────────────────────────────────
 $Register = Get-ChildItem -LiteralPath $ViaRoot -Filter 'Register-VIA-Commands-v*.ps1' -File -ErrorAction SilentlyContinue |
     Sort-Object Name | Select-Object -Last 1
-if (-not $Register) { Write-Line '  [FAIL] 指令註冊冊缺(Register-VIA-Commands-v*.ps1)' 'Red'; exit 2 }
+if (-not $Register) { Write-Line '  [FAIL] 指令註冊冊缺(Register-VIA-Commands-v*.ps1)' 'Red'; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 . $Register.FullName | Out-Null
 Write-Line "  指令冊   : $($Register.Name)"
 
@@ -118,7 +158,7 @@ function Get-Newest([string]$Folder, [string]$Pattern) {
 
 $Eng83 = Get-Newest 'functional modules\VRN' 'VRN_ENG083_VerifiedMatrix_v*.py'
 $Eng73 = Get-Newest 'functional modules\VRN' 'VRN_ENG073_ReportStructuredDB_v*.py'
-if (-not $Eng83) { Write-Line '  [FAIL] 找不到 VRN_ENG083_VerifiedMatrix_v*.py' 'Red'; exit 2 }
+if (-not $Eng83) { Write-Line '  [FAIL] 找不到 VRN_ENG083_VerifiedMatrix_v*.py' 'Red'; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 Write-Line "  矩陣引擎 : $(Split-Path $Eng83 -Leaf)"
 
 # ── 4 進度條:@@PROGRESS 是**第二個內層來源**(批619)──────────────
@@ -321,4 +361,5 @@ if ($Verdict -eq 'ABSENT') {
     Write-Line "    3) 逐步原文在 $RunDir"
 }
 # 誠實四態照原樣往外送:0=GREEN 1=RED 2=NODATA 3=ABSENT
-exit $(switch ($Verdict) { 'GREEN' { 0 } 'NODATA' { 2 } 'ABSENT' { 3 } default { 1 } })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(switch ($Verdict) { 'GREEN' { 0 } 'NODATA' { 2 } 'ABSENT' { 3 } default { 1 } })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

@@ -8,6 +8,45 @@
 #   本檔不裝套件(.sh ⓪ 的 pip 自補是容器非持久境的事;工作站家族境是操作員的手)、不改同意閘行為(批123/137/150 常令授權沿用)。
 # marker 防重複:每日首跑才實跑;log 落 VIA_Reports/boot_update_logs/
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
     while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
@@ -32,11 +71,11 @@ $TODAY = [TimeZoneInfo]::ConvertTimeBySystemTimeZoneId([DateTimeOffset]::UtcNow,
 
 New-Item -ItemType Directory -Force -Path $LOGD, $MEGA | Out-Null
 try { New-Item -ItemType Directory -Path $LOCK -ErrorAction Stop | Out-Null }
-catch { Write-Host "[boot-ps1] BUSY: $LOCK（另一輪尚未釋放；異常中斷須先核對工作站行程）"; exit 3 }
+catch { Write-Host "[boot-ps1] BUSY: $LOCK（另一輪尚未釋放；異常中斷須先核對工作站行程）"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 3 }
 try {
 if ((Test-Path $MARK) -and (Test-Path $VERIFIED) -and ((Get-Content $MARK -ErrorAction SilentlyContinue) -eq $TODAY) -and ((Get-Content $VERIFIED -ErrorAction SilentlyContinue) -eq $TODAY)) {
     Add-Content (Join-Path $LOGD "skip.log") "[boot-update] $TODAY 已更(marker)=SKIP(ps1)"
-    exit 0
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 }
 $LOG = Join-Path $LOGD ("BOOT_" + (Get-Date -Format "yyyyMMdd_HHmmss") + "_ps1.log")
 $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"
@@ -74,9 +113,9 @@ if ($envpy) {
 Add-Content $LOG "=== VIA 開機更新 $TODAY(ps1 載體;節序=via_boot_update.sh 正主)==="
 Add-Content $LOG "--- ⓪ 家族境 python(尺=CGC_MDL136 envpy):$PY · $PYSTATE(本檔不裝套件;境缺=操作員的手)"
 Step "擷取前查庫（正主目錄；失敗即停）" (Newest $REG "CGC_MDL123_DataHome_v*.py") @("catalog")
-if ($script:BootLastRc -ne 0) { exit 2 }
+if ($script:BootLastRc -ne 0) { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 Step "增量缺口（不使用舊目錄猜）" (Newest $ENG "VDF_ENG089_IncrementalFetchGate_v*.py") @("plan", "--deep")
-if ($script:BootLastRc -ne 0) { exit 2 }
+if ($script:BootLastRc -ne 0) { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 Step "① OmniFetch 全車道"          (Newest $ENG "VDF_ENG055_OmniFetch_v*.py") @("run")
 Step "② 價格增量"                  (Newest $ENG "VDF_ENG054_TWDailyBackfill_v*.py") @("run")
 Step "②b 調整後價格層(批178)"    (Newest $ENG "VDF_ENG060_AdjPriceLayer_v*.py") @("build")
@@ -131,8 +170,9 @@ if ($script:BootFailed -eq 0) {
     Set-Content $MARK $TODAY -ErrorAction Stop
     Set-Content $VERIFIED $TODAY -ErrorAction Stop
     Write-Host "[boot-ps1] COMPLETE：子步 rc 全為 0；資料涵蓋仍以各閘為準 · log=$LOG"
-    exit 0
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 }
 Write-Host "[boot-ps1] INCOMPLETE：$script:BootFailed 個子步非零；同日可重試 · log=$LOG"
-exit 1
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1
 } finally { Remove-Item -LiteralPath $LOCK -Force -ErrorAction Stop }
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

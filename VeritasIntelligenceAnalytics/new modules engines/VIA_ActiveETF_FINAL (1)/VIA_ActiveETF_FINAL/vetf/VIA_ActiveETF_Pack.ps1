@@ -17,6 +17,46 @@ param(
     [switch]$SyncBundle,
     [switch]$NoExe
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 
 $script:Core = @("VIA_ActiveETF_System.py","console_merged_template.html","VIA_ActiveETF.ps1","VIA_ActiveETF_Console.html","VIA_ActiveETF_PackList.json")
 $script:Used = @("VeritasAegisNexus.py","VeritasCeleritas.py","VIA_EnvManager.py","VIA_SSOT_Unified.py")
@@ -30,7 +70,7 @@ function Find-Python {
 }
 
 # ---------- INTEGRATE ----------
-if (-not (Test-Path $Root)) { Write-Status FAIL "找不到 vetf 資料夾：$Root"; exit 1 }
+if (-not (Test-Path $Root)) { Write-Status FAIL "找不到 vetf 資料夾：$Root"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 Write-Status INFO ("Root = {0}" -f $Root)
 $missing = @($script:Core | Where-Object { -not (Test-Path (Join-Path $Root $_)) })
 if ($missing.Count) { foreach ($m in $missing) { Write-Status WARN "缺核心檔：$m" } }
@@ -55,7 +95,7 @@ if ($Sync) {
         & $py[0] ($py[1..($py.Count-1)] + $a); if ($LASTEXITCODE -eq 0) { Write-Status OK "Console 已重建。" } else { Write-Status WARN "sync 非零，沿用現有 Console。" }
     } else { Write-Status WARN "缺 Python/模板，略過 sync。" }
 }
-if (-not (Test-Path $consoleSrc)) { Write-Status FAIL "找不到 Console.html"; exit 1 }
+if (-not (Test-Path $consoleSrc)) { Write-Status FAIL "找不到 Console.html"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 
 # ---------- COPY：Console + PWA 資產 ----------
 Copy-Item -LiteralPath $consoleSrc -Destination (Join-Path $Dist "VIA_ActiveETF_Console.html") -Force
@@ -105,7 +145,7 @@ if ($SyncBundle) {
 }
 
 # ---------- PACK → EXE（.NET 編譯，內嵌 Console）----------
-if ($NoExe) { Write-Status OK "NoExe：完成打包（dist 內含 Console + PWA）。"; exit 0 }
+if ($NoExe) { Write-Status OK "NoExe：完成打包（dist 內含 Console + PWA）。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0 }
 Write-Status INFO "PACK：內嵌 Console → 編譯 EXE..."
 $bytes = [IO.File]::ReadAllBytes($consoleSrc)
 $b64 = [Convert]::ToBase64String($bytes)
@@ -147,4 +187,5 @@ try {
 }
 Write-Status OK "DONE：dist 內含 VIA_ActiveETF.exe + Console + PWA(manifest/sw/icons)。"
 Write-Status INFO "PWA 安裝：以 http 提供 dist（如 'py -m http.server'）後用 Edge/Chrome 開 Console → 網址列『安裝』。"
-exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

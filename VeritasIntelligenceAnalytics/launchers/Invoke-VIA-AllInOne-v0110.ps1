@@ -56,6 +56,46 @@ param(
     [switch]$ProgressLines,   # 批618:強制「每 N 秒印一行」(要複製逐字稿時用;\r 重畫抓下來會有殘影)
     [int]$ProgressEverySec = 0  # 0=自動(TTY 1s / 非 TTY 30s)
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -113,7 +153,7 @@ if (-not $ViaRoot) {
     $ViaRoot = Split-Path -Parent $here          # launchers\ 的上一層 = 母資料夾
 }
 if (-not (Test-Path -LiteralPath $ViaRoot -PathType Container)) {
-    Write-Line "  [FAIL] 母資料夾不存在:$ViaRoot" 'Red'; exit 2
+    Write-Line "  [FAIL] 母資料夾不存在:$ViaRoot" 'Red'; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 Set-Location -LiteralPath $ViaRoot
 Write-Line "`n=== VIA ALL-IN-ONE v$SelfVer(同步 + 25 加速器 + 全系統實測)===" 'Cyan'
@@ -232,14 +272,14 @@ if (-not $NoSync) {
 # ── 1 指令冊(短令 + 中央 python 入口)─────────────────────────────────────
 $Register = Get-ChildItem -LiteralPath $ViaRoot -Filter 'Register-VIA-Commands-v*.ps1' -File -ErrorAction SilentlyContinue |
     Sort-Object Name | Select-Object -Last 1
-if (-not $Register) { Write-Line '  [FAIL] 指令註冊冊缺(Register-VIA-Commands-v*.ps1)' 'Red'; exit 2 }
+if (-not $Register) { Write-Line '  [FAIL] 指令註冊冊缺(Register-VIA-Commands-v*.ps1)' 'Red'; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 . $Register.FullName
 Set-Location -LiteralPath $ViaRoot
 Write-Line "`n  指令冊   : $($Register.Name)"
 
 if (-not (Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)) {
     Write-Line '  [FAIL] 中央 python 入口 Invoke-VIAPython 不在;禁止繞過 VIA 直呼 python(fail-closed)' 'Red'
-    exit 2
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 
 # ── 2 加速器 25 名冊 ───────────────────────────────────────────────────────
@@ -743,4 +783,5 @@ if ($OpenPage -and (Get-Command via-open -ErrorAction SilentlyContinue)) {
     via-open (Join-Path $ViaRoot 'VIA_Reports\vcgc\VIA_UI_MatrixControl_v0100.html')
 }
 # 誠實三態 rc:0 綠 · 1 紅 · 2 黃(黃不是綠)
-exit $(switch ($verdict) { 'GREEN' { 0 } 'RED' { 1 } default { 2 } })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(switch ($verdict) { 'GREEN' { 0 } 'RED' { 1 } default { 2 } })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

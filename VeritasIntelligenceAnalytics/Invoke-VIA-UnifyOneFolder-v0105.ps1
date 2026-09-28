@@ -73,6 +73,46 @@ param(
     [switch]$SkipOldClone,
     [switch]$Plan
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -148,11 +188,11 @@ Start-Transcript -Path (Join-Path $EvDir "UNIFY_$Ts.log") -Append | Out-Null
 # ---- S1 前檢:解譯器+加速器 -------------------------------------------------
 if (-not (Test-Path -LiteralPath $NewVia -PathType Container)) {
     Add-Step 'S1 前檢' 'FAIL' "唯一正典不存在:$NewVia"
-    Stop-Transcript | Out-Null; exit 1
+    Stop-Transcript | Out-Null; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1
 }
 $Py = if (Get-Command py -ErrorAction SilentlyContinue) { 'py' }
       elseif (Get-Command python -ErrorAction SilentlyContinue) { 'python' } else { $null }
-if (-not $Py) { Add-Step 'S1 前檢' 'FAIL' '無 python/py'; Stop-Transcript | Out-Null; exit 1 }
+if (-not $Py) { Add-Step 'S1 前檢' 'FAIL' '無 python/py'; Stop-Transcript | Out-Null; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 $env:VIA_OLDSCAN_WORKERS = "$Accelerators"                       # 25 個加速器注入 oldscan
 $env:Path = (Join-Path $NewVia 'bin') + ';' + $env:Path          # PATH 錨定新正典 bin(修舊 bin 誤掛)
 $fd = [bool](Get-Command fd -ErrorAction SilentlyContinue)
@@ -184,7 +224,7 @@ if ($rc -ne 0) { Write-Line 'WARN' '拉新失敗仍續行(用既有版本,誠實
 # ---- S3 動態解析最新版 oldscan(嚴禁寫死版號) -------------------------------
 $scanner = Get-ChildItem -LiteralPath (Join-Path $NewVia 'supportive modules\registry') `
     -Filter 'via_oldroot_scan_v0*.py' | Sort-Object Name | Select-Object -Last 1
-if (-not $scanner) { Add-Step 'S3 解析 oldscan' 'FAIL' '查無 via_oldroot_scan_v0*.py'; Stop-Transcript | Out-Null; exit 1 }
+if (-not $scanner) { Add-Step 'S3 解析 oldscan' 'FAIL' '查無 via_oldroot_scan_v0*.py'; Stop-Transcript | Out-Null; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 Add-Step 'S3 解析 oldscan' 'OK' $scanner.Name
 $launcher = Get-ChildItem -LiteralPath (Join-Path $NewVia 'supportive modules\registry') `
     -Filter 'via_py_celeritas_launcher_v0*.py' -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
@@ -318,5 +358,6 @@ $skip = @($Steps | Where-Object state -eq 'SKIP').Count
 Write-Line ($(if ($fail -eq 0) { 'OK' } else { 'FAIL' })) "OK $ok · FAIL $fail · SKIP $skip · 存證 VIA_Reports\unify_runs\UNIFY_$Ts.json"
 Write-Line 'WARN' '兩棵舊樹=退役候裁:零刪除不動,僅停止寫入;清理時機由操作員裁決'
 Stop-Transcript | Out-Null
-exit $(if ($fail -eq 0) { 0 } else { 1 })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(if ($fail -eq 0) { 0 } else { 1 })
 
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

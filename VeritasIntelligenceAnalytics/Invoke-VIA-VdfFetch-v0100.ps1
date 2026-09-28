@@ -24,6 +24,46 @@ param(
     [switch]$NoEnter,
     [string]$Root = ""
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -69,7 +109,7 @@ function Get-Tail([string]$Dir, [string]$Pat) {
 $VIA = Resolve-VIARoot $Root
 if (-not $VIA) {
     Write-Host "  [FAIL] 找不到 VIA 根(需含 Register-VIA-Commands-v*.ps1)。請加 -Root <VeritasIntelligenceAnalytics 完整路徑>" -ForegroundColor Red
-    if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 }
+    if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 }
 Write-Host ("=== [via-vdffetch] 單一 PowerShell 啟動 VDF · 根 " + $VIA + " ===") -ForegroundColor Cyan
 
@@ -107,7 +147,7 @@ if ($PY -eq "python") {
 }
 
 # ---------------------------------------------------------------- ⑤ 年份旗標
-if (-not ($Year -match "^\d{4}$")) { Write-Host ("  [FAIL] -Year 需四位數年份,收到:" + $Year) -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 } }
+if (-not ($Year -match "^\d{4}$")) { Write-Host ("  [FAIL] -Year 需四位數年份,收到:" + $Year) -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 } }
 $env:VIA_HIST_SINCE = $Year + "-01-01"
 $env:VIA_REV_SINCE = $Year + "-01"
 if ($Limit -gt 0) { $env:VIA_HIST_LIMIT = "" + $Limit } else { $env:VIA_HIST_LIMIT = "" }
@@ -120,13 +160,13 @@ $accel = Get-Tail (Join-Path $VIA "supportive modules") "SUP_MDL737_SuperAccelMo
 if ($accel) { & $PY $accel --activate } else { Write-Host "  [加速器] 模組缺=略(graceful)" -ForegroundColor Yellow }
 
 $lanes = Get-Tail (Join-Path $VIA "supportive modules\registry") "CGC_MDL134_ParallelLanes_v*.py"
-if (-not $lanes) { Write-Host "  [FAIL] 十道並行編排引擎缺(CGC_MDL134_ParallelLanes_v*.py)" -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { exit 2 } }
+if (-not $lanes) { Write-Host "  [FAIL] 十道並行編排引擎缺(CGC_MDL134_ParallelLanes_v*.py)" -ForegroundColor Red; if ($script:Dotted) { $global:LASTEXITCODE = 2; return } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 } }
 Write-Step "⑥ 九頭龍哨兵 H1-H6(唯讀;H3 進程雙頭/H5 尾版律 FAIL=誠實停)"
 $plan = (& $PY $lanes plan 2>&1 | Out-String)
 Write-Host $plan
 if ($plan -match "H3 FAIL|H5 FAIL") {
     Write-Host "=== [via-vdffetch] 九頭龍風險(見上 H3/H5)=誠實停;關閉另一條在跑的鏈或修尾版後重試 ===" -ForegroundColor Red
-    if ($script:Dotted) { $global:LASTEXITCODE = 3; return } else { exit 3 }
+    if ($script:Dotted) { $global:LASTEXITCODE = 3; return } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 3 }
 }
 
 # ---------------------------------------------------------------- ⑦ 十一步資料鏈十道並行
@@ -143,4 +183,5 @@ $proj = Get-Tail (Join-Path $VIA "supportive modules\registry") "CGC_MDL131_Proj
 if ($proj) { & $PY $proj digest }
 
 Write-Host ("=== [via-vdffetch] 畢 rc=" + $rc + ";看頁:via-open 架構 / via-open 竣工(零跳出律:頁只落檔)===") -ForegroundColor Cyan
-if ($script:Dotted) { $global:LASTEXITCODE = $rc } else { exit $rc }
+if ($script:Dotted) { $global:LASTEXITCODE = $rc } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $rc }
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

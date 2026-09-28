@@ -19,6 +19,8 @@
 #   短令冊 v0189 起,三種 python 呼叫形狀一律改走 Invoke-VIAPython;啟動器逐個接。
 # =====================================================================================
 
+# CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; batch R16-9)
+# ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
 if (-not (Get-Variable -Name VIA_ACCEL25 -Scope Global -ErrorAction SilentlyContinue)) {
     $accelMod = Join-Path $PSScriptRoot "VIA_PS_Accel_Module.ps1"
     if (Test-Path -LiteralPath $accelMod) { . $accelMod }

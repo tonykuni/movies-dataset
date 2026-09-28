@@ -1,4 +1,6 @@
 #requires -Version 7.0
+# CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; batch R16-9)
+# ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
 Set-StrictMode -Version Latest
 
 function Resolve-VDFDataRoot {

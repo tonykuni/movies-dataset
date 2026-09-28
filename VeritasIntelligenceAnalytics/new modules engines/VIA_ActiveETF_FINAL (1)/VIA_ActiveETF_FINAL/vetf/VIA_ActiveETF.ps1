@@ -14,6 +14,46 @@ param(
     [switch]$NoBrowser,
     [switch]$NoSync
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 
 $script:Console  = "VIA_ActiveETF_Console.html"
 $script:PyModule = "VIA_ActiveETF_System.py"
@@ -72,7 +112,7 @@ function Select-Folder { param([string]$Title,[string]$Start)
 # ---- locate ----
 Write-Status INFO "VIA Active ETF — SYNC & ACTIVATE"
 $root = Resolve-Root -Hint $Root -Need $script:PyModule
-if (-not $root) { Write-Status FAIL "找不到 $script:PyModule。請與其放同資料夾或用 -Root 指定。"; exit 1 }
+if (-not $root) { Write-Status FAIL "找不到 $script:PyModule。請與其放同資料夾或用 -Root 指定。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 Write-Status OK "Root = $root"
 if (-not (Test-Path (Join-Path $root $script:Template))) { Write-Status WARN "missing template: $script:Template（sync 將沿用現有 Console）" }
 
@@ -88,7 +128,7 @@ Write-Status OK ("BASE = {0}" -f $Base)
 # ---- SYNC（呼叫 PY）----
 if (-not $NoSync) {
     $py = Find-Python
-    if (-not $py) { Write-Status FAIL "找不到 Python（py 啟動器 / python）。"; exit 1 }
+    if (-not $py) { Write-Status FAIL "找不到 Python（py 啟動器 / python）。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
     Write-Status INFO ("Python = {0}" -f ($py -join ' '))
     $logo = Join-Path $root "VIA_logo.png"
     $pyArgs = @((Join-Path $root $script:PyModule), "sync",
@@ -99,16 +139,17 @@ if (-not $NoSync) {
     $r = Invoke-Proc -Exe $py[0] -ArgList ($py[1..($py.Count-1)] + $pyArgs) -TimeoutSec 900 -Activity "VIA sync"
     $code = $r.Exit
     if ($r.Killed) { Write-Status WARN "sync 逾時已結束；仍嘗試以現有 HTML 啟動。" }
-    elseif ($code -eq 2) { Write-Status FAIL "eco 守門 BLOCK（套件/環境衝突）。已停止，未啟動 UI。"; exit 2 }
+    elseif ($code -eq 2) { Write-Status FAIL "eco 守門 BLOCK（套件/環境衝突）。已停止，未啟動 UI。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
     elseif ($code -ne 0) { Write-Status WARN "sync 回傳非零（$code）；仍嘗試以現有 HTML 啟動。" }
     else { Write-Status OK ("SYNC 完成 {0}s（PARQUET 增量 + HTML UI 已建置）。" -f $r.Seconds) }
 } else { Write-Status INFO "NoSync：略過資料同步，直接啟動現有 UI。" }
 
 # ---- ACTIVATE（跳出 HTML UI）----
 $consolePath = Join-Path $root $script:Console
-if (-not (Test-Path $consolePath)) { Write-Status FAIL "找不到 $script:Console（請先成功 sync）。"; exit 1 }
-if ($NoBrowser) { Write-Status OK "Done（NoBrowser）。開啟：$consolePath"; exit 0 }
+if (-not (Test-Path $consolePath)) { Write-Status FAIL "找不到 $script:Console（請先成功 sync）。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
+if ($NoBrowser) { Write-Status OK "Done（NoBrowser）。開啟：$consolePath"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0 }
 Write-Status INFO "Activating Console UI..."
 Start-Process $consolePath
 Write-Status OK "VIA Active ETF 已同步並啟動。BASE/DICT 已注入並凍結。"
-exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit
