@@ -5,10 +5,193 @@
  ],
  "batch": 588,
  "ts": "2026-09-24 20:05",
- "engines": 77,
+ "engines": 80,
  "store": "VIA_Capability_Store__vdf.sqlite",
- "note": "一族一本,一引擎一張卡,只收尾版。這次以樹上尾版為準;能力庫不在,新卡的 owns 留空。",
+ "note": "一族一本,一引擎一張卡,只收尾版。這次以樹上尾版為準;能力庫不在,新卡的 owns 留空。 · R17(2026-09-28)補 3 張(ENG229/230/231;以 CGC_MDL161 同一套抽取器產生;能力庫不在,owns 留空)",
  "cards": [
+  {
+   "engine": "VDF_ENG045_OutputHub_v0101",
+   "path": "functional modules/VDF/VDF_ENG045_OutputHub_v0101.py",
+   "version": "0101",
+   "purpose": "vdf_output_hub_v0100 — VDF 統一參數+全格式輸出樞紐(TOOL-058;操作員令 2026-08-18)",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG092_TWFlowsAdjConsensus_v0100",
+   "path": "functional modules/VDF/VDF_ENG092_TWFlowsAdjConsensus_v0100.py",
+   "version": "0100",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG093_LaunchConsole_v0103",
+   "path": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py",
+   "version": "0103",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL002_YFinanceFetchingEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_MDL002_YFinanceFetchingEngine.py",
+   "verbs": [],
+   "flags": [
+    "--etf-only",
+    "--non-etf-only"
+   ],
+   "contract": [],
+   "owns": [
+    "build.backup",
+    "compute.tier2_per_etf",
+    "compute.tier4_composite",
+    "detect.ssot",
+    "detect.tw_ticker_format",
+    "filter.etf_only",
+    "load.batch_v17",
+    "load.existing",
+    "load.market_info",
+    "load.missing_dates",
+    "load.region_market",
+    "load.single_v5",
+    "load.yfinance",
+    "log.plain_summary"
+   ],
+   "owns_n": 30,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL003_SentimentMacroEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_MDL003_SentimentMacroEngine.py",
+   "verbs": [
+    "cnn_subindicators",
+    "indicator"
+   ],
+   "flags": [
+    "--aaii",
+    "--akshare",
+    "--cnn",
+    "--fred"
+   ],
+   "contract": [],
+   "owns": [
+    "load.http",
+    "load.one",
+    "log.plain_summary",
+    "log.rich_summary_matrix",
+    "misc.ak_call",
+    "misc.backup",
+    "misc.end_date",
+    "misc.interactive_menu",
+    "misc.now_iso",
+    "misc.today",
+    "misc.try_excel",
+    "misc.try_html",
+    "misc.via_fred_keyfile",
+    "render.header"
+   ],
+   "owns_n": 17,
+   "tables": [],
+   "deps": [
+    "VRN_MDL013_AKShareFetcher",
+    "VRN_MDL014_MacroFetcher"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL004_TWFullMarketEngine_v0100",
+   "path": "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py",
+   "version": "0100",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL006_FinancialModel_v0100",
+   "path": "functional modules/VDF/VDF_MDL006_FinancialModel_v0100.py",
+   "version": "0100",
+   "purpose": "",
+   "verbs": [],
+   "flags": [],
+   "contract": [
+    "selftest"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_MDL007_SSOTResolver_v0100",
+   "path": "functional modules/VDF/VDF_MDL007_SSOTResolver_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_MDL007_SSOTResolver.py",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [
+    "load.batch",
+    "load.bwibbu",
+    "load.company_basic",
+    "load.daily",
+    "load.http",
+    "load.one",
+    "load.pe_ratio",
+    "load.record",
+    "log.rich_summary",
+    "merge.codes",
+    "merge.name",
+    "misc.cached",
+    "misc.canonical",
+    "misc.gather_inputs"
+   ],
+   "owns_n": 23,
+   "tables": [],
+   "deps": [
+    "VDF_MDL101_OutputManager"
+   ],
+   "has_selftest": true
+  },
   {
    "engine": "VDF_ENG046_FetchMatrixRegistry_v0100",
    "path": "functional modules/VDF/engine/VDF_ENG046_FetchMatrixRegistry_v0100.py",
@@ -1617,157 +1800,6 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_MDL002_YFinanceFetchingEngine_v0100",
-   "path": "functional modules/VDF/VDF_MDL002_YFinanceFetchingEngine_v0100.py",
-   "version": "0100",
-   "purpose": "VDF_MDL002_YFinanceFetchingEngine.py",
-   "verbs": [],
-   "flags": [
-    "--etf-only",
-    "--non-etf-only"
-   ],
-   "contract": [],
-   "owns": [
-    "build.backup",
-    "compute.tier2_per_etf",
-    "compute.tier4_composite",
-    "detect.ssot",
-    "detect.tw_ticker_format",
-    "filter.etf_only",
-    "load.batch_v17",
-    "load.existing",
-    "load.market_info",
-    "load.missing_dates",
-    "load.region_market",
-    "load.single_v5",
-    "load.yfinance",
-    "log.plain_summary"
-   ],
-   "owns_n": 30,
-   "tables": [],
-   "deps": [],
-   "has_selftest": true
-  },
-  {
-   "engine": "VDF_MDL003_SentimentMacroEngine_v0100",
-   "path": "functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py",
-   "version": "0100",
-   "purpose": "VDF_MDL003_SentimentMacroEngine.py",
-   "verbs": [
-    "cnn_subindicators",
-    "indicator"
-   ],
-   "flags": [
-    "--aaii",
-    "--akshare",
-    "--cnn",
-    "--fred"
-   ],
-   "contract": [],
-   "owns": [
-    "load.http",
-    "load.one",
-    "log.plain_summary",
-    "log.rich_summary_matrix",
-    "misc.ak_call",
-    "misc.backup",
-    "misc.end_date",
-    "misc.interactive_menu",
-    "misc.now_iso",
-    "misc.today",
-    "misc.try_excel",
-    "misc.try_html",
-    "misc.via_fred_keyfile",
-    "render.header"
-   ],
-   "owns_n": 17,
-   "tables": [],
-   "deps": [
-    "VRN_MDL013_AKShareFetcher",
-    "VRN_MDL014_MacroFetcher"
-   ],
-   "has_selftest": true
-  },
-  {
-   "engine": "VDF_MDL007_SSOTResolver_v0100",
-   "path": "functional modules/VDF/VDF_MDL007_SSOTResolver_v0100.py",
-   "version": "0100",
-   "purpose": "VDF_MDL007_SSOTResolver.py",
-   "verbs": [],
-   "flags": [],
-   "contract": [],
-   "owns": [
-    "load.batch",
-    "load.bwibbu",
-    "load.company_basic",
-    "load.daily",
-    "load.http",
-    "load.one",
-    "load.pe_ratio",
-    "load.record",
-    "log.rich_summary",
-    "merge.codes",
-    "merge.name",
-    "misc.cached",
-    "misc.canonical",
-    "misc.gather_inputs"
-   ],
-   "owns_n": 23,
-   "tables": [],
-   "deps": [
-    "VDF_MDL101_OutputManager"
-   ],
-   "has_selftest": true
-  },
-  {
-   "engine": "VDF_ENG045_OutputHub_v0101",
-   "path": "functional modules/VDF/VDF_ENG045_OutputHub_v0101.py",
-   "version": "0101",
-   "purpose": "vdf_output_hub_v0100 — VDF 統一參數+全格式輸出樞紐(TOOL-058;操作員令 2026-08-18)",
-   "verbs": [],
-   "flags": [],
-   "contract": [
-    "selftest"
-   ],
-   "owns": [],
-   "owns_n": 0,
-   "tables": [],
-   "deps": [],
-   "has_selftest": true
-  },
-  {
-   "engine": "VDF_ENG092_TWFlowsAdjConsensus_v0100",
-   "path": "functional modules/VDF/VDF_ENG092_TWFlowsAdjConsensus_v0100.py",
-   "version": "0100",
-   "purpose": "",
-   "verbs": [],
-   "flags": [],
-   "contract": [
-    "selftest"
-   ],
-   "owns": [],
-   "owns_n": 0,
-   "tables": [],
-   "deps": [],
-   "has_selftest": true
-  },
-  {
-   "engine": "VDF_ENG093_LaunchConsole_v0103",
-   "path": "functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py",
-   "version": "0103",
-   "purpose": "",
-   "verbs": [],
-   "flags": [],
-   "contract": [
-    "selftest"
-   ],
-   "owns": [],
-   "owns_n": 0,
-   "tables": [],
-   "deps": [],
-   "has_selftest": true
-  },
-  {
    "engine": "VDF_ENG094_ActiveETFActivity_v0100",
    "path": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0100.py",
    "version": "0100",
@@ -2068,20 +2100,6 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_ENG117_ForwardVintage_v0101",
-   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v0101.py",
-   "version": "0101",
-   "purpose": "Point-in-time forward valuation vintage reference implementation v2.",
-   "verbs": [],
-   "flags": [],
-   "contract": [],
-   "owns": [],
-   "owns_n": 0,
-   "tables": [],
-   "deps": [],
-   "has_selftest": false
-  },
-  {
    "engine": "VDF_ENG117_ForwardVintageDoor_v0100",
    "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v0100.py",
    "version": "0100",
@@ -2096,6 +2114,20 @@
    "tables": [],
    "deps": [],
    "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG117_ForwardVintage_v0101",
+   "path": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v0101.py",
+   "version": "0101",
+   "purpose": "Point-in-time forward valuation vintage reference implementation v2.",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
   },
   {
    "engine": "VDF_ENG118_ExportDesk_v0100",
@@ -2144,36 +2176,97 @@
    "has_selftest": true
   },
   {
-   "engine": "VDF_MDL004_TWFullMarketEngine_v0100",
-   "path": "functional modules/VDF/VDF_MDL004_TWFullMarketEngine_v0100.py",
+   "engine": "VDF_ENG229_CNNFearGreedHistory_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v0100.py",
    "version": "0100",
-   "purpose": "",
-   "verbs": [],
-   "flags": [],
+   "purpose": "VDF_ENG229_CNNFearGreedHistory v0100 — CNN 恐懼與貪婪指數「全歷史」回補(只增不覆寫)",
+   "verbs": [
+    "run",
+    "status"
+   ],
+   "flags": [
+    "--csv",
+    "--dry",
+    "--start"
+   ],
    "contract": [
+    "run",
     "selftest"
    ],
    "owns": [],
    "owns_n": 0,
    "tables": [],
-   "deps": [],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
    "has_selftest": true
   },
   {
-   "engine": "VDF_MDL006_FinancialModel_v0100",
-   "path": "functional modules/VDF/VDF_MDL006_FinancialModel_v0100.py",
+   "engine": "VDF_ENG230_ForwardValuation_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG230_ForwardValuation_v0100.py",
    "version": "0100",
-   "purpose": "",
-   "verbs": [],
-   "flags": [],
+   "purpose": "VDF_ENG230_ForwardValuation v0100 — 指數 Forward PER / EPS 唯一正主(兩支附件整合:A 的廣度 × B 的嚴謹)",
+   "verbs": [
+    "run",
+    "status"
+   ],
+   "flags": [
+    "--days",
+    "--dry"
+   ],
    "contract": [
+    "run",
+    "selftest",
+    "status"
+   ],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [
+    "SUP_MDL740_NetUnified"
+   ],
+   "has_selftest": true
+  },
+  {
+   "engine": "VDF_ENG231_GlobalListings_v0100",
+   "path": "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0100.py",
+   "version": "0100",
+   "purpose": "VDF_ENG231_GlobalListings v0100 — 美 · 日 · 台 個股總清單 + 每日主動式台股 ETF 總清單(一個出口)",
+   "verbs": [
+    "lists",
+    "run",
+    "status"
+   ],
+   "flags": [
+    "--dry",
+    "--only"
+   ],
+   "contract": [
+    "run",
     "selftest"
    ],
    "owns": [],
    "owns_n": 0,
    "tables": [],
-   "deps": [],
+   "deps": [
+    "SUP_MDL740_NetUnified",
+    "VDF_ENG087_MarketListGovernance"
+   ],
    "has_selftest": true
+  },
+  {
+   "engine": "VDF_InjectAccelNetBridges_v0104",
+   "path": "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py",
+   "version": "0104",
+   "purpose": "VDF_InjectAccelNetBridges_v0104 — 只增不減錨點注入器",
+   "verbs": [],
+   "flags": [],
+   "contract": [],
+   "owns": [],
+   "owns_n": 0,
+   "tables": [],
+   "deps": [],
+   "has_selftest": false
   },
   {
    "engine": "vdf_input_matrix_v0100",
@@ -2190,20 +2283,6 @@
    "tables": [],
    "deps": [],
    "has_selftest": true
-  },
-  {
-   "engine": "VDF_InjectAccelNetBridges_v0104",
-   "path": "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py",
-   "version": "0104",
-   "purpose": "VDF_InjectAccelNetBridges_v0104 — 只增不減錨點注入器",
-   "verbs": [],
-   "flags": [],
-   "contract": [],
-   "owns": [],
-   "owns_n": 0,
-   "tables": [],
-   "deps": [],
-   "has_selftest": false
   }
  ],
  "token_ledger": {

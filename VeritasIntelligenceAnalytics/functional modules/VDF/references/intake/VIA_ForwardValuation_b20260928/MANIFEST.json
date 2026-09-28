@@ -1,0 +1,23 @@
+{
+ "schema": "VIA.Intake.Manifest.v1",
+ "batch": "b20260928",
+ "received": "2026-09-28",
+ "from": "操作員上傳(Claude 對話附件兩支)",
+ "rule": "收容件一個位元不動(L03);引擎 VDF_ENG230 從這裡載入、在記憶體裡補丁,不改這兩支",
+ "files": {
+  "forward_valuation_vintage_v2_2.py": {
+   "sha256": "12540f67fbb1aa57fad0f04834ef2b33330245eff528ba829adcdb6ff3903d21",
+   "bytes": 100557,
+   "lines": 2612
+  },
+  "via_fwdper_free4_fetch.py": {
+   "sha256": "4666bd7c61bac68f1374f73e84bbaed6a6d5eeaded2c611e7b56e75699bf451e",
+   "bytes": 37457,
+   "lines": 583
+  }
+ },
+ "known_issues": {
+  "forward_valuation_vintage_v2_2.py": "pandas 3.x:_prepare_asof_inputs 的 merge_asof 兩邊日期精度不同(datetime64[us] vs [s])→ MergeError;ENG230 載入時補成 datetime64[ns](不改原檔);另:頁面沒有發布時間 meta 時,extract_factset_article_document 把發布時間設成擷取日 23:59:59(晚於擷取時刻)→ 必拋 ValueError,走不到 date-only 複核狀態;ENG230 攔下當 B_REJECT(不升格)",
+  "via_fwdper_free4_fetch.py": "直接 urllib 外呼、yfinance 後備也直連 → ENG230 換成統包網路工具 curl_bytes(雙閘)並封掉 yfinance 後備"
+ }
+}
