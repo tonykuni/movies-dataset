@@ -506,8 +506,10 @@ try {
         $rcN = @($ls.lines | Where-Object { $_ -match 'RC-\d+' }).Count
         Write-Host ("  ⑥b 教訓帳 · rc=" + $ls.rc + " · 根因帳 " + $rcN + " 行(手記:via-lessons --record 現象 --cause 根因 --fix 解法)") -ForegroundColor $(if ($ls.rc -eq 0) { "Green" } else { "Yellow" })
         $ls.lines | Where-Object { $_ -match '存錄|本輪全文' } | Select-Object -Last 2 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        if ($ls.rc -ne 0) { $exitCode = 2 }                  # lessons not harvested = step not done (Codex #363)
     } else {
         Write-Host "  ⑥b 教訓帳 · ABSENT(CGC_MDL058 尾版不在)" -ForegroundColor Yellow
+        $exitCode = 2
     }
     Set-OcLap "⑥b 教訓帳"
 

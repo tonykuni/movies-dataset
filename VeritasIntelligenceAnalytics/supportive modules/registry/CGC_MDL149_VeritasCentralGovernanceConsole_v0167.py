@@ -11,6 +11,7 @@ r"""CGC_MDL149_VeritasCentralGovernanceConsole v0167 — 薄尾:VCGC 活元件�
      status / registry-sync 乾跑 / --apply 各算一遍;工作站在 OneDrive 夾、每讀一檔都被防毒掃,放大到幾百秒。加速器只管資料運算,管不到這段。
      本尾版:以 git 樹狀態(HEAD + `git status --porcelain -uall` + 每支改動 / 未追蹤檔的大小與時間)為鑰,把 live_components 的結果
      存在 VIA_Reports/vcgc/cache/(不入 git);樹沒變就直接用,變了照舊重算。VIA_VCGC_NOCACHE=1 一律重算。
+     鑰也納入 runtime_rows 的來源(VIA_TOOLS_PLAN_LATEST 或 env_governance/TOOLS_PLAN_latest.json 的路徑 · 大小 · 時間;Codex #363)。
      盤點結果一個欄位都不改(同一支函式算出來的 JSON 原樣存取),registry-sync 的只增律不受影響。
 其餘動詞原樣轉給前一版(同夾同名、版號小於自己的最新一支)。只收 VCGC 呼叫(VIA_FROM_VCGC=YES)的規矩照前一版。
 """
@@ -119,7 +120,18 @@ def tree_key(root: Path = VIA) -> str | None:
             parts.append(f"{line[:2]}|{rel}|{s.st_size}|{s.st_mtime_ns}")
         except OSError:
             parts.append(f"{line[:2]}|{rel}|gone")
+    tp = runtime_plan()                                           # runtime_rows read this ignored file: it is part of the key (Codex #363)
+    try:
+        ts = tp.stat()
+        parts.append(f"plan|{tp}|{ts.st_size}|{ts.st_mtime_ns}")
+    except OSError:
+        parts.append(f"plan|{tp}|absent")
     return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()[:16]
+
+
+def runtime_plan() -> Path:
+    """The same source live_components reads for runtime_rows (v0119: VIA_TOOLS_PLAN_LATEST override, else the env_governance plan)."""
+    return Path(os.environ.get("VIA_TOOLS_PLAN_LATEST") or (VIA / "VIA_Reports" / "env_governance" / "TOOLS_PLAN_latest.json"))
 
 
 def cached(fn, name: str = "live_components", cache: Path = CACHE, key_fn=tree_key):
@@ -214,6 +226,21 @@ def selftest() -> int:
         (repo / "b.py").write_text("y = 1\n", encoding="utf-8")
         k3 = tree_key(repo)
         chk("鑰:改一支檔、多一支未追蹤檔都會變", k1 and k1 != k2 != k3 and tree_key(repo) == k3)
+        plan = Path(td) / "plan.json"
+        keep = os.environ.get("VIA_TOOLS_PLAN_LATEST")
+        os.environ["VIA_TOOLS_PLAN_LATEST"] = str(plan)
+        try:
+            ka = tree_key(repo)
+            plan.write_text('{"envs": {}}', encoding="utf-8")
+            kb = tree_key(repo)
+            os.environ["VIA_TOOLS_PLAN_LATEST"] = str(plan) + ".other"
+            kc = tree_key(repo)
+        finally:
+            if keep is None:
+                os.environ.pop("VIA_TOOLS_PLAN_LATEST", None)
+            else:
+                os.environ["VIA_TOOLS_PLAN_LATEST"] = keep
+        chk("鑰:執行期工具計畫(runtime_rows 的來源)重生或換路徑都會變(Codex #363)", ka != kb and kb != kc)
     chk("接上:活元件盤點已換成快取版(audit / registry-sync 讀的那一份)", _PATCHED >= 1, f"換了 {_PATCHED} 處")
     head = Path(__file__).read_text(encoding="utf-8").split("\n", 3)[2]
     chk("抬頭是 raw 字串(不再噴 invalid escape)", head.startswith('r"""'))
