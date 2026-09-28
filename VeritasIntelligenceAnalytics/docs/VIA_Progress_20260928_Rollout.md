@@ -39,3 +39,4 @@
 **教訓(R10)**:stash 格子重生件時要**逐檔點名**,不要整批收;不然自己手改的檔會被一起收掉,再誤判成「被格子洗掉」。
 
 **教訓(兩次了)**:開新尾版的同一個 commit 裡,一定要跑 `via-vrnbook build`;新尾版如果會出現在 MasterControl 頁上,追蹤頁也要重生。不然 status 的邏輯庫會變紅,CI 的 test_11 也會紅。
+| R14 | 操作員令「PowerShell 面板(詳細摘要 · 錯誤矩陣含 AST 與說明)· 存政策 · 全部台股與主動式台股 ETF 驗證清單的取得方法」:① `CGC_MDL228 v0102`:核對修 Codex #333 P1(冊上 `db_scope=all_home` 的表逐本正庫查,缺一本 = RED);新動詞 `panel`(唯讀:目錄 → 總覽 → 核對 → 計畫 → 兩張清單 → AST 矩陣 → 錯誤矩陣 → 摘要,@@PROGRESS + 黃色貼回塊,寫 DBM_PANEL_latest.json/.md)② `Invoke-VIA-DBPanel-v0100.ps1`(模板章 · Celeritas · 只走 Invoke-VIAPython · 八區上色 · -Pull/-SkipCatalog/-BuildUi/-Rows)③ 政策附冊 `VIA_Policy_DBPanel_v0100.json`(DBPANEL-1;正本不動,附冊釘正本 sha c7aab42f7ebfd283;AST 17 類說明從全景字典產生)④ `VDF_ENG087 v0105` 兩張清單唯一讀取口 + `docs/VIA_TWLists_Method_20260928.md` | (本輪) | 完成(容器) | MDL228 自測 24/24 · ENG087 21/21 · VCGC v0163 `dbm panel` 路由到 v0102(無入口旗標 DENY)· 契約測 19 OK · 總管 rc0 · Deck 26/26 · 閘 PY 缺 0 · PS 基線外新缺 0;全景讀新四檔 0 問題;**PS 容器無 pwsh 未實跑,要工作站一貼**;真數字要工作站目錄 |
