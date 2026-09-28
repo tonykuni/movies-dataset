@@ -5,7 +5,7 @@
 操作員 2026-09-28 R28:「直接透過 VCGC 路徑啟動一切」。
 v0165 以前整條流程(流程閘 → ENV MANAGER → 註冊同步 → 換模板 → VDF 建庫 → 全景實測 → Parquet → 操作台 → 單一路徑驗證 →
 布建紀錄上傳 → 簡單版 HTML)只能從倉根 `.\VIA-OperatorConsole.ps1` 進。本尾版多收一個動詞:
-  via-vcgc go [-SkipSweep] [-NoOpen] [-BuildDb|-NoBuild] [-ApproveRegistrySync] [-TemplateIn <檔>] [-NoUpload]
+  via-vcgc go [-Full] [-SkipSweep] [-NoOpen] [-BuildDb|-NoBuild] [-ApproveRegistrySync] [-TemplateIn <檔>] [-NoUpload]
               [-DataDir <夾>] [-SystemDir <夾>] [-Pick]            (別名 all · run-all)
 → 找 VeritasIntelligenceAnalytics 下 Invoke-VIA-OperatorConsole-v*.ps1 的**尾版**,用 PowerShell 7 跑它,參數原樣轉;
   輸出直接接到畫面(不截留),對話框(選夾 · 批准 · 換模板 · 上傳)照常跳。**編排只有那一支 PowerShell**(一把尺):
@@ -75,7 +75,7 @@ VIA = HERE.parent.parent
 _STEM = "CGC_MDL149_VeritasCentralGovernanceConsole"
 GO_VERBS = ("go", "all", "run-all")
 ENTRY_GLOB = "Invoke-VIA-OperatorConsole-v*.ps1"
-SWITCHES = ("SkipSweep", "NoOpen", "BuildDb", "NoBuild", "ApproveRegistrySync", "NoUpload", "Pick")
+SWITCHES = ("SkipSweep", "NoOpen", "BuildDb", "NoBuild", "ApproveRegistrySync", "NoUpload", "Pick", "Full")
 VALUED = ("TemplateIn", "DataDir", "SystemDir", "ApplyInput")
 
 
