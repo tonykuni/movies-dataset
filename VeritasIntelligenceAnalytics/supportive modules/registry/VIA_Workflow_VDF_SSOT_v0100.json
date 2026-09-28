@@ -40,7 +40,8 @@
      "進口 VCGC → VDF · 出口 VDF → VCGC",
      "separate_test:VDF-WKF002 各站可單測",
      "資料庫無缺漏(VDF-WKF003)",
-     "每本 .duckdb 每張表 → parquet"
+     "每本 .duckdb 每張表 → parquet",
+     "D4 之後 L14 全庫同步(目錄庫也帶四表;DB 面板核對不因目錄庫缺表而紅)"
     ]
    },
    "plan": {
@@ -62,7 +63,8 @@
        "CGC_MDL239_DataBroker",
        "build"
       ]
-     ]
+     ],
+     "finding_hand": "建庫計畫 rc 2 = 有待建表(需網路者待操作員開同意閘 VIA_NET_CONSENT · L07)"
     },
     {
      "code": "VDF-WKF001-STP002",
@@ -76,7 +78,8 @@
        "CGC_MDL170_VDFChainRunner",
        "run"
       ]
-     ]
+     ],
+     "finding_hand": "鏈 rc 4 = 有站 GATED / NODATA(同意閘 · 沒料);逐站原因看鏈報告"
     },
     {
      "code": "VDF-WKF001-STP003",
@@ -104,6 +107,20 @@
        "parquet"
       ]
      ]
+    },
+    {
+     "code": "VDF-WKF001-STP005",
+     "alias": "D5",
+     "name": "L14 全庫同步",
+     "engine": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
+     "verb": "sync-db",
+     "what": "資料家每本 .duckdb 寫同一份政策 / 交接 / 因子 / 同步對帳四表(L14;D4 新產生的目錄庫也要有)",
+     "match": [
+      [
+       "VRN_ENG082_ExtractionLogic",
+       "sync-db"
+      ]
+     ]
     }
    ],
    "tests": {
@@ -116,7 +133,8 @@
      "X-ACCEL",
      "X-NET"
     ],
-    "real": "via-vcgc go(③ 全景實測 ② VDF 鏈)"
+    "real": "via-vcgc go(③ 全景實測 ② VDF 鏈)",
+    "real_run": "go"
    }
   },
   {
@@ -235,7 +253,7 @@
      "match": [
       [
        "CGC_MDL149_VeritasCentralGovernanceConsole",
-       "dbm"
+       "dbm panel"
       ]
      ]
     },
@@ -267,7 +285,8 @@
      "X-ACCEL",
      "X-NET"
     ],
-    "real": "via-vcgc go(③ 全景實測 ⑥ DB 面板)"
+    "real": "via-vcgc go(③ 全景實測 ⑥ DB 面板)",
+    "real_run": "go"
    }
   },
   {

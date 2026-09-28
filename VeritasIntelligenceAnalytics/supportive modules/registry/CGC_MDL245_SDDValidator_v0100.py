@@ -629,7 +629,7 @@ def selftests(only: str | None = None, timeout: int = 600, write: bool = True) -
     return rep
 
 
-def run_events(run: str | None) -> tuple:
+def run_events(run: str | None, prefix: str = "go-") -> tuple:
     rows = []
     for f in sorted(EVENTS.glob("EVENTS_*.jsonl"))[-3:]:
         for line in f.read_text(encoding="utf-8").splitlines():
@@ -640,7 +640,7 @@ def run_events(run: str | None) -> tuple:
             if e.get("run"):
                 rows.append(e)
     if not run:
-        gos = [e for e in rows if str(e.get("run")).startswith("go-")]
+        gos = [e for e in rows if str(e.get("run")).startswith(prefix)]
         run = max(gos, key=lambda e: e.get("t0") or 0)["run"] if gos else ""
     return run, sorted((e for e in rows if e.get("run") == run), key=lambda e: e.get("t0") or 0)
 
@@ -656,9 +656,21 @@ def _chain_states() -> dict:
     return out
 
 
-def real(run: str | None = None, write: bool = True) -> dict:
+WORST = {"FAIL": 3, "FINDING": 2, "OK": 1}
+
+
+def _act(e: dict) -> tuple:
+    """(act, act with its sub-verb): run → target's first non-dash arg; console verbs → the verb (and `verb sub`)."""
+    if e.get("verb") == "run":
+        return e.get("act"), e.get("act")
+    args = [a for a in e.get("args") or [] if not str(a).startswith("-")]
+    return e.get("verb"), f"{e.get('verb')} {args[0]}" if args else e.get("verb")
+
+
+def real(run: str | None = None, write: bool = True, ai_run: str | None = None) -> dict:
     state = load_books()
     run, evs = run_events(run)
+    ai_run, ai_evs = run_events(ai_run, "ai-")
     selfrep = _json(OUT / "SDD_SELF_latest.json", {}) or {}
     chains = _chain_states()
     res = {}
@@ -668,12 +680,18 @@ def real(run: str | None = None, write: bool = True) -> dict:
             res[w["code"]] = {"alias": w.get("alias"), "level": "registered_only", "state": "REGISTERED_ONLY", "steps": {}}
             continue
         steps = {}
+        mine = ai_evs if (w.get("tests") or {}).get("real_run") == "ai" else evs
         for st in w.get("steps") or []:
             if st.get("match"):
-                hit = [e for e in evs for tgt, vb in st["match"]
-                       if (e.get("target") or CONSOLE) == tgt and (vb is None or vb == (e.get("act") if e.get("verb") == "run" else e.get("verb")))]
-                steps[st["code"]] = ({"state": hit[-1]["outcome"], "rc": hit[-1]["rc"], "at": hit[-1]["ts"], "secs": hit[-1].get("secs")} if hit
-                                     else {"state": "NOT_RUN"})
+                hit = [e for e in mine for tgt, vb in st["match"]
+                       if (e.get("target") or CONSOLE) == tgt and (vb is None or vb in _act(e))]
+                if hit:
+                    worst = max(hit, key=lambda e: WORST.get(e["outcome"], 0))      # a step that ran twice is as good as its worst run
+                    steps[st["code"]] = {"state": worst["outcome"], "rc": worst["rc"], "at": worst["ts"], "secs": worst.get("secs"), "runs": len(hit)}
+                    if worst["outcome"] == "FINDING" and st.get("finding_hand"):
+                        steps[st["code"]]["hand"] = st["finding_hand"]
+                else:
+                    steps[st["code"]] = {"state": "NOT_RUN"}
             elif st.get("inside"):
                 steps[st["code"]] = {"state": "INSIDE", "by": st["inside"]}
             else:
@@ -682,13 +700,19 @@ def real(run: str | None = None, write: bool = True) -> dict:
         level = "real" if any(st.get("match") for st in w.get("steps") or []) else "selftest"
         lamp = ("FAIL" if "FAIL" in states else "NOT_RUN" if "NOT_RUN" in states else "FINDING" if "FINDING" in states
                 else "NOSELFTEST" if "NOSELFTEST" in states else "OK")
-        res[w["code"]] = {"alias": w.get("alias"), "level": level, "state": lamp, "steps": steps}
+        res[w["code"]] = {"alias": w.get("alias"), "level": level, "state": lamp, "steps": steps,
+                          "run": ai_run if (w.get("tests") or {}).get("real_run") == "ai" else run}
     for code, chain in (("VDF-WKF001", "vdf"), ("VRN-WKF001", "vrn")):
         if code in res:
             res[code]["chain"] = chains.get(chain)
-            if res[code]["state"] == "FINDING" and all(o["state"] in OPERATOR_HAND for o in chains[chain]["open"]):
-                res[code]["operator_hand"] = True
-    rep = {"schema": "VIA.SDD.Real.v1", "engine": ENGINE, "ts": _now(), "head": _head()[:12], "run": run, "events": len(evs),
+            if any(o["state"] not in OPERATOR_HAND for o in chains[chain]["open"]):   # a chain node that is RED / CRASH is ours to fix
+                for s in res[code]["steps"].values():
+                    s.pop("hand", None)
+    for code, r in res.items():
+        bad = [s for s in r["steps"].values() if s.get("state") not in ("OK", "INSIDE") and s.get("by") != "OK"]
+        if r["state"] == "FINDING" and bad and all(s.get("hand") for s in bad):
+            r["operator_hand"] = True
+    rep = {"schema": "VIA.SDD.Real.v1", "engine": ENGINE, "ts": _now(), "head": _head()[:12], "run": run, "events": len(evs), "ai_run": ai_run, "ai_events": len(ai_evs),
            "self_run": selfrep.get("run"), "wkf": res}
     if write:
         OUT.mkdir(parents=True, exist_ok=True)
