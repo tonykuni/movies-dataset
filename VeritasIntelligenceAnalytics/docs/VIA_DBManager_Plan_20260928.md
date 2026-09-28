@@ -157,3 +157,45 @@
 3. Google Sheet 直接寫入 API(OAuth)要不要做;目前只給相容 CSV。
 4. 普查已貼回(本文 §1 已更新)。請再跑 `via-datahome catalog -Tables`,把一頁目錄寫出來(`VIA_Reports\\datahome\\DATAHOME_CATALOG_latest.json`)。P1 的總覽就讀這一頁,不再逐表 COUNT。
 5. §1 的優化目標 1–8 要做哪幾項:建議先 5(壞檔清單)、4(mega 合併計畫)、2(_raw 定位),都只出計畫。
+
+
+## 7. 進度(R12:操作員裁定「1 開工 · 2 三項 · 3 對帳檢查用的」)
+
+- **裁定 3**:資料家裡的 `_repo_` 庫是對帳檢查用的副本 → 在總覽標為「對帳副本」,不算正庫、不算重疊;核對時列出它與正庫同名表的列數差。
+- **P1 + P2 已完成(容器)**:
+  - 新模組 `CGC_MDL228_VIADBManager_v0100`(自測 15/15)。
+  - VCGC 入口 `CGC_MDL149 v0163` 加上 `dbm` 路由,工作站打 `via-vcgc dbm …`。
+  - 主控台 `CGC_MDL227 v0101` 加上 DB 家族與「資料庫」分頁(自測 15/15;瀏覽器 15/15 + 原 33/33,零 JS 錯誤)。
+- **三項計畫(只出計畫)**:`via-vcgc dbm plan` 寫 `VIA_Reports/dbmanager/DBM_PLANS_latest.json`。
+  - 壞檔清單。
+  - mega 按年合併 SQL(DISTINCT + ZSTD + 回讀核對)。
+  - `_raw` 定位:FULL_DUP / RAW_SUPERSET / RAW_SUBSET。
+
+**工作站怎麼用**
+
+```
+via-datahome catalog -Tables          # 先寫一頁目錄(總覽只讀這一頁,不逐表 COUNT)
+via-vcgc dbm overview                 # 正庫 / 對帳副本 / 表 / 列 / 最新日 / 湖 / 壞檔
+via-vcgc dbm reconcile                # 冊上期望 vs 實量(比上次少 = AMBER 要說明;冊上有庫裡沒有 = RED)
+via-vcgc dbm plan                     # 三項計畫 → VIA_Reports/dbmanager/DBM_PLANS_latest.json
+via-vcgc dbm export --db vdf_tw_market.duckdb --table tw_daily_prices --cols date,ticker,close --start 2026-01-01 --end 2026-09-25 --format csv --dry
+python "supportive modules/registry/CGC_MDL227_ConsoleBlueprint_v0101.py" build   # 主控台重建(資料庫分頁吃同一份目錄)
+```
+
+**匯出格式**
+
+| 格式 | 用途 | 單次上限 |
+|---|---|---|
+| csv | utf-8-sig,Excel 直開;委派 ENG045 | 100 萬列 |
+| big5 | cp950;放不下的字逐字報數,狀態 LOSSY | 100 萬列 |
+| gsheet | Sheets 匯入用 CSV;委派 ENG045 | 100 萬列 |
+| md | Markdown,給人看的小範圍 | 2,000 列 |
+| json | — | 20 萬列 |
+| parquet | DuckDB COPY zstd,全量用 | 5,000 萬列 |
+
+每次匯出都先數列數,寫完回讀核對。讀庫一律唯讀。欄名與表名只收目錄與 PRAGMA 認得的,注入字串會被擋下。
+
+**還沒做**:
+
+- P4 API 呼叫帳。
+- 三項計畫的實際執行:刪、搬、合併換上,都等操作員看過計畫檔再裁定(L10)。
