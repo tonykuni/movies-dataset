@@ -336,3 +336,5 @@
 | Z265 | 中英文完整:SSOT 484 本全有中英名(冊內中文或詞彙表譯名,詞彙表只增、每對編 SYN 號);同義字 207 組只有英文(多為外資券商,例 BERNSTEIN)→ 標黃,不代擬中文名;要補請操作員給名或指定來源冊 | 候 | 操作員給名 / 指定來源 | R23 |
 | Z266 | 金融市場代號:台股全部與主動式台股 ETF 全部由 VDF_ENG087 尾版讀庫(vdf_tw_market / ActiveTWETF);容器沒有庫 → 只列已提交名冊 272 檔(焦點 149 · 主動 ETF 37 · 美股 ETF 70 · 指數/期貨/匯率)。台股 English Name 要 TWSE openapi 英文簡稱(要網路同意閘,AI 不代設)。主動 ETF 名冊與批104 矩陣名碼不一 3 檔標黃(候 TWSE 實連) | 候 | 操作員工作站 via-vcgc 跑 CGC_MDL237 --apply | R23 |
 | Z267 | 多來源對照:美10Y / 10Y-3M / WTI 一致(綠);失業率 · 非農 BLS 與 FRED 一致、寬表較舊(黃 PARTIAL);台積電收盤 TWSE × yfinance 兩條庫線本機無庫(黃 NODATA)→ 工作站跑一次就有 | 候 | 操作員工作站 | R23 |
+| Z268 | 全景實測時 VRN 鏈某節點自測把 `candidates`(帶時間戳)寫進已追蹤的 `VIA_Engine_Consolidation_Register_v0100.json`(nlp_one_vs_eng073_family_b283)—— 違「自測只寫暫存」;本輪不提交該改動(還原)。要找出是哪一支、改成寫暫存 | 候 | AI 下一輪查 | R24 |
+| Z269 | 「其他退掉刪除」:四件工具新版已同鎖(accelerator v1141 · network v1652 · layout v0109 · nlp v0105)。舊版刪除與 L04「舊版留作版史」衝突,且 thin tail 靠舊版當本體(layout v0109 → v0106 · network v1652 → v1651 …);受治理探針 CGC_MDL230 判可刪 0。已算出「鏈上不需要、全樹活碼零引用」的候選清單,等操作員定範圍(git rm,可 git restore 救回) | 候 | 操作員裁定 | R24 |
