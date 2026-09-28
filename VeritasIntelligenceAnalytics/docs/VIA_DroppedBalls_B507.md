@@ -347,3 +347,6 @@
 | Z276 | VCGC 元件註冊冊待同步:新 1,406 · 變更 521 · 退役 1,088(R24c 刪檔也在內)。唯一入口 ①d 會跳「是 / 否」(預設否);按「是」= 操作員批准 registry-sync --apply,寫已追蹤的註冊冊後要 commit(接續 Z261b) | 結 | R27 操作員令「自動完成」= 批准:registry-sync --apply(10,996 → 12,382 → 12,407 筆,0 遺失 · 0 改碼 · 1,108 標 RETIRED) | R26 |
 | Z277 | CGC_MDL237 編號的 ENV 類讀工具鎖冊時找 `lock["tools"]` / `lock["families"]`,但鎖冊頂層鍵是 accelerator / network / layout / nlp → 四件工具的鎖沒有被編成 ENV 號。要換版修讀法再 --apply(只增) | 結 | R27:CGC_MDL237 v0101 讀鎖冊頂層鍵 → VIA-VCGC-ENV068~071(accelerator v1141 · layout v0109 · network v1652 · nlp v0105) | R26 |
 | Z278 | VIA_ToolRoster_SSOT 沒列 pydantic(VRN_ENG073 需要;ENV MANAGER 從鏈上缺件抓到)。工具冊要新版補上(只增) | 結 | R27:VIA_ToolRoster_SSOT_v0102(via_vrn_312 + pydantic;unified_nlp 指向鎖定 v0105) | R26 |
+| Z279 | 版號異形尾版(非四碼 `_v1` / `_v001` / `_v112` / `_v02783`…)不歸 VCGC 尾版律管,註冊冊不收:VCGC 2 · VRN 5 · SUP 37(CGC_MDL242 v0101 涵蓋稽核 C3 逐支列)。要收進註冊冊 = 各自出四碼版號新檔(L04)並遷呼叫者;哪些要收由操作員定 | 開 | — | R29 |
+| Z280 | `vdf_akshare_dedup_invalid_quarantine_gate_v02783.py`(五碼版號)編號冊沒號(CGC_MDL237 只認四碼)。同 Z279 一併處理 | 開 | — | R29 |
+| Z281 | 沒版號後綴的 .py:VCGC 18 · VDF 50 · VRN 74 · SUP 699(多為輔助檔 / 套件 / __init__)— 不是尾版族,沒有引擎號與註冊時間。要逐支判定哪些其實是引擎、需要換成版號檔名(L04) | 開 | — | R29 |
