@@ -21,7 +21,9 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     throw "VeritasCeleritas.PS7 需要 PowerShell 7+。目前：$($PSVersionTable.PSVersion)"
 }
 
-if (-not (Get-Variable -Name 'CeleritasPS7' -Scope Script -ErrorAction Ignore)) {
+# 有人先把 $script:CeleritasPS7 設成 $null 再點源(Register v0243 的 Invoke-VIACeleritasScoped 等 7 處)→ 也要初始化,
+# 否則 Applied/Sw 讀不到,Start 失敗,助手永遠退成「正主在但沒套上」(2026-09-28 工作站實錄)。
+if (-not (Get-Variable -Name 'CeleritasPS7' -Scope Script -ErrorAction Ignore) -or $null -eq $script:CeleritasPS7) {
     $script:CeleritasPS7 = [ordered]@{
         Version     = 'v1141'
         Applied     = $false

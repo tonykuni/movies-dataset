@@ -317,4 +317,5 @@
 | Z248 | 12 支無版號工具副本(VeritasCeleritas*.py / VeritasAegisNexus*.py,intake 除外)操作員要刪 —— 逐支查全有活檔在用:網路本體(v0116 with_name)· 容器根副本 56 支按名匯入 · 50_Protection 凍結 no_delete + VDF 工具副本位 · 各套件(VDF_final · CentralGovernance · Standalone)內自帶引用 | 候 | 先遷呼叫者:按名 `import VeritasAegisNexus` → 走 SUP_MDL740 尾版;套件內副本隨套件退役;每遷一批跑 `.\VIA-Sweep.ps1`,探針判零引用才 `-RetireOld`(L10)| TOOLPROBE_latest.json legacy_detail 有逐支引用者 |
 | Z249 | PS 既有債剩 53 支沒接章(要 100% 還差這些):封存/備份副本 3(保持原樣)· 雜湊被冊/manifest 登錄 25(VAP 資產冊 · FileMatrix · 全庫盤點 CSV 等記著它們的 sha)· 凍結鎖 15 · intake 正本 5(永不動)· 原檔本身剖析不過 5 | 候 | 操作員裁定:雜湊冊要不要重算(重算=改治理資料,本輪權限閘擋了同類改寫)· 凍結的要不要解凍 · 壞的 5 支修或退役 | VIA_CeleritasPolicy_PaidDebt_v0100.json not_paid.by_reason 逐支 |
 | Z250 | 基線資料檔 VIA_CeleritasPolicy_Baseline_v0100.json 收緊(移除已還 790 支)被權限閘判「不可逆破壞」擋下 → 改用只增的已還帳 + 閘 v0102;v0101 單獨跑自測 ④ 會 7/8(版史,尾版 v0102 全過,格子取尾版)| 候 | 操作員要收緊基線就親手改(或授權 AI 改),之後閘 v0102 照樣過 | R16-9 |
+| Z251 | 工作站 ② VDF 鏈 rc=2(NODATA)0.9s,容器同步驟是 rc=4(GATED)——兩地結論不同,因由在工作站 log(v0103 起 rc≠0 會把最後四行印在畫面上)| 候 | 操作員重跑 `.\VIA-Sweep.ps1` 把貼回包貼回;AI 依印出的因由修 | 工作站 Sweep_20260928_152447.log |
 | ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |
