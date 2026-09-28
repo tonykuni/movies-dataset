@@ -33,6 +33,7 @@ import importlib.util
 import json
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -55,6 +56,40 @@ def __getattr__(name):
 def _probe(side: dict) -> dict | None:
     p = Path(side.get("toolprobe_json") or TOOLPROBE)
     return PRIOR._load(p)
+
+
+STATUS_JSON = "SWEEP_STATUS_latest.json"
+_LAST: dict = {}
+
+
+def _utc_epoch(s: str | None) -> float | None:
+    if not s:
+        return None
+    try:
+        return datetime.strptime(str(s)[:19].replace("T", " "), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
+    except ValueError:
+        return None
+
+
+def _freshness(given: dict | None, path: Path, step: dict) -> str:
+    """這一步的 JSON 是不是本次寫的。chain 的 generated 帶 Z(UTC)就比它;沒有 UTC 欄位(DB 面板的 ts 是本地時間)就比檔案 mtime。
+    回 fresh / stale / absent / unknown。步驟略過 = unknown(不判)。"""
+    if step.get("skipped"):
+        return "unknown"
+    t0 = _utc_epoch(step.get("started_utc"))
+    rep = given if given is not None else PRIOR._load(path)
+    if not rep:
+        return "absent"
+    if t0 is None:
+        return "unknown"
+    gen = str(rep.get("generated") or "")
+    if gen.endswith("Z"):
+        g = _utc_epoch(gen)
+    elif given is None and path.is_file():
+        g = path.stat().st_mtime
+    else:
+        return "unknown"
+    return "fresh" if g is not None and g >= t0 - 2 else "stale"
 
 
 def build(side: dict, vdf: dict | None = None, vrn: dict | None = None, db: dict | None = None,
@@ -88,9 +123,6 @@ def build(side: dict, vdf: dict | None = None, vrn: dict | None = None, db: dict
     kpi_row = ["⑦ 工具註冊 · 覆蓋", state, "—" if step.get("rc") is None else str(step.get("rc")),
                "—" if step.get("sec") is None else f"{step.get('sec')}s", point]
     rep["kpi"].append(kpi_row)
-    for i, (t, cols, rows, st) in enumerate(rep["sections"]):
-        if t.startswith("①"):
-            rep["sections"][i] = (t, cols, rows + [[cell(x) for x in kpi_row]], st)
     # ⑩ 待辦併入工具待辦
     if tp:
         for r in tp.get("todo") or []:
@@ -105,12 +137,60 @@ def build(side: dict, vdf: dict | None = None, vrn: dict | None = None, db: dict
         for m, sec in zip(marks, (tp.get("sections") or [])[:4]):
             t, cols, rows, st = sec
             rep["sections"].append((m + " " + t, cols, rows, st))
+    # Codex #338 P1:舊的結論不決定本次總判。本步沒寫 JSON(崩潰 / 逾時 / 中斷)= STALE;本步輸出有 Traceback = RED
+    incomplete = []
+    checks = (("② VDF 鏈", "vdf_chain", vdf, PRIOR.VDF_CHAIN), ("③ VRN 鏈", "vrn_chain", vrn, PRIOR.VRN_CHAIN),
+              ("⑥ DB 面板", "db_panel", db, PRIOR.DB_PANEL))
+    for name, sid, given, path in checks:
+        stp = PRIOR._step(side, sid)
+        row = next((r for r in rep["kpi"] if r[0] == name), None)
+        if row is None or not stp or stp.get("skipped"):
+            continue
+        if stp.get("missing"):
+            incomplete.append(f"{name}:尾版不在")
+            continue
+        crashed = any("Traceback (most recent call last)" in str(x) for x in stp.get("lines") or [])
+        f = _freshness(given, path, stp)
+        if crashed:
+            row[1], row[4] = "RED", "本步崩潰(輸出有 Traceback)· " + str(row[4])
+            incomplete.append(f"{name}:崩潰")
+        if f in ("stale", "absent") and not crashed:
+            row[1] = "STALE" if f == "stale" else "ABSENT"
+            row[4] = ("JSON 不是本次寫的(舊結論不算)· " if f == "stale" else "本次沒有結論 JSON · ") + str(row[4])
+            incomplete.append(f"{name}:{'結論是舊的' if f == 'stale' else '沒有結論'}")
+            rep["todo"].insert(0, [row[1], "實測", name, "本次這一步沒有寫出結論(崩潰 / 逾時 / 中斷)", "看 log 該步全文;單跑該步"])
+    for sid, name in (("bridge", "④ 橋掃"), ("panorama", "⑤ 全景"), ("toolprobe", "⑦ 工具")):
+        stp = PRIOR._step(side, sid)
+        if stp and not stp.get("skipped") and (stp.get("missing") or any("Traceback (most recent call last)" in str(x) for x in stp.get("lines") or [])):
+            incomplete.append(f"{name}:{'尾版不在' if stp.get('missing') else '崩潰'}")
+    for i, (t, cols, rows, st) in enumerate(rep["sections"]):
+        if t.startswith("①"):
+            rep["sections"][i] = (t, cols, [[cell(x) for x in r] for r in rep["kpi"]], st)
+    rep["incomplete"] = incomplete
     rep["verdict"] = PRIOR._worst([r[1] for r in rep["kpi"] if r[1] not in ("INFO", "SKIP", "HOLD")])
+    _LAST.clear()
+    _LAST.update({"verdict": rep["verdict"], "incomplete": incomplete, "ts": rep["ts"]})
     return rep
 
 
 PRIOR.build = build            # v0100 的 render / main 用本尾版的 build(v0100 單獨跑時不受影響)
-render = PRIOR.render
+
+
+_BASE_RENDER = PRIOR.render
+
+
+def render(side: dict, *a, **kw) -> dict:
+    """同 v0100 render,另寫 SWEEP_STATUS_latest.json(總判 + 沒跑完的步)給 PowerShell 定結束碼(Codex #338 P2)。"""
+    r = _BASE_RENDER(side, *a, **kw)
+    out = Path(kw.get("out") or PRIOR.OUT)
+    st = {"verdict": _LAST.get("verdict"), "incomplete": _LAST.get("incomplete") or [], "ts": _LAST.get("ts")}
+    (out / STATUS_JSON).write_text(json.dumps(st, ensure_ascii=False, indent=1), encoding="utf-8")
+    r["incomplete"] = st["incomplete"]
+    r["paths"]["status"] = str(out / STATUS_JSON)
+    return r
+
+
+PRIOR.render = render          # v0100 的 main 也走本尾版 render(寫狀態檔)
 plain = PRIOR.plain
 paste = PRIOR.paste
 
@@ -160,6 +240,38 @@ def selftest() -> int:
                   vdf={}, vrn={}, db=empty, probe=dict(probe, ts_utc="2026-09-28 01:00:00"))
     chk("⑦ 探針 JSON 比這次開跑還舊 = STALE,不冒充本次", any(r[0] == "⑦ 工具註冊 · 覆蓋" and r[1] == "STALE" for r in stale["kpi"]))
     chk("⑧ 薄尾只接:v0100 本體 build 原樣保留、render 走本尾版", PRIOR_PATH.name.endswith("_v0100.py") and _BASE_BUILD is not build and PRIOR.build is build)
+    # Codex #338 P1/P2
+    side3 = dict(side, steps=side["steps"] + [
+        {"id": "vdf_chain", "rc": 1, "sec": 1.0, "started_utc": "2026-09-28 05:00:00", "lines": ["Traceback (most recent call last):", "boom"]},
+        {"id": "vrn_chain", "rc": 1, "sec": 1.0, "started_utc": "2026-09-28 05:00:00", "lines": []},
+        {"id": "db_panel", "rc": 0, "sec": 1.0, "started_utc": "2026-09-28 05:00:00", "lines": []}])
+    green = {"rc_name": "GREEN", "generated": "2026-09-27 01:00:00Z", "rows": []}
+    fresh_green = {"rc_name": "GREEN", "generated": "2026-09-28 05:00:30Z", "rows": []}
+    with tempfile.TemporaryDirectory() as td:
+        dbp = Path(td) / "DBM_PANEL_latest.json"
+        dbp.write_text(json.dumps({"verdict": "GREEN", "ts": "2026-09-28 13:00:00", "summary": []}), encoding="utf-8")
+        import os as _os
+        _os.utime(dbp, (_utc_epoch("2026-09-27 00:00:00"), _utc_epoch("2026-09-27 00:00:00")))
+        keep = PRIOR.DB_PANEL
+        PRIOR.DB_PANEL = dbp
+        try:
+            r3 = build(side3, vdf=green, vrn=green, db=None, probe=probe)
+        finally:
+            PRIOR.DB_PANEL = keep
+    k3 = {r[0]: r[1] for r in r3["kpi"]}
+    chk("⑨ 舊的 GREEN 結論不冒充本次:VRN JSON 早於本步開跑 = STALE;DB 面板本地 ts 看似新、檔案 mtime 舊 = STALE",
+        k3.get("③ VRN 鏈") == "STALE" and k3.get("⑥ DB 面板") == "STALE", str(k3))
+    chk("⑩ 本步輸出有 Traceback = RED,總判跟著 RED", k3.get("② VDF 鏈") == "RED" and r3["verdict"] == "RED", r3["verdict"])
+    chk("⑪ incomplete 列出沒跑完的步(PowerShell 據此給結束碼 2)", len(r3["incomplete"]) >= 3, " · ".join(r3["incomplete"]))
+    side4 = dict(side, steps=side["steps"] + [{"id": "vrn_chain", "rc": 1, "sec": 1.0, "started_utc": "2026-09-28 05:00:00", "lines": []}])
+    r4 = build(side4, vdf={}, vrn=fresh_green, db={"summary": []}, probe=probe)
+    chk("⑫ 本次寫的 JSON 照用(不誤判 STALE)", {r[0]: r[1] for r in r4["kpi"]}.get("③ VRN 鏈") == "GREEN" and not any("VRN" in x for x in r4["incomplete"]))
+    with tempfile.TemporaryDirectory() as td:
+        pj = Path(td) / "TOOLPROBE_latest.json"
+        pj.write_text(json.dumps(probe, ensure_ascii=False), encoding="utf-8")
+        render(dict(side3, toolprobe_json=str(pj)), out=Path(td), use_plain=True, echo=False, vdf=green, vrn=green, db={"summary": []})
+        stj = json.loads((Path(td) / STATUS_JSON).read_text(encoding="utf-8"))
+        chk("⑬ render 寫 SWEEP_STATUS_latest.json(總判 + incomplete)", stj.get("verdict") == "RED" and stj.get("incomplete"), str(stj))
     ok = all(results)
     print(f"  {ENGINE_TAG} selftest {sum(results)}/{len(results)} {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1

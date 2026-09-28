@@ -17,7 +17,7 @@
 #        rich 缺 = 純文字同十張;存 HTML / TXT;貼回包放剪貼簿。
 #   其餘照 v0100:② VDF 鏈 run --resume · ③ VRN 鏈 run --resume · ④ 橋掃乾跑 · ⑤ 全景 · ⑥ DB 面板。只量不修;不代開網路同意閘。
 # 用法(站在倉根):.\VIA-Sweep.ps1        參數:-SkipChains · -SkipPanel · -SkipTools · -Zip <zip> · -RetireOld · -NoClipboard · -PlainReport · -Rows N
-# 結束碼:0 = 跑完 · 3 = 流程閘沒過或沒跑起來(看 log 與報告)
+# 結束碼:0 = 每一步都跑完且寫出本次結論 · 2 = 有步沒跑完(尾版不在 / 崩潰 / 結論是舊的 / 報告沒寫出;Codex #338 P2)· 3 = 流程閘沒過或沒跑起來
 # =====================================================================================
 [CmdletBinding()]
 param(
@@ -88,6 +88,7 @@ $outDir = Join-Path $VIA "VIA_Reports\sweep"
 $logDir = Join-Path $outDir "logs"
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$runStartUtc = [DateTime]::UtcNow
 $logPath = Join-Path $logDir ("Sweep_" + $stamp + ".log")
 $steps = [System.Collections.Generic.List[object]]::new()
 $rxAnsi = Get-SwpRegex "`e\[[0-9;]*m"
@@ -256,4 +257,22 @@ if ($clipOk) {
 }
 Set-Location -LiteralPath $StartDir
 if ($gateStop) { exit 3 }
+# 結束碼跟著每一步走(Codex #338 P2):不是只看流程閘
+$why = [System.Collections.Generic.List[string]]::new()
+foreach ($s in $steps) { if ($s.missing) { $why.Add($s.title + ":尾版不在") } }
+$rep = @($steps | Where-Object { $_.id -eq "report" } | Select-Object -Last 1)
+if ($rep.Count -eq 0 -or $rep[0].rc -ne 0) { $why.Add("⑧ 報告:rc=" + $(if ($rep.Count) { $rep[0].rc } else { "沒跑" })) }
+$statusPath = Join-Path $outDir "SWEEP_STATUS_latest.json"
+if ((Test-Path -LiteralPath $statusPath) -and ((Get-Item -LiteralPath $statusPath).LastWriteTimeUtc -ge $runStartUtc.AddSeconds(-2))) {
+    try {
+        $sj = Get-Content -LiteralPath $statusPath -Raw -Encoding utf8 | ConvertFrom-Json
+        foreach ($x in @($sj.incomplete)) { if ($x) { $why.Add("" + $x) } }
+    } catch { $why.Add("狀態檔讀不動:" + $_.Exception.Message) }
+} else {
+    $why.Add("SWEEP_STATUS_latest.json 本次沒寫出(報告正主不是 v0101 以上或沒跑完)")
+}
+if ($why.Count -gt 0) {
+    Write-Host ("  [結束碼 2] 有步沒跑完:" + ($why -join " · ")) -ForegroundColor Yellow
+    exit 2
+}
 exit 0
