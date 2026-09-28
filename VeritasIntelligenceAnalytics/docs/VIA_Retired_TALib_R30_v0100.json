@@ -5,17 +5,53 @@
  "order": "操作員 R30:「刪除一切 TA-LIB 指令 模組化刪除 不要在外擴 刪除後修正」(L10:刪除是操作員的手 = 本令)",
  "ruler": "CGC_MDL158 全景 TALIB 類(活接線)= 0;本批另量指令 / 探針 / 補庫句",
  "removed": [
-  {"path": "bin/via-ta.cmd", "what": "via-ta 啟動器(指向已刪的 VDF_ENG048_TAFactory,TA-Lib 全指標工廠)", "how": "git rm(整支,死指令)", "restore": "git show <本批前一個 commit>:VeritasIntelligenceAnalytics/bin/via-ta.cmd"},
-  {"path": "supportive modules/registry/CGC_MDL137_RunGate_v0108.py", "what": "vap 家族探針 optional 名單的 talib(會在家族境 import talib)· 補庫對照 talib→TA-Lib(會印 pip install TA-Lib)", "how": "新版 CGC_MDL137_RunGate_v0109 薄尾原地拿掉(v0108 留作版史 L04,不改一個位元)"}
+  {
+   "path": "bin/via-ta.cmd",
+   "what": "via-ta 啟動器(指向已刪的 VDF_ENG048_TAFactory,TA-Lib 全指標工廠)",
+   "how": "git rm(整支,死指令)",
+   "restore": "git show <本批前一個 commit>:VeritasIntelligenceAnalytics/bin/via-ta.cmd"
+  },
+  {
+   "path": "supportive modules/registry/CGC_MDL137_RunGate_v0108.py",
+   "what": "vap 家族探針 optional 名單的 talib(會在家族境 import talib)· 補庫對照 talib→TA-Lib(會印 pip install TA-Lib)",
+   "how": "新版 CGC_MDL137_RunGate_v0109 薄尾原地拿掉(v0108 留作版史 L04,不改一個位元)"
+  },
+  {
+   "path": "Register-VIA-Commands-v0262.ps1",
+   "what": "活指令 via-talib、via-taone、別名 技術指標 / 技術指標引擎。它們從 v0207 被後面的冊 dot-source 帶上來",
+   "how": "新冊尾版 Remove-Item。v0205–v0207 留作版史，不改一個位元",
+   "restore": "不要把這兩個函式加回尾版"
+  }
  ],
  "kept_on_purpose": [
-  {"what": "禁令守衛:CGC_MDL190 TALibLock · CGC_MDL205 TalibBan · CGC_MDL206 TalibPolicy · CGC_MDL187 KILL-06 · CGC_MDL158 TALIB 類 · CGC_MDL169 _FORBIDDEN_LIBS · VDF_ENG086 QuantGuard · 各掃描排除名單", "why": "它們是「偵測並禁止」TA-Lib 的碼,拿掉 = 禁令失守"},
-  {"what": "正本(references/ · supportive modules/intake/ · accelerator/VeritasCeleritas.py · VRN_ENG112 v0100)", "why": "正本一個位元不動"},
-  {"what": "舊版號檔的歷史碼(Register-VIA-Commands v0205–0207 · WorkOps v0110 · UserTest v0100 · RunGate v0100–0108 · MDL156 v0105–0110)", "why": "版史(L04);各家尾版已乾淨,執行只走尾版"},
-  {"what": "functional modules/VDF/VDF_TA_Engine_Spec_v0100.json", "why": "VDF_ENG049_FiveDayFetch 仍讀它的抓取宇宙(DXY/VIX/金/公債…),不是 TA-Lib 呼叫"},
-  {"what": "生成式登錄冊(VIA_Component_Inventory / Interface_Contract / AutoCode / Naming_Registry)的舊列", "why": "只增冊的歷史列(已退役件照規矩標 RETIRED),刪列 = 破壞只增律"},
-  {"what": "VIA_Tool_Escalation_Ladder_v0100 talib 階 · VIA_System_Charter_v0100 TA 車道文字", "why": "階已標退役 / 章程敘述;讀它們的尾版不會去裝或匯入 TA-Lib"},
-  {"what": "CGC_MDL152_VtmraGate_v0102 id in (talib, talib_one) 分支", "why": "批539 起名單已無此兩列 = 永不觸發的死分支;要拿掉得整支複製新版(外擴),依令不外擴"}
+  {
+   "what": "禁令守衛:CGC_MDL190 TALibLock · CGC_MDL205 TalibBan · CGC_MDL206 TalibPolicy · CGC_MDL187 KILL-06 · CGC_MDL158 TALIB 類 · CGC_MDL169 _FORBIDDEN_LIBS · VDF_ENG086 QuantGuard · 各掃描排除名單",
+   "why": "它們是「偵測並禁止」TA-Lib 的碼,拿掉 = 禁令失守"
+  },
+  {
+   "what": "正本(references/ · supportive modules/intake/ · accelerator/VeritasCeleritas.py · VRN_ENG112 v0100)",
+   "why": "正本一個位元不動"
+  },
+  {
+   "what": "舊版號檔的歷史碼(Register-VIA-Commands v0205–0207 · WorkOps v0110 · UserTest v0100 · RunGate v0100–0108 · MDL156 v0105–0110)",
+   "why": "版史(L04);各家尾版已乾淨,執行只走尾版"
+  },
+  {
+   "what": "functional modules/VDF/VDF_TA_Engine_Spec_v0100.json",
+   "why": "VDF_ENG049_FiveDayFetch 仍讀它的抓取宇宙(DXY/VIX/金/公債…),不是 TA-Lib 呼叫"
+  },
+  {
+   "what": "生成式登錄冊(VIA_Component_Inventory / Interface_Contract / AutoCode / Naming_Registry)的舊列",
+   "why": "只增冊的歷史列(已退役件照規矩標 RETIRED),刪列 = 破壞只增律"
+  },
+  {
+   "what": "VIA_Tool_Escalation_Ladder_v0100 talib 階 · VIA_System_Charter_v0100 TA 車道文字",
+   "why": "階已標退役 / 章程敘述;讀它們的尾版不會去裝或匯入 TA-Lib"
+  },
+  {
+   "what": "CGC_MDL152_VtmraGate_v0102 id in (talib, talib_one) 分支",
+   "why": "批539 起名單已無此兩列 = 永不觸發的死分支;要拿掉得整支複製新版(外擴),依令不外擴"
+  }
  ],
  "after": "刪除後修正:能跑閘 v0109 自測 22/22(三條新檢 + v0108 十九檢)· probe 輸出零 talib"
 }
