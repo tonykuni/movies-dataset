@@ -322,5 +322,5 @@
 | Z253 | 工作站操作員的手(會寫你的庫 / 要開同意閘):`via-vrnlogic sync-db`(aaii 補 L14 四表)· 開閘後 `via-finstat run --mops`(tw_financial_mops)· `via-cnnfg run` · `via-fwdval run` · `via-lists run` 再 `via-lists lists` —— R17-b 起併成倉根一句 `.\VIA-RunAll.ps1`(問一次 YES 開本次同意閘;或加 -Consent)| 候 | 操作員 | R17 · R17-b |
 | Z254 | 全景 scan 時 VDF_ENG051_ActiveTWETF_Holdings.py:26 與 VRN_ENG062_SummarizerV1.py:32 印 SyntaxWarning(docstring 裡的 `\d` 沒用 raw 字串)—— 只是警告,行為不變 | 候(低)| AI:兩支都是無版號舊檔;要改就開新版號(L04),不在原檔動 | 工作站 15:41 |
 | Z255 | 附件 B(forward_valuation_vintage v2.2)兩個原生 bug:pandas 3.x merge_asof 精度 · 無發布時間 meta 必拋 ValueError | 已在 ENG230 載入時攔 / 補(原檔不改,MANIFEST 記);回報給附件作者 | 操作員轉達 | intake MANIFEST |
-| Z256 | 日股清單 jp_listings 沒落地(R17-b 工作站兩跑 ⑦a PARTIAL:美股 OK、日股沒成)。ENG231 v0101 下一跑最後三行會寫明原因:ABSENT = 工作站 python 缺 xlrd(操作員的手 `pip install xlrd`,AI 不裝)· FAIL「回來的是網頁」= JPX 擋頁或改址(AI 改網址出新版)· 其他照原因 | 候 | 操作員貼回 → AI | R17-c |
+| Z256 | 日股清單 jp_listings 沒落地(R17-b 工作站兩跑 ⑦a PARTIAL)| **撤銷**:操作員 R17-d「每日台股清單 其他刪除」→ 美 · 日清單整段撤下(ENG231 v0102 · 冊 v0102);工作站庫裡的 us_listings 由操作員親手 `via-lists retire --yes` 撤(L10) | 操作員(撤表) | R17-c · R17-d |
 | ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |

@@ -3,7 +3,7 @@
 # VIA-RunAll.ps1 — 倉根啟動器:R17 一鍵(操作員令 2026-09-28「把它們在一個 PS 指令中」)
 # 站在倉根(movies-dataset)打:  .\VIA-RunAll.ps1
 # 做的事:git pull --ff-only → 找 VeritasIntelligenceAnalytics\Invoke-VIA-RunAll-v*.ps1 最新一支 → 跑它
-#        (VCGC 流程閘 → 政策同步 sync-db → 網路同意閘(問你一次 YES)→ 財報 --mops · CNN 恐懼貪婪 · Forward PER · 美日台總清單
+#        (VCGC 流程閘 → 政策同步 sync-db → 網路同意閘(問你一次 YES)→ 財報 --mops · CNN 恐懼貪婪 · Forward PER · 每日台股清單
 #         → 全景實測)→ 一包貼回自動放進剪貼簿,回 Claude 對話框 Ctrl+V。
 # 參數原樣轉:-Consent(不問,直接開本次同意閘)· -SkipSweep · -NoClipboard · -Days N · -NoPull(啟動器也不拉)。
 # AI 不代開網路同意閘(L07/L08):只有你加 -Consent 或提示時親手打 YES 才開,而且只這一次執行、跑完關回。
