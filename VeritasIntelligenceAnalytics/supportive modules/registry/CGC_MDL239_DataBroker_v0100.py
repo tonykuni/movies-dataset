@@ -344,7 +344,11 @@ def coverage(res: dict, req: dict, today: date | None = None) -> dict:
     got = {p["code"]: p for p in res["per_code"]}
     missing = [c for c in req["codes"] if c not in got] if res["code_col"] else []
     stale = []
-    for p in res["per_code"]:
+    per = res["per_code"]
+    if not req["codes"] and len(per) > 1:                # no symbols asked: freshness is the table's newest date, so a
+        top = max(per, key=lambda p: str(p["hi"] or ""))  # delisted / historical symbol cannot mark a current table stale
+        per = [{**top, "code": "*"}]
+    for p in per:
         hi = _as_day(p["hi"])
         grace = req["grace_days"] if len(str(p["hi"] or "")) >= 10 else max(req["grace_days"], 62)
         if hi is None or (target - hi).days > grace:
@@ -726,6 +730,7 @@ def selftest() -> int:
         db = home / "vdf_tw_market.duckdb"
         con = duckdb.connect(str(db))
         con.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE, volume BIGINT)")
+        con.execute("INSERT INTO tw_daily_prices VALUES ('2019-12-31', '9999', 10, 1)")   # a delisted symbol, long stale
         for tk in ("2330", "2317"):
             con.execute("INSERT INTO tw_daily_prices SELECT CAST(DATE '2026-06-01' + CAST(i AS INTEGER) AS VARCHAR), ?, 100 + i, 1000 "
                         "FROM range(0, 119) t(i)", [tk])                      # last day 2026-09-27
@@ -805,7 +810,7 @@ def selftest() -> int:
             and [d["file"] for d in bp["own_tables"]] == ["VRN_ENG902_C_v0100.py"], bp["why"])
         b = build(home, rts=rts, today=today, bus=fb)
         st = {x["table"]: x["state"] for x in b["rows"]}
-        chk("⑭ VCGC→VDF 建庫計畫:正庫表逐張量,在且新 = GREEN,缺的排 VDF 項(預設乾跑)",
+        chk("⑭ VCGC→VDF 建庫計畫:正庫表逐張量,在且新 = GREEN(下市舊代號不拖累整表),缺的排 VDF 項(預設乾跑)",
             st.get("tw_daily_prices") == "GREEN" and all(v in ("GREEN", "PLAN", "GATED", "ABSENT") for v in st.values()),
             " · ".join(f"{k} {v}" for k, v in sorted(b["tally"].items())))
         class LazyBus:

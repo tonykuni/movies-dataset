@@ -185,7 +185,7 @@ try {
             $ba = Invoke-OcPy $broker.FullName @("build", "--apply")
             Write-Host ("  ②b VDF 建庫 · rc=" + $ba.rc) -ForegroundColor $(if ($ba.rc -eq 0) { "Green" } else { "Yellow" })
             $ba.lines | Select-Object -Last 24 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
-            if ($ba.lines | Where-Object { $_ -match '^\s*(RED|TIMEOUT)\s' }) { $exitCode = 2 }
+            if ($ba.rc -ne 0) { $exitCode = 2 }                  # GATED / ABSENT / NODATA / RED / TIMEOUT: tables still missing = step not done
         }
     }
 
@@ -216,6 +216,10 @@ try {
     $pg = Invoke-OcPy $engine.FullName @("page")
     $st = Invoke-OcPy $engine.FullName @("status")
     Write-Host ("  ⑤ 操作台頁 · rc=" + $pg.rc) -ForegroundColor $(if ($pg.rc -eq 0) { "Green" } else { "Yellow" })
+    if ($pg.rc -ne 0) {
+        $exitCode = 2
+        $pg.lines | Select-Object -Last 8 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+    }
     try {
         $rows = ($st.lines -join "`n") | ConvertFrom-Json
         $lampRows = @($rows | ForEach-Object { [pscustomobject]@{ id = $_.item; title = $_.item; state = @{ OK = "GREEN"; SKIP = "AMBER"; FAIL = "RED"; UNTESTED = "EMPTY" }[$_.lamp]; note = $_.text } })
@@ -236,7 +240,8 @@ try {
     if (Test-Path -LiteralPath $sync) { Write-Host ("  [SYNCHRONIZER] " + $sync) -ForegroundColor Cyan }
     $page = Join-Path $VIA "VIA_Reports\operator_console\VIA_OperatorConsole_latest.html"
     Write-Host ("  [頁] " + $page) -ForegroundColor Cyan
-    if (-not $NoOpen -and (Test-Path -LiteralPath $page)) { try { Invoke-Item -LiteralPath $page } catch { Write-Host "  [頁] 開不了瀏覽器(手動開上面的檔)" -ForegroundColor Yellow } }
+    if ($pg.rc -ne 0) { Write-Host "  [頁] 本次沒產出新頁(上面是舊頁,不自動開)" -ForegroundColor Yellow }
+    if (-not $NoOpen -and $pg.rc -eq 0 -and (Test-Path -LiteralPath $page)) { try { Invoke-Item -LiteralPath $page } catch { Write-Host "  [頁] 開不了瀏覽器(手動開上面的檔)" -ForegroundColor Yellow } }
 } finally {
     $env:VIA_DATA_HOME = $prevHome
     if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }
