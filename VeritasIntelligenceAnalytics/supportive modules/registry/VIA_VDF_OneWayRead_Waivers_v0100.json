@@ -1,0 +1,26 @@
+{
+ "schema": "VIA.VDF.OneWayReadWaivers.v1",
+ "rule": "VDF 獨立性(0c):VDF 引擎指到兄弟家族(VRN/VAP)預設算依賴。逐支審過、確認**只讀不回寫**的,才登在這裡;登了才算 GREEN。命中字串或呼叫的函式變了 = 不再符合 = 回 NODATA 重審。豁免必附理由(L87)。",
+ "reviewed": "2026-09-28",
+ "reviewer": "AI(R17-1;工作站 VDF 鏈 rc=2 追根)",
+ "waivers": [
+  {
+   "family": "VDF_ENG063_MonthlyRevenue",
+   "target": "functional modules/VRN",
+   "module_glob": "VRN_ENG069_ConsensusDB_v*.py",
+   "calls": ["fetch_universe", "snapshot_day"],
+   "direction": "read-only",
+   "why": "fetch_universe 以 read_only=True 開 VDF 自家的 vdf_tw_market.duckdb 讀 tw_listings / tw_listings_industry 名冊;snapshot_day 只算台灣日期。VDF 只寫自己的 tw_monthly_revenue,不回寫 VRN。",
+   "decouple_later": "名冊可改由 VDF 自家正主 VDF_ENG087_MarketListGovernance 提供(Z252)"
+  },
+  {
+   "family": "VDF_ENG094_ActiveETFActivity",
+   "target": "functional modules/VRN",
+   "module_glob": "VRN_ENG090_FinStatementsTemplate_v*.py",
+   "calls": ["pkg_integrity"],
+   "direction": "read-only",
+   "why": "只呼叫 pkg_integrity 驗 VIA_HTML_UI 正典模板完整性(唯讀);頁面寫到本引擎自己的 output/ui,不回寫 VRN。",
+   "decouple_later": "模板完整性檢查可提升到共用層(Z252)"
+  }
+ ]
+}
