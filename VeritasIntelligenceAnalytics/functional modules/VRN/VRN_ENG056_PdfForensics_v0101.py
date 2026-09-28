@@ -96,10 +96,11 @@ def selftest() -> int:
     fitz = None
     try:
         fitz = importlib.import_module("fitz")
-    except ModuleNotFoundError as exc:
-        print(f"  {type(exc).__name__}: {exc}")
-        print(f"  NODATA 缺件 {exc.name or 'fitz'}(缺件≠壞掉 L16)")
-        missing.append(exc.name or "fitz")
+    except ImportError as exc:                     # 沒裝 = ModuleNotFoundError;裝了但載不起來(DLL 壞)= ImportError,都照實缺件
+        name = getattr(exc, "name", None) or "fitz"
+        print(f"  ModuleNotFoundError: No module named '{name}'" if isinstance(exc, ModuleNotFoundError) else f"  {type(exc).__name__}: {exc}")
+        print(f"  NODATA 缺件 {name}(缺件≠壞掉 L16)")
+        missing.append(name)
     if importlib.util.find_spec("pdfplumber") is None:
         print("  [註] pdfplumber 未裝——只在 fitz 缺席時當後備路;fitz 在時不影響判決")
 

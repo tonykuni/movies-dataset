@@ -144,6 +144,7 @@ def _selftest() -> int:
 
     # ③ 安全載入本體(暫存夾當工作目錄;本體頂層重庫全走探針,零網路零寫檔)
     mod = None
+    backends = None                     # None = 本體沒載入,無法確認有擷取後端(Codex #344 P1)
     old_cwd = os.getcwd()
     with tempfile.TemporaryDirectory() as td:
         os.chdir(td)
@@ -152,6 +153,7 @@ def _selftest() -> int:
             caps = getattr(mod, "_CAP", {}) or {}
             have = sorted(k for k, v in caps.items() if v)
             lack = sorted(k for k, v in caps.items() if not v)
+            backends = [k for k in ('fitz', 'pdfplumber', 'camelot', 'tabula', 'docling') if caps.get(k)]
             chk("本體可載入且入口類別在", hasattr(mod, "VRN_MDL004_OCRFetcher"),
                 f"__version__={getattr(mod, '__version__', '?')}")
             print(f"  [記] 本機可用引擎/庫 {have};缺 {lack}(本體探針式載入,缺件≠壞掉 L16)", flush=True)
@@ -196,7 +198,15 @@ def _selftest() -> int:
 
     k, n = sum(marks), len(marks)
     ok = k == n
-    print(f"  [計] {STEM} v0100 自測 {k}/{n} · {'PASS' if ok else 'FAIL'}", flush=True)
+    # Codex #344 P1:包裝類別在、純函式過,不等於這台能抽 PDF。擷取後端一個都沒有(或本體沒載入、無從確認)
+    # = 量不到真擷取 → NODATA(rc 2),不回綠;純函式檢查失敗仍回 1。
+    if ok and not backends:
+        need = "/".join(('fitz', 'pdfplumber', 'camelot', 'tabula', 'docling'))
+        why = "本體沒載入,無從確認擷取後端" if backends is None else "擷取後端全不在"
+        print(f"  NODATA 缺件 {need}({why};缺件≠壞掉 L16)", flush=True)
+        print(f"  [計] {STEM} v0100 自測 {k}/{n} · NODATA(可跑的檢查全過,真擷取量不到)", flush=True)
+        return 2
+    print(f"  [計] {STEM} v0100 自測 {k}/{n} · {'PASS' if ok else 'FAIL'}" + (f" · 擷取後端 {backends}" if ok else ""), flush=True)
     return 0 if ok else 1
 
 
