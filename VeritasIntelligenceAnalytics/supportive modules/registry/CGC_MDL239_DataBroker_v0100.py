@@ -205,13 +205,13 @@ def _stores(home: Path | None, explicit: bool = False) -> list:
     return sorted(p for p in Path(home).rglob("*.duckdb") if not _skip(p))
 
 
-def locate(home: Path | None, table: str, dbs: list, explicit: bool = False) -> list:
+def locate(home: Path | None, table: str, dbs: list, explicit: bool = False, stores: list | None = None) -> list:
     """Where the table can be read: source stores first (freshest truth), then the Parquet catalog VIEW."""
     duckdb = _duckdb()
     found = []
     if duckdb is None:
         return found
-    for p in _stores(home, explicit):
+    for p in (stores if stores is not None else _stores(home, explicit)):
         if dbs and p.stem not in dbs:
             continue
         try:
@@ -387,6 +387,9 @@ def item_params(item: dict, req: dict) -> dict:
     return out
 
 
+_CAT: dict = {}
+
+
 def handoff(route: dict, req: dict, apply: bool = False, bus=None, timeout: int = DEFAULT_TIMEOUT) -> dict:
     item = pick_item(route, req)
     if item is None:
@@ -399,9 +402,14 @@ def handoff(route: dict, req: dict, apply: bool = False, bus=None, timeout: int 
     bus = bus if bus is not None else mod("CGC_MDL148_EngineBus")
     if bus is None:
         return {**base, "state": "ABSENT", "why": "CGC_MDL148 EngineBus 尾版不在"}
-    r = bus.call(item["id"], params, timeout=timeout, apply=apply)
+    if bus is mod("CGC_MDL148_EngineBus"):              # the real bus: resolve its catalog once per process
+        if "rows" not in _CAT:
+            _CAT["rows"] = bus.catalog()
+        r = bus.call(item["id"], params, timeout=timeout, apply=apply, catalog_rows=_CAT["rows"])
+    else:
+        r = bus.call(item["id"], params, timeout=timeout, apply=apply)
     return {**base, "state": r.get("state", "RED"), "rc": r.get("rc"), "argv": r.get("argv", []),
-            "why": r.get("why", ""), "seconds": r.get("seconds", 0)}
+            "why": r.get("why", ""), "seconds": r.get("seconds", 0), "log": r.get("stdout_log", "")}
 
 
 # ───────────────────────── ⑤ the request, end to end ─────────────────────────
@@ -411,9 +419,9 @@ def _rid(req: dict) -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + hashlib.sha1(key.encode()).hexdigest()[:8]
 
 
-def _read_best(home, route: dict, req: dict, out: Path | None, explicit: bool = False) -> tuple:
+def _read_best(home, route: dict, req: dict, out: Path | None, explicit: bool = False, stores: list | None = None) -> tuple:
     tried = []
-    for src in locate(home, req["table"], route["dbs"] if route else [], explicit):
+    for src in locate(home, req["table"], route["dbs"] if route else [], explicit, stores):
         if not src["ok"]:
             tried.append(src)
             continue
@@ -536,12 +544,13 @@ def build(home=None, apply: bool = False, bus=None, rts: list | None = None, tod
     rts = rts if rts is not None else routes()
     explicit = bool(home)
     home = Path(home) if home else data_home(None)[0]
+    stores = _stores(home, explicit)                     # scan once per build, not once per table
     rows, planned = [], {}
     for r in rts:
         if not r["in_ssot"] or not str(r["role"]).startswith("正庫"):
             continue
         req = validate({"table": r["table"], "requester": "VCGC_BUILD"})[0]
-        got, _ = _read_best(home, r, req, None, explicit) if _duckdb() else (None, [])
+        got, _ = _read_best(home, r, req, None, explicit, stores) if _duckdb() else (None, [])
         cov = coverage(got, req, today) if got else None
         if got and got["rows"] >= max(1, r["min_rows"]) and cov["enough"]:
             rows.append({"table": r["table"], "state": "GREEN", "rows": got["rows"], "item": "", "why": "在且新"})
@@ -558,6 +567,20 @@ def build(home=None, apply: bool = False, bus=None, rts: list | None = None, tod
         planned[item["id"]] = h["state"]
         rows.append({"table": r["table"], "state": h["state"], "rows": (got or {}).get("rows", 0), "item": item["id"],
                      "why": ("不在" if not got else "舊了/不足") + " → " + h["state"] + (":" + h["why"][:100] if h.get("why") else "")})
+    if apply and any(v == "GREEN" for v in planned.values()):
+        stores = _stores(home, explicit)                 # a VDF item may have created a new store: scan again
+        for x in rows:
+            if x["state"] != "GREEN" or not x["item"]:
+                continue
+            r = next(z for z in rts if z["table"] == x["table"])
+            req = validate({"table": r["table"], "requester": "VCGC_BUILD"})[0]
+            got, _ = _read_best(home, r, req, None, explicit, stores)
+            cov = coverage(got, req, today) if got else None
+            if got and got["rows"] >= max(1, r["min_rows"]) and cov["enough"]:
+                x.update(rows=got["rows"], why=x["why"] + f" → 重量:在且新({got['rows']} 列)")
+            else:                                        # rc 0 is not the table: an engine can print SKIP and exit 0
+                x.update(state="NODATA", rows=(got or {}).get("rows", 0),
+                         why=x["why"] + " → 重量:VDF 項回綠但表仍" + ("舊" if got else "不在") + "(看站紀錄;引擎可能自述 SKIP)")
     tally = {}
     for x in rows:
         tally[x["state"]] = tally.get(x["state"], 0) + 1
@@ -782,9 +805,19 @@ def selftest() -> int:
         chk("⑭ VCGC→VDF 建庫計畫:正庫表逐張量,在且新 = GREEN,缺的排 VDF 項(預設乾跑)",
             st.get("tw_daily_prices") == "GREEN" and all(v in ("GREEN", "PLAN", "GATED", "ABSENT") for v in st.values()),
             " · ".join(f"{k} {v}" for k, v in sorted(b["tally"].items())))
+        class LazyBus:
+            def call(self, item_id, params, timeout=0, apply=False):
+                return {"state": "GREEN" if apply else "PLAN", "rc": 0, "argv": [], "why": ""}
+
+        b2 = build(home, apply=True, rts=[r for r in rts if r["table"] in ("tw_chip_derived", "etf_revenue_momentum")],
+                   today=today, bus=LazyBus())
+        st2 = {x["table"]: x["state"] for x in b2["rows"]}
+        chk("⑮ 建庫 --apply 後重量:rc 0 不等於表在(引擎自述 SKIP 也回 0)→ 表仍缺 = NODATA,不記綠",
+            st2.get("etf_revenue_momentum", "NODATA") == "NODATA" and all(v in ("GREEN", "NODATA") for v in st2.values()),
+            " · ".join(f"{k} {v}" for k, v in sorted(st2.items())))
     keep = os.environ.pop("VIA_FROM_VCGC", None)
     try:
-        chk("⑮ CLI 不經 VCGC 就拒跑", main(["status"]) == 2)
+        chk("⑯ CLI 不經 VCGC 就拒跑", main(["status"]) == 2)
     finally:
         if keep is not None:
             os.environ["VIA_FROM_VCGC"] = keep
