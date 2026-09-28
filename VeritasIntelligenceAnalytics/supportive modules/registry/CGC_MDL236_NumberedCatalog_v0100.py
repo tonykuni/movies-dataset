@@ -174,11 +174,20 @@ def ssot(ledger: dict) -> list:
     return rows
 
 
+_PATHLIKE = re.compile(r"^[A-Za-z]:[\\/]|^\\\\|\.(json|jsonl|py|ps1|txt|csv|xlsx?|md|yaml|yml)$", re.I)
+
+
+def _is_pattern(key: str, val: str) -> bool:
+    """A key named *regex*/*pattern*/rx may still hold a file reference (e.g. files.financial_regex = a Windows path)."""
+    return bool(re.search(r"(?i)regex|pattern|\brx\b", key)) and not _PATHLIKE.search(val.strip()) and \
+        not re.search(r"(?i)(file|path|dir)s?$", key)
+
+
 def _walk_regex(obj, path=""):
     if isinstance(obj, dict):
         for k, v in obj.items():
             sub = f"{path}.{k}" if path else str(k)
-            if isinstance(v, str) and re.search(r"(?i)regex|pattern|\brx\b", str(k)):
+            if isinstance(v, str) and _is_pattern(str(k), v) and not re.search(r"(?i)(^|\.)files?(\.|$)", path):
                 yield sub, v
             else:
                 yield from _walk_regex(v, sub)
@@ -198,21 +207,33 @@ def _rule_modules() -> list:
                 out.append(act._body_of(p))
     rules = VIA / "supportive modules" / "70_VRN_Rules"
     fam = {}
-    for p in rules.glob("SUP_MDL0*_v*.py"):
-        if re.search(r"(?i)ssot|regex|alias|ticker|lexicon", p.stem):
+    for p in list(rules.glob("SUP_MDL*_v*.py")) + list(rules.glob("VIS_VRN_*_v*.py")):
+        if re.search(r"(?i)ssot|regex|alias|ticker|lexicon|rule|field|policy|financial", p.stem):
             k = re.sub(r"_v\d+$", "", p.stem)
-            if k not in fam or _vnum(p) > _vnum(fam[k]):
+            if k not in fam or _rule_ver(p) > _rule_ver(fam[k]):
                 fam[k] = p
     return out + sorted(fam.values(), key=lambda p: p.name)
+
+
+def _rule_ver(p: Path) -> tuple:
+    """VIS_VRN versions run v0599 < v05910 < v05912 < v0600: first three digits, then the rest as its own number."""
+    m = re.search(r"_v(\d+)$", p.stem)
+    d = m.group(1) if m else "0"
+    return int(d[:3]), int(d[3:] or 0)
 
 
 def regex_and_params(ledger: dict) -> tuple:
     act = _activator()
     rx_rows, pm_rows, seen = [], [], {}
+
+    def ident(key: str) -> str | None:
+        """Conflict identity = the full field path. Entries inside arrays (patterns[3].rx) are meant to differ: no identity."""
+        return None if "[" in key else key
     for p in ssot_books():
         book = re.sub(r"_v\d+$", "", p.stem)
         for key, pat in _walk_regex(_json(p) or {}):
-            seen.setdefault(key.split(".")[-1], set()).add(pat)
+            if ident(key):
+                seen.setdefault(ident(key), set()).add(pat)
             try:
                 re.compile(pat)
                 lamp, note = "GREEN", ""
@@ -223,12 +244,13 @@ def regex_and_params(ledger: dict) -> tuple:
     for mod in _rule_modules():
         try:
             tables = act.param_tables(mod) if act else {}
-        except SyntaxError:
+        except Exception:                               # a rule module this python cannot parse: no tables, not a crash
             tables = {}
         base = re.sub(r"_v\d+$", "", mod.stem)
         for key, val in tables.items():
             if key.endswith("#regex"):
-                seen.setdefault(key[:-6].split(".")[-1], set()).add(str(val))
+                if ident(key[:-6]):
+                    seen.setdefault(ident(key[:-6]), set()).add(str(val))
                 try:
                     re.compile(val)
                     lamp, note = "GREEN", str(val)[:90]
@@ -240,21 +262,34 @@ def regex_and_params(ledger: dict) -> tuple:
                 size = len(val) if hasattr(val, "__len__") and not isinstance(val, str) else 1
                 pm_rows.append(_row(ledger, "PARAM", f"{base}|{key}", key, _version_of(mod.name), mod.name,
                                     locked_at(mod), "GREEN", f"{type(val).__name__} · {size} 項"))
-    for r in rx_rows:                                   # same key name, two different patterns = conflict (AMBER)
-        if r["lamp"] == "GREEN" and len(seen.get(r["name"].split(".")[-1], ())) > 1:
+    for r in rx_rows:                                   # same full field path, two different patterns = conflict (AMBER)
+        if r["lamp"] == "GREEN" and ident(r["name"]) and len(seen.get(ident(r["name"]), ())) > 1:
             r["lamp"], r["note"] = "AMBER", "同名 regex 兩處不同值(衝突待裁定):" + r["note"]
     return rx_rows, pm_rows
+
+
+def db_measurements(folder: Path | None = None) -> dict:
+    """(db file name, table) -> the DB panel row. The producer (CGC_MDL228 panel) writes DBM_PANEL_latest.json with rows
+    under overview.tables; an older flat DBM_REPORT_latest.json (tables at top level) is read too. Keyed by db AND table:
+    prices_canonical / features_daily exist in two databases."""
+    folder = folder or REPORTS / "dbmanager"
+    out = {}
+    for name, pick in (("DBM_REPORT_latest.json", lambda d: d.get("tables")),
+                       ("DBM_PANEL_latest.json", lambda d: (d.get("overview") or {}).get("tables"))):
+        for t in pick(_json(folder / name) or {}) or []:
+            if isinstance(t, dict) and t.get("table"):
+                out[(Path(str(t.get("db") or "")).name.lower(), str(t["table"]).lower())] = t
+    return out
 
 
 def indices(ledger: dict) -> list:
     p = _newest(HERE, "VIA_DB_Table_SSOT_v*.json")
     book = _json(p) or {}
-    dbm = _json(REPORTS / "dbmanager" / "DBM_REPORT_latest.json") or {}
-    seen = {str(t.get("table")): t for t in (dbm.get("tables") or []) if isinstance(t, dict)}
+    seen = db_measurements()
     rows = []
     for t in book.get("tables") or []:
         name = str(t.get("table"))
-        live = seen.get(name)
+        live = seen.get((Path(str(t.get("db") or "")).name.lower(), name.lower()))
         if live is None:
             lamp, note = "AMBER", "本機沒有 DB 面板量測(工作站跑一鍵後才有)"
         else:
@@ -443,6 +478,22 @@ def selftest() -> int:
     chk("⑤ 燈只有紅黃綠三種", {r["lamp"] for k in ("tool", "ssot", "regex", "param", "index", "test") for r in cat[k]} <= set(LAMP))
     codes = [r["code"] for k in ("tool", "ssot", "regex", "param", "index", "test") for r in cat[k]] + [p["code"] for p in cat["paths"]]
     chk("⑥ 每一列都有編號,而且不重號", len(codes) == len(set(codes)) and all(codes), f"{len(codes)} 號")
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        Path(td, "DBM_PANEL_latest.json").write_text(json.dumps({"overview": {"tables": [
+            {"db": "D:/x/vdf_tw_market.duckdb", "table": "prices_canonical", "state": "GREEN"},
+            {"db": "vdf_global_market.duckdb", "table": "prices_canonical", "state": "RED"}]}}), encoding="utf-8")
+        m = db_measurements(Path(td))
+    chk("⑦ DB 面板讀 DBM_PANEL overview.tables,以 (庫, 表) 為鍵(同名表不互蓋)",
+        m.get(("vdf_tw_market.duckdb", "prices_canonical"), {}).get("state") == "GREEN" and
+        m.get(("vdf_global_market.duckdb", "prices_canonical"), {}).get("state") == "RED")
+    walked = dict(_walk_regex({"files": {"financial_regex": "C:\\Users\\x\\regex.json"}, "rules": {"rx": "\\d+"},
+                               "patterns": [{"rx": "a"}, {"rx": "b"}]}))
+    chk("⑧ 檔案參照不當 regex 編;陣列內各式不算衝突", "files.financial_regex" not in walked and walked.get("rules.rx") == "\\d+"
+        and not [r for r in cat["regex"] if "[" in r["name"] and "衝突" in r["note"]])
+    chk("⑨ VRN 規則族全收(SUP_MDL7xx · VIS_VRN_*),VIS 版號 v0599 < v05912 < v0600",
+        any("SUP_MDL749" in p.name for p in _rule_modules()) and
+        _rule_ver(Path("X_v0599.py")) < _rule_ver(Path("X_v05912.py")) < _rule_ver(Path("X_v0600.py")))
     ok = all(results)
     print(f"  {ENGINE} selftest {sum(results)}/{len(results)} {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 1
