@@ -80,12 +80,30 @@ def cel_order() -> list[str]:
     return order or _TEXT_ORDER()
 
 
+def _pinned(family: str) -> Path | None:
+    """R20c: the lock book (CGC_MDL233 pinned) names the tool in use; only VCGC activate moves it."""
+    act = _newest(HERE, "CGC_MDL233_ToolActivate_v*.py")
+    if not act:
+        return None
+    spec = importlib.util.spec_from_file_location("tool_activate_for_mdl156", act)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod
+    spec.loader.exec_module(mod)
+    return mod.pinned(family)
+
+
 def celeritas_tail() -> Path:
+    pin = _pinned("accelerator")
+    if pin:
+        return pin
     first = next((SUPP / c for c in cel_order() if (SUPP / c).is_file()), None)
     return first or _newest(SUPP, "VeritasCeleritas_v*.py") or SUPP / "ABSENT-VeritasCeleritas-tail"
 
 
 def aegis_tail() -> Path:
+    pin = _pinned("network")
+    if pin:
+        return pin
     for folder in (SUPP / "network", SUPP):
         hit = _newest(folder, "VeritasAegisNexus_v*.py")
         if hit:

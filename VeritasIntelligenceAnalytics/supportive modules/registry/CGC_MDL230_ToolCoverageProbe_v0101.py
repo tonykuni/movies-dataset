@@ -167,6 +167,41 @@ def probe(zip_path: Path | None = None, root: Path = VIA) -> dict:
 
 
 _PRIOR.probe = probe
+_LEGACY = _PRIOR.legacy
+
+
+def _with_name_owners(root: Path = VIA) -> dict:
+    """Every versioned tool tail that loads an unversioned body by with_name(): body rel path -> [tails]."""
+    owners = {}
+    for folder in (root / "supportive modules" / "network", root / "supportive modules"):
+        for tail in sorted(folder.glob("VeritasAegisNexus_v*.py")) + sorted(folder.glob("VeritasCeleritas_v*.py")):
+            m = re.search(r"with_name\(\s*['\"]((?:VeritasAegisNexus|VeritasCeleritas)\.py)['\"]",
+                          tail.read_text(encoding="utf-8", errors="ignore"))
+            if m and tail.with_name(m.group(1)).is_file():
+                owners.setdefault(_PRIOR._rel(tail.with_name(m.group(1)), root), []).append(tail.name)
+    return owners
+
+
+def legacy(root: Path = VIA, tool: dict | None = None) -> dict:
+    """v0101: v0100 only asked the newest network file for its body. Since R20c the lock names v1652, which runs
+    on the versioned 1.65.1 body; the unversioned body is the body of the history tails v0116/v0117 — still a body,
+    still kept. Name every tail that loads it."""
+    rep = _LEGACY(root, tool)
+    owners = _with_name_owners(root)
+    for row in rep["rows"]:
+        tails = owners.get(row[1])
+        if tails and "本體" not in row[5]:
+            row[5] = f"{' / '.join(tails)} 的本體(with_name 載入)" + (" · " + row[5] if row[5] != "—" else "")
+            if row[4] != "保留":
+                row[0], row[4] = "HOLD", "保留"
+                rep["retire_cmds"] = [c for c in rep["retire_cmds"] if row[1] not in c]
+    rep["keep"] = sum(1 for r in rep["rows"] if r[4] == "保留")
+    rep["deletable"] = len(rep["retire_cmds"])
+    rep["state"] = "AMBER" if rep["retire_cmds"] else "HOLD"
+    return rep
+
+
+_PRIOR.legacy = legacy
 
 for _name, _value in vars(_PRIOR).items():
     if not _name.startswith("__") and _name not in globals():

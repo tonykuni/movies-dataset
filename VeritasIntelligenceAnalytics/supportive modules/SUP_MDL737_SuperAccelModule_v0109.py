@@ -4,7 +4,8 @@
 
 v0108 wrote one body file name (the v1141 one) into CEL_CANDIDATES.
 A newer body would never be loaded, and the pinned name is a PINVER.
-This tail sets CEL_CANDIDATES from _cel_versioned(), which v0106 already carries:
+This tail sets CEL_CANDIDATES from the lock book first (CGC_MDL233 pinned, R20c: only VCGC
+activate moves it), else from _cel_versioned(), which v0106 already carries:
 every VeritasCeleritas_v*.py next to this file, newest first, and a body that names
 talib is not a candidate (L50). Nothing else changes. Nothing is fetched or installed.
 """
@@ -72,8 +73,26 @@ def _cel_versioned() -> tuple:
 
 
 # The one change. celeritas(), activate() and selftest() read this global on the prior module.
+def _pinned_accelerator() -> tuple:
+    """R20c: the lock book names the body (CGC_MDL233 pinned; only VCGC activate moves it)."""
+    hits = [p for p in (HERE / "registry").glob("CGC_MDL233_ToolActivate_v*.py") if _vnum(p) >= 0]
+    if not hits:
+        return ()
+    spec = importlib.util.spec_from_file_location("tool_activate_for_mdl737", max(hits, key=_vnum))
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod
+    try:
+        spec.loader.exec_module(mod)
+        p = mod.pinned("accelerator")
+    except Exception as exc:
+        LOCK_NOTE.append(f"lock unreadable: {type(exc).__name__}")
+        return ()
+    return (p.name,) if p and p.parent == HERE and p.name in _cel_versioned() else ()
+
+
+LOCK_NOTE: list = []
 _PRIOR._cel_versioned = _cel_versioned
-_PRIOR.CEL_CANDIDATES = _cel_versioned()
+_PRIOR.CEL_CANDIDATES = _pinned_accelerator() or _cel_versioned()
 
 for _name, _value in vars(_PRIOR).items():
     if not _name.startswith("__") and _name not in globals():
@@ -92,9 +111,10 @@ def selftest() -> int:
     clean = [p.name for p in versioned
              if "talib" not in p.read_text(encoding="utf-8", errors="ignore").lower()]
     own = Path(__file__).read_text(encoding="utf-8")
+    pin = _pinned_accelerator()
     checks = [
-        ("CEL_CANDIDATES is the newest talib-free VeritasCeleritas_v*",
-         bool(clean) and CEL_CANDIDATES[:1] == (clean[-1],)),
+        ("CEL_CANDIDATES first = the lock book's body (else the newest talib-free VeritasCeleritas_v*)",
+         bool(clean) and CEL_CANDIDATES[:1] == (pin or (clean[-1],))[:1]),
         ("no body file name is written into this tail",
          re.search(r"VeritasCeleritas_v\d{4}\.py", own) is None),
     ]

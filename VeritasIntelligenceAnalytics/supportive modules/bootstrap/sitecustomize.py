@@ -280,8 +280,22 @@ def _boot():
     try:
         mounted = []
         sup = os.path.join(root, "supportive modules")
-        tails = {"VeritasCeleritas": _cel_tail(sup),
-                 "VeritasAegisNexus": _tool_tail("VeritasAegisNexus", (os.path.join(sup, "network"), sup))}
+        # R20c(操作員「透過VCGC才能啟用」「版本固定」):先問鎖冊(CGC_MDL233 pinned,與 SUP_MDL737/740、
+        # CGC_MDL156 同一把尺);夾裡新放的版號檔沒經 VCGC activate 寫鎖,就不會被掛上。鎖讀不到才退回尾版律。
+        pins = {}
+        try:
+            act = _newest(os.path.join(sup, "registry"), "CGC_MDL233_ToolActivate_v")
+            if act:
+                mod = _load(act, "via_tool_activate_boot")
+                for fam, name in (("accelerator", "VeritasCeleritas"), ("network", "VeritasAegisNexus")):
+                    p = mod.pinned(fam)
+                    if p:
+                        pins[name] = str(p)
+        except Exception as exc:
+            note.append(f"鎖冊 ABSENT:{type(exc).__name__}")
+        tails = {"VeritasCeleritas": pins.get("VeritasCeleritas") or _cel_tail(sup),
+                 "VeritasAegisNexus": pins.get("VeritasAegisNexus")
+                 or _tool_tail("VeritasAegisNexus", (os.path.join(sup, "network"), sup))}
         for name, rels in (("VeritasCeleritas", ("supportive modules/VeritasCeleritas.py",
                                                  "supportive modules/50_Protection_Acceleration/VeritasCeleritas.py",
                                                  "supportive modules/accelerator/VeritasCeleritas.py")),

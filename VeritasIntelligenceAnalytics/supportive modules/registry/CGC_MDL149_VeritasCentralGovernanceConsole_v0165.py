@@ -4,7 +4,9 @@
 
 操作員 2026-09-28:「LAYOUT引擎 NLP引擎 都集合成單一出口」。
 v0164 以前 `via-vcgc layout …` 有路,NLP 沒有——要跑 NLP 得自己找 SUP_MDL866 哪一版去叫。
-本尾版多收兩個動詞,交給 NLP/Layout 門尾版(CGC_MDL216_NlpLayoutDoor_v*,照尾版律取):
+本尾版多收三個動詞。tools 交給工具啟用閘尾版(CGC_MDL233_ToolActivate_v*:加速器/網路工具的版本固定,
+只有這裡的 activate --apply 能動鎖冊);nlp、door 交給 NLP/Layout 門尾版(CGC_MDL216_NlpLayoutDoor_v*,照尾版律取):
+  via-vcgc tools [activate <family> <file> [--apply]]
   via-vcgc nlp <SUP_MDL866 參數>   → 門 → NLP 編排器尾版
   via-vcgc door                     → 門的路線卡(每條路線的尾版 · 版號 · 與座位冊是否一致)
 `layout` 照舊由前一版處理(門的 layout 也是交回這一條,不另寫一條)。其餘動詞原樣轉給前一版。
@@ -38,6 +40,7 @@ HERE = Path(__file__).resolve().parent
 _STEM = "CGC_MDL149_VeritasCentralGovernanceConsole"
 DOOR_STEM = "CGC_MDL216_NlpLayoutDoor"
 DOOR_VERBS = ("nlp", "door")
+TOOLS_STEM = "CGC_MDL233_ToolActivate"
 
 
 def _vnum(path: Path) -> int:
@@ -72,12 +75,33 @@ def _door():
     return module
 
 
+def _tools():
+    hits = [p for p in HERE.glob(TOOLS_STEM + "_v*.py") if _vnum(p) >= 0]
+    if not hits:
+        return None
+    p = max(hits, key=_vnum)
+    spec = importlib.util.spec_from_file_location("vcgc_tools_" + p.stem, p)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def _is_door_verb(args) -> bool:
     return bool(args) and args[0] in DOOR_VERBS
 
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
+    if args[:1] == ["tools"]:
+        if os.environ.get("VIA_FROM_VCGC") != "YES":
+            print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
+            return 2
+        tools = _tools()
+        if tools is None:
+            print(json.dumps({"via": "vcgc", "state": "ABSENT", "why": TOOLS_STEM + " tail"}, ensure_ascii=False))
+            return 2
+        return tools.main(args[1:])
     if not _is_door_verb(args):
         return PRIOR.main(argv)
     if os.environ.get("VIA_FROM_VCGC") != "YES":
