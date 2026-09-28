@@ -25,5 +25,6 @@
 | 步 | 內容 | 還原點 | 狀態 | 證據 |
 |---|---|---|---|---|
 | R8 | Z223 PY 缺橋 91:逐支在所有已追蹤 JSON 冊裡找這支檔的內容 sha / md5 —— 8 支被鎖或證據冊釘住,記進 `py_readonly`(`added_20260928b` 逐支寫明哪本冊);其餘 83 支由正主 `via_accel_injector.inject_py` 補橋,逐支再 `compile()`。另補 R7 漏跑的 `via-vrnbook build`(ENG090 v0103 新尾版讓冊過期) | 0add58b5 | 完成(容器) | CGC_MDL183 **整體 GREEN 第一次**(PY 缺 0 · PS 新缺 0 · 自測 8/8);83 支每支只加 14 行;MDL193 九鎖 + SuccessLedger 全 true;沒有封章冊點名這 83 支;CI 工作流 Python 全段 OK;邏輯冊 53/53;status 邏輯庫 OK · VRN STALE/NODATA |
+| R9 | Z234 全景 ⑭ 兩條假紅:`tail_contains` 只讀尾版字面,可是 VDF_ENG087 v0104 載 v0103 本體、VIA_SYSTEM_MANAGER_v0150 exec v0148 本體,憑據其實在實際跑的本體裡。新尾版 `CGC_MDL158 v0115`:沿尾版**實際載入**(程式碼字串常數點名 + 有 exec/runpy/importlib/__getattr__)的較舊同族檔往回走到具體實作;markers 在整串找,markers_absent 整串都不得出現;說明/註解只提到舊版不算載入(第一版連註解都跟,把 MDL158 自己也標成薄尾,當場收緊)。v0114 留作版史 | 06b4e5c5 | 完成(容器) | 自測 45/45(⑭ GREEN,新 ⑭b 沙盒);已修冊 tail_contains 九條全 GREEN(F536-PINVER · F537-MGR 由 RED 轉 GREEN,並寫出實際本體);新 pytest `test_panorama_thin_tail_markers_v0100.py` 4/4(連舊 6 條共 10/10);總管/Deck 自測 rc0;契約測 19/19;邏輯冊未變 GREEN;閘 PY 缺 0 |
 
 **教訓(兩次了)**:開新尾版的同一個 commit 裡,一定要跑 `via-vrnbook build`;新尾版如果會出現在 MasterControl 頁上,追蹤頁也要重生。不然 status 的邏輯庫會變紅,CI 的 test_11 也會紅。

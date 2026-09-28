@@ -294,5 +294,5 @@
 | ~~Z226~~(結) | 加速橋在 `from __future__` 前,三支尾版 import 即 SyntaxError;`ast.parse` 抓不到 | **已結(側線 2026-09-28 R2+R5)** | AI | R2 三支新版號修;R5 全景 CGC_MDL158 v0114 骨架卡多 COMPILE 類(compile 才報的錯)+ TAILAPI 類(尾版少公開名稱又沒轉接),沙盒驗收 5 測 OK;只報位置不改 |
 | ~~Z222~~(續) | SSOT 連動 BROKEN 4 | **BROKEN 已結(R2)**;YELLOW 7 仍待逐格裁定 | 操作員 | status:BROKEN 0 · YELLOW 7 · GREEN 5 |
 | Z233 | MasterControl 頁 486 個引擎列顯示「正式名稱待治理」(例:E007 VDF_ENG074 原顯示「FRED 宏觀單一真實來源擷取引擎」)—— v0148 本體與 v0150 產頁逐字同,是樹上名冊現況,不是 v0150 造成 | 未做 | AI(找名冊來源) | R3 發現;追蹤頁已照正主重生(test_11 要求),名稱回填另批 |
-| Z234 | CGC_MDL158 自測 ⑭ 已修冊複驗:回歸 F536-PINVER · F537-MGR(v0113 與 v0114 同,既有) | 未做 | AI | 43/44 |
+| Z234 | CGC_MDL158 自測 ⑭ 已修冊複驗:回歸 F536-PINVER · F537-MGR(v0113 與 v0114 同,既有)—— 假紅:只讀尾版字面,憑據在薄尾實際載入的本體裡 | **已收(R9)** | AI | v0115 沿實際載入鏈判;自測 45/45;九條 tail_contains 全 GREEN |
 | ~~Z223~~(結) | CGC_MDL183 [PY ] 缺橋 91 | **已結(側線 2026-09-28 R8)** | AI(操作員「依擬建議」「GO ON」) | 8 支內容被鎖 / 證據冊釘住 → `py_readonly`(基線冊 `added_20260928b` 逐支寫明哪本冊);83 支正主 `inject_py` 補橋 + 逐支 compile;閘整體 GREEN、自測 8/8;九鎖與 SuccessLedger 全 true |
