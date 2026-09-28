@@ -14,6 +14,7 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
      不在啟動層載 Celeritas;VIA_ACCEL_BOOT = "cache:<可用>/<冊>:<n>env" | "NOCACHE:…" | (VIA_ACCEL_FULL=1 時)"1:…"
   ③ 資料家(批490):目錄頁/MDL123 → env VIA_DATA_HOME、VIA_DB_<庫名>(引擎按名取路徑;家不在=誠實不設)
   ④ 正典工具本名掛載(批494):VeritasCeleritas / VeritasAegisNexus 惰性代理進 sys.modules;VIA_TOOLS_MOUNT 存證
+     R20 起先掛版號尾版(VeritasCeleritas_v* 依 SUP_MDL737 解析序 · VeritasAegisNexus_v* 最大號),無版號檔只當後備
   ② 網路正典件(VIA_FAMILY=vdf 時;其餘家族不掛):尾版 SUP_MDL740 →
      註冊成 sys.modules["via_net"],引擎可 `import via_net` 用 http_json/http_bytes/yf_download
      → VIA_NET_BOOT = "1" 或 "ABSENT:<原因>"
@@ -246,8 +247,55 @@ def _boot():
     #   現在每個行程都把 VeritasCeleritas / VeritasAegisNexus 掛進 sys.modules(惰性代理:首次取屬性才真載入,
     #   起跑零等待;`import VeritasCeleritas` 在任何 VIA 行程都直接可用);VIA_ACCEL_FULL=1 仍是起跑就真點亮。
     #   正典路徑同 SUP_MDL737 CEL_CANDIDATES / SUP_MDL740 AEGIS 正典序;橋(737/740)留作橋,工具只認這兩件。
+    #   R20(2026-09-28 操作員:「網路工具名稱不對 … 有版本號 VeritasAegisNexus 名稱才對」):
+    #   舊序第一位是無版號檔——Aegis 掛到本體 network/VeritasAegisNexus.py(沒有 v0116 的反封鎖梯),
+    #   Celeritas 掛到 accelerator/VeritasCeleritas.py(23 行的 CLI 座位,只有 main,取不到加速器 API)。
+    #   現在先掛**版號尾版**:Celeritas 問 SUP_MDL737 的解析序(CEL_CANDIDATES,零 talib 尾版;同一把尺),
+    #   Aegis 取 VeritasAegisNexus_v*.py 最大號(同 SUP_MDL740 _resolve_aegis_path:network 夾先,supportive 夾後)。
+    #   無版號檔只在尾版不在時當後備。本檔名是 Python 規定的 sitecustomize,不能換成版號檔名。
+    def _tool_tail(stem, dirs):
+        for d in dirs:
+            best = None
+            try:
+                names = os.listdir(d)
+            except Exception:
+                names = []              # 夾不在=這一夾沒有尾版,換下一夾
+            for n in names:
+                digits = n[len(stem) + 2:-3] if n.startswith(stem + "_v") and n.endswith(".py") else ""
+                if digits.isdigit() and (best is None or int(digits) > best[0]):
+                    best = (int(digits), os.path.join(d, n))
+            if best:
+                return best[1]
+        return None
+
+    def _cel_tail(sup):
+        try:
+            for rel in (getattr(VIA_ACCEL, "CEL_CANDIDATES", None) or ()):
+                if os.path.isfile(os.path.join(sup, rel)):
+                    return os.path.join(sup, rel)
+        except Exception:
+            return None                 # 加速器橋缺席=沒有解析序,走後備
+        return None
+
     try:
         mounted = []
+        sup = os.path.join(root, "supportive modules")
+        # R20c(操作員「透過VCGC才能啟用」「版本固定」):先問鎖冊(CGC_MDL233 pinned,與 SUP_MDL737/740、
+        # CGC_MDL156 同一把尺);夾裡新放的版號檔沒經 VCGC activate 寫鎖,就不會被掛上。鎖讀不到才退回尾版律。
+        pins = {}
+        try:
+            act = _newest(os.path.join(sup, "registry"), "CGC_MDL233_ToolActivate_v")
+            if act:
+                mod = _load(act, "via_tool_activate_boot")
+                for fam, name in (("accelerator", "VeritasCeleritas"), ("network", "VeritasAegisNexus")):
+                    p = mod.pinned(fam)
+                    if p:
+                        pins[name] = str(p)
+        except Exception as exc:
+            note.append(f"鎖冊 ABSENT:{type(exc).__name__}")
+        tails = {"VeritasCeleritas": pins.get("VeritasCeleritas") or _cel_tail(sup),
+                 "VeritasAegisNexus": pins.get("VeritasAegisNexus")
+                 or _tool_tail("VeritasAegisNexus", (os.path.join(sup, "network"), sup))}
         for name, rels in (("VeritasCeleritas", ("supportive modules/VeritasCeleritas.py",
                                                  "supportive modules/50_Protection_Acceleration/VeritasCeleritas.py",
                                                  "supportive modules/accelerator/VeritasCeleritas.py")),
@@ -256,7 +304,8 @@ def _boot():
             real = sys.modules.get(name)
             if real is not None and not isinstance(real, _LazyTool):
                 mounted.append(f"{name}=loaded"); continue
-            path = next((os.path.join(root, r) for r in rels if os.path.isfile(os.path.join(root, r))), None)
+            path = tails.get(name) or next((os.path.join(root, r) for r in rels
+                                            if os.path.isfile(os.path.join(root, r))), None)
             if not path:
                 mounted.append(f"{name}=ABSENT"); continue
             if real is None:
