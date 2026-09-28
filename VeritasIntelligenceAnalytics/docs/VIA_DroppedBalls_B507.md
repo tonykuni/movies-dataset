@@ -312,3 +312,4 @@
 | Z243 | CGC_MDL124 BridgeSweeper v0107 自測 ④ 假紅:期望 `VeritasCeleritas.py` 回「獨立工具不可動」,該檔 R4 退役後回「未在冊」(仍排除);另 `--subsystems --apply` 的計畫不讀閘的 py_readonly,會碰 ENG112 正本 / ENG110 v0114 sha 鎖 / 版史檔 | 候 | AI(開 v0108:期望改成「非空排除因由」+ 讀閘唯讀冊與鎖冊再計畫) | R16-1 已改逐支注入避開 |
 | Z244 | InputConsole resolve_argv 對 etf_holdings_daily 只帶 --start(gap-mode / end 沒帶進 argv)—— v0112 與 v0113 同,既有行為 | 候 | AI 查參數鍵名(冊用 gap-mode,翻譯器可能認 gap_mode) | R16-2 實測發現 |
 | Z245 | 全景 TAILAPI 40 支尾版(薄尾只轉 main):R16-3 逐支查真呼叫端,只有 via_params_central_v0110 一件真壞(已修 v0111);其餘 39 支沒有以尾版方式取用被丟名稱的呼叫端(釘舊版 / 只跑命令列 / 執行期名稱其實在)| 候(設計債,非故障)| AI(之後有新呼叫端時再逐支開轉接尾版;不批量開新尾版以免 Hydra)| 清單與逐支證據:掃描輸出 severe.json · tailapi_callers.json(R16-3)|
+| Z246 | VRN 鏈 RED 2:ENG067 MindMapSSOT ① 依賴鏈(容器無 vdf_tw_market.duckdb)· ENG068 DailyBrief ③ VAP 收割(VAP_ENG009 無資料時回空、why 也空 → FAIL 而非 SKIP,L16「缺件≠壞掉」沒守到)| 候 | 操作員工作站跑 VRN 鏈(有庫才是實測)· AI 之後開 ENG068 新版:空結果且無因由 = SKIP 並寫因由 | 容器鏈 01:14 的結果;工作站未量 |
