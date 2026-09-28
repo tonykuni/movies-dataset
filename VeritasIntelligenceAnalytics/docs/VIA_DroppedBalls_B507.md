@@ -319,7 +319,7 @@
 | Z250 | 基線資料檔 VIA_CeleritasPolicy_Baseline_v0100.json 收緊(移除已還 790 支)被權限閘判「不可逆破壞」擋下 → 改用只增的已還帳 + 閘 v0102;v0101 單獨跑自測 ④ 會 7/8(版史,尾版 v0102 全過,格子取尾版)| 候 | 操作員要收緊基線就親手改(或授權 AI 改),之後閘 v0102 照樣過 | R16-9 |
 | Z251 | 工作站 ② VDF 鏈 rc=2(NODATA)0.9s,容器同步驟是 rc=4(GATED)——兩地結論不同,因由在工作站 log(v0103 起 rc≠0 會把最後四行印在畫面上)| 候 | 操作員重跑 `.\VIA-Sweep.ps1` 把貼回包貼回;AI 依印出的因由修 | 工作站 Sweep_20260928_152447.log |
 | Z252 | VDF 0c 兩處單向讀取(ENG063→VRN_ENG069 名冊 · ENG094→VRN_ENG090 模板完整性)以豁免冊放行 | 候(設計債)| AI 日後解耦:名冊改由 VDF 自家 ENG087 提供(注意 ENG069 收 0 開頭代號、ENG087 只收普通股,月營收本就只需公司)· 完整性檢查提升到共用層 | VIA_VDF_OneWayRead_Waivers_v0100.json |
-| Z253 | 工作站操作員的手(會寫你的庫 / 要開同意閘):`via-vrnlogic sync-db`(aaii 補 L14 四表)· 開閘後 `via-finstat run --mops`(tw_financial_mops)· `via-cnnfg run` · `via-fwdval run` · `via-lists run` 再 `via-lists lists` | 候 | 操作員 | R17 |
+| Z253 | 工作站操作員的手(會寫你的庫 / 要開同意閘):`via-vrnlogic sync-db`(aaii 補 L14 四表)· 開閘後 `via-finstat run --mops`(tw_financial_mops)· `via-cnnfg run` · `via-fwdval run` · `via-lists run` 再 `via-lists lists` —— R17-b 起併成倉根一句 `.\VIA-RunAll.ps1`(問一次 YES 開本次同意閘;或加 -Consent)| 候 | 操作員 | R17 · R17-b |
 | Z254 | 全景 scan 時 VDF_ENG051_ActiveTWETF_Holdings.py:26 與 VRN_ENG062_SummarizerV1.py:32 印 SyntaxWarning(docstring 裡的 `\d` 沒用 raw 字串)—— 只是警告,行為不變 | 候(低)| AI:兩支都是無版號舊檔;要改就開新版號(L04),不在原檔動 | 工作站 15:41 |
 | Z255 | 附件 B(forward_valuation_vintage v2.2)兩個原生 bug:pandas 3.x merge_asof 精度 · 無發布時間 meta 必拋 ValueError | 已在 ENG230 載入時攔 / 補(原檔不改,MANIFEST 記);回報給附件作者 | 操作員轉達 | intake MANIFEST |
 | ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |
