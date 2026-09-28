@@ -179,5 +179,32 @@
         "evidence": "CGC_MDL064 v0498 全格子(容器,修補前的工作樹)OK 300 · FAIL 46 · SKIP 15 · 存證 GRID_20260927_210820.json;再生件已 stash「grid regen」未 commit;沒有 base 對照,不宣稱是本 PR 造成"
       }
     ]
+  },
+  "remeasure_20260928_workstation_rc": {
+    "env": "workstation",
+    "source": "操作員貼回實錄(設 VIA_FROM_VCGC=YES,工作站 HEAD 8d8c130a)",
+    "why": "04:30 矩陣記的 rc 2/1/1 與容器量的 rc0 不同;這次工作站依正式入口重量。舊鎖不改寫,並列。",
+    "cells": [
+      {
+        "id": "vdf_manager_selftest",
+        "lamp": "GREEN",
+        "evidence": "VDF_SystemManager_v0118 --selftest rc=0"
+      },
+      {
+        "id": "vrn_manager_selftest",
+        "lamp": "GREEN",
+        "evidence": "VRN_SystemManager_v0108 --selftest rc=0"
+      },
+      {
+        "id": "eng110_selftest",
+        "lamp": "GREEN",
+        "evidence": "VRN_ENG110_TabReport_v0116 --selftest rc=0"
+      },
+      {
+        "id": "crlf_lock_sources",
+        "lamp": "RED",
+        "evidence": "git ls-files --eol:VIA_Policy_Laws_SSOT_v0100.json · VRN_ENG112_FinancialRead_v0100.py · VRN_ENG110_TabReport_v0114.py 皆 i/lf w/crlf attr/(無屬性保護)→ SuccessLedger 假紅與 layout LOCK_MISMATCH 的根因;修補 P7 待 via 審核"
+      }
+    ]
   }
 }

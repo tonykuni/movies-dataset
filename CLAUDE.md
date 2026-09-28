@@ -10,7 +10,7 @@ python3 "$E" slice <檔> <名|Class.method>   # 只取一個定義的原始碼(�
 
 - 唯讀:不寫檔、不執行被讀的檔(只做 `ast.parse`;`.ps1` 只做文字剖析)。
 - 錯誤分兩層:治理七類(ACCEL/NET/VERB/HARDIMP/PINVER/SYSEXE/TALIB,只在 VIA 樹內算)+ 通用 AST 類
-  (SYNTAX/DUPDEF/UNREACH/BAREEXC/SWALLOW/MUTDEF;PowerShell:PSDUPFN/PSDOCSTR)。全都只報位置,不自動改。
+  (SYNTAX/DUPDEF/UNREACH/BAREEXC/SWALLOW/MUTDEF;v0114 起 +COMPILE(ast 過、compile 不過,例:橋注在 `from __future__` 前)+TAILAPI(尾版比前版少公開名稱又沒轉接);PowerShell:PSDUPFN/PSDOCSTR)。全都只報位置,不自動改。
 - 先 `read` 看定義樹 → 用 `slice` 或帶 offset/limit 的讀檔只取要改的那一段。
 - 操作員端同一個功能:`via-panorama read <路徑>` / `via-panorama slice <檔> <名>`。
 
