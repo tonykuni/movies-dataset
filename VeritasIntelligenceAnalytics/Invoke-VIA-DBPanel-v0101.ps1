@@ -7,7 +7,7 @@
 #     ② 加速器(Celeritas PS7):Start-CeleritasPS7 起、Get-CeleritasRegex 編譯進度協定、Invoke-CeleritasParallel 並行算鎖定檔雜湊、
 #        Read/Write-CeleritasText 讀寫 JSON、Get-CeleritasStatus 進報告、Write-CeleritasReport 存加速器頁、結束 Restore-CeleritasPS7。
 #     ③ 鎖定檔行尾(Z231):律冊 + VRN_ENG112 v0100 + VRN_ENG110 v0114 三支逐支比「工作複本 / 換 LF 後 / 倉裡 blob」。
-#        只差行尾 → 先備份到 VIA_Reports\dbmanager\restore\<時間>\ 再用 git checkout-index 換回倉裡原位元(內容一字不變);
+#        只差行尾 → 先備份到 VIA_Reports\dbmanager\restore\<時間>\ 再寫回倉裡原位元(寫入的位元組先證明 git blob = HEAD;內容一字不變);
 #        內容真的不同 → 不碰、列 RED 請 via 審核。-NoEolFix = 只檢查不修。
 #     ④ 資料家目錄(可 -SkipCatalog)→ ⑤ VCGC dbm panel(只認這次新寫的 JSON)→ ⑥ VCGC dbm report:rich 十二張矩陣
 #        (總判 · 加速器 · 行尾 · 步驟 · 資料庫 · 核對 · 兩張清單 · 清單檢查 · mega 日期診斷 · 錯誤矩陣 · AST 檔 · AST 問題),
@@ -20,6 +20,7 @@
 #   ... -NoEolFix        行尾只檢查不修
 #   ... -Pull -BuildUi   先 git pull --ff-only;最後重建主控台藍圖頁
 #   ... -PlainReport     不用 rich,純文字十二張
+#   ... -Rows 60         長表(核對 · 錯誤 · AST 問題 · mega)每張最多幾列(預設 25;全表在面板 JSON)
 # 結束碼:0 = GREEN/AMBER · 1 = RED · 2 = NODATA/ABSENT · 3 = 面板沒跑出來(看 log)
 # =====================================================================================
 [CmdletBinding()]
@@ -226,7 +227,11 @@ try {
             if (-not $NoEolFix) {
                 New-Item -ItemType Directory -Force -Path $restoreDir | Out-Null
                 Copy-Item -LiteralPath $h.Full -Destination (Join-Path $restoreDir $name) -Force
-                git -C $Repo checkout-index -f -- $h.Rel 2>&1 | Out-Null
+                # 工作站實錄(R15):git checkout-index -f 看索引 stat 沒變就不寫 → 三支都「換回失敗」。
+                # 改成直接寫 LF 位元組:上面已證明它的 git blob = HEAD blob,寫進去的就是倉裡原位元,不靠 git 的 stat 快取
+                $lfBytes = [Text.Encoding]::Latin1.GetBytes([Text.Encoding]::Latin1.GetString([IO.File]::ReadAllBytes($h.Full)).Replace("`r`n", "`n"))
+                [IO.File]::WriteAllBytes($h.Full, $lfBytes)
+                git -C $Repo update-index -q --refresh 2>&1 | Out-Null
                 $after = [IO.File]::ReadAllBytes($h.Full)
                 $afterSha = ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($after)) -replace '-', '').Substring(0, 16).ToLower()
                 if ($afterSha -eq $h.Lf16) { $state = "FIXED"; $action = "已換回倉裡原位元 " + $afterSha + "(原檔備份:" + $restoreDir + ")" }
@@ -286,7 +291,7 @@ try {
     Write-Host "  [5/7] VCGC dbm report(rich 詳細摘要矩陣;缺 rich = 純文字同十二張)" -ForegroundColor Cyan
     Write-Host ""
     $env:COLUMNS = "" + $width
-    $repArgs = @("dbm", "report", "--side", $sidePath, "--width", ("" + $width))
+    $repArgs = @("dbm", "report", "--side", $sidePath, "--width", ("" + $width), "--rows", ("" + $Rows))
     if ($PlainReport) { $repArgs += "--plain" }
     $rep = Invoke-DBPStep "報告" "vrn" $console $repArgs -Show
     if ($rep.Rc -ne 0) { Write-Host ("  [報告] rc={0}:報告沒畫出來(面板 JSON 仍在;看 log)" -f $rep.Rc) -ForegroundColor Yellow }

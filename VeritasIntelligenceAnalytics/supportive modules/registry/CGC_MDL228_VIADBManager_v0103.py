@@ -13,7 +13,7 @@ v0102→v0103(側線 2026-09-28;操作員令「全部整合成一支 PowerShell 
   其餘(overview / reconcile / plan / export / ui / panel)一律交 v0102 本體(模組層 __getattr__ 轉接,公開面零損失)。
 
 用法:
-  python CGC_MDL228_VIADBManager_v0103.py report [--side <側車.json>] [--width N] [--plain]
+  python CGC_MDL228_VIADBManager_v0103.py report [--side <側車.json>] [--width N] [--rows N] [--plain]
   python CGC_MDL228_VIADBManager_v0103.py panel | overview | reconcile | plan | export … | ui     # = v0102
   python CGC_MDL228_VIADBManager_v0103.py --selftest
 """
@@ -84,7 +84,7 @@ def panel_policy(folder: Path = HERE) -> dict:
     lf = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()[:16]
     if lf == pol.get("book_sha256_16"):
         res.update(state="AMBER", eol_only=True,
-                   why=f"只差行尾(CRLF,Z231):內容與正本 {lf} 相同 → Invoke-VIA-DBPanel -FixEol(或 git checkout-index -f)換回倉裡原位元")
+                   why=f"只差行尾(CRLF,Z231):內容與正本 {lf} 相同 → 跑 Invoke-VIA-DBPanel-v0101(預設就修:先備份再寫回倉裡原位元;-NoEolFix 只檢查)")
     else:
         res.update(eol_only=False, why=res["why"] + " · 換成 LF 也不符 = 內容真的被動過,停,請 via 審核")
     return res
@@ -112,7 +112,7 @@ def mega_diag(cat: dict | None) -> list:
             if m.get("date_col"):
                 g["cols"].add(str(m["date_col"]))
             lo, hi = str(m.get("lo") or ""), str(m.get("hi") or "")
-            if lo or hi:
+            if lo and hi:                                  # 起迄都有才算「有日期」(Codex #335:缺一邊的檔分不到年)
                 g["dated"] += 1
                 if lo and (not g["lo"] or lo < g["lo"]):
                     g["lo"] = lo
@@ -124,6 +124,9 @@ def mega_diag(cat: dict | None) -> list:
             st, why, nxt = "AMBER", "目錄沒認到日期欄(欄名不在 DataHome 日期欄冊)", "把這張表的日期欄名補進 DataHome 日期欄冊,重跑 via-datahome catalog -Tables"
         elif not g["dated"]:
             st, why, nxt = "AMBER", "認到日期欄,但檔內沒有 min/max 統計", "寫檔端開 parquet 統計;或合併時用 SQL 實算 MIN/MAX(計畫 SQL 已含)"
+        elif g["dated"] < g["files"]:
+            st, why, nxt = ("AMBER", f"只有 {g['dated']}/{g['files']} 檔有完整起迄;其餘檔分不到年",
+                            "沒日期統計的那幾檔先用 SQL 實算 MIN/MAX(或重寫開統計),全部齊了才按年切")
         elif not iso:
             st, why, nxt = "AMBER", f"日期不是西元 ISO({g['lo'][:10]}…)", "先轉西元再按年切;轉之前只能 part-all"
         else:
@@ -146,8 +149,15 @@ def _cell(v) -> str:
     return str(v).replace("\n", " ")
 
 
-def _sections(pan: dict, side: dict, diag: list) -> list:
-    """十二張矩陣:(標題, 欄, 列, 狀態欄序或 None)。列都是字串;rich 與純文字共用這一份。"""
+def _cap(rows: list, limit: int | None, ncols: int) -> list:
+    """長表只留前 limit 列,尾巴補一列「另 N 列」(Codex #335:-Rows 要真的生效;全表在面板 JSON)。"""
+    if not limit or len(rows) <= limit:
+        return rows
+    return rows[:limit] + [[f"… 另 {len(rows) - limit} 列(全表在 {BASE.PANEL_JSON};-Rows 可加大)"] + [""] * (ncols - 1)]
+
+
+def _sections(pan: dict, side: dict, diag: list, limit: int | None = None) -> list:
+    """十二張矩陣:(標題, 欄, 列, 狀態欄序或 None)。列都是字串;rich 與純文字共用這一份。limit = 每張長表最多幾列。"""
     ov, k = pan.get("overview") or {}, (pan.get("overview") or {}).get("kpi") or {}
     lst, ast, pol = pan.get("lists") or {}, pan.get("ast") or {}, pan.get("policy") or {}
     sev = {s: sum(1 for r in pan.get("errors") or [] if r.get("sev") == s) for s in ("HIGH", "MED", "LOW")}
@@ -187,7 +197,7 @@ def _sections(pan: dict, side: dict, diag: list) -> list:
            ("⑩ 錯誤矩陣", ["嚴重度", "來源", "項目", "說明", "建議處置"], errs, 0),
            ("⑪ AST 檔", ["檔", "語言", "行數", "定義", "問題", "HIGH", "狀態"], af, 6),
            ("⑫ AST 問題(含類別說明)", ["嚴重度", "類別", "檔:行", "類別說明", "建議處置"], ai, 0)]
-    return [(t, c, [[_cell(x) for x in r] for r in rows], s) for t, c, rows, s in out]
+    return [(t, c, _cap([[_cell(x) for x in r] for r in rows], limit, len(c)), s) for t, c, rows, s in out]
 
 
 def _plain(sections: list, width: int) -> str:
@@ -229,11 +239,11 @@ def _plain(sections: list, width: int) -> str:
 
 
 def render_report(pan: dict, side: dict | None = None, cat: dict | None = None, width: int = 160,
-                  plain: bool = False, out: Path = OUT, echo: bool = True) -> dict:
+                  plain: bool = False, out: Path = OUT, echo: bool = True, limit: int | None = None) -> dict:
     """十二張矩陣 → 終端 + DBM_REPORT_latest.html / .txt。回 {engine: rich|plain, paths, sections}。"""
     side = side or {}
     diag = mega_diag(cat)
-    secs = _sections(pan, side, diag)
+    secs = _sections(pan, side, diag, limit)
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     html_p, txt_p = out / REPORT_HTML, out / REPORT_TXT
@@ -310,11 +320,14 @@ def selftest() -> int:
             {"table": "tw_daily_prices_20260902_1200", "file": "b.parquet", "rows": 5, "date_col": "date", "lo": "2026-08-26", "hi": "2026-08-30"},
             {"table": "tw_listings_20260901_1200", "file": "c.parquet", "rows": 9, "date_col": "", "lo": "", "hi": ""},
             {"table": "tw_chip_inst_20260901_1200", "file": "d.parquet", "rows": 7, "date_col": "date", "lo": "", "hi": ""},
-            {"table": "tw_rest_20260901_1200", "file": "e.parquet", "rows": 3, "date_col": "date", "lo": "115/09/01", "hi": "115/09/05"}]}]}
+            {"table": "tw_rest_20260901_1200", "file": "e.parquet", "rows": 3, "date_col": "date", "lo": "115/09/01", "hi": "115/09/05"},
+            {"table": "tw_margin_20260901_1200", "file": "f.parquet", "rows": 4, "date_col": "date", "lo": "2026-08-25", "hi": "2026-08-29"},
+            {"table": "tw_margin_20260902_1200", "file": "g.parquet", "rows": 4, "date_col": "date", "lo": "", "hi": ""}]}]}
         dg = {d["stem"]: d for d in mega_diag(cat)}
         chk("③ mega 診斷:日期齊 = GREEN(可按年切)· 沒認到日期欄 · 有欄沒統計 · 非西元 各自講清楚",
             dg["tw_daily_prices"]["state"] == "GREEN" and dg["tw_daily_prices"]["lo"] == "2026-08-25" and dg["tw_daily_prices"]["hi"] == "2026-08-30"
-            and "沒認到日期欄" in dg["tw_listings"]["why"] and "min/max" in dg["tw_chip_inst"]["why"] and "西元" in dg["tw_rest"]["why"],
+            and "沒認到日期欄" in dg["tw_listings"]["why"] and "min/max" in dg["tw_chip_inst"]["why"] and "西元" in dg["tw_rest"]["why"]
+            and dg["tw_margin"]["state"] == "AMBER" and "1/2" in dg["tw_margin"]["why"],
             str({k_: v["state"] for k_, v in dg.items()}))
         pan = {"verdict": "RED", "ts": "2026-09-28 12:16:17", "engine": "x",
                "overview": {"state": "OK", "catalog_ts": "t", "catalog_state": "OK", "kpi": {"dbs": 5, "rows": 15783873, "tables": 71},
@@ -337,6 +350,11 @@ def selftest() -> int:
         chk("④ 純文字降級:十二張矩陣都在(總判 · 加速器 · 行尾 · 步驟 · 資料庫 · 核對 · 清單 · 檢查 · mega · 錯誤 · AST×2)· 存 .txt/.html 到指定 out",
             r_plain["engine"] == "plain" and r_plain["sections"] == 12 and all(s in txt for s in ("① 總判 KPI", "② 加速器", "③ 鎖定檔行尾", "⑨ mega 日期診斷", "⑫ AST 問題"))
             and "1,981" in txt and (out / REPORT_HTML).is_file() and "純文字降級" in buf.getvalue(), f"{r_plain['engine']} · {r_plain['sections']} 張")
+        many = dict(pan, errors=[{"sev": "MED", "source": "核對", "item": f"t{i}", "desc": "d", "action": "a"} for i in range(40)])
+        with contextlib.redirect_stdout(io.StringIO()):
+            render_report(many, side, cat, width=140, plain=True, out=out / "cap", limit=10)
+        ctxt = (out / "cap" / REPORT_TXT).read_text(encoding="utf-8")
+        chk("④ -Rows 生效:長表只留前 N 列 + 「另 N 列」(Codex #335)", "t9 " in ctxt and "t10 " not in ctxt and "另 30 列" in ctxt)
         chk("④ 純文字寬度:中文按 2 格算,每行不超過指定寬(140)",
             max(sum(2 if __import__('unicodedata').east_asian_width(c) in 'WF' else 1 for c in ln) for ln in txt.splitlines()) <= 142)
         try:
@@ -379,8 +397,9 @@ def main(argv=None) -> int:
     side_p = Path(a[a.index("--side") + 1]) if "--side" in a and a.index("--side") + 1 < len(a) else OUT / SIDE_JSON
     side = _load_json(side_p) or {}
     width = int(a[a.index("--width") + 1]) if "--width" in a and a.index("--width") + 1 < len(a) else int(os.environ.get("COLUMNS") or 160)
+    limit = int(a[a.index("--rows") + 1]) if "--rows" in a and a.index("--rows") + 1 < len(a) else None
     cat, _st, _why = BASE.load_catalog()
-    r = render_report(pan, side, cat, width=width, plain="--plain" in a)
+    r = render_report(pan, side, cat, width=width, plain="--plain" in a, limit=limit)
     print(f"[DBM report] {r['engine']} · {r['sections']} 張矩陣 · HTML {r['paths']['html']} · TXT {r['paths']['txt']}")
     return 0
 

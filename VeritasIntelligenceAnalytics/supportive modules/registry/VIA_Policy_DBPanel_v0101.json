@@ -302,7 +302,11 @@
    "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py",
    "functional modules/VRN/VRN_ENG110_TabReport_v0114.py"
   ],
-  "rule": "repair only when the LF-normalized bytes equal the HEAD blob; back up the working copy to VIA_Reports/dbmanager/restore/<ts>/ first; then git checkout-index -f; content differences are never touched",
+  "rule": "repair only when the LF-normalized bytes' git blob equals the HEAD blob; back up the working copy to VIA_Reports/dbmanager/restore/<ts>/ first; then write those LF bytes directly and run git update-index --refresh (git checkout-index -f skips files whose index stat is unchanged, seen on the workstation 2026-09-28); content differences are never touched",
   "why": "Z231: autocrlf checked these out as CRLF before .gitattributes -text existed; sha locks read raw bytes"
+ },
+ "datahome": {
+  "engine": "CGC_MDL123_DataHome_v0106+",
+  "rule": "parquet date ranges read stats_min_value/stats_max_value first and stats_min/stats_max as fallback (pyarrow string dates have only the new fields)"
  }
 }

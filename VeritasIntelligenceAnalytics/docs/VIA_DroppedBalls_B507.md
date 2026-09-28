@@ -306,3 +306,5 @@
 | Z231(續二) | 工作站 R14 面板實證:律冊工作複本 sha 43b2de1213c987e7(CRLF)≠ 附冊所釘 c7aab42f7ebfd283(LF);`.gitattributes -text` 已在,但工作複本是設屬性前取出的,git 不會自己重寫 | **修法已進面板 v0101**:三支鎖定檔逐支比 git blob,只差行尾才備份後 `checkout-index -f` 換回;內容不同不碰 | 操作員(跑 v0101 一次)| 容器以同法模擬 CRLF,三支都判 EOL_ONLY、換 LF 後 = HEAD blob |
 | Z241 | mega 合併計畫 20 張表全是「— → —」→ 退成 part-all(不按年切):目錄沒記到 mega 檔的日期起迄 | 診斷已上(報告矩陣 ⑨ 逐表講缺在哪一層) | 操作員跑 v0101 貼回 ⑨ → AI 依結果補日期欄冊或改計畫 | 容器驗:DuckDB / pyarrow 寫的 DATE / TIMESTAMP / 字串日期都有 min/max 統計,所以多半是欄名不在 DataHome 日期欄冊 |
 | Z242 | aaii_sentiment.duckdb 缺 4 張 L14 同步表(via_handover · via_policy_factors · via_policy_sync · vrn_extraction_logic)—— v0102 修 Codex #333 P1 後第一次看得到 | 候 | 操作員裁(VRN_ENG082 政策同步是否涵蓋這本庫) | 另 aaii_sentiment 表本身冊外(請入冊) |
+| Z241(續) | mega 日期「— → —」根因坐實:pyarrow 字串日期只寫新式統計,DataHome v0105 只讀舊式 stats_min | **修法 = CGC_MDL123 v0106**(新式優先、舊式後備) | 操作員重跑目錄(面板不帶 -SkipCatalog)| 修好後計畫 4 才會按年切 part-YYYY |
+| Z231(續三) | 工作站 v0101 實跑:三支都 EOL_ONLY,但 `git checkout-index -f` 因索引 stat 未變不寫 → 換回失敗 | 面板改直接寫已證明 = HEAD blob 的位元組 | 操作員再跑一次 | 原檔備份在 VIA_Reports\\dbmanager\\restore\\20260928_123535 |
