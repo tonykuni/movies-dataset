@@ -132,6 +132,18 @@ $def_PARAM_SUPPORTIVE_RULES = @(
   @{ Role="AST_AUDIT";        Folder="audit_tools";    Manager="VIA_Panorama_AST_RuntimeInjector.py";Pattern="(?i)(ast|injector|audit|panorama|matrix|gate|validator|validation|selftest|syntax|compile|patchplan|repair|health|hydra)"; Responsibility="AST 掃描、語法驗證、治理矩陣、修復計畫、健康檢查" },
   @{ Role="UI_SUPPORT";       Folder="ui_support";     Manager="VPN_v35_Dashboard.html";            Pattern="(?i)(dashboard|console|html|ui|u_i|pwa|manifest|sw\.js|css|layout|theme|visual|chart|matrix)"; Responsibility="HTML U/I、儀表板、報表、視覺矩陣、前端支援" }
 )
+# R21(2026-09-28):網路與加速器兩個角色的主管檔改成鎖冊指定的版號檔(Get-CeleritasToolPath);模板不在照上面原表
+if (Get-Command Get-CeleritasToolPath -ErrorAction Ignore) {
+    foreach ($VIARule in $def_PARAM_SUPPORTIVE_RULES) {
+        $VIAFam = if ($VIARule.Role -eq 'NETWORK_AEGIS') { 'network' } elseif ($VIARule.Role -eq 'ACCELERATOR') { 'accelerator' } else { $null }
+        if (-not $VIAFam) { continue }
+        $VIAPin = Get-CeleritasToolPath -Family $VIAFam
+        if (-not $VIAPin) { continue }
+        $VIARule.Manager = Split-Path -Leaf $VIAPin
+        $VIADir = Split-Path -Leaf (Split-Path -Parent $VIAPin)
+        $VIARule.Folder = if ($VIADir -eq 'supportive modules') { '.' } else { $VIADir }
+    }
+}
 
 $def_PARAM_FUNCTIONAL_RULES = @(
   @{ Role="VDF";       Folder="VDF";       Manager="Invoke-VDF.ps1";              Pattern="(?i)(\bVDF\b|DataForge|TWSE|TPEX|MOPS|Fetch|Ticker|base.?info|financial.?data|fundamental)"; Responsibility="台股交易所/櫃買/MOPS/基礎與財報資料擷取" },

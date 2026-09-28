@@ -84,6 +84,12 @@ $def_PARAM_RUN_STAMP = Get-Date -Format "yyyyMMdd_HHmmss"
 
 $def_PARAM_AEGIS_PY = Join-Path $def_PARAM_BASE_DIR "50_Protection_Acceleration\VeritasAegisNexus.py"
 $def_PARAM_CELERITAS_PY = Join-Path $def_PARAM_BASE_DIR "50_Protection_Acceleration\VeritasCeleritas.py"
+# R21(2026-09-28):工具路徑改問鎖冊(Get-CeleritasToolPath,與 CGC_MDL233 同一本冊);模板不在就照上面原路徑。
+#   舊路徑 50_Protection_Acceleration\VeritasCeleritas.py 已不在,檢查會永遠判 FAIL/HIGH(CGC_MDL234 舊名探針抓到)。
+if (Get-Command Get-CeleritasToolPath -ErrorAction Ignore) {
+    $VIAToolPin = Get-CeleritasToolPath -Family network; if ($VIAToolPin) { $def_PARAM_AEGIS_PY = $VIAToolPin }
+    $VIAToolPin = Get-CeleritasToolPath -Family accelerator; if ($VIAToolPin) { $def_PARAM_CELERITAS_PY = $VIAToolPin }
+}
 $def_PARAM_ENVMANAGER_PY = Join-Path $def_PARAM_BASE_DIR "40_Environment_Health\VIA_EnvManager.py"
 
 $def_PARAM_OUT_ROOT = Join-Path $def_PARAM_BASE_DIR "_nexuscore_external_bridge\RUN_$def_PARAM_RUN_STAMP"
