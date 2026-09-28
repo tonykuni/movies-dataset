@@ -110,13 +110,20 @@ def build(owner=None, day: date | None = None) -> dict:
 
 
 def write_daily(payload: dict, out: Path = OUT) -> dict:
-    """每張清單落 <STEM>_<YYYYMMDD>.csv + _latest.csv;摘要 JSON 同樣兩份。空清單不落 CSV(照實,不寫空檔)。"""
+    """每張清單落 <STEM>_<YYYYMMDD>.csv + _latest.csv;摘要 JSON 同樣兩份。
+    空清單不寫空 CSV,而且把本支先前寫的「今天那份」與 _latest 撤掉(Codex #343 P1:舊名單不能冒充今天的清單);
+    撤掉的檔名記在 paths["removed"],摘要 JSON 照實 NODATA。只動本支自己產生的這兩個檔名,不碰其他檔。"""
     out.mkdir(parents=True, exist_ok=True)
     tag = payload["date"].replace("-", "")
     paths = {}
     for key, stem, _fn, _zh in LISTS:
         rows = payload[key]["rows"]
         if not rows:
+            for name in (f"{stem}_{tag}.csv", f"{stem}_latest.csv"):
+                stale = out / name
+                if stale.is_file():
+                    stale.unlink()
+                    paths.setdefault("removed", []).append(name)
             continue
         cols = list(dict.fromkeys(k for r in rows for k in r))
         for name in (f"{stem}_{tag}.csv", f"{stem}_latest.csv"):
@@ -243,8 +250,14 @@ def selftest() -> int:
         chk("⑤ 摘要 JSON 不含整份列(只留狀態 · 數 · 檢查 · 檔名)", "rows" not in summ["tw_stocks"] and summ["date"] == "2026-09-28" and "files" in summ)
         empty = build(type("E", (), {"load_stock_list": lambda self: {"state": "NODATA", "why": "空", "rows": []},
                                      "load_active_etfs": lambda self: {"state": "NODATA", "why": "空", "rows": []}})(), day=date(2026, 9, 29))
+        (td / "e").mkdir()
+        for name in ("TW_STOCKS_20260929.csv", "TW_STOCKS_latest.csv", "TW_STOCKS_20260928.csv", "OTHER.csv"):
+            (td / "e" / name).write_text("code\n2330\n", encoding="utf-8")
         p2 = write_daily(empty, td / "e")
-        chk("⑥ 清單空 = 不寫空 CSV(照實 NODATA)", set(p2) == {"summary"})
+        left_e = sorted(x.name for x in (td / "e").iterdir())
+        chk("⑥ 清單空 = 不寫空 CSV,且撤掉本支先前寫的今天那份與 latest(舊名單不冒充今天;別天、別的檔不動)",
+            set(p2) == {"summary", "removed"} and sorted(p2["removed"]) == ["TW_STOCKS_20260929.csv", "TW_STOCKS_latest.csv"]
+            and "TW_STOCKS_20260928.csv" in left_e and "OTHER.csv" in left_e and "TW_STOCKS_latest.csv" not in left_e, ", ".join(left_e))
         ln = lines(p)
         chk("⑦ 白話兩行:GREEN 只報數;非 GREEN 帶原因", len(ln) == 2 and "加權 1" in ln[0] and "1 檔還沒有持股" in ln[1], ln[1].strip())
         import duckdb

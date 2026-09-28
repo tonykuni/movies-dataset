@@ -323,4 +323,6 @@
 | Z254 | 全景 scan 時 VDF_ENG051_ActiveTWETF_Holdings.py:26 與 VRN_ENG062_SummarizerV1.py:32 印 SyntaxWarning(docstring 裡的 `\d` 沒用 raw 字串)—— 只是警告,行為不變 | 候(低)| AI:兩支都是無版號舊檔;要改就開新版號(L04),不在原檔動 | 工作站 15:41 |
 | Z255 | 附件 B(forward_valuation_vintage v2.2)兩個原生 bug:pandas 3.x merge_asof 精度 · 無發布時間 meta 必拋 ValueError | 已在 ENG230 載入時攔 / 補(原檔不改,MANIFEST 記);回報給附件作者 | 操作員轉達 | intake MANIFEST |
 | Z256 | 日股清單 jp_listings 沒落地(R17-b 工作站兩跑 ⑦a PARTIAL)| **撤銷**:操作員 R17-d「每日台股清單 其他刪除」→ 美 · 日清單整段撤下(ENG231 v0102 · 冊 v0102);工作站庫裡的 us_listings 由操作員親手 `via-lists retire --yes` 撤(L10) | 操作員(撤表) | R17-c · R17-d |
+| Z257 | VRN 交接燈的批號解析跟不上律冊新格式:律冊 batch 已是「側線 2026-09-25 第十六段」,VRN_SystemManager_v0104 `read_handover` 取第一個數字 = 2026;VCGC `_batch_from_laws` 取全部數字 = 20260925。R18 重生一頁交接後燈是綠的(真的較新),但之後律冊再往後推,2026 永遠 ≤ 一頁的 20260925 → **再也判不出過期(靜默假綠)**。修法:兩邊同一把尺(抽日期或全數字);VRN 管理器是 v0105→v0108 四層各自重載 v0104 本體的鏈(v0106 不登記 sys.modules),要把鏈收成一支具體實作的新版號才改得乾淨 | 候(設計債)| AI(操作員點頭後做) | R18 |
+| Z258 | VRN 鏈兩格缺料 NODATA(有門、量得到,缺的是資料):VRN_ENG064_KnowledgeStack 十一檢 NODATA 2;VRN_ENG068_DailyBrief ⑨ 市場寬度 2026-09-18 在庫 1988 ≠ 宇宙 1990(差 2867.TW、5371.TWO)—— 先查這兩檔是不是當日天生沒有(新上市 / 停牌 / 下市);是就該在宇宙冊標註,不是就補抓那天 | 候 | 操作員貼回 → AI | R18 |
 | ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |
