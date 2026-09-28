@@ -36,6 +36,8 @@ param(
 $VIA = $PSScriptRoot
 $Repo = Split-Path $VIA -Parent
 $StartDir = (Get-Location).Path
+# 外層保護(Codex #339 P2):從換夾那一刻起,任何出錯 / Ctrl+C / exit 都經 finally 回到起跑的夾
+try {
 Set-Location -LiteralPath $VIA
 $script:VIAAccelPairNote = "正主缺,略過"
 try {
@@ -285,3 +287,6 @@ if ($why.Count -gt 0) {
     exit 2
 }
 exit 0
+} finally {
+    Set-Location -LiteralPath $StartDir
+}
