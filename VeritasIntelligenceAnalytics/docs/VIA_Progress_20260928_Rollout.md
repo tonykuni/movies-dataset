@@ -19,3 +19,11 @@
 | 收尾 | 全格子(容器)OK 300 · FAIL 46 → **OK 306 · FAIL 40**(無新紅,6 站轉綠;再生件 stash 未 commit)· PR [tonykuni/movies-dataset#328](https://github.com/tonykuni/movies-dataset/pull/328) 已開(不 approve、不 merge) | e3149646 | 完成 | 主控台 status 會自動提交並推送 SubsystemSeat 同步(57199124);之後量測一律設 `VIA_VCGC_PUSH=NO` |
 | R6 | CI 修正:PR #328 的 Windows UAT 只剩 test_11。原因:R5 我把變更說明插在 v0114 / 閘 v0101 docstring 的第一行,總管取名用的是 docstring 第一行,於是 M151 從「PowerShell 代讀誤報修正 治理模組」掉成「正式名稱待治理」;加上 R3 之後的新尾版沒有重生追蹤頁 | 5100abdf | 完成(容器) | 變更說明移到原第一行之後;追蹤頁照正主重生;test_master_control_contract 19 OK · 全景沙盒測 5 OK · 閘 8/8 · layout 登冊 0/0/0 |
 | R7 | CI #328 第三輪 + Codex 三條:① VRN_ENG090 v0103 燈號冊改讀最新一版有 LAMPS 的 VRN_SystemManager(尾版 v0108 是薄尾)② VDF_ENG055 v0121 · VDF_ENG077 v0104:ca098982 的兩層薄尾丟了 lane_global / run / unify,新尾在自己的 namespace 跑具體實作 v0118 / v0101 + 同一個 ScrapeGate 換裝 ③ 閘 v0101 ⑧ 改審自己(VERSION v0101、讀 __file__)④ 全景 v0114 TAILAPI 薄尾往回走到具體實作(Codex)⑤ 追蹤頁再重生 | febffe67 | 完成(容器) | 工作流 Python 全段本機過:總管 10/10 · 契約 19 OK · ENG090 23/23 · daily 五支 + ETF 全 OK · 全景測 6 OK · 閘 8/8;TAILAPI 正控抓到 ENG055 v0120 / ENG077 v0103 |
+
+## 第二輪(PR #328 已併;操作員「GO ON」)
+
+| 步 | 內容 | 還原點 | 狀態 | 證據 |
+|---|---|---|---|---|
+| R8 | Z223 PY 缺橋 91:逐支在所有已追蹤 JSON 冊裡找這支檔的內容 sha / md5 —— 8 支被鎖或證據冊釘住,記進 `py_readonly`(`added_20260928b` 逐支寫明哪本冊);其餘 83 支由正主 `via_accel_injector.inject_py` 補橋,逐支再 `compile()`。另補 R7 漏跑的 `via-vrnbook build`(ENG090 v0103 新尾版讓冊過期) | 0add58b5 | 完成(容器) | CGC_MDL183 **整體 GREEN 第一次**(PY 缺 0 · PS 新缺 0 · 自測 8/8);83 支每支只加 14 行;MDL193 九鎖 + SuccessLedger 全 true;沒有封章冊點名這 83 支;CI 工作流 Python 全段 OK;邏輯冊 53/53;status 邏輯庫 OK · VRN STALE/NODATA |
+
+**教訓(兩次了)**:開新尾版的同一個 commit 裡,一定要跑 `via-vrnbook build`;新尾版如果會出現在 MasterControl 頁上,追蹤頁也要重生。不然 status 的邏輯庫會變紅,CI 的 test_11 也會紅。

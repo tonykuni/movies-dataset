@@ -295,3 +295,4 @@
 | ~~Z222~~(續) | SSOT 連動 BROKEN 4 | **BROKEN 已結(R2)**;YELLOW 7 仍待逐格裁定 | 操作員 | status:BROKEN 0 · YELLOW 7 · GREEN 5 |
 | Z233 | MasterControl 頁 486 個引擎列顯示「正式名稱待治理」(例:E007 VDF_ENG074 原顯示「FRED 宏觀單一真實來源擷取引擎」)—— v0148 本體與 v0150 產頁逐字同,是樹上名冊現況,不是 v0150 造成 | 未做 | AI(找名冊來源) | R3 發現;追蹤頁已照正主重生(test_11 要求),名稱回填另批 |
 | Z234 | CGC_MDL158 自測 ⑭ 已修冊複驗:回歸 F536-PINVER · F537-MGR(v0113 與 v0114 同,既有) | 未做 | AI | 43/44 |
+| ~~Z223~~(結) | CGC_MDL183 [PY ] 缺橋 91 | **已結(側線 2026-09-28 R8)** | AI(操作員「依擬建議」「GO ON」) | 8 支內容被鎖 / 證據冊釘住 → `py_readonly`(基線冊 `added_20260928b` 逐支寫明哪本冊);83 支正主 `inject_py` 補橋 + 逐支 compile;閘整體 GREEN、自測 8/8;九鎖與 SuccessLedger 全 true |
