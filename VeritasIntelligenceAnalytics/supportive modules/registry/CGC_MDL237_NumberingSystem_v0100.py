@@ -235,10 +235,22 @@ def _walk_defs(tree, prefix=""):
             q = prefix + node.name
             yield "FNC", q, node.lineno, f"{q}({_args(node)})", prefix[:-1]
             yield from _walk_defs(node, q + ".")
-        elif isinstance(node, (ast.If, ast.Try, ast.With, ast.For, ast.While)):
-            for part in ("body", "orelse", "finalbody", "handlers"):
-                for sub in getattr(node, part, []) or []:
-                    yield from _walk_defs(type("B", (), {"body": [sub]})(), prefix)
+        elif isinstance(node, ast.stmt):
+            # any compound statement (if / for / while / with / try / try* / match, async too): walk every statement list
+            # it holds, including each except handler's body and each match case's body
+            blocks = [getattr(node, part, None) or [] for part in ("body", "orelse", "finalbody")]
+            blocks += [h.body for h in getattr(node, "handlers", None) or []]
+            blocks += [c.body for c in getattr(node, "cases", None) or []]
+            for block in blocks:
+                if block:
+                    yield from _walk_defs(_Block(block), prefix)
+
+
+class _Block:
+    """A bare statement list, walked like a module body."""
+
+    def __init__(self, body):
+        self.body = body
 
 
 def _ledger_versions() -> dict:
@@ -1493,6 +1505,11 @@ def selftest() -> int:
     back = expand(compact(meth), "FNC", {mdl["code"]: mdl})
     chk("④b CLS/FNC 壓縮存、讀回繼承模組列(號 · 鍵 · 來源 · 版本 · 更新日不變)", back and back["code"] == meth["code"] and
         back["key"] == meth["key"] and back["source"] == mdl["source"] and back["version"] == "v0100")
+    src = ("try:\n    import x\nexcept ImportError:\n    def tbl(): pass\n    class _E: pass\n"
+           "with open('f') as h:\n    def w(): pass\nmatch 1:\n    case 1:\n        def m(): pass\n"
+           "for i in []:\n    pass\nelse:\n    def e(): pass\n")
+    names = {q for _, q, *_ in _walk_defs(ast.parse(src))}
+    chk("④c except / with / match / for-else 裡的定義都收(不漏編)", names == {"tbl", "_E", "w", "m", "e"}, ", ".join(sorted(names)))
     chk("⑤ 多來源對照:取最近共同日期比、容差外 = 不一致", d == "2026-01-03" and not _close(1.04, 1.2, ("abs", 0.05)) and
         _close(4.48, 4.422, ("abs", 0.1)))
     chk("⑥ TA-Lib 進 LIB = 紅(L50)", lib_items({"talib": {"supportive modules/x.py"}})[0]["lamp"] == "RED")
