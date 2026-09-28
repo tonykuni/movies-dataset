@@ -771,6 +771,76 @@
    "match": null,
    "source": "operator",
    "ts": "20260831_190306"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-23",
+   "sig": "TA-Lib 禁令一再被違反:via-ta.cmd、via-talib、via-taone、能跑閘探 talib、補庫句印 pip install TA-Lib 一直留著",
+   "cause": "舊尺 CGC_MDL158 TALIB 類只看 Python AST 的 import;PowerShell 函式 / 別名、.cmd 啟動器、探針名單字串、pip 對照、舊版號檔都不在量測面,量不到就一直漏",
+   "fix": "偵測面補齊(CGC_MDL243 TalibCommandScan 切片掃 · RunGate v0109 拿掉 talib · Register v0262 拆指令 · via-ta.cmd 刪);禁令守衛與版史留著;尾版只准 AST 定位局部切除後出新版號並自測過",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201823"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-24",
+   "sig": "工作站每載入一次 VCGC v0166 就噴 SyntaxWarning: invalid escape sequence '\\V'",
+   "cause": "抬頭三引號不是 raw,又寫了 Windows 路徑 .\\VIA-OperatorConsole.ps1(ENG072 v0135 同型 LL175 再犯);已併入 main 的檔照 L04 不能改",
+   "fix": "新尾版抬頭一律 raw 三引號;VCGC v0167 載前一版時只對 SyntaxWarning 消音;寫抬頭註解時不要把三引號本身寫進去(會提早關閉)",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201823"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-25",
+   "sig": "via-vcgc go 流程閘一步 439 秒、無輸出 281 秒,看起來像當機、像沒上加速器",
+   "cause": "VCGC status 的 live_components 每跑一次就把約 580 支尾版檔整支 ast.parse + 走訪,status / registry-sync 乾跑 / --apply 各算一遍;OneDrive 夾 + 防毒逐檔掃放大;加速器只管資料運算管不到這段",
+   "fix": "VCGC v0167 以 git 樹狀態為鑰快取活元件盤點(VIA_Reports/vcgc/cache,不入 git;樹變才重算;VIA_VCGC_NOCACHE=1 強制重算);容器 status 14.8s→8.4s",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201823"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-26",
+   "sig": "別的會話併進 main 的新檔(5 支 PY · 3 支 PS)沒有加速器橋 / 模板章,涵蓋稽核轉紅",
+   "cause": "新檔入倉沒有經過 BridgeSweeper --apply 與 PS 模板章;L103 最高政策三條只有量測、沒有入倉前的自動補",
+   "fix": "每次併 main 後照 VCGC 路徑跑 CGC_MDL124 BridgeSweeper --subsystems --apply + 新 .ps1 頂行補 CELERITAS-TEMPLATE-JOIN v1,再跑涵蓋稽核確認 100%",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201824"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-27",
+   "sig": "新 VCGC 尾版一上,流程閘就擋:missing CONSOLE(unmarked)",
+   "cause": "CGC_MDL222 座位探針要求子系統尾版內文含 VIA_FROM_VCGC 標記;薄尾的抬頭沒寫到這個字串",
+   "fix": "每支 VCGC / 子系統尾版抬頭都寫明『只收 VCGC 呼叫(VIA_FROM_VCGC=YES)』;上新尾版後先跑一次 status 確認『政策過 · 子系統已對齊』",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201824"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-28",
+   "sig": "兩個會話都寫 VRN 邏輯冊(產物),合併撞 JSON;若用舊建冊器重建會把別人加的節點洗掉",
+   "cause": "邏輯冊是建冊器 + VrnLogicAdd 兩條寫入路徑的產物;建冊器 v0111 不知道 AllInOne 節點",
+   "fix": "合併時產物冊取 main 版;只增不減:不要用比冊舊的建冊器 build;加節點走 CGC_MDL244 VrnLogicAdd(冊版 +1)",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201824"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-29",
+   "sig": "VCGC status 沒設 VIA_VCGC_PUSH=NO 就自己 commit + push 子系統座位冊",
+   "cause": "status 的座位同步設計為有漂移就寫冊並推送;容器或測試時忘了關",
+   "fix": "容器 / 測試一律設 VIA_VCGC_PUSH=NO;工作站要推才不設",
+   "match": null,
+   "source": "operator",
+   "ts": "20260928_201824"
   }
  ]
 }
