@@ -1,3 +1,4 @@
+# CELERITAS-TEMPLATE-JOIN v1
 #Requires -Version 7.0
 $ErrorActionPreference = "Stop"
 $via = Split-Path -Parent $MyInvocation.MyCommand.Path
