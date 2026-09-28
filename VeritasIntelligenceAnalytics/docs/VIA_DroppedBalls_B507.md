@@ -297,3 +297,4 @@
 | Z234 | CGC_MDL158 自測 ⑭ 已修冊複驗:回歸 F536-PINVER · F537-MGR(v0113 與 v0114 同,既有)—— 假紅:只讀尾版字面,憑據在薄尾實際載入的本體裡 | **已收(R9)** | AI | v0115 沿實際載入鏈判;自測 45/45;九條 tail_contains 全 GREEN |
 | ~~Z223~~(結) | CGC_MDL183 [PY ] 缺橋 91 | **已結(側線 2026-09-28 R8)** | AI(操作員「依擬建議」「GO ON」) | 8 支內容被鎖 / 證據冊釘住 → `py_readonly`(基線冊 `added_20260928b` 逐支寫明哪本冊);83 支正主 `inject_py` 補橋 + 逐支 compile;閘整體 GREEN、自測 8/8;九鎖與 SuccessLedger 全 true |
 | Z235 | VRN_ENG089 `_jsval` 用 `<\!--` 拆註解,但 `\!` 不是合法的 JSON 跳脫:研報資料裡只要出現 `<!--`,頁上的 `JSON.parse` 就整份讀不動(CGC_MDL227 自測 ⑨ 實量到同一招會炸,已改成 `\u003c`)| 候 | AI(開 ENG089 新版號修,L04)| 潛在問題,樹上現有資料未觸發 |
+| Z236 | CGC_MDL139 `resolve_argv`:參數冊項目同時列 `range` 與 `start`(tw_history)時,解析出 `--start X --end Y --start X`(重複)。ENG064 取第一個,所以目前無害,但這是冊與翻譯器對不齊 | 候 | via(冊上 tw_history 拿掉多餘的 start,或正主去重)| R11b 實測發現 |

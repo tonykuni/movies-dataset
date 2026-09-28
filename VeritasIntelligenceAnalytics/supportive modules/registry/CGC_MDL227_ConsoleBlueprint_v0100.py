@@ -68,7 +68,8 @@ BOOKS = {
 }
 BOOK_ZH = {"spec": "參數冊 InputConsole", "laws": "政策律條冊", "logic": "VRN 邏輯架構冊", "lock": "收尾鎖冊",
            "ledger": "成功冊", "fixed": "已修冊", "celeritas": "Celeritas 基線冊", "bus": "引擎調度匯流排 MDL148",
-           "panorama": "全景稽核 MDL158", "manager": "系統總管 do_list", "grid": "最近一次格子證據", "eng089": "VRN 模板 ENG089"}
+           "panorama": "全景稽核 MDL158", "manager": "系統總管 do_list", "grid": "最近一次格子證據", "eng089": "VRN 模板 ENG089",
+           "console": "輸入主控台 MDL139(參數翻譯正主)"}
 GRID_DIR = VIA / "VIA_Reports" / "selftest_runs"
 OUT_DIR = VIA / "VIA_Reports" / "console_blueprint"
 TEMPLATE_ROOT = VIA / "VIA_HTML_UI"
@@ -87,13 +88,21 @@ FAMILIES = (("vcgc", "central", "VCGC 中央治理"), ("vdf", "vdf", "VDF 資料
 TABS = (("overview", "總覽", "矩陣 · 邏輯規範 · 引擎總攬 · 運作摘要 · 錯誤摘要,一頁看"),
         ("matrix", "矩陣", "每一本治理矩陣逐列狀態"),
         ("logic", "邏輯規範", "政策律條(依位階)與 VRN 六層邏輯"),
-        ("engines", "引擎", "參數冊每一項 → 尾版 → 在位 → 實際會跑哪一句(PLAN)"),
+        ("engines", "引擎", "參數冊每一項 → 尾版 → 在位 → 正主 MDL139 以冊上參數解析出會跑的那一句"),
         ("errors", "錯誤與待辦", "紅燈與待操作員裁定,逐條附來源"),
         ("results", "執行結果", "最近一次格子逐站結果"))
-#: 參數種類 → 左面板控制項(冊上沒有的種類照實給文字框並註明)
-CONTROL_OF = {"start": "date", "since": "date", "range": "date", "since_ym": "month", "days": "number",
-              "codes": "codes", "ticker": "codes", "code": "codes", "dir": "dir", "scan-dir": "dir", "from-file": "dir",
-              "only": "text", "lanes": "text", "cats": "text", "text_positional": "text", "vapone": "text", "vetf": "text"}
+#: 參數種類 → 正主 CGC_MDL139.resolve_argv 讀的鍵與控制項。旗標怎麼寫(range 拆 --start/--end、codes 依 codes_style、
+#: since_ym 截月、lanes → --lane …)一律由正主翻譯;本支只收值,不自己拼旗標(v0100 實測抓到自拼出 `--range`,ENG064 不認)。
+#: 不在這張表的種類 = 正主不接 → 不給欄位,照實列出。
+KIND_KEYS = {"range": (("start", "date"), ("end", "date")), "start": (("start", "date"),), "since": (("start", "date"),),
+             "since_ym": (("start", "month"),), "days": (("days", "number"),), "codes": (("codes", "codes"),),
+             "only": (("only", "text"), ("cats", "text")), "cats": (("cats", "text"),), "lanes": (("lanes", "text"),),
+             "dir": (("dir", "dir"),), "code": (("code", "codes"),),
+             "vapone": (("out", "dir"), ("formats", "text"), ("profile", "text"), ("config", "dir"), ("data", "dir"))}
+KEY_HINT = {"end": "YYYY-MM-DD;留空 = 今天(正主規則)", "codes": "4~6 位代碼,逗號分隔(≤200);寫法依該項 codes_style",
+            "lanes": "L1~L15,逗號分隔", "cats": "英文類別名,逗號分隔", "only": "FRED 序列代碼,逗號分隔;留空 = 依類別",
+            "dir": "報告夾(留空 = 冊預設 ∪ incoming)", "code": "4~6 位代碼", "out": "輸出夾", "formats": "svg,html,png,pdf,plotly",
+            "profile": "vap_spec_v1 | seaborn_stack_v23", "config": "stack config.json(--render 必填)", "data": "資料檔(選填)"}
 SEVERITY = {"RED": 0, "AMBER": 1, "NODATA": 2, "ABSENT": 3, "GREEN": 4}
 
 
@@ -157,17 +166,18 @@ def _mod_row(path, err: str) -> dict:
 
 
 # ---------------------------------------------------------------- ① 收集
-def collect_params(spec: dict | None, bus_rows: list | None, plan) -> list:
-    """參數冊 → 左面板。plan(item_id) 回 EngineBus PLAN(argv 與原因);bus_rows 是 catalog()。"""
+def _relargv(argv: list) -> list:
+    return [("python" if i == 0 else _rel(a) if os.sep in str(a) and Path(str(a)).is_absolute() else str(a))
+            for i, a in enumerate(argv or [])]
+
+
+def collect_params(spec: dict | None, bus_rows: list | None, plan, resolver=None, eff_start=None) -> list:
+    """參數冊 → 左面板。plan(id) = EngineBus PLAN;resolver(id) = 正主 MDL139 resolve_argv(冊上參數會跑的那一句);
+    eff_start(id, group) = 正主 effective_start(起日的實際值,給欄位當提示)。三者缺席 = 照實 NODATA,不自己算。"""
     fams = []
     spec = spec or {}
     kinds = spec.get("param_kinds") or {}
-    dflt = spec.get("defaults") or {}
-    user = spec.get("user") or {}
     by_id = {r.get("id"): r for r in (bus_rows or [])}
-    codes = []
-    for ex in ("TWSE", "TPEX"):
-        codes += [str(c) for c in ((user.get("tw_codes") or {}).get(ex) or [])]
     for key, skey, zh in FAMILIES:
         fam = (spec.get("families") or {}).get(skey)
         if not isinstance(fam, dict):
@@ -180,25 +190,33 @@ def collect_params(spec: dict | None, bus_rows: list | None, plan) -> list:
             for it in g.get("items") or []:
                 iid = str(it.get("id") or "")
                 bus = by_id.get(iid) or {}
-                ctrls = []
+                ctrls, seen, unsupported = [], set(), []
                 for p in it.get("params") or []:
-                    hint = kinds.get(p)
-                    default = ""
-                    if p in ("start", "range", "since"):
-                        default = ((user.get("starts") or {}).get(iid) or (user.get("group_starts") or {}).get(g.get("id"))
-                                   or dflt.get("start") or "")
-                    elif p == "days":
-                        default = (user.get("days") or {}).get(iid) or dflt.get("days") or ""
-                    elif p in ("dir", "scan-dir") and skey == "vrn":
-                        default = user.get("vrn_dir") or ((fam.get("input") or {}).get("dir_default")) or ""
-                    elif p in ("codes", "ticker", "code"):
-                        default = ",".join(codes)
-                    ctrls.append({"param": p, "control": CONTROL_OF.get(p, "text"), "default": str(default),
-                                  "hint": hint or "冊上 param_kinds 沒有這個參數種類的說明(照實給文字框)",
-                                  "known": bool(hint)})
+                    if p not in KIND_KEYS:
+                        unsupported.append(p)
+                        continue
+                    for pkey, control in KIND_KEYS[p]:
+                        if pkey in seen:
+                            continue
+                        seen.add(pkey)
+                        ph = ""
+                        if pkey == "start" and eff_start is not None:
+                            try:
+                                ph = eff_start(iid, g.get("id")) or "latest(引擎增量律,不帶旗標)"
+                            except Exception:
+                                ph = ""
+                        elif pkey == "lanes":
+                            ph = str(it.get("lanes_default") or "")
+                        ctrls.append({"key": pkey, "kind": p, "control": control, "placeholder": ph,
+                                      "hint": kinds.get(p, "") if pkey == "start" else KEY_HINT.get(pkey, kinds.get(p, ""))})
                 pl = plan(iid) if bus else {}
-                argv = [("python" if i == 0 else _rel(a) if i == 1 and os.sep in str(a) else str(a))
-                        for i, a in enumerate(pl.get("argv") or [])]
+                argv = _relargv(pl.get("argv"))
+                rs = {}
+                if resolver is not None:
+                    try:
+                        rs = resolver(iid) or {}
+                    except Exception as exc:
+                        rs = {"state": "UNREADABLE", "note": type(exc).__name__}
                 in_place = bus.get("engine_state") == "在位"
                 items.append({"id": iid, "zh": it.get("zh") or iid, "net": bool(it.get("net")),
                               "note": str(it.get("note") or "")[:160], "params": ctrls,
@@ -206,7 +224,10 @@ def collect_params(spec: dict | None, bus_rows: list | None, plan) -> list:
                               "engine_state": "GREEN" if in_place else ("ABSENT" if bus else "NODATA"),
                               "engine_why": "" if bus else "匯流排目錄沒有這一項(或匯流排載不到)",
                               "versions": bus.get("versions") or 0, "outputs": list(it.get("outputs") or [])[:6],
-                              "plan_argv": argv, "plan_state": pl.get("state") or ("NODATA" if not bus else "")})
+                              "plan_argv": argv, "plan_state": pl.get("state") or ("NODATA" if not bus else ""),
+                              "resolved_argv": _relargv(rs.get("argv")), "resolved_state": rs.get("state") or "NODATA",
+                              "resolved_note": str(rs.get("note") or ("正主 MDL139 載不到" if resolver is None else ""))[:200],
+                              "unsupported": unsupported})
                 n_items += 1
                 n_in += 1 if in_place else 0
                 n_net += 1 if it.get("net") else 0
@@ -414,7 +435,7 @@ def _kpis(fams, inv, mats, logic, run, errors) -> list:
 
 
 def collect(spec_path: Path = SPEC, books: dict | None = None, grid_dir: Path = GRID_DIR,
-            bus_mod=None, panorama=None, manager=None, eng089=None, load_live: bool = True) -> dict:
+            bus_mod=None, panorama=None, manager=None, eng089=None, console=None, load_live: bool = True) -> dict:
     """收集全部需求 → 藍圖(dict)。唯讀、零寫檔、不跑任何引擎。"""
     t0 = time.time()
     sources: dict = {}
@@ -437,6 +458,10 @@ def collect(spec_path: Path = SPEC, books: dict | None = None, grid_dir: Path = 
             p = _tail(VIA, "VIA_SYSTEM_MANAGER_v*.py")
             manager, err = _load(p, "vcb_manager")
             _src(sources, "manager", _mod_row(p, err))
+        if console is None:
+            p = _tail(HERE, "CGC_MDL139_InputConsole_v*.py")
+            console, err = _load(p, "vcb_console")
+            _src(sources, "console", _mod_row(p, err))
         if eng089 is None:
             p = _tail(VIA / "functional modules" / "VRN", "VRN_ENG089_TemplateView_v*.py")
             eng089, err = _load(p, "vcb_eng089")
@@ -457,7 +482,14 @@ def collect(spec_path: Path = SPEC, books: dict | None = None, grid_dir: Path = 
         except Exception as exc:
             return {"state": "UNREADABLE", "why": type(exc).__name__}
 
-    fams = collect_params(spec, bus_rows, plan)
+    resolver = eff = None
+    if console is not None and spec is not None:
+        def resolver(iid):
+            return console.resolve_argv(spec, iid, {})       # 冊上參數;唯讀(只檢查檔案在不在)
+
+        def eff(iid, gid):
+            return console.effective_start(spec, iid, gid, "")
+    fams = collect_params(spec, bus_rows, plan, resolver, eff)
     inv = collect_inventory(manager)
     mats = collect_matrices(loaded, panorama, fams)
     logic = collect_logic(loaded)
@@ -468,12 +500,13 @@ def collect(spec_path: Path = SPEC, books: dict | None = None, grid_dir: Path = 
         "schema": "VIA.ConsoleBlueprint.v1", "engine": ENGINE_TAG, "built_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "collect_secs": round(time.time() - t0, 2),
         "layout": {"left": {"title": "參數輸入", "families": [f["key"] for f in fams],
-                            "controls": sorted(set(CONTROL_OF.values())), "actions": ["複製指令", "下載參數 JSON", "重設"]},
+                            "controls": sorted({c for v in KIND_KEYS.values() for _, c in v}), "actions": ["複製指令", "下載參數 JSON", "重設"]},
                    "right": {"tabs": [{"id": t, "zh": zh, "desc": d} for t, zh, d in TABS]},
                    "rule": "總覽第一、結果最後;每個數字都帶來源與四態(GREEN / RED / NODATA / ABSENT),量不到不當綠"},
         "sources": sources, "families": fams, "inventory": inv, "matrices": mats, "logic": logic, "run": run,
         "errors": errors, "kpis": _kpis(fams, inv, mats, logic, run, errors),
         "bus_cmd": _bus_cmd(),
+        "console_cmd": _console_cmd(),
         "sync": {"module": MODULE, "state_key": STATE_KEY, "channel": CHANNEL},
         "_eng089": eng089,
     }
@@ -481,6 +514,11 @@ def collect(spec_path: Path = SPEC, books: dict | None = None, grid_dir: Path = 
 
 def _bus_cmd() -> str:
     p = _tail(HERE, "CGC_MDL148_EngineBus_v*.py")
+    return f'python "{_rel(p)}"' if p else ""
+
+
+def _console_cmd() -> str:
+    p = _tail(HERE, "CGC_MDL139_InputConsole_v*.py")
     return f'python "{_rel(p)}"' if p else ""
 
 
@@ -620,13 +658,19 @@ APP_JS = r"""(function () {
     function selected() { return allItems().filter(function (x) { return S.sel[x.it.id]; }); }
     function paramsOfSel() {
       var m = {};
-      selected().forEach(function (x) { (x.it.params || []).forEach(function (c) { if (!m[c.param]) m[c.param] = { c: c, who: [] }; m[c.param].who.push(x.it.id); }); });
+      selected().forEach(function (x) { (x.it.params || []).forEach(function (c) { if (!m[c.key]) m[c.key] = { c: c, who: [] }; m[c.key].who.push(x.it.id); }); });
       return m;
     }
+    function q(s) { s = String(s); return /[\s"]/.test(s) ? '"' + s.replace(/"/g, '\\"') + '"' : s; }
+    // 旗標怎麼寫由正主 MDL139 翻譯(argv = 唯讀解析 · run --dry = 乾跑);本頁只交鍵=值,不自己拼旗標
     function argvOf(it) {
-      var a = (it.plan_argv || []).map(function (s) { return /\s/.test(s) ? '"' + s + '"' : s; });
-      (it.params || []).forEach(function (c) { var v = S.vals[c.param]; if (v === undefined) v = c.default; if (v !== '' && v !== undefined) a.push('--' + c.param, /\s/.test(v) ? '"' + v + '"' : v); });
-      return a.length ? a.join(' ') : '(匯流排沒有這一項的 PLAN:' + (it.engine_why || it.plan_state || '無') + ')';
+      var kv = (it.params || []).map(function (c) { var v = S.vals[c.key]; return v ? q(c.key + '=' + v) : ''; }).filter(Boolean).join(' ');
+      if (!P.console_cmd) return '(輸入主控台 MDL139 尾版不在:無法委派翻譯)';
+      var lines = [P.console_cmd + ' argv --item ' + it.id + (kv ? ' ' + kv : '') + '      # 正主解析,唯讀',
+                   P.console_cmd + ' run --item ' + it.id + (kv ? ' ' + kv : '') + ' --dry  # 乾跑,不動手'];
+      if (!kv) lines.push('# 以冊上參數,正主解析 = ' + it.resolved_state + (it.resolved_argv.length ? ':' + it.resolved_argv.map(q).join(' ') : '') + (it.resolved_note ? '(' + it.resolved_note + ')' : ''));
+      if ((it.unsupported || []).length) lines.push('# 冊上另有 ' + it.unsupported.join(', ') + ':正主翻譯器不接,本頁不給欄位');
+      return lines.join('\n');
     }
     function renderLeft() {
       var f = famOf(S.fam) || { groups: [], counts: {} };
@@ -646,13 +690,12 @@ APP_JS = r"""(function () {
       });
       var pm = paramsOfSel(), keys = Object.keys(pm);
       h += '<div class="vcb-sec"><h3>參數(已選 ' + selected().length + ' 項)</h3>' + (keys.length ? keys.map(function (k) {
-        var c = pm[k].c, v = S.vals[k] !== undefined ? S.vals[k] : c.default, t = { date: 'date', month: 'month', number: 'number' }[c.control] || 'text';
-        if (t === 'date' && v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) t = 'text';
-        return '<div class="vcb-field"><label>--' + esc(k) + ' <span class="vcb-meta">(' + esc(c.control) + ' · ' + pm[k].who.length + ' 項用)</span></label><input type="' + t + '" data-param="' + esc(k) + '" value="' + esc(v) + '"><span class="h">' + esc(c.hint) + '</span></div>';
+        var c = pm[k].c, v = S.vals[k] || '', t = { number: 'number' }[c.control] || 'text';
+        return '<div class="vcb-field"><label>' + esc(k) + ' <span class="vcb-meta">(' + esc(c.kind) + ' · ' + pm[k].who.length + ' 項用)</span></label><input type="' + t + '" data-param="' + esc(k) + '" value="' + esc(v) + '" placeholder="' + esc(c.placeholder ? '冊上:' + c.placeholder : (c.control === 'date' ? 'YYYY-MM-DD' : c.control === 'month' ? 'YYYY-MM 或 YYYY-MM-DD' : '留空 = 冊上參數')) + '"><span class="h">' + esc(c.hint) + '</span></div>';
       }).join('') : '<div class="vcb-meta">勾選左邊的項目,這裡只出現它們用得到的參數。</div>') + '</div>';
       var cmd = selected().map(function (x) { return '# ' + x.it.id + '\n' + argvOf(x.it); }).join('\n\n');
-      h += '<div class="vcb-sec"><h3>指令預覽(PLAN,不動手)</h3><pre class="vcb-cmd" data-vcb="cmd">' + esc(cmd || '(先勾選項目)') + '</pre>' +
-        '<div class="vcb-meta" style="margin-top:6px">與 EngineBus 同一規則(尾版 + 動詞 + --參數 值)。真跑一律經 VCGC 唯一入口 / 匯流排 --apply。</div>' +
+      h += '<div class="vcb-sec"><h3>指令預覽(正主解析 / 乾跑,不動手)</h3><pre class="vcb-cmd" data-vcb="cmd">' + esc(cmd || '(先勾選項目)') + '</pre>' +
+        '<div class="vcb-meta" style="margin-top:6px">旗標寫法由輸入主控台 MDL139 正主翻譯(範圍拆 --start/--end、代碼依各項寫法…);欄位留空 = 冊上參數。真跑一律經 VCGC 唯一入口。</div>' +
         '<div class="vcb-btns"><button type="button" class="vcb-btn pri" data-act="copy">複製指令</button><button type="button" class="vcb-btn" data-act="json">下載參數 JSON</button><button type="button" class="vcb-btn" data-act="reset">重設</button></div></div>';
       var keep = left.scrollTop;          // 勾選 / 改參數會重畫左面板:捲動位置留住,不跳回頂端
       left.innerHTML = h; left.scrollTop = keep;
@@ -775,11 +818,12 @@ APP_JS = r"""(function () {
       var ff = S.filt.f || '';
       var rows = allItems().filter(function (x) { return (!ff || x.f.key === ff) && hit('eng', x.it.id + ' ' + x.it.zh + ' ' + x.it.engine); });
       return chips('f', P.families.map(function (f) { return [f.key, f.zh + ' ' + f.counts.in_place + '/' + f.counts.items]; })) + qbox('eng', '搜尋項目 / 引擎') +
-        table(['家族', '項目', '尾版引擎', '在位', '版數', '觸網', '參數', 'PLAN(會跑的那一句)'], rows.map(function (x) {
+        table(['家族', '項目', '尾版引擎', '在位', '版數', '觸網', '參數', '正主解析(冊上參數會跑的那一句)'], rows.map(function (x) {
           var it = x.it;
           return [esc(x.f.key.toUpperCase()), '<b class="cl2" title="' + esc(it.zh) + '">' + esc(it.zh) + '</b><span class="vcb-mono vcb-meta">' + esc(it.id) + '</span>', '<span class="vcb-mono">' + esc(it.engine || it.engine_glob) + '</span>',
-            badge(it.engine_state), esc(it.versions || '—'), it.net ? badge('NET', '觸網') : '—', esc((it.params || []).map(function (c) { return c.param; }).join(', ') || '—'),
-            '<span class="vcb-mono">' + esc((it.plan_argv || []).join(' ') || it.engine_why) + '</span>'];
+            badge(it.engine_state), esc(it.versions || '—'), it.net ? badge('NET', '觸網') : '—',
+            esc((it.params || []).map(function (c) { return c.key; }).concat((it.unsupported || []).map(function (u) { return u + '(不接)'; })).join(', ') || '—'),
+            badge({ READY: 'GREEN', NODATA: 'NODATA', UNREADABLE: 'ABSENT' }[it.resolved_state] || 'AMBER', it.resolved_state) + ' <span class="vcb-mono">' + esc((it.resolved_argv || []).join(' ')) + '</span>' + (it.resolved_note ? '<div class="vcb-meta">' + esc(it.resolved_note) + '</div>' : '')];
         }));
     }
     function errors() {
@@ -1057,7 +1101,7 @@ def selftest() -> int:
                          "tw_codes": {"TWSE": ["2330"], "TPEX": []}},
                 "families": {"vdf": {"groups": [{"id": "g1", "zh": "群一", "items": [
                     {"id": "a1", "zh": "項一", "params": ["start", "days"], "net": True, "engine": {"glob": "X_v*.py"}},
-                    {"id": "a2", "zh": "項二", "params": ["start", "weird"], "engine": {"glob": "Y_v*.py"}}]}]},
+                    {"id": "a2", "zh": "項二", "params": ["range", "weird"], "engine": {"glob": "Y_v*.py"}}]}]},
                     "vrn": {"input": {"dir_default": "in"}, "groups": [{"id": "p", "zh": "管線", "items": [
                         {"id": "b1", "zh": "報告", "params": ["dir"], "engine": {"glob": "Z_v*.py"}}]}]}}}
         sp = t / "spec.json"
@@ -1075,25 +1119,32 @@ def selftest() -> int:
                 assert apply is False
                 return {"state": "PLAN", "argv": ["/usr/bin/python3", str(VIA / "e" / "X_v0102.py"), "run"]}
 
-        # ① 參數冊 → 左面板
+        # ① 參數冊 → 左面板(只給正主會接的鍵;提示值來自正主 effective_start)
         spec_l, _ = _read_json(sp)
-        fams = collect_params(spec_l, bus_rows, lambda i: Bus.call(i, None) if i == "a1" else {})
+
+        def fake_resolver(iid):
+            if iid == "a1":
+                return {"state": "READY", "argv": ["/usr/bin/python3", str(VIA / "e" / "X_v0102.py"), "run", "--start", "2024-01-02", "--days", "20"]}
+            return {"state": "NEED_DIR", "argv": [], "note": "報告夾裡沒有報告件"}
+
+        fams = collect_params(spec_l, bus_rows, lambda i: Bus.call(i, None) if i == "a1" else {}, fake_resolver,
+                              lambda iid, gid: {"a1": "2024-01-02"}.get(iid) or {"g1": "2023-09-01"}.get(gid, ""))
         f_vdf = next(f for f in fams if f["key"] == "vdf")
         a1 = f_vdf["groups"][0]["items"][0]
         a2 = f_vdf["groups"][0]["items"][1]
-        c_start = next(c for c in a1["params"] if c["param"] == "start")
-        c2_start = next(c for c in a2["params"] if c["param"] == "start")
-        c_weird = next(c for c in a2["params"] if c["param"] == "weird")
         b1 = next(f for f in fams if f["key"] == "vrn")["groups"][0]["items"][0]
-        chk("① 左面板只從參數冊來:家族 / 群組 / 項目 / 參數種類 → 控制項;預設 項目起日 > 群組起日 > 冊預設;VRN 夾 = user.vrn_dir",
-            c_start["control"] == "date" and c_start["default"] == "2024-01-02" and c2_start["default"] == "2023-09-01"
-            and b1["params"][0]["default"] == "C:\\樣本" and a1["net"] is True,
-            f"a1 起日 {c_start['default']} · a2 起日 {c2_start['default']} · 夾 {b1['params'][0]['default']}")
-        chk("② 冊上沒有說明的參數種類:照實給文字框並註明,不編說明",
-            c_weird["control"] == "text" and c_weird["known"] is False and "沒有" in c_weird["hint"], c_weird["hint"])
-        chk("③ 引擎在位 / PLAN 只從 EngineBus 來:在位=GREEN · 目錄說缺=ABSENT · 目錄沒有=NODATA;PLAN 路徑去機器前綴、python 不寫死",
+        k1 = [(c["key"], c["control"], c["placeholder"]) for c in a1["params"]]
+        chk("① 左面板只從參數冊來、只給正主 resolve_argv 會接的鍵;起日提示 = 正主 effective_start(項目 > 群組 > 冊預設)",
+            k1 == [("start", "date", "2024-01-02"), ("days", "number", "")] and a2["params"][0]["placeholder"] == "2023-09-01"
+            and [c["key"] for c in b1["params"]] == ["dir"] and a1["net"] is True, f"{k1} · a2 {a2['params'][0]['placeholder']}")
+        chk("② range 拆成 start / end 兩欄(不給 --range);正主不接的種類不給欄位、照實列出",
+            [c["key"] for c in a2["params"]] == ["start", "end"] and a2["unsupported"] == ["weird"], f"{[c['key'] for c in a2['params']]} · 不接 {a2['unsupported']}")
+        chk("③ 引擎在位 / PLAN 從 EngineBus;冊上參數會跑的那一句從正主 MDL139;路徑去機器前綴、python 不寫死",
             a1["engine_state"] == "GREEN" and b1["engine_state"] == "ABSENT" and a2["engine_state"] == "NODATA"
-            and a1["plan_argv"] == ["python", "e/X_v0102.py", "run"], f"{a1['plan_argv']}")
+            and a1["plan_argv"] == ["python", "e/X_v0102.py", "run"]
+            and a1["resolved_argv"] == ["python", "e/X_v0102.py", "run", "--start", "2024-01-02", "--days", "20"]
+            and b1["resolved_state"] == "NEED_DIR" and "--' + c." not in APP_JS,
+            f"{a1['resolved_argv']} · b1 {b1['resolved_state']}")
         missing = [f for f in fams if f["key"] == "vcgc"][0]
         chk("④ 參數冊少一個家族 → 那一家族 ABSENT(說原因),其餘照畫", missing["state"] == "ABSENT" and "central" in missing["why"])
 
@@ -1203,7 +1254,13 @@ def selftest() -> int:
     live = collect()
     fams_ok = {f["key"]: f["state"] for f in live["families"]}
     n_items = sum(f["counts"]["items"] for f in live["families"])
-    chk("⑬ 活樹唯讀收集:VCGC/VDF/VRN/VAP 四家族都從參數冊來 · 每一項都有匯流排判定 · 收集不寫任何冊",
+    live_items = [it for f in live["families"] for g in f["groups"] for it in g["items"]]
+    th = next((it for it in live_items if it["id"] == "tw_history"), None)
+    chk("⑬ 活樹:正主解析出來的指令沒有任何一項帶 --range(ENG064 不認);tw_history 冊上參數 = --start … --end …",
+        not any("--range" in it["resolved_argv"] for it in live_items)
+        and (th is None or th["resolved_state"] != "READY" or ("--start" in th["resolved_argv"] and "--end" in th["resolved_argv"])),
+        f"tw_history {th['resolved_state'] if th else '不在'} {' '.join(th['resolved_argv'][2:]) if th else ''}")
+    chk("⑭ 活樹唯讀收集:VCGC/VDF/VRN/VAP 四家族都從參數冊來 · 每一項都有匯流排判定 · 收集不寫任何冊",
         all(v == "OK" for v in fams_ok.values()) and n_items > 0
         and all(it["engine_state"] in ("GREEN", "ABSENT", "NODATA") for f in live["families"] for g in f["groups"] for it in g["items"])
         and snap == {p: p.stat().st_mtime_ns for p in snap},
