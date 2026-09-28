@@ -217,11 +217,17 @@ if (-not $SkipCatalog) {
 
 # ③ 面板
 Write-Host "  [3/4] VCGC dbm panel(總覽 · 核對 · 計畫 · 兩張清單 · AST · 錯誤矩陣)" -ForegroundColor Cyan
-$pan = Invoke-DBPStep "面板" "vrn" $console @("dbm", "panel")
 $jsonPath = Join-Path $outDir "DBM_PANEL_latest.json"
 $mdPath = Join-Path $outDir "DBM_PANEL_latest.md"
-if (-not (Test-Path -LiteralPath $jsonPath)) {
-    Write-Host ("  [DB 面板] 面板 JSON 沒產出(rc={0});最後幾行:" -f $pan.Rc) -ForegroundColor Red
+# 上一次的 JSON 可能還在:這次沒跑成就不能拿舊的充數(Codex #334 P1)。記下開跑前的時間,只認這次新寫的檔,rc 也要是面板自己的 0/1/2
+$panStart = [DateTime]::UtcNow.AddSeconds(-1)
+$pan = Invoke-DBPStep "面板" "vrn" $console @("dbm", "panel")
+$fresh = (Test-Path -LiteralPath $jsonPath) -and ((Get-Item -LiteralPath $jsonPath).LastWriteTimeUtc -ge $panStart)
+$rcOk = @(0, 1, 2) -contains [int]$pan.Rc
+$hasPaste = @($pan.Lines | Where-Object { $_ -eq "END_PASTE" }).Count -gt 0
+if (-not ($fresh -and $rcOk -and $hasPaste)) {
+    $why = if (-not $fresh) { "這次沒有寫出新的面板 JSON(現存那份是舊的或不存在,不拿來充數)" } elseif (-not $rcOk) { "面板 rc 不是 0/1/2" } else { "面板沒印完(沒有 END_PASTE)" }
+    Write-Host ("  [DB 面板] 面板沒跑成(rc={0}):{1};最後幾行:" -f $pan.Rc, $why) -ForegroundColor Red
     $pl = @($pan.Lines)
     $k = [Math]::Min(12, $pl.Count)
     if ($k -gt 0) { $pl[($pl.Count - $k)..($pl.Count - 1)] | ForEach-Object { Write-Host ("    " + $_) -ForegroundColor DarkGray } }

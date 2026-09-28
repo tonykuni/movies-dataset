@@ -58,7 +58,7 @@
    "AST"
   ],
   "severity": {
-   "HIGH": "RED / ABSENT from any source; AST SYNTAX, DUPDEF, UNREACH, BAREEXC, PSDUPFN, PSDOCSTR, COMPILE, TAILAPI",
+   "HIGH": "RED / ABSENT from any source; AST SYNTAX, DUPDEF, UNREACH, BAREEXC, PSDUPFN, PSDOCSTR, COMPILE, TAILAPI, UNREADABLE (a target panorama could not read)",
    "MED": "AMBER from any source; stale catalog; bad parquet; AST HARDIMP, PINVER, SYSEXE, TALIB, MUTDEF",
    "LOW": "NODATA reconcile rows; AST ACCEL, NET, VERB, SWALLOW (summed into one row)"
   },
@@ -175,6 +175,13 @@
    "severity": "HIGH",
    "desc": "return/raise/break/continue 之後同一區塊還有陳述式(永遠跑不到)",
    "action": "刪掉 return/raise 之後那幾行,或改寫流程",
+   "scope": "所有檔"
+  },
+  "UNREADABLE": {
+   "kind": "tail_check",
+   "severity": "HIGH",
+   "desc": "panorama 讀不動這支檔(不在 / 編碼 / 權限),這支沒有被審到",
+   "action": "確認檔在、UTF-8、可讀;修好前這支的 AST 視為未審",
    "scope": "所有檔"
   },
   "VERB": {

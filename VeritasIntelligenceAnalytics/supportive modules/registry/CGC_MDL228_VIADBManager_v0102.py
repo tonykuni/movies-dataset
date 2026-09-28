@@ -621,6 +621,7 @@ SEV_ORDER = {"HIGH": 0, "MED": 1, "LOW": 2, "INFO": 3}
 AST_EXTRA_DESC = {
     "COMPILE": "ast.parse 過、compile 不過(例:加速橋注在 from __future__ 前,Z226)",
     "TAILAPI": "尾版比前版少了公開名稱又沒轉接(呼叫端一叫就 AttributeError,Z229)",
+    "UNREADABLE": "panorama 讀不動這支檔(不在 / 編碼 / 權限),這支沒有被審到",
 }
 AST_ACTION = {
     "SYNTAX": "必修:照行號修語法(本器不猜改)", "COMPILE": "把 from __future__ 移回檔頭第一個陳述式",
@@ -629,8 +630,9 @@ AST_ACTION = {
     "BAREEXC": "改 except Exception:(不吞 KeyboardInterrupt / SystemExit)", "PSDUPFN": "PowerShell 同名 function 只留一個",
     "PSDOCSTR": "把函式開頭的三引號字串改成 # 註解或 <# #> 說明塊", "MUTDEF": "預設值改 None,函式內再建新物件",
     "SWALLOW": "graceful 設計可保留;不是刻意的就記一行或回報狀態",
+    "UNREADABLE": "確認檔在、UTF-8、可讀;修好前這支的 AST 視為未審",
 }
-AST_SEVERE_EXTRA = ("COMPILE", "TAILAPI")
+AST_SEVERE_EXTRA = ("COMPILE", "TAILAPI", "UNREADABLE")
 AST_MED = ("HARDIMP", "PINVER", "SYSEXE", "TALIB", "MUTDEF")
 #: AST 矩陣看哪幾支:DB/清單/主控台這條鏈的尾版 + 面板 PowerShell 本身(都用 glob 取尾版)
 AST_CHAIN = (
@@ -711,9 +713,15 @@ def ast_matrix(targets: list | None = None) -> dict:
     for f in files:
         try:
             card = pano.read_file(f)
-        except Exception as exc:      # 讀不動照實列一行,不中斷整張矩陣
+        except Exception as exc:      # 讀不動照實列一行,不中斷整張矩陣;但它要進判定(Codex #334 P2:沒審到 ≠ 沒問題)
+            why = f"{type(exc).__name__}: {exc}"[:160]
+            desc, action = _ast_desc("UNREADABLE", pano)
+            res["issues"].append({"file": f.name, "line": 0, "cls": "UNREADABLE", "sev": "HIGH", "desc": desc,
+                                  "detail": why, "action": action})
+            res["by_class"]["UNREADABLE"] = res["by_class"].get("UNREADABLE", 0) + 1
+            res["by_sev"]["HIGH"] = res["by_sev"].get("HIGH", 0) + 1
             res["files"].append({"file": f.name, "lang": f.suffix.lstrip("."), "lines": None, "defs": None,
-                                 "issues": None, "high": None, "state": "UNREADABLE", "why": f"{type(exc).__name__}: {exc}"[:120]})
+                                 "issues": 1, "high": 1, "state": "UNREADABLE", "why": why})
             continue
         rows = []
         for i in card.get("issues") or []:
@@ -1117,6 +1125,11 @@ def selftest() -> int:
             am = pan["ast"]
             cls_ = {i["cls"] for i in am["issues"]}
             be = next((i for i in am["issues"] if i["cls"] == "BAREEXC"), {})
+            am2 = ast_matrix([root / "missing_target.py"])
+            chk("⑳b v0102 AST 讀不動的檔 = HIGH UNREADABLE(進嚴重度計數,錯誤矩陣看得到;沒審到 ≠ 沒問題)",
+                am2["by_sev"].get("HIGH") == 1 and am2["issues"][0]["cls"] == "UNREADABLE" and am2["files"][0]["state"] == "UNREADABLE"
+                and any(r["sev"] == "HIGH" and r["state"] == "UNREADABLE" for r in error_matrix(overview(None, "ABSENT"), [], [], [], am2)),
+                str(am2["by_class"]))
             chk("⑳ v0102 AST 矩陣:panorama 唯讀判 DUPDEF/UNREACH/BAREEXC/PSDUPFN,每筆帶類別說明 + 嚴重度 HIGH + 建議處置",
                 {"DUPDEF", "UNREACH", "BAREEXC", "PSDUPFN"} <= cls_ and be.get("sev") == "HIGH" and "裸 except" in be.get("desc", "")
                 and be.get("action", "").startswith("改 except") and am["files"][0]["state"] == "RED", f"{sorted(cls_)}")
