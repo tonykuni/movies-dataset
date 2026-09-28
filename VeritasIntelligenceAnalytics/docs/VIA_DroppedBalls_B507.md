@@ -308,3 +308,9 @@
 | Z242 | aaii_sentiment.duckdb 缺 4 張 L14 同步表(via_handover · via_policy_factors · via_policy_sync · vrn_extraction_logic)—— v0102 修 Codex #333 P1 後第一次看得到 | 候 | 操作員裁(VRN_ENG082 政策同步是否涵蓋這本庫) | 另 aaii_sentiment 表本身冊外(請入冊) |
 | Z241(續) | mega 日期「— → —」根因坐實:pyarrow 字串日期只寫新式統計,DataHome v0105 只讀舊式 stats_min | **修法 = CGC_MDL123 v0106**(新式優先、舊式後備) | 操作員重跑目錄(面板不帶 -SkipCatalog)| 修好後計畫 4 才會按年切 part-YYYY |
 | Z231(續三) | 工作站 v0101 實跑:三支都 EOL_ONLY,但 `git checkout-index -f` 因索引 stat 未變不寫 → 換回失敗 | 面板改直接寫已證明 = HEAD blob 的位元組 | 操作員再跑一次 | 原檔備份在 VIA_Reports\\dbmanager\\restore\\20260928_123535 |
+| ~~Z237~~(結) | VDF_ENG078 v0112 TAILAPI | **已結(R16-2)** | AI | v0113 轉接沿委派鏈,保住 CGC_MDL224 掃描閘 |
+| Z243 | CGC_MDL124 BridgeSweeper v0107 自測 ④ 假紅:期望 `VeritasCeleritas.py` 回「獨立工具不可動」,該檔 R4 退役後回「未在冊」(仍排除);另 `--subsystems --apply` 的計畫不讀閘的 py_readonly,會碰 ENG112 正本 / ENG110 v0114 sha 鎖 / 版史檔 | 候 | AI(開 v0108:期望改成「非空排除因由」+ 讀閘唯讀冊與鎖冊再計畫) | R16-1 已改逐支注入避開 |
+| Z244 | InputConsole resolve_argv 對 etf_holdings_daily 只帶 --start(gap-mode / end 沒帶進 argv)—— v0112 與 v0113 同,既有行為 | 候 | AI 查參數鍵名(冊用 gap-mode,翻譯器可能認 gap_mode) | R16-2 實測發現 |
+| Z245 | 全景 TAILAPI 40 支尾版(薄尾只轉 main):R16-3 逐支查真呼叫端,只有 via_params_central_v0110 一件真壞(已修 v0111);其餘 39 支沒有以尾版方式取用被丟名稱的呼叫端(釘舊版 / 只跑命令列 / 執行期名稱其實在)| 候(設計債,非故障)| AI(之後有新呼叫端時再逐支開轉接尾版;不批量開新尾版以免 Hydra)| 清單與逐支證據:掃描輸出 severe.json · tailapi_callers.json(R16-3)|
+| Z246 | VRN 鏈 RED 2:ENG067 MindMapSSOT ① 依賴鏈(容器無 vdf_tw_market.duckdb)· ENG068 DailyBrief ③ VAP 收割(VAP_ENG009 無資料時回空、why 也空 → FAIL 而非 SKIP,L16「缺件≠壞掉」沒守到)| 候 | 操作員工作站跑 VRN 鏈(有庫才是實測)· AI 之後開 ENG068 新版:空結果且無因由 = SKIP 並寫因由 | 容器鏈 01:14 的結果;工作站未量 |
+| ~~Z243~~(結) | BridgeSweeper 自測 ④ 假紅 + `--apply` 計畫不聽閘唯讀冊 | **已結(R16-5)** | AI | v0108 15/15;乾跑計畫 0 支 |
