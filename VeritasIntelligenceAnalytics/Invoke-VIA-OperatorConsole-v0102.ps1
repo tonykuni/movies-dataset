@@ -1,0 +1,388 @@
+# CELERITAS-TEMPLATE-JOIN v1
+#Requires -Version 7.0
+# =====================================================================================
+# Invoke-VIA-OperatorConsole-v0102.ps1 — **唯一入口**(R26):VCGC 流程閘 → ENV MANAGER → 註冊同步 → VDF 建庫 → 實測 → Parquet → 跳出 HTML U/I
+#   v0101→v0102(操作員 R26:「都寫成一個 PS CODE 全部整合唯一解決問題 從 VCGC 的頭跑流程 ENV MANAGER 理應自動檢查上下所有 LIBS 跟環境
+#   都有布建完畢 尤其是加速器 網路工具等輔助工具常被忽略 註冊更新 SYNC 跳出 HTML U/I」):
+#   ①b PS 端事實(PS 版本 · Celeritas PS7 版號與是否已套 · Invoke-VIAPython / Invoke-VIACeleritasScoped 在位)→ env_manager\PS_SIDE_latest.json
+#   ①c ENV MANAGER(CGC_MDL240,只查不裝):四件工具鎖版 + 載得起來(加速器 · 網路 · LAYOUT · NLP)· 覆蓋 · 家族境 · 工具冊 · 鏈上缺件 ·
+#      執行檔 · PS 端 → 一個總判;缺的只印補法(一貼即用 .ps1 在 VIA_Reports\env_governance),裝件是你的手
+#   ①d 註冊同步(CGC_MDL238 v0102 sync-check,乾跑):registry-sync(新 · 變更 · 退役)· VRN 邏輯冊 · 格式鎖 · 編號冊;
+#      有待同步 → Windows「是 / 否」對話框(預設「否」)= 你對 VCGC registry-sync --apply 的明確批准(Master Prompt);-ApproveRegistrySync 不問直接批
+#   ①e 換模板(CGC_MDL241 模板轉接器,零 token):把任何設計檔(W3C / Style Dictionary / Tokens Studio JSON · CSS :root · 含 <style> 的 HTML,
+#      例 Claude Design 匯出頁 · 另一份 VIA TemplateSSOT)拖進 VIA_Reports\template_adapter\inbox\ → 自動對鍵 · 驗值 · 對比 · LAYOUT 多版型打分優化 ·
+#      圖規格 → 候選 + 預覽頁;Windows「是 / 否」(預設「否」)→ 是 = 寫 TemplateSSOT 新版號 + CGC_MDL238 template --lock 重鎖;-TemplateIn <檔> 指定檔
+#   ⑤ 頁尾同時跳出操作台與 SYNCHRONIZER(-NoOpen 不開)。其餘照 v0101。
+#   v0100→v0101(操作員 R25:「從 VCGC 一路邊測邊修正邊編號註冊鎖定向下到 VDF 生成資料庫 再從 VCGC 一路向下 … 向 VRN 他需要擷取資料
+#   透過 VCGC 進入資料庫或轉交 VDF 擷取透過 VCGC 返回 VRN … VCGC 統合 HTML U/I … SYNCHORIZER 交互整合一切」):
+#   ②b VCGC→VDF 建庫計畫(CGC_MDL239 build,乾跑):庫表冊「正庫」逐張量在不在 / 新不新,缺的排 VDF 項;有得跑就跳 Windows「是 / 否」
+#      對話框(滑鼠)問要不要建庫;「是」= build --apply。需網路的項要**操作員自己**先開同意閘 VIA_NET_CONSENT(本支不代設;
+#      沒開 = GATED,照實列出)。-BuildDb 直接建(不問)· -NoBuild 不建不問。
+#   ⑤ 操作台頁用 CGC_MDL238 最新版(v0101 起:總覽 +資料中介 · 繞道 · 建庫三燈;頁尾 dock 出 SYNCHRONIZER / 中央 UI 複本,掛本台外掛)。
+#   ⑥ VCGC 資料中介摘要(路由 · 繞道 · 建庫 · 要料帳)。其餘照 v0100。
+#   操作員 2026-09-28:「VCGC 全部步驟自動化 唯一要輸入的地方是系統檔案夾位置及資料庫檔案夾位置 WINDOW I/O 基本上整個輸入以滑鼠即可」
+#   「第一頁高整合結果 三色燈掌握 其他頁是詳細結果及驗證 輸出統一為 PARQUET 最節省 TOKEN 架構」。
+#   ⓪ 兩個資料夾(唯一的輸入):第一次或 -Pick 時跳 Windows 選夾視窗(系統資料夾 · 資料庫資料夾);記在
+#      VIA_Reports\operator_console\OPERATOR_PATHS.json(本機檔,不進 git)。之後每次把資料庫資料夾設成**本行程**的 VIA_DATA_HOME
+#      (CGC_MDL123 解析序第一順位;跑完還原,不動機器環境變數)。選的系統資料夾若是另一份副本,改跑那份副本的本支。
+#   ① VCGC 入口 = 流程閘(PSGATE-1):沒讀到「[流程] 政策過」就停(exit 3),後面一步都不跑。
+#   ② 有 -ApplyInput <輸入包.json>(操作台頁「匯出輸入包」):經 CGC_MDL238 apply 入冊(去重後只走 CGC_MDL139 apply_set)。
+#   ③ 全景實測(Invoke-VIA-Sweep 最新一版:VDF / VRN 兩條鏈 · 橋 · 全景 · DB 面板 · 工具 · rich 矩陣);-SkipSweep 略過。
+#   ④ 輸出統一 Parquet:CGC_MDL238 parquet --apply(每本 .duckdb 每張表 → parquet zstd;DuckDB 管家每表一個 VIEW;來源庫唯讀)。
+#   ⑤ 操作台頁:CGC_MDL238 page(第一頁總覽三色燈;其後 輸入摘要 · 引擎 · 運作 · 驗證 · 輸出 · 資料庫擷取),跑完自動開(-NoOpen 不開)。
+#   不代開網路同意閘(L07/L08);只經 Invoke-VIAPython 叫 python;每步包 Invoke-VIACeleritasScoped(有就套)。
+# 用法(站在倉根):.\VIA-OperatorConsole.ps1   參數:-Pick · -ApplyInput <json> · -SkipSweep · -NoOpen · -SystemDir <夾> · -DataDir <夾> · -BuildDb · -NoBuild · -ApproveRegistrySync
+# 結束碼:0 = 每步跑完 · 2 = 有步沒跑完 · 3 = 流程閘沒過 / 沒選資料夾
+# =====================================================================================
+[CmdletBinding()]
+param(
+    [switch]$Pick,
+    [string]$ApplyInput = "",
+    [switch]$SkipSweep,
+    [switch]$NoOpen,
+    [string]$SystemDir = "",
+    [string]$DataDir = "",
+    [switch]$BuildDb,
+    [switch]$NoBuild,
+    [switch]$ApproveRegistrySync,
+    [string]$TemplateIn = ""
+)
+
+$VIA = $PSScriptRoot
+$Repo = Split-Path $VIA -Parent
+$StartDir = (Get-Location).Path
+$prevHome = $env:VIA_DATA_HOME
+$exitCode = 0
+try {
+    Set-Location -LiteralPath $VIA
+    try {
+        $join = Join-Path $VIA "supportive modules\ps7\VeritasCeleritas.PS7.ps1"
+        if (Test-Path -LiteralPath $join) { . $join; Write-Host ("  [加速器] 套對 " + $script:CeleritasPS7.Version) -ForegroundColor DarkGray }
+    } catch {
+        Write-Host "  [加速器] 正主載入失敗,略過" -ForegroundColor DarkGray
+    }
+    $env:VIA_FROM_VCGC = "YES"
+    $env:VIA_VCGC_PUSH = "NO"
+    $env:VIA_NO_OPEN = "1"
+    if (-not (Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)) {
+        $pyMod = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"
+        if (Test-Path -LiteralPath $pyMod) { . $pyMod }
+    }
+    if (-not (Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)) {
+        Write-Host "  [操作台] 中央 Invoke-VIAPython 不在(VIA_PS_PyProgress_Module.ps1 缺);不繞過直呼 python,停。" -ForegroundColor Red
+        $exitCode = 3
+        return
+    }
+    $hasScoped = [bool](Get-Command Invoke-VIACeleritasScoped -ErrorAction SilentlyContinue)
+    $reg = Join-Path $VIA "supportive modules\registry"
+    $engine = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL238_OperatorConsole_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+    $console = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+    $broker = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL239_DataBroker_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+    $envmgr = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL240_EnvManager_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+    $adapter = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL241_TemplateAdapter_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+    if ($null -eq $engine -or $null -eq $console) {
+        Write-Host "  [操作台] CGC_MDL238 或 CGC_MDL149 尾版不在(先 git pull)" -ForegroundColor Red
+        $exitCode = 2
+        return
+    }
+
+    function Invoke-OcPy {
+        # 一步:包在 Invoke-VIACeleritasScoped(有就套)裡跑 Invoke-VIAPython;回 (rc, 輸出行)
+        param([string]$Script, [string[]]$ArgList)
+        $q = { param($v) "'" + (("" + $v) -replace "'", "''") + "'" }
+        $cmd = "Invoke-VIAPython -Family 'vrn' " + (& $q $Script) + " " + ((@($ArgList) | ForEach-Object { & $q $_ }) -join " ") + " 2>&1"
+        $body = [scriptblock]::Create($cmd)
+        $global:LASTEXITCODE = 0
+        $raw = if ($hasScoped) { Invoke-VIACeleritasScoped -Body $body } else { & $body }
+        return [pscustomobject]@{ rc = $global:LASTEXITCODE; lines = @($raw | ForEach-Object { "" + $_ }) }
+    }
+
+    function Select-OcFolder {
+        # Windows 選夾視窗(唯一的輸入);非 Windows 或沒有視窗環境 = 照實說並停
+        param([string]$Title, [string]$Start)
+        try {
+            Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+            $dlg = [System.Windows.Forms.FolderBrowserDialog]::new()
+            $dlg.Description = $Title
+            $dlg.UseDescriptionForTitle = $true
+            if ($Start -and (Test-Path -LiteralPath $Start)) { $dlg.SelectedPath = $Start }
+            if ($dlg.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { return $dlg.SelectedPath }
+            return ""
+        } catch {
+            Write-Host ("  [操作台] 這個環境開不了 Windows 選夾視窗:" + $_.Exception.Message + "(改用 -SystemDir / -DataDir)") -ForegroundColor Yellow
+            return ""
+        }
+    }
+
+    Write-Host ""
+    Write-Host "  ╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+    Write-Host "  ║  VIA 唯一入口 v0102 · VCGC → ENV → SYNC → VDF → VRN → U/I    ║" -ForegroundColor Cyan
+    Write-Host "  ╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+
+    # ⓪ 兩個資料夾
+    $saved = $null
+    $pathsFile = Join-Path $VIA "VIA_Reports\operator_console\OPERATOR_PATHS.json"
+    if (Test-Path -LiteralPath $pathsFile) { try { $saved = Get-Content -LiteralPath $pathsFile -Raw -Encoding utf8 | ConvertFrom-Json } catch { $saved = $null } }
+    $sys = if ($SystemDir) { $SystemDir } elseif ($saved -and $saved.system -and -not $Pick) { "" + $saved.system } else { "" }
+    $dat = if ($DataDir) { $DataDir } elseif ($saved -and $saved.data -and -not $Pick) { "" + $saved.data } else { "" }
+    if (-not $sys) { $sys = Select-OcFolder "① 選「系統資料夾」(VeritasIntelligenceAnalytics 所在的那一份)" $VIA }
+    if (-not $dat) { $dat = Select-OcFolder "② 選「資料庫資料夾」(放 .duckdb 與 parquet 的資料家)" ("" + $env:VIA_DATA_HOME) }
+    if (-not $sys -or -not $dat) {
+        Write-Host "  [操作台] 兩個資料夾都要選(或給 -SystemDir / -DataDir);停。" -ForegroundColor Red
+        $exitCode = 3
+        return
+    }
+    $sysVia = if (Test-Path -LiteralPath (Join-Path $sys "supportive modules")) { $sys } elseif (Test-Path -LiteralPath (Join-Path $sys "VeritasIntelligenceAnalytics")) { Join-Path $sys "VeritasIntelligenceAnalytics" } else { $sys }
+    if ((Resolve-Path -LiteralPath $sysVia -ErrorAction SilentlyContinue).Path -ne (Resolve-Path -LiteralPath $VIA).Path) {
+        $other = Get-ChildItem -LiteralPath $sysVia -Filter "Invoke-VIA-OperatorConsole-v*.ps1" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+        if ($null -ne $other) {
+            Write-Host ("  [操作台] 系統資料夾是另一份副本 → 改跑 " + $other.FullName) -ForegroundColor Cyan
+            $pass = @{ SystemDir = $sysVia; DataDir = $dat }
+            if ($ApplyInput) { $pass["ApplyInput"] = $ApplyInput }
+            if ($SkipSweep) { $pass["SkipSweep"] = $true }
+            if ($NoOpen) { $pass["NoOpen"] = $true }
+            if ($BuildDb) { $pass["BuildDb"] = $true }
+            if ($NoBuild) { $pass["NoBuild"] = $true }
+            if ($ApproveRegistrySync) { $pass["ApproveRegistrySync"] = $true }
+            if ($TemplateIn) { $pass["TemplateIn"] = $TemplateIn }
+            & $other.FullName @pass
+            $exitCode = $LASTEXITCODE
+            return
+        }
+        Write-Host "  [操作台] 選的系統資料夾裡沒有操作台;照這一份跑" -ForegroundColor Yellow
+    }
+    $null = Invoke-OcPy $engine.FullName @("paths", "--system", $sysVia, "--data", $dat)
+    $env:VIA_DATA_HOME = $dat
+    Write-Host ("  [資料夾] 系統 " + $sysVia) -ForegroundColor DarkGray
+    Write-Host ("  [資料夾] 資料庫 " + $dat + "(本行程 VIA_DATA_HOME)") -ForegroundColor DarkGray
+
+    # ① VCGC 流程閘(PSGATE-1)
+    $g = Invoke-OcPy $console.FullName @("status")
+    $flow = @($g.lines | Where-Object { $_ -match '\[流程\]\s*政策過' } | Select-Object -First 1)
+    if ($flow.Count -eq 0) {
+        Write-Host "  [流程閘] 沒讀到「[流程] 政策過」→ 依 PSGATE-1 停在這裡" -ForegroundColor Red
+        $exitCode = 3
+        return
+    }
+    Write-Host ("  [流程閘] 過:" + $flow[0].Trim()) -ForegroundColor Green
+
+    # ①b PS 端事實(ENV MANAGER 的 Ⓒ 區讀這一份;一小時內有效)
+    $cel = $null
+    if (Get-Command Get-CeleritasStatus -ErrorAction SilentlyContinue) { try { $cel = Get-CeleritasStatus } catch { $cel = $null } }
+    $side = [ordered]@{
+        ts                 = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        ps_version         = $PSVersionTable.PSVersion.ToString()
+        ps_edition         = "" + $PSVersionTable.PSEdition
+        celeritas_version  = if ($cel) { "" + $cel.Version } else { "" }
+        celeritas_applied  = if ($cel) { [bool]$cel.Applied } else { $false }
+        invoke_viapython   = [bool](Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)
+        celeritas_scoped   = $hasScoped
+        os                 = [System.Environment]::OSVersion.VersionString
+    }
+    $sideDir = Join-Path $VIA "VIA_Reports\env_manager"
+    New-Item -ItemType Directory -Force -Path $sideDir | Out-Null
+    ($side | ConvertTo-Json) | Set-Content -LiteralPath (Join-Path $sideDir "PS_SIDE_latest.json") -Encoding utf8
+
+    # ①c ENV MANAGER(只查不裝)
+    if ($null -eq $envmgr) {
+        Write-Host "  ①c ENV MANAGER · ABSENT(CGC_MDL240 尾版不在;先 git pull)" -ForegroundColor Red
+        $exitCode = 2
+    } else {
+        $ev = Invoke-OcPy $envmgr.FullName @()
+        $verdictLine = @($ev.lines | Where-Object { $_ -match '\[ENV MANAGER\] 總判' } | Select-Object -Last 1)
+        $ev.lines | Where-Object { $_ -match '^\s*(RED|AMBER|NODATA)\s' -or $_ -match '└ 補法' } | Select-Object -First 40 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        $col = if ($ev.rc -eq 0) { "Green" } elseif ($ev.rc -eq 1) { "Red" } else { "Yellow" }
+        Write-Host ("  ①c ENV MANAGER · " + $(if ($verdictLine.Count) { $verdictLine[0].Trim() } else { "rc=" + $ev.rc })) -ForegroundColor $col
+        $plan = Join-Path $VIA "VIA_Reports\env_governance\TOOLS_PLAN_latest.ps1"
+        if ($ev.rc -ne 0 -and (Test-Path -LiteralPath $plan)) { Write-Host ("     補法(一貼即用;裝件是你的手,要網路先開同意閘):" + $plan) -ForegroundColor Yellow }
+        if ($ev.rc -eq 1) { $exitCode = 2 }
+    }
+
+    # ①d 註冊同步(乾跑)→ 有待同步才問(預設「否」)
+    $sc = Invoke-OcPy $engine.FullName @("sync-check")
+    $sc.lines | Where-Object { $_ -match '^\s*(OK|SKIP|FAIL|UNTESTED)\s' -or $_ -match '\[SYNC\]' } | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+    $pending = @($sc.lines | Where-Object { $_ -match '^\s*SKIP\s+VCGC 元件註冊冊' })
+    if ($pending.Count -gt 0) {
+        $go = [bool]$ApproveRegistrySync
+        if (-not $go) {
+            try {
+                Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+                $msg = "VCGC 元件註冊冊有待同步:`n" + $pending[0].Trim() + "`n`n要批准 via-vcgc registry-sync --apply 嗎?(寫入已追蹤的註冊冊;之後要 commit)"
+                $ans = [System.Windows.Forms.MessageBox]::Show($msg, "VIA 唯一入口 · 註冊同步批准", [System.Windows.Forms.MessageBoxButtons]::YesNo,
+                    [System.Windows.Forms.MessageBoxIcon]::Question, [System.Windows.Forms.MessageBoxDefaultButton]::Button2)
+                $go = ($ans -eq [System.Windows.Forms.DialogResult]::Yes)
+            } catch {
+                Write-Host "     這個環境開不了 Windows 對話框;不批准(要批請加 -ApproveRegistrySync)" -ForegroundColor Yellow
+            }
+        }
+        if ($go) {
+            $vc = Get-ChildItem -LiteralPath $reg -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+            $ra = Invoke-OcPy $vc.FullName @("registry-sync", "--apply")
+            Write-Host ("  ①d registry-sync --apply(你批准)· rc=" + $ra.rc) -ForegroundColor $(if ($ra.rc -eq 0) { "Green" } else { "Yellow" })
+            $ra.lines | Select-Object -Last 6 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+            Write-Host "     註冊冊是已追蹤檔:請 git add / commit / push(或交給 AI 下一輪開 PR)" -ForegroundColor Yellow
+            if ($ra.rc -ne 0) { $exitCode = 2 }
+            $null = Invoke-OcPy $engine.FullName @("sync-check")
+        } else {
+            Write-Host "  ①d 註冊同步 · 未批准(照舊乾跑;頁上黃燈)" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  ①d 註冊同步 · 無待同步" -ForegroundColor Green
+    }
+
+    # ①e 換模板:inbox 有比上次候選新的設計檔(或 -TemplateIn)才動
+    $inbox = Join-Path $VIA "VIA_Reports\template_adapter\inbox"
+    New-Item -ItemType Directory -Force -Path $inbox | Out-Null
+    $tplSrc = $null
+    if ($TemplateIn -and (Test-Path -LiteralPath $TemplateIn)) {
+        $tplSrc = (Resolve-Path -LiteralPath $TemplateIn).Path
+    } else {
+        $last = Join-Path $VIA "VIA_Reports\template_adapter\PLAN_latest.json"
+        $cut = if (Test-Path -LiteralPath $last) { (Get-Item -LiteralPath $last).LastWriteTime } else { [datetime]::MinValue }
+        $new = Get-ChildItem -LiteralPath $inbox -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -match '^\.(json|css|html?|scss)$' -and $_.LastWriteTime -gt $cut } |
+            Sort-Object LastWriteTime | Select-Object -Last 1
+        if ($new) { $tplSrc = $new.FullName }
+    }
+    if ($null -eq $adapter) {
+        Write-Host "  ①e 換模板 · ABSENT(CGC_MDL241 尾版不在)" -ForegroundColor Yellow
+    } elseif ($null -eq $tplSrc) {
+        Write-Host ("  ①e 換模板 · 沒有新設計檔(要換就把設計檔拖進 " + $inbox + ")") -ForegroundColor DarkGray
+    } else {
+        $tp = Invoke-OcPy $adapter.FullName @("plan", "--in", $tplSrc)
+        $tp.lines | Where-Object { $_ -match '\[模板轉接\]|預覽' } | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        $prev = Join-Path $VIA "VIA_Reports\template_adapter\PREVIEW_latest.html"
+        if ($tp.rc -eq 0) {
+            if (-not $NoOpen -and (Test-Path -LiteralPath $prev)) { try { Invoke-Item -LiteralPath $prev } catch { } }
+            $go = $false
+            try {
+                Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+                $sum = @($tp.lines | Where-Object { $_ -match '\[模板轉接\]' } | Select-Object -First 1)
+                $msg = "新設計檔:" + (Split-Path $tplSrc -Leaf) + "`n" + $(if ($sum.Count) { $sum[0].Trim() } else { "" }) + "`n`n預覽頁已開。要換成這個模板嗎?`n(寫 TemplateSSOT 新版號並重鎖格式鎖;舊版留著,可換回)"
+                $ans = [System.Windows.Forms.MessageBox]::Show($msg, "VIA 唯一入口 · 換模板", [System.Windows.Forms.MessageBoxButtons]::YesNo,
+                    [System.Windows.Forms.MessageBoxIcon]::Question, [System.Windows.Forms.MessageBoxDefaultButton]::Button2)
+                $go = ($ans -eq [System.Windows.Forms.DialogResult]::Yes)
+            } catch {
+                Write-Host "     這個環境開不了 Windows 對話框;不換(候選與預覽留在 VIA_Reports\template_adapter)" -ForegroundColor Yellow
+            }
+            if ($go) {
+                $ta = Invoke-OcPy $adapter.FullName @("apply")
+                $ta.lines | Select-Object -Last 4 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+                if ($ta.rc -eq 0) {
+                    $tl = Invoke-OcPy $engine.FullName @("template", "--lock")
+                    Write-Host ("  ①e 換模板 · 已寫新版號並重鎖 · rc=" + $tl.rc + "(TemplateSSOT 與格式鎖是已追蹤檔:請 commit,或交給 AI 下一輪開 PR)") -ForegroundColor Green
+                    if ($tl.rc -ne 0) { $exitCode = 2 }
+                } else {
+                    Write-Host "  ①e 換模板 · 沒寫(看上面原因)" -ForegroundColor Yellow
+                    $exitCode = 2
+                }
+            } else {
+                Write-Host "  ①e 換模板 · 未換(候選與預覽留著)" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "  ①e 換模板 · 設計檔裡沒有對得上的鍵(看預覽頁的「沒對上」)" -ForegroundColor Yellow
+        }
+    }
+
+    # ② 輸入包入冊
+    if ($ApplyInput) {
+        $a = Invoke-OcPy $engine.FullName @("apply", "--file", $ApplyInput, "--apply")
+        Write-Host ("  ② 輸入包入冊 · rc=" + $a.rc) -ForegroundColor $(if ($a.rc -eq 0) { "Green" } else { "Yellow" })
+        $a.lines | Select-Object -Last 12 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        if ($a.rc -ne 0) { $exitCode = 2 }
+    }
+
+    # ②b VCGC→VDF 建庫計畫(乾跑)→ 滑鼠「是 / 否」→ build --apply
+    if ($null -eq $broker) {
+        Write-Host "  ②b VDF 建庫計畫 · ABSENT(CGC_MDL239 DataBroker 尾版不在)" -ForegroundColor Yellow
+    } elseif (-not $NoBuild) {
+        $bp = Invoke-OcPy $broker.FullName @("build")
+        $todo = @($bp.lines | Where-Object { $_ -match '^\s*(PLAN|GATED)\s' })
+        $gated = @($todo | Where-Object { $_ -match '^\s*GATED\s' })
+        Write-Host ("  ②b VCGC→VDF 建庫計畫(乾跑)· 待建 " + $todo.Count + " 張(其中需網路而同意閘未開 " + $gated.Count + ")") -ForegroundColor $(if ($todo.Count -eq 0) { "Green" } else { "Yellow" })
+        $bp.lines | Select-Object -Last 24 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+        $go = [bool]$BuildDb
+        if ($todo.Count -gt 0 -and -not $BuildDb) {
+            try {
+                Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+                $msg = "VCGC 量到 " + $todo.Count + " 張正庫表缺或舊了。`n要 VCGC 轉交 VDF 建庫嗎?`n`n需網路的 " + $gated.Count + " 項:同意閘 VIA_NET_CONSENT 由你自己開;沒開會照實標 GATED、不會跑。"
+                $ans = [System.Windows.Forms.MessageBox]::Show($msg, "VIA 操作台 · VDF 建庫", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
+                $go = ($ans -eq [System.Windows.Forms.DialogResult]::Yes)
+            } catch {
+                Write-Host "     這個環境開不了 Windows 對話框;不建庫(要建請加 -BuildDb)" -ForegroundColor Yellow
+            }
+        }
+        if ($go -and $todo.Count -gt 0) {
+            if ($env:VIA_NET_CONSENT -ne "YES" -and $gated.Count -gt 0) {
+                Write-Host ("     同意閘未開:需網路的 " + $gated.Count + " 項不會跑(要跑 = 你先 `$env:VIA_NET_CONSENT='YES' 再重跑;本台不代設)") -ForegroundColor Yellow
+            }
+            Write-Host "  ▶ ②b VCGC 轉交 VDF 建庫(build --apply;長的項要幾分鐘,別按 Ctrl+C)" -ForegroundColor DarkGray
+            $ba = Invoke-OcPy $broker.FullName @("build", "--apply")
+            Write-Host ("  ②b VDF 建庫 · rc=" + $ba.rc) -ForegroundColor $(if ($ba.rc -eq 0) { "Green" } else { "Yellow" })
+            $ba.lines | Select-Object -Last 24 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+            if ($ba.rc -ne 0) { $exitCode = 2 }                  # GATED / ABSENT / NODATA / RED / TIMEOUT: tables still missing = step not done
+        }
+    }
+
+    # ③ 全景實測
+    if (-not $SkipSweep) {
+        $sweep = Get-ChildItem -LiteralPath $VIA -Filter "Invoke-VIA-Sweep-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1
+        if ($null -eq $sweep) {
+            Write-Host "  ③ 全景實測 · ABSENT(Invoke-VIA-Sweep 尾版不在)" -ForegroundColor Red
+            $exitCode = 2
+        } else {
+            Write-Host ("  ▶ ③ 全景實測 " + $sweep.Name + "(VDF / VRN 鏈 · 橋 · 全景 · DB 面板 · 工具)") -ForegroundColor DarkGray
+            & $sweep.FullName -NoClipboard
+            $src = $LASTEXITCODE
+            Write-Host ("  ③ 全景實測 · rc=" + $src) -ForegroundColor $(if ($src -eq 0) { "Green" } else { "Yellow" })
+            Set-Location -LiteralPath $VIA
+            if ($src -eq 3) { $exitCode = 3; return }
+            if ($src -ne 0) { $exitCode = 2 }
+        }
+    }
+
+    # ④ 輸出統一 Parquet(DuckDB 管家)
+    $p = Invoke-OcPy $engine.FullName @("parquet", "--apply")
+    Write-Host ("  ④ 輸出統一 Parquet · rc=" + $p.rc) -ForegroundColor $(if ($p.rc -eq 0) { "Green" } else { "Yellow" })
+    $p.lines | Select-Object -Last 8 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+    if ($p.rc -eq 1) { $exitCode = 2 }
+
+    # ⑤ 操作台頁 + 總覽三色燈
+    $pg = Invoke-OcPy $engine.FullName @("page")
+    $st = Invoke-OcPy $engine.FullName @("status")
+    Write-Host ("  ⑤ 操作台頁 · rc=" + $pg.rc) -ForegroundColor $(if ($pg.rc -eq 0) { "Green" } else { "Yellow" })
+    if ($pg.rc -ne 0) {
+        $exitCode = 2
+        $pg.lines | Select-Object -Last 8 | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+    }
+    try {
+        $rows = ($st.lines -join "`n") | ConvertFrom-Json
+        $lampRows = @($rows | ForEach-Object { [pscustomobject]@{ id = $_.item; title = $_.item; state = @{ OK = "GREEN"; SKIP = "AMBER"; FAIL = "RED"; UNTESTED = "EMPTY" }[$_.lamp]; note = $_.text } })
+        if (Get-Command Write-CeleritasMatrixSummary -ErrorAction SilentlyContinue) {
+            Write-CeleritasMatrixSummary -Rows $lampRows -Title "VIA 操作台 · 總覽(三色燈)"
+        } else {
+            $lampRows | ForEach-Object { Write-Host ("  " + $_.state.PadRight(6) + " " + $_.title + " · " + $_.note) }
+        }
+    } catch {
+        Write-Host "  [總覽] 讀不到 status 輸出(看頁)" -ForegroundColor Yellow
+    }
+    if ($null -ne $broker) {
+        $bs = Invoke-OcPy $engine.FullName @("broker")
+        Write-Host "  ⑥ VCGC 資料中介(VRN 要料 → 讀庫 / 轉交 VDF → 回 VRN)" -ForegroundColor Cyan
+        $bs.lines | ForEach-Object { Write-Host ("     " + $_) -ForegroundColor DarkGray }
+    }
+    $sync = Join-Path $VIA "VIA_Reports\operator_console\ui\VIA-SYNCHRONIZER-Standalone.html"
+    if (Test-Path -LiteralPath $sync) { Write-Host ("  [SYNCHRONIZER] " + $sync) -ForegroundColor Cyan }
+    $page = Join-Path $VIA "VIA_Reports\operator_console\VIA_OperatorConsole_latest.html"
+    Write-Host ("  [頁] " + $page) -ForegroundColor Cyan
+    if ($pg.rc -ne 0) { Write-Host "  [頁] 本次沒產出新頁(上面是舊頁,不自動開)" -ForegroundColor Yellow }
+    if (-not $NoOpen -and $pg.rc -eq 0 -and (Test-Path -LiteralPath $page)) {
+        foreach ($u in @($page, $sync)) {
+            if ($u -and (Test-Path -LiteralPath $u)) { try { Invoke-Item -LiteralPath $u } catch { Write-Host ("  [頁] 開不了瀏覽器(手動開 " + $u + ")") -ForegroundColor Yellow } }
+        }
+    }
+} finally {
+    $env:VIA_DATA_HOME = $prevHome
+    if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }
+    Set-Location -LiteralPath $StartDir
+}
+exit $exitCode

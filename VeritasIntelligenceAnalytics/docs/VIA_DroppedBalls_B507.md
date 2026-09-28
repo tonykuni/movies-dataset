@@ -343,3 +343,7 @@
 | Z272 | VRN 尾版仍直讀 VDF 表 3 支:ENG069 ConsensusDB(tw_daily_prices)· ENG073 ReportStructuredDB · ENG080 FourPointDigest(tw_daily_prices · tw_listings · tw_trading_daily)——各自換版時改用 CGC_MDL239 fetch()(ENG086 v0118 是範本;大檔要全複製,讀原始碼的尺才不誤判) | 候 | AI 後續輪 | R25 |
 | Z273 | 庫表冊有、規格冊 vdf 項 outputs 沒宣告的表 42 張(例 ActiveTWETF::holdings_changes · aaii_sentiment · vdf_global_market::fwd_valuation_daily …)→ 中介沒有路由可轉交(照實 ABSENT)。要在規格冊把產出這些表的項補上 outputs(經 CGC_MDL139 / 規格產生器,只增) | 候 | AI 後續輪 / 操作員確認寫庫項 | R25 |
 | Z274 | CGC_MDL239 資料中介已編號(VIA-VCGC-MDL1392)並接進操作台 / 一鍵 v0101,但還沒登錄進 InputConsole 規格冊 central 家族(EngineBus 目錄看不到它)。規格冊每項掛 CGC_MDL054 介面合約(量 argparse 旗標),本支 CLI 不是 argparse → 直接加項可能被合約尺判漂移;要嘛中介換版改 argparse、要嘛合約尺認手寫旗標,再經 CGC_MDL139 加項(只增) | 候 | AI 後續輪 | R25 |
+| Z275 | TemplateSSOT 消費者分兩種:跟隨尾版(glob)的會跟著換模板;釘死 `VIA_UI_TemplateSSOT_v0100.json` 的尾版 3 支(CGC_MDL089 UIBaseTemplate 等;全樹字面 13 處)不會跟 → 換模板後頁面樣式會不一致。要各自換版改讀尾版(或改用 CGC_MDL241 呈現套件 spec() / css()) | 候 | AI 後續輪(新版號) | R26 |
+| Z276 | VCGC 元件註冊冊待同步:新 1,406 · 變更 521 · 退役 1,088(R24c 刪檔也在內)。唯一入口 ①d 會跳「是 / 否」(預設否);按「是」= 操作員批准 registry-sync --apply,寫已追蹤的註冊冊後要 commit(接續 Z261b) | 候 | 操作員批准 | R26 |
+| Z277 | CGC_MDL237 編號的 ENV 類讀工具鎖冊時找 `lock["tools"]` / `lock["families"]`,但鎖冊頂層鍵是 accelerator / network / layout / nlp → 四件工具的鎖沒有被編成 ENV 號。要換版修讀法再 --apply(只增) | 候 | AI 後續輪 | R26 |
+| Z278 | VIA_ToolRoster_SSOT 沒列 pydantic(VRN_ENG073 需要;ENV MANAGER 從鏈上缺件抓到)。工具冊要新版補上(只增) | 候 | AI 後續輪 / 操作員確認 | R26 |
