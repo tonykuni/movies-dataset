@@ -93,7 +93,7 @@ function Invoke-RaStep {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     $global:LASTEXITCODE = 0
     $q = { param($v) "'" + (("" + $v) -replace "'", "''") + "'" }
-    $cmd = "Invoke-VIAPython -Family " + (& $q $Family) + " " + (& $q $Script) + " " + ((@($ArgList) | ForEach-Object { & $q $_ }) -join " ") + " 2>&1"
+    $cmd = "Invoke-VIAPython -Family " + (& $q $Family) + " " + (& $q $Script) + " " + ((@($ArgList) | ForEach-Object { & $q $_ }) -join " ") + " *>&1"   # 全串流:Invoke-VIAPython 把 stderr 用 Write-Host(資訊串流)重印,2>&1 收不到 Traceback(Codex #345)
     $body = [scriptblock]::Create($cmd)
     $raw = if ($script:HasScoped) { Invoke-VIACeleritasScoped -Body $body } else { & $body }
     $rc = $global:LASTEXITCODE
@@ -202,7 +202,7 @@ if (-not $SkipSweep -and -not $NoDiag -and (Test-Path -LiteralPath $chainJson)) 
             $swd = [Diagnostics.Stopwatch]::StartNew()
             $global:LASTEXITCODE = 0
             $q = { param($v) "'" + (("" + $v) -replace "'", "''") + "'" }
-            $body = [scriptblock]::Create("Push-Location -LiteralPath " + (& $q (Split-Path $p -Parent)) + "; try { Invoke-VIAPython -Family 'vrn' -TimeoutSec 900 " + (& $q $p) + " '--selftest' 2>&1 } finally { Pop-Location }")
+            $body = [scriptblock]::Create("Push-Location -LiteralPath " + (& $q (Split-Path $p -Parent)) + "; try { Invoke-VIAPython -Family 'vrn' -TimeoutSec 900 " + (& $q $p) + " '--selftest' *>&1 } finally { Pop-Location }")   # 全串流(同上):診斷全文要含 stderr 的 Traceback
             $raw = if ($script:HasScoped) { Invoke-VIACeleritasScoped -Body $body } else { & $body }
             $drc = $global:LASTEXITCODE
             $dl = [System.Collections.Generic.List[string]]::new()
@@ -236,6 +236,14 @@ foreach ($t in @($r10.tail)) {
     if ($t -match 'HTML\s+(.+\.html)\s*$') { $pagesHtml = $Matches[1].Trim() }
 }
 $lockLine = "" + (@(Get-Content -LiteralPath $logPath -Encoding utf8 | Where-Object { $_ -match '^\s*\[鎖\]' }) | Select-Object -Last 1)
+# ⑩ 自己也要進「一鍵」頁(Codex #345):含 ⑩ 重寫步驟 JSON,再重畫一次(0.4s 級;不另記一步)
+$stepsJson.steps = @($steps)
+[IO.File]::WriteAllText((Join-Path $outDir "RUNALL_STEPS_latest.json"), ($stepsJson | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
+if ($mx) {
+    $q = { param($v) "'" + (("" + $v) -replace "'", "''") + "'" }
+    $rb = [scriptblock]::Create("Invoke-VIAPython -Family 'vrn' " + (& $q $mx) + " 'pages' *>&1")
+    $null = if ($script:HasScoped) { Invoke-VIACeleritasScoped -Body $rb } else { & $rb }
+}
 if ($pagesHtml -and -not $NoOpen -and [Environment]::UserInteractive -and (Test-Path -LiteralPath $pagesHtml)) {
     try { Invoke-Item -LiteralPath $pagesHtml; Write-Host ("  [多頁矩陣] 已開:" + $pagesHtml) -ForegroundColor Green } catch { Write-Host ("  [多頁矩陣] 開不起來(自己開):" + $pagesHtml) -ForegroundColor Yellow }
 } elseif ($pagesHtml) {
