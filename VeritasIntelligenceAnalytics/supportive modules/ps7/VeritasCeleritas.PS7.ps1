@@ -424,6 +424,191 @@ function Write-CeleritasReport {
     return $Path
 }
 
+# ----------------------------------------------------------------------------
+#  工具與改名解析(R21:舊檔名探針 CGC_MDL234 抓到的 PS 殘留,用這兩個函式修,不再寫死檔名)
+#  Get-CeleritasToolPath  : 鎖冊 VIA_ToolVersion_Lock_v*(尾版)指定的加速器 / 網路工具(與 CGC_MDL233 pinned 同一本冊)
+#  Resolve-CeleritasRenamed: 命名冊 VIA_Naming_Registry_v* 的 renamed_from → canonical,回樹上該 canonical 的最新版號檔
+#  兩者只讀冊、不改冊;找不到回 $null(呼叫端照原路徑,誠實)。
+# ----------------------------------------------------------------------------
+function Get-CeleritasViaRoot {
+    $probe = Split-Path -Parent $PSScriptRoot
+    while ($probe) {
+        if (Test-Path -LiteralPath (Join-Path $probe 'supportive modules\registry')) { return $probe }
+        $up = Split-Path -Parent $probe
+        if (-not $up -or $up -eq $probe) { break }
+        $probe = $up
+    }
+    return $null
+}
+
+function Get-CeleritasToolPath {
+    param([Parameter(Mandatory)][ValidateSet('accelerator', 'network')][string]$Family)
+    $via = Get-CeleritasViaRoot
+    if (-not $via) { return $null }
+    $lock = Get-ChildItem -LiteralPath (Join-Path $via 'supportive modules\registry') -Filter 'VIA_ToolVersion_Lock_v*.json' -File -ErrorAction SilentlyContinue |
+        Sort-Object Name | Select-Object -Last 1
+    if (-not $lock) { return $null }
+    try { $book = Get-Content -LiteralPath $lock.FullName -Raw -Encoding utf8 | ConvertFrom-Json } catch { return $null }
+    $ent = $book.$Family
+    if (-not $ent -or -not $ent.path) { return $null }
+    $full = Join-Path (Split-Path -Parent $via) ($ent.path -replace '/', [IO.Path]::DirectorySeparatorChar)
+    if (Test-Path -LiteralPath $full) { return $full }
+    return $null
+}
+
+function Resolve-CeleritasRenamed {
+    param([Parameter(Mandatory)][string]$Name)
+    $via = Get-CeleritasViaRoot
+    if (-not $via) { return $null }
+    $book = Get-ChildItem -LiteralPath (Join-Path $via 'supportive modules\registry') -Filter 'VIA_Naming_Registry_v*.json' -File -ErrorAction SilentlyContinue |
+        Sort-Object Name | Select-Object -Last 1
+    if (-not $book) { return $null }
+    if (-not (Get-Variable -Name 'CeleritasRenamed' -Scope Script -ValueOnly -ErrorAction Ignore)) {
+        $map = @{}
+        try {
+            # 命名冊有只差大小寫的鍵(queue / Queue),物件式 ConvertFrom-Json 會拒收 → 用 -AsHashtable
+            $items = (Get-Content -LiteralPath $book.FullName -Raw -Encoding utf8 | ConvertFrom-Json -AsHashtable)['items']
+            foreach ($row in $items.Values) {
+                if ($row -is [System.Collections.IDictionary] -and $row['renamed_from']) {
+                    $map[[IO.Path]::GetFileNameWithoutExtension(("" + $row['renamed_from'] -split '[\\/]')[-1])] = [string]$row['canonical']
+                }
+            }
+        } catch { $map = @{} }
+        $script:CeleritasRenamed = $map
+    }
+    $stem = [IO.Path]::GetFileNameWithoutExtension($Name)
+    $canon = $script:CeleritasRenamed[$stem]
+    if (-not $canon) { return $null }
+    $ext = [IO.Path]::GetExtension($Name); if (-not $ext) { $ext = '.py' }
+    $hits = @(Get-ChildItem -LiteralPath $via -Recurse -File -Filter ($canon + '*' + $ext) -ErrorAction SilentlyContinue |
+        Where-Object { $_.FullName -notmatch '[\\/](references|VIA_RetiredEngines|VIA_Reports|SCOPE_COPY|new modules engines)[\\/]' -and
+                       ($_.BaseName -eq $canon -or $_.BaseName -match ('^' + [regex]::Escape($canon) + '_v\d{4}$')) } |
+        Sort-Object Name)
+    if ($hits.Count) { return $hits[-1].FullName }
+    return $null
+}
+
+# ----------------------------------------------------------------------------
+#  MATRIX SUMMARY(R21 2026-09-28 操作員「PS加入新加速器的加速模板及MATRIX SUMMARY功能」)
+#  每支接了模板的 .ps1 都能在最後叫一次:一張矩陣列出每一步的狀態、秒數、說明,
+#  表頭是本行程的加速器狀態(版本 · 已套用 · 執行緒 · 耗時),最後一行是計數與總判。
+#  列可以是 hashtable 或物件;欄名通吃:id/步/Id · title/名/Name · state/結果/r/State · sec/秒 · note/註/tail。
+#  只讀加速器狀態,不會替你 Start 或 Restore;-JsonPath 另存一份(UTF-8)。
+# ----------------------------------------------------------------------------
+function Get-CeleritasRowField {
+    param($Row, [string[]]$Names)
+    foreach ($n in $Names) {
+        if ($Row -is [System.Collections.IDictionary]) {
+            if ($Row.Contains($n)) { return $Row[$n] }
+        }
+        elseif ($null -ne $Row -and $Row.PSObject.Properties[$n]) {
+            return $Row.PSObject.Properties[$n].Value
+        }
+    }
+    return $null
+}
+
+function Get-CeleritasDisplayWidth {
+    param([string]$Text)
+    $w = 0
+    foreach ($ch in ("" + $Text).ToCharArray()) {
+        $c = [int]$ch
+        $wide = ($c -ge 0x1100 -and $c -le 0x115F) -or ($c -ge 0x2E80 -and $c -le 0xA4CF) -or ($c -ge 0xAC00 -and $c -le 0xD7A3) -or
+                ($c -ge 0xF900 -and $c -le 0xFAFF) -or ($c -ge 0xFE30 -and $c -le 0xFE4F) -or ($c -ge 0xFF00 -and $c -le 0xFF60) -or
+                ($c -ge 0xFFE0 -and $c -le 0xFFE6)
+        $w += $(if ($wide) { 2 } else { 1 })
+    }
+    return $w
+}
+
+function Format-CeleritasCell {
+    param([string]$Text, [int]$Width)
+    $t = "" + $Text
+    while ((Get-CeleritasDisplayWidth $t) -gt $Width -and $t.Length -gt 1) { $t = $t.Substring(0, $t.Length - 1) }
+    if ($t -ne ("" + $Text)) {
+        while ((Get-CeleritasDisplayWidth ($t + '…')) -gt $Width -and $t.Length -gt 1) { $t = $t.Substring(0, $t.Length - 1) }
+        $t += '…'
+    }
+    return $t + (' ' * [Math]::Max(0, $Width - (Get-CeleritasDisplayWidth $t)))
+}
+
+function Get-CeleritasStateClass {
+    param([string]$State)
+    $s = ("" + $State).Trim().ToUpperInvariant()
+    if ($s -in @('OK', 'GREEN', 'PASS', 'DONE', 'LOCKED')) { return 'OK' }
+    if ($s -like 'SKIP*' -or $s -like 'GATED*' -or $s -in @('HOLD', 'NODATA', 'INFO', 'ABSENT')) { return 'SKIP' }
+    if ($s -in @('FAIL', 'RED', 'CRASH', 'ERROR') -or $s -like 'RC=*' -or $s -like 'FAIL*') { return 'FAIL' }
+    return 'WARN'
+}
+
+function Write-CeleritasMatrixSummary {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Rows,
+        [string]$Title = 'MATRIX SUMMARY',
+        [string]$JsonPath,
+        [switch]$PassThru,
+        [switch]$Quiet
+    )
+    $cel = $script:CeleritasPS7
+    $items = foreach ($r in $Rows) {
+        $state = "" + (Get-CeleritasRowField $r @('state', 'State', '結果', 'r', 'lamp'))
+        $tail = Get-CeleritasRowField $r @('note', 'Note', '註', 'tail', 'detail')
+        if ($tail -is [System.Collections.IEnumerable] -and $tail -isnot [string]) { $tail = (@($tail) -join ' | ') }
+        [pscustomobject]@{
+            Id    = "" + (Get-CeleritasRowField $r @('id', 'Id', '步', 'step'))
+            Title = "" + (Get-CeleritasRowField $r @('title', 'Title', '名', 'name', 'Name'))
+            State = if ($state) { $state } else { '?' }
+            Class = Get-CeleritasStateClass $state
+            Sec   = Get-CeleritasRowField $r @('sec', 'Sec', '秒', 'seconds')
+            Note  = "" + $tail
+        }
+    }
+    $items = @($items)
+    $counts = [ordered]@{ OK = 0; SKIP = 0; WARN = 0; FAIL = 0 }
+    foreach ($i in $items) { $counts[$i.Class]++ }
+    $secTotal = 0.0
+    foreach ($i in $items) { if ($i.Sec -as [double]) { $secTotal += [double]$i.Sec } }
+    $verdict = if ($counts.FAIL) { 'RED' } elseif ($counts.WARN) { 'AMBER' } elseif ($items.Count) { 'GREEN' } else { 'EMPTY' }
+    $summary = [pscustomobject]@{
+        Title   = $Title
+        Verdict = $verdict
+        Total   = $items.Count
+        OK      = $counts.OK
+        SKIP    = $counts.SKIP
+        WARN    = $counts.WARN
+        FAIL    = $counts.FAIL
+        Seconds = [Math]::Round($secTotal, 1)
+        Accel   = [ordered]@{
+            Version   = $cel.Version
+            Applied   = [bool]$cel.Applied
+            Workers   = $cel.Workers
+            ElapsedMs = [int]$cel.Sw.Elapsed.TotalMilliseconds
+        }
+        Rows    = $items
+    }
+    if (-not $Quiet) {
+        $color = @{ OK = 'Green'; SKIP = 'DarkYellow'; WARN = 'Yellow'; FAIL = 'Red' }
+        $wId = [Math]::Max(2, (@($items | ForEach-Object { Get-CeleritasDisplayWidth $_.Id }) + 2 | Measure-Object -Maximum).Maximum)
+        $wTi = [Math]::Min(44, [Math]::Max(4, (@($items | ForEach-Object { Get-CeleritasDisplayWidth $_.Title }) + 4 | Measure-Object -Maximum).Maximum))
+        $wSt = [Math]::Min(14, [Math]::Max(5, (@($items | ForEach-Object { Get-CeleritasDisplayWidth $_.State }) + 5 | Measure-Object -Maximum).Maximum))
+        Write-Host ""
+        Write-Host ("━━ {0} · {1} · Celeritas {2} applied={3} workers={4} · {5} ms ━━" -f $Title, $verdict, $cel.Version, [bool]$cel.Applied, $cel.Workers, [int]$cel.Sw.Elapsed.TotalMilliseconds) -ForegroundColor Cyan
+        Write-Host ("  {0} │ {1} │ {2} │ {3,7} │ {4}" -f (Format-CeleritasCell 'ID' $wId), (Format-CeleritasCell 'STEP' $wTi), (Format-CeleritasCell 'STATE' $wSt), 'SEC', 'NOTE') -ForegroundColor DarkGray
+        foreach ($i in $items) {
+            $sec = if ($i.Sec -as [double]) { '{0,7:N1}' -f [double]$i.Sec } else { '{0,7}' -f '—' }
+            Write-Host ("  {0} │ {1} │ " -f (Format-CeleritasCell $i.Id $wId), (Format-CeleritasCell $i.Title $wTi)) -NoNewline
+            Write-Host (Format-CeleritasCell $i.State $wSt) -ForegroundColor $color[$i.Class] -NoNewline
+            Write-Host (" │ {0} │ {1}" -f $sec, (Format-CeleritasCell $i.Note 90).TrimEnd())
+        }
+        Write-Host ("  [計] {0} 步 · OK {1} · SKIP {2} · WARN {3} · FAIL {4} · {5} 秒 → {6}" -f $items.Count, $counts.OK, $counts.SKIP, $counts.WARN, $counts.FAIL, $summary.Seconds, $verdict) -ForegroundColor $(if ($counts.FAIL) { 'Red' } elseif ($counts.WARN) { 'Yellow' } else { 'Green' })
+    }
+    if ($JsonPath) {
+        Write-CeleritasText -Path $JsonPath -Text ($summary | ConvertTo-Json -Depth 5)
+    }
+    if ($PassThru) { return $summary }
+}
+
 if ($RestoreOnly) {
     Restore-CeleritasPS7
     return [ordered]@{

@@ -131,6 +131,11 @@ $Engines = [ordered]@{
 function Invoke-PyTool {
     param([string]$Tool, [string[]]$Arguments)
     $toolPath = Join-Path $Root $Tool
+    # R21(2026-09-28):工具改過名(VHS_Reader → SUP_MDL164_VHSReader …)就照命名冊 renamed_from 找樹上的正典檔;模板不在照舊略過
+    if (-not (Test-Path $toolPath) -and (Get-Command Resolve-CeleritasRenamed -ErrorAction Ignore)) {
+        $renamed = Resolve-CeleritasRenamed $Tool
+        if ($renamed) { Write-Step ("工具已改名:{0} → {1}(命名冊 renamed_from)" -f $Tool, (Split-Path -Leaf $renamed)) 'DarkCyan'; $toolPath = $renamed }
+    }
     if (-not (Test-Path $toolPath)) {
         Write-Step ("工具不存在,略過:{0}" -f $Tool) 'DarkYellow'
         return @{ ok=$false; code=-1; note='tool-missing' }

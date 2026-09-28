@@ -52,6 +52,11 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $Python = "C:\\Users\\tonyk\\envs\\via_core_312\\Scripts\\python.exe"
 $Builder = "C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VAP\_output\VAP_WAREHOUSE_V4_20260506_222535\vap_warehouse_v4_builder.py"
+# R21(2026-09-28):工作站 _output 那份 builder 不在時,照命名冊 renamed_from 找樹上的正典檔(CGC_MDL234 舊名探針抓到)
+if (-not (Test-Path -LiteralPath $Builder) -and (Get-Command Resolve-CeleritasRenamed -ErrorAction Ignore)) {
+    $VIARenamed = Resolve-CeleritasRenamed (Split-Path -Leaf $Builder)
+    if ($VIARenamed) { Write-Host ("[改名] {0} → {1}" -f (Split-Path -Leaf $Builder), $VIARenamed) -ForegroundColor DarkCyan; $Builder = $VIARenamed }
+}
 $Html = "C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VAP\_output\VAP_WAREHOUSE_V4_20260506_222535\VAP_Warehouse_V4_Intelligence_Report.html"
 Write-Host ""
 Write-Host "Refreshing VAP Warehouse V4..." -ForegroundColor Cyan

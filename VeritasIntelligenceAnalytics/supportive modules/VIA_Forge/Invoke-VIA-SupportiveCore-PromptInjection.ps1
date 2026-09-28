@@ -90,6 +90,11 @@ $VIA_REGISTRY_CORE   = Join-Path $VIA_SUPPORTIVE_DIR "VIA_RegistryCore_v1.py"
 $VIA_RUNTIME_BRIDGE  = Join-Path $VIA_SUPPORTIVE_DIR "VIA_Runtime_Bridge_All_in_One.py"
 $VIA_SSOT_UNIFIED    = Join-Path $VIA_SUPPORTIVE_DIR "VIA_SSOT_Unified.py"
 $VIA_AEGIS_NEXUS     = Join-Path $VIA_SUPPORTIVE_DIR "VeritasAegisNexus.py"
+# R21(2026-09-28):兩件工具改問鎖冊(Get-CeleritasToolPath);模板不在就照上面原路徑(CGC_MDL234 舊名探針抓到)。
+if (Get-Command Get-CeleritasToolPath -ErrorAction Ignore) {
+    $VIAToolPin = Get-CeleritasToolPath -Family accelerator; if ($VIAToolPin) { $VIA_CELERITAS = $VIAToolPin }
+    $VIAToolPin = Get-CeleritasToolPath -Family network; if ($VIAToolPin) { $VIA_AEGIS_NEXUS = $VIAToolPin }
+}
 
 $VIA_PS_NEXUS_CORE   = Join-Path $VIA_SUPPORTIVE_DIR "Invoke-VeritasNexusCore.ps1"
 $VIA_PS_GOVERNANCE   = Join-Path $VIA_SUPPORTIVE_DIR "Invoke-VIA-CentralGovernanceManager.ps1"
