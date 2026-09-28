@@ -30,6 +30,9 @@
 | R11 | 操作員令「VCGC/VDF/VRN 左面板參數 · 右面板多分頁(總覽第一、結果最後)· 收集需求的引擎 · 對接制式 U/I 與 synchronizer」→ 新模組 `CGC_MDL227_ConsoleBlueprint_v0100`。參數只從 InputConsole 冊來,引擎在位與 PLAN 只從 EngineBus 來,已修冊交給全景、盤點交給總管,零第二把尺;對接時模板原文零改動,預置契約沿用 VRN_ENG089。設計見 `docs/VIA_Console_Blueprint_Design_20260928.md` | f2ed7917 | 完成(容器) | 自測 13/13;Chromium 實跑零 JS 錯誤 · 手機無橫捲 · 預置 ADDED · synchronizer 停用後中央頁即時隱藏;加速橋由正主注入器補;閘 PY 缺 0 · PS 新缺 0;總管頁重生(模組 236→237);邏輯冊未變;契約測 OK · 總管 rc0 · Deck 26/26 |
 | R11b | 操作員問「功能實測結果如何」→ 補一輪瀏覽器功能實測,抓到真 bug:左面板自己拼旗標,對 tw_history 產出 `--range`,ENG064 不認。改成把參數 → 指令的翻譯委派正主 CGC_MDL139 `resolve_argv`(`argv` 唯讀解析 / `run --dry` 乾跑),欄位只給正主會接的鍵 | bc26f1ec | 完成(容器) | 自測 14/14(+⑬ 活樹無 --range);瀏覽器 32/32 零 JS 錯誤;終端實跑頁面產生的指令:READY / BAD_PARAM / --ticker 三態都對,零寫入 |
 | R12 | 資料庫管理 P1+P2 + 三項計畫(操作員裁定:開工 · 三項 · `_repo_` = 對帳副本):新模組 `CGC_MDL228_VIADBManager_v0100`(門面:目錄只讀 DataHome 一頁 · 三態與普查同尺 · 核對冊上期望 · 匯出 csv/gsheet 委派 ENG045、另補 Big5/MD/JSON/parquet · 三項計畫只出計畫)+ VCGC `CGC_MDL149 v0163` `dbm` 路由 + 主控台 `CGC_MDL227 v0101` DB 家族與資料庫分頁 | d5991565 | 完成(容器) | MDL228 自測 15/15(沙盒家用正主 catalog 產目錄;正庫檔修改時間前後一致);主控台 15/15;瀏覽器 15/15 + 33/33 零 JS 錯誤;契約測 OK · 總管 rc0 · Deck 26/26 · 閘 PY 缺 0;總管頁重生;**真數字要工作站 `via-datahome catalog -Tables` 後才有**(容器無正庫,資料庫分頁照實 NODATA) |
+| R13 | 工作站首跑實量(目錄 2026-09-28 11:16:58:正庫 5 · 對帳副本 2 · 71 表 · 15,783,873 列 · 湖 30 夾 806 檔 · 壞檔 21;核對 RED 2 · AMBER 31;計畫 壞 21 · mega 20 · raw 3)抓到的修正 → `CGC_MDL228 v0101`:① PowerShell 把 `--cols a,b,c` 拆成三個參數,v0100 默默只匯 1 欄 → 收齊、多餘字與不認得旗標一律擋;② 政策同步表(寫入者 VRN_ENG082)依 L14 在每本庫都有 → GREEN,不報冊外(16 條雜訊);③ plan 印精簡摘要;④ 新動詞 `ui` 以同一份目錄重建主控台 | 06bc7064 | 完成(容器) | 自測 18/18;主控台 15/15;VCGC v0163 路由到 v0101;契約測 OK;閘 PY 缺 0 |
+
+**教訓(R13)**:PowerShell 會把沒加引號的 `a,b,c` 當成陣列傳給程式。凡是逗號清單型的參數,CLI 都要收齊多個字;多出來的字一律擋下,不能默默吞掉。
 
 **教訓(R11b)**:凡是「參數 → 指令」,先找正主翻譯器(CGC_MDL139 `resolve_argv`)。自己拼旗標,就是第二把尺(L05),實測當場就錯。
 
