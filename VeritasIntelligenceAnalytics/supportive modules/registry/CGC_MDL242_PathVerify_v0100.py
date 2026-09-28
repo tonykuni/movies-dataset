@@ -165,10 +165,16 @@ def lock_index() -> dict:
 
 # ---------------------------------------------------------------- ① path steps · ② versions · ③ results
 
+def sweep_lamp(rc) -> str:
+    """The sweep's own rc convention: 0 done · 1 RED · 2 NODATA · 3 ABSENT · 4 GATED (the last three are findings, not breakage)."""
+    return {0: "GREEN", 1: "RED", 2: "AMBER", 3: "AMBER", 4: "AMBER"}.get(rc, "NODATA" if rc is None else "RED")
+
+
 def path_steps() -> list:
     rows = []
     side = _json(REP / "sweep" / "SWEEP_SIDE_latest.json") or {}
-    flow = str(side.get("flow") or "")
+    fl = side.get("flow")
+    flow = str(fl.get("line") or fl) if isinstance(fl, dict) else str(fl or "")
     gate = next((s for s in side.get("steps") or [] if s.get("id") == "vcgc"), {})
     rows.append({"step": "⓪ VCGC 流程閘", "state": "GREEN" if gate.get("rc") == 0 else ("NODATA" if not gate else "RED"),
                  "note": (flow[:80] or "流程閘由全景實測第一步跑") + f" · {side.get('ts', '')}"})
@@ -189,10 +195,9 @@ def path_steps() -> list:
         st = "NODATA" if not t else ("RED" if t.get("RED") else ("GREEN" if set(k for k, v in t.items() if v) <= {"GREEN"} else "AMBER"))
         rows.append({"step": fam, "state": st, "note": " · ".join(f"{k} {v}" for k, v in t.items() if v) + f" · {d.get('generated', '—')}"})
     for s in side.get("steps") or []:
-        if s.get("id") in ("vcgc", "vdf", "vrn"):
+        if s.get("id") in ("vcgc", "vdf", "vrn", "vdf_chain", "vrn_chain"):      # gate and both chains are rows ⓪ ④ ⑤ already
             continue
-        rows.append({"step": "⑥ " + str(s.get("title")), "state": "GREEN" if s.get("rc") == 0 else ("AMBER" if s.get("rc") == 2 else "RED"),
-                     "note": f"rc {s.get('rc')} · {s.get('sec')}s"})
+        rows.append({"step": "⑥ " + str(s.get("title")), "state": sweep_lamp(s.get("rc")), "note": f"rc {s.get('rc')} · {s.get('sec')}s"})
     oc = _mod("CGC_MDL238_OperatorConsole")
     if oc is not None:
         fl = oc.format_lock()
@@ -398,6 +403,8 @@ def selftest() -> int:
         res = result_rows(hp)
     chk("③ 和上一輪比:計數增減逐項列出", res["prev_ts"] == "t0" and any(x.startswith("VDF GREEN") for x in res["delta"]) or not res["now"]["vdf"],
         " · ".join(res["delta"][:4]))
+    chk("① 全景步驟照全景自己的 rc 約定:0 綠 · 1 紅 · 2 缺料 / 3 缺件 / 4 閘未開 = 黃", [sweep_lamp(x) for x in (0, 1, 2, 3, 4)]
+        == ["GREEN", "RED", "AMBER", "AMBER", "AMBER"])
     v = verdict([{"state": "GREEN"}], [{"state": "GREEN"}], {"now": {"vdf": {"RED": 1}, "vrn": {}}})
     chk("總判:鏈上有紅 = 紅(不被綠蓋掉)", v == "RED")
     kit = _mod("CGC_MDL241_TemplateAdapter")
