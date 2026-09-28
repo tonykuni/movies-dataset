@@ -17,28 +17,67 @@
    - 自己只補**真的缺的四塊**:跨庫數量核對、選取式匯出(MD / JSON / Big5 + 範圍選取)、儲存最佳化計畫(row group / 重複層)、API 呼叫帳。
 3. U/I 不另做一頁:接在剛做好的主控台藍圖(CGC_MDL227,制式模板 + synchronizer)上,加一個「資料庫」家族與分頁。
 
-## 1. 現況(讀一次的結果)
+## 1. 現況(讀一次的結果:工作站 via-census 2026-09-28 實量)
 
-來源:`VIA_DB_Table_SSOT_v0100.json`,操作員工作站 via-census 實測,2026-09-13(批475 貼回)。**已經 15 天沒更新。容器裡沒有正庫(`output_hub/mega/` 是空的),所以這份數字不能在容器重量**;第一步要在工作站重跑普查。
+先前用的冊(`VIA_DB_Table_SSOT`,2026-09-13,56 張表)已經過時,以操作員今天貼回的普查為準:
 
-| 庫 | 表數 | 總列數 | 最大的表 |
+- 問過 42 本庫,在庫共 236 張表:GREEN 191 · AMBER 36 · NODATA 9 · ABSENT 9。
+- 另有 11 本沙盒庫(`_self_test`、`engine_bus/_cwd`…)依律不算正庫。
+
+**資料家(正庫)**
+
+| 庫 | 表 | 列數 | 最新日 | 狀態 |
+|---|---|---|---|---|
+| vdf_tw_market.duckdb | 39 | 14,575,472 | 2026-09-25 | GREEN 29 · AMBER 9 · NODATA 1 · 冊外 2 |
+| vdf_global_market.duckdb | 15 | 1,197,747 | 2026-09-28 | GREEN 13 · AMBER 2 |
+| ActiveTWETF.duckdb | 10 | 6,512 | 2026-09-25 | GREEN 6 · AMBER 4 |
+| vdf_hub.duckdb | 6 | 2,100 | 2026-09-25 | GREEN 5 · AMBER 1 · 冊外 2 |
+| aaii_sentiment.duckdb | 1 | 2,042 | 2026-09-24 | GREEN(冊外) |
+| **副本** vdf_tw_market_repo_a7752b3d | 18 | **4,378,059** | 2026-09-25 | GREEN 17 · AMBER 1 |
+| **副本** vdf_global_market_repo_ae7b06f | 5 | 2,056 | 2026-09-25 | GREEN 5 |
+
+**倉內(樹上)的庫**:全部是冊外。
+
+- VDF_TW_MonthlyRevenue(VIA_Reports\vtmra\revphase\out)13 表 · 3,012 列。
+- via.duckdb 174,059 列(最新 2026-08-12);ssot_chipwar 51,168;vap_intelligence 44 表 · 7,239。
+- `inputs_2026091x_*.duckdb` **7 本**,每本 1,268–1,270 列。
+- 其餘是 0–40 列的小庫(VRN_MDL004 / 005 是 0 列)。
+
+**湖(parquet 夾)**
+
+| 湖 | 檔 | 列數 | 看得出的問題 |
 |---|---|---|---|
-| `vdf_tw_market.duckdb` | 39 | 13,686,478 | tw_daily_prices 2.13M · tw_prices_adj 2.13M · prices_canonical 2.13M · features_daily 2.13M · tw_trading_daily 1.47M · 籌碼三表各 1.1M |
-| `vdf_global_market.duckdb` | 11 | 1,107,695 | us_macro 285K · global_daily 204K ×4 層 |
-| `ActiveTWETF.duckdb` | 6 | 585 | active_tw_etf_universe 260 |
-| **合計** | **56** | **≈14.8M** | 另有 12 張「已知舊表不在」 |
+| px/year=2023…2026 | 4 | 1,694,549 | 按年分片,正確 |
+| px/year=_raw | 1 | 1,892,417 | 與年檔重疊;含 1900-01-01 哨兵列 |
+| chip/year=2024…2026 | 6 | 2,259,095 | 按年分片,正確 |
+| chip/year=_raw | 2 | 2,259,095 | **與年檔列數完全相同 = 整份重複** |
+| rest/year=2023…2026 | 31 | 1,289,889 | 2026 的日期範圍寫成「1150824 → Q3」:民國日期與季別混用 |
+| rest/year=_raw | 18 | 1,301,396 | 與年檔重疊 |
+| fred | 156 | 285,018 | 與 macro(1 檔 · 285,018)同列數,加上 global 庫的 us_macro 共**三份** |
+| mega | **399** | 2,412,164 | 每跑一次一個時間戳檔 = 最嚴重的碎檔 |
+| history_gap_batches | 101 | 1,980 | 平均一檔不到 20 列 |
+| fiveday | 42 | 105 | **21 檔讀不動(壞 parquet)** |
+| usmacro | 28 | 8,520 | 碎檔 |
 
-**從現況直接看得出來的問題(優化的真正目標)**
+**缺表(ABSENT 9)**:
 
-| # | 現象 | 影響 | 處理原則 |
+- 冊上宣告但庫裡沒有:tw_financial_mops、tw_financial_mops_log。
+- 冊外、程式碼當表用卻不存在(7 張):tw_daytrade_stock、vrn_md_tables、consensus_latest_adj、tw_shares_issued、tw_prices、consensus_adj …
+
+**從今天的數字看優化目標(依效益排序;全部只出計畫,刪與搬是操作員的手,L10)**
+
+| # | 目標 | 規模 | 建議 |
 |---|---|---|---|
-| A | 價格四層同列數:`tw_daily_prices → tw_prices_adj → prices_canonical → features_daily` 都是 2.13M 列;global 也是四層各 204K | 最大的空間重疊來源。提案擔心的「新舊並存重疊」其實已經發生在這裡 | 先在工作站量每層欄位重疊與可否由上一層決定性推得;能推得的改 VIEW。**只出計畫,刪表是操作員的手(L10)** |
-| B | `tw_daily_prices` 最早日期是 1900-01-01 | 哨兵列污染,跨度與增量起點都會算錯 | 既有 `db_hygiene` 只寫 SQL 不執行;維持「先標不刪」 |
-| C | 7 張表 0 列(vrn_extraction_logic、via_policy_*、via_handover、tw_financial*) | 有的是還沒同步,有的是還沒抓 | 核對表分成「冊說該有」和「目前 0」兩態,不當綠 |
-| D | 22 張表沒有日期範圍(`~`) | 選期間匯出、增量都沒有日期欄可用 | 普查要說出每表的日期欄或「無日期欄」,U/I 期間選擇器照實停用 |
-| E | 量測已 15 天 | 頁上數字不是現在 | 目錄頁帶量測時間,超過門檻顯示 STALE(ENG089 `catalog_freshness` 已有) |
+| 1 | 資料家內的 `_repo_` 副本庫 | 437.8 萬列 | 確認是 VcgcSyncHub 對帳用還是殘留;殘留就由操作員移出資料家(不刪,先搬到封存夾) |
+| 2 | 湖的 `_raw` 與年檔重疊 | chip 225.9 萬(全重複)· px 169.5 萬 · rest 129 萬 | 年檔是正本(L10 約定);`_raw` 定成「只讀歸檔」或改 VIEW,不再被掃描 |
+| 3 | 總經三份 | 28.5 萬 × 3 | 一份正本(DuckDB us_macro,L90),fred / macro 標成派生 |
+| 4 | mega 399 個時間戳檔 | 241 萬列 | 同表按年合併成 `part-YYYY.parquet`(ENG073 `optimize_plan` 已能出 COPY 計畫),合併後回讀列數核對才換上 |
+| 5 | fiveday 21 個壞檔 | 21 檔 | 先列清單交操作員;壞檔不讀進目錄 |
+| 6 | 倉內 7 本 inputs_* 快照 | 各約 1,270 列 | 確認用途後只留最新一本 |
+| 7 | 日期格式混用(民國日期 / 季別) | rest、aetf | 目錄層統一轉成西元日期比對(SUP_MDL753 已有 period 工具),不改原料 |
+| 8 | 缺表 9 張 | — | 冊上 2 張:追寫入者 ENG082;冊外 7 張:確認是舊名還是該建 |
 
-**規模**:全部約 1,480 萬列,zstd Parquet 估計合計只有數百 MB 級。這個量級決定了下面幾條「提案不適用」。
+**規模**:正庫約 1,580 萬列。上面 1–4 項重疊合計約 **1,000 萬列**,比新舊並存的顧慮大得多。這才是空間最佳化真正的著力點。
 
 ## 2. 提案逐條對照(適合才採用)
 
@@ -116,4 +155,5 @@
 1. 要不要照這個分期做?建議先做 P1 + P2:唯讀,馬上看得到全貌、也能選範圍匯出。
 2. 價格四層(A)能推得的改 VIEW:要等 P3 的量測出來再裁,本規劃不動。
 3. Google Sheet 直接寫入 API(OAuth)要不要做;目前只給相容 CSV。
-4. 工作站跑一次:`via-census`(或 EngineBus `census --tables`)+ DataHome `catalog`,把結果貼回,現況表才是今天的數字。
+4. 普查已貼回(本文 §1 已更新)。請再跑 `via-datahome catalog -Tables`,把一頁目錄寫出來(`VIA_Reports\\datahome\\DATAHOME_CATALOG_latest.json`)。P1 的總覽就讀這一頁,不再逐表 COUNT。
+5. §1 的優化目標 1–8 要做哪幾項:建議先 5(壞檔清單)、4(mega 合併計畫)、2(_raw 定位),都只出計畫。
