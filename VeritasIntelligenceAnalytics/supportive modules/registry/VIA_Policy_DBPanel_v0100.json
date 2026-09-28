@@ -1,0 +1,257 @@
+{
+ "schema": "VIA.Policy.DBPanel.v1",
+ "id": "DBPANEL-1",
+ "status": "ACTIVE",
+ "book": "VIA_Policy_Laws_SSOT_v0100.json",
+ "book_edited": false,
+ "book_sha256_16": "c7aab42f7ebfd283",
+ "second_book": false,
+ "operator": "please gave me a powershell code with the necessary code panel with detail & well organize detailed summary and error matrix with ast and descriptions. save this to the policy. find out method to fetch all taiwan stock list & all active taiwan stock etf validated list as input to many engines.",
+ "date": "2026-09-28",
+ "entry": {
+  "powershell": "VeritasIntelligenceAnalytics\\Invoke-VIA-DBPanel-v*.ps1 (newest)",
+  "vcgc": "via-vcgc dbm panel",
+  "engine": "CGC_MDL228_VIADBManager_v0102+ panel (routed by CGC_MDL149 console tail)",
+  "switches": {
+   "-Pull": "git pull --ff-only first",
+   "-SkipCatalog": "use the existing DataHome catalog page",
+   "-BuildUi": "rebuild the console blueprint page (dbm ui)",
+   "-Rows N": "rows shown per matrix (default 25)"
+  },
+  "exit_codes": {
+   "0": "GREEN or AMBER",
+   "1": "RED",
+   "2": "NODATA or ABSENT",
+   "3": "panel did not run (see log)"
+  }
+ },
+ "sections": [
+  "[1] 摘要",
+  "[2] 資料庫",
+  "[3] 數量核對",
+  "[4] 兩張清單",
+  "[5] 三項計畫",
+  "[6] 錯誤矩陣",
+  "[7] AST 矩陣",
+  "[8] 黃色貼回塊"
+ ],
+ "outputs": [
+  "VIA_Reports/dbmanager/DBM_PANEL_latest.json",
+  "VIA_Reports/dbmanager/DBM_PANEL_latest.md",
+  "VIA_Reports/dbmanager/logs/DBPanel_<ts>.log"
+ ],
+ "error_matrix": {
+  "columns": [
+   "sev",
+   "source",
+   "item",
+   "state",
+   "desc",
+   "action"
+  ],
+  "sources": [
+   "目錄",
+   "資料庫",
+   "核對",
+   "湖",
+   "清單",
+   "AST"
+  ],
+  "severity": {
+   "HIGH": "RED / ABSENT from any source; AST SYNTAX, DUPDEF, UNREACH, BAREEXC, PSDUPFN, PSDOCSTR, COMPILE, TAILAPI, UNREADABLE (a target panorama could not read)",
+   "MED": "AMBER from any source; stale catalog; bad parquet; AST HARDIMP, PINVER, SYSEXE, TALIB, MUTDEF",
+   "LOW": "NODATA reconcile rows; AST ACCEL, NET, VERB, SWALLOW (summed into one row)"
+  },
+  "verdict": "NODATA when the catalog is absent; else RED if any HIGH, AMBER if any MED, else GREEN"
+ },
+ "ast_classes": {
+  "ACCEL": {
+   "kind": "governance",
+   "severity": "LOW",
+   "desc": "加速器橋缺席",
+   "action": "純增量;import 時零行為變更",
+   "scope": "VIA 樹內才算"
+  },
+  "BAREEXC": {
+   "kind": "read_check",
+   "severity": "HIGH",
+   "desc": "裸 except:(連 KeyboardInterrupt / SystemExit 都吞)",
+   "action": "改 except Exception:(不吞 KeyboardInterrupt / SystemExit)",
+   "scope": "所有檔"
+  },
+  "COMPILE": {
+   "kind": "tail_check",
+   "severity": "HIGH",
+   "desc": "ast.parse 過、compile 不過(例:加速橋注在 from __future__ 前,Z226)",
+   "action": "把 from __future__ 移回檔頭第一個陳述式",
+   "scope": "所有檔"
+  },
+  "DUPDEF": {
+   "kind": "read_check",
+   "severity": "HIGH",
+   "desc": "同一層同名定義兩次(後者默默蓋掉前者;LL283 via-ui 被自己抹掉就是這一型)",
+   "action": "刪掉或改名前一個同名定義(後者默默蓋掉前者)",
+   "scope": "所有檔"
+  },
+  "HARDIMP": {
+   "kind": "governance",
+   "severity": "MED",
+   "desc": "模組頂硬相依重庫(缺件會 Traceback=假紅)",
+   "action": "搬進探針式載入 → 缺=ABSENT",
+   "scope": "VIA 樹內才算"
+  },
+  "MUTDEF": {
+   "kind": "read_check",
+   "severity": "MED",
+   "desc": "可變預設引數([] / {} / set() / dict() / list())——跨呼叫共用同一個物件",
+   "action": "預設值改 None,函式內再建新物件",
+   "scope": "所有檔"
+  },
+  "NET": {
+   "kind": "governance",
+   "severity": "LOW",
+   "desc": "VDF 網路工具橋缺席",
+   "action": "惰性載入;import 時零網路",
+   "scope": "VIA 樹內才算"
+  },
+  "PINVER": {
+   "kind": "governance",
+   "severity": "MED",
+   "desc": "釘死版號(違尾版律 L54)",
+   "action": "改 newest-glob",
+   "scope": "VIA 樹內才算"
+  },
+  "PSDOCSTR": {
+   "kind": "read_check",
+   "severity": "HIGH",
+   "desc": "PowerShell 函式本體開頭是三引號字串(不是註解,是回傳值;LL182)",
+   "action": "把函式開頭的三引號字串改成 # 註解或 <# #> 說明塊",
+   "scope": "所有檔"
+  },
+  "PSDUPFN": {
+   "kind": "read_check",
+   "severity": "HIGH",
+   "desc": "PowerShell 同名 function 定義兩次(後者蓋掉前者;LL283)",
+   "action": "PowerShell 同名 function 只留一個",
+   "scope": "所有檔"
+  },
+  "SWALLOW": {
+   "kind": "read_check",
+   "severity": "LOW",
+   "desc": "except 本體只有 pass/continue/...(例外被吞、沒有任何看得見的改變;LL151)",
+   "action": "graceful 設計可保留;不是刻意的就記一行或回報狀態",
+   "scope": "所有檔"
+  },
+  "SYNTAX": {
+   "kind": "governance",
+   "severity": "HIGH",
+   "desc": "語法錯(compile 失敗)",
+   "action": "必修:照行號修語法(本器不猜改)",
+   "scope": "所有檔"
+  },
+  "SYSEXE": {
+   "kind": "governance",
+   "severity": "MED",
+   "desc": "裸 sys.executable 派子行程(違家族境律 L51)",
+   "action": "改匯流排 python_for(family)",
+   "scope": "VIA 樹內才算"
+  },
+  "TAILAPI": {
+   "kind": "tail_check",
+   "severity": "HIGH",
+   "desc": "尾版比前版少了公開名稱又沒轉接(呼叫端一叫就 AttributeError,Z229)",
+   "action": "尾版補模組層 __getattr__ 轉接前版,或把少掉的名稱補回",
+   "scope": "所有檔"
+  },
+  "TALIB": {
+   "kind": "governance",
+   "severity": "MED",
+   "desc": "TA-Lib 活動接線(違 L50)",
+   "action": "QuantGuard 為唯一活動路徑",
+   "scope": "VIA 樹內才算"
+  },
+  "UNREACH": {
+   "kind": "read_check",
+   "severity": "HIGH",
+   "desc": "return/raise/break/continue 之後同一區塊還有陳述式(永遠跑不到)",
+   "action": "刪掉 return/raise 之後那幾行,或改寫流程",
+   "scope": "所有檔"
+  },
+  "UNREADABLE": {
+   "kind": "tail_check",
+   "severity": "HIGH",
+   "desc": "panorama 讀不動這支檔(不在 / 編碼 / 權限),這支沒有被審到",
+   "action": "確認檔在、UTF-8、可讀;修好前這支的 AST 視為未審",
+   "scope": "所有檔"
+  },
+  "VERB": {
+   "kind": "governance",
+   "severity": "LOW",
+   "desc": "自測動詞契約不齊(只認位置動詞)",
+   "action": "旗標=位置動詞等價轉換",
+   "scope": "VIA 樹內才算"
+  }
+ },
+ "ast_chain": [
+  "supportive modules/registry/CGC_MDL228_VIADBManager_v*.py",
+  "supportive modules/registry/CGC_MDL227_ConsoleBlueprint_v*.py",
+  "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+  "supportive modules/registry/CGC_MDL123_DataHome_v*.py",
+  "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+  "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v*.py",
+  "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v*.py",
+  "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v*.py",
+  "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v*.py",
+  "./Invoke-VIA-DBPanel-v*.ps1"
+ ],
+ "tw_lists": {
+  "reader": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0105+ (newest tail)",
+  "api": [
+   "load_stock_list(db=None)",
+   "load_active_etfs(db=None)",
+   "stock_codes(db=None)",
+   "active_etf_codes(db=None, verified_only=False)",
+   "build_lists()"
+  ],
+  "stock_code": "^[1-9]\\d{3}$",
+  "stock_exchanges": [
+   "TWSE",
+   "TPEX"
+  ],
+  "stock_table": "vdf_tw_market.duckdb::tw_listings_industry (fallback tw_listings)",
+  "active_etf_code": "^00\\d{3}A$",
+  "active_etf_status": "ACTIVE_DOMESTIC",
+  "active_etf_table": "ActiveTWETF.duckdb::active_tw_etf_registry",
+  "validated": "the ETF has rows in ActiveTWETF.duckdb::holdings_daily",
+  "db_env": [
+   "VIA_DB_VDF_TW_MARKET",
+   "VIA_DB_TW",
+   "VIA_DB_ACTIVETWETF"
+  ],
+  "refresh": [
+   "via-console run --item macro_lanes lanes=L1",
+   "via-console run --item etf_universe",
+   "via-console run --item etf_holdings_daily",
+   "via-console run --item tw_universe_update",
+   "via-vcgc dbm panel"
+  ],
+  "method_doc": "docs/VIA_TWLists_Method_20260928.md"
+ },
+ "rules": [
+  "The panel is read-only: it writes no database, moves no file, fetches nothing, and opens no consent gate.",
+  "Python from PowerShell goes through Invoke-VIAPython only; if the helper is missing the panel stops (fail-closed).",
+  "Paste back only the yellow block between BEGIN_PASTE and END_PASTE.",
+  "Run one command per line; never paste several commands onto one line.",
+  "Quote comma lists in PowerShell (--cols \"a,b,c\"); unquoted a,b,c becomes three arguments.",
+  "Engines read the two Taiwan lists through the newest VDF_ENG087 tail, not their own regex or fetcher.",
+  "The error matrix only suggests an action; deleting or moving data stays the operator's job (L10).",
+  "VIA_Reports outputs are regenerated and never committed."
+ ],
+ "do_not": [
+  "rewrite the locked policy book",
+  "run a refresh step that needs the network from the panel",
+  "call python directly from the panel script",
+  "treat an unverified active ETF as validated",
+  "commit a database or a VIA_Reports file"
+ ]
+}
