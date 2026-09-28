@@ -23,6 +23,46 @@ param(
     [switch]$NoSchedule,
     [switch]$Force
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 
 $script:Core = @("VIA_ActiveETF_System.py","console_merged_template.html","VIA_ActiveETF.ps1","VIA_ActiveETF_Console.html","VIA_ActiveETF_PackList.json")
 $script:Used = @("VeritasAegisNexus.py","VeritasCeleritas.py","VIA_EnvManager.py","VIA_SSOT_Unified.py")
@@ -54,10 +94,10 @@ $warnings  = New-Object System.Collections.Generic.List[string]
 
 # ---------- 1) AUDIT ----------
 Write-Status INFO "VIA Active ETF — 結案部署稽核開始"
-if (-not (Test-Path $Root)) { Write-Status FAIL "找不到 vetf：$Root"; exit 1 }
+if (-not (Test-Path $Root)) { Write-Status FAIL "找不到 vetf：$Root"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 
 $py = Resolve-Python -Hint $PythonExe
-if (-not $py) { Write-Status FAIL "找不到 Python（py 啟動器 / python / -PythonExe）。"; exit 1 }
+if (-not $py) { Write-Status FAIL "找不到 Python（py 啟動器 / python / -PythonExe）。"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 $pyReal = (Invoke-Py $py @("-c","import sys;sys.stdout.write(sys.executable)"))
 $pyVer  = (Invoke-Py $py @("-c","import sys;sys.stdout.write('.'.join(map(str,sys.version_info[:3])))"))
 Write-Status OK ("Python = {0} ({1})" -f $pyVer, $pyReal)
@@ -113,7 +153,7 @@ if ($conflicts.Count -gt 0 -and -not $Force) {
     Write-Status FAIL "結案中止。請修正（或 -Install 補套件 / -Force 強制），不部署、不排程。"
     $script:Report.result = "BLOCKED"; $script:Report.conflicts = @($conflicts)
     [IO.File]::WriteAllText((Join-Path $Root "VIA_ActiveETF_DeployConfig.json"), ($script:Report | ConvertTo-Json -Depth 6), [System.Text.UTF8Encoding]::new($false))
-    exit 2
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2
 }
 Write-Status OK "稽核通過：環境/工具齊備、無衝突。以現況作為自動部署基準。"
 
@@ -166,7 +206,7 @@ Write-Status OK ("每日更新：{0} @ {1}" -f $script:TaskName, $UpdateTime)
 Write-Status OK ("啟動 UI：pwsh -File VIA_ActiveETF.ps1   或   打包 EXE：pwsh -File VIA_ActiveETF_Pack.ps1")
 if ($warnings.Count) { Write-Status WARN ("提醒：{0}" -f ($warnings -join '; ')) }
 Write-Status OK "VIA Active ETF 系統已部署並啟動每日更新。結案完成。"
-exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 
 # ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
 # 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
@@ -175,3 +215,4 @@ exit 0
 # 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
 # Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
 # ===== [VIA:PS-ACCEL:END] =====
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

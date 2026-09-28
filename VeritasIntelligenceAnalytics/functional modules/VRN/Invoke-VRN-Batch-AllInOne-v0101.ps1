@@ -23,6 +23,46 @@ param(
     [int]$Workers = 0,
     [switch]$Fresh
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -42,7 +82,7 @@ $via = $vrn | Split-Path -Parent | Split-Path -Parent
 if (-not $OCR) {
     $v0100 = Join-Path $vrn "Invoke-VRN-Batch-AllInOne-v0100.ps1"
     & pwsh -NoProfile -File $v0100 -Throttle $Throttle -TimeoutSec $TimeoutSec @(if ($Fresh) { "-Fresh" })
-    exit $LASTEXITCODE
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $LASTEXITCODE
 }
 
 # ── OCR 車道 ──────────────────────────────────────────────────────────
@@ -70,7 +110,7 @@ Write-Host "  [入] $inbox" -ForegroundColor DarkGray
 Write-Host "  [出] $stageRt" -ForegroundColor DarkGray
 if ($Probe) {
     Write-Host "  [probe] MDL005=$(Test-Path $eng005) MDL004=$(Test-Path $eng004) 逾時=$StageTimeoutSec s/段 workers=$Workers"
-    exit 0
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 }
 
 $stages = [System.Collections.Generic.List[object]]::new()
@@ -199,5 +239,6 @@ $rep = Join-Path $repDir "ocr_matrix_$ts.html"
 Write-Host "  報告:$rep" -ForegroundColor Cyan
 Write-Host "  存證:$evi" -ForegroundColor Cyan
 if (-not $NoOpen) { Start-Process $rep }
-exit $(if ($failN -eq 0 -and $toN -eq 0) { 0 } else { 1 })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(if ($failN -eq 0 -and $toN -eq 0) { 0 } else { 1 })
 
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

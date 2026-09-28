@@ -7,6 +7,46 @@
 #   選單模式:加 -Menu
 # 背景作業=獨立進程(Start-Process):關掉本視窗不中斷(不卡斷紀律)
 param([switch]$Install, [switch]$Menu)
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -140,7 +180,7 @@ function Invoke-All {
     Write-Host "  P03 對帳 docx 原件 · P08 e-stat appId · P09 REVIEW 20 組 · P18 模板候令(未經允許不碰)"
 }
 
-if ($Install) { New-DesktopShortcut; Read-Host "按 Enter 關閉"; exit 0 }
+if ($Install) { New-DesktopShortcut; Read-Host "按 Enter 關閉"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0 }
 
 if ($Menu) {
     while ($true) {
@@ -157,7 +197,7 @@ if ($Menu) {
                   if ($bf) { Start-Background "歷史回補" $bf @("run") } }
             "4" { Open-UIs }
             "5" { New-DesktopShortcut }
-            "0" { exit 0 }
+            "0" { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0 }
             default { Write-Host "無效選項" }
         }
     }
@@ -165,3 +205,4 @@ if ($Menu) {
 
 Invoke-All
 Read-Host "按 Enter 關閉此視窗(背景作業續跑不中斷)"
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

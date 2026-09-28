@@ -26,6 +26,46 @@ param(
     [string]$SourceDir = $PSScriptRoot,
     [bool]$InjectHooks = $true
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 
 #requires -Version 7
 
@@ -65,7 +105,7 @@ Write-Step "InjectHooks: $InjectHooks"
 if (-not (Test-Path $Base)) {
     Write-Step "✗ Base 目錄不存在: $Base" "Red"
     Write-Step "  請先用 via_package_forge.py 生產品包" "DarkGray"
-    exit 1
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1
 }
 
 $script:viaPs1   = Join-Path $Base "via.ps1"
@@ -75,7 +115,7 @@ $script:cmdsJson = Join-Path $Base "config\commands.json"
 if (-not (Test-Path $script:viaPs1)) {
     Write-Step "✗ 找不到 $script:viaPs1" "Red"
     Write-Step "  此處看起來不是 Forge 生的 VIA 產品包" "DarkGray"
-    exit 1
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1
 }
 
 # 來源檔案
@@ -117,7 +157,7 @@ if (Test-Path $script:srcIntegration) {
     Copy-Item $script:srcIntegration (Join-Path $Base "tools\via_snapshot_integration.py") -Force
     $copied += "tools\via_snapshot_integration.py"
 } else {
-    Write-Step "✗ 找不到 via_snapshot_integration.py" "Red"; exit 1
+    Write-Step "✗ 找不到 via_snapshot_integration.py" "Red"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1
 }
 
 if (Test-Path $script:srcConsole) {
@@ -269,3 +309,4 @@ Write-Host "  已啟用的 hooks (自動拍快照):" -ForegroundColor White
 Write-Host "    ✓ post-activate    每次 via via-activate 成功後" -ForegroundColor Green
 Write-Host "    ✓ post-forge       (需手動觸發 from Forge)"      -ForegroundColor Green
 Write-Host ""
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

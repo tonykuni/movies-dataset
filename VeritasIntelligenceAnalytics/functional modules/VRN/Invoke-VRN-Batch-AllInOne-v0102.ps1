@@ -21,6 +21,46 @@ param(
     [int]$Workers = 0,
     [switch]$Fresh
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -42,7 +82,7 @@ if (-not $Only) {
     $fw = @()
     if ($OCR) { $fw += "-OCR" }; if ($Probe) { $fw += "-Probe" }; if ($NoOpen) { $fw += "-NoOpen" }; if ($Fresh) { $fw += "-Fresh" }
     & pwsh -NoProfile -File $v0101 @fw -Throttle $Throttle -TimeoutSec $TimeoutSec -StageTimeoutSec $StageTimeoutSec -Workers $Workers
-    exit $LASTEXITCODE
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $LASTEXITCODE
 }
 
 # ── -Only 單檔補擷車道 ────────────────────────────────────────────────
@@ -57,7 +97,7 @@ foreach ($d in @($soloIn, $solo005, $solo004, $repDir)) { New-Item -ItemType Dir
 
 $matched = @(Get-ChildItem -LiteralPath $inbox -Filter $Only -File -ErrorAction SilentlyContinue)
 Write-Host "=== VRN 單檔補擷 v0102 · -Only '$Only' → $($matched.Count) 檔 ===" -ForegroundColor Cyan
-if (-not $matched.Count) { Write-Host "  [FAIL] 收件夾無匹配 — 誠實停止" -ForegroundColor Red; exit 1 }
+if (-not $matched.Count) { Write-Host "  [FAIL] 收件夾無匹配 — 誠實停止" -ForegroundColor Red; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
 $matched | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $soloIn; Write-Host "  [收] $($_.Name)" }
 
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe", "py", "python", "python3") |
@@ -129,5 +169,6 @@ foreach ($pair in @(
     Write-Host "  [合併] $r"
 }
 Write-Host "`n=== 單檔補擷完成 · 建議續跑:via-reconcile(驗 64/64)===" -ForegroundColor Cyan
-exit $(if ($ok5 -and $ok4) { 0 } else { 1 })
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(if ($ok5 -and $ok4) { 0 } else { 1 })
 
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

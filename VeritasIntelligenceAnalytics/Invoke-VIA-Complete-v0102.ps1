@@ -19,6 +19,46 @@ param(
     [string]$LogPath = "",
     [Parameter(ValueFromRemainingArguments = $true)][string[]]$Rest = @()
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -67,7 +107,7 @@ function Read-NewText([string]$path, [ref]$pos) {
     } catch { return "" }
 }
 $ENGINE = Newest $REG "CGC_MDL121_CompletionAutomator_v*.py"
-if (-not $ENGINE) { Say "  [FAIL] CGC_MDL121 尾版缺(先 via-reload)" "Red"; exit 2 }
+if (-not $ENGINE) { Say "  [FAIL] CGC_MDL121 尾版缺(先 via-reload)" "Red"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 
 function Invoke-Chain {
     # 工人本體:python MDL121 run(心跳逐行)→stdout 直接落本 log(啟動器直播尾讀)
@@ -92,16 +132,16 @@ function Invoke-Chain {
 
 if ($Worker) {
     $env:VIA_CTRLC_IMMUNE = "1"
-    trap { Say ("  [工人 trap] " + $_.Exception.Message) "Red"; Say "=== 畢(退出碼 1;工人終止性錯誤)===" "White"; exit 1 }
+    trap { Say ("  [工人 trap] " + $_.Exception.Message) "Red"; Say "=== 畢(退出碼 1;工人終止性錯誤)===" "White"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
     try { $host.UI.RawUI.WindowTitle = "VIA 一鍵完工工人 · $STAMP" } catch { }
     Say "=== [工人] 完工鏈開跑 · 分離進程 PID $PID ===" "White"
     try { $code = Invoke-Chain } catch { Say ("  [FAIL] 工人例外:" + $_.Exception.Message) "Red"; Say "=== 畢(退出碼 1;工人例外)===" "White"; $code = 1 }
-    exit $code
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $code
 }
 if ($Foreground) {
     $env:VIA_CTRLC_IMMUNE = "0"
     Say "--- [前景] -Foreground:同窗阻塞跑完工鏈(除錯用;Ctrl-C 可中止)" "Cyan"
-    exit (Invoke-Chain)
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit (Invoke-Chain)
 }
 # ---------- 分離派工+直播尾讀(不卡斷) ----------
 $wargs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ('"' + $PSCommandPath + '"'), "-Worker", "-LogPath", ('"' + $LOG + '"')) + $Rest
@@ -111,7 +151,7 @@ try {
     Say ("--- [背景] 完工鏈已派工:分離進程 PID {0}(關窗不斷;Ctrl-C 只離開觀看;心跳每 5s)" -f $wp.Id) "Cyan"
 } catch {
     Say ("  [FAIL] 派工敗:" + $_.Exception.Message + " → 退前景同窗跑") "Red"
-    exit (Invoke-Chain)
+    if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit (Invoke-Chain)
 }
 Say "--- [直播] 尾讀 log(結束自動收;Ctrl-C 只離開觀看=工人 Ctrl-C 免疫照跑;再看:via-complete watch;停止:via-complete stop)" "Cyan"
 $pos = 0; $done = $false; $tStart = Get-Date
@@ -147,4 +187,5 @@ while (-not $done -and (((Get-Date) - $tStart).TotalHours -lt 12)) {
     }
     Start-Sleep -Milliseconds 700
 }
-if ($done) { exit $(if ($wp.HasExited) { $wp.ExitCode } else { 0 }) } else { exit 1 }
+if ($done) { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit $(if ($wp.HasExited) { $wp.ExitCode } else { 0 }) } else { if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 1 }
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit

@@ -7,6 +7,46 @@ param(
     [string]$Base = "C:\VeritasIntelligenceAnalytics",
     [switch]$DryRun
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -31,12 +71,12 @@ Write-Host ("商品:{0} {1} · 內容物 {2} 件" -f $ptr.pkg_code, $ptr.name, $
 # ── ① 環境檢查 ───────────────────────────────────────────────────────────
 $psOK = $PSVersionTable.PSVersion.Major -ge [int]($ptr.install.ps_min.Split('.')[0])
 Write-Tag ($(if ($psOK) { "OK" } else { "FAIL" })) ("PowerShell {0}(需 {1}+)" -f $PSVersionTable.PSVersion, $ptr.install.ps_min)
-if (-not $psOK) { Write-Host "請先安裝 PowerShell 7+:winget install Microsoft.PowerShell"; exit 2 }
+if (-not $psOK) { Write-Host "請先安裝 PowerShell 7+:winget install Microsoft.PowerShell"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 $py = Get-Command py -ErrorAction SilentlyContinue
 if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
 if (-not $py) { $py = Get-Command python -ErrorAction SilentlyContinue }
 if ($py) { Write-Tag "OK" ("python:{0}" -f $py.Source) }
-else { Write-Tag "FAIL" "python 不在位 — winget install Python.Python.3.12 後重跑"; exit 2 }
+else { Write-Tag "FAIL" "python 不在位 — winget install Python.Python.3.12 後重跑"; if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 2 }
 
 # ── ② pip 依賴(缺才裝;--user) ─────────────────────────────────────────
 foreach ($dep in @($ptr.install.pip)) {
@@ -95,5 +135,6 @@ if ((Test-Path -LiteralPath $mother) -and -not $DryRun) {
 } else { Write-Tag "INFO" "母頁第一頁:VIA_Mother.html(布建後自動開)" }
 
 Write-Host ("=== {0} 安裝{1}完成 · 誠實列況不卡斷 ===" -f $ptr.pkg_code, $(if ($DryRun) { "(DryRun)" } else { "" }))
-exit 0
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }; exit 0
 
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit
