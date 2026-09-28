@@ -342,3 +342,4 @@
 | Z271 | VDF `etf_revenue` 缺上游庫時印「SKIP ActiveTWETF.duckdb 缺」卻 rc 0 → EngineBus 記 GREEN。中介 build --apply 已改成跑完重量(表仍缺 = NODATA,不記綠);引擎本身應照三態回 rc 2(新版號) | 候 | AI 下一輪 | R25 |
 | Z272 | VRN 尾版仍直讀 VDF 表 3 支:ENG069 ConsensusDB(tw_daily_prices)· ENG073 ReportStructuredDB · ENG080 FourPointDigest(tw_daily_prices · tw_listings · tw_trading_daily)——各自換版時改用 CGC_MDL239 fetch()(ENG086 v0118 是範本;大檔要全複製,讀原始碼的尺才不誤判) | 候 | AI 後續輪 | R25 |
 | Z273 | 庫表冊有、規格冊 vdf 項 outputs 沒宣告的表 42 張(例 ActiveTWETF::holdings_changes · aaii_sentiment · vdf_global_market::fwd_valuation_daily …)→ 中介沒有路由可轉交(照實 ABSENT)。要在規格冊把產出這些表的項補上 outputs(經 CGC_MDL139 / 規格產生器,只增) | 候 | AI 後續輪 / 操作員確認寫庫項 | R25 |
+| Z274 | CGC_MDL239 資料中介已編號(VIA-VCGC-MDL1392)並接進操作台 / 一鍵 v0101,但還沒登錄進 InputConsole 規格冊 central 家族(EngineBus 目錄看不到它)。規格冊每項掛 CGC_MDL054 介面合約(量 argparse 旗標),本支 CLI 不是 argparse → 直接加項可能被合約尺判漂移;要嘛中介換版改 argparse、要嘛合約尺認手寫旗標,再經 CGC_MDL139 加項(只增) | 候 | AI 後續輪 | R25 |

@@ -459,8 +459,8 @@ def request(req: dict, home=None, apply: bool = False, allow_handoff: bool = Tru
     cov = coverage(got, clean, today) if got else None
     if got and cov["enough"]:
         got, _ = _read_best(home, route, clean, out, explicit)
-        res.update(state="GREEN", read=_slim(got), coverage=cov, parquet=got["parquet"],
-                   why=f"庫裡夠:{got['rows']} 列 · 來源 {got['source']['kind']}")
+        res.update(state="AMBER" if cov["notes"] else "GREEN", read=_slim(got), coverage=cov, parquet=got["parquet"],
+                   why=f"庫裡夠:{got['rows']} 列 · 來源 {got['source']['kind']}" + ("(" + ";".join(cov["notes"]) + ")" if cov["notes"] else ""))
         return _ledger(res, outdir, write, rid)
     res.update(read=_slim(got) if got else None, coverage=cov)
     short = "庫裡沒有這張表" if not got else ("缺代號 " + ",".join(cov["missing"][:6]) if cov["missing"] else
@@ -740,6 +740,9 @@ def selftest() -> int:
         chk("④ 庫裡夠 → GREEN;代號 · 起日 · 欄都套上,結果回成 Parquet", r["state"] == "GREEN" and n_back == (27, 1)
             and r["read"]["cols"] == ["ticker", "date", "close"], f"{r['state']} · 讀回 {n_back}")
         chk("⑤ 來源庫只開 read_only:一個位元不動", hashlib.sha256(db.read_bytes()).hexdigest() == sha)
+        ra = request({"table": "tw_daily_prices", "codes": "2330", "cols": "close,nope", "requester": "VRN_X"}, home=home,
+                     outdir=outdir, rts=rts, today=today, write=False)
+        chk("⑤b 要了表上沒有的欄 → AMBER 並寫明(不假綠)", ra["state"] == "AMBER" and "nope" in ra["why"], ra["why"][:80])
         r2 = request({"table": "tw_daily_prices", "codes": "2330,2454", "requester": "VRN_ENG068"}, home=home, outdir=outdir,
                      rts=rts, today=today)
         h2 = r2["handoff"] or {}
