@@ -7,7 +7,8 @@ v0501→v0502(側線 2026-09-29 d;主線批號由併線的手指定 L25):
   ABSENT 也講得出先跑哪一句 —— 前版 ⑤ 在資料家空的容器實跑紅,SDD self:all 跟著紅)。
   VRN 擷取中央邏輯庫 十二 → **二十六**(VRN_ENG082 v0111 薄尾 +①~⑤ 全庫同步落本輪報告 SYNCDB_latest.json;站名早就少算 ——
   前版 v0110 實跑已是二十一檢,這次照實數 +5)。VRN 驗證矩陣仍 五十八(VRN_ENG083 v0120 只改 ㊸ 的讀法:沿 ENG073 薄尾鏈找正典表,
-  正反控放在同一檢裡,檢數不變)。
+  正反控放在同一檢裡,檢數不變)。台股回補工人 十二 → **六**(VDF_ENG054 v0111 薄尾 ①~⑥:狀態卡自測改用暫存庫、不看本機
+  有沒有正式庫;前版 v0110 的自測只剩 1 檢、而且要求正式庫不在 —— 站名早就多算,這次照實數)。
   站數不變;其餘站的 glob / 參數 / 期望一字不動;新薄尾由 newest() 自動接上,站不用改路徑。
   (同批的 CGC_MDL245 v0102 SDD 驗證器沒有格子站,照舊由 VCGC sdd 與 SDD 自己的 --selftest 驗。)
 
@@ -2788,7 +2789,7 @@ def battery(fast: bool):
     add("正典裁定器六檢(批133 收官)", newest("CGC_MDL086_CanonArbiter_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("總擷取引擎十檢(批128)", newest("VDF_ENG052_MegaFetch_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("VDF 參數映射器十檢(批134)", newest("VDF_ENG053_ParamEngineMap_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
-    add("台股回補工人十二檢(批136/401;批645 雙所實況)", newest("VDF_ENG054_TWDailyBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
+    add("台股回補工人六檢(批136/401;批645 雙所實況)", newest("VDF_ENG054_TWDailyBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("總擷取執行器十六檢(批137)", newest("VDF_ENG055_OmniFetch_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("籌碼回補引擎十一檢(批140/395)", newest("VDF_ENG056_ChipBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("主動 ETF 持股引擎 self-test(批131)", VIA / "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings.py", ["--self-test"], "rc0", 600)
