@@ -10221,8 +10221,15 @@
       "code": "操作員令「close out these three projects.」+「activate and verify the results.」:VCGC-WKF004 收尾(go → check → selftests → real → lock → closeout)。探測輪量到 AI 端 FAIL 6 條:X-LOCK 以含版號路徑比、看不見 Polars 批換版;ENV MANAGER 唯一的紅是缺 pwsh、路徑驗證的紅同一個因,驗證器都追不到;ENG089 v0106 空資料家 ABSENT 沒講下一步(自測紅)。第一組:CGC_MDL245 v0102(X-LOCK 依家族比 · fail_cause envmgr_exe_absent / pathverify_traced 只讀本輪報告)· VDF_ENG089 v0107 · 格子 v0502。整條重跑(鏈不 resume · 容器本機 output_hub 暫移 · 空資料家)再抓兩件:VRN_ENG083 v0120 ㊸ 沿 ENG073 薄尾鏈找正典表(resume 一直沿用舊綠)· VRN_ENG082 v0111 sync-db 每輪落 SYNCDB_latest.json + v0102 finding_cause syncdb_no_target。第一次鎖燈(v0107,指紋 2109ed8140b9)後複查:VDF_ENG054 v0110 自測斷言正式庫不在,工作站有資料就紅(同機實量:庫在 v0110 rc1)→ 撤回未提交的鎖冊與報告,ENG054 v0111 自測改暫存庫(五庫況 · 正式庫零觸碰;兩種環境 6/6),整輪重跑重鎖。結果:go-20260929-075614-10789 + ai-r34-final-20260929-080706 · 指紋 8593371c7960 · lock --apply 寫 VIA_LampLock_v0107(已鎖 14 · 未鎖 13 全操作員端 · 換鎖 7 處)· 鎖後 X-LOCK 綠 · CLOSED_WITH_OPERATOR_ITEMS;燈鎖冊獨立核對 32 釘全尾版;工作站樣整張自測 FAIL 0。驗證:突變 37/37 · 擊斃閘 rc0(17 檔)· 格子四站 OK · VAL GREEN · 編號只增 ENG +4 · MDL +2 · FNC +127(main 既有列 0 變)· 元件冊 新 26 退役 0。操作員的手:裝 pwsh · 開同意閘抓料 · 裝 polars / pdfplumber / pydantic / paddleocr · VTMRA 正本。",
       "category": "三系統收尾 R34 · 鎖燈 v0107 · 三組修正",
       "component": "側線 2026-09-29 d(主線批號由併線的手指定 L25)· docs/VIA_S20260929d_SDDCloseoutR34.md"
+    },
+    {
+      "ts": "2026-09-29 08:48",
+      "op": "UPGRADE",
+      "code": "操作員令「升級那四個 action,開 PR」:PR #370 的 CI 帶 GitHub 平台 Node.js 20 淘汰 warning(actions/checkout@v4 · setup-node@v4 · setup-python@v5 · upload-artifact@v4 還是 Node 20 版,runner 強制改 Node 24 跑)。先量各 action 自己 tag 上 action.yml 的 runs.using:checkout / setup-node v5 起、setup-python v6 起、upload-artifact v6 起才是 node24(upload-artifact v5 仍 node20)。四支一律升到目前最新大版本 v7(v7.0.1 / v7.0.0 / v7.0.0 / v7.0.1,皆 node24);逐一對照我們用到的輸入(sparse-checkout 非 cone · persist-credentials 供狀態報告 git push · node-version 22 · python-version 3.12 · upload 的 name/path/if-no-files-found/retention-days)全在,沒有被移除或改預設的;setup-node 移除的 always-auth 沒用到,v6 起自動快取要 package.json packageManager=npm,倉根無 package.json 不觸發;upload-artifact 新 archive 預設 true 照舊壓 zip。改 7 行:via-master-control-ui.yml 5 · via-status-report.yml 2;YAML 解析過 · .github 舊版號 0。不改:VIA_HTML_UI 套件 CI 範本(列在 manifest.json,CGC_MDL160 以 sha256 核完整性;GitHub 也不跑)· intake 正本。",
+      "category": "CI · GitHub Actions 升 Node 24(v7)",
+      "component": "側線 2026-09-29 e(主線批號由併線的手指定 L25)· docs/VIA_S20260929e_ActionsNode24.md"
     }
   ],
-  "updated_at": "2026-09-29 08:24",
+  "updated_at": "2026-09-29 08:48",
   "batch": "批731"
 }
