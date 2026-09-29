@@ -11,6 +11,12 @@ r"""CGC_MDL245_SDDValidator v0101 — 薄尾:實測加「先發現、後解掉�
   closeout OPEN 回 2 —— 於是 VCGC-WKF003/004 永遠綠不了(自我參照)。步驟冊寫 `report_rc: {動詞: [可接受 rc…]}` 的步:
   該動詞每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK,原判記 `reported`(燈在被報的那幾條工作流上,不重算兩次)。
   lock 不給 report_rc(拒寫 rc 1 是真失敗)。
+  另(Codex #367 P1):存證(check · real · selftests · 燈鎖冊 wkf_head)原本綁 commit 雜湊 —— 可是把燈鎖冊提交進去、
+  或合併時 squash,commit 就換了,乾淨的 checkout 重跑 closeout 必判 OPEN,收尾狀態永遠重現不了。
+  現在綁**程式內容指紋** code_fingerprint():VIA 樹下 *.py · *.ps1 · 工作流冊 · 需求冊(含未追蹤、不含 ignore)的
+  「路徑 + git blob 雜湊」整體 sha256(已追蹤且沒改的讀索引,改過 / 未追蹤的現算 hash-object)。
+  只改燈鎖冊 / 報告 / 帳本 = 指紋不變;改到任何程式或冊 = 指紋變 = 要重驗。流程閘交接(VIA_GATE_PASSED_HEAD)照舊用 commit
+  (主控台拿 commit 比)。
   其餘一字未動(前版照讀,不複製)。VIA_FROM_VCGC:只收中控呼叫(前版 main 守門)。不用 TA-Lib。
 """
 from __future__ import annotations
@@ -90,6 +96,70 @@ def __getattr__(name: str):
 
 ENGINE = Path(__file__).stem
 PRIOR.ENGINE = ENGINE
+CODE_GLOBS = ("*.py", "*.ps1", "*Workflow*_SSOT_v*.json", "*Requirements_SSOT_v*.json")
+_FP: dict = {}
+
+
+def _git(root: Path, *args) -> str:
+    import subprocess
+    r = subprocess.run(["git", *args], cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
+    return r.stdout if r.returncode == 0 else ""
+
+
+def code_fingerprint(root: Path | None = None, memo: bool = True) -> str:
+    """sha256 over (repo path, git blob sha) of every code / workflow / requirement file under root (tracked + untracked, not ignored)."""
+    import hashlib
+    import subprocess
+    root = Path(root or PRIOR.VIA)
+    if memo and str(root) in _FP:
+        return _FP[str(root)]
+    top = Path(_git(root, "rev-parse", "--show-toplevel").strip() or root)
+    blobs = {}
+    for ent in _git(root, "ls-files", "-s", "-z", "--full-name", "--", *CODE_GLOBS).split("\0"):
+        if "\t" in ent:
+            meta, path = ent.split("\t", 1)
+            blobs[path] = meta.split()[1]
+    toks, dirty = _git(root, "status", "--porcelain", "-z", "-uall", "--", *CODE_GLOBS).split("\0"), []
+    i = 0
+    while i < len(toks):
+        tok = toks[i]
+        if len(tok) > 3:
+            dirty.append(tok[3:])
+            if tok[0] in "RC":
+                i += 1                                  # rename / copy: the next token is the old path
+        i += 1
+    live = [d for d in dirty if (top / d).is_file()]
+    for d in dirty:
+        blobs.pop(d, None)
+    if live:
+        r = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(top), input="\n".join(str(top / d) for d in live),
+                           capture_output=True, text=True, timeout=300)
+        for d, h in zip(live, r.stdout.split()):
+            blobs[d] = h
+    if not blobs:
+        return ""
+    fp = hashlib.sha256("\n".join(f"{k} {v}" for k, v in sorted(blobs.items())).encode("utf-8")).hexdigest()
+    if memo:
+        _FP[str(root)] = fp
+    return fp
+
+
+_COMMIT = PRIOR._head
+
+
+def _gate_env() -> dict:
+    """v0100's gate hand-off, keyed on the commit (the console compares VIA_GATE_PASSED_HEAD with its own commit HEAD)."""
+    saved = PRIOR._head
+    PRIOR._head = _COMMIT
+    try:
+        return _V0100_GATE_ENV()
+    finally:
+        PRIOR._head = saved
+
+
+_V0100_GATE_ENV = PRIOR._gate_env
+PRIOR._gate_env = _gate_env
+PRIOR._head = code_fingerprint
 _V0100_REAL = PRIOR.real
 LAMP_ORDER = ("FAIL", "NOT_RUN", "FINDING", "NOSELFTEST", "CANON")
 
@@ -266,6 +336,30 @@ def selftest() -> int:
     chk("報告步:沒列的動詞(lock 拒寫)照舊 FAIL", resolve_reports(r, st2, [], [real_ev, dict(real_ev, act="lock")]) == [])
     r = rep2()
     chk("報告步:帶錯誤(崩)照舊 FAIL", resolve_reports(r, st2, [], [dict(real_ev, error="Traceback")]) == [])
+    import subprocess
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        g = Path(td)
+        for a in (["init", "-q"], ["config", "user.email", "t@t"], ["config", "user.name", "t"]):
+            subprocess.run(["git", *a], cwd=td, capture_output=True)
+        (g / "a.py").write_text("x = 1\n", encoding="utf-8")
+        (g / "VIA_LampLock_v0100.json").write_text("{}\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=td, capture_output=True)
+        subprocess.run(["git", "commit", "-qm", "a"], cwd=td, capture_output=True)
+        f0 = code_fingerprint(g, memo=False)
+        (g / "VIA_LampLock_v0100.json").write_text('{"wkf": 1}\n', encoding="utf-8")
+        subprocess.run(["git", "commit", "-qam", "lock only"], cwd=td, capture_output=True)
+        f1 = code_fingerprint(g, memo=False)
+        (g / "a.py").write_text("x = 2\n", encoding="utf-8")
+        f2 = code_fingerprint(g, memo=False)
+        subprocess.run(["git", "commit", "-qam", "code"], cwd=td, capture_output=True)
+        f3 = code_fingerprint(g, memo=False)
+        (g / "b.py").write_text("y = 1\n", encoding="utf-8")
+        f4 = code_fingerprint(g, memo=False)
+    chk("存證綁程式內容指紋:只提交燈鎖冊 → 不變;改程式 → 變;改了再提交 = 同一份內容 → 同指紋;新檔(未追蹤)→ 變",
+        f0 and f0 == f1 and f2 != f1 and f3 == f2 and f4 != f3)
+    chk("流程閘交接照舊用 commit(主控台拿 commit 比)", PRIOR._gate_env is _gate_env and PRIOR._head is code_fingerprint
+        and _COMMIT() != code_fingerprint())
     book = PRIOR._json(PRIOR.newest("VIA_Workflow_VCGC_SSOT_v*.json"), {}) or {}
     rb = [s for w2 in book.get("workflows") or [] for s in w2.get("steps") or [] if s.get("finding_resolved_by")]
     chk("VCGC 冊尾版的 H4 帶 finding_resolved_by(核准 apply)", any(s.get("code") == "VCGC-WKF001-STP005" for s in rb),
