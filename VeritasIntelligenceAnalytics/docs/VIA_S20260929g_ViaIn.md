@@ -42,6 +42,7 @@
 ## 四、登錄
 
 - 元件冊:`registry-sync --apply` 新 1(`tool|via-in` = `VIA-TOOL-0194`)· 變更 0。
+  **更正(側線 2026-09-29 h,Codex #373 P1):** 0194 早由引擎版本冊發給 token 引擎(一號兩主),via-in 已改發 `VIA-TOOL-0211`,舊號留在該筆的 `recoded_from`;見 `VIA_S20260929h_ToolCodeCollision.md`。
 - 編號冊只增合併:`VIA-CORE-MDL481` Register-VIA-Commands-v0263 · FNC_CORE +1(`via-in`);元件冊的 content_sha 換新;各冊 n/sha 核過一致。
 - 命令卡冊 `VIA_Command_Cards_v0100.json` **沒有重凍**:凍結器 CGC_MDL162 v0100 只讀尾版命令冊一本,在薄尾冊上重凍會把 169 張卡洗成 1 張。卡冊從 v0244 起就停在 v0243(既有債,同上一段的薄尾盲點);要補,先出 MDL162 的沿鏈讀新版。
 - 台帳 1360(ADD)。
