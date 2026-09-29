@@ -187,6 +187,34 @@ jobs:
           foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
           Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
 
+      - name: Verify VCGC dispatch and manager contracts through the sole entry
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_VCGC_PUSH = "NO"
+          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          Push-Location $via
+          try {
+            $registry = Join-Path $via "supportive modules\registry"
+            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
+              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+              Select-Object -Last 1).FullName
+            if (-not $vcgc) { throw "VCGC entry absent" }
+            python $vcgc token
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL237_NumberingSystem --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VDF_SystemManager --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VRN_SystemManager logic
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
+
       - name: Exercise VRN HTML with empty and synthetic populated databases
         shell: pwsh
         run: |
