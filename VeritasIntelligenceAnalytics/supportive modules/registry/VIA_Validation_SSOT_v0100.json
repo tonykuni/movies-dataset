@@ -1,0 +1,106 @@
+{
+ "schema": "VIA.Validation.SSOT.v1",
+ "id": "VAL-SSOT",
+ "status": "ACTIVE",
+ "ruled_by": "操作員",
+ "date": "2026-09-29",
+ "ruling": "三個系統的validation logic result validation logic cross checking機制寫入ssot",
+ "book_edited": false,
+ "scope": ["VCGC", "VDF", "VRN"],
+ "layers": {
+  "validation_logic": "過程與輸入的驗證:這一步准不准做、照不照律做(閘 · 正典 · 政策)",
+  "result_validation": "產出的驗證:做完的東西對不對、齊不齊(覆蓋 · 核對 · 迴歸 · 驗收)",
+  "cross_check": "交叉核對:兩個來源說的是不是同一件事(X- 代碼;三系統共用一本代碼表,各系統列它用的那幾個)"
+ },
+ "code_rule": "驗證邏輯 <系統>-VAL<三碼> · 結果驗證 <系統>-RVL<三碼> · 交叉核對 X-<名>;只增,舊號不改不刪,退役記 retired",
+ "owner_rule": "每一條都指名正主(相對 VIA 根的路徑;_v*.py = 尾版;.json = 冊);cross_checks 另指實作記號 symbol(正主整條版本鏈裡要找得到)。正主不在或記號不在 = 紅",
+ "honest_states": {"0": "GREEN 綠", "1": "RED 紅", "2": "YELLOW 黃 / NODATA 缺料", "3": "ABSENT 缺件", "4": "GATED 待閘(操作員的手)", "5": "SKIP 略過(照實列)"},
+ "checked_by": "supportive modules/registry/CGC_MDL246_ValidationSSOT_v*.py",
+ "cross_checks": [
+  {"code": "X-COL", "zh": "工作流冊欄位齊(spec · plan · steps · tests)", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_columns"},
+  {"code": "X-CODE", "zh": "工作流 · 步 · 需求代碼格式與唯一", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_codes"},
+  {"code": "X-COMP", "zh": "中樞組成冊 ↔ 子系統工作流冊一致", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_composition"},
+  {"code": "X-ENGINE", "zh": "步的正主尾版在位", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_engines"},
+  {"code": "X-ACCEL", "zh": "步的正主帶標準加速器橋", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_engines"},
+  {"code": "X-REG", "zh": "步的正主在元件編號冊登錄", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_registration"},
+  {"code": "X-NUM", "zh": "冊上代碼 = 編號系統發的號(WKF · STP · REQ)", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_registration"},
+  {"code": "X-ITEM", "zh": "項鏈:冊上項在目錄冊", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_items_and_old"},
+  {"code": "X-OLD", "zh": "舊冊整併:舊工作流冊的條目都有去處", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_items_and_old"},
+  {"code": "X-OWNER", "zh": "引用同一件事的冊指同一個正主", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_owners"},
+  {"code": "X-REQ", "zh": "需求雙向:工作流引的需求在需求冊、需求冊的需求有工作流接", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_requirements"},
+  {"code": "X-CONFLICT", "zh": "SSOT 衝突:中央參數樞紐正主重算,同鍵不同值", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_conflicts"},
+  {"code": "X-PARAM", "zh": "參數冗餘(只報不擋)", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def param_redundancy"},
+  {"code": "X-LOCK", "zh": "已鎖工作流的尾版有沒有換(換了要重驗)", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "symbol": "def check_lock"},
+  {"code": "X-CONF", "zh": "實跑順序與工作流冊一致(本輪第一筆是閘 · 宣告在前的步實跑也在前 · 宣告的步有出現)", "owner": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", "symbol": "def conformance", "how": "via-vcgc workflow <輪號>"},
+  {"code": "X-NET", "zh": "網路只經統包網路工具(全景治理類 NET = 0)", "owner": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py", "symbol": "\"NET\"", "how": "via-panorama read <夾>", "policy": "L07"},
+  {"code": "X-SYNC", "zh": "三冊一致:正則冊 · 同義字冊 · 參數冊說的是同一件事(VCGC 第 8 步只比對、不改冊)", "owner": "supportive modules/registry/CGC_MDL219_RegexParamSync_v*.py", "symbol": "def check"},
+  {"code": "X-FLOW", "zh": "流程一致:先政策、子系統管理器同步到座位,才准動詞", "owner": "supportive modules/registry/CGC_MDL223_FlowConsistency_v*.py", "symbol": "def gate", "policy": "FLOW-1"},
+  {"code": "X-BROKER", "zh": "VRN 要料 ↔ VDF 庫:經 VCGC 中介(先讀庫量夠不夠,不夠才轉交 VDF);VRN 尾版直開 VDF 庫、繞過中介的照實列出", "owner": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py", "symbol": "def bypass"},
+  {"code": "X-PAGE", "zh": "同一頁三種代碼寫法同一個核心 · 各區說法一致才留欄位", "owner": "functional modules/VRN/VRN_ENG105_PageCrosscheck_v*.py", "symbol": "def cross"},
+  {"code": "X-GATEMAP", "zh": "邏輯結果對到入庫閘(原列不改寫)· 對照表鎖住", "owner": "functional modules/VRN/VRN_ENG109_GateMap_v*.py", "symbol": "def map_report"},
+  {"code": "X-VAL", "zh": "本冊自己:三系統驗證 SSOT 與工作流冊 · 驗證器 · 正主雙向一致", "owner": "supportive modules/registry/CGC_MDL246_ValidationSSOT_v*.py", "symbol": "def check"}
+ ],
+ "systems": {
+  "VCGC": {
+   "zh": "中央治理",
+   "validation_logic": [
+    {"code": "VCGC-VAL001", "name": "第一步 省 Token 工具:經 VCGC 啟用(鎖版)· 實測六件 · 要求 AI 先用", "owner": "supportive modules/registry/CGC_MDL226_StepMatrix_v*.py", "how": "front() 第一步 token", "policy": "TOKEN-1", "refs": ["VCGC-WKF001-STP003", "VCGC-WKF003-STP001"]},
+    {"code": "VCGC-VAL002", "name": "唯一入口:只收 via-vcgc(VIA_FROM_VCGC)", "owner": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", "how": "main() 門", "policy": "FLOW-1", "refs": ["VCGC-WKF001-STP002", "VCGC-WKF003-STP002"]},
+    {"code": "VCGC-VAL003", "name": "流程閘:先讀政策、子系統管理器同步,才准動詞", "owner": "supportive modules/registry/CGC_MDL223_FlowConsistency_v*.py", "how": "政策 → 管理器 → 動詞", "policy": "FLOW-1"},
+    {"code": "VCGC-VAL004", "name": "模組更新擊斃閘:十一條擊斃條款(語法 · 尾版律 · 正本 · 不可動 · .ps1 · TA-Lib · 同意閘 · 自測 · 檢號 · 留痕 · 基線時效)", "owner": "supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v*.py", "how": "--base origin/main --run-selftest", "policy": "L04"},
+    {"code": "VCGC-VAL005", "name": "工具啟用鎖版:加速器 · 網路 · LAYOUT · NLP · 省 Token 同一把尺,只有 VCGC 能啟用", "owner": "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py", "how": "tools activate <家> <檔> --apply", "policy": "L05"},
+    {"code": "VCGC-VAL006", "name": "無所不編號:只增不減、同鍵同號", "owner": "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py", "how": "registry-sync / numbering", "refs": ["VCGC-WKF001-STP005", "VCGC-WKF003-STP006"]},
+    {"code": "VCGC-VAL007", "name": "Celeritas 政策閘:禁令與標準模板,棘輪只緊不鬆", "owner": "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v*.py", "policy": "L102", "refs": ["VCGC-WKF001-STP006"]},
+    {"code": "VCGC-VAL008", "name": "單一路徑驗證 + 涵蓋稽核", "owner": "supportive modules/registry/CGC_MDL242_PathVerify_v*.py", "refs": ["VCGC-WKF002-STP002"]}
+   ],
+   "result_validation": [
+    {"code": "VCGC-RVL001", "name": "全格子全跑:誠實多態計數;FAIL 0 · TIMEOUT 0 · 沒中斷 · 正式庫前後一致才建最佳還原點", "owner": "supportive modules/registry/CGC_MDL064_SelftestGrid_v*.py", "policy": "L105"},
+    {"code": "VCGC-RVL002", "name": "SDD 實測 · 加鎖 · 收尾(工作流逐步有跑 · 結果類 · 時間;過關才鎖)", "owner": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py", "how": "real · lock · closeout", "refs": ["VCGC-WKF004-STP002", "VCGC-WKF004-STP003", "VCGC-WKF004-STP004"]},
+    {"code": "VCGC-RVL003", "name": "總控頁契約十九檢", "owner": "supportive modules/registry/tests/test_master_control_contract_v*.py"},
+    {"code": "VCGC-RVL004", "name": "驗證鎖定冊:過關就鎖定,之後只補跑受影響的", "owner": "supportive modules/registry/VIA_Validation_Lock_v*.json", "policy": "L105"},
+    {"code": "VCGC-RVL005", "name": "VIA 功能級整合驗收", "owner": "supportive modules/registry/CGC_MDL154_VIAFunctionalAcceptance_v*.py"},
+    {"code": "VCGC-RVL006", "name": "制度健全度稽核", "owner": "supportive modules/registry/CGC_MDL164_GovernanceCompletenessAudit_v*.py"}
+   ],
+   "cross_check": ["X-COL", "X-CODE", "X-COMP", "X-ENGINE", "X-ACCEL", "X-REG", "X-NUM", "X-ITEM", "X-OLD", "X-OWNER", "X-REQ", "X-CONFLICT", "X-PARAM", "X-LOCK", "X-CONF", "X-SYNC", "X-FLOW", "X-VAL"]
+  },
+  "VDF": {
+   "zh": "資料鍛造",
+   "validation_logic": [
+    {"code": "VDF-VAL001", "name": "同意閘:空與 OFF 關、YES 與法遵權杖才算開;同意閘是操作員的手", "owner": "supportive modules/registry/CGC_MDL224_ScrapeGate_v*.py", "policy": "L07"},
+    {"code": "VDF-VAL002", "name": "增量擷取閘:只抓缺的那一段", "owner": "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py", "refs": ["VDF-WKF003-STP002"]},
+    {"code": "VDF-VAL003", "name": "建庫計畫:正庫逐張量在不在 / 新不新,缺的才排 VDF 項", "owner": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py", "how": "build [--apply]", "refs": ["VDF-WKF001-STP001"]},
+    {"code": "VDF-VAL004", "name": "期別與寫入正典:民國轉西元 · 期別落後 · upsert 同一套 SQL", "owner": "supportive modules/SUP_MDL753_VIACommonUtils_v*.py"},
+    {"code": "VDF-VAL005", "name": "ADJ OHLC 價格層:factor = adj_close ÷ close(同一來源、同一天)", "owner": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v*.py", "policy": "L104"},
+    {"code": "VDF-VAL006", "name": "技術指標唯一正主 QuantGuard,TA-Lib 禁用", "owner": "functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v*.py", "policy": "L50"}
+   ],
+   "result_validation": [
+    {"code": "VDF-RVL001", "name": "資料涵蓋閘:日期欄 · 哨兵列 · 月營收期限讀期別正典(資料庫無缺漏)", "owner": "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v*.py", "refs": ["VDF-WKF001-STP003", "VDF-WKF003-STP003"]},
+    {"code": "VDF-RVL002", "name": "VDF 審計閘:通過審計且跑得起來", "owner": "functional modules/VDF/engine/VDF_ENG091_VdfAuditGate_v*.py"},
+    {"code": "VDF-RVL003", "name": "VDF 鏈逐站實測", "owner": "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py", "refs": ["VDF-WKF001-STP002"]},
+    {"code": "VDF-RVL004", "name": "DB 面板:每本 .duckdb 每張表量到,輸出統一", "owner": "supportive modules/registry/CGC_MDL228_VIADBManager_v*.py", "refs": ["VDF-WKF003-STP001"]}
+   ],
+   "cross_check": ["X-CONF", "X-ENGINE", "X-REG", "X-NUM", "X-ACCEL", "X-NET", "X-OWNER", "X-ITEM", "X-OLD", "X-BROKER", "X-SYNC"]
+  },
+  "VRN": {
+   "zh": "研報引擎",
+   "validation_logic": [
+    {"code": "VRN-VAL001", "name": "擷取範圍政策:哪些文字要擷取", "owner": "supportive modules/registry/VIA_Policy_VRNTextScope_v*.json", "refs": ["VRN-WKF003-STP001"]},
+    {"code": "VRN-VAL002", "name": "要料經 VCGC 中介(VRN 不直接抓網路)", "owner": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py", "refs": ["VRN-WKF001-STP001"]},
+    {"code": "VRN-VAL003", "name": "價格指標只認 ADJ OHLC;目標價跨除權息一律改 ADJ CLOSE 基準", "owner": "functional modules/VRN/VRN_ENG080_FourPointDigest_v*.py", "policy": "L104"},
+    {"code": "VRN-VAL004", "name": "SSOT 正則 · 同義字規則樞紐", "owner": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v*.py"},
+    {"code": "VRN-VAL005", "name": "財務邏輯統轄橋(第二意見 · 評等正典 · 政策因子 · 公式檢)", "owner": "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v*.py"}
+   ],
+   "result_validation": [
+    {"code": "VRN-RVL001", "name": "全文擷取無遺漏 · 修復狀態分類 · 完整內容才摘要", "owner": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py", "refs": ["VRN-WKF001-STP003", "VRN-WKF003-STP004"]},
+    {"code": "VRN-RVL002", "name": "VRN 邏輯總檢(規則各在各的檔)", "owner": "functional modules/VRN/VRN_ENG113_LogicRollup_v*.py", "refs": ["VRN-WKF001-STP004"]},
+    {"code": "VRN-RVL003", "name": "報表核對:一張表一張表核,基本 EPS 與稀釋 EPS 分開", "owner": "functional modules/VRN/VRN_ENG108_StatementCheck_v*.py"},
+    {"code": "VRN-RVL004", "name": "驗證矩陣", "owner": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v*.py"},
+    {"code": "VRN-RVL005", "name": "抽取鏈迴歸閘", "owner": "functional modules/VRN/VRN_ENG076_RegressionGate_v*.py"},
+    {"code": "VRN-RVL006", "name": "VRN 六層鏈逐層實測", "owner": "supportive modules/registry/CGC_MDL172_VRNChainRunner_v*.py", "refs": ["VRN-WKF001-STP002"]},
+    {"code": "VRN-RVL007", "name": "接手迴歸測(CI 每次跑)", "owner": "functional modules/VRN/tests/test_VRN_TakeoverRegression.py"}
+   ],
+   "cross_check": ["X-CONF", "X-ENGINE", "X-REG", "X-NUM", "X-ACCEL", "X-OWNER", "X-ITEM", "X-OLD", "X-PAGE", "X-GATEMAP", "X-BROKER", "X-SYNC"]
+  }
+ },
+ "retired": []
+}
