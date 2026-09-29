@@ -10228,8 +10228,15 @@
       "code": "操作員令「升級那四個 action,開 PR」:PR #370 的 CI 帶 GitHub 平台 Node.js 20 淘汰 warning(actions/checkout@v4 · setup-node@v4 · setup-python@v5 · upload-artifact@v4 還是 Node 20 版,runner 強制改 Node 24 跑)。先量各 action 自己 tag 上 action.yml 的 runs.using:checkout / setup-node v5 起、setup-python v6 起、upload-artifact v6 起才是 node24(upload-artifact v5 仍 node20)。四支一律升到目前最新大版本 v7(v7.0.1 / v7.0.0 / v7.0.0 / v7.0.1,皆 node24);逐一對照我們用到的輸入(sparse-checkout 非 cone · persist-credentials 供狀態報告 git push · node-version 22 · python-version 3.12 · upload 的 name/path/if-no-files-found/retention-days)全在,沒有被移除或改預設的;setup-node 移除的 always-auth 沒用到,v6 起自動快取要 package.json packageManager=npm,倉根無 package.json 不觸發;upload-artifact 新 archive 預設 true 照舊壓 zip。改 7 行:via-master-control-ui.yml 5 · via-status-report.yml 2;YAML 解析過 · .github 舊版號 0。不改:VIA_HTML_UI 套件 CI 範本(列在 manifest.json,CGC_MDL160 以 sha256 核完整性;GitHub 也不跑)· intake 正本。",
       "category": "CI · GitHub Actions 升 Node 24(v7)",
       "component": "側線 2026-09-29 e(主線批號由併線的手指定 L25)· docs/VIA_S20260929e_ActionsNode24.md"
+    },
+    {
+      "ts": "2026-09-29 09:58",
+      "op": "ADD",
+      "code": "操作員令「應該要有進入環境指令 由vcgc進入跑他的流程如規定 加入加速器並告知目前加速器 網路工具 layout工具版本 ssot一切整合最佳化測試除厝更新啟動全部」(實錄:PowerShell 停在 C:\\Users\\tonyk,git push → not a git repository)。先量:via-entry 已會進 $VIA;工作流 SSOT VCGC-WKF001 已規定入口流程(STP002 閘必須第一);status 只列加速器 / 網路、不載入、沒有 layout 版本;go 不 git pull;Python 改不了 shell 的目前資料夾。CGC_MDL149 v0173(薄尾)多一個動詞 via-vcgc enter [--card] [--no-pull] [go 參數]:0 第一步省 Token(紅就停)· 1 位置(不在倉內印 Set-Location 那一行;git 一律 -C 倉根)與只快轉的更新(分岔不合併、本機改動由 git 拒絕,照實印;HEAD 有變交給更新後的尾版 enter --no-pull 接手)· 2 閘(status,rc≠0 一步都不跑)· 3 載入鎖冊那一本加速器(activate,執行緒預算寫進本行程環境,go 的子行程都帶)· 4 鎖冊六件工具版本 + sha(加速器 v1141 · 網路 v1652 · layout v0109 · nlp v0105 · token v0116 · frame v0100)· 網路載入器解析與核心載入 · layout 動詞 · PS 模板;漂移就停 · 5 交給 go 啟動全部;結尾總結 + 中樞事件。實跑抓到總結事件以開始時間排序會排在閘前(workflow RED)→ t0 記寫入當下、另存 started。自測 ①~⑮ + 前版鏈 71 檢 rc0 · 突變 18/18 · 殺手閘 11/11(KILL-10 記債)· 格子 v0503 站名 三十八 → 七十一(v0172 實印 56 +15)· 容器實跑 enter --card rc0 / 倉外 enter:閘過、go ABSENT(無 pwsh)rc2。既有紅(非本批):ssot verify 陸券殘留 2(VRN_Broker_Dict_v0100.json 09-25 · VIA_VRNLogic_AllInOne_v0201.py 09-28)待操作員裁定(LL90)。L70:一句進倉 + 全部的短令 via-in 寫成一次貼交操作員,不動 .ps1。",
+      "category": "VCGC 進入環境一句(enter:位置 · 更新 · 閘 · 加速器 · 工具版本 · 啟動全部)",
+      "component": "側線 2026-09-29 f(主線批號由併線的手指定 L25)· CGC_MDL149_VeritasCentralGovernanceConsole_v0173 · CGC_MDL064_SelftestGrid_v0503 · VIA-VCGC-MDL1436/1437 · docs/VIA_S20260929f_VcgcEnter.md"
     }
   ],
-  "updated_at": "2026-09-29 08:48",
+  "updated_at": "2026-09-29 09:58",
   "batch": "批731"
 }
