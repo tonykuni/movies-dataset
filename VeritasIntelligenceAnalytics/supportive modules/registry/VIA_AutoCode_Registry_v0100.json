@@ -10193,8 +10193,29 @@
       "code": "操作員令「三個系統的validation logic result validation logic cross checking機制寫入ssot」:新冊 VIA_Validation_SSOT_v0100(VAL-SSOT;VCGC · VDF · VRN 各三層:驗證邏輯 VAL 8/6/5 · 結果驗證 RVL 6/4/7 · 交叉核對 X- 18/11/12,三系統共用 22 個代碼,每條指名正主與實作記號;補登工作流冊引用卻從未實作的 X-CONF → VCGC conformance、X-NET → 全景治理類 NET);新核對器 CGC_MDL246 v0100(X-VAL 八道:V-SHAPE/CODE/OWNER/IMPL/XREF/SDD/POLICY/REF;真冊 GREEN;12 檢 · 突變 11/11);VCGC v0171 val 動詞。Codex #366:P1 VCGC v0171 第一步紅時放行 tools / tools activate token|nlp;P2 CGC_MDL226 v0102 快取鍵含整條版本鏈;P2 CGC_MDL187 v0103 委派只認模組層 selftest 必經路徑且結果流進 return。格子 v0500(+1 站 · 步驟矩陣 十→十一)。前批全格子 FAIL 24 在 0cebb651 上同樣 24/24 紅,6 站逐檢比對新增 0。",
       "category": "三系統驗證 SSOT · X-VAL · Codex #366 修正",
       "component": "側線 2026-09-29 b(主線批號由併線的手指定 L25)· docs/VIA_S20260929b_ValidationSSOT.md"
+    },
+    {
+      "ts": "2026-09-29 02:35",
+      "op": "ADD",
+      "code": "操作員令「go on add polars to all necessary engines 記憶體不足可用temp替代用」:先量——全樹尾版 import pandas/polars 327 支,真的把全市場大表撈進 Python 的 4 支(N1)、DuckDB 內全歷史重算 / 整表複製 7 支(N2);容器無 polars(不代裝)。新共用件 SUP_MDL755_VIAPolarsFrame_v0100(VIA-TOOL-0195;經 VCGC tools activate frame 鎖版):polars 探針 · 記憶體預算(可用×0.5,下限 512 MiB)· 受管 temp(VIA_TEMP_ROOT/VIA_spill,用完即刪,sweep)· DuckDB 守門(檔案庫收上限、記憶體庫只換夾、閥 VIA_FRAME_GUARD=off)· frame()(pandas=.df() 零差異;polars 估超預算走 temp parquet → LazyFrame);自測 13/13 + ⑫ ABSENT,突變 20/20。11 支必要引擎新版薄尾(ENG070 v0113 · ENG072 v0104 · GRP041 v0103 · GRP040 v0104 · ENG060 v0108 · ENG061 v0106 · ENG062 v0105 · ENG064 v0113 · ENG079 v0104 · ENG081 v0103 · ENG085 v0106):正典 FRAME 橋 + 守門,rc 與前一版全同。真庫副本實證:ENG061 放大 8 倍 470 萬列,上限 256 MiB 峰值 1138→583 MiB、溢寫進受管 temp;stddev 視窗 2 欄最後幾位差(相對 8.4e-15)照實記。CGC_MDL233 v0103 六家 · 格子 v0501(+1 站,11 站檢數 +3)· 擊斃閘 0 · 13 站全綠 · registry-sync 新 98/失 0 · 驗證 SSOT GREEN;X-NUM(含上一批 VCGC v0171)待工作站 CGC_MDL237 --apply(容器套用會寫進本機庫 862 檔與淺層 clone 時間戳翻動,不入倉)",
+      "category": "Polars 表格層 · 記憶體不足轉 temp · 11 支必要引擎",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 03:14",
+      "op": "FIX",
+      "code": "側線 2026-09-29 c 收尾:併 main(PR #367)。VCGC 座位自動上傳(CGC_MDL223 publish 用不帶路徑的 git commit)以「vcgc: sync the subsystem seat」把暫存中的合併提交並推送 e61b245b;逐檔核對 = main + 本批 18 檔,無誤。編號冊只增合併 10 本 +206 列(對 main 遺失 0 · 改號 0 · 既有列 0 變;TST 不加),X-NUM 轉綠。提交後補修 12 支薄尾(11 支引擎 + CGC_MDL233 v0103):說明首行改成引擎名 +(薄尾註記),總控頁候核名稱回到前一版;家族名 STEM → _STEM,VCGC v0172 沿薄尾鏈盤點認得,registry-sync 對 main 新 98 · 退役 231→0 · 變更 101(source 移到尾版)。總控頁再生前暫移容器本機 StdDashboard,對 main 只差時間與 MDL233 一列;契約 19/19。重跑:12 支自測 rc 不變 · 全景問題 0 · 擊斃閘 rc0 · 格子 13/13 · SDD YELLOW(只剩既有 X-REQ-OPEN)· 驗證 SSOT GREEN。待辦照實交出:Polars ⑫(工作站裝 polars)· 編號冊既有列刷新(選做)· CGC_MDL223 座位上傳只提交座位檔 · VCGC v0172 薄尾偵測也要認 STEM(main 既有 24 支尾版、約 230 個函式標退役)",
+      "category": "Polars 批收尾 · 併 main · 編號只增 · 薄尾補修",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 03:49",
+      "op": "FIX",
+      "code": "Codex #369 兩件修正(新檔未進 main,原檔修)。P2 SUP_MDL755:estimate() 的字串 / 二進位 / 巢狀欄原本一律算 32 位元組,百萬筆 1 KiB 字串會估成 32 MiB、frame() 誤走 .pl();改成同一趟查詢實量內文位元組(strlen = UTF-8 位元組 · octet_length · 巢狀以文字長度近似,欄照位置改名),決策拆成 plan();⑪ 期望值全寫死('é'×512 · BLOB · BIGINT[] · 全 NULL · 重名怪名欄),新突變 11/11、舊突變 19/19;經 VCGC 重新啟用,鎖冊 frame sha 382c5e80。P1 ENG085 v0106:v0105 的 _INSPECT 與 _PREPARE(整表 CTAS)經 subprocess 在家族境新直譯器跑,父行程守門碰不到 → guard_children() 把守門段接在兩段腳本開頭(冪等),子行程載同一支 FRAME 正典、自己量預算、自己開受管 temp、自己刪,閥 off 也傳下去;adapter 不接(收容件原樣、讀已縮好的暫存庫);③ 實測 + 突變 6/6;真庫 run rc0 OK 1163 筆,父 1 子 2 個受管夾跑完全清。普查 11 支前版鏈:只有 ENG085 把 DuckDB 重活放子行程(ENG079 的子行程是 ENG064 薄尾自己守;ENG072 · GRP_ENG040 子行程只用 pandas;ENG081 只讀 ps)。元件冊對 main 新 102 · 退役 0;編號冊以 origin/main 為底重算 +210(本 PR 的列用最終行號);擊斃閘 rc0 · 格子 13/13 · SDD YELLOW(既有)· VAL GREEN",
+      "category": "Polars 批 · Codex #369 P1 子行程守門 · P2 變長欄實量",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
     }
   ],
-  "updated_at": "2026-09-29 01:30",
+  "updated_at": "2026-09-29 03:49",
   "batch": "批731"
 }
