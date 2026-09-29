@@ -5,6 +5,7 @@
 - 第一段 f4dff4616 已由 PR #376 併入 main(d6c304d92,PR #375 同時併入)。
 - PR #376 的 Windows UAT 在最後一步 `handoff check` 紅:panorama / token 兩案沒有收據 · 5 支新尾版沒有測試收據 · 交接冊改過使 numbering 收據失效。
 - 本段收尾接在 main 之上,補齊收據與快照,讓這一步回綠。
+- 同一輪 CI 還量到合約測試 `test_11_committed_page_matches_generator` 紅:第一段新增 CGC_MDL247 後,中央治理模組 255 → 256,但追蹤中的總控頁沒重產。照 LL49 在只含已追蹤檔的乾淨工作樹用 `VIA_SYSTEM_MANAGER_v0150.py ui --no-open` 重產,差異只有產生時間 · 模組數兩處 · 模組清單多一列。合約測試 19/19 過 · 桌機 / 手機瀏覽器 UAT 過(模組 256 · 頁面錯誤 0 · 外部請求 0)。
 
 ## 一、操作員原話(逐字)
 
