@@ -62,7 +62,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             /.github/workflows/via-master-control-ui.yml
@@ -80,12 +80,12 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -151,7 +151,7 @@ jobs:
 
       - name: Upload UAT screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: via-master-control-ui-screenshots
           path: VIA_UI_Test_Artifacts
@@ -239,7 +239,7 @@ jobs:
 
       - name: Upload VRN browser evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: via-vrn-template-browser-evidence
           path: VIA_VRN_Test_Artifacts
