@@ -76,6 +76,10 @@ via-vcgc enter [--card] [--no-pull] [go 的參數 …]
 - 元件冊:`registry-sync --apply`,新 23 · 變更 51 · 退役 0(新增 v0173 的定義 · 格子 v0503 的定義換行號;沒有容器路徑)。
 - 編號冊只增合併:`VIA-VCGC-MDL1436` 格子 v0503 · `VIA-VCGC-MDL1437` VCGC v0173 · FNC_VCGC +72;容器雜訊(FM 862 · TST 6 · LGC 2 · 時間戳翻動)全丟;編號 SSOT 只改兩本冊的 n/sha 與元件冊的 content_sha,各冊 n/sha 核過一致。
 - 座位冊:CONSOLE 尾版 → v0173(閘自己寫的)。
+- 總控頁照 LL49 重產(`VIA_UI_MasterControl_v0100.html`):VCGC 主控台那一列的說明換成 v0173 的抬頭。第一次 push 的 CI 合約測試
+  `test_11_committed_page_matches_generator` 抓到沒重產(容器同一支測試重現同一個差);重產用倉的工具
+  `VIA_SYSTEM_MANAGER_v0150.py ui --no-open`,產之前把容器本機的 `VIA_UI_StdDashboard_v0100.html`(不入 git 的日更頁)暫移、
+  產完原樣移回 —— 照 CI 乾淨樹的條件產,差異只有那一列與產生時間。重產後合約測試 19 支全過、桌機 / 手機瀏覽器 UAT 過(頁面錯誤 0 · 外連 0)。
 - 台帳 1359(ADD)。
 
 ## 八、操作員怎麼用
