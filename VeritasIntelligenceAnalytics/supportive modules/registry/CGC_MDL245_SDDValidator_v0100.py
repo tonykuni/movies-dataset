@@ -952,7 +952,8 @@ def ten_steps(chk: dict, rl: dict, verdict: str) -> list:
             "7. Step 7 是否需要 via 審核:任何程式改動都開新版檔,經 VCGC 自測與本驗證器;燈鎖冊寫入只在 lock --apply",
             f"8. Step 8 測試結果:自測 {len(eng)} 支(OK {sum(1 for e in eng if e['outcome'] == 'OK')} · FAIL {sum(1 for e in eng if e['outcome'] == 'FAIL')} · "
             f"FINDING {sum(1 for e in eng if e['outcome'] == 'FINDING')} · 無自測 {sum(1 for e in eng if e['outcome'] == 'NOSELFTEST')})· 實測 {tally}",
-            f"9. Step 9 是否允許部署:{'是' if verdict != 'OPEN' else '否'}(靜態 {chk.get('lamp')};部署 = 合併到 main 並由工作站 via-vcgc go)",
+            f"9. Step 9 是否允許部署(宣告收尾 · 工作站照此版跑 via-vcgc go 為準):{'是' if verdict != 'OPEN' else '否'}(靜態 {chk.get('lamp')};"
+            "程式合併到 main 另照 CI 綠 · 無衝突 · 無未結討論,不等於宣告收尾)",
             f"10. Step 10 VCGC 最終判定:**{verdict}**"]
 
 
