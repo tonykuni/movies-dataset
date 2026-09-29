@@ -219,6 +219,14 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             python $vcgc run VRN_SystemManager logic
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL140_HandoverConsole --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VRN_SystemManager provenance --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL245_SDDValidator --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc handoff check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } finally {
             Pop-Location
           }
