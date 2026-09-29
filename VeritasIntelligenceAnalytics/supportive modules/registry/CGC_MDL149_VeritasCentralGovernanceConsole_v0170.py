@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""CGC_MDL149_VeritasCentralGovernanceConsole v0170 — 薄尾:元件盤點沿「薄尾鏈」讀(命令冊 dot-source 鏈 · PY 薄尾的前版)
+"""
+CGC_MDL149_VeritasCentralGovernanceConsole v0170 — 薄尾:省 Token 工具是 VCGC 第一步(啟用 · 實測 · 要求 AI 先用)· token 動詞
 
-R33 實測實錄(2026-09-29):註冊乾跑報「退役 55」——剛加的 CGC_MDL245 v0101 / via_vrn_logic_book v0112 是薄尾,
-  函式留在前版、由 __getattr__ 轉接;盤點只 ast 讀尾版,就把 43 + 12 支還在用的函式當退役。再量全冊:
-  命令 181 支有 174 支掛 RETIRED(Register v0244 起是薄尾,只讀尾版那一本)、薄尾 126 支轉接的定義 3,933 個裡 902 個被標退役、
-  827 個從沒上冊。這是「薄尾盲點」同一類(全景讀名冊 · 步驟矩陣 · MDL157 命令冊 · ENG073 ⓬ · ENG086 之後第 6 處)。
-  ① register_cmds:命令冊沿 dot-source 鏈讀(正主 = CGC_MDL157 v0106+ 的 read();新冊拆掉的函式不算);同名以最新一本為準。
-  ② live_components:尾版是薄尾(exec_module 載自己家族的前版)就沿前版往下讀,直到一支實體;前版的類別 / 函式照家族名入冊
-     (鍵不變 = 同一個元件;source 記真正定義它的那一版,via 記轉接它的尾版)。尾版自己的定義優先。
-  ③ 別名後載的鏈模組(CGC_MDL205 以 vcgc_tails_for_talib_ban 載 v0142)也對齊:同步檢查前 ensure() 一次
-     (v0168 同步檢查取 sys.modules 裡第一支 registry_sync;實錄 hub run 後印「退役 1971」就是它拿到沒沿鏈的那支)。
-  結果照舊經 v0167 的樹狀態快取(本層另存一份,鍵同)。只增不減:冊的寫入仍只走 registry-sync --apply(要批准)。
-其餘照 v0169(thin tail;__getattr__ 轉接)。只收 VCGC 呼叫(VIA_FROM_VCGC=YES)。不用 TA-Lib。
+操作員 2026-09-29:「token saving tools registered. activate them and request ai to utilize them as the first step in vcgc.」
+  ① 每個動作第一行:進門(VIA_FROM_VCGC=YES)之後、任何動詞之前,先跑 CGC_MDL226 尾版的第一步(省 Token:鎖上的全景 / NLP
+     有沒有啟用、實測能不能用),印它的 ai_line——AI 從這一行知道先用 read → slice → digest。
+     紅(沒啟用 / 鎖檔被改 / 實測不過)就停在這一步:不讀政策、不開子系統,印啟用短令,rc2。
+     實錄:v0161 的步驟門只擋「會走到 v0161 的動詞」;tools / run / go / events / workflow / sdd 這些後來的動詞由
+     v0163–v0169 直接接走,從來沒過步驟門——所以第一步只能放在最上層,每個動詞都先過。
+  ② token 動詞:印整張省 Token 卡(ai_directive:第一步做什麼 · 指令原樣可貼 · 什麼時候不用);--json 印卡。事件照 v0168 記。
+  ③ v0161 的步驟門(DOOR)改指 CGC_MDL226 尾版(不再字串釘 v0100);它原本寫死的「1 入口 · 2 省Token」那一行,
+     換成新次序「1 省Token · 2 入口 · 3 加速器與網路」的實際燈號——同一個次序只有一種說法。
+其餘照 v0169(thin tail;__getattr__ 轉接)。只收 VCGC 呼叫(VIA_FROM_VCGC=YES)。零網路 · 不安裝。
 """
 from __future__ import annotations
-
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -31,45 +30,17 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-# ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
-VIA_NET_TOOL_PATH = None
-try:
-    from pathlib import Path as _nb_Path
-    _nb_p = _nb_Path(__file__).resolve()
-    while _nb_p.parent != _nb_p:
-        _nb_dir = _nb_p / "supportive modules" / "network"
-        if _nb_dir.exists():
-            _nb_hits = sorted(_nb_dir.glob("via_net_unified_v*.py"))
-            if _nb_hits:
-                VIA_NET_TOOL_PATH = str(_nb_hits[-1])
-            break
-        _nb_p = _nb_p.parent
-except Exception:
-    VIA_NET_TOOL_PATH = None
-
-
-def _via_net():
-    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
-    if VIA_NET_TOOL_PATH is None:
-        return None
-    try:
-        import importlib.util as _nb_ilu
-        spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
-        module = _nb_ilu.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
-    except Exception:
-        return None
-# ===== [VIA:NET-BRIDGE:END] =====
-
-import ast
+import builtins
 import importlib.util
+import json
+import os
 import re
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-VIA = HERE.parent.parent
 _STEM = "CGC_MDL149_VeritasCentralGovernanceConsole"
 
 
@@ -78,8 +49,7 @@ def _vnum(path: Path) -> int:
     return int(match.group(1)) if match else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum,
-                 default=HERE / "CGC_MDL149_VeritasCentralGovernanceConsole_v0169.py")   # the prior this tail was cut from
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
 _spec = importlib.util.spec_from_file_location("vcgc_prior_for_" + Path(__file__).stem, PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
@@ -90,190 +60,99 @@ def __getattr__(name: str):
     return getattr(PRIOR, name)
 
 
-_UEC: dict = {}
-BOOK_HDR = re.compile(r"^# ==== (Register-VIA-Commands-v\d{4}\.ps1) ====$")
+STEPS_STEM = "CGC_MDL226_StepMatrix"
+EVENTS = PRIOR.EVENTS                 # v0168 的事件夾(自測改指暫存夾)
+OLD_STEP_LINE = "[步驟] 1 入口 · 2 省Token GREEN · 3 加速器與網路已接 · 政策與子系統在後"
+_STEPS: dict = {}
 
 
-def uec():
-    """The command-book chain reader's owner: the newest CGC_MDL157 that has command_book_chain (None when absent)."""
-    if "m" not in _UEC:
-        _UEC["m"] = None
-        for p in sorted(HERE.glob("CGC_MDL157_VIAUniqueEntryControl_v*.py"), key=_vnum, reverse=True):
-            try:
-                m = PRIOR._load(p, "uec_for_v0170")
-            except Exception:
-                continue
-            if hasattr(m, "command_book_chain"):
-                _UEC["m"] = m
-                break
-    return _UEC["m"]
+def _steps_tail() -> Path | None:
+    hits = sorted(HERE.glob(STEPS_STEM + "_v*.py"), key=_vnum)
+    return hits[-1] if hits else None
 
 
-def register_cmds() -> dict:
-    """v0170: the command book read as its whole dot-source chain (newest first; a name defined twice keeps the newest)."""
-    books = sorted(VIA.glob("Register-VIA-Commands-v*.ps1"), key=lambda p: int(re.search(r"-v(\d+)$", p.stem).group(1)) if re.search(r"-v(\d+)$", p.stem) else -1)
-    if not books:
-        return {"state": "ABSENT", "cmds": []}
-    p, m = books[-1], uec()
-    text = m.read(p) if m else p.read_text(encoding="utf-8", errors="replace")
-    lines = text.splitlines()
-    cmds, aliases, seen, book = [], {}, set(), p.name
-    for i, ln in enumerate(lines):
-        h = BOOK_HDR.match(ln)
-        if h:
-            book = h.group(1)
-            continue
-        mm = re.match(r"^function global:(via-[A-Za-z0-9\-]+)", ln)
-        if mm and mm.group(1) not in seen:
-            name = mm.group(1)
-            seen.add(name)
-            usage = ""
-            for j in range(i - 1, max(-1, i - 8), -1):
-                if lines[j].startswith("#") and name in lines[j]:
-                    usage = lines[j].lstrip("# ").strip()
-                    break
-            cmds.append({"cmd": name, "usage": usage[:220], "line": i + 1, "book": book})
-        m2 = re.match(r"^Set-Alias -Name (\S+) -Value (via-[A-Za-z0-9\-]+)", ln)
-        if m2 and m2.group(1) not in aliases.get(m2.group(2), []):
-            aliases.setdefault(m2.group(2), []).append(m2.group(1))
-    for c in cmds:
-        c["aliases"] = aliases.get(c["cmd"], [])
-    return {"state": "OK", "src": p.name, "chain": len(m.command_book_chain(p)) if m else 1, "cmds": cmds}
+def steps_module():
+    """步驟矩陣尾版(第一步 = 省 Token)。不在回 None。"""
+    if "m" not in _STEPS:
+        p = _steps_tail()
+        _STEPS["m"] = PRIOR._load(p, "steps_for_" + Path(__file__).stem) if p else None
+    return _STEPS["m"]
 
 
-def is_thin(stem: str, text: str) -> bool:
-    """A tail that loads its own family's prior version (exec_module on `<stem>_v…`)."""
-    return "exec_module" in text and bool(
-        re.search(re.escape(stem) + r"""(?:_v\d{3,4}\.py|_v\*|["']\s*\+)""", text)
-        or re.search(r"""_STEM\s*=\s*["']""" + re.escape(stem) + """["']""", text))
-
-
-def forwarded_defs(tails: list, limit: int = 80) -> dict:
-    """{key: row} for the classes / functions a thin tail forwards from its prior chain (read only; ast.parse, never executed)."""
-    out: dict = {}
-    for stem, q in tails:
-        cur, hops = q, 0
-        while hops < limit:
-            try:
-                txt = cur.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                break
-            if not is_thin(stem, txt):
-                break
-            older = [p for p in cur.parent.glob(stem + "_v*.py") if 0 <= _vnum(p) < _vnum(cur)]
-            if not older:
-                break
-            nxt, hops = max(older, key=_vnum), hops + 1
-            rel, via = nxt.relative_to(VIA).as_posix(), q.relative_to(VIA).as_posix()
-            try:
-                tree = ast.parse(nxt.read_text(encoding="utf-8", errors="replace"), filename=str(nxt))
-            except (SyntaxError, ValueError):
-                cur = nxt
-                continue
-
-            class V(ast.NodeVisitor):
-                def __init__(self):
-                    self.stack: list = []
-
-                def _add(self, node, cat):
-                    ident = f"{stem}:{'.'.join(self.stack + [node.name])}"
-                    out.setdefault(f"{cat}|{ident}", {"key": f"{cat}|{ident}", "category": cat, "identity": ident,
-                                                      "source": rel, "line": node.lineno, "via": via})
-                    self.stack.append(node.name)
-                    self.generic_visit(node)
-                    self.stack.pop()
-
-                def visit_ClassDef(self, node):
-                    self._add(node, "class")
-
-                def visit_FunctionDef(self, node):
-                    self._add(node, "function")
-
-                visit_AsyncFunctionDef = visit_FunctionDef
-
-            V().visit(tree)
-            cur = nxt
-    return out
-
-
-def extend(inv: dict) -> dict:
-    rows = {r["key"]: r for r in inv.get("rows") or []}
-    for c in register_cmds().get("cmds", []):
-        rows.setdefault(f"tool|{c['cmd']}", {"key": f"tool|{c['cmd']}", "category": "tool", "identity": c["cmd"], "source": "Register-VIA-Commands"})
-    tails = [(r["identity"], VIA / r["source"]) for r in rows.values()
-             if r.get("category") in ("engine", "module", "system") and str(r.get("source", "")).endswith(".py")]
-    fwd = forwarded_defs(tails)
-    added = 0
-    for k, r in fwd.items():
-        if k not in rows:
-            rows[k] = r
-            added += 1
-    counts: dict = {}
-    for r in rows.values():
-        counts[r["category"]] = counts.get(r["category"], 0) + 1
-    out = dict(inv)
-    out.update({"rows": [rows[k] for k in sorted(rows)], "counts": counts, "forwarded": added, "chain_reader": "v0170"})
-    return out
-
-
-def _install() -> int:
-    """Swap the effective live_components / register_cmds in every loaded chain module that holds them."""
-    mods = [m for m in list(sys.modules.values()) if getattr(m, "__file__", "") and _STEM in str(getattr(m, "__file__", ""))
-            and m is not sys.modules.get(__name__)]
-    eff = next((m.__dict__["live_components"] for m in mods if callable(m.__dict__.get("live_components")) and "audit" in m.__dict__), None)
-    old_rc = next((m.__dict__["register_cmds"] for m in mods if callable(m.__dict__.get("register_cmds"))), None)
-    n = 0
-    for m in mods:
-        if old_rc is not None and m.__dict__.get("register_cmds") is old_rc:
-            m.__dict__["register_cmds"] = register_cmds
-    if eff is None or getattr(eff, "_v0170", False):
-        return 0
-    base = getattr(eff, "__wrapped__", eff)
-    ext = PRIOR.cached(lambda: extend(base()), name="live_components_v0170")
-    ext._v0170 = True
-    ext.__wrapped__ = lambda: extend(base())
-    _EXT["f"] = ext
-    for m in mods:
-        if m.__dict__.get("live_components") is eff:
-            m.__dict__["live_components"] = ext
-            n += 1
-    return n
-
-
-_EXT: dict = {}
-
-
-def ensure() -> int:
-    """Chain modules loaded later under another name (e.g. CGC_MDL205 loads v0142 as `vcgc_tails_for_talib_ban`) get the same
-    chain-aware inventory; the v0168 sync check takes the first registry_sync it finds in sys.modules, whichever that is."""
-    ext, n = _EXT.get("f"), 0
-    if ext is None:
-        return 0
+def _v0161():
     for m in list(sys.modules.values()):
-        d = getattr(m, "__dict__", {})
-        if _STEM in str(getattr(m, "__file__", "")) and callable(d.get("registry_sync")) and d.get("live_components") is not ext:
-            d["live_components"] = ext
-            if callable(d.get("register_cmds")):
-                d["register_cmds"] = register_cmds
-            n += 1
-    return n
+        if str(getattr(m, "__file__", "") or "").endswith(_STEM + "_v0161.py"):
+            return m
+    return None
 
 
-_V0169_SYNC = PRIOR.sync_check
+def _v0161_print(*args, **kwargs):
+    """v0161 寫死的舊次序那一行 → 新次序的實際燈號(步驟矩陣尾版剛算的那張卡)。其餘原樣。"""
+    if args and args[0] == OLD_STEP_LINE:
+        st = sys.modules.get("steps_for_console")
+        if st is None or not getattr(st, "LAST", None):
+            st = steps_module()
+        if st is not None and hasattr(st, "step_line"):
+            args = (st.step_line(getattr(st, "LAST", None) or None),) + args[1:]
+    return builtins.print(*args, **kwargs)
 
 
-def sync_check(key: str | None = None) -> dict:
-    ensure()
-    return _V0169_SYNC(key)
+def _patch_v0161() -> bool:
+    m, tail = _v0161(), _steps_tail()
+    if m is None or tail is None:
+        return False
+    m.DOOR = tail
+    m.print = _v0161_print
+    return True
 
 
-_PATCHED = _install()
-for _m in [PRIOR] + [getattr(PRIOR, "PRIOR", None)]:
-    if _m is not None and _m.__dict__.get("sync_check") is _V0169_SYNC:
-        _m.__dict__["sync_check"] = sync_check
+PATCHED_V0161 = _patch_v0161()
+
+
+def _event(verb: str, args: list, rc: int, t0: float) -> None:
+    try:
+        PRIOR.write_event({"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "verb": verb,
+                           "args": [str(a)[:80] for a in args[1:7]], "rc": rc, "outcome": PRIOR.outcome(rc),
+                           "secs": round(time.time() - t0, 1), "head": PRIOR._head()[:12], "error": "",
+                           "engine": Path(__file__).stem, "run": os.environ.get("VIA_HUB_RUN", ""),
+                           "t0": round(t0, 3), "target": _STEM, "act": verb}, folder=EVENTS)
+    except Exception:                                   # 事件寫不進去不擋動作(v0168 同一個規矩)
+        pass
+
+
+def first_step() -> dict | None:
+    st = steps_module()
+    return st.front() if st is not None else None
 
 
 def main(argv=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+    if os.environ.get("VIA_FROM_VCGC") != "YES":
+        return PRIOR.main(argv)                          # 門照舊由前一版擋(DENY)
+    t0 = time.time()
+    card = first_step()
+    if card is None:
+        print(json.dumps({"step": 1, "id": "token", "lamp": "ABSENT", "why": "CGC_MDL226 步驟矩陣不在"}, ensure_ascii=False))
+        return 2
+    verb = args[0] if args else ""
+    tok = card["token"]
+    if verb == "token":
+        if "--json" in args:
+            print(json.dumps(dict(tok, ai_line=card["ai_line"], order=card["order"]), ensure_ascii=False, indent=1))
+        else:
+            print("\n".join(card["ai_directive"]))
+            s = tok["smoke"]
+            print(f"  實測:{' · '.join(k + ('✓' if v else '✗') for k, v in tok['tools'].items())}"
+                  f"({'快取 ' + s['at'] if s['cached'] else '剛測 ' + str(s['secs']) + 's'})· 次序 {' → '.join(card['order'])}")
+        rc = 0 if not tok["missing"] else 2
+        _event("token", args, rc, t0)
+        return rc
+    print(card["ai_line"], file=sys.stderr if "--json" in args else sys.stdout)   # --json 的 stdout 保持純 JSON
+    if tok["missing"]:
+        print(json.dumps({"step": 1, "id": "token", "lamp": "RED", "missing": tok["missing"],
+                          "activate_hint": tok["activate_hint"], "next": "不讀政策、不開子系統;先修第一步"},
+                         ensure_ascii=False, indent=1))
+        return 2
     return PRIOR.main(argv)
 
 
@@ -282,41 +161,77 @@ def selftest() -> int:
 
     def chk(name, cond, note=""):
         ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
+        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + note) if note else ''}")
 
-    rc = register_cmds()
-    names = {c["cmd"] for c in rc["cmds"]}
-    chk("命令冊沿 dot-source 鏈讀(正主 CGC_MDL157 read)", uec() is not None and rc.get("chain", 1) >= 2 and len(names) >= 150,
-        f"鏈 {rc.get('chain')} 本 · 命令 {len(names)}")
-    chk("新冊拆掉的命令不算(via-talib / via-taone 由 v0262 拆除)", not ({"via-talib", "via-taone"} & names))
-    chk("同名只留最新一本", len(names) == len(rc["cmds"]))
-    body = "import importlib.util\nPRIOR_PATH = max(HERE.glob(_STEM + '_v*.py'))\n_spec.loader.exec_module(PRIOR)\n"
-    chk("薄尾判定:載自己家族前版 = 薄尾;載別家 = 不是", is_thin("X_MDL001_A", body + "_STEM = \"X_MDL001_A\"\n")
-        and not is_thin("X_MDL001_A", "spec.loader.exec_module(m)  # Y_MDL002_B_v0100.py\n"))
-    me = Path(__file__)
-    fwd = forwarded_defs([(_STEM, me)], limit=3)
-    chk("本支前版的定義照家族名入冊(source = 定義它的那一版)", f"function|{_STEM}:sdd_module" in fwd
-        and fwd[f"function|{_STEM}:sdd_module"]["source"].endswith("_v0169.py"), f"轉接 {len(fwd)}")
-    live = sys.modules[__name__].__dict__.get("_PATCHED")
-    chk("盤點已換成沿鏈版(每支持有 live_components 的鏈模組都換)", bool(live), f"換 {live}")
-    import importlib.util as _ilu
-    sp = _ilu.spec_from_file_location("vcgc_selftest_late_load", HERE / "CGC_MDL149_VeritasCentralGovernanceConsole_v0142.py")
-    late = _ilu.module_from_spec(sp)
-    sys.modules[sp.name] = late
-    sp.loader.exec_module(late)
-    ensure()
-    chk("後載的鏈模組(別名載入 v0142,如 CGC_MDL205)同步檢查前也換成沿鏈盤點", late.live_components is _EXT.get("f")
-        and PRIOR.PRIOR.sync_check is sync_check)
-    sys.modules.pop(sp.name, None)
-    b = Path(__file__).read_text(encoding="utf-8")
-    chk("抬頭 raw · 帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記", b.split("\n", 3)[2].startswith('r"""') and "[VIA:ACCEL-BRIDGE" in b
-        and "[VIA:NET-BRIDGE" in b and "VIA_FROM_VCGC" in b)
-    chk("不含 TA-Lib 匯入", not re.search(r"^\s*(?:import|from)\s+" + "ta" + r"lib\b", b, re.M))
-    if not all(ok):
+    import contextlib
+    import io
+    import tempfile
+    st = steps_module()
+    order = [r[1] for r in getattr(st, "ORDER", ())]
+    chk("① 步驟矩陣尾版的第一步是 token(省 Token),v0100 的八步一步不少",
+        st is not None and order[:1] == ["token"] and len(order) == 8, " → ".join(order))
+    m161 = _v0161()
+    chk("② v0161 的步驟門改指步驟矩陣尾版(不再字串釘 v0100);寫死的舊次序那一行改印新次序",
+        PATCHED_V0161 and m161 is not None and Path(m161.DOOR) == _steps_tail() and m161.print is _v0161_print)
+    global EVENTS
+    saved_env = os.environ.get("VIA_FROM_VCGC")
+    saved_events = EVENTS
+    try:
+        os.environ.pop("VIA_FROM_VCGC", None)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc_deny = main(["token"])
+        chk("③ 門:沒經 via-vcgc 直呼 token → 前一版照擋(DENY rc2),第一步不跑", rc_deny == 2 and "DENY" in buf.getvalue())
+        os.environ["VIA_FROM_VCGC"] = "YES"
+        with tempfile.TemporaryDirectory() as td:
+            EVENTS = Path(td) / "events"
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc_tok = main(["token"])
+            out = buf.getvalue()
+            card = first_step()
+            ev = list(EVENTS.glob("EVENTS_*.jsonl"))
+            ev_ok = bool(ev) and '"verb": "token"' in ev[0].read_text(encoding="utf-8")
+        chk("④ token 動詞:印整張 AI 指令卡(鎖上的全景路徑 · read/slice/digest/--if-etag/pack/--brief · 什麼時候不用)· rc0 · 事件照記",
+            rc_tok == 0 and card["token"]["pinned"]["token"] in out and all(
+                v in out for v in (" read ", " slice ", " digest ", "--if-etag", " pack ", "--brief", "不用的時候")) and ev_ok,
+            f"rc={rc_tok} · 事件 {'有' if ev_ok else '無'}")
+        chk("⑤ 每個動作的第一行 = 省 Token 短版(ai_line),以「[第一步 · 省Token] 已啟用 6/6」開頭",
+            card["ai_line"].startswith("[第一步 · 省Token] 已啟用 6/6") and card["front_pass"])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            _v0161_print(OLD_STEP_LINE)
+            _v0161_print("其他行照印")
+        lines = buf.getvalue().splitlines()
+        chk("⑥ v0161 舊次序那一行換成新次序的實際燈號;其他行一字不動",
+            len(lines) == 2 and lines[0].startswith("[步驟] 1 省Token GREEN · 2 入口 GREEN") and lines[1] == "其他行照印",
+            lines[0][:60] if lines else "")
+        red = dict(card, token=dict(card["token"], missing=["read"], activate_hint=["via-vcgc tools activate token X --apply"]),
+                   ai_line="[第一步 · 省Token] 紅")
+        called = []
+        real_first, real_prior_main = globals()["first_step"], PRIOR.main
+        globals()["first_step"] = lambda: red
+        PRIOR.main = lambda argv=None: called.append(argv) or 0
+        try:
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc_red = main(["status"])
+        finally:
+            globals()["first_step"], PRIOR.main = real_first, real_prior_main
+        chk("⑦ 負控:第一步紅 → 停在第一步(rc2)、不呼叫任何後面的動詞(政策 / 子系統都不開)、印啟用短令",
+            rc_red == 2 and not called and "tools activate token" in buf.getvalue())
+    finally:
+        EVENTS = saved_events
+        if saved_env is None:
+            os.environ.pop("VIA_FROM_VCGC", None)
+        else:
+            os.environ["VIA_FROM_VCGC"] = saved_env
+    passed = all(ok)
+    print(f"  {Path(__file__).stem} selftest {sum(ok)}/{len(ok)} {'PASS' if passed else 'FAIL'}")
+    if not passed:
         return 1
-    return PRIOR.selftest()
+    return PRIOR.selftest()                              # 串前一版(各薄尾同一個規矩:格子只跑尾版,前版的檢不能掉)
 
 
 if __name__ == "__main__":
-    a = sys.argv[1:]
-    raise SystemExit(selftest() if a == ["--selftest"] else main())
+    raise SystemExit(selftest() if "--selftest" in sys.argv else main())
