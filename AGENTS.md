@@ -9,5 +9,6 @@
 5. 只重測相依有變的 case。測試必須經 VCGC 並保留實際命令、rc、目標標記、程式／規則 SHA 與日誌。然後註冊、中央編號、SDD 驗證與 `handoff checkpoint`，再更新 GitHub／CI。
 6. 交接 GREEN 只是可續接；`closeout_lamp` 與 SDD 才判定驗收。主機 DB、全樣本、OCR 未測時保留未完成；不拿單元測試冒充主機實測。
 7. 舊版薄尾仍可能是依賴，未證明無呼叫前不搬走。TA-Lib 禁用。
+8. token 之後跑 VCGC `functions`,照 AI 必用功能卡(正本 `VIA_AI_FunctionCard_SSOT_v0100.json`)的順序用:改薄尾家族前先 `chain`;動 SSOT / 編號 / 註冊前後跑 `ssot panorama`;編號寫入後 `audit` 必須遺失 0 · 改身分 0 · 重號 0。
 
 當前操作與交付說明：`VeritasIntelligenceAnalytics/docs/handoff/README.md`。機器判準的正主：`VIA_Handoff_Continuity_SSOT_v0100.json`，由 `CGC_MDL140_HandoverConsole` 經 VCGC 管理。
