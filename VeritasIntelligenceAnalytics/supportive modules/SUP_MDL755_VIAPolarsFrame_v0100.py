@@ -22,7 +22,8 @@ engines 記憶體不足可用temp替代用」)
                          有 polars 的境,Polars 串流也寫同一夾(POLARS_TEMP_DIR)。呼叫端 config 自己給了的設定照它的。
                          VIA_FRAME_GUARD=off = 操作員關掉守門(不改碼;連線照 DuckDB 預設)。
   frame()                DuckDB 查詢 → 表格:want="pandas" 與 `.df()` 一字不差;want="polars"/"auto" 估算 ≤ 預算走 `.pl()`,
-                         超過就 COPY 到 temp parquet、回 LazyFrame(scan_parquet,collect() 走串流引擎)。
+                         超過就 COPY 到 temp parquet、回 LazyFrame(scan_parquet,collect() 走串流引擎)。估算的變長欄
+                         (字串 · 二進位 · 巢狀)照實量內文(Codex #369 P2:一律算 32 位元組會把百萬筆 1 KiB 字串估成 32 MiB)。
 
 必要引擎名冊 NECESSARY(11 支)與正典橋塊 BRIDGE_BLOCK 在本檔;coverage() 逐支看尾版有沒有橋與守門(格子站 + 自測 ⑬)。
 不代裝(L19):polars 缺席 = 誠實 ABSENT + 裝令(probe 動詞 rc 3);零網路;自測零足跡。
@@ -472,7 +473,7 @@ class FrameAbsent(RuntimeError):
 _WIDTH = {"BOOLEAN": 1, "TINYINT": 1, "UTINYINT": 1, "SMALLINT": 2, "USMALLINT": 2, "INTEGER": 4, "UINTEGER": 4,
           "FLOAT": 4, "DATE": 4, "BIGINT": 8, "UBIGINT": 8, "DOUBLE": 8, "TIME": 8, "HUGEINT": 16, "UHUGEINT": 16,
           "UUID": 16, "INTERVAL": 16}
-VARCHAR_WIDTH = 32                                   # 字串估 32 位元組(字串視圖 16 + 平均內文;保守)
+VIEW_WIDTH = 16    # 變長值(字串 · 二進位 · 巢狀)每值固定的視圖 / 指標;內文另實量(Codex #369 P2:原本一律算 32 會低估)
 
 
 def _width(type_name: str) -> int:
@@ -484,9 +485,19 @@ def _width(type_name: str) -> int:
     if t.startswith("DECIMAL"):
         m = re.search(r"\((\d+)", t)
         return 8 if m and int(m.group(1)) <= 18 else 16
-    if t.startswith("VARCHAR") or t == "BLOB":
-        return VARCHAR_WIDTH
-    return 16
+    return VIEW_WIDTH
+
+
+def _varlen(type_name: str) -> str | None:
+    """變長型別 → 量一個值內文位元組的 SQL 樣板;定長 → None。巢狀以文字長度近似(照實說,不是 Arrow 的精確佔用)。"""
+    t = str(type_name).upper()
+    if t.startswith("VARCHAR"):
+        return "strlen({})"
+    if t in ("BLOB", "BIT"):
+        return "octet_length({})"
+    if t == "JSON" or t.endswith("]") or t.startswith(("STRUCT", "MAP", "UNION", "LIST")):
+        return "strlen(CAST({} AS VARCHAR))"
+    return None
 
 
 def _run(con, sql: str, params=None):
@@ -494,11 +505,23 @@ def _run(con, sql: str, params=None):
 
 
 def estimate(con, sql: str, params=None) -> dict:
-    """列數實數;位元組 = 列數 × 型別寬度估(字串 VARCHAR_WIDTH)。查詢會多跑一次 count(*)。"""
-    rows = int(_run(con, f"SELECT count(*) FROM ({sql}) AS _via_frame_q", params).fetchone()[0])
+    """位元組 = 列數 × 定長寬度 + 變長欄內文**實量**(同一趟算列數與內文;欄照位置改名,重名 · 怪名都不怕)。查詢會多跑一次。"""
     desc = _run(con, f"SELECT * FROM ({sql}) AS _via_frame_q LIMIT 0", params).description
-    width = sum(_width(d[1]) for d in desc)
-    return {"rows": rows, "width": width, "bytes": rows * width, "columns": [d[0] for d in desc]}
+    cols = [(d[0], str(d[1])) for d in desc]
+    names = ", ".join(f"_c{i}" for i in range(len(cols)))
+    probes = [(i, f) for i, f in ((i, _varlen(t)) for i, (_n, t) in enumerate(cols)) if f]
+    aggs = ", ".join(["count(*)"] + [f"sum({f.format(f'_c{i}')})" for i, f in probes])
+    row = _run(con, f"SELECT {aggs} FROM ({sql}) AS _via_frame_q({names})", params).fetchone()
+    rows = int(row[0])
+    payload = sum(int(v or 0) for v in row[1:])
+    width = sum(_width(t) for _n, t in cols)
+    return {"rows": rows, "width": width, "payload": payload, "bytes": rows * width + payload,
+            "columns": [n for n, _t in cols], "varlen": [cols[i][0] for i, _f in probes]}
+
+
+def plan(est_bytes: int, budget_bytes: int | None) -> str:
+    """估算 ≤ 預算 = "memory"(`.pl()`);超過 = "temp"(COPY 到 temp parquet → LazyFrame);預算量不到 = "memory"(不收上限,照實)。"""
+    return "memory" if budget_bytes is None or est_bytes <= budget_bytes else "temp"
 
 
 def nbytes(obj) -> int | None:
@@ -527,8 +550,8 @@ def frame(con, sql: str, params=None, *, want: str = "pandas", spill=None, budge
         df = _run(con, sql, params).df()
         return df, {"backend": "pandas", "plan": "memory", "rows": len(df), "bytes": nbytes(df), "budget": b}
     est = estimate(con, sql, params)
-    info = {"backend": "polars", "rows": est["rows"], "est_bytes": est["bytes"], "budget": b}
-    if b is None or est["bytes"] <= b:
+    info = {"backend": "polars", "rows": est["rows"], "est_bytes": est["bytes"], "est_payload": est["payload"], "budget": b}
+    if plan(est["bytes"], b) == "memory":
         return _run(con, sql, params).pl(), dict(info, plan="memory")
     if spill is None:
         raise ValueError("估算超過預算、要走 temp:請在 session() 裡呼叫,或傳 spill=")
@@ -892,11 +915,25 @@ def selftest() -> int:
         chk("⑩ 誠實路:沒 polars → auto 退 pandas(零差異)、want=polars 誠實拋 FrameAbsent 附裝令;有 polars → auto 走 `.pl()`",
             ok10, note10)
 
-        # ⑪ 估算
+        # ⑪ 估算:定長寬度 + 變長欄內文實量(Codex #369 P2)· 決策 plan()。期望值全寫死(自測拿常數比常數是恆真)
         e = estimate(c, "SELECT * FROM m WHERE i >= ?", [7])
-        chk("⑪ estimate:列數實數、參數照帶;位元組 = 列數 × 型別寬度(字串 32)",
-            e["rows"] == 43 and e["width"] == 74 and e["bytes"] == 43 * 74,   # INTEGER 4 · DECIMAL 8 · VARCHAR 32 · DATE 4 · TIMESTAMP 8 · BOOL 1 · HUGEINT 16 · BOOL 1
-            f"寬 {e['width']} B/列")
+        c.execute("CREATE TABLE w AS SELECT range::INTEGER AS i, repeat('é', 512) AS s, encode(repeat('y', 100))::BLOB AS bl, "
+                  "[range, range + 1] AS li, NULL::VARCHAR AS nv FROM range(2000)")
+        ew = estimate(c, "SELECT * FROM w")
+        ed = estimate(c, 'SELECT s AS a, s AS a, s AS "x""y" FROM w')
+        parts11 = {
+            # INTEGER 4 · DECIMAL 8 · VARCHAR 視圖 16 · DATE 4 · TIMESTAMP 8 · BOOL 1 · HUGEINT 16 · BOOL 1;內文 'abc7'…'abc9' 3×4 + 'abc10'…'abc49' 40×5
+            "定長": e["rows"] == 43 and e["width"] == 58 and e["payload"] == 212 and e["bytes"] == 2706,
+            # 'é'×512 = 1 KiB(UTF-8 位元組,不是字元數)2,048,000 · BLOB 100×2000 · BIGINT[] 文字 21,783 · 全 NULL 0;寬 4+16+16+16+16
+            "變長": ew["rows"] == 2000 and ew["width"] == 68 and ew["payload"] == 2_269_783 and ew["bytes"] == 2_405_783,
+            "重名怪名": ed["bytes"] == 6_240_000 and ed["varlen"] == ["a", "a_1", 'x"y'],   # 3 × 2,048,000 + 2000 × 48
+            "決策": (plan(ew["bytes"], 1 << 20) == "temp" and plan(2000 * 116, 1 << 20) == "memory"
+                     and plan(10, 10) == "memory" and plan(11, 10) == "temp" and plan(10 ** 12, None) == "memory"),
+        }
+        chk("⑪ estimate:列數實數、參數照帶;位元組 = 列數 × 定長寬度 + 變長欄內文實量(1 KiB 字串 · BLOB · 巢狀 · 全 NULL · 重名欄);"
+            "plan():≤ 預算走記憶體、超過走 temp、預算量不到不收",
+            all(parts11.values()),
+            " · ".join(k for k, v in parts11.items() if not v) or f"1 KiB 字串 2000 列估 {ew['bytes']:,} B(舊法一律 32 B 只估 232,000 B,1 MiB 預算下會誤走 .pl())")
 
         # ⑫ polars 一致性(只在有 polars 的境跑;沒有 = ABSENT,不算綠也不算紅)
         q12 = "SELECT i, s, dt, b FROM m WHERE i >= ? ORDER BY i"
