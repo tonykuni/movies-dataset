@@ -82,6 +82,10 @@ SDD 原始診斷實際測的是 Numbering v0105；v0106 隨後獨立通過 36 �
 
 現有 Windows GitHub Actions 工作流已追加中央入口、Numbering、VDF Manager 及 VRN logic 契約檢查，全部由 VCGC 派送。沿用現有 DuckDB／pandas 安裝步驟；本輪未新增任意套件安裝或第二個生產執行器。CI 的實際結果須以對應提交的 Actions 為準，這份本機報告不代表 Windows CI 已通過。
 
+第一次 Windows CI（run 36584690120）在既有 `test_11_committed_page_matches_generator` 失敗：註冊資料更新後，追蹤中的 MasterControl 頁與正主產出不同步，後續步驟因而被跳過。後續透過 VCGC 派送原 VIA System Manager 再生此頁，保留原測試；新增契約檢查改為未取消時獨立執行，其他步驟失敗仍維持整體 CI 失敗狀態。第一次失敗證據保留，重跑結果另列。
+
 主機測試已獲使用者授權；使用者指定樣本資料夾 `C:\測試樣本報告`，每次後續作業先用 VCGC token，沿用 Panorama v0116 的 read → slice → digest 與 ETag。目前執行環境是 Linux，沒有該 C 槽掛載或可用主機遠端入口，不能宣稱已讀取此資料夾。取得入口後，使用 GitHub 該分支的程式與 SSOT，經 VCGC `enter` → 原 `go` → Manager，完成依賴盤點、指定樣本與正式工作流驗證及資料庫檢核，再按真實結果更新 LampLock。不得為了綠燈修改成功擷取邏輯、繞過現有 consent gate、把 NODATA 當成資料更新，或自行建構另一條執行路徑。
+
+使用者另已核准 GitHub 測試資料／資料庫對接。既有 `VIA_DataHome_SSOT_v0100.json` 宣告資料庫根目錄 `C:\Users\tonyk\VIA System\via_database`，其 `VIA_DATA_HOME`／`VIA_DB_<庫名>` 解析與目錄頁優先規則沿用；樣本路徑亦已存在 VRN 邏輯中，不另建資料副本。`VIA_SyncHub_Endpoints_SSOT_v0100.json` 的 endpoints 為空；它的用途是唯讀副本／API 盤點，不是 Windows 遠端執行器。授權已足夠，目前真正缺少的是可達的 Windows 主機執行入口。
 
 交付包是指定基準的增量更新，包含新版本、SSOT 變更、CI、設計與實測證據；不是含資料庫的完整獨立系統。套用前核對基準，衝突時依現行冊增量合併，勿覆蓋較新的主機或 GitHub 資料。

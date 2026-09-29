@@ -188,6 +188,7 @@ jobs:
           Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
 
       - name: Verify VCGC dispatch and manager contracts through the sole entry
+        if: ${{ !cancelled() }}
         shell: pwsh
         run: |
           $env:VIA_FROM_VCGC = "YES"
