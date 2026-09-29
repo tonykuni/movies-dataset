@@ -10214,8 +10214,15 @@
       "code": "Codex #369 兩件修正(新檔未進 main,原檔修)。P2 SUP_MDL755:estimate() 的字串 / 二進位 / 巢狀欄原本一律算 32 位元組,百萬筆 1 KiB 字串會估成 32 MiB、frame() 誤走 .pl();改成同一趟查詢實量內文位元組(strlen = UTF-8 位元組 · octet_length · 巢狀以文字長度近似,欄照位置改名),決策拆成 plan();⑪ 期望值全寫死('é'×512 · BLOB · BIGINT[] · 全 NULL · 重名怪名欄),新突變 11/11、舊突變 19/19;經 VCGC 重新啟用,鎖冊 frame sha 382c5e80。P1 ENG085 v0106:v0105 的 _INSPECT 與 _PREPARE(整表 CTAS)經 subprocess 在家族境新直譯器跑,父行程守門碰不到 → guard_children() 把守門段接在兩段腳本開頭(冪等),子行程載同一支 FRAME 正典、自己量預算、自己開受管 temp、自己刪,閥 off 也傳下去;adapter 不接(收容件原樣、讀已縮好的暫存庫);③ 實測 + 突變 6/6;真庫 run rc0 OK 1163 筆,父 1 子 2 個受管夾跑完全清。普查 11 支前版鏈:只有 ENG085 把 DuckDB 重活放子行程(ENG079 的子行程是 ENG064 薄尾自己守;ENG072 · GRP_ENG040 子行程只用 pandas;ENG081 只讀 ps)。元件冊對 main 新 102 · 退役 0;編號冊以 origin/main 為底重算 +210(本 PR 的列用最終行號);擊斃閘 rc0 · 格子 13/13 · SDD YELLOW(既有)· VAL GREEN",
       "category": "Polars 批 · Codex #369 P1 子行程守門 · P2 變長欄實量",
       "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 08:24",
+      "op": "FIX",
+      "code": "操作員令「close out these three projects.」+「activate and verify the results.」:VCGC-WKF004 收尾(go → check → selftests → real → lock → closeout)。探測輪量到 AI 端 FAIL 6 條:X-LOCK 以含版號路徑比、看不見 Polars 批換版;ENV MANAGER 唯一的紅是缺 pwsh、路徑驗證的紅同一個因,驗證器都追不到;ENG089 v0106 空資料家 ABSENT 沒講下一步(自測紅)。第一組:CGC_MDL245 v0102(X-LOCK 依家族比 · fail_cause envmgr_exe_absent / pathverify_traced 只讀本輪報告)· VDF_ENG089 v0107 · 格子 v0502。整條重跑(鏈不 resume · 容器本機 output_hub 暫移 · 空資料家)再抓兩件:VRN_ENG083 v0120 ㊸ 沿 ENG073 薄尾鏈找正典表(resume 一直沿用舊綠)· VRN_ENG082 v0111 sync-db 每輪落 SYNCDB_latest.json + v0102 finding_cause syncdb_no_target。第一次鎖燈(v0107,指紋 2109ed8140b9)後複查:VDF_ENG054 v0110 自測斷言正式庫不在,工作站有資料就紅(同機實量:庫在 v0110 rc1)→ 撤回未提交的鎖冊與報告,ENG054 v0111 自測改暫存庫(五庫況 · 正式庫零觸碰;兩種環境 6/6),整輪重跑重鎖。結果:go-20260929-075614-10789 + ai-r34-final-20260929-080706 · 指紋 8593371c7960 · lock --apply 寫 VIA_LampLock_v0107(已鎖 14 · 未鎖 13 全操作員端 · 換鎖 7 處)· 鎖後 X-LOCK 綠 · CLOSED_WITH_OPERATOR_ITEMS;燈鎖冊獨立核對 32 釘全尾版;工作站樣整張自測 FAIL 0。驗證:突變 37/37 · 擊斃閘 rc0(17 檔)· 格子四站 OK · VAL GREEN · 編號只增 ENG +4 · MDL +2 · FNC +127(main 既有列 0 變)· 元件冊 新 26 退役 0。操作員的手:裝 pwsh · 開同意閘抓料 · 裝 polars / pdfplumber / pydantic / paddleocr · VTMRA 正本。",
+      "category": "三系統收尾 R34 · 鎖燈 v0107 · 三組修正",
+      "component": "側線 2026-09-29 d(主線批號由併線的手指定 L25)· docs/VIA_S20260929d_SDDCloseoutR34.md"
     }
   ],
-  "updated_at": "2026-09-29 03:49",
+  "updated_at": "2026-09-29 08:24",
   "batch": "批731"
 }
