@@ -62,3 +62,8 @@ AST 五類就在 `read` 裡，不另開五支：`DUPDEF` · `UNREACH` · `BAREEX
 2. 原檔已經比卡片小：直接看，不啟動。
 3. 大檔才 `read`。要看某一個定義再 `slice`。跑測才 `digest`。
 4. 零寫檔、不執行被讀的檔。
+
+## 2026-09-29 更新:省 Token 成為 VCGC 第一步
+
+操作員令:「token saving tools registered. activate them and request ai to utilize them as the first step in vcgc.」
+上面的「啟動順序」改成:**進 VCGC 的第一步就是省 Token**(次序 token → enter → accel_net → policy …)。工具經 VCGC 啟用、鎖版(鎖冊 `token` / `nlp`),每一次都實測;VCGC 每個動作第一行印短版,`via-vcgc token` 印整張卡。細節見 `VIA_S20260929a_TokenFirstStep.md`(政策小冊 TOKEN-1)。

@@ -1,0 +1,29 @@
+{
+  "id": "TOKEN-1",
+  "status": "ACTIVE",
+  "ruled_by": "操作員",
+  "date": "2026-09-29",
+  "ruling": "token saving tools registered. activate them and request ai to utilize them as the first step in vcgc.",
+  "book": "VIA_Policy_Laws_SSOT_v0100.json",
+  "book_edited": false,
+  "second_book": false,
+  "under": "L65 Token 撙節律 ⑤(AI 讀卡,不讀原始碼)· 政策二 docs/VIA_S20260925d_TokenStartTools.md",
+  "rule": "VCGC 每個動作的第一步是省 Token 工具:鎖冊 VIA_ToolVersion_Lock 的 token(全景 read / slice / digest / pack / --if-etag)與 nlp(--brief)要經 VCGC 啟用、位元吻合、實測能用;VCGC 第一行印指令卡的短版,AI 照卡先用。第一步紅就停:不讀政策、不開子系統。",
+  "order": ["token", "enter", "accel_net", "policy", "number", "ps_template", "env", "subsystem"],
+  "tools": ["read", "slice", "digest", "pack", "etag", "brief"],
+  "activate": "via-vcgc tools activate token <CGC_MDL158_…_vNNNN.py> --apply",
+  "ai_card": "via-vcgc token",
+  "engines": [
+    "CGC_MDL226_StepMatrix_v0101",
+    "CGC_MDL233_ToolActivate_v0102",
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0170"
+  ],
+  "not_used_when": "原檔比卡片小(約 40 行內)直接看;小檔用工具反而多花 token(政策二實測負數照報)",
+  "do_not": [
+    "rewrite the locked policy book",
+    "read a large file whole before step 1's read / slice",
+    "paste file bodies back into the conversation",
+    "switch the token tool version without via-vcgc tools activate --apply",
+    "skip step 1 for any verb (tools / run / go / events / workflow / sdd included)"
+  ]
+}
