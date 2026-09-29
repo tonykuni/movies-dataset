@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-GRP_ENG040_GroupingRotationRunner v0104 — 薄尾:Polars 表格層橋 + 記憶體不足轉 temp(操作員 2026-09-29「go on add polars to all necessary engines
-記憶體不足可用temp替代用」)
+GRP_ENG040_GroupingRotationRunner v0104 — 台股族群輪動執行引擎(薄尾:接 SUP_MDL755 Polars 表格層守門 · 記憶體不足轉 temp)
+操作員 2026-09-29「go on add polars to all necessary engines 記憶體不足可用temp替代用」。
 
 v0103 → v0104(側線 2026-09-29 c;主線批號由併線的手指定 L25):
   量到的:台股 / 全球價面板撈進 pandas(必要引擎名冊 N1,SUP_MDL755 NECESSARY)。
@@ -79,7 +79,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-STEM = "GRP_ENG040_GroupingRotationRunner"
+_STEM = "GRP_ENG040_GroupingRotationRunner"
 
 
 def _vnum(path: Path) -> int:
@@ -87,8 +87,8 @@ def _vnum(path: Path) -> int:
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
-_spec = importlib.util.spec_from_file_location(STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
+_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
@@ -103,7 +103,7 @@ def guard() -> dict:
     fr = _via_frame()
     if fr is None:
         return {"state": "ABSENT", "why": "SUP_MDL755 VIAPolarsFrame 不在(橋解不到)"}
-    return fr.install_duckdb_guard(STEM)
+    return fr.install_duckdb_guard(_STEM)
 
 
 def main() -> int:

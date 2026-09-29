@@ -54,6 +54,10 @@
 每支薄尾一樣的形狀:前一版的 ACCEL / NET 橋塊逐字照抄 + **正典 FRAME 橋**(`[VIA:FRAME-BRIDGE:v0100]`,鎖冊 `frame` 優先,缺則尾版)·
 `main()` = 先裝守門再交前一版 `main()`(CLI 一字不動)· 自測 ①橋 ②守門 ③零足跡,再串前一版全部檢。
 
+兩個讀者都要讀得懂薄尾(提交後補修,見第七節):
+- **說明首行 = 引擎名 +(括號裡的薄尾註記)**。總控頁的候核名稱取說明首行、剝掉括號;沒有正式名的 4 支(ENG070 · 072 · 079 · 081)顯示與前一版一字不差。
+- **家族名寫 `_STEM`**。VCGC v0172(main 的 R33)沿薄尾鏈盤點元件,認的是 `_STEM = "<家族>"`;這樣前一版的函式留在元件冊上(source 記定義它的那一版),不被當成退役。
+
 不列入(量過):單碼查詢(VAP_ENG015 · CGC_MDL118)、小表(共識 · 當沖)、逐日抓取器(ENG054 / 056 / 057)、只計數的閘、ENG059 薄尾。
 
 ## 五、Polars 在哪裡、不在哪裡(照實說)
@@ -71,18 +75,20 @@
 | 項 | 結果 |
 |---|---|
 | SUP_MDL755 自測 | 13/13 PASS · ⑫ ABSENT(本境無 polars);突變 20/20 全抓(兩個原本存活的恆真檢已改寫死期望值) |
-| 11 支薄尾自測 | rc 與前一版**完全一致**(10 支 0 · ENG072 2 = 上游籌碼表缺 NODATA);薄尾 3/3;前一版檢數一個不少;自測前後倉內零改動 |
+| 11 支薄尾自測 | rc 與前一版**完全一致**(10 支 0 · ENG072 2 = 上游籌碼表缺 NODATA);薄尾 3/3;前一版檢數一個不少;自測前後倉內零改動。說明首行與 `_STEM` 補修後 12 支(含 MDL233)重跑:rc 與檢數不變,倉內零改動 |
 | 真庫副本 · ENG061 原規模 | 58.8 萬列,上限 128 MiB → 溢寫 8 種進受管 temp · 結果全欄雜湊**位元級一致** |
 | 真庫副本 · ENG061 放大 8 倍 | 470 萬列 · 7,208 檔:不設限峰值 RSS **1,138 MiB** / 9.0 s;上限 256 MiB → **583 MiB(−49%)** / 7.5 s,溢寫進受管 temp、跑完清空 |
 | 同上 · 逐欄比 | 11 欄裡 9 欄位元級一致;`vol_20d_ann`、`volu_z20`(`stddev_samp` 視窗)最後幾位不同:最大絕對 1.8e-15、最大相對 8.4e-15;空值型態完全一致。不設限重跑兩次雜湊相同 → 差異來自溢寫改了 DuckDB 的合併順序,**只在記憶體真的不足時出現** |
 | 真庫 · ENG070 面板 | 上限 128 MiB:結果雜湊與欄型別一字不差;64 MiB(低於下限、只為測試)Out of Memory → 下限 512 MiB 的由來 |
 | CGC_MDL233 v0103 自測 | 20/20(六家同一把尺;frame 冊上那一支過全部檢查;家別不對擋下;已經 VCGC 啟用、鎖冊位元吻合) |
-| 擊斃閘 v0103 `--base origin/main --run-selftest` | 通過 rc 0 · 判 17 檔 · 擊斃 0 · 記債 13(12 支薄尾委派前一版自測 + 格子沿襲既有 ⑥ 撞號)。第一跑抓到 SUP_MDL755 ⑩ 兩個分支各一條 chk(KILL-09 新增撞號),合成一條後重跑通過 |
-| 格子 v0501 `--only`(受影響 13 站) | OK 13 · FAIL 0;正式庫這 13 站前後三本位元組與 mtime 一致 |
-| VCGC `registry-sync --apply` | 新 98(全是本批:共用件 54 · 11 支薄尾各 4)· 遺失 0 · 改號 0;退役 225 = 前一版引擎的函式(元件冊只看尾版自己的定義,薄尾接手即標退役,上一批 VCGC 薄尾退役 16 同一規則) |
-| VCGC `val`(驗證 SSOT) | GREEN · 八道規則全綠 · 交叉代碼 22 |
-| VCGC `sdd check` | X-REG 轉綠(registry-sync 後);**X-NUM 仍紅**(見第八節,含上一批 VCGC v0171);X-REQ-OPEN 黃(既有) |
-| 總控頁再生 · 契約測試(py3.12) | 再生 3 行(時間 · 兩列);契約 19/19 OK |
+| 擊斃閘 v0103 `--base origin/main --run-selftest` | 通過 rc 0 · 判 17 檔 · 擊斃 0 · 記債 13(12 支薄尾委派前一版自測 + 格子沿襲既有 ⑥ 撞號)。第一跑抓到 SUP_MDL755 ⑩ 兩個分支各一條 chk(KILL-09 新增撞號),合成一條後重跑通過。補修後再跑:判 31 檔(本批已在 HEAD,這一跑判的是補修那一步)· 通過 rc 0 · 記債 1(格子 ⑥) |
+| 格子 v0501 `--only`(受影響 13 站) | OK 13 · FAIL 0;正式庫這 13 站前後三本位元組與 mtime 一致。補修後重跑同樣 13/13,工作樹前後一致 |
+| 合併 main(PR #367 · 55fcb1ef) | 合併提交 e61b245b 逐檔核對:與 main 不同的 18 檔全等於本批原檔,其餘全等於 main(衝突兩本 —— 元件冊、總控頁 —— 取 main 後重生) |
+| VCGC `registry-sync --apply`(併 main 後,VCGC v0172 沿薄尾鏈盤點) | 對 main:新 98(共用件 54 · 11 支薄尾各 4)· 遺失 0 · 改號 0 · **退役 0**;變更 101 = 尾版自己重定義的函式把 source 移到新版檔(格子 v0501 42 · 薄尾與 MDL233 各 5–6)。補修前是退役 231(見第七節) |
+| 編號冊(只增合併) | 10 本 +206 列(CLS_SUP 3 · ENG 11 · ENV 4 · FNC_GRPIDX 14 · FNC_SUP 50 · FNC_VCGC 46 · FNC_VDF 72 · LGC 2 · MDL 3 · TOOL 1);對 main 逐鍵比:遺失 0 · 改號 0 · 既有列欄位 0 變;TST 列不加(那是本機格子存證衍生);SSOT 46 本 n/sha 一致;CGC_MDL237 自測 rc 0 |
+| VCGC `val`(驗證 SSOT) | GREEN · 八道規則全綠 · 交叉代碼 22(補修後重跑同) |
+| VCGC `sdd check` | YELLOW:X-NUM · X-REG · X-LOCK 等全綠;只剩 X-REQ-OPEN 黃(既有 13 條需求未落地) |
+| 總控頁再生 · 契約測試(py3.12) | 再生前暫移容器本機的 StdDashboard(gitignore);對 main 只差時間戳與 MDL233 一列(五件 → 六件);契約 19/19 OK |
 | `tools activate frame --apply`(經 VCGC) | 鎖冊 `frame` = v0100 · sha256 764775f2…(定稿後重新啟用;鎖冊位元與檔一致,CGC_MDL233 ㉑ OK) |
 
 ## 七、教訓(照實記)
@@ -91,17 +97,25 @@
 - **上限收小不是免費的**:視窗函數與記憶體庫不能全溢寫 → 下限 512 MiB、記憶體庫不收上限。
 - **溢寫改了浮點合併順序**:`stddev_samp` 類視窗在最後幾位會不同 —— 寫進說明,不假裝位元級不變。
 - **自測拿常數比常數是恆真**:突變 M15(字串寬度)、M20(溢寫根不聽 VIA_TEMP_ROOT)原本存活;期望值要寫死、環境變數要驗真的被聽。
-- **VCGC 失敗會記進教訓冊**:`sdd check` 回紅被記成 VF-028(VF-016 第 5 次),照規矩還原;真正的紅(上一批 VCGC v0171 沒經 CGC_MDL237 編號)本批補上。
+- **VCGC 失敗會記進教訓冊**:`sdd check` 回紅被記成 VF-028(VF-016 第 5 次),照規矩還原。那次的紅是 X-NUM:上一批 VCGC v0171 由 main 的 R33c 補編號,本批的新檔由下面的只增合併補上。
+- **編號冊在容器只做只增合併**:容器實跑 `CGC_MDL237 --apply` 會新增 1,100 列,其中 862 列是**容器本機庫**的台股代號(VDF_ENG087 讀本機名冊,容器庫只有 907 檔);updated_at 取 git 最後提交時間,淺層 clone 會讓整冊翻動(+36,299 / −11,854 行);TST 列來自本機格子存證。所以只把新鍵補進 main 的冊,既有列一字不動。
+- **VCGC 座位自動上傳會把進行中的合併一起推上去**:CGC_MDL223 `publish()` 只 `git add` 座位檔,卻用不帶路徑的 `git commit`,暫存區裡的東西會整包提交再 `git push`。本批合併 main 時,VCGC 以「vcgc: sync the subsystem seat」的名義把合併提交並推送了(e61b245b)。內容逐檔核對無誤(第六節)。以後合併中或暫存區有東西時,先設 `VIA_VCGC_PUSH=NO` 再跑 VCGC。
+- **薄尾要讓兩個讀者都看懂**:① 總控頁取說明首行當候核名稱。本批原本 11 支首行都是「薄尾:Polars…」,ENG079 · ENG081 的真名因此被換成同一句,ENG070 · 072 也從「正式名稱待治理」變成那一句。② VCGC v0172 的薄尾偵測只認 `_STEM = "<家族>"`,本批 12 支原本寫 `STEM`,被當成實體,前一版 231 個函式被標退役。首行改成引擎名、家族名改成 `_STEM` 之後,總控頁名稱與前一版相同,退役 0。
+- **容器本機產物會滲進總控頁**:容器裡的格子跑過 StdDashboard(gitignore),總控頁的 Plotly 段就變成「頁面已產生」,時間是容器的。再生前先暫移,入倉的頁不帶容器狀態。
 
-## 八、工作站待辦(本批做不到、照實交出)
+## 八、待辦(本批做不到或不在範圍,照實交出)
 
-| 項 | 為什麼容器不做 | 工作站一行 |
+| 項 | 為什麼本批不做 | 下一步 |
 |---|---|---|
-| X-NUM:4 支尾版補編號(VDF_ENG085 v0106 · ENG079 v0104 · ENG081 v0103 · **上一批的 VCGC v0171**) | 容器實跑 `CGC_MDL237 --apply`:新增 1,100 列裡 862 列是**容器本機庫**的台股代號(VDF_ENG087 讀本機名冊,容器庫只有 907 檔),另有淺層 clone 算出來的 updated_at 整冊翻動(+36,299 / −11,854 行)。代號與時間戳都該由正本環境給 → 還原、不入倉 | `via-vcgc run --family core CGC_MDL237_NumberingSystem --apply` 然後 `via-vcgc sdd check` |
-| Polars 一致性 ⑫ | 容器沒有 polars,依規不代裝 | `& <vdf python> -m pip install "polars>=1.21,<2"` → `via-vcgc run --family core SUP_MDL755_VIAPolarsFrame probe`(rc 0)→ `--selftest` ⑫ 應為 OK |
+| Polars 一致性 ⑫ | 容器沒有 polars,依規不代裝 | 工作站:`& <vdf python> -m pip install "polars>=1.21,<2"` → `via-vcgc run --family core SUP_MDL755_VIAPolarsFrame probe`(rc 0)→ `--selftest` ⑫ 應為 OK |
+| 編號冊既有列刷新(updated_at · 使用者 · 燈號 · TST 列) | 容器只補新鍵(X-NUM 已綠);這些欄位該由正本環境給 | 工作站(選做):`via-vcgc run --family core CGC_MDL237_NumberingSystem --apply` 然後 `via-vcgc sdd check` |
+| CGC_MDL223 座位上傳只提交座位檔 | VCGC 治理件,不在本批範圍 | 新版:`git commit -m … -- <座位檔>`;有 MERGE_HEAD 或暫存區有別的檔就不提交,回 `held` |
+| VCGC v0172 薄尾偵測也要認 `STEM = "<家族>"` | main 既有缺口:用 `STEM` 的家族尾版另有 24 支(VDF_ENG082 v0106 · VRN_ENG049 / 050 / 052 / 055 / 056 / 057 / 062 · CGC_MDL058 / 089 / 107 / 137 / 142 / 156 / 226 / 231 / 234 / 236 / 237 / 242 · SUP_MDL030 / 737 / 740 · celeritas launcher),main 元件冊裡它們前一版約 230 個函式標退役 | VCGC 新版把 `_STEM` 條件放寬成 `_?STEM`,補正控與負控,再 `registry-sync --apply` |
+| CLAUDE.md L106 寫的 `via-vcgc read / slice / entry` | VCGC v0172 回「v0142 不認得動詞」;VCGC 第一步卡指的是 `via-panorama read / slice`(CGC_MDL158),本批照它讀,問題 0 | 由操作員裁定:VCGC 補這三個動詞(轉交 CGC_MDL158),或 CLAUDE.md 改指 `via-panorama` |
 
 ## 九、還原
 
 - 刪本批新檔,即回到尾版律的前一版:SUP_MDL755 v0100 · 11 支薄尾 · CGC_MDL233 v0103 · 格子 v0501。
-- 鎖冊 `frame` 一項、引擎版號冊 VIA-TOOL-0195 一列:`git restore --source=4ae4f2bd` 對應冊。
+- 鎖冊 `frame` 一項、引擎版號冊 VIA-TOOL-0195 一列:`git restore --source=4ae4f2bd` 對應冊(PR #367 沒動這兩本)。
+- 編號冊 10 本 + `VIA_Numbering_SSOT_v0100.json`、元件冊、總控頁:`git restore --source=55fcb1ef` 對應檔(= 本批之前的 main)。
 - 工作站臨時關守門、不改碼:`$env:VIA_FRAME_GUARD = "off"`;預算要鬆:`$env:VIA_FRAME_MEM_FRACTION = "0.8"`。

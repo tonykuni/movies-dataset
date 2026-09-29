@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-VDF_ENG070_GroupClassificationIndex v0113 — 薄尾:Polars 表格層橋 + 記憶體不足轉 temp(操作員 2026-09-29「go on add polars to all necessary engines
-記憶體不足可用temp替代用」)
+VDF_ENG070_GroupClassificationIndex v0113 — 薄尾:接 SUP_MDL755_VIAPolarsFrame 表格層守門(記憶體不足轉 temp)
+操作員 2026-09-29「go on add polars to all necessary engines 記憶體不足可用temp替代用」。
 
 v0112 → v0113(側線 2026-09-29 c;主線批號由併線的手指定 L25):
   量到的:全市場面板(日價 ⋈ 還原價 ⋈ 名冊)撈進 pandas;容器實量 58.8 萬列 · 載入峰值 RSS +343 MB(必要引擎名冊 N1,SUP_MDL755 NECESSARY)。
@@ -109,7 +109,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-STEM = "VDF_ENG070_GroupClassificationIndex"
+_STEM = "VDF_ENG070_GroupClassificationIndex"
 
 
 def _vnum(path: Path) -> int:
@@ -117,8 +117,8 @@ def _vnum(path: Path) -> int:
     return int(m.group(1)) if m else -1
 
 
-PRIOR_PATH = max((p for p in HERE.glob(STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
-_spec = importlib.util.spec_from_file_location(STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
+_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
@@ -133,7 +133,7 @@ def guard() -> dict:
     fr = _via_frame()
     if fr is None:
         return {"state": "ABSENT", "why": "SUP_MDL755 VIAPolarsFrame 不在(橋解不到)"}
-    return fr.install_duckdb_guard(STEM)
+    return fr.install_duckdb_guard(_STEM)
 
 
 def main() -> int:

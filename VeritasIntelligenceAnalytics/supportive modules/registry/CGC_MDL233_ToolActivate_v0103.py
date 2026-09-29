@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-STEM = "CGC_MDL233_ToolActivate"
+_STEM = "CGC_MDL233_ToolActivate"
 
 
 def _vnum(path: Path) -> int:
@@ -43,8 +43,8 @@ def _vnum(path: Path) -> int:
     return int(m.group(1)) if m else -1
 
 
-PRIOR = max((p for p in HERE.glob(STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
-_spec = importlib.util.spec_from_file_location(STEM + "_prior_for_" + Path(__file__).stem, PRIOR)
+PRIOR = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
+_spec = importlib.util.spec_from_file_location(_STEM + "_prior_for_" + Path(__file__).stem, PRIOR)
 _PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = _PRIOR
 _spec.loader.exec_module(_PRIOR)
