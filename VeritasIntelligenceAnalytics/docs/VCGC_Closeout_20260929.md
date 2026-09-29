@@ -84,6 +84,8 @@ SDD 原始診斷實際測的是 Numbering v0105；v0106 隨後獨立通過 36 �
 
 第一次 Windows CI（run 36584690120）在既有 `test_11_committed_page_matches_generator` 失敗：註冊資料更新後，追蹤中的 MasterControl 頁與正主產出不同步，後續步驟因而被跳過。後續透過 VCGC 派送原 VIA System Manager 再生此頁，保留原測試；新增契約檢查改為未取消時獨立執行，其他步驟失敗仍維持整體 CI 失敗狀態。第一次失敗證據保留，重跑結果另列。
 
+第二次 Windows CI（run 36585768728）已通過上述 freshness、桌面／手機 UAT、VRN 值與模板回歸；VCGC Token 閘發現精簡 checkout 缺少工具檔而正確停行。CI 隨後補入全部 Python／PowerShell 原始碼與 JSON／JSONL／Markdown 設定，仍不抓 PDF、資料庫或模型；checkout 保留 LF 位元組供來源鎖核對。工具鎖與驗證閘未更改。
+
 主機測試已獲使用者授權；使用者指定樣本資料夾 `C:\測試樣本報告`，每次後續作業先用 VCGC token，沿用 Panorama v0116 的 read → slice → digest 與 ETag。目前執行環境是 Linux，沒有該 C 槽掛載或可用主機遠端入口，不能宣稱已讀取此資料夾。取得入口後，使用 GitHub 該分支的程式與 SSOT，經 VCGC `enter` → 原 `go` → Manager，完成依賴盤點、指定樣本與正式工作流驗證及資料庫檢核，再按真實結果更新 LampLock。不得為了綠燈修改成功擷取邏輯、繞過現有 consent gate、把 NODATA 當成資料更新，或自行建構另一條執行路徑。
 
 使用者另已核准 GitHub 測試資料／資料庫對接。既有 `VIA_DataHome_SSOT_v0100.json` 宣告資料庫根目錄 `C:\Users\tonyk\VIA System\via_database`，其 `VIA_DATA_HOME`／`VIA_DB_<庫名>` 解析與目錄頁優先規則沿用；樣本路徑亦已存在 VRN 邏輯中，不另建資料副本。`VIA_SyncHub_Endpoints_SSOT_v0100.json` 的 endpoints 為空；它的用途是唯讀副本／API 盤點，不是 Windows 遠端執行器。授權已足夠，目前真正缺少的是可達的 Windows 主機執行入口。

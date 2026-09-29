@@ -60,6 +60,8 @@ jobs:
         run: |
           git config --global core.longpaths true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Check out repository
         uses: actions/checkout@v7
@@ -77,6 +79,11 @@ jobs:
             /VeritasIntelligenceAnalytics/functional modules/**/*.py
             /VeritasIntelligenceAnalytics/supportive modules/registry/**
             /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
