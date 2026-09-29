@@ -31,8 +31,8 @@ via-vcgc enter [--card] [--no-pull] [go 的參數 …]
 | 1 位置與更新 | 目前資料夾在不在倉內(不在 → 印那一行 `Set-Location -LiteralPath '<倉根>'`)· 分支 · HEAD · 上游 · 本機改動檔數;`git fetch` 上游 → **只快轉**(`merge --ff-only`) | 分岔:不合併,講出 `git pull --no-rebase` 讓操作員決定;本機改動會被蓋:git 自己拒絕,照實印;都照目前版本繼續。不 stash、不 rebase、不 force、不 push |
 | ↳ HEAD 有變 | 交給**更新後**的 VCGC 尾版接手(子行程 `enter --no-pull`,帶原參數) | 閘與後面各步都跑在新碼上 |
 | 2 閘 | 照 VCGC-WKF001-STP002 跑 `status`(政策整冊 · 子系統座位 · 加速器 / 網路已接) | rc 不是 0 → 一步都不跑 |
-| 3 加速器 | `VIA_SuperAccel_Module` → SUP_MDL737 尾版 → 鎖冊那一本 Celeritas,`activate()`:執行緒預算寫進本行程環境,後面 `go` 起的每一支子行程都帶著(L103 ①) | 載不起來 / 載到的不是鎖冊那一本 → 停 |
-| 4 工具版本 | 鎖冊(CGC_MDL233 尾版 `status`)六件:加速器 · 網路工具 · layout · nlp · token · frame 的檔名 · 版號 · sha · 待啟用;網路載入器(SUP_MDL740 尾版)解析到哪一支、核心載不載得起來、同意閘開 / 閉(只報開閉,不印值);`layout` 動詞走哪一支;PS 模板章在不在 | sha 對不上 / 缺件 / 網路核心載不起來 / PS 模板缺 → 停(換版只經 `via-vcgc tools activate … --apply`) |
+| 3 加速器 | `VIA_SuperAccel_Module` → SUP_MDL737 尾版 → 鎖冊那一本 Celeritas,`activate()`:執行緒預算寫進本行程環境,後面 `go` 起的每一支子行程都帶著(L103 ①) | 載不起來 / 載到的不是鎖冊那一本 / 執行緒預算沒套上 → 停 |
+| 4 工具版本 | 鎖冊(CGC_MDL233 尾版 `status`)六件:加速器 · 網路工具 · layout · nlp · token · frame 的檔名 · 版號 · sha · 待啟用;網路載入器(SUP_MDL740 尾版)解析到哪一支、核心載不載得起來、同意閘開 / 閉(只報開閉,不印值);`layout` 動詞走哪一支;PS 模板章在不在 | sha 對不上 / 缺件 / 網路核心載不起來 / PS 模板缺 / `layout` 動詞走的不是鎖冊那一支 → 停(換版只經 `via-vcgc tools activate … --apply`) |
 | 5 啟動全部 | 交給 `go`(操作台 PowerShell 尾版跑整輪);`--card` 只出卡不啟動 | `go` 的 rc 就是 `enter` 的 rc |
 | 總結 | 一行總結 + 一筆中樞事件(verb `enter`;`VIA_HUB_RUN` 沒設就給本輪 `enter-…` 輪號,結束還原) | — |
 
@@ -44,20 +44,28 @@ via-vcgc enter [--card] [--no-pull] [go 的參數 …]
 
 ## 四、格子 `CGC_MDL064_SelftestGrid_v0503`(新)
 
-站名檢數(LL213):Veritas 中央控管台 **三十八 → 七十一**。站名從 v0129 起就沒跟上 —— v0130~v0172 各薄尾的檢號都由 `PRIOR.selftest()` 串著照跑,v0172 實印 56 檢,v0173 再 +15 = 71,照實數。站數不變,其餘站一字不動;新薄尾由 `newest()` 自動接上。
+站名檢數(LL213):Veritas 中央控管台 **三十八 → 七十二**。站名從 v0129 起就沒跟上 —— v0130~v0172 各薄尾的檢號都由 `PRIOR.selftest()` 串著照跑,v0172 實印 56 檢,v0173 再 +16 = 72(①~⑮ 與 ⑦b),照實數。站數不變,其餘站一字不動;新薄尾由 `newest()` 自動接上。
 
 ## 五、驗證
 
 | 項 | 結果 |
 |---|---|
-| v0173 自測 ①~⑮ + 前版鏈 | rc 0 · 71 檢全 OK · 約 48 秒;更新那幾檢用暫存 bare 倉實跑 git(最新 · 落後快轉 · `--no-pull` · 本機改動被 git 拒 · 分岔 · 沒上游 · 不是倉),不連網 |
-| 突變 | 18/18 全殺(第一輪 16/18:毫秒內排序同分被穩定排序蓋過、載入失敗第二道也判紅但理由錯 → 補確定性排序案例與判語檢查) |
+| v0173 自測 ①~⑮ · ⑦b + 前版鏈 | rc 0 · 72 檢全 OK · 約 48 秒;更新那幾檢用暫存 bare 倉實跑 git(最新 · 落後快轉 · `--no-pull` · 本機改動被 git 拒 · 分岔 · 沒上游 · 不是倉),不連網 |
+| 突變 | 20/20 全殺(第一輪 16/18:毫秒內排序同分被穩定排序蓋過、載入失敗第二道也判紅但理由錯 → 補確定性排序案例與判語檢查;Codex 兩條修正後加 M19 執行緒預算沒套上 · M20 layout 動詞漂移) |
 | 殺手閘 CGC_MDL187 v0103(`--base origin/main --run-selftest`) | 11 條全過 · rc 0;KILL-10 記債(薄尾委派前版自測,前版檢號照跑) |
 | 全景卡 | 問題 0 |
-| 格子 `--only` | Veritas 中央控管台七十一檢 OK;SSOT 正則·同義字連動 三站:檢 · 規劃 OK,驗收 FAIL(見第六節,main 原樣就紅) |
+| 格子 `--only` | Veritas 中央控管台七十二檢 OK;SSOT 正則·同義字連動 三站:檢 · 規劃 OK,驗收 FAIL(見第六節,main 原樣就紅) |
 | 容器實跑 `enter --card`(倉內) | rc 0 · 五步全綠:加速器 `VeritasCeleritas_v1141.py`(= 鎖冊,執行緒 3 maxsafe)· 網路工具 `VeritasAegisNexus_v1652.py`(載入器 SUP_MDL740 v0118 解析同一支,核心已載入,同意閘 閉)· layout `SUP_MDL743_GenericLayoutHub_v0109.py`(layout 動詞走同一支)· nlp v0105 · token v0116 · frame v0100 · PS 模板 ✓ |
 | 容器實跑 `enter -NoOpen`(倉外) | 位置:不在倉內 → 印進倉那一行;閘過 · 加速器 · 工具全綠;交給 `go` → 容器沒有 pwsh,照實 ABSENT rc 2;中樞事件 status → go → enter 三筆同一輪號 |
 | 工作流核對 | 修正後本輪第一筆 = H1 閘;未跑的步只是黃(容器沒跑 `go`) |
+
+## 五之二、PR #372 審查與 CI 抓到的(都在本 PR 修掉)
+
+| 誰抓到 | 什麼 | 怎麼修 |
+|---|---|---|
+| CI 合約測試 `test_11_committed_page_matches_generator` | 追蹤中的總控頁還是 v0172 的說明(新尾版沒照 LL49 重產總控頁) | 重產總控頁(第七節) |
+| Codex P2 | 執行緒預算套用失敗(`activate()` 回 `applied={"err": …}`)時,加速器仍報 GREEN、照樣交 `go` | 沒套上任何環境變數(回 err 或空)= RED 停;自測 ⑥ 加兩個反控 |
+| Codex P2 | `layout` 動詞(v0146 `def_layout_hub()`)取夾內 `sorted(glob)[-1]`、不看鎖冊;夾內有比鎖冊新、還沒啟用的一支時,卡只記一筆、不擋 | 照網路載入器同一把尺:動詞會走的 ≠ 鎖冊那一支 = 漂移 → RED 點名(新版先 `via-vcgc tools activate layout <檔> --apply`);判法照 v0146 的夾與 glob,自測 ⑦b 正反控 + 核兩個常數與前版同一把尺 |
 
 ## 六、測到的既有紅(不是本批造成的)
 

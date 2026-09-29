@@ -4,8 +4,8 @@ r"""
 v0502→v0503(側線 2026-09-29 f;主線批號由併線的手指定 L25):
   操作員令「應該要有進入環境指令 由vcgc進入跑他的流程如規定 加入加速器並告知目前加速器 網路工具 layout工具版本
   ssot一切整合最佳化測試除錯更新啟動全部」:VCGC v0173 多一個動詞 `via-vcgc enter`(位置 · 只快轉的更新 · 閘 · 加速器 · 工具版本 · 交 go)。
-  站名檢數(LL213,只換數字、前面補一句這一版加了什麼):Veritas 中央控管台 三十八 → **七十一**(CGC_MDL149 v0173 薄尾 +①~⑮;
-  站名從 v0129 起就沒跟上 —— v0130~v0172 各薄尾的檢號都由 PRIOR.selftest() 串著照跑,v0172 實印 56 檢,v0173 再 +15 = 71,照實數)。
+  站名檢數(LL213,只換數字、前面補一句這一版加了什麼):Veritas 中央控管台 三十八 → **七十二**(CGC_MDL149 v0173 薄尾 +①~⑮ 與 ⑦b;
+  站名從 v0129 起就沒跟上 —— v0130~v0172 各薄尾的檢號都由 PRIOR.selftest() 串著照跑,v0172 實印 56 檢,v0173 再 +16 = 72,照實數;⑦b 是 Codex #372 P2 的 layout 動詞對鎖冊檢)。
   站數不變;其餘站的 glob / 參數 / 期望一字不動;新薄尾由 newest() 自動接上,站不用改路徑。
 
 v0501→v0502(側線 2026-09-29 d;主線批號由併線的手指定 L25):
@@ -3324,7 +3324,7 @@ def battery(fast: bool):
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
     add("三大報表擷取引擎二十二檢(批688 --only 吃 PowerShell 陣列·注入 session 看門狗 40s 逾時/零列/拒收→原生·零列誠實 rc2 不炸;批505;VDF_ENG082;收容件 yfinance 車道走 AegisNexus session·雙閘 fail-closed·MOPS 探路·DuckDB+parquet 冪等;零網路自測)",
         newest("VDF_ENG082_FinStatements_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
-    add("Veritas 中央控管台七十一檢(側線 2026-09-29 f v0173 +①~⑮ enter 一句進環境:位置 · 只快轉更新 · 閘 · 加速器 · 工具版本 · 交 go;批735 v0129 +㊳ VRN 模板交接段:讀 VRN_ENG089 交接口本台只翻譯 · 缺席=ABSENT · 炸掉=RED;批728 v0128 +㊲ 冊同步 CGC_MDL185 四格委派:正主判燈本台只翻譯 · 缺席=ABSENT · 紅進 verify;側線 2026-09-23 v0127 +㊱ 不認得的動詞只印用法段;v0126 +㉝㉞㉟ SSOT 正則·同義字連動口:逐格委派正主 · plan 零寫 · 判燈;批699 +㉛㉜ 掃描面只增不減 · 排除清單逐條具名;批698 +㉚ 樞紐口委派檢;批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
+    add("Veritas 中央控管台七十二檢(側線 2026-09-29 f v0173 +①~⑮ ⑦b enter 一句進環境:位置 · 只快轉更新 · 閘 · 加速器 · 工具版本 · 交 go;批735 v0129 +㊳ VRN 模板交接段:讀 VRN_ENG089 交接口本台只翻譯 · 缺席=ABSENT · 炸掉=RED;批728 v0128 +㊲ 冊同步 CGC_MDL185 四格委派:正主判燈本台只翻譯 · 缺席=ABSENT · 紅進 verify;側線 2026-09-23 v0127 +㊱ 不認得的動詞只印用法段;v0126 +㉝㉞㉟ SSOT 正則·同義字連動口:逐格委派正主 · plan 零寫 · 判燈;批699 +㉛㉜ 掃描面只增不減 · 排除清單逐條具名;批698 +㉚ 樞紐口委派檢;批686b VCGC v0121 +㉗㉘ 三家一把尺;側線 e v0122 補回收尺時漏掉的 VDF bridge 段(主線 ㉖ 對接口在位即紅);側線 2026-09-21 +㉖ VDF 對接口;批682B +㉕ 執行期境不進等式;批681 +㉔ VRN 對接口;批506/516–519/567/568/598;+matrix 矩陣控制台:一行跑法都不自己寫,冊/啟動接 MDL148、引擎四態與修復候選接 MDL158、頁頭接 SUP_MDL750;CGC_MDL149 唯一對接口:政策庫·邏輯庫·因子庫·資料庫·調度·多矩陣·環境工具·註冊表·L19 安裝核可·一頁交接·VTMRA·G17 循環·U/I 對接;只讀零網路;v0113 起 ⑨ 的來源清單由 ⑳ 來源閘釘住,合成檢全關沙盒)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("SSOT 正則·同義字連動檢(側線 2026-09-23;VCGC v0126 ssot:規則樞紐 SUP_MDL749 · 增補橋 VRN_ENG088 · 同義聯集 CGC_MDL176 · 全冊編譯 CGC_MDL169 · 批728 v0128 冊同步 CGC_MDL185 逐格委派;只讀零寫;黃=待操作員裁定)",
         newest("CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", HERE), ["ssot"], "nodata_ok", 300)

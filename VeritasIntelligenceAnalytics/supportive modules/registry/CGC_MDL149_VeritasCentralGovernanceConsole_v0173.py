@@ -13,10 +13,10 @@ r"""CGC_MDL149_VeritasCentralGovernanceConsole v0173 — 薄尾:`via-vcgc enter`
     HEAD 有變 → 交給更新後的 VCGC 尾版(子行程 enter --no-pull),閘與後面各步都跑在新碼上。
   2 閘:照工作流 SSOT VCGC-WKF001-STP002 跑 status(政策整冊 · 子系統座位 · 加速器 / 網路已接);rc 不是 0 → 一步都不跑。
   3 加速器:VIA_SuperAccel_Module → SUP_MDL737 尾版 → 鎖冊那一本 Celeritas,activate():執行緒預算寫進本行程環境,
-    後面 go 起的每一支子行程都帶著(L103 ①)。載不起來 / 載到的不是鎖冊那一本 → 停。
+    後面 go 起的每一支子行程都帶著(L103 ①)。載不起來 / 載到的不是鎖冊那一本 / 執行緒預算沒套上 → 停。
   4 工具版本:鎖冊(CGC_MDL233 尾版 status)六件 —— 加速器 · 網路工具 · layout · nlp · token · frame —— 版號 · sha · 待啟用;
     網路載入器(SUP_MDL740 尾版)解析到哪一支、核心載不載得起來(不連網;同意閘只報開 / 閉)· layout 動詞走哪一支 · PS 模板章在不在。
-    sha 對不上 / 缺件 / 網路核心載不起來 → 停(換版只經 via-vcgc tools activate … --apply)。
+    sha 對不上 / 缺件 / 網路核心載不起來 / layout 動詞走的不是鎖冊那一支 → 停(換版只經 via-vcgc tools activate … --apply)。
   5 啟動全部:交給 go(v0166;操作台 PowerShell 尾版跑整輪:閘 → ENV MANAGER → 註冊同步 → VDF → 全景實測 → … → 單一路徑驗證 → 紀錄上傳)。
     --card 只出卡不啟動。結尾一行總結 + 一筆中樞事件(verb enter;VIA_HUB_RUN 沒設就給本輪一個 enter- 輪號,結束還原)。
   Python 改不了 PowerShell 的目前資料夾:「先進倉再跑」要一句完成,得在短令冊加一行(L70:本批不動 .ps1,一次貼見批文件)。
@@ -87,7 +87,8 @@ _STEM = "CGC_MDL149_VeritasCentralGovernanceConsole"
 ENTER_VERBS = ("enter",)
 OWN_FLAGS = ("--card", "--no-pull")
 MUST = ("accelerator", "network", "layout")          # 操作員點名要報的三件;鎖冊上缺任何一件都停
-LAYOUT_DIR = SUPP / "70_VRN_Rules"                    # v0146 layout 動詞找 SUP_MDL743 的同一個夾
+LAYOUT_DIR = SUPP / "70_VRN_Rules"                    # v0146 layout 動詞找 SUP_MDL743 的同一個夾(自測核 = PRIOR.LAYOUT_HUB)
+LAYOUT_PATTERN = "SUP_MDL743_GenericLayoutHub_v*.py"  # 同上(自測核 = PRIOR.LAYOUT_PATTERN)
 PS_TEMPLATE = SUPP / "ps7" / "VeritasCeleritas.PS7.ps1"
 _DEFAULT = object()
 
@@ -256,10 +257,10 @@ def accelerator(mod=_DEFAULT, act=_DEFAULT) -> dict:
         out["why"] = "Celeritas 沒載起來:" + str(a.get("err") or "?")[:160]
     elif out["pinned"] and out["body"] != out["pinned"]:
         out["why"] = f"載到 {out['body']},鎖冊是 {out['pinned']}"
+    elif not out["applied"]:                        # Codex #372 P2:沒套上的執行緒預算不能報 GREEN、不能照樣交 go
+        out["why"] = "執行緒預算沒套上:" + (str(applied["err"])[:120] if "err" in applied else "activate 沒回任何環境變數")
     else:
         out["state"] = "GREEN"
-        if "err" in applied:
-            out["why"] = "執行緒預算沒套上:" + str(applied["err"])[:120]
     return out
 
 
@@ -300,8 +301,11 @@ def tools_card(act=_DEFAULT, net=_DEFAULT, layout_dir: Path = LAYOUT_DIR, ps_tem
         problems.append(f"網路載入器解析到 {net_row['resolved'] or '(無)'},鎖冊是 {pinned_net}")
     elif not net_row["core"]:
         problems.append("網路核心載不起來 · " + (net_row["why"] or "_aegis() 回 None"))
-    newest_layout = _newest(layout_dir, "SUP_MDL743_GenericLayoutHub_v*.py")
-    layout = {"verb_uses": newest_layout.name if newest_layout else "", "pinned": (by.get("layout") or {}).get("pinned", "")}
+    picks = sorted(layout_dir.glob(LAYOUT_PATTERN))  # v0146 def_layout_hub() 的同一條:夾內 sorted()[-1],不看鎖冊
+    layout = {"verb_uses": picks[-1].name if picks else "", "pinned": (by.get("layout") or {}).get("pinned", "")}
+    if layout["verb_uses"] != layout["pinned"]:       # Codex #372 P2:layout 動詞實際跑的不是鎖冊那一支 = 漂移,和網路載入器同一把尺
+        problems.append(f"layout 動詞走 {layout['verb_uses'] or '(夾內沒有)'},鎖冊是 {layout['pinned'] or '(無)'}"
+                        " → 新版先經 VCGC 啟用:via-vcgc tools activate layout <檔> --apply")
     ps = {"path": str(ps_template), "present": ps_template.is_file()}
     if not ps["present"]:
         problems.append("PS 模板章不在 · " + ps_template.name)
@@ -437,7 +441,7 @@ def _enter(args: list, card: dict, dep: dict) -> int:
               f"({acc['mode']})寫進本行程 {acc['applied']} 個環境變數,後面每支子行程都帶 · lib 可用 {acc['libs']}"
               f" · 真實能力 {acc['real']}" + (f" · 註:{acc['why']}" if acc["why"] else ""))
     else:
-        print(f"[進入 3/5 · 加速器] RED:{acc['why']} → 停(L103 ①:PY 要導入加速器)")
+        print(f"[進入 3/5 · 加速器] RED:{acc['why']} → 停(L103 ①:PY 要導入加速器,執行緒預算要套上)")
         return 2
     tools = dep.get("tools", tools_card)()
     card["tools"] = {"state": tools["state"], "problems": tools["problems"],
@@ -561,11 +565,18 @@ def selftest() -> int:
                                                                      "thread_budget": 1, "mode": "safe"},
                                  _CEL={"mod": SimpleNamespace(__file__="/x/VeritasCeleritas_v" + "9999.py")}, CANONICAL="x")
     other = accelerator(mod=fake_other, act=act)
-    chk("⑥ 加速器:載入的就是鎖冊那一本 · 執行緒預算寫進本行程環境;載不起來 / 橋缺席 / 載到別本 = RED",
+
+    def fake_applied(applied):                      # 鎖冊那一本載起來了,但執行緒預算沒套上(activate 回 err / 空)
+        return SimpleNamespace(activate=lambda apply_limits=True: {"celeritas": True, "err": "", "applied": applied,
+                                                                   "thread_budget": 2, "mode": "safe"},
+                               _CEL={"mod": SimpleNamespace(__file__="/x/" + (pin.name if pin else "none"))}, CANONICAL="x")
+    unapplied = [accelerator(mod=fake_applied(a), act=act) for a in ({"err": "RuntimeError: boom"}, {})]
+    chk("⑥ 加速器:載入的就是鎖冊那一本 · 執行緒預算寫進本行程環境;載不起來 / 橋缺席 / 載到別本 / 執行緒預算沒套上 = RED",
         acc["state"] == "GREEN" and pin is not None and acc["body"] == pin.name and isinstance(acc["threads"], int)
         and acc["threads"] > 0 and os.environ.get("VIA_ACCEL_ACTIVE_THREADS") == str(acc["threads"])
         and accelerator(mod=fake_off, act=act)["state"] == "RED" and "沒載起來" in accelerator(mod=fake_off, act=act)["why"]
-        and accelerator(mod=None)["state"] == "RED" and other["state"] == "RED" and "鎖冊是" in other["why"],
+        and accelerator(mod=None)["state"] == "RED" and other["state"] == "RED" and "鎖冊是" in other["why"]
+        and all(u["state"] == "RED" and "執行緒預算沒套上" in u["why"] for u in unapplied),
         f"{acc['body']} · 執行緒 {acc['threads']}({acc['mode']})")
 
     tools = tools_card(act=act)
@@ -585,6 +596,18 @@ def selftest() -> int:
         and any("網路載入器不在" in p for p in bad["problems"]) and any("PS 模板" in p for p in bad["problems"])
         and off["state"] == "RED" and any("解析到" in p for p in off["problems"]),
         " · ".join(f"{k} {v.get('version')}" for k, v in fams.items()))
+    lay_pin = fams["layout"]["pinned"]
+    good_net = SimpleNamespace(__file__="/x/SUP_MDL740_NetUnified_v0999.py", VIA_AEGIS_PATH="/x/" + fams["network"]["pinned"],
+                               _aegis=lambda: object(), gate_state=lambda: {"open": False})
+    with tempfile.TemporaryDirectory() as ld:          # layout 夾只有鎖冊那一支 = 綠;多一支比鎖冊新(還沒啟用)= 動詞會走新的 → 紅
+        (Path(ld) / lay_pin).write_text("", encoding="utf-8")
+        same_lay = tools_card(act=act, net=good_net, layout_dir=Path(ld))
+        (Path(ld) / f"{lay_pin.rsplit('_v', 1)[0]}_v{_vnum(Path(lay_pin)) + 1:04d}.py").write_text("", encoding="utf-8")
+        ahead_lay = tools_card(act=act, net=good_net, layout_dir=Path(ld))
+    chk("⑦b layout 動詞走的 = 鎖冊那一支才綠;夾內有比鎖冊新、還沒啟用的一支 → RED 點名(同 v0146 的夾與 glob)",
+        same_lay["state"] == "GREEN" and ahead_lay["state"] == "RED"
+        and any(p.startswith("layout 動詞走") for p in ahead_lay["problems"])
+        and LAYOUT_DIR == PRIOR.LAYOUT_HUB and LAYOUT_PATTERN == PRIOR.LAYOUT_PATTERN, ahead_lay["layout"].get("verb_uses"))
 
     same = {"state": "OK", "why": "已是最新", "moved": False, "repo": "r", "branch": "main", "upstream": "origin/main",
             "head": "h", "head_after": "h", "ahead": 0, "behind": 0, "dirty": 0}
