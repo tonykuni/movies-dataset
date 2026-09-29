@@ -19,7 +19,7 @@
 | 6 | SYNC ALL TO GITHUB. | VCGC-REQ057 |
 | 7 | 收尾工作 / 交接 | VCGC-REQ058 · VCGC-REQ075 |
 
-非需求 3 則(照答,不入冊):暫停更新紀錄 · 現況提問 · 流程矩陣提問。需求冊 v0104 的 reviewed 從 144 則改記為 149 則。
+非需求 3 則(照答,不入冊):暫停更新紀錄 · 現況提問 · 流程矩陣提問。收尾追加的原話與 reviewed(144 → 149 則)記在**需求冊 v0105**:v0104 已隨 #376 併入 main,不就地改(Codex #377 P1;AGENTS.md 第 4 條「修改開新版」),v0104 與 main 位元一致。
 
 ## 二、本批交付
 
@@ -32,6 +32,7 @@
 | `CGC_MDL158_VIAPanoramaAuditRepair_v0117.py` | 省 Token:.json 兩層卡 · .jsonl 欄位卡 · JSON 路徑切片(`a.b[0]` · `[-1]` · `[*]` · `[鍵=值]`)· `chain` 薄尾版本鏈圖 | 本版 9/9 · 前版 45/45 · 啟用閘 10 項全過 · 鎖冊 token → v0117(VIA-TOOL-0212)· case `token` 收據 rc 0 |
 | `VIA_AI_FunctionCard_SSOT_v0100.json`(新) | AI 必用功能卡唯一正本:12 步必用順序 · 指令 · 時機 · 禁止。CLAUDE.md / AGENTS.md 只指向本冊 | `via-vcgc functions` rc 0 |
 | 需求冊 v0104 · VCGC 工作流冊 v0103 · VRN 工作流冊 v0103 | +VCGC-REQ077–083 · +VCGC-WKF001-STP007 · 回指補齊 | SDD X-REQ · X-REQ-BACK · X-NUM 綠 |
+| 需求冊 v0105(收尾) | VCGC-REQ078 補範圍令原話 · 需求句 · 證據;reviewed 149 則;其餘 108 條一字不動 | SDD X-REQ 綠(讀尾版 v0105) |
 | 交接冊(就地只增) | +case panorama / token · 本批工作項 6 件 VERIFIED · 4 件帶理由待辦 | 交接 GREEN · 驗收 YELLOW |
 
 ## 三、範圍令:編號只登本批的列
@@ -51,7 +52,7 @@
 | REQ · STP | 7 · 1 | VCGC-REQ077–083 · VCGC-WKF001-STP007 |
 | TOOL · ENV | 2 · 1 | token v0117 的兩列工具號(VIA-TOOL-0194 · VIA-TOOL-0212)· 鎖冊 token@v0117 |
 | LGC | 12 | 交接冊新增的 2 案 + 10 件工作項 |
-| SSOT(rows) | 4 | 功能卡 · 需求冊 v0104 · 兩本工作流冊 v0103;另外元件冊、交接冊兩本就地改過的冊換內容指紋 |
+| SSOT(rows) | 5 | 功能卡 · 需求冊 v0104 · v0105 · 兩本工作流冊 v0103;另外元件冊、交接冊兩本就地改過的冊換內容指紋 |
 | 分類碼 | 7 | FNC-C3946–C3951 · TOOL-C019 |
 
 **範圍外,不寫**(掛交接待辦 `VCGC-REQ078:backlog`,等操作員令):
@@ -66,7 +67,7 @@
 |---|---|---|---|
 | 第一步 省 Token | `token` | 已啟用 6/6(鎖版 v0117 · NLP v0105) | 綠 |
 | 註冊冊乾跑 | `registry-sync` | 活元件 13,820 · 新 0 · 變更 0 · 退役 0 · AST 錯 0 · 他冊已發 18 號 · 撞號 0 | 綠 |
-| 編號只增稽核 | `run CGC_MDL237_NumberingSystem audit` | 基準 main d6c304d92 · 101,489 → 101,625(+136)· 遺失 0 · 改身分 0 · 重號 0 · 冊內紅列 21(對 PR #375 前的 main cb3727e78:96,502 → 101,625,遺失 / 改身分 / 重號也都是 0) | 黃(紅列 21 在 HEAD 已是 21,本批沒加;法條缺號 Z263 · 同義一詞兩主 Z264 待裁) |
+| 編號只增稽核 | `run CGC_MDL237_NumberingSystem audit` | 基準 main d6c304d92 · 101,489 → 101,626(+137)· 遺失 0 · 改身分 0 · 重號 0 · 冊內紅列 21(對 PR #375 前的 main cb3727e78:96,502 → 101,626,遺失 / 改身分 / 重號也都是 0) | 黃(紅列 21 在 HEAD 已是 21,本批沒加;法條缺號 Z263 · 同義一詞兩主 Z264 待裁) |
 | SDD 交叉檢 | `run CGC_MDL245_SDDValidator check` | 工作流 30 · 步 110 · 需求 109 · 綠 14 項(X-REG · X-NUM ×2 · X-REQ · X-REQ-BACK · X-CONFLICT …) | 黃:X-REQ-OPEN 17(各有歸屬與下一步)· X-LOCK 6(見第五節) |
 | 交接測試 | `handoff test <case>` × 8 | handoff 68s · provenance 35s · entry 45s · manager 35s · sdd 38s · numbering 76s · panorama 35s · token 38s,全部 rc 0 且見到標記 | 綠 |
 | 交接快照 | `handoff checkpoint` | 需求 109 · 監看檔 2,745 · 待辦 25 · 可沿用 12 · findings 0 | 交接綠 · **驗收黃**(有待辦就不寫成成功) |
