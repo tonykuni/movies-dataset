@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""CGC_MDL245_SDDValidator v0102 — SDD 驗證器:工作流 SSOT 的自測 · 交叉測 · 實測 · 加鎖 · 收尾(薄尾:X-LOCK 依家族比尾版 · 失敗追因多兩種;R34 收尾實測)
+r"""CGC_MDL245_SDDValidator v0102 — SDD 驗證器:工作流 SSOT 的自測 · 交叉測 · 實測 · 加鎖 · 收尾(薄尾:X-LOCK 依家族比尾版 · FAIL / FINDING 追因;R34 收尾實測)
 
   ① X-LOCK 看不到換版(R34 實測):燈鎖冊 wkf 區記的是「正主尾版的路徑 → 檔名」,路徑本身含版號;v0100 的 check_lock 拿這個
   路徑去對這次 check 的尾版表(也以含版號的路徑為鍵)—— 尾版一換,舊路徑在新表裡就查不到,被當成「沒換」跳過,
@@ -16,7 +16,12 @@ r"""CGC_MDL245_SDDValidator v0102 — SDD 驗證器:工作流 SSOT 的自測 · 
                        其他任何 RED(工具鎖版 sha 不對 · 加速器 / 網路 / LAYOUT / NLP 載不起來 …)混在裡面 = 追不到,照舊 FAIL。
     pathverify_traced  單一路徑驗證本輪報告的**每一步** RED 都追得到因:「DB 面板」步 → dbpanel_absent,「ENV MANAGER」步 →
                        envmgr_exe_absent;有一步追不到(或報告不是本輪)= 追不到,照舊 FAIL。它是 pathverify_dbpanel 的超集。
-  掛法:v0100 的 check() / real() 叫的是 v0100 模組裡 check_lock · fail_cause 這兩個名字 → 本支換掉它們;舊兩種追因
+  ③ FINDING 也要追得到因(R34 收尾實測):空資料家時 L14 全庫同步(VRN_ENG082 sync-db)誠實 SKIP、rc 2,可是 rc 2 同時涵蓋
+  PARTIAL · BUSY · FAIL,中樞事件只記 rc → VDF-WKF001-STP005 停在沒有成因的 FINDING。步驟冊寫 `finding_cause: <種類>` 的步,
+  FINDING 而且還沒有手時,讀正主本輪報告追因:syncdb_no_target —— ENG082 v0111 起每輪落 SYNCDB_latest.json,本輪、SKIP、
+  目標 0 本、不是乾跑也不是指名 --db → 資料家空(要先有資料 = 操作員的手)。鏈上有 RED / CRASH 的工作流不替它找操作員端的因;
+  step: 證據跟著帶手;燈與操作員端旗重算(v0101 _relamp)。
+  掛法:v0100 的 check() / real() 叫的是 v0100 模組裡 check_lock · fail_cause · real 這幾個名字 → 本支換掉它們;舊兩種追因
   (dbpanel_absent · pathverify_dbpanel)原樣交回 v0100(前版照讀,不複製)。步驟冊寫哪一種,在 VIA_Workflow_<子系統>_SSOT 的步上 fail_cause。
   其餘一字未動。VIA_FROM_VCGC:只收中控呼叫(前版 main 守門)。不用 TA-Lib。
 """
@@ -180,6 +185,68 @@ def fail_cause(kind: str, since: str) -> str:
 
 
 _BASE.fail_cause = fail_cause
+FINDING_KINDS = ("syncdb_no_target",)
+
+
+def syncdb_no_target(since: str) -> str:
+    """VRN_ENG082 v0111+ 本輪 sync-db 報告:SKIP、目標 0 本、不是乾跑也不是指名 --db → 資料家空 → 回成因;否則回空字串。"""
+    d = _report("vrn", "extraction_logic", "SYNCDB_latest.json")
+    if not _fresh(d, since) or d.get("state") != "SKIP" or d.get("targets") or d.get("dry_run") or d.get("explicit_db"):
+        return ""
+    return ("資料家空:L14 全庫同步本輪沒有任何目標庫(ENG082 本輪報告 SKIP · 目標 0 本;env VIA_DB_* / VIA_DATA_HOME / "
+            "output_hub/mega 皆無 .duckdb)→ 有庫的資料家才寫得進去;抓料觸網要操作員開同意閘(L07/L08)")
+
+
+def finding_cause(kind: str, since: str) -> str:
+    """FINDING 追因;不認得的種類 → 追不到。"""
+    return syncdb_no_target(since) if kind == "syncdb_no_target" else ""
+
+
+def apply_finding_causes(rep: dict, state: dict, evs: list, ai_evs: list) -> list:
+    """步驟冊寫 finding_cause 的步:FINDING 且還沒有手 → 讀正主本輪報告追因,追得到就標手;step: 證據跟著;燈重算。回標到的步碼。"""
+    got = {}
+    for _, w in state["wkfs"]:
+        r = (rep.get("wkf") or {}).get(w["code"])
+        if not r or r.get("state") == "REGISTERED_ONLY":
+            continue
+        if any(o.get("state") not in _BASE.OPERATOR_HAND for o in ((r.get("chain") or {}).get("open") or [])):
+            continue                                            # 鏈上有 RED / CRASH = AI 端要修,不替它找操作員端的因
+        mine = ai_evs if (w.get("tests") or {}).get("real_run") == "ai" else evs
+        since = (mine[0].get("ts") if mine else "") or ""
+        for st in w.get("steps") or []:
+            s = (r.get("steps") or {}).get(st.get("code"))
+            if not st.get("finding_cause") or not s or s.get("state") != "FINDING" or s.get("hand"):
+                continue
+            c = finding_cause(st["finding_cause"], since)
+            if c:
+                s["hand"] = got[st["code"]] = c
+    for r in (rep.get("wkf") or {}).values():                   # step:<碼> 證據跟著它的來源帶手
+        for s in (r.get("steps") or {}).values():
+            src = str(s.get("by") or "")
+            if src.startswith("step:") and src[5:] in got and s.get("state") == "FINDING" and not s.get("hand"):
+                s["hand"] = got[src[5:]]
+    if got:
+        PRIOR._relamp(rep)
+    return sorted(got)
+
+
+_V0101_REAL = PRIOR.real
+
+
+def real(run: str | None = None, write: bool = True, ai_run: str | None = None) -> dict:
+    """v0102:v0101 的實測,再套 finding_cause(FINDING 追因)。"""
+    rep = _V0101_REAL(run, write=False, ai_run=ai_run)
+    _, evs = _BASE.run_events(rep.get("run") or "no-run")
+    _, ai_evs = _BASE.run_events(rep.get("ai_run") or "no-run", "ai-")
+    rep["engine"] = ENGINE
+    rep["finding_causes"] = apply_finding_causes(rep, _BASE.load_books(), evs, ai_evs)
+    if write:
+        _BASE.OUT.mkdir(parents=True, exist_ok=True)
+        (_BASE.OUT / "SDD_REAL_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
+    return rep
+
+
+_BASE.real = real
 
 
 def selftest() -> int:
@@ -290,10 +357,50 @@ def selftest() -> int:
             chk("㉔ 舊種類原樣交回 v0100:pathverify_dbpanel · dbpanel_absent 照舊判", "資料家缺庫" in fail_cause("pathverify_dbpanel", since)
                 and "資料家缺庫" in fail_cause("dbpanel_absent", since))
             chk("㉕ 不認得的種類 → 追不到", fail_cause("no_such_kind", since) == "")
+            put("vrn/extraction_logic/SYNCDB_latest.json", {"ts": "2026-09-29 05:12:00", "state": "SKIP", "targets": [], "dry_run": False,
+                                                           "explicit_db": "", "why": "庫缺:env VIA_DB_* / VIA_DATA_HOME / output_hub/mega 皆無 .duckdb"})
+            c = finding_cause("syncdb_no_target", since)
+            chk("㉖ syncdb_no_target:ENG082 本輪報告 SKIP、目標 0 本 → 資料家空 · 操作員端", c.startswith("資料家空") and "操作員" in c, c[:40])
+            chk("㉗ syncdb_no_target:報告不是本輪 → 追不到;不認得的 FINDING 種類 → 追不到",
+                finding_cause("syncdb_no_target", "2026-09-29 05:30:00") == "" and finding_cause("no_such_kind", since) == "")
+            base = {"ts": "2026-09-29 05:12:00", "state": "SKIP", "targets": [], "dry_run": False, "explicit_db": ""}
+            miss = []
+            for bad in ({"state": "BUSY"}, {"state": "PARTIAL"}, {"state": "FAIL"}, {"targets": ["x.duckdb"]}, {"dry_run": True},
+                        {"explicit_db": "x.duckdb"}):
+                put("vrn/extraction_logic/SYNCDB_latest.json", dict(base, **bad))
+                if finding_cause("syncdb_no_target", since):
+                    miss.append(bad)
+            chk("㉘ syncdb_no_target:庫忙 · 部分 · 寫壞 · 有目標庫 · 乾跑 · 指名 --db 都追不到(照舊要人看)", not miss, miss)
+            put("vrn/extraction_logic/SYNCDB_latest.json", base)
+            wf = {"code": "T-WKF009", "tests": {"real_run": "go"}, "steps": [
+                {"code": "T-WKF009-STP001", "match": [["VRN_ENG082_ExtractionLogic", "sync-db"]], "finding_cause": "syncdb_no_target"},
+                {"code": "T-WKF009-STP002", "evidence": "step:T-WKF009-STP001"},
+                {"code": "T-WKF009-STP003", "match": [["X", None]]}]}
+
+            def rep9(s1="FINDING", open_=None):
+                return {"wkf": {"T-WKF009": {"state": "FINDING", "chain": {"open": open_ or []}, "steps": {
+                    "T-WKF009-STP001": {"state": s1, "rc": 2},
+                    "T-WKF009-STP002": {"state": s1, "by": "step:T-WKF009-STP001"},
+                    "T-WKF009-STP003": {"state": "FINDING", "hand": "同意閘沒開"}}}}}
+            ev9 = [{"ts": "2026-09-29 05:05:00", "t0": 1}]
+            r9 = rep9()
+            done = apply_finding_causes(r9, {"wkfs": [("T", wf)]}, ev9, [])
+            st9 = r9["wkf"]["T-WKF009"]["steps"]
+            chk("㉙ apply_finding_causes:追得到 → 標手;step: 證據跟著帶手;每一步都有手 → 工作流記操作員端",
+                done == ["T-WKF009-STP001"] and st9["T-WKF009-STP001"]["hand"].startswith("資料家空")
+                and st9["T-WKF009-STP002"].get("hand") == st9["T-WKF009-STP001"]["hand"] and r9["wkf"]["T-WKF009"].get("operator_hand") is True)
+            r9 = rep9(open_=[{"id": "4b", "state": "RED"}])
+            chk("㉚ apply_finding_causes:鏈上有 RED → 不替它找操作員端的因", apply_finding_causes(r9, {"wkfs": [("T", wf)]}, ev9, []) == []
+                and "hand" not in r9["wkf"]["T-WKF009"]["steps"]["T-WKF009-STP001"])
+            r9 = rep9(s1="FAIL")
+            chk("㉛ apply_finding_causes:只管 FINDING(FAIL 歸 fail_cause)", apply_finding_causes(r9, {"wkfs": [("T", wf)]}, ev9, []) == [])
+            r9 = rep9()
+            chk("㉜ apply_finding_causes:別輪(ai-)的事件不串到 go 輪的步", apply_finding_causes(r9, {"wkfs": [("T", wf)]}, [], ev9) == [])
         finally:
             _BASE.VIA = saved
-    chk("㉖ v0100.real() 叫的就是本支的 fail_cause(換掉模組全域)", _BASE.fail_cause is fail_cause and PRIOR.PRIOR is _BASE)
-    chk("㉗ 報告與燈鎖冊記本支引擎名", _BASE.ENGINE == ENGINE and PRIOR.ENGINE == ENGINE)
+    chk("㉝ v0100.real() 叫的就是本支的 fail_cause(換掉模組全域)", _BASE.fail_cause is fail_cause and PRIOR.PRIOR is _BASE)
+    chk("㉞ v0100 的 real 換成本支(v0101 的實測再套 finding_cause)", _BASE.real is real and _V0101_REAL is PRIOR.real)
+    chk("㉟ 報告與燈鎖冊記本支引擎名", _BASE.ENGINE == ENGINE and PRIOR.ENGINE == ENGINE)
     used = {}
     for sub in ("VCGC", "VDF", "VRN"):
         book = _BASE._json(_BASE.newest(f"VIA_Workflow_{sub}_SSOT_v*.json"), {}) or {}
@@ -301,12 +408,21 @@ def selftest() -> int:
             for s in w.get("steps") or []:
                 if s.get("fail_cause"):
                     used[s["code"]] = s["fail_cause"]
-    chk("㉘ 三冊尾版的 fail_cause 都是本支認得的種類", used and set(used.values()) <= set(KINDS), used)
-    chk("㉙ VCGC 冊尾版:ENV MANAGER 步帶 envmgr_exe_absent · 路徑驗證步帶 pathverify_traced",
+    chk("㊱ 三冊尾版的 fail_cause 都是本支認得的種類", used and set(used.values()) <= set(KINDS), used)
+    chk("㊲ VCGC 冊尾版:ENV MANAGER 步帶 envmgr_exe_absent · 路徑驗證步帶 pathverify_traced",
         used.get("VCGC-WKF001-STP004") == "envmgr_exe_absent" and used.get("VCGC-WKF002-STP002") == "pathverify_traced")
+    fused = {}
+    for sub in ("VCGC", "VDF", "VRN"):
+        book = _BASE._json(_BASE.newest(f"VIA_Workflow_{sub}_SSOT_v*.json"), {}) or {}
+        for w in book.get("workflows") or []:
+            for s in w.get("steps") or []:
+                if s.get("finding_cause"):
+                    fused[s["code"]] = s["finding_cause"]
+    chk("㊳ 三冊尾版的 finding_cause 都是本支認得的種類;VDF-WKF001-STP005(L14 全庫同步)帶 syncdb_no_target",
+        set(fused.values()) <= set(FINDING_KINDS) and fused.get("VDF-WKF001-STP005") == "syncdb_no_target", fused)
     body = Path(__file__).read_text(encoding="utf-8")
-    chk("㉚ 本支帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記", "[VIA:ACCEL-BRIDGE" in body and "[VIA:NET-BRIDGE" in body and "VIA_FROM_VCGC" in body)
-    chk("㉛ 不含 TA-Lib 匯入", not re.search(r"^\s*(?:import|from)\s+" + "ta" + r"lib\b", body, re.M))
+    chk("㊴ 本支帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記", "[VIA:ACCEL-BRIDGE" in body and "[VIA:NET-BRIDGE" in body and "VIA_FROM_VCGC" in body)
+    chk("㊵ 不含 TA-Lib 匯入", not re.search(r"^\s*(?:import|from)\s+" + "ta" + r"lib\b", body, re.M))
     rc = PRIOR.selftest()
     return 0 if all(ok) and rc == 0 else 1
 

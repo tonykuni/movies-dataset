@@ -5,6 +5,9 @@ v0501→v0502(側線 2026-09-29 d;主線批號由併線的手指定 L25):
   操作員令「close out these three projects」+「activate and verify the results」(R34 收尾實測):
   站名檢數(LL213,只換數字不動其他字):增量擷取閘 二十四 → **二十九**(VDF_ENG089 v0107 薄尾 +①~⑤:資料家目錄在、一本庫都沒有的
   ABSENT 也講得出先跑哪一句 —— 前版 ⑤ 在資料家空的容器實跑紅,SDD self:all 跟著紅)。
+  VRN 擷取中央邏輯庫 十二 → **二十六**(VRN_ENG082 v0111 薄尾 +①~⑤ 全庫同步落本輪報告 SYNCDB_latest.json;站名早就少算 ——
+  前版 v0110 實跑已是二十一檢,這次照實數 +5)。VRN 驗證矩陣仍 五十八(VRN_ENG083 v0120 只改 ㊸ 的讀法:沿 ENG073 薄尾鏈找正典表,
+  正反控放在同一檢裡,檢數不變)。
   站數不變;其餘站的 glob / 參數 / 期望一字不動;新薄尾由 newest() 自動接上,站不用改路徑。
   (同批的 CGC_MDL245 v0102 SDD 驗證器沒有格子站,照舊由 VCGC sdd 與 SDD 自己的 --selftest 驗。)
 
@@ -3307,7 +3310,7 @@ def battery(fast: bool):
             "r=subprocess.run([sys.executable,r'" + str(_ue) + "','--selftest'],capture_output=True,text=True,timeout=570,"
             "cwd=r'" + str(_ue.parent) + "',stdin=subprocess.DEVNULL)\n"
             "sys.stdout.write((r.stdout or '')[-4000:]); sys.stderr.write((r.stderr or '')[-1500:]); sys.exit(r.returncode)\n")})
-    add("VRN 擷取中央邏輯庫十二檢(批493;非OCR雙法互核·OCR階梯 simple→dual→paddle·文字修復·命中不重抽·PaddleOCR 3.x 墊片)",
+    add("VRN 擷取中央邏輯庫二十六檢(批493;非OCR雙法互核·OCR階梯 simple→dual→paddle·文字修復·命中不重抽·PaddleOCR 3.x 墊片)",
         newest("VRN_ENG082_ExtractionLogic_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 300)
     add("財務邏輯統轄橋九檢(批504;AllInOne 2.1.0 + FDS 28 欄掛載·第二意見·評等正典·政策因子·公式檢;零網路)",
         newest("SUP_MDL748_FinancialLogicHub_v*.py", VIA / "supportive modules/70_VRN_Rules"), ["--selftest"], "rc0", 180)
