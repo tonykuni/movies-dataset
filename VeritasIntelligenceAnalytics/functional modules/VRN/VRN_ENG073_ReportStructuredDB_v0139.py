@@ -54,6 +54,13 @@ def __getattr__(name: str):
 
 _BOOK_RX = re.compile(r"^Register-VIA-Commands-v\d{4}\.ps1$")
 
+# The upside labels' canon is this family's tail (VRN_ENG086 reads UPS_PRICE_RX / UPS_TOTAL_RX off the newest ENG073 file by
+# AST, not by import). A thin tail must still carry them, word for word as v0138 (selftest asserts they are identical).
+UPS_PRICE_RX = re.compile(
+    r"(?:Expected\s*)?share\s*price\s*return|股價報酬(?:率)?|價格報酬(?:率)?", re.I)
+UPS_TOTAL_RX = re.compile(
+    r"(?:Expected\s*)?total\s*return|總報酬(?:率)?|整體報酬(?:率)?", re.I)
+
 
 def _chain_reader():
     """The command-book chain reader of CGC_MDL157 (its owner since v0106); absent → None (then the tail text is read, as before)."""
@@ -88,11 +95,16 @@ def selftest() -> int:
                 busy.pop()
         return orig(self, *a, **k)
 
+    same = (UPS_PRICE_RX.pattern, UPS_PRICE_RX.flags, UPS_TOTAL_RX.pattern, UPS_TOTAL_RX.flags) == \
+        (PRIOR.UPS_PRICE_RX.pattern, PRIOR.UPS_PRICE_RX.flags, PRIOR.UPS_TOTAL_RX.pattern, PRIOR.UPS_TOTAL_RX.flags)
+    print(f"  [{'OK' if same else 'FAIL'}] v0139 尾版帶的上漲空間標籤正規式與 v0138 逐字相同(VRN_ENG086 以尾版為正本讀)")
     Path.read_text = book_aware
     try:
         rc = PRIOR.selftest()
     finally:
         Path.read_text = orig
+    if not same:
+        rc = rc or 1
     print(f"  [v0139] 命令冊照 dot-source 鏈讀(正主 CGC_MDL157 v0106 起的 read):{'有' if reader else '缺,照舊讀尾版'}")
     return rc
 
