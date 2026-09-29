@@ -1,0 +1,722 @@
+{
+ "schema": "VIA.LampLock.v2",
+ "measured_at": "2026-09-28 16:20:01",
+ "measured_by": "容器實跑(Invoke-VIA-Sweep-v0103 · HEAD a1e81465 · 同意閘未開;VRN 鏈另於 ENG067 v0104 / ENG068 v0108 後重跑)",
+ "door": "via-vcgc",
+ "prior": "VIA_LampLock_v0105.json",
+ "why": "R24 實測收尾:VRN_ENG052_DocxEngine 本次轉綠 → 加鎖。VRN_AutoTestLoop 容器綠(26s)但工作站 900s 逾時(Z260 未結)→ 暫不鎖,工作站貼回綠再鎖(鎖了就會在工作站立刻判回歸)。其餘照 v0101。",
+ "rule": "已鎖項目 RED / ABSENT / NODATA / CRASH = 回歸;GATED / SKIP = 未量(同意閘沒開或本次略過),不算回歸。新轉綠的項目由 AI 依貼回實錄開下一版冊加鎖(工作站不自己寫冊,避免 git pull 衝突)。",
+ "locked": [
+  "vdf_policy",
+  "vdf_logic",
+  "vdf_factor",
+  "vdf_param",
+  "vdf_engine",
+  "vdf_bridge",
+  "vdf_tool",
+  "vdf_handover",
+  "vdf_records",
+  "vrn_policy",
+  "vrn_logic",
+  "vrn_factor",
+  "vrn_param",
+  "vrn_handover",
+  "vrn_records",
+  "vrn_ssot"
+ ],
+ "open": [
+  "vrn_engine"
+ ],
+ "nodes": {
+  "vdf": [
+   "0a",
+   "0b",
+   "0c",
+   "1",
+   "2",
+   "3a",
+   "3b",
+   "4a",
+   "4b",
+   "4c"
+  ],
+  "vrn": [
+   "加速器掛載",
+   "網路工具掛載",
+   "SUP_MDL030_VISVRNTickerFilenameSSOT",
+   "SUP_MDL031_VISVRNTickerRegexShim",
+   "SUP_MDL015_VISVRNBrokerAliasFullList",
+   "VRN_ENG084_FilenameTokenParse",
+   "VRN_ENG082_ExtractionLogic",
+   "VRN_ENG060_TextOmni",
+   "VRN_ENG058_TableOmni",
+   "VRN_ENG056_PdfForensics",
+   "VRN_ENG059_GapMultirescue",
+   "VRN_ENG075_DocToMarkdown",
+   "VRN_ENG077_OmniFormatBridge",
+   "SUP_MDL747_OcrLaneRunner",
+   "SUP_MDL746_PDFPlumberPlusHub",
+   "VRN_ENG017_MDL004OCRFetchingPDFTable",
+   "VRN_ENG018_MDL005OCRFetchingPDFText",
+   "VRN_ENG023_MDL011DailyFetcher",
+   "VRN_ENG070_YahooConsensus",
+   "VRN_ENG057_ScanOcrRescue",
+   "VRN_ENG074_FinancialPages",
+   "VRN_ENG063_Lexicon",
+   "VRN_ENG085_MarkdownRestore",
+   "VRN_ENG086_FirstPageLogicBridge",
+   "VRN_ENG087_NLPTextSummaryBridge",
+   "VRN_ENG055_OfficeMerge",
+   "VRN_ENG066_NLPSupportHub",
+   "VRN_ENG071_CnyesFusion",
+   "VRN_ENG078_NLPOneBridge",
+   "VRN_ENG073_ReportStructuredDB",
+   "VRN_ENG067_MindMapSSOT",
+   "VRN_ENG083_VerifiedMatrix",
+   "VRN_ENG076_RegressionGate",
+   "CGC_MDL141_ClosingGate",
+   "VRN_ENG049_ContentReconcile",
+   "VRN_ENG080_FourPointDigest",
+   "VRN_ENG079_ControlTowerDashboard",
+   "VRN_ENG089_TemplateView",
+   "VRN_ENG090_FinStatementsTemplate",
+   "VRN_ENG062_SummarizerV1",
+   "VRN_ENG065_MailIntel",
+   "VRN_ENG081_ParquetMainDB",
+   "VRN_ENG050_ContentStore",
+   "VRN_ENG069_ConsensusDB",
+   "VRN_ENG052_DocxEngine"
+  ]
+ },
+ "nodes_open": {
+  "vdf": [],
+  "vrn": [
+   "VRN_ENG072_FirstPageText",
+   "VRN_ENG064_KnowledgeStack",
+   "VRN_AutoTestLoop",
+   "VRN_ENG068_DailyBrief"
+  ]
+ },
+ "pending_lock": {
+  "VRN_AutoTestLoop": "容器綠;工作站逾時(Z260)未結 → 工作站綠才鎖"
+ },
+ "wkf_rule": "SDD 工作流過關(CGC_MDL245:靜態不紅 · 自測 / 實測 OK)= 鎖:記步正主的尾版 · 編號 · 註冊時間;之後尾版換了 = X-LOCK 要重驗,狀態退步 = 回歸紅",
+ "wkf_measured_at": "2026-09-29 01:54:00",
+ "wkf_head": "040178d7f8e1",
+ "wkf_run": "go-20260929-014327-2328",
+ "wkf_ai_run": "ai-r33-final-20260929-014059",
+ "wkf": {
+  "VCGC-WKF003": {
+   "alias": "ai_change",
+   "level": "real",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "CGC_MDL158_VIAPanoramaAuditRepair_v0116.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0172.py": "CGC_MDL149_VeritasCentralGovernanceConsole_v0172.py",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0108.py": "CGC_MDL124_BridgeSweeper_v0108.py",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0104.py": "CGC_MDL237_NumberingSystem_v0104.py",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "CGC_MDL245_SDDValidator_v0101.py",
+    "supportive modules/registry/CGC_MDL058_Lessons_v0102.py": "CGC_MDL058_Lessons_v0102.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "VIA-VCGC-MDL1417",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0172.py": "VIA-VCGC-MDL1425",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0108.py": "VIA-VCGC-MDL794",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0104.py": "VIA-VCGC-MDL1415",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "VIA-VCGC-MDL1420",
+    "supportive modules/registry/CGC_MDL058_Lessons_v0102.py": "VIA-VCGC-MDL1412"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "2026-09-28T23:42:26",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0172.py": "2026-09-29T01:41:44",
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0108.py": "2026-09-28T18:20:56",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0104.py": "2026-09-28T23:10:28",
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "2026-09-29T01:41:44",
+    "supportive modules/registry/CGC_MDL058_Lessons_v0102.py": "2026-09-28T22:44:26"
+   }
+  },
+  "VCGC-WKF004": {
+   "alias": "sdd_closeout",
+   "level": "real",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "CGC_MDL245_SDDValidator_v0101.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "VIA-VCGC-MDL1420"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v0101.py": "2026-09-29T01:41:44"
+   }
+  },
+  "VCGC-WKF006": {
+   "alias": "via_ssot_autocode_governance",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL155_VIAUnifiedSSOTAutoCode_v0101.py": "CGC_MDL155_VIAUnifiedSSOTAutoCode_v0101.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL155_VIAUnifiedSSOTAutoCode_v0101.py": "VIA-VCGC-MDL1053"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL155_VIAUnifiedSSOTAutoCode_v0101.py": "2026-09-16T16:23:34"
+   }
+  },
+  "VCGC-WKF007": {
+   "alias": "via_accelerator_control",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py": "CGC_MDL156_VIAAcceleratorControl_v0111.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py": "VIA-VCGC-MDL1065"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py": "2026-09-28T18:20:56"
+   }
+  },
+  "VCGC-WKF008": {
+   "alias": "via_unique_entry_control",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "CGC_MDL157_VIAUniqueEntryControl_v0106.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "VIA-VCGC-MDL1418"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "2026-09-29T01:41:44"
+   }
+  },
+  "VCGC-WKF009": {
+   "alias": "via_panorama_chain",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "CGC_MDL157_VIAUniqueEntryControl_v0106.py",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "CGC_MDL158_VIAPanoramaAuditRepair_v0116.py"
+   },
+   "numbered": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "VIA-VCGC-MDL1418",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "VIA-VCGC-MDL1417"
+   },
+   "registered": {
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0106.py": "2026-09-29T01:41:44",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0116.py": "2026-09-28T23:42:26"
+   }
+  },
+  "VCGC-WKF010": {
+   "alias": "via_unified_nlp_pipeline",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py": "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py",
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "VRN_ENG087_NLPTextSummaryBridge_v0101.py"
+   },
+   "numbered": {
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py": "VIA-SUP-MDL066",
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "VIA-VRN-ENG259"
+   },
+   "registered": {
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py": "2026-09-28T18:20:56",
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "2026-09-16T16:23:34"
+   }
+  },
+  "VDF-WKF004": {
+   "alias": "vdf_daily_update",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0110.py": "VDF_ENG054_TWDailyBackfill_v0110.py",
+    "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0106.py": "VDF_ENG056_ChipBackfill_v0106.py",
+    "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0109.py": "VDF_ENG057_TradingValueBackfill_v0109.py",
+    "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0102.py": "VDF_ENG081_UniverseAlign_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "VDF_ENG073_DataArchitecture_v0101.py"
+   },
+   "numbered": {
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0110.py": "VIA-VDF-ENG039",
+    "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0106.py": "VIA-VDF-ENG069",
+    "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0109.py": "VIA-VDF-ENG079",
+    "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0102.py": "VIA-VDF-ENG213",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "VIA-VDF-ENG170"
+   },
+   "registered": {
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0110.py": "2026-09-28T18:20:56",
+    "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0106.py": "2026-09-28T18:20:56",
+    "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0109.py": "2026-09-28T18:20:56",
+    "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0102.py": "2026-09-24T17:17:52",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "2026-09-24T09:09:41"
+   }
+  },
+  "VDF-WKF005": {
+   "alias": "vdf_db_governance",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0103.py": "VDF_ENG079_LocalDbConsolidate_v0103.py",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "VDF_ENG073_DataArchitecture_v0101.py"
+   },
+   "numbered": {
+    "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0103.py": "VIA-VDF-ENG210",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "VIA-VDF-ENG170"
+   },
+   "registered": {
+    "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0103.py": "2026-09-24T17:42:25",
+    "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "2026-09-24T09:09:41"
+   }
+  },
+  "VDF-WKF006": {
+   "alias": "vatetf_pipeline",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py": "VDF_ENG077_ActiveETFUniverse_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py": "VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+    "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0102.py": "VDF_ENG076_ETFRevenueMomentum_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0105.py": "VDF_ENG085_VatetfBridge_v0105.py"
+   },
+   "numbered": {
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py": "VIA-VDF-ENG192",
+    "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py": "VIA-VDF-ENG206",
+    "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0102.py": "VIA-VDF-ENG186",
+    "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0105.py": "VIA-VDF-ENG226"
+   },
+   "registered": {
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py": "2026-09-28T18:20:56",
+    "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py": "2026-09-28T18:20:56",
+    "functional modules/VDF/engine/VDF_ENG076_ETFRevenueMomentum_v0102.py": "2026-09-24T16:05:57",
+    "functional modules/VDF/engine/VDF_ENG085_VatetfBridge_v0105.py": "2026-09-24T12:33:07"
+   }
+  },
+  "VDF-WKF010": {
+   "alias": "vdf_market_lists_acceptance",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0105.py": "VDF_ENG087_MarketListGovernance_v0105.py"
+   },
+   "numbered": {
+    "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0105.py": "VIA-VDF-ENG234"
+   },
+   "registered": {
+    "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0105.py": "2026-09-28T18:20:56"
+   }
+  },
+  "VRN-WKF003": {
+   "alias": "vrn_text_completeness",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "supportive modules/registry/VIA_Policy_VRNTextScope_v0100.json": "VIA_Policy_VRNTextScope_v0100.json",
+    "functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py": "VRN_ENG392_TextCompleteness_v0100.py"
+   },
+   "numbered": {
+    "supportive modules/registry/VIA_Policy_VRNTextScope_v0100.json": "VIA-VCGC-PLCY678",
+    "functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py": "VIA-VRN-ENG304"
+   },
+   "registered": {
+    "supportive modules/registry/VIA_Policy_VRNTextScope_v0100.json": null,
+    "functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py": "2026-09-28T20:02:06"
+   }
+  },
+  "VRN-WKF005": {
+   "alias": "vrn_logic_nlp",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py": "VRN_ENG082_ExtractionLogic_v0110.py",
+    "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v0100.py": "SUP_MDL748_FinancialLogicHub_v0100.py",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py": "SUP_MDL744_NLPApplicationHub_v0102.py"
+   },
+   "numbered": {
+    "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py": "VIA-VRN-ENG212",
+    "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v0100.py": "VIA-SUP-MDL044",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py": "VIA-SUP-MDL037"
+   },
+   "registered": {
+    "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py": "2026-09-15T09:26:41",
+    "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub_v0100.py": "2026-09-15T08:40:26",
+    "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py": "2026-09-15T10:48:39"
+   }
+  },
+  "VRN-WKF007": {
+   "alias": "vrn_nlp_vdf_pipeline",
+   "level": "selftest",
+   "locked_at": "2026-09-29 01:54:00",
+   "head": "040178d7f8e1",
+   "run": "go-20260929-014327-2328",
+   "versions": {
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "VRN_ENG087_NLPTextSummaryBridge_v0101.py"
+   },
+   "numbered": {
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "VIA-VRN-ENG259"
+   },
+   "registered": {
+    "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py": "2026-09-16T16:23:34"
+   }
+  }
+ },
+ "wkf_open": {
+  "VCGC-WKF001": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VCGC-WKF001-STP004": {
+     "state": "FINDING",
+     "rc": 2,
+     "at": "2026-09-29 01:44:27",
+     "secs": 14.1,
+     "runs": 1,
+     "hand": "ENV MANAGER AMBER = 缺套件 / 家族境未建(只查不裝;裝件是操作員的手 · L07/L08)"
+    }
+   }
+  },
+  "VCGC-WKF002": {
+   "state": "FAIL",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VCGC-WKF002-STP002": {
+     "state": "FAIL",
+     "rc": 1,
+     "at": "2026-09-29 01:46:53",
+     "secs": 1.6,
+     "runs": 1,
+     "hand": "單一路徑驗證只因 DB 面板紅 → 資料家缺庫:DB 面板核對 ABSENT 63 列、沒有真正 RED(整本庫不在目錄;有庫的資料家才量得到)"
+    }
+   }
+  },
+  "VCGC-WKF005": {
+   "state": "FAIL",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VCGC-WKF005-STP001": {
+     "state": "FAIL",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "功能驗收紅:股票價史只到 2024-01-02(驗收要 2023-01-01 起;回補要網路 → 操作員開同意閘)· QuantGuard 缺 polars(裝件是操作員的手)",
+      "ref": "VDF-REQ004 · VCGC-REQ046"
+     },
+     "hand": "功能驗收紅:股票價史只到 2024-01-02(驗收要 2023-01-01 起;回補要網路 → 操作員開同意閘)· QuantGuard 缺 polars(裝件是操作員的手)"
+    }
+   }
+  },
+  "VDF-WKF001": {
+   "state": "FAIL",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [
+    {
+     "id": "0b",
+     "state": "GATED",
+     "why": "同意閘沒開(L07/L08:只有操作員能開)",
+     "detail": "SUP_MDL740_NetUnified_v0118.py · 後端 supportive modules/network/VeritasAegisNexus_v1652.py · 閘一=未開 閘二"
+    },
+    {
+     "id": "3a",
+     "state": "NODATA",
+     "why": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)",
+     "detail": "[計] 十一檢 OK 3 · FAIL 0 · NODATA 1 · SKIP 7(誠實多態) / [註] 正式台股庫自測前後一致(rc=2;缺料不是壞掉)"
+    },
+    {
+     "id": "3b",
+     "state": "NODATA",
+     "why": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)",
+     "detail": "[計] 十檢 OK 2 · FAIL 0 · NODATA 1 · SKIP 7(誠實多態) / [註] 正式台股庫自測前後一致(rc=2;缺料不是壞掉)"
+    }
+   ],
+   "steps": {
+    "VDF-WKF001-STP001": {
+     "state": "FINDING",
+     "rc": 2,
+     "at": "2026-09-29 01:45:07",
+     "secs": 0.9,
+     "runs": 1,
+     "hand": "建庫計畫 rc 2 = 有待建表(需網路者待操作員開同意閘 VIA_NET_CONSENT · L07)"
+    },
+    "VDF-WKF001-STP002": {
+     "state": "FINDING",
+     "rc": 4,
+     "at": "2026-09-29 01:45:08",
+     "secs": 0.5,
+     "runs": 1,
+     "hand": "鏈 rc 4 = 有站 GATED / NODATA(同意閘 · 沒料);逐站原因看鏈報告"
+    },
+    "VDF-WKF001-STP003": {
+     "state": "FAIL",
+     "evidence": "step:VDF-WKF003-STP001",
+     "by": "step:VDF-WKF003-STP001",
+     "hand": "資料家缺庫:DB 面板核對 ABSENT 63 列、沒有真正 RED(整本庫不在目錄;有庫的資料家才量得到)"
+    }
+   }
+  },
+  "VDF-WKF002": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VDF-WKF002-STP002": {
+     "state": "FINDING",
+     "evidence": "chain:vdf:0b",
+     "by": "chain:vdf:0b",
+     "hand": "同意閘沒開(L07/L08:只有操作員能開)"
+    },
+    "VDF-WKF002-STP006": {
+     "state": "FINDING",
+     "evidence": "chain:vdf:3a",
+     "by": "chain:vdf:3a",
+     "hand": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)"
+    },
+    "VDF-WKF002-STP007": {
+     "state": "FINDING",
+     "evidence": "chain:vdf:3b",
+     "by": "chain:vdf:3b",
+     "hand": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)"
+    }
+   }
+  },
+  "VDF-WKF003": {
+   "state": "FAIL",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VDF-WKF003-STP001": {
+     "state": "FAIL",
+     "rc": 1,
+     "at": "2026-09-29 01:46:00",
+     "secs": 0.7,
+     "runs": 1,
+     "hand": "資料家缺庫:DB 面板核對 ABSENT 63 列、沒有真正 RED(整本庫不在目錄;有庫的資料家才量得到)"
+    }
+   }
+  },
+  "VDF-WKF007": {
+   "state": "CANON",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VDF-WKF007-STP004": {
+     "state": "CANON",
+     "by": "selftest",
+     "hand": "正本唯讀(不改、無獨立自測門;實測走匯流排 call --item,需資料家)"
+    },
+    "VDF-WKF007-STP005": {
+     "state": "CANON",
+     "by": "selftest",
+     "hand": "正本唯讀(不改、無獨立自測門;實測走匯流排 call --item,需資料家)"
+    }
+   }
+  },
+  "VDF-WKF008": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VDF-WKF008-STP002": {
+     "state": "FINDING",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝;裝件是操作員的手)",
+      "ref": "VCGC-WKF001-STP004"
+     },
+     "hand": "QuantGuard 缺 polars 等套件(只查不裝;裝件是操作員的手)"
+    }
+   }
+  },
+  "VDF-WKF009": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VDF-WKF009-STP003": {
+     "state": "FINDING",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "QuantGuard 缺 polars 等套件(只查不裝)",
+      "ref": "VCGC-WKF001-STP004"
+     },
+     "hand": "QuantGuard 缺 polars 等套件(只查不裝)"
+    }
+   }
+  },
+  "VRN-WKF001": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [
+    {
+     "id": "網路工具掛載",
+     "state": "GATED",
+     "why": "同意閘沒開(L07/L08:只有操作員能開)",
+     "detail": "SUP_MDL740_NetUnified_v0118.py · 後端 supportive modules/network/VeritasAegisNexus_v1652.py · 閘一=未開 ——"
+    },
+    {
+     "id": "VRN_ENG057_ScanOcrRescue",
+     "state": "ABSENT",
+     "why": "缺套件或缺件(裝件是操作員的手)",
+     "detail": "缺件 paddleocr(ModuleNotFoundError;缺件≠壞掉 L16)/ [OK] build_ocr:參數不合即降階(第二梯 textline+ch) · {'use_textlin"
+    },
+    {
+     "id": "VRN_ENG072_FirstPageText",
+     "state": "ABSENT",
+     "why": "缺套件或缺件(裝件是操作員的手)",
+     "detail": "逾時冊放寬到 600s / 缺件 pdfplumber(ModuleNotFoundError;缺件≠壞掉 L16)/ [OK] ㊿之六 分片動詞在位:`prewarm-shard --list --"
+    },
+    {
+     "id": "VRN_ENG073_ReportStructuredDB",
+     "state": "ABSENT",
+     "why": "缺套件或缺件(裝件是操作員的手)",
+     "detail": "缺件 pydantic(ModuleNotFoundError;缺件≠壞掉 L16)/ [FAIL] ㉑ 券商正典化(批412:綁正典 SSOT,本器不自建第二份字典;舊鍵遷移;認不出=空) (CIT"
+    },
+    {
+     "id": "VRN_ENG064_KnowledgeStack",
+     "state": "NODATA",
+     "why": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)",
+     "detail": "Loading model cost 0.922 seconds. / Prefix dict has been built successfully.(缺料不是壞掉)"
+    },
+    {
+     "id": "VRN_ENG067_MindMapSSOT",
+     "state": "NODATA",
+     "why": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)",
+     "detail": "Loading model cost 0.842 seconds. / Prefix dict has been built successfully.(缺料不是壞掉)"
+    },
+    {
+     "id": "VRN_ENG068_DailyBrief",
+     "state": "NODATA",
+     "why": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)",
+     "detail": "[OK] ⑪ 庫檔在而收割空 → why 不補(抽不出來照樣 FAIL,不放寬) / VRN_ENG068_DailyBrief_v0108 +2/2 PASS(缺料不是壞掉)"
+    }
+   ],
+   "steps": {
+    "VRN-WKF001-STP001": {
+     "state": "FINDING",
+     "evidence": "step:VRN-WKF001-STP002",
+     "by": "step:VRN-WKF001-STP002",
+     "hand": "鏈 rc 3 = 有節點 ABSENT / GATED / NODATA(缺套件 · 同意閘 · 沒料);逐節點原因看鏈報告"
+    },
+    "VRN-WKF001-STP002": {
+     "state": "FINDING",
+     "rc": 3,
+     "at": "2026-09-29 01:45:30",
+     "secs": 20.8,
+     "runs": 1,
+     "hand": "鏈 rc 3 = 有節點 ABSENT / GATED / NODATA(缺套件 · 同意閘 · 沒料);逐節點原因看鏈報告"
+    }
+   }
+  },
+  "VRN-WKF002": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VRN-WKF002-STP002": {
+     "state": "FINDING",
+     "evidence": "chain:vrn:L1",
+     "by": "chain:vrn:L1",
+     "hand": "缺套件或缺件(裝件是操作員的手)"
+    },
+    "VRN-WKF002-STP003": {
+     "state": "FINDING",
+     "evidence": "chain:vrn:L2",
+     "by": "chain:vrn:L2",
+     "hand": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時) · 缺套件或缺件(裝件是操作員的手)"
+    },
+    "VRN-WKF002-STP005": {
+     "state": "FINDING",
+     "evidence": "chain:vrn:L4",
+     "by": "chain:vrn:L4",
+     "hand": "沒料或逾時(資料家空 · 樣本不在 · 工作站逾時)"
+    }
+   }
+  },
+  "VRN-WKF004": {
+   "state": "FAIL",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VRN-WKF004-STP001": {
+     "state": "FINDING",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     },
+     "hand": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)"
+    },
+    "VRN-WKF004-STP002": {
+     "state": "FAIL",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "ENG073 自測 61/64:㉑㉒㉓ 金融機構 SSOT 三檢需要 pydantic(缺件依批412 一律紅;裝件是操作員的手)。⓬ 命令冊檢查 v0139 起沿 dot-source 鏈讀已轉綠",
+      "ref": "VCGC-WKF001-STP004"
+     },
+     "hand": "ENG073 自測 61/64:㉑㉒㉓ 金融機構 SSOT 三檢需要 pydantic(缺件依批412 一律紅;裝件是操作員的手)。⓬ 命令冊檢查 v0139 起沿 dot-source 鏈讀已轉綠"
+    }
+   }
+  },
+  "VRN-WKF006": {
+   "state": "FINDING",
+   "operator_hand": true,
+   "ai_open": null,
+   "open": [],
+   "steps": {
+    "VRN-WKF006-STP001": {
+     "state": "FINDING",
+     "by": "selftest",
+     "known_open": {
+      "hand": "operator",
+      "why": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)",
+      "ref": "VCGC-WKF001-STP004"
+     },
+     "hand": "首頁擷取 SKIP 1:缺 pdfplumber(裝件)"
+    }
+   }
+  }
+ }
+}
