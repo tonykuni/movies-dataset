@@ -18,7 +18,7 @@
   "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
   "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
   "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN",
-  "fail_cause_rule": "fail_cause:FAIL 由驗證器讀正主本輪存證追因(dbpanel_absent · pathverify_dbpanel);追得到操作員端成因才標操作員的手,追不到仍是 FAIL"
+  "fail_cause_rule": "fail_cause:FAIL 由驗證器讀正主本輪存證追因(dbpanel_absent · pathverify_dbpanel · envmgr_exe_absent · pathverify_traced;後兩種 CGC_MDL245 v0102 起:ENV MANAGER 的 RED 全是 PATH 上找不到的必備執行檔 · 單一路徑驗證每一步 RED 都追得到前兩種因);finding_cause:FINDING 同一套(syncdb_no_target:ENG082 v0111 起的本輪 sync-db 報告 SKIP、目標 0 本 → 資料家空);追得到操作員端成因才標操作員的手,追不到仍是 FAIL / FINDING"
  },
  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
  "workflows": [
@@ -110,7 +110,8 @@
        "VRN_ENG082_ExtractionLogic",
        "sync-db"
       ]
-     ]
+     ],
+     "finding_cause": "syncdb_no_target"
     },
     {
      "code": "VDF-WKF001-STP004",
