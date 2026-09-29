@@ -9,6 +9,8 @@ R33 實測實錄(2026-09-29):註冊乾跑報「退役 55」——剛加的 CGC_M
   ① register_cmds:命令冊沿 dot-source 鏈讀(正主 = CGC_MDL157 v0106+ 的 read();新冊拆掉的函式不算);同名以最新一本為準。
   ② live_components:尾版是薄尾(exec_module 載自己家族的前版)就沿前版往下讀,直到一支實體;前版的類別 / 函式照家族名入冊
      (鍵不變 = 同一個元件;source 記真正定義它的那一版,via 記轉接它的尾版)。尾版自己的定義優先。
+  ③ 別名後載的鏈模組(CGC_MDL205 以 vcgc_tails_for_talib_ban 載 v0142)也對齊:同步檢查前 ensure() 一次
+     (v0168 同步檢查取 sys.modules 裡第一支 registry_sync;實錄 hub run 後印「退役 1971」就是它拿到沒沿鏈的那支)。
   結果照舊經 v0167 的樹狀態快取(本層另存一份,鍵同)。只增不減:冊的寫入仍只走 registry-sync --apply(要批准)。
 其餘照 v0169(thin tail;__getattr__ 轉接)。只收 VCGC 呼叫(VIA_FROM_VCGC=YES)。不用 TA-Lib。
 """
@@ -230,6 +232,7 @@ def _install() -> int:
     ext = PRIOR.cached(lambda: extend(base()), name="live_components_v0170")
     ext._v0170 = True
     ext.__wrapped__ = lambda: extend(base())
+    _EXT["f"] = ext
     for m in mods:
         if m.__dict__.get("live_components") is eff:
             m.__dict__["live_components"] = ext
@@ -237,7 +240,37 @@ def _install() -> int:
     return n
 
 
+_EXT: dict = {}
+
+
+def ensure() -> int:
+    """Chain modules loaded later under another name (e.g. CGC_MDL205 loads v0142 as `vcgc_tails_for_talib_ban`) get the same
+    chain-aware inventory; the v0168 sync check takes the first registry_sync it finds in sys.modules, whichever that is."""
+    ext, n = _EXT.get("f"), 0
+    if ext is None:
+        return 0
+    for m in list(sys.modules.values()):
+        d = getattr(m, "__dict__", {})
+        if _STEM in str(getattr(m, "__file__", "")) and callable(d.get("registry_sync")) and d.get("live_components") is not ext:
+            d["live_components"] = ext
+            if callable(d.get("register_cmds")):
+                d["register_cmds"] = register_cmds
+            n += 1
+    return n
+
+
+_V0169_SYNC = PRIOR.sync_check
+
+
+def sync_check(key: str | None = None) -> dict:
+    ensure()
+    return _V0169_SYNC(key)
+
+
 _PATCHED = _install()
+for _m in [PRIOR] + [getattr(PRIOR, "PRIOR", None)]:
+    if _m is not None and _m.__dict__.get("sync_check") is _V0169_SYNC:
+        _m.__dict__["sync_check"] = sync_check
 
 
 def main(argv=None):
@@ -266,6 +299,15 @@ def selftest() -> int:
         and fwd[f"function|{_STEM}:sdd_module"]["source"].endswith("_v0169.py"), f"轉接 {len(fwd)}")
     live = sys.modules[__name__].__dict__.get("_PATCHED")
     chk("盤點已換成沿鏈版(每支持有 live_components 的鏈模組都換)", bool(live), f"換 {live}")
+    import importlib.util as _ilu
+    sp = _ilu.spec_from_file_location("vcgc_selftest_late_load", HERE / "CGC_MDL149_VeritasCentralGovernanceConsole_v0142.py")
+    late = _ilu.module_from_spec(sp)
+    sys.modules[sp.name] = late
+    sp.loader.exec_module(late)
+    ensure()
+    chk("後載的鏈模組(別名載入 v0142,如 CGC_MDL205)同步檢查前也換成沿鏈盤點", late.live_components is _EXT.get("f")
+        and PRIOR.PRIOR.sync_check is sync_check)
+    sys.modules.pop(sp.name, None)
     b = Path(__file__).read_text(encoding="utf-8")
     chk("抬頭 raw · 帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記", b.split("\n", 3)[2].startswith('r"""') and "[VIA:ACCEL-BRIDGE" in b
         and "[VIA:NET-BRIDGE" in b and "VIA_FROM_VCGC" in b)

@@ -7,6 +7,10 @@ r"""CGC_MDL245_SDDValidator v0101 — 薄尾:實測加「先發現、後解掉�
   永遠鎖不起來。
   現在:步驟冊寫 `finding_resolved_by: [[目標, 動詞, 必帶旗?], …]`;同一輪裡最後一次 FINDING 之後,有一次解法事件 OK
   → 這一步 OK,並記 `resolved_by`(誰、何時)與 `finding_at`。有 FAIL 不解;解法事件在發現之前不算。
+  另(R33c 實測):驗證器自己的步(check · real · closeout)rc 反映的是**別條工作流**的燈 —— real 見到操作員端的 FAIL 就回 1,
+  closeout OPEN 回 2 —— 於是 VCGC-WKF003/004 永遠綠不了(自我參照)。步驟冊寫 `report_rc: {動詞: [可接受 rc…]}` 的步:
+  該動詞每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK,原判記 `reported`(燈在被報的那幾條工作流上,不重算兩次)。
+  lock 不給 report_rc(拒寫 rc 1 是真失敗)。
   其餘一字未動(前版照讀,不複製)。VIA_FROM_VCGC:只收中控呼叫(前版 main 守門)。不用 TA-Lib。
 """
 from __future__ import annotations
@@ -126,14 +130,22 @@ def resolve_findings(rep: dict, state: dict, evs: list, ai_evs: list) -> list:
                       + f" @ {f.get('ts')}"})
             s.pop("hand", None)
             done.append(st["code"])
-    if not done:
-        return done
+    if done:
+        _follow(rep, done)
+        _relamp(rep)
+    return done
+
+
+def _follow(rep: dict, done: list) -> None:
     for r in (rep.get("wkf") or {}).values():          # evidence copies (`step:<code>`) follow their source
         for s in (r.get("steps") or {}).values():
             src = str(s.get("by") or "")
-            if src.startswith("step:") and src[5:] in done and s.get("state") == "FINDING":
+            if src.startswith("step:") and src[5:] in done and s.get("state") in ("FINDING", "FAIL"):
                 s.update({"state": "OK", "resolved_by": "step:" + src[5:]})
                 s.pop("hand", None)
+
+
+def _relamp(rep: dict) -> None:
     for r in (rep.get("wkf") or {}).values():
         if r.get("state") == "REGISTERED_ONLY":
             continue
@@ -148,6 +160,31 @@ def resolve_findings(rep: dict, state: dict, evs: list, ai_evs: list) -> list:
             r["ai_open"] = ai
         else:
             r.pop("ai_open", None)
+
+
+def resolve_reports(rep: dict, state: dict, evs: list, ai_evs: list) -> list:
+    """Steps whose book names `report_rc`: every hit with a listed verb ran to a defined verdict (rc in its list, no error) → OK."""
+    done = []
+    for _, w in state["wkfs"]:
+        r = (rep.get("wkf") or {}).get(w["code"])
+        if not r or r.get("state") == "REGISTERED_ONLY":
+            continue
+        mine = ai_evs if (w.get("tests") or {}).get("real_run") == "ai" else evs
+        for st in w.get("steps") or []:
+            rr, s = st.get("report_rc"), (r.get("steps") or {}).get(st.get("code"))
+            if not rr or not s or s.get("state") not in ("FINDING", "FAIL"):
+                continue
+            hits = [e for e in mine for m in st.get("match") or [] if _hit(e, *m)]
+            if not hits:
+                continue
+            ok = all(PRIOR._act(e)[0] in rr and e.get("rc") in rr[PRIOR._act(e)[0]] and not e.get("error") for e in hits)
+            if ok:
+                s.update({"state": "OK", "reported": s.get("state"), "report_rc": sorted({e.get("rc") for e in hits})})
+                s.pop("hand", None)
+                done.append(st["code"])
+    if done:
+        _follow(rep, done)
+        _relamp(rep)
     return done
 
 
@@ -157,7 +194,9 @@ def real(run: str | None = None, write: bool = True, ai_run: str | None = None) 
     _, evs = PRIOR.run_events(rep.get("run") or "no-run")
     _, ai_evs = PRIOR.run_events(rep.get("ai_run") or "no-run", "ai-")
     rep["engine"] = ENGINE
-    rep["resolved"] = resolve_findings(rep, PRIOR.load_books(), evs, ai_evs)
+    books = PRIOR.load_books()
+    rep["resolved"] = resolve_findings(rep, books, evs, ai_evs)
+    rep["reports"] = resolve_reports(rep, books, evs, ai_evs)
     if write:
         PRIOR.OUT.mkdir(parents=True, exist_ok=True)
         (PRIOR.OUT / "SDD_REAL_latest.json").write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -209,10 +248,31 @@ def selftest() -> int:
     chk("同一步有 FAIL 就不解", resolve_findings(r, st, [find, dict(find, outcome="FAIL", t0=3), apply_ok], []) == [])
     r = rep0()
     chk("別輪(ai-)的事件不串到 go 輪", resolve_findings(r, st, [find], [apply_ok]) == [])
+    w2 = {"code": "T-WKF002", "tests": {"real_run": "ai"}, "steps": [
+        {"code": "T-WKF002-STP001", "match": [["CGC_MDL245_SDDValidator", None]], "report_rc": {"real": [0, 1, 2], "check": [0, 2]}}]}
+    st2 = {"wkfs": [("T", w2)]}
+
+    def rep2():
+        return {"wkf": {"T-WKF002": {"state": "FAIL", "steps": {"T-WKF002-STP001": {"state": "FAIL", "rc": 1}}}}}
+    real_ev = {"target": "CGC_MDL245_SDDValidator", "verb": "run", "act": "real", "outcome": "FAIL", "rc": 1, "t0": 1}
+    r = rep2()
+    chk("報告步:real 回 1(別條有紅)= 報告有產出 → OK,原判記 reported",
+        resolve_reports(r, st2, [], [real_ev]) == ["T-WKF002-STP001"] and r["wkf"]["T-WKF002"]["steps"]["T-WKF002-STP001"]["reported"] == "FAIL"
+        and r["wkf"]["T-WKF002"]["state"] == "OK")
+    r = rep2()
+    chk("報告步:check 回 1(SSOT 紅)不在可接受 rc → 照舊 FAIL",
+        resolve_reports(r, st2, [], [dict(real_ev, act="check")]) == [] and r["wkf"]["T-WKF002"]["state"] == "FAIL")
+    r = rep2()
+    chk("報告步:沒列的動詞(lock 拒寫)照舊 FAIL", resolve_reports(r, st2, [], [real_ev, dict(real_ev, act="lock")]) == [])
+    r = rep2()
+    chk("報告步:帶錯誤(崩)照舊 FAIL", resolve_reports(r, st2, [], [dict(real_ev, error="Traceback")]) == [])
     book = PRIOR._json(PRIOR.newest("VIA_Workflow_VCGC_SSOT_v*.json"), {}) or {}
     rb = [s for w2 in book.get("workflows") or [] for s in w2.get("steps") or [] if s.get("finding_resolved_by")]
     chk("VCGC 冊尾版的 H4 帶 finding_resolved_by(核准 apply)", any(s.get("code") == "VCGC-WKF001-STP005" for s in rb),
         f"帶的步 {[s.get('code') for s in rb]}")
+    rs = [s.get("code") for w3 in book.get("workflows") or [] for s in w3.get("steps") or [] if s.get("report_rc")]
+    chk("VCGC 冊尾版:驗證器自己的報告步帶 report_rc(lock 不帶)", {"VCGC-WKF004-STP001", "VCGC-WKF004-STP002", "VCGC-WKF004-STP004"} <= set(rs)
+        and "VCGC-WKF004-STP003" not in rs, f"帶的步 {rs}")
     body = Path(__file__).read_text(encoding="utf-8")
     chk("本支帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記", "[VIA:ACCEL-BRIDGE" in body and "[VIA:NET-BRIDGE" in body and "VIA_FROM_VCGC" in body)
     chk("不含 TA-Lib 匯入", not re.search(r"^\s*(?:import|from)\s+" + "ta" + r"lib\b", body, re.M))
