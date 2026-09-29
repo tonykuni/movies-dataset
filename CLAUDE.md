@@ -9,6 +9,7 @@ VIA_FROM_VCGC=YES python3 "$V" token > /tmp/token_card.txt 2>&1; cat /tmp/token_
 
 - 卡上是**經 VCGC 啟用**(鎖冊 `VIA_ToolVersion_Lock_v0100.json` 的 `token` / `nlp`)、**實測過**的工具,指令可原樣貼上:
   `read`(骨架卡)→ `slice`(一個定義)→ `digest`(日誌只留判決行)· `--if-etag`(沒變回 304)· `pack`(整夾索引)· NLP `--brief`(長文摘要)。
+- v0117 起另有 `chain <家族名>`(薄尾版本鏈圖:誰是本體、誰蓋了誰)· `.json` 用 `read`(兩層卡,`--depth N`)、`slice <檔> <JSON 路徑>`(`a.b[0]` · `[-1]` · `[*]` · `[鍵=值]`)· `.jsonl` 用 `read`(欄位次數 · 首末列)。
 - VCGC 每個動作的第一行都是這一步的短版;這一步紅(沒啟用 / 鎖檔被改 / 實測不過)VCGC 就停,不讀政策、不開子系統。
 - 工具換版只經 `via-vcgc tools activate token <CGC_MDL158_…_vNNNN.py> --apply`;不要自己取尾版。
 - 原檔比卡片小(約 40 行內)直接看;不把原文貼回對話。
@@ -29,3 +30,15 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 - 操作員端同一個功能:`via-panorama read <路徑>` / `via-panorama slice <檔> <名>`;整張卡 `via-vcgc token`。
 
 **不要**為了看說明而跑 `CGC_MDL064_SelftestGrid_v*.py --help`:它不吃 `--help`,會把整張格子跑起來並重寫已追蹤的檔(批707 實錄 21 檔)。單站用 `--only <站名子字串>`。
+
+**交接防遺漏（VCGC-REQ075；2026-09-29）**：每次接手在 token 後，經同一 VCGC 入口執行 `handoff check`。
+讀 `VeritasIntelligenceAnalytics/docs/handoff/HANDOFF_latest.json` 的摘要、pending 與相依變更，不從對話記憶推定已完成。
+每次更新把新需求登錄中央需求冊／工作流冊，待辦只能帶理由轉態，不能消失；不同資料來源不得因值相同合併編號。
+只重跑有相依變更的已宣告測試（`handoff test <case>`），接續 registry-sync、中央編號與 SDD 驗證，再 `handoff checkpoint`。
+`handoff` 綠燈僅代表交接資料完整；`closeout_lamp` 才代表驗收，BLOCKED／REVIEW／缺證據絕不能寫成成功。
+凍結來源不改；仍被薄尾引用的舊模組不搬走。測試證據與下一步詳見 `VeritasIntelligenceAnalytics/docs/handoff/README.md`。
+
+**AI 必用功能(VCGC-REQ082;側線 2026-09-29 i)**:token 之後、動手之前跑 `VIA_FROM_VCGC=YES python3 "$V" functions`,照卡上的順序用。
+卡的唯一正本是 `VIA_AI_FunctionCard_SSOT_v0100.json`(這裡不另抄;token 卡尾端也會印三行摘要)。必做三件:
+改任何薄尾家族(出新版號檔)前先 `python3 "$E" chain <家族名>`;動到 SSOT / 正則 / 同義字 / 編號 / 命名 / 註冊前後各跑一次
+`VIA_FROM_VCGC=YES python3 "$V" ssot panorama`;編號寫入後 `run CGC_MDL237_NumberingSystem audit` 必須遺失 0 · 改身分 0 · 重號 0。

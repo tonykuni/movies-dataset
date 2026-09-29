@@ -1,0 +1,68 @@
+{
+  "schema": "VRN.SourceProvenance.SSOT.v1",
+  "version": "v0100",
+  "updated_at": "2026-09-29T15:38:10+00:00",
+  "sources": [
+    {
+      "key": "filename",
+      "name": "檔案名稱",
+      "scope": "檔名拆分；不同檔名保留各自證據"
+    },
+    {
+      "key": "first_page_info",
+      "name": "第一頁資訊區",
+      "scope": "依 Layout 座標與標籤分類，各角落均可；分類候選需驗證"
+    },
+    {
+      "key": "first_page_body",
+      "name": "第一頁本文區",
+      "scope": "本文修復、原文與來源座標保留"
+    },
+    {
+      "key": "annual_financial",
+      "name": "年度財報頁與財務表格",
+      "scope": "左右再上下的独立表格保留；表型／年度尚未確認時保留候選，不偽稱年度驗收"
+    }
+  ],
+  "policies": {
+    "identity": "不同来源不同 SRC / OBS；值相同不合併；重試不增加獨立證據數",
+    "null": "null 合法但不是 0，也不表示欄位完整性通過",
+    "comparison": "相同文件、欄位、期間、單位、貨幣、實際／預估語意才可對照；兩來源一致非完整性證明",
+    "preservation": "保留 raw、value、座標、欄列、修復版本、revision 指紋；不回寫凍結來源",
+    "scope": "四來源為最低通道；未能判型的表格保留候選並列 REVIEW",
+    "escalation": "只列失敗區域的下一級；自動執行尚未驗證時不得宣稱已跑 OCR",
+    "owner": "SSOT/REGEX/同義字由既有 VRN_Evidence_Core 載入；本冊不複製正規式"
+  },
+  "parameters": {
+    "max_attempts_per_region": 5,
+    "max_seconds_per_region": 60,
+    "dpi_retry": [
+      300,
+      350
+    ]
+  },
+  "escalation": [
+    {
+      "engine": "second_native",
+      "dpi": null
+    },
+    {
+      "engine": "native_layout",
+      "dpi": null
+    },
+    {
+      "engine": "basic_ocr",
+      "dpi": 300
+    },
+    {
+      "engine": "basic_ocr",
+      "dpi": 350
+    },
+    {
+      "engine": "registered_heavy_ocr",
+      "dpi": 350
+    }
+  ],
+  "validation_status": "PROVENANCE_ONLY; automatic heavy-engine execution remains PARTIAL",
+  "owner": "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py"
+}
