@@ -117,6 +117,8 @@ function global:via-in { via-entry; via-vcgc enter @args }
 加在哪:下一版命令冊(`Register-VIA-Commands-v0263.ps1`,dot-source v0262 之後),或先貼在自己的 PowerShell profile 試用。
 為什麼:Python 子行程改不了 PowerShell 的目前資料夾,只有 PowerShell 函式能 `Set-Location`;`via-in` 名稱已掃過母倉命令冊與 Grok 矩陣,沒有撞名。
 
+> 後續(側線 2026-09-29 g):操作員令「加 via-in 短令到命令冊 v0263」→ 已加進 `Register-VIA-Commands-v0263.ps1`(另含逾時放寬與兩支 `.cmd` 梭),見 `docs/VIA_S20260929g_ViaIn.md`。
+
 ## 九、還原
 
 - `git revert` 本批的合併提交;或刪掉 `CGC_MDL149_VeritasCentralGovernanceConsole_v0173.py` 與 `CGC_MDL064_SelftestGrid_v0503.py`(`newest()` 會退回 v0172 / v0502),再把四本冊(元件冊 · 編號冊 MDL / FNC_VCGC · 編號 SSOT)與座位冊還原到前一版。
