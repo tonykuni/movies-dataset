@@ -324,6 +324,30 @@
       "owner": "操作員裁定",
       "reason": "同號異名 12 組(VCGC 7 · VDF 3 · VRN 1 · SUP 1)是同家族伴隨模組還是真撞號,要人裁;不自動改名",
       "next": "裁定後:伴隨模組記進命名冊;真撞號出新版號檔改號並遷呼叫(L04);版號異形 44 · 沒版號 841 逐支判定(Z279 / Z281)"
+    },
+    {
+      "id": "VCGC-REQ030:relock",
+      "requirement": "VCGC-REQ030",
+      "state": "PENDING",
+      "owner": "AI(下一輪收尾驗收輪)",
+      "reason": "SDD X-LOCK 6 處要重驗:已鎖工作流 VCGC-WKF003 / 004 / 009 的正主尾版換了(CGC_MDL149 v0172→v0178 · MDL158 v0116→v0117 · MDL237 v0104→v0108 · MDL245 v0102→v0104;其中 4 處是 #373–#375 既有)。重鎖要先提交、同一 HEAD 跑 real 才准寫燈鎖冊,屬收尾驗收輪,本批不擴張",
+      "next": "收尾驗收輪:VCGC run CGC_MDL245_SDDValidator real → lock --apply(VCGC-WKF004-STP003,下一版 VIA_LampLock)→ check 的 X-LOCK 回綠才可寫驗收"
+    },
+    {
+      "id": "VCGC-REQ078:backlog",
+      "requirement": "VCGC-REQ078",
+      "state": "PENDING",
+      "owner": "操作員令",
+      "reason": "操作員令「既有範圍內註冊 不要擴張範圍」:全量重建多出的範圍外列(FM 股票清單 862 · SYN 同義 862 · TST 測試 5)與既有列的 updated_at / lamp / gone 翻動本批不寫;完整重建差異留在 AI 暫存,不入倉",
+      "next": "操作員下令後:VCGC run CGC_MDL237_NumberingSystem --apply(v0108 寫後自核,違反只增整批還原)→ run CGC_MDL237_NumberingSystem audit 遺失 0 · 改身分 0 · 重號 0 → 提交"
+    },
+    {
+      "id": "VCGC-REQ075:reuse-glob",
+      "requirement": "VCGC-REQ075",
+      "state": "PENDING",
+      "owner": "AI(下一批,新版號檔)",
+      "reason": "側線 i 收尾實測盲點:CGC_MDL140 v0101 run_case 判「沿用成功」只比收據上記的相依雜湊,不重掃宣告的相依樣式;新尾版(CGC_MDL149 v0178 · CGC_MDL245 v0104)符合 _v*.py 卻沒進舊收據,entry / sdd 兩案被沿用而沒測到新尾版。本批收尾已把相依集合變了的收據照工具原格式存進 history 後重跑(不是沿用)",
+      "next": "CGC_MDL140 v0102 薄尾:沿用前重掃 case 相依樣式 + VCGC 樣式,檔案集合 ≠ 收據集合即重跑;自測加負控(新增 _v 檔 → 不沿用);換版經 handoff watch / managed 登錄"
     }
   ]
 }
