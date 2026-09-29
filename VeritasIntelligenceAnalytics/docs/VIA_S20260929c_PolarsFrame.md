@@ -111,8 +111,6 @@
 | 編號冊既有列刷新(updated_at · 使用者 · 燈號 · TST 列) | 容器只補新鍵(X-NUM 已綠);這些欄位該由正本環境給 | 工作站(選做):`via-vcgc run --family core CGC_MDL237_NumberingSystem --apply` 然後 `via-vcgc sdd check` |
 | CGC_MDL223 座位上傳只提交座位檔 | VCGC 治理件,不在本批範圍 | 新版:`git commit -m … -- <座位檔>`;有 MERGE_HEAD 或暫存區有別的檔就不提交,回 `held` |
 | VCGC v0172 薄尾偵測也要認 `STEM = "<家族>"` | main 既有缺口:用 `STEM` 的家族尾版另有 24 支(VDF_ENG082 v0106 · VRN_ENG049 / 050 / 052 / 055 / 056 / 057 / 062 · CGC_MDL058 / 089 / 107 / 137 / 142 / 156 / 226 / 231 / 234 / 236 / 237 / 242 · SUP_MDL030 / 737 / 740 · celeritas launcher),main 元件冊裡它們前一版約 230 個函式標退役 | VCGC 新版把 `_STEM` 條件放寬成 `_?STEM`,補正控與負控,再 `registry-sync --apply` |
-| CLAUDE.md L106 寫的 `via-vcgc read / slice / entry` | VCGC v0172 回「v0142 不認得動詞」;VCGC 第一步卡指的是 `via-panorama read / slice`(CGC_MDL158),本批照它讀,問題 0 | 由操作員裁定:VCGC 補這三個動詞(轉交 CGC_MDL158),或 CLAUDE.md 改指 `via-panorama` |
-
 ## 九、還原
 
 - 刪本批新檔,即回到尾版律的前一版:SUP_MDL755 v0100 · 11 支薄尾 · CGC_MDL233 v0103 · 格子 v0501。
