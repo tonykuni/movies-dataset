@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-30T10:19:25+00:00",
+  "updated_at": "2026-09-30T19:32:05+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -91,7 +91,14 @@
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
     "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
-    "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py"
+    "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py",
+    "supportive modules/registry/VIA_Panorama_v0103.py",
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py",
+    "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0106.py",
+    "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py",
+    "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py",
+    "supportive modules/registry/CGC_MDL176_SynonymUnion_v0103.py",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -306,6 +313,93 @@
         "supportive modules/registry/tests/test_master_control_contract_v*.py"
       ],
       "timeout_seconds": 600
+    },
+    "via_panorama": {
+      "argv": [
+        "VIA_Panorama",
+        "--selftest"
+      ],
+      "success_marker": "VIA_Panorama_v0103 selftest 13/13 PASS",
+      "scope": "第一步監控 VIA_Panorama v0103:monitor(VCGC 事件 · VDF/VRN 鏈 · SDD · 串測 · 交接 · TA-Lib 一條線一盞燈;舊存證 STALE)· first(掃描 + 監控)+ 前版 v0102/v0101/v0100 自測(R34)",
+      "dependencies": [
+        "supportive modules/registry/VIA_Panorama_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "dataframe_lock": {
+      "argv": [
+        "CGC_MDL249_DataFrameLock",
+        "--selftest"
+      ],
+      "success_marker": "[DataFrame 鎖] 自測 15/15 PASS",
+      "scope": "輸出表頭定案 → DataFrame 鎖定:欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數 · NODATA 照實 · 鎖帳只增 · 表頭指紋變了冊沒新版 = 拒寫(R34)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "vdf_lists": {
+      "argv": [
+        "VDF_ENG087_MarketListGovernance",
+        "--selftest"
+      ],
+      "success_marker": "[VDF_ENG087 v0106] 15/15 OK",
+      "scope": "台股清單自動更新:ACTIVE / NEW / DELISTED(不刪列 · 不改號 · 抓不到 = HOLD 不判下市 · 大量下市 = REVIEW)(R34 · VDF-REQ014)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "vdf_etf_metrics": {
+      "argv": [
+        "VDF_ENG094_ActiveETFActivity",
+        "--selftest"
+      ],
+      "success_marker": "[VDF_ENG094 v0101] 24/24 OK",
+      "scope": "主動式 ETF:AUM · NAV · 單位數 · 淨流入 / 流出(ESTIMATE)· 配置明細;毛申購 / 毛贖回查無來源 = NULL;fetch 經同意閘(AI 不代設)(R34 · VDF-REQ014)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v*.py",
+        "functional modules/VDF/engine/VDF_ENG096_ActiveETFMeasures_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "vrn_ssot_consistency": {
+      "argv": [
+        "SUP_MDL749_VRNFieldRuleHub",
+        "--selftest"
+      ],
+      "success_marker": "[計] v0116 新增 15 檢 OK 15 · FAIL 0",
+      "scope": "VRN SSOT 評等 / 目標價同義字跨冊一致(方向衝突 = 紅 · 粒度 = 黃)· 正則自檢(樣本夾 C:\\測試樣本報告)· 薄尾鏈讀(R34 · VRN-REQ008)",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "synonym_union_r34": {
+      "argv": [
+        "CGC_MDL176_SynonymUnion",
+        "--selftest"
+      ],
+      "success_marker": "[同義聯集 v0103] 自測 6/6 PASS",
+      "scope": "券商正典鍵別名再補 8 條(BAML/ML→BOFA · CITIGROUP→CITI · FCB/FIRSTSEC→FIRST · HNSC→HUANAN · MORGAN STANLEY/MORGANSTANLEY→MS);樣本索引 StockReportBasicInfo 券商經一扇門解成一主(R34 重號授權)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL176_SynonymUnion_v*.py",
+        "supportive modules/registry/VIA_SSOT_SynonymUnion_v0100.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "numbering_dup_r34": {
+      "argv": [
+        "CGC_MDL237_NumberingSystem",
+        "--selftest"
+      ],
+      "success_marker": "[編號 v0111 重號歸位] 自測 9/9 PASS",
+      "scope": "同義冊一詞兩主:別名折正典鍵 · 評等記最細鍵;樣本相關紅列歸零,樣本沒有的(麥格理 · 元富)照實留待裁定;不改號(R34 重號授權)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py",
+        "supportive modules/registry/CGC_MDL176_SynonymUnion_v*.py"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -607,6 +701,96 @@
       "owner": "AI",
       "reason": "Z291:registry/VIA_PS_Accelerators_25_Roster_v0100.ps1 是被 VIA_PS_Accel_Module 點源的函式庫,卻帶整段 [VIA:PS-TEMPLATE:v0101] 模板塊(開頭 $VIACelTplOwn = $false)→ 點源時把呼叫端「本支套上」旗標蓋掉,呼叫端結尾不還原(要等 PowerShell.Exiting 事件);凡「模板塊 → PS-ACCEL 塊」的 PS 都中",
       "next": "出 Roster v0101(去掉模板塊,只留冊)並由模組改載尾版 —— 動到全樹共用的加速模組載入點,需操作員逐次許可(L70);本批 FullCheck v0101 先在自己檔內另存旗標繞過"
+    },
+    {
+      "id": "VCGC-REQ088:via_panorama",
+      "requirement": "VCGC-REQ088",
+      "state": "VERIFIED",
+      "case": "via_panorama",
+      "receipt": "docs/handoff/evidence/via_panorama.json"
+    },
+    {
+      "id": "VRN-REQ008:dataframe_lock",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "dataframe_lock",
+      "receipt": "docs/handoff/evidence/dataframe_lock.json",
+      "note": "引擎就位;表頭冊待 VDF / VRN 兩線交回後組成"
+    },
+    {
+      "id": "VDF-REQ014:vdf_lists",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_lists",
+      "receipt": "docs/handoff/evidence/vdf_lists.json"
+    },
+    {
+      "id": "VDF-REQ014:vdf_etf_metrics",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_etf_metrics",
+      "receipt": "docs/handoff/evidence/vdf_etf_metrics.json"
+    },
+    {
+      "id": "VDF-REQ014:gross-flows",
+      "requirement": "VDF-REQ014",
+      "state": "PENDING",
+      "owner": "操作員(來源)→ AI",
+      "reason": "毛申購 / 毛贖回(units_subscribed · units_redeemed)在線上程式與封鎖區都查無官方端點;不發明網址,欄位照實 NULL",
+      "next": "操作員給出可用的官方端點(投信 / 交易所 / 基金資訊觀測站)→ AI 出 ENG094 新版接上並實測"
+    },
+    {
+      "id": "VDF-REQ014:workstation-real",
+      "requirement": "VDF-REQ014",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "實抓要同意閘(VIA_NET_CONSENT + VIA_SCRAPE_CONSENT,AI 不代設)與資料家",
+      "next": "工作站:L1 清單 → ENG087 diff → ENG077 → ENG078 daily → ENG094 fetch --apply(兩個交易日)→ breakdown --apply → CGC_MDL249 check / lock --apply"
+    },
+    {
+      "id": "VRN-REQ008:vrn_ssot_consistency",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_ssot_consistency",
+      "receipt": "docs/handoff/evidence/vrn_ssot_consistency.json"
+    },
+    {
+      "id": "VRN-REQ008:s05-regex",
+      "requirement": "VRN-REQ008",
+      "state": "PENDING",
+      "owner": "操作員裁 → AI",
+      "reason": "VRN_S05_FieldRegistry_v0102 兩條正則對不上自己的範例:TARGET_PRICE_LABEL 讀 NT$1,100 成 1(千分位)· EMAIL_FULL 不配自己的範例;目前沒有活引擎跑它們",
+      "next": "裁定後出 S05 新版(數字群組改 ([0-9][0-9,]*(?:\\.[0-9]+)?))並以 C:\\測試樣本報告 實測"
+    },
+    {
+      "id": "VRN-REQ008:workstation-real",
+      "requirement": "VRN-REQ008",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "實測樣本在工作站 C:\\測試樣本報告",
+      "next": "via-vcgc run --family vrn SUP_MDL749_VRNFieldRuleHub consistency → regexcheck → CGC_MDL249 check / lock --apply"
+    },
+    {
+      "id": "VCGC-REQ088:syn-dup-nonsample",
+      "requirement": "VCGC-REQ088",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "同義冊一詞兩主剩 麥格理(MACQ/MACQUARIE/MAQ)· 元富(MASTERLINK/MSTR)5 紅列;測試樣本沒有這兩家,授權範圍外不代裁",
+      "next": "操作員裁定正典鍵 → CGC_MDL176 下一版 R34_RULINGS 加列 → run CGC_MDL176_SynonymUnion apply → CGC_MDL237 audit"
+    },
+    {
+      "id": "VRN-REQ008:synonym_union_r34",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "synonym_union_r34",
+      "receipt": "docs/handoff/evidence/synonym_union_r34.json"
+    },
+    {
+      "id": "VRN-REQ008:numbering_dup_r34",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "numbering_dup_r34",
+      "receipt": "docs/handoff/evidence/numbering_dup_r34.json"
     }
   ]
 }

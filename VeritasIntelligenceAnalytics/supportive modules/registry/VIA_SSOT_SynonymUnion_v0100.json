@@ -2,7 +2,7 @@
  "schema": "VIA.SSOT.SynonymUnion.v1",
  "version": "0102",
  "batch": "批678",
- "ts": "2026-09-23 22:10",
+ "ts": "2026-09-30 20:03",
  "policy": {
   "order": "拒絕清單 → 正典 → 疊加層 → 聯集冊",
   "only_add": true,
@@ -34,7 +34,7 @@
   "WIDEN": 1
  },
  "counts": {
-  "broker": 255,
+  "broker": 277,
   "financial_concept": 7,
   "rating": 189,
   "rating_label": 7,
@@ -72,6 +72,46 @@
    "canonical": "WATERLAND",
    "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
    "why": "IBF=International Bills Finance=國票;規則冊 extra_table 的 IBF→國票 與正典鍵 WATERLAND(國票證券)是同一家;正典鍵為準"
+  },
+  "BAML": {
+   "canonical": "BOFA",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "美國銀行美林證券:knowledge.broker_dict_ext 的 BAML 與 institution 正典鍵 BOFA 是同一家;正典自己的 key_migration_map 已有 BOA/ML→BOFA · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "ML": {
+   "canonical": "BOFA",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "美林(Merrill Lynch)併入美銀;knowledge.broker_dict 的 ML 與正典鍵 BOFA 同一家(正典 key_migration_map ML→BOFA) · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "CITIGROUP": {
+   "canonical": "CITI",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "花旗:broker_list 的 CITIGROUP 與 institution 正典鍵 CITI 同一家;樣本索引 Citi 2 份 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "FCB": {
+   "canonical": "FIRST",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "第一金證券:knowledge.broker_dict 的 FCB 與 institution.domestic_brokers 正典鍵 FIRST 同一家 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "FIRSTSEC": {
+   "canonical": "FIRST",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "第一金證券:規則冊 extra_table 的 FIRSTSEC 與正典鍵 FIRST 同一家 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "HNSC": {
+   "canonical": "HUANAN",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "華南永昌證券:knowledge.broker_dict 的 HNSC 與 institution.domestic_brokers 正典鍵 HUANAN 同一家 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "MORGAN STANLEY": {
+   "canonical": "MS",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "摩根士丹利(大摩):broker_list 的 MORGAN STANLEY 與 institution 正典鍵 MS 同一家;樣本索引 Morgan Stanley 13 份 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
+  },
+  "MORGANSTANLEY": {
+   "canonical": "MS",
+   "ruled_by": "AI(批665 操作員授權同義裁定;LL90 留痕義務不轉移)",
+   "why": "同上;規則冊 extra_table 的 MORGANSTANLEY 拼法 · 裁定 AI(R34 2026-09-30 操作員授權「重號問題授權你可改」;正典鍵為準 · 不刪詞 · 不改號)"
   }
  },
  "direction": {
@@ -126,6 +166,62 @@
  "deny_leak": [
   {
    "scope": "broker",
+   "alias": "cicc",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中信證券",
+   "canonical": "CTBC",
+   "book": "knowledge.broker_dict",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中金",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中金公司",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "cicc",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict_ext",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中信證券",
+   "canonical": "CTBC",
+   "book": "knowledge.broker_dict_ext",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中金",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict_ext",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
+   "alias": "中金公司",
+   "canonical": "CICC",
+   "book": "knowledge.broker_dict_ext",
+   "kind": "LEAK"
+  },
+  {
+   "scope": "broker",
    "alias": "中信證券",
    "canonical": "CTBC",
    "book": "institution.domestic_brokers",
@@ -142,24 +238,17 @@
  "book_defects": [],
  "gate_bypass": [
   {
-   "engine": "VRN_ENG018_MDL005OCRFetchingPDFText.py",
-   "gated": false,
-   "state": "PENDING",
-   "path": "functional modules/VRN/VRN_ENG018_MDL005OCRFetchingPDFText.py",
-   "why": ""
-  },
-  {
-   "engine": "VRN_ENG062_SummarizerV1_v0102.py",
-   "gated": false,
-   "state": "PENDING",
-   "path": "functional modules/VRN/VRN_ENG062_SummarizerV1_v0102.py",
-   "why": ""
-  },
-  {
-   "engine": "VRN_ENG086_FirstPageLogicBridge_v0115.py",
+   "engine": "VRN_ENG086_FirstPageLogicBridge_v0118.py",
    "gated": true,
    "state": "GATED",
-   "path": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0115.py",
+   "path": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0118.py",
+   "why": ""
+  },
+  {
+   "engine": "VRN_ENG111_StockIdentity_v0104.py",
+   "gated": false,
+   "state": "PENDING",
+   "path": "functional modules/VRN/VRN_ENG111_StockIdentity_v0104.py",
    "why": ""
   },
   {
@@ -181,6 +270,13 @@
    "gated": false,
    "state": "PENDING",
    "path": "functional modules/VRN/engine/VRN_AutoTestLoop.py",
+   "why": ""
+  },
+  {
+   "engine": "VRN_BatchPool.py",
+   "gated": false,
+   "state": "PENDING",
+   "path": "functional modules/VRN/engine/VRN_BatchPool.py",
    "why": ""
   },
   {
@@ -230,13 +326,6 @@
    "gated": true,
    "state": "GATED",
    "path": "supportive modules/70_VRN_Rules/SUP_MDL015_VISVRNBrokerAliasFullList_v0102.py",
-   "why": ""
-  },
-  {
-   "engine": "SUP_MDL749_VRNFieldRuleHub_v0114.py",
-   "gated": true,
-   "state": "GATED",
-   "path": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0114.py",
    "why": ""
   },
   {
@@ -359,13 +448,6 @@
    "why": ""
   },
   {
-   "engine": "via_params_central_v0109.py",
-   "gated": false,
-   "state": "PENDING",
-   "path": "supportive modules/registry/via_params_central_v0109.py",
-   "why": ""
-  },
-  {
    "engine": "SUP_MDL668_MDL245VrnBrokerAbbrevSsotFinalPatchV06135SUPPORTRULEV06135.py",
    "gated": false,
    "state": "PENDING",
@@ -417,7 +499,7 @@
  ],
  "gate_behaviour": {
   "state": "GREEN",
-  "why": "樞紐委派給 VRN_ENG086_FirstPageLogicBridge_v0115.py,而那一支有閘(名單 20 條逐條餵真文字,漏擋 0)",
+  "why": "樞紐委派給 VRN_ENG086_FirstPageLogicBridge_v0118.py,而那一支有閘(名單 20 條逐條餵真文字,漏擋 0)",
   "denied": [
    null,
    "拒絕:拒絕清單:摩根(操作員裁決;見 overlay.rulings)"
@@ -428,7 +510,7 @@
   ],
   "probed": 20,
   "leaked": [],
-  "delegates_to": "VRN_ENG086_FirstPageLogicBridge_v0115.py"
+  "delegates_to": "VRN_ENG086_FirstPageLogicBridge_v0118.py"
  },
  "rulings": [
   {
@@ -531,7 +613,9 @@
    "upload_said": [
     "CICC"
    ],
-   "kept": []
+   "kept": [
+    "CICC"
+   ]
   },
   {
    "scope": "broker",
@@ -588,7 +672,9 @@
    "upload_said": [
     "CICC"
    ],
-   "kept": []
+   "kept": [
+    "CICC"
+   ]
   },
   {
    "scope": "broker",
@@ -746,7 +832,21 @@
     },
     {
      "canonical": "BARCLAYS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BARCLAYS",
      "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "barclays research": [
+    {
+     "canonical": "BARCLAYS",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -790,6 +890,34 @@
      "namespace": "freetext"
     }
    ],
+   "boci": [
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "boci research": [
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "bofa": [
     {
      "canonical": "BAML",
@@ -814,6 +942,20 @@
      "source": "USER_DICTIONARY",
      "raw": "BofA",
      "inclusion": "INCLUDED_BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "bofa merrill lynch": [
+    {
+     "canonical": "BAML",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "ML",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
@@ -945,6 +1087,34 @@
      "namespace": "freetext"
     }
    ],
+   "cicc": [
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    }
+   ],
+   "cicc research": [
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "citi": [
     {
      "canonical": "CITI",
@@ -1060,9 +1230,35 @@
     },
     {
      "canonical": "CLSA",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
      "source": "USER_DICTIONARY",
      "raw": "CLSA",
      "inclusion": "INCLUDED_BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "clsa research": [
+    {
+     "canonical": "CLSA",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
@@ -1146,6 +1342,12 @@
     },
     {
      "canonical": "CS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -1169,6 +1371,12 @@
     {
      "canonical": "CS",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CS",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -1201,6 +1409,12 @@
     },
     {
      "canonical": "CTBC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -1217,6 +1431,12 @@
     {
      "canonical": "CTBC",
      "source": "institution.domestic_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -1293,8 +1513,20 @@
    ],
    "daiwa capital markets": [
     {
+     "canonical": "DAI",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
      "canonical": "DAIWA",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "DAIWA",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -1503,6 +1735,20 @@
      "source": "USER_DICTIONARY",
      "raw": "First",
      "inclusion": "INCLUDED_BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "first sec": [
+    {
+     "canonical": "FCB",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "FIRST",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
@@ -1761,6 +2007,14 @@
      "namespace": "freetext"
     }
    ],
+   "hsbc global research": [
+    {
+     "canonical": "HSBC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "hsbc holdings": [
     {
      "canonical": "HSBC",
@@ -1778,6 +2032,12 @@
     }
    ],
    "hua nan": [
+    {
+     "canonical": "HNSC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
     {
      "canonical": "HUANAN",
      "source": "broker_list",
@@ -1805,6 +2065,12 @@
     }
    ],
    "hua nan securities": [
+    {
+     "canonical": "HNSC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
     {
      "canonical": "HUANAN",
      "source": "institution.domestic_brokers",
@@ -1874,8 +2140,34 @@
    ],
    "jefferies": [
     {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
      "canonical": "JEFFERIES",
      "source": "field_rules.broker.extra_table",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "jefferies research": [
+    {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -1944,6 +2236,12 @@
     },
     {
      "canonical": "JPM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -1953,6 +2251,20 @@
      "source": "broker_list",
      "raw": "jp morgan",
      "inclusion": "INCLUDED_BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "jp morgan research": [
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
@@ -1966,6 +2278,12 @@
     {
      "canonical": "JPM",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -1994,6 +2312,12 @@
     {
      "canonical": "J.P. MORGAN",
      "source": "broker_list",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -2028,6 +2352,12 @@
    "jpmorgan chase": [
     {
      "canonical": "JPM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -2040,6 +2370,12 @@
     }
    ],
    "jp摩根": [
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
     {
      "canonical": "JPM",
      "source": "knowledge.broker_dict_ext",
@@ -2116,6 +2452,12 @@
    ],
    "macquarie": [
     {
+     "canonical": "MACQ",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
      "canonical": "MACQUARIE",
      "source": "broker_list",
      "inclusion": "BASELINE",
@@ -2124,6 +2466,12 @@
     {
      "canonical": "MACQUARIE",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MAQ",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -2149,6 +2497,20 @@
      "namespace": "freetext"
     }
    ],
+   "macquarie research": [
+    {
+     "canonical": "MACQ",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MAQ",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "masterlink": [
     {
      "canonical": "MASTERLINK",
@@ -2159,6 +2521,18 @@
     {
      "canonical": "MASTERLINK",
      "source": "institution.domestic_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -2174,6 +2548,18 @@
     {
      "canonical": "MASTERLINK",
      "source": "institution.domestic_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -2297,6 +2683,20 @@
      "namespace": "freetext"
     }
    ],
+   "merrill": [
+    {
+     "canonical": "BAML",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "ML",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "merrill lynch": [
     {
      "canonical": "BAML",
@@ -2392,6 +2792,12 @@
     },
     {
      "canonical": "MS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -2449,6 +2855,12 @@
     {
      "canonical": "MS",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MS",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -2540,6 +2952,20 @@
      "source": "USER_DICTIONARY",
      "raw": "Nomura",
      "inclusion": "INCLUDED_BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "nomura research": [
+    {
+     "canonical": "NMR",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "NOM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
@@ -2907,6 +3333,20 @@
      "namespace": "freetext"
     }
    ],
+   "ubs research": [
+    {
+     "canonical": "UBS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "UBS",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "ubs securities": [
     {
      "canonical": "UBS",
@@ -3079,6 +3519,12 @@
     },
     {
      "canonical": "CTBC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -3110,6 +3556,18 @@
     {
      "canonical": "CTBC",
      "source": "institution.domestic_brokers",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "DENIED",
      "namespace": "freetext"
     }
@@ -3160,6 +3618,68 @@
     },
     {
      "canonical": "CTBC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CTBC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "中金": [
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    }
+   ],
+   "中金公司": [
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CICC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "DENIED",
+     "namespace": "freetext"
+    }
+   ],
+   "中銀": [
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "中銀國際": [
+    {
+     "canonical": "BOCI",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BOCI",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -3169,6 +3689,20 @@
     {
      "canonical": "ORIENTAL",
      "source": "field_rules.broker.extra_table",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "傑富瑞": [
+    {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JEF",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -3287,6 +3821,18 @@
      "namespace": "freetext"
     },
     {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
      "canonical": "MASTERLINK",
      "source": "USER_DICTIONARY",
      "raw": "元富",
@@ -3313,6 +3859,18 @@
     {
      "canonical": "MASTERLINK",
      "source": "institution.domestic_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MSTR",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -4038,6 +4596,12 @@
     },
     {
      "canonical": "MS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -4215,6 +4779,12 @@
     },
     {
      "canonical": "JPM",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -4249,12 +4819,24 @@
     },
     {
      "canonical": "BARCLAYS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "BARCLAYS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
    ],
    "巴克萊銀行": [
+    {
+     "canonical": "BARCLAYS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
     {
      "canonical": "BARCLAYS",
      "source": "knowledge.broker_dict_ext",
@@ -4377,6 +4959,12 @@
    "摩根史坦利": [
     {
      "canonical": "MS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -4438,6 +5026,12 @@
     {
      "canonical": "JPM",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "JPM",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -4594,6 +5188,20 @@
      "namespace": "freetext"
     }
    ],
+   "永豐證券": [
+    {
+     "canonical": "SINOPAC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "SJP",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "永豐金": [
     {
      "canonical": "SINOPAC",
@@ -4646,6 +5254,14 @@
     }
    ],
    "滙豐控股": [
+    {
+     "canonical": "HSBC",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
+   "滙豐研究": [
     {
      "canonical": "HSBC",
      "source": "knowledge.broker_dict_ext",
@@ -4756,6 +5372,12 @@
     },
     {
      "canonical": "CS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CS",
      "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
@@ -4779,6 +5401,12 @@
     {
      "canonical": "CS",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CS",
+     "source": "knowledge.broker_dict",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     },
@@ -4862,6 +5490,18 @@
     {
      "canonical": "UBS",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "UBS",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "UBS",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -5462,6 +6102,14 @@
      "namespace": "freetext"
     }
    ],
+   "華南證券": [
+    {
+     "canonical": "HNSC",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "里昂": [
     {
      "canonical": "CLSA",
@@ -5489,6 +6137,12 @@
     },
     {
      "canonical": "CLSA",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
      "source": "USER_DICTIONARY",
      "raw": "里昂",
      "inclusion": "INCLUDED_BASELINE",
@@ -5499,6 +6153,18 @@
     {
      "canonical": "CLSA",
      "source": "institution.foreign_brokers",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "CLSA",
+     "source": "knowledge.broker_dict_ext",
      "inclusion": "BASELINE",
      "namespace": "freetext"
     }
@@ -5632,6 +6298,12 @@
    ],
    "麥格理": [
     {
+     "canonical": "MACQ",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
      "canonical": "MACQUARIE",
      "source": "broker_list",
      "inclusion": "BASELINE",
@@ -5657,6 +6329,20 @@
      "namespace": "freetext"
     }
    ],
+   "麥格理證券": [
+    {
+     "canonical": "MACQ",
+     "source": "knowledge.broker_dict_ext",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
+    {
+     "canonical": "MAQ",
+     "source": "knowledge.broker_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    }
+   ],
    "麥格理資本": [
     {
      "canonical": "MACQUARIE",
@@ -5671,11 +6357,9 @@
      "namespace": "freetext"
     }
    ],
-   "cicc": [],
    "gf": [],
    "gf securities": [],
    "haitong": [],
-   "中金": [],
    "廣發": [],
    "廣發證券": [],
    "海通": []
@@ -9015,6 +9699,12 @@
     }
    ],
    "強烈買進": [
+    {
+     "canonical": "BUY",
+     "source": "knowledge.rating_dict",
+     "inclusion": "BASELINE",
+     "namespace": "freetext"
+    },
     {
      "canonical": "STRONG_BUY",
      "source": "institution.broker_ratings",

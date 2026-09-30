@@ -1,0 +1,427 @@
+{
+ "schema": "VIA.VDF.SingleEngineTest.v1",
+ "version": "v0100",
+ "subsystem": "VDF",
+ "scope": "VCGC→VDF single-engine tests: every engine locked in VDF-WKF004/005/006/010 (VIA_LampLock_v0107) + ENG055/087/094/077/078",
+ "rule": "Selftest = offline, deterministic, via the VCGC hub. Real test = operator side, network only through the unified net tool with his own consent env. Output = validation: each real run's tables must load under VIA/docs/r34/VDF_OUTPUT_HEADERS_r34.json.",
+ "headers": "VeritasIntelligenceAnalytics/docs/r34/VDF_OUTPUT_HEADERS_r34.json",
+ "engines": [
+  {
+   "family": "VDF_ENG054_TWDailyBackfill",
+   "tail": "VDF_ENG054_TWDailyBackfill_v0111.py",
+   "workflow_steps": [
+    "VDF-WKF004-STP001"
+   ],
+   "console_item": "tw_prices_inc",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG054_TWDailyBackfill --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG054_TWDailyBackfill run",
+    "console": "via-console run --item tw_prices_inc",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "vdf_tw_market.duckdb::tw_daily_prices",
+    "vdf_tw_market.duckdb::tw_listings"
+   ],
+   "note": ""
+  },
+  {
+   "family": "VDF_ENG056_ChipBackfill",
+   "tail": "VDF_ENG056_ChipBackfill_v0106.py",
+   "workflow_steps": [
+    "VDF-WKF004-STP002"
+   ],
+   "console_item": "tw_chips",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG056_ChipBackfill --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG056_ChipBackfill run --days 5",
+    "console": "via-console run --item tw_chips",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "vdf_tw_market.duckdb::tw_chip_inst",
+    "vdf_tw_market.duckdb::tw_chip_margin"
+   ],
+   "note": ""
+  },
+  {
+   "family": "VDF_ENG057_TradingValueBackfill",
+   "tail": "VDF_ENG057_TradingValueBackfill_v0109.py",
+   "workflow_steps": [
+    "VDF-WKF004-STP003"
+   ],
+   "console_item": "tw_trading_value",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG057_TradingValueBackfill --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG057_TradingValueBackfill run --days 5",
+    "console": "via-console run --item tw_trading_value",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "vdf_tw_market.duckdb::tw_trading_daily"
+   ],
+   "note": ""
+  },
+  {
+   "family": "VDF_ENG081_UniverseAlign",
+   "tail": "VDF_ENG081_UniverseAlign_v0103.py",
+   "workflow_steps": [
+    "VDF-WKF004-STP004"
+   ],
+   "console_item": "tw_align",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG081_UniverseAlign --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG081_UniverseAlign check --days 5",
+    "console": "via-console run --item tw_align",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": null
+   },
+   "expected_outputs": [
+    "VIA_Reports/vdf/universe/ALIGN_latest.json"
+   ],
+   "note": "read-only"
+  },
+  {
+   "family": "VDF_ENG073_DataArchitecture",
+   "tail": "VDF_ENG073_DataArchitecture_v0101.py",
+   "workflow_steps": [
+    "VDF-WKF004-STP005",
+    "VDF-WKF005-STP004"
+   ],
+   "console_item": "db_arch",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG073_DataArchitecture --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG073_DataArchitecture build",
+    "console": "via-console run --item db_arch",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": null
+   },
+   "expected_outputs": [
+    "VIA_VDFArchitecture_v0100.json",
+    "VIA_UI_VDFArchitecture_v0100.html"
+   ],
+   "note": "zero network; writes regenerated reports"
+  },
+  {
+   "family": "VDF_ENG079_LocalDbConsolidate",
+   "tail": "VDF_ENG079_LocalDbConsolidate_v0104.py",
+   "workflow_steps": [
+    "VDF-WKF005-STP001",
+    "VDF-WKF005-STP002",
+    "VDF-WKF005-STP003"
+   ],
+   "console_item": "db_localdb_scan · db_coverage · tw_need",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG079_LocalDbConsolidate --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG079_LocalDbConsolidate scan",
+    "console": "via-console run --item db_localdb_scan",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": "then: coverage · need"
+   },
+   "expected_outputs": [
+    "VIA_Reports/vdf/local_db/RUN_latest.json",
+    "VIA_Reports/vdf/local_db/COVERAGE_latest.json",
+    "VIA_Reports/vdf/local_db/NEED_latest.json"
+   ],
+   "note": "read-only"
+  },
+  {
+   "family": "VDF_ENG077_ActiveETFUniverse",
+   "tail": "VDF_ENG077_ActiveETFUniverse_v0105.py",
+   "workflow_steps": [
+    "VDF-WKF006-STP001"
+   ],
+   "console_item": "etf_universe",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG077_ActiveETFUniverse --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG077_ActiveETFUniverse run",
+    "console": "via-console run --item etf_universe",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "ActiveTWETF.duckdb::active_tw_etf_registry",
+    "ActiveTWETF.duckdb::active_tw_etf_universe"
+   ],
+   "note": "header id active_etf_list"
+  },
+  {
+   "family": "VDF_ENG078_ActiveETFHoldingsHistory",
+   "tail": "VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+   "workflow_steps": [
+    "VDF-WKF006-STP002"
+   ],
+   "console_item": "etf_holdings_daily",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG078_ActiveETFHoldingsHistory --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG078_ActiveETFHoldingsHistory daily",
+    "console": "via-console run --item etf_holdings_daily",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "ActiveTWETF.duckdb::holdings_daily"
+   ],
+   "note": "header id etf_holdings_daily"
+  },
+  {
+   "family": "VDF_ENG076_ETFRevenueMomentum",
+   "tail": "VDF_ENG076_ETFRevenueMomentum_v0102.py",
+   "workflow_steps": [
+    "VDF-WKF006-STP003"
+   ],
+   "console_item": "etf_revenue",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG076_ETFRevenueMomentum --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG076_ETFRevenueMomentum run",
+    "console": "via-console run --item etf_revenue",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": null
+   },
+   "expected_outputs": [
+    "etf_revenue_momentum"
+   ],
+   "note": ""
+  },
+  {
+   "family": "VDF_ENG085_VatetfBridge",
+   "tail": "VDF_ENG085_VatetfBridge_v0106.py",
+   "workflow_steps": [
+    "VDF-WKF006-STP004"
+   ],
+   "console_item": "vdf_vetf_consensus",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG085_VatetfBridge --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG085_VatetfBridge run",
+    "console": "via-console run --item vdf_vetf_consensus",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": null
+   },
+   "expected_outputs": [
+    "VIA_Reports/vatetf/out/asof=*/audit.json",
+    "VIA_Reports/vatetf/RUN_latest.json"
+   ],
+   "note": ""
+  },
+  {
+   "family": "VDF_ENG087_MarketListGovernance",
+   "tail": "VDF_ENG087_MarketListGovernance_v0106.py",
+   "workflow_steps": [
+    "VDF-WKF010-STP001"
+   ],
+   "console_item": "vdf_market_lists",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG087_MarketListGovernance --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG087_MarketListGovernance diff",
+    "console": "via-console run --item vdf_market_lists",
+    "net": false,
+    "consent_env": [],
+    "consent_note": "no network",
+    "then": "after: status · lists"
+   },
+   "expected_outputs": [
+    "VIA_Reports/vdf/central_lists/TW_STOCK_LIST_SNAPSHOT_latest.json",
+    "VIA_Reports/vdf/central_lists/TW_LISTS_latest.json",
+    "VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json"
+   ],
+   "note": "v0106 adds diff (ACTIVE/NEW/DELISTED); reads tw_listings_industry, run ENG055 L1 first. Locked tail in VIA_LampLock_v0107 is v0105 → lead re-locks"
+  },
+  {
+   "family": "VDF_ENG055_OmniFetch",
+   "tail": "VDF_ENG055_OmniFetch_v0122.py",
+   "workflow_steps": [],
+   "console_item": "macro_lanes lanes=L1",
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG055_OmniFetch --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG055_OmniFetch run --lane L1",
+    "console": "via-console run --item macro_lanes lanes=L1",
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": null
+   },
+   "expected_outputs": [
+    "vdf_tw_market.duckdb::tw_listings_industry"
+   ],
+   "note": "not in a locked workflow; L1 = the TW stock list writer (header id tw_stock_list)"
+  },
+  {
+   "family": "VDF_ENG094_ActiveETFActivity",
+   "tail": "VDF_ENG094_ActiveETFActivity_v0101.py",
+   "workflow_steps": [],
+   "console_item": null,
+   "selftest_cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG094_ActiveETFActivity --selftest",
+   "real_test": {
+    "side": "operator workstation",
+    "cmd": "VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 \"VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py\" run --family vdf VDF_ENG094_ActiveETFActivity fetch --apply",
+    "console": null,
+    "net": true,
+    "consent_env": [
+     "VIA_NET_CONSENT=YES",
+     "VIA_SCRAPE_CONSENT=YES | I_ACCEPT_RESPONSIBLE_SCRAPING (CGC_MDL224 ScrapeGate)"
+    ],
+    "consent_note": "operator sets these himself in his own shell; engines and this book never set them (L07/L08)",
+    "then": "then: breakdown --apply · metrics"
+   },
+   "expected_outputs": [
+    "ActiveTWETF.duckdb::etf_daily_metrics",
+    "ActiveTWETF.duckdb::etf_breakdown"
+   ],
+   "note": "v0101 new verbs; breakdown/metrics are zero-network; gross subscriptions/redemptions ABSENT; NAV endpoint CANDIDATE"
+  }
+ ],
+ "container_selftest": {
+  "utc": "2026-09-30T19:45:44+00:00",
+  "git_sha": "d49b2dbc940f994dc8bdb3a23c2badb681f8c57c",
+  "where": "claude container (offline; VIA_NET_CONSENT / VIA_SCRAPE_CONSENT unset)",
+  "results": {
+   "VDF_ENG054_TWDailyBackfill": {
+    "rc": 0,
+    "seconds": 43.8,
+    "tail_file": "VDF_ENG054_TWDailyBackfill_v0111.py",
+    "summary": "[計] 六檢 OK 6 · FAIL 0(② 內串前版自測 1 檢)",
+    "fail_lines": []
+   },
+   "VDF_ENG055_OmniFetch": {
+    "rc": 0,
+    "seconds": 1.6,
+    "tail_file": "VDF_ENG055_OmniFetch_v0122.py",
+    "summary": "[OK] 本支沒有字串釘死同族版號(PINVER 0)",
+    "fail_lines": []
+   },
+   "VDF_ENG056_ChipBackfill": {
+    "rc": 0,
+    "seconds": 1.7,
+    "tail_file": "VDF_ENG056_ChipBackfill_v0106.py",
+    "summary": "[OK]",
+    "fail_lines": []
+   },
+   "VDF_ENG057_TradingValueBackfill": {
+    "rc": 0,
+    "seconds": 2.0,
+    "tail_file": "VDF_ENG057_TradingValueBackfill_v0109.py",
+    "summary": "[OK]",
+    "fail_lines": []
+   },
+   "VDF_ENG073_DataArchitecture": {
+    "rc": 0,
+    "seconds": 3.7,
+    "tail_file": "VDF_ENG073_DataArchitecture_v0101.py",
+    "summary": "[計] 十檢 OK 10 · FAIL 0",
+    "fail_lines": []
+   },
+   "VDF_ENG076_ETFRevenueMomentum": {
+    "rc": 0,
+    "seconds": 2.8,
+    "tail_file": "VDF_ENG076_ETFRevenueMomentum_v0102.py",
+    "summary": "[計] 八檢 OK 8 · FAIL 0",
+    "fail_lines": []
+   },
+   "VDF_ENG077_ActiveETFUniverse": {
+    "rc": 0,
+    "seconds": 1.8,
+    "tail_file": "VDF_ENG077_ActiveETFUniverse_v0105.py",
+    "summary": "[OK] 本支沒有字串釘死同族版號(PINVER 0)",
+    "fail_lines": []
+   },
+   "VDF_ENG078_ActiveETFHoldingsHistory": {
+    "rc": 0,
+    "seconds": 4.8,
+    "tail_file": "VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+    "summary": "[OK] 本體自測",
+    "fail_lines": []
+   },
+   "VDF_ENG079_LocalDbConsolidate": {
+    "rc": 0,
+    "seconds": 45.9,
+    "tail_file": "VDF_ENG079_LocalDbConsolidate_v0104.py",
+    "summary": "VDF_ENG079_LocalDbConsolidate_v0104 薄尾 3/3 PASS · 前一版 rc=0",
+    "fail_lines": []
+   },
+   "VDF_ENG081_UniverseAlign": {
+    "rc": 0,
+    "seconds": 45.7,
+    "tail_file": "VDF_ENG081_UniverseAlign_v0103.py",
+    "summary": "VDF_ENG081_UniverseAlign_v0103 薄尾 3/3 PASS · 前一版 rc=0",
+    "fail_lines": []
+   },
+   "VDF_ENG085_VatetfBridge": {
+    "rc": 0,
+    "seconds": 48.0,
+    "tail_file": "VDF_ENG085_VatetfBridge_v0106.py",
+    "summary": "VDF_ENG085_VatetfBridge_v0106 薄尾 4/4 PASS · 前一版 rc=0",
+    "fail_lines": []
+   },
+   "VDF_ENG087_MarketListGovernance": {
+    "rc": 0,
+    "seconds": 44.3,
+    "tail_file": "VDF_ENG087_MarketListGovernance_v0106.py",
+    "summary": "[VDF_ENG087 v0106] 15/15 OK",
+    "fail_lines": []
+   },
+   "VDF_ENG094_ActiveETFActivity": {
+    "rc": 0,
+    "seconds": 2.8,
+    "tail_file": "VDF_ENG094_ActiveETFActivity_v0101.py",
+    "summary": "[VDF_ENG094 v0101] 24/24 OK",
+    "fail_lines": []
+   }
+  },
+  "verdict": "GREEN",
+  "n": 13,
+  "n_rc0": 13
+ }
+}
