@@ -52,7 +52,7 @@ via-vcgc run VDF_SystemManager store --root "$D" migrate-legacy --db 'C:\Users\t
 
 刪除只涵蓋受管庫內該商品的全資料（本版 daily prices），**不掃描／删除其他舊 DuckDB、備份、報告或來源 CSV**。舊資料若要全面移轉、停用舊排程並刪除，需先盤點所有主機副本；目前未冒稱完成。刪除失敗可重跑 delete，tombstone 商品不會被背景復活；重新匯入同代號屬明示重新新增。單寫入鎖涵蓋更新／匯入／刪除，避免競態；異常退出的 `.writer.lock` 不自動強搶，必須先確認原程序已停止。
 
-本版不替主機註冊開機服務。可在 Windows 工作排程器「登入時」執行既有 Python 與 VCGC 入口：參數 `"<repo>\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v0178.py" run VDF_SystemManager store --root "<D>" start --interval 3600`，起始位置為 repo；採「已有執行個體則不啟動」。使用該主機原有 VCGC 啟動環境與同意政策；先完成手動一次更新再設定。此項仍待主機實測。
+本版不替主機註冊開機服務。可在 Windows 工作排程器「登入時」執行既有 Python 與 VCGC 入口：參數 `"<repo>\VeritasIntelligenceAnalytics\supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py" run VDF_SystemManager store --root "<D>" start --interval 3600`，起始位置為 repo；採「已有執行個體則不啟動」。使用該主機原有 VCGC 啟動環境與同意政策；先完成手動一次更新再設定。此項仍待主機實測。
 
 ## HEADER 鎖定
 
@@ -93,3 +93,7 @@ VDF→VRN 商品對照唯讀，保留四碼股票名稱、上市櫃市場及 Yah
 ## 證據
 
 每一案由 `via-vcgc handoff test <case>` 留下命令、rc、目標 marker、相依 SHA 與完整日誌：`vdf_dispatch`、`vdf_manager`、`vdf_store`、`vrn_manager_route`、`vrn_probe`。`handoff checkpoint` 的可續接燈不等於全系統 closeout 燈；原有主機、鎖漂移、OCR 待辦保留。
+
+本批合併 PR #378 後用 VCGC v0179 重驗：五個新增 case 皆 rc0 與 marker 成立。中央編號追加 128 筆（含交接補強 8 筆），遺失／身分改動／重號皆 0，六項註冊完整性皆 0；既有 rule 紅列 21 保留。SDD 為 YELLOW（32 工作流、112 步、112 需求，鎖版本待重驗 7 處），SSOT panorama 尚有舊同義字／命名風險，詳見 evidence/vdf_vrn_*_20260930.txt；不宣稱全系統綠燈。
+
+交接補強：v0103 同時保留 VRN v0110 與 v0111 的受管範圍。活入口按元件冊核對，已宣告的同族舊依賴必須在中央 MDL/ENG 編號冊找到唯一對應列，且該冊 SHA／列數吻合才承認歷史登錄；缺登錄、不同家族或冊指紋不符仍拒絕。新舊版程式皆不刪除。

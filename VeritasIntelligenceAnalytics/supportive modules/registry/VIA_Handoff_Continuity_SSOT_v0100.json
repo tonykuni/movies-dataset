@@ -72,13 +72,13 @@
     "functional modules/VRN/VRN_ReportProbe_v0100.py",
     "supportive modules/registry/VIA_Requirements_SSOT_v0107.json",
     "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0101.json",
-    "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json"
+    "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py"
   ],
   "managed_modules": [
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0101.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0177.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0107.py",
-    "functional modules/VRN/VRN_SystemManager_v0110.py",
     "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
     "supportive modules/registry/CGC_MDL245_SDDValidator_v0103.py",
     "supportive modules/registry/CGC_MDL247_SSOTPanorama_v0100.py",
@@ -94,7 +94,9 @@
     "functional modules/VDF/VDF_SystemManager_v0120.py",
     "functional modules/VDF/VDF_ParquetStore_v0100.py",
     "functional modules/VRN/VRN_SystemManager_v0111.py",
-    "functional modules/VRN/VRN_ReportProbe_v0100.py"
+    "functional modules/VRN/VRN_ReportProbe_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0110.py",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -115,7 +117,7 @@
         "CGC_MDL140_HandoverConsole",
         "--selftest"
       ],
-      "success_marker": "[交接回歸] fail=0",
+      "success_marker": "[交接歷史席位] fail=0",
       "scope": "交接遺漏／證據過期／鎖漂移故障注入",
       "dependencies": [
         "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py",
@@ -564,6 +566,13 @@
       "owner": "具資料存取權之主機操作者",
       "reason": "目前只有合成 TXT/PDF；正式報告全文、OCR、年報期別與全樣本準確率未驗收",
       "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
+    }
+  ],
+  "retained_dependencies": [
+    {
+      "path": "functional modules/VRN/VRN_SystemManager_v0110.py",
+      "active_entry": "functional modules/VRN/VRN_SystemManager_v0111.py",
+      "reason": "舊程式與 watch 保留；managed_modules 只指向目前中央註冊的活入口，避免一族兩個主入口。"
     }
   ]
 }
