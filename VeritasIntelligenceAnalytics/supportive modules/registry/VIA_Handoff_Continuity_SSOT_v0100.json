@@ -89,7 +89,8 @@
     "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
-    "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py"
+    "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
+    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -291,6 +292,19 @@
         "supportive modules/registry/CGC_MDL241_TemplateAdapter_v*.py"
       ],
       "timeout_seconds": 300
+    },
+    "deck": {
+      "argv": [
+        "CGC_MDL095_DeckServer",
+        "--selftest"
+      ],
+      "success_marker": "安全橋自測 26 項 · OK 26 · FAIL 0",
+      "scope": "指揮台本地執行橋安全自測(同源 · 權杖 · 拒絕路徑);v0161 拒絕 POST 前先讀掉請求本文,Windows 不再 RST(Z289 · VCGC-REQ087 · 側線 2026-09-30 b)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL095_DeckServer_v*.py",
+        "supportive modules/registry/tests/test_master_control_contract_v*.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -524,6 +538,21 @@
       "state": "VERIFIED",
       "case": "fullcheck",
       "receipt": "docs/handoff/evidence/fullcheck.json"
+    },
+    {
+      "id": "VCGC-REQ087:deck-rst",
+      "requirement": "VCGC-REQ087",
+      "state": "VERIFIED",
+      "case": "deck",
+      "receipt": "docs/handoff/evidence/deck.json"
+    },
+    {
+      "id": "VCGC-REQ087:branch-protection",
+      "requirement": "VCGC-REQ087",
+      "state": "PENDING",
+      "owner": "操作員(倉庫設定)",
+      "reason": "半途合併(#380 · #383)要在倉庫層擋:AI 沒有改倉庫設定的權限",
+      "next": "GitHub → Settings → Branches → main:Require status checks to pass before merging,勾 Windows bundled Chromium UAT"
     },
     {
       "id": "VCGC-REQ085:base-380",
