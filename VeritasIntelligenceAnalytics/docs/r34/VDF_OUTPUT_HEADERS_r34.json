@@ -1,0 +1,124 @@
+{
+ "schema": "VIA.OutputHeaders.fragment.v1",
+ "subsystem": "VDF",
+ "round": "r34",
+ "generated_utc": "2026-09-30",
+ "rule": "Fixed header per output table; columns copied from the writer's code (file:line in evidence). Loader: read source → select exactly these columns in this order → cast dtype → assert required non-null, key unique, rows >= min_rows. output = validation = result validation.",
+ "paths_root": "VeritasIntelligenceAnalytics",
+ "tables": {
+  "tw_stock_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {"kind": "duckdb", "db_env": "VIA_DB_VDF_TW_MARKET", "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb", "table": "tw_listings_industry"},
+   "columns": [
+    {"name": "code", "dtype": "str", "required": true, "key": true},
+    {"name": "name", "dtype": "str", "required": true, "key": false},
+    {"name": "market", "dtype": "str", "required": true, "key": true},
+    {"name": "industry_code", "dtype": "str", "required": false, "key": false},
+    {"name": "industry_name", "dtype": "str", "required": false, "key": false},
+    {"name": "yf_ticker", "dtype": "str", "required": true, "key": false}
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:336-341 (row columns) · :343 (upsert keys code,market) · :168 (DB_TW) · reader VDF_ENG087_MarketListGovernance_v0105.py:159 load_stock_list · min_rows = SOFT_MIN TWSE 900 + TPEX 700 at VDF_ENG087_MarketListGovernance_v0105.py:93 · db_env at VDF_ENG087_MarketListGovernance_v0105.py:129"
+  },
+  "tw_stock_list_diff": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG087_MarketListGovernance",
+   "source": {"kind": "json", "db_env": "", "path": "VIA_Reports/vdf/central_lists/TW_STOCK_LIST_SNAPSHOT_latest.json", "table": "rows"},
+   "columns": [
+    {"name": "code", "dtype": "str", "required": true, "key": true},
+    {"name": "name", "dtype": "str", "required": false, "key": false},
+    {"name": "market", "dtype": "str", "required": true, "key": false},
+    {"name": "yf_ticker", "dtype": "str", "required": false, "key": false},
+    {"name": "industry", "dtype": "str", "required": false, "key": false},
+    {"name": "status", "dtype": "str", "required": true, "key": false},
+    {"name": "first_seen", "dtype": "date", "required": false, "key": false},
+    {"name": "last_seen", "dtype": "date", "required": false, "key": false},
+    {"name": "delisted_on", "dtype": "date", "required": false, "key": false},
+    {"name": "relisted", "dtype": "bool", "required": true, "key": false}
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0106.py:161-166 (row columns) · :96 (SNAPSHOT path) · status in ACTIVE|NEW|DELISTED (:95 STATUSES)"
+  },
+  "active_etf_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG077_ActiveETFUniverse",
+   "source": {"kind": "duckdb", "db_env": "VIA_DB_ACTIVETWETF", "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb", "table": "active_tw_etf_registry"},
+   "columns": [
+    {"name": "ticker", "dtype": "str", "required": true, "key": true},
+    {"name": "name", "dtype": "str", "required": true, "key": false},
+    {"name": "fund_type", "dtype": "str", "required": false, "key": false},
+    {"name": "domestic", "dtype": "bool", "required": false, "key": false},
+    {"name": "daily_required", "dtype": "bool", "required": false, "key": false},
+    {"name": "status", "dtype": "str", "required": true, "key": false},
+    {"name": "source", "dtype": "str", "required": false, "key": false},
+    {"name": "issuer", "dtype": "str", "required": false, "key": false},
+    {"name": "first_seen", "dtype": "str", "required": false, "key": false},
+    {"name": "last_seen", "dtype": "str", "required": false, "key": false}
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py:192-193 (DDL, ticker PRIMARY KEY; first_seen/last_seen VARCHAR) · locked tail VDF_ENG077_ActiveETFUniverse_v0105.py (VIA_LampLock_v0107 VDF-WKF006) · db_env at VDF_ENG087_MarketListGovernance_v0105.py:137"
+  },
+  "etf_holdings_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG078_ActiveETFHoldingsHistory",
+   "source": {"kind": "duckdb", "db_env": "VIA_DB_ACTIVETWETF", "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb", "table": "holdings_daily"},
+   "columns": [
+    {"name": "portfolio_date", "dtype": "date", "required": true, "key": true},
+    {"name": "etf_ticker", "dtype": "str", "required": true, "key": true},
+    {"name": "etf_yf_ticker", "dtype": "str", "required": false, "key": false},
+    {"name": "etf_name", "dtype": "str", "required": false, "key": false},
+    {"name": "issuer", "dtype": "str", "required": false, "key": false},
+    {"name": "holding_ticker", "dtype": "str", "required": true, "key": true},
+    {"name": "holding_yf_ticker", "dtype": "str", "required": false, "key": false},
+    {"name": "holding_name", "dtype": "str", "required": false, "key": false},
+    {"name": "weight_pct", "dtype": "float", "required": true, "key": false},
+    {"name": "shares", "dtype": "float", "required": false, "key": false},
+    {"name": "source_type", "dtype": "str", "required": false, "key": false},
+    {"name": "source_url", "dtype": "str", "required": false, "key": false},
+    {"name": "fetched_at", "dtype": "datetime", "required": false, "key": false}
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259-2273 (DDL; ENG051 owns structure) · writer VDF_ENG078_ActiveETFHoldingsHistory_v0107.py:994-997 (_HOLD_MAP) and :1000-1031 (upsert key portfolio_date,etf_ticker,holding_ticker) · locked tail VDF_ENG078_ActiveETFHoldingsHistory_v0113.py (VDF-WKF006)"
+  },
+  "etf_daily_metrics": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {"kind": "duckdb", "db_env": "VIA_DB_ACTIVETWETF", "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb", "table": "etf_daily_metrics"},
+   "columns": [
+    {"name": "date", "dtype": "date", "required": true, "key": true},
+    {"name": "etf_ticker", "dtype": "str", "required": true, "key": true},
+    {"name": "aum", "dtype": "float", "required": false, "key": false},
+    {"name": "nav", "dtype": "float", "required": false, "key": false},
+    {"name": "units_outstanding", "dtype": "float", "required": false, "key": false},
+    {"name": "units_subscribed", "dtype": "float", "required": false, "key": false},
+    {"name": "units_redeemed", "dtype": "float", "required": false, "key": false},
+    {"name": "net_units", "dtype": "float", "required": false, "key": false},
+    {"name": "inflow_value", "dtype": "float", "required": false, "key": false},
+    {"name": "outflow_value", "dtype": "float", "required": false, "key": false},
+    {"name": "net_flow_value", "dtype": "float", "required": false, "key": false},
+    {"name": "source", "dtype": "str", "required": true, "key": false},
+    {"name": "source_url", "dtype": "str", "required": false, "key": false},
+    {"name": "fetched_at", "dtype": "datetime", "required": true, "key": false},
+    {"name": "kind", "dtype": "str", "required": true, "key": false}
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:109-114 (METRICS_COLS, METRICS_DDL; operator-defined table) · kind OFFICIAL|ESTIMATE · units_subscribed/units_redeemed are ABSENT (always NULL: no gross creation/redemption source in code or quarantine; see SOURCES in the same file)"
+  },
+  "etf_breakdown": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {"kind": "duckdb", "db_env": "VIA_DB_ACTIVETWETF", "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb", "table": "etf_breakdown"},
+   "columns": [
+    {"name": "portfolio_date", "dtype": "date", "required": true, "key": true},
+    {"name": "etf_ticker", "dtype": "str", "required": true, "key": true},
+    {"name": "group_kind", "dtype": "str", "required": true, "key": true},
+    {"name": "group", "dtype": "str", "required": true, "key": true},
+    {"name": "weight_pct", "dtype": "float", "required": true, "key": false},
+    {"name": "n_holdings", "dtype": "int", "required": true, "key": false}
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:115-117 (BREAKDOWN_COLS, BREAKDOWN_DDL) · group_kind in industry|asset · inputs holdings_daily (VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259) × tw_listings_industry.industry_name (VDF_ENG055_OmniFetch_v0118.py:339)"
+  }
+ }
+}
