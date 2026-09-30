@@ -156,6 +156,20 @@ def __getattr__(name: str):
     return getattr(PRIOR, name)
 
 
+# build 內部叫的 analyze 走本模組這一格(替換本尾版的 analyze 就等於替換 v0100 的;CI 測 test_via_etf_activity 取尾版後 patch 這裡)
+analyze = PRIOR.analyze
+
+
+def build(*args, **kwargs):
+    """v0100 build 原樣;只把它呼叫的 analyze 換成本模組當下的 analyze(可被測試 patch),跑完還原。"""
+    orig = PRIOR.analyze
+    PRIOR.analyze = globals()["analyze"]
+    try:
+        return PRIOR.build(*args, **kwargs)
+    finally:
+        PRIOR.analyze = orig
+
+
 # ---------------------------------------------------------------- 小工具
 def _num(v):
     if v is None:
