@@ -31,6 +31,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import importlib.util
+import json
 import os
 import re
 import sys
@@ -79,6 +80,15 @@ def run(argv: list, via: Path = PRIOR.VIA) -> tuple:
         else:
             os.environ[HUB] = parent
     card["hub"] = parent or ""
+    latest = Path(via) / "VIA_Reports" / "vcgc" / "TEST_latest.json"
+    if card.get("run") and latest.is_file():  # 前版在 run 裡就寫了報告 → 補上 hub 欄(同一輪才補)
+        try:
+            doc = json.loads(latest.read_text(encoding="utf-8"))
+            if doc.get("run") == card["run"]:
+                doc["hub"] = card["hub"]
+                latest.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        except (OSError, ValueError):
+            pass
     return card, rc
 
 
@@ -126,25 +136,30 @@ def selftest() -> int:
 
     def fake(argv, via):
         seen["run"] = os.environ.get(HUB)
+        rep_dir = Path(via) / "VIA_Reports" / "vcgc"
+        rep_dir.mkdir(parents=True, exist_ok=True)
+        (rep_dir / "TEST_latest.json").write_text(json.dumps({"run": seen["run"]}) + "\n", encoding="utf-8")
         return {"run": seen["run"]}, 0
 
     try:
         globals()["_PRIOR_RUN"] = fake
-        os.environ[HUB] = "go-20260930-120000-1"
-        card, _rc = run([])
-        back = os.environ.get(HUB)
-        os.environ.pop(HUB, None)
-        card2, _rc = run([])
-        gone = HUB not in os.environ
+        with tempfile.TemporaryDirectory() as tmp:
+            os.environ[HUB] = "go-20260930-120000-1"
+            card, _rc = run([], Path(tmp))
+            back = os.environ.get(HUB)
+            on_disk = json.loads((Path(tmp) / "VIA_Reports" / "vcgc" / "TEST_latest.json").read_text(encoding="utf-8")).get("hub")
+            os.environ.pop(HUB, None)
+            card2, _rc = run([], Path(tmp))
+            gone = HUB not in os.environ
     finally:
         globals()["_PRIOR_RUN"] = _PRIOR_RUN_REAL
         if had is None:
             os.environ.pop(HUB, None)
         else:
             os.environ[HUB] = had
-    chk("⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告 hub 記入口輪 · 跑完還原(沒有就不留)",
+    chk("⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留)",
         seen["run"].startswith("test-") and card["hub"] == "go-20260930-120000-1" and back == "go-20260930-120000-1"
-        and card2["hub"] == "" and gone and PRIOR.run is run, card)
+        and card2["hub"] == "" and gone and on_disk == "go-20260930-120000-1" and PRIOR.run is run, card)
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑥ 加速器橋在 · 不碰 TA-Lib", "VIA:ACCEL-BRIDGE" in src and not re.search(r"^\s*(import|from)\s+talib", src, re.M))
     mine = all(ok)
