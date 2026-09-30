@@ -141,3 +141,14 @@
    - 容器可在暫存區放 portable pwsh 7.4.6 實跑。
 3. `VCGC-REQ085:backup-stale`(Z286):出 CGC_MDL221 新版修比法。
 4. 新增 / 換版任何 VCGC 指令或模組之後:跑 `test`(整輪,沒變的站沿用)。新指令登進盤點冊新版號;紀錄冊的新行要一起提交。
+
+## 六、跟進:Codex 對已併 PR #378 的四條審查(新版號檔修,前版不動)
+
+| 審查 | 成立? | 修法 |
+|---|---|---|
+| P1 沒有 origin/main 的檢出,`base_ref()` 退回 HEAD → `--apply --scope` 回「範圍 0 檔」當成功 | 成立 | `CGC_MDL237_NumberingSystem_v0110`:`real_base()` 依序找 origin/main → main → origin/HEAD;都找不到就拒跑 rc 2、一列不寫(可給 `--base <ref>` 或明列檔);`scope` 乾跑也標出基準真假 |
+| P1 `--apply --scope <檔…>` 明列檔時 dirty 設成空 → 未提交的明列檔照樣發號 | 成立 | 同版:明列檔也算 dirty,未提交的擋下並列出;全都未提交 = rc 2 |
+| P2 名冊第二次啟用起 prior 不前進(v0104 的 prior 停在 v0102) | 成立 | `CGC_MDL233_ToolActivate_v0105`:`roster_next()` 一律把 prior 設成直接前版 |
+| P2 席位 0 列也放行 → 鎖冊換了卻沒有現役指標 | 成立 | 同版:席位檢查改「恰一列」;實冊六家每家正好一列 |
+
+自測:MDL237 v0110 本版 5/5(v0109 · v0108 鏈照過)· MDL233 v0105 +4/4(v0100–v0104 鏈全過;v0104 ㉖ 的本體身分斷言照原樣跑完再換裝本版)。
