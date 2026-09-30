@@ -6,8 +6,9 @@ v0100 stays (L04); this thin tail adds verbs and forwards the v0100 surface (pla
 Runs only through VCGC (VIA_FROM_VCGC=YES); `--selftest` is offline, deterministic, fixtures only.
 
   fetch [--apply] [--db PATH]      GATED lane. Uses only the unified network tool (_via_net → SUP_MDL740);
-                                   refuses unless the operator has set VIA_NET_CONSENT=YES himself (this file reads it,
-                                   never sets it). Produces etf_daily_metrics; --apply upserts into the EXISTING
+                                   refuses unless the operator opened both gates himself — the same ruler the tool and
+                                   ENG055/077/078 use (CGC_MDL224 ScrapeGate.gate_open: VIA_NET_CONSENT=YES and
+                                   VIA_SCRAPE_CONSENT=YES|token); this file reads them, never sets them. Produces etf_daily_metrics; --apply upserts into the EXISTING
                                    ActiveTWETF.duckdb (never creates a replacement DB, same rule as v0100.build).
   metrics [--db PATH] [--json]     read-only: latest etf_daily_metrics row per ETF.
   breakdown [--apply] [--all] [--db PATH] [--tw-db PATH] [--json]
@@ -378,8 +379,16 @@ def yahoo_levels(db_gl: Path, tickers) -> dict:
 
 # ---------------------------------------------------------------- fetch(閘門車道)
 def consent_open(env=None) -> bool:
+    """同一把尺:registry 尾版 CGC_MDL224_ScrapeGate.gate_open(ENG055/077/078 與 SUP_MDL740 同用)。尺缺 = 關(fail-closed)。"""
     env = os.environ if env is None else env
-    return str(env.get("VIA_NET_CONSENT", "")).strip().upper() == "YES"
+    reg = VDF.parent.parent / "supportive modules" / "registry"
+    hits = sorted(reg.glob("CGC_MDL224_ScrapeGate_v*.py"), key=_vnum)
+    if not hits:
+        return False
+    spec = importlib.util.spec_from_file_location("scrape_gate_for_eng094_v0101", hits[-1])
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return bool(mod.gate_open(env))
 
 
 def active_universe(db_etf: Path | None = None) -> list:
@@ -393,7 +402,8 @@ def active_universe(db_etf: Path | None = None) -> list:
 def fetch(db: Path = DB, apply: bool = False, net=None, env=None, today: str | None = None) -> dict:
     today = today or _dt.date.today().isoformat()
     if not consent_open(env):
-        return {"state": "NO_CONSENT", "rows": [], "why": "VIA_NET_CONSENT 未由操作員設為 YES;本支只讀不代設(L07/L08)"}
+        return {"state": "NO_CONSENT", "rows": [], "why": "同意閘未開(VIA_NET_CONSENT=YES 且 VIA_SCRAPE_CONSENT=YES|token,"
+                "操作員親設);本支只讀不代設(L07/L08)"}
     net = net if net is not None else _via_net()
     if net is None or not hasattr(net, "http_json"):
         return {"state": "ABSENT", "rows": [], "why": "統包網路工具缺(via_net_unified / SUP_MDL740)"}
@@ -540,6 +550,9 @@ class _FakeNet:
         return {"state": "FAIL", "data": None, "note": "unexpected url"}
 
 
+OPEN_ENV = {"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "YES"}   # 只給自測的假 env 字典;不寫 os.environ
+
+
 def selftest() -> int:
     checks = []
 
@@ -586,6 +599,9 @@ def selftest() -> int:
         and SOURCES["nav"]["state"] == "CANDIDATE")
     net = _FakeNet(units_d1, nav_d1)
     chk("沒有同意閘 = NO_CONSENT、零發包", fetch(Path("/nonexistent.duckdb"), net=net, env={})["state"] == "NO_CONSENT" and net.calls == [])
+    chk("只開閘一(沒開爬蟲閘)仍 NO_CONSENT", fetch(Path("/nonexistent.duckdb"), net=net, env={"VIA_NET_CONSENT": "YES"})["state"]
+        == "NO_CONSENT" and net.calls == [])
+    chk("閘尺 = CGC_MDL224:兩閘開才開", consent_open(OPEN_ENV) and not consent_open({"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "OFF"}))
     hold = [{"portfolio_date": "2026-09-29", "etf_ticker": "00981A.TW", "holding_ticker": "2330", "holding_name": "台積電", "weight_pct": 9.0},
             {"portfolio_date": "2026-09-29", "etf_ticker": "00981A", "holding_ticker": "2454", "holding_name": "聯發科", "weight_pct": 5.0},
             {"portfolio_date": "2026-09-29", "etf_ticker": "00981A", "holding_ticker": "2317", "holding_name": "鴻海", "weight_pct": 4.0},
@@ -628,10 +644,10 @@ def selftest() -> int:
             chk("breakdown 落表(最新日;庫 × 產業)", res["written"] == len(res["rows"]) and ("半導體業", 14.0) in got
                 and dates == [("2026-09-29",)] and res["unmapped_industry"] == ["9999"], str(got))
             net = _FakeNet(units_d1, nav_d1)
-            r1 = fetch(db, apply=True, net=net, env={"VIA_NET_CONSENT": "YES"}, today="2026-09-29")
+            r1 = fetch(db, apply=True, net=net, env=OPEN_ENV, today="2026-09-29")
             units_d2 = [dict(units_d1[0], **{"發行單位數/轉換數": "1,200,000", "出表日期": "1150930"})]
             nav_d2 = {"data": [{"基金代號": "00981A", "單位淨值": "15.50", "資料日期": "115/09/30"}]}
-            r2 = fetch(db, apply=True, net=_FakeNet(units_d2, nav_d2), env={"VIA_NET_CONSENT": "YES"}, today="2026-09-30")
+            r2 = fetch(db, apply=True, net=_FakeNet(units_d2, nav_d2), env=OPEN_ENV, today="2026-09-30")
             rows = read_metrics(db)
             last = [r for r in rows if r["etf_ticker"] == "00981A" and r["date"] == "2026-09-30"]
             chk("fetch(假網路)→ 落表 → 第二天從庫接前值算流量", r1["written"] and r2["written"] == 1 and last
