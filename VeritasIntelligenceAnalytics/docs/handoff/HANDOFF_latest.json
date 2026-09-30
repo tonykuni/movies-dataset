@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-09-30T09:37:41+00:00",
+  "at": "2026-09-30T11:32:16+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -134,6 +134,20 @@
       "topic": "編號 · 註冊 · SSOT 治理架構重整與風險治理"
     },
     {
+      "id": "VDF-REQ014",
+      "state": "PARTIAL",
+      "owner": "AI",
+      "next": "核對正主需求與證據後補齊驗收",
+      "topic": "受管 Parquet 增量商品庫"
+    },
+    {
+      "id": "VRN-REQ008",
+      "state": "PARTIAL",
+      "owner": "AI",
+      "next": "核對正主需求與證據後補齊驗收",
+      "topic": "VCGC-VDF-VRN 受控實測與失敗判決"
+    },
+    {
       "id": "host-live",
       "requirement": "VCGC-REQ028",
       "state": "BLOCKED",
@@ -204,6 +218,22 @@
       "owner": "AI(下一批)",
       "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
       "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
+    },
+    {
+      "id": "VDF-REQ014:host",
+      "requirement": "VDF-REQ014",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "正式 Windows 資料家、真 API、系統開機排程尚未執行；只轉存日價，舊庫商品删除未接管",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
+    },
+    {
+      "id": "VRN-REQ008:real_reports",
+      "requirement": "VRN-REQ008",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "目前只有合成 TXT/PDF；正式報告全文、OCR、年報期別與全樣本準確率未驗收",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
     }
   ],
   "reusable_successes": [
@@ -223,12 +253,17 @@
     "VCGC-REQ084:numbering",
     "VCGC-REQ084:activation",
     "VCGC-REQ084:entry",
-    "VCGC-REQ084:handoff"
+    "VCGC-REQ084:handoff",
+    "VDF-REQ014:vdf_dispatch",
+    "VDF-REQ014:vdf_manager",
+    "VDF-REQ014:vdf_store",
+    "VRN-REQ008:vrn_probe",
+    "VRN-REQ008:vrn_manager_route"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
+      "sha256": "0c772019672597ae720f8725a7e4a7082f2e0e5786a590f5a0d58f0d7f74e068"
     },
     "VCGC-REQ075:entry": {
       "path": "docs/handoff/evidence/entry.json",
@@ -236,11 +271,11 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
+      "sha256": "6ae02fc527f40a4d06b476c4accf068a27e8f000003c402f075513f34a6c29ba"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
-      "sha256": "9c0ac66e6c95f3ac7afde1bd444f96b852c7deb2570aa3e6b1a48ef54fe4e71a"
+      "sha256": "b53a6172939113185bf960dd345149557d4d2b752ed7e9d069f537d724f2cb2d"
     },
     "VRN-REQ007:provenance": {
       "path": "docs/handoff/evidence/provenance.json",
@@ -256,7 +291,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
+      "sha256": "6ae02fc527f40a4d06b476c4accf068a27e8f000003c402f075513f34a6c29ba"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -276,11 +311,11 @@
     },
     "VCGC-REQ075:reuse-glob": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
+      "sha256": "0c772019672597ae720f8725a7e4a7082f2e0e5786a590f5a0d58f0d7f74e068"
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
+      "sha256": "6ae02fc527f40a4d06b476c4accf068a27e8f000003c402f075513f34a6c29ba"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -292,7 +327,27 @@
     },
     "VCGC-REQ084:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
+      "sha256": "0c772019672597ae720f8725a7e4a7082f2e0e5786a590f5a0d58f0d7f74e068"
+    },
+    "VDF-REQ014:vdf_dispatch": {
+      "path": "docs/handoff/evidence/vdf_dispatch.json",
+      "sha256": "834025ba30ddc35e6ef2e39650bc74ceb2333e0d9d8864dcd47df1e20480847d"
+    },
+    "VDF-REQ014:vdf_manager": {
+      "path": "docs/handoff/evidence/vdf_manager.json",
+      "sha256": "277fc55daace979d856da061ecf323c6f391b7d995a3cb28492f201b40490f6b"
+    },
+    "VDF-REQ014:vdf_store": {
+      "path": "docs/handoff/evidence/vdf_store.json",
+      "sha256": "6951ca26d4625e51ccb1ce8e21dbe93b04a445d9d37d793f39f258cf22ae9eed"
+    },
+    "VRN-REQ008:vrn_probe": {
+      "path": "docs/handoff/evidence/vrn_probe.json",
+      "sha256": "c988b8c27ad85aaa92fbde0a7ffae829e8c50ff4b74b96b8b00a50c6abf17041"
+    },
+    "VRN-REQ008:vrn_manager_route": {
+      "path": "docs/handoff/evidence/vrn_manager_route.json",
+      "sha256": "dbc9d6832e5d4af4cd3b7ce56b40186598da4283c54b7f80649411e4f9d94d6e"
     }
   },
   "state": {
@@ -309,6 +364,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0104.json": "9e56a92292de5e255a7be82c0d99c9cd52dc4027b79adf49b94769cedea2de6a",
       "supportive modules/registry/VIA_Requirements_SSOT_v0105.json": "3754ddf6e8e98290f637c43785aa2e7679b6be4f004ce5bc651b02fd8b321012",
       "supportive modules/registry/VIA_Requirements_SSOT_v0106.json": "ec82b7dbbba3210a32f17e5f3bb2bd28de16adf9627ec9bcd3a47d4b0b61bc60",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0107.json": "c9efebd649d1e6f0820be66788def56c79d667bc40e0c161a25472b9e442cc23",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_VAP_SSOT_v0100.json": "f6637fa62be61763f6d8711cbeddf3c089595171f1523ca175f542fc2b7f7955",
@@ -318,11 +374,13 @@
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0103.json": "0000b6bda9e207599b8d05fa67e1e77250d54a2a2fe7e9cfc050a62dad003935",
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0104.json": "7601f4db7d73280beb9e6e976356459364fe73856d39e098bfe033234093ba72",
       "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0100.json": "0c4c5bc77a34b184a7211b4c82dff63d743eadae014d41b9d6926cb632c5039b",
+      "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0101.json": "dfc216b49f2115cc11222f499bca81579460538411c56b37cbfefceb1f9bac60",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0100.json": "369ca6e8af6385c083b6180bdbb110eafcc8abc75b90a4fa6e5873a907e16aaf",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "ba81757755babf3f614aa6b0209c42081c9bb4b88f193b7daa997179cd49a440",
+      "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "6f83a9b4f22fa6f841593bc0a59960222b552f90de587a12b99010d0ff15f2d5",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "fe76e2c2fdaa5192cebb50cbfb917620cf8687658a711c6a4a96f8be6864ced9",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -706,6 +764,7 @@
       "functional modules/VRN/VRN_MDL259_vrn_report_date_window_table_restore_v0597_REPORT_v0597_sha748e5920d4a0.py": "635cf0d58249c5696e0038a26963dc7b4f5a9da7422d35809e4b6540a647578c",
       "functional modules/VRN/VRN_OperatorRegex_TWTicker_v0100.py": "15e21b2039aa136c15b261540867e1361db31dd966d88865fa46de5ca57a7a5d",
       "functional modules/VRN/VRN_OperatorRegex_TWTicker_v0101.py": "156e938bdd51e201f27766d22f75f5ba313b2c7d66dfc6d3078d01744cad7099",
+      "functional modules/VRN/VRN_ReportProbe_v0100.py": "7c581de55358c52c790d0e151070a5959d0f73f5cc5d6bdb091b439e173f1f7c",
       "functional modules/VRN/VRN_SystemManager_v0100.py": "9bd5f8d91e80114c33cd22c0967879828c9c0f490dca8afa4fc6c2f34c277386",
       "functional modules/VRN/VRN_SystemManager_v0101.py": "9a261b7b2c2045c8bad4cf6fae6a8135ef832c964aa35bba02ca7445f48434b8",
       "functional modules/VRN/VRN_SystemManager_v0102.py": "3e36041708e06b843235dce51c8190d4a63e73d5fc79d3f07036186f67a604ea",
@@ -716,6 +775,7 @@
       "functional modules/VRN/VRN_SystemManager_v0107.py": "d749748a1b06de0fb66a2be95ad2feaa8086be82f8b267a987c0102f0d70775b",
       "functional modules/VRN/VRN_SystemManager_v0108.py": "68dceb1e4fec2d8771eaba0ff1bb5934060c1b704119dd38c5422aee1e782758",
       "functional modules/VRN/VRN_SystemManager_v0109.py": "dbb42295b6cc460b792d68892377545b34cdee7a1c2df4f8d80690dd66f5fed4",
+      "functional modules/VRN/VRN_SystemManager_v0111.py": "9bda6fa608b022c2e7cd2156a4fb2dcc29cf1301488af4a49c49d9b85f00782d",
       "functional modules/VRN/VRN_TW01_TickerBridge.py": "c13cd9af033aeafa448130ef946b84aae668a992bf6a185f5de11eb8759ae792",
       "functional modules/VRN/VRN_TW01_TickerBridge_v0101.py": "2836a3f0d86b94d5937fbc311dc42eb4bea421339753771c3198211e34da2600",
       "functional modules/VRN/VRN_TW01_TickerBridge_v0102.py": "c4fdbd38de7ecad46277e75f274776262b266861a40201ad75eb7a2f6575ba68",
@@ -1049,6 +1109,7 @@
       "functional modules/VRN/reporter.py": "4d047f384932b693c1e68e10877252bbd2c161b849d5ba7a919ab70c0046057e",
       "functional modules/VRN/reporters.py": "5859b4b881ada9add5fb597b95cac2fef5495ab296bc92ca4a67a6292728cbef",
       "functional modules/VRN/table.py": "1f986a7221956b3f1cfd34e57837637af28df67d0991ff3a918a7e132265c4ee",
+      "functional modules/VRN/tests/test_ReportProbe_v0100.py": "b05ab000829fb2f13c9d4b44b9c4f7f6f4469568299fc1204b1a57988bcc1a83",
       "functional modules/VRN/tests/test_VRN_AdjBasis.py": "4d3e721ba4b9f8c31a5b4fbda8828b99c9e6dd659873e18345c2bd03ecf3bb28",
       "functional modules/VRN/tests/test_VRN_AdjOracle.py": "0bdacad001e2a530e96948197a1fb7c209f5719bc8a3871201a94904786644b2",
       "functional modules/VRN/tests/test_VRN_Appendix.py": "fa717202dc2179310000592430703bddb6f2e678b2be0a3d91ef63ee0e7a2646",
@@ -1140,6 +1201,7 @@
       "functional modules/VDF/VDF_MDL201_GenerateFullRegistry_shae84832cb.py": "8d79aee04b371613020249e802cb170d693893a26be534a121ad0e1a3cf7e1eb",
       "functional modules/VDF/VDF_MDL301_SystemTest_sha0036d630.py": "b5d6ac55825754b8e66b4628afcc8a7e6d209058e2a4893244094688df3ce345",
       "functional modules/VDF/VDF_MDL303_RegistryActivation_shafe35bcd1.py": "1a75c62440e12a0320ebb04041dab087bb7db27a319ebfb69dd491ded7615874",
+      "functional modules/VDF/VDF_ParquetStore_v0100.py": "211942914c9e35ee454e97c79c498c566150ffdcc3793ad495be275fb13dc5a1",
       "functional modules/VDF/VDF_SystemManager_v0100.py": "517b45f1d8a9eeeeea3641df7e7761778d724a8c5e03f572bed3781b05fa1d4f",
       "functional modules/VDF/VDF_SystemManager_v0101.py": "161e1d0608c822e7592eaca8477d6e77e13bf0dd2867cd0205bbd333f072eb03",
       "functional modules/VDF/VDF_SystemManager_v0102.py": "bc4a15d4a31ecb508d53d460e712b8d09e2c9463c29316c3248abc95ec2190fa",
@@ -1160,6 +1222,8 @@
       "functional modules/VDF/VDF_SystemManager_v0117.py": "eca4104cec126b1be186bfc094d49dd04f5cf5b5b86af00f5f5437a9b3e98820",
       "functional modules/VDF/VDF_SystemManager_v0118.py": "830f56c56139591d0941a087cbf194388e428d842066dbf8b4f8de62e3e047e9",
       "functional modules/VDF/VDF_SystemManager_v0119.py": "2f8fa50fb5640fefe3b14a1354ef2084765113b5c51d4e2883a5d7a2b9941e9d",
+      "functional modules/VDF/VDF_SystemManager_v0120.py": "eb9977d83c427aec26accaa98f0365b3e8f7180bc2947304fdb5ac97bea42c83",
+      "functional modules/VDF/VDF_SystemManager_v0121.py": "19818228ddc675a4ce6c986635dbe42faca421059ff5cc84bf11a7b36b8345f7",
       "functional modules/VDF/VRN_MDL097_vrn_financialdata_final_evidence_selector_v06149_FINANCIALDATA_v06149_sha8a20c4943eaa.py": "1f88bca7df0651335e7362002953d0d913f9855af957f7cc5c7887c57a485a9d",
       "functional modules/VDF/VRN_MDL215_vrn_financialdata_triflow_staging_v06153_FINANCIALDATA_v06153_sha3ca6301e256f.py": "0c8a7cc8d1298d9b6cdb05c602bc3d667c077209e89e05ab988237846a58c1d4",
       "functional modules/VDF/VRN_MDL218_vrn_financial_data_confirm_verify_v06125_FINANCIALDATA_v06125_sha2e4c0a77b946.py": "f90658aca31fc810afbf5fea1789e17960502767a02d2774923d8a93e0c55c75",
@@ -1209,6 +1273,7 @@
       "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0109.py": "8f82a3515c42bf93a030cfe50510b607361c0623fc7e22527b7b4760bc86bc7b",
       "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0110.py": "79a83bf7665bc82a8ebdcac09ce760c0d113c61d6b10a5dd8884ee06393d468e",
       "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py": "3890b418d3455038f9926a79ffdbe784d7ab720b4b522a9f4264ceed11c04709",
+      "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0112.py": "298382c624110a178d8011d6d3857ab066fcf728368a5d0c746776fa93f5b43b",
       "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0100.py": "0f2c33dbf314db78b6a6a58030e6be15c18352cba9d547f14a64d50f1b074805",
       "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0101.py": "ab40a7abf7a4d7f3ee59c1938f1cbff160e91dc28195b25705e731cf4b878568",
       "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0102.py": "27ca84a5df6ad4fb59ad7c9a1538395cd7fc79d3a0e95f48d622a5da6502eb11",
@@ -1545,6 +1610,8 @@
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_tdcc.py": "2b43d2af980012191097bd18f8ceac637df43cc4e07019ffeacf5a6104bf3623",
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_supportive_bridge.py": "0a7c2caf87a6e4b1c60f1681c8a82cf34b30172c3e403166313932dd3b5b053b",
       "functional modules/VDF/references/intake/vdf_fetchers_financials_b504/vdf_fetchers_financials.py": "eef127506ca903303fad04311a61516d32585b3e31b2425696f39eddba12a071",
+      "functional modules/VDF/tests/test_backfill_dispatch_v0100.py": "1fc60a31b5d2c4b7e77d3c2dd705767777f6ab3a5a13696ec86cbb404503bdb4",
+      "functional modules/VDF/tests/test_managed_store_v0100.py": "61584a6fb7e5dfeb366ce8cd2e7c4c36e4d9b977781a4947f5c2688325ace5d3",
       "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py": "690cd34e0fe38a5d9ef247915ae124d26be6c2a16e4cae23b19ae5b33cda13ec",
       "functional modules/VDF/vdf_input_matrix_v0100.py": "9675c402e2dd7cb2ae706afefb1aa66ca6f29961f8f3953de46ac40de295ecf0",
       "functional modules/VDF/vrn_financialdata_staging_extraction_store_v029vrn1d_sha35458a11a7b7.py": "2d1ad2de184ea3ce909a8572f3caec210bc781136c2a452f5d04230fe6100909",
@@ -2395,6 +2462,7 @@
       "supportive modules/registry/CGC_MDL139_InputConsole_v0111.py": "1ddbda69ffcd14793654e2df45e3f75a3c86a4063306c5ce39a2ed2e4250b1c6",
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0100.py": "e9fdd5f09784411f9a68dc3293ad51c9f4885fc97540309bc737cf6aac0cff89",
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py": "8e75760012025f83d1fd6a6dd746c628701d5b230bca1abfb155993e9687257b",
+      "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py": "a46742837abd29ad20e2f0b6559552f3fd1253e9720e3e1e54196e59bbf1813e",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0100.py": "2d7d58c33adfed3990e89c1023da0174d1ba71a43c8042b3ed7b3b8b108b651e",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0101.py": "0fd1fc1a59b67e425e7389257b7f0eb46c8d22e8a4a86115329b6e14a2544176",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0102.py": "503280c23250cc1e283dcb96d6f9c5a92dd5417d1bdfb92c7e4352cf12523942",
@@ -2759,6 +2827,7 @@
       "supportive modules/registry/CGC_MDL207_PolicyRun_v0101.py": "bfaef1ffe7c0cc46203d346319d165e5020a850b6a9aa5ba06a3d59c75ab699b",
       "supportive modules/registry/CGC_MDL208_VdfMeasure_v0100.py": "a74c13bcfcff681e3f3c01097a7ec81fa5e673efdb8aaf34cf04ac5b02438239",
       "supportive modules/registry/CGC_MDL209_VdfStart_v0100.py": "b7a1cdd77138696784e6bf3b9371bdfff8e4db4c4f31964114e6016c8b8ae25b",
+      "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py": "eec82e56d1fc307ac130cd541d180426e227e781cad2bd15cc1aa43c20edc843",
       "supportive modules/registry/CGC_MDL210_TWBackfillLock_v0100.py": "f3cc4921ec91e2d1b22c02106cfee2fd47fbd4796fb9daaae236eebce3e5f524",
       "supportive modules/registry/CGC_MDL211_FlowGate_v0100.py": "5463648db10797b7f2d610a44be3e5502a94cb563dd8319f8f69d58a96835641",
       "supportive modules/registry/CGC_MDL211_FlowGate_v0101.py": "0b814424d91bb8e4898e6d5aa24c1ee310c5f603202160e7ee8d932e2512fe2f",
@@ -4259,6 +4328,28 @@
           "VCGC-WKF003-STP006",
           "docs/VIA_S20260930a_RegistryArchitecture.md"
         ]
+      },
+      "VDF-REQ014": {
+        "definition": "ae67512366fa27c0f2cf0b0e7ec0885d242271d0a78fe886987d401203224a5c",
+        "status": "PARTIAL",
+        "next": null,
+        "owner": null,
+        "topic": "受管 Parquet 增量商品庫",
+        "homes": [
+          "VDF-WKF011",
+          "docs/VIA_VDF_VRN_Managed_Runbook_20260930.md"
+        ]
+      },
+      "VRN-REQ008": {
+        "definition": "4f01bd8529160362bf583c13d0a467c3fe709872f4a6048543c9ee0fbf9dcc6e",
+        "status": "PARTIAL",
+        "next": null,
+        "owner": null,
+        "topic": "VCGC-VDF-VRN 受控實測與失敗判決",
+        "homes": [
+          "VRN-WKF009",
+          "docs/VIA_VDF_VRN_Managed_Runbook_20260930.md"
+        ]
       }
     }
   },
@@ -4285,7 +4376,6 @@
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0101.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0177.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0107.py",
-    "functional modules/VRN/VRN_SystemManager_v0110.py",
     "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
     "supportive modules/registry/CGC_MDL245_SDDValidator_v0103.py",
     "supportive modules/registry/CGC_MDL247_SSOTPanorama_v0100.py",
@@ -4296,7 +4386,16 @@
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0112.py",
+    "functional modules/VDF/VDF_SystemManager_v0120.py",
+    "functional modules/VDF/VDF_ParquetStore_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0111.py",
+    "functional modules/VRN/VRN_ReportProbe_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0110.py",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -4493,13 +4592,85 @@
       "owner": "AI(下一批)",
       "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
       "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
+    },
+    "VDF-REQ014:vdf_dispatch": {
+      "id": "VDF-REQ014:vdf_dispatch",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_dispatch",
+      "receipt": "docs/handoff/evidence/vdf_dispatch.json",
+      "owner": "AI"
+    },
+    "VDF-REQ014:vdf_manager": {
+      "id": "VDF-REQ014:vdf_manager",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_manager",
+      "receipt": "docs/handoff/evidence/vdf_manager.json",
+      "owner": "AI"
+    },
+    "VDF-REQ014:vdf_store": {
+      "id": "VDF-REQ014:vdf_store",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_store",
+      "receipt": "docs/handoff/evidence/vdf_store.json",
+      "owner": "AI"
+    },
+    "VRN-REQ008:vrn_probe": {
+      "id": "VRN-REQ008:vrn_probe",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_probe",
+      "receipt": "docs/handoff/evidence/vrn_probe.json",
+      "owner": "AI"
+    },
+    "VRN-REQ008:vrn_manager_route": {
+      "id": "VRN-REQ008:vrn_manager_route",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_manager_route",
+      "receipt": "docs/handoff/evidence/vrn_manager_route.json",
+      "owner": "AI"
+    },
+    "VDF-REQ014:host": {
+      "id": "VDF-REQ014:host",
+      "requirement": "VDF-REQ014",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "正式 Windows 資料家、真 API、系統開機排程尚未執行；只轉存日價，舊庫商品删除未接管",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
+    },
+    "VRN-REQ008:real_reports": {
+      "id": "VRN-REQ008:real_reports",
+      "requirement": "VRN-REQ008",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "目前只有合成 TXT/PDF；正式報告全文、OCR、年報期別與全樣本準確率未驗收",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
     }
   },
   "summary": {
-    "requirements": 110,
-    "watched_files": 2754,
-    "pending": 27,
-    "reusable": 17,
+    "requirements": 112,
+    "watched_files": 2768,
+    "pending": 31,
+    "reusable": 22,
     "findings": 0
-  }
+  },
+  "historical_registration": [
+    {
+      "source": "functional modules/VRN/VRN_SystemManager_v0110.py",
+      "code": "VIA-VRN-MDL287",
+      "active_entry": "functional modules/VRN/VRN_SystemManager_v0111.py",
+      "registration": "verified_numbering_history",
+      "numbering_book": "supportive modules/registry/VIA_Numbering_SSOT_v0100.json"
+    },
+    {
+      "source": "functional modules/VDF/VDF_SystemManager_v0120.py",
+      "code": "VIA-VDF-MDL163",
+      "active_entry": "functional modules/VDF/VDF_SystemManager_v0121.py",
+      "registration": "verified_numbering_history",
+      "numbering_book": "supportive modules/registry/VIA_Numbering_SSOT_v0100.json"
+    }
+  ]
 }

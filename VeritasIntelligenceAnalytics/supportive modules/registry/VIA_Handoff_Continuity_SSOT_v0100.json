@@ -1,8 +1,8 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-29T15:38:10+00:00",
-  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
+  "updated_at": "2026-09-30T09:50:00+00:00",
+  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v0107.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
   "tool_lock": "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
@@ -64,13 +64,23 @@
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
     "supportive modules/registry/VIA_Registry_Architecture_SSOT_v*.json",
-    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json"
+    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0112.py",
+    "functional modules/VDF/VDF_SystemManager_v0120.py",
+    "functional modules/VDF/VDF_ParquetStore_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0111.py",
+    "functional modules/VRN/VRN_ReportProbe_v0100.py",
+    "supportive modules/registry/VIA_Requirements_SSOT_v0107.json",
+    "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0101.json",
+    "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
   ],
   "managed_modules": [
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0101.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0177.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0107.py",
-    "functional modules/VRN/VRN_SystemManager_v0110.py",
     "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
     "supportive modules/registry/CGC_MDL245_SDDValidator_v0103.py",
     "supportive modules/registry/CGC_MDL247_SSOTPanorama_v0100.py",
@@ -81,7 +91,16 @@
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0112.py",
+    "functional modules/VDF/VDF_SystemManager_v0120.py",
+    "functional modules/VDF/VDF_ParquetStore_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0111.py",
+    "functional modules/VRN/VRN_ReportProbe_v0100.py",
+    "functional modules/VRN/VRN_SystemManager_v0110.py",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -102,7 +121,7 @@
         "CGC_MDL140_HandoverConsole",
         "--selftest"
       ],
-      "success_marker": "[交接回歸] fail=0",
+      "success_marker": "[交接歷史席位] fail=0",
       "scope": "交接遺漏／證據過期／鎖漂移故障注入",
       "dependencies": [
         "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py",
@@ -221,6 +240,83 @@
         "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py",
         "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
         "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "vdf_dispatch": {
+      "argv": [
+        "VDF_ENG054_TWDailyBackfill",
+        "--selftest"
+      ],
+      "success_marker": "[VDF 派送回歸] fail=0",
+      "scope": "隔離 fixture 回歸；無正式資料庫/網路/AI；不等於全樣本驗收",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
+        "functional modules/VDF/tests/test_backfill_dispatch_v0100.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "vdf_manager": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[VDF Manager 契約回歸] fail=0",
+      "scope": "隔離 fixture 回歸；無正式資料庫/網路/AI；不等於全樣本驗收",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
+        "functional modules/VDF/tests/test_backfill_dispatch_v0100.py",
+        "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "vdf_store": {
+      "argv": [
+        "VDF_SystemManager",
+        "store",
+        "selftest"
+      ],
+      "success_marker": "[VDF Parquet 回歸] checks=32; fail=0",
+      "scope": "隔離 fixture 回歸；無正式資料庫/網路/AI；不等於全樣本驗收",
+      "dependencies": [
+        "functional modules/VDF/VDF_ParquetStore_v0100.py",
+        "functional modules/VDF/VDF_SystemManager_v0120.py",
+        "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
+        "functional modules/VDF/tests/test_managed_store_v0100.py",
+        "functional modules/VDF/VDF_SystemManager_v0121.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "vrn_probe": {
+      "argv": [
+        "VRN_SystemManager",
+        "probe",
+        "--selftest"
+      ],
+      "success_marker": "[VRN 實測入口] checks=14; fail=0",
+      "scope": "隔離 fixture 回歸；無正式資料庫/網路/AI；不等於全樣本驗收",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v0111.py",
+        "functional modules/VRN/VRN_ReportProbe_v0100.py",
+        "functional modules/VRN/tests/test_ReportProbe_v0100.py",
+        "functional modules/VRN/engine/VRN_Integrated_ReportDatabase_Engine.py",
+        "functional modules/VRN/engine/VRN_Evidence_Core.py",
+        "functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+        "functional modules/VDF/VDF_ParquetStore_v0100.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "vrn_manager_route": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[VRN 精確入口] fail=0",
+      "scope": "隔離 fixture 回歸；無正式資料庫/網路/AI；不等於全樣本驗收",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py",
+        "functional modules/VRN/tests/test_ReportProbe_v0100.py"
       ],
       "timeout_seconds": 300
     }
@@ -420,6 +516,74 @@
       "owner": "AI(下一批)",
       "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
       "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
+    },
+    {
+      "id": "VDF-REQ014:vdf_dispatch",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_dispatch",
+      "receipt": "docs/handoff/evidence/vdf_dispatch.json",
+      "owner": "AI"
+    },
+    {
+      "id": "VDF-REQ014:vdf_manager",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_manager",
+      "receipt": "docs/handoff/evidence/vdf_manager.json",
+      "owner": "AI"
+    },
+    {
+      "id": "VDF-REQ014:vdf_store",
+      "requirement": "VDF-REQ014",
+      "state": "VERIFIED",
+      "case": "vdf_store",
+      "receipt": "docs/handoff/evidence/vdf_store.json",
+      "owner": "AI"
+    },
+    {
+      "id": "VRN-REQ008:vrn_probe",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_probe",
+      "receipt": "docs/handoff/evidence/vrn_probe.json",
+      "owner": "AI"
+    },
+    {
+      "id": "VRN-REQ008:vrn_manager_route",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_manager_route",
+      "receipt": "docs/handoff/evidence/vrn_manager_route.json",
+      "owner": "AI"
+    },
+    {
+      "id": "VDF-REQ014:host",
+      "requirement": "VDF-REQ014",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "正式 Windows 資料家、真 API、系統開機排程尚未執行；只轉存日價，舊庫商品删除未接管",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
+    },
+    {
+      "id": "VRN-REQ008:real_reports",
+      "requirement": "VRN-REQ008",
+      "state": "BLOCKED",
+      "owner": "具資料存取權之主機操作者",
+      "reason": "目前只有合成 TXT/PDF；正式報告全文、OCR、年報期別與全樣本準確率未驗收",
+      "next": "依 runbook 在正式主機隔離輸出實測，回交 VRN_PROBE / store inspect 結果"
+    }
+  ],
+  "retained_dependencies": [
+    {
+      "path": "functional modules/VRN/VRN_SystemManager_v0110.py",
+      "active_entry": "functional modules/VRN/VRN_SystemManager_v0111.py",
+      "reason": "舊程式與 watch 保留；managed_modules 只指向目前中央註冊的活入口，避免一族兩個主入口。"
+    },
+    {
+      "path": "functional modules/VDF/VDF_SystemManager_v0120.py",
+      "active_entry": "functional modules/VDF/VDF_SystemManager_v0121.py",
+      "reason": "保留 PR #380 加速器鎖冊修正，v0121 組合其 facade 與受管 Parquet/契約派送。"
     }
   ]
 }

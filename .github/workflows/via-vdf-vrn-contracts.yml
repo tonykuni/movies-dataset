@@ -1,0 +1,66 @@
+name: VCGC VDF VRN isolated contracts
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/via-vdf-vrn-contracts.yml'
+      - 'VeritasIntelligenceAnalytics/functional modules/VDF/**'
+      - 'VeritasIntelligenceAnalytics/functional modules/VRN/**'
+      - 'VeritasIntelligenceAnalytics/supportive modules/registry/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: '1'
+      PYTHONWARNINGS: ignore
+      VIA_FROM_VCGC: 'YES'
+      VIA_VCGC_PUSH: 'NO'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /AGENTS.md
+            /CLAUDE.md
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/**
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: python -m pip install duckdb==1.5.5 polars==1.44.2 pandas==2.2.3 PyMuPDF==1.26.6 pdfplumber==0.11.8
+      - name: Run exact targets through VCGC
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess, sys
+          entry=max(Path('VeritasIntelligenceAnalytics/supportive modules/registry').glob('CGC_MDL149_VeritasCentralGovernanceConsole_v*.py'))
+          cases=[(['CGC_MDL140_HandoverConsole','--selftest'],'[交接歷史席位] fail=0'),
+                 (['VDF_ENG054_TWDailyBackfill','--selftest'],'[VDF 派送回歸] fail=0'),
+                 (['VDF_SystemManager','--selftest'],'[VDF Manager 契約回歸] fail=0'),
+                 (['CGC_MDL209_VdfStart','--selftest'],'[OK]'),
+                 (['VDF_SystemManager','store','selftest'],'[VDF Parquet 回歸] checks=32; fail=0'),
+                 (['VRN_SystemManager','--selftest'],'[VRN 精確入口] fail=0'),
+                 (['VRN_SystemManager','probe','--selftest'],'[VRN 實測入口] checks=14; fail=0')]
+          logs=Path('isolated-test-logs');logs.mkdir()
+          for index,(args,marker) in enumerate(cases):
+              result=subprocess.run([sys.executable,str(entry),'run',*args],capture_output=True,text=True,timeout=240)
+              output=result.stdout+result.stderr
+              (logs/f'{index}.txt').write_text(output,encoding='utf-8')
+              print(args,'rc=',result.returncode,'marker=',marker in output)
+              if result.returncode or marker not in output:
+                  print(output[-12000:]);raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-vdf-vrn-contracts
+          path: isolated-test-logs
