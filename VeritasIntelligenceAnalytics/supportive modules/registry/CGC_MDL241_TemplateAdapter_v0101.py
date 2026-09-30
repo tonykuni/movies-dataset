@@ -337,7 +337,7 @@ def find_pages(root: Node, bk: dict) -> list:
             if x.tag == "#text":
                 continue
             if "heading" in roles_of(x, roles):
-                t = _text_of(x, 40)
+                t = re.sub(r"\s+", " ", EXPR.sub("", "".join(k.text or "" for k in x.kids if k.tag == "#text"))).strip()[:40] or _text_of(x, 40)
                 if t:
                     return t
             stack[0:0] = x.kids
@@ -434,7 +434,9 @@ def analyse(root: Node, css_all: str, bk: dict) -> dict:
         for k, v in n.attrs:
             if k.startswith("hint-"):
                 continue
-            ctx = "event" if k.startswith("sc-camel-on-") else "class" if k == "class" else "style" if k == "style" else "attr"
+            if k == "ref":
+                continue
+            ctx = "event" if k.startswith("sc-camel-on-") or re.fullmatch(r"on[a-z]+", k) else "class" if k == "class" else "style" if k == "style" else "attr"
             for e in EXPR.findall(v or ""):
                 rec(e, scope, ctx, page)
         rs = roles_of(n, roles) if n.tag != "#root" else []
@@ -1079,7 +1081,7 @@ class Renderer:
         for k, v in n.attrs:
             if k.startswith("hint-") or k == "ref":
                 continue
-            if k.startswith("sc-camel-on-"):
+            if k.startswith("sc-camel-on-") or re.fullmatch(r"on[a-z]+", k):
                 e = _single(v)
                 ok, val = self.resolve(e, scope, "event") if e else (False, None)
                 if ok and isinstance(val, TabRef):
@@ -1131,12 +1133,31 @@ class Renderer:
             return ""
         real = t[7:] if t.startswith("sc-raw-") else t
         a = self.attrs(n, scope, extra)
+        gm = re.search(r"repeat\((\d+),", n.get("style"))
+        if gm:                                                     # the designer fixed N columns for N sample items → follow the live count
+            fix = self.grid_count(n, scope, int(gm.group(1)))
+            if fix is not None:
+                a = a.replace(f"repeat({gm.group(1)},", f"repeat({fix},", 1)
+                self.stats["grid_adapted"] += 1
         if real in VOID:
             return f"<{real}{a}>"
         inner = "".join(self.el(k, scope) for k in n.kids)
         if id(n) in self.page_parents and not self.tabs_bound:
             inner = self.tabbar() + inner
         return f"<{real}{a}>{inner}</{real}>"
+
+    def grid_count(self, n: Node, scope: dict, want: int):
+        """A fixed repeat(N, …) grid whose repeated cells come from a list previewed with N placeholders → the list's live length."""
+        stack = [(k, 0) for k in n.kids]
+        while stack:
+            x, d = stack.pop(0)
+            if x.tag == "sc-for" and int(x.get("hint-placeholder-count") or -1) == want:
+                expr = _single(x.get("list"))
+                ok, seq = self.resolve(expr, scope, "list") if expr else (False, None)
+                return len(seq) if ok and isinstance(seq, list) and seq and len(seq) != want else None
+            if d < 3 and x.tag != "#text" and "grid-template-columns" not in x.get("style"):
+                stack += [(k, d + 1) for k in x.kids]
+        return None
 
     def for_(self, n: Node, scope: dict) -> str:
         expr = _single(n.get("list"))
@@ -1239,7 +1260,9 @@ def render_skeleton(conv: dict, views: dict, theme: dict, binding: dict, title: 
             f"<div class='{_e(card)} {_e(theme['acc'].get(lamp4(r.get('status')), ''))}' data-via-row='k'><div class='via-sk-k'>{_e(r.get('label') or r.get('name'))}</div>"
             f"<div class='via-sk-v' style='color:{_e(theme['lamp_hex'][lamp4(r.get('status'))])}'>{_e(r.get('value'))}</div>"
             f"<div class='via-sk-n'>{_e(r.get('note', ''))}</div></div>" for r in rows) + "</div>"
-    pages = [("overview", "總覽 Overview", cards(views.get("kpis") or []) + "".join(c["chart"] for c in views.get("charts") or [])
+    charts = "<div class='via-sk-charts'>" + "".join(f"<figure class='{_e(card)} via-sk-fig' data-via-row='c'><figcaption>{_e(c['title'])}</figcaption>{c['chart']}</figure>"
+                                                     for c in views.get("charts") or []) + "</div>"
+    pages = [("overview", "總覽 Overview", cards(views.get("kpis") or []) + charts
               + tbl(views.get("summary") or [], [("來源", "name"), ("燈", "status"), ("tally", "tally"), ("綠比", "score"), ("距今", "age"), ("引擎", "engine")]))]
     for c in views.get("categories") or []:
         pages.append((c["code"].lower(), c["name"], cards(c["kpis"]) + tbl(c["items"], [("代碼", "code"), ("項", "name"), ("燈", "status"), ("說明", "note")])))
@@ -1306,7 +1329,7 @@ def chrome_css(facts: dict, theme: dict, bk: dict, pal: dict) -> str:
             ".via-nodata-block{color:#64748b;font:12px ui-monospace,monospace}"
             ".via-pill{font:600 10px ui-monospace,monospace;padding:1px 6px;white-space:nowrap}"
             ".via-js [data-via-page]:not(.on){display:none!important}"
-            ".via-tabbar{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 8px}.via-tabbar .via-tab{font:inherit;cursor:pointer;border:1px solid " + ln + ";background:" + bg + ";color:" + tx + ";padding:4px 10px}"
+            ".via-tabbar{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 8px;position:relative;z-index:2147482000}.via-tabbar .via-tab{font:inherit;cursor:pointer;border:1px solid " + ln + ";background:" + bg + ";color:" + tx + ";padding:4px 10px}"
             ".via-tabbar .via-tab.on{background:" + tx + ";color:" + bg + "}"
             "[data-via-tab]:focus-visible{outline:2px solid " + theme["lamp_hex"]["YELLOW"] + ";outline-offset:1px}"
             "table th{position:sticky;top:0;z-index:1}"
@@ -1318,7 +1341,7 @@ def chrome_css(facts: dict, theme: dict, bk: dict, pal: dict) -> str:
             ".via-dock input{font:inherit;padding:3px 6px;border:1px solid " + ln + ";width:100%;box-sizing:border-box}"
             ".via-dock button{font:inherit;cursor:pointer;border:1px solid " + ln + ";background:" + bg + ";color:" + tx + ";padding:2px 8px}"
             ".via-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}"
-            ".via-report{padding:12px 16px;background:" + bg + ";color:" + tx + ";font:11px/1.5 system-ui,'Noto Sans TC',sans-serif;border-top:2px solid " + ln + "}"
+            ".via-report{overflow-wrap:anywhere;padding:12px 16px;background:" + bg + ";color:" + tx + ";font:11px/1.5 system-ui,'Noto Sans TC',sans-serif;border-top:2px solid " + ln + "}"
             ".via-report table{border-collapse:collapse;width:100%}.via-report th,.via-report td{border:1px solid " + ln + ";padding:2px 6px;text-align:left;vertical-align:top;word-break:break-word}"
             ".via-report th{background:" + bg + "}"
             ".via-stale{font:700 9px ui-monospace,monospace;color:#fff;background:" + theme["lamp_hex"]["YELLOW"] + ";padding:0 4px}"
@@ -1326,6 +1349,8 @@ def chrome_css(facts: dict, theme: dict, bk: dict, pal: dict) -> str:
             ".via-sk-status{font:11px ui-monospace,monospace;opacity:.8}.via-sk-body{display:flex;flex:1;min-height:0}"
             ".via-sk-side{flex:0 0 auto;padding:8px 12px;min-width:0}.via-sk-main{flex:1;min-width:0;padding:8px 16px}"
             ".via-sk-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:0 0 8px}"
+            ".via-sk-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:0 0 8px}"
+            ".via-sk-fig{margin:0;padding:6px 8px;min-width:0}.via-sk-fig figcaption{font-weight:700;margin:0 0 4px}"
             ".via-sk-k{font-weight:700}.via-sk-v{font:700 14px ui-monospace,monospace}.via-sk-n{opacity:.75;font-size:10px;word-break:break-word}"
             ".via-sk-h{font-weight:700;margin:8px 0 4px}.via-sk-src{padding:2px 0}.via-sk-link{display:block;padding:2px 0}"
             ".via-sk table td,.via-sk table th{word-break:break-word}"
@@ -1351,9 +1376,13 @@ def offline_scan(html: str) -> dict:
     """T20: what would reach the network if this page were opened."""
     ext_src = re.findall(r"""<(?:script|img|iframe|source|video|audio|embed)\b[^>]*\bsrc\s*=\s*["']?(?:https?:)?//""", html, re.I)
     ext_link = re.findall(r"""<link\b[^>]*\bhref\s*=\s*["']?(?:https?:)?//""", html, re.I)
-    ext_url = re.findall(r"""url\(\s*["']?(?:https?:)?//""", html, re.I)
-    imports = re.findall(r"@import\b", html)
-    js_net = re.findall(r"\bfetch\s*\(|XMLHttpRequest|WebSocket\s*\(|EventSource\s*\(", html)
+    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", html, re.S | re.I)
+                    + [_html.unescape(x) for x in re.findall(r"""\sstyle\s*=\s*"([^"]*)\"""", html)]
+                    + [_html.unescape(x) for x in re.findall(r"""\sstyle\s*=\s*'([^']*)'""", html)])
+    js = "\n".join(re.findall(r"<script(?![^>]*application/json)[^>]*>(.*?)</script>", html, re.S | re.I))
+    ext_url = re.findall(r"""url\(\s*["']?(?:https?:)?//""", css, re.I)
+    imports = re.findall(r"@import\b", css)
+    js_net = re.findall(r"\bfetch\s*\(|XMLHttpRequest|WebSocket\s*\(|EventSource\s*\(|importScripts\s*\(", js)
     anchors = re.findall(r"""<a\b[^>]*\bhref\s*=\s*["']?https?://""", html, re.I)
     bad = len(ext_src) + len(ext_link) + len(ext_url) + len(imports) + len(js_net)
     return {"ext_src": len(ext_src), "ext_link": len(ext_link), "ext_url": len(ext_url), "imports": len(imports), "js_net": len(js_net),
@@ -1424,8 +1453,8 @@ def convert(path: Path, out: Path | None = None, propose: bool = False, bk: dict
                        "layout_best": (rep.get("layout") or {}).get("best"), "contrast_warnings": rep.get("warnings") or [],
                        "state": rep.get("state"), "proposed": bool(propose and cand)},
             "offline": {"links_dropped": len(doc["links"]), "scripts_dropped": doc["scripts_dropped"], "resources": len(info["resources"])}}
-    body["ir_sha"] = _sha(json.dumps({k: body[k] for k in ("regions", "components", "slots", "pages", "tokens")}, sort_keys=True, ensure_ascii=False,
-                                     default=str).encode())
+    body["ir_sha"] = _sha(json.dumps({**{k: body[k] for k in ("regions", "components", "slots", "pages")}, "vars": body["tokens"]["vars"]},
+                                     sort_keys=True, ensure_ascii=False, default=str).encode())
     (cd / "TEMPLATE_IR.json").write_text(json.dumps(body, ensure_ascii=False, indent=1, default=str) + "\n", encoding="utf-8")
     (cd / "COMPONENTS.json").write_text(json.dumps({"components": comps, "library": body["component_library"], "lists": lists},
                                                    ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -1498,7 +1527,12 @@ def sync(path: Path, out: Path | None = None, mode: str = "auto", root: Path | N
     views["bindings"] = binding_rows(b)
     views["progress"] = f"已對接 {b['coverage']['bound']}/{b['coverage']['total']} 槽 · {b['coverage']['pct']}%"
     has_slots = bool(ir["scalars"] or ir["lists"])
-    faithful = mode == "faithful" or (mode == "auto" and has_slots)
+    # layout auto-choice: the template's own markup leads only when it can show real data (≥ 30 % of data slots bound);
+    # otherwise VIA's skeleton in the template's look leads and the faithful copy is still written next to it
+    faithful = has_slots and mode != "skeleton"
+    primary_v = "faithful" if faithful and (mode == "faithful" or b["coverage"]["pct"] >= 30) else "skeleton"
+    mode_why = ("操作員指定" if mode != "auto" else "沒有槽 → 骨架" if not has_slots else
+                f"覆蓋 {b['coverage']['pct']}% {'≥' if primary_v == 'faithful' else '<'} 30% → {primary_v} 為主頁")
     off = Offline(conv["resources"], bk)
     tpl_css = [off.css(c) for c in conv["doc"]["css"]]
     pal = (conv["candidate"] or {}).get("palette") or {}
@@ -1543,7 +1577,7 @@ def sync(path: Path, out: Path | None = None, mode: str = "auto", root: Path | N
                 f"<div>{_e(views['progress'])}</div><input id='via-filter' type='search' placeholder='篩選 filter rows' aria-label='filter rows'>"
                 f"<div><button type='button' id='via-theme'>淺 / 深 theme</button> <a href='#via-unmapped'>報告 report</a></div></div></details>")
         html = assemble(f"{title_base} · VIA", css_parts, body, preseed, prov, report, dock)
-        name = f"VIA_UI_{conv['slug']}_latest.html" if variant == ("faithful" if faithful else "skeleton") else f"VIA_UI_{conv['slug']}_{variant}_latest.html"
+        name = f"VIA_UI_{conv['slug']}_latest.html" if variant == primary_v else f"VIA_UI_{conv['slug']}_{variant}_latest.html"
         (sd / name).write_text(html, encoding="utf-8")
         # T24 round trip: the rendered page re-converted keeps the template's tokens and regions
         rt_doc = split_doc(html)
@@ -1570,7 +1604,7 @@ def sync(path: Path, out: Path | None = None, mode: str = "auto", root: Path | N
         nt, nb = name_of(tx), name_of(bgd)
         if nt and nb:
             dark_pair = PRIOR.contrast(dk[nt], dk[nb])
-    primary = outputs["faithful" if faithful else "skeleton"]
+    primary = outputs[primary_v]
     probs = []
     if any(o["offline"]["violations"] for o in outputs.values()):
         probs.append(("RED", "離線違規(外部資源)"))
@@ -1582,7 +1616,7 @@ def sync(path: Path, out: Path | None = None, mode: str = "auto", root: Path | N
         probs.append((primary["perf"]["lamp"], "效能預算"))
     lamp = worst([p[0] for p in probs]) if probs else "GREEN"
     rep = {"schema": "VIA.TemplateSync.v1", "engine": ENGINE, "utc": _utc(), "template": _rel(path), "slug": conv["slug"], "kind": conv["info"]["kind"],
-           "lamp": lamp, "problems": [p[1] for p in probs], "mode": "faithful" if faithful else "skeleton", "outputs": outputs,
+           "lamp": lamp, "problems": [p[1] for p in probs], "mode": primary_v, "mode_why": mode_why, "outputs": outputs,
            "coverage": b["coverage"], "unmapped": b["unmapped"], "presentational": b["presentational"], "events_static": b["events"],
            "lists": {k: {x: v[x] for x in ("view", "how", "rows", "kind", "fields")} for k, v in b["lists"].items()},
            "scalars": b["scalars"], "pages": [p["id"] for p in ir["pages"]], "regions": ir["regions"],
@@ -1603,14 +1637,14 @@ def write_sync_index(out: Path | None = None) -> Path:
     for p in sorted((out / "synced").glob("*/BINDING_latest.json")):
         j = PRIOR._json(p) or {}
         rows.append(j)
-    body = ("<table class='via'><tr><th>燈</th><th>模板</th><th>種類</th><th>模式</th><th>覆蓋</th><th>未對接</th><th>離線</th><th>大小</th><th>頁</th><th>時間</th></tr>"
+    body = ("<div style='overflow-x:auto;max-width:100%'><table class='via'><tr><th>燈</th><th>模板</th><th>種類</th><th>模式</th><th>覆蓋</th><th>未對接</th><th>離線</th><th>大小</th><th>頁</th><th>時間</th></tr>"
             + "".join(f"<tr data-via-row='i'><td>{PRIOR.lamp(j.get('lamp', 'NODATA'), j.get('lamp', ''))}</td><td>{_e(j.get('template'))}</td><td>{_e(j.get('kind'))}</td>"
                       f"<td>{_e(j.get('mode'))}</td><td>{_e((j.get('coverage') or {}).get('pct'))}%</td><td>{len(j.get('unmapped') or [])}</td>"
                       f"<td>{_e(' / '.join(o['offline']['lamp'] for o in (j.get('outputs') or {}).values()))}</td>"
                       f"<td>{_e(' / '.join(str(o['perf']['bytes']) for o in (j.get('outputs') or {}).values()))}</td>"
                       f"<td>" + " ".join(f"<a href='{_e(os.path.relpath(o['file'], out))}'>{_e(v)}</a>" for v, o in (j.get('outputs') or {}).items()) +
-                      f"</td><td>{_e(j.get('utc'))}</td></tr>" for j in rows) + "</table>"
-            + f"<p class='via-note'>投放夾 {_e((book().get('drop') or {}).get('inbox'))} · 同義 / 來源 / TOP25 冊 {_e(book().get('_path'))} · {_e(ENGINE)}</p>")
+                      f"</td><td>{_e(j.get('utc'))}</td></tr>" for j in rows) + "</table></div>"
+            + f"<p class='via-note' style='overflow-wrap:anywhere'>投放夾 {_e((book().get('drop') or {}).get('inbox'))} · 同義 / 來源 / TOP25 冊 {_e(book().get('_path'))} · {_e(ENGINE)}</p>")
     html = PRIOR.page("模板同步總表 Template sync index", body, module={"id": "via-tpl-index", "name": "模板同步總表"})
     p = out / "SYNC_INDEX_latest.html"
     p.write_text(html, encoding="utf-8")
@@ -1794,6 +1828,7 @@ body{background:var(--bg);color:var(--ink)} .app-root{height:100vh;overflow:hidd
 <div class="ucc-right"><div class="tabs"><sc-for list="{{ tabs }}" as="t"><span sc-camel-on-click="{{ t.pick }}" class="tab {{ t.onCs }}">{{ t.label }}</span></sc-for></div>
 <div class="pane"><sc-if value="{{ isT1 }}"><div class="hd">Overview</div>
 <div class="grid"><sc-for list="{{ vKpis }}" as="k"><div class="card {{ k.acc }}"><div>{{ k.label }}</div><div style="{{ k.vCs }}">{{ k.value }}</div></div></sc-for></div>
+<div style="display:grid;grid-template-columns:repeat(5,64px)"><sc-for list="{{ vKpis }}" as="h" hint-placeholder-count="5"><b>{{ h.label }}</b></sc-for></div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr"><sc-for list="{{ valRows }}" as="v"><div style="display:contents"><div style="{{ v.rowCs }}">{{ v.id }}</div><div>{{ v.badge }}</div><div>{{ v.flux }}</div></div></sc-for></div>
 <sc-for list="{{ gallery }}" as="g"><div class="chart">{{ g.title }}{{ g.chart }}</div></sc-for></sc-if>
 <sc-if value="{{ isCat }}"><div class="hd">{{ catName }}</div><sc-for list="{{ catItems }}" as="c"><div><span class="pill" style="background:{{ c.color }}">{{ c.status }}</span>{{ c.name }}</div></sc-for></sc-if>
@@ -1899,6 +1934,8 @@ def selftest() -> int:
             chk("C11", "分頁:兄弟 sc-if → 分頁;分類頁依來源數複製;tabs 清單帶 data-via-tab;深連結 + 鍵盤 JS 在",
                 pages[0] == "isT1" and sum(1 for p in pages if p.startswith("isCat-")) >= 3 and 'data-via-tab="isT1"' in fh
                 and "ArrowRight" in fh and "#tab=" in fh, pages)
+            chk("C11", "版面自動調整:設計者按 5 個樣本寫死的 repeat(5,…) 格線跟著活資料列數改", "repeat(5," not in fh.split("<body>", 1)[-1].split("via-report")[0]
+                and r["outputs"]["faithful"]["stats"].get("grid_adapted", 0) >= 1, r["outputs"]["faithful"]["stats"])
             chk("C12", "SYNCHRONIZER 登記:via.sync.state.v2 預置腳本在頁頭", PRIOR.STATE_KEY in fh and "via-tpl-fixture_ui" in fh.lower())
             srcs = {s["id"]: s for s in r["sources"]}
             chk("C13", "新鮮度:50h 前的 TEST 標 STALE(燈不改色)", srcs["test"]["stale"] and srcs["test"]["lamp"] == "YELLOW" and not srcs["panorama"]["stale"]
@@ -1906,11 +1943,11 @@ def selftest() -> int:
             chk("C14", "錯誤邊界:壞 JSON = UNREADABLE、沒檔 = ABSENT,都 NODATA,頁照出", srcs["vdf_chain"]["state"] == "UNREADABLE"
                 and srcs["dflock"]["state"] == "ABSENT" and srcs["dflock"]["lamp"] == "NODATA" and len(fh) > 1000)
             chk("C15", "手機護欄:img/svg 限寬、寬表內捲、≤480px 16px 邊距(--pad 覆寫)", "--pad:16px" in fh and "max-width:100%" in fh and ".via-tw{overflow-x:auto" in fh)
-            chk("C16", "深色 token 推導 + 切換鈕(模板寫死色不動 → PARTIAL)", ":root[data-theme=dark]{--bg:" in fh and 'id="via-theme"' in fh
+            chk("C16", "深色 token 推導 + 切換鈕(模板寫死色不動 → PARTIAL)", ":root[data-theme=dark]{--bg:" in fh and "id='via-theme'" in fh
                 and derive_dark({"bg": "#ffffff"})["bg"] < "#333333")
             chk("C17", "對比檢:燈色 / 底逐項量,不足只標", len(r["contrast"]) >= 4 and all("ratio" in c for c in r["contrast"]))
             chk("C18", "列印 CSS:分頁攤開、浮動列藏、100vh 容器自動高", "@media print{" in fh and ".app-root{height:auto!important}" in fh)
-            chk("C19", "篩選 + 黏頂表頭:清單列掛 data-via-row、篩選框、th sticky", 'data-via-row="logs"' in fh and 'id="via-filter"' in fh
+            chk("C19", "篩選 + 黏頂表頭:清單列掛 data-via-row、篩選框、th sticky", 'data-via-row="logs"' in fh and "id='via-filter'" in fh
                 and "table th{position:sticky" in fh)
             chk("C20", "離線:外部 link / script / @import / 遠端 url() / 外部 img 全拿掉;0 違規", r["outputs"]["faithful"]["offline"]["violations"] == 0
                 and r["outputs"]["skeleton"]["offline"]["violations"] == 0 and "googleapis" not in fh and "example.invalid" not in fh,
