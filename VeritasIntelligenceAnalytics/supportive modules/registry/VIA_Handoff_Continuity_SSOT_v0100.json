@@ -73,7 +73,9 @@
     "supportive modules/registry/VIA_Requirements_SSOT_v0107.json",
     "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0101.json",
     "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json",
-    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py"
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
   ],
   "managed_modules": [
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0101.py",
@@ -96,7 +98,9 @@
     "functional modules/VRN/VRN_SystemManager_v0111.py",
     "functional modules/VRN/VRN_ReportProbe_v0100.py",
     "functional modules/VRN/VRN_SystemManager_v0110.py",
-    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py"
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -262,7 +266,8 @@
       "dependencies": [
         "functional modules/VDF/VDF_SystemManager_v*.py",
         "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
-        "functional modules/VDF/tests/test_backfill_dispatch_v0100.py"
+        "functional modules/VDF/tests/test_backfill_dispatch_v0100.py",
+        "supportive modules/registry/CGC_MDL209_VdfStart_v0101.py"
       ],
       "timeout_seconds": 300
     },
@@ -278,7 +283,8 @@
         "functional modules/VDF/VDF_ParquetStore_v0100.py",
         "functional modules/VDF/VDF_SystemManager_v0120.py",
         "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
-        "functional modules/VDF/tests/test_managed_store_v0100.py"
+        "functional modules/VDF/tests/test_managed_store_v0100.py",
+        "functional modules/VDF/VDF_SystemManager_v0121.py"
       ],
       "timeout_seconds": 300
     },
@@ -573,6 +579,11 @@
       "path": "functional modules/VRN/VRN_SystemManager_v0110.py",
       "active_entry": "functional modules/VRN/VRN_SystemManager_v0111.py",
       "reason": "舊程式與 watch 保留；managed_modules 只指向目前中央註冊的活入口，避免一族兩個主入口。"
+    },
+    {
+      "path": "functional modules/VDF/VDF_SystemManager_v0120.py",
+      "active_entry": "functional modules/VDF/VDF_SystemManager_v0121.py",
+      "reason": "保留 PR #380 加速器鎖冊修正，v0121 組合其 facade 與受管 Parquet/契約派送。"
     }
   ]
 }

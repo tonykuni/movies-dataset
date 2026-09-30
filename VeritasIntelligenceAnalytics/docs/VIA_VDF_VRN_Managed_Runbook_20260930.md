@@ -97,3 +97,9 @@ VDF→VRN 商品對照唯讀，保留四碼股票名稱、上市櫃市場及 Yah
 本批合併 PR #378 後用 VCGC v0179 重驗：五個新增 case 皆 rc0 與 marker 成立。中央編號追加 128 筆（含交接補強 8 筆），遺失／身分改動／重號皆 0，六項註冊完整性皆 0；既有 rule 紅列 21 保留。SDD 為 YELLOW（32 工作流、112 步、112 需求，鎖版本待重驗 7 處），SSOT panorama 尚有舊同義字／命名風險，詳見 evidence/vdf_vrn_*_20260930.txt；不宣稱全系統綠燈。
 
 交接補強：v0103 同時保留 VRN v0110 與 v0111 的受管範圍。活入口按元件冊核對，已宣告的同族舊依賴必須在中央 MDL/ENG 編號冊找到唯一對應列，且該冊 SHA／列數吻合才承認歷史登錄；缺登錄、不同家族或冊指紋不符仍拒絕。新舊版程式皆不刪除。
+
+合併 PR #380：其 VDF Manager v0120 與 VdfStart v0101 原檔保留。本批入口升為 v0121，組合 v0120 的加速器鎖冊 facade 與既有 v0119 公開 API，並保留本批 contract/store/measure 修正；自測另核對加速器實際路徑等於鎖冊。
+
+PR #380 整合重驗：v0121 鎖冊整合 PASS、VdfStart 自測 PASS；五個 VDF/VRN case 皆 rc0（未變更依賴者沿用有效證據）。中央冊再追加 22 筆，相對本批主分支合計追加 150 筆，原身分保留。
+
+最新交接快照 GREEN（watched 2768、findings 0），closeout YELLOW。合併後編號器留下 1 筆 UNCOMMITTED 警示：VIA-VDF-MDL166 / v0121 實際已於 5a6a56c 合併提交；既有 git_times 使用 git log --name-only，未列出合併提交新增檔，故產生誤報。本批保留原稽核結果，不手改冊上時間；後續由編號器版本修正合併提交時間收集。其餘五項註冊完整性皆 0。
