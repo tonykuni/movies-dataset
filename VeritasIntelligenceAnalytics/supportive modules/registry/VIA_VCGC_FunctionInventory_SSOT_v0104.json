@@ -1013,6 +1013,42 @@
     "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
    ],
    "timeout": 600
+  },
+  {
+   "id": "C-vdf_lists",
+   "name": "交接案 vdf_lists(VDF_ENG087_MarketListGovernance --selftest;台股清單 ACTIVE/NEW/DELISTED)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG087_MarketListGovernance",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vdf_etf_metrics",
+   "name": "交接案 vdf_etf_metrics(VDF_ENG094_ActiveETFActivity --selftest;主動式 ETF 指標與配置)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG094_ActiveETFActivity",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_ssot_consistency",
+   "name": "交接案 vrn_ssot_consistency(SUP_MDL749_VRNFieldRuleHub --selftest;VRN SSOT 一致與正則自檢)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL749_VRNFieldRuleHub",
+    "--selftest"
+   ],
+   "timeout": 1200
   }
  ],
  "coverage": {
@@ -1247,6 +1283,15 @@
    },
    "dataframe_lock": {
     "station": "C-dataframe_lock"
+   },
+   "vdf_lists": {
+    "station": "C-vdf_lists"
+   },
+   "vdf_etf_metrics": {
+    "station": "C-vdf_etf_metrics"
+   },
+   "vrn_ssot_consistency": {
+    "station": "C-vrn_ssot_consistency"
    }
   },
   "workflow": {
@@ -1385,5 +1430,5 @@
  "why_v0101": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):交接冊新增案 backup(CGC_MDL221_SystemBackup --selftest,Z286 修正 v0101 的收據)→ 覆蓋登錄指到既有站 L-backup(同一支自測,不另開站);其餘站與覆蓋一字不動",
  "why_v0102": "側線 2026-09-30 b 第四段(VCGC-REQ086):交接新案 fullcheck → 新站 C-fullcheck(CGC_MDL248_FullCheck --selftest);其餘一字不動",
  "why_v0103": "側線 2026-09-30 b 第四段(VCGC-REQ087):交接新案 deck → 新站 C-deck(CGC_MDL095_DeckServer --selftest);其餘一字不動",
- "why_v0104": "R34(操作員 2026-09-30「將 PANORAMA 為第一步啟動監控 VCGC-VDF-VRN」):交接新案 via_panorama → 新站 C-via_panorama(VIA_Panorama --selftest;v0103 monitor / first);其餘一字不動；交接新案 dataframe_lock → 新站 C-dataframe_lock(CGC_MDL249)"
+ "why_v0104": "R34(操作員 2026-09-30「將 PANORAMA 為第一步啟動監控 VCGC-VDF-VRN」):交接新案 via_panorama → 新站 C-via_panorama(VIA_Panorama --selftest;v0103 monitor / first);其餘一字不動；交接新案 dataframe_lock → 新站 C-dataframe_lock(CGC_MDL249)；交接新案 vdf_lists · vdf_etf_metrics · vrn_ssot_consistency → 新站 C-*(R34 VDF / VRN 兩線)"
 }

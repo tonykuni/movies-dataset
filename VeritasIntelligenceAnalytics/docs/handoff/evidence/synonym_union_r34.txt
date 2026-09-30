@@ -27,24 +27,17 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 554 · import 0 · 提及 46 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 554 · import 0 · 提及 45 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL249_DataFrameLock_v0100.py(家族 core)
-  [OK] 欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數全對 = GREEN
-  [OK] 缺必填欄(net_flow_value)= RED,並點名
-  [OK] ${VIA_DATA_HOME} 路徑展開到資料家
-  [OK] 來源不在 = NODATA(不冒充綠)
-  [OK] duckdb 來源:主鍵重複 = RED
-  [OK] 分片 parquet(part-*.parquet)全部讀進來
-  [OK] 投影表(extra_ok)寬表多欄不算黃
-  [OK] 多出冊上沒有的欄 = YELLOW(表頭未定案)
-  [OK] 型別不符(date · float)= RED
-  [OK] 總判取最差(有紅 = RED)
-  [OK] lock 只寫綠的表(tw_list)
-  [OK] 同表頭同資料 = 已鎖不重寫
-  [OK] 表頭指紋變了而冊沒出新版 = 拒寫(表頭鎖死)
-  [OK] plan 列來源在不在與主鍵
+  [via-vcgc run] [流程] 政策過 · CGC_MDL176_SynonymUnion_v0103.py(家族 core)
+  [OK] 前版 v0102 自測:加了 R34 裁定沒有新增任何失敗項
+  [既有] 前版單獨跑就紅的項(非本版造成,照實列出):⑩ 真漏口 0;剩下的只
+  [OK] 前版 6 條原樣在(只增)
+  [OK] R34 八條在,且都指向 institution 正典鍵
+  [OK] 別名不指向別名(正典鍵自己不是別名)
+  [OK] 樣本券商(StockReportBasicInfo 的 Morgan Stanley · Citi 等)經一扇門解成一個正典鍵
   [OK] 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
-[DataFrame 鎖] 自測 15/15 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 51, 'changed': 15, 'stale': 0, 'expected': 14178, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[同義聯集 v0103] 自測 6/6 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL237_NumberingSystem_v0111.py(冊 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL237_NumberingSystem_v0111.py'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 55, 'changed': 27, 'stale': 0, 'expected': 14182, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply

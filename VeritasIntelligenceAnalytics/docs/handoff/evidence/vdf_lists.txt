@@ -30,21 +30,43 @@
 [政策] L50 全景 · 尾版 554 · import 0 · 提及 46 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL249_DataFrameLock_v0100.py(家族 core)
-  [OK] 欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數全對 = GREEN
-  [OK] 缺必填欄(net_flow_value)= RED,並點名
-  [OK] ${VIA_DATA_HOME} 路徑展開到資料家
-  [OK] 來源不在 = NODATA(不冒充綠)
-  [OK] duckdb 來源:主鍵重複 = RED
-  [OK] 分片 parquet(part-*.parquet)全部讀進來
-  [OK] 投影表(extra_ok)寬表多欄不算黃
-  [OK] 多出冊上沒有的欄 = YELLOW(表頭未定案)
-  [OK] 型別不符(date · float)= RED
-  [OK] 總判取最差(有紅 = RED)
-  [OK] lock 只寫綠的表(tw_list)
-  [OK] 同表頭同資料 = 已鎖不重寫
-  [OK] 表頭指紋變了而冊沒出新版 = 拒寫(表頭鎖死)
-  [OK] plan 列來源在不在與主鍵
-  [OK] 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
-[DataFrame 鎖] 自測 15/15 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 51, 'changed': 15, 'stale': 0, 'expected': 14178, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · VDF_ENG087_MarketListGovernance_v0106.py(家族 vdf)
+  OK   規則:普通股四碼
+  OK   規則:主動股票 A 碼
+  OK   轉接:v0103 的 dedupe_market_turnover / run_update 叫得到(TAILAPI)
+  OK   轉接:v0104 的 verify_etf_master 叫得到
+  OK   refresh 計畫五步、只有前三步要網路
+  OK   股票:只收四碼普通股、去後綴去重
+  OK   股票:上市/上櫃 → TWSE/TPEX
+  OK   股票:剔除數照實
+  OK   股票:低於軟下限 + 認不得交易所 = AMBER(不是 GREEN)
+  OK   股票:yf 後綴
+  OK   ETF:只收國內主動股票 A 碼
+  OK   ETF:剔除數(D 碼 1 · 國外/下架 2)
+  OK   ETF:持股驗證(.TW 後綴也算)
+  OK   ETF:有檔未驗證 = AMBER
+  OK   代號串列:verified_only
+  OK   交叉:掛牌 A 碼不在總清單要報
+  OK   lists 寫到指定路徑(自測不碰 VIA_Reports)
+  OK   股票:只有一所 = RED
+  OK   庫不在 = ABSENT
+  OK   庫路徑:只設 VIA_DB_TW 也認
+  OK   庫路徑:VIA_DB_VDF_TW_MARKET 優先
+[VDF_ENG087 v0105] 21/21 OK
+{"via": "vcgc", "state": "DENY", "why": "只經 VCGC(VIA_FROM_VCGC=YES)"}
+  OK   前版 v0105 自測仍綠
+  OK   首跑 = 基準:全 ACTIVE、沒有 NEW
+  OK   新掛牌 = NEW
+  OK   下市 = DELISTED(列不刪)
+  OK   兩天都在 = ACTIVE(去後綴同碼)
+  OK   代號不改、first_seen 保留、delisted_on 記日
+  OK   已下市的第二天仍在、下市日不變、不再算今日下市
+  OK   下市後回來 = NEW + relisted(first_seen 保留)
+  OK   一步下市 10 > 上限 5 = mass_delist
+  OK   前快照三種形狀都認
+  OK   庫到快照:v0105 形狀當前快照 → 1101 DELISTED、6488 NEW
+  OK   寫快照 + 日期副本(自測寫暫存夾)
+  OK   用自己的快照再比:全 ACTIVE 或 DELISTED、無 NEW
+  OK   清單抓不到 = HOLD,不寫、不判下市
+  OK   不經 VCGC 就拒跑
+[VDF_ENG087 v0106] 15/15 OK

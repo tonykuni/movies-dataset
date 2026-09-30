@@ -30,21 +30,30 @@
 [政策] L50 全景 · 尾版 554 · import 0 · 提及 46 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL249_DataFrameLock_v0100.py(家族 core)
-  [OK] 欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數全對 = GREEN
-  [OK] 缺必填欄(net_flow_value)= RED,並點名
-  [OK] ${VIA_DATA_HOME} 路徑展開到資料家
-  [OK] 來源不在 = NODATA(不冒充綠)
-  [OK] duckdb 來源:主鍵重複 = RED
-  [OK] 分片 parquet(part-*.parquet)全部讀進來
-  [OK] 投影表(extra_ok)寬表多欄不算黃
-  [OK] 多出冊上沒有的欄 = YELLOW(表頭未定案)
-  [OK] 型別不符(date · float)= RED
-  [OK] 總判取最差(有紅 = RED)
-  [OK] lock 只寫綠的表(tw_list)
-  [OK] 同表頭同資料 = 已鎖不重寫
-  [OK] 表頭指紋變了而冊沒出新版 = 拒寫(表頭鎖死)
-  [OK] plan 列來源在不在與主鍵
-  [OK] 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
-[DataFrame 鎖] 自測 15/15 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 51, 'changed': 15, 'stale': 0, 'expected': 14178, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · VDF_ENG094_ActiveETFActivity_v0101.py(家族 vdf)
+{"via": "vcgc", "state": "DENY", "why": "只經 VCGC(VIA_FROM_VCGC=YES)"}
+  OK   v0100 公開面轉接(fund_interval / build)
+  OK   ROC 日期
+  OK   單位數:只收主動 A 碼、千分位
+  OK   淨值:dict 列 + 位置列、略過前一日淨值
+  OK   規模 = 單位數 × 淨值、官方 = OFFICIAL
+  OK   Yahoo 後備 = ESTIMATE
+  OK   日期對不上 = ESTIMATE
+  OK   流入:Δunits × NAV_t
+  OK   流出:負淨額 → outflow
+  OK   缺單位數 → ENG096 aum_flow(淨值不變,AUM +3000 萬)
+  OK   首日無流量、毛申贖永遠 NULL(ABSENT)
+  OK   欄位齊(etf_daily_metrics 表頭)
+  OK   來源冊:毛申贖 ABSENT、NAV 仍是 CANDIDATE
+  OK   沒有同意閘 = NO_CONSENT、零發包
+  OK   只開閘一(沒開爬蟲閘)仍 NO_CONSENT
+  OK   閘尺 = CGC_MDL224:兩閘開才開
+  OK   產業配置:同產業加總、檔數
+  OK   資產配置:股票 / 現金
+  OK   breakdown 欄位齊、ETF 去後綴
+  OK   breakdown 落表(最新日;庫 × 產業)
+  OK   fetch(假網路)→ 落表 → 第二天從庫接前值算流量
+  OK   fetch 只打兩條官方 URL(t187ap47_L · etfNav)
+  OK   正庫不在 = 拒寫(不代建)
+  OK   不經 VCGC 就拒跑
+[VDF_ENG094 v0101] 24/24 OK

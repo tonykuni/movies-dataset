@@ -4,7 +4,7 @@
 操作員(R34,2026-09-30):「將輸出 HEADER 檢視定案後建立 DATAFRAME 鎖定 以 DATAFRAME 中資料的輸出即驗證即結果驗證為範圍目標不發散」
 正本:VIA_Output_Header_SSOT 尾版(每張輸出表:子系統 · 正主引擎 · 來源〔duckdb / parquet / csv / json〕· 欄位〔名 · 型別 · 必填 · 主鍵〕· 最少列數)。
 本支只讀資料:把每張表載成 pandas DataFrame,逐項核:
-  欄位 = 表頭(缺必填欄 = RED;多出冊上沒有的欄 = YELLOW,表頭沒定案)· 型別可轉 · 必填不空 · 主鍵不重複 · 列數 ≥ 最少列數;
+  欄位 = 表頭(缺必填欄 = RED;多出冊上沒有的欄 = YELLOW,表頭沒定案;表標 extra_ok = 投影,寬表多欄不算)· 型別可轉 · 必填不空 · 主鍵不重複 · 列數 ≥ 最少列數;
   來源不在 = NODATA(照實,不冒充綠)。
 動詞:
   plan                     列每張表:來源在不在、欄數、主鍵(不讀資料)
@@ -86,6 +86,14 @@ def resolve_source(src: dict, data_home: str | None = None) -> Path | None:
     return p if p.is_absolute() else (VIA / p)
 
 
+def _exists(p: Path | None) -> bool:
+    if not p:
+        return False
+    if any(ch in p.name for ch in "*?["):
+        return any(p.parent.glob(p.name))
+    return p.exists()
+
+
 def load_frame(src: dict, path: Path):
     """The table as a pandas DataFrame (read only)."""
     import pandas as pd
@@ -98,6 +106,9 @@ def load_frame(src: dict, path: Path):
         finally:
             con.close()
     if kind == "parquet":
+        if any(ch in path.name for ch in "*?["):                 # 分片:part-*.parquet 全部讀進來
+            parts = sorted(path.parent.glob(path.name))
+            return pd.concat([pd.read_parquet(x) for x in parts], ignore_index=True) if parts else pd.DataFrame()
         return pd.read_parquet(path)
     if kind == "csv":
         return pd.read_csv(path, dtype=str, keep_default_na=False)
@@ -135,7 +146,7 @@ def check_table(tid: str, spec: dict, data_home: str | None = None, frame=None) 
     if frame is None:
         path = resolve_source(src, data_home)
         row["source"] = str(path) if path else None
-        if not path or not path.exists():
+        if not _exists(path):
             row.update(lamp="NODATA", problems=[f"來源不在:{path or '(沒有 path / db_env)'}"])
             return row
         try:
@@ -155,7 +166,7 @@ def check_table(tid: str, spec: dict, data_home: str | None = None, frame=None) 
         red.append(f"缺必填欄 {miss_req[:8]}")
     if miss_opt:
         yellow.append(f"缺非必填欄 {miss_opt[:8]}")
-    if extra:
+    if extra and not spec.get("extra_ok"):
         yellow.append(f"多出冊上沒有的欄(表頭未定案){extra[:8]}")
     for c in cols:
         n = c["name"]
@@ -245,7 +256,7 @@ def plan(book: dict | None = None, data_home: str | None = None) -> list:
     for tid, spec in sorted((book.get("tables") or {}).items()):
         p = resolve_source(spec.get("source") or {}, data_home)
         out.append({"table": tid, "subsystem": spec.get("subsystem"), "owner": spec.get("owner"), "kind": (spec.get("source") or {}).get("kind"),
-                    "source": str(p) if p else None, "exists": bool(p and p.exists()), "columns": len(spec.get("columns") or []),
+                    "source": str(p) if p else None, "exists": _exists(p), "columns": len(spec.get("columns") or []),
                     "keys": [c["name"] for c in spec.get("columns") or [] if c.get("key")], "header_sha": header_sha(spec)})
     return out
 
@@ -345,7 +356,15 @@ def selftest() -> int:
         chk("來源不在 = NODATA(不冒充綠)", by["gone"]["lamp"] == "NODATA")
         if have_duck:
             chk("duckdb 來源:主鍵重複 = RED", by["holdings"]["lamp"] == "RED" and "重複" in " ".join(by["holdings"]["problems"]))
+        (tmp / "parts").mkdir()
+        for i in range(2):
+            pd.DataFrame([{"fileId": f"f{i}", "value": float(i)}]).to_parquet(tmp / "parts" / f"part-{i}.parquet")
+        spec_g = {"subsystem": "VRN", "owner": "V", "source": {"kind": "parquet", "path": str(tmp / "parts" / "part-*.parquet")},
+                  "columns": [{"name": "fileId", "dtype": "str", "required": True, "key": True}, {"name": "value", "dtype": "float"}]}
+        rg = check_table("parts", spec_g)
+        chk("分片 parquet(part-*.parquet)全部讀進來", rg["lamp"] == "GREEN" and rg["rows"] == 2, rg["problems"])
         df_extra = pd.DataFrame(rows).assign(extra_col=1)
+        chk("投影表(extra_ok)寬表多欄不算黃", check_table("tw_list", dict(book["tables"]["tw_list"], extra_ok=True), frame=df_extra)["lamp"] == "GREEN")
         chk("多出冊上沒有的欄 = YELLOW(表頭未定案)", check_table("tw_list", book["tables"]["tw_list"], frame=df_extra)["lamp"] == "YELLOW")
         df_bad = pd.DataFrame([{"date": "not-a-date", "etf_ticker": "A", "aum": "x", "nav": 1, "net_flow_value": 0}])
         r_bad = check_table("etf_metrics", book["tables"]["etf_metrics"], frame=df_bad)
