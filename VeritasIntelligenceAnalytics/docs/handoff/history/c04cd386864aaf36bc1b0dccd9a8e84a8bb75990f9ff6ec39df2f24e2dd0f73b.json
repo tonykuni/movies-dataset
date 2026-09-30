@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-09-30T21:32:52+00:00",
+  "at": "2026-09-30T20:47:59+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -162,20 +162,6 @@
       "topic": "VRN 全部 SSOT 正則 · 同義字邏輯一致 · 輸出表頭定案 → DataFrame 鎖定(輸出即驗證即結果驗證)"
     },
     {
-      "id": "VRN-REQ009",
-      "state": "PARTIAL",
-      "owner": "AI · 操作員(實測樣本)",
-      "next": "操作員工作站以 C:\\測試樣本報告 實測(classify / verify;pdfplumber 會加入互核);VRN 工作流冊新版掛 classify → route → 首頁互核步",
-      "topic": "VRN 文件五類分類(個股 · 產業/展望 · 新聞摘要 · 其他投資報告 · 其他)+ 首頁文字 / 表格 / 分類還原修復驗證 + 亂數三格乘積多法互核"
-    },
-    {
-      "id": "VCGC-REQ089",
-      "state": "PARTIAL",
-      "owner": "AI · 操作員(模板檔與重鎖)",
-      "next": "操作員把 claude.ai/design 匯出的 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → watch;採用其 token 才走 convert --propose → apply → CGC_MDL238 template --lock 重鎖",
-      "topic": "HTML U/I 原始模板 + SYNCHRONIZER:任何模板可轉換 · 自動同步成自己的 U/I · TOP 25 能力"
-    },
-    {
       "id": "host-live",
       "requirement": "VCGC-REQ028",
       "state": "BLOCKED",
@@ -318,22 +304,6 @@
       "owner": "操作員",
       "reason": "同義冊一詞兩主剩 麥格理(MACQ/MACQUARIE/MAQ)· 元富(MASTERLINK/MSTR)5 紅列;測試樣本沒有這兩家,授權範圍外不代裁",
       "next": "操作員裁定正典鍵 → CGC_MDL176 下一版 R34_RULINGS 加列 → run CGC_MDL176_SynonymUnion apply → CGC_MDL237 audit"
-    },
-    {
-      "id": "VRN-REQ009:workstation-real",
-      "requirement": "VRN-REQ009",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "真實 PDF 樣本在工作站 C:\\測試樣本報告,容器沒有;容器只驗 76 檔名分類與正本合成 PDF",
-      "next": "via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → verify --samples 同夾 → CGC_MDL249 check / lock --apply"
-    },
-    {
-      "id": "VCGC-REQ089:universal-ui-export",
-      "requirement": "VCGC-REQ089",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
-      "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
     }
   ],
   "reusable_successes": [
@@ -369,9 +339,7 @@
     "VDF-REQ014:vdf_etf_metrics",
     "VRN-REQ008:vrn_ssot_consistency",
     "VRN-REQ008:synonym_union_r34",
-    "VRN-REQ008:numbering_dup_r34",
-    "VRN-REQ009:vrn_docclass",
-    "VCGC-REQ089:template_sync"
+    "VRN-REQ008:numbering_dup_r34"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -384,7 +352,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
+      "sha256": "2b763dc7654b10fc8680d05304b29b80a977da6e55385ab6a43d98d969b4539d"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -404,7 +372,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
+      "sha256": "2b763dc7654b10fc8680d05304b29b80a977da6e55385ab6a43d98d969b4539d"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -428,7 +396,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
+      "sha256": "2b763dc7654b10fc8680d05304b29b80a977da6e55385ab6a43d98d969b4539d"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -444,11 +412,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "4e34fe9ac614d19ed3b9212f17825f53a41fc7c13ef64bf483519f4aefb94462"
+      "sha256": "02791ddc45bdb344fd13f11810a8f5421c07a46bc995782f68a27521fed652e1"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "4e34fe9ac614d19ed3b9212f17825f53a41fc7c13ef64bf483519f4aefb94462"
+      "sha256": "02791ddc45bdb344fd13f11810a8f5421c07a46bc995782f68a27521fed652e1"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -456,7 +424,7 @@
     },
     "VCGC-REQ086:fullcheck": {
       "path": "docs/handoff/evidence/fullcheck.json",
-      "sha256": "5266f2b965c92b76c44b89b49959060b9f0d41de0b2f87e77a7090c080a2ce48"
+      "sha256": "7a92470edf72da09de3bdd4eb0066b3d01019c5b7c2d3f6dbfccb17d3d2a7f0f"
     },
     "VCGC-REQ087:deck-rst": {
       "path": "docs/handoff/evidence/deck.json",
@@ -468,7 +436,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
+      "sha256": "2b763dc7654b10fc8680d05304b29b80a977da6e55385ab6a43d98d969b4539d"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -476,7 +444,7 @@
     },
     "VCGC-REQ086:own-page": {
       "path": "docs/handoff/evidence/fullcheck.json",
-      "sha256": "5266f2b965c92b76c44b89b49959060b9f0d41de0b2f87e77a7090c080a2ce48"
+      "sha256": "7a92470edf72da09de3bdd4eb0066b3d01019c5b7c2d3f6dbfccb17d3d2a7f0f"
     },
     "VCGC-REQ088:via_panorama": {
       "path": "docs/handoff/evidence/via_panorama.json",
@@ -505,14 +473,6 @@
     "VRN-REQ008:numbering_dup_r34": {
       "path": "docs/handoff/evidence/numbering_dup_r34.json",
       "sha256": "9b0a7434da5eec84792ab4af2e1eb40824f5d44159af01a2b1d6c8768e9c86a8"
-    },
-    "VRN-REQ009:vrn_docclass": {
-      "path": "docs/handoff/evidence/vrn_docclass.json",
-      "sha256": "169c1fa989cf6a85aaa514b619e85d9dff5814d9774a9271ee60f91d06d4ded3"
-    },
-    "VCGC-REQ089:template_sync": {
-      "path": "docs/handoff/evidence/template_sync.json",
-      "sha256": "d33fdf5b9d7b9caeedef7a0c5c3c615a0e69f23e338280cd8c3afc4e1f06f861"
     }
   },
   "state": {
@@ -535,7 +495,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0111.json": "d99607851c4be6d8c206eaf73326bcc245cf0575ca53eda30a6aaeb01b5703bf",
       "supportive modules/registry/VIA_Requirements_SSOT_v0112.json": "37e4e9f5761442fef9604a6950eb4b0d511c74e6c9ba6e9249b678c68a94a115",
       "supportive modules/registry/VIA_Requirements_SSOT_v0113.json": "33d40a021c48fb1f9b1e3561a0aff4c0bdc653cadf47f5c2d55b1a0cb61cbe64",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0114.json": "72ddae689365c58814d2b9752ae00173db1e1a4dfa2c6dbba2bb80ee95d9b279",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -551,7 +510,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "9d4c683c54c76fb1c01cb05ac06598845b6547b298d170539e043c27cfeaf911",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "1f059b6f9454e66eab4dfad9dce77489f4a7198a8c9a3b952bb7df428a24859f",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -910,7 +869,6 @@
       "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py": "4f0965ad99c4febe2d14804ffd13777c40c646c74304e981ce91a7e79dea590d",
       "functional modules/VRN/VRN_ENG113_LogicRollup_v0100.py": "071113a2b99d875c754a4cf5cdd91f9897b08c6e8758c430bb2b9729941bdca4",
       "functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py": "8fa184082104f4fb28a40f18e002045e7c138e44a78d50a39310ca5c93595312",
-      "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py": "e00d4079e0614e63361ca6153f7aecbda32439fbeaaa37bda1c19b915c414b73",
       "functional modules/VRN/VRN_Financial_Synonyms_SSOT.py": "9dd35fcad36574c85366944c156a097ae1e1cfa95309edf80bff5eda4d2fdc9c",
       "functional modules/VRN/VRN_MDL001_Converter.py": "7fbd0997d6a18fbcdc83bd2407f7d70e662d904e17f1dbe0b56308b85400609b",
       "functional modules/VRN/VRN_MDL001_Converter_shaf09dc35c.py": "a41b9eba43f5a9b86372c9ddb1c420fd4b4c1ef397a8b8861c9a8dc9906d1642",
@@ -3065,7 +3023,6 @@
       "supportive modules/registry/CGC_MDL239_DataBroker_v0100.py": "d23d28551fb3d4b4e2d5e6a2b278b0c563e6361368b076a759a2dd9450da6767",
       "supportive modules/registry/CGC_MDL240_EnvManager_v0100.py": "d8f01b3ae9e366ffab779d915bba6d04bcb8e56c712ba2f8eb68deff7bb30548",
       "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0100.py": "b71589167e9e60dba4d2c1f530bc0e479bd6e6480ec45a0b1e9f9278b39aa01e",
-      "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py": "49257b70c00ddfc56c17197541212303b6f6f405da22ff677029576553e47e35",
       "supportive modules/registry/CGC_MDL242_PathVerify_v0100.py": "1c497d8b5422199b52464843cc45ce989c93cee5f1620a8ee08d212ecb7b9e3a",
       "supportive modules/registry/CGC_MDL242_PathVerify_v0101.py": "14ccead3c269d34b6ab406a5e343a087fb67c540d538382a1753f1e23f4b4623",
       "supportive modules/registry/CGC_MDL242_PathVerify_v0102.py": "6fffbfa33a183ea2761678f69c66fba9cfbded303cdfa525d246b8abf726ad6f",
@@ -3308,8 +3265,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0101.json": "da5d101becb50ed3851fef190e7649fcb45f6f0afb62c550183d1a01f52899f3",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0102.json": "2f7ac956534217a03281a4a5b9fc4b69f475efb635d6ccefc2ab12e80c8d96a5",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0103.json": "3c0574c2898aab9dfecc8d4d2263acd3fb5b4e6d9c857893448a1a7246af487c",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0104.json": "d0b3c6e91448a520ea98440fc72f704d63f81787d92186083a854ef10ebaf262",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0105.json": "cd9081eb7aae98d221a67becff700c0b66a94a98fde32922115b67fc8f82a035"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0104.json": "d0b3c6e91448a520ea98440fc72f704d63f81787d92186083a854ef10ebaf262"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4588,40 +4544,6 @@
           "VIA_SSOT_SynonymUnion_v0100.json",
           "VIA_Central_Synonym_Regex_v0100.json"
         ]
-      },
-      "VRN-REQ009": {
-        "definition": "d728f089a0591d864c248e5e9f16c6df011baa8223cd62efae910c068a4d80a5",
-        "status": "PARTIAL",
-        "next": "操作員工作站以 C:\\測試樣本報告 實測(classify / verify;pdfplumber 會加入互核);VRN 工作流冊新版掛 classify → route → 首頁互核步",
-        "owner": "AI · 操作員(實測樣本)",
-        "topic": "VRN 文件五類分類(個股 · 產業/展望 · 新聞摘要 · 其他投資報告 · 其他)+ 首頁文字 / 表格 / 分類還原修復驗證 + 亂數三格乘積多法互核",
-        "homes": [
-          "VIA_VRN_DocClass_SSOT_v0100.json",
-          "VIA_Output_Header_SSOT_v0101.json",
-          "VRN-WKF005"
-        ]
-      },
-      "VCGC-REQ089": {
-        "definition": "7308438fd9af92e995e8ec7882b5fc55c245c4a15ea38602cf058265127bf6fa",
-        "status": "PARTIAL",
-        "next": "操作員把 claude.ai/design 匯出的 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → watch;採用其 token 才走 convert --propose → apply → CGC_MDL238 template --lock 重鎖",
-        "owner": "AI · 操作員(模板檔與重鎖)",
-        "topic": "HTML U/I 原始模板 + SYNCHRONIZER:任何模板可轉換 · 自動同步成自己的 U/I · TOP 25 能力",
-        "homes": [
-          "VIA_UI_TemplateSync_SSOT_v0100.json",
-          "VCGC-WKF001"
-        ]
-      },
-      "VCGC-REQ090": {
-        "definition": "918d7dd2c1e6cf64734617df308d8371a85d0ed6c27d505d5ea52614d24b858b",
-        "status": "COVERED",
-        "next": "",
-        "owner": "AI",
-        "topic": "PS 入口跑完強制自動關機(選用開關)",
-        "homes": [
-          "VCGC-WKF001",
-          "VIA_VCGC_FunctionInventory_SSOT_v0104.json"
-        ]
       }
     }
   },
@@ -4674,9 +4596,7 @@
     "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py",
     "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py",
     "supportive modules/registry/CGC_MDL176_SynonymUnion_v0103.py",
-    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py",
-    "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
-    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py"
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5067,43 +4987,13 @@
       "state": "VERIFIED",
       "case": "numbering_dup_r34",
       "receipt": "docs/handoff/evidence/numbering_dup_r34.json"
-    },
-    "VRN-REQ009:vrn_docclass": {
-      "id": "VRN-REQ009:vrn_docclass",
-      "requirement": "VRN-REQ009",
-      "state": "VERIFIED",
-      "case": "vrn_docclass",
-      "receipt": "docs/handoff/evidence/vrn_docclass.json"
-    },
-    "VCGC-REQ089:template_sync": {
-      "id": "VCGC-REQ089:template_sync",
-      "requirement": "VCGC-REQ089",
-      "state": "VERIFIED",
-      "case": "template_sync",
-      "receipt": "docs/handoff/evidence/template_sync.json"
-    },
-    "VRN-REQ009:workstation-real": {
-      "id": "VRN-REQ009:workstation-real",
-      "requirement": "VRN-REQ009",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "真實 PDF 樣本在工作站 C:\\測試樣本報告,容器沒有;容器只驗 76 檔名分類與正本合成 PDF",
-      "next": "via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → verify --samples 同夾 → CGC_MDL249 check / lock --apply"
-    },
-    "VCGC-REQ089:universal-ui-export": {
-      "id": "VCGC-REQ089:universal-ui-export",
-      "requirement": "VCGC-REQ089",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
-      "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
     }
   },
   "summary": {
-    "requirements": 119,
-    "watched_files": 2793,
-    "pending": 44,
-    "reusable": 35,
+    "requirements": 116,
+    "watched_files": 2789,
+    "pending": 40,
+    "reusable": 33,
     "findings": 0
   }
 }
