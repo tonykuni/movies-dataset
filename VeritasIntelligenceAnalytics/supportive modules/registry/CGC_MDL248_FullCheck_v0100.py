@@ -71,7 +71,7 @@ STEPS = [
      "argv": ["run", "--family", "core", "CGC_MDL064_SelftestGrid"], "full": [], "report": "VIA_Reports/selftest_runs/GRID_*.json",
      "owner": "CGC_MDL064_SelftestGrid", "timeout": 3600, "evidence_unless": "grid"},
     {"n": 5, "id": "handoff", "name": "交接防遺漏(需求 · 待辦 · 收據 · 相依變更)", "layer": "VCGC",
-     "argv": ["handoff", "check"], "full": [], "report": "docs/handoff/HANDOFF_latest.json", "owner": "CGC_MDL140_HandoverConsole", "timeout": 900},
+     "argv": ["handoff", "check"], "full": [], "report": "VIA_Reports/fullcheck/HANDOFF_CHECK_latest.json", "owner": "CGC_MDL140_HandoverConsole", "timeout": 900},
 ]
 
 
@@ -173,11 +173,30 @@ def read_grid(d: dict) -> tuple:
     return lamp, f"{d.get('done', len(rows))}/{d.get('total', len(rows))} 站 · OK {d.get('ok', 0)} · FAIL {d.get('fail', 0)} · SKIP {d.get('skip', 0)} · 逾時 {d.get('timeout', 0)}", probs
 
 
+HANDOFF_RX = re.compile(r"\[交接防遺漏\]\s+(\w+)\s+·\s+驗收\s+(\w+)\s+·\s+(\{.*\})")
+FINDING_RX = re.compile(r"^\[(RED|YELLOW)\]\s+(\S+)\s+(.*)$")
+
+
+def handoff_report(out: str) -> dict:
+    """handoff check prints its verdict (it rewrites HANDOFF_latest.json only on checkpoint): verdict · closeout lamp · summary · each finding line."""
+    m = None
+    for m in HANDOFF_RX.finditer(out):
+        pass
+    summary = {}
+    if m:
+        try:
+            summary = json.loads(m.group(3))
+        except ValueError:
+            summary = {}
+    finds = [{"lamp": f.group(1), "code": f.group(2), "detail": f.group(3)[:300]} for f in (FINDING_RX.match(ln.strip()) for ln in out.splitlines()) if f]
+    return {"verdict": m.group(1) if m else "", "closeout_lamp": m.group(2) if m else "", "summary": summary, "findings": finds, "at": now_utc()}
+
+
 def read_handoff(d: dict) -> tuple:
     s = d.get("summary") or {}
-    probs = [{"where": "交接", "item": f.get("code") or f.get("id") or "finding", "lamp": "RED", "detail": f.get("message") or json.dumps(f, ensure_ascii=False)[:200], "next": "via-vcgc handoff check"}
+    probs = [{"where": "交接", "item": f.get("code") or "finding", "lamp": _lamp(f.get("lamp")), "detail": f.get("detail") or "", "next": "via-vcgc handoff check"}
              for f in d.get("findings") or [] if isinstance(f, dict)]
-    lamp = "RED" if s.get("findings") else "GREEN"
+    lamp = _lamp(d.get("verdict")) if d.get("verdict") else ("RED" if s.get("findings") else "NODATA")
     close = _lamp(d.get("closeout_lamp"))
     if close != "GREEN":
         probs.append({"where": "交接", "item": "closeout_lamp", "lamp": close, "detail": f"驗收燈 {d.get('closeout_lamp')}(交接綠只代表資料完整,不是驗收)", "next": "sdd closeout"})
@@ -253,6 +272,12 @@ def run_step(via: Path, step: dict, full: bool, grid: bool, runner) -> dict:
         rp.write_text(json.dumps(bridges_report(via, out1, out2), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         rc = rc1 or rc2
         return _finish(via, step, t0, at, rc, (out1 + out2), False)
+    if step["id"] == "handoff":
+        rc, out = runner(via, step["argv"], step["timeout"])
+        rp = via / step["report"]
+        rp.parent.mkdir(parents=True, exist_ok=True)
+        rp.write_text(json.dumps(handoff_report(out), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        return _finish(via, step, t0, at, rc, out, False)
     evidence_only = step.get("evidence_unless") == "grid" and not grid
     rc, out = (0, "沿用最新格子存證(整張重跑加 --grid / -Grid)") if evidence_only else runner(via, step["argv"] + (step["full"] if full else []), step["timeout"])
     return _finish(via, step, t0, at, rc, out, evidence_only)
@@ -445,10 +470,8 @@ def selftest() -> int:
                 (p / "PATH_VERIFY_latest.json").write_text(json.dumps({"verdict": "GREEN", "steps": [{"step": "s", "state": "GREEN"}], "versions": []}), encoding="utf-8")
                 return 0, ""
             if argv[:1] == ["handoff"]:
-                p = v / "docs" / "handoff"
-                p.mkdir(parents=True, exist_ok=True)
-                (p / "HANDOFF_latest.json").write_text(json.dumps({"summary": {"findings": 0, "pending": 27}, "closeout_lamp": "YELLOW"}), encoding="utf-8")
-                return 0, ""
+                return 0, '[交接防遺漏] GREEN · 驗收 YELLOW · {"requirements": 111, "pending": 27, "reusable": 23, "findings": 0}\n'
+
             return 0, ""
 
         rep = run(via, full=True, runner=fake, kit=None)
@@ -480,6 +503,10 @@ def selftest() -> int:
         g0 = read_bridges(d0)[0]
         stale = read_bridges(dict(d0, loaded={"引擎": "VeritasCeleritas_v1140.py", "網路": "VeritasAegisNexus_v1652.py"}))
         bplan = [p for p in rep["problems"] if p["step"] == 0]
+        red = handoff_report('[交接防遺漏] RED · 驗收 RED · {"findings": 2}\n[RED] CHANGED_CODE_WITHOUT_TEST a.py\n[YELLOW] CHECKPOINT_STALE [b]\n')
+        hl, _hs, hp = read_handoff(red)
+        chk("⑨ 交接讀輸出行(紅時不重寫 HANDOFF_latest):紅 · 每條 finding 進問題清單 · 驗收燈另列", hl == "RED"
+            and [p["item"] for p in hp] == ["CHANGED_CODE_WITHOUT_TEST", "CHECKPOINT_STALE", "closeout_lamp"], [p["item"] for p in hp])
         chk("⑦ 三橋:全接且載入最新 = 綠 · 載入舊版 = 紅(點名)· 缺橋 = 紅並列出補缺計畫那一支", g0 == "GREEN" and stale[0] == "RED"
             and any("v1140" in p["detail"] for p in stale[2]) and any(p["item"].startswith("Invoke-X-v0101.ps1") for p in bplan), [p["item"] for p in bplan])
     os.environ.pop("VIA_FROM_VCGC", None)

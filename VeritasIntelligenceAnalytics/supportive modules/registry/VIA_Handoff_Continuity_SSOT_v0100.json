@@ -88,7 +88,8 @@
     "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
-    "supportive modules/registry/CGC_SystemManager_v0111.py"
+    "supportive modules/registry/CGC_SystemManager_v0111.py",
+    "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -273,6 +274,21 @@
         "supportive modules/registry/CGC_SystemManager_v*.py",
         "supportive modules/registry/VIA_VCGC_SystemBackup_v0100.json",
         "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "fullcheck": {
+      "argv": [
+        "CGC_MDL248_FullCheck",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL248_FullCheck_v0100 selftest 9/9 PASS",
+      "scope": "整合全景實測:三橋覆蓋與最新版 → VCGC 串測 → SSOT 全景 → 單一路徑 → 格子 → 交接;紅了照跑 · 讀正主本輪報告不重判 · 紀錄冊只增(UTC · 尾版 · sha16 · 秒數)· HTML 總報告(側線 2026-09-30 b · VCGC-REQ086)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL248_FullCheck_v*.py",
+        "launchers/Invoke-VIA-FullCheck-v*.ps1",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+        "supportive modules/registry/CGC_MDL241_TemplateAdapter_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -501,6 +517,13 @@
       "case": "backup",
       "receipt": "docs/handoff/evidence/backup.json",
       "resolved": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):CGC_MDL221_SystemBackup v0101 讀鏈報告的 schema 與 mode —— 真跑(mode run…)= RAN_AFTER_BACKUP,鎖定照成立、標 stale 請重備(不自動改冊);計畫 / 非鏈跑器 / 讀不到照 v0100 判 chain_file。CGC_SystemManager v0111 backup 改走 v0101、席位 VCGC → v0111;v0100 · v0110 不動、報告不刪"
+    },
+    {
+      "id": "VCGC-REQ086:fullcheck",
+      "requirement": "VCGC-REQ086",
+      "state": "VERIFIED",
+      "case": "fullcheck",
+      "receipt": "docs/handoff/evidence/fullcheck.json"
     },
     {
       "id": "VCGC-REQ085:base-380",

@@ -189,3 +189,22 @@
 | 掉球帳 | Z286 以只增結案列結案 |
 
 驗收燈 `closeout_lamp` 另計;交接 GREEN 只代表交接資料完整。
+
+## 九、第四段:整合全景實測一鍵 PS(VCGC-REQ086)
+
+操作員令(逐字):「先把這個面檢視實測的工具整合為一」「給我一個整合後的POWRESHELL跳書HTML報告如今天清晨」「請加入PS加速器模板並檢查系統中的引擎都有加入最新版加速器 VDF加入最新的網路工具 從VCGC VDF VRN提供這個PS指令我自己貼上去跳出HTML U/I如今天早上 熱PS去跑 請提供一個整合後指令」「跑完直接開PR合併給我指令」。
+
+| 檔 | 做什麼 |
+|---|---|
+| `launchers/Invoke-VIA-FullCheck-v0100.ps1`(新) | 一鍵:模板接法(CELERITAS-TEMPLATE-JOIN + Celeritas 正主)· PS 25 加速器橋 · 只經 Invoke-VIAPython 叫 VCGC;跑完跳出 `VIA_Reports\fullcheck\FULLCHECK_latest.html`。參數 `-Full`(全部重量)· `-Grid`(自測格子整張重跑)· `-NoOpen` · `-Only 0,5` · `-SystemDir`;結束碼 0 綠 · 2 黃 · 1 紅 · 3 環境缺件 |
+| `CGC_MDL248_FullCheck_v0100.py`(新) | 六段依序、紅了照跑:⓪ 三橋覆蓋與最新版(CGC_MDL124 乾跑 + 載入版 vs 樹上最新)→ ① VCGC 串測 → ② SSOT 全景 → ③ 單一路徑驗證 → ④ 自測格子(預設讀存證並標時間,`-Grid` 才重跑)→ ⑤ 交接(讀 check 輸出行)。燈讀各正主本輪報告,沒更新的照紅;每段 + 總判只增寫 `VIA_VCGC_FullCheck_Ledger_v0100.jsonl`(UTC · 尾版 · 版號 · sha16 · 秒數 · HEAD)。自測 9/9 |
+| 三橋補缺(Z288) | VDF 網路橋 131/131 · PS 25 加速器橋 928/928(73 支尾版經橋掃 `--apply` 補上)|
+| 冊 | 需求冊 v0110(+VCGC-REQ086)· 盤點冊 v0102(站 C-fullcheck)· 交接冊(案 fullcheck · 工作項 VCGC-REQ086:fullcheck)|
+
+pwsh 實跑(容器,-NoOpen):六段跑到底,296.9 秒。⓪ 三橋 綠(ACCEL 1628/1628 · NET 131/131 · PS-ACCEL 928/928 · 載入 = 最新)· ① 串測 紅 1(V-inventory 棘輪:昨天格子 FAIL 24)· ② 全景 黃(紅 0)· ③ 單一路徑 紅(容器沒跑 go 的路徑步;版本 72 支全齊)· ④ 格子存證 36 小時前 FAIL 24 · ⑤ 交接。實跑中抓到本支自己的缺陷:`handoff check` 紅時不重寫 HANDOFF_latest.json,第 ⑤ 段誤判「報告沒更新」→ 改讀 check 的輸出行(自測 ⑨),`--only 5` 實跑確認 9 條 findings 全列。
+
+操作員端一行指令(倉根,Windows PowerShell 7):
+
+```powershell
+git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAnalytics\launchers\Invoke-VIA-FullCheck-v0100.ps1
+```
