@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-09-29T20:10:24+00:00",
+  "at": "2026-09-30T09:37:41+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -127,6 +127,13 @@
       "topic": "命名普查(同號異名 · 版號異形 · 沒版號)"
     },
     {
+      "id": "VCGC-REQ084",
+      "state": "PARTIAL",
+      "owner": "AI",
+      "next": "R09 兩本待辦帳對帳(交接冊 × 掉球帳)· R07 三冊號碼對照報表(命名 · 元件 · 中央編號);R10 / R11 / R12 / R14 由操作員裁定",
+      "topic": "編號 · 註冊 · SSOT 治理架構重整與風險治理"
+    },
+    {
       "id": "host-live",
       "requirement": "VCGC-REQ028",
       "state": "BLOCKED",
@@ -183,12 +190,20 @@
       "next": "操作員下令後:VCGC run CGC_MDL237_NumberingSystem --apply(v0108 寫後自核,違反只增整批還原)→ run CGC_MDL237_NumberingSystem audit 遺失 0 · 改身分 0 · 重號 0 → 提交"
     },
     {
-      "id": "VCGC-REQ075:reuse-glob",
-      "requirement": "VCGC-REQ075",
+      "id": "VCGC-REQ084:reconcile",
+      "requirement": "VCGC-REQ084",
       "state": "PENDING",
-      "owner": "AI(下一批,新版號檔)",
-      "reason": "側線 i 收尾實測盲點:CGC_MDL140 v0101 run_case 判「沿用成功」只比收據上記的相依雜湊,不重掃宣告的相依樣式;新尾版(CGC_MDL149 v0178 · CGC_MDL245 v0104)符合 _v*.py 卻沒進舊收據,entry / sdd 兩案被沿用而沒測到新尾版。本批收尾已把相依集合變了的收據照工具原格式存進 history 後重跑(不是沿用)",
-      "next": "CGC_MDL140 v0102 薄尾:沿用前重掃 case 相依樣式 + VCGC 樣式,檔案集合 ≠ 收據集合即重跑;自測加負控(新增 _v 檔 → 不沿用);換版經 handoff watch / managed 登錄"
+      "owner": "AI(下一批)",
+      "reason": "R09:兩本待辦帳沒對帳 —— 交接待辦 25 件 × 掉球帳 285 列中 214 列未劃線;已修的沒轉態(例 Z280 側線 i 已修、本批才結案)",
+      "next": "唯讀對照表:Z 號 ↔ 交接工作項 / 需求 next;已修的帶理由劃線結案,仍開的掛到對應需求或交接工作項,一條都不消失"
+    },
+    {
+      "id": "VCGC-REQ084:crosswalk",
+      "requirement": "VCGC-REQ084",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
+      "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
     }
   ],
   "reusable_successes": [
@@ -203,56 +218,81 @@
     "VCGC-REQ079:sdd",
     "VCGC-REQ079:entry",
     "VCGC-REQ081:token",
-    "VCGC-REQ082:entry"
+    "VCGC-REQ082:entry",
+    "VCGC-REQ075:reuse-glob",
+    "VCGC-REQ084:numbering",
+    "VCGC-REQ084:activation",
+    "VCGC-REQ084:entry",
+    "VCGC-REQ084:handoff"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "e2a5ecd01485b04fbb0aef114094277924bf6ed4bd44a6fd1fab5942a35e38a6"
+      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
     },
     "VCGC-REQ075:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "99bb437cf3897af9ead8e6879723461baadaecbd3c7fc37d761cbfe0f41d215f"
+      "sha256": "715561f918289bcfc463ce3c429d21b5b8c803ced63a0b25cde2d9dd4d00c79a"
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "a11b6a56f88fb84f513d649e02dc3126cf0935845c274ec06c48afd4779af441"
+      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
-      "sha256": "8de4ced832111848abb8981445c7463fd4efada0bf43fdf82a95d8f1309692a9"
+      "sha256": "9c0ac66e6c95f3ac7afde1bd444f96b852c7deb2570aa3e6b1a48ef54fe4e71a"
     },
     "VRN-REQ007:provenance": {
       "path": "docs/handoff/evidence/provenance.json",
-      "sha256": "e5909b3a20e30fe00a83aa442e703ab0a377a7868c57c05311310e997ed88c1a"
+      "sha256": "1bd9814f8ca4f7aafb870bacef85d211c8bd6afdf60734a2dd3536af6ac744a3"
     },
     "VCGC-REQ075:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "4ed4c8e6b384a1ddee08a1e2c2d8a297b281685b0fe0b5020c69978a7244ab84"
+      "sha256": "3b67e31006e0f2c22cbb0e8ca1ecd09a62210411934387768e6a94b8c2e9897b"
     },
     "VCGC-REQ077:panorama": {
       "path": "docs/handoff/evidence/panorama.json",
-      "sha256": "e9b98d057fb77363f8f29f86037dbfa22a733c98110531182e998b127aa4a8bc"
+      "sha256": "09321178b05cae4060e6e7f6f56f3e885aaed8d65bf839772903e5eb455822c8"
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "a11b6a56f88fb84f513d649e02dc3126cf0935845c274ec06c48afd4779af441"
+      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "4ed4c8e6b384a1ddee08a1e2c2d8a297b281685b0fe0b5020c69978a7244ab84"
+      "sha256": "3b67e31006e0f2c22cbb0e8ca1ecd09a62210411934387768e6a94b8c2e9897b"
     },
     "VCGC-REQ079:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "99bb437cf3897af9ead8e6879723461baadaecbd3c7fc37d761cbfe0f41d215f"
+      "sha256": "715561f918289bcfc463ce3c429d21b5b8c803ced63a0b25cde2d9dd4d00c79a"
     },
     "VCGC-REQ081:token": {
       "path": "docs/handoff/evidence/token.json",
-      "sha256": "bb483bb002483c55ff27703a35895f3c5f62339ecd9b2be3b0efbc0365d5aa95"
+      "sha256": "d7f41bbe57bd0bda8b534e4a3c0b76a36e62842cb39c818a0b0cd43c65126b4c"
     },
     "VCGC-REQ082:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "99bb437cf3897af9ead8e6879723461baadaecbd3c7fc37d761cbfe0f41d215f"
+      "sha256": "715561f918289bcfc463ce3c429d21b5b8c803ced63a0b25cde2d9dd4d00c79a"
+    },
+    "VCGC-REQ075:reuse-glob": {
+      "path": "docs/handoff/evidence/handoff.json",
+      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
+    },
+    "VCGC-REQ084:numbering": {
+      "path": "docs/handoff/evidence/numbering.json",
+      "sha256": "74cca4654ae61a559e1fc1c77b08e5530c8d6576430651f409f4fb51590f5a50"
+    },
+    "VCGC-REQ084:activation": {
+      "path": "docs/handoff/evidence/activation.json",
+      "sha256": "f6557755e8de6c8bbc5f6946f3163cb2f5fc06917c8fa968afb6dd518d06498f"
+    },
+    "VCGC-REQ084:entry": {
+      "path": "docs/handoff/evidence/entry.json",
+      "sha256": "715561f918289bcfc463ce3c429d21b5b8c803ced63a0b25cde2d9dd4d00c79a"
+    },
+    "VCGC-REQ084:handoff": {
+      "path": "docs/handoff/evidence/handoff.json",
+      "sha256": "d327a8d61f14e668be49bf40a01482ecc13451bb0cb9f4c99e64242fff10602f"
     }
   },
   "state": {
@@ -268,6 +308,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0103.json": "4ec4ea5e46e35a1050b382e02038700ad25588dbd1ef03fa822286756aaf7d1f",
       "supportive modules/registry/VIA_Requirements_SSOT_v0104.json": "9e56a92292de5e255a7be82c0d99c9cd52dc4027b79adf49b94769cedea2de6a",
       "supportive modules/registry/VIA_Requirements_SSOT_v0105.json": "3754ddf6e8e98290f637c43785aa2e7679b6be4f004ce5bc651b02fd8b321012",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0106.json": "ec82b7dbbba3210a32f17e5f3bb2bd28de16adf9627ec9bcd3a47d4b0b61bc60",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_VAP_SSOT_v0100.json": "f6637fa62be61763f6d8711cbeddf3c089595171f1523ca175f542fc2b7f7955",
@@ -275,12 +316,13 @@
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0101.json": "ebbd1b9b8ed4ec4e20d1f8832b93769f333cf493e3118958576ae024dd95cdf4",
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0102.json": "a3a958019ec8032505b94d4e040069413aadbf405f1671e89151dd11e55bc4f8",
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0103.json": "0000b6bda9e207599b8d05fa67e1e77250d54a2a2fe7e9cfc050a62dad003935",
+      "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0104.json": "7601f4db7d73280beb9e6e976356459364fe73856d39e098bfe033234093ba72",
       "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0100.json": "0c4c5bc77a34b184a7211b4c82dff63d743eadae014d41b9d6926cb632c5039b",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0100.json": "369ca6e8af6385c083b6180bdbb110eafcc8abc75b90a4fa6e5873a907e16aaf",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "f4498ba42a184e88c3cf56567314b012dabe581c95a7f8475cc8eb43096129a2",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "ba81757755babf3f614aa6b0209c42081c9bb4b88f193b7daa997179cd49a440",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -2352,6 +2394,7 @@
       "supportive modules/registry/CGC_MDL139_InputConsole_v0110.py": "6acd725d679d3c2ee9375ded48634444d7265bb30e92e99316c562a2e643f62c",
       "supportive modules/registry/CGC_MDL139_InputConsole_v0111.py": "1ddbda69ffcd14793654e2df45e3f75a3c86a4063306c5ce39a2ed2e4250b1c6",
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0100.py": "e9fdd5f09784411f9a68dc3293ad51c9f4885fc97540309bc737cf6aac0cff89",
+      "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py": "8e75760012025f83d1fd6a6dd746c628701d5b230bca1abfb155993e9687257b",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0100.py": "2d7d58c33adfed3990e89c1023da0174d1ba71a43c8042b3ed7b3b8b108b651e",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0101.py": "0fd1fc1a59b67e425e7389257b7f0eb46c8d22e8a4a86115329b6e14a2544176",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0102.py": "503280c23250cc1e283dcb96d6f9c5a92dd5417d1bdfb92c7e4352cf12523942",
@@ -2526,6 +2569,7 @@
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0175.py": "662d29c9c0377a86748ff8ed5dc1f76b807a80f27ddd8c7ba36fc168d5981463",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0176.py": "d7e8a0616fbb52f3173d921967b4b8bd45f5c0dafd18676da6dc0a3e36fb7bb9",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0178.py": "0bc6033b599d3f393b8d6b889076af52295201213be74afcf8df55e2d17aaaac",
+      "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py": "ccf6b8379088f97b106bf4d268f04c1f9f929537d740b6af6fe60986a97d9ad4",
       "supportive modules/registry/CGC_MDL149_WorkflowMatrix_v0100.py": "f944bcdfaf9c94640263579778078137906dccf8ca414f1393deed46d3a4dcd3",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0100.py": "1afa4d0e30eaffc395f036ece954701fdb5850f23ffca0f6eef659232888ec1d",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0101.py": "5cb90bec6d4a1138d4883066371993c117bbb15527088ffbb74d0171be4a423b",
@@ -2757,6 +2801,7 @@
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0101.py": "cc11a3f70cf5295b3c9453e4a45360509f4f4d89de324c591248386b0505704f",
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0102.py": "b1d04fa002aae058442c18580ca5a3876ac816d6e0c35b819524ee576528db9f",
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0103.py": "aba9d07ebd8a263621fd8eb55fc0d3b0869ad62adb5918eea2b9bf6cba2afd31",
+      "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py": "8a028d0796663e769fcab9d85c48470af16936a6240bc5b49a06827d2b72f801",
       "supportive modules/registry/CGC_MDL234_RenameResidueProbe_v0100.py": "5a89eed35376e68eeb394459a4f813eb2208f3696c351afee0abd2ce75672b32",
       "supportive modules/registry/CGC_MDL234_RenameResidueProbe_v0101.py": "ac381470b071a8b269d13f6418f31417f063715ccf2916ff3babb09159ef6bd9",
       "supportive modules/registry/CGC_MDL235_EngineVersionLedger_v0100.py": "7bd57efab8c4a1c8caa0811b2ba3413a870bce027d0c11ebdd4e2110004be509",
@@ -2770,6 +2815,7 @@
       "supportive modules/registry/CGC_MDL237_NumberingSystem_v0105.py": "5fed140b4b7b8e39305b84d0d49051614e38cf3462a3b7698d9d33393a6ce1a1",
       "supportive modules/registry/CGC_MDL237_NumberingSystem_v0106.py": "01abfd5a398a5a85d4f445c1ad31f482cdd383b58ccb2eff95675c9e1d1e5c27",
       "supportive modules/registry/CGC_MDL237_NumberingSystem_v0108.py": "c51811ee9ba106253046c616be3a43c47ced91970ec35e109893f04e6e9dd511",
+      "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py": "45f69f86fad58c1a21684b28e2d5789ad8189184cdc34dca50e3c7fdf0d98844",
       "supportive modules/registry/CGC_MDL238_OperatorConsole_v0100.py": "74f00e19a07a0c4edce9948c8ef79e3f05f9589464553ed6705b64034112e486",
       "supportive modules/registry/CGC_MDL238_OperatorConsole_v0101.py": "da8a70ca5cccec36a12447999ee96d12bf164d8119c82e3ef948d15e56d73481",
       "supportive modules/registry/CGC_MDL238_OperatorConsole_v0102.py": "42d5c16f86c20aaca88f8454e2c8d1e089169b316db9ecee82545aca0576eacf",
@@ -3002,7 +3048,9 @@
       "supportive modules/registry/VIA_VRN_FieldSpec_SSOT_v0100.json": "6f37885318219532fa5c08e22f50813d8406e1b1483ea1812ffc0fb1023fdf1d",
       "functional modules/VRN/registry/VRN_BROKER_LIST_v01.json": "a1b6f943f1dc9d0e0e9b8a85694416c27c0170b26fdc440a9bc3a5467dcdf8cf",
       "supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.json": "c1fb3b59bbc0a660ac8fc69ddaf348a47a72b5be897bd5282b829653cbfe23cd",
-      "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json": "a110747742c77d92abe6c92599352f42015a059aa46f22cfcd39905fbe1ecd8e"
+      "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json": "841c5c4e7e994bfb039e880489fa9b607005a6b6cb15b35635133bfab3fcb122",
+      "supportive modules/registry/VIA_Registry_Architecture_SSOT_v0100.json": "b7169706eb732c69cc5bc28ba45d93ecc60ba705e6dce890017034b18fdd2a4d",
+      "supportive modules/registry/VIA_EngineVersion_Register_v0100.json": "26036d920ad7e28dd9329ce4224be9b6768f5ebca8dac6a77dd55014791ce606"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4198,6 +4246,19 @@
         "homes": [
           "docs/VIA_S20260929i_SSOTPanorama.md"
         ]
+      },
+      "VCGC-REQ084": {
+        "definition": "2185aec4a401cda4c979f20a18289c4c228edc3bb7e570001469cdf5ab2ea681",
+        "status": "PARTIAL",
+        "next": "R09 兩本待辦帳對帳(交接冊 × 掉球帳)· R07 三冊號碼對照報表(命名 · 元件 · 中央編號);R10 / R11 / R12 / R14 由操作員裁定",
+        "owner": null,
+        "topic": "編號 · 註冊 · SSOT 治理架構重整與風險治理",
+        "homes": [
+          "VIA_Registry_Architecture_SSOT_v0100.json",
+          "VCGC-WKF001-STP005",
+          "VCGC-WKF003-STP006",
+          "docs/VIA_S20260930a_RegistryArchitecture.md"
+        ]
       }
     }
   },
@@ -4231,7 +4292,11 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0178.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0108.py",
     "supportive modules/registry/CGC_MDL245_SDDValidator_v0104.py",
-    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py"
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0117.py",
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py",
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
+    "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -4377,17 +4442,64 @@
     "VCGC-REQ075:reuse-glob": {
       "id": "VCGC-REQ075:reuse-glob",
       "requirement": "VCGC-REQ075",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(下一批,新版號檔)",
       "reason": "側線 i 收尾實測盲點:CGC_MDL140 v0101 run_case 判「沿用成功」只比收據上記的相依雜湊,不重掃宣告的相依樣式;新尾版(CGC_MDL149 v0178 · CGC_MDL245 v0104)符合 _v*.py 卻沒進舊收據,entry / sdd 兩案被沿用而沒測到新尾版。本批收尾已把相依集合變了的收據照工具原格式存進 history 後重跑(不是沿用)",
-      "next": "CGC_MDL140 v0102 薄尾:沿用前重掃 case 相依樣式 + VCGC 樣式,檔案集合 ≠ 收據集合即重跑;自測加負控(新增 _v 檔 → 不沿用);換版經 handoff watch / managed 登錄"
+      "next": "CGC_MDL140 v0102 薄尾:沿用前重掃 case 相依樣式 + VCGC 樣式,檔案集合 ≠ 收據集合即重跑;自測加負控(新增 _v 檔 → 不沿用);換版經 handoff watch / managed 登錄",
+      "case": "handoff",
+      "receipt": "docs/handoff/evidence/handoff.json",
+      "resolved": "側線 2026-09-30 a:CGC_MDL140 v0102 evidence_status 比相依集合(check 紅 · test 不沿用、存 history 後重跑);案 handoff 相依改 _v*.py 樣式"
+    },
+    "VCGC-REQ084:numbering": {
+      "id": "VCGC-REQ084:numbering",
+      "requirement": "VCGC-REQ084",
+      "state": "VERIFIED",
+      "case": "numbering",
+      "receipt": "docs/handoff/evidence/numbering.json"
+    },
+    "VCGC-REQ084:activation": {
+      "id": "VCGC-REQ084:activation",
+      "requirement": "VCGC-REQ084",
+      "state": "VERIFIED",
+      "case": "activation",
+      "receipt": "docs/handoff/evidence/activation.json"
+    },
+    "VCGC-REQ084:entry": {
+      "id": "VCGC-REQ084:entry",
+      "requirement": "VCGC-REQ084",
+      "state": "VERIFIED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json"
+    },
+    "VCGC-REQ084:handoff": {
+      "id": "VCGC-REQ084:handoff",
+      "requirement": "VCGC-REQ084",
+      "state": "VERIFIED",
+      "case": "handoff",
+      "receipt": "docs/handoff/evidence/handoff.json"
+    },
+    "VCGC-REQ084:reconcile": {
+      "id": "VCGC-REQ084:reconcile",
+      "requirement": "VCGC-REQ084",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "R09:兩本待辦帳沒對帳 —— 交接待辦 25 件 × 掉球帳 285 列中 214 列未劃線;已修的沒轉態(例 Z280 側線 i 已修、本批才結案)",
+      "next": "唯讀對照表:Z 號 ↔ 交接工作項 / 需求 next;已修的帶理由劃線結案,仍開的掛到對應需求或交接工作項,一條都不消失"
+    },
+    "VCGC-REQ084:crosswalk": {
+      "id": "VCGC-REQ084:crosswalk",
+      "requirement": "VCGC-REQ084",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
+      "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
     }
   },
   "summary": {
-    "requirements": 109,
-    "watched_files": 2746,
-    "pending": 25,
-    "reusable": 12,
+    "requirements": 110,
+    "watched_files": 2754,
+    "pending": 27,
+    "reusable": 17,
     "findings": 0
   }
 }
