@@ -1,0 +1,225 @@
+{
+  "schema": "VIA_Panorama_Profiles/v0100",
+  "engine": "VIA_Panorama_v0100.py",
+  "note": "萬用全景的專案設定只放這裡;核心程式不寫死任何專案名(R8)。未命中任何 detect = generic(全自動探索)。",
+  "profiles": {
+    "generic": {
+      "name": "generic",
+      "detect": [],
+      "tail_regex": "^(?P<family>.+?)_v(?P<ver>\\d{3,4})\\.(?P<ext>py|ps1|json|jsonl)$",
+      "scopes": {
+        "ALL": [
+          "*"
+        ]
+      },
+      "default_scopes": [
+        "ALL"
+      ],
+      "markers": []
+    },
+    "via": {
+      "name": "via",
+      "detect": [
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "out_in_ignored": "VIA_Reports/panorama",
+      "tail_regex": "^(?P<family>.+?)[_-]v(?P<ver>\\d{3,4})\\.(?P<ext>py|ps1|psm1|json|jsonl|md|html)$",
+      "skip_parts": [
+        "references",
+        "intake",
+        "VIA_RetiredEngines",
+        "vendor",
+        "tests",
+        "new modules engines",
+        "50_Protection_Acceleration",
+        "_via_mother_root_reconciliation_runs",
+        "rollback",
+        "VIA_Reports",
+        "output_hub",
+        "site-packages",
+        "_quarantine",
+        "_review_quarantine",
+        "ASSETS",
+        "SCOPE_COPY"
+      ],
+      "skip_prefix": [
+        "_backup"
+      ],
+      "skip_file_regex": "_sha[0-9a-f]{6,}\\.(py|ps1)$",
+      "scopes": {
+        "VCGC": [
+          "supportive modules/registry/CGC_*"
+        ],
+        "VDF": [
+          "functional modules/VDF/*"
+        ],
+        "VRN": [
+          "functional modules/VRN/*"
+        ],
+        "VAP": [
+          "functional modules/VAP/*"
+        ],
+        "SUP": [
+          "supportive modules/*"
+        ],
+        "PS": [
+          "*.ps1",
+          "launchers/*.ps1"
+        ]
+      },
+      "default_scopes": [
+        "VCGC",
+        "VDF",
+        "VRN"
+      ],
+      "markers": [
+        {
+          "id": "ACCEL",
+          "name": "PY 加速器橋(L103)",
+          "ext": [
+            ".py"
+          ],
+          "regex": "\\[VIA:ACCEL-BRIDGE",
+          "need": true,
+          "severity": "RED",
+          "scopes": [
+            "VCGC",
+            "VDF",
+            "VRN",
+            "VAP",
+            "SUP"
+          ],
+          "exempt_names": [
+            "VIA_SuperAccel_Module.py"
+          ],
+          "exempt_name_regex": "^(Veritas(Celeritas|AegisNexus)|SUP_MDL737_SuperAccelModule)"
+        },
+        {
+          "id": "NET",
+          "name": "VDF 網路工具橋(L103)",
+          "ext": [
+            ".py"
+          ],
+          "regex": "\\[VIA:NET-BRIDGE",
+          "need": true,
+          "severity": "RED",
+          "scopes": [
+            "VDF"
+          ]
+        },
+        {
+          "id": "ACCEL-USE",
+          "name": "實際呼叫加速器(accel_map/run_fast/fetch/activate)",
+          "ext": [
+            ".py"
+          ],
+          "regex": "VIA_ACCEL\\.(accel_map|run_fast|fetch|activate|stats)\\b",
+          "need": false,
+          "scopes": [
+            "VCGC",
+            "VDF",
+            "VRN",
+            "VAP",
+            "SUP"
+          ]
+        },
+        {
+          "id": "PS-TEMPLATE",
+          "name": "PS 模板章",
+          "ext": [
+            ".ps1"
+          ],
+          "regex": "CELERITAS-TEMPLATE-JOIN|\\[VIA:PS-TEMPLATE",
+          "need": true,
+          "severity": "YELLOW",
+          "scopes": [
+            "PS",
+            "VCGC",
+            "VDF",
+            "VRN",
+            "VAP",
+            "SUP"
+          ]
+        },
+        {
+          "id": "PS-ACCEL",
+          "name": "PS 加速器橋",
+          "ext": [
+            ".ps1"
+          ],
+          "regex": "\\[VIA:PS-ACCEL",
+          "need": true,
+          "severity": "YELLOW",
+          "scopes": [
+            "PS",
+            "VCGC",
+            "VDF",
+            "VRN",
+            "VAP",
+            "SUP"
+          ]
+        }
+      ],
+      "tool_lock": {
+        "path": "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "strip_prefix": "VeritasIntelligenceAnalytics/"
+      },
+      "pins": {
+        "accelerator": "supportive modules/VeritasCeleritas_v*.py",
+        "network": "supportive modules/network/VeritasAegisNexus_v*.py"
+      },
+      "handoff": "docs/handoff/HANDOFF_latest.json",
+      "ledgers": [
+        "supportive modules/registry/VIA_VCGC_FunctionLedger_v0100.jsonl",
+        "supportive modules/registry/VIA_VCGC_FullCheck_Ledger_v0100.jsonl"
+      ],
+      "token_tool": {
+        "lock_key": "token"
+      },
+      "nlp_tool": {
+        "lock_key": "nlp"
+      },
+      "console_glob": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+      "governance_regex": "(?i)(lock|quarantine|ledger|ssot|manifest)[^/]*\\.(json|jsonl)$",
+      "frozen_suffixes": [
+        ".freeze.lock.json"
+      ],
+      "readonly_rosters": [
+        {
+          "path": "supportive modules/registry/VIA_CeleritasPolicy_Baseline_v0100.json",
+          "key": "py_readonly"
+        }
+      ]
+    },
+    "via-verb-engine": {
+      "name": "via-verb-engine",
+      "detect": [
+        "verb-engine/ssot/quarantine.json"
+      ],
+      "tail_regex": "^(?P<family>.+?)_v(?P<ver>\\d{3,4})\\.(?P<ext>py|ps1|json|jsonl)$",
+      "scopes": {
+        "ENGINES": [
+          "verb-engine/engines/*"
+        ],
+        "ALL": [
+          "*"
+        ]
+      },
+      "default_scopes": [
+        "ALL"
+      ],
+      "markers": [],
+      "quarantine": {
+        "path": "verb-engine/ssot/quarantine.json",
+        "lock": "verb-engine/ssot/lock.json",
+        "file_globs": [
+          "verb-engine/engines/{name}.py",
+          "verb-engine/engines/{name}/*"
+        ]
+      },
+      "reference_only": [
+        "verb-engine/engines/VIA_PanoramaCheck.py"
+      ]
+    }
+  }
+}
