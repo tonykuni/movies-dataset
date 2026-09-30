@@ -8,6 +8,16 @@
 #   例:via-in · via-in --card(只出卡不啟動)· via-in --no-pull(不更新)· via-in -Full -NoOpen(照傳給 go)。
 #   逾時:整輪常超過 Invoke-VIAPython 預設 1800 秒 —— VIA_PY_TIMEOUT_SEC 沒設、不是數字、或比 7200 小時,
 #   本次放寬到 7200,結束還原;設 0(不設限)或 ≥ 7200 就照你的。
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 . (Join-Path $PSScriptRoot "Register-VIA-Commands-v0262.ps1")
 $global:VIARegisterPath = $MyInvocation.MyCommand.Path
 function global:via-in {
