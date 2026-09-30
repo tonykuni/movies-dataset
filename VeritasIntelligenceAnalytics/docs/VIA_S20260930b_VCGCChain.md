@@ -171,3 +171,21 @@
 
 - 兩輪的 ⑥ 單一路徑驗證都是 rc 2,v0107 就有,不是本段造成的。
 - 這一段只證明 ①g 接上了、以及兩個引擎缺陷修好了,不代表整條操作台綠燈。
+- 主樹整輪串測沒設 `VIA_PWSH` 時,P-entry 照實黃(「沒有 pwsh:語法沒量」,不冒充綠);設了 `VIA_PWSH` 才驗 pwsh Parser。
+
+## 八、第三段:收尾 VCGC(Z286 · VCGC-REQ085:backup-stale)
+
+操作員令「收尾VCGC」。REQ085 最後一條待辦是 Z286:備份自測在跑過 VDF 鏈的機器上一律紅,串測 L-backup · S-vcgc-manager 兩站跟著紅。
+
+根因:鏈跑器在計畫模式(`mode: plan`)和真跑都會寫 `VDFCHAIN_latest.json`。v0100 要防的是「照計畫寫出報告」(do_not 第一條),但它分不出兩種,只要檔在就判失敗。
+
+| 檔 | 做什麼 |
+|---|---|
+| `CGC_MDL221_SystemBackup_v0101.py` | 讀鏈報告的 schema 與 mode:schema `VIA.VDFChain.v1` · mode 以 run 開頭 · 有 stages 與 generated = `RAN_AFTER_BACKUP`,鎖定照成立,卡片標 `stale` 並寫「要重備」(不自動改冊);plan · 非鏈跑器 · 讀不到 = 照 v0100 判 `chain_file`。自測 6/6(五種報告情境 + 實樹);v0100 不動 |
+| `CGC_SystemManager_v0111.py` | `backup` 走 v0101(v0110 把 v0100 釘死);其餘照 v0110。席位冊 VCGC → v0111 |
+| 盤點冊 `VIA_VCGC_FunctionInventory_SSOT_v0101.json` | 交接案 `backup` 的覆蓋指到既有站 L-backup(同一支自測);其餘一字不動 |
+| 需求冊 `VIA_Requirements_SSOT_v0109.json` | VCGC-REQ085 PARTIAL → COVERED,理由 = 三個交接工作項都 VERIFIED;其餘 110 條不動。v0107 仍被 PR #379 占用 |
+| 交接冊 | 新案 `backup`;工作項 `VCGC-REQ085:backup-stale` → VERIFIED |
+| 掉球帳 | Z286 以只增結案列結案 |
+
+驗收燈 `closeout_lamp` 另計;交接 GREEN 只代表交接資料完整。

@@ -86,7 +86,9 @@
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
-    "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py"
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
+    "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
+    "supportive modules/registry/CGC_SystemManager_v0111.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -258,6 +260,21 @@
         "functional modules/VDF/VDF_SystemManager_v*.py"
       ],
       "timeout_seconds": 600
+    },
+    "backup": {
+      "argv": [
+        "CGC_MDL221_SystemBackup",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL221_SystemBackup_v0101 selftest 6/6 PASS",
+      "scope": "VCGC 備份門:鏈報告分真跑(RAN_AFTER_BACKUP · 冊待重備,不判失敗)與計畫 / 非鏈跑器 / 讀不到(照舊 chain_file);VCGC 管理器 v0111 backup 走 v0101(Z286 · VCGC-REQ085:backup-stale · 側線 2026-09-30 b)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL221_SystemBackup_v*.py",
+        "supportive modules/registry/CGC_SystemManager_v*.py",
+        "supportive modules/registry/VIA_VCGC_SystemBackup_v0100.json",
+        "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -477,10 +494,13 @@
     {
       "id": "VCGC-REQ085:backup-stale",
       "requirement": "VCGC-REQ085",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(下一段)",
       "reason": "串測首輪抓到 Z286:CGC_MDL221_SystemBackup 自測只要 VIA_Reports/vdf_chain/VDFCHAIN_latest.json 存在就判 chain_file 失敗(CGC_SystemManager 自測連帶紅);工作站跑過 VDF 鏈也一樣紅",
-      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告"
+      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告",
+      "case": "backup",
+      "receipt": "docs/handoff/evidence/backup.json",
+      "resolved": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):CGC_MDL221_SystemBackup v0101 讀鏈報告的 schema 與 mode —— 真跑(mode run…)= RAN_AFTER_BACKUP,鎖定照成立、標 stale 請重備(不自動改冊);計畫 / 非鏈跑器 / 讀不到照 v0100 判 chain_file。CGC_SystemManager v0111 backup 改走 v0101、席位 VCGC → v0111;v0100 · v0110 不動、報告不刪"
     },
     {
       "id": "VCGC-REQ085:base-380",
