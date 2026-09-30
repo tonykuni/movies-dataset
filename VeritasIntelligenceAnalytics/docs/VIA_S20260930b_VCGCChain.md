@@ -152,3 +152,59 @@
 | P2 席位 0 列也放行 → 鎖冊換了卻沒有現役指標 | 成立 | 同版:席位檢查改「恰一列」;實冊六家每家正好一列 |
 
 自測:MDL237 v0110 本版 5/5(v0109 · v0108 鏈照過)· MDL233 v0105 +4/4(v0100–v0104 鏈全過;v0104 ㉖ 的本體身分斷言照原樣跑完再換裝本版)。
+
+## 七、第二段:唯一 PS 入口串上串測(VCGC-REQ085:ps-entry)
+
+操作員令「go on」:接著做 `VCGC-REQ085:ps-entry`。
+
+| 檔 | 做什麼 |
+|---|---|
+| `Invoke-VIA-OperatorConsole-v0108.ps1` | ①a 省 Token 之後加「①g VCGC 全功能串測」:經主控台跑 `test`(`-Full` → `test --full`);總判紅或沒有總判行 → 整輪 exit 2;紅站與「新 / 缺」各列前 12 行。⑦ 上傳的紀錄冊多帶 `VIA_VCGC_FunctionLedger_v0100.jsonl`。v0107 一字不動 |
+| `CGC_MDL224_TestAuto_v0102.py` | 實跑抓到的兩個串測引擎缺陷(掉球帳 Z287,同段結):① 版號同時認 `_vNNNN` 與 `-vNNNN`(PS 入口站不再誤判 ABSENT;紀錄冊記到 PS 入口版本)② 串測期間自開 `test-…` 輪號,入口輪記在報告 `hub` 欄(回傳與 `TEST_latest.json`),跑完還原。v0101 不動 |
+
+### pwsh 實跑(portable pwsh 7.4.6,乾淨工作樹 · 隔離資料夾 · `-SkipSweep -NoOpen -NoUpload -NoBuild`)
+
+| 輪 | ①g 串測 | 工作流(操作台 go 輪) | PSRC |
+|---|---|---|---|
+| 第一輪(v0101 引擎) | 紅 1:P-entry「ABSENT Invoke-VIA-OperatorConsole-v*.ps1」 | **紅**:事件 89 · 不在冊上的步 61 · 順序紅 6(「H3 宣告在 H4 之前,實跑在後」…)—— 串測 75 站的事件記進了 go 輪 | 2 |
+| 第二輪(v0102 引擎) | P-entry **綠**(pwsh Parser 過 · 串測步在);紅 1 = V-sdd,只因實跑樹是複本、v0102 沒在那棵樹登錄(主樹已登錄) | **黃**:事件 17 · 不在冊上的步 2 · 順序紅 0;黃 = H6 / D1 / D2 / R2 本輪沒跑(`-SkipSweep`、沒建庫) | 2 |
+
+- 兩輪的 ⑥ 單一路徑驗證都是 rc 2,v0107 就有,不是本段造成的。
+- 這一段只證明 ①g 接上了、以及兩個引擎缺陷修好了,不代表整條操作台綠燈。
+- 主樹整輪串測沒設 `VIA_PWSH` 時,P-entry 照實黃(「沒有 pwsh:語法沒量」,不冒充綠);設了 `VIA_PWSH` 才驗 pwsh Parser。
+
+## 八、第三段:收尾 VCGC(Z286 · VCGC-REQ085:backup-stale)
+
+操作員令「收尾VCGC」。REQ085 最後一條待辦是 Z286:備份自測在跑過 VDF 鏈的機器上一律紅,串測 L-backup · S-vcgc-manager 兩站跟著紅。
+
+根因:鏈跑器在計畫模式(`mode: plan`)和真跑都會寫 `VDFCHAIN_latest.json`。v0100 要防的是「照計畫寫出報告」(do_not 第一條),但它分不出兩種,只要檔在就判失敗。
+
+| 檔 | 做什麼 |
+|---|---|
+| `CGC_MDL221_SystemBackup_v0101.py` | 讀鏈報告的 schema 與 mode:schema `VIA.VDFChain.v1` · mode 以 run 開頭 · 有 stages 與 generated = `RAN_AFTER_BACKUP`,鎖定照成立,卡片標 `stale` 並寫「要重備」(不自動改冊);plan · 非鏈跑器 · 讀不到 = 照 v0100 判 `chain_file`。自測 6/6(五種報告情境 + 實樹);v0100 不動 |
+| `CGC_SystemManager_v0111.py` | `backup` 走 v0101(v0110 把 v0100 釘死);其餘照 v0110。席位冊 VCGC → v0111 |
+| 盤點冊 `VIA_VCGC_FunctionInventory_SSOT_v0101.json` | 交接案 `backup` 的覆蓋指到既有站 L-backup(同一支自測);其餘一字不動 |
+| 需求冊 `VIA_Requirements_SSOT_v0109.json` | VCGC-REQ085 PARTIAL → COVERED,理由 = 三個交接工作項都 VERIFIED;其餘 110 條不動。v0107 仍被 PR #379 占用 |
+| 交接冊 | 新案 `backup`;工作項 `VCGC-REQ085:backup-stale` → VERIFIED |
+| 掉球帳 | Z286 以只增結案列結案 |
+
+驗收燈 `closeout_lamp` 另計;交接 GREEN 只代表交接資料完整。
+
+## 九、第四段:整合全景實測一鍵 PS(VCGC-REQ086)
+
+操作員令(逐字):「先把這個面檢視實測的工具整合為一」「給我一個整合後的POWRESHELL跳書HTML報告如今天清晨」「請加入PS加速器模板並檢查系統中的引擎都有加入最新版加速器 VDF加入最新的網路工具 從VCGC VDF VRN提供這個PS指令我自己貼上去跳出HTML U/I如今天早上 熱PS去跑 請提供一個整合後指令」「跑完直接開PR合併給我指令」。
+
+| 檔 | 做什麼 |
+|---|---|
+| `launchers/Invoke-VIA-FullCheck-v0100.ps1`(新) | 一鍵:模板接法(CELERITAS-TEMPLATE-JOIN + Celeritas 正主)· PS 25 加速器橋 · 只經 Invoke-VIAPython 叫 VCGC;跑完跳出 `VIA_Reports\fullcheck\FULLCHECK_latest.html`。參數 `-Full`(全部重量)· `-Grid`(自測格子整張重跑)· `-NoOpen` · `-Only 0,5` · `-SystemDir`;結束碼 0 綠 · 2 黃 · 1 紅 · 3 環境缺件 |
+| `CGC_MDL248_FullCheck_v0100.py`(新) | 六段依序、紅了照跑:⓪ 三橋覆蓋與最新版(CGC_MDL124 乾跑 + 載入版 vs 樹上最新)→ ① VCGC 串測 → ② SSOT 全景 → ③ 單一路徑驗證 → ④ 自測格子(預設讀存證並標時間,`-Grid` 才重跑)→ ⑤ 交接(讀 check 輸出行)。燈讀各正主本輪報告,沒更新的照紅;每段 + 總判只增寫 `VIA_VCGC_FullCheck_Ledger_v0100.jsonl`(UTC · 尾版 · 版號 · sha16 · 秒數 · HEAD)。自測 9/9 |
+| 三橋補缺(Z288) | VDF 網路橋 131/131 · PS 25 加速器橋 928/928(73 支尾版經橋掃 `--apply` 補上)|
+| 冊 | 需求冊 v0110(+VCGC-REQ086)· 盤點冊 v0102(站 C-fullcheck)· 交接冊(案 fullcheck · 工作項 VCGC-REQ086:fullcheck)|
+
+pwsh 實跑(容器,-NoOpen):六段跑到底,296.9 秒。⓪ 三橋 綠(ACCEL 1628/1628 · NET 131/131 · PS-ACCEL 928/928 · 載入 = 最新)· ① 串測 紅 1(V-inventory 棘輪:昨天格子 FAIL 24)· ② 全景 黃(紅 0)· ③ 單一路徑 紅(容器沒跑 go 的路徑步;版本 72 支全齊)· ④ 格子存證 36 小時前 FAIL 24 · ⑤ 交接。實跑中抓到本支自己的缺陷:`handoff check` 紅時不重寫 HANDOFF_latest.json,第 ⑤ 段誤判「報告沒更新」→ 改讀 check 的輸出行(自測 ⑨),`--only 5` 實跑確認 9 條 findings 全列。
+
+操作員端一行指令(倉根,Windows PowerShell 7):
+
+```powershell
+git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAnalytics\launchers\Invoke-VIA-FullCheck-v0100.ps1
+```

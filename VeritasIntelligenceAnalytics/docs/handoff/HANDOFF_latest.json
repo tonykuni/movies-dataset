@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-09-30T11:56:39+00:00",
+  "at": "2026-09-30T12:41:36+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -134,13 +134,6 @@
       "topic": "編號 · 註冊 · SSOT 治理架構重整與風險治理"
     },
     {
-      "id": "VCGC-REQ085",
-      "state": "PARTIAL",
-      "owner": "AI",
-      "next": "PS 操作台 Invoke-VIA-OperatorConsole-v0108.ps1:①g 串測站 + ⑦ 上傳紀錄冊(操作員本令即 L70 逐次許可;只新增版號檔)· pwsh 實跑",
-      "topic": "VCGC 全功能盤點與一條串測(PS 唯一入口 · AI 進場同流程 · 新指令自動進流程 · 版本時間紀錄)"
-    },
-    {
       "id": "host-live",
       "requirement": "VCGC-REQ028",
       "state": "BLOCKED",
@@ -211,22 +204,6 @@
       "owner": "AI(下一批)",
       "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
       "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
-    },
-    {
-      "id": "VCGC-REQ085:ps-entry",
-      "requirement": "VCGC-REQ085",
-      "state": "PENDING",
-      "owner": "AI(下一段)",
-      "reason": "操作員令「先完成手頭部分開PR」:本段先交盤點冊 · 串測引擎 · VCGC 入口;唯一 PS 入口(操作台)還沒串進來,盤點冊 P-entry 站照實黃「待辦」",
-      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑"
-    },
-    {
-      "id": "VCGC-REQ085:backup-stale",
-      "requirement": "VCGC-REQ085",
-      "state": "PENDING",
-      "owner": "AI(下一段)",
-      "reason": "串測首輪抓到 Z286:CGC_MDL221_SystemBackup 自測只要 VIA_Reports/vdf_chain/VDFCHAIN_latest.json 存在就判 chain_file 失敗(CGC_SystemManager 自測連帶紅);工作站跑過 VDF 鏈也一樣紅",
-      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告"
     }
   ],
   "reusable_successes": [
@@ -248,6 +225,8 @@
     "VCGC-REQ084:entry",
     "VCGC-REQ084:handoff",
     "VCGC-REQ085:inventory",
+    "VCGC-REQ085:ps-entry",
+    "VCGC-REQ085:backup-stale",
     "VCGC-REQ085:base-380",
     "VCGC-REQ084:codex378-numbering",
     "VCGC-REQ084:codex378-activation"
@@ -263,7 +242,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b5ea43aed8b9f97f7d3c7c1ea30e393e6631f6cc08697df05228e7a80525e60f"
+      "sha256": "c9a998e3c6113d5f00bd4468484a20b08b26e7cfd3c108866a9dffbb91b8bfa3"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -283,7 +262,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b5ea43aed8b9f97f7d3c7c1ea30e393e6631f6cc08697df05228e7a80525e60f"
+      "sha256": "c9a998e3c6113d5f00bd4468484a20b08b26e7cfd3c108866a9dffbb91b8bfa3"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -307,7 +286,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b5ea43aed8b9f97f7d3c7c1ea30e393e6631f6cc08697df05228e7a80525e60f"
+      "sha256": "c9a998e3c6113d5f00bd4468484a20b08b26e7cfd3c108866a9dffbb91b8bfa3"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -323,7 +302,15 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "522fd6c92397e82992380ac0ff2ae96bf4f99cba29d0b7aad78e72fca5216cac"
+      "sha256": "9f05437672d56bc938fd5b509c722ad43a0f7e477c6103e3143f74f03acc6a43"
+    },
+    "VCGC-REQ085:ps-entry": {
+      "path": "docs/handoff/evidence/chain.json",
+      "sha256": "9f05437672d56bc938fd5b509c722ad43a0f7e477c6103e3143f74f03acc6a43"
+    },
+    "VCGC-REQ085:backup-stale": {
+      "path": "docs/handoff/evidence/backup.json",
+      "sha256": "7c42f05725dd892818717aaa80df636cd4ca54d90f9da371664452c1fd18e5ae"
     },
     "VCGC-REQ085:base-380": {
       "path": "docs/handoff/evidence/vdfstart.json",
@@ -331,7 +318,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "b5ea43aed8b9f97f7d3c7c1ea30e393e6631f6cc08697df05228e7a80525e60f"
+      "sha256": "c9a998e3c6113d5f00bd4468484a20b08b26e7cfd3c108866a9dffbb91b8bfa3"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -353,6 +340,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0105.json": "3754ddf6e8e98290f637c43785aa2e7679b6be4f004ce5bc651b02fd8b321012",
       "supportive modules/registry/VIA_Requirements_SSOT_v0106.json": "ec82b7dbbba3210a32f17e5f3bb2bd28de16adf9627ec9bcd3a47d4b0b61bc60",
       "supportive modules/registry/VIA_Requirements_SSOT_v0108.json": "bec762f65415f5f69500d05464d2c07d882b5a6c520beb14b3f720c5483308c0",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0109.json": "e68803a8c2950cb21dcb9e9cfaa3744d046320fa92affbe980c3b846432854dc",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_VAP_SSOT_v0100.json": "f6637fa62be61763f6d8711cbeddf3c089595171f1523ca175f542fc2b7f7955",
@@ -367,7 +355,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "859cdcbc7aeda4ff4393b218de457fdf55705f405b9b4fa583a95fab5cf9c5f3",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "1c91d368a7fc57b5608b4cea92faaf5dab66290387cced47a60193ac87fda6cf",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -2821,11 +2809,13 @@
       "supportive modules/registry/CGC_MDL219_RegexParamSync_v0100.py": "36bb39d9105c090e9b96df46ece99b558cb46614eb51d33ce8a258148ede97ad",
       "supportive modules/registry/CGC_MDL220_SuccessLedger_v0100.py": "691c36cc8270b64e19b888b231e441829cc0c4e72f827f2b4c788af3a6df11ff",
       "supportive modules/registry/CGC_MDL221_SystemBackup_v0100.py": "b17e5c0ecd0b013e585e941dc06063215bd5392117a4ad9dcd54c84b65cfe179",
+      "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py": "f97a89f091e817d6e5111b0f556fe9b9c0bdd2662f169b336db90a3b0e8f049f",
       "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0100.py": "863ce71da65f3271361181a56952ee75ebfe90fbedeeedc3a3a0fb341813113b",
       "supportive modules/registry/CGC_MDL223_FlowConsistency_v0100.py": "ee0e51b30c6b7f2943961e5ec4cb11b6844ba0cb1d99937572f10ecfffd5effa",
       "supportive modules/registry/CGC_MDL224_ScrapeGate_v0100.py": "a810969538c94e98329463d74610e276f7b5b261c0d5263267763fa8314e8f29",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0100.py": "33c052c5ccfd3d74de21bc7db925f6ebbab177fc301103d1cb3b0260947933c8",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py": "ca4a3dbb27d2b5ce37672f1ea3add5a21019365151e9ebd59d1a093163d7ee6d",
+      "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py": "fc64fce8c3b843a7fc9f812cb63303e1e89e86dca849a594eccd75f7efd66035",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0100.py": "41f585d0402f10318edba2a8c38fc217e64b3c5a69390e78ffb9895df239048f",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0101.py": "d267175eafc89630d07539c1a96fd6d6967570f070aae63806166ded97124ba8",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0102.py": "5dfe795c993c83147a8b0939d676ae0697285006f5d8b9a6c74ec417c362fed4",
@@ -2896,6 +2886,7 @@
       "supportive modules/registry/CGC_SystemManager_v0108.py": "252b4dbf743ea5f8b8b0afa967b36a9fb0ed1bdbb2e36d29d92cf5907102e988",
       "supportive modules/registry/CGC_SystemManager_v0109.py": "55e5f5ac20f9ea13b00555d32d9ebd86b6f5b38f15d39993242d0ec8d091908d",
       "supportive modules/registry/CGC_SystemManager_v0110.py": "29c43af981aa41e77d42768a49db4aa7e1dfad718910a0991bb93fe239473f2d",
+      "supportive modules/registry/CGC_SystemManager_v0111.py": "663965804f1ad732a15f304de3e30b31ba77e04d49fdd737a143969e45fe0d4e",
       "supportive modules/registry/VDF_AutoCodeRegistryEngine_shad7fd781ac69f.py": "af77ee3a07b20dc6d15d5451faaff8133012f7460b0d67c6a3c05b1e2489abd4",
       "supportive modules/registry/VDF_MDL103_MasterRegistry.py": "4c267a2591b1bc914abed9ad429fdae0af6e6ca257efd86e60cb77bfac8ee97b",
       "supportive modules/registry/VDF_MDL104_RegistryLoader.py": "f1c1fb21dafe3d605fd472d911673d05d6e036e65c824ad089de0f8fc3bf9fd9",
@@ -3102,7 +3093,8 @@
       "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json": "29fbfb04c76782c8b8ad513984a5095e81b1d1bf5f68a36480de6fa2521dc5dd",
       "supportive modules/registry/VIA_Registry_Architecture_SSOT_v0100.json": "b7169706eb732c69cc5bc28ba45d93ecc60ba705e6dce890017034b18fdd2a4d",
       "supportive modules/registry/VIA_EngineVersion_Register_v0100.json": "26036d920ad7e28dd9329ce4224be9b6768f5ebca8dac6a77dd55014791ce606",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0100.json": "f2581eca4b5050ab035455ca4b80f84069ae9d71edc21e43f2f307c10549def2"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0100.json": "f2581eca4b5050ab035455ca4b80f84069ae9d71edc21e43f2f307c10549def2",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0101.json": "da5d101becb50ed3851fef190e7649fcb45f6f0afb62c550183d1a01f52899f3"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4314,8 +4306,8 @@
       },
       "VCGC-REQ085": {
         "definition": "4edbdb4383b911c34b6b203204e0b7ee49b390e0abb8a6dab6d4f8eefa8e8c71",
-        "status": "PARTIAL",
-        "next": "PS 操作台 Invoke-VIA-OperatorConsole-v0108.ps1:①g 串測站 + ⑦ 上傳紀錄冊(操作員本令即 L70 逐次許可;只新增版號檔)· pwsh 實跑",
+        "status": "COVERED",
+        "next": "—(轉 COVERED:三個交接工作項 inventory · ps-entry · backup-stale 都 VERIFIED;燈仍照實,驗收燈 closeout_lamp 另計)",
         "owner": null,
         "topic": "VCGC 全功能盤點與一條串測(PS 唯一入口 · AI 進場同流程 · 新指令自動進流程 · 版本時間紀錄)",
         "homes": [
@@ -4362,7 +4354,10 @@
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
-    "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py"
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
+    "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
+    "supportive modules/registry/CGC_SystemManager_v0111.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -4570,18 +4565,24 @@
     "VCGC-REQ085:ps-entry": {
       "id": "VCGC-REQ085:ps-entry",
       "requirement": "VCGC-REQ085",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(下一段)",
       "reason": "操作員令「先完成手頭部分開PR」:本段先交盤點冊 · 串測引擎 · VCGC 入口;唯一 PS 入口(操作台)還沒串進來,盤點冊 P-entry 站照實黃「待辦」",
-      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑"
+      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json",
+      "resolved": "側線 2026-09-30 b 第二段:Invoke-VIA-OperatorConsole-v0108.ps1(①g 串測 · ⑦ 帶紀錄冊;v0107 一字不動)pwsh 實跑抓到兩個串測引擎缺陷,出 CGC_MDL224_TestAuto v0102 修:版號認 -vNNNN(P-entry 不再誤判 ABSENT · 紀錄冊記到 PS 入口版本)· 串測自開 test-… 輪號(站事件不進操作台 go 輪,工作流順序不再假紅);案 chain 相依加 PS 入口"
     },
     "VCGC-REQ085:backup-stale": {
       "id": "VCGC-REQ085:backup-stale",
       "requirement": "VCGC-REQ085",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(下一段)",
       "reason": "串測首輪抓到 Z286:CGC_MDL221_SystemBackup 自測只要 VIA_Reports/vdf_chain/VDFCHAIN_latest.json 存在就判 chain_file 失敗(CGC_SystemManager 自測連帶紅);工作站跑過 VDF 鏈也一樣紅",
-      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告"
+      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告",
+      "case": "backup",
+      "receipt": "docs/handoff/evidence/backup.json",
+      "resolved": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):CGC_MDL221_SystemBackup v0101 讀鏈報告的 schema 與 mode —— 真跑(mode run…)= RAN_AFTER_BACKUP,鎖定照成立、標 stale 請重備(不自動改冊);計畫 / 非鏈跑器 / 讀不到照 v0100 判 chain_file。CGC_SystemManager v0111 backup 改走 v0101、席位 VCGC → v0111;v0100 · v0110 不動、報告不刪"
     },
     "VCGC-REQ085:base-380": {
       "id": "VCGC-REQ085:base-380",
@@ -4607,9 +4608,9 @@
   },
   "summary": {
     "requirements": 111,
-    "watched_files": 2763,
-    "pending": 30,
-    "reusable": 21,
+    "watched_files": 2768,
+    "pending": 27,
+    "reusable": 23,
     "findings": 0
   }
 }
