@@ -222,3 +222,44 @@ git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAna
 1. AI 端(本段起照做):收尾在本機全部跑完(註冊 → 編號 → 稽核 → 交接各案 → checkpoint → check 綠 → 整輪串測),**才一次推送**;中途不推。
 2. 倉庫設定(操作員的手):GitHub → Settings → Branches → `main` 開「Require status checks to pass before merging」,勾 `Windows bundled Chromium UAT`。開了之後 CI 紅就按不了合併,半成品進不了 main。
 3. 本段修復:分支接回合併後的 main(只剩編號與收據兩個提交沒進 main),補齊後一次推送、新 PR 綠了才合併。
+
+## 十一、第五段:PS 自擋開頁(Z290)· 整合全景實測 PS v0101
+
+操作員原話(逐字):「這個ＰＳ指令一定沒有加加速模板自動跳出ＨＴＭＬ」
+
+**實測屬實。** 容器 portable pwsh 7.4.6、不帶 `-NoOpen` 跑 `Invoke-VIA-FullCheck-v0100.ps1 -Only 0`:頁有產出,但最後一行是「[VIA_NO_OPEN] 抑制跳出 …FULLCHECK_latest.html」——沒跳出。第九節的實跑都帶 `-NoOpen`,開頁那段從沒被跑到;需求冊 REQ086 證據寫「跳 HTML」不成立(v0112 更正)。
+
+根因:v0100 為了不讓引擎各自跳頁先設 `VIA_NO_OPEN=1`,到 finally 才還原;同一行程的 PS 加速器模組(PS-ACCEL 橋 · `VIA_PS_PyProgress_Module` · 命令冊都會載)從批366 起裝了全域的 `Invoke-Item` / `Start-Process` 代理(零跳出閘),看到 `VIA_NO_OPEN=1` 就把 .html 目標靜默略過 → 自己的總報告也被吃掉。
+
+| 項 | v0100 | v0101 |
+|---|---|---|
+| 跳頁 | 不跳(被自己的 `VIA_NO_OPEN=1` 擋) | 跳:`Microsoft.PowerShell.Management\Invoke-Item`(帶模組名,不經代理);假 xdg-open 收到頁(`pwsh -File` 與熱 PS `&` 兩式) |
+| 呼叫端自己設 `VIA_NO_OPEN=1` | 不開、不說 | 照守不開,印黃字教怎麼開 |
+| 加速模板 | 點源 Celeritas 正主 · 只印版號 | 全樹標準 `[VIA:PS-TEMPLATE:v0101]` 模板塊(646 支同一段)· 開跑印 版號 · 已套用 · 執行緒 · 優先權 · 結尾 MATRIX SUMMARY(六段燈 · 秒數 · 摘要) |
+| 輸出 | 整輪跑完才一次印 | 邊跑邊印(上色) |
+| 熱 PS 用 `&` 跑 | 結尾一律 Restore(連視窗自己套的也還原) | 只還原本支套上的;`VIA_NO_OPEN` / `VIA_FROM_VCGC` / `VIA_VCGC_PUSH` / 資料夾原樣還原(實測優先權 Normal → Normal) |
+
+防再犯:`CGC_MDL248_FullCheck_v0101` 的 ⓪ 段多一項「PS 自擋開頁」—— PS 尾版(家族最新;不含 VIA_Reports / history / intake)裡自設 `VIA_NO_OPEN=1` 後、沒先換回原值就用不帶模組名的 `Invoke-Item` / `Start-Process` / `ii` 開頁 → 紅並點名檔 · 行;明寫判斷 `VIA_NO_OPEN` 的(VIA.ps1 零跳出律)不算。自測 5/5 + 前版 9/9。
+
+全樹掃出的同病尾版(⓪ 段每輪點名):
+
+| 檔 | 行 | 處置 |
+|---|---|---|
+| `Invoke-VIA-OperatorConsole-v0108.ps1`(唯一入口;v0100 起每一版都是) | L400 ①e 模板預覽 · L665 結尾簡單版驗證頁 | 新版 v0109 已備妥(同一個 `Open-VIAOwnPage` · finally 還原;其餘一字不動),**.ps1 要操作員 L70 逐次許可**(擊斃閘 KILL-05)→ 交接待辦 `VCGC-REQ086:console-runall-own-page` |
+| `Invoke-VIA-RunAll-v0102.ps1` | L258 多頁矩陣 | 同上(v0103 已備妥) |
+| `launchers/Invoke-VIA-GitHubFirst-Closeout-v0100.ps1` · `launchers/Invoke-VIA-VCGC-CloseoutChain-v0100.ps1`(PR #386) | L409 · L338(還原寫在開頁下一行) | 另一個 session 仍在活動,不就地出版;兩支也缺 PS-ACCEL 橋 → 交接待辦 `VCGC-REQ086:closeout-own-page` |
+
+附帶抓到(Z291):`registry/VIA_PS_Accelerators_25_Roster_v0100.ps1` 是被加速模組點源的函式庫,卻帶整段模板塊(開頭 `$VIACelTplOwn = $false`)→ 把呼叫端「本支套上」旗標蓋掉,結尾不還原(等 PowerShell.Exiting 才還原)。FullCheck v0101 先在自己檔內另存旗標繞過;根治要動全樹共用的載入點,待操作員許可。
+
+擊斃閘 `CGC_MDL187 v0103 --base origin/main --run-selftest`:rc 0 · 許可 1(P012:FullCheck v0101 · 釘 sha256)· 債 1(薄尾委派前版自測)。
+
+收尾:(本段收尾數字見下一行)
+
+操作員端(熱 PS 直接貼,站在倉內任何資料夾;PowerShell 7):
+
+```powershell
+git pull --ff-only
+$f = (Get-ChildItem (Join-Path (git rev-parse --show-toplevel) 'VeritasIntelligenceAnalytics\launchers\Invoke-VIA-FullCheck-v*.ps1') | Sort-Object Name | Select-Object -Last 1).FullName; if ($PSVersionTable.PSVersion.Major -ge 7) { & $f } else { pwsh -NoProfile -ExecutionPolicy Bypass -File $f }
+```
+
+PowerShell 7 的視窗就在本視窗跑(熱 PS · 模板只動本行程、跑完還原);Windows PowerShell 5.1 自動改叫 pwsh 子行程。參數照加:`& $f -Full` · `-Grid` · `-NoOpen` · `-Only 0,5`。

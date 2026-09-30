@@ -90,7 +90,8 @@
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
-    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py"
+    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
+    "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -283,8 +284,8 @@
         "CGC_MDL248_FullCheck",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL248_FullCheck_v0100 selftest 9/9 PASS",
-      "scope": "整合全景實測:三橋覆蓋與最新版 → VCGC 串測 → SSOT 全景 → 單一路徑 → 格子 → 交接;紅了照跑 · 讀正主本輪報告不重判 · 紀錄冊只增(UTC · 尾版 · sha16 · 秒數)· HTML 總報告(側線 2026-09-30 b · VCGC-REQ086)",
+      "success_marker": "CGC_MDL248_FullCheck_v0101 selftest 5/5 PASS",
+      "scope": "整合全景實測:三橋覆蓋與最新版 → VCGC 串測 → SSOT 全景 → 單一路徑 → 格子 → 交接;紅了照跑 · 讀正主本輪報告不重判 · 紀錄冊只增(UTC · 尾版 · sha16 · 秒數)· HTML 總報告(側線 2026-09-30 b · VCGC-REQ086);v0101 ⓪ 段加「PS 自擋開頁」:PS 尾版自設 VIA_NO_OPEN=1 後不帶模組名開頁 = 紅並點名(Z290 · 操作員 2026-09-30「這個ＰＳ指令一定沒有加加速模板自動跳出ＨＴＭＬ」)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL248_FullCheck_v*.py",
         "launchers/Invoke-VIA-FullCheck-v*.ps1",
@@ -574,6 +575,38 @@
       "state": "VERIFIED",
       "case": "activation",
       "receipt": "docs/handoff/evidence/activation.json"
+    },
+    {
+      "id": "VCGC-REQ086:own-page",
+      "requirement": "VCGC-REQ086",
+      "state": "VERIFIED",
+      "case": "fullcheck",
+      "receipt": "docs/handoff/evidence/fullcheck.json",
+      "note": "Z290:launchers/Invoke-VIA-FullCheck-v0101 開自己的頁改用 cmdlet 全名(呼叫端設 1 照守);CGC_MDL248_FullCheck v0101 ⓪ 段守這條(PS 尾版自擋開頁點名)"
+    },
+    {
+      "id": "VCGC-REQ086:console-runall-own-page",
+      "requirement": "VCGC-REQ086",
+      "state": "PENDING",
+      "owner": "操作員(L70 逐次許可)→ AI",
+      "reason": "唯一入口 v0108(①e 模板預覽 L400 · 結尾簡單版驗證頁 L665)與 RunAll v0102(多頁矩陣 L258)同病:自設 VIA_NO_OPEN=1 後自己開頁被零跳出閘吃掉;.ps1 未經操作員逐次許可 AI 不得改(KILL-05 · L70)",
+      "next": "操作員說一聲許可 → 新版 Invoke-VIA-OperatorConsole-v0109 · Invoke-VIA-RunAll-v0103(已備妥:同一個 Open-VIAOwnPage · finally 還原 VIA_NO_OPEN · 其餘一字不動;pwsh 剖析 0 錯 · 函式在零跳出閘下單測過)入樹,許可冊記 sha256"
+    },
+    {
+      "id": "VCGC-REQ086:closeout-own-page",
+      "requirement": "VCGC-REQ086",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "PR #386 新進的兩支收尾鏈 PS(launchers/Invoke-VIA-GitHubFirst-Closeout-v0100 L409 · Invoke-VIA-VCGC-CloseoutChain-v0100 L338)同病:自設 VIA_NO_OPEN=1 後 Start-Process 開頁,還原在下一行 → 頁被零跳出閘吃掉;兩支也缺 PS-ACCEL 橋。另一個 session 正在活動,本批不就地出新版以免撞號",
+      "next": "出 v0101:把還原那一行移到 Start-Process 之前(或改 Open-VIAOwnPage),補 PS-ACCEL 橋,同步改檔內自我複製 / git add 的 -v0100 檔名;跑 CGC_MDL248_FullCheck ⓪ 應 自擋開頁 0 · PS-ACCEL 缺 0"
+    },
+    {
+      "id": "VCGC-REQ086:roster-template-own",
+      "requirement": "VCGC-REQ086",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "Z291:registry/VIA_PS_Accelerators_25_Roster_v0100.ps1 是被 VIA_PS_Accel_Module 點源的函式庫,卻帶整段 [VIA:PS-TEMPLATE:v0101] 模板塊(開頭 $VIACelTplOwn = $false)→ 點源時把呼叫端「本支套上」旗標蓋掉,呼叫端結尾不還原(要等 PowerShell.Exiting 事件);凡「模板塊 → PS-ACCEL 塊」的 PS 都中",
+      "next": "出 Roster v0101(去掉模板塊,只留冊)並由模組改載尾版 —— 動到全樹共用的加速模組載入點,需操作員逐次許可(L70);本批 FullCheck v0101 先在自己檔內另存旗標繞過"
     }
   ]
 }
