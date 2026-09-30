@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-30T10:19:25+00:00",
+  "updated_at": "2026-09-30T19:32:05+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -91,7 +91,9 @@
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
     "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
-    "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py"
+    "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py",
+    "supportive modules/registry/VIA_Panorama_v0103.py",
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -306,6 +308,30 @@
         "supportive modules/registry/tests/test_master_control_contract_v*.py"
       ],
       "timeout_seconds": 600
+    },
+    "via_panorama": {
+      "argv": [
+        "VIA_Panorama",
+        "--selftest"
+      ],
+      "success_marker": "VIA_Panorama_v0103 selftest 13/13 PASS",
+      "scope": "第一步監控 VIA_Panorama v0103:monitor(VCGC 事件 · VDF/VRN 鏈 · SDD · 串測 · 交接 · TA-Lib 一條線一盞燈;舊存證 STALE)· first(掃描 + 監控)+ 前版 v0102/v0101/v0100 自測(R34)",
+      "dependencies": [
+        "supportive modules/registry/VIA_Panorama_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "dataframe_lock": {
+      "argv": [
+        "CGC_MDL249_DataFrameLock",
+        "--selftest"
+      ],
+      "success_marker": "[DataFrame 鎖] 自測 13/13 PASS",
+      "scope": "輸出表頭定案 → DataFrame 鎖定:欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數 · NODATA 照實 · 鎖帳只增 · 表頭指紋變了冊沒新版 = 拒寫(R34)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -607,6 +633,21 @@
       "owner": "AI",
       "reason": "Z291:registry/VIA_PS_Accelerators_25_Roster_v0100.ps1 是被 VIA_PS_Accel_Module 點源的函式庫,卻帶整段 [VIA:PS-TEMPLATE:v0101] 模板塊(開頭 $VIACelTplOwn = $false)→ 點源時把呼叫端「本支套上」旗標蓋掉,呼叫端結尾不還原(要等 PowerShell.Exiting 事件);凡「模板塊 → PS-ACCEL 塊」的 PS 都中",
       "next": "出 Roster v0101(去掉模板塊,只留冊)並由模組改載尾版 —— 動到全樹共用的加速模組載入點,需操作員逐次許可(L70);本批 FullCheck v0101 先在自己檔內另存旗標繞過"
+    },
+    {
+      "id": "VCGC-REQ088:via_panorama",
+      "requirement": "VCGC-REQ088",
+      "state": "VERIFIED",
+      "case": "via_panorama",
+      "receipt": "docs/handoff/evidence/via_panorama.json"
+    },
+    {
+      "id": "VRN-REQ008:dataframe_lock",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "dataframe_lock",
+      "receipt": "docs/handoff/evidence/dataframe_lock.json",
+      "note": "引擎就位;表頭冊待 VDF / VRN 兩線交回後組成"
     }
   ]
 }

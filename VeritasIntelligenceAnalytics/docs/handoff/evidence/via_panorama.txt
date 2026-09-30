@@ -30,26 +30,19 @@
 [政策] L50 全景 · 尾版 553 · import 0 · 提及 46 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0102.py(家族 core)
-  [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
-  [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
-  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0108.ps1
-  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · 沒有 pwsh:語法沒量(不冒充綠;設 VIA_PWSH 或裝 PowerShell 7)· 串測步在
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20260930-193755-16122', 'hub': 'go-20260930-120000-1'}
-  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
-  [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
-  [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
-  [OK] ③ sha16 把 CRLF 當 LF(工作站 autocrlf 不假變更)
-  [OK] ④ compile 在記憶體:語法錯抓到 · 橋標記與 --selftest 認得 · SyntaxError L1: invalid syntax
-  [OK] ⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新 · 沒 sha 的項(動詞)沒變不重記 · ['changed:family:A', 'added:family:C', 'removed:family:B']
-  [OK] ⑥ 燈:rc 0 綠 · 標記沒見到 黃 · yellow_rc 黃 · 其餘紅
-{"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
-[VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
-  [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0104.json · 0
-  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 78
-  [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
-  CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
-  CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):3 個,例 ['VCGC-REQ088', 'VDF-REQ014', | X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VCGC-REQ088→supportive modules/registry/VIA_Panorama_v0103 → via-vcgc sdd check
+  [via-vcgc run] [流程] 政策過 · VIA_Panorama_v0103.py(家族 core)
+=== VIA_Panorama_v0103 自測(薄尾;先跑前版 v0102 → v0101 → 本體 v0100)===
+  ✓ 前版 v0102(含 v0101 · 本體 v0100)自測
+  ✓ 尾版不少公開名稱(TAILAPI)
+  ✓ VCGC 事件:最近一輪 go- 有 FAIL = 紅,並點名目標
+  ✓ VCGC 事件:ai- 輪全 OK = 綠
+  ✓ VDF 鏈 tally 全綠且新鮮 = 綠
+  ✓ VRN 鏈有 NODATA = 黃,並列未綠節點
+  ✓ 存證不在 = NODATA(SDD · 串測 · 交接),不冒充綠
+  ✓ 綠但存證過期 = STALE(黃)
+  ✓ TA-Lib 查無 = 綠(禁用正確)
+  ✓ 總判取最差:有紅 = 紅
+  ✓ 輸出 monitor_latest.json + html(RYG · 明暗主題 · 無外部資源)
+  ✓ 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
+  VIA_Panorama_v0103 selftest 12/12 PASS
   [同步] 樹有變 · 註冊冊待同步 {'new': 16, 'changed': 5, 'stale': 0, 'expected': 14072, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
