@@ -6,7 +6,7 @@ description: 萬用型系統級「全景偵測」:對本機路徑或 GitHub 路�
 # panorama-matrix — 萬用全景偵測(只看不動 · 矩陣報告)
 
 本技能是**監測器**,不是修復器。執行體是 `scripts/panorama_matrix.py`,它轉交釘版引擎
-`VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0100.py`(同一支程式,不另抄)。
+`VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0102.py`(薄尾鏈:v0102 全函式記錄 + 教訓學習 → v0101 儀表板 → 本體 v0100;同一支程式,不另抄)。
 
 ## 1. 硬規則(Hard Rules)
 
@@ -34,6 +34,20 @@ python3 $S … --static                        # Tier-1(ast/compile 只在記憶
 python3 $S show C --top 20                   # 從上一份 JSON 取一段,不重掃
 python3 $S … --if-etag <上一張卡的 etag>      # 沒變回 304(約 0.3 秒)
 ```
+
+```bash
+python3 $S watch --interval 30               # 即時儀表板:每 30 秒一輪(沒變 = 304,0.2 秒),頁面自己重新載入,不用 server
+python3 $S dashboard                         # 只產一次儀表板
+```
+儀表板 `dashboard_latest.html`(與報告同夾):淺色 · 11px · 緊湊自動排版 · KPI · Plotly(紅數趨勢 · 段 × 輪燈號矩陣 · 秒數 · 標記覆蓋 · 語言)· 段總覽 · 非綠項 · 交接報告 · LIVE LOG · 帳本末筆事件。Plotly 用本機套件自帶的 js(複製到輸出夾),沒有才退 CDN。
+
+```bash
+python3 $S lessons                           # 教訓卡(≤ 12 行,不重掃):各類筆數 · MTTR · 再犯 · 建議
+```
+- **全函式記錄**:每個函式計時 · 計次 · 例外照丟並記 ERROR → `panorama.log`(JSON 行,1 MB × 5 輪替;`VIA_PANORAMA_LOG_LEVEL=DEBUG` 才逐筆)。
+- **教訓學習**:每次真的重掃就比對前一份,只增寫 `lessons.jsonl`(FIXED · NEW · REGRESSED · ESCALATED · EASED · VERDICT · RETROGRESS · DEGRADE · PERF · 首輪 BASELINE);
+  學習 = 再犯排行 · 修了又壞(UNSTABLE)· MTTR · 同輪共病群 · 規則式建議 → `LESSONS_latest.md`(交接用)· `lessons.parquet`。目標樹裡的教訓帳只讀列出。
+- **八個本機免費函式庫**:duckdb · pyarrow · pandas · numpy · networkx · psutil · jinja2 · plotly;缺哪個標 ABSENT 並退回標準庫(不裝套件)。
 
 1. 只看卡(≤ 15 行):總判 · 各段燈 · 前 3 紅 · 頁路徑 · etag。**不要把 HTML / JSON 整份讀進對話。**
 2. 要細節 → `show <段>`;同輸入再問 → `--if-etag`。
