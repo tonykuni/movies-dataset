@@ -208,3 +208,16 @@ pwsh 實跑(容器,-NoOpen):六段跑到底,296.9 秒。⓪ 三橋 綠(ACCEL 162
 ```powershell
 git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAnalytics\launchers\Invoke-VIA-FullCheck-v0100.ps1
 ```
+
+## 十、CI「VIA Master Control UI」反覆紅:根因與防法
+
+| 次 | 現象 | 根因 |
+|---|---|---|
+| main #998(PR #380) | `handoff check` 紅 | 新尾版沒有交接案涵蓋就併進 main(當時補:案 vdfstart) |
+| main #1005(PR #383) | `handoff check` 紅 16 條(收據失效 · 改過沒測 · fullcheck 收據不在) | PR 在本分支**收尾做到一半**時被合併(393425bab = 註冊同步那一步;收據與 checkpoint 還沒提交) |
+| 分支各中間推送 | 同上 | 收尾每一步都推送,中間狀態本來就紅 |
+
+防法:
+1. AI 端(本段起照做):收尾在本機全部跑完(註冊 → 編號 → 稽核 → 交接各案 → checkpoint → check 綠 → 整輪串測),**才一次推送**;中途不推。
+2. 倉庫設定(操作員的手):GitHub → Settings → Branches → `main` 開「Require status checks to pass before merging」,勾 `Windows bundled Chromium UAT`。開了之後 CI 紅就按不了合併,半成品進不了 main。
+3. 本段修復:分支接回合併後的 main(只剩編號與收據兩個提交沒進 main),補齊後一次推送、新 PR 綠了才合併。
