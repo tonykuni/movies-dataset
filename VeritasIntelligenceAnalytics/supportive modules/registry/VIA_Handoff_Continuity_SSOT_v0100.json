@@ -98,7 +98,9 @@
     "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py",
     "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py",
     "supportive modules/registry/CGC_MDL176_SynonymUnion_v0103.py",
-    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py"
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py",
+    "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
+    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -398,6 +400,33 @@
       "dependencies": [
         "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py",
         "supportive modules/registry/CGC_MDL176_SynonymUnion_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vrn_docclass": {
+      "argv": [
+        "VRN_ENG393_DocClassVerify",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG393_DocClassVerify v0100] 自測 35/35 PASS",
+      "scope": "VRN 文件五類分類(個股 · 產業展望 · 新聞摘要 · 其他投資 · 其他→複核)+ 首頁文字 / 表格還原 + 亂數三格乘積多法互核(種子入冊 · 兩輪 · 含 0 逐格下鑽)(R35 · VRN-REQ009)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py",
+        "supportive modules/registry/VIA_VRN_DocClass_SSOT_v*.json",
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json"
+      ],
+      "timeout_seconds": 1200
+    },
+    "template_sync": {
+      "argv": [
+        "CGC_MDL241_TemplateAdapter",
+        "--selftest"
+      ],
+      "success_marker": "[模板轉接 v0101] 自測 37/37 PASS",
+      "scope": "HTML 模板 SYNCHRONIZER:convert / sync(faithful · skeleton)/ watch 投放夾 / diff / lock;TOP 25 對自測 C01–C25;未對槽位照實報(R35 · VCGC-REQ089)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL241_TemplateAdapter_v*.py",
+        "supportive modules/registry/VIA_UI_TemplateSync_SSOT_v*.json"
       ],
       "timeout_seconds": 1200
     }
@@ -791,6 +820,36 @@
       "state": "VERIFIED",
       "case": "numbering_dup_r34",
       "receipt": "docs/handoff/evidence/numbering_dup_r34.json"
+    },
+    {
+      "id": "VRN-REQ009:vrn_docclass",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_docclass",
+      "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VCGC-REQ089:template_sync",
+      "requirement": "VCGC-REQ089",
+      "state": "VERIFIED",
+      "case": "template_sync",
+      "receipt": "docs/handoff/evidence/template_sync.json"
+    },
+    {
+      "id": "VRN-REQ009:workstation-real",
+      "requirement": "VRN-REQ009",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實 PDF 樣本在工作站 C:\\測試樣本報告,容器沒有;容器只驗 76 檔名分類與正本合成 PDF",
+      "next": "via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → verify --samples 同夾 → CGC_MDL249 check / lock --apply"
+    },
+    {
+      "id": "VCGC-REQ089:universal-ui-export",
+      "requirement": "VCGC-REQ089",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
+      "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
     }
   ]
 }
