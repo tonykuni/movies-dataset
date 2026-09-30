@@ -1,7 +1,7 @@
 {
  "schema": "VIA.AIFunctionCard.v1",
  "version": "v0100",
- "updated_at": "2026-09-29 側線 i",
+ "updated_at": "2026-09-30 側線 a",
  "why": "操作員令(側線 2026-09-29 i):「AI 進入讀取後開始使用 · 要求充分讓 AI 知道功能及使用及必用功能寫入」。本冊是 AI 功能卡的唯一正本:VCGC `functions` 照冊印全卡,`token` 卡尾端印必用摘要,CLAUDE.md / AGENTS.md 只指向本冊,不各抄一份。",
  "entry": {
   "V": "V=$(ls \"VeritasIntelligenceAnalytics/supportive modules/registry/\"CGC_MDL149_VeritasCentralGovernanceConsole_v*.py | tail -1)",
@@ -17,7 +17,7 @@
   {"step": 6, "id": "chain", "cmd": "python3 \"$E\" chain <家族名|任一版的檔> [--all]", "when": "改任何薄尾家族(出新版號檔)之前", "what": "版本鏈圖:誰是本體、前版怎麼接、誰蓋了誰;防薄尾盲點", "req": "VCGC-REQ081"},
   {"step": 7, "id": "digest", "cmd": "python3 \"$E\" digest <日誌>", "when": "看跑測日誌", "what": "只留判決行;紅日誌誠實回 rc 1", "req": "VCGC-REQ081"},
   {"step": 8, "id": "ssot_panorama", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" ssot panorama [--full]", "when": "動到 SSOT / 正則 / 同義字 / 編號 / 命名 / 註冊之前與之後", "what": "六族 × VCGC → VDF → VRN → SUP 上下單向檢測到底;輸入沒變的格沿用", "req": "VCGC-REQ077"},
-  {"step": 9, "id": "number_audit", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" run CGC_MDL237_NumberingSystem audit", "when": "編號寫入之後、提交之前", "what": "只增稽核:遺失 · 改身分 · 重號 必須全 0(--apply 自己也會寫後自核、違反即還原)", "req": "VCGC-REQ078"},
+  {"step": 9, "id": "number_audit", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" run CGC_MDL237_NumberingSystem --apply --scope  →  run CGC_MDL237_NumberingSystem audit", "when": "程式與冊提交之後(先提交再編號)、編號冊提交之前", "what": "只登本批(範圍 = 對 main 有變的已提交檔;不帶 --scope 的全量 --apply 要操作員下令)· audit 遺失 · 改身分 · 重號 必須全 0,另查註冊完整性 IMMUT · DUPREG · XCODE · FPSTALE · UNCOMMITTED · TIMEFMT", "req": "VCGC-REQ078 · VCGC-REQ084"},
   {"step": 10, "id": "registry", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" registry-sync  →  registry-sync --apply", "when": "新增 / 換版模組之後", "what": "元件註冊冊:先乾跑看新 / 變 / 過期 / 撞號,批准才 --apply", "req": "VCGC-REQ079"},
   {"step": 11, "id": "sdd", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" run CGC_MDL245_SDDValidator check", "when": "每批收尾前", "what": "X-* 交叉檢;X-REQ-BACK 需求 ↔ 工作流回指;X-LOCK 換尾版要重驗", "req": "VCGC-REQ079"},
   {"step": 12, "id": "handoff_close", "cmd": "VIA_FROM_VCGC=YES python3 \"$V\" handoff test <case>  →  handoff checkpoint", "when": "每批收尾", "what": "只重跑相依變更的已宣告測試,收據帶命令 · rc · 標記 · 相依 SHA;保存交接快照", "req": "VCGC-REQ075"}
@@ -51,6 +51,7 @@
   "不裝套件、不代設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT / FRED_API_KEY(都是操作員的手)",
   "不跑 CGC_MDL064_SelftestGrid --help(會重寫已追蹤檔;單站用 --only)",
   "新功能一律新版號檔(L04)、只增不減;凍結來源不改;仍被薄尾引用的舊模組不搬走",
-  "黃不是綠:BLOCKED / REVIEW / 缺證據 / 同意閘沒開 不能寫成成功"
+  "黃不是綠:BLOCKED / REVIEW / 缺證據 / 同意閘沒開 不能寫成成功",
+  "已發布的版號冊不就地改(出新版號檔,prior 指回前版);鎖版工具新版先登 role=candidate,席位只由 tools activate 改(架構正本 VIA_Registry_Architecture_SSOT)"
  ]
 }
