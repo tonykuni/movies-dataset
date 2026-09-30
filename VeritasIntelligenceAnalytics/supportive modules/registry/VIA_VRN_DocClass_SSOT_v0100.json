@@ -1,0 +1,227 @@
+{
+ "schema": "VIA.VRN.DocClass.SSOT.v1",
+ "version": "v0100",
+ "batch": "R35",
+ "ts": "2026-09-30",
+ "book_edited": false,
+ "source": "操作員 2026-09-30:「啟動實測並驗證真實輸出結果  修正後的首頁內容持續調整到最佳化 文字表格分類還原修復驗證  格子若有數字則可用亂數選三格相乘 若多方法結果並存 可檢驗數值乘積  再亂選三個直到選完  檢視政策都有符合  VRN目前這條路徑只擷取個股報告  為 產業/展望  新聞摘要 / 其他投資報告(無關個股)  其他分類好就好」",
+ "reader": "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py(尾版;照本冊讀,不另寫第二份)",
+ "why": [
+  "量過(R35):VRN 樹內已有三把細型別尺,都寫死在程式裡、互不相認——ENG073 classify_kind(個股/研討會/大盤晨報/海外/產業/其他;vrn_report_basic.report_kind 的正主)、首頁全能引擎 TickerFilename.classify_kind(強/弱非個股標記 + 主題詞冊)、ENG086 doc_type(晨會早報/市場分析/期貨/策略展望/產業報告/個股報告);另有 webscraping 套件的 VIA_Investment_Report_Type_SSOT.json(39 細型,帶 scope)。沒有一本冊把它們收成操作員要的五大類,也沒有一條路由告訴下游『非個股往哪裡去』。",
+  "本冊只加一層粗類與路由,不改任何細型別尺(只增不減):細型別照舊由各自的正主判,本冊把它們當證據讀,並把用到的詞冊與次序寫成規則(次序即判準)。",
+  "個股(STOCK)走既有路徑,一個位元不變;其餘四類各有自己的車道記錄,個股專屬欄一律留 NULL(不猜);『其他』一律進複核(REVIEW),不得靜默丟棄。"
+ ],
+ "alias_source": {
+  "fine_kind_canon": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v*.py 尾版:classify_kind · TICK_RX · _is_year_like · _date_spans · parse_broker · parse_date(本冊不抄其碼,只讀其判)",
+  "fine_type_book": "functional modules/VRN/webscraping_dualengine_v20260819/VIA_Investment_Report_Type_SSOT.json(39 細型 · scope;分類器 VIA_Investment_Report_Classifier.def_classify_investment_report)",
+  "lexicon_derived_from": [
+   "functional modules/VRN/VIA_VRN_FirstPageEngine_v0129.py TickerFilename._STRONG_NONSTOCK / _WEAK_NONSTOCK / _SECTOR_KW / _SECTOR_KW_EN / _ACRONYM_STOP(批426-428 操作員 63-64 份真檔名實測)",
+   "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py KIND_RULES / OUTLOOK_WORDS(批418)",
+   "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0118.py _DOCTYPE_RULES(批536)"
+  ],
+  "text_scope": "supportive modules/registry/VIA_Policy_VRNTextScope_v0100.json(個股 = 第 1 頁;本冊的首頁驗證對五類都只看第 1 頁)",
+  "text_verify": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py audit_doc(覆蓋率 · 數字逐一 · 修復迭代 · 品質分)",
+  "zones_xcheck": "functional modules/VRN/VRN_ENG072_FirstPageText_v*.py extract_page1_zones(法A fitz)· extract_page1_plumber(法B pdfplumber,含表格)· compare_zones"
+ },
+ "classes": {
+  "STOCK": {"zh": "個股報告", "route": "stock_firstpage", "stock_fields": "FILL", "review": false,
+            "lane": "既有路徑不變:ENG072 首頁 → ENG086 首頁邏輯 → ENG073 vrn_report_basic → ENG083 vrn_firstpage_matrix"},
+  "INDUSTRY_OUTLOOK": {"zh": "產業/展望", "route": "industry_outlook", "stock_fields": "NULL", "review": false,
+                       "lane": "產業 · 主題 · 年度/市場展望 · 趨勢;記錄 lanes/industry_outlook.jsonl"},
+  "NEWS_DIGEST": {"zh": "新聞摘要", "route": "news_digest", "stock_fields": "NULL", "review": false,
+                  "lane": "晨會 · 晨報/早報 · 盤勢 · 日/週報 · 當日新聞與重要訊息 · 每日市場分析;記錄 lanes/news_digest.jsonl"},
+  "OTHER_INVEST": {"zh": "其他投資報告(無關個股)", "route": "other_invest", "stock_fields": "NULL", "review": false,
+                   "lane": "總經 · 策略/資產配置 · 基金/ETF · 債券/匯率 · 期貨/商品 · 量化/技術面 · 海外市場;記錄 lanes/other_invest.jsonl"},
+  "OTHER": {"zh": "其他(未分類)", "route": "review", "stock_fields": "NULL", "review": true, "never_drop": true,
+            "lane": "複核佇列 lanes/review.jsonl;分不出來誠實留白,不硬塞個股"}
+ },
+ "stock_only_fields": ["ticker", "rating_ssot_key", "target_price", "upside_calc", "name_official", "price", "upside_report"],
+ "stock_only_fields_why": "非個股型的這些欄留 NULL,狀態寫 NOT_STOCK_CLASS——不是漏抓也不是 N/A 裁定(N/A 仍照 VRN_MatrixApplicability_SSOT 的 NA-01..03);report_date · broker · analyst 五類都可能有,照常抽。",
+ "lexicon": {
+  "news_digest": ["晨會", "晨報", "早報", "晨間", "晨訊", "解盤", "盤勢", "盤前", "盤後", "盤中", "收盤", "每日觀察", "盤中速報",
+                  "投資日報", "日報", "週報", "周報", "新聞", "重要訊息", "市場評論", "美股分析", "日股分析", "港股分析", "陸股分析",
+                  "morning", "daily wrap", "market wrap", "daily brief", "morning note", "weekly"],
+  "seminar": ["研討會", "論壇", "峰會", "第一場", "第二場", "第三場", "第四場", "第五場",
+              "conference", "summit", "expert call", "roadshow", "corporate day"],
+  "seminar_weak": ["法說", "法人說明會", "說明會", "earnings call"],
+  "outlook": ["展望", "趨勢", "前瞻", "大趨勢", "outlook", "thoughts on", "year ahead"],
+  "industry_zh": ["產業", "類股", "族群", "供應鏈", "產業鏈", "價值鏈", "半導體", "晶圓", "晶圓代工", "先進封裝", "封測", "記憶體",
+                  "面板", "被動元件", "印刷電路板", "銅箔基板", "載板", "散熱", "伺服器", "資料中心", "光通訊", "網通", "電動車",
+                  "太陽能", "風電", "重電", "儲能", "電池", "機器人", "低軌衛星", "矽光子", "生技", "軍工", "航運", "鋼鐵", "水泥",
+                  "金融股", "資安", "車用", "手機", "消費性電子", "工具機", "紡織", "食品股", "觀光股", "自動化", "機械", "硬體",
+                  "散熱模組", "水冷", "液冷", "銅箔", "玻纖"],
+  "industry_en": ["sector", "industry", "supply chain", "value chain", "semiconductor", "semis", "foundry", "packaging", "osat",
+                  "memory", "dram", "nand", "panel", "pcb", "ccl", "abf", "substrate", "cowos", "hbm", "tpu", "gpu", "asic",
+                  "mlcc", "euv", "cpo", "sic", "gan", "server", "data center", "datacenter", "networking", "optical", "solar",
+                  "battery", "robotics", "humanoid", "quantum", "satellite", "handset", "smartphone", "automotive", "shipping",
+                  "automation", "thermal", "cooling", "hardware", "connector", "fabless", "display", "sensor", "component"],
+  "other_invest_zh": ["總經", "總體經濟", "經濟", "央行", "利率", "債券", "固定收益", "匯率", "美元指數", "外匯", "資產配置",
+                      "投資策略", "策略", "基金", "指數", "期貨", "選擇權", "衍生性", "大宗商品", "原物料", "黃金", "油價",
+                      "量化", "技術分析", "籌碼", "金融商品", "泡沫"],
+  "other_invest_en": ["macro", "macroeconomic", "economics", "economy", "rates", "fixed income", "credit", "bond", "bonds", "fx",
+                      "currency", "dxy", "dollar index", "asset allocation", "strategy", "portfolio", "fund", "funds", "etf",
+                      "index", "futures", "options", "commodity", "commodities", "gold", "oil", "quant", "quantitative",
+                      "technical analysis", "investment"],
+  "overseas": ["海外", "美股", "陸股", "港股", "日股", "全球", "跨國", "global", "offshore", "overseas", "asia", "japan", "china"],
+  "acronym_stop": ["GS", "MS", "JP", "JPM", "UBS", "CS", "DB", "BOFA", "BAML", "CLSA", "CLST", "HSBC", "CITI", "BNP", "MQ", "GF",
+                   "NOMURA", "SC", "CIMB", "KGI", "SINO", "IBTS", "CTBC", "TT", "TW", "TWO", "TWSE", "TPEX", "OTC", "KY", "ADR",
+                   "GDR", "FY", "CY", "YTD", "QOQ", "YOY", "MOM", "CAGR", "NTD", "NT", "USD", "TWD", "RMB", "JPY", "EPS", "PER",
+                   "PE", "PBR", "PB", "ROE", "ROA", "EV", "EBIT", "EBITDA", "DCF", "NAV", "PT", "TP", "OP", "GM", "OPM", "BUY",
+                   "HOLD", "SELL", "OW", "UW", "EW", "NR", "NA", "PDF", "REV", "AI"]
+ },
+ "lexicon_match": {
+  "zh": "NFKC 後子字串比對(casefold)",
+  "en": "NFKC + casefold,詞界 (?<![A-Za-z0-9])…(?![A-Za-z0-9]),多字詞中間空白可寬(批427-N:用 in 掃 'review' 會被 'ev' 命中)",
+  "en_keys": ["news_digest", "seminar", "seminar_weak", "outlook", "industry_en", "other_invest_en", "overseas"]
+ },
+ "ticker": {
+  "canon": "ENG073 尾版 TICK_RX + _is_year_like(三道年份守衛:落在日期字串內 · 後接年/年度/H1/Q3… · 1990–2099 且檔名帶展望詞且旁無代號記號)",
+  "year_context_guard": {
+   "id": "YG-2",
+   "range": [1990, 2099],
+   "reject_when_any_lex": ["news_digest", "seminar", "outlook", "industry_zh", "industry_en", "other_invest_zh", "other_invest_en", "overseas"],
+   "keep_when_marked": "(…) · 代號後接 TT/TW/TWO · 代號後接 ,/) · 前接『英文券商縮寫-』或『投顧/證券/投信 _/-』",
+   "why": "ENG073 第③道只看『展望』類詞;實測 `2026_macro_investment_engine_v10.pdf` 的 2026 過三道被當成代號(=聚亨,真實上市代號),把總經簡報歸到聚亨名下。本道只加詞冊範圍,不改 ENG073;記號在就放行(`凱基投顧_2002 中鋼` 照舊是個股)。"
+  }
+ },
+ "rules": [
+  {"id": "DC-R01", "class": "NEWS_DIGEST", "when": {"any_lex": ["news_digest"]}, "base": 0.95,
+   "why": "強標記:晨會/晨報本來就列一串代號,縱使檔名帶代號也不是個股報告(承 FirstPageEngine 批427-N ①)"},
+  {"id": "DC-R02", "class": "INDUSTRY_OUTLOOK", "when": {"any_lex": ["seminar"], "also_any_lex": ["outlook", "industry_zh", "industry_en"]}, "base": 0.85,
+   "why": "研討會/場次(強標記,批428-T2)且主題是展望/產業 → 產業/展望"},
+  {"id": "DC-R03", "class": "OTHER_INVEST", "when": {"any_lex": ["seminar"]}, "base": 0.70,
+   "why": "研討會/場次但主題不是產業/展望 → 其他投資(無關個股)"},
+  {"id": "DC-R04", "class": "STOCK", "when": {"ticker": true}, "base": 0.95,
+   "why": "有可驗證四碼代號(過 ENG073 三道 + YG-2 年份守衛)= 個股;主題詞不得越過代號(批427-N2)"},
+  {"id": "DC-R05", "class": "INDUSTRY_OUTLOOK", "when": {"ticker": false, "any_lex": ["outlook", "industry_zh", "industry_en"]}, "base": 0.88,
+   "why": "無代號 + 展望/產業主題詞(操作員把『產業』與『展望』併成一類)"},
+  {"id": "DC-R06", "class": "OTHER_INVEST", "when": {"ticker": false, "any_lex": ["other_invest_zh", "other_invest_en"]}, "base": 0.85,
+   "why": "無代號 + 總經/策略/基金/ETF/債匯/期貨商品/量化技術詞 → 其他投資(無關個股)"},
+  {"id": "DC-R07", "class": "OTHER_INVEST", "when": {"ticker": false, "any_lex": ["overseas"]}, "base": 0.70,
+   "why": "無代號 + 海外市場詞(非每日盤勢)→ 其他投資"},
+  {"id": "DC-R08", "class": "OTHER_INVEST", "when": {"ticker": false, "any_lex": ["seminar_weak"]}, "base": 0.60,
+   "why": "法說/說明會但沒有代號 → 不是單一公司可歸 → 其他投資(弱)"},
+  {"id": "DC-R09", "class": "INDUSTRY_OUTLOOK", "when": {"ticker": false, "min_acronyms": 2}, "base": 0.60,
+   "why": "有界啟發:≥2 個全大寫科技縮寫(扣停用詞;批427-N ⑤)"},
+  {"id": "DC-R10", "class": "@fine_type", "when": {"fine_type_vote": true}, "base": 0.55,
+   "why": "檔名與標題都沒中詞冊時,才讓 webscraping 細型冊(39 型)的 scope 投票;信心低,照樣進複核門檻判"},
+  {"id": "DC-R99", "class": "OTHER", "when": {}, "base": 0.20,
+   "why": "無代號、無任何型別詞、無細型投票 = 其他 → 複核(誠實留白,不硬塞)"}
+ ],
+ "fine_kind_map": {
+  "ENG073": {"個股": "STOCK", "產業": "INDUSTRY_OUTLOOK", "大盤晨報": "NEWS_DIGEST", "研討會": null, "海外": null, "其他": null},
+  "ENG114_scope": {"COMPANY": "STOCK", "INDUSTRY": "INDUSTRY_OUTLOOK", "THEME": "INDUSTRY_OUTLOOK", "CONTAINER": "NEWS_DIGEST",
+                   "MARKET": "NEWS_DIGEST", "PERIODIC": "NEWS_DIGEST", "MACRO": "OTHER_INVEST", "STRATEGY": "OTHER_INVEST",
+                   "FIXED_INCOME": "OTHER_INVEST", "FUND": "OTHER_INVEST", "QUANT": "OTHER_INVEST", "EVENT": "OTHER_INVEST",
+                   "COMPANY_OR_TOPIC": null, "UNKNOWN": null},
+  "ENG114_type_override": {"MARKET_OUTLOOK": "INDUSTRY_OUTLOOK", "ANNUAL_OUTLOOK": "INDUSTRY_OUTLOOK", "MID_YEAR_OUTLOOK": "INDUSTRY_OUTLOOK",
+                           "MONTHLY_INVESTMENT_OUTLOOK": "INDUSTRY_OUTLOOK", "QUARTERLY_OUTLOOK": "INDUSTRY_OUTLOOK",
+                           "TECHNICAL_ANALYSIS": "OTHER_INVEST", "ECONOMIC_DATA_COMMENT": "NEWS_DIGEST"}
+ },
+ "confidence": {
+  "agree_eng073": 0.03,
+  "agree_fine_type": 0.02,
+  "broker_present_stock": 0.02,
+  "disagree_eng073": -0.15,
+  "title_conflict": -0.10,
+  "title_only": -0.05,
+  "floor": 0.05,
+  "cap": 0.99,
+  "review_below": 0.60,
+  "why": "信心 = 命中規則的 base ± 旁證;旁證只調信心、不改類(次序才是判準)。低於 review_below 或檔名/標題互斥 → needs_review=true,類別照判不硬改。"
+ },
+ "evidence_order": ["filename", "title"],
+ "evidence_why": "先判檔名(操作員真檔名是最穩的證據),檔名落到 DC-R99 才用首頁標題帶;兩者都判得出又不同 = 衝突,照檔名判、降信心、進複核。",
+ "xcheck": {
+  "zh": "首頁表格數字格多法互核:三格亂數乘積",
+  "operator_rule": "格子若有數字則可用亂數選三格相乘 · 若多方法結果並存可檢驗數值乘積 · 再亂選三個直到選完",
+  "methods_priority": ["fitz_tables", "pdfplumber_tables", "fitz_words_grid", "recorded:*"],
+  "methods_note": {
+   "fitz_tables": "PyMuPDF page.find_tables().extract()(格線/文字對齊偵測)",
+   "pdfplumber_tables": "ENG072 尾版 extract_page1_plumber()['tables'](本境沒有 pdfplumber = 缺件照實寫)",
+   "fitz_words_grid": "PyMuPDF get_text('words') 在表框內自行以列距/欄縫分格(幾何獨立);形狀對不上時退回借用 fitz_tables 格框,並標 grid=borrowed",
+   "recorded:*": "外部擷取器留下的格子 jsonl(table_id,row,column,text;1 起算)——例:PDFRegressionEvidence 包的 04_table/table_cells.jsonl"
+  },
+  "group_size": 3,
+  "passes": 2,
+  "passes_why": "單輪三格乘積看不到『同一組內兩格互換』與互相抵銷的誤差;第二輪用 seed+1 重洗再分組,兩輪都得碰巧同組才遮得住。",
+  "rel_tol": 1e-9,
+  "rel_tol_why": "數值以 Decimal→Fraction 精確解析與相乘;同一字串解析的乘積誤差為 0,容差只留給浮點轉換。報告實際相對差。",
+  "seed_rule": "未給 --seed 時 seed = int(sha256(檔名 + '|' + 位元組數)[:8], 16);第 k 輪用 seed+k。種子寫進輸出,可重現。",
+  "zero_rule": "三格中任一格在任一法為 0 → 乘積被遮蔽,該組一律逐格下鑽",
+  "numeric_cell": {
+   "rx": "^[-+]?(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?$",
+   "neg_paren": true,
+   "strip_prefix": ["NT$", "US$", "HK$", "RMB", "NTD", "USD", "$", "¥", "€", "£"],
+   "strip_suffix": ["%", "x", "X", "倍", "元", "pp", "bps"],
+   "minus_chars": "−–—－",
+   "why": "整格是一個數才算數字格;'Q1' '2Q25' 'n.a.' '-' 不算。單位字尾剝掉但記下,兩法單位不同也算差異。"
+  },
+  "cell_states": {
+   "MULTI": "≥2 法都讀到數字 → 進三格乘積",
+   "SINGLE_SOURCE": "只有 1 法有這張表/這格 → 無法互核(不是 PASS)",
+   "PRESENCE_DIFF": "另一法對得上這張表,這格卻不是數字/空白 → 有一法漏了數字(紅)"
+  },
+  "triple_states": {
+   "MATCH": "各法乘積相對差 ≤ rel_tol",
+   "MISMATCH": "乘積不同 → 逐格下鑽,指出哪一格哪一法不同(紅)",
+   "ZERO_DRILL": "含 0 → 乘積遮蔽,逐格下鑽;下鑽全同 = 過,有差 = 紅",
+   "UNDER_COVERED": "三格沒有共同的兩法 → 逐格下鑽代替乘積"
+  },
+  "verdict": {
+   "RED": ["任一組乘積不符且下鑽確認格值不同", "PRESENCE_DIFF > 0", "ENG392 首頁文字 RED(遺漏/亂碼)"],
+   "YELLOW": ["SINGLE_SOURCE > 0(有數字格無法互核)", "表格可用方法 < 2", "ENG392 首頁 AMBER(影像/OCR/單法)", "ENG072 兩法分區 DIVERGE", "分類 OTHER 或 needs_review"],
+   "GREEN": "以上皆無:首頁文字完整、每一個數字格都經 ≥2 法互核且乘積全符(或本頁沒有數字格,記 NO_NUMERIC_CELLS)"
+  },
+  "limits": "乘積是篩檢:相乘可交換,兩輪不同種子降低遮蔽機率但不是零;下鑽才是逐格定案。"
+ },
+ "proposed_headers": {
+  "why": "vrn_firstpage_matrix(ENG083 · duckdb vrn_report_basic)七欄全是個股單值且 required=true;非個股列放進去 = CGC_MDL249 判『必填但空』紅。故非個股不進該表,另立兩表;本冊只提案,表頭定案由 VIA_Output_Header_SSOT 出新版(操作員/併線的手)。",
+  "vrn_doc_class": {"subsystem": "VRN", "owner": "VRN_ENG393_DocClassVerify", "min_rows": 1, "extra_ok": true,
+   "columns": [
+    {"name": "report_file", "dtype": "str", "required": true, "key": true},
+    {"name": "doc_class", "dtype": "str", "required": true, "key": false},
+    {"name": "doc_class_zh", "dtype": "str", "required": true, "key": false},
+    {"name": "class_confidence", "dtype": "float", "required": true, "key": false},
+    {"name": "class_rule", "dtype": "str", "required": true, "key": false},
+    {"name": "class_evidence", "dtype": "str", "required": true, "key": false},
+    {"name": "route", "dtype": "str", "required": true, "key": false},
+    {"name": "needs_review", "dtype": "bool", "required": true, "key": false},
+    {"name": "fine_kind_eng073", "dtype": "str", "required": false, "key": false},
+    {"name": "fine_type_eng114", "dtype": "str", "required": false, "key": false},
+    {"name": "ticker", "dtype": "str", "required": false, "key": false},
+    {"name": "broker_raw", "dtype": "str", "required": false, "key": false},
+    {"name": "report_date", "dtype": "str", "required": false, "key": false},
+    {"name": "stock_fields_state", "dtype": "str", "required": true, "key": false}
+   ]},
+  "vrn_firstpage_xcheck": {"subsystem": "VRN", "owner": "VRN_ENG393_DocClassVerify", "min_rows": 0, "extra_ok": true,
+   "columns": [
+    {"name": "report_file", "dtype": "str", "required": true, "key": true},
+    {"name": "doc_class", "dtype": "str", "required": true, "key": false},
+    {"name": "text_state", "dtype": "str", "required": true, "key": false},
+    {"name": "text_coverage", "dtype": "float", "required": false, "key": false},
+    {"name": "text_numbers_missing", "dtype": "int", "required": false, "key": false},
+    {"name": "text_quality", "dtype": "str", "required": false, "key": false},
+    {"name": "zones_xcheck", "dtype": "str", "required": true, "key": false},
+    {"name": "table_methods", "dtype": "str", "required": true, "key": false},
+    {"name": "tables", "dtype": "int", "required": true, "key": false},
+    {"name": "numeric_cells", "dtype": "int", "required": true, "key": false},
+    {"name": "multi_cells", "dtype": "int", "required": true, "key": false},
+    {"name": "single_source_cells", "dtype": "int", "required": true, "key": false},
+    {"name": "presence_diffs", "dtype": "int", "required": true, "key": false},
+    {"name": "seed", "dtype": "int", "required": true, "key": false},
+    {"name": "triples", "dtype": "int", "required": true, "key": false},
+    {"name": "triples_mismatch", "dtype": "int", "required": true, "key": false},
+    {"name": "zero_drills", "dtype": "int", "required": true, "key": false},
+    {"name": "last_group_size", "dtype": "int", "required": true, "key": false},
+    {"name": "cell_diffs", "dtype": "int", "required": true, "key": false},
+    {"name": "verdict", "dtype": "str", "required": true, "key": false},
+    {"name": "verdict_why", "dtype": "str", "required": true, "key": false}
+   ]}
+ },
+ "discipline": [
+  "只增不減:細型別尺(ENG073 / FirstPageEngine / ENG086 / webscraping 型冊)一字不改;本冊改版 = 出 v0101,舊版留作版史。",
+  "非個股的個股專屬欄 = NULL + NOT_STOCK_CLASS,不用任何啟發式去補。",
+  "OTHER 不是失敗也不是丟棄:一律寫進 review 車道,等人裁定後回寫詞冊。"
+ ]
+}
