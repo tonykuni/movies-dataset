@@ -253,7 +253,7 @@ git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAna
 
 擊斃閘 `CGC_MDL187 v0103 --base origin/main --run-selftest`:rc 0 · 許可 1(P012:FullCheck v0101 · 釘 sha256)· 債 1(薄尾委派前版自測)。
 
-收尾:(本段收尾數字見下一行)
+收尾(本機全跑完才一次推送;中途併 main #387 後在合併樹上重產註冊與編號):整合全景實測 PS v0101 完整六段實跑 307.2 秒 · 結尾「[頁] 已跳出 FULLCHECK_latest.html」(假 xdg-open 收到)· MATRIX SUMMARY 六段齊 · 模板「已套用 True · 本支套上 · 跑完還原」(各段燈照實:⓪ 紅 = #386 兩支缺 PS-ACCEL + 自擋開頁 5;① 紅 1 = V-inventory 既有棘輪;④ 格子存證 42 小時前 FAIL 24;⑤ 見下)· 頁在無頭 Chromium 渲染 3 表 · JS 錯 0 · 主控台 v0109(待許可)在隔離工作樹整輪實跑 577.5 秒,結尾驗證頁「已跳出」· 引擎 v0101 自測 5/5 + 前版 9/9 · 擊斃閘 rc 0(許可 1 · 債 1)· 元件註冊同步 新 6 · 變更 8 · 編號只登本批 18 檔,稽核 遺失 0 · 改身分 0 · 重號 0 · 總控頁乾淨工作樹重產 · 合約 19/19 · 交接 14 案 rc 0(fullcheck 新標記 5/5 對上)· VCGC 串測 --quick 黃(紅 0)。**交接 check 仍紅,紅在 main 本來就紅的那三條**:`VIA_Panorama_v0100/0101/0102.py` CHANGED_CODE_WITHOUT_TEST(PR #386 · #387 併入後 main CI 1026 · 1028 同紅;模組屬另一個 session,依「既有範圍內註冊 不要擴張範圍」本批不代登)→ checkpoint 拒寫,本批的 REQ_CHANGED(REQ086)與 CHECKPOINT_STALE 兩黃要等那三條補上交接案後重做 checkpoint。
 
 操作員端(熱 PS 直接貼,站在倉內任何資料夾;PowerShell 7):
 
