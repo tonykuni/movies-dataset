@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-29T15:38:10+00:00",
+  "updated_at": "2026-09-30T10:19:25+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -64,11 +64,14 @@
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
     "supportive modules/registry/VIA_Registry_Architecture_SSOT_v*.json",
-    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json"
+    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
+    "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json"
   ],
   "managed_modules": [
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0101.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0177.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0107.py",
     "functional modules/VRN/VRN_SystemManager_v0110.py",
     "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
@@ -81,7 +84,8 @@
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -223,6 +227,35 @@
         "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
       ],
       "timeout_seconds": 300
+    },
+    "chain": {
+      "argv": [
+        "CGC_MDL224_TestAuto",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS",
+      "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
+        "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
+        "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json",
+        "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json",
+        "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "vdfstart": {
+      "argv": [
+        "CGC_MDL209_VdfStart",
+        "--selftest"
+      ],
+      "success_marker": "[OK]",
+      "scope": "VDF 啟動門跟管理器尾版(PR #380 併入 main:CGC_MDL209_VdfStart v0101 · VDF_SystemManager v0120;沒有交接案涵蓋 → main 的 handoff check 紅,本批帶進收據)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL209_VdfStart_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -420,6 +453,36 @@
       "owner": "AI(下一批)",
       "reason": "R07:同一函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號,沒有對照表(主號 / 別名規則已定在架構正本 entity_primary)",
       "next": "唯讀報表:以 source + name 為鍵接三冊,列缺號 · 一物多號 · 別名推不回主號的;不發新號、不改舊號"
+    },
+    {
+      "id": "VCGC-REQ085:inventory",
+      "requirement": "VCGC-REQ085",
+      "state": "VERIFIED",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json"
+    },
+    {
+      "id": "VCGC-REQ085:ps-entry",
+      "requirement": "VCGC-REQ085",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員令「先完成手頭部分開PR」:本段先交盤點冊 · 串測引擎 · VCGC 入口;唯一 PS 入口(操作台)還沒串進來,盤點冊 P-entry 站照實黃「待辦」",
+      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑"
+    },
+    {
+      "id": "VCGC-REQ085:backup-stale",
+      "requirement": "VCGC-REQ085",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "串測首輪抓到 Z286:CGC_MDL221_SystemBackup 自測只要 VIA_Reports/vdf_chain/VDFCHAIN_latest.json 存在就判 chain_file 失敗(CGC_SystemManager 自測連帶紅);工作站跑過 VDF 鏈也一樣紅",
+      "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告"
+    },
+    {
+      "id": "VCGC-REQ085:base-380",
+      "requirement": "VCGC-REQ085",
+      "state": "VERIFIED",
+      "case": "vdfstart",
+      "receipt": "docs/handoff/evidence/vdfstart.json"
     }
   ]
 }
