@@ -7,6 +7,11 @@ on:
       - claude/via-system-followup-tz7k9t
     paths:
       - ".github/workflows/via-master-control-ui.yml"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/**"
+      - "VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/ssot/**"
       - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py"
       - "VeritasIntelligenceAnalytics/VIA.ps1"
       - "VeritasIntelligenceAnalytics/VIA_HTML_UI/**"
@@ -25,6 +30,11 @@ on:
       - main
     paths:
       - ".github/workflows/via-master-control-ui.yml"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "VeritasIntelligenceAnalytics/supportive modules/registry/**"
+      - "VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/**/*.py"
+      - "VeritasIntelligenceAnalytics/supportive modules/ssot/**"
       - "VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py"
       - "VeritasIntelligenceAnalytics/VIA.ps1"
       - "VeritasIntelligenceAnalytics/VIA_HTML_UI/**"
@@ -60,9 +70,11 @@ jobs:
         run: |
           git config --global core.longpaths true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             /.github/workflows/via-master-control-ui.yml
@@ -77,15 +89,20 @@ jobs:
             /VeritasIntelligenceAnalytics/functional modules/**/*.py
             /VeritasIntelligenceAnalytics/supportive modules/registry/**
             /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
           sparse-checkout-cone-mode: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -151,7 +168,7 @@ jobs:
 
       - name: Upload UAT screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: via-master-control-ui-screenshots
           path: VIA_UI_Test_Artifacts
@@ -186,6 +203,43 @@ jobs:
           $late = $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and "$($n.Left)" -eq '$VIACelScopedSrc' }, $true)
           foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
           Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
+
+      - name: Verify VCGC dispatch and manager contracts through the sole entry
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_VCGC_PUSH = "NO"
+          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          Push-Location $via
+          try {
+            $registry = Join-Path $via "supportive modules\registry"
+            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
+              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+              Select-Object -Last 1).FullName
+            if (-not $vcgc) { throw "VCGC entry absent" }
+            python $vcgc token
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL237_NumberingSystem --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VDF_SystemManager --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VRN_SystemManager logic
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL140_HandoverConsole --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run VRN_SystemManager provenance --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL245_SDDValidator --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc handoff check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
 
       - name: Exercise VRN HTML with empty and synthetic populated databases
         shell: pwsh
@@ -239,7 +293,7 @@ jobs:
 
       - name: Upload VRN browser evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: via-vrn-template-browser-evidence
           path: VIA_VRN_Test_Artifacts

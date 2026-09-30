@@ -1,0 +1,81 @@
+{
+ "schema": "VIA.Workflow.HubSSOT.v1",
+ "version": "v0100",
+ "batch": "R31 · R32(conformance · match · 出口段依實跑順序重排)",
+ "ts": "2026-09-28",
+ "book_edited": false,
+ "source": "操作員 R31:「Vcgc have one loop to vdf and the VRn separately. VCGC is the hub between outside world and VRn and vdf.」「review the file through VCGC as the only gate … activate token saving tools first … then environment manager … then SSOT … auto coding … grade the slow and weak engines … decide the SSOT of workflow of VCGC VDF VRN」",
+ "model": {
+  "shape": "hub_and_two_loops",
+  "hub": "VCGC",
+  "loops": ["VCGC↔VDF", "VCGC↔VRN"],
+  "rules": [
+   "外部世界(操作員輸入 · 樣本夾 · 資料夾 · 網路 · GitHub)只經 VCGC 進出;VDF / VRN 不直接對外。",
+   "VDF 與 VRN 互不直連:VRN 要資料 → 向 VCGC 要 → VCGC 讀庫或轉交 VDF 迴圈 → 經 VCGC 回 VRN(CGC_MDL239 資料中介)。",
+   "兩個迴圈各自獨立:VDF 迴圈可單獨跑、可逐站單測(不同引擎);VRN 迴圈照 L0→L5 順序,不跳層。",
+   "中樞步驟順序鎖死:H1 流程閘沒過(沒有「[流程] 政策過」)後面一步都不跑(PSGATE-1)。",
+   "網路只在 VDF 迴圈、只經統包網路工具橋、只在操作員自己開 VIA_NET_CONSENT=YES 之後(AI 不代設,L07/L08)。",
+   "TA-Lib 禁用(L50 第一條):任何一步量到 TA-Lib 活指令即紅;QuantGuard 為唯一技術分析路徑。",
+   "過關就鎖定:綠燈進燈鎖冊(VIA_LampLock_v*),回歸 = 紅,不反覆。"
+  ]
+ },
+ "executor": {
+  "entry": "Invoke-VIA-OperatorConsole-v*.ps1(尾版;唯一編排)",
+  "start": "via-vcgc go(CGC_MDL149 尾版找入口尾版,參數原樣轉)",
+  "note": "本冊宣告順序與每一步的正主;不執行、不複製任何規則。執行者只有入口那一支 PowerShell,每一步的判準在各自正主裡(L05 不另立第二把尺)。"
+ },
+ "conformance": {
+  "checker": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py(v0168 起)· 動詞 workflow [輪號]",
+  "evidence": "VIA_Reports/vcgc/events/EVENTS_*.jsonl:入口每一步 python 都經 VCGC(主控台動詞或 run)留一筆事件;輪號 = 入口設的 VIA_HUB_RUN",
+  "match_rule": "match = [引擎 stem, 動詞](動詞 null = 不限);一筆事件對到某步 = 該步本輪有跑;取每步第一次出現的位置",
+  "rules": [
+   "本輪第一筆事件必須是 H1 流程閘(PSGATE-1),否則紅",
+   "中樞段 → 兩迴圈 → 出口段;段內照 id 順序;兩迴圈彼此不排序(各自獨立)。第一次出現的位置倒置 = 紅",
+   "after_gate 的步(H0 記住資料夾)只要求在 H1 之後(選夾在閘前、寫入在閘後)",
+   "inside 的步在鏈內或 PowerShell 內跑,不要求中樞事件;其餘宣告步本輪沒出現 = 黃(可能是 -SkipSweep 或沿用)"
+  ],
+  "grade": "紅 rc 1 · 黃 rc 2 · 綠 rc 0;只讀事件,不重跑、不寫冊"
+ },
+ "hub": [
+  {"id": "H0", "name": "外部輸入進中樞", "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py", "verb": "paths", "what": "系統資料夾 · 資料庫資料夾(VIA_DATA_HOME)· VRN 樣本夾(InputConsole 規格冊 user.vrn_dir)", "match": [["CGC_MDL238_OperatorConsole", "paths"]], "after_gate": true},
+  {"id": "H1", "name": "VCGC 流程閘", "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", "verb": "status", "gate": "[流程] 政策過 · 子系統已對齊", "what": "政策冊整冊讀 · 子系統座位 · 加速器 / 網路已接", "match": [["CGC_MDL149_VeritasCentralGovernanceConsole", "status"]]},
+  {"id": "H2", "name": "省 token 工具先啟用", "engine": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py", "verb": "read | slice | digest | pack", "what": "AI 讀倉只用骨架卡與切片,不讀整檔(CLAUDE.md 讀檔規則);VCGC status 第 2 步「省Token」燈", "match": [["CGC_MDL158_VIAPanoramaAuditRepair", null]]},
+  {"id": "H3", "name": "環境管理器", "engine": "supportive modules/registry/CGC_MDL240_EnvManager_v*.py", "verb": "(預設)", "what": "四件工具鎖版與載入 · 家族境 · 工具冊 · 鏈上缺件 · 執行檔 · PS 端;只查不裝(裝件是操作員的手)", "match": [["CGC_MDL240_EnvManager", null]]},
+  {"id": "H4", "name": "SSOT 審閱 · 註冊同步 · 自動編號", "engine": ["supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py", "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"], "verb": "registry-sync [--apply] · --apply", "what": "政策 · 邏輯 · 正規式 · 同義字 · 參數 · 引擎 · SSOT 冊全編號(VIA-<子系統>-<類><號>;只增);--apply 需操作員批准", "match": [["CGC_MDL238_OperatorConsole", "sync-check"], ["CGC_MDL149_VeritasCentralGovernanceConsole", "registry-sync"], ["CGC_MDL237_NumberingSystem", null]]},
+  {"id": "H5", "name": "禁令與標準模板", "engine": ["supportive modules/registry/CGC_MDL243_TalibCommandScan_v*.py", "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py", "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v*.py"], "verb": "scan · --subsystems · (預設)", "what": "TA-Lib 活指令 0 · PY 加速器橋 · VDF 網路橋 · PS 模板章", "match": [["CGC_MDL243_TalibCommandScan", null], ["CGC_MDL183_CeleritasPolicyGate", null], ["CGC_MDL124_BridgeSweeper", null]]}
+ ],
+ "loop_vdf": {
+  "enter": "VCGC → VDF(建庫計畫或 VRN 經中介要料)",
+  "exit": "VDF → VCGC(庫表 · Parquet · 燈號)",
+  "separate_test": true,
+  "steps": [
+   {"id": "D1", "name": "VCGC→VDF 建庫計畫", "engine": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py", "verb": "build [--apply]", "what": "庫表冊「正庫」逐張量在不在 / 新不新;缺的排 VDF 項;需網路者待同意閘", "match": [["CGC_MDL239_DataBroker", "build"]]},
+   {"id": "D2", "name": "VDF 鏈", "engine": "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py", "verb": "run [--resume]", "what": "0a 加速器 · 0b 網路工具 · 0c VDF 獨立性 · 1 ENG053 · 2 ENG073 · 3a ENG061 · 3b ENG062 · 4a ENG090 · 4b ENG089 · 4c ENG091(站表的正主在跑器裡)", "match": [["CGC_MDL170_VDFChainRunner", "run"]]},
+   {"id": "D3", "name": "資料庫無缺漏", "engine": ["supportive modules/registry/CGC_MDL228_VIADBManager_v*.py", "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py", "functional modules/VDF/engine/VDF_ENG090_DataCoverageGate_v*.py"], "verb": "panel · plan --deep · roster", "what": "庫表冊 × 目錄核對 · 交易日缺口 · 代號缺漏", "inside": "D2 鏈內(ENG090 站)+ 全景實測 ⑥ DB 面板(PowerShell)"},
+   {"id": "D4", "name": "回中樞:輸出統一", "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py", "verb": "parquet --apply", "what": "每本 .duckdb 每張表 → parquet;DuckDB 管家 VIEW", "match": [["CGC_MDL238_OperatorConsole", "parquet"]]}
+  ]
+ },
+ "loop_vrn": {
+  "enter": "VCGC → VRN(樣本夾 · 操作員輸入)",
+  "exit": "VRN → VCGC(擷取 · 驗證 · 摘要 · 燈號)",
+  "ordered": "L0→L5,不跳層",
+  "data_rule": "VRN 要市場 / 財報資料一律經 VCGC 資料中介(CGC_MDL239),不直讀 VDF 引擎",
+  "steps": [
+   {"id": "R1", "name": "VRN 要料經中樞", "engine": "supportive modules/registry/CGC_MDL239_DataBroker_v*.py", "verb": "request / route", "what": "讀庫或轉交 VDF 迴圈,結果經 VCGC 回 VRN", "inside": "R2 鏈內(VRN 引擎在行程內向 CGC_MDL239 要料)"},
+   {"id": "R2", "name": "VRN 六層鏈", "engine": "supportive modules/registry/CGC_MDL172_VRNChainRunner_v*.py", "verb": "run [--resume]", "what": "L0 輸入識別 → L1 擷取 → L2 結構與知識 → L3 驗證 → L4 產出 → L5 儲存;節點的正主 = VIA_VRN_LogicArchitecture_SSOT_v0100.json", "match": [["CGC_MDL172_VRNChainRunner", "run"]]},
+   {"id": "R3", "name": "全文擷取無遺漏", "engine": "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py", "verb": "run", "what": "個股報告只取第 1 頁 · 年度財報全頁先拆左右再拆上下(規則冊 VIA_Policy_VRNTextScope_v0100);完整才摘要", "inside": "R2 鏈內(VRN 邏輯架構冊的節點)"},
+   {"id": "R4", "name": "VRN 邏輯總檢", "engine": "functional modules/VRN/VRN_ENG113_LogicRollup_v*.py", "verb": "(預設)", "what": "邏輯冊版號 · 節點數 · 缺 0 · talib 0", "match": [["VRN_ENG113_LogicRollup", null]]}
+  ]
+ },
+ "exit": [
+  {"id": "X1", "name": "HTML U/I", "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py", "verb": "page", "what": "紅黃綠矩陣在最前", "match": [["CGC_MDL238_OperatorConsole", "page"]]},
+  {"id": "X2", "name": "單一路徑驗證 + 涵蓋稽核", "engine": "supportive modules/registry/CGC_MDL242_PathVerify_v*.py", "verb": "run", "what": "執行版本 × 編號冊 × 註冊冊 × 鎖冊 · 兩迴圈結果 × 燈鎖 × 上一輪 · 橋 · 四件工具 · 多來源 · SSOT", "match": [["CGC_MDL242_PathVerify", "run"]]},
+  {"id": "X3", "name": "教訓帳", "engine": "supportive modules/registry/CGC_MDL058_Lessons_v*.py", "verb": "(預設)· --record", "what": "根因帳只增;重複出錯要留因與解法(VCGC v0168 起 FAIL 事件自動記 VCGC_FAIL)", "match": [["CGC_MDL058_Lessons", null]]},
+  {"id": "X4", "name": "布建紀錄上傳", "engine": "Invoke-VIA-OperatorConsole-v*.ps1", "verb": "⑦", "what": "只 commit + push 紀錄冊;對 GitHub 也只經 VCGC", "inside": "入口 ⑦(git 在 PowerShell 裡,不是 python 步)"}
+ ],
+ "grading": {
+  "slow": "VIA_Reports/operator_console/TIMING_latest.json(各步秒數)· VIA_Reports/vdf_chain/VDFCHAIN_latest.json · VIA_Reports/vrn_chain/VRNCHAIN_latest.json(各節點 secs)由大到小",
+  "weak": "兩條鏈上非 GREEN 的節點(RED > ABSENT > GATED > NODATA)+ 全景稽核問題數",
+  "rule": "分級只讀正主剛寫的存證,不重跑、不另判"
+ }
+}

@@ -10179,8 +10179,120 @@
       "code": "併工作站線 15b7e409(只增不減):CloseoutLock 加 remeasure_20260928_0525(容器同一棵樹重量 12 格,celeritas_gate 因 PY 缺橋 91 照實 RED、SSOT 連動 BROKEN 4、邏輯庫 RED 並列不改舊鎖)+ held 9;掉球 Z218–Z222 續記進度 + Z223–Z230;修補提案 P1–P6 只寫文字(docs/VIA_Patch_Proposals_20260928.md),依操作員 VCGC Master Prompt 待 via 審核,一支引擎都沒改;PR #327 CI Windows UAT 紅 = VIA_SYSTEM_MANAGER_v0149 沒轉 do_list(main 同病)已留言。",
       "category": "VCGC 收尾併線 · 容器重量 · 修補提案待審",
       "component": "側線 2026-09-28(主線批號由併線的手指定 L25)· PR #327:VIA_VCGC_CloseoutLock_v0100 · VIA_AutoCode_Registry_v0100 · docs/VIA_DroppedBalls_B507 · docs/VIA_Closeout_Matrix_20260928_0525 · docs/VIA_Patch_Proposals_20260928"
+    },
+    {
+      "ts": "2026-09-29 00:45",
+      "op": "ADD",
+      "code": "操作員令「token saving tools registered. activate them and request ai to utilize them as the first step in vcgc.」:引擎版號冊 +VIA-TOOL-0194(token · 全景 CGC_MDL158 v0116);CGC_MDL233 v0102 第五家 token,經 via-vcgc tools activate token … --apply 寫鎖冊;CGC_MDL226 v0101 第一步=省 Token(鎖版啟用 · 實測 read/slice/digest/pack/--if-etag/--brief 六件 · AI 指令卡 · 同位元快取 · 政策小冊 TOKEN-1 核對);VCGC v0170 每個動作第一行印 ai_line、第一步紅就停、token 動詞、v0161 DOOR 改指步驟矩陣尾版(新動詞 tools/run/go/events/workflow/sdd 以前繞過步驟門);CLAUDE.md 第一步;CGC_MDL187 v0102 新版沿襲已進線前一版的行記債不擊斃(防洗白)+ 薄尾串 PRIOR.selftest() 是委派不是刪檢號(KILL-10 誤殺);格子 v0499 +2 站 · 擊斃閘 廿五→廿七。",
+      "category": "VCGC 第一步 · 省 Token 啟用 · AI 先用",
+      "component": "側線 2026-09-29 a(主線批號由併線的手指定 L25)· docs/VIA_S20260929a_TokenFirstStep.md"
+    },
+    {
+      "ts": "2026-09-29 01:30",
+      "op": "ADD",
+      "code": "操作員令「三個系統的validation logic result validation logic cross checking機制寫入ssot」:新冊 VIA_Validation_SSOT_v0100(VAL-SSOT;VCGC · VDF · VRN 各三層:驗證邏輯 VAL 8/6/5 · 結果驗證 RVL 6/4/7 · 交叉核對 X- 18/11/12,三系統共用 22 個代碼,每條指名正主與實作記號;補登工作流冊引用卻從未實作的 X-CONF → VCGC conformance、X-NET → 全景治理類 NET);新核對器 CGC_MDL246 v0100(X-VAL 八道:V-SHAPE/CODE/OWNER/IMPL/XREF/SDD/POLICY/REF;真冊 GREEN;12 檢 · 突變 11/11);VCGC v0171 val 動詞。Codex #366:P1 VCGC v0171 第一步紅時放行 tools / tools activate token|nlp;P2 CGC_MDL226 v0102 快取鍵含整條版本鏈;P2 CGC_MDL187 v0103 委派只認模組層 selftest 必經路徑且結果流進 return。格子 v0500(+1 站 · 步驟矩陣 十→十一)。前批全格子 FAIL 24 在 0cebb651 上同樣 24/24 紅,6 站逐檢比對新增 0。",
+      "category": "三系統驗證 SSOT · X-VAL · Codex #366 修正",
+      "component": "側線 2026-09-29 b(主線批號由併線的手指定 L25)· docs/VIA_S20260929b_ValidationSSOT.md"
+    },
+    {
+      "ts": "2026-09-29 02:35",
+      "op": "ADD",
+      "code": "操作員令「go on add polars to all necessary engines 記憶體不足可用temp替代用」:先量——全樹尾版 import pandas/polars 327 支,真的把全市場大表撈進 Python 的 4 支(N1)、DuckDB 內全歷史重算 / 整表複製 7 支(N2);容器無 polars(不代裝)。新共用件 SUP_MDL755_VIAPolarsFrame_v0100(VIA-TOOL-0195;經 VCGC tools activate frame 鎖版):polars 探針 · 記憶體預算(可用×0.5,下限 512 MiB)· 受管 temp(VIA_TEMP_ROOT/VIA_spill,用完即刪,sweep)· DuckDB 守門(檔案庫收上限、記憶體庫只換夾、閥 VIA_FRAME_GUARD=off)· frame()(pandas=.df() 零差異;polars 估超預算走 temp parquet → LazyFrame);自測 13/13 + ⑫ ABSENT,突變 20/20。11 支必要引擎新版薄尾(ENG070 v0113 · ENG072 v0104 · GRP041 v0103 · GRP040 v0104 · ENG060 v0108 · ENG061 v0106 · ENG062 v0105 · ENG064 v0113 · ENG079 v0104 · ENG081 v0103 · ENG085 v0106):正典 FRAME 橋 + 守門,rc 與前一版全同。真庫副本實證:ENG061 放大 8 倍 470 萬列,上限 256 MiB 峰值 1138→583 MiB、溢寫進受管 temp;stddev 視窗 2 欄最後幾位差(相對 8.4e-15)照實記。CGC_MDL233 v0103 六家 · 格子 v0501(+1 站,11 站檢數 +3)· 擊斃閘 0 · 13 站全綠 · registry-sync 新 98/失 0 · 驗證 SSOT GREEN;X-NUM(含上一批 VCGC v0171)待工作站 CGC_MDL237 --apply(容器套用會寫進本機庫 862 檔與淺層 clone 時間戳翻動,不入倉)",
+      "category": "Polars 表格層 · 記憶體不足轉 temp · 11 支必要引擎",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 03:14",
+      "op": "FIX",
+      "code": "側線 2026-09-29 c 收尾:併 main(PR #367)。VCGC 座位自動上傳(CGC_MDL223 publish 用不帶路徑的 git commit)以「vcgc: sync the subsystem seat」把暫存中的合併提交並推送 e61b245b;逐檔核對 = main + 本批 18 檔,無誤。編號冊只增合併 10 本 +206 列(對 main 遺失 0 · 改號 0 · 既有列 0 變;TST 不加),X-NUM 轉綠。提交後補修 12 支薄尾(11 支引擎 + CGC_MDL233 v0103):說明首行改成引擎名 +(薄尾註記),總控頁候核名稱回到前一版;家族名 STEM → _STEM,VCGC v0172 沿薄尾鏈盤點認得,registry-sync 對 main 新 98 · 退役 231→0 · 變更 101(source 移到尾版)。總控頁再生前暫移容器本機 StdDashboard,對 main 只差時間與 MDL233 一列;契約 19/19。重跑:12 支自測 rc 不變 · 全景問題 0 · 擊斃閘 rc0 · 格子 13/13 · SDD YELLOW(只剩既有 X-REQ-OPEN)· 驗證 SSOT GREEN。待辦照實交出:Polars ⑫(工作站裝 polars)· 編號冊既有列刷新(選做)· CGC_MDL223 座位上傳只提交座位檔 · VCGC v0172 薄尾偵測也要認 STEM(main 既有 24 支尾版、約 230 個函式標退役)",
+      "category": "Polars 批收尾 · 併 main · 編號只增 · 薄尾補修",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 03:49",
+      "op": "FIX",
+      "code": "Codex #369 兩件修正(新檔未進 main,原檔修)。P2 SUP_MDL755:estimate() 的字串 / 二進位 / 巢狀欄原本一律算 32 位元組,百萬筆 1 KiB 字串會估成 32 MiB、frame() 誤走 .pl();改成同一趟查詢實量內文位元組(strlen = UTF-8 位元組 · octet_length · 巢狀以文字長度近似,欄照位置改名),決策拆成 plan();⑪ 期望值全寫死('é'×512 · BLOB · BIGINT[] · 全 NULL · 重名怪名欄),新突變 11/11、舊突變 19/19;經 VCGC 重新啟用,鎖冊 frame sha 382c5e80。P1 ENG085 v0106:v0105 的 _INSPECT 與 _PREPARE(整表 CTAS)經 subprocess 在家族境新直譯器跑,父行程守門碰不到 → guard_children() 把守門段接在兩段腳本開頭(冪等),子行程載同一支 FRAME 正典、自己量預算、自己開受管 temp、自己刪,閥 off 也傳下去;adapter 不接(收容件原樣、讀已縮好的暫存庫);③ 實測 + 突變 6/6;真庫 run rc0 OK 1163 筆,父 1 子 2 個受管夾跑完全清。普查 11 支前版鏈:只有 ENG085 把 DuckDB 重活放子行程(ENG079 的子行程是 ENG064 薄尾自己守;ENG072 · GRP_ENG040 子行程只用 pandas;ENG081 只讀 ps)。元件冊對 main 新 102 · 退役 0;編號冊以 origin/main 為底重算 +210(本 PR 的列用最終行號);擊斃閘 rc0 · 格子 13/13 · SDD YELLOW(既有)· VAL GREEN",
+      "category": "Polars 批 · Codex #369 P1 子行程守門 · P2 變長欄實量",
+      "component": "側線 2026-09-29 c(主線批號由併線的手指定 L25)· docs/VIA_S20260929c_PolarsFrame.md"
+    },
+    {
+      "ts": "2026-09-29 08:24",
+      "op": "FIX",
+      "code": "操作員令「close out these three projects.」+「activate and verify the results.」:VCGC-WKF004 收尾(go → check → selftests → real → lock → closeout)。探測輪量到 AI 端 FAIL 6 條:X-LOCK 以含版號路徑比、看不見 Polars 批換版;ENV MANAGER 唯一的紅是缺 pwsh、路徑驗證的紅同一個因,驗證器都追不到;ENG089 v0106 空資料家 ABSENT 沒講下一步(自測紅)。第一組:CGC_MDL245 v0102(X-LOCK 依家族比 · fail_cause envmgr_exe_absent / pathverify_traced 只讀本輪報告)· VDF_ENG089 v0107 · 格子 v0502。整條重跑(鏈不 resume · 容器本機 output_hub 暫移 · 空資料家)再抓兩件:VRN_ENG083 v0120 ㊸ 沿 ENG073 薄尾鏈找正典表(resume 一直沿用舊綠)· VRN_ENG082 v0111 sync-db 每輪落 SYNCDB_latest.json + v0102 finding_cause syncdb_no_target。第一次鎖燈(v0107,指紋 2109ed8140b9)後複查:VDF_ENG054 v0110 自測斷言正式庫不在,工作站有資料就紅(同機實量:庫在 v0110 rc1)→ 撤回未提交的鎖冊與報告,ENG054 v0111 自測改暫存庫(五庫況 · 正式庫零觸碰;兩種環境 6/6),整輪重跑重鎖。結果:go-20260929-075614-10789 + ai-r34-final-20260929-080706 · 指紋 8593371c7960 · lock --apply 寫 VIA_LampLock_v0107(已鎖 14 · 未鎖 13 全操作員端 · 換鎖 7 處)· 鎖後 X-LOCK 綠 · CLOSED_WITH_OPERATOR_ITEMS;燈鎖冊獨立核對 32 釘全尾版;工作站樣整張自測 FAIL 0。驗證:突變 37/37 · 擊斃閘 rc0(17 檔)· 格子四站 OK · VAL GREEN · 編號只增 ENG +4 · MDL +2 · FNC +127(main 既有列 0 變)· 元件冊 新 26 退役 0。操作員的手:裝 pwsh · 開同意閘抓料 · 裝 polars / pdfplumber / pydantic / paddleocr · VTMRA 正本。",
+      "category": "三系統收尾 R34 · 鎖燈 v0107 · 三組修正",
+      "component": "側線 2026-09-29 d(主線批號由併線的手指定 L25)· docs/VIA_S20260929d_SDDCloseoutR34.md"
+    },
+    {
+      "ts": "2026-09-29 08:48",
+      "op": "UPGRADE",
+      "code": "操作員令「升級那四個 action,開 PR」:PR #370 的 CI 帶 GitHub 平台 Node.js 20 淘汰 warning(actions/checkout@v4 · setup-node@v4 · setup-python@v5 · upload-artifact@v4 還是 Node 20 版,runner 強制改 Node 24 跑)。先量各 action 自己 tag 上 action.yml 的 runs.using:checkout / setup-node v5 起、setup-python v6 起、upload-artifact v6 起才是 node24(upload-artifact v5 仍 node20)。四支一律升到目前最新大版本 v7(v7.0.1 / v7.0.0 / v7.0.0 / v7.0.1,皆 node24);逐一對照我們用到的輸入(sparse-checkout 非 cone · persist-credentials 供狀態報告 git push · node-version 22 · python-version 3.12 · upload 的 name/path/if-no-files-found/retention-days)全在,沒有被移除或改預設的;setup-node 移除的 always-auth 沒用到,v6 起自動快取要 package.json packageManager=npm,倉根無 package.json 不觸發;upload-artifact 新 archive 預設 true 照舊壓 zip。改 7 行:via-master-control-ui.yml 5 · via-status-report.yml 2;YAML 解析過 · .github 舊版號 0。不改:VIA_HTML_UI 套件 CI 範本(列在 manifest.json,CGC_MDL160 以 sha256 核完整性;GitHub 也不跑)· intake 正本。",
+      "category": "CI · GitHub Actions 升 Node 24(v7)",
+      "component": "側線 2026-09-29 e(主線批號由併線的手指定 L25)· docs/VIA_S20260929e_ActionsNode24.md"
+    },
+    {
+      "ts": "2026-09-29 09:58",
+      "op": "ADD",
+      "code": "操作員令「應該要有進入環境指令 由vcgc進入跑他的流程如規定 加入加速器並告知目前加速器 網路工具 layout工具版本 ssot一切整合最佳化測試除厝更新啟動全部」(實錄:PowerShell 停在 C:\\Users\\tonyk,git push → not a git repository)。先量:via-entry 已會進 $VIA;工作流 SSOT VCGC-WKF001 已規定入口流程(STP002 閘必須第一);status 只列加速器 / 網路、不載入、沒有 layout 版本;go 不 git pull;Python 改不了 shell 的目前資料夾。CGC_MDL149 v0173(薄尾)多一個動詞 via-vcgc enter [--card] [--no-pull] [go 參數]:0 第一步省 Token(紅就停)· 1 位置(不在倉內印 Set-Location 那一行;git 一律 -C 倉根)與只快轉的更新(分岔不合併、本機改動由 git 拒絕,照實印;HEAD 有變交給更新後的尾版 enter --no-pull 接手)· 2 閘(status,rc≠0 一步都不跑)· 3 載入鎖冊那一本加速器(activate,執行緒預算寫進本行程環境,go 的子行程都帶;沒套上就停)· 4 鎖冊六件工具版本 + sha(加速器 v1141 · 網路 v1652 · layout v0109 · nlp v0105 · token v0116 · frame v0100)· 網路載入器解析與核心載入 · layout 動詞 · PS 模板;漂移(含 layout 動詞走的不是鎖冊那一支)就停 · 5 交給 go 啟動全部;結尾總結 + 中樞事件。實跑抓到總結事件以開始時間排序會排在閘前(workflow RED)→ t0 記寫入當下、另存 started。自測 ①~⑮ · ⑦b + 前版鏈 72 檢 rc0 · 突變 20/20 · 殺手閘 11/11(KILL-10 記債)· 格子 v0503 站名 三十八 → 七十二(v0172 實印 56 +16)· 容器實跑 enter --card rc0 / 倉外 enter:閘過、go ABSENT(無 pwsh)rc2。既有紅(非本批):ssot verify 陸券殘留 2(VRN_Broker_Dict_v0100.json 09-25 · VIA_VRNLogic_AllInOne_v0201.py 09-28)待操作員裁定(LL90)。L70:一句進倉 + 全部的短令 via-in 寫成一次貼交操作員,不動 .ps1。 PR #372:CI 合約測試 test_11 抓到總控頁沒照 LL49 重產(重產,容器本機日更儀表板暫移、照乾淨樹產)· Codex 兩條 P2:執行緒預算沒套上仍報 GREEN → 判 RED;layout 動詞(v0146 取夾內最新、不看鎖冊)走的不是鎖冊那一支 → 判 RED 點名。",
+      "category": "VCGC 進入環境一句(enter:位置 · 更新 · 閘 · 加速器 · 工具版本 · 啟動全部)",
+      "component": "側線 2026-09-29 f(主線批號由併線的手指定 L25)· CGC_MDL149_VeritasCentralGovernanceConsole_v0173 · CGC_MDL064_SelftestGrid_v0503 · VIA-VCGC-MDL1436/1437 · docs/VIA_S20260929f_VcgcEnter.md"
+    },
+    {
+      "ts": "2026-09-29 10:37",
+      "op": "ADD",
+      "code": "操作員令「加 via-in 短令到命令冊 v0263」(L70 逐次許可:只這一支、只這一個短令)。Register-VIA-Commands-v0263.ps1(薄尾;函式庫式模板章;dot-source v0262;LF · 無 BOM 同 v0259–v0262):+via-in(別名 進入環境)= $VIA 檢查 → via-entry(進 $VIA · 設環境;在倉內,git push 不再報 not a git repository) → 逾時本次放寬到 7200(沒設 / 非數字 / <7200;0 或 ≥7200 照舊;結束含 Ctrl+C 還原)→ via-vcgc enter @args(VCGC v0173)。兩支 .cmd 梭(VIA 根 · bin/;可執行段與 via-vrnfin 標準梭逐位元相同;CRLF)。許可冊 P011 釘 v0263 的 sha256。驗證:CGC_MDL157 v0106 加前 rc2(上一批文件一次貼的 via-in 是 ghost)→ 加後 rc0 29/29(427 呼叫全解 · 185 短令全有梭 · 零釘死)· 殺手閘 KILL-05 先擊斃、記許可後 11/11 · [許可] 1 · MDL183 基線外新缺 0 · MDL243 rc0 · 格子 唯一接觸口 / 三專案打包 OK。既有紅(非本批):短令能跑閘 CGC_MDL165 v0101 只讀尾版命令冊一本,main 原樣 0 令就紅三檢(薄尾盲點),修法 v0102 改用 MDL157 read() 沿鏈讀,未在本批。命令卡冊不重凍(MDL162 v0100 只讀尾版一本,會把 169 張洗成 1 張;v0244 起既有債)。",
+      "category": "命令冊 +via-in(進倉 + VCGC 入口流程一句完成)",
+      "component": "側線 2026-09-29 g(主線批號由併線的手指定 L25)· Register-VIA-Commands-v0263 · via-in.cmd ×2 · 許可 P011 · VIA-CORE-MDL481 · VIA-TOOL-0194 · docs/VIA_S20260929g_ViaIn.md"
+    },
+    {
+      "ts": "2026-09-29 11:42",
+      "op": "ADD",
+      "code": "Codex #373 P1(PR #373 合併後):registry-sync 把 tool|via-in 發成 VIA-TOOL-0194,引擎版本冊(手寫 where=this register)早把 0194 給了 token 引擎(CGC_MDL158 v0116),編號 SSOT TOOL-C017 · 編號書 · 編號台帳 · 批文件都照它引用。全倉實測 0179–0194 共 16 號一號兩主(15 號本批之前就撞:引擎版本冊 09-27 起自己發號、沒記回元件冊計數器;元件冊 09-28 18:21 / 09-29 01:43 再發給 15 支短令)。根因:v0142 registry_sync 只看元件冊 counters+1。CGC_MDL149 v0174(薄尾):minted_elsewhere(他冊自己發的號=已佔,只抄元件冊號的列不算)· registry_sync 發號取計數器/元件冊最大號/他冊最大號之大 +1、撞號那筆 --apply 讓號(留 recoded_from · recoded_at · recode_why;乾跑零寫;只有寫正本才讀他冊,暫存冊同前版)· 鏈上每支持有 registry_sync 的模組都換成本版(動詞 · --layout-only/--nlp-only · hub 委派 · v0168 乾跑)· 同步檢查多報 registry.recode · 動詞多印發號段、寫後仍撞 rc2。元件冊 16 筆改號 0179–0194 → 0196–0211(via-in → VIA-TOOL-0211),TOOL 計數器 194 → 211;引擎版本冊 · 編號書一字不動(讓號的是元件冊:他冊號已被編號書引用,短令號全倉無別處引用)。格子 v0504 中央控管台 七十二 → 八十二檢。驗證:修前正本上 ⑥ 紅(16 撞)· ⑧ 反控紅(16)→ 修後 82 檢全過;突變見批文件。P2(負數逾時)要出 Register v0264,L70 待操作員逐次許可,本批不動 .ps1。另依操作員令核對近三日 VCGC 功能要求:需求冊 v0102(+VCGC-REQ072–074 · SUP-REQ006 · VRN-REQ006 PARTIAL;REQ056/058/059/069 補引文)· 驗證 SSOT +X-MINT · SDD 驗證 X-REQ / X-NUM 綠、X-REQ-OPEN 14 與 X-LOCK(VCGC-WKF003 鎖在 v0172,既有)黃,重鎖待下一輪。",
+      "category": "元件冊發號避開他冊已發的號(一號不得兩主)",
+      "component": "側線 2026-09-29 h(主線批號由併線的手指定 L25)· CGC_MDL149 v0174 · CGC_MDL064 v0504 · VIA-VCGC-MDL1439(v0174)· VIA-VCGC-MDL1438(格子 v0504)· FNC_VCGC +67 · 元件冊 16 筆改號 · docs/VIA_S20260929h_ToolCodeCollision.md · VIA_Requirements_SSOT_v0102(VIA-VCGC-SSOT051)· REQ +5 · 驗證 SSOT X-MINT"
+    },
+    {
+      "ts": "2026-09-29 19:45",
+      "op": "ADD",
+      "code": "操作員令「VCGC TO VDF TO VRN 全部檢測 … SSOT REGEX 同義字 自動編號 命名 註冊功能強化 SSOT全景式檢視 … 自動自適應式上下單向檢測到底 … 只增不減」「盤點中央控管功能架構缺漏補強 … 升級 TOKEN SAVING 工具 … AI 進入讀取後開始使用 · 必用功能寫入」「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」「收尾工作」「交接」。CGC_MDL247_SSOTPanorama v0100(新):六族 × VCGC → VDF → VRN → SUP 全景,上游紅串流到底、輸入指紋沒變沿用、每格委派既有正主、只讀。CGC_MDL237 v0108:NOT_LIVE 只比目錄(Z280 真因)· audit 只增稽核 · --apply 寫後自核違反即整批還原。CGC_MDL245 v0104:X-REQ-BACK(單向 4 條由工作流冊 v0103 補齊)。VCGC v0178:manager_names 沿系統管理器薄尾鏈(VDF / VRN 上行七處 6/7 假缺 → 7/7)· ssot panorama · functions · token 卡尾必用摘要。CGC_MDL158 v0117 省 Token:JSON 兩層卡 · JSONL 欄位卡 · JSON 路徑切片 · chain 鏈圖(本版 9/9 · 前版 45/45 · 啟用閘 10 項過 · 鎖冊 token → v0117 · VIA-TOOL-0212)。VIA_AI_FunctionCard_SSOT v0100(12 步必用)· 需求冊 v0104(+VCGC-REQ077–083)· 工作流冊 VCGC / VRN v0103。範圍令:全量重建 +1,862 列只登本批 136 列(MDL 6 · FNC 103 · LGC 12 · REQ 7 · STP 1 · TOOL 2 · ENV 1 · SSOT 4;HEAD 舊列一字不動、刪 0 行),範圍外 FM 862 · SYN 862 · TST 5 與既有列翻動不寫,掛交接待辦 VCGC-REQ078:backlog。收尾實測:registry-sync 乾跑 新 0 · 變 0 · 撞號 0;編號 audit 基準 main d6c304d92(第一段已由 PR #376 併入)101,489 → 101,625(+136)遺失 0 · 改身分 0 · 重號 0(冊內紅列 21 與 HEAD 同);PR #376 的 Windows UAT 在 handoff check 紅(缺收據)由本段補齊;SDD 綠 14 · 黃 X-REQ-OPEN 17 · X-LOCK 6;交接測試 8/8 rc 0 且見標記;checkpoint 交接 GREEN · 驗收 YELLOW(待辦 25)。收尾量到交接盲點:CGC_MDL140 v0101 沿用只比收據雜湊、不重掃相依樣式 → entry / sdd 首跑被沿用而沒測新尾版;本批把 5 張相依集合變了的收據存 history 後真跑,v0102 修正掛 VCGC-REQ075:reuse-glob;X-LOCK 重鎖掛 VCGC-REQ030:relock(驗收輪)。函式庫建議 TOP 15 + 每功能 TOP 10 + Streamlit / Rich 部署見批文件(只建議,安裝是操作員的手)。",
+      "category": "SSOT 全景上下單向檢測 · 編號只登本批 · 交接收尾",
+      "component": "側線 2026-09-29 i(主線批號由併線的手指定 L25)· CGC_MDL247 v0100 · CGC_MDL237 v0108 · CGC_MDL245 v0104 · CGC_MDL149 v0178 · CGC_MDL158 v0117 · VIA-VCGC-MDL1476–1480 · VIA-SUP-MDL1182 · VIA_AI_FunctionCard_SSOT_v0100(VIA-VCGC-SSOT055)· VIA_Requirements_SSOT_v0104(VIA-VCGC-SSOT056)· VIA_Workflow_VCGC_SSOT_v0103(VIA-VCGC-SSOT057)· VIA_Workflow_VRN_SSOT_v0103(VIA-VRN-SSOT168)· 交接冊 +2 case +10 工作項(VIA-VCGC-LGC152–163)· docs/VIA_S20260929i_SSOTPanorama.md"
+    },
+    {
+      "ts": "2026-09-29 20:10",
+      "op": "ADD",
+      "code": "Codex #377 P1(本 PR 審查):v0104 已由 PR #376 併入 main,收尾卻就地改了 VCGC-REQ078 與 reviewed(違反 AGENTS.md 第 4 條「修改開新版」)。修正:v0104 還原成與 main 位元一致;同一批改動改以 VIA_Requirements_SSOT_v0105.json 發布(prior v0104 · why_v0105;其餘 108 條一字不動;LL334 242 分支無 v0105)。編號只增:+VIA-VCGC-SSOT058(v0105)· SSOT056 內容指紋照引擎換回 main 原樣(1d614246f9d1 → 9e56a92292de);audit 基準 main 101,489 → 101,626 遺失 0 · 改身分 0 · 重號 0。同一輪 CI 另量到總控頁合約測試紅(中央治理模組 255 → 256 未重產),照 LL49 在乾淨工作樹重產,合約 19/19 · 瀏覽器 UAT 過。交接快照重存(需求冊兩檔換)。",
+      "category": "已併入版號不就地改(Codex #377 P1)· 總控頁重產",
+      "component": "VIA_Requirements_SSOT_v0105(VIA-VCGC-SSOT058)· VIA_Requirements_SSOT_v0104 還原 · VIA_UI_MasterControl_v0100.html · docs/VIA_S20260929i_SSOTPanorama.md"
+    },
+    {
+      "ts": "2026-09-30 09:38",
+      "op": "ADD",
+      "code": "操作員令「SSOT / 自動編號 / 含版本及時間自動註冊 / WORKFLOW SSOT / REGEX / 同義字管理等將邏輯管理編號架構及可能的風險從新整理優化一遍」→ VCGC-REQ084(PARTIAL)。架構正本 VIA_Registry_Architecture_SSOT_v0100:A0–A6 七層 · 11 號碼空間(正則)· 實體主號與別名 · 冊的可改性(snapshot / living / pointer / generated)· 時間規範(新寫入 UTC +00:00,舊格式保留)· 登錄 8 步 · 風險 R01–R15。防線(新版號檔):CGC_MDL237 v0109 `--apply --scope` 只登本批 + audit 註冊完整性六檢(IMMUT / DUPREG / XCODE 紅 · FPSTALE / UNCOMMITTED / TIMEFMT 黃);CGC_MDL140 v0102 收據沿用前比相依集合;CGC_MDL233 v0104 席位唯一 · activated_at · 名冊換名出新版;VCGC v0179 元件註冊新時間補 UTC;引擎版本冊 VIA-TOOL-0212 engine → candidate(R06)。編號只登本批 13 檔 +79 列,audit 基準 main e48318c38 101,626 → 101,705 遺失 0 · 改身分 0 · 重號 0 · 註冊完整性 0。Z280 以只增結案列結案(就地劃線會讓編號判 gone,已改回)。總控頁重產,合約 19/19;交接 9 案因相依集合變動全部重跑。",
+      "category": "編號 · 註冊 · SSOT 治理架構重整與風險治理(VCGC-REQ084)",
+      "component": "側線 2026-09-30 a · VIA_Registry_Architecture_SSOT_v0100(VIA-VCGC-SSOT059)· CGC_MDL237 v0109(VIA-VCGC-MDL1484)· CGC_MDL140 v0102(VIA-VCGC-MDL1481)· CGC_MDL149 v0179(VIA-VCGC-MDL1482)· CGC_MDL233 v0104(VIA-VCGC-MDL1483)· VIA_Requirements_SSOT_v0106(VIA-VCGC-SSOT060 · VIA-VCGC-REQ084)· VIA_Workflow_VCGC_SSOT_v0104(VIA-VCGC-SSOT061)· 交接冊 VIA-VCGC-LGC164–170 · VIA_UI_MasterControl_v0100.html · docs/VIA_S20260930a_RegistryArchitecture.md"
+    },
+    {
+      "ts": "2026-09-30 11:23",
+      "op": "ADD",
+      "code": "操作員令「VCGC所有功能盤點如先前所說用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」→ VCGC-REQ085(PARTIAL);操作員續令「目前進頓交接」「先完成手頭部分開PR」→ 本段收在盤點冊 · 串測引擎 · VCGC 入口,PS 操作台 v0108 列下一段。盤點冊 VIA_VCGC_FunctionInventory_SSOT_v0100 74 站(動詞 40 / 席位 6 / 必用卡 13 / 交接案 10 / 工作流步 39 / PS 1;新 0 · 缺 0;64 支容器實測寫已追蹤檔 0);CGC_MDL224_TestAuto v0101(照冊跑站 · 動詞 AST 自動盤點 · 250 支 CGC 尾版 compile + 橋 · 改過的尾版自動自測 · 紀錄冊版本 · sha · UTC 時間只增 · 沿用 · 防遞迴;自測 10/10);VCGC v0180(test 走尾版 · enter 先串測 · help 入口回尾版;自測 6/6)。最終整輪 76 站 綠 64 · 黃 9 · 紅 3(Z286 兩站 · 本機舊格子存證一站),紀錄冊 baseline 295 + 變更 5。編號只登本批 +59 遺失 0 · 改身分 0 · 重號 0 · 註冊完整性 0;交接 10 案 rc 0 · check GREEN(驗收 YELLOW);總控頁合約 19/19。",
+      "category": "VCGC 全功能盤點與串測(VCGC-REQ085 第一段)",
+      "component": "側線 2026-09-30 b · VIA_VCGC_FunctionInventory_SSOT_v0100 · CGC_MDL224_TestAuto_v0101 · CGC_MDL149_VeritasCentralGovernanceConsole_v0180 · VIA_VCGC_FunctionLedger_v0100.jsonl · VIA_Requirements_SSOT_v0108(VIA-VCGC-REQ085)· VIA_Workflow_VCGC_SSOT_v0105(WKF001-STP008)· 功能卡 · CLAUDE.md · 交接冊 case chain · 掉球 Z286 · docs/VIA_S20260930b_VCGCChain.md"
+    },
+    {
+      "ts": "2026-09-30 12:00",
+      "op": "ADD",
+      "code": "Codex 對已併 PR #378 的四條審查(2 P1 · 2 P2)都成立,新版號檔修:CGC_MDL237_NumberingSystem_v0110(沒有真基準不退回 HEAD、拒跑 rc 2;明列檔也不收未提交)· CGC_MDL233_ToolActivate_v0105(名冊 prior 一律指回直接前版;席位恰一列)。自測 5/5 + v0109/v0108 鏈 · +4/4 + v0100–v0104 鏈。編號只登本批 +19 遺失 0 · 改身分 0 · 重號 0;交接 11 案 · check GREEN;串測 --quick 把兩支更新尾版自動自測(綠)並記紀錄冊 +3;總控頁重產 19/19。",
+      "category": "Codex #378 跟進(只登本批的真基準 · 啟用閘名冊鏈與席位)",
+      "component": "CGC_MDL237_NumberingSystem_v0110 · CGC_MDL233_ToolActivate_v0105 · 交接冊工作項 VCGC-REQ084:codex378-numbering / -activation · docs/VIA_S20260930b_VCGCChain.md 第六節"
+    },
+    {
+      "ts": "2026-09-30 13:35",
+      "op": "ADD",
+      "code": "側線 2026-09-30 b 第二至四段(操作員令「go on」「收尾VCGC」「先把這個面檢視實測的工具整合為一」「給我一個整合後的POWRESHELL跳書HTML報告」「請加入PS加速器模板…VDF加入最新的網路工具」「跑完直接開PR合併給我指令」)。① 唯一 PS 入口 Invoke-VIA-OperatorConsole-v0108(①g 串測 · ⑦ 帶紀錄冊),pwsh 實跑抓到串測引擎兩缺陷 → CGC_MDL224_TestAuto v0102(PS 版號 -vNNNN · 串測自開輪號 · 報告 hub;Z287 結)。② Z286 備份門分真跑與計畫 → CGC_MDL221 v0101 · CGC_SystemManager v0111(席位 VCGC → v0111);需求冊 v0109 REQ085 → COVERED;盤點冊 v0101。③ 整合全景實測 CGC_MDL248_FullCheck v0100 + launchers/Invoke-VIA-FullCheck-v0100.ps1:⓪ 三橋覆蓋與最新版 → ① VCGC 串測 → ② SSOT 全景 → ③ 單一路徑 → ④ 自測格子 → ⑤ 交接,紅了照跑,跳 HTML;每段尾版 · 版號 · sha16 · UTC · 秒數只增寫 VIA_VCGC_FullCheck_Ledger_v0100.jsonl;自測 9/9;pwsh 實跑六段跑到底。④ 三橋補缺(Z288 結):VDF 網路橋 131/131 · PS 25 加速器橋 73 支補齊 928/928(pwsh Parser 0 錯);載入 Celeritas v1141 / Aegis v1652 = 樹上最新。需求冊 v0110(+REQ086)· 盤點冊 v0102 · 交接 13 案 rc 0 · check GREEN(驗收 YELLOW)· 編號只登本批遺失 0 · 改身分 0 · 重號 0。CI 反覆紅根因:收尾中途推送 + PR 在中間狀態被合併(#380 · #383);改為本機收尾綠了才一次推送,並建議 main 開必過狀態檢查。",
+      "category": "VCGC 收尾 · 整合全景實測一鍵 PS · 三橋補缺(VCGC-REQ085 / REQ086)",
+      "component": "Invoke-VIA-OperatorConsole-v0108.ps1 · CGC_MDL224_TestAuto_v0102 · CGC_MDL221_SystemBackup_v0101 · CGC_SystemManager_v0111 · CGC_MDL248_FullCheck_v0100 · launchers/Invoke-VIA-FullCheck-v0100.ps1 · VIA_Requirements_SSOT_v0109/v0110 · VIA_VCGC_FunctionInventory_SSOT_v0101/v0102 · 交接冊 case backup · fullcheck · 掉球 Z286 · Z287 · Z288 · docs/VIA_S20260930b_VCGCChain.md 第七至十節"
     }
   ],
-  "updated_at": "2026-09-28 05:25",
+  "updated_at": "2026-09-30 13:35",
   "batch": "批731"
 }

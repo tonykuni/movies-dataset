@@ -1,0 +1,67 @@
+{
+ "schema": "VIA.Workflow.SDD.v1",
+ "version": "v0100",
+ "subsystem": "VAP",
+ "zh": "視覺繪圖工作流",
+ "batch": "R33",
+ "ts": "2026-09-28",
+ "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
+ "sdd": {
+  "layers": [
+   "spec(目標 · 需求 REQ 代碼 · 驗收)",
+   "plan(進出口 · 順序 · 正主)",
+   "steps(STP 代碼 · 引擎 · 動詞 · 中樞觀測鍵)",
+   "tests(自測 self · 交叉 cross · 實測 real)",
+   "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
+  ],
+  "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+ },
+ "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
+ "workflows": [
+  {
+   "code": "VAP-WKF001",
+   "alias": "vap_charts",
+   "name": "VAP 圖表(儀表板→標準儀表板→Seaborn 垂直圖組)",
+   "kind": "item_chain",
+   "spec": {
+    "goal": "VAP 圖表(儀表板 → 標準儀表板 → 垂直圖組)",
+    "requirements": [],
+    "acceptance": [
+     "各項 rc 0 或誠實四態"
+    ]
+   },
+   "plan": {
+    "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+    "profile": "run",
+    "order": "依序;net 項要操作員同意閘(L07/L08)"
+   },
+   "steps": [
+    {
+     "code": "VAP-WKF001-STP001",
+     "alias": "vap_dashboard",
+     "item": "vap_dashboard"
+    },
+    {
+     "code": "VAP-WKF001-STP002",
+     "alias": "vap_std_dashboard",
+     "item": "vap_std_dashboard"
+    },
+    {
+     "code": "VAP-WKF001-STP003",
+     "alias": "vap_stack",
+     "item": "vap_stack"
+    }
+   ],
+   "tests": {
+    "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+    "cross": [
+     "X-ITEM",
+     "X-OLD"
+    ],
+    "real": "via-console run --workflow vap_charts(或逐項 call --item)"
+   },
+   "from": "VIA_Workflow_SSOT_v0100.json#vap_charts"
+  }
+ ]
+}
