@@ -2,7 +2,7 @@
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0100",
  "batch": "側線 2026-09-30 b",
- "ts": "2026-09-30T10:19:01+00:00",
+ "ts": "2026-09-30T11:26:24+00:00",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
@@ -925,6 +925,21 @@
    "timeout": 600
   },
   {
+   "id": "C-vdfstart",
+   "name": "交接案 vdfstart(CGC_MDL209_VdfStart --selftest;載 VDF 管理器尾版)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL209_VdfStart",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL209_VdfStart_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
    "id": "P-entry",
    "name": "唯一 PS 入口:語法(pwsh Parser)+ 串測步在",
    "kind": "ps",
@@ -1152,6 +1167,9 @@
    },
    "chain": {
     "station": "C-chain"
+   },
+   "vdfstart": {
+    "station": "C-vdfstart"
    }
   },
   "workflow": {

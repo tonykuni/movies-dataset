@@ -243,6 +243,19 @@
         "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json"
       ],
       "timeout_seconds": 300
+    },
+    "vdfstart": {
+      "argv": [
+        "CGC_MDL209_VdfStart",
+        "--selftest"
+      ],
+      "success_marker": "[OK]",
+      "scope": "VDF 啟動門跟管理器尾版(PR #380 併入 main:CGC_MDL209_VdfStart v0101 · VDF_SystemManager v0120;沒有交接案涵蓋 → main 的 handoff check 紅,本批帶進收據)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL209_VdfStart_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -463,6 +476,13 @@
       "owner": "AI(下一段)",
       "reason": "串測首輪抓到 Z286:CGC_MDL221_SystemBackup 自測只要 VIA_Reports/vdf_chain/VDFCHAIN_latest.json 存在就判 chain_file 失敗(CGC_SystemManager 自測連帶紅);工作站跑過 VDF 鏈也一樣紅",
       "next": "出 CGC_MDL221 新版:備份冊與現況的比法改成『冊記的狀態 vs 報告時間』或由冊明示 chain 報告允許存在;不改 v0100、不刪報告"
+    },
+    {
+      "id": "VCGC-REQ085:base-380",
+      "requirement": "VCGC-REQ085",
+      "state": "VERIFIED",
+      "case": "vdfstart",
+      "receipt": "docs/handoff/evidence/vdfstart.json"
     }
   ]
 }
