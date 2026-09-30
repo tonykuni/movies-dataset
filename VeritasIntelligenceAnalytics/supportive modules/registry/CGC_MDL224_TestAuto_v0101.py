@@ -274,7 +274,7 @@ def changes(before: dict, now_items: dict) -> list:
         old = before.get(key)
         if old is None:
             out.append(("added", key, it, None))
-        elif (old.get("file"), old.get("sha16")) != (it["file"], it["sha16"]):
+        elif (old.get("file"), old.get("sha16") or "") != (it["file"], it.get("sha16") or ""):     # 紀錄冊不寫空值:空 sha 與缺欄同義
             out.append(("changed", key, it, {"file": old.get("file"), "sha16": old.get("sha16"), "ts": old.get("ts")}))
     for key in sorted(set(before) - set(now_items)):
         out.append(("removed", key, before[key], None))
@@ -604,14 +604,16 @@ def selftest() -> int:
         st = ledger_state(led)
         ch = changes(st, {"family:A": {"kind": "family", "file": "A_v0101.py", "sha16": "3"},
                           "family:C": {"kind": "family", "file": "C_v0100.py", "sha16": "4"}})
+        append_ledger(led, [{"id": "verb:x", "event": "baseline", "file": "V_v0100.py"}])
+        same_verb = [c for c in changes(ledger_state(led), {"verb:x": {"kind": "verb", "file": "V_v0100.py", "sha16": ""}}) if c[1] == "verb:x"]
         before_bytes = led.read_bytes()
         append_ledger(led, [{"id": "family:A", "event": "changed", "file": "A_v0101.py", "sha16": "3"}])
         grown = led.read_bytes()
         st2 = ledger_state(led)
     chk("③ sha16 把 CRLF 當 LF(工作站 autocrlf 不假變更)", same)
     chk("④ compile 在記憶體:語法錯抓到 · 橋標記與 --selftest 認得", not cb["ok"] and cg["ok"] and cg["bridge"] and cg["selftest"], cb["why"])
-    chk("⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新",
-        n0 == 2 and sorted(e for e, *_ in ch) == ["added", "changed", "removed"] and grown.startswith(before_bytes)
+    chk("⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新 · 沒 sha 的項(動詞)沒變不重記",
+        n0 == 2 and sorted(e for e, *_ in ch) == ["added", "changed", "removed"] and grown.startswith(before_bytes) and same_verb == []
         and st2["family:A"]["file"] == "A_v0101.py", [e + ":" + k for e, k, *_ in ch])
     st_a = {"id": "x", "argv": ["status"], "deps": []}
     chk("⑥ 燈:rc 0 綠 · 標記沒見到 黃 · yellow_rc 黃 · 其餘紅",
