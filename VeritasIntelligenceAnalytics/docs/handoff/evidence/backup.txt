@@ -30,24 +30,12 @@
 [政策] L50 全景 · 尾版 551 · import 0 · 提及 44 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0102.py(家族 core)
-  [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
-  [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
-  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0108.ps1
-  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-OperatorConsole-v0108.ps1
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20260930-124007-6007', 'hub': 'go-20260930-120000-1'}
-  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
-  [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
-  [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
-  [OK] ③ sha16 把 CRLF 當 LF(工作站 autocrlf 不假變更)
-  [OK] ④ compile 在記憶體:語法錯抓到 · 橋標記與 --selftest 認得 · SyntaxError L1: invalid syntax
-  [OK] ⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新 · 沒 sha 的項(動詞)沒變不重記 · ['changed:family:A', 'added:family:C', 'removed:family:B']
-  [OK] ⑥ 燈:rc 0 綠 · 標記沒見到 黃 · yellow_rc 黃 · 其餘紅
+  [via-vcgc run] [流程] 政策過 · CGC_MDL221_SystemBackup_v0101.py(家族 core)
+  [OK] ① 鏈報告判法:不在 ABSENT · 真跑 RAN_AFTER_BACKUP · 計畫 / 非鏈跑器 / 讀不到 NOT_A_RUN · {'absent': 'ABSENT', 'run': 'RAN_AFTER_BACKUP', 'plan': 'NOT_A_RUN', 'foreign': 'NOT_A_RUN', 'bad': 'NOT_A_RUN'}
+  [OK] ② 冊本身(五檔 · 兆豐 MEGA · 引擎 NODATA)照 v0100 過:沒有鏈報告時 lock_success · green 8 · kept_show IBF · 0
+  [OK] ③ 真跑過鏈:不判 chain_file · stale 標出來 · next 說要重備(不自動改冊)
+  [OK] ④ 計畫寫出的報告 / 非鏈跑器 / 讀不到:照舊 chain_file(do_not 第一條守住)
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
-[VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
-  [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0101.json · 0
-  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 75
-  [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
-  CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
-  CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
+  [OK] ⑤ 只收 VCGC · 實樹鎖定成立(鏈報告現況 RAN_AFTER_BACKUP;計畫寫出的報告照樣紅) · 0
+  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 不動
+  CGC_MDL221_SystemBackup_v0101 selftest 6/6 PASS
