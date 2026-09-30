@@ -172,6 +172,7 @@ def selftest() -> int:
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         prc = PRIOR.selftest()
+    print(buf.getvalue().rstrip())                   # 前版鏈的判決行照印(交接案例 numbering 的 marker 在這裡)
     chk("前版 v0110(含本體鏈)自測", prc == 0, (buf.getvalue().strip().splitlines() or [""])[-1])
     ka = {"BAML": "BOFA", "ML": "BOFA"}
     coarse = {"STRONG_SELL": "SELL", "SELL": "SELL", "STRONG_BUY": "BUY", "BUY": "BUY", "HOLD": "HOLD"}
