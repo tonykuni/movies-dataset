@@ -355,3 +355,4 @@
 | Z284 | VRN 實測樣本夾 C:\測試樣本報告 在工作站,容器照實 ABSENT;容器以合成樣本 + 倉內真 PDF 實測 ENG392。掃描影像頁要 OCR(本機沒有 pytesseract / tesseract)= IMAGE_NO_OCR 黃燈;第二讀法 pdfplumber 缺件。工作站跑 `via-vcgc go` 即以樣本夾實測 | 開 | — | R30 |
 | Z285 | PS 模板章既有債 53 支(0/53):正是 R16-9 剖析器驗證加章時具名跳過的那批(雜湊登記 · 凍結 · 非 UTF-8 · 剖析不過 · 具名區塊 · 參數撞名),自動加章會破壞它們;要逐支人工處理或出新版號改寫 | 開 | — | R30 |
 | ~~Z280~~(結) | 五碼版號檔 `vdf_akshare_dedup_invalid_quarantine_gate_v02783.py` 編號冊沒號 | **已結(側線 2026-09-29 i 修 · 2026-09-30 a 轉態)** | AI | 實測根因不是五碼:NOT_LIVE 把檔名裡的 `_quarantine` 當隔離夾;CGC_MDL237 v0108 只比目錄,已編 VIA-SUP-MDL1182(+FNC 1)。版號異形另由 Z279 追(R29 · 風險冊 R12) |
+| Z286 | VCGC 全功能串測首輪(側線 2026-09-30 b)抓到:`CGC_MDL221_SystemBackup_v0100` 自測只要 `VIA_Reports/vdf_chain/VDFCHAIN_latest.json` 存在就判 `chain_file` 失敗,`CGC_SystemManager_v0110` 自測連帶 FAIL。乾淨工作樹綠、跑過 VDF 鏈的機器(容器 9/29 · 工作站)一律紅 —— 備份冊記的是「引擎 NODATA」時點,報告一出現就判冊過期,但訊息只寫 chain_file | 開 | AI(交接待辦 VCGC-REQ085:backup-stale) | 串測站 L-backup · S-vcgc-manager 照實紅,不改站、不刪報告 |
