@@ -85,7 +85,8 @@
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0109.py",
     "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
-    "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py"
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -233,14 +234,15 @@
         "CGC_MDL224_TestAuto",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS",
+      "success_marker": "CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS",
       "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
         "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
         "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json",
         "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json",
-        "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json"
+        "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
+        "Invoke-VIA-OperatorConsole-v*.ps1"
       ],
       "timeout_seconds": 300
     },
@@ -464,10 +466,13 @@
     {
       "id": "VCGC-REQ085:ps-entry",
       "requirement": "VCGC-REQ085",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(下一段)",
       "reason": "操作員令「先完成手頭部分開PR」:本段先交盤點冊 · 串測引擎 · VCGC 入口;唯一 PS 入口(操作台)還沒串進來,盤點冊 P-entry 站照實黃「待辦」",
-      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑"
+      "next": "出 Invoke-VIA-OperatorConsole-v0108.ps1(v0107 一字不動;操作員本令即 L70 逐次許可):①a 後加 ①g console test(-Full → --full;紅 → exit 2)· ⑦ 上傳帶 VIA_VCGC_FunctionLedger_v0100.jsonl;pwsh Parser 驗 + 容器實跑",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json",
+      "resolved": "側線 2026-09-30 b 第二段:Invoke-VIA-OperatorConsole-v0108.ps1(①g 串測 · ⑦ 帶紀錄冊;v0107 一字不動)pwsh 實跑抓到兩個串測引擎缺陷,出 CGC_MDL224_TestAuto v0102 修:版號認 -vNNNN(P-entry 不再誤判 ABSENT · 紀錄冊記到 PS 入口版本)· 串測自開 test-… 輪號(站事件不進操作台 go 輪,工作流順序不再假紅);案 chain 相依加 PS 入口"
     },
     {
       "id": "VCGC-REQ085:backup-stale",
