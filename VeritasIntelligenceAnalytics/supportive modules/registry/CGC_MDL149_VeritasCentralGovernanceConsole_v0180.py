@@ -115,7 +115,7 @@ def help_catalog():
     return card
 
 
-def show_current_help():
+def _show_help_v0180():   # 不叫 show_current_help:元件冊以最新定義檔記來源,v0177 的記錄要留在 v0177(交接冊管它)
     if _SHOW is not None:
         _SHOW()
     print("  " + TEST_LINE)
@@ -127,7 +127,7 @@ if _SHOW_MOD is not None:                                 # only the modules bel
         if "help_catalog" in vars(_m):
             _m.help_catalog = help_catalog
         if "show_current_help" in vars(_m):
-            _m.show_current_help = show_current_help
+            _m.show_current_help = _show_help_v0180
 
 
 # ---------------------------------------------------------------- ① test → the newest CGC_MDL224 tail through run
