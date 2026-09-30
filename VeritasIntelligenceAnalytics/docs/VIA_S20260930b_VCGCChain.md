@@ -216,6 +216,7 @@ git pull; pwsh -NoProfile -ExecutionPolicy Bypass -File .\VeritasIntelligenceAna
 | main #998(PR #380) | `handoff check` 紅 | 新尾版沒有交接案涵蓋就併進 main(當時補:案 vdfstart) |
 | main #1005(PR #383) | `handoff check` 紅 16 條(收據失效 · 改過沒測 · fullcheck 收據不在) | PR 在本分支**收尾做到一半**時被合併(393425bab = 註冊同步那一步;收據與 checkpoint 還沒提交) |
 | 分支各中間推送 | 同上 | 收尾每一步都推送,中間狀態本來就紅 |
+| PR #384(run 36723641938) | 合約測試 test_22 `ConnectionAbortedError [WinError 10053]`(交接已綠) | DeckServer 拒絕 POST 時沒讀掉請求本文就關連線,Windows 送 RST(時序競態;Z289)→ `CGC_MDL095_DeckServer_v0161` 拒絕前先讀掉本文 |
 
 防法:
 1. AI 端(本段起照做):收尾在本機全部跑完(註冊 → 編號 → 稽核 → 交接各案 → checkpoint → check 綠 → 整輪串測),**才一次推送**;中途不推。
