@@ -1,0 +1,512 @@
+{
+  "schema": "VIA.RegistryArchitecture.v1",
+  "version": "v0100",
+  "batch": "側線 2026-09-30 a",
+  "ts": "2026-09-30T08:58:36+00:00",
+  "why": "操作員令(2026-09-30):「SSOT / 自動編號 / 含版本及時間自動註冊 / WORKFLOW SSOT / REGEX / 同義字管理等將邏輯管理編號架構及可能的風險從新整理優化一遍」。本冊是編號 · 註冊 · SSOT 治理架構的唯一正本:分層 · 號碼空間 · 冊的可改性 · 時間格式 · 寫入流程 · 對照規則 · 風險冊;CGC_MDL237 v0109 audit 照本冊的 mutability / time / registers 檢查。數字皆為本批實測(measured_at)。",
+  "measured_at": "2026-09-30T08:58:36+00:00",
+  "principles": [
+    "一個實體一個主號:每類實體指定唯一主號空間,其餘只當別名,且別名必須能由對照鍵推回主號(不得各自再發新號)",
+    "號碼是身分:發出去不改、不刪、不重用;不見了記 gone / RETIRED / retired_at,改號只准讓號並留 recoded_from · recoded_at · recode_why",
+    "版號檔(snapshot)一經發布就不可就地改;要改出新版號檔(prior 指回前版)。活冊(living)可就地寫,但只增不減、狀態轉移要帶時間",
+    "指標列(pointer)只由它的閘改(工具啟用閘 · 座位冊);歷史留在 previous / candidate 列,不靠覆寫",
+    "新寫入的時間一律 UTC ISO-8601 帶時區(+00:00);舊格式照舊保留,不回頭改寫",
+    "寫入只登本批範圍(操作員 2026-09-29「既有範圍內註冊 不要擴張範圍」);全量重建要操作員下令",
+    "先提交再編號:編號的 updated_at 取來源的 git 提交時間,未提交的檔不發號"
+  ],
+  "layers": [
+    {
+      "id": "A0",
+      "name": "檔案家族名",
+      "what": "<系統>_<MDL|ENG><三碼>_<名>_v<四碼>.<副檔名>;新功能 = 新版號檔(L04)",
+      "book": "VIA_Naming_Registry_v0100.json",
+      "writer": "命名冊(先發先得 · 實體檔零改名)"
+    },
+    {
+      "id": "A1",
+      "name": "元件註冊",
+      "what": "每個活的類別 / 函式 / 模組 / 套件 / 工具 / 引擎 / 系統 / 環境一個 VIA-<類>-<四碼>",
+      "book": "VIA_Component_Inventory_SSOT_v0100.json",
+      "writer": "VCGC registry-sync(CGC_MDL149;v0174 起避開他冊已發號;v0179 起新時間寫 UTC)"
+    },
+    {
+      "id": "A2",
+      "name": "中央編號(無所不編號)",
+      "what": "26 類 × 子系統 × 分類,鍵 = 內容鍵@版本;對照層:每列帶 source 路徑與 name,可接回 A0 / A1",
+      "book": "VIA_Numbering_SSOT_v0100.json + VIA_NumberBooks/*.jsonl",
+      "writer": "CGC_MDL237(v0109 起 --apply --scope 只登本批;audit 含註冊完整性檢查)"
+    },
+    {
+      "id": "A3",
+      "name": "工具版本與啟用",
+      "what": "鎖版工具六家(accelerator · network · layout · nlp · token · frame)的現役指標與歷史",
+      "book": "VIA_ToolVersion_Lock_v0100.json + VIA_EngineVersion_Register_v0100.json",
+      "writer": "CGC_MDL233 tools activate(v0104 起引擎列唯一 · 記 activated_at · 名冊改寫出新版)"
+    },
+    {
+      "id": "A4",
+      "name": "治理代碼",
+      "what": "需求 <子系統>-REQ### · 工作流 <子系統>-WKF### · 步 -STP###;中央編號鏡像 VIA-<代碼>",
+      "book": "VIA_Requirements_SSOT_v*.json · VIA_Workflow_*_SSOT_v*.json · VIA_LampLock_v*.json",
+      "writer": "版號冊(每次改出新版)· SDD 驗證 CGC_MDL245"
+    },
+    {
+      "id": "A5",
+      "name": "政策與待辦",
+      "what": "律 L### · 教訓 LL### · 掉球 Z### · 交接待辦(工作項)",
+      "book": "VIA_Policy_Laws_SSOT_v0100.json · docs/VIA_DroppedBalls_B507.md · VIA_Handoff_Continuity_SSOT_v0100.json",
+      "writer": "律冊(活冊)· 批文件 · 交接台 CGC_MDL140"
+    },
+    {
+      "id": "A6",
+      "name": "帳本",
+      "what": "每批一筆(只增);附 11 個並存命名空間的說明",
+      "book": "VIA_AutoCode_Registry_v0100.json",
+      "writer": "每批收尾"
+    }
+  ],
+  "namespaces": [
+    {
+      "id": "NS-NM",
+      "pattern": "^(CHW|GRP|VIA|PLG|VAP|VDF|VRN|SUP|CGC|FLOW)_(ENG|MDL)\\d{3}$",
+      "example": "CGC_MDL237",
+      "layer": "A0",
+      "authority": "主號(檔案家族)",
+      "mint": "命名冊 counters 各家 +1(CHW_ENG 46 · GRP_ENG 87 · VIA_ENG 313 · PLG_ENG 18 · VAP_ENG 240 · VDF_ENG 228 · VRN_ENG 391 · SUP_MDL 866 · CGC_MDL 184 · FLOW_ENG 24 · FLOW_MDL 3)",
+      "crosswalk": "檔名前綴;A2 的 MDL / ENG 列 name = 檔名主幹"
+    },
+    {
+      "id": "NS-COMP",
+      "pattern": "^VIA-(FNC|CLS|MDL|PKG|TOOL|FNT|ENG|SYS|ENV)-\\d{4}$",
+      "example": "VIA-FNC-12330",
+      "layer": "A1",
+      "authority": "別名(元件註冊視圖)",
+      "mint": "counters 各類 +1;v0174 起取 計數器 · 冊內最大 · 他冊已發 之大 +1",
+      "crosswalk": "records[].source + identity ↔ A2 列 source + name(函式 / 類別取 模組列 + q)"
+    },
+    {
+      "id": "NS-TOOL",
+      "pattern": "^VIA-(TOOL|SYS)-\\d{4}$",
+      "example": "VIA-TOOL-0194",
+      "layer": "A3",
+      "authority": "主號(工具 · 與 NS-COMP 共用 VIA-TOOL 空間)",
+      "mint": "引擎版本冊 where=this register 手寫;共用空間由 VCGC v0174 minted_elsewhere 防撞",
+      "crosswalk": "rows[].file ↔ A2 TOOL 列 name"
+    },
+    {
+      "id": "NS-NUM",
+      "pattern": "^VIA-[A-Z]+-[A-Z]{2,4}\\d{3,4}(-[A-Z]{2,4}\\d{3})*$",
+      "example": "VIA-VCGC-MDL1476-FNC001",
+      "layer": "A2",
+      "authority": "中央主號(函式 / 類別 / SSOT 冊 / 正則 / 同義字 / 參數 / 政策…)",
+      "mint": "同父層同類下一號(連續);鍵 = 內容鍵@版本",
+      "crosswalk": "本身即對照層"
+    },
+    {
+      "id": "NS-FM",
+      "pattern": "^VIA-VDF-FM-[A-Z]{2,3}-[A-Z]{3}-\\d{4}$",
+      "example": "VIA-VDF-FM-TW-EQT-0149",
+      "layer": "A2",
+      "authority": "中央主號(金融商品)",
+      "mint": "市場 · 資產別下一號",
+      "crosswalk": "key = 代號@版本"
+    },
+    {
+      "id": "NS-GOV",
+      "pattern": "^(VCGC|VDF|VRN|VAP|SUP)-(REQ\\d{3}|WKF\\d{3}(-STP\\d{3})?)$",
+      "example": "VCGC-WKF001-STP007",
+      "layer": "A4",
+      "authority": "主號(治理代碼)",
+      "mint": "冊內從 001 連續(X-CODE)",
+      "crosswalk": "A2 鏡像 = 'VIA-' + 代碼(X-NUM)"
+    },
+    {
+      "id": "NS-LAW",
+      "pattern": "^L{1,2}\\d+$",
+      "example": "L50 · LL443",
+      "layer": "A5",
+      "authority": "主號(律 / 教訓)",
+      "mint": "律冊",
+      "crosswalk": "A2 PLCY 列"
+    },
+    {
+      "id": "NS-Z",
+      "pattern": "^Z\\d+$",
+      "example": "Z280",
+      "layer": "A5",
+      "authority": "主號(掉球)",
+      "mint": "掉球帳下一號(LL334 全分支掃過再取)",
+      "crosswalk": "交接工作項 / 需求 next 欄引用"
+    },
+    {
+      "id": "NS-R22",
+      "pattern": "^(TL|TS)-\\d{4}$",
+      "example": "TL-0017",
+      "layer": "A2",
+      "authority": "別名(R22 工具 / 測試表)",
+      "mint": "R22 表",
+      "crosswalk": "A2 TOOL / TST 列 key = r22|<別名>@<版本>"
+    },
+    {
+      "id": "NS-LEDGER",
+      "pattern": "^\\d+$",
+      "example": "1363",
+      "layer": "A6",
+      "authority": "主號(帳本序)",
+      "mint": "ledger[] 長度 +1",
+      "crosswalk": "帳本 component 欄列出本批各號"
+    },
+    {
+      "id": "NS-BATCH",
+      "pattern": "^(批\\d+|側線 \\d{4}-\\d{2}-\\d{2} [a-z])$",
+      "example": "側線 2026-09-30 a",
+      "layer": "A6",
+      "authority": "主號(批次)",
+      "mint": "主線批號由併線的手指定(L25);側線 = 日期 + 字母",
+      "crosswalk": "批文件 docs/VIA_S<日期><字母>_*.md"
+    }
+  ],
+  "entity_primary": [
+    {
+      "entity": "檔案家族(模組 / 引擎)",
+      "primary": "NS-NM",
+      "aliases": [
+        "NS-COMP VIA-MDL/ENG",
+        "NS-NUM MDL/ENG"
+      ]
+    },
+    {
+      "entity": "版號檔(一個版本)",
+      "primary": "NS-NUM MDL/ENG 列(鍵 = 路徑@版本)",
+      "aliases": [
+        "NS-COMP VIA-MDL/ENG"
+      ]
+    },
+    {
+      "entity": "函式 / 類別",
+      "primary": "NS-NUM FNC/CLS(掛在模組列下)",
+      "aliases": [
+        "NS-COMP VIA-FNC/CLS",
+        "命名冊 fnc 表 FNC###"
+      ]
+    },
+    {
+      "entity": "鎖版工具",
+      "primary": "NS-TOOL(引擎列 = 席位 · 其餘列 = 版本)",
+      "aliases": [
+        "NS-NUM TOOL",
+        "NS-R22 TL-####"
+      ]
+    },
+    {
+      "entity": "需求 / 工作流 / 步",
+      "primary": "NS-GOV",
+      "aliases": [
+        "NS-NUM REQ/WKF/STP"
+      ]
+    },
+    {
+      "entity": "SSOT 冊 · 正則 · 同義字 · 參數",
+      "primary": "NS-NUM SSOT/RGX/SYN/PRMT",
+      "aliases": []
+    }
+  ],
+  "mutability": {
+    "classes": {
+      "snapshot": "版號冊:發布後不可就地改;要改就出下一個版號檔,prior 指回前版(需求冊 · 工作流冊 · 燈鎖冊 · 名冊 …)",
+      "living": "活冊:單一版號、就地寫,只增不減;狀態轉移帶時間(元件冊 · 編號冊 · 命名冊 · 帳本 · 律冊 · 交接冊 · 鎖冊 · 座位冊 · 正則字典 …)",
+      "pointer": "指標列:指向「現役」的列,只由它的閘改,歷史另存(引擎版本冊 role=engine 列 · 鎖冊各家 · 座位冊 tails)",
+      "generated": "產出:VIA_Reports/** 不入 git;docs/handoff/evidence 由交接台重產(舊收據存 history)"
+    },
+    "default_rule": "registry 夾的 <名>_v<四碼>.json:同家族在基準上 ≥2 個版號檔 = snapshot;只有一個 = living;下表列名的以下表為準",
+    "snapshot_families": [
+      "VIA_Requirements_SSOT",
+      "VIA_Workflow_VCGC_SSOT",
+      "VIA_Workflow_VDF_SSOT",
+      "VIA_Workflow_VRN_SSOT",
+      "VIA_Workflow_VAP_SSOT",
+      "VIA_Workflow_Hub_SSOT",
+      "VIA_LampLock",
+      "VIA_ToolRoster_SSOT",
+      "VIA_Accelerator_Roster_SSOT",
+      "VIA_Registry_Architecture_SSOT"
+    ],
+    "living_books": [
+      "VIA_Component_Inventory_SSOT_v0100.json",
+      "VIA_Numbering_SSOT_v0100.json",
+      "VIA_Naming_Registry_v0100.json",
+      "VIA_AutoCode_Registry_v0100.json",
+      "VIA_Policy_Laws_SSOT_v0100.json",
+      "VIA_Handoff_Continuity_SSOT_v0100.json",
+      "VIA_ToolVersion_Lock_v0100.json",
+      "VIA_EngineVersion_Register_v0100.json",
+      "VIA_VCGC_SubsystemSeat_v0100.json",
+      "VIA_SSOT_RegexDict_v0100.json",
+      "VIA_SSOT_SynonymUnion_v0100.json",
+      "VIA_AI_FunctionCard_SSOT_v0100.json"
+    ],
+    "pointer_rows": [
+      {
+        "book": "VIA_EngineVersion_Register_v0100.json",
+        "rows": "role == engine",
+        "rule": "每家恰一列 engine = 現役席位;新版先登 role=candidate(版本號),tools activate --apply 才把席位指到新版;歷史在鎖冊 previous 與 candidate 列"
+      },
+      {
+        "book": "VIA_ToolVersion_Lock_v0100.json",
+        "rows": "各家",
+        "rule": "只由 CGC_MDL233 apply 寫;previous 留前版;v0104 起帶 activated_at(UTC)"
+      },
+      {
+        "book": "VIA_VCGC_SubsystemSeat_v0100.json",
+        "rows": "tails",
+        "rule": "換尾版時同批更新"
+      }
+    ],
+    "measured": {
+      "snapshot_families_on_disk": 22,
+      "snapshot_files": 63,
+      "published_files_edited_again": 13,
+      "of_which_tails": 3,
+      "living_top_edits": {
+        "VIA_AutoCode_Registry": 1041,
+        "VIA_Component_Inventory_SSOT": 326,
+        "VIA_Policy_Laws_SSOT": 145,
+        "VIA_SSOT_RegexDict": 132,
+        "VIA_Naming_Registry": 71,
+        "VIA_Numbering_SSOT": 40
+      }
+    }
+  },
+  "time": {
+    "canonical": "YYYY-MM-DDTHH:MM:SS+00:00",
+    "canonical_regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\+00:00|Z)$",
+    "accepted_regex": [
+      "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\+00:00|Z)$",
+      "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} \\+0000$"
+    ],
+    "legacy": [
+      {
+        "format": "YYYY-MM-DD HH:MM:SS +0000",
+        "where": "編號冊 numbered_at · updated_at(git 提交時間)",
+        "zone": "UTC",
+        "count": "numbered_at 全部 · updated_at 大宗"
+      },
+      {
+        "format": "YYYY-MM-DDTHH:MM:SS(無時區)",
+        "where": "元件冊 first_seen · changed_at · retired_at · recoded_at(VCGC v0178 以前)",
+        "zone": "寫入那台機器的本地時間(容器 UTC · 工作站 UTC+8),不可跨機比較",
+        "count": "14,138 筆 first_seen"
+      },
+      {
+        "format": "YYYY-MM-DD HH:MM",
+        "where": "帳本 ledger[].ts",
+        "zone": "未標(AI 寫入為 UTC)",
+        "count": "1,363 筆"
+      },
+      {
+        "format": "YYYYMMDD_HHMMSS · YYYY-MM-DD · YYYY-MM · —",
+        "where": "編號冊 updated_at 承襲來源自帶的時間戳 / 日期",
+        "zone": "依來源",
+        "count": "實測 51 · 3 · 2 · 1(抽樣 883 列)"
+      },
+      {
+        "format": "YYYYMMDD",
+        "where": "命名冊 assigned_at",
+        "zone": "日期",
+        "count": "2,940 筆"
+      }
+    ],
+    "fields": {
+      "numbered_at": "中央編號發號時間",
+      "updated_at": "來源最後提交時間(未提交 = uncommitted,不發號)",
+      "first_seen": "元件第一次登錄",
+      "changed_at": "元件欄位變更",
+      "retired_at": "元件退役",
+      "activated_at": "工具啟用(v0104 起)",
+      "ts / recorded_at": "冊版本時間 / 原話記錄時間",
+      "assigned_at": "命名冊發名日"
+    }
+  },
+  "flow": [
+    {
+      "step": 1,
+      "do": "token → functions → handoff check",
+      "why": "第一步 · 必用卡 · 交接不從記憶推定"
+    },
+    {
+      "step": 2,
+      "do": "新功能出新版號檔(L04);活冊只增不減;版號冊不就地改",
+      "why": "R01"
+    },
+    {
+      "step": 3,
+      "do": "先提交程式與冊",
+      "why": "編號 updated_at 取 git 時間(R04)"
+    },
+    {
+      "step": 4,
+      "do": "VIA_FROM_VCGC=YES via-vcgc registry-sync → registry-sync --apply",
+      "why": "元件註冊(v0179 起新時間寫 UTC)"
+    },
+    {
+      "step": 5,
+      "do": "via-vcgc run CGC_MDL237_NumberingSystem --apply --scope → audit",
+      "why": "只登本批;遺失 0 · 改身分 0 · 重號 0 · 註冊完整性"
+    },
+    {
+      "step": 6,
+      "do": "(鎖版工具才要)先登 candidate 列 → tools activate <家> <檔> → --apply",
+      "why": "席位指標 · activated_at"
+    },
+    {
+      "step": 7,
+      "do": "run CGC_MDL245_SDDValidator check → handoff test <case> → handoff checkpoint",
+      "why": "X-* · 收據(v0102 相依集合變了就重跑)"
+    },
+    {
+      "step": 8,
+      "do": "提交 → PR → CI → merge commit",
+      "why": "同步 GitHub"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R01",
+      "title": "已發布的版號冊被就地改",
+      "evidence": "多版家族 22 家 63 檔中 13 檔發布後又被改(尾版 3);需求冊 v0104 事件(Codex #377 P1);工具啟用把名冊尾版就地改寫",
+      "severity": "高",
+      "guard": "CGC_MDL237 v0109 audit IMMUT(對基準:snapshot 冊內容變 = RED)· CGC_MDL233 v0104 名冊改寫出新版",
+      "status": "本批加防線",
+      "owner": "AI"
+    },
+    {
+      "id": "R02",
+      "title": "交接收據沿用看不到新尾版",
+      "evidence": "CGC_MDL140 v0101 只比收據記的雜湊;v0178 / v0104 進來時 entry / sdd 被判沿用",
+      "severity": "高",
+      "guard": "CGC_MDL140 v0102:沿用前重掃相依樣式;check 的證據檢查也比集合",
+      "status": "本批修",
+      "owner": "AI",
+      "req": "VCGC-REQ075"
+    },
+    {
+      "id": "R03",
+      "title": "全量重建把積壓混進本批",
+      "evidence": "側線 i:本批 136 列,全量重建 +1,862 列 · 24 本冊 −14,948 行",
+      "severity": "中高",
+      "guard": "CGC_MDL237 v0109 --apply --scope(只登本批,號碼 / 分類碼仍連續)",
+      "status": "本批修",
+      "owner": "AI",
+      "req": "VCGC-REQ078"
+    },
+    {
+      "id": "R04",
+      "title": "未提交就發號,更新時間寫成 uncommitted",
+      "evidence": "需求冊 v0105 提交前的重建列 updated_at = uncommitted",
+      "severity": "中",
+      "guard": "v0109 --scope 不收未提交來源;audit UNCOMMITTED",
+      "status": "本批修",
+      "owner": "AI"
+    },
+    {
+      "id": "R05",
+      "title": "SSOT 冊內容指紋過期",
+      "evidence": "現況 510/510 吻合(0 過期);就地改冊後不重編就會過期",
+      "severity": "中",
+      "guard": "audit FPSTALE",
+      "status": "本批加防線",
+      "owner": "AI"
+    },
+    {
+      "id": "R06",
+      "title": "同一版本兩個工具號 · 指標語意未寫明",
+      "evidence": "引擎版本冊 token v0117:VIA-TOOL-0194(engine)與 VIA-TOOL-0212(engine)同檔;閘要求候選先登列、apply 又改寫席位列",
+      "severity": "中高",
+      "guard": "0212 改為 candidate(照 network v1652 的 0191 先例)· CGC_MDL233 v0104 引擎列唯一 · audit DUPREG",
+      "status": "本批修",
+      "owner": "AI"
+    },
+    {
+      "id": "R07",
+      "title": "同一實體多套號碼、沒有對照表",
+      "evidence": "一個函式在命名冊 FNC### · 元件冊 VIA-FNC-##### · 中央編號 VIA-<子>-MDL###-FNC### 各一號;帳本另有 11 個並存命名空間",
+      "severity": "中",
+      "guard": "本冊 entity_primary 定主號與別名;audit XCODE 查共用空間撞號",
+      "status": "本批定規則",
+      "owner": "AI"
+    },
+    {
+      "id": "R08",
+      "title": "時間格式不一 · 元件冊時間沒有時區",
+      "evidence": "編號 updated_at 6 種格式;元件冊 datetime.now() 本地時間(容器 UTC / 工作站 UTC+8)混寫同一冊;鎖冊沒有啟用時間",
+      "severity": "中",
+      "guard": "VCGC v0179 registry-sync 新時間寫 UTC;CGC_MDL233 v0104 activated_at;audit TIMEFMT(本批新列)",
+      "status": "本批修(舊值不改寫)",
+      "owner": "AI"
+    },
+    {
+      "id": "R09",
+      "title": "兩本待辦帳沒對帳",
+      "evidence": "交接待辦 25 件 vs 掉球帳 285 列中 214 列未劃線;Z280 已修仍標開",
+      "severity": "中",
+      "guard": "本批 Z280 結案;對帳列交接待辦",
+      "status": "待辦",
+      "owner": "AI"
+    },
+    {
+      "id": "R10",
+      "title": "正則分歧 · 無版號正則檔",
+      "evidence": "台股代號 4 本冊判法不同(E4);regex_registry.json 無版號(CGC_MDL023 讀)",
+      "severity": "中",
+      "guard": "SSOT 全景 booksync;收斂與否操作員裁",
+      "status": "待裁",
+      "owner": "操作員"
+    },
+    {
+      "id": "R11",
+      "title": "同義字一詞兩主 · 同詞多義 · 拒絕閘漏口",
+      "evidence": "一詞兩主 15 組(Z264)· 同詞多義 10 · 拒絕閘漏口 8 · 讀券商冊未過閘 26 支",
+      "severity": "中",
+      "guard": "SUP_MDL749 additive / drift;裁定後只增",
+      "status": "待裁",
+      "owner": "操作員"
+    },
+    {
+      "id": "R12",
+      "title": "命名異常",
+      "evidence": "同號異名 12 組 · 版號異形 44 · 沒版號 .py 841(Z279 / Z281)",
+      "severity": "中",
+      "guard": "SSOT 全景命名族",
+      "status": "待裁",
+      "owner": "操作員"
+    },
+    {
+      "id": "R13",
+      "title": "已鎖工作流尾版換了未重驗",
+      "evidence": "X-LOCK 6 處",
+      "severity": "中",
+      "guard": "SDD X-LOCK",
+      "status": "待辦(VCGC-REQ030:relock)",
+      "owner": "AI"
+    },
+    {
+      "id": "R14",
+      "title": "冊上宣告碼 ≠ 發出號(紅列)",
+      "evidence": "21 列(法條缺號 Z263 · 同義一詞兩主 Z264)",
+      "severity": "低中",
+      "guard": "audit 冊內一致",
+      "status": "待裁",
+      "owner": "操作員"
+    },
+    {
+      "id": "R15",
+      "title": "薄尾讀尾版:新版一落地就被讀到",
+      "evidence": "交接 / SDD / 全景 / 編號都讀 _v*.json 尾版;登錄完成前就生效",
+      "severity": "低中",
+      "guard": "flow 次序(先提交 → 註冊 → 編號 → 驗)",
+      "status": "流程規範",
+      "owner": "AI"
+    }
+  ],
+  "req": "VCGC-REQ084"
+}
