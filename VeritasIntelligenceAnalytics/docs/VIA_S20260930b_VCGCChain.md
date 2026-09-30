@@ -123,6 +123,11 @@
 - **紅 3 站照實**:
   - Z286 兩站:`L-backup` · `S-vcgc-manager`。
   - `V-inventory`:讀到本容器 9/29 的格子存證(`VIA_Reports` 本機、不入 git),棘輪退步 20。乾淨工作樹沒有存證 = NODATA 黃,不是本批造成。
+- **併 main(PR #380)後**:#380 加的 `CGC_MDL209_VdfStart_v0101` · `VDF_SystemManager_v0120` 沒有任何交接案涵蓋,也沒註冊,main 自己的 `handoff check` 就是紅(CI 最後一步會紅)。
+  - 本批帶進的修補:交接冊加 case `vdfstart`(`CGC_MDL209_VdfStart --selftest`,會載 VDF 管理器尾版),工作項 `VCGC-REQ085:base-380` VERIFIED。
+  - 同時做了 registry-sync,並用明列這兩檔的 `--scope` 編號:+15 列。
+  - 11 案 rc 0,`handoff check` GREEN;audit 基準 main 0cf6ddfa1:101,705 → 101,781 · 遺失 0 · 改身分 0 · 重號 0。
+  - 最終整輪 76 站:綠 64 · 黃 9 · 紅 3(同上 3 站)。#380 的 MDL209 v0101 被當成「更新的尾版」自動跑自測(綠),紀錄冊 +4 行。
 - **總控頁**:新尾版說明變了,在乾淨工作樹重產,合約 19/19。
 - **帳本** +1365。
 
