@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T20:29:13+00:00",
+  "updated_at": "2026-10-01T20:54:24+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -125,7 +125,8 @@
     "supportive modules/registry/VIA_Panorama_v0105.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0184.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0184.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -1448,6 +1449,23 @@
       "owner": "AI(VCGC closeout)",
       "reason": "closeout 已入 v0182/v0183,等 entry 案(主控台自測鏈)本輪實測",
       "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ108:entry",
+      "requirement": "VCGC-REQ108",
+      "state": "PENDING",
+      "case": "entry",
+      "owner": "AI(VCGC closeout)",
+      "reason": "gate / link / closeout ⑩ 的邏輯在主控台自測鏈(entry 案)",
+      "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ108:all-green",
+      "requirement": "VCGC-REQ108",
+      "state": "BLOCKED",
+      "owner": "操作員 / 工作站",
+      "reason": "全綠閘首跑:OPERATOR 8(台股代號 regex 四冊判法不一 · 同詞多義 10 · 同號異名 11 組)· RUN(8 處已鎖工作流要實跑重驗)· ENV(容器無 pwsh)",
+      "next": "操作員裁定 OPERATOR 項 → 工作站 via-vcgc sdd real → lock --apply → via-vcgc gate 全綠後轉 VERIFIED"
     }
   ]
 }
