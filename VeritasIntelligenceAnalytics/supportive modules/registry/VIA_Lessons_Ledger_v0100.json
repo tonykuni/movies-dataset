@@ -3435,6 +3435,36 @@
    "source": "vcgc-hub",
    "count": 15,
    "repeat_of": "VF-002"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-31",
+   "sig": "工作站每個 python $V run 都要 60 秒以上(三庫入庫 8 個指令)",
+   "cause": "VCGC v0167 盤點快取鑰含 git status 每一行;每個 run 都寫 VIA_Reports / 帳本 / 資料 → 鑰必變 → run 後同步檢查整樹 1553 支 ast.parse(62 秒)",
+   "fix": "VCGC v0181:鑰只收盤點真的讀的來源(.py/.ps1/冊 .json,排除輸出夾與只增帳本);同指令 1.2–1.5 秒",
+   "match": null,
+   "source": "operator",
+   "ts": "20261001_174452"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-32",
+   "sig": "三庫入庫 tw__consensus_daily FAIL Duplicate key violates primary key",
+   "cause": "ENG065 協定檔鍵律只認 date+ticker;consensus_daily 鍵欄是 date·code·source → EXCEPT 整列比對;主鍵相同其他欄不同被當新列",
+   "fix": "VDF_ENG079 v0105:目標表有主鍵 / 唯一鍵就照它 anti-join(既有列零觸碰 · 來源同鍵只進一列)",
+   "match": null,
+   "source": "operator",
+   "ts": "20261001_174528"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-33",
+   "sig": "入口串測 51 站紅、SDD 鎖不了(一步之遙無法收尾)",
+   "cause": "閘 status 在同步檢查發現樹未同步(工作站未拉到 #405、本地 main 提交帳本後分叉)回 rc 2;串測各站只印第一行,真正擋的 [同步] 行看不到",
+   "fix": "先 MergeMedic sync --apply 拉齊(帳本只增聯集),status 必須 rc 0 才往下;工作站不在 main 直接提交帳本以外的東西",
+   "match": null,
+   "source": "operator",
+   "ts": "20261001_174531"
   }
  ]
 }
