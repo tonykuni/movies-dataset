@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T06:58:38+00:00",
+  "at": "2026-09-30T21:32:52+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -334,14 +334,6 @@
       "owner": "操作員",
       "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
       "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
-    },
-    {
-      "id": "VRN-REQ009:closeout-fail4",
-      "requirement": "VRN-REQ009",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "工作站 via-closeout vrn:4 份有對照源而對不起來(Citi-3231 頁價 114 vs 庫 109.5 · Daiwa-3653 TP 未抽到且頁價 2550 vs 庫 2445 · Daiwa-6278 TP=15 疑誤抽(比值 0.069)且頁價 230 vs 庫 203 · 第 4 份見 VRN_CLOSEOUT_latest.json);價差可能是還原價 vs 原始價或報告引用價日不同,須看 PDF 才能裁,不在容器代判",
-      "next": "git pull → via-closeout vrn --run(四點 QC 假紅已由 ENG080 v0111 修)→ 對 fail 清單逐份開 PDF 核 TP 與現價 → 解析錯就回報該份,價日差就裁容差/價日規則"
     }
   ],
   "reusable_successes": [
@@ -379,8 +371,7 @@
     "VRN-REQ008:synonym_union_r34",
     "VRN-REQ008:numbering_dup_r34",
     "VRN-REQ009:vrn_docclass",
-    "VCGC-REQ089:template_sync",
-    "VRN-REQ009:vrn_fourpoint"
+    "VCGC-REQ089:template_sync"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -393,7 +384,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "d908182bd6d4fe6bc449ddc23a0092dcae25ab6858f3d10d68f7eb9071782a81"
+      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -413,7 +404,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "d908182bd6d4fe6bc449ddc23a0092dcae25ab6858f3d10d68f7eb9071782a81"
+      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -437,7 +428,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "d908182bd6d4fe6bc449ddc23a0092dcae25ab6858f3d10d68f7eb9071782a81"
+      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -453,11 +444,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "628952bed5b70e79eac46eac1723d13e396ed4e93ad3c2b4ef2c744da4da7bb2"
+      "sha256": "4e34fe9ac614d19ed3b9212f17825f53a41fc7c13ef64bf483519f4aefb94462"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "628952bed5b70e79eac46eac1723d13e396ed4e93ad3c2b4ef2c744da4da7bb2"
+      "sha256": "4e34fe9ac614d19ed3b9212f17825f53a41fc7c13ef64bf483519f4aefb94462"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -477,7 +468,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "d908182bd6d4fe6bc449ddc23a0092dcae25ab6858f3d10d68f7eb9071782a81"
+      "sha256": "b359479e826cc9e2996173495e0b596da55ea795cbdc3a960e1cee5fd7f00093"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -522,10 +513,6 @@
     "VCGC-REQ089:template_sync": {
       "path": "docs/handoff/evidence/template_sync.json",
       "sha256": "d33fdf5b9d7b9caeedef7a0c5c3c615a0e69f23e338280cd8c3afc4e1f06f861"
-    },
-    "VRN-REQ009:vrn_fourpoint": {
-      "path": "docs/handoff/evidence/vrn_fourpoint.json",
-      "sha256": "035d2d53b51892c95492701eccf06fc2875ee55995f65956d360803322570852"
     }
   },
   "state": {
@@ -564,7 +551,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "a6f799c9c7b4ecc2b49d56b856f4be5b557cc3b8c5c8bc556d6167be3efb1067",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "9d4c683c54c76fb1c01cb05ac06598845b6547b298d170539e043c27cfeaf911",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -817,7 +804,6 @@
       "functional modules/VRN/VRN_ENG080_FourPointDigest_v0108.py": "79f070ebd1312ca3c938692c3630ad5de7b9a6cf9e8e7e19fe596ae988b02a60",
       "functional modules/VRN/VRN_ENG080_FourPointDigest_v0109.py": "80146e557b3f8635f27cdddd343a33985f35f6dd16a48063dc0dbbb42ee25359",
       "functional modules/VRN/VRN_ENG080_FourPointDigest_v0110.py": "2e388fdfe09f5c3e7e4d61df7b98dc5ce7220090c73e5b0ed88a8f3da346e75b",
-      "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py": "876e019fa0ef99b090fca7e65f589f6b1d93c4fa3faa25d84aad42bcff72b50e",
       "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0100.py": "22761a8ead8430000bda9e71f1d8cee11e131b6bb51d31cd7503ed5be9e05d10",
       "functional modules/VRN/VRN_ENG081_ParquetMainDB_v0101.py": "29a4e83f99f1d82955d14beb6a2f8e27a85985acdc4f6c31b9c9cc6e5e827c8d",
       "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0100.py": "e66807de415a7342d696e7d59b65d7d565052aa051c5d6bcab1a4a0728ca71c8",
@@ -3323,8 +3309,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0102.json": "2f7ac956534217a03281a4a5b9fc4b69f475efb635d6ccefc2ab12e80c8d96a5",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0103.json": "3c0574c2898aab9dfecc8d4d2263acd3fb5b4e6d9c857893448a1a7246af487c",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0104.json": "d0b3c6e91448a520ea98440fc72f704d63f81787d92186083a854ef10ebaf262",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0105.json": "cd9081eb7aae98d221a67becff700c0b66a94a98fde32922115b67fc8f82a035",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0106.json": "8064698c51e1aeddc1874569ebaf36e3db6aa31a3141c275f0be44896cca9922"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0105.json": "cd9081eb7aae98d221a67becff700c0b66a94a98fde32922115b67fc8f82a035"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4691,8 +4676,7 @@
     "supportive modules/registry/CGC_MDL176_SynonymUnion_v0103.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
-    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py",
-    "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py"
+    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5113,28 +5097,13 @@
       "owner": "操作員",
       "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
       "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
-    },
-    "VRN-REQ009:vrn_fourpoint": {
-      "id": "VRN-REQ009:vrn_fourpoint",
-      "requirement": "VRN-REQ009",
-      "state": "VERIFIED",
-      "case": "vrn_fourpoint",
-      "receipt": "docs/handoff/evidence/vrn_fourpoint.json"
-    },
-    "VRN-REQ009:closeout-fail4": {
-      "id": "VRN-REQ009:closeout-fail4",
-      "requirement": "VRN-REQ009",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "工作站 via-closeout vrn:4 份有對照源而對不起來(Citi-3231 頁價 114 vs 庫 109.5 · Daiwa-3653 TP 未抽到且頁價 2550 vs 庫 2445 · Daiwa-6278 TP=15 疑誤抽(比值 0.069)且頁價 230 vs 庫 203 · 第 4 份見 VRN_CLOSEOUT_latest.json);價差可能是還原價 vs 原始價或報告引用價日不同,須看 PDF 才能裁,不在容器代判",
-      "next": "git pull → via-closeout vrn --run(四點 QC 假紅已由 ENG080 v0111 修)→ 對 fail 清單逐份開 PDF 核 TP 與現價 → 解析錯就回報該份,價日差就裁容差/價日規則"
     }
   },
   "summary": {
     "requirements": 119,
-    "watched_files": 2795,
-    "pending": 45,
-    "reusable": 36,
+    "watched_files": 2793,
+    "pending": 44,
+    "reusable": 35,
     "findings": 0
   }
 }
