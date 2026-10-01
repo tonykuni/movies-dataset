@@ -79,7 +79,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 14,
-  "COVERED": 99,
+  "COVERED": 100,
   "PARTIAL": 30,
   "MISSING": 1
  },
@@ -3667,6 +3667,27 @@
     }
    ],
    "r46": true
+  },
+  {
+   "code": "VCGC-REQ108",
+   "subsystem": "VCGC",
+   "topic": "via-realtest v0104:工作站實測中途例外也要從 GitHub 看得到原因",
+   "requirement": "實測 v0101 整段畫面落 Transcript;貼給 AI 檔沒產出時把紅字 / 例外 / 結尾 40 行收進 docs/handoff/workstation 交接紀錄;VCGC 路線紅黃站逐行收;樣本驗證只收判決行(濾 FontBBox / delisted 雜訊)",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "工作站 WS_HANDOVER_20261002_041509:v0101 rc 1 且「本輪沒有 PASTE_TO_AI_latest.txt」、VCGC 紅 2 只有總結行、樣本尾段全是 FontBBox 雜訊 → v0104 沙盒:假 v0101 拋例外 → 交接紀錄帶出「自身例外:… @ 行 284」;pwsh 剖析 0 錯",
+   "next": "工作站:git pull → via-realtest -AutoInstall(自動取 v0104)",
+   "hand": "AI(實作 · 登錄 · 沙盒實測)",
+   "quotes": [
+    {
+     "text": "不要再要授權 不違反無ta-lib  透過vcgc的全景式功能及其他工具 將他引擎清理乾淨注入ast 分類說明  加速器 加速模板 及網路工具導入其他全數授權不要再問完成vdf輸出結果驗證收尾他並記錄上傳github",
+     "recorded_at": "2026-10-02T07:00:00+00:00",
+     "said_in": "R46 session 2026-10-02(逐字)"
+    }
+   ],
+   "r46": true
   }
  ],
  "non_requirements": [
@@ -3798,5 +3819,5 @@
  "why_v0128": "R44:+VCGC-REQ100(COVERED:via-realtest v0102 拉齊 → 實測 → 樣本 → 交接紀錄 → 同步 GitHub);其餘一字不動",
  "why_v0129": "R45:+VCGC-REQ101(COVERED:via-realtest v0103 三路線 · 環境完整安裝 · 全景 AST 錨點);其餘一字不動",
  "why_v0130": "PR #412 合併 main:側線六條需求(全景監控引擎 · 儀表板 · 記錄與教訓 · VCGC 自動監控 · 交接閘與工作流圖 · closeout 一指令收尾)原編 VCGC-REQ088–093,與 main 已發的 REQ088–093 同號異義 → 照「不同來源不得因值相同合併編號」改編 VCGC-REQ102–107(每條帶 renumbered_from);main 的 REQ088–101 一字不動",
- "why_v0131": "R46:+VDF-REQ015(COVERED:VDF 74 支逐支自測 RED 5 → 0)。本條原寫在側線 v0130,與 PR #412 的 v0130 撞號 → 改出 v0131(一號不得兩主;PR #412 的 v0130 原樣保留)"
+ "why_v0131": "R46:+VDF-REQ015(COVERED:VDF 74 支逐支自測 RED 5 → 0)。本條原寫在側線 v0130,與 PR #412 的 v0130 撞號 → 改出 v0131(一號不得兩主;PR #412 的 v0130 原樣保留);+VCGC-REQ108(via-realtest v0104 交接紀錄帶出實測例外)"
 }
