@@ -41,7 +41,7 @@
   VDF_ENG079_LocalDbConsolidate_v0105 薄尾 6/6 PASS
 === VDF_ENG079_LocalDbConsolidate_v0104 · 薄尾自測(FRAME 守門開著,再串 VDF_ENG079_LocalDbConsolidate_v0103 全部檢)===
   [OK] ① FRAME 橋:解到 SUP_MDL755 VIAPolarsFrame(鎖冊 frame 優先,缺則尾版)並載得進來 · SUP_MDL755_VIAPolarsFrame_v0100.py
-  [OK] ② 守門開:本行程新開的 DuckDB 連線 → 溢寫夾在受管 temp(VIA_TEMP_ROOT/VIA_spill)下;前一版全部檢在守門下照跑 · /tmp/via_frame_tail_9cwoohf7/VIA_spill/VDF_ENG079_LocalDbConsolidate_10888_3v_89x9a
+  [OK] ② 守門開:本行程新開的 DuckDB 連線 → 溢寫夾在受管 temp(VIA_TEMP_ROOT/VIA_spill)下;前一版全部檢在守門下照跑 · /tmp/via_frame_tail_nvo1zyat/VIA_spill/VDF_ENG079_LocalDbConsolidate_11196_237_9qxh
   [OK] ① 日期正規化(DATE/TIMESTAMP/VARCHAR 多格式/整數 20230105 → 'YYYY-MM-DD') 
   [OK] ② scan 唯讀盤點(單元 8:parquet×6/csv/duckdb 表;路由 px→tw_daily_prices chip→tw_chips_daily rest→tw_rest_daily;ENG065 協定 tw__X→X gl__X→X) (單元 8;[('extra.csv', 'tw_daily_prices', 'PLAN'), ('old_prices.duckdb::px_extra', 'tw_daily_prices', 'PLAN'), ('part-000.parquet', 'tw_daily_prices', 'PLAN'), ('chips.parquet', 'tw_chips_daily', 'PLAN'), ('tw__tw_chips_daily.parquet', 'tw_chips_daily', 'PLAN'), ('gl__us_macro.parquet', 'us_macro', 'PLAN'), ('rest.parquet', 'tw_rest_daily', 'PLAN'), ('tw__tw_listings.parquet', 'tw_listings', 'PLAN')])
   [OK] ③ dry-run 零寫入(價表列數不變;計畫新增=裸碼對映 yahoo 後 anti-join:2330 01-06 +6488=2;既有 2330 01-05 不算;裸碼 9999 對不到→local_px_daily 1;AAPL→global_daily 1;csv 2;duckdb 表 1;協定 3+2+2;v0102 唯讀盤點:表清單一張不多、全球庫檔不建——v0101 在這裡建了 4 張空表外加一個全球庫檔) (計畫 18;單元 [('extra.csv', 2, 0), ('old_prices.duckdb::px_extra', 1, 0), ('part-000.parquet', 4, 1), ('chips.parquet', 2, None), ('tw__tw_chips_daily.parquet', 2, None), ('gl__us_macro.parquet', 2, None), ('rest.parquet', 2, None), ('tw__tw_listings.parquet', 3, None)];scan 多出的表 [];全球庫檔 False→False)
@@ -54,12 +54,11 @@
   [OK] ⑨ ckpt 交棒 ENG064 --rebuild-ckpt(尾版 glob;不在自測執行) 
   [OK] ⑩ 缺 src 誠實 RED(不假綠;RUN_latest 落檔) 
   [OK] ⑪ 紀律宣告(只增不減/原件零觸碰/誠實三態/零網路/尾版律/COPY_ONLY/ACCEL-BRIDGE) 
-  [OK] ⑬ 資料家接點燈(批389:--db 自訂路徑=不適用 None;正典庫路徑=MDL123 正本判 LINKED 綠/其餘黃並指 via-datahome link 後冪等重跑) (('YELLOW', 'REAL_DIR'))
+  [OK] ⑬ 資料家接點燈(批389:--db 自訂路徑=不適用 None;正典庫路徑=MDL123 正本判 LINKED 綠/其餘黃並指 via-datahome link 後冪等重跑) (('YELLOW', 'MISSING'))
   [OK] ⑭ v0102 計畫/實寫交正典 upsert_select(計畫與實寫同答;NULL 鍵 IS NOT DISTINCT FROM 不重插;來源同鍵自去重;where 只挑台股碼、AAPL 不進;無鍵 EXCEPT 完全重複列只一份、NULL 視為相等、重跑 0) (計畫 1 實寫 1 重跑 0 · 無鍵 2/2/0)
   [OK] ⑮ v0102 庫檔裡的每張表各用表名(原文 Path.stem 先剝掉「.duckdb::表」只剩檔名):rest 兩張有 date+ticker 的表 kind=表名各 2 列,不再撞鍵整批丟列(v0101:pe 0 列);無鍵兩張表各落 local_rest__<表名>,不併成一張 local_rest__store;再 scan 一個多一欄的新檔:唯讀盤點不加欄、計畫 1 列 (kind [('pb', 2), ('pe', 2)] · 表 ['local_rest__notes', 'local_rest__tags'] · scan 後欄 ['date', 'ticker', 'kind', 'value'] · 新檔 PLAN 1)
   [OK] ⑯ v0103 scan 遇到既有表缺欄(無鍵表新來源多一欄 note · 籌碼多一個 kind 鍵欄):計畫照「--apply 先加欄」數(2 · 1)不 Binder 錯、scan 後表的欄一欄不多;接著 --apply 實寫 2 · 1 = 計畫(PR #113 審;v0102 在這裡兩個單元都 FAIL) (scan [('a_inst.parquet', 'SKIP_LEDGER', 0), ('b_kind.parquet', 'PLAN', 1), ('misc.csv', 'PLAN', 2)] · 欄 {'local_rest__misc': ['kind', 'label', 'n'], 'tw_chips_daily': ['date', 'ticker', 'foreign_net']} · apply [('a_inst.parquet', 'SKIP_LEDGER', 0), ('b_kind.parquet', 'OK', 1), ('misc.csv', 'OK', 2)])
   [計] 十六檢 OK 16 · FAIL 0
   [OK] ③ 收:守門卸下、溢寫夾刪乾淨(零足跡)
   VDF_ENG079_LocalDbConsolidate_v0104 薄尾 3/3 PASS · 前一版 rc=0
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL149_VeritasCentralGovernanceCo | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL149_VeritasCentralGovernanceConsole_v0186.p | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):3 個,例 ['VCGC-WKF012-STP009', 'VCGC- → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 12, 'changed': 13, 'stale': 0, 'expected': 14692, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 1811 · 觸碰 run VDF_ENG079_LocalDbConsolidate · 交接閘 YELLOW · 落後 1 提交 · 快照 1.2h · 頁 /tmp/claude-0/wt417/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
