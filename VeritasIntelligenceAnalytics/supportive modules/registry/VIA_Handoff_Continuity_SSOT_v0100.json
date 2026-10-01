@@ -110,7 +110,8 @@
     "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py",
     "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py",
-    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py"
+    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -550,6 +551,21 @@
         "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
         "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py",
         "functional modules/VRN/VRN_ENG396_ReportEntities_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "tool_coverage_matrix": {
+      "argv": [
+        "CGC_MDL230_ToolCoverageProbe",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL230_ToolCoverageProbe v0102 覆蓋矩陣 · AST · PS 剖析器] 自測 14/14 PASS",
+      "scope": "全樹工具覆蓋矩陣:PY 加速器 · 觸網 PY 網路橋 · VDF 全件網路橋 · PS 尾版加速器模組;燈由正主(sweeper / MDL117),AST 與 pwsh Parser 第二讀法互核;具名豁免附理由;HTML 矩陣報告前次 → 本次(R37c · VCGC-REQ092)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v*.py",
+        "supportive modules/registry/VIA_ToolCoverageMatrix_SSOT_v*.json",
+        "supportive modules/registry/via_bridge_sweeper_v*.py",
+        "supportive modules/registry/CGC_MDL117_AccelCoverage_v*.py"
       ],
       "timeout_seconds": 900
     }
@@ -1121,6 +1137,31 @@
       "owner": "操作員",
       "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
       "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
+    },
+    {
+      "id": "VCGC-REQ092:tool_coverage_matrix",
+      "requirement": "VCGC-REQ092",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL230 v0102 matrix:四面非豁免缺 0 · 兩法不一致 0;補橋 PS 8 支 · PS 函式內橋移頂層 4 支 · PY 網路橋 3 支 · 空橋 / 半橋 / 字串橋修 5 支",
+      "next": "via-vcgc run --family core CGC_MDL230_ToolCoverageProbe matrix(工作站有 pwsh 時 PS 用剖析器讀)",
+      "test_case": "tool_coverage_matrix"
+    },
+    {
+      "id": "VCGC-REQ092:ps-parse-errors",
+      "requirement": "VCGC-REQ092",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
+      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可"
+    },
+    {
+      "id": "VCGC-REQ092:accel-real-use",
+      "requirement": "VCGC-REQ092",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
+      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
     }
   ]
 }

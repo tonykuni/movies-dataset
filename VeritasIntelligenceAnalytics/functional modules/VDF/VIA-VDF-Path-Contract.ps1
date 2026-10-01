@@ -1,10 +1,6 @@
 #requires -Version 7.0
 # CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; batch R16-9)
 # ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
-Set-StrictMode -Version Latest
-
-function Resolve-VDFDataRoot {
-    param([AllowEmptyString()][string]$RequestedRoot = '')
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -15,6 +11,10 @@ try {
     }
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
+Set-StrictMode -Version Latest
+
+function Resolve-VDFDataRoot {
+    param([AllowEmptyString()][string]$RequestedRoot = '')
 
     $Candidate = if ($RequestedRoot) {
         $RequestedRoot
