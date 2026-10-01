@@ -599,6 +599,19 @@
         "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_local_db": {
+      "argv": [
+        "VDF_ENG079_LocalDbConsolidate",
+        "--selftest"
+      ],
+      "success_marker": "VDF_ENG079_LocalDbConsolidate_v0105 薄尾 6/6 PASS",
+      "scope": "本機三庫整併:目標表有主鍵就照主鍵只補缺(協定檔 consensus_daily 不再撞主鍵)· 既有列零觸碰 · 計畫 = 實寫 · 重跑冪等 + v0103 十六檢(R40 · VCGC-REQ094)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v*.py",
+        "supportive modules/SUP_MDL753_*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -1234,6 +1247,28 @@
       "owner": "操作員",
       "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
       "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
+    },
+    {
+      "id": "VCGC-REQ094:vcgc-cache-key",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json"
+    },
+    {
+      "id": "VCGC-REQ094:eng079-pk",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_local_db",
+      "receipt": "docs/handoff/evidence/vdf_local_db.json"
+    },
+    {
+      "id": "VCGC-REQ095:architecture-map",
+      "requirement": "VCGC-REQ095",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
+      "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
     }
   ]
 }
