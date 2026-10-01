@@ -299,3 +299,88 @@ jobs:
           path: VIA_VRN_Test_Artifacts
           if-no-files-found: warn
           retention-days: 14
+
+  vcgc-pwsh-gate:
+    name: VCGC PowerShell 7 · conflict guard · all-green gate (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py
+            /VeritasIntelligenceAnalytics/supportive modules/*.py
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # VCGC-REQ111:PowerShell 互動在 Windows 用真 pwsh 實測;衝突閘 · 全綠閘結果寫進 job summary。只有 RED(rc 1)讓 CI 紅;黃照實列出(黃不是綠)。
+      - name: VCGC live checks with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_VCGC_PUSH = "NO"
+          $env:VIA_PANORAMA_AUTO = "0"
+          $env:VIA_NO_OPEN = "1"
+          $env:VIA_PWSH = (Get-Command pwsh).Source
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $registry = Join-Path $via "supportive modules\registry"
+          $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
+            Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+            Select-Object -Last 1).FullName
+          if (-not $vcgc) { throw "VCGC entry absent" }
+          $rows = @()
+          $red = $false
+          foreach ($step in @(
+              @{ name = "PowerShell 入口(pwsh Parser 實測)"; args = @("test", "--quick", "--only", "P-entry") },
+              @{ name = "衝突閘(寫入前阻擋)"; args = @("guard") },
+              @{ name = "全綠閘(交接 · 母子連接 · 衝突哨兵)"; args = @("gate", "--only", "交接,母子連接,衝突哨兵") })) {
+            $out = & python $vcgc @($step.args) 2>&1 | Out-String
+            $rc = $LASTEXITCODE
+            Write-Host $out
+            $head = ($out -split "`n" | Where-Object { $_ -match '^\[VCGC' } | Select-Object -Last 1)
+            $lamp = if ($rc -eq 0) { "GREEN" } elseif ($rc -eq 2) { "YELLOW" } else { "RED" }
+            if ($rc -eq 1) { $red = $true }
+            $rows += "| $($step.name) | $lamp | rc $rc | $($head -replace '\|', '/') |"
+          }
+          "## VCGC live checks (PowerShell $($PSVersionTable.PSVersion))" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| 檢查 | 燈 | rc | 判決行 |" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "|---|---|---|---|" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          $rows | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          if ($red) { exit 1 }
+
+      - name: Upload VCGC gate evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: via-vcgc-gate-evidence
+          path: |
+            VeritasIntelligenceAnalytics/VIA_Reports/gate/GATE_latest.json
+            VeritasIntelligenceAnalytics/VIA_Reports/vcgc/exec/EXEC_latest.json
+            VeritasIntelligenceAnalytics/VIA_Reports/vcgc/TEST_latest.json
+          if-no-files-found: warn
+          retention-days: 14
