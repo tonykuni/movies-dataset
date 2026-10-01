@@ -565,9 +565,16 @@
         "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v*.py",
         "supportive modules/registry/VIA_ToolCoverageMatrix_SSOT_v*.json",
         "supportive modules/registry/via_bridge_sweeper_v*.py",
-        "supportive modules/registry/CGC_MDL117_AccelCoverage_v*.py"
+        "supportive modules/registry/CGC_MDL117_AccelCoverage_v*.py",
+        "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v*.py",
+        "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v*.py",
+        "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v*.py",
+        "supportive modules/registry/CGC_MDL074_AccelBridge_v*.py",
+        "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v*.py",
+        "supportive modules/registry/via_accel_injector_v*.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "dependency_why": "橋修件(真橋 / 半橋補全 / 空橋還原)的驗收就是本案 AST 讀法:矩陣 ㉖ ㉗ 逐檔讀它們的橋是否真程式碼"
     }
   },
   "work_items": [
@@ -1142,10 +1149,10 @@
       "id": "VCGC-REQ092:tool_coverage_matrix",
       "requirement": "VCGC-REQ092",
       "state": "VERIFIED",
-      "owner": "AI",
       "reason": "CGC_MDL230 v0102 matrix:四面非豁免缺 0 · 兩法不一致 0;補橋 PS 8 支 · PS 函式內橋移頂層 4 支 · PY 網路橋 3 支 · 空橋 / 半橋 / 字串橋修 5 支",
       "next": "via-vcgc run --family core CGC_MDL230_ToolCoverageProbe matrix(工作站有 pwsh 時 PS 用剖析器讀)",
-      "test_case": "tool_coverage_matrix"
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
     },
     {
       "id": "VCGC-REQ092:ps-parse-errors",
