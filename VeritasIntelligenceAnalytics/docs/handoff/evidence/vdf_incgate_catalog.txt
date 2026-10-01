@@ -47,7 +47,7 @@
   [OK] ② 零寫庫(連線一律 read_only;無 CREATE/INSERT/UPDATE/DELETE)
   [OK] ③ 沒有 --apply(本閘只算缺口,不代抓)
   [OK] ④ 零九頭龍:庫清點複用 MDL123 資料家 catalog,不自己再寫一份掃庫
-  [OK] ⑤ 目錄不在=誠實 ABSENT 且講得出要先跑哪一句(不是空表假綠) (ABSENT · 目錄裡沒有任何帶日期欄且有列的表(庫空或還沒 catalog) → 先 `via-datahome status` 看資)
+  [OK] ⑤ 目錄不在=誠實 ABSENT 且講得出要先跑哪一句(不是空表假綠) (ABSENT · 資料家目錄不在:DATAHOME_CATALOG_latest.json → 先跑 `via-datahome cata)
   [OK] ⑥ scan 讀得出五張表,帶日期欄的算四張 (表 5 · 帶日期 4)
   [OK] ⑦ plan 只列缺口:頭缺算頭段、尾缺算尾段、頭尾都缺列兩段、全覆蓋的不列 (缺 3 · 覆蓋 1 · 無日期欄 ['nodate'])
   [OK] ⑧ 缺口天數算得對(純頭缺 2023 整年=365;頭尾都缺=365+1=366) (頭 365 · 頭尾 366)
@@ -69,5 +69,5 @@
   [OK] ㉔ v0105/v0106 私有去重寫入普查(去重寫入的唯一實作=SUP_MDL753 upsert_rows · 關聯層 upsert_select):綁正典的兩支都不算;anti-join insert、insert-or-replace、except 寫入、暫存表 anti-join(create…as select … not exists)都算,且標出掛它的啟動入口;DDL 的 if not exists、只讀 count 查詢、自測函式(含內層)裡的夾具不算;實樹:收進正典的十二族(ENG052 · 054 · 056 · 057 · 059 · 074 · 075 · 076 · 078 · Z194 的 065 · 079 · 081)一支都不在名單上 ((ok · 合成 ['ENG921_PrivateAntiJoin', 'ENG923_OrReplace', 'ENG924_ExceptInsert', 'ENG926_StagingAntiJoin'] · 實樹還沒收 []))
   [計] 24 檢 OK 24 · FAIL 0
   [計] VDF_ENG089 v0108 薄尾 4/4 · 前版 PASS · 合計 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 2, 'stale': 0, 'expected': 14657, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 23328 · 觸碰 run VDF_ENG089_IncrementalFetchGate · 交接閘 RED · 落後 4 提交 · 快照 0.1h · 未推 34 · 未登 1 支(VDF_ENG072_StoryRotationBridge) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL149_VeritasCentralGovernanceCo | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):1 個,例 ['VCGC-REQ110'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 23, 'changed': 13, 'stale': 0, 'expected': 14680, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
