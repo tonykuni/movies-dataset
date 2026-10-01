@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VCGC v0182 — 薄尾:`closeout` 一個指令掌控整個收尾(交接閘 → 重測 → 註冊 → 編號 → SDD → checkpoint → 推上 GitHub)
+"""VCGC v0182 — 薄尾:`monitor` 動詞 · 任何 VCGC 動作收尾都在背景自動開全景監控(AUTO SYNC VCGC ↔ 子系統)
 
-操作員(側線 2026-10-01):「做一次優化補不足之處 推上去自動完成 auto sync to github」「與 vcgc 結合掌控一切」
-實錄(同批):AI 收尾要手打九步(handoff check → 逐案 handoff test → registry-sync → 編號 → audit → SDD → checkpoint → 提交 → push),
-  漏一步交接快照就落後(9/30 14:01 之後 49 提交沒 checkpoint;需求冊沒登)。本版把九步收進 VCGC 一個動詞:
-  closeout [--apply] [--push] [--cases a,b] [--skip-tests]
-    ① 交接閘(VIA_Panorama 尾版 state)前
-    ② handoff check → 從發現自動算出要重測的案(EVIDENCE_INVALID 的工作項 → 案;CHANGED_CODE_WITHOUT_TEST 的檔 → 相依命中的案)
-    ③ 逐案 handoff test(任一案失敗 = 停,不 checkpoint)
-    ④ registry-sync 乾跑;有待註冊:--apply 才套用並提交
-    ⑤ --apply:編號 --apply --scope → audit(遺失 / 改身分 / 重號任一非 0 = 停)→ 提交
-    ⑥ SDD 檢查(RED = 停,不 checkpoint)
-    ⑦ --apply:handoff checkpoint → 提交收據 · 交接冊 · 只增帳
-    ⑧ --push:git push origin HEAD(不強推 · 不改歷史;被拒照實回紅)
-    ⑨ 交接閘(後)· 前後對比一行
-  沒帶 --apply = 只跑測試與乾跑,印出要下的指令(同意閘:寫冊 / 提交 / 推送都要操作員明打旗標)。
-  每步完整輸出落 VIA_Reports/closeout/<輪號>/<步>.log,螢幕每步一行(省 Token);總表 CLOSEOUT_latest.json。
-  子步一律以子行程跑本版(VIA_PANORAMA_AUTO=0 · VIA_VCGC_PUSH=NO,推送只由 ⑧ 決定);收尾完照 v0181 觸發一次監控。
-其餘照 v0181。
+操作員(側線 2026-09-30):「上傳擋入 VCGC 起任何碰到 VCGC 就自動開啟他來監控 · 與 VCGC 高度 AUTO SYNC ·
+  VCGC 與子系統高度 AUTO SYNC」「導入加速器」
+本版:
+  ① monitor [scan|watch|dashboard|lessons|sync|show …] → VCGC run VIA_Panorama 尾版(閘 · 事件 · 教訓照舊)。
+     不叫 panorama:那是 v0103 起既有的「全景(PLAN 預覽)」動詞(盤點冊站 V-panorama),本版原樣轉交前版、不蓋。
+  ② 自動監控:每個 VCGC 動作(成功或失敗)收尾都呼叫 VIA_Panorama 尾版 `autostart --from <動詞>`
+     (VIA_ACCEL.run_fast · 20 秒上限;對方約 0.3 秒回):記一筆觸碰;背景監控沒在跑就起一支(單例),
+     背景那支每輪全景(304 不重掃)+ 有觸碰就經本入口跑唯讀同步探針 sync-check · ssot panorama(VCGC → VDF → VRN → SUP)。
+     提示只寫 stderr 一行,不污染 stdout(sync-check 等動詞印 JSON 給別支解析)。
+     不觸發:VIA_PANORAMA_AUTO=0 · 背景監控自己呼叫(VIA_PANORAMA_ACTIVE=1,防遞迴)· 串測中(VIA_VCGC_TEST_ACTIVE=1)· CI=true · --selftest。
+     --apply 一律不自動下(同意閘);監控只列待批准指令。
+  ③ help 的目前生效入口 = 本版;多印 monitor 一行。其餘照 v0181(main:快取鑰)→ v0180。零網路。
+合併註(2026-10-01):本版原在側線編為 v0181,與 main 的 v0181(活元件盤點快取鑰)撞號 → 側線三版順移 v0182–v0184,
+  前版鏈接到 main 的 v0181(快取鑰修正保留);邏輯不變。
 """
 from __future__ import annotations
 
@@ -68,31 +65,26 @@ def _via_net():
         return None
 # ===== [VIA:NET-BRIDGE:END] =====
 
-import fnmatch
 import importlib.util
 import json
 import os
-import re
 import subprocess
 import sys
-import time
-from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-VIA = HERE.parents[1]
-REPO = VIA.parent
 _STEM = "CGC_MDL149_VeritasCentralGovernanceConsole"
 PRIOR_PATH = max(p for p in HERE.glob(_STEM + "_v*.py") if p.name < Path(__file__).name)
 _spec = importlib.util.spec_from_file_location(_STEM + "_prior_v0182", PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
-HANDOFF_SSOT = HERE / "VIA_Handoff_Continuity_SSOT_v0100.json"
-OUT = VIA / "VIA_Reports" / "closeout"
-COMMIT_PATHS = ["VeritasIntelligenceAnalytics/docs/handoff", "VeritasIntelligenceAnalytics/supportive modules/registry"]
-CLOSE_LINE = ("closeout [--apply] [--push] [--cases a,b]  一個指令收尾:交接閘 → 自動算重測案 → handoff test → registry-sync → 編號 → SDD"
-              " → checkpoint → 推上 GitHub(寫冊 / 提交 / 推送要明打旗標)")
+PANORAMA_FAMILY = "VIA_Panorama"
+AUTO_ENV = "VIA_PANORAMA_AUTO"
+ACTIVE_ENV = "VIA_PANORAMA_ACTIVE"
+TEST_ENV = "VIA_VCGC_TEST_ACTIVE"
+PANO_LINE = ("monitor [scan|watch|dashboard|lessons|sync|show …]  VIA 全景(只讀)· 任何 VCGC 動作都會在背景自動開監控與"
+             " AUTO SYNC(VIA_PANORAMA_AUTO=0 關)")
 
 
 def __getattr__(name):
@@ -107,33 +99,35 @@ def _chain() -> list:
     return mods
 
 
-# ---------------------------------------------------------------- help: current entry is this tail
+# ---------------------------------------------------------------- ③ help: current entry is this tail
 _PREV_CATALOG = PRIOR.help_catalog
-_PREV_SHOW = vars(PRIOR).get("_show_help_v0181")
-_PATCHED: list = []
+_PREV_SHOW = next((vars(_m)["_show_help_v0180"] for _m in [PRIOR, *_chain()] if "_show_help_v0180" in vars(_m)), None)  # main v0181 沒接 help:沿鏈找 v0180 的
 
 
 def help_catalog():
     card = _PREV_CATALOG()
-    card.update(entry=Path(__file__).name, previous=PRIOR_PATH.name, closeout=CLOSE_LINE)
+    card.update(entry=Path(__file__).name, previous=PRIOR_PATH.name, monitor=PANO_LINE)
     return card
 
 
-def _show_help_v0182():
+def _show_help_v0183():
     if _PREV_SHOW is not None:
         _PREV_SHOW()
-    print("  " + CLOSE_LINE)
+    print("  " + PANO_LINE)
+
+
+_PATCHED: list = []
 
 
 def _patch_help(on: bool = True) -> None:
-    """v0181 把舊版的 help 接到它身上;本版接回自己(v0181 本身不動)。on=False 還原(跑前版自測時用)。"""
+    """v0180 把舊版的 help 接到它身上;本版接回自己(v0180 本身不動)。on=False 還原(跑前版自測時用)。"""
     if on:
         for _m in _chain()[1:]:
             if vars(_m).get("help_catalog") is _PREV_CATALOG:
                 _m.help_catalog = help_catalog
                 _PATCHED.append((_m, "help_catalog", _PREV_CATALOG))
             if _PREV_SHOW is not None and vars(_m).get("show_current_help") is _PREV_SHOW:
-                _m.show_current_help = _show_help_v0182
+                _m.show_current_help = _show_help_v0183
                 _PATCHED.append((_m, "show_current_help", _PREV_SHOW))
     else:
         for _m, attr, orig in _PATCHED:
@@ -144,201 +138,67 @@ def _patch_help(on: bool = True) -> None:
 _patch_help(True)
 
 
-# ---------------------------------------------------------------- closeout
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+# ---------------------------------------------------------------- ① monitor → VIA_Panorama 尾版 through run
+def monitor(args: list) -> int:
+    return PRIOR.main(["run", "--family", "core", PANORAMA_FAMILY] + list(args))
 
 
-def sub(argv: list, log: Path, timeout: int = 1800) -> tuple:
-    """子行程跑本版主控台(不觸發監控 · 不自動推);完整輸出落檔,回 (rc, 文字)。"""
-    env = {**os.environ, "VIA_FROM_VCGC": "YES", "VIA_PANORAMA_AUTO": "0", "VIA_VCGC_PUSH": "NO", "VIA_NO_OPEN": "1"}
+# ---------------------------------------------------------------- ② 任何 VCGC 動作收尾 → 背景自動開監控
+def panorama_tail() -> Path | None:
+    hits = sorted(HERE.glob(PANORAMA_FAMILY + "_v*.py"))
+    return hits[-1] if hits else None
+
+
+def auto_skip(args: list) -> str:
+    if os.environ.get(AUTO_ENV) == "0":
+        return f"{AUTO_ENV}=0"
+    if os.environ.get(ACTIVE_ENV) == "1":
+        return "監控自己呼叫(防遞迴)"
+    if os.environ.get(TEST_ENV) == "1":
+        return "串測中"
+    if os.environ.get("CI", "").lower() == "true":
+        return "CI"
+    if args[:1] in (["--selftest"], ["selftest"]):
+        return "自測"
+    return ""
+
+
+def auto_monitor(args: list, launcher=None) -> str:
+    """不擋、不拋、不寫 stdout;回一行狀態(也寫 stderr)。"""
+    why = auto_skip(args)
+    if why:
+        return "skip:" + why
+    tail = panorama_tail()
+    if tail is None:
+        return "skip:VIA_Panorama 不在"
+    argv = [sys.executable, str(tail), "autostart", "--from", " ".join(args[:2]) or "(無動詞)"]
     try:
-        p = subprocess.run([sys.executable, str(Path(__file__).resolve()), *argv], cwd=str(REPO), capture_output=True, timeout=timeout,
-                           env=env, stdin=subprocess.DEVNULL)
-        rc, txt = p.returncode, (p.stdout + p.stderr).decode("utf-8", "replace")
-    except subprocess.TimeoutExpired:
-        rc, txt = 124, f"逾時 {timeout}s(誠實)"
-    log.parent.mkdir(parents=True, exist_ok=True)
-    log.write_text(txt, encoding="utf-8")
-    return rc, txt
-
-
-def git(*args, timeout: int = 300) -> tuple:
-    try:
-        p = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, timeout=timeout, stdin=subprocess.DEVNULL)
-        return p.returncode, (p.stdout + p.stderr).decode("utf-8", "replace")
-    except subprocess.TimeoutExpired:
-        return 124, "逾時"
-
-
-def commit(message: str) -> str:
-    """只提交收尾會動到的兩夾;沒有變動 = 不提交(誠實回 clean)。"""
-    git("add", "-A", "--", *COMMIT_PATHS)
-    rc, _ = git("diff", "--cached", "--quiet")
-    if rc == 0:
-        return "clean"
-    rc, out = git("commit", "-q", "-m", message)
-    return "committed" if rc == 0 else f"commit 失敗:{out.strip()[-120:]}"
-
-
-def affected_cases(check_text: str, cases: dict, work_items: list) -> list:
-    """handoff check 的發現 → 要重測的案(依交接冊的工作項與案相依)。"""
-    wi = {w["id"]: w.get("case") for w in work_items if isinstance(w, dict)}
-    hit = set()
-    for m in re.finditer(r"EVIDENCE_INVALID \{'id': '([^']+)'", check_text):
-        c = wi.get(m.group(1)) or m.group(1).split(":")[-1]
-        if c in cases:
-            hit.add(c)
-    changed = re.findall(r"CHANGED_CODE_WITHOUT_TEST (.+)", check_text)
-    for f in (x.strip() for x in changed):
-        for name, spec in cases.items():
-            if any(fnmatch.fnmatch(f, d) for d in spec.get("dependencies") or []):
-                hit.add(name)
-    order = list(cases)
-    return sorted(hit, key=order.index)
-
-
-def verify_work_items(passed: list) -> int:
-    """本輪 handoff test 通過的案 → 其下 PENDING 工作項轉 VERIFIED(掛收據);其他狀態一律不動。"""
-    ho = json.loads(HANDOFF_SSOT.read_text(encoding="utf-8"))
-    n = 0
-    for w in ho.get("work_items") or []:
-        if isinstance(w, dict) and w.get("case") in passed and w.get("state") == "PENDING":
-            w["state"], w["receipt"] = "VERIFIED", f"docs/handoff/evidence/{w['case']}.json"
-            n += 1
-    if n:
-        ho["updated_at"] = _now()
-        HANDOFF_SSOT.write_text(json.dumps(ho, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return n
-
-
-def gate(log: Path) -> str:
-    tails = sorted(HERE.glob("VIA_Panorama_v*.py"))
-    if not tails:
-        return "交接閘 ABSENT(VIA_Panorama 不在)"
-    env = {**os.environ, "VIA_PANORAMA_AUTO": "0"}
-    try:
-        p = subprocess.run([sys.executable, str(tails[-1]), "state"], cwd=str(VIA), capture_output=True, timeout=300, env=env, stdin=subprocess.DEVNULL)
-        txt = (p.stdout + p.stderr).decode("utf-8", "replace")
-    except subprocess.TimeoutExpired:
-        txt = "逾時"
-    log.parent.mkdir(parents=True, exist_ok=True)
-    log.write_text(txt, encoding="utf-8")
-    first = (txt.strip().splitlines() or [""])[0]
-    return first.split("] ", 1)[-1] if "] " in first else first
-
-
-def closeout(args: list) -> int:
-    apply, push = "--apply" in args, "--push" in args
-    skip_tests = "--skip-tests" in args
-    only = args[args.index("--cases") + 1].split(",") if "--cases" in args and args.index("--cases") + 1 < len(args) else None
-    run = "co-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    d = OUT / run
-    rows, t0 = [], time.time()
-
-    def step(sid, name, lamp, note, sec):
-        rows.append({"step": sid, "name": name, "lamp": lamp, "note": note, "sec": round(sec, 1)})
-        print(f"  {sid:<2} {name:<16} {lamp:<6} {sec:6.1f}s · {note}"[:220], flush=True)
-
-    def finish(rc):
-        after = gate(d / "9_gate_after.log")
-        step("⑨", "交接閘(後)", "GREEN" if " GREEN" in after else ("RED" if " RED" in after else "YELLOW"), after, 0)
-        res = {"run": run, "at": _now(), "apply": apply, "push": push, "rc": rc, "sec": round(time.time() - t0, 1), "steps": rows,
-               "head": git("rev-parse", "--short=12", "HEAD")[1].strip()}
-        OUT.mkdir(parents=True, exist_ok=True)
-        (OUT / "CLOSEOUT_latest.json").write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
-        with open(OUT / "closeout_ledger.jsonl", "a", encoding="utf-8") as f:  # 只增
-            f.write(json.dumps({k: res[k] for k in ("run", "at", "apply", "push", "rc", "sec", "head")}, ensure_ascii=False) + "\n")
-        print(f"[VCGC closeout] {'GREEN' if rc == 0 else ('RED' if rc == 1 else 'YELLOW')} · rc {rc} · {res['sec']}s · 記錄 {d}")
-        return rc
-
-    print(f"[VCGC closeout] {run} · {'--apply' if apply else '乾跑(不寫冊 · 不提交)'} · {'--push' if push else '不推'}", flush=True)
-    t = time.time()
-    before = gate(d / "1_gate_before.log")
-    step("①", "交接閘(前)", "RED" if " RED" in before else ("GREEN" if " GREEN" in before else "YELLOW"), before, time.time() - t)
-    t = time.time()
-    rc, txt = sub(["handoff", "check"], d / "2_handoff_check.log")
-    try:
-        ho = json.loads(HANDOFF_SSOT.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
-        step("②", "handoff check", "RED", f"交接冊讀不到:{e}", time.time() - t)
-        return finish(1)
-    cases = only or affected_cases(txt, ho.get("test_cases") or {}, ho.get("work_items") or [])
-    head = next((ln for ln in txt.splitlines() if ln.startswith("[交接防遺漏]")), "").replace("[交接防遺漏] ", "")
-    step("②", "handoff check", "GREEN" if rc == 0 else "YELLOW", f"{head[:90]} → 要重測 {len(cases)} 案:{','.join(cases) or '無'}", time.time() - t)
-    passed = []
-    if not skip_tests:
-        for c in cases:
-            t = time.time()
-            rc, txt = sub(["handoff", "test", c], d / f"3_test_{c}.log", timeout=1800)
-            rec = next((json.loads(ln) for ln in txt.splitlines() if ln.startswith("{\"case\"")), {})
-            ok = rc == 0 and rec.get("marker", False)
-            step("③", f"test {c}", "GREEN" if ok else "RED", f"rc {rc} · 標記 {rec.get('marker')}", time.time() - t)
-            if not ok:
-                print(f"  停:{c} 沒過,不往下 checkpoint(看 {d / f'3_test_{c}.log'})")
-                return finish(1)
-            passed.append(c)
-    if apply and passed:
-        t = time.time()
-        n = verify_work_items(passed)
-        step("③+", "工作項轉 VERIFIED", "GREEN", f"{n} 項(只轉本輪實測通過的案底下 PENDING 的;BLOCKED 不動)", time.time() - t)
-    t = time.time()
-    rc, txt = sub(["registry-sync"] + (["--apply"] if apply else []), d / "4_registry.log")
-    m = re.search(r"新 (\d+) · 變更 (\d+) · 退役 (\d+)", txt)
-    pend = m and any(int(x) for x in m.groups())
-    note = f"新 {m.group(1)} · 變 {m.group(2)} · 退役 {m.group(3)}" if m else "讀不到計數"
-    if apply and pend:
-        note += " · " + commit("vcgc closeout: registry-sync --apply")
-    step("④", "registry-sync", "GREEN" if not pend or apply else "YELLOW", note + ("" if apply or not pend else " → 要套用:closeout --apply"), time.time() - t)
-    if apply:
-        t = time.time()
-        git("fetch", "-q", "origin", "main")
-        rc, txt = sub(["run", "CGC_MDL237_NumberingSystem", "--apply", "--scope"], d / "5_numbering.log")
-        rc2, txt2 = sub(["run", "CGC_MDL237_NumberingSystem", "audit"], d / "5_numbering_audit.log")
-        a = re.search(r"遺失 (\d+) · 改身分 (\d+) · 重號 (\d+)", txt2)
-        clean = bool(a) and not any(int(x) for x in a.groups())
-        note = (f"遺失 {a.group(1)} · 改身分 {a.group(2)} · 重號 {a.group(3)}" if a else "稽核讀不到") + (" · " + commit("vcgc closeout: numbering --apply --scope") if clean else "")
-        step("⑤", "編號 + 稽核", "GREEN" if clean else "RED", note, time.time() - t)
-        if not clean:
-            return finish(1)
-    t = time.time()
-    rc, txt = sub(["run", "CGC_MDL245_SDDValidator", "check"], d / "6_sdd.log")
-    ms = re.search(r"\[SDD 驗證\] (GREEN|YELLOW|RED)", txt)
-    sdd = ms.group(1) if ms else ("GREEN" if rc == 0 else ("RED" if rc == 1 else "YELLOW"))  # 讀不到燈才看結束碼
-    step("⑥", "SDD 檢查", sdd, f"rc {rc}", time.time() - t)
-    if sdd == "RED":
-        print(f"  停:SDD 紅,不 checkpoint(看 {d / '6_sdd.log'})")
-        return finish(1)
-    if apply:
-        t = time.time()
-        rc, txt = sub(["handoff", "checkpoint"], d / "7_checkpoint.log")
-        note = f"rc {rc} · " + commit("vcgc closeout: handoff checkpoint · 收據 · 只增帳")
-        step("⑦", "checkpoint+提交", "GREEN" if rc in (0, 2) else "RED", note, time.time() - t)
-        if rc not in (0, 2):
-            return finish(1)
-    else:
-        step("⑦", "checkpoint", "YELLOW", "乾跑不寫:要收尾 → via-vcgc closeout --apply [--push]", 0)
-    if push:
-        t = time.time()
-        rc, out = git("push", "origin", "HEAD", timeout=600)
-        step("⑧", "推上 GitHub", "GREEN" if rc == 0 else "RED", "已推" if rc == 0 else f"被拒(不強推):{out.strip()[-120:]}", time.time() - t)
-        if rc != 0:
-            return finish(1)
-    return finish(0 if apply else 2)
+        if launcher is not None:
+            rc, out = launcher(argv)
+        elif VIA_ACCEL is not None and hasattr(VIA_ACCEL, "run_fast"):
+            rc, out = VIA_ACCEL.run_fast(argv, timeout=20)
+        else:
+            p = subprocess.run(argv, capture_output=True, timeout=20, stdin=subprocess.DEVNULL)
+            rc, out = p.returncode, (p.stdout + p.stderr).decode("utf-8", "replace")
+    except Exception as e:  # 監控起不來不影響 VCGC 本身的結果
+        rc, out = "ERR", f"{type(e).__name__}: {e}"
+    line = next((ln for ln in str(out).splitlines() if ln.startswith("[監控]")), f"[監控] rc {rc} · {str(out).strip()[:120]}")
+    print(line, file=sys.stderr)
+    return line
 
 
 # ---------------------------------------------------------------- main
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
-    if args[:1] == ["closeout"]:
-        try:
+    try:
+        if args[:1] == ["monitor"]:
             if os.environ.get("VIA_FROM_VCGC") != "YES":
                 print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
                 return 2
-            return closeout(args[1:])
-        finally:
-            PRIOR.auto_monitor(args)
-    return PRIOR.main(args)
+            return monitor(args[1:])
+        return PRIOR.main(args)
+    finally:
+        auto_monitor(args)
 
 
 # ---------------------------------------------------------------- selftest
@@ -349,55 +209,68 @@ def selftest():
         ok.append(bool(cond))
         print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
 
-    check = ("[RED] EVIDENCE_INVALID {'id': 'VCGC-REQ075:handoff', 'why': ['x']}\n[RED] EVIDENCE_INVALID {'id': 'VCGC-REQ079:sdd', 'why': []}\n"
-             "[RED] CHANGED_CODE_WITHOUT_TEST supportive modules/registry/VIA_Panorama_v0104.py\n[RED] CHANGED_CODE_WITHOUT_TEST zzz/none.py\n")
-    cases = {"handoff": {"dependencies": ["a/*.py"]}, "sdd": {"dependencies": []}, "monitor": {"dependencies": ["supportive modules/registry/VIA_Panorama_v*.py"]},
-             "deck": {"dependencies": ["b/*.py"]}}
-    wi = [{"id": "VCGC-REQ075:handoff", "case": "handoff"}, {"id": "VCGC-REQ079:sdd", "case": "sdd"}]
-    got = affected_cases(check, cases, wi)
-    chk("② handoff check 發現 → 要重測的案(工作項對案 + 改過的檔對相依;照冊序;不相干的檔不算)", got == ["handoff", "sdd", "monitor"], got)
-    seen, real_main = [], PRIOR.main
-    calls, real_auto = [], PRIOR.auto_monitor
+    import contextlib
+    import io
+    keep = {k: os.environ.get(k) for k in ("VIA_FROM_VCGC", AUTO_ENV, ACTIVE_ENV, TEST_ENV, "CI")}
+    seen, calls = [], []
+    real_main, real_auto = PRIOR.main, globals()["auto_monitor"]
     PRIOR.main = lambda a: seen.append(list(a)) or 0
-    PRIOR.auto_monitor = lambda a, launcher=None: calls.append(list(a)) or "stub"
-    env = os.environ.get("VIA_FROM_VCGC")
+    globals()["auto_monitor"] = lambda a, launcher=None: calls.append(list(a)) or "stub"
     try:
+        for k in keep:
+            os.environ.pop(k, None)
+        os.environ["VIA_FROM_VCGC"] = "YES"
+        rc = main(["monitor", "lessons"])
+        rc2 = main(["panorama"])  # 既有動詞:原樣轉交前版
         os.environ.pop("VIA_FROM_VCGC", None)
-        denied = main(["closeout"])
-        passthru = main(["status"])
+        denied = main(["monitor"])
     finally:
-        PRIOR.main, PRIOR.auto_monitor = real_main, real_auto
-        if env is None:
-            os.environ.pop("VIA_FROM_VCGC", None)
-        else:
-            os.environ["VIA_FROM_VCGC"] = env
-    chk("closeout 不經 VCGC 拒跑 · 拒跑也觸發監控 · 其他動詞原樣轉交 v0181", denied == 2 and calls == [["closeout"]] and seen == [["status"]]
-        and passthru == 0, (seen, calls))
-    src = Path(__file__).read_text(encoding="utf-8")
-    chk("同意閘:寫冊 / 提交只在 --apply · 推送只在 --push · 不強推 · 子步 VIA_VCGC_PUSH=NO",
-        "if apply and pend:" in src and "if push:" in src and '"push", "origin", "HEAD"' in src and ("--" + "force") not in src  # 拆開組:這行自己不算
-        and '"VIA_VCGC_PUSH": "NO"' in src)
-    chk("停損:案沒過 / 稽核非 0 / SDD 紅 都不 checkpoint", src.count("return finish(1)") >= 4)
-    import tempfile
-    global HANDOFF_SSOT
-    keep_ssot = HANDOFF_SSOT
-    with tempfile.TemporaryDirectory() as td:
-        HANDOFF_SSOT = Path(td) / "h.json"
-        HANDOFF_SSOT.write_text(json.dumps({"work_items": [{"id": "a", "case": "monitor", "state": "PENDING"}, {"id": "b", "case": "monitor", "state": "BLOCKED"},
-                                                          {"id": "c", "case": "deck", "state": "PENDING"}]}), encoding="utf-8")
-        n = verify_work_items(["monitor"])
-        st = {w["id"]: w["state"] for w in json.loads(HANDOFF_SSOT.read_text(encoding="utf-8"))["work_items"]}
-    HANDOFF_SSOT = keep_ssot
-    chk("工作項:只轉本輪通過的案底下 PENDING → VERIFIED;BLOCKED 與沒跑的案不動", n == 1 and st == {"a": "VERIFIED", "b": "BLOCKED", "c": "PENDING"}, st)
-    chk("提交只收兩夾(docs/handoff · registry)· 沒變動不空提交", COMMIT_PATHS == ["VeritasIntelligenceAnalytics/docs/handoff",
-                                                                     "VeritasIntelligenceAnalytics/supportive modules/registry"] and '"diff", "--cached", "--quiet"' in src)
+        PRIOR.main = real_main
+        globals()["auto_monitor"] = real_auto
+    chk("① monitor 走 run VIA_Panorama 尾版;不經 VCGC 拒跑;既有 panorama 動詞原樣轉交前版(不蓋)",
+        rc == 0 and seen[0] == ["run", "--family", "core", PANORAMA_FAMILY, "lessons"] and seen[1] == ["panorama"] and denied == 2, seen)
+    chk("② 每個 VCGC 動作收尾都觸發監控(含被拒的那次)", calls == [["monitor", "lessons"], ["panorama"], ["monitor"]] and rc2 == 0, calls)
+    fired = []
+
+    def fake(argv):
+        fired.append(argv)
+        return 0, "[監控] 已在背景起全景監控 pid 1 · 頁 x\n"
+    err, outb = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stderr(err), contextlib.redirect_stdout(outb):
+        line = auto_monitor(["sync-check"], launcher=fake)
+    chk("② 觸發帶動詞 · 呼叫尾版 autostart · 提示只寫 stderr(stdout 乾淨,JSON 動詞不受影響)",
+        fired and fired[0][2:] == ["autostart", "--from", "sync-check"] and line.startswith("[監控]") and outb.getvalue() == ""
+        and "[監控]" in err.getvalue(), fired)
+    skips = []
+    for k, v in ((AUTO_ENV, "0"), (ACTIVE_ENV, "1"), (TEST_ENV, "1"), ("CI", "true")):
+        os.environ[k] = v
+        skips.append(auto_monitor(["status"], launcher=fake).startswith("skip:"))
+        os.environ.pop(k, None)
+    skips.append(auto_monitor(["--selftest"], launcher=fake).startswith("skip:"))
+    chk("② 不觸發:AUTO=0 · 監控自己(防遞迴)· 串測中 · CI · 自測", all(skips) and len(fired) == 1, skips)
+
+    def boom(argv):
+        raise RuntimeError("x")
+    with contextlib.redirect_stderr(io.StringIO()):
+        safe = auto_monitor(["status"], launcher=boom)
+    chk("② 監控起不來不拋、不影響 VCGC 結果", safe.startswith("[監控]"), safe)
+    tail = panorama_tail()
+    chk("② VIA_Panorama 尾版在且有 autostart", tail is not None and "def autostart" in tail.read_text(encoding="utf-8"), tail)
     card = help_catalog()
-    chk("help 目前生效入口 = 本版 · 多一行 closeout", card.get("entry") == Path(__file__).name and "closeout" in card and card.get("previous") == PRIOR_PATH.name)
-    chk("加速器橋 · 網路橋在", "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src)
+    chk("③ help 目前生效入口 = 本版 · 多一行 monitor", card.get("entry") == Path(__file__).name and "monitor" in card
+        and card.get("previous") == PRIOR_PATH.name, card.get("entry"))
+    src = Path(__file__).read_text(encoding="utf-8")
+    chk("加速器:ACCEL 橋 · NET 橋 · 觸發走 VIA_ACCEL.run_fast", "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src
+        and "VIA_ACCEL.run_fast(argv, timeout=20)" in src)
+    for k, v in keep.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
     print(f"  VCGC v0182 selftest {sum(ok)}/{len(ok)} {'PASS' if all(ok) else 'FAIL'}")
     if not all(ok):
         return 1
-    _patch_help(False)  # 前版自測核的是「help 接在 v0181」:暫時還原,跑完再接回本版
+    _patch_help(False)  # 前版自測核的是「help 接在 v0180」:暫時還原,跑完再接回本版
     try:
         return PRIOR.selftest()
     finally:
@@ -405,4 +278,6 @@ def selftest():
 
 
 if __name__ == "__main__":
-    raise SystemExit(selftest() if sys.argv[1:] == ["--selftest"] else main())
+    if sys.argv[1:2] == ["--selftest"]:
+        raise SystemExit(selftest())
+    raise SystemExit(main())

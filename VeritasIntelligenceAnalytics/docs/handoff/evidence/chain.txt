@@ -27,15 +27,21 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 553 · import 0 · 提及 44 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 561 · import 0 · 提及 50 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0102.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0103.py(家族 core)
+=== CGC_MDL224_TestAuto_v0103 · 薄尾自測(逐站落本機暫存 · 中斷接續)===
+  [OK] ① 進度暫存模組 CGC_MDL251 載得到;本體的站執行格與 run 已換成本版
+  [OK] ② 中斷(Ctrl+C)後重跑:已跑完的 a · b 接續不重跑,只跑沒跑過的 c;接續的站 log 照寫且標明「接續」 · (2, [('c',)])
+  [OK] ③ 正常跑完標完成 → 下一次重開新一輪(不拿舊結果冒充)
+  [OK] ④ 暫存檔在本機暫存夾(VIA_PROGRESS_DIR 指定處)、不在倉內 · /tmp/tmpljky7e2u/VIA_progress/TestAutoST_0f5150b1a867328f.jsonl
+  [OK] ⑤ 加速器橋 · 網路橋在;不碰 TA-Lib
   [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
   [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
-  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0108.ps1
+  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0111.ps1
   [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · 沒有 pwsh:語法沒量(不冒充綠;設 VIA_PWSH 或裝 PowerShell 7)· 串測步在
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261001-200720-24812', 'hub': 'go-20260930-120000-1'}
+  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261001-194139-14721', 'hub': 'go-20260930-120000-1'}
   [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
   [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
   [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
@@ -46,10 +52,10 @@
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
 [VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
   [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0106.json · 0
-  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 80
+  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0117.json · 0
+  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 101
   [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
   CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
   CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL149_VeritasCentralGovernanceCo | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL149_VeritasCentralGovernanceConsole_v0183.p → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 3, 'changed': 13, 'stale': 0, 'expected': 14100, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [OK] ⑥ 前版自測跑完後本版換裝還在(站執行格 · run)
+  [CGC_MDL224_TestAuto_v0103] 薄尾 6/6 PASS

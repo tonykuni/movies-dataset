@@ -6,7 +6,7 @@ description: 萬用型系統級「全景偵測」:對本機路徑或 GitHub 路�
 # panorama-matrix — 萬用全景偵測(只看不動 · 矩陣報告)
 
 本技能是**監測器**,不是修復器。執行體是 `scripts/panorama_matrix.py`,它轉交釘版引擎
-`VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0104.py`(薄尾鏈:v0104 交接閘 + 工作流圖 → v0103 VCGC 自動監控 + AUTO SYNC → v0102 全函式記錄 + 教訓學習 → v0101 儀表板 → 本體 v0100;同一支程式,不另抄)。
+`VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0105.py`(薄尾鏈:v0105 交接閘 + 工作流圖 → v0104 VCGC 自動監控 + AUTO SYNC → v0103 第一步監控(first · monitor)→ v0102 全函式記錄 + 教訓學習 → v0101 儀表板 → 本體 v0100;同一支程式,不另抄)。
 
 ## 1. 硬規則(Hard Rules)
 
@@ -47,7 +47,7 @@ python3 $S lessons                           # 教訓卡(≤ 12 行,不重掃):�
 - **全函式記錄**:每個函式計時 · 計次 · 例外照丟並記 ERROR → `panorama.log`(JSON 行,1 MB × 5 輪替;`VIA_PANORAMA_LOG_LEVEL=DEBUG` 才逐筆)。
 - **教訓學習**:每次真的重掃就比對前一份,只增寫 `lessons.jsonl`(FIXED · NEW · REGRESSED · ESCALATED · EASED · VERDICT · RETROGRESS · DEGRADE · PERF · 首輪 BASELINE);
   學習 = 再犯排行 · 修了又壞(UNSTABLE)· MTTR · 同輪共病群 · 規則式建議 → `LESSONS_latest.md`(交接用)· `lessons.parquet`。目標樹裡的教訓帳只讀列出。
-- **碰到 VCGC 就自動監控**(VCGC v0181 起):任何 `via-vcgc` 動作收尾都在背景叫 `autostart`(stderr 一行提示;約 0.3 秒);背景 `watch --autosync`
+- **碰到 VCGC 就自動監控**(VCGC v0182 起):任何 `via-vcgc` 動作收尾都在背景叫 `autostart`(stderr 一行提示;約 0.3 秒);背景 `watch --autosync`
   單例、閒置 30 分自停;有觸碰就經 VCGC 跑唯讀同步探針 `sync-check` + `ssot panorama`(VCGC → VDF → VRN → SUP,加速器並行)→ 儀表板「AUTO SYNC」卡。
   `--apply` 不自動下(同意閘),只列待批准指令。關掉:`VIA_PANORAMA_AUTO=0`。手動:`python3 $S sync`(≤ 10 行卡)· VCGC 動詞 `via-vcgc monitor …`。
 - **交接閘(AI STATE gate)**:`python3 $S state`(≤ 10 行卡)· 交接快照之後落後幾個提交、改過的程式有沒有被需求冊 / 工作流冊點名;

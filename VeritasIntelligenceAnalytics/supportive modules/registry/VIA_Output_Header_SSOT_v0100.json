@@ -1,0 +1,1233 @@
+{
+ "schema": "VIA.OutputHeader.SSOT.v1",
+ "version": "v0100",
+ "batch": "R34",
+ "ts": "2026-09-30T19:52:52+00:00",
+ "source": "操作員 R34 2026-09-30:「將輸出HEADER檢視定案後建立DATAFRAME鎖定 以DATAFRAME中資料的輸出即驗證即結果驗證為範圍目標不發散」",
+ "owner": "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py(check / lock)",
+ "rule": [
+  "每張表的欄位從正主程式照抄(evidence 帶檔:行),不發明;唯一例外 = 操作員指名要的 ETF 四項(etf_daily_metrics · etf_breakdown)",
+  "表頭定案 = 本冊版號;改表頭先出本冊新版,鎖帳才收(CGC_MDL249 拒寫同版改表頭)",
+  "來源不在 = NODATA(照實);資料在工作站資料家,容器只驗自測",
+  "毛申購 / 毛贖回(units_subscribed · units_redeemed)查無官方來源,照實留 NULL(非必填);資金流入 / 流出 = 淨流量正負拆分,標 kind=ESTIMATE"
+ ],
+ "fragments": [
+  "docs/r34/VDF_OUTPUT_HEADERS_r34.json",
+  "docs/r34/VRN_OUTPUT_HEADERS_r34.json"
+ ],
+ "tables": {
+  "tw_stock_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_VDF_TW_MARKET",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_listings_industry"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "industry_code",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "industry_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:336-341 (row columns) · :343 (upsert keys code,market) · :168 (DB_TW) · reader VDF_ENG087_MarketListGovernance_v0105.py:159 load_stock_list · min_rows = SOFT_MIN TWSE 900 + TPEX 700 at VDF_ENG087_MarketListGovernance_v0105.py:93 · db_env at VDF_ENG087_MarketListGovernance_v0105.py:129"
+  },
+  "tw_stock_list_diff": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG087_MarketListGovernance",
+   "source": {
+    "kind": "json",
+    "db_env": "",
+    "path": "VIA_Reports/vdf/central_lists/TW_STOCK_LIST_SNAPSHOT_latest.json",
+    "table": "rows"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "industry",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "first_seen",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "last_seen",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "delisted_on",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "relisted",
+     "dtype": "bool",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0106.py:161-166 (row columns) · :96 (SNAPSHOT path) · status in ACTIVE|NEW|DELISTED (:95 STATUSES)"
+  },
+  "active_etf_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG077_ActiveETFUniverse",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "active_tw_etf_registry"
+   },
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "fund_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "domestic",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "daily_required",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "first_seen",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "last_seen",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py:192-193 (DDL, ticker PRIMARY KEY; first_seen/last_seen VARCHAR) · locked tail VDF_ENG077_ActiveETFUniverse_v0105.py (VIA_LampLock_v0107 VDF-WKF006) · db_env at VDF_ENG087_MarketListGovernance_v0105.py:137"
+  },
+  "etf_holdings_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG078_ActiveETFHoldingsHistory",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "holdings_daily"
+   },
+   "columns": [
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "etf_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "holding_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "holding_yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "holding_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "weight_pct",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "shares",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source_url",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fetched_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259-2273 (DDL; ENG051 owns structure) · writer VDF_ENG078_ActiveETFHoldingsHistory_v0107.py:994-997 (_HOLD_MAP) and :1000-1031 (upsert key portfolio_date,etf_ticker,holding_ticker) · locked tail VDF_ENG078_ActiveETFHoldingsHistory_v0113.py (VDF-WKF006)"
+  },
+  "etf_daily_metrics": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "etf_daily_metrics"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "aum",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "nav",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_outstanding",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_subscribed",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_redeemed",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "net_units",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "inflow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "outflow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "net_flow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source_url",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fetched_at",
+     "dtype": "datetime",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:109-114 (METRICS_COLS, METRICS_DDL; operator-defined table) · kind OFFICIAL|ESTIMATE · units_subscribed/units_redeemed are ABSENT (always NULL: no gross creation/redemption source in code or quarantine; see SOURCES in the same file)"
+  },
+  "etf_breakdown": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "etf_breakdown"
+   },
+   "columns": [
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "group_kind",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "group",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "weight_pct",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "n_holdings",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:115-117 (BREAKDOWN_COLS, BREAKDOWN_DDL) · group_kind in industry|asset · inputs holdings_daily (VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259) × tw_listings_industry.industry_name (VDF_ENG055_OmniFetch_v0118.py:339)"
+  },
+  "vrn_basic_info": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG110_TabReport",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/output_hub/vrn/basic/vrn_basic.duckdb",
+    "table": "basic_info"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportType",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "yfinanceTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bloombergTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "tickerKind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "companyName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "brokerAbbr",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportDate",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportCode",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "language",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pages",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ratingCat",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationRisk",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:30"
+  },
+  "vrn_financial": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/financial/part-*.parquet",
+    "table": "vrn_financial"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "statement",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "item",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "dataName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "unit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "confidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "grade",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "defects",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:20"
+  },
+  "vrn_page1": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/page1/part-*.parquet",
+    "table": "vrn_page1"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "page",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fixed_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "supportive modules/registry/VIA_VRN_TabFields_v0100.json:15"
+  },
+  "vrn_report_basic": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "name_official",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_raw",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_report",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "title_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "conflicts",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "extracted_at",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_close",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_retro_ratio",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_event",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_age_days",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_freshness",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_block_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_zh",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_en",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_code",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_direction",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_n",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ssot_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "kind_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:1489"
+  },
+  "vrn_firstpage_matrix": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG083_VerifiedMatrix",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0120.py:419",
+   "extra_ok": true
+  },
+  "vrn_regex_selfcheck": {
+   "subsystem": "VRN",
+   "owner": "SUP_MDL749_VRNFieldRuleHub",
+   "source": {
+    "kind": "csv",
+    "path": "VIA_Reports/vrn/regex_selfcheck_latest.csv",
+    "table": ""
+   },
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "file_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "text_scope",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "chars",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "family",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pattern_id",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "hits",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "first_hit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bucket",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "evidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py:681"
+  }
+ }
+}

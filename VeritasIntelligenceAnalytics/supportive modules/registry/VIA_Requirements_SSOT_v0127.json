@@ -1,0 +1,3591 @@
+{
+ "schema": "VIA.Requirements.SSOT.v1",
+ "version": "v0127",
+ "batch": "R43 2026-10-02",
+ "ts": "2026-10-02T03:40:00+00:00",
+ "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
+ "reviewed": {
+  "messages": 156,
+  "span": [
+   "2026-09-27T20:45:53.548Z",
+   "2026-09-30T10:19:01+00:00"
+  ],
+  "non_requirements": 27,
+  "method": "逐則讀兩天對話的操作員訊息(含工作中插話的佇列訊息),同義合併成需求,每條附原話與時間;非需求(暫停 · 純提問)另列",
+  "rounds": [
+   {
+    "batch": "R33b",
+    "messages": 124,
+    "span": [
+     "2026-09-27T20:45:53.548Z",
+     "2026-09-29T00:10Z"
+    ],
+    "non_requirements": 16
+   },
+   {
+    "batch": "側線 2026-09-29 h",
+    "messages": 14,
+    "span": [
+     "2026-09-29T00:02:40.224Z",
+     "2026-09-29T12:01:57.142Z"
+    ],
+    "non_requirements": 4,
+    "source": "本 session 逐字紀錄(含工作中插話的佇列訊息);停止提示(stop hook)不是操作員的話,不列"
+   },
+   {
+    "batch": "側線 2026-09-29 i",
+    "messages": 11,
+    "span": [
+     "2026-09-29T13:00Z",
+     "2026-09-29T19:23:29+00:00"
+    ],
+    "non_requirements": 3,
+    "source": "本 session 逐字紀錄;非需求 3 則 = 暫停更新紀錄 · 現況提問 · 流程矩陣提問(照答不入冊);停止提示不是操作員的話;收尾追加 5 則全對既有條:註冊編號 SSOT 化 / 範圍令 → VCGC-REQ078(原話入冊)· SYNC ALL TO GITHUB ×2 → VCGC-REQ057 · 收尾工作 / 交接 → VCGC-REQ058 · VCGC-REQ075(舊條一字不動,照做)"
+   },
+   {
+    "batch": "側線 2026-09-30 a",
+    "messages": 3,
+    "span": [
+     "2026-09-30T00:00Z",
+     "2026-09-30T09:13:55+00:00"
+    ],
+    "non_requirements": 2,
+    "source": "本 session 逐字紀錄;需求 1 則 → VCGC-REQ084;非需求 2 則 = 缺口提問「線現在還缺少的部分」· 續行「繼續」(照答不入冊)"
+   },
+   {
+    "batch": "側線 2026-09-30 b",
+    "messages": 3,
+    "span": [
+     "2026-09-30T10:00Z",
+     "2026-09-30T10:19:01+00:00"
+    ],
+    "non_requirements": 2,
+    "source": "本 session 逐字紀錄;需求 1 則 → VCGC-REQ085;非需求 2 則 = 工序令「目前進頓交接」「先完成手頭部分開PR」(照做不入冊)"
+   },
+   {
+    "batch": "側線 2026-09-30 b 第五段",
+    "messages": 1,
+    "span": [
+     "2026-09-30T17:57:26+00:00",
+     "2026-09-30T17:57:26+00:00"
+    ],
+    "non_requirements": 0,
+    "source": "本 session 逐字紀錄;1 則 = 對 VCGC-REQ086 的缺陷回報(原話入 REQ086 quotes;Z290);停止提示不是操作員的話"
+   }
+  ]
+ },
+ "sdd_layer": "spec(需求)— 工作流冊 spec.requirements 引用本冊代碼;CGC_MDL245 X-REQ 雙向核對",
+ "status_rule": "COVERED = 有正主執行(律 / 引擎 / 工作流步);RECORDED = 常設令已入冊有代碼,由 AI 程序遵守;PARTIAL / MISSING = 附 next 與 hand(誰的手)",
+ "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
+ "tally": {
+  "RECORDED": 14,
+  "COVERED": 91,
+  "PARTIAL": 29,
+  "MISSING": 1
+ },
+ "requirements": [
+  {
+   "code": "VCGC-REQ001",
+   "review_id": "R-001",
+   "subsystem": "VCGC",
+   "topic": "自動授權與不中斷",
+   "requirement": "操作員離線時 AI 全權自動完成(含實測、邊測邊修、註冊、推送),不問不等、不中途停下,直到結果驗證無誤。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003",
+    "L81"
+   ],
+   "evidence": "只見於 docs/VIA_Progress_20260928_Rollout.md 各輪記載與 L81(授權跑完零動作不准安靜);沒有一條律寫明「授權範圍內自動續跑、不中斷、以驗證無誤為終點」。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "操作員已去睡,全權授權你在「本倉 + 本機資料家只讀 + C:\\測試樣本報告」範圍內自動完成,不問、不等;範圍外任何路徑、安裝、環境一律不碰。 分支固定 claude/vcgc-vrn-read-forward(PR #327 已開;永不 approve、永不 merge、零 force push、不 Remove-Item / pip uninstall / Stop-Pro"
+    },
+    {
+     "ts": "2026-09-28T04:55:40.739Z",
+     "text": "自動互動完成以上目標及專案有勞 我去睡覺 ps 電腦開著"
+    },
+    {
+     "ts": "2026-09-28T04:56:51.738Z",
+     "text": "自動完成三個系統"
+    },
+    {
+     "ts": "2026-09-28T05:54:49.195Z",
+     "text": "我去睡覺授權你自動完成全部含實測全部正常運作結果可驗證無誤鎖住成功註冊更新逐步邊測邊完善 授權進行一切 午安 我去睡覺 你自動互動完成"
+    },
+    {
+     "ts": "2026-09-29T00:10Z",
+     "text": "I am going to sleep please work by yourself I authorized everything complying with the policy"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ002",
+   "review_id": "R-002",
+   "subsystem": "VCGC",
+   "topic": "作業範圍",
+   "requirement": "授權範圍只限本倉 + 本機資料家(只讀)+ C:\\測試樣本報告;範圍外路徑、安裝、環境一律不碰。",
+   "status": "RECORDED",
+   "homes": [
+    "L10",
+    "L08",
+    "VCGC-WKF003"
+   ],
+   "evidence": "L10(資料家)、L08(不裝不刪環境)、VIA_Policy_DataSeat_v0100 部分涵蓋;「本倉+資料家只讀+樣本夾」三界範圍沒有集中寫成一條。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "全權授權你在「本倉 + 本機資料家只讀 + C:\\測試樣本報告」範圍內自動完成,不問、不等;範圍外任何路徑、安裝、環境一律不碰。 分支固定 claude/vcgc-vrn-read-forward(PR #327 已開;永不 approve、永不 merge、零 force push、不 Remove-Item / pip uninstall / Stop-Process)。 "
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ003",
+   "review_id": "R-003",
+   "subsystem": "VCGC",
+   "topic": "分支與合併",
+   "requirement": "工作分支固定 claude/vcgc-vrn-read-forward;原令永不 approve/merge,後令改為「CI 綠、無衝突即可自行合併推送」。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003-STP009",
+    "VCGC-WKF003",
+    "L25"
+   ],
+   "evidence": "只在未追蹤的 R33 冊 VIA_Workflow_VCGC_SSOT_v0100.json VCGC-WKF003 acceptance「CI 綠 · 無衝突 · 無未結討論才合併」;兩道令的先後取代關係未入律冊(L25 只管多 AI 會合)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "分支固定 claude/vcgc-vrn-read-forward(PR #327 已開;永不 approve、永不 merge、零 force push、不 Remove-Item / pip uninstall / Stop-Process)。 第 0 步(不准跳過): - git fetch origin;git status --short;git log --onel"
+    },
+    {
+     "ts": "2026-09-28T14:17:57.196Z",
+     "text": "github 同意授權推上去若able to merge就自己同意不衝突及推 自動化完成自動互動直到成功"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "自動推剩無衝突再推送GITHUB你跟他對口接口畚箕資料夾自動完成授權一切 我去睡晚安 一定要到結果測試驗證完成 不要再中斷 授權全部"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ004",
+   "review_id": "R-004",
+   "subsystem": "VCGC",
+   "topic": "安全禁令",
+   "requirement": "零 force push;不 Remove-Item / pip uninstall / conda remove / Stop-Process;裝套件是操作員的手。",
+   "status": "COVERED",
+   "homes": [
+    "L08"
+   ],
+   "evidence": "VIA_Policy_Laws_SSOT L08;CLAUDE.md 規則;CGC_MDL240 只查不裝。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "零 force push、不 Remove-Item / pip uninstall / Stop-Process)。 第 0 步(不准跳過): - git fetch origin;git status --short;git log --oneline -5;分支不對就 git checkout claude/vcgc-vrn-read-forward;git pull -"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ005",
+   "review_id": "R-005",
+   "subsystem": "VCGC",
+   "topic": "開工第 0 步",
+   "requirement": "每段工作先 git fetch/status/log 比對、落後就 pull --ff-only;工作樹半套改動先列出分類,非本任務的不碰也不 stash。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP002",
+    "L25"
+   ],
+   "evidence": "L25 多 AI 交會律;LL457(改完先提交再跑再生)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "第 0 步(不准跳過): - git fetch origin;git status --short;git log --oneline -5;分支不對就 git checkout claude/vcgc-vrn-read-forward;git pull --ff-only origin claude/vcgc-vrn-read-forward。 - 操作員剛手動中止一個一貼"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ006",
+   "review_id": "R-006",
+   "subsystem": "VCGC",
+   "topic": "省 Token 讀檔",
+   "requirement": "VCGC 第一步 AI 先啟用省 token 工具:讀檔一律全景 read/slice、大檔不整檔讀、JSON 用 python 取鍵、輸出只留結論行、etag 不重讀、NLP 加 --brief;全程要實際使用。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP003",
+    "VCGC-WKF003-STP001",
+    "CLAUDE.md",
+    "L01",
+    "L65"
+   ],
+   "evidence": "L01、L65 Token 撙節律;CLAUDE.md 讀檔規則;VIA_Workflow_Hub_SSOT_v0100 hub H2(CGC_MDL158 read/slice/digest/pack);入口 v0106 ①a。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "H. 省 Token 規則(L01;VCGC 第 2 步的六把工具就是你的讀檔工具,不另找): - 讀檔一律先走全景,不整檔讀: E=$(ls \"supportive modules/registry/\"CGC_MDL158_VIAPanoramaAuditRepair_v*.py | sort | tail -1) python3 \"$E\" read <檔或夾> # 骨架卡:"
+    },
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "1. 啟動 token 節省工具（第一步） * 必須先啟動，否則 AI 不得進行全面掃描或 AST。 * token 節省工具會決定： * 是否進行輕量掃描 * 是否啟動全面探針 * 是否允許 AST 精準定位 2. 確認環境工具完整（依賴檢查） 必須確認以下模組存在且為最新版： * VIA_SuperAccel_ModuleLayout * SUP_MDL743_Generi"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "token節省工具先列出來 ai要先啟動token節省工具他才知道用甚麼 先確認環境工具完整他才能去作業 確認所有py黨都要加入加速器 vdf黨要加入網路工具 都是最新版他才跑得動 先讀取政策才不會違反政策亂成一團 要讓 AI 進入 tonykuni/movies-dataset（VIA 系統）作業時不亂改、不爆 Token、不違反尾版律，必須強制 AI 執行 「先開省 Tok"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "VCGC第一步啟動節省TOKEN工具全部啟動 環境上下自動健側佈建完善 加速器網路工具包含啟動PS都要依規定加載 政策 自動編碼註冊自動上下檢查 其他流程順序進行稻子系統 VCGC唯一軸心 AI進入路徑鎖死不會遺漏 單路徑雙向檢查更新不衝突檢查更新 VDF 檢查資料庫無缺漏 VRN輸出有檢查機制存在 成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ007",
+   "review_id": "R-007",
+   "subsystem": "VCGC",
+   "topic": "SelftestGrid 禁 --help",
+   "requirement": "不跑 CGC_MDL064_SelftestGrid --help;單站用 --only;全格子只在 push 前跑一次,再生件 stash 不 commit;修完一顆紅只重跑受影響站。",
+   "status": "COVERED",
+   "homes": [
+    "CLAUDE.md",
+    "L105"
+   ],
+   "evidence": "CLAUDE.md(批707);LL460 過關就鎖定只重跑受影響站;L105。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "不跑 CGC_MDL064_SelftestGrid --help(它不吃 --help,會跑整張格子並重寫已追蹤檔);單站用 --only <站名>。全格子只在 push 前跑一次,跑完 git stash push -m \"grid regen\"(不帶 -u),再生件永不 commit。 - 可以用的就是樹上已有的正主:VCGC 各口、via_accel_injector."
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ008",
+   "review_id": "R-008",
+   "subsystem": "VCGC",
+   "topic": "唯一入口 VIA_FROM_VCGC",
+   "requirement": "每個 python 指令都經 VCGC(VIA_FROM_VCGC=YES)、用家族境 python;VCGC 為唯一核心與審核者,修補/掃描/補丁/版本切換/layout 重跑都經它,並探針檢查子系統合規。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP002",
+    "VCGC-WKF003-STP004",
+    "L20",
+    "L26",
+    "L51"
+   ],
+   "evidence": "L20 唯一對接口律、L26、L51;VIA_Policy_FlowGate_v0100;RC-27;CGC_MDL149 v0168 run 動詞。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "每個 python 指令前 $env:VIA_FROM_VCGC='YES'(VCGC 唯一入口,L20);python 用 Register-VIA-Commands 尾版的 Get-VIAEnvPython vrn,沒有就 python。 本線已落地(不要重做,只驗): - cd2b324:VRN_SystemManager_v0108.py 接回 read()/colle"
+    },
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "3. VCGC 是唯一核心審核者 * 所有修補、掃描、補丁、版本切換、layout 重跑都必須經過 VCGC 審核。 4. 不得將多條指令貼成同一行。 5. 不得執行 `registry-sync --apply` * 除非 VCGC 明確批准。 二、啟動順序（必須照順序執行） 1. 啟動 token 節省工具（第一步） * 必須先啟動，否則 AI 不得進行全面掃描或 AST。"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "找到vcgc目前更新進度生為via系統唯一核心任何動作都要經過他必要的步驟才不會發生衝突 他會探針自動檢查子系統是否和規善用 檢查這對話 不用大幅修正風險太高 適度採用他的架構 來避免整合失敗的架構優化https://share.gemini.google/HjeQX7n3grNY 在 tonykuni/movies-dataset 儲存庫中，VCGC（Veritas Cent"
+    },
+    {
+     "ts": "2026-09-28T08:23:25.512Z",
+     "text": "趕緊透過VCGC進入VDF將他的問題解決 更新同步 還有其他"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ009",
+   "review_id": "R-009",
+   "subsystem": "VCGC",
+   "topic": "正本零觸碰",
+   "requirement": "正本(references/intake、supportive modules/intake、accelerator/VeritasCeleritas.py、layout 鎖冊指名的 VRN_ENG112 v0100)一個位元不動;鎖冊哈希不得改。",
+   "status": "COVERED",
+   "homes": [
+    "L03",
+    "L22"
+   ],
+   "evidence": "L03、L22;VIA_Policy_DataSeat do_not「edit intake macro_ssot」;Z231 行尾修只寫 HEAD blob。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "正本(references/intake、supportive modules/intake、accelerator/VeritasCeleritas.py、layout 鎖冊指名的 VRN_ENG112_FinancialRead_v0100)一個位元不動;不裝套件、不改境;TA-Lib 永遠禁(L50);同一個紅修三輪還紅就寫進掉球清單當 held,不硬拗成綠。 F. 收尾"
+    },
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "鎖冊哈希不得改動 6. 啟用加速器與網路工具 * layout 必須加入： `import VIA_SuperAccel_ModuleLayout` * 加速器不存在時 → VIA_ACCEL = None（行為不變） * 網路工具必須存在（SUP_MDL740、VeritasAegisNexus） 7. 全面掃描探針（由 token 節省工具決定） * 輕量掃描：import"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ010",
+   "review_id": "R-010",
+   "subsystem": "VCGC",
+   "topic": "尾版律 新版號檔",
+   "requirement": "引擎任何改動 = 新版號檔(無版號 JSON 冊才就地改);更新版本就換一號。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP003",
+    "L04",
+    "L54"
+   ],
+   "evidence": "L04、L54;VIA_Numbering_SSOT rule「版本一換就是新鍵新號」。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "引擎改動=新版號檔(L04 尾版律),無版號 JSON 冊才就地改;正本(references/intake、supportive modules/intake、accelerator/VeritasCeleritas.py、layout 鎖冊指名的 VRN_ENG112_FinancialRead_v0100)一個位元不動;不裝套件、不改境;TA-Lib 永遠禁(L50);同"
+    },
+    {
+     "ts": "2026-09-28T14:50:47.948Z",
+     "text": "更新版本就要換一號"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ011",
+   "review_id": "R-011",
+   "subsystem": "VCGC",
+   "topic": "不另立第二把尺",
+   "requirement": "只用樹上已有正主(VCGC 各口、via_accel_injector、CGC_MDL183 scan、MDL193 各鎖、registry-sync、全景分析引擎),不另寫第二把尺、不 pip install 新工具。",
+   "status": "COVERED",
+   "homes": [
+    "L05",
+    "L30",
+    "L80"
+   ],
+   "evidence": "L05 Zero-Hydra、L30、L80;CGC_MDL240 docstring「不另立尺」。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "不另寫第二把尺(L05 / LL404)、不 pip install、不裝任何新工具;缺工具就寫進掉球清單當 held。 - 每修完一顆紅,先跑那一支自己的 --selftest 或那一道鎖,不要每次都重跑全部。 VDF所有引擎都是獨立的可獨立策 有兩個清單做輸入是要自動更新的 台股全部個股清單 主動式台股ETF全部根據REGEX及邏輯定義是主動式股票ETF中可以擷取到一規定每"
+    },
+    {
+     "ts": "2026-09-28T14:23:04.063Z",
+     "text": "全景式分析引擎在vcgc有 可使用他"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ012",
+   "review_id": "R-012",
+   "subsystem": "VCGC",
+   "topic": "誠實燈號與 held",
+   "requirement": "沒在本機量到綠不准寫 GREEN;同一紅修三輪仍紅就寫進掉球清單當 held,不硬拗成綠。",
+   "status": "RECORDED",
+   "homes": [
+    "L16",
+    "VCGC-WKF004-STP003",
+    "L57"
+   ],
+   "evidence": "L16 誠實四態、L57 涵蓋前半;「修三輪仍紅轉 held」只在 #0 任務文與 docs/VIA_DroppedBalls_B507.md 實務,律冊沒有。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "沒在你這台量到綠的,不准寫 GREEN(L16 誠實四態)。 2) VIA_VCGC_SuccessLedger_v0100.json 的 kept 追加 {\"id\":\"closeout_20260928\",\"file\":\"VIA_VCGC_CloseoutLock_v0100.json\"};book_edited 保持 false;之後跑 CGC_MDL220_Success"
+    },
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "同一個紅修三輪還紅就寫進掉球清單當 held,不硬拗成綠。 F. 收尾:docs/VIA_Closeout_Matrix_YYYYMMDD_HHmm.md 寫完整矩陣(區/件/燈/證據,含每個 held 的原因);git add 只加本任務的檔(*.ps1 接章者、docs、上述四本冊、VIA_Component_Inventory_SSOT、VIA_VCGC_Subsyste"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ013",
+   "review_id": "R-013",
+   "subsystem": "VCGC",
+   "topic": "VIA_Reports 不入 git",
+   "requirement": "VIA_Reports/ 再生件永不 commit;git add 只加本任務的檔。",
+   "status": "COVERED",
+   "homes": [
+    "L22"
+   ],
+   "evidence": "L22;VIA_Policy_DBPanel_v0101 rules;VIA_Policy_FlowGate do_not。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "VIA_Reports/ 再生件永不 commit;commit 訊息 \"vcgc: closeout lock + ledger + Z218-Z222; PS template on N scripts; layout registry sync; matrix <ts>\";git push origin claude/vcgc-vrn-read-forward;PR #3"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ014",
+   "review_id": "R-014",
+   "subsystem": "VCGC",
+   "topic": "同意閘不代設",
+   "requirement": "網路/爬取同意閘(VIA_NET_CONSENT 等)一律操作員自設,AI 不代設。",
+   "status": "COVERED",
+   "homes": [
+    "L07"
+   ],
+   "evidence": "L07;VIA_Workflow_Hub_SSOT rules 第 5 條;入口 v0106 註記。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "不裝套件、不改境;TA-Lib 永遠禁(L50);同一個紅修三輪還紅就寫進掉球清單當 held,不硬拗成綠。 F. 收尾:docs/VIA_Closeout_Matrix_YYYYMMDD_HHmm.md 寫完整矩陣(區/件/燈/證據,含每個 held 的原因);git add 只加本任務的檔(*.ps1 接章者、docs、上述四本冊、VIA_Component_Invento"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ015",
+   "review_id": "R-015",
+   "subsystem": "VCGC",
+   "topic": ".ps1 修改需操作員許可",
+   "requirement": ".ps1 修改須操作員逐次許可;本輪令即許可但只限基線外新缺,基線內既有債不碰。",
+   "status": "COVERED",
+   "homes": [
+    "L70"
+   ],
+   "evidence": "L70;VIA_CeleritasPolicy_Baseline ps1_debt;Z249 / Z285(53 支既有債待逐支裁)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "L70 逐次許可=本令即許可,但只限「基線外新缺」那 64 支;基線內既有債 838 支不碰): - 目標清單由閘算:載入 supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0100.py 的 scan(),取 ps.new_missing;其中 supportive modules/intake/ 底下 5"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ016",
+   "review_id": "R-016",
+   "subsystem": "VCGC",
+   "topic": "回覆中文",
+   "requirement": "所有回覆與說明一律用中文。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003"
+   ],
+   "evidence": "只在 docs/VIA_AI_Handover_Prompt_v0100/v0101.md 與 VIA_AutoCode_Registry;CLAUDE.md 與 Laws SSOT 都沒有。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:45:36.515Z",
+     "text": "中文回復"
+    },
+    {
+     "ts": "2026-09-28T08:23:25.512Z",
+     "text": "說明問題用中文回答逐一做出解決方案 昨天VDF有成功紀錄及參數請去GITHUN看一下記錄在解決問題 AAII SENTIMENT https://www.aaii.com/files/surveys/sentiment.xls GENERATE A PY CODE TO FETCH ALL HISTORICAL cnn fear and greed You can fetch "
+    },
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "Please reply in Chinese."
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ017",
+   "review_id": "R-017",
+   "subsystem": "VCGC",
+   "topic": "還原點",
+   "requirement": "每一步先建立還原點(可 checkout/revert),失敗回滾到前一版並記錄。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP009",
+    "L105"
+   ],
+   "evidence": "L105 最佳還原點自動建置;docs/VIA_Progress_20260928_Rollout.md 每步還原點欄;VIA_Validation_Lock_v0100。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "可先在此備份建立還原點，自動完成: https://github.com/tonykuni/movies-dataset/tree/main 找到vcgc目前更新進度生為via系統唯一核心任何動作都要經過他必要的步驟才不會發生衝突 他會探針自動檢查子系統是否和規善用 檢查這對話 不用大幅修正風險太高 適度採用他的架構 來避免整合失敗的架構優化https://share.gemi"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "自動完成實測自修正 隨時建立還原點"
+    },
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "若失敗 → 回滾到 v0104 或 v0106 9. 測試（單元 + 整合） * 換行再驗證 * 哈希再驗證 * 加速器可用性 * 網路工具連通性 * 若失敗 → 回滾並記錄 PR 10. via-vcgc layout 重新部署（最後步驟） 執行： 程式碼 ``` PowerShellgit pull via-vcgc layout ``` * 必須載入 v0108 * 換行"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ018",
+   "review_id": "R-018",
+   "subsystem": "VCGC",
+   "topic": "Master Prompt 啟動順序",
+   "requirement": "依 Master Prompt 固定順序:省 token 工具 → 環境工具完整性 → 讀政策 → 只讀拉碼 → 換行/哈希 → 加速器與網路 → 輕量/全面掃描 → AST 定位修補 → 測試 → 部署;缺模組不得執行 layout。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VCGC-WKF001-STP001"
+   ],
+   "evidence": "VIA_Workflow_Hub_SSOT_v0100 hub H0–H5 + conformance 已鎖序,但 H1 流程閘在 H2 省 token 之前(與 Master Prompt「token 工具第一步」不同);Master Prompt 本文未收成一本冊(只在 CloseoutLock / docs)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "二、啟動順序（必須照順序執行） 1. 啟動 token 節省工具（第一步） * 必須先啟動，否則 AI 不得進行全面掃描或 AST。 * token 節省工具會決定： * 是否進行輕量掃描 * 是否啟動全面探針 * 是否允許 AST 精準定位 2. 確認環境工具完整（依賴檢查） 必須確認以下模組存在且為最新版： * VIA_SuperAccel_ModuleLayout * S"
+    },
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "若缺少模組 → 不得執行 layout 3. 讀取政策（必須在任何變更前） * 解析禁止清單 * 解析版本規範 * 解析 layout 規範 * 若政策衝突 → 停止所有動作 4. 拉取程式碼（只讀） 執行兩行指令（不可合併）： 程式碼 ``` PowerShellgit pull via-vcgc layout ``` * layout 必須載入 v0108 * v0106 "
+    },
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "The second step is to activate environment manager to check the whole project necessary libraries, and the environments our hundred percent deployed it without conflicts following the logic."
+    }
+   ],
+   "r33": "R33:VCGC-WKF001 plan 記下順序:VCGC 是唯一的門(先過閘),進門第一件事就是省 Token(STP003)再環境(STP004),與操作員 R31 原話一致"
+  },
+  {
+   "code": "VCGC-REQ019",
+   "review_id": "R-019",
+   "subsystem": "VCGC",
+   "topic": "未讀政策不得變更",
+   "requirement": "所有動作必須先讀取政策,未讀政策不得執行任何變更。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP002"
+   ],
+   "evidence": "VIA_Policy_FlowGate_v0100;PSGATE-1;hub H1「[流程] 政策過」;CGC_MDL149 v0159 起每動詞先過閘。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "2. 所有動作必須先讀取政策，未讀政策不得執行任何變更。 3. VCGC 是唯一核心審核者 * 所有修補、掃描、補丁、版本切換、layout 重跑都必須經過 VCGC 審核。 4. 不得將多條指令貼成同一行。 5. 不得執行 `registry-sync --apply` * 除非 VCGC 明確批准。 二、啟動順序（必須照順序執行） 1. 啟動 token 節省工具（第一步）"
+    },
+    {
+     "ts": "2026-09-28T05:01:16.879Z",
+     "text": "從vcgc進去讀一次流程"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ020",
+   "review_id": "R-020",
+   "subsystem": "VCGC",
+   "topic": "政策衝突即停",
+   "requirement": "政策衝突時停止所有動作,列出衝突等操作員裁。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003",
+    "VCGC-WKF001-STP002"
+   ],
+   "evidence": "實務有(Z230 Master Prompt 與樹版號衝突 → 不部署等裁);只寫在 docs(Closeout_Matrix_0525 / DroppedBalls / Handover);律冊無。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "若政策衝突 → 停止所有動作 4. 拉取程式碼（只讀） 執行兩行指令（不可合併）： 程式碼 ``` PowerShellgit pull via-vcgc layout ``` * layout 必須載入 v0108 * v0106 保留為前一版 * v0104 為本體仍在使用的版本 * PR #320、#321、#322 已在 main 5. 換行與哈希檢查（CRLF / L"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ021",
+   "review_id": "R-021",
+   "subsystem": "VCGC",
+   "topic": "多條指令不得同一行",
+   "requirement": "不得將多條指令貼成同一行;一行一令、兩行指令不可合併。",
+   "status": "RECORDED",
+   "homes": [
+    "VIA_Policy_PSCommandGate"
+   ],
+   "evidence": "只在 VIA_Policy_DBPanel_v0100/v0101 rules(限 DB 面板);未升為全域 PS 交付規則。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "4. 不得將多條指令貼成同一行。 5. 不得執行 `registry-sync --apply` * 除非 VCGC 明確批准。 二、啟動順序（必須照順序執行） 1. 啟動 token 節省工具（第一步） * 必須先啟動，否則 AI 不得進行全面掃描或 AST。 * token 節省工具會決定： * 是否進行輕量掃描 * 是否啟動全面探針 * 是否允許 AST 精準定位 2. "
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ022",
+   "review_id": "R-022",
+   "subsystem": "VCGC",
+   "topic": "registry-sync --apply 需批准",
+   "requirement": "未經 VCGC/操作員明確批准不得執行 registry-sync --apply;stale 不為 0 立刻停。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP005",
+    "VCGC-WKF003-STP005"
+   ],
+   "evidence": "VIA_Workflow_Hub_SSOT_v0100 H4「--apply 需操作員批准」;入口 v0106 ①d 是/否(預設否)與 -ApproveRegistrySync;CGC_MDL149 v0168 自動同步只乾跑。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "5. 不得執行 `registry-sync --apply` * 除非 VCGC 明確批准。 二、啟動順序（必須照順序執行） 1. 啟動 token 節省工具（第一步） * 必須先啟動，否則 AI 不得進行全面掃描或 AST。 * token 節省工具會決定： * 是否進行輕量掃描 * 是否啟動全面探針 * 是否允許 AST 精準定位 2. 確認環境工具完整（依賴檢查） 必須"
+    },
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "stale 若不為 0 立刻停,不 apply。 D. 實測(每件記 rc 與最後一行證據): VCGC:CGC_MDL149 v0161 --selftest;CGC_MDL226 --selftest;CGC_MDL190_TALibLock(imports 必須 0);via-vcgc status 抓 邏輯庫/因子庫/VRN 系統管理/VDF 系統管理/L50 全景/S"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ023",
+   "review_id": "R-023",
+   "subsystem": "VCGC",
+   "topic": "AST patch 需審核",
+   "requirement": "AST 修補需先產純文字 diff、經 VIA/VCGC 審核與測試後才套用,不得自動套用。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003-STP003",
+    "VCGC-WKF004"
+   ],
+   "evidence": "VIA_VCGC_CloseoutLock / docs/VIA_Patch_Proposals_20260928.md 實務採用;CGC_MDL243 以「自測審核」代替人工審;律冊無,且與後續「授權一切」令的關係沒寫明。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "禁止自動套用 AST patch（需 via 審核） * 禁止自動載入未知二進位 * 禁止跳過政策讀取 五、VCGC 必須遵守的執行邏輯 1. VCGC 是唯一核心，所有動作必須經過它。 2. VCGC 會自動探針檢查子系統是否與政策一致。 3. VCGC 必須先確認工具完整 → 才能執行 layout。 4. VCGC 必須先啟動 token 節省工具 → 才能掃描。 5. "
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ024",
+   "review_id": "R-024",
+   "subsystem": "VCGC",
+   "topic": "禁載未知二進位",
+   "requirement": "禁止自動載入未知二進位。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF001-STP004",
+    "L09"
+   ],
+   "evidence": "只在 VCGC v0165 tools activate 十項檢查(匯入層不載二進位)與 Closeout_Matrix_0525;政策冊無。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "禁止自動載入未知二進位 * 禁止使用 ta-lib 8. AST 精準定位與修補（需 via 審核） 流程： 1. AST 定位可疑行號 2. 產生 patch（純文字 diff） 3. via 審核 4. 測試 5. 若失敗 → 回滾到 v0104 或 v0106 9. 測試（單元 + 整合） * 換行再驗證 * 哈希再驗證 * 加速器可用性 * 網路工具連通性 * 若失敗 "
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ025",
+   "review_id": "R-025",
+   "subsystem": "VCGC",
+   "topic": "回答格式 Step1–10",
+   "requirement": "執行任務時依 Master Prompt 十步格式回報(政策確認 → 工具完整 → 換行/哈希 → 掃描 → AST → patch → 是否需審核 → 測試 → 是否部署 → VCGC 最終判定)。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP004"
+   ],
+   "evidence": "律冊、工作流冊、交接提示詞都沒有此十步回報格式(只 Closeout_Matrix_0525 引用過一次)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "在執行時必須遵守的回答格式 你在執行任何任務時，必須依照以下格式回覆： 1. Step 1：政策確認結果 2. Step 2：工具完整性檢查結果 3. Step 3：換行/哈希檢查結果 4. Step 4：掃描結果（輕量/全面） 5. Step 5：AST 定位結果（若有） 6. Step 6：建議 patch（純文字 diff） 7. Step 7：是否需要 via 審核 8"
+    }
+   ],
+   "r33": "R33:VCGC-WKF004 spec.report_format 十步;收尾報告(CGC_MDL245 closeout)依十步寫"
+  },
+  {
+   "code": "VCGC-REQ026",
+   "review_id": "R-026",
+   "subsystem": "VCGC",
+   "topic": "換行/哈希檢查",
+   "requirement": "鎖冊 11 來源做哈希比對;CRLF 工作複本去 \\r 後比對,仍不符即拒絕並印檔名;layout 只收 LF。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP002"
+   ],
+   "evidence": "Z231 系列;.gitattributes -text(R1);VIA_Policy_DBPanel_v0101 eol_repair;CGC_MDL220 SuccessLedger。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "5. 換行與哈希檢查（CRLF / LF） * 鎖冊內有 11 個來源 * 9 個哈希相符 * 2 個 CRLF 工作複本需移除 `\\r` 後比對（VRN_ENG112、VRN_ENG110） 規則： * 若移除 `\\r` 後仍不符 → 拒絕並印出檔名 * layout v0108 只接受 LF * 鎖冊哈希不得改動 6. 啟用加速器與網路工具 * layout 必須加入： `"
+    }
+   ]
+  },
+  {
+   "code": "SUP-REQ001",
+   "review_id": "R-027",
+   "subsystem": "SUP",
+   "topic": "四件工具用最新版且鎖版",
+   "requirement": "加速器、網路工具、LAYOUT、NLP 一律用最新版(附件不要用錯版),版本固定在鎖冊,只有經 VCGC 才能啟用,其餘退掉;不要再把版號寫死。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP004",
+    "L09"
+   ],
+   "evidence": "CGC_MDL233_ToolActivate 鎖冊為唯一的尺;VCGC v0165 tools / tools activate;編號 VIA-VCGC-ENV068~071(Z277);Z230 由操作員裁「用最新版」;L09。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:08:31.620Z",
+     "text": "最新版本不要用錯"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "加速起 網路工具 LAYOUT都用最新版 LAYOUT功能可以用AST定位模組化整合優化他用最少的TOKEN 所有事物元件定義在這系統中 只增不減除非衝突 另外修正或優化參考附件 請自動互動完成全部 一個進度劑型自動更新GITHUB 核准權限 若附件內容已被擬修正或過時可不採用，可先在此備份建立還原點，自動完成: https://github.com/tonykuni/movi"
+    },
+    {
+     "ts": "2026-09-28T13:28:54.197Z",
+     "text": "透過GITHUB擷取加速器 用這兩個經過VCGC完成新的工具編號註冊作為統一更新的加速器 舊版刪除版本號是 1.65.0。 檔案裡寫著 ENGINE_VERSION = \"1.65.0\"。查看版本： text ``` python VeritasAegisNexus.py version ``` 會印出 VeritasAegisNexus 1.65.0。右邊的下載連結也是這一版"
+    },
+    {
+     "ts": "2026-09-28T13:30:44.691Z",
+     "text": "@\"/root/.claude/uploads/5e104bac-0438-5656-bbdf-f053d9256bd5/78022f02-VCGC_LAYOUT_ENGINE_v0104.zip\" 更新註冊 所有PY PS黨都要加入加速器 VDF引擎加入網路工具版本固定新的全面導入"
+    }
+   ]
+  },
+  {
+   "code": "SUP-REQ002",
+   "review_id": "R-028",
+   "subsystem": "SUP",
+   "topic": "舊版刪除",
+   "requirement": "新版上線後舊版工具/引擎刪除、全部改用新版。",
+   "status": "PARTIAL",
+   "homes": [
+    "L04"
+   ],
+   "evidence": "Z269:舊版刪除與 L04「舊版留作版史」及薄尾靠舊版當本體衝突,候操作員裁;Z248 無版號副本逐支有活檔在用。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T05:36:11.286Z",
+     "text": "就得請刪除"
+    },
+    {
+     "ts": "2026-09-28T12:47:26.465Z",
+     "text": "就工具刪除 TA-LIB工具局部指令刪除修復 所有引擎都要有版本號註冊進行控管"
+    },
+    {
+     "ts": "2026-09-28T13:28:54.197Z",
+     "text": "舊版刪除版本號是 1.65.0。 檔案裡寫著 ENGINE_VERSION = \"1.65.0\"。查看版本： text ``` python VeritasAegisNexus.py version ``` 會印出 VeritasAegisNexus 1.65.0。右邊的下載連結也是這一版。 <render_file file_path=\"/workspace/artifact"
+    },
+    {
+     "ts": "2026-09-28T16:36:54.929Z",
+     "text": "其他退掉刪除"
+    }
+   ],
+   "next": "Laws(L04 補「可刪條件」)待操作員裁",
+   "hand": "操作員裁定(與 L04 版史律衝突,Z269)"
+  },
+  {
+   "code": "SUP-REQ003",
+   "review_id": "R-029",
+   "subsystem": "SUP",
+   "topic": "網路工具名帶版號",
+   "requirement": "網路工具檔名要帶版號(VeritasAegisNexus_v…),以 1.65.x 新版整合新舊功能、經 VCGC 註冊。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF001-STP004"
+   ],
+   "evidence": "R20a/R20c:啟動層改掛版號尾版、VeritasAegisNexus_v1651/v1652(TOOL-0190/0191);Z248 12 支無版號副本仍在。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T12:50:33.937Z",
+     "text": "網路工具名稱不對 請查有版本號VeritasAegisNexus.py名稱有版本耗材對"
+    },
+    {
+     "ts": "2026-09-28T13:32:37.012Z",
+     "text": "https://github.com/tonykuni/movies-dataset/blob/main/VeritasIntelligenceAnalytics/VeritasAegisNexus_v1.65.1.py"
+    },
+    {
+     "ts": "2026-09-28T13:41:03.428Z",
+     "text": "網路新舊整合模組化AST整合和一更新新版本"
+    }
+   ],
+   "next": "鎖冊 + Z248 收尾",
+   "hand": "AI 下一輪(Z248 12 支未版號副本)"
+  },
+  {
+   "code": "VCGC-REQ027",
+   "review_id": "R-030",
+   "subsystem": "VCGC",
+   "topic": "L103 三條最高政策",
+   "requirement": "所有 PY 導入加速器、所有 VDF 導入網路工具、所有 PS 導入加速模板;以全景 AST 探針驗證覆蓋率 100% 且確實生效(非只掛字)。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP006",
+    "VCGC-WKF003-STP003",
+    "L103",
+    "L69",
+    "L102"
+   ],
+   "evidence": "L103、L69、L102;CGC_MDL183 CeleritasPolicyGate;CGC_MDL242 v0101 涵蓋稽核(加速器 1,749/1,749 · VDF 網路 131/131);R16-10 Invoke-VIACeleritasScoped 修正。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "Python 檔案是否加入加速器（若無 → VIA_ACCEL = None） * vdf 檔案是否加入網路工具 * 禁止模組是否存在（ta-lib） * 若缺少模組 → 不得執行 layout 3. 讀取政策（必須在任何變更前） * 解析禁止清單 * 解析版本規範 * 解析 layout 規範 * 若政策衝突 → 停止所有動作 4. 拉取程式碼（只讀） 執行兩行指令（不可合併"
+    },
+    {
+     "ts": "2026-09-28T05:36:11.286Z",
+     "text": "加速器導入所有py黨ps黨 網路工具導入vdf檔案全部 留意用全景式分析ast探針檢查他們功能覆蓋率要達100% 上面少了網路工具版本號你查一下 就得請刪除"
+    },
+    {
+     "ts": "2026-09-28T07:27:06.989Z",
+     "text": "是不是沒裝更新加速器在 PY PS也沒裝加速的部分"
+    },
+    {
+     "ts": "2026-09-28T07:27:13.594Z",
+     "text": "正主在但沒套上,略過(令照跑) ① VCGC 入口(流程閘) · rc=0 · 49.9s 比對過 · 未改 [流程閘] 過:[流程] 政策過 · 子系統已對齊 · 才執行 [Celeritas] 正主在但沒套上,略過(令照跑) ② VDF 鏈 run --resume · r"
+    }
+   ]
+  },
+  {
+   "code": "SUP-REQ004",
+   "review_id": "R-031",
+   "subsystem": "SUP",
+   "topic": "PS 模板章全覆蓋",
+   "requirement": "新 .ps1 必帶 CELERITAS-TEMPLATE-JOIN 模板章(不包裹接法、ParseFile 驗);既有 .ps1 也要全部接上。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF001-STP006",
+    "L102",
+    "L103"
+   ],
+   "evidence": "新產出 100%(PSCommandGate template、L102/L103);既有債 53 支 0/53(Z249/Z285,雜湊/凍結/剖析不過,需逐支裁)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "B. PS 模板章(操作員令:所有 PS 都要接加速器模板;L102 ②;L70 逐次許可=本令即許可,但只限「基線外新缺」那 64 支;基線內既有債 838 支不碰): - 目標清單由閘算:載入 supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0100.py 的 scan(),取 ps.new_missi"
+    },
+    {
+     "ts": "2026-09-28T12:47:26.465Z",
+     "text": "PS加入新加速器的加速模板及MATRIX SUMMARY功能 用節省TOKEN的全景式檢是 AST定位 探針全驗尋找 就工具刪除 TA-LIB工具局部指令刪除修復 所有引擎都要有版本號註冊進行控管"
+    }
+   ],
+   "next": "VIA_CeleritasPolicy_Baseline + Z285 逐支裁",
+   "hand": "操作員(L70:既有 .ps1 逐支許可;Z285)"
+  },
+  {
+   "code": "SUP-REQ005",
+   "review_id": "R-032",
+   "subsystem": "SUP",
+   "topic": "LAYOUT/NLP 單一出口並入加速器",
+   "requirement": "LAYOUT 引擎、NLP 引擎集合成單一出口且有版號;網路/LAYOUT/NLP 等工具都接加速器;LAYOUT 以 AST 定位模組化、用最少 token。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP004"
+   ],
+   "evidence": "CGC_MDL216_NlpLayoutDoor_v0101(七路線照尾版律、比對座位冊);四件工具鎖冊;VIA_ToolRoster_SSOT_v0102。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T12:47:26.465Z",
+     "text": "LAYOUT引擎 NLP引擎 都集合成單一出口 確認都有版本號 將所ˇ有工具含網路工具 LAYOUT NLP 都加 入加速器 PS加入新加速器的加速模板及MATRIX SUMMARY功能 用節省TOKEN的全景式檢是 AST定位 探針全驗尋找 就工具刪除 TA-LIB工具局部指令刪除修復 所有引擎都要有版本號註冊進行控管"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "LAYOUT功能可以用AST定位模組化整合優化他用最少的TOKEN 所有事物元件定義在這系統中 只增不減除非衝突 另外修正或優化參考附件 請自動互動完成全部 一個進度劑型自動更新GITHUB 核准權限 若附件內容已被擬修正或過時可不採用，可先在此備份建立還原點，自動完成: https://github.com/tonykuni/movies-dataset/tree/main "
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ028",
+   "review_id": "R-033",
+   "subsystem": "VCGC",
+   "topic": "引擎版號·編號·註冊時間",
+   "requirement": "所有引擎都要有版號、編號、註冊時間;此刻已成功鎖定的引擎全部上版號並同步註冊。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF003-STP005",
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "CGC_MDL242 v0101 涵蓋稽核 VCGC/VDF/VRN 尾版全綠;但 Z279/Z280 版號異形不收、Z281 無版號 .py(VCGC 18 · VDF 50 · VRN 74 · SUP 699)仍無引擎號。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T12:47:26.465Z",
+     "text": "所有引擎都要有版本號註冊進行控管"
+    },
+    {
+     "ts": "2026-09-28T13:41:03.428Z",
+     "text": "以此時此刻已成功鎖定的引擎全部上版本號 全部同步註冊更新 網路新舊整合模組化AST整合和一更新新版本"
+    },
+    {
+     "ts": "2026-09-28T18:53:51.291Z",
+     "text": "確定所有引擎都有家版本號編號註冊時間 所有參數即使相同數據不同來源也是編號不同 下式個股編號不蓋上市新增 檢查SSOT 版本編號完善自VCGC更快速啟動所有"
+    },
+    {
+     "ts": "2026-09-28T19:58:58.820Z",
+     "text": "實測驗證所VCGC直到成功註冊版本號完工即可"
+    }
+   ],
+   "next": "Numbering SSOT + Z279–Z281",
+   "hand": "AI 下一輪(Z279–Z281 版號異形 / 沒版號檔)"
+  },
+  {
+   "code": "VCGC-REQ029",
+   "review_id": "R-034",
+   "subsystem": "VCGC",
+   "topic": "只增不減",
+   "requirement": "所有事物元件定義在系統中;參數、SSOT、regex、同義字只增不減,除非衝突。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006",
+    "L02",
+    "L18"
+   ],
+   "evidence": "L02、L18;Numbering SSOT append_only;VCGC tools activate「參數只增不減不衝突」;registry-sync 0 lost。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "所有事物元件定義在這系統中 只增不減除非衝突 另外修正或優化參考附件 請自動互動完成全部 一個進度劑型自動更新GITHUB 核准權限 若附件內容已被擬修正或過時可不採用，可先在此備份建立還原點，自動完成: https://github.com/tonykuni/movies-dataset/tree/main 找到vcgc目前更新進度生為via系統唯一核心任何動作都要經過他必要"
+    },
+    {
+     "ts": "2026-09-28T13:59:50.719Z",
+     "text": "引擎雖有更新 參數不變只增不減 ssot / regex / 同義字 參數可以只增不減只要不衝突"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ030",
+   "review_id": "R-035",
+   "subsystem": "VCGC",
+   "topic": "過關就鎖定不反覆",
+   "requirement": "邊測邊修,成功一件就鎖定;鎖定的不再反覆出錯,不要一直掉球;只修剩下的。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP003",
+    "L105"
+   ],
+   "evidence": "L105;VIA_LampLock_v0100–v0102;VIA_VCGC_SuccessLedger;hub rules「過關就鎖定」。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T05:04:44.585Z",
+     "text": "照流程開始全自動最後要通過實測邊測邊檢查修正成功即鎖定直到全數成功"
+    },
+    {
+     "ts": "2026-09-28T12:07:02.260Z",
+     "text": "成功的部份鎖住 後面的部分就邊測邊修 TEST DEBUG OPTIMIZE TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG TILL THEY WORK PERFECTLY. VCGC VDF VRN自動跳出多頁式矩陣式報告 BY RICH 字體"
+    },
+    {
+     "ts": "2026-09-28T19:22:57.299Z",
+     "text": "檢查鎖定已成功部分註冊登記不要一職反覆吊球 SSOT 所一切 編號一切"
+    },
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "成功一件就鎖定 不要反覆成功地又出錯 vcgc唯一入口軸心 我去睡覺 授權遵守政策一切自動完成推勝直到輸出驗證無誤 跳出html u/i若有問題可以先是對話況上方紀錄 記錄下為何一職重複出錯 logging lesson-learned沒導入 } ======== 黃色到此 ======== PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ031",
+   "review_id": "R-036",
+   "subsystem": "VCGC",
+   "topic": "TEST DEBUG 工序",
+   "requirement": "TEST→DEBUG→OPTIMIZE→TEST→DEBUG→CONSOLIDATE→TEST→DEBUG→USER-TEST→DEBUG→ACTIVATE→TEST→DEBUG 直到完美運作。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP004",
+    "VCGC-WKF004",
+    "L33",
+    "L64"
+   ],
+   "evidence": "L33 工序律;L64 四階段治理。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T04:55:40.739Z",
+     "text": "real test debug optimize test debug consolidate test debug user-test debug activate test debug till they works perfectly. 自動互動完成以上目標及專案有勞 我去睡覺 ps 電腦開著"
+    },
+    {
+     "ts": "2026-09-28T12:07:02.260Z",
+     "text": "TEST DEBUG OPTIMIZE TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG TILL THEY WORK PERFECTLY. VCGC VDF VRN自動跳出多頁式矩陣式報告 BY RICH 字體小版面自動優化 [7/7] 檔案 報告"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ032",
+   "review_id": "R-037",
+   "subsystem": "VCGC",
+   "topic": "全景 AST 修復分平行/順序",
+   "requirement": "用全景掃描與 AST 錯誤定位修問題:可同時修者並行、其餘依序,不破壞引擎、不引發 Hydra。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF009",
+    "L56",
+    "L05"
+   ],
+   "evidence": "L56 自動修三態律;L05;CGC_MDL158 v0115(COMPILE/TAILAPI)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T04:55:40.739Z",
+     "text": "panaromatic scanning and analyzing on the problematic part use ast error identification functions to fix issue which can be resolved aimultaneouly, and others in sequence without damaging th"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ033",
+   "review_id": "R-038",
+   "subsystem": "VCGC",
+   "topic": "操作員裁定三項",
+   "requirement": "操作員裁定:依擬建議(P1–P7)、Z218 批345 正本退役、套用最新版;附件(Gemini)適度採用不大幅修正。",
+   "status": "COVERED",
+   "homes": [
+    "docs/VIA_DroppedBalls_B507.md"
+   ],
+   "evidence": "docs/VIA_Progress_20260928_Rollout.md R1–R5 與「附件採用對照」;CloseoutLock。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "1. 一擬建議 2. 退役 3. 套用最新版修改他 加速起 網路工具 LAYOUT都用最新版 LAYOUT功能可以用AST定位模組化整合優化他用最少的TOKEN 所有事物元件定義在這系統中 只增不減除非衝突 另外修正或優化參考附件 請自動互動完成全部 一個進度劑型自動更新GITHUB 核准權限 若附件內容已被擬修正或過時可不採用，可先在此備份建立還原點，自動完成: https:"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "不用大幅修正風險太高 適度採用他的架構 來避免整合失敗的架構優化https://share.gemini.google/HjeQX7n3grNY 在 tonykuni/movies-dataset 儲存庫中，VCGC（Veritas Central Governance Core，目前核心演進至 v0130 與 批338 尾版律） 已確立為 VIA（Veritas Intell"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ034",
+   "review_id": "R-039",
+   "subsystem": "VCGC",
+   "topic": "Gemini 附件建議",
+   "requirement": "參考 Gemini 對話建議:AST 橋探針、__future__ compile 驗、尾版公開 API 不退化、SyncHub SHA-256 指紋/DB 名排序/fail-closed、SDD 契約嵌入邏輯冊不新增第四本、MCP 巨集閘道、pre-commit/CI 門禁、治理指南;適度採用。",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF003"
+   ],
+   "evidence": "已採 COMPILE/TAILAPI(CGC_MDL158 v0114)、還原點、沙盒驗收;七支新腳本不採(進度表記載)。SyncHub SHA-256/fail-closed 與 pre-commit 門禁沒有採用或不採用的紀錄。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "請撰寫一段不耗 Token 的本地 AST 巡檢腳本，自動掃描所有最新尾版 .py 是否已掛載加速器橋接，並檢查所有 VDF 尾版是否已同時掛載最新版網路工具橋接（Scrape Gate）。 [source: 4]這支本地端 Python AST 巡檢腳本（via_ast_bridge_probe.py）完全使用 Python 標準庫（ast、pathlib、importlib"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "請針對 CGC_MDL179_VcgcSyncHub 撰寫最小化修改切片：以 SHA-256 內容指紋取代檔案大小比對、加入資料庫名稱排序防死鎖，並將 DB 存取異常改為 Fail-Closed。 針對 CGC_MDL179_VcgcSyncHub（負責唯讀資料庫對帳與跨子系統同步狀態巡檢的核心模組）[cite: 1]，原本實作存在三個關鍵脆弱點： 指紋盲區：依賴檔案大小（st"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "思考在目前架構像導入SDD開發架構功能及MCP的可能性及風險性 在現行 VIA / VCGC（v0130 · 批338 尾版律） 架構下，導入 SDD（Spec-Driven Development，規格驅動開發） 與 MCP（Model Context Protocol，模型上下文協定） 的整體評估結論為：「局部嫁接高度可行且效益極大，但全面重構或下放權限則具致命風險」。 這"
+    },
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "請設計如何在不新增第四本冊的前提下，將 SDD 的公開方法契約（VF_FUNCTIONS_KEPT）與雙橋接斷言無損嵌入現有的 VIA_VRN_LogicArchitecture_SSOT_v0100.json 中。 要在不新增「第四本冊」（避免 SSOT 分裂與多頭對帳）的前提下，將 SDD 的 公開方法保全契約（VF_FUNCTIONS_KEPT） 與 雙橋接斷言（ACCE"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VCGC-REQ035",
+   "review_id": "R-040",
+   "subsystem": "VCGC",
+   "topic": "PS 須先過 VCGC 流程 + 模板 + rich 矩陣",
+   "requirement": "交給操作員的 PowerShell 必須先跑過 VCGC 流程才生成,且帶加速模板與 rich 詳細摘要矩陣報告;寫入政策並同步。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP004"
+   ],
+   "evidence": "VIA_Policy_PSCommandGate_v0100(PSGATE-1);CGC_MDL229 SweepReport;VeritasCeleritas.PS7 Write-CeleritasMatrixSummary(R21)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T04:23:37.634Z",
+     "text": "please integrate all above into a powershell code with requested functions from 加速器 plus detailed summary matrix report by rich."
+    },
+    {
+     "ts": "2026-09-28T05:30:43.126Z",
+     "text": "剛才指令你是否沒加入ps加速指令模板及detailed summary matrix summary by rich. 把它加上"
+    },
+    {
+     "ts": "2026-09-28T05:32:09.812Z",
+     "text": "將這個只另寫入政策包含一定要從vcgc跑過流程才可生成os指令幫我加入更新同步"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ036",
+   "review_id": "R-041",
+   "subsystem": "VCGC",
+   "topic": "一支 PS 整合全部",
+   "requirement": "全部整合成一支 PowerShell,從 VCGC 的頭跑流程,唯一解決問題。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VCGC-WKF002"
+   ],
+   "evidence": "Invoke-VIA-OperatorConsole-v0106.ps1(唯一入口)+ via-vcgc go;hub executor.entry。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T04:47:09.978Z",
+     "text": "one powershell code to handle all"
+    },
+    {
+     "ts": "2026-09-28T05:37:07.684Z",
+     "text": "one powershell to handle all above"
+    },
+    {
+     "ts": "2026-09-28T08:59:47.150Z",
+     "text": "把它們在一個PS指令中"
+    },
+    {
+     "ts": "2026-09-28T17:48:18.771Z",
+     "text": "都寫成一個PS CODE全部整合唯一解決問題從VCGC的頭瞟流程 ENV MANAGER理應自動檢查上下所有LIBS跟環境都有布建完畢 尤其是加速器 網路更具等輔助工具常被忽略 註冊更新SYNC 跳出HTML U/I"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ037",
+   "review_id": "R-042",
+   "subsystem": "VCGC",
+   "topic": "指令在操作員視窗可直接跑",
+   "requirement": "交給操作員的指令必須在他當下視窗就能執行(倉根啟動器、全路徑、短令),不能要他猜路徑。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP004",
+    "L89",
+    "L97"
+   ],
+   "evidence": "L89、L97;VIA_Policy_DBPanel_v0101 rule「Run the panel script by its full path」;倉根 VIA-DBPanel.ps1 / VIA-Sweep.ps1 / VIA-RunAll.ps1 / VIA-OperatorConsole.ps1。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T03:15:58.671Z",
+     "text": "dbm: 無法將 'dbm' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。 請檢查名稱拼字，如果名稱含有路徑，請確認路徑正確，然後再試一次。 [General Feedback] 最相似的命令為: ➤ dbp PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalyti"
+    },
+    {
+     "ts": "2026-09-28T04:15:05.300Z",
+     "text": "0100.ps1 .\\VeritasIntelligenceAnalytics\\Invoke-VIA-DBPanel-v0100.ps1: 無法將 '.\\VeritasIntelligenceAnalytics\\Invoke-VIA-DBPanel-v0100.ps1' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。 請檢查名稱拼字，如果名稱含有路徑，請確認路徑正確"
+    },
+    {
+     "ts": "2026-09-28T04:21:01.215Z",
+     "text": "找不到路徑 'C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VIA_Reports\\datahome\\DATAHOME_CATALOG_latest.json'，因為它不存在。 PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset> $c = Get-Content .\\VIA"
+    },
+    {
+     "ts": "2026-09-28T04:23:54.616Z",
+     "text": "Invoke-VIA-DBPanel-v0100.ps1: 無法將 '.\\Invoke-VIA-DBPanel-v0100.ps1' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。 請檢查名稱拼字，如果名稱含有路徑，請確認路徑正確，然後再試一次。 PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset>"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ038",
+   "review_id": "R-043",
+   "subsystem": "VCGC",
+   "topic": "直接經 VCGC 路徑啟動一切",
+   "requirement": "一切從 VCGC 路徑直接啟動(via-vcgc go),VCGC 啟動要更快(十分鐘太慢)。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP002"
+   ],
+   "evidence": "CGC_MDL149 v0166 go;v0167 快取;入口 v0104 沿用閘與全景;RC-25(慢因是 AST 盤點不是加速器)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T18:48:21.164Z",
+     "text": "直接透過VCGC路徑啟動一切"
+    },
+    {
+     "ts": "2026-09-28T18:53:51.291Z",
+     "text": "走整個VCGC流程還需要十分鐘 確定所有引擎都有家版本號編號註冊時間 所有參數即使相同數據不同來源也是編號不同 下式個股編號不蓋上市新增 檢查SSOT 版本編號完善自VCGC更快速啟動所有"
+    },
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "速度好曼應該沒上加速器 加速器網路工具新版本不要在便所死"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ001",
+   "review_id": "R-044",
+   "subsystem": "VDF",
+   "topic": "DB 管理架構",
+   "requirement": "資料庫化:Parquet 儲存、DuckDB 管理、增量擷取、批次擷取、入庫檢查去重補缺、最省 AI/API token;泛用架構;舊程式不改,U/I 由統一引擎(VIA_DBManager,置於 VCGC)輸出。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF003",
+    "VDF-WKF001-STP004",
+    "L10",
+    "L90",
+    "L27",
+    "L28",
+    "L37"
+   ],
+   "evidence": "CGC_MDL228_VIADBManager(v0100–v0102)+ VCGC dbm 路由;L10、L27、L28、L37、L90;docs/VIA_DBManager_Plan_20260928.md。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T01:57:27.203Z",
+     "text": "資料庫管理優化及HTML U/I參考適合才採用: 用我們的標準麼板來規劃: 昨天 各類資訊資料庫化後 檢視所有資料庫 資訊用PARQUET儲存最佳 如何優化各類不同資訊資料庫結構 方便讀取現況 增量擷取 BATCH FETCHING 入庫檢查彙整去重補不足等功能 用DBDUCK功能管理能讓運作速度 擷取速度 API擷取TOKEN耗費最低 結論先講：你要的不是單一技巧，而是一套「"
+    },
+    {
+     "ts": "2026-09-28T01:57:27.203Z",
+     "text": "不要固定資料室是否為VIA 泛用型優化架構管理架構 Tony，我完全理解你的要求： 你不要 VIA 專用架構，你要「泛用型 × 最省 AI Token × 最省 API Token × 速度最快」的資料庫管理架構。 也就是： 任何資料室、任何專案、任何 AI 協作都能用的「通用型 Parquet × DuckDB × Incremental × Batch × Dedup × "
+    },
+    {
+     "ts": "2026-09-28T01:57:27.203Z",
+     "text": "舊程式不改 那呈現在U/I地的資料庫資訊統一由這個引擎輸出資料給U/I? Tony，你問的這句話其實是整個架構的「核心決策」： 舊程式不改，那呈現在 U/I 的資料庫資訊是否全部改由這個新引擎統一輸出？ 我給你最精準的答案： ✅ 是的。舊程式完全不改，U/I 的所有資料庫資訊都應由新引擎統一輸出。 而且這是 唯一能做到：最省 Token、最省 API、速度最快、架構最乾淨、風險"
+    },
+    {
+     "ts": "2026-09-28T01:57:27.203Z",
+     "text": "給這個引擎名稱為VIA_DBManager Tony，收到。 從現在開始，整個新架構的資料庫管理引擎正式命名為： 🟥 VIA_DBManager 而且我會把這個名稱正式納入後續所有架構、流程、程式碼、U/I 輸出層、轉接器、增量擷取器、metadata cache、批次入庫器、去重引擎、熱路徑引擎等所有模組。 你現在擁有的是： ⭐ VIA_DBManager = 新舊資料庫並存"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ002",
+   "review_id": "R-045",
+   "subsystem": "VDF",
+   "topic": "DB 擷取匯出",
+   "requirement": "資料庫管理可擷取資料並選項目/期間/勾選欄位,輸出 CSV(處理編碼)/ Google Sheet / JSON / MD / Parquet;U/I 一口氣攤開現況。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF003-STP001",
+    "L90"
+   ],
+   "evidence": "CGC_MDL228 export(csv utf-8-sig · Big5 · gsheet · JSON · MD · parquet;勾欄 · 時間區間);CGC_MDL238 資料庫擷取頁;L90 派生層。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T01:57:27.203Z",
+     "text": "彙整資料庫顯示現況很重要 一是一口氣要U/I全攤牌 如何優化 人可以在得知其範圍後選擇˙特定項目 期間 選族輸出格式 CSV(編碼問題) GOOGLE SHEET MD JSON Tony，我完全理解你現在要做的事： 你要一個「彙整所有資料庫現況 → 一口氣攤牌給 U/I → 人可以依範圍選擇 → 再輸出成 CSV / Google Sheet / MD / JSON」的完整中"
+    },
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "但資料庫管理允許你擷取資料"
+    },
+    {
+     "ts": "2026-09-28T16:30:46.031Z",
+     "text": "資料庫管理可擷取資料輸出CSV GOOGLE SHEET JSON MD PARQUET 編碼問題 可以選擇轉換格式 時間區間 勾選內容"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ003",
+   "review_id": "R-046",
+   "subsystem": "VDF",
+   "topic": "輸出統一 Parquet",
+   "requirement": "輸出統一為 Parquet(最省 token),DuckDB 管理。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF001-STP004",
+    "L10",
+    "L90"
+   ],
+   "evidence": "hub D4(CGC_MDL238 parquet --apply);L10;L90。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "後面是輸出統一為PARQUET DUCKDB管理 但資料庫管理允許你擷取資料"
+    },
+    {
+     "ts": "2026-09-28T16:30:46.031Z",
+     "text": "輸出統一為PARQUET最節省TOKEN架構 資料庫管理可擷取資料輸出CSV GOOGLE SHEET JSON MD PARQUET 編碼問題 可以選擇轉換格式 時間區間 勾選內容"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ039",
+   "review_id": "R-047",
+   "subsystem": "VCGC",
+   "topic": "DB 面板 PS + 錯誤矩陣存政策",
+   "requirement": "提供 PowerShell 面板:詳細摘要、含 AST 與說明的錯誤矩陣,並存入政策。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF003-STP001"
+   ],
+   "evidence": "VIA_Policy_DBPanel_v0100/v0101;Invoke-VIA-DBPanel-v0102.ps1;CGC_MDL228 panel。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T03:26:02.119Z",
+     "text": "please gave me a powershell code with the necessary code panel with detail & well organize detailed summary and error matrix with ast and descriptions. save this to the policy. find out meth"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ004",
+   "review_id": "R-048",
+   "subsystem": "VDF",
+   "topic": "兩張清單每日更新",
+   "requirement": "台股全部個股清單與主動式台股 ETF 清單(依 regex 與邏輯定義、可擷取每日公布持股者)每天自動更新,作為後續引擎輸入;美股/日股清單撤下。",
+   "status": "PARTIAL",
+   "homes": [
+    "VDF-WKF010",
+    "L35"
+   ],
+   "evidence": "讀取口 VDF_ENG087 v0105、ENG231 v0102、docs/VIA_TWLists_Method_20260928.md;Z227「每日實跑仍在工作站排程」;Z256 美日撤下;清單律未入 Laws(L35 只管基金範圍)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "有兩個清單做輸入是要自動更新的 台股全部個股清單 主動式台股ETF全部根據REGEX及邏輯定義是主動式股票ETF中可以擷取到一規定每日公布台股持股的 者兩個清單引擎要每天更新全部作為後面引擎輸入"
+    },
+    {
+     "ts": "2026-09-28T03:26:02.119Z",
+     "text": "find out method to fetch all taiwan stock list & all active taiwan stock etf validated list as input to many engines."
+    },
+    {
+     "ts": "2026-09-28T08:23:25.512Z",
+     "text": "檢查有無能生成美日台股個股總清單 每日主動式台股ETF總清單 VDF昨天應該是全過的 趕緊透過VCGC進入VDF將他的問題解決 更新同步 還有其他"
+    },
+    {
+     "ts": "2026-09-28T10:40:43.562Z",
+     "text": "不對 每日台股清單其他刪除"
+    }
+   ],
+   "next": "VDF-WKF(R33)新增日更清單工作流 + Laws 補條",
+   "hand": "工作站排程(Z227)"
+  },
+  {
+   "code": "VDF-REQ005",
+   "review_id": "R-049",
+   "subsystem": "VDF",
+   "topic": "VDF 引擎獨立",
+   "requirement": "VDF 所有引擎各自獨立、可獨立測。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF001",
+    "VDF-WKF002"
+   ],
+   "evidence": "VIA_Workflow_Hub_SSOT loop_vdf.separate_test=true;hub rules 第 3 條。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "VDF所有引擎都是獨立的可獨立策 有兩個清單做輸入是要自動更新的 台股全部個股清單 主動式台股ETF全部根據REGEX及邏輯定義是主動式股票ETF中可以擷取到一規定每日公布台股持股的 者兩個清單引擎要每天更新全部作為後面引擎輸入"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "VDF可以分開測試因為不同引擎 VRN按順序 留意輸出原始文字如何驗證所有文字都有取到 驗要鄭 完成一切 自動推剩無衝突再推送GITHUB你跟他對口接口畚箕資料夾自動完成授權一切 我去睡晚安 一定要到結果測試驗證完成 不要再中斷 授權全部"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ006",
+   "review_id": "R-050",
+   "subsystem": "VDF",
+   "topic": "外部資料源整合",
+   "requirement": "AAII sentiment、CNN 恐懼貪婪全歷史、FactSet S&P 500 forward earnings(兩附件整合唯一)經 VCGC 登錄編號、接加速器與網路工具、實測優化。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF004",
+    "L43"
+   ],
+   "evidence": "VDF ENG229(CNN)· ENG230(Forward PER/EPS)· aaii_sentiment 庫;L43 共識 EPS;Z255 附件 bug 記錄。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T08:23:25.512Z",
+     "text": "AAII SENTIMENT https://www.aaii.com/files/surveys/sentiment.xls GENERATE A PY CODE TO FETCH ALL HISTORICAL cnn fear and greed You can fetch historical data for the CNN Fear & Greed Index by "
+    },
+    {
+     "ts": "2026-09-28T08:23:25.512Z",
+     "text": "FACTSET 對指數S&P 500都有公布FORWARD EARNING在新聞稿顧可以倒這兩個附件實測一下各有優劣則整合唯一從VCGC去登錄編號加入加速器及網路工具實測優化修正使用 檢查有無能生成美日台股個股總清單 每日主動式台股ETF總清單 VDF昨天應該是全過的 趕緊透過VCGC進入VDF將他的問題解決 更新同步 還有其他"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ007",
+   "review_id": "R-051",
+   "subsystem": "VDF",
+   "topic": "MOPS 為主 · 合規只發訊號",
+   "requirement": "只有 MOPS 受限為主,其他來源不受限;合規偵測只發訊號,限不限由操作員決定。",
+   "status": "RECORDED",
+   "homes": [
+    "L07",
+    "VDF-WKF001",
+    "L09"
+   ],
+   "evidence": "實作在 VeritasAegisNexus_v1652(非 MOPS 記 SIGNAL;VIA_COMPLIANCE_ENFORCE=YES 由操作員設);只記於進度表 R20c,律冊/政策冊沒有。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T13:42:06.153Z",
+     "text": "只有MOPS為主其他不受限 偵測COMPLIANCE只有訊號 淤決定售不受限我決定"
+    }
+   ],
+   "r33": "R33:常設令入需求冊(有代碼 · 編號);執行面由 VCGC-WKF003 程序與 AI 遵守,律冊正本未改"
+  },
+  {
+   "code": "VDF-REQ008",
+   "review_id": "R-052",
+   "subsystem": "VDF",
+   "topic": "VCGC↔VDF/VRN 資料中介",
+   "requirement": "VCGC 一路向下到 VDF 生成資料庫;VRN 要資料經 VCGC 進資料庫或轉交 VDF,再經 VCGC 回 VRN;資料庫三方互動完成。",
+   "status": "PARTIAL",
+   "homes": [
+    "VRN-WKF001-STP001",
+    "VDF-WKF001-STP001"
+   ],
+   "evidence": "hub rules 第 2 條 + CGC_MDL239 DataBroker;Z272 仍有 3 支 VRN 尾版直讀 VDF 表、Z273 42 張表無路由、Z274 中介未登 InputConsole。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:47:39.689Z",
+     "text": "從VCGC一路邊測編修正邊編號註冊鎖定向下到VDF生成資料庫 再從VCGC一路向下時測鞭策邊邊號註冊鎖定向VRN他需要擷取資料透過VCGC進入資料庫或轉交VDF擷取透過VCGC返回VRN進行下述流程 VCGC統合HTML U/I 展現方式可透過HTML U/I SYNCHORIZER交互整合一切"
+    },
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "資料庫三方互動完成 vcgc vdf vrn 邊實測邊修正直到成功 成功一件就鎖定 不要反覆成功地又出錯 vcgc唯一入口軸心 我去睡覺 授權遵守政策一切自動完成推勝直到輸出驗證無誤 跳出html u/i若有問題可以先是對話況上方紀錄 記錄下為何一職重複出錯 logging lesson-learned沒導入 } ======== 黃色到此 ======== PS C:\\Use"
+    }
+   ],
+   "next": "hub data_rule + Z272–Z274",
+   "hand": "AI 下一輪(Z272–Z274)"
+  },
+  {
+   "code": "VDF-REQ009",
+   "review_id": "R-053",
+   "subsystem": "VDF",
+   "topic": "VDF 庫無缺漏 · VRN 輸出檢查",
+   "requirement": "VDF 檢查資料庫無缺漏;VRN 輸出要有檢查機制。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF003",
+    "VRN-WKF001-STP004",
+    "VDF-WKF001-STP003"
+   ],
+   "evidence": "hub D3(CGC_MDL228 · ENG089 · ENG090)、R3/R4。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "VDF 檢查資料庫無缺漏 VRN輸出有檢查機制存在 成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是跑完的結果 全部用紅黃綠燈放最前面矩陣顯示結果 刪除一切TA-LIB指令模組化刪除不要在外擴 刪除後修正 整個對話最新要求邏輯庫政策更新 收斂 收尾VCGC VDF VRN 跳出驗證結果全部綠就成功收尾 "
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ040",
+   "review_id": "R-054",
+   "subsystem": "VCGC",
+   "topic": "U/I 面板設計",
+   "requirement": "VCGC/VDF/VRN U/I:左面板參數輸入、右面板多元展示為主;多 TAB,TAB1 放矩陣狀況/邏輯規範/引擎總覽/運作摘要/錯誤摘要,結果往後放;第一頁盡量視覺化、現代專業;生成收集需求的引擎並以 SYNCHRONIZER 對接制式可調 HTML U/I。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP001",
+    "L39",
+    "L100"
+   ],
+   "evidence": "CGC_MDL227 ConsoleBlueprint;CGC_MDL238 OperatorConsole + VIA_UI_FormatLock_v0100;L39、L100。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T01:30:08.392Z",
+     "text": "幫我想一閜VCGC/VDF/VRM 左面板 參數輸入 又面板多元展示為主少量功能 多TABE規劃設計所有矩陣狀況邏輯規範引擎總攬運作摘要 錯誤摘要 等放TAB 1 結果往後放 看需要幾個TAB 第一頁儘量視覺化 儘量視覺化現代但專業呈現跟 把這些參數 介面 生成一個引擎收集相關需求 將與存檔的標準可調的HTML U/I對快速耊接SYNCHORINZER"
+    },
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "GITHUB中有模板做好VCGC生成一個引擎與模板HTML U/I FORMAT鎖定同步 左面板為輸入 VDF只有增減過內外個股財報 單季 累計 年度 起始時間 其他起始時間統一但可分群更改蟻群為單位 VRN只有將輸入文件位置WINDOWS I/O或拖曳式輸入 輸入摘要有去重功能 引擎狀況 運作摘要 後面是輸出統一為PARQUET DUCKDB管理 但資料庫管理允許你擷取資料"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ041",
+   "review_id": "R-055",
+   "subsystem": "VCGC",
+   "topic": "唯一輸入兩個資料夾",
+   "requirement": "VCGC 全部步驟自動化,唯一要輸入的是系統資料夾與資料庫資料夾(Windows 選夾、滑鼠即可)。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP001"
+   ],
+   "evidence": "入口 v0106 ⓪(OPERATOR_PATHS.json);hub H0。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:30:46.031Z",
+     "text": "VCGC全部步驟自動化唯一要輸入的地方是系統檔案夾位置及資料庫檔案夾位置 WINDOW I/O 基本上整個輸入以滑鼠即可輸入介面完成 第一頁高整合結果 三色燈掌握 其他頁式詳細結果及驗證 輸出統一為PARQUET最節省TOKEN架構 資料庫管理可擷取資料輸出CSV GOOGLE SHEET JSON MD PARQUET 編碼問題 可以選擇轉換格式 時間區間 勾選內容"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ042",
+   "review_id": "R-056",
+   "subsystem": "VCGC",
+   "topic": "頁序規格",
+   "requirement": "第一頁高整合三色燈(輸入檢查去重、引擎檢查、運作結果摘要);第二頁到倒數第二頁為跑完結果;紅黃綠矩陣放最前;所有掌控項目放最後一頁。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF002-STP001"
+   ],
+   "evidence": "CGC_MDL238 頁序(總覽 · 輸入摘要 · 引擎 · 運作 · 驗證 · 輸出 · 資料庫)與 CGC_MDL231 最後三頁分屬兩個產生器;沒有一本冊定頁序。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:30:46.031Z",
+     "text": "第一頁高整合結果 三色燈掌握 其他頁式詳細結果及驗證 輸出統一為PARQUET最節省TOKEN架構 資料庫管理可擷取資料輸出CSV GOOGLE SHEET JSON MD PARQUET 編碼問題 可以選擇轉換格式 時間區間 勾選內容"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是跑完的結果 全部用紅黃綠燈放最前面矩陣顯示結果 刪除一切TA-LIB指令模組化刪除不要在外擴 刪除後修正 整個對話最新要求邏輯庫政策更新 收斂 收尾VCGC VDF VRN 跳出驗證結果全部綠就成功收尾 交接報告 自測字完成 收工更新GITHIUB自動推進無衝突就推授權 明天第三方AU"
+    }
+   ],
+   "next": "VIA_UI_Contract / VIA_UI_FormatLock 下一版",
+   "hand": "AI 下一輪(R30-5 頁序)"
+  },
+  {
+   "code": "VCGC-REQ043",
+   "review_id": "R-057",
+   "subsystem": "VCGC",
+   "topic": "最後 TAB 編號總冊",
+   "requirement": "每個 VCGC/VDF/VRN 的工具、參數、SSOT、regex、指數全編號放 U/I 最後一頁,紅黃綠燈、偵測工具、unit/integration/system test 狀態、workflow 圖像化;邏輯路徑編號備份,附版號與鎖定日期+時間。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP001"
+   ],
+   "evidence": "CGC_MDL236 NumberedCatalog;CGC_MDL231 MatrixPages v0101/v0102;VIA_Numbering_Ledger_v0100;VIA_LogicPath_Backup_v0100(鎖定時間含時區)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:28:08.801Z",
+     "text": "每一個vcgc vdf vrn所用的工具參數ssot regex 參數 指數都有編號全部整理列入u/i tab最後一頁 紅黃綠三燈顯示狀況 偵測工具 unit integration system test 狀態顯示 流程邏輯workflow 圖像化也放最後tabs 全都編號 邏輯路徑編號備份 附上版本號即鎖定日期 只增不減只要不衝突"
+    },
+    {
+     "ts": "2026-09-28T14:28:45.452Z",
+     "text": "鎖定日期還要加上時間"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ044",
+   "review_id": "R-058",
+   "subsystem": "VCGC",
+   "topic": "多頁 rich 矩陣報告自動跳出",
+   "requirement": "VCGC/VDF/VRN 自動跳出多頁式矩陣報告(rich),字小、版面自動優化;收尾以簡單版 HTML U/I 自動跳出驗證結果。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP001",
+    "VCGC-WKF002-STP002"
+   ],
+   "evidence": "CGC_MDL229/MDL231;CGC_MDL242 簡單版頁;入口 v0106 結尾開頁。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T12:07:02.260Z",
+     "text": "VCGC VDF VRN自動跳出多頁式矩陣式報告 BY RICH 字體小版面自動優化 [7/7] 檔案 報告 HTML C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Reports\\dbmanager\\DBM_REPORT_latest.html 報告 TXT "
+    },
+    {
+     "ts": "2026-09-28T18:18:57.704Z",
+     "text": "先用簡單版U/I自動跳出結果完成收尾"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是跑完的結果 全部用紅黃綠燈放最前面矩陣顯示結果 刪除一切TA-LIB指令模組化刪除不要在外擴 刪除後修正 整個對話最新要求邏輯庫政策更新 收斂 收尾VCGC VDF VRN 跳出驗證結果全部綠就成功收尾 交接報告 自測字完成 收工更新GITHIUB自動推進"
+    },
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "跳出html u/i若有問題可以先是對話況上方紀錄 記錄下為何一職重複出錯 logging lesson-learned沒導入 } ======== 黃色到此 ======== PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset> via-vcgc go -Full -ApproveRegistrySync C:\\Users\\"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ045",
+   "review_id": "R-059",
+   "subsystem": "VCGC",
+   "topic": "模板轉接器",
+   "requirement": "SYNCHRONIZER 內含所有規格、自適應對接以最省 token 彈性換模板(含 Claude Design 模板);LAYOUT 多元自動優化、圖規格;預設最簡淺色小規格,新功能快速對接。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP001",
+    "L100"
+   ],
+   "evidence": "CGC_MDL241_TemplateAdapter_v0100;入口 v0106 ①e;VIA_UI_TemplateSSOT。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T17:55:02.946Z",
+     "text": "另外如何對接CLAUDE DESIGN的模板??"
+    },
+    {
+     "ts": "2026-09-28T17:57:20.614Z",
+     "text": "這個動作很花費TOKEN嗎 是否把SYNCHRONIZER內涵所有可能規格自動自適應式對接節省最多TOKEN彈性更換模板"
+    },
+    {
+     "ts": "2026-09-28T17:59:29.501Z",
+     "text": "這個模組要有所有規格自適應式選擇 LAUOUT多元自動化優化 規格 圖的規格等"
+    },
+    {
+     "ts": "2026-09-28T18:08:50.172Z",
+     "text": "先不指定 只要規格參數弄好自適應式快五對對接 新的功能近來也可快速對接呈現方式 顏色 設計 LAYOUT參數應該式自動與他對接不燃平常就是最簡單淺色自小規格自動優化簡單即可"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ010",
+   "review_id": "R-060",
+   "subsystem": "VDF",
+   "topic": "VDF 輸入面板",
+   "requirement": "VDF 只輸入:國內外個股財報增減、單季/累計/年度、起始時間;其他起始時間統一但可按群更改。",
+   "status": "COVERED",
+   "homes": [
+    "VDF-WKF001-STP001"
+   ],
+   "evidence": "CGC_MDL238 左面板(國內/國外勾選 · 單季/累計/年度 · 起迄 · 按群改)經 CGC_MDL139 apply_set。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "VDF只有增減過內外個股財報 單季 累計 年度 起始時間 其他起始時間統一但可分群更改蟻群為單位 VRN只有將輸入文件位置WINDOWS I/O或拖曳式輸入 輸入摘要有去重功能 引擎狀況 運作摘要 後面是輸出統一為PARQUET DUCKDB管理 但資料庫管理允許你擷取資料"
+    }
+   ]
+  },
+  {
+   "code": "VRN-REQ001",
+   "review_id": "R-061",
+   "subsystem": "VRN",
+   "topic": "VRN 輸入面板",
+   "requirement": "VRN 只輸入文件位置(Windows I/O 或拖曳);輸入摘要要去重。",
+   "status": "COVERED",
+   "homes": [
+    "VRN-WKF001-STP002"
+   ],
+   "evidence": "CGC_MDL238 VRN 選夾/拖曳;輸入冊去重後 apply_set。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "VRN只有將輸入文件位置WINDOWS I/O或拖曳式輸入 輸入摘要有去重功能 引擎狀況 運作摘要 後面是輸出統一為PARQUET DUCKDB管理 但資料庫管理允許你擷取資料"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ046",
+   "review_id": "R-062",
+   "subsystem": "VCGC",
+   "topic": "實測區間 2026-07-01~今",
+   "requirement": "以 2026-07-01 至今為區間實測,並開 HTML U/I 顯示結果與驗證。",
+   "status": "MISSING",
+   "homes": [
+    "VCGC-WKF004-STP002"
+   ],
+   "evidence": "進度表與入口/InputConsole 冊查不到以 2026-07-01 起的實測紀錄或預設區間。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T17:38:44.265Z",
+     "text": "實測並開啟HTML U/I顯現結果及驗證結果 2026-07-01~今"
+    }
+   ],
+   "next": "VCGC-WKF004-STP002 實測參數 / InputConsole 預設",
+   "hand": "操作員(需同意閘 VIA_NET_CONSENT + 工作站資料家)"
+  },
+  {
+   "code": "VCGC-REQ047",
+   "review_id": "R-063",
+   "subsystem": "VCGC",
+   "topic": "中樞與兩迴圈",
+   "requirement": "VCGC 是外部世界與 VDF、VRN 之間的中樞,對 VDF 與 VRN 各一條獨立迴圈;決定 VCGC/VDF/VRN 工作流 SSOT。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VDF-WKF001",
+    "VRN-WKF001"
+   ],
+   "evidence": "VIA_Workflow_Hub_SSOT_v0100(model hub_and_two_loops;hub/loop_vdf/loop_vrn/exit)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "Please decide the SSOT of workflow of vcgc vdf VRN. Please reply in Chinese."
+    },
+    {
+     "ts": "2026-09-28T22:21:41.957Z",
+     "text": "Vcgc have one loop to vdf and the VRn separately VCGC is the hub between outside world and VRn and vdf."
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ048",
+   "review_id": "R-064",
+   "subsystem": "VCGC",
+   "topic": "順序鎖死雙向檢查",
+   "requirement": "VCGC 按順序鎖定不可跳出,AI 進入路徑鎖死;單一路徑雙向檢查、更新不衝突;VRN 按層順序,VDF 可分開。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VRN-WKF002",
+    "VDF-WKF002"
+   ],
+   "evidence": "hub rules 第 4 條 + conformance(CGC_MDL149 v0168 workflow);loop_vrn.ordered L0→L5。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "VCGC一定要按上述順序鎖定不可跳出 VDF可以分開測試因為不同引擎 VRN按順序 留意輸出原始文字如何驗證所有文字都有取到 驗要鄭 完成一切 自動推剩無衝突再推送GITHUB你跟他對口接口畚箕資料夾自動完成授權一切 我去睡晚安 一定要到結果測試驗證完成 不要再中斷 授權全部"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "AI進入路徑鎖死不會遺漏 單路徑雙向檢查更新不衝突檢查更新 VDF 檢查資料庫無缺漏 VRN輸出有檢查機制存在 成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是跑完的結果 全部用紅黃綠燈放最前面矩陣顯示結果 刪除一切TA-LIB指令模組化刪除不要在外擴 刪除後修正 整個對話最新要求邏輯庫政策更新 收斂 "
+    },
+    {
+     "ts": "2026-09-28T20:06:28.032Z",
+     "text": "所有流程順序鎖定進入vrn或vdf 更新新增不衝突即可 去talib鐵律"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ049",
+   "review_id": "R-065",
+   "subsystem": "VCGC",
+   "topic": "中樞自動同步+教訓帳",
+   "requirement": "AI 任何動作(含審閱與修改)都經 VCGC;經中樞的動作與回饋觸發自動同步檢查;產生 logging 與 lesson-learned 引擎,記錄為何重複出錯;所有 VCGC 引擎都有自動同步檢查測試。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003",
+    "VCGC-WKF002-STP003"
+   ],
+   "evidence": "CGC_MDL149 v0168(事件 · 自動同步 · FAIL 進教訓帳);CGC_MDL058 v0102 record_event;VIA_Lessons_Ledger RC-23–RC-29;hub X3。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "記錄下為何一職重複出錯 logging lesson-learned沒導入 } ======== 黃色到此 ======== PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset> via-vcgc go -Full -ApproveRegistrySync C:\\Users\\tonyk\\OneDrive\\Documents\\m"
+    },
+    {
+     "ts": "2026-09-28T22:31:44.919Z",
+     "text": "AI will do any action, including reviewing and any changes through the process of vcgc, all of the action and feedback through the hub will trigger auto synchronizing mechanism all functions"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ050",
+   "review_id": "R-066",
+   "subsystem": "VCGC",
+   "topic": "環境管理器全檢",
+   "requirement": "ENV MANAGER 自動檢查上下所有 LIB 與環境布建完畢且無衝突,特別是常被忽略的加速器與網路工具。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP004"
+   ],
+   "evidence": "CGC_MDL240_EnvManager_v0100(只查不裝);hub H3;VIA_ToolRoster_SSOT_v0102。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T17:48:18.771Z",
+     "text": "ENV MANAGER理應自動檢查上下所有LIBS跟環境都有布建完畢 尤其是加速器 網路更具等輔助工具常被忽略 註冊更新SYNC 跳出HTML U/I"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "環境上下自動健側佈建完善 加速器網路工具包含啟動PS都要依規定加載 政策 自動編碼註冊自動上下檢查 其他流程順序進行稻子系統 VCGC唯一軸心 AI進入路徑鎖死不會遺漏 單路徑雙向檢查更新不衝突檢查更新 VDF 檢查資料庫無缺漏 VRN輸出有檢查機制存在 成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是"
+    },
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "activate environment manager to check the whole project necessary libraries, and the environments our hundred percent deployed it without conflicts following the logic. The first step is to "
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ051",
+   "review_id": "R-067",
+   "subsystem": "VCGC",
+   "topic": "慢/弱引擎分級",
+   "requirement": "以 SSOT 評比剩餘流程中最慢與最弱的引擎。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP002"
+   ],
+   "evidence": "VIA_Workflow_Hub_SSOT grading(slow · weak · rule)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "use SST to grade the remaining processes works slow and the least of engines. Please decide the SSOT of workflow of vcgc vdf VRN. Please reply in Chinese."
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ052",
+   "review_id": "R-068",
+   "subsystem": "VCGC",
+   "topic": "SSOT 審閱與自動編號",
+   "requirement": "先審閱 SSOT(政策、邏輯、regex、引擎清單、參數…),以自動編碼引擎在 VIA 階層給每件具體編號。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP005"
+   ],
+   "evidence": "hub H4(CGC_MDL149 registry-sync + CGC_MDL237 NumberingSystem v0103)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:19:11.095Z",
+     "text": "The first step is to review SSOT including policies logic regex list of engine parameters and so on. Use auto coding engine to provide them with specific number in the hierarchy of via syste"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "政策 自動編碼註冊自動上下檢查 其他流程順序進行稻子系統 VCGC唯一軸心 AI進入路徑鎖死不會遺漏 單路徑雙向檢查更新不衝突檢查更新 VDF 檢查資料庫無缺漏 VRN輸出有檢查機制存在 成功收尾跳出HTML U/I 所有掌控項目放最後一頁 第一頁輸入檢查去重 引擎檢查 運作結果摘要報告 第二頁到倒數第二頁都是跑完的結果 全部用紅黃綠燈放最前面矩陣顯示結果 刪除一切TA-LIB"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ053",
+   "review_id": "R-069",
+   "subsystem": "VCGC",
+   "topic": "SDD 工作流 SSOT 代碼",
+   "requirement": "導入 SDD 結構,建立並註冊工作流 SSOT,代碼如 VCGC-WKF001,同樣建 VDF、VRN 工作流 SSOT;整合去冗、SSOT 無衝突。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004",
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "R33 進行中:VIA_Workflow_VCGC/VDF/VRN/VAP_SSOT_v0100、Hub v0101 皆未追蹤未提交;spec.requirements 全空;引用的 CGC_MDL245_SDDValidator 與 CGC_MDL237 v0104(WKF/STP/REQ 類)樹上不存在。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:48:58.689Z",
+     "text": "follow M CP and sdd structures. Please proceed with all above work automatically."
+    },
+    {
+     "ts": "2026-09-28T22:52:21.511Z",
+     "text": "Implement sdd structures and build up workflow SSOT and the registers them and keep them a code VCGC-WKF001 like that . Please apply this logic to build up workflow ssot VRN and vdf. Integra"
+    },
+    {
+     "ts": "2026-09-29T00:10Z",
+     "text": "Implement sdd structures and build up workflow SSOT and the registers them and keep them a code VCGC-WKF001 like that (再次下令)"
+    }
+   ],
+   "r33": "R33:R33 四本工作流冊 + 組成冊 v0101 + CGC_MDL237 v0104(WKF/STP/REQ 編號)+ CGC_MDL245"
+  },
+  {
+   "code": "VCGC-REQ054",
+   "review_id": "R-070",
+   "subsystem": "VCGC",
+   "topic": "參數整合去冗",
+   "requirement": "整合、合併、移除所有參數的冗餘,SSOT 無衝突。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF006",
+    "VCGC-WKF004-STP001",
+    "L30",
+    "L61"
+   ],
+   "evidence": "L30、L61 規則在;Z264 同義字一詞兩主 15 組未解;參數冊整併無具體工作項。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:52:21.511Z",
+     "text": "Integrate and consolidate and removing redundancy for all perimeter. SSOT without conflict. Everything he has salt he should be integrated and optimize. You can increase a slow as there is n"
+    }
+   ],
+   "next": "VCGC-WKF006(統一 SSOT 治理)+ Z264",
+   "hand": "操作員裁定(Z264 同義字一詞兩主 15 組)"
+  },
+  {
+   "code": "VCGC-REQ055",
+   "review_id": "R-071",
+   "subsystem": "VCGC",
+   "topic": "自測·交叉測·實測·輸出驗證",
+   "requirement": "逐步自測與實測,成功版本註冊並自動與 SSOT 同步;建立完整自測、交叉測、輸出驗證 SSOT,驗證通過才宣告收尾。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004"
+   ],
+   "evidence": "CGC_MDL242 單一路徑驗證 + LampLock 已有;SDD 驗證(VCGC-WKF004 check/real/lock)只在未提交 R33 冊,驗證器未寫。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:48:58.689Z",
+     "text": "Self test and a real test for all step-by-step and a fixed successful versions registered auto sync synchronizing with ssot to prevent any missing like above. When the results and output a v"
+    },
+    {
+     "ts": "2026-09-28T22:52:21.511Z",
+     "text": "complete self testing gross testing output, validating ssot as well Review records in this chat room for two days to check if there anything missed. Replenish them into SSOT. Are you using t"
+    }
+   ],
+   "r33": "R33:CGC_MDL245 check / selftests / real / lock / closeout"
+  },
+  {
+   "code": "VCGC-REQ056",
+   "review_id": "R-072",
+   "subsystem": "VCGC",
+   "topic": "兩天紀錄補進 SSOT",
+   "requirement": "回顧兩天對話紀錄,找遺漏補進 SSOT(含欄位與註冊修正)。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP001"
+   ],
+   "evidence": "律冊 lessons 停在 LL462(2026-09-25),本兩天的教訓(進度表 R10–R13 教訓、R30b 等)未入 Laws;RC-23–29 已入 Lessons Ledger;本冊即補遺依據。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T22:42:59.849Z",
+     "text": "Review records in this chat room for two days to check if there anything missed. Replenish them into SSOT. Are you using token saving tools in the system right now? Ensure to utilize them."
+    },
+    {
+     "ts": "2026-09-28T22:48:58.689Z",
+     "text": "Remember to fix all columns and the registering in ssot. Review the record in two days carefully to make everything salty and follow M CP and sdd structures. Please proceed with all above wo"
+    },
+    {
+     "ts": "2026-09-29T11:59:18.257Z",
+     "text": "先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾"
+    }
+   ],
+   "r33": "R33:本冊:兩天 124 則操作員訊息 → 94 條需求,全數編碼、掛歸屬",
+   "s0929h": "側線 2026-09-29 h:+引文 1 則(同一需求再申明;狀態不變)"
+  },
+  {
+   "code": "VCGC-REQ057",
+   "review_id": "R-073",
+   "subsystem": "VCGC",
+   "topic": "里程碑同步 GitHub",
+   "requirement": "每個里程碑同步到 GitHub,連同已註冊成功的引擎版本與時間;有成果就上傳;自動讀取 PowerShell 回饋。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP009",
+    "VCGC-WKF002-STP004"
+   ],
+   "evidence": "入口 ⑦ 只上傳布建紀錄冊(含四件工具版本/sha);VCGC-WKF003-STP009 在未提交 R33 冊;中樞事件/TIMING 在 VIA_Reports 不入 git,AI 讀不到工作站回饋(靠剪貼簿貼回包)。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T22:00:06.115Z",
+     "text": "一個進度劑型自動更新GITHUB 核准權限 若附件內容已被擬修正或過時可不採用，可先在此備份建立還原點，自動完成: https://github.com/tonykuni/movies-dataset/tree/main 找到vcgc目前更新進度生為via系統唯一核心任何動作都要經過他必要的步驟才不會發生衝突 他會探針自動檢查子系統是否和規善用 檢查這對話 不用大幅修正風險太高"
+    },
+    {
+     "ts": "2026-09-28T19:27:57.729Z",
+     "text": "隨時重工結果鎖定就上傳GITHUB"
+    },
+    {
+     "ts": "2026-09-28T20:10:58.683Z",
+     "text": "自動讀取powershell反饋同步github一切ssot畫編號有版本 資料庫三方互動完成 vcgc vdf vrn 邊實測邊修正直到成功 成功一件就鎖定 不要反覆成功地又出錯 vcgc唯一入口軸心 我去睡覺 授權遵守政策一切自動完成推勝直到輸出驗證無誤 跳出html u/i若有問題可以先是對話況上方紀錄 記錄下為何一職重複出錯 logging lesson-learned沒"
+    },
+    {
+     "ts": "2026-09-28T20:39:34.859Z",
+     "text": "先更新結果到github收工"
+    }
+   ],
+   "r33": "R33:每個里程碑都推 GitHub(PR #365 分 milestone 1/1b/2/3/3b/4);成功版本 · 編號 · 註冊時間由 VCGC-WKF004-STP003 寫進燈鎖冊 wkf 區一起推"
+  },
+  {
+   "code": "VCGC-REQ058",
+   "review_id": "R-074",
+   "subsystem": "VCGC",
+   "topic": "收尾交接與稽核",
+   "requirement": "收尾產交接報告、自測完成、推 GitHub,供隔日第三方稽核。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP004",
+    "L15"
+   ],
+   "evidence": "L15 交接三處律;docs/VIA_Handover_*;VIA_Closeout_Matrix_*;VCGC-WKF004-STP004(R33)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "交接報告 自測字完成 收工更新GITHIUB自動推進無衝突就推授權 明天第三方AUDIT VCGC一定要按上述順序鎖定不可跳出 VDF可以分開測試因為不同引擎 VRN按順序 留意輸出原始文字如何驗證所有文字都有取到 驗要鄭 完成一切 自動推剩無衝突再推送GITHUB你跟他對口接口畚箕資料夾自動完成授權一切 我去睡晚安 一定要到結果測試驗證完成 不要再中斷 授權全部"
+    },
+    {
+     "ts": "2026-09-28T19:21:57.442Z",
+     "text": "正是收尾全部完成有勞自動完成明天接受稽核"
+    },
+    {
+     "ts": "2026-09-28T19:46:58.367Z",
+     "text": "完成動作後收尾交接報告全部刪除舊版用新版"
+    },
+    {
+     "ts": "2026-09-29T12:01:57.142Z",
+     "text": "GITHUB端也要檢查"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h:+引文 1 則(同一需求再申明;狀態不變)"
+  },
+  {
+   "code": "VCGC-REQ059",
+   "review_id": "R-075",
+   "subsystem": "VCGC",
+   "topic": "收尾實測 VCGC VDF VRN",
+   "requirement": "實測收尾 VCGC→VDF、VCGC→VRN(C:\\測試樣本報告),邊測邊修邊註冊邊鎖版,驗證結果交互比對,全綠才收尾。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP002",
+    "VRN-WKF003",
+    "VCGC-WKF002-STP002"
+   ],
+   "evidence": "CGC_MDL242 PathVerify(單一路徑 · 交叉比對);入口 v0106;Z284(樣本夾只在工作站)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T16:12:35.543Z",
+     "text": "實測收尾VCGC VDF 測試修正鎖定同步"
+    },
+    {
+     "ts": "2026-09-28T16:17:41.927Z",
+     "text": "實測收尾VCGC VDF VRN測試修正直到成功 GITHUB中有模板做好VCGC生成一個引擎與模板HTML U/I FORMAT鎖定同步 左面板為輸入 VDF只有增減過內外個股財報 單季 累計 年度 起始時間 其他起始時間統一但可分群更改蟻群為單位 VRN只有將輸入文件位置WINDOWS I/O或拖曳式輸入 輸入摘要有去重功能 引擎狀況 運作摘要 後面是輸出統一為PARQUE"
+    },
+    {
+     "ts": "2026-09-28T18:23:14.937Z",
+     "text": "單一路徑實測 VCSC VDF VRN 邊實測邊修邊註冊邊所指令版本執行後並驗證結果交互比對跳出簡單版HTML介面整個收尾"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "實測VCGC VCGC TO VDF VCGC TO VRN \"C:\\測試樣本報告\"實測VRN 上下SSOT各方面完善 VCGC第一步啟動節省TOKEN工具全部啟動 環境上下自動健側佈建完善 加速器網路工具包含啟動PS都要依規定加載 政策 自動編碼註冊自動上下檢查 其他流程順序進行稻子系統 VCGC唯一軸心 AI進入路徑鎖死不會遺漏 單路徑雙向檢查更新不衝突檢查更新 VDF 檢"
+    },
+    {
+     "ts": "2026-09-29T05:09:07.119Z",
+     "text": "close out these three projects."
+    },
+    {
+     "ts": "2026-09-29T11:56:47.918Z",
+     "text": "先檢查收尾VCGC"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h:+引文 2 則(同一需求再申明;狀態不變)"
+  },
+  {
+   "code": "VCGC-REQ060",
+   "review_id": "R-076",
+   "subsystem": "VCGC",
+   "topic": "布建紀錄上傳",
+   "requirement": "加速器、網路工具、PS 標準模板都要加;環境工具布建完成紀錄上傳、收尾儲存備份。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF002-STP004"
+   ],
+   "evidence": "VIA_EnvProvision_Ledger_v0100.jsonl;入口 ⑦;hub X4。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T18:24:46.124Z",
+     "text": "加速器 網路工具 PS工具標準模板都要加 環境工具布建完成紀錄上船收尾儲存輩分"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ061",
+   "review_id": "R-077",
+   "subsystem": "VCGC",
+   "topic": "SUP 歸 VCGC 管",
+   "requirement": "SUP 也歸 VCGC 管理,確認都採新版本。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "L20"
+   ],
+   "evidence": "L20;Numbering 子系統 VIA-05 SUP;CGC_MDL242 涵蓋稽核含 SUP 142 尾版。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "SUP也是規VCGC管理 確認都是採用新版本 實測VCGC VCGC TO VDF VCGC TO VRN \"C:\\測試樣本報告\"實測VRN 上下SSOT各方面完善 VCGC第一步啟動節省TOKEN工具全部啟動 環境上下自動健側佈建完善 加速器網路工具包含啟動PS都要依規定加載 政策 自動編碼註冊自動上下檢查 其他流程順序進行稻子系統 VCGC唯一軸心 AI進入路徑鎖死不會遺漏"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ062",
+   "review_id": "R-078",
+   "subsystem": "VCGC",
+   "topic": "繼續 Z275–Z278",
+   "requirement": "繼續處理 Z275–Z278 自動完成。",
+   "status": "COVERED",
+   "homes": [
+    "docs/VIA_DroppedBalls_B507.md"
+   ],
+   "evidence": "DroppedBalls Z275–Z278 已結(R27;Z275 VAP 部分依令暫緩)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T18:17:50.366Z",
+     "text": "繼續處理 Z275–Z278 自動完成"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ063",
+   "review_id": "R-079",
+   "subsystem": "VCGC",
+   "topic": "VAP 先不動",
+   "requirement": "VAP 暫不動,先做 VCGC/VDF/VRN 三個子系統。",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Workflow_Hub_SSOT"
+   ],
+   "evidence": "只在進度表 R27 與 Z275 註記;R33 又建了 VIA_Workflow_VAP_SSOT_v0100(未追蹤),範圍決定未入冊。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T18:18:30.490Z",
+     "text": "先不動VAP先用前三個子系統"
+    }
+   ],
+   "r33": "R33:組成冊 v0101 scope:VAP 只登錄不納入收尾(VAP-WKF001 保留舊項序)"
+  },
+  {
+   "code": "VCGC-REQ064",
+   "review_id": "R-080",
+   "subsystem": "VCGC",
+   "topic": "無所不編號",
+   "requirement": "自動編號註冊做到最強:MDL/ENG/CLS/FNC/LIB/ENV/PLCY/PRMT/LGC/FD/BI、整測優化、環境布建都編號。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "VIA_Numbering_SSOT_v0100 kinds 21(K01 MDL … K21 XSRC)+ VIA_NumberBooks;CGC_MDL237 v0103。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:40:21.573Z",
+     "text": "把自動編號註冊能力做到最強無所不編號 整測優化也編號 環境布建 lib編號 VIA VIA-VRN VIA-VDF MDL ENG CLS FNC LIB ENV PLCY(POLICY) PRMT(PARAMETER) LGC(LOGIC) FD(Financial Data) BI(Basic Info) Ticker/YFinance Ticker/Bloomberg T"
+    },
+    {
+     "ts": "2026-09-28T19:22:57.299Z",
+     "text": "SSOT 所一切 編號一切"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ065",
+   "review_id": "R-081",
+   "subsystem": "VCGC",
+   "topic": "編號格式",
+   "requirement": "VIA 為母系統號、VRN/VDF 為子系統號並分類;VIA-VRN-MDL-CLS-FNC-LIB 階層,LIB 四碼其他三碼連續;版號接在名字後;換版換號。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "Numbering SSOT format/rule/mother/subsystems/categories。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:47:20.917Z",
+     "text": "VIA / VIA-VDF / VIA-VRN 不對 VIA是母系統號 VRN VDF是子系統號 分類分好 全部都要有分類"
+    },
+    {
+     "ts": "2026-09-28T14:49:45.211Z",
+     "text": "VIA-VRN-MDL-CLS-FNC-LIB LIB尾數四碼 其他都三碼連續數字"
+    },
+    {
+     "ts": "2026-09-28T14:50:33.472Z",
+     "text": "後面家版本號在名字後面"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ011",
+   "review_id": "R-082",
+   "subsystem": "VDF",
+   "topic": "總經與金融市場代號",
+   "requirement": "總經 MRC-US-XXXX、金融市場 FM-US-EQT-XXXX(EQUITY=EQT);總經編號表自決。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "NumberBook MRC(VIA-VDF-MRC-US 277 列)、FM(VIA-VDF-FM-<區>-<類>-####,US-EQT/TW-EQT)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:43:25.961Z",
+     "text": "VDF VRN那些參數如總體經濟數據要如何建構編號表請自決 更新日期及資料來源及API來源曾入全部編號系統"
+    },
+    {
+     "ts": "2026-09-28T14:54:35.325Z",
+     "text": "總聽經濟 MRC-US-XXXX"
+    },
+    {
+     "ts": "2026-09-28T14:55:14.085Z",
+     "text": "金融市場FM-US-XXXX"
+    },
+    {
+     "ts": "2026-09-28T14:56:28.256Z",
+     "text": "FM-US-EQY-XXXX"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ012",
+   "review_id": "R-083",
+   "subsystem": "VDF",
+   "topic": "商品欄位與全清單編號",
+   "requirement": "商品欄 Ticker/YFinance/Bloomberg/Name/English Name/Exchange/Instrument/Currency/Unit(容許無值);台股全部、主動式台股 ETF 全部都要編號。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF003-STP006",
+    "VDF-WKF010"
+   ],
+   "evidence": "instrument_columns 已定;FM 冊只 272 檔(TW-EQT 148),全台股 1,981 檔待工作站讀庫(Z266;notes load_stock_list ABSENT)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:40:21.573Z",
+     "text": "Ticker/YFinance Ticker/Bloomberg Ticker/Name/English Name/Exchange/Instrument/Currency/Unit(容許無值得存在，台股全部/主動式台股ETF全部/其他參數及商品)"
+    }
+   ],
+   "next": "Numbering FM + 工作站跑 CGC_MDL237",
+   "hand": "工作站(Z266 全清單需資料家)"
+  },
+  {
+   "code": "VCGC-REQ066",
+   "review_id": "R-084",
+   "subsystem": "VCGC",
+   "topic": "來源與更新日入編號",
+   "requirement": "更新日期、資料來源、API 來源存入全部編號系統。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "Numbering row_fields(source · api · updated_at · numbered_at)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:43:25.961Z",
+     "text": "更新日期及資料來源及API來源曾入全部編號系統"
+    }
+   ]
+  },
+  {
+   "code": "VDF-REQ013",
+   "review_id": "R-085",
+   "subsystem": "VDF",
+   "topic": "多來源三值對照",
+   "requirement": "同一數據多來源取最新三值對照並增加同義字;同數據不同來源編號不同。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "Numbering kind XSRC(latest3 lanes);CGC_MDL242 v0101 多來源重號 0;Z267 部分待工作站。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:44:38.238Z",
+     "text": "同一數據多來源可以相互取最新三值對照增加同義字 SSOT REGEX 同義字 都要編號並編入SSOT"
+    },
+    {
+     "ts": "2026-09-28T18:53:51.291Z",
+     "text": "所有參數即使相同數據不同來源也是編號不同 下式個股編號不蓋上市新增 檢查SSOT 版本編號完善自VCGC更快速啟動所有"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ067",
+   "review_id": "R-086",
+   "subsystem": "VCGC",
+   "topic": "SSOT/REGEX/同義字 編號與中英完整",
+   "requirement": "SSOT、REGEX、同義字都編號並入 SSOT,中英文完整、只增不減不衝突;政策也要編碼不漏。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF003-STP006",
+    "VCGC-WKF006"
+   ],
+   "evidence": "SSOT/RGX/SYN 列在 Numbering SSOT、PLCY 冊 1,001 列;Z263 L116/L133 被引用卻不在律冊、Z264 一詞兩主 15 組、Z265 207 組同義字缺中文。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T14:44:38.238Z",
+     "text": "SSOT REGEX 同義字 都要編號並編入SSOT"
+    },
+    {
+     "ts": "2026-09-28T15:00:44.343Z",
+     "text": "自動編馬與SSOT REGEX 同義字 中英文完整只增不減不衝突 政策也編碼不要遺漏"
+    }
+   ],
+   "next": "Numbering + Z263–Z265",
+   "hand": "操作員裁定 + AI(Z263–Z265)"
+  },
+  {
+   "code": "VRN-REQ002",
+   "review_id": "R-087",
+   "subsystem": "VRN",
+   "topic": "個股編號不覆蓋",
+   "requirement": "下市個股編號不覆蓋,上市新增。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006"
+   ],
+   "evidence": "CGC_MDL237 v0102 gone_since / <代號>#L2 新號 / revived_at。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T18:53:51.291Z",
+     "text": "下式個股編號不蓋上市新增 檢查SSOT 版本編號完善自VCGC更快速啟動所有"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ068",
+   "review_id": "R-088",
+   "subsystem": "VCGC",
+   "topic": "舊檔名殘留探針",
+   "requirement": "重新掛載註冊並實測;以全景探針找出指令中漏換的舊檔名(SSOT 同義字中有舊名)。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF009",
+    "L70"
+   ],
+   "evidence": "CGC_MDL234 RenameResidueProbe(舊名讀 SSOT renamed_from);.py 已修;Z262 .ps1 活指令 29 支 64 處待操作員批准(L70)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T13:45:05.384Z",
+     "text": "重新掛載註冊完成實測 舊檔案名稱全景式檢是探針找到指令中的部分替換物遺漏"
+    },
+    {
+     "ts": "2026-09-28T13:53:49.832Z",
+     "text": "SSOT 同義字中有"
+    }
+   ],
+   "next": "Z262",
+   "hand": "操作員(L70:Z262 29 支 .ps1)"
+  },
+  {
+   "code": "VRN-REQ003",
+   "review_id": "R-089",
+   "subsystem": "VRN",
+   "topic": "全文擷取無遺漏",
+   "requirement": "驗證擷取文字無遺漏、文字修復還原狀態分類、修復品質自評再修,修完完整內容才依規定摘要;驗證原始文字全部取到。",
+   "status": "COVERED",
+   "homes": [
+    "VRN-WKF003",
+    "VRN-WKF001-STP003"
+   ],
+   "evidence": "VRN_ENG392_TextCompleteness_v0100;VIA_Policy_VRNTextScope_v0100;hub R3。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:27:18.876Z",
+     "text": "我比較擔心擷取文字不遺漏 文字修復還原狀態分類 修正後的個股報告第一頁 你要如何驗證全部擷取無遺漏 生成修復文字你自己看得懂品質 依品質再修正優化檢查 修完的完整內容再進行SUMMARY依規定 自動完成"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "留意輸出原始文字如何驗證所有文字都有取到 驗要鄭 完成一切 自動推剩無衝突再推送GITHUB你跟他對口接口畚箕資料夾自動完成授權一切 我去睡晚安 一定要到結果測試驗證完成 不要再中斷 授權全部"
+    }
+   ]
+  },
+  {
+   "code": "VRN-REQ004",
+   "review_id": "R-090",
+   "subsystem": "VRN",
+   "topic": "擷取範圍與版面切割",
+   "requirement": "個股報告只取第一頁;年度財報先拆左右再拆上下;邏輯整合編號儲存後再進行。",
+   "status": "COVERED",
+   "homes": [
+    "VRN-WKF003-STP001",
+    "VRN-WKF003-STP002"
+   ],
+   "evidence": "VIA_Policy_VRNTextScope_v0100(stock_report · annual_report · layout);VRN 邏輯冊 v0111 L3 +ENG392。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:31:28.232Z",
+     "text": "個股報告只取締一頁及年度財報業更新政策邏輯"
+    },
+    {
+     "ts": "2026-09-28T19:32:43.757Z",
+     "text": "年度財報業可能會分左有 左右右上夏墅表堆疊 先拆左右在拆上下 更新 邏輯整合編號儲存更新後再進行下去"
+    }
+   ]
+  },
+  {
+   "code": "VRN-REQ005",
+   "review_id": "R-091",
+   "subsystem": "VRN",
+   "topic": "VRN 邏輯只增不減",
+   "requirement": "VRN 邏輯經 VCGC 更新只增不減、不衝突、去 TA-Lib;不 --install apply 蓋掉。",
+   "status": "COVERED",
+   "homes": [
+    "VRN-WKF001-STP004",
+    "VRN-WKF002"
+   ],
+   "evidence": "RC-28;CGC_MDL244 VrnLogicAdd;VIA_VRN_LogicArchitecture_SSOT v0112(節點 54→55)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T20:06:28.032Z",
+     "text": "去除所有TA-LIB局部指令修復更新VRN邏輯 不可用TA-LIBTA-Lib 不能用。先看 main 上禁令有沒有接上，再只補還沒落地的那一截。已中斷指令除TA-LIB活指令還在。via-ta.cmd、via-talib、via-taone 會從舊註冊檔一路帶進來。只拆這三個指令，版史和禁令守衛留著。已中斷系統除TA-LIB局部指令並修復 啟用VCGC全景式檢是用節省TOKE"
+    },
+    {
+     "ts": "2026-09-28T20:06:28.032Z",
+     "text": "邏輯更新只增不減 經過VCGC所有流程啟動節省TOKEN所有工具邏輯只加了一支，沒有刪任何舊節點。已併入 movies-dataset#362，提交 def0e659。 項目結果冊v0111 → v0112節點54 → 55，少的是 0新增VIA_VRNLogic_AllInOne_v0201.py，掛在 L3舊引擎不動。沒有跑 --install apply，所以不會蓋掉 v"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ069",
+   "review_id": "R-092",
+   "subsystem": "VCGC",
+   "topic": "TA-Lib 全面禁用",
+   "requirement": "全專案零 TA-Lib 引擎或功能;VCGC 要完全偵測;以 AST 定位局部指令修復(不刪整支引擎),版史與禁令守衛保留。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP006",
+    "L50"
+   ],
+   "evidence": "L50 第一條;VIA_Policy_TalibBan_v0101;CGC_MDL243 TalibCommandScan(hub H5);CGC_MDL190 TALibLock 零匯入;RC-23;R31 最後死分支已切。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T21:12:14.150Z",
+     "text": "1. 禁止使用 ta-lib * 若任何檔案、模組、指令、AST 中出現 ta-lib，必須： * 先由 token 節省工具進行全面掃描 * AST 精準定位 * 產生移除補丁 * 進行修復測試 * 不得自動套用，需人工審核（via 核心） 2. 所有動作必須先讀取政策，未讀政策不得執行任何變更。 3. VCGC 是唯一核心審核者 * 所有修補、掃描、補丁、版本切換、layo"
+    },
+    {
+     "ts": "2026-09-28T12:47:26.465Z",
+     "text": "TA-LIB工具局部指令刪除修復 所有引擎都要有版本號註冊進行控管"
+    },
+    {
+     "ts": "2026-09-28T19:21:34.017Z",
+     "text": "刪除一切TA-LIB指令模組化刪除不要在外擴 刪除後修正 整個對話最新要求邏輯庫政策更新 收斂 收尾VCGC VDF VRN 跳出驗證結果全部綠就成功收尾 交接報告 自測字完成 收工更新GITHIUB自動推進無衝突就推授權 明天第三方AUDIT VCGC一定要按上述順序鎖定不可跳出 VDF可以分開測試因為不同引擎 VRN按順序 留意輸出原始文字如何驗證所有文字都有取到 驗要鄭 "
+    },
+    {
+     "ts": "2026-09-28T19:43:10.971Z",
+     "text": "刪除一切TA-LIB"
+    },
+    {
+     "ts": "2026-09-29T00:10Z",
+     "text": "I am going to sleep please work by yourself I authorized everything complying with the policy remember to remove anything regarding talib in the system"
+    },
+    {
+     "ts": "2026-09-29T11:55:27.800Z",
+     "text": "不准使用TA-LIB"
+    }
+   ],
+   "r33b": "R33b 清查(2026-09-29):AST 真 import 敘述 0 · 動態匯入 0 · 安裝指令 0(只在說明字串)· via-talib/via-taone 已於命令冊 v0262 拆除 · CGC_MDL243 掃描 lock_success。其餘字樣是歷史版檔 / 禁令守衛 / 正本:依 L50「不刪字 · 禁令加在旁邊 · 正本未改」與掃描器 do_not「不得刪 Register v0205–v0207」保留 —— 「刪掉一切 TA-Lib 字樣」與 L50 衝突,依 Master Prompt 該項停手並回報,不硬刪",
+   "s0929h": "側線 2026-09-29 h:+引文 1 則(同一需求再申明;狀態不變)"
+  },
+  {
+   "code": "VCGC-REQ070",
+   "review_id": "R-093",
+   "subsystem": "VCGC",
+   "topic": "TA-Lib 偵測修復引擎",
+   "requirement": "TA-Lib 全面偵測修復引擎:AST 定位局部 → 新版號 → compile+自測審核 → 受影響家族舊版刪除。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF001-STP006"
+   ],
+   "evidence": "Z283:CGC_MDL243 全面修復版已寫、自測 8/8 但依令暫停(樹上只有掃描門 v0100)。",
+   "quotes": [
+    {
+     "ts": "2026-09-28T19:44:18.000Z",
+     "text": "這個政策為何一植被違反 VCGC 應該要完全偵測刪除"
+    },
+    {
+     "ts": "2026-09-28T19:45:50.286Z",
+     "text": "他不是珊所有引擎 是AST定位山局部指令然後修復"
+    }
+   ],
+   "next": "Z283 + VCGC-WKF001-STP006",
+   "hand": "AI 下一輪(Z283 暫停中)"
+  },
+  {
+   "code": "VCGC-REQ071",
+   "review_id": "R-094",
+   "subsystem": "VCGC",
+   "topic": "收尾落冊 A–G",
+   "requirement": "落冊 CloseoutLock/SuccessLedger/AutoCode 冊與 Z218–Z222;layout 登冊乾跑→apply→0/0/0;VCGC/VDF/VRN 實測記 rc 與證據;收尾矩陣與給操作員的裁決清單。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP003"
+   ],
+   "evidence": "VIA_VCGC_CloseoutLock_v0100、VIA_VCGC_SuccessLedger、VIA_AutoCode_Registry、DroppedBalls Z218–Z222、docs/VIA_Closeout_Matrix_20260928_0430/0525。",
+   "quotes": [
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "A. 紀錄落冊(冊都在 supportive modules/registry/): 1) 新建 VIA_VCGC_CloseoutLock_v0100.json(schema VIA.VCGC.CloseoutLock.v1;book_edited:false;line:\"側線 2026-09-28(主線批號由併線的手指定 L25)· PR #327\";locked[] 每格"
+    },
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "C. layout 登冊:via-vcgc registry-sync --layout-only(乾跑,預期 new 1 changed 61)→ --apply → 再乾跑必須 0/0/0 → via-vcgc layout --selftest rc 0 → via-vcgc layout --manifest errors 空。冊只增不減;stale 若不為 0 立刻停"
+    },
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "D. 實測(每件記 rc 與最後一行證據): VCGC:CGC_MDL149 v0161 --selftest;CGC_MDL226 --selftest;CGC_MDL190_TALibLock(imports 必須 0);via-vcgc status 抓 邏輯庫/因子庫/VRN 系統管理/VDF 系統管理/L50 全景/SSOT 連動 六行(不准出現 BROKEN;NOD"
+    },
+    {
+     "ts": "2026-09-27T20:45:53.548Z",
+     "text": "F. 收尾:docs/VIA_Closeout_Matrix_YYYYMMDD_HHmm.md 寫完整矩陣(區/件/燈/證據,含每個 held 的原因);git add 只加本任務的檔(*.ps1 接章者、docs、上述四本冊、VIA_Component_Inventory_SSOT、VIA_VCGC_SubsystemSeat);VIA_Reports/ 再生件永不 comm"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ072",
+   "review_id": "R-095",
+   "subsystem": "VCGC",
+   "topic": "一句進環境(VCGC 入口)",
+   "requirement": "操作員一句進環境:由 VCGC 進入、照規定流程跑(第一步省 Token → 只快轉更新 → 閘 → 載入加速器並告知目前加速器 → 網路工具 / layout 等工具版本卡 → 啟動全部);PowerShell 一句 via-in 先進倉(之後 git push 不再報 not a git repository)再跑同一流程。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "docs/VIA_S20260929f_VcgcEnter.md",
+    "docs/VIA_S20260929g_ViaIn.md"
+   ],
+   "evidence": "CGC_MDL149 v0173 `via-vcgc enter`(PR #372);命令冊 Register-VIA-Commands-v0263 `via-in` / 別名 進入環境(PR #373,L70 逐次許可 P011);CI 以 PowerShell 解析器解析 v0263 零錯。",
+   "quotes": [
+    {
+     "ts": "2026-09-29T08:59:19.043Z",
+     "text": "應該要有進入環境指令  由vcgc進入跑他的流程如規定  加入加速器並告知目前加速器  網路工具  layout工具版本  ssot一切整合最佳化測試除厝更新啟動全部"
+    },
+    {
+     "ts": "2026-09-29T10:24:55.716Z",
+     "text": "加 via-in 短令到命令冊 v0263"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h 新增"
+  },
+  {
+   "code": "VCGC-REQ073",
+   "review_id": "R-096",
+   "subsystem": "VCGC",
+   "topic": "驗證輸出收斂(DataFrame · SSOT 欄位)",
+   "requirement": "驗證不可無限發散:每批驗證照驗證 SSOT 的欄位輸出一張 DataFrame 表(層 VAL / RVL / X · 代碼 · 實測法 · 狀態 · 結果 · 結果的驗證),一列一件事、不加列外的檢;沒跑的照實標 SKIP。",
+   "status": "RECORDED",
+   "homes": [
+    "VIA_Validation_SSOT_v0100.json",
+    "VCGC-WKF004",
+    "docs/VIA_S20260929h_ToolCodeCollision.md"
+   ],
+   "evidence": "常設令入冊;首次照做:側線 h 批文件「四、驗證」14 列(狀態碼用驗證 SSOT 的誠實狀態)。目前由 AI 程序遵守,沒有引擎自動產表。",
+   "quotes": [
+    {
+     "ts": "2026-09-29T11:44:32.083Z",
+     "text": "不可無限發散  輸出欄位DATAFRAM SSOT 驗證實測法及結果的驗證"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h 新增"
+  },
+  {
+   "code": "VCGC-REQ074",
+   "review_id": "R-097",
+   "subsystem": "VCGC",
+   "topic": "CI Actions 升 Node 24",
+   "requirement": "CI 工作流用到的四個 GitHub Actions 升到支援 Node 24 的版本,開 PR。",
+   "status": "COVERED",
+   "homes": [
+    "docs/VIA_S20260929e_ActionsNode24.md"
+   ],
+   "evidence": "PR #371 已合併;之後 main 各輪 CI 綠。",
+   "quotes": [
+    {
+     "ts": "2026-09-29T08:41:19.271Z",
+     "text": "升級那四個 action,開 PR"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h 新增"
+  },
+  {
+   "code": "SUP-REQ006",
+   "review_id": "R-098",
+   "subsystem": "SUP",
+   "topic": "Polars 表格層與 temp 溢寫",
+   "requirement": "必要引擎加上 Polars 表格層;記憶體不足時可用 temp 替代(溢寫暫存,不中斷)。",
+   "status": "COVERED",
+   "homes": [
+    "VIA_ToolVersion_Lock_v0100.json",
+    "docs/VIA_S20260929c_PolarsFrame.md"
+   ],
+   "evidence": "SUP_MDL755 VIAPolarsFrame v0100(鎖冊 frame 家族,經 VCGC tools activate frame)· 11 支必要引擎接上(PR #369)。",
+   "quotes": [
+    {
+     "ts": "2026-09-29T01:28:23.216Z",
+     "text": "go on add polars to all necessary engines 記憶體不足可用temp替代用"
+    }
+   ],
+   "s0929h": "側線 2026-09-29 h 新增"
+  },
+  {
+   "code": "VRN-REQ006",
+   "review_id": "R-099",
+   "subsystem": "VRN",
+   "topic": "擷取分層升級(輕到重 · 有上限)",
+   "requirement": "VRN 各類資料(TABLE · TEXT)的資訊還原與交叉比對:先測試 / 分類(文字層或掃描 · 表或文),從初階單一工具起(非 OCR 文字層、pdfplumber),驗證不過才升級到雙 / 三引擎組合、重度工具(PaddleOCR 之類)與 layout 引擎;失敗才把畫質提高到 DPI 300–350 以上重試;工具不全開,兼顧齊全驗證與速度、資源,升級有上限不無限發散。",
+   "status": "PARTIAL",
+   "homes": [
+    "VRN-WKF002",
+    "VRN-WKF003"
+   ],
+   "evidence": "已有:VRN_MDL001_Converter v0121 DPI 300–350 自動帶(批448;向量頁不渲染、單頁像素上限 4000 萬),但它一律照帶渲染,不是失敗才升;引進件 GenericLayoutEngine v2.1.0 b245 的 multi_engine_policy 有 light_to_heavy_fallback(pdfplumber 為主、依條件升級)。缺:正式鏈上沒有「先分類 → 初階單一工具 → 驗證不過才升一級 / 才重渲 · 每頁升級次數與總時間上限 · 引擎間交叉比對」的路由正主。",
+   "quotes": [
+    {
+     "ts": "2026-09-29T11:53:40.207Z",
+     "text": "提醒各類VRN資料如TABLE TEXT 資訊還原  交叉比對  非OCR  基礎OCR PDFPLUMBER搭配其他單引擎或雙引擎或三引擎舉例  重度工具PRADDLE之類  搭配LAYOUT引擎再掀非常吃資資源及速度  從簡單用到重度 在完整擷取上工具過多全用不實際  如何齊全驗證同時考量速度問題  LAYOUT全用也可能拖慢運作因為工具過多  如何智慧型先測試或分類  失敗再提高畫質到DFI=300~350以上  從初階單一工具失敗再找高階工具組合  如何優化"
+    }
+   ],
+   "next": "出 VRN 擷取路由正主(先分類 → 初階 → 驗證不過才升級 / 重渲;上限寫進參數冊;輸出 DataFrame 欄位照 SSOT),接 VRN-WKF002 L1 擷取",
+   "hand": "AI 下一批(升級上限的數字由操作員定)",
+   "s0929h": "側線 2026-09-29 h 新增"
+  },
+  {
+   "code": "VCGC-REQ075",
+   "subsystem": "VCGC",
+   "topic": "交接防遺漏閘",
+   "requirement": "每次更新及接手，核對需求、待辦、來源、相依版本、成功鎖及實測證據；缺件不能誤報完工。",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF011"
+   ],
+   "evidence": "VIA_Handoff_Continuity_SSOT_v0100 / VRN_SourceProvenance_SSOT_v0100；實際測試證據見 docs/handoff/evidence",
+   "quotes": [
+    {
+     "text": "為了避免每次更新接手有遺漏  如何避免這個風險  請加入",
+     "recorded_at": "2026-09-29T15:38:10+00:00"
+    }
+   ]
+  },
+  {
+   "code": "VCGC-REQ076",
+   "subsystem": "VCGC",
+   "topic": "舊模組依賴隔離",
+   "requirement": "舊模組與未用模組移入隔離區前，先確認無執行依賴；有依賴則保留並註明。",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF011"
+   ],
+   "evidence": "VIA_Handoff_Continuity_SSOT_v0100 / VRN_SourceProvenance_SSOT_v0100；實際測試證據見 docs/handoff/evidence",
+   "quotes": [
+    {
+     "text": "舊模組及還沒用的模組另外開一區隔離移開",
+     "recorded_at": "2026-09-29T15:38:10+00:00"
+    }
+   ],
+   "next": "建立相依證据後才實際搬移",
+   "hand": "AI"
+  },
+  {
+   "code": "VRN-REQ007",
+   "subsystem": "VRN",
+   "topic": "四來源分立與完整性證據",
+   "requirement": "檔名、第一頁資訊区、第一頁本文、年度財報表格分別編號；允許 null，跨來源核對，完整性另驗，按檔名排序。",
+   "status": "PARTIAL",
+   "homes": [
+    "VRN-WKF008"
+   ],
+   "evidence": "VIA_Handoff_Continuity_SSOT_v0100 / VRN_SourceProvenance_SSOT_v0100；實際測試證據見 docs/handoff/evidence",
+   "quotes": [
+    {
+     "text": "所有相同數據來源不同視為不同SSOT編號",
+     "recorded_at": "2026-09-29T15:38:10+00:00"
+    }
+   ],
+   "next": "目前完成來源觀測層；補齊全部樣本、年度頁判型、單位期間正規化與受控重試實測",
+   "hand": "AI"
+  },
+  {
+   "code": "VCGC-REQ077",
+   "subsystem": "VCGC",
+   "topic": "SSOT 全景上下單向檢測",
+   "requirement": "VCGC → VDF → VRN 全部檢測;正則 · 同義字 · 自動編號 · 命名 · 註冊 · 上下連結 六族 × 四層(VCGC → VDF → VRN → SUP)全景檢視;由上而下單向檢測到底(上層紅 → 下層同族標上游紅,照量不停);自適應(輸入指紋沒變沿用);只讀、只增不減、不另立第二把尺",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP007",
+    "VCGC-WKF006",
+    "docs/VIA_S20260929i_SSOTPanorama.md"
+   ],
+   "evidence": "CGC_MDL247_SSOTPanorama v0100(自測 fail=0)· VCGC v0178 ssot panorama 經 run 派送;實跑見批文件",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN 全部檢測 將VCGC將SSOT REGEX 同義字 自動編號 命名 註冊功能強化 SSOT全景式檢視  優化 自動化  自動自適應式上下單向檢測到底更新整合優化  只增不減只要不發生衝突政策",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "VCGC TO VDF TO VRN  SSOT相關功能進一步升級強化一次  PLEASE ADVIS TOP 15 LOCAL FREE LIBS TO IMPROVE  STREAMLIT RICH LIB TO DEPLOY.",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ078",
+   "subsystem": "VCGC",
+   "topic": "自動編號強化(只增自核)",
+   "requirement": "自動編號活檔判定只看目錄(檔名不算隔離;Z280 根因)· 唯讀只增稽核 audit(遺失 · 改身分 · 重號 · 冊內一致)· --apply 寫後自核,違反只增即整批還原· 寫入只登本批範圍(全量重建多出的範圍外列不寫,掛交接待辦等操作員令)",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF003-STP006",
+    "VCGC-WKF001-STP005"
+   ],
+   "evidence": "CGC_MDL237_NumberingSystem v0108(自測 46 OK)· 本批只登本批自己的列(操作員令「既有範圍內註冊 不要擴張範圍」),範圍外列掛交接待辦 VCGC-REQ078:backlog;VCGC audit 遺失 0 · 改身分 0 · 重號 0(實數見批文件)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN 全部檢測 將VCGC將SSOT REGEX 同義字 自動編號 命名 註冊功能強化 SSOT全景式檢視  優化 自動化  自動自適應式上下單向檢測到底更新整合優化  只增不減只要不發生衝突政策",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "註冊編號SSOT化更新全部SYNC ALL TO GITHUB",
+     "recorded_at": "2026-09-29T19:23:29+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "既有範圍內註冊 不要擴張範圍",
+     "recorded_at": "2026-09-29T19:23:29+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ079",
+   "subsystem": "VCGC",
+   "topic": "註冊與上下連結強化",
+   "requirement": "系統管理器薄尾沿鏈讀名冊(VDF / VRN 上行七處 6/7 假缺 → 7/7);需求 ↔ 工作流真雙向(X-REQ-BACK:需求歸屬指到的工作流要回指)",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF004-STP001",
+    "VCGC-WKF001-STP005"
+   ],
+   "evidence": "VCGC v0178 manager_names 沿鏈(實跑 VDF · VRN 七處 7/7)· CGC_MDL245 v0104 X-REQ-BACK(單向 4 條由工作流冊 v0103 補齊)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN 全部檢測 將VCGC將SSOT REGEX 同義字 自動編號 命名 註冊功能強化 SSOT全景式檢視  優化 自動化  自動自適應式上下單向檢測到底更新整合優化  只增不減只要不發生衝突政策",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "VCGC TO VDF TO VRN盤點一個中央控管功能架構還那些缺漏  補強  有新增功能每個功能可增TOP 10 LOCAL FREE LIBS既有的工具功能下再進一步升級優化TOKEN SAVING工具並且AI進入讀取後開始使用要求充分讓AI知道功能及使用及必用功能寫入",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ080",
+   "subsystem": "VCGC",
+   "topic": "命名普查(同號異名 · 版號異形 · 沒版號)",
+   "requirement": "命名全樹普查:同一 <前綴>_<MDL|ENG><號> 掛多個名字、版號異形(非四碼)、沒版號 .py 逐層列報;改名改號要操作員裁定,不自動改",
+   "status": "PARTIAL",
+   "homes": [
+    "VCGC-WKF006",
+    "docs/VIA_S20260929i_SSOTPanorama.md"
+   ],
+   "evidence": "CGC_MDL247 命名族:同號異名 12 組(VCGC 7 · VDF 3 · VRN 1 · SUP 1)· 版號異形 44 · 沒版號 .py 841(Z279 / Z281)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN 全部檢測 將VCGC將SSOT REGEX 同義字 自動編號 命名 註冊功能強化 SSOT全景式檢視  優化 自動化  自動自適應式上下單向檢測到底更新整合優化  只增不減只要不發生衝突政策",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "next": "操作員裁定:同家族伴隨模組記進命名冊;真撞號出新版號檔改號並遷呼叫(L04)",
+   "hand": "操作員裁定",
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ081",
+   "subsystem": "VCGC",
+   "topic": "省 Token 工具再升級",
+   "requirement": "既有省 Token 工具再升級:JSON 兩層骨架卡 · JSONL 欄位卡 · JSON 路徑切片 · 薄尾版本鏈圖;只經 VCGC tools activate 換版(鎖冊)",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP003",
+    "VCGC-WKF003-STP001",
+    "CLAUDE.md"
+   ],
+   "evidence": "CGC_MDL158 v0117(本版 9/9 · 前版 45/45;啟用閘 10 項全過;鎖冊 token → v0117 · VIA-TOOL-0212)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN盤點一個中央控管功能架構還那些缺漏  補強  有新增功能每個功能可增TOP 10 LOCAL FREE LIBS既有的工具功能下再進一步升級優化TOKEN SAVING工具並且AI進入讀取後開始使用要求充分讓AI知道功能及使用及必用功能寫入",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ082",
+   "subsystem": "VCGC",
+   "topic": "AI 進場必用功能卡",
+   "requirement": "AI 進場讀取後即照卡使用:功能 · 用法 · 必用順序 · 禁止寫成 SSOT 冊;VCGC functions 印全卡,token 卡尾印必用摘要;CLAUDE.md / AGENTS.md 指向本冊",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001-STP003",
+    "VIA_AI_FunctionCard_SSOT_v0100.json",
+    "CLAUDE.md"
+   ],
+   "evidence": "VIA_AI_FunctionCard_SSOT_v0100(12 步必用)· VCGC v0178 functions / token 尾摘要(實跑 rc 0)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN盤點一個中央控管功能架構還那些缺漏  補強  有新增功能每個功能可增TOP 10 LOCAL FREE LIBS既有的工具功能下再進一步升級優化TOKEN SAVING工具並且AI進入讀取後開始使用要求充分讓AI知道功能及使用及必用功能寫入",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ083",
+   "subsystem": "VCGC",
+   "topic": "本機免費函式庫建議",
+   "requirement": "每個新功能列 TOP 10 本機免費函式庫;整體 TOP 15 改善清單;Streamlit / Rich 部署建議(只建議,安裝經 ENV MANAGER,是操作員的手)",
+   "status": "RECORDED",
+   "homes": [
+    "docs/VIA_S20260929i_SSOTPanorama.md"
+   ],
+   "evidence": "批文件「函式庫建議」一節(含本倉已用 / 容器已裝的實測對照)",
+   "quotes": [
+    {
+     "text": "VCGC TO VDF TO VRN  SSOT相關功能進一步升級強化一次  PLEASE ADVIS TOP 15 LOCAL FREE LIBS TO IMPROVE  STREAMLIT RICH LIB TO DEPLOY.",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "VCGC TO VDF TO VRN盤點一個中央控管功能架構還那些缺漏  補強  有新增功能每個功能可增TOP 10 LOCAL FREE LIBS既有的工具功能下再進一步升級優化TOKEN SAVING工具並且AI進入讀取後開始使用要求充分讓AI知道功能及使用及必用功能寫入",
+     "recorded_at": "2026-09-29T18:52:56+00:00",
+     "said_in": "側線 2026-09-29 i session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "hand": "操作員(安裝經 ENV MANAGER 順序:盤點 → 相減 → 偵測 → 隔離 → 還原點 → 再新增)",
+   "s0929i": true
+  },
+  {
+   "code": "VCGC-REQ084",
+   "subsystem": "VCGC",
+   "topic": "編號 · 註冊 · SSOT 治理架構重整與風險治理",
+   "requirement": "SSOT / 自動編號 / 含版本及時間的自動註冊 / 工作流 SSOT / 正則 / 同義字 的邏輯與編號架構重新整理成一本正本(分層 · 號碼空間與主號 / 別名 · 冊的可改性 · 時間規範 · 登錄次序 · 風險冊),並把量到的風險做成自動防線:已發布版號冊不就地改 · 收據沿用重掃相依 · 編號只登本批 · 未提交不發號 · 指紋過期 · 同版兩號 / 席位唯一 · 共用號碼空間撞號 · 新時間 UTC 帶時區",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Registry_Architecture_SSOT_v0100.json",
+    "VCGC-WKF001-STP005",
+    "VCGC-WKF003-STP006",
+    "docs/VIA_S20260930a_RegistryArchitecture.md"
+   ],
+   "evidence": "VIA_Registry_Architecture_SSOT_v0100(11 號碼空間 · 15 風險)· CGC_MDL237 v0109(--apply --scope · audit 六項註冊完整性)· CGC_MDL140 v0102(相依集合)· CGC_MDL233 v0104(席位唯一 · activated_at · 名冊出新版)· VCGC v0179(元件註冊時間 UTC)· 引擎版本冊 VIA-TOOL-0212 改 candidate(R06)",
+   "next": "R09 兩本待辦帳對帳(交接冊 × 掉球帳)· R07 三冊號碼對照報表(命名 · 元件 · 中央編號);R10 / R11 / R12 / R14 由操作員裁定",
+   "quotes": [
+    {
+     "text": "SSOT / 自動編號 / 含版本及時間自動註冊 / WORKFLOW SSOT / REGEX / 同義字管理等將邏輯管理編號架構及可能的風險從新整理優化一遍",
+     "recorded_at": "2026-09-30T09:13:55+00:00",
+     "said_in": "側線 2026-09-30 a session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0930a": true
+  },
+  {
+   "code": "VCGC-REQ085",
+   "subsystem": "VCGC",
+   "topic": "VCGC 全功能盤點與一條串測(PS 唯一入口 · AI 進場同流程 · 新指令自動進流程 · 版本時間紀錄)",
+   "requirement": "VCGC 所有功能(動詞 · 席位 · 必用卡步 · 交接案 · 工作流步 · PS 入口 · 全部 CGC 家族尾版)盤點成一本站表正本,由一條串測逐項測試(唯讀 / 乾跑)、不遺漏;唯一 PS 入口(操作台)· enter · AI 進場都跑同一流程;之後新生成的指令沒登錄 = 黃、改過的尾版自動跑自測;任何更新以版本 · sha · UTC 時間只增記錄;範圍只在 VCGC",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VCGC_FunctionInventory_SSOT_v0100.json",
+    "VCGC-WKF001-STP008",
+    "docs/VIA_S20260930b_VCGCChain.md"
+   ],
+   "evidence": "盤點冊 VIA_VCGC_FunctionInventory_SSOT_v0101 75 站(動詞 40 · 席位 6 · 必用卡 13 · 交接案 12 · 工作流步 39 · PS 1;新 0 · 缺 0);串測引擎 CGC_MDL224 v0102(PS 入口版號 -vNNNN · 串測自開輪號;自測 6/6 + v0101 10/10);唯一 PS 入口 Invoke-VIA-OperatorConsole-v0108(①g 串測 · ⑦ 帶紀錄冊)pwsh 實跑:P-entry 綠 · 工作流順序紅 0;AI 進場(token → functions → handoff check → test --quick)與 enter 走同一流程;紀錄冊 VIA_VCGC_FunctionLedger 只增記版本 · sha16 · UTC 時間;Z286 以 CGC_MDL221 v0101 · CGC_SystemManager v0111 修(真跑的鏈報告不再判備份失敗)",
+   "next": "—(轉 COVERED:三個交接工作項 inventory · ps-entry · backup-stale 都 VERIFIED;燈仍照實,驗收燈 closeout_lamp 另計)",
+   "quotes": [
+    {
+     "text": "VCGC所有功能盤點如先前所說用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間  範圍不發散完成VCGC",
+     "recorded_at": "2026-09-30T10:19:01+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0930b": true,
+   "closed_at": "2026-09-30T12:33:52+00:00"
+  },
+  {
+   "code": "VCGC-REQ086",
+   "subsystem": "VCGC",
+   "topic": "整合全景實測一鍵 PS(VCGC → VDF → VRN → SUP · 紅了照跑 · 跳 HTML)· 三橋補齊與最新版",
+   "requirement": "面檢視實測工具整合為一:一支 PowerShell 經 VCGC 依序跑 三橋覆蓋與最新版 → VCGC 指令串測 → SSOT 全景 → 單一路徑驗證 → 自測格子 → 交接,任何一段紅照跑下一段,最後跳出一頁 HTML 總報告(與單一路徑驗證頁同版型);每段正主尾版 · 版號 · sha16 · UTC 時間 · 秒數只增紀錄;所有 PY 引擎接最新加速器、VDF 接最新網路工具、PS 接加速器模板,缺一支就紅並點名",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VCGC_FunctionInventory_SSOT_v0102.json",
+    "docs/VIA_S20260930b_VCGCChain.md"
+   ],
+   "evidence": "【更正 · Z290】v0100 的「跳 HTML」不成立:launcher v0100 自設 VIA_NO_OPEN=1 到 finally 才還原,同一行程的 PS 加速器模組零跳出閘(批366)把自己的 Invoke-Item 靜默吃掉(pwsh 實跑印「[VIA_NO_OPEN] 抑制跳出」);v0100 實跑都帶 -NoOpen,開頁那段從沒被跑到。修:launchers/Invoke-VIA-FullCheck-v0101.ps1(開自己的頁用 cmdlet 全名 · 呼叫端設 1 照守並印黃字 · 標準模板塊 [VIA:PS-TEMPLATE:v0101] · 開跑印 Celeritas 狀態 · 結尾 MATRIX SUMMARY · 邊跑邊印;pwsh -File 與熱 PS「&」兩式實跑:假 xdg-open 收到 FULLCHECK_latest.html · 優先權 / 環境變數 / 資料夾跑完原樣還原)· CGC_MDL248_FullCheck v0101(⓪ 段加「PS 自擋開頁」:PS 尾版自設 1 後不帶模組名開頁 = 紅並點名檔 · 行;自測 5/5 + 前版 9/9)· 同病:唯一入口 v0108 · RunAll v0102(新版 v0109 / v0103 已備妥並實測,.ps1 要操作員 L70 逐次許可才入樹;⓪ 段每輪點名)。先前證據(照留):CGC_MDL248_FullCheck v0100(六段 · 自測 9/9)· 橋掃 --apply:VDF 網路橋 131/131 · PS 25 加速器橋 928/928 · 載入 Celeritas v1141 / Aegis v1652 = 樹上最新;紀錄冊 VIA_VCGC_FullCheck_Ledger_v0100.jsonl",
+   "next": "同病待辦(⓪ 段每輪點名):唯一入口 v0108 · RunAll v0102 → 新版已備妥,待操作員 L70 許可(交接待辦 VCGC-REQ086:console-runall-own-page);#386 兩支收尾鏈 PS → VCGC-REQ086:closeout-own-page",
+   "quotes": [
+    {
+     "text": "先把這個面檢視實測的工具整合為一  我們先看一下況 確認一下VCGC已經結案上傳全部版本耗時間等都記錄好",
+     "recorded_at": "2026-09-30T13:19:27+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "給我一個整合後的POWRESHELL跳書HTML報告如今天清晨",
+     "recorded_at": "2026-09-30T13:19:27+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "請加入PS加速器模板並檢查系統中的引擎都有加入最新版加速器  VDF加入最新的網路工具 從VCGC VDF VRN提供這個PS指令我自己貼上去跳出HTML U/I如今天早上 熱PS去跑 請提供一個整合後指令",
+     "recorded_at": "2026-09-30T13:19:27+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "跑完直接開PR合併給我指令",
+     "recorded_at": "2026-09-30T13:19:27+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "這個ＰＳ指令一定沒有加加速模板自動跳出ＨＴＭＬ",
+     "recorded_at": "2026-09-30T17:57:26+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;對 VCGC-REQ086 的缺陷回報 → Z290)"
+    }
+   ],
+   "s0930b": true
+  },
+  {
+   "code": "VCGC-REQ087",
+   "subsystem": "VCGC",
+   "topic": "CI「VIA Master Control UI」反覆紅一口氣根治(半途合併 · Windows 連線重置)",
+   "requirement": "CI 反覆紅要一次找出根因並根治:① 收尾在本機全部跑完、handoff check 綠了才一次推送,不推中間狀態;② 合約測試在 Windows 的間歇紅(DeckServer 拒絕 POST 沒讀本文就關連線 → RST)以新版修正;③ 倉庫 main 開必過狀態檢查(操作員設定)",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_FunctionInventory_SSOT_v0103.json",
+    "docs/VIA_S20260930b_VCGCChain.md"
+   ],
+   "evidence": "根因:#380 · #383 在收尾中途合併(handoff check 紅)· #384 test_22 WinError 10053(DeckServer v0160 拒絕路徑未讀本文);CGC_MDL095_DeckServer_v0161 +_drain_body(自測 26/26 · 合約 19/19);交接案 deck",
+   "next": "操作員:GitHub Settings → Branches → main 開 Require status checks to pass before merging(勾 Windows bundled Chromium UAT);AI:Windows 上 test_22 以 CI 實證",
+   "hand": "操作員(倉庫設定)· AI(CI 實證)",
+   "quotes": [
+    {
+     "text": "這個問題反覆出現能否一口氣針對他解決  https://github.com/tonykuni/movies-dataset/actions/runs/36721027527",
+     "recorded_at": "2026-09-30T13:53:49+00:00",
+     "said_in": "側線 2026-09-30 b session(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "s0930b": true
+  },
+  {
+   "code": "VCGC-REQ088",
+   "subsystem": "VCGC",
+   "topic": "Panorama 第一步監控 · VCGC→VDF ∥ VCGC→VRN 同步進行(不用等的步先實測)· AUTO SYNC · 里程碑同步 GitHub",
+   "requirement": "① 第一步啟動檢查 U/I(VIA_Panorama first = 掃描 + monitor:VCGC 事件 · VDF/VRN 鏈 · SDD · 串測 · 交接 · TA-Lib 一條線一盞燈)就知道問題在哪;② PS 指令串一次跑全流程,VDF 與 VRN 兩迴圈並行,互不等待的步驟先實測;③ 邊成功邊編號鎖定,里程碑同步 GitHub;④ 不可 TA-Lib",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Panorama_v0103.py",
+    "VIA_VCGC_FunctionInventory_SSOT_v0104.json",
+    "VIA_Workflow_Hub_SSOT_v0102.json",
+    "VCGC-WKF001"
+   ],
+   "evidence": "VIA_Panorama v0103 monitor / first(自測 12/12;交接案 via_panorama 收據 rc 0)",
+   "next": "PS 操作台新版:⓪a Panorama first · VDF / VRN 鏈並行(Start-Job)· Hub 冊新版宣告兩迴圈並行",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "將PANAROMA為第一步啟動監控VCGC-VDF-VRN用先前那樣PS指令串所有流程步驟WORKFLOW VCGC-VDF     VCGC-VRN同步進行AUTO SYN功能強化",
+     "recorded_at": "2026-09-30T19:35:29+00:00",
+     "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "我去睡覺請自動完成  VCGC-VRN  VCGC-VDF在第一部啟動檢查U/I後就可知問題在哪 先啟動他",
+     "recorded_at": "2026-09-30T19:35:29+00:00",
+     "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "自動完成授權一切VCGC  VCGC-VRN  VCGC-VDF可同步進行 各自WORKFLOW SSOT 若一個步驟在等待其他 其他不用等的步驟可直接先進行實測 避免交互等待  不可TA-LIB  三方面同步進行 我去睡了 晚安 邊進行成功就編鎖定 全部結果測完全鎖完就全成功",
+     "recorded_at": "2026-09-30T19:35:29+00:00",
+     "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r34": true
+  },
+  {
+   "code": "VDF-REQ014",
+   "subsystem": "VDF",
+   "topic": "台股清單 · 主動式台股 ETF 清單自動更新 · ETF 的 AUM / NAV / 資金流入流出 / 配置明細 · VDF 單引擎測試",
+   "requirement": "① 台股清單自動更新並標新上市 / 下市(不刪列、不改號);② 主動式台股 ETF 清單自動更新;③ 每檔主動式 ETF 必抓 AUM · NAV · 申購贖回(資金流入 / 流出)· 持股配置明細;④ VCGC→VDF 單引擎測試冊;⑤ 以已鎖架構為主,沒資料才去封鎖區找",
+   "status": "PARTIAL",
+   "homes": [
+    "VDF-WKF010",
+    "VDF-WKF006"
+   ],
+   "evidence": "(本批進行中)",
+   "next": "ENG087 新版 diff · ENG094 新版 fetch / breakdown · 單引擎測試冊;實抓由操作員在工作站開同意閘跑",
+   "hand": "AI · 操作員(同意閘與實抓)",
+   "quotes": [
+    {
+     "text": "準備VCGC-VDF的單引擎測試 … 自動更新台股清單  自動更新的主動式\"台股\"ETF清單  ETF一定要抓取到AUM NAV CASH INFLOW/OUTFLOW AND BREAKDOWN 實測一鎖定註冊編號就鎖死不改編號",
+     "recorded_at": "2026-09-30T19:35:29+00:00",
+     "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r34": true
+  },
+  {
+   "code": "VRN-REQ008",
+   "subsystem": "VRN",
+   "topic": "VRN 全部 SSOT 正則 · 同義字邏輯一致 · 輸出表頭定案 → DataFrame 鎖定(輸出即驗證即結果驗證)",
+   "requirement": "① 正則 · 同義字 · 評等 · 目標價同義字跨冊一致(衝突點名,不擅改冊);② 輸出表頭定案後以 DataFrame 鎖定,輸出即驗證;③ 實測樣本 C:\\測試樣本報告(操作員工作站);④ 以已鎖架構為主,不外擴",
+   "status": "PARTIAL",
+   "homes": [
+    "VRN-WKF005",
+    "VIA_SSOT_SynonymUnion_v0100.json",
+    "VIA_Central_Synonym_Regex_v0100.json"
+   ],
+   "evidence": "(本批進行中)",
+   "next": "一致性檢查 · 表頭冊 · DataFrame 鎖定引擎;操作員在工作站以樣本實測",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "VCGC-VRN所有SSOT REGEX同義字等邏輯  全部以GITHUB已成功鎖定的架構為主不要外擴範圍  將輸出HEADER檢視定案後建立DATAFRAME鎖定 以DATAFRAME中資料的輸出即驗證即結果驗證為範圍目標不發散",
+     "recorded_at": "2026-09-30T19:35:29+00:00",
+     "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r34": true
+  },
+  {
+   "code": "VRN-REQ009",
+   "subsystem": "VRN",
+   "topic": "VRN 文件五類分類(個股 · 產業/展望 · 新聞摘要 · 其他投資報告 · 其他)+ 首頁文字 / 表格 / 分類還原修復驗證 + 亂數三格乘積多法互核",
+   "requirement": "① VRN 路徑不再只收個股報告:分 個股 / 產業展望 / 新聞摘要 / 其他投資(無關個股)/ 其他(送複核,不丟);非個股的個股欄 NULL 不猜;② 首頁文字 · 表格 · 分類還原修復並驗證;③ 數字格亂數每取三格相乘,多方法並存時比對乘積,取到用完;④ 實測輸出後結果驗證;⑤ 政策相符(無 TA-Lib · 經 VCGC · 正本唯讀)",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VRN_DocClass_SSOT_v0100.json",
+    "VIA_Output_Header_SSOT_v0101.json",
+    "VRN-WKF005"
+   ],
+   "evidence": "VRN_ENG393_DocClassVerify v0100 自測 35/35;76 真實檔名 STOCK 54 · INDUSTRY_OUTLOOK 13 · NEWS_DIGEST 9 · 丟棄 0;正本合成 PDF 6 格三法乘積一致;表頭 v0101 兩表 CGC_MDL249 check GREEN 並鎖(帳只增)",
+   "next": "操作員工作站以 C:\\測試樣本報告 實測(classify / verify;pdfplumber 會加入互核);VRN 工作流冊新版掛 classify → route → 首頁互核步",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "啟動實測並驗證真實輸出結果  修正後的首頁內容持續調整到最佳化 文字表格分類還原修復驗證  格子若有數字則可用亂數選三格相乘多若多方法結果並存 可檢驗數值乘積  再亂選三個直到選完  檢視政策都有符合",
+     "recorded_at": "2026-09-30T21:20:00+00:00",
+     "said_in": "R35 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "VRN目前這條路徑只擷取個股報告  為 產業/展望  新聞摘要 / 其他投資報告(無關個股)  其他分類好就好",
+     "recorded_at": "2026-09-30T21:20:00+00:00",
+     "said_in": "R35 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r35": true
+  },
+  {
+   "code": "VCGC-REQ089",
+   "subsystem": "VCGC",
+   "topic": "HTML U/I 原始模板 + SYNCHRONIZER:任何模板可轉換 · 自動同步成自己的 U/I · TOP 25 能力",
+   "requirement": "① 模板(含 Claude Design 匯出的 VIA HTML Universal UI.dc.html)丟進來即可轉換;② SYNCHRONIZER 自動隨模板調整、綁 VIA 即時資料成為自己的 U/I(沒對到的槽位照實報,不造假資料);③ 加 TOP 25 能力建構此功能;④ 完成後註冊 · 同步 · 檢查無誤 · 同步 GitHub",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_UI_TemplateSync_SSOT_v0100.json",
+    "VCGC-WKF001"
+   ],
+   "evidence": "CGC_MDL241_TemplateAdapter v0101(convert / sync / watch / diff / lock / top25)自測 37/37;TOP 25 = IMPLEMENTED 24 · PARTIAL 1(深色主題);Universal UI 參考匯出 faithful 覆蓋 111/120;Chromium 390px 無橫捲 · 0 主控台錯",
+   "next": "操作員把 claude.ai/design 匯出的 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → watch;採用其 token 才走 convert --propose → apply → CGC_MDL238 template --lock 重鎖",
+   "hand": "AI · 操作員(模板檔與重鎖)",
+   "quotes": [
+    {
+     "text": "如果所有功能都完成上完完工後  之前有HTML U/I RAW TEMPLATE WITH SYNCHONIZER(強大到多種功能接有自動隨模板範例調整) AUTO SYNC WITH TEMPLATE: https://claude.ai/design/p/636f0a43-1ef4-4238-b253-6bc7d762053d?file=VIA+HTML+Universal+UI.dc.html&via=share  完成並註冊同步更新一切檢查無誤 SYNC TO GITHUB",
+     "recorded_at": "2026-09-30T21:20:00+00:00",
+     "said_in": "R35 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "模板可轉換  SYNCHROZIERY自動隨之調整變成自己的U/I  可加TOP 25 TO BULD UP THIS FUNCTION.",
+     "recorded_at": "2026-09-30T21:20:00+00:00",
+     "said_in": "R35 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r35": true
+  },
+  {
+   "code": "VCGC-REQ090",
+   "subsystem": "VCGC",
+   "topic": "PS 入口跑完強制自動關機(選用開關)",
+   "requirement": "PS 唯一入口帶開關時,整輪跑完 · 報告寫完後強制自動關機;倒數中可取消;不帶開關行為不變",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VIA_VCGC_FunctionInventory_SSOT_v0104.json"
+   ],
+   "evidence": "Invoke-VIA-OperatorConsole-v0110.ps1 -ShutdownWhenDone [-ShutdownDelaySec 120]:finally 之後 shutdown.exe /s /f /t N,取消 shutdown /a;非 Windows 只印略過;pwsh Parser 0 錯 · 串測 P-entry GREEN",
+   "next": "",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "下一個指令到PS強制自動關機",
+     "recorded_at": "2026-09-30T21:20:00+00:00",
+     "said_in": "R35 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r35": true
+  },
+  {
+   "code": "VCGC-REQ091",
+   "subsystem": "VCGC",
+   "topic": "跑完自動跳出所有 U/I(瀏覽器分頁;不經 VS Code)",
+   "requirement": "VCGC / VRN 收尾等指令跑完後,把相關 U/I 頁自動跳出;一鍵開全部主要 U/I;不回到 .html 預設程式(VS Code)跳窗",
+   "status": "COVERED",
+   "homes": [
+    "VCGC-WKF001",
+    "VIA_VCGC_FunctionInventory_SSOT_v0106.json"
+   ],
+   "evidence": "Register-VIA-Commands-v0264.ps1:via-ui-all(別名 全部UI;-Hours/-All/-List)+ via-closeout · via-vcgc 跑完把本輪新寫的 VIA_Reports *.html 以瀏覽器 exe 分頁開出(VIA_UI_AUTOPOP=0 關);pwsh Parser 0 錯 · 容器 pwsh 載入實測列 25 頁 · 兩令已包",
+   "next": "",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "自動跳出所有U/I",
+     "recorded_at": "2026-10-01T08:00:00+00:00",
+     "said_in": "R35c session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r35": true
+  },
+  {
+   "code": "VRN-REQ010",
+   "subsystem": "VRN",
+   "topic": "版面還原:資訊區(上/左/右/下)與本文區拆開 · 扁平文字表格還原(表號/說明 · 表頭 · 表身 · 資料來源)· 圖≠表 · 小字頁尾/附錄排除 · 合併格 · 表格驗算",
+   "requirement": "① 資料區不論在上 / 左 / 右 / 下都歸「資訊區」,與本文區拆開;② 任何區擷取出來像表格的(含 OCR 扁平文字裡一格對一格的表)移到資訊區並還原成表(表號: 說明 / 表頭 / 表 / 資料來源,頭尾可無);③ 本文區照原樣還原但一句一列、有據點,記字級與粗體,類別 文 / 表 / 圖,次類別 大中小標題 / 本文 / 小字無關頁尾;④ 財報頁與首頁先左右拆、再上下拆,再擷取表格;堆疊表也拆;⑤ 精準抓出小字無關頁尾與報告後方附錄(連同標題)不擷取;⑥ 所有表用垂直線分隔,格內去空格且 TRIM;⑦ 合併儲存格要解;⑧ 驗證表格正確性;⑨ 說明用哪些方法確認首頁內容都抓到",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VRN_LayoutRestore_SSOT_v0100.json",
+    "VRN-WKF005"
+   ],
+   "evidence": "VRN_ENG394_LayoutRestore v0100 自測 48/48:操作員貼的四段 OCR 扁平文字(兆豐指數表 13 列並排 2 張 · 漲跌幅驗算 13/13;Citi Earnings Summary 5×8 · 單位掛欄 · EPS 成長率與 P/E×EPS≈114 驗算;GS Mitac / Hon Hai Exhibit 1 判圖不造表)· 合成首頁 PDF(右側欄資訊區 · 畫線表合併格 · 並排表 · 本文扁平表移入資訊區 · 小字免責排除)· 倉內真實 FactSet 報告 31 頁(p4 兩張堆疊表 Target − Closing = Diff 10/10 · p2 分行目錄 · p31 Important Notice 連標題排除)",
+   "next": "操作員工作站以 C:\\測試樣本報告 實測 restore --pages 1(與 all);ENG072 首頁四節改接本支版面樹(下一版)",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "1. 確認一下你用哪些方法確認第一頁內容都抓到   2. 資料區可能在上左右甚至下  你可以把它整理再一起 都稱資訊區   3. 不管資訊區或是本文區",
+     "recorded_at": "2026-10-01T09:53:16+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "擷取下來都有出現類似表格的樣子  把他提出去到資訊區並還原表格  本文區還原原本的樣子但一句一資料(有據點)有字體大小粗細識別  有類別(文表圖) 也有次類別(大中小標題/本文/字體",
+     "recorded_at": "2026-10-01T09:53:16+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "財報頁有時候為左右垂直表格 先左右拆 在上下拆  然後擷取表格  首頁也應該這樣  資訊區可能是上左右下 根本文拆開  堆疊數表也拆  經準抓到小字體部相關頁尾及小字體部相關的報告後方附錄之類的跟他的標題部擷取  所有的表用垂直線當間隔 內部文字去空格且TRIM過   合併儲存格的解決問題  驗證表格正確性問題",
+     "recorded_at": "2026-10-01T10:03:14+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "剛剛式一些OCR工具擷取出的表格藏在文字裡 一格對一格 明顯就是表格 表格分為 表號: 說明 / 表頭 / 表 / 資料來源: 第一個跟最後一個未必有 很明顯工具並未式別出他們式表格 如何識別如何還原",
+     "recorded_at": "2026-10-01T10:03:14+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r36": true
+  },
+  {
+   "code": "VRN-REQ011",
+   "subsystem": "VRN",
+   "topic": "財務評價方法(valuation_method)SSOT 化與編號註冊:VAL_* 代碼 · 英文全稱 / 縮寫 · 台灣 / 香港 / 大陸用語分區 · 變體 · 舊詞庫收編",
+   "requirement": "① 評價方法單一事實來源,標準代碼 VAL_*(股權乘數 · 企業價值乘數 · 絕對估值 · 情境比較四組);② 區分地區慣用語(台灣繁體 vs 大陸簡體;香港另列);③ 涵蓋縮寫、全稱、衍生詞(預估 / 歷史 · FCFF / FCFE · 河流圖);④ 可供 NLP 字典、資料庫標籤、研究報告標準化(JSON 陣列結構);⑤ 編號註冊",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VRN_ValuationMethod_SSOT_v0100.json"
+   ],
+   "evidence": "VRN_ENG395_ValuationMethodLexicon v0100 自測 22/22:16 方法(操作員稿 14 + AI 補 殖利率法 VAL_DY · EV/EBIT VAL_EV_EBIT)· 一詞一碼 · 台灣 / 香港欄無簡體字 · 大陸欄無繁體字 · SYNONYM_LIBRARY_v4 6 canonical 與 ENG062 VALUATION_METHODS 8 canonical 全數收編;短縮寫只認大寫(per share / operating 不誤中)· 最長詞優先(本益比河流圖 → VAL_BAND);registry-sync + CGC_MDL237 編號(遺失 0 · 改身分 0 · 重號 0)",
+   "next": "VRN_ENG062 摘要器改用本冊比對器取代子字串比對(要出 ENG062 新版尾)",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "valuation_method   ssot化  邊號註冊  建立財務評價方法的 SSOT (Single Source of Truth, 單一事實來源)，最關鍵的是要區分地區慣用語（台灣繁體 vs. 大陸簡體）以及涵蓋完整的使用情境（縮寫、全稱、衍生詞）。這對於建立 NLP 字典、資料庫標籤或內部研究報告的標準化非常重要。",
+     "recorded_at": "2026-10-01T10:40:00+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r36": true
+  },
+  {
+   "code": "VRN-REQ012",
+   "subsystem": "VRN",
+   "topic": "首頁主標題判定:字最大 · 不含個股名稱與代碼 · 一句話沒有句號(版面 + NLP)",
+   "requirement": "① 主標題 = 首頁字級最大的一句;② 不含個股名稱與代碼;③ 一句話、句尾沒有句號;④ 用版面(字級)與 NLP 規則判;⑤ 分類用主標題,不用整條頁首帶",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VRN_DocClass_SSOT_v0100.json",
+    "VRN-WKF005"
+   ],
+   "evidence": "VRN_ENG393_DocClassVerify v0101 page1_title() 自測 15/15(仿 MS / 國泰首頁 · 公司行含代號剔除 · 有句號剔除 · 跨行標題接起來);檔名有代號判個股時,主標題只靠無代號類規則不算衝突(工作站 MS 九份誤標複核的根因)",
+   "next": "操作員工作站 classify 重跑比對待複核數(前次 218)",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "文章的主標題通常偏大 不包含個股及代碼的一句話沒有句號",
+     "recorded_at": "2026-10-01T11:10:00+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "nlp layout可幫忙",
+     "recorded_at": "2026-10-01T11:10:30+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r36": true
+  },
+  {
+   "code": "VRN-REQ013",
+   "subsystem": "VRN",
+   "topic": "分析師聯絡區塊:姓名在職稱 / 電話 / 電郵上方 · 中英職稱表 · 電話式只增不減不衝突 · @ 前英文名 · @ 後券商",
+   "requirement": "① 中英文姓名在職稱、電話、電郵上方;② 列中英文職稱,也去樣本找;③ 電話 regex 可更新,只增不減、不衝突;④ 電郵 @ 前為分析師英文名,@ 後為券商",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VRN_ReportFieldRules_SSOT_v0101.json"
+   ],
+   "evidence": "規則冊 v0101(只增不減):職稱 中 19→43 · 英 15→31;電話 +TW_MOBILE · +INTL(排在台北 / 香港之後,只吃未命中區間);CGC_MDL182 v0101 自測 15/15 · v0100 自測 18/18 在新冊下全過(不衝突證據)· Evidence_Core 端到端(Jeff Pu GREEN · GOLDMAN SACHS · +65 電話)· mine 動詞挖樣本提案",
+   "next": "操作員工作站跑 mine --samples C:\\測試樣本報告 → AI 裁定提案(職稱 / 號碼格式 / 網域)→ 冊新版",
+   "hand": "操作員(跑 mine)· AI(裁定入冊)",
+   "quotes": [
+    {
+     "text": "分析師中英文姓名通常放在職稱電話電郵上方 列一些可能的中英文職稱也可去樣本找  電話regex可更新只增不減不衝突  電郵通常@前方為分析師英文名  後方為broker",
+     "recorded_at": "2026-10-01T11:20:00+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r36": true
+  },
+  {
+   "code": "VRN-REQ014",
+   "subsystem": "VRN",
+   "topic": "研報本文實體:公司名稱中英文 · 最簡寫 · 局部識別;目標價(本次 / 調整前);評價法(代碼 · 倍數 · 基準年 · 驗算)",
+   "requirement": "① 本文找公司名稱(中英文),推最簡寫並做局部識別;② 目標價要有調整前的值;③ 評價法(方法、倍數、基準年)",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VRN_ReportEntities_SSOT_v0100.json",
+    "VIA_VRN_ValuationMethod_SSOT_v0100.json"
+   ],
+   "evidence": "VRN_ENG396_ReportEntities v0100 自測 25/25:鴻海(全名 → 去後綴 → Hon Hai · 最簡寫 · HHPI)· 南亞(檔名 + 首頁 → 南亞)· 局部識別 台積電 / 中信金 · 停用詞不判;目標價 from A to B / to B from A / (prev. A) / 由 A 上調至 B / (原 A 元) / 前次目標價 · 剔除 % 與倍數 · 維持;評價法 VAL_PE 本益比 / 推定(14x EPS)· 句內指標 · 表內指標驗算 VERIFIED / MISMATCH / UNVERIFIED",
+   "next": "工作站 run --in C:\\測試樣本報告 實測;接證券主檔(中英名稱)當別名來源",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "本文可找到公司名稱中英文最簡寫局部識別",
+     "recorded_at": "2026-10-01T12:20:00+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "目標價(調整前) 評價法",
+     "recorded_at": "2026-10-01T12:20:00+00:00",
+     "said_in": "R36 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r36": true
+  },
+  {
+   "code": "VRN-REQ015",
+   "subsystem": "VRN",
+   "topic": "版面還原輸出:右側資訊區 / 表格雙欄 · 一句一標題一資料(兩種編號 · 兩層分類)· 截取完整度 · 去重修復",
+   "requirement": "① 一句一標題一資料,有編號、分類兩種;② 確認全部都有被截取;③ 周邊資訊區及表格放右邊還原;④ 植入去重修復引擎",
+   "status": "COVERED",
+   "homes": [
+    "VIA_VRN_LayoutRestore_SSOT_v0100.json"
+   ],
+   "evidence": "VRN_ENG394 v0101 自測 16/16(前版 48/48):S0001 全文編號 + 節.句 · 所屬標題 · 類別 × 次類別;截取完整度對文字層逐字(倉內 6 份真實 PDF 54 頁全 100%,含修好的 FactSet p2 目錄自列項);跨頁頁眉 / 同頁重複句去重(≥12 字)移到排除區;雙欄頁左本文右資訊區",
+   "next": "工作站 restore --in C:\\測試樣本報告 --pages all 看完整度紅黃綠",
+   "hand": "AI · 操作員(實測樣本)",
+   "quotes": [
+    {
+     "text": "時測自完成優化完善解取 一句一標題一資料並且有編號分類兩種  確認全部都有被截取  周邊資訊區及表格放右邊還原",
+     "recorded_at": "2026-10-01T13:00:00+00:00",
+     "said_in": "R37 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "植入去重修復引擎",
+     "recorded_at": "2026-10-01T12:55:00+00:00",
+     "said_in": "R37 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r37": true
+  },
+  {
+   "code": "VRN-REQ016",
+   "subsystem": "VRN",
+   "topic": "VRN 引擎模組化樂高化:可拔積木 · AST 盤點與功能分類說明 · 模組化整合(外部版面 / 表格工具偵測接上)",
+   "requirement": "① 引擎模組化、樂高化、可拔元件;② 注入 AST 及功能分類及說明;③ 模組化整合(Docling / MinerU / Surya / pdfplumber / Camelot / TATR … 全部可接)",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VRN_PluginHub_SSOT_v0100.json"
+   ],
+   "evidence": "VRN_ENG397_PluginHub v0100 自測 17/17:11 階段 · 6 內部積木 · 13 外部積木(find_spec 偵測不安裝)· 計畫 default / xcheck · 執行期 register / unregister · ABSENT 退回內部並記錄 · AST 盤點含薄尾前版鏈 · 功能分類 ≥8 類 · 知識物件",
+   "next": "外部工具要用時照環境計畫在工作站裝(中樞不裝);裝好後跑 probe 會轉 AVAILABLE、xcheck 計畫自動當第二讀法",
+   "hand": "操作員(環境)· AI(轉接器)",
+   "quotes": [
+    {
+     "text": "讚優化個引擎模組化樂高化可拔元件注入AST及功能分類及說明  模組化整合  植入去重修復引擎",
+     "recorded_at": "2026-10-01T12:55:00+00:00",
+     "said_in": "R37 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r37": true
+  },
+  {
+   "code": "VCGC-REQ092",
+   "subsystem": "VCGC",
+   "topic": "全樹工具覆蓋:PS 加速器模組 · PY 加速器(含 HTML U/I MATRIX REPORT)· VDF 網路工具 · AST 探針互核 + HTML 矩陣報告",
+   "requirement": "① PS 檔都要掛加速器模組;② HTML / U/I / MATRIX / REPORT 等 PY 都要掛加速器;③ VDF 都要掛網路工具;④ 探針用 AST 加高(量真)加速器覆蓋率;⑤ HTML U/I 矩陣報告",
+   "status": "COVERED",
+   "homes": [
+    "VIA_ToolCoverageMatrix_SSOT_v0100.json"
+   ],
+   "evidence": "CGC_MDL230 v0102 matrix 自測 14/14(+v0101 5/5):前 → 後 觸網 PY 網路橋 95.9%(缺 3)→ 100% · PS 尾版加速器 98.8%(缺 8)→ 100% · AST 真橋 PY 1531 → 1535 · VDF 107 → 109 · PS 688(4 支函式內的橋移到頂層);VDF 全件 109/109 · PY 加速器 1535/1535;豁免 16 條具名附理由(正本 / 自指 / 凍結 / 上傳原件);HTML 矩陣報告 VIA_Reports/toolprobe/COVERAGE_MATRIX_latest.html",
+   "next": "4 支 PS 檔本身 pwsh 剖析錯誤(既有,非本批):HyperBOM_SELF_CONTAINED_v2 · VRN-Fallback-Activation-v0136 · FlowSystem_SandboxPatch_v025 · v0163A OneClick-Sidebar-v0159 —— 修語法需操作員裁(L70);真用加速 API 0.7%(掛橋 ≠ 加速,改寫熱路徑才會升)",
+   "hand": "AI(橋 · 探針)· 操作員(4 支 PS 語法 · 熱路徑改寫)",
+   "quotes": [
+    {
+     "text": "PS檔案都要加加速器模組及HTML U/I MATRIX REPORT PY都要加加速器 探針 AST加高加速器覆蓋率 VDF都要加網路工具 允許一切授權 時測自完成優化完善解取 一句一標題一資料並且有編號分類兩種 確認全部都有被截取 周邊資訊區及表格放右邊還原",
+     "recorded_at": "2026-10-01T13:00:00+00:00",
+     "said_in": "R37 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    }
+   ],
+   "r37": true
+  },
+  {
+   "code": "VCGC-REQ093",
+   "subsystem": "VCGC",
+   "topic": "VCGC 監控覆蓋矩陣完善:PS 加速器模板章 · PY AST 分類與說明 · 結果只增帳本 · 淺色緊湊自動跳出 · SYNCHRONIZER 標準化 · PS 語法錯修正",
+   "requirement": "① 成功部分編號註冊鎖定不動;② 專注 VCGC · VCGC-VDF · VCGC-VRN;③ 每支 PY 有加速器 + AST 分類 + 說明;④ PS 加速器模板;⑤ 結果矩陣只增不減不衝突;⑥ VCGC 呈現、自動跳出、淺色、字小、緊湊;⑦ 經 SYNCHRONIZER 標準化 HTML U/I;⑧ 修語法錯誤並加加速模組",
+   "status": "COVERED",
+   "homes": [
+    "VIA_ToolCoverageMatrix_SSOT_v0101.json",
+    "VIA_UI_TemplateSync_SSOT_v0101.json"
+   ],
+   "evidence": "CGC_MDL230 v0103 自測 9/9(+v0102 14/14 · v0101 5/5;有無 pwsh 都過):六面 GREEN —— PY 加速器 1535/1535 · 觸網網路橋 73/73 · VDF 109/109 · PS 加速器 691/691 · PS 模板章(VCGC/VDF/VRN)189/189 · 兩法一致 · 剖析錯 0;⑦ AST 目錄 610 支(原檔說明 87.7%,其餘 AST 推導標明);3 支 PS 語法修好並經 Invoke-VIA-PSTemplateJoin 接章(v0136 由 v0136A 取代,進版史);只增帳本 VIA_ToolCoverage_Ledger_v0100.jsonl(merge=union);SYNCHRONIZER 來源 toolcov GREEN、標準化 U/I 出現工具覆蓋矩陣;v0104:matrix 預設以 file:// 直開單檔頁(零 server · 零 <script> · 零外部資源),CI / 無桌面 / --no-open / VIA_NO_OPEN=1 照實略過;自測 4/4",
+   "next": "原檔 docstring 補寫(VCGC 9 · VRN 21 支)需逐支新版號,另批;VRN 5 支 PS 雜湊被登錄 / 凍結鎖在旁,照 PaidDebt 不接章",
+   "hand": "AI(矩陣 · 帳本 · 頁)· 操作員(工作站 --open 跳頁 · docstring 補寫裁定)",
+   "quotes": [
+    {
+     "text": "以成功的部份編號註冊鎖定不動  專注VCGC VCGC-VDF  VCGC-VRN  VCGC  每個PY擋都要加入加速器 AST分類 說明  PS擋要加加速器模板  整個結果矩陣全部整則只增不減 部衝突  用VCGC 監控系統更完善化用他呈現自動跳出 淺色  自小一點  LAYOUT緊湊  自動最佳化HTML U/I  現在的檢查報告將逐步演化為HTML操作用的U/I  實測時修正  上面與法錯誤改善 記得加入加速模組  標準化目前所有的HTML U/I用最節省TOKEN的方法透過SYNCHRONIZER來做自動調是媒介",
+     "recorded_at": "2026-10-01T14:15:00+00:00",
+     "said_in": "R38 session 2026-10-01(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "不跑SERVER直接跳出",
+     "recorded_at": "2026-10-01T15:25:00+00:00",
+     "said_in": "R38 session 2026-10-01(逐字)"
+    }
+   ],
+   "r38": true
+  },
+  {
+   "code": "VCGC-REQ094",
+   "subsystem": "VCGC",
+   "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題",
+   "requirement": "① VCGC 起頭依序(DASHBOARD · 省 Token · 環境 · 加速器 · 網路工具)→ VDF → VRN 實測(VRN 首頁文字與 SUMMARY 待校正除外);② 結果驗證後鎖成功的工作流 · 引擎版本 · 編號;③ 上傳 AUTO SYNC;④ 解決實測找到的問題",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VDF_OneWayRead_Waivers_v0100.json",
+    "VIA_VRN_LogicArchitecture_SSOT_v0100.json"
+   ],
+   "evidence": "容器實跑唯一入口 v0110 -Full(1259 s;①g test --full 684 s 占 54%)· 找到並修好:VRN 邏輯冊 2 指標過期(09-29 建冊後 09-30/10-01 進新尾版)→ 重建 55/55;CGC_MDL170 0c 掃描看不見薄尾繼承的依賴(ENG094 v0101 薄尾)→ v0104 沿鏈取文,⑳ 回 PASS|R40 工作站實跑(2026-10-01)找到並修好:① 每個 `python $V run …` 都 60 秒以上(容器剖析 69.5 秒中 62 秒在 run 後的同步檢查整樹 ast.parse;快取鑰把每次 run 寫的報告 / 帳本也算進去 → 工作站永遠沒命中)→ VCGC v0181 鑰只看盤點來源,同指令 1.2–1.5 秒;② 三庫入庫 tw__consensus_daily FAIL Duplicate key(協定檔無 date+ticker → EXCEPT 撞正典表主鍵)→ VDF_ENG079 v0105 照表主鍵只補缺(重現 + 修正 6/6);③ 入口串測 51 紅 = 閘(status)rc 2:工作站樹當時未同步(未拉到 #405 · 本地 main 分叉);乾淨 main 實測 status rc 0",
+   "next": "工作站:git merge --abort → MergeMedic sync --apply(帳本只增聯集)→ 拉到含 v0181 / v0105 的 main → 入庫重跑 run --apply → status 必須 rc 0 → selftests → real → lock --apply;VIA_DATA_HOME 用接點真正指向的 C:\\Users\\tonyk\\VIA System\\via_database(不 --relink)",
+   "hand": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
+   "quotes": [
+    {
+     "text": "鎖成功的引擎版本也鎖成功的路徑VCGC沿順序而下啟動觀察DASHBOARD 用TOKEN節省工具  環境 加速器 網路工具  先把VCGC-VDF-VRN順序而下除了VRN的擷取第一頁文字及SUMMARY可能還需要校正外  其它他趕快坐實測及結果驗證鎖住WORKFLOW及引擎 版本 編號上傳AUTO SYNC TO GITHUB.",
+     "recorded_at": "2026-10-01T15:30:00+00:00",
+     "said_in": "R39 session 2026-10-01(逐字)"
+    },
+    {
+     "text": "解決所有問題",
+     "recorded_at": "2026-10-01T16:00:00+00:00",
+     "said_in": "R39 session 2026-10-01(逐字)"
+    },
+    {
+     "text": "指令跑太慢未加加速模板  檢查一切指令",
+     "recorded_at": "2026-10-01T17:30:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字)"
+    },
+    {
+     "text": "一職離完工一步之遙無法收尾  未何",
+     "recorded_at": "2026-10-01T17:30:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字)"
+    }
+   ],
+   "r39": true
+  },
+  {
+   "code": "VCGC-REQ095",
+   "subsystem": "VCGC",
+   "topic": "依「政策庫(規則中心)+ SSOT(事實中心)+ 規則引擎(執行中心)」架構強化 VCGC SDD:先對照既有部件、列缺口,不另起微服務",
+   "requirement": "A 政策庫四層(可操作化條件 · 嵌入流程 · 系統強制 · 監控稽核)· B SSOT 四機制(唯一來源 · 寫入治理 · 版本控制 · 事實驗證)· C 規則引擎讀政策 + 讀 SSOT 事實 → 判斷 → 例外 → 紀錄 → 稽核閉環 · D 事件流;全部落在 VCGC 既有正主上(L05 一把尺,避免九頭龍)",
+   "status": "RECORDED",
+   "homes": [
+    "VIA_Policy_Laws_SSOT_v0100.json",
+    "VIA_Requirements_SSOT_v0124.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Numbering_SSOT_v0100.json"
+   ],
+   "mapping": {
+    "A.Policy/Policy_Version": "VIA_Policy_Laws_SSOT(律 103 · lessons 362 · rank / ACTIVE / 被取代)· 冊版號 + prior / why_vNNNN",
+    "A.Policy_Rule/Condition": "已有:L50 → TA-Lib 查無(MDL205)· L103 → 工具覆蓋矩陣(MDL230 六面)· L04 → 全景 TAILAPI / 薄尾鏈;缺:其餘律沒有機器可判的條件",
+    "A.Policy_Exception": "散在各冊:VDF 單向讀取豁免冊 · 覆蓋矩陣具名豁免(附理由 + 改由誰驗)· PaidDebt not_paid 理由",
+    "A.Execution(Trigger/Validator/Logger/Auditor)": "VCGC 每個動詞先過流程閘(CGC_MDL223)· run id 事件(v0168)· 教訓帳(CGC_MDL058)· SDD 驗證(MDL245)· 全景監控",
+    "B.SSOT_Entity/Record": "中央參數樞紐 73 本冊 · 元件註冊冊 · 編號冊(ENG/MDL/WKF/STP/REQ …)",
+    "B.Write_Governance": "registry-sync 乾跑 → 批准 --apply · 編號 --apply --scope + 稽核(遺失 0 · 改身分 0 · 重號 0)· 帳本只增(MergeMedic 聯集)· 凍結正本不改",
+    "B.Version/Change_Log": "薄尾版號(L04)· 冊 prior + why_vNNNN · 版本時間只增帳(FunctionLedger)",
+    "B.Validation": "SDD X-COL / X-CODE / X-OWNER / X-CONFLICT(鎖定正規式 12 條)/ X-PARAM · ssot panorama",
+    "C.Rule_Engine": "SDDValidator check / real / lock / closeout + 流程閘;燈鎖 VIA_LampLock 只鎖 OK",
+    "D.Events": "run id 事件 · 動詞後同步檢查 · handoff checkpoint(相依變更才重跑)"
+   },
+   "gaps": [
+    "G1 政策可操作化:律 103 條只有 ACTIVE 22 / 被取代 3 有標,78 條未標;每條律缺「條件 · 資料來源 · 由誰強制」三欄 → 合規率算不出來",
+    "G2 例外冊分散:豁免 / 不付債理由散在 3 本以上,沒有一本「例外登記」(核准角色 · 時間 · 到期)",
+    "G3 閘的理由看不見:status rc 2 時串測每站只印第一行(子系統比對過),真正擋的 [同步] 那行被截掉(R40 工作站 51 紅就是這樣)",
+    "G4 寫入治理在工作站被繞過:直接在本地 main 提交帳本 → 與遠端分叉 → 拉不動(R40 實錄)",
+    "G5 監控沒有逐律合規 KPI(合規率 · 例外數 · 稽核失敗數)"
+   ],
+   "evidence": "R40:對照表與缺口已登錄;G4 由 MergeMedic 既有聯集解(工作站指令);其餘缺口未動工(不擴張範圍)",
+   "next": "操作員裁定先做哪一個缺口(建議 G3 → G1 → G2,各一支薄尾 + 一本冊,不新建服務);做的時候每律補「條件 · 資料來源 · 強制者」並由 SDD 驗證出合規率燈",
+   "hand": "操作員(裁定順序)· AI(逐缺口實作 · 登錄 · 測試)",
+   "quotes": [
+    {
+     "text": "強化VCGC依據此  SDD",
+     "recorded_at": "2026-10-01T17:30:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字;附政策庫 + SSOT + 規則引擎 A/B/C/D 架構全文)"
+    }
+   ],
+   "r40": true
+  },
+  {
+   "code": "VCGC-REQ096",
+   "subsystem": "VCGC",
+   "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)",
+   "requirement": "① 每批改動當場 registry-sync → 編號 → 交接案 → checkpoint → 串測(階段式登錄);② VCGC 經 run --family core/vdf/vrn 各自對接子系統;③ 入口收尾自動跳出同步器標準化三合一頁(VCGC 全景 · 串測 · 交接 · SDD + VDF 鏈 + VRN 鏈 + DataFrame 鎖 + 工具覆蓋);④ HTML U/I 先簡單標準化,對接另批",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_UI_TemplateSync_SSOT_v0101.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0114.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "R40 容器實跑入口 v0111(728 s):ⓖ 三合一矩陣頁 rc 2(YELLOW:覆蓋 111/120 · 離線 GREEN)產出並設為收尾自動開啟;串測 98 站 綠 89 · 黃 9 · 紅 0(黃為未登錄 / 待工作站重鎖 / 冊指紋待重編,登錄後轉綠);交接 31 案重跑全 rc 0 · checkpoint GREEN",
+   "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
+   "hand": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
+   "quotes": [
+    {
+     "text": "隨時階段式更新註冊  強化自動化連結VCGC與個子系統的單獨連結自動更新能力  VCGC流程一條龍串連 完善檢查 將VCGC不足功能補齊成功收尾",
+     "recorded_at": "2026-10-01T17:20:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    },
+    {
+     "text": "完成收尾自動跳出HTML三合一矩陣含狀態及實際結果驗證狀態  收尾 自動完成",
+     "recorded_at": "2026-10-01T17:20:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    },
+    {
+     "text": "HTML U/I不管先簡單標準化即可 對接明天再說",
+     "recorded_at": "2026-10-01T17:00:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    }
+   ],
+   "r40": true
+  },
+  {
+   "code": "VCGC-REQ097",
+   "subsystem": "VCGC",
+   "topic": "長流程逐步進度落本機暫存檔:記憶體不足 / 中斷不丟進度,重跑同一指令就接續",
+   "requirement": "長流程(VCGC 全功能串測 · SDD selftests)每完成一步即寫本機暫存(fsync);中斷(Ctrl+C · 被砍 · 記憶體不足)後同一 HEAD 與同一份程式重跑 → 接續已完成的步;正常跑完標完成;暫存在本機暫存夾(不在 OneDrive · 不進 git);每步記當下可用記憶體",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0115.json"
+   ],
+   "evidence": "R41 容器實測:SDD selftests 跑到第 10 支引擎時 kill -9 → 重跑印「接續上一輪沒跑完的 10 步」,只跑剩下的(190 s,完整 300 s),判定與完整跑一致(59 · OK 52 · FINDING 2 · FAIL 1)並標完成;CGC_MDL251 自測 9/9 · TestAuto v0103 6/6 + 前版全過 · SDDValidator v0105 4/4 + 前版全過",
+   "next": "工作站:長指令中斷後直接重跑同一行即可接續;要強制從頭跑設 $env:VIA_PROGRESS='0'",
+   "hand": "AI(實作 · 登錄 · 實測)",
+   "quotes": [
+    {
+     "text": "增加一個功能就式記憶體不族有時容易丟式進度善用temp檔案放在本機",
+     "recorded_at": "2026-10-01T18:00:00+00:00",
+     "said_in": "R41 session 2026-10-01(逐字)"
+    }
+   ],
+   "r41": true
+  },
+  {
+   "code": "VCGC-REQ098",
+   "subsystem": "VCGC",
+   "topic": "一支 PS 短指令 via-realtest 跑完整實測:25 個 PS 加速器 · 並行不卡斷 · 動態進度條與百分比 · 自動用瀏覽器開三合一與驗證頁 · 結果彙總在最後(紅字錯誤 · 黃字貼給 AI)",
+   "requirement": "① 載入 25 個 PS 加速器(Celeritas PS7);② VCGC 閘門記錄不擋;③ VDF 鏈 ∥ VRN 鏈 ∥ 覆蓋矩陣 ∥ ENV MANAGER(上下全部 lib 缺漏)∥ 現況衝突 並行,各道進度條與百分比、卡住警告、逾時看門狗;④ Panorama 監看 + 三合一頁,只用瀏覽器 exe 開,不交給 VS Code;⑤ 最後彙總:紅字錯誤清單 · 黃字貼給 AI 區塊(存檔 + 剪貼簿);⑥ 補環境只走 via-envtools -Apply -Approve 且要操作員自己開閘",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0116.json"
+   ],
+   "evidence": "R42 容器實跑 Invoke-VIA-RealTest-v0100.ps1 -NoOpen(185 s):加速器 25/25 · 閘門 rc 0 · 五道並行完成 · 結果表 + 紅字清單 + 黃字 PASTE_TO_AI_latest.txt;鏈跑器每站印 [進度](CGC_MDL170 v0105 自測 3/3 + v0104 PASS · CGC_MDL172 v0108 自測 3/3 + v0107 PASS)",
+   "next": "工作站:. .\\Register-VIA-Commands-v0265.ps1 → via-realtest(-Resume 接續 · -FixEnv 需操作員自設 VIA_NET_CONSENT)",
+   "hand": "AI(實作 · 登錄 · 實測)",
+   "quotes": [
+    {
+     "text": "要加入25個ps加速器 所有py擋要加入加速氣 ps標準模板自動跳差html 三合一矩陣報告及結果驗證報告 請寫成短指令via_realtest 一定要加入上述功能 太慢了還是卡斷 25個加速器 動態進度條 動態百分比 自動跳出報告",
+     "recorded_at": "2026-10-01T19:40:00+00:00",
+     "said_in": "R42 session 2026-10-01(逐字)"
+    },
+    {
+     "text": "不要被vs code開啟 走環境流程也要自動檢查上下全部有無缺漏lib 現況有無衝突 依照他的邏輯補強環境工具無衝突 整個結果報告可透過via panorama結合更完整包含所有vcgc的控管項目",
+     "recorded_at": "2026-10-01T19:40:00+00:00",
+     "said_in": "R42 session 2026-10-01(逐字)"
+    },
+    {
+     "text": "all into one ps code to handle all所有加速模組及跳出html報告全部何一不卡斷實測 所有結果聚在最後紅字為錯誤黃字要貼給ai詳細且明確足夠",
+     "recorded_at": "2026-10-01T19:40:00+00:00",
+     "said_in": "R42 session 2026-10-01(逐字)"
+    }
+   ],
+   "r42": true
+  },
+  {
+   "code": "VCGC-REQ099",
+   "subsystem": "VCGC",
+   "topic": "via-realtest 工作站實跑「看起來卡住 / ENV MANAGER 丟了」+ VCGC→VRN 鏈剩下兩顆紅收尾",
+   "requirement": "① ENV MANAGER 逐委派即時進度(k/8),不再 780 秒無字;② ENV 等 VDF / VRN 鏈跑完才起跑,⑨ 鏈上缺件讀本輪結果;③ 只在結尾輸出的工具標明「沒新輸出 ≠ 卡住」;④ VRN 鏈 L2 ENG086 ⑤ 自測期望跟 CGC_MDL176 券商裁定(MORGANSTANLEY→MS)走,不寫死;⑤ L3 AutoTestLoop:test_SourceProvenance 單獨被撈到也能自載正主,不再 23 支假紅;不碰第一頁文字 / 表格 / 摘要擷取;不用 TA-Lib",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0117.json"
+   ],
+   "evidence": "容器:CGC_MDL240 v0101 自測 5/5 + v0100 13/13 · 真跑逐行 [進度] ENV 1/8…8/8;VRN_ENG086 v0119 自測 118/118;test_SourceProvenance 單獨 23/23 OK · 經 ENG114 run(module) 23/23;Invoke-VIA-RealTest-v0101 pwsh 剖析 0 錯",
+   "next": "工作站:git pull → . .\\Register-VIA-Commands-v0265.ps1 → via-realtest(自動取 v0101)",
+   "hand": "AI(實作 · 登錄 · 實測)",
+   "quotes": [
+    {
+     "text": "他卡住了嗎??  自行互動完成我去睡",
+     "recorded_at": "2026-10-02T03:40:00+00:00",
+     "said_in": "R43 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "en manager怎麼丟了去隔離找",
+     "recorded_at": "2026-10-02T03:40:00+00:00",
+     "said_in": "R43 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "自動完成上述所有工作",
+     "recorded_at": "2026-10-02T03:40:00+00:00",
+     "said_in": "R43 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "自動完成到vcgc-vdf  vcgc-vrn成功結果驗證無誤收尾為止",
+     "recorded_at": "2026-10-02T03:40:00+00:00",
+     "said_in": "R43 session 2026-10-02(逐字)"
+    }
+   ],
+   "r43": true
+  }
+ ],
+ "non_requirements": [
+  {
+   "ts": "2026-09-27T21:40:53.406Z",
+   "text": "1 PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics> git push origin $br 2>&1 | Select-Object -Last 2 To https://github.com/tonyk",
+   "reason": "工作站 git push 與收尾矩陣輸出貼回(開頭「1」為選項回覆),屬證據"
+  },
+  {
+   "ts": "2026-09-27T21:43:56.690Z",
+   "text": "[VIA] +Grok 矩陣 12 令(母倉撞名者 -grok):via-enter/via-path/via-env-grok/via-entry-grok/via-gh/via-hand/via-aea/via-rev/via-handle/via-probe/via-ingest/via-matrix · 唯一入",
+   "reason": "工作站 git pull 與自測輸出貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T00:50:38.551Z",
+   "text": "GO ON",
+   "reason": "「GO ON」續行指示,無新要求"
+  },
+  {
+   "ts": "2026-09-28T01:52:06.523Z",
+   "text": "功能實測結果如何",
+   "reason": "詢問功能實測結果(引出 R11b 瀏覽器實測),純問題"
+  },
+  {
+   "ts": "2026-09-28T02:49:28.057Z",
+   "text": "[庫] VDF_TW_MonthlyRevenue.duckdb → 倉:VIA_Reports\\vtmra\\revphase\\out\\VDF_TW_MonthlyRevenue.duckdb ase(env …] [沙盒略] 11 本:functional modules/VDF/output_hub/active_",
+   "reason": "DataHome 目錄 / 庫況輸出貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T03:09:44.659Z",
+   "text": "PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics> catalog 18 檔=18…] catalog: 無法將 'catalog' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。 請檢查名稱拼字",
+   "reason": "via-vcgc status 與 catalog 輸出貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T03:11:14.095Z",
+   "text": "git pull via-datahome catalog -Tables via-vcgc dbm overview via-vcgc dbm reconcile via-vcgc dbm plan via-vcgc dbm export --db vdf_tw_market.duckdb --table tw_da",
+   "reason": "操作員貼出自己要跑的 dbm 指令清單,屬證據"
+  },
+  {
+   "ts": "2026-09-28T03:19:34.140Z",
+   "text": "目錄] OK · 存證 C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Reports\\datahome\\DATAHOME_CATALOG_latest.json(啟動層/匯流排/引擎按名讀這頁,不掃樹)",
+   "reason": "DBM overview 輸出貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T04:17:25.573Z",
+   "text": ".../docs/VIA_Progress_20260928_Rollout.md | 1 + .../docs/VIA_TWLists_Method_20260928.md | 99 ++ .../VDF_ENG087_MarketListGovernance_v0105.py | 589 +++++++++ ...",
+   "reason": "R14 面板輸出與 git 紀錄貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T04:36:27.474Z",
+   "text": "EOL_ONLY VRN_ENG112_FinancialRead_v0100.py 換回失敗(現在 1bce5fba81c6698d);原檔備份在 C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Rep",
+   "reason": "DB 面板 v0101 rich 報告貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T04:45:12.464Z",
+   "text": "PS C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset> Get-Content -Raw \"C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Reports",
+   "reason": "操作員把報告放剪貼簿的指令紀錄,屬證據"
+  },
+  {
+   "ts": "2026-09-28T07:26:09.585Z",
+   "text": ".\\VIA-Sweep.ps1 -Zip \"C:\\Users\\tonyk\\Downloads\\VeritasCeleritas-v1.14.0_4.zip\"",
+   "reason": "操作員執行 VIA-Sweep 的指令本身"
+  },
+  {
+   "ts": "2026-09-28T07:51:27.950Z",
+   "text": "CGC_MDL149_VeritasCentralGovernanceConsole_v0163.py py 86 6 1 0 AMBER …] CGC_MDL123_DataHome_v0106.py py 1,055 26 8 0 GREEN …] VDF_ENG087_MarketListGovernance_v",
+   "reason": "詢問三支引擎為何非綠燈(R16 已修),純問題"
+  },
+  {
+   "ts": "2026-09-28T10:23:43.195Z",
+   "text": "║ VIA 全景實測 v0103 · VCGC 流程閘 · 加速模板 · 工具 · rich ║ ╚══════════════════════════════════════════════════════════════╝ [模板] Invoke-VIACeleritasScoped 已套(每步只動本行程、跑完還原",
+   "reason": "全景實測 v0103 與一鍵總表貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T10:29:51.429Z",
+   "text": "======== 只貼黃色 ======== [DBM 面板] RED · CGC_MDL228_VIADBManager v0102 · 2026-09-28 18:25:42 · 政策 DBPANEL-1 GREEN 行尾 OK VRN_ENG112_FinancialRead_v0100.py · OK VRN_",
+   "reason": "DB 面板與一鍵總表貼回,屬證據"
+  },
+  {
+   "ts": "2026-09-28T19:54:02.246Z",
+   "text": "暫停",
+   "reason": "「暫停」"
+  },
+  {
+   "ts": "2026-09-29T00:02:40.224Z",
+   "text": "Try again",
+   "reason": "重試,非需求"
+  },
+  {
+   "ts": "2026-09-29T07:45:31.553Z",
+   "text": "Your response above was cut off mid-stream. …",
+   "reason": "系統續傳提示,不是操作員的話"
+  },
+  {
+   "ts": "2026-09-29T08:37:43.625Z",
+   "text": "[Image]",
+   "reason": "截圖;需求見 08:41 那一則(升級四個 action)"
+  },
+  {
+   "ts": "2026-09-29T08:54:36.795Z",
+   "text": "[Image]",
+   "reason": "截圖;需求見 08:59 那一則(進入環境指令)"
+  }
+ ],
+ "prior": "VIA_Requirements_SSOT_v0126.json",
+ "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
+ "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
+ "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
+ "why_v0108": "側線 2026-09-30 b:VCGC-REQ085(VCGC 全功能盤點與串測;PARTIAL:PS v0108 待下一段)。版號跳過 v0107:PR #379(codex/vdf-dispatch-contract-20260930)已占用 v0107(+VDF-REQ014 · VRN-REQ008),LL334 不撞號;兩邊誰後併,誰出新版合併兩邊需求。舊 110 條一字不動",
+ "why_v0109": "側線 2026-09-30 b 第三段(操作員令「go on」「收尾VCGC」):VCGC-REQ085 PARTIAL → COVERED,理由 = 交接工作項 VCGC-REQ085:inventory / ps-entry / backup-stale 全部 VERIFIED(收據 chain · backup)。只動 REQ085 一條與 tally;其餘 110 條一字不動。v0107 仍由 PR #379 占用(未併),兩邊誰後併誰出新版合併",
+ "why_v0110": "側線 2026-09-30 b 第四段:+VCGC-REQ086(整合全景實測一鍵 PS · 三橋補齊);其餘 111 條一字不動",
+ "why_v0111": "側線 2026-09-30 b 第四段:+VCGC-REQ087(CI 反覆紅根治;PARTIAL:main 必過狀態檢查待操作員設定);其餘 112 條一字不動",
+ "why_v0112": "側線 2026-09-30 b 第五段:操作員「這個ＰＳ指令一定沒有加加速模板自動跳出ＨＴＭＬ」→ pwsh 實測屬實(Z290)。只動 VCGC-REQ086 一條:證據欄照實更正(v0100 的「跳 HTML」不成立)並記 v0101 修法與實測(同病的唯一入口 · RunAll 新版待 L70 許可);原話入 quotes;reviewed 加本輪 1 則。其餘 112 條一字不動,tally 不變",
+ "why_v0113": "R34:操作員 2026-09-30 令(Panorama 第一步監控 · 三線同步 · 清單與 ETF 四項 · VRN SSOT 一致與 DataFrame 鎖定)入冊為 VCGC-REQ088 · VDF-REQ014 · VRN-REQ008(原話逐字);其餘一字不動",
+ "why_v0114": "R35:操作員 2026-09-30 令(VRN 首頁還原與亂數三格乘積互核 · 文件五類分類 · HTML 模板 SYNCHRONIZER 與 TOP 25 · PS 跑完強制關機)入冊為 VRN-REQ009 · VCGC-REQ089 · VCGC-REQ090(原話逐字);其餘 116 條一字不動",
+ "why_v0115": "R35c:操作員 2026-10-01「自動跳出所有U/I」入冊 VCGC-REQ091(COVERED;Register v0264);其餘 119 條一字不動",
+ "why_v0116": "R36:操作員 2026-10-01 版面還原令(資訊區上左右下 · 扁平表還原 · 一句一據點 · 先左右後上下 · 小字頁尾附錄排除 · 合併格 · 表格驗算)入冊 VRN-REQ010(原話逐字);其餘 120 條一字不動 · +VRN-REQ011(評價方法 SSOT 化與編號註冊;COVERED)",
+ "why_v0117": "R36c/d:+VRN-REQ012(首頁主標題 · COVERED)· +VRN-REQ013(分析師聯絡區塊 · PARTIAL 待樣本挖掘裁定);其餘 122 條一字不動",
+ "why_v0118": "R36e:+VRN-REQ014(研報本文實體 · PARTIAL 待工作站實測);其餘 124 條一字不動",
+ "why_v0119": "R37:+VRN-REQ015(版面還原雙欄 · 編號 · 完整度 · 去重;COVERED)· +VRN-REQ016(樂高化外掛中樞;PARTIAL 外部工具待工作站環境);其餘 125 條一字不動",
+ "why_v0120": "R37c:+VCGC-REQ092(全樹工具覆蓋 · AST / PS 剖析器互核 · HTML 矩陣報告;COVERED);其餘 127 條一字不動",
+ "why_v0121": "R38:+VCGC-REQ093(COVERED);其餘 128 條一字不動",
+ "why_v0122": "R38:VCGC-REQ093 追加操作員原話「不跑SERVER直接跳出」與 v0104 證據;其餘一字不動",
+ "why_v0123": "R39:+VCGC-REQ094(PARTIAL:修正已做,加鎖待工作站存證);其餘一字不動",
+ "why_v0124": "R40:VCGC-REQ094 證據 / 下一步補工作站實錄三修(v0181 快取鑰 · ENG079 v0105 主鍵 · 閘 rc 2 根因);+VCGC-REQ095(RECORDED:政策庫 + SSOT + 規則引擎架構對照 · 缺口 G1–G5);其餘一字不動;+VCGC-REQ096(PARTIAL:入口 v0111 收尾三合一頁 · 階段式登錄;工作站實跑待做)",
+ "why_v0125": "R41:+VCGC-REQ097(COVERED:進度暫存 CGC_MDL251 · TestAuto v0103 · SDDValidator v0105;容器 kill -9 後接續實測);其餘一字不動",
+ "why_v0126": "R42:+VCGC-REQ098(COVERED:via-realtest 一支 PS 實測 · 鏈跑器進度行 CGC_MDL170 v0105 / CGC_MDL172 v0108);其餘一字不動",
+ "why_v0127": "R43:+VCGC-REQ099(COVERED:ENV MANAGER 進度 CGC_MDL240 v0101 · via-realtest v0101 · VRN_ENG086 v0119 ⑤ 跟裁定 · test_SourceProvenance 單獨可跑);其餘一字不動"
+}

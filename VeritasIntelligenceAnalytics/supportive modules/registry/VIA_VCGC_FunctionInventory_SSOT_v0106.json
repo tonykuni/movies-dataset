@@ -1,8 +1,8 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0106",
- "batch": "側線 2026-10-01(VCGC closeout)",
- "ts": "2026-10-01T19:41:01+00:00",
+ "batch": "R35b",
+ "ts": "2026-10-01T00:30:00+00:00",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0105.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
@@ -985,39 +985,8 @@
    "timeout": 600
   },
   {
-   "id": "V-monitor",
-   "name": "VIA 全景監控(只讀;經 run 走閘)· 教訓卡",
-   "argv": [
-    "monitor",
-    "lessons"
-   ],
-   "timeout": 600,
-   "yellow_rc": [
-    2
-   ],
-   "deps": [
-    "supportive modules/registry/VIA_Panorama_v*.py",
-    "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
-   ]
-  },
-  {
-   "id": "V-closeout",
-   "name": "VCGC 一指令收尾(乾跑:--skip-tests,不寫收據 · 不提交 · 不推)",
-   "argv": [
-    "closeout",
-    "--skip-tests"
-   ],
-   "timeout": 900,
-   "yellow_rc": [
-    2
-   ],
-   "deps": [
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
-   ]
-  },
-  {
-   "id": "C-monitor",
-   "name": "交接案 monitor(VIA_Panorama --selftest;薄尾鏈 v0104 → v0100 全自測)",
+   "id": "C-via_panorama",
+   "name": "交接案 via_panorama(VIA_Panorama --selftest;第一步監控)",
    "argv": [
     "run",
     "--family",
@@ -1026,10 +995,120 @@
     "--selftest"
    ],
    "deps": [
-    "supportive modules/registry/VIA_Panorama_v*.py",
-    "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
+    "supportive modules/registry/VIA_Panorama_v*.py"
    ],
-   "timeout": 900
+   "timeout": 1200
+  },
+  {
+   "id": "C-dataframe_lock",
+   "name": "交接案 dataframe_lock(CGC_MDL249_DataFrameLock --selftest;表頭 → DataFrame 鎖)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL249_DataFrameLock",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vdf_lists",
+   "name": "交接案 vdf_lists(VDF_ENG087_MarketListGovernance --selftest;台股清單 ACTIVE/NEW/DELISTED)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG087_MarketListGovernance",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vdf_etf_metrics",
+   "name": "交接案 vdf_etf_metrics(VDF_ENG094_ActiveETFActivity --selftest;主動式 ETF 指標與配置)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG094_ActiveETFActivity",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_ssot_consistency",
+   "name": "交接案 vrn_ssot_consistency(SUP_MDL749_VRNFieldRuleHub --selftest;VRN SSOT 一致與正則自檢)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL749_VRNFieldRuleHub",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-synonym_union_r34",
+   "name": "交接案 synonym_union_r34(CGC_MDL176_SynonymUnion --selftest;同義聯集 v0103;券商別名再補 8 條 · 樣本券商一主)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL176_SynonymUnion",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-numbering_dup_r34",
+   "name": "交接案 numbering_dup_r34(CGC_MDL237_NumberingSystem --selftest;編號 v0111;一詞兩主折正典鍵 · 評等記最細鍵)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_docclass",
+   "name": "交接案 vrn_docclass(VRN_ENG393_DocClassVerify --selftest;文件五類分類 · 首頁亂數三格乘積互核)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG393_DocClassVerify",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-template_sync",
+   "name": "交接案 template_sync(CGC_MDL241_TemplateAdapter --selftest;HTML 模板 SYNCHRONIZER · TOP 25)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL241_TemplateAdapter",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_fourpoint",
+   "name": "交接案 vrn_fourpoint(VRN_ENG080_FourPointDigest --selftest;QC 連接號≠負號)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG080_FourPointDigest",
+    "--selftest"
+   ],
+   "timeout": 1200
   }
  ],
  "coverage": {
@@ -1153,12 +1232,6 @@
    },
    "run-all": {
     "exempt": "go 的別名(v0166 GO_VERBS)"
-   },
-   "monitor": {
-    "station": "V-monitor"
-   },
-   "closeout": {
-    "station": "V-closeout"
    }
   },
   "seat": {
@@ -1265,8 +1338,35 @@
    "deck": {
     "station": "C-deck"
    },
-   "monitor": {
-    "station": "C-monitor"
+   "via_panorama": {
+    "station": "C-via_panorama"
+   },
+   "dataframe_lock": {
+    "station": "C-dataframe_lock"
+   },
+   "vdf_lists": {
+    "station": "C-vdf_lists"
+   },
+   "vdf_etf_metrics": {
+    "station": "C-vdf_etf_metrics"
+   },
+   "vrn_ssot_consistency": {
+    "station": "C-vrn_ssot_consistency"
+   },
+   "synonym_union_r34": {
+    "station": "C-synonym_union_r34"
+   },
+   "numbering_dup_r34": {
+    "station": "C-numbering_dup_r34"
+   },
+   "vrn_docclass": {
+    "station": "C-vrn_docclass"
+   },
+   "template_sync": {
+    "station": "C-template_sync"
+   },
+   "vrn_fourpoint": {
+    "station": "C-vrn_fourpoint"
    }
   },
   "workflow": {
@@ -1390,30 +1490,6 @@
    "VCGC-WKF011-STP003": {
     "station": "C-handoff",
     "note": "checkpoint 寫快照;自測驗"
-   },
-   "VCGC-WKF012-STP001": {
-    "station": "C-monitor",
-    "note": "scan 由自測驗(假倉 · 只讀 · mtime 不變)"
-   },
-   "VCGC-WKF012-STP002": {
-    "station": "C-monitor",
-    "note": "watch / dashboard 由自測驗(背景單例 · 閒置自停)"
-   },
-   "VCGC-WKF012-STP003": {
-    "station": "C-monitor",
-    "note": "sync 探針由自測驗(不碰真 VCGC);實探針會跑 VCGC,不放串測"
-   },
-   "VCGC-WKF012-STP004": {
-    "station": "V-monitor",
-    "note": "monitor lessons 乾跑卡"
-   },
-   "VCGC-WKF012-STP005": {
-    "station": "C-monitor",
-    "note": "交接閘由自測驗(綠 / 黃 / 紅 · 同步 GitHub)"
-   },
-   "VCGC-WKF012-STP006": {
-    "station": "V-closeout",
-    "note": "closeout 乾跑(--skip-tests);--apply / --push 由 v0182 自測驗"
    }
   },
   "ps": {
@@ -1429,7 +1505,7 @@
  "why_v0101": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):交接冊新增案 backup(CGC_MDL221_SystemBackup --selftest,Z286 修正 v0101 的收據)→ 覆蓋登錄指到既有站 L-backup(同一支自測,不另開站);其餘站與覆蓋一字不動",
  "why_v0102": "側線 2026-09-30 b 第四段(VCGC-REQ086):交接新案 fullcheck → 新站 C-fullcheck(CGC_MDL248_FullCheck --selftest);其餘一字不動",
  "why_v0103": "側線 2026-09-30 b 第四段(VCGC-REQ087):交接新案 deck → 新站 C-deck(CGC_MDL095_DeckServer --selftest);其餘一字不動",
- "why_v0104": "側線 2026-09-30 c:VCGC v0181 新動詞 monitor(VIA_Panorama 尾版經 run;不用 panorama,那是既有 V-panorama 動詞)→ 新站 V-monitor(乾跑形式:lessons 卡,不重掃)。每個 VCGC 動作收尾自動觸發的背景監控由 v0181 --selftest 驗(依本冊規則 3,不直接跑);其餘一字不動",
- "why_v0105": "側線 2026-10-01:VCGC v0182 新動詞 closeout → 新站 V-closeout(乾跑形式,依本冊規則 3;--apply / --push 由 v0182 --selftest 驗);其餘一字不動",
- "why_v0106": "側線 2026-10-01:串測引擎 ⑧ 抓到 case:monitor 與 VCGC-WKF012 六步沒站 → +站 C-monitor · coverage.case.monitor · coverage.workflow WKF012 STP001~006;其餘一字不動"
+ "why_v0104": "R34(操作員 2026-09-30「將 PANORAMA 為第一步啟動監控 VCGC-VDF-VRN」):交接新案 via_panorama → 新站 C-via_panorama(VIA_Panorama --selftest;v0103 monitor / first);其餘一字不動；交接新案 dataframe_lock → 新站 C-dataframe_lock(CGC_MDL249)；交接新案 vdf_lists · vdf_etf_metrics · vrn_ssot_consistency → 新站 C-*(R34 VDF / VRN 兩線)；R34 重號授權:交接新案 synonym_union_r34 · numbering_dup_r34 → 新站 C-*(CGC_MDL176 v0103 · CGC_MDL237 v0111)",
+ "why_v0105": "R35(操作員 2026-09-30):交接新案 vrn_docclass · template_sync → 新站 C-vrn_docclass(VRN_ENG393)· C-template_sync(CGC_MDL241 v0101);PS 入口尾版 v0110(-ShutdownWhenDone)沿用 P-entry 站;其餘一字不動",
+ "why_v0106": "R35b(工作站 2026-10-01 via-closeout vrn 實錄 QC 紅 8):交接新案 vrn_fourpoint → 新站 C-vrn_fourpoint(VRN_ENG080 v0111);其餘一字不動"
 }

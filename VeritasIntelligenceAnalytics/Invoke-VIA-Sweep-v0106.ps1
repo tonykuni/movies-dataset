@@ -1,0 +1,393 @@
+# CELERITAS-TEMPLATE-JOIN v1
+#Requires -Version 7.0
+# =====================================================================================
+# Invoke-VIA-Sweep-v0106.ps1 — VCGC 全景實測一鍵
+#   v0106(操作員 R34 2026-09-30「將 PANORAMA 為第一步啟動監控 VCGC-VDF-VRN … WORKFLOW VCGC-VDF VCGC-VRN 同步進行 … 若一個步驟在等待其他
+#     其他不用等的步驟可直接先進行實測 避免交互等待」;v0105 一字不動,本版為新檔):
+#     ①p 過閘後第一步 = VIA_Panorama first(經 VCGC run:掃描 + monitor 一條線一盞燈:VCGC 事件 · VDF / VRN 鏈 · SDD · 串測 · 交接 · TA-Lib),
+#        看完就知道問題在哪一條線;它的 rc 只報不擋(監控不是閘)。
+#     ②∥③ VDF 鏈與 VRN 鏈並行:兩個 Start-Job(各自一個 pwsh 行程,點源同一支 VIA_PS_PyProgress_Module · 經同一個 VCGC 中樞
+#        `run --family <家族>`;事件輪號 VIA_HUB_RUN 與過閘記號由環境變數繼承),兩條互不等待;全部收回後照 v0105 的記法入側車與 log。
+#        -Serial = 退回 v0105 的一先一後(工作站若 Start-Job 不可用也自動退回)。
+#     ⑨ 收尾再跑一次 VIA_Panorama monitor(本輪跑完的現況)。其餘整支照 v0105。
+#   v0105(操作員 R32「所有動作經 VCGC 中樞並觸發自動同步 · 失敗進教訓帳」):每一步 python 改經 VCGC 尾版 `run --family <家族> <引擎>`
+#     (① 流程閘那一步本來就是主控台 status);事件 · 同步檢查 · 教訓由 VCGC v0168 起的中樞層統一處理。
+#     事件輪號 VIA_HUB_RUN:上層入口設了就沿用(同一輪),單獨跑本支自己開一輪、結束還原。其餘整支照 v0104。
+# (v0104 起) · 加速器模板 + rich 詳細摘要矩陣 + 工具註冊/覆蓋/舊副本(PSGATE-1)
+#   v0104(操作員 R29「自 VCGC 更快速啟動所有」):① 流程閘不重跑——上層唯一入口(Invoke-VIA-OperatorConsole v0104 起)剛過閘時會在
+#     **本行程**設 VIA_GATE_PASSED_HEAD / _AT / _LINE;本支看到「同一個 git HEAD、15 分鐘內、那一行真的是「[流程] 政策過」」就沿用,
+#     步 ① 記成 reused(rc 0,原句照登),省一次 VCGC status(容器實測約 15 秒)。三樣任一不符 = 照舊自己跑閘(PSGATE-1 不放鬆:
+#     閘一定跑過,只是不跑兩次)。單獨跑本支時上層沒設,照舊跑閘。其餘整支照 v0103。
+#   v0102(操作員 2026-09-28「加速器與網路工具都有新版本號請註冊 · 覆蓋率要達 100% · 少了網路工具版本號 · 舊的請刪除」
+#   「one powershell to handle all above」):
+#     ⑦ 工具步 CGC_MDL230 ToolCoverageProbe:工具註冊(CGC_MDL225 尾版)· 上游包比對(-Zip 給上傳的 zip;沒給就比 intake)·
+#        覆蓋率(Celeritas 閘 PY/PS · VDF 尾版加速器/網路橋 · TA-Lib 鎖)· 舊副本誰還在用。報告 ② 補網路工具版本號,⑪–⑭ 四張工具矩陣。
+#     -RetireOld:只刪探針判「沒有任何引用」的舊副本(git rm,可 git restore 救回);有引用的一支都不碰(L10 刪除是操作員的手 = 這個開關)。
+#   v0103(工作站 2026-09-28 15:24 實錄):① 每步前印「跑中」(長步不再像當機被 Ctrl+C)② rc≠0 的步把輸出最後幾行印出來(不用翻 log 就看到根因)
+#         ③ 不論跑完、出錯或 Ctrl+C,finally 都回到起跑的夾(不再把人留在 VeritasIntelligenceAnalytics 下,害下一句 .\VIA-Sweep.ps1 找不到)。
+#   v0102 · v0101 · v0100 留作版史(L04)。操作員 2026-09-28:「ps 加速指令模板及 detailed summary matrix summary by rich 把它加上」
+#   「一定要從 vcgc 跑過流程才可生成 ps 指令」。v0101:
+#     ⓐ 流程閘:第一步 VCGC 入口 status;沒讀到「[流程] 政策過」就停在這裡,後面各步一律不跑(exit 3),報告照樣畫(總判 RED)。
+#     ⓑ PS 加速模板:點源 Celeritas;每一步包在 Invoke-VIACeleritasScoped(VCGC 流程指定的 PS 加速;只動本行程、跑完就還原);
+#        沒有這個助手(沒載短令冊)就照實說並直接跑。Celeritas 函式:Get-CeleritasRegex(流程閘與進度協定)、
+#        Read/Write-CeleritasText(側車)、Get-CeleritasStatus(報告 ②)、Write-CeleritasReport(加速器頁)、finally Restore。
+#     ⓒ rich 詳細摘要矩陣:CGC_MDL229 SweepReport 十張矩陣(總判 KPI · 加速器 · VCGC 燈 · 流程 · DB · VDF 鏈 · VRN 鏈 · 橋 · 全景 · 待辦),
+#        rich 缺 = 純文字同十張;存 HTML / TXT;貼回包放剪貼簿。
+#   其餘照 v0100:② VDF 鏈 run --resume · ③ VRN 鏈 run --resume · ④ 橋掃乾跑 · ⑤ 全景 · ⑥ DB 面板。只量不修;不代開網路同意閘。
+# 用法(站在倉根):.\VIA-Sweep.ps1        參數:-SkipChains · -SkipPanel · -SkipTools · -Zip <zip> · -RetireOld · -NoClipboard · -PlainReport · -Rows N
+# 結束碼:0 = 每一步都跑完且寫出本次結論 · 2 = 有步沒跑完(尾版不在 / 崩潰 / 結論是舊的 / 報告沒寫出;Codex #338 P2)· 3 = 流程閘沒過或沒跑起來
+# =====================================================================================
+[CmdletBinding()]
+param(
+    [switch]$SkipChains,
+    [switch]$SkipPanel,
+    [switch]$SkipTools,
+    [string]$Zip = "",
+    [switch]$RetireOld,
+    [switch]$NoClipboard,
+    [switch]$PlainReport,
+    [ValidateRange(5, 500)][int]$Rows = 25,
+    [switch]$Serial
+)
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
+
+$VIA = $PSScriptRoot
+$Repo = Split-Path $VIA -Parent
+$StartDir = (Get-Location).Path
+# 外層保護(Codex #339 P2):從換夾那一刻起,任何出錯 / Ctrl+C / exit 都經 finally 回到起跑的夾
+try {
+Set-Location -LiteralPath $VIA
+$script:VIAAccelPairNote = "正主缺,略過"
+try {
+    $join = Join-Path $VIA "supportive modules\ps7\VeritasCeleritas.PS7.ps1"
+    if (Test-Path -LiteralPath $join) {
+        . $join
+        $script:VIAAccelPairNote = "套對 $($script:CeleritasPS7.Version) · 已套"
+    }
+} catch {
+    $script:VIAAccelPairNote = "正主載入失敗,略過"
+}
+Write-Host ("  [加速器] " + $script:VIAAccelPairNote)
+$env:VIA_FROM_VCGC = "YES"
+$env:VIA_VCGC_PUSH = "NO"
+$swpOwnRun = -not $env:VIA_HUB_RUN     # 單獨跑本支 = 自己一輪(事件輪號);上層入口已設就沿用入口那一輪
+if ($swpOwnRun) { $env:VIA_HUB_RUN = "sweep-" + (Get-Date).ToString("yyyyMMdd-HHmmss") + "-" + $PID }
+$env:VIA_NO_OPEN = "1"
+$env:GIT_EDITOR = "true"
+$env:GIT_TERMINAL_PROMPT = "0"
+$script:HasCel = [bool](Get-Command Get-CeleritasRegex -ErrorAction SilentlyContinue)
+$script:HasScoped = [bool](Get-Command Invoke-VIACeleritasScoped -ErrorAction SilentlyContinue)
+
+function Get-SwpNewest {
+    param([string]$Dir, [string]$Pattern)
+    $hit = Get-ChildItem -LiteralPath $Dir -Filter $Pattern -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+    if ($null -eq $hit) { return $null }
+    return $hit.FullName
+}
+
+function Get-SwpRegex {
+    param([string]$Pattern)
+    if ($script:HasCel) { return (Get-CeleritasRegex -Pattern $Pattern) }
+    return [regex]::new($Pattern)
+}
+
+function Write-SwpText {
+    param([string]$Path, [string]$Text)
+    if ($script:HasCel) { Write-CeleritasText -Path $Path -Text $Text; return }
+    [IO.File]::WriteAllText($Path, $Text, [Text.UTF8Encoding]::new($false))
+}
+
+if (-not (Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)) {
+    $pyMod = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"
+    if (Test-Path -LiteralPath $pyMod) { . $pyMod }
+}
+if (-not (Get-Command Invoke-VIAPython -ErrorAction SilentlyContinue)) {
+    Write-Host "  [實測] 中央 Invoke-VIAPython 不在(VIA_PS_PyProgress_Module.ps1 缺);不繞過直呼 python,停。" -ForegroundColor Red
+    Set-Location -LiteralPath $StartDir
+    exit 3
+}
+
+$reg = Join-Path $VIA "supportive modules\registry"
+$outDir = Join-Path $VIA "VIA_Reports\sweep"
+$logDir = Join-Path $outDir "logs"
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+$stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$runStartUtc = [DateTime]::UtcNow
+$logPath = Join-Path $logDir ("Sweep_" + $stamp + ".log")
+$steps = [System.Collections.Generic.List[object]]::new()
+$rxAnsi = Get-SwpRegex "`e\[[0-9;]*m"
+$rxProg = Get-SwpRegex '^@@PROGRESS\|'
+$rxFlow = Get-SwpRegex '\[流程\]\s*政策過'
+
+function Invoke-SwpStep {
+    # 一步:包在 Invoke-VIACeleritasScoped(有就套)裡跑 Invoke-VIAPython;全文進 log;記進側車
+    param([string]$Id, [string]$Title, [string]$Family, [string]$Script, [string[]]$ArgList, [switch]$Show)
+    $rec = [ordered]@{ id = $Id; title = $Title; rc = $null; sec = $null; started_utc = [DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"); missing = $false; lines = @() }
+    if (-not $Script) {
+        $rec.missing = $true
+        $steps.Add($rec)
+        Write-Host ("  " + $Title + " · ABSENT(尾版不在)") -ForegroundColor Red
+        return $rec
+    }
+    Write-Host ("  ▶ " + $Title + " 跑中…(長的步要幾分鐘,別按 Ctrl+C;全文進 log)") -ForegroundColor DarkGray
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $global:LASTEXITCODE = 0
+    # 參數寫成字面值嵌進指令塊(不用 GetNewClosure:閉包是另一個模組範圍,看不到本腳本點源的 Invoke-VIAPython)
+    $q = { param($v) "'" + (("" + $v) -replace "'", "''") + "'" }
+    $hubCon = Get-SwpNewest $reg "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+    $cmd = if ($hubCon -and $Script -ne $hubCon) {
+        "Invoke-VIAPython -Family " + (& $q $Family) + " " + (& $q $hubCon) + " 'run' '--family' " + (& $q $Family) + " " + (& $q $Script) + " " + ((@($ArgList) | ForEach-Object { & $q $_ }) -join " ") + " 2>&1"
+    } else {
+        "Invoke-VIAPython -Family " + (& $q $Family) + " " + (& $q $Script) + " " + ((@($ArgList) | ForEach-Object { & $q $_ }) -join " ") + " 2>&1"
+    }
+    $body = [scriptblock]::Create($cmd)
+    $raw = if ($script:HasScoped) { Invoke-VIACeleritasScoped -Body $body } else { & $body }
+    $rc = $global:LASTEXITCODE
+    $lines = [System.Collections.Generic.List[string]]::new()
+    foreach ($o in @($raw)) {
+        $ln = $rxAnsi.Replace(("" + $o), "")
+        if ($rxProg.IsMatch($ln)) { continue }
+        $lines.Add($ln)
+        if ($Show) { Write-Host ("" + $o) }
+    }
+    $rec.rc = $rc
+    $rec.sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1)
+    $rec.lines = @($lines)
+    Add-Content -LiteralPath $logPath -Value (@("===== " + $Title + " · rc=" + $rc + " =====") + @($lines)) -Encoding utf8
+    $steps.Add($rec)
+    if (-not $Show) { Write-Host ("  " + $Title + " · rc=" + $rc + " · " + $rec.sec + "s") -ForegroundColor $(if ($rc -eq 0) { "Green" } else { "Yellow" }) }
+    if (-not $Show -and $rc -ne 0) {
+        # rc≠0 不一定是壞(鏈跑器 rc 1=RED · 2=NODATA · 4=GATED 是結論),但要看得到為什麼:印最後幾行
+        $tail = @($lines | Where-Object { ("" + $_).Trim() } | Select-Object -Last 4)
+        foreach ($t in $tail) { Write-Host ("      │ " + ("" + $t).Trim()) -ForegroundColor DarkYellow }
+    }
+    return $rec
+}
+
+function Add-SwpSkipped {
+    param([string]$Id, [string]$Title)
+    $steps.Add([ordered]@{ id = $Id; title = $Title; skipped = $true; lines = @() })
+    Write-Host ("  " + $Title + " · 略過") -ForegroundColor DarkGray
+}
+
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "  ║  VIA 全景實測 v0106 · Panorama 第一步 · VDF ∥ VRN 並行 · rich ║" -ForegroundColor Cyan
+Write-Host "  ╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ("  [模板] Invoke-VIACeleritasScoped " + $(if ($script:HasScoped) { "已套(每步只動本行程、跑完還原)" } else { "不在(沒載短令冊;照實直接跑)" })) -ForegroundColor DarkGray
+Write-Host ("  [log]  " + $logPath) -ForegroundColor DarkGray
+$head = ("" + (git -C $Repo log --oneline -1 2>$null))
+$flow = [ordered]@{ ok = $false; line = "" }
+$gateStop = $false
+
+try {
+    # ① VCGC 入口 = 流程閘(PSGATE-1)
+    $console = Get-SwpNewest $reg "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+    $gateHead = ("" + (git -C $Repo rev-parse HEAD 2>$null)).Trim()
+    $gateAge = [double]::MaxValue
+    try { $gateAge = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [long]$env:VIA_GATE_PASSED_AT } catch { $gateAge = [double]::MaxValue }
+    if ($gateHead -and $env:VIA_GATE_PASSED_HEAD -eq $gateHead -and $gateAge -ge 0 -and $gateAge -le 900 -and $rxFlow.IsMatch("" + $env:VIA_GATE_PASSED_LINE)) {
+        $s1 = [ordered]@{ id = "vcgc"; title = "① VCGC 入口(流程閘)"; rc = 0; sec = 0; started_utc = [DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"); missing = $false
+                          reused = ("上層唯一入口 " + [int]$gateAge + " 秒前同一 HEAD 已過閘"); lines = @("" + $env:VIA_GATE_PASSED_LINE) }
+        $steps.Add($s1)
+        Add-Content -LiteralPath $logPath -Value @("===== ① VCGC 入口(流程閘)· 沿用上層入口 " + [int]$gateAge + " 秒前的結果 =====", ("" + $env:VIA_GATE_PASSED_LINE)) -Encoding utf8
+        Write-Host ("  ① VCGC 入口(流程閘)· 沿用上層入口 " + [int]$gateAge + " 秒前同一 HEAD 的結果(不重跑)") -ForegroundColor Green
+    } else {
+        $s1 = Invoke-SwpStep "vcgc" "① VCGC 入口(流程閘)" "vrn" $console @("status")
+    }
+    $hit = @($s1.lines | Where-Object { $rxFlow.IsMatch($_) } | Select-Object -First 1)
+    if ($hit.Count -gt 0) {
+        $flow.ok = $true
+        $flow.line = ("" + $hit[0]).Trim()
+        Write-Host ("  [流程閘] 過:" + $flow.line) -ForegroundColor Green
+    } else {
+        $gateStop = $true
+        Write-Host "  [流程閘] 沒讀到「[流程] 政策過」→ 依 PSGATE-1 停在這裡,後面各步不跑(報告照畫,總判 RED)" -ForegroundColor Red
+    }
+
+    if (-not $gateStop) {
+        # ①p 第一步監控(VIA_Panorama first;只報不擋)
+        $pano = Get-SwpNewest $reg "VIA_Panorama_v*.py"
+        if ($pano) {
+            $null = Invoke-SwpStep "panorama_first" "①p Panorama 第一步監控(掃描 + monitor)" "vrn" $pano @("first") -Show
+        } else {
+            Write-Host "  ①p Panorama 第一步監控 · ABSENT(VIA_Panorama 尾版不在)" -ForegroundColor Yellow
+        }
+        if (-not $SkipChains) {
+            $chainDefs = @(
+                [ordered]@{ id = "vdf_chain"; title = "② VDF 鏈 run --resume"; fam = "vdf"; scr = (Get-SwpNewest $reg "CGC_MDL170_VDFChainRunner_v*.py") },
+                [ordered]@{ id = "vrn_chain"; title = "③ VRN 鏈 run --resume"; fam = "vrn"; scr = (Get-SwpNewest $reg "CGC_MDL172_VRNChainRunner_v*.py") })
+            $canJob = [bool](Get-Command Start-Job -ErrorAction SilentlyContinue)
+            $hubCon = Get-SwpNewest $reg "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+            if ($Serial -or -not $canJob -or -not $hubCon) {
+                foreach ($c in $chainDefs) { $null = Invoke-SwpStep $c.id $c.title $c.fam $c.scr @("run", "--resume") }
+            } else {
+                Write-Host "  ▶ ② VDF 鏈 ∥ ③ VRN 鏈 並行中(兩個背景工作 · 互不等待;全文進 log)…" -ForegroundColor DarkGray
+                $pyMod = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"
+                $jobs = [System.Collections.Generic.List[object]]::new()
+                foreach ($c in $chainDefs) {
+                    if (-not $c.scr) {
+                        $steps.Add([ordered]@{ id = $c.id; title = $c.title; rc = $null; sec = $null; missing = $true; lines = @() })
+                        Write-Host ("  " + $c.title + " · ABSENT(尾版不在)") -ForegroundColor Red
+                        continue
+                    }
+                    $j = Start-Job -Name $c.id -ArgumentList $pyMod, $hubCon, $c.fam, $c.scr -ScriptBlock {
+                        param($mod, $hub, $fam, $scr)
+                        . $mod
+                        $sw = [Diagnostics.Stopwatch]::StartNew()
+                        $global:LASTEXITCODE = 0
+                        $out = @(Invoke-VIAPython -Family $fam $hub 'run' '--family' $fam $scr 'run' '--resume' 2>&1 | ForEach-Object { "" + $_ })
+                        [pscustomobject]@{ rc = $global:LASTEXITCODE; sec = [Math]::Round($sw.Elapsed.TotalSeconds, 1); lines = $out }
+                    }
+                    $jobs.Add([pscustomobject]@{ job = $j; def = $c; t0 = [DateTime]::UtcNow })
+                }
+                $null = Wait-Job -Job @($jobs | ForEach-Object { $_.job })
+                foreach ($x in $jobs) {
+                    $res = @(Receive-Job -Job $x.job -ErrorAction SilentlyContinue) | Where-Object { $_ -and $_.PSObject.Properties["rc"] } | Select-Object -Last 1
+                    Remove-Job -Job $x.job -Force -ErrorAction SilentlyContinue
+                    $lines = [System.Collections.Generic.List[string]]::new()
+                    foreach ($o in @($(if ($res) { $res.lines } else { @() }))) {
+                        $ln = $rxAnsi.Replace(("" + $o), "")
+                        if ($rxProg.IsMatch($ln)) { continue }
+                        $lines.Add($ln)
+                    }
+                    $rc = if ($res) { $res.rc } else { 1 }
+                    $rec = [ordered]@{ id = $x.def.id; title = $x.def.title + "(並行)"; rc = $rc; sec = $(if ($res) { $res.sec } else { $null })
+                                       started_utc = $x.t0.ToString("yyyy-MM-dd HH:mm:ss"); missing = $false; parallel = $true; lines = @($lines) }
+                    Add-Content -LiteralPath $logPath -Value (@("===== " + $rec.title + " · rc=" + $rc + " =====") + @($lines)) -Encoding utf8
+                    $steps.Add($rec)
+                    Write-Host ("  " + $rec.title + " · rc=" + $rc + " · " + $rec.sec + "s") -ForegroundColor $(if ($rc -eq 0) { "Green" } else { "Yellow" })
+                    if ($rc -ne 0) {
+                        foreach ($tl in @($lines | Where-Object { ("" + $_).Trim() } | Select-Object -Last 4)) { Write-Host ("      │ " + ("" + $tl).Trim()) -ForegroundColor DarkYellow }
+                    }
+                }
+            }
+        } else {
+            Add-SwpSkipped "vdf_chain" "② VDF 鏈"
+            Add-SwpSkipped "vrn_chain" "③ VRN 鏈"
+        }
+        $null = Invoke-SwpStep "bridge" "④ 橋掃(乾跑)" "vrn" (Get-SwpNewest $reg "CGC_MDL124_BridgeSweeper_v*.py") @("--subsystems")
+        $null = Invoke-SwpStep "panorama" "⑤ 全景" "core" (Get-SwpNewest $reg "CGC_MDL158_VIAPanoramaAuditRepair_v*.py") @("scan")
+        if (-not $SkipPanel) {
+            $panel = Get-SwpNewest $VIA "Invoke-VIA-DBPanel-v*.ps1"
+            $rec6 = [ordered]@{ id = "db_panel"; title = "⑥ DB 面板"; rc = $null; sec = $null; started_utc = [DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"); missing = (-not $panel); lines = @() }
+            if ($panel) {
+                $sw6 = [Diagnostics.Stopwatch]::StartNew()
+                $out6 = @(& $panel -NoPull -NoClipboard -Rows $Rows 2>&1 | ForEach-Object { $rxAnsi.Replace(("" + $_), "") })
+                $rec6.rc = $LASTEXITCODE
+                $rec6.sec = [Math]::Round($sw6.Elapsed.TotalSeconds, 1)
+                Add-Content -LiteralPath $logPath -Value (@("===== ⑥ DB 面板 · rc=" + $rec6.rc + " =====") + $out6) -Encoding utf8
+            }
+            $steps.Add($rec6)
+        } else {
+            Add-SwpSkipped "db_panel" "⑥ DB 面板"
+        }
+        # ⑦ 工具註冊 · 覆蓋 · 舊副本(CGC_MDL230;只讀)
+        if (-not $SkipTools) {
+            $pargs = @("probe", "--plain")
+            if ($Zip) {
+                $zipFull = $null
+                try { $zipFull = (Resolve-Path -LiteralPath $Zip -ErrorAction Stop).Path } catch { $zipFull = $null }
+                if ($zipFull) { $pargs += @("--zip", $zipFull) } else { Write-Host ("  [工具] -Zip 找不到:" + $Zip + "(改比樹內 intake)") -ForegroundColor Yellow }
+            }
+            $s7 = Invoke-SwpStep "toolprobe" "⑦ 工具註冊 · 覆蓋 · 舊副本" "vrn" (Get-SwpNewest $reg "CGC_MDL230_ToolCoverageProbe_v*.py") $pargs
+            $probeJson = Join-Path $VIA "VIA_Reports\toolprobe\TOOLPROBE_latest.json"
+            if ($RetireOld -and (Test-Path -LiteralPath $probeJson)) {
+                $pj = Get-Content -LiteralPath $probeJson -Raw -Encoding utf8 | ConvertFrom-Json
+                $rx = Get-SwpRegex '^git rm -- "(.+)"$'
+                $gone = 0
+                foreach ($c in @($pj.retire_cmds)) {
+                    $m = $rx.Match("" + $c)
+                    if (-not $m.Success) { continue }
+                    $rel = $m.Groups[1].Value
+                    $full = Join-Path $VIA $rel
+                    if (-not (Test-Path -LiteralPath $full)) { continue }
+                    $null = git -C $VIA ls-files --error-unmatch -- $rel 2>$null
+                    if ($LASTEXITCODE -ne 0) { Write-Host ("  [退役] 略過(不是追蹤檔):" + $rel) -ForegroundColor DarkGray; continue }
+                    $null = git -C $VIA rm -q -- $rel 2>&1
+                    if ($LASTEXITCODE -eq 0) { $gone++; Write-Host ("  [退役] git rm " + $rel + "(救回:git restore --staged --worktree -- `"" + $rel + "`")") -ForegroundColor Yellow }
+                }
+                Write-Host ("  [退役] 沒有任何引用的舊副本刪了 " + $gone + " 支;有引用的一支都沒碰(先遷呼叫者)") -ForegroundColor Cyan
+            }
+        } else {
+            Add-SwpSkipped "toolprobe" "⑦ 工具註冊 · 覆蓋"
+        }
+    }
+
+    # 側車 → rich 詳細摘要矩陣(CGC_MDL229)
+    $accel = [ordered]@{ "加速器" = $script:VIAAccelPairNote; "模板助手" = $(if ($script:HasScoped) { "Invoke-VIACeleritasScoped 已套(每步)" } else { "Invoke-VIACeleritasScoped 不在(沒載短令冊)" }) }
+    if (Get-Command Get-CeleritasStatus -ErrorAction SilentlyContinue) {
+        try { $st = Get-CeleritasStatus; foreach ($k in $st.Keys) { $accel[$k] = "" + $st[$k] } } catch { $accel["狀態"] = "讀不到:" + $_.Exception.Message }
+    }
+    $accel["PowerShell"] = "" + $PSVersionTable.PSVersion
+    $netTail = Get-SwpNewest (Join-Path $VIA "supportive modules\network") "VeritasAegisNexus_v*.py"
+    $netLoader = Get-SwpNewest (Join-Path $VIA "supportive modules\network") "SUP_MDL740_NetUnified_v*.py"
+    $accel["網路工具(PS 側看檔名)"] = $(if ($netTail) { (Split-Path $netTail -Leaf) + " ← " + $(if ($netLoader) { Split-Path $netLoader -Leaf } else { "載入器缺" }) } else { "VeritasAegisNexus_v*.py 不在" })
+    $sidePath = Join-Path $outDir "SWEEP_SIDE_latest.json"
+    $side = [ordered]@{ schema = "VIA.Sweep.Side.v1"; script = (Split-Path $PSCommandPath -Leaf); ts = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+                        head = $head; flow = $flow; accel = $accel; steps = @($steps)
+                        toolprobe_json = (Join-Path $VIA "VIA_Reports\toolprobe\TOOLPROBE_latest.json") }
+    Write-SwpText $sidePath ($side | ConvertTo-Json -Depth 6)
+    $width = 160
+    try { $width = [Math]::Max(100, [Math]::Min(220, $Host.UI.RawUI.WindowSize.Width - 2)) } catch { $width = 160 }
+    $rargs = @("render", "--side", $sidePath, "--width", ("" + $width), "--rows", ("" + $Rows))
+    if ($PlainReport) { $rargs += "--plain" }
+    Write-Host ""
+    $panoEnd = Get-SwpNewest $reg "VIA_Panorama_v*.py"
+    if ($panoEnd -and -not $gateStop) { $null = Invoke-SwpStep "panorama_monitor" "⑨ Panorama monitor(本輪跑完的現況)" "vrn" $panoEnd @("monitor") -Show }
+    $null = Invoke-SwpStep "report" "⑧ rich 詳細摘要矩陣" "vrn" (Get-SwpNewest $reg "CGC_MDL229_SweepReport_v*.py") $rargs -Show
+
+    if (Get-Command Write-CeleritasReport -ErrorAction SilentlyContinue) {
+        try { [void](Write-CeleritasReport -Path (Join-Path $outDir "SWEEP_ACCEL_latest.html")) } catch { }
+    }
+} finally {
+    if (Get-Command Restore-CeleritasPS7 -ErrorAction SilentlyContinue) { try { Restore-CeleritasPS7 } catch { } }
+    Set-Location -LiteralPath $StartDir     # 出錯或 Ctrl+C 也回到起跑的夾
+}
+
+$pastePath = Join-Path $outDir "SWEEP_PASTE_latest.txt"
+$clipOk = $false
+if ((Test-Path -LiteralPath $pastePath) -and -not $NoClipboard -and (Get-Command Set-Clipboard -ErrorAction SilentlyContinue)) {
+    try { Set-Clipboard -Value ([IO.File]::ReadAllText($pastePath)); $clipOk = $true } catch { $clipOk = $false }
+}
+Write-Host ""
+Write-Host ("  [報告] " + (Join-Path $outDir "SWEEP_REPORT_latest.html")) -ForegroundColor DarkCyan
+Write-Host ("  [貼回] " + $pastePath) -ForegroundColor DarkCyan
+Write-Host ("  [log]  " + $logPath) -ForegroundColor DarkCyan
+if ($clipOk) {
+    Write-Host "  ✅ 實測貼回包已放進剪貼簿 → 回到 Claude 對話框按 Ctrl+V 送出。不要貼回 PowerShell。" -ForegroundColor Green
+}
+Set-Location -LiteralPath $StartDir
+if ($gateStop) { exit 3 }
+# 結束碼跟著每一步走(Codex #338 P2):不是只看流程閘
+$why = [System.Collections.Generic.List[string]]::new()
+foreach ($s in $steps) { if ($s.missing) { $why.Add($s.title + ":尾版不在") } }
+$rep = @($steps | Where-Object { $_.id -eq "report" } | Select-Object -Last 1)
+if ($rep.Count -eq 0 -or $rep[0].rc -ne 0) { $why.Add("⑧ 報告:rc=" + $(if ($rep.Count) { $rep[0].rc } else { "沒跑" })) }
+$statusPath = Join-Path $outDir "SWEEP_STATUS_latest.json"
+if ((Test-Path -LiteralPath $statusPath) -and ((Get-Item -LiteralPath $statusPath).LastWriteTimeUtc -ge $runStartUtc.AddSeconds(-2))) {
+    try {
+        $sj = Get-Content -LiteralPath $statusPath -Raw -Encoding utf8 | ConvertFrom-Json
+        foreach ($x in @($sj.incomplete)) { if ($x) { $why.Add("" + $x) } }
+    } catch { $why.Add("狀態檔讀不動:" + $_.Exception.Message) }
+} else {
+    $why.Add("SWEEP_STATUS_latest.json 本次沒寫出(報告正主不是 v0101 以上或沒跑完)")
+}
+if ($why.Count -gt 0) {
+    Write-Host ("  [結束碼 2] 有步沒跑完:" + ($why -join " · ")) -ForegroundColor Yellow
+    exit 2
+}
+exit 0
+} finally {
+    if ($swpOwnRun) { $env:VIA_HUB_RUN = $null }
+    Set-Location -LiteralPath $StartDir
+}

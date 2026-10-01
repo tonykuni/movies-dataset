@@ -45,6 +45,16 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
     } catch { }
 }
 # ===== [VIA:PS-TEMPLATE:END] =====
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 &{
 # ============================================================================
 # Optimize-VIA-Repo_v0101.ps1  -  tonykuni/movies-dataset repo hygiene, one click
@@ -68,16 +78,6 @@ if (-not $IsWindows) { $script:DataHomeRoot = Join-Path $HOME "Github" }
 
 function Write-Log {
     param([string]$Msg, [string]$Lvl = "INFO")
-# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
-try {
-    $VIAPSAccelProbe = $PSScriptRoot
-    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
-        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
-        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
-        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
-    }
-} catch { }
-# ===== [VIA:PS-ACCEL:END] =====
     $color = "Gray"
     if ($Lvl -eq "OK") { $color = "Green" }
     if ($Lvl -eq "WARN") { $color = "Yellow"; $script:Warn.Add($Msg) }

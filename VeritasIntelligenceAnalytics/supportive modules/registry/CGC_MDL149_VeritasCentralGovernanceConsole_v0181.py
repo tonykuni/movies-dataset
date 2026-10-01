@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VCGC v0181 — 薄尾:`monitor` 動詞 · 任何 VCGC 動作收尾都在背景自動開全景監控(AUTO SYNC VCGC ↔ 子系統)
+"""VCGC v0181 — 薄尾:活元件盤點快取的鑰只看「盤點真的讀的檔」(工作站每個 run 都 60 秒以上的根因)
 
-操作員(側線 2026-09-30):「上傳擋入 VCGC 起任何碰到 VCGC 就自動開啟他來監控 · 與 VCGC 高度 AUTO SYNC ·
-  VCGC 與子系統高度 AUTO SYNC」「導入加速器」
-本版:
-  ① monitor [scan|watch|dashboard|lessons|sync|show …] → VCGC run VIA_Panorama 尾版(閘 · 事件 · 教訓照舊)。
-     不叫 panorama:那是 v0103 起既有的「全景(PLAN 預覽)」動詞(盤點冊站 V-panorama),本版原樣轉交前版、不蓋。
-  ② 自動監控:每個 VCGC 動作(成功或失敗)收尾都呼叫 VIA_Panorama 尾版 `autostart --from <動詞>`
-     (VIA_ACCEL.run_fast · 20 秒上限;對方約 0.3 秒回):記一筆觸碰;背景監控沒在跑就起一支(單例),
-     背景那支每輪全景(304 不重掃)+ 有觸碰就經本入口跑唯讀同步探針 sync-check · ssot panorama(VCGC → VDF → VRN → SUP)。
-     提示只寫 stderr 一行,不污染 stdout(sync-check 等動詞印 JSON 給別支解析)。
-     不觸發:VIA_PANORAMA_AUTO=0 · 背景監控自己呼叫(VIA_PANORAMA_ACTIVE=1,防遞迴)· 串測中(VIA_VCGC_TEST_ACTIVE=1)· CI=true · --selftest。
-     --apply 一律不自動下(同意閘);監控只列待批准指令。
-  ③ help 的目前生效入口 = 本版;多印 monitor 一行。其餘照 v0180。零網路。
+操作員(R40 工作站實錄 2026-10-01):「指令跑太慢未加加速模板 檢查一切指令」——三庫入庫 8 個 `python $V run …` 每個都等很久。
+量到的(容器剖析 `run --family vdf VDF_ENG079_LocalDbConsolidate coverage`):69.5 秒裡 62 秒在 run 之後的同步檢查
+(sync_check → registry_sync 乾跑 → live_components:1553 支 ast.parse,compile 18 秒);快取命中時同一個指令 1.5 秒。
+工作站每次都沒命中:v0167 的鑰 = HEAD + `git status --porcelain -uall` 每一行(含大小 · 時間)。每個 run 都會寫
+VIA_Reports/…(RUN_latest.json · NEED_latest.json · 事件 · 教訓帳 · 燈鎖)與 output_hub 的資料 / checkpoint,鑰一定變 → 下一個指令整樹重剖析;
+OneDrive 夾逐檔被防毒掃,放大到幾分鐘。不是加速器沒掛(加速器管資料運算,管不到這段)。
+本尾版:鑰只收盤點會讀的來源(.py · .ps1 · .psm1 · .json),且排除輸出夾(VIA_Reports/ · output_hub/ · docs/handoff/ · __pycache__/)
+與只增帳本 / 燈鎖(*_Ledger_v####.json · VIA_LampLock_v####.json);HEAD 與 TOOLS_PLAN 來源照舊入鑰。盤點函式、結果欄位、
+registry-sync 只增律一字不動;源碼一改(含新檔)照舊重算;VIA_VCGC_NOCACHE=1 照舊一律重算。其餘照 v0180。零網路。
+只收 VCGC 呼叫(VIA_FROM_VCGC=YES)的規矩照前一版(本版不放寬)。
 """
 from __future__ import annotations
 
@@ -63,11 +61,13 @@ def _via_net():
         return None
 # ===== [VIA:NET-BRIDGE:END] =====
 
+import hashlib
 import importlib.util
-import json
 import os
+import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -77,12 +77,9 @@ _spec = importlib.util.spec_from_file_location(_STEM + "_prior_v0181", PRIOR_PAT
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
-PANORAMA_FAMILY = "VIA_Panorama"
-AUTO_ENV = "VIA_PANORAMA_AUTO"
-ACTIVE_ENV = "VIA_PANORAMA_ACTIVE"
-TEST_ENV = "VIA_VCGC_TEST_ACTIVE"
-PANO_LINE = ("monitor [scan|watch|dashboard|lessons|sync|show …]  VIA 全景(只讀)· 任何 VCGC 動作都會在背景自動開監控與"
-             " AUTO SYNC(VIA_PANORAMA_AUTO=0 關)")
+
+INPUT_SUFFIX = (".py", ".ps1", ".psm1", ".json")
+OUTPUT_RX = re.compile(r"(^|/)(VIA_Reports|output_hub|__pycache__)/|(^|/)docs/handoff/|(_Ledger_v\d{4}|VIA_LampLock_v\d{4})[^/]*\.json$", re.I)
 
 
 def __getattr__(name):
@@ -97,106 +94,89 @@ def _chain() -> list:
     return mods
 
 
-# ---------------------------------------------------------------- ③ help: current entry is this tail
-_PREV_CATALOG = PRIOR.help_catalog
-_PREV_SHOW = vars(PRIOR).get("_show_help_v0180")
+def _owner(name: str):
+    """The first console module below this one that defines `name` itself."""
+    for m in _chain():
+        if callable(vars(m).get(name)):
+            return m
+    return None
 
 
-def help_catalog():
-    card = _PREV_CATALOG()
-    card.update(entry=Path(__file__).name, previous=PRIOR_PATH.name, monitor=PANO_LINE)
-    return card
+def is_input(rel: str) -> bool:
+    """A changed path that the live-component inventory can read (sources), not an output a run writes."""
+    rel = rel.replace("\\", "/")
+    return rel.lower().endswith(INPUT_SUFFIX) and not OUTPUT_RX.search(rel)
 
 
-def _show_help_v0181():
-    if _PREV_SHOW is not None:
-        _PREV_SHOW()
-    print("  " + PANO_LINE)
-
-
-_PATCHED: list = []
-
-
-def _patch_help(on: bool = True) -> None:
-    """v0180 把舊版的 help 接到它身上;本版接回自己(v0180 本身不動)。on=False 還原(跑前版自測時用)。"""
-    if on:
-        for _m in _chain()[1:]:
-            if vars(_m).get("help_catalog") is _PREV_CATALOG:
-                _m.help_catalog = help_catalog
-                _PATCHED.append((_m, "help_catalog", _PREV_CATALOG))
-            if _PREV_SHOW is not None and vars(_m).get("show_current_help") is _PREV_SHOW:
-                _m.show_current_help = _show_help_v0181
-                _PATCHED.append((_m, "show_current_help", _PREV_SHOW))
-    else:
-        for _m, attr, orig in _PATCHED:
-            setattr(_m, attr, orig)
-        _PATCHED.clear()
-
-
-_patch_help(True)
-
-
-# ---------------------------------------------------------------- ① monitor → VIA_Panorama 尾版 through run
-def monitor(args: list) -> int:
-    return PRIOR.main(["run", "--family", "core", PANORAMA_FAMILY] + list(args))
-
-
-# ---------------------------------------------------------------- ② 任何 VCGC 動作收尾 → 背景自動開監控
-def panorama_tail() -> Path | None:
-    hits = sorted(HERE.glob(PANORAMA_FAMILY + "_v*.py"))
-    return hits[-1] if hits else None
-
-
-def auto_skip(args: list) -> str:
-    if os.environ.get(AUTO_ENV) == "0":
-        return f"{AUTO_ENV}=0"
-    if os.environ.get(ACTIVE_ENV) == "1":
-        return "監控自己呼叫(防遞迴)"
-    if os.environ.get(TEST_ENV) == "1":
-        return "串測中"
-    if os.environ.get("CI", "").lower() == "true":
-        return "CI"
-    if args[:1] in (["--selftest"], ["selftest"]):
-        return "自測"
-    return ""
-
-
-def auto_monitor(args: list, launcher=None) -> str:
-    """不擋、不拋、不寫 stdout;回一行狀態(也寫 stderr)。"""
-    why = auto_skip(args)
-    if why:
-        return "skip:" + why
-    tail = panorama_tail()
-    if tail is None:
-        return "skip:VIA_Panorama 不在"
-    argv = [sys.executable, str(tail), "autostart", "--from", " ".join(args[:2]) or "(無動詞)"]
+def input_key(root: Path | None = None) -> str | None:
+    """HEAD + changed / untracked *inventory inputs* (size · mtime) + the TOOLS_PLAN source. None without git (= no cache)."""
+    root = Path(root or PRIOR.VIA)
     try:
-        if launcher is not None:
-            rc, out = launcher(argv)
-        elif VIA_ACCEL is not None and hasattr(VIA_ACCEL, "run_fast"):
-            rc, out = VIA_ACCEL.run_fast(argv, timeout=20)
-        else:
-            p = subprocess.run(argv, capture_output=True, timeout=20, stdin=subprocess.DEVNULL)
-            rc, out = p.returncode, (p.stdout + p.stderr).decode("utf-8", "replace")
-    except Exception as e:  # 監控起不來不影響 VCGC 本身的結果
-        rc, out = "ERR", f"{type(e).__name__}: {e}"
-    line = next((ln for ln in str(out).splitlines() if ln.startswith("[監控]")), f"[監控] rc {rc} · {str(out).strip()[:120]}")
-    print(line, file=sys.stderr)
-    return line
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, timeout=30).stdout.strip()
+        st = subprocess.run(["git", "status", "--porcelain", "-uall", "--", "."], cwd=root, capture_output=True,
+                            text=True, timeout=120).stdout
+        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=root, capture_output=True, text=True, timeout=30).stdout.strip()
+    except Exception:
+        return None
+    if not head:
+        return None
+    top = Path(top or root)
+    parts = [head]
+    for line in st.splitlines():
+        rel = line[3:].strip().strip('"')
+        if " -> " in rel:
+            rel = rel.split(" -> ", 1)[1]
+        if not is_input(rel):
+            continue
+        try:
+            s = (top / rel).stat()
+            parts.append(f"{line[:2]}|{rel}|{s.st_size}|{s.st_mtime_ns}")
+        except OSError:
+            parts.append(f"{line[:2]}|{rel}|gone")
+    tp = PRIOR.runtime_plan()
+    try:
+        ts = tp.stat()
+        parts.append(f"plan|{tp}|{ts.st_size}|{ts.st_mtime_ns}")
+    except OSError:
+        parts.append(f"plan|{tp}|absent")
+    return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()[:16]
 
 
-# ---------------------------------------------------------------- main
+_STATE: dict = {}
+
+
+def _install() -> int:
+    """Re-wrap the chain-aware inventory (v0172) with the same cache, keyed by input_key; swap it wherever the old one sits."""
+    m172 = next((m for m in _chain() if isinstance(vars(m).get("_EXT"), dict) and callable(vars(m).get("ensure"))), None)
+    m167 = _owner("cached")
+    if m172 is None or m167 is None:
+        return 0
+    old = vars(m172)["_EXT"].get("f")
+    if old is None or getattr(old, "_v0181", False):
+        return 0
+    raw = getattr(old, "__wrapped__", None)
+    if raw is None:
+        return 0
+    new = vars(m167)["cached"](raw, name="live_components_v0181", key_fn=input_key)
+    new._v0172 = True
+    new._v0181 = True
+    vars(m172)["_EXT"]["f"] = new
+    n = 0
+    for mod in list(sys.modules.values()):
+        d = getattr(mod, "__dict__", {})
+        if _STEM in str(d.get("__file__", "")) and d.get("live_components") is old:
+            d["live_components"] = new
+            n += 1
+    vars(m172)["ensure"]()
+    _STATE.update(old=old, new=new, swapped=n)
+    return n
+
+
+_PATCHED = _install()
+
+
 def main(argv=None):
-    args = list(sys.argv[1:] if argv is None else argv)
-    try:
-        if args[:1] == ["monitor"]:
-            if os.environ.get("VIA_FROM_VCGC") != "YES":
-                print(json.dumps({"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}, ensure_ascii=False))
-                return 2
-            return monitor(args[1:])
-        return PRIOR.main(args)
-    finally:
-        auto_monitor(args)
+    return PRIOR.main(list(sys.argv[1:] if argv is None else argv))
 
 
 # ---------------------------------------------------------------- selftest
@@ -207,75 +187,57 @@ def selftest():
         ok.append(bool(cond))
         print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
 
-    import contextlib
-    import io
-    keep = {k: os.environ.get(k) for k in ("VIA_FROM_VCGC", AUTO_ENV, ACTIVE_ENV, TEST_ENV, "CI")}
-    seen, calls = [], []
-    real_main, real_auto = PRIOR.main, globals()["auto_monitor"]
-    PRIOR.main = lambda a: seen.append(list(a)) or 0
-    globals()["auto_monitor"] = lambda a, launcher=None: calls.append(list(a)) or "stub"
-    try:
-        for k in keep:
-            os.environ.pop(k, None)
-        os.environ["VIA_FROM_VCGC"] = "YES"
-        rc = main(["monitor", "lessons"])
-        rc2 = main(["panorama"])  # 既有動詞:原樣轉交前版
-        os.environ.pop("VIA_FROM_VCGC", None)
-        denied = main(["monitor"])
-    finally:
-        PRIOR.main = real_main
-        globals()["auto_monitor"] = real_auto
-    chk("① monitor 走 run VIA_Panorama 尾版;不經 VCGC 拒跑;既有 panorama 動詞原樣轉交前版(不蓋)",
-        rc == 0 and seen[0] == ["run", "--family", "core", PANORAMA_FAMILY, "lessons"] and seen[1] == ["panorama"] and denied == 2, seen)
-    chk("② 每個 VCGC 動作收尾都觸發監控(含被拒的那次)", calls == [["monitor", "lessons"], ["panorama"], ["monitor"]] and rc2 == 0, calls)
-    fired = []
-
-    def fake(argv):
-        fired.append(argv)
-        return 0, "[監控] 已在背景起全景監控 pid 1 · 頁 x\n"
-    err, outb = io.StringIO(), io.StringIO()
-    with contextlib.redirect_stderr(err), contextlib.redirect_stdout(outb):
-        line = auto_monitor(["sync-check"], launcher=fake)
-    chk("② 觸發帶動詞 · 呼叫尾版 autostart · 提示只寫 stderr(stdout 乾淨,JSON 動詞不受影響)",
-        fired and fired[0][2:] == ["autostart", "--from", "sync-check"] and line.startswith("[監控]") and outb.getvalue() == ""
-        and "[監控]" in err.getvalue(), fired)
-    skips = []
-    for k, v in ((AUTO_ENV, "0"), (ACTIVE_ENV, "1"), (TEST_ENV, "1"), ("CI", "true")):
-        os.environ[k] = v
-        skips.append(auto_monitor(["status"], launcher=fake).startswith("skip:"))
-        os.environ.pop(k, None)
-    skips.append(auto_monitor(["--selftest"], launcher=fake).startswith("skip:"))
-    chk("② 不觸發:AUTO=0 · 監控自己(防遞迴)· 串測中 · CI · 自測", all(skips) and len(fired) == 1, skips)
-
-    def boom(argv):
-        raise RuntimeError("x")
-    with contextlib.redirect_stderr(io.StringIO()):
-        safe = auto_monitor(["status"], launcher=boom)
-    chk("② 監控起不來不拋、不影響 VCGC 結果", safe.startswith("[監控]"), safe)
-    tail = panorama_tail()
-    chk("② VIA_Panorama 尾版在且有 autostart", tail is not None and "def autostart" in tail.read_text(encoding="utf-8"), tail)
-    card = help_catalog()
-    chk("③ help 目前生效入口 = 本版 · 多一行 monitor", card.get("entry") == Path(__file__).name and "monitor" in card
-        and card.get("previous") == PRIOR_PATH.name, card.get("entry"))
+    print("=== VCGC v0181 · 薄尾加檢(盤點快取鑰只看來源)===")
+    chk("① 來源 / 輸出分得開:.py · .ps1 · 冊 .json 算來源;VIA_Reports · output_hub · docs/handoff · 帳本 · 燈鎖 · .jsonl · .duckdb 不算",
+        is_input("VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0105.py")
+        and is_input("VeritasIntelligenceAnalytics/supportive modules/registry/VIA_ToolRoster_SSOT_v0100.json")
+        and is_input("VeritasIntelligenceAnalytics/Register-VIA-Commands-v0264.ps1")
+        and not is_input("VeritasIntelligenceAnalytics/VIA_Reports/vdf/local_db/RUN_latest.json")
+        and not is_input("VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/history_backfill_checkpoint.json")
+        and not is_input("VeritasIntelligenceAnalytics/docs/handoff/HANDOFF_latest.json")
+        and not is_input("VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Lessons_Ledger_v0100.json")
+        and not is_input("VeritasIntelligenceAnalytics/supportive modules/registry/VIA_LampLock_v0102.json")
+        and not is_input("VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VCGC_FunctionLedger_v0100.jsonl")
+        and not is_input("x/mega/vdf_tw_market.duckdb"))
+    with tempfile.TemporaryDirectory() as td:
+        r = Path(td)
+        g = lambda *a: subprocess.run(["git", *a], cwd=r, capture_output=True, text=True)
+        g("init", "-q")
+        g("config", "user.email", "t@t")
+        g("config", "user.name", "t")
+        (r / "a.py").write_text("x = 1\n", encoding="utf-8")
+        g("add", "-A")
+        g("commit", "-q", "-m", "a")
+        k0 = input_key(r)
+        (r / "VIA_Reports" / "vdf").mkdir(parents=True)
+        (r / "VIA_Reports" / "vdf" / "RUN_latest.json").write_text("{}", encoding="utf-8")
+        (r / "VIA_Lessons_Ledger_v0100.json").write_text("{}", encoding="utf-8")
+        (r / "events.jsonl").write_text("{}\n", encoding="utf-8")
+        k1 = input_key(r)
+        chk("② 跑完寫報告 / 帳本 / 事件(工作站每個 run 都會)→ 鑰不變 = 下一個指令命中快取", k0 is not None and k0 == k1, f"{k0} {k1}")
+        (r / "a.py").write_text("x = 2\n", encoding="utf-8")
+        k2 = input_key(r)
+        (r / "b.py").write_text("y = 1\n", encoding="utf-8")
+        k3 = input_key(r)
+        (r / "VIA_ToolRoster_SSOT_v0100.json").write_text("{}", encoding="utf-8")
+        k4 = input_key(r)
+        chk("③ 來源一改就重算:改 .py · 新 .py · 新冊 .json 都換鑰(結果不會舊)", len({k1, k2, k3, k4}) == 4, f"{k2} {k3} {k4}")
+    st = _STATE
+    m172 = next((m for m in _chain() if isinstance(vars(m).get("_EXT"), dict)), None)
+    chk("④ 換裝:沿鏈盤點(v0172)改由本版快取包;鏈上原持舊包的模組都換掉;registry_sync 讀的就是新包",
+        bool(st) and m172 is not None and vars(m172)["_EXT"].get("f") is st.get("new") and st.get("swapped", 0) >= 1
+        and not any(getattr(mod, "__dict__", {}).get("live_components") is st.get("old") for mod in list(sys.modules.values())),
+        st.get("swapped"))
+    chk("⑤ 盤點函式本體不換(同一支 extend(base()) · 結果欄位不變)· VIA_VCGC_NOCACHE=1 照舊重算",
+        bool(st) and getattr(st["new"], "__wrapped__", None) is getattr(st["old"], "__wrapped__", None))
     src = Path(__file__).read_text(encoding="utf-8")
-    chk("加速器:ACCEL 橋 · NET 橋 · 觸發走 VIA_ACCEL.run_fast", "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src
-        and "VIA_ACCEL.run_fast(argv, timeout=20)" in src)
-    for k, v in keep.items():
-        if v is None:
-            os.environ.pop(k, None)
-        else:
-            os.environ[k] = v
-    print(f"  VCGC v0181 selftest {sum(ok)}/{len(ok)} {'PASS' if all(ok) else 'FAIL'}")
+    chk("⑥ 加速器橋 · 網路橋在;不碰 TA-Lib", "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src
+        and not re.search(r"^\s*(import|from)\s+talib", src, re.M))
+    print(f"[VCGC v0181] 本版 {sum(ok)}/{len(ok)}")
     if not all(ok):
         return 1
-    _patch_help(False)  # 前版自測核的是「help 接在 v0180」:暫時還原,跑完再接回本版
-    try:
-        return PRIOR.selftest()
-    finally:
-        _patch_help(True)
+    return PRIOR.selftest()
 
 
 if __name__ == "__main__":
-    if sys.argv[1:2] == ["--selftest"]:
-        raise SystemExit(selftest())
-    raise SystemExit(main())
+    raise SystemExit(selftest() if sys.argv[1:] == ["--selftest"] else main())

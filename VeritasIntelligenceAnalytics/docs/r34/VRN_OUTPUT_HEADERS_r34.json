@@ -1,0 +1,868 @@
+{
+ "schema": "VIA.R34.OutputHeaders.fragment.v1",
+ "subsystem": "VRN",
+ "generated_by": "VRN track (VCGC->VRN) · copied from code by AST/DDL text, no engine executed",
+ "paths_relative_to": "VeritasIntelligenceAnalytics/",
+ "tables": {
+  "vrn_basic_info": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG110_TabReport",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/output_hub/vrn/basic/vrn_basic.duckdb",
+    "table": "basic_info"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportType",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "yfinanceTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bloombergTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "tickerKind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "companyName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "brokerAbbr",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportDate",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportCode",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "language",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pages",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ratingCat",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationRisk",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:30"
+  },
+  "vrn_financial": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/financial/part-*.parquet",
+    "table": "vrn_financial"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "statement",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "item",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "dataName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "unit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "confidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "grade",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "defects",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:20"
+  },
+  "vrn_page1": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/page1/part-*.parquet",
+    "table": "vrn_page1"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "page",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fixed_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "supportive modules/registry/VIA_VRN_TabFields_v0100.json:15"
+  },
+  "vrn_report_basic": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "name_official",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_raw",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_report",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "title_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "conflicts",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "extracted_at",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_close",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_retro_ratio",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_event",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_age_days",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_freshness",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_block_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_zh",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_en",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_code",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_direction",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_n",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ssot_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "kind_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:1489"
+  },
+  "vrn_firstpage_matrix": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG083_VerifiedMatrix",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0120.py:419"
+  },
+  "vrn_regex_selfcheck": {
+   "subsystem": "VRN",
+   "owner": "SUP_MDL749_VRNFieldRuleHub",
+   "source": {
+    "kind": "csv",
+    "path": "VIA_Reports/vrn/regex_selfcheck_latest.csv",
+    "table": ""
+   },
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "file_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "text_scope",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "chars",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "family",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pattern_id",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "hits",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "first_hit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bucket",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "evidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py:681"
+  }
+ },
+ "notes": {
+  "vrn_basic_info": {
+   "copies": {
+    "state": "SAME",
+    "n": 22,
+    "copies": [
+     "ENG109.BASIC",
+     "ENG110.KEEP",
+     "TabFields.BASIC_INFO"
+    ]
+   },
+   "evidence_all": [
+    "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:13",
+    "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:30",
+    "supportive modules/registry/VIA_VRN_TabFields_v0100.json:5"
+   ],
+   "writer": "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:73 _store: CREATE OR REPLACE TABLE basic_info (all VARCHAR) + COPY TO basic/vrn_basic_v0100.parquet; rows = CROSS_CHECKED only; no duckdb -> vrn_basic_v0100.jsonl",
+   "root": "VIA_VRN_DATA env overrides functional modules/VRN/output_hub/vrn",
+   "dtype_basis": "stored VARCHAR (ENG110 _store) -> str"
+  },
+  "vrn_financial": {
+   "copies": {
+    "state": "SAME",
+    "n": 14,
+    "copies": [
+     "ENG109.FINANCIAL",
+     "TabFields.FINANCIAL_DATA"
+    ]
+   },
+   "evidence_all": [
+    "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:20",
+    "supportive modules/registry/VIA_VRN_TabFields_v0100.json:20"
+   ],
+   "row_builder": "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py:157 (value is a string; str lock)",
+   "writer": "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:69 store(): parquet part + DuckDB view vrn_financial in vrn_tabs.duckdb; only VERIFIED reports. ENG110 v0116 run() shows financial rows in VRN_TabReport.html but does not call store() -> min_rows 0"
+  },
+  "vrn_page1": {
+   "copies": {
+    "state": "DIFFER",
+    "TabFields.PAGE_1": [
+     "fileId",
+     "fileName",
+     "page",
+     "fixed_page1",
+     "summary_page1"
+    ],
+    "ENG110_v0103_display": [
+     "fileId",
+     "fileName",
+     "page",
+     "fixed_page1",
+     "summary_page1"
+    ],
+    "ENG109.store_page_frame": [
+     "fileId",
+     "fixed_page1",
+     "summary_page1"
+    ],
+    "missing_in_ENG109_store": [
+     "fileName",
+     "page"
+    ]
+   },
+   "evidence_all": [
+    "supportive modules/registry/VIA_VRN_TabFields_v0100.json:15",
+    "functional modules/VRN/VRN_ENG110_TabReport_v0103.py:176",
+    "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:137",
+    "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:76"
+   ],
+   "disagreement": "ENG109.store() persists only fileId/fixed_page1/summary_page1; the tab contract (TabFields, ENG110 display) has fileName and page too -> marked required:false here, not invented. No live persisted writer in the ENG110 v0116 path -> min_rows 0"
+  },
+  "vrn_report_basic": {
+   "base_cols": 15,
+   "extra_cols": 39,
+   "evidence_all": [
+    "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:1489",
+    "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:1459 BASIC_EXTRA_COLS"
+   ],
+   "tail": "ENG073 v0139 is a thin tail over v0138 (DDL unchanged)",
+   "db_resolution": "VIA_DATA_HOME/**/vdf_tw_market.duckdb first, else functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb (functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:260)",
+   "not_listed": "vrn_report_analyst / vrn_report_metrics (same DDL block) are outside this fragment's five tables"
+  },
+  "vrn_firstpage_matrix": {
+   "reads": "ENG083 COLUMNS are read (read_only) from vrn_report_basic; matrix JSON goes to VIA_Reports/vrn/matrix/VRN_MATRIX_latest.json",
+   "correction": "the handoff listed 'upside'; code v0120 has 'upside_calc' (the batch-633 comment in ENG083 explains 'upside' never existed)",
+   "dtype_basis": "types taken from the ENG073 DDL of the same columns"
+  },
+  "vrn_regex_selfcheck": {
+   "why": "this track's new output (SUP_MDL749 v0116 regexcheck); rows are validated against REGEXCHECK_COLUMNS before write",
+   "json": "VIA_Reports/vrn/regex_selfcheck_latest.json (same rows + per_file summary)"
+  }
+ }
+}
