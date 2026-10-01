@@ -100,7 +100,8 @@
     "supportive modules/registry/CGC_MDL176_SynonymUnion_v0103.py",
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
-    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py"
+    "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py",
+    "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -427,6 +428,18 @@
       "dependencies": [
         "supportive modules/registry/CGC_MDL241_TemplateAdapter_v*.py",
         "supportive modules/registry/VIA_UI_TemplateSync_SSOT_v*.json"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vrn_fourpoint": {
+      "argv": [
+        "VRN_ENG080_FourPointDigest",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG080 v0111 連接號≠負號] 自測 11/11 PASS",
+      "scope": "四點文摘 QC 新數字:組字「名(代號.TW)-2026 標題」的連接號不算負號(工作站 2026-10-01 via-closeout vrn 實錄 QC 紅 8 全是 -2026/-2025/-2023 假紅);真負號與捏造數字照抓;前版 32 檢全過",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG080_FourPointDigest_v*.py"
       ],
       "timeout_seconds": 1200
     }
@@ -850,6 +863,21 @@
       "owner": "操作員",
       "reason": "claude.ai/design 私人專案容器取不到;倉內參考匯出 VIAHTMLUniversalUI-Standalone.html 已實測(覆蓋 111/120)",
       "next": "把 VIA HTML Universal UI.dc.html 放進 VIA_Reports/template_adapter/inbox/ → run CGC_MDL241_TemplateAdapter watch --once;採用 token 才 convert --propose → apply → CGC_MDL238 template --lock"
+    },
+    {
+      "id": "VRN-REQ009:vrn_fourpoint",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_fourpoint",
+      "receipt": "docs/handoff/evidence/vrn_fourpoint.json"
+    },
+    {
+      "id": "VRN-REQ009:closeout-fail4",
+      "requirement": "VRN-REQ009",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "工作站 via-closeout vrn:4 份有對照源而對不起來(Citi-3231 頁價 114 vs 庫 109.5 · Daiwa-3653 TP 未抽到且頁價 2550 vs 庫 2445 · Daiwa-6278 TP=15 疑誤抽(比值 0.069)且頁價 230 vs 庫 203 · 第 4 份見 VRN_CLOSEOUT_latest.json);價差可能是還原價 vs 原始價或報告引用價日不同,須看 PDF 才能裁,不在容器代判",
+      "next": "git pull → via-closeout vrn --run(四點 QC 假紅已由 ENG080 v0111 修)→ 對 fail 清單逐份開 PDF 核 TP 與現價 → 解析錯就回報該份,價日差就裁容差/價日規則"
     }
   ]
 }
