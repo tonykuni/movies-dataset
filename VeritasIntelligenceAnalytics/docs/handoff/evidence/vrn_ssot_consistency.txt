@@ -27,7 +27,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 560 · import 0 · 提及 46 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 561 · import 0 · 提及 48 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · SUP_MDL749_VRNFieldRuleHub_v0116.py(家族 core)
@@ -35,10 +35,10 @@
   [OK] ① 規則正本冊在位且讀得動(冊不在=誠實 ABSENT,不編) (VRN_FieldRules_SSOT_v0100.json)
   [OK] ② 評等正本詞彙 = 收容件 canon_map ∪ 本土尺度;含批538 打出來的本土尺度(增加持股/減少持股) (66 詞)
   [OK] ③ 目標價線索與券商證據分級都在冊(不是各引擎各抄一份) (線索 2 條 · 分級 ['文內(去電郵/網址)', '檔名', '電郵網域(弱)'])
-  [OK] ④ 正本那一支自己零落差(ENG086 v0102 是冊的來源,它若有落差就是冊寫錯了——量法要兩段:載收容件字典算有英文評等,本土尺度要寫在自己檔裡) (VRN_ENG086_FirstPageLogicBridge_v0118.py CANON · 本體 54/66 · 經樞紐 66/66)
+  [OK] ④ 正本那一支自己零落差(ENG086 v0102 是冊的來源,它若有落差就是冊寫錯了——量法要兩段:載收容件字典算有英文評等,本土尺度要寫在自己檔裡) (VRN_ENG086_FirstPageLogicBridge_v0119.py CANON · 本體 54/66 · 經樞紐 66/66)
   [OK] ⑤ 落差看得見、且只量它真的在抽的欄位(ENG080 只抽目標價,拿評等去量它是無中生有=判錯的紅燈) (落差 2/5 支 · 不適用 1 支)
   [OK] ⑥ 零改線宣告:本樞紐只讀冊、只報落差、只轉交正本實作,**不改寫任何現役引擎**;正本實作惰性載入(import 本樞紐時不碰任何引擎)· 零網路 · 不落檔(不影響現有功能 · 零九頭龍) 
-  [OK] ⑦ 轉交的是**實作**不是詞表:本土尺度只看前段(內文「外資持有」不當評等 LL68)· 幅度不是價格(LL64)· 券商證據分級挖掉電郵網域(LL66)——這三條守衛跟著一起繼承 (正本實作 VRN_ENG086_FirstPageLogicBridge_v0118.py · 評等 BUY · 內文誤判 None · 目標價 1250.0/None · 券商 DAIWA/文內)
+  [OK] ⑦ 轉交的是**實作**不是詞表:本土尺度只看前段(內文「外資持有」不當評等 LL68)· 幅度不是價格(LL64)· 券商證據分級挖掉電郵網域(LL66)——這三條守衛跟著一起繼承 (正本實作 VRN_ENG086_FirstPageLogicBridge_v0119.py · 評等 BUY · 內文誤判 None · 目標價 1250.0/None · 券商 DAIWA/文內)
   [OK] ⑧ 批541 去衝突:合併後同一別名不得對到多個正典名(下游一 join 就散)——必須是 0 (撞名 0 · 合併後 42 家)
   [OK] ⑨ 批541 邊實測邊長同義字:候選一律 PENDING_OPERATOR,**絕不自己寫進正本冊**(不代設);沒有實測結果就誠實 NODATA 並指路,不編 (NODATA · 候選 0 條)
   [OK] ⑩ 批541 候選閘門負控:擋得住假候選(報告段名/產品類別——檔名裡已經有在冊別名就生不出新券商),**也放得出真候選**(全新機構名),而且一份檔名只端一個(不把標的公司名一起撈進來) (合成兩列 → 端出 ['寰宇投顧'])
@@ -96,7 +96,9 @@
   [OK] ⑨ regexcheck 合成中英文研報:凱基『增加持股』→ BUY、目標價 1250;大摩 Overweight → BUY、NT$1,300;雜訊檔(增持庫藏股 / 毛利率目標 / 上漲空間)評等與目標價都不准抓到 ({'en_ms.txt': {'rating': 'BUY', 'tp': '1300.0', 'conflict_words': '', 'regex_hits': 5}, 'zh_kgi.txt': {'rating': 'BUY', 'tp': '1250.0', 'conflict_words': '', 'regex_hits': 13}, 'zh_noise.txt': {'rating': '', 'tp': '', 'conflict_words': '', 'regex_hits': 3}})
   [OK] ⑩ 輸出=驗證:每一列欄名/順序/型別鎖在 REGEXCHECK_COLUMNS;壞列一定被抓 (111 列 · 13 欄)
   [OK] ⑪ JSON/CSV 寫在暫存夾、讀得回來、DataFrame 欄序一致(pandas 缺席就只驗 JSON) (regex_selfcheck_latest.csv · DataFrame (111, 13))
-  [OK] ⑫ 樣本夾不在本機 = 誠實 ABSENT(不編列、不冒充綠) (['不在本機:/tmp/tmpu7kk_0sf/no_such_dir(操作員樣本夾在工作站;容器照實 ABSENT)'])
+  [OK] ⑫ 樣本夾不在本機 = 誠實 ABSENT(不編列、不冒充綠) (['不在本機:/tmp/tmpdbrqzw58/no_such_dir(操作員樣本夾在工作站;容器照實 ABSENT)'])
   [OK] ⑬ 預設樣本夾取自 VIA_InputConsole_Spec user.vrn_dir(本機不存在就照實 ABSENT) (['C:\\測試樣本報告'])
   [OK] ⑭ 新動詞只收 VCGC:VIA_FROM_VCGC 不是 YES 就拒絕(rc 2) 
   [計] v0116 新增 15 檢 OK 15 · FAIL 0(前版自測 rc 0)
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_Panorama_v0105.py(冊上 VIA_Panorama | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_Panorama_v0105.py', 'CGC_MDL149_VeritasCentral | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):6 個,例 ['VCGC-REQ102', 'VCGC-REQ103' → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 48, 'changed': 20, 'stale': 0, 'expected': 14643, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply

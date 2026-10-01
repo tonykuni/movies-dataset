@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-30T19:32:05+00:00",
+  "updated_at": "2026-10-01T20:29:13+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -120,7 +120,12 @@
     "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0105.py",
     "supportive modules/registry/CGC_MDL172_VRNChainRunner_v0108.py",
     "supportive modules/registry/CGC_MDL240_EnvManager_v0101.py",
-    "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0119.py"
+    "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0119.py",
+    "supportive modules/registry/VIA_Panorama_v0104.py",
+    "supportive modules/registry/VIA_Panorama_v0105.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0184.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -666,6 +671,19 @@
       "scope": "VRN 第一頁邏輯補缺橋:⑤ 券商正典鍵跟 CGC_MDL176 裁定(MORGANSTANLEY→MS)· ⑤' 一家一名;第一頁文字 / 表格 / 摘要擷取一字不動(R43 · VCGC-REQ099)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "monitor": {
+      "argv": [
+        "VIA_Panorama",
+        "--selftest"
+      ],
+      "success_marker": "VIA_Panorama_v0105 selftest 12/12 PASS",
+      "scope": "VIA_Panorama 薄尾鏈(v0105 → v0104 → v0103 → v0100)全自測:只讀全景 · 儀表板 · 記錄 / 教訓 · 背景單例監控 · AUTO SYNC · 交接閘 · 工作流圖(VCGC-REQ102~106)",
+      "dependencies": [
+        "supportive modules/registry/VIA_Panorama_v*.py",
+        "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
       ],
       "timeout_seconds": 900
     }
@@ -1375,6 +1393,61 @@
       "state": "VERIFIED",
       "case": "provenance",
       "receipt": "docs/handoff/evidence/provenance.json"
+    },
+    {
+      "id": "VCGC-REQ102:monitor",
+      "requirement": "VCGC-REQ102",
+      "state": "VERIFIED",
+      "case": "monitor",
+      "receipt": "docs/handoff/evidence/monitor.json"
+    },
+    {
+      "id": "VCGC-REQ103:monitor",
+      "requirement": "VCGC-REQ103",
+      "state": "VERIFIED",
+      "case": "monitor",
+      "receipt": "docs/handoff/evidence/monitor.json"
+    },
+    {
+      "id": "VCGC-REQ104:monitor",
+      "requirement": "VCGC-REQ104",
+      "state": "VERIFIED",
+      "case": "monitor",
+      "receipt": "docs/handoff/evidence/monitor.json"
+    },
+    {
+      "id": "VCGC-REQ105:monitor",
+      "requirement": "VCGC-REQ105",
+      "state": "VERIFIED",
+      "case": "monitor",
+      "receipt": "docs/handoff/evidence/monitor.json"
+    },
+    {
+      "id": "VCGC-REQ105:entry",
+      "requirement": "VCGC-REQ105",
+      "state": "BLOCKED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "owner": "操作員 / Windows 主機",
+      "reason": "VCGC 自動開監控(背景 watch · pid 鎖 · 閒置自停)只在 Linux 雲端實測;Windows PS 操作台 / pythonw 背景行程未實測(REQ091 PARTIAL)",
+      "next": "在 Windows 跑 via-vcgc 任一動詞 → 確認 stderr 一行 [監控] 與 VeritasIntelligenceAnalytics/.panorama/watch.pid;再 via-vcgc monitor stop;收據回填後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ106:monitor",
+      "requirement": "VCGC-REQ106",
+      "state": "VERIFIED",
+      "case": "monitor",
+      "receipt": "docs/handoff/evidence/monitor.json"
+    },
+    {
+      "id": "VCGC-REQ107:entry",
+      "requirement": "VCGC-REQ107",
+      "state": "VERIFIED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "owner": "AI(VCGC closeout)",
+      "reason": "closeout 已入 v0182/v0183,等 entry 案(主控台自測鏈)本輪實測",
+      "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
     }
   ]
 }
