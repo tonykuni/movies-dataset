@@ -116,7 +116,9 @@
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
-    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0105.py",
+    "supportive modules/registry/CGC_MDL172_VRNChainRunner_v0108.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -592,7 +594,7 @@
         "CGC_MDL170_VDFChainRunner",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0104 薄尾 4/4 · v0103 PASS · 合計 PASS",
+      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0105 薄尾 3/3 · v0104 PASS · 合計 PASS",
       "scope": "VDF 鏈跑器 0c 獨立性:沿薄尾鏈取文看依賴(薄尾繼承的依賴不再看不見)· 單向讀取豁免冊比對 · 真樹 ENG063 / ENG094 已審 · 未審 0(R39 · VCGC-REQ094)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
@@ -628,6 +630,18 @@
         "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
       ],
       "timeout_seconds": 300
+    },
+    "vrn_chain_runner": {
+      "argv": [
+        "CGC_MDL172_VRNChainRunner",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL172_VRNChainRunner v0108 薄尾 3/3 · v0107 PASS · 合計 PASS",
+      "scope": "VRN 鏈跑器每節點印 [進度] 開始 / k/N 完成(執行緒鎖)給 via-realtest 進度條算百分比 · 前版 v0107 全過(R42 · VCGC-REQ098)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL172_VRNChainRunner_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -1300,6 +1314,20 @@
       "state": "VERIFIED",
       "case": "progress_journal",
       "receipt": "docs/handoff/evidence/progress_journal.json"
+    },
+    {
+      "id": "VCGC-REQ098:vrn_chain_runner",
+      "requirement": "VCGC-REQ098",
+      "state": "VERIFIED",
+      "case": "vrn_chain_runner",
+      "receipt": "docs/handoff/evidence/vrn_chain_runner.json"
+    },
+    {
+      "id": "VCGC-REQ098:vdf_chain_runner",
+      "requirement": "VCGC-REQ098",
+      "state": "VERIFIED",
+      "case": "vdf_chain_runner",
+      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
     }
   ]
 }
