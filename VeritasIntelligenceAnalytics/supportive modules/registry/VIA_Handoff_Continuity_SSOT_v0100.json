@@ -414,12 +414,13 @@
         "VRN_ENG393_DocClassVerify",
         "--selftest"
       ],
-      "success_marker": "[VRN_ENG393 v0101 前綴格不當掉] 自測 7/7 PASS",
-      "scope": "VRN 文件五類分類(個股 · 產業展望 · 新聞摘要 · 其他投資 · 其他→複核)+ 首頁文字 / 表格還原 + 亂數三格乘積多法互核(種子入冊 · 兩輪 · 含 0 逐格下鑽)(R35 · VRN-REQ009) · v0101 只有幣別前綴的格子不再讓 verify 當掉(R36 工作站實錄 IndexError)",
+      "success_marker": "[VRN_ENG393 v0101 前綴格 · 主標題] 自測 15/15 PASS",
+      "scope": "VRN 文件五類分類(個股 · 產業展望 · 新聞摘要 · 其他投資 · 其他→複核)+ 首頁文字 / 表格還原 + 亂數三格乘積多法互核(種子入冊 · 兩輪 · 含 0 逐格下鑽)(R35 · VRN-REQ009) · v0101 只有幣別前綴的格子不再讓 verify 當掉(R36 工作站實錄 IndexError) · 首頁主標題改用版面字級(字最大 · 不含股名代碼 · 無句號;R36)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py",
         "supportive modules/registry/VIA_VRN_DocClass_SSOT_v*.json",
-        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json"
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py"
       ],
       "timeout_seconds": 1200
     },
@@ -996,6 +997,21 @@
       "state": "VERIFIED",
       "case": "vrn_docclass",
       "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VRN-REQ009:page1-main-title",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_docclass",
+      "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VRN-REQ009:title-rule-workstation",
+      "requirement": "VRN-REQ009",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "主標題新判法只在合成首頁與容器樣本驗過;真實 306 件在工作站 C:\\測試樣本報告",
+      "next": "git pull 後 via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → 比對待複核數(前次 218)與 MS 九份是否不再誤標"
     }
   ]
 }
