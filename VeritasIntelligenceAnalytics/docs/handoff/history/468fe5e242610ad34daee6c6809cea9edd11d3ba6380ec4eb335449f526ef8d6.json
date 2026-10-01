@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T20:18:05+00:00",
+  "at": "2026-09-30T14:01:37+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -141,13 +141,6 @@
       "topic": "CI「VIA Master Control UI」反覆紅一口氣根治(半途合併 · Windows 連線重置)"
     },
     {
-      "id": "VCGC-REQ091",
-      "state": "PARTIAL",
-      "owner": "操作員(Windows 實測)",
-      "next": "操作員:Windows 上實測 autostart 背景脫離(DETACHED_PROCESS)與第一次自動開頁;沒問題轉 COVERED",
-      "topic": "碰到 VCGC 就自動開監控 · VCGC ↔ 子系統 AUTO SYNC"
-    },
-    {
       "id": "host-live",
       "requirement": "VCGC-REQ028",
       "state": "BLOCKED",
@@ -226,16 +219,6 @@
       "owner": "操作員(倉庫設定)",
       "reason": "半途合併(#380 · #383)要在倉庫層擋:AI 沒有改倉庫設定的權限",
       "next": "GitHub → Settings → Branches → main:Require status checks to pass before merging,勾 Windows bundled Chromium UAT"
-    },
-    {
-      "id": "VCGC-REQ091:entry",
-      "requirement": "VCGC-REQ091",
-      "state": "BLOCKED",
-      "case": "entry",
-      "receipt": "docs/handoff/evidence/entry.json",
-      "owner": "操作員 / Windows 主機",
-      "reason": "VCGC 自動開監控(背景 watch · pid 鎖 · 閒置自停)只在 Linux 雲端實測;Windows PS 操作台 / pythonw 背景行程未實測(REQ091 PARTIAL)",
-      "next": "在 Windows 跑 via-vcgc 任一動詞 → 確認 stderr 一行 [監控] 與 VeritasIntelligenceAnalytics/.panorama/watch.pid;再 via-vcgc monitor stop;收據回填後轉 VERIFIED"
     }
   ],
   "reusable_successes": [
@@ -263,138 +246,108 @@
     "VCGC-REQ087:deck-rst",
     "VCGC-REQ085:base-380",
     "VCGC-REQ084:codex378-numbering",
-    "VCGC-REQ084:codex378-activation",
-    "VCGC-REQ088:monitor",
-    "VCGC-REQ089:monitor",
-    "VCGC-REQ090:monitor",
-    "VCGC-REQ091:monitor",
-    "VCGC-REQ092:monitor",
-    "VCGC-REQ093:entry"
+    "VCGC-REQ084:codex378-activation"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "2116e13dd32fb870739b8fb130212d8cbe9a6d94ebaaac56bf579d1e80dd88d2"
+      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
     },
     "VCGC-REQ075:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "0aaf4a142a6c12216d4983fd0330ef0f63eab0d7948e28ba7ade79f383b15475"
+      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "4362f521af4987e5d01d19dc6fb3ab0fde8991def7fefcd10c1a4295477b2b14"
+      "sha256": "6164c32c45d0b5061a299facd5e6424464b32ddb10cd21613a4ff08af6dc4b9c"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
-      "sha256": "9805948db4319a427f9334c9e1b7e47b30b1a81719817ed6b8f96b3a7ae027a7"
+      "sha256": "51a0a6acb5e34a1743713c3b4e45f42c5b1ac56f03ee8e9223f8b3fe6e00855e"
     },
     "VRN-REQ007:provenance": {
       "path": "docs/handoff/evidence/provenance.json",
-      "sha256": "5b235a2354a4c0d4b5ef5e3725f038969441932b0ff3fd99868e49ae2de46fe2"
+      "sha256": "fc7b9d4790894718579bbee2b574728ca96662a31755d32bbd88d10f2313e7f1"
     },
     "VCGC-REQ075:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "d34a7e8331cc325cff46520fd082d55f8fb4be60a553547756338c37639c01db"
+      "sha256": "32dfe7c9a6c81581198d1a4ce60d809a733175cc33ce521c1b034083e2549528"
     },
     "VCGC-REQ077:panorama": {
       "path": "docs/handoff/evidence/panorama.json",
-      "sha256": "599cee656690abbc24f7a9cbbf8a8e4dda19d77c5f5992085608712bf52c2170"
+      "sha256": "54e8cf44575326ab985fff5a867590f4b7556e728a63a052db1039b3bb623f3c"
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "4362f521af4987e5d01d19dc6fb3ab0fde8991def7fefcd10c1a4295477b2b14"
+      "sha256": "6164c32c45d0b5061a299facd5e6424464b32ddb10cd21613a4ff08af6dc4b9c"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "d34a7e8331cc325cff46520fd082d55f8fb4be60a553547756338c37639c01db"
+      "sha256": "32dfe7c9a6c81581198d1a4ce60d809a733175cc33ce521c1b034083e2549528"
     },
     "VCGC-REQ079:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "0aaf4a142a6c12216d4983fd0330ef0f63eab0d7948e28ba7ade79f383b15475"
+      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
     },
     "VCGC-REQ081:token": {
       "path": "docs/handoff/evidence/token.json",
-      "sha256": "9780b4d734771f12a135979470e380ecf891edcf7a3a27acd851280b3c5ef579"
+      "sha256": "a57345667943ed4e91c5be12797ba8f3c476d9316bccc886139ca838d1dc8d50"
     },
     "VCGC-REQ082:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "0aaf4a142a6c12216d4983fd0330ef0f63eab0d7948e28ba7ade79f383b15475"
+      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
     },
     "VCGC-REQ075:reuse-glob": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "2116e13dd32fb870739b8fb130212d8cbe9a6d94ebaaac56bf579d1e80dd88d2"
+      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "4362f521af4987e5d01d19dc6fb3ab0fde8991def7fefcd10c1a4295477b2b14"
+      "sha256": "6164c32c45d0b5061a299facd5e6424464b32ddb10cd21613a4ff08af6dc4b9c"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "5c06236d23cdfce2fdaf2c2520864c1a53f83a54b611f0f6151ccc8120ada9a8"
+      "sha256": "f09d07249b4f97f073420c5a6b4999591808d7923574a7e11b2a9b00e56305a3"
     },
     "VCGC-REQ084:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "0aaf4a142a6c12216d4983fd0330ef0f63eab0d7948e28ba7ade79f383b15475"
+      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
     },
     "VCGC-REQ084:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "2116e13dd32fb870739b8fb130212d8cbe9a6d94ebaaac56bf579d1e80dd88d2"
+      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "22bb7e3a566de9cb6acdef049989c06d63d71b0b08a11f512f1b67bf16f90263"
+      "sha256": "88678d46f8816c75353034b90d16fd8984510dcedc2078b93a008579343472c9"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "22bb7e3a566de9cb6acdef049989c06d63d71b0b08a11f512f1b67bf16f90263"
+      "sha256": "88678d46f8816c75353034b90d16fd8984510dcedc2078b93a008579343472c9"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
-      "sha256": "03f94003e89da9deaf2b858d234f98abb4d312495dfcedab53a16c6c42afbb7b"
+      "sha256": "7c42f05725dd892818717aaa80df636cd4ca54d90f9da371664452c1fd18e5ae"
     },
     "VCGC-REQ086:fullcheck": {
       "path": "docs/handoff/evidence/fullcheck.json",
-      "sha256": "82dfc19cf8f0c6370e04153217919605255834b26dbfe3b887b797161b417d0f"
+      "sha256": "5588f502cb2d1477bcddf956e5d56efcc0068570f652a797ebf22a1cd71e66cb"
     },
     "VCGC-REQ087:deck-rst": {
       "path": "docs/handoff/evidence/deck.json",
-      "sha256": "31eebf8835735bbbb6b68545cd76cce6d50fac581cfadf26ec984e568e6d2e80"
+      "sha256": "21d27f1f55f5f8e2214d97df24c7c5a7d232a1e7926a6b332d525fed700e5ca5"
     },
     "VCGC-REQ085:base-380": {
       "path": "docs/handoff/evidence/vdfstart.json",
-      "sha256": "4c56efc23563b8a88c119fcf887da4c62bf0cf90615accef58e1059b39559b57"
+      "sha256": "f8170bd32a0a433e63bc39fa23d7dd80011456c135b64b16c0bae3d1acc7629d"
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "4362f521af4987e5d01d19dc6fb3ab0fde8991def7fefcd10c1a4295477b2b14"
+      "sha256": "6164c32c45d0b5061a299facd5e6424464b32ddb10cd21613a4ff08af6dc4b9c"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "5c06236d23cdfce2fdaf2c2520864c1a53f83a54b611f0f6151ccc8120ada9a8"
-    },
-    "VCGC-REQ088:monitor": {
-      "path": "docs/handoff/evidence/monitor.json",
-      "sha256": "936e274152c321671ea1d3f8a958cc229a3b5a762e37901acb9cbe84d7c49bc8"
-    },
-    "VCGC-REQ089:monitor": {
-      "path": "docs/handoff/evidence/monitor.json",
-      "sha256": "936e274152c321671ea1d3f8a958cc229a3b5a762e37901acb9cbe84d7c49bc8"
-    },
-    "VCGC-REQ090:monitor": {
-      "path": "docs/handoff/evidence/monitor.json",
-      "sha256": "936e274152c321671ea1d3f8a958cc229a3b5a762e37901acb9cbe84d7c49bc8"
-    },
-    "VCGC-REQ091:monitor": {
-      "path": "docs/handoff/evidence/monitor.json",
-      "sha256": "936e274152c321671ea1d3f8a958cc229a3b5a762e37901acb9cbe84d7c49bc8"
-    },
-    "VCGC-REQ092:monitor": {
-      "path": "docs/handoff/evidence/monitor.json",
-      "sha256": "936e274152c321671ea1d3f8a958cc229a3b5a762e37901acb9cbe84d7c49bc8"
-    },
-    "VCGC-REQ093:entry": {
-      "path": "docs/handoff/evidence/entry.json",
-      "sha256": "0aaf4a142a6c12216d4983fd0330ef0f63eab0d7948e28ba7ade79f383b15475"
+      "sha256": "f09d07249b4f97f073420c5a6b4999591808d7923574a7e11b2a9b00e56305a3"
     }
   },
   "state": {
@@ -415,8 +368,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0109.json": "e68803a8c2950cb21dcb9e9cfaa3744d046320fa92affbe980c3b846432854dc",
       "supportive modules/registry/VIA_Requirements_SSOT_v0110.json": "c638719588eccecc993874522a5489faaa12276ce4af603ba0f0a170808bea2e",
       "supportive modules/registry/VIA_Requirements_SSOT_v0111.json": "d99607851c4be6d8c206eaf73326bcc245cf0575ca53eda30a6aaeb01b5703bf",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0112.json": "ce5c8d317cac482e4426a8d9cb187700866149e5214e99087073009fe3941d15",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0113.json": "a75d44b9577c2a590395fb9fddb2a10171f9bb539b6038f7afcb42c6353747a2",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_VAP_SSOT_v0100.json": "f6637fa62be61763f6d8711cbeddf3c089595171f1523ca175f542fc2b7f7955",
@@ -426,14 +377,12 @@
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0103.json": "0000b6bda9e207599b8d05fa67e1e77250d54a2a2fe7e9cfc050a62dad003935",
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0104.json": "7601f4db7d73280beb9e6e976356459364fe73856d39e098bfe033234093ba72",
       "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0105.json": "9a2c8fb30dc666a779ae5ed271724aa68a6ad7d4376f95f4bed7804b5347f6c6",
-      "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0106.json": "732153a96230ff443bae6264f8f768d0cfefb054c6d74ec82e81d654ac10e328",
-      "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0107.json": "089b30b70ccd0912a51e3b2a42370ee35a580b86080d782f6fbbd9cea97a1dc3",
       "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0100.json": "0c4c5bc77a34b184a7211b4c82dff63d743eadae014d41b9d6926cb632c5039b",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0100.json": "369ca6e8af6385c083b6180bdbb110eafcc8abc75b90a4fa6e5873a907e16aaf",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "2d50c8513e2dca6e8517cff19cf712310a4cd1ff63defa859afcd48e3db5f774",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "e48799fc055e2bab574e5a202a95dfe77c7491bbf3673c4687b0626002c1da23",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -2684,9 +2633,6 @@
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0178.py": "0bc6033b599d3f393b8d6b889076af52295201213be74afcf8df55e2d17aaaac",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py": "ccf6b8379088f97b106bf4d268f04c1f9f929537d740b6af6fe60986a97d9ad4",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py": "98c85bf824d020b2705d04102e87a5ee02fcc25e80e26bb60134e128429ddce3",
-      "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py": "34b5a76ed498a00a6a600a608464effd3ad8ee5cefbae4e8ba280d9b5246a499",
-      "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py": "88b25a22743a85bff8efcfb74f14fd93b95278dc34ab08fcf3371a44064eed58",
-      "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py": "0957df63eeae06aa079e20f01f5e2ddd5f3337005ccda7181efa2961a6c05043",
       "supportive modules/registry/CGC_MDL149_WorkflowMatrix_v0100.py": "f944bcdfaf9c94640263579778078137906dccf8ca414f1393deed46d3a4dcd3",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0100.py": "1afa4d0e30eaffc395f036ece954701fdb5850f23ffca0f6eef659232888ec1d",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0101.py": "5cb90bec6d4a1138d4883066371993c117bbb15527088ffbb74d0171be4a423b",
@@ -2982,11 +2928,6 @@
       "supportive modules/registry/VIA_DefTestAudit_v0101.py": "66ea796d4c9e93a5312f5dc8b281298e2812fc263dc5e92b062c9ec4acd728be",
       "supportive modules/registry/VIA_DefTestAudit_v0102.py": "fbb28210d75adb417050803fb9f389bb8edf79958d1f59113fd85d73c033675b",
       "supportive modules/registry/VIA_GovernanceParameterControl_v0115D.py": "4d32804f2354046c5e80972124317673c6c39a1bc666c88275538af5e5079826",
-      "supportive modules/registry/VIA_Panorama_v0100.py": "e74225e8689972d00b48772d826d8fcafb8baef64b0221bbdeda582690ec79d6",
-      "supportive modules/registry/VIA_Panorama_v0101.py": "947d6a4ff1db500b3774c961130ffa3030292bf2ce93c660aefe1f112ba0393a",
-      "supportive modules/registry/VIA_Panorama_v0102.py": "24b702e0824ade7d9a83a7e0dae9b2675a4361cab210cc057f16df05eb64becd",
-      "supportive modules/registry/VIA_Panorama_v0103.py": "cec38d2827c54eed121d3870f00de4e3b43162123e627becc922fc807ef2ad72",
-      "supportive modules/registry/VIA_Panorama_v0104.py": "a0dac74c06b71ab5e8e53ed3c7f8a8a6615280a5cdca56708317aff850afdea3",
       "supportive modules/registry/VIA_RegistryCore_v1.py": "fb8073a837da469d2b223ff6323d284b20f3114667474e80ff1c05f8a24a01cf",
       "supportive modules/registry/VIS_InstallHealthRegistry.py": "1d818853dce870de2001b68284a11279d9cc627d2b38fea15f65e228bcc07a98",
       "supportive modules/registry/pdf_system_minimal_sha05d91c1fe009.py": "1fb43240fed13c3ec9251883f5db1a3308b69999695a4755b1da6ee2fa1ea9f7",
@@ -3184,10 +3125,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0100.json": "f2581eca4b5050ab035455ca4b80f84069ae9d71edc21e43f2f307c10549def2",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0101.json": "da5d101becb50ed3851fef190e7649fcb45f6f0afb62c550183d1a01f52899f3",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0102.json": "2f7ac956534217a03281a4a5b9fc4b69f475efb635d6ccefc2ab12e80c8d96a5",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0103.json": "3c0574c2898aab9dfecc8d4d2263acd3fb5b4e6d9c857893448a1a7246af487c",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0104.json": "810bae276014177ea382c77505c71e5b0b0b0f86676e8992245e7f77210efcbc",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0105.json": "1b9f9cb571f351bc4c1b7c33f3822ae48865755f9de6f3e02b0276d38181f7dd",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0106.json": "9270f55ff5f23f8d8de556d4831aa769e1f8fa0311a2c40b6c4954201593212c"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0103.json": "3c0574c2898aab9dfecc8d4d2263acd3fb5b4e6d9c857893448a1a7246af487c"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4430,66 +4368,6 @@
           "VIA_VCGC_FunctionInventory_SSOT_v0103.json",
           "docs/VIA_S20260930b_VCGCChain.md"
         ]
-      },
-      "VCGC-REQ088": {
-        "definition": "ecf1e7112c3ab363935dbfbbfe19dfb45c34de47fe7e75591157acc1cfe647d1",
-        "status": "COVERED",
-        "next": null,
-        "owner": null,
-        "topic": "VIA_Panorama 萬用全景引擎(只讀 · 省 Token 卡 · 矩陣報告)+ panorama-matrix 技能",
-        "homes": [
-          "VCGC-WKF012"
-        ]
-      },
-      "VCGC-REQ089": {
-        "definition": "29edd0349b8cc5bc9f8cdc0805a2a8951a18e29e14e1b6e88e9953def897f030",
-        "status": "COVERED",
-        "next": null,
-        "owner": null,
-        "topic": "即時現況儀表板(無 server · 淺色 · 小字 · 緊湊 · LIVE LOG · 交接報告 · Plotly)",
-        "homes": [
-          "VCGC-WKF012"
-        ]
-      },
-      "VCGC-REQ090": {
-        "definition": "e65689e9a95dd18d0b6d0e53a226a8271e8a49006c2398dde5ebc5cc9c223695",
-        "status": "COVERED",
-        "next": null,
-        "owner": null,
-        "topic": "全函式記錄 + 教訓學習(LESSONS LEARNED)+ 八個本機免費函式庫",
-        "homes": [
-          "VCGC-WKF012"
-        ]
-      },
-      "VCGC-REQ091": {
-        "definition": "6fc8f73d295f20be1c97c70fc2fbbf0026dfa07211f27a40f0f1ed704677c148",
-        "status": "PARTIAL",
-        "next": "操作員:Windows 上實測 autostart 背景脫離(DETACHED_PROCESS)與第一次自動開頁;沒問題轉 COVERED",
-        "owner": "操作員(Windows 實測)",
-        "topic": "碰到 VCGC 就自動開監控 · VCGC ↔ 子系統 AUTO SYNC",
-        "homes": [
-          "VCGC-WKF012"
-        ]
-      },
-      "VCGC-REQ092": {
-        "definition": "e80631889b7df452071334d727a1bd915720d63f3fadd0d4c065376738f5c181",
-        "status": "COVERED",
-        "next": null,
-        "owner": null,
-        "topic": "交接閘(AI STATE gate)+ 工作流冊流程圖(Plotly 視覺化)",
-        "homes": [
-          "VCGC-WKF012"
-        ]
-      },
-      "VCGC-REQ093": {
-        "definition": "9bac6ea562549df9b83ef88e0261af8287baf67e885ede935485030cf7bb6143",
-        "status": "COVERED",
-        "next": null,
-        "owner": null,
-        "topic": "VCGC 一個指令掌控收尾並同步 GitHub(closeout)",
-        "homes": [
-          "VCGC-WKF012"
-        ]
       }
     }
   },
@@ -4534,11 +4412,7 @@
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
-    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
-    "supportive modules/registry/VIA_Panorama_v0104.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py"
+    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -4807,68 +4681,13 @@
       "state": "VERIFIED",
       "case": "activation",
       "receipt": "docs/handoff/evidence/activation.json"
-    },
-    "VCGC-REQ088:monitor": {
-      "id": "VCGC-REQ088:monitor",
-      "requirement": "VCGC-REQ088",
-      "state": "VERIFIED",
-      "case": "monitor",
-      "receipt": "docs/handoff/evidence/monitor.json"
-    },
-    "VCGC-REQ089:monitor": {
-      "id": "VCGC-REQ089:monitor",
-      "requirement": "VCGC-REQ089",
-      "state": "VERIFIED",
-      "case": "monitor",
-      "receipt": "docs/handoff/evidence/monitor.json"
-    },
-    "VCGC-REQ090:monitor": {
-      "id": "VCGC-REQ090:monitor",
-      "requirement": "VCGC-REQ090",
-      "state": "VERIFIED",
-      "case": "monitor",
-      "receipt": "docs/handoff/evidence/monitor.json"
-    },
-    "VCGC-REQ091:monitor": {
-      "id": "VCGC-REQ091:monitor",
-      "requirement": "VCGC-REQ091",
-      "state": "VERIFIED",
-      "case": "monitor",
-      "receipt": "docs/handoff/evidence/monitor.json"
-    },
-    "VCGC-REQ091:entry": {
-      "id": "VCGC-REQ091:entry",
-      "requirement": "VCGC-REQ091",
-      "state": "BLOCKED",
-      "case": "entry",
-      "receipt": "docs/handoff/evidence/entry.json",
-      "owner": "操作員 / Windows 主機",
-      "reason": "VCGC 自動開監控(背景 watch · pid 鎖 · 閒置自停)只在 Linux 雲端實測;Windows PS 操作台 / pythonw 背景行程未實測(REQ091 PARTIAL)",
-      "next": "在 Windows 跑 via-vcgc 任一動詞 → 確認 stderr 一行 [監控] 與 VeritasIntelligenceAnalytics/.panorama/watch.pid;再 via-vcgc monitor stop;收據回填後轉 VERIFIED"
-    },
-    "VCGC-REQ092:monitor": {
-      "id": "VCGC-REQ092:monitor",
-      "requirement": "VCGC-REQ092",
-      "state": "VERIFIED",
-      "case": "monitor",
-      "receipt": "docs/handoff/evidence/monitor.json"
-    },
-    "VCGC-REQ093:entry": {
-      "id": "VCGC-REQ093:entry",
-      "requirement": "VCGC-REQ093",
-      "state": "VERIFIED",
-      "case": "entry",
-      "receipt": "docs/handoff/evidence/entry.json",
-      "owner": "AI(VCGC closeout)",
-      "reason": "closeout 已入 v0182/v0183,等 entry 案(主控台自測鏈)本輪實測",
-      "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
     }
   },
   "summary": {
-    "requirements": 119,
-    "watched_files": 2789,
-    "pending": 31,
-    "reusable": 31,
+    "requirements": 113,
+    "watched_files": 2774,
+    "pending": 29,
+    "reusable": 25,
     "findings": 0
   }
 }
