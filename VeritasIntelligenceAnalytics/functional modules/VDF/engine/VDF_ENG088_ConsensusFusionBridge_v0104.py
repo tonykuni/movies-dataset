@@ -53,8 +53,9 @@ try:
             _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
             break
         _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
 except Exception:
-    pass
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 # ===== [VIA:NET-BRIDGE:v0100] 統包網路工具橋(批115 VDF 全導入令;graceful 零行為變更) =====
 VIA_NET_TOOL_PATH = None

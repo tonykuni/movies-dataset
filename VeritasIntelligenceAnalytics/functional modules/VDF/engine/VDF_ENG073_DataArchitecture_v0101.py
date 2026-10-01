@@ -72,6 +72,18 @@ try:
         _nb_p = _nb_p.parent
 except Exception:
     VIA_NET_TOOL_PATH = None
+def _via_net():
+    """統包唯一網路工具惰性載入(法遵雙閘 VIA_NET_CONSENT);缺席回 None(誠實)"""
+    if VIA_NET_TOOL_PATH is None:
+        return None
+    try:
+        import importlib.util as _nb_ilu
+        _nb_spec = _nb_ilu.spec_from_file_location("VIA_NET_UNIFIED", VIA_NET_TOOL_PATH)
+        _nb_mod = _nb_ilu.module_from_spec(_nb_spec)
+        _nb_spec.loader.exec_module(_nb_mod)
+        return _nb_mod
+    except Exception:
+        return None
 # ===== [VIA:NET-BRIDGE:END] =====
 import html
 import json

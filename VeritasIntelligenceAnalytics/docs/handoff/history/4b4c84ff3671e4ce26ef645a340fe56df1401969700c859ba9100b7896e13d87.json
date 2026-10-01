@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T13:57:13+00:00",
+  "at": "2026-10-01T13:24:14+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -426,22 +426,6 @@
       "owner": "操作員",
       "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
       "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
-    },
-    {
-      "id": "VCGC-REQ092:ps-parse-errors",
-      "requirement": "VCGC-REQ092",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
-      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可"
-    },
-    {
-      "id": "VCGC-REQ092:accel-real-use",
-      "requirement": "VCGC-REQ092",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
-      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
     }
   ],
   "reusable_successes": [
@@ -491,8 +475,7 @@
     "VRN-REQ013:field_rulers",
     "VRN-REQ014:vrn_entities",
     "VRN-REQ015:layout-v0101",
-    "VRN-REQ016:vrn_plugin_hub",
-    "VCGC-REQ092:tool_coverage_matrix"
+    "VRN-REQ016:vrn_plugin_hub"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -505,7 +488,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "fbab045563ebed02819cbc529d51857050b57e56e113d8a81c1009a9d3ca7dd0"
+      "sha256": "ed4251d40ded36871c1aa0debab9a5eac35880c440fe355c720185f1a03cf3e9"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -525,7 +508,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "fbab045563ebed02819cbc529d51857050b57e56e113d8a81c1009a9d3ca7dd0"
+      "sha256": "ed4251d40ded36871c1aa0debab9a5eac35880c440fe355c720185f1a03cf3e9"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -549,7 +532,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "fbab045563ebed02819cbc529d51857050b57e56e113d8a81c1009a9d3ca7dd0"
+      "sha256": "ed4251d40ded36871c1aa0debab9a5eac35880c440fe355c720185f1a03cf3e9"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -565,11 +548,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "3602b576613b49b05fc664f82928b5af447f5d7df5011106c5975a4c0b37e0f1"
+      "sha256": "b0ef219a7f2885af2af13998c451976c3e2eceb8dbf36bfe5914e56047de1da5"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "3602b576613b49b05fc664f82928b5af447f5d7df5011106c5975a4c0b37e0f1"
+      "sha256": "b0ef219a7f2885af2af13998c451976c3e2eceb8dbf36bfe5914e56047de1da5"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -589,7 +572,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "fbab045563ebed02819cbc529d51857050b57e56e113d8a81c1009a9d3ca7dd0"
+      "sha256": "ed4251d40ded36871c1aa0debab9a5eac35880c440fe355c720185f1a03cf3e9"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -682,10 +665,6 @@
     "VRN-REQ016:vrn_plugin_hub": {
       "path": "docs/handoff/evidence/vrn_plugin_hub.json",
       "sha256": "2df857a2347030dc47709314bed5afaa36740e78380df4549cef0ca92aaf2d20"
-    },
-    "VCGC-REQ092:tool_coverage_matrix": {
-      "path": "docs/handoff/evidence/tool_coverage_matrix.json",
-      "sha256": "52d47fdfe4c96a12fb0da6e998b57d8412ad04f3e53ce405bb984c458617d9b1"
     }
   },
   "state": {
@@ -714,7 +693,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0117.json": "3983c699c1aac4ff72ddbb1157e402866ef252f9627d62fa3677ef2a855ac24f",
       "supportive modules/registry/VIA_Requirements_SSOT_v0118.json": "b4e6a90a8ca658ce7ff8c1bd36aea572e185f528b551f97ae6a7ba5f3593de02",
       "supportive modules/registry/VIA_Requirements_SSOT_v0119.json": "88d6961002e12fec7ac53614609e29c7f1eaa6644c4633fe73aa235b511ec8de",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0120.json": "0cd859665f55a121ad1a09c2c49ef25d733cf61860eddce590953ac10a05773d",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -730,7 +708,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "176e5261c2b1b8ed11547378b2f860841a53034d60e2b4ab7e7cc2a9d20f3d8f",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "ea86430818792561dd38f2c0ea179a501f790b16848a56cd2304e111c59628d3",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -1762,7 +1740,7 @@
       "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0103.py": "7906a1b976a27ee63ea36521745472deb06160ee2fe23cad49e0ab4ac4e94503",
       "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0104.py": "98423c03d147edd58bec0a8a6cbd7dc5d46f39a55f44e0536dd19bd0642966bc",
       "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py": "6c84a0941e5b165c40919f2a19d0f9e611f6ffe96dffecfd846754e7ee34b119",
-      "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "f6e19a1a772ef1d529759a75a6d54ec1a0f993cc6b7160cd8aae1800eaed936f",
+      "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "e550c05aaeb92885ceb73020b43a1e50691d7605cfd80e8a2c426103f26d0fb1",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0100.py": "4e0aa48af571f7527e4b11a1c477f1ffdf4354a7a316ec696f24f5ee58032dee",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0101.py": "2cf165a184ed5f337c86510955d0643727c274f7030321f615465805349b6bc7",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0102.py": "2ca5dee1c091669f40f41b291bd575350e4de24232228a283d233e10020a9945",
@@ -1835,7 +1813,7 @@
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0101.py": "009207a81d3e6f90dd6e63ee82ee70588c9b1872aa4a83dd62daf5c2b4423b52",
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0102.py": "0e73a37bc7d4abfbdb13442b8258fb5180a8b125bb96ec9483263d8fdcb7fb2e",
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0103.py": "c0829d5100eaed1f8cf32764b62240f81c9b204d230858edc55f4f6f9c68b1c4",
-      "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0104.py": "68c0013014cea5fd67e461ef9f521044bb622f85ff87655129f198328e967ee5",
+      "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0104.py": "339e2a1a5742b2d57baf318cc046844eb0a0f18fc2af71c170f48cb87b6af576",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0100.py": "7693732466ce8c47c7ac6f68743546d7dd8702d6af9a7ef516481cf1c681e873",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0101.py": "8aa0843040336e666e8c1ff1f20fd3aee10be98d54ea6d777fc7b6fed22b46e2",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0102.py": "2d44a36922a99031c42524a68d4eec82f882e39bb86ba08683f8c8d36053daf3",
@@ -1964,7 +1942,7 @@
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_tdcc.py": "2b43d2af980012191097bd18f8ceac637df43cc4e07019ffeacf5a6104bf3623",
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_supportive_bridge.py": "0a7c2caf87a6e4b1c60f1681c8a82cf34b30172c3e403166313932dd3b5b053b",
       "functional modules/VDF/references/intake/vdf_fetchers_financials_b504/vdf_fetchers_financials.py": "eef127506ca903303fad04311a61516d32585b3e31b2425696f39eddba12a071",
-      "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py": "62147db7199d6b7b0f7a62d9f3c89b346670befd46f918e1170df8b308aba057",
+      "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py": "690cd34e0fe38a5d9ef247915ae124d26be6c2a16e4cae23b19ae5b33cda13ec",
       "functional modules/VDF/vdf_input_matrix_v0100.py": "9675c402e2dd7cb2ae706afefb1aa66ca6f29961f8f3953de46ac40de295ecf0",
       "functional modules/VDF/vrn_financialdata_staging_extraction_store_v029vrn1d_sha35458a11a7b7.py": "2d1ad2de184ea3ce909a8572f3caec210bc781136c2a452f5d04230fe6100909",
       "supportive modules/registry/CGC_MDL023_AutoCodeRegistryEngine.py": "9e50392716428066fabf08f81cbdbb8e9695119ac9c4a35d3dcf2f031b7d6cf8",
@@ -2478,7 +2456,7 @@
       "supportive modules/registry/CGC_MDL071_Namereg_v0102.py": "a970417a0f0bbc56ab604b4c2d2dc1d2e49e91ade6f32ab71d344d9bff53eb2c",
       "supportive modules/registry/CGC_MDL072_ProductUi_v0100.py": "d00d5828ebbca37b764b23a304755da621752bcbb97a2fa5dbe56de1846ff8d7",
       "supportive modules/registry/CGC_MDL073_EngineCatalog_v0100.py": "2d0b32563f83b53dca42ccbaa8bcf9cfd3b69f6e6969873882e5091394fd35a7",
-      "supportive modules/registry/CGC_MDL074_AccelBridge_v0100.py": "84497b622aeb2b5c8e573d31f41af4467f2a283340ca424f6f4d49c1a915e853",
+      "supportive modules/registry/CGC_MDL074_AccelBridge_v0100.py": "df430a6f955c59ce9d38a106ca3225979d19a1de4dfc83a4654a1a19b9734ea9",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0100.py": "c49e9cb445460b6dc6f8dafd17f767421217167d4ceed8bf29789c2aab40b432",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0101.py": "5a1ef9ce86ade8137c975df9b889b9a675a04ab0e6ef90007e34faea9a97ae95",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0102.py": "08016a3d988125fba63dd1677ebf07326cbd59201067ecef644655bc8787c433",
@@ -3132,7 +3110,7 @@
       "supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py": "4e8ea80b81864a6f0da6ee8ecb5e362eda2ce62988aa3cae3e75336dc6688ac8",
       "supportive modules/registry/CGC_MDL188_BatchResultReport_v0100.py": "38b437a270bc9b6f80d6b53e4f1fa8c41d02adf7da0bd4b9dcdbd97f54d450c1",
       "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0100.py": "e81bda677b8550539aeef2cc7c7ef8c71d27ab3ccac74708f76d1d8721c6fce1",
-      "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0101.py": "09e31a61e1ed906211d79af717a9029b1a63162f18a5cfcc7d1255b41b75bba5",
+      "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0101.py": "618c4cac1eb8ad9959635b1d1ce17e6e3be4caa1f22e47a2cb568db64b3846f7",
       "supportive modules/registry/CGC_MDL190_TALibLock_v0100.py": "214d85460323936790a177bc51702d03beefdb76a076898aceeb7324d347d608",
       "supportive modules/registry/CGC_MDL191_KnowledgeAsset_v0100.py": "5588437771bcfb4f9e4d7759187b726284cb753f17f6a6110f183ad3ef9d6f59",
       "supportive modules/registry/CGC_MDL192_MacroParamSync_v0100.py": "990edf5dea437b5453f732ff6dd476fc27ac73f501226066c7be719cc7decf53",
@@ -3222,7 +3200,6 @@
       "supportive modules/registry/CGC_MDL229_SweepReport_v0101.py": "fdac82a73f4a7bf9b93ade2aa650a6222b09682861fb5a84276cde87b4ad1c17",
       "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0100.py": "b82497e1a4751d41355c8519eb8a298e4ff79fc77b1ab598a8fd8233177932dd",
       "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0101.py": "c706fde86a146f780a23b2d9e5b2eb3daf7ca1170f2e623e24da085bfccf0fdd",
-      "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py": "762ccc36da364be12dd3266047ceb818de505392e7d06d2beb37fb176de55a17",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0100.py": "e4cf4c57d0889871ce7b806f463685d3eb07c6af61aa668ae244c918d2f65dba",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0101.py": "f2116d81747d746303891c408d3777b8e6eadef3578a0981a020ffb9393c7c2d",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0102.py": "2bbc037fba5a926c3f34ff1aa96de086e1f81a4f310870b7d14192c6597ba128",
@@ -3304,7 +3281,7 @@
       "supportive modules/registry/pdf_system_minimal_sha05d91c1fe009.py": "1fb43240fed13c3ec9251883f5db1a3308b69999695a4755b1da6ee2fa1ea9f7",
       "supportive modules/registry/via_accel_injector_v0100.py": "6a4b59a62f8d9fa4140085413a9c2e4d04d952232cd2de61d47494ea5cd674bb",
       "supportive modules/registry/via_accel_injector_v0101.py": "1c72298f0e07e29c2c4a460f20f2565b0b05cdd1e3f07f1fe4bc4bdb694eec63",
-      "supportive modules/registry/via_accel_injector_v0102.py": "1c78f6c430dc5002c1a300eeb75a119bcb29d67e22654105d258aef74b4bf9a4",
+      "supportive modules/registry/via_accel_injector_v0102.py": "c3ba51db063abb54d13de6f524991478670e5bf929200c583099457b75a94ce9",
       "supportive modules/registry/via_bridge_sweeper_v0100.py": "2c7af7e841a7675ffe0ab9906abd1fc85883de8477e8a451849e056ce7541385",
       "supportive modules/registry/via_bridge_sweeper_v0101.py": "209bd8dab0cc542c09556ee1397aee1605b0a578a9e8349d87e596f3215a18b7",
       "supportive modules/registry/via_bridge_sweeper_v0102.py": "58397bfd5a8b90dd6089dc5d50cf6456a6e0e8ba8d65afa320635ae1061e68ea",
@@ -3505,8 +3482,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0108.json": "95a34d1f0b9a4e95e64713d1b6afc17b609809cd124e7dbccf307f607743d593",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0109.json": "f3c3c5f920db988f24ced560beb8d3b1f3907352630ce8342f848c283aa80d7e",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0110.json": "e44792f2f416aff2a1920ae4c1df8bf7923045f25c7ac3a388e1c1a28f255f95",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0111.json": "f28b7a6fa9c6e4391a9246b631a9255c17fbdcec3108a30fed445a538a8bf701",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0112.json": "04b78578a57bc48206d0d5e28a7b7b27cf0d06160f794f38a942943ded729b38"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0111.json": "f28b7a6fa9c6e4391a9246b631a9255c17fbdcec3108a30fed445a538a8bf701"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4903,16 +4879,6 @@
         "homes": [
           "VIA_VRN_PluginHub_SSOT_v0100.json"
         ]
-      },
-      "VCGC-REQ092": {
-        "definition": "ccea7dcb9c9f81f544b739a0f29f067c8c60ea98254a7191ecc83e49b4a8572d",
-        "status": "COVERED",
-        "next": "4 支 PS 檔本身 pwsh 剖析錯誤(既有,非本批):HyperBOM_SELF_CONTAINED_v2 · VRN-Fallback-Activation-v0136 · FlowSystem_SandboxPatch_v025 · v0163A OneClick-Sidebar-v0159 —— 修語法需操作員裁(L70);真用加速 API 0.7%(掛橋 ≠ 加速,改寫熱路徑才會升)",
-        "owner": "AI(橋 · 探針)· 操作員(4 支 PS 語法 · 熱路徑改寫)",
-        "topic": "全樹工具覆蓋:PS 加速器模組 · PY 加速器(含 HTML U/I MATRIX REPORT)· VDF 網路工具 · AST 探針互核 + HTML 矩陣報告",
-        "homes": [
-          "VIA_ToolCoverageMatrix_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -4977,8 +4943,7 @@
     "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py",
     "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py",
-    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
-    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py"
+    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5547,38 +5512,13 @@
       "owner": "操作員",
       "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
       "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
-    },
-    "VCGC-REQ092:tool_coverage_matrix": {
-      "id": "VCGC-REQ092:tool_coverage_matrix",
-      "requirement": "VCGC-REQ092",
-      "state": "VERIFIED",
-      "reason": "CGC_MDL230 v0102 matrix:四面非豁免缺 0 · 兩法不一致 0;補橋 PS 8 支 · PS 函式內橋移頂層 4 支 · PY 網路橋 3 支 · 空橋 / 半橋 / 字串橋修 5 支",
-      "next": "via-vcgc run --family core CGC_MDL230_ToolCoverageProbe matrix(工作站有 pwsh 時 PS 用剖析器讀)",
-      "case": "tool_coverage_matrix",
-      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
-    },
-    "VCGC-REQ092:ps-parse-errors": {
-      "id": "VCGC-REQ092:ps-parse-errors",
-      "requirement": "VCGC-REQ092",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
-      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可"
-    },
-    "VCGC-REQ092:accel-real-use": {
-      "id": "VCGC-REQ092:accel-real-use",
-      "requirement": "VCGC-REQ092",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
-      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
     }
   },
   "summary": {
-    "requirements": 128,
-    "watched_files": 2817,
-    "pending": 58,
-    "reusable": 48,
+    "requirements": 127,
+    "watched_files": 2814,
+    "pending": 56,
+    "reusable": 47,
     "findings": 0
   }
 }
