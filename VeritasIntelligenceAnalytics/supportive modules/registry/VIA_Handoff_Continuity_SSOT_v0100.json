@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T19:49:04+00:00",
+  "updated_at": "2026-10-01T19:56:09+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -93,7 +93,8 @@
     "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
     "supportive modules/registry/VIA_Panorama_v0104.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -622,9 +623,12 @@
     {
       "id": "VCGC-REQ091:entry",
       "requirement": "VCGC-REQ091",
-      "state": "PENDING",
+      "state": "BLOCKED",
       "case": "entry",
-      "receipt": "docs/handoff/evidence/entry.json"
+      "receipt": "docs/handoff/evidence/entry.json",
+      "owner": "操作員 / Windows 主機",
+      "reason": "VCGC 自動開監控(背景 watch · pid 鎖 · 閒置自停)只在 Linux 雲端實測;Windows PS 操作台 / pythonw 背景行程未實測(REQ091 PARTIAL)",
+      "next": "在 Windows 跑 via-vcgc 任一動詞 → 確認 stderr 一行 [監控] 與 VeritasIntelligenceAnalytics/.panorama/watch.pid;再 via-vcgc monitor stop;收據回填後轉 VERIFIED"
     },
     {
       "id": "VCGC-REQ092:monitor",
@@ -638,7 +642,10 @@
       "requirement": "VCGC-REQ093",
       "state": "PENDING",
       "case": "entry",
-      "receipt": "docs/handoff/evidence/entry.json"
+      "receipt": "docs/handoff/evidence/entry.json",
+      "owner": "AI(VCGC closeout)",
+      "reason": "closeout 已入 v0182/v0183,等 entry 案(主控台自測鏈)本輪實測",
+      "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
     }
   ]
 }
