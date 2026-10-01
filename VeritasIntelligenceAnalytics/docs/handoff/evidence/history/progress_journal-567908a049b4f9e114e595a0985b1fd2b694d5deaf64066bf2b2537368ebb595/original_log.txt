@@ -27,25 +27,18 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 561 · import 0 · 提及 48 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 561 · import 0 · 提及 47 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VIA_Panorama_v0105.py(家族 core)
-=== VIA_Panorama_v0105 自測(薄尾;先跑前版 v0104 → v0103 → v0102 → v0101 → 本體 v0100)===
-  VIA_Panorama_v0103 selftest 13/13 PASS
-  VIA_Panorama_v0104 selftest 11/11 PASS
-  ✓ 前版 v0104(含 v0103 · v0102 · v0101 · v0100)自測
-  ✓ 尾版不少公開名稱(TAILAPI)
-  ✓ 交接閘:checkpoint 收尾提交本身不算落後 = GREEN
-  ✓ 交接閘:有落後但程式都已登記 = YELLOW
-  ✓ 交接閘:改過的程式沒被冊點名 = RED · 列出族名 · 給收尾指令
-  ✓ 同步 GitHub:沒有上游 = 沒量(None)不假綠
-  ✓ 同步 GitHub:本機領先上游 1 = 未推 1 · 收尾指令帶 git push
-  ✓ 工作流圖:networkx 無環分層 · 引擎在 = 跟需求最差(PARTIAL 黃)· 引擎清單缺一支 = 紅
-  ✓ Plotly 圖:邊一條線 + 工作流 / 步兩組節點 · hover 帶引擎與需求
-  ✓ 儀表板:交接閘卡 · 需求冊總表 · 提交表 · 工作流圖 插在 KPI 下方
-  ✓ gate_line 一行(給 VCGC [監控] 提示)
-  ✓ 只讀:跑完目標 git 工作樹沒變
-  VIA_Panorama_v0105 selftest 12/12 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL149_VeritasCentralGovernanceCo | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL149_VeritasCentralGovernanceConsole_v0184.p | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):6 個,例 ['VCGC-REQ102', 'VCGC-REQ103' → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 48, 'changed': 20, 'stale': 0, 'expected': 14643, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · CGC_MDL251_ProgressJournal_v0100.py(家族 core)
+=== CGC_MDL251_ProgressJournal v0100 · 自測(暫存沙盒)===
+  [OK] ① 新一輪:沒有舊紀錄 → 接續 0
+  [OK] ② 中斷後重跑同一 context:前兩步接續、寫一半的尾行跳過 · {'s1': {'rc': 0}, 's2': {'rc': 2}}
+  [OK] ③ 上一輪正常跑完(_done)→ 下一次重開新一輪,不拿舊結果
+  [OK] ④ context 變了(程式改了 / HEAD 換了)→ 不接續
+  [OK] ⑤ VIA_PROGRESS=0 → 一律從頭(仍記錄)
+  [OK] ⑥ 每行帶可用記憶體欄(量不到 = None,不編造)
+  [OK] ⑦ 本機可用記憶體量得到或誠實回 None · 15319
+  [OK] ⑧ 位置:VIA_PROGRESS_DIR 優先,否則 VIA_TEMP_ROOT,否則系統暫存夾(本機,不在倉內)
+  [OK] ⑨ 加速器橋 · 網路橋在;不碰 TA-Lib
+[CGC_MDL251_ProgressJournal v0100] 自測 9/9 PASS
