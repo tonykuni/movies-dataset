@@ -104,7 +104,8 @@
     "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py",
     "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py",
     "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py",
-    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py"
+    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
+    "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -481,10 +482,24 @@
       "dependencies": [
         "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
         "supportive modules/registry/VIA_VRN_LayoutRestore_SSOT_v*.json",
-        "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
-        "supportive modules/specs/EarningsInsight_062626.pdf"
+        "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py"
       ],
       "timeout_seconds": 1200
+    },
+    "vrn_valuation": {
+      "argv": [
+        "VRN_ENG395_ValuationMethodLexicon",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG395 v0100 評價方法 SSOT] 自測 22/22 PASS",
+      "scope": "財務評價方法 SSOT:VAL_* 代碼 · 英文 / 台灣 / 香港 / 大陸分區 · 一詞一碼 · 繁簡分欄檢核 · 短縮寫大小寫敏感 · 最長詞優先 · 舊詞庫(SYNONYM_LIBRARY_v4 · ENG062)收編(R36 · VRN-REQ011)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v*.py",
+        "supportive modules/registry/VIA_VRN_ValuationMethod_SSOT_v*.json",
+        "functional modules/VRN/knowledge/SYNONYM_LIBRARY_v4.json",
+        "functional modules/VRN/VRN_ENG062_SummarizerV1*.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -958,6 +973,21 @@
       "owner": "操作員",
       "reason": "真實券商 PDF 在工作站 C:\\測試樣本報告,容器沒有;容器只驗四段 OCR 扁平文字 · 合成首頁 · 倉內 FactSet 31 頁",
       "next": "via-vcgc run --family vrn VRN_ENG394_LayoutRestore restore --in \"C:\\測試樣本報告\" --pages 1 → 看 VIA_Reports\\vrn\\layout_restore\\LAYOUT_latest.html"
+    },
+    {
+      "id": "VRN-REQ011:vrn_valuation",
+      "requirement": "VRN-REQ011",
+      "state": "VERIFIED",
+      "case": "vrn_valuation",
+      "receipt": "docs/handoff/evidence/vrn_valuation.json"
+    },
+    {
+      "id": "VRN-REQ011:eng062-adopt",
+      "requirement": "VRN-REQ011",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VRN_ENG062 摘要器仍用子字串比對 VALUATION_METHODS(pe 會中 operating、per 會中 per share);本輪只建正本與比對器,不動摘要器",
+      "next": "出 VRN_ENG062 新版尾:_detect_valuation 改叫 VRN_ENG395 Matcher.methods_in(strict)並把 VAL_* 映回舊碼"
     }
   ]
 }

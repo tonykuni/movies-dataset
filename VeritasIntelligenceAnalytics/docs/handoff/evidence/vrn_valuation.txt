@@ -30,24 +30,29 @@
 [政策] L50 全景 · 尾版 558 · import 0 · 提及 45 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0102.py(家族 core)
-  [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
-  [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
-  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0110.ps1
-  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-OperatorConsole-v0110.ps1
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261001-104741-8812', 'hub': 'go-20260930-120000-1'}
-  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
-  [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
-  [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
-  [OK] ③ sha16 把 CRLF 當 LF(工作站 autocrlf 不假變更)
-  [OK] ④ compile 在記憶體:語法錯抓到 · 橋標記與 --selftest 認得 · SyntaxError L1: invalid syntax
-  [OK] ⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新 · 沒 sha 的項(動詞)沒變不重記 · ['changed:family:A', 'added:family:C', 'removed:family:B']
-  [OK] ⑥ 燈:rc 0 綠 · 標記沒見到 黃 · yellow_rc 黃 · 其餘紅
-{"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
-[VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
-  [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0108.json · 0
-  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 91
-  [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
-  CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
-  CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
+  [via-vcgc run] [流程] 政策過 · VRN_ENG395_ValuationMethodLexicon_v0100.py(家族 vrn)
+  [OK] 正本檢核全綠(代碼 · 連號 · 一詞一碼 · 繁簡分欄 · 變體 · 舊詞庫收編)
+  [OK] 16 個方法 · 四組都有
+  [OK] 舊詞庫 6 個 canonical + ENG062 8 個 canonical 全數對到 VAL 代碼
+  [OK] 台灣:「以 2026 年預估本益比 18 倍評價」→ VAL_PE · 變體 forward
+  [OK] 大陸:「动态市盈率」→ VAL_PE · 地區 zh_cn
+  [OK] 香港 / 大陸共用「市盈率」→ 地區 zh_cn + zh_hk
+  [OK] 台灣「本益比」只標 zh_tw
+  [OK] 英文常字不誤中:per share / operating / pe / speed
+  [OK] 大寫 PER / PE 才中:「PER 15x」→ VAL_PE
+  [OK] PEG 不被 PE 吃掉
+  [OK] EV/EBITDA 不被 EV/EBIT 吃掉,反之亦然
+  [OK] 全形與空白正規化:「Ｐ／Ｅ」「P / E」→ VAL_PE
+  [OK] 最長詞優先:「本益比河流圖」→ VAL_BAND(不是 VAL_PE)· 變體 pe_basis
+  [OK] 「PE River」「股價淨值比河流圖」→ VAL_BAND
+  [OK] 混合段落依序取出 SOTP · DCF · PE
+  [OK] 需語境的詞 strict 不算:「NAV」「Dividend Yield」
+  [OK] 殖利率法 → VAL_DY;先前交易 → VAL_MA(id_alias VAL_M&A)
+  [OK] 簡體字:「市净率」「股价账面价值比」→ VAL_PB · zh_cn
+  [OK] 檢核抓錯:台灣欄混簡體字 · 大陸欄混繁體字 · 同一詞兩碼 → RED
+  [OK] 檢核抓錯:舊詞庫 canonical PE 沒對到 → RED
+  [OK] 匯出:操作員稿結構(英文 lowercase 陣列)+ case_sensitive + zh_hk
+  [OK] 帶加速器橋 · VIA_FROM_VCGC 閘 · 不匯入 TA-Lib · 不碰網路
+[VRN_ENG395 v0100 評價方法 SSOT] 自測 22/22 PASS
+  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):1 個,例 ['VRN-REQ011'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 18, 'changed': 0, 'stale': 0, 'expected': 14432, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply

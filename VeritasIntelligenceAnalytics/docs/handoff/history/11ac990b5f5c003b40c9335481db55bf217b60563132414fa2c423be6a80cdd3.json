@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T10:57:47+00:00",
+  "at": "2026-10-01T10:36:57+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -365,14 +365,6 @@
       "owner": "操作員",
       "reason": "真實券商 PDF 在工作站 C:\\測試樣本報告,容器沒有;容器只驗四段 OCR 扁平文字 · 合成首頁 · 倉內 FactSet 31 頁",
       "next": "via-vcgc run --family vrn VRN_ENG394_LayoutRestore restore --in \"C:\\測試樣本報告\" --pages 1 → 看 VIA_Reports\\vrn\\layout_restore\\LAYOUT_latest.html"
-    },
-    {
-      "id": "VRN-REQ011:eng062-adopt",
-      "requirement": "VRN-REQ011",
-      "state": "PENDING",
-      "owner": "AI",
-      "reason": "VRN_ENG062 摘要器仍用子字串比對 VALUATION_METHODS(pe 會中 operating、per 會中 per share);本輪只建正本與比對器,不動摘要器",
-      "next": "出 VRN_ENG062 新版尾:_detect_valuation 改叫 VRN_ENG395 Matcher.methods_in(strict)並把 VAL_* 映回舊碼"
     }
   ],
   "reusable_successes": [
@@ -414,8 +406,7 @@
     "VRN-REQ009:vrn_fourpoint",
     "VCGC-REQ088:ledger_union",
     "VCGC-REQ088:merge_medic",
-    "VRN-REQ010:vrn_layout",
-    "VRN-REQ011:vrn_valuation"
+    "VRN-REQ010:vrn_layout"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -428,7 +419,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0846c3e4394eaf3b4194c5577a96e422eedcfc9094790ca197d19b20efe160fb"
+      "sha256": "42187933d687d9df317e024063cd4d2f9f3fbada4cdcd371ff9eb948d5d48b78"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -448,7 +439,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0846c3e4394eaf3b4194c5577a96e422eedcfc9094790ca197d19b20efe160fb"
+      "sha256": "42187933d687d9df317e024063cd4d2f9f3fbada4cdcd371ff9eb948d5d48b78"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -472,7 +463,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0846c3e4394eaf3b4194c5577a96e422eedcfc9094790ca197d19b20efe160fb"
+      "sha256": "42187933d687d9df317e024063cd4d2f9f3fbada4cdcd371ff9eb948d5d48b78"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -488,11 +479,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "1f311c7475967a641e184a8ec9cdb3e63e5852dec677e10c4649524cef454afd"
+      "sha256": "5d2d74043e209eda8ee104181e1b039d47a4aa7dcbe87fac1dd2f47a73f470a7"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "1f311c7475967a641e184a8ec9cdb3e63e5852dec677e10c4649524cef454afd"
+      "sha256": "5d2d74043e209eda8ee104181e1b039d47a4aa7dcbe87fac1dd2f47a73f470a7"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -512,7 +503,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0846c3e4394eaf3b4194c5577a96e422eedcfc9094790ca197d19b20efe160fb"
+      "sha256": "42187933d687d9df317e024063cd4d2f9f3fbada4cdcd371ff9eb948d5d48b78"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -572,11 +563,7 @@
     },
     "VRN-REQ010:vrn_layout": {
       "path": "docs/handoff/evidence/vrn_layout.json",
-      "sha256": "f380ca2a2f21dbfa3fe5bf0681f8fb18b1f8b5e806c7640de410b212fc5c5dab"
-    },
-    "VRN-REQ011:vrn_valuation": {
-      "path": "docs/handoff/evidence/vrn_valuation.json",
-      "sha256": "329c395747c42815b80e7fb20b1d1eba028ca0cb2f72afd785808e130e10a67e"
+      "sha256": "a33a9a43ff58b298d730e44cde82cfaeda30999803839940a9c57a1a2a49c2f0"
     }
   },
   "state": {
@@ -601,7 +588,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0113.json": "33d40a021c48fb1f9b1e3561a0aff4c0bdc653cadf47f5c2d55b1a0cb61cbe64",
       "supportive modules/registry/VIA_Requirements_SSOT_v0114.json": "72ddae689365c58814d2b9752ae00173db1e1a4dfa2c6dbba2bb80ee95d9b279",
       "supportive modules/registry/VIA_Requirements_SSOT_v0115.json": "ee028de86b0cd80640f1ec732f93c151c7542ded44318f6f6a9674d715daf6e9",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0116.json": "22ffb408b728aba8d65f176ac64bab2f96c7ae0fac7e7d0df240b85cf6e08dee",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0116.json": "9b40cbbbf2a70d27b7287a7d0a7935bf7be3694c839f140af85b8db6bbb1b09a",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -617,7 +604,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "7ad7ff89f55b2457c0b35cbdc33cabef0be136e2d60652c33730cdae8b4feb20",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "71cd119f5e47175192bdd37d7a6d01c9f16b1cf8cb2f4e32f19ebef82b304415",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -979,7 +966,6 @@
       "functional modules/VRN/VRN_ENG392_TextCompleteness_v0100.py": "8fa184082104f4fb28a40f18e002045e7c138e44a78d50a39310ca5c93595312",
       "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py": "e00d4079e0614e63361ca6153f7aecbda32439fbeaaa37bda1c19b915c414b73",
       "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py": "1c0bc7219200b3e06983be694d31aa841fdee63269c77df6de33727bf1903c51",
-      "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py": "b9721379022213885274d4a248701ec723707d0105b18ad0e26e2e848262da0e",
       "functional modules/VRN/VRN_Financial_Synonyms_SSOT.py": "9dd35fcad36574c85366944c156a097ae1e1cfa95309edf80bff5eda4d2fdc9c",
       "functional modules/VRN/VRN_MDL001_Converter.py": "7fbd0997d6a18fbcdc83bd2407f7d70e662d904e17f1dbe0b56308b85400609b",
       "functional modules/VRN/VRN_MDL001_Converter_shaf09dc35c.py": "a41b9eba43f5a9b86372c9ddb1c420fd4b4c1ef397a8b8861c9a8dc9906d1642",
@@ -3383,7 +3369,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0105.json": "cd9081eb7aae98d221a67becff700c0b66a94a98fde32922115b67fc8f82a035",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0106.json": "8064698c51e1aeddc1874569ebaf36e3db6aa31a3141c275f0be44896cca9922",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0107.json": "557a3eac7c59ffa65db8b054371e8ccaf362a08330ab87468fcffc02f5f37324",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0108.json": "95a34d1f0b9a4e95e64713d1b6afc17b609809cd124e7dbccf307f607743d593"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0108.json": "59143b8dde3daef326a320ff860adb7a27cbe49b12fbbd139c8727f74f40f2eb"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4718,16 +4704,6 @@
           "VIA_VRN_LayoutRestore_SSOT_v0100.json",
           "VRN-WKF005"
         ]
-      },
-      "VRN-REQ011": {
-        "definition": "e9360c99cf569b71d8b4089d74c9eebcc7e982f0a4674288e30f4fbe4c832dc4",
-        "status": "COVERED",
-        "next": "VRN_ENG062 摘要器改用本冊比對器取代子字串比對(要出 ENG062 新版尾)",
-        "owner": "AI",
-        "topic": "財務評價方法(valuation_method)SSOT 化與編號註冊:VAL_* 代碼 · 英文全稱 / 縮寫 · 台灣 / 香港 / 大陸用語分區 · 變體 · 舊詞庫收編",
-        "homes": [
-          "VIA_VRN_ValuationMethod_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -4786,8 +4762,7 @@
     "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py",
     "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py",
     "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py",
-    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
-    "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py"
+    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5260,28 +5235,13 @@
       "owner": "操作員",
       "reason": "真實券商 PDF 在工作站 C:\\測試樣本報告,容器沒有;容器只驗四段 OCR 扁平文字 · 合成首頁 · 倉內 FactSet 31 頁",
       "next": "via-vcgc run --family vrn VRN_ENG394_LayoutRestore restore --in \"C:\\測試樣本報告\" --pages 1 → 看 VIA_Reports\\vrn\\layout_restore\\LAYOUT_latest.html"
-    },
-    "VRN-REQ011:vrn_valuation": {
-      "id": "VRN-REQ011:vrn_valuation",
-      "requirement": "VRN-REQ011",
-      "state": "VERIFIED",
-      "case": "vrn_valuation",
-      "receipt": "docs/handoff/evidence/vrn_valuation.json"
-    },
-    "VRN-REQ011:eng062-adopt": {
-      "id": "VRN-REQ011:eng062-adopt",
-      "requirement": "VRN-REQ011",
-      "state": "PENDING",
-      "owner": "AI",
-      "reason": "VRN_ENG062 摘要器仍用子字串比對 VALUATION_METHODS(pe 會中 operating、per 會中 per share);本輪只建正本與比對器,不動摘要器",
-      "next": "出 VRN_ENG062 新版尾:_detect_valuation 改叫 VRN_ENG395 Matcher.methods_in(strict)並把 VAL_* 映回舊碼"
     }
   },
   "summary": {
-    "requirements": 122,
-    "watched_files": 2803,
-    "pending": 49,
-    "reusable": 40,
+    "requirements": 121,
+    "watched_files": 2802,
+    "pending": 48,
+    "reusable": 39,
     "findings": 0
   }
 }
