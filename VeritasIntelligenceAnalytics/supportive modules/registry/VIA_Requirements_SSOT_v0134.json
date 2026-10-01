@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0134",
- "batch": "側線 2026-10-01 VCGC 整合",
- "ts": "2026-10-01T21:57:57+00:00",
+ "batch": "R48 2026-10-02(工作站交接 051143 修紅)",
+ "ts": "2026-10-01T22:16:43+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -79,8 +79,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 14,
-  "COVERED": 101,
-  "PARTIAL": 32,
+  "COVERED": 102,
+  "PARTIAL": 31,
   "MISSING": 1
  },
  "requirements": [
@@ -3725,6 +3725,11 @@
     {
      "text": "vcgc ssot regex 同義字 workflow for vcgc vrn vdg 只增不減但要編號 相同數據不同來源也是不同編號 引擎 模組 系統 子系統 羅及 參數 應該全都自動編號優化 不衝突只增不減 子系統跟母系統如何自動連接 所有邏輯參數下放稻子系統由母系統擷取檢查衝突或透過github檢查 自動化相互檢測的能力建構在 vcgc vcgc所有功能全亮綠燈檢查才往下",
      "recorded_at": "2026-10-01T20:54:24+00:00"
+    },
+    {
+     "text": "繼續自動監控 有新交接紀錄就修紅  抓取VCGC所有與VDF相關資料進行實測修正結果驗證輸出結果驗證  VDF VRN獨立性運作  VCGC監控偵測功能轉強  自動將VDF VRN收尾  子系統有向上通報 SYNC TO VCGC的功能  VCGC會邊SSOT編號檢視  子系統在自動擷取結果及編號即可  自動完成VDF及VRN收尾 授權一切  成功就自動更新GITHUB善用VCGC的節省功能完成實測修正及結果驗證收尾",
+     "recorded_at": "2026-10-01T22:16:43+00:00",
+     "said_in": "R48 session 2026-10-02(逐字;「子系統向上通報 SYNC TO VCGC · VCGC 邊看 SSOT 編號 · 子系統只擷取結果及編號」歸本條母子連接)"
     }
    ],
    "renumbered_from": "VCGC-REQ108(側線 claude/ecstatic-brahmagupta-ec19u9;main 的 VCGC-REQ108 是 via-realtest v0104,同號異義,不合併)"
@@ -3732,21 +3737,23 @@
   {
    "code": "VCGC-REQ111",
    "subsystem": "VCGC",
-   "topic": "VCGC 整合不影響 VDF / VRN:正本歸子系統 · 寫入前衝突阻擋 · 每個動詞執行監控 · PowerShell / GitHub 互動自動實測",
-   "requirement": "① 參數庫 · 邏輯冊的正本歸 VDF / VRN(不搬檔),VCGC 只讀、只查衝突並阻擋,不改子系統正本(動作後量越界);② 所有寫入動作(--apply · --push · handoff checkpoint)先過衝突閘(衝突哨兵 13 道 · GitHub 撞號 · 子系統邊界),有衝突不執行;唯讀動作只監控;③ 每個 VCGC 動詞記執行帳(寫入 · 閘判 · rc · 秒數 · 越界,只增),全綠閘多衝突哨兵 · 執行監控兩探針;④ link 只寫 VCGC 冊,VDF / VRN 冊只出提案;⑤ PowerShell 7 實測(唯一 PS 入口 pwsh Parser)· 衝突閘 · 全綠閘接進 GitHub CI Windows job,結果寫 job summary 與存證",
-   "status": "PARTIAL",
+   "topic": "工作站實測本體在 StrictMode 下不得因選配鍵缺席而整輪中止;VCGC 全功能串測紅站名必進交接紀錄",
+   "requirement": "via-realtest 實測本體讀並行線的選配鍵(after)前先問有沒有(Celeritas PS7 模板開 Set-StrictMode -Version Latest),VDF ∥ VRN 兩條鏈每輪都要起跑;外層收 VCGC 串測站列用 `\\[(RED|YELLOW)\\s*\\]`(站列補空白對齊),紅站名逐行進交接紀錄",
+   "status": "COVERED",
    "homes": [
-    "VCGC-WKF012"
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "CGC_MDL149 v0186(自測 10/10 · 整鏈 [交接入口] fail=0);guard 實跑 PASS(衝突哨兵 FAIL 0 · WARN 1 ETF 名碼 · GitHub 撞號 0 · 邊界綠);CI job vcgc-pwsh-gate(.github/workflows/via-master-control-ui.yml)",
-   "next": "CI job vcgc-pwsh-gate 首跑綠後轉 COVERED;VDF / VRN 工作流冊回指提案由子系統管理器出新版",
-   "ruling": "操作員裁定 2026-10-01:下放 = 正本歸子系統不搬檔 · PowerShell 實測接進 GitHub CI 的 Windows · 阻擋範圍 = 所有寫入動作",
+   "evidence": "工作站交接 WS_HANDOVER_20261002_041509 / 051143 兩輪同一例外「找不到屬性 'after'」@ v0101 行 197;Invoke-VIA-RealTestCore-v0102.ps1 只改該行($ln.Contains(\"after\"));Invoke-VIA-RealTest-v0106.ps1 改呼叫 RealTestCore 尾版 + 紅站列正則;容器 VCGC test --quick 站列格式實測 `[GREEN ]` / `[YELLOW]`(容器無 pwsh,PS 剖析待工作站)",
+   "next": "工作站迴圈下一輪 git pull 後自動取 v0106;看交接紀錄 ② 是否列出實測本體 RealTestCore-v0102 與 VDF / VRN 鏈結果",
+   "hand": "AI(實作 · 登錄)",
    "quotes": [
     {
-     "text": "結束後進行對VCGC進行整合不要影響VDF VRN  所有餐庫及邏輯等下放到VDF VRN  監控能力增強到VCGC自動將VCGC整合收尾一切功能都要有執行監控及實施阻擋衝突的能力  授權跟GITHUB的互動及POWERSHELL的互動自動完成並時測驗證上傳GITHUB",
-     "recorded_at": "2026-10-01T21:57:57+00:00"
+     "text": "繼續自動監控 有新交接紀錄就修紅  抓取VCGC所有與VDF相關資料進行實測修正結果驗證輸出結果驗證  VDF VRN獨立性運作  VCGC監控偵測功能轉強  自動將VDF VRN收尾  子系統有向上通報 SYNC TO VCGC的功能  VCGC會邊SSOT編號檢視  子系統在自動擷取結果及編號即可  自動完成VDF及VRN收尾 授權一切  成功就自動更新GITHUB善用VCGC的節省功能完成實測修正及結果驗證收尾",
+     "recorded_at": "2026-10-01T22:16:43+00:00",
+     "said_in": "R48 session 2026-10-02(逐字)"
     }
-   ]
+   ],
+   "r48": true
   }
  ],
  "non_requirements": [
@@ -3851,7 +3858,7 @@
    "reason": "截圖;需求見 08:59 那一則(進入環境指令)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0133.json",
+ "prior": "VIA_Requirements_SSOT_v0132.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -3880,6 +3887,5 @@
  "why_v0130": "PR #412 合併 main:側線六條需求(全景監控引擎 · 儀表板 · 記錄與教訓 · VCGC 自動監控 · 交接閘與工作流圖 · closeout 一指令收尾)原編 VCGC-REQ088–093,與 main 已發的 REQ088–093 同號異義 → 照「不同來源不得因值相同合併編號」改編 VCGC-REQ102–107(每條帶 renumbered_from);main 的 REQ088–101 一字不動",
  "why_v0131": "R46:+VDF-REQ015(COVERED:VDF 74 支逐支自測 RED 5 → 0)。本條原寫在側線 v0130,與 PR #412 的 v0130 撞號 → 改出 v0131(一號不得兩主;PR #412 的 v0130 原樣保留);+VCGC-REQ108(via-realtest v0104 交接紀錄帶出實測例外)",
  "why_v0132": "R47:+VCGC-REQ109(COVERED:via-realtest v0105 接 VCGC 下放檢查);其餘一字不動",
- "why_v0133": "PR #415 合併 main:側線需求冊 v0131(與 main v0131 同號)不帶入;側線 VCGC-REQ108(全綠閘 · 母子自動連接)與 main 的 VCGC-REQ108(via-realtest v0104)同號異義 → 改編 VCGC-REQ110(帶 renumbered_from);main 的 REQ108 / REQ109 一字不動",
- "why_v0134": "+VCGC-REQ111(PARTIAL:寫入前衝突阻擋 · 執行監控 · 子系統邊界 · PowerShell / GitHub CI 實測;待 CI 首跑);其餘一字不動"
+ "why_v0133": "PR #415 合併 main:側線需求冊 v0131(與 main v0131 同號)不帶入;側線 VCGC-REQ108(全綠閘 · 母子自動連接)與 main 的 VCGC-REQ108(via-realtest v0104)同號異義 → 改編 VCGC-REQ110(帶 renumbered_from);main 的 REQ108 / REQ109 一字不動"
 }
