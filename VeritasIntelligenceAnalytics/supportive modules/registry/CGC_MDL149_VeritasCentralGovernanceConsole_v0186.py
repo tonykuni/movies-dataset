@@ -15,6 +15,8 @@
   ③ 全綠閘多兩探針:衝突哨兵 · 執行監控(最近寫入動作有被擋 / 越界 / 失敗 = 黃,列出)。
   ④ link:只寫 VCGC 自己的工作流冊;VDF / VRN 工作流冊的回指只出提案(VIA_Reports/link/PROPOSAL_latest.json)由子系統自己出新版。
      (本裁定前 v0185 已寫的 VIA_Workflow_VDF v0101 / VRN v0104 照只增律保留,不刪 —— 刪了編號稽核會記遺失。)
+  ⑤ closeout --apply:先比對總控頁(VIA_UI_MasterControl)與正主管理器輸出 —— 用契約測試同一把尺(test_master_control_contract 的
+     normalized_generated_page);落後才重產並提交(新尾版一進來 CI test_11 就不再紅;R48 實錄)。
 其餘照 v0185。
 """
 from __future__ import annotations
@@ -323,6 +325,54 @@ def write_links(plan: dict, apply: bool) -> list:
 PRIOR.write_links = write_links  # v0185 的 link 寫冊走這支
 
 
+# ---------------------------------------------------------------- 總控頁同步(契約測試同一把尺)
+MASTER_HTML = VIA / "supportive modules" / "ui_support" / "VIA_UI_MasterControl_v0100.html"
+
+
+def _load(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def mastercontrol_sync(apply: bool) -> str:
+    tests = sorted((HERE / "tests").glob("test_master_control_contract_v*.py"))
+    mgrs = sorted(VIA.glob("VIA_SYSTEM_MANAGER_v*.py"))
+    if not tests or not mgrs or not MASTER_HTML.is_file():
+        return "ABSENT(契約測試 / 管理器 / 總控頁不在)"
+    path0 = sys.path[:]
+    try:
+        t = _load(tests[-1], "via_mc_contract_for_v0186")
+        mgr = t.load_module(t.MANAGER_PATH, "via_mc_manager_for_v0186")
+        deck = t.load_module(t.latest_deck_path(), "via_mc_deck_for_v0186")
+        page = mgr._build_page(mgr.do_list(do_print=False), deck.task_registry())
+        old = MASTER_HTML.read_text(encoding="utf-8")
+        if t.normalized_generated_page(old) == t.normalized_generated_page(page):
+            return "同步(不重產)"
+        if not apply:
+            return "落後(乾跑不寫)"
+        MASTER_HTML.write_text(page, encoding="utf-8")
+        rel = str(MASTER_HTML.relative_to(REPO))
+        PRIOR._git("add", "--", rel)
+        rc, out = PRIOR._git("commit", "-q", "-m", "vcgc closeout: 總控頁依正主管理器重產(契約 test_11 同一把尺)", "--", rel)
+        return "落後 → 已重產並提交" if rc == 0 else f"已重產,提交失敗:{out.strip()[-80:]}"
+    except Exception as e:  # 照實回報,不擋收尾
+        return f"比對失敗:{type(e).__name__}: {str(e)[:80]}"
+    finally:
+        sys.path[:] = path0
+
+
+_CLOSEOUT0 = PRIOR.closeout
+
+
+def closeout(args: list) -> int:
+    if "--apply" in args:
+        print(f"  ⓪+ 總控頁同步 · {mastercontrol_sync(True)}", flush=True)
+    return _CLOSEOUT0(args)
+
+
 # ---------------------------------------------------------------- main:每個動詞都監控 · 寫入先過閘
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
@@ -346,7 +396,7 @@ def main(argv=None):
             return 1
     rc = None
     try:
-        rc = PRIOR.main(args)
+        rc = closeout(args[1:]) if args[:1] == ["closeout"] and os.environ.get("VIA_FROM_VCGC") == "YES" else PRIOR.main(args)
         return rc
     finally:
         crossed = sorted(set(owned_dirty()) - set(before)) if write else []
@@ -428,6 +478,9 @@ def selftest():
         LINK_OUT = keep_l
     chk("link:VCGC 冊照寫新版;VDF 冊只出提案不寫(正本歸子系統)", wrote_vcgc and not wrote_vdf and len(done) == 1
         and prop["proposals"][0]["subsystem"] == "VDF", (wrote_vcgc, wrote_vdf, prop))
+    src0 = Path(__file__).read_text(encoding="utf-8")
+    chk("closeout --apply 先比對總控頁(契約測試同一把尺)· 落後才重產 · 只提交那一檔", "normalized_generated_page" in src0
+        and "⓪+ 總控頁同步" in src0 and '"commit", "-q", "-m"' in src0 and mastercontrol_sync.__code__.co_argcount == 1)
     names = [p[0] for p in GATE_PROBES]
     chk("全綠閘多兩探針(衝突哨兵 · 執行監控)· v0185 closeout ⑩ 用到的 gate 已換成本版", names[-2:] == ["衝突哨兵", "執行監控"] and PRIOR.gate is gate)
     src = Path(__file__).read_text(encoding="utf-8")
