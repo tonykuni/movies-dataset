@@ -30,30 +30,24 @@
 [政策] L50 全景 · 尾版 560 · import 0 · 提及 45 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_ENG396_ReportEntities_v0100.py(家族 vrn)
-  [OK] 規則冊在 registry · 本支照冊讀
-  [OK] 英文:首頁帶代號記號的行 → 全名 · 去法定後綴 · 去產業後綴 → Hon Hai
-  [OK] 英文:最簡寫 = 本文實際出現的 Hon Hai(提及 ≥3)
-  [OK] 目標價:from NT$270 to NT$300 → 本次 300 · 調整前 270 · up · +11.11%
-  [OK] 評價法:「14x 2026E EPS」推定 VAL_PE(標 inferred)· 14x · 2026 · EPS 21.4(句內)· 隱含 299.6 ≈ 300 → VERIFIED
-  [OK] 中文:檔名股名「南亞」+ 首頁「南亞塑膠工業」都收 · 全名去後綴到 南亞
-  [OK] 中文:最簡寫 = 南亞
-  [OK] 目標價:由 60 元上調至 72 元 → 本次 72 · 調整前 60 · +20%
-  [OK] 評價法:本益比 → VAL_PE · 20 倍 · 2026 · EPS 3.6 · 隱含 72 → VERIFIED
-  [OK] 局部識別:台積電 ← 台灣積體電路製造 · 中信金 ← 中國信託金融控股(依序取字 · 首字相同)
-  [OK] 停用詞不算:「台灣」「中國」不判成公司
-  [OK] 全名照收(最長優先)
-  [OK] 英文字首縮寫:Taiwan Semiconductor Manufacturing Company → TSMC
-  [OK] 英文單詞形式只認大寫開頭:Delta Electronics → Delta 中 · delta 不中
-  [OK] (prev. A):本次 4,200 · 調整前 3,600
-  [OK] 前次目標價 125 不當本次:本次 145 · 調整前 125
-  [OK] 目標價上調至 B 元(原 A 元)
-  [OK] to B from A(下修)→ down
-  [OK] 剔除:目標價後接 %(上漲空間)· 13x(倍數)都不是價格
-  [OK] 維持:只有本次 → direction maintain
-  [OK] 表內取指標:2026E Diluted EPS 25.0 · 14x → 隱含 350 ≠ 300 → MISMATCH(列出)
-  [OK] 沒有倍數 / 指標 → UNVERIFIED(未驗,不是錯)· SOTP 照判
-  [OK] 需語境的詞不算評價句:「NAV per unit」
-  [OK] 輸出:公司名稱 / 目標價 / 評價法 三張表都用垂直線
+  [via-vcgc run] [流程] 政策過 · VRN_ENG397_PluginHub_v0100.py(家族 vrn)
+  [OK] 規則冊:11 階段 · 6 內部積木 · 13 外部積木 · 2 計畫
+  [OK] probe:內部積木全 AVAILABLE(尾版在 · 函式在)
+  [OK] probe:外部積木只偵測不匯入 —— 狀態只有 AVAILABLE / ABSENT,沒有例外
+  [OK] 中樞不安裝套件(沒有 pip install / subprocess)
+  [OK] AST 盤點:ENG392 / 393 / 394 / 395 / 396 都在 · 含薄尾前版鏈(ENG394 v0101 + v0100 · ENG393 v0101 + v0100)
+  [OK] 功能分類 ≥ 8 類(自測 · 入口 · 輸出 · 去重 · 驗證 · 表格 · 版面 · 擷取 …)
+  [OK] 每個定義都有說明欄(沒有 docstring 誠實標「無說明」,不編造)
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+Consider using the pymupdf_layout package for a greatly improved page layout analysis.
+  [OK] run default:知識物件有 body · tables · figures · excluded · completeness · dedup · title · classification · entities
+  [OK] 知識物件:本文一句一列帶 S 編號 · 節.句 · 所屬標題 · 類別
+  [OK] 知識物件:截取完整度 GREEN · 分類 STOCK(檔名代號 1303)
+  [OK] 用到的積木 = 計畫 default 的四塊內部積木 · 沒有退回
+  [OK] 計畫 xcheck:外部 pdfplumber / camelot 沒裝 → 誠實記退回(只少第二讀法,內部結果不變)
+  [OK] LEGO:執行期加掛積木 → 計畫點名就跑 · 結果進知識物件
+  [OK] LEGO:拔掉後不再出現在 probe
+  [OK] 計畫指名的外部版面積木 ABSENT → 退回內部 int.eng394.restore(記在 fallbacks)
+  [OK] 輸出:KO_*.json · HUB_latest.json · HUB_latest.html(積木矩陣 · AST 分類矩陣 · 執行摘要)
   [OK] 帶加速器橋 · VIA_FROM_VCGC 閘 · 不匯入 TA-Lib · 不碰網路
-[VRN_ENG396 v0100 研報實體] 自測 25/25 PASS
+[VRN_ENG397 v0100 外掛中樞] 自測 17/17 PASS

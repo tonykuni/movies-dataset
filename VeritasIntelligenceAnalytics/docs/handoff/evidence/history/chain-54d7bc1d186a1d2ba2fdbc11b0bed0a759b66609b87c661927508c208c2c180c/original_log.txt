@@ -27,33 +27,27 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 560 · import 0 · 提及 45 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 559 · import 0 · 提及 45 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_ENG396_ReportEntities_v0100.py(家族 vrn)
-  [OK] 規則冊在 registry · 本支照冊讀
-  [OK] 英文:首頁帶代號記號的行 → 全名 · 去法定後綴 · 去產業後綴 → Hon Hai
-  [OK] 英文:最簡寫 = 本文實際出現的 Hon Hai(提及 ≥3)
-  [OK] 目標價:from NT$270 to NT$300 → 本次 300 · 調整前 270 · up · +11.11%
-  [OK] 評價法:「14x 2026E EPS」推定 VAL_PE(標 inferred)· 14x · 2026 · EPS 21.4(句內)· 隱含 299.6 ≈ 300 → VERIFIED
-  [OK] 中文:檔名股名「南亞」+ 首頁「南亞塑膠工業」都收 · 全名去後綴到 南亞
-  [OK] 中文:最簡寫 = 南亞
-  [OK] 目標價:由 60 元上調至 72 元 → 本次 72 · 調整前 60 · +20%
-  [OK] 評價法:本益比 → VAL_PE · 20 倍 · 2026 · EPS 3.6 · 隱含 72 → VERIFIED
-  [OK] 局部識別:台積電 ← 台灣積體電路製造 · 中信金 ← 中國信託金融控股(依序取字 · 首字相同)
-  [OK] 停用詞不算:「台灣」「中國」不判成公司
-  [OK] 全名照收(最長優先)
-  [OK] 英文字首縮寫:Taiwan Semiconductor Manufacturing Company → TSMC
-  [OK] 英文單詞形式只認大寫開頭:Delta Electronics → Delta 中 · delta 不中
-  [OK] (prev. A):本次 4,200 · 調整前 3,600
-  [OK] 前次目標價 125 不當本次:本次 145 · 調整前 125
-  [OK] 目標價上調至 B 元(原 A 元)
-  [OK] to B from A(下修)→ down
-  [OK] 剔除:目標價後接 %(上漲空間)· 13x(倍數)都不是價格
-  [OK] 維持:只有本次 → direction maintain
-  [OK] 表內取指標:2026E Diluted EPS 25.0 · 14x → 隱含 350 ≠ 300 → MISMATCH(列出)
-  [OK] 沒有倍數 / 指標 → UNVERIFIED(未驗,不是錯)· SOTP 照判
-  [OK] 需語境的詞不算評價句:「NAV per unit」
-  [OK] 輸出:公司名稱 / 目標價 / 評價法 三張表都用垂直線
-  [OK] 帶加速器橋 · VIA_FROM_VCGC 閘 · 不匯入 TA-Lib · 不碰網路
-[VRN_ENG396 v0100 研報實體] 自測 25/25 PASS
+  [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0102.py(家族 core)
+  [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
+  [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
+  [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0110.ps1
+  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-OperatorConsole-v0110.ps1
+  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261001-125355-2125', 'hub': 'go-20260930-120000-1'}
+  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
+  [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
+  [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
+  [OK] ③ sha16 把 CRLF 當 LF(工作站 autocrlf 不假變更)
+  [OK] ④ compile 在記憶體:語法錯抓到 · 橋標記與 --selftest 認得 · SyntaxError L1: invalid syntax
+  [OK] ⑤ 紀錄冊只增:changed / added / removed 各一 · 舊行位元不動 · 折疊後取最新 · 沒 sha 的項(動詞)沒變不重記 · ['changed:family:A', 'added:family:C', 'removed:family:B']
+  [OK] ⑥ 燈:rc 0 綠 · 標記沒見到 黃 · yellow_rc 黃 · 其餘紅
+{"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
+[VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
+  [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
+  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0110.json · 0
+  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 93
+  [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
+  CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
+  CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
