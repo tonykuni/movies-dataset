@@ -113,7 +113,8 @@
     "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
-    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py"
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -583,6 +584,21 @@
       ],
       "timeout_seconds": 900,
       "dependency_why": "橋修件(真橋 / 半橋補全 / 空橋還原)的驗收就是本案 AST 讀法:矩陣 ㉖ ㉗ 逐檔讀它們的橋是否真程式碼"
+    },
+    "vdf_chain_runner": {
+      "argv": [
+        "CGC_MDL170_VDFChainRunner",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0104 薄尾 4/4 · v0103 PASS · 合計 PASS",
+      "scope": "VDF 鏈跑器 0c 獨立性:沿薄尾鏈取文看依賴(薄尾繼承的依賴不再看不見)· 單向讀取豁免冊比對 · 真樹 ENG063 / ENG094 已審 · 未審 0(R39 · VCGC-REQ094)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
+        "supportive modules/registry/VIA_VDF_OneWayRead_Waivers_v*.json",
+        "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v*.py",
+        "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -1195,6 +1211,29 @@
       "owner": "操作員",
       "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
       "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
+    },
+    {
+      "id": "VCGC-REQ094:vdf_chain_runner",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_chain_runner",
+      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
+    },
+    {
+      "id": "VCGC-REQ094:workstation-lock",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
+      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
+    },
+    {
+      "id": "VCGC-REQ094:env-data",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
+      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
     }
   ]
 }
