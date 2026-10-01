@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 14,
   "COVERED": 88,
-  "PARTIAL": 28,
+  "PARTIAL": 29,
   "MISSING": 1
  },
  "requirements": [
@@ -3336,6 +3336,39 @@
     }
    ],
    "r40": true
+  },
+  {
+   "code": "VCGC-REQ096",
+   "subsystem": "VCGC",
+   "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)",
+   "requirement": "① 每批改動當場 registry-sync → 編號 → 交接案 → checkpoint → 串測(階段式登錄);② VCGC 經 run --family core/vdf/vrn 各自對接子系統;③ 入口收尾自動跳出同步器標準化三合一頁(VCGC 全景 · 串測 · 交接 · SDD + VDF 鏈 + VRN 鏈 + DataFrame 鎖 + 工具覆蓋);④ HTML U/I 先簡單標準化,對接另批",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_UI_TemplateSync_SSOT_v0101.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0114.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "R40 容器實跑入口 v0111(728 s):ⓖ 三合一矩陣頁 rc 2(YELLOW:覆蓋 111/120 · 離線 GREEN)產出並設為收尾自動開啟;串測 98 站 綠 89 · 黃 9 · 紅 0(黃為未登錄 / 待工作站重鎖 / 冊指紋待重編,登錄後轉綠);交接 31 案重跑全 rc 0 · checkpoint GREEN",
+   "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
+   "hand": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
+   "quotes": [
+    {
+     "text": "隨時階段式更新註冊  強化自動化連結VCGC與個子系統的單獨連結自動更新能力  VCGC流程一條龍串連 完善檢查 將VCGC不足功能補齊成功收尾",
+     "recorded_at": "2026-10-01T17:20:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    },
+    {
+     "text": "完成收尾自動跳出HTML三合一矩陣含狀態及實際結果驗證狀態  收尾 自動完成",
+     "recorded_at": "2026-10-01T17:20:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    },
+    {
+     "text": "HTML U/I不管先簡單標準化即可 對接明天再說",
+     "recorded_at": "2026-10-01T17:00:00+00:00",
+     "said_in": "R40 session 2026-10-01(逐字節錄)"
+    }
+   ],
+   "r40": true
   }
  ],
  "non_requirements": [
@@ -3460,5 +3493,5 @@
  "why_v0121": "R38:+VCGC-REQ093(COVERED);其餘 128 條一字不動",
  "why_v0122": "R38:VCGC-REQ093 追加操作員原話「不跑SERVER直接跳出」與 v0104 證據;其餘一字不動",
  "why_v0123": "R39:+VCGC-REQ094(PARTIAL:修正已做,加鎖待工作站存證);其餘一字不動",
- "why_v0124": "R40:VCGC-REQ094 證據 / 下一步補工作站實錄三修(v0181 快取鑰 · ENG079 v0105 主鍵 · 閘 rc 2 根因);+VCGC-REQ095(RECORDED:政策庫 + SSOT + 規則引擎架構對照 · 缺口 G1–G5);其餘一字不動"
+ "why_v0124": "R40:VCGC-REQ094 證據 / 下一步補工作站實錄三修(v0181 快取鑰 · ENG079 v0105 主鍵 · 閘 rc 2 根因);+VCGC-REQ095(RECORDED:政策庫 + SSOT + 規則引擎架構對照 · 缺口 G1–G5);其餘一字不動;+VCGC-REQ096(PARTIAL:入口 v0111 收尾三合一頁 · 階段式登錄;工作站實跑待做)"
 }

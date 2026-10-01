@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T17:54:26+00:00",
+  "at": "2026-10-01T17:29:45+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -209,13 +209,6 @@
       "owner": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
       "next": "工作站:git merge --abort → MergeMedic sync --apply(帳本只增聯集)→ 拉到含 v0181 / v0105 的 main → 入庫重跑 run --apply → status 必須 rc 0 → selftests → real → lock --apply;VIA_DATA_HOME 用接點真正指向的 C:\\Users\\tonyk\\VIA System\\via_database(不 --relink)",
       "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題"
-    },
-    {
-      "id": "VCGC-REQ096",
-      "state": "PARTIAL",
-      "owner": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
-      "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
-      "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)"
     },
     {
       "id": "host-live",
@@ -480,14 +473,6 @@
       "owner": "操作員",
       "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
       "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
-    },
-    {
-      "id": "VCGC-REQ096:closeout-tri-page",
-      "requirement": "VCGC-REQ096",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
-      "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
     }
   ],
   "reusable_successes": [
@@ -556,7 +541,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "90291dca16ec1d427f642b8eb72d61e2833e5cb583de119552e3bf8ad36e9ac3"
+      "sha256": "3e1edca0015f6fb59abd9041ca527c1d31e52de8a83e783f55cff1d38a37716d"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -576,7 +561,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "90291dca16ec1d427f642b8eb72d61e2833e5cb583de119552e3bf8ad36e9ac3"
+      "sha256": "3e1edca0015f6fb59abd9041ca527c1d31e52de8a83e783f55cff1d38a37716d"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -600,7 +585,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "90291dca16ec1d427f642b8eb72d61e2833e5cb583de119552e3bf8ad36e9ac3"
+      "sha256": "3e1edca0015f6fb59abd9041ca527c1d31e52de8a83e783f55cff1d38a37716d"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -616,11 +601,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "483b1a806565cee4b8477f7bb3aabf10e73005bd69d29ff9f92b37a8886d3c79"
+      "sha256": "8052c6d4ed681777e871746f93e166868dfcc1aab7a6c309ac42dd71bb31d4ca"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "483b1a806565cee4b8477f7bb3aabf10e73005bd69d29ff9f92b37a8886d3c79"
+      "sha256": "8052c6d4ed681777e871746f93e166868dfcc1aab7a6c309ac42dd71bb31d4ca"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -640,7 +625,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "90291dca16ec1d427f642b8eb72d61e2833e5cb583de119552e3bf8ad36e9ac3"
+      "sha256": "3e1edca0015f6fb59abd9041ca527c1d31e52de8a83e783f55cff1d38a37716d"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -789,7 +774,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0121.json": "30acc38d2597284b636d73e018135fa2c035dc648fbbf679f659cc5cd8f0cb91",
       "supportive modules/registry/VIA_Requirements_SSOT_v0122.json": "84d43ef903d25889adc9a4b9f57490417f2952503069a7bb06d13474c346995e",
       "supportive modules/registry/VIA_Requirements_SSOT_v0123.json": "62cd88a5792de050856ca9e808c95b7031b7f31f9f40b73c5947f31a652f3a60",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0124.json": "de4955732d4ebf227628b1f5e2a236d1f2a4d51178ecaed4eeb0e8f92685b185",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0124.json": "d692cd42a1833ca9d7001e95b77b71f8aa39797aa975703256a5861915f48c9c",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -805,7 +790,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "82e0789e7401f5ee0d28d32ef36a889d062a4a2700ea60156342972a3da5510e",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "f18d82cf32304f9be641026a0145dd464022deeb994e5790a842057a543bc2fb",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -5030,18 +5015,6 @@
           "VIA_Handoff_Continuity_SSOT_v0100.json",
           "VIA_Numbering_SSOT_v0100.json"
         ]
-      },
-      "VCGC-REQ096": {
-        "definition": "fe213d1bb8f071b23df055748eeaade24a9052cca9423e57ccdc862ecf701a89",
-        "status": "PARTIAL",
-        "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
-        "owner": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
-        "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)",
-        "homes": [
-          "VIA_UI_TemplateSync_SSOT_v0101.json",
-          "VIA_VCGC_FunctionInventory_SSOT_v0114.json",
-          "VIA_Handoff_Continuity_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -5767,20 +5740,12 @@
       "owner": "操作員",
       "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
       "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
-    },
-    "VCGC-REQ096:closeout-tri-page": {
-      "id": "VCGC-REQ096:closeout-tri-page",
-      "requirement": "VCGC-REQ096",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
-      "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
     }
   },
   "summary": {
-    "requirements": 132,
+    "requirements": 131,
     "watched_files": 2828,
-    "pending": 64,
+    "pending": 62,
     "reusable": 53,
     "findings": 0
   }
