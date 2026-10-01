@@ -145,7 +145,7 @@ def selftest() -> int:
     chk("① 進度暫存模組 CGC_MDL251 載得到;本體的站執行格與 run 已換成本版", PJ is not None and BODY.run_console is run_console and BODY.run is run)
     calls = []
 
-    def fake(via, console, argv, timeout, log):
+    def fake_console(via, console, argv, timeout, log):
         calls.append(tuple(argv))
         if argv[0] == "boom":
             raise KeyboardInterrupt
@@ -156,7 +156,7 @@ def selftest() -> int:
     real_rc0 = _RC0
     with tempfile.TemporaryDirectory() as td:
         os.environ["VIA_PROGRESS_DIR"] = td
-        _RC0 = fake
+        _RC0 = fake_console
         try:
             log = Path(td) / "logs" / "x.txt"
             j = PJ.Journal("TestAutoST", scope=td, context="CTX")
