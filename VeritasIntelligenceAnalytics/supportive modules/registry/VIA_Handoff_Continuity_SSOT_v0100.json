@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-09-30T10:19:25+00:00",
+  "updated_at": "2026-10-01T19:13:21+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -90,7 +90,9 @@
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
-    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py"
+    "supportive modules/registry/CGC_MDL095_DeckServer_v0161.py",
+    "supportive modules/registry/VIA_Panorama_v0104.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -305,6 +307,19 @@
         "supportive modules/registry/tests/test_master_control_contract_v*.py"
       ],
       "timeout_seconds": 600
+    },
+    "monitor": {
+      "argv": [
+        "VIA_Panorama",
+        "--selftest"
+      ],
+      "success_marker": "PASS",
+      "scope": "VIA_Panorama 薄尾鏈(v0104 → v0100)全自測:只讀全景 · 儀表板 · 記錄 / 教訓 · 背景單例監控 · AUTO SYNC · 交接閘 · 工作流圖(VCGC-REQ088~092)",
+      "dependencies": [
+        "supportive modules/registry/VIA_Panorama_v*.py",
+        "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
