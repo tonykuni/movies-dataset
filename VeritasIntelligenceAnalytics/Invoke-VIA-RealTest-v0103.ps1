@@ -19,6 +19,9 @@
 #       PAN-READ `read <VDF> <VRN> <registry> --json`(通用 AST 類 SYNTAX/COMPILE/DUPDEF/TAILAPI/UNREACH/BAREEXC/SWALLOW/MUTDEF)。
 #       每個問題落成一個錨點「檔:行 類 說明」,**一個不漏**寫進 VIA_Reports\realtest\AST_ANCHORS_<時間>.txt + _latest.txt(每輪再生);
 #       SYNTAX / COMPILE / TALIB 有就記紅;其餘分類計數進交接紀錄與黃字。v0101 原有的 Panorama monitor 照跑(只增不減)。
+#   (E) MasterControl 總控頁併入 VCGC 收尾(R45 第三令「master control main併入vcgc總控」):追蹤頁 ui_support\VIA_UI_MasterControl_v0100.html
+#       由正主管理器(VIA_SYSTEM_MANAGER 尾版 _build_page)產生;新模組一進來頁就落後,CI test_11 會紅。收尾時用契約測試同一把尺比對,
+#       落後才重產(LF · UTF-8)並跟交接紀錄一起提交;一樣就不動。
 #   (C) 加速模組 · 矩陣報告確認列:PS 25 加速器(v0101 ①)· PY 加速器 / 網路工具載入(ENV MANAGER ②③)· 覆蓋矩陣頁 · 三合一頁,收尾一行交代。
 # ---- 以下為 v0102 原說明 ----
 # Invoke-VIA-RealTest-v0102.ps1 — 短指令 via-realtest(R44 · 一支 PS 全包:拉齊 → 實測 → 樣本驗證 → 交接紀錄 → 同步 GitHub)
@@ -77,7 +80,7 @@ $Red = New-Object System.Collections.Generic.List[string]
 $Notes = New-Object System.Collections.Generic.List[string]
 $SideEffect = @("VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Engine_Consolidation_Register_v0100.json")
 $LedgerRx = '_Ledger_v\d{3,4}\.jsonl?$'
-$HandoffRx = '^VeritasIntelligenceAnalytics/docs/handoff/'
+$HandoffRx = '^VeritasIntelligenceAnalytics/docs/handoff/|^VeritasIntelligenceAnalytics/supportive modules/ui_support/VIA_UI_MasterControl_v0100\.html$'
 $keepFromVcgc = $env:VIA_FROM_VCGC; $keepPush = $env:VIA_VCGC_PUSH; $keepConsent = $env:VIA_NET_CONSENT
 
 function Get-Py {
@@ -360,6 +363,33 @@ $wsFile = Join-Path $wsDir ("WS_HANDOVER_" + $stamp + ".md")
 $md -join "`n" | Set-Content -LiteralPath $wsFile -Encoding UTF8
 Copy-Item -LiteralPath $wsFile -Destination (Join-Path $wsDir "WS_HANDOVER_latest.md") -Force
 Write-Host ("  ⑤ 交接紀錄 · " + $wsFile) -ForegroundColor Cyan
+
+# (E) MasterControl 總控頁同步(落後才重產;同契約測試那把尺) ----------------------------------
+$mcLine = "沒跑"
+$mcTest = Get-Newest (Join-Path $Reg "tests") "test_master_control_contract_v*.py"
+if ($mcTest) {
+    $mcPy = Join-Path ([IO.Path]::GetTempPath()) ("via_mc_sync_" + $stamp + ".py")
+    @'
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("mct_sync", sys.argv[1]); t = importlib.util.module_from_spec(spec); spec.loader.exec_module(t)
+mgr = t.load_module(t.MANAGER_PATH, "via_manager_sync"); deck = t.load_module(t.latest_deck_path(), "via_deck_sync")
+page = mgr._build_page(mgr.do_list(do_print=False), deck.task_registry())
+old = t.MASTER_HTML.read_text(encoding="utf-8") if t.MASTER_HTML.exists() else ""
+if t.normalized_generated_page(old) == t.normalized_generated_page(page):
+    print("[總控頁] SAME · 與正主一致,不動")
+else:
+    t.MASTER_HTML.write_text(page, encoding="utf-8", newline="\n")
+    print("[總控頁] REGEN · 落後 → 已依正主重產 " + t.MASTER_HTML.name)
+'@ | Set-Content -LiteralPath $mcPy -Encoding UTF8
+    $mcOut = @(& $py $mcPy $mcTest.FullName 2>&1 | ForEach-Object { "" + $_ })
+    $mcLine = (@($mcOut | Where-Object { $_ -match '\[總控頁\]' }) | Select-Object -Last 1)
+    if (-not $mcLine) { $mcLine = "失敗:" + (($mcOut | Select-Object -Last 2) -join " | "); $Red.Add("MasterControl 總控頁同步 " + $mcLine) }
+    Move-Item -LiteralPath $mcPy -Destination (Join-Path $LogDir ("via_mc_sync_" + $stamp + ".py")) -Force
+}
+Write-Host ("  ⓜ MasterControl 總控頁 · " + $mcLine) -ForegroundColor $(if ($mcLine -match 'SAME|REGEN') { "Green" } else { "Red" })
+$md2 = Join-Path $wsDir "WS_HANDOVER_latest.md"
+Add-Content -LiteralPath $wsFile -Value ("- ⓜ MasterControl 總控頁:" + $mcLine) -Encoding UTF8
+Copy-Item -LiteralPath $wsFile -Destination $md2 -Force
 
 # ⑥ 同步 GitHub ---------------------------------------------------------------------------
 $pushLine = "跳過(-NoPush)"

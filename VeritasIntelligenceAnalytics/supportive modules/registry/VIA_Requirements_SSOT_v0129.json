@@ -3486,12 +3486,12 @@
    "code": "VCGC-REQ101",
    "subsystem": "VCGC",
    "topic": "via-realtest v0103:VCGC ∥ VCGC-VDF ∥ VCGC-VRN 三路線同步 · 環境直接接完整安裝流程 · 全景 AST 錨點精準定位(只增不減)",
-   "requirement": "① VCGC 全功能串測(test --quick)與 VDF / VRN 鏈同時跑;② ENV MANAGER 不是 GREEN → CGC_MDL135 tools --apply --approve + CGC_MDL137 --approve-install + 再驗(網路同意閘 AI 不代設:操作員帶 -AutoInstall 或在視窗答 Y);③ 全景 AST:鎖冊 token 工具 scan --fast --json(治理七類)+ read --json(通用 AST 類)並行,每個問題一個「檔:行 類 說明」錨點、一個不漏寫 AST_ANCHORS_latest.txt,SYNTAX / COMPILE / TALIB 記紅;既有 Panorama monitor 照跑;④ 加速模組(PS 25 · PY / 網路載入)與矩陣頁(覆蓋 · 三合一)收尾確認列",
+   "requirement": "① VCGC 全功能串測(test --quick)與 VDF / VRN 鏈同時跑;② ENV MANAGER 不是 GREEN → CGC_MDL135 tools --apply --approve + CGC_MDL137 --approve-install + 再驗(網路同意閘 AI 不代設:操作員帶 -AutoInstall 或在視窗答 Y);③ 全景 AST:鎖冊 token 工具 scan --fast --json(治理七類)+ read --json(通用 AST 類)並行,每個問題一個「檔:行 類 說明」錨點、一個不漏寫 AST_ANCHORS_latest.txt,SYNTAX / COMPILE / TALIB 記紅;既有 Panorama monitor 照跑;④ 加速模組(PS 25 · PY / 網路載入)與矩陣頁(覆蓋 · 三合一)收尾確認列;⑤ MasterControl 總控頁併入 VCGC 收尾:用契約測試同一把尺比對,落後才依正主管理器重產並隨交接提交(CI test_11 不再因新模組紅)",
    "status": "COVERED",
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "Invoke-VIA-RealTest-v0103.ps1 pwsh 剖析 0 錯;沙盒:VCGC 線並行 rc 照實 · -AutoInstall 走 ①②③ ENV AMBER→GREEN · 無同意閘只列補法;真倉 PAN-SCAN 1720 檔 18.7 s + PAN-READ 744 檔 → 錨點 1072(0.3 s 收成)· 嚴重類 0",
+   "evidence": "Invoke-VIA-RealTest-v0103.ps1 pwsh 剖析 0 錯;沙盒:VCGC 線並行 rc 照實 · -AutoInstall 走 ①②③ ENV AMBER→GREEN · 無同意閘只列補法;真倉 PAN-SCAN 1720 檔 18.7 s + PAN-READ 744 檔 → 錨點 1072(0.3 s 收成)· 嚴重類 0;總控頁同步片段在真倉跑 → SAME(與正主一致);CI test_11 紅(259→260)以正主重產修好,契約測試 19/19",
    "next": "工作站:git pull → . .\\Register-VIA-Commands-v0265.ps1 → via-realtest(自動取 v0103;要裝環境帶 -AutoInstall)",
    "hand": "AI(實作 · 登錄 · 沙盒 + 真倉實測)",
    "quotes": [
@@ -3503,6 +3503,16 @@
     {
      "text": "加入全景分析功能ast定位功能卯點精準定位  全面 快 精準不遺漏  再生及一次 與panorama指令結合只增不減 只快不遺漏",
      "recorded_at": "2026-10-02T04:40:00+00:00",
+     "said_in": "R45 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "有衝突  若ssot workflow code regex 同義字這些有衝突去隔離區找 要做去除ta-lib流程  編號紀錄等  只增不減只要不衝突找回編號怎會丟失  自動完成  master control main併入vcgc總控",
+     "recorded_at": "2026-10-02T05:00:00+00:00",
+     "said_in": "R45 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "自動完成一切驗收不發散 核准推了以後github五分種檢查有無過自動修復修正完成系統及輸出驗收",
+     "recorded_at": "2026-10-02T05:00:00+00:00",
      "said_in": "R45 session 2026-10-02(逐字)"
     }
    ],
