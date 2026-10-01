@@ -106,7 +106,8 @@
     "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py",
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
     "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
-    "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py"
+    "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py",
+    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -500,6 +501,20 @@
         "supportive modules/registry/VIA_VRN_ValuationMethod_SSOT_v*.json",
         "functional modules/VRN/knowledge/SYNONYM_LIBRARY_v4.json",
         "functional modules/VRN/VRN_ENG062_SummarizerV1*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "field_rulers": {
+      "argv": [
+        "CGC_MDL182_ReportFieldRulers",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL182 v0101 職稱 · 電話只增不減 · mine] 自測 15/15 PASS",
+      "scope": "分析師聯絡區塊:姓名在職稱 / 電話 / 電郵上方(錨點回溯窗)· 中英職稱表只增不減 · 電話式只增不減且 v0100 探針逐條不變 · @ 前英文名互證 · @ 後網域券商(先過拒絕閘)· mine 樣本提案(R36 · VRN-REQ013)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v*.py",
+        "supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v*.json",
+        "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json"
       ],
       "timeout_seconds": 600
     }
@@ -1012,6 +1027,28 @@
       "owner": "操作員",
       "reason": "主標題新判法只在合成首頁與容器樣本驗過;真實 306 件在工作站 C:\\測試樣本報告",
       "next": "git pull 後 via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → 比對待複核數(前次 218)與 MS 九份是否不再誤標"
+    },
+    {
+      "id": "VRN-REQ012:page1-main-title",
+      "requirement": "VRN-REQ012",
+      "state": "VERIFIED",
+      "case": "vrn_docclass",
+      "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VRN-REQ013:field_rulers",
+      "requirement": "VRN-REQ013",
+      "state": "VERIFIED",
+      "case": "field_rulers",
+      "receipt": "docs/handoff/evidence/field_rulers.json"
+    },
+    {
+      "id": "VRN-REQ013:mine-samples",
+      "requirement": "VRN-REQ013",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "冊外職稱 / 號碼格式 / 網域要從真實樣本量,容器沒有樣本",
+      "next": "via-vcgc run --family core CGC_MDL182_ReportFieldRulers mine --samples \"C:\\測試樣本報告\" → 貼回 MINE_latest.json 摘要 → AI 裁定 → 冊新版(只增不減)"
     }
   ]
 }
