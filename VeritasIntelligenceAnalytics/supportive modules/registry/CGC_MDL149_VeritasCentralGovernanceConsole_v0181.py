@@ -11,6 +11,7 @@ OneDrive 夾逐檔被防毒掃,放大到幾分鐘。不是加速器沒掛(加速
 本尾版:鑰只收盤點會讀的來源(.py · .ps1 · .psm1 · .json),且排除輸出夾(VIA_Reports/ · output_hub/ · docs/handoff/ · __pycache__/)
 與只增帳本 / 燈鎖(*_Ledger_v####.json · VIA_LampLock_v####.json);HEAD 與 TOOLS_PLAN 來源照舊入鑰。盤點函式、結果欄位、
 registry-sync 只增律一字不動;源碼一改(含新檔)照舊重算;VIA_VCGC_NOCACHE=1 照舊一律重算。其餘照 v0180。零網路。
+只收 VCGC 呼叫(VIA_FROM_VCGC=YES)的規矩照前一版(本版不放寬)。
 """
 from __future__ import annotations
 
