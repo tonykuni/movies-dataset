@@ -111,7 +111,8 @@
     "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py",
     "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
-    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py"
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -559,8 +560,8 @@
         "CGC_MDL230_ToolCoverageProbe",
         "--selftest"
       ],
-      "success_marker": "[CGC_MDL230_ToolCoverageProbe v0102 覆蓋矩陣 · AST · PS 剖析器] 自測 14/14 PASS",
-      "scope": "全樹工具覆蓋矩陣:PY 加速器 · 觸網 PY 網路橋 · VDF 全件網路橋 · PS 尾版加速器模組;燈由正主(sweeper / MDL117),AST 與 pwsh Parser 第二讀法互核;具名豁免附理由;HTML 矩陣報告前次 → 本次(R37c · VCGC-REQ092)",
+      "success_marker": "[CGC_MDL230_ToolCoverageProbe v0103 模板章 · AST 目錄 · 只增帳本 · 淺色頁] 自測 9/9 PASS",
+      "scope": "全樹工具覆蓋矩陣:PY 加速器 · 觸網 PY 網路橋 · VDF 全件網路橋 · PS 尾版加速器模組;燈由正主(sweeper / MDL117),AST 與 pwsh Parser 第二讀法互核;具名豁免附理由;HTML 矩陣報告前次 → 本次(R37c · VCGC-REQ092);R38 v0103:+⑥ PS 模板章(正主 MDL183 + PaidDebt)· ⑦ PY AST 分類說明目錄 · 版號尾碼 · 只增帳本 · 淺色緊湊頁 · SYNCHRONIZER 來源(VCGC-REQ093)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v*.py",
         "supportive modules/registry/VIA_ToolCoverageMatrix_SSOT_v*.json",
@@ -571,7 +572,13 @@
         "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v*.py",
         "supportive modules/registry/CGC_MDL074_AccelBridge_v*.py",
         "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v*.py",
-        "supportive modules/registry/via_accel_injector_v*.py"
+        "supportive modules/registry/via_accel_injector_v*.py",
+        "supportive modules/registry/VIA_UI_TemplateSync_SSOT_v*.json",
+        "supportive modules/registry/VIA_CeleritasPolicy_PaidDebt_v*.json",
+        "supportive modules/registry/VIA_VRN_PluginHub_SSOT_v*.json",
+        "functional modules/WorkOps/VMT/Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2.ps1",
+        "supportive modules/VIA_FlowSystem/Invoke_VIA_FlowSystem_SandboxPatch_v025.ps1",
+        "supportive modules/VIA_Governance_Runtime/v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159.ps1"
       ],
       "timeout_seconds": 900,
       "dependency_why": "橋修件(真橋 / 半橋補全 / 空橋還原)的驗收就是本案 AST 讀法:矩陣 ㉖ ㉗ 逐檔讀它們的橋是否真程式碼"
@@ -1157,10 +1164,13 @@
     {
       "id": "VCGC-REQ092:ps-parse-errors",
       "requirement": "VCGC-REQ092",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "操作員",
       "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
-      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可"
+      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "resolved": "R38 2026-10-01 操作員令「上面語法錯誤改善 記得加入加速模組」(L70 許可):HyperBOM_SELF_CONTAINED_v2(-replace \"`\" 跳脫掉收尾引號 → 單引號 ×2)· FlowSystem_SandboxPatch_v025(\\\" 不是 PS 跳脫 → 單引號字串)· v0163A Sidebar-v0159(( if … ) → $( if … ))就地最小修 · pwsh 剖析 0 錯 · Invoke-VIA-PSTemplateJoin -Apply 接章(寫前備份)· PS-ACCEL 本在頂層;Fallback-Activation-v0136 由 v0136A(剖析 0 錯)取代,矩陣尾碼排序後進版史不改"
     },
     {
       "id": "VCGC-REQ092:accel-real-use",
@@ -1169,6 +1179,21 @@
       "owner": "操作員",
       "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
       "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
+    },
+    {
+      "id": "VCGC-REQ093:coverage-matrix-v0103",
+      "requirement": "VCGC-REQ093",
+      "state": "VERIFIED",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
+    },
+    {
+      "id": "VCGC-REQ093:docstrings",
+      "requirement": "VCGC-REQ093",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
+      "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
     }
   ]
 }

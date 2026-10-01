@@ -8,6 +8,46 @@ param(
     [bool]$OpenHtml = $true,
     [bool]$KeepPowerShellOpen = $true
 )
+# CELERITAS-TEMPLATE-JOIN v1 (no-wrap join, L103-3; batch R16-9; PS 5.1 runs unchanged, only PS7 loads the template)
+# ===== [VIA:PS-TEMPLATE:v0101] Celeritas PS7 template: this process only, restore on exit, skip when absent, param() untouched =====
+$VIACelTplOwn = $false
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        $VIACelTplFile = $null
+        $VIACelTplProbe = $PSScriptRoot
+        while ($VIACelTplProbe) {
+            $VIACelTplTry = Join-Path $VIACelTplProbe 'supportive modules\ps7\VeritasCeleritas.PS7.ps1'
+            if (Test-Path -LiteralPath $VIACelTplTry) { $VIACelTplFile = $VIACelTplTry; break }
+            $VIACelTplUp = Split-Path $VIACelTplProbe -Parent
+            if ((-not $VIACelTplUp) -or ($VIACelTplUp -eq $VIACelTplProbe)) { break }
+            $VIACelTplProbe = $VIACelTplUp
+        }
+        if ($VIACelTplFile -and (-not (Get-Command Restore-CeleritasPS7 -ErrorAction Ignore))) {
+            $VIACelTplKeep = @{}
+            foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                $VIACelTplVar = Get-Variable -Name $VIACelTplName -Scope 0 -ErrorAction Ignore
+                if ($VIACelTplVar) { $VIACelTplKeep[$VIACelTplName] = $VIACelTplVar.Value }
+            }
+            try { $null = . $VIACelTplFile -RestoreOnly }
+            finally {
+                Set-StrictMode -Off
+                foreach ($VIACelTplName in 'RestoreOnly', 'Report', 'Body') {
+                    Remove-Variable -Name $VIACelTplName -Scope 0 -Force -ErrorAction Ignore
+                    if ($VIACelTplKeep.ContainsKey($VIACelTplName)) { Set-Variable -Name $VIACelTplName -Value $VIACelTplKeep[$VIACelTplName] -Scope 0 }
+                }
+            }
+            if (Get-Command Start-CeleritasPS7 -ErrorAction Ignore) {
+                if (-not (Get-EventSubscriber -Force -ErrorAction Ignore | Where-Object { $_.SourceIdentifier -eq 'PowerShell.Exiting' })) {
+                    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -SupportEvent -Action { try { Restore-CeleritasPS7 } catch { } }
+                }
+                [void](Start-CeleritasPS7)
+                $VIACelTplOwn = $true
+            }
+        }
+    } catch { }
+}
+# ===== [VIA:PS-TEMPLATE:END] =====
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -33,7 +73,7 @@ function def_WriteBytesFromBase64 {
     param([Parameter(Mandatory=$true)][string]$Path,[Parameter(Mandatory=$true)][string]$Base64Text)
     $dir = Split-Path -Parent $Path
     if ($dir -and -not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-    $clean = ($Base64Text -replace "`r", "" -replace "`n", "" -replace "`", "")
+    $clean = ($Base64Text -replace "`r", "" -replace "`n", "" -replace '`', '')
     [System.IO.File]::WriteAllBytes($Path, [Convert]::FromBase64String($clean))
 }
 function def_Banner {
@@ -78,7 +118,7 @@ dGlvbiB3YXMgZXhlY3V0ZWQuIiAtRm9yZWdyb3VuZENvbG9yIEN5YW4KICAgICAgICBSZWFkLUhvc3Qg
 '@
 
     def_WriteBytesFromBase64 -Path $packageZip -Base64Text $zipB64
-    def_WriteText -Path $runnerPath -Text ([System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(($runnerB64 -replace "`r", "" -replace "`n", "" -replace "`", ""))))
+    def_WriteText -Path $runnerPath -Text ([System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(($runnerB64 -replace "`r", "" -replace "`n", "" -replace '`', ''))))
 
     Write-Host "[OK] Embedded HyperBOM package restored: $packageZip" -ForegroundColor Green
     Write-Host "[OK] Embedded runner restored        : $runnerPath" -ForegroundColor Green
@@ -117,3 +157,4 @@ dGlvbiB3YXMgZXhlY3V0ZWQuIiAtRm9yZWdyb3VuZENvbG9yIEN5YW4KICAgICAgICBSZWFkLUhvc3Qg
     }
 }
 
+if ($VIACelTplOwn) { try { Restore-CeleritasPS7 } catch { } }  # [VIA:PS-TEMPLATE] restore on exit
