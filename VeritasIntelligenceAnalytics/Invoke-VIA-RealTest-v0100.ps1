@@ -94,6 +94,11 @@ function Get-P([object]$o, [string]$n) {
     return $null
 }
 function Cut([object]$s, [int]$n = 260) { $t = ("" + $s) -replace "\s+", " "; if ($t.Length -gt $n) { $t.Substring(0, $n) + "…" } else { $t } }
+function To-FileUri([string]$path) {
+    $full = [IO.Path]::GetFullPath($path) -replace '\\', '/'
+    if (-not $full.StartsWith('/')) { $full = '/' + $full }
+    return 'file://' + (($full -split '/' | ForEach-Object { [Uri]::EscapeDataString($_) -replace '%3A', ':' }) -join '/')
+}
 function Open-RtPages([string[]]$Pages) {
     $p = @($Pages | Where-Object { $_ -and (Test-Path -LiteralPath $_) })
     if ($p.Count -eq 0) { return }
@@ -101,10 +106,10 @@ function Open-RtPages([string[]]$Pages) {
     $bx = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe", "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
             "$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe",
             "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") | Where-Object { $_ -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
-    if ($bx) { Start-Process -FilePath $bx -ArgumentList ($p | ForEach-Object { '"' + ([Uri]$_).AbsoluteUri + '"' }) | Out-Null; return }
+    if ($bx) { Start-Process -FilePath $bx -ArgumentList ($p | ForEach-Object { '"' + (To-FileUri $_) + '"' }) | Out-Null; return }
     # 找不到瀏覽器:只印網址,絕不交給 .html 預設程式(工作站是 VS Code)
     Write-Host "  [頁] 找不到 Edge / Chrome;請用瀏覽器開下列網址(不交給 .html 預設程式):" -ForegroundColor Yellow
-    $p | ForEach-Object { Write-Host ("     " + ([Uri]$_).AbsoluteUri) -ForegroundColor DarkGray }
+    $p | ForEach-Object { Write-Host ("     " + (To-FileUri $_)) -ForegroundColor DarkGray }
 }
 
 try {
@@ -308,7 +313,7 @@ try {
             }
         }
         if ($ln.id -eq "CFL") {
-            $cf = @($lines | Where-Object { $_ -match '\[八路衝突|BLOCK|衝突|forbidden|mismatch' } | Select-Object -First 12)
+            $cf = @($lines | Where-Object { $_ -match '\[八路衝突|BLOCK|forbidden|mismatch' -and $_ -notmatch '^\s*\[(政策|分群|不衝突|靜態|位階|加速|環境計畫|回覆|衝突|還原)\]|^\[第一步' } | Select-Object -First 12)
             $cf | ForEach-Object { $Ai.Add("  " + (Cut $_ 400)) }
             if ($rc -ne 0 -and $cf.Count) { $Errs.Add("現況衝突:" + (Cut $cf[0] 200)) }
         }
@@ -326,7 +331,7 @@ try {
         }
     } else { $Ai.Add("[全景 VCGC 控管] 本輪沒產出 monitor_latest.json") }
     $Ai.Add("[三合一] " + $(if ($triLine) { Cut $triLine 240 } else { "本輪沒產出" }))
-    $Ai.Add("[頁] " + (@($pages | ForEach-Object { ([Uri]$_).AbsoluteUri }) -join " · "))
+    $Ai.Add("[頁] " + (@($pages | ForEach-Object { (To-FileUri $_) }) -join " · "))
     $Ai.Add("[時間] 全程 " + [Math]::Round($clock.Elapsed.TotalSeconds, 1) + " 秒 · 結束碼 " + $worst)
     $Ai.Add("===== 貼給 AI 結束 =====")
     $exitCode = $worst
