@@ -27,22 +27,25 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 560 · import 0 · 提及 46 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 561 · import 0 · 提及 48 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VIA_Panorama_v0103.py(家族 core)
-=== VIA_Panorama_v0103 自測(薄尾;先跑前版 v0102 → v0101 → 本體 v0100)===
-  ✓ 前版 v0102(含 v0101 · 本體 v0100)自測
-  ✓ 尾版不少公開名稱(TAILAPI)
-  ✓ VCGC 事件:最近一輪 go- 有 FAIL = 紅,並點名目標
-  ✓ VCGC 事件:ai- 輪全 OK = 綠(VIA_Panorama 自己的 FAIL 不算)
-  ✓ VDF 鏈 tally 全綠且新鮮 = 綠
-  ✓ VRN 鏈有 NODATA = 黃,並列未綠節點
-  ✓ 存證不在 = NODATA(SDD · 串測 · 交接),不冒充綠
-  ✓ 綠但存證過期 = STALE(黃)
-  ✓ TA-Lib 查無 = 綠(禁用正確)
-  ✓ 總判取最差:有紅 = 紅
-  ✓ monitor 有紅回 rc 2(報告不是閘;rc 1 只給崩潰)
-  ✓ 輸出 monitor_latest.json + html(RYG · 明暗主題 · 無外部資源)
-  ✓ 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
+  [via-vcgc run] [流程] 政策過 · VIA_Panorama_v0105.py(家族 core)
+=== VIA_Panorama_v0105 自測(薄尾;先跑前版 v0104 → v0103 → v0102 → v0101 → 本體 v0100)===
   VIA_Panorama_v0103 selftest 13/13 PASS
+  VIA_Panorama_v0104 selftest 11/11 PASS
+  ✓ 前版 v0104(含 v0103 · v0102 · v0101 · v0100)自測
+  ✓ 尾版不少公開名稱(TAILAPI)
+  ✓ 交接閘:checkpoint 收尾提交本身不算落後 = GREEN
+  ✓ 交接閘:有落後但程式都已登記 = YELLOW
+  ✓ 交接閘:改過的程式沒被冊點名 = RED · 列出族名 · 給收尾指令
+  ✓ 同步 GitHub:沒有上游 = 沒量(None)不假綠
+  ✓ 同步 GitHub:本機領先上游 1 = 未推 1 · 收尾指令帶 git push
+  ✓ 工作流圖:networkx 無環分層 · 引擎在 = 跟需求最差(PARTIAL 黃)· 引擎清單缺一支 = 紅
+  ✓ Plotly 圖:邊一條線 + 工作流 / 步兩組節點 · hover 帶引擎與需求
+  ✓ 儀表板:交接閘卡 · 需求冊總表 · 提交表 · 工作流圖 插在 KPI 下方
+  ✓ gate_line 一行(給 VCGC [監控] 提示)
+  ✓ 只讀:跑完目標 git 工作樹沒變
+  VIA_Panorama_v0105 selftest 12/12 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_Panorama_v0105.py(冊上 VIA_Panorama | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_Panorama_v0105.py', 'CGC_MDL149_VeritasCentral | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):6 個,例 ['VCGC-REQ102', 'VCGC-REQ103' → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 48, 'changed': 20, 'stale': 0, 'expected': 14643, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
