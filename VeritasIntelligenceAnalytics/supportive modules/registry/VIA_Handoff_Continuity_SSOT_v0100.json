@@ -612,6 +612,20 @@
         "supportive modules/SUP_MDL753_*.py"
       ],
       "timeout_seconds": 900
+    },
+    "progress_journal": {
+      "argv": [
+        "CGC_MDL251_ProgressJournal",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL251_ProgressJournal v0100] 自測 9/9 PASS",
+      "scope": "長流程逐步進度落本機暫存檔(fsync)· 中斷後同 context 接續 · 寫一半的尾行跳過 · 正常跑完標完成 · context 變了不接續 · 每步記可用記憶體(R41 · VCGC-REQ097)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL251_ProgressJournal_v*.py",
+        "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
+        "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -1277,6 +1291,13 @@
       "owner": "操作員",
       "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
       "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
+    },
+    {
+      "id": "VCGC-REQ097:progress-journal",
+      "requirement": "VCGC-REQ097",
+      "state": "VERIFIED",
+      "case": "progress_journal",
+      "receipt": "docs/handoff/evidence/progress_journal.json"
     }
   ]
 }
