@@ -116,7 +116,11 @@
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
-    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0105.py",
+    "supportive modules/registry/CGC_MDL172_VRNChainRunner_v0108.py",
+    "supportive modules/registry/CGC_MDL240_EnvManager_v0101.py",
+    "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0119.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -592,7 +596,7 @@
         "CGC_MDL170_VDFChainRunner",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0104 薄尾 4/4 · v0103 PASS · 合計 PASS",
+      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0105 薄尾 3/3 · v0104 PASS · 合計 PASS",
       "scope": "VDF 鏈跑器 0c 獨立性:沿薄尾鏈取文看依賴(薄尾繼承的依賴不再看不見)· 單向讀取豁免冊比對 · 真樹 ENG063 / ENG094 已審 · 未審 0(R39 · VCGC-REQ094)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
@@ -628,6 +632,42 @@
         "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
       ],
       "timeout_seconds": 300
+    },
+    "vrn_chain_runner": {
+      "argv": [
+        "CGC_MDL172_VRNChainRunner",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL172_VRNChainRunner v0108 薄尾 3/3 · v0107 PASS · 合計 PASS",
+      "scope": "VRN 鏈跑器每節點印 [進度] 開始 / k/N 完成(執行緒鎖)給 via-realtest 進度條算百分比 · 前版 v0107 全過(R42 · VCGC-REQ098)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL172_VRNChainRunner_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "env_manager": {
+      "argv": [
+        "CGC_MDL240_EnvManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL240_EnvManager v0101 薄尾 5/5 · v0100 PASS · 合計 PASS",
+      "scope": "ENV MANAGER 逐委派印 [進度] ENV k/8 開始 / 完成(via-realtest 環境進度條靠它)· 判燈與只查不裝照 v0100(R43 · VCGC-REQ099)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL240_EnvManager_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "vrn_firstpage_bridge": {
+      "argv": [
+        "VRN_ENG086_FirstPageLogicBridge",
+        "--selftest"
+      ],
+      "success_marker": "[計] 118 檢 OK 118 · FAIL 0",
+      "scope": "VRN 第一頁邏輯補缺橋:⑤ 券商正典鍵跟 CGC_MDL176 裁定(MORGANSTANLEY→MS)· ⑤' 一家一名;第一頁文字 / 表格 / 摘要擷取一字不動(R43 · VCGC-REQ099)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -1300,6 +1340,41 @@
       "state": "VERIFIED",
       "case": "progress_journal",
       "receipt": "docs/handoff/evidence/progress_journal.json"
+    },
+    {
+      "id": "VCGC-REQ098:vrn_chain_runner",
+      "requirement": "VCGC-REQ098",
+      "state": "VERIFIED",
+      "case": "vrn_chain_runner",
+      "receipt": "docs/handoff/evidence/vrn_chain_runner.json"
+    },
+    {
+      "id": "VCGC-REQ098:vdf_chain_runner",
+      "requirement": "VCGC-REQ098",
+      "state": "VERIFIED",
+      "case": "vdf_chain_runner",
+      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
+    },
+    {
+      "id": "VCGC-REQ099:env_manager",
+      "requirement": "VCGC-REQ099",
+      "state": "VERIFIED",
+      "case": "env_manager",
+      "receipt": "docs/handoff/evidence/env_manager.json"
+    },
+    {
+      "id": "VCGC-REQ099:vrn_firstpage_bridge",
+      "requirement": "VCGC-REQ099",
+      "state": "VERIFIED",
+      "case": "vrn_firstpage_bridge",
+      "receipt": "docs/handoff/evidence/vrn_firstpage_bridge.json"
+    },
+    {
+      "id": "VCGC-REQ099:provenance",
+      "requirement": "VCGC-REQ099",
+      "state": "VERIFIED",
+      "case": "provenance",
+      "receipt": "docs/handoff/evidence/provenance.json"
     }
   ]
 }

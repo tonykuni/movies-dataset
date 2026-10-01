@@ -54,6 +54,23 @@ M=None
 N=None
 
 
+def setUpModule():
+    """R43:單獨被 unittest discover 撈到時(VRN_AutoTestLoop ① 掃 VRN/tests)沒有人呼叫 run(module) 注入 M/N,
+    23 支全以 NoneType 報錯=假紅。這裡自己載同一支正主(VRN_ENG114 尾版)與編號器;經 run(module) 進來時 M 已在,原樣不動。"""
+    global M,N
+    if M is not None:
+        return
+    import importlib.util
+    from pathlib import Path
+    vrn=Path(__file__).resolve().parent.parent
+    eng=max(vrn.glob('VRN_ENG114_SourceProvenance_v*.py'))
+    spec=importlib.util.spec_from_file_location('_provenance_standalone_eng114',eng)
+    mod=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    M=mod
+    N=M.load(max(M.REG.glob('CGC_MDL237_NumberingSystem_v*.py')),'_provenance_test_numbering')
+
+
 class ProvenanceTests(unittest.TestCase):
     def setUp(self):
         self.catalog={key:'VIA-VRN-SRC'+str(i).zfill(3) for i,key in enumerate(['filename','first_page_info','first_page_body','annual_financial'],1)}
