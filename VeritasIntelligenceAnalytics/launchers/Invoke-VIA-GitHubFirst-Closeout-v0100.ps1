@@ -21,6 +21,16 @@
 #   環境:VIA_REPO_ROOT · VIA_CELERITAS_ROOT · VIA_GHF_NOOPEN=1 · VIA_GHF_NOPUSH=1(只 commit 不 push)
 # =====================================================================================
 param([switch]$DryRun, [switch]$Full, [switch]$SkipSync)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $__root = if ($PSScriptRoot) { $PSScriptRoot } else { $env:VIA_CELERITAS_ROOT }
 $__self = $PSCommandPath
 if ($DryRun) { $env:VIA_GHF_DRYRUN = "1" }

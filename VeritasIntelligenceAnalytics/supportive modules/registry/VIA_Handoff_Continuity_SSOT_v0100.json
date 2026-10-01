@@ -87,6 +87,8 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0103.py",
+    "supportive modules/registry/CGC_MDL251_ProgressJournal_v0100.py",
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
@@ -107,7 +109,14 @@
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
     "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py",
-    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py"
+    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py",
+    "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
+    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py",
+    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -480,8 +489,8 @@
         "VRN_ENG394_LayoutRestore",
         "--selftest"
       ],
-      "success_marker": "[VRN_ENG394 v0100 版面還原] 自測 48/48 PASS",
-      "scope": "VRN 版面還原:資訊區(上/左/右/下)/ 本文區(一句一據點 · 字級粗體 · 次類別)/ 圖 / 排除區(小字頁尾 · 附錄連標題)· 扁平文字表格還原(表號 · 表頭 · 單位 · 來源 · 並排 · 分組)· 合併格 · 左右 / 上下拆 · 表格驗算(R36 · VRN-REQ010)",
+      "success_marker": "[VRN_ENG394 v0101 雙欄 · 編號 · 完整度 · 去重] 自測 16/16 PASS",
+      "scope": "VRN 版面還原:資訊區(上/左/右/下)/ 本文區(一句一據點 · 字級粗體 · 次類別)/ 圖 / 排除區(小字頁尾 · 附錄連標題)· 扁平文字表格還原(表號 · 表頭 · 單位 · 來源 · 並排 · 分組)· 合併格 · 左右 / 上下拆 · 表格驗算(R36 · VRN-REQ010) · v0101 右側資訊區雙欄頁 · 一句一標題一資料(S 編號 + 節.句 · 類別 × 次類別)· 截取完整度(對文字層逐字)· 跨頁 / 同頁去重(R37)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
         "supportive modules/registry/VIA_VRN_LayoutRestore_SSOT_v*.json",
@@ -517,6 +526,108 @@
         "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json"
       ],
       "timeout_seconds": 600
+    },
+    "vrn_entities": {
+      "argv": [
+        "VRN_ENG396_ReportEntities",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG396 v0100 研報實體] 自測 25/25 PASS",
+      "scope": "研報本文實體:公司名稱中英文(全名 · 去後綴 · 最簡寫 · 局部識別)· 目標價本次 / 調整前 · 評價法(VAL_* · 倍數 · 基準年 · 驗算)(R36 · VRN-REQ014)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG396_ReportEntities_v*.py",
+        "supportive modules/registry/VIA_VRN_ReportEntities_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v*.py",
+        "supportive modules/registry/VIA_VRN_ValuationMethod_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "vrn_plugin_hub": {
+      "argv": [
+        "VRN_ENG397_PluginHub",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG397 v0100 外掛中樞] 自測 17/17 PASS",
+      "scope": "VRN 樂高化外掛中樞:階段 × 積木註冊 · 計畫 · 外部工具偵測不安裝 · ABSENT 退回內部 · 執行期加掛 / 拔除 · AST 盤點功能分類 · 知識物件(R37 · VRN-REQ016)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG397_PluginHub_v*.py",
+        "supportive modules/registry/VIA_VRN_PluginHub_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
+        "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py",
+        "functional modules/VRN/VRN_ENG396_ReportEntities_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "tool_coverage_matrix": {
+      "argv": [
+        "CGC_MDL230_ToolCoverageProbe",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL230_ToolCoverageProbe v0104 不跑 server 直接跳出] 自測 4/4 PASS",
+      "scope": "全樹工具覆蓋矩陣:PY 加速器 · 觸網 PY 網路橋 · VDF 全件網路橋 · PS 尾版加速器模組;燈由正主(sweeper / MDL117),AST 與 pwsh Parser 第二讀法互核;具名豁免附理由;HTML 矩陣報告前次 → 本次(R37c · VCGC-REQ092);R38 v0103:+⑥ PS 模板章(正主 MDL183 + PaidDebt)· ⑦ PY AST 分類說明目錄 · 版號尾碼 · 只增帳本 · 淺色緊湊頁 · SYNCHRONIZER 來源(VCGC-REQ093);v0104:matrix 預設 file:// 直接跳出(不跑 server)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v*.py",
+        "supportive modules/registry/VIA_ToolCoverageMatrix_SSOT_v*.json",
+        "supportive modules/registry/via_bridge_sweeper_v*.py",
+        "supportive modules/registry/CGC_MDL117_AccelCoverage_v*.py",
+        "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v*.py",
+        "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v*.py",
+        "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v*.py",
+        "supportive modules/registry/CGC_MDL074_AccelBridge_v*.py",
+        "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v*.py",
+        "supportive modules/registry/via_accel_injector_v*.py",
+        "supportive modules/registry/VIA_UI_TemplateSync_SSOT_v*.json",
+        "supportive modules/registry/VIA_CeleritasPolicy_PaidDebt_v*.json",
+        "supportive modules/registry/VIA_VRN_PluginHub_SSOT_v*.json",
+        "functional modules/WorkOps/VMT/Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2.ps1",
+        "supportive modules/VIA_FlowSystem/Invoke_VIA_FlowSystem_SandboxPatch_v025.ps1",
+        "supportive modules/VIA_Governance_Runtime/v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159.ps1"
+      ],
+      "timeout_seconds": 900,
+      "dependency_why": "橋修件(真橋 / 半橋補全 / 空橋還原)的驗收就是本案 AST 讀法:矩陣 ㉖ ㉗ 逐檔讀它們的橋是否真程式碼"
+    },
+    "vdf_chain_runner": {
+      "argv": [
+        "CGC_MDL170_VDFChainRunner",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL170_VDFChainRunner v0104 薄尾 4/4 · v0103 PASS · 合計 PASS",
+      "scope": "VDF 鏈跑器 0c 獨立性:沿薄尾鏈取文看依賴(薄尾繼承的依賴不再看不見)· 單向讀取豁免冊比對 · 真樹 ENG063 / ENG094 已審 · 未審 0(R39 · VCGC-REQ094)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL170_VDFChainRunner_v*.py",
+        "supportive modules/registry/VIA_VDF_OneWayRead_Waivers_v*.json",
+        "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v*.py",
+        "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_local_db": {
+      "argv": [
+        "VDF_ENG079_LocalDbConsolidate",
+        "--selftest"
+      ],
+      "success_marker": "VDF_ENG079_LocalDbConsolidate_v0105 薄尾 6/6 PASS",
+      "scope": "本機三庫整併:目標表有主鍵就照主鍵只補缺(協定檔 consensus_daily 不再撞主鍵)· 既有列零觸碰 · 計畫 = 實寫 · 重跑冪等 + v0103 十六檢(R40 · VCGC-REQ094)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v*.py",
+        "supportive modules/SUP_MDL753_*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "progress_journal": {
+      "argv": [
+        "CGC_MDL251_ProgressJournal",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL251_ProgressJournal v0100] 自測 9/9 PASS",
+      "scope": "長流程逐步進度落本機暫存檔(fsync)· 中斷後同 context 接續 · 寫一半的尾行跳過 · 正常跑完標完成 · context 變了不接續 · 每步記可用記憶體(R41 · VCGC-REQ097)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL251_ProgressJournal_v*.py",
+        "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
+        "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -1049,6 +1160,146 @@
       "owner": "操作員",
       "reason": "冊外職稱 / 號碼格式 / 網域要從真實樣本量,容器沒有樣本",
       "next": "via-vcgc run --family core CGC_MDL182_ReportFieldRulers mine --samples \"C:\\測試樣本報告\" → 貼回 MINE_latest.json 摘要 → AI 裁定 → 冊新版(只增不減)"
+    },
+    {
+      "id": "VRN-REQ014:vrn_entities",
+      "requirement": "VRN-REQ014",
+      "state": "VERIFIED",
+      "case": "vrn_entities",
+      "receipt": "docs/handoff/evidence/vrn_entities.json"
+    },
+    {
+      "id": "VRN-REQ014:workstation-real",
+      "requirement": "VRN-REQ014",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實券商報告在工作站;容器只驗自寫句子與倉內 FactSet 週報",
+      "next": "via-vcgc run --family vrn VRN_ENG396_ReportEntities run --in \"C:\\測試樣本報告\" --pages 1-2 → 看 VIA_Reports\\vrn\\entities\\ENTITIES_latest.json"
+    },
+    {
+      "id": "VRN-REQ015:layout-v0101",
+      "requirement": "VRN-REQ015",
+      "state": "VERIFIED",
+      "case": "vrn_layout",
+      "receipt": "docs/handoff/evidence/vrn_layout.json"
+    },
+    {
+      "id": "VRN-REQ016:vrn_plugin_hub",
+      "requirement": "VRN-REQ016",
+      "state": "VERIFIED",
+      "case": "vrn_plugin_hub",
+      "receipt": "docs/handoff/evidence/vrn_plugin_hub.json"
+    },
+    {
+      "id": "VRN-REQ016:external-tools",
+      "requirement": "VRN-REQ016",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
+      "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
+    },
+    {
+      "id": "VCGC-REQ092:tool_coverage_matrix",
+      "requirement": "VCGC-REQ092",
+      "state": "VERIFIED",
+      "reason": "CGC_MDL230 v0102 matrix:四面非豁免缺 0 · 兩法不一致 0;補橋 PS 8 支 · PS 函式內橋移頂層 4 支 · PY 網路橋 3 支 · 空橋 / 半橋 / 字串橋修 5 支",
+      "next": "via-vcgc run --family core CGC_MDL230_ToolCoverageProbe matrix(工作站有 pwsh 時 PS 用剖析器讀)",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
+    },
+    {
+      "id": "VCGC-REQ092:ps-parse-errors",
+      "requirement": "VCGC-REQ092",
+      "state": "VERIFIED",
+      "owner": "操作員",
+      "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
+      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "resolved": "R38 2026-10-01 操作員令「上面語法錯誤改善 記得加入加速模組」(L70 許可):HyperBOM_SELF_CONTAINED_v2(-replace \"`\" 跳脫掉收尾引號 → 單引號 ×2)· FlowSystem_SandboxPatch_v025(\\\" 不是 PS 跳脫 → 單引號字串)· v0163A Sidebar-v0159(( if … ) → $( if … ))就地最小修 · pwsh 剖析 0 錯 · Invoke-VIA-PSTemplateJoin -Apply 接章(寫前備份)· PS-ACCEL 本在頂層;Fallback-Activation-v0136 由 v0136A(剖析 0 錯)取代,矩陣尾碼排序後進版史不改"
+    },
+    {
+      "id": "VCGC-REQ092:accel-real-use",
+      "requirement": "VCGC-REQ092",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
+      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
+    },
+    {
+      "id": "VCGC-REQ093:coverage-matrix-v0103",
+      "requirement": "VCGC-REQ093",
+      "state": "VERIFIED",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
+    },
+    {
+      "id": "VCGC-REQ093:docstrings",
+      "requirement": "VCGC-REQ093",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
+      "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
+    },
+    {
+      "id": "VCGC-REQ094:vdf_chain_runner",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_chain_runner",
+      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
+    },
+    {
+      "id": "VCGC-REQ094:workstation-lock",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
+      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
+    },
+    {
+      "id": "VCGC-REQ094:env-data",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
+      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
+    },
+    {
+      "id": "VCGC-REQ094:vcgc-cache-key",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json"
+    },
+    {
+      "id": "VCGC-REQ094:eng079-pk",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_local_db",
+      "receipt": "docs/handoff/evidence/vdf_local_db.json"
+    },
+    {
+      "id": "VCGC-REQ095:architecture-map",
+      "requirement": "VCGC-REQ095",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
+      "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
+    },
+    {
+      "id": "VCGC-REQ096:closeout-tri-page",
+      "requirement": "VCGC-REQ096",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
+      "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
+    },
+    {
+      "id": "VCGC-REQ097:progress-journal",
+      "requirement": "VCGC-REQ097",
+      "state": "VERIFIED",
+      "case": "progress_journal",
+      "receipt": "docs/handoff/evidence/progress_journal.json"
     }
   ]
 }

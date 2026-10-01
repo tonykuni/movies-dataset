@@ -1,0 +1,1171 @@
+{
+ "schema": "VIA_UI_TEMPLATE_SYNC_SSOT",
+ "version": "v0101",
+ "append_only": true,
+ "engine": "CGC_MDL241_TemplateAdapter_v0101",
+ "req": "操作員 2026-09-30 R35:「HTML U/I RAW TEMPLATE WITH SYNCHRONIZER ... 模板可轉換 SYNCHRONIZER 自動隨之調整變成自己的 U/I 可加 TOP 25 TO BUILD UP THIS FUNCTION」",
+ "policy": [
+  "樣式唯一的尺仍是 VIA_UI_TemplateSSOT 尾版(L05):convert 只出下一版候選,寫入要 apply,格式鎖要操作員 MDL238 template --lock 重鎖。",
+  "對接只接本機既有報告(唯讀);沒對上的槽列在未對接報告並在頁上標 NODATA,不補示範值、不造數(誠實四態)。",
+  "輸出單檔離線:外部 <link>/<script>/@import/遠端 url() 一律拿掉;Claude Design 綁包內的字型只收拉丁子集內嵌,大圖換成 VIA 自己的印章資產。",
+  "本冊只增不減:新同義字 / 新來源 / 新能力出下一版號(v0101…),舊版不動。"
+ ],
+ "drop": {
+  "inbox": "VIA_Reports/template_adapter/inbox",
+  "patterns": [
+   ".dc.html",
+   ".html",
+   ".htm"
+  ],
+  "expected": "VIA HTML Universal UI.dc.html",
+  "reference_copy": "VIA_HTML_UI/legacy/reference-templates/VIAHTMLUniversalUI-Standalone.html",
+  "note": "操作員把 Claude Design 匯出的 .dc.html(或 Standalone .html 綁包)放進 inbox;watch 以 sha 偵測,自動 convert + sync。inbox 空 = NODATA(不拿參考副本冒充)。"
+ },
+ "out": {
+  "converted": "VIA_Reports/template_adapter/converted/<slug>/",
+  "synced": "VIA_Reports/template_adapter/synced/<slug>/VIA_UI_<slug>_latest.html",
+  "index": "VIA_Reports/template_adapter/SYNC_INDEX_latest.html"
+ },
+ "stale_h_default": 24,
+ "budget": {
+  "html_bytes_green": 1500000,
+  "html_bytes_yellow": 3000000,
+  "dom_nodes_green": 6000,
+  "inline_image_max_bytes": 300000
+ },
+ "sources": [
+  {
+   "id": "panorama",
+   "name": "全景監測",
+   "en": "Panorama monitor",
+   "path": "VIA_Reports/panorama/monitor_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "verdict",
+   "rows_key": "rows",
+   "row_map": {
+    "name": "track",
+    "status": "lamp",
+    "note": "value|note",
+    "ts": "at"
+   },
+   "engine_key": "engine",
+   "stale_h": 24
+  },
+  {
+   "id": "test",
+   "name": "VCGC 全功能串測",
+   "en": "VCGC test",
+   "path": "VIA_Reports/vcgc/TEST_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "lamp",
+   "rows_key": "rows",
+   "row_map": {
+    "code": "id",
+    "name": "name",
+    "status": "lamp",
+    "note": "last",
+    "secs": "secs",
+    "ts": "at"
+   },
+   "engine_key": "door",
+   "stale_h": 24
+  },
+  {
+   "id": "handoff",
+   "name": "交接 HANDOFF",
+   "en": "Handoff",
+   "path": "docs/handoff/HANDOFF_latest.json",
+   "adapter": "handoff",
+   "status": true,
+   "lamp_key": "lamp",
+   "rows_key": "pending",
+   "row_map": {
+    "code": "id",
+    "name": "topic",
+    "status": "state",
+    "note": "next",
+    "engine": "owner"
+   },
+   "engine_key": "engine",
+   "stale_h": 48
+  },
+  {
+   "id": "sdd",
+   "name": "SDD 規格驗證",
+   "en": "SDD check",
+   "path": "VIA_Reports/sdd/SDD_CHECK_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "lamp",
+   "rows_key": "rows",
+   "row_map": {
+    "code": "rule",
+    "name": "rule",
+    "status": "lamp",
+    "note": "msg"
+   },
+   "engine_key": "engine",
+   "stale_h": 24
+  },
+  {
+   "id": "dflock",
+   "name": "DataFrame 鎖",
+   "en": "DataFrame lock",
+   "path": "VIA_Reports/dataframe_lock/DFLOCK_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "verdict",
+   "rows_key": "tables",
+   "row_map": {
+    "code": "table|id",
+    "name": "table|id",
+    "status": "lamp",
+    "note": "problems"
+   },
+   "engine_key": "engine",
+   "stale_h": 24
+  },
+  {
+   "id": "vdf_chain",
+   "name": "VDF 鏈",
+   "en": "VDF chain",
+   "path": "VIA_Reports/vdf_chain/VDFCHAIN_latest.json",
+   "adapter": "chain",
+   "status": true,
+   "lamp_key": "rc_name",
+   "rows_key": "stages",
+   "row_map": {
+    "code": "id|layer",
+    "name": "name",
+    "status": "state",
+    "note": "detail",
+    "secs": "secs"
+   },
+   "engine_key": "schema",
+   "stale_h": 24
+  },
+  {
+   "id": "vrn_chain",
+   "name": "VRN 鏈",
+   "en": "VRN chain",
+   "path": "VIA_Reports/vrn_chain/VRNCHAIN_latest.json",
+   "adapter": "chain",
+   "status": true,
+   "lamp_key": "rc_name",
+   "rows_key": "stages",
+   "row_map": {
+    "code": "layer|id",
+    "name": "name",
+    "status": "state",
+    "note": "detail",
+    "secs": "secs"
+   },
+   "engine_key": "schema",
+   "stale_h": 24
+  },
+  {
+   "id": "operator_sync",
+   "name": "註冊同步",
+   "en": "Registry sync",
+   "path": "VIA_Reports/operator_console/SYNC_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "lamp",
+   "rows_key": "rows",
+   "row_map": {
+    "name": "item",
+    "status": "state",
+    "note": "note"
+   },
+   "engine_key": "engine",
+   "stale_h": 24
+  },
+  {
+   "id": "env",
+   "name": "環境管理",
+   "en": "Env manager",
+   "path": "VIA_Reports/env_manager/ENVMGR_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "verdict",
+   "rows_key": "rows",
+   "row_map": {
+    "code": "id",
+    "name": "item",
+    "status": "state",
+    "note": "note",
+    "secs": "secs"
+   },
+   "engine_key": "engine",
+   "stale_h": 72
+  },
+  {
+   "id": "ledger",
+   "name": "VCGC 功能帳",
+   "en": "Function ledger",
+   "path": "supportive modules/registry/VIA_VCGC_FunctionLedger_v0100.jsonl",
+   "adapter": "jsonl_tail",
+   "status": false,
+   "tail": 40,
+   "stale_h": 72
+  },
+  {
+   "id": "inventory",
+   "name": "VCGC 功能盤點冊",
+   "en": "Function inventory",
+   "path": "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
+   "adapter": "inventory",
+   "status": false,
+   "stale_h": 99999
+  },
+  {
+   "id": "card",
+   "name": "AI 必用功能卡",
+   "en": "AI function card",
+   "path": "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v*.json",
+   "adapter": "card",
+   "status": false,
+   "stale_h": 99999
+  },
+  {
+   "id": "input",
+   "name": "輸入冊",
+   "en": "Input book",
+   "path": "supportive modules/registry/VIA_InputConsole_Spec_v*.json",
+   "adapter": "input",
+   "status": false,
+   "stale_h": 99999
+  },
+  {
+   "id": "tssot",
+   "name": "樣式冊 TemplateSSOT",
+   "en": "Template SSOT",
+   "path": "supportive modules/registry/VIA_UI_TemplateSSOT_v*.json",
+   "adapter": "tssot",
+   "status": false,
+   "stale_h": 99999
+  },
+  {
+   "id": "toolcov",
+   "name": "工具覆蓋矩陣",
+   "en": "Tool coverage matrix",
+   "path": "VIA_Reports/toolprobe/COVERAGE_MATRIX_latest.json",
+   "adapter": "rows",
+   "status": true,
+   "lamp_key": "verdict",
+   "rows_key": "rows",
+   "row_map": {
+    "code": "side",
+    "name": "group",
+    "status": "lamp",
+    "note": "pct",
+    "ts": "ts_utc"
+   },
+   "engine_key": "engine",
+   "stale_h": 24
+  }
+ ],
+ "links": [
+  {
+   "code": "OPS",
+   "name": "操作台",
+   "path": "VIA_Reports/operator_console/VIA_OperatorConsole_latest.html"
+  },
+  {
+   "code": "SYNC",
+   "name": "SYNCHRONIZER",
+   "path": "VIA_Reports/operator_console/ui/VIA-SYNCHRONIZER-Standalone.html"
+  },
+  {
+   "code": "PANO",
+   "name": "全景實測報告",
+   "path": "VIA_Reports/sweep/SWEEP_REPORT_latest.html"
+  },
+  {
+   "code": "SSOT",
+   "name": "SSOT 全景",
+   "path": "VIA_Reports/ssot_panorama/SSOT_PANORAMA_latest.html"
+  },
+  {
+   "code": "TPL",
+   "name": "模板轉接預覽",
+   "path": "VIA_Reports/template_adapter/PREVIEW_latest.html"
+  },
+  {
+   "code": "IDX",
+   "name": "模板同步總表",
+   "path": "VIA_Reports/template_adapter/SYNC_INDEX_latest.html"
+  },
+  {
+   "code": "TCOV",
+   "name": "工具覆蓋矩陣",
+   "path": "VIA_Reports/toolprobe/COVERAGE_MATRIX_latest.html"
+  }
+ ],
+ "views": {
+  "status_line": [
+   "runStat",
+   "status",
+   "statusLine",
+   "runStatus",
+   "verdict",
+   "systemStatus",
+   "lastRun",
+   "overall"
+  ],
+  "progress": [
+   "progTxt",
+   "progress",
+   "progressText",
+   "coverage",
+   "syncText"
+  ],
+  "drop_hint": [
+   "dzText",
+   "dropText",
+   "dropHint",
+   "dropzone"
+  ],
+  "palette_label": [
+   "palLabel",
+   "paletteLabel",
+   "themeLabel",
+   "palette"
+  ],
+  "params": [
+   "params",
+   "paramRows",
+   "inputs",
+   "inputRows",
+   "parameters",
+   "fields"
+  ],
+  "links": [
+   "subs",
+   "links",
+   "nav",
+   "navLinks",
+   "subsystems",
+   "menu"
+  ],
+  "logs": [
+   "logs",
+   "log",
+   "events",
+   "logRows",
+   "ledger"
+  ],
+  "tabs": [
+   "tabs",
+   "pages",
+   "tabList"
+  ],
+  "kpis": [
+   "vKpis",
+   "kpis",
+   "stats",
+   "metrics",
+   "summaryKpis",
+   "kpiRows"
+  ],
+  "validation": [
+   "valRows",
+   "rules",
+   "validation",
+   "checks",
+   "checkRows",
+   "validRows"
+  ],
+  "tests": [
+   "testCards",
+   "tests",
+   "testRows",
+   "autoTests"
+  ],
+  "summary": [
+   "sumRows",
+   "summary",
+   "summaryRows",
+   "overview",
+   "overviewRows"
+  ],
+  "categories": [
+   "cats",
+   "categories",
+   "groups"
+  ],
+  "engines": [
+   "engines",
+   "engineRows",
+   "registry",
+   "stations"
+  ],
+  "sources": [
+   "ssot",
+   "sources",
+   "snapshot",
+   "snapshots",
+   "sourceRows"
+  ],
+  "charts": [
+   "gallery",
+   "charts",
+   "plots",
+   "chartRows"
+  ],
+  "chart_spec": [
+   "vapSpec",
+   "chartSpec",
+   "plotSpec",
+   "specRows"
+  ],
+  "top25": [
+   "adaptRules",
+   "capabilities",
+   "features",
+   "top25"
+  ],
+  "bindings": [
+   "bindRows",
+   "bindings",
+   "slots",
+   "slotRows"
+  ],
+  "pipeline": [
+   "pathNodes",
+   "path",
+   "steps",
+   "pipeline",
+   "flow",
+   "flowNodes"
+  ],
+  "palettes": [
+   "palOpts",
+   "palettes",
+   "themes",
+   "paletteOptions"
+  ],
+  "pending": [
+   "pending",
+   "todo",
+   "todos",
+   "backlog"
+  ]
+ },
+ "abbrev": {
+  "eng": "engines",
+  "cat": "categories",
+  "param": "params",
+  "val": "validation",
+  "sum": "summary",
+  "pal": "palettes",
+  "log": "logs",
+  "gallery": "charts",
+  "sub": "links",
+  "test": "tests",
+  "kpi": "kpis",
+  "src": "sources",
+  "chart": "charts",
+  "step": "pipeline",
+  "rule": "validation",
+  "tab": "tabs",
+  "bind": "bindings",
+  "pend": "pending"
+ },
+ "count_suffix": [
+  "n",
+  "count",
+  "num",
+  "total",
+  "cnt"
+ ],
+ "list_suffix": [
+  "rows",
+  "row",
+  "list",
+  "items",
+  "cards",
+  "data",
+  "arr",
+  "set"
+ ],
+ "page_scope_prefix": [
+  "cat",
+  "category",
+  "xc",
+  "grp",
+  "group",
+  "cur",
+  "sel"
+ ],
+ "page_category_markers": [
+  "cat",
+  "category",
+  "group",
+  "grp"
+ ],
+ "field_syn": {
+  "code": [
+   "code",
+   "id",
+   "no",
+   "slot",
+   "sid",
+   "ref",
+   "step"
+  ],
+  "name": [
+   "name",
+   "title",
+   "label",
+   "item",
+   "field",
+   "target",
+   "topic",
+   "track",
+   "txt",
+   "nm"
+  ],
+  "note": [
+   "note",
+   "detail",
+   "why",
+   "text",
+   "desc",
+   "description",
+   "msg",
+   "api",
+   "rule",
+   "hint",
+   "sub"
+  ],
+  "status": [
+   "status",
+   "state",
+   "lamp",
+   "verdict",
+   "st",
+   "level",
+   "lv"
+  ],
+  "value": [
+   "value",
+   "val",
+   "v",
+   "result"
+  ],
+  "score": [
+   "score",
+   "pct",
+   "ratio",
+   "percent"
+  ],
+  "tally": [
+   "stage",
+   "tally",
+   "phase"
+  ],
+  "age": [
+   "dist",
+   "age",
+   "ago",
+   "fresh",
+   "freshness"
+  ],
+  "engine": [
+   "engine",
+   "by",
+   "owner",
+   "producer",
+   "src"
+  ],
+  "ms": [
+   "ms",
+   "secs",
+   "dur",
+   "duration",
+   "elapsed"
+  ],
+  "ts": [
+   "ts",
+   "at",
+   "time",
+   "date",
+   "when"
+  ],
+  "key": [
+   "key",
+   "k",
+   "param"
+  ],
+  "tier": [
+   "tier",
+   "grade"
+  ],
+  "lines": [
+   "lines",
+   "kv",
+   "pairs"
+  ],
+  "items": [
+   "items",
+   "children"
+  ],
+  "kpis": [
+   "kpis",
+   "stats"
+  ],
+  "cells": [
+   "cells"
+  ],
+  "cols": [
+   "cols",
+   "columns",
+   "heads"
+  ],
+  "rows": [
+   "rows"
+  ],
+  "href": [
+   "href",
+   "url",
+   "link"
+  ],
+  "en": [
+   "en",
+   "english",
+   "enname"
+  ],
+  "role": [
+   "role",
+   "kind",
+   "type",
+   "argv"
+  ],
+  "chart": [
+   "chart",
+   "svg",
+   "plot"
+  ],
+  "spec": [
+   "spec",
+   "schema"
+  ],
+  "swatch": [
+   "swatch",
+   "swatches",
+   "colors"
+  ],
+  "color": [
+   "color",
+   "c",
+   "hex",
+   "fill"
+  ],
+  "mark": [
+   "mark",
+   "sym"
+  ],
+  "calls": [
+   "calls",
+   "hits",
+   "runs"
+  ]
+ },
+ "derived": {
+  "class_style_suffix": "Cs",
+  "zebra_vars": [
+   "zebra",
+   "stripe",
+   "row-alt",
+   "alt"
+  ],
+  "on_fields": [
+   "on",
+   "active",
+   "sel",
+   "selected",
+   "current"
+  ],
+  "tick_fields": [
+   "tick",
+   "check",
+   "ck"
+  ],
+  "arrow_fields": [
+   "arrow",
+   "sep",
+   "next"
+  ],
+  "accent_fields": [
+   "acc",
+   "accent",
+   "tone"
+  ],
+  "color_fields": [
+   "color",
+   "dotColor",
+   "barColor"
+  ],
+  "badge_fields": [
+   "badge",
+   "pill",
+   "tag"
+  ]
+ },
+ "lamp_class_vocab": {
+  "GREEN": [
+   "ok",
+   "pass",
+   "good",
+   "success",
+   "green",
+   "g"
+  ],
+  "YELLOW": [
+   "wn",
+   "warn",
+   "warning",
+   "amber",
+   "am",
+   "yellow",
+   "y",
+   "caution"
+  ],
+  "RED": [
+   "er",
+   "err",
+   "error",
+   "fail",
+   "bad",
+   "danger",
+   "red",
+   "r"
+  ],
+  "NODATA": [
+   "in",
+   "info",
+   "mut",
+   "gy",
+   "gray",
+   "grey",
+   "off",
+   "na",
+   "nodata"
+  ]
+ },
+ "lamp_canon": {
+  "GREEN": "#15803d",
+  "YELLOW": "#b45309",
+  "RED": "#b91c1c",
+  "NODATA": "#64748b"
+ },
+ "lamp_alias": {
+  "GREEN": [
+   "GREEN",
+   "OK",
+   "PASS",
+   "PASSED",
+   "SAME",
+   "DONE",
+   "IMPLEMENTED",
+   "MEASURED",
+   "WRITTEN",
+   "READY"
+  ],
+  "YELLOW": [
+   "YELLOW",
+   "AMBER",
+   "WARN",
+   "WARNING",
+   "SKIP",
+   "GATED",
+   "FINDING",
+   "PARTIAL",
+   "REVIEW",
+   "STALE",
+   "CHANGED",
+   "PLAN",
+   "PENDING",
+   "OPEN",
+   "DRIFT"
+  ],
+  "RED": [
+   "RED",
+   "FAIL",
+   "FAILED",
+   "ERROR",
+   "BLOCKED",
+   "BROKEN",
+   "DENY"
+  ],
+  "NODATA": [
+   "NODATA",
+   "ABSENT",
+   "UNTESTED",
+   "NONE",
+   "UNKNOWN",
+   "INFO",
+   "PLANNED",
+   "UNREADABLE",
+   ""
+  ]
+ },
+ "roles": {
+  "header": {
+   "tags": [
+    "header"
+   ],
+   "classes": [
+    "head",
+    "header",
+    "topbar",
+    "masthead",
+    "hdr",
+    "app-header"
+   ]
+  },
+  "left": {
+   "tags": [
+    "aside"
+   ],
+   "classes": [
+    "left",
+    "side",
+    "sidebar",
+    "leftpanel",
+    "sidenav",
+    "gate"
+   ]
+  },
+  "tabs": {
+   "tags": [],
+   "classes": [
+    "tabs",
+    "tabbar",
+    "tab-bar",
+    "nav-tabs",
+    "tablist"
+   ]
+  },
+  "tab": {
+   "tags": [],
+   "classes": [
+    "tab"
+   ]
+  },
+  "pane": {
+   "tags": [
+    "main"
+   ],
+   "classes": [
+    "pane",
+    "tab-pane",
+    "tabpanel",
+    "right",
+    "main",
+    "content"
+   ]
+  },
+  "footer": {
+   "tags": [
+    "footer"
+   ],
+   "classes": [
+    "foot",
+    "footer"
+   ]
+  },
+  "card": {
+   "tags": [],
+   "classes": [
+    "card",
+    "kpi",
+    "tile",
+    "stat",
+    "metric"
+   ]
+  },
+  "table": {
+   "tags": [
+    "table",
+    "sc-raw-table"
+   ],
+   "classes": [
+    "mx",
+    "table",
+    "tbl",
+    "matrix",
+    "data-table"
+   ]
+  },
+  "lamp": {
+   "tags": [],
+   "classes": [
+    "dot",
+    "lamp",
+    "led",
+    "light",
+    "pill",
+    "badge",
+    "chip",
+    "status"
+   ]
+  },
+  "chart": {
+   "tags": [
+    "svg",
+    "canvas"
+   ],
+   "classes": [
+    "chart",
+    "plot",
+    "spark",
+    "viz"
+   ]
+  },
+  "button": {
+   "tags": [
+    "button"
+   ],
+   "classes": [
+    "btn",
+    "button"
+   ]
+  },
+  "input": {
+   "tags": [
+    "input",
+    "select",
+    "textarea"
+   ],
+   "classes": [
+    "fi",
+    "input"
+   ]
+  },
+  "grid": {
+   "tags": [],
+   "classes": [
+    "grid",
+    "row1",
+    "cards",
+    "kpis"
+   ]
+  },
+  "log": {
+   "tags": [],
+   "classes": [
+    "log",
+    "console",
+    "terminal"
+   ]
+  },
+  "heading": {
+   "tags": [
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ],
+   "classes": [
+    "hd",
+    "title",
+    "heading"
+   ]
+  }
+ },
+ "top25": [
+  {
+   "id": "T01",
+   "name": "通用匯入 Universal ingest",
+   "why": "任何模板都能丟進來:Claude Design .dc.html、Standalone 綁包(__bundler/template JSON 解包)、一般 .html、.css、token JSON。",
+   "status": "IMPLEMENTED",
+   "check": "C01"
+  },
+  {
+   "id": "T02",
+   "name": "Token → TemplateSSOT 下一版提案",
+   "why": "顏色 / 字型 / 間距 / 圓角進 v0100 plan(同義字冊 + 版面自動優化 + 圖規格),只出候選;apply 與重鎖是操作員的手。",
+   "status": "IMPLEMENTED",
+   "check": "C02"
+  },
+  {
+   "id": "T03",
+   "name": "版面區塊偵測 Layout regions",
+   "why": "header / 左面板 / 分頁列 / 分頁內容 / footer 由角色冊判出,骨架模式與報告都用它。",
+   "status": "IMPLEMENTED",
+   "check": "C03"
+  },
+  {
+   "id": "T04",
+   "name": "元件盤點匯出 + 重複元件去重",
+   "why": "卡 / 表 / 燈 / 圖 / 按鈕 / 輸入逐類計數,結構簽章相同的元件併成一個元件庫條目(COMPONENTS.json)。",
+   "status": "IMPLEMENTED",
+   "check": "C04"
+  },
+  {
+   "id": "T05",
+   "name": "槽位抽取 Slot extraction",
+   "why": "{{ 純量 }}、sc-for 清單與欄位(含巢狀)、sc-if 條件、事件槽全列;模板語言只有這幾種(本機 40 份 .dc.html 實測)。",
+   "status": "IMPLEMENTED",
+   "check": "C05"
+  },
+  {
+   "id": "T06",
+   "name": "活資料對接 Live binding",
+   "why": "槽名經同義字 / 縮寫 / 計數尾碼對上 VIA 既有報告(全景 · TEST · HANDOFF · SDD · DFLOCK · VDF/VRN 鏈 · 註冊同步 · 環境 · 功能帳)。",
+   "status": "IMPLEMENTED",
+   "check": "C06"
+  },
+  {
+   "id": "T07",
+   "name": "未對接槽報告(不造數)",
+   "why": "沒對上的槽頁上標 NODATA、報告列出來源與原因;模板裡的示範資料一律不用。",
+   "status": "IMPLEMENTED",
+   "check": "C07"
+  },
+  {
+   "id": "T08",
+   "name": "RYG 燈號元件對映",
+   "why": "四態燈自動對到模板自己的語彙(ok/wn/er/in 類名)與色票(色相最近的 --var),不寫死顏色。",
+   "status": "IMPLEMENTED",
+   "check": "C08"
+  },
+  {
+   "id": "T09",
+   "name": "表格 / 清單自動對接",
+   "why": "清單列欄位經欄位同義字冊對到正規欄;衍生欄(rowCs 斑馬 · onCs · acc · badge · tick)照規則算。",
+   "status": "IMPLEMENTED",
+   "check": "C09"
+  },
+  {
+   "id": "T10",
+   "name": "圖槽對映(內嵌 SVG)",
+   "why": "圖庫槽用各來源燈號 tally 畫內嵌 SVG 長條,系列色取模板色票;零圖表函式庫、零網路。",
+   "status": "IMPLEMENTED",
+   "check": "C10"
+  },
+  {
+   "id": "T11",
+   "name": "分頁 / 多頁 + 分類自動開頁 + 深連結 + 鍵盤",
+   "why": "兄弟 sc-if 判成分頁;分類頁依來源數複製(模板 A4 規則);#tab= 深連結;←→ Home End 切頁。",
+   "status": "IMPLEMENTED",
+   "check": "C11"
+  },
+  {
+   "id": "T12",
+   "name": "SYNCHRONIZER 登記",
+   "why": "同步頁借 VRN_ENG089 PRESEED 契約登記進 via.sync.state.v2 模組冊,與中央 UI / SYNCHRONIZER 同一協定。",
+   "status": "IMPLEMENTED",
+   "check": "C12"
+  },
+  {
+   "id": "T13",
+   "name": "來源新鮮度 STALE 徽章",
+   "why": "每個來源量距今時數,超過門檻標 STALE(燈不改色,另掛徽章),總燈照實計。",
+   "status": "IMPLEMENTED",
+   "check": "C13"
+  },
+  {
+   "id": "T14",
+   "name": "缺料錯誤邊界",
+   "why": "來源不在 = ABSENT、讀不動 = UNREADABLE → NODATA,頁照樣出、不拋例外。",
+   "status": "IMPLEMENTED",
+   "check": "C14"
+  },
+  {
+   "id": "T15",
+   "name": "手機 390px 無橫捲 · 16px 邊距",
+   "why": "護欄 CSS(寬表內捲、圖縮放、窄螢幕 16px 邊距);實測以 Chromium 390 寬量 scrollWidth。",
+   "status": "IMPLEMENTED",
+   "check": "C15"
+  },
+  {
+   "id": "T16",
+   "name": "淺 / 深主題 token",
+   "why": "由模板淺色變數推導深色變數(中性色反轉亮度、彩色提亮),切換鈕 data-theme;模板寫死的顏色不動,所以只算部分。",
+   "status": "PARTIAL",
+   "check": "C16"
+  },
+  {
+   "id": "T17",
+   "name": "無障礙對比檢查",
+   "why": "文字 / 底、燈色 / 底依 WCAG 量;不足只標黃,不代改色。",
+   "status": "IMPLEMENTED",
+   "check": "C17"
+  },
+  {
+   "id": "T18",
+   "name": "列印 / PDF CSS",
+   "why": "@media print:全部分頁攤開、100vh 容器改自動高、浮動列隱藏。",
+   "status": "IMPLEMENTED",
+   "check": "C18"
+  },
+  {
+   "id": "T19",
+   "name": "表格篩選 + 黏頂表頭",
+   "why": "每個清單列掛 data-via-row,浮動列一個篩選框即時過濾;th 黏頂。",
+   "status": "IMPLEMENTED",
+   "check": "C19"
+  },
+  {
+   "id": "T20",
+   "name": "離線單檔 + 效能預算",
+   "why": "零外部 src / href 資源 / @import / fetch;字型拉丁子集內嵌;大圖換 VIA 印章;量檔案大小與 DOM 節點數。",
+   "status": "IMPLEMENTED",
+   "check": "C20"
+  },
+  {
+   "id": "T21",
+   "name": "雜湊鎖 + 重鎖流程",
+   "why": "模板 sha / IR sha 鎖在 TEMPLATE_LOCK.json(lock --apply 才寫);模板一變 sync 標 DRIFT 黃,等操作員重鎖。",
+   "status": "IMPLEMENTED",
+   "check": "C21"
+  },
+  {
+   "id": "T22",
+   "name": "出處頁尾 Provenance",
+   "why": "引擎版號 · UTC 時間 · 模板 sha · IR sha · 各來源 sha · 對接覆蓋率,另嵌 JSON 供機器讀。",
+   "status": "IMPLEMENTED",
+   "check": "C22"
+  },
+  {
+   "id": "T23",
+   "name": "模板版本差異",
+   "why": "兩份模板(或兩份 IR)比:槽增減、元件數差、token 值變化。",
+   "status": "IMPLEMENTED",
+   "check": "C23"
+  },
+  {
+   "id": "T24",
+   "name": "往返冪等 convert→render→re-convert",
+   "why": "同步頁再轉一次,模板 token 與區塊角色不變(模板 CSS 原樣帶進來)。",
+   "status": "IMPLEMENTED",
+   "check": "C24"
+  },
+  {
+   "id": "T25",
+   "name": "監看自動同步 + 投放夾",
+   "why": "watch 以 sha 輪詢 inbox 模板與資料來源,有變才重出;--once 給 CI;inbox 空 = NODATA。",
+   "status": "IMPLEMENTED",
+   "check": "C25"
+  }
+ ],
+ "not_in_top25": [
+  {
+   "name": "i18n 中 / 英切換",
+   "why": "VIA 頁以繁中為主、模板文字屬設計者;同步器自己的標籤已中英並列。整頁語系切換價值低於上面 25 項,列 PLANNED。",
+   "status": "PLANNED"
+  },
+  {
+   "name": "模板 x-dc 腳本執行",
+   "why": "模板腳本內是示範資料與 React 事件;執行它等於造數又要外部 runtime,刻意不做。",
+   "status": "REJECTED"
+  }
+ ],
+ "prior": "VIA_UI_TemplateSync_SSOT_v0100.json",
+ "why_v0101": "R38(VCGC-REQ093):+來源 toolcov(CGC_MDL230 v0103 matrix 的 JSON)+ 連結 TCOV;其餘一字不動"
+}

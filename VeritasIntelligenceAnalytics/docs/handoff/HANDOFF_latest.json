@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T11:42:54+00:00",
+  "at": "2026-10-01T18:25:06+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -188,6 +188,34 @@
       "owner": "操作員(跑 mine)· AI(裁定入冊)",
       "next": "操作員工作站跑 mine --samples C:\\測試樣本報告 → AI 裁定提案(職稱 / 號碼格式 / 網域)→ 冊新版",
       "topic": "分析師聯絡區塊:姓名在職稱 / 電話 / 電郵上方 · 中英職稱表 · 電話式只增不減不衝突 · @ 前英文名 · @ 後券商"
+    },
+    {
+      "id": "VRN-REQ014",
+      "state": "PARTIAL",
+      "owner": "AI · 操作員(實測樣本)",
+      "next": "工作站 run --in C:\\測試樣本報告 實測;接證券主檔(中英名稱)當別名來源",
+      "topic": "研報本文實體:公司名稱中英文 · 最簡寫 · 局部識別;目標價(本次 / 調整前);評價法(代碼 · 倍數 · 基準年 · 驗算)"
+    },
+    {
+      "id": "VRN-REQ016",
+      "state": "PARTIAL",
+      "owner": "操作員(環境)· AI(轉接器)",
+      "next": "外部工具要用時照環境計畫在工作站裝(中樞不裝);裝好後跑 probe 會轉 AVAILABLE、xcheck 計畫自動當第二讀法",
+      "topic": "VRN 引擎模組化樂高化:可拔積木 · AST 盤點與功能分類說明 · 模組化整合(外部版面 / 表格工具偵測接上)"
+    },
+    {
+      "id": "VCGC-REQ094",
+      "state": "PARTIAL",
+      "owner": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
+      "next": "工作站:git merge --abort → MergeMedic sync --apply(帳本只增聯集)→ 拉到含 v0181 / v0105 的 main → 入庫重跑 run --apply → status 必須 rc 0 → selftests → real → lock --apply;VIA_DATA_HOME 用接點真正指向的 C:\\Users\\tonyk\\VIA System\\via_database(不 --relink)",
+      "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題"
+    },
+    {
+      "id": "VCGC-REQ096",
+      "state": "PARTIAL",
+      "owner": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
+      "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
+      "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)"
     },
     {
       "id": "host-live",
@@ -396,6 +424,70 @@
       "owner": "操作員",
       "reason": "冊外職稱 / 號碼格式 / 網域要從真實樣本量,容器沒有樣本",
       "next": "via-vcgc run --family core CGC_MDL182_ReportFieldRulers mine --samples \"C:\\測試樣本報告\" → 貼回 MINE_latest.json 摘要 → AI 裁定 → 冊新版(只增不減)"
+    },
+    {
+      "id": "VRN-REQ014:workstation-real",
+      "requirement": "VRN-REQ014",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實券商報告在工作站;容器只驗自寫句子與倉內 FactSet 週報",
+      "next": "via-vcgc run --family vrn VRN_ENG396_ReportEntities run --in \"C:\\測試樣本報告\" --pages 1-2 → 看 VIA_Reports\\vrn\\entities\\ENTITIES_latest.json"
+    },
+    {
+      "id": "VRN-REQ016:external-tools",
+      "requirement": "VRN-REQ016",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
+      "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
+    },
+    {
+      "id": "VCGC-REQ092:accel-real-use",
+      "requirement": "VCGC-REQ092",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
+      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
+    },
+    {
+      "id": "VCGC-REQ093:docstrings",
+      "requirement": "VCGC-REQ093",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
+      "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
+    },
+    {
+      "id": "VCGC-REQ094:workstation-lock",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
+      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
+    },
+    {
+      "id": "VCGC-REQ094:env-data",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
+      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
+    },
+    {
+      "id": "VCGC-REQ095:architecture-map",
+      "requirement": "VCGC-REQ095",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
+      "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
+    },
+    {
+      "id": "VCGC-REQ096:closeout-tri-page",
+      "requirement": "VCGC-REQ096",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
+      "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
     }
   ],
   "reusable_successes": [
@@ -442,184 +534,234 @@
     "VRN-REQ009:verify-prefix-cell",
     "VRN-REQ009:page1-main-title",
     "VRN-REQ012:page1-main-title",
-    "VRN-REQ013:field_rulers"
+    "VRN-REQ013:field_rulers",
+    "VRN-REQ014:vrn_entities",
+    "VRN-REQ015:layout-v0101",
+    "VRN-REQ016:vrn_plugin_hub",
+    "VCGC-REQ092:tool_coverage_matrix",
+    "VCGC-REQ092:ps-parse-errors",
+    "VCGC-REQ093:coverage-matrix-v0103",
+    "VCGC-REQ094:vdf_chain_runner",
+    "VCGC-REQ094:vcgc-cache-key",
+    "VCGC-REQ094:eng079-pk",
+    "VCGC-REQ097:progress-journal"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
+      "sha256": "b842ca6b5486350dd9870121eb9da289398eac0df4c0f0c2624d517fd131d529"
     },
     "VCGC-REQ075:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
+      "sha256": "680f96e82a738f5f3f2d7c9289581cd6a816b1ffb0221b31bcfdca9bddcbda19"
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "362e640d31f8bbf4c7fde24e62551652b2e30fa6547827e6740aa6b24eceba52"
+      "sha256": "a672d1e07afe6a8d6bb874130946b4e473bfc8ac7558b5dfa680141c10309ef7"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
-      "sha256": "51a0a6acb5e34a1743713c3b4e45f42c5b1ac56f03ee8e9223f8b3fe6e00855e"
+      "sha256": "98a4384d77d56d387152c3b8b14f337f779d1437260aac849a72d57c68740fdb"
     },
     "VRN-REQ007:provenance": {
       "path": "docs/handoff/evidence/provenance.json",
-      "sha256": "fc7b9d4790894718579bbee2b574728ca96662a31755d32bbd88d10f2313e7f1"
+      "sha256": "5bb5e6b99235e462ac3bf05d1d0512da45e52f138af9eee4da90eb6f59b9c513"
     },
     "VCGC-REQ075:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "32dfe7c9a6c81581198d1a4ce60d809a733175cc33ce521c1b034083e2549528"
+      "sha256": "3ccb27d97f840bb1b1a14a499c1d3d4030f478516f05c79adcb4c3c528185c1b"
     },
     "VCGC-REQ077:panorama": {
       "path": "docs/handoff/evidence/panorama.json",
-      "sha256": "54e8cf44575326ab985fff5a867590f4b7556e728a63a052db1039b3bb623f3c"
+      "sha256": "3d01beadada4f1ee996e19cf4a4507aed612ea0ab603617f087e697204e26074"
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "362e640d31f8bbf4c7fde24e62551652b2e30fa6547827e6740aa6b24eceba52"
+      "sha256": "a672d1e07afe6a8d6bb874130946b4e473bfc8ac7558b5dfa680141c10309ef7"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
-      "sha256": "32dfe7c9a6c81581198d1a4ce60d809a733175cc33ce521c1b034083e2549528"
+      "sha256": "3ccb27d97f840bb1b1a14a499c1d3d4030f478516f05c79adcb4c3c528185c1b"
     },
     "VCGC-REQ079:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
+      "sha256": "680f96e82a738f5f3f2d7c9289581cd6a816b1ffb0221b31bcfdca9bddcbda19"
     },
     "VCGC-REQ081:token": {
       "path": "docs/handoff/evidence/token.json",
-      "sha256": "a57345667943ed4e91c5be12797ba8f3c476d9316bccc886139ca838d1dc8d50"
+      "sha256": "b13dd3f7c8633fcec04c8b0ba28ec4299a1ffc2ed6a9a574906fc31033b0a4bc"
     },
     "VCGC-REQ082:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
+      "sha256": "680f96e82a738f5f3f2d7c9289581cd6a816b1ffb0221b31bcfdca9bddcbda19"
     },
     "VCGC-REQ075:reuse-glob": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
+      "sha256": "b842ca6b5486350dd9870121eb9da289398eac0df4c0f0c2624d517fd131d529"
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "362e640d31f8bbf4c7fde24e62551652b2e30fa6547827e6740aa6b24eceba52"
+      "sha256": "a672d1e07afe6a8d6bb874130946b4e473bfc8ac7558b5dfa680141c10309ef7"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "f09d07249b4f97f073420c5a6b4999591808d7923574a7e11b2a9b00e56305a3"
+      "sha256": "29691be04e40e8815b752d8b164251126fcefd211684c23ebd90de9a0ebc8334"
     },
     "VCGC-REQ084:entry": {
       "path": "docs/handoff/evidence/entry.json",
-      "sha256": "d357e54ba1901aa6b76319bcd6c746abd757a33e4ce08a0b7827e54c575aff99"
+      "sha256": "680f96e82a738f5f3f2d7c9289581cd6a816b1ffb0221b31bcfdca9bddcbda19"
     },
     "VCGC-REQ084:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "3447d2ae3fae574909ceef5967585d0ef1b75878be186cbfc92ceb4a0d2db895"
+      "sha256": "b842ca6b5486350dd9870121eb9da289398eac0df4c0f0c2624d517fd131d529"
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "094acbf728c5c829faa5a8190a6c8ceaae01754d4435fe9a9ef7bc52dd2ca579"
+      "sha256": "fe4105fb5109994da04a7c2440f7f4f16db1b8388a3054ea4c606a19000ad9df"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "094acbf728c5c829faa5a8190a6c8ceaae01754d4435fe9a9ef7bc52dd2ca579"
+      "sha256": "fe4105fb5109994da04a7c2440f7f4f16db1b8388a3054ea4c606a19000ad9df"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
-      "sha256": "7c42f05725dd892818717aaa80df636cd4ca54d90f9da371664452c1fd18e5ae"
+      "sha256": "6f5a38bf99fbaff1eaa5706d15b223f4581c0eec9eee39ae9d22eaa8a505a322"
     },
     "VCGC-REQ086:fullcheck": {
       "path": "docs/handoff/evidence/fullcheck.json",
-      "sha256": "5266f2b965c92b76c44b89b49959060b9f0d41de0b2f87e77a7090c080a2ce48"
+      "sha256": "4e99d2286d5c0d9255c406f19cd57c13a5183f294f97d2f7499e40a370522161"
     },
     "VCGC-REQ087:deck-rst": {
       "path": "docs/handoff/evidence/deck.json",
-      "sha256": "21d27f1f55f5f8e2214d97df24c7c5a7d232a1e7926a6b332d525fed700e5ca5"
+      "sha256": "fa698be4faf095e9a30dba432b5b8ecae3b3dc8ef29d932778552f5b483786d2"
     },
     "VCGC-REQ085:base-380": {
       "path": "docs/handoff/evidence/vdfstart.json",
-      "sha256": "f8170bd32a0a433e63bc39fa23d7dd80011456c135b64b16c0bae3d1acc7629d"
+      "sha256": "3b84dd4a89f05213e1c5951795653e6df530663d2704d8c581677f94beac8e4a"
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "362e640d31f8bbf4c7fde24e62551652b2e30fa6547827e6740aa6b24eceba52"
+      "sha256": "a672d1e07afe6a8d6bb874130946b4e473bfc8ac7558b5dfa680141c10309ef7"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "f09d07249b4f97f073420c5a6b4999591808d7923574a7e11b2a9b00e56305a3"
+      "sha256": "29691be04e40e8815b752d8b164251126fcefd211684c23ebd90de9a0ebc8334"
     },
     "VCGC-REQ086:own-page": {
       "path": "docs/handoff/evidence/fullcheck.json",
-      "sha256": "5266f2b965c92b76c44b89b49959060b9f0d41de0b2f87e77a7090c080a2ce48"
+      "sha256": "4e99d2286d5c0d9255c406f19cd57c13a5183f294f97d2f7499e40a370522161"
     },
     "VCGC-REQ088:via_panorama": {
       "path": "docs/handoff/evidence/via_panorama.json",
-      "sha256": "72f5912787dcae122a64195f9412e98b17b39a398d7b529972efa55399a25b4d"
+      "sha256": "348e28c29b20d4cb0b54be86d293239694dae3545a28e621c171891a990063b4"
     },
     "VRN-REQ008:dataframe_lock": {
       "path": "docs/handoff/evidence/dataframe_lock.json",
-      "sha256": "5cd8395d5b995bcba325b10a667f2c895dd6cff1ce34fe7c61e7a8c7940af67d"
+      "sha256": "2906a12b35566e6caf5c26dc2b0a75f2a53c87bb285102d2e26f5525d972abd0"
     },
     "VDF-REQ014:vdf_lists": {
       "path": "docs/handoff/evidence/vdf_lists.json",
-      "sha256": "126181cac640e9b6a2fa1bf3aeed1d495324a2e1d2c621757c34feab0e47aba1"
+      "sha256": "62ddd90ce8267998537486b34496f39ecbd1d23ef0eba9d01b263936462d661a"
     },
     "VDF-REQ014:vdf_etf_metrics": {
       "path": "docs/handoff/evidence/vdf_etf_metrics.json",
-      "sha256": "c413029b5ab9074a5f1d3b746f7dcbcaf065f9d9c05e65a3b0324f3e196c6eb1"
+      "sha256": "6ca860e148ddae9e85b6ca2636297a9290cf29f8304e03b21107952b161c4883"
     },
     "VRN-REQ008:vrn_ssot_consistency": {
       "path": "docs/handoff/evidence/vrn_ssot_consistency.json",
-      "sha256": "cb5c73ec5d8cea6b3660a86683881be4f7b54299b40e38c538e8f4dea0e81965"
+      "sha256": "5d21609ee96578bbd31e4370fad5591c8ba1ab42df1913841ea53434a4efec8e"
     },
     "VRN-REQ008:synonym_union_r34": {
       "path": "docs/handoff/evidence/synonym_union_r34.json",
-      "sha256": "b55ad4138b3854fa7a0cbc70070b344d264badd47d121cfd57b711c103accbf1"
+      "sha256": "984b674ed1daffc8fdb7a16e99bf39de9d39c725154c3aab758b70976a0241e6"
     },
     "VRN-REQ008:numbering_dup_r34": {
       "path": "docs/handoff/evidence/numbering_dup_r34.json",
-      "sha256": "9b0a7434da5eec84792ab4af2e1eb40824f5d44159af01a2b1d6c8768e9c86a8"
+      "sha256": "d66a7952bed5746e60eb53c0bf2c2d32dde6055e2386b455e5a99f72aafb77c5"
     },
     "VRN-REQ009:vrn_docclass": {
       "path": "docs/handoff/evidence/vrn_docclass.json",
-      "sha256": "336f28269c695dbd632baf762fcd8233a27220e534188a3fd0229c8fef72be1d"
+      "sha256": "26e23264578c9e71a932ae1ad0d5acd41873e65c43fbcd06427a06acb687897e"
     },
     "VCGC-REQ089:template_sync": {
       "path": "docs/handoff/evidence/template_sync.json",
-      "sha256": "d33fdf5b9d7b9caeedef7a0c5c3c615a0e69f23e338280cd8c3afc4e1f06f861"
+      "sha256": "d7f962ab4d71f25f44e5e52fc875d75e5d23f1386f428771ebea367cd9a84541"
     },
     "VRN-REQ009:vrn_fourpoint": {
       "path": "docs/handoff/evidence/vrn_fourpoint.json",
-      "sha256": "035d2d53b51892c95492701eccf06fc2875ee55995f65956d360803322570852"
+      "sha256": "089c34f9a3fb6f5d9de822f36a02907e5176623f79cd3111ef7f1343893314f4"
     },
     "VCGC-REQ088:ledger_union": {
       "path": "docs/handoff/evidence/ledger_union.json",
-      "sha256": "a110cb6624399d84ff0561821cd01c9840af321b185cc682fd8e19dd5aebae4b"
+      "sha256": "e2aeee9e74d43eca0137084e1594702421009f92cc87fc2b82abb27ae76b040d"
     },
     "VCGC-REQ088:merge_medic": {
       "path": "docs/handoff/evidence/merge_medic.json",
-      "sha256": "62541aa1e4bec99e6b798b9d808ef4b42af8be1a68eeb94b267c9f61c8720d82"
+      "sha256": "34b51ea2f85eaffb3e1cbd35fe2d1ad8fe2d2475c8f761446b7a959d89ac99a7"
     },
     "VRN-REQ010:vrn_layout": {
       "path": "docs/handoff/evidence/vrn_layout.json",
-      "sha256": "f380ca2a2f21dbfa3fe5bf0681f8fb18b1f8b5e806c7640de410b212fc5c5dab"
+      "sha256": "3d72a5359b876336a823b7498a415a8a716b1a3b7a841667d36af0e9075f8d79"
     },
     "VRN-REQ011:vrn_valuation": {
       "path": "docs/handoff/evidence/vrn_valuation.json",
-      "sha256": "329c395747c42815b80e7fb20b1d1eba028ca0cb2f72afd785808e130e10a67e"
+      "sha256": "fd089d898285315e74ca12148dc8ea82f130e57e3639ec377ae40248f51024c7"
     },
     "VRN-REQ009:verify-prefix-cell": {
       "path": "docs/handoff/evidence/vrn_docclass.json",
-      "sha256": "336f28269c695dbd632baf762fcd8233a27220e534188a3fd0229c8fef72be1d"
+      "sha256": "26e23264578c9e71a932ae1ad0d5acd41873e65c43fbcd06427a06acb687897e"
     },
     "VRN-REQ009:page1-main-title": {
       "path": "docs/handoff/evidence/vrn_docclass.json",
-      "sha256": "336f28269c695dbd632baf762fcd8233a27220e534188a3fd0229c8fef72be1d"
+      "sha256": "26e23264578c9e71a932ae1ad0d5acd41873e65c43fbcd06427a06acb687897e"
     },
     "VRN-REQ012:page1-main-title": {
       "path": "docs/handoff/evidence/vrn_docclass.json",
-      "sha256": "336f28269c695dbd632baf762fcd8233a27220e534188a3fd0229c8fef72be1d"
+      "sha256": "26e23264578c9e71a932ae1ad0d5acd41873e65c43fbcd06427a06acb687897e"
     },
     "VRN-REQ013:field_rulers": {
       "path": "docs/handoff/evidence/field_rulers.json",
-      "sha256": "3543de9326d450d0986d7b9c27c689e4199d64fb9895a14b7f779bfed1f3a90a"
+      "sha256": "1c525fe2e4338287e7638676f772a0c6f9337e06f13f0a634ea4df51f37969c4"
+    },
+    "VRN-REQ014:vrn_entities": {
+      "path": "docs/handoff/evidence/vrn_entities.json",
+      "sha256": "64e1332e9c4ba698c88c6e485cb8c37d6719438539fbc144701c889c21cdab4c"
+    },
+    "VRN-REQ015:layout-v0101": {
+      "path": "docs/handoff/evidence/vrn_layout.json",
+      "sha256": "3d72a5359b876336a823b7498a415a8a716b1a3b7a841667d36af0e9075f8d79"
+    },
+    "VRN-REQ016:vrn_plugin_hub": {
+      "path": "docs/handoff/evidence/vrn_plugin_hub.json",
+      "sha256": "a4d1543c75c20cde9c72d3d4e79985a40d7a0ec92efe9f03a990b8f73651d3ce"
+    },
+    "VCGC-REQ092:tool_coverage_matrix": {
+      "path": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "sha256": "c648887573d1cf0622de54802306aa5ffe09e0980404a6b8f12077c6adf520b4"
+    },
+    "VCGC-REQ092:ps-parse-errors": {
+      "path": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "sha256": "c648887573d1cf0622de54802306aa5ffe09e0980404a6b8f12077c6adf520b4"
+    },
+    "VCGC-REQ093:coverage-matrix-v0103": {
+      "path": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "sha256": "c648887573d1cf0622de54802306aa5ffe09e0980404a6b8f12077c6adf520b4"
+    },
+    "VCGC-REQ094:vdf_chain_runner": {
+      "path": "docs/handoff/evidence/vdf_chain_runner.json",
+      "sha256": "a2dc0eecbbf50a3aa08773550f83b9cc60a4a246c57c046da2d0e9fa2d28e444"
+    },
+    "VCGC-REQ094:vcgc-cache-key": {
+      "path": "docs/handoff/evidence/entry.json",
+      "sha256": "680f96e82a738f5f3f2d7c9289581cd6a816b1ffb0221b31bcfdca9bddcbda19"
+    },
+    "VCGC-REQ094:eng079-pk": {
+      "path": "docs/handoff/evidence/vdf_local_db.json",
+      "sha256": "51f92a57284bc53ddf3b4ab2a8efa01e3bc6da46907c00655d3ae28655045b22"
+    },
+    "VCGC-REQ097:progress-journal": {
+      "path": "docs/handoff/evidence/progress_journal.json",
+      "sha256": "3509251def8a2be8a8c2fe26c2f28b6659b601b9f8d0135a778ba6633b912b90"
     }
   },
   "state": {
@@ -646,6 +788,14 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0115.json": "ee028de86b0cd80640f1ec732f93c151c7542ded44318f6f6a9674d715daf6e9",
       "supportive modules/registry/VIA_Requirements_SSOT_v0116.json": "22ffb408b728aba8d65f176ac64bab2f96c7ae0fac7e7d0df240b85cf6e08dee",
       "supportive modules/registry/VIA_Requirements_SSOT_v0117.json": "3983c699c1aac4ff72ddbb1157e402866ef252f9627d62fa3677ef2a855ac24f",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0118.json": "b4e6a90a8ca658ce7ff8c1bd36aea572e185f528b551f97ae6a7ba5f3593de02",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0119.json": "88d6961002e12fec7ac53614609e29c7f1eaa6644c4633fe73aa235b511ec8de",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0120.json": "0cd859665f55a121ad1a09c2c49ef25d733cf61860eddce590953ac10a05773d",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0121.json": "30acc38d2597284b636d73e018135fa2c035dc648fbbf679f659cc5cd8f0cb91",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0122.json": "84d43ef903d25889adc9a4b9f57490417f2952503069a7bb06d13474c346995e",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0123.json": "62cd88a5792de050856ca9e808c95b7031b7f31f9f40b73c5947f31a652f3a60",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0124.json": "de4955732d4ebf227628b1f5e2a236d1f2a4d51178ecaed4eeb0e8f92685b185",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0125.json": "f7e83accf189127527b5d9f936a42cb049cfd1100bd45b74fd8618e0f7104a2e",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -661,7 +811,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "d4061eda850f8665859953e860562f33ed9e3d856a96e97a87c893d1c772f21e",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "8761dabd0376a5db5fbf7dc300b2560e5b482342306dc101eba7c307173d85df",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -1024,7 +1174,10 @@
       "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py": "e00d4079e0614e63361ca6153f7aecbda32439fbeaaa37bda1c19b915c414b73",
       "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py": "ec84ba9ce51a1b4177d88f2b2072b3641d726d8a37e5025e0fc3faeb7fb3b166",
       "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py": "1c0bc7219200b3e06983be694d31aa841fdee63269c77df6de33727bf1903c51",
+      "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py": "58dbb0f8f907229e3e191a7227182db60e5a0a402834eaef4914e064474de4c8",
       "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py": "b9721379022213885274d4a248701ec723707d0105b18ad0e26e2e848262da0e",
+      "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py": "ef31803bfa04a99e1e45ef0b845fb285ec7a53671e46d64efe3eced17abccaa4",
+      "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py": "b699bc592695c17f30c9a0c85e0a9fc57508e8c0a36b10ea11e45513a0622bd5",
       "functional modules/VRN/VRN_Financial_Synonyms_SSOT.py": "9dd35fcad36574c85366944c156a097ae1e1cfa95309edf80bff5eda4d2fdc9c",
       "functional modules/VRN/VRN_MDL001_Converter.py": "7fbd0997d6a18fbcdc83bd2407f7d70e662d904e17f1dbe0b56308b85400609b",
       "functional modules/VRN/VRN_MDL001_Converter_shaf09dc35c.py": "a41b9eba43f5a9b86372c9ddb1c420fd4b4c1ef397a8b8861c9a8dc9906d1642",
@@ -1690,7 +1843,7 @@
       "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0103.py": "7906a1b976a27ee63ea36521745472deb06160ee2fe23cad49e0ab4ac4e94503",
       "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0104.py": "98423c03d147edd58bec0a8a6cbd7dc5d46f39a55f44e0536dd19bd0642966bc",
       "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0100.py": "6c84a0941e5b165c40919f2a19d0f9e611f6ffe96dffecfd846754e7ee34b119",
-      "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "e550c05aaeb92885ceb73020b43a1e50691d7605cfd80e8a2c426103f26d0fb1",
+      "functional modules/VDF/engine/VDF_ENG073_DataArchitecture_v0101.py": "f6e19a1a772ef1d529759a75a6d54ec1a0f993cc6b7160cd8aae1800eaed936f",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0100.py": "4e0aa48af571f7527e4b11a1c477f1ffdf4354a7a316ec696f24f5ee58032dee",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0101.py": "2cf165a184ed5f337c86510955d0643727c274f7030321f615465805349b6bc7",
       "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0102.py": "2ca5dee1c091669f40f41b291bd575350e4de24232228a283d233e10020a9945",
@@ -1732,6 +1885,7 @@
       "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0102.py": "1521d499c7e420dd8d2109cc70c18063256e1022ef5facb6917d92c5cac8d1a5",
       "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0103.py": "07fadb343ac5e79210b90b768e41c4057d912eec95dddbb3643e04b937acec10",
       "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0104.py": "c1d09236a7389ce7ebc1ca9d1e6ded6be005cc95d534ce26958c2618cd289464",
+      "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v0105.py": "bff4c6205279d6d7899ab38928d5152f69b1d2886de58441cea26edd00103bf7",
       "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0100.py": "fc2f90a3970aef1d160461b43c03fcc5712eb3c53d32a9cb36e2f1e580df70d8",
       "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0101.py": "1127b06e3b5b2edb9077e9a0eca30889aa38ab99dd6a2b205fbfe3a5014a1cae",
       "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v0102.py": "1f98e2899a2a1191d53f207e4fcf509f1dafac055951bf5005acbb0bc01ae4ff",
@@ -1763,7 +1917,7 @@
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0101.py": "009207a81d3e6f90dd6e63ee82ee70588c9b1872aa4a83dd62daf5c2b4423b52",
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0102.py": "0e73a37bc7d4abfbdb13442b8258fb5180a8b125bb96ec9483263d8fdcb7fb2e",
       "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0103.py": "c0829d5100eaed1f8cf32764b62240f81c9b204d230858edc55f4f6f9c68b1c4",
-      "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0104.py": "339e2a1a5742b2d57baf318cc046844eb0a0f18fc2af71c170f48cb87b6af576",
+      "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0104.py": "68c0013014cea5fd67e461ef9f521044bb622f85ff87655129f198328e967ee5",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0100.py": "7693732466ce8c47c7ac6f68743546d7dd8702d6af9a7ef516481cf1c681e873",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0101.py": "8aa0843040336e666e8c1ff1f20fd3aee10be98d54ea6d777fc7b6fed22b46e2",
       "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0102.py": "2d44a36922a99031c42524a68d4eec82f882e39bb86ba08683f8c8d36053daf3",
@@ -1892,7 +2046,7 @@
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_tdcc.py": "2b43d2af980012191097bd18f8ceac637df43cc4e07019ffeacf5a6104bf3623",
       "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_supportive_bridge.py": "0a7c2caf87a6e4b1c60f1681c8a82cf34b30172c3e403166313932dd3b5b053b",
       "functional modules/VDF/references/intake/vdf_fetchers_financials_b504/vdf_fetchers_financials.py": "eef127506ca903303fad04311a61516d32585b3e31b2425696f39eddba12a071",
-      "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py": "690cd34e0fe38a5d9ef247915ae124d26be6c2a16e4cae23b19ae5b33cda13ec",
+      "functional modules/VDF/tools/VDF_InjectAccelNetBridges_v0104.py": "62147db7199d6b7b0f7a62d9f3c89b346670befd46f918e1170df8b308aba057",
       "functional modules/VDF/vdf_input_matrix_v0100.py": "9675c402e2dd7cb2ae706afefb1aa66ca6f29961f8f3953de46ac40de295ecf0",
       "functional modules/VDF/vrn_financialdata_staging_extraction_store_v029vrn1d_sha35458a11a7b7.py": "2d1ad2de184ea3ce909a8572f3caec210bc781136c2a452f5d04230fe6100909",
       "supportive modules/registry/CGC_MDL023_AutoCodeRegistryEngine.py": "9e50392716428066fabf08f81cbdbb8e9695119ac9c4a35d3dcf2f031b7d6cf8",
@@ -2406,7 +2560,7 @@
       "supportive modules/registry/CGC_MDL071_Namereg_v0102.py": "a970417a0f0bbc56ab604b4c2d2dc1d2e49e91ade6f32ab71d344d9bff53eb2c",
       "supportive modules/registry/CGC_MDL072_ProductUi_v0100.py": "d00d5828ebbca37b764b23a304755da621752bcbb97a2fa5dbe56de1846ff8d7",
       "supportive modules/registry/CGC_MDL073_EngineCatalog_v0100.py": "2d0b32563f83b53dca42ccbaa8bcf9cfd3b69f6e6969873882e5091394fd35a7",
-      "supportive modules/registry/CGC_MDL074_AccelBridge_v0100.py": "df430a6f955c59ce9d38a106ca3225979d19a1de4dfc83a4654a1a19b9734ea9",
+      "supportive modules/registry/CGC_MDL074_AccelBridge_v0100.py": "84497b622aeb2b5c8e573d31f41af4467f2a283340ca424f6f4d49c1a915e853",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0100.py": "c49e9cb445460b6dc6f8dafd17f767421217167d4ceed8bf29789c2aab40b432",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0101.py": "5a1ef9ce86ade8137c975df9b889b9a675a04ab0e6ef90007e34faea9a97ae95",
       "supportive modules/registry/CGC_MDL075_CentralGov_v0102.py": "08016a3d988125fba63dd1677ebf07326cbd59201067ecef644655bc8787c433",
@@ -2920,6 +3074,7 @@
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0178.py": "0bc6033b599d3f393b8d6b889076af52295201213be74afcf8df55e2d17aaaac",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py": "ccf6b8379088f97b106bf4d268f04c1f9f929537d740b6af6fe60986a97d9ad4",
       "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py": "98c85bf824d020b2705d04102e87a5ee02fcc25e80e26bb60134e128429ddce3",
+      "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py": "95d40138af477a9438ca1e9f8fdb9a738258342be8a49b232c95819fa500332a",
       "supportive modules/registry/CGC_MDL149_WorkflowMatrix_v0100.py": "f944bcdfaf9c94640263579778078137906dccf8ca414f1393deed46d3a4dcd3",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0100.py": "1afa4d0e30eaffc395f036ece954701fdb5850f23ffca0f6eef659232888ec1d",
       "supportive modules/registry/CGC_MDL150_CentralGovernanceFamily_v0101.py": "5cb90bec6d4a1138d4883066371993c117bbb15527088ffbb74d0171be4a423b",
@@ -3017,6 +3172,7 @@
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0101.py": "c6ed55dd1e4f559a482961e4f7c74e27f2fa1e6820d6ca388c07c84edbf6e1d5",
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0102.py": "3d7a5f5599d5216ab09c3ea1c4233f67c74ea878d831b35eae965af40ab857a2",
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0103.py": "276752def37b4e2c28ad3193e3b5a814392e69a9813ace86f9a2c07860a53991",
+      "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py": "aaa3890379e704224ac54147fc56c891e0f132ade1ae2fb980aedb357e481419",
       "supportive modules/registry/CGC_MDL171_PanoramaBatchPlanner_v0100.py": "3f9e98934e966a10e5b9618b70cc01919141c378dbf65124fc303bd483395fde",
       "supportive modules/registry/CGC_MDL171_PanoramaBatchPlanner_v0101.py": "de0375fcbc5df1dedea2ed3186b8df4d1b3e4c4c84f8178e9d3013907ce6846d",
       "supportive modules/registry/CGC_MDL172_VRNChainRunner_v0100.py": "84c1dbf7068d3a69c4fbc7bb7e8d620b7a4bf2e76433ccd7b59f83f682edb187",
@@ -3060,7 +3216,7 @@
       "supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py": "4e8ea80b81864a6f0da6ee8ecb5e362eda2ce62988aa3cae3e75336dc6688ac8",
       "supportive modules/registry/CGC_MDL188_BatchResultReport_v0100.py": "38b437a270bc9b6f80d6b53e4f1fa8c41d02adf7da0bd4b9dcdbd97f54d450c1",
       "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0100.py": "e81bda677b8550539aeef2cc7c7ef8c71d27ab3ccac74708f76d1d8721c6fce1",
-      "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0101.py": "618c4cac1eb8ad9959635b1d1ce17e6e3be4caa1f22e47a2cb568db64b3846f7",
+      "supportive modules/registry/CGC_MDL189_GitHubSyncEngine_v0101.py": "09e31a61e1ed906211d79af717a9029b1a63162f18a5cfcc7d1255b41b75bba5",
       "supportive modules/registry/CGC_MDL190_TALibLock_v0100.py": "214d85460323936790a177bc51702d03beefdb76a076898aceeb7324d347d608",
       "supportive modules/registry/CGC_MDL191_KnowledgeAsset_v0100.py": "5588437771bcfb4f9e4d7759187b726284cb753f17f6a6110f183ad3ef9d6f59",
       "supportive modules/registry/CGC_MDL192_MacroParamSync_v0100.py": "990edf5dea437b5453f732ff6dd476fc27ac73f501226066c7be719cc7decf53",
@@ -3133,6 +3289,7 @@
       "supportive modules/registry/CGC_MDL224_TestAuto_v0100.py": "33c052c5ccfd3d74de21bc7db925f6ebbab177fc301103d1cb3b0260947933c8",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py": "ca4a3dbb27d2b5ce37672f1ea3add5a21019365151e9ebd59d1a093163d7ee6d",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py": "fc64fce8c3b843a7fc9f812cb63303e1e89e86dca849a594eccd75f7efd66035",
+      "supportive modules/registry/CGC_MDL224_TestAuto_v0103.py": "4475a1188e0447ccf00d9e59fbd38db7bbb16021cdc8728b9f931b21a28ebd09",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0100.py": "41f585d0402f10318edba2a8c38fc217e64b3c5a69390e78ffb9895df239048f",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0101.py": "d267175eafc89630d07539c1a96fd6d6967570f070aae63806166ded97124ba8",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0102.py": "5dfe795c993c83147a8b0939d676ae0697285006f5d8b9a6c74ec417c362fed4",
@@ -3150,6 +3307,9 @@
       "supportive modules/registry/CGC_MDL229_SweepReport_v0101.py": "fdac82a73f4a7bf9b93ade2aa650a6222b09682861fb5a84276cde87b4ad1c17",
       "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0100.py": "b82497e1a4751d41355c8519eb8a298e4ff79fc77b1ab598a8fd8233177932dd",
       "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0101.py": "c706fde86a146f780a23b2d9e5b2eb3daf7ca1170f2e623e24da085bfccf0fdd",
+      "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py": "762ccc36da364be12dd3266047ceb818de505392e7d06d2beb37fb176de55a17",
+      "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py": "20ffa69ce94c5a8880db24ff238fa03e43b833fccf86e468c5715be3a6fa698d",
+      "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py": "0b53dbe604ad2a44dab981390487ce14471d8be5b49f6d79a14ebf8f4f38c3bd",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0100.py": "e4cf4c57d0889871ce7b806f463685d3eb07c6af61aa668ae244c918d2f65dba",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0101.py": "f2116d81747d746303891c408d3777b8e6eadef3578a0981a020ffb9393c7c2d",
       "supportive modules/registry/CGC_MDL231_MatrixPages_v0102.py": "2bbc037fba5a926c3f34ff1aa96de086e1f81a4f310870b7d14192c6597ba128",
@@ -3192,12 +3352,14 @@
       "supportive modules/registry/CGC_MDL245_SDDValidator_v0102.py": "d0fc64a3798932eb67e9c5446fd7a108dede20140e6e62b9ad09f55690e05b8b",
       "supportive modules/registry/CGC_MDL245_SDDValidator_v0103.py": "7ac7e08c08a8d86dca10b6016ce10310c85d451dc816c08280a9561f6a39ec5f",
       "supportive modules/registry/CGC_MDL245_SDDValidator_v0104.py": "857c3fb1c5b6f45a02fe627e041a7796a6a6241c2793a9948db0906220326510",
+      "supportive modules/registry/CGC_MDL245_SDDValidator_v0105.py": "99f490fbdb180aba1f69365f4fb2e0a43240e57d2ba1f0d17d17b9bb0deb00e3",
       "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py": "0a716d63f22cec252ba8b16623f8041839fa131b1e20b4c351487a4341024216",
       "supportive modules/registry/CGC_MDL247_SSOTPanorama_v0100.py": "41e8155a8be751486c79589ccf6ffaccf387f4bbd0162dec0fdcca47fbfe2fdd",
       "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py": "00bb5b4cba5c772137f14579c248633616c78785c904688aee779d374a37dc87",
       "supportive modules/registry/CGC_MDL248_FullCheck_v0101.py": "af72d33148adee3583cbdc0528ee46efe161b83bcc69e3f1bdbecc4d5b2f9f5b",
       "supportive modules/registry/CGC_MDL249_DataFrameLock_v0100.py": "954147fcfa4766aa8abae512fe8a19b43e4edbf7c2598e7c3ea41d31e989a08f",
       "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py": "7e5dd8bdad9be7aa8a06543cf80ff722c9fbf4d30a67f9e5598c593f3d78db7e",
+      "supportive modules/registry/CGC_MDL251_ProgressJournal_v0100.py": "3c50a3a806b7bb16e1b6f53bc9963b23332a5d263c4c77fb1ec3e1ac97e77611",
       "supportive modules/registry/CGC_SystemManager_v0100.py": "891dd0e88b41dc53bc848da522ef5e95fa0aba5a5a866435b4315fdd2a054de6",
       "supportive modules/registry/CGC_SystemManager_v0101.py": "42b71ba0e3a5f5567b1ed4fd6bf74a44bc89893fdbae8ce3f7397692dc77a483",
       "supportive modules/registry/CGC_SystemManager_v0102.py": "593cbda396058e49818b77376bd207e68a3633690d517162b8759d0aec904a59",
@@ -3231,7 +3393,7 @@
       "supportive modules/registry/pdf_system_minimal_sha05d91c1fe009.py": "1fb43240fed13c3ec9251883f5db1a3308b69999695a4755b1da6ee2fa1ea9f7",
       "supportive modules/registry/via_accel_injector_v0100.py": "6a4b59a62f8d9fa4140085413a9c2e4d04d952232cd2de61d47494ea5cd674bb",
       "supportive modules/registry/via_accel_injector_v0101.py": "1c72298f0e07e29c2c4a460f20f2565b0b05cdd1e3f07f1fe4bc4bdb694eec63",
-      "supportive modules/registry/via_accel_injector_v0102.py": "c3ba51db063abb54d13de6f524991478670e5bf929200c583099457b75a94ce9",
+      "supportive modules/registry/via_accel_injector_v0102.py": "1c78f6c430dc5002c1a300eeb75a119bcb29d67e22654105d258aef74b4bf9a4",
       "supportive modules/registry/via_bridge_sweeper_v0100.py": "2c7af7e841a7675ffe0ab9906abd1fc85883de8477e8a451849e056ce7541385",
       "supportive modules/registry/via_bridge_sweeper_v0101.py": "209bd8dab0cc542c09556ee1397aee1605b0a578a9e8349d87e596f3215a18b7",
       "supportive modules/registry/via_bridge_sweeper_v0102.py": "58397bfd5a8b90dd6089dc5d50cf6456a6e0e8ba8d65afa320635ae1061e68ea",
@@ -3430,7 +3592,13 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0106.json": "8064698c51e1aeddc1874569ebaf36e3db6aa31a3141c275f0be44896cca9922",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0107.json": "557a3eac7c59ffa65db8b054371e8ccaf362a08330ab87468fcffc02f5f37324",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0108.json": "95a34d1f0b9a4e95e64713d1b6afc17b609809cd124e7dbccf307f607743d593",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0109.json": "f3c3c5f920db988f24ced560beb8d3b1f3907352630ce8342f848c283aa80d7e"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0109.json": "f3c3c5f920db988f24ced560beb8d3b1f3907352630ce8342f848c283aa80d7e",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0110.json": "e44792f2f416aff2a1920ae4c1df8bf7923045f25c7ac3a388e1c1a28f255f95",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0111.json": "f28b7a6fa9c6e4391a9246b631a9255c17fbdcec3108a30fed445a538a8bf701",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0112.json": "04b78578a57bc48206d0d5e28a7b7b27cf0d06160f794f38a942943ded729b38",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0113.json": "fbf9d9f1ffa62fe52bf0ee9a612759cb13b76056f8469414c10dd2dd9192cc39",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0114.json": "3c388a6ac6538166d93cc1fd878a648bf009ad6d56bde6841641456bf23d59e8",
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0115.json": "118386ef8754b887c3c68aef38309f0c2b5c9213dcbe6bd278fe61ee30ffae34"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4796,6 +4964,105 @@
         "homes": [
           "VIA_VRN_ReportFieldRules_SSOT_v0101.json"
         ]
+      },
+      "VRN-REQ014": {
+        "definition": "768a7368981260281fce7ae68f9d02eb6a7d21dce5dfa52b6f108005e6674e9d",
+        "status": "PARTIAL",
+        "next": "工作站 run --in C:\\測試樣本報告 實測;接證券主檔(中英名稱)當別名來源",
+        "owner": "AI · 操作員(實測樣本)",
+        "topic": "研報本文實體:公司名稱中英文 · 最簡寫 · 局部識別;目標價(本次 / 調整前);評價法(代碼 · 倍數 · 基準年 · 驗算)",
+        "homes": [
+          "VIA_VRN_ReportEntities_SSOT_v0100.json",
+          "VIA_VRN_ValuationMethod_SSOT_v0100.json"
+        ]
+      },
+      "VRN-REQ015": {
+        "definition": "875596cb6033c9516d8d7fd961e6355d20b1ae4244216033885c38d8238885e7",
+        "status": "COVERED",
+        "next": "工作站 restore --in C:\\測試樣本報告 --pages all 看完整度紅黃綠",
+        "owner": "AI · 操作員(實測樣本)",
+        "topic": "版面還原輸出:右側資訊區 / 表格雙欄 · 一句一標題一資料(兩種編號 · 兩層分類)· 截取完整度 · 去重修復",
+        "homes": [
+          "VIA_VRN_LayoutRestore_SSOT_v0100.json"
+        ]
+      },
+      "VRN-REQ016": {
+        "definition": "384a741d09fa9489a718987e401db10106d49cc2ded23a4c3151c0d405b87a7b",
+        "status": "PARTIAL",
+        "next": "外部工具要用時照環境計畫在工作站裝(中樞不裝);裝好後跑 probe 會轉 AVAILABLE、xcheck 計畫自動當第二讀法",
+        "owner": "操作員(環境)· AI(轉接器)",
+        "topic": "VRN 引擎模組化樂高化:可拔積木 · AST 盤點與功能分類說明 · 模組化整合(外部版面 / 表格工具偵測接上)",
+        "homes": [
+          "VIA_VRN_PluginHub_SSOT_v0100.json"
+        ]
+      },
+      "VCGC-REQ092": {
+        "definition": "ccea7dcb9c9f81f544b739a0f29f067c8c60ea98254a7191ecc83e49b4a8572d",
+        "status": "COVERED",
+        "next": "4 支 PS 檔本身 pwsh 剖析錯誤(既有,非本批):HyperBOM_SELF_CONTAINED_v2 · VRN-Fallback-Activation-v0136 · FlowSystem_SandboxPatch_v025 · v0163A OneClick-Sidebar-v0159 —— 修語法需操作員裁(L70);真用加速 API 0.7%(掛橋 ≠ 加速,改寫熱路徑才會升)",
+        "owner": "AI(橋 · 探針)· 操作員(4 支 PS 語法 · 熱路徑改寫)",
+        "topic": "全樹工具覆蓋:PS 加速器模組 · PY 加速器(含 HTML U/I MATRIX REPORT)· VDF 網路工具 · AST 探針互核 + HTML 矩陣報告",
+        "homes": [
+          "VIA_ToolCoverageMatrix_SSOT_v0100.json"
+        ]
+      },
+      "VCGC-REQ093": {
+        "definition": "7f154818e6c88e5736796578fcb4249fbdc65bf672750f4caf8ef2b802f55ec6",
+        "status": "COVERED",
+        "next": "原檔 docstring 補寫(VCGC 9 · VRN 21 支)需逐支新版號,另批;VRN 5 支 PS 雜湊被登錄 / 凍結鎖在旁,照 PaidDebt 不接章",
+        "owner": "AI(矩陣 · 帳本 · 頁)· 操作員(工作站 --open 跳頁 · docstring 補寫裁定)",
+        "topic": "VCGC 監控覆蓋矩陣完善:PS 加速器模板章 · PY AST 分類與說明 · 結果只增帳本 · 淺色緊湊自動跳出 · SYNCHRONIZER 標準化 · PS 語法錯修正",
+        "homes": [
+          "VIA_ToolCoverageMatrix_SSOT_v0101.json",
+          "VIA_UI_TemplateSync_SSOT_v0101.json"
+        ]
+      },
+      "VCGC-REQ094": {
+        "definition": "1cfa39b8658de7be12c77e789ece5093f36ae9de1499c5c80a91f52bc82d32ea",
+        "status": "PARTIAL",
+        "next": "工作站:git merge --abort → MergeMedic sync --apply(帳本只增聯集)→ 拉到含 v0181 / v0105 的 main → 入庫重跑 run --apply → status 必須 rc 0 → selftests → real → lock --apply;VIA_DATA_HOME 用接點真正指向的 C:\\Users\\tonyk\\VIA System\\via_database(不 --relink)",
+        "owner": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
+        "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題",
+        "homes": [
+          "VIA_VDF_OneWayRead_Waivers_v0100.json",
+          "VIA_VRN_LogicArchitecture_SSOT_v0100.json"
+        ]
+      },
+      "VCGC-REQ095": {
+        "definition": "badbe0053373fe443fe54edeb876d310c6f1b0da4f3211f9d3cf70f587fbc178",
+        "status": "RECORDED",
+        "next": "操作員裁定先做哪一個缺口(建議 G3 → G1 → G2,各一支薄尾 + 一本冊,不新建服務);做的時候每律補「條件 · 資料來源 · 強制者」並由 SDD 驗證出合規率燈",
+        "owner": "操作員(裁定順序)· AI(逐缺口實作 · 登錄 · 測試)",
+        "topic": "依「政策庫(規則中心)+ SSOT(事實中心)+ 規則引擎(執行中心)」架構強化 VCGC SDD:先對照既有部件、列缺口,不另起微服務",
+        "homes": [
+          "VIA_Policy_Laws_SSOT_v0100.json",
+          "VIA_Requirements_SSOT_v0124.json",
+          "VIA_Handoff_Continuity_SSOT_v0100.json",
+          "VIA_Numbering_SSOT_v0100.json"
+        ]
+      },
+      "VCGC-REQ096": {
+        "definition": "fe213d1bb8f071b23df055748eeaade24a9052cca9423e57ccdc862ecf701a89",
+        "status": "PARTIAL",
+        "next": "工作站實跑入口 v0111(含開閘建庫)→ 三合一頁實際資料驗證 → SDD real + lock --apply;VRN 第一頁文表 / 摘要校正由操作員下次檢視(本批不動)",
+        "owner": "AI(登錄 · 實作 · 容器實測)· 操作員(工作站實跑 · 加鎖)",
+        "topic": "VCGC 一條龍收尾:隨時階段式登錄 · 子系統各自經 VCGC 自動更新 · 邊測邊修邊鎖 · 收尾自動跳出 HTML 三合一矩陣(狀態 + 實測結果驗證)",
+        "homes": [
+          "VIA_UI_TemplateSync_SSOT_v0101.json",
+          "VIA_VCGC_FunctionInventory_SSOT_v0114.json",
+          "VIA_Handoff_Continuity_SSOT_v0100.json"
+        ]
+      },
+      "VCGC-REQ097": {
+        "definition": "d464923d4271d96dd82656f53bfab372706d40bccbb29a9795c2d11b58151ecf",
+        "status": "COVERED",
+        "next": "工作站:長指令中斷後直接重跑同一行即可接續;要強制從頭跑設 $env:VIA_PROGRESS='0'",
+        "owner": "AI(實作 · 登錄 · 實測)",
+        "topic": "長流程逐步進度落本機暫存檔:記憶體不足 / 中斷不丟進度,重跑同一指令就接續",
+        "homes": [
+          "VIA_Handoff_Continuity_SSOT_v0100.json",
+          "VIA_VCGC_FunctionInventory_SSOT_v0115.json"
+        ]
       }
     }
   },
@@ -4837,6 +5104,8 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0179.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py",
     "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py",
+    "supportive modules/registry/CGC_MDL224_TestAuto_v0103.py",
+    "supportive modules/registry/CGC_MDL251_ProgressJournal_v0100.py",
     "supportive modules/registry/CGC_MDL221_SystemBackup_v0101.py",
     "supportive modules/registry/CGC_SystemManager_v0111.py",
     "supportive modules/registry/CGC_MDL248_FullCheck_v0100.py",
@@ -4857,7 +5126,14 @@
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
     "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py",
-    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py"
+    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py",
+    "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py",
+    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0101.py",
+    "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
+    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5389,13 +5665,153 @@
       "owner": "操作員",
       "reason": "冊外職稱 / 號碼格式 / 網域要從真實樣本量,容器沒有樣本",
       "next": "via-vcgc run --family core CGC_MDL182_ReportFieldRulers mine --samples \"C:\\測試樣本報告\" → 貼回 MINE_latest.json 摘要 → AI 裁定 → 冊新版(只增不減)"
+    },
+    "VRN-REQ014:vrn_entities": {
+      "id": "VRN-REQ014:vrn_entities",
+      "requirement": "VRN-REQ014",
+      "state": "VERIFIED",
+      "case": "vrn_entities",
+      "receipt": "docs/handoff/evidence/vrn_entities.json"
+    },
+    "VRN-REQ014:workstation-real": {
+      "id": "VRN-REQ014:workstation-real",
+      "requirement": "VRN-REQ014",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實券商報告在工作站;容器只驗自寫句子與倉內 FactSet 週報",
+      "next": "via-vcgc run --family vrn VRN_ENG396_ReportEntities run --in \"C:\\測試樣本報告\" --pages 1-2 → 看 VIA_Reports\\vrn\\entities\\ENTITIES_latest.json"
+    },
+    "VRN-REQ015:layout-v0101": {
+      "id": "VRN-REQ015:layout-v0101",
+      "requirement": "VRN-REQ015",
+      "state": "VERIFIED",
+      "case": "vrn_layout",
+      "receipt": "docs/handoff/evidence/vrn_layout.json"
+    },
+    "VRN-REQ016:vrn_plugin_hub": {
+      "id": "VRN-REQ016:vrn_plugin_hub",
+      "requirement": "VRN-REQ016",
+      "state": "VERIFIED",
+      "case": "vrn_plugin_hub",
+      "receipt": "docs/handoff/evidence/vrn_plugin_hub.json"
+    },
+    "VRN-REQ016:external-tools": {
+      "id": "VRN-REQ016:external-tools",
+      "requirement": "VRN-REQ016",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "Docling / MinerU / Surya / pdfplumber / Camelot / PaddleOCR / TATR 等外部積木在容器都 ABSENT;中樞只偵測不安裝",
+      "next": "照環境計畫在工作站裝需要的外部工具(建議先 pdfplumber:純 CPU、ENG072 已在用)→ via-vcgc run --family vrn VRN_ENG397_PluginHub probe → run --plan xcheck"
+    },
+    "VCGC-REQ092:tool_coverage_matrix": {
+      "id": "VCGC-REQ092:tool_coverage_matrix",
+      "requirement": "VCGC-REQ092",
+      "state": "VERIFIED",
+      "reason": "CGC_MDL230 v0102 matrix:四面非豁免缺 0 · 兩法不一致 0;補橋 PS 8 支 · PS 函式內橋移頂層 4 支 · PY 網路橋 3 支 · 空橋 / 半橋 / 字串橋修 5 支",
+      "next": "via-vcgc run --family core CGC_MDL230_ToolCoverageProbe matrix(工作站有 pwsh 時 PS 用剖析器讀)",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
+    },
+    "VCGC-REQ092:ps-parse-errors": {
+      "id": "VCGC-REQ092:ps-parse-errors",
+      "requirement": "VCGC-REQ092",
+      "state": "VERIFIED",
+      "owner": "操作員",
+      "reason": "4 支 PS 檔 pwsh 7 剖析錯誤(既有,非本批):Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2 L32 · Invoke-VIA-VRN-Fallback-Activation-v0136 L77 · Invoke_VIA_FlowSystem_SandboxPatch_v025 L93 · v0163A/child/Invoke-VIA-VRN-OneClick-Sidebar-v0159 L2002",
+      "next": "操作員裁:修語法(新版號檔)或標退役;L70 PS 改動需許可",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json",
+      "resolved": "R38 2026-10-01 操作員令「上面語法錯誤改善 記得加入加速模組」(L70 許可):HyperBOM_SELF_CONTAINED_v2(-replace \"`\" 跳脫掉收尾引號 → 單引號 ×2)· FlowSystem_SandboxPatch_v025(\\\" 不是 PS 跳脫 → 單引號字串)· v0163A Sidebar-v0159(( if … ) → $( if … ))就地最小修 · pwsh 剖析 0 錯 · Invoke-VIA-PSTemplateJoin -Apply 接章(寫前備份)· PS-ACCEL 本在頂層;Fallback-Activation-v0136 由 v0136A(剖析 0 錯)取代,矩陣尾碼排序後進版史不改"
+    },
+    "VCGC-REQ092:accel-real-use": {
+      "id": "VCGC-REQ092:accel-real-use",
+      "requirement": "VCGC-REQ092",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真用加速 API 0.7%(1535 支掛橋中 10 支真呼叫);掛橋 ≠ 加速",
+      "next": "選熱路徑引擎改用 VIA_ACCEL.accel_map / run_fast(逐支新版號薄尾),matrix ⑤ 會照實升"
+    },
+    "VCGC-REQ093:coverage-matrix-v0103": {
+      "id": "VCGC-REQ093:coverage-matrix-v0103",
+      "requirement": "VCGC-REQ093",
+      "state": "VERIFIED",
+      "case": "tool_coverage_matrix",
+      "receipt": "docs/handoff/evidence/tool_coverage_matrix.json"
+    },
+    "VCGC-REQ093:docstrings": {
+      "id": "VCGC-REQ093:docstrings",
+      "requirement": "VCGC-REQ093",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
+      "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
+    },
+    "VCGC-REQ094:vdf_chain_runner": {
+      "id": "VCGC-REQ094:vdf_chain_runner",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_chain_runner",
+      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
+    },
+    "VCGC-REQ094:workstation-lock": {
+      "id": "VCGC-REQ094:workstation-lock",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
+      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
+    },
+    "VCGC-REQ094:env-data": {
+      "id": "VCGC-REQ094:env-data",
+      "requirement": "VCGC-REQ094",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
+      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
+    },
+    "VCGC-REQ094:vcgc-cache-key": {
+      "id": "VCGC-REQ094:vcgc-cache-key",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json"
+    },
+    "VCGC-REQ094:eng079-pk": {
+      "id": "VCGC-REQ094:eng079-pk",
+      "requirement": "VCGC-REQ094",
+      "state": "VERIFIED",
+      "case": "vdf_local_db",
+      "receipt": "docs/handoff/evidence/vdf_local_db.json"
+    },
+    "VCGC-REQ095:architecture-map": {
+      "id": "VCGC-REQ095:architecture-map",
+      "requirement": "VCGC-REQ095",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "對照表與缺口 G1–G5 已登錄(需求冊 v0124);實作順序待裁定,不擴張範圍",
+      "next": "裁定後逐缺口一支薄尾 + 一本冊(建議 G3 → G1 → G2),SDD 出合規率燈"
+    },
+    "VCGC-REQ096:closeout-tri-page": {
+      "id": "VCGC-REQ096:closeout-tri-page",
+      "requirement": "VCGC-REQ096",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器實跑入口 v0111 已產出並開啟三合一頁(覆蓋 111/120);實際資料(開閘建庫 · VRN 樣本)只在工作站",
+      "next": "工作站跑入口 v0111 → 看三合一頁的 VDF / VRN 實測列 → SDD real + lock --apply"
+    },
+    "VCGC-REQ097:progress-journal": {
+      "id": "VCGC-REQ097:progress-journal",
+      "requirement": "VCGC-REQ097",
+      "state": "VERIFIED",
+      "case": "progress_journal",
+      "receipt": "docs/handoff/evidence/progress_journal.json"
     }
   },
   "summary": {
-    "requirements": 124,
-    "watched_files": 2807,
-    "pending": 52,
-    "reusable": 44,
+    "requirements": 133,
+    "watched_files": 2833,
+    "pending": 64,
+    "reusable": 54,
     "findings": 0
   }
 }

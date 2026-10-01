@@ -27,10 +27,28 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 558 · import 0 · 提及 45 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 560 · import 0 · 提及 46 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_ENG394_LayoutRestore_v0100.py(家族 vrn)
+  [via-vcgc run] [流程] 政策過 · VRN_ENG394_LayoutRestore_v0101.py(家族 vrn)
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+Consider using the pymupdf_layout package for a greatly improved page layout analysis.
+  [OK] 兩種編號:全文 S0001… 連號 · 章節 節.句(標題 = 節.0)
+  [OK] 一句一標題一資料:每列都有所屬標題(本文句的標題 = 上一個 H 列)
+  [OK] 兩層分類:類別(文)× 次類別(H1/H2/BODY…)· 表 T01… 帶次類別(格線表 / 鍵值 / 扁平表)
+  [OK] 截取完整度:合成首頁每個字都在(本文 + 資訊區 + 表 + 排除區)→ GREEN ≥ 99.9%
+  [OK] 擷取覆蓋(不含排除區)< 截取覆蓋:排除區有截到、不擷取(數得出差多少)
+  [OK] 輸出 md:本文表 # (S0001)| 據點 | 類別 | 次類別 | 字級 | 粗 | 內容 | 節.句 | 所屬標題 · 截取完整度表 · 去重行
+  [OK] 雙欄頁:左本文區 · 右資訊區 / 表格 / 圖(CSS grid,窄螢幕上下疊)
+  [OK] 抓漏:刪掉一句 → 截取完整度 RED · 缺字片段指出那一句
+  [OK] 去重:跨頁頁眉只留第一頁 · 其餘兩頁移到排除區(理由 跨頁重複)
+  [OK] 去重:同頁重複句只留一次(每頁各去一句 · 原文留在排除區)
+  [OK] 去重後截取完整度仍 GREEN(去掉的在排除區,不算漏)
+  [OK] 真實 31 頁:每頁截取完整度 GREEN(含 p2 目錄自列項)· 跨頁頁眉去重
+  [OK] 目錄自列項:「Table of Contents | 2」是目錄表的一列
+  [OK] 文字模式也編號 · 也算完整度
+  [OK] 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
+--- 前版 v0100 全套自測(本版編號 / 完整度 / 雙欄照開;去重關閉 —— 跨頁頁眉只留一次是本版新行為,由上方去重檢驗)---
   [OK] 規則冊在 registry 且本支照冊讀
   [OK] TRIM:CJK 字間空白去掉 · 英數詞間壓一格
   [OK] 值 token:3231.TW / Jul-14 / 2025E / S&P 500 不算值
@@ -63,8 +81,6 @@
   [OK] 堆疊表:整列全空 → 上下拆 2 張
   [OK] 堆疊表:數字列後出現新表頭 → 上下拆 2 張
   [OK] 並排表:整欄全空 → 左右拆 2 張
-warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
-Consider using the pymupdf_layout package for a greatly improved page layout analysis.
   [OK] PDF:葉區四類都在(資訊 / 本文 / 排除;表在資訊區)
   [OK] PDF:右側欄 → 資訊區(右)· 鍵值表 評等=買進
   [OK] PDF:畫線表 2 張(並排)· 合併格補值 營收/Q1
@@ -82,3 +98,5 @@ Consider using the pymupdf_layout package for a greatly improved page layout ana
   [OK] 真實 PDF:每頁小字頁尾(版權 / 頁碼)都進排除區
   [OK] 帶加速器橋 · VIA_FROM_VCGC 閘 · 不匯入 TA-Lib · 不碰網路
 [VRN_ENG394 v0100 版面還原] 自測 48/48 PASS
+  [OK] 前版自測在本版下仍全過(去重關)
+[VRN_ENG394 v0101 雙欄 · 編號 · 完整度 · 去重] 自測 16/16 PASS

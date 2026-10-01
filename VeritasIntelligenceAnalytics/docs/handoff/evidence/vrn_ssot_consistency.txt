@@ -27,7 +27,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 554 · import 0 · 提及 46 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 560 · import 0 · 提及 46 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · SUP_MDL749_VRNFieldRuleHub_v0116.py(家族 core)
@@ -80,7 +80,7 @@
   [OK] ㊹ 只增不減實證:樞紐自己的每一個評等別名在增補冊上都在,而且樞紐的正典名都留在候選裡(冊沒丟也沒改既有對應);rating_words() 全部在冊 (樞紐別名 38 · 冊上沒有 0 · 對應被改 0 · 詞表缺 0)
   [OK] ㊺ 多義只攤開不裁定:每條 ≥2 正典且每個正典都帶來源;樞紐既有的 2 個撞名(Accumulate/Add)都在冊的多義裡;是 YELLOW 不是 RED;讀冊不改冊(前後同);既有判定 rating_of 一位元沒變 (多義 10 · 對回樞紐差 4 · 樞紐撞名 ['Accumulate', 'Add'])
   [OK] ㊻ 負控(合成冊,只落暫存):兩來源兩正典=SOURCE_REQUIRED 且兩個都回;指定來源=RESOLVED;沒收的來源=UNKNOWN;only_add:false / schema 不對=拒讀 RED;冊不在=ABSENT;候選冊不在=NODATA 不編 (SOURCE_REQUIRED ['BUY', 'HOLD'] · s2→HOLD · s9→UNKNOWN · RED/RED/ABSENT/NODATA)
-  [OK] ㊼ 券商拒絕閘(CGC_MDL176)經正本實作 ENG086 v0110 生效:broker_of 被拒別名(從閘上取,合成別名表隔離驗)→ None;凱基 → KGI;閘態端得上來(拒 ≥10 · 正典鍵對映 ≥4) (閘 OK 拒 20 對映 6 · 被拒別名 12 個試一個=None · 凱基=KGI)
+  [OK] ㊼ 券商拒絕閘(CGC_MDL176)經正本實作 ENG086 v0110 生效:broker_of 被拒別名(從閘上取,合成別名表隔離驗)→ None;凱基 → KGI;閘態端得上來(拒 ≥10 · 正典鍵對映 ≥4) (閘 OK 拒 20 對映 14 · 被拒別名 12 個試一個=None · 凱基=KGI)
   [OK] ㊽ 批728 增補冊讀冊口 resolve_synonym(broker) 也過同一個拒絕閘:閘上每個被拒名 → DENIED;合成冊「別名合法但正典被拒」→ DENIED;凱基 → KGI 不被連坐(名單從閘上取,本檔零字面) (閘 20 名 · 漏 0 · 正典被拒=DENIED · 凱基=KGI)
   [計] 50 檢 OK 50 · FAIL 0(檢數現場計,不寫死)
 === v0116 新增檢(零網路;合成冊與合成文字只落暫存)===
@@ -96,7 +96,7 @@
   [OK] ⑨ regexcheck 合成中英文研報:凱基『增加持股』→ BUY、目標價 1250;大摩 Overweight → BUY、NT$1,300;雜訊檔(增持庫藏股 / 毛利率目標 / 上漲空間)評等與目標價都不准抓到 ({'en_ms.txt': {'rating': 'BUY', 'tp': '1300.0', 'conflict_words': '', 'regex_hits': 5}, 'zh_kgi.txt': {'rating': 'BUY', 'tp': '1250.0', 'conflict_words': '', 'regex_hits': 13}, 'zh_noise.txt': {'rating': '', 'tp': '', 'conflict_words': '', 'regex_hits': 3}})
   [OK] ⑩ 輸出=驗證:每一列欄名/順序/型別鎖在 REGEXCHECK_COLUMNS;壞列一定被抓 (111 列 · 13 欄)
   [OK] ⑪ JSON/CSV 寫在暫存夾、讀得回來、DataFrame 欄序一致(pandas 缺席就只驗 JSON) (regex_selfcheck_latest.csv · DataFrame (111, 13))
-  [OK] ⑫ 樣本夾不在本機 = 誠實 ABSENT(不編列、不冒充綠) (['不在本機:/tmp/tmpc60fsn2u/no_such_dir(操作員樣本夾在工作站;容器照實 ABSENT)'])
+  [OK] ⑫ 樣本夾不在本機 = 誠實 ABSENT(不編列、不冒充綠) (['不在本機:/tmp/tmpu7kk_0sf/no_such_dir(操作員樣本夾在工作站;容器照實 ABSENT)'])
   [OK] ⑬ 預設樣本夾取自 VIA_InputConsole_Spec user.vrn_dir(本機不存在就照實 ABSENT) (['C:\\測試樣本報告'])
   [OK] ⑭ 新動詞只收 VCGC:VIA_FROM_VCGC 不是 YES 就拒絕(rc 2) 
   [計] v0116 新增 15 檢 OK 15 · FAIL 0(前版自測 rc 0)
