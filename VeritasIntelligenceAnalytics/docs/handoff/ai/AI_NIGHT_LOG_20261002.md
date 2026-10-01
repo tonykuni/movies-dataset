@@ -32,3 +32,15 @@
 ## 輪次紀錄
 
 (下面每一輪由 AI 追加)
+
+### R48 · UTC 21:56–22:30(台北 05:56–06:30)
+
+- main CI 在 #415(另一 session 的 VCGC v0185)合併後紅:test_11 總控頁與正主不同步 → #416 依正主重產(2 行),契約 19/19 → 綠即合併。
+- 工作站第 2 份交接紀錄 `WS_HANDOVER_20261002_051143`(跑的是 v0104,HEAD 3ec73468):
+  - **紅 ① 實測本體 v0101 一進 ③ 就拋「找不到屬性 'after'」@ 行 197**(04:15 那輪的「v0101 例外」也是它)。Celeritas PS7 模板開了 StrictMode,五條並行線只有 ENV 有 `after` 鍵 → VDF ∥ VRN 兩條鏈整輪沒起跑。
+    修:`Invoke-VIA-RealTestCore-v0102.ps1`(只改那一行,`$ln.Contains("after")`)+ `Invoke-VIA-RealTest-v0106.ps1`(呼叫 RealTestCore 尾版)。舊 v0101 不動(L70)。
+  - **紅 ② VCGC 全功能串測 紅 2 站,名字沒進紀錄**:站列是 `[RED   ]`(補空白),v0104/v0105 正則只抓得到 `[YELLOW]`。v0106 改 `\[(RED|YELLOW)\s*\]`,下一輪就看得到是哪兩站。容器同一指令:綠 6 · 黃 1(P-entry:容器沒 pwsh)· 紅 0。
+  - 環境 AMBER(工具冊 rc 2 · 家族境 rc 1;VDF_MDL003 SentimentMacro 自測 NODATA 1 → 被記 FAIL):已知、未擴張。
+  - 樣本 305 件:全文覆蓋 100%、缺數字 0;總判 RED 來自 ENG072 首頁 RED(操作員保留範圍,AI 不動)。
+  - 交接檢查 GREEN(findings 0)。
+- 需求冊 v0134:+VCGC-REQ111(本修);操作員 R48 原話「子系統向上通報 SYNC TO VCGC · VCGC 邊看 SSOT 編號」歸 VCGC-REQ110(母子連接)加引述。
