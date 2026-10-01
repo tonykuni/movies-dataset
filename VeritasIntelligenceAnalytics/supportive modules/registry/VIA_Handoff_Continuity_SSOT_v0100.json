@@ -105,7 +105,8 @@
     "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py",
     "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py",
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
-    "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py"
+    "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
+    "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -413,12 +414,13 @@
         "VRN_ENG393_DocClassVerify",
         "--selftest"
       ],
-      "success_marker": "[VRN_ENG393_DocClassVerify v0100] 自測 35/35 PASS",
-      "scope": "VRN 文件五類分類(個股 · 產業展望 · 新聞摘要 · 其他投資 · 其他→複核)+ 首頁文字 / 表格還原 + 亂數三格乘積多法互核(種子入冊 · 兩輪 · 含 0 逐格下鑽)(R35 · VRN-REQ009)",
+      "success_marker": "[VRN_ENG393 v0101 前綴格 · 主標題] 自測 15/15 PASS",
+      "scope": "VRN 文件五類分類(個股 · 產業展望 · 新聞摘要 · 其他投資 · 其他→複核)+ 首頁文字 / 表格還原 + 亂數三格乘積多法互核(種子入冊 · 兩輪 · 含 0 逐格下鑽)(R35 · VRN-REQ009) · v0101 只有幣別前綴的格子不再讓 verify 當掉(R36 工作站實錄 IndexError) · 首頁主標題改用版面字級(字最大 · 不含股名代碼 · 無句號;R36)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG393_DocClassVerify_v*.py",
         "supportive modules/registry/VIA_VRN_DocClass_SSOT_v*.json",
-        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json"
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py"
       ],
       "timeout_seconds": 1200
     },
@@ -988,6 +990,28 @@
       "owner": "AI",
       "reason": "VRN_ENG062 摘要器仍用子字串比對 VALUATION_METHODS(pe 會中 operating、per 會中 per share);本輪只建正本與比對器,不動摘要器",
       "next": "出 VRN_ENG062 新版尾:_detect_valuation 改叫 VRN_ENG395 Matcher.methods_in(strict)並把 VAL_* 映回舊碼"
+    },
+    {
+      "id": "VRN-REQ009:verify-prefix-cell",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_docclass",
+      "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VRN-REQ009:page1-main-title",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_docclass",
+      "receipt": "docs/handoff/evidence/vrn_docclass.json"
+    },
+    {
+      "id": "VRN-REQ009:title-rule-workstation",
+      "requirement": "VRN-REQ009",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "主標題新判法只在合成首頁與容器樣本驗過;真實 306 件在工作站 C:\\測試樣本報告",
+      "next": "git pull 後 via-vcgc run --family vrn VRN_ENG393_DocClassVerify classify --samples \"C:\\測試樣本報告\" → 比對待複核數(前次 218)與 MS 九份是否不再誤標"
     }
   ]
 }
