@@ -6,7 +6,7 @@ v0104→v0105(R46 2026-10-02 · 操作員令「單獨測試vdf所有引擎」「
 FileNotFoundError 崩掉。量到的:容器裡沒有台股庫 → export() 只回 {"err": "DB_TW 缺"},沒有 state;v0103 自測只認
 state == "NODATA" 才走「上游缺料 → 誠實跳過」那條路(批584),於是落到 ② FAIL,再去讀不存在的 parquet → 崩。
 v0105:export() 回 err「DB_TW 缺」時,另補 state = NODATA · missing_tables · why(err 原樣保留,既有呼叫端照讀 err 不受影響)。
-庫在時一字不動。自測照前版:沒庫 → NODATA rc 2(缺料不是壞掉);有庫 → 照跑八檢。零網路 · 不安裝 · 不用 TA-Lib。
+庫在時一字不動。`--selftest-tail` 只跑本尾版四檢(交接案用)。自測照前版:沒庫 → NODATA rc 2(缺料不是壞掉);有庫 → 照跑八檢。零網路 · 不安裝 · 不用 TA-Lib。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -108,12 +108,14 @@ BODY.export = export                      # 本體 selftest / run 以模組全�
 
 
 def main() -> int:
+    if "--selftest-tail" in sys.argv[1:]:
+        return selftest(tail_only=True)
     if "--selftest" in sys.argv[1:]:
         return selftest()
     return PRIOR.main()
 
 
-def selftest() -> int:
+def selftest(tail_only: bool = False) -> int:
     ok = []
 
     def chk(name, cond, note=""):
@@ -142,6 +144,10 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("④ 本支帶加速器橋 · 網路橋;不含 TA-Lib 匯入", "[VIA:ACCEL-BRIDGE" in src and "[VIA:NET-BRIDGE" in src
         and not re.search(r"^\s*(?:import|from)\s+" + "ta" + r"lib\b", src, re.M))
+    if tail_only:                         # 交接案用:只驗本尾版四檢(前版八檢要台股庫,缺庫=NODATA 屬環境事實)
+        BODY.export = keep
+        print(f"  [計] VDF_ENG072 v0105 薄尾 {sum(ok)}/{len(ok)} · 只驗薄尾 · 合計 {'PASS' if all(ok) else 'FAIL'}")
+        return 0 if all(ok) else 1
     rc = PRIOR.selftest()
     BODY.export = keep
     good = all(ok)
