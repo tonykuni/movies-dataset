@@ -1,0 +1,34 @@
+# AI 夜間紀錄 · 2026-10-02(明天從這份接續)
+
+> 只增不減。每一輪工作站交接紀錄(docs/handoff/workstation/WS_HANDOVER_*.md)推上來,AI 讀完就在這裡加一段。
+
+## 起點(UTC 2026-10-01 21:20 · 台北 10-02 05:20)
+
+- 工作站已貼上 6 輪迴圈:每輪 `git pull` → `via-realtest -AutoInstall -NoOpen`(自動取最新版號)→ 交接紀錄推 GitHub → 等 20 分鐘;結束碼 0 即停。
+- AI 端:每 5 分鐘讀 GitHub(新交接紀錄 · PR CI · main CI);紅就修 → 開 PR → 綠即合併。
+- 不做:強制關機(AI 沒有通道,也不在每天用的指令裡埋關機;要的話操作員自己在迴圈 break 那行加 `Stop-Computer -Force`)。
+- 不做:代設網路同意閘(-AutoInstall 是操作員親手的開閘)。
+
+## 已在 main 的(今晚之前)
+
+| PR | 內容 |
+|---|---|
+| #409 | via-realtest v0100(25 PS 加速器 · VDF ∥ VRN ∥ 覆蓋 ∥ ENV ∥ 衝突 · 紅字 / 黃字) |
+| #410 | ENV MANAGER 逐項進度 v0101 · realtest v0101 · VRN 鏈 RED 0(ENG086 v0119 · test_SourceProvenance) |
+| #411 | realtest v0102(拉齊 → 實測 → 樣本 → 交接紀錄 → 推 GitHub)· v0103(三路線 · 環境完整安裝 · 全景 AST 錨點 · 總控頁) |
+| #413 | VDF 74 支逐支自測 RED 5 → 0(ENG089 v0108 · ENG074 v0107 · ENG088 v0105 · ENG072 v0105 · ENG082 v0107)· realtest v0104(例外進交接紀錄) |
+
+## 本段(R47)
+
+- realtest v0105:VCGC 下放檢查接進每一輪 —— `sdd check`(工作流冊)與 `ssot panorama`(參數 / regex / 同義字 / 編號 / 上下連結)背景並行,紅黃列逐行進交接紀錄。需求 VCGC-REQ109。
+
+## 工作站第 1 份交接紀錄(v0103 · 04:51 台北)摘要
+
+- ENG093 ⑦ 紅 → #413 的 ENG089 v0108 修好(下一輪應消失)。
+- 環境:ENV RED → AMBER(工具冊 rc 2 · 家族境補庫 rc 1)。
+- 樣本驗證 305 件:有首頁 RED —— 首頁文字 / 表格 / 摘要是操作員保留範圍,AI 不動。
+- v0101 中途例外、沒寫貼給 AI 檔 → v0104 起把例外收進交接紀錄。
+
+## 輪次紀錄
+
+(下面每一輪由 AI 追加)
