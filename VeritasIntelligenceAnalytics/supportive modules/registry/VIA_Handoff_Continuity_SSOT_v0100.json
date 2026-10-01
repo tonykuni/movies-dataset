@@ -103,7 +103,8 @@
     "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py",
     "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py",
     "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py",
-    "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py"
+    "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py",
+    "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -469,6 +470,21 @@
         "supportive modules/registry/CGC_MDL250_LedgerUnion_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "vrn_layout": {
+      "argv": [
+        "VRN_ENG394_LayoutRestore",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG394 v0100 版面還原] 自測 48/48 PASS",
+      "scope": "VRN 版面還原:資訊區(上/左/右/下)/ 本文區(一句一據點 · 字級粗體 · 次類別)/ 圖 / 排除區(小字頁尾 · 附錄連標題)· 扁平文字表格還原(表號 · 表頭 · 單位 · 來源 · 並排 · 分組)· 合併格 · 左右 / 上下拆 · 表格驗算(R36 · VRN-REQ010)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py",
+        "supportive modules/registry/VIA_VRN_LayoutRestore_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+        "supportive modules/specs/EarningsInsight_062626.pdf"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -927,6 +943,21 @@
       "owner": "操作員",
       "reason": "工作站 1cb0f4958 落後 57;git pull 被 VIA_Lessons_Ledger_v0100.json · VIA_VCGC_FullCheck_Ledger_v0100.jsonl 本地改動擋住(2026-10-01 實錄)",
       "next": "備份兩本到倉外 → git checkout -- 兩本 → git pull --ff-only → 重點源命令冊 → via-vcgc run --family core CGC_MDL250_LedgerUnion merge --from <備份夾> --apply;之後同類情形用 via-medic sync --apply(v0105 自動聯集)"
+    },
+    {
+      "id": "VRN-REQ010:vrn_layout",
+      "requirement": "VRN-REQ010",
+      "state": "VERIFIED",
+      "case": "vrn_layout",
+      "receipt": "docs/handoff/evidence/vrn_layout.json"
+    },
+    {
+      "id": "VRN-REQ010:workstation-real",
+      "requirement": "VRN-REQ010",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實券商 PDF 在工作站 C:\\測試樣本報告,容器沒有;容器只驗四段 OCR 扁平文字 · 合成首頁 · 倉內 FactSet 31 頁",
+      "next": "via-vcgc run --family vrn VRN_ENG394_LayoutRestore restore --in \"C:\\測試樣本報告\" --pages 1 → 看 VIA_Reports\\vrn\\layout_restore\\LAYOUT_latest.html"
     }
   ]
 }
