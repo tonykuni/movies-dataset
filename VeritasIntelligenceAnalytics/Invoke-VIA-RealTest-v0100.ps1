@@ -86,6 +86,13 @@ function Read-RtJson([string]$Path) {
     if ((Get-Item -LiteralPath $Path).LastWriteTime -lt $runStart.AddSeconds(-2)) { return $null }
     try { return Get-Content -LiteralPath $Path -Raw -Encoding utf8 | ConvertFrom-Json -Depth 30 } catch { return $null }
 }
+function Get-P([object]$o, [string]$n) {
+    # 安全取欄位:結果 JSON 各家欄位不一(VDF 站 id · VRN 站 layer),嚴格模式下取不存在的欄位會丟例外
+    if ($null -eq $o) { return $null }
+    $p = $o.PSObject.Properties[$n]
+    if ($p) { return $p.Value }
+    return $null
+}
 function Cut([object]$s, [int]$n = 260) { $t = ("" + $s) -replace "\s+", " "; if ($t.Length -gt $n) { $t.Substring(0, $n) + "…" } else { $t } }
 function Open-RtPages([string[]]$Pages) {
     $p = @($Pages | Where-Object { $_ -and (Test-Path -LiteralPath $_) })
@@ -279,23 +286,23 @@ try {
         $j = if ($ln.json) { Read-RtJson (Join-Path $Rep $ln.json) } else { $null }
         if ($ln.json -and -not $j) { $Ai.Add("  (本輪沒產出 " + $ln.json + ";舊檔不採用)") }
         if ($j) {
-            if ($j.stages) {
-                foreach ($st in @($j.stages | Where-Object { $_.state -ne "GREEN" -and $_.state -ne "SKIP" })) {
-                    $sid = if ($st.id) { $st.id } else { $st.layer }
-                    $Ai.Add("  - " + $sid + " " + $st.name + " · " + $st.state + " · 細節:" + (Cut $st.detail 420) + $(if ($st.fix) { " · 補法:" + (Cut $st.fix 200) } else { "" }) + $(if ($st.evidence) { " · 證據:" + $st.evidence } else { "" }))
-                    if ($st.state -eq "RED") { $Errs.Add($ln.id + " 紅燈:" + $sid + " " + $st.name + " · " + (Cut $st.detail 220)) }
+            if ((Get-P $j 'stages')) {
+                foreach ($st in @((Get-P $j 'stages') | Where-Object { (Get-P $_ 'state') -ne "GREEN" -and (Get-P $_ 'state') -ne "SKIP" })) {
+                    $sid = if ((Get-P $st 'id')) { (Get-P $st 'id') } else { (Get-P $st 'layer') }
+                    $Ai.Add("  - " + $sid + " " + (Get-P $st 'name') + " · " + (Get-P $st 'state') + " · 細節:" + (Cut (Get-P $st 'detail') 420) + $(if ((Get-P $st 'fix')) { " · 補法:" + (Cut (Get-P $st 'fix') 200) } else { "" }) + $(if ((Get-P $st 'evidence')) { " · 證據:" + (Get-P $st 'evidence') } else { "" }))
+                    if ((Get-P $st 'state') -eq "RED") { $Errs.Add($ln.id + " 紅燈:" + $sid + " " + (Get-P $st 'name') + " · " + (Cut (Get-P $st 'detail') 220)) }
                 }
             } elseif ($ln.id -eq "COV") {
-                $Ai.Add("  總判 " + $j.verdict)
-                foreach ($r in @($j.rows | Where-Object { $_.lamp -ne "GREEN" })) {
-                    $Ai.Add("  - " + $r.title + " [" + $r.group + "] · " + $r.lamp + " · " + $r.have + "/" + $r.elig + $(if ($r.miss) { " · 缺:" + (Cut (@($r.miss) -join ", ") 300) } else { "" }) + $(if ($r.perr) { " · 剖析錯:" + (Cut (@($r.perr) -join ", ") 200) } else { "" }))
-                    if ($r.lamp -eq "RED") { $Errs.Add("工具覆蓋紅:" + $r.title + " [" + $r.group + "] 缺 " + (Cut (@($r.miss) -join ", ") 160)) }
+                $Ai.Add("  總判 " + (Get-P $j 'verdict'))
+                foreach ($r in @((Get-P $j 'rows') | Where-Object { (Get-P $_ 'lamp') -ne "GREEN" })) {
+                    $Ai.Add("  - " + (Get-P $r 'title') + " [" + (Get-P $r 'group') + "] · " + (Get-P $r 'lamp') + " · " + (Get-P $r 'have') + "/" + (Get-P $r 'elig') + $(if ((Get-P $r 'miss')) { " · 缺:" + (Cut (@((Get-P $r 'miss')) -join ", ") 300) } else { "" }) + $(if ((Get-P $r 'perr')) { " · 剖析錯:" + (Cut (@((Get-P $r 'perr')) -join ", ") 200) } else { "" }))
+                    if ((Get-P $r 'lamp') -eq "RED") { $Errs.Add("工具覆蓋紅:" + (Get-P $r 'title') + " [" + (Get-P $r 'group') + "] 缺 " + (Cut (@((Get-P $r 'miss')) -join ", ") 160)) }
                 }
             } elseif ($ln.id -eq "ENV") {
-                $Ai.Add("  總判 " + $j.verdict + " · " + (($j.tally.PSObject.Properties | ForEach-Object { $_.Name + " " + $_.Value }) -join " · "))
-                foreach ($r in @($j.rows | Where-Object { $_.state -ne "GREEN" })) {
-                    $Ai.Add("  - " + $r.group + " " + $r.item + " · " + $r.state + " · " + (Cut $r.note 220) + $(if ($r.fix) { " · 補法:" + (Cut $r.fix 220) } else { "" }))
-                    if ($r.state -eq "RED") { $Errs.Add("環境紅:" + $r.item + " · " + (Cut $r.note 160) + " · 補法:" + (Cut $r.fix 160)) }
+                $Ai.Add("  總判 " + (Get-P $j 'verdict') + " · " + (((Get-P $j 'tally').PSObject.Properties | ForEach-Object { $_.Name + " " + $_.Value }) -join " · "))
+                foreach ($r in @((Get-P $j 'rows') | Where-Object { (Get-P $_ 'state') -ne "GREEN" })) {
+                    $Ai.Add("  - " + (Get-P $r 'group') + " " + (Get-P $r 'item') + " · " + (Get-P $r 'state') + " · " + (Cut (Get-P $r 'note') 220) + $(if ((Get-P $r 'fix')) { " · 補法:" + (Cut (Get-P $r 'fix') 220) } else { "" }))
+                    if ((Get-P $r 'state') -eq "RED") { $Errs.Add("環境紅:" + (Get-P $r 'item') + " · " + (Cut (Get-P $r 'note') 160) + " · 補法:" + (Cut (Get-P $r 'fix') 160)) }
                 }
                 $Ai.Add("  補法一貼即用:" + (Join-Path $Rep "env_governance\TOOLS_PLAN_latest.ps1") + "(裝件是操作員的手;-FixEnv 走 via-envtools -Apply -Approve)")
             }
@@ -313,9 +320,9 @@ try {
     $pj = Read-RtJson (Join-Path $Rep "panorama\monitor_latest.json")
     $Ai.Add("")
     if ($pj) {
-        $Ai.Add("[全景 VCGC 控管] 總判 " + $pj.verdict)
-        foreach ($r in @($pj.rows | Where-Object { $_.lamp -ne "GREEN" })) {
-            $Ai.Add("  - " + $r.track + " · " + $r.lamp + " · " + (Cut $r.value 260) + $(if ($r.note) { " · " + (Cut $r.note 200) } else { "" }))
+        $Ai.Add("[全景 VCGC 控管] 總判 " + (Get-P $pj 'verdict'))
+        foreach ($r in @((Get-P $pj 'rows') | Where-Object { (Get-P $_ 'lamp') -ne "GREEN" })) {
+            $Ai.Add("  - " + (Get-P $r 'track') + " · " + (Get-P $r 'lamp') + " · " + (Cut (Get-P $r 'value') 260) + $(if ((Get-P $r 'note')) { " · " + (Cut (Get-P $r 'note') 200) } else { "" }))
         }
     } else { $Ai.Add("[全景 VCGC 控管] 本輪沒產出 monitor_latest.json") }
     $Ai.Add("[三合一] " + $(if ($triLine) { Cut $triLine 240 } else { "本輪沒產出" }))
