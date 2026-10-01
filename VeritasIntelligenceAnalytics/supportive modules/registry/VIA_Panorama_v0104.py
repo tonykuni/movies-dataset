@@ -143,6 +143,14 @@ def state_gate(root: Path) -> dict:
     unreg = [f for f in fams if f not in books]
     res.update(changed_code=len(code), families=len(fams), unregistered=unreg, req_book=reqf.name if reqf else None,
                wkf_book=wkf.name if wkf else None)
+    # 同步到 GitHub:本機有沒推上 origin 的提交(沒有上游 = 沒量,不假綠)
+    rc_u, up, _ = BASE.git(root, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+    if rc_u == 0 and up.strip():
+        rc_c, cnt, _ = BASE.git(root, "rev-list", "--count", f"{up.strip()}..HEAD")
+        res["unpushed"] = int(cnt.strip()) if rc_c == 0 and cnt.strip().isdigit() else None
+        res["upstream"] = up.strip()
+    else:
+        res["unpushed"], res["upstream"] = None, None
     try:
         rq = json.loads(reqf.read_text(encoding="utf-8")) if reqf else {}
         res["req_tally"] = rq.get("tally") or {}
@@ -161,12 +169,17 @@ def state_gate(root: Path) -> dict:
         res["why"].append(f"交接快照之後有 {res['behind']} 個提交還沒 checkpoint")
     else:
         lamp = "GREEN"
+    if res.get("unpushed"):
+        lamp = BASE.worst([lamp, "YELLOW"])
+        res["why"].append(f"{res['unpushed']} 個提交還沒推上 {res['upstream']}")
+    elif res.get("upstream") is None:
+        res["why"].append("沒有上游分支:GitHub 同步沒量")
     res["lamp"] = lamp
     res["next"] = [] if lamp == "GREEN" else (
         (["登需求冊 / 工作流冊(新版號):" + " · ".join(unreg[:6])] if unreg else [])
         + ["via-vcgc handoff check", "via-vcgc handoff test <受影響 case>", "via-vcgc registry-sync → --apply(同意閘)",
            "via-vcgc run CGC_MDL237_NumberingSystem --apply --scope → audit", "via-vcgc run CGC_MDL245_SDDValidator check",
-           "via-vcgc handoff checkpoint"])
+           "via-vcgc handoff checkpoint"]) + ([f"git push(還有 {res['unpushed']} 個提交沒推上 {res['upstream']})"] if res.get("unpushed") else [])
     return res
 
 
@@ -174,6 +187,8 @@ def gate_line(g: dict) -> str:
     if g.get("lamp") == "ABSENT":
         return "交接閘 ABSENT(" + " · ".join(g.get("why") or []) + ")"
     s = f"交接閘 {g['lamp']} · 落後 {g.get('behind', 0)} 提交 · 快照 {g.get('age_h')}h"
+    if g.get("unpushed"):
+        s += f" · 未推 {g['unpushed']}"
     if g.get("unregistered"):
         s += f" · 未登 {len(g['unregistered'])} 支({' · '.join(g['unregistered'][:3])}{' …' if len(g['unregistered']) > 3 else ''})"
     return s
@@ -276,6 +291,8 @@ def gate_cards(g: dict, wg: dict) -> tuple:
            "值": f"{g.get('behind', 0)} 個(上限 {MAX_BEHIND})"},
           {"項": "改過的程式", "lamp": "RED" if g.get("unregistered") else "GREEN",
            "值": f"{g.get('changed_code', 0)} 檔 · {g.get('families', 0)} 族 · 未登 {len(g.get('unregistered') or [])}"},
+          {"項": "同步 GitHub", "lamp": "ABSENT" if g.get("upstream") is None else ("YELLOW" if g.get("unpushed") else "GREEN"),
+           "值": f"未推 {g.get('unpushed')} · 上游 {g.get('upstream') or '沒有'}"},
           {"項": "驗收 closeout", "lamp": g.get("closeout") or "NODATA", "值": "交接綠 ≠ 驗收"}]
     unreg = "".join(f"<li class='mono'>{e(u)}</li>" for u in (g.get("unregistered") or [])[:20]) or "<li>(無)</li>"
     nxt = "".join(f"<li class='mono'>{e(n)}</li>" for n in g.get("next") or []) or "<li>交接閘綠:沒有要補的</li>"
@@ -416,6 +433,7 @@ def main(argv=None) -> int:
     if a and a[0] in ("--selftest", "selftest"):
         return selftest()
     V103.one_round = one_round  # 前版 watch / dashboard 走本版的一輪(多交接閘)
+    V103.ENGINE = ENGINE        # 前版動詞印的名字 = 實際執行的本版
     if a and a[0] in ("autostart", "state"):
         opts, target = V103._opts(a[1:])
         return (autostart if a[0] == "autostart" else state_verb)(target, opts)
@@ -479,6 +497,18 @@ def selftest() -> int:
         g2 = state_gate(v)
         chk("交接閘:改過的程式沒被冊點名 = RED · 列出族名 · 給收尾指令", g2["lamp"] == "RED" and g2["unregistered"] == ["Stray_Module"]
             and any("handoff checkpoint" in n for n in g2["next"]), json.dumps({k: g2.get(k) for k in ("lamp", "unregistered")}, ensure_ascii=False))
+        chk("同步 GitHub:沒有上游 = 沒量(None)不假綠", g2.get("upstream") is None and g2.get("unpushed") is None
+            and any("沒有上游" in w for w in g2["why"]))
+        bare = tmp / "remote.git"
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(bare)], capture_output=True, env=env)
+        g("remote", "add", "origin", str(bare))
+        g("push", "-q", "-u", "origin", "main")
+        (reg / "Known_Engine_v0102.py").write_text('"""k3"""\n', encoding="utf-8")
+        g("add", ".")
+        g("commit", "-q", "-m", "local only")
+        g3 = state_gate(v)
+        chk("同步 GitHub:本機領先上游 1 = 未推 1 · 收尾指令帶 git push", g3.get("unpushed") == 1 and any("git push" in n for n in g3["next"])
+            and "未推 1" in gate_line(g3), json.dumps({k: g3.get(k) for k in ("unpushed", "upstream", "lamp")}, ensure_ascii=False))
         wg = workflow_graph(v)
         st = {n["id"]: n["lamp"] for n in wg["nodes"]}
         chk("工作流圖:networkx 無環分層 · 引擎在 = 跟需求最差(PARTIAL 黃)· 引擎清單缺一支 = 紅", wg["acyclic"] and st["X-WKF001"] == "YELLOW"
