@@ -101,7 +101,9 @@
     "supportive modules/registry/CGC_MDL237_NumberingSystem_v0111.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py",
     "supportive modules/registry/CGC_MDL241_TemplateAdapter_v0101.py",
-    "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py"
+    "functional modules/VRN/VRN_ENG080_FourPointDigest_v0111.py",
+    "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py",
+    "supportive modules/registry/CGC_MDL143_MergeMedic_v0105.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -442,6 +444,31 @@
         "functional modules/VRN/VRN_ENG080_FourPointDigest_v*.py"
       ],
       "timeout_seconds": 1200
+    },
+    "ledger_union": {
+      "argv": [
+        "CGC_MDL250_LedgerUnion",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL250_LedgerUnion_v0100] 自測 10/10 PASS",
+      "scope": "帳本聯集:jsonl 逐行 · entries 逐筆(同 id 異內容 → 本地 -WS;同號同 sig 取大 count)· 乾跑 / --apply 留 .pre_union · 冪等 · 帶衝突標記拒寫(工作站 2026-10-01 pull 被兩本帳本擋住實錄)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL250_LedgerUnion_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "merge_medic": {
+      "argv": [
+        "CGC_MDL143_MergeMedic",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL143_MergeMedic_v0105 帳本聯集] 自測 11/11 PASS",
+      "scope": "拉齊醫生 v0105:*_Ledger_v####.json/.jsonl 也當台帳聯集;真 git 倉重現「本地髒帳本擋住快轉」→ sync --apply 拉得動、兩邊行都在、零衝突標記、stash 清",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL143_MergeMedic_v*.py",
+        "supportive modules/registry/CGC_MDL250_LedgerUnion_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -878,6 +905,28 @@
       "owner": "操作員",
       "reason": "工作站 via-closeout vrn:4 份有對照源而對不起來(Citi-3231 頁價 114 vs 庫 109.5 · Daiwa-3653 TP 未抽到且頁價 2550 vs 庫 2445 · Daiwa-6278 TP=15 疑誤抽(比值 0.069)且頁價 230 vs 庫 203 · 第 4 份見 VRN_CLOSEOUT_latest.json);價差可能是還原價 vs 原始價或報告引用價日不同,須看 PDF 才能裁,不在容器代判",
       "next": "git pull → via-closeout vrn --run(四點 QC 假紅已由 ENG080 v0111 修)→ 對 fail 清單逐份開 PDF 核 TP 與現價 → 解析錯就回報該份,價日差就裁容差/價日規則"
+    },
+    {
+      "id": "VCGC-REQ088:ledger_union",
+      "requirement": "VCGC-REQ088",
+      "state": "VERIFIED",
+      "case": "ledger_union",
+      "receipt": "docs/handoff/evidence/ledger_union.json"
+    },
+    {
+      "id": "VCGC-REQ088:merge_medic",
+      "requirement": "VCGC-REQ088",
+      "state": "VERIFIED",
+      "case": "merge_medic",
+      "receipt": "docs/handoff/evidence/merge_medic.json"
+    },
+    {
+      "id": "VCGC-REQ088:workstation-pull",
+      "requirement": "VCGC-REQ088",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "工作站 1cb0f4958 落後 57;git pull 被 VIA_Lessons_Ledger_v0100.json · VIA_VCGC_FullCheck_Ledger_v0100.jsonl 本地改動擋住(2026-10-01 實錄)",
+      "next": "備份兩本到倉外 → git checkout -- 兩本 → git pull --ff-only → 重點源命令冊 → via-vcgc run --family core CGC_MDL250_LedgerUnion merge --from <備份夾> --apply;之後同類情形用 via-medic sync --apply(v0105 自動聯集)"
     }
   ]
 }
