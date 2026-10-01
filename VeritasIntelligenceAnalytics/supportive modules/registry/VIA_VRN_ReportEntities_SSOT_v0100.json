@@ -1,0 +1,316 @@
+{
+  "ssot": "VIA_VRN_ReportEntities_SSOT",
+  "version": "v0100",
+  "owner_engine": "VRN_ENG396_ReportEntities",
+  "requirement": "VRN-REQ014",
+  "created": "2026-10-01",
+  "purpose": "研報本文實體:公司名稱(中英全名 · 去後綴簡稱 · 最簡寫 · 局部識別)· 目標價(本次 / 調整前 · 方向 · 調幅)· 評價法(VAL_* 代碼由 VIA_VRN_ValuationMethod_SSOT 判 · 倍數 · 基準年 · 基準指標 · 表內驗算)。引擎照冊讀,不另寫第二份。",
+  "company": {
+    "name_sources": [
+      "檔名:代號旁的中文股名(南亞(1303 · 2637 慧洋-KY)",
+      "首頁:帶代號記號的行,記號前的字串(Wistron (3231.TW) · 神達(3706 TT) · 鴻海精密工業(2317))",
+      "呼叫端給的別名(operator DB / 證券主檔),有就併入"
+    ],
+    "ticker_mark_rx": "(?P<name>[A-Za-z][A-Za-z0-9&.,'\\- ]{1,60}?|[\\u4e00-\\u9fff][\\u4e00-\\u9fffA-Za-z0-9\\-]{0,20}?)\\s*[\\(（]\\s*(?P<code>[1-9]\\d{3})(?:\\s*(?:\\.TW|\\.TWO|TT|TW|-TW)|\\s*[\\)）])",
+    "legal_suffix_en": [
+      "Co., Ltd.",
+      "Co.,Ltd.",
+      "Co. Ltd.",
+      "Company Limited",
+      "Corporation",
+      "Holdings",
+      "Holding",
+      "Limited",
+      "Company",
+      "Group",
+      "Corp.",
+      "Corp",
+      "Inc.",
+      "Inc",
+      "Ltd.",
+      "Ltd",
+      "Co.",
+      "plc",
+      "PLC",
+      "S.A.",
+      "AG",
+      "N.V.",
+      "Class A",
+      "Class B"
+    ],
+    "industry_suffix_en": [
+      "Technologies",
+      "Technology",
+      "Electronics",
+      "Electronic",
+      "Industrial",
+      "Industries",
+      "Industry",
+      "International",
+      "Precision",
+      "Semiconductor",
+      "Manufacturing",
+      "Computer",
+      "Optoelectronics",
+      "Materials",
+      "Chemical",
+      "Systems",
+      "Networks",
+      "Communications",
+      "Energy",
+      "Biotech",
+      "Pharmaceutical",
+      "Enterprise",
+      "Enterprises"
+    ],
+    "legal_suffix_zh": [
+      "股份有限公司",
+      "有限公司",
+      "控股公司",
+      "公司",
+      "集團",
+      "控股",
+      "-KY",
+      "KY",
+      "－KY"
+    ],
+    "industry_suffix_zh": [
+      "精密工業",
+      "積體電路製造",
+      "金融控股",
+      "半導體",
+      "電子",
+      "電腦",
+      "科技",
+      "工業",
+      "精密",
+      "光電",
+      "國際",
+      "實業",
+      "企業",
+      "化學",
+      "化工",
+      "塑膠",
+      "銀行",
+      "證券",
+      "生技",
+      "醫療",
+      "能源",
+      "材料",
+      "機械",
+      "電機",
+      "通訊",
+      "網通",
+      "海運",
+      "航運",
+      "鋼鐵",
+      "建設",
+      "食品",
+      "紡織"
+    ],
+    "en_stop_tokens": [
+      "Taiwan",
+      "Asia",
+      "Asian",
+      "Global",
+      "United",
+      "China",
+      "General",
+      "International",
+      "First",
+      "Great",
+      "New",
+      "The",
+      "And",
+      "Pacific",
+      "World",
+      "National"
+    ],
+    "zh_stop_words": [
+      "中國",
+      "台灣",
+      "臺灣",
+      "國際",
+      "中華",
+      "大中華",
+      "亞洲",
+      "美國",
+      "日本",
+      "香港",
+      "全球",
+      "公司",
+      "產業",
+      "科技",
+      "電子",
+      "集團",
+      "工業"
+    ],
+    "abbrev_rules": {
+      "zh_subsequence": "中文簡稱 = 全名的字依序取出(首字相同、至少 2 字、不在停用詞):台積電 ← 台灣積體電路製造 · 中信金 ← 中國信託金融控股 · 南亞 ← 南亞塑膠工業",
+      "en_token_span": "英文簡稱 = 去後綴後連續詞段(合計 ≥ 4 字母、首詞不在停用詞):Hon Hai ← Hon Hai Precision Industry · Delta ← Delta Electronics",
+      "en_acronym": "字首縮寫(≥ 3 字母、本文以大寫出現才算):TSMC ← Taiwan Semiconductor Manufacturing Company",
+      "shortest": "最簡寫 = 本文實際出現過的形式裡字數最少的一個(不是推算的)"
+    },
+    "acronym_skip": [
+      "Co",
+      "Co.",
+      "Ltd",
+      "Ltd.",
+      "Inc",
+      "Inc.",
+      "Corp",
+      "Corp.",
+      "Limited",
+      "plc",
+      "PLC",
+      "of",
+      "and",
+      "the",
+      "&"
+    ]
+  },
+  "target_price": {
+    "price_rx": "(?:NT\\$|US\\$|HK\\$|RMB|\\$|新台幣|台幣)?\\s*(?P<v>\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?|\\d+(?:\\.\\d+)?)\\s*(?:元|dollars?)?",
+    "reject_tail_rx": "^\\s*(?:%|％|x\\b|X\\b|倍|年|[EF]\\b|bn|mn|tn|億|百萬|ppt|pp\\b)",
+    "patterns": [
+      {
+        "id": "EN_FROM_TO",
+        "rx": "(?i:(?:TP|PT|target\\s+price|price\\s+target)[^.。\\n]{0,40}?from\\s+{P1}\\s+to\\s+{P2})",
+        "prior": "P1",
+        "current": "P2"
+      },
+      {
+        "id": "EN_TO_FROM",
+        "rx": "(?i:(?:TP|PT|target\\s+price|price\\s+target)[^.。\\n]{0,40}?to\\s+{P2}\\s*[\\(（,]?\\s*from\\s+{P1})",
+        "prior": "P1",
+        "current": "P2"
+      },
+      {
+        "id": "EN_PREV_PAREN",
+        "rx": "(?i:(?:TP|PT|target\\s+price|price\\s+target)\\s*(?:of|at|:|is)?\\s*{P2}\\s*[\\(（]\\s*(?:prev(?:ious)?\\.?|prior|was|from|old)\\s*:?\\s*{P1}\\s*[\\)）])",
+        "prior": "P1",
+        "current": "P2"
+      },
+      {
+        "id": "ZH_FROM_TO",
+        "rx": "目標價\\s*(?:由|從|自)\\s*{P1}\\s*(?:元)?\\s*(?:上調|調升|調高|下調|調降|調低|上修|下修|調整|提高|降低)?\\s*(?:至|為|到)\\s*{P2}",
+        "prior": "P1",
+        "current": "P2"
+      },
+      {
+        "id": "ZH_PAREN_ORIG",
+        "rx": "目標價\\s*(?:上調|調升|調高|下調|調降|調低|上修|下修|調整|維持|為|:|：)?\\s*(?:至|為|到)?\\s*{P2}\\s*(?:元)?\\s*[\\(（]\\s*(?:原|前次|先前|舊|調整前)\\s*(?:目標價)?\\s*[:：]?\\s*{P1}",
+        "prior": "P1",
+        "current": "P2"
+      },
+      {
+        "id": "EN_PREV_ONLY",
+        "rx": "(?i:(?:previous|prior|old)\\s+(?:TP|PT|target\\s+price|price\\s+target)\\s*[:：]?\\s*{P1})",
+        "prior": "P1",
+        "current": null
+      },
+      {
+        "id": "ZH_PREV_ONLY",
+        "rx": "(?:前次|原|先前|舊|調整前)(?:投資建議)?[^。\\n]{0,24}?目標價\\s*[:：]?\\s*{P1}",
+        "prior": "P1",
+        "current": null
+      },
+      {
+        "id": "EN_CURRENT",
+        "rx": "(?i:(?:TP|PT|target\\s+price|price\\s+target)\\s*(?:\\([^)]{0,12}\\))?\\s*(?:of|at|:|is|to)?\\s*{P2})",
+        "prior": null,
+        "current": "P2"
+      },
+      {
+        "id": "ZH_CURRENT",
+        "rx": "目標價\\s*(?:\\([^)]{0,12}\\))?\\s*(?:上調|調升|調高|下調|調降|調低|維持|為|:|：)?\\s*(?:至|為|到)?\\s*{P2}",
+        "prior": null,
+        "current": "P2"
+      }
+    ],
+    "pattern_order_why": "成對式(本次 + 調整前)先跑並遮掉區間;只給一邊的式子後跑,不得重抽已配對的數字",
+    "direction": {
+      "up": "本次 > 調整前",
+      "down": "本次 < 調整前",
+      "flat": "相等或「維持 / maintain」",
+      "unknown": "缺一邊"
+    },
+    "maintain_rx": "(?i:維持|maintain|reiterate|unchanged)"
+  },
+  "valuation": {
+    "cue_rx": "(?i:目標價|評價|估值|給予|target\\s+price|price\\s+target|\\bTP\\b|\\bPT\\b|valu(?:e|ed|ing|ation)\\b|based\\s+on|derived|implies?)",
+    "multiple_rx": "(?P<m>\\d{1,3}(?:\\.\\d{1,2})?)\\s*(?:x|X|倍)(?![A-Za-z])",
+    "year_rx": "(?P<y>(?:FY)?(?:19|20)?\\d{2}(?:[EFP]|年(?:預估)?|E\\b)|(?:19|20)\\d{2}\\s*(?:年度|年)|[12]H\\d{2}[EF]?|FY\\d{2,4}[EF]?)",
+    "metric_of_method": {
+      "VAL_PE": "EPS",
+      "VAL_PEG": "EPS",
+      "VAL_PB": "BVPS",
+      "VAL_PS": "Sales",
+      "VAL_EV_EBITDA": "EBITDA",
+      "VAL_EV_SALES": "Sales",
+      "VAL_EV_EBIT": "EBIT",
+      "VAL_DY": "DPS",
+      "VAL_BAND": "EPS/BVPS"
+    },
+    "table_metric_aliases": {
+      "EPS": [
+        "EPS",
+        "Diluted EPS",
+        "每股盈餘",
+        "稅後EPS",
+        "EPS (NT$)"
+      ],
+      "BVPS": [
+        "BVPS",
+        "Book value per share",
+        "每股淨值"
+      ],
+      "DPS": [
+        "DPS",
+        "每股股利",
+        "現金股利"
+      ]
+    },
+    "check_tol": 0.03,
+    "check_why": "倍數 × 基準年指標 ≈ 目標價(±3%):表內找得到該年 EPS / BVPS 才驗;找不到 = 未驗(不是錯)",
+    "metric_value_rx": "(?:{ALIAS})\\s*(?:of|為|:|：|=|at|est\\.?|estimate)?\\s*(?:NT\\$|US\\$|HK\\$|\\$)?\\s*(?P<v>\\d+(?:\\.\\d+)?)\\s*(?:元)?(?!\\d|[.,]\\d|\\s*(?:x|X|倍|%|Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov))",
+    "metric_value_why": "指標詞與數字之間只准連接詞(of / 為 / : / = / at),不准夾別的字 —— 實測「Diluted EPS P/E 31 Dec」若放寬會抓到表頭的 31",
+    "implied_method": {
+      "why": "研報常寫「14x 2026E EPS」不寫 P/E:倍數後 24 字內緊接的指標詞推定方法,標 inferred(不冒充原文有方法詞)",
+      "map": {
+        "VAL_PE": [
+          "EPS",
+          "每股盈餘",
+          "earnings"
+        ],
+        "VAL_PB": [
+          "BVPS",
+          "book value",
+          "每股淨值",
+          "淨值"
+        ],
+        "VAL_EV_EBITDA": [
+          "EBITDA"
+        ],
+        "VAL_PS": [
+          "sales",
+          "revenue",
+          "營收"
+        ],
+        "VAL_DY": [
+          "DPS",
+          "dividend",
+          "股利"
+        ]
+      }
+    }
+  },
+  "outputs": {
+    "dir": "VIA_Reports/vrn/entities",
+    "files": [
+      "<檔>.entities.md(垂直線表)",
+      "<檔>.entities.json",
+      "ENTITIES_latest.json"
+    ]
+  }
+}

@@ -107,7 +107,8 @@
     "functional modules/VRN/VRN_ENG394_LayoutRestore_v0100.py",
     "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v0100.py",
     "functional modules/VRN/VRN_ENG393_DocClassVerify_v0101.py",
-    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py"
+    "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v0101.py",
+    "functional modules/VRN/VRN_ENG396_ReportEntities_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -515,6 +516,22 @@
         "supportive modules/registry/CGC_MDL182_ReportFieldRulers_v*.py",
         "supportive modules/registry/VIA_VRN_ReportFieldRules_SSOT_v*.json",
         "supportive modules/registry/VRN_FieldRules_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 600
+    },
+    "vrn_entities": {
+      "argv": [
+        "VRN_ENG396_ReportEntities",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG396 v0100 研報實體] 自測 25/25 PASS",
+      "scope": "研報本文實體:公司名稱中英文(全名 · 去後綴 · 最簡寫 · 局部識別)· 目標價本次 / 調整前 · 評價法(VAL_* · 倍數 · 基準年 · 驗算)(R36 · VRN-REQ014)",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG396_ReportEntities_v*.py",
+        "supportive modules/registry/VIA_VRN_ReportEntities_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG395_ValuationMethodLexicon_v*.py",
+        "supportive modules/registry/VIA_VRN_ValuationMethod_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG394_LayoutRestore_v*.py"
       ],
       "timeout_seconds": 600
     }
@@ -1049,6 +1066,21 @@
       "owner": "操作員",
       "reason": "冊外職稱 / 號碼格式 / 網域要從真實樣本量,容器沒有樣本",
       "next": "via-vcgc run --family core CGC_MDL182_ReportFieldRulers mine --samples \"C:\\測試樣本報告\" → 貼回 MINE_latest.json 摘要 → AI 裁定 → 冊新版(只增不減)"
+    },
+    {
+      "id": "VRN-REQ014:vrn_entities",
+      "requirement": "VRN-REQ014",
+      "state": "VERIFIED",
+      "case": "vrn_entities",
+      "receipt": "docs/handoff/evidence/vrn_entities.json"
+    },
+    {
+      "id": "VRN-REQ014:workstation-real",
+      "requirement": "VRN-REQ014",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "真實券商報告在工作站;容器只驗自寫句子與倉內 FactSet 週報",
+      "next": "via-vcgc run --family vrn VRN_ENG396_ReportEntities run --in \"C:\\測試樣本報告\" --pages 1-2 → 看 VIA_Reports\\vrn\\entities\\ENTITIES_latest.json"
     }
   ]
 }
