@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-01T16:17:17+00:00",
+  "at": "2026-10-01T15:51:21+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -202,13 +202,6 @@
       "owner": "操作員(環境)· AI(轉接器)",
       "next": "外部工具要用時照環境計畫在工作站裝(中樞不裝);裝好後跑 probe 會轉 AVAILABLE、xcheck 計畫自動當第二讀法",
       "topic": "VRN 引擎模組化樂高化:可拔積木 · AST 盤點與功能分類說明 · 模組化整合(外部版面 / 表格工具偵測接上)"
-    },
-    {
-      "id": "VCGC-REQ094",
-      "state": "PARTIAL",
-      "owner": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
-      "next": "鎖定要工作站實測層級存證(容器 lock 可鎖 0):操作員在工作站跑 selftests → real → lock --apply;環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 缺 pydantic(工作站基礎境有)· MDL154 市場清單價格未回補到 2023-01-01 · QuantGuard 結果缺(要開同意閘抓資料);串測平行化要先讓紀錄帳可並行寫(另批)",
-      "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題"
     },
     {
       "id": "host-live",
@@ -449,22 +442,6 @@
       "owner": "操作員",
       "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
       "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
-    },
-    {
-      "id": "VCGC-REQ094:workstation-lock",
-      "requirement": "VCGC-REQ094",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
-      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
-    },
-    {
-      "id": "VCGC-REQ094:env-data",
-      "requirement": "VCGC-REQ094",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
-      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
     }
   ],
   "reusable_successes": [
@@ -517,8 +494,7 @@
     "VRN-REQ016:vrn_plugin_hub",
     "VCGC-REQ092:tool_coverage_matrix",
     "VCGC-REQ092:ps-parse-errors",
-    "VCGC-REQ093:coverage-matrix-v0103",
-    "VCGC-REQ094:vdf_chain_runner"
+    "VCGC-REQ093:coverage-matrix-v0103"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -531,7 +507,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0b25d353dca3ca84721a0d98e68323374e9ec82bf924f1151c5029f0d9911965"
+      "sha256": "6d7ddafcb56598b2dae9685d68894d01b960c52149461b82c21cf30dd9016af1"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -551,7 +527,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0b25d353dca3ca84721a0d98e68323374e9ec82bf924f1151c5029f0d9911965"
+      "sha256": "6d7ddafcb56598b2dae9685d68894d01b960c52149461b82c21cf30dd9016af1"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -575,7 +551,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0b25d353dca3ca84721a0d98e68323374e9ec82bf924f1151c5029f0d9911965"
+      "sha256": "6d7ddafcb56598b2dae9685d68894d01b960c52149461b82c21cf30dd9016af1"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -591,11 +567,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "1e7f302c65dd5f25d3438626e4a0dfeafc8bb6f95c188361c6e61d4196b9dfd2"
+      "sha256": "3602b576613b49b05fc664f82928b5af447f5d7df5011106c5975a4c0b37e0f1"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "1e7f302c65dd5f25d3438626e4a0dfeafc8bb6f95c188361c6e61d4196b9dfd2"
+      "sha256": "3602b576613b49b05fc664f82928b5af447f5d7df5011106c5975a4c0b37e0f1"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -615,7 +591,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "0b25d353dca3ca84721a0d98e68323374e9ec82bf924f1151c5029f0d9911965"
+      "sha256": "6d7ddafcb56598b2dae9685d68894d01b960c52149461b82c21cf30dd9016af1"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -720,10 +696,6 @@
     "VCGC-REQ093:coverage-matrix-v0103": {
       "path": "docs/handoff/evidence/tool_coverage_matrix.json",
       "sha256": "b80ee3c1fe098049435b40cbaaea65119bafd0089dc1d6d6c7884d38107765b4"
-    },
-    "VCGC-REQ094:vdf_chain_runner": {
-      "path": "docs/handoff/evidence/vdf_chain_runner.json",
-      "sha256": "4c8f015f519a4305e5145e16caa70e78ad3d00d6cc1b401c7b8a4630fd1c37d2"
     }
   },
   "state": {
@@ -755,7 +727,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0120.json": "0cd859665f55a121ad1a09c2c49ef25d733cf61860eddce590953ac10a05773d",
       "supportive modules/registry/VIA_Requirements_SSOT_v0121.json": "30acc38d2597284b636d73e018135fa2c035dc648fbbf679f659cc5cd8f0cb91",
       "supportive modules/registry/VIA_Requirements_SSOT_v0122.json": "84d43ef903d25889adc9a4b9f57490417f2952503069a7bb06d13474c346995e",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0123.json": "62cd88a5792de050856ca9e808c95b7031b7f31f9f40b73c5947f31a652f3a60",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -771,7 +742,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0101.json": "2edfacb970af7b153b9d3b0e924db152104c47ab9d743c71c2cad4b274d62830",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "dc253b3bbf71e50e74931bd6adefda96bcc8d2b1c9d56950c4900e933d2e7197",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "0b10387d1a42005f6a9f90b03a519bda6b08494a5a50b231061314dbe4cc72d0",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -3130,7 +3101,6 @@
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0101.py": "c6ed55dd1e4f559a482961e4f7c74e27f2fa1e6820d6ca388c07c84edbf6e1d5",
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0102.py": "3d7a5f5599d5216ab09c3ea1c4233f67c74ea878d831b35eae965af40ab857a2",
       "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0103.py": "276752def37b4e2c28ad3193e3b5a814392e69a9813ace86f9a2c07860a53991",
-      "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py": "aaa3890379e704224ac54147fc56c891e0f132ade1ae2fb980aedb357e481419",
       "supportive modules/registry/CGC_MDL171_PanoramaBatchPlanner_v0100.py": "3f9e98934e966a10e5b9618b70cc01919141c378dbf65124fc303bd483395fde",
       "supportive modules/registry/CGC_MDL171_PanoramaBatchPlanner_v0101.py": "de0375fcbc5df1dedea2ed3186b8df4d1b3e4c4c84f8178e9d3013907ce6846d",
       "supportive modules/registry/CGC_MDL172_VRNChainRunner_v0100.py": "84c1dbf7068d3a69c4fbc7bb7e8d620b7a4bf2e76433ccd7b59f83f682edb187",
@@ -3550,8 +3520,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0109.json": "f3c3c5f920db988f24ced560beb8d3b1f3907352630ce8342f848c283aa80d7e",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0110.json": "e44792f2f416aff2a1920ae4c1df8bf7923045f25c7ac3a388e1c1a28f255f95",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0111.json": "f28b7a6fa9c6e4391a9246b631a9255c17fbdcec3108a30fed445a538a8bf701",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0112.json": "04b78578a57bc48206d0d5e28a7b7b27cf0d06160f794f38a942943ded729b38",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0113.json": "fbf9d9f1ffa62fe52bf0ee9a612759cb13b76056f8469414c10dd2dd9192cc39"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0112.json": "04b78578a57bc48206d0d5e28a7b7b27cf0d06160f794f38a942943ded729b38"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -4969,17 +4938,6 @@
           "VIA_ToolCoverageMatrix_SSOT_v0101.json",
           "VIA_UI_TemplateSync_SSOT_v0101.json"
         ]
-      },
-      "VCGC-REQ094": {
-        "definition": "f368f65f2ffa400b0dc2c631854d8c7e0d404ed83065227a32cce33ab37aac29",
-        "status": "PARTIAL",
-        "next": "鎖定要工作站實測層級存證(容器 lock 可鎖 0):操作員在工作站跑 selftests → real → lock --apply;環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 缺 pydantic(工作站基礎境有)· MDL154 市場清單價格未回補到 2023-01-01 · QuantGuard 結果缺(要開同意閘抓資料);串測平行化要先讓紀錄帳可並行寫(另批)",
-        "owner": "AI(修正 · 登錄)· 操作員(工作站實測 · 加鎖 · 同意閘)",
-        "topic": "鎖定成功引擎版本與路徑:VCGC 沿順序實測 VCGC→VDF→VRN · 結果驗證 · 鎖 WORKFLOW / 引擎 / 版本 / 編號 · AUTO SYNC GitHub · 解決實測找到的問題",
-        "homes": [
-          "VIA_VDF_OneWayRead_Waivers_v0100.json",
-          "VIA_VRN_LogicArchitecture_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -5047,8 +5005,7 @@
     "functional modules/VRN/VRN_ENG397_PluginHub_v0100.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0102.py",
     "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0103.py",
-    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py",
-    "supportive modules/registry/CGC_MDL170_VDFChainRunner_v0104.py"
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0104.py"
   ],
   "work_items": {
     "VCGC-REQ075:handoff": {
@@ -5660,36 +5617,13 @@
       "owner": "操作員",
       "reason": "原檔 docstring:VCGC 9 · VRN 21 · UI 23(非正本)支沒有;矩陣 ⑦ 用 AST 推導並標「推導」,不冒充原檔說明",
       "next": "要寫進原檔須逐支新版號薄尾(L04);操作員裁定後分批做,每批跑 matrix ⑦ 看說明率"
-    },
-    "VCGC-REQ094:vdf_chain_runner": {
-      "id": "VCGC-REQ094:vdf_chain_runner",
-      "requirement": "VCGC-REQ094",
-      "state": "VERIFIED",
-      "case": "vdf_chain_runner",
-      "receipt": "docs/handoff/evidence/vdf_chain_runner.json"
-    },
-    "VCGC-REQ094:workstation-lock": {
-      "id": "VCGC-REQ094:workstation-lock",
-      "requirement": "VCGC-REQ094",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "SDD lock 需要工作站實測層級存證;容器 lock 乾跑可鎖 0",
-      "next": "工作站照 R39 指令第 6–7 步:selftests → real → lock --apply → git push(只帶燈鎖冊與教訓帳)"
-    },
-    "VCGC-REQ094:env-data": {
-      "id": "VCGC-REQ094:env-data",
-      "requirement": "VCGC-REQ094",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "環境 / 資料項(非程式錯):VRN_ENG073 ㉑ · ENG086 ⑤ 容器缺 pydantic(工作站基礎境清單有);MDL154 市場清單價格未回補到 2023-01-01;QuantGuard 結果缺",
-      "next": "工作站開同意閘回補 VDF 價格到 2023-01-01 並跑 QuantGuard;確認境內 pydantic 在位"
     }
   },
   "summary": {
-    "requirements": 130,
-    "watched_files": 2824,
-    "pending": 61,
-    "reusable": 51,
+    "requirements": 129,
+    "watched_files": 2821,
+    "pending": 58,
+    "reusable": 50,
     "findings": 0
   }
 }
