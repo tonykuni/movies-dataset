@@ -23,24 +23,14 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88
-  [衝突] 現況 NODATA 先 via-envgov eight-hub
+  [衝突] 現況 RED · 2026-09-21T02:45:15
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 553 · import 0 · 提及 44 · 已裝 False · GREEN
+  [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
+[政策] L50 全景 · 尾版 551 · import 0 · 提及 43 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py(家族 core)
-{"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
-  [OK] ① monitor 走 run VIA_Panorama 尾版;不經 VCGC 拒跑;既有 panorama 動詞原樣轉交前版(不蓋) · [['run', '--family', 'core', 'VIA_Panorama', 'lessons'], ['panorama']]
-  [OK] ② 每個 VCGC 動作收尾都觸發監控(含被拒的那次) · [['monitor', 'lessons'], ['panorama'], ['monitor']]
-  [OK] ② 觸發帶動詞 · 呼叫尾版 autostart · 提示只寫 stderr(stdout 乾淨,JSON 動詞不受影響) · [['/usr/local/bin/python3', '/home/user/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0104.py', 'autostart', '--from', 'sync-check']]
-  [OK] ② 不觸發:AUTO=0 · 監控自己(防遞迴)· 串測中 · CI · 自測 · [True, True, True, True, True]
-  [OK] ② 監控起不來不拋、不影響 VCGC 結果 · [監控] rc ERR · RuntimeError: x
-  [OK] ② VIA_Panorama 尾版在且有 autostart · /home/user/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Panorama_v0104.py
-  [OK] ③ help 目前生效入口 = 本版 · 多一行 monitor · CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py
-  [OK] 加速器:ACCEL 橋 · NET 橋 · 觸發走 VIA_ACCEL.run_fast
-  VCGC v0181 selftest 8/8 PASS
+  [via-vcgc run] [流程] 政策過 · CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py(家族 core)
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
   [OK] ① test 走 run CGC_MDL224_TestAuto 尾版(不再釘 v0100);不經 VCGC 拒跑 · [['run', '--family', 'core', 'CGC_MDL224_TestAuto', '--quick']]
 [進入 5/5 · 啟動全部 · 先串測] via-vcgc test --quick(盤點 · 快站 · 更新過的尾版自測 · 版本時間紀錄)
@@ -82,8 +72,8 @@
   [OK] ① 他冊自己發的號才算已佔(where = this register);只抄元件冊號的列不算;冊照尾版律取最新一本;不是號的字串不算 · {'VIA-TOOL-0005': 'VIA_EngineVersion_Register_v0101.json · a|engine|a.py'}
   [OK] ② 地板 = 計數器 · 元件冊最大號 · 他冊最大號取大;要讓號的 = 他冊先發的號 + 元件冊內和前一筆同號的那筆 · {'floor': {'TOOL': 7}, 'collisions': [{'key': 'tool|c', 'code': 'VIA-TOOL-0002', 'other': '元件冊 · tool|b'}, {'key': 'tool|d', 'code': 'VIA-TOOL-0003', 'other': 'EV · x'}]}
   [OK] ③ 改號:撞號那筆拿地板之上的新號、舊號留 recoded_from(改兩次留兩個)· 計數器停在地板 · 全冊零重號、零他冊號 · [{'key': 'tool|c', 'from': 'VIA-TOOL-0008', 'to': 'VIA-TOOL-0010'}]
-  [OK] ④ 真冊副本:乾跑零寫、照列要改的號;--apply 後零撞號 —— 撞號那筆改到他冊最大號之上、留舊號;前一版新發的號也在他冊號之上;再同步一次號碼不動;沒撞號但他冊號比計數器大 → 先抬計數器、不動任何舊號 · VIA-TOOL-0001 → VIA-TOOL-0217 · 前一版新發 ['VIA-TOOL-0218', 'VIA-TOOL-0219'] · 地板 219 · 只抬計數器 ['VIA-TOOL-0219', 'VIA-TOOL-0220']
-  [OK] ⑤ 暫存冊(不是正本元件冊)不讀他冊:和前一版逐鍵同號,拿著他冊號的那筆也不動 · 拿 ['VIA-TOOL-0179'] · 鍵 14405
+  [OK] ④ 真冊副本:乾跑零寫、照列要改的號;--apply 後零撞號 —— 撞號那筆改到他冊最大號之上、留舊號;前一版新發的號也在他冊號之上;再同步一次號碼不動;沒撞號但他冊號比計數器大 → 先抬計數器、不動任何舊號 · VIA-TOOL-0001 → VIA-TOOL-0214 · 前一版新發 ['VIA-TOOL-0215', 'VIA-TOOL-0216'] · 地板 216 · 只抬計數器 ['VIA-TOOL-0216', 'VIA-TOOL-0217']
+  [OK] ⑤ 暫存冊(不是正本元件冊)不讀他冊:和前一版逐鍵同號,拿著他冊號的那筆也不動 · 拿 ['VIA-TOOL-0179'] · 鍵 14211
   [OK] ⑥ 正本元件冊乾跑:零寫;元件冊與他冊零撞號(他冊手寫發號撞上元件冊 → 這裡就紅,via-vcgc registry-sync --apply 讓號) · 他冊號 18 · 撞 0
   [OK] ⑦ 鏈上每一支持有 registry_sync 的模組都走本版(含後載的別名模組);v0172 的同步檢查也換成本版;本版包的是原函式,不自己套自己 · 載入時換 1 · 後載換 1
   [OK] ⑧ 同步檢查多報 registry.recode:有撞號就算待同步(正控:自己算 · 取乾跑那一份兩條路)· 他冊照實讀時 0 筆(反控) · 正控 {'new': 0, 'changed': 0, 'stale': 0, 'recode': 1} / {'new': 0, 'changed': 0, 'stale': 0, 'recode': 1} · 反控 {'new': 0, 'changed': 0, 'stale': 0, 'recode': 0}
@@ -91,10 +81,10 @@
   [OK] ⑩ 抬頭 raw · 帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記;不含 TA-Lib 匯入;零網路匯入;不 push、不設同意閘;冊名不釘版號(尾版律)
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
   [OK] ① enter 只收 VCGC 呼叫(沒有 VIA_FROM_VCGC = DENY rc 2)
-  [OK] ② 位置:倉外 → 給一行進倉(指名倉根);倉內子夾 → 不給 · cd '/tmp/tmpnn_r7tfn/repo'
-  [OK] ③ 更新:已是最新 = OK 不動;上游多 1 = 只快轉到上游那一個 HEAD;--no-pull 不 fetch 不動 · 已是最新 | 快轉 1 個提交 8023cce6b6f7 → 686b8ac3b6c9 | --no-pull:不更新
+  [OK] ② 位置:倉外 → 給一行進倉(指名倉根);倉內子夾 → 不給 · cd '/tmp/tmpjre1i9yb/repo'
+  [OK] ③ 更新:已是最新 = OK 不動;上游多 1 = 只快轉到上游那一個 HEAD;--no-pull 不 fetch 不動 · 已是最新 | 快轉 1 個提交 5e36b2abe58c → b1dacb01795f | --no-pull:不更新
   [OK] ④ 本機改動會被蓋 → git 拒絕快轉:YELLOW · HEAD 不動 · 改動留著;清掉後同一句就快轉 · 快轉沒成(git 拒絕,多半是本機改動會被蓋):Aborting · 照目前版本跑
-  [OK] ⑤ 分岔 → 不合併(YELLOW · HEAD 不動 · 沒有合併提交);沒上游 → SKIP;不是倉 → ABSENT · 分岔(本機多 1 · 上游多 1):不自動合併 → 操作員決定:git -C "/tmp/tmpnn_r7tfn/a" pull --no-rebase · 照目前版本跑 | 沒有上游分支(分離 HEAD 或沒設追蹤)· 不更新
+  [OK] ⑤ 分岔 → 不合併(YELLOW · HEAD 不動 · 沒有合併提交);沒上游 → SKIP;不是倉 → ABSENT · 分岔(本機多 1 · 上游多 1):不自動合併 → 操作員決定:git -C "/tmp/tmpjre1i9yb/a" pull --no-rebase · 照目前版本跑 | 沒有上游分支(分離 HEAD 或沒設追蹤)· 不更新
   [OK] ⑥ 加速器:載入的就是鎖冊那一本 · 執行緒預算寫進本行程環境;載不起來 / 橋缺席 / 載到別本 / 執行緒預算沒套上 = RED · VeritasCeleritas_v1141.py · 執行緒 3(maxsafe)
   [OK] ⑦ 工具卡:六件都在鎖冊且 sha ✓ · 網路載入器解析到鎖冊那一支、核心載得起來 · PS 模板在;layout sha 不對 / 網路載入器缺 / 解析到別支 / PS 模板缺 → RED 並點名 · accelerator v1141 · network v1652 · layout v0109 · nlp v0105 · token v0117 · frame v0100
   [OK] ⑦b layout 動詞走的 = 鎖冊那一支才綠;夾內有比鎖冊新、還沒啟用的一支 → RED 點名(同 v0146 的夾與 glob) · SUP_MDL743_GenericLayoutHub_v0110.py
@@ -183,7 +173,7 @@
   [OK] ⑧ 次序:更新 → 閘 → 加速器 → 工具 → go;go 收到的是去掉本動詞旗標的參數;--no-pull 傳到更新 · update → gate → accel → tools → go
   [OK] ⑨ --card 不啟動;閘沒過 / 工具漂移 → 後面一步都不跑;第一步紅 → 連更新都不做
   [OK] ⑩ HEAD 快轉後交給新碼接手(帶原參數;本行程不再跑閘 / go),回它的 rc
-[進入 1/5] HEAD 變了 → 交給更新後的 VCGC 尾版 CGC_MDL149_VeritasCentralGovernanceConsole_v0181.py 接著跑(enter --no-pull;閘與後面各步都跑在新碼上)
+[進入 1/5] HEAD 變了 → 交給更新後的 VCGC 尾版 CGC_MDL149_VeritasCentralGovernanceConsole_v0180.py 接著跑(enter --no-pull;閘與後面各步都跑在新碼上)
   [OK] ⑪ 接手的子行程:最新 VCGC 尾版 enter --no-pull(旗標不重複)· 帶 VIA_FROM_VCGC=YES
   [OK] ⑫ 每次 enter 留一筆中樞事件(verb enter · rc · 卡);本輪輪號自己給、結束還原
   [OK] ⑮ 總結事件排在本輪最後:工作流 SSOT 核對本輪第一筆仍是 H1 閘(status)· 開始時間另記 started · H1 | H1 | H1
@@ -216,8 +206,7 @@
   [OK] 組成冊由 SDD 驗證器組(hub · loop_vdf · loop_vrn · exit) · VIA_Workflow_Hub_SSOT_v0101.json
   [OK] 每步帶 STP 代碼 · VCGC-WKF001-STP001
   [OK] 前一版的核對讀到的是組成冊(已換掉 _flow_book)
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_Panorama_v0104.py(冊上 VIA_Panorama | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_Panorama_v0104.py'] | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):11 個,例 ['VCGC-WKF012', 'VCGC-WKF012 → via-vcgc sdd check
-  [OK] 同步檢查帶 SDD 靜態燈 · RED
+  [OK] 同步檢查帶 SDD 靜態燈 · YELLOW
   [OK] 抬頭 raw · 帶 VIA_FROM_VCGC 標記(座位探針要)
   [OK] 結果類:0=OK · 2/3/4=FINDING · 其他=FAIL
   [OK] run 找尾版 / 找不到 = ABSENT
@@ -234,9 +223,9 @@
   [OK] 接上:活元件盤點已換成快取版(audit / registry-sync 讀的那一份) · 換了 2 處
   [OK] 抬頭是 raw 字串(不再噴 invalid escape)
   [OK] go 參數:-X / --x / x=v 都轉成入口自己的參數;不認得的照實列出不轉 · ['-SkipSweep', '-NoOpen', '-DataDir', 'D:\\data', '-TemplateIn', 'x.css']
-  [OK] 入口取尾版(Invoke-VIA-OperatorConsole-v*.ps1 版號最大者) · Invoke-VIA-OperatorConsole-v0108.ps1
+  [OK] 入口取尾版(Invoke-VIA-OperatorConsole-v*.ps1 版號最大者) · Invoke-VIA-OperatorConsole-v0107.ps1
   [via-vcgc go] 提醒:全程常超過 1800s(Invoke-VIAPython 逾時);要放寬:$env:VIA_PY_TIMEOUT_SEC=7200 後再 via-vcgc go
-  [via-vcgc go] VCGC → Invoke-VIA-OperatorConsole-v0108.ps1(PowerShell python3) · -NoOpen
+  [via-vcgc go] VCGC → Invoke-VIA-OperatorConsole-v0107.ps1(PowerShell python3) · -NoOpen
   [OK] go 只是從 VCGC 進:叫尾版入口一次,參數原樣轉(編排仍只有那一支 PowerShell)
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
   [OK] go 不經 VCGC 就拒跑
@@ -254,5 +243,3 @@
   [OK]
 [薄尾補強] 10 checks; inherited selftest rc=0; fail=0
 [交接入口] fail=0
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_Panorama_v0104.py(冊上 VIA_Panorama | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_Panorama_v0104.py'] | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):11 個,例 ['VCGC-WKF012', 'VCGC-WKF012 → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 12, 'changed': 8, 'stale': 0, 'expected': 14087, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
