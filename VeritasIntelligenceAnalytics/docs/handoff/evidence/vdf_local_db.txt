@@ -27,7 +27,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 560 · import 0 · 提及 46 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 561 · import 0 · 提及 48 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_ENG079_LocalDbConsolidate_v0105.py(家族 vdf)
@@ -41,7 +41,7 @@
   VDF_ENG079_LocalDbConsolidate_v0105 薄尾 6/6 PASS
 === VDF_ENG079_LocalDbConsolidate_v0104 · 薄尾自測(FRAME 守門開著,再串 VDF_ENG079_LocalDbConsolidate_v0103 全部檢)===
   [OK] ① FRAME 橋:解到 SUP_MDL755 VIAPolarsFrame(鎖冊 frame 優先,缺則尾版)並載得進來 · SUP_MDL755_VIAPolarsFrame_v0100.py
-  [OK] ② 守門開:本行程新開的 DuckDB 連線 → 溢寫夾在受管 temp(VIA_TEMP_ROOT/VIA_spill)下;前一版全部檢在守門下照跑 · /tmp/via_frame_tail_1yd1k357/VIA_spill/VDF_ENG079_LocalDbConsolidate_6609_5mk10gk8
+  [OK] ② 守門開:本行程新開的 DuckDB 連線 → 溢寫夾在受管 temp(VIA_TEMP_ROOT/VIA_spill)下;前一版全部檢在守門下照跑 · /tmp/via_frame_tail_lbnlfm9l/VIA_spill/VDF_ENG079_LocalDbConsolidate_9215_dp_np2ij
   [OK] ① 日期正規化(DATE/TIMESTAMP/VARCHAR 多格式/整數 20230105 → 'YYYY-MM-DD') 
   [OK] ② scan 唯讀盤點(單元 8:parquet×6/csv/duckdb 表;路由 px→tw_daily_prices chip→tw_chips_daily rest→tw_rest_daily;ENG065 協定 tw__X→X gl__X→X) (單元 8;[('extra.csv', 'tw_daily_prices', 'PLAN'), ('old_prices.duckdb::px_extra', 'tw_daily_prices', 'PLAN'), ('part-000.parquet', 'tw_daily_prices', 'PLAN'), ('chips.parquet', 'tw_chips_daily', 'PLAN'), ('tw__tw_chips_daily.parquet', 'tw_chips_daily', 'PLAN'), ('gl__us_macro.parquet', 'us_macro', 'PLAN'), ('rest.parquet', 'tw_rest_daily', 'PLAN'), ('tw__tw_listings.parquet', 'tw_listings', 'PLAN')])
   [OK] ③ dry-run 零寫入(價表列數不變;計畫新增=裸碼對映 yahoo 後 anti-join:2330 01-06 +6488=2;既有 2330 01-05 不算;裸碼 9999 對不到→local_px_daily 1;AAPL→global_daily 1;csv 2;duckdb 表 1;協定 3+2+2;v0102 唯讀盤點:表清單一張不多、全球庫檔不建——v0101 在這裡建了 4 張空表外加一個全球庫檔) (計畫 18;單元 [('extra.csv', 2, 0), ('old_prices.duckdb::px_extra', 1, 0), ('part-000.parquet', 4, 1), ('chips.parquet', 2, None), ('tw__tw_chips_daily.parquet', 2, None), ('gl__us_macro.parquet', 2, None), ('rest.parquet', 2, None), ('tw__tw_listings.parquet', 3, None)];scan 多出的表 [];全球庫檔 False→False)
@@ -61,3 +61,5 @@
   [計] 十六檢 OK 16 · FAIL 0
   [OK] ③ 收:守門卸下、溢寫夾刪乾淨(零足跡)
   VDF_ENG079_LocalDbConsolidate_v0104 薄尾 3/3 PASS · 前一版 rc=0
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VIA_Panorama_v0105.py(冊上 VIA_Panorama | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VIA_Panorama_v0105.py', 'CGC_MDL149_VeritasCentral | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):6 個,例 ['VCGC-REQ102', 'VCGC-REQ103' → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 48, 'changed': 20, 'stale': 0, 'expected': 14643, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
