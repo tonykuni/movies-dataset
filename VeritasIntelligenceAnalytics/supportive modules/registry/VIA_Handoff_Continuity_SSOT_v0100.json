@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T21:01:45+00:00",
+  "updated_at": "2026-10-01T21:39:40+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -126,6 +126,11 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0182.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0183.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0184.py",
+    "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v0108.py",
+    "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0107.py",
+    "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0107.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py"
   ],
   "frozen_sources": {
@@ -685,6 +690,66 @@
       "dependencies": [
         "supportive modules/registry/VIA_Panorama_v*.py",
         "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_incgate_catalog": {
+      "argv": [
+        "VDF_ENG089_IncrementalFetchGate",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG089 v0108 薄尾 4/4 · 前版 PASS · 合計 PASS",
+      "scope": "增量擷取閘:呼叫端改 CATALOG 帶到本體(ENG093 ⑦ · --catalog 不再看錯目錄)(R46 · VDF-REQ015)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG089_IncrementalFetchGate_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_fred_clock": {
+      "argv": [
+        "VDF_ENG074_FredMacroSSOT",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG074 v0107 薄尾 4/4 · 合計 PASS",
+      "scope": "FRED 宏觀:自測時鐘固定測資月份 + 真時鐘最新一筆 = 本月 1 日(R46 · VDF-REQ015)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_consensus_fixture": {
+      "argv": [
+        "VDF_ENG088_ConsensusFusionBridge",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG088 v0105 薄尾 4/4 · 合計 PASS",
+      "scope": "共識融合橋:自測自帶正典庫測資;本境照實 ABSENT(R46 · VDF-REQ015)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_storyrot_nodata": {
+      "argv": [
+        "VDF_ENG072_StoryRotationBridge",
+        "--selftest-tail"
+      ],
+      "success_marker": "[計] VDF_ENG072 v0105 薄尾 4/4 · 只驗薄尾 · 合計 PASS",
+      "scope": "故事輪動橋:缺台股庫 → export 照實 NODATA 不崩(前版八檢要實庫,在工作站驗)(R46 · VDF-REQ015)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_finstmt_gate2": {
+      "argv": [
+        "VDF_ENG082_FinStatements",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG082 v0107 薄尾 5/5 · 合計 PASS",
+      "scope": "三大報表:自測假代碼跟上收緊後的第二道閘;正式 run 走真閘(R46 · VDF-REQ015)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG082_FinStatements_v*.py"
       ],
       "timeout_seconds": 900
     }
@@ -1451,8 +1516,43 @@
       "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED"
     },
     {
-      "id": "VCGC-REQ108:entry",
-      "requirement": "VCGC-REQ108",
+      "id": "VDF-REQ015:vdf_incgate_catalog",
+      "requirement": "VDF-REQ015",
+      "state": "VERIFIED",
+      "case": "vdf_incgate_catalog",
+      "receipt": "docs/handoff/evidence/vdf_incgate_catalog.json"
+    },
+    {
+      "id": "VDF-REQ015:vdf_fred_clock",
+      "requirement": "VDF-REQ015",
+      "state": "VERIFIED",
+      "case": "vdf_fred_clock",
+      "receipt": "docs/handoff/evidence/vdf_fred_clock.json"
+    },
+    {
+      "id": "VDF-REQ015:vdf_consensus_fixture",
+      "requirement": "VDF-REQ015",
+      "state": "VERIFIED",
+      "case": "vdf_consensus_fixture",
+      "receipt": "docs/handoff/evidence/vdf_consensus_fixture.json"
+    },
+    {
+      "id": "VDF-REQ015:vdf_storyrot_nodata",
+      "requirement": "VDF-REQ015",
+      "state": "VERIFIED",
+      "case": "vdf_storyrot_nodata",
+      "receipt": "docs/handoff/evidence/vdf_storyrot_nodata.json"
+    },
+    {
+      "id": "VDF-REQ015:vdf_finstmt_gate2",
+      "requirement": "VDF-REQ015",
+      "state": "VERIFIED",
+      "case": "vdf_finstmt_gate2",
+      "receipt": "docs/handoff/evidence/vdf_finstmt_gate2.json"
+    },
+    {
+      "id": "VCGC-REQ110:entry",
+      "requirement": "VCGC-REQ110",
       "state": "VERIFIED",
       "case": "entry",
       "owner": "AI(VCGC closeout)",
@@ -1461,8 +1561,8 @@
       "receipt": "docs/handoff/evidence/entry.json"
     },
     {
-      "id": "VCGC-REQ108:all-green",
-      "requirement": "VCGC-REQ108",
+      "id": "VCGC-REQ110:all-green",
+      "requirement": "VCGC-REQ110",
       "state": "BLOCKED",
       "owner": "操作員 / 工作站",
       "reason": "全綠閘首跑:OPERATOR 8(台股代號 regex 四冊判法不一 · 同詞多義 10 · 同號異名 11 組)· RUN(8 處已鎖工作流要實跑重驗)· ENV(容器無 pwsh)",

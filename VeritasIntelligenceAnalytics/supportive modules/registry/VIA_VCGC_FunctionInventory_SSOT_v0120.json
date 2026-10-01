@@ -1,9 +1,9 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
- "version": "v0119",
- "batch": "R46 2026-10-02",
- "ts": "2026-10-02T06:40:00+00:00",
- "prior": "VIA_VCGC_FunctionInventory_SSOT_v0118.json",
+ "version": "v0120",
+ "batch": "PR415 合併 2026-10-01",
+ "ts": "2026-10-01T21:39:40+00:00",
+ "prior": "VIA_VCGC_FunctionInventory_SSOT_v0119.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
@@ -1384,6 +1384,36 @@
     "--selftest"
    ],
    "timeout": 900
+  },
+  {
+   "id": "V-gate",
+   "name": "VCGC 全綠閘(乾跑:只點編號稽核 · 母子連接;全探針由 v0185 自測驗,串測中不遞迴)",
+   "argv": [
+    "gate",
+    "--only",
+    "編號稽核,母子連接"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "V-link",
+   "name": "母子自動連接(乾跑:不寫冊)",
+   "argv": [
+    "link"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
   }
  ],
  "coverage": {
@@ -1513,6 +1543,12 @@
    },
    "closeout": {
     "station": "V-closeout"
+   },
+   "gate": {
+    "station": "V-gate"
+   },
+   "link": {
+    "station": "V-link"
    }
   },
   "seat": {
@@ -1855,6 +1891,14 @@
    "VCGC-WKF012-STP006": {
     "station": "V-closeout",
     "note": "closeout 乾跑(--skip-tests);--apply / --push 由 v0182 自測驗"
+   },
+   "VCGC-WKF012-STP007": {
+    "station": "V-gate",
+    "note": "全探針 / 分類 / 帳只增由 v0185 自測驗"
+   },
+   "VCGC-WKF012-STP008": {
+    "station": "V-link",
+    "note": "--apply 寫新版冊由 v0185 自測驗(暫存夾)"
    }
   },
   "ps": {
@@ -1885,5 +1929,6 @@
  "why_v0116": "R42(VCGC-REQ098):交接新案 vrn_chain_runner → 新站 C-vrn_chain_runner(CGC_MDL172 v0108);vdf_chain_runner 案隨尾版 v0105;其餘一字不動",
  "why_v0117": "R43(VCGC-REQ099):交接新案 env_manager · vrn_firstpage_bridge → 新站 C-env_manager(CGC_MDL240 v0101)· C-vrn_firstpage_bridge(VRN_ENG086 v0119);其餘一字不動",
  "why_v0118": "PR #412 合併 main:側線盤點冊 v0104–v0106(與 main 同號)不帶入;把側線增的三站 V-monitor · V-closeout · C-monitor、coverage verb.monitor / verb.closeout / case.monitor、工作流 VCGC-WKF012 STP001–006 疊在 main v0117 上;VCGC 版號改 v0182–v0184(原側線 v0181–v0183);其餘一字不動",
- "why_v0119": "R46(VDF-REQ015):交接新案五條(VDF 逐支自測修好的五支尾版)→ 新站 C-vdf_*;其餘一字不動"
+ "why_v0119": "R46(VDF-REQ015):交接新案五條(VDF 逐支自測修好的五支尾版)→ 新站 C-vdf_*;其餘一字不動",
+ "why_v0120": "PR #415 合併 main:側線盤點冊 v0119(與 main v0119 同號)不帶入;VCGC v0185 新動詞 gate · link → 站 V-gate(只點兩探針的乾跑)· V-link(乾跑);coverage WKF012 STP007 / STP008 疊在 main v0119 上;其餘一字不動"
 }
