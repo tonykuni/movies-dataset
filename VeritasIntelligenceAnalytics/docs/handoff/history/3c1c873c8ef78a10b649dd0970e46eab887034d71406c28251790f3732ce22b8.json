@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-02T13:28:54+00:00",
+  "at": "2026-10-02T12:10:20+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -244,13 +244,6 @@
       "owner": "AI",
       "next": "工作站貼 VIA-Review-OneClick-v0105 實跑一次(Windows 有 pwsh 與 verb-engine),回貼 REVIEW_latest.md 後轉 COVERED",
       "topic": "總檢指令整合為一:via-review v0105 併 VIA-VERB-ENGINE 五支入口(health · global_read · fullcheck · 收尾鎖;PanoramaCloseout 由 ① + ⑨c 涵蓋)"
-    },
-    {
-      "id": "VCGC-REQ116",
-      "state": "PARTIAL",
-      "owner": "AI",
-      "next": "工作站點源 Register v0267 → via-tools(自動開 TOOLING_latest.html)· via-cmds;貼回 TOOLING_latest.md 後轉 COVERED",
-      "topic": "工具盤點矩陣:進入環境指令 + 近期短令清單顯示 + 全景 AST / 中央編號 / 分類 / 說明 / 子系統 / 來源 / L103 三導入一張表"
     },
     {
       "id": "host-live",
@@ -565,14 +558,6 @@
       "owner": "操作員 / Windows 工作站",
       "reason": "via-review v0105 是 PowerShell 入口,要真 pwsh + 工作站的 verb-engine 夾才跑得到全程;容器只驗過 verb-engine 四支 Python 與 CI Parser",
       "next": "貼 VIA-Review-OneClick-v0105.ps1 → 回貼 VIA_Reports\\review\\REVIEW_latest.md(⑨a–⑨d 四燈)→ 帶收據轉 VERIFIED"
-    },
-    {
-      "id": "VCGC-REQ116:workstation",
-      "requirement": "VCGC-REQ116",
-      "state": "PENDING",
-      "owner": "操作員 / Windows 工作站",
-      "reason": "HTML 自動開頁(os.startfile)與 Register v0267 短令要真 Windows + 點源命令冊才看得到;容器只驗 Python 與 CI pwsh 實跑",
-      "next": "點源 Register v0267 → via-tools · via-cmds → 回貼 VIA_Reports\\tooling\\TOOLING_latest.md → 帶收據轉 VERIFIED"
     }
   ],
   "reusable_successes": [
@@ -658,8 +643,7 @@
     "VCGC-REQ110:ticker_regex_scope",
     "VRN-REQ009:vrn_header_frame",
     "VRN-REQ008:vrn_header_frame",
-    "VCGC-REQ115:handoff",
-    "VCGC-REQ116:tooling"
+    "VCGC-REQ115:handoff"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -672,7 +656,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "458e94300b7f69a3e6842d6a54bdcccc94d6c5f21b5c901e9d9fe73b7a294ee1"
+      "sha256": "69797a819fabd79fbeb4c366dc510ffd98676537b908dd5d44f4c2582b1bb14f"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -692,7 +676,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "458e94300b7f69a3e6842d6a54bdcccc94d6c5f21b5c901e9d9fe73b7a294ee1"
+      "sha256": "69797a819fabd79fbeb4c366dc510ffd98676537b908dd5d44f4c2582b1bb14f"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -716,7 +700,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "458e94300b7f69a3e6842d6a54bdcccc94d6c5f21b5c901e9d9fe73b7a294ee1"
+      "sha256": "69797a819fabd79fbeb4c366dc510ffd98676537b908dd5d44f4c2582b1bb14f"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -756,7 +740,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "458e94300b7f69a3e6842d6a54bdcccc94d6c5f21b5c901e9d9fe73b7a294ee1"
+      "sha256": "69797a819fabd79fbeb4c366dc510ffd98676537b908dd5d44f4c2582b1bb14f"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -993,10 +977,6 @@
     "VCGC-REQ115:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
       "sha256": "d17e7dea62bbd97a4c6c203b153efe96bbb406fc81a9dff05bd0bbf261ae8dc8"
-    },
-    "VCGC-REQ116:tooling": {
-      "path": "docs/handoff/evidence/tooling.json",
-      "sha256": "02f459eb99665dd802585ac528b2c96bc9b068f4e06ef05f29cd34e2e8d4b510"
     }
   },
   "state": {
@@ -1049,7 +1029,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0141.json": "d9214d23dac3f01a8597c537dfdc6abcf566a00f902c61d3af318e9691784c39",
       "supportive modules/registry/VIA_Requirements_SSOT_v0142.json": "3518b8ff3d4fa9f2049a8ffd13d01f0dbbfb1788c292db4e6db9b2b65b93f70c",
       "supportive modules/registry/VIA_Requirements_SSOT_v0143.json": "3ef9c42ef491f71fbc0348c4ea421e8e54ac9f25ca2dbb382e68b0f6c8e8c86c",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0144.json": "4577998943d54ceceba7c896009d9735031498533f09991c30838199d477a6e6",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -1074,7 +1053,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "556d507564f8203698a5d08bd5efbd8b5d7b09e8f6c39d444be0363e9239decd",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "d1b846109e7d45703b947bab3a618d527a236966706b6efced62ab6b9467d218",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "a7488cc1f85c6f5a166de03b6862f1cd78cff4f252ff9e5cfdcf817134a906d0",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -3652,7 +3631,6 @@
       "supportive modules/registry/CGC_MDL250_LedgerUnion_v0100.py": "7e5dd8bdad9be7aa8a06543cf80ff722c9fbf4d30a67f9e5598c593f3d78db7e",
       "supportive modules/registry/CGC_MDL251_ProgressJournal_v0100.py": "3c50a3a806b7bb16e1b6f53bc9963b23332a5d263c4c77fb1ec3e1ac97e77611",
       "supportive modules/registry/CGC_MDL252_ManagerParity_v0100.py": "0e170c144fbf981943c8a22ae25fb12ecf23ea2ce49e7bd54ce18d231c0923d1",
-      "supportive modules/registry/CGC_MDL253_ToolingInventory_v0100.py": "944e7c29c3c6f50f25a69a11f06f6b7b3789f1c082c4fd1fcf3684101a30272c",
       "supportive modules/registry/CGC_SystemManager_v0100.py": "891dd0e88b41dc53bc848da522ef5e95fa0aba5a5a866435b4315fdd2a054de6",
       "supportive modules/registry/CGC_SystemManager_v0101.py": "42b71ba0e3a5f5567b1ed4fd6bf74a44bc89893fdbae8ce3f7397692dc77a483",
       "supportive modules/registry/CGC_SystemManager_v0102.py": "593cbda396058e49818b77376bd207e68a3633690d517162b8759d0aec904a59",
@@ -5582,16 +5560,6 @@
         "homes": [
           "VIA_Handoff_Continuity_SSOT_v0100.json"
         ]
-      },
-      "VCGC-REQ116": {
-        "definition": "87234b0f2abb35223d135d8b739867f574d8507249908705b5ebcebe7067be27",
-        "status": "PARTIAL",
-        "next": "工作站點源 Register v0267 → via-tools(自動開 TOOLING_latest.html)· via-cmds;貼回 TOOLING_latest.md 後轉 COVERED",
-        "owner": null,
-        "topic": "工具盤點矩陣:進入環境指令 + 近期短令清單顯示 + 全景 AST / 中央編號 / 分類 / 說明 / 子系統 / 來源 / L103 三導入一張表",
-        "homes": [
-          "VIA_Handoff_Continuity_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -6616,31 +6584,13 @@
       "reason": "CGC_MDL140_HandoverConsole_v0103 新尾版落地,handoff 案要重跑取新收據",
       "next": "via-vcgc closeout --apply --push(③ test handoff 過即轉 VERIFIED)",
       "receipt": "docs/handoff/evidence/handoff.json"
-    },
-    "VCGC-REQ116:tooling": {
-      "id": "VCGC-REQ116:tooling",
-      "requirement": "VCGC-REQ116",
-      "state": "VERIFIED",
-      "case": "tooling",
-      "owner": "VCGC closeout",
-      "reason": "CGC_MDL253_ToolingInventory_v0100 新引擎落地,要經交接案 tooling 取收據",
-      "next": "via-vcgc closeout --apply --push(③ test tooling 過即轉 VERIFIED)",
-      "receipt": "docs/handoff/evidence/tooling.json"
-    },
-    "VCGC-REQ116:workstation": {
-      "id": "VCGC-REQ116:workstation",
-      "requirement": "VCGC-REQ116",
-      "state": "PENDING",
-      "owner": "操作員 / Windows 工作站",
-      "reason": "HTML 自動開頁(os.startfile)與 Register v0267 短令要真 Windows + 點源命令冊才看得到;容器只驗 Python 與 CI pwsh 實跑",
-      "next": "點源 Register v0267 → via-tools · via-cmds → 回貼 VIA_Reports\\tooling\\TOOLING_latest.md → 帶收據轉 VERIFIED"
     }
   },
   "summary": {
-    "requirements": 155,
-    "watched_files": 2904,
-    "pending": 75,
-    "reusable": 84,
+    "requirements": 154,
+    "watched_files": 2902,
+    "pending": 73,
+    "reusable": 83,
     "findings": 0
   }
 }
