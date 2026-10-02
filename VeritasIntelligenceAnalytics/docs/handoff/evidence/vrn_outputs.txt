@@ -27,16 +27,16 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 0 · 歷史 2
-[政策] L50 全景 · 尾版 565 · import 0 · 提及 50 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 566 · import 0 · 提及 52 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_SystemManager_v0113.py(家族 vrn)
+  [via-vcgc run] [流程] 政策過 · VRN_SystemManager_v0114.py(家族 vrn)
 === VRN_SystemManager v0111 · 薄尾自測(outputs:表頭 · DataFrame · 驗證 · 順序 · 三方對照 · Parquet · 鎖)===
   [OK] ① 表頭只讀中央表頭冊的 VRN 表(不抄) · ('VIA_Output_Header_SSOT_v0101.json', 8)
   [OK] ② 表頭 → DataFrame:欄序照冊 · bool / float 照型別
   [OK] ③ 驗證走 CGC_MDL249:主鍵 report_file 重複抓得到 · ["主鍵 ['report_file'] 重複 1 筆"]
   [OK] ④ 順序:VRN 工作流冊每一步都列出(引擎 / 項 / 證據) · 27
-  [OK] ⑤ 三方對照彙總:有一份 RED = RED,列最差的 · {'verdict': 'RED', 'rows': 2, 'tally': {'GREEN': 1, 'YELLOW': 0, 'RED': 1}, 'worst': ['b · 乘積不符'], 'report': '/tmp/tmprqgrtqgr/x.json'}
+  [OK] ⑤ 三方對照彙總:有一份 RED = RED,列最差的 · {'verdict': 'RED', 'rows': 2, 'tally': {'GREEN': 1, 'YELLOW': 0, 'RED': 1}, 'worst': ['b · 乘積不符'], 'report': '/tmp/tmpx75h2otx/x.json'}
   [OK] ⑥ 報告不在 = NODATA(不假綠)
   [OK] ⑦ Parquet:資料家不可用 = NODATA(寫手 CGC_MDL238 · 增量在 CGC_MDL252)
   [OK] ⑧ 鎖:VRN-WKF* 每條在鎖帳上的 locked_at 讀得到 · ('PARTIAL', 4)
@@ -89,7 +89,7 @@
    ],
    "n": 1,
    "spilled": false,
-   "path": "/tmp/tmp6bl565n3/out/t0.parquet",
+   "path": "/tmp/tmpxjym1l21/out/t0.parquet",
    "flags": []
   }
  ],
@@ -104,8 +104,8 @@
   "state": "GREEN",
   "n": 4
  },
- "db": "/tmp/tmp6bl565n3/out/tables.duckdb",
- "html": "/tmp/tmp6bl565n3/out/page.html"
+ "db": "/tmp/tmpxjym1l21/out/tables.duckdb",
+ "html": "/tmp/tmpxjym1l21/out/page.html"
 }
   [OK] 經理跑通
   [OK] 缺的預設由冊補
@@ -179,7 +179,7 @@
    ],
    "n": 1,
    "spilled": false,
-   "path": "/tmp/tmppdc_rgrf/out/t0.parquet",
+   "path": "/tmp/tmp3pciwtv6/out/t0.parquet",
    "flags": []
   }
  ],
@@ -194,10 +194,21 @@
   "state": "GREEN",
   "n": 4
  },
- "db": "/tmp/tmppdc_rgrf/out/tables.duckdb",
- "html": "/tmp/tmppdc_rgrf/out/page.html"
+ "db": "/tmp/tmp3pciwtv6/out/tables.duckdb",
+ "html": "/tmp/tmp3pciwtv6/out/page.html"
 }
   [OK] 經理跑通且驗證 PASS
   [OK] 缺的預設由冊補
   [計] VRN_SystemManager v0113 本版 7 檢 OK · FAIL 0 · 前版 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 2, 'changed': 1, 'stale': 0, 'expected': 14841, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[VRN] 拒絕。只能經 via-vcgc。
+  [OK] ① 未經 VCGC 拒絕(engine 也一樣)
+  [OK] ② 檢視本體是 VCGC 的 CGC_MDL253(與 VDF 管理員同一份)
+  [OK] ③ 真樹:VRN 引擎冊有料 · 沒有被擋的紅燈(缺橋 = 修掉或具名) · (87, [])
+  [OK] ④ 綠燈引擎的單引擎短令走 VCGC run(--family vrn)
+{"engine_gate": {"sub": "VRN", "key": "NO_SUCH_ENGINE_ZZZ", "lamp": "NODATA", "candidates": []}}
+  [VRN_SystemManager v0114] 找不到:NO_SUCH_ENGINE_ZZZ
+  [OK] ⑤ 找不到的引擎回 3(不猜)
+  [OK] ⑥ 加速器橋在;不碰 TA-Lib
+  [計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VRN_SystemManager_v0114.py(冊上 VRN_Sys | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_SystemManager_v0114.py', 'VDF_SystemManager_v0 | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):5 個,例 ['VCGC-REQ117', 'VCGC-REQ118' | X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VCGC-REQ118→VDF_SystemManager_v*.py', 'VCGC-REQ118→VRN_Sys → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 19, 'changed': 37, 'stale': 0, 'expected': 14899, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
