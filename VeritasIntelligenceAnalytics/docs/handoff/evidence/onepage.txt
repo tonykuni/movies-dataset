@@ -30,23 +30,14 @@
 [政策] L50 全景 · 尾版 567 · import 0 · 提及 53 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL253_ToolingInventory_v0100.py(家族 core)
-  [OK] ① 全景用鎖版那一支(雜湊相符;不自己取尾版) · v0117
-  [OK] ② 尾版律:同家族只留版號最大那支 · ['Demo-Tool-v0100.ps1', 'VDF_ENG999_Demo_v0101.py']
-  [OK] ③ 全景卡:定義樹 + 說明(去掉「名稱 vNNNN —」) · (1, '示範引擎')
-  [OK] ④ CLI 面:argparse 子令 / 旗標 + sys.argv 字面旗標 · (['fix', 'scan'], ['--json', '--menu'])
-  [OK] ⑤ L103:PY 缺加速器 · VDF 用到 requests 缺網路橋 = MISS · {'py_accel': 'MISS', 'vdf_net': 'MISS', 'ps_tpl': '—'}
-  [OK] ⑥ PS:.SYNOPSIS 當說明 · param() 當旗標 · 缺模板章 = MISS · ('示範 PS 工具', ['-NoOpen', '-RepoPath'], {'py_accel': '—', 'vdf_net': '—', 'ps_tpl': 'MISS'})
-  [OK] ⑦ 編號冊有料就帶號 / 子系統;沒號 = 未編號 + 黃
-  [OK] ⑧ 短令按家族接回檔 · ['via-demo']
-  [OK] ⑨ 短令冊順點源鏈:看得到舊版定義的 via-in / via-vcgc 與尾版的 via-review · 196
-  [OK] ⑩ 別名接回(via-in = 進入環境)· 新增於 v0263 · (['進入環境'], 263)
-  [OK] ⑫ 引擎解析:229 → ENG229 一支;同號異名 ENG110 照實回 2 個候選不猜
-  [OK] ⑬ 啟動前閘:缺加速器 / 用網路缺網路橋 = 紅擋 · ['缺 PY 加速器橋 [VIA:ACCEL-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply', '用到網路套件卻缺 VDF 網路工具橋 [VIA:NET-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply']
-  [OK] ⑭ 沒 __main__ = 程式庫 NA(不單獨啟動,不算紅);基線具名唯讀本缺橋 = 黃不擋 · ('NA', 'YELLOW')
-  [OK] ⑯ 引擎冊:同號異名的短令改給全名;不重號的照用引擎號 · via-vdfeng VDF_ENG110_AKShareProbe
-  [OK] ⑮ 綠燈引擎給出單引擎短令與 VCGC 路徑 · {'vcgc': ['run', '--family', 'vdf', 'VDF_ENG229_CNNFearGreedHistory'], 'short': 'via-vdfeng ENG229', 'selftest': 'via-vdfeng ENG229 --selftest'}
-  [OK] ⑪ 檔頭 · 加速器橋 · 網路橋在;只收 VCGC;不碰 TA-Lib
-[工具盤點 v0100] 自測 16/16
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):2 個,例 ['VCGC-REQ122', 'VCGC-REQ123' → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 29, 'changed': 0, 'stale': 0, 'expected': 14929, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · CGC_MDL254_ReviewOnePage_v0100.py(家族 core)
+  [OK] ① 燈號口徑統一:AMBER→黃 · OK→綠 · ABSENT→無資料 · PLAN→資訊 · rc 0/2/1
+  [OK] ② 時間格式都讀得懂(ISO · 空白 · 帶時區 · 20261001_222547)
+  [OK] ③ 非綠逐條收(綠的不收) · [{'lamp': 'RED', 'raw': 'RED', 'text': 'X1:壞了'}, {'lamp': 'YELLOW', 'raw': 'AMBER', 'text': 'p:注意'}]
+  [OK] ④ 來源冊:代碼唯一 · 路徑唯一 · 每條有正主
+  [OK] ⑤ 真樹一頁:每個來源都有一列 · 總判在五態內 · 下一步去重 · RED
+  [OK] ⑥ 過期判定:超過時限的結果標過期(不冒充現況) · (True, 'YELLOW')
+  [OK] ⑦ 冊外 *_latest.json 列未登錄(不漏)
+  [OK] ⑨ 總檢本輪併進同一頁:步驟欄名統一(No/Step/Lamp → step/name/lamp)· 原多頁每一頁都成可點開的段 · 閘關 GATE = 黃
+  [OK] ⑧ 加速器橋 · 網路橋在;只收 VCGC;不碰 TA-Lib
+[唯一頁 v0100] 自測 9/9
