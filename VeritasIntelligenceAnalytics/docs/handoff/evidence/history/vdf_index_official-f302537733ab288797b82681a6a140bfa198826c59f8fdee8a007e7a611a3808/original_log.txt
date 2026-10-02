@@ -27,26 +27,30 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
-[政策] L50 全景 · 尾版 564 · import 0 · 提及 51 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 563 · import 0 · 提及 51 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_SystemManager_v0111.py(家族 vrn)
-=== VRN_SystemManager v0111 · 薄尾自測(outputs:表頭 · DataFrame · 驗證 · 順序 · 三方對照 · Parquet · 鎖)===
-  [OK] ① 表頭只讀中央表頭冊的 VRN 表(不抄) · ('VIA_Output_Header_SSOT_v0101.json', 8)
-  [OK] ② 表頭 → DataFrame:欄序照冊 · bool / float 照型別
-  [OK] ③ 驗證走 CGC_MDL249:主鍵 report_file 重複抓得到 · ["主鍵 ['report_file'] 重複 1 筆"]
-  [OK] ④ 順序:VRN 工作流冊每一步都列出(引擎 / 項 / 證據) · 27
-  [OK] ⑤ 三方對照彙總:有一份 RED = RED,列最差的 · {'verdict': 'RED', 'rows': 2, 'tally': {'GREEN': 1, 'YELLOW': 0, 'RED': 1}, 'worst': ['b · 乘積不符'], 'report': '/tmp/tmpk8mnqmxx/x.json'}
-  [OK] ⑥ 報告不在 = NODATA(不假綠)
-  [OK] ⑦ Parquet:資料家不可用 = NODATA(寫手 CGC_MDL238 · 增量在 CGC_MDL252)
-  [OK] ⑧ 鎖:VRN-WKF* 每條在鎖帳上的 locked_at 讀得到 · ('PARTIAL', 4)
-  [OK] ⑨ 互比(CGC_MDL252):VRN outputs 七項能力全在(與 VDF universe 一樣強)
-[DENY] VCGC entry required
-  [OK] ⑩ 不經 VCGC 拒跑
-  [OK] ⑪ 加速器橋 · 網路橋在;不碰 TA-Lib;不代設同意閘
-[VRN] 拒絕。只能經 via-vcgc。
-  [OK]
-[VRN 來源入口] fail=0
-  [計] VRN_SystemManager v0111 薄尾 11/11 · 前版 PASS · 合計 PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL149_VeritasCentralGovernanceConsole_v0187.p → via-vcgc sdd check
-[監控] 背景全景監控中 pid 1092 · 觸碰 run VRN_SystemManager · 交接閘 RED · 落後 3 提交 · 快照 1.0h · 未登 10 支(VDF_MDL006_FinancialModel · VDF_MDL101_OutputManager · VDF_MDL102_FormatUpgrader …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_ENG232_TWIndexOfficial_v0101.py(家族 vdf)
+=== VDF_ENG232_TWIndexOfficial_v0101 · 薄尾自測(增量起點;零外呼)===
+  [OK] ① 庫空 = 從 BOOT 起(2023-01-01)
+  [OK] ② 少一個指數(只有 TAIEX)= 仍從 BOOT 起(兩個都要補齊)
+  [OK] ③ 兩個都在 = 取較早的最新日 + 1 天 · 2026-09-26
+  [OK] ④ 起點晚於迄日 = UP_TO_DATE、零外呼 · UP_TO_DATE
+  [OK] ⑤ 增量跑把起點交給 v0100(incremental 標記) · ('2026-09-26', 'OK')
+  [OK] ⑥ 給 --start = 照 v0100 原樣(非增量) · OK
+  [OK] ⑦ 加速器橋 · 網路橋在;不代設同意閘
+=== VDF_ENG232_TWIndexOfficial_v0100 · 自測(假網路工具 + 暫存庫,零外呼)===
+  [OK] ① 收容件在且 TA-Lib 0 筆;本支也不碰 TA-Lib
+  [OK] ② 收容件的 _Http 換成走網路工具的替身(收容件檔不改)
+  [OK] ③ 一個交易日:TAIEX 一列入庫(收盤 23456.78;OHL=收盤照實標) · ({'state': 'OK', 'start': '2026-10-01', 'end': '2026-10-01', 'fetched': 1, 'added': 1, 'calls': 0, 'note': ''}, {'TAIEX': (1, '2026-10-01', '2026-10-01')})
+  [OK] ④ 外呼全經網路工具(端點是官方 TWSE / TPEX) · 9
+  [OK] ⑤ 重跑只增不覆寫(同鍵不動)
+  [OK] ⑥ 同意閘沒開 = DENY、零寫入
+  [OK] ⑦ 空輸入 = 空列(不假填)
+  [OK] ⑧ 輸出欄位 = VDF 輸入範圍冊 OUT-05(DailyRow 冊 indices.columns) · ['date', 'index_code', 'index_name', 'open', 'low', 'high', 'close', 'volume', 'turnover', 'inst_foreign_net', 'inst_trust_net', 'inst_dealer_net']
+  [OK] ⑨ 加速器橋 · 網路橋 · 正典橋在;不代設同意閘
+  [計] VDF_ENG232_TWIndexOfficial_v0100 9/9 · PASS
+  [OK] ⑧ 前版自測 PASS
+  [計] VDF_ENG232_TWIndexOfficial_v0101 薄尾 8/8 · PASS
+  [同步] SDD 驗證 RED:X-COL VDF-WKF011 欄位不齊:VDF-WKF011-STP001.verb/what/match|inside, VDF-WKF011-STP002.verb | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL252_ManagerParity_v0100.py', 'VRN_SystemMan | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):12 個,例 ['VDF-WKF011', 'VDF-WKF011-S → via-vcgc sdd check
+[監控] 背景全景監控中 pid 2259 · 觸碰 run VDF_ENG232_TWIndexOfficial · 交接閘 YELLOW · 落後 2 提交 · 快照 0.4h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
