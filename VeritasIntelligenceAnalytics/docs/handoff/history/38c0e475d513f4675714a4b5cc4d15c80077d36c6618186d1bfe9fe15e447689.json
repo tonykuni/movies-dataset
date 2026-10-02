@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-02T17:59:33+00:00",
+  "at": "2026-10-02T17:40:36+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -683,15 +683,6 @@
       "next": "照回覆裡的同步 + 三系統啟動驗證貼上區塊跑一次,把結尾的矩陣貼回;同步後仍紅的逐條根因修"
     },
     {
-      "id": "VCGC-REQ126:praddle-envs",
-      "requirement": "VCGC-REQ126",
-      "state": "PENDING",
-      "owner": "操作員(工作站裝隔離境)",
-      "reason": "PRADDLE(RapidOCR · PaddleOCR)高風險,操作員令要獨立環境;ENG398 只在隔離境子行程叫它們。容器與工作站目前兩車道 NO_ENV",
-      "next": "工作站:via-vcgc run via_ocr_super --plan 看兩個隔離境(via_rapidocr · via_paddle_311)的安裝計畫 → 照環境計畫(盤點 → 衝突檢查 → 乾淨還原點)由操作員裝(要網路先自己開同意閘)→ via-vcgc run --family vrn VRN_ENG398_PraddleExtractor probe 兩車道 READY → run --in C:\\測試樣本報告 --ocr force 看互核",
-      "note": "2026-10-02 更正(VERIFIED → PENDING):上輪 closeout ③+ 因本項掛了 praddle 案(容器程式自測)而自動轉 VERIFIED;但本項是工作站裝兩個隔離境,容器自測證不到 → 轉回 PENDING、不掛案;收據要工作站 ENG398 probe 兩車道 READY"
-    },
-    {
       "id": "VCGC-REQ124:workstation-ui",
       "requirement": "VCGC-REQ124",
       "state": "PENDING",
@@ -706,14 +697,6 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
-    },
-    {
-      "id": "VCGC-REQ126:best-aligned-baseline",
-      "requirement": "VCGC-REQ126",
-      "state": "PENDING",
-      "owner": "操作員(工作站實跑)· AI(根因修)",
-      "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
-      "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
     }
   ],
   "reusable_successes": [
@@ -807,7 +790,7 @@
     "VCGC-REQ124:plan",
     "VCGC-REQ124:live-components",
     "VCGC-REQ126:vrn-ocr-ladder",
-    "VCGC-REQ127:tool-import"
+    "VCGC-REQ126:praddle-envs"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -820,7 +803,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
+      "sha256": "56401d6deebd9cb37f40a547a1bac66e09bf7983fdf9ad659892877ac375cbd3"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -840,7 +823,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
+      "sha256": "56401d6deebd9cb37f40a547a1bac66e09bf7983fdf9ad659892877ac375cbd3"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -852,7 +835,7 @@
     },
     "VCGC-REQ081:token": {
       "path": "docs/handoff/evidence/token.json",
-      "sha256": "b2016896066ed4e93fccc70a87673138df122f2cf8c0a774dce6fb83152e2acc"
+      "sha256": "b312427f6300c043ec6460c901f0e6eb565a5a69cb709e3dd4252f8d48e59272"
     },
     "VCGC-REQ082:entry": {
       "path": "docs/handoff/evidence/entry.json",
@@ -864,11 +847,11 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
+      "sha256": "56401d6deebd9cb37f40a547a1bac66e09bf7983fdf9ad659892877ac375cbd3"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "8cec49527c19f8c47e280bb478f9b56bc9a5dbe13cf2785353eaec194d19d077"
+      "sha256": "f6f3b593a09cb640e6c8d23da95f60901ce2aeaa24c9fcf42a9877070f5c67d6"
     },
     "VCGC-REQ084:entry": {
       "path": "docs/handoff/evidence/entry.json",
@@ -880,15 +863,15 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "bdaa9848a90758c13b400fff1e50b688b436836dd889d151566651f1b1f7777a"
+      "sha256": "59479bc28239da0f533774bc540db35a6e3b97dd9d68d1b4c04e4a91ca750356"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "bdaa9848a90758c13b400fff1e50b688b436836dd889d151566651f1b1f7777a"
+      "sha256": "59479bc28239da0f533774bc540db35a6e3b97dd9d68d1b4c04e4a91ca750356"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
-      "sha256": "76bb8ef7aa02282c2dee9840355e6ad073ce61e745cc17f3ba7c681e7095d6a8"
+      "sha256": "a4a6f4db7b75e247d7e540e4cdb53a3607693e96755acdf49059550d6fe01a75"
     },
     "VCGC-REQ086:fullcheck": {
       "path": "docs/handoff/evidence/fullcheck.json",
@@ -904,11 +887,11 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
+      "sha256": "56401d6deebd9cb37f40a547a1bac66e09bf7983fdf9ad659892877ac375cbd3"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
-      "sha256": "8cec49527c19f8c47e280bb478f9b56bc9a5dbe13cf2785353eaec194d19d077"
+      "sha256": "f6f3b593a09cb640e6c8d23da95f60901ce2aeaa24c9fcf42a9877070f5c67d6"
     },
     "VCGC-REQ086:own-page": {
       "path": "docs/handoff/evidence/fullcheck.json",
@@ -1144,7 +1127,7 @@
     },
     "VCGC-REQ116:tooling": {
       "path": "docs/handoff/evidence/tooling.json",
-      "sha256": "739a516f3c8a0558bde8bfb58213423d10fbce1c41f3bbc4dd0f582507df626b"
+      "sha256": "5c03fc416bf85854f44d6df800f373101c760019d95f6854bf5c24cec6f4bfb8"
     },
     "VCGC-REQ117:vdf_engine": {
       "path": "docs/handoff/evidence/vdf_engine.json",
@@ -1170,9 +1153,9 @@
       "path": "docs/handoff/evidence/ppp_hub.json",
       "sha256": "7c3826dc0eb0a3d684c8765cee0e33a70b8debce0510687ae74aa723f267b4cf"
     },
-    "VCGC-REQ127:tool-import": {
-      "path": "docs/handoff/evidence/nlp_praddle.json",
-      "sha256": "1090c7ac494ffb2cc50733f3ea1c5565c31bb0fd9153ec6a4017bbf37968bbdb"
+    "VCGC-REQ126:praddle-envs": {
+      "path": "docs/handoff/evidence/praddle.json",
+      "sha256": "308f8ec051a589e5ff17b4520476826dc45a1a4f5b3216cb3165978e08bc54d5"
     }
   },
   "state": {
@@ -1230,8 +1213,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0146.json": "47a9988b09b09ee08f9b776ad852073e23a61b723b7e46017989e35025d2f452",
       "supportive modules/registry/VIA_Requirements_SSOT_v0147.json": "8d5fd43f27b03a14b8116b65e7292e7d8d3cf2d0c5c6324db17b4e10753e2285",
       "supportive modules/registry/VIA_Requirements_SSOT_v0148.json": "6ee0a039d435bfeda443a75ec1334760a97c97b45f04dbae3495b7257c3095f0",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0149.json": "e56b55d1e9058b16501159203b349326c07f45627a20921e8dbaabcef18246dd",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0150.json": "6d48f4b8631b592ed33618a8c3e6bae3ef1e7792fef8da4206490639d4531524",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0149.json": "6236c920dd45a93826b3d8ec624821470c827ecc28c7a7e6926ca4adcb415b76",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -1256,9 +1238,9 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "556d507564f8203698a5d08bd5efbd8b5d7b09e8f6c39d444be0363e9239decd",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "d80b4db8368882e34b198cf5716dba3ab27fbd2820ee70627dfd3dabc1765a79",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "b29dcd7922ba36f1fa8f9bfe2cd181321bc9c98f399d549c2819c3712fc40d1e",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
-      "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "eb32b72e1d282ccc12dd6184b099ed64c7614333ad8ae0ad407ff8d82b5d5ee5",
+      "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
       "functional modules/VRN/tests/test_SourceProvenance_v0100.py": "5fe4d138b22278722fa723dc58b36825836e4288751e637b8a2ef78c2cc9ecd4",
       "functional modules/VRN/20260804/VRN_ENG036_FinalizeCoreV2.py": "6048eaa4930017a01034a2f2a5acd87d62d968e42c495081f24feddda24465ea",
@@ -3797,7 +3779,6 @@
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0103.py": "aba9d07ebd8a263621fd8eb55fc0d3b0869ad62adb5918eea2b9bf6cba2afd31",
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0104.py": "8a028d0796663e769fcab9d85c48470af16936a6240bc5b49a06827d2b72f801",
       "supportive modules/registry/CGC_MDL233_ToolActivate_v0105.py": "74f9b383c0969d2f46eed6fcc102306f1e5c7ceb7f5cc102eb3c212d3a5f36f9",
-      "supportive modules/registry/CGC_MDL233_ToolActivate_v0106.py": "625f2235bbcfce245e606429a3c089618560a0802f16a8856d8cf331d521a6ce",
       "supportive modules/registry/CGC_MDL234_RenameResidueProbe_v0100.py": "5a89eed35376e68eeb394459a4f813eb2208f3696c351afee0abd2ce75672b32",
       "supportive modules/registry/CGC_MDL234_RenameResidueProbe_v0101.py": "ac381470b071a8b269d13f6418f31417f063715ccf2916ff3babb09159ef6bd9",
       "supportive modules/registry/CGC_MDL235_EngineVersionLedger_v0100.py": "7bd57efab8c4a1c8caa0811b2ba3413a870bce027d0c11ebdd4e2110004be509",
@@ -3962,7 +3943,6 @@
       "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0107.py": "19e223706f33b46c09eb79c137ffecf0cbaad2aaad31675d8e24249ef90a4a19",
       "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0108.py": "7378e915fe6ab69e77bbd20188e51a8b32fd9b815958e7505c874322f9555881",
       "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0109.py": "12182337dfddd44dfb7fd3db27fb8053780d50307e0245ad71457db049e96d7e",
-      "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0110.py": "ba4d7e95f64f5b487923099c6e35794eb89977652ffe68e5a579c43c35e7a383",
       "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0100.py": "438a9d62f9c036d287c91dc51d0ab67086b109aade4032bb4d2e99e78cdc6ff2",
       "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0101.py": "288e266e61f811bcda6003cdc65861ed052b8fa821008b84586c53d69b09bb15",
       "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30",
@@ -3994,7 +3974,6 @@
       "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0103.py": "692795ee6f5be99f142541b994e509f2f8026f68971621b38c7229d90e24875a",
       "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0104.py": "4b0b85e882e9a12e52b8076cf5dad81f3dc54c79f4713aae559d956b1691e2d0",
       "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0105.py": "3e4c2c971ed7698dd7784a7ae9e01430a75c135a067c01b51761425bf0dfe4e8",
-      "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0106.py": "ab3f7d393b0bca45818e5152f920b4d3d250222a0b5c96c746c7390fdece3834",
       "supportive modules/70_VRN_Rules/VETF_VIS_VRN_FinancialSSOT_v0608.py": "96ad72b72d0be7eed74db3e1b7ff7d8bbbb5a2992b0e9f53cf0c29f66a959275",
       "supportive modules/70_VRN_Rules/VIS_VRN_BrokerAlias_Compatibility_v0222.py": "022786aed9f2170034f8abe7a438473b8956d11ab1034e6960af2a99589d0fef",
       "supportive modules/70_VRN_Rules/VIS_VRN_BrokerAlias_Extension_v0224.py": "e4994a01a8d56b0c5156ffe1f75adc92174359b1045bad0083355e8178020cb5",
@@ -4071,7 +4050,7 @@
       "supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.json": "c1fb3b59bbc0a660ac8fc69ddaf348a47a72b5be897bd5282b829653cbfe23cd",
       "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json": "29fbfb04c76782c8b8ad513984a5095e81b1d1bf5f68a36480de6fa2521dc5dd",
       "supportive modules/registry/VIA_Registry_Architecture_SSOT_v0100.json": "b7169706eb732c69cc5bc28ba45d93ecc60ba705e6dce890017034b18fdd2a4d",
-      "supportive modules/registry/VIA_EngineVersion_Register_v0100.json": "1d98b28d4843cce3141fa2472bdac4cd46a3bdf86135a46304fe82d88f69d1a6",
+      "supportive modules/registry/VIA_EngineVersion_Register_v0100.json": "26036d920ad7e28dd9329ce4224be9b6768f5ebca8dac6a77dd55014791ce606",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0100.json": "f2581eca4b5050ab035455ca4b80f84069ae9d71edc21e43f2f307c10549def2",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0101.json": "da5d101becb50ed3851fef190e7649fcb45f6f0afb62c550183d1a01f52899f3",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0102.json": "2f7ac956534217a03281a4a5b9fc4b69f475efb635d6ccefc2ab12e80c8d96a5",
@@ -4104,7 +4083,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0129.json": "3d22c7a385b6e919aafe6d8b67e0df2fcd2484d96092835db8992aad17e5f342",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0130.json": "9e764b9802eebed738fdec08a2e986067ebf93386c3e474e0ae797c64eff5ebb",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0131.json": "0431499fd7d676bd89794867a39c90f28ef1de64d1eb1ad87d1defc00aec9d0d",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0132.json": "844179e7ef2f916ec158f51cd0296a55312d657635a493dd1b381e0fcdd32cec"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0132.json": "b6011ef2362ccdb1093a68c5966319849a7b7fd58ec22c7a5ede28b89a3093fd"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -5885,24 +5864,12 @@
         ]
       },
       "VCGC-REQ126": {
-        "definition": "bc3dcc0f2114e5f460ae576ecef1ac1eac644b010c860d4bf9b0ce4c2a372d6f",
+        "definition": "33db8a4c8afb3777bdbe9467ce40fd43f0f1a8dd9b16daaec4fa1261fba665ff",
         "status": "RECORDED",
         "next": "工作站先同步到 main(via-medic sync --apply → git pull --no-rebase → 重點源 Register 尾版)→ 依序 VCGC status → VDF 引擎冊 / 單引擎 → VRN 引擎冊 / 鏈 → 結果驗證;同步後的紅燈再逐條根因修",
         "owner": "操作員(工作站同步與實跑)· AI(根因修)",
         "topic": "聚焦:VCGC · VDF · VRN 三者成功啟動且結果驗證成功;無關的不管",
         "homes": [
-          "VIA_Handoff_Continuity_SSOT_v0100.json"
-        ]
-      },
-      "VCGC-REQ127": {
-        "definition": "cf6e7a59a9e14d1cbd39c0bc94d9d0510ad7f52753404659efd0d4c7caae824b",
-        "status": "COVERED",
-        "next": "工作站同步後 via-vcgc tools status 看七家 sha 全對;隔離境裝好後 NLP pdf --ocr force 看掃描件",
-        "owner": "AI(已交)· 操作員(工作站同步 · 隔離境)",
-        "topic": "LAYOUT · NLP 經工具鎖冊導入 PRADDLE",
-        "homes": [
-          "VIA_ToolVersion_Lock_v0100.json",
-          "VIA_EngineVersion_Register_v0100.json",
           "VIA_Handoff_Continuity_SSOT_v0100.json"
         ]
       }
@@ -7093,11 +7060,12 @@
     "VCGC-REQ126:praddle-envs": {
       "id": "VCGC-REQ126:praddle-envs",
       "requirement": "VCGC-REQ126",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "操作員(工作站裝隔離境)",
       "reason": "PRADDLE(RapidOCR · PaddleOCR)高風險,操作員令要獨立環境;ENG398 只在隔離境子行程叫它們。容器與工作站目前兩車道 NO_ENV",
       "next": "工作站:via-vcgc run via_ocr_super --plan 看兩個隔離境(via_rapidocr · via_paddle_311)的安裝計畫 → 照環境計畫(盤點 → 衝突檢查 → 乾淨還原點)由操作員裝(要網路先自己開同意閘)→ via-vcgc run --family vrn VRN_ENG398_PraddleExtractor probe 兩車道 READY → run --in C:\\測試樣本報告 --ocr force 看互核",
-      "note": "2026-10-02 更正(VERIFIED → PENDING):上輪 closeout ③+ 因本項掛了 praddle 案(容器程式自測)而自動轉 VERIFIED;但本項是工作站裝兩個隔離境,容器自測證不到 → 轉回 PENDING、不掛案;收據要工作站 ENG398 probe 兩車道 READY"
+      "case": "praddle",
+      "receipt": "docs/handoff/evidence/praddle.json"
     },
     "VCGC-REQ124:workstation-ui": {
       "id": "VCGC-REQ124:workstation-ui",
@@ -7114,30 +7082,12 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
-    },
-    "VCGC-REQ127:tool-import": {
-      "id": "VCGC-REQ127:tool-import",
-      "requirement": "VCGC-REQ127",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "操作員令「將 LAYOUT NPL 都有導入工具」:PRADDLE 進工具鎖冊(CGC_MDL233 v0106 praddle 家族)· LAYOUT v0110 / NLP v0106 從鎖冊取它並經 VCGC 啟用",
-      "next": "收尾實跑 nlp_praddle 案(含 LAYOUT 修復段落 → run_text)轉 VERIFIED;工作站同步後 via-vcgc tools status 看七家 sha 全對",
-      "case": "nlp_praddle",
-      "receipt": "docs/handoff/evidence/nlp_praddle.json"
-    },
-    "VCGC-REQ126:best-aligned-baseline": {
-      "id": "VCGC-REQ126:best-aligned-baseline",
-      "requirement": "VCGC-REQ126",
-      "state": "PENDING",
-      "owner": "操作員(工作站實跑)· AI(根因修)",
-      "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
-      "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
     }
   },
   "summary": {
-    "requirements": 166,
-    "watched_files": 2928,
-    "pending": 93,
+    "requirements": 165,
+    "watched_files": 2924,
+    "pending": 91,
     "reusable": 91,
     "findings": 0
   }
