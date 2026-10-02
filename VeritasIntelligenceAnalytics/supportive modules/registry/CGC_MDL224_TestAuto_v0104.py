@@ -289,7 +289,7 @@ def selftest() -> int:
         and target_of(runs[1]["argv"]) == target_of(runs[3]["argv"]) == "A")
     spans, lk = {}, threading.Lock()
 
-    def fake(via, console, argv, timeout, log):
+    def fake_v0104(via, console, argv, timeout, log):
         t = time.time()
         time.sleep(0.4)
         with lk:
@@ -301,7 +301,7 @@ def selftest() -> int:
     _PLAN.clear()
     _PLAN.update(jobs=4, segs=[seg], launched=set(), evt={}, res={}, pools=[], seg_of={str(log_path(via, s)): 0 for s in seg})
     t0 = time.time()
-    _launch(0, via, None, runner=fake)
+    _launch(0, via, None, runner=fake_v0104)
     for s in seg:
         _PLAN["evt"][str(log_path(via, s))].wait(10)
     wall = time.time() - t0
