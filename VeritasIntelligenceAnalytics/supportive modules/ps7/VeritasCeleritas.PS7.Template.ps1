@@ -15,6 +15,7 @@ $script:CeleritasTemplate = [ordered]@{
     Version = 'v1141'
     Marker  = 'CELERITAS-TEMPLATE-JOIN v1'
     Joined  = $false
+    UI      = ''
 }
 
 $join = Join-Path $PSScriptRoot 'VeritasCeleritas.PS7.ps1'
@@ -28,6 +29,15 @@ if (Test-Path -LiteralPath $join) {
     if (-not $script:CeleritasPS7.Applied) { [void](Start-CeleritasPS7) }
     $script:CeleritasTemplate.Version = [string]$script:CeleritasPS7.Version
     $script:CeleritasTemplate.Joined = $true
+}
+
+# [CELERITAS-UI v0100] 主控台呈現件:YFinance 啟動器(VDF_MDL002)的 Rich 版型,純 PS 重做。
+# 操作員 2026-10-02「他 PS U/I 呈現很美 可採用加入標準 PS 模板」(VCGC-REQ124)。只增;缺檔不擋。
+# 用法:Write-CeleritasRichMatrix -Title … -Rows …(計數判決同 Write-CeleritasMatrixSummary)· Write-CeleritasTable · Write-CeleritasPanel · Test-CeleritasUI
+$celeritasUIPath = Join-Path $PSScriptRoot 'VeritasCeleritas.PS7.UI.ps1'
+if ($script:CeleritasTemplate.Joined -and (Test-Path -LiteralPath $celeritasUIPath)) {
+    . $celeritasUIPath
+    $script:CeleritasTemplate.UI = [string]$script:CeleritasUI.Version
 }
 
 function Invoke-CeleritasGenerated {
@@ -47,6 +57,7 @@ function Test-CeleritasJoin {
         Marker  = $script:CeleritasTemplate.Marker
         Joined  = [bool]$script:CeleritasTemplate.Joined
         Version = $script:CeleritasTemplate.Version
+        UI      = $script:CeleritasTemplate.UI
         PidOnly = $true
     }
 }
