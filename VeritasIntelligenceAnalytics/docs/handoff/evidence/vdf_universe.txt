@@ -30,13 +30,24 @@
 [政策] L50 全景 · 尾版 562 · import 0 · 提及 50 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL221_SystemBackup_v0101.py(家族 core)
-  [OK] ① 鏈報告判法:不在 ABSENT · 真跑 RAN_AFTER_BACKUP · 計畫 / 非鏈跑器 / 讀不到 NOT_A_RUN · {'absent': 'ABSENT', 'run': 'RAN_AFTER_BACKUP', 'plan': 'NOT_A_RUN', 'foreign': 'NOT_A_RUN', 'bad': 'NOT_A_RUN'}
-  [OK] ② 冊本身(五檔 · 兆豐 MEGA · 引擎 NODATA)照 v0100 過:沒有鏈報告時 lock_success · green 8 · kept_show IBF · 0
-  [OK] ③ 真跑過鏈:不判 chain_file · stale 標出來 · next 說要重備(不自動改冊)
-  [OK] ④ 計畫寫出的報告 / 非鏈跑器 / 讀不到:照舊 chain_file(do_not 第一條守住)
-{"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
-  [OK] ⑤ 只收 VCGC · 實樹鎖定成立(鏈報告現況 RAN_AFTER_BACKUP;計畫寫出的報告照樣紅) · 0
-  [OK] ⑥ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 不動
-  CGC_MDL221_SystemBackup_v0101 selftest 6/6 PASS
-[監控] 背景全景監控中 pid 711 · 觸碰 run CGC_MDL221_SystemBackup · 交接閘 YELLOW · 落後 10 提交 · 快照 1.6h · 未推 28 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0121.py(家族 vdf)
+=== VDF_SystemManager v0121 · 薄尾自測(輸入範圍 · 輸出項目與表頭)===
+  [OK] ① 冊:三組輸入(個股 · 主動股票 ETF · 指數)+ 五項輸出
+  [OK] ② 表頭全可解析;指標正本解出(個股日資料 26 欄 · 指數 12 欄,中文齊) · {'OUT-01': 13, 'OUT-02': 26, 'OUT-03': 13, 'OUT-04': 12, 'OUT-05': 12}
+  [OK] ③ 只收:個股四碼(0050 不算個股)· 主動 A 尾且有每日持股(D 尾 · 沒持股不收)· 兩個指數 · {'TW_STOCK': 2, 'TW_ACTIVE_EQUITY_ETF': 1, 'TW_INDEX': 2}
+  [OK] ④ 指數:TAIEX / TPEX 官方為準,yfinance 只標代理
+  [OK] ⑤ 輸出清單表頭 = 冊 OUT-01 中文欄名、欄序照冊;列數對
+  [OK] ⑥ 讀取口缺 = 照實記(不假填),只剩指數兩列
+  [OK] ⑦ check:冊規則與 ENG087 尾版讀取口 / regex 對得上
+[VDF] 拒絕。只能經 via-vcgc。
+  [OK] ⑧ 不經 VCGC 拒跑
+  [OK] ⑩ 順序:12 站照 main 工作流冊(E-01 清單起 · E-11 驗證收);E-10 指數正主 = VDF_ENG232 尾版在 · ['OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK']
+  [OK] ⑪ 表頭 → DataFrame:OUT-03 欄 = 中央表頭冊 etf_holdings_daily(不抄);日期欄是時間型
+  [OK] ⑫ 驗證 OUT-01 走 CGC_MDL249:列數 < 1600 記紅(假資料只有 5 列),主鍵不重 · ['列數 5 < 最少 1600']
+  [OK] ⑬ 驗證抓得到主鍵重複(OUT-04 同一筆兩列) · ["主鍵 ['portfolio_date', 'etf_ticker', 'holding_ticker'] 重複 1 筆"]
+  [OK] ⑭ 本冊沒有可直讀來源的項不假造:不給資料 = NODATA
+  [OK] ⑨ 加速器橋 · 網路橋在;不碰 TA-Lib;不代設同意閘
+[VDF] 拒絕。只能經 via-vcgc。
+  [OK]
+  [計] VDF_SystemManager v0121 薄尾 14/14 · 前版 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 711 · 觸碰 run VDF_SystemManager · 交接閘 YELLOW · 落後 10 提交 · 快照 1.7h · 未推 28 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

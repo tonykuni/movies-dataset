@@ -132,7 +132,9 @@
     "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0105.py",
     "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0107.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0186.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0186.py",
+    "functional modules/VDF/VDF_SystemManager_v0121.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -751,6 +753,37 @@
       "scope": "三大報表:自測假代碼跟上收緊後的第二道閘;正式 run 走真閘(R46 · VDF-REQ015)",
       "dependencies": [
         "functional modules/VDF/engine/VDF_ENG082_FinStatements_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_universe": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0121 薄尾 14/14 · 前版 PASS · 合計 PASS",
+      "scope": "VDF 管理員 universe 動詞:三組輸入(全部個股 · 主動股票 ETF 有每日持股 · 加權 / 櫃買指數)· 五項輸出 · 引擎 E-01…E-11 順序(照 main 工作流冊)· 表頭 → DataFrame · 輸出驗證經 CGC_MDL249(R49 · VDF-REQ016)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json",
+        "functional modules/VDF/VDF_TWEquity_DailyRow_Schema_v0100.json",
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py",
+        "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_index_official": {
+      "argv": [
+        "VDF_ENG232_TWIndexOfficial",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG232_TWIndexOfficial_v0100 9/9 · PASS",
+      "scope": "加權 · 櫃買指數官方日資料 → tw_index_daily(解析沿用收容件 b360,網路走 SUP_MDL740,TA-Lib 0;R49 · VDF-REQ016)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
+        "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_market.py",
+        "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json"
       ],
       "timeout_seconds": 900
     }
@@ -1594,6 +1627,20 @@
       "owner": "AI(下一個接手)",
       "reason": "操作員令先中斷紀錄備份;需求已登錄未開工",
       "next": "盤點 VDF / VRN SystemManager 動詞與 chain 存證 → 設計 VDF / VRN 向上通報 sync 動詞(子系統正本不搬)→ 收尾全綠才推"
+    },
+    {
+      "id": "VDF-REQ016:vdf_universe",
+      "requirement": "VDF-REQ016",
+      "state": "VERIFIED",
+      "case": "vdf_universe",
+      "receipt": "docs/handoff/evidence/vdf_universe.json"
+    },
+    {
+      "id": "VDF-REQ016:vdf_index_official",
+      "requirement": "VDF-REQ016",
+      "state": "VERIFIED",
+      "case": "vdf_index_official",
+      "receipt": "docs/handoff/evidence/vdf_index_official.json"
     }
   ]
 }

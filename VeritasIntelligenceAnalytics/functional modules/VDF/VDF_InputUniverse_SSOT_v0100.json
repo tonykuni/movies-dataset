@@ -1,0 +1,598 @@
+{
+ "schema": "VDF.InputUniverse.SSOT.v1",
+ "version": "v0100",
+ "ts": "2026-10-02",
+ "owner": "functional modules/VDF/VDF_SystemManager_v*.py(尾版;動詞 universe)",
+ "source": "操作員 R49 2026-10-02:「只有台灣個股全部及主動式台股ETF為主動式股票ETF中可以依規定抓到每日台股持股資訊的ETF 加權 櫃買資訊跟上面全抓當輸入 VDF SYSTEM MANAGER管理 輸出項目及HEADER也是他管理」;「輸入 輸出 透過那些引擎分開編號由SYSTEM MANAGER管理 還有輸出HEADER轉DATAFRAME 輸出的驗證方式」;「順序的LOOP找紀錄找MAIN串一下」",
+ "rule": "正本歸 VDF。本冊定範圍、引擎、順序、輸出項目與驗證;表頭有正本的只放指標(中央表頭冊 VIA_Output_Header_SSOT 的 table id,或 DailyRow 冊路徑),不抄第二份。表頭 → DataFrame 與輸出驗證交 CGC_MDL249_DataFrameLock(check_table:必填欄 · 型別可轉 · 主鍵不重 · 最少列)再加本冊的範圍規則。只增不減。",
+ "inputs": [
+  {
+   "id": "IN-01",
+   "group": "TW_STOCK",
+   "zh": "台灣全部個股(加權上市 + 櫃買上櫃)",
+   "code_regex": "^[1-9]\\d{3}$",
+   "market": [
+    "TWSE",
+    "TPEX"
+   ],
+   "reader": {
+    "engine": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+    "call": "load_stock_list"
+   },
+   "truth": "vdf_tw_market.duckdb::tw_listings_industry(OpenAPI t187ap03_L / mopsfin_t187ap03_O;VDF_ENG055 L1)",
+   "floor": {
+    "TWSE": 900,
+    "TPEX": 700,
+    "note": "任一所 0 家 = RED;低於下限 = AMBER(ENG087 規則)"
+   },
+   "engines": [
+    "E-01",
+    "E-04"
+   ]
+  },
+  {
+   "id": "IN-02",
+   "group": "TW_ACTIVE_EQUITY_ETF",
+   "zh": "主動式台股 ETF(主動式股票 ETF 中,依規定每日揭露台股持股者)",
+   "code_regex": "^00\\d{3}A$",
+   "require": {
+    "status": "ACTIVE_DOMESTIC",
+    "verified": "holdings_daily 有持股列(每日台股持股可取)"
+   },
+   "exclude": [
+    "D 尾(主動債券)",
+    "國外成分(FOREIGN_COMPONENT)",
+    "下架 / 無持股揭露"
+   ],
+   "reader": {
+    "engine": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+    "call": "load_active_etfs",
+    "filter": "verified == True"
+   },
+   "truth": "ActiveTWETF.duckdb::active_tw_etf_registry(t187ap47_L)· holdings_daily(各投信每日持股揭露;VDF_ENG078 daily)",
+   "engines": [
+    "E-02",
+    "E-03",
+    "E-04"
+   ]
+  },
+  {
+   "id": "IN-03",
+   "group": "TW_INDEX",
+   "zh": "加權指數 · 櫃買指數",
+   "members": [
+    {
+     "code": "TAIEX",
+     "zh": "發行量加權股價指數",
+     "market": "TWSE",
+     "official": "TWSE 官方",
+     "yf_proxy": "^TWII"
+    },
+    {
+     "code": "TPEX",
+     "zh": "櫃買指數",
+     "market": "TPEX",
+     "official": "TPEX 官方",
+     "yf_proxy": "^TWOII"
+    }
+   ],
+   "truth": "VDF_TWIndex_Daily.duckdb::tw_index_daily(VDF_TWEquity_DailyRow_Schema_v0100.indices)",
+   "rule": "官方 > 代理;yfinance ^TWII / ^TWOII 只當代理,不冒充官方層",
+   "engines": [
+    "E-09",
+    "E-10"
+   ]
+  }
+ ],
+ "outputs": [
+  {
+   "id": "OUT-01",
+   "item": "universe_list",
+   "zh": "輸入清單(三組合一)",
+   "table": "(再生件)VIA_Reports/vdf/universe/VDF_UNIVERSE_latest.csv / .json",
+   "header_row": "zh",
+   "columns": [
+    {
+     "key": "seq",
+     "zh": "序號",
+     "dtype": "INTEGER"
+    },
+    {
+     "key": "group",
+     "zh": "組別",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "code",
+     "zh": "代號",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "name",
+     "zh": "名稱",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "market",
+     "zh": "市場",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "yf_ticker",
+     "zh": "yfinance 代碼",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "bb_ticker",
+     "zh": "Bloomberg 代碼",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "industry",
+     "zh": "產業",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "issuer",
+     "zh": "投信",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "verified",
+     "zh": "持股已驗證",
+     "dtype": "BOOLEAN"
+    },
+    {
+     "key": "last_holdings_date",
+     "zh": "最新持股日",
+     "dtype": "DATE"
+    },
+    {
+     "key": "source",
+     "zh": "來源",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "state",
+     "zh": "狀態",
+     "dtype": "VARCHAR"
+    }
+   ],
+   "engines": [
+    "E-04",
+    "E-11"
+   ],
+   "header_owner": "本冊 columns",
+   "keys": [
+    "group",
+    "code"
+   ],
+   "required": [
+    "group",
+    "code",
+    "name",
+    "state"
+   ],
+   "min_rows": 1600
+  },
+  {
+   "id": "OUT-02",
+   "item": "tw_equity_daily",
+   "zh": "個股日資料(一檔一日一行)",
+   "for": [
+    "IN-01"
+   ],
+   "table": "VDF_TWEquity_Daily.duckdb::tw_equity_daily",
+   "columns_ref": {
+    "path": "functional modules/VDF/VDF_TWEquity_DailyRow_Schema_v0100.json",
+    "key": "columns"
+   },
+   "engines": [
+    "E-05",
+    "E-06",
+    "E-07",
+    "E-08"
+   ],
+   "source_tables": [
+    "tw_daily_prices",
+    "tw_chip_inst",
+    "tw_chip_margin",
+    "tw_trading_daily"
+   ],
+   "header_owner": "columns_ref 指標",
+   "keys": [
+    "date",
+    "ticker"
+   ],
+   "required": [
+    "date",
+    "ticker",
+    "yfinance_ticker"
+   ],
+   "min_rows": 1
+  },
+  {
+   "id": "OUT-03",
+   "item": "holdings_daily",
+   "zh": "主動 ETF 每日持股",
+   "for": [
+    "IN-02"
+   ],
+   "table": "ActiveTWETF.duckdb::holdings_daily",
+   "ddl_owner": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v*.py",
+   "engines": [
+    "E-03"
+   ],
+   "header_ref": "etf_holdings_daily",
+   "header_owner": "VIA_Output_Header_SSOT(中央表頭冊)· table etf_holdings_daily"
+  },
+  {
+   "id": "OUT-04",
+   "item": "holdings_changes",
+   "zh": "主動 ETF 持股異動",
+   "for": [
+    "IN-02"
+   ],
+   "table": "ActiveTWETF.duckdb::holdings_changes",
+   "ddl_owner": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v*.py",
+   "columns": [
+    {
+     "key": "portfolio_date",
+     "zh": "持股日",
+     "dtype": "DATE"
+    },
+    {
+     "key": "previous_date",
+     "zh": "前一持股日",
+     "dtype": "DATE"
+    },
+    {
+     "key": "etf_ticker",
+     "zh": "ETF 代號",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "holding_ticker",
+     "zh": "成分股代號",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "holding_name",
+     "zh": "成分股名稱",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "change_type",
+     "zh": "異動類型",
+     "dtype": "VARCHAR"
+    },
+    {
+     "key": "shares_previous",
+     "zh": "前日股數",
+     "dtype": "DOUBLE"
+    },
+    {
+     "key": "shares_current",
+     "zh": "本日股數",
+     "dtype": "DOUBLE"
+    },
+    {
+     "key": "shares_change",
+     "zh": "股數變動",
+     "dtype": "DOUBLE"
+    },
+    {
+     "key": "weight_previous",
+     "zh": "前日權重",
+     "dtype": "DOUBLE"
+    },
+    {
+     "key": "weight_current",
+     "zh": "本日權重",
+     "dtype": "DOUBLE"
+    },
+    {
+     "key": "weight_change",
+     "zh": "權重變動",
+     "dtype": "DOUBLE"
+    }
+   ],
+   "engines": [
+    "E-03"
+   ],
+   "header_owner": "本冊 columns",
+   "keys": [
+    "portfolio_date",
+    "etf_ticker",
+    "holding_ticker"
+   ],
+   "required": [
+    "portfolio_date",
+    "previous_date",
+    "etf_ticker",
+    "holding_ticker",
+    "change_type"
+   ],
+   "min_rows": 0
+  },
+  {
+   "id": "OUT-05",
+   "item": "tw_index_daily",
+   "zh": "加權 · 櫃買指數日資料",
+   "for": [
+    "IN-03"
+   ],
+   "table": "functional modules/VDF/output_hub/tw_index/VDF_TWIndex_Daily.duckdb::tw_index_daily",
+   "columns_ref": {
+    "path": "functional modules/VDF/VDF_TWEquity_DailyRow_Schema_v0100.json",
+    "key": "indices.columns"
+   },
+   "zh_for_ref": {
+    "date": "日期",
+    "index_code": "指數代碼",
+    "index_name": "指數名稱",
+    "open": "開盤",
+    "low": "最低",
+    "high": "最高",
+    "close": "收盤",
+    "volume": "成交量",
+    "turnover": "成交值",
+    "inst_foreign_net": "外資買賣超",
+    "inst_trust_net": "投信買賣超",
+    "inst_dealer_net": "自營商買賣超"
+   },
+   "engines": [
+    "E-10",
+    "E-09"
+   ],
+   "header_owner": "columns_ref 指標",
+   "keys": [
+    "date",
+    "index_code"
+   ],
+   "required": [
+    "date",
+    "index_code",
+    "close"
+   ],
+   "min_rows": 1,
+   "extra_columns": [
+    "source",
+    "note"
+   ]
+  }
+ ],
+ "states": {
+  "OK": "在清單且符合規則",
+  "CHECK": "在清單但缺驗證(主動 ETF 沒持股 / 市場欄空)",
+  "ABSENT": "讀取口或庫缺(照實記,不假填)"
+ },
+ "engines": [
+  {
+   "id": "E-01",
+   "engine": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v*.py",
+   "verb": "L1 lane_listings",
+   "item": "tw_listings",
+   "wkf": "VDF-WKF010-STP001",
+   "writes": [
+    "vdf_tw_market.duckdb::tw_listings_industry"
+   ],
+   "net": true,
+   "role": "IN-01 正本(上市 + 上櫃清單)"
+  },
+  {
+   "id": "E-02",
+   "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v*.py",
+   "verb": "run",
+   "item": "etf_universe",
+   "wkf": "VDF-WKF006-STP001",
+   "writes": [
+    "ActiveTWETF.duckdb::active_tw_etf_registry",
+    "active_tw_etf_universe"
+   ],
+   "net": true,
+   "role": "IN-02 總清單"
+  },
+  {
+   "id": "E-03",
+   "engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v*.py",
+   "verb": "daily",
+   "item": "etf_holdings_daily",
+   "wkf": "VDF-WKF006-STP002",
+   "writes": [
+    "ActiveTWETF.duckdb::holdings_daily",
+    "holdings_changes"
+   ],
+   "parser": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v*.py",
+   "net": true,
+   "role": "IN-02 驗證(每日台股持股)· OUT-03 · OUT-04"
+  },
+  {
+   "id": "E-04",
+   "engine": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v*.py",
+   "verb": "load_stock_list / load_active_etfs(唯讀)",
+   "item": "vdf_market_lists",
+   "wkf": "VDF-WKF010-STP001",
+   "writes": [],
+   "net": false,
+   "role": "IN-01 · IN-02 唯一讀取口 → OUT-01"
+  },
+  {
+   "id": "E-05",
+   "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v*.py",
+   "verb": "run",
+   "item": "tw_prices_inc",
+   "wkf": "VDF-WKF004-STP001",
+   "writes": [
+    "tw_daily_prices"
+   ],
+   "net": true,
+   "role": "OUT-02 價量"
+  },
+  {
+   "id": "E-06",
+   "engine": "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py",
+   "verb": "run",
+   "item": "tw_chips",
+   "wkf": "VDF-WKF004-STP002",
+   "writes": [
+    "tw_chip_inst",
+    "tw_chip_margin"
+   ],
+   "net": true,
+   "role": "OUT-02 籌碼"
+  },
+  {
+   "id": "E-07",
+   "engine": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v*.py",
+   "verb": "run",
+   "item": "tw_trading_value",
+   "wkf": "VDF-WKF004-STP003",
+   "writes": [
+    "tw_trading_daily"
+   ],
+   "net": true,
+   "role": "OUT-02 成交值"
+  },
+  {
+   "id": "E-08",
+   "engine": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v*.py",
+   "verb": "check",
+   "item": "tw_align",
+   "wkf": "VDF-WKF004-STP004",
+   "writes": [
+    "VIA_Reports/vdf/universe/ALIGN_latest.json"
+   ],
+   "net": false,
+   "role": "OUT-02 價量 × 籌碼 對齊核對"
+  },
+  {
+   "id": "E-09",
+   "engine": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v*.py",
+   "verb": "L2 lane_trading(FMTQIK)",
+   "item": "(ENG055 L2)",
+   "wkf": "",
+   "writes": [
+    "tw_market_agg(date, volume, taiex)"
+   ],
+   "net": true,
+   "role": "IN-03 加權收盤(部分;只有收盤)"
+  },
+  {
+   "id": "E-10",
+   "engine": "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
+   "verb": "run --start YYYY-MM-DD [--end]",
+   "item": "tw_index_official",
+   "wkf": "",
+   "writes": [
+    "functional modules/VDF/output_hub/tw_index/VDF_TWIndex_Daily.duckdb::tw_index_daily"
+   ],
+   "net": true,
+   "role": "IN-03 / OUT-05 正主:加權 + 櫃買官方日資料(解析沿用收容件 b360 fetch_tw_index_official,網路走 SUP_MDL740,TA-Lib 0)",
+   "state": "OK",
+   "candidate": {
+    "path": "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_market.py",
+    "call": "fetch_tw_index_official(spec, ctx)",
+    "endpoints": {
+     "TAIEX": [
+      "twse FMTQIK(價)",
+      "BFI82U(三大法人)",
+      "MI_MARGN(融資券)",
+      "TWTB4U(當沖)"
+     ],
+     "TPEX": [
+      "tpex dmsRpt(價)",
+      "3itrade_hedge_result(三大法人)",
+      "margin_bal_result(融資券)",
+      "intraday_trading_stat_result(當沖)"
+     ]
+    },
+    "ticker_map": {
+     "^TWII": "TAIEX",
+     "^TWO": "TPEX"
+    },
+    "talib": "0(R49 掃整個 b360 夾 0 筆)",
+    "how": "引入件是正本不改;接法 = 出一支新 VDF 引擎讀它的函式、網路改走 SUP_MDL740 網路橋與同意閘、寫 tw_index_daily(欄照 OUT-05);新引擎號由操作員排序後發",
+    "found": "操作員 R49「隔離資料夾有 去檢查去TA-LIB」"
+   }
+  },
+  {
+   "id": "E-11",
+   "engine": "functional modules/VDF/VDF_SystemManager_v*.py",
+   "verb": "universe list / validate",
+   "item": "",
+   "wkf": "",
+   "writes": [
+    "VIA_Reports/vdf/universe/VDF_UNIVERSE_latest.csv"
+   ],
+   "net": false,
+   "role": "OUT-01 產出 + 全部輸出驗證(經 CGC_MDL249)"
+  }
+ ],
+ "loop": {
+  "zh": "順序(照 main 工作流冊 VDF-WKF010 → VDF-WKF006 → VDF-WKF004;每輪同序)",
+  "order": [
+   "E-01",
+   "E-02",
+   "E-03",
+   "E-04",
+   "E-11:list",
+   "E-05",
+   "E-06",
+   "E-07",
+   "E-08",
+   "E-09",
+   "E-10",
+   "E-11:validate"
+  ],
+  "rule": "前一站紅就停後面需要它的站(依 inputs.engines);觸網站要操作員自己開同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT),本冊與管理員不代設"
+ },
+ "validation": {
+  "engine": "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py(check_table)",
+  "common": [
+   "表頭 → DataFrame:欄名照冊、型別照冊轉(str/int/float/date/datetime/bool)",
+   "必填欄在且不空",
+   "型別可轉(轉不過的筆數記紅)",
+   "主鍵不重",
+   "列數 ≥ 最少列",
+   "多出冊上沒有的欄 = 黃(表頭未定案)",
+   "來源不在 = NODATA(照實,不假填)"
+  ],
+  "per_output": {
+   "OUT-01": [
+    "個股代號全合 ^[1-9]\\d{3}$;主動 ETF 全合 ^00\\d{3}A$ 且持股已驗證",
+    "加權家數 ≥ 900 · 櫃買家數 ≥ 700(低於 = AMBER;任一所 0 = RED)",
+    "指數 TAIEX · TPEX 兩列都在",
+    "代號不重"
+   ],
+   "OUT-02": [
+    "(date, ticker) 不重",
+    "ticker 都在 OUT-01 個股",
+    "E-08 對齊 ALIGNED(PARTIAL = 黃 · MISALIGNED = 紅)"
+   ],
+   "OUT-03": [
+    "中央表頭冊 etf_holdings_daily(主鍵 portfolio_date · etf_ticker · holding_ticker)",
+    "etf_ticker 都在 OUT-01 主動 ETF",
+    "weight_pct 每檔每日合計 ≤ 100.5"
+   ],
+   "OUT-04": [
+    "(portfolio_date, etf_ticker, holding_ticker) 不重",
+    "previous_date < portfolio_date"
+   ],
+   "OUT-05": [
+    "(date, index_code) 不重",
+    "index_code ∈ {TAIEX, TPEX}",
+    "官方層才算;yfinance 代理值不得寫入"
+   ]
+  },
+  "dtype_map": {
+   "VARCHAR": "str",
+   "DATE": "date",
+   "TIMESTAMP": "datetime",
+   "DOUBLE": "float",
+   "BIGINT": "int",
+   "INTEGER": "int",
+   "BOOLEAN": "bool"
+  }
+ }
+}
