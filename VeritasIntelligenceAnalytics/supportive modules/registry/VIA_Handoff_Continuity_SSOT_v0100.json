@@ -945,8 +945,8 @@
         "CGC_MDL254_ReviewOnePage",
         "--selftest"
       ],
-      "success_marker": "[唯一頁 v0101] 自測 3/3",
-      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁;v0101:過期判定用未捨入年齡(收尾閘剛寫 GATE_latest 時 ⑥ 必紅的根因)",
+      "success_marker": "[唯一頁 v0102] 自測 7/7",
+      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁;v0101:過期判定用未捨入年齡(收尾閘剛寫 GATE_latest 時 ⑥ 必紅的根因);v0102(VCGC-REQ130):tabs 多分頁 U/I(總覽 · VCGC · VDF · VRN · 治理 · 全部輸出 · 下一步衝突)· 驗證口徑一把尺 · 小字 · 矩陣自動調節",
       "dependencies": [
         "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
         "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
@@ -2271,6 +2271,23 @@
       "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
       "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠",
       "renumbered_from": "VCGC-REQ128:workstation-vdfdb"
+    },
+    {
+      "id": "VCGC-REQ130:tabs-page",
+      "requirement": "VCGC-REQ130",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "操作員令:啟動 VCGC / VDF / VRN、輸出並驗證,用多分頁 HTML U/I 顯示全部輸出與驗證狀態;小字、矩陣自動調節",
+      "next": "收尾實跑 onepage 案(v0102 7/7)轉 VERIFIED",
+      "case": "onepage"
+    },
+    {
+      "id": "VCGC-REQ130:workstation-view",
+      "requirement": "VCGC-REQ130",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "容器頁:235 項輸出 · 已驗證 182 · 失敗 6(容器沒 pwsh · 基底境 38 衝突 · VDF 清單資料到 09-15 · 全景 / 工具盤點各紅 1)· 過期 3;工作站資料才是正本",
+      "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs(預設自動開頁)看 VIA_Reports/review/TABS_latest.html"
     }
   ]
 }

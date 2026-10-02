@@ -79,7 +79,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 21,
-  "COVERED": 106,
+  "COVERED": 107,
   "PARTIAL": 40,
   "MISSING": 1
  },
@@ -4289,6 +4289,29 @@
     "CGC_MDL254_ReviewOnePage_v0101.py"
    ],
    "renumbered_from": "VCGC-REQ128"
+  },
+  {
+   "code": "VCGC-REQ130",
+   "subsystem": "VCGC",
+   "topic": "三系統輸出與驗證狀態 · 多分頁 HTML U/I · 小字 · 矩陣自動調節",
+   "requirement": "操作員令:啟動 VCGC / VDF / VRN 並輸出、驗證輸出;用多分頁 HTML U/I 顯示所有輸出與驗證狀態;小字體;自動調節優化矩陣報告",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "docs/VIA_S20261002_CpuAccel_RealTest_Closeout.md"
+   ],
+   "evidence": "CGC_MDL254 v0102 `tabs`:讀唯一頁 27 源 + 串測逐站 + VDF / VRN 鏈逐站 + 冊外 *_latest.json → TABS_latest.html;驗證口徑一把尺(綠且未過期 = 已驗證 · 黃 = 警示 · 紅 = 失敗 · 缺 = 無資料 · 過期);七分頁 · 11px / 矩陣自動 9–12px · 排序 · 篩選 · 燈號快篩 · 單檔零外連;自測 7/7;Chromium 實測 1400 / 390 寬:零 JS 錯 · 頁身不橫捲 · 快篩 53 → 8 列。容器實跑:VCGC 串測 135 站綠 122 · 黃 13 · 紅 0(418s 並行 4)· VDF 鏈綠 8 · NODATA 2 · VRN 鏈綠 45 · NODATA 3 · ABSENT 3;頁上 235 項 · 已驗證 182 · 失敗 6 · 過期 3",
+   "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs 看工作站正本資料",
+   "hand": "AI(已交)· 操作員(工作站看頁)",
+   "quotes": [
+    {
+     "text": "ACTIVATE VCGC VDF VRN AND OUTPUT AND VERIFY OUTPUT AND USE A HTML U/I MULTIPLE TAB U/I TO DISPLAY THE OUTPUT AND VERIFIED STATUS OF ALLOUTPUT. 小字體  自動調節優化矩陣報告.",
+     "recorded_at": "2026-10-02T19:36:36+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL254_ReviewOnePage_v0102.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -4441,6 +4464,6 @@
  "why_v0148": "VCGC-REQ124 RECORDED→PARTIAL(VCGC v0188 治理沿用 · PS 模板呈現件 UI v0100 · 掃橋器 v0109;附實測)· +VCGC-REQ125(RECORDED:串聯短令流程改 PY 流程器 + 加速器;附量測與提案);其餘一字不動",
  "why_v0149": "VCGC-REQ124 補 v0189 實測(改檔後 run 36s→6s);+VCGC-REQ126(RECORDED:聚焦 VCGC/VDF/VRN 成功啟動與結果驗證);其餘一字不動",
  "why_v0150": "+VCGC-REQ127(PARTIAL:每日進度交接十點引擎 CGC_MDL140 v0104 `handoff daily`;容器實測過,工作站每日實跑待做);其餘一字不動(只增)",
- "why_v0151": "PR #434 合併 main:main 的 v0150 = PR #435(+VCGC-REQ127 每日交接),側線也出了 v0150(同號異義)→ main 的 v0150 一字不動;側線內容改登本版:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據 · 近兩週最佳對齊記錄;側線 VCGC-REQ127(LAYOUT · NLP 經鎖冊導入 PRADDLE)→ 改編 VCGC-REQ128;側線 VCGC-REQ128(CPU 最大加速 · 三系統實測 · 工具使用記錄)→ 改編 VCGC-REQ129(各帶 renumbered_from;不同來源不得因值相同合併編號)",
+ "why_v0151": "PR #434 合併 main:main 的 v0150 = PR #435(+VCGC-REQ127 每日交接),側線也出了 v0150(同號異義)→ main 的 v0150 一字不動;側線內容改登本版:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據 · 近兩週最佳對齊記錄;側線 VCGC-REQ127(LAYOUT · NLP 經鎖冊導入 PRADDLE)→ 改編 VCGC-REQ128;側線 VCGC-REQ128(CPU 最大加速 · 三系統實測 · 工具使用記錄)→ 改編 VCGC-REQ129(各帶 renumbered_from;不同來源不得因值相同合併編號);同批 +VCGC-REQ130(COVERED:三系統輸出與驗證多分頁 U/I)",
  "why_v0150_branch": "v0149 已由 PR #433 併入 main(註冊完整性 IMMUT:不得就地改)→ 本批改以新版號發布:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據與原話 · VCGC-REQ126 補近兩週最佳對齊記錄;+VCGC-REQ127(COVERED:LAYOUT · NLP 經鎖冊導入 PRADDLE);v0149 回復 main 原樣、其餘一字不動;同批 +VCGC-REQ128(PARTIAL:CPU 最大加速 · 三系統實測 · 工具使用記錄;四項待辦附下一步)"
 }
