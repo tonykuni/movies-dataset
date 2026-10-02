@@ -935,6 +935,20 @@
         "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "onepage": {
+      "argv": [
+        "CGC_MDL254_ReviewOnePage",
+        "--selftest"
+      ],
+      "success_marker": "[唯一頁 v0100] 自測 9/9",
+      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
+        "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -1942,6 +1956,47 @@
       "owner": "AI(下一段)",
       "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;VCGC 總控入口 依序接著做",
       "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ122:onepage",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "case": "onepage",
+      "owner": "VCGC closeout",
+      "reason": "唯一頁新引擎落地",
+      "next": "via-vcgc closeout --apply --push(③ test onepage 過即轉 VERIFIED)"
+    },
+    {
+      "id": "VCGC-REQ122:workstation",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "via-review v0106 要真 PowerShell 才走得到 ⑧ 唯一頁;容器只驗 Python 端與 CI build",
+      "next": "git pull → via-review → 看 ONEPAGE_latest.html → 回貼 ONEPAGE_latest.md 後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ122:panorama-label",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "全景工作流冊圖把「引擎欄是說明文字」與「需求 MISSING」都算成「引擎不在」(唯一頁 C1 已照實拆三類);全景本身的標籤待出新尾版修",
+      "next": "VIA_Panorama 新尾版:engine_missing 只算真的找不到檔;說明文字列外部工具;需求 MISSING 另列"
+    },
+    {
+      "id": "VCGC-REQ122:workstation-sync",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "工作站 HEAD 6c065e900 領先 10 / 落後 66 · stash 29:全景 E 段本機缺 7 紅 + 本機落後 13 黃 + 交接閘未登 Invoke-VIA-Review 都是同一根因;main 的 Register v0266 已改回與 OneClick 一字不差(操作員 L70 許可),拉取不會在該檔撞",
+      "next": "工作站:via-medic sync --apply(只快轉不了才合併;零 force · 帳本只增聯集;stash 不動)→ git push → via-review"
+    },
+    {
+      "id": "VCGC-REQ123:plan",
+      "requirement": "VCGC-REQ123",
+      "state": "PENDING",
+      "owner": "AI(下一段)→ 操作員(同意閘)",
+      "reason": "環境安裝要網路同意閘,AI 永不代設;先唯讀查現況避免重工",
+      "next": "REQ122 收尾後開工:唯讀檢查 → 編號指令卡 → 操作員工作站開閘照驗證後計畫安裝"
     }
   ]
 }

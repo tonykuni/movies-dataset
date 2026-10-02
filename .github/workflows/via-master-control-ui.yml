@@ -380,6 +380,24 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           exit 0
 
+      - name: Build the single review page through VCGC
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_NO_OPEN = "1"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $registry = Join-Path $via "supportive modules\registry"
+          $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          if (-not (Get-ChildItem $registry -Filter "CGC_MDL254_ReviewOnePage_v*.py" -File)) { Write-Host "absent CGC_MDL254_ReviewOnePage"; exit 0 }
+          $out = & python $vcgc run CGC_MDL254_ReviewOnePage build --no-open 2>&1 | Out-String
+          $rc = $LASTEXITCODE
+          Write-Host $out
+          $page = Join-Path $via "VIA_Reports\review\ONEPAGE_latest.html"
+          if ($rc -notin 0, 1, 2 -or -not (Test-Path -LiteralPath $page) -or $out -notmatch '\[唯一頁\]') { Write-Host ("FAIL one page rc " + $rc); exit 1 }
+          Write-Host ("OK one page rc " + $rc)
+          exit 0
+
       - name: VCGC live checks with PowerShell 7
         if: ${{ !cancelled() }}
         shell: pwsh

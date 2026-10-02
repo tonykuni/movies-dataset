@@ -1,0 +1,510 @@
+{
+ "schema": "VIA.ReviewOnePage.Sources.v1",
+ "version": "v0100",
+ "batch": "側線 2026-10-02 檢視整合為一頁(VCGC-REQ122)",
+ "ts": "2026-10-02T14:50:00+00:00",
+ "append_only": true,
+ "why": "操作員令「檢視指令太多頁有重複有衝突應該整合為一頁 各細節不漏 統一」。本冊是唯一頁(via-review → CGC_MDL254)讀哪些來源的正本:每個來源只讀它自己的 *_latest.json,不重跑、不改;冊外的 *_latest.json 一律列「未登錄來源」,不漏。",
+ "lamp_map": {
+  "GREEN": [
+   "GREEN",
+   "OK",
+   "PASS",
+   "COVERED",
+   "READY",
+   "READY_FOR_25",
+   "LOCKED",
+   "VERIFIED"
+  ],
+  "YELLOW": [
+   "YELLOW",
+   "AMBER",
+   "WARN",
+   "WARNING",
+   "PARTIAL",
+   "REVIEW",
+   "HOLD",
+   "FINDING",
+   "GATE"
+  ],
+  "RED": [
+   "RED",
+   "FAIL",
+   "FAILED",
+   "ERROR",
+   "BLOCKED",
+   "DENY",
+   "TIMEOUT"
+  ],
+  "NODATA": [
+   "NODATA",
+   "ABSENT",
+   "MISSING",
+   "NOT_RUN",
+   "SKIP",
+   "UNKNOWN",
+   "REGISTERED_ONLY"
+  ],
+  "INFO": [
+   "PLAN",
+   "INFO",
+   "EXEMPT",
+   "NA",
+   "RECORDED"
+  ]
+ },
+ "stale_hours_default": 48,
+ "sources": [
+  {
+   "id": "S01",
+   "title": "全綠閘",
+   "area": "VCGC",
+   "path": "VIA_Reports/gate/GATE_latest.json",
+   "owner": "CGC_MDL149 gate",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [
+    "remedy"
+   ],
+   "rerun": "via-vcgc gate"
+  },
+  {
+   "id": "S02",
+   "title": "交接(可接續)",
+   "area": "交接",
+   "path": "docs/handoff/HANDOFF_latest.json",
+   "owner": "CGC_MDL140 handoff check",
+   "lamp": [
+    "lamp"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-vcgc handoff check",
+   "extra_lamp": {
+    "驗收 closeout": "closeout_lamp"
+   }
+  },
+  {
+   "id": "S03",
+   "title": "交接閘(AI STATE)",
+   "area": "交接",
+   "path": "VIA_Reports/panorama/state_gate_latest.json",
+   "owner": "VIA_Panorama state",
+   "lamp": [
+    "lamp"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [
+    "next"
+   ],
+   "rerun": "via-vcgc run VIA_Panorama state"
+  },
+  {
+   "id": "S04",
+   "title": "收尾(closeout)",
+   "area": "VCGC",
+   "path": "VIA_Reports/closeout/CLOSEOUT_latest.json",
+   "owner": "CGC_MDL149 closeout",
+   "lamp": [
+    "rc"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-vcgc closeout --apply --push"
+  },
+  {
+   "id": "S05",
+   "title": "全功能串測",
+   "area": "VCGC",
+   "path": "VIA_Reports/vcgc/TEST_latest.json",
+   "owner": "CGC_MDL224 test",
+   "lamp": [
+    "lamp"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-vcgc test"
+  },
+  {
+   "id": "S06",
+   "title": "SDD 結構檢",
+   "area": "SSOT",
+   "path": "VIA_Reports/sdd/SDD_CHECK_latest.json",
+   "owner": "CGC_MDL245 check",
+   "lamp": [
+    "lamp"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc sdd check"
+  },
+  {
+   "id": "S07",
+   "title": "SDD 實測",
+   "area": "SSOT",
+   "path": "VIA_Reports/sdd/SDD_REAL_latest.json",
+   "owner": "CGC_MDL245 real",
+   "lamp": [],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc sdd real"
+  },
+  {
+   "id": "S08",
+   "title": "SDD 自測輪",
+   "area": "SSOT",
+   "path": "VIA_Reports/sdd/SDD_SELF_latest.json",
+   "owner": "CGC_MDL245 selftests",
+   "lamp": [],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc sdd selftests"
+  },
+  {
+   "id": "S09",
+   "title": "SSOT 全景(六族 × 四層)",
+   "area": "SSOT",
+   "path": "VIA_Reports/ssot_panorama/SSOT_PANORAMA_latest.json",
+   "owner": "CGC_MDL247 ssot panorama",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc ssot panorama"
+  },
+  {
+   "id": "S10",
+   "title": "全景監控(檔案 · 標記 · 漂移)",
+   "area": "全景",
+   "path": "VIA_Reports/panorama/panorama_latest.json",
+   "owner": "VIA_Panorama scan",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-vcgc run VIA_Panorama scan"
+  },
+  {
+   "id": "S11",
+   "title": "AUTO SYNC(VCGC ↔ 子系統)",
+   "area": "全景",
+   "path": "VIA_Reports/panorama/autosync_latest.json",
+   "owner": "VIA_Panorama sync",
+   "lamp": [
+    "lamp"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc run VIA_Panorama sync"
+  },
+  {
+   "id": "S12",
+   "title": "執行監控(寫入動作)",
+   "area": "VCGC",
+   "path": "VIA_Reports/vcgc/exec/EXEC_latest.json",
+   "owner": "CGC_MDL149 exec",
+   "lamp": [],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-vcgc exec"
+  },
+  {
+   "id": "S13",
+   "title": "工具盤點(L103 三導入)",
+   "area": "工具",
+   "path": "VIA_Reports/tooling/TOOLING_latest.json",
+   "owner": "CGC_MDL253 scan",
+   "lamp": [
+    "summary.verdict"
+   ],
+   "time": [
+    "at"
+   ],
+   "next": [],
+   "rerun": "via-tools"
+  },
+  {
+   "id": "S14",
+   "title": "環境管理(ENV MANAGER)",
+   "area": "環境",
+   "path": "VIA_Reports/env_manager/ENVMGR_latest.json",
+   "owner": "CGC_MDL240 check",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc run CGC_MDL240_EnvManager check"
+  },
+  {
+   "id": "S15",
+   "title": "環境治理實跑",
+   "area": "環境",
+   "path": "VIA_Reports/env_governance/RUN_latest.json",
+   "owner": "CGC_MDL135 run",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-envgov"
+  },
+  {
+   "id": "S16",
+   "title": "環境最佳還原點(LKGC)",
+   "area": "環境",
+   "path": "VIA_Reports/env_governance/LKGC_latest.json",
+   "owner": "CGC_MDL135 lkgc",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-envgov"
+  },
+  {
+   "id": "S17",
+   "title": "能跑閘(VDF / VRN / VAP 境)",
+   "area": "環境",
+   "path": "VIA_Reports/rungate/RUNGATE_latest.json",
+   "owner": "via-rungate",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [
+    "next"
+   ],
+   "rerun": "via-rungate"
+  },
+  {
+   "id": "S18",
+   "title": "加速器控管",
+   "area": "工具",
+   "path": "VIA_Reports/accelerator/VIA_ACCELERATOR_CONTROL_latest.json",
+   "owner": "CGC_MDL156",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "timestamp"
+   ],
+   "next": [],
+   "rerun": "via-accel"
+  },
+  {
+   "id": "S19",
+   "title": "工具覆蓋矩陣",
+   "area": "工具",
+   "path": "VIA_Reports/toolprobe/COVERAGE_MATRIX_latest.json",
+   "owner": "CGC_MDL230 matrix",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts_utc"
+   ],
+   "next": [],
+   "rerun": "via-vcgc run CGC_MDL230_ToolCoverageProbe matrix --no-open"
+  },
+  {
+   "id": "S20",
+   "title": "工具探針",
+   "area": "工具",
+   "path": "VIA_Reports/toolprobe/TOOLPROBE_latest.json",
+   "owner": "CGC_MDL230 probe",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts_utc",
+    "ts"
+   ],
+   "next": [
+    "todo"
+   ],
+   "rerun": "via-vcgc run CGC_MDL230_ToolCoverageProbe"
+  },
+  {
+   "id": "S21",
+   "title": "功能級整合驗收",
+   "area": "VCGC",
+   "path": "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.json",
+   "owner": "CGC_MDL154",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [
+    "next_actions"
+   ],
+   "rerun": "via-functional-acceptance"
+  },
+  {
+   "id": "S22",
+   "title": "資料中介(VDF ↔ VRN)",
+   "area": "VDF",
+   "path": "VIA_Reports/data_broker/BROKER_latest.json",
+   "owner": "資料中介",
+   "lamp": [
+    "state"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-vcgc run CGC_MDL239_DataBroker status"
+  },
+  {
+   "id": "S23",
+   "title": "VDF 市場清單",
+   "area": "VDF",
+   "path": "VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json",
+   "owner": "VDF 清單",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-market-lists"
+  },
+  {
+   "id": "S24",
+   "title": "QuantGuard(TA-Lib 唯一替代)",
+   "area": "VDF",
+   "path": "VIA_Reports/vdf/quantguard/QUANTGUARD_latest.json",
+   "owner": "VDF_ENG086",
+   "lamp": [
+    "state"
+   ],
+   "time": [],
+   "next": [],
+   "rerun": "via-quantguard"
+  },
+  {
+   "id": "S25",
+   "title": "VRN NLP 管線",
+   "area": "VRN",
+   "path": "VIA_Reports/vrn/nlp_pipeline/NLP_VRN_VDF_latest.json",
+   "owner": "VRN NLP",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [],
+   "next": [],
+   "rerun": "via-nlpvrn"
+  },
+  {
+   "id": "S26",
+   "title": "統一 NLP",
+   "area": "VRN",
+   "path": "VIA_Reports/nlp_unified/VIA_UNIFIED_NLP_latest.json",
+   "owner": "SUP_MDL866",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "generated_at"
+   ],
+   "next": [],
+   "rerun": "via-nlpunified"
+  },
+  {
+   "id": "S27",
+   "title": "SSOT 自動編碼",
+   "area": "SSOT",
+   "path": "VIA_Reports/ssot_autocode/VIA_SSOT_AUTOCODE_latest.json",
+   "owner": "SSOT autocode",
+   "lamp": [
+    "verdict"
+   ],
+   "time": [
+    "ts"
+   ],
+   "next": [],
+   "rerun": "via-ssot"
+  }
+ ],
+ "conflict_rules": [
+  {
+   "id": "C1",
+   "topic": "工作流引擎在不在",
+   "a": "全景工作流冊圖(VIA_Panorama workflow_graph:engine_missing)",
+   "b": "SDD X-ENGINE",
+   "owner": "SDD X-ENGINE(逐步解析正主尾版)",
+   "rule": "全景把「引擎欄是說明文字」與「工作流掛的需求 MISSING」也算成引擎不在;唯一頁拆成三類照實列"
+  },
+  {
+   "id": "C2",
+   "topic": "交接燈",
+   "a": "交接閘 state_gate",
+   "b": "交接快照 HANDOFF_latest",
+   "owner": "交接快照(CGC_MDL140)",
+   "rule": "交接閘比快照舊 = 交接閘要重算;兩者燈不同照列"
+  },
+  {
+   "id": "C3",
+   "topic": "全功能串測燈",
+   "a": "全綠閘探針「全功能串測」",
+   "b": "TEST_latest",
+   "owner": "TEST_latest(CGC_MDL224)",
+   "rule": "閘引用的串測比 TEST_latest 舊或燈不同照列"
+  },
+  {
+   "id": "C4",
+   "topic": "需求條數",
+   "a": "需求冊尾版條數",
+   "b": "SDD 結構檢需求數 · 交接閘需求冊名",
+   "owner": "需求冊尾版",
+   "rule": "三處條數 / 冊名不一 = 有一方是舊的"
+  },
+  {
+   "id": "C5",
+   "topic": "結果是哪個提交量的",
+   "a": "各來源記的 head",
+   "b": "目前 HEAD",
+   "owner": "目前 HEAD",
+   "rule": "來源 head 不是目前 HEAD = 舊提交的結果(不冒充現況)"
+  }
+ ]
+}
