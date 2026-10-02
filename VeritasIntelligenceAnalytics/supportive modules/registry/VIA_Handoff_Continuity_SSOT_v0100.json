@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T22:16:49+00:00",
+  "updated_at": "2026-10-02T10:15:42+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -878,6 +878,22 @@
         "supportive modules/registry/VIA_TickerRegex_Scope_SSOT_v*.json"
       ],
       "timeout_seconds": 900
+    },
+    "vrn_header_frame": {
+      "argv": [
+        "VRN_ENG115_HeaderFrameTemp",
+        "--selftest"
+      ],
+      "success_marker": "[計] 7 檢 OK · FAIL 0",
+      "scope": "PR #419 VRN 首頁:HEADER → DataFrame(先落 TEMP parquet,超過 mem_rows 只回預覽,全量留磁碟與 DuckDB)· 文左表右 · ENG392 R0–R3 修復(掉覆蓋整輪退回)· ENG082 字袋 / 序列互核 · 完整才一標題四點;v0100 12 檢 + v0101 7 檢",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v*.py",
+        "functional modules/VRN/VRN_FrameFlow_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+        "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
+        "functional modules/VRN/VRN_ENG107_TextRestore_v*.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -1775,6 +1791,20 @@
       "state": "VERIFIED",
       "case": "ticker_regex_scope",
       "receipt": "docs/handoff/evidence/ticker_regex_scope.json"
+    },
+    {
+      "id": "VRN-REQ009:vrn_header_frame",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_header_frame",
+      "receipt": "docs/handoff/evidence/vrn_header_frame.json"
+    },
+    {
+      "id": "VRN-REQ008:vrn_header_frame",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_header_frame",
+      "receipt": "docs/handoff/evidence/vrn_header_frame.json"
     }
   ]
 }
