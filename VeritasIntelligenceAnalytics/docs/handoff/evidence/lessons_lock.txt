@@ -30,20 +30,26 @@
 [政策] L50 全景 · 尾版 568 · import 0 · 提及 60 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL254_ReviewOnePage_v0101.py(家族 core)
-  [OK] ① 燈號口徑統一:AMBER→黃 · OK→綠 · ABSENT→無資料 · PLAN→資訊 · rc 0/2/1
-  [OK] ② 時間格式都讀得懂(ISO · 空白 · 帶時區 · 20261001_222547)
-  [OK] ③ 非綠逐條收(綠的不收) · [{'lamp': 'RED', 'raw': 'RED', 'text': 'X1:壞了'}, {'lamp': 'YELLOW', 'raw': 'AMBER', 'text': 'p:注意'}]
-  [OK] ④ 來源冊:代碼唯一 · 路徑唯一 · 每條有正主
-  [OK] ⑤ 真樹一頁:每個來源都有一列 · 總判在五態內 · 下一步去重 · RED
-  [OK] ⑥ 過期判定:超過時限的結果標過期(不冒充現況) · (True, 'GREEN')
-  [OK] ⑦ 冊外 *_latest.json 列未登錄(不漏)
-  [OK] ⑨ 總檢本輪併進同一頁:步驟欄名統一(No/Step/Lamp → step/name/lamp)· 原多頁每一頁都成可點開的段 · 閘關 GATE = 黃
-  [OK] ⑧ 加速器橋 · 網路橋在;只收 VCGC;不碰 TA-Lib
-[唯一頁 v0100] 自測 9/9
-  [OK] ⑩ 前版 v0100 自測全過(⑥ 改走本版 read_source)
-  [OK] ⑪ 剛寫的檔(年齡 0)不過期;2 分鐘前的結果在 0.01 小時(36 秒)時限下判過期 —— 前版捨成 0.0 判不出 · (False, True, 0.0)
-  [OK] ⑫ 加速器橋 · 網路橋在;只收 VCGC(照前版 main);不碰 TA-Lib;頁面顯示的 age_h 仍照前版捨入
-[唯一頁 v0101] 自測 3/3
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL058_Lessons_v0103.py(冊上 CGC_MD | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL058_Lessons_v0103.py', 'CGC_MDL224_TestAuto | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):1 個,例 ['VCGC-REQ128'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 14, 'changed': 23, 'stale': 0, 'expected': 15033, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · CGC_MDL058_Lessons_v0103.py(家族 core)
+  [OK] 簽名把時間 · 路徑 · 數字拿掉:同一個坑同一張單 · run · rc=1 · FileNotFoundError: <path> at <ts> line <n>
+  [OK] 第一次 = 新簽名;第二次 = 重複出錯(帶 repeat_of、count 2)
+  [OK] 只增:三筆都在,原帳目不改
+  [OK] 重複出錯榜
+=== 教訓帳本引擎自測 10 檢(v0101)(零網路零改動;合成存證)===
+  [OK  ] 收割三態
+  [OK  ] 冪等零重複
+  [OK  ] 單境基線+指紋去重
+  [OK  ] 艦隊達陣判定
+  [OK  ] 規則命中三式
+  [OK  ] 矩陣行
+  [OK  ] 基線行+艦隊
+  [OK  ] 預載規則完備
+  [OK  ] 規則不重號
+  [OK  ] 缺目錄誠實
+  [計] 10/10 綠
+  [OK] ① 前版 v0102 自測過(簽名 · 重複出錯 · 只增)
+  [OK] ② 檔不在 = 新帳;檔在但半截 = 丟例外、不寫(前版會當空帳 → 蓋掉整本)
+  [OK] ③ 原子寫入:暫存檔換上,不留 .tmp
+  [OK] ④ 並行:6 個行程各記 5 筆同時寫同一本帳 → 30 筆一筆不少 · 編號不重 · 30 筆 · 重號 0 · []
+  [OK] ⑤ 加速器橋 · 網路橋在;鎖檔在系統暫存夾(倉內不多檔);不碰 TA-Lib
+  [計] CGC_MDL058 v0103 5/5 · PASS
