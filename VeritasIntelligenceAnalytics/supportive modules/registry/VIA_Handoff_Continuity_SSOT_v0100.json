@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T17:14:38+00:00",
+  "updated_at": "2026-10-02T18:22:19+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -972,6 +972,18 @@
       "scope": "VRN 擷取重型 OCR 車道:paddle 推論核心不在不開 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE 讓 ENG072 標壞跳過(完整自測含全庫抽樣封頂,留給 VRN 鏈)",
       "dependencies": [
         "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "daily_handover": {
+      "argv": [
+        "CGC_MDL140_HandoverConsole",
+        "--selftest-tail"
+      ],
+      "success_marker": "每日交接十點 · PASS",
+      "scope": "每日進度交接十點引擎(v0104 `handoff daily`):① git SHA-16 ② 事件帳次數 / 成功率 / 壞行紅 ③ 資料指紋 SHA-256 ④ 版號矩陣(就地改黃 · 改號黃 · 刪紅)⑤ Schema 漂移 ⑥ 串測燈與過期 ⑦ 例外佇列 ⑧ 暫存只量只印清理指令 ⑨ T+1 ⑩ 清單契約(缺 SHA / 多欄 / 被改都攔)· 自身雜湊 · 只增帳 · sqlite 觸發器只增可重播;零網路 · 選用庫全探針 · 只收 VCGC",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2079,6 +2091,23 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
+    },
+    {
+      "id": "VCGC-REQ127:daily-engine",
+      "requirement": "VCGC-REQ127",
+      "state": "PENDING",
+      "owner": "AI(容器實測)",
+      "reason": "操作員令十點每日交接 + 十個本地函式庫併成一支;CGC_MDL140 v0104 新增 `handoff daily`(L30 交接正主加動詞,不另起引擎)",
+      "next": "收尾跑 handoff test daily_handover(--selftest-tail 23 項)→ 收據轉 VERIFIED",
+      "case": "daily_handover"
+    },
+    {
+      "id": "VCGC-REQ127:daily-workstation",
+      "requirement": "VCGC-REQ127",
+      "state": "PENDING",
+      "owner": "操作員(工作站每日收工)",
+      "reason": "容器沒有工作站資料夾也沒有 pwsh:③ 資料指紋 NODATA、⑥ 串測 P-entry 黃都是容器限制;工作站真實十點還沒跑過",
+      "next": "工作站同步 main 後每日收工跑 via-vcgc handoff daily --data <當日輸出夾>(或把夾寫進 docs/handoff/daily/handover.toml 的 data_dirs);貼回 [每日交接] 那行與判決行,提交 docs/handoff/daily 的清單與只增帳"
     }
   ]
 }
