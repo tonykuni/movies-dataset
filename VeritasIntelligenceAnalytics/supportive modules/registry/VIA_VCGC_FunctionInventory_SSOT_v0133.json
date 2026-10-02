@@ -1,9 +1,9 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
- "version": "v0132",
+ "version": "v0133",
  "batch": "側線 2026-10-02 d",
- "ts": "2026-10-02T18:22:19+00:00",
- "prior": "VIA_VCGC_FunctionInventory_SSOT_v0131.json",
+ "ts": "2026-10-02T19:11:31+00:00",
+ "prior": "VIA_VCGC_FunctionInventory_SSOT_v0132.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
@@ -340,7 +340,11 @@
    "argv": [
     "systems"
    ],
-   "timeout": 300
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ],
+   "note": "系統卡 rc 2 = STALE/NODATA(缺料 / 冊樹不同步,照實黃);rc 1 = RED 才是壞(2026-10-02 VCGC-REQ128)"
   },
   {
    "id": "V-dbm",
@@ -1658,6 +1662,80 @@
    "deps": [
     "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py"
    ]
+  },
+  {
+   "id": "C-praddle",
+   "name": "交接案 praddle(VRN_ENG398_PraddleExtractor --selftest;PRADDLE 擷取編排)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG398_PraddleExtractor",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+    "supportive modules/registry/via_ocr_super_v*.py"
+   ]
+  },
+  {
+   "id": "C-ocr_super_boxes",
+   "name": "交接案 ocr_super_boxes(via_ocr_super --selftest-tail;隔離境車道回座標)",
+   "argv": [
+    "run",
+    "via_ocr_super",
+    "--selftest-tail"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/via_ocr_super_v*.py"
+   ]
+  },
+  {
+   "id": "C-layout_praddle",
+   "name": "交接案 layout_praddle(SUP_MDL743_GenericLayoutHub --selftest;LAYOUT 從鎖冊取 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL743_GenericLayoutHub",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
+  },
+  {
+   "id": "C-nlp_praddle",
+   "name": "交接案 nlp_praddle(SUP_MDL866_VIAUnifiedNLPOrchestrator --selftest;NLP pdf 動詞經鎖冊 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
+  },
+  {
+   "id": "C-lessons_lock",
+   "name": "交接案 lessons_lock(CGC_MDL058_Lessons --selftest;教訓帳跨行程鎖)",
+   "argv": [
+    "run",
+    "CGC_MDL058_Lessons",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+   ]
   }
  ],
  "coverage": {
@@ -2042,6 +2120,21 @@
    },
    "daily_handover": {
     "station": "C-daily_handover"
+   },
+   "praddle": {
+    "station": "C-praddle"
+   },
+   "ocr_super_boxes": {
+    "station": "C-ocr_super_boxes"
+   },
+   "layout_praddle": {
+    "station": "C-layout_praddle"
+   },
+   "nlp_praddle": {
+    "station": "C-nlp_praddle"
+   },
+   "lessons_lock": {
+    "station": "C-lessons_lock"
    }
   },
   "workflow": {
@@ -2247,5 +2340,6 @@
  "why_v0129": "側線 2026-10-02(VCGC-REQ122):交接新案 onepage → 新站 C-onepage;其餘一字不動(只增)",
  "why_v0130": "側線 2026-10-02 b(VCGC-REQ124):交接新案 sweeper → 新站 C-sweeper(站冊 + 交接案對應);其餘一字不動(只增)",
  "why_v0131": "側線 2026-10-02 c(VCGC-REQ126):交接新案 ppp_hub → 新站 C-ppp_hub(站冊 + 交接案對應);其餘一字不動(只增)",
- "why_v0132": "側線 2026-10-02 d(VCGC-REQ127):交接新案 daily_handover → 新站 C-daily_handover(CGC_MDL140 v0104 --selftest-tail;每日進度交接十點)+ coverage.case;其餘一字不動(只增)"
+ "why_v0132": "側線 2026-10-02 d(VCGC-REQ127):交接新案 daily_handover → 新站 C-daily_handover(CGC_MDL140 v0104 --selftest-tail;每日進度交接十點)+ coverage.case;其餘一字不動(只增)",
+ "why_v0133": "PR #434 合併 main:main 的 v0132 = PR #435(每日交接站),側線也出了 v0132(同號異義)→ main 的 v0132 一字不動;側線站改登本版:+C-praddle · C-ocr_super_boxes · C-layout_praddle · C-nlp_praddle · C-lessons_lock(站冊 + 交接案對應);V-systems 加 yellow_rc [2](系統卡 rc 2 = STALE/NODATA 依設計是黃)"
 }

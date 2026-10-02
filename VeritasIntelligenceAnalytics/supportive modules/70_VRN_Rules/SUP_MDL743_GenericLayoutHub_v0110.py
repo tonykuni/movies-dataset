@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Layout tail v0110: LAYOUT 導入 PRADDLE 工具(從工具鎖冊取,經 VCGC 才跑)。
 
-操作員 2026-10-02(VCGC-REQ127):「將 LAYOUT NPL 都有導入工具」。
+操作員 2026-10-02(VCGC-REQ128;原側線編 REQ127,與 main 每日交接同號 → 改編):「將 LAYOUT NPL 都有導入工具」。
 PRADDLE(VRN_ENG398;RapidOCR → PaddleOCR 雙引擎,各在隔離境子行程)由 CGC_MDL233 v0106 啟用進鎖冊 `praddle`。
 本版只加三件,其餘(修復鏈 STAGES · def_repair_document · def_run_batch · 換行鎖 · pdfminer 降噪)照 v0109:
   · praddle_pinned():只認鎖冊那一支(檔在 · sha256 對得上,CRLF 正規化也算);沒啟用 / 檔不在 / 被改過 照實回因由,

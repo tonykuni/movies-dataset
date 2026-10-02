@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """SUP_MDL866 NLP tail v0106: NLP 導入 PRADDLE 工具(從工具鎖冊取,經 VCGC 才跑)。
 
-操作員 2026-10-02(VCGC-REQ127):「將 LAYOUT NPL 都有導入工具」。
+操作員 2026-10-02(VCGC-REQ128;原側線編 REQ127,與 main 每日交接同號 → 改編):「將 LAYOUT NPL 都有導入工具」。
 PRADDLE(VRN_ENG398)由 CGC_MDL233 v0106 啟用進鎖冊 `praddle`。本版只加一個動詞,其餘(status · text · pipeline · --brief)照 v0105:
   · `pdf --file <x.pdf> [--ocr auto|off|force] [--points N] [--compact] [--brief]`:
     PDF → 鎖冊那一支 PRADDLE(數位頁原生 + LAYOUT 修復鏈;掃描 / 編碼壞頁才走隔離境 RapidOCR → 不足才 PaddleOCR)

@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
- "version": "v0150",
- "batch": "側線 2026-10-02 d VCGC-REQ127 每日進度交接十點引擎",
- "ts": "2026-10-02T18:22:19+00:00",
+ "version": "v0151",
+ "batch": "合併 main(PR #435)後側線 PRADDLE · LAYOUT/NLP 導入 · CPU 並行改登本版",
+ "ts": "2026-10-02T19:11:16+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -79,8 +79,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 21,
-  "COVERED": 105,
-  "PARTIAL": 39,
+  "COVERED": 106,
+  "PARTIAL": 40,
   "MISSING": 1
  },
  "requirements": [
@@ -2506,7 +2506,7 @@
     "VRN-WKF002",
     "VRN-WKF003"
    ],
-   "evidence": "已有:VRN_MDL001_Converter v0121 DPI 300–350 自動帶(批448;向量頁不渲染、單頁像素上限 4000 萬),但它一律照帶渲染,不是失敗才升;引進件 GenericLayoutEngine v2.1.0 b245 的 multi_engine_policy 有 light_to_heavy_fallback(pdfplumber 為主、依條件升級)。缺:正式鏈上沒有「先分類 → 初階單一工具 → 驗證不過才升一級 / 才重渲 · 每頁升級次數與總時間上限 · 引擎間交叉比對」的路由正主。",
+   "evidence": "已有:VRN_MDL001_Converter v0121 DPI 300–350 自動帶(批448;向量頁不渲染、單頁像素上限 4000 萬),但它一律照帶渲染,不是失敗才升;引進件 GenericLayoutEngine v2.1.0 b245 的 multi_engine_policy 有 light_to_heavy_fallback(pdfplumber 為主、依條件升級)。缺:正式鏈上沒有「先分類 → 初階單一工具 → 驗證不過才升一級 / 才重渲 · 每頁升級次數與總時間上限 · 引擎間交叉比對」的路由正主。;2026-10-02:擷取分層升級落地為 VRN_ENG398 PRADDLE 編排(原生 → RapidOCR → PaddleOCR,無法才用重型;重型在隔離境)+ SUP_MDL746 v0102(paddle 推論核心不在不開重型 · 只建一次 · 建失敗 UNAVAILABLE)",
    "quotes": [
     {
      "ts": "2026-09-29T11:53:40.207Z",
@@ -2515,7 +2515,11 @@
    ],
    "next": "出 VRN 擷取路由正主(先分類 → 初階 → 驗證不過才升級 / 重渲;上限寫進參數冊;輸出 DataFrame 欄位照 SSOT),接 VRN-WKF002 L1 擷取",
    "hand": "AI 下一批(升級上限的數字由操作員定)",
-   "s0929h": "側線 2026-09-29 h 新增"
+   "s0929h": "側線 2026-09-29 h 新增",
+   "modules": [
+    "VRN_ENG398_PraddleExtractor_v0100.py",
+    "SUP_MDL746_PDFPlumberPlusHub_v0102.py"
+   ]
   },
   {
    "code": "VCGC-REQ075",
@@ -4157,7 +4161,7 @@
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料);VRN 根因(全景 + 讀碼):SUP_MDL746 v0101 ocr_ready() 只看 paddleocr import 得到、不看推論核心 paddle → 工作站被報可跑;ocr_page() 每次 new 抽取器 → 失敗不記、每件掃描頁重建;自測 ⑥ 全庫 triage → 180s 逾時。SUP_MDL746 v0102:核心不在不開重型車道 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE(ENG072 標壞跳過)· 自測抽樣封頂 40 件 · 無掃描檔照實 NODATA;容器:薄尾 5/5 · 完整自測 3s(前版 ⑥ NODATA)· ENG072 v0139 自測 55 過 0 紅 22s。操作員提供的 Downloads / 上傳 4 支 / 隔離區經雜湊比對:倉內皆已有,上傳 4 支只多舊 VIA_SUPPORT_BRIDGE(MDL004/005 還少加速器橋)→ 不採用",
+   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料);VRN 根因(全景 + 讀碼):SUP_MDL746 v0101 ocr_ready() 只看 paddleocr import 得到、不看推論核心 paddle → 工作站被報可跑;ocr_page() 每次 new 抽取器 → 失敗不記、每件掃描頁重建;自測 ⑥ 全庫 triage → 180s 逾時。SUP_MDL746 v0102:核心不在不開重型車道 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE(ENG072 標壞跳過)· 自測抽樣封頂 40 件 · 無掃描檔照實 NODATA;容器:薄尾 5/5 · 完整自測 3s(前版 ⑥ NODATA)· ENG072 v0139 自測 55 過 0 紅 22s。操作員提供的 Downloads / 上傳 4 支 / 隔離區經雜湊比對:倉內皆已有,上傳 4 支只多舊 VIA_SUPPORT_BRIDGE(MDL004/005 還少加速器橋)→ 不採用;PRADDLE(操作員「增加引擎」Paddle + Rapid 雙引擎 · LAYOUT/TEXT/TABLE/GRAPH 各五組 · pdfplumber+1 · 10 組合 · 30 大問題;「跟 LAYOUT 引擎相互搭配並修復驗證」;「PRADDLE 工具們高風險要獨立環境」):全景盤點後 10 組多數已有正主 → 新增 VRN_ENG398_PraddleExtractor v0100 只做編排:SUP_MDL746 分流 → 原生 + SUP_MDL743 LAYOUT 修復鏈;掃描頁 → via_ocr_super v0102 隔離境車道(RapidOCR via_rapidocr ≥0.85 就停 · 不足才 PaddleOCR via_paddle_311)→ OCR 行照 GLE 格式進同一條 LAYOUT 修復鏈(表格還原 · 閱讀順序 · 跨頁接續 · 驗算);新增的只有階梯裁決 · 進 LAYOUT 前的數字錯字修正 · 儲存格正規化(括號負數 · 破折號 · 貨幣 · % · O→0 · 全形 · 空白≠0)· 逐格信心旗標 · 原生/OCR 互核 · CID 亂碼改走 OCR;本行程不 import 任何 OCR 套件。容器:ENG398 自測 9/9(經 VCGC 含原生實跑 synthetic_financial_report 兩頁 DIGITAL 0.4s GREEN)· via_ocr_super v0102 8/8 + 前版 12/12;兩車道 NO_ENV(隔離境要操作員裝);近兩週對齊記錄(操作員「檢查近期兩周對話紀錄有兩三次幾乎值完全對齊 · 記錄當時的狀態及邏輯及工具組合」「其他對話框也是」):#1 09-21 工作站 105 份 × 7 欄 GREEN 461 · 判對率 461/461 · 可判率 62.7%(09-24 重現;cb1939a2 / B690 · B694 · B729)· #2 09-23 姊妹倉第二血統 106 份 FAIL 0(41ce6d4 / B728;本對話框無權親驗)· #3 09-21 容器 81 份 306/306(bf727640 / B677);現在 425:差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 v0119 _v_upside 零綠;字彙未收或交易所價表缺日 Z174 兩假設待工作站庫定案);工具組合 · 尾版對照 · 限制寫在 docs/VIA_S20261002_VrnBestAlignedRuns.md;交接 VCGC-REQ126:best-aligned-baseline PENDING",
    "next": "工作站先同步到 main(via-medic sync --apply → git pull --no-rebase → 重點源 Register 尾版)→ 依序 VCGC status → VDF 引擎冊 / 單引擎 → VRN 引擎冊 / 鏈 → 結果驗證;同步後的紅燈再逐條根因修",
    "hand": "操作員(工作站同步與實跑)· AI(根因修)",
    "quotes": [
@@ -4172,11 +4176,33 @@
     {
      "text": "隔離資料夾可查",
      "recorded_at": "2026-10-02T17:12:44+00:00"
+    },
+    {
+     "text": "增加引擎 PaddleOCR + RapidOCR 雙引擎 10 組管線",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
+    },
+    {
+     "text": "PRADDLE工具+EXTRACTOR 針對LAYOUT TEXT TABLE GRAPH各五組搭配 … 跟LAYOUT引擎相互搭配並修復驗證才能",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
+    },
+    {
+     "text": "PRADDLE工具們高風險要獨立環境",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
+    },
+    {
+     "text": "在檢查近期兩周對話紀錄有兩三次幾乎值完全隊齊紀錄剛當時的狀態及邏輯及工具組合",
+     "recorded_at": "2026-10-02T17:52:18+00:00"
+    },
+    {
+     "text": "其他對話框也是",
+     "recorded_at": "2026-10-02T17:52:18+00:00"
     }
    ],
    "modules": [
     "SUP_MDL746_PDFPlumberPlusHub_v0102.py",
-    "CGC_MDL149_VeritasCentralGovernanceConsole_v0189.py"
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0189.py",
+    "VRN_ENG398_PraddleExtractor_v0100.py",
+    "via_ocr_super_v0102.py"
    ]
   },
   {
@@ -4204,6 +4230,65 @@
    "modules": [
     "CGC_MDL140_HandoverConsole_v0104.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ128",
+   "subsystem": "VCGC",
+   "topic": "LAYOUT · NLP 經工具鎖冊導入 PRADDLE",
+   "requirement": "操作員令:將 LAYOUT、NLP 都導入工具 —— PRADDLE(RapidOCR + PaddleOCR 雙引擎編排 VRN_ENG398;OCR 套件只在隔離境)像 LAYOUT · NLP 一樣經 VCGC 啟用進工具鎖冊;LAYOUT 與 NLP 只從鎖冊取它(sha 對得上),不 glob 猜版本",
+   "status": "COVERED",
+   "homes": [
+    "VIA_ToolVersion_Lock_v0100.json",
+    "VIA_EngineVersion_Register_v0100.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "CGC_MDL233_ToolActivate v0106:+praddle 家族(必備 API main · selftest · run_pdf · ladder_page);引擎版本冊 VIA-TOOL-0224 席位;via-vcgc tools activate praddle VRN_ENG398_PraddleExtractor_v0100.py --apply 11 檢全過 → 鎖冊 praddle v0100;SUP_MDL743 v0110(praddle_pinned · def_praddle_lanes · def_run_praddle;def_run_batch 不改道)· SUP_MDL866 v0106(pdf 動詞:PDF → 鎖冊 PRADDLE → LAYOUT 修復段落 → run_text) 先登 candidate VIA-TOOL-0225 / 0226、前版 v0109 / v0105 留 prior 0227 / 0228,再經同一把尺啟用(11 檢全過;鎖冊 layout v0110 · nlp v0106 · 名冊 VIA_ToolRoster_SSOT v0103);容器實測:ToolActivate 鏈 v0100–v0106 全 PASS(v0106 +5/5)· LAYOUT v0110 7/7 · NLP v0106 7/7(合成報表 24 段 · 數位頁全 native · 頁眉剔除 · run_text PASS · GREEN 1.4s)· 經 via-vcgc run 兩站 rc 0;兩車道 NO_ENV(隔離境由操作員裝)",
+   "next": "工作站同步後 via-vcgc tools status 看七家 sha 全對;隔離境裝好後 NLP pdf --ocr force 看掃描件",
+   "hand": "AI(已交)· 操作員(工作站同步 · 隔離境)",
+   "quotes": [
+    {
+     "text": "將LAYOUT NPL都有導入工具",
+     "recorded_at": "2026-10-02T17:52:18+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL233_ToolActivate_v0106.py",
+    "SUP_MDL743_GenericLayoutHub_v0110.py",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0106.py",
+    "VRN_ENG398_PraddleExtractor_v0100.py"
+   ],
+   "renumbered_from": "VCGC-REQ127"
+  },
+  {
+   "code": "VCGC-REQ129",
+   "subsystem": "VCGC",
+   "topic": "CPU 最大加速 · 三系統實測盤點 · 工具使用記錄 · 收尾上傳",
+   "requirement": "操作員令:全部系統在 CPU 架構下最大加速化;完成 VCGC / VRN / VDF 實測、輸出結果盤點驗證、編號、記錄一切現況;有用到 / 沒用到的工具功能全部記錄、備份上傳、收尾",
+   "status": "PARTIAL",
+   "homes": [
+    "docs/VIA_S20261002_CpuAccel_RealTest_Closeout.md",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0132.json"
+   ],
+   "evidence": "量測:串測 133 站序列 609s · 4 核忙碌 19–26%;CGC_MDL224 v0104 交接案站依加速器 aggressive 預算並行:C-* 62 站 339s → 113s(3.0 倍,燈號 / 順序全同),全 134 站 --full 431s;CGC_MDL058 v0103 教訓帳跨行程鎖(無鎖 6 行程 600 筆剩 24 → 600/600);CGC_MDL254 v0101 過期判定修;VRN 邏輯冊重建 55/55;VDF 鏈 14s CPU 97% · VRN 鏈 74s CPU 92%(已層內並行);開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 綠 8 · NODATA 2 · VRN 綠 45 · NODATA 3 · ABSENT 3;工具使用:本容器事件 1753 筆 · 目標 107 個 · 鎖冊七家 · 未引用引擎 210 件(明細 docs/VIA_S20261002_ToolUsage_v0100.json)",
+   "next": "PENDING 四項:VDF 卡書兩把尺對齊 · CGC_MDL092 不覆寫 Schema Registry · 工作站 via-vdfdb 落庫 · 收尾 ③ 交接案與 handoff test 仍序列(下一步同法並行)",
+   "hand": "AI(下一批)· 操作員(工作站落庫 · 未引用引擎整併裁量)",
+   "quotes": [
+    {
+     "text": "全部系統在CPU架構下最大加速化  完成VCGC VRN VDF實測輸出結果盤點驗證即編號一切記錄一切現況即收尾  有用到沒用到的工具功能紀錄全部有備份上傳收尾 CLOSE OUT",
+     "recorded_at": "2026-10-02T18:48:18+00:00"
+    },
+    {
+     "text": "允許開閘",
+     "recorded_at": "2026-10-02T18:48:18+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL224_TestAuto_v0104.py",
+    "CGC_MDL058_Lessons_v0103.py",
+    "CGC_MDL254_ReviewOnePage_v0101.py"
+   ],
+   "renumbered_from": "VCGC-REQ128"
   }
  ],
  "non_requirements": [
@@ -4308,7 +4393,7 @@
    "reason": "截圖;需求見 08:59 那一則(進入環境指令)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0149.json",
+ "prior": "VIA_Requirements_SSOT_v0150.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -4355,5 +4440,7 @@
  "why_v0147": "VCGC-REQ123 RECORDED→PARTIAL(功能卡 v0101 編號手冊)· +VCGC-REQ124(RECORDED:提速 · 去重 · PS U/I;附實測);其餘一字不動",
  "why_v0148": "VCGC-REQ124 RECORDED→PARTIAL(VCGC v0188 治理沿用 · PS 模板呈現件 UI v0100 · 掃橋器 v0109;附實測)· +VCGC-REQ125(RECORDED:串聯短令流程改 PY 流程器 + 加速器;附量測與提案);其餘一字不動",
  "why_v0149": "VCGC-REQ124 補 v0189 實測(改檔後 run 36s→6s);+VCGC-REQ126(RECORDED:聚焦 VCGC/VDF/VRN 成功啟動與結果驗證);其餘一字不動",
- "why_v0150": "+VCGC-REQ127(PARTIAL:每日進度交接十點引擎 CGC_MDL140 v0104 `handoff daily`;容器實測過,工作站每日實跑待做);其餘一字不動(只增)"
+ "why_v0150": "+VCGC-REQ127(PARTIAL:每日進度交接十點引擎 CGC_MDL140 v0104 `handoff daily`;容器實測過,工作站每日實跑待做);其餘一字不動(只增)",
+ "why_v0151": "PR #434 合併 main:main 的 v0150 = PR #435(+VCGC-REQ127 每日交接),側線也出了 v0150(同號異義)→ main 的 v0150 一字不動;側線內容改登本版:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據 · 近兩週最佳對齊記錄;側線 VCGC-REQ127(LAYOUT · NLP 經鎖冊導入 PRADDLE)→ 改編 VCGC-REQ128;側線 VCGC-REQ128(CPU 最大加速 · 三系統實測 · 工具使用記錄)→ 改編 VCGC-REQ129(各帶 renumbered_from;不同來源不得因值相同合併編號)",
+ "why_v0150_branch": "v0149 已由 PR #433 併入 main(註冊完整性 IMMUT:不得就地改)→ 本批改以新版號發布:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據與原話 · VCGC-REQ126 補近兩週最佳對齊記錄;+VCGC-REQ127(COVERED:LAYOUT · NLP 經鎖冊導入 PRADDLE);v0149 回復 main 原樣、其餘一字不動;同批 +VCGC-REQ128(PARTIAL:CPU 最大加速 · 三系統實測 · 工具使用記錄;四項待辦附下一步)"
 }

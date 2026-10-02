@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """CGC_MDL233_ToolActivate v0106 — 薄尾:PRADDLE 擷取編排(VRN_ENG398)與 LAYOUT · NLP 同一把尺,經 VCGC 啟用、鎖版號
 
-操作員 2026-10-02(VCGC-REQ127):「將 LAYOUT NPL 都有導入工具」—— PRADDLE(RapidOCR + PaddleOCR 雙引擎,隔離境)
+操作員 2026-10-02(VCGC-REQ128;原側線編 REQ127,與 main 每日交接同號 → 改編):「將 LAYOUT NPL 都有導入工具」—— PRADDLE(RapidOCR + PaddleOCR 雙引擎,隔離境)
 要像 LAYOUT · NLP 一樣進工具鎖冊;LAYOUT(SUP_MDL743 v0110)· NLP(SUP_MDL866 v0106)再從鎖冊取它,不靠 glob 猜版本。
 本版只把一家加進 FAMILIES:praddle = VRN_ENG398_PraddleExtractor(functional modules/VRN;必備 API main · selftest ·
 run_pdf · ladder_page)。檢查照前版原樣(檔在該在的夾 · 四位版號 · AST · 零 TA-Lib · 加速器橋 · 匯入層不開子行程 ·
