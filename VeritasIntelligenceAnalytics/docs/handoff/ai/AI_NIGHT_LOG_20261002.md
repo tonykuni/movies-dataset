@@ -52,3 +52,36 @@
 - VCGC→VDF 啟動:VDF 鏈 RED 0;74 支逐支 GREEN 65 · RED 0。
 - VDF 輸入範圍 / 輸出表頭歸 VDF 管理員(VDF-REQ016):`VDF_InputUniverse_SSOT_v0100`(IN 3 · OUT 5 · E 11 · 順序照 main 工作流冊)· `VDF_SystemManager_v0121`(universe headers / list / check / loop / frame / validate;驗證經 CGC_MDL249)· `VDF_ENG232_TWIndexOfficial_v0100`(加權 / 櫃買官方指數;隔離區收容件 b360 解析,TA-Lib 0,網路走 SUP_MDL740)。
 - VRN 代號 regex 四冊收斂:僅攤開分歧,待操作員裁(未動 VRN 冊)。
+
+### R50 · UTC 01:30–03:30
+
+- PR #420(R49)CI:UAT 綠;PS7 gate 紅 = main 同病(#417 後 main 也紅)。本 PR 先補掉能補的「母子連接 VCGC-REQ113→VCGC-WKF012 單向」(link --apply → VCGC 工作流冊 v0111);剩衝突哨兵黃(ETF 名碼 00980A/00981A/00982A 待操作員裁),步驟 rc 全是 0/2,但 job 仍以 1 結束(PS 步驟最後的原生退出碼外漏)→ CI 檔問題,待操作員裁。已在 PR 留言後合併(b2350b5b)。
+- 操作員 R50 令:動作引擎化 · 管理員串流程 · 版號 + 時間鎖 · Parquet 由 DuckDB 管(增量)· 三方對照 · 三表同日數量 · 兩個管理員互比一樣強(VDF-REQ017)。
+  - `VDF_InputUniverse_SSOT_v0101`:+OUT-06 加權三來源 · OUT-07 三表同日代號數 · xcheck / parquet / lock 節 · 順序 15 站收在 E-11:lock。
+  - `VDF_SystemManager_v0122`:universe xcheck(ENG232 官方 · ENG055 tw_market_agg.taiex · yfinance ^TWII 代理;價量 / 籌碼 / 成交值三表個股代號逐日比)· parquet(寫手 CGC_MDL238,目錄列數沒變略過)· lock(VDF-WKF011 的尾版 + 自測 + VIA_LampLock)· parity。OUT-01/06/07 只增進 DuckDB。自測 11/11 + 前版 14/14。
+  - `VDF_ENG232_TWIndexOfficial_v0101`:不給 --start = 兩指數 MAX(date) 較早者 + 1 天;已最新零外呼。8/8 + 前版 9/9。
+  - `CGC_MDL252_ManagerParity_v0100`(中央一支,VDF/VRN 不互相匯入):AST 動詞盤點 + 11 項能力表。初測 VRN 缺 4、兩邊都缺 3 → 補完後 **GREEN 11/11**。
+  - `VRN_SystemManager_v0111`:outputs headers / frame / validate / loop / xcheck(VRN_ENG393 三重對照彙總)/ parquet / lock。11/11 + 前版 PASS。
+  - 工作流冊 VDF v0102(+VDF-WKF011 十步)· 需求冊 v0137(+VDF-REQ017)· 盤點冊 v0123(+4 站)· 交接案 4 個全過 · 編號稽核 遺失 0 / 改身分 0 / 重號 0。
+  - 容器實跑:xcheck / parquet / validate OUT-06 = NODATA(無實庫;資料家為 Windows 路徑)照實;WKF011 = OPEN,待 SDD selftests → real → lock --apply。
+- 工作站第 3 份交接紀錄 `WS_HANDOVER_20261002_080732`(main bd405ee6):
+  - ④ PS 加速器橋 155/156:唯一缺的是 `WorkOps/engines/.venv_pm/Scripts/Activate.ps1`(venv 產物,第 3 次重複)→ `CGC_MDL230_ToolCoverageProbe_v0105`:含 pyvenv.cfg 的夾不算 PS 尾版。3/3 + 前版全 PASS。
+  - VCGC 站 GATE `policy_step`(V-handoff-check · V-status · upd:DeckServer)+ 八路衝突 BLOCKED(待裝 6 段)· paddlepaddle 未裝(VRN 擷取逾時)· 本機 TA-Lib 可 import:環境面,操作員手。
+- R50 收尾:
+  - PR #421 UAT 紅兩層:① test_11 總控頁與正主不同步(本 PR 加 CGC_MDL252 → 中央治理模組 260 → 261)→ 照先例依正主重產(契約 19/19);② 第 10 步紅使第 13 步(pip duckdb/pandas)被跳過,第 14 步才缺庫 → v0122 自測補「duckdb 不在 = ②–⑧ 照實略過」(防禦,重現過再修)。
+  - SDD:自測整輪(63 支)→ real:VDF-WKF011 OK(10 步全 OK,層級 selftest)→ `SDDValidator lock --apply` → **VIA_LampLock_v0108:VDF-WKF011 LOCKED · 鎖於 2026-10-02 02:32:06 · 10 支引擎尾版 + 編號**;`universe lock` = LOCKED。
+- R51(PR #422 已合):操作員「所有檔案加入加速器 vdf檔案加入網路工具」→ 正主注入器 CGC_MDL124 v0108 全樹掃:PY 加速器 1771/1771 · VDF 網路工具 132/132(最後 10 支是 VAP/ASSETS/SCOPE_COPY 的 VDF 副本)· PS 0 缺;其餘全是注入器自己的排除規則(HTML_UI 封印 21 · 閘唯讀 10 · b514 凍結 4 · 唯讀正本 1 · 加速器本身 1 · VDF 歷史版 23)。
+- R51b(操作員「你決定自動完成」三項待裁):
+  - ① 主動 ETF 名碼衝突 00980A / 00981A / 00982A(種子冊與批104 矩陣輪錯一位):根因是 FLOW_ENG023 的 --refresh 只轉 SEED_KNOWN,衝突態與 34 檔待驗永遠沒人處理 → `FLOW_ENG023_FlowTwActiveEtf_v0101`:官方名錄(t187ap47_L + STOCK_DAY_ALL,經 SuperAccel.fetch、閘在工具裡)定奪,誰跟官方名一致取誰,原值留 seed_*;兩候選都不符照實留衝突;名稱不符記 NAME_MISMATCH_OPENAPI 不覆寫。沒收到官方名錄 / 仍有衝突 = rc 2(不算成功)。自測 10/10 + 前版 6/6;容器閘關實跑 = SKIP rc 2、冊不動。第三方佐證(Yahoo TAI meta)00980A 野村 · 00981A 統一 · 00982A 群益,與矩陣一致。冊由官方資料寫,不由 AI 手改(AI 直改註冊冊兩次被權限擋,照擋)。
+    操作員一步:工作站開同意閘 `via-vcgc run FLOW_ENG023_FlowTwActiveEtf --refresh` → 衝突哨兵 ③ 轉綠 → gate GREEN → CI PS7 閘綠。
+  - VCGC v0187:`run` 給檔路徑時 v0168 的 _tail 回相對路徑、子行程 cwd 換到引擎夾 → 路徑拼兩次(handoff test 實錄 rc 2)→ 一律轉絕對路徑;stem 多找 FlowSystem 引擎夾。自測 10/10 + 前版鏈全 PASS([交接入口] fail=0)。
+  - ② PS7 CI 紅:根因就是 ① 的衝突 WARN 讓 gate YELLOW;CI yml 放行被判繞過(照擋),走 ① 根治。
+  - ③ VRN 四冊代號 regex:裁定保留各冊範疇(STOCK4 · INSTRUMENT_ALL · TEXT_EXTRACT_STOCK),探針只比同範疇(下一批:範疇冊 + CGC_MDL185 v0101)。
+  - 盤點冊 v0124(+C-etf_registry_resolve)· 需求冊 v0139(VDF-REQ014 引述 + 證據)· 交接案 etf_registry_resolve / entry 全過。
+  - 既有紅(非本批):V-systems 的 VRN logic RED = VRN 自家邏輯冊 v0112 記 ENG086 v0118、磁碟已 v0119(R43 起);冊歸 VRN,VCGC 不改。
+- R51b 收尾:PR #423 合併(e1a5784f)。UAT 第一輪紅 = test_11 總控頁嵌 VCGC 尾版說明行(v0187 換了)→ 依正主重產(契約 19/19),後面 pandas 錯是 pip 步被跳過的連帶。PS7 紅 = 已知 ETF 衝突 WARN(PR 上留言一次)。
+- R51c(三項待裁之三 · VRN 四冊代號 regex):裁定保留各冊範疇,不合併。
+  - `VIA_TickerRegex_Scope_SSOT_v0100`:三範疇 STOCK4_LOCKED(中央 LOCKED)· INSTRUMENT_ALL(規則冊 corrected)· STOCK_TEXT_EXTRACT(TickerRegexSSOT + 寬鬆式),每範疇對 9 探針宣告收 / 拒;式的正本仍在各冊,本冊不改式。
+  - `CGC_MDL185_SsotBookSync_v0101`:E4 逐冊對自己範疇預期;偏離 = SCOPE_DRIFT(黃)· 未宣告冊 = UNSCOPED(黃)· 範疇冊缺 = 退回 v0100 原判(不假綠)。自測 10/10 + 前版 24/24。
+  - ssot panorama 前後:正則@VCGC YELLOW(DISAGREE:0050 / 00878 / 00981A)→ 綠(AGREE)。已知限制:年份四碼(2026)fullmatch 層各冊都收,靠上下文,不在本冊改。
+  - 需求冊 v0140(VCGC-REQ110 引述 + 證據)· 盤點冊 v0125(+C-ticker_regex_scope)· 交接案 ticker_regex_scope 過。
