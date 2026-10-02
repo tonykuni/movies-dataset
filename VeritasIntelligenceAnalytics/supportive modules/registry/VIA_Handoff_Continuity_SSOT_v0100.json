@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T15:46:22+00:00",
+  "updated_at": "2026-10-02T18:50:04+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -275,12 +275,15 @@
         "CGC_MDL233_ToolActivate",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL233_ToolActivate_v0104 selftest +5/5 PASS",
-      "scope": "工具啟用閘:席位唯一 · activated_at(UTC)· 名冊換名出新版號檔 + v0100–v0103 原檢查(側線 2026-09-30 a · R06 / R01 / R08)",
+      "success_marker": "CGC_MDL233_ToolActivate_v0106 selftest +5/5 PASS",
+      "scope": "工具啟用閘:席位唯一 · activated_at(UTC)· 名冊換名出新版號檔 + v0100–v0103 原檢查(側線 2026-09-30 a · R06 / R01 / R08);v0106(VCGC-REQ128):+praddle 家族(VRN_ENG398)· LAYOUT v0110 / NLP v0106 從鎖冊取 PRADDLE 並經同一把尺啟用;前版鏈量出貨時鎖冊",
       "dependencies": [
         "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py",
         "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
-        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
       ],
       "timeout_seconds": 300
     },
@@ -289,15 +292,16 @@
         "CGC_MDL224_TestAuto",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS",
-      "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085)",
+      "success_marker": "[CGC_MDL224_TestAuto_v0104] 薄尾 6/6 PASS",
+      "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085);v0104(VCGC-REQ129):交接案站依加速器 CPU 預算並行(連續 C-* 段 · 同引擎同線 · 進度暫存加鎖);實測 62 站 339s → 113s 燈號全同",
       "dependencies": [
         "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
         "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
         "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json",
         "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json",
         "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
-        "Invoke-VIA-OperatorConsole-v*.ps1"
+        "Invoke-VIA-OperatorConsole-v*.ps1",
+        "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
       ],
       "timeout_seconds": 300
     },
@@ -941,8 +945,8 @@
         "CGC_MDL254_ReviewOnePage",
         "--selftest"
       ],
-      "success_marker": "[唯一頁 v0100] 自測 9/9",
-      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁",
+      "success_marker": "[唯一頁 v0101] 自測 3/3",
+      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁;v0101:過期判定用未捨入年齡(收尾閘剛寫 GATE_latest 時 ⑥ 必紅的根因)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
         "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
@@ -960,6 +964,100 @@
       "dependencies": [
         "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
         "supportive modules/ps7/VeritasCeleritas.PS7*.ps1"
+      ],
+      "timeout_seconds": 300
+    },
+    "ppp_hub": {
+      "argv": [
+        "SUP_MDL746_PDFPlumberPlusHub",
+        "--selftest-tail"
+      ],
+      "success_marker": "SUP_MDL746_PDFPlumberPlusHub v0102 本版 5/5 · 只驗薄尾 · PASS",
+      "scope": "VRN 擷取重型 OCR 車道:paddle 推論核心不在不開 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE 讓 ENG072 標壞跳過(完整自測含全庫抽樣封頂,留給 VRN 鏈)",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "daily_handover": {
+      "argv": [
+        "CGC_MDL140_HandoverConsole",
+        "--selftest-tail"
+      ],
+      "success_marker": "每日交接十點 · PASS",
+      "scope": "每日進度交接十點引擎(v0104 `handoff daily`):① git SHA-16 ② 事件帳次數 / 成功率 / 壞行紅 ③ 資料指紋 SHA-256 ④ 版號矩陣(就地改黃 · 改號黃 · 刪紅)⑤ Schema 漂移 ⑥ 串測燈與過期 ⑦ 例外佇列 ⑧ 暫存只量只印清理指令 ⑨ T+1 ⑩ 清單契約(缺 SHA / 多欄 / 被改都攔)· 自身雜湊 · 只增帳 · sqlite 觸發器只增可重播;零網路 · 選用庫全探針 · 只收 VCGC",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "praddle": {
+      "argv": [
+        "VRN_ENG398_PraddleExtractor",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG398 v0100 PRADDLE 擷取編排] 自測 9/9 PASS",
+      "scope": "PRADDLE 擷取編排:原生(SUP_MDL746 分流 · SUP_MDL743 LAYOUT)→ RapidOCR → PaddleOCR(隔離境;無法才用重型)· OCR 行走同一條 LAYOUT 修復鏈 · 儲存格正規化 · 逐格信心旗標 · 高風險隔離",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "ocr_super_boxes": {
+      "argv": [
+        "via_ocr_super",
+        "--selftest-tail"
+      ],
+      "success_marker": "via_ocr_super v0102 本版 8/8 · PASS",
+      "scope": "隔離境 OCR 車道回逐行座標(RapidOCR via_rapidocr · PaddleOCR via_paddle_311 2.x / 3.x);主行程不 import OCR 套件",
+      "dependencies": [
+        "supportive modules/registry/via_ocr_super_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "layout_praddle": {
+      "argv": [
+        "SUP_MDL743_GenericLayoutHub",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL743 v0110 7/7 · PASS",
+      "scope": "LAYOUT 導入 PRADDLE(VCGC-REQ128):只認鎖冊 praddle(sha 對得上;不 glob)· def_run_praddle 只收 VCGC · 車道狀態(隔離境)· 合成報表經 LAYOUT 跑鎖冊 PRADDLE · 本行程不載 OCR 套件 · def_run_batch 不改道",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "nlp_praddle": {
+      "argv": [
+        "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL866 v0106 7/7 · PASS",
+      "scope": "NLP 導入 PRADDLE(VCGC-REQ128):pdf 動詞 = PDF → 鎖冊 PRADDLE → LAYOUT 修復段落(頁眉雜訊剔除)→ v0103 run_text;只收 VCGC · 只認鎖冊 · 本行程不載 OCR 套件",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "lessons_lock": {
+      "argv": [
+        "CGC_MDL058_Lessons",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL058 v0103 5/5 · PASS",
+      "scope": "教訓帳跨行程鎖 + 原子寫入 + 讀壞不當空帳(VCGC-REQ129 並行前提;實測無鎖 6 行程 600 筆剩 24 筆 → 有鎖 600/600)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2026,10 +2124,31 @@
     {
       "id": "VCGC-REQ124:live-components",
       "requirement": "VCGC-REQ124",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(另案)",
       "reason": "v0188 後冷跑剩下的大頭:v0142 live_components 每支尾版整檔 ast 解析約 6s;要逐檔沿用得重寫那條規則(不在本批,避免發散)",
-      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上"
+      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "resolved": "側線 2026-10-02 c(操作員「繼續做 REQ124 冷跑提速」):CGC_MDL149 v0189 只攔 v0142 live_components 那一次 ast.parse,同內容回骨架樹;真樹結果完全相同(10858 列),4.5s → 0.2s;改一檔後的下一次 run 11.5s → 6s;自測 8/8 + [交接入口] fail=0"
+    },
+    {
+      "id": "VCGC-REQ126:workstation-sync",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "工作站 HEAD 6c065e900 落後 main 77 提交(Register v0266 · 無 via-engines / via-vdfeng / PS 模板 UI 件);衝突閘因撞號 2 與 PATH 黑名單擋寫入;容器最新 main 上 VCGC status · VDF / VRN 管理器皆 rc 0",
+      "next": "照回覆裡的同步 + 三系統啟動驗證貼上區塊跑一次,把結尾的矩陣貼回;同步後仍紅的逐條根因修"
+    },
+    {
+      "id": "VCGC-REQ126:vrn-ocr-ladder",
+      "requirement": "VCGC-REQ126",
+      "state": "VERIFIED",
+      "owner": "操作員(工作站實跑)",
+      "reason": "工作站 VRN 鏈 SUP_MDL746 逾時 180s · ENG072 逾時 600s:paddleocr 在、paddlepaddle 不在被報可跑,每件掃描頁重建 PaddleOCR 再失敗;自測 ⑥ 全庫 triage。SUP_MDL746 v0102 修(容器:薄尾 5/5、ENG072 自測 55 過 0 紅)",
+      "next": "工作站同步後跑 via-vrnchain run --resume:SUP_MDL746 · VRN_ENG072 應在逾時內跑完(ENG072 標記帶 PPP_SKIP / UNAVAILABLE,不再每件重建);仍逾時就貼 VIA_Reports\\vrn_chain\\timeout\\*.log 尾段",
+      "case": "ppp_hub",
+      "receipt": "docs/handoff/evidence/ppp_hub.json"
     },
     {
       "id": "VCGC-REQ124:workstation-ui",
@@ -2046,6 +2165,112 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
+    },
+    {
+      "id": "VCGC-REQ127:daily-engine",
+      "requirement": "VCGC-REQ127",
+      "state": "VERIFIED",
+      "owner": "AI(容器實測)",
+      "reason": "操作員令十點每日交接 + 十個本地函式庫併成一支;CGC_MDL140 v0104 新增 `handoff daily`(L30 交接正主加動詞,不另起引擎)",
+      "next": "收尾跑 handoff test daily_handover(--selftest-tail 23 項)→ 收據轉 VERIFIED",
+      "case": "daily_handover",
+      "receipt": "docs/handoff/evidence/daily_handover.json"
+    },
+    {
+      "id": "VCGC-REQ127:daily-workstation",
+      "requirement": "VCGC-REQ127",
+      "state": "PENDING",
+      "owner": "操作員(工作站每日收工)",
+      "reason": "容器沒有工作站資料夾也沒有 pwsh:③ 資料指紋 NODATA、⑥ 串測 P-entry 黃都是容器限制;工作站真實十點還沒跑過",
+      "next": "工作站同步 main 後每日收工跑 via-vcgc handoff daily --data <當日輸出夾>(或把夾寫進 docs/handoff/daily/handover.toml 的 data_dirs);貼回 [每日交接] 那行與判決行,提交 docs/handoff/daily 的清單與只增帳"
+    },
+    {
+      "id": "VCGC-REQ126:praddle-envs",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站裝隔離境)",
+      "reason": "PRADDLE(RapidOCR · PaddleOCR)高風險,操作員令要獨立環境;ENG398 只在隔離境子行程叫它們。容器與工作站目前兩車道 NO_ENV",
+      "next": "工作站:via-vcgc run via_ocr_super --plan 看兩個隔離境(via_rapidocr · via_paddle_311)的安裝計畫 → 照環境計畫(盤點 → 衝突檢查 → 乾淨還原點)由操作員裝(要網路先自己開同意閘)→ via-vcgc run --family vrn VRN_ENG398_PraddleExtractor probe 兩車道 READY → run --in C:\\測試樣本報告 --ocr force 看互核",
+      "note": "2026-10-02 更正(VERIFIED → PENDING):上輪 closeout ③+ 因本項掛了 praddle 案(容器程式自測)而自動轉 VERIFIED;但本項是工作站裝兩個隔離境,容器自測證不到 → 轉回 PENDING、不掛案;收據要工作站 ENG398 probe 兩車道 READY"
+    },
+    {
+      "id": "VCGC-REQ128:tool-import",
+      "requirement": "VCGC-REQ128",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員令「將 LAYOUT NPL 都有導入工具」:PRADDLE 進工具鎖冊(CGC_MDL233 v0106 praddle 家族)· LAYOUT v0110 / NLP v0106 從鎖冊取它並經 VCGC 啟用",
+      "next": "收尾實跑 nlp_praddle 案(含 LAYOUT 修復段落 → run_text)轉 VERIFIED;工作站同步後 via-vcgc tools status 看七家 sha 全對",
+      "case": "nlp_praddle",
+      "receipt": "docs/handoff/evidence/nlp_praddle.json",
+      "renumbered_from": "VCGC-REQ127:tool-import"
+    },
+    {
+      "id": "VCGC-REQ126:best-aligned-baseline",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站實跑)· AI(根因修)",
+      "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
+      "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
+    },
+    {
+      "id": "VCGC-REQ129:parallel-test",
+      "requirement": "VCGC-REQ129",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "全功能串測 133 站一站接一站、4 核只用約 23%;C-* 交接案站 62 站 420s 彼此不相依",
+      "next": "收尾實跑 chain 案(TestAuto v0104 並行)轉 VERIFIED",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json",
+      "renumbered_from": "VCGC-REQ128:parallel-test"
+    },
+    {
+      "id": "VCGC-REQ129:lessons-lock",
+      "requirement": "VCGC-REQ129",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "教訓帳 load_ledger 讀到半截檔回空帳 → save 蓋掉整本只增帳;實測無鎖 6 行程 600 筆剩 24 筆",
+      "next": "收尾實跑 lessons_lock 案轉 VERIFIED",
+      "case": "lessons_lock",
+      "receipt": "docs/handoff/evidence/lessons_lock.json",
+      "renumbered_from": "VCGC-REQ128:lessons-lock"
+    },
+    {
+      "id": "VCGC-REQ129:onepage-stale",
+      "requirement": "VCGC-REQ129",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "唯一頁過期判定拿捨入到 0.1 小時的年齡比時限 → 收尾閘剛寫 GATE_latest 時自測 ⑥ 必紅(教訓帳同簽名 5 次)",
+      "next": "收尾實跑 onepage 案轉 VERIFIED",
+      "case": "onepage",
+      "receipt": "docs/handoff/evidence/onepage.json",
+      "renumbered_from": "VCGC-REQ128:onepage-stale"
+    },
+    {
+      "id": "VCGC-REQ129:vdf-cardbook-rulers",
+      "requirement": "VCGC-REQ129",
+      "state": "PENDING",
+      "owner": "AI(下一批)· 操作員裁定",
+      "reason": "VDF 系統卡 logic STALE:卡書(VIA_Essentia_CardBook_VDF)缺 VDF_ENG232;照指示用 PEIS scan + book 重建後樹有冊無 1 → 7、冊有樹無 0 → 1(PEIS 建冊範圍與 VDF_SystemManager 檢查範圍兩把尺不同)→ 已還原卡書,不硬改",
+      "next": "對齊兩把尺:VDF_SystemManager 的 tree 家族集合 vs CGC_MDL161 DEAD_ALLOW / _live 篩法;定一把後出新版號,重建卡書到 tree_only 0 · book_only 0",
+      "renumbered_from": "VCGC-REQ128:vdf-cardbook-rulers"
+    },
+    {
+      "id": "VCGC-REQ129:consolidation-schema-overwrite",
+      "requirement": "VCGC-REQ129",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "CGC_MDL092 ConsolidationAudit 預設動作 build_registers() 就地重寫 3 本冊;在沒有資料庫的機器(容器)把 VIA_Schema_Registry 的真表結構(440 行)蓋成「庫缺」→ 本批已還原三本冊",
+      "next": "出 CGC_MDL092 新尾版:庫缺時不寫 Schema Registry(或寫新版號檔)、預設只稽核不寫冊;寫冊要 --apply",
+      "renumbered_from": "VCGC-REQ128:consolidation-schema-overwrite"
+    },
+    {
+      "id": "VCGC-REQ129:workstation-vdfdb",
+      "requirement": "VCGC-REQ129",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
+      "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠",
+      "renumbered_from": "VCGC-REQ128:workstation-vdfdb"
     }
   ]
 }
