@@ -4157,14 +4157,26 @@
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料)",
+   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料);VRN 根因(全景 + 讀碼):SUP_MDL746 v0101 ocr_ready() 只看 paddleocr import 得到、不看推論核心 paddle → 工作站被報可跑;ocr_page() 每次 new 抽取器 → 失敗不記、每件掃描頁重建;自測 ⑥ 全庫 triage → 180s 逾時。SUP_MDL746 v0102:核心不在不開重型車道 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE(ENG072 標壞跳過)· 自測抽樣封頂 40 件 · 無掃描檔照實 NODATA;容器:薄尾 5/5 · 完整自測 3s(前版 ⑥ NODATA)· ENG072 v0139 自測 55 過 0 紅 22s。操作員提供的 Downloads / 上傳 4 支 / 隔離區經雜湊比對:倉內皆已有,上傳 4 支只多舊 VIA_SUPPORT_BRIDGE(MDL004/005 還少加速器橋)→ 不採用",
    "next": "工作站先同步到 main(via-medic sync --apply → git pull --no-rebase → 重點源 Register 尾版)→ 依序 VCGC status → VDF 引擎冊 / 單引擎 → VRN 引擎冊 / 鏈 → 結果驗證;同步後的紅燈再逐條根因修",
    "hand": "操作員(工作站同步與實跑)· AI(根因修)",
    "quotes": [
     {
      "text": "無關VCGC VRN VDF成功啟動的不管專注這三個成功啟動住結果驗證成功",
      "recorded_at": "2026-10-02T16:55:39+00:00"
+    },
+    {
+     "text": "有需要的可餐可 只有輸出準確度提高 擷取更快 從NON-OCR OCR 從PDFPLUMBER單引擎雙引擎到 PRADDLE重型工具 無法才使用重型工具",
+     "recorded_at": "2026-10-02T17:12:44+00:00"
+    },
+    {
+     "text": "隔離資料夾可查",
+     "recorded_at": "2026-10-02T17:12:44+00:00"
     }
+   ],
+   "modules": [
+    "SUP_MDL746_PDFPlumberPlusHub_v0102.py",
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0189.py"
    ]
   }
  ],
