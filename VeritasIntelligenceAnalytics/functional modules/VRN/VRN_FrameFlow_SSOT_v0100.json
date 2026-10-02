@@ -1,0 +1,33 @@
+{
+  "schema": "VIA.VRN.FrameFlow.v1",
+  "engine": "VRN_ENG115_HeaderFrameTemp_v0100.py",
+  "managed_by": "VRN_SystemManager",
+  "input_params": [
+    {"name": "temp_dir", "required": true, "why": "列先落 TEMP，不把整表留在記憶體"},
+    {"name": "header", "default": 0, "why": "哪一列是 HEADER，轉成 DataFrame 欄名"},
+    {"name": "chunk", "default": 500, "why": "每一批寫進 TEMP 的列數"},
+    {"name": "mem_rows", "default": 2000, "why": "超過就只回預覽，全量留在磁碟"},
+    {"name": "preview", "default": 20, "why": "溢寫時 DataFrame 只帶前幾列"}
+  ],
+  "output": {
+    "kind": "dataframe",
+    "header": "first_row",
+    "spill": "temp_parquet",
+    "over_mem_rows": "preview_only",
+    "database": "tables.duckdb"
+  },
+  "sources": [
+    {"id": "left_text", "side": "left", "kind": "text", "becomes": "restored_text"},
+    {"id": "right_table", "side": "right", "kind": "table", "becomes": "dataframe"}
+  ],
+  "flow": [
+    "split_left_right",
+    "repair_left",
+    "header_to_frame",
+    "spill_temp",
+    "store_duckdb",
+    "cover_gate",
+    "four_point"
+  ],
+  "actions": ["show", "run", "selftest"]
+}
