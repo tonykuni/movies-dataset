@@ -338,6 +338,98 @@ jobs:
           python-version: "3.12"
 
       # VCGC-REQ112:PowerShell 互動在 Windows 用真 pwsh 實測;衝突閘 · 全綠閘結果寫進 job summary。只有 RED(rc 1)讓 CI 紅;黃照實列出(黃不是綠)。
+      # 總檢入口(via-review / 總檢)三支尾版用真 pwsh Parser 解析:Invoke-VIA-Review · Register-VIA-Commands · VIA-Review-OneClick;語法錯 = 紅
+      - name: Parse via-review entry scripts with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $bad = 0
+          foreach ($pat in @("Invoke-VIA-Review-v*.ps1", "Register-VIA-Commands-v*.ps1", "VIA-Review-OneClick-v*.ps1", "Inspect-VIA-Tooling-v*.ps1")) {
+            $f = Get-ChildItem -LiteralPath $via -Filter $pat -File | Sort-Object Name | Select-Object -Last 1
+            if (-not $f) { Write-Host ("absent " + $pat); continue }
+            $tokens = $null; $errors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$tokens, [ref]$errors)
+            if (@($errors).Count -gt 0) {
+              $bad += @($errors).Count
+              foreach ($e in $errors) { Write-Host ("{0}:{1} {2}" -f $f.Name, $e.Extent.StartLineNumber, $e.Message) }
+            } else { Write-Host ("Parsed " + $f.Name) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          exit 0
+
+      - name: Run tooling inventory helper with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_NO_OPEN = "1"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $tool = Get-ChildItem -LiteralPath $via -Filter "Inspect-VIA-Tooling-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1
+          if (-not $tool) { Write-Host "absent Inspect-VIA-Tooling-v*.ps1"; exit 0 }
+          $bad = 0
+          foreach ($run in @(
+              @{ name = "cmds"; args = @{ Commands = $true; Recent = 8; PythonExe = "python" }; want = "via-tools" },
+              @{ name = "card"; args = @{ Card = "supportive modules\registry\CGC_MDL253_ToolingInventory_v0100.py"; PythonExe = "python" }; want = "via-tools" })) {
+            $p = $run.args
+            $out = & $tool.FullName @p 2>&1 | Out-String
+            $rc = $LASTEXITCODE
+            Write-Host $out
+            if ($rc -notin 0, 2 -or $out -notmatch [regex]::Escape($run.want)) { Write-Host ("FAIL " + $run.name + " rc " + $rc); $bad++ }
+            else { Write-Host ("OK " + $run.name + " rc " + $rc) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          exit 0
+
+      # VCGC-REQ124:標準 PS 模板的 YFinance 版型呈現件(VeritasCeleritas.PS7.UI.ps1)用真 pwsh 解析 + 經模板接入自測 + 印一張示範矩陣
+      - name: Celeritas PS template UI self-test with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $ps7 = Resolve-Path ".\VeritasIntelligenceAnalytics\supportive modules\ps7"
+          $bad = 0
+          foreach ($name in @("VeritasCeleritas.PS7.UI.ps1", "VeritasCeleritas.PS7.Template.ps1")) {
+            $f = Join-Path $ps7 $name
+            if (-not (Test-Path -LiteralPath $f)) { Write-Host ("absent " + $name); $bad++; continue }
+            $tokens = $null; $errors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($f, [ref]$tokens, [ref]$errors)
+            if (@($errors).Count -gt 0) { $bad += @($errors).Count; foreach ($e in $errors) { Write-Host ("{0}:{1} {2}" -f $name, $e.Extent.StartLineNumber, $e.Message) } }
+            else { Write-Host ("Parsed " + $name) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          . (Join-Path $ps7 "VeritasCeleritas.PS7.Template.ps1")
+          try {
+            $join = Test-CeleritasJoin
+            Write-Host ("Template joined " + $join.Joined + " · UI " + $join.UI)
+            if (-not $join.Joined -or -not $join.UI) { Write-Host "FAIL template did not join the UI part"; exit 1 }
+            $env:VIA_PS_UI_WIDTH = "110"
+            $r = Test-CeleritasUI
+            Write-CeleritasRichMatrix -Title "CI 示範 · VDF 單引擎" -Header @("引擎 : VDF_ENG229_Demo", "模式 : status") -Rows @(
+              @{ id = "①"; title = "啟動前閘"; state = "GREEN"; sec = 0.4; note = "加速器 · 網路橋都在" },
+              @{ id = "②"; title = "經 VCGC 啟動"; state = "YELLOW"; sec = 3.2; note = "觸網要 VIA_NET_CONSENT(AI 不代設)" })
+            if (-not $r.Pass) { Write-Host ("FAIL Celeritas UI self-test " + $r.Passed + "/" + $r.Total); exit 1 }
+            Write-Host ("OK Celeritas UI self-test " + $r.Passed + "/" + $r.Total)
+          }
+          finally { Restore-CeleritasPS7 }
+          exit 0
+
+      - name: Build the single review page through VCGC
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_NO_OPEN = "1"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $registry = Join-Path $via "supportive modules\registry"
+          $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File | Sort-Object Name | Select-Object -Last 1).FullName
+          if (-not (Get-ChildItem $registry -Filter "CGC_MDL254_ReviewOnePage_v*.py" -File)) { Write-Host "absent CGC_MDL254_ReviewOnePage"; exit 0 }
+          $out = & python $vcgc run CGC_MDL254_ReviewOnePage build --no-open 2>&1 | Out-String
+          $rc = $LASTEXITCODE
+          Write-Host $out
+          $page = Join-Path $via "VIA_Reports\review\ONEPAGE_latest.html"
+          if ($rc -notin 0, 1, 2 -or -not (Test-Path -LiteralPath $page) -or $out -notmatch '\[唯一頁\]') { Write-Host ("FAIL one page rc " + $rc); exit 1 }
+          Write-Host ("OK one page rc " + $rc)
+          exit 0
+
       - name: VCGC live checks with PowerShell 7
         if: ${{ !cancelled() }}
         shell: pwsh
@@ -372,6 +464,8 @@ jobs:
           "|---|---|---|---|" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           $rows | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($red) { exit 1 }
+          # 黃(rc 2)照實列在 summary,不讓 job 紅;pwsh 步驟結尾會沿用最後原生指令的 $LASTEXITCODE,所以明寫 exit 0
+          exit 0
 
       - name: Upload VCGC gate evidence
         if: always()

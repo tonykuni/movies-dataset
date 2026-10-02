@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T22:16:49+00:00",
+  "updated_at": "2026-10-02T15:46:22+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -878,6 +878,90 @@
         "supportive modules/registry/VIA_TickerRegex_Scope_SSOT_v*.json"
       ],
       "timeout_seconds": 900
+    },
+    "vrn_header_frame": {
+      "argv": [
+        "VRN_ENG115_HeaderFrameTemp",
+        "--selftest"
+      ],
+      "success_marker": "[計] 7 檢 OK · FAIL 0",
+      "scope": "PR #419 VRN 首頁:HEADER → DataFrame(先落 TEMP parquet,超過 mem_rows 只回預覽,全量留磁碟與 DuckDB)· 文左表右 · ENG392 R0–R3 修復(掉覆蓋整輪退回)· ENG082 字袋 / 序列互核 · 完整才一標題四點;v0100 12 檢 + v0101 7 檢",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v*.py",
+        "functional modules/VRN/VRN_FrameFlow_SSOT_v*.json",
+        "functional modules/VRN/VRN_ENG392_TextCompleteness_v*.py",
+        "functional modules/VRN/VRN_ENG082_ExtractionLogic_v*.py",
+        "functional modules/VRN/VRN_ENG107_TextRestore_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "tooling": {
+      "argv": [
+        "CGC_MDL253_ToolingInventory",
+        "--selftest"
+      ],
+      "success_marker": "[工具盤點 v0100] 自測 16/16",
+      "scope": "工具盤點:鎖版全景 · 尾版律 · CLI 面 · L103 三導入 · 編號接回 · 短令冊順點源鏈",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+        "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "Register-VIA-Commands-v*.ps1"
+      ],
+      "timeout_seconds": 180
+    },
+    "vdf_engine": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0123 本版 6/6 · 前版 PASS",
+      "scope": "VDF 單引擎啟動冊:engine 動詞 · 啟動前閘 · 經 VCGC run",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vrn_engine": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS",
+      "scope": "VRN 單引擎啟動冊:engine 動詞 · 啟動前閘 · 經 VCGC run",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "onepage": {
+      "argv": [
+        "CGC_MDL254_ReviewOnePage",
+        "--selftest"
+      ],
+      "success_marker": "[唯一頁 v0100] 自測 9/9",
+      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
+        "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "sweeper": {
+      "argv": [
+        "CGC_MDL124_BridgeSweeper",
+        "--selftest"
+      ],
+      "success_marker": "OK 16 · FAIL 0",
+      "scope": "掃橋器尾版:PY / NET / PS 加速橋掃描與排除律;v0109 起 Celeritas 模板呈現件(VeritasCeleritas.PS7.UI.ps1)同本體 / 模板排除",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+        "supportive modules/ps7/VeritasCeleritas.PS7*.ps1"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -1775,6 +1859,193 @@
       "state": "VERIFIED",
       "case": "ticker_regex_scope",
       "receipt": "docs/handoff/evidence/ticker_regex_scope.json"
+    },
+    {
+      "id": "VRN-REQ009:vrn_header_frame",
+      "requirement": "VRN-REQ009",
+      "state": "VERIFIED",
+      "case": "vrn_header_frame",
+      "receipt": "docs/handoff/evidence/vrn_header_frame.json"
+    },
+    {
+      "id": "VRN-REQ008:vrn_header_frame",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_header_frame",
+      "receipt": "docs/handoff/evidence/vrn_header_frame.json"
+    },
+    {
+      "id": "VCGC-REQ114:workstation",
+      "requirement": "VCGC-REQ114",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "via-review v0105 是 PowerShell 入口,要真 pwsh + 工作站的 verb-engine 夾才跑得到全程;容器只驗過 verb-engine 四支 Python 與 CI Parser",
+      "next": "貼 VIA-Review-OneClick-v0105.ps1 → 回貼 VIA_Reports\\review\\REVIEW_latest.md(⑨a–⑨d 四燈)→ 帶收據轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ115:handoff",
+      "requirement": "VCGC-REQ115",
+      "state": "VERIFIED",
+      "case": "handoff",
+      "owner": "VCGC closeout",
+      "reason": "CGC_MDL140_HandoverConsole_v0103 新尾版落地,handoff 案要重跑取新收據",
+      "next": "via-vcgc closeout --apply --push(③ test handoff 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/handoff.json"
+    },
+    {
+      "id": "VCGC-REQ116:tooling",
+      "requirement": "VCGC-REQ116",
+      "state": "VERIFIED",
+      "case": "tooling",
+      "owner": "VCGC closeout",
+      "reason": "CGC_MDL253_ToolingInventory_v0100 新引擎落地,要經交接案 tooling 取收據",
+      "next": "via-vcgc closeout --apply --push(③ test tooling 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/tooling.json"
+    },
+    {
+      "id": "VCGC-REQ116:workstation",
+      "requirement": "VCGC-REQ116",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "HTML 自動開頁(os.startfile)與 Register v0267 短令要真 Windows + 點源命令冊才看得到;容器只驗 Python 與 CI pwsh 實跑",
+      "next": "點源 Register v0267 → via-tools · via-cmds → 回貼 VIA_Reports\\tooling\\TOOLING_latest.md → 帶收據轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ117:vdf_engine",
+      "requirement": "VCGC-REQ117",
+      "state": "VERIFIED",
+      "case": "vdf_engine",
+      "owner": "VCGC closeout",
+      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
+      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/vdf_engine.json"
+    },
+    {
+      "id": "VCGC-REQ117:vrn_engine",
+      "requirement": "VCGC-REQ117",
+      "state": "VERIFIED",
+      "case": "vrn_engine",
+      "owner": "VCGC closeout",
+      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
+      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/vrn_engine.json"
+    },
+    {
+      "id": "VCGC-REQ117:workstation",
+      "requirement": "VCGC-REQ117",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "via-vdfeng / via-vrneng 兩步啟動(管理員閘 → VCGC run)要真 PowerShell + 點源 Register v0268 才走得到;容器只驗 Python 端與 CI pwsh 解析",
+      "next": "點源 Register v0268 → via-engines → via-vdfeng 229 --selftest → 回貼後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ118:plan",
+      "requirement": "VCGC-REQ118",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;參數 / HEADER 下放 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ119:plan",
+      "requirement": "VCGC-REQ119",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;VRN 多來源 · 相互對照 · 還原修復 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ120:plan",
+      "requirement": "VCGC-REQ120",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;編號空格回填(與 REQ112 同路徑) 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ121:plan",
+      "requirement": "VCGC-REQ121",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;VCGC 總控入口 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ122:onepage",
+      "requirement": "VCGC-REQ122",
+      "state": "VERIFIED",
+      "case": "onepage",
+      "owner": "VCGC closeout",
+      "reason": "唯一頁新引擎落地",
+      "next": "via-vcgc closeout --apply --push(③ test onepage 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/onepage.json"
+    },
+    {
+      "id": "VCGC-REQ122:workstation",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "via-review v0106 要真 PowerShell 才走得到 ⑧ 唯一頁;容器只驗 Python 端與 CI build",
+      "next": "git pull → via-review → 看 ONEPAGE_latest.html → 回貼 ONEPAGE_latest.md 後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ122:panorama-label",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "全景工作流冊圖把「引擎欄是說明文字」與「需求 MISSING」都算成「引擎不在」(唯一頁 C1 已照實拆三類);全景本身的標籤待出新尾版修",
+      "next": "VIA_Panorama 新尾版:engine_missing 只算真的找不到檔;說明文字列外部工具;需求 MISSING 另列"
+    },
+    {
+      "id": "VCGC-REQ122:workstation-sync",
+      "requirement": "VCGC-REQ122",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "工作站 HEAD 6c065e900 領先 10 / 落後 66 · stash 29:全景 E 段本機缺 7 紅 + 本機落後 13 黃 + 交接閘未登 Invoke-VIA-Review 都是同一根因;main 的 Register v0266 已改回與 OneClick 一字不差(操作員 L70 許可),拉取不會在該檔撞",
+      "next": "工作站:via-medic sync --apply(只快轉不了才合併;零 force · 帳本只增聯集;stash 不動)→ git push → via-review"
+    },
+    {
+      "id": "VCGC-REQ123:plan",
+      "requirement": "VCGC-REQ123",
+      "state": "PENDING",
+      "owner": "AI(下一段)→ 操作員(同意閘)",
+      "reason": "環境安裝要網路同意閘,AI 永不代設;先唯讀查現況避免重工",
+      "next": "REQ122 收尾後開工:唯讀檢查 → 編號指令卡 → 操作員工作站開閘照驗證後計畫安裝"
+    },
+    {
+      "id": "VCGC-REQ124:plan",
+      "requirement": "VCGC-REQ124",
+      "state": "VERIFIED",
+      "owner": "操作員核准 → AI",
+      "reason": "動到 VCGC 主控台(全治理入口)的沿用機制要操作員點頭;PS U/I 模板要操作員指認檔",
+      "next": "核准後出主控台新尾版(治理檢查沿用 + --fresh)並實測 run 耗時;PS U/I 照指認的 YFinance 啟動器模板出新版",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "resolved": "側線 2026-10-02 b(操作員「依照你的提案最佳化」「直接採用」):CGC_MDL149 v0188 治理沿用(樹沒變重印上次輸出 · 驗收 / 寫入動詞與 --fresh 一律重算 · 逐檔內容雜湊沿用前版定義,整樹 5573 個定義逐鍵相同)run 4.1s → 1.8s、改檔後 36s → 11.5s,自測 11/11 + 前版鏈 [交接入口] fail=0;PS U/I:短令冊沒有單獨啟動 YFinance 的指令,版面來自 VDF_MDL002 的 Rich 輸出,純 PS7 重做成模板呈現件 VeritasCeleritas.PS7.UI.ps1 併進標準模板,CI pwsh 自測"
+    },
+    {
+      "id": "VCGC-REQ124:live-components",
+      "requirement": "VCGC-REQ124",
+      "state": "PENDING",
+      "owner": "AI(另案)",
+      "reason": "v0188 後冷跑剩下的大頭:v0142 live_components 每支尾版整檔 ast 解析約 6s;要逐檔沿用得重寫那條規則(不在本批,避免發散)",
+      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上"
+    },
+    {
+      "id": "VCGC-REQ124:workstation-ui",
+      "requirement": "VCGC-REQ124",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "容器沒有 pwsh,PS 版型件只在 CI(Windows · pwsh 7)解析與自測;實際字型 / 寬度要在工作站 Windows Terminal 目視",
+      "next": "工作站:pwsh -NoProfile -Command \". '.\\supportive modules\\ps7\\VeritasCeleritas.PS7.Template.ps1'; Test-CeleritasUI\";舊主控台框線亂就設 VIA_PS_UI_ASCII=1;既有短令改用此版型要逐支 L70 許可"
+    },
+    {
+      "id": "VCGC-REQ125:pilot",
+      "requirement": "VCGC-REQ125",
+      "state": "PENDING",
+      "owner": "操作員(決定何時重啟)→ AI",
+      "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
+      "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
     }
   ]
 }

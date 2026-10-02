@@ -85,3 +85,13 @@
   - `CGC_MDL185_SsotBookSync_v0101`:E4 逐冊對自己範疇預期;偏離 = SCOPE_DRIFT(黃)· 未宣告冊 = UNSCOPED(黃)· 範疇冊缺 = 退回 v0100 原判(不假綠)。自測 10/10 + 前版 24/24。
   - ssot panorama 前後:正則@VCGC YELLOW(DISAGREE:0050 / 00878 / 00981A)→ 綠(AGREE)。已知限制:年份四碼(2026)fullmatch 層各冊都收,靠上下文,不在本冊改。
   - 需求冊 v0140(VCGC-REQ110 引述 + 證據)· 盤點冊 v0125(+C-ticker_regex_scope)· 交接案 ticker_regex_scope 過。
+- R52(操作員:「從vcgc進vdf … 2023-06-01~最新 所有資料啟動」「一個ps指令加入加速器先 … 補齊台股清單及主動式台股etf清單 再全部同步啟用」「全景式掃描 … 工作前製作葉子指令ps擋」):
+  - 容器經 VCGC 實跑 CGC_MDL134 plan(18 步 · H1–H5 OK)→ run 15 步(VIA_HIST_SINCE=2023-06-01;pip 鏈 · vap_node 是裝件,AI 不跑)。終態 PART · OK 3 · FAIL 10 · SKIP 2 · 3156s:
+    資料家是工作站 Windows 路徑 → datahome SKIP、hist_probe / hist_2023 / group_class / global / consensus / revenue_consensus 庫缺;TWSE 擋容器 IP → etf_universe / etf_history;
+    revenue_backfill 真的上 MOPS 抓到 59 段、逾時 2400s 停在 56%(**MDL134 對 net 步在子行程設同意閘 = 起跑即同意,既有設計**;我先前說「容器網路步會 GATED」是錯的,已更正);
+    refail 重跑 33 站 OK 14;etf_fetch · etf_revenue · digest OK。資料只落容器暫存庫(不提交)。容器副作用檔全部 git checkout 還原。
+  - `Invoke-VIA-VdfFetch-v0108.ps1`(薄尾):① 依 VDF_ENG087 refresh --plan 順序經 VCGC 補兩張清單 → ② 原參數交 v0107 全部步並行;七個 ① 指令在容器經 VCGC 逐一驗 argv。
+  - `Invoke-VIA-QuickScan-v0100.ps1`(葉子指令,唯讀):閘 · CGC_MDL230 覆蓋矩陣 · AST 全景 · test --quick · ENV MANAGER · 八路衝突 → 總表 + 自動開頁。
+    容器實測:覆蓋 GREEN(PS 加速器橋 708/708 · 模板章 188/188);AST 0 SYNTAX/COMPILE,ACCEL 32 件全在豁免 / 正本(HTML_UI 22 · ENG112 · 加速器本身 · intake 8);
+    動詞 46/46 · case 52/52 · workflow 49/49 · compile 錯 0 · 紅 0;ENV / 八路是容器環境(無 pwsh · 家族境未建),工作站照葉子指令量。
+  - 需求冊 v0141(VDF-REQ014 · VCGC-REQ092 引述 + 證據)。
