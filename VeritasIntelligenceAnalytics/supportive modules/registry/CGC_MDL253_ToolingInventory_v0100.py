@@ -133,7 +133,7 @@ def rel(p: Path) -> str:
 
 def family_of(path_or_name) -> str:
     stem = Path(str(path_or_name)).stem if str(path_or_name).endswith((".py", ".ps1")) else str(path_or_name)
-    return VER_RX.sub("", stem.replace("-v*", "").replace("_v*", ""))
+    return re.sub(r"[-_]v$", "", VER_RX.sub("", stem.replace("-v*", "").replace("_v*", "")))   # 「…_v*.py」截出來的尾巴 _v 也去掉
 
 
 def version_of(p: Path) -> int:
@@ -215,6 +215,15 @@ def cli_surface(src: str) -> dict:
                         if isinstance(e, ast.Constant) and isinstance(e.value, str) and re.fullmatch(r"[a-z][a-z0-9-]{1,20}", e.value):
                             verbs.add(e.value)
             ops = [node.left, *node.comparators]
+            for c in ops:                                     # `"--selftest" in a` / `a[1] == "--dry"`:比較式裡的 --xxx 字面一律算旗標
+                for e in (c.elts if isinstance(c, (ast.List, ast.Tuple, ast.Set)) else [c]):
+                    if isinstance(e, ast.Constant) and isinstance(e.value, str) and re.fullmatch(r"--?[a-z][\w-]{0,30}", e.value):
+                        flags.add(e.value)
+            if any(isinstance(c, ast.Subscript) and isinstance(c.value, ast.Name) and c.value.id in ("a", "args", "argv", "av")
+                   for c in ops):                             # `a[0] == "status"`:位置參數比對字面 = 子令
+                for c in ops:
+                    if isinstance(c, ast.Constant) and isinstance(c.value, str) and re.fullmatch(r"[a-z][a-z0-9-]{1,20}", c.value):
+                        verbs.add(c.value)
             if any("argv" in ast.unparse(c) for c in ops if not isinstance(c, ast.Constant)):   # 真的拿 sys.argv 來比,才算旗標
                 for c in ops:
                     for e in (c.elts if isinstance(c, (ast.List, ast.Tuple, ast.Set)) else [c]):
@@ -298,7 +307,7 @@ def number_index() -> dict:
 FUNC_RX = re.compile(r"(?m)^function\s+global:([A-Za-z][\w\-]*)\s*(?:\(|\{)")
 ALIAS_RX = re.compile(r"Set-Alias\s+(?:-Name\s+)?(\S+)\s+(?:-Value\s+)?([A-Za-z][\w\-]*)")
 CHAIN_RX = re.compile(r"Register-VIA-Commands-v(\d{4})\.ps1")
-TARGET_RX = re.compile(r"\b([A-Z]{2,5}_(?:MDL|ENG|SUP|LGC|TOOL)\d{2,4}(?:_[A-Za-z0-9]+)?)|([A-Za-z][\w\.\-]*?)(?:[-_]v\*|[-_]v\d{4})?\.ps1")
+TARGET_RX = re.compile(r"\b([A-Z]{2,5}_(?:MDL|ENG|SUP|LGC|TOOL)\d{2,4}(?:_[A-Za-z0-9]+)*)|([A-Za-z][\w\.\-]*?)(?:[-_]v\*|[-_]v\d{4})?\.ps1")   # 名稱可多段底線
 VCGC_RX = re.compile(r"via-vcgc\s+([a-z][\w\-]*(?:\s+[a-z][\w\-]*)?)")
 
 
@@ -465,7 +474,7 @@ def build_row(f: Path, card: dict, num: dict | None, dates: dict, cmd_by_fam: di
         "updated": upd or time.strftime("%Y-%m-%d", time.localtime(f.stat().st_mtime)), "updated_src": "git" if upd else "mtime",
         "numbered_at": (num or {}).get("numbered_at", ""), "lines": card.get("lines", 0), "defs": len(card.get("defs", [])),
         "entry": entry + (["__main__"] if is_py and card.get("_main") else []), "flags": cli.get("flags", []), "verbs": cli.get("verbs", []),
-        "cmds": cmds, "run": run, "l103": l103, "issues": cls, "lamp": "RED" if red else ("YELLOW" if yellow else "GREEN"),
+        "cmds": cmds, "run": run, "l103": l103, "issues": cls, "netuse": bool(card.get("_netuse")), "lamp": "RED" if red else ("YELLOW" if yellow else "GREEN"),
         "functions": [f"{d['name']}{d.get('sig', '')}" for d in card.get("defs", [])][:200],
         "anchors": [f"{r}:{i['line']} {i['cls']} {i.get('detail', '')[:80]}" for i in issues][:20],
     }
@@ -623,6 +632,206 @@ def _open(p: Path):
         print(f"  [頁] 沒自動開({e});自己開:{p}")
 
 
+
+# ---------------------------------------------------------------- 單引擎:盤點 · 解析 · 啟動前閘(兩個 SYSTEM MANAGER 共用這一份,不各抄一套)
+ENGINE_SPEC = {
+    "VDF": {"root": "functional modules/VDF", "rx": re.compile(r"^VDF_(ENG|MDL)\d{2,4}_"), "need_net": True, "family": "vdf", "cmd": "via-vdfeng"},
+    "VRN": {"root": "functional modules/VRN", "rx": re.compile(r"^VRN_(ENG|MDL)\d{2,4}_"), "need_net": False, "family": "vrn", "cmd": "via-vrneng"},
+}
+ENGINE_ID_RX = re.compile(r"^[A-Z]{2,5}_((?:ENG|MDL)\d{2,4})_")
+
+
+def engines(sub: str, quiet: bool = True) -> list[dict]:
+    """子系統的引擎尾版逐支一列(與 scan 同一套欄位)+ eid(ENG229 / MDL002)。"""
+    spec = ENGINE_SPEC[sub.upper()]
+    pan, ver = panorama_path()
+    if pan is None:
+        raise RuntimeError(ver)
+    _pan_init(str(pan))
+    root = VIA / spec["root"]
+    files = [f for f in targets([str(root)]) if f.suffix == ".py" and spec["rx"].match(f.name) and not SKIP_RX.search(rel(f))
+             and not re.search(r"_sha[0-9a-f]{6,}$", f.stem)]          # _sha… 是去重快照副本,不是另一支引擎
+    dates, nums, cmds = git_dates(), number_index(), commands()
+    by = {}
+    for c in cmds:
+        for tg in c["targets"]:
+            for key in {family_of(tg).lower(), "_".join(tg.split("_")[:2]).lower()}:
+                by.setdefault(key, []).append(c["cmd"])
+    named = celeritas_named()
+    rows = []
+    for f in files:
+        r = build_row(f, _card(str(f)), nums.get(rel(f)), dates, by)
+        r["eid"] = ENGINE_ID_RX.match(f.name).group(1)
+        r["named"] = named.get(r["path"], "")
+        rows.append(r)
+    return sorted(rows, key=lambda r: (r["eid"], r["family"], -version_of(VIA / r["path"])))
+
+
+def celeritas_named() -> dict:
+    """Celeritas 基線的具名名單(唯讀正典 / 凍結豁免):{VIA 相對路徑: 理由}。名單歸 CGC_MDL183 管,本支只讀。"""
+    base = _newest("VIA_CeleritasPolicy_Baseline_v*.json") or (HERE / "VIA_CeleritasPolicy_Baseline_v0100.json")
+    try:
+        b = json.loads(base.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"  [Celeritas 基線] 讀不到({e});不套具名豁免")
+        return {}
+    out = {}
+    for key, why in (("py_readonly", "正典唯讀本(不准注橋)"), ("py_exempt", "凍結夾具名豁免")):
+        for f in (b.get(key) or {}).get("files") or []:
+            out[str(f).replace("\\", "/")] = why
+    return out
+
+
+def resolve(rows: list[dict], key: str) -> tuple[dict | None, list[dict]]:
+    """229 / ENG229 / MDL002 / 全名 / 名稱片段 → 一支;同號異名或片段命中多支 = 照實回候選,不猜。"""
+    k = key.strip()
+    if re.fullmatch(r"\d{2,4}", k):
+        k = "ENG" + k.zfill(3)
+    ku = k.upper()
+    hits = [r for r in rows if r["eid"] == ku] or [r for r in rows if r["family"].upper() == family_of(ku).upper()] \
+        or [r for r in rows if ku in r["family"].upper()]
+    fams = {}
+    for r in hits:                                     # 同家族在兩個夾:版號大的贏;同版 engine/ 夾優先
+        best = fams.get(r["family"])
+        if best is None or (version_of(VIA / r["path"]), "/engine/" in r["path"]) > (version_of(VIA / best["path"]), "/engine/" in best["path"]):
+            fams[r["family"]] = r
+    cands = list(fams.values())
+    return (cands[0] if len(cands) == 1 else None), cands
+
+
+def gate(row: dict, sub: str) -> dict:
+    """啟動前閘:紅 = 不准啟動(讀不過 / 沒有入口 / 缺 L103 導入);黃 = 可以跑但要知道的事。"""
+    spec = ENGINE_SPEC[sub.upper()]
+    block, warn = [], []
+    bad = sorted(c for c in row["issues"] if c in RED_CLS)
+    if bad:
+        block.append("AST 讀不過:" + " ".join(bad) + "(" + (row["anchors"][0] if row["anchors"] else row["path"]) + ")")
+    library = "__main__" not in row["entry"]
+    named = row.get("named", "")
+    miss = [k for k in ("py_accel", "vdf_net") if row["l103"].get(k) == "MISS" and (k == "py_accel" or spec["need_net"])]
+    if miss and named:                                  # 基線具名名單上的檔:不准注橋,照實列黃,不擋
+        warn.append(f"缺 {'/'.join(miss)} 橋,但在 Celeritas 基線具名名單:{named}(CGC_MDL183 管;不注橋)")
+    elif "py_accel" in miss:
+        block.append("缺 PY 加速器橋 [VIA:ACCEL-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply")
+    if not named and "vdf_net" in miss:
+        block.append("用到網路套件卻缺 VDF 網路工具橋 [VIA:NET-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply")
+    if row["code"] == "未編號":
+        warn.append("未編號(下一輪 closeout 的 registry-sync + 編號會補)")
+    if "--selftest" not in row["flags"] and "selftest" not in row["verbs"]:
+        warn.append("沒看到 --selftest(無法先自測再跑)")
+    if row.get("netuse"):                              # 原始碼真的匯入網路套件(清單問掃橋器尾版)
+        warn.append("會觸網:要在你的視窗自己開 VIA_NET_CONSENT(" + ("已開" if os.environ.get("VIA_NET_CONSENT") == "YES" else "未開 → 引擎會照實 DENY") + ";AI 永不代設)")
+    soft = sorted(c for c in row["issues"] if c not in RED_CLS)
+    if soft:
+        warn.append("AST 提醒:" + " ".join(f"{c}×{row['issues'][c]}" for c in soft))
+    lamp = "RED" if block else ("NA" if library else ("YELLOW" if warn else "GREEN"))
+    if library and not block:
+        warn.insert(0, "沒有 __main__:這支是給別的引擎呼叫的程式庫,不單獨啟動")
+    verb = next((v for v in ("status", "run", "scan", "check") if v in row["verbs"]), "")
+    return {"sub": sub.upper(), "eid": row["eid"], "family": row["family"], "path": row["path"], "version": row["version"], "code": row["code"],
+            "lamp": lamp, "block": block, "warn": warn, "verbs": row["verbs"], "flags": row["flags"], "desc": row["desc"],
+            "launch": {"vcgc": ["run", "--family", spec["family"], row["family"]], "short": f"{spec['cmd']} {row['eid']}" + (f" {verb}" if verb else ""),
+                       "selftest": f"{spec['cmd']} {row['eid']} --selftest"}}
+
+
+def list_gates(rows: list[dict], sub: str) -> list[dict]:
+    """一個家族一列(多夾副本取 resolve 的那一份,另記副本數);同號異名的引擎號短令改給全名(引擎號會被問候選)。"""
+    by_fam = {}
+    for r in rows:
+        by_fam.setdefault(r["family"], []).append(r)
+    picked = []
+    for fam, rs in by_fam.items():
+        one, _ = resolve(rs, fam)
+        g = gate(one or rs[0], sub)
+        g["copies"] = len(rs) - 1
+        picked.append(g)
+    eids = {}
+    for g in picked:
+        eids.setdefault(g["eid"], []).append(g)
+    for eid, gs in eids.items():
+        if len(gs) > 1:
+            for g in gs:
+                g["launch"]["short"] = g["launch"]["short"].replace(f" {eid}", f" {g['family']}", 1)
+                g["launch"]["selftest"] = g["launch"]["selftest"].replace(f" {eid}", f" {g['family']}", 1)
+                g["warn"].append(f"同號異名:{eid} 還有 " + " · ".join(x["family"] for x in gs if x is not g) + "(短令用全名)")
+    return sorted(picked, key=lambda g: (g["eid"], g["family"]))
+
+
+def engine_main(sub: str, args: list[str], tag: str) -> int:
+    """SYSTEM MANAGER 的 `engine` 動詞本體:list · check <引擎> · card <引擎>(都只讀;真正啟動由短令經 VCGC 跑)。"""
+    sub = sub.upper()
+    verb, rest = (args[0], args[1:]) if args else ("list", [])
+    as_json = "--json" in rest
+    rest = [a for a in rest if a != "--json"]
+    try:
+        rows = engines(sub)
+    except RuntimeError as e:
+        print(json.dumps({"engine_gate": {"sub": sub, "lamp": "RED", "why": str(e)}}, ensure_ascii=False))
+        return 1
+    if verb == "list":
+        gates = list_gates(rows, sub)
+        if as_json:
+            print(json.dumps({"engines": gates}, ensure_ascii=False))
+            return 0
+        lamps = {k: sum(1 for g in gates if g["lamp"] == k) for k in ("GREEN", "YELLOW", "RED", "NA")}
+        print(f"[{tag} 引擎冊] {sub} 引擎尾版 {len(gates)} 支 · 可啟動 綠 {lamps['GREEN']} · 黃 {lamps['YELLOW']} · 紅(擋)  {lamps['RED']} · 程式庫(不單獨啟動)  {lamps['NA']}"
+              f" · 單引擎短令 {ENGINE_SPEC[sub]['cmd']} <引擎號> [子令 / 旗標]")
+        for g in gates:
+            mark = {"GREEN": "綠", "YELLOW": "黃", "RED": "紅", "NA": "庫"}[g["lamp"]]
+            print(f"  {mark} {g['eid']:<7} {g['family'][:44]:<44} {g['version']:<6} {g['code']:<18} → {g['launch']['short']}"
+                  + (f"  ✗ {g['block'][0][:60]}" if g["block"] else ""))
+        page = write_engine_page(sub, gates, tag)
+        print(f"  [頁] {page}")
+        return 0 if not lamps["RED"] else 2
+    if verb in ("check", "card"):
+        if not rest:
+            print(f"用法:{verb} <引擎號 | 全名 | 名稱片段>")
+            return 3
+        row, cands = resolve(rows, rest[0])
+        if row is None:
+            out = {"sub": sub, "key": rest[0], "lamp": "NODATA" if not cands else "AMBIGUOUS",
+                   "candidates": [{"eid": c["eid"], "family": c["family"], "path": c["path"]} for c in cands]}
+            print(json.dumps({"engine_gate": out}, ensure_ascii=False))
+            if not as_json:
+                print(f"  [{tag}] {'找不到' if not cands else '同號異名 / 片段命中多支,請給全名'}:{rest[0]}"
+                      + "".join(f"\n     · {c['eid']} {c['family']}  ({c['path']})" for c in cands))
+            return 3
+        g = gate(row, sub)
+        if not as_json:
+            print(f"[{tag} 啟動前閘] {g['lamp']} · {g['eid']} {g['family']} {g['version']} · 編號 {g['code']} · {g['path']}")
+            print(f"  說明 {g['desc'] or '—'}")
+            print(f"  子令 / 旗標 {' '.join(g['verbs'] + g['flags']) or '—'}")
+            for b in g["block"]:
+                print("  [擋] " + b)
+            for w in g["warn"]:
+                print("  [黃] " + w)
+            print(f"  [啟動] {g['launch']['short']}   (= via-vcgc {' '.join(g['launch']['vcgc'])} …;先自測:{g['launch']['selftest']})")
+            if verb == "card":
+                print("  [函數] " + " · ".join(row["functions"][:15]) + (" …" if len(row["functions"]) > 15 else ""))
+        print(json.dumps({"engine_gate": g}, ensure_ascii=False))
+        return {"GREEN": 0, "YELLOW": 2, "RED": 1, "NA": 2}[g["lamp"]]
+    print(f"用法:engine list | check <引擎> | card <引擎> [--json]")
+    return 2
+
+
+def write_engine_page(sub: str, gates: list[dict], tag: str) -> Path:
+    spec = _load(_newest("CGC_MDL173_MatrixReportSpec_v*.py"), "_mdl253_spec")
+    rows = [[{"t": g["lamp"], "s": g["lamp"]}, g["eid"], g["family"], g["version"], g["code"], g["desc"] or "—",
+             " ".join(g["verbs"] + g["flags"])[:80] or "—", g["launch"]["short"], "; ".join(g["block"]) or "—", "; ".join(g["warn"]) or "—"] for g in gates]
+    lamps = {k: sum(1 for g in gates if g["lamp"] == k) for k in ("GREEN", "YELLOW", "RED")}
+    body = spec.html_table(["燈", "引擎號", "家族", "版本", "編號", "說明", "子令 / 旗標", "單引擎啟動", "擋(紅)", "提醒(黃)"], rows,
+                           caption=f"{sub} 引擎冊:{len(gates)} 支尾版(點表頭排序)", center_cols={0}) + _FILTER_JS.replace("#main table.m", "table.m")
+    body = ("<div id='main'><div class='bar'><input id='tbx' placeholder='篩選:引擎號 / 名稱 / 說明…'> <select id='tlamp'><option value=''>全部燈</option>"
+            "<option>RED</option><option>YELLOW</option><option>GREEN</option></select> <select id='tsub'><option value=''>全部</option></select>"
+            " <span id='tcnt'></span></div>" + body + "</div>")
+    kpis = [{"label": "引擎", "value": len(gates), "state": "NA"}, {"label": "綠", "value": lamps["GREEN"], "state": "GREEN"},
+            {"label": "黃", "value": lamps["YELLOW"], "state": "YELLOW"}, {"label": "紅(擋)", "value": lamps["RED"], "state": "RED" if lamps["RED"] else "GREEN"}]
+    out = spec.page_html(body, title=f"{sub} 單引擎啟動冊", out=OUT / f"ENGINES_{sub}_latest.html", kpis=kpis,
+                         payload={"engines": gates}, md="", subtitle=f"{time.strftime('%Y-%m-%d %H:%M:%S')} · {tag} engine list · {ENGINE}",
+                         law="紅 = 啟動前閘擋下(讀不過 / 沒有入口 / 缺 L103 導入);黃 = 能跑但要知道(未編號 / 沒自測 / 要網路同意閘)。")
+    return out
+
+
 # ---------------------------------------------------------------- 動詞
 def do_scan(args: list[str]) -> int:
     flags = {a for a in args if a.startswith("--")}
@@ -745,6 +954,29 @@ def selftest() -> int:
     chk("⑨ 短令冊順點源鏈:看得到舊版定義的 via-in / via-vcgc 與尾版的 via-review", {"via-in", "via-vcgc", "via-review"} <= names, len(cmds))
     vin = next((c for c in cmds if c["cmd"] == "via-in"), {})
     chk("⑩ 別名接回(via-in = 進入環境)· 新增於 v0263", "進入環境" in vin.get("alias", []) and vin.get("added_ver") == 263, (vin.get("alias"), vin.get("added_ver")))
+    def fake(eid, fam, path, entry=("__main__",), accel="OK", net="OK", netuse=False, named="", code="VIA-X-ENG001", flags=("--selftest",)):
+        return {"eid": eid, "family": fam, "path": path, "version": "v0100", "code": code, "entry": list(entry), "flags": list(flags), "verbs": [],
+                "issues": {}, "anchors": [], "desc": "", "functions": [], "l103": {"py_accel": accel, "vdf_net": net, "ps_tpl": "—"},
+                "netuse": netuse, "named": named}
+    rows = [fake("ENG110", "VDF_ENG110_AKShareProbe", "functional modules/VDF/engine/VDF_ENG110_AKShareProbe_v0102.py"),
+            fake("ENG110", "VDF_ENG110_USMacroTree", "functional modules/VDF/engine/VDF_ENG110_USMacroTree_v0100.py"),
+            fake("ENG229", "VDF_ENG229_CNNFearGreedHistory", "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v0100.py")]
+    one, _ = resolve(rows, "229")
+    none, cands = resolve(rows, "ENG110")
+    chk("⑫ 引擎解析:229 → ENG229 一支;同號異名 ENG110 照實回 2 個候選不猜", one and one["eid"] == "ENG229" and none is None and len(cands) == 2)
+    red = gate(fake("ENG001", "VDF_ENG001_X", "x.py", accel="MISS", net="MISS", netuse=True), "VDF")
+    chk("⑬ 啟動前閘:缺加速器 / 用網路缺網路橋 = 紅擋", red["lamp"] == "RED" and len(red["block"]) == 2, red["block"])
+    lib = gate(fake("MDL006", "VRN_MDL006_Lib", "y.py", entry=()), "VRN")
+    named = gate(fake("ENG112", "VRN_ENG112_FinancialRead", "z.py", accel="MISS", named="正典唯讀本(不准注橋)"), "VRN")
+    chk("⑭ 沒 __main__ = 程式庫 NA(不單獨啟動,不算紅);基線具名唯讀本缺橋 = 黃不擋",
+        lib["lamp"] == "NA" and named["lamp"] == "YELLOW" and not named["block"], (lib["lamp"], named["lamp"]))
+    lg = {g["family"]: g for g in list_gates(rows, "VDF")}
+    chk("⑯ 引擎冊:同號異名的短令改給全名;不重號的照用引擎號",
+        lg["VDF_ENG110_AKShareProbe"]["launch"]["short"] == "via-vdfeng VDF_ENG110_AKShareProbe"
+        and lg["VDF_ENG229_CNNFearGreedHistory"]["launch"]["short"].startswith("via-vdfeng ENG229"), lg["VDF_ENG110_AKShareProbe"]["launch"]["short"])
+    ok_ = gate(rows[2], "VDF")
+    chk("⑮ 綠燈引擎給出單引擎短令與 VCGC 路徑", ok_["lamp"] == "GREEN" and ok_["launch"]["short"].startswith("via-vdfeng ENG229")
+        and ok_["launch"]["vcgc"] == ["run", "--family", "vdf", "VDF_ENG229_CNNFearGreedHistory"], ok_["launch"])
     text = Path(__file__).read_text(encoding="utf-8")
     chk("⑪ 檔頭 · 加速器橋 · 網路橋在;只收 VCGC;不碰 TA-Lib", PY_MARK in text and NET_MARK in text and "VIA_FROM_VCGC" in text
         and not re.search(r"^\s*(import|from)\s+talib", text, re.M))

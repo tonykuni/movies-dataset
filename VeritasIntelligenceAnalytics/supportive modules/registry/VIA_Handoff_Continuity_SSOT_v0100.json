@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T13:24:10+00:00",
+  "updated_at": "2026-10-02T14:03:52+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -900,7 +900,7 @@
         "CGC_MDL253_ToolingInventory",
         "--selftest"
       ],
-      "success_marker": "[工具盤點 v0100] 自測 11/11",
+      "success_marker": "[工具盤點 v0100] 自測 16/16",
       "scope": "工具盤點:鎖版全景 · 尾版律 · CLI 面 · L103 三導入 · 編號接回 · 短令冊順點源鏈",
       "dependencies": [
         "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
@@ -909,6 +909,32 @@
         "Register-VIA-Commands-v*.ps1"
       ],
       "timeout_seconds": 180
+    },
+    "vdf_engine": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0123 本版 6/6 · 前版 PASS",
+      "scope": "VDF 單引擎啟動冊:engine 動詞 · 啟動前閘 · 經 VCGC run",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vrn_engine": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS",
+      "scope": "VRN 單引擎啟動冊:engine 動詞 · 啟動前閘 · 經 VCGC run",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -1856,6 +1882,66 @@
       "owner": "操作員 / Windows 工作站",
       "reason": "HTML 自動開頁(os.startfile)與 Register v0267 短令要真 Windows + 點源命令冊才看得到;容器只驗 Python 與 CI pwsh 實跑",
       "next": "點源 Register v0267 → via-tools · via-cmds → 回貼 VIA_Reports\\tooling\\TOOLING_latest.md → 帶收據轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ117:vdf_engine",
+      "requirement": "VCGC-REQ117",
+      "state": "VERIFIED",
+      "case": "vdf_engine",
+      "owner": "VCGC closeout",
+      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
+      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/vdf_engine.json"
+    },
+    {
+      "id": "VCGC-REQ117:vrn_engine",
+      "requirement": "VCGC-REQ117",
+      "state": "VERIFIED",
+      "case": "vrn_engine",
+      "owner": "VCGC closeout",
+      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
+      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
+      "receipt": "docs/handoff/evidence/vrn_engine.json"
+    },
+    {
+      "id": "VCGC-REQ117:workstation",
+      "requirement": "VCGC-REQ117",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "via-vdfeng / via-vrneng 兩步啟動(管理員閘 → VCGC run)要真 PowerShell + 點源 Register v0268 才走得到;容器只驗 Python 端與 CI pwsh 解析",
+      "next": "點源 Register v0268 → via-engines → via-vdfeng 229 --selftest → 回貼後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ118:plan",
+      "requirement": "VCGC-REQ118",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;參數 / HEADER 下放 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ119:plan",
+      "requirement": "VCGC-REQ119",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;VRN 多來源 · 相互對照 · 還原修復 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ120:plan",
+      "requirement": "VCGC-REQ120",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;編號空格回填(與 REQ112 同路徑) 依序接著做",
+      "next": "REQ117 收尾後開工"
+    },
+    {
+      "id": "VCGC-REQ121:plan",
+      "requirement": "VCGC-REQ121",
+      "state": "PENDING",
+      "owner": "AI(下一段)",
+      "reason": "操作員 2026-10-02 令先做 ① 單引擎短令;VCGC 總控入口 依序接著做",
+      "next": "REQ117 收尾後開工"
     }
   ]
 }
