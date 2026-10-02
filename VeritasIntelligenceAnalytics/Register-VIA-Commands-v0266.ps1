@@ -6,7 +6,6 @@
 #     = Invoke-VIA-Review 尾版:① Git 整合檢視(唯讀;-Sync 才交 MergeMedic)② 撞名閘 MDL165 ③ 環境 MDL240 check(-Install 才接 MDL135 → MDL137 補裝)
 #       ④ sdd check + ssot panorama + 受控 .py 無編號 / 未註冊 = 紅 ⑤ 全景 AST 錨點(PAN-SCAN / PAN-READ / PS Parser;每條錯誤標 AST精準 / 彈性 / 行程)
 #       ⑥ -Lists 清單七步(v0108 原表)⑦ -Optimize 全部優化一回(RealTestCore 尾版)⑧ 多頁矩陣 HTML 自動開 + 貼回包進剪貼簿。
-#     v0105 起同一個指令再併 VIA-VERB-ENGINE 五支入口(⑨ health · global_read · fullcheck · 收尾鎖;-VerbEngine <夾> · -NoVerb)—— 指令整合為一。
 #     via_review(底線寫法)同一支。
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
