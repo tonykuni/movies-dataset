@@ -2289,6 +2289,14 @@
       "owner": "操作員(工作站)",
       "reason": "容器頁:235 項輸出 · 已驗證 182 · 失敗 6(容器沒 pwsh · 基底境 38 衝突 · VDF 清單資料到 09-15 · 全景 / 工具盤點各紅 1)· 過期 3;工作站資料才是正本",
       "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs(預設自動開頁)看 VIA_Reports/review/TABS_latest.html"
+    },
+    {
+      "id": "VCGC-REQ130:stale-vdf-vrn",
+      "requirement": "VCGC-REQ130",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "多分頁頁標過期 3 項(操作員 2026-10-02 指出「輸出結果驗證有錯」):S23 VDF 市場清單(09-16 RED)· S25 VRN NLP 管線(09-25)· S26 統一 NLP(09-25)。容器重跑實測:S23 → ABSENT(vdf_tw_market.duckdb 不在容器)· S25 / S26 → YELLOW(VDF 閘擋下游橋;容器只有合成 / 規格 PDF,不是券商研報)→ 容器結果不能代表正本,三份報告與 vrn_reports.duckdb 已還原,不以容器結果覆蓋工作站證據",
+      "next": "工作站:via-market-lists(status;要更新清單另開兩道同意閘 VIA_NET_CONSENT + VIA_SCRAPE_CONSENT 再 via-market-lists run)→ via-nlpvrn run -In <研報夾> → via-nlpunified pipeline -In <研報夾> → via-vcgc run CGC_MDL254_ReviewOnePage tabs 看 S23 / S25 / S26 轉現況"
     }
   ]
 }
