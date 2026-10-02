@@ -1,0 +1,94 @@
+{
+ "schema": "VIA.TickerRegexScope.SSOT.v1",
+ "version": "v0100",
+ "ts": "2026-10-02T04:40:00+00:00",
+ "batch": "R51b 2026-10-02(VRN 四冊代號 regex 收斂裁定)",
+ "source": "操作員 2026-10-02:「你決定自動完成」(三項待裁之三:VRN 四冊代號 regex 收斂)",
+ "decision": "保留各冊範疇,不合併成一本;CGC_MDL185 E4 只比同範疇的冊,並逐冊對照本冊宣告的範疇預期(收 / 拒)。冊的式不由本冊改寫——本冊只宣告範疇與預期,式的正本仍在各冊。",
+ "match": "fullmatch(與 CGC_MDL185 v0100 compare_regex_books 同一把尺)",
+ "probes": [
+  "2330",
+  "1101",
+  "0050",
+  "00878",
+  "00981A",
+  "2026",
+  "123",
+  "12345",
+  "2330.TW"
+ ],
+ "scopes": {
+  "STOCK4_LOCKED": {
+   "meaning": "四碼台股代號(含 0 開頭四碼 ETF 如 0050);中央 LOCKED 圈",
+   "ruling": "2026-08-04 四碼範疇凍結(中央同義字 regex 冊 TW_TICKER_LOCKED)",
+   "expect": {
+    "2330": true,
+    "1101": true,
+    "0050": true,
+    "00878": false,
+    "00981A": false,
+    "2026": true,
+    "123": false,
+    "12345": false,
+    "2330.TW": false
+   }
+  },
+  "INSTRUMENT_ALL": {
+   "meaning": "台股全商品代號:個股 + ETF(四到六碼、00 開頭五碼帶 ABDLRTUV 尾碼)",
+   "ruling": "批628 三平台九型含 ETF(VRN 規則冊 corrected)",
+   "expect": {
+    "2330": true,
+    "1101": true,
+    "0050": true,
+    "00878": true,
+    "00981A": true,
+    "2026": true,
+    "123": false,
+    "12345": false,
+    "2330.TW": false
+   }
+  },
+  "STOCK_TEXT_EXTRACT": {
+   "meaning": "從報告內文抽個股代號(首碼非零四碼;ETF 不在此範疇)",
+   "ruling": "寬鬆式不入 LOCKED 圈;TickerRegexSSOT 只抽個股",
+   "expect": {
+    "2330": true,
+    "1101": true,
+    "0050": false,
+    "00878": false,
+    "00981A": false,
+    "2026": true,
+    "123": false,
+    "12345": false,
+    "2330.TW": false
+   }
+  }
+ },
+ "books": {
+  "VIA_Central_Synonym_Regex": {
+   "key": "TW_TICKER_LOCKED",
+   "scope": "STOCK4_LOCKED"
+  },
+  "VRN_FieldRules_SSOT": {
+   "key": "rules.ticker.corrected.TW_TICKER",
+   "scope": "INSTRUMENT_ALL"
+  },
+  "VRN_TickerRegexSSOT": {
+   "key": "rules.TW_TICKER_REGEX",
+   "scope": "STOCK_TEXT_EXTRACT",
+   "match_prefix": true
+  },
+  "VRN_TickerDate_Regex(寬鬆式)": {
+   "key": "ticker_patterns.LOOSE_TW_TICKER",
+   "scope": "STOCK_TEXT_EXTRACT"
+  }
+ },
+ "known_limits": [
+  "2026 這類年份四碼所有冊都收(fullmatch 層分不出年份與代號,要靠上下文;中央 LOCKED 第二支 (?!202[1-9]|2030) 被第一支 [1-9]\\d{3} 先吃掉,屬既有式,不在本冊改)"
+ ],
+ "states": {
+  "AGREE": "GREEN · 每本冊都符合自己範疇的預期,同範疇冊判法相同",
+  "SCOPE_DRIFT": "YELLOW · 某冊對某探針的判法偏離自己範疇的預期",
+  "UNSCOPED": "YELLOW · 讀得到的冊沒在本冊宣告範疇(新冊先登範疇)"
+ }
+}

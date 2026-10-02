@@ -79,3 +79,9 @@
   - ③ VRN 四冊代號 regex:裁定保留各冊範疇(STOCK4 · INSTRUMENT_ALL · TEXT_EXTRACT_STOCK),探針只比同範疇(下一批:範疇冊 + CGC_MDL185 v0101)。
   - 盤點冊 v0124(+C-etf_registry_resolve)· 需求冊 v0139(VDF-REQ014 引述 + 證據)· 交接案 etf_registry_resolve / entry 全過。
   - 既有紅(非本批):V-systems 的 VRN logic RED = VRN 自家邏輯冊 v0112 記 ENG086 v0118、磁碟已 v0119(R43 起);冊歸 VRN,VCGC 不改。
+- R51b 收尾:PR #423 合併(e1a5784f)。UAT 第一輪紅 = test_11 總控頁嵌 VCGC 尾版說明行(v0187 換了)→ 依正主重產(契約 19/19),後面 pandas 錯是 pip 步被跳過的連帶。PS7 紅 = 已知 ETF 衝突 WARN(PR 上留言一次)。
+- R51c(三項待裁之三 · VRN 四冊代號 regex):裁定保留各冊範疇,不合併。
+  - `VIA_TickerRegex_Scope_SSOT_v0100`:三範疇 STOCK4_LOCKED(中央 LOCKED)· INSTRUMENT_ALL(規則冊 corrected)· STOCK_TEXT_EXTRACT(TickerRegexSSOT + 寬鬆式),每範疇對 9 探針宣告收 / 拒;式的正本仍在各冊,本冊不改式。
+  - `CGC_MDL185_SsotBookSync_v0101`:E4 逐冊對自己範疇預期;偏離 = SCOPE_DRIFT(黃)· 未宣告冊 = UNSCOPED(黃)· 範疇冊缺 = 退回 v0100 原判(不假綠)。自測 10/10 + 前版 24/24。
+  - ssot panorama 前後:正則@VCGC YELLOW(DISAGREE:0050 / 00878 / 00981A)→ 綠(AGREE)。已知限制:年份四碼(2026)fullmatch 層各冊都收,靠上下文,不在本冊改。
+  - 需求冊 v0140(VCGC-REQ110 引述 + 證據)· 盤點冊 v0125(+C-ticker_regex_scope)· 交接案 ticker_regex_scope 過。
