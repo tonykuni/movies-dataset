@@ -734,6 +734,29 @@ def gate(row: dict, sub: str) -> dict:
                        "selftest": f"{spec['cmd']} {row['eid']} --selftest"}}
 
 
+def list_gates(rows: list[dict], sub: str) -> list[dict]:
+    """一個家族一列(多夾副本取 resolve 的那一份,另記副本數);同號異名的引擎號短令改給全名(引擎號會被問候選)。"""
+    by_fam = {}
+    for r in rows:
+        by_fam.setdefault(r["family"], []).append(r)
+    picked = []
+    for fam, rs in by_fam.items():
+        one, _ = resolve(rs, fam)
+        g = gate(one or rs[0], sub)
+        g["copies"] = len(rs) - 1
+        picked.append(g)
+    eids = {}
+    for g in picked:
+        eids.setdefault(g["eid"], []).append(g)
+    for eid, gs in eids.items():
+        if len(gs) > 1:
+            for g in gs:
+                g["launch"]["short"] = g["launch"]["short"].replace(f" {eid}", f" {g['family']}", 1)
+                g["launch"]["selftest"] = g["launch"]["selftest"].replace(f" {eid}", f" {g['family']}", 1)
+                g["warn"].append(f"同號異名:{eid} 還有 " + " · ".join(x["family"] for x in gs if x is not g) + "(短令用全名)")
+    return sorted(picked, key=lambda g: (g["eid"], g["family"]))
+
+
 def engine_main(sub: str, args: list[str], tag: str) -> int:
     """SYSTEM MANAGER 的 `engine` 動詞本體:list · check <引擎> · card <引擎>(都只讀;真正啟動由短令經 VCGC 跑)。"""
     sub = sub.upper()
@@ -746,7 +769,7 @@ def engine_main(sub: str, args: list[str], tag: str) -> int:
         print(json.dumps({"engine_gate": {"sub": sub, "lamp": "RED", "why": str(e)}}, ensure_ascii=False))
         return 1
     if verb == "list":
-        gates = [gate(r, sub) for r in rows]
+        gates = list_gates(rows, sub)
         if as_json:
             print(json.dumps({"engines": gates}, ensure_ascii=False))
             return 0
@@ -947,6 +970,10 @@ def selftest() -> int:
     named = gate(fake("ENG112", "VRN_ENG112_FinancialRead", "z.py", accel="MISS", named="正典唯讀本(不准注橋)"), "VRN")
     chk("⑭ 沒 __main__ = 程式庫 NA(不單獨啟動,不算紅);基線具名唯讀本缺橋 = 黃不擋",
         lib["lamp"] == "NA" and named["lamp"] == "YELLOW" and not named["block"], (lib["lamp"], named["lamp"]))
+    lg = {g["family"]: g for g in list_gates(rows, "VDF")}
+    chk("⑯ 引擎冊:同號異名的短令改給全名;不重號的照用引擎號",
+        lg["VDF_ENG110_AKShareProbe"]["launch"]["short"] == "via-vdfeng VDF_ENG110_AKShareProbe"
+        and lg["VDF_ENG229_CNNFearGreedHistory"]["launch"]["short"].startswith("via-vdfeng ENG229"), lg["VDF_ENG110_AKShareProbe"]["launch"]["short"])
     ok_ = gate(rows[2], "VDF")
     chk("⑮ 綠燈引擎給出單引擎短令與 VCGC 路徑", ok_["lamp"] == "GREEN" and ok_["launch"]["short"].startswith("via-vdfeng ENG229")
         and ok_["launch"]["vcgc"] == ["run", "--family", "vdf", "VDF_ENG229_CNNFearGreedHistory"], ok_["launch"])
