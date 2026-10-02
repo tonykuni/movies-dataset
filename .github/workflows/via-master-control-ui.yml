@@ -372,6 +372,8 @@ jobs:
           "|---|---|---|---|" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           $rows | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($red) { exit 1 }
+          # 黃(rc 2)照實列在 summary,不讓 job 紅;pwsh 步驟結尾會沿用最後原生指令的 $LASTEXITCODE,所以明寫 exit 0
+          exit 0
 
       - name: Upload VCGC gate evidence
         if: always()
