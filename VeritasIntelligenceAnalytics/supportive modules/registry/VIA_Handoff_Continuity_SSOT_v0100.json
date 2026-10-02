@@ -275,12 +275,15 @@
         "CGC_MDL233_ToolActivate",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL233_ToolActivate_v0104 selftest +5/5 PASS",
-      "scope": "工具啟用閘:席位唯一 · activated_at(UTC)· 名冊換名出新版號檔 + v0100–v0103 原檢查(側線 2026-09-30 a · R06 / R01 / R08)",
+      "success_marker": "CGC_MDL233_ToolActivate_v0106 selftest +5/5 PASS",
+      "scope": "工具啟用閘:席位唯一 · activated_at(UTC)· 名冊換名出新版號檔 + v0100–v0103 原檢查(側線 2026-09-30 a · R06 / R01 / R08);v0106(VCGC-REQ127):+praddle 家族(VRN_ENG398)· LAYOUT v0110 / NLP v0106 從鎖冊取 PRADDLE 並經同一把尺啟用;前版鏈量出貨時鎖冊",
       "dependencies": [
         "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py",
         "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
-        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
       ],
       "timeout_seconds": 300
     },
@@ -999,6 +1002,37 @@
       "scope": "隔離境 OCR 車道回逐行座標(RapidOCR via_rapidocr · PaddleOCR via_paddle_311 2.x / 3.x);主行程不 import OCR 套件",
       "dependencies": [
         "supportive modules/registry/via_ocr_super_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "layout_praddle": {
+      "argv": [
+        "SUP_MDL743_GenericLayoutHub",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL743 v0110 7/7 · PASS",
+      "scope": "LAYOUT 導入 PRADDLE(VCGC-REQ127):只認鎖冊 praddle(sha 對得上;不 glob)· def_run_praddle 只收 VCGC · 車道狀態(隔離境)· 合成報表經 LAYOUT 跑鎖冊 PRADDLE · 本行程不載 OCR 套件 · def_run_batch 不改道",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "nlp_praddle": {
+      "argv": [
+        "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL866 v0106 7/7 · PASS",
+      "scope": "NLP 導入 PRADDLE(VCGC-REQ127):pdf 動詞 = PDF → 鎖冊 PRADDLE → LAYOUT 修復段落(頁眉雜訊剔除)→ v0103 run_text;只收 VCGC · 只認鎖冊 · 本行程不載 OCR 套件",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
       ],
       "timeout_seconds": 300
     }
@@ -2094,12 +2128,11 @@
     {
       "id": "VCGC-REQ126:praddle-envs",
       "requirement": "VCGC-REQ126",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "操作員(工作站裝隔離境)",
       "reason": "PRADDLE(RapidOCR · PaddleOCR)高風險,操作員令要獨立環境;ENG398 只在隔離境子行程叫它們。容器與工作站目前兩車道 NO_ENV",
       "next": "工作站:via-vcgc run via_ocr_super --plan 看兩個隔離境(via_rapidocr · via_paddle_311)的安裝計畫 → 照環境計畫(盤點 → 衝突檢查 → 乾淨還原點)由操作員裝(要網路先自己開同意閘)→ via-vcgc run --family vrn VRN_ENG398_PraddleExtractor probe 兩車道 READY → run --in C:\\測試樣本報告 --ocr force 看互核",
-      "case": "praddle",
-      "receipt": "docs/handoff/evidence/praddle.json"
+      "note": "2026-10-02 更正(VERIFIED → PENDING):上輪 closeout ③+ 因本項掛了 praddle 案(容器程式自測)而自動轉 VERIFIED;但本項是工作站裝兩個隔離境,容器自測證不到 → 轉回 PENDING、不掛案;收據要工作站 ENG398 probe 兩車道 READY"
     },
     {
       "id": "VCGC-REQ124:workstation-ui",
@@ -2116,6 +2149,23 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
+    },
+    {
+      "id": "VCGC-REQ127:tool-import",
+      "requirement": "VCGC-REQ127",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "操作員令「將 LAYOUT NPL 都有導入工具」:PRADDLE 進工具鎖冊(CGC_MDL233 v0106 praddle 家族)· LAYOUT v0110 / NLP v0106 從鎖冊取它並經 VCGC 啟用",
+      "next": "收尾實跑 nlp_praddle 案(含 LAYOUT 修復段落 → run_text)轉 VERIFIED;工作站同步後 via-vcgc tools status 看七家 sha 全對",
+      "case": "nlp_praddle"
+    },
+    {
+      "id": "VCGC-REQ126:best-aligned-baseline",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站實跑)· AI(根因修)",
+      "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
+      "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
     }
   ]
 }

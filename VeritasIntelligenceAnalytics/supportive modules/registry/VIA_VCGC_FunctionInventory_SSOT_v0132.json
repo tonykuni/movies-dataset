@@ -1672,6 +1672,38 @@
    "deps": [
     "supportive modules/registry/via_ocr_super_v*.py"
    ]
+  },
+  {
+   "id": "C-layout_praddle",
+   "name": "交接案 layout_praddle(SUP_MDL743_GenericLayoutHub --selftest;LAYOUT 從鎖冊取 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL743_GenericLayoutHub",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
+  },
+  {
+   "id": "C-nlp_praddle",
+   "name": "交接案 nlp_praddle(SUP_MDL866_VIAUnifiedNLPOrchestrator --selftest;NLP pdf 動詞經鎖冊 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
   }
  ],
  "coverage": {
@@ -2059,6 +2091,12 @@
    },
    "ocr_super_boxes": {
     "station": "C-ocr_super_boxes"
+   },
+   "layout_praddle": {
+    "station": "C-layout_praddle"
+   },
+   "nlp_praddle": {
+    "station": "C-nlp_praddle"
    }
   },
   "workflow": {
@@ -2264,5 +2302,5 @@
  "why_v0129": "側線 2026-10-02(VCGC-REQ122):交接新案 onepage → 新站 C-onepage;其餘一字不動(只增)",
  "why_v0130": "側線 2026-10-02 b(VCGC-REQ124):交接新案 sweeper → 新站 C-sweeper(站冊 + 交接案對應);其餘一字不動(只增)",
  "why_v0131": "側線 2026-10-02 c(VCGC-REQ126):交接新案 ppp_hub → 新站 C-ppp_hub(站冊 + 交接案對應);其餘一字不動(只增)",
- "why_v0132": "側線 2026-10-02 d(VCGC-REQ126):交接新案 praddle · ocr_super_boxes → 新站 C-praddle · C-ocr_super_boxes(站冊 + 交接案對應);其餘一字不動(只增)"
+ "why_v0132": "側線 2026-10-02 d(VCGC-REQ126):交接新案 praddle · ocr_super_boxes → 新站 C-praddle · C-ocr_super_boxes(站冊 + 交接案對應);其餘一字不動(只增);同批(VCGC-REQ127「將 LAYOUT NPL 都有導入工具」):+C-layout_praddle · C-nlp_praddle(站冊 + 交接案對應)"
 }
