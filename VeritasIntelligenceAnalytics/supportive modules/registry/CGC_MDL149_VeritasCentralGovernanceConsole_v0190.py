@@ -179,6 +179,8 @@ def selftest() -> int:
         not [x for x in w if issubclass(x.category, DeprecationWarning)]
         and got == [("ClassDef", "A", 3, [("FunctionDef", "m", 4)]), ("FunctionDef", "g", 9, [])] and PRIOR._build_v0189 is _build_v0190, got)
     src = Path(__file__).read_text(encoding="utf-8")
+    chk("⑧ 只有單獨 --selftest 跑中央自測:run X --selftest 照路由給 X(收尾交接案靠這條)",
+        bool(re.search(r'^\s+sys\.exit\(selftest\(\) if sys\.argv\[1:\] == \["--selftest"\] else main\(\)\)', src, re.M)))
     chk("⑦ 已裝進前版(v0188.cached · v0189._build_v0189)· 加速器橋在 · 只收 VCGC · 不碰 TA-Lib",
         V0188.cached is cached and "[VIA:ACCEL-BRIDGE" in src and "VIA_FROM_VCGC" in src
         and not re.search(r"^\s*(import|from)\s+talib", src, re.M))
@@ -187,4 +189,4 @@ def selftest() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(selftest() if "--selftest" in sys.argv[1:] else main())
+    sys.exit(selftest() if sys.argv[1:] == ["--selftest"] else main())    # 只有單獨 --selftest 跑中央自測;run X --selftest 照路由給 X(v0176 起的規矩)
