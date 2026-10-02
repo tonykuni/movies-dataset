@@ -214,12 +214,12 @@
         "CGC_MDL149_VeritasCentralGovernanceConsole",
         "--selftest"
       ],
-      "success_marker": "[交接入口] fail=0",
-      "scope": "VCGC 入口、精確子引擎派送與舊回歸",
+      "success_marker": "[計] VCGC v0190 本版 7/7 · PASS",
+      "scope": "VCGC 入口、精確子引擎派送與舊回歸;v0190(VCGC-REQ131):閘沿用只沿用「過」· 骨架節點必填欄;本版行只在前版鏈 [交接入口] fail=0 時才印 PASS",
       "dependencies": [
         "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
       ],
-      "timeout_seconds": 180
+      "timeout_seconds": 600
     },
     "manager": {
       "argv": [
@@ -1058,6 +1058,18 @@
       "scope": "教訓帳跨行程鎖 + 原子寫入 + 讀壞不當空帳(VCGC-REQ129 並行前提;實測無鎖 6 行程 600 筆剩 24 筆 → 有鎖 600/600)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "step_matrix": {
+      "argv": [
+        "CGC_MDL226_StepMatrix",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL226_StepMatrix_v0103 selftest +13/13 PASS",
+      "scope": "步驟矩陣 4–8 真量(唯讀):政策冊在 · 撞號 / 無號照列不套 · PS 模板 / 加速章(入口缺才 RED)· 境沿用 ENVMGR · 子系統 drift;前三步一字不動;opened_subsystem 照 v0100 意思",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL226_StepMatrix_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2305,6 +2317,40 @@
       "owner": "操作員裁定資料來源 → AI",
       "reason": "工作站 2026-10-02 實跑 via-market-lists:總判 RED「個股 SCHEMA_MISSING」,但同次 v0105 讀取器 tw_stock GREEN 1981 檔 · active_tw_etf GREEN 22 檔。兩把尺:本體 status 要求 tw_listings_industry 同時有台灣與美國產業分類欄(us_industry / gics_industry / industry_us),v0105 只量代號清單。現役引擎沒有任何一支寫美國產業分類欄(ENG058 只做台灣雙所混合分類)→ 真資料缺口,不是程式錯;零發明律下不自造對照",
       "next": "操作員裁定美國產業分類來源(例:yfinance sector/industry · GICS 對照表)→ 出寫入引擎新版 → via-market-lists 轉 GREEN;或裁定個股只要台灣分類 → 出 VDF_ENG087 新尾版改尺(要寫明理由)"
+    },
+    {
+      "id": "VCGC-REQ131:step-matrix-real",
+      "requirement": "VCGC-REQ131",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "步 4–8 寫死 HOLD 從沒量過",
+      "next": "收尾實跑 step_matrix 案轉 VERIFIED",
+      "case": "step_matrix"
+    },
+    {
+      "id": "VCGC-REQ131:gate-cache-pass-only",
+      "requirement": "VCGC-REQ131",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "v0188 沿用連閘失敗也記 → 工作站串測 94 站連坐同一筆失敗",
+      "next": "收尾實跑 entry 案(v0190 7/7)轉 VERIFIED",
+      "case": "entry"
+    },
+    {
+      "id": "VCGC-REQ131:workstation-rerun",
+      "requirement": "VCGC-REQ131",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "工作站串測 136 站紅 94(閘失敗沿用連坐)· 可用記憶體 952 MB → 加速器 aggressive 預算降到 1,並行自動關(記憶體壓力係數,照設計)",
+      "next": "PR 併入後 via-medic sync --apply → via-vcgc test;若仍有閘紅:via-vcgc status --fresh 貼回第一個沒過的閘"
+    },
+    {
+      "id": "VCGC-REQ131:number-collisions",
+      "requirement": "VCGC-REQ131",
+      "state": "PENDING",
+      "owner": "操作員裁定命名",
+      "reason": "步 5 實量撞號 14 組(同家族同號不同名):CGC_MDL193 15 支 · CGC_MDL149 24 支附屬 · SUP_MDL743 Layout* 6 支 · VDF_ENG110/117/118 · VRN_ENG109 · CGC_MDL135/142/197/199/224 · VDF_MDL001 · VRN_MDL001",
+      "next": "操作員裁定:附屬拆檔(Layout* · MDL149_*)算同家族合法,或改號;裁定後出 StepMatrix 新尾版收規則 / 交中央編號 CGC_MDL237 改號"
     }
   ]
 }

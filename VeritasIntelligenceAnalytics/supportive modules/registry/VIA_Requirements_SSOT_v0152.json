@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
- "version": "v0151",
- "batch": "合併 main(PR #435)後側線 PRADDLE · LAYOUT/NLP 導入 · CPU 並行改登本版",
- "ts": "2026-10-02T19:11:16+00:00",
+ "version": "v0152",
+ "batch": "VCGC-REQ130 多分頁 U/I(合併後改登本版)· VCGC-REQ131 步驟矩陣 4–8 真量 · 閘沿用只沿用「過」",
+ "ts": "2026-10-02T20:42:35+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -79,7 +79,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 21,
-  "COVERED": 106,
+  "COVERED": 108,
   "PARTIAL": 40,
   "MISSING": 1
  },
@@ -4289,6 +4289,57 @@
     "CGC_MDL254_ReviewOnePage_v0101.py"
    ],
    "renumbered_from": "VCGC-REQ128"
+  },
+  {
+   "code": "VCGC-REQ130",
+   "subsystem": "VCGC",
+   "topic": "三系統輸出與驗證狀態 · 多分頁 HTML U/I · 小字 · 矩陣自動調節",
+   "requirement": "操作員令:啟動 VCGC / VDF / VRN 並輸出、驗證輸出;用多分頁 HTML U/I 顯示所有輸出與驗證狀態;小字體;自動調節優化矩陣報告",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "docs/VIA_S20261002_CpuAccel_RealTest_Closeout.md"
+   ],
+   "evidence": "CGC_MDL254 v0102 `tabs`:讀唯一頁 27 源 + 串測逐站 + VDF / VRN 鏈逐站 + 冊外 *_latest.json → TABS_latest.html;驗證口徑一把尺(綠且未過期 = 已驗證 · 黃 = 警示 · 紅 = 失敗 · 缺 = 無資料 · 過期);七分頁 · 11px / 矩陣自動 9–12px · 排序 · 篩選 · 燈號快篩 · 單檔零外連;自測 7/7;Chromium 實測 1400 / 390 寬:零 JS 錯 · 頁身不橫捲 · 快篩 53 → 8 列。容器實跑:VCGC 串測 135 站綠 122 · 黃 13 · 紅 0(418s 並行 4)· VDF 鏈綠 8 · NODATA 2 · VRN 鏈綠 45 · NODATA 3 · ABSENT 3;頁上 235 項 · 已驗證 182 · 失敗 6 · 過期 3",
+   "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs 看工作站正本資料",
+   "hand": "AI(已交)· 操作員(工作站看頁)",
+   "quotes": [
+    {
+     "text": "ACTIVATE VCGC VDF VRN AND OUTPUT AND VERIFY OUTPUT AND USE A HTML U/I MULTIPLE TAB U/I TO DISPLAY THE OUTPUT AND VERIFIED STATUS OF ALLOUTPUT. 小字體  自動調節優化矩陣報告.",
+     "recorded_at": "2026-10-02T19:36:36+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL254_ReviewOnePage_v0102.py"
+   ]
+  },
+  {
+   "code": "VCGC-REQ131",
+   "subsystem": "VCGC",
+   "topic": "步驟矩陣 4–8 從 HOLD 改真量 · 串測 94 紅根因(閘失敗被沿用)",
+   "requirement": "操作員令(2026-10-03,貼回 via-vcgc test 136 站 · 紅 94):修正 5 HOLD number · 6 HOLD ps_template · 7 HOLD env · 8 HOLD subsystem;加入加速模板或加速器。操作員帶來 CGC_MDL226 v0103(步 1–3 不動 · 4–8 真量 · 本口不做的事仍不做)",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0134.json"
+   ],
+   "evidence": "CGC_MDL226 v0103(操作員帶來;入倉前讀過全檔並修三件):① PS 尾版版號只認 _vNNNN → OperatorConsole-v0111 等全回 -1,取到 glob 第一支(Windows 上最舊)→ 加 _psvnum_v0103;② PS 章只讀前 6000 字元 → v0111 第 122 行的 [VIA:PS-ACCEL] 讀不到誤判 RED → 讀整檔;③ 撞號把同一支的 _sha… 快照 / _vNNNNR 封存當另一個名字(30 → 14 組);④ opened_subsystem 改成 True 使 v0161 / v0170 鏈自測(前三步不開子系統)紅 → 照 v0100 意思保持 False,第 8 步讀冊另記 subsystem_read。自測 13/13;實跑 rc 0:步 4 GREEN · 5 YELLOW(646 家族 · 撞號 14 · 無號 122)· 6 YELLOW(PS 128 · 入口 v0111 兩章齊 · 舊快照缺模板章 3)· 7 RED(沿用 ENVMGR)· 8 GREEN;加速器橋覆蓋 524/549。串測 94 紅根因(本對話框 v0188 的沿用):cached() 連失敗也記,94 站共用同一把鑰匙 c829e6274566b0af 的一筆閘失敗;政策冊衝突 / 還原兩段只印不擋(return 0)→ VCGC v0190:policy / gate_ok 只沿用「過」,失敗不記、記著的失敗丟掉重算;另修 v0189 骨架節點缺必填欄(Python 3.13 DeprecationWarning)。v0190 本版 7/7 · 鏈 [交接入口] fail=0",
+   "next": "工作站同步後 via-vcgc test:紅站應大幅下降;若仍有閘紅,via-vcgc status --fresh 看第一個沒過的閘並貼回;14 組撞號由操作員裁定命名",
+   "hand": "AI(已交)· 操作員(工作站重跑 · 撞號裁定)",
+   "quotes": [
+    {
+     "text": "修正以下問題  5 HOLD number after_policy 自動編碼編號,本口不套用 · 6 HOLD ps_template later · 7 HOLD env later · 8 HOLD subsystem 到這步才讀 … 加入加速模板或加速器",
+     "recorded_at": "2026-10-02T20:42:35+00:00"
+    },
+    {
+     "text": "先把根因講清楚:那四個 HOLD 不是壞掉,是 CGC_MDL226_StepMatrix v0100 的設計 … 出 v0103 薄尾(上面檔案,放進 supportive modules\\registry\\)",
+     "recorded_at": "2026-10-02T20:42:35+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL226_StepMatrix_v0103.py",
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0190.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -4393,7 +4444,7 @@
    "reason": "截圖;需求見 08:59 那一則(進入環境指令)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0150.json",
+ "prior": "VIA_Requirements_SSOT_v0151.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -4442,5 +4493,6 @@
  "why_v0149": "VCGC-REQ124 補 v0189 實測(改檔後 run 36s→6s);+VCGC-REQ126(RECORDED:聚焦 VCGC/VDF/VRN 成功啟動與結果驗證);其餘一字不動",
  "why_v0150": "+VCGC-REQ127(PARTIAL:每日進度交接十點引擎 CGC_MDL140 v0104 `handoff daily`;容器實測過,工作站每日實跑待做);其餘一字不動(只增)",
  "why_v0151": "PR #434 合併 main:main 的 v0150 = PR #435(+VCGC-REQ127 每日交接),側線也出了 v0150(同號異義)→ main 的 v0150 一字不動;側線內容改登本版:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據 · 近兩週最佳對齊記錄;側線 VCGC-REQ127(LAYOUT · NLP 經鎖冊導入 PRADDLE)→ 改編 VCGC-REQ128;側線 VCGC-REQ128(CPU 最大加速 · 三系統實測 · 工具使用記錄)→ 改編 VCGC-REQ129(各帶 renumbered_from;不同來源不得因值相同合併編號)",
- "why_v0150_branch": "v0149 已由 PR #433 併入 main(註冊完整性 IMMUT:不得就地改)→ 本批改以新版號發布:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據與原話 · VCGC-REQ126 補近兩週最佳對齊記錄;+VCGC-REQ127(COVERED:LAYOUT · NLP 經鎖冊導入 PRADDLE);v0149 回復 main 原樣、其餘一字不動;同批 +VCGC-REQ128(PARTIAL:CPU 最大加速 · 三系統實測 · 工具使用記錄;四項待辦附下一步)"
+ "why_v0150_branch": "v0149 已由 PR #433 併入 main(註冊完整性 IMMUT:不得就地改)→ 本批改以新版號發布:VRN-REQ006 · VCGC-REQ126 補 PRADDLE 證據與原話 · VCGC-REQ126 補近兩週最佳對齊記錄;+VCGC-REQ127(COVERED:LAYOUT · NLP 經鎖冊導入 PRADDLE);v0149 回復 main 原樣、其餘一字不動;同批 +VCGC-REQ128(PARTIAL:CPU 最大加速 · 三系統實測 · 工具使用記錄;四項待辦附下一步)",
+ "why_v0152": "v0151 已由 PR #434 併入 main(IMMUT:不得就地改)→ 合併後側線加在 v0151 的 VCGC-REQ130 改登本版,v0151 回復 main 原樣;+VCGC-REQ131(COVERED:步驟矩陣 4–8 真量 · 閘沿用只沿用「過」)"
 }
