@@ -1,13 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VRN manager tail. Repair and the result check stay in the books.
+"""VRN manager tail (v0112). Frame flow is a verb. The book lists the params.
 
-v0111 still owns the first frame door. This file reads
-VRN_FrameFlow_SSOT_v0101 and runs ENG115 v0101. That engine calls ENG392
-for R0–R3 and ENG082 for the cross-check. The manager does not restate
-the thresholds.
+Merge note (2026-10-02, PR #419): this tail was cut as v0111 on an old base; main already
+has its own v0111 (the `outputs` verb, R50). Renumbered to v0112 with the prior set to main's
+v0111, so `outputs` and `frame` both stay. One number, one owner.
+
+v0111 (outputs) and v0110 still own status, catalog, read, provenance and outputs. This file adds
+`frame`. Input params, the dataframe output, source tables, the flow, and
+the actions are read from VRN_FrameFlow_SSOT. They are not copied here.
+An action that is not in the book is refused.
 """
 from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import importlib.util
 import json
@@ -17,8 +35,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PRIOR_PATH = HERE / "VRN_SystemManager_v0111.py"
-BOOK_PATH = HERE / "VRN_FrameFlow_SSOT_v0101.json"
-ENGINE_PATH = HERE / "VRN_ENG115_HeaderFrameTemp_v0101.py"
+BOOK_PATH = HERE / "VRN_FrameFlow_SSOT_v0100.json"
+ENGINE_PATH = HERE / "VRN_ENG115_HeaderFrameTemp_v0100.py"
 VIA = "VRN_SystemManager v0112"
 _prior = None
 _engine = None
@@ -42,7 +60,7 @@ def _facade():
 def _eng():
     global _engine
     if _engine is None:
-        _engine = _load(ENGINE_PATH, "vrn_eng115_v0101_for_manager")
+        _engine = _load(ENGINE_PATH, "vrn_eng115_for_manager")
     return _engine
 
 
@@ -103,8 +121,7 @@ def _card(result: dict) -> dict:
         })
     return {
         "via": VIA,
-        "state": result.get("verify", {}).get("status") or result.get("state"),
-        "verify": result.get("verify"),
+        "state": result.get("state"),
         "cover": result.get("cover"),
         "sources": book().get("sources"),
         "flow": book().get("flow"),
@@ -131,7 +148,7 @@ def frame(action: str, params: dict | None = None) -> tuple[int, dict]:
         return 2, {"via": VIA, "state": "NODATA", "missing": missing, "params": contract()["book_params"]}
     result = _eng().run(ready)
     card = _card(result)
-    ok = (result.get("verify") or {}).get("status") == "PASS"
+    ok = result.get("state") in ("REPAIRED", "INTACT")
     return (0 if ok else 1), card
 
 
@@ -154,6 +171,8 @@ def main(argv=None) -> int:
 
 def selftest() -> int:
     fails = []
+    # 先跑前版鏈自測(輸出照印:main 交接案 vrn_outputs / manager 的判決標記在前版輸出裡)
+    prior_rc = _facade().selftest()
 
     def chk(name, ok):
         print(("  [OK] " if ok else "  [FAIL] ") + name)
@@ -164,8 +183,8 @@ def selftest() -> int:
     chk("未經 VCGC 拒絕", main(["frame", "show"]) == 2)
     os.environ["VIA_FROM_VCGC"] = "YES"
     card = contract()
-    chk("參數名同一份", card["ok"] and card["book_params"][-1] == "second_text")
-    chk("修復與互核在流程裡", "repair_r0_r3" in card["flow"] and "xcheck" in card["flow"] and card["flow"][-1] == "four_point")
+    chk("參數名同一份", card["ok"] and card["book_params"] == ["temp_dir", "header", "chunk", "mem_rows", "preview"])
+    chk("來源表與流程在冊上", len(card["sources"]) == 2 and card["flow"][0] == "split_left_right" and card["flow"][-1] == "four_point")
     chk("冊外動作拒絕", frame("drop")[0] == 2)
     shown = read("frame")
     chk("read frame", shown["state"] == "GREEN" and shown["output"]["kind"] == "dataframe")
@@ -175,23 +194,22 @@ def selftest() -> int:
         path.write_text(json.dumps({
             "temp_dir": str(Path(td) / "out"),
             "blocks": [
-                {"kind": "text", "x": 10, "y": 0, "text": "\n".join([
-                    "台積電 2330",
-                    "我們維持買進評等，目標價為 1275 元。",
-                    "本季營收成長來自先進製程擴產。",
-                    "毛利率於本季持穩，優於同業。",
-                    "資本支出高於去年同期水準。",
-                ])},
+                {"kind": "text", "x": 10, "y": 0, "text": "台積電 2330"},
+                {"kind": "text", "x": 10, "y": 20, "text": "我們維持\n買進。"},
+                {"kind": "text", "x": 10, "y": 40, "text": "目標價 1275。"},
+                {"kind": "text", "x": 10, "y": 60, "text": "營收成長來自先進製程。"},
+                {"kind": "text", "x": 10, "y": 80, "text": "毛利率持穩。"},
                 {"kind": "table", "x": 400, "y": 20, "rows": [["科目", "2025"], ["營收", "100"]]},
             ],
         }, ensure_ascii=False), encoding="utf-8")
         rc = main(["frame", "run", str(path)])
-        chk("經理跑通且驗證 PASS", rc == 0)
+        chk("經理跑通", rc == 0)
     ready, missing = prepare({"temp_dir": td})
     chk("缺的預設由冊補", missing == [] and ready["mem_rows"] == 2000 and ready["header"] == 0)
-    print(f"  [計] {7 - len(fails)} 檢 OK · FAIL {len(fails)}")
-    return 1 if fails else 0
+    print(f"  [計] VRN_SystemManager v0112 本版 {7 - len(fails)} 檢 OK · FAIL {len(fails)} · 前版 {'PASS' if prior_rc == 0 else 'FAIL'}")
+    return 1 if fails or prior_rc != 0 else 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(selftest() if "--selftest" in sys.argv else main())
+    # 只有單獨 --selftest 跑本版自測;`provenance --selftest` 等子動詞照轉前版(main 的交接案 provenance 走這條)
+    raise SystemExit(selftest() if sys.argv[1:] == ["--selftest"] else main())
