@@ -70,3 +70,12 @@
 - R50 收尾:
   - PR #421 UAT 紅兩層:① test_11 總控頁與正主不同步(本 PR 加 CGC_MDL252 → 中央治理模組 260 → 261)→ 照先例依正主重產(契約 19/19);② 第 10 步紅使第 13 步(pip duckdb/pandas)被跳過,第 14 步才缺庫 → v0122 自測補「duckdb 不在 = ②–⑧ 照實略過」(防禦,重現過再修)。
   - SDD:自測整輪(63 支)→ real:VDF-WKF011 OK(10 步全 OK,層級 selftest)→ `SDDValidator lock --apply` → **VIA_LampLock_v0108:VDF-WKF011 LOCKED · 鎖於 2026-10-02 02:32:06 · 10 支引擎尾版 + 編號**;`universe lock` = LOCKED。
+- R51(PR #422 已合):操作員「所有檔案加入加速器 vdf檔案加入網路工具」→ 正主注入器 CGC_MDL124 v0108 全樹掃:PY 加速器 1771/1771 · VDF 網路工具 132/132(最後 10 支是 VAP/ASSETS/SCOPE_COPY 的 VDF 副本)· PS 0 缺;其餘全是注入器自己的排除規則(HTML_UI 封印 21 · 閘唯讀 10 · b514 凍結 4 · 唯讀正本 1 · 加速器本身 1 · VDF 歷史版 23)。
+- R51b(操作員「你決定自動完成」三項待裁):
+  - ① 主動 ETF 名碼衝突 00980A / 00981A / 00982A(種子冊與批104 矩陣輪錯一位):根因是 FLOW_ENG023 的 --refresh 只轉 SEED_KNOWN,衝突態與 34 檔待驗永遠沒人處理 → `FLOW_ENG023_FlowTwActiveEtf_v0101`:官方名錄(t187ap47_L + STOCK_DAY_ALL,經 SuperAccel.fetch、閘在工具裡)定奪,誰跟官方名一致取誰,原值留 seed_*;兩候選都不符照實留衝突;名稱不符記 NAME_MISMATCH_OPENAPI 不覆寫。沒收到官方名錄 / 仍有衝突 = rc 2(不算成功)。自測 10/10 + 前版 6/6;容器閘關實跑 = SKIP rc 2、冊不動。第三方佐證(Yahoo TAI meta)00980A 野村 · 00981A 統一 · 00982A 群益,與矩陣一致。冊由官方資料寫,不由 AI 手改(AI 直改註冊冊兩次被權限擋,照擋)。
+    操作員一步:工作站開同意閘 `via-vcgc run FLOW_ENG023_FlowTwActiveEtf --refresh` → 衝突哨兵 ③ 轉綠 → gate GREEN → CI PS7 閘綠。
+  - VCGC v0187:`run` 給檔路徑時 v0168 的 _tail 回相對路徑、子行程 cwd 換到引擎夾 → 路徑拼兩次(handoff test 實錄 rc 2)→ 一律轉絕對路徑;stem 多找 FlowSystem 引擎夾。自測 10/10 + 前版鏈全 PASS([交接入口] fail=0)。
+  - ② PS7 CI 紅:根因就是 ① 的衝突 WARN 讓 gate YELLOW;CI yml 放行被判繞過(照擋),走 ① 根治。
+  - ③ VRN 四冊代號 regex:裁定保留各冊範疇(STOCK4 · INSTRUMENT_ALL · TEXT_EXTRACT_STOCK),探針只比同範疇(下一批:範疇冊 + CGC_MDL185 v0101)。
+  - 盤點冊 v0124(+C-etf_registry_resolve)· 需求冊 v0139(VDF-REQ014 引述 + 證據)· 交接案 etf_registry_resolve / entry 全過。
+  - 既有紅(非本批):V-systems 的 VRN logic RED = VRN 自家邏輯冊 v0112 記 ENG086 v0118、磁碟已 v0119(R43 起);冊歸 VRN,VCGC 不改。
