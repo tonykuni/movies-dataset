@@ -894,6 +894,21 @@
         "functional modules/VRN/VRN_ENG107_TextRestore_v*.py"
       ],
       "timeout_seconds": 600
+    },
+    "tooling": {
+      "argv": [
+        "CGC_MDL253_ToolingInventory",
+        "--selftest"
+      ],
+      "success_marker": "[工具盤點 v0100] 自測 11/11",
+      "scope": "工具盤點:鎖版全景 · 尾版律 · CLI 面 · L103 三導入 · 編號接回 · 短令冊順點源鏈",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+        "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "Register-VIA-Commands-v*.ps1"
+      ],
+      "timeout_seconds": 180
     }
   },
   "work_items": [
@@ -1823,6 +1838,23 @@
       "reason": "CGC_MDL140_HandoverConsole_v0103 新尾版落地,handoff 案要重跑取新收據",
       "next": "via-vcgc closeout --apply --push(③ test handoff 過即轉 VERIFIED)",
       "receipt": "docs/handoff/evidence/handoff.json"
+    },
+    {
+      "id": "VCGC-REQ116:tooling",
+      "requirement": "VCGC-REQ116",
+      "state": "PENDING",
+      "case": "tooling",
+      "owner": "VCGC closeout",
+      "reason": "CGC_MDL253_ToolingInventory_v0100 新引擎落地,要經交接案 tooling 取收據",
+      "next": "via-vcgc closeout --apply --push(③ test tooling 過即轉 VERIFIED)"
+    },
+    {
+      "id": "VCGC-REQ116:workstation",
+      "requirement": "VCGC-REQ116",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "HTML 自動開頁(os.startfile)與 Register v0267 短令要真 Windows + 點源命令冊才看得到;容器只驗 Python 與 CI pwsh 實跑",
+      "next": "點源 Register v0267 → via-tools · via-cmds → 回貼 VIA_Reports\\tooling\\TOOLING_latest.md → 帶收據轉 VERIFIED"
     }
   ]
 }

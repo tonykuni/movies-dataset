@@ -345,7 +345,7 @@ jobs:
         run: |
           $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
           $bad = 0
-          foreach ($pat in @("Invoke-VIA-Review-v*.ps1", "Register-VIA-Commands-v*.ps1", "VIA-Review-OneClick-v*.ps1")) {
+          foreach ($pat in @("Invoke-VIA-Review-v*.ps1", "Register-VIA-Commands-v*.ps1", "VIA-Review-OneClick-v*.ps1", "Inspect-VIA-Tooling-v*.ps1")) {
             $f = Get-ChildItem -LiteralPath $via -Filter $pat -File | Sort-Object Name | Select-Object -Last 1
             if (-not $f) { Write-Host ("absent " + $pat); continue }
             $tokens = $null; $errors = $null
@@ -354,6 +354,28 @@ jobs:
               $bad += @($errors).Count
               foreach ($e in $errors) { Write-Host ("{0}:{1} {2}" -f $f.Name, $e.Extent.StartLineNumber, $e.Message) }
             } else { Write-Host ("Parsed " + $f.Name) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          exit 0
+
+      - name: Run tooling inventory helper with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $env:VIA_NO_OPEN = "1"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $tool = Get-ChildItem -LiteralPath $via -Filter "Inspect-VIA-Tooling-v*.ps1" -File | Sort-Object Name | Select-Object -Last 1
+          if (-not $tool) { Write-Host "absent Inspect-VIA-Tooling-v*.ps1"; exit 0 }
+          $bad = 0
+          foreach ($run in @(
+              @{ name = "cmds"; args = @{ Commands = $true; Recent = 8; PythonExe = "python" }; want = "via-tools" },
+              @{ name = "card"; args = @{ Card = "supportive modules\registry\CGC_MDL253_ToolingInventory_v0100.py"; PythonExe = "python" }; want = "via-tools" })) {
+            $p = $run.args
+            $out = & $tool.FullName @p 2>&1 | Out-String
+            $rc = $LASTEXITCODE
+            Write-Host $out
+            if ($rc -notin 0, 2 -or $out -notmatch [regex]::Escape($run.want)) { Write-Host ("FAIL " + $run.name + " rc " + $rc); $bad++ }
+            else { Write-Host ("OK " + $run.name + " rc " + $rc) }
           }
           if ($bad -gt 0) { exit 1 }
           exit 0
