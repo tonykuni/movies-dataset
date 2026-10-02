@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T17:14:38+00:00",
+  "updated_at": "2026-10-02T17:34:26+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -972,6 +972,33 @@
       "scope": "VRN 擷取重型 OCR 車道:paddle 推論核心不在不開 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE 讓 ENG072 標壞跳過(完整自測含全庫抽樣封頂,留給 VRN 鏈)",
       "dependencies": [
         "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "praddle": {
+      "argv": [
+        "VRN_ENG398_PraddleExtractor",
+        "--selftest"
+      ],
+      "success_marker": "[VRN_ENG398 v0100 PRADDLE 擷取編排] 自測 9/9 PASS",
+      "scope": "PRADDLE 擷取編排:原生(SUP_MDL746 分流 · SUP_MDL743 LAYOUT)→ RapidOCR → PaddleOCR(隔離境;無法才用重型)· OCR 行走同一條 LAYOUT 修復鏈 · 儲存格正規化 · 逐格信心旗標 · 高風險隔離",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+        "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "ocr_super_boxes": {
+      "argv": [
+        "via_ocr_super",
+        "--selftest-tail"
+      ],
+      "success_marker": "via_ocr_super v0102 本版 8/8 · PASS",
+      "scope": "隔離境 OCR 車道回逐行座標(RapidOCR via_rapidocr · PaddleOCR via_paddle_311 2.x / 3.x);主行程不 import OCR 套件",
+      "dependencies": [
+        "supportive modules/registry/via_ocr_super_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2063,6 +2090,15 @@
       "next": "工作站同步後跑 via-vrnchain run --resume:SUP_MDL746 · VRN_ENG072 應在逾時內跑完(ENG072 標記帶 PPP_SKIP / UNAVAILABLE,不再每件重建);仍逾時就貼 VIA_Reports\\vrn_chain\\timeout\\*.log 尾段",
       "case": "ppp_hub",
       "receipt": "docs/handoff/evidence/ppp_hub.json"
+    },
+    {
+      "id": "VCGC-REQ126:praddle-envs",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站裝隔離境)",
+      "reason": "PRADDLE(RapidOCR · PaddleOCR)高風險,操作員令要獨立環境;ENG398 只在隔離境子行程叫它們。容器與工作站目前兩車道 NO_ENV",
+      "next": "工作站:via-vcgc run via_ocr_super --plan 看兩個隔離境(via_rapidocr · via_paddle_311)的安裝計畫 → 照環境計畫(盤點 → 衝突檢查 → 乾淨還原點)由操作員裝(要網路先自己開同意閘)→ via-vcgc run --family vrn VRN_ENG398_PraddleExtractor probe 兩車道 READY → run --in C:\\測試樣本報告 --ocr force 看互核",
+      "case": "praddle"
     },
     {
       "id": "VCGC-REQ124:workstation-ui",

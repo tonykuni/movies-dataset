@@ -2506,7 +2506,7 @@
     "VRN-WKF002",
     "VRN-WKF003"
    ],
-   "evidence": "已有:VRN_MDL001_Converter v0121 DPI 300–350 自動帶(批448;向量頁不渲染、單頁像素上限 4000 萬),但它一律照帶渲染,不是失敗才升;引進件 GenericLayoutEngine v2.1.0 b245 的 multi_engine_policy 有 light_to_heavy_fallback(pdfplumber 為主、依條件升級)。缺:正式鏈上沒有「先分類 → 初階單一工具 → 驗證不過才升一級 / 才重渲 · 每頁升級次數與總時間上限 · 引擎間交叉比對」的路由正主。",
+   "evidence": "已有:VRN_MDL001_Converter v0121 DPI 300–350 自動帶(批448;向量頁不渲染、單頁像素上限 4000 萬),但它一律照帶渲染,不是失敗才升;引進件 GenericLayoutEngine v2.1.0 b245 的 multi_engine_policy 有 light_to_heavy_fallback(pdfplumber 為主、依條件升級)。缺:正式鏈上沒有「先分類 → 初階單一工具 → 驗證不過才升一級 / 才重渲 · 每頁升級次數與總時間上限 · 引擎間交叉比對」的路由正主。;2026-10-02:擷取分層升級落地為 VRN_ENG398 PRADDLE 編排(原生 → RapidOCR → PaddleOCR,無法才用重型;重型在隔離境)+ SUP_MDL746 v0102(paddle 推論核心不在不開重型 · 只建一次 · 建失敗 UNAVAILABLE)",
    "quotes": [
     {
      "ts": "2026-09-29T11:53:40.207Z",
@@ -2515,7 +2515,11 @@
    ],
    "next": "出 VRN 擷取路由正主(先分類 → 初階 → 驗證不過才升級 / 重渲;上限寫進參數冊;輸出 DataFrame 欄位照 SSOT),接 VRN-WKF002 L1 擷取",
    "hand": "AI 下一批(升級上限的數字由操作員定)",
-   "s0929h": "側線 2026-09-29 h 新增"
+   "s0929h": "側線 2026-09-29 h 新增",
+   "modules": [
+    "VRN_ENG398_PraddleExtractor_v0100.py",
+    "SUP_MDL746_PDFPlumberPlusHub_v0102.py"
+   ]
   },
   {
    "code": "VCGC-REQ075",
@@ -4157,7 +4161,7 @@
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料);VRN 根因(全景 + 讀碼):SUP_MDL746 v0101 ocr_ready() 只看 paddleocr import 得到、不看推論核心 paddle → 工作站被報可跑;ocr_page() 每次 new 抽取器 → 失敗不記、每件掃描頁重建;自測 ⑥ 全庫 triage → 180s 逾時。SUP_MDL746 v0102:核心不在不開重型車道 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE(ENG072 標壞跳過)· 自測抽樣封頂 40 件 · 無掃描檔照實 NODATA;容器:薄尾 5/5 · 完整自測 3s(前版 ⑥ NODATA)· ENG072 v0139 自測 55 過 0 紅 22s。操作員提供的 Downloads / 上傳 4 支 / 隔離區經雜湊比對:倉內皆已有,上傳 4 支只多舊 VIA_SUPPORT_BRIDGE(MDL004/005 還少加速器橋)→ 不採用",
+   "evidence": "容器(最新 main)實測:via-vcgc status rc 0;VDF_SystemManager v0123 / VRN_SystemManager v0114 engine list 與 --selftest 皆 rc 0(6/6)。工作站(2026-10-02 貼回):HEAD 6c065e900 · 本機多 10 · 上游多 77 → Register 停在 v0266(找不到 via-engines / via-vdfeng)· 沒有 PS 模板 UI 件;VCGC 串測 V-status 等 rc 2 · upd:CGC_MDL095 GATE policy_step;衝突閘 BLOCK(GitHub 對齊 撞號 2 · PATH 黑名單 14 條)擋 VDF 建庫;VRN 鏈 GREEN 46 · NODATA 5(SUP_MDL746 180s · ENG072 600s paddle 未裝 · AutoTestLoop 900s 逾時 · ENG064 / ENG068 缺料);VRN 根因(全景 + 讀碼):SUP_MDL746 v0101 ocr_ready() 只看 paddleocr import 得到、不看推論核心 paddle → 工作站被報可跑;ocr_page() 每次 new 抽取器 → 失敗不記、每件掃描頁重建;自測 ⑥ 全庫 triage → 180s 逾時。SUP_MDL746 v0102:核心不在不開重型車道 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE(ENG072 標壞跳過)· 自測抽樣封頂 40 件 · 無掃描檔照實 NODATA;容器:薄尾 5/5 · 完整自測 3s(前版 ⑥ NODATA)· ENG072 v0139 自測 55 過 0 紅 22s。操作員提供的 Downloads / 上傳 4 支 / 隔離區經雜湊比對:倉內皆已有,上傳 4 支只多舊 VIA_SUPPORT_BRIDGE(MDL004/005 還少加速器橋)→ 不採用;PRADDLE(操作員「增加引擎」Paddle + Rapid 雙引擎 · LAYOUT/TEXT/TABLE/GRAPH 各五組 · pdfplumber+1 · 10 組合 · 30 大問題;「跟 LAYOUT 引擎相互搭配並修復驗證」;「PRADDLE 工具們高風險要獨立環境」):全景盤點後 10 組多數已有正主 → 新增 VRN_ENG398_PraddleExtractor v0100 只做編排:SUP_MDL746 分流 → 原生 + SUP_MDL743 LAYOUT 修復鏈;掃描頁 → via_ocr_super v0102 隔離境車道(RapidOCR via_rapidocr ≥0.85 就停 · 不足才 PaddleOCR via_paddle_311)→ OCR 行照 GLE 格式進同一條 LAYOUT 修復鏈(表格還原 · 閱讀順序 · 跨頁接續 · 驗算);新增的只有階梯裁決 · 進 LAYOUT 前的數字錯字修正 · 儲存格正規化(括號負數 · 破折號 · 貨幣 · % · O→0 · 全形 · 空白≠0)· 逐格信心旗標 · 原生/OCR 互核 · CID 亂碼改走 OCR;本行程不 import 任何 OCR 套件。容器:ENG398 自測 9/9(經 VCGC 含原生實跑 synthetic_financial_report 兩頁 DIGITAL 0.4s GREEN)· via_ocr_super v0102 8/8 + 前版 12/12;兩車道 NO_ENV(隔離境要操作員裝)",
    "next": "工作站先同步到 main(via-medic sync --apply → git pull --no-rebase → 重點源 Register 尾版)→ 依序 VCGC status → VDF 引擎冊 / 單引擎 → VRN 引擎冊 / 鏈 → 結果驗證;同步後的紅燈再逐條根因修",
    "hand": "操作員(工作站同步與實跑)· AI(根因修)",
    "quotes": [
@@ -4172,11 +4176,25 @@
     {
      "text": "隔離資料夾可查",
      "recorded_at": "2026-10-02T17:12:44+00:00"
+    },
+    {
+     "text": "增加引擎 PaddleOCR + RapidOCR 雙引擎 10 組管線",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
+    },
+    {
+     "text": "PRADDLE工具+EXTRACTOR 針對LAYOUT TEXT TABLE GRAPH各五組搭配 … 跟LAYOUT引擎相互搭配並修復驗證才能",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
+    },
+    {
+     "text": "PRADDLE工具們高風險要獨立環境",
+     "recorded_at": "2026-10-02T17:34:26+00:00"
     }
    ],
    "modules": [
     "SUP_MDL746_PDFPlumberPlusHub_v0102.py",
-    "CGC_MDL149_VeritasCentralGovernanceConsole_v0189.py"
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0189.py",
+    "VRN_ENG398_PraddleExtractor_v0100.py",
+    "via_ocr_super_v0102.py"
    ]
   }
  ],
