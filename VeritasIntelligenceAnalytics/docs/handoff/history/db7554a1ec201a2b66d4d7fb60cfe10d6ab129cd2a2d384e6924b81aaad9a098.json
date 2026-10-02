@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-02T19:48:15+00:00",
+  "at": "2026-10-02T19:19:17+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -763,22 +763,6 @@
       "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
       "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠",
       "renumbered_from": "VCGC-REQ128:workstation-vdfdb"
-    },
-    {
-      "id": "VCGC-REQ130:workstation-view",
-      "requirement": "VCGC-REQ130",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "容器頁:235 項輸出 · 已驗證 182 · 失敗 6(容器沒 pwsh · 基底境 38 衝突 · VDF 清單資料到 09-15 · 全景 / 工具盤點各紅 1)· 過期 3;工作站資料才是正本",
-      "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs(預設自動開頁)看 VIA_Reports/review/TABS_latest.html"
-    },
-    {
-      "id": "VCGC-REQ130:stale-vdf-vrn",
-      "requirement": "VCGC-REQ130",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "多分頁頁標過期 3 項(操作員 2026-10-02 指出「輸出結果驗證有錯」):S23 VDF 市場清單(09-16 RED)· S25 VRN NLP 管線(09-25)· S26 統一 NLP(09-25)。容器重跑實測:S23 → ABSENT(vdf_tw_market.duckdb 不在容器)· S25 / S26 → YELLOW(VDF 閘擋下游橋;容器只有合成 / 規格 PDF,不是券商研報)→ 容器結果不能代表正本,三份報告與 vrn_reports.duckdb 已還原,不以容器結果覆蓋工作站證據",
-      "next": "工作站:via-market-lists(status;要更新清單另開兩道同意閘 VIA_NET_CONSENT + VIA_SCRAPE_CONSENT 再 via-market-lists run)→ via-nlpvrn run -In <研報夾> → via-nlpunified pipeline -In <研報夾> → via-vcgc run CGC_MDL254_ReviewOnePage tabs 看 S23 / S25 / S26 轉現況"
     }
   ],
   "reusable_successes": [
@@ -876,8 +860,7 @@
     "VCGC-REQ128:tool-import",
     "VCGC-REQ129:parallel-test",
     "VCGC-REQ129:lessons-lock",
-    "VCGC-REQ129:onepage-stale",
-    "VCGC-REQ130:tabs-page"
+    "VCGC-REQ129:onepage-stale"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -890,7 +873,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "80ebc9d8e2288ed2067920a5653d45c519aa51d016b2cc987c420ab21aada8e4"
+      "sha256": "7a8c61a916d5a5d6ada492ac2e98da4793ad714801d7eb0ec87b535a294abda1"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -910,7 +893,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "80ebc9d8e2288ed2067920a5653d45c519aa51d016b2cc987c420ab21aada8e4"
+      "sha256": "7a8c61a916d5a5d6ada492ac2e98da4793ad714801d7eb0ec87b535a294abda1"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -934,7 +917,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "80ebc9d8e2288ed2067920a5653d45c519aa51d016b2cc987c420ab21aada8e4"
+      "sha256": "7a8c61a916d5a5d6ada492ac2e98da4793ad714801d7eb0ec87b535a294abda1"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -974,7 +957,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "80ebc9d8e2288ed2067920a5653d45c519aa51d016b2cc987c420ab21aada8e4"
+      "sha256": "7a8c61a916d5a5d6ada492ac2e98da4793ad714801d7eb0ec87b535a294abda1"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -1226,7 +1209,7 @@
     },
     "VCGC-REQ122:onepage": {
       "path": "docs/handoff/evidence/onepage.json",
-      "sha256": "1fe27387c162261eb3f09918fdbb0d690d3de39905b3f99291483579960abd4b"
+      "sha256": "8705b49d22c6bdaeec41e5054ea60557614a3f1f82bf8f7fa3622c433fc722c9"
     },
     "VCGC-REQ124:plan": {
       "path": "docs/handoff/evidence/entry.json",
@@ -1258,11 +1241,7 @@
     },
     "VCGC-REQ129:onepage-stale": {
       "path": "docs/handoff/evidence/onepage.json",
-      "sha256": "1fe27387c162261eb3f09918fdbb0d690d3de39905b3f99291483579960abd4b"
-    },
-    "VCGC-REQ130:tabs-page": {
-      "path": "docs/handoff/evidence/onepage.json",
-      "sha256": "1fe27387c162261eb3f09918fdbb0d690d3de39905b3f99291483579960abd4b"
+      "sha256": "8705b49d22c6bdaeec41e5054ea60557614a3f1f82bf8f7fa3622c433fc722c9"
     }
   },
   "state": {
@@ -1322,7 +1301,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0148.json": "6ee0a039d435bfeda443a75ec1334760a97c97b45f04dbae3495b7257c3095f0",
       "supportive modules/registry/VIA_Requirements_SSOT_v0149.json": "e56b55d1e9058b16501159203b349326c07f45627a20921e8dbaabcef18246dd",
       "supportive modules/registry/VIA_Requirements_SSOT_v0150.json": "7a1f2dbfcf0894eb99cbaa0dca88d2310621cb061d7a8bdcf0b35da29ebd9fab",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0151.json": "d4429e52b4d6303b86a900e44c7592f8e5491fc4b1dda30e566766e530790e7a",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0151.json": "31614c43c7c5d5947b242795f0446fe17bfb268cadc16b82d9cf9f230caba5ab",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -1347,7 +1326,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "556d507564f8203698a5d08bd5efbd8b5d7b09e8f6c39d444be0363e9239decd",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "66551d9cf80492bc54a430ae0ff256a6499b29c703da36dc1a580d4af42b16f8",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "1ac265db14f3a61d3aaa280b81503c92b72e6b8ff7637ce5dfd1676025739761",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "96c89724029ef61e91590a1d07f3755f75977c40c9899d721e7d9a1406178384",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -3938,7 +3917,6 @@
       "supportive modules/registry/CGC_MDL253_ToolingInventory_v0100.py": "d5866f5797c2eba4809066741c0d2bf6228afedc47711f839ac204a88027f693",
       "supportive modules/registry/CGC_MDL254_ReviewOnePage_v0100.py": "5f9e4b9b0f9b4af0b0b3de0eabffdd1e78a8563983d9092b7a26d32aad0b65c5",
       "supportive modules/registry/CGC_MDL254_ReviewOnePage_v0101.py": "1493f731d01e9da5f9c2a09bf26f3d1e9645523ec3e3f29109c7840992a5b501",
-      "supportive modules/registry/CGC_MDL254_ReviewOnePage_v0102.py": "b2497de6577c8fb6e661eeb7f2283ee405537d46b03ba73276bae088d39241bd",
       "supportive modules/registry/CGC_SystemManager_v0100.py": "891dd0e88b41dc53bc848da522ef5e95fa0aba5a5a866435b4315fdd2a054de6",
       "supportive modules/registry/CGC_SystemManager_v0101.py": "42b71ba0e3a5f5567b1ed4fd6bf74a44bc89893fdbae8ce3f7397692dc77a483",
       "supportive modules/registry/CGC_SystemManager_v0102.py": "593cbda396058e49818b77376bd207e68a3633690d517162b8759d0aec904a59",
@@ -6024,17 +6002,6 @@
           "VIA_Handoff_Continuity_SSOT_v0100.json",
           "VIA_VCGC_FunctionInventory_SSOT_v0132.json"
         ]
-      },
-      "VCGC-REQ130": {
-        "definition": "910e848069a1a3c17e4186f69b5cb8fff4fb0e9b66ad4314f8bd23fba4554d51",
-        "status": "COVERED",
-        "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs 看工作站正本資料",
-        "owner": "AI(已交)· 操作員(工作站看頁)",
-        "topic": "三系統輸出與驗證狀態 · 多分頁 HTML U/I · 小字 · 矩陣自動調節",
-        "homes": [
-          "VIA_Handoff_Continuity_SSOT_v0100.json",
-          "docs/VIA_S20261002_CpuAccel_RealTest_Closeout.md"
-        ]
       }
     }
   },
@@ -7341,39 +7308,13 @@
       "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
       "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠",
       "renumbered_from": "VCGC-REQ128:workstation-vdfdb"
-    },
-    "VCGC-REQ130:tabs-page": {
-      "id": "VCGC-REQ130:tabs-page",
-      "requirement": "VCGC-REQ130",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "操作員令:啟動 VCGC / VDF / VRN、輸出並驗證,用多分頁 HTML U/I 顯示全部輸出與驗證狀態;小字、矩陣自動調節",
-      "next": "收尾實跑 onepage 案(v0102 7/7)轉 VERIFIED",
-      "case": "onepage",
-      "receipt": "docs/handoff/evidence/onepage.json"
-    },
-    "VCGC-REQ130:workstation-view": {
-      "id": "VCGC-REQ130:workstation-view",
-      "requirement": "VCGC-REQ130",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "容器頁:235 項輸出 · 已驗證 182 · 失敗 6(容器沒 pwsh · 基底境 38 衝突 · VDF 清單資料到 09-15 · 全景 / 工具盤點各紅 1)· 過期 3;工作站資料才是正本",
-      "next": "工作站同步後 via-vcgc run CGC_MDL254_ReviewOnePage tabs(預設自動開頁)看 VIA_Reports/review/TABS_latest.html"
-    },
-    "VCGC-REQ130:stale-vdf-vrn": {
-      "id": "VCGC-REQ130:stale-vdf-vrn",
-      "requirement": "VCGC-REQ130",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "多分頁頁標過期 3 項(操作員 2026-10-02 指出「輸出結果驗證有錯」):S23 VDF 市場清單(09-16 RED)· S25 VRN NLP 管線(09-25)· S26 統一 NLP(09-25)。容器重跑實測:S23 → ABSENT(vdf_tw_market.duckdb 不在容器)· S25 / S26 → YELLOW(VDF 閘擋下游橋;容器只有合成 / 規格 PDF,不是券商研報)→ 容器結果不能代表正本,三份報告與 vrn_reports.duckdb 已還原,不以容器結果覆蓋工作站證據",
-      "next": "工作站:via-market-lists(status;要更新清單另開兩道同意閘 VIA_NET_CONSENT + VIA_SCRAPE_CONSENT 再 via-market-lists run)→ via-nlpvrn run -In <研報夾> → via-nlpunified pipeline -In <研報夾> → via-vcgc run CGC_MDL254_ReviewOnePage tabs 看 S23 / S25 / S26 轉現況"
     }
   },
   "summary": {
-    "requirements": 169,
-    "watched_files": 2935,
-    "pending": 101,
-    "reusable": 96,
+    "requirements": 168,
+    "watched_files": 2934,
+    "pending": 99,
+    "reusable": 95,
     "findings": 0
   }
 }
