@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T15:46:22+00:00",
+  "updated_at": "2026-10-02T16:55:52+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2026,10 +2026,21 @@
     {
       "id": "VCGC-REQ124:live-components",
       "requirement": "VCGC-REQ124",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(另案)",
       "reason": "v0188 後冷跑剩下的大頭:v0142 live_components 每支尾版整檔 ast 解析約 6s;要逐檔沿用得重寫那條規則(不在本批,避免發散)",
-      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上"
+      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "resolved": "側線 2026-10-02 c(操作員「繼續做 REQ124 冷跑提速」):CGC_MDL149 v0189 只攔 v0142 live_components 那一次 ast.parse,同內容回骨架樹;真樹結果完全相同(10858 列),4.5s → 0.2s;改一檔後的下一次 run 11.5s → 6s;自測 8/8 + [交接入口] fail=0"
+    },
+    {
+      "id": "VCGC-REQ126:workstation-sync",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "工作站 HEAD 6c065e900 落後 main 77 提交(Register v0266 · 無 via-engines / via-vdfeng / PS 模板 UI 件);衝突閘因撞號 2 與 PATH 黑名單擋寫入;容器最新 main 上 VCGC status · VDF / VRN 管理器皆 rc 0",
+      "next": "照回覆裡的同步 + 三系統啟動驗證貼上區塊跑一次,把結尾的矩陣貼回;同步後仍紅的逐條根因修"
     },
     {
       "id": "VCGC-REQ124:workstation-ui",
