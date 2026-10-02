@@ -1,8 +1,8 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0121",
- "batch": "R49 2026-10-02",
- "ts": "2026-10-02T00:58:03+00:00",
+ "batch": "側線 2026-10-01 VCGC 整合",
+ "ts": "2026-10-01T21:57:57+00:00",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0120.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
@@ -1416,28 +1416,31 @@
    ]
   },
   {
-   "id": "C-vdf_universe",
-   "name": "交接案 vdf_universe(VDF_SystemManager --selftest;VDF 管理員 universe 動詞:三組輸入 · 五項輸出 · 引擎順序 · 表頭 → DataFrame · 輸出驗證(CGC_MDL249))",
+   "id": "V-guard",
+   "name": "寫入前衝突閘(乾跑:只判不寫)",
    "argv": [
-    "run",
-    "--family",
-    "vdf",
-    "VDF_SystemManager",
-    "--selftest"
+    "guard"
    ],
-   "timeout": 900
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
   },
   {
-   "id": "C-vdf_index_official",
-   "name": "交接案 vdf_index_official(VDF_ENG232_TWIndexOfficial --selftest;加權 · 櫃買指數官方日資料(收容件 b360 解析 · 網路走 SUP_MDL740 · TA-Lib 0))",
+   "id": "V-exec",
+   "name": "執行監控卡(唯讀)",
    "argv": [
-    "run",
-    "--family",
-    "vdf",
-    "VDF_ENG232_TWIndexOfficial",
-    "--selftest"
+    "exec",
+    "--last",
+    "5"
    ],
-   "timeout": 900
+   "timeout": 60,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
   }
  ],
  "coverage": {
@@ -1573,6 +1576,12 @@
    },
    "link": {
     "station": "V-link"
+   },
+   "guard": {
+    "station": "V-guard"
+   },
+   "exec": {
+    "station": "V-exec"
    }
   },
   "seat": {
@@ -1768,12 +1777,6 @@
    },
    "vdf_finstmt_gate2": {
     "station": "C-vdf_finstmt_gate2"
-   },
-   "vdf_universe": {
-    "station": "C-vdf_universe"
-   },
-   "vdf_index_official": {
-    "station": "C-vdf_index_official"
    }
   },
   "workflow": {
@@ -1929,6 +1932,13 @@
    "VCGC-WKF012-STP008": {
     "station": "V-link",
     "note": "--apply 寫新版冊由 v0185 自測驗(暫存夾)"
+   },
+   "VCGC-WKF012-STP009": {
+    "station": "V-guard",
+    "note": "擋下 / 放行 / 越界由 v0186 自測驗"
+   },
+   "VCGC-WKF012-STP010": {
+    "station": "V-exec"
    }
   },
   "ps": {
@@ -1961,5 +1971,5 @@
  "why_v0118": "PR #412 合併 main:側線盤點冊 v0104–v0106(與 main 同號)不帶入;把側線增的三站 V-monitor · V-closeout · C-monitor、coverage verb.monitor / verb.closeout / case.monitor、工作流 VCGC-WKF012 STP001–006 疊在 main v0117 上;VCGC 版號改 v0182–v0184(原側線 v0181–v0183);其餘一字不動",
  "why_v0119": "R46(VDF-REQ015):交接新案五條(VDF 逐支自測修好的五支尾版)→ 新站 C-vdf_*;其餘一字不動",
  "why_v0120": "PR #415 合併 main:側線盤點冊 v0119(與 main v0119 同號)不帶入;VCGC v0185 新動詞 gate · link → 站 V-gate(只點兩探針的乾跑)· V-link(乾跑);coverage WKF012 STP007 / STP008 疊在 main v0119 上;其餘一字不動",
- "why_v0121": "R49:+C-vdf_universe(VDF_SystemManager v0121 universe 動詞)+C-vdf_index_official(VDF_ENG232)(VDF-REQ016)"
+ "why_v0121": "VCGC v0186 新動詞 guard · exec → 新站 V-guard(乾跑)· V-exec(唯讀);coverage WKF012 STP009 / STP010;其餘一字不動"
 }

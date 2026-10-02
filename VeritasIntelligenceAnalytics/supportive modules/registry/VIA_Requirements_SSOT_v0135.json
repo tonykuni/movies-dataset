@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0135",
- "batch": "R49 2026-10-02(VDF 輸入範圍 · 輸出表頭 · 指數正主)",
- "ts": "2026-10-02T00:51:42+00:00",
+ "batch": "側線 2026-10-01 中斷備份 · R48 撞號改編(PR #417 併 main)",
+ "ts": "2026-10-01T22:16:49+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -78,9 +78,9 @@
  "status_rule": "COVERED = 有正主執行(律 / 引擎 / 工作流步);RECORDED = 常設令已入冊有代碼,由 AI 程序遵守;PARTIAL / MISSING = 附 next 與 hand(誰的手)",
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
-  "RECORDED": 14,
-  "COVERED": 103,
-  "PARTIAL": 31,
+  "RECORDED": 15,
+  "COVERED": 102,
+  "PARTIAL": 32,
   "MISSING": 1
  },
  "requirements": [
@@ -3756,55 +3756,47 @@
    "r48": true
   },
   {
-   "code": "VDF-REQ016",
-   "subsystem": "VDF",
-   "topic": "VDF 輸入範圍與輸出項目 / 表頭歸 VDF 管理員:全部個股 · 主動式台股股票 ETF(每日台股持股)· 加權 / 櫃買指數",
-   "requirement": "輸入只收三組:IN-01 台灣全部個股(加權 + 櫃買,^[1-9]\\d{3}$)· IN-02 主動式台股股票 ETF 且可抓每日台股持股(^00\\d{3}A$ · ACTIVE_DOMESTIC · holdings_daily 有列)· IN-03 加權 / 櫃買指數(官方為準,yfinance 只當代理);輸入 IN · 輸出 OUT · 引擎 E 三套分開編號,由 VDF_SystemManager 尾版的 universe 動詞管理;順序照 main 工作流冊(VDF-WKF010 → 006 → 004);輸出表頭 → DataFrame 與輸出驗證經 CGC_MDL249(必填 · 型別 · 主鍵 · 最少列)加範圍規則;指數正主缺口由隔離區收容件(TA-Lib 0)接成新引擎,加速器 + 網路工具 + 編號 + 版號 + 註冊",
-   "status": "COVERED",
+   "code": "VCGC-REQ112",
+   "subsystem": "VCGC",
+   "topic": "VCGC 整合不影響 VDF / VRN:正本歸子系統 · 寫入前衝突阻擋 · 每個動詞執行監控 · PowerShell / GitHub 互動自動實測",
+   "requirement": "① 參數庫 · 邏輯冊的正本歸 VDF / VRN(不搬檔),VCGC 只讀、只查衝突並阻擋,不改子系統正本(動作後量越界);② 所有寫入動作(--apply · --push · handoff checkpoint)先過衝突閘(衝突哨兵 13 道 · GitHub 撞號 · 子系統邊界),有衝突不執行;唯讀動作只監控;③ 每個 VCGC 動詞記執行帳(寫入 · 閘判 · rc · 秒數 · 越界,只增),全綠閘多衝突哨兵 · 執行監控兩探針;④ link 只寫 VCGC 冊,VDF / VRN 冊只出提案;⑤ PowerShell 7 實測(唯一 PS 入口 pwsh Parser)· 衝突閘 · 全綠閘接進 GitHub CI Windows job,結果寫 job summary 與存證",
+   "status": "PARTIAL",
    "homes": [
-    "VIA_Handoff_Continuity_SSOT_v0100.json"
+    "VCGC-WKF012"
    ],
-   "evidence": "VDF_InputUniverse_SSOT_v0100.json(IN-01..03 · OUT-01..05 · E-01..E-11 · loop 12 站 · validation);VDF_SystemManager_v0121(universe headers / list / check / loop / frame / validate)自測 14/14 + 前版 PASS;VDF_ENG232_TWIndexOfficial_v0100 自測 9/9(收容件 b360 fetch_tw_index_official 只讀載入、_Http 換成 SUP_MDL740 curl_bytes、同意閘沒開 = DENY 零寫入、只增不覆寫);表頭不抄:OUT-03 指中央表頭冊 etf_holdings_daily · OUT-02 / OUT-05 指 DailyRow 冊",
-   "next": "工作站(有實庫、操作員開同意閘):via-vcgc run --family vdf VDF_SystemManager universe list → validate;VDF_ENG232 run --start 起始日 回補指數;VRN 端的代號分類 regex 冊收斂仍待操作員裁定(本條不動 VRN)",
-   "hand": "AI(實作 · 登錄 · 沙盒實測)",
+   "evidence": "CGC_MDL149 v0186(自測 10/10 · 整鏈 [交接入口] fail=0);guard 實跑 PASS(衝突哨兵 FAIL 0 · WARN 1 ETF 名碼 · GitHub 撞號 0 · 邊界綠);CI job vcgc-pwsh-gate(.github/workflows/via-master-control-ui.yml)",
+   "next": "CI job vcgc-pwsh-gate 首跑綠後轉 COVERED;VDF / VRN 工作流冊回指提案由子系統管理器出新版",
+   "ruling": "操作員裁定 2026-10-01:下放 = 正本歸子系統不搬檔 · PowerShell 實測接進 GitHub CI 的 Windows · 阻擋範圍 = 所有寫入動作",
    "quotes": [
     {
-     "text": "台灣股票及各類ETF REGEX",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "接進來使用由˙VRN SYSTEM MANAGER管理  輸入輸出清單HEADER呢",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "只有台灣個股全部及主動式台股ETF為主動式股票ETF中可以依規定抓到每日台股持股資訊的ETF  加權 櫃買資訊跟上面全抓當輸入  VDF SYSTEM MANAGER管理  輸出項目及HEADER也是他管理",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "輸入 輸出 透過那些引擎分開編號由STSTEM MANAGER管理 還有輸出HEADER轉DATAFRAME  輸出的驗證方式",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "順序的LOOP找紀錄找MAIN串一下",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "隔離資料夾有 去檢查去TA-LIB",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
-    },
-    {
-     "text": "可尋找舊資料可取用模塊化去TA-LIB編號加版本註冊加加速器 VDF加網路工具完成流程此用",
-     "recorded_at": "2026-10-02T00:51:42+00:00",
-     "said_in": "R49 session 2026-10-02(逐字)"
+     "text": "結束後進行對VCGC進行整合不要影響VDF VRN  所有餐庫及邏輯等下放到VDF VRN  監控能力增強到VCGC自動將VCGC整合收尾一切功能都要有執行監控及實施阻擋衝突的能力  授權跟GITHUB的互動及POWERSHELL的互動自動完成並時測驗證上傳GITHUB",
+     "recorded_at": "2026-10-01T21:57:57+00:00"
     }
    ],
-   "r49": true
+   "renumbered_from": "VCGC-REQ111(側線 claude/ecstatic-brahmagupta-ec19u9 / PR #417;main 的 VCGC-REQ111 是 PR #418 via-realtest v0106 StrictMode 修正,同號異義,不合併)"
+  },
+  {
+   "code": "VCGC-REQ113",
+   "subsystem": "VCGC",
+   "topic": "VDF / VRN 向上通報 SYNC TO VCGC · VCGC 對 SSOT 編號檢視 · 子系統自動擷取結果與編號 · VDF / VRN 自動收尾並更新 GitHub",
+   "requirement": "① VDF / VRN 各自向上通報(SYNC TO VCGC):結果與編號由子系統自動擷取;② VCGC 邊收邊對 SSOT 編號檢視(只增 · 不同來源不同編號);③ VDF / VRN 收尾自動完成(實測 · 修正 · 結果驗證),成功才自動更新 GitHub;④ 善用 VCGC 省 Token 工具(read · slice · digest · pack)",
+   "status": "RECORDED",
+   "homes": [
+    "VCGC-WKF012"
+   ],
+   "evidence": "操作員中途令「先中斷紀錄備份」:本條先登錄,未開工;前一條 VCGC-REQ112(v0186 guard / exec)已推上 PR #417",
+   "next": "接手:先盤點 VDF_SystemManager / VRN_SystemManager 尾版的動詞與 VDFCHAIN / VRNCHAIN 存證(是否已有向上通報),再設計 sync 動詞;VDF / VRN 正本仍歸子系統(VCGC 只讀)",
+   "quotes": [
+    {
+     "text": "子系統有向上通報 SYNC TO VCGC的功能  VCGC會邊SSOT編號檢視  子系統在自動擷取結果及編號即可  自動完成VDF及VRN收尾 授權一切  成功就自動更新GITHUB善用VCGC的節省功能完成實測修正及結果驗證收尾",
+     "recorded_at": "2026-10-01T22:16:49+00:00"
+    },
+    {
+     "text": "先中斷紀錄被分",
+     "recorded_at": "2026-10-01T22:16:49+00:00"
+    }
+   ],
+   "renumbered_from": "VCGC-REQ112(側線 PR #417;隨前一條改號順延)"
   }
  ],
  "non_requirements": [
@@ -3939,5 +3931,7 @@
  "why_v0131": "R46:+VDF-REQ015(COVERED:VDF 74 支逐支自測 RED 5 → 0)。本條原寫在側線 v0130,與 PR #412 的 v0130 撞號 → 改出 v0131(一號不得兩主;PR #412 的 v0130 原樣保留);+VCGC-REQ108(via-realtest v0104 交接紀錄帶出實測例外)",
  "why_v0132": "R47:+VCGC-REQ109(COVERED:via-realtest v0105 接 VCGC 下放檢查);其餘一字不動",
  "why_v0133": "PR #415 合併 main:側線需求冊 v0131(與 main v0131 同號)不帶入;側線 VCGC-REQ108(全綠閘 · 母子自動連接)與 main 的 VCGC-REQ108(via-realtest v0104)同號異義 → 改編 VCGC-REQ110(帶 renumbered_from);main 的 REQ108 / REQ109 一字不動",
- "why_v0135": "+VDF-REQ016(R49:VDF 輸入範圍 · 輸出項目 / 表頭 · 引擎順序 · DataFrame 驗證 · 指數正主 VDF_ENG232)"
+ "why_v0134": "(側線原 v0134 與 main v0134 撞號:main 那份為正;側線新增改登在本版)",
+ "why_v0135": "+VCGC-REQ112(側線原 VCGC-REQ111:寫入前衝突阻擋 · 執行監控 · 子系統邊界 · PowerShell / GitHub CI 實測)+VCGC-REQ113(側線原 VCGC-REQ112:VDF / VRN 向上通報 SYNC TO VCGC,未開工);兩條都因 main 已有 VCGC-REQ111 改號,一號一主",
+ "why_v0134_main": "main v0134 = PR #418(+VCGC-REQ111 realtest StrictMode)"
 }
