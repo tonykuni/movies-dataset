@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T15:46:22+00:00",
+  "updated_at": "2026-10-02T17:14:38+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -960,6 +960,18 @@
       "dependencies": [
         "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
         "supportive modules/ps7/VeritasCeleritas.PS7*.ps1"
+      ],
+      "timeout_seconds": 300
+    },
+    "ppp_hub": {
+      "argv": [
+        "SUP_MDL746_PDFPlumberPlusHub",
+        "--selftest-tail"
+      ],
+      "success_marker": "SUP_MDL746_PDFPlumberPlusHub v0102 本版 5/5 · 只驗薄尾 · PASS",
+      "scope": "VRN 擷取重型 OCR 車道:paddle 推論核心不在不開 · 同一行程只建一次 · 建失敗帶 UNAVAILABLE 讓 ENG072 標壞跳過(完整自測含全庫抽樣封頂,留給 VRN 鏈)",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2026,10 +2038,31 @@
     {
       "id": "VCGC-REQ124:live-components",
       "requirement": "VCGC-REQ124",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI(另案)",
       "reason": "v0188 後冷跑剩下的大頭:v0142 live_components 每支尾版整檔 ast 解析約 6s;要逐檔沿用得重寫那條規則(不在本批,避免發散)",
-      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上"
+      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "resolved": "側線 2026-10-02 c(操作員「繼續做 REQ124 冷跑提速」):CGC_MDL149 v0189 只攔 v0142 live_components 那一次 ast.parse,同內容回骨架樹;真樹結果完全相同(10858 列),4.5s → 0.2s;改一檔後的下一次 run 11.5s → 6s;自測 8/8 + [交接入口] fail=0"
+    },
+    {
+      "id": "VCGC-REQ126:workstation-sync",
+      "requirement": "VCGC-REQ126",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "工作站 HEAD 6c065e900 落後 main 77 提交(Register v0266 · 無 via-engines / via-vdfeng / PS 模板 UI 件);衝突閘因撞號 2 與 PATH 黑名單擋寫入;容器最新 main 上 VCGC status · VDF / VRN 管理器皆 rc 0",
+      "next": "照回覆裡的同步 + 三系統啟動驗證貼上區塊跑一次,把結尾的矩陣貼回;同步後仍紅的逐條根因修"
+    },
+    {
+      "id": "VCGC-REQ126:vrn-ocr-ladder",
+      "requirement": "VCGC-REQ126",
+      "state": "VERIFIED",
+      "owner": "操作員(工作站實跑)",
+      "reason": "工作站 VRN 鏈 SUP_MDL746 逾時 180s · ENG072 逾時 600s:paddleocr 在、paddlepaddle 不在被報可跑,每件掃描頁重建 PaddleOCR 再失敗;自測 ⑥ 全庫 triage。SUP_MDL746 v0102 修(容器:薄尾 5/5、ENG072 自測 55 過 0 紅)",
+      "next": "工作站同步後跑 via-vrnchain run --resume:SUP_MDL746 · VRN_ENG072 應在逾時內跑完(ENG072 標記帶 PPP_SKIP / UNAVAILABLE,不再每件重建);仍逾時就貼 VIA_Reports\\vrn_chain\\timeout\\*.log 尾段",
+      "case": "ppp_hub",
+      "receipt": "docs/handoff/evidence/ppp_hub.json"
     },
     {
       "id": "VCGC-REQ124:workstation-ui",
