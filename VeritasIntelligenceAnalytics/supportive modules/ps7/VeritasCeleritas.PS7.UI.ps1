@@ -274,7 +274,8 @@ function Write-CeleritasTable {
     $topLine = $b.tl + (($cols | ForEach-Object { $b.h * ($_.Width + 2) }) -join $b.tj) + $b.tr
     $sepLine = $b.lj + (($cols | ForEach-Object { $b.h * ($_.Width + 2) }) -join $b.x) + $b.rj
     $botLine = $b.bl + (($cols | ForEach-Object { $b.h * ($_.Width + 2) }) -join $b.bj) + $b.br
-    $titleLine = $(if ($Title) { Format-CeleritasUICell $Title $outer 'center' } else { '' })
+    # 表名比表寬就整句照印(不裁;Rich 也是讓標題溢出而不截字)
+    $titleLine = $(if (-not $Title) { '' } elseif ((Get-CeleritasUIWidth $Title) -ge $outer) { $Title } else { Format-CeleritasUICell $Title $outer 'center' })
     $headCells = @(for ($k = 0; $k -lt $n; $k++) { Format-CeleritasUICell $cols[$k].Name $cols[$k].Width $(if ($cols[$k].Lamp) { 'center' } else { $cols[$k].Justify }) })
     $bodyCells = @(foreach ($row in $cells) {
             , @(for ($k = 0; $k -lt $n; $k++) {
