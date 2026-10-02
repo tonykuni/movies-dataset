@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T14:52:59+00:00",
+  "updated_at": "2026-10-02T15:46:22+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -947,6 +947,19 @@
         "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
         "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
         "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "sweeper": {
+      "argv": [
+        "CGC_MDL124_BridgeSweeper",
+        "--selftest"
+      ],
+      "success_marker": "OK 16 · FAIL 0",
+      "scope": "掃橋器尾版:PY / NET / PS 加速橋掃描與排除律;v0109 起 Celeritas 模板呈現件(VeritasCeleritas.PS7.UI.ps1)同本體 / 模板排除",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+        "supportive modules/ps7/VeritasCeleritas.PS7*.ps1"
       ],
       "timeout_seconds": 300
     }
@@ -2002,10 +2015,37 @@
     {
       "id": "VCGC-REQ124:plan",
       "requirement": "VCGC-REQ124",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "操作員核准 → AI",
       "reason": "動到 VCGC 主控台(全治理入口)的沿用機制要操作員點頭;PS U/I 模板要操作員指認檔",
-      "next": "核准後出主控台新尾版(治理檢查沿用 + --fresh)並實測 run 耗時;PS U/I 照指認的 YFinance 啟動器模板出新版"
+      "next": "核准後出主控台新尾版(治理檢查沿用 + --fresh)並實測 run 耗時;PS U/I 照指認的 YFinance 啟動器模板出新版",
+      "case": "entry",
+      "receipt": "docs/handoff/evidence/entry.json",
+      "resolved": "側線 2026-10-02 b(操作員「依照你的提案最佳化」「直接採用」):CGC_MDL149 v0188 治理沿用(樹沒變重印上次輸出 · 驗收 / 寫入動詞與 --fresh 一律重算 · 逐檔內容雜湊沿用前版定義,整樹 5573 個定義逐鍵相同)run 4.1s → 1.8s、改檔後 36s → 11.5s,自測 11/11 + 前版鏈 [交接入口] fail=0;PS U/I:短令冊沒有單獨啟動 YFinance 的指令,版面來自 VDF_MDL002 的 Rich 輸出,純 PS7 重做成模板呈現件 VeritasCeleritas.PS7.UI.ps1 併進標準模板,CI pwsh 自測"
+    },
+    {
+      "id": "VCGC-REQ124:live-components",
+      "requirement": "VCGC-REQ124",
+      "state": "PENDING",
+      "owner": "AI(另案)",
+      "reason": "v0188 後冷跑剩下的大頭:v0142 live_components 每支尾版整檔 ast 解析約 6s;要逐檔沿用得重寫那條規則(不在本批,避免發散)",
+      "next": "主控台新尾版:把 v0142 live_components 的「每支尾版的類別 / 函數清單」改按內容雜湊逐檔沿用,與原函數整樹逐鍵比對相同才換上"
+    },
+    {
+      "id": "VCGC-REQ124:workstation-ui",
+      "requirement": "VCGC-REQ124",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "容器沒有 pwsh,PS 版型件只在 CI(Windows · pwsh 7)解析與自測;實際字型 / 寬度要在工作站 Windows Terminal 目視",
+      "next": "工作站:pwsh -NoProfile -Command \". '.\\supportive modules\\ps7\\VeritasCeleritas.PS7.Template.ps1'; Test-CeleritasUI\";舊主控台框線亂就設 VIA_PS_UI_ASCII=1;既有短令改用此版型要逐支 L70 許可"
+    },
+    {
+      "id": "VCGC-REQ125:pilot",
+      "requirement": "VCGC-REQ125",
+      "state": "PENDING",
+      "owner": "操作員(決定何時重啟)→ AI",
+      "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
+      "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
     }
   ]
 }

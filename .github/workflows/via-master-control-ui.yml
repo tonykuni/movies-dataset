@@ -380,6 +380,38 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           exit 0
 
+      # VCGC-REQ124:標準 PS 模板的 YFinance 版型呈現件(VeritasCeleritas.PS7.UI.ps1)用真 pwsh 解析 + 經模板接入自測 + 印一張示範矩陣
+      - name: Celeritas PS template UI self-test with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $ps7 = Resolve-Path ".\VeritasIntelligenceAnalytics\supportive modules\ps7"
+          $bad = 0
+          foreach ($name in @("VeritasCeleritas.PS7.UI.ps1", "VeritasCeleritas.PS7.Template.ps1")) {
+            $f = Join-Path $ps7 $name
+            if (-not (Test-Path -LiteralPath $f)) { Write-Host ("absent " + $name); $bad++; continue }
+            $tokens = $null; $errors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($f, [ref]$tokens, [ref]$errors)
+            if (@($errors).Count -gt 0) { $bad += @($errors).Count; foreach ($e in $errors) { Write-Host ("{0}:{1} {2}" -f $name, $e.Extent.StartLineNumber, $e.Message) } }
+            else { Write-Host ("Parsed " + $name) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          . (Join-Path $ps7 "VeritasCeleritas.PS7.Template.ps1")
+          try {
+            $join = Test-CeleritasJoin
+            Write-Host ("Template joined " + $join.Joined + " · UI " + $join.UI)
+            if (-not $join.Joined -or -not $join.UI) { Write-Host "FAIL template did not join the UI part"; exit 1 }
+            $env:VIA_PS_UI_WIDTH = "110"
+            $r = Test-CeleritasUI
+            Write-CeleritasRichMatrix -Title "CI 示範 · VDF 單引擎" -Header @("引擎 : VDF_ENG229_Demo", "模式 : status") -Rows @(
+              @{ id = "①"; title = "啟動前閘"; state = "GREEN"; sec = 0.4; note = "加速器 · 網路橋都在" },
+              @{ id = "②"; title = "經 VCGC 啟動"; state = "YELLOW"; sec = 3.2; note = "觸網要 VIA_NET_CONSENT(AI 不代設)" })
+            if (-not $r.Pass) { Write-Host ("FAIL Celeritas UI self-test " + $r.Passed + "/" + $r.Total); exit 1 }
+            Write-Host ("OK Celeritas UI self-test " + $r.Passed + "/" + $r.Total)
+          }
+          finally { Restore-CeleritasPS7 }
+          exit 0
+
       - name: Build the single review page through VCGC
         if: ${{ !cancelled() }}
         shell: pwsh
