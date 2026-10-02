@@ -1,0 +1,159 @@
+# 工作站交接紀錄 · via-realtest v0105 · 2026-10-02 09:52:49
+
+- 分支 main · HEAD(開始)3192cd011 · (拉齊後)3192cd011
+- ① 拉齊:HEAD 3192cd011 → 3192cd011 · 落後/領先 0/0 · MergeMedic rc 0 ·   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝 |   [via-vcgc run] [流程] 政策過 · CGC_MDL143_MergeMedic_v0105.py(家族 core) |   [OK] 分歧判定 UP_TO_DATE · 本地獨有 0 · 遠端獨有 0 · origin/main
+  - 其餘本機改動不碰(1 檔):VeritasIntelligenceAnalytics/functional modules/VDF/WHERE_IS_OUTPUT_HUB.md
+  - 安裝:  [OK     ] vdf VDF_MDL002_YFinanceFetchingEngine_v0100.py · 4.9s ·   ✓ ⑩ --help=用法 · 未知旗標點名 · 已知旗標照收 · 缺件不代裝 | [計] OK 9 · FAIL 0 · NODATA 0 → rc=0 (GREEN)
+  - 安裝:  [FAIL   ] vdf VDF_MDL003_SentimentMacroEngine_v0100.py · 8.2s · [計] OK 6 · FAIL 0 · NODATA 1 → rc=2 (NODATA)
+  - 安裝:  [OK     ] vdf VDF_MDL004_TWFullMarketEngine_v0100.py · 4.1s ·   [OK] ⑥ 兩所都在掃描面(TWSE **與** TPEX):樹上 893 檔全是 `.TWO`,缺的就是上市那一半 ((TWSE + TPEX 兩個抓取器都在)) |   [計] 9 檢 OK 9 · FAIL 0
+  - 安裝:  [OK     ] vdf VDF_MDL006_FinancialModel_v0100.py · 5.2s ·   ✓ ⑭ 六表與價格史全空 → fail 1 / ok 0(原件 ok+=1) | [計] OK 13 · FAIL 0 · NODATA 0 → rc=0 (GREEN)
+  - 安裝:  [OK     ] vdf vdf_input_matrix_v0100.py · 0.3s ·   [OK] 正本零觸碰  |   [計] 十三檢 OK 13 · FAIL 0
+  - 安裝:RED     vdf   python=C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe(OK) · 必要庫 4/4 選配 4/4 · 引擎 7/8 OK · 引擎自測非 OK:VDF_MDL003_SentimentMacroEngine_v0100.py(FAIL)
+- ② 三路線:VCGC 全功能串測 rc 1 · [VCGC 全功能串測] RED · 站 7(綠 4 · 黃 1 · 紅 2 · 沿用 0)· 盤點 verb 44/44 · seat 6/6 · card 13/13 · case 44/44 · workflow 47/47 · ps 1/1 · 家族尾版 254 支 compile 錯 0 · 缺橋 0 · 更新 1 · 新 0 · 缺 0 · 紀錄 +0 行 · 372.3s · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\VCGC_20261002_080732.log
+    [YELLOW] V-handoff-check                    rc 2     50.6s · {"via": "vcgc", "verb": "run", "state": "GATE", "why": "[\"policy_step\"]"}
+    [RED   ] V-status                           rc 2     64.5s · [子系統] SSOT regex 同義字 參數比對過 · 未改冊 · drift 無
+    [RED   ] upd:CGC_MDL095_DeckServer_v0161    rc 2     44.1s · {"via": "vcgc", "verb": "run", "state": "GATE", "why": "[\"policy_step\"]"}
+- ② VCGC→VDF ∥ VCGC→VRN(實測 v0101)結束碼:1(0 全綠 · 2 有發現 · 1 有紅 · 124 超時)
+- ⓔ 環境完整安裝:ENV AMBER → AMBER · 工具冊 rc 2 · 家族境補庫 rc 1
+- ⓐ 加速模組 · 矩陣報告:PS 加速器 25/25 · PY 加速器 / 網路工具載入 GREEN/GREEN · 覆蓋矩陣頁 本輪新 · 三合一頁 本輪新
+- ⓓ 全景 AST 錨點:錨點 970 · 治理:HARDIMP 54 · 治理:PINVER 49 · 治理:ACCEL 10 · AST:SWALLOW 619 · AST:HARDIMP 2 · AST:TAILAPI 31 · AST:PINVER 136 · AST:BAREEXC 65 · AST:ACCEL 1 · AST:SYSEXE 1 · AST:DUPDEF 2 · 全文 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\AST_ANCHORS_20261002_080732.txt
+- ⓖ VCGC 下放檢查(SDD 工作流冊 · SSOT 全景):
+    SDD rc 2 · [SDD 驗證] YELLOW · 工作流 31 · 步 119 · 需求 148 · 29.5s · 存證 VIA_Reports/sdd/SDD_CHECK_latest.json
+        YELLOW X-REQ-OPEN  需求未全落地 32 條(PARTIAL / MISSING,各有歸屬與下一步):['SUP-REQ002', 'SUP-REQ003', 'SUP-REQ004', 'VCGC-REQ028', 'VDF-REQ004', 'VDF-REQ008', 'VCGC-REQ042', 'VCGC-REQ046', 'VCGC-REQ054', 'VDF-REQ012']
+        YELLOW X-LOCK      已鎖工作流的尾版換了,要重驗(8 處):['VCGC-WKF003:CGC_MDL158_VIAPanoramaAuditRepair_v0116.py→CGC_MDL158_VIAPanoramaAuditRepair_v0117.py', 'VCGC-WKF003:CGC_MDL149_VeritasCentralGovernanceConsole_v0172.py→CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py', 'VCGC-WKF003:CGC_MDL237_NumberingSystem_v0104.py→CGC_MDL237_NumberingSystem_v0111.py', 'VCGC-WKF003:CGC_MDL245_SDDValidator_v0102.py→CGC_MDL245_SDDValidator_v0105.py', 'VCGC-WKF004:CGC_MDL245_SDDValidator_v0102.py→CGC_MDL245_SDDValidator_v0105.py', 'VCGC-WKF009:CGC_MDL158_VIAPanoramaAuditRepair_v0116.py→CGC_MDL158_VIAPanoramaAuditRepair_v0117.py']
+    SSOT rc 2 · [SSOT 全景] YELLOW · 上下單向 VCGC → VDF → VRN → SUP · 探針 7(沿用 1)· 373.3s
+        [YELLOW] 正則@VCGC · 1 格 · 非綠 1 · booksync.ticker YELLOW:E4 台股代號 regex 冊一致:DISAGREE · 4 本冊在 3 個探針上判法不同 · 0050:收 2 本 / 拒 2 本 ; 00878:收 1 本 / 拒 3 本 ;  → 各冊的範疇是不同的操作員裁定(批628 三平台九型含 ETF · 2026-08-04 四碼首碼非零範疇凍結 · 寬鬆式不入 LOCKED 圈);要不要收斂成一本=操作員裁,本支只把分歧攤開
+        [YELLOW] 同義字@VCGC · 7 格 · 非綠 3 · hub.additive YELLOW:同詞多義 10 條(按來源可判;裁定權在操作員) ; booksync.domains YELLOW:E2 兩本網域冊一致:NONCANONICAL · 共有網域 6 · NONCANONICAL 1 · SAME 4 · SPELLING 2 · 例 jpmorgan.com:J ; booksync.copies YELLOW:E3 同名冊副本釘住:DIVERGED · SYNONYM_  → py SUP_MDL749 additive
+        [YELLOW] 同義字@VRN · 4 格 · 非綠 3 · hub.drift YELLOW:正主態 OK · 下游落差 2 支(TW02 報告解析器, 首頁全能引擎) ; bridge.drift YELLOW:收容件對樞紐漂移 8 列(只攤開不裁定) ; union.gate YELLOW:拒絕清單真漏口 8 · 讀券商冊還沒過拒絕閘 44 支 · 冊內瑕疵 0  → py SUP_MDL749 drift(改下游是各引擎的新版,不是本台)
+        [YELLOW] 自動編號@VCGC · 尾版 277 · 有號 277 · 缺號 0 · 缺編號時間 0 ‖ 只增稽核 基準 3192cd01150c · 列 103417 → 103417(+0)· 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1(紅列(冊上宣告碼 ≠ 發出號等;不改任何一邊) 11)  → 紅列多為待裁定(法條缺號 Z263 · 同義字一詞兩主 Z264);遺失 / 改身分 > 0 才是真紅
+        [YELLOW] 命名@VCGC · 版號異形 2(非四碼,尾版律不管;Z279)· 沒版號 .py 18(Z281 待逐支判定;不計燈)· 具名排除 1 ‖ 同號異名 7 組:CGC_MDL135:EnvGovernance/EnvPlan ; CGC_MDL142:AccelImport/TWNameBook ; CGC_MDL149:BoxesFlow/ChainAll/Closeout/EntryLock/FilenameCut/GreenMatrix/Identity/Integra  → 各自出四碼版號新檔再遷呼叫(L04;操作員排序)
+        [YELLOW] 命名@VDF · 版號異形 0(非四碼,尾版律不管;Z279)· 沒版號 .py 50(Z281 待逐支判定;不計燈)· 具名排除 0 ‖ 同號異名 3 組:VDF_ENG110:AKShareProbe/USMacroProbe/USMacroTree ; VDF_ENG117:ForwardVintage/ForwardVintageDoor ; VDF_ENG118:ExportDesk/TWMarket  → 是同家族伴隨模組就記進命名冊;真撞號由操作員裁定改號(不自動改名)
+        [YELLOW] 命名@VRN · 版號異形 5(非四碼,尾版律不管;Z279)· 沒版號 .py 74(Z281 待逐支判定;不計燈)· 具名排除 2 ‖ 同號異名 1 組:VRN_ENG109:GateMap/TabStore  → 各自出四碼版號新檔再遷呼叫(L04;操作員排序)
+        [YELLOW] 命名@SUP · 版號異形 37(非四碼,尾版律不管;Z279)· 沒版號 .py 699(Z281 待逐支判定;不計燈)· 具名排除 3 ‖ 同號異名 1 組:SUP_MDL743:GenericLayoutHub/LayoutBundle/LayoutCommon/LayoutFigures/LayoutTables/LayoutText  → 各自出四碼版號新檔再遷呼叫(L04;操作員排序)
+        [YELLOW] 上下連結@VCGC · 工作流 12 · 步 47 · 需求 111 · 單向 0 · 待重驗鎖 3:VCGC-WKF003、VCGC-WKF004、VCGC-WKF009 · 中央結構檢 GREEN  → via-vcgc sdd selftests / real → lock --apply
+- ③ 樣本驗證 C:\測試樣本報告:rc 1
+      AMBER  群益3Q26論壇_MIC_物理AI趨勢下人形機器人發展趨勢.pdf · OCR 還原(單法) · 覆蓋 100.00% · 數字 330 缺 0 · 品質 A 93.8 · ENG072 首頁 GREEN · 摘要 SKIP
+      AMBER  群益專題報告-台股投資與操作策略_20260917.pdf · OCR 還原(單法) · 覆蓋 100.00% · 數字 253 缺 0 · 品質 A 93.6 · ENG072 首頁 GREEN · 摘要 SKIP
+      GREEN  華南投顧-2606-裕民-1141202.pdf · 修復還原完整 · 覆蓋 100.00% · 數字 94 缺 0 · 品質 A 96.9 · ENG072 首頁 GREEN · 摘要 GREEN
+      GREEN  華南投顧-2637-慧洋-KY-1141202.pdf · 修復還原完整 · 覆蓋 100.00% · 數字 87 缺 0 · 品質 A 97.5 · ENG072 首頁 GREEN · 摘要 GREEN
+      GREEN  華南投顧-2762-世界健身-KY-Memo-20251209.docx · 修復還原完整 · 覆蓋 100.00% · 數字 31 缺 0 · 品質 A 100.0 · ENG072 首頁 GREEN · 摘要 N/A
+      GREEN  華南投顧-3017-奇鋐-1141202.pdf · 修復還原完整 · 覆蓋 100.00% · 數字 115 缺 0 · 品質 A 98.7 · ENG072 首頁 GREEN · 摘要 GREEN
+      GREEN  華南投顧-3038-全台-Memo-20251209.docx · 修復還原完整 · 覆蓋 100.00% · 數字 90 缺 0 · 品質 A 100.0 · ENG072 首頁 RED · 摘要 N/A
+      GREEN  華南投顧-3038-全台-Memo-20260916.docx · 修復還原完整 · 覆蓋 100.00% · 數字 120 缺 0 · 品質 A 100.0 · ENG072 首頁 RED · 摘要 N/A
+      GREEN  華南投顧-3675-德微-Memo-20260518.docx · 修復還原完整 · 覆蓋 100.00% · 數字 124 缺 0 · 品質 A 100.0 · ENG072 首頁 GREEN · 摘要 N/A
+      GREEN  華南投顧-3675-德微-Memo-20260916.docx · 修復還原完整 · 覆蓋 100.00% · 數字 108 缺 0 · 品質 A 100.0 · ENG072 首頁 GREEN · 摘要 GREEN
+      GREEN  華南投顧-4153-鈺緯-Memo-20251208.docx · 修復還原完整 · 覆蓋 100.00% · 數字 120 缺 0 · 品質 A 100.0 · ENG072 首頁 RED · 摘要 N/A
+      GREEN  華南投顧-4442 竣邦-Memo-20260916.docx · 修復還原完整 · 覆蓋 100.00% · 數字 17 缺 0 · 品質 A 100.0 · ENG072 首頁 GREEN · 摘要 N/A
+      GREEN  華南投顧-6143-振曜-1141128.pdf · 修復還原完整 · 覆蓋 100.00% · 數字 93 缺 0 · 品質 A 97.2 · ENG072 首頁 GREEN · 摘要 GREEN
+    [全文無遺漏] 總判 RED · 305 件 · OCR 後端 在 · 第二讀法 在 · 頁 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\vrn\text_completeness\TEXTCOMP_latest.html
+    [監控] 背景全景監控中 pid 9424 · 觸碰 run --family · 交接閘 GREEN · 落後 0 提交 · 快照 3.5h · 頁 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\panorama\dashboard_latest.html
+- ④ 交接檢查:rc 0 · [交接防遺漏] GREEN · 驗收 YELLOW · {"requirements": 148, "watched_files": 2868, "pending": 68, "reusable": 71, "findings": 0}
+
+## 紅字(本支)
+- VCGC 全功能串測 rc 1:[VCGC 全功能串測] RED · 站 7(綠 4 · 黃 1 · 紅 2 · 沿用 0)· 盤點 verb 44/44 · seat 6/6 · card 13/13 · case 44/44 · workflow 47/47 · ps 1/1 · 家族尾版 254 支 compile 錯 0 · 缺橋 0 · 更新 1 · 新 0 · 缺 0 · 紀錄 +0 行 · 372.3s
+- 環境安裝有紅:ENV AMBER → AMBER · 工具冊 rc 2 · 家族境補庫 rc 1
+- 樣本驗證 rc 1:  AMBER  【中信｜債券ETF周報】油價攀升壓抑債市，利率高檔震盪_CTBC260915.pdf · OCR 還原(單法) · 覆蓋 100.00% · 數字 2736 缺 0 · 品質 A 90.9 · ENG072 首頁 RED · 摘要 SKIP | [全文無遺漏] 總判 RED · 305 件 · OCR 後端 在 · 第二讀法 在 · 頁 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\vrn\text_completeness\TEXTCOMP_latest.html |   [教訓] 重複出錯:run VRN_ENG392_TextCompleteness · rc=1 · $<n>.TW: No data found, symbol may be delisted · 第 3 次 · 帳本 CGC_MDL058(via-lessons)
+
+## 實測全文(v0101 的「貼給 AI」整段)
+
+```
+===== 貼給 AI · via-realtest 2026-10-02 09:17:16(從這行到「貼給 AI 結束」整段複製)=====
+[環境] 倉 C:\Users\tonyk\OneDrive\Documents\movies-dataset · 分支 main · HEAD 3192cd011 · 落後/領先 origin/main 20/0 · 未提交 4 檔
+[環境] Python 3.13.7 · pwsh 7.6.6 · VCGC CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py · PS 加速器 25/25 · Celeritas PS7 已套
+[環境] VIA_NET_CONSENT=YES · VIA_SCRAPE_CONSENT=YES · VIA_DATA_HOME=C:\Users\tonyk\VIA System\via_database · 沒帶 -FixEnv:只查不裝
+[VCGC 閘] status rc 0
+
+[VDF] VCGC → VDF 鏈 · rc 0 · 3032s · 無總結行 · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\VDF_20261002_082644.log
+
+[VRN] VCGC → VRN 鏈 · rc 2 · 3032s · 無總結行 · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\VRN_20261002_082644.log
+  - L1_擷取 VRN_ENG082_ExtractionLogic · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG082_ExtractionLogic_v0111.py
+  - L1_擷取 VRN_ENG060_TextOmni · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG060_TextOmni_v0100.py
+  - L1_擷取 VRN_ENG057_ScanOcrRescue · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG057_ScanOcrRescue_v0105.py
+  - L1_擷取 SUP_MDL746_PDFPlumberPlusHub · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v0101.py
+  - L1_擷取 VRN_ENG017_MDL004OCRFetchingPDFTable · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG017_MDL004OCRFetchingPDFTable_v0100.py
+  - L1_擷取 VRN_ENG018_MDL005OCRFetchingPDFText · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG018_MDL005OCRFetchingPDFText_v0100.py
+  - L2_結構與知識 VRN_ENG072_FirstPageText · NODATA · 細節:逾時冊放寬到 600s / 逾時 600s —— **沒跑完=沒有結論**,不是紅燈 · 停掉前最後一行:[VIA_PDFPlumberPlusEngine] OCR 引擎載入失敗，掃描頁將標記為 NO_OCR：RuntimeError: Engine 'paddle_static' is unavailable because dependency 'paddlepaddle' is not installed. · 補法:看 VIA_Reports/vrn_chain/timeout/VRN_ENG072_FirstPageText.log(停掉前全文)找卡住的那一段 · 證據:functional modules/VRN/VRN_ENG072_FirstPageText_v0139.py
+  - L2_結構與知識 VRN_ENG073_ReportStructuredDB · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0139.py
+  - L2_結構與知識 VRN_ENG063_Lexicon · NODATA · 細節:逾時 180s —— **沒跑完=沒有結論**,不是紅燈 · 補法:單跑看它卡在哪;或 run(不加 --fast)放寬逾時 · 證據:functional modules/VRN/VRN_ENG063_Lexicon_v0101.py
+  - L2_結構與知識 VRN_ENG064_KnowledgeStack · NODATA · 細節:[OK] ⑪ 對照表有出處,不是我憑記憶造字(零發明) (凍結對照表 VIA_ZhConvert_S2TWP_CharMap_v0100.json(2784 筆)) / [計] 十一檢 OK 9 · FAIL 0 · NODATA 2 → rc=2 (NODATA)(缺料不是壞掉) · 補法:照它點的名補料 · 證據:functional modules/VRN/VRN_ENG064_KnowledgeStack_v0103.py
+  - L3_驗證 VRN_AutoTestLoop · NODATA · 細節:逾時冊放寬到 900s / 逾時 900s —— **沒跑完=沒有結論**,不是紅燈 · 停掉前最後一行:=== VRN_AutoTestLoop v0107 · 自測門(單元測試 + 合成小批;沙盒零網路)=== · 補法:看 VIA_Reports/vrn_chain/timeout/VRN_AutoTestLoop.log(停掉前全文)找卡住的那一段 · 證據:functional modules/VRN/engine/VRN_AutoTestLoop.py
+  - L4_產出 VRN_ENG068_DailyBrief · NODATA · 細節:[OK] ⑪ 庫檔在而收割空 → why 不補(抽不出來照樣 FAIL,不放寬) / VRN_ENG068_DailyBrief_v0108 +2/2 PASS(缺料不是壞掉) · 補法:照它點的名補料 · 證據:functional modules/VRN/VRN_ENG068_DailyBrief_v0108.py
+  log 尾段:
+     rating_ssot_key 0 72 0 33 0 落在正典評等鍵(樞紐 rating_keys) 評等 
+     target_price 0 38 0 58 9 > 0 且 目標價/現價 落在 0.2–5.0 目標價 
+     upside_calc 0 0 0 67 38 ADJ 車道 upside_adj 算成(操作員裁示)或 upside_state 為 *_DB 上漲空間 
+     analyst_names 0 71 0 34 0 analyst_n ≥ 1 分析師 
+     
+     [頁] VIA_Reports/vrn_chain/VIA_VRN_Chain_Evidence_v0100.html(同一頁:引擎鏈 + 數據驗證 + 逐列舉證;頁上三顆鍵轉 MD / JSON;零 CDN 零外連,file:// 直開)
+     [紀錄] VIA_Reports/vrn_chain/VRNCHAIN_latest.json + VRNCHAIN_latest.md + VRNCHAIN_<時間戳>.json + LEDGER.tsv
+     [律] 「引擎會跑」與「資料是對的」是兩件事:上表第一段是引擎,第二三段才是資料。**一個全綠如果庫裡 0 列,那個綠沒有意義。**
+
+[COV] 工具覆蓋(PY 加速器 · VDF 網路 · PS 模板) · rc 1 · 3032s · [ToolMatrix] 總判 RED · HTML C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\toolprobe\COVERAGE_MATRIX_latest.html · JSON C:\Users\tonyk\OneDrive\Documents\movi… · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\COV_20261002_082644.log
+  總判 RED
+  - ④ PS 加速器模組橋(尾版) [ROOT] · RED · 155/156 · 缺:functional modules/WorkOps/engines/.venv_pm/Scripts/Activate.ps1
+  - ⑥ PS 加速器模板章(尾版) [VAP] · INFO · 22/22
+  - ⑥ PS 加速器模板章(尾版) [UI] · INFO · 40/40
+  - ⑥ PS 加速器模板章(尾版) [SUP] · INFO · 180/180
+  - ⑥ PS 加速器模板章(尾版) [ROOT] · INFO · 151/152 · 缺:functional modules/WorkOps/engines/.venv_pm/Scripts/Activate.ps1
+  log 尾段:
+     [前次 → 本次] py_accel 覆蓋 100.0% → 100.0% · 缺 0 → 0
+     [前次 → 本次] py_net 覆蓋 100.0% → 100.0% · 缺 0 → 0
+     [前次 → 本次] vdf_net 覆蓋 100.0% → 100.0% · 缺 0 → 0
+     [前次 → 本次] ps_accel 覆蓋 99.9% → 99.9% · 缺 1 → 1
+     [前次 → 本次] use 覆蓋 0.3% → 0.3%
+     [前次 → 本次] ps_tpl 覆蓋 100.0% → 100.0% · 缺 0 → 0
+    [ToolMatrix] 總判 RED · HTML C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\toolprobe\COVERAGE_MATRIX_latest.html · JSON C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\toolprobe\COVERAGE_MATRIX_latest.json · 目錄 C:\Us…
+     [教訓] 重複出錯:run CGC_MDL230_ToolCoverageProbe · rc=1 · (無例外訊息) · 第 3 次 · 帳本 CGC_MDL058(via-lessons)
+
+[ENV] 環境 · 上下 LIB 缺漏(ENV MANAGER) · rc 2 · 960s · [ENV MANAGER] 總判 AMBER · AMBER 1 · GREEN 23 · NODATA 1 · JSON C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_manager\ENVMGR_latest.json · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\ENV_20261002_082644.log
+  總判 AMBER · GREEN 23 · AMBER 1 · NODATA 1
+  - Ⓐ 輔助工具 ⑥ 加速器 / 網路 註冊 · 覆蓋(CGC_MDL230) · AMBER · 總判 AMBER · 補法:看 VIA_Reports/toolprobe/TOOLPROBE_latest.json 的待辦
+  - Ⓒ PowerShell 端 PS 端檢查 · NODATA · 沒有 PS_SIDE_latest.json(從操作台 PowerShell 跑才有) · 補法:.\VIA-OperatorConsole.ps1
+  補法一貼即用:C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_governance\TOOLS_PLAN_latest.ps1(裝件是操作員的手;-FixEnv 走 via-envtools -Apply -Approve)
+  log 尾段:
+     GREEN │ Ⓑ 環境與 LIB │ ⑩ 執行檔 · npm │ C:\Program Files\nodejs\npm.CMD
+     GREEN │ Ⓑ 環境與 LIB │ ⑩ 執行檔 · uv │ C:\Users\tonyk\.local\bin\uv.EXE
+     GREEN │ Ⓑ 環境與 LIB │ ⑩ 執行檔 · tesseract │ C:\Program Files\Tesseract-OCR\tesseract.EXE
+     GREEN │ Ⓑ 環境與 LIB │ ⑩ 執行檔 · java │ C:\Program Files (x86)\Common Files\Oracle\Java\java8path\java.EXE
+     GREEN │ Ⓑ 環境與 LIB │ ⑩ 執行檔 · pandoc │ C:\ProgramData\chocolatey\bin\pandoc.EXE
+     NODATA │ Ⓒ PowerShell 端 │ PS 端檢查 │ 沒有 PS_SIDE_latest.json(從操作台 PowerShell 跑才有)
+     └ 補法:.\VIA-OperatorConsole.ps1
+    [ENV MANAGER] 總判 AMBER · AMBER 1 · GREEN 23 · NODATA 1 · JSON C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_manager\ENVMGR_latest.json
+
+[CFL] 環境 · 現況衝突(八路 + uv) · rc 2 · 3032s · [八路衝突+uv] BLOCKED · 境 47 · 待裝 6 段 · log C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\realtest\CFL_20261002_082644.log
+  [八路衝突+uv] BLOCKED · 境 47 · 待裝 6 段
+   BASE BLOCK interpreter_identity:BASE 換了一支直譯器:上一跑 3.13.7 @ C:\Python313\python.exe(; family_isolation:forbidden=accelerate,fastapi,llvmlite,numba,onnxru
+   camelot_311 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+   paddle_311 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+   via_camelot_311 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+   via_html_312 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+   via_iso_cloud_H BLOCK pip_check:C:\Users\tonyk\envs\via_iso_cloud_H\Scripts\python
+   via_iso_compilers_H BLOCK pip_check:C:\Users\tonyk\envs\via_iso_compilers_H\Scripts\py
+   via_iso_llm_H BLOCK pip_check:C:\Users\tonyk\envs\via_iso_llm_H\Scripts\python.e
+   via_iso_ops_M BLOCK pip_check:C:\Users\tonyk\envs\via_iso_ops_M\Scripts\python.e
+   via_iso_quarantine BLOCK pip_check:C:\Users\tonyk\envs\via_iso_quarantine\Scripts\pyt
+   via_iso_scrape_H BLOCK installed_requirements:missing/mismatched=2; pip_check:C:\Users\tonyk\envs\via_iso_scrape_H\Scripts\pytho
+  log 尾段:
+     via_poly_rust_H BLOCK pip_check:C:\Users\tonyk\envs\via_poly_rust_H\Scripts\python
+     via_tools_312 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+     via_vap_312 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+     via_vdf_312 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus
+     via_vmt_pm BLOCK pip_check:C:\Users\tonyk\envs\via_vmt_pm\Scripts\python.exe:
+     via_vrn_312 BLOCK interpreter_identity:python=3.13.7 identity=NAME_LIES ; native_abi:identity=NAME_LIES; native tags and pyvenv.cfg mus; installed_requirements:missing/mismatched=1; pip_check:pdf2docx 0.5.8 requires opencv-python-headless, wh
+     vmt_pm BLOCK pip_check:C:\Users\tonyk\envs\vmt_pm\Scripts\python.exe: No 
+     成功基線 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_governance\LKGC_latest.json · 前檢 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\env_governance\eight_hub\20261002T005446632408Z_18100.json · 結果 C:\Users\tony…
+
+[全景 VCGC 控管] 總判 RED
+  - VCGC 實跑(go) · RED · 輪 go-20261002-002049-1156 · 事件 4 · OK 3 · FINDING 0 · FAIL 1 · FAIL:CGC_MDL224_TestAuto
+  - VCGC 實跑(AI) · NODATA · 沒有這類輪號的事件 · 先跑一輪(PS 操作台 go / AI 經 VCGC)
+  - VCGC → VRN 鏈 · YELLOW · NODATA 12 · GREEN 39 · 未綠 L1_擷取:NODATA · L1_擷取:NODATA · L1_擷取:NODATA · L1_擷取:NODATA · L1_擷取:NODATA
+  - SDD 實測(工作流) · RED · NOT_RUN 29 · REGISTERED_ONLY 1 · AI 端未綠 VCGC-WKF001 · VCGC-WKF002 · VCGC-WKF003 · VCGC-WKF004 · VCGC-WKF005
+  - VCGC 串測 · RED · GREEN 4 · YELLOW 1 · RED 2 · V-handoff-check · V-status · upd:CGC_MDL095_DeckServer_v0161
+  - 交接(驗收) · YELLOW · 交接 GREEN · 驗收 YELLOW · 待辦 68 · 交接綠 ≠ 驗收;BLOCKED / REVIEW 照實
+  - TA-Lib(L50) · RED · 本機 import 查得到 · 只查不裝不刪;QuantGuard(VDF_ENG086)是唯一正主
+[三合一] [模板同步] YELLOW · VIAHTMLUniversalUI-Standalone.html · faithful · 覆蓋 111/120(92.5%) · 未對接 9 · 離線 GREEN · 1283551 B · 鎖 NONE · 8.9s
+[頁] file:///C:/Users/tonyk/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/monitor_latest.html · file:///C:/Users/tonyk/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/template_adapter/synced/VIAHTMLUniversalUI_Standalone/VIA_UI_VIAHTMLUniversalUI_Standalone_latest.html · file:///C:/Users/tonyk/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf_chain/VIA_VDF_Chain_Matrix_v0100.html · file:///C:/Users/tonyk/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn_chain/VIA_VRN_Chain_Evidence_v0100.html · file:///C:/Users/tonyk/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/toolprobe/COVERAGE_MATRIX_latest.html
+[時間] 全程 3544.7 秒 · 結束碼 1
+===== 貼給 AI 結束 =====
+```
+- ⓜ MasterControl 總控頁:[總控頁] SAME · 與正主一致,不動

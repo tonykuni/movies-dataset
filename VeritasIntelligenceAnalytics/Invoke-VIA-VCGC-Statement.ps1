@@ -2,6 +2,16 @@
 #Requires -Version 7.0
 # 從 VCGC 往下。只讀樣本夾裡個股 PDF 的損益頁。不重抓、不叫 Paddle。
 # 表先印。文末黃色只貼 BEGIN_PASTE 到 END_PASTE。
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-Location -LiteralPath (Split-Path $PSScriptRoot -Parent)
 $script:VIAAccelPairNote = "正主缺,略過"
 try {

@@ -23,14 +23,20 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88
-  [衝突] 現況 RED · 2026-09-21T02:45:15
+  [衝突] 現況 NODATA 先 via-envgov eight-hub
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
-[政策] L50 全景 · 尾版 551 · import 0 · 提及 43 · 已裝 False · GREEN
+  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
+[政策] L50 全景 · 尾版 564 · import 0 · 提及 51 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL245_SDDValidator_v0104.py(家族 core)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL245_SDDValidator_v0105.py(家族 core)
+=== CGC_MDL245_SDDValidator_v0105 · 薄尾自測(selftests 逐支落本機暫存 · 中斷接續)===
+  [OK] ① 進度暫存模組 CGC_MDL251 載得到;本體 selftests 與 subprocess 那一格已換成本版
+  [OK] ② Ctrl+C 後重跑 selftests:a · b 接續(rc 照錄 0 · 2,最後一行標「接續」),只跑 c;不帶 --selftest 的呼叫照舊直通 · (2, ['c.py', 'rev-parse'])
+  [OK] ③ 正常跑完標完成 → 下一次重開新一輪
+  [OK] ④ 加速器橋 · 網路橋在;不碰 TA-Lib
+  [CGC_MDL245_SDDValidator_v0105] 薄尾 4/4 PASS
   [OK] ① 單向抓得到:步歸屬也算到它的工作流;律 / 文件歸屬不算 · ['VCGC-REQ002→VCGC-WKF001']
   [OK] ② 回指補上 = 0 條
   [OK] ③ 列:全回指 GREEN · 有單向 YELLOW(不紅、不擋鎖) · ['GREEN', 'YELLOW']
@@ -95,7 +101,7 @@
   [OK] VCGC 冊尾版:驗證器自己的報告步帶 report_rc(lock 不帶) · 帶的步 ['VCGC-WKF003-STP007', 'VCGC-WKF004-STP001', 'VCGC-WKF004-STP002', 'VCGC-WKF004-STP004']
   [OK] 本支帶加速器橋 · 網路橋 · VIA_FROM_VCGC 標記
   [OK] 不含 TA-Lib 匯入
-  [OK] 組成冊與四本工作流冊讀得到 · 30 條
+  [OK] 組成冊與四本工作流冊讀得到 · 32 條
   [OK] 組成 = 中樞相容冊(hub · loop_vdf · loop_vrn · exit · conformance)
   [OK] 組成後每步帶 STP 代碼,id 用 alias(中樞一致性訊息照舊 H1…X4) · VCGC-WKF001-STP002
   [OK] X-COL:步缺 what / match|inside = 紅 · VCGC-WKF001 欄位不齊:VCGC-WKF001-STP001.verb/what/match|inside
@@ -108,8 +114,10 @@
   [OK] 實測對事件:主控台動詞以動詞比 · run 以目標引擎 + 子動詞比
   [OK] Codex #365 P1:inside 步要有證據 — 鏈證據沒有本輪 = NOT_RUN;自測證據只認當前 HEAD 的存證 · NOT_RUN · NOT_RUN self:VRN_ENG392_TextCompleteness(自測存證不是當前 HEAD)
   [OK] Codex #365 P2:不存在的輪 → 範圍內工作流是 NOT_RUN(CLI 回非 0)
-  [OK] Codex #365 P1:存證不是當前 HEAD = 拒絕加鎖 · ['check 存證是 000000000000 不是當前 HEAD d0254827e41f']
+  [OK] Codex #365 P1:存證不是當前 HEAD = 拒絕加鎖 · ['check 存證是 000000000000 不是當前 HEAD 2553e77cf54e']
   [OK] Codex #365 P1:沒有實測 / 鎖 = 收尾不成立
   [OK] 本支帶加速器橋 · VIA_FROM_VCGC 標記
 [交接加鎖閘] 拒寫：先補交接遺漏或更新相依證據
 [交接收尾] fail=0
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL149_VeritasCentralGovernanceConsole_v0187.p → via-vcgc sdd check
+[監控] 背景全景監控中 pid 1092 · 觸碰 run CGC_MDL245_SDDValidator · 交接閘 RED · 落後 2 提交 · 快照 0.8h · 未登 10 支(VDF_MDL006_FinancialModel · VDF_MDL101_OutputManager · VDF_MDL102_FormatUpgrader …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

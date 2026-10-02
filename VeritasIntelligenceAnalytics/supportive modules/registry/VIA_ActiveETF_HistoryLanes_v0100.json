@@ -12,9 +12,31 @@
   {
    "id": "ISSUER_ARCHIVE:群益投信",
    "kind": "DATED",
-   "state": "PENDING_SOURCE",
-   "url": "https://www.capitalfund.com.tw/etf/product/detail/500/portfolio?date={ymd}",
-   "note": "ENG051 已有現值解析(00992A);歷史日期參數候工作站驗證"
+   "state": "VERIFIED",
+   "url": "https://www.capitalfund.com.tw/CFWeb/api/etf/buyback",
+   "note": "ENG051 已有現值解析(00992A);歷史日期參數候工作站驗證 · 批409 舊未驗 url 汰換:https://www.capitalfund.com.tw/etf/product/detail/500/portfolio?date={ymd} · 批409 實測驗真:00992A(fundId 500)date=null 回 39 列、date=2026-09-01 回 40 列且 pcf.date1 隨之改;00982A(399)回 56 列",
+   "body": {
+    "fundId": "{fundid}",
+    "date": "{date}"
+   },
+   "date_path": "data.pcf.date1",
+   "fetch": "http",
+   "id_api": {
+    "url": "https://www.capitalfund.com.tw/CFWeb/api/etf/list",
+    "method": "POST",
+    "body": null,
+    "pick": "data.funds",
+    "code_field": "stockNo",
+    "id_field": "fundNo"
+   },
+   "listing_api": {
+    "url": "https://www.capitalfund.com.tw/CFWeb/api/etf/detail/{fundid}",
+    "method": "GET",
+    "pick": "data.listingDate",
+    "fallback_pick": "data.establishmentTime"
+   },
+   "method": "POST",
+   "pick": "data.stocks"
   },
   {
    "id": "ISSUER_ARCHIVE:統一投信",
