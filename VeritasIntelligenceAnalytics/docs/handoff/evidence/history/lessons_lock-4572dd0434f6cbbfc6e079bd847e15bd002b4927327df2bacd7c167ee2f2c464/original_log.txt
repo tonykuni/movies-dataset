@@ -30,20 +30,26 @@
 [政策] L50 全景 · 尾版 568 · import 0 · 提及 60 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VRN_ENG398_PraddleExtractor_v0100.py(家族 vrn)
-=== VRN_ENG398_PraddleExtractor_v0100 · 自測(編排 · 階梯 · 正規化 · LAYOUT 修復搭配 · 高風險隔離)===
-  [OK] ① 三個正主掛得上(SUP_MDL743 LAYOUT · SUP_MDL746 分流 · via_ocr_super 隔離境車道含 run_lane_boxes) · SUP_MDL743_GenericLayoutHub_v0110.py · SUP_MDL746_PDFPlumberPlusHub_v0102.py · via_ocr_super_v0102.py
-  [OK] ② 儲存格正規化:括號負數 · 各種破折號 · 貨幣分離 · % 單位 · 數值欄 O→0(文字欄不動)· 全形數字;空白 / 破折號 / 0 三者分開 · 7 例全對
-  [OK] ③ 階梯:Rapid ≥ 0.85 就停(不叫重型)· 不足才升 Paddle · Paddle 不在照實留 Rapid 標低信心 · 兩道都不在 = no_ocr · ('rapid', 'paddle', 'rapid_low_conf_no_heavy', 'no_ocr')
-  [OK] ④ 掃描頁 OCR 行照 GLE 格式進 SUP_MDL743 修復鏈:年度列種子還原出表格 · 括號負數 · 數值欄 O→0 · [[None, '2024', '2025'], [None, '1234', '1500'], [None, '-567', '-600'], [None, '667', '900']]
-  [OK] ⑤ 逐格信心:格子取組成 OCR 行的最低信心;< 0.6 標 FLAGGED_MANUAL_REVIEW(只標那一格) · [(3, 2, ['FLAGGED_MANUAL_REVIEW:low_conf'])]
-warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
-[Layout 1/1] synthetic_financial_report.pdf
-Consider using the pymupdf_layout package for a greatly improved page layout analysis.
-  [OK] ⑥ 數位原生 PDF:分流 DIGITAL → 只走 pdfplumber / 原生 + LAYOUT,一次 OCR 都不叫;報告落地 · GREEN · 頁 ['DIGITAL', 'DIGITAL'] · 原生行 30 · 1.3s
-  [OK] ⑦ CID 亂碼判得出(編碼壞的原生層改走 OCR)
-  [OK] ⑧ 高風險隔離:本行程沒有 import paddle / rapidocr / onnxruntime / cv2;車道在各自隔離境(via_rapidocr · via_paddle_311)
-  [OK] ⑨ 加速器橋 · VCGC 閘(VIA_FROM_VCGC)· 不用 TA-Lib / requests / urllib(零網路)
-[VRN_ENG398 v0100 PRADDLE 擷取編排] 自測 9/9 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL224_TestAuto_v0104.py(冊上 CGC_M | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL224_TestAuto_v0104.py', 'CGC_MDL058_Lessons | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):2 個,例 ['VCGC-REQ128', 'VCGC-REQ129' → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 57, 'changed': 41, 'stale': 0, 'expected': 15084, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [via-vcgc run] [流程] 政策過 · CGC_MDL058_Lessons_v0103.py(家族 core)
+  [OK] 簽名把時間 · 路徑 · 數字拿掉:同一個坑同一張單 · run · rc=1 · FileNotFoundError: <path> at <ts> line <n>
+  [OK] 第一次 = 新簽名;第二次 = 重複出錯(帶 repeat_of、count 2)
+  [OK] 只增:三筆都在,原帳目不改
+  [OK] 重複出錯榜
+=== 教訓帳本引擎自測 10 檢(v0101)(零網路零改動;合成存證)===
+  [OK  ] 收割三態
+  [OK  ] 冪等零重複
+  [OK  ] 單境基線+指紋去重
+  [OK  ] 艦隊達陣判定
+  [OK  ] 規則命中三式
+  [OK  ] 矩陣行
+  [OK  ] 基線行+艦隊
+  [OK  ] 預載規則完備
+  [OK  ] 規則不重號
+  [OK  ] 缺目錄誠實
+  [計] 10/10 綠
+  [OK] ① 前版 v0102 自測過(簽名 · 重複出錯 · 只增)
+  [OK] ② 檔不在 = 新帳;檔在但半截 = 丟例外、不寫(前版會當空帳 → 蓋掉整本)
+  [OK] ③ 原子寫入:暫存檔換上,不留 .tmp
+  [OK] ④ 並行:6 個行程各記 5 筆同時寫同一本帳 → 30 筆一筆不少 · 編號不重 · 30 筆 · 重號 0 · []
+  [OK] ⑤ 加速器橋 · 網路橋在;鎖檔在系統暫存夾(倉內不多檔);不碰 TA-Lib
+  [計] CGC_MDL058 v0103 5/5 · PASS
