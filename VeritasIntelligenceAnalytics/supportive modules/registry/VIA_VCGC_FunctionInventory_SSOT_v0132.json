@@ -340,7 +340,11 @@
    "argv": [
     "systems"
    ],
-   "timeout": 300
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ],
+   "note": "系統卡 rc 2 = STALE/NODATA(缺料 / 冊樹不同步,照實黃);rc 1 = RED 才是壞(2026-10-02 VCGC-REQ128)"
   },
   {
    "id": "V-dbm",
@@ -1704,6 +1708,19 @@
     "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
     "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
    ]
+  },
+  {
+   "id": "C-lessons_lock",
+   "name": "交接案 lessons_lock(CGC_MDL058_Lessons --selftest;教訓帳跨行程鎖)",
+   "argv": [
+    "run",
+    "CGC_MDL058_Lessons",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+   ]
   }
  ],
  "coverage": {
@@ -2097,6 +2114,9 @@
    },
    "nlp_praddle": {
     "station": "C-nlp_praddle"
+   },
+   "lessons_lock": {
+    "station": "C-lessons_lock"
    }
   },
   "workflow": {
@@ -2302,5 +2322,5 @@
  "why_v0129": "側線 2026-10-02(VCGC-REQ122):交接新案 onepage → 新站 C-onepage;其餘一字不動(只增)",
  "why_v0130": "側線 2026-10-02 b(VCGC-REQ124):交接新案 sweeper → 新站 C-sweeper(站冊 + 交接案對應);其餘一字不動(只增)",
  "why_v0131": "側線 2026-10-02 c(VCGC-REQ126):交接新案 ppp_hub → 新站 C-ppp_hub(站冊 + 交接案對應);其餘一字不動(只增)",
- "why_v0132": "側線 2026-10-02 d(VCGC-REQ126):交接新案 praddle · ocr_super_boxes → 新站 C-praddle · C-ocr_super_boxes(站冊 + 交接案對應);其餘一字不動(只增);同批(VCGC-REQ127「將 LAYOUT NPL 都有導入工具」):+C-layout_praddle · C-nlp_praddle(站冊 + 交接案對應)"
+ "why_v0132": "側線 2026-10-02 d(VCGC-REQ126):交接新案 praddle · ocr_super_boxes → 新站 C-praddle · C-ocr_super_boxes(站冊 + 交接案對應);其餘一字不動(只增);同批(VCGC-REQ127「將 LAYOUT NPL 都有導入工具」):+C-layout_praddle · C-nlp_praddle(站冊 + 交接案對應);同批(VCGC-REQ128 CPU 最大加速):+C-lessons_lock;V-systems 加 yellow_rc [2](系統卡 rc 2 = STALE/NODATA 依設計是黃,不是壞)"
 }

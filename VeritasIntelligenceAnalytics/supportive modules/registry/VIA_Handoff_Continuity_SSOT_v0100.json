@@ -292,15 +292,16 @@
         "CGC_MDL224_TestAuto",
         "--selftest"
       ],
-      "success_marker": "CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS",
-      "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085)",
+      "success_marker": "[CGC_MDL224_TestAuto_v0104] 薄尾 6/6 PASS",
+      "scope": "VCGC 全功能串測:盤點冊覆蓋(動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口;新 0 · 缺 0)· 紀錄冊只增 · CRLF 不假變更 · 防遞迴(側線 2026-09-30 b · VCGC-REQ085);v0104(VCGC-REQ128):交接案站依加速器 CPU 預算並行(連續 C-* 段 · 同引擎同線 · 進度暫存加鎖);實測 62 站 339s → 113s 燈號全同",
       "dependencies": [
         "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
         "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v*.json",
         "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json",
         "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json",
         "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
-        "Invoke-VIA-OperatorConsole-v*.ps1"
+        "Invoke-VIA-OperatorConsole-v*.ps1",
+        "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
       ],
       "timeout_seconds": 300
     },
@@ -944,8 +945,8 @@
         "CGC_MDL254_ReviewOnePage",
         "--selftest"
       ],
-      "success_marker": "[唯一頁 v0100] 自測 9/9",
-      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁",
+      "success_marker": "[唯一頁 v0101] 自測 3/3",
+      "scope": "唯一頁:燈號口徑統一 · 時間格式 · 非綠逐條 · 來源冊 · 過期 · 未登錄 · 總檢本輪併頁;v0101:過期判定用未捨入年齡(收尾閘剛寫 GATE_latest 時 ⑥ 必紅的根因)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
         "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json",
@@ -1033,6 +1034,18 @@
         "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
         "supportive modules/registry/via_ocr_super_v*.py",
         "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "lessons_lock": {
+      "argv": [
+        "CGC_MDL058_Lessons",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL058 v0103 5/5 · PASS",
+      "scope": "教訓帳跨行程鎖 + 原子寫入 + 讀壞不當空帳(VCGC-REQ128 並行前提;實測無鎖 6 行程 600 筆剩 24 筆 → 有鎖 600/600)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
       ],
       "timeout_seconds": 300
     }
@@ -2167,6 +2180,57 @@
       "owner": "操作員(工作站實跑)· AI(根因修)",
       "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
       "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
+    },
+    {
+      "id": "VCGC-REQ128:parallel-test",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "全功能串測 133 站一站接一站、4 核只用約 23%;C-* 交接案站 62 站 420s 彼此不相依",
+      "next": "收尾實跑 chain 案(TestAuto v0104 並行)轉 VERIFIED",
+      "case": "chain"
+    },
+    {
+      "id": "VCGC-REQ128:lessons-lock",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "教訓帳 load_ledger 讀到半截檔回空帳 → save 蓋掉整本只增帳;實測無鎖 6 行程 600 筆剩 24 筆",
+      "next": "收尾實跑 lessons_lock 案轉 VERIFIED",
+      "case": "lessons_lock"
+    },
+    {
+      "id": "VCGC-REQ128:onepage-stale",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "唯一頁過期判定拿捨入到 0.1 小時的年齡比時限 → 收尾閘剛寫 GATE_latest 時自測 ⑥ 必紅(教訓帳同簽名 5 次)",
+      "next": "收尾實跑 onepage 案轉 VERIFIED",
+      "case": "onepage"
+    },
+    {
+      "id": "VCGC-REQ128:vdf-cardbook-rulers",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "AI(下一批)· 操作員裁定",
+      "reason": "VDF 系統卡 logic STALE:卡書(VIA_Essentia_CardBook_VDF)缺 VDF_ENG232;照指示用 PEIS scan + book 重建後樹有冊無 1 → 7、冊有樹無 0 → 1(PEIS 建冊範圍與 VDF_SystemManager 檢查範圍兩把尺不同)→ 已還原卡書,不硬改",
+      "next": "對齊兩把尺:VDF_SystemManager 的 tree 家族集合 vs CGC_MDL161 DEAD_ALLOW / _live 篩法;定一把後出新版號,重建卡書到 tree_only 0 · book_only 0"
+    },
+    {
+      "id": "VCGC-REQ128:consolidation-schema-overwrite",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "AI(下一批)",
+      "reason": "CGC_MDL092 ConsolidationAudit 預設動作 build_registers() 就地重寫 3 本冊;在沒有資料庫的機器(容器)把 VIA_Schema_Registry 的真表結構(440 行)蓋成「庫缺」→ 本批已還原三本冊",
+      "next": "出 CGC_MDL092 新尾版:庫缺時不寫 Schema Registry(或寫新版號檔)、預設只稽核不寫冊;寫冊要 --apply"
+    },
+    {
+      "id": "VCGC-REQ128:workstation-vdfdb",
+      "requirement": "VCGC-REQ128",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
+      "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠"
     }
   ]
 }
