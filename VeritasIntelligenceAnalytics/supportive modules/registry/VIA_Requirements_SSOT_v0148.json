@@ -4093,11 +4093,8 @@
    "requirement": "工程量大的地方可能沒有把加速器加到每支 PS / PY 指令,速度很慢;重複功能去重整合讓它更快;除了跳出 HTML U/I 報告外,PS 端 U/I 的呈現方式採用 YFinance 啟動器的 PS 模板(操作員評:U/I 優化效果很好)",
    "status": "PARTIAL",
    "homes": [
-    "CGC_MDL149_VeritasCentralGovernanceConsole_v0188.py",
-    "VeritasCeleritas.PS7.UI.ps1",
-    "VeritasCeleritas.PS7.Template.ps1",
-    "CGC_MDL124_BridgeSweeper_v0109.py",
-    "VIA_Handoff_Continuity_SSOT_v0100.json"
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_ToolCoverageMatrix_SSOT_v0102.json"
    ],
    "evidence": "容器實測(2026-10-02):同一支引擎直接跑 0.70s、經 via-vcgc run 4.13s;cProfile:每次 run 的前置 / 後置治理檢查重做——SDD check 3.06s · 參數樞紐 73 本 0.93s · FlowConsistency 0.78s · TA-Lib 禁令掃描 0.73s;Windows CI 上一次 cmds 72s。加速器橋覆蓋 PY 511/511 · NET 111/111(全景),慢點不在橋,在每次重做的整樹檢查;2026-10-02 落地(容器實測):① VCGC v0188 治理沿用——樹沒變時 policy_step / _gate_ok / sync_check 重印上次輸出(與 --fresh 一字不差),run CGC_MDL254_ReviewOnePage --selftest 4.1s → 1.8s;冷跑大頭(任一檔一改就 36s)是 v0172 forwarded_defs 把 962 支前版檔整檔 ast.parse,改為逐檔內容雜湊沿用(整樹 573 條尾鏈 5573 個定義逐鍵逐序相同)→ 改檔後 11.5s;自測 11/11 + 前版鏈 [交接入口] fail=0。② 查證:短令冊沒有單獨啟動 YFinance 的指令;操作員看到的版面是 VDF_MDL002_YFinanceFetchingEngine 用 Python Rich 在 PS 視窗印的(藍框標題 Panel · 圓角表 · 洋紅表頭 · 青綠黃欄色 · 整體狀態 Panel)。用純 PS7 重做成模板呈現件 VeritasCeleritas.PS7.UI.ps1(Write-CeleritasRichMatrix / Table / Panel / Rule;計數判決交給既有 Write-CeleritasMatrixSummary,不另寫一份),模板只增點源(操作員「可採用加入標準 PS 模板」= 這一次的 L70 許可);CI vcgc-pwsh-gate 用真 pwsh 解析 + Test-CeleritasUI 自測 + 印示範矩陣。掃橋器 v0109 把 UI 件同模板豁免(自測 16/16)",
    "next": "剩:① v0142 live_components 每支尾版整檔解析約 6s(要逐檔沿用得重寫那條規則,另案)② 既有短令(.ps1)改用 RichMatrix 呈現要逐支 L70 許可 + 新 Register 版 ③ 工作站實測 v0188 秒數與 PS 版面(Windows Terminal;舊主控台設 VIA_PS_UI_ASCII=1)",
@@ -4111,7 +4108,13 @@
      "recorded_at": "2026-10-02T15:45:04+00:00"
     }
    ],
-   "hand": "AI(剩①)· 操作員(②許可 · ③工作站實測)"
+   "hand": "AI(剩①)· 操作員(②許可 · ③工作站實測)",
+   "modules": [
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0188.py",
+    "VeritasCeleritas.PS7.UI.ps1",
+    "VeritasCeleritas.PS7.Template.ps1",
+    "CGC_MDL124_BridgeSweeper_v0109.py"
+   ]
   },
   {
    "code": "VCGC-REQ125",
