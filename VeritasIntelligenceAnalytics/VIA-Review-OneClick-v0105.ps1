@@ -1,3 +1,4 @@
+# CELERITAS-TEMPLATE-JOIN v1 (paste block: Invoke-VIA-Review tail it runs carries the template; operator-approved stamp 2026-10-02 L70)
 &{
 # =====================================================================================
 # VIA-Review-OneClick-v0105.ps1 — 一貼可用 · 一個指令整合全部檢視 · 不關 PS 視窗
