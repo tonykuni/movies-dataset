@@ -41,7 +41,7 @@ _prior = None
 _engine = None
 
 
-def _load(path: Path, name: str):
+def _load_v0113(path: Path, name: str):  # 版本專屬名:元件冊以函式登記,共用名會把前版(v0110 _load)的紀錄搶走
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
@@ -52,14 +52,14 @@ def _load(path: Path, name: str):
 def _facade():
     global _prior
     if _prior is None:
-        _prior = _load(PRIOR_PATH, "vrn_manager_v0112_for_v0113")
+        _prior = _load_v0113(PRIOR_PATH, "vrn_manager_v0112_for_v0113")
     return _prior
 
 
 def _eng():
     global _engine
     if _engine is None:
-        _engine = _load(ENGINE_PATH, "vrn_eng115_v0101_for_manager")
+        _engine = _load_v0113(ENGINE_PATH, "vrn_eng115_v0101_for_manager")
     return _engine
 
 
