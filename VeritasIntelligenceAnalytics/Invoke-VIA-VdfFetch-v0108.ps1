@@ -14,7 +14,9 @@
 #   6 台股清單 新上市 / 下市     via-vcgc run --family vdf VDF_ENG087_MarketListGovernance diff
 #   7 每日兩張清單檔             via-vcgc run --family vdf VDF_ENG231_GlobalListings lists
 #   每步都經 VCGC(VIA_FROM_VCGC=YES 只設在本行程、跑完還原);網路只經各引擎自己的統包網路工具,同意閘在工具裡:
-#   閘沒開 = 該步誠實回 GATE / SKIP,不代開、不中斷,① 跑完照樣進 ②。rc:0 綠 · 2 沒料 / 有發現 · 4 閘關 · 其他 紅。
+#   ① 本檔不設同意閘 —— 視窗沒開閘 = 該步誠實回 GATE / SKIP,不中斷,① 跑完照樣進 ②。rc:0 綠 · 2 沒料 / 有發現 · 4 閘關 · 其他 紅。
+#   注意 ②:v0107 → CGC_MDL134 的設計是「起跑即同意」—— 步冊標 net 的步,MDL134 會在**該步子行程**設 VIA_NET_CONSENT /
+#   VIA_SCRAPE_CONSENT=YES(既有正主行為,本檔不改;R52 容器實錄:revenue_backfill 因此真的上 MOPS 抓)。不想上網就加 -Dry。
 #
 # 用法(PowerShell 7;同 v0107 的參數全部照收):
 #   pwsh -NoProfile -File "<本檔>" -Since 2023-06-01            ① 補兩張清單 → ② 2023-06-01 到今天全部步並行
