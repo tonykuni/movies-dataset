@@ -416,7 +416,10 @@ def main() -> int:
 
 def selftest() -> int:
     import tempfile
-    import duckdb
+    try:
+        import duckdb
+    except ImportError:          # CI 某些步驟的直譯器沒有 duckdb:要暫存庫的檢查照實略過(不算過、不算錯)
+        duckdb = None
     ok = []
 
     def chk(name, cond, note=""):
@@ -428,86 +431,89 @@ def selftest() -> int:
     chk("① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節",
         len(bk["outputs"]) == 7 and bk["loop"]["order"][-3:] == ["E-11:xcheck", "E-11:parquet", "E-11:lock"]
         and all(k in bk for k in ("xcheck", "parquet", "lock")), PRIOR.book_path().name)
-    with tempfile.TemporaryDirectory() as td:
-        T = Path(td)
-        dbs = {"idx": T / "idx.duckdb", "tw": T / "tw.duckdb", "gl": T / "gl.duckdb"}
-        c = duckdb.connect(str(dbs["idx"]))
-        c.execute("CREATE TABLE tw_index_daily(date VARCHAR, index_code VARCHAR, close DOUBLE)")
-        c.execute("INSERT INTO tw_index_daily VALUES ('2026-09-29','TAIEX',20000),('2026-09-30','TAIEX',20100),('2026-10-01','TAIEX',20200),"
-                  "('2026-10-01','TPEX',250)")
-        c.close()
-        c = duckdb.connect(str(dbs["tw"]))
-        c.execute("CREATE TABLE tw_market_agg(date DATE, volume DOUBLE, taiex DOUBLE)")
-        c.execute("INSERT INTO tw_market_agg VALUES ('2026-09-29',1,20000),('2026-09-30',1,20100),('2026-10-01',1,20402)")
-        c.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE)")
-        c.execute("INSERT INTO tw_daily_prices VALUES ('2026-09-29','2330.TW',1),('2026-09-29','6488.TWO',1),('2026-09-29','0050.TW',1),"
-                  "('2026-09-30','2330.TW',1),('2026-09-30','6488.TWO',1),('2026-10-01','2330.TW',1)")
-        c.execute("CREATE TABLE tw_chip_inst(date DATE, code VARCHAR, market VARCHAR)")
-        c.execute("INSERT INTO tw_chip_inst VALUES ('2026-09-29','2330','TWSE'),('2026-09-29','6488','TPEX'),('2026-09-29','0050','TWSE'),"
-                  "('2026-09-30','2330','TWSE')")
-        c.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR)")
-        c.execute("INSERT INTO tw_trading_daily VALUES ('2026-09-29','2330','TWSE'),('2026-09-29','6488','TPEX'),"
-                  "('2026-09-30','2330','TWSE'),('2026-09-30','6488','TPEX'),('2026-10-01','2330','TWSE')")
-        c.close()
-        c = duckdb.connect(str(dbs["gl"]))
-        c.execute("CREATE TABLE global_daily(date VARCHAR, ticker VARCHAR, close DOUBLE)")
-        c.execute("INSERT INTO global_daily VALUES ('2026-09-29','^TWII',20010),('2026-10-01','^TWII',20200),('2026-09-29','^N225',1)")
-        c.close()
-        ix = xcheck_index(20, dbs)
-        lam = {r["date"]: r["lamp"] for r in ix["rows"]}
-        chk("② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED",
-            lam == {"2026-09-29": "GREEN", "2026-09-30": "YELLOW", "2026-10-01": "RED"} and ix["verdict"] == "RED", lam)
-        ct = xcheck_counts(20, dbs["tw"])
-        cl = {r["date"]: (r["prices_n"], r["chips_n"], r["trading_n"], r["all3_n"], r["lamp"]) for r in ct["rows"]}
-        chk("③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊)",
-            cl == {"2026-09-29": (2, 2, 2, 2, "GREEN"), "2026-09-30": (2, 1, 2, 1, "YELLOW"), "2026-10-01": (1, 0, 1, 0, "YELLOW")}
-            and any(r["only_sample"] == "6488" for r in ct["rows"]), cl)
-        out_db = T / "uni.duckdb"
-        rep = xcheck(20, True, dbs, out_db, T / "rep")
-        rep2 = xcheck(20, True, dbs, out_db, T / "rep")
-        chk("④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0",
-            rep["stored"]["OUT-06"]["added"] == 3 and rep["stored"]["OUT-07"]["added"] == 3
-            and rep2["stored"]["OUT-06"]["added"] == 0 and (T / "rep" / "XCHECK_latest.json").is_file(), rep2["stored"])
-        v6 = PRIOR.validate("OUT-06", PRIOR.frame("OUT-06", ix["rows"]))
-        v7 = PRIOR.validate("OUT-07", PRIOR.frame("OUT-07", ct["rows"]))
-        chk("⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵)", v6["lamp"] == "GREEN" and v7["lamp"] == "GREEN",
-            (v6.get("problems"), v7.get("problems")))
-        st = store("OUT-01", [{"seq": 1, "group": "TW_STOCK", "code": "2330", "name": "台積電", "market": "TWSE", "yf_ticker": "2330.TW",
-                               "bb_ticker": "2330 TT", "industry": "", "issuer": "", "verified": None, "last_holdings_date": "",
-                               "source": "t", "state": "OK"}], out_db)
-        st2 = store("OUT-01", [{"seq": 9, "group": "TW_STOCK", "code": "2330", "name": "改名", "market": "TWSE", "state": "OK"}], out_db)
-        chk("⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)", st["added"] == 1 and st2["added"] == 0
-            and duckdb.connect(str(out_db), read_only=True).execute("SELECT name, last_holdings_date FROM universe_list").fetchall() == [("台積電", None)])
+    if duckdb is None:
+        print("  [略過] ②–⑧ 要 duckdb 建暫存庫;本直譯器沒有 duckdb → 照實略過(其餘照驗)")
+    else:
+        with tempfile.TemporaryDirectory() as td:
+            T = Path(td)
+            dbs = {"idx": T / "idx.duckdb", "tw": T / "tw.duckdb", "gl": T / "gl.duckdb"}
+            c = duckdb.connect(str(dbs["idx"]))
+            c.execute("CREATE TABLE tw_index_daily(date VARCHAR, index_code VARCHAR, close DOUBLE)")
+            c.execute("INSERT INTO tw_index_daily VALUES ('2026-09-29','TAIEX',20000),('2026-09-30','TAIEX',20100),('2026-10-01','TAIEX',20200),"
+                      "('2026-10-01','TPEX',250)")
+            c.close()
+            c = duckdb.connect(str(dbs["tw"]))
+            c.execute("CREATE TABLE tw_market_agg(date DATE, volume DOUBLE, taiex DOUBLE)")
+            c.execute("INSERT INTO tw_market_agg VALUES ('2026-09-29',1,20000),('2026-09-30',1,20100),('2026-10-01',1,20402)")
+            c.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE)")
+            c.execute("INSERT INTO tw_daily_prices VALUES ('2026-09-29','2330.TW',1),('2026-09-29','6488.TWO',1),('2026-09-29','0050.TW',1),"
+                      "('2026-09-30','2330.TW',1),('2026-09-30','6488.TWO',1),('2026-10-01','2330.TW',1)")
+            c.execute("CREATE TABLE tw_chip_inst(date DATE, code VARCHAR, market VARCHAR)")
+            c.execute("INSERT INTO tw_chip_inst VALUES ('2026-09-29','2330','TWSE'),('2026-09-29','6488','TPEX'),('2026-09-29','0050','TWSE'),"
+                      "('2026-09-30','2330','TWSE')")
+            c.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR)")
+            c.execute("INSERT INTO tw_trading_daily VALUES ('2026-09-29','2330','TWSE'),('2026-09-29','6488','TPEX'),"
+                      "('2026-09-30','2330','TWSE'),('2026-09-30','6488','TPEX'),('2026-10-01','2330','TWSE')")
+            c.close()
+            c = duckdb.connect(str(dbs["gl"]))
+            c.execute("CREATE TABLE global_daily(date VARCHAR, ticker VARCHAR, close DOUBLE)")
+            c.execute("INSERT INTO global_daily VALUES ('2026-09-29','^TWII',20010),('2026-10-01','^TWII',20200),('2026-09-29','^N225',1)")
+            c.close()
+            ix = xcheck_index(20, dbs)
+            lam = {r["date"]: r["lamp"] for r in ix["rows"]}
+            chk("② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED",
+                lam == {"2026-09-29": "GREEN", "2026-09-30": "YELLOW", "2026-10-01": "RED"} and ix["verdict"] == "RED", lam)
+            ct = xcheck_counts(20, dbs["tw"])
+            cl = {r["date"]: (r["prices_n"], r["chips_n"], r["trading_n"], r["all3_n"], r["lamp"]) for r in ct["rows"]}
+            chk("③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊)",
+                cl == {"2026-09-29": (2, 2, 2, 2, "GREEN"), "2026-09-30": (2, 1, 2, 1, "YELLOW"), "2026-10-01": (1, 0, 1, 0, "YELLOW")}
+                and any(r["only_sample"] == "6488" for r in ct["rows"]), cl)
+            out_db = T / "uni.duckdb"
+            rep = xcheck(20, True, dbs, out_db, T / "rep")
+            rep2 = xcheck(20, True, dbs, out_db, T / "rep")
+            chk("④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0",
+                rep["stored"]["OUT-06"]["added"] == 3 and rep["stored"]["OUT-07"]["added"] == 3
+                and rep2["stored"]["OUT-06"]["added"] == 0 and (T / "rep" / "XCHECK_latest.json").is_file(), rep2["stored"])
+            v6 = PRIOR.validate("OUT-06", PRIOR.frame("OUT-06", ix["rows"]))
+            v7 = PRIOR.validate("OUT-07", PRIOR.frame("OUT-07", ct["rows"]))
+            chk("⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵)", v6["lamp"] == "GREEN" and v7["lamp"] == "GREEN",
+                (v6.get("problems"), v7.get("problems")))
+            st = store("OUT-01", [{"seq": 1, "group": "TW_STOCK", "code": "2330", "name": "台積電", "market": "TWSE", "yf_ticker": "2330.TW",
+                                   "bb_ticker": "2330 TT", "industry": "", "issuer": "", "verified": None, "last_holdings_date": "",
+                                   "source": "t", "state": "OK"}], out_db)
+            st2 = store("OUT-01", [{"seq": 9, "group": "TW_STOCK", "code": "2330", "name": "改名", "market": "TWSE", "state": "OK"}], out_db)
+            chk("⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)", st["added"] == 1 and st2["added"] == 0
+                and duckdb.connect(str(out_db), read_only=True).execute("SELECT name, last_holdings_date FROM universe_list").fetchall() == [("台積電", None)])
 
-        class FakeM238:
-            def __init__(self, home):
-                self.home, self.applied = home, None
+            class FakeM238:
+                def __init__(self, home):
+                    self.home, self.applied = home, None
 
-            def data_home(self, override=None):
-                return (self.home, "test") if self.home else (None, "資料家不可用")
+                def data_home(self, override=None):
+                    return (self.home, "test") if self.home else (None, "資料家不可用")
 
-            def parquet_plan(self, home):
-                return [{"db": "vdf_tw_market", "table": "tw_daily_prices", "rows": 6, "view": "vdf_tw_market__tw_daily_prices", "exists": True},
-                        {"db": "vdf_tw_market", "table": "tw_chip_inst", "rows": 4, "view": "vdf_tw_market__tw_chip_inst", "exists": True},
-                        {"db": "x", "table": "not_mine", "rows": 1, "view": "x__not_mine", "exists": False}]
+                def parquet_plan(self, home):
+                    return [{"db": "vdf_tw_market", "table": "tw_daily_prices", "rows": 6, "view": "vdf_tw_market__tw_daily_prices", "exists": True},
+                            {"db": "vdf_tw_market", "table": "tw_chip_inst", "rows": 4, "view": "vdf_tw_market__tw_chip_inst", "exists": True},
+                            {"db": "x", "table": "not_mine", "rows": 1, "view": "x__not_mine", "exists": False}]
 
-            def parquet_apply(self, home, plan):
-                self.applied = [r["view"] for r in plan]
-                return {"written": len(plan), "failed": [], "catalog": str(Path(home) / "VIA_Parquet_Catalog.duckdb")}
+                def parquet_apply(self, home, plan):
+                    self.applied = [r["view"] for r in plan]
+                    return {"written": len(plan), "failed": [], "catalog": str(Path(home) / "VIA_Parquet_Catalog.duckdb")}
 
-        home = T / "home"
-        home.mkdir()
-        c = duckdb.connect(str(home / "VIA_Parquet_Catalog.duckdb"))
-        c.execute("CREATE TABLE _via_catalog(view VARCHAR PRIMARY KEY, db VARCHAR, tbl VARCHAR, rows BIGINT, parquet VARCHAR, updated_at VARCHAR)")
-        c.execute("INSERT INTO _via_catalog VALUES ('vdf_tw_market__tw_daily_prices','vdf_tw_market','tw_daily_prices',6,'p','t')")
-        c.close()
-        fm = FakeM238(home)
-        r0 = parquet(False, None, fm)
-        r1 = parquet(True, None, fm)
-        chk("⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238)",
-            r0["plan"] == 2 and r0["todo"] == ["vdf_tw_market__tw_chip_inst"] and not r0["applied"]
-            and r1["applied"] and fm.applied == ["vdf_tw_market__tw_chip_inst"], (r0, fm.applied))
-        chk("⑧ 資料家不可用 = NODATA(不假寫)", parquet(True, None, FakeM238(None))["state"] == "NODATA")
+            home = T / "home"
+            home.mkdir()
+            c = duckdb.connect(str(home / "VIA_Parquet_Catalog.duckdb"))
+            c.execute("CREATE TABLE _via_catalog(view VARCHAR PRIMARY KEY, db VARCHAR, tbl VARCHAR, rows BIGINT, parquet VARCHAR, updated_at VARCHAR)")
+            c.execute("INSERT INTO _via_catalog VALUES ('vdf_tw_market__tw_daily_prices','vdf_tw_market','tw_daily_prices',6,'p','t')")
+            c.close()
+            fm = FakeM238(home)
+            r0 = parquet(False, None, fm)
+            r1 = parquet(True, None, fm)
+            chk("⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238)",
+                r0["plan"] == 2 and r0["todo"] == ["vdf_tw_market__tw_chip_inst"] and not r0["applied"]
+                and r1["applied"] and fm.applied == ["vdf_tw_market__tw_chip_inst"], (r0, fm.applied))
+            chk("⑧ 資料家不可用 = NODATA(不假寫)", parquet(True, None, FakeM238(None))["state"] == "NODATA")
     lv = lock_view()
     chk("⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock)",
         lv["state"] in ("OPEN", "LOCKED", "RELOCK") and lv["steps"] and all(s["tail"] for s in lv["steps"]), (lv["state"], lv["book"]))
