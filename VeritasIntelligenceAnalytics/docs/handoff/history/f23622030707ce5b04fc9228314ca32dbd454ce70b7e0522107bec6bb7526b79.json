@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-02T18:59:21+00:00",
+  "at": "2026-10-02T17:59:33+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -279,13 +279,6 @@
       "owner": "操作員(①許可 · ②工作站同步與實測)",
       "next": "剩:① 既有短令(.ps1)改用 RichMatrix 呈現要逐支 L70 許可 + 新 Register 版 ② 工作站實測 v0189 秒數與 PS 版面(工作站目前落後 main 77 提交,要先同步)",
       "topic": "提速:每支 PS / PY 指令都帶加速器且真的快 · 重複功能去重 · PS 端 U/I 改用 YFinance 啟動器 PS 模板"
-    },
-    {
-      "id": "VCGC-REQ128",
-      "state": "PARTIAL",
-      "owner": "AI(下一批)· 操作員(工作站落庫 · 未引用引擎整併裁量)",
-      "next": "PENDING 四項:VDF 卡書兩把尺對齊 · CGC_MDL092 不覆寫 Schema Registry · 工作站 via-vdfdb 落庫 · 收尾 ③ 交接案與 handoff test 仍序列(下一步同法並行)",
-      "topic": "CPU 最大加速 · 三系統實測盤點 · 工具使用記錄 · 收尾上傳"
     },
     {
       "id": "host-live",
@@ -721,30 +714,6 @@
       "owner": "操作員(工作站實跑)· AI(根因修)",
       "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
       "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
-    },
-    {
-      "id": "VCGC-REQ128:vdf-cardbook-rulers",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "AI(下一批)· 操作員裁定",
-      "reason": "VDF 系統卡 logic STALE:卡書(VIA_Essentia_CardBook_VDF)缺 VDF_ENG232;照指示用 PEIS scan + book 重建後樹有冊無 1 → 7、冊有樹無 0 → 1(PEIS 建冊範圍與 VDF_SystemManager 檢查範圍兩把尺不同)→ 已還原卡書,不硬改",
-      "next": "對齊兩把尺:VDF_SystemManager 的 tree 家族集合 vs CGC_MDL161 DEAD_ALLOW / _live 篩法;定一把後出新版號,重建卡書到 tree_only 0 · book_only 0"
-    },
-    {
-      "id": "VCGC-REQ128:consolidation-schema-overwrite",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "AI(下一批)",
-      "reason": "CGC_MDL092 ConsolidationAudit 預設動作 build_registers() 就地重寫 3 本冊;在沒有資料庫的機器(容器)把 VIA_Schema_Registry 的真表結構(440 行)蓋成「庫缺」→ 本批已還原三本冊",
-      "next": "出 CGC_MDL092 新尾版:庫缺時不寫 Schema Registry(或寫新版號檔)、預設只稽核不寫冊;寫冊要 --apply"
-    },
-    {
-      "id": "VCGC-REQ128:workstation-vdfdb",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
-      "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠"
     }
   ],
   "reusable_successes": [
@@ -838,10 +807,7 @@
     "VCGC-REQ124:plan",
     "VCGC-REQ124:live-components",
     "VCGC-REQ126:vrn-ocr-ladder",
-    "VCGC-REQ127:tool-import",
-    "VCGC-REQ128:parallel-test",
-    "VCGC-REQ128:lessons-lock",
-    "VCGC-REQ128:onepage-stale"
+    "VCGC-REQ127:tool-import"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
@@ -854,7 +820,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "2066caeb670f1c448ebc4d2aeaa60ea9f7a9f61708d07d60f300a8355d50e14d"
+      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -874,7 +840,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "2066caeb670f1c448ebc4d2aeaa60ea9f7a9f61708d07d60f300a8355d50e14d"
+      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -898,7 +864,7 @@
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "2066caeb670f1c448ebc4d2aeaa60ea9f7a9f61708d07d60f300a8355d50e14d"
+      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -914,11 +880,11 @@
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "feadb14feeaa1e44891c79d333d2bbad9bebd16956785279209c7c56ee85da73"
+      "sha256": "bdaa9848a90758c13b400fff1e50b688b436836dd889d151566651f1b1f7777a"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "feadb14feeaa1e44891c79d333d2bbad9bebd16956785279209c7c56ee85da73"
+      "sha256": "bdaa9848a90758c13b400fff1e50b688b436836dd889d151566651f1b1f7777a"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -938,7 +904,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "2066caeb670f1c448ebc4d2aeaa60ea9f7a9f61708d07d60f300a8355d50e14d"
+      "sha256": "1fffe1894a4902f8c9c2d5450cb3670e71d42c6b62c281a2a8b96eb4baf297c6"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -1058,7 +1024,7 @@
     },
     "VCGC-REQ097:progress-journal": {
       "path": "docs/handoff/evidence/progress_journal.json",
-      "sha256": "717159b3740c2eed4a1848193a7774773cfae445f387d0a5a074dd7a08f1c3ea"
+      "sha256": "cfc9a8c595880071fd32df744caf20c5f4c079fef9e9a2abe1e1f759bfc69b72"
     },
     "VCGC-REQ098:vrn_chain_runner": {
       "path": "docs/handoff/evidence/vrn_chain_runner.json",
@@ -1190,7 +1156,7 @@
     },
     "VCGC-REQ122:onepage": {
       "path": "docs/handoff/evidence/onepage.json",
-      "sha256": "8705b49d22c6bdaeec41e5054ea60557614a3f1f82bf8f7fa3622c433fc722c9"
+      "sha256": "49cb0d6afbc1e439c981790e0637c2219422aed748c164191dd1d4ee1b247f38"
     },
     "VCGC-REQ124:plan": {
       "path": "docs/handoff/evidence/entry.json",
@@ -1207,18 +1173,6 @@
     "VCGC-REQ127:tool-import": {
       "path": "docs/handoff/evidence/nlp_praddle.json",
       "sha256": "1090c7ac494ffb2cc50733f3ea1c5565c31bb0fd9153ec6a4017bbf37968bbdb"
-    },
-    "VCGC-REQ128:parallel-test": {
-      "path": "docs/handoff/evidence/chain.json",
-      "sha256": "feadb14feeaa1e44891c79d333d2bbad9bebd16956785279209c7c56ee85da73"
-    },
-    "VCGC-REQ128:lessons-lock": {
-      "path": "docs/handoff/evidence/lessons_lock.json",
-      "sha256": "f5ae2ff77d79f0b048737f5b01d14f27a808d916823adeff742e30be90958a60"
-    },
-    "VCGC-REQ128:onepage-stale": {
-      "path": "docs/handoff/evidence/onepage.json",
-      "sha256": "8705b49d22c6bdaeec41e5054ea60557614a3f1f82bf8f7fa3622c433fc722c9"
     }
   },
   "state": {
@@ -1277,7 +1231,7 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0147.json": "8d5fd43f27b03a14b8116b65e7292e7d8d3cf2d0c5c6324db17b4e10753e2285",
       "supportive modules/registry/VIA_Requirements_SSOT_v0148.json": "6ee0a039d435bfeda443a75ec1334760a97c97b45f04dbae3495b7257c3095f0",
       "supportive modules/registry/VIA_Requirements_SSOT_v0149.json": "e56b55d1e9058b16501159203b349326c07f45627a20921e8dbaabcef18246dd",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0150.json": "be292f3ea5c4ea00dd42e5ca4df982b021cdd04a3f0822a6207222fe601790af",
+      "supportive modules/registry/VIA_Requirements_SSOT_v0150.json": "6d48f4b8631b592ed33618a8c3e6bae3ef1e7792fef8da4206490639d4531524",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -1302,7 +1256,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "556d507564f8203698a5d08bd5efbd8b5d7b09e8f6c39d444be0363e9239decd",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "9ab4a5fb4cb040c8df90e39ca13afc503b647565af614d80b88724532e3462c2",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "d80b4db8368882e34b198cf5716dba3ab27fbd2820ee70627dfd3dabc1765a79",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "eb32b72e1d282ccc12dd6184b099ed64c7614333ad8ae0ad407ff8d82b5d5ee5",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -2624,7 +2578,6 @@
       "supportive modules/registry/CGC_MDL058_Lessons_v0100.py": "5338119a6a2153f768115282bda217d369a844e56a108cba813a650f198e33e6",
       "supportive modules/registry/CGC_MDL058_Lessons_v0101.py": "92d000106137a0c18c532bf7af40b5cbb3f0c5a95c62703545f7776f9e63683c",
       "supportive modules/registry/CGC_MDL058_Lessons_v0102.py": "b0fa7decabb48d2ed2b35f5052036c6bbe510641131bcc954c7093c04e252a92",
-      "supportive modules/registry/CGC_MDL058_Lessons_v0103.py": "405df8c463d395453881874368340404d623d469d32c4f18ead7e981bd9032fb",
       "supportive modules/registry/CGC_MDL059_MasterHub_v0100.py": "ad8b403cb0ae270fabad17d285aa56e780d8c77a2af0db407324181b6acb7de4",
       "supportive modules/registry/CGC_MDL059_MasterHub_v0101.py": "ce53b5d0d406a99790ab8c5c4be5126951c3cdc7b35e55f01b33e4237c28be3d",
       "supportive modules/registry/CGC_MDL059_MasterHub_v0102.py": "f601680451b3e68268d7930839d38894bdae01b111b0ef4e6422966a3282d671",
@@ -3814,7 +3767,6 @@
       "supportive modules/registry/CGC_MDL224_TestAuto_v0101.py": "ca4a3dbb27d2b5ce37672f1ea3add5a21019365151e9ebd59d1a093163d7ee6d",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0102.py": "fc64fce8c3b843a7fc9f812cb63303e1e89e86dca849a594eccd75f7efd66035",
       "supportive modules/registry/CGC_MDL224_TestAuto_v0103.py": "4475a1188e0447ccf00d9e59fbd38db7bbb16021cdc8728b9f931b21a28ebd09",
-      "supportive modules/registry/CGC_MDL224_TestAuto_v0104.py": "7e06e8e57682984dcf889a9045dd5a6908cf582bb61745d8a1949eddaeb61994",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0100.py": "41f585d0402f10318edba2a8c38fc217e64b3c5a69390e78ffb9895df239048f",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0101.py": "d267175eafc89630d07539c1a96fd6d6967570f070aae63806166ded97124ba8",
       "supportive modules/registry/CGC_MDL225_VersionPanorama_v0102.py": "5dfe795c993c83147a8b0939d676ae0697285006f5d8b9a6c74ec417c362fed4",
@@ -3891,7 +3843,6 @@
       "supportive modules/registry/CGC_MDL252_ManagerParity_v0100.py": "0e170c144fbf981943c8a22ae25fb12ecf23ea2ce49e7bd54ce18d231c0923d1",
       "supportive modules/registry/CGC_MDL253_ToolingInventory_v0100.py": "d5866f5797c2eba4809066741c0d2bf6228afedc47711f839ac204a88027f693",
       "supportive modules/registry/CGC_MDL254_ReviewOnePage_v0100.py": "5f9e4b9b0f9b4af0b0b3de0eabffdd1e78a8563983d9092b7a26d32aad0b65c5",
-      "supportive modules/registry/CGC_MDL254_ReviewOnePage_v0101.py": "1493f731d01e9da5f9c2a09bf26f3d1e9645523ec3e3f29109c7840992a5b501",
       "supportive modules/registry/CGC_SystemManager_v0100.py": "891dd0e88b41dc53bc848da522ef5e95fa0aba5a5a866435b4315fdd2a054de6",
       "supportive modules/registry/CGC_SystemManager_v0101.py": "42b71ba0e3a5f5567b1ed4fd6bf74a44bc89893fdbae8ce3f7397692dc77a483",
       "supportive modules/registry/CGC_SystemManager_v0102.py": "593cbda396058e49818b77376bd207e68a3633690d517162b8759d0aec904a59",
@@ -4153,7 +4104,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0129.json": "3d22c7a385b6e919aafe6d8b67e0df2fcd2484d96092835db8992aad17e5f342",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0130.json": "9e764b9802eebed738fdec08a2e986067ebf93386c3e474e0ae797c64eff5ebb",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0131.json": "0431499fd7d676bd89794867a39c90f28ef1de64d1eb1ad87d1defc00aec9d0d",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0132.json": "5fac9b27d373db12f9b5036c59915408a05021963e72785be9aca7dbc2c43dc8"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0132.json": "844179e7ef2f916ec158f51cd0296a55312d657635a493dd1b381e0fcdd32cec"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -5954,18 +5905,6 @@
           "VIA_EngineVersion_Register_v0100.json",
           "VIA_Handoff_Continuity_SSOT_v0100.json"
         ]
-      },
-      "VCGC-REQ128": {
-        "definition": "fb940956868aef9773f0e419be25ff5dc0d2400440f6449cf3267353dbc42656",
-        "status": "PARTIAL",
-        "next": "PENDING 四項:VDF 卡書兩把尺對齊 · CGC_MDL092 不覆寫 Schema Registry · 工作站 via-vdfdb 落庫 · 收尾 ③ 交接案與 handoff test 仍序列(下一步同法並行)",
-        "owner": "AI(下一批)· 操作員(工作站落庫 · 未引用引擎整併裁量)",
-        "topic": "CPU 最大加速 · 三系統實測盤點 · 工具使用記錄 · 收尾上傳",
-        "homes": [
-          "docs/VIA_S20261002_CpuAccel_RealTest_Closeout.md",
-          "VIA_Handoff_Continuity_SSOT_v0100.json",
-          "VIA_VCGC_FunctionInventory_SSOT_v0132.json"
-        ]
       }
     }
   },
@@ -7193,67 +7132,13 @@
       "owner": "操作員(工作站實跑)· AI(根因修)",
       "reason": "近兩週最接近全對齊的一跑 = 09-21 工作站 105 份 GREEN 461 · 判對率 461/461(09-24 重現);現在 425,差 36 格全在上漲空間欄(ENG073 v0137/v0138 改 ADJ 後 ENG083 _v_upside 零綠);記錄 docs/VIA_S20261002_VrnBestAlignedRuns.md",
       "next": "工作站同步後跑 VRN 矩陣 → 看 V3 [ADJ] 的 upside_adj_state 分布:狀態字彙沒收 → ENG083 新尾版收;交易所價表缺日(Z174)→ 補表;回到 ≥ 461 後把 ENG083 · ENG073 加進燈鎖"
-    },
-    "VCGC-REQ128:parallel-test": {
-      "id": "VCGC-REQ128:parallel-test",
-      "requirement": "VCGC-REQ128",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "全功能串測 133 站一站接一站、4 核只用約 23%;C-* 交接案站 62 站 420s 彼此不相依",
-      "next": "收尾實跑 chain 案(TestAuto v0104 並行)轉 VERIFIED",
-      "case": "chain",
-      "receipt": "docs/handoff/evidence/chain.json"
-    },
-    "VCGC-REQ128:lessons-lock": {
-      "id": "VCGC-REQ128:lessons-lock",
-      "requirement": "VCGC-REQ128",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "教訓帳 load_ledger 讀到半截檔回空帳 → save 蓋掉整本只增帳;實測無鎖 6 行程 600 筆剩 24 筆",
-      "next": "收尾實跑 lessons_lock 案轉 VERIFIED",
-      "case": "lessons_lock",
-      "receipt": "docs/handoff/evidence/lessons_lock.json"
-    },
-    "VCGC-REQ128:onepage-stale": {
-      "id": "VCGC-REQ128:onepage-stale",
-      "requirement": "VCGC-REQ128",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "唯一頁過期判定拿捨入到 0.1 小時的年齡比時限 → 收尾閘剛寫 GATE_latest 時自測 ⑥ 必紅(教訓帳同簽名 5 次)",
-      "next": "收尾實跑 onepage 案轉 VERIFIED",
-      "case": "onepage",
-      "receipt": "docs/handoff/evidence/onepage.json"
-    },
-    "VCGC-REQ128:vdf-cardbook-rulers": {
-      "id": "VCGC-REQ128:vdf-cardbook-rulers",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "AI(下一批)· 操作員裁定",
-      "reason": "VDF 系統卡 logic STALE:卡書(VIA_Essentia_CardBook_VDF)缺 VDF_ENG232;照指示用 PEIS scan + book 重建後樹有冊無 1 → 7、冊有樹無 0 → 1(PEIS 建冊範圍與 VDF_SystemManager 檢查範圍兩把尺不同)→ 已還原卡書,不硬改",
-      "next": "對齊兩把尺:VDF_SystemManager 的 tree 家族集合 vs CGC_MDL161 DEAD_ALLOW / _live 篩法;定一把後出新版號,重建卡書到 tree_only 0 · book_only 0"
-    },
-    "VCGC-REQ128:consolidation-schema-overwrite": {
-      "id": "VCGC-REQ128:consolidation-schema-overwrite",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "AI(下一批)",
-      "reason": "CGC_MDL092 ConsolidationAudit 預設動作 build_registers() 就地重寫 3 本冊;在沒有資料庫的機器(容器)把 VIA_Schema_Registry 的真表結構(440 行)蓋成「庫缺」→ 本批已還原三本冊",
-      "next": "出 CGC_MDL092 新尾版:庫缺時不寫 Schema Registry(或寫新版號檔)、預設只稽核不寫冊;寫冊要 --apply"
-    },
-    "VCGC-REQ128:workstation-vdfdb": {
-      "id": "VCGC-REQ128:workstation-vdfdb",
-      "requirement": "VCGC-REQ128",
-      "state": "PENDING",
-      "owner": "操作員(工作站)",
-      "reason": "容器開閘(操作員「允許開閘」,只在本次指令帶 VIA_NET_CONSENT)後 VDF 鏈 GATED 0;剩 3a/3b NODATA = features_daily 表不在;容器連 Yahoo 429 · TWSE 連線被重置,無法在容器落庫",
-      "next": "工作站開閘後 via-vdfdb 落庫 → via-vdfchain run --resume → 3a/3b 轉綠"
     }
   },
   "summary": {
-    "requirements": 167,
-    "watched_files": 2931,
-    "pending": 97,
-    "reusable": 94,
+    "requirements": 166,
+    "watched_files": 2928,
+    "pending": 93,
+    "reusable": 91,
     "findings": 0
   }
 }
