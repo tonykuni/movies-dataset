@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-01T21:39:40+00:00",
+  "updated_at": "2026-10-01T22:16:49+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -131,7 +131,8 @@
     "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
     "functional modules/VDF/engine/VDF_ENG072_StoryRotationBridge_v0105.py",
     "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0107.py",
-    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py"
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py",
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0186.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -1567,6 +1568,32 @@
       "owner": "操作員 / 工作站",
       "reason": "全綠閘首跑:OPERATOR 8(台股代號 regex 四冊判法不一 · 同詞多義 10 · 同號異名 11 組)· RUN(8 處已鎖工作流要實跑重驗)· ENV(容器無 pwsh)",
       "next": "操作員裁定 OPERATOR 項 → 工作站 via-vcgc sdd real → lock --apply → via-vcgc gate 全綠後轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ112:entry",
+      "requirement": "VCGC-REQ112",
+      "state": "VERIFIED",
+      "case": "entry",
+      "owner": "AI(VCGC closeout)",
+      "reason": "guard / exec / 子系統邊界 / link 提案的邏輯在主控台自測鏈(entry 案)",
+      "next": "via-vcgc closeout --apply --push:entry 過了自動轉 VERIFIED",
+      "receipt": "docs/handoff/evidence/entry.json"
+    },
+    {
+      "id": "VCGC-REQ112:ci-pwsh",
+      "requirement": "VCGC-REQ112",
+      "state": "PENDING",
+      "owner": "GitHub CI(vcgc-pwsh-gate)",
+      "reason": "PowerShell 7 實測 · 衝突閘 · 全綠閘在 Windows CI job 跑,容器沒有 pwsh 不能代證",
+      "next": "PR 上 vcgc-pwsh-gate 綠(job summary 三列)後帶收據轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ113:sync-up",
+      "requirement": "VCGC-REQ113",
+      "state": "PENDING",
+      "owner": "AI(下一個接手)",
+      "reason": "操作員令先中斷紀錄備份;需求已登錄未開工",
+      "next": "盤點 VDF / VRN SystemManager 動詞與 chain 存證 → 設計 VDF / VRN 向上通報 sync 動詞(子系統正本不搬)→ 收尾全綠才推"
     }
   ]
 }

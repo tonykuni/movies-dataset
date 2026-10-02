@@ -42,7 +42,7 @@
   [OK] ② 代號正規:2330→2330.TW · 2330.TWO 照原 · AAPL 照原 · 空=空 
   [OK] ③ 同意閘 fail-closed:閘未開 → 印 [FAIL-CLOSED] 同意閘未開 · rc2(匯流排判 GATED,不是壞) 
   [OK] ④ --dry 只列不抓不寫(閘未開也能列目標) 
-  [OK] ⑤ 端到端(假車道):2 檔 × 2 期 → 4 列、23+1 欄、重跑冪等(同 Ticker DELETE+INSERT 不倍增)、parquet 由 duckdb COPY 落 mega/fin(零 pyarrow) (列 4 · 檔 2 · 欄 24 · parquet 2)
+  [OK] ⑤ 端到端(假車道):2 檔 × 2 期 → 4 列、23+1 欄、重跑冪等(同 Ticker DELETE+INSERT 不倍增)、parquet 由 duckdb COPY 落 mega/fin(零 pyarrow) (列 4 · 檔 2 · 欄 24 · parquet 1)
   [OK] ⑥ status 讀得出表(列數/逐檔最新期) (  交易所財報覆蓋:tw_financial_mops 未建(先 run --mops;閘要你開))
   [OK] ⑦ 零直呼網路(無 import requests/httpx/yfinance 於模組頂層;yfinance 只在車道內惰性 import;MOPS 走 NetUnified http_text) 
   [OK] ⑧ 閘態讀自 NetUnified gate_state(永不代設;本容器應為關) (False · gate1 (未設) · gate2 (未設))
@@ -65,5 +65,5 @@
   [OK] ④ 跑完拿掉自測閘,正式 run 走真閘
   [OK] ⑤ 本支帶加速器橋 · 網路橋;不含 TA-Lib 匯入;本支沒有任何地方設 VIA_NET_CONSENT=YES 給正式路徑
   [計] VDF_ENG082 v0107 薄尾 5/5 · 合計 PASS
-  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['CGC_MDL149_VeritasCentralGovernanceCo | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):1 個,例 ['VCGC-REQ110'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 23, 'changed': 13, 'stale': 0, 'expected': 14680, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [同步] 樹有變 · 註冊冊待同步 {'new': 1, 'changed': 26, 'stale': 0, 'expected': 14693, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 1811 · 觸碰 run VDF_ENG082_FinStatements · 交接閘 YELLOW · 落後 1 提交 · 快照 1.3h · 頁 /tmp/claude-0/wt417/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
