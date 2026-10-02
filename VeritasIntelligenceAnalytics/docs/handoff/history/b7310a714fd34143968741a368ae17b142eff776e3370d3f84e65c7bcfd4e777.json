@@ -1,7 +1,7 @@
 {
   "schema": "VIA.Handoff.Audit.v1",
   "engine": "CGC_MDL140_HandoverConsole_v0101",
-  "at": "2026-10-02T18:31:03+00:00",
+  "at": "2026-10-02T17:18:51+00:00",
   "lamp": "GREEN",
   "closeout_lamp": "YELLOW",
   "meaning": "handoff integrity is separate from completed extraction or production acceptance",
@@ -279,13 +279,6 @@
       "owner": "操作員(①許可 · ②工作站同步與實測)",
       "next": "剩:① 既有短令(.ps1)改用 RichMatrix 呈現要逐支 L70 許可 + 新 Register 版 ② 工作站實測 v0189 秒數與 PS 版面(工作站目前落後 main 77 提交,要先同步)",
       "topic": "提速:每支 PS / PY 指令都帶加速器且真的快 · 重複功能去重 · PS 端 U/I 改用 YFinance 啟動器 PS 模板"
-    },
-    {
-      "id": "VCGC-REQ127",
-      "state": "PARTIAL",
-      "owner": "操作員(工作站每日實跑)· AI(根因修)",
-      "next": "工作站同步後每日收工跑 via-vcgc handoff daily(資料夾帶 --data 或寫進 docs/handoff/daily/handover.toml);十點真實結果貼回後轉 COVERED",
-      "topic": "每日進度交接十點引擎:一支 `via-vcgc handoff daily` → panorama.manifest.json"
     },
     {
       "id": "host-live",
@@ -704,14 +697,6 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
-    },
-    {
-      "id": "VCGC-REQ127:daily-workstation",
-      "requirement": "VCGC-REQ127",
-      "state": "PENDING",
-      "owner": "操作員(工作站每日收工)",
-      "reason": "容器沒有工作站資料夾也沒有 pwsh:③ 資料指紋 NODATA、⑥ 串測 P-entry 黃都是容器限制;工作站真實十點還沒跑過",
-      "next": "工作站同步 main 後每日收工跑 via-vcgc handoff daily --data <當日輸出夾>(或把夾寫進 docs/handoff/daily/handover.toml 的 data_dirs);貼回 [每日交接] 那行與判決行,提交 docs/handoff/daily 的清單與只增帳"
     }
   ],
   "reusable_successes": [
@@ -804,13 +789,12 @@
     "VCGC-REQ122:onepage",
     "VCGC-REQ124:plan",
     "VCGC-REQ124:live-components",
-    "VCGC-REQ126:vrn-ocr-ladder",
-    "VCGC-REQ127:daily-engine"
+    "VCGC-REQ126:vrn-ocr-ladder"
   ],
   "receipts": {
     "VCGC-REQ075:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d8ebbb297c9c9eb54d0f64667ffef88fe5ac242a3c8b466e634b4a64e765bf60"
+      "sha256": "2ecd2c872c30e99cc624ba793b5dc528a108af5b55e85bfdccd107909579dd18"
     },
     "VCGC-REQ075:entry": {
       "path": "docs/handoff/evidence/entry.json",
@@ -818,7 +802,7 @@
     },
     "VRN-REQ007:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "863ca8256a92aea5e7a9ddf52199b5a1883b82c08b4d4a0c35adfa93f9ab6ea6"
+      "sha256": "f54b8cefef820c5f1f9164247a9bccff1bce367b27c52ded4ebe19d75e488f00"
     },
     "VRN-REQ007:manager": {
       "path": "docs/handoff/evidence/manager.json",
@@ -838,7 +822,7 @@
     },
     "VCGC-REQ078:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "863ca8256a92aea5e7a9ddf52199b5a1883b82c08b4d4a0c35adfa93f9ab6ea6"
+      "sha256": "f54b8cefef820c5f1f9164247a9bccff1bce367b27c52ded4ebe19d75e488f00"
     },
     "VCGC-REQ079:sdd": {
       "path": "docs/handoff/evidence/sdd.json",
@@ -858,11 +842,11 @@
     },
     "VCGC-REQ075:reuse-glob": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d8ebbb297c9c9eb54d0f64667ffef88fe5ac242a3c8b466e634b4a64e765bf60"
+      "sha256": "2ecd2c872c30e99cc624ba793b5dc528a108af5b55e85bfdccd107909579dd18"
     },
     "VCGC-REQ084:numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "863ca8256a92aea5e7a9ddf52199b5a1883b82c08b4d4a0c35adfa93f9ab6ea6"
+      "sha256": "f54b8cefef820c5f1f9164247a9bccff1bce367b27c52ded4ebe19d75e488f00"
     },
     "VCGC-REQ084:activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -874,15 +858,15 @@
     },
     "VCGC-REQ084:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d8ebbb297c9c9eb54d0f64667ffef88fe5ac242a3c8b466e634b4a64e765bf60"
+      "sha256": "2ecd2c872c30e99cc624ba793b5dc528a108af5b55e85bfdccd107909579dd18"
     },
     "VCGC-REQ085:inventory": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "abb3972da2e0830785852212532d9c4a894f5c9ea3063868a904170418a742fc"
+      "sha256": "5e7f86636257ad9929ce50634e69ac065439fc2d66f007854e681bfb16ebfcdf"
     },
     "VCGC-REQ085:ps-entry": {
       "path": "docs/handoff/evidence/chain.json",
-      "sha256": "abb3972da2e0830785852212532d9c4a894f5c9ea3063868a904170418a742fc"
+      "sha256": "5e7f86636257ad9929ce50634e69ac065439fc2d66f007854e681bfb16ebfcdf"
     },
     "VCGC-REQ085:backup-stale": {
       "path": "docs/handoff/evidence/backup.json",
@@ -902,7 +886,7 @@
     },
     "VCGC-REQ084:codex378-numbering": {
       "path": "docs/handoff/evidence/numbering.json",
-      "sha256": "863ca8256a92aea5e7a9ddf52199b5a1883b82c08b4d4a0c35adfa93f9ab6ea6"
+      "sha256": "f54b8cefef820c5f1f9164247a9bccff1bce367b27c52ded4ebe19d75e488f00"
     },
     "VCGC-REQ084:codex378-activation": {
       "path": "docs/handoff/evidence/activation.json",
@@ -1138,7 +1122,7 @@
     },
     "VCGC-REQ115:handoff": {
       "path": "docs/handoff/evidence/handoff.json",
-      "sha256": "d8ebbb297c9c9eb54d0f64667ffef88fe5ac242a3c8b466e634b4a64e765bf60"
+      "sha256": "2ecd2c872c30e99cc624ba793b5dc528a108af5b55e85bfdccd107909579dd18"
     },
     "VCGC-REQ116:tooling": {
       "path": "docs/handoff/evidence/tooling.json",
@@ -1167,10 +1151,6 @@
     "VCGC-REQ126:vrn-ocr-ladder": {
       "path": "docs/handoff/evidence/ppp_hub.json",
       "sha256": "7c3826dc0eb0a3d684c8765cee0e33a70b8debce0510687ae74aa723f267b4cf"
-    },
-    "VCGC-REQ127:daily-engine": {
-      "path": "docs/handoff/evidence/daily_handover.json",
-      "sha256": "dfa853b068f709639743d16503dd58aa79613bb27beb949d8897c8a09cc29feb"
     }
   },
   "state": {
@@ -1229,7 +1209,6 @@
       "supportive modules/registry/VIA_Requirements_SSOT_v0147.json": "8d5fd43f27b03a14b8116b65e7292e7d8d3cf2d0c5c6324db17b4e10753e2285",
       "supportive modules/registry/VIA_Requirements_SSOT_v0148.json": "6ee0a039d435bfeda443a75ec1334760a97c97b45f04dbae3495b7257c3095f0",
       "supportive modules/registry/VIA_Requirements_SSOT_v0149.json": "e56b55d1e9058b16501159203b349326c07f45627a20921e8dbaabcef18246dd",
-      "supportive modules/registry/VIA_Requirements_SSOT_v0150.json": "7a1f2dbfcf0894eb99cbaa0dca88d2310621cb061d7a8bdcf0b35da29ebd9fab",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0100.json": "0f0d51f00efa1c65a89591b2dbada4d8b51971af5c13cbc5f4bb67b208b90034",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json": "2f5056c57d7d074b1c2b30b770678ba4542d64040c87b24e9cef12808b247bf3",
       "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json": "b0bd246387155b4d6413047df26f58e2e6668823859128d4d0616e252abea6bc",
@@ -1254,7 +1233,7 @@
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0102.json": "415d585285fe442e358847382fc8d17331fa9e4e4b7df1ee1b69c800cbee9547",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0103.json": "f97665cdaabab3953f35c70208216b30c4239387863fd0b7991d876dcfb58312",
       "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0104.json": "556d507564f8203698a5d08bd5efbd8b5d7b09e8f6c39d444be0363e9239decd",
-      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "cd34cbe7bc5fc3cc254789058defe25a02293aea5e6d933342cba6eb5608b905",
+      "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json": "f2779a3fb5dd1a22c275387aebff5da7b73d95c34e4f529d4206c4bca97d4dd7",
       "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json": "ff13bd913bbeec566e7382af3e7189aa2397d1dd1282d74a45ac42cb671c1111",
       "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json": "1d72787579e951165314a4ee3db5ac0f6612f632e733bc49ba6c4035407b0733",
       "supportive modules/registry/tests/test_handoff_continuity_v0100.py": "2469bb1761b9a9593a1fac3efe35be8aeb957e70ba1aa1ff28c4a7bd6de708ef",
@@ -3359,7 +3338,6 @@
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0100.py": "e9fdd5f09784411f9a68dc3293ad51c9f4885fc97540309bc737cf6aac0cff89",
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0102.py": "8e75760012025f83d1fd6a6dd746c628701d5b230bca1abfb155993e9687257b",
       "supportive modules/registry/CGC_MDL140_HandoverConsole_v0103.py": "c56c6473bcf544b43b454f50f91ad36e6a58fe0666284d523e8542eecc3e7313",
-      "supportive modules/registry/CGC_MDL140_HandoverConsole_v0104.py": "bc75f19e3e95e059401bbc35f3f34931cd128e2789d9d363fa6db1ebd3a833b9",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0100.py": "2d7d58c33adfed3990e89c1023da0174d1ba71a43c8042b3ed7b3b8b108b651e",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0101.py": "0fd1fc1a59b67e425e7389257b7f0eb46c8d22e8a4a86115329b6e14a2544176",
       "supportive modules/registry/CGC_MDL141_ClosingGate_v0102.py": "503280c23250cc1e283dcb96d6f9c5a92dd5417d1bdfb92c7e4352cf12523942",
@@ -4097,8 +4075,7 @@
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0128.json": "46767c671f656f3eaa20293842b97a1a39d73236725c8cc72ec765b4ec4f8892",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0129.json": "3d22c7a385b6e919aafe6d8b67e0df2fcd2484d96092835db8992aad17e5f342",
       "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0130.json": "9e764b9802eebed738fdec08a2e986067ebf93386c3e474e0ae797c64eff5ebb",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0131.json": "0431499fd7d676bd89794867a39c90f28ef1de64d1eb1ad87d1defc00aec9d0d",
-      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0132.json": "563693a60e2258568bbb151aaf267b91ef9722c49dab6cca7f73fe66fe4f8df7"
+      "supportive modules/registry/VIA_VCGC_FunctionInventory_SSOT_v0131.json": "0431499fd7d676bd89794867a39c90f28ef1de64d1eb1ad87d1defc00aec9d0d"
     },
     "requirements": {
       "VCGC-REQ001": {
@@ -5887,16 +5864,6 @@
         "homes": [
           "VIA_Handoff_Continuity_SSOT_v0100.json"
         ]
-      },
-      "VCGC-REQ127": {
-        "definition": "ab2da7970a62fbf91a13f6211fb09163a569b4e428704cc23f47c9b2b0afa79f",
-        "status": "PARTIAL",
-        "next": "工作站同步後每日收工跑 via-vcgc handoff daily(資料夾帶 --data 或寫進 docs/handoff/daily/handover.toml);十點真實結果貼回後轉 COVERED",
-        "owner": "操作員(工作站每日實跑)· AI(根因修)",
-        "topic": "每日進度交接十點引擎:一支 `via-vcgc handoff daily` → panorama.manifest.json",
-        "homes": [
-          "VIA_Handoff_Continuity_SSOT_v0100.json"
-        ]
       }
     }
   },
@@ -7097,31 +7064,13 @@
       "owner": "操作員(決定何時重啟)→ AI",
       "reason": "操作員方向:串聯短令流程改 PY 模組化 + 加速器、PS 只做簡單串接;同時說「太費工就不用」→ 本批不動工",
       "next": "重啟時:VCGC 流程器模組(新編號)+ 流程 JSON SSOT,先試點 via-vdfeng(閘→啟動)量前後秒數"
-    },
-    "VCGC-REQ127:daily-engine": {
-      "id": "VCGC-REQ127:daily-engine",
-      "requirement": "VCGC-REQ127",
-      "state": "VERIFIED",
-      "owner": "AI(容器實測)",
-      "reason": "操作員令十點每日交接 + 十個本地函式庫併成一支;CGC_MDL140 v0104 新增 `handoff daily`(L30 交接正主加動詞,不另起引擎)",
-      "next": "收尾跑 handoff test daily_handover(--selftest-tail 23 項)→ 收據轉 VERIFIED",
-      "case": "daily_handover",
-      "receipt": "docs/handoff/evidence/daily_handover.json"
-    },
-    "VCGC-REQ127:daily-workstation": {
-      "id": "VCGC-REQ127:daily-workstation",
-      "requirement": "VCGC-REQ127",
-      "state": "PENDING",
-      "owner": "操作員(工作站每日收工)",
-      "reason": "容器沒有工作站資料夾也沒有 pwsh:③ 資料指紋 NODATA、⑥ 串測 P-entry 黃都是容器限制;工作站真實十點還沒跑過",
-      "next": "工作站同步 main 後每日收工跑 via-vcgc handoff daily --data <當日輸出夾>(或把夾寫進 docs/handoff/daily/handover.toml 的 data_dirs);貼回 [每日交接] 那行與判決行,提交 docs/handoff/daily 的清單與只增帳"
     }
   },
   "summary": {
-    "requirements": 166,
-    "watched_files": 2924,
-    "pending": 93,
-    "reusable": 91,
+    "requirements": 165,
+    "watched_files": 2921,
+    "pending": 91,
+    "reusable": 90,
     "findings": 0
   }
 }

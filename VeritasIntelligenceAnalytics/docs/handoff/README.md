@@ -12,6 +12,8 @@
 
 修改後：登錄需求和來源 → 開新版模組 → `handoff test <case>` → 原有 `registry-sync --apply` → 中央編號 `--apply` → SDD 檢查 → `handoff checkpoint` → GitHub CI。每個測試收據包含精確命令、目標成功標記、實際 rc、相依 SHA、測試紀錄 SHA、時間與測試環境；相依未變的成功證據直接沿用。
 
+每日收工：`via-vcgc handoff daily` 產出十點每日交接憑證 `daily/panorama.manifest.json`（Git SHA-16、事件帳、資料指紋、版號矩陣、Schema、測試、例外佇列、暫存、T+1、清單契約；說明見 `daily/README.md`）。它只讀既有正主，不取代 check／checkpoint。
+
 目前測試 case：`handoff`、`provenance`、`numbering`、`entry`、`manager`、`sdd`。新功能必須加上其需求、管理模組與測試 case；檢查器會拒絕沒有測試相依證據的新程式。
 
 來源驗證走 `via-vcgc run VRN_SystemManager provenance --report <LAYOUT_REVIEW.json> --source <樣本檔或夾> --out <證據輸出夾>`。重用既有成功擷取；每個來源有中央 SRC 號，每筆觀測有中央規格的 OBS 號，原文、修復值、空值、0、表格欄列與座標均保留。同一字形經不同引擎讀取不算兩個獨立來源。數值相符不等於完整性驗收。
