@@ -134,7 +134,11 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0185.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0186.py",
     "functional modules/VDF/VDF_SystemManager_v0121.py",
-    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0100.py"
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0100.py",
+    "functional modules/VDF/VDF_SystemManager_v0122.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0101.py",
+    "functional modules/VRN/VRN_SystemManager_v0111.py",
+    "supportive modules/registry/CGC_MDL252_ManagerParity_v0100.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -784,6 +788,66 @@
         "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
         "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_market.py",
         "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_universe_r50": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0122 薄尾 11/11 · 前版 PASS · 合計 PASS",
+      "scope": "VDF 管理員 universe xcheck(加權三來源 · 三表同日代號數)· parquet(CGC_MDL238 增量)· lock(VDF-WKF011 版號 + 時間)· parity;OUT-01/06/07 只增入 DuckDB(R50 · VDF-REQ017)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json",
+        "supportive modules/registry/VIA_Workflow_VDF_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL252_ManagerParity_v*.py",
+        "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py",
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_index_incr": {
+      "argv": [
+        "VDF_ENG232_TWIndexOfficial",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG232_TWIndexOfficial_v0101 薄尾 8/8 · PASS",
+      "scope": "加權 · 櫃買指數增量擷取:不給 --start = 兩指數 MAX(date) 取較早 + 1 天;已最新 = 零外呼(R50 · VDF-REQ017)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v*.py",
+        "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/vdf_fetchers_market.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vrn_outputs": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager v0111 薄尾 11/11 · 前版 PASS · 合計 PASS",
+      "scope": "VRN 管理員 outputs 動詞(表頭 · DataFrame · 驗證 · 順序 · 三方對照 · Parquet · 鎖)與 VDF universe 同一套能力(R50 互比補弱 · VDF-REQ017)",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py",
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "supportive modules/registry/VIA_Workflow_VRN_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL252_ManagerParity_v*.py",
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "manager_parity": {
+      "argv": [
+        "CGC_MDL252_ManagerParity",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL252_ManagerParity_v0100 8/8 · PASS",
+      "scope": "VDF / VRN 兩個系統管理員能力互比(AST 動詞盤點 + 11 項能力表;兩邊不互相匯入)(R50 · VDF-REQ017)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL252_ManagerParity_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VRN/VRN_SystemManager_v*.py"
       ],
       "timeout_seconds": 900
     }
@@ -1641,6 +1705,34 @@
       "state": "VERIFIED",
       "case": "vdf_index_official",
       "receipt": "docs/handoff/evidence/vdf_index_official.json"
+    },
+    {
+      "id": "VDF-REQ017:vdf_universe_r50",
+      "requirement": "VDF-REQ017",
+      "state": "VERIFIED",
+      "case": "vdf_universe_r50",
+      "receipt": "docs/handoff/evidence/vdf_universe_r50.json"
+    },
+    {
+      "id": "VDF-REQ017:vdf_index_incr",
+      "requirement": "VDF-REQ017",
+      "state": "VERIFIED",
+      "case": "vdf_index_incr",
+      "receipt": "docs/handoff/evidence/vdf_index_incr.json"
+    },
+    {
+      "id": "VDF-REQ017:vrn_outputs",
+      "requirement": "VDF-REQ017",
+      "state": "VERIFIED",
+      "case": "vrn_outputs",
+      "receipt": "docs/handoff/evidence/vrn_outputs.json"
+    },
+    {
+      "id": "VDF-REQ017:manager_parity",
+      "requirement": "VDF-REQ017",
+      "state": "VERIFIED",
+      "case": "manager_parity",
+      "receipt": "docs/handoff/evidence/manager_parity.json"
     }
   ]
 }

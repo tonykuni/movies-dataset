@@ -52,3 +52,21 @@
 - VCGC→VDF 啟動:VDF 鏈 RED 0;74 支逐支 GREEN 65 · RED 0。
 - VDF 輸入範圍 / 輸出表頭歸 VDF 管理員(VDF-REQ016):`VDF_InputUniverse_SSOT_v0100`(IN 3 · OUT 5 · E 11 · 順序照 main 工作流冊)· `VDF_SystemManager_v0121`(universe headers / list / check / loop / frame / validate;驗證經 CGC_MDL249)· `VDF_ENG232_TWIndexOfficial_v0100`(加權 / 櫃買官方指數;隔離區收容件 b360 解析,TA-Lib 0,網路走 SUP_MDL740)。
 - VRN 代號 regex 四冊收斂:僅攤開分歧,待操作員裁(未動 VRN 冊)。
+
+### R50 · UTC 01:30–03:30
+
+- PR #420(R49)CI:UAT 綠;PS7 gate 紅 = main 同病(#417 後 main 也紅)。本 PR 先補掉能補的「母子連接 VCGC-REQ113→VCGC-WKF012 單向」(link --apply → VCGC 工作流冊 v0111);剩衝突哨兵黃(ETF 名碼 00980A/00981A/00982A 待操作員裁),步驟 rc 全是 0/2,但 job 仍以 1 結束(PS 步驟最後的原生退出碼外漏)→ CI 檔問題,待操作員裁。已在 PR 留言後合併(b2350b5b)。
+- 操作員 R50 令:動作引擎化 · 管理員串流程 · 版號 + 時間鎖 · Parquet 由 DuckDB 管(增量)· 三方對照 · 三表同日數量 · 兩個管理員互比一樣強(VDF-REQ017)。
+  - `VDF_InputUniverse_SSOT_v0101`:+OUT-06 加權三來源 · OUT-07 三表同日代號數 · xcheck / parquet / lock 節 · 順序 15 站收在 E-11:lock。
+  - `VDF_SystemManager_v0122`:universe xcheck(ENG232 官方 · ENG055 tw_market_agg.taiex · yfinance ^TWII 代理;價量 / 籌碼 / 成交值三表個股代號逐日比)· parquet(寫手 CGC_MDL238,目錄列數沒變略過)· lock(VDF-WKF011 的尾版 + 自測 + VIA_LampLock)· parity。OUT-01/06/07 只增進 DuckDB。自測 11/11 + 前版 14/14。
+  - `VDF_ENG232_TWIndexOfficial_v0101`:不給 --start = 兩指數 MAX(date) 較早者 + 1 天;已最新零外呼。8/8 + 前版 9/9。
+  - `CGC_MDL252_ManagerParity_v0100`(中央一支,VDF/VRN 不互相匯入):AST 動詞盤點 + 11 項能力表。初測 VRN 缺 4、兩邊都缺 3 → 補完後 **GREEN 11/11**。
+  - `VRN_SystemManager_v0111`:outputs headers / frame / validate / loop / xcheck(VRN_ENG393 三重對照彙總)/ parquet / lock。11/11 + 前版 PASS。
+  - 工作流冊 VDF v0102(+VDF-WKF011 十步)· 需求冊 v0137(+VDF-REQ017)· 盤點冊 v0123(+4 站)· 交接案 4 個全過 · 編號稽核 遺失 0 / 改身分 0 / 重號 0。
+  - 容器實跑:xcheck / parquet / validate OUT-06 = NODATA(無實庫;資料家為 Windows 路徑)照實;WKF011 = OPEN,待 SDD selftests → real → lock --apply。
+- 工作站第 3 份交接紀錄 `WS_HANDOVER_20261002_080732`(main bd405ee6):
+  - ④ PS 加速器橋 155/156:唯一缺的是 `WorkOps/engines/.venv_pm/Scripts/Activate.ps1`(venv 產物,第 3 次重複)→ `CGC_MDL230_ToolCoverageProbe_v0105`:含 pyvenv.cfg 的夾不算 PS 尾版。3/3 + 前版全 PASS。
+  - VCGC 站 GATE `policy_step`(V-handoff-check · V-status · upd:DeckServer)+ 八路衝突 BLOCKED(待裝 6 段)· paddlepaddle 未裝(VRN 擷取逾時)· 本機 TA-Lib 可 import:環境面,操作員手。
+- R50 收尾:
+  - PR #421 UAT 紅兩層:① test_11 總控頁與正主不同步(本 PR 加 CGC_MDL252 → 中央治理模組 260 → 261)→ 照先例依正主重產(契約 19/19);② 第 10 步紅使第 13 步(pip duckdb/pandas)被跳過,第 14 步才缺庫 → v0122 自測補「duckdb 不在 = ②–⑧ 照實略過」(防禦,重現過再修)。
+  - SDD:自測整輪(63 支)→ real:VDF-WKF011 OK(10 步全 OK,層級 selftest)→ `SDDValidator lock --apply` → **VIA_LampLock_v0108:VDF-WKF011 LOCKED · 鎖於 2026-10-02 02:32:06 · 10 支引擎尾版 + 編號**;`universe lock` = LOCKED。
