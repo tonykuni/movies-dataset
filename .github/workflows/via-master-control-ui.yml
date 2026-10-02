@@ -338,6 +338,26 @@ jobs:
           python-version: "3.12"
 
       # VCGC-REQ112:PowerShell 互動在 Windows 用真 pwsh 實測;衝突閘 · 全綠閘結果寫進 job summary。只有 RED(rc 1)讓 CI 紅;黃照實列出(黃不是綠)。
+      # 總檢入口(via-review / 總檢)三支尾版用真 pwsh Parser 解析:Invoke-VIA-Review · Register-VIA-Commands · VIA-Review-OneClick;語法錯 = 紅
+      - name: Parse via-review entry scripts with PowerShell 7
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          $bad = 0
+          foreach ($pat in @("Invoke-VIA-Review-v*.ps1", "Register-VIA-Commands-v*.ps1", "VIA-Review-OneClick-v*.ps1")) {
+            $f = Get-ChildItem -LiteralPath $via -Filter $pat -File | Sort-Object Name | Select-Object -Last 1
+            if (-not $f) { Write-Host ("absent " + $pat); continue }
+            $tokens = $null; $errors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$tokens, [ref]$errors)
+            if (@($errors).Count -gt 0) {
+              $bad += @($errors).Count
+              foreach ($e in $errors) { Write-Host ("{0}:{1} {2}" -f $f.Name, $e.Extent.StartLineNumber, $e.Message) }
+            } else { Write-Host ("Parsed " + $f.Name) }
+          }
+          if ($bad -gt 0) { exit 1 }
+          exit 0
+
       - name: VCGC live checks with PowerShell 7
         if: ${{ !cancelled() }}
         shell: pwsh
