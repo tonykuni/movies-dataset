@@ -1334,7 +1334,28 @@
         "functional modules/VDF/VDF_MDL00*.py",
         "functional modules/VDF/VDF_SystemManager_v*.py",
         "functional modules/VDF/VDF_FetchSystem_SSOT_v0101.json",
-        "functional modules/VDF/engine/VDF_ENG*.py"
+        "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+        "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0122.py",
+        "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0106.py",
+        "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0109.py",
+        "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0103.py",
+        "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+        "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+        "functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v0102.py",
+        "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0107.py",
+        "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0105.py",
+        "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+        "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+        "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0107.py",
+        "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+        "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0101.py",
+        "functional modules/VDF/engine/VDF_ENG114_PmiPair_v0100.py",
+        "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0101.py",
+        "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+        "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v0100.py",
+        "functional modules/VDF/engine/VDF_ENG230_ForwardValuation_v0101.py",
+        "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0102.py",
+        "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0101.py"
       ],
       "timeout_seconds": 3600
     },
@@ -1415,6 +1436,20 @@
         "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
       ],
       "timeout_seconds": 1800
+    },
+    "vdf_akshare_card": {
+      "argv": [
+        "VDF_SystemManager",
+        "fetch",
+        "card",
+        "011"
+      ],
+      "success_marker": "\"mdl\": \"MDL011\"",
+      "scope": "MDL011 AkShare VAKE 接線卡(AST · 兩橋 · 冊 · 缺件 ABSENT 照實;本容器缺 akshare/polars,功能實測待工作站)(VCGC-REQ143)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -2940,38 +2975,51 @@
     {
       "id": "VCGC-REQ143:vdf_master_control",
       "requirement": "VCGC-REQ143",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "VDF 管理員 v0128 總控 · 獨立運作",
+      "reason": "VDF 管理員 v0128 總控 · 獨立運作 → 已驗:2026-10-03T17:37:20+00:00 rc 0 · 標記見到",
       "next": "handoff test vdf_master_control 實跑轉 VERIFIED",
-      "case": "vdf_master_control"
+      "case": "vdf_master_control",
+      "receipt": "docs/handoff/evidence/vdf_master_control.json"
     },
     {
       "id": "VCGC-REQ143:vdf_fetch_v0101",
       "requirement": "VCGC-REQ143",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "MDL008 v0101 總控入口 · 冊 v0101 · 第一步清單",
+      "reason": "MDL008 v0101 總控入口 · 冊 v0101 · 第一步清單 → 已驗:2026-10-03T17:37:26+00:00 rc 0 · 標記見到",
       "next": "handoff test vdf_fetch_v0101 實跑轉 VERIFIED",
-      "case": "vdf_fetch_v0101"
+      "case": "vdf_fetch_v0101",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0101.json"
     },
     {
       "id": "VCGC-REQ143:vdf_list_stock",
       "requirement": "VCGC-REQ143",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "MDL009 全台股清單(開頭五欄 · 驗證七項 · DuckDB 增量)",
+      "reason": "MDL009 全台股清單(開頭五欄 · 驗證七項 · DuckDB 增量) → 已驗:2026-10-03T17:37:32+00:00 rc 0 · 標記見到",
       "next": "handoff test vdf_list_stock 實跑轉 VERIFIED",
-      "case": "vdf_list_stock"
+      "case": "vdf_list_stock",
+      "receipt": "docs/handoff/evidence/vdf_list_stock.json"
     },
     {
       "id": "VCGC-REQ143:vdf_list_etf",
       "requirement": "VCGC-REQ143",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "MDL010 主動式 ETF 清單(ENG077 律 · 開頭五欄 · 驗證七項)",
+      "reason": "MDL010 主動式 ETF 清單(ENG077 律 · 開頭五欄 · 驗證七項) → 已驗:2026-10-03T17:37:38+00:00 rc 0 · 標記見到",
       "next": "handoff test vdf_list_etf 實跑轉 VERIFIED",
-      "case": "vdf_list_etf"
+      "case": "vdf_list_etf",
+      "receipt": "docs/handoff/evidence/vdf_list_etf.json"
+    },
+    {
+      "id": "VCGC-REQ143:vdf_akshare_card",
+      "requirement": "VCGC-REQ143",
+      "state": "PENDING",
+      "owner": "AI / 操作員",
+      "reason": "MDL011 接線卡(功能實測要 akshare + polars,本容器沒有 → 工作站 fetch run 011)",
+      "next": "handoff test vdf_akshare_card;工作站 fetch run 011 --apply --mode live",
+      "case": "vdf_akshare_card"
     }
   ]
 }

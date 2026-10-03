@@ -27,18 +27,19 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 0 · 歷史 3
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 571 · import 0 · 提及 64 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL256_SubsystemBundle_v0100.py(家族 core)
-=== CGC_MDL256_SubsystemBundle_v0100 · 自測(子系統下載包:冊 · 清單 · 編號 · sha256 · zip)===
-  [OK] ① 冊:每包有目標資料夾 · 檔案清單 · 實測指令 · ['via_01_vdf', 'via_00_vcgc']
-  [OK] ② build:清單檔全在 · 照 VIA 佈局落 <包>/VeritasIntelligenceAnalytics/… · zip 有 · (902, 0)
-  [OK] ③ 每檔有版本 · sha256;中央編號有登的帶上 · 有編號 720/902
-  [OK] ④ verify:原包全相符;改一個位元組 → 點名不合(負控)
-  [OK] ⑤b 目標夾不是包 → 拒跑不刪(操作員資料在);前一版包 → 原地更新不打 zip
-  [OK] ⑤ zip 內含 MANIFEST.json · README_實測.txt · 全部檔 · 904
-  [OK] ⑥ via_01_vdf 包內網路 / 加速器只有鎖版(v1652 + 其本體 v1651 · v1141)
-  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib
-  [計] CGC_MDL256_SubsystemBundle_v0100 8/8 PASS
-[監控] 背景全景監控中 pid 4142 · 觸碰 run CGC_MDL256_SubsystemBundle · 交接閘 RED · 落後 45 提交 · 快照 20.5h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0100.py(家族 vdf)
+=== VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
+  [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
+  [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
+  [OK] ③ 舊佈局絕對路徑全改寫到輸出根(每支 ≥ 1 處)· __main__ 段分出 · {'001u': 1, '002': 1, '003': 1, '004': 1, '005': 2, '006': 2, '007': 1}
+  [OK] ④ 依 needs 排序:MDL001 宇宙先於 004 / 005 / 006 / 007
+  [OK] ⑤ live 閘沒開 → rc4 GATED 零子行程;未知動詞 / 冊外代號 rc2;不加 --apply 只列計畫 · (4, 2, 2, 0)
+  [OK] ⑥ fixture 路由:兩所日行情 · 上市基本資料 · CNN 都有樣本;未知網址回 404(不編)
+  [OK] ⑧ live 路由:requests GET/POST 全走鎖版網路工具(http_bytes / post_json · 帶 params)· 閘關 = GATED 例外不出網 · ['https://openapi.twse.com.tw/v1/x?a=1', 'POST https://example.org/p', 'https://openapi.twse.com.tw/v1/x']
+  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib;本支不寫 VIA_NET_CONSENT
+  [計] VDF_MDL008_FetchSystem v0100 8/8 PASS
+  [同步] SDD 驗證 RED:X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VCGC-REQ141→functional modules/VDF/VDF_FetchSystem_SSOT_v0 → via-vcgc sdd check
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 43 提交 · 快照 20.0h · 未推 1 · 未登 1 支(CGC_MDL256_SubsystemBundle) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
