@@ -71,9 +71,29 @@ try {
         $rc = $LASTEXITCODE
     } else {
         if (-not (Test-Path $prog)) { Write-Host "[VDF 補缺] VIA_PS_PyProgress_Module.ps1 不在 → 用本檔的 Write-Progress(同一個 [進度] i/n 協定)" -ForegroundColor DarkYellow }
+        # 退回路徑也守整輪上限(PR #444 Codex P2):子行程逐行非同步讀;逾時 = 砍整棵行程樹、rc 124(照實,不假裝跑完)
         $exe = if ($Python) { $Python } else { "python" }
-        & $exe $mgr.FullName @fillArgs 2>&1 | ForEach-Object {
-            $ln = "$_"
+        $argv = @($mgr.FullName) + $fillArgs
+        $psi = New-Object System.Diagnostics.ProcessStartInfo
+        $psi.FileName = $exe
+        $psi.Arguments = (($argv | ForEach-Object { $a = "$_" -replace '"', '\"'; if ($a -match '\s|^$') { '"' + $a + '"' } else { $a } }) -join ' ')
+        $psi.UseShellExecute = $false
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError = $true
+        $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+        $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+        $proc = [System.Diagnostics.Process]::Start($psi)
+        $errTask = $proc.StandardError.ReadToEndAsync()          # 同時排 stderr,不讓緩衝區塞住
+        $deadline = if ($TimeoutSec -gt 0) { $t0.AddSeconds($TimeoutSec) } else { [datetime]::MaxValue }
+        $timedOut = $false
+        while ($true) {
+            $lineTask = $proc.StandardOutput.ReadLineAsync()
+            while (-not $lineTask.Wait(1000)) {
+                if ((Get-Date) -gt $deadline) { $timedOut = $true; break }
+            }
+            if ($timedOut) { break }
+            $ln = $lineTask.Result
+            if ($null -eq $ln) { break }                            # 子行程關了 stdout = 跑完
             if ($ln -match '^\s*\[進度\]\s*(\d+)\s*/\s*(\d+)\s*(.*)$') {
                 $i = [int]$Matches[1]; $n = [int]$Matches[2]
                 $pct = if ($n -gt 0) { [math]::Min(100, [int](100 * $i / $n)) } else { 100 }
@@ -83,14 +103,23 @@ try {
             }
             if ($ln -notmatch '^##VIA-PROGRESS##') { Write-Host $ln }
         }
-        $rc = $LASTEXITCODE
+        if ($timedOut) {
+            Write-Host "[VDF 補缺] 整輪逾時 ${TimeoutSec}s → 砍整棵行程樹(rc 124);已完成的引擎輸出照樣在,再跑一次只補還不足的部分" -ForegroundColor Red
+            try { $proc.Kill($true) } catch { try { & taskkill /T /F /PID $proc.Id | Out-Null } catch { try { $proc.Kill() } catch { } } }
+            $rc = 124
+        } else {
+            $proc.WaitForExit()
+            $rc = $proc.ExitCode
+        }
+        $errText = if ($errTask.Wait(5000)) { $errTask.Result } else { "" }
+        if ($errText) { $errText.TrimEnd() -split "`r?`n" | ForEach-Object { Write-Host $_ -ForegroundColor DarkGray } }
         Write-Progress -Activity "VDF 補缺擷取" -Completed
     }
 } finally {
     Pop-Location
 }
 $secs = [int]((Get-Date) - $t0).TotalSeconds
-$why = switch ($rc) { 0 { "PASS" } 1 { "有引擎失敗或輸出不合(看上面矩陣的 FAIL 列與報告)" } 2 { "參數錯或沒有總控入口" } 3 { "缺核心套件(照上面 pip 指令自己裝)" } 4 { "雙閘沒開(零寫)" } default { "rc $rc" } }
+$why = switch ($rc) { 124 { "整輪逾時(已砍行程樹)" } 0 { "PASS" } 1 { "有引擎失敗或輸出不合(看上面矩陣的 FAIL 列與報告)" } 2 { "參數錯或沒有總控入口" } 3 { "缺核心套件(照上面 pip 指令自己裝)" } 4 { "雙閘沒開(零寫)" } default { "rc $rc" } }
 $color = if ($rc -eq 0) { "Green" } elseif ($rc -eq 4) { "Yellow" } else { "Red" }
 Write-Host ("[VDF 補缺] 結束 rc $rc · $why · ${secs}s · 報告在 " + (Join-Path (Split-Path $FetchHome -Parent) "_reports")) -ForegroundColor $color
 $global:LASTEXITCODE = $rc

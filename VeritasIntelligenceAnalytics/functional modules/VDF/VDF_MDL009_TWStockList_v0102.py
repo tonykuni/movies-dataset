@@ -123,7 +123,7 @@ def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args == ["--selftest"]:
         return selftest()
-    PRIOR.PRIOR.TAG = TAG
+    PRIOR.TAG = TAG                                    # v0101 的 main / run_v0101 讀的是它自己的 TAG(再往下蓋 v0100)→ 報告與輸出記本版
     return PRIOR.main(args)
 
 
@@ -165,7 +165,34 @@ def selftest() -> int:
         and PRIOR._via_net is _forward_via_net_v0102)
     import contextlib
     import io
+    import json
     import os
+    import tempfile
+
+    class _Net2:
+        def http_json(self, url, timeout=30):
+            d = {SRC["twse_quote"]: [{"Code": "2330", "Name": "台積電"}], SRC["tpex_quote"]: [{"SecuritiesCompanyCode": "6488", "CompanyName": "環球晶"}]}
+            return {"state": "OK", "data": d.get(url, [])}
+    keep_tag, keep_env = PRIOR.TAG, os.environ.get("VIA_FROM_VDFSM")
+    with tempfile.TemporaryDirectory() as tmp:
+        cwd = os.getcwd()
+        try:
+            globals()["_via_net"] = lambda: _Net2()
+            os.environ["VIA_FROM_VDFSM"] = "YES"
+            os.chdir(tmp)
+            with contextlib.redirect_stdout(io.StringIO()) as out5:
+                rc5 = main(["run", "--date", "2026-10-01", "--min", "1"])
+            rep5 = json.loads((Path(tmp) / OUT_DIR / "verify_report.json").read_text(encoding="utf-8"))
+        finally:
+            os.chdir(cwd)
+            globals()["_via_net"] = real
+            PRIOR.TAG = keep_tag
+            if keep_env is None:
+                os.environ.pop("VIA_FROM_VDFSM", None)
+            else:
+                os.environ["VIA_FROM_VDFSM"] = keep_env
+    chk("⑤ 經 main 跑:報告 engine 與輸出首行都記本版(不是 v0101;PR #444 Codex P2)",
+        rc5 == 0 and rep5.get("engine") == TAG and out5.getvalue().startswith(f"[{TAG}]"), (rep5.get("engine"), out5.getvalue()[:40]))
     saved = {k: os.environ.pop(k, None) for k in ("VIA_FROM_VDFSM", "VIA_FROM_VCGC")}
     try:
         with contextlib.redirect_stdout(io.StringIO()) as buf:
