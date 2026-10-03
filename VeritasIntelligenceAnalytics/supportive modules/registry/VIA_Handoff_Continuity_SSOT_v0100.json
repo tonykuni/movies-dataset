@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T11:43:57+00:00",
+  "updated_at": "2026-10-03T11:58:44+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1111,6 +1111,49 @@
         "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json"
       ],
       "timeout_seconds": 900
+    },
+    "engine_params": {
+      "argv": [
+        "CGC_MDL253_ToolingInventory",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL253_ToolingInventory_v0101 本版 11/11 · 前版 PASS · 合計 PASS",
+      "scope": "單引擎備料本體(兩個管理員共用):argparse 參數 · 環境變數 · SSOT 冊 → 尾版 · regex(本地 / 中央屬本支 / 同式)· 同義字(委樞 / 本地表)· 工作流步 · VDF 輸入範圍 · 薄尾鏈走到本體(VCGC-REQ133)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+        "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+        "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json",
+        "supportive modules/registry/VIA_Workflow_VDF_SSOT_v*.json",
+        "supportive modules/registry/VIA_Workflow_VRN_SSOT_v*.json",
+        "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_engine_params": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0125 本版 7/7 · 前版 PASS · 合計 PASS",
+      "scope": "VDF 管理員 params / prep 動詞:ENG055 備料卡七段 · engine params 同路 · prep 90 支 json + html · 未經 VCGC 拒絕(VCGC-REQ133)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vrn_engine_params": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager v0115 本版 7/7 · 前版 PASS · 合計 PASS",
+      "scope": "VRN 管理員 params / prep 動詞:ENG398 備料卡七段 · engine params 同路 · prep 72 支 json + html · 未經 VCGC 拒絕(VCGC-REQ133)",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py",
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -2442,6 +2485,36 @@
       "next": "工作站 via-vcgc handoff test first_page_engine(標記已改正)→ rc 0 + marker 轉 VERIFIED",
       "case": "first_page_engine",
       "receipt": "docs/handoff/evidence/first_page_engine.json"
+    },
+    {
+      "id": "VCGC-REQ133:engine-params-body",
+      "requirement": "VCGC-REQ133",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "兩個管理員共用的檢視本體 CGC_MDL253 只有 list / check / card,沒有輸入參數 · SSOT · regex · 同義字的備料",
+      "next": "handoff test engine_params 實跑轉 VERIFIED",
+      "case": "engine_params",
+      "receipt": "docs/handoff/evidence/engine_params.json"
+    },
+    {
+      "id": "VCGC-REQ133:vdf-params-verb",
+      "requirement": "VCGC-REQ133",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 管理員沒有單引擎啟動前備料動詞",
+      "next": "handoff test vdf_engine_params 實跑轉 VERIFIED",
+      "case": "vdf_engine_params",
+      "receipt": "docs/handoff/evidence/vdf_engine_params.json"
+    },
+    {
+      "id": "VCGC-REQ133:vrn-params-verb",
+      "requirement": "VCGC-REQ133",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VRN 管理員沒有單引擎啟動前備料動詞",
+      "next": "handoff test vrn_engine_params 實跑轉 VERIFIED",
+      "case": "vrn_engine_params",
+      "receipt": "docs/handoff/evidence/vrn_engine_params.json"
     }
   ]
 }
