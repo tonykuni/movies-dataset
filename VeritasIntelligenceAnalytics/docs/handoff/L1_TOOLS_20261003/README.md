@@ -42,3 +42,11 @@ review 輸入 lane 可為 regex/jellyfish/polyfuzz/recordlinkage/spacy/gensim/fa
 輸出 SHA 驗證通過才重用；CSV 公式前綴中和、UTF8 BOM，Parquet 保留原文。manifest 最後寫入；未宣稱多檔跨程序崩潰原子性。VIA_FROM_VCGC 是入口契約，不是安全認證。一般 Regex 重疊证明與中央未明 scope 的舊候選仍須 REVIEW。
 
 治理：VCGC-REQ134 / VCGC-WKF015，註冊與發號沿用 CGC237；本批未建立第二套 allocator。既有主機 DB、OCR、134 引擎 Windows lanes 與全域紅黃燈未因這次 47 項通過而結案。
+
+## 本批驗證結果
+
+L1 新增測試 47/47；另經 VCGC 指定 v0106 執行舊 NLP 自測，7/7 與前版 v0105 通過。新版 `--selftest` 專驗 L1，舊 PDF/brief 回歸須保留指定 v0106 的這條命令，不能只看新版測試就宣稱舊功能已驗。
+
+完整回歸 148 站初測 105 綠／17 黃／26 紅。隔離環境缺 PyMuPDF，補入 1.26.6 後，僅重測 5 個受影響站且各站 rc=0、GREEN；合併有效結果為 110 綠／17 黃／21 紅（不是另跑一次完整回歸）。精準複測 runner 因既有 coverage 欠件仍 rc=1，與目標站 rc=0 分開記錄。舊版 NLP 自測也通過。L1 兩個新增站為 GREEN。
+
+本批中央新增 60 號；遺失 0、改身分 0、重號 0。SDD YELLOW、交接 RED，正式驗收仍 BLOCKED。原始及複測證據各自留存，pending 有 ID、原因、負責者與下一步。

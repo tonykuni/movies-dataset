@@ -1,6 +1,6 @@
 {
   "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator_v0107.py",
-  "source_sha256": "f8408adf08143cb8dcc26642716aa36b427f02bdaa91d58f7a1a885b966dc339",
+  "source_sha256": "dad847a927f4a89605c6c97c5fd7af783a48daaddc86926e425755276eea0715",
   "environment": "Linux Python 3.12 isolated via_l1_tools_env",
   "selftest": {
     "command": "VCGC run SUP_MDL866_VIAUnifiedNLPOrchestrator --selftest",
@@ -12,6 +12,89 @@
   "semantic_models": "SYNTHETIC_FIXTURES_ONLY",
   "windows_validation": "NOT_RUN",
   "TA_Lib": "FORBIDDEN",
-  "integration": "IN_PROGRESS",
-  "governance": "IN_PROGRESS"
+  "integration": {
+    "central_cli_rc": 0,
+    "rows": 2,
+    "separate_sources": 2,
+    "central_rule": "VIA-VCGC-SYN400",
+    "allocated_ids": 0,
+    "legacy_brief_rc": 0
+  },
+  "governance": {
+    "SDD": "YELLOW",
+    "handoff": "RED",
+    "numbering_invariants": "PASS",
+    "closeout": "BLOCKED"
+  },
+  "numbering": {
+    "before": 110016,
+    "after": 110076,
+    "added": 60,
+    "lost": 0,
+    "identity_changes": 0,
+    "duplicates": 0,
+    "audit_rc": 2,
+    "existing_rule_findings": 52,
+    "existing_stale_fingerprints": 523,
+    "existing_uncommitted": 139
+  },
+  "full_test": {
+    "stations": 148,
+    "counts": {
+      "GREEN": 105,
+      "YELLOW": 17,
+      "RED": 26
+    },
+    "seconds": 480.3,
+    "lamp": "RED"
+  },
+  "effective_results": {
+    "method": "Original full run plus five dependency-affected station retests; not a new full run",
+    "stations": 148,
+    "counts": {
+      "GREEN": 110,
+      "YELLOW": 17,
+      "RED": 21
+    },
+    "lamp": "RED"
+  },
+  "legacy_nlp": {
+    "version": "v0106",
+    "passed": 7,
+    "failed": 0,
+    "rc": 0,
+    "prior_v0105": "PASS"
+  },
+  "environment_dependency_fix": {
+    "package": "PyMuPDF",
+    "version": "1.26.6",
+    "affected_stations": 5,
+    "all_targets_green": true
+  },
+  "pending": [
+    {
+      "id": "VCGC-REQ134-WORDNET",
+      "reason": "本地語料未提供",
+      "owner": "operator / VCGC",
+      "next": "提供合法本地 WordNet corpus_dir，再跑資源測試"
+    },
+    {
+      "id": "VCGC-REQ134-MODELS",
+      "reason": "金融語意模型尚未提供，只有合成測資",
+      "owner": "operator / VCGC",
+      "next": "提供本地模型及 SHA，驗證金融候選品質"
+    },
+    {
+      "id": "VCGC-REQ134-WINDOWS",
+      "reason": "本環境 Linux Python 3.12，未在 Windows 3.13 執行",
+      "owner": "operator / VCGC",
+      "next": "在 via_ 隔離境重建相依、重跑 L1 與原始 134 車道"
+    },
+    {
+      "id": "GLOBAL-RED-21",
+      "reason": "既有 21 站 RED 與治理欠件",
+      "owner": "VCGC",
+      "next": "沿有效結果清單逐案修復；禁止全綠結案"
+    }
+  ]
 }
