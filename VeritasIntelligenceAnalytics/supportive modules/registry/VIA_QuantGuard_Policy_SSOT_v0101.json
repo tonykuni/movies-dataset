@@ -1,0 +1,127 @@
+{
+  "name": "QuantGuard",
+  "ssot_id": "VIA_QuantGuard_Policy_SSOT_v0101",
+  "version": "1.0.1",
+  "batch": "QG-SSOT-20260929",
+  "built_at": "2026-09-29T11:44:31.238962+00:00",
+  "mode": {
+    "online": false,
+    "network": "OFF",
+    "silent_open": false,
+    "self_consent": false,
+    "talib": "forbidden",
+    "akshare": "not_started",
+    "control_plane": "VCGC",
+    "entry": "ONLY_VIA_ENTRY",
+    "connection": "single",
+    "description": "QuantGuard 先不上線。唯一連線經 VCGC。不得自行觸網、不得自行取得操作員同意、不得安裝或 import TA-Lib。"
+  },
+  "data_plane": {
+    "allowed_owners": [
+      "VDF",
+      "VRN"
+    ],
+    "allowed_source_types": [
+      "duckdb",
+      "parquet",
+      "sqlite"
+    ],
+    "read_only": true,
+    "schema_writeback": false,
+    "reverse_mutate_vdf": false,
+    "raw_row_egress": false,
+    "output_mode": "derived_only",
+    "status_forward": "whitelist_only",
+    "description": "輸入只接受 VDF 或 VRN 所生成、且由 VDF 持有的資料庫／Parquet。資料庫內容不可直接輸出。現況摘要與衍生指標必須經 VCGC 轉換後才供給應用端。"
+  },
+  "status_forward_whitelist": [
+    "link_id",
+    "owner",
+    "source_type",
+    "status",
+    "row_count",
+    "column_names",
+    "fingerprint8",
+    "checked_at",
+    "cached",
+    "error_code"
+  ],
+  "status_forward_forbidden": [
+    "raw_rows",
+    "sample_rows",
+    "cell_values",
+    "connection_string",
+    "credentials",
+    "sql_text"
+  ],
+  "equity_price_policy": {
+    "price_field": "adj_close",
+    "fallback_chain": [
+      "若來源有 adj_close，技術分析只准使用 adj_close。",
+      "若來源無 adj_close 且標的為指數，close 可視為 adj_close，必須標記 index_close_as_adj。",
+      "若來源無 adj_close 且標的為個股或 ETF，不得用 close 冒充 adj_close；該序列標記 price_unadjusted_blocked。"
+    ],
+    "ohlc_adjustment": "若 open/high/low 要進入區間型指標，必須與 adj_close 使用同一套 corporate-action 係數；否則改走僅收盤解。",
+    "no_forward_fill": true,
+    "no_mean_fill": true,
+    "no_zero_as_missing_price": true,
+    "null_price_action": "skip_bar",
+    "mix_sources": false
+  },
+  "volume_policy": {
+    "tw_equity": "clean_volume = volume - daytrade_volume；當沖量、當沖成交值、當沖占比只作旁路欄位，不回寫價格。",
+    "us_equity": "不扣當沖。clean_volume = volume。",
+    "index": "不得用 ETF 量或成分股量推算指數量；缺量保持 null，不得填 0 冒充有量，除非來源明示 0。",
+    "daytrade_gt_volume": "列為來源錯誤，該日 clean_volume = null，不可截斷為 0，不可推算。",
+    "fill": "禁止前值、均值、0 替代 null。",
+    "flow_ne_volume": "ETF flow 來自份額變化，不得用成交量代替。"
+  },
+  "calendar_policy": {
+    "tw_latency": "T+1",
+    "us_latency": "T+0",
+    "align": "台股缺日不得用美股值填補。圖上少一天是合法狀態。",
+    "monthly": "月頻落在該月最後日曆日，不得展開成日頻，不得與日頻直接同頻運算。",
+    "holiday": "不得以日期存在推斷為交易日；必須用市場交易曆。"
+  },
+  "invalid_output_policy": {
+    "principle": "失效時不靜默補成可用數字。每條指標同時給出三個解，並附驗證裁決。",
+    "min_solutions": 3,
+    "solution_roles": {
+      "S1": "strict_causal",
+      "S2": "alternate_estimator",
+      "S3": "robust_or_explicit_null"
+    },
+    "disagreement_rule": "三解在共同有效樣本上超出公差，裁決為 DIVERGE，不挑選單一數值出閘。",
+    "lookahead": "禁止。視窗只使用當下與過去。"
+  },
+  "limits": {
+    "max_input_rows": 5000,
+    "max_output_rows": 100,
+    "max_window": 252,
+    "allow_raw_rows": false,
+    "allowed_purposes": [
+      "technical_analysis",
+      "statistics",
+      "status_forward"
+    ]
+  },
+  "inherits": [
+    "VIA_QuantGuard_TA_Lib_Policy_v0100",
+    "B533 ONLY_VIA_ENTRY / network OFF",
+    "equity extraction SSOT: adj price, clean volume, no fill, TW T+1"
+  ],
+  "prior": "VIA_QuantGuard_Policy_SSOT_v0100",
+  "lifecycle": "CANDIDATE_OFFLINE",
+  "source_attachment_sha256": "337fa455a3b767b614c26300ae92cc04456cbe1fbf85a605cbf554070a36a2b7",
+  "implementation_gate": {
+    "production": "BLOCKED_PENDING_VCGC_SOURCE_BINDING",
+    "network": "OFF",
+    "raw_output": "DENY",
+    "ta_lib": "DENY",
+    "owners": [
+      "VDF",
+      "VRN"
+    ],
+    "max_output_rows": 100
+  }
+}

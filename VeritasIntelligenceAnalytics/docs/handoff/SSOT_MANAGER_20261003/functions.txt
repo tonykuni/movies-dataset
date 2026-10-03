@@ -1,0 +1,51 @@
+[監控] 已在背景起全景監控 pid 9 · 閒置 1800 秒自停 · 交接閘 RED · 落後 11 提交 · 快照 14.6h · 未登 2400 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /workspace/scratch/fa1134e5038f/via_repo/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[AI 必用功能卡] VIA_AI_FunctionCard_SSOT_v0101.json · 進場照順序用;指令從倉根照貼(V = VCGC 尾版;E = token 鎖版工具)
+   1. token          VIA_FROM_VCGC=YES python3 "$V" token > /tmp/token_card.txt 2>&1; cat /tmp/token_card.txt
+      何時:每次進場第一步 · 做什麼:啟用並實測省 Token 工具;紅了就停,不讀政策、不開子系統
+   2. functions      VIA_FROM_VCGC=YES python3 "$V" functions
+      何時:token 之後 · 做什麼:印本卡:必用順序 · 指令 · 何時用 · 禁止
+   3. handoff        VIA_FROM_VCGC=YES python3 "$V" handoff check
+      何時:接手時(換對話 / 換接手者) · 做什麼:讀交接快照的摘要、待辦、相依變更;不從對話記憶推定已完成
+   4. test           VIA_FROM_VCGC=YES python3 "$V" test --quick  →  收尾前 test(整輪)
+      何時:handoff 之後(每次進場);新增 / 換版任何 VCGC 指令或模組之後 · 做什麼:VCGC 全功能串測:盤點冊(VIA_VCGC_FunctionInventory_SSOT)逐站跑 · 新指令未登錄 = 黃 · 更新過的尾版自動跑 --selftest · 版本與 UTC 時間寫進 VIA_VCGC_FunctionLedger_v0100.jsonl;PS 操作台與 enter 走同一流程
+   5. read           python3 "$E" read <檔或夾> [--depth N]
+      何時:讀任何約 >200 行的檔或整夾之前 · 做什麼:骨架卡(定義樹 · AST 問題);.json 看兩層、.jsonl 看欄位次數與首末列
+   6. slice          python3 "$E" slice <檔> <定義名|Class.method|JSON 路徑>
+      何時:只要改或看其中一段 · 做什麼:只取一個定義;JSON 路徑 a.b[0] · [-1] · [*] · [鍵=值]
+   7. chain          python3 "$E" chain <家族名|任一版的檔> [--all]
+      何時:改任何薄尾家族(出新版號檔)之前 · 做什麼:版本鏈圖:誰是本體、前版怎麼接、誰蓋了誰;防薄尾盲點
+   8. digest         python3 "$E" digest <日誌>
+      何時:看跑測日誌 · 做什麼:只留判決行;紅日誌誠實回 rc 1
+   9. ssot_panorama  VIA_FROM_VCGC=YES python3 "$V" ssot panorama [--full]
+      何時:動到 SSOT / 正則 / 同義字 / 編號 / 命名 / 註冊之前與之後 · 做什麼:六族 × VCGC → VDF → VRN → SUP 上下單向檢測到底;輸入沒變的格沿用
+  10. number_audit   VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL237_NumberingSystem --apply --scope  →  run CGC_MDL237_NumberingSystem audit
+      何時:程式與冊提交之後(先提交再編號)、編號冊提交之前 · 做什麼:只登本批(範圍 = 對 main 有變的已提交檔;不帶 --scope 的全量 --apply 要操作員下令)· audit 遺失 · 改身分 · 重號 必須全 0,另查註冊完整性 IMMUT · DUPREG · XCODE · FPSTALE · UNCOMMITTED · TIMEFMT
+  11. registry       VIA_FROM_VCGC=YES python3 "$V" registry-sync  →  registry-sync --apply
+      何時:新增 / 換版模組之後 · 做什麼:元件註冊冊:先乾跑看新 / 變 / 過期 / 撞號,批准才 --apply
+  12. sdd            VIA_FROM_VCGC=YES python3 "$V" run CGC_MDL245_SDDValidator check
+      何時:每批收尾前 · 做什麼:X-* 交叉檢;X-REQ-BACK 需求 ↔ 工作流回指;X-LOCK 換尾版要重驗
+  13. handoff_close  VIA_FROM_VCGC=YES python3 "$V" handoff test <case>  →  handoff checkpoint
+      何時:每批收尾 · 做什麼:只重跑相依變更的已宣告測試,收據帶命令 · rc · 標記 · 相依 SHA;保存交接快照
+  [省 Token 工具] read:骨架卡(.py/.ps1 定義樹;.json 兩層;.jsonl 欄位) · slice:一個定義或一段 JSON 路徑 · digest:日誌只留判決行 · pack:整夾索引 · --if-etag:沒變回 304,沿用上一張 · chain:薄尾版本鏈圖 · brief:NLP 長文摘要(SUP_MDL866 text --file <檔> --brief)
+  [門] enter [--card] [--no-pull]         唯一入口流程:第一步 → 位置 / 更新 → 閘 → 加速器 → 工具版本 → go
+  [門] go                                 既有 PowerShell 唯一編排(操作台);AI 容器沒有 pwsh 時不冒充跑過
+  [門] run <引擎> [參數]                      經閘與事件紀錄逐項執行任一正主(含 --selftest)
+  [門] status                             閘:政策整冊 · 子系統座位 · 加速器 / 網路已接
+  [門] sync-check                         座位 + 註冊冊乾跑 + SDD 檢(同步檢查)
+  [門] ssot [plan|verify|panorama]        SSOT 第四扇門:正則 · 同義字逐格委派正主;panorama = 六族四層全景
+  [門] matrix                             冊 × 啟動矩陣 × 引擎四態 × 修復候選(預設 PLAN)
+  [門] workflow [輪號] / events [筆數]        流程符合性 / 真實事件
+  [門] tools activate <家族> <檔> --apply    鎖版工具換版的唯一路(token · nlp · layout …)
+  [門] handoff check|checkpoint|test <case> 交接防遺漏
+  [門] test [--quick|--full|inventory]    VCGC 全功能串測(盤點冊驅動;enter 與 PS 操作台都跑)
+  [門] functions                          本卡
+  [門] help                               用法(help --full 版史)
+  [門] functions --json → playbooks       編號作業手冊:ENV 環境安裝 E01–E12 · 唯一頁 R01–R03 · 單引擎 G01–G04 · 工作站同步 W01–W04(AI 與操作員照號做)
+  [禁] TA-Lib 一律不用(L50;技術指標唯一正主是 QuantGuard)
+  [禁] 不改 .ps1(L70:操作員逐次許可;要改就把「哪一行 · 哪一支 · 為什麼」寫成一次貼交操作員)
+  [禁] 不裝套件、不代設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT / FRED_API_KEY(都是操作員的手)
+  [禁] 不跑 CGC_MDL064_SelftestGrid --help(會重寫已追蹤檔;單站用 --only)
+  [禁] 新功能一律新版號檔(L04)、只增不減;凍結來源不改;仍被薄尾引用的舊模組不搬走
+  [禁] 黃不是綠:BLOCKED / REVIEW / 缺證據 / 同意閘沒開 不能寫成成功
+  [禁] 已發布的版號冊不就地改(出新版號檔,prior 指回前版);鎖版工具新版先登 role=candidate,席位只由 tools activate 改(架構正本 VIA_Registry_Architecture_SSOT)
+  [禁] 新指令 / 新模組:登進 VIA_VCGC_FunctionInventory_SSOT(出新版號;測法或豁免理由),否則串測黃;改過的尾版串測會自動跑它的 --selftest 並記版本與時間

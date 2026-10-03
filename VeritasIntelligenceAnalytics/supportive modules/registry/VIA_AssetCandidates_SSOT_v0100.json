@@ -1,0 +1,248 @@
+{
+  "schema": "VIA.AssetCandidates.v1",
+  "version": "1.0.0",
+  "assets": [
+    {
+      "candidate_id": "twse_start",
+      "ssot_code": null,
+      "asset_type": "INPT",
+      "owner": "VDF",
+      "source_id": "operator-proposal:20261003:twse_start",
+      "source_pointer": "twse_start",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "daily.start",
+      "semantic_key": "start_date",
+      "name": "TWSE 日資料起始日預設",
+      "value": "2026-01-02",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [],
+      "negative": []
+    },
+    {
+      "candidate_id": "tpex_start",
+      "ssot_code": null,
+      "asset_type": "INPT",
+      "owner": "VDF",
+      "source_id": "operator-proposal:20261003:tpex_start",
+      "source_pointer": "tpex_start",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "daily.start",
+      "semantic_key": "start_date",
+      "name": "TPEX 日資料起始日預設",
+      "value": "2026-01-02",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [],
+      "negative": []
+    },
+    {
+      "candidate_id": "mom_period",
+      "ssot_code": null,
+      "asset_type": "INPT",
+      "owner": "VQG",
+      "source_id": "operator-proposal:20261003:mom_period",
+      "source_pointer": "mom_period",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "indicator.mom",
+      "semantic_key": "period",
+      "name": "MOM 視窗預設",
+      "value": 10,
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [],
+      "negative": []
+    },
+    {
+      "candidate_id": "mom",
+      "ssot_code": null,
+      "asset_type": "INDICATOR",
+      "owner": "VQG",
+      "source_id": "operator-proposal:20261003:mom",
+      "source_pointer": "mom",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "indicator.mom",
+      "semantic_key": "definition",
+      "name": "動能 MOM 指標定義",
+      "value": {
+        "formula": "adj_close[t] - adj_close[t-n]",
+        "parameters": {
+          "n": 10,
+          "price": "adj_close"
+        },
+        "benchmark": {
+          "centerline": 0,
+          "meaning": "描述價格差，不構成自動交易指令"
+        },
+        "explanation": "n 期價格差；MOM 上升不必然代表今日價格上漲。未驗證策略有效性。",
+        "pros": [
+          "易理解",
+          "保留絕對價格差"
+        ],
+        "cons": [
+          "跨股尺度不同",
+          "仍有回看視窗",
+          "盤整雜訊",
+          "前值缺失則結果空值"
+        ],
+        "alternatives": [
+          "ROC（報酬比率，沒有固定上下界）",
+          "RSI",
+          "MACD"
+        ]
+      },
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [],
+      "negative": []
+    },
+    {
+      "candidate_id": "mom_alias",
+      "ssot_code": null,
+      "asset_type": "SYNONYM",
+      "owner": "VQG",
+      "source_id": "operator-proposal:20261003:mom_alias",
+      "source_pointer": "mom_alias",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "indicator.names",
+      "semantic_key": "mom",
+      "name": "MOM 同義字",
+      "value": "VQG.IND.MOM",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [
+        "MOM",
+        "Momentum",
+        "動能指標"
+      ],
+      "positive": [],
+      "negative": []
+    },
+    {
+      "candidate_id": "twse_ticker",
+      "ssot_code": null,
+      "asset_type": "REGEX",
+      "owner": "VDF",
+      "source_id": "operator-proposal:20261003:twse_ticker",
+      "source_pointer": "twse_ticker",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "ticker.yfinance",
+      "semantic_key": "TWSE",
+      "name": "TWSE 普通股代碼格式",
+      "value": "^[1-9][0-9]{3}\\.TW$",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [
+        "2330.TW"
+      ],
+      "negative": [
+        "0233.TW",
+        "2330.TWO",
+        "bad2330.TW"
+      ]
+    },
+    {
+      "candidate_id": "tpex_ticker",
+      "ssot_code": null,
+      "asset_type": "REGEX",
+      "owner": "VDF",
+      "source_id": "operator-proposal:20261003:tpex_ticker",
+      "source_pointer": "tpex_ticker",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "ticker.yfinance",
+      "semantic_key": "TPEX",
+      "name": "TPEX 普通股代碼格式",
+      "value": "^[1-9][0-9]{3}\\.TWO$",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [
+        "6488.TWO"
+      ],
+      "negative": [
+        "0648.TWO",
+        "6488.TW",
+        "bad6488.TWO"
+      ]
+    },
+    {
+      "candidate_id": "source_identity",
+      "ssot_code": null,
+      "asset_type": "LOGIC",
+      "owner": "VCGC",
+      "source_id": "operator-proposal:20261003:source_identity",
+      "source_pointer": "source_identity",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "version": "1.0.0",
+      "supersedes": null,
+      "scope": "numbering.identity",
+      "semantic_key": "source_separation",
+      "name": "同值不同來源分號",
+      "value": {
+        "key": [
+          "source_id",
+          "source_pointer",
+          "candidate_id",
+          "version"
+        ],
+        "same_values_do_not_merge": true
+      },
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ],
+      "aliases": [],
+      "positive": [],
+      "negative": []
+    }
+  ]
+}
