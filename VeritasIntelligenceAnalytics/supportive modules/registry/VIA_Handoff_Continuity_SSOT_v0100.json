@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T15:12:13+00:00",
+  "updated_at": "2026-10-03T15:13:50+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1206,6 +1206,54 @@
       "scope": "NLP L1 可選依賴:l1-clean / l1-review 缺件回 ABSENT 點名;核心 v0106 自測(PRADDLE / LAYOUT 那一路)照跑(VCGC-REQ139)",
       "dependencies": [
         "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "qg_onebridge": {
+      "argv": [
+        "VDF_ENG086_QuantGuardOneBridge",
+        "--selftest"
+      ],
+      "success_marker": " · FAIL 0",
+      "scope": "QuantGuard 唯一正主橋 v0102(#439;要 polars;容器 ABSENT rc 3 → 工作站驗)(VCGC-REQ139)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "usmacro_probe": {
+      "argv": [
+        "VDF_ENG110_USMacroProbe",
+        "--selftest"
+      ],
+      "success_marker": "[計] OK 6 · FAIL 0",
+      "scope": "美國總經探針 v0102(#439)(VCGC-REQ139)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "forward_vintage": {
+      "argv": [
+        "VDF_ENG117_ForwardVintage",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG117_ForwardVintage_v0103 本版 3/3 · 合計 PASS",
+      "scope": "前瞻年份 v0103:merge_asof 日期鍵統一 ns(pandas 3);v0101 run_self_test 過(VCGC-REQ139)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "forward_vintage_door": {
+      "argv": [
+        "VDF_ENG117_ForwardVintageDoor",
+        "--selftest"
+      ],
+      "success_marker": "[計] OK 2 · FAIL 0",
+      "scope": "前瞻年份門 v0101(#439)(VCGC-REQ139)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v*.py"
       ],
       "timeout_seconds": 900
     }
@@ -2609,6 +2657,46 @@
       "next": "handoff test nlp_optional 實跑轉 VERIFIED",
       "case": "nlp_optional",
       "receipt": "docs/handoff/evidence/nlp_optional.json"
+    },
+    {
+      "id": "VCGC-REQ139:qg_onebridge",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "operator",
+      "reason": "#439 新增 VDF_ENG086_QuantGuardOneBridge 沒有交接案(CHANGED_CODE_WITHOUT_TEST)· 要 polars,容器 / CI 沒有 → 照實 ABSENT",
+      "next": "handoff test qg_onebridge(工作站有 polars 的境) 實跑轉 VERIFIED",
+      "case": "qg_onebridge",
+      "receipt": "docs/handoff/evidence/qg_onebridge.json"
+    },
+    {
+      "id": "VCGC-REQ139:usmacro_probe",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "#439 新增 VDF_ENG110_USMacroProbe 沒有交接案(CHANGED_CODE_WITHOUT_TEST)",
+      "next": "handoff test usmacro_probe 實跑轉 VERIFIED",
+      "case": "usmacro_probe",
+      "receipt": "docs/handoff/evidence/usmacro_probe.json"
+    },
+    {
+      "id": "VCGC-REQ139:forward_vintage",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "#439 新增 VDF_ENG117_ForwardVintage 沒有交接案(CHANGED_CODE_WITHOUT_TEST)",
+      "next": "handoff test forward_vintage 實跑轉 VERIFIED",
+      "case": "forward_vintage",
+      "receipt": "docs/handoff/evidence/forward_vintage.json"
+    },
+    {
+      "id": "VCGC-REQ139:forward_vintage_door",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "#439 新增 VDF_ENG117_ForwardVintageDoor 沒有交接案(CHANGED_CODE_WITHOUT_TEST)",
+      "next": "handoff test forward_vintage_door 實跑轉 VERIFIED",
+      "case": "forward_vintage_door",
+      "receipt": "docs/handoff/evidence/forward_vintage_door.json"
     }
   ]
 }
