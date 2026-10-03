@@ -1449,6 +1449,46 @@
         "functional modules/VDF/VDF_MDL011_AkshareFetcher_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_list_stock_v0101": {
+      "argv": [
+        "VDF_MDL009_TWStockList",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL009_TWStockList v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+      "scope": "MDL009 v0101 年區代碼 2021–2030 中英文名稱局部識別核對 · 8 家寫入程式 · 不可刪(VCGC-REQ144)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL009_TWStockList_v0101.py",
+        "supportive modules/VIA_Central_Governance/tw_source_snapshots/t187ap03_L_20260805.json"
+      ],
+      "timeout_seconds": 1800
+    },
+    "vdf_fetch_v0102": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0102 本版 5/5 · v0101 PASS · 合計 PASS",
+      "scope": "MDL008 v0102 冊 v0102(MDL009 → v0101)· 子行程從本版起 · fixture 擋區兩家不刪(VCGC-REQ144)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0102.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json",
+        "functional modules/VDF/VDF_MDL009_TWStockList_v0101.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    "bundle_tool_v0101": {
+      "argv": [
+        "CGC_MDL256_SubsystemBundle",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL256_SubsystemBundle_v0101 本版 4/4 · v0100 PASS · 合計 PASS",
+      "scope": "CGC_MDL256 v0101 下載包冊取尾版 · 冊 v0101 帶 MDL009 v0101 / MDL008 v0102 / 擷取冊 v0102(VCGC-REQ144)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL256_SubsystemBundle_v0101.py",
+        "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 1800
     }
   },
   "work_items": [
@@ -3020,6 +3060,36 @@
       "next": "handoff test vdf_akshare_card;工作站 fetch run 011 --apply --mode live",
       "case": "vdf_akshare_card",
       "receipt": "docs/handoff/evidence/vdf_akshare_card.json"
+    },
+    {
+      "id": "VCGC-REQ144:vdf_list_stock_v0101",
+      "requirement": "VCGC-REQ144",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL009 v0101 年區代碼中英文名稱局部識別 · 不可刪 → 待 handoff test vdf_list_stock_v0101 實跑",
+      "next": "handoff test vdf_list_stock_v0101 實跑轉 VERIFIED",
+      "case": "vdf_list_stock_v0101",
+      "receipt": "docs/handoff/evidence/vdf_list_stock_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ144:vdf_fetch_v0102",
+      "requirement": "VCGC-REQ144",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0102 冊 v0102 · 子行程從本版起 → 待 handoff test vdf_fetch_v0102 實跑",
+      "next": "handoff test vdf_fetch_v0102 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0102",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ144:bundle_tool_v0101",
+      "requirement": "VCGC-REQ144",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "下載包冊取尾版 · 新測過指令進 via_01_vdf → 待 handoff test bundle_tool_v0101 實跑",
+      "next": "handoff test bundle_tool_v0101 實跑轉 VERIFIED",
+      "case": "bundle_tool_v0101",
+      "receipt": "docs/handoff/evidence/bundle_tool_v0101.json"
     }
   ]
 }
