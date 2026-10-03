@@ -13,6 +13,7 @@
     "MDL008 v0101 · MDL009 · MDL010 · 網路 / 加速器 --selftest"
    ],
    "commands": [
+    "# 先跑 README 第 3 步 verify 與第 4 步 preflight(缺核心套件就先自己 pip install)",
     "# 總控 = VDF System Manager(獨立運作,不必經 VCGC)",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch list                       # 五組:TWSE/TPEX · YFINANCE · FED · AKSHARE · OTHERS",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch test                       # 離線整合測試(不連網):MDL 全鏈 + ENG 各自自測 + 接資料庫",
@@ -747,6 +748,7 @@
     "supportive modules/SUP_MDL163_Toolkit.py",
     "supportive modules/SUP_MDL737_SuperAccelModule_v0108.py",
     "supportive modules/SUP_MDL737_SuperAccelModule_v0109.py",
+    "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py",
     "supportive modules/SUP_MDL751_VIATailPick_v0102.py",
     "supportive modules/SUP_MDL752_VIAJsonIO_v0100.py",
     "supportive modules/SUP_MDL753_VIACommonUtils_v0112.py",
@@ -930,7 +932,33 @@
     "supportive modules/ssot/VDF_AkShare_NarrowSource_CanonicalKeyContract_v02782.json",
     "supportive modules/ssot/VDF_AkShare_SmartRemapRules_v027811.json"
    ],
-   "note": "執行期閉包外另補:ENG088 以 glob 定位(只定位不開檔,開檔追蹤記不到)的共識融合收容件"
+   "note": "執行期閉包外另補:ENG088 以 glob 定位(只定位不開檔,開檔追蹤記不到)的共識融合收容件",
+   "requirements": {
+    "core": [
+     "requests",
+     "pandas",
+     "numpy",
+     "pyarrow",
+     "duckdb",
+     "yfinance"
+    ],
+    "optional": [
+     "akshare",
+     "polars",
+     "rich",
+     "openpyxl",
+     "xlrd",
+     "plotly",
+     "bs4",
+     "lxml",
+     "curl_cffi",
+     "cloudscraper",
+     "fredapi",
+     "pandas_datareader",
+     "matplotlib",
+     "dateutil"
+    ]
+   }
   },
   "via_00_vcgc": {
    "target": "C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_00_vcgc",
@@ -3991,6 +4019,7 @@
     "supportive modules/SUP_MDL737_SuperAccelModule_v0104.py",
     "supportive modules/SUP_MDL737_SuperAccelModule_v0108.py",
     "supportive modules/SUP_MDL737_SuperAccelModule_v0109.py",
+    "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py",
     "supportive modules/SUP_MDL738_InvokeVIASSDResourceGuard_v0100.py",
     "supportive modules/SUP_MDL751_VIATailPick_v0100.py",
     "supportive modules/SUP_MDL751_VIATailPick_v0101.py",
@@ -7364,7 +7393,31 @@
     "validation/VIA_v0140B_Windows_File_Handle_Acquisition_Sandbox_Validation_ReadOnly/via_v0140b_windows_handle_core.py",
     "via_bootstrap.py"
    ],
-   "note": "收容區 / 舊封包裡的 AegisNexus · Celeritas 副本是交接冊監看的凍結來源(資料,不在任何橋的搜尋路徑上);包內照帶,否則 handoff FILE_REMOVED 紅"
+   "note": "收容區 / 舊封包裡的 AegisNexus · Celeritas 副本是交接冊監看的凍結來源(資料,不在任何橋的搜尋路徑上);包內照帶,否則 handoff FILE_REMOVED 紅",
+   "requirements": {
+    "core": [
+     "requests",
+     "pandas",
+     "numpy",
+     "pyarrow",
+     "duckdb"
+    ],
+    "optional": [
+     "yfinance",
+     "polars",
+     "pydantic",
+     "re2",
+     "pandera",
+     "ahocorasick",
+     "rich",
+     "openpyxl",
+     "bs4",
+     "lxml",
+     "plotly",
+     "networkx",
+     "matplotlib"
+    ]
+   }
   }
  }
 }

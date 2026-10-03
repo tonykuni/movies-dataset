@@ -151,6 +151,7 @@ def missing_v0101(row: dict) -> list:
     return [m for m in row.get("requires") or [] if importlib.util.find_spec(m) is None]
 
 
+CORE_PACKAGES_V0101 = ("requests", "pandas", "numpy", "pyarrow", "duckdb", "yfinance")
 GROUPS_V0101 = ("TWSE/TPEX", "YFINANCE", "FED", "AKSHARE", "OTHERS")
 TICKER_COLS_V0101 = ("ticker", "Ticker", "code", "Code", "symbol", "Symbol", "證券代號", "公司代號", "stock_id")
 
@@ -400,6 +401,11 @@ def main(argv=None) -> int:
         return 2
     verb = args[0] if args else "list"
     rest = args[1:]
+    if verb in ("test", "run", "db"):                  # 乾淨直譯器先報缺件,不讓引擎半路 ModuleNotFoundError(PR #442 審查)
+        core = [m for m in CORE_PACKAGES_V0101 if importlib.util.find_spec(m) is None]
+        if core:
+            print(f"[ABSENT] {TAG}:本直譯器缺核心套件 {', '.join(core)} —— 不代裝;自己裝:py -3 -m pip install {' '.join(core)}")
+            return 3
     home = PRIOR.home_dir(rest[rest.index("--home") + 1] if "--home" in rest and rest.index("--home") + 1 < len(rest) else None)
     book = load_book_v0101()
     if verb == "list":

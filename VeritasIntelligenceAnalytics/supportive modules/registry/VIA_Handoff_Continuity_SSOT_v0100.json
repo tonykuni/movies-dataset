@@ -1361,16 +1361,15 @@
     },
     "network_lock_seat": {
       "argv": [
-        "SUP_MDL740_NetUnified",
+        "SUP_MDL737_SuperAccelModule",
         "--selftest"
       ],
-      "success_marker": "core = lock book, not the newest file",
-      "scope": "網路工具只認鎖版 v1652(四座位導向鎖冊 · 舊版已刪)(VCGC-REQ141)",
+      "success_marker": "[計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS",
+      "scope": "網路 / 加速器只認鎖版:SUP_MDL737 v0110 鎖版導向(裸名 import → 鎖冊 v1652 / v1141);凍結檔原樣 · v0116 / v0117 還原(PR #442 審查)(VCGC-REQ141)",
       "dependencies": [
-        "supportive modules/network/*.py",
-        "supportive modules/VeritasAegisNexus.py",
-        "supportive modules/50_Protection_Acceleration/VeritasAegisNexus.py",
-        "VeritasAegisNexus.py"
+        "supportive modules/SUP_MDL737_SuperAccelModule_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "supportive modules/network/VeritasAegisNexus_v*.py"
       ],
       "timeout_seconds": 900
     },
@@ -2955,12 +2954,11 @@
     {
       "id": "VCGC-REQ141:network_lock_seat",
       "requirement": "VCGC-REQ141",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "網路工具只認鎖版 v1652(四座位導向鎖冊 · 舊版已刪) → 已驗:2026-10-03T16:49:20+00:00 rc 0 · 標記見到",
+      "reason": "網路工具只認鎖版:改為 SUP_MDL737 v0110 導向(凍結檔不改)",
       "next": "handoff test network_lock_seat 實跑轉 VERIFIED",
-      "case": "network_lock_seat",
-      "receipt": "docs/handoff/evidence/network_lock_seat.json"
+      "case": "network_lock_seat"
     },
     {
       "id": "VCGC-REQ142:bundle_tool",

@@ -123,9 +123,28 @@ def manifest(name: str, spec: dict, idx: dict | None = None) -> dict:
             continue
         rows.append({"path": "VeritasIntelligenceAnalytics/" + rel, "codes": idx.get(rel, []), "version": version_of(rel),
                      "sha256": sha256(p), "bytes": p.stat().st_size})
-    return {"schema": "VIA.SubsystemBundle.Manifest.v1", "bundle": name, "target": spec["target"], "built_at":
+    return {"schema": "VIA.SubsystemBundle.Manifest.v1", "bundle": name, "requirements": requirements(spec), "target": spec["target"], "built_at":
             datetime.now(timezone.utc).isoformat(timespec="seconds"), "builder": ENGINE, "files": rows, "missing": missing,
             "numbered": sum(1 for r in rows if r["codes"]), "count": len(rows)}
+
+
+PIP_NAME = {"bs4": "beautifulsoup4", "dateutil": "python-dateutil", "yaml": "pyyaml", "PIL": "pillow", "sklearn": "scikit-learn"}
+
+
+def requirements(spec: dict) -> dict:
+    req = spec.get("requirements") or {}
+    return {"core": list(req.get("core") or []), "optional": list(req.get("optional") or [])}
+
+
+def preflight(spec_or_man: dict) -> dict:
+    """依包的 requirements 逐一 find_spec;核心缺 = RED(rc 3),選用缺 = 黃。只讀,不裝。"""
+    import importlib.util as ilu
+    req = spec_or_man.get("requirements") or {}
+    miss_core = [m for m in req.get("core") or [] if ilu.find_spec(m) is None]
+    miss_opt = [m for m in req.get("optional") or [] if ilu.find_spec(m) is None]
+    pip = " ".join(PIP_NAME.get(m, m) for m in miss_core + miss_opt)
+    return {"core_missing": miss_core, "optional_missing": miss_opt, "lamp": "RED" if miss_core else ("YELLOW" if miss_opt else "GREEN"),
+            "pip": f"py -3 -m pip install {pip}" if pip else ""}
 
 
 def readme(name: str, spec: dict, man: dict) -> str:
@@ -134,7 +153,11 @@ def readme(name: str, spec: dict, man: dict) -> str:
              "", "2. 開 PowerShell,進到包內的 VeritasIntelligenceAnalytics:",
              f"   cd \"{spec['target']}\\VeritasIntelligenceAnalytics\"", "",
              "3. 先驗包(逐檔 sha256 對 MANIFEST;不合就停):",
-             f"   py -3 \"supportive modules\\registry\\{ENGINE}.py\" verify .. ", "", "4. 實測指令(照順序):"]
+             f"   py -3 \"supportive modules\\registry\\{ENGINE}.py\" verify .. ",
+             "", "4. 再驗套件(本包要的 Python 套件在不在;缺核心 = 停,照印出的 pip 指令自己裝 —— AI 不代裝):",
+             f"   py -3 \"supportive modules\\registry\\{ENGINE}.py\" preflight .. ",
+             f"   (清單:requirements_{name}.txt;核心 {', '.join(requirements(spec)['core']) or '—'})",
+             "", "5. 實測指令(照順序):"]
     lines += ["   " + c for c in spec.get("commands") or []]
     lines += ["", "py 不行就把 py -3 換成 python。", "連網實測要你自己在本視窗開雙閘(AI 永不代設):",
               "   $env:VIA_NET_CONSENT='YES'", "   $env:VIA_SCRAPE_CONSENT='<你的同意值>'"]
@@ -170,6 +193,10 @@ def build(name: str, out: Path | None = None, make_zip: bool = True) -> dict:
         shutil.copy2(VIA.parent / r["path"], dst)
     (root / "MANIFEST.json").write_text(json.dumps(man, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (root / "README_實測.txt").write_text(readme(name, spec, man), encoding="utf-8")
+    req = requirements(spec)
+    (root / f"requirements_{name}.txt").write_text(
+        "# 核心(缺了不能跑)\n" + "".join(PIP_NAME.get(m, m) + "\n" for m in req["core"])
+        + "# 選用(缺了只有該支引擎照實 ABSENT)\n" + "".join("# " + PIP_NAME.get(m, m) + "\n" for m in req["optional"]), encoding="utf-8")
     man["removed_old"] = removed
     man["dir"] = str(root)
     if make_zip:
@@ -202,8 +229,17 @@ def main(argv=None) -> int:
         print(f"[{ENGINE} verify] {r['bundle']} · {r['count'] - len(r['bad'])}/{r['count']} 檔 sha256 相符" +
               ("" if r["ok"] else " · 不合:" + " · ".join(r["bad"][:5])))
         return 0 if r["ok"] else 1
+    if verb == "preflight":                                 # PC 上解壓後直接跑:只讀 find_spec,不裝
+        target = Path(args[1]) if len(args) > 1 else Path.cwd()
+        if not (target / "MANIFEST.json").is_file() and (target.parent / "MANIFEST.json").is_file():
+            target = target.parent
+        man = json.loads((target / "MANIFEST.json").read_text(encoding="utf-8"))
+        r = preflight(man)
+        print(f"[{ENGINE} preflight] {man['bundle']} · {r['lamp']} · 核心缺 {r['core_missing'] or '無'} · 選用缺 {r['optional_missing'] or '無'}"
+              + (f"\n  自己裝(AI 不代裝):{r['pip']}" if r["pip"] else ""))
+        return 3 if r["core_missing"] else 0
     if os.environ.get("VIA_FROM_VCGC") != "YES":
-        print(f"[{ENGINE}] 拒絕。只能經 via-vcgc(verify 除外)。")
+        print(f"[{ENGINE}] 拒絕。只能經 via-vcgc(verify / preflight 除外)。")
         return 2
     book = load_book()
     if verb == "list":
@@ -267,8 +303,12 @@ def selftest() -> int:
         m2 = build(name, Path(tmp), make_zip=False)
         chk("⑤b 目標夾不是包 → 拒跑不刪(操作員資料在);前一版包 → 原地更新不打 zip", refused and (Path(tmp) / "userdata" / name / "my.parquet").is_file()
             and m2["count"] == m["count"] and "zip" not in m2)
-        chk("⑤ zip 內含 MANIFEST.json · README_實測.txt · 全部檔", f"{name}/MANIFEST.json" in names and f"{name}/README_實測.txt" in names
-            and len(names) == m["count"] + 2, len(names))
+        chk("⑤ zip 內含 MANIFEST.json · README_實測.txt · requirements · 全部檔", f"{name}/MANIFEST.json" in names and f"{name}/README_實測.txt" in names
+            and f"{name}/requirements_{name}.txt" in names and len(names) == m["count"] + 3, len(names))
+        pf_ok = preflight({"requirements": {"core": ["json"], "optional": []}})
+        pf_bad = preflight({"requirements": {"core": ["no_such_pkg_zz"], "optional": ["yaml_nope_zz"]}})
+        chk("⑤c preflight:核心在 = GREEN;核心缺 = RED 並給 pip 指令(不代裝)", pf_ok["lamp"] == "GREEN" and pf_bad["lamp"] == "RED"
+            and "no_such_pkg_zz" in pf_bad["pip"] and m.get("requirements", {}).get("core"))
     vdf = book["bundles"].get("via_01_vdf", {}).get("files", [])
     locked = json.loads((HERE / "VIA_ToolVersion_Lock_v0100.json").read_text(encoding="utf-8"))
     net = locked["network"]["path"].split("VeritasIntelligenceAnalytics/", 1)[-1]
