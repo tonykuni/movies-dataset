@@ -1,0 +1,1298 @@
+{
+  "schema": "VIA.Workflow.SDD.v1",
+  "version": "0115",
+  "subsystem": "VCGC",
+  "zh": "中央治理 · 中樞工作流",
+  "batch": "側線 2026-10-01(VCGC closeout)",
+  "ts": "2026-10-03T09:54:03.714348+00:00",
+  "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」",
+  "sdd": {
+    "layers": [
+      "spec(目標 · 需求 REQ 代碼 · 驗收)",
+      "plan(進出口 · 順序 · 正主)",
+      "steps(STP 代碼 · 引擎 · 動詞 · 中樞觀測鍵)",
+      "tests(自測 self · 交叉 cross · 實測 real)",
+      "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
+    ],
+    "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
+    "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+    "evidence_rule": "inside / 站 / 層步要有機器可驗的證據:step:<STP 代碼>(繼承正主步)· self:<引擎 stem | all>(當前 HEAD 的自測)· chain:<vdf|vrn>:<站 | 層>(本輪鏈報告)· git:pushed(HEAD 已在遠端)",
+    "known_open_rule": "已知未綠(known_open)寫在步上:原因 · 誰的手(operator / ai)· 參照;驗證器據此分類,不因寫了就變綠 —— operator 的手可收尾為 CLOSED_WITH_OPERATOR_ITEMS,ai 的手 = 仍 OPEN",
+    "fail_cause_rule": "fail_cause:FAIL 由驗證器讀正主本輪存證追因(dbpanel_absent · pathverify_dbpanel · envmgr_exe_absent · pathverify_traced;後兩種 CGC_MDL245 v0102 起:ENV MANAGER 的 RED 全是 PATH 上找不到的必備執行檔 · 單一路徑驗證每一步 RED 都追得到前兩種因);finding_cause:FINDING 同一套(syncdb_no_target:ENG082 v0111 起的本輪 sync-db 報告 SKIP、目標 0 本 → 資料家空);追得到操作員端成因才標操作員的手,追不到仍是 FAIL / FINDING"
+  },
+  "composed_by": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0101.json",
+  "workflows": [
+    {
+      "code": "VCGC-WKF001",
+      "alias": "hub",
+      "name": "中樞入口流程(外部輸入 → 閘 → 省 Token → 環境 → SSOT 同步編號 → 禁令模板)",
+      "kind": "hub_steps",
+      "spec": {
+        "goal": "所有外部輸入只經 VCGC 進入;閘沒過一步都不跑;工具 · 環境 · SSOT · 禁令都在兩迴圈之前確認",
+        "requirements": [
+          "SUP-REQ001",
+          "SUP-REQ003",
+          "SUP-REQ004",
+          "SUP-REQ005",
+          "VCGC-REQ006",
+          "VCGC-REQ008",
+          "VCGC-REQ018",
+          "VCGC-REQ019",
+          "VCGC-REQ020",
+          "VCGC-REQ022",
+          "VCGC-REQ024",
+          "VCGC-REQ026",
+          "VCGC-REQ027",
+          "VCGC-REQ036",
+          "VCGC-REQ038",
+          "VCGC-REQ041",
+          "VCGC-REQ047",
+          "VCGC-REQ048",
+          "VCGC-REQ050",
+          "VCGC-REQ052",
+          "VCGC-REQ061",
+          "VCGC-REQ069",
+          "VCGC-REQ070",
+          "VCGC-REQ072",
+          "VCGC-REQ077",
+          "VCGC-REQ078",
+          "VCGC-REQ079",
+          "VCGC-REQ081",
+          "VCGC-REQ082",
+          "VCGC-REQ084",
+          "VCGC-REQ085",
+          "VCGC-REQ088",
+          "VCGC-REQ089",
+          "VCGC-REQ090",
+          "VCGC-REQ091"
+        ],
+        "acceptance": [
+          "本輪第一筆中樞事件是 STP002 流程閘",
+          "STP003 省 Token 索引在 STP004 環境管理器之前",
+          "STP006 禁令與模板在兩迴圈之前",
+          "每步經 via-vcgc(事件可查)"
+        ]
+      },
+      "plan": {
+        "enter": "操作員(Windows 選夾 / -SystemDir -DataDir)",
+        "exit": "兩迴圈(VDF-WKF001 ∥ VRN-WKF001)",
+        "order": "STP002 必須第一;STP001 在閘後寫入;其餘照 STP 序",
+        "order_note": "VCGC-WKF001 plan 記下順序:VCGC 是唯一的門(先過閘),進門第一件事就是省 Token(STP003)再環境(STP004),與操作員 R31 原話一致"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF001-STP001",
+          "alias": "H0",
+          "name": "外部輸入進中樞",
+          "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py",
+          "verb": "paths",
+          "what": "系統資料夾 · 資料庫資料夾(VIA_DATA_HOME)· VRN 樣本夾(InputConsole 規格冊 user.vrn_dir)",
+          "match": [
+            [
+              "CGC_MDL238_OperatorConsole",
+              "paths"
+            ]
+          ],
+          "after_gate": true
+        },
+        {
+          "code": "VCGC-WKF001-STP002",
+          "alias": "H1",
+          "name": "VCGC 流程閘",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "status",
+          "what": "政策冊整冊讀 · 子系統座位 · 加速器 / 網路已接",
+          "match": [
+            [
+              "CGC_MDL149_VeritasCentralGovernanceConsole",
+              "status"
+            ]
+          ],
+          "gate": "[流程] 政策過 · 子系統已對齊"
+        },
+        {
+          "code": "VCGC-WKF001-STP003",
+          "alias": "H2",
+          "name": "省 token 工具先啟用",
+          "engine": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+          "verb": "read | slice | digest | pack",
+          "what": "AI 讀倉只用骨架卡與切片,不讀整檔(CLAUDE.md 讀檔規則);VCGC status 第 2 步「省Token」燈 · v0117 起 +chain 薄尾鏈圖 · JSON 兩層卡 / 路徑切片;token 卡尾印 AI 必用摘要(正本 VIA_AI_FunctionCard_SSOT;全卡 via-vcgc functions)",
+          "match": [
+            [
+              "CGC_MDL158_VIAPanoramaAuditRepair",
+              null
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF001-STP004",
+          "alias": "H3",
+          "name": "環境管理器",
+          "engine": "supportive modules/registry/CGC_MDL240_EnvManager_v*.py",
+          "verb": "(預設)",
+          "what": "四件工具鎖版與載入 · 家族境 · 工具冊 · 鏈上缺件 · 執行檔 · PS 端;只查不裝(裝件是操作員的手)",
+          "match": [
+            [
+              "CGC_MDL240_EnvManager",
+              null
+            ]
+          ],
+          "finding_hand": "ENV MANAGER AMBER = 缺套件 / 家族境未建(只查不裝;裝件是操作員的手 · L07/L08)",
+          "fail_cause": "envmgr_exe_absent"
+        },
+        {
+          "code": "VCGC-WKF001-STP005",
+          "alias": "H4",
+          "name": "SSOT 審閱 · 註冊同步 · 自動編號",
+          "engine": [
+            "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+            "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+          ],
+          "verb": "registry-sync [--apply] · --apply",
+          "what": "政策 · 邏輯 · 正規式 · 同義字 · 參數 · 引擎 · SSOT 冊全編號(VIA-<子系統>-<類><號>;只增);--apply 需操作員批准;編號只登本批(--apply --scope;全量 --apply 要操作員下令)· 架構正本 VIA_Registry_Architecture_SSOT_v0100.json",
+          "match": [
+            [
+              "CGC_MDL238_OperatorConsole",
+              "sync-check"
+            ],
+            [
+              "CGC_MDL149_VeritasCentralGovernanceConsole",
+              "registry-sync"
+            ],
+            [
+              "CGC_MDL237_NumberingSystem",
+              null
+            ]
+          ],
+          "finding_resolved_by": [
+            [
+              "CGC_MDL238_OperatorConsole",
+              "sync-check"
+            ],
+            [
+              "CGC_MDL149_VeritasCentralGovernanceConsole",
+              "registry-sync",
+              "--apply"
+            ]
+          ],
+          "finding_resolved_why": "H4 的乾跑(sync-check rc 2)本來就是要報「有待同步」讓操作員核准;同一輪最後一次 FINDING 之後,複檢 sync-check OK 或核准的 registry-sync --apply OK = 這一步完成。之後再 FINDING 就不算解(R33 實測;CGC_MDL245 v0101)"
+        },
+        {
+          "code": "VCGC-WKF001-STP006",
+          "alias": "H5",
+          "name": "禁令與標準模板",
+          "engine": [
+            "supportive modules/registry/CGC_MDL243_TalibCommandScan_v*.py",
+            "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+            "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v*.py"
+          ],
+          "verb": "scan · --subsystems · (預設)",
+          "what": "TA-Lib 活指令 0 · PY 加速器橋 · VDF 網路橋 · PS 模板章",
+          "match": [
+            [
+              "CGC_MDL243_TalibCommandScan",
+              null
+            ],
+            [
+              "CGC_MDL183_CeleritasPolicyGate",
+              null
+            ],
+            [
+              "CGC_MDL124_BridgeSweeper",
+              null
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF001-STP007",
+          "alias": "H6",
+          "name": "SSOT 全景上下單向檢測",
+          "engine": "supportive modules/registry/CGC_MDL247_SSOTPanorama_v*.py",
+          "verb": "ssot panorama [--full](經 VCGC run 派送)",
+          "what": "正則 · 同義字 · 自動編號 · 命名 · 註冊 · 上下連結 六族 × VCGC → VDF → VRN → SUP;上層紅 → 下層同族標上游紅;輸入沒變沿用;只讀",
+          "match": [
+            [
+              "CGC_MDL247_SSOTPanorama",
+              null
+            ]
+          ],
+          "after_gate": true
+        },
+        {
+          "code": "VCGC-WKF001-STP008",
+          "alias": "H7",
+          "name": "VCGC 全功能串測",
+          "engine": "supportive modules/registry/CGC_MDL224_TestAuto_v*.py",
+          "verb": "test [--quick|--full|inventory](經 VCGC run 派送;enter 與 PS 操作台都跑)",
+          "what": "盤點冊 VIA_VCGC_FunctionInventory_SSOT_v0100.json 逐站唯讀 / 乾跑;動詞 · 席位 · 必用卡 · 交接案 · 工作流步 · PS 入口全覆蓋(新 = 黃 · 缺 = 紅);全部 CGC 尾版 compile + 加速器橋;改過的尾版自動 --selftest;版本 · sha · UTC 時間只增寫 VIA_VCGC_FunctionLedger_v0100.jsonl",
+          "match": [
+            [
+              "CGC_MDL224_TestAuto",
+              null
+            ]
+          ],
+          "after_gate": true
+        }
+      ],
+      "tests": {
+        "self": "各步引擎 --selftest",
+        "cross": [
+          "X-CONF",
+          "X-ENGINE",
+          "X-REG",
+          "X-NUM",
+          "X-ACCEL"
+        ],
+        "real": "via-vcgc go(唯一入口 v0106 起)→ via-vcgc workflow <輪號>",
+        "real_run": "go"
+      }
+    },
+    {
+      "code": "VCGC-WKF002",
+      "alias": "exit",
+      "name": "出口流程(操作台頁 → 單一路徑驗證 → 教訓帳 → 紀錄上傳)",
+      "kind": "hub_steps",
+      "spec": {
+        "goal": "兩迴圈的結果只經 VCGC 回外部;驗證 · 教訓 · 紀錄都有存證",
+        "requirements": [
+          "VCGC-REQ035",
+          "VCGC-REQ036",
+          "VCGC-REQ037",
+          "VCGC-REQ040",
+          "VCGC-REQ042",
+          "VCGC-REQ043",
+          "VCGC-REQ044",
+          "VCGC-REQ045",
+          "VCGC-REQ049",
+          "VCGC-REQ057",
+          "VCGC-REQ059",
+          "VCGC-REQ060"
+        ],
+        "acceptance": [
+          "出口段在兩迴圈之後",
+          "單一路徑驗證 rc 0/2 有頁",
+          "教訓帳只增",
+          "上傳只含紀錄冊"
+        ]
+      },
+      "plan": {
+        "enter": "兩迴圈結果",
+        "exit": "操作員(HTML 頁 · GitHub 紀錄)",
+        "order": "照 STP 序(入口 ⑤ → ⑥ → ⑥b → ⑦)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF002-STP001",
+          "alias": "X1",
+          "name": "HTML U/I",
+          "engine": "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py",
+          "verb": "page",
+          "what": "紅黃綠矩陣在最前",
+          "match": [
+            [
+              "CGC_MDL238_OperatorConsole",
+              "page"
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF002-STP002",
+          "alias": "X2",
+          "name": "單一路徑驗證 + 涵蓋稽核",
+          "engine": "supportive modules/registry/CGC_MDL242_PathVerify_v*.py",
+          "verb": "run",
+          "what": "執行版本 × 編號冊 × 註冊冊 × 鎖冊 · 兩迴圈結果 × 燈鎖 × 上一輪 · 橋 · 四件工具 · 多來源 · SSOT",
+          "match": [
+            [
+              "CGC_MDL242_PathVerify",
+              "run"
+            ]
+          ],
+          "fail_cause": "pathverify_traced"
+        },
+        {
+          "code": "VCGC-WKF002-STP003",
+          "alias": "X3",
+          "name": "教訓帳",
+          "engine": "supportive modules/registry/CGC_MDL058_Lessons_v*.py",
+          "verb": "(預設)· --record",
+          "what": "根因帳只增;重複出錯要留因與解法(VCGC v0168 起 FAIL 事件自動記 VCGC_FAIL)",
+          "match": [
+            [
+              "CGC_MDL058_Lessons",
+              null
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF002-STP004",
+          "alias": "X4",
+          "name": "布建紀錄上傳",
+          "engine": "Invoke-VIA-OperatorConsole-v*.ps1",
+          "verb": "⑦",
+          "what": "只 commit + push 紀錄冊;對 GitHub 也只經 VCGC",
+          "inside": "入口 ⑦(git 在 PowerShell 裡,不是 python 步)",
+          "evidence": "git:pushed"
+        }
+      ],
+      "tests": {
+        "self": "各步引擎 --selftest",
+        "cross": [
+          "X-CONF",
+          "X-ENGINE",
+          "X-REG",
+          "X-NUM"
+        ],
+        "real": "via-vcgc go → via-vcgc workflow <輪號>",
+        "real_run": "go"
+      }
+    },
+    {
+      "code": "VCGC-WKF003",
+      "alias": "ai_change",
+      "name": "AI 經中樞的讀改流程(讀 → 閘 → 新版檔 → 自測 → 註冊 → 編號 → SDD 驗證 → 里程碑同步)",
+      "kind": "procedure",
+      "spec": {
+        "goal": "AI 的任何審閱與修改都經 VCGC:先用省 Token 工具讀,改動一律開新版檔,自測過才註冊編號,SDD 驗證綠才鎖定與上傳",
+        "requirements": [
+          "VCGC-REQ001",
+          "VCGC-REQ002",
+          "VCGC-REQ003",
+          "VCGC-REQ005",
+          "VCGC-REQ006",
+          "VCGC-REQ008",
+          "VCGC-REQ010",
+          "VCGC-REQ016",
+          "VCGC-REQ017",
+          "VCGC-REQ020",
+          "VCGC-REQ022",
+          "VCGC-REQ023",
+          "VCGC-REQ027",
+          "VCGC-REQ028",
+          "VCGC-REQ029",
+          "VCGC-REQ031",
+          "VCGC-REQ034",
+          "VCGC-REQ049",
+          "VCGC-REQ053",
+          "VCGC-REQ057",
+          "VCGC-REQ064",
+          "VCGC-REQ065",
+          "VCGC-REQ066",
+          "VCGC-REQ067",
+          "VDF-REQ011",
+          "VDF-REQ012",
+          "VDF-REQ013",
+          "VRN-REQ002",
+          "VCGC-REQ078",
+          "VCGC-REQ081",
+          "VCGC-REQ084"
+        ],
+        "acceptance": [
+          "讀倉用骨架卡 / 切片(CLAUDE.md 讀檔規則)",
+          "改動 = 新版本檔(L04;未合併 PR 內新檔可原地改)",
+          "新 .py 帶加速器橋、VDF 帶網路橋、新 .ps1 帶模板章",
+          "自測經 via-vcgc run",
+          "registry-sync --apply 與編號只增(0 遺失 · 0 改碼)",
+          "每個里程碑推 GitHub(CI 綠 · 無衝突 · 無未結討論才合併)"
+        ]
+      },
+      "plan": {
+        "enter": "操作員指令(對話)",
+        "exit": "GitHub(PR · 合併)",
+        "order": "照 STP 序;任何政策衝突 → 停(Master Prompt)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF003-STP001",
+          "alias": "read",
+          "name": "省 Token 讀倉",
+          "engine": "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+          "verb": "read · slice · pack",
+          "what": "骨架卡 · 切片 · 全倉索引(etag 沒變 304)",
+          "match": [
+            [
+              "CGC_MDL158_VIAPanoramaAuditRepair",
+              null
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF003-STP002",
+          "alias": "gate",
+          "name": "VCGC 流程閘",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "status",
+          "what": "[流程] 政策過 · 子系統已對齊",
+          "match": [
+            [
+              "CGC_MDL149_VeritasCentralGovernanceConsole",
+              "status"
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF003-STP003",
+          "alias": "edit",
+          "name": "開新版檔 + 標準橋",
+          "engine": "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+          "verb": "--subsystems(乾跑核對)",
+          "what": "L04 新版檔;加速器橋 · 網路橋 · PS 模板章(橋掃核對 100%)",
+          "inside": "AI 編修;由 STP003 橋掃與 CGC_MDL245 X-ACCEL 核對",
+          "evidence": "step:VCGC-WKF001-STP006"
+        },
+        {
+          "code": "VCGC-WKF003-STP004",
+          "alias": "selftest",
+          "name": "自測經中樞",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "run <引擎> --selftest",
+          "what": "每支改過的引擎自測 rc 0;失敗自動進教訓帳",
+          "inside": "via-vcgc run(事件記目標引擎)",
+          "evidence": "self:all"
+        },
+        {
+          "code": "VCGC-WKF003-STP005",
+          "alias": "register",
+          "name": "註冊同步",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "registry-sync --apply(批准)",
+          "what": "元件註冊冊只增;新尾版記 changed_at",
+          "match": [
+            [
+              "CGC_MDL149_VeritasCentralGovernanceConsole",
+              "registry-sync"
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF003-STP006",
+          "alias": "number",
+          "name": "自動編號",
+          "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py",
+          "verb": "--apply --scope · audit",
+          "what": "已追蹤檔全編號(含 WKF · STP · REQ);只增核對 0 遺失 0 改碼;只登本批(先提交再編號)· audit 另查註冊完整性 IMMUT · DUPREG · XCODE · FPSTALE · UNCOMMITTED · TIMEFMT",
+          "match": [
+            [
+              "CGC_MDL237_NumberingSystem",
+              null
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF003-STP007",
+          "alias": "validate",
+          "name": "SDD 驗證",
+          "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+          "verb": "check · real · lock",
+          "what": "自測 · 交叉測 · 實測;綠 → 燈鎖冊下一版記成功版本與時間",
+          "match": [
+            [
+              "CGC_MDL245_SDDValidator",
+              null
+            ]
+          ],
+          "report_rc": {
+            "check": [
+              0,
+              2
+            ],
+            "real": [
+              0,
+              1,
+              2
+            ],
+            "closeout": [
+              0,
+              2
+            ],
+            "lock": [
+              0
+            ],
+            "selftests": [
+              0
+            ]
+          },
+          "report_why": "驗證器自己的報告步:rc 反映的是別條工作流的燈(real 見 FAIL 回 1 · check YELLOW 回 2 · closeout OPEN 回 2)。每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK;原判記 reported,燈只算在被報的工作流上(R33c;CGC_MDL245 v0101)。lock 不列(拒寫是真失敗)"
+        },
+        {
+          "code": "VCGC-WKF003-STP008",
+          "alias": "lessons",
+          "name": "教訓帳",
+          "engine": "supportive modules/registry/CGC_MDL058_Lessons_v*.py",
+          "verb": "(FAIL 自動)· --record",
+          "what": "重複出錯要留因與解法",
+          "inside": "VCGC v0168 起 FAIL 事件自動記",
+          "evidence": "step:VCGC-WKF002-STP003"
+        },
+        {
+          "code": "VCGC-WKF003-STP009",
+          "alias": "milestone",
+          "name": "里程碑同步 GitHub",
+          "engine": "git · GitHub PR",
+          "verb": "commit · push · PR · merge",
+          "what": "只在 CI 綠 · 無衝突 · 無未結討論時合併;零 force push;VIA_Reports 永不 commit",
+          "inside": "GitHub(AI 端;不是 python 步)",
+          "evidence": "git:pushed"
+        }
+      ],
+      "tests": {
+        "self": "CGC_MDL245 --selftest",
+        "cross": [
+          "X-ENGINE",
+          "X-ACCEL",
+          "X-REG",
+          "X-NUM"
+        ],
+        "real": "每輪改動照 STP 序跑;事件 via-vcgc events",
+        "real_run": "ai"
+      }
+    },
+    {
+      "code": "VCGC-WKF004",
+      "alias": "sdd_closeout",
+      "name": "SDD 驗證與收尾(靜態自測 → 交叉測 → 實測 → 加鎖 → 收尾報告)",
+      "kind": "procedure",
+      "spec": {
+        "goal": "SSOT 驗證全綠才宣告收尾;成功版本與時間進燈鎖冊,之後回歸 = 紅",
+        "requirements": [
+          "VCGC-REQ012",
+          "VCGC-REQ023",
+          "VCGC-REQ025",
+          "VCGC-REQ030",
+          "VCGC-REQ031",
+          "VCGC-REQ046",
+          "VCGC-REQ051",
+          "VCGC-REQ053",
+          "VCGC-REQ054",
+          "VCGC-REQ055",
+          "VCGC-REQ056",
+          "VCGC-REQ058",
+          "VCGC-REQ059",
+          "VCGC-REQ071",
+          "VCGC-REQ073",
+          "VCGC-REQ079"
+        ],
+        "acceptance": [
+          "check 全綠(欄位齊 · 代碼唯一連續 · 引擎尾版在 · 已註冊已編號 · 橋在 · 需求雙向對應 · 無衝突)",
+          "real:每個工作流的中樞步本輪都跑且結果 OK/FINDING",
+          "lock:燈鎖冊下一版 wkf 區",
+          "closeout:收尾報告"
+        ],
+        "report_format": [
+          "Step 1 政策確認結果",
+          "Step 2 工具完整性檢查結果",
+          "Step 3 換行/哈希檢查結果",
+          "Step 4 掃描結果(輕量/全面)",
+          "Step 5 AST 定位結果(若有)",
+          "Step 6 建議 patch(純文字 diff)",
+          "Step 7 是否需要 via 審核",
+          "Step 8 測試結果",
+          "Step 9 是否允許部署",
+          "Step 10 VCGC 最終判定"
+        ]
+      },
+      "plan": {
+        "enter": "唯一入口一輪(via-vcgc go)",
+        "exit": "燈鎖冊 · 收尾報告 · GitHub",
+        "order": "check → real → lock → closeout",
+        "real_range_default": "2026-07-01 → 今日(操作員 R30 令;VDF 增量抓取要操作員開同意閘,容器無資料家 → 工作站實跑)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF004-STP001",
+          "alias": "check",
+          "name": "靜態自測 + 交叉測",
+          "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+          "verb": "check",
+          "what": "X-* 交叉規則全跑",
+          "match": [
+            [
+              "CGC_MDL245_SDDValidator",
+              "check"
+            ]
+          ],
+          "report_rc": {
+            "check": [
+              0,
+              2
+            ]
+          },
+          "report_why": "驗證器自己的報告步:rc 反映的是別條工作流的燈(real 見 FAIL 回 1 · check YELLOW 回 2 · closeout OPEN 回 2)。每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK;原判記 reported,燈只算在被報的工作流上(R33c;CGC_MDL245 v0101)。lock 不列(拒寫是真失敗)"
+        },
+        {
+          "code": "VCGC-WKF004-STP002",
+          "alias": "real",
+          "name": "實測核對",
+          "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+          "verb": "real [輪號]",
+          "what": "讀本輪中樞事件:每步有跑 · 結果類 · 尾版 · 時間",
+          "match": [
+            [
+              "CGC_MDL245_SDDValidator",
+              "real"
+            ]
+          ],
+          "report_rc": {
+            "real": [
+              0,
+              1,
+              2
+            ]
+          },
+          "report_why": "驗證器自己的報告步:rc 反映的是別條工作流的燈(real 見 FAIL 回 1 · check YELLOW 回 2 · closeout OPEN 回 2)。每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK;原判記 reported,燈只算在被報的工作流上(R33c;CGC_MDL245 v0101)。lock 不列(拒寫是真失敗)"
+        },
+        {
+          "code": "VCGC-WKF004-STP003",
+          "alias": "lock",
+          "name": "過關加鎖",
+          "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+          "verb": "lock --apply",
+          "what": "燈鎖冊下一版 wkf 區(工作站不自己寫冊;AI 依實錄寫)",
+          "match": [
+            [
+              "CGC_MDL245_SDDValidator",
+              "lock"
+            ]
+          ]
+        },
+        {
+          "code": "VCGC-WKF004-STP004",
+          "alias": "closeout",
+          "name": "收尾報告",
+          "engine": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py",
+          "verb": "closeout [--apply]",
+          "what": "全綠才 CLOSED;報告進 docs/",
+          "match": [
+            [
+              "CGC_MDL245_SDDValidator",
+              "closeout"
+            ]
+          ],
+          "report_rc": {
+            "closeout": [
+              0,
+              2
+            ]
+          },
+          "report_why": "驗證器自己的報告步:rc 反映的是別條工作流的燈(real 見 FAIL 回 1 · check YELLOW 回 2 · closeout OPEN 回 2)。每一次都落在可接受 rc 且沒有錯誤 = 報告有產出 = 這一步 OK;原判記 reported,燈只算在被報的工作流上(R33c;CGC_MDL245 v0101)。lock 不列(拒寫是真失敗)"
+        }
+      ],
+      "tests": {
+        "self": "CGC_MDL245 --selftest",
+        "cross": [
+          "X-*"
+        ],
+        "real": "via-vcgc go → CGC_MDL245 real → lock → closeout",
+        "real_run": "ai"
+      }
+    },
+    {
+      "code": "VCGC-WKF005",
+      "alias": "via_functional_acceptance",
+      "name": "VIA 功能級整合驗收(中央 gate；逐站 rc/裁決/證據)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "中央閘逐站驗收(rc · 裁決 · 證據)",
+        "requirements": [],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "test",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF005-STP001",
+          "alias": "via_functional_acceptance",
+          "item": "via_functional_acceptance",
+          "known_open": {
+            "hand": "operator",
+            "why": "功能驗收紅:股票價史只到 2024-01-02(驗收要 2023-01-01 起;回補要網路 → 操作員開同意閘)· QuantGuard 缺 polars(裝件是操作員的手)",
+            "ref": "VDF-REQ004 · VCGC-REQ046"
+          }
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_functional_acceptance(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_functional_acceptance"
+    },
+    {
+      "code": "VCGC-WKF006",
+      "alias": "via_ssot_autocode_governance",
+      "name": "VIA 統一 SSOT 治理(Regex／同義字／邏輯／參數／因子／資料庫／模組／狀態／收容；自動編碼隔離協定)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "統一 SSOT 治理與自動編碼隔離協定",
+        "requirements": [
+          "VCGC-REQ054",
+          "VCGC-REQ067",
+          "VCGC-REQ077",
+          "VCGC-REQ080"
+        ],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "test",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF006-STP001",
+          "alias": "via_ssot_autocode",
+          "item": "via_ssot_autocode"
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_ssot_autocode_governance(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_ssot_autocode_governance"
+    },
+    {
+      "code": "VCGC-WKF007",
+      "alias": "via_accelerator_control",
+      "name": "VIA 25 項加速器線控(PS roster→Python bootstrap→Celeritas/Aegis mount→證據矩陣)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "25 項加速器線控(PS roster → bootstrap → mount → 證據)",
+        "requirements": [],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "test",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF007-STP001",
+          "alias": "via_accelerator_control",
+          "item": "via_accelerator_control"
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_accelerator_control(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_accelerator_control"
+    },
+    {
+      "code": "VCGC-WKF008",
+      "alias": "via_unique_entry_control",
+      "name": "VIA 唯一接觸口控制(VIA command book→CGC157→VRN/VDF/QuantGuard)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "唯一接觸口(VIA command book → CGC157 → 三家族)",
+        "requirements": [],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "test",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF008-STP001",
+          "alias": "via_unique_entry_control",
+          "item": "via_unique_entry_control"
+        },
+        {
+          "code": "VCGC-WKF008-STP002",
+          "alias": "vrn_dispatch",
+          "item": "vrn_dispatch"
+        },
+        {
+          "code": "VCGC-WKF008-STP003",
+          "alias": "vdf_dispatch",
+          "item": "vdf_dispatch"
+        },
+        {
+          "code": "VCGC-WKF008-STP004",
+          "alias": "quantguard_dispatch",
+          "item": "quantguard_dispatch"
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_unique_entry_control(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_unique_entry_control"
+    },
+    {
+      "code": "VCGC-WKF009",
+      "alias": "via_panorama_chain",
+      "name": "全景稽核修復鏈(唯一接觸口閘 → 全景 AST 稽核與純增量修 → 中央三家族派送;批535)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "全景稽核修復鏈(唯一接觸口閘 → AST 稽核 → 純增量修)",
+        "requirements": [
+          "VCGC-REQ032",
+          "VCGC-REQ068"
+        ],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "run",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF009-STP001",
+          "alias": "via_unique_entry_control",
+          "item": "via_unique_entry_control"
+        },
+        {
+          "code": "VCGC-WKF009-STP002",
+          "alias": "via_panorama_audit",
+          "item": "via_panorama_audit"
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_panorama_chain(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_panorama_chain"
+    },
+    {
+      "code": "VCGC-WKF010",
+      "alias": "via_unified_nlp_pipeline",
+      "name": "VIA 統一 NLP 強化鏈(Hub→文字正規化／表格／版面／角色／證據摘要→VRN→VDF；附件 adapter 受控)",
+      "kind": "item_chain",
+      "spec": {
+        "goal": "統一 NLP 強化鏈(Hub → 正規化 · 表格 · 版面 · 證據摘要 → VRN → VDF)",
+        "requirements": [],
+        "acceptance": [
+          "各項 rc 0 或誠實四態(GATED/NODATA 附原因)",
+          "net 項同意閘未開 = GATED 不算紅"
+        ]
+      },
+      "plan": {
+        "runner": "中央匯流排 call --item(CGC_MDL148 EngineBus);引擎與參數的正主 = VIA_InputConsole_Spec 項(本冊只記項序)",
+        "profile": "test",
+        "order": "依序;net 項要操作員同意閘(L07/L08)"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF010-STP001",
+          "alias": "via_unified_nlp",
+          "item": "via_unified_nlp"
+        },
+        {
+          "code": "VCGC-WKF010-STP002",
+          "alias": "vrn_nlp_vrn_vdf_pipeline",
+          "item": "vrn_nlp_vrn_vdf_pipeline"
+        }
+      ],
+      "tests": {
+        "self": "每項引擎尾版 --selftest(經 via-vcgc run)",
+        "cross": [
+          "X-ITEM",
+          "X-OLD"
+        ],
+        "real": "via-console run --workflow via_unified_nlp_pipeline(或逐項 call --item)"
+      },
+      "from": "VIA_Workflow_SSOT_v0100.json#via_unified_nlp_pipeline"
+    },
+    {
+      "code": "VCGC-WKF011",
+      "alias": "handoff_continuity",
+      "name": "交接防遺漏與成功證據沿用",
+      "kind": "procedure",
+      "spec": {
+        "goal": "交接防遺漏與成功證據沿用",
+        "requirements": [
+          "VCGC-REQ075",
+          "VCGC-REQ076"
+        ],
+        "acceptance": [
+          "不修改凍結成功擷取",
+          "交接／驗收分開判定",
+          "缺件或證據過期不假綠"
+        ]
+      },
+      "plan": {
+        "enter": "VCGC",
+        "exit": "VCGC",
+        "order": "照 STP 序；不新增另一個工作流執行者"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF011-STP001",
+          "alias": "check",
+          "name": "交接前核對",
+          "engine": "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py",
+          "verb": "check",
+          "inside": "VCGC run / Manager",
+          "evidence": "self:CGC_MDL140_HandoverConsole",
+          "what": "交接前核對；依正主留存證據，未執行者維持 pending"
+        },
+        {
+          "code": "VCGC-WKF011-STP002",
+          "alias": "test",
+          "name": "相依變更才重新實測",
+          "engine": "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py",
+          "verb": "test <case>",
+          "inside": "VCGC run / Manager",
+          "evidence": "self:CGC_MDL140_HandoverConsole",
+          "what": "相依變更才重新實測；依正主留存證據，未執行者維持 pending"
+        },
+        {
+          "code": "VCGC-WKF011-STP003",
+          "alias": "checkpoint",
+          "name": "保存交接快照與待辦",
+          "engine": "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py",
+          "verb": "checkpoint",
+          "inside": "VCGC run / Manager",
+          "evidence": "self:CGC_MDL140_HandoverConsole",
+          "what": "保存交接快照與待辦；依正主留存證據，未執行者維持 pending"
+        }
+      ],
+      "tests": {
+        "self": "經 VCGC 的 --selftest",
+        "cross": [
+          "X-ENGINE",
+          "X-REG",
+          "X-NUM",
+          "X-ACCEL"
+        ],
+        "real": "docs/handoff/evidence；完整樣本驗收仍按 pending 清單"
+      }
+    },
+    {
+      "code": "VCGC-WKF012",
+      "alias": "panorama_monitor",
+      "name": "全景監控 · AUTO SYNC · 交接閘",
+      "kind": "procedure",
+      "spec": {
+        "goal": "只讀全景 → 即時儀表板 → VCGC ↔ 子系統自動同步 → 教訓學習 → 交接閘 → 全綠閘(全綠才往下)· 母子自動連接 → 寫入前衝突阻擋 · 執行監控(VCGC 不改 VDF / VRN 正本)",
+        "requirements": [
+          "VCGC-REQ102",
+          "VCGC-REQ103",
+          "VCGC-REQ104",
+          "VCGC-REQ105",
+          "VCGC-REQ106",
+          "VCGC-REQ107",
+          "VCGC-REQ110",
+          "VCGC-REQ112",
+          "VCGC-REQ113"
+        ],
+        "acceptance": [
+          "不寫目標 · 不執行目標 · 報告不含原文",
+          "--apply 不自動下(同意閘)",
+          "黃不是綠:量不到寫 ABSENT"
+        ]
+      },
+      "plan": {
+        "enter": "VCGC",
+        "exit": "VCGC",
+        "order": "照 STP 序;背景監控單例,閒置自停"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF012-STP001",
+          "alias": "scan",
+          "name": "只讀全景掃描",
+          "engine": "supportive modules/registry/VIA_Panorama_v*.py",
+          "verb": "scan [目標] [--static]",
+          "inside": "VCGC monitor(v0181)/ 每個 VCGC 動作收尾 autostart",
+          "evidence": "self:VIA_Panorama",
+          "what": "A–H 段矩陣 · 省 Token 卡 · 304 不重掃"
+        },
+        {
+          "code": "VCGC-WKF012-STP002",
+          "alias": "watch",
+          "name": "即時儀表板",
+          "engine": "supportive modules/registry/VIA_Panorama_v*.py",
+          "verb": "watch --autosync / dashboard",
+          "inside": "VCGC monitor(v0181)/ 每個 VCGC 動作收尾 autostart",
+          "evidence": "self:VIA_Panorama",
+          "what": "每輪 304 不重掃 · 頁面自己重新載入 · LIVE LOG"
+        },
+        {
+          "code": "VCGC-WKF012-STP003",
+          "alias": "sync",
+          "name": "VCGC ↔ 子系統同步探針",
+          "engine": "supportive modules/registry/VIA_Panorama_v*.py",
+          "verb": "sync",
+          "inside": "VCGC monitor(v0181)/ 每個 VCGC 動作收尾 autostart",
+          "evidence": "self:VIA_Panorama",
+          "what": "sync-check + ssot panorama(唯讀 · 加速器並行)· 待批准指令"
+        },
+        {
+          "code": "VCGC-WKF012-STP004",
+          "alias": "lessons",
+          "name": "教訓學習",
+          "engine": "supportive modules/registry/VIA_Panorama_v*.py",
+          "verb": "lessons",
+          "inside": "VCGC monitor(v0181)/ 每個 VCGC 動作收尾 autostart",
+          "evidence": "self:VIA_Panorama",
+          "what": "前後比對記教訓 · 再犯 · MTTR · 共病群 · 建議"
+        },
+        {
+          "code": "VCGC-WKF012-STP005",
+          "alias": "state",
+          "name": "交接閘",
+          "engine": "supportive modules/registry/VIA_Panorama_v*.py",
+          "verb": "state",
+          "inside": "VCGC monitor(v0181)/ 每個 VCGC 動作收尾 autostart",
+          "evidence": "self:VIA_Panorama",
+          "what": "交接快照落後 · 改過的程式有沒有登冊 · 收尾指令"
+        },
+        {
+          "code": "VCGC-WKF012-STP006",
+          "alias": "closeout",
+          "name": "VCGC 一指令收尾",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "closeout [--apply] [--push]",
+          "inside": "VCGC(v0182)",
+          "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+          "what": "交接閘 → 自動算重測案 → handoff test → registry-sync → 編號 → SDD → checkpoint → 提交 → push;寫冊 / 推送要明打旗標"
+        },
+        {
+          "code": "VCGC-WKF012-STP007",
+          "alias": "gate",
+          "name": "VCGC 全綠閘",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "gate [--json] [--only …]",
+          "inside": "VCGC(v0185)",
+          "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+          "what": "七探針並行(交接 · 串測 · SSOT 全景 · SDD · 編號 · GitHub 對齊 · 母子連接)全綠才 GREEN;非綠分 AUTO / RUN / ENV / OPERATOR"
+        },
+        {
+          "code": "VCGC-WKF012-STP008",
+          "alias": "link",
+          "name": "母子自動連接",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "link [--apply]",
+          "inside": "VCGC(v0185)",
+          "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+          "what": "需求 → 工作流 / 步沒回指的,補進子系統工作流冊新版 spec.requirements(只增 · prior 指回)"
+        },
+        {
+          "code": "VCGC-WKF012-STP009",
+          "alias": "guard",
+          "name": "寫入前衝突閘",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "guard(寫入動作自動先過)",
+          "inside": "VCGC(v0186)",
+          "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+          "what": "衝突哨兵 · GitHub 撞號 · 子系統邊界;有衝突不寫入,沒有繞過開關"
+        },
+        {
+          "code": "VCGC-WKF012-STP010",
+          "alias": "exec",
+          "name": "執行監控",
+          "engine": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+          "verb": "exec [--last N]",
+          "inside": "VCGC(v0186)",
+          "evidence": "self:CGC_MDL149_VeritasCentralGovernanceConsole",
+          "what": "每個動詞記 寫入 · 閘判 · rc · 秒數 · 越界(只增帳);全綠閘多執行監控探針"
+        }
+      ],
+      "tests": {
+        "self": "經 VCGC 的 --selftest(交接案 monitor)",
+        "cross": [
+          "X-ENGINE",
+          "X-REG",
+          "X-NUM",
+          "X-ACCEL"
+        ],
+        "real": "docs/handoff/evidence/monitor.json;Windows 背景脫離實測仍 pending(VCGC-REQ105)"
+      }
+    },
+    {
+      "code": "VCGC-WKF013",
+      "alias": "vqg_polars_tools",
+      "name": "VQG Polars / SSOT / 本地工具驗證",
+      "kind": "procedure",
+      "spec": {
+        "goal": "以中央入口驗證候選計算與編號、保留異常與部署阻擋",
+        "requirements": [
+          "VCGC-REQ132"
+        ],
+        "acceptance": [
+          "TA-Lib import=0",
+          "來源分立／重跑保號／新版增列",
+          "Polars 三解不合併 DIVERGE",
+          "原始列不得出閘",
+          "Windows 車道與真庫未驗不得綠燈結案"
+        ]
+      },
+      "plan": {
+        "enter": "VCGC",
+        "exit": "VCGC",
+        "order": "token → functions → handoff → test → ssot panorama → per-engine tests → scoped numbering → audit → SDD → checkpoint"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF013-STP001",
+          "alias": "指標與缺值驗證",
+          "name": "指標與缺值驗證",
+          "engine": "functional modules/VDF/engine/VDF_ENG086_QuantGuardOneBridge_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:VDF_ENG086_QuantGuardOneBridge",
+          "what": "指標與缺值驗證",
+          "evidence_artifact": "docs/handoff/VQG_TOOLS_20261003/evidence.json"
+        },
+        {
+          "code": "VCGC-WKF013-STP002",
+          "alias": "編號與正規化",
+          "name": "編號與正規化",
+          "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:CGC_MDL237_NumberingSystem",
+          "what": "編號與正規化",
+          "evidence_artifact": "docs/handoff/VQG_TOOLS_20261003/evidence.json"
+        },
+        {
+          "code": "VCGC-WKF013-STP003",
+          "alias": "估值自測介面",
+          "name": "估值自測介面",
+          "engine": "functional modules/VDF/engine/VDF_ENG117_ForwardVintage_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:VDF_ENG117_ForwardVintage",
+          "what": "估值自測介面",
+          "evidence_artifact": "docs/handoff/VQG_TOOLS_20261003/evidence.json"
+        },
+        {
+          "code": "VCGC-WKF013-STP004",
+          "alias": "來源完整性",
+          "name": "來源完整性",
+          "engine": "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:VDF_ENG117_ForwardVintageDoor",
+          "what": "來源完整性",
+          "evidence_artifact": "docs/handoff/VQG_TOOLS_20261003/evidence.json"
+        },
+        {
+          "code": "VCGC-WKF013-STP005",
+          "alias": "隔離憑證解析自測",
+          "name": "隔離憑證解析自測",
+          "engine": "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:VDF_ENG110_USMacroProbe",
+          "what": "隔離憑證解析自測",
+          "evidence_artifact": "docs/handoff/VQG_TOOLS_20261003/evidence.json"
+        }
+      ],
+      "tests": {
+        "self": "五支候選引擎各自 --selftest",
+        "cross": [
+          "X-REQ-BACK",
+          "X-ENGINE",
+          "X-REG",
+          "X-NUM",
+          "X-ACCEL"
+        ],
+        "real": "Windows 車道與正式來源綁定待驗",
+        "real_run": "VQG production gated"
+      }
+    },
+    {
+      "code": "VCGC-WKF014",
+      "alias": "ssot_asset_intake",
+      "name": "SSOT 候選資產衝突檢查與中央註冊",
+      "kind": "procedure",
+      "spec": {
+        "goal": "候選無號；不衝突才經既有中央發號；無法證明者待審",
+        "requirements": [
+          "VCGC-REQ133"
+        ],
+        "acceptance": [
+          "來源分立",
+          "同版本不可改定義",
+          "Regex 證明不足不綠",
+          "TA-Lib 禁用",
+          "編號不等於部署通過"
+        ]
+      },
+      "plan": {
+        "enter": "VCGC",
+        "exit": "VCGC",
+        "order": "assets-plan → commit → scoped apply → audit → SDD → handoff"
+      },
+      "steps": [
+        {
+          "code": "VCGC-WKF014-STP001",
+          "alias": "資產衝突測試",
+          "name": "候選驗證",
+          "engine": "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py",
+          "verb": "--selftest",
+          "inside": "VCGC run",
+          "evidence": "self:CGC_MDL237_NumberingSystem",
+          "what": "validate candidate conflicts and numbering",
+          "evidence_artifact": "docs/handoff/SSOT_INTAKE_20261003/evidence.json"
+        }
+      ],
+      "tests": {
+        "self": "CGC_MDL237 --selftest",
+        "cross": [
+          "X-NUM",
+          "X-REG",
+          "X-REQ-BACK"
+        ],
+        "real": "Windows 主機與其他舊版寫入者並行驗證未完成",
+        "real_run": "不開正式庫、不啟用指標策略"
+      }
+    }
+  ],
+  "prior": "VIA_Workflow_VCGC_SSOT_v0114.json",
+  "why_v0101": "VCGC-WKF008/009 的已知未綠移除:唯一接觸口 CGC_MDL157 v0106 沿命令冊 dot-source 鏈讀 + 撞號以編號系統唯一碼為準 + 補 15 支缺梭 → 29/29 GREEN",
+  "why_v0103": "側線 i:+VCGC-WKF001-STP007 SSOT 全景(CGC_MDL247);需求回指補齊(REQ072→WKF001 · REQ073→WKF004,SDD v0104 X-REQ-BACK 量到的單向);新需求 REQ077–082 掛上;其餘步與工作流一字不動",
+  "why_v0104": "側線 2026-09-30 a:VCGC-REQ084 回指(WKF001 · WKF003)· STP005 / WKF003-STP006 記只登本批與註冊完整性稽核;代碼 · 步序 · 正主一律不動",
+  "why_v0105": "側線 2026-09-30 b:VCGC-REQ085 → WKF001-STP008 VCGC 全功能串測(正主 CGC_MDL224_TestAuto 尾版);既有代碼 · 步序 · 正主一律不動",
+  "why_v0106": "側線 2026-10-01:+VCGC-WKF012 panorama_monitor(5 步;回指 VCGC-REQ102~092);其餘 11 條一字不動",
+  "why_v0107": "側線 2026-10-01:VCGC-WKF012 +STP006 closeout(回指 VCGC-REQ107);其餘一字不動",
+  "why_v0108": "VCGC-WKF012 +STP007 gate(全綠閘)· STP008 link(母子自動連接)(VCGC v0185;VCGC-REQ110);其餘一字不動",
+  "why_v0109": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VCGC-WKF001 ← VCGC-REQ088, VCGC-REQ089, VCGC-REQ090, VCGC-REQ091 · VCGC-WKF012 ← VCGC-REQ110;其餘一字不動",
+  "why_v0110": "VCGC-WKF012 +STP009 guard(寫入前衝突閘)· STP010 exec(執行監控)(VCGC v0186;VCGC-REQ112,含回指);其餘一字不動",
+  "why_v0111": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VCGC-WKF012 ← VCGC-REQ113;其餘一字不動",
+  "why_v0114": "Evidence tokens use validator self:<engine stem>; artifact location is separate.",
+  "why_v0115": "REQ133 candidate conflict gate and existing central number allocation"
+}

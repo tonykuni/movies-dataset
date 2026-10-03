@@ -1,0 +1,658 @@
+{
+  "ssot_id": "VIA_QuantGuard_Indicator_SSOT_v0101",
+  "version": "1.0.1",
+  "batch": "QG-SSOT-20260929",
+  "built_at": "2026-09-29T11:44:31.238962+00:00",
+  "talib": "forbidden",
+  "price_input": "adj_close",
+  "egress": "derived_only",
+  "min_solutions": 3,
+  "indicators": [
+    {
+      "id": "summary",
+      "family": "level",
+      "inputs": [
+        "adj_close"
+      ],
+      "formula": "latest, min, max, mean, pstdev of finite adj_close",
+      "function": "describe_level",
+      "pros": [
+        "不需視窗",
+        "可檢查尺度與零價"
+      ],
+      "cons": [
+        "全樣本平均含早期體制",
+        "不能代表當下結構"
+      ],
+      "invalid_when": [
+        "無有效價格",
+        "價格含非有限值"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "strict_finite",
+          "method": "只納入有限正價格；空集合回 null"
+        },
+        {
+          "id": "S2",
+          "name": "median_level",
+          "method": "用 median / MAD 描述位置，降低跳空影響"
+        },
+        {
+          "id": "S3",
+          "name": "last_valid_only",
+          "method": "只報告最後有效價與有效筆數，不做分布"
+        }
+      ],
+      "stable_id": "VQG.IND.SUMMARY",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=summary]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "returns",
+      "family": "return",
+      "inputs": [
+        "adj_close"
+      ],
+      "formula": "simple = p_t/p_{t-1}-1 ; log = ln(p_t/p_{t-1})",
+      "function": "returns_pair",
+      "pros": [
+        "尺度無關",
+        "可跨標的比較"
+      ],
+      "cons": [
+        "前值為 0 或 null 時無定義",
+        "簡單報酬不可加總跨多期"
+      ],
+      "invalid_when": [
+        "前一有效價缺失",
+        "前一價 <= 0",
+        "中間有 null 仍被前值填補"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "simple_strict",
+          "method": "只對相鄰有效交易日計算；缺日兩側都 null"
+        },
+        {
+          "id": "S2",
+          "name": "log_strict",
+          "method": "同樣相鄰約束下取對數報酬"
+        },
+        {
+          "id": "S3",
+          "name": "gap_aware_hold",
+          "method": "缺日不填價；跨缺日報酬另欄 gap_return，不混入連續報酬"
+        }
+      ],
+      "stable_id": "VQG.IND.RETURNS",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=returns]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "sma",
+      "family": "trend",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "SMA_n(t) = mean(p_{t-n+1..t})",
+      "function": "sma_triplet",
+      "pros": [
+        "定義穩定",
+        "可重複"
+      ],
+      "cons": [
+        "滯後",
+        "未滿視窗無定義",
+        "對跳空等權"
+      ],
+      "invalid_when": [
+        "有效樣本 < n",
+        "視窗內有 null 卻被前值填上"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "strict_window",
+          "method": "未滿 n 或視窗內有 null 則 null"
+        },
+        {
+          "id": "S2",
+          "name": "expanding_flagged",
+          "method": "未滿 n 用擴張均值並標記 partial=true，滿窗後等同 S1"
+        },
+        {
+          "id": "S3",
+          "name": "clean_remap",
+          "method": "先剔除 null 再算滿窗 SMA，映回原時間軸；coverage < 1 則標記"
+        }
+      ],
+      "stable_id": "VQG.IND.SMA",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=sma]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "ema",
+      "family": "trend",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "EMA_t = alpha*p_t + (1-alpha)*EMA_{t-1}, alpha=2/(n+1)",
+      "function": "ema_triplet",
+      "pros": [
+        "較 SMA 敏感",
+        "因果"
+      ],
+      "cons": [
+        "種子定義會改變前段",
+        "未滿種子視窗不穩定"
+      ],
+      "invalid_when": [
+        "有效點 < n",
+        "種子用了未來值"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "sma_seed",
+          "method": "前 n 根 SMA 當種子，之前 null"
+        },
+        {
+          "id": "S2",
+          "name": "first_price_seed",
+          "method": "第一有效價當種子，標記 seed=first_price"
+        },
+        {
+          "id": "S3",
+          "name": "wilder_alpha",
+          "method": "alpha=1/n 的 Wilder 平滑；未滿 n 為 null"
+        }
+      ],
+      "stable_id": "VQG.IND.EMA",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=ema]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "volatility",
+      "family": "risk",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "stdev of simple returns over n",
+      "function": "vol_triplet",
+      "pros": [
+        "只需要收盤",
+        "可比較"
+      ],
+      "cons": [
+        "未年化以免混用交易曆",
+        "高低價資訊未用",
+        "樣本數 < 2 無定義"
+      ],
+      "invalid_when": [
+        "報酬樣本 < 2",
+        "價格零或 null",
+        "誤把 0 量當波動"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "sample_simple",
+          "method": "簡單報酬樣本標準差，未滿窗 null，不年化"
+        },
+        {
+          "id": "S2",
+          "name": "population_simple",
+          "method": "母體標準差；與 S1 的理論比為 sqrt(n/(n-1))"
+        },
+        {
+          "id": "S3",
+          "name": "log_or_robust",
+          "method": "對數報酬樣本標準差；若高低價齊備改 Parkinson，否則維持 log"
+        }
+      ],
+      "stable_id": "VQG.IND.VOLATILITY",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=volatility]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "zscore",
+      "family": "level",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "(p_t - mean_n) / stdev_n",
+      "function": "zscore_triplet",
+      "pros": [
+        "無量綱",
+        "可跨標的看偏離"
+      ],
+      "cons": [
+        "std=0 時無定義",
+        "非常態時尾部失真"
+      ],
+      "invalid_when": [
+        "視窗未滿",
+        "標準差為 0",
+        "null 被填成常數後假裝 std=0"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "sample_null_if_flat",
+          "method": "樣本標準差；std=0 回 null"
+        },
+        {
+          "id": "S2",
+          "name": "population_zero_if_flat",
+          "method": "母體標準差；價格等於均值且 std=0 回 0 並標記 flat"
+        },
+        {
+          "id": "S3",
+          "name": "mad_robust",
+          "method": "0.6745*(p-median)/MAD；MAD=0 回 null"
+        }
+      ],
+      "stable_id": "VQG.IND.ZSCORE",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=zscore]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "rsi",
+      "family": "momentum",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 14,
+      "formula": "RSI = 100 - 100/(1+avg_gain/avg_loss)",
+      "function": "rsi_triplet",
+      "pros": [
+        "有界 0–100",
+        "普遍可對照"
+      ],
+      "cons": [
+        "平滑定義分歧",
+        "單邊行情損失為 0 時飽和",
+        "平坦序列無資訊"
+      ],
+      "invalid_when": [
+        "變動樣本 < n",
+        "avg_loss=0",
+        "價格平坦",
+        "用了未來平滑"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "wilder",
+          "method": "Wilder 平滑；損失為 0 且有漲幅時 100，全平回 null"
+        },
+        {
+          "id": "S2",
+          "name": "cutler_sma",
+          "method": "增益與損失取 SMA，不滿窗 null"
+        },
+        {
+          "id": "S3",
+          "name": "explicit_null_on_saturation",
+          "method": "同 Cutler，但損失為 0 或全平時回 null，不輸出 100/50 冒充訊號"
+        }
+      ],
+      "stable_id": "VQG.IND.RSI",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=rsi]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "macd",
+      "family": "momentum",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 26,
+      "formula": "MACD = EMA12-EMA26 ; signal = EMA9(MACD)",
+      "function": "macd_triplet",
+      "pros": [
+        "趨勢與柱狀可同時描述"
+      ],
+      "cons": [
+        "參數慣例不是定律",
+        "短樣本種子敏感",
+        "不是超買超賣計數"
+      ],
+      "invalid_when": [
+        "樣本 < 26",
+        "信號線樣本不足",
+        "種子使用未來"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "ema_12_26_9",
+          "method": "標準 EMA MACD，未滿 26+信號暖機則 signal null"
+        },
+        {
+          "id": "S2",
+          "name": "sma_12_26_9",
+          "method": "SMA 差與 SMA 信號，定義不同，只供分歧檢測"
+        },
+        {
+          "id": "S3",
+          "name": "withhold_if_short",
+          "method": "樣本不足或三解分歧超公差則整組 null，不外推"
+        }
+      ],
+      "stable_id": "VQG.IND.MACD",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=macd]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "bollinger",
+      "family": "range",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "mid = SMA_n ; band = mid +/- k*stdev",
+      "function": "bollinger_triplet",
+      "pros": [
+        "同時給位置與寬度"
+      ],
+      "cons": [
+        "k=2 是慣例",
+        "std=0 時上下軌重合",
+        "需滿窗"
+      ],
+      "invalid_when": [
+        "有效樣本 < n",
+        "std=0",
+        "null 填補後寬度失真"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "sample_k2",
+          "method": "SMA 與樣本標準差，k=2，未滿窗 null"
+        },
+        {
+          "id": "S2",
+          "name": "population_k2",
+          "method": "改用母體標準差，寬度略窄"
+        },
+        {
+          "id": "S3",
+          "name": "robust_mad",
+          "method": "中位數 +/- 2*1.4826*MAD；MAD=0 回 null"
+        }
+      ],
+      "stable_id": "VQG.IND.BOLLINGER",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=bollinger]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "roc",
+      "family": "momentum",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "ROC_n = p_t/p_{t-n}-1",
+      "function": "roc_triplet",
+      "pros": [
+        "視窗固定",
+        "可比"
+      ],
+      "cons": [
+        "基期為 0 無定義",
+        "中間缺日會偷換基期"
+      ],
+      "invalid_when": [
+        "t-n 缺失",
+        "基期 <= 0",
+        "用更早價格冒充 t-n"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "simple_fixed_lag",
+          "method": "只在恰好 n 根前有有效價時計算"
+        },
+        {
+          "id": "S2",
+          "name": "log_fixed_lag",
+          "method": "同 lag 的對數報酬"
+        },
+        {
+          "id": "S3",
+          "name": "reject_stale_base",
+          "method": "基期缺失即 null，禁止改抓更早價格"
+        }
+      ],
+      "stable_id": "VQG.IND.ROC",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=roc]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "slope",
+      "family": "trend",
+      "inputs": [
+        "adj_close"
+      ],
+      "window": 20,
+      "formula": "OLS slope of adj_close on 0..n-1",
+      "function": "slope_triplet",
+      "pros": [
+        "給出每根的價格斜率"
+      ],
+      "cons": [
+        "對離群敏感",
+        "未取對數時受價位尺度影響"
+      ],
+      "invalid_when": [
+        "有效點 < 3",
+        "x 無變異",
+        "缺日被重編號後假裝等距"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "ols_price",
+          "method": "等距交易日 OLS；視窗內有缺日則 null"
+        },
+        {
+          "id": "S2",
+          "name": "ols_log",
+          "method": "對 ln(price) 做 OLS，單位改為對數斜率"
+        },
+        {
+          "id": "S3",
+          "name": "theil_sen",
+          "method": "兩兩斜率中位數；少於 3 點 null"
+        }
+      ],
+      "stable_id": "VQG.IND.SLOPE",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=slope]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "drawdown",
+      "family": "risk",
+      "inputs": [
+        "adj_close"
+      ],
+      "formula": "p_t/running_peak - 1, peak causal",
+      "function": "drawdown_triplet",
+      "pros": [
+        "路徑依賴清楚",
+        "不需外部基準"
+      ],
+      "cons": [
+        "峰值起點會改變數值",
+        "缺日若沿用舊峰值需標記"
+      ],
+      "invalid_when": [
+        "無正價格",
+        "缺日後仍無標記沿用峰值"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "causal_peak",
+          "method": "峰值只含當下與過去有效價"
+        },
+        {
+          "id": "S2",
+          "name": "window_peak_20",
+          "method": "只在近 20 個有效價內取峰值"
+        },
+        {
+          "id": "S3",
+          "name": "reset_on_gap",
+          "method": "價格缺日後峰值重設，不跨缺口沿用"
+        }
+      ],
+      "stable_id": "VQG.IND.DRAWDOWN",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=drawdown]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "volume_zscore",
+      "family": "volume",
+      "inputs": [
+        "volume",
+        "daytrade_volume",
+        "market"
+      ],
+      "window": 20,
+      "formula": "zscore of clean_volume",
+      "function": "volume_triplet",
+      "pros": [
+        "把當沖從台股量移除",
+        "可看相對熱度"
+      ],
+      "cons": [
+        "當沖大於總量時來源壞掉",
+        "量不可填補",
+        "不等於資金流"
+      ],
+      "invalid_when": [
+        "daytrade > volume",
+        "volume null",
+        "視窗未滿",
+        "std=0"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "clean_sample_z",
+          "method": "台股扣當沖；壞列 null；樣本 z"
+        },
+        {
+          "id": "S2",
+          "name": "log1p_z",
+          "method": "對 log1p(clean_volume) 做樣本 z，減輕右偏"
+        },
+        {
+          "id": "S3",
+          "name": "robust_or_null",
+          "method": "MAD z；全零或壞列比例過高則整窗 null"
+        }
+      ],
+      "stable_id": "VQG.IND.VOLUME_ZSCORE",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=volume_zscore]",
+      "central_number": "PENDING_CGC_MDL237"
+    },
+    {
+      "id": "beta",
+      "family": "relative",
+      "inputs": [
+        "adj_close",
+        "benchmark_adj_close"
+      ],
+      "window": 20,
+      "formula": "beta = cov(r, r_b) / var(r_b)",
+      "function": "beta_triplet",
+      "pros": [
+        "描述相對基準的同向程度"
+      ],
+      "cons": [
+        "基準缺失不可用別的市場頂替",
+        "基準無波動時無定義"
+      ],
+      "invalid_when": [
+        "基準序列缺失",
+        "基準變異為 0",
+        "日期未對齊卻強行內積"
+      ],
+      "solutions": [
+        {
+          "id": "S1",
+          "name": "aligned_ols",
+          "method": "僅在兩邊都有有效報酬的日期計算"
+        },
+        {
+          "id": "S2",
+          "name": "downside_beta",
+          "method": "只取基準報酬 < 0 的子集；子集 < 5 則 null"
+        },
+        {
+          "id": "S3",
+          "name": "withhold_if_no_benchmark",
+          "method": "無基準或市場錯配則 null，禁止用美股填台股"
+        }
+      ],
+      "stable_id": "VQG.IND.BETA",
+      "lifecycle": "CANDIDATE_OFFLINE",
+      "library": "POLARS",
+      "source_identity": "VIA_QuantGuard_Indicator_SSOT_v0100(1).json#indicators[id=beta]",
+      "central_number": "PENDING_CGC_MDL237"
+    }
+  ],
+  "prior": "VIA_QuantGuard_Indicator_SSOT_v0100",
+  "lifecycle": "CANDIDATE_OFFLINE",
+  "source_attachment_sha256": "6325aabed77c1a0f0612a8f07cc272a37b5882c776d1458011c38e391ea951b5",
+  "engine": "VDF_ENG086_QuantGuardOneBridge",
+  "implementation": "polars",
+  "comparison_policy": "Compare only like quantities after explicit unit transforms; no automatic consensus across different estimators.",
+  "implementation_clarifications": [
+    "summary S3 latest price is withheld at the application boundary because raw cell egress is forbidden; aggregate mean/median remain available.",
+    "EMA resets and reseeds after null; no null compression for S1/S2/S3.",
+    "MACD S3 compares S1/S2 componentwise using rtol 1e-6, atol 1e-10, and withholds on divergence.",
+    "ROC output is a fraction, not percent; log ROC has a distinct unit.",
+    "RSI flat= null; S1/S2 up-only=100; S3 saturation=null.",
+    "SMA S3 and drawdown S2 explicitly report valid-bar compression; slope S2 uses log-price units.",
+    "Input must carry a contiguous official session_index from VDF; absent calendar or omitted sessions blocks computation.",
+    "Default windows 5/10/20/60/120/240 are available per request; RSI default 14; max 252."
+  ]
+}

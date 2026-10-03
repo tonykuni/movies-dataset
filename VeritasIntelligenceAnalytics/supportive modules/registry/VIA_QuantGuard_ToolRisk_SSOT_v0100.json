@@ -1,0 +1,158 @@
+{
+  "version": "1.0.0",
+  "status": "CANDIDATE_OFFLINE",
+  "requirement": "VCGC-REQ132",
+  "built_at": "2026-10-03T09:54:03.714348+00:00",
+  "risks": [
+    {
+      "id": "VQG.RISK.001",
+      "risk": "資料污染",
+      "control": "strict schema + price finite/positive + duplicate reject",
+      "status": "TESTED",
+      "correction": "不得將 ±10.5% 作所有商品硬閘；需商品制度與企業行動證據"
+    },
+    {
+      "id": "VQG.RISK.002",
+      "risk": "正則回溯",
+      "control": "Polars literal matching / DuckDB RE2 anchored regex",
+      "status": "TESTED",
+      "correction": "禁止任意外來 regex，自訂模式另經冊審核"
+    },
+    {
+      "id": "VQG.RISK.003",
+      "risk": "血緣斷裂",
+      "control": "source identity + definition SHA256 + append-only central assign",
+      "status": "TESTED",
+      "correction": "相同內容不同來源仍分號"
+    },
+    {
+      "id": "VQG.RISK.004",
+      "risk": "記憶體",
+      "control": "max input 5000 / output 100 / max window252",
+      "status": "PARTIAL",
+      "correction": "大型資料由 VDF LazyFrame / DuckDB 分區；未量測大資料 RAM"
+    },
+    {
+      "id": "VQG.RISK.005",
+      "risk": "存活者偏差",
+      "control": "point-in-time universe",
+      "status": "PENDING",
+      "correction": "需含下市櫃歷史；附件 roster 未證實"
+    },
+    {
+      "id": "VQG.RISK.006",
+      "risk": "前視偏差",
+      "control": "causal prefix invariance",
+      "status": "PARTIAL",
+      "correction": "US→TW 用 available_at+交易曆；不是所有運算 shift(1)"
+    },
+    {
+      "id": "VQG.RISK.007",
+      "risk": "過擬合",
+      "control": "walk-forward/OOS",
+      "status": "PENDING",
+      "correction": "不得將離線公式測試當策略有效"
+    },
+    {
+      "id": "VQG.RISK.008",
+      "risk": "分群失真",
+      "control": "leader/peer/lagger separate indices",
+      "status": "PENDING",
+      "correction": "50/35/15僅提案；流動性門檻動態且歷史可得"
+    },
+    {
+      "id": "VQG.RISK.009",
+      "risk": "滑價",
+      "control": "cost/impact/participation model",
+      "status": "PENDING",
+      "correction": "本輪不下單、不提供實單介面"
+    },
+    {
+      "id": "VQG.RISK.010",
+      "risk": "跳空",
+      "control": "same corporate action basis for OHLC",
+      "status": "PENDING",
+      "correction": "Adj 價與實際成交金額口徑分開"
+    },
+    {
+      "id": "VQG.RISK.011",
+      "risk": "處置股",
+      "control": "restriction flags / signal mask",
+      "status": "PENDING",
+      "correction": "資料源需正式驗證"
+    },
+    {
+      "id": "VQG.RISK.012",
+      "risk": "API延遲",
+      "control": "offline guard",
+      "status": "PARTIAL",
+      "correction": "重試與備援在 VDF；VQG 不自行觸網"
+    },
+    {
+      "id": "VQG.RISK.013",
+      "risk": "AST雪崩",
+      "control": "new version only + syntax/compile/import evidence",
+      "status": "PARTIAL",
+      "correction": "原成功來源未改；Windows整鏈仍待測"
+    },
+    {
+      "id": "VQG.RISK.014",
+      "risk": "LLM幻覺",
+      "control": "schema+source hashes+review candidate",
+      "status": "PARTIAL",
+      "correction": "模糊候選不得自動改身分；AST不是安全沙盒"
+    },
+    {
+      "id": "VQG.RISK.015",
+      "risk": "相依衝突",
+      "control": "bounded dependencies and probes",
+      "status": "PARTIAL",
+      "correction": "測試版本記錄；可選庫缺席不假裝啟用"
+    },
+    {
+      "id": "VQG.RISK.016",
+      "risk": "SDD漂移",
+      "control": "REQ132 / WKF013 / inventory links",
+      "status": "PARTIAL",
+      "correction": "既有 SDD 紅燈保留"
+    },
+    {
+      "id": "VQG.RISK.017",
+      "risk": "權限越界",
+      "control": "production binding fail-closed",
+      "status": "TESTED",
+      "correction": "env entry marker不是安全認證"
+    },
+    {
+      "id": "VQG.RISK.018",
+      "risk": "敏感資料",
+      "control": "derived output / status whitelist",
+      "status": "TESTED",
+      "correction": "不輸出真實憑證或原始列；程式層不等於 OS 沙盒"
+    },
+    {
+      "id": "VQG.RISK.019",
+      "risk": "鎖死／逾時",
+      "control": "separate assertion and process exit status",
+      "status": "PENDING",
+      "correction": "Windows需父子 PID、退出碼、elapsed、最後心跳；PASS字串不等於程序PASS"
+    },
+    {
+      "id": "VQG.RISK.020",
+      "risk": "交接遺漏",
+      "control": "versioned requirements + evidence + pending owner",
+      "status": "PARTIAL",
+      "correction": "缺證據不得結綠"
+    }
+  ],
+  "methodology_corrections": [
+    "clean_volume=volume-daytrade_volume; clean_turnover=turnover-daytrade_turnover only when same units/date/source. No inferred turnover from adjusted price.",
+    "Only remove TSMC from an index where it is a constituent, using lagged weights and rebased return construction; never subtract stock price from index points.",
+    "Regression residuals reduce modeled market exposure; they do not guarantee complete noise removal.",
+    "Swing anchors require confirmation and available_at; no hindsight ZigZag pivots.",
+    "Fund shares x NAV is net creation/redemption estimate; cannot infer separate gross inflows and outflows from net shares alone.",
+    "Maintain calendar time for inactive/flat periods; filters do not delete time.",
+    "CSV UTF-8 BOM remains available alongside Parquet; no blanket replacement of all formats.",
+    "MOM/ROC are not guaranteed leading signals; ROC is unbounded above."
+  ]
+}
