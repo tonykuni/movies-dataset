@@ -200,20 +200,29 @@ def evolve_schema_v0101(out_root: Path, table: str, cols: list) -> list:
         con.close()
 
 
+def unify_columns_v0101(current: list, final: list) -> tuple:
+    """欄位取全部列的聯集(開頭五欄 → 本輪欄 → 日差欄 → 舊表其他欄);缺欄補空字串。
+    日差把前一份(舊 schema)的下市列照代碼排序混進來,若只看第一列會把本版新欄整欄丟掉(PR #443 Codex P1)。"""
+    cols = list(KEY_COLS)
+    for r in list(current) + list(final):
+        cols += [c for c in r if c not in cols]
+    return cols, [{c: ("" if r.get(c) is None else r.get(c, "")) for c in cols} for r in final]
+
+
 def run_v0101(day: str | None = None, out_root: Path | None = None, mins: dict | None = None) -> dict:
     day = day or date.today().isoformat()
     out_root = Path(out_root or Path.cwd())
     rows, rejected, states, zone = collect_v0101(day)
     prev = load_previous_v0100(out_root, OUT_DIR, STEM)
     v = verify_v0101(rows, rejected, states, prev, day, mins if mins is not None else MIN_DEFAULT, zone)
-    final = v["diff"]["rows"]
+    cols, final = unify_columns_v0101(rows, v["diff"]["rows"])
     rep = {"engine": TAG, "date": day, "count": len(rows), "lamp": v["lamp"], "checks": v["checks"],
            "diff": {k: v["diff"][k] for k in ("baseline", "counts", "new", "delisted_today", "mass_delist", "mass_delist_limit")},
            "rejected": rejected[:200], "year_zone": zone, "sources": states, "key_columns": list(KEY_COLS),
            "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
     accept = v["lamp"] != "RED" and bool(rows)
     if accept and final:
-        rep["schema_added"] = evolve_schema_v0101(out_root, TABLE, list(final[0].keys()) + ["status", "first_seen"])
+        rep["schema_added"] = evolve_schema_v0101(out_root, TABLE, cols)
     rep["write"] = write_outputs_v0100(final, rep, out_root, OUT_DIR, STEM, TABLE, day, accept=accept)
     return rep
 
@@ -305,6 +314,17 @@ def selftest() -> int:
             con.close()
             chk("⑦ v0100 舊表(沒有 name_en / id_check)→ 補欄後增量,舊列保留", set(r2.get("schema_added") or []) == {"name_en", "id_check"}
                 and n[0] == 1 + r2["count"] and n[1] == 2, (r2.get("schema_added"), n))
+            old9 = root / "old9"
+            (old9 / OUT_DIR).mkdir(parents=True)
+            pd.DataFrame([{"date": "2026-09-30", "ticker": c, "yf_ticker": c + ".TW", "bloomberg_ticker": c + " TT", "name": n, "market": "TWSE",
+                           "industry": "", "status": "ACTIVE", "first_seen": "2026-09-30"} for c, n in (("1101", "台泥"), ("2330", "台積電"))]
+                         ).to_parquet(old9 / OUT_DIR / f"{STEM}_latest.parquet", index=False)
+            r9 = run_v0101("2026-10-01", old9, mins={"TWSE": 1, "TPEX": 1})
+            d9 = pd.read_parquet(old9 / OUT_DIR / f"{STEM}_latest.parquet")
+            chk("⑨ 前一份是舊 schema 且排第一的代碼今天下市(1101)→ 新欄照樣整欄寫出 · 2027 核對結果在 · 下市列新欄空白",
+                list(d9.columns[:5]) == list(KEY_COLS) and {"name_en", "id_check"} <= set(d9.columns)
+                and set(d9.loc[d9.ticker == "2027", "id_check"]) == {"ZH+EN"} and set(d9.loc[d9.ticker == "1101", "status"]) == {"DELISTED"}
+                and set(d9.loc[d9.ticker == "1101", "id_check"]) == {""} and r9["write"].get("written"), list(d9.columns))
         finally:
             g["_via_net"] = real
     import contextlib
