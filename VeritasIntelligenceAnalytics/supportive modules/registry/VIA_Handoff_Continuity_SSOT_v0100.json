@@ -1502,6 +1502,70 @@
         "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json"
       ],
       "timeout_seconds": 2400
+    },
+    "vdf_list_stock_v0102": {
+      "argv": [
+        "VDF_MDL009_TWStockList",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL009_TWStockList v0102 本版 4/4 · v0101 PASS · 合計 PASS",
+      "scope": "MDL009 v0102 網路工具 AST 真橋(模組層 VIA_NET_TOOL_PATH + def _via_net)· 換網鏈轉回尾版(VCGC-REQ146)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_fetch_v0104": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0104 本版 8/8 · v0103 PASS · 合計 PASS",
+      "scope": "MDL008 v0104 網路工具 AST 真橋 · 冊 v0103 · fill --progress([進度] i/n 真百分比)· fill-matrix 詳細矩陣(Rich · AST 位置)(VCGC-REQ146)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0104.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0103.json",
+        "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "sweeper_v0110": {
+      "argv": [
+        "CGC_MDL124_BridgeSweeper",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL124_BridgeSweeper v0110 本版 5/5 · v0109 PASS · 合計 PASS",
+      "scope": "掃橋器 v0110:PS 版史照版號(無版號舊檔有同族 -vNNNN 時是版史,不再計畫注橋進舊 .ps1;L70)(VCGC-REQ146)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0110.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "tool_probe_v0106": {
+      "argv": [
+        "CGC_MDL230_ToolCoverageProbe",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL230_ToolCoverageProbe v0106 無版號舊 PS 檔算版史] 自測 2/2 PASS",
+      "scope": "工具覆蓋矩陣 v0106:無版號舊 PS 檔有同族版號檔時算版史;整條鏈 v0101–v0106 全過(含 MDL225 載入器尾版在冊)(VCGC-REQ146)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0106.py",
+        "supportive modules/registry/VIA_EngineVersion_Register_v0100.json"
+      ],
+      "timeout_seconds": 2400
+    },
+    "version_panorama_loader": {
+      "argv": [
+        "CGC_MDL225_VersionPanorama",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL225_VersionPanorama_v0102 薄尾 5/5 · v0101 本體 PASS · 合計 PASS",
+      "scope": "版本全景:加速器載入器尾版 SUP_MDL737 v0110 補登引擎版本冊(VIA-TOOL-0231;PR #442 漏登的回歸)(VCGC-REQ146)",
+      "dependencies": [
+        "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+        "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py"
+      ],
+      "timeout_seconds": 2400
     }
   },
   "work_items": [
@@ -3121,6 +3185,76 @@
       "owner": "操作員",
       "reason": "工作站開雙閘後跑 fetch fill --apply(via_database\\vdf_fetch)補到今天;容器內 Yahoo 429 · FRED 400 · CNN 418,資料也到不了 PC 庫",
       "next": "操作員回貼 _reports/fill_*.json 收據",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ146:vdf_list_stock_v0102",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL009 v0102 網路工具 AST 真橋 → 待 handoff test vdf_list_stock_v0102 實跑",
+      "next": "handoff test vdf_list_stock_v0102 實跑轉 VERIFIED",
+      "case": "vdf_list_stock_v0102",
+      "receipt": "docs/handoff/evidence/vdf_list_stock_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ146:vdf_fetch_v0104",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0104 網路工具 AST 真橋 · 冊 v0103 · fill --progress → 待 handoff test vdf_fetch_v0104 實跑",
+      "next": "handoff test vdf_fetch_v0104 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0104",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0104.json"
+    },
+    {
+      "id": "VCGC-REQ146:sweeper_v0110",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "掃橋器 v0110:PS 版史照版號 → 待 handoff test sweeper_v0110 實跑",
+      "next": "handoff test sweeper_v0110 實跑轉 VERIFIED",
+      "case": "sweeper_v0110",
+      "receipt": "docs/handoff/evidence/sweeper_v0110.json"
+    },
+    {
+      "id": "VCGC-REQ146:tool_probe_v0106",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "工具覆蓋矩陣 v0106:無版號舊 PS 檔有同族版號檔時算版史;整條鏈 v0101–v0106 全過 → 待 handoff test tool_probe_v0106 實跑",
+      "next": "handoff test tool_probe_v0106 實跑轉 VERIFIED",
+      "case": "tool_probe_v0106",
+      "receipt": "docs/handoff/evidence/tool_probe_v0106.json"
+    },
+    {
+      "id": "VCGC-REQ146:version_panorama_loader",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "版本全景:加速器載入器尾版 SUP_MDL737 v0110 補登引擎版本冊 → 待 handoff test version_panorama_loader 實跑",
+      "next": "handoff test version_panorama_loader 實跑轉 VERIFIED",
+      "case": "version_panorama_loader",
+      "receipt": "docs/handoff/evidence/version_panorama_loader.json"
+    },
+    {
+      "id": "VCGC-REQ146:workstation-env-install",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "ENV MANAGER 一政策安裝:工具冊 v0105 via_vdf_312 22 件(+13);via-envgov tools 出計畫 → --apply --approve 由操作員動手(AI 不代裝)",
+      "next": "操作員回貼 TOOLS_PLAN_latest.json / 安裝後 via-envgov tools 全綠",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ146:workstation-ps-launcher",
+      "requirement": "VCGC-REQ146",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "Invoke-VDF-FetchFill-v0100.ps1 容器沒有 pwsh(文字檢查過、未實跑);工作站 PS7 跑 -Plan 與實抓",
+      "next": "操作員回貼 PS 視窗輸出 + _reports/fill_*.json",
       "case": null,
       "receipt": null
     }
