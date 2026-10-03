@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T10:55:13+00:00",
+  "updated_at": "2026-10-03T11:43:57+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1104,7 +1104,7 @@
         "VIA_VRN_FirstPageEngine",
         "--selftest"
       ],
-      "success_marker": "[計] VIA_VRN_FirstPageEngine_v0130 薄尾 3/3 · 前版 rc=0 · 合計 PASS",
+      "success_marker": "[計] VIA_VRN_FirstPageEngine_v0130 薄尾 3/3 · 前版 PASS · 合計 PASS",
       "scope": "首頁全能引擎 v0130:評等 / 目標價委樞(drift 0)+ 前版 42 檢;㊳ 要庫內真 sidecar ≥ 20 份(工作站 66;容器 2 → 只能工作站驗)(VCGC-REQ132)",
       "dependencies": [
         "functional modules/VRN/VIA_VRN_FirstPageEngine_v*.py",
@@ -2438,8 +2438,8 @@
       "requirement": "VCGC-REQ132",
       "state": "PENDING",
       "owner": "operator",
-      "reason": "main 新增 VIA_VRN_FirstPageEngine v0130 沒有交接案;前版 ㊳ 要庫內真 sidecar ≥ 20 份,容器只有 2 份 → 容器實跑 rc 1(41/42,唯一紅是 ㊳ 份數不足,不是回歸) · 2026-10-03 容器實跑:42 檢 OK 41 · FAIL 1(㊳ 真的跑過 2 份 < 20)· v0130 本版 3/3",
-      "next": "工作站(66 份 sidecar)跑 via-vcgc handoff test first_page_engine;rc 0 才轉 VERIFIED",
+      "reason": "main 新增 VIA_VRN_FirstPageEngine v0130 沒有交接案;前版 ㊳ 要庫內真 sidecar ≥ 20 份,容器只有 2 份 → 容器實跑 rc 1(41/42,唯一紅是 ㊳ 份數不足,不是回歸) · 2026-10-03 容器實跑:42 檢 OK 41 · FAIL 1(㊳ 真的跑過 2 份 < 20)· v0130 本版 3/3 · 2026-10-03 工作站實跑(移除 via_core_312 的 TA-Lib 0.6.8 後):rc 0(42 檢含 ㊳ 66 份全過)但 marker 未見 —— 登錄的標記寫成「前版 rc=0」,v0130 前版過時實印「前版 PASS」;標記改正,需工作站重跑一次",
+      "next": "工作站 via-vcgc handoff test first_page_engine(標記已改正)→ rc 0 + marker 轉 VERIFIED",
       "case": "first_page_engine",
       "receipt": "docs/handoff/evidence/first_page_engine.json"
     }
