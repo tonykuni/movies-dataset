@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T12:20:52+00:00",
+  "updated_at": "2026-10-03T15:12:13+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1182,6 +1182,30 @@
         "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
         "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py",
         "supportive modules/registry/via_ocr_super_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "numbering_optional": {
+      "argv": [
+        "CGC_MDL237_NumberingSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL237_NumberingSystem_v0116 本版 6/6 · v0111 PASS",
+      "scope": "中央編號可選依賴:缺 pydantic → 標準庫同規則嚴格驗;缺 duckdb → Regex 候選留 REVIEW 不發號;缺 re2 等 → L1 清洗 ABSENT 點名;真樹 collect 照樣收齊(VCGC-REQ139)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "nlp_optional": {
+      "argv": [
+        "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL866_VIAUnifiedNLPOrchestrator_v0108 本版 5/5 · v0106 PASS",
+      "scope": "NLP L1 可選依賴:l1-clean / l1-review 缺件回 ABSENT 點名;核心 v0106 自測(PRADDLE / LAYOUT 那一路)照跑(VCGC-REQ139)",
+      "dependencies": [
+        "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
       ],
       "timeout_seconds": 900
     }
@@ -2529,9 +2553,9 @@
     {
       "id": "VCGC-REQ133:vdf-params-verb",
       "requirement": "VCGC-REQ133",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "VDF 管理員沒有單引擎啟動前備料動詞",
+      "reason": "VDF 管理員沒有單引擎啟動前備料動詞 → 已驗:2026-10-03T12:39:50+00:00 rc 0 · 標記見到",
       "next": "handoff test vdf_engine_params 實跑轉 VERIFIED",
       "case": "vdf_engine_params",
       "receipt": "docs/handoff/evidence/vdf_engine_params.json"
@@ -2539,9 +2563,9 @@
     {
       "id": "VCGC-REQ133:vrn-params-verb",
       "requirement": "VCGC-REQ133",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "VRN 管理員沒有單引擎啟動前備料動詞",
+      "reason": "VRN 管理員沒有單引擎啟動前備料動詞 → 已驗:2026-10-03T12:41:24+00:00 rc 0 · 標記見到",
       "next": "handoff test vrn_engine_params 實跑轉 VERIFIED",
       "case": "vrn_engine_params",
       "receipt": "docs/handoff/evidence/vrn_engine_params.json"
@@ -2559,12 +2583,32 @@
     {
       "id": "VCGC-REQ134:pdfplumber-ocr-locked",
       "requirement": "VCGC-REQ134",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "PRADDLE 底下的 PDFPLUMBER 樞紐與 OCR 隔離車道沒進工具鎖冊",
+      "reason": "PRADDLE 底下的 PDFPLUMBER 樞紐與 OCR 隔離車道沒進工具鎖冊 → 已驗:2026-10-03T12:43:28+00:00 rc 0 · 標記見到",
       "next": "handoff test tool_activate_ocr 實跑轉 VERIFIED",
       "case": "tool_activate_ocr",
       "receipt": "docs/handoff/evidence/tool_activate_ocr.json"
+    },
+    {
+      "id": "VCGC-REQ139:numbering-optional",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "#439 的 CGC_MDL237 v0112–v0115 讓中央編號硬性依賴 pydantic / duckdb / re2;容器與 CI 沒有 → --apply 與自測直接崩",
+      "next": "handoff test numbering_optional 實跑轉 VERIFIED",
+      "case": "numbering_optional",
+      "receipt": "docs/handoff/evidence/numbering_optional.json"
+    },
+    {
+      "id": "VCGC-REQ139:nlp-optional",
+      "requirement": "VCGC-REQ139",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "#439 的 SUP_MDL866 v0107 L1 自測要 16 套件,且沒跑 v0106 核心自測 → nlp_praddle 標記看不到",
+      "next": "handoff test nlp_optional 實跑轉 VERIFIED",
+      "case": "nlp_optional",
+      "receipt": "docs/handoff/evidence/nlp_optional.json"
     }
   ]
 }
