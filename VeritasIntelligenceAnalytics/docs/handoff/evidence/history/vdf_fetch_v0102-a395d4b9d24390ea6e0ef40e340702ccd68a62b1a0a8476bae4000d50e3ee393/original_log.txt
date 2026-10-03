@@ -30,25 +30,30 @@
 [政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL009_TWStockList_v0101.py(家族 vdf)
-=== VDF_MDL009_TWStockList v0100 · 自測(假網路工具 · 暫存輸出根 · 零外呼)===
-  [OK] ① 生成:SSOT 律擋 ETF / 年份樣碼 / A 碼 · 留 4 檔 · 開頭五欄 · 簡稱 / 產業別併入
-  [OK] ② 欄位開頭 = date · ticker · yf_ticker · bloomberg_ticker · name;.TW / .TWO 與 'TT' 對所別 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'status', 'first_seen']
-  [OK] ③ 日差:2317 下市 · 2454 新增(ENG087 同一式) · {'ACTIVE': 3, 'NEW': 1, 'DELISTED': 1}
-  [OK] ④ DuckDB 增量:兩天各一份 · 同日重跑零新列(date + ticker 反連接) · ((9, 2), 9)
-  [OK] ⑤ 大量下市守門:55 檔同日消失 → RED · 最新不覆寫(負控) · 55
-  [OK] ⑥ 雙閘沒開 → rc4(不是壞掉)· 零寫入最新
-  [OK] ⑦ 沒有總控入口 → rc2;加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
-  [計] VDF_MDL009_TWStockList v0100 7/7 PASS
-=== VDF_MDL009_TWStockList v0101 · 薄尾自測(年區代碼中英文名稱局部識別 · 不可刪 · 假網路工具 · 零外呼)===
-  [OK] ① v0100 自測過(生成 · 開頭五欄 · 日差 · DuckDB 增量 · 下市守門 · 雙閘 · 入口) · rc 0
-  [OK] ② 寫入程式的幾家 = 官方快照擋區裡的全部上市股票(代碼 · 中文簡稱 · 公司名稱 · 英文簡稱逐字一致) · ['2022', '2023', '2024', '2025', '2027', '2028', '2029', '2030']
-  [OK] ③ 擋區不刪:2027 大成鋼(中 + 英)· 2030 彰源(中 + 英)· 2023 燁輝(中)· 2024 志聯(只有英文 CHIH LIEN)全數保留 · {'2027': 'ZH+EN', '2030': 'ZH+EN', '2023': 'ZH', '2024': 'EN', '2029': 'MISMATCH', '2026': 'NOT_IN_ROSTER'}
-  [OK] ④ 名稱對不上(2029 寫成別家公司)· 冊外新代碼(2026)→ 照樣保留,V8 黃請人核(黃不是綠) · YELLOW
-  [OK] ⑤ 非股票形狀照擋(0050 · 00981A)· 擋區以外不逐列比名(2330 id_check 空白)
-  [OK] ⑥ 開頭五欄不變;其後 name_en · id_check;2330 id_check 空白 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'name_en', 'id_check', 'status', 'first_seen']
-  [OK] ⑦ v0100 舊表(沒有 name_en / id_check)→ 補欄後增量,舊列保留 · (['name_en', 'id_check'], (9, 2, 8))
-  [OK] ⑨ 前一份是舊 schema 且排第一的代碼今天下市(1101)→ 新欄照樣整欄寫出 · 2027 核對結果在 · 下市列新欄空白 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'name_en', 'id_check', 'status', 'first_seen']
-  [OK] ⑧ 沒有總控入口 → rc2;共用核心 *_v0100 照出(MDL010 用);加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
-  [計] VDF_MDL009_TWStockList v0101 本版 9/9 · v0100 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL009_TWStockList · 交接閘 RED · 落後 57 提交 · 快照 21.9h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0102.py(家族 vdf)
+=== VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
+  [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
+  [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
+  [OK] ③ 舊佈局絕對路徑全改寫到輸出根(每支 ≥ 1 處)· __main__ 段分出 · {'001u': 1, '002': 1, '003': 1, '004': 1, '005': 2, '006': 2, '007': 1}
+  [OK] ④ 依 needs 排序:MDL001 宇宙先於 004 / 005 / 006 / 007
+  [OK] ⑤ live 閘沒開 → rc4 GATED 零子行程;未知動詞 / 冊外代號 rc2;不加 --apply 只列計畫 · (4, 2, 2, 0)
+  [OK] ⑥ fixture 路由:兩所日行情 · 上市基本資料 · CNN 都有樣本;未知網址回 404(不編)
+  [OK] ⑧ live 路由:requests GET/POST 全走鎖版網路工具(http_bytes / post_json · 帶 params)· 閘關 = GATED 例外不出網 · ['https://openapi.twse.com.tw/v1/x?a=1', 'POST https://example.org/p', 'https://openapi.twse.com.tw/v1/x']
+  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib;本支不寫 VIA_NET_CONSENT
+  [計] VDF_MDL008_FetchSystem v0100 8/8 PASS
+=== VDF_MDL008_FetchSystem v0101 · 薄尾自測(獨立運作 · 由 VDF System Manager 總控 · 第一步兩支清單引擎)===
+  [OK] ① v0100 自測過(冊 · 改寫 · 雙閘 · live 路由) · rc 0
+  [OK] ② 沒有入口 → rc2 並指向 VDF 管理員總控;VDF 管理員標記 → rc0;VCGC 呼叫照收 rc0 · (2, 0, 0)
+  [OK] ③ 核准只在呼叫內:呼叫結束不留 VIA_FROM_VCGC 在環境裡
+  [OK] ⑤ 冊 v0101:第一步 = MDL009 全台股 · MDL010 主動式 ETF;MDL001–007 全部排在後面 · 擷取函式 AST 定位一致 · (['009', '010', '001u'], [])
+  [OK] ⑥ fixture 加 ETF 冊樣本(官方欄名)· 其他路由照 v0100
+  [OK] ④ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0101 本版 6/6 · v0100 PASS · 合計 PASS
+=== VDF_MDL008_FetchSystem v0102 · 薄尾自測(冊 v0102 · MDL009 v0101 年區代碼不刪 · 子行程從本版起)===
+  [OK] ① v0101 自測過(入口 · 冊 AST 定位 · fixture · 橋;冊已是 v0102) · rc 0
+  [OK] ② 冊 v0102:MDL009 → v0101 · 檔在 · 其餘 34 支與冊 v0101 相同
+  [OK] ③ fixture 補擋區兩家(行情 + 基本資料中英文簡稱);其他路由照 v0101
+  [OK] ④ 子行程從本版起:MDL009 v0101 fixture rc0 · 2027 大成鋼 / 2030 彰源中英文核對後留在清單 · 呼叫後 __file__ 還原 · (0, {'2027': 'ZH+EN', '2030': 'ZH+EN'})
+  [OK] ⑤ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0102 本版 5/5 · v0101 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 53 提交 · 快照 21.5h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

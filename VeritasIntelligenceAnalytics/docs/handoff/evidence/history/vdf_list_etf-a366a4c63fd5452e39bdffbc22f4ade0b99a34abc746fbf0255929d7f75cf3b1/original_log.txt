@@ -30,25 +30,14 @@
 [政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL009_TWStockList_v0101.py(家族 vdf)
-=== VDF_MDL009_TWStockList v0100 · 自測(假網路工具 · 暫存輸出根 · 零外呼)===
-  [OK] ① 生成:SSOT 律擋 ETF / 年份樣碼 / A 碼 · 留 4 檔 · 開頭五欄 · 簡稱 / 產業別併入
-  [OK] ② 欄位開頭 = date · ticker · yf_ticker · bloomberg_ticker · name;.TW / .TWO 與 'TT' 對所別 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'status', 'first_seen']
-  [OK] ③ 日差:2317 下市 · 2454 新增(ENG087 同一式) · {'ACTIVE': 3, 'NEW': 1, 'DELISTED': 1}
-  [OK] ④ DuckDB 增量:兩天各一份 · 同日重跑零新列(date + ticker 反連接) · ((9, 2), 9)
-  [OK] ⑤ 大量下市守門:55 檔同日消失 → RED · 最新不覆寫(負控) · 55
-  [OK] ⑥ 雙閘沒開 → rc4(不是壞掉)· 零寫入最新
-  [OK] ⑦ 沒有總控入口 → rc2;加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
-  [計] VDF_MDL009_TWStockList v0100 7/7 PASS
-=== VDF_MDL009_TWStockList v0101 · 薄尾自測(年區代碼中英文名稱局部識別 · 不可刪 · 假網路工具 · 零外呼)===
-  [OK] ① v0100 自測過(生成 · 開頭五欄 · 日差 · DuckDB 增量 · 下市守門 · 雙閘 · 入口) · rc 0
-  [OK] ② 寫入程式的幾家 = 官方快照擋區裡的全部上市股票(代碼 · 中文簡稱 · 公司名稱 · 英文簡稱逐字一致) · ['2022', '2023', '2024', '2025', '2027', '2028', '2029', '2030']
-  [OK] ③ 擋區不刪:2027 大成鋼(中 + 英)· 2030 彰源(中 + 英)· 2023 燁輝(中)· 2024 志聯(只有英文 CHIH LIEN)全數保留 · {'2027': 'ZH+EN', '2030': 'ZH+EN', '2023': 'ZH', '2024': 'EN', '2029': 'MISMATCH', '2026': 'NOT_IN_ROSTER'}
-  [OK] ④ 名稱對不上(2029 寫成別家公司)· 冊外新代碼(2026)→ 照樣保留,V8 黃請人核(黃不是綠) · YELLOW
-  [OK] ⑤ 非股票形狀照擋(0050 · 00981A)· 擋區以外不逐列比名(2330 id_check 空白)
-  [OK] ⑥ 開頭五欄不變;其後 name_en · id_check;2330 id_check 空白 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'name_en', 'id_check', 'status', 'first_seen']
-  [OK] ⑦ v0100 舊表(沒有 name_en / id_check)→ 補欄後增量,舊列保留 · (['name_en', 'id_check'], (9, 2, 8))
-  [OK] ⑨ 前一份是舊 schema 且排第一的代碼今天下市(1101)→ 新欄照樣整欄寫出 · 2027 核對結果在 · 下市列新欄空白 · ['date', 'ticker', 'yf_ticker', 'bloomberg_ticker', 'name', 'market', 'industry', 'name_en', 'id_check', 'status', 'first_seen']
-  [OK] ⑧ 沒有總控入口 → rc2;共用核心 *_v0100 照出(MDL010 用);加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
-  [計] VDF_MDL009_TWStockList v0101 本版 9/9 · v0100 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL009_TWStockList · 交接閘 RED · 落後 57 提交 · 快照 21.9h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL010_ActiveETFList_v0100.py(家族 vdf)
+=== VDF_MDL010_ActiveETFList v0100 · 自測(假網路工具 · 暫存輸出根 · 零外呼)===
+  [OK] ① 規則 = 舊模組 ENG077 原件(代碼律 · 揭露律) · VDF_ENG077_ActiveETFUniverse_v0100.py
+  [OK] ② 生成:只留 A 碼 3 檔 · 被動 / 債券 ETF 擋 · 國內 2 國外 1 · GREEN
+  [OK] ③ 開頭五欄 · 00981A.TW / '00981A TT'
+  [OK] ④ 日差:00981A 消失 · 00988A 新增;類型未知 → 黃(不猜) · YELLOW
+  [OK] ⑤ DuckDB 增量:兩天兩份 · 同日重跑零新列
+  [OK] ⑥ 雙閘沒開 → rc4(不是壞掉)
+  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘;共用核心 = MDL009
+  [計] VDF_MDL010_ActiveETFList v0100 7/7 PASS
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL010_ActiveETFList · 交接閘 RED · 落後 53 提交 · 快照 21.5h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
