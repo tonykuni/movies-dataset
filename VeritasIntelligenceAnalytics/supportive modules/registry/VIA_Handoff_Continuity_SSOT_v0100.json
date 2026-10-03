@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T11:58:44+00:00",
+  "updated_at": "2026-10-03T12:20:52+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1154,6 +1154,36 @@
         "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
       ],
       "timeout_seconds": 1200
+    },
+    "engine_tools": {
+      "argv": [
+        "CGC_MDL253_ToolingInventory",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL253_ToolingInventory_v0102 本版 8/8 · 前版 PASS · 合計 PASS",
+      "scope": "備料卡 ⑧ 輸出(SQL 寫表 · 輸出檔 · 中央表頭冊 · 輸入範圍 writes)· ⑨ 掛入的鎖冊工具 + PDF/OCR 套件 · ⑩ 鏈上每版 AST 定位與中央編號;engine tools 工具鏈全景(VRN layout · nlp · praddle · pdfplumber · ocr 與樞紐;VDF accelerator · network · frame)(VCGC-REQ134)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "tool_activate_ocr": {
+      "argv": [
+        "CGC_MDL233_ToolActivate",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL233_ToolActivate_v0107 selftest +6/6 PASS",
+      "scope": "工具鎖冊九家同一把尺:+pdfplumber(SUP_MDL746 v0102 · VIA-TOOL-0229)+ocr(via_ocr_super v0102 · VIA-TOOL-0230)尾版過全部啟用檢查;家別不對的擋下;本行程不載 OCR 套件(VCGC-REQ134)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py",
+        "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+        "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py",
+        "supportive modules/registry/via_ocr_super_v*.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -2515,6 +2545,26 @@
       "next": "handoff test vrn_engine_params 實跑轉 VERIFIED",
       "case": "vrn_engine_params",
       "receipt": "docs/handoff/evidence/vrn_engine_params.json"
+    },
+    {
+      "id": "VCGC-REQ134:outputs-tools-ast",
+      "requirement": "VCGC-REQ134",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "備料卡只有輸入面(①–⑦),沒有輸出 · 掛入工具 · AST 定位與逐版編號;沒有工具鏈全景",
+      "next": "handoff test engine_tools 實跑轉 VERIFIED",
+      "case": "engine_tools",
+      "receipt": "docs/handoff/evidence/engine_tools.json"
+    },
+    {
+      "id": "VCGC-REQ134:pdfplumber-ocr-locked",
+      "requirement": "VCGC-REQ134",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "PRADDLE 底下的 PDFPLUMBER 樞紐與 OCR 隔離車道沒進工具鎖冊",
+      "next": "handoff test tool_activate_ocr 實跑轉 VERIFIED",
+      "case": "tool_activate_ocr",
+      "receipt": "docs/handoff/evidence/tool_activate_ocr.json"
     }
   ]
 }
