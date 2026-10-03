@@ -30,7 +30,7 @@
 [政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0101.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0103.py(家族 vdf)
 === VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
   [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
   [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
@@ -49,4 +49,22 @@
   [OK] ⑥ fixture 加 ETF 冊樣本(官方欄名)· 其他路由照 v0100
   [OK] ④ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
   [計] VDF_MDL008_FetchSystem v0101 本版 6/6 · v0100 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 49 提交 · 快照 20.8h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+=== VDF_MDL008_FetchSystem v0102 · 薄尾自測(冊 v0102 · MDL009 v0101 年區代碼不刪 · 子行程從本版起)===
+  [OK] ① v0101 自測過(入口 · 冊 AST 定位 · fixture · 橋;冊已是 v0102) · rc 0
+  [OK] ② 冊 v0102:MDL009 → v0101 · 檔在 · 其餘 34 支與冊 v0101 相同
+  [OK] ③ fixture 補擋區兩家(行情 + 基本資料中英文簡稱);其他路由照 v0101
+  [OK] ④ 子行程從本版起:MDL009 v0101 fixture rc0 · 2027 大成鋼 / 2030 彰源中英文核對後留在清單 · 呼叫後 __file__ 還原 · (0, {'2027': 'ZH+EN', '2030': 'ZH+EN'})
+  [OK] ⑤ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0102 本版 5/5 · v0101 PASS · 合計 PASS
+=== VDF_MDL008_FetchSystem v0103 · 薄尾自測(fill 補缺:只抓不足 · 清單第一步 · 雙閘 · fixture 離線網)===
+  [OK] ① v0102 自測過(冊 v0102 · MDL009 v0101 · 子行程) · rc 0
+  [OK] ② 空輸出根的計畫:能跑的全部要抓(理由:沒跑過 / 輸出缺)· 缺套件的照列 ABSENT 不抓 · 零寫檔 · 要抓 34 · ABSENT ['011']
+  [OK] ③ live 雙閘沒開 → rc 4 · 零子行程 · 零寫檔(不是壞掉)
+  [OK] ④ fixture 補缺:5 支全抓 · rc 0 · 輸出全合格 · 資料庫有主清單 · 報告寫出 · [('009', 0), ('010', 0), ('001u', 0), ('004', 0), ('007', 0)]
+  [OK] ⑤ 再補一次:全部新鮮 → 零子行程(省下載)
+  [OK] ⑥ 只有 MDL004 的輸出變舊 → 只抓 004 + 第一步兩份清單 · 其他不動 · ['009', '010', '004']
+  [OK] ⑦ fixture 跑過不算 live:live 計畫仍要抓(理由「live 模式沒跑過」)
+  [OK] ⑧ 沒有總控入口 → rc 2;參數錯 → rc 2;計畫 rc 0;核准只在呼叫內 · (2, 2, 0)
+  [OK] ⑨ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0103 本版 9/9 · v0102 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 3294 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 61 提交 · 快照 22.4h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
