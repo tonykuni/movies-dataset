@@ -1256,6 +1256,111 @@
         "functional modules/VDF/engine/VDF_ENG117_ForwardVintageDoor_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "numbering_verbs": {
+      "argv": [
+        "CGC_MDL237_NumberingSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL237_NumberingSystem_v0117 本版 6/6",
+      "scope": "中央編號 v0117 未知動詞 / 旗標拒跑 · door 報尾版(VCGC-REQ140)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vdf_unknown_verb": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0126 本版 5/5",
+      "scope": "VDF 管理員 v0126 未知動詞拒跑 · 抬頭尾版(VCGC-REQ140)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vrn_unknown_verb": {
+      "argv": [
+        "VRN_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager v0116 本版 6/6",
+      "scope": "VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位(VCGC-REQ140)",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vdf_fetch_verb": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0127 本版 6/6",
+      "scope": "VDF 管理員 v0127 fetch 動詞 → MDL008(VCGC-REQ141)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vdf_fetch_system": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0100 8/8 PASS",
+      "scope": "VDF 獨立擷取系統 MDL008(冊 · 改寫 · 雙閘 · live 路由)(VCGC-REQ141)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0100.json",
+        "functional modules/VDF/VDF_MDL00*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_fetch_integration": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "test"
+      ],
+      "success_marker": "整合測試(fixture 離線網)] PASS",
+      "scope": "VDF 擷取系統整合測試:七支全鏈 · 輸出契約 · 倉內零寫入 · block 零出網(VCGC-REQ141)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0100.json",
+        "functional modules/VDF/VDF_MDL00*.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    "network_lock_seat": {
+      "argv": [
+        "SUP_MDL740_NetUnified",
+        "--selftest"
+      ],
+      "success_marker": "core = lock book, not the newest file",
+      "scope": "網路工具只認鎖版 v1652(四座位導向鎖冊 · 舊版已刪)(VCGC-REQ141)",
+      "dependencies": [
+        "supportive modules/network/*.py",
+        "supportive modules/VeritasAegisNexus.py",
+        "supportive modules/50_Protection_Acceleration/VeritasAegisNexus.py",
+        "VeritasAegisNexus.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "bundle_tool": {
+      "argv": [
+        "CGC_MDL256_SubsystemBundle",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL256_SubsystemBundle_v0100 8/8 PASS",
+      "scope": "子系統下載包 MDL256(via_00_vcgc · via_01_vdf:閉包 · 編號 · 版本 · sha256 · 安全原地更新)(VCGC-REQ142)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL256_SubsystemBundle_v*.py",
+        "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -2697,6 +2802,78 @@
       "next": "handoff test forward_vintage_door 實跑轉 VERIFIED",
       "case": "forward_vintage_door",
       "receipt": "docs/handoff/evidence/forward_vintage_door.json"
+    },
+    {
+      "id": "VCGC-REQ140:numbering_verbs",
+      "requirement": "VCGC-REQ140",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "中央編號 v0117 未知動詞 / 旗標拒跑 · door 報尾版:新模組要交接案",
+      "next": "handoff test numbering_verbs 實跑轉 VERIFIED",
+      "case": "numbering_verbs"
+    },
+    {
+      "id": "VCGC-REQ140:vdf_unknown_verb",
+      "requirement": "VCGC-REQ140",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 管理員 v0126 未知動詞拒跑 · 抬頭尾版:新模組要交接案",
+      "next": "handoff test vdf_unknown_verb 實跑轉 VERIFIED",
+      "case": "vdf_unknown_verb"
+    },
+    {
+      "id": "VCGC-REQ140:vrn_unknown_verb",
+      "requirement": "VCGC-REQ140",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位:新模組要交接案",
+      "next": "handoff test vrn_unknown_verb 實跑轉 VERIFIED",
+      "case": "vrn_unknown_verb"
+    },
+    {
+      "id": "VCGC-REQ141:vdf_fetch_verb",
+      "requirement": "VCGC-REQ141",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 管理員 v0127 fetch 動詞 → MDL008:新模組要交接案",
+      "next": "handoff test vdf_fetch_verb 實跑轉 VERIFIED",
+      "case": "vdf_fetch_verb"
+    },
+    {
+      "id": "VCGC-REQ141:vdf_fetch_system",
+      "requirement": "VCGC-REQ141",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 獨立擷取系統 MDL008(冊 · 改寫 · 雙閘 · live 路由):新模組要交接案",
+      "next": "handoff test vdf_fetch_system 實跑轉 VERIFIED",
+      "case": "vdf_fetch_system"
+    },
+    {
+      "id": "VCGC-REQ141:vdf_fetch_integration",
+      "requirement": "VCGC-REQ141",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 擷取系統整合測試:七支全鏈 · 輸出契約 · 倉內零寫入 · block 零出網:新模組要交接案",
+      "next": "handoff test vdf_fetch_integration 實跑轉 VERIFIED",
+      "case": "vdf_fetch_integration"
+    },
+    {
+      "id": "VCGC-REQ141:network_lock_seat",
+      "requirement": "VCGC-REQ141",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "網路工具只認鎖版 v1652(四座位導向鎖冊 · 舊版已刪):新模組要交接案",
+      "next": "handoff test network_lock_seat 實跑轉 VERIFIED",
+      "case": "network_lock_seat"
+    },
+    {
+      "id": "VCGC-REQ142:bundle_tool",
+      "requirement": "VCGC-REQ142",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "子系統下載包 MDL256:新模組要交接案",
+      "next": "handoff test bundle_tool 實跑轉 VERIFIED",
+      "case": "bundle_tool"
     }
   ]
 }

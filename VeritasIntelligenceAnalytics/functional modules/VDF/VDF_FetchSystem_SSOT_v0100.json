@@ -1,0 +1,255 @@
+{
+ "schema": "VIA.VDF.FetchSystem.v1",
+ "version": "v0100",
+ "ts": "2026-10-03",
+ "owner": "VDF_SystemManager",
+ "rule": "VDF 只留擷取與建庫;MDL001–099 = 核心擷取引擎(VDF_MDL000_README.md 2026-06-04 編號表)。原件凍結不改,系統層在記憶體改寫舊佈局路徑、統一同意閘、統一輸出根。",
+ "source_readme": "functional modules/VDF/VDF_MDL000_README.md",
+ "home_env": "VIA_VDF_FETCH_HOME",
+ "home_default": "VIA_Reports/vdf_fetch/dict",
+ "legacy_prefixes": [
+  "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VDF\\dict",
+  "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\dict"
+ ],
+ "gate": {
+  "live": "VIA_NET_CONSENT=YES(操作員設;系統只讀)",
+  "fixture": "離線樣本網(整合測試)",
+  "block": "全封"
+ },
+ "engines": [
+  {
+   "id": "001u",
+   "mdl": "MDL001",
+   "file": "VDF_MDL001_TWUniverseVerify_sha67ef6fce.py",
+   "role": "台股 universe · TWSE/TPEX OpenAPI 抓清單 + SSOT regex 驗證",
+   "needs": [],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 168
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-0-TWUniverse/tw_universe_combined.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/twse_universe.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/tpex_universe.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/verify_report.json",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "002",
+   "mdl": "MDL002",
+   "file": "VDF_MDL002_YFinanceFetchingEngine_v0100.py",
+   "role": "YFinance 175 tickers / 19 groups 日線(增量)",
+   "needs": [],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_single_v5",
+     "line": 1210
+    },
+    {
+     "name": "_fetch_batch_v17",
+     "line": 1231
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-3-YFinanceUniverse/YFinanceData.parquet",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "003",
+   "mdl": "MDL003",
+   "file": "VDF_MDL003_SentimentMacroEngine_v0100.py",
+   "role": "AAII · CNN F&G · FRED · AKShare 情緒與總經",
+   "needs": [],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 566
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-4-SentimentMacro/cnn_fear_greed.parquet",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "004",
+   "mdl": "MDL004",
+   "file": "VDF_MDL004_TWFullMarketEngine_v0100.py",
+   "role": "台股全市場日線 · SMA · 量 · 市值 · consensus",
+   "needs": [
+    "001u"
+   ],
+   "run_args": [],
+   "fetch_functions": [
+    {
+     "name": "_net_json",
+     "line": 322
+    },
+    {
+     "name": "_fetch_batch",
+     "line": 510
+    },
+    {
+     "name": "_fetch_one",
+     "line": 596
+    },
+    {
+     "name": "_fetch_via_net",
+     "line": 643
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-4-TWFullMarket/tw_fullmarket_snapshot.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/raw_quote.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/sma_avgvol_mcap.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/yf_consensus.parquet",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "005",
+   "mdl": "MDL005",
+   "file": "VDF_MDL005_TWStockFilter_sha49861a44.py",
+   "role": "consensus · upside · PER · 殖利率(個股擷取)",
+   "needs": [
+    "001u"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_one",
+     "line": 248
+    },
+    {
+     "name": "_fetch_one",
+     "line": 402
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-5-TWStockFilter/stock_filter_consensus.parquet",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "006",
+   "mdl": "MDL006",
+   "file": "VDF_MDL006_FinancialModel_v0100.py",
+   "role": "三大報表(年 / 季)· PE/PB band 原始值",
+   "needs": [
+    "001u"
+   ],
+   "run_args": [
+    "--no-pause",
+    "--no-charts"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_one",
+     "line": 421
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-6-FinancialModel/income_statement_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/balance_sheet_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/cashflow_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/income_statement_quarterly.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/daily_history.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/valuation_snapshot.parquet",
+     "min_rows": 1
+    }
+   ]
+  },
+  {
+   "id": "007",
+   "mdl": "MDL007",
+   "file": "VDF_MDL007_SSOTResolver.py",
+   "role": "TWSE/TPEX/MOPS/YF 四源個股解析(_v0100 薄尾的本體;薄尾 main 不分自測動詞,系統直跑本體)",
+   "needs": [
+    "001u"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 326
+    },
+    {
+     "name": "fetch_one",
+     "line": 722
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-7-SSOTResolver/ssot_resolved.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-7-SSOTResolver/parse_log.parquet",
+     "min_rows": 1
+    }
+   ]
+  }
+ ],
+ "note_outputs": "輸出契約 = 2026-10-03 fixture 離線網實跑七支 rc 0 後量到的主檔(parquet + 驗證報告);csv / json / duckdb 是同表副本,不另列"
+}
