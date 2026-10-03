@@ -1,15 +1,15 @@
 {
  "schema": "VIA.VDF.CentralMarketLists.v1",
- "engine": "VDF_ENG087_MarketListGovernance_v0101",
- "ts": "2026-09-16T10:53:29+00:00",
+ "engine": "VDF_ENG087_MarketListGovernance_v0105.py",
+ "ts": "2026-10-03T05:26:03+08:00",
  "start_required": "2023-01-01",
  "verdict": "RED",
  "policy": {
   "dispatcher_only": true,
   "network_default": "OFF_BY_DEFAULT",
-  "stock_update_engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
-  "active_etf_update_engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
-  "active_etf_history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+  "stock_update_engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+  "active_etf_update_engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+  "active_etf_history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
   "story_group_engine": "supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_hierarchical_group_index_engine.py",
   "turnover_key": [
    "date",
@@ -20,45 +20,44 @@
  },
  "lists": {
   "tw_stock_universe": {
-   "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
-   "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
-   "state": "RED",
+   "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+   "db": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\output_hub\\mega\\vdf_tw_market.duckdb",
+   "state": "SCHEMA_MISSING",
    "table": "tw_listings_industry",
    "columns": [
     "code",
     "name",
     "market",
-    "external_ticker",
     "industry_code",
     "industry_name",
-    "us_industry",
-    "us_industry_source",
-    "classification_level",
-    "isin"
+    "yf_ticker"
    ],
    "mapping": {
     "code": "code",
     "name": "name",
     "exchange": "market",
-    "external_ticker": "external_ticker",
+    "external_ticker": "yf_ticker",
     "taiwan_industry": "industry_name",
-    "us_industry": "us_industry"
+    "us_industry": null
    },
-   "rows": 1979,
-   "missing_fields": [],
-   "why": "價格資料最早日 2024-01-02 晚於要求起始日 2023-01-01；需補齊 2023 起資料",
+   "rows": 1981,
+   "missing_fields": [
+    "us_industry"
+   ],
+   "why": "股票全集欄位不足；台灣/美國產業分類缺一不可，未把其他欄位冒充",
    "prices": {
     "state": "OK",
     "column": "date",
-    "min": "2024-01-02",
-    "max": "2026-09-15",
-    "rows": 208848
+    "min": "2020-01-02",
+    "max": "2026-10-02",
+    "rows": 2202814,
+    "sentinel": 1
    }
   },
   "active_tw_etf": {
-   "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
-   "history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
-   "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+   "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+   "history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+   "db": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VDF\\output_hub\\active_tw_etf\\active_tw_etf_holdings\\ActiveTWETF.duckdb",
    "state": "GREEN",
    "mapping": {
     "registry_ticker": "ticker",
@@ -68,23 +67,31 @@
     "holding_ticker": "holding_ticker",
     "portfolio_date": "portfolio_date"
    },
-   "registry_rows": 30,
-   "holdings_rows": 1122,
+   "registry_rows": 31,
+   "holdings_rows": 3745,
    "missing_fields": [],
    "duplicate_registry": 0,
    "daily_required_count": 22,
-   "why": "A 碼 registry 與持股資料表在位；逐日缺口交由 ENG078 coverage 驗證",
+   "why": "主動式台股 ETF 總清單 22 檔持股都已驗證",
    "holdings_dates": {
     "state": "OK",
     "column": "portfolio_date",
-    "min": "2026-09-15",
-    "max": "2026-09-15",
-    "rows": 1122
+    "min": "2026-09-07",
+    "max": "2026-10-02",
+    "rows": 3745
+   },
+   "master_check": {
+    "required": 22,
+    "verified": 22,
+    "state": "GREEN",
+    "why": "主動式台股 ETF 總清單 22 檔持股都已驗證",
+    "missing": [],
+    "not_equity_a": []
    }
   },
   "hot_story_groups": {
    "state": "GREEN",
-   "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VDF_StoryGroup_Registry_v0101.json",
+   "path": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\supportive modules\\registry\\VDF_StoryGroup_Registry_v0101.json",
    "groups": 33,
    "membership_rows": 197,
    "distinct_tickers": 165,
@@ -175,5 +182,83 @@
    "why": "跨族群重複允許；跨族群成交值彙總必須以 (date,ticker) 去重"
   }
  },
- "result_rule": "只有結果檔存在且 verdict=GREEN 才算此橋驗收通過；ABSENT/NODATA/RED 不得假綠"
+ "result_rule": "只有結果檔存在且 verdict=GREEN 才算此橋驗收通過；ABSENT/NODATA/RED 不得假綠",
+ "daily_lists": [
+  "tw_stock_universe",
+  "active_tw_etf"
+ ],
+ "canonical_lists": [
+  {
+   "list": "tw_stock",
+   "state": "GREEN",
+   "n": 1981,
+   "why": "股票清單 1981 檔(加權 1089 · 櫃買 892)",
+   "table": "tw_listings_industry",
+   "counts": {
+    "TWSE": 1089,
+    "TPEX": 892
+   },
+   "dropped": {
+    "not_stock_code": 0,
+    "unknown_market": 0,
+    "duplicate": 0
+   },
+   "checks": [
+    {
+     "check": "兩所都在",
+     "ok": true,
+     "detail": "加權 1089 · 櫃買 892"
+    },
+    {
+     "check": "軟下限",
+     "ok": true,
+     "detail": "TWSE 1089/900 · TPEX 892/700"
+    },
+    {
+     "check": "同碼不掛兩所",
+     "ok": true,
+     "detail": "0"
+    },
+    {
+     "check": "交易所都認得",
+     "ok": true,
+     "detail": "0"
+    }
+   ]
+  },
+  {
+   "list": "active_tw_etf",
+   "state": "GREEN",
+   "n": 22,
+   "why": "主動式台股 ETF 22 檔,全部有持股(已驗證)",
+   "table": "active_tw_etf_registry",
+   "counts": {
+    "listed": 22,
+    "verified": 22,
+    "unverified": 0
+   },
+   "dropped": {
+    "not_active_a_code": 0,
+    "not_domestic": 9,
+    "duplicate": 0
+   },
+   "checks": [
+    {
+     "check": "總清單有檔",
+     "ok": true,
+     "detail": "22"
+    },
+    {
+     "check": "持股表在",
+     "ok": true,
+     "detail": "holdings_daily"
+    },
+    {
+     "check": "每檔都有持股(驗證)",
+     "ok": true,
+     "detail": "0"
+    }
+   ]
+  }
+ ]
 }

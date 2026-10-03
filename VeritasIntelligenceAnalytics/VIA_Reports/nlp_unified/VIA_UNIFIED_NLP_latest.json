@@ -1,348 +1,41 @@
 {
-  "schema": "VIA.UnifiedNLP.Selftest.v1",
-  "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
-  "version": "v0103",
-  "verdict": "YELLOW",
-  "checks": [
-    {
-      "name": "attachment manifest exists",
-      "state": "PASS",
-      "actual": "/tmp/mc/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json"
-    },
-    {
-      "name": "seven attachment records",
-      "state": "PASS",
-      "actual": "7"
-    },
-    {
-      "name": "NLP Hub VERIFIED",
-      "state": "PASS",
-      "actual": "VERIFIED"
-    },
-    {
-      "name": "six report NLP services",
-      "state": "PASS",
-      "actual": "6/6"
-    },
-    {
-      "name": "TextProcessor normalization",
-      "state": "PASS",
-      "actual": "台積電 (2330 TT) 買進,目標價 1250 元\n| 項目 | 2025F"
-    },
-    {
-      "name": "table/layout services",
-      "state": "FAIL",
-      "actual": "tables=0;blocks=0"
-    },
-    {
-      "name": "evidence summary",
-      "state": "FAIL",
-      "actual": "ABSENT;points=0"
-    },
-    {
-      "name": "adapter execution is fail-closed",
-      "state": "PASS",
-      "actual": "[('vake_ps', 'COLLECTED_NOT_RUN'), ('vake_py', 'COLLECTED_NOT_RUN'), ('ves_ps', 'INTAKE_ONLY'), ('ves_py', 'INTAKE_ONLY'), ('ves_collab', 'INTAKE_ONLY'), ('vcaf', 'INTAKE_ONLY'), ('cge_adaptive', 'INTAKE_ONLY')]"
-    },
-    {
-      "name": "network mode offline",
-      "state": "PASS",
-      "actual": "OFFLINE_ONLY"
-    },
-    {
-      "name": "code slice kind",
-      "state": "PASS",
-      "actual": "code"
-    },
-    {
-      "name": "code slice name",
-      "state": "PASS",
-      "actual": "['intl_universe']"
-    },
-    {
-      "name": "prose markers",
-      "state": "PASS",
-      "actual": "{'tickers': ['2330 TT'], 'eps': ['diluted'], 'ratings': ['買進']}"
-    },
-    {
-      "name": "compact drops the body",
-      "state": "PASS",
-      "actual": ""
-    },
-    {
-      "name": "bilingual pairs",
-      "state": "PASS",
-      "actual": "[{'zh': '稀釋每股盈餘', 'en': 'Diluted EPS'}, {'zh': '基本每股盈餘', 'en': 'Basic EPS'}]"
-    },
-    {
-      "name": "nltk stays optional and does not download",
-      "state": "PASS",
-      "actual": "ABSENT"
-    },
-    {
-      "name": "brief drops the hub dump",
-      "state": "PASS",
-      "actual": "{'state': 'PASS', 'kind': 'prose', 'markers': {}, 'pairs': [{'zh': '稀釋每股盈餘', 'en': 'Diluted EPS'}, {'zh': '基本每股盈餘', 'en': 'Basic EPS'}], 'code_names': None, 'points': ['one'], 'nltk': 'ABSENT', 'brief': True}"
-    },
-    {
-      "name": "VRN file bridge present",
-      "state": "PASS",
-      "actual": "VRN_ENG087"
-    }
-  ],
-  "status": {
-    "schema": "VIA.UnifiedNLP.Status.v1",
+  "schema": "VIA.UnifiedNLP.Pipeline.v1",
+  "pipeline": {
+    "state": "YELLOW",
     "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
-    "version": "v0103",
-    "hub": {
-      "module": "SUP_MDL744",
-      "hub": "NLPApplicationHub",
-      "version": "v0101",
-      "mount": {
-        "state": "FAILED",
-        "dir": "/tmp/mc/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
-        "version": "1.8.0",
-        "requested": "/tmp/mc/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
-        "mounted_from": null,
-        "why": "匯入失敗(ModuleNotFoundError: No module named 'tomllib')"
-      },
-      "modules": 41,
-      "loadable": 39,
-      "roles_why": "尚未呼叫",
-      "report_services": [
-        "content_roles",
-        "context_reconstruction",
-        "function_classifier",
-        "layout_analysis",
-        "summarization",
-        "table_ops"
-      ],
-      "report_services_missing": [],
-      "candidates": [
-        "VIA_NLP_OneEngine_v1.1.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.1.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.5.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.6.1",
-        "VIA_NLP_Application_System_v1.8.0"
-      ],
-      "state": "VERIFIED",
-      "path": "/tmp/mc/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
-      "sha256": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30"
-    },
-    "manifest": {
-      "path": "/tmp/mc/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json",
-      "state": "REGISTERED_INTAKE_ONLY",
-      "attachments": 7,
-      "sha256": "760f15118c16a4766436d43e3dade4c824d68b11107c6c678f2ff8eb885d7bb0"
-    },
-    "adapters": [
-      {
-        "id": "vake_ps",
-        "kind": "VDF data adapter launcher",
-        "nlp_role": "NO_NLP_DATA_ADAPTER",
-        "execution_state": "COLLECTED_NOT_RUN",
-        "network": true,
-        "route": "VDF_AKSHARE_CANDIDATE"
-      },
-      {
-        "id": "vake_py",
-        "kind": "VDF data fetcher",
-        "nlp_role": "NO_NLP_DATA_ADAPTER",
-        "execution_state": "COLLECTED_NOT_RUN",
-        "network": true,
-        "route": "VDF_AKSHARE_CANDIDATE"
-      },
-      {
-        "id": "ves_ps",
-        "kind": "VES launcher",
-        "nlp_role": "NLP_SUPPORT_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "ves_py",
-        "kind": "engine standardizer and AI handoff governance",
-        "nlp_role": "NLP_SUPPORT_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "ves_collab",
-        "kind": "AI collaboration protocol",
-        "nlp_role": "NLP_HANDOVER_PROTOCOL",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "vcaf",
-        "kind": "central governance auto-fix candidate",
-        "nlp_role": "NO_NLP_GOVERNANCE_AUTOFIX",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "CGC_ABC_INTAKE"
-      },
-      {
-        "id": "cge_adaptive",
-        "kind": "adaptive interface registry candidate",
-        "nlp_role": "NO_NLP_INTERFACE_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "CGE_ADAPTIVE_INTAKE"
-      }
+    "dispatch": "VRN_ENG087_NLPTextSummaryBridge",
+    "bridge": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+    "argv": [
+      "C:\\Users\\tonyk\\envs\\via_vrn_312\\Scripts\\python.exe",
+      "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\VRN_ENG087_NLPTextSummaryBridge_v0101.py",
+      "run",
+      "--in",
+      "C:\\測試樣本報告",
+      "--db",
+      "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\db\\vrn_reports.duckdb",
+      "--out",
+      "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Reports\\vrn\\nlp_pipeline",
+      "--points",
+      "5"
     ],
-    "accelerator": {
-      "roster": "UNSET",
-      "control": "UNSET",
-      "bootstrap": false,
-      "family": "UNSET",
-      "network_consent": "OFF"
-    },
-    "network_mode": "OFFLINE_ONLY",
-    "policy": "SUP_MDL744 is the NLP capability provider; attachments are governed adapters and are not implicit execution paths.",
-    "hub_loaded": true
-  },
-  "probe": {
-    "state": "PASS",
-    "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
-    "kind": "table",
-    "markers": {
-      "tickers": [
-        "2330 TT"
-      ],
-      "eps": [
-        "diluted"
-      ],
-      "ratings": [
-        "買進"
-      ]
-    },
-    "pairs": [],
-    "nltk": {
-      "state": "ABSENT",
-      "download": "FORBIDDEN",
-      "why": "nltk is not installed; the hub path still runs"
-    },
-    "code": null,
-    "hub": {
-      "module": "SUP_MDL744",
-      "hub": "NLPApplicationHub",
-      "version": "v0101",
-      "mount": {
-        "state": "FAILED",
-        "dir": "/tmp/mc/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
-        "version": "1.8.0",
-        "requested": "/tmp/mc/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
-        "mounted_from": null,
-        "why": "匯入失敗(ModuleNotFoundError: No module named 'tomllib')"
-      },
-      "modules": 41,
-      "loadable": 39,
-      "roles_why": "尚未呼叫",
-      "report_services": [
-        "content_roles",
-        "context_reconstruction",
-        "function_classifier",
-        "layout_analysis",
-        "summarization",
-        "table_ops"
-      ],
-      "report_services_missing": [],
-      "candidates": [
-        "VIA_NLP_OneEngine_v1.1.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.1.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.5.0",
-        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.6.1",
-        "VIA_NLP_Application_System_v1.8.0"
-      ],
-      "state": "VERIFIED",
-      "path": "/tmp/mc/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
-      "sha256": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30"
-    },
-    "raw_char_count": 103,
-    "normalized_char_count": 103,
-    "raw_sha256": "5367890135ea1cb9b83dd80cb9bb71f73490a9345349d6033c592e6d6b11be12",
-    "normalized_sha256": "bdce8e3da6a544d240118687674739682685d818fa2634ebabd93ccb85526d05",
-    "segment_count": 1,
-    "table_count": 0,
-    "layout_block_count": 0,
-    "role_count": 0,
-    "roles_why": "content_roles 子模組載不起來(收容件缺席或版本無此模組)",
-    "summary": {
-      "state": "ABSENT",
-      "why": "尾版無 summarization 模組或 TextProcessor 未掛(v1.7+ 才有;收容缺席=ABSENT)",
-      "points": []
-    },
-    "adapter_policy": [
-      {
-        "id": "vake_ps",
-        "kind": "VDF data adapter launcher",
-        "nlp_role": "NO_NLP_DATA_ADAPTER",
-        "execution_state": "COLLECTED_NOT_RUN",
-        "network": true,
-        "route": "VDF_AKSHARE_CANDIDATE"
-      },
-      {
-        "id": "vake_py",
-        "kind": "VDF data fetcher",
-        "nlp_role": "NO_NLP_DATA_ADAPTER",
-        "execution_state": "COLLECTED_NOT_RUN",
-        "network": true,
-        "route": "VDF_AKSHARE_CANDIDATE"
-      },
-      {
-        "id": "ves_ps",
-        "kind": "VES launcher",
-        "nlp_role": "NLP_SUPPORT_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "ves_py",
-        "kind": "engine standardizer and AI handoff governance",
-        "nlp_role": "NLP_SUPPORT_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "ves_collab",
-        "kind": "AI collaboration protocol",
-        "nlp_role": "NLP_HANDOVER_PROTOCOL",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "VES_READONLY_LANE"
-      },
-      {
-        "id": "vcaf",
-        "kind": "central governance auto-fix candidate",
-        "nlp_role": "NO_NLP_GOVERNANCE_AUTOFIX",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "CGC_ABC_INTAKE"
-      },
-      {
-        "id": "cge_adaptive",
-        "kind": "adaptive interface registry candidate",
-        "nlp_role": "NO_NLP_INTERFACE_GOVERNANCE",
-        "execution_state": "INTAKE_ONLY",
-        "network": false,
-        "route": "CGE_ADAPTIVE_INTAKE"
-      }
+    "returncode": 2,
+    "inputs": [
+      "C:\\測試樣本報告"
     ],
-    "accelerator": {
-      "roster": "UNSET",
-      "control": "UNSET",
-      "bootstrap": false,
-      "family": "UNSET",
-      "network_consent": "OFF"
-    },
+    "db": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\functional modules\\VRN\\db\\vrn_reports.duckdb",
+    "out": "C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics\\VIA_Reports\\vrn\\nlp_pipeline",
+    "stdout": "{\n  \"engine\": \"VRN_ENG087_NLPTextSummaryBridge\",\n  \"run_id\": \"B529-20261003T042022-aa41464e\",\n  \"verdict\": \"YELLOW\",\n  \"input_count\": 305,\n  \"sidecars\": 105,\n  \"nlp_processed\": 105,\n  \"summary_ok\": 105,\n  \"db\": {\n    \"state\": \"GREEN\",\n    \"path\": \"C:\\\\Users\\\\tonyk\\\\OneDrive\\\\Documents\\\\movies-dataset\\\\VeritasIntelligenceAnalytics\\\\functional modules\\\\VRN\\\\db\\\\vrn_reports.duckdb\",\n    \"tables\": [\n      \"vrn_nlp_text_summary\",\n      \"vrn_pipeline_runs\",\n      \"vrn_report_analyst\",\n      \"vrn_report_basic\",\n      \"vrn_report_metrics\"\n    ],\n    \"counts\": {\n      \"vrn_report_basic\": 107,\n      \"vrn_report_metrics\": 77,\n      \"vrn_report_analyst\": 190,\n      \"vrn_nlp_text_summary\": 107,\n      \"vrn_pipeline_runs\": 6\n    }\n  },\n  \"vdf_green\": false,\n  \"output\": \"C:\\\\Users\\\\tonyk\\\\OneDrive\\\\Documents\\\\movies-dataset\\\\VeritasIntelligenceAnalytics\\\\VIA_Reports\\\\vrn\\\\nlp_pipeline\\\\B529-20261003T042022-aa41464e\"\n}\n",
+    "stderr": "",
     "network_mode": "OFFLINE_ONLY",
-    "compact": false
+    "accelerator": {
+      "roster": "VIA_PS_Accelerators_25_Roster_v0100:25",
+      "control": "CGC_MDL156_VIAAcceleratorControl_v0100",
+      "bootstrap": true,
+      "family": "vrn",
+      "network_consent": "YES"
+    },
+    "note": "YELLOW is retained when VDF coverage blocks the downstream bridge; no false GREEN."
   },
-  "generated_at": "2026-09-25T15:11:39.724301+00:00",
-  "manifest_sha256": "760f15118c16a4766436d43e3dade4c824d68b11107c6c678f2ff8eb885d7bb0"
+  "generated_at": "2026-10-02T20:22:47.000484+00:00",
+  "manifest_sha256": "257332c089d6e1dc589c387fff298cfd427c0f33926fc3be6ba92d8f47a8b543"
 }
