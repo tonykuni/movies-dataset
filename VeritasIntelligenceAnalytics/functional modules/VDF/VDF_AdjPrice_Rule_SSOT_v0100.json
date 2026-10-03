@@ -1,0 +1,66 @@
+{
+ "schema": "VIA.VDF.AdjPriceRule.SSOT.v1",
+ "version": "v0100",
+ "batch": "側線 2026-10-03 b",
+ "ts": "2026-10-02T23:28:46",
+ "law": "L110 / L104",
+ "purpose": "調整價係數規則正本(VDF 基層,L108 ①):原始永不改,係數另存,台美同法,驗證兩條",
+ "rules": [
+  {
+   "id": "R-ADJ-01",
+   "zh": "原始不覆寫",
+   "raw_columns": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+   ],
+   "never_overwrite": true
+  },
+  {
+   "id": "R-ADJ-02",
+   "zh": "係數另存",
+   "factor_row": [
+    "ticker",
+    "market",
+    "effective_date",
+    "split_factor",
+    "dividend_factor",
+    "source_id",
+    "as_of"
+   ],
+   "adj_columns": [
+    "adj_close",
+    "adj_open",
+    "adj_high",
+    "adj_low",
+    "adj_version"
+   ]
+  },
+  {
+   "id": "R-ADJ-03",
+   "zh": "台美同法",
+   "method": "back-adjust from latest (multiply cumulative factor backwards)",
+   "markets": [
+    "TW",
+    "US"
+   ],
+   "currency": "原幣,不換算"
+  },
+  {
+   "id": "R-ADJ-04",
+   "zh": "驗證",
+   "step_function": "adj_close/close 只在 effective_date 跳階,其餘日恆定(容差 1e-6)",
+   "second_source_sample": {
+    "n": 20,
+    "note": "yfinance 記 auto_adjust 口徑"
+   }
+  },
+  {
+   "id": "R-ADJ-05",
+   "zh": "VRN 只讀",
+   "consumer": "VRN 讀 adj_* 欄(L104),不自算"
+  }
+ ]
+}
