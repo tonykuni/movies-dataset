@@ -2287,6 +2287,20 @@
     "supportive modules/registry/CGC_MDL256_SubsystemBundle_v0101.py",
     "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0101.json"
    ]
+  },
+  {
+   "id": "C-vdf_fetch_fill",
+   "name": "交接案 vdf_fetch_fill(MDL008 v0103 fetch fill 補缺擷取:只抓不足 · 清單第一步 · 雙閘 rc 4 零寫 · 再補零子行程 · 只抓變舊的(VCGC-REQ145))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0103.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json"
+   ]
   }
  ],
  "coverage": {
@@ -2779,6 +2793,9 @@
    },
    "bundle_tool_v0101": {
     "station": "C-bundle_tool_v0101"
+   },
+   "vdf_fetch_fill": {
+    "station": "C-vdf_fetch_fill"
    }
   },
   "workflow": {
@@ -3026,5 +3043,5 @@
  "why_v0146": "REQ143 交接案 +4 各一站;vdf_fetch_integration 改由 VDF 總控跑(v0101 整合測試)",
  "why_v0147": "MDL011 接線卡一站;整合測試站相依收窄到冊上 25 支 ENG(不再用 VDF_ENG*.py 假覆蓋 ENG086)",
  "why_v0148": "PR #442 審查:網路鎖版改由 SUP_MDL737 v0110 導向(凍結檔原樣),交接站同步",
- "why_v0149": "VCGC-REQ144:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 各一站 + coverage.case;其餘一字不動(只增)"
+ "why_v0149": "VCGC-REQ144 / REQ145:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 · vdf_fetch_fill 各一站 + coverage.case;其餘一字不動(只增)"
 }

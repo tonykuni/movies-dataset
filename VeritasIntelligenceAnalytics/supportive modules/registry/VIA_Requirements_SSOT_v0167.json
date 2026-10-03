@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 50,
+  "PARTIAL": 51,
   "MISSING": 1
  },
  "requirements": [
@@ -4713,6 +4713,30 @@
     "CGC_MDL256_SubsystemBundle_v0101.py",
     "VIA_SubsystemBundle_SSOT_v0101.json"
    ]
+  },
+  {
+   "code": "VCGC-REQ145",
+   "subsystem": "VDF",
+   "topic": "所有擷取模組啟動補資料庫不足的部分(只抓不足 · 依相依 · 清單第一步)· 逐支實測可用",
+   "requirement": "操作員令(2026-10-03):「Activate every modules to fetch the data to the database to replenish insufficient parts. Test depart them work.」;選擇「Workstation run」:一支測過的指令,操作員開雙閘後在 PC 補到今天,容器內離線實測每一支",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0149.json",
+    "VIA_SubsystemBundle_SSOT_v0101.json"
+   ],
+   "evidence": "VDF_MDL008_FetchSystem v0103 9/9:fetch fill 每支列不足理由(輸出缺 / 空 / 變舊 · 該模式沒跑過 · 上次 rc≠0 · 上次太久)→ 只抓不足的,清單 MDL009 / MDL010 第一步 → 驗收 → DuckDB 視圖 → _reports/fill_*.json;live 雙閘沒開 rc 4 零寫;再補一次零子行程;只有一支變舊就只抓那支 + 兩份清單。容器實測:VDF 管理員 fetch fill(MDL 九支 fixture)rc 0 · 輸出 23/23 · 補後不足 0 · 視圖 28 / 鍵欄 18;再跑零子行程;fetch test 整合測試 PASS(ENG 22 支封網自測 OK · MDL011 缺 akshare / polars 照列 ABSENT);全 35 支 live 計畫 34 支要抓 · 閘關 rc 4。容器網路:TWSE / TPEX 200 · Yahoo 429 · FRED 400(要金鑰)· CNN 418。",
+   "next": "操作員在工作站本視窗開雙閘 → fetch fill --apply --home via_database\\vdf_fetch → 回貼 _reports/fill_*.json(PARTIAL → COVERED)",
+   "hand": "操作員(live)/ AI",
+   "quotes": [
+    {
+     "text": "Activate every modules to fetch the data to the database to replenish insufficient parts. Test depart them work.",
+     "recorded_at": "2026-10-03T19:40:00+00:00"
+    }
+   ],
+   "modules": [
+    "VDF_MDL008_FetchSystem_v0103.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -4874,5 +4898,5 @@
  "why_v0164": "SDD X-REQ:REQ141 歸屬指到 registry 外 → 改指盤點冊 v0145;REQ142 補模組 MDL256(監控「未登」)並轉 PARTIAL",
  "why_v0165": "REQ143 VDF 獨立運作 · 總控 · 清單第一步 · 五組 · 卡 / 監控 / 資料庫;REQ141 證據續",
  "why_v0166": "PR #442 審查三條 P1:凍結檔還原 + 鎖版改新版導向 · v0116/v0117 還原 · 下載包依賴清單與 preflight",
- "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動"
+ "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)"
 }

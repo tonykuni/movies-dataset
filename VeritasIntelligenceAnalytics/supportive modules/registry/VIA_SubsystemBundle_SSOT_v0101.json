@@ -19,6 +19,9 @@
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch test                       # 離線整合測試(不連網):MDL 全鏈 + ENG 各自自測 + 接資料庫",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch card 009                   # 單引擎卡:AST · 擷取函式 · VCGC 的 SSOT / regex / 同義字 / 工作流",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch plan                       # 第一步 MDL009 全台股 · MDL010 主動式 ETF,其後依相依",
+    "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch fill --home \"C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_fetch\"                    # 補缺計畫:每支為什麼不足(不連網、不寫檔)",
+    "# ↓ 補缺實抓:先自己在本視窗開雙閘 $env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'(AI 永不代設)",
+    "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch fill --apply --home \"C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_fetch\"            # 只抓不足的部分:清單第一步 → 其餘依相依 → 驗收 → 資料庫報告(_reports/fill_*.json)",
     "# ↓ 連網實測:先自己在本視窗開雙閘(AI 永不代設)",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch run 009 010 --apply --mode live --home \"C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_fetch\"   # 第一步:兩份清單",
     "py -3 \"functional modules\\VDF\\VDF_SystemManager_v0128.py\" fetch run --apply --mode live --home \"C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_fetch\"           # 全部(或給單支 id 單獨啟動)",
@@ -346,6 +349,7 @@
     "functional modules/VDF/VDF_MDL008_FetchSystem_v0100.py",
     "functional modules/VDF/VDF_MDL008_FetchSystem_v0101.py",
     "functional modules/VDF/VDF_MDL008_FetchSystem_v0102.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0103.py",
     "functional modules/VDF/VDF_MDL009_TWStockList_v0100.py",
     "functional modules/VDF/VDF_MDL009_TWStockList_v0101.py",
     "functional modules/VDF/VDF_MDL010_ActiveETFList_v0100.py",
@@ -7429,5 +7433,5 @@
   }
  },
  "prior": "VIA_SubsystemBundle_SSOT_v0100.json",
- "why_v0101": "VCGC-REQ144:前版在包裡的檔補上新版(MDL009 v0101 年區代碼中英文名稱局部識別 · MDL008 v0102 · 擷取冊 v0102 · CGC_MDL256 v0101 / 本冊);via_01_vdf 另帶官方 t187ap03_L 2026-08-05 快照(MDL009 v0101 自測逐字比對 8 家);舊冊檔案一個不少(只增)"
+ "why_v0101": "VCGC-REQ144:前版在包裡的檔補上新版(MDL009 v0101 年區代碼中英文名稱局部識別 · MDL008 v0102 · 擷取冊 v0102 · CGC_MDL256 v0101 / 本冊);via_01_vdf 另帶官方 t187ap03_L 2026-08-05 快照(MDL009 v0101 自測逐字比對 8 家);舊冊檔案一個不少(只增);+MDL008 v0103(fetch fill 補缺擷取)與兩行 fill 指令"
 }

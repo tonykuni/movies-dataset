@@ -1489,6 +1489,19 @@
         "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0101.json"
       ],
       "timeout_seconds": 1800
+    },
+    "vdf_fetch_fill": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0103 本版 9/9 · v0102 PASS · 合計 PASS",
+      "scope": "MDL008 v0103 fetch fill 補缺擷取:只抓不足 · 清單第一步 · 雙閘 rc 4 零寫 · 再補零子行程 · 只抓變舊的(VCGC-REQ145)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0103.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 2400
     }
   },
   "work_items": [
@@ -3090,6 +3103,26 @@
       "next": "handoff test bundle_tool_v0101 實跑轉 VERIFIED",
       "case": "bundle_tool_v0101",
       "receipt": "docs/handoff/evidence/bundle_tool_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ145:vdf_fetch_fill",
+      "requirement": "VCGC-REQ145",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0103 fetch fill 補缺擷取 → 待 handoff test vdf_fetch_fill 實跑",
+      "next": "handoff test vdf_fetch_fill 實跑轉 VERIFIED",
+      "case": "vdf_fetch_fill",
+      "receipt": "docs/handoff/evidence/vdf_fetch_fill.json"
+    },
+    {
+      "id": "VCGC-REQ145:workstation-live-fill",
+      "requirement": "VCGC-REQ145",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "工作站開雙閘後跑 fetch fill --apply(via_database\\vdf_fetch)補到今天;容器內 Yahoo 429 · FRED 400 · CNN 418,資料也到不了 PC 庫",
+      "next": "操作員回貼 _reports/fill_*.json 收據",
+      "case": null,
+      "receipt": null
     }
   ]
 }
