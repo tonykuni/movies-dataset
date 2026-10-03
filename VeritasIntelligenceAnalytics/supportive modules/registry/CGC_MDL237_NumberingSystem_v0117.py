@@ -12,6 +12,8 @@
      散落的位置參數只准出現在 --scope 之後(檔清單)· --base 之後(基準)· assets-plan 之後(候選冊)。
      不合 → 印中文 [拒跑] + 正確用法,rc 2,零寫入。manager 子命令原樣交 v0115 argparse(它自己會擋)。
   ② BASE(v0100)的 ENGINE 換成本尾版檔名:door 與 SSOT engine 欄報實際跑的版。
+  ③ BASE._requirements 跳過磁碟上不在的需求檔:CI 用 sparse checkout(不拉 .txt),git ls-files 仍列出
+     requirements_*.txt,v0100 照讀 → FileNotFoundError(main 的 Windows UAT 一直紅的根因)。
 自測:先跑 v0116 全鏈自測,再驗拒跑 / 放行判法與「拒跑零寫入」。只收 VCGC 呼叫;零網路;不碰 TA-Lib。
 """
 from __future__ import annotations
@@ -101,6 +103,25 @@ PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0117(p) 
 PRIOR = _load_v0117(PRIOR_PATH, _STEM + "_prior_for_" + ENGINE)        # v0116:可選依賴缺件不崩
 BASE = PRIOR.BASE                                                       # v0100:build() · door
 BASE.ENGINE = ENGINE                                                    # ② door / SSOT engine 報實際尾版
+_REQUIREMENTS_V0100 = BASE._requirements
+
+
+def requirements_v0117() -> dict:
+    """③ 同 v0100 _requirements,但 git 有列、磁碟上不在的需求檔(CI sparse checkout 不拉 .txt)照實跳過,
+    不在 read_text 上 FileNotFoundError(main 與 PR #442 的 Windows UAT 同因)。live_files 不動(v0108 自測認它的身分)。"""
+    req = {}
+    for rel in BASE.live_files("*requirements*.txt", "VIA_Env_Requirements_v*.txt"):
+        p = BASE.VIA / rel
+        if not p.is_file():
+            continue
+        for line in p.read_text(encoding="utf-8", errors="ignore").splitlines():
+            m = re.match(r"\s*([A-Za-z0-9_.\-]+)\s*([=<>!~]=?\s*[\w.*]+)?", line)
+            if m and not line.strip().startswith("#"):
+                req.setdefault(m.group(1).lower().replace("-", "_"), []).append((rel, (m.group(2) or "").replace(" ", "")))
+    return req
+
+
+BASE._requirements = requirements_v0117
 
 
 def __getattr__(name):
@@ -188,6 +209,11 @@ def selftest() -> int:
     chk("④ 拒跑:rc 2 · 前版一次都沒進(零寫入)· 印中文理由與用法", set(rcs) == {2} and calls == [["audit", "--json"]]
         and rc_ok == 0 and out.count("[拒跑]") == len(reject) and "用法" in out, (set(rcs), calls))
     chk("⑤ door / SSOT engine 報實際尾版(BASE.ENGINE = 本檔名)", BASE.ENGINE == ENGINE, BASE.ENGINE)
+    listed = BASE.live_files("*requirements*.txt", "VIA_Env_Requirements_v*.txt")
+    gone = [f for f in listed if not (BASE.VIA / f).is_file()]
+    same = requirements_v0117() == _REQUIREMENTS_V0100() if not gone else True
+    chk("⑦ sparse 守門:需求檔 git 有列、磁碟沒有 → 照實跳過不崩;都在時與 v0100 結果相同",
+        BASE._requirements is requirements_v0117 and isinstance(requirements_v0117(), dict) and same, f"列 {len(listed)} · 不在磁碟 {len(gone)}")
     text = Path(__file__).read_text(encoding="utf-8")
     chk("⑥ 加速器橋 · 網路橋在 · 不碰 TA-Lib", "[VIA:ACCEL-BRIDGE" in text and "[VIA:NET-BRIDGE" in text
         and not re.search(r"^\s*(import|from)\s+talib", text, re.M))
