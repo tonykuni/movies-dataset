@@ -30,43 +30,23 @@
 [政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0128.py(家族 vdf)
-[VDF 擷取系統 · 整合測試 v0101] PASS
-  ── MDL(fixture 離線網 · 全鏈)
-  [OK] MDL009      0.6s · [MDL008] MDL009 rc=0 · 網路計數 {"requests": 0, "yf": 0, "net": 4, "blocked": 0}
-  [OK] MDL010      0.7s · [MDL008] MDL010 rc=0 · 網路計數 {"requests": 0, "yf": 0, "net": 1, "blocked": 0}
-  [OK] MDL001      0.6s · [MDL008] MDL001 rc=0 · 網路計數 {"requests": 2, "yf": 0, "net": 0, "blocked": 0}
-  [OK] MDL002      4.0s · [MDL008] MDL002 rc=0 · 網路計數 {"requests": 0, "yf": 9, "net": 0, "blocked": 0}
-  [OK] MDL003      9.1s · [MDL008] MDL003 rc=0 · 網路計數 {"requests": 7, "yf": 0, "net": 0, "blocked": 0}
-  [OK] MDL004      0.8s · [MDL008] MDL004 rc=0 · 網路計數 {"requests": 0, "yf": 9, "net": 3, "blocked": 0}
-  [OK] MDL005      0.8s · [MDL008] MDL005 rc=0 · 網路計數 {"requests": 0, "yf": 11, "net": 0, "blocked": 0}
-  [OK] MDL006      2.2s · [MDL008] MDL006 rc=0 · 網路計數 {"requests": 0, "yf": 11, "net": 0, "blocked": 0}
-  [OK] MDL007      1.0s · [MDL008] MDL007 rc=0 · 網路計數 {"requests": 6, "yf": 3, "net": 0, "blocked": 0}
-  [輸出] 23/23 檔合格
-  ── ENG / MDL011(各自離線自測 · 全封網)
-  [ABSENT] MDL011                                0.0s · 缺 akshare,polars
-  [OK    ] ENG054_TWDailyBackfill                0.7s
-  [OK    ] ENG055_OmniFetch                      0.2s
-  [OK    ] ENG056_ChipBackfill                   0.2s
-  [OK    ] ENG057_TradingValueBackfill           0.2s
-  [OK    ] ENG063_MonthlyRevenue                 0.6s
-  [OK    ] ENG075_MonthlyRevenueBackfill         0.2s
-  [OK    ] ENG077_ActiveETFUniverse              0.2s
-  [OK    ] ENG078_ActiveETFHoldingsHistory       2.2s
-  [OK    ] ENG232_TWIndexOfficial                0.9s
-  [OK    ] ENG059_EstimateBands                  0.2s
-  [OK    ] ENG064_HistoryBackfill                0.5s
-  [OK    ] ENG066_GlobalUniverse                 0.6s
-  [OK    ] ENG082_FinStatements                  7.8s
-  [OK    ] ENG074_FredMacroSSOT                  2.1s
-  [OK    ] ENG113_MacroMethod                    0.6s
-  [OK    ] ENG114_PmiPair                        0.2s
-  [OK    ] ENG229_CNNFearGreedHistory            0.8s
-  [OK    ] ENG230_ForwardValuation               1.3s
-  [OK    ] ENG115_SentimentFetch                 0.1s
-  [OK    ] ENG116_AAIIWorkbook                   0.5s
-  [OK    ] ENG088_ConsensusFusionBridge          0.6s
-  [OK    ] ENG231_GlobalListings                 0.3s
-  [資料庫] 視圖 28 · 鍵欄視圖 18 · 主清單 True
-  [倉內寫入] 0 檔
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 53 提交 · 快照 21.6h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0101.py(家族 vdf)
+=== VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
+  [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
+  [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
+  [OK] ③ 舊佈局絕對路徑全改寫到輸出根(每支 ≥ 1 處)· __main__ 段分出 · {'001u': 1, '002': 1, '003': 1, '004': 1, '005': 2, '006': 2, '007': 1}
+  [OK] ④ 依 needs 排序:MDL001 宇宙先於 004 / 005 / 006 / 007
+  [OK] ⑤ live 閘沒開 → rc4 GATED 零子行程;未知動詞 / 冊外代號 rc2;不加 --apply 只列計畫 · (4, 2, 2, 0)
+  [OK] ⑥ fixture 路由:兩所日行情 · 上市基本資料 · CNN 都有樣本;未知網址回 404(不編)
+  [OK] ⑧ live 路由:requests GET/POST 全走鎖版網路工具(http_bytes / post_json · 帶 params)· 閘關 = GATED 例外不出網 · ['https://openapi.twse.com.tw/v1/x?a=1', 'POST https://example.org/p', 'https://openapi.twse.com.tw/v1/x']
+  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib;本支不寫 VIA_NET_CONSENT
+  [計] VDF_MDL008_FetchSystem v0100 8/8 PASS
+=== VDF_MDL008_FetchSystem v0101 · 薄尾自測(獨立運作 · 由 VDF System Manager 總控 · 第一步兩支清單引擎)===
+  [OK] ① v0100 自測過(冊 · 改寫 · 雙閘 · live 路由) · rc 0
+  [OK] ② 沒有入口 → rc2 並指向 VDF 管理員總控;VDF 管理員標記 → rc0;VCGC 呼叫照收 rc0 · (2, 0, 0)
+  [OK] ③ 核准只在呼叫內:呼叫結束不留 VIA_FROM_VCGC 在環境裡
+  [OK] ⑤ 冊 v0101:第一步 = MDL009 全台股 · MDL010 主動式 ETF;MDL001–007 全部排在後面 · 擷取函式 AST 定位一致 · (['009', '010', '001u'], [])
+  [OK] ⑥ fixture 加 ETF 冊樣本(官方欄名)· 其他路由照 v0100
+  [OK] ④ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0101 本版 6/6 · v0100 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 49 提交 · 快照 20.8h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

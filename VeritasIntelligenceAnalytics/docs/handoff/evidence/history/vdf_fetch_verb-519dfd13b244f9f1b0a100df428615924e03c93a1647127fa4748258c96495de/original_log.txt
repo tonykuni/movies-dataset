@@ -35,10 +35,10 @@
   [OK] ① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節 · VDF_InputUniverse_SSOT_v0101.json
   [OK] ② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED · {'2026-09-29': 'GREEN', '2026-09-30': 'YELLOW', '2026-10-01': 'RED'}
   [OK] ③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊) · {'2026-09-29': (2, 2, 2, 2, 'GREEN'), '2026-09-30': (2, 1, 2, 1, 'YELLOW'), '2026-10-01': (1, 0, 1, 0, 'YELLOW')}
-  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmp0vc_rc_0/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmp0vc_rc_0/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
+  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmp0chziy5g/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmp0chziy5g/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
   [OK] ⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵) · ([], [])
   [OK] ⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)
-  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmp0vc_rc_0/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
+  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmp0chziy5g/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
   [OK] ⑧ 資料家不可用 = NODATA(不假寫)
   [OK] ⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock) · ('RELOCK', 'VIA_Workflow_VDF_SSOT_v0102.json')
   [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在
@@ -86,7 +86,7 @@
   [OK] ② 檢視本體 = VCGC 的 CGC_MDL253 尾版且有 params / prep(兩個管理員同一份) · CGC_MDL253_ToolingInventory_v0102.py
   [OK] ③ params <引擎>:備料卡七段都在(參數 · 環境變數 · SSOT · regex · 同義字 · 工作流步 · 短令)· rc 照燈 · (2, 'YELLOW', ['v0122', 'v0118'], 'via-vdfeng ENG055')
   [OK] ④ engine params 與 params 同一條路(rc 相同) · (2, 2)
-  [OK] ⑤ prep:VDF 每支引擎一列 · json + html 落地 · 沒有被擋的紅燈 · {'engines': 94, 'lamps': {'GREEN': 17, 'YELLOW': 77, 'RED': 0, 'NA': 0}, 'with_cli': 80, 'with_books': 30, 'local_synonym_tables': 29}
+  [OK] ⑤ prep:VDF 每支引擎一列 · json + html 落地 · 沒有被擋的紅燈 · {'engines': 94, 'lamps': {'GREEN': 17, 'YELLOW': 77, 'RED': 0, 'NA': 0}, 'with_cli': 80, 'with_books': 30, 'local_synonym_tables': 28}
   [OK] ⑥ 找不到的引擎回 3(不猜)
   [OK] ⑦ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib
   [計] VDF_SystemManager v0125 本版 7/7 · 前版 PASS · 合計 PASS
@@ -111,4 +111,4 @@
   [OK] ③ 呼叫結束環境還原(不留 VIA_FROM_VCGC / VIA_FROM_VDFSM)
   [OK] ④ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不寫同意閘
   [計] VDF_SystemManager v0128 本版 4/4 · 前版 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 53 提交 · 快照 21.6h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 50 提交 · 快照 20.9h · 未推 2 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
