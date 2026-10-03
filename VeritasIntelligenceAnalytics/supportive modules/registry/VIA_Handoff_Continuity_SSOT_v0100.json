@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-02T21:02:48+00:00",
+  "updated_at": "2026-10-03T10:52:14+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -301,7 +301,8 @@
         "supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json",
         "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
         "Invoke-VIA-OperatorConsole-v*.ps1",
-        "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+        "supportive modules/registry/CGC_MDL058_Lessons_v*.py",
+        "Invoke-VIA-Step1-SyncAndLKGC*.ps1"
       ],
       "timeout_seconds": 300
     },
@@ -1072,6 +1073,44 @@
         "supportive modules/registry/CGC_MDL226_StepMatrix_v*.py"
       ],
       "timeout_seconds": 300
+    },
+    "github_panorama": {
+      "argv": [
+        "CGC_MDL255_GitHubPanorama",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL255_GitHubPanorama_v0101 selftest +6/6 PASS",
+      "scope": "GitHub 全景(只讀):AI 讀 origin/main 九本分號冊 + union 三本聯集冊;v0100 8/8 → v0101 6/6(VCGC-REQ132;盤點冊 v0135 已登 C-github_panorama,交接冊補案)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL255_GitHubPanorama_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "tw02_parser": {
+      "argv": [
+        "VRN_TW02_ReportParser",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_TW02_ReportParser_v0102 薄尾 6/6 · PASS",
+      "scope": "TW02 報告解析器 v0102:同義字 / 正則委樞(SUP_MDL749 hub,drift 0)· 委樞印記 · 加速器橋(VCGC-REQ132)",
+      "dependencies": [
+        "functional modules/VRN/VRN_TW02_ReportParser_v*.py",
+        "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json"
+      ],
+      "timeout_seconds": 300
+    },
+    "first_page_engine": {
+      "argv": [
+        "VIA_VRN_FirstPageEngine",
+        "--selftest"
+      ],
+      "success_marker": "[計] VIA_VRN_FirstPageEngine_v0130 薄尾 3/3 · 前版 rc=0 · 合計 PASS",
+      "scope": "首頁全能引擎 v0130:評等 / 目標價委樞(drift 0)+ 前版 42 檢;㊳ 要庫內真 sidecar ≥ 20 份(工作站 66;容器 2 → 只能工作站驗)(VCGC-REQ132)",
+      "dependencies": [
+        "functional modules/VRN/VIA_VRN_FirstPageEngine_v*.py",
+        "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -2353,6 +2392,56 @@
       "owner": "操作員裁定命名",
       "reason": "步 5 實量撞號 14 組(同家族同號不同名):CGC_MDL193 15 支 · CGC_MDL149 24 支附屬 · SUP_MDL743 Layout* 6 支 · VDF_ENG110/117/118 · VRN_ENG109 · CGC_MDL135/142/197/199/224 · VDF_MDL001 · VRN_MDL001",
       "next": "操作員裁定:附屬拆檔(Layout* · MDL149_*)算同家族合法,或改號;裁定後出 StepMatrix 新尾版收規則 / 交中央編號 CGC_MDL237 改號"
+    },
+    {
+      "id": "VCGC-REQ132:vdf-manager-book-follow",
+      "requirement": "VCGC-REQ132",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF_SystemManager v0122 自測 ① 寫死七項輸出;main 入範圍冊 v0102/v0103 長成八項 → vdf_universe / vdf_universe_r50 紅",
+      "next": "VDF_SystemManager v0124(前版釘出貨冊 v0101 · 尾冊只增不減)→ 重跑兩案轉 VERIFIED",
+      "case": "vdf_universe",
+      "receipt": "docs/handoff/evidence/vdf_universe.json"
+    },
+    {
+      "id": "VCGC-REQ132:ps-entries",
+      "requirement": "VCGC-REQ132",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "盤點冊 v0135 登 ps.step1_sync_lkgc,TestAuto 本體只認主控台一支 → ⑧ GONE;PS 站一律驗主控台;Step1 一次貼缺 L103 模板兩章",
+      "next": "TestAuto v0105 + Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1 + 盤點冊 v0136 → chain 案轉 VERIFIED",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json"
+    },
+    {
+      "id": "VCGC-REQ132:github-panorama-case",
+      "requirement": "VCGC-REQ132",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "main 新增 CGC_MDL255 v0100/v0101 沒有交接案(CHANGED_CODE_WITHOUT_TEST;盤點冊 coverage.case 已指向)",
+      "next": "交接案 github_panorama 實跑轉 VERIFIED",
+      "case": "github_panorama",
+      "receipt": "docs/handoff/evidence/github_panorama.json"
+    },
+    {
+      "id": "VCGC-REQ132:tw02-parser-case",
+      "requirement": "VCGC-REQ132",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "main 新增 VRN_TW02_ReportParser v0102 沒有交接案(CHANGED_CODE_WITHOUT_TEST)",
+      "next": "交接案 tw02_parser 實跑轉 VERIFIED",
+      "case": "tw02_parser",
+      "receipt": "docs/handoff/evidence/tw02_parser.json"
+    },
+    {
+      "id": "VCGC-REQ132:first-page-v0130-case",
+      "requirement": "VCGC-REQ132",
+      "state": "PENDING",
+      "owner": "operator",
+      "reason": "main 新增 VIA_VRN_FirstPageEngine v0130 沒有交接案;前版 ㊳ 要庫內真 sidecar ≥ 20 份,容器只有 2 份 → 容器實跑 rc 1(41/42,唯一紅是 ㊳ 份數不足,不是回歸)",
+      "next": "工作站(66 份 sidecar)跑 via-vcgc handoff test first_page_engine;rc 0 才轉 VERIFIED",
+      "case": "first_page_engine",
+      "receipt": "docs/handoff/evidence/first_page_engine.json"
     }
   ]
 }
