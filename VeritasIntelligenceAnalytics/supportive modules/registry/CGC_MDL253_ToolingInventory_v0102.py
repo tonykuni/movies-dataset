@@ -103,7 +103,7 @@ OCR_PKGS_V0102 = ("fitz", "pymupdf", "pdfplumber", "pypdf", "pdfminer", "camelot
 TOOL_SETS_V0102 = {
     "VRN": {"locked": ("layout", "nlp", "praddle", "pdfplumber", "ocr"),
             "hubs": (("supportive modules/70_VRN_Rules", "SUP_MDL744_NLPApplicationHub"), ("supportive modules/70_VRN_Rules", "SUP_MDL745_MarkdownStructureHub"),
-                     ("supportive modules/70_VRN_Rules", "SUP_MDL743_Layout*"), ("functional modules/VRN", "VRN_ENG394_LayoutRestore"),
+                     ("supportive modules/70_VRN_Rules/layout_repair_v0100", "SUP_MDL743_Layout*"), ("functional modules/VRN", "VRN_ENG394_LayoutRestore"),
                      ("functional modules/VRN", "VRN_ENG087_NLPTextSummaryBridge"))},
     "VDF": {"locked": ("accelerator", "network", "frame"), "hubs": ()},
 }
