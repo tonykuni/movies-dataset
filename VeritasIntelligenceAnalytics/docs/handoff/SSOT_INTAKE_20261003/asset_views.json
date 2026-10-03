@@ -1,0 +1,189 @@
+{
+  "scope": "asset_intake_only",
+  "authority": "VIA_Numbering_SSOT / VIA_NumberBooks",
+  "ssot_asset_registry": [
+    {
+      "asset_key": "[\"operator-proposal:20261003:mom\",\"mom\",\"mom\"]",
+      "current_code": "VIA-VQG-LGC001",
+      "current_version": "1.0.0",
+      "asset_type": "INDICATOR",
+      "owner": "VQG",
+      "scope": "indicator.mom",
+      "name": "動能 MOM 指標定義",
+      "status": "REGISTERED_NOT_DEPLOYED"
+    },
+    {
+      "asset_key": "[\"operator-proposal:20261003:mom_period\",\"mom_period\",\"mom_period\"]",
+      "current_code": "VIA-VQG-PRMT001",
+      "current_version": "1.0.0",
+      "asset_type": "INPT",
+      "owner": "VQG",
+      "scope": "indicator.mom",
+      "name": "MOM 視窗預設",
+      "status": "REGISTERED_NOT_DEPLOYED"
+    },
+    {
+      "asset_key": "[\"operator-proposal:20261003:source_identity\",\"source_identity\",\"source_identity\"]",
+      "current_code": "VIA-VCGC-LGC370",
+      "current_version": "1.0.0",
+      "asset_type": "LOGIC",
+      "owner": "VCGC",
+      "scope": "numbering.identity",
+      "name": "同值不同來源分號",
+      "status": "REGISTERED_NOT_DEPLOYED"
+    },
+    {
+      "asset_key": "[\"operator-proposal:20261003:tpex_start\",\"tpex_start\",\"tpex_start\"]",
+      "current_code": "VIA-VDF-PRMT720",
+      "current_version": "1.0.0",
+      "asset_type": "INPT",
+      "owner": "VDF",
+      "scope": "daily.start",
+      "name": "TPEX 日資料起始日預設",
+      "status": "REGISTERED_NOT_DEPLOYED"
+    },
+    {
+      "asset_key": "[\"operator-proposal:20261003:twse_start\",\"twse_start\",\"twse_start\"]",
+      "current_code": "VIA-VDF-PRMT719",
+      "current_version": "1.0.0",
+      "asset_type": "INPT",
+      "owner": "VDF",
+      "scope": "daily.start",
+      "name": "TWSE 日資料起始日預設",
+      "status": "REGISTERED_NOT_DEPLOYED"
+    }
+  ],
+  "vcgc_version_history": [
+    {
+      "ssot_code": "VIA-VDF-PRMT719",
+      "asset_key": "[\"operator-proposal:20261003:twse_start\",\"twse_start\",\"twse_start\"]",
+      "version": "1.0.0",
+      "value": "2026-01-02",
+      "source_id": "operator-proposal:20261003:twse_start",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "numbered_at": "2026-10-03 10:38:01 +0000"
+    },
+    {
+      "ssot_code": "VIA-VDF-PRMT720",
+      "asset_key": "[\"operator-proposal:20261003:tpex_start\",\"tpex_start\",\"tpex_start\"]",
+      "version": "1.0.0",
+      "value": "2026-01-02",
+      "source_id": "operator-proposal:20261003:tpex_start",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "numbered_at": "2026-10-03 10:38:01 +0000"
+    },
+    {
+      "ssot_code": "VIA-VQG-PRMT001",
+      "asset_key": "[\"operator-proposal:20261003:mom_period\",\"mom_period\",\"mom_period\"]",
+      "version": "1.0.0",
+      "value": 10,
+      "source_id": "operator-proposal:20261003:mom_period",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "numbered_at": "2026-10-03 10:38:01 +0000"
+    },
+    {
+      "ssot_code": "VIA-VCGC-LGC370",
+      "asset_key": "[\"operator-proposal:20261003:source_identity\",\"source_identity\",\"source_identity\"]",
+      "version": "1.0.0",
+      "value": {
+        "key": [
+          "source_id",
+          "source_pointer",
+          "candidate_id",
+          "version"
+        ],
+        "same_values_do_not_merge": true
+      },
+      "source_id": "operator-proposal:20261003:source_identity",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "numbered_at": "2026-10-03 10:38:01 +0000"
+    },
+    {
+      "ssot_code": "VIA-VQG-LGC001",
+      "asset_key": "[\"operator-proposal:20261003:mom\",\"mom\",\"mom\"]",
+      "version": "1.0.0",
+      "value": {
+        "formula": "adj_close[t] - adj_close[t-n]",
+        "parameters": {
+          "n": 10,
+          "price": "adj_close"
+        },
+        "benchmark": {
+          "centerline": 0,
+          "meaning": "描述價格差，不構成自動交易指令"
+        },
+        "explanation": "n 期價格差；MOM 上升不必然代表今日價格上漲。未驗證策略有效性。",
+        "pros": [
+          "易理解",
+          "保留絕對價格差"
+        ],
+        "cons": [
+          "跨股尺度不同",
+          "仍有回看視窗",
+          "盤整雜訊",
+          "前值缺失則結果空值"
+        ],
+        "alternatives": [
+          "ROC（報酬比率，沒有固定上下界）",
+          "RSI",
+          "MACD"
+        ]
+      },
+      "source_id": "operator-proposal:20261003:mom",
+      "source_sha256": "9728b1739a043198cd4f08e6a48a6f568d86d08cc52025c144cc82c92ad2f203",
+      "numbered_at": "2026-10-03 10:38:01 +0000"
+    }
+  ],
+  "asset_execution_tags": [
+    {
+      "ssot_code": "VIA-VDF-PRMT719",
+      "owner": "VDF",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ]
+    },
+    {
+      "ssot_code": "VIA-VDF-PRMT720",
+      "owner": "VDF",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ]
+    },
+    {
+      "ssot_code": "VIA-VQG-PRMT001",
+      "owner": "VQG",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ]
+    },
+    {
+      "ssot_code": "VIA-VCGC-LGC370",
+      "owner": "VCGC",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ]
+    },
+    {
+      "ssot_code": "VIA-VQG-LGC001",
+      "owner": "VQG",
+      "risk_level": "MED",
+      "environment": "via_core",
+      "libraries": [
+        "polars",
+        "duckdb"
+      ]
+    }
+  ]
+}

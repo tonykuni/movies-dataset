@@ -44,3 +44,20 @@ Regex 採 DuckDB RE2 測正反例；自動判斷重疊只支援錨定、固定�
 - MOM 有回看期，不能稱零延遲或保證領先；ROC 沒有固定上下界。
 - 不把 HIGH 風險只能跑 PRD 當作治理政策；隔離與授權仍由既有環境工具裁定。
 - 既有 134 支 Windows 車道、舊同義字待裁定與總體紅燈並未因本輪登錄消失。
+
+## 本輪實測結果
+
+- 自測 30 過／0 失敗；入冊 5，REVIEW 3（保持空號）。
+- 全功能 147 站：109 綠／17 黃／21 紅；整體仍 RED，SDD YELLOW，交接 RED。
+- 中央編號稽核：遺失 0、改身分 0、重號 0；舊冊其他稽核項仍待处理。
+
+|候選|實際中央碼／狀態|
+|---|---|
+|twse_start|VIA-VDF-PRMT719|
+|tpex_start|VIA-VDF-PRMT720|
+|mom_period|VIA-VQG-PRMT001|
+|mom|VIA-VQG-LGC001|
+|mom_alias|REVIEW|
+|twse_ticker|REVIEW|
+|tpex_ticker|REVIEW|
+|source_identity|VIA-VCGC-LGC370|
