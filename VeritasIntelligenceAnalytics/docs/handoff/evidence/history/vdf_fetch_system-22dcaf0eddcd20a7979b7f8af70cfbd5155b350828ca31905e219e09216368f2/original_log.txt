@@ -30,16 +30,15 @@
 [政策] L50 全景 · 尾版 571 · import 0 · 提及 64 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL252_ManagerParity_v0100.py(家族 core)
-=== CGC_MDL252_ManagerParity_v0100 · 自測(暫存兩個假管理員鏈;只 ast.parse)===
-  [OK] ① AST 收 args[0] · args[:1] · sub 三種比對 · {'top': {'universe', 'status'}, 'sub': {'universe': {'xcheck', 'parquet', 'headers', 'frame', 'validate', 'lock', 'loop'}}}
-  [OK] ② 弱的一邊缺能力 = YELLOW,逐項列「VRN 缺」
-  [OK] ③ 只在一邊的一般動詞照列(provenance 只在 VRN)
-  [OK] ④ 補上薄尾後整鏈聯集 = 兩邊一樣強 → GREEN
-  [OK] ⑤ 報告寫得出、讀得回
-  [OK] ⑥ frame_from_spec:欄序照冊 · 型別照冊轉
-  [OK] ⑦ 真實兩條鏈讀得到(VDF · VRN 尾版都在) · {'VDF': 'VDF_SystemManager_v0127.py', 'VRN': 'VRN_SystemManager_v0116.py'}
-  [OK] ⑧ 加速器橋在 · 不碰 TA-Lib · 不 import 子系統管理員
-  [計] CGC_MDL252_ManagerParity_v0100 8/8 · PASS
-  [同步] SDD 驗證 RED:X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VCGC-REQ141→functional modules/VDF/VDF_FetchSystem_SSOT_v0 → via-vcgc sdd check
-[監控] 背景全景監控中 pid 4142 · 觸碰 run CGC_MDL252_ManagerParity · 交接閘 RED · 落後 43 提交 · 快照 20.0h · 未推 1 · 未登 1 支(CGC_MDL256_SubsystemBundle) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0100.py(家族 vdf)
+=== VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
+  [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
+  [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
+  [OK] ③ 舊佈局絕對路徑全改寫到輸出根(每支 ≥ 1 處)· __main__ 段分出 · {'001u': 1, '002': 1, '003': 1, '004': 1, '005': 2, '006': 2, '007': 1}
+  [OK] ④ 依 needs 排序:MDL001 宇宙先於 004 / 005 / 006 / 007
+  [OK] ⑤ live 閘沒開 → rc4 GATED 零子行程;未知動詞 / 冊外代號 rc2;不加 --apply 只列計畫 · (4, 2, 2, 0)
+  [OK] ⑥ fixture 路由:兩所日行情 · 上市基本資料 · CNN 都有樣本;未知網址回 404(不編)
+  [OK] ⑧ live 路由:requests GET/POST 全走鎖版網路工具(http_bytes / post_json · 帶 params)· 閘關 = GATED 例外不出網 · ['https://openapi.twse.com.tw/v1/x?a=1', 'POST https://example.org/p', 'https://openapi.twse.com.tw/v1/x']
+  [OK] ⑦ 加速器橋 · 網路橋在;不碰 TA-Lib;本支不寫 VIA_NET_CONSENT
+  [計] VDF_MDL008_FetchSystem v0100 8/8 PASS
+[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 41 提交 · 快照 19.6h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
