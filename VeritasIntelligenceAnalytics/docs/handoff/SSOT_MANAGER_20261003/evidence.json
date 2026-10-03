@@ -5,6 +5,82 @@
   "prior_selftest_pass": 30,
   "TA_Lib": "FORBIDDEN",
   "runtime": "Linux Python 3.12",
-  "governance": "IN_PROGRESS",
-  "Windows": "NOT_RUN"
+  "governance": {
+    "SDD": "YELLOW",
+    "handoff": "RED",
+    "closeout": "BLOCKED"
+  },
+  "Windows": "NOT_RUN",
+  "integration": {
+    "state": "REVIEW",
+    "rc": 2,
+    "active_rules": 55,
+    "catalog_holds": 0,
+    "registered": 5,
+    "candidate_review": 3,
+    "allocation": {
+      "requested": true,
+      "performed": false,
+      "rc": null
+    },
+    "records": 2,
+    "export": "REUSED"
+  },
+  "central_module_code": "VIA-VCGC-MDL1550",
+  "numbering": {
+    "before": 110076,
+    "after": 110099,
+    "added": 23,
+    "lost": 0,
+    "identity_changes": 0,
+    "duplicates": 0,
+    "audit_rc": 2
+  },
+  "pending": [
+    {
+      "id": "VCGC-REQ135-LEGACY",
+      "state": "REVIEW",
+      "owner": "VCGC / operator",
+      "reason": "原有 MOM 同義字及 TWSE/TPEX Regex 缺少可證明範圍",
+      "next": "補齊原正主 scope 或裁定後出候選新版，再同步"
+    },
+    {
+      "id": "VCGC-REQ135-WINDOWS",
+      "state": "NOT_RUN",
+      "owner": "operator / VCGC",
+      "reason": "目前 Linux/Python 3.12 隔離環境",
+      "next": "Windows 主機驗證同一入口及原始 134 車道"
+    },
+    {
+      "id": "VCGC-REQ134-RESOURCES",
+      "state": "PENDING",
+      "owner": "operator / VCGC",
+      "reason": "WordNet 與正式金融向量資源仍未驗證",
+      "next": "提供本地資源與模型 SHA 再驗"
+    },
+    {
+      "id": "GLOBAL-RED-20",
+      "state": "BLOCKED",
+      "owner": "VCGC",
+      "reason": "本輪全域回歸 20 個既有紅燈、SDD YELLOW、交接 RED",
+      "next": "依 full_test_report 逐案處理，禁止全綠結案"
+    }
+  ],
+  "full_test": {
+    "stations": 150,
+    "counts": {
+      "GREEN": 112,
+      "YELLOW": 18,
+      "RED": 20
+    },
+    "seconds": 492.6,
+    "lamp": "RED",
+    "new_red_vs_prior_effective": []
+  },
+  "manager_preview": {
+    "lamp": "YELLOW",
+    "rc": 2,
+    "reason": "3 existing REVIEW candidates retain null IDs"
+  },
+  "source_commit": "a25e2922"
 }

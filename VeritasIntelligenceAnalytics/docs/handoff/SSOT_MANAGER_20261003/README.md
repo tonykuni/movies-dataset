@@ -29,3 +29,9 @@ plan/show/conflicts/sync 都回傳中央 plan 與 catalog；snapshot 是可刪�
 TA-Lib 禁用。沿用先前隔離 Linux/Python 3.12 與相依 lock；Windows、原始 134 車道及正式 DB/OCR 沒有在此環境驗收。先前 MOM 同義詞與 TWSE/TPEX Regex 三個候選仍待審，不能自動略過。
 
 中央 writer 忙碌時回 HOLD，不強制接管；跨程序、跨檔崩潰原子性及舊寫入者不宣稱已保證。本次前次作業遺留鎖已確認沒有對應存活 Python 行程，原鎖及復原紀錄存於本目錄；runtime manager 不自動解除他人鎖。
+
+## 本次結果
+
+中央代碼 VIA-VCGC-MDL1550；管理器新增 28/28、原中央 30/30 自測通過。本批新增 23 號，遺失／改身分／重號全部為 0。真冊串接同步出 55 條可用規則、保留 5 個原號與 3 個空號 REVIEW，兩個來源的 L1 清洗與輸出驗證成功。
+
+完整回歸 150 站，112 綠／18 黃／20 紅，492.6 秒；相較前輪有效結果沒有新增紅燈。SSOT-manager-plan 因 3 個既有待審候選回 rc=2 / YELLOW，並非偷偷改綠。SDD YELLOW、交接 RED，整體未結案。細節、來源 SHA、實際命令與後續事項見 evidence.json、runs.json、full_test_report.json。
