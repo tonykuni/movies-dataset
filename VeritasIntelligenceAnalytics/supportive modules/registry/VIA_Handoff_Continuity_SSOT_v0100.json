@@ -1322,17 +1322,21 @@
     },
     "vdf_fetch_integration": {
       "argv": [
-        "VDF_MDL008_FetchSystem",
+        "VDF_SystemManager",
+        "fetch",
         "test"
       ],
-      "success_marker": "整合測試(fixture 離線網)] PASS",
+      "success_marker": "整合測試 v0101] PASS",
       "scope": "VDF 擷取系統整合測試:七支全鏈 · 輸出契約 · 倉內零寫入 · block 零出網(VCGC-REQ141)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
         "functional modules/VDF/VDF_FetchSystem_SSOT_v0100.json",
-        "functional modules/VDF/VDF_MDL00*.py"
+        "functional modules/VDF/VDF_MDL00*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0101.json",
+        "functional modules/VDF/engine/VDF_ENG*.py"
       ],
-      "timeout_seconds": 1800
+      "timeout_seconds": 3600
     },
     "network_lock_seat": {
       "argv": [
@@ -1361,6 +1365,56 @@
         "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0100.json"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_master_control": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0128 本版 4/4",
+      "scope": "VDF 管理員 v0128 總控 · 獨立運作(VCGC-REQ143)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    "vdf_fetch_v0101": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0101 本版 6/6",
+      "scope": "MDL008 v0101 總控入口 · 冊 v0101 · 第一步清單(VCGC-REQ143)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 1800
+    },
+    "vdf_list_stock": {
+      "argv": [
+        "VDF_MDL009_TWStockList",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL009_TWStockList v0100 7/7 PASS",
+      "scope": "MDL009 全台股清單(開頭五欄 · 驗證七項 · DuckDB 增量)(VCGC-REQ143)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    "vdf_list_etf": {
+      "argv": [
+        "VDF_MDL010_ActiveETFList",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL010_ActiveETFList v0100 7/7 PASS",
+      "scope": "MDL010 主動式 ETF 清單(ENG077 律 · 開頭五欄 · 驗證七項)(VCGC-REQ143)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL010_ActiveETFList_v*.py",
+        "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
+      ],
+      "timeout_seconds": 1800
     }
   },
   "work_items": [
@@ -2882,6 +2936,42 @@
       "next": "handoff test bundle_tool 實跑轉 VERIFIED",
       "case": "bundle_tool",
       "receipt": "docs/handoff/evidence/bundle_tool.json"
+    },
+    {
+      "id": "VCGC-REQ143:vdf_master_control",
+      "requirement": "VCGC-REQ143",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF 管理員 v0128 總控 · 獨立運作",
+      "next": "handoff test vdf_master_control 實跑轉 VERIFIED",
+      "case": "vdf_master_control"
+    },
+    {
+      "id": "VCGC-REQ143:vdf_fetch_v0101",
+      "requirement": "VCGC-REQ143",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0101 總控入口 · 冊 v0101 · 第一步清單",
+      "next": "handoff test vdf_fetch_v0101 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0101"
+    },
+    {
+      "id": "VCGC-REQ143:vdf_list_stock",
+      "requirement": "VCGC-REQ143",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL009 全台股清單(開頭五欄 · 驗證七項 · DuckDB 增量)",
+      "next": "handoff test vdf_list_stock 實跑轉 VERIFIED",
+      "case": "vdf_list_stock"
+    },
+    {
+      "id": "VCGC-REQ143:vdf_list_etf",
+      "requirement": "VCGC-REQ143",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL010 主動式 ETF 清單(ENG077 律 · 開頭五欄 · 驗證七項)",
+      "next": "handoff test vdf_list_etf 實跑轉 VERIFIED",
+      "case": "vdf_list_etf"
     }
   ]
 }
