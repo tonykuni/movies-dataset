@@ -1,0 +1,277 @@
+{
+ "schema": "VIA.VRN.FrameFlow.v1",
+ "engine": "VRN_ENG115_HeaderFrameTemp_v0101.py",
+ "managed_by": "VRN_SystemManager",
+ "repair": "VRN_ENG392_TextCompleteness repair_loop（R0 原樣，R1 去零寬與全形，R2 字間空白與數字接回，R3 斷行；覆蓋率下降整輪退回）",
+ "verify": "VRN_ENG392 覆蓋率與數字逐一核；VRN_ENG082 xcheck 字袋與序列。門檻只讀冊，不在管理器重寫。",
+ "input_params": [
+  {
+   "name": "temp_dir",
+   "required": true,
+   "why": "列先落 TEMP，不把整表留在記憶體"
+  },
+  {
+   "name": "header",
+   "default": 0,
+   "why": "哪一列是 HEADER，轉成 DataFrame 欄名"
+  },
+  {
+   "name": "chunk",
+   "default": 500,
+   "why": "每一批寫進 TEMP 的列數"
+  },
+  {
+   "name": "mem_rows",
+   "default": 2000,
+   "why": "超過就只回預覽，全量留在磁碟"
+  },
+  {
+   "name": "preview",
+   "default": 20,
+   "why": "溢寫時 DataFrame 只帶前幾列"
+  },
+  {
+   "name": "second_text",
+   "why": "第二讀法。沒有就是 SINGLE，不另造一份去互核"
+  }
+ ],
+ "output": {
+  "kind": "dataframe",
+  "header": "first_row",
+  "spill": "temp_parquet",
+  "over_mem_rows": "preview_only",
+  "database": "tables.duckdb",
+  "verify_status": [
+   "PASS",
+   "WARN",
+   "FAIL",
+   "REVIEW_REQUIRED"
+  ]
+ },
+ "sources": [
+  {
+   "id": "left_text",
+   "side": "left",
+   "kind": "text",
+   "becomes": "restored_text"
+  },
+  {
+   "id": "right_table",
+   "side": "right",
+   "kind": "table",
+   "becomes": "dataframe"
+  },
+  {
+   "id": "p1_info_zones",
+   "side": "page1",
+   "kind": "zones",
+   "becomes": "zones[]",
+   "src": "SRC-VRN-P1INFO"
+  },
+  {
+   "id": "body_text",
+   "side": "body",
+   "kind": "text",
+   "becomes": "left_text",
+   "src": "SRC-VRN-P1BODY"
+  },
+  {
+   "id": "fin_table",
+   "side": "fin_pages",
+   "kind": "table",
+   "becomes": "dataframe",
+   "src": "SRC-VRN-FINTAB",
+   "split": "左右 / 上下"
+  },
+  {
+   "id": "ext_hist",
+   "side": "external",
+   "kind": "adj_ohlc",
+   "becomes": "xcheck input",
+   "src": "SRC-EXT-HIST(VDF 供 adj_*,L104/L110)"
+  }
+ ],
+ "flow": [
+  "layout_zones",
+  "table_in_text",
+  "split_left_right",
+  "repair_r0_r3",
+  "nlp_support",
+  "coverage_map",
+  "header_to_frame",
+  "spill_temp",
+  "store_duckdb",
+  "number_check",
+  "xcheck",
+  "verdict",
+  "four_point"
+ ],
+ "actions": [
+  "show",
+  "run",
+  "selftest"
+ ],
+ "version": "v0102",
+ "prior": "VRN_FrameFlow_SSOT_v0101.json",
+ "ts": "2026-10-03T05:39:34",
+ "batch": "側線 2026-10-03 g(操作員:VRN 擷取邏輯 表格及文字 · 文字中有表格左右分開還原修復 · layout 及修復功能 · NLP 持續支援要導入;承 L109 六律 · VIA_VRN_ExtractRules R-TIER/R-COV/R-TEMP/R-EPS)",
+ "flow_v0101": [
+  "split_left_right",
+  "repair_r0_r3",
+  "header_to_frame",
+  "spill_temp",
+  "store_duckdb",
+  "number_check",
+  "xcheck",
+  "verdict",
+  "four_point"
+ ],
+ "steps": [
+  {
+   "id": "S01",
+   "step": "layout_zones",
+   "engine": "VRN_ENG394_LayoutRestore",
+   "zh": "版面切區:頁 1 資訊區(上/左/右/下)與本文區分開;小字頁尾 / 附錄排除;圖≠表",
+   "in": [
+    "pdf page(s)"
+   ],
+   "out": [
+    "zones[] (zone_id · kind · bbox · text)"
+   ],
+   "tier": "R-TIER-01 tier 0(文字層+layout)",
+   "src": "SRC-VRN-P1INFO / SRC-VRN-P1BODY"
+  },
+  {
+   "id": "S02",
+   "step": "table_in_text",
+   "engine": "VRN_ENG058_TableOmni + VRN_ENG394(格線/對齊偵測)",
+   "zh": "本文區裡的表:偵測欄位對齊 / 格線 / 數字列群 → 從文字塊切出成獨立 right_table 來源;文字段保留在 left_text;左右互不吞",
+   "in": [
+    "zones[kind=text]"
+   ],
+   "out": [
+    "left_text[]",
+    "right_table[] (table_id · bbox · split_method=in_text)"
+   ],
+   "rule": "R-DB-01 長表 split_method 欄"
+  },
+  {
+   "id": "S03",
+   "step": "split_left_right",
+   "engine": "VRN_ENG115_HeaderFrameTemp(前版步)",
+   "zh": "左文右表分開(前版照舊;S02 的產物併入同一條左右車道)",
+   "in": [
+    "left_text[]",
+    "right_table[]"
+   ],
+   "out": [
+    "restored_text(左)",
+    "dataframe(右)"
+   ]
+  },
+  {
+   "id": "S04",
+   "step": "repair_r0_r3",
+   "engine": "VRN_ENG392_TextCompleteness repair_loop + VRN_ENG107_TextRestore + VRN_ENG085_MarkdownRestore",
+   "zh": "修復:R0 原樣 · R1 去零寬 / 全形 · R2 字間空白與數字接回 · R3 斷行;覆蓋率下降整輪退回(前版照舊)",
+   "in": [
+    "restored_text"
+   ],
+   "out": [
+    "restored_text(repaired) · repair_round · coverage"
+   ]
+  },
+  {
+   "id": "S05",
+   "step": "nlp_support",
+   "engine": "VRN_ENG066_NLPSupportHub ← VRN_ENG078_NLPOneBridge(鎖冊 SUP_MDL866 v0106)· VRN_ENG087_NLPTextSummaryBridge",
+   "zh": "NLP 持續支援:句界 · 命名實體 · 數字單位正規化 · 摘要;正主缺席走 STDLIB 誠實(不假綠);輸出帶 nlp_path 欄(HUB / STDLIB)",
+   "in": [
+    "restored_text(repaired)"
+   ],
+   "out": [
+    "entities · sentences · summary · nlp_path"
+   ],
+   "lock": "VIA_ToolVersion_Lock nlp=SUP_MDL866_VIAUnifiedNLPOrchestrator 尾版"
+  },
+  {
+   "id": "S06",
+   "step": "coverage_map",
+   "engine": "VRN_ENG392_TextCompleteness(coverage)+ VRN_ENG397_PluginHub(升級)",
+   "zh": "完整性三檢(R-COV-01):墨跡覆蓋圖 · 表格格線 vs 格子 · 數字自洽;未覆蓋區塊才按 R-TIER-01 升級(輕 OCR → 重 OCR → 350dpi 只對該區)",
+   "in": [
+    "zones · dataframe · restored_text"
+   ],
+   "out": [
+    "coverage(zone 分數)· escalations[]"
+   ]
+  },
+  {
+   "id": "S07",
+   "step": "header_to_frame",
+   "engine": "VRN_ENG115_HeaderFrameTemp(前版步)",
+   "zh": "表頭 → DataFrame(欄位正典 id;介面表頭 Title Case R-HDR-01)"
+  },
+  {
+   "id": "S08",
+   "step": "spill_temp",
+   "engine": "VRN_ENG115(前版步)",
+   "zh": "TEMP 分夾 <doc_sha>/<page>/<dpi>/<tool>(R-TEMP-01;文件做完才清)"
+  },
+  {
+   "id": "S09",
+   "step": "store_duckdb",
+   "engine": "VRN_ENG073_ReportStructuredDB",
+   "zh": "長表入庫(R-DB-01:parquet + duckdb;欄 文件·頁·區·表號·列·欄·期別·科目id·值·單位·等級·來源·bbox·切法)"
+  },
+  {
+   "id": "S10",
+   "step": "number_check",
+   "engine": "VRN_ENG108_StatementCheck",
+   "zh": "數字逐一核(小計=分項和 · EPS×股數≈淨利 · 百分比重算)"
+  },
+  {
+   "id": "S11",
+   "step": "xcheck",
+   "engine": "VRN_ENG082_ExtractionLogic",
+   "zh": "多來源對照(R-CMP-01:決策級欄位兩路以上一致 measured;不一致 RED 兩值都留;一路 single-source)"
+  },
+  {
+   "id": "S12",
+   "step": "verdict",
+   "engine": "VRN_SystemManager",
+   "zh": "誠實四態總判 + EPS 裁決 R-EPS-01(eps_diluted / eps_basic / eps_rule / eps_grade)"
+  },
+  {
+   "id": "S13",
+   "step": "four_point",
+   "engine": "VRN_ENG080_FourPointDigest",
+   "zh": "四點文摘(前版步)"
+  }
+ ],
+ "sources_v0101": [
+  {
+   "id": "left_text",
+   "side": "left",
+   "kind": "text",
+   "becomes": "restored_text"
+  },
+  {
+   "id": "right_table",
+   "side": "right",
+   "kind": "table",
+   "becomes": "dataframe"
+  }
+ ],
+ "rules_ref": [
+  "VIA_VRN_ExtractRules_SSOT_v0100(R-SRC-01 · R-CMP-01 · R-TIER-01 · R-COV-01 · R-TEMP-01 · R-DB-01 · R-FCST-01 · R-EPS-01)",
+  "VDF_DataArchitecture_Rule_SSOT_v0100(R-DB-01…10)",
+  "L109 · L107 · L108"
+ ],
+ "continuity": {
+  "nlp": "S05 永在流程上;正主缺席 = nlp_path STDLIB + grade 降級,不略過不假綠",
+  "layout": "S01 永在;無 layout 能力(fitz 缺)= tier 0 失敗 → S06 升級",
+  "repair": "S04 覆蓋率下降整輪退回(前版律)",
+  "engine_next": "VRN_ENG115_HeaderFrameTemp 下一版讀 flow(本冊)而非寫死九步;VRN_SystemManager outputs 動詞照 steps 順序派工"
+ }
+}
