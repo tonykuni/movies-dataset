@@ -83,7 +83,7 @@ VIA = PRIOR.VIA
 TAG = f"VDF_MDL012_FetchGroups v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 PRIOR.TAG = TAG
 UI_DIR = VIA / "supportive modules" / "ui_support"
-UI_PAGE = UI_DIR / "VIA_UI_VDF_FetchGroups_v0100.html"
+UI_PAGE = UI_DIR / "VIA_UI_VDFFetchGroups_v0100.html"
 NUMBER_DIR = VIA / "supportive modules" / "registry" / "VIA_NumberBooks"
 REG = VIA / "supportive modules" / "registry"
 LIVE_SEC = 120
@@ -505,7 +505,7 @@ function build() {
   show(st.page && document.getElementById(st.page) ? st.page : 'pg-1');
   if (st.verb) setCmd(st.verb), show(st.page || 'pg-1');
   if (S.live.running && st.autoreload !== false) setTimeout(() => location.reload(), 15000);
-  try { const bc = new BroadcastChannel('via-ui'); bc.postMessage({page: 'VIA_UI_VDF_FetchGroups', as_of: S.as_of, built: S.built}); } catch (e) {}
+  try { const bc = new BroadcastChannel('via-ui'); bc.postMessage({page: 'VIA_UI_VDFFetchGroups', as_of: S.as_of, built: S.built}); } catch (e) {}
 }
 document.addEventListener('DOMContentLoaded', build);
 """
