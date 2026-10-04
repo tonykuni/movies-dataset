@@ -44,3 +44,12 @@ TEXT:缺字/重複/閱讀順序/數字單位 · TABLE:列欄數/表頭期間/單
 - **中央編號**:ENG400+插件批 78 席已入冊(registry-sync APPLIED · AST錯 0 · 撞號 0;audit 三零)。
 - 仍待:OCR 重型層(掛 ENG400.OCR heavy 座位,需另驗)· lopdf/iText 自備接頭(cargo 專案+jar)·
   真 PDF 逐件認證(validation 欄待宿主轉綠)· borb/lopdf/iText 以外的 PENDING 無。
+
+## 現況更新(2026-10-05 b:OCR 重型層收口)
+- **Paddle 系列盤點:整條車道已在**——ENG082 ExtractionLogic(paddle 三轉接器 · 3.x 墊片 ·
+  後端健康 · 判準)· ENG072 第三階 · SUP_MDL747 OcrLaneRunner(via_paddle_311 專屬境)。
+- **重型層 = ENG400 v0101 薄尾**:heavy 座位委派正主,不另寫 paddle;在境實跑(先墊片,
+  PPStructure 在場加表格結構)、缺席誠實 UNAVAILABLE+車道指路+健康名單、失敗回寫 BROKEN;
+  `requires_separate_validation` 恆 True(重型需另驗);DPI 300 預設、350 只在最後。
+- 六引擎殼至此六座位全實:FILE/LAYOUT/TEXT/TABLE/GRAPH 實作或委派 · OCR basic+heavy 雙接。
+- 仍待(工作站):via_paddle_311 境 heavy 實跑證據 · lopdf/iText 自備接頭 · 真 PDF 逐件認證。

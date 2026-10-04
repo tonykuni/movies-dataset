@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 61,
+  "PARTIAL": 57,
   "MISSING": 1
  },
  "requirements": [
@@ -4915,120 +4915,6 @@
    "modules": [
     "VDF_MDL012_FetchGroups_v0101.py"
    ]
-  },
-  {
-   "code": "VCGC-REQ152",
-   "subsystem": "VDF",
-   "topic": "啟動指令對接 U/I · 自適應任何範本",
-   "requirement": "操作員令(2026-10-04,貼回工作站 VDF HTML U/I(ENG234 UiLauncher v0102)輸出後):「將啟動指令對接u/i可以自適用式其他模板範本」",
-   "status": "PARTIAL",
-   "homes": [
-    "VIA_Workflow_VDF_SSOT_v0104.json",
-    "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
-   ],
-   "evidence": "MDL012 v0102 ui --template 自測 8/8(Jinja 沙盒 · 逐變數代換 · 注入 · 沙盒擋 __subclasses__ · 找不到範本誠實報);Invoke-VDF-FetchGroupsUI-v0100.ps1 pwsh 解析 0 錯 · 容器跑三模式(正典頁經 Invoke-VIAPython 加速 · -Template 範例範本 · -List)皆 rc 0;對接快照 VDF_FetchGroups_SNAPSHOT_latest.json",
-   "next": "工作站 ENG234 UiLauncher v0102 不在倉(GitHub 各分支 / PR 都沒有)→ 操作員推上來後,把它的「對接:」接到 VDF_FetchGroups_SNAPSHOT_latest.json;其輸出的「Start-CeleritasPS7 掛不上(null)」要看它的原始碼才能定位(正本 VeritasCeleritas.PS7.ps1 已有 null 初始化保護;政策入口是 PS-ACCEL 橋 / Invoke-VIACeleritasScoped)",
-   "hand": "AI",
-   "quotes": [
-    {
-     "text": "將啟動指令對接u/i可以自適用式其他模板範本",
-     "recorded_at": "2026-10-04T07:20:00+00:00"
-    }
-   ],
-   "modules": [
-    "VDF_MDL012_FetchGroups_v0102.py",
-    "Invoke-VDF-FetchGroupsUI-v0100.ps1"
-   ]
-  },
-  {
-   "code": "VCGC-REQ153",
-   "subsystem": "VCGC",
-   "topic": "一鍵 U/I 引擎:照測過環境安裝 · 自適應任何範本 · 參數可調 · 內建標準範本 · DuckDB 顯式資料庫",
-   "requirement": "操作員令(2026-10-04):「DUCK顯式資料庫於U/I功能 建立一個U/I架構會自適應式吻合任何模板設計」「如果一個系統已經完成,我要如何用一個引擎來進行自動安裝所有工具跟環境依照我測試過的結果然後啟動HTML Ui讓操作介面全部都在上面實習而不動系統」「如果我還不確定模板,他可以自適應是調整去適應模板,並有參數可調整」「可不可以啟動的檔兼啟動最簡單的html標準模板 然後拿未來的來套用」「這個版本元件夠多嗎」",
-   "status": "PARTIAL",
-   "homes": [
-    "VIA_Workflow_VCGC_SSOT_v0119.json",
-    "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
-   ],
-   "evidence": "CGC_MDL261 v0100(原暫號 MDL257,與 main 的 CGC_MDL257_AiVerbLadder 撞號後改 261)自測 9/9;容器實跑 Start-VIA-UIEngine-v0100.ps1:RunGate GREEN(三族家族境真跑)· LKGC RED(本容器境 61 衝突,不可用)· 產頁 586 KB · DuckDB 3 庫 206 表 · Chromium 截圖三頁零 JS 錯誤;MinimalGrid 範本 + --set 主色實產",
-   "next": "工作站:先 EnvGovernance 跑到全綠存 LKGC(你測過的版本鎖)→ Start-VIA-UIEngine -Install 照鎖重建;操作類按鈕(在頁上直接跑指令)需另裁:目前頁只讀、指令由 PS / VCGC 執行",
-   "hand": "AI",
-   "quotes": [
-    {
-     "text": "DUCK顯式資料庫於U/I功能  建立一個U/I架構會自適應式吻合任何模板設計  如果一個系統已經完成，我要如何用一個引擎來進行自動安裝所有工具跟環境依照我測試過的結果然後啟動HTML Ui讓操作介面全部都在上面實習而不動系統",
-     "recorded_at": "2026-10-04T08:20:00+00:00"
-    }
-   ],
-   "modules": [
-    "CGC_MDL261_UIEngine_v0100.py",
-    "Start-VIA-UIEngine-v0100.ps1"
-   ]
-  },
-  {
-   "code": "VCGC-REQ154",
-   "subsystem": "VCGC",
-   "topic": "U/I 左輸入右多頁 · 純滑鼠 · 兩個位置 · 元件註冊與版本鎖 · VDF 大類 + 預設成員 · 起始日只能按大類改 · 不走 server",
-   "requirement": "操作員令(2026-10-04):左輸入功能區、右多頁顯示(第一頁輸入摘要去重 / 引擎工具功能 / 運作結果三矩陣,其他頁結果,末頁流程圖 + 邏輯 · regex 等全部細節矩陣、小字、自動排版、響應式);VCGC 輸入只有系統存放位置與資料庫位置;全滑鼠(拖曳 · 下拉 · 打勾);顯示所有元件的註冊與版本鎖;VDF 分大類:台股與主動式台股 ETF 清單全抓每日量價 · 籌碼 · 月營收,台股個股財報與國際股財報單獨擷取,預設 2330 / 3324 / NVDA;分類後參數皆有預設可增減,起始日只能按大類改、不可單獨改;自動跳出 HTML U/I、不走 server、自適應銜接各種範本",
-   "status": "PARTIAL",
-   "homes": [
-    "VIA_Workflow_VCGC_SSOT_v0119.json",
-    "VIA_Workflow_VDF_SSOT_v0104.json",
-    "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
-   ],
-   "evidence": "CGC_MDL261 v0101 自測 9/9(v0100 PASS)· VDF_MDL012 v0103 自測 11/11(v0102 PASS)· 族群冊 v0101(四大類 TW_MARKET / FIN / MACRO / OTHER;TW_DAILY 拆量價 TW_PRICE_VOL + 籌碼 TW_CHIP;TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA)· Start-VIA-UIEngine-v0101.ps1 pwsh 剖析 0 錯;容器端到端:下載夾匯入 VIA_UI_Input.json(VDF 帳零變動 · ui_config 寫入)· -Run -Mode block(e082 rc 2 · 006 rc 4 誠實擋)· Chromium 截圖 p1 / FIN / 末頁零 JS 錯誤",
-   "next": "工作站:.\\Start-VIA-UIEngine-v0101.ps1(自動開頁、自動匯入下載夾 VIA_UI_Input.json)→ 頁上點選 → 匯出輸入 → 再跑一次 -Run 實抓;台股 / 國際實抓要在工作站(容器 TWSE WAF · Yahoo 429)",
-   "hand": "AI",
-   "quotes": [
-    {
-     "text": "左輸入功能區 右顯示  多頁式 第一頁輸入摘要去重矩陣  引擎工具功能矩陣  運作結果矩陣  其他頁都式結果  最後頁把WORKFLOW 邏輯 REGEX等等所有細節矩陣放到最後一頁非常詳細 小字體 自動優化LAYOUT MATRIX 響振式設計   VCGC  輸入只有系統存放位置及資料庫兩個位置  避免用鍵盤  全用滑鼠介面 WINDOW I/O拖曳式  下拉選單  打勾  介面全部自適應式  顯示所有元件都有註冊及版本號鎖住   VDF分大類類輸入  台股及主動式台股ETF清單式全部抓取每日量價及籌碼資訊 及月營收   台股個股財報及國際股財報式單獨擷取用2330 3324 NVDA為DEFAULT",
-     "recorded_at": "2026-10-04T09:05:00+00:00"
-    },
-    {
-     "text": "分類後的參數其他都有DEFAULT可增減  變動的式起始日期 可分大群改 不可單獨改",
-     "recorded_at": "2026-10-04T09:10:00+00:00"
-    },
-    {
-     "text": "自動跳出HTMD U/I不走SERVER 自適應式銜接各種模板設計風格",
-     "recorded_at": "2026-10-04T09:12:00+00:00"
-    }
-   ],
-   "modules": [
-    "CGC_MDL261_UIEngine_v0101.py",
-    "VDF_MDL012_FetchGroups_v0103.py",
-    "VDF_FetchGroups_SSOT_v0101.json",
-    "Start-VIA-UIEngine-v0101.ps1"
-   ]
-  },
-  {
-   "code": "VCGC-REQ155",
-   "subsystem": "VCGC",
-   "topic": "短指令組合(操作台 · 族群 · 資料庫)· 所有 PS / PY 依規定掛加速器與模組 · VDF 掛網路工具",
-   "requirement": "操作員令(2026-10-04):把 U/I 引擎、VDF 擷取大族群、DuckDB、起始日、監控等用短指令組合在一起;所有 PS / PY 依規定(L103)掛加速器與模組;VDF 檔掛網路工具",
-   "status": "PARTIAL",
-   "homes": [
-    "VIA_Workflow_VCGC_SSOT_v0119.json",
-    "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
-   ],
-   "evidence": "Register-VIA-Commands-v0269.ps1 十件短令(via-op · via-op-run · via-op-pick · via-uieng · via-duck · via-groups · via-groups-ui · via-startdate · via-monitor · via-uihelp + 中文別名),每件包 Invoke-VIACeleritasScoped;pwsh 剖析 0 錯、容器點源實跑 via-groups / via-startdate / via-duck / via-monitor / via-op / via-groups-ui 全 rc 0;via-duck / via-monitor 沒給 --home = 操作台選的資料庫位置。掃橋器 CGC_MDL124:ALL/accel 1787/1787 · VDF/net 137/137;CGC_MDL183:PS 基線外新缺 0;VRN_NewPlugins v0103 薄尾補 PY 加速器橋(自測 5/5);MDL012 v0102/v0103 · MDL261 v0101 加薄尾轉接(TAILAPI 清);工作站首跑(2026-10-05):倉在 Documents\\movies-dataset、本機停在 claude/new-session-q9pb23 → 沒拉到 v0269;且 via-ui 撞名舊令(CGC_MDL130 正典 U/I)→ 改名 via-op / via-op-run / via-op-pick;資料庫位置補倉旁 Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_fetch;工作站次跑(2026-10-05 00:24):via-op 產頁 3.6 MB · DuckDB 9 庫 113 表 1,776 萬列 · RunGate GREEN · LKGC RED;via-monitor 240 列(台股量價 / 主動 ETF / 財報 / 美總經 / 情緒有資料;CN_MACRO / GLOBAL_MACRO / SHIPPING / CN_NBS = <home>\\vake\\db\\vake.duckdb 不在 → NODATA 照實;TW_INDEX 庫不在;INTL_FIN parquet 不在);查出 via-op-run 的 -Run 以陣列字串傳入被綁成 -FetchHome(沒擷取)→ 改雜湊展開,容器假啟動器驗 Run=True · FetchHome 不被吃;via-groups 資料動詞補 --home 預設",
-   "next": "工作站:點源 Register v0269 → via-uihelp → via-op → via-op-run(VIA_NET_CONSENT=YES 才 live);CGC_MDL183 仍數 VRN_NewPlugins_v0102 本體缺橋(已發布 · VCGC 邊界不准就地改;由 v0103 尾版接上)— 要不要讓 VRN 端就地補由操作員裁;PS 既有債 50 支屬 L70 操作員的手",
-   "hand": "AI",
-   "quotes": [
-    {
-     "text": "以都用短指令組合再一起  所有PS PY依規定安裝加速器及模組  VDF加祿網路工具",
-     "recorded_at": "2026-10-04T15:40:00+00:00"
-    }
-   ],
-   "modules": [
-    "Register-VIA-Commands-v0269.ps1",
-    "VRN_NewPlugins_v0103.py",
-    "VDF_MDL012_FetchGroups_v0102.py",
-    "VDF_MDL012_FetchGroups_v0103.py",
-    "CGC_MDL261_UIEngine_v0101.py"
-   ]
   }
  ],
  "non_requirements": [
@@ -5193,5 +5079,5 @@
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
  "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1);+VCGC-REQ150(PARTIAL:擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化 · MDL012 v0100 · 冊 VDF_FetchGroups_SSOT_v0100;歸屬回指工作流冊 VDF v0103 VDF-WKF014);+VCGC-REQ151(PARTIAL:族群操作頁 · MDL012 v0101 ui;歸屬回指 VDF-WKF014-STP003)",
- "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改);+VCGC-REQ152(PARTIAL:啟動指令對接 U/I · 自適應範本;歸屬回指 VDF-WKF014-STP004 · 工作流冊 v0104 · 盤點冊 v0152);+VCGC-REQ153(PARTIAL:一鍵 U/I 引擎 · CGC_MDL261 · Start-VIA-UIEngine;歸屬回指 VCGC-WKF018 · 工作流冊 VCGC v0119 · 盤點冊 v0152);+VCGC-REQ154(PARTIAL:左輸入右多頁 · 純滑鼠 · 兩個位置 · 元件註冊 / 版本鎖 · VDF 大類 · 起始日按大類;歸屬回指 VCGC-WKF018-STP003/004 · VDF-WKF014-STP005);+VCGC-REQ155(PARTIAL:短指令組合 Register v0269 · L103 全樹橋;歸屬回指 VCGC-WKF018-STP005)"
+ "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改)"
 }
