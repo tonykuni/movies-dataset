@@ -92,6 +92,7 @@ def __getattr__(name: str):
 VIA = PRIOR.VIA
 TAG = f"CGC_MDL261_UIEngine v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 PRIOR.TAG = TAG
+SKIPPED: list = []          # 讀冊時跳過的壞列 / 壞收據(照實留底,不吞)
 VDF = VIA / "functional modules" / "VDF"
 REG = VIA / "supportive modules" / "registry"
 NUMBER_DIR = REG / "VIA_NumberBooks"
@@ -241,8 +242,8 @@ def component_matrix(vdf: dict) -> list:
                     try:
                         r = json.loads(ln)
                         numbers[r["source"].replace("\\", "/")] = r.get("code")
-                    except ValueError:
-                        pass
+                    except ValueError as exc:
+                        SKIPPED.append({"file": _rel(p), "why": f"編號冊壞列:{exc}"[:160]})
     reg = {}
     ci = REG / "VIA_Component_Inventory_SSOT_v0100.json"
     if ci.is_file():
@@ -259,7 +260,8 @@ def component_matrix(vdf: dict) -> list:
     for p in EVID.glob("*.json") if EVID.is_dir() else []:
         try:
             r = json.loads(p.read_text(encoding="utf-8"))
-        except ValueError:
+        except ValueError as exc:
+            SKIPPED.append({"file": _rel(p), "why": f"收據不是 JSON:{exc}"[:160]})
             continue
         if r.get("rc") != 0 or not r.get("target_marker_seen"):
             continue
@@ -322,7 +324,9 @@ def snapshot_v0101(cfg: dict, home: Path | None) -> dict:
     snap["vdf"] = vdf
     snap["locations"] = location_candidates(cfg, home, snap["duckdb"])
     snap["members_pick"] = member_candidates()
+    SKIPPED.clear()
     snap["components"] = component_matrix(vdf)
+    snap["skipped_rows"] = SKIPPED[:50]
     snap["tools"] = tool_matrix()
     snap["functions"] = [{"module": a, "verbs": b, "what": c} for a, b, c in FUNCTIONS]
     t = date.today()
