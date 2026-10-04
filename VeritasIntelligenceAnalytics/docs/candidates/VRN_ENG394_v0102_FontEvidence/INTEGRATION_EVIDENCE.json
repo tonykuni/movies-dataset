@@ -1,0 +1,41 @@
+{
+  "engine": "VRN_ENG394_LayoutRestore_v0102",
+  "status": "INTEGRATED_CONTAINER_ACCEPTED · real_pdf_acceptance PENDING(宿主跑)",
+  "date_utc": "2026-10-04T15:03:13Z",
+  "uploaded_sha256": "2d6e9e2286e34deb5450a32ddbb6941cf68e4fb3ab137d8e4d22ed8cda54a76d",
+  "integrated_sha256": "5423f8a7211c8b1ae8816e071ea944f070aa97445f237af5f14dd8014c128e2e",
+  "container_patches": [
+    {
+      "no": 1,
+      "what": "PEP 562 模組層 __getattr__ 轉接前版鏈",
+      "why": "TAILAPI:尾版少公開名稱(text_restore/to_markdown 等)沒轉接"
+    },
+    {
+      "no": 2,
+      "what": "轉接只擋 dunder,單底線私名一併轉",
+      "why": "ENG393 用尾版私名 _order_lines/_page_lines/_wmedian,擋私名→主標題抽空(15/15 掉 10/15)"
+    },
+    {
+      "no": 3,
+      "what": "PRIOR_PATH 改 _PRIOR_PATH,釘名路徑改 v0101 家族式 glob 取前版",
+      "why": "ENG397 catalog 以 _PRIOR_PATH 認薄尾鏈(缺→鏈斷、去重分類消失 17/17 掉 15/17);釘名觸 PINVER"
+    }
+  ],
+  "acceptance": {
+    "host_selftest_on_uploaded": "17/17 PASS · scope SYNTHETIC_ONLY(見 host-selftest-17of17.log;sha 驗籤一致)",
+    "container_selftest": "ENV-YELLOW:需 reportlab+pdfplumber+pdfminer+pypdfium2,容器無且禁裝;補丁後請宿主重跑 --selftest 覆寫本欄",
+    "caller_selftests_with_v0102_as_tail": {
+      "VRN_ENG394_v0101": "16/16 + 前版 48/48 PASS",
+      "VRN_ENG393_DocClassVerify_v0101": "15/15 PASS",
+      "VRN_ENG396_ReportEntities_v0100": "25/25 PASS",
+      "VRN_ENG397_PluginHub_v0100": "17/17 PASS"
+    },
+    "panorama": "v0102 問題 0 · VRN 夾九頭龍 347→347 零退步",
+    "container_functional": "加法性(舊分類零改動)· 缺 pdfplumber 誠實 FAILED 不炸 · font_hint 未知回 None · 公/私名全轉接"
+  },
+  "pending": [
+    "宿主以補丁後檔重跑 --selftest(17 項)與真 PDF 驗收",
+    "中央編號:via-vcgc run CGC_MDL237_NumberingSystem manager sync --apply(操作員鈕)",
+    "FunctionInventory / Workflow SSOT 登錄(操作員閘)"
+  ]
+}
