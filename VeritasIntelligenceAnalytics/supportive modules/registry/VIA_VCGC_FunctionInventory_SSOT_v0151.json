@@ -5,7 +5,7 @@
  "ts": "2026-10-04T02:45:00+00:00",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0150.json",
  "req": "VCGC-REQ085",
- "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
+ "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。;+C-vdf_fetch_groups_v0100(VCGC-REQ150)",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
  "rules": [
   "新 VCGC 動詞 / 新席位 / 新必用卡步 / 新交接案 / 新工作流步:出本冊新版號登錄測法(站)或豁免理由;沒登 = 串測黃,並先跑它所在尾版的 --selftest",
@@ -2490,6 +2490,23 @@
    "deps": [
     "Invoke-VDF-FetchFill-v*.ps1"
    ]
+  },
+  {
+   "id": "C-vdf_fetch_groups_v0100",
+   "name": "交接案 vdf_fetch_groups_v0100(MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150))",
+   "argv": [
+    "run",
+    "VDF_MDL012_FetchGroups",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+    "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
+    "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+    "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json"
+   ]
   }
  ],
  "coverage": {
@@ -3021,6 +3038,9 @@
    },
    "version_panorama_loader": {
     "station": "C-version_panorama_loader"
+   },
+   "vdf_fetch_groups_v0100": {
+    "station": "C-vdf_fetch_groups_v0100"
    }
   },
   "workflow": {

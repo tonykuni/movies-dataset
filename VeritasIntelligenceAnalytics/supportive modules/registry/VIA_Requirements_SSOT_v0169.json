@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 55,
+  "PARTIAL": 56,
   "MISSING": 1
  },
  "requirements": [
@@ -4863,6 +4863,34 @@
     "VDF_MDL008_FetchSystem_v0107.py",
     "VDF_MDL011_AkshareFetcher_v0102.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ150",
+   "subsystem": "VDF",
+   "topic": "擷取輸入輸出分大族群:名單增減 · 全族群同一 as-of 日 · DuckDB 管理監控 · 庫最佳化",
+   "requirement": "操作員令(2026-10-04):「將輸入輸出分為大族群 除了國際股市 每日行情及財報 國內股票選定股股票的財報 可以增減外,其他部分大部分也是可以增加減少 其實日期固定在同一天,但可以族群更改,結果可以用duckdb管理監控 資料庫要最佳化」「台股每日資訊跟台股股票指數跟主動式台股ETF是抓全部也要顯示固定全部」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Workflow_VDF_SSOT_v0103.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0151.json"
+   ],
+   "evidence": "冊 VDF_FetchGroups_SSOT_v0100(13 群;FIXED_ALL = 台股每日 · 月營收 · 指數 · 主動式 ETF)· MDL012 v0100 自測 14/14 · 容器實測 monitor:VAKE 族群逐支讀 parquet 截到 as-of 2026-10-02(中國經濟 83 支 · NBS · 各國經濟 133 · 航運 8),台股 / 國際 / 美國總經庫在容器不存在 = NODATA(照實)· optimize 計畫:VAKE 687 分片中 492 片 < 64KB",
+   "next": "工作站:via_database\\vdf_fetch 上跑 MDL012 monitor / optimize --apply(台股與國際庫在工作站);名單增減由操作員下 add / remove --apply",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "將輸入輸出分為大族群  出了國際股市 每日行情機財報 國內股票選定股股票的財報 可以增減外，其他部分大部分也是可以增加減少 其實日期固定在同一天，但可以族群更改，結果可以用duckdb管理監控 資料庫要最佳化",
+     "recorded_at": "2026-10-04T05:45:00+00:00"
+    },
+    {
+     "text": "台股每日資訊是跟台股股票指數跟竹東是台股ETF是抓全部也要顯示固定全部",
+     "recorded_at": "2026-10-04T05:50:00+00:00"
+    }
+   ],
+   "modules": [
+    "VDF_MDL012_FetchGroups_v0100.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -5026,5 +5054,5 @@
  "why_v0166": "PR #442 審查三條 P1:凍結檔還原 + 鎖版改新版導向 · v0116/v0117 還原 · 下載包依賴清單與 preflight",
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
- "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1)"
+ "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1);+VCGC-REQ150(PARTIAL:擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化 · MDL012 v0100 · 冊 VDF_FetchGroups_SSOT_v0100;歸屬回指工作流冊 VDF v0103 VDF-WKF014)"
 }

@@ -909,10 +909,64 @@
     "real": "容器實抓經鎖版網路工具",
     "real_run": "雙閘本視窗開"
    }
+  },
+  {
+   "code": "VDF-WKF014",
+   "alias": "fetch_groups",
+   "name": "擷取大族群:名單增減 · 同一 as-of 日 · DuckDB 監控 · 最佳化",
+   "kind": "procedure",
+   "spec": {
+    "goal": "輸入(名單)與輸出(庫 · 表)按大族群收成一張冊;台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部,其他族群可增減;全族群同一 as-of 日;DuckDB 目錄監控與最佳化",
+    "requirements": [
+     "VCGC-REQ150"
+    ],
+    "acceptance": [
+     "MDL012 尾版 --selftest PASS",
+     "FIXED_ALL 拒絕增減(rc 2)",
+     "monitor 逐表 ≤ as-of 截齊、照 cadence / 資料自身間隔給燈;庫不在 = NODATA",
+     "fg_status 只增 · fg_status_latest 視圖",
+     "optimize --apply 被鎖 = LOCKED 跳過、不搶鎖"
+    ]
+   },
+   "plan": {
+    "enter": "VCGC",
+    "exit": "VCGC",
+    "order": "冊 → groups / members → add|remove --apply → asof → run --groups → monitor → optimize"
+   },
+   "steps": [
+    {
+     "code": "VDF-WKF014-STP001",
+     "alias": "fetch_groups_selftest",
+     "name": "分組尾版自測",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "--selftest",
+     "inside": "VCGC run",
+     "evidence": "self:VDF_MDL012_FetchGroups",
+     "what": "族群冊 · 帳本增減 · as-of · run 計畫 · 監控 · query 視圖 · 最佳化"
+    },
+    {
+     "code": "VDF-WKF014-STP002",
+     "alias": "fetch_groups_monitor",
+     "name": "族群監控(同一 as-of)",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "monitor --home <輸出根>",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP001",
+     "what": "VDF_FetchGroups.duckdb fg_status 快照 + _reports/groups_latest.json"
+    }
+   ],
+   "tests": {
+    "self": "MDL012 --selftest",
+    "cross": [
+     "X-REQ-BACK"
+    ],
+    "real": "容器:VAKE 族群實測;工作站:台股 / 國際 / 美國總經庫",
+    "real_run": "monitor / optimize 不連網;run live 要雙閘"
+   }
   }
  ],
  "prior": "VIA_Workflow_VDF_SSOT_v0102.json",
  "why_v0101": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VDF-WKF006 ← VDF-REQ014 · VDF-WKF010 ← VDF-REQ014;其餘一字不動",
  "why_v0102": "R50:加 VDF-WKF011 輸入範圍迴圈(10 步,各步引擎自測過即可由 SDD lock 記版號 + 時間);其餘一字不動(只增)",
- "why_v0103": "+VDF-WKF012(VCGC-REQ147 開閘實抓全走最新工具)· +VDF-WKF013(VCGC-REQ149 AkShare 深度擷取);PR #446 Codex P1:需求要在工作流冊有回指;其餘一字不動"
+ "why_v0103": "+VDF-WKF012(VCGC-REQ147 開閘實抓全走最新工具)· +VDF-WKF013(VCGC-REQ149 AkShare 深度擷取);PR #446 Codex P1:需求要在工作流冊有回指;其餘一字不動;+VDF-WKF014(VCGC-REQ150 擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化)"
 }

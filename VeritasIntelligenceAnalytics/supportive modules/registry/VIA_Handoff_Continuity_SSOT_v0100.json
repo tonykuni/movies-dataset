@@ -1664,6 +1664,22 @@
         "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0101.py"
       ],
       "timeout_seconds": 1200
+    },
+    "vdf_fetch_groups_v0100": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+      "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
+        "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -3463,6 +3479,26 @@
       "owner": "操作員",
       "reason": "tier full(全國年度 2188 + 分省月 / 季 × 31 省 = 6404 呼叫,每呼叫 10–20 秒)容器跑不完",
       "next": "工作站 fetch fill 011d(或 deep-macro --tier full)",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ150:vdf_fetch_groups_v0100",
+      "requirement": "VCGC-REQ150",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
+      "next": "handoff test vdf_fetch_groups_v0100 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0100",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0100.json"
+    },
+    {
+      "id": "VCGC-REQ150:workstation-monitor",
+      "requirement": "VCGC-REQ150",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "台股每日 / 月營收 / 指數 / 主動式 ETF · 國際每日 · 美國總經 · 情緒的 DuckDB 庫在工作站(容器 NODATA 照實)",
+      "next": "工作站 MDL012 monitor --home <via_database\\vdf_fetch> · optimize --apply",
       "case": null,
       "receipt": null
     }
