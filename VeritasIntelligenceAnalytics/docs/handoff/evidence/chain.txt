@@ -23,11 +23,11 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 RED · 2026-10-02T19:34:36
+  [衝突] 現況 RED · 2026-10-04T02:57:12
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 0 · 歷史 3
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
+  [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
+[政策] L50 全景 · 尾版 575 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · CGC_MDL224_TestAuto_v0105.py(家族 core)
@@ -37,13 +37,13 @@
   [OK] ① 進度暫存模組 CGC_MDL251 載得到;本體的站執行格與 run 已換成本版
   [OK] ② 中斷(Ctrl+C)後重跑:已跑完的 a · b 接續不重跑,只跑沒跑過的 c;接續的站 log 照寫且標明「接續」 · (2, [('c',)])
   [OK] ③ 正常跑完標完成 → 下一次重開新一輪(不拿舊結果冒充)
-  [OK] ④ 暫存檔在本機暫存夾(VIA_PROGRESS_DIR 指定處)、不在倉內 · /tmp/tmpznfevamv/VIA_progress/TestAutoST_d312b9f54bf879b2.jsonl
+  [OK] ④ 暫存檔在本機暫存夾(VIA_PROGRESS_DIR 指定處)、不在倉內 · /tmp/tmp3nzq_rsc/VIA_progress/TestAutoST_049aaeba9bb66e3d.jsonl
   [OK] ⑤ 加速器橋 · 網路橋在;不碰 TA-Lib
   [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
   [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
   [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0111.ps1
-  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · 沒有 pwsh:語法沒量(不冒充綠;設 VIA_PWSH 或裝 PowerShell 7)· 串測步在
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261003-210802-2393', 'hub': 'go-20260930-120000-1'}
+  [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-OperatorConsole-v0111.ps1
+  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261004-062302-1911', 'hub': 'go-20260930-120000-1'}
   [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
   [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
   [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
@@ -54,8 +54,8 @@
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
 [VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
   [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0150.json · 0
-  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 178
+  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0151.json · 0
+  [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 186
   [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
   CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
   CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
@@ -64,15 +64,18 @@
   [OK] ① 前版 v0103 自測全過(進度暫存 · 接續);跑完後本版換裝還在
   [OK] ② 平行度取加速器 aggressive 預算;--jobs / VIA_TEST_JOBS 可蓋過 · (4, 'VeritasCeleritas aggressive')
   [OK] ③ 切段:連續 C-* 一段,中間夾 V 站就切開;upd / V 站不並行;引擎名跳過 --family
-  [OK] ④ 8 站 4 支引擎、平行度 4:牆鐘約 2 站時間(序列要 8 站);每站結果對回自己;同引擎不重疊 · 0.81s · 同引擎重疊 False
+  [OK] ④ 8 站 4 支引擎、平行度 4:牆鐘約 2 站時間(序列要 8 站);每站結果對回自己;同引擎不重疊 · 0.80s · 同引擎重疊 False
   [OK] ⑤ 平行度 1 或非 C 站 → 直接走前版執行格(行為照前版)
   [OK] ⑥ 前提在:教訓帳 CGC_MDL058 尾版有跨行程鎖(v0103 起)· 加速器橋 · 網路橋 · 不碰 TA-Lib
   [CGC_MDL224_TestAuto_v0104] 薄尾 6/6 PASS
   [OK] ① 前版鏈自測過(v0104 → … → v0101 實樹 ⑧ 新 0 · 缺 0);本版換裝還在 · rc 0
   [OK] ② 挑檔:只有無版號 → 認它 · 有 -vNNNN → 取最新版號 · 沒有 → None
   [OK] ③ 實樹 discover:PS 入口兩支都找到(主控台 · Step1),Step1 取有版號那支 · {'operator_console': 'Invoke-VIA-OperatorConsole-v0111.ps1', 'step1_sync_lkgc': 'Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1'}
-  [OK] ④ 實樹 P-step1 驗的是 Step1 自己那支(不是主控台):兩章在 → 不是 RED(沒 pwsh 照實黃) · 沒有 pwsh:語法沒量(不冒充綠;設 VIA_PWSH 或裝 PowerShell 7)· 串測步在
+  [OK] ④ 實樹 P-step1 驗的是 Step1 自己那支(不是主控台):兩章在 → 不是 RED(沒 pwsh 照實黃) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1
   [OK] ⑤ 紀錄冊項:主控台照前版 · Step1 另記檔名 + 版本 + sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1', 'version': 'v0101', 'sha16': 'da608cd023e7deb1'}
   [OK] ⑥ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 只收 VCGC
   [CGC_MDL224_TestAuto_v0105] 薄尾 6/6 PASS
-[監控] 背景全景監控中 pid 1662 · 觸碰 run CGC_MDL224_TestAuto · 交接閘 RED · 落後 70 提交 · 快照 23.9h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+[監控] 已在背景起全景監控 pid 2058 · 閒置 1800 秒自停 · 交接閘 RED · 落後 135 提交 · 快照 33.2h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

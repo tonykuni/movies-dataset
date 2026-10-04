@@ -1,6 +1,6 @@
 {
  "schema": "VIA.UnifiedSSOT.AutoCode.v0100",
- "ts": "2026-09-19T23:43:31Z",
+ "ts": "2026-10-04T02:21:33Z",
  "policy": {
   "source_of_truth": "existing VIA registries remain canonical",
   "append_only": true,
@@ -35,8 +35,8 @@
     "path": "supportive modules/registry/VIA_SSOT_RegexDict_v0100.json",
     "exists": true,
     "kind": "json",
-    "sha256": "f1b042881f06623cf97994fb682612dacb1a5cc93690a3fb5e2d5873d77f57b8",
-    "bytes": 11718
+    "sha256": "276f211cd07b348d0db5ec104f71665c064bf5371d0f0689b0ef4de25e17e274",
+    "bytes": 13692
    },
    {
     "key": "regex_census",
@@ -103,16 +103,16 @@
     "path": "supportive modules/registry/VIA_FinalParameters_CanonicalRegistry.json",
     "exists": true,
     "kind": "json",
-    "sha256": "6a0b665788efa5ac1e859ba1e15106d3eb704b888aa5b47d4adadb3f15e2410d",
-    "bytes": 27374475
+    "sha256": "46acefaf7ff90f0d475598afbe8e7b1c387d7fa8859d856f90fc970ad25f7b70",
+    "bytes": 27360934
    },
    {
     "key": "parameter_ssot",
     "path": "supportive modules/ssot/VIA_Parameters_SSOT.json",
     "exists": true,
     "kind": "json",
-    "sha256": "105059fe21cf6d34f6bad4c527b11570556bce39e0d76b9999ac8ac57d94c150",
-    "bytes": 20022236
+    "sha256": "840ce35c3d08d77194e5c4c08c4918d1870339dd9685741eb7ec0b31fe6bf3b6",
+    "bytes": 20012212
    }
   ],
   "factors": [
@@ -147,24 +147,24 @@
     "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
     "exists": true,
     "kind": "duckdb",
-    "sha256": "05224f9efab962ec3950fc72330b0a86315e44209b244b73d00c9b4acbc515d1",
-    "bytes": 195571712
+    "sha256": "6c048e95425d8f5c29aba1ad78d3b4e93323911518c8aa4228c51ca87b7d8701",
+    "bytes": 1323008
    },
    {
     "key": "active_etf_duckdb",
     "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
-    "exists": true,
+    "exists": false,
     "kind": "duckdb",
-    "sha256": "6e6534bdf7ad0727a229a2bf45ab8f2d05c9a7d99b648769d040803cd8aae38b",
-    "bytes": 3944448
+    "sha256": null,
+    "bytes": null
    },
    {
     "key": "vrn_report_db",
     "path": "functional modules/VRN/db/vrn_reports.duckdb",
     "exists": true,
     "kind": "duckdb",
-    "sha256": "4a2f05722cd282a69e70e8bb9d664a3177014f5bc1ad3f4940cd707c71a466e3",
-    "bytes": 1847296
+    "sha256": "52c54355e58383b912bbf1dc109776b07bfb5a1d81b6a7ae6eadd5b9172cdf64",
+    "bytes": 4993024
    }
   ],
   "modules": [
@@ -197,8 +197,8 @@
     "path": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
     "exists": true,
     "kind": "json",
-    "sha256": "230b4b926786945fa196101cb5f348a811f3b17b6e221b7380e3ceacdbe6cda6",
-    "bytes": 1961218
+    "sha256": "369361b3248624092a9c72aecdebf98199c3c04842ec52124d91c260ed432eb0",
+    "bytes": 5824881
    },
    {
     "key": "interface_registry",
@@ -255,8 +255,8 @@
     "path": "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.json",
     "exists": true,
     "kind": "json",
-    "sha256": "e603ccbd599e67fae8d4e9b7d40d035df0f1f794bb3fbad7fe84736d32c5b5ce",
-    "bytes": 10947
+    "sha256": "87e73ef2d2af04d1a96101801c67428be74b6ac9e26fdf34281dea7e1deeb5bc",
+    "bytes": 9911
    }
   ],
   "quarantine": [
@@ -301,8 +301,10 @@
   },
   "databases": {
    "declared": 3,
-   "present": 3,
-   "missing": []
+   "present": 2,
+   "missing": [
+    "active_etf_duckdb"
+   ]
   },
   "modules": {
    "declared": 8,
@@ -322,7 +324,7 @@
  },
  "regex_synonym": {
   "regex_count": 12,
-  "synonym_count": 310,
+  "synonym_count": 316,
   "conflict_count": 0,
   "conflicts": [],
   "semantic_merges": [
@@ -718,8 +720,10 @@
  "states": {
   "system_state": "GREEN",
   "engine_state": "GREEN",
-  "data_state": "GREEN",
-  "missing_data_sources": [],
+  "data_state": "YELLOW",
+  "missing_data_sources": [
+   "active_etf_duckdb"
+  ],
   "subsystem_state": {
    "VRN": "GREEN",
    "VDF": "GREEN",
@@ -777,5 +781,5 @@
   },
   "pass": true
  },
- "verdict": "GREEN"
+ "verdict": "YELLOW"
 }

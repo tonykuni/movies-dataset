@@ -15,7 +15,7 @@
   [位階] 1 L103 **【最高政策】三條,缺一不可:PY 導入加速器 · VDF 導入網路工具 · PS 導入模板工具。**
   [位階] 2 L50 **【第一條】TA-Lib 禁用,QuantGuard 是唯一正主。**(操作員批618 裁定升為第一條)
   [位階] 3 L102 **【第二條】凡本樹產出的程式,都要接上 Celeritas 契約。**
-  [加速] 引擎 VeritasCeleritas_v1141.py · 由 SUP_MDL737_SuperAccelModule_v0109.py 載入。無版號 VeritasCeleritas.py 不優先
+  [加速] 引擎 VeritasCeleritas_v1141.py · 由 SUP_MDL737_SuperAccelModule_v0110.py 載入。無版號 VeritasCeleritas.py 不優先
   [加速] 網路 VeritasAegisNexus_v1652.py · 由 SUP_MDL740_NetUnified_v0118.py 載入
   [加速] PS 用 Invoke-VIACeleritasScoped。補缺才 via-bridge-sweep --subsystems --apply
   [環境計畫] 盤點 → 相減 → 偵測 → 隔離 → 乾淨還原點 → 再新增 → 通過才執行
@@ -23,11 +23,11 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 RED · 2026-10-02T19:34:36
+  [衝突] 現況 RED · 2026-10-04T02:57:12
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 0 · 歷史 3
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
+  [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
+[政策] L50 全景 · 尾版 574 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0128.py(家族 vdf)
@@ -37,37 +37,26 @@
   "mdl": "MDL011",
   "kind": "MDL",
   "group": "AKSHARE",
-  "file": "VDF_MDL011_AkshareFetcher_v0100.py",
+  "file": "VDF_MDL011_AkshareFetcher_v0102.py",
   "ast": {
-   "doc": "VDF_MDL011_AkshareFetcher v0100 — 擷取來源組 AKSHARE:VAKE(Veritas AKShare Knowledge & Extraction Engine v0200)",
-   "defs": 103,
+   "doc": "VDF_MDL011_AkshareFetcher v0102 — 薄尾:deep-macro 深度擷取(中國經濟 · 各國經濟 · 航運指數)· 參數列覆寫 __rows__",
+   "defs": 20,
    "imports": [
     "VIA_SuperAccel_Module",
-    "akshare",
+    "__future__",
     "argparse",
-    "ast",
-    "concurrent",
+    "contextlib",
     "datetime",
-    "duckdb",
-    "hashlib",
-    "http",
     "importlib",
-    "itertools",
+    "io",
     "json",
-    "os",
     "pandas",
     "pathlib",
-    "polars",
-    "random",
     "re",
-    "requests",
-    "socket",
     "sys",
+    "tempfile",
     "threading",
-    "time",
-    "urllib",
-    "uuid",
-    "webbrowser"
+    "time"
    ],
    "bridges": {
     "accel": true,
@@ -77,15 +66,18 @@
   "fetch_functions": [
    {
     "name": "_get",
-    "line": 402
+    "line": 402,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
    },
    {
     "name": "_call",
-    "line": 1495
+    "line": 1495,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
    },
    {
     "name": "run_selection",
-    "line": 1544
+    "line": 1544,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
    }
   ],
   "tables": [],
@@ -101,10 +93,7 @@
    "polars",
    "duckdb"
   ],
-  "missing": [
-   "akshare",
-   "polars"
-  ],
+  "missing": [],
   "launch": "python \"functional modules/VDF/VDF_SystemManager_v0128.py\" fetch run 011 --apply",
   "vcgc": {
    "lamp": "YELLOW",
@@ -122,8 +111,8 @@
     "dynamic": 0
    },
    "regex": {
-    "local": 21,
-    "local_unique": 21,
+    "local": 26,
+    "local_unique": 25,
     "samples": [
      "^(#{1,6})\\s+(.*?)\\s*$",
      "^接口[:：]\\s*([A-Za-z_][A-Za-z0-9_]*)",
@@ -134,7 +123,9 @@
     ],
     "central_owned": [],
     "same_as_central": [
-     "RX_DATE_014"
+     "RX_DATE_014",
+     "RX_OTHER_002",
+     "RX_VERSION_010"
     ]
    },
    "synonyms": {
@@ -159,17 +150,31 @@
     "central_keys_from_this": []
    },
    "workflow": {
-    "book": "VIA_Workflow_VDF_SSOT_v0102.json",
-    "steps": [],
+    "book": "VIA_Workflow_VDF_SSOT_v0103.json",
+    "steps": [
+     {
+      "code": "VDF-WKF013-STP001",
+      "name": "AkShare 尾版自測",
+      "verb": "--selftest"
+     }
+    ],
     "universe_book": "VDF_InputUniverse_SSOT_v0103.json",
     "universe": []
    },
    "env": null,
-   "code": "VIA-VDF-MDL174",
+   "code": "VIA-VDF-MDL184",
    "chain": [
+    "v0102",
+    "v0101",
     "v0100"
    ]
   }
  }
 }
-[監控] 背景全景監控中 pid 4142 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 46 提交 · 快照 20.5h · 未推 2 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] 樹有變 · 註冊冊待同步 {'new': 5, 'changed': 23, 'stale': 0, 'expected': 15679, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+[監控] 背景全景監控中 pid 6444 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 129 提交 · 快照 32.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

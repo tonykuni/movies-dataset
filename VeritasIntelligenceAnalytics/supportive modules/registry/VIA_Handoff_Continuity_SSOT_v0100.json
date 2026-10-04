@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T15:13:50+00:00",
+  "updated_at": "2026-10-04T04:10:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1566,6 +1566,135 @@
         "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py"
       ],
       "timeout_seconds": 2400
+    },
+    "vdf_fetch_v0105": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0105 本版 10/10 · v0104 PASS · 合計 PASS",
+      "scope": "MDL008 v0105 urllib / yfinance 走網路工具並計數 · output_hub 歸位 --home · nodata 標記 · 冊 v0104(VCGC-REQ147)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0105.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0104.json",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0104.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_fetch_v0106": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0106 本版 6/6 · v0105 PASS · 合計 PASS",
+      "scope": "MDL008 v0106 block / fixture 的 curl_cffi 封口屬性可取、呼叫才擋(akshare 1.19.1 import 不炸)· 冊 v0105 MDL011 → v0101(VCGC-REQ147)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0106.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0105.json",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0101.py",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0105.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_akshare_v0101": {
+      "argv": [
+        "VDF_MDL011_AkshareFetcher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL011_AkshareFetcher v0101 本版 4/4 · 合計 PASS",
+      "scope": "MDL011 v0101 params 無註冊表 = NODATA rc 2(不再 KeyError);有註冊表照 v0100(VCGC-REQ147)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0101.py",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0100.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "celeritas_gate_v0103": {
+      "argv": [
+        "CGC_MDL183_CeleritasPolicyGate",
+        "--selftest"
+      ],
+      "success_marker": "[計] v0103 薄尾 4/4 · v0102 PASS · 合計 PASS",
+      "scope": "Celeritas 產出契約閘 v0103:無版號舊 .ps1 有帶章版號尾版 = 版史(同掃橋器 v0110 · 探針 v0106);PS 基線外新缺 0(VCGC-REQ148) · ⑯ 活冊指名照紅 / retired_entries 歸版史(PR #446 Codex P1)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0103.py",
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0102.py",
+        "Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1"
+      ],
+      "timeout_seconds": 1200
+    },
+    "env_gov_v0118": {
+      "argv": [
+        "CGC_MDL135_EnvGovernance",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL135_EnvGovernance v0118 本版 5/5 · v0117 PASS · 合計 PASS",
+      "scope": "環境治理 v0118:spaCy 模型件改指官方 wheel(zh-core-web-sm 不在 PyPI,via_nlp 模擬原紅)(VCGC-REQ148)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL135_EnvGovernance_v0118.py",
+        "supportive modules/registry/CGC_MDL135_EnvGovernance_v0117.py"
+      ],
+      "timeout_seconds": 1800
+    },
+    "vdf_fetch_v0107": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0107 本版 6/6 · v0106 PASS · 合計 PASS",
+      "scope": "MDL008 v0107 live curl_cffi 改道進鎖版網路工具(akshare NBS)· 冊 v0106(MDL011 v0102 · +011d 深度宏觀)· 列上限 timeout_s(VCGC-REQ149)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0107.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0102.py",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0106.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_akshare_v0102": {
+      "argv": [
+        "VDF_MDL011_AkshareFetcher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL011_AkshareFetcher v0102 本版 8/8 · v0101 PASS · 合計 PASS",
+      "scope": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149) · NBS 節流 + 長區間切 5 年段拼回 · --group",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0102.py",
+        "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0101.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vdf_fetch_groups_v0100": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+      "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
+        "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json"
+      ],
+      "timeout_seconds": 600
+    },
+    "vdf_fetch_groups_v0101": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+      "scope": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
+        "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -2971,9 +3100,9 @@
     {
       "id": "VCGC-REQ139:qg_onebridge",
       "requirement": "VCGC-REQ139",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "operator",
-      "reason": "#439 新增 VDF_ENG086_QuantGuardOneBridge 沒有交接案(CHANGED_CODE_WITHOUT_TEST)· 要 polars,容器 / CI 沒有 → 照實 ABSENT",
+      "reason": "#439 新增 VDF_ENG086_QuantGuardOneBridge 沒有交接案(CHANGED_CODE_WITHOUT_TEST)· 要 polars,容器 / CI 沒有 → 照實 ABSENT → 已驗:2026-10-04T02:28:20+00:00 rc 0 · 標記見到",
       "next": "handoff test qg_onebridge(工作站有 polars 的境) 實跑轉 VERIFIED",
       "case": "qg_onebridge",
       "receipt": "docs/handoff/evidence/qg_onebridge.json"
@@ -3257,6 +3386,146 @@
       "next": "操作員回貼 PS 視窗輸出 + _reports/fill_*.json",
       "case": null,
       "receipt": null
+    },
+    {
+      "id": "VCGC-REQ147:vdf_fetch_v0105",
+      "requirement": "VCGC-REQ147",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL008 v0105 新尾版 · 冊 v0104 → 已驗:2026-10-04T02:33:36+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_v0105 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0105",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0105.json"
+    },
+    {
+      "id": "VCGC-REQ147:workstation-live-fill",
+      "requirement": "VCGC-REQ147",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器 IP 被 TWSE WAF 擋 · Yahoo 429 · 無 FRED 金鑰:上市清單 / 上市日線 / FED 只能工作站實抓",
+      "next": "工作站 Invoke-VDF-FetchFill-v0100.ps1(雙閘本視窗設)回貼 _reports\\fill_*.json",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ147:vdf_fetch_v0106",
+      "requirement": "VCGC-REQ147",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL008 v0106 block / fixture 的 curl_cffi 封口屬性可取、呼叫才擋(akshare 1.19.1 import 不炸)· 冊 v0105 MDL011 → v0101(VCGC-REQ147) → 已驗:2026-10-04T02:49:56+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_v0106 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0106",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0106.json"
+    },
+    {
+      "id": "VCGC-REQ147:vdf_akshare_v0101",
+      "requirement": "VCGC-REQ147",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL011 v0101 params 無註冊表 = NODATA rc 2(不再 KeyError);有註冊表照 v0100(VCGC-REQ147) → 已驗:2026-10-04T02:50:03+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_akshare_v0101 實跑轉 VERIFIED",
+      "case": "vdf_akshare_v0101",
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ148:celeritas_gate_v0103",
+      "requirement": "VCGC-REQ148",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "Celeritas 產出契約閘 v0103:無版號舊 .ps1 有帶章版號尾版 = 版史(同掃橋器 v0110 · 探針 v0106);PS 基線外新缺 0(VCGC-REQ148) → 已驗:2026-10-04T03:07:52+00:00 rc 0 · 標記見到",
+      "next": "handoff test celeritas_gate_v0103 實跑轉 VERIFIED",
+      "case": "celeritas_gate_v0103",
+      "receipt": "docs/handoff/evidence/celeritas_gate_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ148:env_gov_v0118",
+      "requirement": "VCGC-REQ148",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "環境治理 v0118:spaCy 模型件改指官方 wheel(zh-core-web-sm 不在 PyPI,via_nlp 模擬原紅)(VCGC-REQ148) → 已驗:2026-10-04T03:17:34+00:00 rc 0 · 標記見到",
+      "next": "handoff test env_gov_v0118 實跑轉 VERIFIED",
+      "case": "env_gov_v0118",
+      "receipt": "docs/handoff/evidence/env_gov_v0118.json"
+    },
+    {
+      "id": "VCGC-REQ148:base-nlp-remove",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "plan 的 REMOVE_BASE(nlp 12 件 · stealth 2 · table 2 · 閉包外 4)是候裁;容器 base 仍在跑 VRN NLP,AI 只補相依讓 base 零衝突,不代裁移除",
+      "next": "操作員裁定後 via-envgov apply --approve --approve-remove",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ148:pwsh",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "EnvManager B10 必備執行檔 pwsh:容器 PATH 沒有(工作站有)",
+      "next": "工作站跑 EnvManager check 回貼",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ149:vdf_fetch_v0107",
+      "requirement": "VCGC-REQ149",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL008 v0107 live curl_cffi 改道進鎖版網路工具(akshare NBS)· 冊 v0106(MDL011 v0102 · +011d 深度宏觀)· 列上限 timeout_s(VCGC-REQ149) → 已驗:2026-10-04T04:11:22+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_v0107 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0107",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0107.json"
+    },
+    {
+      "id": "VCGC-REQ149:vdf_akshare_v0102",
+      "requirement": "VCGC-REQ149",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149) → 已驗:2026-10-04T04:11:29+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_akshare_v0102 實跑轉 VERIFIED",
+      "case": "vdf_akshare_v0102",
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ149:deep-full-tier",
+      "requirement": "VCGC-REQ149",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "tier full(全國年度 2188 + 分省月 / 季 × 31 省 = 6404 呼叫,每呼叫 10–20 秒)容器跑不完",
+      "next": "工作站 fetch fill 011d(或 deep-macro --tier full)",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ150:vdf_fetch_groups_v0100",
+      "requirement": "VCGC-REQ150",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150) → 已驗:2026-10-04T06:11:46+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0100 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0100",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0100.json"
+    },
+    {
+      "id": "VCGC-REQ150:workstation-monitor",
+      "requirement": "VCGC-REQ150",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "台股每日 / 月營收 / 指數 / 主動式 ETF · 國際每日 · 美國總經 · 情緒的 DuckDB 庫在工作站(容器 NODATA 照實)",
+      "next": "工作站 MDL012 monitor --home <via_database\\vdf_fetch> · optimize --apply",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ151:vdf_fetch_groups_v0101",
+      "requirement": "VCGC-REQ151",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151) → 已驗:2026-10-04T06:29:19+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0101 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0101",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0101.json"
     }
   ]
 }
