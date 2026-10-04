@@ -79,7 +79,7 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 23,
-  "COVERED": 114,
+  "COVERED": 115,
   "PARTIAL": 65,
   "MISSING": 1
  },
@@ -5347,6 +5347,28 @@
     "CGC_MDL140_HandoverConsole_v0105.py",
     "via-master-control-ui.yml"
    ]
+  },
+  {
+   "code": "VCGC-REQ165",
+   "subsystem": "VCGC",
+   "topic": "一行短指令 via-activate-vcgc:把 VCGC 帶到可交接狀態給其他人 / AI",
+   "requirement": "操作員令(2026-10-05):「advise a short code via_activate_vcgc to make ready for others」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Workflow_VCGC_SSOT_v0121.json"
+   ],
+   "evidence": "Register-VIA-Commands-v0270.ps1 +via-activate-vcgc(別名 via_activate_vcgc · 啟動中控):同步(只快轉)→ token → enter --card → handoff check → functions → MDL262 status → 總表 READY / NOT READY;pwsh 解析 0 錯;mock 三情境(交接黃仍 READY · token 紅 NOT READY · -StopOnRed 停)過;容器實跑五動詞 rc 0/0/1(交接 VRN pending)/0/0",
+   "next": "工作站點源 v0270 後跑 via-activate-vcgc 回貼總表",
+   "hand": "AI / 操作員",
+   "quotes": [
+    {
+     "text": "advsi a short code \"via_activat_vcgc to make ready for others.",
+     "recorded_at": "2026-10-05T10:40:00+00:00"
+    }
+   ],
+   "modules": [
+    "Register-VIA-Commands-v0270.ps1"
+   ]
   }
  ],
  "non_requirements": [
@@ -5517,5 +5539,5 @@
  "why_v0172": "v0171 已隨 PR #458 發布 → 出新版不就地改;+VCGC-REQ157(L111 子系統獨立 · 母系統監控協助 · 一對二;VRN / VDF SSOT 資訊卡);其餘一字不動",
  "why_v0173": "v0172 已隨 PR #460 發布 → 出新版不就地改;+VCGC-REQ158(L111 ⑦ 編號流程 · 輸出表頭普查);其餘一字不動",
  "why_v0174": "v0173 已隨 PR #461 發布 → 出新版;+VCGC-REQ159(VCGC / VDF 收尾);其餘一字不動;+VCGC-REQ160(tabula 獨立境 + 境內 Java);+VCGC-REQ161(加速 / 網路橋 / DuckDB TEMP 鉤);+VCGC-REQ162(TaiwanStockGroup);+VCGC-REQ163(收尾登錄 81 族歸屬 · 編號版本號)",
- "why_v0175": "v0174 已隨 PR #462 發布 → 出新版;+VCGC-REQ164(MDL140 v0105 · CI sparse);其餘一字不動"
+ "why_v0175": "v0174 已隨 PR #462 發布 → 出新版;+VCGC-REQ164(MDL140 v0105 · CI sparse);其餘一字不動;+VCGC-REQ165(via-activate-vcgc)"
 }
