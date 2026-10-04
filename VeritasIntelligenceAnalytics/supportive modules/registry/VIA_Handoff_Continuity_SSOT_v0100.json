@@ -1698,7 +1698,7 @@
     },
     "vdf_fetch_groups_v0102": {
       "argv": [
-        "VDF_MDL012_FetchGroups",
+        "VDF_MDL012_FetchGroups_v0102",
         "--selftest"
       ],
       "success_marker": "[計] VDF_MDL012_FetchGroups v0102 本版 8/8 · v0101 PASS · 合計 PASS",
@@ -1752,6 +1752,19 @@
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
       ],
       "timeout_seconds": 1200
+    },
+    "vrn_newplugins_v0103": {
+      "argv": [
+        "VRN_NewPlugins",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_NewPlugins v0103 本版 5/5 · 合計 PASS",
+      "scope": "VRN_NewPlugins v0103 薄尾:補 L103 PY 加速器橋 · 插件字典 / AST 索引照 v0102 · 轉接(VCGC-REQ155)",
+      "dependencies": [
+        "functional modules/VRN/VRN_NewPlugins_v0103.py",
+        "functional modules/VRN/VRN_NewPlugins_v0102.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -3587,9 +3600,9 @@
     {
       "id": "VCGC-REQ152:vdf_fetch_groups_v0102",
       "requirement": "VCGC-REQ152",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152) → 已驗:2026-10-04T07:40:42+00:00 rc 0 · 標記見到(VCGC 跑在 VDF 境,無 jinja2 → 檢 ③ 驗退化路徑)",
+      "reason": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152)(REQ155 加轉接後重驗)",
       "next": "handoff test vdf_fetch_groups_v0102 實跑轉 VERIFIED",
       "case": "vdf_fetch_groups_v0102",
       "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0102.json"
@@ -3627,9 +3640,9 @@
     {
       "id": "VCGC-REQ154:ui_engine_v0101",
       "requirement": "VCGC-REQ154",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154) → 已驗:2026-10-04T15:00:54+00:00 rc 0 · 標記見到",
+      "reason": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154)(REQ155 加轉接後重驗)",
       "next": "handoff test ui_engine_v0101 實跑轉 VERIFIED",
       "case": "ui_engine_v0101",
       "receipt": "docs/handoff/evidence/ui_engine_v0101.json"
@@ -3637,9 +3650,9 @@
     {
       "id": "VCGC-REQ154:vdf_fetch_groups_v0103",
       "requirement": "VCGC-REQ154",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154) → 已驗:2026-10-04T15:01:05+00:00 rc 0 · 標記見到",
+      "reason": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)(REQ155 加轉接後重驗)",
       "next": "handoff test vdf_fetch_groups_v0103 實跑轉 VERIFIED",
       "case": "vdf_fetch_groups_v0103",
       "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0103.json"
@@ -3651,6 +3664,36 @@
       "owner": "操作員",
       "reason": "台股 / 國際實抓在容器被 TWSE WAF · Yahoo 429 擋;頁上點選後的 -Run live 要在工作站",
       "next": "工作站 .\\Start-VIA-UIEngine-v0101.ps1 → 匯出輸入 → VIA_NET_CONSENT=YES 下 -Run -Mode live",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:vrn_newplugins_v0103",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VRN_NewPlugins v0103 薄尾:補 L103 PY 加速器橋 · 插件字典 / AST 索引照 v0102 · 轉接(VCGC-REQ155)",
+      "next": "handoff test vrn_newplugins_v0103 實跑轉 VERIFIED",
+      "case": "vrn_newplugins_v0103",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:workstation-cmds",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "短令要真 PowerShell 點源 Register v0269 才走得到 Windows 路徑與資料夾對話框;容器只驗 pwsh 剖析與 Linux pwsh 點源實跑",
+      "next": "點源 Register v0269 → via-uihelp → via-ui → via-ui-run -Mode block → 回貼後轉 VERIFIED",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:vrn-v0102-bridge",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "CGC_MDL183 全樹尺仍數 VRN_NewPlugins_v0102 本體缺 PY 加速器橋;該檔已隨 PR #448 發布,VCGC 子系統邊界不准就地改 → 已出 v0103 尾版接上",
+      "next": "操作員裁:准 VRN 端就地補 v0102,或把 v0102 列版史豁免",
       "case": null,
       "receipt": null
     }

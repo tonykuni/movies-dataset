@@ -2529,7 +2529,7 @@
    "name": "交接案 vdf_fetch_groups_v0102(MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152))",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups",
+    "VDF_MDL012_FetchGroups_v0102",
     "--selftest"
    ],
    "timeout": 900,
@@ -2617,6 +2617,37 @@
     "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
     "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
     "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json"
+   ]
+  },
+  {
+   "id": "P-ui_cmds",
+   "name": "操作台短令 Register 尾版:語法(pwsh Parser)+ 章在(十件短令 · Invoke-VIACeleritasScoped · 資料庫位置預設)",
+   "kind": "ps",
+   "quick": false,
+   "must": [
+    "function global:via-ui-run",
+    "function global:via-groups",
+    "function global:via-duck",
+    "Invoke-VIACeleritasScoped",
+    "Get-VIAUiDbRoot",
+    "VIA:PS-ACCEL"
+   ],
+   "deps": [
+    "Register-VIA-Commands-v*.ps1"
+   ]
+  },
+  {
+   "id": "C-vrn_newplugins_v0103",
+   "name": "交接案 vrn_newplugins_v0103(VRN_NewPlugins v0103 薄尾:補 L103 PY 加速器橋 · 插件字典 / AST 索引照 v0102 · 轉接(VCGC-REQ155))",
+   "argv": [
+    "run",
+    "VRN_NewPlugins",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "functional modules/VRN/VRN_NewPlugins_v0103.py",
+    "functional modules/VRN/VRN_NewPlugins_v0102.py"
    ]
   }
  ],
@@ -3167,6 +3198,9 @@
    },
    "vdf_fetch_groups_v0103": {
     "station": "C-vdf_fetch_groups_v0103"
+   },
+   "vrn_newplugins_v0103": {
+    "station": "C-vrn_newplugins_v0103"
    }
   },
   "workflow": {
@@ -3383,6 +3417,9 @@
    },
    "VCGC-WKF018-STP004": {
     "station": "P-ui_engine"
+   },
+   "VCGC-WKF018-STP005": {
+    "station": "P-ui_cmds"
    }
   },
   "ps": {
@@ -3391,6 +3428,9 @@
    },
    "step1_sync_lkgc": {
     "station": "P-step1"
+   },
+   "ui_cmds": {
+    "station": "P-ui_cmds"
    }
   }
  },
@@ -3445,5 +3485,5 @@
  "why_v0148": "PR #442 審查:網路鎖版改由 SUP_MDL737 v0110 導向(凍結檔原樣),交接站同步",
  "why_v0149": "VCGC-REQ144 / REQ145:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 · vdf_fetch_fill 各一站 + coverage.case;其餘一字不動(只增)",
  "why_v0150": "VCGC-REQ146:交接新案 5 條(MDL009 v0102 · MDL008 v0104 · 掃橋器 v0110 · 覆蓋探針 v0106 · 版本全景載入器)各一站 + PS 站 P-vdf_fill(Invoke-VDF-FetchFill 章字;PS 入口覆蓋只認主控台 / Step1 兩支,本站不另立入口鍵);其餘一字不動(只增)",
- "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153);+C-ui_engine_v0101 · +C-vdf_fetch_groups_v0103 · C-ui_engine_v0100 釘本版檔 · 工作流 VCGC-WKF018-STP003/004(VCGC-REQ154)"
+ "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153);+C-ui_engine_v0101 · +C-vdf_fetch_groups_v0103 · C-ui_engine_v0100 釘本版檔 · 工作流 VCGC-WKF018-STP003/004(VCGC-REQ154);+P-ui_cmds · +C-vrn_newplugins_v0103 · C-vdf_fetch_groups_v0102 釘本版檔 · 工作流 VCGC-WKF018-STP005(VCGC-REQ155)"
 }

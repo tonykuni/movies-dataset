@@ -1467,7 +1467,8 @@
     "goal": "一個引擎:RunGate 檢查 · LKGC 照測過版本安裝(只進 via_* 隔離境)→ 產 U/I(內建標準範本或任何範本;參數檔可調;DuckDB 顯式)→ 開(file:// 或本機只讀樞紐)",
     "requirements": [
      "VCGC-REQ153",
-     "VCGC-REQ154"
+     "VCGC-REQ154",
+     "VCGC-REQ155"
     ],
     "acceptance": [
      "CGC_MDL261 --selftest PASS",
@@ -1476,7 +1477,8 @@
      "範本不在 = 誠實報,不退內建假裝成功",
      "U/I 輸入區零文字框:位置下拉 + 拖曳 · 群組打勾 · 成員晶片 · 起始日下拉(只按大類)",
      "第一頁三矩陣(輸入摘要去重 · 引擎工具功能 · 運作結果)· 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣",
-     "匯入只收白名單鍵;VDF 部分轉 MDL012 ui-import(只寫差異、冪等)"
+     "匯入只收白名單鍵;VDF 部分轉 MDL012 ui-import(只寫差異、冪等)",
+     "短令十件(Register v0269)每件包 Invoke-VIACeleritasScoped;PY 尾版帶 SuperAccel 橋;VDF 尾版帶網路工具橋"
     ]
    },
    "plan": {
@@ -1524,6 +1526,16 @@
      "inside": "VCGC run",
      "evidence": "step:VCGC-WKF018-STP003",
      "what": "VIA_Reports\\ui_engine\\ui_config.json + _last_import.txt · MDL012 run / monitor"
+    },
+    {
+     "code": "VCGC-WKF018-STP005",
+     "alias": "ui_short_commands",
+     "name": "短指令組合:操作台 · 族群 · 資料庫 · 起始日 · 監控",
+     "engine": "Register-VIA-Commands-v*.ps1",
+     "verb": "via-ui · via-ui-run · via-ui-pick · via-uieng · via-duck · via-groups · via-groups-ui · via-startdate · via-monitor · via-uihelp",
+     "inside": "VCGC run",
+     "evidence": "step:VCGC-WKF018-STP004",
+     "what": "點源後一張表 via-uihelp(別名 操作台短令)"
     }
    ],
    "tests": {
@@ -1552,5 +1564,5 @@
  "why_v0116": "REQ134 Local L1 normalization and review adapters",
  "why_v0117": "REQ135 single central manager",
  "why_v0118": "+VCGC-WKF017(VCGC-REQ148 環境全檢無衝突安裝);PR #446 Codex P1:需求要在工作流冊有回指;其餘一字不動",
- "why_v0119": "+VCGC-WKF018 一鍵 U/I 引擎(VCGC-REQ153);v0118 已隨 PR #446 發布,出新版不就地改;其餘一字不動;+VCGC-WKF018-STP003/004 純滑鼠輸入 · 匯入 · 照選擷取(VCGC-REQ154)"
+ "why_v0119": "+VCGC-WKF018 一鍵 U/I 引擎(VCGC-REQ153);v0118 已隨 PR #446 發布,出新版不就地改;其餘一字不動;+VCGC-WKF018-STP003/004 純滑鼠輸入 · 匯入 · 照選擷取(VCGC-REQ154);+VCGC-WKF018-STP005 短指令組合(VCGC-REQ155)"
 }
