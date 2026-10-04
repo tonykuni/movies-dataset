@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 54,
+  "PARTIAL": 55,
   "MISSING": 1
  },
  "requirements": [
@@ -4777,6 +4777,7 @@
    "requirement": "操作員令(2026-10-04):「開閘授權一切 向前」「全部都要跨入最新加速器跟網路工具」「GO ON」「鎖住成功版本就更新」",
    "status": "PARTIAL",
    "homes": [
+    "VIA_Workflow_VDF_SSOT_v0103.json",
     "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0151.json"
    ],
@@ -4816,6 +4817,7 @@
    "requirement": "操作員令(2026-10-04):「完成後請vcgc檢查vcgc及vrn vdf所有工具環境無衝突安裝完畢」「有進度就所版本上傳github備份優先」",
    "status": "PARTIAL",
    "homes": [
+    "VIA_Workflow_VCGC_SSOT_v0118.json",
     "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0151.json"
    ],
@@ -4835,6 +4837,30 @@
    "modules": [
     "CGC_MDL183_CeleritasPolicyGate_v0103.py",
     "CGC_MDL135_EnvGovernance_v0118.py"
+   ]
+  },
+  {
+   "code": "VCGC-REQ149",
+   "subsystem": "VDF",
+   "topic": "AkShare 深度擷取:中國經濟 · 各國經濟 · 航運指數(全歷史 + 細節參數展開)",
+   "requirement": "操作員令(2026-10-04):「Akshare截取中國經濟數據 各國經濟數據 航運指數 資料要往下載一截取深入一點細節點的資料」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Workflow_VDF_SSOT_v0103.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "探測經鎖版網路工具:中國 CPI / GDP / PMI · 美 CPI · 歐 GDP · BDI 9552 列 · Drewry WCI · 中國運價指數 5000 列皆通;NBS 走 curl_cffi 原本繞過網路工具 → MDL008 v0107 改道(curl 計數);NBS 十類目錄樹逐葉走訪 3408 條路徑(curl 374 請求全經網路工具)",
+   "next": "MDL011 v0102 deep-macro + 選單正本 + 冊 v0106 011d → 容器實抓 → 結果分類",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "Akshare截取中國經濟數據 各國經濟數據 航運指數 資料要往下載一截取深入一點細節點的資料",
+     "recorded_at": "2026-10-04T04:10:00+00:00"
+    }
+   ],
+   "modules": [
+    "VDF_MDL008_FetchSystem_v0107.py",
+    "VDF_MDL011_AkshareFetcher_v0102.py"
    ]
   }
  ],
@@ -4999,5 +5025,5 @@
  "why_v0166": "PR #442 審查三條 P1:凍結檔還原 + 鎖版改新版導向 · v0116/v0117 還原 · 下載包依賴清單與 preflight",
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
- "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118)"
+ "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1)"
 }
