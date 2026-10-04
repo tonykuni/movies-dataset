@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- VDF_FetchGroups_Compact_v0100 · 範例範本(VDF_MDL012 ui --template VDF_FetchGroups_Compact_v0100)
+     變數 = 族群快照頂層鍵:as_of · built · tool · groups[] · engines[] · live · io[] …;window.VIA = 整份快照(產生器注入)。
+     複製本檔改版面即可做自己的範本;Jinja 語法(for / if 區塊、雙大括號變數)沙盒渲染,沒裝 jinja2 時只代換雙大括號變數。 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VDF 族群 · 精簡 · {{ as_of }}</title>
+<style>
+body{margin:0;background:var(--via-ink-page,#0b0c0d);color:var(--via-fg,#e6ebf2);font:12.5px/1.4 var(--via-font,system-ui,sans-serif)}
+header{padding:14px 20px;border-bottom:1px solid var(--via-rule,#333)}
+header b{font-size:16px}
+main{padding:14px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.g{border:1px solid var(--via-rule,#333);border-radius:8px;padding:10px;background:var(--via-card,#14181c)}
+.g h3{margin:0 0 6px;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.lamp-GREEN,.lamp-YELLOW,.lamp-RED,.lamp-NODATA,.lamp-NODATE,.lamp-LOCKED{border-radius:4px;padding:0 6px;font-size:11px}
+.mut{color:var(--via-muted,#8c99a6)}
+pre{white-space:pre-wrap;font-size:10.5px;max-height:220px;overflow:auto}
+</style>
+</head>
+<body>
+<header><b>VDF 擷取大族群 · 精簡範本</b> <span class="mut">as-of {{ as_of }} · 產生 {{ built }} · {{ tool }}</span></header>
+<main>
+{% for g in groups %}
+ <section class="g">
+  <h3><span>{% if g.membership == 'FIXED_ALL' %}🔒 {% endif %}{{ g.zh }}</span><span class="lamp-{{ g.summary.worst or 'NODATA' }}">{{ g.summary.worst or 'NODATA' }}</span></h3>
+  <div class="mut">{{ g.id }} · 引擎 {{ g.engines | join(',') }} · 成員 {{ '全部' if g.n is none else g.n }}</div>
+  <div>≤as-of 筆數 {{ '{:,}'.format(g.summary.rows_asof or 0) }} · 最晚 {{ g.summary.max_date or '—' }}</div>
+ </section>
+{% endfor %}
+ <section class="g" style="grid-column:1/-1">
+  <h3><span>Live log</span><span class="mut">{{ '擷取中' if live.running else '閒置' }} · {{ live.newest or '—' }}</span></h3>
+  <pre>{{ live.lines[-40:] | join('\n') }}</pre>
+ </section>
+</main>
+<script>
+  // 範本也能直接用 window.VIA(產生器注入的整份快照)做互動,例如:擷取中每 15 秒重載
+  if (window.VIA && window.VIA.live && window.VIA.live.running) setTimeout(function () { location.reload(); }, 15000);
+</script>
+</body>
+</html>
