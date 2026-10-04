@@ -1,0 +1,3147 @@
+{
+ "schema": "VIA.VCGC.FunctionInventory.v1",
+ "version": "v0150",
+ "batch": "側線 2026-10-03 f(VCGC-REQ139)",
+ "ts": "2026-10-03T20:45:00+00:00",
+ "prior": "VIA_VCGC_FunctionInventory_SSOT_v0149.json",
+ "req": "VCGC-REQ085",
+ "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。",
+ "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
+ "rules": [
+  "新 VCGC 動詞 / 新席位 / 新必用卡步 / 新交接案 / 新工作流步:出本冊新版號登錄測法(站)或豁免理由;沒登 = 串測黃,並先跑它所在尾版的 --selftest",
+  "新或改過的 CGC 家族尾版:串測自動跑它的 --selftest(紀錄冊比 sha),不需要先登冊",
+  "站只准唯讀或乾跑形式;會寫冊 / 鎖 / 快照 / 推送的動作由自測站驗,不直接跑",
+  "黃不是綠:rc 2 的站照實黃;整輪燈取最差"
+ ],
+ "reuse_hours": 24,
+ "stations": [
+  {
+   "id": "V-token",
+   "name": "省 Token 第一步",
+   "argv": [
+    "token"
+   ],
+   "quick": true,
+   "timeout": 300
+  },
+  {
+   "id": "V-functions",
+   "name": "AI 必用功能卡",
+   "argv": [
+    "functions"
+   ],
+   "quick": true,
+   "timeout": 120,
+   "deps": [
+    "supportive modules/registry/VIA_AI_FunctionCard_SSOT_v0100.json"
+   ]
+  },
+  {
+   "id": "V-handoff-check",
+   "name": "交接防遺漏檢查",
+   "argv": [
+    "handoff",
+    "check"
+   ],
+   "quick": true,
+   "timeout": 600,
+   "yellow_rc": [
+    1,
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/VIA_Handoff_Continuity_SSOT_v0100.json",
+    "docs/handoff/HANDOFF_latest.json"
+   ]
+  },
+  {
+   "id": "V-status",
+   "name": "流程閘(政策 · 座位 · 加速器 / 網路)",
+   "argv": [
+    "status"
+   ],
+   "quick": true,
+   "timeout": 300,
+   "marker": "[流程] 政策過"
+  },
+  {
+   "id": "V-sync-check",
+   "name": "同步檢查(座位 + 註冊乾跑 + SDD)",
+   "argv": [
+    "sync-check"
+   ],
+   "quick": true,
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-help",
+   "name": "用法",
+   "argv": [
+    "help"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-ssot",
+   "name": "SSOT 第四扇門檢",
+   "argv": [
+    "ssot"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-ssot-plan",
+   "name": "SSOT 零寫規劃",
+   "argv": [
+    "ssot",
+    "plan"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-ssot-panorama",
+   "name": "SSOT 六族四層全景",
+   "argv": [
+    "ssot",
+    "panorama",
+    "--no-write"
+   ],
+   "timeout": 900,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-sdd",
+   "name": "SDD 驗證 check",
+   "argv": [
+    "sdd"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-val",
+   "name": "三系統驗證 SSOT check",
+   "argv": [
+    "val"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-workflow",
+   "name": "流程符合性動詞可用(整輪判定由 PS 結尾帶輪號跑)",
+   "argv": [
+    "workflow"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    1,
+    2
+   ],
+   "marker": "代碼"
+  },
+  {
+   "id": "V-events",
+   "name": "中樞事件",
+   "argv": [
+    "events",
+    "5"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-registry-sync",
+   "name": "元件註冊乾跑",
+   "argv": [
+    "registry-sync"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-matrix",
+   "name": "冊 × 啟動矩陣(PLAN)",
+   "argv": [
+    "matrix",
+    "--no-tests"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-inventory",
+   "name": "工具盤點 · 棘輪 · 撞號",
+   "argv": [
+    "inventory"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-sync",
+   "name": "資料樞紐",
+   "argv": [
+    "sync"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-check",
+   "name": "安裝核可檢",
+   "argv": [
+    "check"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-audit",
+   "name": "稽核",
+   "argv": [
+    "audit"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-panorama",
+   "name": "全景(PLAN 預覽)",
+   "argv": [
+    "panorama"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-page",
+   "name": "中央頁(落 VIA_Reports,不 publish)",
+   "argv": [
+    "page"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-onepage",
+   "name": "一頁交接(落 VIA_Reports,不 publish)",
+   "argv": [
+    "onepage"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-register-plan",
+   "name": "註冊計畫",
+   "argv": [
+    "register-plan"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-layout",
+   "name": "Layout 樞紐自測",
+   "argv": [
+    "layout",
+    "--selftest"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-support",
+   "name": "NLP / Layout 路由",
+   "argv": [
+    "support"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-nlp",
+   "name": "NLP 門",
+   "argv": [
+    "nlp"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-door",
+   "name": "NLP / Layout 出口",
+   "argv": [
+    "door"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-books",
+   "name": "政策 · 邏輯 · 參數冊指標",
+   "argv": [
+    "books"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-lexicon",
+   "name": "正則 · 同義字 · 參數紀錄",
+   "argv": [
+    "lexicon"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-ledger",
+   "name": "成功帳",
+   "argv": [
+    "ledger"
+   ],
+   "timeout": 120
+  },
+  {
+   "id": "V-probe",
+   "name": "子系統探針",
+   "argv": [
+    "probe"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-systems",
+   "name": "系統卡",
+   "argv": [
+    "systems"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ],
+   "note": "系統卡 rc 2 = STALE/NODATA(缺料 / 冊樹不同步,照實黃);rc 1 = RED 才是壞(2026-10-02 VCGC-REQ128)"
+  },
+  {
+   "id": "V-dbm",
+   "name": "資料庫中央管控(容器無資料家 = NODATA 黃)",
+   "argv": [
+    "dbm"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-tools",
+   "name": "鎖版工具卡",
+   "argv": [
+    "tools"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "V-chain",
+   "name": "VCGC 一鏈(計畫 · 不寫入)",
+   "argv": [
+    "chain"
+   ],
+   "timeout": 900,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "V-enter-card",
+   "name": "唯一入口卡(不拉不啟動;串測中不遞迴)",
+   "argv": [
+    "enter",
+    "--card",
+    "--no-pull"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "S-vcgc-manager",
+   "name": "席位 VCGC 管理器自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_SystemManager",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_SystemManager_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "S-vdf-manager",
+   "name": "席位 VDF 管理器自測",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "S-nlp",
+   "name": "席位 NLP 正主自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "C-handoff",
+   "name": "交接案 handoff(CGC_MDL140_HandoverConsole --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL140_HandoverConsole",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-numbering",
+   "name": "交接案 numbering(CGC_MDL237_NumberingSystem --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-entry",
+   "name": "交接案 entry(CGC_MDL149_VeritasCentralGovernanceConsole --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL149_VeritasCentralGovernanceConsole",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-sdd",
+   "name": "交接案 sdd(CGC_MDL245_SDDValidator --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL245_SDDValidator",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-panorama",
+   "name": "交接案 panorama(CGC_MDL247_SSOTPanorama --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL247_SSOTPanorama",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL247_SSOTPanorama_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-token",
+   "name": "交接案 token(CGC_MDL158_VIAPanoramaAuditRepair --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL158_VIAPanoramaAuditRepair",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-activation",
+   "name": "交接案 activation(CGC_MDL233_ToolActivate --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL233_ToolActivate",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-provenance",
+   "name": "交接案 provenance(VRN 來源回歸)",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "provenance",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "C-manager",
+   "name": "交接案 manager(VRN 管理器)",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "E-operator-console",
+   "name": "操作台引擎自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL238_OperatorConsole",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL238_OperatorConsole_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-envmanager",
+   "name": "ENV MANAGER自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL240_EnvManager",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL240_EnvManager_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-talib-scan",
+   "name": "TA-Lib 活指令掃自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL243_TalibCommandScan",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL243_TalibCommandScan_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-pathverify",
+   "name": "單一路徑驗證自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL242_PathVerify",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL242_PathVerify_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-lessons",
+   "name": "教訓帳自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL058_Lessons",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-bridge-sweeper",
+   "name": "橋掃自測",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL124_BridgeSweeper",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "E-number-audit",
+   "name": "編號只增稽核(唯讀)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL237_NumberingSystem",
+    "audit"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+   ],
+   "timeout": 900,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_functional_acceptance",
+   "name": "項鏈 via_functional_acceptance 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_functional_acceptance",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_ssot_autocode",
+   "name": "項鏈 via_ssot_autocode 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_ssot_autocode",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_accelerator_control",
+   "name": "項鏈 via_accelerator_control 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_accelerator_control",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_unique_entry_control",
+   "name": "項鏈 via_unique_entry_control 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_unique_entry_control",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-vrn_dispatch",
+   "name": "項鏈 vrn_dispatch 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "vrn_dispatch",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-vdf_dispatch",
+   "name": "項鏈 vdf_dispatch 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "vdf_dispatch",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-quantguard_dispatch",
+   "name": "項鏈 quantguard_dispatch 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "quantguard_dispatch",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_panorama_audit",
+   "name": "項鏈 via_panorama_audit 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_panorama_audit",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-via_unified_nlp",
+   "name": "項鏈 via_unified_nlp 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "via_unified_nlp",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "I-vrn_nlp_vrn_vdf_pipeline",
+   "name": "項鏈 vrn_nlp_vrn_vdf_pipeline 派送計畫(PLAN 乾跑)",
+   "argv": [
+    "matrix",
+    "--ids",
+    "vrn_nlp_vrn_vdf_pipeline",
+    "--no-tests"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ]
+  },
+  {
+   "id": "L-policy",
+   "name": "v0100 舊套 policy(CGC_MDL207_PolicyRun)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL207_PolicyRun",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL207_PolicyRun_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-talib",
+   "name": "v0100 舊套 talib(CGC_MDL205_TalibBan)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL205_TalibBan",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL205_TalibBan_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-ledger",
+   "name": "v0100 舊套 ledger(CGC_MDL220_SuccessLedger)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL220_SuccessLedger",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL220_SuccessLedger_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-matrix",
+   "name": "v0100 舊套 matrix(CGC_MDL217_ManagerMatrix)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL217_ManagerMatrix",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL217_ManagerMatrix_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-backup",
+   "name": "v0100 舊套 backup(CGC_MDL221_SystemBackup)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL221_SystemBackup",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL221_SystemBackup_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-probe",
+   "name": "v0100 舊套 probe(CGC_MDL222_SubsystemProbe)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL222_SubsystemProbe",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL222_SubsystemProbe_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "L-flow",
+   "name": "v0100 舊套 flow(CGC_MDL223_FlowConsistency)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL223_FlowConsistency",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL223_FlowConsistency_v*.py"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "C-chain",
+   "name": "交接案 chain(CGC_MDL224_TestAuto --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL224_TestAuto",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL224_TestAuto_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vdfstart",
+   "name": "交接案 vdfstart(CGC_MDL209_VdfStart --selftest;載 VDF 管理器尾版)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL209_VdfStart",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL209_VdfStart_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "P-entry",
+   "name": "唯一 PS 入口:語法(pwsh Parser)+ 串測步在",
+   "kind": "ps",
+   "quick": true,
+   "must": [
+    "@\\(\\\"test\\\""
+   ],
+   "deps": [
+    "Invoke-VIA-OperatorConsole-v*.ps1"
+   ],
+   "pending_until": "Invoke-VIA-OperatorConsole-v0108.ps1"
+  },
+  {
+   "id": "C-fullcheck",
+   "name": "交接案 fullcheck(CGC_MDL248_FullCheck --selftest;整合全景實測六段編排)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL248_FullCheck",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL248_FullCheck_v*.py",
+    "launchers/Invoke-VIA-FullCheck-v*.ps1"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-deck",
+   "name": "交接案 deck(CGC_MDL095_DeckServer --selftest;指揮台本地執行橋安全自測)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL095_DeckServer",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL095_DeckServer_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-via_panorama",
+   "name": "交接案 via_panorama(VIA_Panorama --selftest;第一步監控)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "VIA_Panorama",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/VIA_Panorama_v*.py"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-dataframe_lock",
+   "name": "交接案 dataframe_lock(CGC_MDL249_DataFrameLock --selftest;表頭 → DataFrame 鎖)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL249_DataFrameLock",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vdf_lists",
+   "name": "交接案 vdf_lists(VDF_ENG087_MarketListGovernance --selftest;台股清單 ACTIVE/NEW/DELISTED)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG087_MarketListGovernance",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vdf_etf_metrics",
+   "name": "交接案 vdf_etf_metrics(VDF_ENG094_ActiveETFActivity --selftest;主動式 ETF 指標與配置)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG094_ActiveETFActivity",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_ssot_consistency",
+   "name": "交接案 vrn_ssot_consistency(SUP_MDL749_VRNFieldRuleHub --selftest;VRN SSOT 一致與正則自檢)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL749_VRNFieldRuleHub",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-synonym_union_r34",
+   "name": "交接案 synonym_union_r34(CGC_MDL176_SynonymUnion --selftest;同義聯集 v0103;券商別名再補 8 條 · 樣本券商一主)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL176_SynonymUnion",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-numbering_dup_r34",
+   "name": "交接案 numbering_dup_r34(CGC_MDL237_NumberingSystem --selftest;編號 v0111;一詞兩主折正典鍵 · 評等記最細鍵)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_docclass",
+   "name": "交接案 vrn_docclass(VRN_ENG393_DocClassVerify --selftest;文件五類分類 · 首頁亂數三格乘積互核)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG393_DocClassVerify",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-template_sync",
+   "name": "交接案 template_sync(CGC_MDL241_TemplateAdapter --selftest;HTML 模板 SYNCHRONIZER · TOP 25)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL241_TemplateAdapter",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_fourpoint",
+   "name": "交接案 vrn_fourpoint(VRN_ENG080_FourPointDigest --selftest;QC 連接號≠負號)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG080_FourPointDigest",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-ledger_union",
+   "name": "交接案 ledger_union(CGC_MDL250_LedgerUnion --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL250_LedgerUnion",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-merge_medic",
+   "name": "交接案 merge_medic(CGC_MDL143_MergeMedic --selftest)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL143_MergeMedic",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vrn_layout",
+   "name": "交接案 vrn_layout(VRN_ENG394_LayoutRestore --selftest;資訊區 / 本文區 · 扁平表還原 · 圖≠表 · 合併格 · 表格驗算)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG394_LayoutRestore",
+    "--selftest"
+   ],
+   "timeout": 1200
+  },
+  {
+   "id": "C-vrn_valuation",
+   "name": "交接案 vrn_valuation(VRN_ENG395_ValuationMethodLexicon --selftest;評價方法 SSOT 比對 · 繁簡分欄 · 舊詞庫收編)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG395_ValuationMethodLexicon",
+    "--selftest"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-field_rulers",
+   "name": "交接案 field_rulers(CGC_MDL182_ReportFieldRulers --selftest;分析師職稱 · 電話只增不減不衝突 · @ 左右 · mine)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL182_ReportFieldRulers",
+    "--selftest"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vrn_entities",
+   "name": "交接案 vrn_entities(VRN_ENG396_ReportEntities --selftest;公司名稱最簡寫 · 目標價調整前 · 評價法驗算)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG396_ReportEntities",
+    "--selftest"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vrn_plugin_hub",
+   "name": "交接案 vrn_plugin_hub(VRN_ENG397_PluginHub --selftest;積木註冊 · 外部偵測 · AST 分類 · 知識物件)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG397_PluginHub",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-tool_coverage_matrix",
+   "name": "交接案 tool_coverage_matrix(CGC_MDL230_ToolCoverageProbe --selftest;AST / PS 剖析器互核 · 四面覆蓋 · HTML 矩陣)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL230_ToolCoverageProbe",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_chain_runner",
+   "name": "交接案 vdf_chain_runner(CGC_MDL170_VDFChainRunner --selftest;0c 獨立性沿薄尾鏈看依賴)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL170_VDFChainRunner",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_local_db",
+   "name": "交接案 vdf_local_db(VDF_ENG079_LocalDbConsolidate --selftest;目標表有主鍵就照主鍵只補缺 + v0103 十六檢)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG079_LocalDbConsolidate",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-progress_journal",
+   "name": "交接案 progress_journal(CGC_MDL251_ProgressJournal --selftest;逐步落本機暫存 · 中斷接續)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL251_ProgressJournal",
+    "--selftest"
+   ],
+   "timeout": 300
+  },
+  {
+   "id": "C-vrn_chain_runner",
+   "name": "交接案 vrn_chain_runner(CGC_MDL172_VRNChainRunner --selftest;每節點印 [進度] 給 via-realtest 進度條)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL172_VRNChainRunner",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-env_manager",
+   "name": "交接案 env_manager(CGC_MDL240_EnvManager --selftest;逐委派進度行 · 只查不裝)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL240_EnvManager",
+    "--selftest"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vrn_firstpage_bridge",
+   "name": "交接案 vrn_firstpage_bridge(VRN_ENG086_FirstPageLogicBridge --selftest;券商正典鍵跟 CGC_MDL176 裁定)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG086_FirstPageLogicBridge",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "V-monitor",
+   "name": "VIA 全景監控(只讀;經 run 走閘)· 教訓卡",
+   "argv": [
+    "monitor",
+    "lessons"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/VIA_Panorama_v*.py",
+    "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
+   ]
+  },
+  {
+   "id": "V-closeout",
+   "name": "VCGC 一指令收尾(乾跑:--skip-tests,不寫收據 · 不提交 · 不推)",
+   "argv": [
+    "closeout",
+    "--skip-tests"
+   ],
+   "timeout": 900,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "C-monitor",
+   "name": "交接案 monitor(VIA_Panorama --selftest;薄尾鏈 v0104 → v0100 全自測)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "VIA_Panorama",
+    "--selftest"
+   ],
+   "deps": [
+    "supportive modules/registry/VIA_Panorama_v*.py",
+    "supportive modules/registry/VIA_Panorama_Profiles_v0100.json"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_incgate_catalog",
+   "name": "交接案 vdf_incgate_catalog(VDF_ENG089_IncrementalFetchGate --selftest;增量擷取閘:呼叫端改 CATALOG 帶到本體(ENG093 ⑦ · --catalog 不再看錯目錄))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG089_IncrementalFetchGate",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_fred_clock",
+   "name": "交接案 vdf_fred_clock(VDF_ENG074_FredMacroSSOT --selftest;FRED 宏觀:自測時鐘固定測資月份 + 真時鐘最新一筆 = 本月 1 日)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG074_FredMacroSSOT",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_consensus_fixture",
+   "name": "交接案 vdf_consensus_fixture(VDF_ENG088_ConsensusFusionBridge --selftest;共識融合橋:自測自帶正典庫測資;本境照實 ABSENT)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG088_ConsensusFusionBridge",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_storyrot_nodata",
+   "name": "交接案 vdf_storyrot_nodata(VDF_ENG072_StoryRotationBridge --selftest-tail;故事輪動橋:缺台股庫 → export 照實 NODATA 不崩(前版八檢要實庫,在工作站驗))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG072_StoryRotationBridge",
+    "--selftest-tail"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_finstmt_gate2",
+   "name": "交接案 vdf_finstmt_gate2(VDF_ENG082_FinStatements --selftest;三大報表:自測假代碼跟上收緊後的第二道閘;正式 run 走真閘)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG082_FinStatements",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "V-gate",
+   "name": "VCGC 全綠閘(乾跑:只點編號稽核 · 母子連接;全探針由 v0185 自測驗,串測中不遞迴)",
+   "argv": [
+    "gate",
+    "--only",
+    "編號稽核,母子連接"
+   ],
+   "timeout": 600,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "V-link",
+   "name": "母子自動連接(乾跑:不寫冊)",
+   "argv": [
+    "link"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "V-guard",
+   "name": "寫入前衝突閘(乾跑:只判不寫)",
+   "argv": [
+    "guard"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "V-exec",
+   "name": "執行監控卡(唯讀)",
+   "argv": [
+    "exec",
+    "--last",
+    "5"
+   ],
+   "timeout": 60,
+   "yellow_rc": [
+    2
+   ],
+   "deps": [
+    "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_universe",
+   "name": "交接案 vdf_universe(VDF_SystemManager --selftest;VDF 管理員 universe 動詞:三組輸入 · 五項輸出 · 引擎順序 · 表頭 → DataFrame · 輸出驗證(CGC_MDL249))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_index_official",
+   "name": "交接案 vdf_index_official(VDF_ENG232_TWIndexOfficial --selftest;加權 · 櫃買指數官方日資料(收容件 b360 解析 · 網路走 SUP_MDL740 · TA-Lib 0))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG232_TWIndexOfficial",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_universe_r50",
+   "name": "交接案 vdf_universe_r50(VDF_SystemManager --selftest;VDF 管理員 universe xcheck(加權三來源 · 三表同日代號數)· parquet(CGC_MDL238 增量)· lock(VDF-WKF011 版號 + 時間)· parity;OUT-01/06/07 只增入 DuckDB(R50 · VDF-REQ017))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vdf_index_incr",
+   "name": "交接案 vdf_index_incr(VDF_ENG232_TWIndexOfficial --selftest;加權 · 櫃買指數增量擷取:不給 --start = 兩指數 MAX(date) 取較早 + 1 天;已最新 = 零外呼(R50 · VDF-REQ017))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG232_TWIndexOfficial",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vrn_outputs",
+   "name": "交接案 vrn_outputs(VRN_SystemManager --selftest;VRN 管理員 outputs 動詞(表頭 · DataFrame · 驗證 · 順序 · 三方對照 · Parquet · 鎖)與 VDF universe 同一套能力(R50 互比補弱 · VDF-REQ017))",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-manager_parity",
+   "name": "交接案 manager_parity(CGC_MDL252_ManagerParity --selftest;VDF / VRN 兩個系統管理員能力互比(AST 動詞盤點 + 11 項能力表;兩邊不互相匯入)(R50 · VDF-REQ017))",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL252_ManagerParity",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-etf_registry_resolve",
+   "name": "交接案 etf_registry_resolve(FLOW_ENG023_FlowTwActiveEtf --selftest;主動 ETF 清單 --refresh 用官方名錄定奪名碼衝突與待驗(記憶體內冊、零網路、不寫檔)(R51b · VDF-REQ014))",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "FLOW_ENG023_FlowTwActiveEtf",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-ticker_regex_scope",
+   "name": "交接案 ticker_regex_scope(CGC_MDL185_SsotBookSync --selftest;E4 台股代號 regex 範疇感知:只比同範疇冊 + 逐冊對範疇預期(R51c · VCGC-REQ110))",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL185_SsotBookSync",
+    "--selftest"
+   ],
+   "timeout": 900
+  },
+  {
+   "id": "C-vrn_header_frame",
+   "name": "交接案 vrn_header_frame(VRN_ENG115_HeaderFrameTemp --selftest;HEADER→DataFrame 經 TEMP · 文左表右 · 修復與互核)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG115_HeaderFrameTemp",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VRN/VRN_ENG115_HeaderFrameTemp_v*.py",
+    "functional modules/VRN/VRN_FrameFlow_SSOT_v*.json"
+   ]
+  },
+  {
+   "id": "C-tooling",
+   "name": "交接案 tooling(CGC_MDL253_ToolingInventory --selftest;鎖版全景 · 尾版律 · CLI 面 · L103 三導入 · 編號接回 · 短令冊順點源鏈)",
+   "argv": [
+    "run",
+    "CGC_MDL253_ToolingInventory",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+    "supportive modules/registry/CGC_MDL173_MatrixReportSpec_v*.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ]
+  },
+  {
+   "id": "C-vdf_engine",
+   "name": "交接案 vdf_engine(VDF_SystemManager --selftest;engine 動詞 · 啟動前閘 · 經 VCGC run)",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py",
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+   ]
+  },
+  {
+   "id": "C-vrn_engine",
+   "name": "交接案 vrn_engine(VRN_SystemManager --selftest;engine 動詞 · 啟動前閘 · 經 VCGC run)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py",
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+   ]
+  },
+  {
+   "id": "C-onepage",
+   "name": "交接案 onepage(CGC_MDL254_ReviewOnePage --selftest;唯一頁)",
+   "argv": [
+    "run",
+    "CGC_MDL254_ReviewOnePage",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL254_ReviewOnePage_v*.py",
+    "supportive modules/registry/VIA_ReviewOnePage_Sources_SSOT_v*.json"
+   ]
+  },
+  {
+   "id": "C-sweeper",
+   "name": "交接案 sweeper(CGC_MDL124_BridgeSweeper --selftest;掃橋器 · PS 模板呈現件排除)",
+   "argv": [
+    "run",
+    "CGC_MDL124_BridgeSweeper",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py",
+    "supportive modules/ps7/VeritasCeleritas.PS7*.ps1"
+   ]
+  },
+  {
+   "id": "C-ppp_hub",
+   "name": "交接案 ppp_hub(SUP_MDL746_PDFPlumberPlusHub --selftest-tail;VRN 重型 OCR 車道)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL746_PDFPlumberPlusHub",
+    "--selftest-tail"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py"
+   ]
+  },
+  {
+   "id": "C-daily_handover",
+   "name": "交接案 daily_handover(CGC_MDL140_HandoverConsole --selftest-tail;每日進度交接十點 · 清單契約 · 只增帳)",
+   "argv": [
+    "run",
+    "--family",
+    "core",
+    "CGC_MDL140_HandoverConsole",
+    "--selftest-tail"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL140_HandoverConsole_v*.py"
+   ]
+  },
+  {
+   "id": "C-praddle",
+   "name": "交接案 praddle(VRN_ENG398_PraddleExtractor --selftest;PRADDLE 擷取編排)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "VRN_ENG398_PraddleExtractor",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py",
+    "supportive modules/registry/via_ocr_super_v*.py"
+   ]
+  },
+  {
+   "id": "C-ocr_super_boxes",
+   "name": "交接案 ocr_super_boxes(via_ocr_super --selftest-tail;隔離境車道回座標)",
+   "argv": [
+    "run",
+    "via_ocr_super",
+    "--selftest-tail"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/via_ocr_super_v*.py"
+   ]
+  },
+  {
+   "id": "C-layout_praddle",
+   "name": "交接案 layout_praddle(SUP_MDL743_GenericLayoutHub --selftest;LAYOUT 從鎖冊取 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL743_GenericLayoutHub",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
+  },
+  {
+   "id": "C-nlp_praddle",
+   "name": "交接案 nlp_praddle(SUP_MDL866_VIAUnifiedNLPOrchestrator --selftest;NLP pdf 動詞經鎖冊 PRADDLE)",
+   "argv": [
+    "run",
+    "--family",
+    "vrn",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py",
+    "functional modules/VRN/VRN_ENG398_PraddleExtractor_v*.py"
+   ]
+  },
+  {
+   "id": "C-lessons_lock",
+   "name": "交接案 lessons_lock(CGC_MDL058_Lessons --selftest;教訓帳跨行程鎖)",
+   "argv": [
+    "run",
+    "CGC_MDL058_Lessons",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL058_Lessons_v*.py"
+   ]
+  },
+  {
+   "id": "C-step_matrix",
+   "name": "交接案 step_matrix(CGC_MDL226_StepMatrix --selftest;步驟 4–8 真量)",
+   "argv": [
+    "run",
+    "CGC_MDL226_StepMatrix",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL226_StepMatrix_v*.py"
+   ]
+  },
+  {
+   "id": "C-github_panorama",
+   "name": "交接案 github_panorama(CGC_MDL255_GitHubPanorama --selftest;AI 讀 origin/main 九本分號冊 + union 三本聯集冊;只讀)",
+   "argv": [
+    "run",
+    "CGC_MDL255_GitHubPanorama",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "supportive modules/registry/CGC_MDL255_GitHubPanorama_v*.py"
+   ]
+  },
+  {
+   "id": "C-tw02_parser",
+   "name": "交接案 tw02_parser(VRN_TW02_ReportParser --selftest;同義字 / 正則委樞 drift 0)",
+   "argv": [
+    "run",
+    "VRN_TW02_ReportParser",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "deps": [
+    "functional modules/VRN/VRN_TW02_ReportParser_v*.py",
+    "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json"
+   ]
+  },
+  {
+   "id": "C-first_page_engine",
+   "name": "交接案 first_page_engine(VIA_VRN_FirstPageEngine --selftest;㊳ 要真 sidecar ≥ 20 份 → 工作站驗)",
+   "argv": [
+    "run",
+    "VIA_VRN_FirstPageEngine",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VRN/VIA_VRN_FirstPageEngine_v*.py",
+    "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json"
+   ]
+  },
+  {
+   "id": "C-engine_params",
+   "name": "交接案 engine_params(CGC_MDL253 v0101 --selftest;單引擎備料本體)",
+   "argv": [
+    "run",
+    "CGC_MDL253_ToolingInventory",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py",
+    "supportive modules/registry/VIA_Central_Synonym_Regex_v*.json",
+    "supportive modules/registry/VIA_Workflow_VDF_SSOT_v*.json",
+    "supportive modules/registry/VIA_Workflow_VRN_SSOT_v*.json",
+    "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json"
+   ]
+  },
+  {
+   "id": "C-vdf_engine_params",
+   "name": "交接案 vdf_engine_params(VDF_SystemManager v0125 --selftest;params / prep)",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py",
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+   ]
+  },
+  {
+   "id": "C-vrn_engine_params",
+   "name": "交接案 vrn_engine_params(VRN_SystemManager v0115 --selftest;params / prep)",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py",
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py"
+   ]
+  },
+  {
+   "id": "C-engine_tools",
+   "name": "交接案 engine_tools(CGC_MDL253 v0102 --selftest;輸出 · 工具 · AST 編號 · 工具鏈全景)",
+   "argv": [
+    "run",
+    "CGC_MDL253_ToolingInventory",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "supportive modules/registry/CGC_MDL253_ToolingInventory_v*.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+    "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+    "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v*.py"
+   ]
+  },
+  {
+   "id": "C-tool_activate_ocr",
+   "name": "交接案 tool_activate_ocr(CGC_MDL233 v0107 --selftest;pdfplumber · ocr 進鎖冊)",
+   "argv": [
+    "run",
+    "CGC_MDL233_ToolActivate",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/registry/CGC_MDL233_ToolActivate_v*.py",
+    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+    "supportive modules/70_VRN_Rules/SUP_MDL746_PDFPlumberPlusHub_v*.py",
+    "supportive modules/registry/via_ocr_super_v*.py"
+   ]
+  },
+  {
+   "id": "P-step1",
+   "name": "Step1 同步與 LKGC 一次貼:語法(pwsh Parser)+ 章在(CELERITAS-TEMPLATE-JOIN · PS-ACCEL)",
+   "kind": "ps",
+   "quick": false,
+   "must": [
+    "CELERITAS-TEMPLATE-JOIN",
+    "VIA:PS-ACCEL"
+   ],
+   "deps": [
+    "Invoke-VIA-Step1-SyncAndLKGC*.ps1"
+   ]
+  },
+  {
+   "id": "QG-VDF_ENG086_QuantGuardOneBridge",
+   "name": "VDF_ENG086_QuantGuardOneBridge 本輪候選契約驗證",
+   "argv": [
+    "run",
+    "VDF_ENG086_QuantGuardOneBridge",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2,
+    3
+   ],
+   "quick": false
+  },
+  {
+   "id": "QG-CGC_MDL237_NumberingSystem",
+   "name": "CGC_MDL237_NumberingSystem 本輪候選契約驗證",
+   "argv": [
+    "run",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2,
+    3
+   ],
+   "quick": false
+  },
+  {
+   "id": "QG-VDF_ENG117_ForwardVintage",
+   "name": "VDF_ENG117_ForwardVintage 本輪候選契約驗證",
+   "argv": [
+    "run",
+    "VDF_ENG117_ForwardVintage",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2,
+    3
+   ],
+   "quick": false
+  },
+  {
+   "id": "QG-VDF_ENG117_ForwardVintageDoor",
+   "name": "VDF_ENG117_ForwardVintageDoor 本輪候選契約驗證",
+   "argv": [
+    "run",
+    "VDF_ENG117_ForwardVintageDoor",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2,
+    3
+   ],
+   "quick": false
+  },
+  {
+   "id": "QG-VDF_ENG110_USMacroProbe",
+   "name": "VDF_ENG110_USMacroProbe 本輪候選契約驗證",
+   "argv": [
+    "run",
+    "VDF_ENG110_USMacroProbe",
+    "--selftest"
+   ],
+   "timeout": 300,
+   "yellow_rc": [
+    2,
+    3
+   ],
+   "quick": false
+  },
+  {
+   "id": "SSOT-assets-plan",
+   "name": "SSOT 候選衝突規劃",
+   "argv": [
+    "run",
+    "CGC_MDL237_NumberingSystem",
+    "assets-plan"
+   ],
+   "timeout": 180,
+   "yellow_rc": [
+    2
+   ],
+   "quick": false
+  },
+  {
+   "id": "SSOT-assets-view",
+   "name": "SSOT 中央資產唯讀三表投影",
+   "argv": [
+    "run",
+    "CGC_MDL237_NumberingSystem",
+    "assets-view"
+   ],
+   "timeout": 120,
+   "yellow_rc": [
+    2
+   ],
+   "quick": false
+  },
+  {
+   "id": "L1-local-selftest",
+   "name": "L1 本地工具整合契約",
+   "argv": [
+    "run",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "timeout": 180,
+   "yellow_rc": [
+    2
+   ],
+   "quick": false
+  },
+  {
+   "id": "L1-local-tools",
+   "name": "L1 套件資源盤點",
+   "argv": [
+    "run",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "l1-tools"
+   ],
+   "timeout": 120,
+   "yellow_rc": [
+    2
+   ],
+   "quick": false
+  },
+  {
+   "id": "C-numbering_optional",
+   "name": "交接案 numbering_optional(CGC_MDL237 v0116 --selftest;可選依賴缺件不崩)",
+   "argv": [
+    "run",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+   ]
+  },
+  {
+   "id": "C-nlp_optional",
+   "name": "交接案 nlp_optional(SUP_MDL866 v0108 --selftest;L1 可選依賴 · 核心照 v0106)",
+   "argv": [
+    "run",
+    "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+   ]
+  },
+  {
+   "id": "C-numbering_verbs",
+   "name": "交接案 numbering_verbs(中央編號 v0117 未知動詞 / 旗標拒跑 · door 報尾版(VCGC-REQ140))",
+   "argv": [
+    "run",
+    "CGC_MDL237_NumberingSystem",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "supportive modules/registry/CGC_MDL237_NumberingSystem_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_unknown_verb",
+   "name": "交接案 vdf_unknown_verb(VDF 管理員 v0126 未知動詞拒跑 · 抬頭尾版(VCGC-REQ140))",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "C-vrn_unknown_verb",
+   "name": "交接案 vrn_unknown_verb(VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位(VCGC-REQ140))",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_verb",
+   "name": "交接案 vdf_fetch_verb(VDF 管理員 v0127 fetch 動詞 → MDL008(VCGC-REQ141))",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_system",
+   "name": "交接案 vdf_fetch_system(VDF 獨立擷取系統 MDL008(冊 · 改寫 · 雙閘 · live 路由)(VCGC-REQ141))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0100.json",
+    "functional modules/VDF/VDF_MDL00*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_integration",
+   "name": "交接案 vdf_fetch_integration(VDF 擷取系統整合測試:七支全鏈 · 輸出契約 · 倉內零寫入 · block 零出網(VCGC-REQ141))",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "fetch",
+    "test"
+   ],
+   "timeout": 3600,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0100.json",
+    "functional modules/VDF/VDF_MDL00*.py",
+    "functional modules/VDF/VDF_SystemManager_v*.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0101.json",
+    "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0111.py",
+    "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0122.py",
+    "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v0106.py",
+    "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0109.py",
+    "functional modules/VDF/engine/VDF_ENG059_EstimateBands_v0103.py",
+    "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+    "functional modules/VDF/engine/VDF_ENG064_HistoryBackfill_v0113.py",
+    "functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG074_FredMacroSSOT_v0107.py",
+    "functional modules/VDF/engine/VDF_ENG075_MonthlyRevenueBackfill_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+    "functional modules/VDF/engine/VDF_ENG082_FinStatements_v0107.py",
+    "functional modules/VDF/engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG113_MacroMethod_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG114_PmiPair_v0100.py",
+    "functional modules/VDF/engine/VDF_ENG115_SentimentFetch_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v0100.py",
+    "functional modules/VDF/engine/VDF_ENG230_ForwardValuation_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG231_GlobalListings_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0101.py"
+   ]
+  },
+  {
+   "id": "C-network_lock_seat",
+   "name": "交接案 network_lock_seat(SUP_MDL737 v0110 鎖版導向)",
+   "argv": [
+    "run",
+    "SUP_MDL737_SuperAccelModule",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/SUP_MDL737_SuperAccelModule_v*.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json",
+    "supportive modules/network/VeritasAegisNexus_v*.py"
+   ]
+  },
+  {
+   "id": "C-bundle_tool",
+   "name": "交接案 bundle_tool(子系統下載包 MDL256(via_00_vcgc · via_01_vdf:閉包 · 編號 · 版本 · sha256 · 安全原地更新)(VCGC-REQ1)",
+   "argv": [
+    "run",
+    "CGC_MDL256_SubsystemBundle",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "supportive modules/registry/CGC_MDL256_SubsystemBundle_v*.py",
+    "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0100.json"
+   ]
+  },
+  {
+   "id": "C-vdf_master_control",
+   "name": "交接案 vdf_master_control(VDF 管理員 v0128 總控 · 獨立運作(VCGC-REQ143))",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_SystemManager_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_v0101",
+   "name": "交接案 vdf_fetch_v0101(MDL008 v0101 總控入口 · 冊 v0101 · 第一步清單(VCGC-REQ143))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v*.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0101.json"
+   ]
+  },
+  {
+   "id": "C-vdf_list_stock",
+   "name": "交接案 vdf_list_stock(MDL009 全台股清單(開頭五欄 · 驗證七項 · DuckDB 增量)(VCGC-REQ143))",
+   "argv": [
+    "run",
+    "VDF_MDL009_TWStockList",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_list_etf",
+   "name": "交接案 vdf_list_etf(MDL010 主動式 ETF 清單(ENG077 律 · 開頭五欄 · 驗證七項)(VCGC-REQ143))",
+   "argv": [
+    "run",
+    "VDF_MDL010_ActiveETFList",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v*.py",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_akshare_card",
+   "name": "交接案 vdf_akshare_card(MDL011 接線卡)",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "fetch",
+    "card",
+    "011"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VDF/VDF_MDL011_AkshareFetcher_v*.py"
+   ]
+  },
+  {
+   "id": "C-vdf_list_stock_v0101",
+   "name": "交接案 vdf_list_stock_v0101(MDL009 v0101 年區代碼 2021–2030 中英文名稱局部識別核對 · 8 家寫入程式 · 不可刪(VCGC-REQ144))",
+   "argv": [
+    "run",
+    "VDF_MDL009_TWStockList",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0101.py",
+    "supportive modules/VIA_Central_Governance/tw_source_snapshots/t187ap03_L_20260805.json"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_v0102",
+   "name": "交接案 vdf_fetch_v0102(MDL008 v0102 冊 v0102(MDL009 → v0101)· 子行程從本版起 · fixture 擋區兩家不刪(VCGC-REQ144))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0102.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0101.py"
+   ]
+  },
+  {
+   "id": "C-bundle_tool_v0101",
+   "name": "交接案 bundle_tool_v0101(CGC_MDL256 v0101 下載包冊取尾版 · 冊 v0101 帶 MDL009 v0101 / MDL008 v0102 / 擷取冊 v0102(VCGC-REQ144))",
+   "argv": [
+    "run",
+    "CGC_MDL256_SubsystemBundle",
+    "--selftest"
+   ],
+   "timeout": 1800,
+   "deps": [
+    "supportive modules/registry/CGC_MDL256_SubsystemBundle_v0101.py",
+    "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0101.json"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_fill",
+   "name": "交接案 vdf_fetch_fill(MDL008 v0103 fetch fill 補缺擷取:只抓不足 · 清單第一步 · 雙閘 rc 4 零寫 · 再補零子行程 · 只抓變舊的(VCGC-REQ145))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0103.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0102.json"
+   ]
+  },
+  {
+   "id": "C-vdf_list_stock_v0102",
+   "name": "交接案 vdf_list_stock_v0102(MDL009 v0102 網路工具 AST 真橋(模組層 VIA_NET_TOOL_PATH + def _via_net)· 換網鏈轉回尾版(VCGC-REQ146) · ⑤ 經 main 跑報告記本版標籤(PR #444 Codex P2))",
+   "argv": [
+    "run",
+    "VDF_MDL009_TWStockList",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"
+   ]
+  },
+  {
+   "id": "C-vdf_fetch_v0104",
+   "name": "交接案 vdf_fetch_v0104(MDL008 v0104 網路工具 AST 真橋 · 冊 v0103 · fill --progress([進度] i/n 真百分比)· fill-matrix 詳細矩陣(Rich · AST 位置)(VCGC-REQ146))",
+   "argv": [
+    "run",
+    "VDF_MDL008_FetchSystem",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0104.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0103.json",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"
+   ]
+  },
+  {
+   "id": "C-sweeper_v0110",
+   "name": "交接案 sweeper_v0110(掃橋器 v0110:PS 版史照版號(無版號舊檔有同族 -vNNNN 時是版史,不再計畫注橋進舊 .ps1;L70)(VCGC-REQ146))",
+   "argv": [
+    "run",
+    "CGC_MDL124_BridgeSweeper",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0110.py"
+   ]
+  },
+  {
+   "id": "C-tool_probe_v0106",
+   "name": "交接案 tool_probe_v0106(工具覆蓋矩陣 v0106:無版號舊 PS 檔有同族版號檔時算版史;整條鏈 v0101–v0106 全過(含 MDL225 載入器尾版在冊)(VCGC-REQ146))",
+   "argv": [
+    "run",
+    "CGC_MDL230_ToolCoverageProbe",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "supportive modules/registry/CGC_MDL230_ToolCoverageProbe_v0106.py",
+    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json"
+   ]
+  },
+  {
+   "id": "C-version_panorama_loader",
+   "name": "交接案 version_panorama_loader(版本全景:加速器載入器尾版 SUP_MDL737 v0110 補登引擎版本冊(VIA-TOOL-0231;PR #442 漏登的回歸)(VCGC-REQ146))",
+   "argv": [
+    "run",
+    "CGC_MDL225_VersionPanorama",
+    "--selftest"
+   ],
+   "timeout": 2400,
+   "deps": [
+    "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
+    "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py"
+   ]
+  },
+  {
+   "id": "P-vdf_fill",
+   "name": "VDF 補缺擷取 PS 啟動器:語法(pwsh Parser)+ 章在(CELERITAS-TEMPLATE-JOIN · PS-ACCEL · Invoke-VIAPython · --progress)",
+   "kind": "ps",
+   "quick": false,
+   "must": [
+    "CELERITAS-TEMPLATE-JOIN",
+    "VIA:PS-ACCEL",
+    "Invoke-VIAPython",
+    "--progress"
+   ],
+   "deps": [
+    "Invoke-VDF-FetchFill-v*.ps1"
+   ]
+  }
+ ],
+ "coverage": {
+  "verb": {
+   "token": {
+    "station": "V-token"
+   },
+   "functions": {
+    "station": "V-functions"
+   },
+   "help": {
+    "station": "V-help"
+   },
+   "status": {
+    "station": "V-status"
+   },
+   "handoff": {
+    "station": "V-handoff-check"
+   },
+   "sync-check": {
+    "station": "V-sync-check"
+   },
+   "ssot": {
+    "station": "V-ssot"
+   },
+   "sdd": {
+    "station": "V-sdd"
+   },
+   "val": {
+    "station": "V-val"
+   },
+   "workflow": {
+    "station": "V-workflow"
+   },
+   "events": {
+    "station": "V-events"
+   },
+   "registry-sync": {
+    "station": "V-registry-sync"
+   },
+   "matrix": {
+    "station": "V-matrix"
+   },
+   "inventory": {
+    "station": "V-inventory"
+   },
+   "sync": {
+    "station": "V-sync"
+   },
+   "check": {
+    "station": "V-check"
+   },
+   "audit": {
+    "station": "V-audit"
+   },
+   "panorama": {
+    "station": "V-panorama"
+   },
+   "page": {
+    "station": "V-page"
+   },
+   "onepage": {
+    "station": "V-onepage"
+   },
+   "register-plan": {
+    "station": "V-register-plan"
+   },
+   "layout": {
+    "station": "V-layout"
+   },
+   "support": {
+    "station": "V-support"
+   },
+   "nlp": {
+    "station": "V-nlp"
+   },
+   "door": {
+    "station": "V-door"
+   },
+   "books": {
+    "station": "V-books"
+   },
+   "lexicon": {
+    "station": "V-lexicon"
+   },
+   "ledger": {
+    "station": "V-ledger"
+   },
+   "probe": {
+    "station": "V-probe"
+   },
+   "systems": {
+    "station": "V-systems"
+   },
+   "dbm": {
+    "station": "V-dbm"
+   },
+   "tools": {
+    "station": "V-tools"
+   },
+   "chain": {
+    "station": "V-chain"
+   },
+   "enter": {
+    "station": "V-enter-card"
+   },
+   "run": {
+    "station": "C-numbering"
+   },
+   "test": {
+    "exempt": "本流程自己(遞迴);由 VCGC v0180 test 路由與 CGC_MDL224 自測驗"
+   },
+   "selftest": {
+    "exempt": "不是動詞:v0168 比對 run 的子參數字串;v0142 回「不認得動詞」(實測)"
+   },
+   "go": {
+    "exempt": "PS 唯一編排本身;PS 入口站驗語法與串測步,整輪由操作員 via-vcgc go / via-in 跑"
+   },
+   "all": {
+    "exempt": "go 的別名(v0166 GO_VERBS)"
+   },
+   "run-all": {
+    "exempt": "go 的別名(v0166 GO_VERBS)"
+   },
+   "monitor": {
+    "station": "V-monitor"
+   },
+   "closeout": {
+    "station": "V-closeout"
+   },
+   "gate": {
+    "station": "V-gate"
+   },
+   "link": {
+    "station": "V-link"
+   },
+   "guard": {
+    "station": "V-guard"
+   },
+   "exec": {
+    "station": "V-exec"
+   }
+  },
+  "seat": {
+   "VCGC": {
+    "station": "S-vcgc-manager"
+   },
+   "CONSOLE": {
+    "station": "C-entry"
+   },
+   "VDF": {
+    "station": "S-vdf-manager"
+   },
+   "VRN": {
+    "station": "C-manager"
+   },
+   "NLP": {
+    "station": "S-nlp"
+   },
+   "LAYOUT": {
+    "station": "V-layout"
+   }
+  },
+  "card": {
+   "token": {
+    "station": "V-token"
+   },
+   "functions": {
+    "station": "V-functions"
+   },
+   "handoff": {
+    "station": "V-handoff-check"
+   },
+   "read": {
+    "station": "C-token"
+   },
+   "slice": {
+    "station": "C-token"
+   },
+   "chain": {
+    "station": "C-token"
+   },
+   "digest": {
+    "station": "C-token"
+   },
+   "ssot_panorama": {
+    "station": "V-ssot-panorama"
+   },
+   "number_audit": {
+    "station": "E-number-audit"
+   },
+   "registry": {
+    "station": "V-registry-sync"
+   },
+   "sdd": {
+    "station": "V-sdd"
+   },
+   "handoff_close": {
+    "station": "C-handoff"
+   },
+   "test": {
+    "exempt": "這一步就是本流程(test --quick);由 CGC_MDL224 自測與本冊站表驗"
+   }
+  },
+  "case": {
+   "handoff": {
+    "station": "C-handoff"
+   },
+   "provenance": {
+    "station": "C-provenance"
+   },
+   "numbering": {
+    "station": "C-numbering"
+   },
+   "entry": {
+    "station": "C-entry"
+   },
+   "manager": {
+    "station": "C-manager"
+   },
+   "sdd": {
+    "station": "C-sdd"
+   },
+   "panorama": {
+    "station": "C-panorama"
+   },
+   "token": {
+    "station": "C-token"
+   },
+   "activation": {
+    "station": "C-activation"
+   },
+   "chain": {
+    "station": "C-chain"
+   },
+   "vdfstart": {
+    "station": "C-vdfstart"
+   },
+   "backup": {
+    "station": "L-backup"
+   },
+   "fullcheck": {
+    "station": "C-fullcheck"
+   },
+   "deck": {
+    "station": "C-deck"
+   },
+   "via_panorama": {
+    "station": "C-via_panorama"
+   },
+   "dataframe_lock": {
+    "station": "C-dataframe_lock"
+   },
+   "vdf_lists": {
+    "station": "C-vdf_lists"
+   },
+   "vdf_etf_metrics": {
+    "station": "C-vdf_etf_metrics"
+   },
+   "vrn_ssot_consistency": {
+    "station": "C-vrn_ssot_consistency"
+   },
+   "synonym_union_r34": {
+    "station": "C-synonym_union_r34"
+   },
+   "numbering_dup_r34": {
+    "station": "C-numbering_dup_r34"
+   },
+   "vrn_docclass": {
+    "station": "C-vrn_docclass"
+   },
+   "template_sync": {
+    "station": "C-template_sync"
+   },
+   "vrn_fourpoint": {
+    "station": "C-vrn_fourpoint"
+   },
+   "ledger_union": {
+    "station": "C-ledger_union"
+   },
+   "merge_medic": {
+    "station": "C-merge_medic"
+   },
+   "vrn_layout": {
+    "station": "C-vrn_layout"
+   },
+   "vrn_valuation": {
+    "station": "C-vrn_valuation"
+   },
+   "field_rulers": {
+    "station": "C-field_rulers"
+   },
+   "vrn_entities": {
+    "station": "C-vrn_entities"
+   },
+   "vrn_plugin_hub": {
+    "station": "C-vrn_plugin_hub"
+   },
+   "tool_coverage_matrix": {
+    "station": "C-tool_coverage_matrix"
+   },
+   "vdf_chain_runner": {
+    "station": "C-vdf_chain_runner"
+   },
+   "vdf_local_db": {
+    "station": "C-vdf_local_db"
+   },
+   "progress_journal": {
+    "station": "C-progress_journal"
+   },
+   "vrn_chain_runner": {
+    "station": "C-vrn_chain_runner"
+   },
+   "env_manager": {
+    "station": "C-env_manager"
+   },
+   "vrn_firstpage_bridge": {
+    "station": "C-vrn_firstpage_bridge"
+   },
+   "monitor": {
+    "station": "C-monitor"
+   },
+   "vdf_incgate_catalog": {
+    "station": "C-vdf_incgate_catalog"
+   },
+   "vdf_fred_clock": {
+    "station": "C-vdf_fred_clock"
+   },
+   "vdf_consensus_fixture": {
+    "station": "C-vdf_consensus_fixture"
+   },
+   "vdf_storyrot_nodata": {
+    "station": "C-vdf_storyrot_nodata"
+   },
+   "vdf_finstmt_gate2": {
+    "station": "C-vdf_finstmt_gate2"
+   },
+   "vdf_universe": {
+    "station": "C-vdf_universe"
+   },
+   "vdf_index_official": {
+    "station": "C-vdf_index_official"
+   },
+   "vdf_universe_r50": {
+    "station": "C-vdf_universe_r50"
+   },
+   "vdf_index_incr": {
+    "station": "C-vdf_index_incr"
+   },
+   "vrn_outputs": {
+    "station": "C-vrn_outputs"
+   },
+   "manager_parity": {
+    "station": "C-manager_parity"
+   },
+   "etf_registry_resolve": {
+    "station": "C-etf_registry_resolve"
+   },
+   "ticker_regex_scope": {
+    "station": "C-ticker_regex_scope"
+   },
+   "vrn_header_frame": {
+    "station": "C-vrn_header_frame"
+   },
+   "tooling": {
+    "station": "C-tooling"
+   },
+   "vdf_engine": {
+    "station": "C-vdf_engine"
+   },
+   "vrn_engine": {
+    "station": "C-vrn_engine"
+   },
+   "onepage": {
+    "station": "C-onepage"
+   },
+   "sweeper": {
+    "station": "C-sweeper"
+   },
+   "ppp_hub": {
+    "station": "C-ppp_hub"
+   },
+   "daily_handover": {
+    "station": "C-daily_handover"
+   },
+   "praddle": {
+    "station": "C-praddle"
+   },
+   "ocr_super_boxes": {
+    "station": "C-ocr_super_boxes"
+   },
+   "layout_praddle": {
+    "station": "C-layout_praddle"
+   },
+   "nlp_praddle": {
+    "station": "C-nlp_praddle"
+   },
+   "lessons_lock": {
+    "station": "C-lessons_lock"
+   },
+   "step_matrix": {
+    "station": "C-step_matrix"
+   },
+   "github_panorama": {
+    "station": "C-github_panorama"
+   },
+   "tw02_parser": {
+    "station": "C-tw02_parser"
+   },
+   "first_page_engine": {
+    "station": "C-first_page_engine"
+   },
+   "engine_params": {
+    "station": "C-engine_params"
+   },
+   "vdf_engine_params": {
+    "station": "C-vdf_engine_params"
+   },
+   "vrn_engine_params": {
+    "station": "C-vrn_engine_params"
+   },
+   "engine_tools": {
+    "station": "C-engine_tools"
+   },
+   "tool_activate_ocr": {
+    "station": "C-tool_activate_ocr"
+   },
+   "numbering_optional": {
+    "station": "C-numbering_optional"
+   },
+   "nlp_optional": {
+    "station": "C-nlp_optional"
+   },
+   "qg_onebridge": {
+    "station": "QG-VDF_ENG086_QuantGuardOneBridge"
+   },
+   "usmacro_probe": {
+    "station": "QG-VDF_ENG110_USMacroProbe"
+   },
+   "forward_vintage": {
+    "station": "QG-VDF_ENG117_ForwardVintage"
+   },
+   "forward_vintage_door": {
+    "station": "QG-VDF_ENG117_ForwardVintageDoor"
+   },
+   "numbering_verbs": {
+    "station": "C-numbering_verbs"
+   },
+   "vdf_unknown_verb": {
+    "station": "C-vdf_unknown_verb"
+   },
+   "vrn_unknown_verb": {
+    "station": "C-vrn_unknown_verb"
+   },
+   "vdf_fetch_verb": {
+    "station": "C-vdf_fetch_verb"
+   },
+   "vdf_fetch_system": {
+    "station": "C-vdf_fetch_system"
+   },
+   "vdf_fetch_integration": {
+    "station": "C-vdf_fetch_integration"
+   },
+   "network_lock_seat": {
+    "station": "C-network_lock_seat"
+   },
+   "bundle_tool": {
+    "station": "C-bundle_tool"
+   },
+   "vdf_master_control": {
+    "station": "C-vdf_master_control"
+   },
+   "vdf_fetch_v0101": {
+    "station": "C-vdf_fetch_v0101"
+   },
+   "vdf_list_stock": {
+    "station": "C-vdf_list_stock"
+   },
+   "vdf_list_etf": {
+    "station": "C-vdf_list_etf"
+   },
+   "vdf_akshare_card": {
+    "station": "C-vdf_akshare_card"
+   },
+   "vdf_list_stock_v0101": {
+    "station": "C-vdf_list_stock_v0101"
+   },
+   "vdf_fetch_v0102": {
+    "station": "C-vdf_fetch_v0102"
+   },
+   "bundle_tool_v0101": {
+    "station": "C-bundle_tool_v0101"
+   },
+   "vdf_fetch_fill": {
+    "station": "C-vdf_fetch_fill"
+   },
+   "vdf_list_stock_v0102": {
+    "station": "C-vdf_list_stock_v0102"
+   },
+   "vdf_fetch_v0104": {
+    "station": "C-vdf_fetch_v0104"
+   },
+   "sweeper_v0110": {
+    "station": "C-sweeper_v0110"
+   },
+   "tool_probe_v0106": {
+    "station": "C-tool_probe_v0106"
+   },
+   "version_panorama_loader": {
+    "station": "C-version_panorama_loader"
+   }
+  },
+  "workflow": {
+   "VCGC-WKF001-STP001": {
+    "station": "E-operator-console"
+   },
+   "VCGC-WKF001-STP002": {
+    "station": "V-status"
+   },
+   "VCGC-WKF001-STP003": {
+    "station": "C-token"
+   },
+   "VCGC-WKF001-STP004": {
+    "station": "E-envmanager"
+   },
+   "VCGC-WKF001-STP005": {
+    "station": "V-registry-sync"
+   },
+   "VCGC-WKF001-STP006": {
+    "station": "E-talib-scan"
+   },
+   "VCGC-WKF001-STP007": {
+    "station": "V-ssot-panorama"
+   },
+   "VCGC-WKF001-STP008": {
+    "exempt": "這一步就是本流程(CGC_MDL224 test);由 C-chain 自測站與本冊站表驗"
+   },
+   "VCGC-WKF002-STP001": {
+    "station": "E-operator-console"
+   },
+   "VCGC-WKF002-STP002": {
+    "station": "E-pathverify"
+   },
+   "VCGC-WKF002-STP003": {
+    "station": "E-lessons"
+   },
+   "VCGC-WKF002-STP004": {
+    "station": "P-entry"
+   },
+   "VCGC-WKF003-STP001": {
+    "station": "C-token"
+   },
+   "VCGC-WKF003-STP002": {
+    "station": "V-status"
+   },
+   "VCGC-WKF003-STP003": {
+    "station": "E-bridge-sweeper"
+   },
+   "VCGC-WKF003-STP004": {
+    "station": "C-entry"
+   },
+   "VCGC-WKF003-STP005": {
+    "station": "V-registry-sync"
+   },
+   "VCGC-WKF003-STP006": {
+    "station": "E-number-audit"
+   },
+   "VCGC-WKF003-STP007": {
+    "station": "V-sdd"
+   },
+   "VCGC-WKF003-STP008": {
+    "station": "E-lessons"
+   },
+   "VCGC-WKF003-STP009": {
+    "exempt": "git commit · push · PR · merge 是 AI / 操作員的手,不在自動串測裡(CI 跑同一批檢查)"
+   },
+   "VCGC-WKF004-STP001": {
+    "station": "V-sdd"
+   },
+   "VCGC-WKF004-STP002": {
+    "station": "C-sdd",
+    "note": "real 要整輪事件;自測驗"
+   },
+   "VCGC-WKF004-STP003": {
+    "station": "C-sdd",
+    "note": "lock --apply 寫燈鎖冊;自測驗,不直接跑"
+   },
+   "VCGC-WKF004-STP004": {
+    "station": "C-sdd",
+    "note": "closeout 寫報告;自測驗,不直接跑"
+   },
+   "VCGC-WKF005-STP001": {
+    "station": "I-via_functional_acceptance"
+   },
+   "VCGC-WKF006-STP001": {
+    "station": "I-via_ssot_autocode"
+   },
+   "VCGC-WKF007-STP001": {
+    "station": "I-via_accelerator_control"
+   },
+   "VCGC-WKF008-STP001": {
+    "station": "I-via_unique_entry_control"
+   },
+   "VCGC-WKF008-STP002": {
+    "station": "I-vrn_dispatch"
+   },
+   "VCGC-WKF008-STP003": {
+    "station": "I-vdf_dispatch"
+   },
+   "VCGC-WKF008-STP004": {
+    "station": "I-quantguard_dispatch"
+   },
+   "VCGC-WKF009-STP001": {
+    "station": "I-via_unique_entry_control"
+   },
+   "VCGC-WKF009-STP002": {
+    "station": "I-via_panorama_audit"
+   },
+   "VCGC-WKF010-STP001": {
+    "station": "I-via_unified_nlp"
+   },
+   "VCGC-WKF010-STP002": {
+    "station": "I-vrn_nlp_vrn_vdf_pipeline"
+   },
+   "VCGC-WKF011-STP001": {
+    "station": "V-handoff-check"
+   },
+   "VCGC-WKF011-STP002": {
+    "station": "C-handoff"
+   },
+   "VCGC-WKF011-STP003": {
+    "station": "C-handoff",
+    "note": "checkpoint 寫快照;自測驗"
+   },
+   "VCGC-WKF012-STP001": {
+    "station": "C-monitor",
+    "note": "scan 由自測驗(假倉 · 只讀 · mtime 不變)"
+   },
+   "VCGC-WKF012-STP002": {
+    "station": "C-monitor",
+    "note": "watch / dashboard 由自測驗(背景單例 · 閒置自停)"
+   },
+   "VCGC-WKF012-STP003": {
+    "station": "C-monitor",
+    "note": "sync 探針由自測驗(不碰真 VCGC);實探針會跑 VCGC,不放串測"
+   },
+   "VCGC-WKF012-STP004": {
+    "station": "V-monitor",
+    "note": "monitor lessons 乾跑卡"
+   },
+   "VCGC-WKF012-STP005": {
+    "station": "C-monitor",
+    "note": "交接閘由自測驗(綠 / 黃 / 紅 · 同步 GitHub)"
+   },
+   "VCGC-WKF012-STP006": {
+    "station": "V-closeout",
+    "note": "closeout 乾跑(--skip-tests);--apply / --push 由 v0182 自測驗"
+   },
+   "VCGC-WKF012-STP007": {
+    "station": "V-gate",
+    "note": "全探針 / 分類 / 帳只增由 v0185 自測驗"
+   },
+   "VCGC-WKF012-STP008": {
+    "station": "V-link",
+    "note": "--apply 寫新版冊由 v0185 自測驗(暫存夾)"
+   },
+   "VCGC-WKF012-STP009": {
+    "station": "V-guard",
+    "note": "擋下 / 放行 / 越界由 v0186 自測驗"
+   },
+   "VCGC-WKF012-STP010": {
+    "station": "V-exec"
+   },
+   "VCGC-WKF013-STP001": {
+    "station": "QG-VDF_ENG086_QuantGuardOneBridge"
+   },
+   "VCGC-WKF013-STP002": {
+    "station": "QG-CGC_MDL237_NumberingSystem"
+   },
+   "VCGC-WKF013-STP003": {
+    "station": "QG-VDF_ENG117_ForwardVintage"
+   },
+   "VCGC-WKF013-STP004": {
+    "station": "QG-VDF_ENG117_ForwardVintageDoor"
+   },
+   "VCGC-WKF013-STP005": {
+    "station": "QG-VDF_ENG110_USMacroProbe"
+   },
+   "VCGC-WKF014-STP001": {
+    "station": "QG-CGC_MDL237_NumberingSystem"
+   },
+   "VCGC-WKF015-STP001": {
+    "station": "L1-local-selftest"
+   },
+   "VCGC-WKF016-STP001": {
+    "station": "QG-CGC_MDL237_NumberingSystem",
+    "note": "單入口 manager sync 由 CGC_MDL237 尾版自測驗(v0116 起可選依賴缺件不崩)"
+   }
+  },
+  "ps": {
+   "operator_console": {
+    "station": "P-entry"
+   },
+   "step1_sync_lkgc": {
+    "station": "P-step1"
+   }
+  }
+ },
+ "selftest_exempt": {
+  "CGC_MDL064_SelftestGrid": "整張格子會重寫已追蹤檔(CLAUDE.md;單站用 --only)"
+ },
+ "bridge_exempt": {},
+ "why_v0101": "側線 2026-09-30 b 第三段(操作員令「收尾VCGC」):交接冊新增案 backup(CGC_MDL221_SystemBackup --selftest,Z286 修正 v0101 的收據)→ 覆蓋登錄指到既有站 L-backup(同一支自測,不另開站);其餘站與覆蓋一字不動",
+ "why_v0102": "側線 2026-09-30 b 第四段(VCGC-REQ086):交接新案 fullcheck → 新站 C-fullcheck(CGC_MDL248_FullCheck --selftest);其餘一字不動",
+ "why_v0103": "側線 2026-09-30 b 第四段(VCGC-REQ087):交接新案 deck → 新站 C-deck(CGC_MDL095_DeckServer --selftest);其餘一字不動",
+ "why_v0104": "R34(操作員 2026-09-30「將 PANORAMA 為第一步啟動監控 VCGC-VDF-VRN」):交接新案 via_panorama → 新站 C-via_panorama(VIA_Panorama --selftest;v0103 monitor / first);其餘一字不動；交接新案 dataframe_lock → 新站 C-dataframe_lock(CGC_MDL249)；交接新案 vdf_lists · vdf_etf_metrics · vrn_ssot_consistency → 新站 C-*(R34 VDF / VRN 兩線)；R34 重號授權:交接新案 synonym_union_r34 · numbering_dup_r34 → 新站 C-*(CGC_MDL176 v0103 · CGC_MDL237 v0111)",
+ "why_v0105": "R35(操作員 2026-09-30):交接新案 vrn_docclass · template_sync → 新站 C-vrn_docclass(VRN_ENG393)· C-template_sync(CGC_MDL241 v0101);PS 入口尾版 v0110(-ShutdownWhenDone)沿用 P-entry 站;其餘一字不動",
+ "why_v0106": "R35b(工作站 2026-10-01 via-closeout vrn 實錄 QC 紅 8):交接新案 vrn_fourpoint → 新站 C-vrn_fourpoint(VRN_ENG080 v0111);其餘一字不動",
+ "why_v0107": "R35d(工作站 2026-10-01 git pull 被兩本帳本擋住):交接新案 ledger_union · merge_medic → 新站 C-*(CGC_MDL250 v0100 · CGC_MDL143 v0105);其餘一字不動",
+ "why_v0108": "R36(VRN-REQ010 版面還原 · VRN-REQ011 評價方法 SSOT):交接新案 vrn_layout · vrn_valuation → 新站 C-vrn_layout(VRN_ENG394 v0100)· C-vrn_valuation(VRN_ENG395 v0100);其餘一字不動",
+ "why_v0109": "R36d(VRN-REQ013):交接新案 field_rulers → 新站 C-field_rulers(CGC_MDL182 v0101);其餘一字不動",
+ "why_v0110": "R36e(VRN-REQ014):交接新案 vrn_entities → 新站 C-vrn_entities(VRN_ENG396 v0100);其餘一字不動",
+ "why_v0111": "R37(VRN-REQ016):交接新案 vrn_plugin_hub → 新站 C-vrn_plugin_hub(VRN_ENG397 v0100);其餘一字不動",
+ "why_v0112": "R37c(VCGC-REQ092):交接新案 tool_coverage_matrix → 新站 C-tool_coverage_matrix(CGC_MDL230 v0102);其餘一字不動",
+ "why_v0113": "R39(VCGC-REQ094):交接新案 vdf_chain_runner → 新站 C-vdf_chain_runner(CGC_MDL170 v0104);其餘一字不動",
+ "why_v0114": "R40(VCGC-REQ094):交接新案 vdf_local_db → 新站 C-vdf_local_db(VDF_ENG079 v0105);VCGC v0181 只換盤點快取鑰,動詞 / 席位不變;其餘一字不動",
+ "why_v0115": "R41(VCGC-REQ097):交接新案 progress_journal → 新站 C-progress_journal(CGC_MDL251 v0100);其餘一字不動",
+ "why_v0116": "R42(VCGC-REQ098):交接新案 vrn_chain_runner → 新站 C-vrn_chain_runner(CGC_MDL172 v0108);vdf_chain_runner 案隨尾版 v0105;其餘一字不動",
+ "why_v0117": "R43(VCGC-REQ099):交接新案 env_manager · vrn_firstpage_bridge → 新站 C-env_manager(CGC_MDL240 v0101)· C-vrn_firstpage_bridge(VRN_ENG086 v0119);其餘一字不動",
+ "why_v0118": "PR #412 合併 main:側線盤點冊 v0104–v0106(與 main 同號)不帶入;把側線增的三站 V-monitor · V-closeout · C-monitor、coverage verb.monitor / verb.closeout / case.monitor、工作流 VCGC-WKF012 STP001–006 疊在 main v0117 上;VCGC 版號改 v0182–v0184(原側線 v0181–v0183);其餘一字不動",
+ "why_v0119": "R46(VDF-REQ015):交接新案五條(VDF 逐支自測修好的五支尾版)→ 新站 C-vdf_*;其餘一字不動",
+ "why_v0120": "PR #415 合併 main:側線盤點冊 v0119(與 main v0119 同號)不帶入;VCGC v0185 新動詞 gate · link → 站 V-gate(只點兩探針的乾跑)· V-link(乾跑);coverage WKF012 STP007 / STP008 疊在 main v0119 上;其餘一字不動",
+ "why_v0121": "VCGC v0186 新動詞 guard · exec → 新站 V-guard(乾跑)· V-exec(唯讀);coverage WKF012 STP009 / STP010;其餘一字不動",
+ "why_v0122": "R49:+C-vdf_universe(VDF_SystemManager v0121 universe 動詞)+C-vdf_index_official(VDF_ENG232)(VDF-REQ016)(側線原 v0121 與 main v0121 撞號 → 改本版)",
+ "why_v0123": "R50:+C-vdf_universe_r50 · C-vdf_index_incr · C-vrn_outputs · C-manager_parity(VDF-REQ017);其餘一字不動(只增)",
+ "why_v0124": "R51b:+C-etf_registry_resolve(FLOW_ENG023 v0101,VDF-REQ014);VCGC v0187 只修 run 的引擎路徑解析(檔路徑轉絕對 · stem 多找 FlowSystem 引擎夾),動詞 / 席位不變;其餘一字不動(只增)",
+ "why_v0125": "R51c:+C-ticker_regex_scope(CGC_MDL185 v0101,VCGC-REQ110);其餘一字不動(只增)",
+ "why_v0126": "PR #419(VRN ENG115 HeaderFrameTemp)新交接案 vrn_header_frame → 新站 C-vrn_header_frame + coverage.case;其餘一字不動",
+ "why_v0127": "側線 2026-10-02(VCGC-REQ116):交接新案 tooling → 新站 C-tooling(CGC_MDL253 v0100)+ coverage.case;其餘一字不動(只增)",
+ "why_v0128": "側線 2026-10-02(VCGC-REQ117):交接新案 vdf_engine · vrn_engine → 新站 C-vdf_engine · C-vrn_engine;其餘一字不動(只增)",
+ "why_v0129": "側線 2026-10-02(VCGC-REQ122):交接新案 onepage → 新站 C-onepage;其餘一字不動(只增)",
+ "why_v0130": "側線 2026-10-02 b(VCGC-REQ124):交接新案 sweeper → 新站 C-sweeper(站冊 + 交接案對應);其餘一字不動(只增)",
+ "why_v0131": "側線 2026-10-02 c(VCGC-REQ126):交接新案 ppp_hub → 新站 C-ppp_hub(站冊 + 交接案對應);其餘一字不動(只增)",
+ "why_v0132": "側線 2026-10-02 d(VCGC-REQ127):交接新案 daily_handover → 新站 C-daily_handover(CGC_MDL140 v0104 --selftest-tail;每日進度交接十點)+ coverage.case;其餘一字不動(只增)",
+ "why_v0133": "PR #434 合併 main:main 的 v0132 = PR #435(每日交接站),側線也出了 v0132(同號異義)→ main 的 v0132 一字不動;側線站改登本版:+C-praddle · C-ocr_super_boxes · C-layout_praddle · C-nlp_praddle · C-lessons_lock(站冊 + 交接案對應);V-systems 加 yellow_rc [2](系統卡 rc 2 = STALE/NODATA 依設計是黃)",
+ "why_v0134": "VCGC-REQ131:+C-step_matrix(交接案 step_matrix · CGC_MDL226 v0103 步 4–8 真量);其餘一字不動",
+ "why_v0135": "側線 2026-10-03:交接閘「未登 2 支」→ +C-github_panorama(CGC_MDL255 v0101 --selftest;AI 讀 GitHub 全景與 union 聯集)· +P-step1(Invoke-VIA-Step1-SyncAndLKGC.ps1 語法 + 兩章;L106)+ coverage.case / coverage.ps;其餘一字不動(只增)",
+ "why_v0136": "VCGC-REQ132(側線 2026-10-03 b):P-step1 deps 改 glob Invoke-VIA-Step1-SyncAndLKGC*.ps1(新版 -v0101 帶 L103 模板兩章,TestAuto v0105 取最新版號那支驗)· +C-tw02_parser · +C-first_page_engine(交接冊補案 tw02_parser / first_page_engine 的站 + coverage.case);其餘一字不動(只增)",
+ "why_v0137": "VCGC-REQ133(側線 2026-10-03 d):+C-engine_params · +C-vdf_engine_params · +C-vrn_engine_params(交接冊新三案的站 + coverage.case);其餘一字不動(只增)",
+ "why_v0138": "VCGC-REQ134(側線 2026-10-03 e):+C-engine_tools · +C-tool_activate_ocr(交接冊新兩案的站 + coverage.case);其餘一字不動(只增)",
+ "why_v0142": "PR #439 冊 v0139 順延為 v0142(main / 側線已發 v0136–v0138):併入 #439 的站 QG-VDF_ENG086_QuantGuardOneBridge · QG-CGC_MDL237_NumberingSystem · QG-VDF_ENG117_ForwardVintage · QG-VDF_ENG117_ForwardVintageDoor · QG-VDF_ENG110_USMacroProbe · SSOT-assets-plan · SSOT-assets-view · L1-local-selftest · L1-local-tools · coverage workflow:VCGC-WKF013-STP001,VCGC-WKF013-STP002,VCGC-WKF013-STP003,VCGC-WKF013-STP004,VCGC-WKF013-STP005,VCGC-WKF014-STP001,VCGC-WKF015-STP001;需求碼 132→136 · 133→137 · 134→138;其餘照本側 v0138",
+ "why_v0143": "VCGC-REQ139:+coverage.workflow VCGC-WKF016-STP001 → QG-CGC_MDL237_NumberingSystem(#439 工作流冊 v0117 新步)· +C-numbering_optional · +C-nlp_optional;其餘一字不動(只增)",
+ "why_v0144": "VCGC-REQ139:交接冊補 #439 四支 VDF 引擎的案(qg_onebridge · usmacro_probe · forward_vintage · forward_vintage_door)→ 對回 #439 已登的 QG-* 站;其餘一字不動(只增)",
+ "why_v0145": "2026-10-03 交接案 +8(REQ140 語意錯誤第一輪 · REQ141 VDF 獨立擷取系統與網路鎖版 · REQ142 子系統下載包)各補一站",
+ "why_v0146": "REQ143 交接案 +4 各一站;vdf_fetch_integration 改由 VDF 總控跑(v0101 整合測試)",
+ "why_v0147": "MDL011 接線卡一站;整合測試站相依收窄到冊上 25 支 ENG(不再用 VDF_ENG*.py 假覆蓋 ENG086)",
+ "why_v0148": "PR #442 審查:網路鎖版改由 SUP_MDL737 v0110 導向(凍結檔原樣),交接站同步",
+ "why_v0149": "VCGC-REQ144 / REQ145:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 · vdf_fetch_fill 各一站 + coverage.case;其餘一字不動(只增)",
+ "why_v0150": "VCGC-REQ146:交接新案 5 條(MDL009 v0102 · MDL008 v0104 · 掃橋器 v0110 · 覆蓋探針 v0106 · 版本全景載入器)各一站 + PS 站 P-vdf_fill(Invoke-VDF-FetchFill 章字;PS 入口覆蓋只認主控台 / Step1 兩支,本站不另立入口鍵);其餘一字不動(只增)"
+}
