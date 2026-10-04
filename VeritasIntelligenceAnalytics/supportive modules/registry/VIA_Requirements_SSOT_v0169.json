@@ -4780,7 +4780,7 @@
     "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0151.json"
    ],
-   "evidence": "MDL008 v0105(薄尾 v0104):urllib.request.urlopen 改走鎖版網路工具(GET→http_bytes · 帶 data→post_json · 非 OK→HTTPError · DENY→URLError)· requests 經 _TL.inside 不重算 · yfinance download/Ticker/Tickers 計數(FIX_STATS requests/yf/net);子行程 output_hub 歸位到 --home(compile_engine · SourceFileLoader.get_code · builtins.compile 三處 AST 改寫);nodata_markers(rc 0 + 標記 → rc 2,MDL011 不再假綠);冊 v0104:e054 指 v0109 真回補工人(v0110/v0111 只是狀態卡)· e056/e057/e063 需 e054。自測 v0105 10/10 · 整鏈 PASS。容器實抓:MDL001–007 OK;TWSE OpenAPI 對容器 IP 回 WAF 頁(009/010/e055tw);Yahoo 429;e054 TPEX 892 檔 +586,004 列;FRED 無金鑰 rc 2。SDD 自測:ENG073 / ENG072 失敗根因 = 容器缺 pydantic / pdfplumber(補裝後 64/64 · 56/56)。",
+   "evidence": "MDL008 v0105(薄尾 v0104):urllib.request.urlopen 改走鎖版網路工具(GET→http_bytes · 帶 data→post_json · 非 OK→HTTPError · DENY→URLError)· requests 經 _TL.inside 不重算 · yfinance download/Ticker/Tickers 計數(FIX_STATS requests/yf/net);子行程 output_hub 歸位到 --home(compile_engine · SourceFileLoader.get_code · builtins.compile 三處 AST 改寫);nodata_markers(rc 0 + 標記 → rc 2,MDL011 不再假綠);冊 v0104:e054 指 v0109 真回補工人(v0110/v0111 只是狀態卡)· e056/e057/e063 需 e054。自測 v0105 10/10 · 整鏈 PASS。容器實抓:MDL001–007 OK;TWSE OpenAPI 對容器 IP 回 WAF 頁(009/010/e055tw);Yahoo 429;e054 TPEX 892 檔 +586,004 列;FRED 無金鑰 rc 2。SDD 自測:ENG073 / ENG072 失敗根因 = 容器缺 pydantic / pdfplumber(補裝後 64/64 · 56/56)。 整合測試(fetch test)在 akshare 1.19.1 裝上後紅:MDL003 fixture rc 1(v0100 curl_cffi 封口每個屬性都是函式,akshare import 時讀 curl_requests.Session 即炸;v0104 同紅)· MDL011 block params 無註冊表 KeyError → MDL008 v0106(封口改拒絕類別:屬性可取、呼叫才擋)· MDL011 v0101(無註冊表 = NODATA rc 2)· 冊 v0105;整合測試 PASS(輸出 23/23 · 倉內寫入 0)。",
    "next": "① 工作站實抓(cd via_01_vdf\\VeritasIntelligenceAnalytics;用 python 不用 py -3;雙閘本視窗設)② FRED_API_KEY ③ MDL011 default_selection ④ first_page_engine ㊳ 要工作站 ≥20 份真 sidecar",
    "hand": "操作員(工作站實抓 · 金鑰 · 選股檔 · sidecar)/ AI",
    "quotes": [
@@ -4803,7 +4803,10 @@
    ],
    "modules": [
     "VDF_MDL008_FetchSystem_v0105.py",
-    "VDF_FetchSystem_SSOT_v0104.json"
+    "VDF_FetchSystem_SSOT_v0104.json",
+    "VDF_MDL008_FetchSystem_v0106.py",
+    "VDF_MDL011_AkshareFetcher_v0101.py",
+    "VDF_FetchSystem_SSOT_v0105.json"
    ]
   }
  ],
@@ -4968,5 +4971,5 @@
  "why_v0166": "PR #442 審查三條 P1:凍結檔還原 + 鎖版改新版導向 · v0116/v0117 還原 · 下載包依賴清單與 preflight",
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
- "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動"
+ "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動"
 }

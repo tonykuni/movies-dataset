@@ -1,0 +1,1133 @@
+{
+ "schema": "VIA.VDF.FetchSystem.v1",
+ "version": "v0105",
+ "ts": "2026-10-04",
+ "owner": "VDF_SystemManager",
+ "rule": "VDF 只留擷取與建庫;MDL001–099 = 核心擷取引擎(VDF_MDL000_README.md 2026-06-04 編號表)。原件凍結不改,系統層在記憶體改寫舊佈局路徑、統一同意閘、統一輸出根。",
+ "source_readme": "functional modules/VDF/VDF_MDL000_README.md",
+ "home_env": "VIA_VDF_FETCH_HOME",
+ "home_default": "VIA_Reports/vdf_fetch/dict",
+ "legacy_prefixes": [
+  "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VDF\\dict",
+  "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\dict"
+ ],
+ "gate": {
+  "live": "VIA_NET_CONSENT=YES(操作員設;系統只讀)",
+  "fixture": "離線樣本網(整合測試)",
+  "block": "全封"
+ },
+ "engines": [
+  {
+   "id": "009",
+   "mdl": "MDL009",
+   "file": "VDF_MDL009_TWStockList_v0102.py",
+   "role": "第一步 ① 全台股清單(TWSE + TPEX OpenAPI · SSOT 代碼律 · 年區代碼 2021–2030 經中英文名稱局部識別核對、真股票不刪 · 開頭五欄 · 驗證八項)",
+   "needs": [],
+   "run_args": [
+    "run"
+   ],
+   "fetch_functions": [
+    {
+     "name": "fetch_json_v0100",
+     "line": 112
+    }
+   ],
+   "outputs": [
+    {
+     "path": "0-1-TWStockList/tw_stock_list_latest.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "0-1-TWStockList/verify_report.json",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": false,
+   "kind": "MDL",
+   "group": "TWSE/TPEX",
+   "doc": "VDF_MDL009_TWStockList v0102 — 薄尾:網路工具橋補成 AST 真橋(模組層 VIA_NET_TOOL_PATH + def _via_net())",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "010",
+   "mdl": "MDL010",
+   "file": "VDF_MDL010_ActiveETFList_v0100.py",
+   "role": "第一步 ② 主動式 ETF 清單(t187ap47_L · ENG077 代碼律 / 揭露律 · 開頭五欄 · 驗證七項)",
+   "needs": [],
+   "run_args": [
+    "run"
+   ],
+   "fetch_functions": [
+    {
+     "name": "collect",
+     "line": 113
+    }
+   ],
+   "outputs": [
+    {
+     "path": "0-2-ActiveETFList/active_etf_list_latest.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "0-2-ActiveETFList/verify_report.json",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": false,
+   "kind": "MDL",
+   "group": "TWSE/TPEX",
+   "doc": "VDF_MDL010_ActiveETFList v0100 — 擷取第一步 ②:主動式台股 ETF 清單(自動生成 · 驗證過 · 所有資料庫的開頭)",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "001u",
+   "mdl": "MDL001",
+   "file": "VDF_MDL001_TWUniverseVerify_sha67ef6fce.py",
+   "role": "台股 universe · TWSE/TPEX OpenAPI 抓清單 + SSOT regex 驗證",
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 168
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-0-TWUniverse/tw_universe_combined.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/twse_universe.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/tpex_universe.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-0-TWUniverse/verify_report.json",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "TWSE/TPEX",
+   "doc": "MDL001 台股 universe · TWSE/TPEX OpenAPI 抓清單 + SSOT regex 驗證(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "002",
+   "mdl": "MDL002",
+   "file": "VDF_MDL002_YFinanceFetchingEngine_v0100.py",
+   "role": "YFinance 175 tickers / 19 groups 日線(增量)",
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_single_v5",
+     "line": 1210
+    },
+    {
+     "name": "_fetch_batch_v17",
+     "line": 1231
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-3-YFinanceUniverse/YFinanceData.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "YFINANCE",
+   "doc": "MDL002 YFinance 175 tickers / 19 groups 日線(增量)(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "003",
+   "mdl": "MDL003",
+   "file": "VDF_MDL003_SentimentMacroEngine_v0100.py",
+   "role": "AAII · CNN F&G · FRED · AKShare 情緒與總經",
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 566
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-4-SentimentMacro/cnn_fear_greed.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "FED",
+   "doc": "MDL003 AAII · CNN F&G · FRED · AKShare 情緒與總經(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture",
+   "group_also": [
+    "OTHERS",
+    "AKSHARE"
+   ]
+  },
+  {
+   "id": "004",
+   "mdl": "MDL004",
+   "file": "VDF_MDL004_TWFullMarketEngine_v0100.py",
+   "role": "台股全市場日線 · SMA · 量 · 市值 · consensus",
+   "needs": [
+    "001u",
+    "009",
+    "010"
+   ],
+   "run_args": [],
+   "fetch_functions": [
+    {
+     "name": "_net_json",
+     "line": 322
+    },
+    {
+     "name": "_fetch_batch",
+     "line": 510
+    },
+    {
+     "name": "_fetch_one",
+     "line": 596
+    },
+    {
+     "name": "_fetch_via_net",
+     "line": 643
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-4-TWFullMarket/tw_fullmarket_snapshot.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/raw_quote.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/sma_avgvol_mcap.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-4-TWFullMarket/yf_consensus.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "TWSE/TPEX",
+   "doc": "MDL004 台股全市場日線 · SMA · 量 · 市值 · consensus(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture",
+   "group_also": [
+    "YFINANCE"
+   ]
+  },
+  {
+   "id": "005",
+   "mdl": "MDL005",
+   "file": "VDF_MDL005_TWStockFilter_sha49861a44.py",
+   "role": "consensus · upside · PER · 殖利率(個股擷取)",
+   "needs": [
+    "001u",
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_one",
+     "line": 248
+    },
+    {
+     "name": "_fetch_one",
+     "line": 402
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-5-TWStockFilter/stock_filter_consensus.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "YFINANCE",
+   "doc": "MDL005 consensus · upside · PER · 殖利率(個股擷取)(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "006",
+   "mdl": "MDL006",
+   "file": "VDF_MDL006_FinancialModel_v0100.py",
+   "role": "三大報表(年 / 季)· PE/PB band 原始值",
+   "needs": [
+    "001u",
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause",
+    "--no-charts"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_fetch_one",
+     "line": 421
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-6-FinancialModel/income_statement_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/balance_sheet_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/cashflow_annual.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/income_statement_quarterly.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/daily_history.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-6-FinancialModel/valuation_snapshot.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "YFINANCE",
+   "doc": "MDL006 三大報表(年 / 季)· PE/PB band 原始值(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture"
+  },
+  {
+   "id": "007",
+   "mdl": "MDL007",
+   "file": "VDF_MDL007_SSOTResolver.py",
+   "role": "TWSE/TPEX/MOPS/YF 四源個股解析(_v0100 薄尾的本體;薄尾 main 不分自測動詞,系統直跑本體)",
+   "needs": [
+    "001u",
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--no-pause"
+   ],
+   "fetch_functions": [
+    {
+     "name": "_http_get",
+     "line": 326
+    },
+    {
+     "name": "fetch_one",
+     "line": 722
+    }
+   ],
+   "outputs": [
+    {
+     "path": "1-7-SSOTResolver/ssot_resolved.parquet",
+     "min_rows": 1
+    },
+    {
+     "path": "1-7-SSOTResolver/parse_log.parquet",
+     "min_rows": 1
+    }
+   ],
+   "legacy_paths": true,
+   "kind": "MDL",
+   "group": "TWSE/TPEX",
+   "doc": "MDL007 TWSE/TPEX/MOPS/YF 四源個股解析(_v0100 薄尾的本體;薄尾 main 不分自測動詞,系統直跑本體)(說明注入:VDF_MDL000_README 2026-06-04 編號表)",
+   "test_mode": "fixture",
+   "group_also": [
+    "YFINANCE"
+   ]
+  },
+  {
+   "id": "011",
+   "mdl": "MDL011",
+   "kind": "MDL",
+   "group": "AKSHARE",
+   "file": "VDF_MDL011_AkshareFetcher_v0101.py",
+   "doc": "VDF_MDL011_AkshareFetcher v0101 — 薄尾:參數矩陣在註冊表還沒建立時誠實回 NODATA(rc 2),不再 KeyError",
+   "role": "AkShare 全域擷取 VAKE v0200(AST 盤點 akshare 函式 · 參數分類 · 僅增 parquet 分片 · DuckDB 目錄 / 視圖 · 每日增量 schedule-run)",
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "schedule-run"
+   ],
+   "test_args": [
+    "params"
+   ],
+   "test_mode": "block",
+   "requires": [
+    "akshare",
+    "polars",
+    "duckdb"
+   ],
+   "env": {
+    "VAKE_ROOT": "{home}/vake"
+   },
+   "origin_sha256": "c158aa33cc25dc9e00cf8ad9f2ce4b25db2f94b3ac33e40f61ebbb8e66c34c9d",
+   "fetch_functions": [
+    {
+     "name": "cmd_params_v0101",
+     "line": 85
+    },
+    {
+     "name": "main",
+     "line": 97
+    }
+   ],
+   "outputs": [],
+   "legacy_paths": false,
+   "nodata_markers": [
+    "no default_selection.json yet"
+   ],
+   "prior_file": "VDF_MDL011_AkshareFetcher_v0100.py"
+  },
+  {
+   "id": "e054",
+   "mdl": "ENG054_TWDailyBackfill",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG054_TWDailyBackfill_v0109.py",
+   "doc": "VDF_ENG054_TWDailyBackfill v0109 — 台股全市場日線回補工人(v0110 / v0111 是唯讀狀態卡,main 只做門檢不回補;擷取冊指向真回補工人)",
+   "role": "TWDailyBackfill(舊模組;表 tw_daily_prices, tw_listings)",
+   "tables": [
+    "tw_daily_prices",
+    "tw_listings"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [
+    {
+     "name": "fetch_listings",
+     "line": 219
+    },
+    {
+     "name": "fetch_etf_listings",
+     "line": 280
+    },
+    {
+     "name": "_fetch_group",
+     "line": 392
+    },
+    {
+     "name": "run",
+     "line": 427
+    }
+   ],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e055tw",
+   "mdl": "ENG055_OmniFetch",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG055_OmniFetch_v0122.py",
+   "doc": "VDF_ENG055_OmniFetch tail v0122. 本體與 ScrapeGate 改照尾版律取(不再字串釘死版號)。",
+   "role": "OmniFetch(舊模組;表 cross_macro, etf_book, etf_stats_daily, factset_earnings, global_daily, index_valuation_proxy, sentiment_daily, tw_daytrade_eligible, tw_daytrade_market, tw_listings_industry, tw_rates_cbc, tw_trading_daily, tw_valuation_daily, us_macro)",
+   "tables": [
+    "cross_macro",
+    "etf_book",
+    "etf_stats_daily",
+    "factset_earnings",
+    "global_daily",
+    "index_valuation_proxy",
+    "sentiment_daily",
+    "tw_daytrade_eligible",
+    "tw_daytrade_market",
+    "tw_listings_industry",
+    "tw_rates_cbc",
+    "tw_trading_daily",
+    "tw_valuation_daily",
+    "us_macro"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--lane",
+    "L1,L2,L3,L4,L12,L15"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e055yf",
+   "mdl": "ENG055_OmniFetch",
+   "kind": "ENG",
+   "group": "YFINANCE",
+   "file": "engine/VDF_ENG055_OmniFetch_v0122.py",
+   "doc": "VDF_ENG055_OmniFetch tail v0122. 本體與 ScrapeGate 改照尾版律取(不再字串釘死版號)。",
+   "role": "OmniFetch(舊模組;表 cross_macro, etf_book, etf_stats_daily, factset_earnings, global_daily, index_valuation_proxy, sentiment_daily, tw_daytrade_eligible, tw_daytrade_market, tw_listings_industry, tw_rates_cbc, tw_trading_daily, tw_valuation_daily, us_macro)",
+   "tables": [
+    "cross_macro",
+    "etf_book",
+    "etf_stats_daily",
+    "factset_earnings",
+    "global_daily",
+    "index_valuation_proxy",
+    "sentiment_daily",
+    "tw_daytrade_eligible",
+    "tw_daytrade_market",
+    "tw_listings_industry",
+    "tw_rates_cbc",
+    "tw_trading_daily",
+    "tw_valuation_daily",
+    "us_macro"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--lane",
+    "L5,L6,L7"
+   ],
+   "test_args": null,
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e055fed",
+   "mdl": "ENG055_OmniFetch",
+   "kind": "ENG",
+   "group": "FED",
+   "file": "engine/VDF_ENG055_OmniFetch_v0122.py",
+   "doc": "VDF_ENG055_OmniFetch tail v0122. 本體與 ScrapeGate 改照尾版律取(不再字串釘死版號)。",
+   "role": "OmniFetch(舊模組;表 cross_macro, etf_book, etf_stats_daily, factset_earnings, global_daily, index_valuation_proxy, sentiment_daily, tw_daytrade_eligible, tw_daytrade_market, tw_listings_industry, tw_rates_cbc, tw_trading_daily, tw_valuation_daily, us_macro)",
+   "tables": [
+    "cross_macro",
+    "etf_book",
+    "etf_stats_daily",
+    "factset_earnings",
+    "global_daily",
+    "index_valuation_proxy",
+    "sentiment_daily",
+    "tw_daytrade_eligible",
+    "tw_daytrade_market",
+    "tw_listings_industry",
+    "tw_rates_cbc",
+    "tw_trading_daily",
+    "tw_valuation_daily",
+    "us_macro"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--lane",
+    "L8"
+   ],
+   "test_args": null,
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e055oth",
+   "mdl": "ENG055_OmniFetch",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG055_OmniFetch_v0122.py",
+   "doc": "VDF_ENG055_OmniFetch tail v0122. 本體與 ScrapeGate 改照尾版律取(不再字串釘死版號)。",
+   "role": "OmniFetch(舊模組;表 cross_macro, etf_book, etf_stats_daily, factset_earnings, global_daily, index_valuation_proxy, sentiment_daily, tw_daytrade_eligible, tw_daytrade_market, tw_listings_industry, tw_rates_cbc, tw_trading_daily, tw_valuation_daily, us_macro)",
+   "tables": [
+    "cross_macro",
+    "etf_book",
+    "etf_stats_daily",
+    "factset_earnings",
+    "global_daily",
+    "index_valuation_proxy",
+    "sentiment_daily",
+    "tw_daytrade_eligible",
+    "tw_daytrade_market",
+    "tw_listings_industry",
+    "tw_rates_cbc",
+    "tw_trading_daily",
+    "tw_valuation_daily",
+    "us_macro"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--lane",
+    "L9,L10,L11,L13,L14"
+   ],
+   "test_args": null,
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e056",
+   "mdl": "ENG056_ChipBackfill",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG056_ChipBackfill_v0106.py",
+   "doc": "VDF_ENG056_ChipBackfill tail. The newest file carries both bridges. v0105 still owns the scrape gate.",
+   "role": "ChipBackfill(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010",
+    "e054"
+   ],
+   "run_args": [],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e057",
+   "mdl": "ENG057_TradingValueBackfill",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG057_TradingValueBackfill_v0109.py",
+   "doc": "VDF_ENG057_TradingValueBackfill tail. The newest file carries both bridges. v0108 still owns the scrape gate.",
+   "role": "TradingValueBackfill(舊模組;表 tw_trading_daily)",
+   "tables": [
+    "tw_trading_daily"
+   ],
+   "needs": [
+    "009",
+    "010",
+    "e054"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e063",
+   "mdl": "ENG063_MonthlyRevenue",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG063_MonthlyRevenue_v0107.py",
+   "doc": "v0107（2026-09-25）：正式全名冊核對、抓前查庫、同日去重、官方優先去重分析、缺碼/逾期/source failure 不回假綠。",
+   "role": "MonthlyRevenue(舊模組;表 tw_monthly_revenue)",
+   "tables": [
+    "tw_monthly_revenue"
+   ],
+   "needs": [
+    "009",
+    "010",
+    "e054"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e075",
+   "mdl": "ENG075_MonthlyRevenueBackfill",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG075_MonthlyRevenueBackfill_v0105.py",
+   "doc": "VDF_ENG075_MonthlyRevenueBackfill tail. The newest file carries both bridges. v0104 still owns the scrape gate.",
+   "role": "MonthlyRevenueBackfill(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e077",
+   "mdl": "ENG077_ActiveETFUniverse",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+   "doc": "VDF_ENG077_ActiveETFUniverse tail v0105. 本體與 ScrapeGate 改照尾版律取(不再字串釘死版號)。",
+   "role": "ActiveETFUniverse(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e078",
+   "mdl": "ENG078_ActiveETFHoldingsHistory",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG078_ActiveETFHoldingsHistory_v0113.py",
+   "doc": "VDF_ENG078_ActiveETFHoldingsHistory tail. The newest file carries both bridges. v0111 still owns the scrape gate.",
+   "role": "ActiveETFHoldingsHistory(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "daily"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e232",
+   "mdl": "ENG232_TWIndexOfficial",
+   "kind": "ENG",
+   "group": "TWSE/TPEX",
+   "file": "engine/VDF_ENG232_TWIndexOfficial_v0101.py",
+   "doc": "VDF_ENG232_TWIndexOfficial v0101 — 薄尾:增量擷取(不給 --start = 從庫內最新日的下一天接著抓)",
+   "role": "TWIndexOfficial(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e059",
+   "mdl": "ENG059_EstimateBands",
+   "kind": "ENG",
+   "group": "YFINANCE",
+   "file": "engine/VDF_ENG059_EstimateBands_v0103.py",
+   "doc": "VDF_ENG059_EstimateBands tail. The newest file carries both bridges. v0102 still owns the scrape gate.",
+   "role": "EstimateBands(舊模組;表 analyst_estimates)",
+   "tables": [
+    "analyst_estimates"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e064",
+   "mdl": "ENG064_HistoryBackfill",
+   "kind": "ENG",
+   "group": "YFINANCE",
+   "file": "engine/VDF_ENG064_HistoryBackfill_v0113.py",
+   "doc": "VDF_ENG064_HistoryBackfill v0113 — 跨市場歷史資料回補引擎(薄尾:接 SUP_MDL755 Polars 表格層守門 · 記憶體不足轉 temp)",
+   "role": "HistoryBackfill(舊模組;表 tw_daily_prices)",
+   "tables": [
+    "tw_daily_prices"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e066",
+   "mdl": "ENG066_GlobalUniverse",
+   "kind": "ENG",
+   "group": "YFINANCE",
+   "file": "engine/VDF_ENG066_GlobalUniverse_v0102.py",
+   "doc": "VDF_ENG066_GlobalUniverse v0102 — 全球宇宙擷取引擎(批226 立;批228 P3 契約對齊)",
+   "role": "GlobalUniverse(舊模組;表 global_daily)",
+   "tables": [
+    "global_daily"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e082",
+   "mdl": "ENG082_FinStatements",
+   "kind": "ENG",
+   "group": "YFINANCE",
+   "file": "engine/VDF_ENG082_FinStatements_v0107.py",
+   "doc": "VDF_ENG082_FinStatements v0107 — 薄尾:自測的假同意代碼跟上網路工具 v0116 收緊後的第二道閘(引擎行為一字不動)",
+   "role": "FinStatements(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e074",
+   "mdl": "ENG074_FredMacroSSOT",
+   "kind": "ENG",
+   "group": "FED",
+   "file": "engine/VDF_ENG074_FredMacroSSOT_v0107.py",
+   "doc": "VDF_ENG074_FredMacroSSOT v0107 — 薄尾:自測的「今天」固定在測資寫成的月份(引擎行為一字不動)",
+   "role": "FredMacroSSOT(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e113",
+   "mdl": "ENG113_MacroMethod",
+   "kind": "ENG",
+   "group": "FED",
+   "file": "engine/VDF_ENG113_MacroMethod_v0101.py",
+   "doc": "Same Fed-method refresh. The live us_macro table has three columns; add fetched_at, do not rebuild it.",
+   "role": "MacroMethod(舊模組;表 us_macro)",
+   "tables": [
+    "us_macro"
+   ],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "--refresh"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e114",
+   "mdl": "ENG114_PmiPair",
+   "kind": "ENG",
+   "group": "AKSHARE",
+   "file": "engine/VDF_ENG114_PmiPair_v0100.py",
+   "doc": "Two PMI prints per economy that this AKShare actually has. Does not invent the rest.",
+   "role": "PmiPair(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e229",
+   "mdl": "ENG229_CNNFearGreedHistory",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG229_CNNFearGreedHistory_v0100.py",
+   "doc": "VDF_ENG229_CNNFearGreedHistory v0100 — CNN 恐懼與貪婪指數「全歷史」回補(只增不覆寫)",
+   "role": "CNNFearGreedHistory(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e230",
+   "mdl": "ENG230_ForwardValuation",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG230_ForwardValuation_v0101.py",
+   "doc": "VDF_ENG230_ForwardValuation v0101 — 薄尾:FactSet 候選表一律建表(沒候選 = 0 列,不是「冊上有、庫裡沒有」)",
+   "role": "ForwardValuation(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e115",
+   "mdl": "ENG115_SentimentFetch",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG115_SentimentFetch_v0101.py",
+   "doc": "AAII: spreadsheet first, survey page second. A block page still yields no percentages.",
+   "role": "SentimentFetch(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e116",
+   "mdl": "ENG116_AAIIWorkbook",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG116_AAIIWorkbook_v0101.py",
+   "doc": "Load the AAII workbook. Dates must be YYYY-MM-DD and numbers must be plain Python floats.",
+   "role": "AAIIWorkbook(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e088",
+   "mdl": "ENG088_ConsensusFusionBridge",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG088_ConsensusFusionBridge_v0105.py",
+   "doc": "VDF_ENG088_ConsensusFusionBridge v0105 — 薄尾:自測不再被「本境有沒有正典庫」左右(引擎行為一字不動)",
+   "role": "ConsensusFusionBridge(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "sync",
+    "--apply"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  },
+  {
+   "id": "e231",
+   "mdl": "ENG231_GlobalListings",
+   "kind": "ENG",
+   "group": "OTHERS",
+   "file": "engine/VDF_ENG231_GlobalListings_v0102.py",
+   "doc": "VDF_ENG231_GlobalListings v0102 — 每日台股清單(台股個股 + 主動式台股 ETF);美股 · 日股撤下",
+   "role": "GlobalListings(舊模組;表 —)",
+   "tables": [],
+   "needs": [
+    "009",
+    "010"
+   ],
+   "run_args": [
+    "run"
+   ],
+   "test_args": [
+    "--selftest"
+   ],
+   "test_mode": "block",
+   "fetch_functions": [],
+   "outputs": [],
+   "legacy_paths": false
+  }
+ ],
+ "note_outputs": "輸出契約 = 2026-10-03 fixture 離線網實跑七支 rc 0 後量到的主檔(parquet + 驗證報告);csv / json / duckdb 是同表副本,不另列",
+ "prior": "VDF_FetchSystem_SSOT_v0104.json",
+ "first_step": [
+  "009",
+  "010"
+ ],
+ "key_columns": [
+  "date",
+  "ticker",
+  "yf_ticker",
+  "bloomberg_ticker",
+  "name"
+ ],
+ "master": "VDF_SystemManager(總控;獨立運作,VCGC 也可呼叫)",
+ "why_v0101": "操作員 2026-10-03「產生兩個自動生成清單驗證過引擎為第一步」「改為獨立運作由 VDF SYSTEM MANAGER 總控」:MDL009 全台股 · MDL010 主動式 ETF 排第一步,MDL001–007 全部相依於它們;其他引擎依舊補上(ENG 擷取引擎 25 支,依 21 張資料庫表反查)· MDL011 AkShare VAKE · 來源五組 TWSE/TPEX · YFINANCE · FED · AKSHARE · OTHERS",
+ "groups": [
+  "TWSE/TPEX",
+  "YFINANCE",
+  "FED",
+  "AKSHARE",
+  "OTHERS"
+ ],
+ "why_v0102": "操作員 2026-10-03「要經過中英文名稱進行局部識別核對 不可刪」「將這幾家有股票的代碼中英文名稱寫入程式識別 沒幾家」:MDL009 改指 v0101(鎖定 regex 擋區裡 8 家上市股票 2022 聚亨 · 2023 燁輝 · 2024 志聯 · 2025 千興 · 2027 大成鋼 · 2028 威致 · 2029 盛餘 · 2030 彰源 以代碼 + 中英文簡稱寫入程式核對後保留;對不上 / 冊外照留亮黃);其他引擎與 v0101 相同",
+ "why_v0103": "VCGC-REQ146:MDL009 改指 v0102(CGC_MDL230 ③ 網路工具橋 AST 真橋;年區代碼識別 · 欄位聯集照 v0101);其他 34 支與 v0102 相同",
+ "why_v0104": "容器開閘實抓(操作員 2026-10-04 授權)量到的冊設定錯:e054 指尾版 v0111 = 唯讀狀態卡(只門檢不回補)→ 改指回補工人 v0109;e056 / e057 / e063 要讀 e054 填的 tw_daily_prices / DB_TW → needs 加 e054;MDL011 沒存 default_selection 時 rc 0 卻零擷取 → nodata_markers 標記改判 NODATA(rc 2)",
+ "why_v0105": "容器裝上 akshare 1.19.1 後整合測試量到:MDL011 block 自測 params 在新輸出根沒有 vake_registry.json 時 KeyError(rc 1)→ 改指 v0101(無註冊表 = NODATA rc 2,有就照 v0100);擷取函式定位指本版 AST;其他 34 支與 v0104 相同"
+}
