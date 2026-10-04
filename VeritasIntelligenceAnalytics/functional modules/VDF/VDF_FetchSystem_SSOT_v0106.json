@@ -473,7 +473,8 @@
    "legacy_paths": false,
    "nodata_markers": [],
    "prior_file": "VDF_MDL011_AkshareFetcher_v0100.py",
-   "selection": "VDF_AkshareSelection_MacroShipping_v0100.json"
+   "selection": "VDF_AkshareSelection_MacroShipping_v0100.json",
+   "timeout_s": 14400
   },
   {
    "id": "e054",
@@ -1186,5 +1187,5 @@
  "why_v0103": "VCGC-REQ146:MDL009 改指 v0102(CGC_MDL230 ③ 網路工具橋 AST 真橋;年區代碼識別 · 欄位聯集照 v0101);其他 34 支與 v0102 相同",
  "why_v0104": "容器開閘實抓(操作員 2026-10-04 授權)量到的冊設定錯:e054 指尾版 v0111 = 唯讀狀態卡(只門檢不回補)→ 改指回補工人 v0109;e056 / e057 / e063 要讀 e054 填的 tw_daily_prices / DB_TW → needs 加 e054;MDL011 沒存 default_selection 時 rc 0 卻零擷取 → nodata_markers 標記改判 NODATA(rc 2)",
  "why_v0105": "容器裝上 akshare 1.19.1 後整合測試量到:MDL011 block 自測 params 在新輸出根沒有 vake_registry.json 時 KeyError(rc 1)→ 改指 v0101(無註冊表 = NODATA rc 2,有就照 v0100);擷取函式定位留原件真擷取點(_get · _call · run_selection,帶 file 指 v0100;薄尾只換 cmd_params;PR #446 Codex P2);其他 34 支與 v0104 相同",
- "why_v0106": "VCGC-REQ149 AkShare 深度擷取:MDL011 改指 v0102(deep-macro · __rows__ · tier);+011d 深度宏觀列(中國經濟 · 各國經濟 · 航運指數;選單正本 VDF_AkshareSelection_MacroShipping_v*.json);其他 34 支與 v0105 相同"
+ "why_v0106": "VCGC-REQ149 AkShare 深度擷取:MDL011 改指 v0102(deep-macro · __rows__ · tier);+011d 深度宏觀列(中國經濟 · 各國經濟 · 航運指數;選單正本 VDF_AkshareSelection_MacroShipping_v*.json);其他 34 支與 v0105 相同;011d timeout_s 14400(深度全歷史跑超過子行程預設 30 分;MDL008 v0107 照列上限)"
 }

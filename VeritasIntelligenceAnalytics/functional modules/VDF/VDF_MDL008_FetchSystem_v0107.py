@@ -131,7 +131,17 @@ def install_live_routes_v0107(nt) -> None:
 
 
 def run_v0107(*args, **kwargs):
-    """同 v0106 run;子行程改從本版起(curl_cffi 改道在子行程裡生效),呼叫完還原。"""
+    """同 v0106 run;子行程改從本版起(curl_cffi 改道在子行程裡生效),呼叫完還原。
+    冊列帶 timeout_s(例:011d 深度全歷史 4 小時)且比呼叫給的上限長 → 用列上限(fill 每次只送一列)。"""
+    rows = args[0] if args else kwargs.get("rows") or []
+    want = max([int(r.get("timeout_s") or 0) for r in rows if isinstance(r, dict)] or [0])
+    if want:
+        cur = kwargs.get("timeout") if "timeout" in kwargs else (args[4] if len(args) > 4 else BASE.CHILD_TIMEOUT_S)
+        if want > int(cur or 0):
+            if len(args) > 4:
+                args = tuple(args[:4]) + (want,) + tuple(args[5:])
+            else:
+                kwargs["timeout"] = want
     keep = PRIOR.__dict__.get("__file__")
     PRIOR.__dict__["__file__"] = str(Path(__file__).resolve())
     try:
@@ -223,7 +233,18 @@ def selftest() -> int:
     chk("⑤ 冊 v0106:MDL011 → v0102 · +011d deep-macro(block 自測 = --plan 零網路;擷取點帶 file 指原件)· 其他 34 支與 v0105 相同(VCGC-REQ149)",
         E["011"]["file"] == E["011d"]["file"] == "VDF_MDL011_AkshareFetcher_v0102.py" and E["011d"]["run_args"] == ["deep-macro"]
         and E["011d"]["test_args"] == ["deep-macro", "--plan"] and all((f["name"], f["line"]) in defs(f.get("file") or E["011d"]["file"]) for f in E["011d"]["fetch_functions"])
-        and not others and len(bk["engines"]) == len(prev["engines"]) + 1, others[:3])
+        and not others and len(bk["engines"]) == len(prev["engines"]) + 1 and E["011d"].get("timeout_s") == 14400, others[:3])
+    seen = {}
+    keep_run = globals()["_RUN_V0106"]
+    globals()["_RUN_V0106"] = lambda rows, *a, **k: seen.update(t=k.get("timeout", a[3] if len(a) > 3 else None)) or []
+    try:
+        run_v0107([E["011d"]], "block", HERE, logs=None, timeout=1800)
+        t_long = seen.get("t")
+        run_v0107([E["009"]], "block", HERE, logs=None, timeout=1800)
+        t_def = seen.get("t")
+    finally:
+        globals()["_RUN_V0106"] = keep_run
+    chk("⑥ 列上限:011d timeout_s 14400 蓋過呼叫的 1800;沒帶 timeout_s 的列照 1800", t_long == 14400 and t_def == 1800, (t_long, t_def))
     text = Path(__file__).read_text(encoding="utf-8")
     chk("④ 加速器橋 · 網路橋(模組層 VIA_NET_TOOL_PATH + def _via_net)在;不碰 TA-Lib;不寫同意閘", "[VIA:ACCEL-BRIDGE" in text and "def _via_net" in text
         and not re.search(r"^\s*(import|from)\s+talib", text, re.M) and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT", text))
