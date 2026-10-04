@@ -27,20 +27,18 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
-[政策] L50 全景 · 尾版 581 · import 0 · 提及 68 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 575 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL261_UIEngine_v0101.py(家族 core)
-  [OK] ① v0100 自測照過(9 檢;用 v0100 自己的內建範本)
-  [OK] ② 全滑鼠:內建頁沒有任何文字輸入框 / 文字區(只有下拉 · 打勾 · 拖放 · 按鈕)
-  [OK] ③ 左面板:VCGC 只兩個位置(系統存放 · 資料庫)+ 拖放區 · VDF 大類起始日下拉(只按大類)· 財報成員方塊 + 下拉加入
-  [OK] ④ VDF 快照直接取 MDL012 尾版(三大類 · 財報預設 2330 3324 / NVDA)
-  [OK] ⑤ 右面板:第一頁三矩陣(輸入摘要去重 · 引擎工具功能 · 運作結果)· 每大類一頁結果 · DuckDB · 環境 · 末頁細節矩陣(流程圖在最上)
-  [OK] ⑥ 元件矩陣:本檔 · VCGC 入口 · MDL012 · MDL008 · 引擎 · PS 啟動器 · 正本冊都列;每列 版號 · sha · 編號 · 註冊 · 鎖 · 燈
-  [OK] ⑦ 位置候選:資料庫位置含設定的輸出根與有 .duckdb 的夾 · 系統位置含本倉
-  [OK] ⑧ 匯入:只收白名單(位置 · 範本 · 勾選族群 · 主題 · 版面);其他鍵照實拒絕;不存在的夾拒絕
-  [OK] ⑨ 零 CDN / 零 fetch / 不需伺服器(file://)
-[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):2 個,例 ['VCGC-WKF018-STP005', 'VCGC- → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 16, 'changed': 47, 'stale': 0, 'expected': 15941, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 已在背景起全景監控 pid 15372 · 閒置 1800 秒自停 · 交接閘 RED · 落後 172 提交 · 快照 42.8h · 未登 5 支(CGC_MDL258_TempAccel · CGC_MDL259_AiVerbBridge · CGC_MDL260_AiToolPanel …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · VDF_MDL012_FetchGroups_v0102.py(家族 vdf)
+  [OK] ① v0101 自測照過(本版 8 + v0100 14)
+  [OK] ② 純 HTML 範本:{{ }} 代換(含點路徑 groups.1.zh)· 注入 window.VIA + 鎖定色 + 四燈(快照含 Windows 反斜線路徑也注入得進)· 找不到的變數照留不假填
+  [OK] ③ 本境缺 jinja2:不崩、退逐變數代換、照實註明 Jinja 區塊沒渲染(不假裝渲染過)
+  [OK] ④ 沙盒擋得住:範本碰不到 Python 內部(__subclasses__ 不展開)
+  [OK] ⑤ 範本夾:列得出(含用到的變數)· 名字不帶 .html 也找得到 · 輸出 VDF_FetchGroups_<範本>.html · 範本原檔零觸碰
+  [OK] ⑥ 對接快照:每次產頁都寫 SNAPSHOT_latest.json(13 族群 · as-of 同一天),其他 U/I 讀它就接上
+  [OK] ⑦ 範本不在 = 誠實報找不到(列出找過的夾),不退回別頁假裝成功
+  [OK] ⑧ 隨附範例範本至少一份(ui_templates\)
+[計] VDF_MDL012_FetchGroups v0102 本版 8/8 · v0101 PASS · 合計 PASS
+  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 6, 'stale': 0, 'expected': 15770, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 已在背景起全景監控 pid 8913 · 閒置 1800 秒自停 · 交接閘 RED · 落後 148 提交 · 快照 34.5h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
