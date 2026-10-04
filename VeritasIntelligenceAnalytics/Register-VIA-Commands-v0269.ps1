@@ -31,16 +31,18 @@ try {
 $global:VIARegisterPath = $MyInvocation.MyCommand.Path
 
 function global:Invoke-VIAScopedLauncher {
-    param([string]$Pattern, [string]$Tag, [object[]]$Rest)
+    param([string]$Pattern, [string]$Tag, [object[]]$Rest, [hashtable]$Switch = @{})
+    # 開關(-Run / -Pick)一律走雜湊展開:陣列裡的字串 "-Run" 會被當成位置引數綁到 -FetchHome(工作站首跑 2026-10-05 實錄)
     $vroot = Split-Path -Parent $global:VIARegisterPath
     $ps = Get-ChildItem -LiteralPath $vroot -Filter $Pattern -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
     if (-not $ps) { Write-Host ("  [" + $Tag + "] 找不到 " + $Pattern + "(先 git pull)") -ForegroundColor Red; $global:LASTEXITCODE = 3; return }
     $a = @($Rest)
-    Write-Host ("  [" + $Tag + "] " + $ps.Name + " " + ($a -join ' ')) -ForegroundColor Cyan
+    $sw = $Switch
+    Write-Host ("  [" + $Tag + "] " + $ps.Name + " " + ((@($sw.Keys | ForEach-Object { "-" + $_ }) + $a) -join ' ')) -ForegroundColor Cyan
     if (Get-Command Invoke-VIACeleritasScoped -ErrorAction SilentlyContinue) {
-        Invoke-VIACeleritasScoped { & $ps.FullName @a }
+        Invoke-VIACeleritasScoped { & $ps.FullName @sw @a }
     } else {
-        & $ps.FullName @a
+        & $ps.FullName @sw @a
     }
 }
 function global:Invoke-VIAScopedVcgc {
@@ -73,8 +75,8 @@ function global:Add-VIAUiHome([object[]]$Rest) {
 
 # ---- U/I 引擎(VCGC):Start-VIA-UIEngine-v*.ps1 · CGC_MDL261_UIEngine ----
 function global:via-op { Invoke-VIAScopedLauncher "Start-VIA-UIEngine-v*.ps1" "via-op" $args }
-function global:via-op-run { Invoke-VIAScopedLauncher "Start-VIA-UIEngine-v*.ps1" "via-op-run" (@('-Run') + @($args)) }
-function global:via-op-pick { Invoke-VIAScopedLauncher "Start-VIA-UIEngine-v*.ps1" "via-op-pick" (@('-Pick') + @($args)) }
+function global:via-op-run { Invoke-VIAScopedLauncher "Start-VIA-UIEngine-v*.ps1" "via-op-run" $args @{ Run = $true } }
+function global:via-op-pick { Invoke-VIAScopedLauncher "Start-VIA-UIEngine-v*.ps1" "via-op-pick" $args @{ Pick = $true } }
 function global:via-uieng {
     $a = @($args); if ($a.Count -eq 0) { $a = @('build') }
     Invoke-VIAScopedVcgc "via-uieng" (@('CGC_MDL261_UIEngine') + $a)
@@ -84,6 +86,7 @@ function global:via-duck { Invoke-VIAScopedVcgc "via-duck" (@('CGC_MDL261_UIEngi
 # ---- VDF 擷取大族群:VDF_MDL012_FetchGroups · Invoke-VDF-FetchGroupsUI-v*.ps1 ----
 function global:via-groups {
     $a = @($args); if ($a.Count -eq 0) { $a = @('groups') }
+    if (("" + $a[0]) -in @('run', 'monitor', 'query', 'optimize', 'groups', 'members', 'add', 'remove', 'asof')) { $a = Add-VIAUiHome $a }   # 資料動詞沒給 --home = 操作台選的資料庫位置
     Invoke-VIAScopedVcgc "via-groups" (@('--family', 'vdf', 'VDF_MDL012_FetchGroups') + $a)
 }
 function global:via-groups-ui { Invoke-VIAScopedLauncher "Invoke-VDF-FetchGroupsUI-v*.ps1" "via-groups-ui" $args }

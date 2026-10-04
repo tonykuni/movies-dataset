@@ -3682,8 +3682,8 @@
       "requirement": "VCGC-REQ155",
       "state": "PENDING",
       "owner": "操作員 / Windows 工作站",
-      "reason": "短令要真 PowerShell 點源 Register v0269 才走得到 Windows 路徑與資料夾對話框;容器只驗 pwsh 剖析與 Linux pwsh 點源實跑;首跑 2026-10-05 沒拉到本分支(本機在 claude/new-session-q9pb23)且 via-ui 撞名 → 改 via-op",
-      "next": "cd Documents\\movies-dataset → git checkout claude/ecstatic-brahmagupta-ec19u9 → 點源 VeritasIntelligenceAnalytics\\Register-VIA-Commands-v0269 → via-uihelp → via-op → via-op-run -Mode block → 回貼後轉 VERIFIED",
+      "reason": "短令要真 PowerShell 點源 Register v0269 才走得到 Windows 路徑與資料夾對話框;容器只驗 pwsh 剖析與 Linux pwsh 點源實跑;首跑 2026-10-05 沒拉到本分支(本機在 claude/new-session-q9pb23)且 via-ui 撞名 → 改 via-op;次跑 2026-10-05 00:24:via-op / via-monitor 實跑通;via-op-run 的 -Run 沒傳到(已修,待第三跑)",
+      "next": "git pull 本分支 → 點源 Register v0269 → via-op-run -Mode block(看到 [擷取] 行)→ 回貼後轉 VERIFIED",
       "case": null,
       "receipt": null
     },
@@ -3694,6 +3694,16 @@
       "owner": "操作員",
       "reason": "CGC_MDL183 全樹尺仍數 VRN_NewPlugins_v0102 本體缺 PY 加速器橋;該檔已隨 PR #448 發布,VCGC 子系統邊界不准就地改 → 已出 v0103 尾版接上",
       "next": "操作員裁:准 VRN 端就地補 v0102,或把 v0102 列版史豁免",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:workstation-vake",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "工作站 monitor:CN_MACRO / GLOBAL_MACRO / SHIPPING / CN_NBS 讀 <home>\\vake\\db\\vake.duckdb 不在(容器深抓的資料不進 git);獨立版 VDF_AkshareFetcher 預設 VAKE_ROOT=C:\\VIA\\VAKE,若舊資料在那邊要搬或指過來",
+      "next": "Test-Path C:\\VIA\\VAKE\\db\\vake.duckdb → 有就回報;沒有就 VIA_NET_CONSENT=YES 下 via-groups run --groups CN_MACRO,GLOBAL_MACRO,SHIPPING,CN_NBS",
       "case": null,
       "receipt": null
     }
