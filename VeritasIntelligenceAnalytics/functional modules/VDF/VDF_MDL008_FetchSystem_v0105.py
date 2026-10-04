@@ -11,7 +11,8 @@
     ② 計數:requests 改道 → requests · urllib 改道 → net · yfinance 過閘 → yf(子行程結尾「網路計數」照實印)。
     ③ 輸出歸位:75 個 ENG 家族把輸出寫死成 `VDF / "output_hub" / …`(VDF 由引擎檔位置推),live 實抓全寫進倉內 / 下載包夾,
        不進 --home。子行程裡把 `… / "output_hub"` 改成 `Path(<--home>) / "output_hub"`:頂層引擎在 compile_engine 改,
-       VDF 樹內其他模組(薄尾用 spec_from_file_location 載的前版本體)在 SourceFileLoader.get_code 改。只動記憶體,原檔不動。
+       VDF 樹內其他模組(薄尾用 spec_from_file_location 載的前版本體)在 SourceFileLoader.get_code 改,
+       薄尾直接 exec(compile(本體原始碼)) 的(ENG055 v0122)在 builtins.compile 改。只動記憶體,原檔不動。
 其餘(冊 v0103 · fill / fill-matrix / --progress · 雙閘 rc 4)照 v0104。不碰 TA-Lib;不讀寫同意閘(只問網路工具)。
 """
 from __future__ import annotations
@@ -279,6 +280,33 @@ def install_loader_hub_v0105(home, root: Path = HERE) -> None:
     loader.get_code = get_code
 
 
+def install_compile_hub_v0105(home, root: Path = HERE) -> None:
+    """子行程:薄尾用 exec(compile(本體原始碼, 路徑, "exec")) 直接執行前版(繞過 loader;ENG055 v0122 即此)——
+    builtins.compile 對 root 樹內 .py 的 exec 編譯一樣做 output_hub 歸位;只要 AST 的呼叫(ast.parse)照原樣,不遞迴。"""
+    import builtins
+    if getattr(builtins.compile, "_via_hub_v0105", False):
+        return
+    real_compile = builtins.compile
+    root_s = str(Path(root).resolve())
+
+    def hub_compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1, **kw):
+        fn = str(filename)
+        if (mode == "exec" and isinstance(source, (str, bytes)) and not (flags & ast.PyCF_ONLY_AST) and fn.endswith(".py")):
+            try:
+                inside = str(Path(fn).resolve()).startswith(root_s)
+            except OSError:
+                inside = False
+            if inside:
+                tree = ast.parse(source, filename=fn)
+                n = rewrite_tree_v0105(tree, home)
+                HUB_STATS_V0105["modules"] += 1
+                HUB_STATS_V0105["rewrites"] += n
+                return real_compile(tree, filename, mode, flags, dont_inherit, optimize, **kw)
+        return real_compile(source, filename, mode, flags, dont_inherit, optimize, **kw)
+    hub_compile._via_hub_v0105 = True
+    builtins.compile = hub_compile
+
+
 def _install_v0105() -> None:
     BASE._install_live_routes = install_live_routes_v0105
     BASE.compile_engine = compile_engine_v0105
@@ -296,6 +324,7 @@ def main(argv=None) -> int:
         return selftest()
     if args[:1] == ["_child"] and len(args) > 2:
         install_loader_hub_v0105(args[2])             # 子行程:VDF 樹內模組的 output_hub 一律歸位到 --home
+        install_compile_hub_v0105(args[2])            # 薄尾 exec(compile(本體)) 這條繞道也收
         try:
             return PRIOR.main(args)
         finally:
@@ -371,10 +400,18 @@ def selftest() -> int:
                                                       "_s = importlib.util.spec_from_file_location('body_t', Path(__file__).with_name('Body_v0100.py'))\n"
                                                       "B = importlib.util.module_from_spec(_s); _s.loader.exec_module(B)\n"
                                                       "TOP = Path(__file__).resolve().parent.parent / 'output_hub'\n", encoding="utf-8")
+        (root / "engine" / "Exec_v0102.py").write_text("from pathlib import Path\n_B = Path(__file__).with_name('Body_v0100.py')\n"
+                                                      "exec(compile(_B.read_text(encoding='utf-8'), str(_B), 'exec'), globals())\n", encoding="utf-8")
         outside = Path(tmp) / "elsewhere.py"
         outside.write_text("from pathlib import Path\nX = Path('/r') / 'output_hub'\n", encoding="utf-8")
+        import builtins
+        keep_compile = builtins.compile
         try:
             install_loader_hub_v0105(str(home), root=root)
+            install_compile_hub_v0105(str(home), root=root)
+            se = importlib.util.spec_from_file_location("exec_t", root / "engine" / "Exec_v0102.py")
+            me = importlib.util.module_from_spec(se)
+            se.loader.exec_module(me)
             body, mains, n_top = compile_engine_v0105(root / "engine" / "Tail_v0101.py", home)
             g = {"__name__": "t", "__file__": str(root / "engine" / "Tail_v0101.py")}
             exec(body, g)
@@ -383,11 +420,14 @@ def selftest() -> int:
             so.loader.exec_module(mo)
         finally:
             importlib.machinery.SourceFileLoader.get_code = keep_gc
-        chk("⑦ output_hub 歸位:頂層引擎(compile_engine)與薄尾載的前版本體(get_code)都改到 --home/output_hub;樹外模組不動;原檔不改",
-            g["TOP"] == home / "output_hub" and g["B"].OUT == home / "output_hub" / "mega" and g["B"].DB == home / "output_hub" / "mega" / "x.duckdb"
+            builtins.compile = keep_compile
+        chk("⑦ output_hub 歸位:頂層引擎(compile_engine)· 前版本體(get_code)· exec(compile(本體))繞道 都改到 --home/output_hub;樹外模組不動;原檔不改",
+            me.OUT == home / "output_hub" / "mega" and g["TOP"] == home / "output_hub" and g["B"].OUT == home / "output_hub" / "mega" and g["B"].DB == home / "output_hub" / "mega" / "x.duckdb"
             and n_top == 1 and mo.X == Path("/r") / "output_hub" and "'output_hub'" in (root / "engine" / "Body_v0100.py").read_text(encoding="utf-8"),
             (str(g["TOP"]), str(g["B"].OUT)))
-    chk("⑧ 呼叫完 SourceFileLoader.get_code 還原(自測不污染行程)", importlib.machinery.SourceFileLoader.get_code is keep_gc)
+    import builtins as _bi
+    chk("⑧ 呼叫完 SourceFileLoader.get_code · builtins.compile 還原(自測不污染行程)",
+        importlib.machinery.SourceFileLoader.get_code is keep_gc and not getattr(_bi.compile, "_via_hub_v0105", False))
     bk = load_book_v0105()
     E = {r["id"]: r for r in bk["engines"]}
     import ast as _a
