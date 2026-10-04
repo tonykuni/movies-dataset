@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-04T03:40:00+00:00",
+  "updated_at": "2026-10-04T03:10:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1608,6 +1608,33 @@
         "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0100.py"
       ],
       "timeout_seconds": 1200
+    },
+    "celeritas_gate_v0103": {
+      "argv": [
+        "CGC_MDL183_CeleritasPolicyGate",
+        "--selftest"
+      ],
+      "success_marker": "[計] v0103 薄尾 3/3 · v0102 PASS · 合計 PASS",
+      "scope": "Celeritas 產出契約閘 v0103:無版號舊 .ps1 有帶章版號尾版 = 版史(同掃橋器 v0110 · 探針 v0106);PS 基線外新缺 0(VCGC-REQ148)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0103.py",
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0102.py",
+        "Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1"
+      ],
+      "timeout_seconds": 1200
+    },
+    "env_gov_v0118": {
+      "argv": [
+        "CGC_MDL135_EnvGovernance",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL135_EnvGovernance v0118 本版 5/5 · v0117 PASS · 合計 PASS",
+      "scope": "環境治理 v0118:spaCy 模型件改指官方 wheel(zh-core-web-sm 不在 PyPI,via_nlp 模擬原紅)(VCGC-REQ148)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL135_EnvGovernance_v0118.py",
+        "supportive modules/registry/CGC_MDL135_EnvGovernance_v0117.py"
+      ],
+      "timeout_seconds": 1800
     }
   },
   "work_items": [
@@ -3339,6 +3366,46 @@
       "next": "handoff test vdf_akshare_v0101 實跑轉 VERIFIED",
       "case": "vdf_akshare_v0101",
       "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ148:celeritas_gate_v0103",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "Celeritas 產出契約閘 v0103:無版號舊 .ps1 有帶章版號尾版 = 版史(同掃橋器 v0110 · 探針 v0106);PS 基線外新缺 0(VCGC-REQ148)",
+      "next": "handoff test celeritas_gate_v0103 實跑轉 VERIFIED",
+      "case": "celeritas_gate_v0103",
+      "receipt": "docs/handoff/evidence/celeritas_gate_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ148:env_gov_v0118",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "環境治理 v0118:spaCy 模型件改指官方 wheel(zh-core-web-sm 不在 PyPI,via_nlp 模擬原紅)(VCGC-REQ148)",
+      "next": "handoff test env_gov_v0118 實跑轉 VERIFIED",
+      "case": "env_gov_v0118",
+      "receipt": "docs/handoff/evidence/env_gov_v0118.json"
+    },
+    {
+      "id": "VCGC-REQ148:base-nlp-remove",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "plan 的 REMOVE_BASE(nlp 12 件 · stealth 2 · table 2 · 閉包外 4)是候裁;容器 base 仍在跑 VRN NLP,AI 只補相依讓 base 零衝突,不代裁移除",
+      "next": "操作員裁定後 via-envgov apply --approve --approve-remove",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ148:pwsh",
+      "requirement": "VCGC-REQ148",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "EnvManager B10 必備執行檔 pwsh:容器 PATH 沒有(工作站有)",
+      "next": "工作站跑 EnvManager check 回貼",
+      "case": null,
+      "receipt": null
     }
   ]
 }

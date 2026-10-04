@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 53,
+  "PARTIAL": 54,
   "MISSING": 1
  },
  "requirements": [
@@ -4808,6 +4808,34 @@
     "VDF_MDL011_AkshareFetcher_v0101.py",
     "VDF_FetchSystem_SSOT_v0105.json"
    ]
+  },
+  {
+   "code": "VCGC-REQ148",
+   "subsystem": "ALL",
+   "topic": "VCGC 檢查 VCGC / VRN / VDF 所有工具環境無衝突安裝完畢 · 有進度就鎖版本上傳 GitHub 備份優先",
+   "requirement": "操作員令(2026-10-04):「完成後請vcgc檢查vcgc及vrn vdf所有工具環境無衝突安裝完畢」「有進度就所版本上傳github備份優先」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0151.json"
+   ],
+   "evidence": "ENV 劇本 E01 EnvManager check RED:A6 覆蓋探針 RED 唯一一筆 = Invoke-VIA-Step1-SyncAndLKGC.ps1(L70 舊檔,已有帶章 -v0101 尾版)→ CGC_MDL183 v0103(無版號舊 .ps1 有帶章尾版 = 版史,同掃橋器 v0110 / 探針 v0106 一把尺)· PS 基線外新缺 0;E07 模擬 S02 RED = zh-core-web-sm 不在 PyPI → CGC_MDL135 v0118(spaCy 模型件改指官方 wheel)· 模擬全 GREEN;E08 apply --approve:4 個隔離境零衝突,via_nlp 以 base 現版鎖補齊 spaCy / sumy / quantulum3 相依後零衝突;base 修補改走 uv(pip 24.0 是 Debian 裝的不能解除安裝,釘住)· setuptools 釘 <82 · base 185 件零衝突;E09 家族境工具冊補裝(via_vdf_312 · via_vrn_312 · via_vap_312 · via_paddle_311 · via_core)。每一步提交推送 GitHub。",
+   "next": "① 家族境裝完後 E10 EnvManager check 重驗 ② pwsh 必備執行檔(容器沒有;工作站有)③ base 端 nlp 家族移除(--approve-remove)待操作員裁定(base 仍在跑 VRN NLP)",
+   "hand": "AI(容器)/ 操作員(工作站同劇本 · 移除裁定)",
+   "quotes": [
+    {
+     "text": "完成後請vcgc檢查vcgc及vrn vdf所有工具環境無衝突安裝完畢",
+     "recorded_at": "2026-10-04T03:10:00+00:00"
+    },
+    {
+     "text": "有進度就所版本上傳github備份優先",
+     "recorded_at": "2026-10-04T03:10:00+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL183_CeleritasPolicyGate_v0103.py",
+    "CGC_MDL135_EnvGovernance_v0118.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -4971,5 +4999,5 @@
  "why_v0166": "PR #442 審查三條 P1:凍結檔還原 + 鎖版改新版導向 · v0116/v0117 還原 · 下載包依賴清單與 preflight",
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
- "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動"
+ "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118)"
 }
