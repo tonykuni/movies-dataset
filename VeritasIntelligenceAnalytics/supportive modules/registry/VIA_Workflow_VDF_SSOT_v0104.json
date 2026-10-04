@@ -920,7 +920,8 @@
     "requirements": [
      "VCGC-REQ150",
      "VCGC-REQ151",
-     "VCGC-REQ152"
+     "VCGC-REQ152",
+     "VCGC-REQ154"
     ],
     "acceptance": [
      "MDL012 尾版 --selftest PASS",
@@ -929,7 +930,10 @@
      "fg_status 只增 · fg_status_latest 視圖",
      "optimize --apply 被鎖 = LOCKED 跳過、不搶鎖",
      "ui:左面板(回母系統 · 跳其他系統 · 功能 · Live log)· 右面板第一頁輸入 / 引擎 / 運作 / 結果 · 每族群一頁 · 末頁流程圖 + 六矩陣 · 零 CDN",
-     "啟動指令對接 U/I:Invoke-VDF-FetchGroupsUI -Template 任何範本 → 同一份族群快照;對接快照 SNAPSHOT_latest.json 每次都寫"
+     "啟動指令對接 U/I:Invoke-VDF-FetchGroupsUI -Template 任何範本 → 同一份族群快照;對接快照 SNAPSHOT_latest.json 每次都寫",
+     "族群冊 v0101 四大類;起始日只按大類(start --group 拒絕 rc 2)",
+     "EDITABLE_DEFAULT:TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA,可增減、可還原",
+     "ui-import:只寫差異 · 冪等 · 拒絕單群起始日 / FIXED 成員 / 矩陣群"
     ]
    },
    "plan": {
@@ -977,6 +981,16 @@
      "inside": "VCGC run",
      "evidence": "step:VDF-WKF014-STP003",
      "what": "VIA_Reports\\vdf\\ui\\VDF_FetchGroups_<範本>.html + VDF_FetchGroups_SNAPSHOT_latest.json"
+    },
+    {
+     "code": "VDF-WKF014-STP005",
+     "alias": "fetch_groups_categories",
+     "name": "大類 · 預設成員 · 起始日按大類 · U/I 輸入匯入",
+     "engine": "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+     "verb": "start [--category X --set D|default --apply] · ui-import FILE [--apply]",
+     "inside": "VCGC run",
+     "evidence": "step:VDF-WKF014-STP004",
+     "what": "VDF_FetchGroups_MemberLedger_v0100.jsonl(只增:member / start)"
     }
    ],
    "tests": {
@@ -993,5 +1007,5 @@
  "why_v0101": "VCGC link(母子自動連接):需求冊歸屬指到本冊工作流 / 步而工作流沒回指 → 補進 spec.requirements(只增):VDF-WKF006 ← VDF-REQ014 · VDF-WKF010 ← VDF-REQ014;其餘一字不動",
  "why_v0102": "R50:加 VDF-WKF011 輸入範圍迴圈(10 步,各步引擎自測過即可由 SDD lock 記版號 + 時間);其餘一字不動(只增)",
  "why_v0103": "+VDF-WKF012(VCGC-REQ147 開閘實抓全走最新工具)· +VDF-WKF013(VCGC-REQ149 AkShare 深度擷取);PR #446 Codex P1:需求要在工作流冊有回指;其餘一字不動;+VDF-WKF014(VCGC-REQ150 擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化);VDF-WKF014 +STP003 族群操作頁(VCGC-REQ151)",
- "why_v0104": "VDF-WKF014 +STP004 啟動指令對接 U/I · 自適應範本(VCGC-REQ152);v0103 已隨 PR #446 發布,出新版不就地改;其餘一字不動"
+ "why_v0104": "VDF-WKF014 +STP004 啟動指令對接 U/I · 自適應範本(VCGC-REQ152);v0103 已隨 PR #446 發布,出新版不就地改;其餘一字不動;VDF-WKF014 +STP005 大類 · 預設成員 · 起始日按大類 · ui-import(VCGC-REQ154)"
 }

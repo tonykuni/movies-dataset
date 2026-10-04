@@ -2557,11 +2557,26 @@
    ]
   },
   {
+   "id": "C-vdf_fetch_groups_v0103",
+   "name": "交接案 vdf_fetch_groups_v0103(MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154))",
+   "argv": [
+    "run",
+    "VDF_MDL012_FetchGroups",
+    "--selftest"
+   ],
+   "timeout": 900,
+   "deps": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+    "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
+   ]
+  },
+  {
    "id": "C-ui_engine_v0100",
    "name": "交接案 ui_engine_v0100(CGC_MDL261 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153))",
    "argv": [
     "run",
-    "CGC_MDL261_UIEngine",
+    "CGC_MDL261_UIEngine_v0100",
     "--selftest"
    ],
    "timeout": 600,
@@ -2582,10 +2597,26 @@
     "Invoke-VIAPython",
     "CGC_MDL137_RunGate",
     "CGC_MDL135_EnvGovernance",
-    "CGC_MDL261_UIEngine"
+    "CGC_MDL261_UIEngine",
+    "ui_config.json"
    ],
    "deps": [
     "Start-VIA-UIEngine-v*.ps1"
+   ]
+  },
+  {
+   "id": "C-ui_engine_v0101",
+   "name": "交接案 ui_engine_v0101(CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154))",
+   "argv": [
+    "run",
+    "CGC_MDL261_UIEngine",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
+    "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
+    "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json"
    ]
   }
  ],
@@ -3130,6 +3161,12 @@
    },
    "ui_engine_v0100": {
     "station": "C-ui_engine_v0100"
+   },
+   "ui_engine_v0101": {
+    "station": "C-ui_engine_v0101"
+   },
+   "vdf_fetch_groups_v0103": {
+    "station": "C-vdf_fetch_groups_v0103"
    }
   },
   "workflow": {
@@ -3340,6 +3377,12 @@
    },
    "VCGC-WKF018-STP002": {
     "station": "P-ui_engine"
+   },
+   "VCGC-WKF018-STP003": {
+    "station": "C-ui_engine_v0101"
+   },
+   "VCGC-WKF018-STP004": {
+    "station": "P-ui_engine"
    }
   },
   "ps": {
@@ -3402,5 +3445,5 @@
  "why_v0148": "PR #442 審查:網路鎖版改由 SUP_MDL737 v0110 導向(凍結檔原樣),交接站同步",
  "why_v0149": "VCGC-REQ144 / REQ145:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 · vdf_fetch_fill 各一站 + coverage.case;其餘一字不動(只增)",
  "why_v0150": "VCGC-REQ146:交接新案 5 條(MDL009 v0102 · MDL008 v0104 · 掃橋器 v0110 · 覆蓋探針 v0106 · 版本全景載入器)各一站 + PS 站 P-vdf_fill(Invoke-VDF-FetchFill 章字;PS 入口覆蓋只認主控台 / Step1 兩支,本站不另立入口鍵);其餘一字不動(只增)",
- "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153)"
+ "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153);+C-ui_engine_v0101 · +C-vdf_fetch_groups_v0103 · C-ui_engine_v0100 釘本版檔 · 工作流 VCGC-WKF018-STP003/004(VCGC-REQ154)"
 }

@@ -1713,7 +1713,7 @@
     },
     "ui_engine_v0100": {
       "argv": [
-        "CGC_MDL261_UIEngine",
+        "CGC_MDL261_UIEngine_v0100",
         "--selftest"
       ],
       "success_marker": "[計] CGC_MDL261_UIEngine v0100 本版 9/9 · 合計 PASS",
@@ -1724,6 +1724,32 @@
         "supportive modules/ui_support/ui_templates/VIA_UIEngine_MinimalGrid_v0100.html"
       ],
       "timeout_seconds": 900
+    },
+    "ui_engine_v0101": {
+      "argv": [
+        "CGC_MDL261_UIEngine",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+      "scope": "pwsh Parser)+ 章在(CELERITAS-TEMPLATE-JOIN · PS-ACCEL · Invoke-VIAPython · RunGate · LKGC · build",
+      "dependencies": [
+        "Start-VIA-UIEngine-v*.ps1"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_fetch_groups_v0103": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+      "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -3579,9 +3605,9 @@
     {
       "id": "VCGC-REQ153:ui_engine_v0100",
       "requirement": "VCGC-REQ153",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "CGC_MDL261 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153) → 已驗:None rc 0 · 標記見到",
+      "reason": "CGC_MDL261 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153)(改號 MDL257→261 後收據失效、案釘本版檔重驗)",
       "next": "handoff test ui_engine_v0100 實跑轉 VERIFIED",
       "case": "ui_engine_v0100",
       "receipt": "docs/handoff/evidence/ui_engine_v0100.json"
@@ -3593,6 +3619,36 @@
       "owner": "操作員",
       "reason": "「照我測過的結果安裝」= LKGC;工作站要先 EnvGovernance 全綠存 LKGC_latest(可用)才有鎖可照",
       "next": "工作站 via-envgov run → 全綠晉升 LKGC → Start-VIA-UIEngine -Install",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ154:ui_engine_v0101",
+      "requirement": "VCGC-REQ154",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "pwsh Parser)+ 章在(CELERITAS-TEMPLATE-JOIN · PS-ACCEL · Invoke-VIAPython · RunGate · LKGC · build",
+      "next": "handoff test ui_engine_v0101 實跑轉 VERIFIED",
+      "case": "ui_engine_v0101",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ154:vdf_fetch_groups_v0103",
+      "requirement": "VCGC-REQ154",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154",
+      "next": "handoff test vdf_fetch_groups_v0103 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0103",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ154:workstation-run",
+      "requirement": "VCGC-REQ154",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "台股 / 國際實抓在容器被 TWSE WAF · Yahoo 429 擋;頁上點選後的 -Run live 要在工作站",
+      "next": "工作站 .\\Start-VIA-UIEngine-v0101.ps1 → 匯出輸入 → VIA_NET_CONSENT=YES 下 -Run -Mode live",
       "case": null,
       "receipt": null
     }
