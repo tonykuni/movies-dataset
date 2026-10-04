@@ -201,6 +201,8 @@ def render_template(tpl: str, snap: dict) -> tuple:
     else:
         out = inject + out
     report["missing"] = sorted(set(report["missing"]))
+    if not report["engine"].startswith("jinja2(") and _JINJA_BLOCK.search(tpl):
+        report["note"] = "本境缺 jinja2:{% %} 區塊原樣留在頁上沒渲染(裝 jinja2 或改用純 {{ 變數 }} 範本)"
     return out, report
 
 
@@ -256,6 +258,7 @@ def cmd_ui(argv: list) -> int:
         snap, out, tp, rep = build_templated(home, a.template, Path(a.out) if a.out else None, a.as_of)
         print(f"[ui · 範本] {tp.name} → {out} · {round(out.stat().st_size / 1024, 1)} KB · 引擎 {rep['engine']} · 變數 {len(rep['vars'])}"
               + (f" · 找不到 {len(rep['missing'])}:{', '.join(rep['missing'][:6])}(照留原字)" if rep["missing"] else "")
+              + (f" · ⚠ {rep['note']}" if rep.get("note") else "")
               + f" · as-of {snap['as_of']} · 對接快照 {SNAP_LATEST.name}")
         if not a.watch:
             return 0
@@ -293,9 +296,19 @@ def selftest() -> int:
     tpl2 = ("<html><head></head><body>{% for g in groups %}<i class='lamp-{{ g.summary.worst }}'>{{ g.zh }}</i>{% endfor %}"
             "{{ '<script>' }}</body></html>")
     out2, rep2 = render_template(tpl2, snap)
-    chk("③ Jinja 範本:沙盒渲染迴圈 · 自動跳脫(<script> 字串不成標籤)",
-        "<i class='lamp-GREEN'>台股每日行情</i><i class='lamp-YELLOW'>航運指數</i>" in out2 and "&lt;script&gt;" in out2
-        and rep2["engine"].startswith("jinja2"), (rep2, out2[-200:]))
+    try:
+        import jinja2  # noqa: F401
+        has_j2 = True
+    except ImportError:
+        has_j2 = False
+    if has_j2:
+        chk("③ Jinja 範本:沙盒渲染迴圈 · 自動跳脫(<script> 字串不成標籤)",
+            "<i class='lamp-GREEN'>台股每日行情</i><i class='lamp-YELLOW'>航運指數</i>" in out2 and "&lt;script&gt;" in out2
+            and rep2["engine"].startswith("jinja2"), (rep2, out2[-200:]))
+    else:
+        chk("③ 本境缺 jinja2:不崩、退逐變數代換、照實註明 Jinja 區塊沒渲染(不假裝渲染過)",
+            rep2["engine"] == "逐變數代換" and "{% for g in groups %}" in out2 and "jinja2" in rep2.get("note", "")
+            and "window.VIA = " in out2, rep2)
     tpl3 = "<div>{{ __class__.__mro__ }}{% set x = ''.__class__ %}{{ x.__subclasses__() }}</div>"
     out3, rep3 = render_template(tpl3, snap)
     chk("④ 沙盒擋得住:範本碰不到 Python 內部(__subclasses__ 不展開)", "subprocess" not in out3 and "Popen" not in out3, (rep3, out3[:200]))

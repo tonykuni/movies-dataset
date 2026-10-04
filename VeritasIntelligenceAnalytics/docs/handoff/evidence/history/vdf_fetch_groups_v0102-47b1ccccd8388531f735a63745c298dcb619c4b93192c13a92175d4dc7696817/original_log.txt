@@ -33,12 +33,13 @@
   [via-vcgc run] [流程] 政策過 · VDF_MDL012_FetchGroups_v0102.py(家族 vdf)
   [OK] ① v0101 自測照過(本版 8 + v0100 14)
   [OK] ② 純 HTML 範本:{{ }} 代換(含點路徑 groups.1.zh)· 注入 window.VIA + 鎖定色 + 四燈(快照含 Windows 反斜線路徑也注入得進)· 找不到的變數照留不假填
-  [OK] ③ 本境缺 jinja2:不崩、退逐變數代換、照實註明 Jinja 區塊沒渲染(不假裝渲染過)
+  [FAIL] ③ Jinja 範本:沙盒渲染迴圈 · 自動跳脫(<script> 字串不成標籤) · ({'engine': '逐變數代換', 'vars': ['g.summary.worst', 'g.zh'], 'missing': ['g.summary.worst', 'g.zh']}, 'ing": false}, "home": "C:\\\\Users\\\\x\\\\via_database\\\\vdf_fetch"};</script></head><body>{% for g in groups %}<i class=\'lamp-{{ g.summary.worst }}\'>{{ g.zh }}</i>{% endfor %}{{ \'<script>\' }}</
   [OK] ④ 沙盒擋得住:範本碰不到 Python 內部(__subclasses__ 不展開)
   [OK] ⑤ 範本夾:列得出(含用到的變數)· 名字不帶 .html 也找得到 · 輸出 VDF_FetchGroups_<範本>.html · 範本原檔零觸碰
   [OK] ⑥ 對接快照:每次產頁都寫 SNAPSHOT_latest.json(13 族群 · as-of 同一天),其他 U/I 讀它就接上
   [OK] ⑦ 範本不在 = 誠實報找不到(列出找過的夾),不退回別頁假裝成功
   [OK] ⑧ 隨附範例範本至少一份(ui_templates\)
-[計] VDF_MDL012_FetchGroups v0102 本版 8/8 · v0101 PASS · 合計 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 6, 'stale': 0, 'expected': 15770, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 已在背景起全景監控 pid 8913 · 閒置 1800 秒自停 · 交接閘 RED · 落後 148 提交 · 快照 34.5h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[計] VDF_MDL012_FetchGroups v0102 本版 7/8 · v0101 PASS · 合計 FAIL
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_MDL012_FetchGroups_v0102.py(冊上 VD | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VDF_MDL012_FetchGroups_v0102.py'] | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):2 個,例 ['VDF-WKF014-STP004', 'VCGC-R → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 9, 'changed': 6, 'stale': 0, 'expected': 15770, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 已在背景起全景監控 pid 3723 · 閒置 1800 秒自停 · 交接閘 RED · 落後 147 提交 · 快照 34.3h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
