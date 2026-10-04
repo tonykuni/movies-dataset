@@ -1770,7 +1770,7 @@
       "argv": [
         "--family",
         "vdf",
-        "VDF_ENG234_UiLauncher",
+        "VDF_ENG234_UiLauncher_v0102",
         "--selftest"
       ],
       "success_marker": "[計] VDF_ENG234_UiLauncher_v0102 自測 11/11 · PASS",
@@ -1778,6 +1778,94 @@
       "dependencies": [
         "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0102.py",
         "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ai_verb_bridge_256": {
+      "argv": [
+        "CGC_MDL256_AiVerbBridge",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL256_AiVerbBridge_v0100 自測 11/11 · PASS",
+      "scope": "CGC_MDL256_AiVerbBridge v0100 AI 動詞橋(薄尾產生 · PRIOR 載前版 · 轉接 · 加速器橋)(VCGC-REQ159)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL256_AiVerbBridge_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ai_verb_ladder": {
+      "argv": [
+        "CGC_MDL257_AiVerbLadder",
+        "--selftest"
+      ],
+      "success_marker": "[計] 13 PASS / 0 FAIL",
+      "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "temp_accel": {
+      "argv": [
+        "CGC_MDL258_TempAccel",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL258_TempAccel_v0100 自測 11/11 · PASS",
+      "scope": "CGC_MDL258_TempAccel v0100 暫存加速(VCGC-REQ159)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL258_TempAccel_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ai_verb_bridge_259": {
+      "argv": [
+        "CGC_MDL259_AiVerbBridge",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL259_AiVerbBridge_v0100 自測 11/11 · PASS",
+      "scope": "CGC_MDL259_AiVerbBridge v0100 AI 動詞橋(259)(VCGC-REQ159)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL259_AiVerbBridge_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ai_tool_panel": {
+      "argv": [
+        "CGC_MDL260_AiToolPanel",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL260_AiToolPanel_v0100 自測 8/8 · PASS",
+      "scope": "CGC_MDL260_AiToolPanel v0100 AI 工具面板(活體燈 · 防遞迴)(VCGC-REQ159)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL260_AiToolPanel_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_ui_launcher_v0103": {
+      "argv": [
+        "--family",
+        "vdf",
+        "VDF_ENG234_UiLauncher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG234_UiLauncher v0103 本版 5/5 · v0102 PASS · 合計 PASS",
+      "scope": "VDF_ENG234 UiLauncher v0103 薄尾:補 L103② VDF 網路工具橋(VDF/net 137/137)· PS 啟動器 Invoke-VIA-VdfUi-v0104.ps1(VCGC-REQ161)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0103.py",
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0102.py",
+        "Invoke-VIA-VdfUi-v0104.ps1"
+      ],
+      "timeout_seconds": 900
+    },
+    "duck_temp_hook": {
+      "argv": [
+        "CGC_MDL262_DuckTempHook",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL262_DuckTempHook_v0100 自測 12/12 · PASS",
+      "scope": "CGC_MDL262_DuckTempHook v0100 DuckDB TEMP 為主 · 記憶體為輔環境掛鉤 · 輕框清理(VCGC-REQ161)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL262_DuckTempHook_v0100.py"
       ],
       "timeout_seconds": 900
     }
@@ -3841,6 +3929,156 @@
       "next": "操作員點頭後:VCGC 普查動詞正式化 + 偵測無誤才發 OUT 號(鍵 = 子系統 | 來源 | 表)+ 子系統讀號介面",
       "case": null,
       "receipt": null
+    },
+    {
+      "id": "VCGC-REQ159:ai_verb_bridge_256",
+      "requirement": "VCGC-REQ159",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL256_AiVerbBridge v0100 經 PR #447 合入、沒有交接案(CHANGED_CODE_WITHOUT_TEST) → 已驗:2026-10-04T18:33:58+00:00 rc 0 · 標記見到",
+      "next": "handoff test ai_verb_bridge_256 實跑轉 VERIFIED",
+      "case": "ai_verb_bridge_256",
+      "receipt": "docs/handoff/evidence/ai_verb_bridge_256.json"
+    },
+    {
+      "id": "VCGC-REQ159:ai_verb_ladder",
+      "requirement": "VCGC-REQ159",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL257_AiVerbLadder v0100 經 PR #447 合入、沒有交接案(CHANGED_CODE_WITHOUT_TEST) → 已驗:2026-10-04T18:34:05+00:00 rc 0 · 標記見到",
+      "next": "handoff test ai_verb_ladder 實跑轉 VERIFIED",
+      "case": "ai_verb_ladder",
+      "receipt": "docs/handoff/evidence/ai_verb_ladder.json"
+    },
+    {
+      "id": "VCGC-REQ159:temp_accel",
+      "requirement": "VCGC-REQ159",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL258_TempAccel v0100 經 PR #447 合入、沒有交接案(CHANGED_CODE_WITHOUT_TEST) → 已驗:2026-10-04T18:34:12+00:00 rc 0 · 標記見到",
+      "next": "handoff test temp_accel 實跑轉 VERIFIED",
+      "case": "temp_accel",
+      "receipt": "docs/handoff/evidence/temp_accel.json"
+    },
+    {
+      "id": "VCGC-REQ159:ai_verb_bridge_259",
+      "requirement": "VCGC-REQ159",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL259_AiVerbBridge v0100 經 PR #447 合入、沒有交接案(CHANGED_CODE_WITHOUT_TEST) → 已驗:2026-10-04T18:34:19+00:00 rc 0 · 標記見到",
+      "next": "handoff test ai_verb_bridge_259 實跑轉 VERIFIED",
+      "case": "ai_verb_bridge_259",
+      "receipt": "docs/handoff/evidence/ai_verb_bridge_259.json"
+    },
+    {
+      "id": "VCGC-REQ159:ai_tool_panel",
+      "requirement": "VCGC-REQ159",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL260_AiToolPanel v0100 經 PR #447 合入、沒有交接案(CHANGED_CODE_WITHOUT_TEST) → 已驗:2026-10-04T18:34:26+00:00 rc 0 · 標記見到",
+      "next": "handoff test ai_tool_panel 實跑轉 VERIFIED",
+      "case": "ai_tool_panel",
+      "receipt": "docs/handoff/evidence/ai_tool_panel.json"
+    },
+    {
+      "id": "VCGC-REQ159:eng234-register",
+      "requirement": "VCGC-REQ159",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VDF_ENG234_UiLauncher v0100 MODULE_UNREGISTERED;v0102 缺號",
+      "next": "registry-sync --apply + 編號 --scope 補號",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ160:workstation-tabula",
+      "requirement": "VCGC-REQ160",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "容器已建 via_tabula_311 + 境內 Temurin JRE 並實擷通過;工作站境要照同一套建 → 已驗:操作員回貼 2026-10-05(Tony-NB · Windows 10.0.26200):via_tabula_311 · tabula-py 2.10.0 · jpype1 1.7.1 · pdfplumber 0.11.10 · Java = Temurin 21.0.12.1(境內 jre) → 2026-10-05 轉回 PENDING:操作員回貼是人工證據,不是可重跑收據(proof 律:rc + 目標標記缺一不得稱通過)",
+      "next": "補可重跑驗證案(RunGate 目前只收 vdf|vrn|vap,tabula 境要另出驗證站)",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vdf_ui_launcher_v0103",
+      "requirement": "VCGC-REQ161",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新模組 / 新尾版需交接案 vdf_ui_launcher_v0103 → 已驗:2026-10-04T19:36:17+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_ui_launcher_v0103 實跑轉 VERIFIED",
+      "case": "vdf_ui_launcher_v0103",
+      "receipt": "docs/handoff/evidence/vdf_ui_launcher_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ161:duck_temp_hook",
+      "requirement": "VCGC-REQ161",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新模組 / 新尾版需交接案 duck_temp_hook → 已驗:2026-10-04T19:36:25+00:00 rc 0 · 標記見到",
+      "next": "handoff test duck_temp_hook 實跑轉 VERIFIED",
+      "case": "duck_temp_hook",
+      "receipt": "docs/handoff/evidence/duck_temp_hook.json"
+    },
+    {
+      "id": "VCGC-REQ161:vcgc-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VCGC 開 duckdb 的尾版 35 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vdf-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager",
+      "reason": "VDF 開 duckdb 的尾版 38 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vrn-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN 開 duckdb 的尾版 35 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:workstation-duck-temp",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "容器 4/4 境已裝鉤並實測;工作站各境要照同一套裝",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook install --apply → status 回貼",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ162:tw-stock-group",
+      "requirement": "VCGC-REQ162",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "6 份上傳(1 份位元組重複)整合去重 → functional modules/VDF/TaiwanStockGroup.json:148 檔 · 13 類 · 37 子類 · 153 歸屬 · 9 題材;以實抓 TPEX 上櫃名單 892 檔驗市場別修 9(7 支 .TW→.TWO、2 支 .TWO→.TW 推定上市) → 2026-10-05 轉回 PENDING:產出已上傳,但沒有可重跑驗證案(只有產出檔不算收據)",
+      "next": "由 VDF 出 TaiwanStockGroup 驗證(去重 · 市場別 · TWSE 名單)並掛交接案",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ159:live-inventory-20261005",
+      "requirement": "VCGC-REQ159",
+      "state": "BLOCKED",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "容器實擷盤點 PARTIAL:SHIPPING 44,823 列(GREEN 5 · YELLOW 3)· TPEX 日價 586,004 列 892 檔 GREEN · CNN F&G 1,563 列;TWSE 被 WAF 擋、FRED 鑰缺、sentiment/aaii 只准 PS 路徑、e057 被整輪上限截斷(docs/handoff/ai/VCGC_LiveFetchInventory_20261005.md)",
+      "next": "工作站補 TWSE / FRED / sentiment / e057 後 via-monitor 回貼;全 GREEN 或合理 YELLOW 才轉 VERIFIED",
+      "case": null,
+      "receipt": "docs/handoff/ai/VCGC_LiveFetchInventory_20261005.md"
     }
   ]
 }
