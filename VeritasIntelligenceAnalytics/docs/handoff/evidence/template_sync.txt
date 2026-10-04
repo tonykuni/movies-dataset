@@ -30,13 +30,44 @@
 [政策] L50 全景 · 尾版 588 · import 0 · 提及 70 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL241_TemplateAdapter_v0102.py(家族 core)
-  [OK] ① 根因重現:前版 YELLOW → UNTESTED(灰)
-  [OK] ② 本版 YELLOW / STALE / PARTIAL → SKIP(黃)
-  [OK] ③ GATED / ABSENT / DORMANT → 灰 · NODATA → 青 · RED → FAIL
-  [OK] ④ CSS 追加:紅燈慢閃 keyframes · 黃 #f59e0b · reduced-motion 關閃 · 前版 CSS 仍在
-  [OK] ⑤ 擁有者層已換(MDL247 / 248 經 kit.lamp 自動走本版)
-  [OK] ⑥ 文字 HTML 轉義不變
-  [OK] ⑦ 加速器橋在
-  [計] CGC_MDL241_TemplateAdapter_v0102 薄尾 7/7 · PASS
-[監控] 已在背景起全景監控 pid 5512 · 閒置 1800 秒自停 · 交接閘 RED · 落後 200 提交 · 快照 44.6h · 未登 85 支(CGC_MDL069_SystemManager · CGC_MDL149_LayoutUse · CGC_MDL256_AiVerbBridge …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · CGC_MDL241_TemplateAdapter_v0101.py(家族 core)
+=== CGC_MDL241_TemplateAdapter_v0101 · 自測(夾具模板 + 夾具來源;不寫 registry、不寫真的 VIA_Reports)===
+  [OK] C00 前版 v0100 自測照過(薄尾載入不改它的行為)
+  [OK] C00 TOP25 冊:25 項 · T01..T25 · 狀態只用 IMPLEMENTED / PARTIAL / PLANNED · 每項有檢號
+  [OK] C01 綁包 __bundler/template 解包 → dc 標記 + 資源冊;.dc.html 直接認得
+  [OK] C02 token → TemplateSSOT 下一版候選(--propose 只寫到 OUT;registry 不動)
+  [OK] C03 版面區塊:header · left · tabs · pane · footer 都判出
+  [OK] C04 元件盤點(卡 / 燈 / 圖 / 表)+ 結構簽章去重
+  [OK] C05 槽位:純量 · 清單(含巢狀 ssot.lines)· 條件 · 事件都抽到
+  [OK] C06 活資料對接:runStat / engN / logs / vKpis / valRows / gallery / ssot 都對上 VIA 來源
+  [OK] C07 未對接槽照實列出並標 NODATA;模板示範資料一個字都不用
+  [OK] C08 燈號對映:四態對到模板類名 ok/wn/er/in、色相最近的 --up/--dn/--am、卡片修飾 up/dn/am
+  [OK] C09 表格自動對接:欄位同義(v.id→code)+ 衍生欄(rowCs 斑馬 · badge 燈 · onCs)
+  [OK] C10 圖槽:tally 畫成內嵌 SVG,系列色取模板色票
+  [OK] C11 分頁:兄弟 sc-if → 分頁;分類頁依來源數複製;tabs 清單帶 data-via-tab;深連結 + 鍵盤 JS 在
+  [OK] C11 版面自動調整:設計者按 5 個樣本寫死的 repeat(5,…) 格線跟著活資料列數改
+  [OK] C12 SYNCHRONIZER 登記:via.sync.state.v2 預置腳本在頁頭
+  [OK] C13 新鮮度:50h 前的 TEST 標 STALE(燈不改色)
+  [OK] C14 錯誤邊界:壞 JSON = UNREADABLE、沒檔 = ABSENT,都 NODATA,頁照出
+  [OK] C15 手機護欄:img/svg 限寬、寬表內捲、≤480px 16px 邊距(--pad 覆寫)
+  [OK] C16 深色 token 推導 + 切換鈕(模板寫死色不動 → PARTIAL)
+  [OK] C17 對比檢:燈色 / 底逐項量,不足只標
+  [OK] C18 列印 CSS:分頁攤開、浮動列藏、100vh 容器自動高
+  [OK] C19 篩選 + 黏頂表頭:清單列掛 data-via-row、篩選框、th sticky
+  [OK] C20 離線:外部 link / script / @import / 遠端 url() / 外部 img 全拿掉;0 違規
+  [OK] C20 綁包:拉丁字型內嵌(data:font)、非拉丁子集丟、大圖換 VIA 印章
+  [OK] C20 效能預算量得出(bytes · 元素數 · 燈)
+  [OK] C21 鎖:沒鎖 = NONE;lock --apply 後 OK;模板一改 = DRIFT(黃)
+  [OK] C21 改模板後 sync 標 DRIFT 並列問題
+  [OK] C22 出處:引擎版號 · UTC · 模板 sha · IR sha · 來源 sha 內嵌 JSON
+  [OK] C23 版本差異:只改 --pad → tokens_changed 只有 pad
+  [OK] C23 同一份比自己 = same
+  [OK] C24 往返冪等:同步頁再轉一次 token 不變、區塊角色都在
+  [OK] C25 投放夾:空 = NODATA;放進去自動同步;沒變不重出;資料一動重出
+  [OK] C03 沒有槽的一般 .html → 骨架模式:模板角色類名(card)套 VIA 版面,外部 script 拿掉
+  [OK] C06 總表 SYNC_INDEX 列出每份模板
+  [OK] C00 不經 VCGC 就拒跑(新動詞)
+  [OK] C00 帶加速器橋 · VIA_FROM_VCGC 標記 · 不匯入 TA-Lib
+  [OK] C00 TOP25 交叉核對:每個 IMPLEMENTED / PARTIAL 的檢號都在本自測且全過
+[模板轉接 v0101] 自測 37/37 PASS
+[監控] 背景全景監控中 pid 6176 · 觸碰 run CGC_MDL241_TemplateAdapter_v0101 · 交接閘 RED · 落後 201 提交 · 快照 44.6h · 未推 1 · 未登 85 支(CGC_MDL069_SystemManager · CGC_MDL149_LayoutUse · CGC_MDL256_AiVerbBridge …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
