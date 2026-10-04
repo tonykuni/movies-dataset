@@ -1695,6 +1695,21 @@
         "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_fetch_groups_v0102": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0102 本版 8/8 · v0101 PASS · 合計 PASS",
+      "scope": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/ui_templates/VDF_FetchGroups_Compact_v0100.html"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -3526,6 +3541,26 @@
       "next": "handoff test vdf_fetch_groups_v0101 實跑轉 VERIFIED",
       "case": "vdf_fetch_groups_v0101",
       "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ152:vdf_fetch_groups_v0102",
+      "requirement": "VCGC-REQ152",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152)",
+      "next": "handoff test vdf_fetch_groups_v0102 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0102",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ152:eng234-wire",
+      "requirement": "VCGC-REQ152",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "ENG234 UiLauncher v0102 與其 PS 啟動器只在工作站(倉內與 GitHub 都沒有);對接欄空白 · Start-CeleritasPS7 null",
+      "next": "工作站 git add / commit / push ENG234 與其 .ps1 → AI 接對接快照、查加速器 null",
+      "case": null,
+      "receipt": null
     }
   ]
 }

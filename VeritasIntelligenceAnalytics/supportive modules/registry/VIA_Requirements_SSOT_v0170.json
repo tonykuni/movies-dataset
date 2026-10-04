@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 57,
+  "PARTIAL": 58,
   "MISSING": 1
  },
  "requirements": [
@@ -4915,6 +4915,31 @@
    "modules": [
     "VDF_MDL012_FetchGroups_v0101.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ152",
+   "subsystem": "VDF",
+   "topic": "啟動指令對接 U/I · 自適應任何範本",
+   "requirement": "操作員令(2026-10-04,貼回工作站 VDF HTML U/I(ENG234 UiLauncher v0102)輸出後):「將啟動指令對接u/i可以自適用式其他模板範本」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Workflow_VDF_SSOT_v0104.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
+   ],
+   "evidence": "MDL012 v0102 ui --template 自測 8/8(Jinja 沙盒 · 逐變數代換 · 注入 · 沙盒擋 __subclasses__ · 找不到範本誠實報);Invoke-VDF-FetchGroupsUI-v0100.ps1 pwsh 解析 0 錯 · 容器跑三模式(正典頁經 Invoke-VIAPython 加速 · -Template 範例範本 · -List)皆 rc 0;對接快照 VDF_FetchGroups_SNAPSHOT_latest.json",
+   "next": "工作站 ENG234 UiLauncher v0102 不在倉(GitHub 各分支 / PR 都沒有)→ 操作員推上來後,把它的「對接:」接到 VDF_FetchGroups_SNAPSHOT_latest.json;其輸出的「Start-CeleritasPS7 掛不上(null)」要看它的原始碼才能定位(正本 VeritasCeleritas.PS7.ps1 已有 null 初始化保護;政策入口是 PS-ACCEL 橋 / Invoke-VIACeleritasScoped)",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "將啟動指令對接u/i可以自適用式其他模板範本",
+     "recorded_at": "2026-10-04T07:20:00+00:00"
+    }
+   ],
+   "modules": [
+    "VDF_MDL012_FetchGroups_v0102.py",
+    "Invoke-VDF-FetchGroupsUI-v0100.ps1"
+   ]
   }
  ],
  "non_requirements": [
@@ -5079,5 +5104,5 @@
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
  "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1);+VCGC-REQ150(PARTIAL:擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化 · MDL012 v0100 · 冊 VDF_FetchGroups_SSOT_v0100;歸屬回指工作流冊 VDF v0103 VDF-WKF014);+VCGC-REQ151(PARTIAL:族群操作頁 · MDL012 v0101 ui;歸屬回指 VDF-WKF014-STP003)",
- "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改)"
+ "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改);+VCGC-REQ152(PARTIAL:啟動指令對接 U/I · 自適應範本;歸屬回指 VDF-WKF014-STP004 · 工作流冊 v0104 · 盤點冊 v0152)"
 }
