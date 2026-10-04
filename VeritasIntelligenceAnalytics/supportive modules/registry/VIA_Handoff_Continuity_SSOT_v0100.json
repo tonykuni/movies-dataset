@@ -1710,6 +1710,20 @@
         "functional modules/VDF/ui_templates/VDF_FetchGroups_Compact_v0100.html"
       ],
       "timeout_seconds": 1200
+    },
+    "ui_engine_v0100": {
+      "argv": [
+        "CGC_MDL257_UIEngine",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL257_UIEngine v0100 本版 9/9 · 合計 PASS",
+      "scope": "CGC_MDL257 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL257_UIEngine_v0100.py",
+        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json",
+        "supportive modules/ui_support/ui_templates/VIA_UIEngine_MinimalGrid_v0100.html"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -3559,6 +3573,26 @@
       "owner": "操作員",
       "reason": "ENG234 UiLauncher v0102 與其 PS 啟動器只在工作站(倉內與 GitHub 都沒有);對接欄空白 · Start-CeleritasPS7 null",
       "next": "工作站 git add / commit / push ENG234 與其 .ps1 → AI 接對接快照、查加速器 null",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ153:ui_engine_v0100",
+      "requirement": "VCGC-REQ153",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "CGC_MDL257 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153)",
+      "next": "handoff test ui_engine_v0100 實跑轉 VERIFIED",
+      "case": "ui_engine_v0100",
+      "receipt": "docs/handoff/evidence/ui_engine_v0100.json"
+    },
+    {
+      "id": "VCGC-REQ153:workstation-lkgc",
+      "requirement": "VCGC-REQ153",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "「照我測過的結果安裝」= LKGC;工作站要先 EnvGovernance 全綠存 LKGC_latest(可用)才有鎖可照",
+      "next": "工作站 via-envgov run → 全綠晉升 LKGC → Start-VIA-UIEngine -Install",
       "case": null,
       "receipt": null
     }

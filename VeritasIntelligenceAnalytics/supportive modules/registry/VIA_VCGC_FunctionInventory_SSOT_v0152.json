@@ -2555,6 +2555,38 @@
    "deps": [
     "Invoke-VDF-FetchGroupsUI-v*.ps1"
    ]
+  },
+  {
+   "id": "C-ui_engine_v0100",
+   "name": "交接案 ui_engine_v0100(CGC_MDL257 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153))",
+   "argv": [
+    "run",
+    "CGC_MDL257_UIEngine",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "supportive modules/registry/CGC_MDL257_UIEngine_v0100.py",
+    "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json",
+    "supportive modules/ui_support/ui_templates/VIA_UIEngine_MinimalGrid_v0100.html"
+   ]
+  },
+  {
+   "id": "P-ui_engine",
+   "name": "一鍵 U/I 引擎 PS 啟動器:語法(pwsh Parser)+ 章在(CELERITAS-TEMPLATE-JOIN · PS-ACCEL · Invoke-VIAPython · RunGate · LKGC · build)",
+   "kind": "ps",
+   "quick": false,
+   "must": [
+    "CELERITAS-TEMPLATE-JOIN",
+    "VIA:PS-ACCEL",
+    "Invoke-VIAPython",
+    "CGC_MDL137_RunGate",
+    "CGC_MDL135_EnvGovernance",
+    "CGC_MDL257_UIEngine"
+   ],
+   "deps": [
+    "Start-VIA-UIEngine-v*.ps1"
+   ]
   }
  ],
  "coverage": {
@@ -3095,6 +3127,9 @@
    },
    "vdf_fetch_groups_v0102": {
     "station": "C-vdf_fetch_groups_v0102"
+   },
+   "ui_engine_v0100": {
+    "station": "C-ui_engine_v0100"
    }
   },
   "workflow": {
@@ -3299,6 +3334,12 @@
    },
    "VCGC-WKF017-STP005": {
     "station": "C-celeritas_gate_v0103"
+   },
+   "VCGC-WKF018-STP001": {
+    "station": "C-ui_engine_v0100"
+   },
+   "VCGC-WKF018-STP002": {
+    "station": "P-ui_engine"
    }
   },
   "ps": {
@@ -3361,5 +3402,5 @@
  "why_v0148": "PR #442 審查:網路鎖版改由 SUP_MDL737 v0110 導向(凍結檔原樣),交接站同步",
  "why_v0149": "VCGC-REQ144 / REQ145:交接新案 vdf_list_stock_v0101 · vdf_fetch_v0102 · bundle_tool_v0101 · vdf_fetch_fill 各一站 + coverage.case;其餘一字不動(只增)",
  "why_v0150": "VCGC-REQ146:交接新案 5 條(MDL009 v0102 · MDL008 v0104 · 掃橋器 v0110 · 覆蓋探針 v0106 · 版本全景載入器)各一站 + PS 站 P-vdf_fill(Invoke-VDF-FetchFill 章字;PS 入口覆蓋只認主控台 / Step1 兩支,本站不另立入口鍵);其餘一字不動(只增)",
- "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改"
+ "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153)"
 }
