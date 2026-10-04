@@ -40,12 +40,11 @@
 === VDF_MDL011_AkshareFetcher v0102 · 薄尾自測(deep-macro · __rows__)===
   [OK] ① v0101 自測過(params 無註冊表 NODATA) · rc 0
   [OK] ② __rows__ 明列參數組(kind 與 path 綁定,不做笛卡兒積;純量併入每組);清單寫法照 v0100 笛卡兒積 · [{'period': '1990-', 'kind': '月度数据', 'path': '价格指数 > A'}, {'period': '1990-', 'kind': '年度数据', 'path': '人口 > B'}]
-  [OK] ③ 選單正本在(同夾版號尾版):中國經濟 · 各國經濟 · 航運三組都有;NBS 走 __rows__;Drewry 八航線;全歷史(start ≤ 1990;FULL_SNAPSHOT 一呼叫回全歷史,incremental 可續跑) · VDF_AkshareSelection_MacroShipping_v0100.json
+  [OK] ③ 選單正本在(同夾版號尾版):中國經濟 · 各國經濟 · 航運三組都有;NBS 走 __rows__;Drewry 八航線;backfill 全歷史 · VDF_AkshareSelection_MacroShipping_v0100.json
   [OK] ⑥ tier:core = 選單本體(NBS 全國月 / 季);full = + 全國年度 + 分省 × 31 省(extra_rows 併進 __rows__);沒有的 tier = None · (721, 2909)
   [OK] ④ 計畫(零網路):cpi 1 序列 + NBS 2 組 = 3 序列;冊外函式照實略過 · {'groups': {'china_macro': {'fns': 2, 'series': 3, 'windows': 3}}, 'series': 3, 'skipped': [{'fn': 'no_such_fn', 'reason': 'not in registry'}]}
-  [OK] ⑦ NBS 長區間失敗 → 切 5 年段逐查、按指標列對齊拼回(新→舊 15 欄不重複);短區間一次過不切段 · ((2, 15), ['2012-2026', '2022-2026', '2017-2021', '2012-2016', '2022-2026'])
-  [OK] ⑧ NBS 呼叫走 v0102 節流 / 切段(原件 _call 由本版接手;其他函式照原件重試)
   [OK] ⑤ L103:模組層加速器橋 + 網路工具橋(def _via_net);不碰 TA-Lib;不寫同意閘
-  [計] VDF_MDL011_AkshareFetcher v0102 本版 8/8 · v0101 PASS · 合計 PASS
-  [同步] 樹有變 · 註冊冊待同步 {'new': 5, 'changed': 23, 'stale': 0, 'expected': 15679, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 已在背景起全景監控 pid 6444 · 閒置 1800 秒自停 · 交接閘 RED · 落後 128 提交 · 快照 32.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [計] VDF_MDL011_AkshareFetcher v0102 本版 6/6 · v0101 PASS · 合計 PASS
+/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL011_AkshareFetcher_v0100.py:3: SyntaxWarning: invalid escape sequence '\V'
+  """VDF_MDL011_AkshareFetcher v0100 — 擷取來源組 AKSHARE:VAKE(Veritas AKShare Knowledge & Extraction Engine v0200)
+[監控] 背景全景監控中 pid 29042 · 觸碰 run VDF_MDL011_AkshareFetcher · 交接閘 RED · 落後 113 提交 · 快照 31.0h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
