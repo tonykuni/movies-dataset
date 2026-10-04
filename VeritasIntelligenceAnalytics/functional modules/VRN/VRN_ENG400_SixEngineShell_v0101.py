@@ -128,8 +128,14 @@ class OcrEngine(PRIOR.OcrEngine):   # 同名承接:前版 selftest 以 __name__ 
         row["work_dir"] = str(work)
         page_no = int(cfg.get("page", 1))
         dpi = int(cfg.get("render_dpi", 300))        # 重型預設 300;350 只在解析度不足最後(正典)
-        img = PRIOR._tail("VRN_OCRPlugins")._render_page(pdf, page_no, dpi, work / "page.png")
-        row["artifacts"].append(str(img))
+        try:   # 渲染失敗不是 paddle 的錯:隔離成 ERROR,不丟例外、不記後端 BROKEN
+            img = PRIOR._tail("VRN_OCRPlugins")._render_page(pdf, page_no, dpi, work / "page.png")
+            row["artifacts"].append(str(img))
+        except Exception as exc:
+            row.update(state="ERROR", light="RED",
+                       error=f"render: {type(exc).__name__}: {str(exc)[:200]}")
+            self.record("heavy", {"state": "ERROR", "stage": "render"})
+            return row
         try:
             ocr = paddleocr.PaddleOCR(lang=cfg.get("paddle_lang", "ch"))
             got = ocr.ocr(str(img))
@@ -206,11 +212,23 @@ def selftest() -> int:
     oc = OcrEngine(sink)
     ck("④ heavy 座位已實接(callable,不再是字串宣告)", callable(oc.ADAPTERS["heavy"]))
     work = tempfile.mkdtemp(prefix="eng400h-st-")
-    r = oc.heavy(__file__, work)
+    src = __file__
+    try:   # 有 fitz 就合成真 PDF 當重型測資(拿 .py 餵引擎只測得到隔離,測不到實跑)
+        import fitz
+        pdfp = Path(work) / "heavy.pdf"
+        d = fitz.open(); pg = d.new_page(width=300, height=200)
+        pg.insert_text((30, 100), "HEAVY CHECK 123", fontsize=20)
+        d.save(str(pdfp)); d.close()
+        src = str(pdfp)
+    except ImportError:
+        pass
+    r = oc.heavy(src, work)
     has_paddle = r["state"] != "UNAVAILABLE"
     if has_paddle:
-        ck("⑤ paddle 在境:實跑(含 3.x 墊片)· 狀態 %s" % r["state"],
+        ck("⑤ paddle 在境:實跑(含 3.x 墊片)· 狀態 %s · 字 %s" % (r["state"], r["metadata"].get("word_count")),
            r["state"] in ("EXTRACTED_UNVERIFIED", "ERROR") and "compat_shim" in r["metadata"])
+        if r["state"] == "ERROR":
+            print("      [誠實記] %s" % r.get("error", "")[:160])
     else:
         ck("⑤ paddle 缺席:誠實 UNAVAILABLE + 車道指路 + 後端健康名單",
            PADDLE_LANE in r.get("error", "") and "backend_health" in r["metadata"])
