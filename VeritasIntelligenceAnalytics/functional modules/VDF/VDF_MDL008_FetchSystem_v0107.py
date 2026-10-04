@@ -100,9 +100,29 @@ _CURL_KEYS = ("params", "headers", "json", "data", "timeout", "cookies", "allow_
 _TL7 = threading.local()
 
 
+_META_KEYS = ("__file__", "__path__", "__version__", "__package__", "__spec__", "__loader__", "__doc__")
+
+
 def install_live_routes_v0107(nt) -> None:
-    """v0105 live 改道(requests · urllib · yfinance · akshare 過閘)+ curl_cffi Session.request → 改道後的 requests。"""
+    """v0105 live 改道(requests · urllib · yfinance · akshare 過閘)+ curl_cffi Session.request → 改道後的 requests。
+    v0100 的過閘替身模組只抄非 dunder 屬性 → akshare.__file__ / __path__ / __version__ 不見,MDL011 deep-macro 的離線 scan
+    (AST 盤點讀 akshare.__file__)當場 AttributeError;本版把真模組的套件中繼資料抄回替身(呼叫照樣過閘)。"""
+    reals = {}
+    for name in ("akshare", "yfinance"):
+        try:
+            reals[name] = __import__(name)
+        except Exception:
+            continue
     _LIVE_V0105(nt)
+    for name, real in reals.items():
+        proxy = sys.modules.get(name)
+        if proxy is not None and proxy is not real:
+            for k in _META_KEYS:
+                if hasattr(real, k):
+                    try:
+                        setattr(proxy, k, getattr(real, k))
+                    except (AttributeError, TypeError):
+                        pass
     try:
         from curl_cffi.requests import Session as CurlSession
     except Exception:                                  # 沒裝 curl_cffi = 沒有這條路要收
@@ -197,7 +217,12 @@ st = m.BASE.FIX_STATS
 ok = (r1.json() == {"data": [{"_id": "root"}]} and r1.status_code == 200 and r2.json() == {"echo": {"q": 1}}
       and calls[0] == ("GET", "https://nbs.invalid/tree?pid=&code=1", "https://nbs.invalid/r") and calls[1][0] == "POST"
       and len(calls) == 3 and st["curl"] == 3 and st["requests"] == 3)
-print("PROBE", ok, json.dumps(st), len(calls))
+import importlib.util as _u
+meta = True
+if _u.find_spec("akshare") is not None:
+    ak = sys.modules.get("akshare")
+    meta = bool(ak is not None and getattr(ak, "__file__", None) and getattr(ak, "__path__", None) and getattr(ak, "__version__", None))
+print("PROBE", ok and meta, json.dumps(st), len(calls), "meta", meta)
 '''
 
 
@@ -220,7 +245,7 @@ def selftest() -> int:
                         encoding="utf-8", errors="replace", timeout=600, env=env)
     line = next((x for x in pr.stdout.splitlines() if x.startswith("PROBE ")), "")
     chk("② live(子行程):curl_cffi Session.get / post / 模組層 get → 網路工具 http_bytes / post_json(帶 params · headers · json);"
-        "回應 .json() · status_code 同介面;計數 curl 3 · requests 3(一請求一抓)",
+        "回應 .json() · status_code 同介面;計數 curl 3 · requests 3(一請求一抓);akshare 過閘替身保有 __file__ / __path__ / __version__(deep-macro 離線 scan 要)",
         line.startswith("PROBE True"), line or pr.stderr.strip()[-200:])
     chk("③ 換裝:BASE live 改道 / run / 冊載入全指本版", BASE._install_live_routes is install_live_routes_v0107 and BASE.run is run_v0107
         and V0101.load_book_v0101 is load_book_v0107)
