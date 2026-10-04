@@ -83,6 +83,12 @@ PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
 
+
+def __getattr__(name: str):
+    """薄尾轉接:本版沒蓋的公開名稱照前版(TAILAPI)。"""
+    return getattr(PRIOR, name)
+
+
 VIA = PRIOR.VIA
 TAG = f"CGC_MDL261_UIEngine v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 PRIOR.TAG = TAG

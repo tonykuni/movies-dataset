@@ -73,6 +73,13 @@ _spec = importlib.util.spec_from_file_location("VDF_MDL012_FetchGroups_v0102_for
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
+
+
+def __getattr__(name: str):
+    """薄尾轉接:本版沒蓋的公開名稱照前版(TAILAPI)。"""
+    return getattr(PRIOR, name)
+
+
 V0101 = PRIOR.PRIOR
 V0100 = V0101.PRIOR
 

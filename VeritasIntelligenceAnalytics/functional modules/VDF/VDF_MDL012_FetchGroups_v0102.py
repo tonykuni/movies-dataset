@@ -78,6 +78,12 @@ PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
 _spec.loader.exec_module(PRIOR)
 
+
+def __getattr__(name: str):
+    """薄尾轉接:本版沒蓋的公開名稱照前版(TAILAPI)。"""
+    return getattr(PRIOR, name)
+
+
 TAG = f"VDF_MDL012_FetchGroups v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 PRIOR.TAG = TAG
 PRIOR.PRIOR.TAG = TAG
@@ -269,7 +275,7 @@ def cmd_ui(argv: list) -> int:
 
 
 # ---------- 自測 ----------
-def selftest() -> int:
+def _selftest_v0102() -> int:
     import contextlib
     import io
     import shutil
@@ -347,6 +353,16 @@ def selftest() -> int:
     ok = sum(res)
     print(f"[計] {TAG} 本版 {ok}/{len(res)} · v0101 {'PASS' if prior_rc == 0 else 'FAIL'} · 合計 {'PASS' if ok == len(res) else 'FAIL'}")
     return 0 if ok == len(res) else 1
+
+
+def selftest() -> int:
+    """本版斷言寫的是冊 v0100 的族群(冊 v0101 起 TW_DAILY 拆量價 / 籌碼)→ 自測期間釘冊 v0100,跑完還原。"""
+    keep_glob = PRIOR.PRIOR.BOOK_GLOB
+    PRIOR.PRIOR.BOOK_GLOB = "VDF_FetchGroups_SSOT_v0100.json"
+    try:
+        return _selftest_v0102()
+    finally:
+        PRIOR.PRIOR.BOOK_GLOB = keep_glob
 
 
 def main(argv=None) -> int:
