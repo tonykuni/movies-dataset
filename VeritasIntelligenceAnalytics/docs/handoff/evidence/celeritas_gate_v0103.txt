@@ -27,12 +27,12 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 67 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 574 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · CGC_MDL183_CeleritasPolicyGate_v0103.py(家族 core)
 === Celeritas 產出契約閘 v0101(批715 · 執法 L102)· 自測(沙盒 · 零網路 · 唯讀)===
-  [OK] ① 掃描面的排除清單**問正典**(L77),不自己列一張。**負控**:正典問不到要誠實 NODATA —— 硬掃出來的分母是假的,比不掃還糟 ((掃描面 py 3361 · ps 1008))
+  [OK] ① 掃描面的排除清單**問正典**(L77),不自己列一張。**負控**:正典問不到要誠實 NODATA —— 硬掃出來的分母是假的,比不掃還糟 ((掃描面 py 3363 · ps 1008))
   [OK] ② **提到加速器的名字 ≠ 有橋**(批715 根因):舊導入器用『文中出現加速器名字』當『已橋』,**18 支從來沒有橋卻一直被報成綠的**;而兩支加速器正本自己都帶真標記,那道守衛從來沒保護過任何東西。**正控**:判準只認標記本身 ((只提到名字→有橋? False))
   [OK] ③ **PS 稽核一律問引擎**(ANC-30 的 `xps_audit` / `xps_join`),本支一條規則都不抄(LL404)。**正控**:`xps_join` 出來的要帶章;**負控**:裸 .ps1 要被判缺 ((裸→joined False/缺 3 · join 出來帶章 True))
   [OK] ④ **既有債棘輪**:樹上 838 支既有 .ps1 沒有模板章 —— 那是**既有債不是違律**(L70:未經操作員逐次許可不得修改任何 .ps1)。基線在**資料檔**不在碼裡(批709 教訓)。**負控**:基線以外新冒出來的一支都算紅,不然這道閘等於沒有 ((既有債 50 · 基線外新缺 0))
@@ -49,7 +49,9 @@
   [計] v0102 薄尾 4/4 · v0101 八檢 PASS · 合計 PASS
 === CGC_MDL183_CeleritasPolicyGate v0103 薄尾加檢(無版號舊 .ps1 有帶章尾版 = 版史)===
   [OK] ⑬ 無版號舊檔 + 帶章版號尾版 = 版史(不紅);尾版也沒章 · 沒同族 · 只是前綴相同 照紅 (版史 [{'file': 'x/Old.ps1', 'tail': 'x/Old-v0101.ps1'}] · 新缺 ['x/Bad-v0102.ps1', 'x/Bad.ps1', 'x/Lone.ps1', 'x/Older.ps1'])
-  [OK] ⑭ 實樹:Invoke-VIA-Step1-SyncAndLKGC.ps1 歸版史(尾版 -v0101 帶章);基線外新缺 0 (新缺 [])
+  [OK] ⑯ 活冊仍指名舊檔 = 照紅(history_blocked 附呼叫者);只看各家族尾版冊 · 敘述欄 / glob / .jsonl 號冊不算;尾版冊宣告 retired_entries(檔單照只增保留)後才歸版史(PR #446 Codex P1) (呼叫者 ['VIA_Bundle_SSOT_v0102.json:.files[1]'])
+  [OK] ⑭ 實樹:Invoke-VIA-Step1-SyncAndLKGC.ps1 歸版史(尾版 -v0101 帶章 · 子系統包冊 v0103 宣告退役入口);基線外新缺 0 (新缺 [])
   [OK] ⑮ report 與模組層 scan 同一把尺(v0101 report 讀本版 scan)
-  [計] v0103 薄尾 3/3 · v0102 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 29536 · 觸碰 run CGC_MDL183_CeleritasPolicyGate · 交接閘 RED · 落後 90 提交 · 快照 29.9h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [計] v0103 薄尾 4/4 · v0102 PASS · 合計 PASS
+  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 8, 'stale': 0, 'expected': 15674, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 背景全景監控中 pid 29042 · 觸碰 run CGC_MDL183_CeleritasPolicyGate · 交接閘 RED · 落後 116 提交 · 快照 31.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
