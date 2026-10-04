@@ -234,10 +234,13 @@ def selftest() -> int:
     bk = load_book_v0106()
     prev = _LOAD_V0105(PRIOR.BOOK_V0104)
     E = {r["id"]: r for r in bk["engines"]}
-    defs = {(n.name, n.lineno) for n in ast.walk(ast.parse((HERE / E["011"]["file"]).read_text(encoding="utf-8"))) if isinstance(n, ast.FunctionDef)}
+    def _defs(fname):
+        return {(n.name, n.lineno) for n in ast.walk(ast.parse((HERE / fname).read_text(encoding="utf-8"))) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
     same = [r["id"] for r in prev["engines"] if r["id"] != "011" and r != E.get(r["id"])]
-    chk("③ 冊 v0105:MDL011 → v0101(擷取函式 AST 位置對得上)· 其他 34 支與 v0104 逐欄相同",
-        E["011"]["file"] == "VDF_MDL011_AkshareFetcher_v0101.py" and all((f["name"], f["line"]) in defs for f in E["011"]["fetch_functions"])
+    ff = E["011"]["fetch_functions"]
+    chk("③ 冊 v0105:MDL011 → v0101;擷取函式留原件真擷取點(帶 file,AST 名@行對得上;PR #446 Codex P2)· 其他 34 支與 v0104 逐欄相同",
+        E["011"]["file"] == "VDF_MDL011_AkshareFetcher_v0101.py" and {f["name"] for f in ff} == {"_get", "_call", "run_selection"}
+        and all((f["name"], f["line"]) in _defs(f.get("file") or E["011"]["file"]) for f in ff)
         and not same and len(bk["engines"]) == len(prev["engines"]), same[:3])
     with tempfile.TemporaryDirectory() as tmp:
         rows = [dict(E["003"], needs=[])]

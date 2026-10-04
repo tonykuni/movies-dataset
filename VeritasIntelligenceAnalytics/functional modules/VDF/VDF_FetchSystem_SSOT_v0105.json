@@ -404,12 +404,19 @@
    "origin_sha256": "c158aa33cc25dc9e00cf8ad9f2ce4b25db2f94b3ac33e40f61ebbb8e66c34c9d",
    "fetch_functions": [
     {
-     "name": "cmd_params_v0101",
-     "line": 85
+     "name": "_get",
+     "line": 402,
+     "file": "VDF_MDL011_AkshareFetcher_v0100.py"
     },
     {
-     "name": "main",
-     "line": 97
+     "name": "_call",
+     "line": 1495,
+     "file": "VDF_MDL011_AkshareFetcher_v0100.py"
+    },
+    {
+     "name": "run_selection",
+     "line": 1544,
+     "file": "VDF_MDL011_AkshareFetcher_v0100.py"
     }
    ],
    "outputs": [],
@@ -1129,5 +1136,5 @@
  "why_v0102": "操作員 2026-10-03「要經過中英文名稱進行局部識別核對 不可刪」「將這幾家有股票的代碼中英文名稱寫入程式識別 沒幾家」:MDL009 改指 v0101(鎖定 regex 擋區裡 8 家上市股票 2022 聚亨 · 2023 燁輝 · 2024 志聯 · 2025 千興 · 2027 大成鋼 · 2028 威致 · 2029 盛餘 · 2030 彰源 以代碼 + 中英文簡稱寫入程式核對後保留;對不上 / 冊外照留亮黃);其他引擎與 v0101 相同",
  "why_v0103": "VCGC-REQ146:MDL009 改指 v0102(CGC_MDL230 ③ 網路工具橋 AST 真橋;年區代碼識別 · 欄位聯集照 v0101);其他 34 支與 v0102 相同",
  "why_v0104": "容器開閘實抓(操作員 2026-10-04 授權)量到的冊設定錯:e054 指尾版 v0111 = 唯讀狀態卡(只門檢不回補)→ 改指回補工人 v0109;e056 / e057 / e063 要讀 e054 填的 tw_daily_prices / DB_TW → needs 加 e054;MDL011 沒存 default_selection 時 rc 0 卻零擷取 → nodata_markers 標記改判 NODATA(rc 2)",
- "why_v0105": "容器裝上 akshare 1.19.1 後整合測試量到:MDL011 block 自測 params 在新輸出根沒有 vake_registry.json 時 KeyError(rc 1)→ 改指 v0101(無註冊表 = NODATA rc 2,有就照 v0100);擷取函式定位指本版 AST;其他 34 支與 v0104 相同"
+ "why_v0105": "容器裝上 akshare 1.19.1 後整合測試量到:MDL011 block 自測 params 在新輸出根沒有 vake_registry.json 時 KeyError(rc 1)→ 改指 v0101(無註冊表 = NODATA rc 2,有就照 v0100);擷取函式定位留原件真擷取點(_get · _call · run_selection,帶 file 指 v0100;薄尾只換 cmd_params;PR #446 Codex P2);其他 34 支與 v0104 相同"
 }
