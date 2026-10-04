@@ -9,6 +9,9 @@
     ① urllib.request.urlopen → 鎖版網路工具(GET = http_bytes · 帶 data = post_json);網路工具自己內部也用 urllib
        → 執行緒旗標防重入(工具內的呼叫走原 urlopen,不遞迴)。回應物件給 read() · status · getcode() · headers。
     ② 計數:requests 改道 → requests · urllib 改道 → net · yfinance 過閘 → yf(子行程結尾「網路計數」照實印)。
+    ③ 輸出歸位:75 個 ENG 家族把輸出寫死成 `VDF / "output_hub" / …`(VDF 由引擎檔位置推),live 實抓全寫進倉內 / 下載包夾,
+       不進 --home。子行程裡把 `… / "output_hub"` 改成 `Path(<--home>) / "output_hub"`:頂層引擎在 compile_engine 改,
+       VDF 樹內其他模組(薄尾用 spec_from_file_location 載的前版本體)在 SourceFileLoader.get_code 改。只動記憶體,原檔不動。
 其餘(冊 v0103 · fill / fill-matrix / --progress · 雙閘 rc 4)照 v0104。不碰 TA-Lib;不讀寫同意閘(只問網路工具)。
 """
 from __future__ import annotations
@@ -58,6 +61,7 @@ def _via_net():
         return None
 # ===== [VIA:NET-BRIDGE:END] =====
 
+import ast
 import contextlib
 import importlib.util
 import io
@@ -90,7 +94,14 @@ def __getattr__(name):
 
 
 _RUN_V0104 = PRIOR.run_v0104
+BOOK_V0104 = HERE / "VDF_FetchSystem_SSOT_v0104.json"
+
+
+def load_book_v0105(path: Path = BOOK_V0104) -> dict:
+    return PRIOR.V0102.PRIOR._LOAD_BOOK_V0100(path)
 _LIVE_V0100 = BASE._install_live_routes
+_COMPILE_V0100 = BASE.compile_engine
+_LOAD_V0104 = PRIOR.load_book_v0104
 _TL = threading.local()
 
 
@@ -99,9 +110,20 @@ def run_v0105(*args, **kwargs):
     keep = PRIOR.__dict__.get("__file__")
     PRIOR.__dict__["__file__"] = str(Path(__file__).resolve())
     try:
-        return _RUN_V0104(*args, **kwargs)
+        out = _RUN_V0104(*args, **kwargs)
     finally:
         PRIOR.__dict__["__file__"] = keep
+    marks = {r["id"]: r.get("nodata_markers") or [] for r in (args[0] if args else kwargs.get("rows") or [])}
+    for x in out:                                      # rc 0 卻零擷取(冊上 nodata_markers 見於日誌)→ 照實改判 NODATA(rc 2)
+        if x.get("rc") == 0 and marks.get(x["id"]):
+            try:
+                log = Path(x["log"]).read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                log = ""
+            hit = [m for m in marks[x["id"]] if m in log]
+            if hit:
+                x["rc"], x["tail"] = 2, (x.get("tail") or []) + [f"[MDL008] NODATA:rc 0 但日誌見「{hit[0]}」= 零擷取(冊 nodata_markers)"]
+    return out
 
 
 class _RoutedResponse(io.BytesIO):
@@ -183,8 +205,85 @@ def install_live_routes_v0105(nt) -> None:
             setattr(yf, name, counted)
 
 
+class _HubRewriter(ast.NodeTransformer):
+    """`<任何> / "output_hub"` → `__import__("pathlib").Path(<home>) / "output_hub"`(其後的 / "mega" … 照接)。"""
+
+    def __init__(self, home: str):
+        self.home, self.n = home, 0
+
+    def visit_BinOp(self, node):
+        self.generic_visit(node)
+        if isinstance(node.op, ast.Div) and isinstance(node.right, ast.Constant) and node.right.value == "output_hub":
+            self.n += 1
+            path_call = ast.Call(func=ast.Attribute(value=ast.Call(func=ast.Name(id="__import__", ctx=ast.Load()),
+                                                                   args=[ast.Constant("pathlib")], keywords=[]),
+                                                    attr="Path", ctx=ast.Load()), args=[ast.Constant(self.home)], keywords=[])
+            return ast.copy_location(ast.BinOp(left=path_call, op=ast.Div(), right=ast.Constant("output_hub")), node)
+        return node
+
+
+def rewrite_tree_v0105(tree, home) -> int:
+    """舊佈局絕對路徑(v0100 同一律)+ output_hub 歸位;回改寫筆數。"""
+    n = 0
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            for pre in BASE.LEGACY_PREFIXES:
+                if node.value.startswith(pre):
+                    rest = [x for x in node.value[len(pre):].replace("\\", "/").split("/") if x]
+                    node.value = str(Path(home, *rest))
+                    n += 1
+                    break
+    rw = _HubRewriter(str(Path(home)))
+    rw.visit(tree)
+    ast.fix_missing_locations(tree)
+    return n + rw.n
+
+
+def compile_engine_v0105(path: Path, home: Path):
+    """同 v0100 compile_engine(本體碼 · __main__ 段碼 · 改寫筆數),多 output_hub 歸位。"""
+    src = Path(path).read_text(encoding="utf-8", errors="replace")
+    tree = ast.parse(src, filename=str(path))
+    n = rewrite_tree_v0105(tree, home)
+    body = [x for x in tree.body if not BASE._is_main_guard(x)]
+    mains = [x for x in tree.body if BASE._is_main_guard(x)]
+    mk = lambda stmts: compile(ast.Module(body=stmts, type_ignores=[]), str(path), "exec")  # noqa: E731
+    return mk(body), mk(mains), n
+
+
+HUB_STATS_V0105 = {"modules": 0, "rewrites": 0}
+
+
+def install_loader_hub_v0105(home, root: Path = HERE) -> None:
+    """子行程:root 樹內每個以檔案載入的 .py(含薄尾 spec_from_file_location 的前版本體)載入時照樣改寫;樹外照舊。"""
+    import importlib.machinery
+    loader = importlib.machinery.SourceFileLoader
+    if getattr(loader.get_code, "_via_hub_v0105", False):
+        return
+    real_get_code = loader.get_code
+    root_s = str(Path(root).resolve())
+
+    def get_code(self, fullname):
+        path = str(getattr(self, "path", "") or "")
+        try:
+            inside = path.endswith(".py") and str(Path(path).resolve()).startswith(root_s)
+        except OSError:
+            inside = False
+        if not inside:
+            return real_get_code(self, fullname)
+        tree = ast.parse(Path(path).read_text(encoding="utf-8", errors="replace"), filename=path)
+        n = rewrite_tree_v0105(tree, home)
+        HUB_STATS_V0105["modules"] += 1
+        HUB_STATS_V0105["rewrites"] += n
+        return compile(tree, path, "exec")
+    get_code._via_hub_v0105 = True
+    loader.get_code = get_code
+
+
 def _install_v0105() -> None:
     BASE._install_live_routes = install_live_routes_v0105
+    BASE.compile_engine = compile_engine_v0105
+    V0101.load_book_v0101, V0101.BOOK_V0101, BASE.load_book = load_book_v0105, BOOK_V0104, load_book_v0105
+    PRIOR.load_book_v0104 = load_book_v0105
     PRIOR.run_v0104 = V0101.run_v0101 = PRIOR.V0102.run_v0102 = BASE.run = run_v0105
 
 
@@ -195,6 +294,13 @@ def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args == ["--selftest"]:
         return selftest()
+    if args[:1] == ["_child"] and len(args) > 2:
+        install_loader_hub_v0105(args[2])             # 子行程:VDF 樹內模組的 output_hub 一律歸位到 --home
+        try:
+            return PRIOR.main(args)
+        finally:
+            if HUB_STATS_V0105["modules"]:
+                print(f"[MDL008] output_hub 歸位 → {Path(args[2]) / 'output_hub'} · 模組 {HUB_STATS_V0105['modules']} · 改寫 {HUB_STATS_V0105['rewrites']} 處", flush=True)
     return PRIOR.main(args)
 
 
@@ -208,6 +314,9 @@ def selftest() -> int:
 
     PRIOR.run_v0104 = _RUN_V0104                       # 前版自測驗前版自己的子行程鏈
     BASE._install_live_routes = _LIVE_V0100
+    BASE.compile_engine = _COMPILE_V0100
+    PRIOR.load_book_v0104 = _LOAD_V0104
+    PRIOR._install_v0104()                             # 前版自測驗前版自己的冊(v0103)
     try:
         rc0 = PRIOR.selftest()
     finally:
@@ -250,6 +359,53 @@ def selftest() -> int:
     chk("④ live:requests 照 v0100 改道且計數 · urllib 計數(真流量不再是 0)· 工具內部呼叫不重複改道(一請求一抓)",
         r.status_code == 200 and stats["requests"] == 1 and stats["net"] == 2 and len([c for c in calls if c[0] == "GET"]) == 2, (stats, len(calls)))
     chk("⑤ 呼叫完原 urlopen / requests 還原(自測不污染行程)", urllib.request.urlopen is keep_url and requests.sessions.Session.request is keep_req)
+    import importlib.machinery
+    import tempfile
+    keep_gc = importlib.machinery.SourceFileLoader.get_code
+    with tempfile.TemporaryDirectory() as tmp:
+        root, home = Path(tmp) / "VDF", Path(tmp) / "home"
+        (root / "engine").mkdir(parents=True)
+        (root / "engine" / "Body_v0100.py").write_text("from pathlib import Path\nVDF = Path(__file__).resolve().parent.parent\n"
+                                                      "OUT = VDF / 'output_hub' / 'mega'\nDB = VDF / 'output_hub' / 'mega' / 'x.duckdb'\n", encoding="utf-8")
+        (root / "engine" / "Tail_v0101.py").write_text("import importlib.util\nfrom pathlib import Path\n"
+                                                      "_s = importlib.util.spec_from_file_location('body_t', Path(__file__).with_name('Body_v0100.py'))\n"
+                                                      "B = importlib.util.module_from_spec(_s); _s.loader.exec_module(B)\n"
+                                                      "TOP = Path(__file__).resolve().parent.parent / 'output_hub'\n", encoding="utf-8")
+        outside = Path(tmp) / "elsewhere.py"
+        outside.write_text("from pathlib import Path\nX = Path('/r') / 'output_hub'\n", encoding="utf-8")
+        try:
+            install_loader_hub_v0105(str(home), root=root)
+            body, mains, n_top = compile_engine_v0105(root / "engine" / "Tail_v0101.py", home)
+            g = {"__name__": "t", "__file__": str(root / "engine" / "Tail_v0101.py")}
+            exec(body, g)
+            so = importlib.util.spec_from_file_location("outside_t", outside)
+            mo = importlib.util.module_from_spec(so)
+            so.loader.exec_module(mo)
+        finally:
+            importlib.machinery.SourceFileLoader.get_code = keep_gc
+        chk("⑦ output_hub 歸位:頂層引擎(compile_engine)與薄尾載的前版本體(get_code)都改到 --home/output_hub;樹外模組不動;原檔不改",
+            g["TOP"] == home / "output_hub" and g["B"].OUT == home / "output_hub" / "mega" and g["B"].DB == home / "output_hub" / "mega" / "x.duckdb"
+            and n_top == 1 and mo.X == Path("/r") / "output_hub" and "'output_hub'" in (root / "engine" / "Body_v0100.py").read_text(encoding="utf-8"),
+            (str(g["TOP"]), str(g["B"].OUT)))
+    chk("⑧ 呼叫完 SourceFileLoader.get_code 還原(自測不污染行程)", importlib.machinery.SourceFileLoader.get_code is keep_gc)
+    bk = load_book_v0105()
+    E = {r["id"]: r for r in bk["engines"]}
+    import ast as _a
+    defs = {(n.name, n.lineno) for n in _a.walk(_a.parse((HERE / E["e054"]["file"]).read_text(encoding="utf-8"))) if isinstance(n, _a.FunctionDef)}
+    chk("⑨ 冊 v0104:e054 → 回補工人 v0109(AST 位置對得上)· e056 / e057 / e063 相依 e054 · MDL011 有 nodata 標記",
+        E["e054"]["file"].endswith("_v0109.py") and all((f["name"], f["line"]) in defs for f in E["e054"]["fetch_functions"])
+        and all("e054" in E[k]["needs"] for k in ("e056", "e057", "e063")) and E["011"].get("nodata_markers")
+        and [r["id"] for r in PRIOR.BASE.ordered(bk["engines"])].index("e054") < [r["id"] for r in PRIOR.BASE.ordered(bk["engines"])].index("e056"))
+    with tempfile.TemporaryDirectory() as tmp:
+        lg = Path(tmp) / "011_live.log"
+        lg.write_text("[WARN] schedule-run: no default_selection.json yet (save one from the console)\n", encoding="utf-8")
+        keep_run = _RUN_V0104
+        globals()["_RUN_V0104"] = lambda rows, *a, **k: [{"id": "011", "mdl": "MDL011", "rc": 0, "sec": 0.1, "log": str(lg), "tail": []}]
+        try:
+            res = run_v0105([E["011"]], "live", Path(tmp))
+        finally:
+            globals()["_RUN_V0104"] = keep_run
+    chk("⑩ rc 0 但日誌見 nodata 標記 → 照實改判 NODATA rc 2(不再假綠)", res[0]["rc"] == 2 and "NODATA" in res[0]["tail"][-1], res[0]["rc"])
     text = Path(__file__).read_text(encoding="utf-8")
     chk("⑥ 加速器橋 · 網路橋(模組層 VIA_NET_TOOL_PATH + def _via_net)在;不碰 TA-Lib;不寫同意閘", "[VIA:ACCEL-BRIDGE" in text and "def _via_net" in text
         and not re.search(r"^\s*(import|from)\s+talib", text, re.M) and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT", text))
