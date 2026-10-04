@@ -19,7 +19,6 @@
 """
 from __future__ import annotations
 
-<<<<<<< HEAD
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -35,8 +34,6 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-=======
->>>>>>> @{-1}
 import ast
 import builtins
 import hashlib

@@ -17,7 +17,6 @@
 """
 from __future__ import annotations
 
-<<<<<<< HEAD
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
 try:
     import sys as _sa_sys
@@ -33,8 +32,6 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
-=======
->>>>>>> @{-1}
 import gzip
 import json
 import os
@@ -198,7 +195,6 @@ class TempAccel:
 
 
 def selftest() -> tuple:
-<<<<<<< HEAD
     """自測: 防衛閘/子進程/串流/回復/命名空間/滾動清理/原子落地。全程隔離 TEMP 根, 不碰真實轉儲資料。"""
     import tempfile as _tf
     keep = os.environ.get("VIA_TEMPACCEL_DIR")
@@ -214,9 +210,6 @@ def selftest() -> tuple:
 
 def _selftest_body() -> tuple:
     """自測本體 (由 selftest 的隔離殼呼叫)。"""
-=======
-    """自測: 防衛閘觸發/子進程轉儲/串流聚合/中斷回復/命名空間/滾動清理/原子落地。"""
->>>>>>> @{-1}
     p = f = 0
 
     def ck(name, cond):

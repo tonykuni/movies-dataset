@@ -1,14 +1,8 @@
 ---
 name: via-verb-interaction
-<<<<<<< HEAD
 description: VIA 的「AI 動詞交互反饋」技能:AI 不讀整檔、只讀動詞回傳;每輪一來一回(黃紅字貼回包 ≤300 行 + NEXT 一行);紅分三類(被打斷 / 環境 / 真紅);真紅只出薄尾(新版號、前版不動、含根因重現檢);教訓帳與裁定帳先讀再修。正主 CGC_MDL259_AiVerbBridge。
 version: v0100
 engine: CGC_MDL259_AiVerbBridge_v0100
-=======
-description: VIA 的「AI 動詞交互反饋」技能:AI 不讀整檔、只讀動詞回傳;每輪一來一回(黃紅字貼回包 ≤300 行 + NEXT 一行);紅分三類(被打斷 / 環境 / 真紅);真紅只出薄尾(新版號、前版不動、含根因重現檢);教訓帳與裁定帳先讀再修。正主 CGC_MDL256_AiVerbBridge。
-version: v0100
-engine: CGC_MDL256_AiVerbBridge_v0100
->>>>>>> @{-1}
 ---
 
 # via-verb-interaction(VSKE 技能 · 可分拆)
@@ -41,11 +35,7 @@ AI     → 薄尾 N 支 + 一貼(不出整檔、不出長文)
 ```
 token 上限(建議):輸入 ≤ 6k · 輸出 ≤ 8k;超過 = 動詞囉嗦,修動詞不修 AI。
 
-<<<<<<< HEAD
 ## 動詞(都在 CGC_MDL259;VIA_FROM_VCGC=YES)
-=======
-## 動詞(都在 CGC_MDL256;VIA_FROM_VCGC=YES)
->>>>>>> @{-1}
 - `paste <log|-> [--max 300] [--next "…"]`
 - `classify <ENGINE_READINESS.csv | 貼回包>`
 - `lesson add <key> <note>` · `lesson get <key>` · `lesson list`
@@ -62,11 +52,7 @@ token 上限(建議):輸入 ≤ 6k · 輸出 ≤ 8k;超過 = 動詞囉嗦,修動
 [真紅] vrn VRN_ENG112_FinancialRead_v0100 · sys.exit(selftest()) · 錨 C:\Python313\Lib\threading.py:1094
 [真紅] vdf VDF_ENG117_ForwardVintage_v0101 · unrecognized arguments: --selftest · 錨
 ```
-<<<<<<< HEAD
 機器驗:`python CGC_MDL259_AiVerbBridge_v0100.py --selftest`(11 檢)。
-=======
-機器驗:`python CGC_MDL256_AiVerbBridge_v0100.py --selftest`(11 檢)。
->>>>>>> @{-1}
 
 ## 不做
 不讀整檔、不改舊版、不刪行為、不裁定(裁定權在操作員)、不在貼回包外推斷錨點。
