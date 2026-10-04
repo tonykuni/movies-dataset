@@ -1,0 +1,687 @@
+{
+ "schema": "VIA.LayoutCapabilities.v1",
+ "engine_id": "SUP_MDL743_GenericLayoutHub",
+ "version": "v0104",
+ "public_entry": "via-vcgc layout",
+ "purpose": "Layout 分析與擷取後修復；原擷取鎖定；文、表、圖統一來源證據",
+ "source_attachment": {
+  "name": "貼上的文字 (1)(1).txt",
+  "sha256": "f769b083ccddff7d350ce038ad5e7b0d72b0d6462d8cc64e9a74dca541b6ec76",
+  "lines": 3230
+ },
+ "parameters": {
+  "epsilon": 0.001,
+  "row_tolerance": 2.0,
+  "row_height_ratio": 0.35,
+  "font_fallback": 10.0,
+  "corridor_overlap": 0.35,
+  "context_lines": 5,
+  "header_zone": 0.1,
+  "footer_zone": 0.88,
+  "repeat_ratio": 0.55,
+  "end_zone": 0.8,
+  "small_font": 0.9,
+  "end_small_ratio": 0.7,
+  "title_ratios": [
+   1.8,
+   1.45,
+   1.2,
+   1.05
+  ],
+  "heading_max_chars": 45,
+  "line_full": 0.9,
+  "line_short": 0.85,
+  "gap_ratio": 1.3,
+  "bold_duplicate_tolerance": 0.8,
+  "column_gutter": 12.0,
+  "word_gutter": 6.0,
+  "span_width_ratio": 0.68,
+  "column_overlap": 0.8,
+  "table_min_numeric": 2,
+  "column_tolerance": 9.0,
+  "table_row_gap": 2.4,
+  "table_bottom_ratio": 0.7,
+  "table_top_ratio": 0.3,
+  "numeric_alignment": 0.65,
+  "checksum_tolerance": "0.01",
+  "figure_gutter_ratio": 0.025,
+  "figure_background_delta": 18,
+  "figure_foreground_fraction": 0.005,
+  "figure_min_size": 30,
+  "figure_upscale": 2,
+  "ocr_languages": "chi_tra+eng",
+  "ocr_min_native_tokens": 3,
+  "axis_left_ratio": 0.18,
+  "axis_right_ratio": 0.82,
+  "axis_bottom_ratio": 0.76,
+  "figure_title_ratio": 0.15,
+  "label_pair_tolerance": 0.045,
+  "ocr_probe_timeout": 15,
+  "split_row_bottom": 0.94,
+  "split_row_top": 0.16,
+  "plain_heading_chars": 22,
+  "plain_heading_fill": 0.7,
+  "table_row_center_ratio": 0.55,
+  "table_row_overlap_guard": 0.5,
+  "statement_header_gap": 42.0,
+  "statement_header_scan_rows": 3
+ },
+ "regex": {
+  "number": "(?:[+−-]?(?:\\d{1,3}(?:[,，]\\d{3})+|\\d+)(?:\\.\\d+)?[%％]?|[（(](?:\\d{1,3}(?:[,，]\\d{3})+|\\d+)(?:\\.\\d+)?[%％]?[）)])",
+  "year": "(?:FY[- ]?)?(?:20)?\\d{2}(?:[AEF]|Q[1-4])?",
+  "caption": "^(?:表\\s*[0-9一二三四五六七八九十]+|Table\\s*\\d+|圖\\s*[0-9一二三四五六七八九十]+|Fig(?:ure)?\\.?\\s*\\d+)",
+  "source": "^(?:資料來源|數據來源|Source|註\\d*|備註|Notes?)\\s*[:：]?",
+  "unit": "^(?:單位|Units?)\\s*[:：]",
+  "heading": "^(?:[壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+[、．.]|\\d+(?:\\.\\d+){0,3}[、．. ]|[（(][一二三四五六七八九十0-9A-Za-z]+[）)]|[■●◆▲❖•➢★])",
+  "disclaimer": "免責聲明|版權聲明|重要揭露|法律聲明|僅供參考|Disclaimer|Disclosure",
+  "sentence_end": "(?:[。！？!?；;]|(?<!\\d)\\.)(?:[」』”’）)\\]】]+)?$",
+  "continuation": "(?:[，、,：:\\-（(「]|以及|由於|包含|之|與|及|and|or|of|the|to|with)$",
+  "hyphen_word": "[A-Za-z]{2,}-$",
+  "page_number": "^(?:Page\\s*)?[-—]?\\s*\\d+\\s*(?:of\\s*\\d+|/\\s*\\d+|頁)?\\s*[-—]?$",
+  "continued": "續|续|Continued|Cont[’\\x27]?d",
+  "total": "^(?:合計|總計|小計|Total|Subtotal)\\b|(?:合計|總計|小計)$",
+  "numeric_unit": "[%％]|USD|TWD|NTD|百萬|千元|億元",
+  "statement_heading": "^(?:(?:合併|簡明|Consolidated)\\s*)?(?:資產負債表|(?:綜合)?損益表|現金流量表|比率分析|財務比率(?:分析)?|Balance\\s+Sheets?|Income\\s+Statements?|Statements?\\s+of\\s+(?:Income|Cash\\s+Flows?)|Cash\\s*Flow(?:\\s+Statements?)?|(?:Financial\\s+)?Ratio(?:s|\\s+Analysis))$",
+  "table_period": "^(?:(?:FY[- ]?)?(?:20)?\\d{2}(?:[AEF]|Q[1-4])?|[1-4]Q(?:20)?\\d{2}|(?:20)?\\d{2}[1-4]Q)(?:\\([AEF]\\))?$"
+ },
+ "modules": {
+  "hub": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0104.py",
+  "base": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py",
+  "common": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutCommon_v0100.py",
+  "text": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutText_v0100.py",
+  "tables": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutTables_v0101.py",
+  "figures": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutFigures_v0100.py",
+  "manager": "supportive modules/registry/CGC_MDL069_SystemManager_v0114.py",
+  "gle_core": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py",
+  "gle_adapters": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/adapter_sdk.py",
+  "gle_backends": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py",
+  "gle_router": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/multi_engine_orchestrator.py",
+  "bridge": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0100.py",
+  "financial_reader": "functional modules/VRN/engine/VRN_Integrated_ReportDatabase_Engine.py",
+  "evidence_reader": "functional modules/VRN/engine/VRN_Evidence_Core.py",
+  "bundle": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutBundle_v0100.py"
+ },
+ "capabilities": [
+  {
+   "id": "LAYOUT.SOURCE_LOCK",
+   "name": "成功擷取／原始值 SHA-256 鎖定",
+   "implementation": [
+    "base:def_locked_sources",
+    "hub:def_repair_document"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_locked_values"
+  },
+  {
+   "id": "LAYOUT.EXTRACT_REUSE",
+   "name": "沿用舊 GLE 與三後端擷取，不重造擷取器",
+   "implementation": [
+    "base:def_analyze"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_locked_values"
+  },
+  {
+   "id": "LAYOUT.FULL_PAGE",
+   "name": "首頁任意位置與全頁文字座標保留",
+   "implementation": [
+    "common:def_words",
+    "common:def_lines",
+    "base:def_native_svg"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_locked_values"
+  },
+  {
+   "id": "LAYOUT.FONT_EVIDENCE",
+   "name": "字級／字型粗體／描邊／疊印證據",
+   "implementation": [
+    "text:def_font_evidence",
+    "hub:def_traces"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_font_and_overprint"
+  },
+  {
+   "id": "LAYOUT.SEVEN_LEVELS",
+   "name": "主標題、H1/H2/H3、本文、頁底、後方備註七階",
+   "implementation": [
+    "text:def_classify"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_seven_roles_and_margin"
+  },
+  {
+   "id": "LAYOUT.END_MATTER",
+   "name": "後方小字與其標題子樹隔離且留存",
+   "implementation": [
+    "text:def_classify"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_seven_roles_and_margin"
+  },
+  {
+   "id": "LAYOUT.RUNNING_MARGIN",
+   "name": "跨頁重複頁首、頁尾、頁碼指紋隔離",
+   "implementation": [
+    "text:def_classify"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_seven_roles_and_margin"
+  },
+  {
+   "id": "LAYOUT.BODY_TABLE_MASK",
+   "name": "表圖與本文分流，避免表格文字混入段落",
+   "implementation": [
+    "text:def_reading_order"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_table_mask_and_context"
+  },
+  {
+   "id": "LAYOUT.CONTEXT_FIVE",
+   "name": "表圖上下最多五行補抓及同欄防撞",
+   "implementation": [
+    "common:def_context"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_table_mask_and_context"
+  },
+  {
+   "id": "LAYOUT.SOURCE_BIND",
+   "name": "表號／圖號／說明／單位／資料來源綁定",
+   "implementation": [
+    "common:def_context",
+    "figures:def_figure_metadata"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_table_mask_and_context"
+  },
+  {
+   "id": "LAYOUT.TABLE_PROJECT",
+   "name": "無框線表格由原生文字座標重建欄列",
+   "implementation": [
+    "tables:def_project_rows",
+    "tables:def_recover_tables",
+    "tables:def_table_rows"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_label_baseline_offset_and_numeric_columns"
+  },
+  {
+   "id": "LAYOUT.MISSING_ROWS",
+   "name": "表頭以外對齊資料列與合計列補回",
+   "implementation": [
+    "tables:def_recover_tables"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_header_only_seed_recovers_body"
+  },
+  {
+   "id": "LAYOUT.TABLE_SPANS",
+   "name": "幾何證明的跨格／多層表頭；無來源空軸清理與HTML表格",
+   "implementation": [
+    "tables:def_spans_and_fragments",
+    "hub:def_html_table"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_spans_need_geometric_proof"
+  },
+  {
+   "id": "LAYOUT.CELL_WRAP",
+   "name": "同一来源儲存格斷行縫合，歧義不強併",
+   "implementation": [
+    "tables:def_spans_and_fragments"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_rowspan_and_wrapped_cell_evidence"
+  },
+  {
+   "id": "LAYOUT.NUMERIC_GUARD",
+   "name": "零／空白／負括號／百分比與原值分開保留",
+   "implementation": [
+    "common:def_number",
+    "tables:def_cell"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_numeric_lossless"
+  },
+  {
+   "id": "LAYOUT.CHECKSUM",
+   "name": "合計驗算與不一致標記，禁止用吻合冒充完整",
+   "implementation": [
+    "tables:def_checksum"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_checksum_does_not_prove_completeness"
+  },
+  {
+   "id": "LAYOUT.MULTITABLE_SPLIT",
+   "name": "左右獨立財報先分欄、各欄上下分表，避免再黏回",
+   "implementation": [
+    "tables:def_split_tables",
+    "tables:def_statement_regions",
+    "hub:def_tables_html"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_statement_grid_and_asymmetric_stacks"
+  },
+  {
+   "id": "LAYOUT.SIDE_RELATION",
+   "name": "並排獨立表／折疊表／帳戶表／寬表四態判別",
+   "implementation": [
+    "tables:def_table_relation"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_side_by_side_types"
+  },
+  {
+   "id": "LAYOUT.VERTICAL_UNROLL",
+   "name": "有表頭、表號、序列證據才縱向展開",
+   "implementation": [
+    "tables:def_adjacent"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_side_by_side_types"
+  },
+  {
+   "id": "LAYOUT.ACCOUNT_BIND",
+   "name": "資產與負債權益雙區共同綁定",
+   "implementation": [
+    "tables:def_adjacent"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_side_by_side_types"
+  },
+  {
+   "id": "LAYOUT.WIDE_REJOIN",
+   "name": "主鍵與列座標守門，誤切寬表橫向接回",
+   "implementation": [
+    "tables:def_adjacent"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_side_by_side_types"
+  },
+  {
+   "id": "LAYOUT.CROSS_PAGE_TABLE",
+   "name": "相鄰頁、欄位、表號及正文障礙共同檢查續表",
+   "implementation": [
+    "tables:def_continue_tables"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_continuation_and_heading_barrier"
+  },
+  {
+   "id": "LAYOUT.REPEATED_HEADER",
+   "name": "續表重複表頭去重，保留原始頁面與來源",
+   "implementation": [
+    "tables:def_continue_tables"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_continuation_and_heading_barrier"
+  },
+  {
+   "id": "LAYOUT.TABLE_DEDUP",
+   "name": "同座標同來源候選去重，異處同值不得消失",
+   "implementation": [
+    "tables:def_deduplicate"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_duplicate_proposals_not_duplicate_values"
+  },
+  {
+   "id": "LAYOUT.HEADING_FSM",
+   "name": "標題前綴／留白／字級／間距守門與斷句FSM",
+   "implementation": [
+    "text:def_can_join",
+    "text:def_stitch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_heading_join_veto"
+  },
+  {
+   "id": "LAYOUT.WRAPPED_HEADING",
+   "name": "長標題同階緊鄰折行合併",
+   "implementation": [
+    "text:def_stitch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_heading_tree_and_wrap"
+  },
+  {
+   "id": "LAYOUT.CROSS_PAGE_TEXT",
+   "name": "跨頁接句剝離頁首頁尾且禁止吞入新標題",
+   "implementation": [
+    "text:def_can_join",
+    "text:def_stitch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_cross_page_text"
+  },
+  {
+   "id": "LAYOUT.HEADING_TREE",
+   "name": "主文標題樹與段落路徑",
+   "implementation": [
+    "text:def_stitch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_heading_tree_and_wrap"
+  },
+  {
+   "id": "LAYOUT.MIXED_COLUMNS",
+   "name": "單雙欄閱讀順序、浮動圖表、章節分界",
+   "implementation": [
+    "text:def_reading_order"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_floating_and_section_order"
+  },
+  {
+   "id": "LAYOUT.COMPOUND_FIGURE",
+   "name": "左右與上下複合子圖空白走廊切分",
+   "implementation": [
+    "figures:def_split_canvas",
+    "figures:def_compact_assets"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_compound_figures_and_dual_axis"
+  },
+  {
+   "id": "LAYOUT.DUAL_AXIS_GUARD",
+   "name": "連續X軸／繪圖內容阻止錯切雙Y軸圖",
+   "implementation": [
+    "figures:def_split_canvas"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_compound_figures_and_dual_axis"
+  },
+  {
+   "id": "LAYOUT.SHARED_LEGEND",
+   "name": "共用圖例獨立擷取並綁回子圖",
+   "implementation": [
+    "figures:def_split_canvas",
+    "figures:def_figures"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_shared_legend_and_parent"
+  },
+  {
+   "id": "LAYOUT.FIGURE_PARENT",
+   "name": "共用母圖號、獨立子圖號與來源歸屬",
+   "implementation": [
+    "figures:def_figure_metadata"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_shared_legend_and_parent"
+  },
+  {
+   "id": "LAYOUT.FIGURE_OCR",
+   "name": "裁切放大後逐子圖OCR；原生文字優先",
+   "implementation": [
+    "figures:def_figures",
+    "figures:def_ocr_status"
+   ],
+   "verification_scope": "沿用 GLE 行級 OCR；英文裁切實測，正式繁中需 chi_tra+eng，缺件 UNAVAILABLE",
+   "test_id": "test_missing_ocr_not_success"
+  },
+  {
+   "id": "LAYOUT.OCR_ROLES",
+   "name": "圖內標題、左右Y軸、X軸、圖例、數據標籤",
+   "implementation": [
+    "figures:def_ocr_roles"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_ocr_roles_and_pair_ambiguity"
+  },
+  {
+   "id": "LAYOUT.LABEL_PAIR",
+   "name": "位置相近標籤配對候選，未知數列不造值",
+   "implementation": [
+    "figures:def_ocr_roles"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_ocr_roles_and_pair_ambiguity"
+  },
+  {
+   "id": "LAYOUT.DUAL_EVIDENCE",
+   "name": "原頁／圖區影像加原生文字與上下文共同留證",
+   "implementation": [
+    "figures:def_figures",
+    "hub:def_export"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_fragment_retention"
+  },
+  {
+   "id": "LAYOUT.RAW_REPAIRED",
+   "name": "原始與修復值、source IDs、理由與頁碼沿革",
+   "implementation": [
+    "hub:def_repair_document"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_render_escapes_raw_text"
+  },
+  {
+   "id": "LAYOUT.CACHE_RESUME",
+   "name": "內容及程式雜湊快取、逐檔原子斷點",
+   "implementation": [
+    "hub:def_run_batch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_cache_resume_and_filename_order"
+  },
+  {
+   "id": "LAYOUT.FILENAME_ORDER",
+   "name": "依輸入檔名向下排列、檔內按實體頁排序",
+   "implementation": [
+    "hub:def_run_batch"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_cache_resume_and_filename_order"
+  },
+  {
+   "id": "LAYOUT.EXPORT",
+   "name": "HTML、JSON、CSV與內嵌HTML表格Markdown",
+   "implementation": [
+    "hub:def_export"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_export_formats_preserve_values"
+  },
+  {
+   "id": "LAYOUT.FINANCIAL_REUSE",
+   "name": "舊年度財報矩陣與新版修復同時保留",
+   "implementation": [
+    "base:def_analyze",
+    "hub:def_export",
+    "financial_reader:extract_document_tables",
+    "evidence_reader:pdf_column_tables"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_header_only_seed_recovers_body"
+  },
+  {
+   "id": "LAYOUT.ENGINE_HEADER",
+   "name": "引擎頂部機器可讀功能描述與唯一SSOT",
+   "implementation": [
+    "hub:def_manifest",
+    "manager:def_engine_catalog",
+    "manager:def_ast_index",
+    "manager:def_effective_api"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_effective_api_has_one_runtime_owner"
+  },
+  {
+   "id": "LAYOUT.MANAGER_UI",
+   "name": "System Manager 與使用者同一完整功能卡",
+   "implementation": [
+    "manager:def_catalog_html",
+    "hub:def_catalog_html"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_manager_user_same_features"
+  },
+  {
+   "id": "LAYOUT.REGISTRY",
+   "name": "每項功能與實作def可追溯、缺件紅燈",
+   "implementation": [
+    "manager:def_engine_catalog",
+    "bundle:def_verify",
+    "bundle:def_copy_runtime",
+    "bundle:def_create_zip"
+   ],
+   "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+   "test_id": "test_scoped_registry_preserves_unrelated_and_stable_ids"
+  },
+  {
+   "id": "LAYOUT.OPTIONAL_BACKENDS",
+   "name": "既有模型介面沿用、缺依賴誠實列示、不自動下載",
+   "implementation": [
+    "gle_core:probe_backends",
+    "figures:def_ocr_status"
+   ],
+   "verification_scope": "32 個介面不等於模型已安裝；本次只啟用可用依賴",
+   "test_id": "test_missing_ocr_not_success"
+  }
+ ],
+ "input": "existing locked PDF extraction or its verified layout_review.json",
+ "outputs": [
+  "LAYOUT_REVIEW.html",
+  "LAYOUT_REVIEW.json",
+  "LAYOUT_REPAIRED.json",
+  "LAYOUT_REPAIRED.md",
+  "LAYOUT_REPAIRED.csv",
+  "ENGINE_CATALOG.json"
+ ],
+ "source_policy": "VIA_Layout_Reuse_SSOT_v0100.json",
+ "automatic_model_downloads": false,
+ "automatic_cloud_calls": false,
+ "validation_rule": "合計吻合不是完整還原證明；低信心保留 REVIEW，原值不覆寫",
+ "snippet_crosswalk": {
+  "extract_table_with_5_line_window": "common:def_context",
+  "extract_clean_table_with_projection": "tables:def_project_rows",
+  "repair_broken_table": "tables:def_spans_and_fragments",
+  "detect_line_features": "text:def_font_evidence",
+  "classify_line_role": "text:def_classify",
+  "stitch_lines_into_sentences": "text:def_stitch",
+  "build_running_header_footer_fingerprints": "text:def_classify",
+  "count_unclosed_brackets": "text:def_can_join",
+  "should_stitch_across_pages": "text:def_can_join",
+  "process_multi_page_document": "hub:def_repair_document",
+  "normalize_cell_text": "tables:def_cell",
+  "calc_row_similarity": "tables:def_continue_tables",
+  "calc_bbox_x_iou": "common:def_overlap",
+  "is_continued_table": "tables:def_continue_tables",
+  "merge_two_tables": "tables:def_continue_tables",
+  "merge_all_cross_page_tables": "tables:def_continue_tables",
+  "group_words_into_lines": "common:def_word_rows",
+  "_build_line_dict": "common:def_word_rows",
+  "split_side_by_side_tables": "tables:def_split_tables",
+  "calc_grid_interval_iou": "tables:def_continue_tables",
+  "split_vertically_stacked_tables": "tables:def_split_tables",
+  "extract_multi_tables_with_clamped_5_lines": "common:def_context",
+  "norm_header_str": "tables:def_cell",
+  "calc_header_isomorphism": "tables:def_table_relation",
+  "get_column_type_signature": "tables:def_table_relation",
+  "check_sequence_continuity": "tables:def_table_relation",
+  "classify_and_reconstruct_side_by_side_tables": "tables:def_adjacent",
+  "parse_parent_caption_for_subfigures": "figures:def_figure_metadata",
+  "split_compound_figure_canvas": "figures:def_split_canvas",
+  "extract_structured_ocr_from_subfigure": "figures:def_ocr_roles",
+  "bind_compound_figure_metadata": "figures:def_figure_metadata"
+ },
+ "registration_scope": "VCGC registry-sync --layout-only; preserve unrelated and delegated records, append stable central IDs",
+ "test_source": "supportive modules/70_VRN_Rules/tests/test_layout_unified_v0102.py",
+ "registry_stems": {
+  "financial_reader": "SUP_MDL743_Reference_financial_reader",
+  "evidence_reader": "SUP_MDL743_Reference_evidence_reader"
+ },
+ "composition": {
+  "public_entry": "via-vcgc layout",
+  "facade_precedence": [
+   "hub",
+   "base",
+   "bridge"
+  ],
+  "roles": {
+   "hub": "唯一公開引擎與修復流程",
+   "base": "鎖定的成功擷取與原始證據",
+   "common": "共用參數、座標與原值",
+   "text": "內文結構與接句修復",
+   "tables": "表格分區、還原與核對",
+   "figures": "圖區、子圖與條件式 OCR",
+   "manager": "靜態清冊、函式索引與功能呈現",
+   "gle_core": "鎖定的 Layout 核心",
+   "gle_adapters": "鎖定的後端介面",
+   "gle_backends": "鎖定的後端實作",
+   "gle_router": "鎖定的後端調度",
+   "bridge": "鎖定的 GLE 掛載與相容介面",
+   "financial_reader": "鎖定的 FINANCIAL DATA 擷取",
+   "evidence_reader": "鎖定的座標證據支援",
+   "bundle": "原始位元封裝與完整性核對"
+  },
+  "historical_files_not_runtime": [
+   "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0102.py",
+   "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0103.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutTables_v0100.py",
+   "supportive modules/70_VRN_Rules/tests/test_layout_unified_v0100.py",
+   "supportive modules/70_VRN_Rules/tests/test_layout_unified_v0101.py"
+  ]
+ },
+ "bundle": {
+  "scope": "VCGC Layout runtime and all registered Layout capabilities; other VCGC/VDF/VRN host commands require the existing VIA installation",
+  "console_entry": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0148.py",
+  "runtime_files": [
+   "docs/VRN_LAYOUT_BUNDLE_v0104.md",
+   "functional modules/VRN/VRN_ENG072_FirstPageText_v0139.py",
+   "functional modules/VRN/VRN_ENG074_FinancialPages_v0114.py",
+   "functional modules/VRN/VRN_ENG104_FilenameCut_v0100.py",
+   "functional modules/VRN/VRN_ENG110_TabReport_v0114.py",
+   "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py",
+   "functional modules/VRN/engine/VIA_VRN_FirstPageEngine.py",
+   "functional modules/VRN/engine/VRN_Evidence_Core.py",
+   "functional modules/VRN/engine/VRN_Integrated_ReportDatabase_Engine.py",
+   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/adapter_sdk.py",
+   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py",
+   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py",
+   "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/multi_engine_orchestrator.py",
+   "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0100.py",
+   "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py",
+   "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0104.py",
+   "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0103.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutBundle_v0100.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutCommon_v0100.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutFigures_v0100.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutTables_v0101.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutText_v0100.py",
+   "supportive modules/70_VRN_Rules/layout_repair_v0100/__init__.py",
+   "supportive modules/70_VRN_Rules/tests/fixtures/ctbc_financial_grid_v0100.json",
+   "supportive modules/70_VRN_Rules/tests/test_layout_unified_v0102.py",
+   "supportive modules/SUP_MDL737_SuperAccelModule_v0108.py",
+   "supportive modules/SUP_MDL751_VIATailPick_v0102.py",
+   "supportive modules/SUP_MDL752_VIAJsonIO_v0100.py",
+   "supportive modules/SUP_MDL753_VIACommonUtils_v0112.py",
+   "supportive modules/VIA_SuperAccel_Module.py",
+   "supportive modules/VeritasCeleritas_v1141.py",
+   "supportive modules/registry/CGC_MDL069_SystemManager_v0114.py",
+   "supportive modules/registry/CGC_MDL149_LayoutUse_v0100.py",
+   "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0142.py",
+   "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0143.py",
+   "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0144.py",
+   "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0146.py",
+   "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0148.py",
+   "supportive modules/registry/CGC_MDL158_VIAPanoramaAuditRepair_v0113.py",
+   "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
+   "supportive modules/registry/VIA_EnvPlan_Rules_v0100.json",
+   "supportive modules/registry/VIA_EnvRestore_Methodology_SSOT_v0100.json",
+   "supportive modules/registry/VIA_InputConsole_Spec_v0100.json",
+   "supportive modules/registry/VIA_Layout_Capabilities_SSOT_v0100.json",
+   "supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json",
+   "supportive modules/registry/VIA_Policy_Laws_SSOT_v0100.json"
+  ],
+  "provenance": "exact source bytes; dependency read tracing plus all declared modules and 11 locked sources",
+  "isolated_test": "deny original source-tree access in a fresh unpacked process",
+  "optional_runtime": "backend registration does not install models or imply availability"
+ }
+}
