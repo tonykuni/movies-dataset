@@ -349,10 +349,26 @@ def selftest():
         r2 = PLUGINS["ocr.text_recognition"]["call"]("ocr_text", str(pdfp), work)
         ck("⑨ 圖中文字辨識實跑:合成頁找回 TICK 字樣(字框帶信心值)",
            r2["state"] == "EXTRACTED_UNVERIFIED" and any("TICK" in w["text"].upper() for w in r2["elements"]))
-        r3 = PLUGINS["ocr.chart_restore"]["call"]("chart_basic", str(pdfp), work)
-        ck("⑩ 圖表基礎還原:刻度 0/10/20/30 等差過 · series_values 誠實 None + NEEDS_HEAVY",
-           r3["metadata"]["axis_arithmetic"] and r3["metadata"]["series_values"] is None
-           and r3["metadata"]["needs_heavy"] is True)
+        chartp = Path(work) / "chart.pdf"
+        cdoc = fitz.open()
+        cpage = cdoc.new_page(width=300, height=240)
+        for i, v in enumerate(("40", "30", "20", "10")):   # 縱軸大字刻度,一字一位,對 OCR 公平
+            cpage.insert_text((20, 50 + i * 45), v, fontsize=18)
+        cpage.insert_text((120, 30), "Revenue", fontsize=16)
+        cdoc.save(str(chartp))
+        cdoc.close()
+        r3 = PLUGINS["ocr.chart_restore"]["call"]("chart_basic", str(chartp), work,
+                                                  config={"render_dpi": 300})
+        m3 = r3["metadata"]
+        ck("⑩ 圖表基礎還原契約:series_values 誠實 None + NEEDS_HEAVY · axis_ticks 為列表",
+           m3.get("series_values") is None and m3.get("needs_heavy") is True
+           and isinstance(m3.get("axis_ticks"), list))
+        n_ticks = len(m3.get("axis_ticks") or [])
+        if n_ticks >= 3:
+            ck("⑩b 等差實跑:認得 %d 刻度 → 等差成立" % n_ticks, m3.get("axis_arithmetic") is True)
+        else:
+            ck("⑩b OCR 僅認得 %d 刻度(<3)→ 誠實不外插:axis_step=None + 警告在列" % n_ticks,
+               m3.get("axis_step") is None and any("不外插" in w for w in r3["warnings"]))
     except (ImportError, FileNotFoundError):
         r2 = PLUGINS["ocr.text_recognition"]["call"]("ocr_text", __file__, work)
         r3 = PLUGINS["ocr.chart_restore"]["call"]("chart_basic", __file__, work)
