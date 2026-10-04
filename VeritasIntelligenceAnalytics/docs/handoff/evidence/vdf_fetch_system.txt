@@ -30,7 +30,7 @@
 [政策] L50 全景 · 尾版 574 · import 0 · 提及 66 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0104.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_MDL008_FetchSystem_v0105.py(家族 vdf)
 === VDF_MDL008_FetchSystem v0100 · 自測(獨立擷取系統:冊 · 改寫 · 閘 · 路由;整合全鏈另跑 test)===
   [OK] ① 冊:MDL001–007 每號至少一支 · 檔都在 · 每支有擷取函式定位與輸出契約 · 7
   [OK] ② 擷取函式 AST 定位與原件一致(名稱 + 行號;原件改了就紅)
@@ -58,7 +58,7 @@
   [計] VDF_MDL008_FetchSystem v0102 本版 5/5 · v0101 PASS · 合計 PASS
 === VDF_MDL008_FetchSystem v0103 · 薄尾自測(fill 補缺:只抓不足 · 清單第一步 · 雙閘 · fixture 離線網)===
   [OK] ① v0102 自測過(冊 v0102 · MDL009 v0101 · 子行程) · rc 0
-  [OK] ② 空輸出根的計畫:能跑的全部要抓(理由:沒跑過 / 輸出缺)· 缺套件的照列 ABSENT 不抓 · 零寫檔 · 要抓 34 · ABSENT ['011']
+  [OK] ② 空輸出根的計畫:能跑的全部要抓(理由:沒跑過 / 輸出缺)· 缺套件的照列 ABSENT 不抓 · 零寫檔 · 要抓 35 · ABSENT []
   [OK] ③ live 雙閘沒開 → rc 4 · 零子行程 · 零寫檔(不是壞掉)
   [OK] ④ fixture 補缺:5 支全抓 · rc 0 · 輸出全合格 · 資料庫有主清單 · 報告寫出 · [('009', 0), ('010', 0), ('001u', 0), ('004', 0), ('007', 0)]
   [OK] ⑤ 再補一次:全部新鮮 → 零子行程(省下載)
@@ -73,8 +73,20 @@
   [OK] ③ 冊 v0103:MDL009 → v0102 · AST 位置對得上 · 其餘 34 支與冊 v0102 相同
   [OK] ④ fill --progress:每支前後一行機讀進度 + 一行「[進度] i/n」(PS Invoke-VIAPython 真百分比協定)· 百分比遞增到 100 · rc 0 · 子行程跑的是 MDL009 v0102 · [33.3, 66.7, 100.0]
   [OK] ⑤ 詳細矩陣(純文字路徑):每支一列 · AST 位置(名@行)· 狀態 OK · 摘要含成功率 / 輸出 / 資料庫 / 總判 · 1 | MDL009 | TWSE/TPEX | VDF_MDL009_TWStockList_v0102.py | fetch_json_v0100@112 | 輸出缺 / 空 
-  [OK] ⑥ Rich 路徑:本直譯器沒有 rich → 照實退純文字(不冒充;工作站 pip install rich 後走 Rich 表)
+  [OK] ⑥ Rich 路徑:rich 在 → Rich 表格(同欄)+ 摘要框
   [OK] ⑦ 入口:沒有總控標記 → rc 2;fill-matrix 找不到報告 → rc 2
   [OK] ⑧ 加速器橋 · 網路橋在;不碰 TA-Lib;不寫同意閘
   [計] VDF_MDL008_FetchSystem v0104 本版 8/8 · v0103 PASS · 合計 PASS
-[監控] 背景全景監控中 pid 1662 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 70 提交 · 快照 23.9h · 未推 1 · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+=== VDF_MDL008_FetchSystem v0105 · 薄尾自測(live urllib 改道進鎖版網路工具 · 防重入 · 真流量計數)===
+  [OK] ① v0104 自測過(冊 v0103 · fill --progress · 詳細矩陣 · 網路工具真橋) · rc 0
+  [OK] ② live:urllib GET → 網路工具 http_bytes(工具內的 urllib 走原道,不遞迴) · b'routed:inner-ok'
+  [OK] ③ live:urllib 帶 data → 網路工具 post_json(JSON 照解)
+  [OK] ④ live:requests 照 v0100 改道且計數 · urllib 計數(真流量不再是 0)· 工具內部呼叫不重複改道(一請求一抓) · ({'requests': 1, 'yf': 0, 'net': 2, 'blocked': 0}, 3)
+  [OK] ⑤ 呼叫完原 urlopen / requests 還原(自測不污染行程)
+  [OK] ⑦ output_hub 歸位:頂層引擎(compile_engine)· 前版本體(get_code)· exec(compile(本體))繞道 都改到 --home/output_hub;樹外模組不動;原檔不改 · ('/tmp/tmpx0p7kght/home/output_hub', '/tmp/tmpx0p7kght/home/output_hub/mega')
+  [OK] ⑧ 呼叫完 SourceFileLoader.get_code · builtins.compile 還原(自測不污染行程)
+  [OK] ⑨ 冊 v0104:e054 → 回補工人 v0109(AST 位置對得上)· e056 / e057 / e063 相依 e054 · MDL011 有 nodata 標記
+  [OK] ⑩ rc 0 但日誌見 nodata 標記 → 照實改判 NODATA rc 2(不再假綠) · 2
+  [OK] ⑥ 加速器橋 · 網路橋(模組層 VIA_NET_TOOL_PATH + def _via_net)在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_MDL008_FetchSystem v0105 本版 10/10 · v0104 PASS · 合計 PASS
+[監控] 背景全景監控中 pid 29536 · 觸碰 run VDF_MDL008_FetchSystem · 交接閘 RED · 落後 81 提交 · 快照 29.5h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
