@@ -27,48 +27,132 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 68 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 574 · import 0 · 提及 67 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0128.py(家族 vdf)
-[VDF 擷取系統 · 整合測試 v0101] PASS
-  ── MDL(fixture 離線網 · 全鏈)
-  [OK] MDL009      0.8s · [MDL008] output_hub 歸位 → /tmp/vdf_fetch_it_r702f0s7/dict/output_hub · 模組 2 · 改寫 0 處
-  [OK] MDL010      0.9s · [MDL008] output_hub 歸位 → /tmp/vdf_fetch_it_r702f0s7/dict/output_hub · 模組 4 · 改寫 2 處
-  [OK] MDL001      0.8s · [MDL008] MDL001 rc=0 · 網路計數 {"requests": 2, "yf": 0, "net": 0, "blocked": 0}
-  [OK] MDL002      4.8s · [MDL008] MDL002 rc=0 · 網路計數 {"requests": 0, "yf": 9, "net": 0, "blocked": 0}
-  [OK] MDL003     13.6s · [MDL008] MDL003 rc=0 · 網路計數 {"requests": 90, "yf": 0, "net": 0, "blocked": 0}
-  [OK] MDL004      1.0s · [MDL008] output_hub 歸位 → /tmp/vdf_fetch_it_r702f0s7/dict/output_hub · 模組 1 · 改寫 0 處
-  [OK] MDL005      1.0s · [MDL008] MDL005 rc=0 · 網路計數 {"requests": 0, "yf": 11, "net": 0, "blocked": 0}
-  [OK] MDL006      2.6s · [MDL008] MDL006 rc=0 · 網路計數 {"requests": 0, "yf": 11, "net": 0, "blocked": 0}
-  [OK] MDL007      1.5s · [MDL008] output_hub 歸位 → /tmp/vdf_fetch_it_r702f0s7/dict/output_hub · 模組 1 · 改寫 0 處
-  [輸出] 23/23 檔合格
-  ── ENG / MDL011(各自離線自測 · 全封網)
-  [NODATA] MDL011                                0.6s
-  [OK    ] MDL011                                2.2s
-  [OK    ] ENG054_TWDailyBackfill                1.1s
-  [OK    ] ENG055_OmniFetch                      0.4s
-  [OK    ] ENG056_ChipBackfill                   0.2s
-  [OK    ] ENG057_TradingValueBackfill           0.3s
-  [OK    ] ENG063_MonthlyRevenue                 0.8s
-  [OK    ] ENG075_MonthlyRevenueBackfill         0.2s
-  [OK    ] ENG077_ActiveETFUniverse              0.2s
-  [OK    ] ENG078_ActiveETFHoldingsHistory       3.0s
-  [OK    ] ENG232_TWIndexOfficial                1.5s
-  [OK    ] ENG059_EstimateBands                  0.2s
-  [OK    ] ENG064_HistoryBackfill                0.8s
-  [OK    ] ENG066_GlobalUniverse                 0.8s
-  [OK    ] ENG082_FinStatements                  9.6s
-  [OK    ] ENG074_FredMacroSSOT                  2.7s
-  [OK    ] ENG113_MacroMethod                    0.7s
-  [OK    ] ENG114_PmiPair                        0.2s
-  [OK    ] ENG229_CNNFearGreedHistory            0.9s
-  [OK    ] ENG230_ForwardValuation               1.7s
-  [OK    ] ENG115_SentimentFetch                 0.2s
-  [OK    ] ENG116_AAIIWorkbook                   0.9s
-  [OK    ] ENG088_ConsensusFusionBridge          1.3s
-  [OK    ] ENG231_GlobalListings                 0.5s
-  [資料庫] 視圖 28 · 鍵欄視圖 18 · 主清單 True
-  [倉內寫入] 0 檔
-  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 8, 'stale': 0, 'expected': 15674, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 29042 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 115 提交 · 快照 31.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+{
+ "engine_card": {
+  "id": "011",
+  "mdl": "MDL011",
+  "kind": "MDL",
+  "group": "AKSHARE",
+  "file": "VDF_MDL011_AkshareFetcher_v0101.py",
+  "ast": {
+   "doc": "VDF_MDL011_AkshareFetcher v0101 — 薄尾:參數矩陣在註冊表還沒建立時誠實回 NODATA(rc 2),不再 KeyError",
+   "defs": 7,
+   "imports": [
+    "VIA_SuperAccel_Module",
+    "__future__",
+    "ast",
+    "contextlib",
+    "importlib",
+    "io",
+    "pathlib",
+    "re",
+    "sys"
+   ],
+   "bridges": {
+    "accel": true,
+    "net": true
+   }
+  },
+  "fetch_functions": [
+   {
+    "name": "cmd_params_v0101",
+    "line": 85
+   },
+   {
+    "name": "main",
+    "line": 97
+   }
+  ],
+  "tables": [],
+  "outputs": [],
+  "run": [
+   "schedule-run"
+  ],
+  "test": [
+   "params"
+  ],
+  "requires": [
+   "akshare",
+   "polars",
+   "duckdb"
+  ],
+  "missing": [],
+  "launch": "python \"functional modules/VDF/VDF_SystemManager_v0128.py\" fetch run 011 --apply",
+  "vcgc": {
+   "lamp": "YELLOW",
+   "ssot": {
+    "books": [
+     {
+      "book": "vake_registry",
+      "asked": "vake_registry.json",
+      "pinned": false,
+      "tail": "",
+      "tail_version": "",
+      "state": "ABSENT"
+     }
+    ],
+    "dynamic": 0
+   },
+   "regex": {
+    "local": 22,
+    "local_unique": 22,
+    "samples": [
+     "^(#{1,6})\\s+(.*?)\\s*$",
+     "^接口[:：]\\s*([A-Za-z_][A-Za-z0-9_]*)",
+     "choice of\\s*\\{(.*?)\\}",
+     "[\\\"'“”‘’]([^\\\"'“”‘’]+)[\\\"'“”‘’]",
+     "\\[([^\\]]*)\\]\\([^)]*\\)",
+     "ak\\.([A-Za-z_][A-Za-z0-9_]*)\\((.*)\\)\\s*$"
+    ],
+    "central_owned": [],
+    "same_as_central": [
+     "RX_DATE_014",
+     "RX_VERSION_010"
+    ]
+   },
+   "synonyms": {
+    "delegated": [],
+    "local_tables": [
+     {
+      "name": "CATEGORY_ZH",
+      "keys": 22,
+      "line": 128
+     },
+     {
+      "name": "AST_CAT_TO_DOC",
+      "keys": 43,
+      "line": 667
+     },
+     {
+      "name": "PROVIDERS",
+      "keys": 13,
+      "line": 1328
+     }
+    ],
+    "central_keys_from_this": []
+   },
+   "workflow": {
+    "book": "VIA_Workflow_VDF_SSOT_v0102.json",
+    "steps": [],
+    "universe_book": "VDF_InputUniverse_SSOT_v0103.json",
+    "universe": []
+   },
+   "env": null,
+   "code": "VIA-VDF-MDL182",
+   "chain": [
+    "v0101",
+    "v0100"
+   ]
+  }
+ }
+}
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
+[監控] 背景全景監控中 pid 29536 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 97 提交 · 快照 30.4h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

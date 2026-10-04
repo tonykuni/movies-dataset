@@ -27,7 +27,7 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
-[政策] L50 全景 · 尾版 574 · import 0 · 提及 67 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 574 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0128.py(家族 vdf)
@@ -37,20 +37,22 @@
   "mdl": "MDL011",
   "kind": "MDL",
   "group": "AKSHARE",
-  "file": "VDF_MDL011_AkshareFetcher_v0101.py",
+  "file": "VDF_MDL011_AkshareFetcher_v0102.py",
   "ast": {
-   "doc": "VDF_MDL011_AkshareFetcher v0101 — 薄尾:參數矩陣在註冊表還沒建立時誠實回 NODATA(rc 2),不再 KeyError",
-   "defs": 7,
+   "doc": "VDF_MDL011_AkshareFetcher v0102 — 薄尾:deep-macro 深度擷取(中國經濟 · 各國經濟 · 航運指數)· 參數列覆寫 __rows__",
+   "defs": 15,
    "imports": [
     "VIA_SuperAccel_Module",
     "__future__",
-    "ast",
+    "argparse",
     "contextlib",
     "importlib",
     "io",
+    "json",
     "pathlib",
     "re",
-    "sys"
+    "sys",
+    "tempfile"
    ],
    "bridges": {
     "accel": true,
@@ -59,12 +61,19 @@
   },
   "fetch_functions": [
    {
-    "name": "cmd_params_v0101",
-    "line": 85
+    "name": "_get",
+    "line": 402,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
    },
    {
-    "name": "main",
-    "line": 97
+    "name": "_call",
+    "line": 1495,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
+   },
+   {
+    "name": "run_selection",
+    "line": 1544,
+    "file": "VDF_MDL011_AkshareFetcher_v0100.py"
    }
   ],
   "tables": [],
@@ -98,8 +107,8 @@
     "dynamic": 0
    },
    "regex": {
-    "local": 22,
-    "local_unique": 22,
+    "local": 25,
+    "local_unique": 24,
     "samples": [
      "^(#{1,6})\\s+(.*?)\\s*$",
      "^接口[:：]\\s*([A-Za-z_][A-Za-z0-9_]*)",
@@ -111,6 +120,7 @@
     "central_owned": [],
     "same_as_central": [
      "RX_DATE_014",
+     "RX_OTHER_002",
      "RX_VERSION_010"
     ]
    },
@@ -136,23 +146,31 @@
     "central_keys_from_this": []
    },
    "workflow": {
-    "book": "VIA_Workflow_VDF_SSOT_v0102.json",
-    "steps": [],
+    "book": "VIA_Workflow_VDF_SSOT_v0103.json",
+    "steps": [
+     {
+      "code": "VDF-WKF013-STP001",
+      "name": "AkShare 尾版自測",
+      "verb": "--selftest"
+     }
+    ],
     "universe_book": "VDF_InputUniverse_SSOT_v0103.json",
     "universe": []
    },
    "env": null,
-   "code": "VIA-VDF-MDL182",
+   "code": "VIA-VDF-MDL184",
    "chain": [
+    "v0102",
     "v0101",
     "v0100"
    ]
   }
  }
 }
+  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 8, 'stale': 0, 'expected': 15674, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
 <unknown>:670: SyntaxWarning: invalid escape sequence '\d'
 <unknown>:670: SyntaxWarning: invalid escape sequence '\d'
 <unknown>:670: SyntaxWarning: invalid escape sequence '\d'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\V'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\V'
-[監控] 背景全景監控中 pid 29536 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 97 提交 · 快照 30.4h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 29042 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 115 提交 · 快照 31.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
