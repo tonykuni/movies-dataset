@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-03T15:13:50+00:00",
+  "updated_at": "2026-10-04T02:45:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1564,6 +1564,20 @@
       "dependencies": [
         "supportive modules/registry/VIA_EngineVersion_Register_v0100.json",
         "supportive modules/SUP_MDL737_SuperAccelModule_v0110.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_fetch_v0105": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0105 本版 10/10 · v0104 PASS · 合計 PASS",
+      "scope": "MDL008 v0105 urllib / yfinance 走網路工具並計數 · output_hub 歸位 --home · nodata 標記 · 冊 v0104(VCGC-REQ147)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0105.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0104.json",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0104.py"
       ],
       "timeout_seconds": 2400
     }
@@ -3255,6 +3269,26 @@
       "owner": "操作員",
       "reason": "Invoke-VDF-FetchFill-v0100.ps1 容器沒有 pwsh(文字檢查過、未實跑);工作站 PS7 跑 -Plan 與實抓",
       "next": "操作員回貼 PS 視窗輸出 + _reports/fill_*.json",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ147:vdf_fetch_v0105",
+      "requirement": "VCGC-REQ147",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0105 新尾版 · 冊 v0104",
+      "next": "handoff test vdf_fetch_v0105 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0105",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0105.json"
+    },
+    {
+      "id": "VCGC-REQ147:workstation-live-fill",
+      "requirement": "VCGC-REQ147",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器 IP 被 TWSE WAF 擋 · Yahoo 429 · 無 FRED 金鑰:上市清單 / 上市日線 / FED 只能工作站實抓",
+      "next": "工作站 Invoke-VDF-FetchFill-v0100.ps1(雙閘本視窗設)回貼 _reports\\fill_*.json",
       "case": null,
       "receipt": null
     }
