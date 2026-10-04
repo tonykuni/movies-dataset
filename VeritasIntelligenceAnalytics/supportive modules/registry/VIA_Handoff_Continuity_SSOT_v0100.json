@@ -1770,7 +1770,7 @@
       "argv": [
         "--family",
         "vdf",
-        "VDF_ENG234_UiLauncher",
+        "VDF_ENG234_UiLauncher_v0102",
         "--selftest"
       ],
       "success_marker": "[計] VDF_ENG234_UiLauncher_v0102 自測 11/11 · PASS",
@@ -1838,6 +1838,34 @@
       "scope": "CGC_MDL260_AiToolPanel v0100 AI 工具面板(活體燈 · 防遞迴)(VCGC-REQ159)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL260_AiToolPanel_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_ui_launcher_v0103": {
+      "argv": [
+        "--family",
+        "vdf",
+        "VDF_ENG234_UiLauncher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG234_UiLauncher v0103 本版 5/5 · v0102 PASS · 合計 PASS",
+      "scope": "VDF_ENG234 UiLauncher v0103 薄尾:補 L103② VDF 網路工具橋(VDF/net 137/137)· PS 啟動器 Invoke-VIA-VdfUi-v0104.ps1(VCGC-REQ161)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0103.py",
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0102.py",
+        "Invoke-VIA-VdfUi-v0104.ps1"
+      ],
+      "timeout_seconds": 900
+    },
+    "duck_temp_hook": {
+      "argv": [
+        "CGC_MDL262_DuckTempHook",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL262_DuckTempHook_v0100 自測 12/12 · PASS",
+      "scope": "CGC_MDL262_DuckTempHook v0100 DuckDB TEMP 為主 · 記憶體為輔環境掛鉤 · 輕框清理(VCGC-REQ161)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL262_DuckTempHook_v0100.py"
       ],
       "timeout_seconds": 900
     }
@@ -3971,6 +3999,76 @@
       "next": "工作站跑交付的 PowerShell 段 → 回貼 tabula.environment_info() 與實擷結果",
       "case": null,
       "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vdf_ui_launcher_v0103",
+      "requirement": "VCGC-REQ161",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新模組 / 新尾版需交接案 vdf_ui_launcher_v0103 → 已驗:2026-10-04T19:36:17+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_ui_launcher_v0103 實跑轉 VERIFIED",
+      "case": "vdf_ui_launcher_v0103",
+      "receipt": "docs/handoff/evidence/vdf_ui_launcher_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ161:duck_temp_hook",
+      "requirement": "VCGC-REQ161",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新模組 / 新尾版需交接案 duck_temp_hook → 已驗:2026-10-04T19:36:25+00:00 rc 0 · 標記見到",
+      "next": "handoff test duck_temp_hook 實跑轉 VERIFIED",
+      "case": "duck_temp_hook",
+      "receipt": "docs/handoff/evidence/duck_temp_hook.json"
+    },
+    {
+      "id": "VCGC-REQ161:vcgc-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "VCGC 開 duckdb 的尾版 35 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vdf-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager",
+      "reason": "VDF 開 duckdb 的尾版 38 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:vrn-duck-temp-adopt",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN 開 duckdb 的尾版 35 支沒自己設 temp_directory;已由 CGC_MDL262 環境鉤補上(不改引擎)。子系統要更細的上限可在自己的連線 config / SET 覆寫(鉤只補沒給的)",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook status 看境覆蓋;工作站 install --apply 後回貼 status",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ161:workstation-duck-temp",
+      "requirement": "VCGC-REQ161",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "容器 4/4 境已裝鉤並實測;工作站各境要照同一套裝",
+      "next": "via-vcgc run CGC_MDL262_DuckTempHook install --apply → status 回貼",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ162:tw-stock-group",
+      "requirement": "VCGC-REQ162",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "6 份上傳(1 份位元組重複)整合去重 → functional modules/VDF/TaiwanStockGroup.json:148 檔 · 13 類 · 37 子類 · 153 歸屬 · 9 題材;以實抓 TPEX 上櫃名單 892 檔驗市場別修 9(7 支 .TW→.TWO、2 支 .TWO→.TW 推定上市)",
+      "next": "後續上傳放 references/intake/TaiwanStockGroup_gemini_20261005 重跑 _build_TaiwanStockGroup.py.txt;TWSE 名單工作站補驗",
+      "case": null,
+      "receipt": "functional modules/VDF/TaiwanStockGroup.json"
     }
   ]
 }

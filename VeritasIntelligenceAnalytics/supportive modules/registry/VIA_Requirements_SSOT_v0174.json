@@ -79,8 +79,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 22,
-  "COVERED": 112,
-  "PARTIAL": 64,
+  "COVERED": 113,
+  "PARTIAL": 65,
   "MISSING": 1
  },
  "requirements": [
@@ -5166,6 +5166,61 @@
    "modules": [
     "VIA_EnvGovernance_Baseline_v0101.json"
    ]
+  },
+  {
+   "code": "VCGC-REQ161",
+   "subsystem": "VCGC",
+   "topic": "VCGC / VDF / VRN 各型引擎:加速器覆蓋 100% · VDF 網路工具不漏 · DuckDB TEMP 為主記憶體為輔(環境鉤)· TEMP 輕框管理 · DuckDB 顯示",
+   "requirement": "操作員令(2026-10-05):VCGC VDF VRN 有很多種型引擎,加速器覆蓋率要 100%,VDF 要加網路工具不可漏,善用 TEMP 為主記憶體為輔,思考最佳解決方式加快;TEMP 的使用及輕框方式管理;DUCKDB 管理資料庫顯示方式;用 TEMP 支援不足的記憶體",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_VCGC_FunctionInventory_SSOT_v0154.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "掃橋器:ALL/accel 1794/1794 · VDF/net 137/137(ENG234 v0103 薄尾補網路橋,自測 5/5);CGC_MDL262 DuckTempHook 自測 12/12(64MB 上限 400 萬列排序落 TEMP 照算對、關後自清、死行程夾輕框清理 + purge 帳);容器 via_core / vap / vdf / vrn 4/4 境掛鉤實測;回歸 MDL012 v0103 · MDL261 v0101 自測 PASS",
+   "next": "工作站 install --apply 回貼 status;交接案 2 支轉 VERIFIED",
+   "hand": "AI / 操作員",
+   "quotes": [
+    {
+     "text": "VCGC VDF VRN有很多種型引擎  加速器覆蓋率要100%  VDF要加網路工具不可露  善用TEMP為主記憶體為輔 你思考一下最佳解決方式加快  另外TEMP的使用及輕框方式管理方式   DUCKDB管理資料庫顯示方式  持續完善收尾",
+     "recorded_at": "2026-10-05T06:30:00+00:00"
+    },
+    {
+     "text": "用TEMP支援不足的記憶體",
+     "recorded_at": "2026-10-05T07:20:00+00:00"
+    }
+   ],
+   "modules": [
+    "VDF_ENG234_UiLauncher_v0103.py",
+    "Invoke-VIA-VdfUi-v0104.ps1",
+    "CGC_MDL262_DuckTempHook_v0100.py"
+   ]
+  },
+  {
+   "code": "VCGC-REQ162",
+   "subsystem": "VDF",
+   "topic": "TaiwanStockGroup.json:台股族群 / 題材上傳檔整合分類去重",
+   "requirement": "操作員令(2026-10-05):上傳 gemini-code 檔「擷取並整合分類為一,後面還有」;「TaiwanStockGroup.json 整合去重後上傳 github」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "6 份上傳(1 份重複)→ 148 檔 · 13 類 · 37 子類 · 153 歸屬 · 9 題材;分類同義併(類 2 · 子類 4,冊內留對照);TPEX 實抓名單驗市場別修 9;TWSE 名單未驗(WAF)",
+   "next": "後續上傳同夾重跑",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "擷取並整合分類為一後面還有",
+     "recorded_at": "2026-10-05T07:25:00+00:00"
+    },
+    {
+     "text": "TaiwanStockGroup.json整合去重後上傳github",
+     "recorded_at": "2026-10-05T07:26:00+00:00"
+    }
+   ],
+   "modules": [
+    "TaiwanStockGroup.json"
+   ]
   }
  ],
  "non_requirements": [
@@ -5335,5 +5390,5 @@
  "why_v0171_ecstatic": "合流 ecstatic 收尾:VCGC-REQ156 → RECORDED(操作員令「還原收尾狀態 不要擴大範圍」:容器境已還原,兩件延伸轉 BLOCKED 帶理由);VCGC-REQ152 證據補 ENG234 UiLauncher 入倉 + 交接案 vdf_ui_launcher",
  "why_v0172": "v0171 已隨 PR #458 發布 → 出新版不就地改;+VCGC-REQ157(L111 子系統獨立 · 母系統監控協助 · 一對二;VRN / VDF SSOT 資訊卡);其餘一字不動",
  "why_v0173": "v0172 已隨 PR #460 發布 → 出新版不就地改;+VCGC-REQ158(L111 ⑦ 編號流程 · 輸出表頭普查);其餘一字不動",
- "why_v0174": "v0173 已隨 PR #461 發布 → 出新版;+VCGC-REQ159(VCGC / VDF 收尾);其餘一字不動;+VCGC-REQ160(tabula 獨立境 + 境內 Java)"
+ "why_v0174": "v0173 已隨 PR #461 發布 → 出新版;+VCGC-REQ159(VCGC / VDF 收尾);其餘一字不動;+VCGC-REQ160(tabula 獨立境 + 境內 Java);+VCGC-REQ161(加速 / 網路橋 / DuckDB TEMP 鉤);+VCGC-REQ162(TaiwanStockGroup)"
 }

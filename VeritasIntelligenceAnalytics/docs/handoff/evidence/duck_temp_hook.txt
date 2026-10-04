@@ -30,20 +30,21 @@
 [政策] L50 全景 · 尾版 589 · import 0 · 提及 70 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_ENG234_UiLauncher_v0102.py(家族 vdf)
-  [OK] ① 內建標準模板渲染:標題 · 四燈 CSS · 鎖定色 · 參數面板 · window.VIA 橋
-  [OK] ② 迷你渲染器(無 jinja2 也能跑):for / if / |length / 三元
-  [OK] ③ 外部 Jinja 模板:宣告變數自動對映 · 補 :root 色票 + lamp css + 橋
-  [OK] ④ 純 HTML 模板:原碼不改 · 尊重模板 :root(不蓋 --primary)· 只補燈色 token · 注入 window.VIA
-  [OK] ⑤ 沒 <head> 的片段:前置注入也能跑
-  [OK] ⑥ 參數全在 py(UI_PARAMS)· ui_config 只覆蓋 · 預設鍵不丟
-{"out": "/tmp/tmp536fe0m8/x.html", "stamped": "/tmp/tmp536fe0m8/x_20261004_193631.html", "bytes": 16952, "adapt": {"template": "builtin", "injected": []}}
-  [OK] ⑩ 靜態 build:單檔 · 資料內嵌(window.VIA.data)· 響應式 @media · seaborn 色票 · 迷你 SVG 圖表 · 不經伺服器
-  [OK] ⑦ 資料只讀:再生件 / 庫不在時誠實空(不假造列)
-  [OK] ⑧ 本機 HTTP 真起得來:/ 回面板 · /api/config 回 JSON · port 52513
-  [OK] ⑪ 左側輸入項目:起始日共用 SSOT-VCGC-VDF-INPT0001 · 五項預設 · 分群五組 · 面板 JS(新增項目 / 分群 / 匯出)在頁內
-  [OK] ⑨ 加速器橋在 · 零網路 · 零寫庫
-  [計] VDF_ENG234_UiLauncher_v0102 自測 11/11 · PASS
-  [同步] SDD 驗證 RED:X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):3 個,例 ['VCGC-REQ160', 'VCGC-REQ161' | X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VCGC-REQ162→functional modules/VDF/TaiwanStockGroup.json'] → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 27, 'changed': 4, 'stale': 0, 'expected': 16133, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 7220 · 觸碰 run --family · 交接閘 RED · 落後 227 提交 · 快照 46.4h · 未登 81 支(CGC_MDL069_SystemManager · CGC_MDL149_LayoutUse · Install-VIA-NLPOneEngine …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [via-vcgc run] [流程] 政策過 · CGC_MDL262_DuckTempHook_v0100.py(家族 core)
+  [OK] ① 本機 python 有 duckdb(自測要它)
+  [OK] ② 不預先 import duckdb(沒用的行程零成本)
+  [OK] ③ import 時掛上 · temp_directory = VIA_TEMP_ROOT/duckdb/p<pid>
+  [OK] ④ memory_limit 走 VIA_DUCKDB_MEM(300MB)
+  [OK] ⑤ 呼叫端自己給的 config 優先(位置引數也行)
+  [OK] ⑥ VIA_DUCK_TEMP=0 不掛(原生 duckdb)
+  [OK] ⑦ 64MB 上限做 400 萬列排序照算對(落 TEMP 不爆記憶體)
+  [OK] ⑧ 關連線後暫存檔清乾淨(輕框:DuckDB 自清)
+  [OK] ⑨ 輕框:只清死行程的 p<pid> 夾 · 留最近 5 · 活行程與別的夾不碰
+  清 /tmp/mdl262_bff46nx2/temproot/duckdb/p4000002  (1 檔 · 0.0 MB)
+  清 /tmp/mdl262_bff46nx2/temproot/duckdb/p4000001  (1 檔 · 0.0 MB)
+  清 /tmp/mdl262_bff46nx2/temproot/duckdb/p4000000  (1 檔 · 0.0 MB)
+  [OK] ⑩ purge --apply 寫 purge_ledger.jsonl
+  [OK] ⑪ 採用率掃得到四族(唯讀)
+  [OK] ⑫ L103 PY 加速器橋在(__future__ 之後)
+[計] CGC_MDL262_DuckTempHook_v0100 自測 12/12 · PASS
+[監控] 背景全景監控中 pid 7220 · 觸碰 run CGC_MDL262_DuckTempHook · 交接閘 RED · 落後 227 提交 · 快照 46.4h · 未登 81 支(CGC_MDL069_SystemManager · CGC_MDL149_LayoutUse · Install-VIA-NLPOneEngine …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

@@ -2563,7 +2563,7 @@
     "run",
     "--family",
     "vdf",
-    "VDF_ENG234_UiLauncher",
+    "VDF_ENG234_UiLauncher_v0102",
     "--selftest"
    ],
    "timeout": 600,
@@ -2729,6 +2729,36 @@
    "timeout": 600,
    "deps": [
     "supportive modules/registry/CGC_MDL260_AiToolPanel_v0100.py"
+   ]
+  },
+  {
+   "id": "C-vdf_ui_launcher_v0103",
+   "name": "交接案 vdf_ui_launcher_v0103(VDF_ENG234 UiLauncher v0103 薄尾:補 L103② VDF 網路工具橋(VDF/net 137/137)· PS 啟動器 Invoke-VIA-VdfUi-v0104.ps1(VCGC-REQ161))",
+   "argv": [
+    "run",
+    "--family",
+    "vdf",
+    "VDF_ENG234_UiLauncher",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0103.py",
+    "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0102.py",
+    "Invoke-VIA-VdfUi-v0104.ps1"
+   ]
+  },
+  {
+   "id": "C-duck_temp_hook",
+   "name": "交接案 duck_temp_hook(CGC_MDL262_DuckTempHook v0100 DuckDB TEMP 為主 · 記憶體為輔環境掛鉤 · 輕框清理(VCGC-REQ161))",
+   "argv": [
+    "run",
+    "CGC_MDL262_DuckTempHook",
+    "--selftest"
+   ],
+   "timeout": 600,
+   "deps": [
+    "supportive modules/registry/CGC_MDL262_DuckTempHook_v0100.py"
    ]
   }
  ],
@@ -3300,6 +3330,12 @@
    },
    "ai_tool_panel": {
     "station": "C-ai_tool_panel"
+   },
+   "vdf_ui_launcher_v0103": {
+    "station": "C-vdf_ui_launcher_v0103"
+   },
+   "duck_temp_hook": {
+    "station": "C-duck_temp_hook"
    }
   },
   "workflow": {
@@ -3583,5 +3619,5 @@
  "why_v0150": "VCGC-REQ146:交接新案 5 條(MDL009 v0102 · MDL008 v0104 · 掃橋器 v0110 · 覆蓋探針 v0106 · 版本全景載入器)各一站 + PS 站 P-vdf_fill(Invoke-VDF-FetchFill 章字;PS 入口覆蓋只認主控台 / Step1 兩支,本站不另立入口鍵);其餘一字不動(只增)",
  "why_v0152": "+C-vdf_fetch_groups_v0102 · +P-vdf_groups_ui(VCGC-REQ152);v0151 已隨 PR #446 發布,出新版不就地改;+C-ui_engine_v0100 · +P-ui_engine · 工作流 VCGC-WKF018 兩步(VCGC-REQ153);+C-ui_engine_v0101 · +C-vdf_fetch_groups_v0103 · C-ui_engine_v0100 釘本版檔 · 工作流 VCGC-WKF018-STP003/004(VCGC-REQ154);+P-ui_cmds · +C-vrn_newplugins_v0103 · C-vdf_fetch_groups_v0102 釘本版檔 · 工作流 VCGC-WKF018-STP005(VCGC-REQ155)",
  "why_v0153": "v0152 已隨 main 發布 → 出新版不就地改;+C-vdf_ui_launcher(ENG234 UiLauncher 入倉,VCGC-REQ152);其餘一字不動",
- "why_v0154": "v0153 已隨 main 發布 → 出新版;+5 站 CGC_MDL256–260(另一線 PR #447 合入、缺交接案;VCGC-REQ159 收尾);其餘一字不動"
+ "why_v0154": "v0153 已隨 main 發布 → 出新版;+5 站 CGC_MDL256–260(另一線 PR #447 合入、缺交接案;VCGC-REQ159 收尾);其餘一字不動;+2 站 vdf_ui_launcher_v0103 · duck_temp_hook(VCGC-REQ161);vdf_ui_launcher 釘 v0102"
 }
