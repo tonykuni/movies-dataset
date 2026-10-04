@@ -53,6 +53,8 @@ not_in_tpex = sorted({tk for g in groups.values() for tk in g if tk.endswith(".T
 themes = []
 LINE = re.compile(r"^(\S+)\s+(.+?)\s+(\d+(?:\.\d+){2})\s+(\S+型)\s+([\d.]+)\s+([\d.]+)\s+(.*)$")
 for f in sorted(intake.glob("*.txt")):
+    if f.name.startswith("_build"):   # 重建腳本自己放在收容夾,不是題材資料
+        continue
     b = f.read_bytes(); sha = hashlib.sha256(b).hexdigest(); n = 0
     for ln in b.decode("utf-8").splitlines():
         ln = ln.strip()
