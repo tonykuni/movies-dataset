@@ -466,7 +466,7 @@
     },
     "template_sync": {
       "argv": [
-        "CGC_MDL241_TemplateAdapter",
+        "CGC_MDL241_TemplateAdapter_v0101",
         "--selftest"
       ],
       "success_marker": "[模板轉接 v0101] 自測 37/37 PASS",
@@ -1765,6 +1765,21 @@
         "functional modules/VRN/VRN_NewPlugins_v0102.py"
       ],
       "timeout_seconds": 600
+    },
+    "vdf_ui_launcher": {
+      "argv": [
+        "--family",
+        "vdf",
+        "VDF_ENG234_UiLauncher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG234_UiLauncher_v0102 自測 11/11 · PASS",
+      "scope": "VDF_ENG234 UiLauncher v0102:VDF HTML U/I 啟動器 · PS 啟動器 Invoke-VIA-VdfUi-v0103.ps1(VCGC-REQ152)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0102.py",
+        "functional modules/VDF/engine/VDF_ENG234_UiLauncher_v0100.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -3610,12 +3625,12 @@
     {
       "id": "VCGC-REQ152:eng234-wire",
       "requirement": "VCGC-REQ152",
-      "state": "PENDING",
-      "owner": "操作員",
-      "reason": "ENG234 UiLauncher v0102 與其 PS 啟動器只在工作站(倉內與 GitHub 都沒有);對接欄空白 · Start-CeleritasPS7 null",
-      "next": "工作站 git add / commit / push ENG234 與其 .ps1 → AI 接對接快照、查加速器 null",
-      "case": null,
-      "receipt": null
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "ENG234 UiLauncher v0102 與其 PS 啟動器只在工作站(倉內與 GitHub 都沒有);對接欄空白 · Start-CeleritasPS7 null;工作站已推 ENG234 v0100 / v0102 與 Invoke-VIA-VdfUi-v0103.ps1(經 main)→ 交接案 vdf_ui_launcher → 已驗:2026-10-04T17:49:22+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_ui_launcher 實跑轉 VERIFIED",
+      "case": "vdf_ui_launcher",
+      "receipt": "docs/handoff/evidence/vdf_ui_launcher.json"
     },
     {
       "id": "VCGC-REQ153:ui_engine_v0100",
@@ -3710,20 +3725,20 @@
     {
       "id": "VCGC-REQ156:workstation-tools",
       "requirement": "VCGC-REQ156",
-      "state": "PENDING",
-      "owner": "操作員 / Windows 工作站",
-      "reason": "容器已補 vrn 選配 2 件、vdf 網路工具合規層 21 件(不含 FinMind:會拉低 pandas);工作站境要照同一份清單補",
-      "next": "工作站 uv pip install --python (Get-VIAEnvPython vdf) <清單> → uv pip check → via-rungate → fetch test",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "reason": "容器已補 vrn 選配 2 件、vdf 網路工具合規層 21 件(不含 FinMind:會拉低 pandas);工作站境要照同一份清單補(轉態:操作員 2026-10-05 令「回顧紀錄不是VCGC VDF已經收尾了嗎 還原收尾狀態 不要擴大範圍」;未做、不算成功)",
+      "next": "操作員另下令才重開",
       "case": null,
       "receipt": null
     },
     {
       "id": "VCGC-REQ156:nlp-v0109",
       "requirement": "VCGC-REQ156",
-      "state": "PENDING",
-      "owner": "AI",
-      "reason": "tools activate nlp v0108 閘不過:公開名稱少(BODY, OCR_PKGS, REGISTRY, paragraphs_of, pdf_text, run_pdf_text …)· 參數少 2 · 未登錄",
-      "next": "出 SUP_MDL866 v0109 薄尾補回 v0106 公開名稱與參數 → 登錄 → tools activate nlp --apply",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "reason": "tools activate nlp v0108 閘不過:公開名稱少(BODY, OCR_PKGS, REGISTRY, paragraphs_of, pdf_text, run_pdf_text …)· 參數少 2 · 未登錄(轉態:操作員 2026-10-05 令「回顧紀錄不是VCGC VDF已經收尾了嗎 還原收尾狀態 不要擴大範圍」;未做、不算成功)",
+      "next": "操作員另下令才重開",
       "case": null,
       "receipt": null
     }
