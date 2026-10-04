@@ -1695,6 +1695,76 @@
         "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_fetch_groups_v0102": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0102",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0102 本版 8/8 · v0101 PASS · 合計 PASS",
+      "scope": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/ui_templates/VDF_FetchGroups_Compact_v0100.html"
+      ],
+      "timeout_seconds": 1200
+    },
+    "ui_engine_v0100": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0100",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0100 本版 9/9 · 合計 PASS",
+      "scope": "CGC_MDL261 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
+        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json",
+        "supportive modules/ui_support/ui_templates/VIA_UIEngine_MinimalGrid_v0100.html"
+      ],
+      "timeout_seconds": 900
+    },
+    "ui_engine_v0101": {
+      "argv": [
+        "CGC_MDL261_UIEngine",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+      "scope": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
+        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_fetch_groups_v0103": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+      "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vrn_newplugins_v0103": {
+      "argv": [
+        "VRN_NewPlugins",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_NewPlugins v0103 本版 5/5 · 合計 PASS",
+      "scope": "VRN_NewPlugins v0103 薄尾:補 L103 PY 加速器橋 · 插件字典 / AST 索引照 v0102 · 轉接(VCGC-REQ155)",
+      "dependencies": [
+        "functional modules/VRN/VRN_NewPlugins_v0103.py",
+        "functional modules/VRN/VRN_NewPlugins_v0102.py"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -3526,6 +3596,116 @@
       "next": "handoff test vdf_fetch_groups_v0101 實跑轉 VERIFIED",
       "case": "vdf_fetch_groups_v0101",
       "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ152:vdf_fetch_groups_v0102",
+      "requirement": "VCGC-REQ152",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152)(REQ155 加轉接後重驗) → 已驗:2026-10-04T16:00:56+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0102 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0102",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ152:eng234-wire",
+      "requirement": "VCGC-REQ152",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "ENG234 UiLauncher v0102 與其 PS 啟動器只在工作站(倉內與 GitHub 都沒有);對接欄空白 · Start-CeleritasPS7 null",
+      "next": "工作站 git add / commit / push ENG234 與其 .ps1 → AI 接對接快照、查加速器 null",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ153:ui_engine_v0100",
+      "requirement": "VCGC-REQ153",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL261 v0100 中央 U/I 引擎:參數檔疊層(正本 ← ui_config.json ← --set)· 內建標準範本(左面板 · 儀表板 / 來源 / DuckDB / 環境 / 參數)· 任何範本自適應(Jinja 沙盒 / 逐變數代換 · window.VIA / VIA_CONFIG · 色票)· DuckDB 顯式(表 · 視圖 · 欄位 · 日期 · 樣本 · LOCKED)· serve 只綁本機只讀 · PS7 Start-VIA-UIEngine(RunGate · LKGC 照測過版本安裝)(VCGC-REQ153)(改號 MDL257→261 後收據失效、案釘本版檔重驗) → 已驗:2026-10-04T15:00:17+00:00 rc 0 · 標記見到",
+      "next": "handoff test ui_engine_v0100 實跑轉 VERIFIED",
+      "case": "ui_engine_v0100",
+      "receipt": "docs/handoff/evidence/ui_engine_v0100.json"
+    },
+    {
+      "id": "VCGC-REQ153:workstation-lkgc",
+      "requirement": "VCGC-REQ153",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "「照我測過的結果安裝」= LKGC;工作站要先 EnvGovernance 全綠存 LKGC_latest(可用)才有鎖可照",
+      "next": "工作站 via-envgov run → 全綠晉升 LKGC → Start-VIA-UIEngine -Install",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ154:ui_engine_v0101",
+      "requirement": "VCGC-REQ154",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154)(REQ155 加轉接後重驗) → 已驗:2026-10-04T16:01:18+00:00 rc 0 · 標記見到",
+      "next": "handoff test ui_engine_v0101 實跑轉 VERIFIED",
+      "case": "ui_engine_v0101",
+      "receipt": "docs/handoff/evidence/ui_engine_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ154:vdf_fetch_groups_v0103",
+      "requirement": "VCGC-REQ154",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)(REQ155 加轉接後重驗) → 已驗:2026-10-04T16:01:07+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0103 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0103",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ154:workstation-run",
+      "requirement": "VCGC-REQ154",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "台股 / 國際實抓在容器被 TWSE WAF · Yahoo 429 擋;頁上點選後的 -Run live 要在工作站",
+      "next": "工作站 .\\Start-VIA-UIEngine-v0101.ps1 → 匯出輸入 → VIA_NET_CONSENT=YES 下 -Run -Mode live",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:vrn_newplugins_v0103",
+      "requirement": "VCGC-REQ155",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VRN_NewPlugins v0103 薄尾:補 L103 PY 加速器橋 · 插件字典 / AST 索引照 v0102 · 轉接(VCGC-REQ155) → 已驗:2026-10-04T16:00:45+00:00 rc 0 · 標記見到",
+      "next": "handoff test vrn_newplugins_v0103 實跑轉 VERIFIED",
+      "case": "vrn_newplugins_v0103",
+      "receipt": "docs/handoff/evidence/vrn_newplugins_v0103.json"
+    },
+    {
+      "id": "VCGC-REQ155:workstation-cmds",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "短令要真 PowerShell 點源 Register v0269 才走得到 Windows 路徑與資料夾對話框;容器只驗 pwsh 剖析與 Linux pwsh 點源實跑;首跑 2026-10-05 沒拉到本分支(本機在 claude/new-session-q9pb23)且 via-ui 撞名 → 改 via-op;次跑 2026-10-05 00:24:via-op / via-monitor 實跑通;via-op-run 的 -Run 沒傳到(已修,待第三跑)",
+      "next": "git pull 本分支 → 點源 Register v0269 → via-op-run -Mode block(看到 [擷取] 行)→ 回貼後轉 VERIFIED",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:vrn-v0102-bridge",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "CGC_MDL183 全樹尺仍數 VRN_NewPlugins_v0102 本體缺 PY 加速器橋;該檔已隨 PR #448 發布,VCGC 子系統邊界不准就地改 → 已出 v0103 尾版接上",
+      "next": "操作員裁:准 VRN 端就地補 v0102,或把 v0102 列版史豁免",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ155:workstation-vake",
+      "requirement": "VCGC-REQ155",
+      "state": "PENDING",
+      "owner": "操作員 / Windows 工作站",
+      "reason": "工作站 monitor:CN_MACRO / GLOBAL_MACRO / SHIPPING / CN_NBS 讀 <home>\\vake\\db\\vake.duckdb 不在(容器深抓的資料不進 git);獨立版 VDF_AkshareFetcher 預設 VAKE_ROOT=C:\\VIA\\VAKE,若舊資料在那邊要搬或指過來",
+      "next": "Test-Path C:\\VIA\\VAKE\\db\\vake.duckdb → 有就回報;沒有就 VIA_NET_CONSENT=YES 下 via-groups run --groups CN_MACRO,GLOBAL_MACRO,SHIPPING,CN_NBS",
+      "case": null,
+      "receipt": null
     }
   ]
 }

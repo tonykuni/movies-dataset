@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- VDF_FetchGroups_Compact_v0100 · 範例範本(VDF_MDL012 ui --template VDF_FetchGroups_Compact_v0100)
+     兩種接法都示範:① 雙大括號變數(as_of · built · tool,任何環境都代換)② window.VIA = 整份族群快照(產生器注入),
+     卡片由下方 JS 從 window.VIA 畫 —— 不靠 jinja2,VDF 境沒裝 jinja2 也照樣出頁。
+     複製本檔改版面即可做自己的範本;要用 Jinja 迴圈區塊也可以(有裝 jinja2 才渲染,沒裝時產生器會照實註明)。 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VDF 族群 · 精簡 · {{ as_of }}</title>
+<style>
+body{margin:0;background:var(--via-ink-page,#0b0c0d);color:var(--via-fg,#e6ebf2);font:12.5px/1.4 var(--via-font,system-ui,sans-serif)}
+header{padding:14px 20px;border-bottom:1px solid var(--via-rule,#333)}
+header b{font-size:16px}
+main{padding:14px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.g{border:1px solid var(--via-rule,#333);border-radius:8px;padding:10px;background:var(--via-card,#14181c)}
+.g h3{margin:0 0 6px;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.lamp-GREEN,.lamp-YELLOW,.lamp-RED,.lamp-NODATA,.lamp-NODATE,.lamp-LOCKED{border-radius:4px;padding:0 6px;font-size:11px}
+.mut{color:var(--via-muted,#8c99a6)}
+.wide{grid-column:1/-1}
+pre{white-space:pre-wrap;font-size:10.5px;max-height:220px;overflow:auto;margin:0}
+</style>
+</head>
+<body>
+<header><b>VDF 擷取大族群 · 精簡範本</b> <span class="mut">as-of {{ as_of }} · 產生 {{ built }} · {{ tool }}</span></header>
+<main id="cards"><div class="mut">(沒有 window.VIA 快照:請用 VDF_MDL012 ui --template 產頁)</div></main>
+<script>
+(function () {
+  var S = window.VIA;
+  if (!S || !S.groups) return;
+  var esc = function (v) { return (v === null || v === undefined) ? '' : String(v).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  var html = S.groups.map(function (g) {
+    var s = g.summary || {}, w = s.worst || 'NODATA';
+    return '<section class="g"><h3><span>' + (g.membership === 'FIXED_ALL' ? '🔒 ' : '') + esc(g.zh) + '</span><span class="lamp-' + esc(w) + '">' + esc(w) + '</span></h3>'
+      + '<div class="mut">' + esc(g.id) + ' · 引擎 ' + esc((g.engines || []).join(',')) + ' · 成員 ' + (g.n === null || g.n === undefined ? '全部' : esc(g.n)) + '</div>'
+      + '<div>≤as-of 筆數 ' + Number(s.rows_asof || 0).toLocaleString() + ' · 最晚 ' + esc(s.max_date || '—') + '</div></section>';
+  }).join('');
+  var lv = S.live || {};
+  html += '<section class="g wide"><h3><span>Live log</span><span class="mut">' + (lv.running ? '擷取中' : '閒置') + ' · ' + esc(lv.newest || '—') + '</span></h3><pre>'
+    + esc((lv.lines || []).slice(-40).join('\n')) + '</pre></section>';
+  document.getElementById('cards').innerHTML = html;
+  if (lv.running) setTimeout(function () { location.reload(); }, 15000);
+})();
+</script>
+</body>
+</html>
