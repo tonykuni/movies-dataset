@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "側線 2026-10-05(+L111 子系統獨立 · 母系統監控協助 · 一對二)",
- "ts": "2026-10-05T03:00:00",
+ "batch": "側線 2026-10-05 a(操作員:除純標準 PS 模板以後都要加入這個寫入政策)",
+ "ts": "2026-10-04T23:16:27",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
   {
@@ -736,12 +736,17 @@
   },
   {
    "id": "L111",
-   "batch": "側線 2026-10-05(操作員:「VRN / VDF MANAGER 控管獨立系統 VCGC 獨立監控下方的問題但不能更動他們但要幫他們安裝所有工具及環境 並監控檢視合規狀態 子系統的獨立性 母系統的監控性跟協助性釘入策略」「功能參數下放子系統 母系統協助提供資訊及自動偵測協助整合衝突問題資訊提供 VCGC-VRN VCGC-VDF 一對二」)",
-   "cat": "治理",
-   "key": "SUBSYSTEM_INDEPENDENCE_PARENT_MONITOR_ASSIST",
-   "status": "ACTIVE",
-   "zh": "**子系統獨立 · 母系統監控與協助律(一對二:VCGC → VDF · VCGC → VRN)。**\n① **子系統獨立**:VDF 由 VDF_SystemManager、VRN 由 VRN_SystemManager 控管;功能、參數、SSOT / regex / 同義字的正本下放子系統(承 L108 正本在基層),由子系統自己修、自己出新版號。\n② **母系統不改子系統**:VCGC 不就地改 VDF / VRN 正本,也不替它們出新版號的程式;越界由 VCGC 子系統邊界閘擋下。\n③ **母系統監控**:VCGC 獨立監控兩個子系統的合規狀態——交接閘 · 全綠閘 · SSOT 全景 · 掃橋(PY 加速器 / VDF 網路工具 / PS 模板)· RunGate · 編號稽核;紅黃逐條點名歸屬,只攤開不裁定。\n④ **母系統協助(環境與工具)**:子系統需要的工具與環境由 VCGC 代裝——只裝進該子系統的家族境(via_vdf_* / via_vrn_*),走 RunGate / EnvGovernance / uv pip --python;裝後必跑相容檢查與該子系統自測;不降版樞紐件(numpy / pandas 降版即還原),不裝規避偵測類。\n⑤ **母系統協助(資訊與整合衝突)**:VCGC 自動偵測整合衝突(跨冊 regex 拷貝、共用冊引用、同號異名 / 缺號、合流衝突),出資訊卡與建議修正(含建議 pattern 與測試例),以交接工作項指派給子系統 manager;子系統修完,VCGC 重測收據再轉態。\n⑥ **一對二**:VCGC→VDF、VCGC→VRN 兩條線各自獨立、互不代管;VDF 與 VRN 共用的冊,衝突由 VCGC 攤開、兩子系統協調,正本歸屬的一方修。",
-   "enforcement": "VCGC 子系統邊界閘(CGC_MDL149 衝突閘:改到 VDF / VRN 正本 = RED 不提交)· handoff check / 全綠閘 · ssot panorama · CGC_MDL124 掃橋 · CGC_MDL183 · CGC_MDL137 RunGate(家族境補庫)· CGC_MDL135 EnvGovernance · CGC_MDL237 編號稽核;資訊卡 docs/handoff/ai/VCGC_SubsystemReport_*.md + 交接工作項(owner = 子系統 manager)"
+   "batch": "側線 2026-10-05 a",
+   "cat": "PS 模板",
+   "key": "PS_SKELETON_MANDATORY",
+   "zh": "【PS 骨架律】凡 AI 或操作員為本樹產出的 PowerShell,除「純標準模板本身」(VeritasCeleritas.PS7.Template.ps1 · VeritasCeleritas.PS7.Skeleton-v####.ps1 · AutoImport · Final · VIA_PS_Accel_Module)外,一律接入骨架尾版(VeritasCeleritas.PS7.Skeleton-v0109 起),八段缺一不可:① 兩章(CELERITAS-TEMPLATE-JOIN + [VIA:PS-ACCEL])且 [CmdletBinding()] param() 為第一語句;② 安全清理只動本行程:GC 兩輪,孤兒子行程**只列不殺**(殺要明寫 -KillOrphans),不改優先權、不 EmptyWorkingSet、不碰他人行程;③ TEMP 為主記憶體:TMP/TEMP/TMPDIR/POLARS/duckdb 全指 VIA_TEMP_ROOT\\ps_<時戳>,滾動只清 2 小時前且 30 分內無人寫的輪,刪了記 purge_ledger(L107);④ 加速器:AutoImport 在 supportive modules 任何兩層子夾都找,掛不上黃字 fallback 不炸,退出 Restore;⑤ 工作走雙軌(或多軌)ThreadJob,NotStarted 算在跑,各道寫 <LogDir>\\<id>.progress,主控台矩陣框原地重繪(Pad-Visual 中文對齊;VT 不支援退回單印);⑥ PS → python 只走 Invoke-VCPython:直呼、argv base64、看門狗在 python 內(先 KeyboardInterrupt 讓 finally/原子換名跑完,10 秒後硬殺 124);禁用 Start-Process 重導向 + WaitForExit、禁用 ThreadJob 攤平參數;⑦ 收尾黃字(貼 AI)/紅字(錯誤)+ NEXT 一行 + paste.md + 剪貼簿,並產靜態 HTML U/I(file:// 直接開,零伺服器;FormatLock 四燈,紅燈慢閃,電腦/手機自適應);⑧ 退出還原:開工備份 TMP/TEMP/VIA_FROM_VCGC/VIA_NO_OPEN/VIA_PANORAMA_AUTO 等環境變數,收尾全部還原,不留繞閘後門。本支只寫 VIA_Reports\\review\\ps_<時戳>\\ 與 VC_UI_latest.html;不動 PATH、$PROFILE、註冊、git、任何冊與引擎。違者 CGC_MDL183 CeleritasPolicyGate 判缺章,不進促轉清單。"
+  },
+  {
+   "id": "L112",
+   "batch": "側線 2026-10-05 a",
+   "cat": "PS 模板",
+   "key": "PS_SKELETON_PRECHECK",
+   "zh": "【PS 出門前三檢】每支接骨架的 PS 出門前:(1) Parser.ParseFile 零錯;(2) 骨架函數被借用時自帶預設(param 不在也能跑);(3) 路徑一律引號(functional modules 有空格)。三檢任一不過不得交付。教訓來源:2026-10-03 param 順序 · 作用域 null · 空格路徑三連環。"
   }
  ],
  "lessons": [
@@ -2765,7 +2770,14 @@
    "zh": "**拔一個被禁的庫,要量「誰真的用它」,不是 grep 字面。** 全樹 575 支檔提到 talib,AST 量(import / from / 動態 import / find_spec)活碼裡真的 import 的是 0 支;其餘是禁令、歷史、收容正本(零觸碰)與偵測器。偵測器(find_spec 看有沒有裝)是 L50 的執法,不是使用;但 VRN 全景探針把 talib 列進「加速候選庫」、裝了就算進可用分母——那是把禁用庫當候選,拔掉。LL443 量不是推的又一例。"
   }
  ],
- "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。 側線 2026-09-23:操作員令三條「列為最高政策」→ L103 置陣列首位 rank=1,L50 順延 2、L102 順延 3;id 不重編。排序待操作員確認(要 L50 仍居首=兩處對調)。 側線 2026-10-03:+L106(加速器導入細則)· L107(TEMP 核外與滾動清理)· L108(SSOT 分層 · 來源分號 · 長相固定 · 同義字只增),皆無 rank,附於陣列尾;id 不重編(L104 L105 已有主,故續號 L106 起);條文為 AI 依操作員原文起草,**待操作員確認**後才由 CGC_MDL207 PolicyRun 讀新版。 側線 2026-10-03 b:+L109(VRN 擷取六律)· L110(調整價係數律);L107 加補充段、原條文一字不改(衝突偵測對 L107 的誤判由此解);皆無 rank;待操作員確認。 側線 2026-10-05:+L111(子系統獨立 · 母系統監控協助 · 一對二),無 rank,附於陣列尾;操作員原文下令,status ACTIVE。",
+ "law_order_note": "批618 操作員裁定:L50 升為第一條,故置於 laws 陣列首位並帶 rank=1。**id 一律不重編**(L01…L91 全樹到處被引用,重編等於製造死連結);順序表達位階,id 表達身分。 批715:操作員令新政策『higher priority』,置於 L50 之後 rank=2(L50 第一條不動)。 側線 2026-09-23:操作員令三條「列為最高政策」→ L103 置陣列首位 rank=1,L50 順延 2、L102 順延 3;id 不重編。排序待操作員確認(要 L50 仍居首=兩處對調)。 側線 2026-10-03:+L106(加速器導入細則)· L107(TEMP 核外與滾動清理)· L108(SSOT 分層 · 來源分號 · 長相固定 · 同義字只增),皆無 rank,附於陣列尾;id 不重編(L104 L105 已有主,故續號 L106 起);條文為 AI 依操作員原文起草,**待操作員確認**後才由 CGC_MDL207 PolicyRun 讀新版。 側線 2026-10-03 b:+L109(VRN 擷取六律)· L110(調整價係數律);L107 加補充段、原條文一字不改(衝突偵測對 L107 的誤判由此解);皆無 rank;待操作員確認。 ‖ L111/L112(2026-10-05):PS 骨架律 + 出門前三檢;純標準模板本身豁免(具名)",
  "lessons_gap_note_b736": "批736 實測:LL344–LL443 共 100 條只存在於 docs/,從未入冊(冊停在 LL343/批687),本批續號自 LL444 起。**冊上 lessons 的計數不等於樹上實有的教訓數**——回填那 100 條是獨立一批的事,待操作員裁定。",
- "prior": "VIA_Policy_Laws_SSOT_v0102.json"
+ "skeleton_exempt": [
+  "VeritasCeleritas.PS7.Template.ps1",
+  "VeritasCeleritas.PS7.Skeleton-v####.ps1",
+  "VeritasCeleritas.PS7.AutoImport*.ps1",
+  "VeritasCeleritas.PS7.Final*.ps1",
+  "VIA_PS_Accel_Module*.ps1",
+  "VeritasCeleritas.PS7.ps1"
+ ]
 }
