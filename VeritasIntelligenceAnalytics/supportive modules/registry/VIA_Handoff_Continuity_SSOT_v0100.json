@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-04T03:35:00+00:00",
+  "updated_at": "2026-10-04T04:10:00+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1635,6 +1635,35 @@
         "supportive modules/registry/CGC_MDL135_EnvGovernance_v0117.py"
       ],
       "timeout_seconds": 1800
+    },
+    "vdf_fetch_v0107": {
+      "argv": [
+        "VDF_MDL008_FetchSystem",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL008_FetchSystem v0107 本版 6/6 · v0106 PASS · 合計 PASS",
+      "scope": "MDL008 v0107 live curl_cffi 改道進鎖版網路工具(akshare NBS)· 冊 v0106(MDL011 v0102 · +011d 深度宏觀)· 列上限 timeout_s(VCGC-REQ149)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0107.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0102.py",
+        "functional modules/VDF/VDF_MDL008_FetchSystem_v0106.py"
+      ],
+      "timeout_seconds": 2400
+    },
+    "vdf_akshare_v0102": {
+      "argv": [
+        "VDF_MDL011_AkshareFetcher",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL011_AkshareFetcher v0102 本版 6/6 · v0101 PASS · 合計 PASS",
+      "scope": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0102.py",
+        "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
+        "functional modules/VDF/VDF_MDL011_AkshareFetcher_v0101.py"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -3404,6 +3433,36 @@
       "owner": "操作員",
       "reason": "EnvManager B10 必備執行檔 pwsh:容器 PATH 沒有(工作站有)",
       "next": "工作站跑 EnvManager check 回貼",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ149:vdf_fetch_v0107",
+      "requirement": "VCGC-REQ149",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL008 v0107 live curl_cffi 改道進鎖版網路工具(akshare NBS)· 冊 v0106(MDL011 v0102 · +011d 深度宏觀)· 列上限 timeout_s(VCGC-REQ149)",
+      "next": "handoff test vdf_fetch_v0107 實跑轉 VERIFIED",
+      "case": "vdf_fetch_v0107",
+      "receipt": "docs/handoff/evidence/vdf_fetch_v0107.json"
+    },
+    {
+      "id": "VCGC-REQ149:vdf_akshare_v0102",
+      "requirement": "VCGC-REQ149",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149)",
+      "next": "handoff test vdf_akshare_v0102 實跑轉 VERIFIED",
+      "case": "vdf_akshare_v0102",
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ149:deep-full-tier",
+      "requirement": "VCGC-REQ149",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "tier full(全國年度 2188 + 分省月 / 季 × 31 省 = 6404 呼叫,每呼叫 10–20 秒)容器跑不完",
+      "next": "工作站 fetch fill 011d(或 deep-macro --tier full)",
       "case": null,
       "receipt": null
     }
