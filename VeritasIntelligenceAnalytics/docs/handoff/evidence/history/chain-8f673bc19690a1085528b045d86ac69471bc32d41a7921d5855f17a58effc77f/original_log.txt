@@ -37,13 +37,13 @@
   [OK] ① 進度暫存模組 CGC_MDL251 載得到;本體的站執行格與 run 已換成本版
   [OK] ② 中斷(Ctrl+C)後重跑:已跑完的 a · b 接續不重跑,只跑沒跑過的 c;接續的站 log 照寫且標明「接續」 · (2, [('c',)])
   [OK] ③ 正常跑完標完成 → 下一次重開新一輪(不拿舊結果冒充)
-  [OK] ④ 暫存檔在本機暫存夾(VIA_PROGRESS_DIR 指定處)、不在倉內 · /tmp/tmpuuwbirdh/VIA_progress/TestAutoST_ffbdc30a2361ff5d.jsonl
+  [OK] ④ 暫存檔在本機暫存夾(VIA_PROGRESS_DIR 指定處)、不在倉內 · /tmp/tmp1dcs8uut/VIA_progress/TestAutoST_6710087124ec9f42.jsonl
   [OK] ⑤ 加速器橋 · 網路橋在;不碰 TA-Lib
   [OK] ① 版號認 -vNNNN(PS)與 _vNNNN(py / json);沒版號或不在結尾 = -1 · [108, 101, 105, -1, -1]
   [OK] ② 前版 newest 換裝後挑到最新 PS 入口 · 紀錄冊項帶版本 v0108 與 sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-OperatorConsole-v0108.ps1', 'version': 'v0108', 'sha16': '783dc382b45b3449'}
   [OK] ③ 實樹:discover 的 PS 入口 = 樹上最新那支(不再是空字串) · Invoke-VIA-OperatorConsole-v0111.ps1
   [OK] ④ 實樹 PS 入口站:不是 ABSENT · 串測步在(沒 pwsh 照實黃,有 pwsh 驗語法) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-OperatorConsole-v0111.ps1
-  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261004-042322-20757', 'hub': 'go-20260930-120000-1'}
+  [OK] ⑤ 串測自開輪號 test-…:站的事件不進入口的 go 輪 · 報告(回傳與 TEST_latest.json)hub 記入口輪 · 跑完還原(沒有就不留) · {'run': 'test-20261004-041912-16354', 'hub': 'go-20260930-120000-1'}
   [OK] ⑥ 加速器橋在 · 不碰 TA-Lib
   [OK] ① 動詞從 AST 抽:args[:1] == ['x'] · args[0] == 'x' · verb in VERBS;無關比較不算 · ['all', 'alpha', 'beta', 'go']
   [OK] ② 盤點:有站 COVERED · 豁免 EXEMPT · 樹上有冊上沒 NEW · 冊上有樹上沒 GONE · [('alpha', 'COVERED'), ('beta', 'NEW'), ('go', 'EXEMPT'), ('gone', 'GONE')]
@@ -54,29 +54,30 @@
 {"via": "vcgc", "state": "DENY", "why": "only via-vcgc"}
 [VCGC 全功能串測] 已在串測中:不遞迴(外層那一輪就是本流程)
   [OK] ⑦ 只收 VCGC · 串測中再叫不遞迴
-  [OK] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0151.json · 0
+  [FAIL] ⑧ 實樹:盤點冊在 · 動詞 / 席位 / 必用卡 / 交接案 / 工作流步 / PS 入口全部有站或豁免(新 0 · 缺 0) · VIA_VCGC_FunctionInventory_SSOT_v0151.json · workflow:VCGC-WKF017-STP001 workflow:VCGC-WKF017-STP002 workflow:VCGC-WKF017-STP003 workflow:VCGC-WKF017-STP004 workflow:VCGC-WKF017-STP005
   [OK] ⑨ 站號唯一 · PS 入口站守住「串測步在」· 快站存在(AI 進場用) · 站 185
   [OK] ⑩ 加速器橋在 · 不碰 TA-Lib · 前版 v0100 的 9 套自測還在盤點冊
-  CGC_MDL224_TestAuto_v0101 selftest 10/10 PASS
-  CGC_MDL224_TestAuto_v0102 selftest 6/6 PASS(前版 CGC_MDL224_TestAuto_v0101 rc=0)
+  CGC_MDL224_TestAuto_v0101 selftest 9/10 FAIL
+  CGC_MDL224_TestAuto_v0102 selftest 6/6 FAIL(前版 CGC_MDL224_TestAuto_v0101 rc=1)
   [OK] ⑥ 前版自測跑完後本版換裝還在(站執行格 · run)
   [CGC_MDL224_TestAuto_v0103] 薄尾 6/6 PASS
-  [OK] ① 前版 v0103 自測全過(進度暫存 · 接續);跑完後本版換裝還在
+  [FAIL] ① 前版 v0103 自測全過(進度暫存 · 接續);跑完後本版換裝還在
   [OK] ② 平行度取加速器 aggressive 預算;--jobs / VIA_TEST_JOBS 可蓋過 · (4, 'VeritasCeleritas aggressive')
   [OK] ③ 切段:連續 C-* 一段,中間夾 V 站就切開;upd / V 站不並行;引擎名跳過 --family
-  [OK] ④ 8 站 4 支引擎、平行度 4:牆鐘約 2 站時間(序列要 8 站);每站結果對回自己;同引擎不重疊 · 0.80s · 同引擎重疊 False
+  [OK] ④ 8 站 4 支引擎、平行度 4:牆鐘約 2 站時間(序列要 8 站);每站結果對回自己;同引擎不重疊 · 0.81s · 同引擎重疊 False
   [OK] ⑤ 平行度 1 或非 C 站 → 直接走前版執行格(行為照前版)
   [OK] ⑥ 前提在:教訓帳 CGC_MDL058 尾版有跨行程鎖(v0103 起)· 加速器橋 · 網路橋 · 不碰 TA-Lib
-  [CGC_MDL224_TestAuto_v0104] 薄尾 6/6 PASS
-  [OK] ① 前版鏈自測過(v0104 → … → v0101 實樹 ⑧ 新 0 · 缺 0);本版換裝還在 · rc 0
+  [CGC_MDL224_TestAuto_v0104] 薄尾 5/6 FAIL
+  [FAIL] ① 前版鏈自測過(v0104 → … → v0101 實樹 ⑧ 新 0 · 缺 0);本版換裝還在 · rc 1
   [OK] ② 挑檔:只有無版號 → 認它 · 有 -vNNNN → 取最新版號 · 沒有 → None
   [OK] ③ 實樹 discover:PS 入口兩支都找到(主控台 · Step1),Step1 取有版號那支 · {'operator_console': 'Invoke-VIA-OperatorConsole-v0111.ps1', 'step1_sync_lkgc': 'Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1'}
   [OK] ④ 實樹 P-step1 驗的是 Step1 自己那支(不是主控台):兩章在 → 不是 RED(沒 pwsh 照實黃) · PS 語法過(pwsh Parser)· 串測步在 · Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1
   [OK] ⑤ 紀錄冊項:主控台照前版 · Step1 另記檔名 + 版本 + sha16 · {'kind': 'ps', 'file': 'Invoke-VIA-Step1-SyncAndLKGC-v0101.ps1', 'version': 'v0101', 'sha16': 'da608cd023e7deb1'}
   [OK] ⑥ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 只收 VCGC
-  [CGC_MDL224_TestAuto_v0105] 薄尾 6/6 PASS
+  [CGC_MDL224_TestAuto_v0105] 薄尾 5/6 FAIL
   [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 8, 'stale': 0, 'expected': 15674, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+  [教訓] 重複出錯:run CGC_MDL224_TestAuto · rc=1 · <unknown>:<n>: SyntaxWarning: invalid escape sequence '<path>' · 第 26 次 · 帳本 CGC_MDL058(via-lessons)
 <unknown>:3: SyntaxWarning: invalid escape sequence '\V'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\V'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\V'
-[監控] 背景全景監控中 pid 29042 · 觸碰 run CGC_MDL224_TestAuto · 交接閘 RED · 落後 120 提交 · 快照 31.2h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 29042 · 觸碰 run CGC_MDL224_TestAuto · 交接閘 RED · 落後 118 提交 · 快照 31.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
