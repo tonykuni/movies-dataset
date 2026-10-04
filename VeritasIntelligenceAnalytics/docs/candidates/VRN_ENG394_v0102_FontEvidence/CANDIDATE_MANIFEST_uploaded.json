@@ -1,0 +1,115 @@
+{
+  "version": "v0102",
+  "status": "CANDIDATE_NOT_RELEASED",
+  "central_ssot_id": null,
+  "tests": {
+    "new_checks": 17,
+    "new_failed": 0,
+    "prior_v0100": 43,
+    "prior_v0101": 14,
+    "cli_synthetic": "GREEN",
+    "real_pdf_acceptance": false
+  },
+  "adapters": {
+    "pdfplumber": {
+      "module": "pdfplumber",
+      "distribution": "pdfplumber",
+      "license": "MIT",
+      "role": "primary native chars/fontname/size",
+      "lineage": "pdfminer",
+      "available": true,
+      "installed_version": "0.11.8",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "pdfminer": {
+      "module": "pdfminer",
+      "distribution": "pdfminer.six",
+      "license": "MIT",
+      "role": "native char diagnostic",
+      "lineage": "pdfminer",
+      "available": true,
+      "installed_version": "20251107",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "fonttools": {
+      "module": "fontTools",
+      "distribution": "fonttools",
+      "license": "MIT",
+      "role": "font-file weight metadata",
+      "lineage": "font-file",
+      "available": true,
+      "installed_version": "4.61.1",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "pymupdf": {
+      "module": "fitz",
+      "distribution": "PyMuPDF",
+      "license": "AGPL-3.0 OR commercial",
+      "role": "native span metadata crosscheck",
+      "lineage": "mupdf",
+      "available": true,
+      "installed_version": "1.26.6",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "pdfium": {
+      "module": "pypdfium2",
+      "distribution": "pypdfium2",
+      "license": "Apache-2.0 OR BSD-3-Clause; PDFium third-party notices",
+      "role": "native font size/weight diagnostic",
+      "lineage": "pdfium",
+      "available": true,
+      "installed_version": "5.3.0",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "opencv": {
+      "module": "cv2",
+      "distribution": "opencv-python",
+      "license": "Apache-2.0 (4.5+)",
+      "role": "image components; not exact font weight",
+      "lineage": "image",
+      "available": false,
+      "installed_version": null,
+      "status": "MISSING"
+    },
+    "pillow": {
+      "module": "PIL",
+      "distribution": "Pillow",
+      "license": "MIT-CMU",
+      "role": "crop/image geometry; not exact font weight",
+      "lineage": "image",
+      "available": true,
+      "installed_version": "12.3.0",
+      "status": "AVAILABLE_NOT_CERTIFIED"
+    },
+    "tesseract": {
+      "module": "pytesseract",
+      "distribution": "pytesseract",
+      "license": "Apache-2.0",
+      "role": "OCR word boxes; font attributes unknown",
+      "lineage": "tesseract",
+      "available": false,
+      "installed_version": null,
+      "status": "MISSING"
+    }
+  },
+  "policy": {
+    "primary": "pdfplumber",
+    "layout_partner": "existing ENG394 v0101",
+    "font_bold_unknown": "null, never assumed regular",
+    "summary": "verified body only; source-linked extractive",
+    "rating": "SUP_MDL749 v0116 rating_of",
+    "valuation": "ENG395 v0100 Matcher",
+    "heavy_adapters": "explicit opt-in; not automatically invoked",
+    "last_retry_dpi": 350,
+    "cache": "per-page TEMP atomic evidence; no stale reuse",
+    "accelerator": "existing bridge imported; no performance benefit claimed"
+  },
+  "limitations": [
+    "new primary font evidence is additive; original layout classification retained",
+    "OpenCV and pytesseract missing; adapter code untested",
+    "no exact original font weight can be inferred from OCR alone",
+    "central numbering,FunctionInventory/Workflow SSOT,Windows host and real PDF validation pending",
+    "requires existing repository dependencies; incremental patch, not standalone installer"
+  ],
+  "source_sha256": "2d6e9e2286e34deb5450a32ddbb6941cf68e4fb3ab137d8e4d22ed8cda54a76d"
+}
