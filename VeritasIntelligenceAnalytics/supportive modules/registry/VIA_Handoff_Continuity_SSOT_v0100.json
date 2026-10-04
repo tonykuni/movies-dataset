@@ -3741,6 +3741,66 @@
       "next": "操作員另下令才重開",
       "case": null,
       "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vrn-s05-regex",
+      "requirement": "VCGC-REQ157",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN S05 欄位冊 EMAIL_FULL(local part 要字母開頭,冊例 10863@… 不中)與 TARGET_PRICE_LABEL(數值無千分位,NT$1,100 截成 1)冊例自驗紅;壞擷取段拷貝 4 處(資訊卡 docs/handoff/ai/VCGC_SubsystemReport_VRN_VDF_SSOT_20261005.md)",
+      "next": "VRN 出 VRN_S05_FieldRegistry 新版(建議 pattern 見資訊卡 A)→ 同步 VRN_Digest_Params → VCGC 重跑 vrn_ssot_consistency",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vrn-mdl749-ruler",
+      "requirement": "VCGC-REQ157",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "SUP_MDL749 前版量尺過時:v0115 ⑤ ENG080 落差 0/5、⑭ TW02 已讀冊(引擎已改好,檢核前提沒跟上);案標記仍指 v0116(資訊卡 docs/handoff/ai/VCGC_SubsystemReport_VRN_VDF_SSOT_20261005.md)",
+      "next": "VRN 出 SUP_MDL749 新尾版更新 ⑤⑭ 預期 → VCGC 換案標記重測",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vrn-eng393",
+      "requirement": "VCGC-REQ157",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN_ENG393 v0101 14/15:前版逐件總判預期 GREEN 實得 YELLOW(ENG072 兩法分區 DIVERGE)(資訊卡 docs/handoff/ai/VCGC_SubsystemReport_VRN_VDF_SSOT_20261005.md)",
+      "next": "VRN 判定 ENG072 分歧是預期或回歸 → 修引擎或夾具 → VCGC 重跑 vrn_docclass",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vrn-cases",
+      "requirement": "VCGC-REQ157",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN 新模組(ENG399 / ENG400 / LibPlugins / OCRPlugins / FirstPageEngine v0130)沒交接案;intake VIA_NLP_OneEngine 整批缺橋(資訊卡 docs/handoff/ai/VCGC_SubsystemReport_VRN_VDF_SSOT_20261005.md)",
+      "next": "VRN 補自測 / 交接案;intake 列掃描豁免由操作員裁",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vdf-sourcefallback",
+      "requirement": "VCGC-REQ157",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager",
+      "reason": "共用冊 VDF_VRN_SourceFallback_AllDataRegistry 以名稱引用 TARGET_PRICE_LABEL,VDF 會承接同樣的千分位截斷(資訊卡 docs/handoff/ai/VCGC_SubsystemReport_VRN_VDF_SSOT_20261005.md)",
+      "next": "VRN 修正本後 VDF 確認引用新版冊(不自拷 pattern);ENG234 v0102 提交後補號",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ157:vcgc-assist-env",
+      "requirement": "VCGC-REQ157",
+      "state": "VERIFIED",
+      "owner": "AI(VCGC 協助)",
+      "reason": "L111 ④:VCGC 代裝 reportlab / fonttools / opencv-python-headless / pytesseract / markitdown / beautifulsoup4 進 via_vrn_312(uv pip check 全相容,numpy 不變);VRN_ENG394 v0102 自測由 rc 1 → rc 0 · failed 0(容器) → 已驗:2026-10-04T18:11:00+00:00 rc 0 · 標記見到(交接案 vrn_layout)",
+      "next": "工作站境照同一份清單補(子系統跑自測確認)",
+      "case": "vrn_layout",
+      "receipt": "docs/handoff/evidence/vrn_layout.json"
     }
   ]
 }
