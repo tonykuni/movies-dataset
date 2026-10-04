@@ -110,6 +110,23 @@ def selection_path_v0102(arg: str | None = None) -> Path | None:
     return hits[-1] if hits else None
 
 
+def apply_tier_v0102(sel: dict, tier: str) -> dict | None:
+    """core = 選單本體;其他 tier = 本體 + tiers[tier].extra_fns + extra_rows(併進 overrides[fn].__rows__)。"""
+    tiers = sel.pop("tiers", None) or {}
+    if tier in ("", "core"):
+        return sel
+    t = tiers.get(tier)
+    if not isinstance(t, dict):
+        return None
+    sel["fns"] = list(sel.get("fns") or []) + [f for f in t.get("extra_fns") or [] if f not in (sel.get("fns") or [])]
+    ov = sel.setdefault("overrides", {})
+    for fn, rows in (t.get("extra_rows") or {}).items():
+        cur = dict(ov.get(fn) or {})
+        cur["__rows__"] = list(cur.get("__rows__") or []) + list(rows)
+        ov[fn] = cur
+    return sel
+
+
 def ensure_registry_v0102() -> dict:
     reg = CORE.load_registry()
     if not reg.get("generated_at"):
@@ -138,13 +155,17 @@ def cmd_deep_macro_v0102(argv: list) -> int:
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--selection")
     ap.add_argument("--workers", type=int)
+    ap.add_argument("--tier", default="core")
     a = ap.parse_args(argv)
     sp = selection_path_v0102(a.selection)
     if sp is None or not sp.is_file():
         print(f"[{TAG}] ABSENT:選單正本 {SEL_GLOB} 不在 {HERE}", flush=True)
         return 3
     sel = json.loads(sp.read_text(encoding="utf-8"))
-    sel = {k: v for k, v in sel.items() if not k.startswith("_")}
+    sel = apply_tier_v0102({k: v for k, v in sel.items() if not k.startswith("_")}, a.tier)
+    if sel is None:
+        print(f"[{TAG}] 選單沒有 tier「{a.tier}」(只有 core 與 {sorted((json.loads(sp.read_text(encoding='utf-8')).get('tiers') or {}))})", flush=True)
+        return 2
     if a.workers:
         sel["workers"] = a.workers
     CORE.ensure_dirs()
@@ -154,7 +175,7 @@ def cmd_deep_macro_v0102(argv: list) -> int:
         print(f"[{TAG}] 計畫 {g:14} 函式 {v['fns']:4} · 序列 {v['series']:5} · 視窗 {v['windows']}", flush=True)
     for s in plan["skipped"][:30]:
         print(f"[{TAG}] 略過 {s['fn']} · {s['reason']}", flush=True)
-    print(f"[{TAG}] 選單 {sp.name} · 模式 {sel.get('mode')} · 起 {sel.get('start_date')} · 序列 {plan['series']} · 略過 {len(plan['skipped'])}", flush=True)
+    print(f"[{TAG}] 選單 {sp.name} · tier {a.tier} · 模式 {sel.get('mode')} · 起 {sel.get('start_date')} · 序列 {plan['series']} · 略過 {len(plan['skipped'])}", flush=True)
     if a.plan:
         return 0 if plan["series"] else 2
     state, report = CORE.run_selection(sel)
@@ -210,8 +231,8 @@ def selftest() -> int:
     with tempfile.TemporaryDirectory() as td:
         buf = io.StringIO()
         reg = {"generated_at": "t", "stats": {}, "tree": {}, "registry": {
-            "macro_china_cpi": {"has_ast": True, "category": "macro", "strategy": "FULL_SNAPSHOT", "date_params": {}, "param_specs": []},
-            "macro_china_nbs_nation": {"has_ast": True, "category": "macro", "strategy": "FULL_SNAPSHOT", "date_params": {},
+            "macro_china_cpi": {"has_ast": True, "category": "macro", "strategy": "FULL_SNAPSHOT", "date_params": {}, "date_fmt": "%Y%m%d", "param_specs": []},
+            "macro_china_nbs_nation": {"has_ast": True, "category": "macro", "strategy": "FULL_SNAPSHOT", "date_params": {}, "date_fmt": "%Y%m%d",
                                        "param_specs": [{"name": "kind", "kind": "FREE", "required": True}, {"name": "path", "kind": "FREE", "required": True}]}}}
 
         class _St:
@@ -230,6 +251,12 @@ def selftest() -> int:
                                        reg)
         finally:
             CORE.Store = keep_store
+        full = apply_tier_v0102(json.loads(json.dumps(sel)), "full") if sel else None
+        core = apply_tier_v0102(json.loads(json.dumps(sel)), "core") if sel else None
+        nat = lambda x: len(((x or {}).get("overrides", {}).get("macro_china_nbs_nation") or {}).get("__rows__") or [])
+        chk("⑥ tier:core = 選單本體(NBS 全國月 / 季);full = + 全國年度 + 分省 × 31 省(extra_rows 併進 __rows__);沒有的 tier = None",
+            full and core and nat(full) > nat(core) > 0 and "macro_china_nbs_region" in full["fns"] and "macro_china_nbs_region" not in core["fns"]
+            and apply_tier_v0102(json.loads(json.dumps(sel)), "nope") is None, (nat(core), nat(full)))
         chk("④ 計畫(零網路):cpi 1 序列 + NBS 2 組 = 3 序列;冊外函式照實略過",
             p["series"] == 3 and p["groups"]["china_macro"]["series"] == 3 and [s["fn"] for s in p["skipped"]] == ["no_such_fn"], p)
     text = Path(__file__).read_text(encoding="utf-8")

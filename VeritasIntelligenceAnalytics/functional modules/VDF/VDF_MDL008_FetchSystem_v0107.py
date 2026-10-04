@@ -7,7 +7,8 @@
 v0105 的 live 改道只收 requests / urllib / yfinance —— curl_cffi 這條**繞過網路工具**,計數也是 0。
 本版 live:curl_cffi.requests.Session.request(模組層 get / post 也走它)→ 轉給已改道的 requests(= 鎖版網路工具 http_bytes /
 post_json,帶 params · headers · json/data),回應是 requests.Response(.json() · .text · .content · .status_code 同介面);
-impersonate 等 curl 專屬參數照收不用;計數 curl。block / fixture 的 curl_cffi 封口照 v0106。其餘全照 v0106。
+impersonate 等 curl 專屬參數照收不用;計數 curl。block / fixture 的 curl_cffi 封口照 v0106。
+冊 v0106(VCGC-REQ149):MDL011 改指 v0102 · +011d 深度宏觀列(deep-macro;選單正本 VDF_AkshareSelection_MacroShipping_v*.json)。其餘全照 v0106。
 不碰 TA-Lib;不讀寫同意閘(只問網路工具)。
 """
 from __future__ import annotations
@@ -88,6 +89,12 @@ def __getattr__(name):
 
 
 _RUN_V0106 = PRIOR.run_v0106
+_LOAD_V0106 = PRIOR.load_book_v0106
+BOOK_V0106 = HERE / "VDF_FetchSystem_SSOT_v0106.json"
+
+
+def load_book_v0107(path: Path = BOOK_V0106) -> dict:
+    return _LOAD_V0106(path)
 _LIVE_V0105 = V0105.install_live_routes_v0105
 _CURL_KEYS = ("params", "headers", "json", "data", "timeout", "cookies", "allow_redirects")
 _TL7 = threading.local()
@@ -135,6 +142,8 @@ def run_v0107(*args, **kwargs):
 
 def _install_v0107() -> None:
     BASE._install_live_routes = install_live_routes_v0107
+    V0101.load_book_v0101, V0101.BOOK_V0101, BASE.load_book = load_book_v0107, BOOK_V0106, load_book_v0107
+    V0105.PRIOR.load_book_v0104 = V0105.load_book_v0105 = PRIOR.load_book_v0106 = load_book_v0107
     V0105.PRIOR.run_v0104 = V0101.run_v0101 = V0105.PRIOR.V0102.run_v0102 = BASE.run = run_v0107
     V0105.run_v0105 = PRIOR.run_v0106 = run_v0107
 
@@ -142,6 +151,7 @@ def _install_v0107() -> None:
 def _restore_v0106() -> None:
     BASE._install_live_routes = V0105.install_live_routes_v0105
     PRIOR.run_v0106 = _RUN_V0106
+    PRIOR.load_book_v0106 = _LOAD_V0106
     PRIOR._install_v0106()
 
 
@@ -202,7 +212,18 @@ def selftest() -> int:
     chk("② live(子行程):curl_cffi Session.get / post / 模組層 get → 網路工具 http_bytes / post_json(帶 params · headers · json);"
         "回應 .json() · status_code 同介面;計數 curl 3 · requests 3(一請求一抓)",
         line.startswith("PROBE True"), line or pr.stderr.strip()[-200:])
-    chk("③ 換裝:BASE live 改道 / run 全指本版", BASE._install_live_routes is install_live_routes_v0107 and BASE.run is run_v0107)
+    chk("③ 換裝:BASE live 改道 / run / 冊載入全指本版", BASE._install_live_routes is install_live_routes_v0107 and BASE.run is run_v0107
+        and V0101.load_book_v0101 is load_book_v0107)
+    import ast as _a
+    bk = load_book_v0107()
+    E = {r["id"]: r for r in bk["engines"]}
+    prev = _LOAD_V0106(PRIOR.BOOK_V0105)
+    defs = lambda fn: {(n.name, n.lineno) for n in _a.walk(_a.parse((HERE / fn).read_text(encoding="utf-8"))) if isinstance(n, (_a.FunctionDef, _a.AsyncFunctionDef))}
+    others = [r["id"] for r in prev["engines"] if r["id"] != "011" and r != E.get(r["id"])]
+    chk("⑤ 冊 v0106:MDL011 → v0102 · +011d deep-macro(block 自測 = --plan 零網路;擷取點帶 file 指原件)· 其他 34 支與 v0105 相同(VCGC-REQ149)",
+        E["011"]["file"] == E["011d"]["file"] == "VDF_MDL011_AkshareFetcher_v0102.py" and E["011d"]["run_args"] == ["deep-macro"]
+        and E["011d"]["test_args"] == ["deep-macro", "--plan"] and all((f["name"], f["line"]) in defs(f.get("file") or E["011d"]["file"]) for f in E["011d"]["fetch_functions"])
+        and not others and len(bk["engines"]) == len(prev["engines"]) + 1, others[:3])
     text = Path(__file__).read_text(encoding="utf-8")
     chk("④ 加速器橋 · 網路橋(模組層 VIA_NET_TOOL_PATH + def _via_net)在;不碰 TA-Lib;不寫同意閘", "[VIA:ACCEL-BRIDGE" in text and "def _via_net" in text
         and not re.search(r"^\s*(import|from)\s+talib", text, re.M) and not re.search(r"environ\[[\"']VIA_(NET|SCRAPE)_CONSENT", text))
