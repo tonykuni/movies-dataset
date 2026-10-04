@@ -220,6 +220,29 @@ def gather_v0103(home, as_of_arg=None) -> dict:
 
 
 V0101.gather = gather_v0103
+_IO_V0101 = V0101.io_matrix
+
+
+def io_matrix_v0103(book: dict, ledger: list, sel: dict, matrix: dict, as_of: str) -> list:
+    """同 v0101,但 {start}/{years}/{members} 也代入,並補 起始日 · 名單參數 兩欄(細節頁要看得到真參數)。"""
+    ledger = _ledger()                          # v0101 gather 傳進來的是定義當下綁死路徑讀的;一律照 V0100.LEDGER 現值
+    rows = _IO_V0101(book, ledger, sel, matrix, as_of)
+    st = starts(book, ledger)
+    for r in rows:
+        g = V0100.group_of(book, r["group"])
+        start = st.get((category_of(book, g["id"]) or {}).get("id", "OTHER"), "")
+        mem = effective_members_v0103(g, ledger, sel, matrix).get("members") or []
+        years = max(1, date.fromisoformat(as_of).year - date.fromisoformat(start).year + 1) if start else ""
+        ctx = {"as_of": as_of, "start": start, "years": years, "members": ",".join(mem)}
+        r["asof_args"] = _sub([r.get("asof_args", "")], ctx)[0]
+        extra = "; ".join(f"{k} {' '.join(_sub(v, ctx))}" for key in ("member_args", "start_args") for k, v in (g.get(key) or {}).items())
+        if extra:
+            r["asof_args"] = (r["asof_args"] + "; " if r["asof_args"] and r["asof_args"] != "(視圖截齊)" else "") + extra
+        r["start"] = start
+    return rows
+
+
+V0101.io_matrix = io_matrix_v0103
 
 
 # ---------- U/I 輸入檔匯入 ----------
@@ -424,6 +447,10 @@ def selftest() -> int:
         (home / "output_hub").mkdir(parents=True)
         snap = gather_v0103(home, "2026-10-02")
         cm = {c["id"]: c for c in snap["categories"]}
+        io = {r["group"]: r for r in snap.get("io", [])}
+        chk("⑪ 細節頁參數邏輯:{start} 已代入(e066 --start 其他大類起始日)· 財報帶 --only / --years 真值",
+            "{start}" not in json.dumps(snap.get("io", []), ensure_ascii=False) and "--only 2330,2454,2317" in io["TW_FIN"]["asof_args"]
+            and "--years 9" in io["TW_FIN"]["asof_args"] and io["INTL_DAILY"]["start"] == "2020-01-01", io.get("TW_FIN"))
         chk("⑩ U/I 快照帶大類(含當前起始日)· 族群標大類 · 財報預設成員",
             cm["FIN"]["start"] == "2018-01-01" and "TW_FIN" in cm["FIN"]["groups"]
             and next(g for g in snap["groups"] if g["id"] == "TW_FIN")["default_members"] == ["2330", "3324"]
