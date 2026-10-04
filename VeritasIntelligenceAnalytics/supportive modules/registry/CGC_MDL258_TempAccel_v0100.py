@@ -195,7 +195,21 @@ class TempAccel:
 
 
 def selftest() -> tuple:
-    """自測: 防衛閘觸發/子進程轉儲/串流聚合/中斷回復/命名空間/滾動清理/原子落地。"""
+    """自測: 防衛閘/子進程/串流/回復/命名空間/滾動清理/原子落地。全程隔離 TEMP 根, 不碰真實轉儲資料。"""
+    import tempfile as _tf
+    keep = os.environ.get("VIA_TEMPACCEL_DIR")
+    os.environ["VIA_TEMPACCEL_DIR"] = _tf.mkdtemp(prefix="VIA_tempaccel_selftest_")
+    try:
+        return _selftest_body()
+    finally:
+        if keep is None:
+            os.environ.pop("VIA_TEMPACCEL_DIR", None)
+        else:
+            os.environ["VIA_TEMPACCEL_DIR"] = keep
+
+
+def _selftest_body() -> tuple:
+    """自測本體 (由 selftest 的隔離殼呼叫)。"""
     p = f = 0
 
     def ck(name, cond):

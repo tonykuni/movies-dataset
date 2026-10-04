@@ -38,6 +38,7 @@ NOISE = re.compile(r"^\s*(\[監控\]|\[矩陣\]|\[VIA_NO_OPEN\]|\[via-vcgc 自�
 RED_PAT = re.compile(r"\[(FAIL|RED|真紅|紅|缺|起|逾時|備份|參數|輸入項目)\]|Traceback|Error:|錯誤 [1-9]|rc [1-9]|rc=-?\d|沒過|被拒|FAIL\b")
 YELLOW_PAT = re.compile(r"\[(計|OK|GREEN|YELLOW|NODATA|判|清點|矩陣結|推|鎖|入倉|自測|發號|登冊|建|開|origin|清理|TEMP|加速器|車道|樣本|風險|249|全景|上輪|還原點|教訓)\]|總判|族總判|落差|遺失|改身分|重號|缺號|FPSTALE|UNCOMMITTED|APPLIED|撞號|NEXT:")
 SYSTEM_ANCHOR = re.compile(r"(threading\.py|codecs|glob\.py|subprocess\.py|runpy\.py|<frozen)")
+OWN_ANCHOR = re.compile(r"(VeritasIntelligenceAnalytics|functional modules|supportive modules|\b(?:VRN|VDF|CGC|SUP|VAP)_)")
 ENV_PAT = re.compile(r"閘未開|NO_CONSENT|同意閘|收容件缺|收容件不在|ABSENT|境缺|No module named|ModuleNotFoundError|lib 缺|unrecognized arguments: --selftest|找不到引擎|FAIL_CLOSED|FAIL-CLOSED|GATED")
 INTERRUPT_RC = {"-1073741510", "124", "137", "130"}
 
@@ -84,7 +85,10 @@ def classify_rows(rows: list[dict]) -> dict:
         if lamp == "NODATA" or ENV_PAT.search(verdict) or ENV_PAT.search(anchor):
             item["why"] = "環境 / 閘 / 收容件 → EnvGovernance 或開閘,不修碼"; out["ENV"].append(item); continue
         if lamp == "RED":
-            item["why"] = "真紅:錨點在自家檔 → 薄尾(含根因重現檢)"; out["TRUE"].append(item); continue
+            if OWN_ANCHOR.search(anchor) and "site-packages" not in anchor:
+                item["why"] = "真紅:錨點在自家檔 → 薄尾(含根因重現檢)"; out["TRUE"].append(item); continue
+            item["why"] = "紅但錨點空白/不在自家檔 → 先補錨點再分類, 不誤出薄尾"
+            out.setdefault("UNANCHORED", []).append(item); continue
         out["OTHER"] += 1
     out["next"] = ("先重跑 INTERRUPTED " + str(len(out["INTERRUPTED"])) + " 支;" if out["INTERRUPTED"] else "") + ("ENV " + str(len(out["ENV"])) + " 支走環境;" if out["ENV"] else "") + ("真紅 " + str(len(out["TRUE"])) + " 支出薄尾" if out["TRUE"] else "真紅 0")
     return out
@@ -170,7 +174,14 @@ def _vnum(p: Path) -> int:
     return int(m.group(1)) if m else -1
 
 
-_PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))), key=_vnum)
+_PRIOR_HINT = r"{prior_path}"
+_cands = [p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum(p) < _vnum(Path(__file__))]
+if not _cands and _PRIOR_HINT and Path(_PRIOR_HINT).is_file():
+    _cands = [Path(_PRIOR_HINT)]
+if not _cands:   # 誠實: 本夾與內嵌提示都找不到前版 → RED, 不炸 ValueError
+    print(json.dumps({{"state": "RED", "why": "找不到前版 " + _STEM + " (本夾無, 內嵌提示失效)"}}, ensure_ascii=False))
+    sys.exit(1)
+_PRIOR_PATH = max(_cands, key=_vnum)
 _spec = importlib.util.spec_from_file_location(_STEM.lower() + "_prior_for_" + Path(__file__).stem, _PRIOR_PATH)
 PRIOR = importlib.util.module_from_spec(_spec)
 sys.modules[_spec.name] = PRIOR
@@ -236,8 +247,21 @@ def thin_tail(stem: str, prior: str, new: str, fn: str, why: str, check: str, fa
     hist = lesson_get(stem)                                   # 教訓帳先讀:同支第 3 次起把失敗過的修法寫進檔頭,AI 不得重蹈
     if len(hist) >= 2:
         why = why + " ‖ 教訓帳(" + str(len(hist)) + " 次,escalate):" + " / ".join(h["note"][:60] for h in hist[-3:])
+    prior_path = ""   # 生成時解析前版: 產出夾 → 本夾 → 全樹; 內嵌進檔, 薄尾落在哪都載得到前版
+    base = Path(__file__).resolve().parents[2]
+    for cand_dir in (out_dir, HERE):
+        hit = sorted(cand_dir.glob(f"{stem}_v*.py"))
+        hit = [x for x in hit if re.search(r"_v(\d{4})$", x.stem) and x.stem < f"{stem}_v{new}"]
+        if hit:
+            prior_path = str(max(hit)); break
+    if not prior_path:
+        tree = [x for x in base.rglob(f"{stem}_v*.py")
+                if "__pycache__" not in x.parts and re.search(r"_v(\d{4})$", x.stem) and x.stem < f"{stem}_v{new}"]
+        if tree:
+            prior_path = str(max(tree, key=lambda x: x.stem))
     p = out_dir / f"{stem}_v{new}.py"
-    p.write_text(THIN_TAIL.format(stem=stem, prior=prior, new=new, fn=fn, why=why, check=check), encoding="utf-8")
+    p.write_text(THIN_TAIL.format(stem=stem, prior=prior, new=new, fn=fn, why=why, check=check,
+                                  prior_path=prior_path), encoding="utf-8")
     return p
 
 

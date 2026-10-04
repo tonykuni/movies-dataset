@@ -17,7 +17,9 @@ try { $VIAPSAccelProbe = if ($PSScriptRoot) { $PSScriptRoot } else { 'C:\Users\t
 #          v0107: 參數改名 $Argv + ConvertTo-Json 改 -InputObject 引數式 (空/單元素一律正確) + null 早炸早報。
 #   [梯次] -Ladder <引擎.py> : AI 梯次指令 (MDL257) — TEST→DEBUG→OPTIMIZE→…→ACTIVATE 十三段,
 #          一步通過才能下一步; 每呼叫推一段並印結果貼回 AI; -UserOk "備註" 過人工閘; -Approve 過啟用閘。
-$ErrorActionPreference = 'Continue'; $VIA = 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'; $dl = "$env:USERPROFILE\Downloads"; Set-Location -LiteralPath $VIA
+$ErrorActionPreference = 'Continue'
+$VIA = if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot 'supportive modules'))) { $PSScriptRoot } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics' }   # 可攜: 以指令檔所在為根, 作者機路徑僅後備
+$dl = "$env:USERPROFILE\Downloads"; Set-Location -LiteralPath $VIA
 $env:PYTHONUTF8 = '1'; $env:PYTHONWARNINGS = 'ignore'; $env:VIA_FROM_VCGC = 'YES'; $env:VIA_NO_OPEN = '1'; $env:VIA_PANORAMA_AUTO = '0'; $env:VIA_ROOT = $VIA; $env:VIA_LADDER_SEC = "$StepSec"
 $script:Stamp = Get-Date -Format yyyyMMdd_HHmmss; $script:Errors = [System.Collections.Generic.List[string]]::new(); $script:Verdicts = [System.Collections.Generic.List[string]]::new()
 function Mark([string]$s) { Write-Host ("  " + (Get-Date -Format HH:mm:ss) + "  ▶ " + $s) }
@@ -31,7 +33,7 @@ function Invoke-PyStep([string]$Id, [string[]]$Argv, [int]$Sec) {   # v0107: $Ar
   if (-not $argvJson) { Write-Host 'rc 99 · 0s'; $script:Errors.Add("[$Id] argv 序列化為 null — 通道蟲, 不往下丟"); return @() }
   $b64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($argvJson))         # base64 argv: PS 原生參數引號不會拆
   $wrap = "import base64,json,os,sys,threading,runpy; a=json.loads(base64.b64decode(sys.argv[1]).decode('utf-8')); t=threading.Timer($Sec, lambda: (sys.stdout.flush(), os._exit(124))); t.daemon=True; t.start(); sys.argv=a; runpy.run_path(a[0], run_name='__main__')"
-  $t0 = Get-Date; $o = @(& python -c $wrap $b64 2>&1 | ForEach-Object { "" + $_ }); $rc = $LASTEXITCODE; $o | Set-Content $out -Encoding UTF8
+  $t0 = Get-Date; $o = @(& python -c $wrap $b64 2>&1 | ForEach-Object { "" + $_ }); $rc = $LASTEXITCODE; $script:PyRc = $rc; $o | Set-Content $out -Encoding UTF8
   Write-Host ("rc $rc · " + [int]((Get-Date) - $t0).TotalSeconds + "s")
   if ($rc -eq 124) { $script:Errors.Add("[看門狗] $Id 超過 $Sec 秒(python 自殺 124)· 最後:" + (($o | Select-Object -Last 1) -join '')) }
   elseif ($rc -notin 0, 2, 3) { $script:Errors.Add("[$Id] rc $rc · " + (($o | Select-Object -Last 2) -join ' | ')) }   # rc3=梯次 WAIT, 不是錯
@@ -57,7 +59,7 @@ if ($Ladder) {
   foreach ($l in $o) { Write-Host ($(if ($l -match 'FAIL|\[錯\]') { "`e[91m" } elseif ($l -match 'WAIT') { "`e[95m" } elseif ($l -match 'PASS|DONE') { "`e[92m" } else { "`e[93m" }) + $l + "`e[0m") }
   if (-not $NoClip) { try { ($o -join "`n") | Set-Clipboard } catch { } }
   Write-Host "`n[梯次] 貼回包已入剪貼簿 — 貼給 AI, 照 NEXT 行動; 同指令重跑 = 重驗同段 / 過了自動進下一段" -ForegroundColor Cyan
-  exit 0 }
+  exit $script:PyRc }   # 傳遞梯次判決: 0=PASS/DONE · 1=FAIL · 3=WAIT · 124=看門狗 (不吞紅)
 if (-not (Test-Path $eng)) { $script:Errors.Add("[缺] $eng"); Show-VCSummary -Title 'AI 動詞橋' -LogDir $LogDir; return }
 $q = '"' + $eng + '"'
 Mark '自測'; $st = Invoke-PyStep 'selftest' @($q, '--selftest') $StepSec | Select-String '\[計\]' | ForEach-Object { $_.Line.Trim() }; foreach ($l in $st) { if ($l -match '[1-9]\d* FAIL') { $script:Errors.Add("[自測] $l") } else { $script:Verdicts.Add("[自測] $l · 加速器橋 " + $(if (Test-Path "$VIA\supportive modules\VIA_SuperAccel_Module.py") { '在(SuperAccel → SUP_MDL737 → 鎖冊 Celeritas)' } else { '缺' })) } }
