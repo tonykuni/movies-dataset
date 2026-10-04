@@ -26,8 +26,13 @@
   [衝突] 現況 NODATA 先 via-envgov eight-hub
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
+<<<<<<< HEAD
   [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
 [政策] L50 全景 · 尾版 579 · import 0 · 提及 68 · 已裝 False · GREEN
+=======
+  [還原] 候選不可鎖定 20260919_034027_236 · RED · 境 43 · 歷史 31
+[政策] L50 全景 · 尾版 571 · import 0 · 提及 60 · 已裝 False · GREEN
+>>>>>>> @{-1}
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VIA_VRN_FirstPageEngine_v0130.py(家族 vrn)
@@ -40,7 +45,10 @@
   [OK] ⑦ 統一到百萬、小數點後兩位(操作員規格①;不可轉=None 不當 0) (22,500.049→22500.05 · 1 billion→1000.0)
   [OK] ⑧ TP 合理性閘 + 復權誠實(批419 工作站:三份真報告 TP/價 比 0.020/0.019/0.005=抽錯的數,印成「上漲 -98%」比不印更糟;批425:現價非復權一律拒算,不拿原始 close 頂替) (0.040→TP_SUSPECT · 非復權→None)
   [OK] ⑨ 總判讀得到 TP 合理性閘,且非個股不被判紅(批422 假綠:上游閘抓到 TP_SUSPECT、下游判定不讀它,於是目標價只有股價 1/200 的報告被印成 DONE;批418:非個股沒有代號與目標價是正常) (個股+TP_SUSPECT→FAIL · 非個股+FAIL→N/A)
+<<<<<<< HEAD
 warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+=======
+>>>>>>> @{-1}
   [PASS] GS-2330 20251205.pdf                           型別=個股     代號=2330  券商=GS       TP=1 (OK) 名稱=-→?[-]
 [計] 1 件 · FAIL 0 · NLP 路徑=HEURISTIC · 正典 MDL008=缺/TW02=缺
 [名稱對帳] 階梯=(未跑)
@@ -72,11 +80,16 @@ warning: The `fitz` API is deprecated and will be removed in future. Use `import
   [OK] ㉟ 核對訊號要比**目標價**,不是比原始數字袋(批440——**這是我自己弄出來的假紅**。批439 我加了 NUM_CONFLICT:兩個取字工具各有對方沒有的數字就判紅,合成測資上乾淨漂亮,**工作站真跑 FAIL 從 1 變成 16**。而我上一批才剛在 docs 寫下批434 那一課「把不是錯的東西講成錯,錯誤矩陣會被灌滿」,然後拿合成測資又犯一次。根因:兩欄式 PDF 的欄界會把左右欄的數字**黏成一個新數**——fitz 讀「18.12,170」得到 18.12/170,pdfplumber 讀「18.1 2,170」得到 18.1/2170,兩邊互有對方沒有的數,而沒有任何一邊讀錯。原始數字袋雜訊太大,不能點燈。改比**兩側各自抽出的目標價**——那才是下游每一道閘消費的東西,也才是批435 這一層真正要抓的事。衝突收得很緊:兩側都抽到且不同才算;一側有一側沒有=涵蓋差,不點燈) (純讀序→ORDER_ONLY · 欄界黏字→AGREE(數字袋不一致=True,診斷留著不點燈) · 目標價打架→TP_CONFLICT 1288.0↔1238.0(序列比率 0.999 仍看似一致))
   [OK] ㊱ 一頁式矩陣報告(批441 操作員令「後面加一個一頁式的矩陣報告,含詳細 matrix report / basic info / fixed content(一標題 一句話一行自動換行,前面的類型分類都要有)/ financial data 用紅黃綠燈,字小一點,矩陣自動最佳化,自動跳出來」。一頁式=不分頁五段直排,六分頁**保留不動**——這是「後面加一個」不是「換掉那個」。fixed content 直接吃批436 DocStructure 的列化結果,CATEGORY(表/圖/文)與 TYPE(字體階層)排在句子**前面**;財報紅黃綠的分界是「**綠只給報告自己寫的數**」——ESTIMATE/DERIVED 是推估給黃,對不上給紅,冊上沒有的狀態給灰不猜色。自動跳出來是操作員明令,治理律零彈窗講的是「不得**自作主張**」,明講要開不算自作主張;VIA_NO_OPEN=1 照樣不開) (外部資源=無 · 段=6 · 6 KB · 分頁控制項=無)
   [OK] ㊲ 現價的假值三種、上漲空間的漏接一種(批445 工作站實錄 MS-2308 text_consensus FAIL:fitz=1288 / pdfplumber=38。**先量再改**——把庫內 66 份 sidecar 逐份量過才知道底下不是一份是十二份:MS 全家現價都讀成 2025(日期 挖掉年份沒挖走)、JP/Citi 讀成 25(兩碼年)、MS-ABF 讀成 5(發佈時刻 05:30)、統一投顧讀成 5(「5 日漲跌幅」)。而 38 那一側的根因是**觸發詞長在上漲空間欄的標籤裡**——「Up/downside to **price target** (%)」;舊的百分比剔除律看數字後面有沒有 %,這裡 % 在數字之前又包在括號裡,擋不住。自洽仲裁只是**分數**壓過去,沒自陳上漲空間的 MS 報告只有直接剔除擋得住,所以兩道都要) (得932.0 · 得2470.0 · 得無 · 得無 · 得55.4 · 上漲空間=38.0 · TP=1288.0 · 38 被剔=True)
+<<<<<<< HEAD
   [NODATA] ㊳ 庫內 66 份真 sidecar 逐份回歸:這一境 VIA_Reports/first_page_text 0 份 sidecar=缺料,不判紅也不假綠(先 via-vrnrun 產 sidecar 再複判)
+=======
+  [OK] ㊳ 改對一件事不准弄壞另一件——庫內 66 份真 sidecar 對上一版逐份回歸(批440 那一課:合成測資只證明碼會動。自審實跑真的逼出兩個回歸:① 帶幣道深掃進 Daiwa-1319 的圖軸 OCR 殘字「n ,23」蓋掉真值 78.90 → 裸數道退回只看第一個數 ② MS-ABF 從 2026 變成 5(發佈時刻)→ 補剔時刻) (真的跑過 105/105 份 · 比值荒謬 上版 0 → 本版 0 · 目標價改變 0 份 · 對照組=VIA_VRN_FirstPageEngine_v0129.py)
+>>>>>>> @{-1}
   [OK] ㊴ 本文一頁 + 摘要一頁(批448 操作員令「擷取下來的文字經過上述修整功能及 NLP 輸出本文一頁(附類型標籤,經過 LAYOUT 引擎),再輸出摘要一頁」)。**類型標籤零重算**——CATEGORY 表/圖/文 與 TYPE 字體階層直接吃 DocStructure.rows()(批436 立,句界由 SUP_MDL745 判、角色由 SUP_MDL744 判);本頁只負責排版。摘要 **quote-or-abstain**:重點句是報告原句照抄,不改寫不歸納不補字,沒有標題級句子就誠實講「報告首頁沒有可引的標題」 (外部資源 0 個 · 重點句原樣可尋=True · 非標題未混入=True · 本文頁 2 KB · 摘要頁 2 KB · 空列誠實留白=True)
   [OK] ㊵ 剔除律要講得出為什麼,不能只靠數值區間(批454:TS 庫 PR #8 的 Codex 審查開了兩件 P1,實測復現後發現兩庫同型。① 1990–2100 的四碼被無條件當年份剔掉——但真目標價本來就會 落進去,大立光 2000+、日股四碼是常態,`Price Target 2000` 回 None,**有觸發詞、有值,值就這樣靜靜掉了**。年份律本身有實據(`目標價 (2026F) NT$650` 的 2026),所以不是拿掉 而是改性質:要剔得先有年份跡證。② 測第一件時撞出第二件——貨幣旗標的尾窗讓數字借到**後面那個數**的記號:「Price target for 2026 NT$650」的 2026 借走 650 的 NT$,於是免疫年份律、多拿 +20 分、還從 M 級升成 V 級,把「P 級不得掛綠」的門規架空。貨幣記號寫在數字前面,那個 NT$ 從來不屬於 2026) (真值留下 True · 有跡證仍剔 True · 不借記號 True · 後綴單位+老本行 True · 對照組 VIA_VRN_FirstPageEngine_v0122.py 確實掉值 True/確實借走 True)
   [OK] ㊶ 四碼裸代號的**邊界律**(批466;操作員上傳兩份真 .docx 實測):上傳層給檔名加了雜湊前綴 `1379b53b-…`,tokenize 照設計切成 1379+b53b(那個切法是對的,批420 的 3014TT 就靠它),於是 1379 通過 is_valid_bare——而 1379 益缶**真的在冊上**,名冊對帳擋不住這種;錯的是它根本不是一個獨立的詞。一份純討論稿因此被判「個股 1379」進了正本庫。不能一刀改成兩側非英數(會誤殺 3014TT/2330TW):左須邊界,右須邊界**或**已知市場後綴(TWO/TT/TW/T)再接邊界 (七例全中)
   [OK] ㊷ 括號或季尾的基準記號(批732 操作員截圖 兆豐 神達 3706 季度損益表):2025(F) / 25Q4(F) / 26Q1(E) / 25Q4F 讀得出期間與基準;原本讀得出的 2025F / 25Q1 / 1Q25 / 12/24A 一個都不改道 (九例全中)
+<<<<<<< HEAD
   [計] 四十二檢(41 檢) OK 41 · FAIL 0 · NODATA 1(㊳ 無 sidecar)
   [OK] ① 樞紐三源聯集併入 RATING(≥ 60 詞) · 196 · 新增 {'BUY': 54, 'HOLD': 33, 'SELL': 44, 'ADD': 0, 'NOT_RATED': 34}
   [OK] ② 前版詞一個不少 · 本土尺度進表(優於大盤 → BUY) · 未知桶 ['RATING_STRENGTH_ACCUMULATE', 'RATING_STRENGTH_STRONG']
@@ -93,3 +106,12 @@ Loading model cost 0.936 seconds.
 [14:28:51][DEBUG] Loading model cost 0.936 seconds.
 Prefix dict has been built successfully.
 [14:28:51][DEBUG] Prefix dict has been built successfully.
+=======
+  [計] 四十二檢(42 檢) OK 42 · FAIL 0
+  [OK] ① 樞紐三源聯集併入 RATING(≥ 60 詞) · 196 · 新增 {'BUY': 54, 'HOLD': 33, 'SELL': 44, 'ADD': 0, 'NOT_RATED': 34}
+  [OK] ② 前版詞一個不少 · 本土尺度進表(優於大盤 → BUY) · 未知桶 ['RATING_STRENGTH_ACCUMULATE', 'RATING_STRENGTH_STRONG']
+  [OK] ③ 委樞印記 · 加速器橋在本檔
+  [計] VIA_VRN_FirstPageEngine_v0130 薄尾 3/3 · 前版 PASS · 合計 PASS
+  [同步] 樹有變 · 註冊冊待同步 {'new': 24, 'changed': 16, 'stale': 0, 'expected': 15174, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
+[監控] 已在背景起全景監控 pid 5508 · 閒置 1800 秒自停 · 交接閘 RED · 落後 21 提交 · 快照 14.5h · 未登 3 支(CGC_MDL255_GitHubPanorama · VIA_VRN_FirstPageEngine · VRN_TW02_ReportParser) · 頁 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\VIA_Reports\panorama\dashboard_latest.html
+>>>>>>> @{-1}

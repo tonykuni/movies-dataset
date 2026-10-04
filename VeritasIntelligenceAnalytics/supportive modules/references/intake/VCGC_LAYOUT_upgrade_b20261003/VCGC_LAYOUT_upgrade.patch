@@ -1,0 +1,855 @@
+diff --git a/VeritasIntelligenceAnalytics/docs/VRN_LAYOUT_REUSE_v0101.md b/VeritasIntelligenceAnalytics/docs/VRN_LAYOUT_REUSE_v0101.md
+new file mode 100644
+index 0000000..a0f373c
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/docs/VRN_LAYOUT_REUSE_v0101.md
+@@ -0,0 +1,58 @@
++# VRN Layout reuse v0101 — 2026-09-27
++
++本次找回其他對話的 `GenericLayoutEngine_AllEngines_v2.1.0.zip`，四個核心檔案與本倉已登錄 intake 完全相同。沿用完整核心、路由器、adapter SDK 與後端實作，不另造擷取引擎。不能據此宣稱全球最強；32 個 adapter 介面也不代表 32 個模型已安裝。
++
++## 改動
++
++- SUP_MDL743 v0101：使用既有 pdfplumber / PyMuPDF / pdfminer.six，保存整頁文字座標、所有頁面、表格候選與既有財務矩陣；不按固定象限裁切。整頁文字還原不是完整表格結構辨識。
++- CGC_MDL149 v0146：新增 `via-vcgc layout`，依序執行既有省 Token、政策、環境閘門；其他路由交還 v0144。
++- CGC_MDL095 v0161：新增 `vcgc_layout_review`。原有 92 個 task 定義相容。
++- HTML：依輸入檔名由上而下排列，每份內依實體頁排列；保留內文、原頁對照及 FINANCIAL DATA。數值零、負數、空白保留來源差異，不補算、不猜年度。
++- SSOT：11 份既有擷取來源以 SHA-256 鎖定，執行前後核對。VDF 清單更新、既有 basic / financial 擷取與資料庫寫入均未改動。
++- 相同輸入、引擎、套件、政策及 bridge 內容才可用快取；原頁影像缺少時重建。涉及 OCR 或低文字量頁面不重用整份快取。
++
++## 實測證據
++
++| 項目 | 結果 |
++| --- | --- |
++| 原 GLE 附件測試 | 18 項通過 |
++| 既有 Hub 自測 | 通過；報告九檢、無失敗 |
++| 新路由／內容／鎖定回歸 | 13 項通過，包括右上與下方座標、後續財報頁、大小寫副檔名、快取及治理閘門 |
++| Deck | 舊 92 個 task 不變；新增 1 個 |
++| 真實報告 | 晶心科 CTBC 15 頁、華南裕民 8 頁，共 23 頁 |
++| 實際後端 | 兩份各 3 個後端 PASS；不表示財報數值已全部通過驗證 |
++| 文字座標輸出 | 晶心科 1,166 / 1,166；裕民 851 / 851，共 2,017 項全部存在 HTML |
++| 首頁年度資訊 | 晶心科 2025F / 2026F / 2027F；裕民 EPS 5.21 / 3.24 / 5.54 / 4.19 / 5.07 均保留 |
++| 結構候選 | GLE 27 個；既有財務讀取器 19 個矩陣，兩者不可相加當獨立表格數 |
++| 真實快取 | 裕民報告第二次命中；晶心科有低文字量頁面，不標為整份可快取 |
++| 鎖定 | 11 個來源 SHA-256 均未改變 |
++| 靜態與登錄差異 | 4 個新 Python 檔解析／編譯通過，均有 accelerator bridge；Spec 僅新增一項、ledger 僅附加一筆 |
++
++部分無框線表格仍只偵測到表頭，尤其晶心科首頁年度表格。下方數字在整頁文字座標還原可見，但不得當作完整結構化矩陣已修復。整體狀態維持 REVIEW。
++
++## 登錄與啟用界線
++
++| 表面 | 狀態 |
++| --- | --- |
++| VCGC 命令 | 新增 layout wrapper，保留原三道治理閘門 |
++| InputConsole Spec | 新增 vcgc_layout_review |
++| Deck | 新增同名 task |
++| SelftestGrid | 既有 GenericLayoutHub 站以尾版選擇新版 selftest |
++| SystemManager | 沿用既有家族盤點；未另建管理器 |
++| 短令／PowerShell | 沿用 via-vcgc 尾版選擇；未更改任何 PowerShell |
++| AutoCode / Component SSOT | ledger 已附加；沿用既有家族代號，新函式編號尚待完整工作樹以 VCGC registry-sync 產生 |
++
++目前是精簡工作副本。從同一基底補回既有 NLP v0103 後，正式入口的省 Token 閘門已 GREEN；政策步驟仍回傳 rc=2，顯示 accelerator / 環境計畫 / 還原順序資料不齊。未跳過閘門。真實 PDF 實測是隔離呼叫 layout hub，不能當作正式 VCGC 全流程通過。
++
++未對精簡工作樹執行 `registry-sync --apply`，以免把未下載的正式元件誤標退役。未宣稱七冊登錄全數完成。瀏覽器安全政策禁止本機 file URL，故 HTML 已做資料／順序／字項完整性核對，但尚未完成瀏覽器畫面驗收。
++
++## 在完整且治理可用的工作樹執行
++
++```text
++via-vcgc layout --dir <PDF檔案或目錄> --out <核對輸出目錄> --open
++via-vcgc layout --selftest
++```
++
++輸出 `LAYOUT_REVIEW.html` 與 `LAYOUT_REVIEW.json`。回傳 rc=2 表示 REVIEW 或 NODATA；不可當作全綠入庫完成。正式庫不由此入口写入。
++
++本次僅完成本機升級候選與審閱補丁，未推送、合併或部署。先前自動核准審核拒絕 GitHub 推送，理由為遠端尚未核實且發布授權不足，本次未改用其他方式發布。安裝前須核對基底及版本號，完成全工作樹的正式登錄、治理與畫面驗收。
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py b/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py
+new file mode 100644
+index 0000000..d949f45
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py	
+@@ -0,0 +1,314 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
++"""Reuse the locked GLE package for complete, source-backed layout review.
++
++The existing extraction, financial values, dictionaries and database are not
++modified. Regions come from complete page elements; position labels never crop
++the input. This is review evidence, not a financial verification verdict.
++"""
++from __future__ import annotations
++
++import base64
++import hashlib
++import html
++import importlib.metadata
++import importlib.util
++import json
++import sys
++from dataclasses import asdict
++from pathlib import Path
++
++# def 01_PARAMETERS: one versioned policy owns route and output settings.
++HERE = Path(__file__).resolve().parent
++VIA = HERE.parent.parent
++POLICY_PATH = VIA / "supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json"
++VERSION = "v0101"
++SCHEMA = "VIA.LayoutReview.v1"
++PREVIOUS = HERE / "SUP_MDL743_GenericLayoutHub_v0100.py"
++SUMMARY_NAME = "LAYOUT_REVIEW.json"
++HTML_NAME = "LAYOUT_REVIEW.html"
++
++# ===== [VIA:ACCEL-BRIDGE:v0100] existing canonical compatibility bridge =====
++try:
++    sys.path.insert(0, str(VIA / "supportive modules"))
++    import VIA_SuperAccel_Module as VIA_ACCEL
++except ImportError:
++    VIA_ACCEL = None
++# ===== [VIA:ACCEL-BRIDGE:END] =====
++
++
++def def_load(path: Path, name: str):
++    spec = importlib.util.spec_from_file_location(name, path)
++    module = importlib.util.module_from_spec(spec)
++    sys.modules[name] = module
++    spec.loader.exec_module(module)
++    return module
++
++
++_previous = def_load(PREVIOUS, "via_layout_hub_locked_v0100")
++
++
++def __getattr__(name: str):
++    return getattr(_previous, name)
++
++
++def def_policy() -> dict:
++    return json.loads(POLICY_PATH.read_text(encoding="utf-8-sig"))
++
++
++def def_sha(path: Path) -> str:
++    with path.open("rb") as stream:
++        return hashlib.file_digest(stream, "sha256").hexdigest()
++
++
++def def_locked_sources(policy: dict) -> dict:
++    result = {}
++    for relative, expected in policy["locked_sources"].items():
++        path = VIA / relative
++        actual = def_sha(path) if path.is_file() else "ABSENT"
++        result[relative] = {"expected": expected, "actual": actual,
++                            "state": "UNCHANGED" if actual == expected else "MISMATCH"}
++    return result
++
++
++def def_signature(path: Path, policy: dict) -> str:
++    mounted = _previous.mount()
++    if mounted.get("state") != "VERIFIED":
++        raise RuntimeError("ABSENT: registered GenericLayoutEngine package")
++    root = Path(mounted["dir"])
++    engines = {name: def_sha(root / (name + ".py")) for name in _previous.GLE_MODULES}
++    packages = {}
++    for name in policy["cache_packages"]:
++        try:
++            packages[name] = importlib.metadata.version(name)
++        except importlib.metadata.PackageNotFoundError:
++            packages[name] = "ABSENT"
++    data = {"input_sha256": def_sha(path), "filename": path.name,
++            "engines": engines, "packages": packages, "policy": policy,
++            "bridge_sha256": def_sha(Path(__file__))}
++    return hashlib.sha256(json.dumps(data, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
++
++
++def def_analyze(path: Path, output_root: Path) -> dict:
++    """Run existing route/core once; retain every page, cell and source bbox."""
++    path = path.resolve()
++    policy = def_policy()
++    signature = def_signature(path, policy)
++    folder = output_root.resolve() / "documents" / signature
++    manifest = folder / "layout_review.json"
++    if manifest.is_file():
++        try:
++            cached = json.loads(manifest.read_text(encoding="utf-8"))
++        except (ValueError, OSError):
++            cached = {}
++        pages = cached.get("layout", {}).get("pages", [])
++        images_ready = bool(pages) and all(
++            p.get("image_path") and Path(p["image_path"]).is_file() for p in pages)
++        if cached.get("signature") == signature and cached.get("cacheable") and images_ready:
++            cached["cache_hit"] = True
++            return cached
++    folder.mkdir(parents=True, exist_ok=True)
++    orchestrator = _previous.orchestrator()
++    core = _previous.gle()
++    if orchestrator is None or core is None:
++        raise RuntimeError("ABSENT: registered layout modules")
++    route_config = orchestrator.OrchestratorConfig(**policy["route"])
++    for key, value in policy["adapter"].items():
++        setattr(route_config.adapter, key, value)
++    run = orchestrator.run_orchestrator(path, folder / "consensus", route_config)
++    native = next((r for r in run.adapter_results if r.adapter_name == "pdfplumber" and r.accepted), None)
++    if native is None:
++        native = next((r for r in run.adapter_results if r.accepted and any(e.bbox for e in r.elements)), None)
++    native_elements = [asdict(e) for e in native.elements if e.bbox and e.element_type == "TEXT"] if native else []
++    financial_engine = def_load(VIA / policy["financial_table_engine"], "layout_locked_financial_tables")
++    financial_tables = financial_engine.extract_document_tables(path)
++    config = core.EngineConfig(**policy["core"])
++    document, outputs = core.analyze_document(path, folder / "core", config)
++    data = core.document_to_dict(document, folder / "core", config)
++    # No role or position filter: even elements marked noise remain in evidence.
++    for page in data["pages"]:
++        for key in ("image_path", "annotated_image_path"):
++            if page.get(key):
++                page[key] = str((folder / "core" / page[key]).resolve())
++    statuses = [{"name": item.adapter_name, "status": item.status,
++                 "warnings": item.warnings, "error": item.error}
++                for item in run.adapter_results]
++    has_text = any(page["native_character_count"] or page["used_ocr"] for page in data["pages"])
++    accepted = any(item.accepted for item in run.adapter_results)
++    result = {"schema": SCHEMA, "via": "vcgc", "filename": path.name,
++              "signature": signature, "input_sha256": data["file_sha256"],
++              "state": "REVIEW" if has_text and accepted else "NODATA",
++              "cache_hit": False,
++              "cacheable": has_text and accepted and all(
++                  page["native_character_count"] >= config.min_native_characters
++                  and not page["used_ocr"] for page in data["pages"]),
++              "extraction_policy": "locked; no basic/financial database writes",
++              "engine_package": _previous.mount()["dir_name"],
++              "route": run.route, "backends": statuses,
++              "native_geometry": native_elements,
++              "native_geometry_source": native.adapter_name if native else "ABSENT",
++              "financial_tables": financial_tables,
++              "consensus_elements": len(run.canonical_elements),
++              "core_outputs": outputs, "layout": data}
++    temporary = manifest.with_suffix(".json.tmp")
++    temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
++    temporary.replace(manifest)
++    return result
++
++
++def def_native_svg(page: dict, elements: list[dict]) -> str:
++    """Preserve the existing adapter's word positions, including unruled tables."""
++    words = [e for e in elements if e.get("page") == page["physical_page"] and e.get("bbox") and e.get("text")]
++    if not words:
++        return '<p>本頁無可用文字座標，請查看原頁；不以空白表示擷取成功。</p>'
++    parts = []
++    for word in words:
++        x0, y0, x1, y1 = word["bbox"]
++        if x1 <= x0 or y1 <= y0:
++            continue
++        metadata = word.get("metadata") or {}
++        size = float(metadata.get("font_size") or min(y1-y0, 10))
++        weight = "700" if "bold" in str(metadata.get("fontname", "")).casefold() else "400"
++        parts.append(f'<text x="{x0}" y="{y0}" font-size="{size}" font-weight="{weight}" '
++                     f'dominant-baseline="text-before-edge" textLength="{x1-x0}" lengthAdjust="spacingAndGlyphs">'
++                     f'{html.escape(word["text"])}</text>')
++    return (f'<svg class="page-reconstruction" role="img" aria-label="依原座標還原整頁文字" '
++            f'viewBox="0 0 {page["width"]} {page["height"]}" style="width:100%;max-width:760px;background:white">'
++            + ''.join(parts) + '</svg>')
++
++
++def def_financial_matrix(table: dict) -> str:
++    """Display the locked reader's matrix separately from source geometry."""
++    rows = table.get("Rows") or []
++    body = ''.join('<tr>' + ''.join('<td>' + html.escape("" if cell is None else str(cell)) + '</td>' for cell in row) + '</tr>' for row in rows)
++    note = "僅有表頭，結構化資料未完整；請核對上方整頁還原。" if len(rows) < 2 else "沿用既有財務表格讀取結果；未改寫原始值。"
++    return f'<p>{note}</p><div class="matrix"><table>{body}</table></div>'
++
++
++def def_tables(page: dict) -> list[dict]:
++    """Group the engine's cells without changing values or deriving periods."""
++    tables = {}
++    for element in page.get("elements", []):
++        if element.get("element_type") != "TABLE":
++            continue
++        metadata = element.get("metadata") or {}
++        index = metadata.get("table_index")
++        if index is None:
++            continue
++        group = tables.setdefault(index, {"index": index, "cells": [], "bbox_pt": None})
++        if metadata.get("row") is not None and metadata.get("column") is not None:
++            group["cells"].append(element)
++        elif element.get("subtype") == "CONTENT":
++            group["bbox_pt"] = element.get("bbox_pt")
++    return [tables[k] for k in sorted(tables) if tables[k]["cells"]]
++
++
++def def_table_svg(table: dict) -> str:
++    """Render source rectangles directly; merged-cell geometry is retained."""
++    cells = table["cells"]
++    boxes = [c["bbox_pt"] for c in cells]
++    x0, y0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
++    x1, y1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
++    if x1 <= x0 or y1 <= y0:
++        return "<p>表格座標不足，請查看原頁。</p>"
++    parts = []
++    for cell in cells:
++        a, b, c, d = cell["bbox_pt"]
++        raw = cell.get("raw_text", "")
++        text = cell.get("repaired_text") or raw
++        meta = cell["metadata"]
++        label = f'row {meta["row"]}, column {meta["column"]}: {raw}'
++        parts.append(f'<g data-row="{meta["row"]}" data-column="{meta["column"]}">'
++                     f'<title>{html.escape(label)}</title>'
++                     f'<rect x="{a}" y="{b}" width="{c-a}" height="{d-b}" fill="white" stroke="#c8c3ba" stroke-width="0.3"/>'
++                     f'<foreignObject x="{a+0.6}" y="{b+0.3}" width="{max(c-a-1.2,0.1)}" height="{max(d-b-0.6,0.1)}">'
++                     f'<div xmlns="http://www.w3.org/1999/xhtml" class="cell">{html.escape(text)}</div>'
++                     '</foreignObject></g>')
++    return (f'<svg role="img" aria-label="表格重建" viewBox="{x0} {y0} {x1-x0} {y1-y0}" '
++            f'style="width:100%;max-width:{(x1-x0)*1.8}px">' + ''.join(parts) + '</svg>')
++
++
++def def_render(report: dict, destination: Path) -> None:
++    sections = []
++    for item in report["documents"]:
++        name = html.escape(item["filename"])
++        pages = item["layout"]["pages"]
++        content = []
++        for page in sorted(pages, key=lambda p: p["physical_page"]):
++            tables = def_tables(page)
++            financial = [t for t in item.get("financial_tables", []) if t.get("PageNumber") == page["physical_page"]]
++            original = ""
++            picture = Path(page["image_path"]) if page.get("image_path") else None
++            if picture and picture.is_file():
++                encoded = base64.b64encode(picture.read_bytes()).decode("ascii")
++                original = f'<details><summary>原頁對照</summary><img loading="lazy" src="data:image/png;base64,{encoded}" alt="{name} 第 {page["physical_page"]} 頁原頁"></details>'
++            raw_blocks = ""
++            if page["physical_page"] == 1:
++                blocks = sorted(page["elements"], key=lambda e: (e.get("reading_order") or 10**9))
++                raw_blocks = '<details><summary>首頁完整區塊與內文</summary>' + ''.join(
++                    f'<article data-element="{html.escape(e["element_id"])}"><small>{html.escape(e["zone"])} · {html.escape(e["element_type"])}.{html.escape(e["subtype"])}</small><pre>{html.escape(e.get("repaired_text") or e.get("raw_text") or "")}</pre></article>'
++                    for e in blocks if e.get("raw_text") or e.get("repaired_text")) + '</details>'
++            grids = ''.join(f'<h4>表格 {t["index"]}</h4>{def_table_svg(t)}' for t in tables)
++            matrices = ''.join('<h4>' + html.escape(t.get("TableID", "")) + '</h4>' + def_financial_matrix(t) for t in financial)
++            geometry = def_native_svg(page, item.get("native_geometry", []))
++            opened = " open" if page["physical_page"] == 1 else ""
++            content.append(f'<section data-page="{page["physical_page"]}"><h3>第 {page["physical_page"]} 頁</h3>{original}'
++                           f'<details{opened}><summary>版面還原（保留整頁文字座標）</summary>{geometry}</details>{raw_blocks}'
++                           f'<details><summary>FINANCIAL DATA／結構化表格候選（仍須核對列欄）</summary>{grids}{matrices}</details></section>')
++        sections.append(f'<div class="report" data-filename="{name}"><h2>{name}</h2><p>{item["state"]} · {len(pages)} 頁 · 表格與數值待原頁核對</p>{"".join(content)}</div>')
++    failures = ''.join(f'<li>{html.escape(e["filename"])}：{html.escape(e["error"])}</li>' for e in report["errors"])
++    text = '''<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VRN Layout Review</title><style>
++body{margin:0;background:#faf8f3;color:#302f2b;font:12px/1.5 Arial,"Noto Sans TC",sans-serif}header,main{max-width:1120px;margin:auto;padding:18px}header{border-bottom:1px solid #ded8ca}header strong{display:block}header p{margin:4px 0}h2{font-size:16px;overflow-wrap:anywhere}h3{font-size:13px}h4{margin:8px 0;font-size:12px}.report{padding:14px;background:white;border:1px solid #e5dfd2;margin:14px 0}section{padding:8px 0;border-top:1px solid #e9e3d8}details{margin:7px 0}summary{cursor:pointer}img{max-width:760px;width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}.cell{font:6.5px/1.15 Arial,"Noto Sans TC",sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;color:#242424}svg{display:block;margin:6px 0}article{border-bottom:1px solid #eee}small{color:#756c5f}@media(max-width:650px){header,main{padding:8px}.report{padding:8px}}
++</style><header><strong>VERITAS INTELLIGENCE ANALYTICS</strong><p>DISCIPLINA • PRUDENTIA • INTEGRITAS</p><strong>AI-Powered Research &amp; Decision Intelligence Platform</strong><p>VeritasReportNova · 版面與表格還原 · 依輸入檔名排序</p></header><main>'''
++    text += '<style>.matrix{overflow:auto}.matrix table{border-collapse:collapse;font-size:11px}.matrix td{border:1px solid #ddd;padding:3px 5px;white-space:pre-wrap}.page-reconstruction text{font-family:Arial,"Noto Sans TC",sans-serif;fill:#242424}</style>'
++    text += '<p>沿用既有 GLE 引擎。原頁、整頁文字座標、表格候選並存；表格辨識不完整時仍保留整頁內容。此頁為核對證據。</p>'
++    text += '<ul>' + failures + '</ul>' + ''.join(sections) + '</main></html>'
++    destination.write_text(text, encoding="utf-8")
++
++
++def def_run_batch(source: Path, output_root: Path) -> dict:
++    policy = def_policy()
++    before = def_locked_sources(policy)
++    if any(v["state"] != "UNCHANGED" for v in before.values()):
++        raise RuntimeError("LOCK_MISMATCH: extraction baseline changed; review before layout run")
++    files = [source] if source.is_file() else list(source.rglob("*")) if source.is_dir() else []
++    files = sorted((p for p in files if p.is_file() and p.suffix.lower() == ".pdf"), key=lambda p: (p.name.casefold(), p.name, str(p)))
++    documents, errors = [], []
++    for i, path in enumerate(files, 1):
++        print(f'[Layout {i}/{len(files)}] {path.name}', flush=True)
++        try:
++            documents.append(def_analyze(path, output_root))
++        except Exception as exc:
++            errors.append({"filename": path.name, "error": f"{type(exc).__name__}: {exc}"})
++    after = def_locked_sources(policy)
++    if before != after:
++        raise RuntimeError("LOCK_MISMATCH: protected sources changed during review")
++    report = {"schema": SCHEMA, "via": "vcgc", "engine": "SUP_MDL743/" + VERSION,
++              "state": "ERROR" if errors else "REVIEW" if any(d["state"] == "REVIEW" for d in documents) else "NODATA",
++              "documents": documents, "errors": errors, "locked_sources": after,
++              "order": "input filename, physical page, original table geometry",
++              "financial_database_written": False,
++              "cache_hits": sum(bool(d["cache_hit"]) for d in documents)}
++    output_root.mkdir(parents=True, exist_ok=True)
++    (output_root / SUMMARY_NAME).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
++    def_render(report, output_root / HTML_NAME)
++    return report
++
++
++def selftest() -> int:
++    import unittest
++    if _previous.selftest():
++        return 1
++    tests = def_load(HERE / "tests/test_layout_reuse_v0100.py", "via_layout_reuse_tests")
++    suite = unittest.defaultTestLoader.loadTestsFromModule(tests)
++    return 0 if unittest.TextTestRunner(verbosity=1).run(suite).wasSuccessful() else 1
++
++
++def main() -> int:
++    if "--selftest" in sys.argv:
++        return selftest()
++    return _previous.main()
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/tests/test_layout_reuse_v0100.py b/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/tests/test_layout_reuse_v0100.py
+new file mode 100644
+index 0000000..66d395a
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/tests/test_layout_reuse_v0100.py	
+@@ -0,0 +1,160 @@
++"""Contract tests for reuse and review; no production database or network."""
++from __future__ import annotations
++import importlib.util
++import json
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++from unittest.mock import patch
++
++# def 01_PARAMETERS
++HERE = Path(__file__).resolve().parent
++HUB_FILE = HERE.parent / "SUP_MDL743_GenericLayoutHub_v0101.py"
++VIA = HERE.parents[2]
++CONSOLE_FILE = VIA / "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0146.py"
++# ===== [VIA:ACCEL-BRIDGE:v0100] inherited canonical compatibility bridge =====
++try:
++    sys.path.insert(0, str(VIA / "supportive modules"))
++    import VIA_SuperAccel_Module as VIA_ACCEL
++except ImportError:
++    VIA_ACCEL = None
++# ===== [VIA:ACCEL-BRIDGE:END] =====
++
++
++def def_module(path: Path, name: str):
++    spec = importlib.util.spec_from_file_location(name, path)
++    module = importlib.util.module_from_spec(spec)
++    sys.modules[name] = module
++    spec.loader.exec_module(module)
++    return module
++
++
++HUB = def_module(HUB_FILE, "test_layout_reuse_hub")
++CONSOLE = def_module(CONSOLE_FILE, "test_layout_reuse_console")
++
++
++def def_cell(row: int, column: int, box: list, text: str) -> dict:
++    return {"element_id": f"cell-{row}-{column}", "element_type": "TABLE", "subtype": "DATA",
++            "bbox_pt": box, "raw_text": text, "repaired_text": text, "zone": "BR",
++            "metadata": {"table_index": 1, "row": row, "column": column}, "reading_order": row}
++
++
++class LayoutReuseTests(unittest.TestCase):
++    def test_locked_sources_unchanged(self):
++        locks = HUB.def_locked_sources(HUB.def_policy())
++        self.assertGreaterEqual(len(locks), 10)
++        self.assertTrue(all(v["state"] == "UNCHANGED" for v in locks.values()))
++
++    def test_existing_package_is_the_only_layout_implementation(self):
++        self.assertEqual(HUB.gle().__file__, HUB._previous.gle().__file__)
++        self.assertTrue(callable(HUB.gle().analyze_document))
++        self.assertEqual(HUB.def_policy()["route"]["selected_adapters"],
++                         ["pdfplumber", "pymupdf", "pdfminer_six"])
++        self.assertFalse(HUB.def_policy()["adapter"]["allow_model_downloads"])
++        self.assertFalse(HUB.def_policy()["adapter"]["allow_cloud_backends"])
++
++    def test_bottom_cells_preserve_raw_value_and_coordinates(self):
++        cells = [def_cell(1, 1, [400, 700, 470, 715], "2025F"),
++                 def_cell(2, 1, [400, 715, 470, 730], "(1,234.50)")]
++        grouped = HUB.def_tables({"physical_page": 1, "elements": cells})
++        self.assertEqual(grouped[0]["cells"], cells)
++        svg = HUB.def_table_svg(grouped[0])
++        self.assertIn('viewBox="400 700 70 30"', svg)
++        self.assertIn('(1,234.50)', svg)
++
++    def test_merged_geometry_uses_source_rectangle(self):
++        table = {"cells": [def_cell(1, 1, [5, 5, 105, 25], "Annual report"),
++                            def_cell(2, 1, [5, 25, 55, 35], "EPS"),
++                            def_cell(2, 2, [55, 25, 105, 35], "5.07")]}
++        svg = HUB.def_table_svg(table)
++        self.assertIn('width="100" height="20"', svg)
++        self.assertEqual(svg.count('data-row="2"'), 2)
++
++    def test_render_retains_lower_information_and_later_tables(self):
++        element = def_cell(1, 1, [400, 700, 470, 715], "BOTTOM_INFO<&>")
++        element.update(element_type="TEXT", subtype="FOOTER", include_in_main_text=False)
++        annual = def_cell(1, 1, [5, 5, 70, 20], "2026F")
++        doc = {"filename": "A<&>.pdf", "state": "REVIEW", "layout": {"pages": [
++            {"physical_page": 1, "elements": [element]},
++            {"physical_page": 7, "elements": [annual]}]}}
++        with tempfile.TemporaryDirectory() as tmp:
++            out = Path(tmp) / "review.html"
++            HUB.def_render({"documents": [doc], "errors": []}, out)
++            text = out.read_text()
++            self.assertIn("BOTTOM_INFO&lt;&amp;&gt;", text)
++            self.assertIn('data-page="7"', text)
++            self.assertIn("2026F", text)
++            self.assertNotIn("A<&>.pdf", text)
++
++    def test_filename_order_is_stable_and_no_database_written(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp); src = root / "input"; src.mkdir()
++            for name in ["b.PDF", "A.pdf", "a.pdf"]:
++                (src / name).write_bytes(b"unit-test input; not sent to a PDF backend")
++            def result(path, out):
++                return {"filename": path.name, "state": "REVIEW", "cache_hit": False,
++                        "layout": {"pages": []}}
++            with patch.object(HUB, "def_analyze", side_effect=result):
++                data = HUB.def_run_batch(src, root / "out")
++            self.assertEqual([d["filename"] for d in data["documents"]], ["A.pdf", "a.pdf", "b.PDF"])
++            self.assertFalse(data["financial_database_written"])
++            self.assertEqual(list(root.rglob("*.duckdb")), [])
++
++    def test_cache_avoids_backend_and_core_calls(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp); folder = root / "documents/fixed"; folder.mkdir(parents=True)
++            image = folder / "page.png"
++            image.write_bytes(b"cache existence fixture")
++            (folder / "layout_review.json").write_text(json.dumps({"signature": "fixed", "cacheable": True,
++                "layout": {"pages": [{"image_path": str(image)}]}}))
++            with patch.object(HUB, "def_signature", return_value="fixed"), \
++                 patch.object(HUB._previous, "orchestrator", side_effect=AssertionError("cache must avoid extraction")):
++                self.assertTrue(HUB.def_analyze(Path("report.pdf"), root)["cache_hit"])
++
++    def test_missing_input_is_nodata(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            data = HUB.def_run_batch(Path(tmp) / "missing", Path(tmp) / "out")
++            self.assertEqual(data["state"], "NODATA")
++            self.assertEqual(data["documents"], [])
++
++    def test_native_geometry_retains_moved_information_zones(self):
++        page = {"physical_page": 1, "width": 600, "height": 800}
++        for box in ([10, 10, 70, 20], [420, 10, 480, 20], [420, 710, 480, 720]):
++            words = [{"page": 1, "bbox": box, "text": "2026F EPS 5.07", "metadata": {"font_size": 8}}]
++            output = HUB.def_native_svg(page, words)
++            self.assertIn("2026F EPS 5.07", output)
++            self.assertIn(f'x="{box[0]}" y="{box[1]}"', output)
++
++    def test_financial_matrix_preserves_zero_negative_and_empty(self):
++        output = HUB.def_financial_matrix({"Rows": [["2025F", "2026F", "2027F"], [0, "(1.20)", None]]})
++        self.assertIn("<td>0</td>", output)
++        self.assertIn("<td>(1.20)</td>", output)
++        self.assertIn("<td></td>", output)
++
++    def test_vcgc_gate_blocks_before_layout(self):
++        with patch.object(CONSOLE.body, "require_token_gate", return_value=2), \
++             patch.object(CONSOLE, "def_layout_command") as run:
++            self.assertEqual(CONSOLE.main(["layout"]), 2)
++            run.assert_not_called()
++
++    def test_vcgc_gate_order_and_arguments(self):
++        order = []
++        with patch.object(CONSOLE.body, "require_token_gate", side_effect=lambda: order.append("token") or 0), \
++             patch.object(CONSOLE.body, "policy_step", side_effect=lambda: order.append("policy") or 0), \
++             patch.object(CONSOLE.body, "env_step", side_effect=lambda: order.append("environment") or 0), \
++             patch.object(CONSOLE, "def_layout_command", return_value=2) as run:
++            self.assertEqual(CONSOLE.main(["layout", "--dir", "sample"]), 2)
++            self.assertEqual(order, ["token", "policy", "environment"])
++            run.assert_called_once_with(["--dir", "sample"])
++
++    def test_old_vcgc_route_is_unchanged(self):
++        before = sys.argv
++        with patch.object(CONSOLE.prev, "main", return_value=7) as run:
++            self.assertEqual(CONSOLE.main(["status"]), 7)
++            run.assert_called_once_with()
++        self.assertIs(sys.argv, before)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL095_DeckServer_v0161.py b/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL095_DeckServer_v0161.py
+new file mode 100644
+index 0000000..9fb5f69
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL095_DeckServer_v0161.py	
+@@ -0,0 +1,62 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
++"""Add the VCGC layout review task to the existing command deck."""
++from __future__ import annotations
++import importlib.util
++import sys
++from pathlib import Path
++
++# def 01_PARAMETERS
++HERE = Path(__file__).resolve().parent
++VIA = HERE.parent.parent
++PREVIOUS = HERE / "CGC_MDL095_DeckServer_v0160.py"
++TASK_ID = "vcgc_layout_review"
++
++# ===== [VIA:ACCEL-BRIDGE:v0100] existing compatibility bridge =====
++try:
++    sys.path.insert(0, str(VIA / "supportive modules"))
++    import VIA_SuperAccel_Module as VIA_ACCEL
++except ImportError:
++    VIA_ACCEL = None
++# ===== [VIA:ACCEL-BRIDGE:END] =====
++
++
++def def_load():
++    spec = importlib.util.spec_from_file_location("vcgc_layout_deck_previous", PREVIOUS)
++    module = importlib.util.module_from_spec(spec)
++    sys.modules[spec.name] = module
++    spec.loader.exec_module(module)
++    return module
++
++
++prev = def_load()
++_previous_registry = prev.task_registry
++
++
++def __getattr__(name: str):
++    return getattr(prev, name)
++
++
++def task_registry() -> dict:
++    tasks = _previous_registry()
++    tasks[TASK_ID] = {
++        "zh": "VRN 完整版面與表格核對（沿用既有 GLE；不寫財務資料庫）",
++        "argv": [prev._py("vrn"), prev._eng("supportive modules/registry", "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"), "layout"],
++        "net": False,
++    }
++    return tasks
++
++
++def main() -> int:
++    if "--selftest" in sys.argv:
++        tasks = task_registry()
++        base = _previous_registry()
++        ok = set(tasks) == set(base) | {TASK_ID} and all(tasks[k] == v for k, v in base.items())
++        print(f"Layout deck additive contract: {'PASS' if ok else 'FAIL'}; existing tasks {len(base)}")
++        return 0 if ok else 1
++    prev.task_registry = task_registry
++    return prev.main()
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0146.py b/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0146.py
+new file mode 100644
+index 0000000..c2875da
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0146.py	
+@@ -0,0 +1,95 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
++"""VCGC: add layout review through the existing GLE hub; keep all old routes."""
++from __future__ import annotations
++import argparse
++import importlib.util
++import json
++import sys
++from pathlib import Path
++
++# def 01_PARAMETERS
++HERE = Path(__file__).resolve().parent
++VIA = HERE.parent.parent
++VERSION = "v0146"
++PREVIOUS = HERE / "CGC_MDL149_VeritasCentralGovernanceConsole_v0144.py"
++LAYOUT_HUB = VIA / "supportive modules/70_VRN_Rules"
++LAYOUT_PATTERN = "SUP_MDL743_GenericLayoutHub_v*.py"
++DEFAULT_OUTPUT = VIA / "VIA_Reports/layout_review"
++
++# ===== [VIA:ACCEL-BRIDGE:v0100] existing compatibility bridge =====
++try:
++    sys.path.insert(0, str(VIA / "supportive modules"))
++    import VIA_SuperAccel_Module as VIA_ACCEL
++except ImportError:
++    VIA_ACCEL = None
++# ===== [VIA:ACCEL-BRIDGE:END] =====
++
++
++def def_load(path: Path, name: str):
++    spec = importlib.util.spec_from_file_location(name, path)
++    module = importlib.util.module_from_spec(spec)
++    sys.modules[name] = module
++    spec.loader.exec_module(module)
++    return module
++
++
++prev = def_load(PREVIOUS, "vcgc_layout_previous")
++body = prev.prev.body
++
++
++def __getattr__(name: str):
++    return getattr(prev, name)
++
++
++def def_layout_hub():
++    choices = sorted(LAYOUT_HUB.glob(LAYOUT_PATTERN))
++    if not choices:
++        raise RuntimeError("ABSENT: GenericLayoutHub")
++    hub = def_load(choices[-1], "vcgc_layout_hub")
++    if not callable(getattr(hub, "def_run_batch", None)):
++        raise RuntimeError("ABSENT: complete layout review route")
++    return hub
++
++
++def def_layout_command(argv: list[str]) -> int:
++    parser = argparse.ArgumentParser(description="VCGC Layout review; locked extraction stays unchanged")
++    parser.add_argument("--dir", type=Path)
++    parser.add_argument("--out", type=Path, default=DEFAULT_OUTPUT)
++    parser.add_argument("--open", action="store_true")
++    args = parser.parse_args(argv)
++    locator = def_load(HERE / "CGC_MDL149_LayoutUse_v0100.py", "vcgc_layout_input_locator")
++    source = args.dir if args.dir is not None else locator.sample_dir()
++    hub = def_layout_hub()
++    report = hub.def_run_batch(source, args.out)
++    summary = {k: report[k] for k in ("via", "state", "errors", "cache_hits", "financial_database_written")}
++    summary.update(documents=len(report["documents"]), page=str(args.out / hub.HTML_NAME))
++    print(json.dumps(summary, ensure_ascii=False, indent=2))
++    if args.open:
++        import webbrowser
++        webbrowser.open((args.out / hub.HTML_NAME).resolve().as_uri())
++    return 1 if report["errors"] else 2
++
++
++def main(argv: list[str] | None = None) -> int:
++    args = list(sys.argv[1:] if argv is None else argv)
++    if args == ["layout", "--selftest"]:
++        return def_layout_hub().selftest()
++    if args and args[0] == "layout":
++        for gate in (body.require_token_gate, body.policy_step, body.env_step):
++            if gate():
++                return 2
++        return def_layout_command(args[1:])
++    original = sys.argv
++    try:
++        sys.argv = [original[0], *args]
++        result = prev.main()
++        if args and args[0] in {"help", "-h", "--help"}:
++            print("layout [--dir PATH] [--out PATH] [--open] · complete layout review, no stock database writes")
++        return result
++    finally:
++        sys.argv = original
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json
+index 01cbb26..29638d6 100644
+--- a/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json	
++++ b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_AutoCode_Registry_v0100.json	
+@@ -10165,8 +10165,15 @@
+       "code": "操作員令「NO TA-LIBS ALLOWED REMOVE ALL TAL-LIB」「WE'VE USE QUANTGUARD TO REPLACE TA-LIB ALREADY.」「WORKFLOW IS FROM VDF TO QUANTGUARD.」:AST 實量活碼 import talib 0 支(575 檔提到的是禁令/歷史/收容/偵測器);六份 Celeritas 副本位元對齊 accelerator/(sha 464f6c14…,零 talib 路徑)· v1140 刪、v1141 零 talib · 退役 VIA_ENG003 換墓碑(零碼,只增不減識別碼留冊,總控頁契約 test_01 退役 117 族)· TALib.zip(vendored ta-lib-python)拔 · 母頁 07 TALib → QuantGuard(CGC_MDL039 v0106)· 子系統頁 talib 鍵拔(CGC_MDL038 v0103,孤兒頁 --prune)· PKG-015 TALib 商品退役(CGC_MDL036 v0101,編號不回收)· .ps1 三支拔 talib 接線(L70 逐次許可)· VRN 全景探針不列 talib 候選 · VDF_TA_Engine_Spec talib_policy 撤銷;擊斃閘 CGC_MDL187 v0101 + 許可冊 VIA_ModuleChange_Permits_v0100(只許 KILL-02/04/05、只放行位元吻合者;25/25 · 突變 7/7)· 加速器控制面 CGC_MDL156 v0110 ⑦ 照裁示位元通過(37/37;五種正負實量);L104 +流程 VDF → QuantGuard → VRN;L105 過關就鎖定 · 最佳還原點(環境 LKGC · 測試 BRP 格子 v0498 自動建,自測 8/8 · 突變 7/7,含真還原點夾零足跡);LL459–LL462;驗證鎖定冊 VIA_Validation_Lock_v0100(四筆全綠紀錄實量重疊 S1/S2/S3/S5,S4/S6/S7 照規則);驗證照冊各一次:registry-sync(新 9/變更 78 → 補 新 4/變更 16)· VCGC 38/38 · 擊斃閘 rc0(24 檔,10 件許可)· 全格子 OK 340 · FAIL 4(工具階梯 Z216 · UI Matrix 舊存證 · MDL120 生成頁不在 · 總控頁契約 → 墓碑 + 再生後 19/19)· SKIP 17 · TIMEOUT 0 · 正式庫三本不變",
+       "category": "TA-Lib 全拔 · 許可冊 · 最佳還原點 · 驗證鎖定",
+       "component": "側線 2026-09-25 第十六段 b(主線批號由併線的手指定 L25):CGC_MDL187 v0101 · CGC_MDL156 v0110 · CGC_MDL064 v0498 · CGC_MDL039 v0106 · CGC_MDL038 v0103 · CGC_MDL036 v0101 · VeritasCeleritas v1141 · VIA_ModuleChange_Permits_v0100 · VIA_Validation_Lock_v0100 · L104/L105 · LL459–LL462"
++    },
++    {
++      "ts": "2026-09-27",
++      "op": "ADD",
++      "code": "SUP_MDL743 v0101 · CGC_MDL149 v0146 · CGC_MDL095 v0161：沿用已收容且與其他對話附件位元一致的 GenericLayoutEngine v2.1.0；新增 VCGC layout 全頁核對路由，三個既有 native backend、整頁文字座標、既有財務矩陣、檔名排序、內容快取。11 個擷取來源 SHA-256 鎖定，不改寫正式資料庫。",
++      "category": "Layout reuse · extraction locked · REVIEW",
++      "component": "側線 2026-09-27 layout-existing；沿用 VIA-MDL-0134 / VIA-MDL-0113 / via-vcgc；新增 Spec / Deck 註冊。新函式編號須於完整工作樹由 VCGC registry-sync 正式產生，未聲稱七冊全數完成。"
+     }
+   ],
+   "updated_at": "2026-09-24 14:10",
+   "batch": "批731"
+-}
+\ No newline at end of file
++}
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_InputConsole_Spec_v0100.json b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_InputConsole_Spec_v0100.json
+index f629a06..beccd44 100644
+--- a/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_InputConsole_Spec_v0100.json	
++++ b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_InputConsole_Spec_v0100.json	
+@@ -7585,6 +7585,33 @@
+        "net": false,
+        "outputs": [],
+        "timeout": 600
++      },
++      {
++       "id": "vcgc_layout_review",
++       "zh": "VRN 全頁版面與 FINANCIAL DATA 核對（既有 GLE；保留擷取鎖定）",
++       "engine": {
++        "dir": "supportive modules/registry",
++        "glob": "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
++        "verb": [
++         "layout"
++        ]
++       },
++       "test_verb": [
++        "layout",
++        "--selftest"
++       ],
++       "params": [
++        "dir",
++        "out",
++        "open"
++       ],
++       "net": false,
++       "outputs": [
++        "VIA_Reports/layout_review/LAYOUT_REVIEW.json",
++        "VIA_Reports/layout_review/LAYOUT_REVIEW.html"
++       ],
++       "timeout": 600,
++       "note": "依輸入檔名、實體頁、原表格座標排序；列欄未核對保持 REVIEW，不寫正式 basic/financial 庫。"
+       }
+      ]
+     },
+@@ -7899,4 +7926,4 @@
+  },
+  "contract_sync_ts": "20260916_151847",
+  "batch": "CGC_MDL157"
+-}
+\ No newline at end of file
++}
+diff --git a/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json
+new file mode 100644
+index 0000000..4559c3a
+--- /dev/null
++++ b/VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Layout_Reuse_SSOT_v0100.json	
+@@ -0,0 +1,63 @@
++{
++  "schema": "VIA.LayoutReuse.SSOT.v1",
++  "source_library": "GenericLayoutEngine_AllEngines_v2.1.0.zip",
++  "source_verified": "four core files byte-identical to registered intake",
++  "scope": "layout and table review only; preserve successful extraction and values",
++  "sort": "filename.casefold, filename, input path; then physical page and source table geometry",
++  "route": {
++    "mode": "consensus",
++    "selected_adapters": [
++      "pdfplumber",
++      "pymupdf",
++      "pdfminer_six"
++    ],
++    "required_capabilities": [
++      "text",
++      "bbox"
++    ],
++    "run_core_layout": false,
++    "max_adapters": 3,
++    "use_cache": true,
++    "stop_on_accept": false
++  },
++  "adapter": {
++    "allow_model_downloads": false,
++    "allow_cloud_backends": false,
++    "device": "cpu",
++    "timeout_seconds": 60
++  },
++  "core": {
++    "save_page_images": true,
++    "save_annotated_images": false,
++    "enable_tables": true,
++    "enable_borderless_tables": true,
++    "enable_optional_backends": false,
++    "ocr_mode": "auto"
++  },
++  "cache_packages": [
++    "PyMuPDF",
++    "pdfplumber",
++    "pdfminer.six"
++  ],
++  "locked_sources": {
++    "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
++    "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/adapter_sdk.py": "673ac9440f3747d48a432c511cbe363e52182a2ea2f1ef5e4938fd6375b24e4b",
++    "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py": "bb3ee68fec840b8869722c6b3c1d590f8cc619cbad1f99fa6daa7cf04f720ac4",
++    "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/multi_engine_orchestrator.py": "579be2aca0b0a7c9280fb702d70558602d57525fdbc296499a285fdd32c5aa45",
++    "functional modules/VRN/engine/VRN_Integrated_ReportDatabase_Engine.py": "d147eead7acd8fe1b675baf125b7996ade38f47eb5254539126033d2a8fe2e06",
++    "functional modules/VRN/engine/VIA_VRN_FirstPageEngine.py": "3983bb83b387cc160b7a85f437bfff530d57b33ee0348c9e525840c88c2ae959",
++    "functional modules/VRN/VRN_ENG072_FirstPageText_v0139.py": "ceb6f2a36692577f789d22aad592a8ce47baa8a6f85f05c378ed7585b1483732",
++    "functional modules/VRN/VRN_ENG074_FinancialPages_v0114.py": "0853c823cf593b810297894916c0fa755ec5a99f77c65d6bf806b24f1e08390c",
++    "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py": "4f0965ad99c4febe2d14804ffd13777c40c646c74304e981ce91a7e79dea590d",
++    "functional modules/VRN/VRN_ENG110_TabReport_v0114.py": "55676304020c37491a5c687d7a5410c302370e2ed0ac83515c0335a4ec61e68d",
++    "functional modules/VRN/engine/VRN_Evidence_Core.py": "e057cb8601f94960300f89e7f01919d5985351f649c2b5e2d90b7eb5e8eb870f"
++  },
++  "registration": {
++    "family": "SUP_MDL743_GenericLayoutHub",
++    "entry": "via-vcgc layout",
++    "grid": "existing GenericLayoutHub station resolves tail version",
++    "manager": "existing VRN SystemManager uses VCGC tail family inventory",
++    "component_ids": "existing module VIA-MDL-0134; new function numbering requires canonical VCGC registry-sync on complete checkout"
++  },
++  "financial_table_engine": "functional modules/VRN/engine/VRN_Integrated_ReportDatabase_Engine.py"
++}

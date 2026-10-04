@@ -1,0 +1,3292 @@
+{
+  "schema": "VIA.LayoutCapabilities.v1",
+  "engine_id": "SUP_MDL743_GenericLayoutHub",
+  "version": "v0102",
+  "public_entry": "via-vcgc layout",
+  "purpose": "Layout 分析與擷取後修復；原擷取鎖定；文、表、圖統一來源證據",
+  "source_attachment": {
+    "name": "貼上的文字 (1)(1).txt",
+    "sha256": "f769b083ccddff7d350ce038ad5e7b0d72b0d6462d8cc64e9a74dca541b6ec76",
+    "lines": 3230
+  },
+  "parameters": {
+    "epsilon": 0.001,
+    "row_tolerance": 2.0,
+    "row_height_ratio": 0.35,
+    "font_fallback": 10.0,
+    "corridor_overlap": 0.35,
+    "context_lines": 5,
+    "header_zone": 0.1,
+    "footer_zone": 0.88,
+    "repeat_ratio": 0.55,
+    "end_zone": 0.8,
+    "small_font": 0.9,
+    "end_small_ratio": 0.7,
+    "title_ratios": [
+      1.8,
+      1.45,
+      1.2,
+      1.05
+    ],
+    "heading_max_chars": 45,
+    "line_full": 0.9,
+    "line_short": 0.85,
+    "gap_ratio": 1.3,
+    "bold_duplicate_tolerance": 0.8,
+    "column_gutter": 12.0,
+    "word_gutter": 6.0,
+    "span_width_ratio": 0.68,
+    "column_overlap": 0.8,
+    "table_min_numeric": 2,
+    "column_tolerance": 9.0,
+    "table_row_gap": 2.4,
+    "table_bottom_ratio": 0.7,
+    "table_top_ratio": 0.3,
+    "numeric_alignment": 0.65,
+    "checksum_tolerance": "0.01",
+    "figure_gutter_ratio": 0.025,
+    "figure_background_delta": 18,
+    "figure_foreground_fraction": 0.005,
+    "figure_min_size": 30,
+    "figure_upscale": 2,
+    "ocr_languages": "chi_tra+eng",
+    "ocr_min_native_tokens": 3,
+    "axis_left_ratio": 0.18,
+    "axis_right_ratio": 0.82,
+    "axis_bottom_ratio": 0.76,
+    "figure_title_ratio": 0.15,
+    "label_pair_tolerance": 0.045,
+    "ocr_probe_timeout": 15,
+    "split_row_bottom": 0.94,
+    "split_row_top": 0.16,
+    "plain_heading_chars": 22,
+    "plain_heading_fill": 0.7
+  },
+  "regex": {
+    "number": "(?:[+−-]?(?:\\d{1,3}(?:[,，]\\d{3})+|\\d+)(?:\\.\\d+)?[%％]?|[（(](?:\\d{1,3}(?:[,，]\\d{3})+|\\d+)(?:\\.\\d+)?[%％]?[）)])",
+    "year": "(?:FY[- ]?)?(?:20)?\\d{2}(?:[AEF]|Q[1-4])?",
+    "caption": "^(?:表\\s*[0-9一二三四五六七八九十]+|Table\\s*\\d+|圖\\s*[0-9一二三四五六七八九十]+|Fig(?:ure)?\\.?\\s*\\d+)",
+    "source": "^(?:資料來源|數據來源|Source|註\\d*|備註|Notes?)\\s*[:：]?",
+    "unit": "^(?:單位|Units?)\\s*[:：]",
+    "heading": "^(?:[壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+[、．.]|\\d+(?:\\.\\d+){0,3}[、．. ]|[（(][一二三四五六七八九十0-9A-Za-z]+[）)]|[■●◆▲❖•➢★])",
+    "disclaimer": "免責聲明|版權聲明|重要揭露|法律聲明|僅供參考|Disclaimer|Disclosure",
+    "sentence_end": "(?:[。！？!?；;]|(?<!\\d)\\.)(?:[」』”’）)\\]】]+)?$",
+    "continuation": "(?:[，、,：:\\-（(「]|以及|由於|包含|之|與|及|and|or|of|the|to|with)$",
+    "hyphen_word": "[A-Za-z]{2,}-$",
+    "page_number": "^(?:Page\\s*)?[-—]?\\s*\\d+\\s*(?:of\\s*\\d+|/\\s*\\d+|頁)?\\s*[-—]?$",
+    "continued": "續|续|Continued|Cont[’\\x27]?d",
+    "total": "^(?:合計|總計|小計|Total|Subtotal)\\b|(?:合計|總計|小計)$",
+    "numeric_unit": "[%％]|USD|TWD|NTD|百萬|千元|億元"
+  },
+  "modules": {
+    "hub": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0102.py",
+    "base": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py",
+    "common": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutCommon_v0100.py",
+    "text": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutText_v0100.py",
+    "tables": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutTables_v0100.py",
+    "figures": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutFigures_v0100.py",
+    "manager": "supportive modules/registry/CGC_MDL069_SystemManager_v0113.py",
+    "gle_core": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py",
+    "gle_adapters": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/adapter_sdk.py",
+    "gle_backends": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py",
+    "gle_router": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/multi_engine_orchestrator.py"
+  },
+  "capabilities": [
+    {
+      "id": "LAYOUT.SOURCE_LOCK",
+      "name": "成功擷取／原始值 SHA-256 鎖定",
+      "implementation": [
+        "base:def_locked_sources",
+        "hub:def_repair_document"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_locked_values",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0145",
+      "binding_codes": {
+        "base:def_locked_sources": "VIA-FNC-8973",
+        "hub:def_repair_document": "VIA-FNC-8978"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.EXTRACT_REUSE",
+      "name": "沿用舊 GLE 與三後端擷取，不重造擷取器",
+      "implementation": [
+        "base:def_analyze"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_locked_values",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0120",
+      "binding_codes": {
+        "base:def_analyze": "VIA-FNC-8965"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FULL_PAGE",
+      "name": "首頁任意位置與全頁文字座標保留",
+      "implementation": [
+        "common:def_words",
+        "common:def_lines",
+        "base:def_native_svg"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_locked_values",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0126",
+      "binding_codes": {
+        "common:def_words": "VIA-FNC-8995",
+        "common:def_lines": "VIA-FNC-8991",
+        "base:def_native_svg": "VIA-FNC-8975"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FONT_EVIDENCE",
+      "name": "字級／字型粗體／描邊／疊印證據",
+      "implementation": [
+        "text:def_font_evidence",
+        "hub:def_traces"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_font_and_overprint",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0125",
+      "binding_codes": {
+        "text:def_font_evidence": "VIA-FNC-9016",
+        "hub:def_traces": "VIA-FNC-8984"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.SEVEN_LEVELS",
+      "name": "主標題、H1/H2/H3、本文、頁底、後方備註七階",
+      "implementation": [
+        "text:def_classify"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_seven_roles_and_margin",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0141",
+      "binding_codes": {
+        "text:def_classify": "VIA-FNC-9015"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.END_MATTER",
+      "name": "後方小字與其標題子樹隔離且留存",
+      "implementation": [
+        "text:def_classify"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_seven_roles_and_margin",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0117",
+      "binding_codes": {
+        "text:def_classify": "VIA-FNC-9015"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.RUNNING_MARGIN",
+      "name": "跨頁重複頁首、頁尾、頁碼指紋隔離",
+      "implementation": [
+        "text:def_classify"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_seven_roles_and_margin",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0140",
+      "binding_codes": {
+        "text:def_classify": "VIA-FNC-9015"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.BODY_TABLE_MASK",
+      "name": "表圖與本文分流，避免表格文字混入段落",
+      "implementation": [
+        "text:def_reading_order"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_table_mask_and_context",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0107",
+      "binding_codes": {
+        "text:def_reading_order": "VIA-FNC-9017"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CONTEXT_FIVE",
+      "name": "表圖上下最多五行補抓及同欄防撞",
+      "implementation": [
+        "common:def_context"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_table_mask_and_context",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0112",
+      "binding_codes": {
+        "common:def_context": "VIA-FNC-8987"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.SOURCE_BIND",
+      "name": "表號／圖號／說明／單位／資料來源綁定",
+      "implementation": [
+        "common:def_context",
+        "figures:def_figure_metadata"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_table_mask_and_context",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0144",
+      "binding_codes": {
+        "common:def_context": "VIA-FNC-8987",
+        "figures:def_figure_metadata": "VIA-FNC-8997"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.TABLE_PROJECT",
+      "name": "無框線表格由原生文字座標重建欄列",
+      "implementation": [
+        "tables:def_project_rows",
+        "tables:def_recover_tables"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_projection_preserves_middle_rating",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0147",
+      "binding_codes": {
+        "tables:def_project_rows": "VIA-FNC-9009",
+        "tables:def_recover_tables": "VIA-FNC-9010"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.MISSING_ROWS",
+      "name": "表頭以外對齊資料列與合計列補回",
+      "implementation": [
+        "tables:def_recover_tables"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_header_only_seed_recovers_body",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0131",
+      "binding_codes": {
+        "tables:def_recover_tables": "VIA-FNC-9010"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.TABLE_SPANS",
+      "name": "幾何證明的跨格／多層表頭；無來源空軸清理與HTML表格",
+      "implementation": [
+        "tables:def_spans_and_fragments",
+        "hub:def_html_table"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_spans_need_geometric_proof",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0148",
+      "binding_codes": {
+        "tables:def_spans_and_fragments": "VIA-FNC-9011",
+        "hub:def_html_table": "VIA-FNC-8971"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CELL_WRAP",
+      "name": "同一来源儲存格斷行縫合，歧義不強併",
+      "implementation": [
+        "tables:def_spans_and_fragments"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_rowspan_and_wrapped_cell_evidence",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0109",
+      "binding_codes": {
+        "tables:def_spans_and_fragments": "VIA-FNC-9011"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.NUMERIC_GUARD",
+      "name": "零／空白／負括號／百分比與原值分開保留",
+      "implementation": [
+        "common:def_number",
+        "tables:def_cell"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_numeric_lossless",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0134",
+      "binding_codes": {
+        "common:def_number": "VIA-FNC-8992",
+        "tables:def_cell": "VIA-FNC-9005"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CHECKSUM",
+      "name": "合計驗算與不一致標記，禁止用吻合冒充完整",
+      "implementation": [
+        "tables:def_checksum"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_checksum_does_not_prove_completeness",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0110",
+      "binding_codes": {
+        "tables:def_checksum": "VIA-FNC-9006"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.MULTITABLE_SPLIT",
+      "name": "上下與左右多表候選切分，限制誤切",
+      "implementation": [
+        "tables:def_split_tables"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_stacked_table_split",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0133",
+      "binding_codes": {
+        "tables:def_split_tables": "VIA-FNC-9012"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.SIDE_RELATION",
+      "name": "並排獨立表／折疊表／帳戶表／寬表四態判別",
+      "implementation": [
+        "tables:def_table_relation"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_side_by_side_types",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0143",
+      "binding_codes": {
+        "tables:def_table_relation": "VIA-FNC-9013"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.VERTICAL_UNROLL",
+      "name": "有表頭、表號、序列證據才縱向展開",
+      "implementation": [
+        "tables:def_adjacent"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_side_by_side_types",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0149",
+      "binding_codes": {
+        "tables:def_adjacent": "VIA-FNC-9004"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.ACCOUNT_BIND",
+      "name": "資產與負債權益雙區共同綁定",
+      "implementation": [
+        "tables:def_adjacent"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_side_by_side_types",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0106",
+      "binding_codes": {
+        "tables:def_adjacent": "VIA-FNC-9004"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.WIDE_REJOIN",
+      "name": "主鍵與列座標守門，誤切寬表橫向接回",
+      "implementation": [
+        "tables:def_adjacent"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_side_by_side_types",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0150",
+      "binding_codes": {
+        "tables:def_adjacent": "VIA-FNC-9004"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CROSS_PAGE_TABLE",
+      "name": "相鄰頁、欄位、表號及正文障礙共同檢查續表",
+      "implementation": [
+        "tables:def_continue_tables"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_continuation_and_heading_barrier",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0113",
+      "binding_codes": {
+        "tables:def_continue_tables": "VIA-FNC-9007"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.REPEATED_HEADER",
+      "name": "續表重複表頭去重，保留原始頁面與來源",
+      "implementation": [
+        "tables:def_continue_tables"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_continuation_and_heading_barrier",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0139",
+      "binding_codes": {
+        "tables:def_continue_tables": "VIA-FNC-9007"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.TABLE_DEDUP",
+      "name": "同座標同來源候選去重，異處同值不得消失",
+      "implementation": [
+        "tables:def_deduplicate"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_duplicate_proposals_not_duplicate_values",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0146",
+      "binding_codes": {
+        "tables:def_deduplicate": "VIA-FNC-9008"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.HEADING_FSM",
+      "name": "標題前綴／留白／字級／間距守門與斷句FSM",
+      "implementation": [
+        "text:def_can_join",
+        "text:def_stitch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_heading_join_veto",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0127",
+      "binding_codes": {
+        "text:def_can_join": "VIA-FNC-9014",
+        "text:def_stitch": "VIA-FNC-9018"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.WRAPPED_HEADING",
+      "name": "長標題同階緊鄰折行合併",
+      "implementation": [
+        "text:def_stitch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_heading_tree_and_wrap",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0151",
+      "binding_codes": {
+        "text:def_stitch": "VIA-FNC-9018"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CROSS_PAGE_TEXT",
+      "name": "跨頁接句剝離頁首頁尾且禁止吞入新標題",
+      "implementation": [
+        "text:def_can_join",
+        "text:def_stitch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_cross_page_text",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0114",
+      "binding_codes": {
+        "text:def_can_join": "VIA-FNC-9014",
+        "text:def_stitch": "VIA-FNC-9018"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.HEADING_TREE",
+      "name": "主文標題樹與段落路徑",
+      "implementation": [
+        "text:def_stitch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_heading_tree_and_wrap",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0128",
+      "binding_codes": {
+        "text:def_stitch": "VIA-FNC-9018"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.MIXED_COLUMNS",
+      "name": "單雙欄閱讀順序、浮動圖表、章節分界",
+      "implementation": [
+        "text:def_reading_order"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_floating_and_section_order",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0132",
+      "binding_codes": {
+        "text:def_reading_order": "VIA-FNC-9017"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.COMPOUND_FIGURE",
+      "name": "左右與上下複合子圖空白走廊切分",
+      "implementation": [
+        "figures:def_split_canvas",
+        "figures:def_compact_assets"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_compound_figures_and_dual_axis",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0111",
+      "binding_codes": {
+        "figures:def_split_canvas": "VIA-FNC-9002",
+        "figures:def_compact_assets": "VIA-FNC-8996"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.DUAL_AXIS_GUARD",
+      "name": "連續X軸／繪圖內容阻止錯切雙Y軸圖",
+      "implementation": [
+        "figures:def_split_canvas"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_compound_figures_and_dual_axis",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0115",
+      "binding_codes": {
+        "figures:def_split_canvas": "VIA-FNC-9002"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.SHARED_LEGEND",
+      "name": "共用圖例獨立擷取並綁回子圖",
+      "implementation": [
+        "figures:def_split_canvas",
+        "figures:def_figures"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_shared_legend_and_parent",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0142",
+      "binding_codes": {
+        "figures:def_split_canvas": "VIA-FNC-9002",
+        "figures:def_figures": "VIA-FNC-8998"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FIGURE_PARENT",
+      "name": "共用母圖號、獨立子圖號與來源歸屬",
+      "implementation": [
+        "figures:def_figure_metadata"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_shared_legend_and_parent",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0122",
+      "binding_codes": {
+        "figures:def_figure_metadata": "VIA-FNC-8997"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FIGURE_OCR",
+      "name": "裁切放大後逐子圖OCR；原生文字優先",
+      "implementation": [
+        "figures:def_figures",
+        "figures:def_ocr_status"
+      ],
+      "verification_scope": "沿用 GLE 行級 OCR；英文裁切實測，正式繁中需 chi_tra+eng，缺件 UNAVAILABLE",
+      "test_id": "test_missing_ocr_not_success",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0121",
+      "binding_codes": {
+        "figures:def_figures": "VIA-FNC-8998",
+        "figures:def_ocr_status": "VIA-FNC-9000"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.OCR_ROLES",
+      "name": "圖內標題、左右Y軸、X軸、圖例、數據標籤",
+      "implementation": [
+        "figures:def_ocr_roles"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_ocr_roles_and_pair_ambiguity",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0135",
+      "binding_codes": {
+        "figures:def_ocr_roles": "VIA-FNC-8999"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.LABEL_PAIR",
+      "name": "位置相近標籤配對候選，未知數列不造值",
+      "implementation": [
+        "figures:def_ocr_roles"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_ocr_roles_and_pair_ambiguity",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0129",
+      "binding_codes": {
+        "figures:def_ocr_roles": "VIA-FNC-8999"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.DUAL_EVIDENCE",
+      "name": "原頁／圖區影像加原生文字與上下文共同留證",
+      "implementation": [
+        "figures:def_figures",
+        "hub:def_export"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_fragment_retention",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0116",
+      "binding_codes": {
+        "figures:def_figures": "VIA-FNC-8998",
+        "hub:def_export": "VIA-FNC-8968"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.RAW_REPAIRED",
+      "name": "原始與修復值、source IDs、理由與頁碼沿革",
+      "implementation": [
+        "hub:def_repair_document"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_render_escapes_raw_text",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0137",
+      "binding_codes": {
+        "hub:def_repair_document": "VIA-FNC-8978"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.CACHE_RESUME",
+      "name": "內容及程式雜湊快取、逐檔原子斷點",
+      "implementation": [
+        "hub:def_run_batch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_cache_resume_and_filename_order",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0108",
+      "binding_codes": {
+        "hub:def_run_batch": "VIA-FNC-8979"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FILENAME_ORDER",
+      "name": "依輸入檔名向下排列、檔內按實體頁排序",
+      "implementation": [
+        "hub:def_run_batch"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_cache_resume_and_filename_order",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0123",
+      "binding_codes": {
+        "hub:def_run_batch": "VIA-FNC-8979"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.EXPORT",
+      "name": "HTML、JSON、CSV與內嵌HTML表格Markdown",
+      "implementation": [
+        "hub:def_export"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_export_formats_preserve_values",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0119",
+      "binding_codes": {
+        "hub:def_export": "VIA-FNC-8968"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.FINANCIAL_REUSE",
+      "name": "舊年度財報矩陣與新版修復同時保留",
+      "implementation": [
+        "base:def_analyze",
+        "hub:def_export"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_header_only_seed_recovers_body",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0124",
+      "binding_codes": {
+        "base:def_analyze": "VIA-FNC-8965",
+        "hub:def_export": "VIA-FNC-8968"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.ENGINE_HEADER",
+      "name": "引擎頂部機器可讀功能描述與唯一SSOT",
+      "implementation": [
+        "hub:def_manifest",
+        "manager:def_engine_catalog"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_catalog_is_complete_and_static",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0118",
+      "binding_codes": {
+        "hub:def_manifest": "VIA-FNC-8974",
+        "manager:def_engine_catalog": "VIA-FNC-8955"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.MANAGER_UI",
+      "name": "System Manager 與使用者同一完整功能卡",
+      "implementation": [
+        "manager:def_catalog_html",
+        "hub:def_catalog_html"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_manager_user_same_features",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0130",
+      "binding_codes": {
+        "manager:def_catalog_html": "VIA-FNC-8954",
+        "hub:def_catalog_html": "VIA-FNC-8967"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.REGISTRY",
+      "name": "每項功能與實作def可追溯、缺件紅燈",
+      "implementation": [
+        "manager:def_engine_catalog"
+      ],
+      "verification_scope": "來源座標與負例回歸；真實文件維持 REVIEW",
+      "test_id": "test_scoped_registry_preserves_unrelated_and_stable_ids",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0138",
+      "binding_codes": {
+        "manager:def_engine_catalog": "VIA-FNC-8955"
+      },
+      "registration_state": "REGISTERED"
+    },
+    {
+      "id": "LAYOUT.OPTIONAL_BACKENDS",
+      "name": "既有模型介面沿用、缺依賴誠實列示、不自動下載",
+      "implementation": [
+        "gle_core:probe_backends",
+        "figures:def_ocr_status"
+      ],
+      "verification_scope": "32 個介面不等於模型已安裝；本次只啟用可用依賴",
+      "test_id": "test_missing_ocr_not_success",
+      "implementation_state": "IMPLEMENTED",
+      "registration_code": "VIA-FNT-0136",
+      "binding_codes": {
+        "gle_core:probe_backends": "VIA-FNC-9162",
+        "figures:def_ocr_status": "VIA-FNC-9000"
+      },
+      "registration_state": "REGISTERED"
+    }
+  ],
+  "input": "existing locked PDF extraction or its verified layout_review.json",
+  "outputs": [
+    "LAYOUT_REVIEW.html",
+    "LAYOUT_REVIEW.json",
+    "LAYOUT_REPAIRED.json",
+    "LAYOUT_REPAIRED.md",
+    "LAYOUT_REPAIRED.csv",
+    "ENGINE_CATALOG.json"
+  ],
+  "source_policy": "VIA_Layout_Reuse_SSOT_v0100.json",
+  "automatic_model_downloads": false,
+  "automatic_cloud_calls": false,
+  "validation_rule": "合計吻合不是完整還原證明；低信心保留 REVIEW，原值不覆寫",
+  "snippet_crosswalk": {
+    "extract_table_with_5_line_window": "common:def_context",
+    "extract_clean_table_with_projection": "tables:def_project_rows",
+    "repair_broken_table": "tables:def_spans_and_fragments",
+    "detect_line_features": "text:def_font_evidence",
+    "classify_line_role": "text:def_classify",
+    "stitch_lines_into_sentences": "text:def_stitch",
+    "build_running_header_footer_fingerprints": "text:def_classify",
+    "count_unclosed_brackets": "text:def_can_join",
+    "should_stitch_across_pages": "text:def_can_join",
+    "process_multi_page_document": "hub:def_repair_document",
+    "normalize_cell_text": "tables:def_cell",
+    "calc_row_similarity": "tables:def_continue_tables",
+    "calc_bbox_x_iou": "common:def_overlap",
+    "is_continued_table": "tables:def_continue_tables",
+    "merge_two_tables": "tables:def_continue_tables",
+    "merge_all_cross_page_tables": "tables:def_continue_tables",
+    "group_words_into_lines": "common:def_word_rows",
+    "_build_line_dict": "common:def_word_rows",
+    "split_side_by_side_tables": "tables:def_split_tables",
+    "calc_grid_interval_iou": "tables:def_continue_tables",
+    "split_vertically_stacked_tables": "tables:def_split_tables",
+    "extract_multi_tables_with_clamped_5_lines": "common:def_context",
+    "norm_header_str": "tables:def_cell",
+    "calc_header_isomorphism": "tables:def_table_relation",
+    "get_column_type_signature": "tables:def_table_relation",
+    "check_sequence_continuity": "tables:def_table_relation",
+    "classify_and_reconstruct_side_by_side_tables": "tables:def_adjacent",
+    "parse_parent_caption_for_subfigures": "figures:def_figure_metadata",
+    "split_compound_figure_canvas": "figures:def_split_canvas",
+    "extract_structured_ocr_from_subfigure": "figures:def_ocr_roles",
+    "bind_compound_figure_metadata": "figures:def_figure_metadata"
+  },
+  "registration_scope": "VCGC registry-sync --layout-only; preserve unrelated and delegated records, append stable central IDs",
+  "test_source": "supportive modules/70_VRN_Rules/tests/test_layout_unified_v0100.py",
+  "engine_manifest": {
+    "schema": "VIA.EngineManifest.v1",
+    "engine_id": "SUP_MDL743_GenericLayoutHub",
+    "version": "v0102",
+    "public_entry": "via-vcgc layout",
+    "capability_ssot": "supportive modules/registry/VIA_Layout_Capabilities_SSOT_v0100.json",
+    "description": "模組化單一 Layout 分析與擷取後修復；保留既有成功擷取",
+    "manager_visible": true,
+    "user_visible": true,
+    "production_database_writes": false
+  },
+  "definitions": {
+    "hub": {
+      "source": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0102.py",
+      "functions": [
+        "def_load",
+        "__getattr__",
+        "def_manifest",
+        "def_traces",
+        "def_repair_document",
+        "def_html_table",
+        "def_catalog_html",
+        "def_figure_html",
+        "def_export",
+        "def_cached_repair",
+        "def_run_batch",
+        "selftest",
+        "main"
+      ],
+      "sha256": "cf6e56b0f6f993232dbd42e6f1e3f905b9a590e3707fd9eea79904917698c2e4",
+      "function_codes": {
+        "def_load": "VIA-FNC-8972",
+        "__getattr__": "VIA-FNC-8964",
+        "def_manifest": "VIA-FNC-8974",
+        "def_traces": "VIA-FNC-8984",
+        "def_repair_document": "VIA-FNC-8978",
+        "def_html_table": "VIA-FNC-8971",
+        "def_catalog_html": "VIA-FNC-8967",
+        "def_figure_html": "VIA-FNC-8969",
+        "def_export": "VIA-FNC-8968",
+        "def_cached_repair": "VIA-FNC-8966",
+        "def_run_batch": "VIA-FNC-8979",
+        "selftest": "VIA-FNC-1830",
+        "main": "VIA-FNC-1823"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-1812",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_label"
+        },
+        {
+          "code": "VIA-FNC-1813",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_mod"
+        },
+        {
+          "code": "VIA-FNC-1814",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_probe"
+        },
+        {
+          "code": "VIA-FNC-1815",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_route"
+        },
+        {
+          "code": "VIA-FNC-1816",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_status"
+        },
+        {
+          "code": "VIA-FNC-1817",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_ver"
+        },
+        {
+          "code": "VIA-FNC-1818",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:adapter_roster"
+        },
+        {
+          "code": "VIA-FNC-1819",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:adapter_sdk"
+        },
+        {
+          "code": "VIA-FNC-1820",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:backend_engines"
+        },
+        {
+          "code": "VIA-FNC-1821",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:backend_matrix"
+        },
+        {
+          "code": "VIA-FNC-1822",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:gle"
+        },
+        {
+          "code": "VIA-FNC-1823",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:main"
+        },
+        {
+          "code": "VIA-FNC-1824",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:mount"
+        },
+        {
+          "code": "VIA-FNC-1825",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:newest"
+        },
+        {
+          "code": "VIA-FNC-1826",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:orchestrator"
+        },
+        {
+          "code": "VIA-FNC-1827",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:roots"
+        },
+        {
+          "code": "VIA-FNC-1828",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:route_fallthrough"
+        },
+        {
+          "code": "VIA-FNC-1829",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:route_modes"
+        },
+        {
+          "code": "VIA-FNC-1830",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:selftest"
+        },
+        {
+          "code": "VIA-FNC-1831",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:selftest.chk"
+        },
+        {
+          "code": "VIA-FNC-1832",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:status"
+        },
+        {
+          "code": "VIA-FNC-1833",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:zone_annotate"
+        },
+        {
+          "code": "VIA-FNC-8964",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:__getattr__"
+        },
+        {
+          "code": "VIA-FNC-8965",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_analyze"
+        },
+        {
+          "code": "VIA-FNC-8966",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_cached_repair"
+        },
+        {
+          "code": "VIA-FNC-8967",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_catalog_html"
+        },
+        {
+          "code": "VIA-FNC-8968",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_export"
+        },
+        {
+          "code": "VIA-FNC-8969",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_figure_html"
+        },
+        {
+          "code": "VIA-FNC-8970",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_financial_matrix"
+        },
+        {
+          "code": "VIA-FNC-8971",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_html_table"
+        },
+        {
+          "code": "VIA-FNC-8972",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_load"
+        },
+        {
+          "code": "VIA-FNC-8973",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_locked_sources"
+        },
+        {
+          "code": "VIA-FNC-8974",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_manifest"
+        },
+        {
+          "code": "VIA-FNC-8975",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_native_svg"
+        },
+        {
+          "code": "VIA-FNC-8976",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_policy"
+        },
+        {
+          "code": "VIA-FNC-8977",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_render"
+        },
+        {
+          "code": "VIA-FNC-8978",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_repair_document"
+        },
+        {
+          "code": "VIA-FNC-8979",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_run_batch"
+        },
+        {
+          "code": "VIA-FNC-8980",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_sha"
+        },
+        {
+          "code": "VIA-FNC-8981",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_signature"
+        },
+        {
+          "code": "VIA-FNC-8982",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_table_svg"
+        },
+        {
+          "code": "VIA-FNC-8983",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_tables"
+        },
+        {
+          "code": "VIA-FNC-8984",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_traces"
+        },
+        {
+          "code": "VIA-MDL-0134",
+          "category": "module",
+          "identity": "SUP_MDL743_GenericLayoutHub"
+        }
+      ]
+    },
+    "base": {
+      "source": "supportive modules/70_VRN_Rules/SUP_MDL743_GenericLayoutHub_v0101.py",
+      "functions": [
+        "def_load",
+        "__getattr__",
+        "def_policy",
+        "def_sha",
+        "def_locked_sources",
+        "def_signature",
+        "def_analyze",
+        "def_native_svg",
+        "def_financial_matrix",
+        "def_tables",
+        "def_table_svg",
+        "def_render",
+        "def_run_batch",
+        "selftest",
+        "main"
+      ],
+      "sha256": "55da563a07f3bd0914c81e2e1589ca7ba44bd72928271c8a33a34fad6f15dbf7",
+      "function_codes": {
+        "def_load": "VIA-FNC-8972",
+        "__getattr__": "VIA-FNC-8964",
+        "def_policy": "VIA-FNC-8976",
+        "def_sha": "VIA-FNC-8980",
+        "def_locked_sources": "VIA-FNC-8973",
+        "def_signature": "VIA-FNC-8981",
+        "def_analyze": "VIA-FNC-8965",
+        "def_native_svg": "VIA-FNC-8975",
+        "def_financial_matrix": "VIA-FNC-8970",
+        "def_tables": "VIA-FNC-8983",
+        "def_table_svg": "VIA-FNC-8982",
+        "def_render": "VIA-FNC-8977",
+        "def_run_batch": "VIA-FNC-8979",
+        "selftest": "VIA-FNC-1830",
+        "main": "VIA-FNC-1823"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-1812",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_label"
+        },
+        {
+          "code": "VIA-FNC-1813",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_mod"
+        },
+        {
+          "code": "VIA-FNC-1814",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_probe"
+        },
+        {
+          "code": "VIA-FNC-1815",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_route"
+        },
+        {
+          "code": "VIA-FNC-1816",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_print_status"
+        },
+        {
+          "code": "VIA-FNC-1817",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:_ver"
+        },
+        {
+          "code": "VIA-FNC-1818",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:adapter_roster"
+        },
+        {
+          "code": "VIA-FNC-1819",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:adapter_sdk"
+        },
+        {
+          "code": "VIA-FNC-1820",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:backend_engines"
+        },
+        {
+          "code": "VIA-FNC-1821",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:backend_matrix"
+        },
+        {
+          "code": "VIA-FNC-1822",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:gle"
+        },
+        {
+          "code": "VIA-FNC-1823",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:main"
+        },
+        {
+          "code": "VIA-FNC-1824",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:mount"
+        },
+        {
+          "code": "VIA-FNC-1825",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:newest"
+        },
+        {
+          "code": "VIA-FNC-1826",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:orchestrator"
+        },
+        {
+          "code": "VIA-FNC-1827",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:roots"
+        },
+        {
+          "code": "VIA-FNC-1828",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:route_fallthrough"
+        },
+        {
+          "code": "VIA-FNC-1829",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:route_modes"
+        },
+        {
+          "code": "VIA-FNC-1830",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:selftest"
+        },
+        {
+          "code": "VIA-FNC-1831",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:selftest.chk"
+        },
+        {
+          "code": "VIA-FNC-1832",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:status"
+        },
+        {
+          "code": "VIA-FNC-1833",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:zone_annotate"
+        },
+        {
+          "code": "VIA-FNC-8964",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:__getattr__"
+        },
+        {
+          "code": "VIA-FNC-8965",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_analyze"
+        },
+        {
+          "code": "VIA-FNC-8966",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_cached_repair"
+        },
+        {
+          "code": "VIA-FNC-8967",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_catalog_html"
+        },
+        {
+          "code": "VIA-FNC-8968",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_export"
+        },
+        {
+          "code": "VIA-FNC-8969",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_figure_html"
+        },
+        {
+          "code": "VIA-FNC-8970",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_financial_matrix"
+        },
+        {
+          "code": "VIA-FNC-8971",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_html_table"
+        },
+        {
+          "code": "VIA-FNC-8972",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_load"
+        },
+        {
+          "code": "VIA-FNC-8973",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_locked_sources"
+        },
+        {
+          "code": "VIA-FNC-8974",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_manifest"
+        },
+        {
+          "code": "VIA-FNC-8975",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_native_svg"
+        },
+        {
+          "code": "VIA-FNC-8976",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_policy"
+        },
+        {
+          "code": "VIA-FNC-8977",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_render"
+        },
+        {
+          "code": "VIA-FNC-8978",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_repair_document"
+        },
+        {
+          "code": "VIA-FNC-8979",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_run_batch"
+        },
+        {
+          "code": "VIA-FNC-8980",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_sha"
+        },
+        {
+          "code": "VIA-FNC-8981",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_signature"
+        },
+        {
+          "code": "VIA-FNC-8982",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_table_svg"
+        },
+        {
+          "code": "VIA-FNC-8983",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_tables"
+        },
+        {
+          "code": "VIA-FNC-8984",
+          "category": "function",
+          "identity": "SUP_MDL743_GenericLayoutHub:def_traces"
+        },
+        {
+          "code": "VIA-MDL-0134",
+          "category": "module",
+          "identity": "SUP_MDL743_GenericLayoutHub"
+        }
+      ]
+    },
+    "common": {
+      "source": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutCommon_v0100.py",
+      "functions": [
+        "def_id",
+        "def_box",
+        "def_overlap",
+        "def_inside",
+        "def_number",
+        "def_join",
+        "def_words",
+        "def_word_rows",
+        "def_lines",
+        "def_context",
+        "def_assets"
+      ],
+      "sha256": "7055696ed081184b42873149ea504a6bdf2c77ccff59ab80307b14a2a9b289c1",
+      "function_codes": {
+        "def_id": "VIA-FNC-8988",
+        "def_box": "VIA-FNC-8986",
+        "def_overlap": "VIA-FNC-8993",
+        "def_inside": "VIA-FNC-8989",
+        "def_number": "VIA-FNC-8992",
+        "def_join": "VIA-FNC-8990",
+        "def_words": "VIA-FNC-8995",
+        "def_word_rows": "VIA-FNC-8994",
+        "def_lines": "VIA-FNC-8991",
+        "def_context": "VIA-FNC-8987",
+        "def_assets": "VIA-FNC-8985"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-8985",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_assets"
+        },
+        {
+          "code": "VIA-FNC-8986",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_box"
+        },
+        {
+          "code": "VIA-FNC-8987",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_context"
+        },
+        {
+          "code": "VIA-FNC-8988",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_id"
+        },
+        {
+          "code": "VIA-FNC-8989",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_inside"
+        },
+        {
+          "code": "VIA-FNC-8990",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_join"
+        },
+        {
+          "code": "VIA-FNC-8991",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_lines"
+        },
+        {
+          "code": "VIA-FNC-8992",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_number"
+        },
+        {
+          "code": "VIA-FNC-8993",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_overlap"
+        },
+        {
+          "code": "VIA-FNC-8994",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_word_rows"
+        },
+        {
+          "code": "VIA-FNC-8995",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutCommon:def_words"
+        },
+        {
+          "code": "VIA-MDL-0225",
+          "category": "module",
+          "identity": "SUP_MDL743_LayoutCommon"
+        }
+      ]
+    },
+    "text": {
+      "source": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutText_v0100.py",
+      "functions": [
+        "def_font_evidence",
+        "def_classify",
+        "def_reading_order",
+        "def_can_join",
+        "def_stitch"
+      ],
+      "sha256": "24a59dd32fe6197fbb404db3c1550273588d3f8cb67e3d33d1a949043765078a",
+      "function_codes": {
+        "def_font_evidence": "VIA-FNC-9016",
+        "def_classify": "VIA-FNC-9015",
+        "def_reading_order": "VIA-FNC-9017",
+        "def_can_join": "VIA-FNC-9014",
+        "def_stitch": "VIA-FNC-9018"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-9014",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutText:def_can_join"
+        },
+        {
+          "code": "VIA-FNC-9015",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutText:def_classify"
+        },
+        {
+          "code": "VIA-FNC-9016",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutText:def_font_evidence"
+        },
+        {
+          "code": "VIA-FNC-9017",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutText:def_reading_order"
+        },
+        {
+          "code": "VIA-FNC-9018",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutText:def_stitch"
+        },
+        {
+          "code": "VIA-MDL-0228",
+          "category": "module",
+          "identity": "SUP_MDL743_LayoutText"
+        }
+      ]
+    },
+    "tables": {
+      "source": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutTables_v0100.py",
+      "functions": [
+        "def_cell",
+        "def_project_rows",
+        "def_recover_tables",
+        "def_split_tables",
+        "def_deduplicate",
+        "def_spans_and_fragments",
+        "def_checksum",
+        "def_table_relation",
+        "def_adjacent",
+        "def_continue_tables"
+      ],
+      "sha256": "9334897b988b0ec9d58cbd46b7217b907fae9f9087a4119cac71bde20f8277c7",
+      "function_codes": {
+        "def_cell": "VIA-FNC-9005",
+        "def_project_rows": "VIA-FNC-9009",
+        "def_recover_tables": "VIA-FNC-9010",
+        "def_split_tables": "VIA-FNC-9012",
+        "def_deduplicate": "VIA-FNC-9008",
+        "def_spans_and_fragments": "VIA-FNC-9011",
+        "def_checksum": "VIA-FNC-9006",
+        "def_table_relation": "VIA-FNC-9013",
+        "def_adjacent": "VIA-FNC-9004",
+        "def_continue_tables": "VIA-FNC-9007"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-9004",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_adjacent"
+        },
+        {
+          "code": "VIA-FNC-9005",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_cell"
+        },
+        {
+          "code": "VIA-FNC-9006",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_checksum"
+        },
+        {
+          "code": "VIA-FNC-9007",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_continue_tables"
+        },
+        {
+          "code": "VIA-FNC-9008",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_deduplicate"
+        },
+        {
+          "code": "VIA-FNC-9009",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_project_rows"
+        },
+        {
+          "code": "VIA-FNC-9010",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_recover_tables"
+        },
+        {
+          "code": "VIA-FNC-9011",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_spans_and_fragments"
+        },
+        {
+          "code": "VIA-FNC-9012",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_split_tables"
+        },
+        {
+          "code": "VIA-FNC-9013",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutTables:def_table_relation"
+        },
+        {
+          "code": "VIA-MDL-0227",
+          "category": "module",
+          "identity": "SUP_MDL743_LayoutTables"
+        }
+      ]
+    },
+    "figures": {
+      "source": "supportive modules/70_VRN_Rules/layout_repair_v0100/SUP_MDL743_LayoutFigures_v0100.py",
+      "functions": [
+        "def_runs",
+        "def_compact_assets",
+        "def_split_canvas",
+        "def_ocr_roles",
+        "def_figure_metadata",
+        "def_ocr_status",
+        "def_figures"
+      ],
+      "sha256": "1580d5f8aa7619d8b88a6fd93686ffd2e32395f453ee0052ceccb42a67bfc2dd",
+      "function_codes": {
+        "def_runs": "VIA-FNC-9001",
+        "def_compact_assets": "VIA-FNC-8996",
+        "def_split_canvas": "VIA-FNC-9002",
+        "def_ocr_roles": "VIA-FNC-8999",
+        "def_figure_metadata": "VIA-FNC-8997",
+        "def_ocr_status": "VIA-FNC-9000",
+        "def_figures": "VIA-FNC-8998"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-8996",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_compact_assets"
+        },
+        {
+          "code": "VIA-FNC-8997",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_figure_metadata"
+        },
+        {
+          "code": "VIA-FNC-8998",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_figures"
+        },
+        {
+          "code": "VIA-FNC-8999",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_ocr_roles"
+        },
+        {
+          "code": "VIA-FNC-9000",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_ocr_status"
+        },
+        {
+          "code": "VIA-FNC-9001",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_runs"
+        },
+        {
+          "code": "VIA-FNC-9002",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_split_canvas"
+        },
+        {
+          "code": "VIA-FNC-9003",
+          "category": "function",
+          "identity": "SUP_MDL743_LayoutFigures:def_split_canvas.coordinates"
+        },
+        {
+          "code": "VIA-MDL-0226",
+          "category": "module",
+          "identity": "SUP_MDL743_LayoutFigures"
+        }
+      ]
+    },
+    "manager": {
+      "source": "supportive modules/registry/CGC_MDL069_SystemManager_v0113.py",
+      "functions": [
+        "def_engine_catalog",
+        "def_catalog_html",
+        "def_previous",
+        "__getattr__",
+        "main"
+      ],
+      "sha256": "6239084906913599cf12fa95a9e1eb5e00e5c7a963c1f9468cc969ce3023b0c5",
+      "function_codes": {
+        "def_engine_catalog": "VIA-FNC-8955",
+        "def_catalog_html": "VIA-FNC-8954",
+        "def_previous": "VIA-FNC-8956",
+        "__getattr__": "VIA-FNC-8953",
+        "main": "VIA-FNC-0343"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-FNC-0330",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:_tail_set"
+        },
+        {
+          "code": "VIA-FNC-0331",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c1_ast_sweep"
+        },
+        {
+          "code": "VIA-FNC-0332",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c1_ast_sweep._names"
+        },
+        {
+          "code": "VIA-FNC-0333",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c2_six"
+        },
+        {
+          "code": "VIA-FNC-0334",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c3_ssot"
+        },
+        {
+          "code": "VIA-FNC-0335",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c4_topo"
+        },
+        {
+          "code": "VIA-FNC-0336",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c4_topo.dfs"
+        },
+        {
+          "code": "VIA-FNC-0337",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c5_complexity"
+        },
+        {
+          "code": "VIA-FNC-0338",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:c6_inventory"
+        },
+        {
+          "code": "VIA-FNC-0339",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:classify"
+        },
+        {
+          "code": "VIA-FNC-0340",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:emit"
+        },
+        {
+          "code": "VIA-FNC-0341",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:html_report"
+        },
+        {
+          "code": "VIA-FNC-0342",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:lang_inventory"
+        },
+        {
+          "code": "VIA-FNC-0343",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:main"
+        },
+        {
+          "code": "VIA-FNC-0345",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:progress"
+        },
+        {
+          "code": "VIA-FNC-0346",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:run_round"
+        },
+        {
+          "code": "VIA-FNC-0347",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:sev_tag"
+        },
+        {
+          "code": "VIA-FNC-0348",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:status"
+        },
+        {
+          "code": "VIA-FNC-4364",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:lang_inventory._archived"
+        },
+        {
+          "code": "VIA-FNC-8953",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:__getattr__"
+        },
+        {
+          "code": "VIA-FNC-8954",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:def_catalog_html"
+        },
+        {
+          "code": "VIA-FNC-8955",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:def_engine_catalog"
+        },
+        {
+          "code": "VIA-FNC-8956",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:def_previous"
+        },
+        {
+          "code": "VIA-FNC-8957",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:main.inventory"
+        },
+        {
+          "code": "VIA-FNC-8958",
+          "category": "function",
+          "identity": "CGC_MDL069_SystemManager:main.render"
+        },
+        {
+          "code": "VIA-MDL-0032",
+          "category": "module",
+          "identity": "CGC_MDL069_SystemManager"
+        }
+      ]
+    },
+    "gle_core": {
+      "source": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py",
+      "functions": [
+        "utc_timestamp",
+        "sha256_file",
+        "hash8",
+        "normalize_text",
+        "text_signature",
+        "weighted_median",
+        "union_bbox",
+        "zone_for_bbox",
+        "font_weight_from_name",
+        "safe_relative_path",
+        "is_supported_input",
+        "probe_backends",
+        "backend_map",
+        "extract_with_pymupdf",
+        "extract_image_page",
+        "should_ocr",
+        "run_tesseract_tsv",
+        "merge_native_and_ocr",
+        "enrich_tables_with_pdfplumber",
+        "estimate_body_font_size",
+        "repeated_margin_signatures",
+        "heading_score",
+        "estimate_heading_levels",
+        "classify_elements",
+        "attach_contained_elements",
+        "bind_captions_and_sources",
+        "deduplicate_table_text",
+        "detect_column_boundaries",
+        "assign_reading_order",
+        "assign_ids",
+        "render_annotations",
+        "collect_statistics",
+        "document_to_dict",
+        "flatten_elements",
+        "export_json",
+        "export_jsonl",
+        "export_csv",
+        "export_sqlite",
+        "export_parquet_if_available",
+        "export_html",
+        "export_all",
+        "analyze_document",
+        "load_config",
+        "build_parser",
+        "command_probe",
+        "command_analyze",
+        "main"
+      ],
+      "sha256": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
+      "function_codes": {
+        "utc_timestamp": "VIA-FNC-9171",
+        "sha256_file": "VIA-FNC-9167",
+        "hash8": "VIA-FNC-9155",
+        "normalize_text": "VIA-FNC-9161",
+        "text_signature": "VIA-FNC-9169",
+        "weighted_median": "VIA-FNC-9172",
+        "union_bbox": "VIA-FNC-9170",
+        "zone_for_bbox": "VIA-FNC-9173",
+        "font_weight_from_name": "VIA-FNC-9154",
+        "safe_relative_path": "VIA-FNC-9166",
+        "is_supported_input": "VIA-FNC-9157",
+        "probe_backends": "VIA-FNC-9162",
+        "backend_map": "VIA-FNC-9131",
+        "extract_with_pymupdf": "VIA-FNC-9152",
+        "extract_image_page": "VIA-FNC-9151",
+        "should_ocr": "VIA-FNC-9168",
+        "run_tesseract_tsv": "VIA-FNC-9165",
+        "merge_native_and_ocr": "VIA-FNC-9160",
+        "enrich_tables_with_pdfplumber": "VIA-FNC-9141",
+        "estimate_body_font_size": "VIA-FNC-9142",
+        "repeated_margin_signatures": "VIA-FNC-9164",
+        "heading_score": "VIA-FNC-9156",
+        "estimate_heading_levels": "VIA-FNC-9143",
+        "classify_elements": "VIA-FNC-9134",
+        "attach_contained_elements": "VIA-FNC-9130",
+        "bind_captions_and_sources": "VIA-FNC-9132",
+        "deduplicate_table_text": "VIA-FNC-9138",
+        "detect_column_boundaries": "VIA-FNC-9139",
+        "assign_reading_order": "VIA-FNC-9129",
+        "assign_ids": "VIA-FNC-9128",
+        "render_annotations": "VIA-FNC-9163",
+        "collect_statistics": "VIA-FNC-9135",
+        "document_to_dict": "VIA-FNC-9140",
+        "flatten_elements": "VIA-FNC-9153",
+        "export_json": "VIA-FNC-9147",
+        "export_jsonl": "VIA-FNC-9148",
+        "export_csv": "VIA-FNC-9145",
+        "export_sqlite": "VIA-FNC-9150",
+        "export_parquet_if_available": "VIA-FNC-9149",
+        "export_html": "VIA-FNC-9146",
+        "export_all": "VIA-FNC-9144",
+        "analyze_document": "VIA-FNC-9127",
+        "load_config": "VIA-FNC-9158",
+        "build_parser": "VIA-FNC-9133",
+        "command_probe": "VIA-FNC-9137",
+        "command_analyze": "VIA-FNC-9136",
+        "main": "VIA-FNC-9159"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-CLS-0455",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox"
+        },
+        {
+          "code": "VIA-CLS-0456",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:BackendStatus"
+        },
+        {
+          "code": "VIA-CLS-0457",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:DocumentLayout"
+        },
+        {
+          "code": "VIA-CLS-0458",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:EngineConfig"
+        },
+        {
+          "code": "VIA-CLS-0459",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:FontProfile"
+        },
+        {
+          "code": "VIA-CLS-0460",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:LayoutElement"
+        },
+        {
+          "code": "VIA-CLS-0461",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:PageLayout"
+        },
+        {
+          "code": "VIA-CLS-0462",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_core:Relation"
+        },
+        {
+          "code": "VIA-FNC-9115",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.area"
+        },
+        {
+          "code": "VIA-FNC-9116",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.as_list"
+        },
+        {
+          "code": "VIA-FNC-9117",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.contains_center"
+        },
+        {
+          "code": "VIA-FNC-9118",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.cx"
+        },
+        {
+          "code": "VIA-FNC-9119",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.cy"
+        },
+        {
+          "code": "VIA-FNC-9120",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.height"
+        },
+        {
+          "code": "VIA-FNC-9121",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.intersection_ratio"
+        },
+        {
+          "code": "VIA-FNC-9122",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.normalized"
+        },
+        {
+          "code": "VIA-FNC-9123",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:BBox.width"
+        },
+        {
+          "code": "VIA-FNC-9124",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:EngineConfig.validate"
+        },
+        {
+          "code": "VIA-FNC-9125",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:LayoutElement.text"
+        },
+        {
+          "code": "VIA-FNC-9126",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:LayoutElement.to_dict"
+        },
+        {
+          "code": "VIA-FNC-9127",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:analyze_document"
+        },
+        {
+          "code": "VIA-FNC-9128",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:assign_ids"
+        },
+        {
+          "code": "VIA-FNC-9129",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:assign_reading_order"
+        },
+        {
+          "code": "VIA-FNC-9130",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:attach_contained_elements"
+        },
+        {
+          "code": "VIA-FNC-9131",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:backend_map"
+        },
+        {
+          "code": "VIA-FNC-9132",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:bind_captions_and_sources"
+        },
+        {
+          "code": "VIA-FNC-9133",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:build_parser"
+        },
+        {
+          "code": "VIA-FNC-9134",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:classify_elements"
+        },
+        {
+          "code": "VIA-FNC-9135",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:collect_statistics"
+        },
+        {
+          "code": "VIA-FNC-9136",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:command_analyze"
+        },
+        {
+          "code": "VIA-FNC-9137",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:command_probe"
+        },
+        {
+          "code": "VIA-FNC-9138",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:deduplicate_table_text"
+        },
+        {
+          "code": "VIA-FNC-9139",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:detect_column_boundaries"
+        },
+        {
+          "code": "VIA-FNC-9140",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:document_to_dict"
+        },
+        {
+          "code": "VIA-FNC-9141",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:enrich_tables_with_pdfplumber"
+        },
+        {
+          "code": "VIA-FNC-9142",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:estimate_body_font_size"
+        },
+        {
+          "code": "VIA-FNC-9143",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:estimate_heading_levels"
+        },
+        {
+          "code": "VIA-FNC-9144",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_all"
+        },
+        {
+          "code": "VIA-FNC-9145",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_csv"
+        },
+        {
+          "code": "VIA-FNC-9146",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_html"
+        },
+        {
+          "code": "VIA-FNC-9147",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_json"
+        },
+        {
+          "code": "VIA-FNC-9148",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_jsonl"
+        },
+        {
+          "code": "VIA-FNC-9149",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_parquet_if_available"
+        },
+        {
+          "code": "VIA-FNC-9150",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:export_sqlite"
+        },
+        {
+          "code": "VIA-FNC-9151",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:extract_image_page"
+        },
+        {
+          "code": "VIA-FNC-9152",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:extract_with_pymupdf"
+        },
+        {
+          "code": "VIA-FNC-9153",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:flatten_elements"
+        },
+        {
+          "code": "VIA-FNC-9154",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:font_weight_from_name"
+        },
+        {
+          "code": "VIA-FNC-9155",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:hash8"
+        },
+        {
+          "code": "VIA-FNC-9156",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:heading_score"
+        },
+        {
+          "code": "VIA-FNC-9157",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:is_supported_input"
+        },
+        {
+          "code": "VIA-FNC-9158",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:load_config"
+        },
+        {
+          "code": "VIA-FNC-9159",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:main"
+        },
+        {
+          "code": "VIA-FNC-9160",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:merge_native_and_ocr"
+        },
+        {
+          "code": "VIA-FNC-9161",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:normalize_text"
+        },
+        {
+          "code": "VIA-FNC-9162",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:probe_backends"
+        },
+        {
+          "code": "VIA-FNC-9163",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:render_annotations"
+        },
+        {
+          "code": "VIA-FNC-9164",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:repeated_margin_signatures"
+        },
+        {
+          "code": "VIA-FNC-9165",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:run_tesseract_tsv"
+        },
+        {
+          "code": "VIA-FNC-9166",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:safe_relative_path"
+        },
+        {
+          "code": "VIA-FNC-9167",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:sha256_file"
+        },
+        {
+          "code": "VIA-FNC-9168",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:should_ocr"
+        },
+        {
+          "code": "VIA-FNC-9169",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:text_signature"
+        },
+        {
+          "code": "VIA-FNC-9170",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:union_bbox"
+        },
+        {
+          "code": "VIA-FNC-9171",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:utc_timestamp"
+        },
+        {
+          "code": "VIA-FNC-9172",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:weighted_median"
+        },
+        {
+          "code": "VIA-FNC-9173",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_core:zone_for_bbox"
+        },
+        {
+          "code": "VIA-MDL-0231",
+          "category": "module",
+          "identity": "SUP_MDL743_Reference_gle_core"
+        }
+      ]
+    },
+    "gle_adapters": {
+      "source": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/adapter_sdk.py",
+      "functions": [
+        "utc_timestamp",
+        "normalize_text",
+        "text_signature",
+        "readable_character_ratio",
+        "replacement_character_ratio",
+        "duplicate_line_ratio",
+        "compute_quality",
+        "evaluate_acceptance",
+        "module_exists",
+        "binary_path",
+        "package_version",
+        "available_memory_gb",
+        "heavy_resource_gate",
+        "merged_environment",
+        "run_command",
+        "truncate_output"
+      ],
+      "sha256": "673ac9440f3747d48a432c511cbe363e52182a2ea2f1ef5e4938fd6375b24e4b",
+      "function_codes": {
+        "utc_timestamp": "VIA-FNC-9042",
+        "normalize_text": "VIA-FNC-9035",
+        "text_signature": "VIA-FNC-9040",
+        "readable_character_ratio": "VIA-FNC-9037",
+        "replacement_character_ratio": "VIA-FNC-9038",
+        "duplicate_line_ratio": "VIA-FNC-9030",
+        "compute_quality": "VIA-FNC-9029",
+        "evaluate_acceptance": "VIA-FNC-9031",
+        "module_exists": "VIA-FNC-9034",
+        "binary_path": "VIA-FNC-9028",
+        "package_version": "VIA-FNC-9036",
+        "available_memory_gb": "VIA-FNC-9027",
+        "heavy_resource_gate": "VIA-FNC-9032",
+        "merged_environment": "VIA-FNC-9033",
+        "run_command": "VIA-FNC-9039",
+        "truncate_output": "VIA-FNC-9041"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-CLS-0415",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterConfig"
+        },
+        {
+          "code": "VIA-CLS-0416",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterContext"
+        },
+        {
+          "code": "VIA-CLS-0417",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterElement"
+        },
+        {
+          "code": "VIA-CLS-0418",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterProbe"
+        },
+        {
+          "code": "VIA-CLS-0419",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterResult"
+        },
+        {
+          "code": "VIA-CLS-0420",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:BaseAdapter"
+        },
+        {
+          "code": "VIA-CLS-0421",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:ExternalCommandAdapter"
+        },
+        {
+          "code": "VIA-CLS-0422",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_adapters:QualityMetrics"
+        },
+        {
+          "code": "VIA-FNC-9019",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterElement.fingerprint"
+        },
+        {
+          "code": "VIA-FNC-9020",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:AdapterResult.to_dict"
+        },
+        {
+          "code": "VIA-FNC-9021",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:BaseAdapter.extract"
+        },
+        {
+          "code": "VIA-FNC-9022",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:BaseAdapter.probe"
+        },
+        {
+          "code": "VIA-FNC-9023",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:BaseAdapter.run"
+        },
+        {
+          "code": "VIA-FNC-9024",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:BaseAdapter.skip_result"
+        },
+        {
+          "code": "VIA-FNC-9025",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:ExternalCommandAdapter.configured_command"
+        },
+        {
+          "code": "VIA-FNC-9026",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:ExternalCommandAdapter.probe"
+        },
+        {
+          "code": "VIA-FNC-9027",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:available_memory_gb"
+        },
+        {
+          "code": "VIA-FNC-9028",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:binary_path"
+        },
+        {
+          "code": "VIA-FNC-9029",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:compute_quality"
+        },
+        {
+          "code": "VIA-FNC-9030",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:duplicate_line_ratio"
+        },
+        {
+          "code": "VIA-FNC-9031",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:evaluate_acceptance"
+        },
+        {
+          "code": "VIA-FNC-9032",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:heavy_resource_gate"
+        },
+        {
+          "code": "VIA-FNC-9033",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:merged_environment"
+        },
+        {
+          "code": "VIA-FNC-9034",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:module_exists"
+        },
+        {
+          "code": "VIA-FNC-9035",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:normalize_text"
+        },
+        {
+          "code": "VIA-FNC-9036",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:package_version"
+        },
+        {
+          "code": "VIA-FNC-9037",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:readable_character_ratio"
+        },
+        {
+          "code": "VIA-FNC-9038",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:replacement_character_ratio"
+        },
+        {
+          "code": "VIA-FNC-9039",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:run_command"
+        },
+        {
+          "code": "VIA-FNC-9040",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:text_signature"
+        },
+        {
+          "code": "VIA-FNC-9041",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:truncate_output"
+        },
+        {
+          "code": "VIA-FNC-9042",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_adapters:utc_timestamp"
+        },
+        {
+          "code": "VIA-MDL-0229",
+          "category": "module",
+          "identity": "SUP_MDL743_Reference_gle_adapters"
+        }
+      ]
+    },
+    "gle_backends": {
+      "source": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py",
+      "functions": [
+        "result_shell",
+        "bbox_from_any",
+        "render_pdf_pages",
+        "image_dimensions",
+        "resolved_tesseract_languages",
+        "command_from_template",
+        "markdown_to_elements",
+        "find_first_text_file",
+        "package_major_version",
+        "paddle_result_payload",
+        "paddle_label_contract",
+        "paddle_v3_elements",
+        "build_all_adapters",
+        "adapter_registry"
+      ],
+      "sha256": "bb3ee68fec840b8869722c6b3c1d590f8cc619cbad1f99fa6daa7cf04f720ac4",
+      "function_codes": {
+        "result_shell": "VIA-FNC-9114",
+        "bbox_from_any": "VIA-FNC-9102",
+        "render_pdf_pages": "VIA-FNC-9112",
+        "image_dimensions": "VIA-FNC-9106",
+        "resolved_tesseract_languages": "VIA-FNC-9113",
+        "command_from_template": "VIA-FNC-9104",
+        "markdown_to_elements": "VIA-FNC-9107",
+        "find_first_text_file": "VIA-FNC-9105",
+        "package_major_version": "VIA-FNC-9108",
+        "paddle_result_payload": "VIA-FNC-9110",
+        "paddle_label_contract": "VIA-FNC-9109",
+        "paddle_v3_elements": "VIA-FNC-9111",
+        "build_all_adapters": "VIA-FNC-9103",
+        "adapter_registry": "VIA-FNC-9101"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-CLS-0423",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:AdobeExtractEngine"
+        },
+        {
+          "code": "VIA-CLS-0424",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:ApacheTikaEngine"
+        },
+        {
+          "code": "VIA-CLS-0425",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:CamelotEngine"
+        },
+        {
+          "code": "VIA-CLS-0426",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:DeepDoctectionEngine"
+        },
+        {
+          "code": "VIA-CLS-0427",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:DoclingEngine"
+        },
+        {
+          "code": "VIA-CLS-0428",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:EasyOcrEngine"
+        },
+        {
+          "code": "VIA-CLS-0429",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:HuriDocsEngine"
+        },
+        {
+          "code": "VIA-CLS-0430",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:LayoutParserEngine"
+        },
+        {
+          "code": "VIA-CLS-0431",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:MarkerEngine"
+        },
+        {
+          "code": "VIA-CLS-0432",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:MinerUEngine"
+        },
+        {
+          "code": "VIA-CLS-0433",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:MuPdfCliEngine"
+        },
+        {
+          "code": "VIA-CLS-0434",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:OcrMyPdfEngine"
+        },
+        {
+          "code": "VIA-CLS-0435",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleDetectionEngine"
+        },
+        {
+          "code": "VIA-CLS-0436",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleLayoutEngine"
+        },
+        {
+          "code": "VIA-CLS-0437",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleOcrEngine"
+        },
+        {
+          "code": "VIA-CLS-0438",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePPStructureEngine"
+        },
+        {
+          "code": "VIA-CLS-0439",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePdfEngine"
+        },
+        {
+          "code": "VIA-CLS-0440",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfBoxEngine"
+        },
+        {
+          "code": "VIA-CLS-0441",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfJsEngine"
+        },
+        {
+          "code": "VIA-CLS-0442",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfMinerEngine"
+        },
+        {
+          "code": "VIA-CLS-0443",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfParseNodeEngine"
+        },
+        {
+          "code": "VIA-CLS-0444",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfPlumberEngine"
+        },
+        {
+          "code": "VIA-CLS-0445",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfSharpEngine"
+        },
+        {
+          "code": "VIA-CLS-0446",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PopplerEngine"
+        },
+        {
+          "code": "VIA-CLS-0447",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdf4LlmEngine"
+        },
+        {
+          "code": "VIA-CLS-0448",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdfEngine"
+        },
+        {
+          "code": "VIA-CLS-0449",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyPdfEngine"
+        },
+        {
+          "code": "VIA-CLS-0450",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:TableTransformerEngine"
+        },
+        {
+          "code": "VIA-CLS-0451",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:TabulaEngine"
+        },
+        {
+          "code": "VIA-CLS-0452",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:TesseractEngine"
+        },
+        {
+          "code": "VIA-CLS-0453",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:TranskribusEngine"
+        },
+        {
+          "code": "VIA-CLS-0454",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_backends:UnstructuredEngine"
+        },
+        {
+          "code": "VIA-FNC-9043",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:AdobeExtractEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9044",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:AdobeExtractEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9045",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:ApacheTikaEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9046",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:ApacheTikaEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9047",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:CamelotEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9048",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:CamelotEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9049",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:DeepDoctectionEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9050",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:DeepDoctectionEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9051",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:DoclingEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9052",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:DoclingEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9053",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:EasyOcrEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9054",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:EasyOcrEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9055",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:HuriDocsEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9056",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:HuriDocsEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9057",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:LayoutParserEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9058",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:LayoutParserEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9059",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:MarkerEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9060",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:MinerUEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9061",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:MuPdfCliEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9062",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:OcrMyPdfEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9063",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleDetectionEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9064",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleDetectionEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9065",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleLayoutEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9066",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleLayoutEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9067",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleOcrEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9068",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddleOcrEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9069",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePPStructureEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9070",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePPStructureEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9071",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePdfEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9072",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PaddlePdfEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9073",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfBoxEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9074",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfBoxEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9075",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfJsEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9076",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfJsEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9077",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfMinerEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9078",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfMinerEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9079",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfParseNodeEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9080",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfParseNodeEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9081",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfPlumberEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9082",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfPlumberEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9083",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfSharpEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9084",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PdfSharpEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9085",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PopplerEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9086",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdf4LlmEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9087",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdf4LlmEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9088",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdfEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9089",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyMuPdfEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9090",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyPdfEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9091",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:PyPdfEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9092",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TableTransformerEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9093",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TableTransformerEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9094",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TabulaEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9095",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TabulaEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9096",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TesseractEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9097",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TranskribusEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9098",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:TranskribusEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9099",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:UnstructuredEngine.extract"
+        },
+        {
+          "code": "VIA-FNC-9100",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:UnstructuredEngine.probe"
+        },
+        {
+          "code": "VIA-FNC-9101",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:adapter_registry"
+        },
+        {
+          "code": "VIA-FNC-9102",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:bbox_from_any"
+        },
+        {
+          "code": "VIA-FNC-9103",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:build_all_adapters"
+        },
+        {
+          "code": "VIA-FNC-9104",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:command_from_template"
+        },
+        {
+          "code": "VIA-FNC-9105",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:find_first_text_file"
+        },
+        {
+          "code": "VIA-FNC-9106",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:image_dimensions"
+        },
+        {
+          "code": "VIA-FNC-9107",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:markdown_to_elements"
+        },
+        {
+          "code": "VIA-FNC-9108",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:package_major_version"
+        },
+        {
+          "code": "VIA-FNC-9109",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:paddle_label_contract"
+        },
+        {
+          "code": "VIA-FNC-9110",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:paddle_result_payload"
+        },
+        {
+          "code": "VIA-FNC-9111",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:paddle_v3_elements"
+        },
+        {
+          "code": "VIA-FNC-9112",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:render_pdf_pages"
+        },
+        {
+          "code": "VIA-FNC-9113",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:resolved_tesseract_languages"
+        },
+        {
+          "code": "VIA-FNC-9114",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_backends:result_shell"
+        },
+        {
+          "code": "VIA-MDL-0230",
+          "category": "module",
+          "identity": "SUP_MDL743_Reference_gle_backends"
+        }
+      ]
+    },
+    "gle_router": {
+      "source": "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/multi_engine_orchestrator.py",
+      "functions": [
+        "load_config_payload",
+        "apply_adapter_config",
+        "load_engine_stack_config",
+        "load_orchestrator_config",
+        "required_capabilities_met",
+        "build_route",
+        "should_jump_to_ocr",
+        "document_profile_from_results",
+        "file_sha256",
+        "adapter_cache_key",
+        "result_from_cache",
+        "run_adapter_cached",
+        "execute_route",
+        "bbox_iou",
+        "normalized_element_bbox",
+        "elements_match",
+        "choose_consensus_type",
+        "fuse_results",
+        "export_backend_audit",
+        "export_consensus",
+        "run_core_layout_bridge",
+        "export_run",
+        "run_orchestrator",
+        "build_parser",
+        "command_probe",
+        "command_list",
+        "command_run",
+        "main"
+      ],
+      "sha256": "579be2aca0b0a7c9280fb702d70558602d57525fdbc296499a285fdd32c5aa45",
+      "function_codes": {
+        "load_config_payload": "VIA-FNC-9192",
+        "apply_adapter_config": "VIA-FNC-9176",
+        "load_engine_stack_config": "VIA-FNC-9193",
+        "load_orchestrator_config": "VIA-FNC-9194",
+        "required_capabilities_met": "VIA-FNC-9197",
+        "build_route": "VIA-FNC-9179",
+        "should_jump_to_ocr": "VIA-FNC-9202",
+        "document_profile_from_results": "VIA-FNC-9184",
+        "file_sha256": "VIA-FNC-9190",
+        "adapter_cache_key": "VIA-FNC-9175",
+        "result_from_cache": "VIA-FNC-9198",
+        "run_adapter_cached": "VIA-FNC-9199",
+        "execute_route": "VIA-FNC-9186",
+        "bbox_iou": "VIA-FNC-9177",
+        "normalized_element_bbox": "VIA-FNC-9196",
+        "elements_match": "VIA-FNC-9185",
+        "choose_consensus_type": "VIA-FNC-9180",
+        "fuse_results": "VIA-FNC-9191",
+        "export_backend_audit": "VIA-FNC-9187",
+        "export_consensus": "VIA-FNC-9188",
+        "run_core_layout_bridge": "VIA-FNC-9200",
+        "export_run": "VIA-FNC-9189",
+        "run_orchestrator": "VIA-FNC-9201",
+        "build_parser": "VIA-FNC-9178",
+        "command_probe": "VIA-FNC-9182",
+        "command_list": "VIA-FNC-9181",
+        "command_run": "VIA-FNC-9183",
+        "main": "VIA-FNC-9195"
+      },
+      "registered_components": [
+        {
+          "code": "VIA-CLS-0463",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_router:CanonicalElement"
+        },
+        {
+          "code": "VIA-CLS-0464",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_router:OrchestratorConfig"
+        },
+        {
+          "code": "VIA-CLS-0465",
+          "category": "class",
+          "identity": "SUP_MDL743_Reference_gle_router:OrchestratorRun"
+        },
+        {
+          "code": "VIA-FNC-9174",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:OrchestratorConfig.validate"
+        },
+        {
+          "code": "VIA-FNC-9175",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:adapter_cache_key"
+        },
+        {
+          "code": "VIA-FNC-9176",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:apply_adapter_config"
+        },
+        {
+          "code": "VIA-FNC-9177",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:bbox_iou"
+        },
+        {
+          "code": "VIA-FNC-9178",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:build_parser"
+        },
+        {
+          "code": "VIA-FNC-9179",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:build_route"
+        },
+        {
+          "code": "VIA-FNC-9180",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:choose_consensus_type"
+        },
+        {
+          "code": "VIA-FNC-9181",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:command_list"
+        },
+        {
+          "code": "VIA-FNC-9182",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:command_probe"
+        },
+        {
+          "code": "VIA-FNC-9183",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:command_run"
+        },
+        {
+          "code": "VIA-FNC-9184",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:document_profile_from_results"
+        },
+        {
+          "code": "VIA-FNC-9185",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:elements_match"
+        },
+        {
+          "code": "VIA-FNC-9186",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:execute_route"
+        },
+        {
+          "code": "VIA-FNC-9187",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:export_backend_audit"
+        },
+        {
+          "code": "VIA-FNC-9188",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:export_consensus"
+        },
+        {
+          "code": "VIA-FNC-9189",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:export_run"
+        },
+        {
+          "code": "VIA-FNC-9190",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:file_sha256"
+        },
+        {
+          "code": "VIA-FNC-9191",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:fuse_results"
+        },
+        {
+          "code": "VIA-FNC-9192",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:load_config_payload"
+        },
+        {
+          "code": "VIA-FNC-9193",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:load_engine_stack_config"
+        },
+        {
+          "code": "VIA-FNC-9194",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:load_orchestrator_config"
+        },
+        {
+          "code": "VIA-FNC-9195",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:main"
+        },
+        {
+          "code": "VIA-FNC-9196",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:normalized_element_bbox"
+        },
+        {
+          "code": "VIA-FNC-9197",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:required_capabilities_met"
+        },
+        {
+          "code": "VIA-FNC-9198",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:result_from_cache"
+        },
+        {
+          "code": "VIA-FNC-9199",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:run_adapter_cached"
+        },
+        {
+          "code": "VIA-FNC-9200",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:run_core_layout_bridge"
+        },
+        {
+          "code": "VIA-FNC-9201",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:run_orchestrator"
+        },
+        {
+          "code": "VIA-FNC-9202",
+          "category": "function",
+          "identity": "SUP_MDL743_Reference_gle_router:should_jump_to_ocr"
+        },
+        {
+          "code": "VIA-MDL-0232",
+          "category": "module",
+          "identity": "SUP_MDL743_Reference_gle_router"
+        }
+      ]
+    }
+  },
+  "errors": [],
+  "state": "REGISTERED"
+}
