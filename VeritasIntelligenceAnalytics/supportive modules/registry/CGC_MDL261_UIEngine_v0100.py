@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""CGC_MDL257_UIEngine v0100 — 中央 U/I 引擎:自適應任何範本 · 參數檔可調 · 內建標準範本 · DuckDB 顯式資料庫面板
+r"""CGC_MDL261_UIEngine v0100 — 中央 U/I 引擎:自適應任何範本 · 參數檔可調 · 內建標準範本 · DuckDB 顯式資料庫面板
 
 操作員 2026-10-04:「DuckDB 顯式資料庫於 U/I 功能;建立一個 U/I 架構會自適應式吻合任何模板設計;參數可調整;
   啟動檔兼最簡單的 HTML 標準模板,未來的拿來套用;一個引擎自動安裝所有工具與環境(照我測過的結果)再啟動 HTML U/I,
@@ -78,7 +78,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 VIA = HERE.parents[1]
 UI_DIR = VIA / "supportive modules" / "ui_support"
-TAG = f"CGC_MDL257_UIEngine v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
+TAG = f"CGC_MDL261_UIEngine v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 CONFIG_GLOB = "VIA_UI_EngineConfig_v*.json"
 WORK_DIR = VIA / "VIA_Reports" / "ui_engine"
 WORK_CONFIG = WORK_DIR / "ui_config.json"

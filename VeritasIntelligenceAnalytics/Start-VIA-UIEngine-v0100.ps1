@@ -7,7 +7,7 @@
 #       -Install 才動手:LKGC 可用 → rollback --to LKGC_latest.json --execute --approve(uv pip sync 照鎖逐境重建;只進 via_* 隔離境,
 #         不給 --approve-remove = 不刪 base 任何東西);LKGC 不可用 → RunGate run --approve-install(只把缺件裝進家族境)。
 #       安裝要連網:本視窗先開雙閘(操作員的手;本檔只檢查、永不代設),沒開 = 跳過安裝、照實說。
-#   ② 產頁:CGC_MDL257_UIEngine 尾版 build(引擎 → JSON 快照 → 頁;零 CDN)。參數疊層 = 正本 VIA_UI_EngineConfig_v*.json ←
+#   ② 產頁:CGC_MDL261_UIEngine 尾版 build(引擎 → JSON 快照 → 頁;零 CDN)。參數疊層 = 正本 VIA_UI_EngineConfig_v*.json ←
 #       工作副本 VIA_Reports\ui_engine\ui_config.json ← -Config ← -Set a.b=值。-Template X = 範本夾任何 .html(未來的設計);不給 = 內建標準範本。
 #   ③ 開:預設瀏覽器直接開檔(file://,不需伺服器);-Serve = 另起只綁 127.0.0.1 的只讀樞紐(改 ui_config.json 重新整理即生效),開 http://127.0.0.1:埠/。
 #   用法(在 VeritasIntelligenceAnalytics 根目錄):
@@ -50,8 +50,8 @@ while ($VIA -and -not (Test-Path (Join-Path $VIA "supportive modules\registry"))
 if (-not $VIA) { Write-Host "[UI 引擎] 找不到 VeritasIntelligenceAnalytics 根目錄" -ForegroundColor Red; $global:LASTEXITCODE = 2; return }
 $reg = Join-Path $VIA "supportive modules\registry"
 $vcgc = Get-ChildItem $reg -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File | Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } | Select-Object -Last 1
-$eng = Get-ChildItem $reg -Filter "CGC_MDL257_UIEngine_v*.py" -File | Sort-Object Name | Select-Object -Last 1
-if (-not $vcgc -or -not $eng) { Write-Host "[UI 引擎] VCGC 入口或 CGC_MDL257_UIEngine 不在 $reg" -ForegroundColor Red; $global:LASTEXITCODE = 3; return }
+$eng = Get-ChildItem $reg -Filter "CGC_MDL261_UIEngine_v*.py" -File | Sort-Object Name | Select-Object -Last 1
+if (-not $vcgc -or -not $eng) { Write-Host "[UI 引擎] VCGC 入口或 CGC_MDL261_UIEngine 不在 $reg" -ForegroundColor Red; $global:LASTEXITCODE = 3; return }
 if (-not $env:PYTHONIOENCODING) { $env:PYTHONIOENCODING = "utf-8" }
 if (-not $env:PYTHONUTF8) { $env:PYTHONUTF8 = "1" }
 $env:VIA_FROM_VCGC = "YES"
