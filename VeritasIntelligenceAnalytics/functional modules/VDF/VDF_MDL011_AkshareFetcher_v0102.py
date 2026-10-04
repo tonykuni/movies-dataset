@@ -9,6 +9,9 @@
     Drewry WCI 八條航線、70 城新房價指數(兩城一呼叫)…;選單裡由 overrides 指定。
   · 參數列覆寫:overrides[fn] = {"__rows__": [{...}, …]} = 明列每組參數(NBS 的 path 跟 kind 綁在一起,不能做笛卡兒積);
     其他寫法照 v0100(清單 = 笛卡兒積、純量 = 固定值)。
+  · 國家統計局 NBS(容器實測):長區間一次查(如 1990- 月度)30 秒逾時回非 JSON、連發會被限流 →
+    NBS 呼叫全域節流(兩呼叫間隔 ≥ NBS_MIN_INTERVAL 秒)· 長區間失敗時切 5 年一段逐段查、按指標列對齊拼回(新→舊、欄不重複)。
+  · --group china_macro,global_macro,shipping 只跑指定組(容器先跑非 NBS 的各國 / 航運,NBS 慢慢補)。
   · 結果誠實:失敗逐支列出;失敗比例 ≤ 選單的 fail_tolerance 才 rc 0(上游介面改版是常態,照列不藏),超過 rc 1;一支都沒成 rc 2。
 其餘(scan · fetch · schedule-run · views · params(v0101 無註冊表 NODATA)· compact · universe)全照前版。不碰 TA-Lib;不讀寫同意閘。
 """
@@ -102,6 +105,77 @@ def expand_params_v0102(reg_entry, max_combos=None, overrides=None):
 
 CORE.expand_params = expand_params_v0102               # plan_series 以 R.expand_params 叫(R = 原件模組)
 
+import threading as _th
+import time as _time
+NBS_MIN_INTERVAL = 2.0
+NBS_CHUNK_YEARS = 5
+_NBS_LOCK = _th.Lock()
+_NBS_LAST = [0.0]
+NBS_STATS = {"calls": 0, "chunked": 0, "chunks": 0}
+_CALL_V0100 = CORE._call
+
+
+def _nbs_throttled(f, kwargs):
+    with _NBS_LOCK:
+        wait = NBS_MIN_INTERVAL - (_time.monotonic() - _NBS_LAST[0])
+        if wait > 0:
+            _time.sleep(wait)
+        _NBS_LAST[0] = _time.monotonic()
+    NBS_STATS["calls"] += 1
+    return f(**kwargs)
+
+
+def period_chunks_v0102(period: str, this_year: int, step: int = NBS_CHUNK_YEARS) -> list:
+    """'1990-' / '1990-2025' → ['2021-2025', '2016-2020', …, '1990-1995'](新→舊,每段 ≤ step 年);不是年區間 = []。"""
+    m = re.match(r"^\s*(\d{4})\s*-\s*(\d{4})?\s*$", str(period or ""))
+    if not m:
+        return []
+    a, b = int(m.group(1)), int(m.group(2) or this_year)
+    out, hi = [], b
+    while hi >= a:
+        lo = max(a, hi - step + 1)
+        out.append(f"{lo}-{hi}")
+        hi = lo - 1
+    return out if len(out) > 1 else []
+
+
+def nbs_call_v0102(f, kwargs):
+    """NBS:節流;整段失敗且是長年區間 → 切段逐查、按指標列對齊拼回;一段都沒有 = 照拋原例外。"""
+    try:
+        return _nbs_throttled(f, kwargs)
+    except Exception as first:
+        import datetime as _dt
+        chunks = period_chunks_v0102(kwargs.get("period"), _dt.date.today().year)
+        if not chunks:
+            raise
+        import pandas as pd
+        parts = []
+        for per in chunks:
+            for attempt in range(2):
+                try:
+                    df = _nbs_throttled(f, dict(kwargs, period=per))
+                    if df is not None and len(df):
+                        parts.append(df)
+                    break
+                except Exception:
+                    if attempt:
+                        break
+        NBS_STATS["chunked"] += 1
+        NBS_STATS["chunks"] += len(chunks)
+        if not parts:
+            raise first
+        out = pd.concat(parts, axis=1)
+        return out.loc[:, ~out.columns.duplicated()]
+
+
+def _call_v0102(fn, kwargs, retries=3):
+    if str(fn).startswith("macro_china_nbs"):
+        return nbs_call_v0102(getattr(CORE._akshare(), fn), kwargs)
+    return _CALL_V0100(fn, kwargs, retries)
+
+
+CORE._call = _call_v0102
+
 
 def selection_path_v0102(arg: str | None = None) -> Path | None:
     if arg:
@@ -156,6 +230,7 @@ def cmd_deep_macro_v0102(argv: list) -> int:
     ap.add_argument("--selection")
     ap.add_argument("--workers", type=int)
     ap.add_argument("--tier", default="core")
+    ap.add_argument("--group", default="")
     a = ap.parse_args(argv)
     sp = selection_path_v0102(a.selection)
     if sp is None or not sp.is_file():
@@ -168,6 +243,11 @@ def cmd_deep_macro_v0102(argv: list) -> int:
         return 2
     if a.workers:
         sel["workers"] = a.workers
+    if a.group:
+        want = {g.strip() for g in a.group.split(",") if g.strip()}
+        keep = {fn for g, fns in (sel.get("groups") or {}).items() if g in want for fn in fns}
+        sel["fns"] = [fn for fn in sel.get("fns") or [] if fn in keep]
+        print(f"[{TAG}] 只跑組 {sorted(want)} · 函式 {len(sel['fns'])}", flush=True)
     CORE.ensure_dirs()
     reg = ensure_registry_v0102()
     plan = plan_summary_v0102(sel, reg)
@@ -260,6 +340,27 @@ def selftest() -> int:
             and apply_tier_v0102(json.loads(json.dumps(sel)), "nope") is None, (nat(core), nat(full)))
         chk("④ 計畫(零網路):cpi 1 序列 + NBS 2 組 = 3 序列;冊外函式照實略過",
             p["series"] == 3 and p["groups"]["china_macro"]["series"] == 3 and [s["fn"] for s in p["skipped"]] == ["no_such_fn"], p)
+    import pandas as pd
+    calls = []
+
+    def fake(kind=None, path=None, period=None):
+        calls.append(period)
+        a, b = [int(x) for x in period.split("-")] if period.count("-") == 1 and period.split("-")[1] else (int(period[:4]), 2026)
+        if b - a + 1 > 5:
+            raise ValueError("Expecting value: line 1 column 1 (char 0)")
+        return pd.DataFrame({f"{y}年": [float(y), float(y) + 0.5] for y in range(b, a - 1, -1)}, index=["指標A", "指標B"])
+    keep_iv = globals()["NBS_MIN_INTERVAL"]
+    globals()["NBS_MIN_INTERVAL"] = 0.0
+    try:
+        out = nbs_call_v0102(fake, {"kind": "年度数据", "path": "x", "period": "2012-2026"})
+        short = nbs_call_v0102(fake, {"kind": "年度数据", "path": "x", "period": "2022-2026"})
+    finally:
+        globals()["NBS_MIN_INTERVAL"] = keep_iv
+    chk("⑦ NBS 長區間失敗 → 切 5 年段逐查、按指標列對齊拼回(新→舊 15 欄不重複);短區間一次過不切段",
+        period_chunks_v0102("2012-2026", 2026) == ["2022-2026", "2017-2021", "2012-2016"] and list(out.columns)[:2] == ["2026年", "2025年"]
+        and out.shape == (2, 15) and out.loc["指標B", "2012年"] == 2012.5 and short.shape == (2, 5) and calls[0] == "2012-2026",
+        (out.shape, calls[:5]))
+    chk("⑧ NBS 呼叫走 v0102 節流 / 切段(原件 _call 由本版接手;其他函式照原件重試)", CORE._call is _call_v0102)
     text = Path(__file__).read_text(encoding="utf-8")
     names = {n.name for n in __import__("ast").parse(text).body if isinstance(n, __import__("ast").FunctionDef)}
     chk("⑤ L103:模組層加速器橋 + 網路工具橋(def _via_net);不碰 TA-Lib;不寫同意閘", "_via_net" in names and "VIA_ACCEL" in text
