@@ -223,10 +223,11 @@ def selftest() -> int:
     sp = selection_path_v0102()
     sel = json.loads(sp.read_text(encoding="utf-8")) if sp else {}
     g = sel.get("groups") or {}
-    chk("③ 選單正本在(同夾版號尾版):中國經濟 · 各國經濟 · 航運三組都有;NBS 走 __rows__;Drewry 八航線;backfill 全歷史",
+    chk("③ 選單正本在(同夾版號尾版):中國經濟 · 各國經濟 · 航運三組都有;NBS 走 __rows__;Drewry 八航線;全歷史(start ≤ 1990;FULL_SNAPSHOT 一呼叫回全歷史,incremental 可續跑)",
         sp is not None and all(g.get(k) for k in ("china_macro", "global_macro", "shipping"))
         and (sel.get("overrides", {}).get("macro_china_nbs_nation") or {}).get("__rows__")
-        and len((sel.get("overrides", {}).get("drewry_wci_index") or {}).get("symbol") or []) == 8 and sel.get("mode") == "backfill",
+        and len((sel.get("overrides", {}).get("drewry_wci_index") or {}).get("symbol") or []) == 8 and sel.get("mode") in ("backfill", "incremental")
+        and sel.get("start_date", "9999") <= "1990-01-01",
         sp.name if sp else None)
     with tempfile.TemporaryDirectory() as td:
         buf = io.StringIO()

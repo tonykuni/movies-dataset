@@ -4,9 +4,9 @@
  "ts": "2026-10-04",
  "_source": "操作員 2026-10-04「Akshare截取中國經濟數據 各國經濟數據 航運指數 資料要往下載一截取深入一點細節點的資料」(VCGC-REQ149)",
  "_nbs_tree": "國家統計局目錄樹 2026-10-04 經鎖版網路工具逐葉走訪(curl_cffi 改道 · 374 請求):月度数据 605 · 季度数据 116 · 年度数据 2188 · 分省月度数据 118 · 分省季度数据 18 · 分省年度数据 316 · 主要城市月度价格 13 · 主要城市年度数据 9 · 港澳台月度数据 4 · 港澳台年度数据 21",
- "mode": "backfill",
+ "mode": "incremental",
  "start_date": "1990-01-01",
- "workers": 4,
+ "workers": 2,
  "max_combos": 50000,
  "batch_rows": 200000,
  "fail_tolerance": 0.15,
@@ -44706,5 +44706,7 @@
  },
  "_excluded": {
   "macro_info_ws": "華爾街見聞日曆是逐日事件表(SINGLE_DATE),不是時間序列;要時另開選單"
- }
+ },
+ "snapshot_ttl_hours": 24,
+ "_mode_note": "incremental:這批 225 支幾乎全是 FULL_SNAPSHOT(一呼叫回全歷史),深度不變;24 小時內已抓過的序列跳過 = 中斷可續跑。workers 2:容器實測 4 併發時國家統計局在第 ~450 個目錄後回非 JSON(限流)。DATE_RANGE 兩支第一次仍從 start_date 全歷史抓。"
 }
