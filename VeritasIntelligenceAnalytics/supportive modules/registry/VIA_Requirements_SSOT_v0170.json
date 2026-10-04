@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 21,
   "COVERED": 111,
-  "PARTIAL": 61,
+  "PARTIAL": 62,
   "MISSING": 1
  },
  "requirements": [
@@ -5029,6 +5029,30 @@
     "VDF_MDL012_FetchGroups_v0103.py",
     "CGC_MDL261_UIEngine_v0101.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ156",
+   "subsystem": "VCGC",
+   "topic": "啟動全部 VCGC 功能(省 Token 工具先行)· 補齊缺的工具 · PY/PS 加速器 · VDF 全裝網路工具",
+   "requirement": "操作員令(2026-10-05):啟動所有 VCGC 功能用 TOKEN 節省工具;擷取所有缺乏的工具;PY PS 加速器安裝;VDF 全部安裝網路工具",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json"
+   ],
+   "evidence": "容器:token 6/6 · functions 13 步 · enter 全綠(工具鎖 sha 全 ✓ · 加速器 v1141 · 網路工具 v1652)· test --quick 綠 7 黃 1 紅 0;RunGate vdf / vrn / vap 全 GREEN(vrn 選配 5/7→7/7:補 markitdown · beautifulsoup4);VDF 境補網路工具合規層(節流 / 重試 · 快取 · 客戶端 · 解析 · twstock · feedparser 共 21 件),FinMind 拉低 pandas 3.0.6→2.3.3 且帶 ta → 退裝 FinMind 樹、pandas 還原 3.0.6,uv pip check 全相容;MDL012 11/11 · MDL011 8/8 · VDF 擷取整合測試 PASS;掃橋 ALL/accel 1788/1788 · VDF/net 137/137;MDL183 PS 基線外新缺 0。未裝:反機器人 / 假身分 / Tor / 代理輪換層(網路工具本身預設不啟用,屬規避偵測,不裝)。NLP v0108 啟用閘不過(公開名稱少於 v0106 · 參數少 2 · 未登錄)→ 不啟用",
+   "next": "工作站照同一份合規清單補 via_vdf_312 / via_vrn_312(只進家族境);NLP v0109 補回 v0106 公開名稱與參數再走 tools activate;VRN_NewPlugins_v0102 本體橋待操作員裁;PS 既有債 50 支 L70",
+   "hand": "AI",
+   "quotes": [
+    {
+     "text": "啟動所有VCGC功能用TOKEN節省工具  擷取所有缺乏的工具  PY PS加速器安裝  VDF全部安裝網路工具",
+     "recorded_at": "2026-10-05T01:00:00+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL149_VeritasCentralGovernanceConsole_v0190.py",
+    "CGC_MDL137_RunGate_v0109.py",
+    "CGC_MDL124_BridgeSweeper_v0110.py"
+   ]
   }
  ],
  "non_requirements": [
@@ -5193,5 +5217,5 @@
  "why_v0167": "+VCGC-REQ144(COVERED:MDL009 v0101 擋區 8 家中英文名稱局部識別 · 不可刪 · 冊 v0102 / MDL008 v0102);REQ143 next ③ 記操作員已裁;其餘一字不動 · +VCGC-REQ145(PARTIAL:fetch fill 補缺擷取 MDL008 v0103;工作站 live 待操作員)",
  "why_v0168": "+VCGC-REQ146(PARTIAL:三處覆蓋缺口補齊 · 工具冊 v0105 · PS 啟動器;工作站安裝 / PS7 實跑待操作員);其餘一字不動",
  "why_v0169": "+VCGC-REQ147(PARTIAL:MDL008 v0105 urllib / yfinance 改走網路工具並計數 · output_hub 歸位 · 冊 v0104;MDL008 v0106 curl_cffi 封口 · MDL011 v0101 無註冊表 NODATA · 冊 v0105;容器實抓分類;工作站實抓 / FRED 金鑰 / 首頁 sidecar 待操作員);其餘一字不動;+VCGC-REQ148(PARTIAL:環境全檢 · MDL183 v0103 · MDL135 v0118);+VCGC-REQ149(AkShare 深度擷取)· REQ147 / REQ148 / REQ149 歸屬回指工作流冊 VDF v0103 / VCGC v0118(PR #446 Codex P1);+VCGC-REQ150(PARTIAL:擷取大族群 · 同一 as-of · DuckDB 監控 · 最佳化 · MDL012 v0100 · 冊 VDF_FetchGroups_SSOT_v0100;歸屬回指工作流冊 VDF v0103 VDF-WKF014);+VCGC-REQ151(PARTIAL:族群操作頁 · MDL012 v0101 ui;歸屬回指 VDF-WKF014-STP003)",
- "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改);+VCGC-REQ152(PARTIAL:啟動指令對接 U/I · 自適應範本;歸屬回指 VDF-WKF014-STP004 · 工作流冊 v0104 · 盤點冊 v0152);+VCGC-REQ153(PARTIAL:一鍵 U/I 引擎 · CGC_MDL261 · Start-VIA-UIEngine;歸屬回指 VCGC-WKF018 · 工作流冊 VCGC v0119 · 盤點冊 v0152);+VCGC-REQ154(PARTIAL:左輸入右多頁 · 純滑鼠 · 兩個位置 · 元件註冊 / 版本鎖 · VDF 大類 · 起始日按大類;歸屬回指 VCGC-WKF018-STP003/004 · VDF-WKF014-STP005);+VCGC-REQ155(PARTIAL:短指令組合 Register v0269 · L103 全樹橋;歸屬回指 VCGC-WKF018-STP005)"
+ "why_v0170": "VCGC-REQ149 證據補容器實抓結果(各國 · 航運 · 中國 · NBS 四組);其餘一字不動(v0169 已隨 PR #446 合併 = 已發布,不就地改);+VCGC-REQ152(PARTIAL:啟動指令對接 U/I · 自適應範本;歸屬回指 VDF-WKF014-STP004 · 工作流冊 v0104 · 盤點冊 v0152);+VCGC-REQ153(PARTIAL:一鍵 U/I 引擎 · CGC_MDL261 · Start-VIA-UIEngine;歸屬回指 VCGC-WKF018 · 工作流冊 VCGC v0119 · 盤點冊 v0152);+VCGC-REQ154(PARTIAL:左輸入右多頁 · 純滑鼠 · 兩個位置 · 元件註冊 / 版本鎖 · VDF 大類 · 起始日按大類;歸屬回指 VCGC-WKF018-STP003/004 · VDF-WKF014-STP005);+VCGC-REQ155(PARTIAL:短指令組合 Register v0269 · L103 全樹橋;歸屬回指 VCGC-WKF018-STP005);+VCGC-REQ156(PARTIAL:全功能啟動 · 補工具 · 加速器 / 網路工具;工作站同步待做)"
 }
