@@ -71,7 +71,7 @@
   [OK ] ㊴ 隔離律:HIGH 家族 via_iso_ml_cuda_H 不借 alt 境 via_ml(操作員實錄要把 jax+tensorflow 裝進既有 torch 境)→ ENV_ABSENT + ENSURE_ENV 獨立境;MEDIUM 家族仍可用 alt
   [OK ] ㊳ 白名單單一來源:core_whitelist() 讀 VIA_EnvManager def_PARAM_VIA_CORE_WHITELIST(≥14 件,含 requests/numpy/duckdb;joblib 不在)
   [OK ] ㊵ L19 安裝核可律(批506):RunGate 缺→tools_apply/apply_plan 皆 BLOCKED_UNITEST 零動作;判定 RED→擋;GREEN 且 24h 內→放行
-  [OK ] ㊶ L24 環境復原律(批508):_M/_H 不借 alt 境(有 via_vap_312/via_ml 在位仍 ENV_ABSENT 建同名境)· 段序 LOW→MEDIUM→HIGH · tools_apply 無授權/無同意皆零動作 · recover plan 唯讀(Baseline 模式)· 無同意=BLOCKED_CONSENT
+  [FAIL] ㊶ L24 環境復原律(批508):_M/_H 不借 alt 境(有 via_vap_312/via_ml 在位仍 ENV_ABSENT 建同名境)· 段序 LOW→MEDIUM→HIGH · tools_apply 無授權/無同意皆零動作 · recover plan 唯讀(Baseline 模式)· 無同意=BLOCKED_CONSENT
   [OK ] ㊷ 解譯器壞(批509):探針 SRE module mismatch → 境 ENV_BROKEN_INTERP · 件 INTERP_BROKEN(不是 ABSENT)· 段只有 REBUILD_ENV(候裁)· apply 零動作(有同意閘亦不跑)· ps 印 Remove-Item/uv venv 令(註解,不自跑)
   [OK ] ㊸ 一貼即用不得一貼即炸(批601):樹內件(install:false)不進 uv pip install 而正常件照留 · 版本釘一律引號(PowerShell 的 > 是重導向)· 境根抽成 $EnvRoot 且**四種段都不留原生境根**(只檢「$EnvRoot 有出現」那條尺太寬,標頭就把它餵飽了) (樹內件擋掉=True · 釘引號=True · 漏根 0 行 · 出處行 2/2 · 段種 4/4)
   [OK ] ㊹ 命名律兩軸分開(批602 操作員令:BASE 獨立,其餘一律 via_):受保護境只管「不重建」,不再順便豁免命名律 · 三個不合律的境全列(vmt_pm 標受保護)· BASE 與 via_ 境零誤報 (列出 ['camelot_311', 'paddle_311', 'vmt_pm'] · 受保護 ['vmt_pm'] · vmt_pm→via_vmt_pm)
@@ -83,12 +83,13 @@
   [OK ] ㊿ resume 還原+新增+衝突檢查+依計畫裝(批621 操作員令):未授權=零動作 · 授權但同意閘未開=BLOCKED_CONSENT 零動作(**不代設**)· CONFLICT 的境一律 SKIP 不裝 · 無待裝件=SKIP_EMPTY · 全程**只增不減**(指令裡不得出現 sync/uninstall/remove)· uv 缺=NOT_RUN 不猜(沒檢查過不等於沒衝突)· 裝完誠實標 reverified=False 並附操作員裁定理由(L87) (未授權 PLAN · 無同意 BLOCKED_CONSENT · 授權後跑 1 · CONFLICT=SKIP · 空=SKIP_EMPTY · uv缺=NOT_RUN)
   [OK ] ⓵ 批696 L19 啟動例外四條(一正五負全合成):唯一欠缺=家族境未見→放行;RED/引擎缺/夾帶別的理由/必要庫缺/空家族→一律擋(RED 永不給例外) (正 True · 該擋沒擋 無(五負全擋))
   [OK ] ⓶ 批696 例外態只放行建(**實跑** apply_plan,不是讀次序):YELLOW-只差境 → state=BOOTSTRAP 且 REMOVE_BASE=SKIP「啟動例外」(即使 --approve-remove 已給);反面控制:同一份計畫換真 GREEN,那句註記不得出現、也不得進 BOOTSTRAP (例外態 BOOTSTRAP/SKIP/L19 啟動例外只放行建境裝件;移除要 Ru · 真綠態 PLAN/OK/無需執行 · 假手接到令 0)
-  [計] 52/52 檢 OK
+  [計] 51/52 檢 OK
 === CGC_MDL135_EnvGovernance v0118 · 薄尾自測(spaCy 模型件 → 官方 wheel 網址)===
-  [OK] ① v0117 自測過 · rc 0
+  [FAIL] ① v0117 自測過 · rc 1
   [OK] ② zh-core-web-sm==3.8.0 → 官方 wheel 裸網址(同版本;沒有空白 / 引號) · https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.8.0/zh_core_web_sm-3.8.0-py3-none-any.whl
   [OK] ③ 非模型件 · 沒版本的模型件 照原樣(不猜版本);en_core_web_trf 也換 · ['spacy==3.8.16', 'zh-core-web-sm', 'numpy==2.4.6', 'core-web-sm==1.0', 'https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl']
   [OK] ④ 換裝:v0117 的 build_plan 走本版 _pins_for_bundle(模組層) · ['spacy==3.8.16', 'https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.8.0/zh_core_web_sm-3.8.0-py3-none-any.whl']
   [OK] ⑤ 加速器橋 · 網路橋(def _via_net)在;不碰 TA-Lib;不寫同意閘
-  [計] CGC_MDL135_EnvGovernance v0118 本版 5/5 · v0117 PASS · 合計 PASS
+  [計] CGC_MDL135_EnvGovernance v0118 本版 4/5 · v0117 FAIL · 合計 FAIL
+  [教訓] 重複出錯:run CGC_MDL135_EnvGovernance · rc=1 · (無例外訊息) · 第 8 次 · 帳本 CGC_MDL058(via-lessons)
 [監控] 背景全景監控中 pid 29536 · 觸碰 run CGC_MDL135_EnvGovernance · 交接閘 RED · 落後 93 提交 · 快照 30.1h · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
