@@ -3801,6 +3801,46 @@
       "next": "工作站境照同一份清單補(子系統跑自測確認)",
       "case": "vrn_layout",
       "receipt": "docs/handoff/evidence/vrn_layout.json"
+    },
+    {
+      "id": "VCGC-REQ158:vdf-multisource",
+      "requirement": "VCGC-REQ158",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager",
+      "reason": "一號多源 5 張:tw_daily_prices(e054 TWSE/TPEX + e064 YFINANCE,表內無來源欄)· cross_macro / sentiment_daily(e055 四變體 FED / OTHERS / TWSE-TPEX / YFINANCE,表內無來源欄)· factset_earnings · tw_trading_daily(有來源欄)(普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.md)",
+      "next": "VDF 依 L108 / L111 ⑦:拆表或補來源欄,SSOT 號碼留空等母系統發",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ158:vdf-nosource",
+      "requirement": "VCGC-REQ158",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager",
+      "reason": "來源未登 25 張(fg_* 目錄表、MDL003 / 005 / 006 / 007 產出等):fetch 冊沒有引擎→表的對應(普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.md)",
+      "next": "VDF 在 fetch 冊 / 表頭冊補 tables 與來源,號碼留空",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ158:vrn-nosource",
+      "requirement": "VCGC-REQ158",
+      "state": "PENDING",
+      "owner": "VRN_SystemManager",
+      "reason": "VRN 輸出 5 張(vrn_report_basic / analyst / metrics / nlp_text_summary / pipeline_runs)全沒有登來源(普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.md)",
+      "next": "VRN 在表頭冊補來源(券商 / 研報檔來源),號碼留空",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ158:vcgc-assign-fetch",
+      "requirement": "VCGC-REQ158",
+      "state": "PENDING",
+      "owner": "AI(VCGC)",
+      "reason": "母系統發號 + 子系統自動擷取機制尚未建:現行中央 IDX 號以表名為鍵、不分來源(7 張核心表)(普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.md)",
+      "next": "操作員點頭後:VCGC 普查動詞正式化 + 偵測無誤才發 OUT 號(鍵 = 子系統 | 來源 | 表)+ 子系統讀號介面",
+      "case": null,
+      "receipt": null
     }
   ]
 }
