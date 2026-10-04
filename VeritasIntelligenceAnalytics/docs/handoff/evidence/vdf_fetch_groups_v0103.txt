@@ -30,17 +30,19 @@
 [政策] L50 全景 · 尾版 581 · import 0 · 提及 68 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL261_UIEngine_v0100.py(家族 core)
-  [OK] ① 參數正本在:預設 = 內建範本(active_template null)· 只綁本機 · duckdb / sources / nav 段齊
-  [OK] ② 參數疊層:正本 ← 工作副本 ← --set(深合併:其他鍵保留 · 布林 / 數字自動轉型)
-  [OK] ③ DuckDB 顯式:表 + 視圖 · 精算列數 · 欄位型別 · 日期欄最早 / 最晚 · 前 N 列樣本
-  [OK] ④ 別人寫鎖中的庫 = LOCKED(照實,不搶鎖、不崩)
-  [OK] ⑤ 內建標準範本:左面板(回母系統 / 其他系統 / 功能頁 / Live log)· 五頁(儀表板 · 來源 · DuckDB · 環境 · 參數)· 參數面板可匯出 · 零 CDN
-  [OK] ⑥ 未來範本:active_template / --template 換版不改程式 · {{ config.x }} / {{ sources… }} 代換 · 注入 window.VIA_CONFIG + 色票 · 找不到變數照留並列出
-  [OK] ⑦ 範本不在 = 誠實報找不到,不退內建假裝成功
-  [OK] ⑧ 色票注入防跑版:參數裡的 ; { } < > 會被濾掉(值關在同一個變數裡,跳不出 :root)
-  [OK] ⑨ serve:只綁本機(0.0.0.0 拒)· GET / 每次重讀參數重產 · /config.json · POST 一律 405(只讀)
-[計] CGC_MDL261_UIEngine v0100 本版 9/9 · 合計 PASS
+  [via-vcgc run] [流程] 政策過 · VDF_MDL012_FetchGroups_v0103.py(家族 vdf)
+  [OK] ① 前版自測照過(v0102 8 + v0101 8 + v0100 14;釘冊 v0100)
+  [OK] ② 冊 v0101:三大類(台股 · 主動式 ETF / 財報 / 總經)+ 其他 · 量價與籌碼分開打勾 · 財報預設 2330 3324 / NVDA
+  [OK] ③ 預設成員可增減:預設 [2330, 3324] → 帳本 +2454 −3324 → [2330, 2454]
+  [OK] ④ 起始日按大類:預設照冊 · 帳本改 FIN 只動 FIN · default 還原
+  [OK] ⑤ 跑時代入:ENG082 --only 2330,2454 --years 8(2019→2026)· MDL006 --tickers NVDA · e232 --start 台股大類起始日 --end as-of
+  [OK] ⑥ AkShare 有效選單 start_date = 總經大類起始日
+  [OK] ⑦ U/I 匯入:只算差異(TW_MARKET 起始日沒變不寫)· +2317 · +AAPL · FIN 2018 · as-of
+  [OK] ⑧ 冪等(同一份再匯 = 零變更)· 單一族群改起始日 = 拒絕 · 固定全部族群不收成員
+  [OK] ⑨ start --group = 拒絕 rc 2、零寫入
+  [OK] ⑪ 細節頁參數邏輯:{start} 已代入(e066 --start 其他大類起始日)· 財報帶 --only / --years 真值
+  [OK] ⑩ U/I 快照帶大類(含當前起始日)· 族群標大類 · 財報預設成員
+[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS
   [同步] SDD 驗證 RED:X-REG 未註冊 ['CGC_MDL261_UIEngine_v0101.py'] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_MDL | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VDF_MDL012_FetchGroups_v0103.py', 'CGC_MDL261_UIEn | X-NUM WKF/STP/REQ 還沒編號(待 CGC_MDL237 v0104 --apply):8 個,例 ['VCGC-WKF018', 'VCGC-WKF018- → via-vcgc sdd check
   [同步] 樹有變 · 註冊冊待同步 {'new': 155, 'changed': 8, 'stale': 0, 'expected': 15925, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 已在背景起全景監控 pid 11840 · 閒置 1800 秒自停 · 交接閘 RED · 落後 164 提交 · 快照 41.8h · 未登 6 支(CGC_MDL258_TempAccel · CGC_MDL259_AiVerbBridge · CGC_MDL260_AiToolPanel …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 已在背景起全景監控 pid 13722 · 閒置 1800 秒自停 · 交接閘 RED · 落後 164 提交 · 快照 41.8h · 未登 6 支(CGC_MDL258_TempAccel · CGC_MDL259_AiVerbBridge · CGC_MDL260_AiToolPanel …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
