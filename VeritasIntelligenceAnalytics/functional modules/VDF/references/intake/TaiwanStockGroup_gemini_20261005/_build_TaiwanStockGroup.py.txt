@@ -1,0 +1,90 @@
+"""TaiwanStockGroup 整合:收容夾裡所有 *.json(成員)+ *.txt(題材輪動)→ 一份去重分類檔。可重跑。"""
+import json, re, sys, hashlib, collections
+from datetime import datetime, timezone
+from pathlib import Path
+intake, out, tpex_db = Path(sys.argv[1]), Path(sys.argv[2]), (sys.argv[3] if len(sys.argv) > 3 else None)
+CAT_ALIAS = {"AI與網通通訊": "網通與通訊業", "綠能環保": "重電與綠能"}
+SUB_ALIAS = {"光通訊 (CPO)": "光通訊與CPO", "IC設計": "IC設計與IP", "代工與系統廠(AI伺服器)": "AI伺服器與代工",
+             "電子通路": "IC通路與代理"}
+def norm_sub(s):
+    s = SUB_ALIAS.get(s, s)
+    return re.sub(r"\s+(?=[(\(A-Za-z])|(?<=[一-鿿])\s+", "", s).strip()
+tpex = {}
+if tpex_db:
+    import duckdb
+    c = duckdb.connect(tpex_db, read_only=True)
+    tpex = {r[0]: r[1] for r in c.execute("select code, name from tw_listings where market='TPEX'").fetchall()}
+sources, seen_sha, rows = [], {}, []
+for f in sorted(intake.glob("*.json")):
+    b = f.read_bytes(); sha = hashlib.sha256(b).hexdigest()
+    if sha in seen_sha:
+        sources.append({"file": f.name, "sha256": sha, "duplicate_of": seen_sha[sha]}); continue
+    seen_sha[sha] = f.name; d = json.loads(b)
+    sources.append({"file": f.name, "sha256": sha, "rows": len(d), "kind": "members"})
+    for r in d: rows.append(dict(r, _src=f.name))
+groups = collections.OrderedDict(); fixes = []; names = {}
+for r in rows:
+    cat = CAT_ALIAS.get(r["Category"].strip(), r["Category"].strip()); sub = norm_sub(r["SubCategory"].strip())
+    code = r["Ticker"].split(".")[0]; tk = r["Ticker"].strip()
+    if tpex and code in tpex and not tk.endswith(".TWO"):
+        fix = (tk, code + ".TWO", "代號在 TPEX 上櫃名單"); tk = code + ".TWO"
+    elif tpex and tk.endswith(".TWO") and code not in tpex:
+        fix = (tk, code + ".TW", "不在 TPEX 上櫃名單 → 推定上市(TWSE 名單未驗,工作站可補)"); tk = code + ".TW"
+    else:
+        fix = None
+    if fix:
+        e = next((x for x in fixes if (x["from"], x["to"]) == fix[:2]), None)
+        if e is None:
+            fixes.append({"from": fix[0], "to": fix[1], "why": fix[2], "src": [r["_src"]]})
+        elif r["_src"] not in e["src"]:
+            e["src"].append(r["_src"])
+    names.setdefault(tk, r["Name"].strip())
+    g = groups.setdefault((cat, sub), collections.OrderedDict())
+    m = g.setdefault(tk, {"ticker": tk, "code": code, "name": r["Name"].strip(), "roles": [], "sources": []})
+    if r.get("Role") and r["Role"] not in m["roles"]: m["roles"].append(r["Role"])
+    if r["_src"] not in m["sources"]: m["sources"].append(r["_src"])
+# 同代號跨檔市場別不一致(沒有 TPEX 名單可驗時)照實列
+codes = collections.defaultdict(set)
+for (c_, s_), g in groups.items():
+    for tk in g: codes[tk.split(".")[0]].add(tk)
+suffix_conflicts = {k: sorted(v) for k, v in codes.items() if len(v) > 1}
+not_in_tpex = sorted({tk for g in groups.values() for tk in g if tk.endswith(".TWO") and tpex and tk.split(".")[0] not in tpex})
+# 題材輪動 txt
+themes = []
+LINE = re.compile(r"^(\S+)\s+(.+?)\s+(\d+(?:\.\d+){2})\s+(\S+型)\s+([\d.]+)\s+([\d.]+)\s+(.*)$")
+for f in sorted(intake.glob("*.txt")):
+    b = f.read_bytes(); sha = hashlib.sha256(b).hexdigest(); n = 0
+    for ln in b.decode("utf-8").splitlines():
+        ln = ln.strip()
+        if not ln: continue
+        m = LINE.match(ln)
+        if not m:
+            themes.append({"unparsed": ln, "src": f.name}); continue
+        n += 1
+        note = m.group(7); ment = sorted({nm for tk, nm in names.items() if nm in note}, key=note.index)
+        themes.append({"stage": m.group(1), "theme": m.group(2), "weights_raw": m.group(3), "driver_type": m.group(4),
+                       "score_1": float(m.group(5)), "score_2": float(m.group(6)), "note": note,
+                       "mentioned": [{"name": nm, "ticker": next(t for t, x in names.items() if x == nm)} for nm in ment],
+                       "src": f.name})
+    sources.append({"file": f.name, "sha256": sha, "rows": n, "kind": "theme_rotation"})
+tick_idx = collections.OrderedDict()
+for (cat, sub), g in groups.items():
+    for tk, m in g.items():
+        e = tick_idx.setdefault(tk, {"name": m["name"], "groups": []}); e["groups"].append(f"{cat}/{sub}")
+cats = collections.OrderedDict()
+for (cat, sub), g in groups.items():
+    cats.setdefault(cat, []).append({"subcategory": sub, "members": list(g.values())})
+doc = {
+  "schema": "TaiwanStockGroup/v1", "as_of": sorted({r.get("Date") for r in rows if r.get("Date")})[-1] if rows else None,
+  "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+  "dedupe_key": "category + subcategory + ticker(同一檔在不同子類照保留,ticker 索引看全部歸屬)",
+  "category_alias": CAT_ALIAS, "subcategory_alias": SUB_ALIAS,
+  "verification": {"tpex_listing_codes": len(tpex), "suffix_fixed": fixes, "suffix_conflicts_after_fix": suffix_conflicts,
+                   "two_not_in_tpex": not_in_tpex, "twse_listing": "未驗(TWSE WAF 擋,容器抓不到;工作站可補)"},
+  "stats": {"input_rows": len(rows), "categories": len(cats), "subcategories": len(groups),
+            "memberships": sum(len(g) for g in groups.values()), "unique_tickers": len(tick_idx), "themes": sum(1 for t in themes if "stage" in t)},
+  "sources": sources, "categories": [{"category": k, "subcategories": v} for k, v in cats.items()],
+  "themes": themes, "tickers": tick_idx,
+}
+out.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+print(json.dumps(doc["stats"], ensure_ascii=False), "· 修市場別", len(fixes), "· 剩衝突", suffix_conflicts, "· .TWO 不在 TPEX", not_in_tpex)
