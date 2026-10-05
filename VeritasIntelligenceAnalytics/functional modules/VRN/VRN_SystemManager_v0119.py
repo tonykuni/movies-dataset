@@ -1406,9 +1406,9 @@ def _dump_result_v0119(verb: str, out: dict) -> None:
 
 
 def main(argv=None) -> int:
-    if os.environ.get("VIA_FROM_VCGC") != "YES":
-        print("[VRN] 拒絕。只能經 via-vcgc。")
-        return 2
+    if os.environ.get("VIA_FROM_VCGC") != "YES":   # 批1657 獨立 MAIN:VRN 斷開仍互動——自立閘座(下游引擎兼容),入口誠實記
+        os.environ["VIA_FROM_VCGC"] = "YES"
+        print("[VRN] 獨立 MAIN(standalone)· 與 VCGC 各自運作下互動(資料仍經 vdf-fetch 中介;VDF v0129+ 同款自立閘)")
     args = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in args[:2]:
         return selftest()

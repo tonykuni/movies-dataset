@@ -93,7 +93,15 @@ UTC)——介面不動一看戳即辨舊引擎/舊頁。
   closeout 全數經 VRN_SystemManager 動詞口(VIA_FROM_VCGC 閘 + 前版鏈),引擎(ENG052/085/
   SUP_MDL866 NLP 座)只被 Manager 調度,不自行對外。
 
-## 四之三、PY 功能律(操作員令 2026-10-05 批1657)
+## 四之三、獨立 MAIN 律(操作員令 2026-10-05 批1657「VRN 現在斷開 仍與 VCGC 各自運作下互動 但獨立 MAIN;VDF VCGC 也一樣」)
+- 三總管(VRN / VDF / VCGC)**各自獨立 MAIN**:單獨可啟動,不互為啟動前提;沒帶 VIA_FROM_VCGC
+  不拒絕——**自立閘座**(對下游引擎兼容)並把入口誠實記 standalone;經 via-vcgc 進來照舊。
+- **互動照走**:資料請求經中介(`vdf-fetch` → CGC_MDL239 → VDF 項);FLOW 親子表、registry-sync、
+  編號等母系統輔助功能不變(治理律 四之二)。
+- 落點:VRN=VRN_SystemManager v0119 main;VDF=v0129+ 原生自立閘(免改);VCGC=CGC_SystemManager_v0112
+  薄尾(glob 前版鏈 + PEP 562 轉接,main 無 rc2 拒絕路,AST 功能檢)。
+
+## 四之三之一、PY 功能律(操作員令 2026-10-05 批1657)
 - **從 VRN 起,所有有功能的指令都用 PY 寫**,帶加速器橋(L103/L102:Celeritas 契約);
   **PS 只負責啟動與連結 HTML U/I**,不帶判定邏輯(.ps1 零觸碰,L70)。
 - 首例落實:原 `Invoke-VIA-RealTest-VRN-v0103.ps1` 的判定段(輸出清點/249 判讀/風險判讀/總判)
