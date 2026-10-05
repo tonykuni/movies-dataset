@@ -69,6 +69,11 @@ NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中�
 批1657 新律:外部價 NaN 列濾除取最後有效收盤 · TP 0/負值拒收(OCR 道 0.0)· 只有重申詞(維持/重申)
 =評等誠實 None · TP 合理性燈(TP/報告日前價超出 0.15–8 帶=可疑回查)· REVERIFY 逐欄差異上報
 (`reverify_diff`:哪欄首輪/重建後各是什麼)· REVERIFY 掃描先去自家格線「|」(渲染物非原文)。
+批1657 三裁定(治理律首輪實行:母系統顯示 → AI+操作員裁 → 子系統落冊):① KEY_BRIDGE 不採用(正典短碼
+為主,記 VRN_FieldRules_SSOT_v0101 broker.key_bridge_ruling);② STRONG_BUY/STRONG_SELL 立獨立正典鍵
+(canon_map 4→6 鍵對齊六級碼冊,樞紐 glob 尾版自動讀);⑤ 包內三守衛入 ENG086 safe_broker 正本 v0120
+(標的段先排除/小寫短碼限檔名黏接/最長優先;drift same 86→90);③④ V 拆型與 K/C/M/S/V 五型=先舉證後裁
+(冊 ticker.pending_evidence,派 VDF 車道取 TWSE/TPEX ISIN 名冊)。
 
 ## 四之二、治理律:子系統獨立性 · 母系統輔助性(操作員令 2026-10-05)
 - **子系統獨立性**:所有 SSOT / REGEX / 同義字 / 邏輯由**子系統(VRN)生成**——中央冊尾版
