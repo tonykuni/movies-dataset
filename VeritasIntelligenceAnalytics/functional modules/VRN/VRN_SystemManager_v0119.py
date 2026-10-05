@@ -861,6 +861,7 @@ def reconstruct(path: str) -> dict:
                 L.append(f"[{k}]")
                 L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
             L.append("")
+            zone12_end = len(L)   # REVERIFY 域界:區一+區二止(首輪只掃第一頁,同域才公平)
             for pno in [x for x in fps[:3] if x != 1]:
                 pz = fin_page_zones(doc[pno - 1])
                 L.append(f"PAGE {pno}")
@@ -875,7 +876,7 @@ def reconstruct(path: str) -> dict:
                          if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
-            rebuilt = "\n".join(L[6:])   # REVERIFY 只對三大區本體(表頭 6 行與 SUMMARY 不入,防自證污染)
+            rebuilt = "\n".join(L[6:zone12_end])   # REVERIFY=區一+區二(表頭/區三/SUMMARY 不入;實測紅:財報頁日期假性不一致)
             rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
                   "日期": _content_date_v0119(crx, rebuilt)}
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
@@ -1048,6 +1049,18 @@ def deepread(path: str) -> dict:
             "non_stock_skipped": skipped, "rows": rows}
 
 
+def _dump_result_v0119(verb: str, out: dict) -> None:
+    """結果落檔 RESULT_<verb>_latest.json(操作員貼回免撈 console;寫不進不擋主流程,誠實印)。"""
+    try:
+        ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+        ui.mkdir(parents=True, exist_ok=True)
+        fp = ui / f"RESULT_{verb}_latest.json"
+        fp.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"  [結果檔] {fp}")
+    except OSError as exc:
+        print(f"  [結果檔] 寫入失敗 {type(exc).__name__}(主流程照走)")
+
+
 def main(argv=None) -> int:
     if os.environ.get("VIA_FROM_VCGC") != "YES":
         print("[VRN] 拒絕。只能經 via-vcgc。")
@@ -1063,6 +1076,7 @@ def main(argv=None) -> int:
             return 2
         out = reconstruct(a[1])
         PRIOR.emit_matrix_html("reconstruct", out)
+        _dump_result_v0119("reconstruct", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["layout-check"]:
@@ -1071,6 +1085,7 @@ def main(argv=None) -> int:
             return 2
         out = layout_check(a[1])
         PRIOR.emit_matrix_html("layout_check", out)
+        _dump_result_v0119("layout_check", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["deepread"]:
@@ -1079,6 +1094,7 @@ def main(argv=None) -> int:
             return 2
         out = deepread(a[1])
         PRIOR.emit_matrix_html("deepread", out)
+        _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     return PRIOR.main(args)   # intake/eps-check/reconcile/closeout 照前版鏈
@@ -1269,6 +1285,11 @@ def selftest() -> int:
             and a11["analyst_name"] == "Gokul Hariharan" and a11["analyst_coauthor"] is None
             and a12["analyst_name"] == "Jerry Su"
             and _fn_analyst_v0119("20251204兆豐個股報告-志強-KY(6768)", crx24, "志強-KY") is None)
+        _dump_result_v0119("deepread", out_b)
+        rc3 = reconstruct(str(td))
+        chk("㊵ REVERIFY 域=區一+區二 · 結果檔落地",
+            (Path(os.environ["VIA_VRN_UI_DIR"]) / "RESULT_deepread_latest.json").is_file()
+            and [x for x in rc3["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
