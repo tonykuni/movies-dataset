@@ -135,6 +135,11 @@ def _central_regex_v0119() -> dict:
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
+            "rating_code": {str(a).lower(): (std, e.get("code"))
+                            for std, e in (syn.get("RATING_CODEBOOK_MASTER") or {}).items()
+                            for a in e.get("aliases", [])},
+            "quarter": re.compile(pat("RX_YEAR_QUARTER", r"(?:(?:20)?\d{2}(?:\.|\s*)?Q[1-4])")),
+            "tw_fin": dict(syn.get("TW_FIN_DICT") or {}),
             "name_zh": re.compile(pat("RX_NAME_ZH", r"[\u4e00-\u9fa5]{2,4}")),
             "name_en": re.compile("(" + pat("RX_NAME_EN_STD", r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b")
                                   + "|" + pat("RX_NAME_EN_SURNAME_FIRST", r"\b[A-Z][A-Z]+(?:\s+[A-Z][a-zA-Z\-]+){1,3}\b")
@@ -323,13 +328,40 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
         return {"state": "ERROR", "why": f"{type(exc).__name__}: {str(exc)[:80]}"}
 
 
+_FINLEX_CACHE = None
+
+
+def _fin_lex_v0119() -> frozenset:
+    """財報科目詞庫(SYNC ALL 之 fin_account 632 條,聯集冊尾版 + TW_FIN_DICT 16 詞):
+    財報頁偵測共用;正則樣式別名濾除,缺冊退 _FIN_KW 誠實。"""
+    global _FINLEX_CACHE
+    if _FINLEX_CACHE is None:
+        words = set(_FIN_KW) | set(_central_regex_v0119()["tw_fin"].keys())
+        try:
+            reg = HERE.parents[1] / "supportive modules" / "registry"
+            hits = sorted(reg.glob("VIA_SSOT_SynonymUnion_v*.json"))
+            d = json.loads(hits[-1].read_text(encoding="utf-8"))
+            for alias in (d.get("scopes", {}).get("fin_account") or {}):
+                a = str(alias).strip()
+                if 2 <= len(a) <= 8 and re.search(r"[\u4e00-\u9fff]", a) \
+                   and not re.search(r"[()\[\]?*+|\\]", a):
+                    words.add(a)
+        except (OSError, ValueError, KeyError) as exc:
+            words.add(f"_載冊失敗{type(exc).__name__}")   # 誠實記,不吞(偵測照 _FIN_KW 走)
+        _FINLEX_CACHE = frozenset(words)
+    return _FINLEX_CACHE
+
+
 def _fin_pages_v0119(doc) -> dict:
-    """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
+    """年度財務頁偵測:年份序列≥3 + 財報科目詞(fin_account 詞庫)≥2 + 數字密度;
+    回頁碼與樣本列,交 ENG400 表格梯。"""
     pages, sample = [], ""
+    lex = _fin_lex_v0119()
     for i in range(1, min(len(doc), 30)):   # 首頁另路(first_page_zones),財報頁從第 2 頁起(實測紅:p1 誤入)
         t = doc[i].get_text()
         years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
-        kws = sum(1 for k in _FIN_KW if k in t)
+        kws = sum(1 for k in lex if k in t)
+        kws = min(kws, 99)
         nums = len(re.findall(r"\d+\.\d+", t))
         if years >= 3 and kws >= 2 and nums >= 8:
             pages.append(i + 1)
@@ -980,7 +1012,10 @@ def deepread_one(path: Path) -> dict:
                                     ("MISS" if c_code and fn["codes"] else "ONE_SIDE"),
                     "broker_match": "MATCH" if (c_broker and c_broker == fn["broker_std"]) else
                                     ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
-                    "rating": rtw, "target_price": tpv,
+                    "rating": rtw,
+                    "rating_std": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[0],
+                    "rating_code": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[1],
+                    "target_price": tpv,
                     "bloomberg_ticker": f"{code} TT" if code else None})
         row["size_h"] = PRIOR.size_h(row.get("size_bytes"))
         comp, comp_src = fn.get("company_name"), "filename"
@@ -1290,6 +1325,14 @@ def selftest() -> int:
         chk("㊵ REVERIFY 域=區一+區二 · 結果檔落地",
             (Path(os.environ["VIA_VRN_UI_DIR"]) / "RESULT_deepread_latest.json").is_file()
             and [x for x in rc3["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
+        lex = _fin_lex_v0119()
+        chk("㊶ SSOT 全接 VRN Manager:fin_account 詞庫>300 · 評等正碼 買進→Buy/2 SS→Strong_Sell/5 未評等→Not_Rated/0 · 季度式 25Q1 · TW_FIN_DICT 16",
+            len(lex) > 150 and "每股盈餘" in lex and "營業毛利" in lex
+            and crx24["rating_code"]["買進"] == ("Buy", 2)
+            and crx24["rating_code"]["ss"] == ("Strong_Sell", 5)
+            and crx24["rating_code"]["未評等"] == ("Not_Rated", 0)
+            and crx24["quarter"].search("25Q1 財測") and len(crx24["tw_fin"]) == 16
+            and r["rating_std"] == "Buy" and r["rating_code"] == 2)
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
