@@ -2,7 +2,7 @@
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0177",
  "batch": "VCGC / VDF 收尾:另一線合入的 VCGC 模組補交接案 · ENG234 補登",
- "ts": "2026-10-05T05:01:22Z",
+ "ts": "2026-10-05T05:00:00+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -79,8 +79,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 23,
-  "COVERED": 116,
-  "PARTIAL": 65,
+  "COVERED": 117,
+  "PARTIAL": 66,
   "MISSING": 1
  },
  "requirements": [
@@ -5394,17 +5394,65 @@
    ]
   },
   {
-   "code": "VRN-REQ017",
-   "subsystem": "VRN",
-   "topic": "單股研報全流程:檔名→首頁資訊段→LAYOUT 切分→輕先重後抽取→原樣還原→多重驗證→四點摘要(VRN SM 統轄)",
-   "requirement": "① 輸入單檔/夾研報(PDF/影像),單一個股;② 取料序:檔名→首頁頂部題名區→LAYOUT 全元件;③ 資訊區左右切+型別分類(矩陣/表/句/文),財務頁左右再上下切;④ 抽取輕先重後,重型僅失敗區,DPI 300→350 僅解析度不足最後;⑤ 表格還原原樣(寬+長+來源);⑥ 多重驗證:長表對帳×TWSE/TPEX 名稱×yfinance 合理價×歷史實際覆蓋預期(第一優先)×區間長度×倍數交叉;⑦ 摘要四點(目標價估值法/EPS 成長動能/擇二)帶據點",
+   "code": "VCGC-REQ167",
+   "subsystem": "VCGC",
+   "topic": "via_precheck 總檢短令:動用 VCGC 全部檢查 · 每個黃紅編號分類說明定位 · 加速 / 網路 / PS 模板覆蓋 · 有編號就有註冊 · 黃紅先定點修",
+   "requirement": "操作員令(2026-10-05):「設一個短令 via_precheck 動用 vcgc 所有功能 將所有置入每個編號分類說明 所有 py ps 檔案都要加入加速模板且覆蓋率100% 網路工具等 ps code 也一樣 有編號就有註冊 利用全景式分析等工具檢查所有引擎都正常可運作綠燈 若是黃紅燈要先定位定點修理好」;「新的都有版本號 其他刪掉」;「這個流程原本是用 ps 寫可以改 py 嗎」",
    "status": "PARTIAL",
    "homes": [
-    "VIA_Workflow_VRN_SSOT_v0105.json:VRN-WKF009",
-    "docs/VRN_SINGLE_STOCK_REPORT_PIPELINE_v0100.md"
+    "VIA_VCGC_FunctionInventory_SSOT_v0155.json",
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0123.json"
    ],
-   "evidence": "引擎面已齊:ENG072/393/394/400(四階段配方+basic/heavy)/058 引用/SUP_MDL749/ENG062/ENG395;SynonymUnion SYN285-297 詞彙在冊;缺:外部對帳車道接線(TWSE/TPEX/yfinance 經 VDF)與全流程串跑實證",
-   "next": "VRN Manager 增 intake/reconcile/closeout 三動詞接線;真 PDF 樣本夾串跑;編號 --apply --scope 兩冊(VRN 冊走 --family vrn)"
+   "evidence": "CGC_MDL263_Precheck v0100(PY 本體,14 站,自測 15/15)+ Register-VIA-Commands-v0271 via-precheck / via_precheck / 總檢(pwsh 解析 0 錯 · mock 三式過);首輪 RED 502 發現 → 定點修 VCGC 紅:CGC_MDL244 / CGC_MDL257 v0101(SYSEXE → 家族境 python)· CGC_MDL156 v0112(控制面 RED 36/38 → GREEN 38/38:薄尾鏈讀 QuantGuard 單向宣告 · TA-Lib 執法字樣不算使用 · 名冊補 supportive modules/intake/)· 刪無版號加速器座位 accelerator/VeritasCeleritas.py(無活尾版引用;import 落 VeritasCeleritas_v1141);覆蓋率 ALL/accel 1797/1797 · VDF/net 138/138;VCGC 紅 0",
+   "next": "VRN 紅 2(VRN_NewPlugins_v0102 · VRN_ENG112 本體缺橋)依 L111 交 VRN;黃 171(PINVER 跨族 117 · HARDIMP 53 · PS 既有債 50)待操作員排序",
+   "hand": "AI / 操作員",
+   "quotes": [
+    {
+     "text": "設一個短另via_precheck動用vcgc所有功能將所有置入每個as1編號分類說明  所也py ps檔案都要加入加速模板且覆蓋率100%  網路工具等ps code也一樣  有編號就有註冊  利用全景式分析等工具剪常所有引擎都正常可運作綠燈  若是黃紅燈要先訂位定點修理好",
+     "recorded_at": "2026-10-05T09:00:00+00:00"
+    },
+    {
+     "text": "新的都有版本好奇他刪掉",
+     "recorded_at": "2026-10-05T09:30:00+00:00"
+    },
+    {
+     "text": "這個流程原本是用ps寫可以改py嗎",
+     "recorded_at": "2026-10-05T09:20:00+00:00"
+    }
+   ],
+   "modules": [
+    "CGC_MDL263_Precheck_v0100.py",
+    "Register-VIA-Commands-v0271.ps1",
+    "CGC_MDL244_VrnLogicAdd_v0101.py",
+    "CGC_MDL257_AiVerbLadder_v0101.py",
+    "CGC_MDL156_VIAAcceleratorControl_v0112.py"
+   ]
+  },
+  {
+   "code": "VCGC-REQ168",
+   "subsystem": "VCGC",
+   "topic": "VIA 標準模板(2026-09-20 版)導入:U/I 引擎可選用三入口範本 · 正典零觸碰",
+   "requirement": "操作員令(2026-10-05):上傳 VIA-UI-Standalone-NoServer · VIA-SYNCHRONIZER-Standalone · VIA-Complete-System · VIA-Standardized-Template-Updated-2026-09-20.zip(+ .sha256)「導入模板」",
+   "status": "COVERED",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "VIA_Workflow_VCGC_SSOT_v0123.json"
+   ],
+   "evidence": "zip sha256 437036d8…e039 與 .sha256 一致;上傳 3 HTML = 倉根 VIA_HTML_UI(09-20),VIA/VIA_HTML_UI 為 09-25 修正版(較新)→ 不覆蓋正典;以最新正典三入口版號名入 supportive modules/ui_support/ui_templates;CGC_MDL261 templates 認 5 份 · build 三份 · headless Chromium JS 錯誤 0 · window.VIA 注入;docs/handoff/ai/VIA_StdTemplate_Import_20261005.md",
+   "next": "兩份正典(倉根 / VIA)不一致待操作員裁定是否同步",
+   "hand": "AI / 操作員",
+   "quotes": [
+    {
+     "text": "導入模板",
+     "recorded_at": "2026-10-05T10:30:00+00:00"
+    }
+   ],
+   "modules": [
+    "VIA_StdTemplate_CompleteSystem_v0100.html",
+    "VIA_StdTemplate_CentralUI_v0100.html",
+    "VIA_StdTemplate_Synchronizer_v0100.html"
+   ]
   }
  ],
  "non_requirements": [
@@ -5576,5 +5624,6 @@
  "why_v0173": "v0172 已隨 PR #460 發布 → 出新版不就地改;+VCGC-REQ158(L111 ⑦ 編號流程 · 輸出表頭普查);其餘一字不動",
  "why_v0174": "v0173 已隨 PR #461 發布 → 出新版;+VCGC-REQ159(VCGC / VDF 收尾);其餘一字不動;+VCGC-REQ160(tabula 獨立境 + 境內 Java);+VCGC-REQ161(加速 / 網路橋 / DuckDB TEMP 鉤);+VCGC-REQ162(TaiwanStockGroup);+VCGC-REQ163(收尾登錄 81 族歸屬 · 編號版本號)",
  "why_v0175": "v0174 已隨 PR #462 發布 → 出新版;+VCGC-REQ164(MDL140 v0105 · CI sparse);其餘一字不動;+VCGC-REQ165(via-activate-vcgc)",
- "why_v0176": "v0175 已隨 PR #463 發布 → 出新版;+VCGC-REQ166(政策冊 v0105 · L113);其餘一字不動"
+ "why_v0176": "v0175 已隨 PR #463 發布 → 出新版;+VCGC-REQ166(政策冊 v0105 · L113);其餘一字不動",
+ "why_v0177": "v0176 已隨 PR #464 發布 → 出新版;+VCGC-REQ167(via_precheck);其餘一字不動;+VCGC-REQ168(VIA 標準模板導入)"
 }

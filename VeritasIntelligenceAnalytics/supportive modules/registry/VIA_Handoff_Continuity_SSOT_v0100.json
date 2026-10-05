@@ -1798,9 +1798,10 @@
         "CGC_MDL257_AiVerbLadder",
         "--selftest"
       ],
-      "success_marker": "[計] 13 PASS / 0 FAIL",
-      "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159)",
+      "success_marker": "[計] CGC_MDL257_AiVerbLadder v0101 本版 4/4 · PASS",
+      "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159) · v0101 梯次自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0101.py",
         "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0100.py"
       ],
       "timeout_seconds": 900
@@ -1868,6 +1869,74 @@
         "supportive modules/registry/CGC_MDL262_DuckTempHook_v0100.py"
       ],
       "timeout_seconds": 900
+    },
+    "precheck": {
+      "argv": [
+        "CGC_MDL263_Precheck",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL263_Precheck_v0100 自測 20/20 · PASS",
+      "scope": "CGC_MDL263_Precheck v0100 via_precheck 本體:14 站 · 每個黃紅 PC-### 編號 · 分類 · 說明 · 歸屬(VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL263_Precheck_v0100.py",
+        "Register-VIA-Commands-v0271.ps1"
+      ],
+      "timeout_seconds": 900
+    },
+    "accel_control": {
+      "argv": [
+        "CGC_MDL156_VIAAcceleratorControl",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
+      "scope": "CGC_MDL156 v0112 25 加速器控制面:QuantGuard 單向宣告沿薄尾鏈 · TA-Lib 執法字樣不算使用 · 名冊補 supportive 側收容件(VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0112.py",
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py",
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0110.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vrn_logic_add": {
+      "argv": [
+        "CGC_MDL244_VrnLogicAdd",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+      "scope": "CGC_MDL244 v0101 派 VRN 引擎自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0101.py",
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ui_std_templates": {
+      "argv": [
+        "CGC_MDL261_UIEngine",
+        "templates"
+      ],
+      "success_marker": "VIA_StdTemplate_Synchronizer_v0100.html",
+      "scope": "VIA 標準模板導入 U/I 引擎範本庫(CompleteSystem · CentralUI · Synchronizer;正典零觸碰;VCGC-REQ168)",
+      "dependencies": [
+        "supportive modules/ui_support/ui_templates/VIA_StdTemplate_CompleteSystem_v0100.html",
+        "supportive modules/ui_support/ui_templates/VIA_StdTemplate_CentralUI_v0100.html",
+        "supportive modules/ui_support/ui_templates/VIA_StdTemplate_Synchronizer_v0100.html"
+      ],
+      "timeout_seconds": 600
+    },
+    "celeritas_gate_v0104": {
+      "argv": [
+        "CGC_MDL183_CeleritasPolicyGate",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL183_CeleritasPolicyGate v0104 本版 3/3 · 前版 PASS · 合計 PASS",
+      "scope": "Celeritas 產出契約閘 v0104:supportive modules/intake 收容件 .ps1 = 凍結收容 INFO(ps.intake 照列);收容夾外同名活檔照紅(負控);⑦ 唯讀本 accelerator/VeritasCeleritas.py 在位(VCGC-REQ167 收尾)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0104.py",
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0103.py",
+        "supportive modules/accelerator/VeritasCeleritas.py"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -4090,6 +4159,66 @@
       "case": "handoff",
       "receipt": "docs/handoff/evidence/handoff.json",
       "windows_evidence": "https://github.com/tonykuni/movies-dataset/actions/runs/37238706339/job/111542872596"
+    },
+    {
+      "id": "VCGC-REQ167:precheck",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 precheck → 已驗:2026-10-05T00:17:05+00:00 rc 0 · 標記見到",
+      "next": "handoff test precheck 實跑轉 VERIFIED",
+      "case": "precheck",
+      "receipt": "docs/handoff/evidence/precheck.json"
+    },
+    {
+      "id": "VCGC-REQ167:accel_control",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 accel_control → 已驗:2026-10-05T00:17:14+00:00 rc 0 · 標記見到",
+      "next": "handoff test accel_control 實跑轉 VERIFIED",
+      "case": "accel_control",
+      "receipt": "docs/handoff/evidence/accel_control.json"
+    },
+    {
+      "id": "VCGC-REQ167:vrn_logic_add",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 vrn_logic_add → 已驗:2026-10-05T00:17:22+00:00 rc 0 · 標記見到",
+      "next": "handoff test vrn_logic_add 實跑轉 VERIFIED",
+      "case": "vrn_logic_add",
+      "receipt": "docs/handoff/evidence/vrn_logic_add.json"
+    },
+    {
+      "id": "VCGC-REQ167:ai_verb_ladder",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 ai_verb_ladder → 已驗:2026-10-05T00:17:32+00:00 rc 0 · 標記見到",
+      "next": "handoff test ai_verb_ladder 實跑轉 VERIFIED",
+      "case": "ai_verb_ladder",
+      "receipt": "docs/handoff/evidence/ai_verb_ladder.json"
+    },
+    {
+      "id": "VCGC-REQ168:ui_std_templates",
+      "requirement": "VCGC-REQ168",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VIA 標準模板三入口導入 U/I 引擎範本庫 → 已驗:2026-10-05T00:31:08+00:00 rc 0 · 標記見到",
+      "next": "handoff test ui_std_templates 實跑轉 VERIFIED",
+      "case": "ui_std_templates",
+      "receipt": "docs/handoff/evidence/ui_std_templates.json"
+    },
+    {
+      "id": "VCGC-REQ167:celeritas_gate_intake",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "收尾 SDD 自測 CGC_MDL183 v0103 紅 2:⑭ 今日收容 AzureFlow_QA_v0120 的 5 支 .ps1 被當基線外新缺;⑦ 唯讀本 accelerator/VeritasCeleritas.py 被刪(已從 main 還原) → v0104 薄尾 → 已驗:None rc 0 · 標記見到",
+      "next": "handoff test celeritas_gate_v0104 實跑轉 VERIFIED",
+      "case": "celeritas_gate_v0104",
+      "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json"
     }
   ]
 }
