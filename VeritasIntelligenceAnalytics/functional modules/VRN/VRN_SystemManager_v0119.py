@@ -226,7 +226,7 @@ def _pick_rating_v0119(crx, info: str, whole: str):
     return reit
 
 
-def _fn_analyst_v0119(stem: str, crx) -> str | None:
+def _fn_analyst_v0119(stem: str, crx, company: str | None = None) -> str | None:
     """檔名中的分析師名(實測紅:KGI 式 …_代號 公司_姓名_日期,name 卻 null)。
     代號獨立成段時其下一段視為公司名跳過;首段視為券商;餘 2–4 字純中文段取最後一個。"""
     segs = [x.strip() for x in re.split(r"[_\-]", stem) if x.strip()]
@@ -235,9 +235,11 @@ def _fn_analyst_v0119(stem: str, crx) -> str | None:
     if code_i is not None and not re.search(r"[\u4e00-\u9fa5]", segs[code_i]) and code_i + 1 < len(segs):
         skip.add(code_i + 1)
     bm = PRIOR._broker_map()
+    comp0 = (company or "").replace("-KY", "")
     cands = [sg for i, sg in enumerate(segs)
              if i not in skip and i != 0 and crx["name_zh"].fullmatch(sg)
-             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)]
+             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)
+             and sg not in (company, comp0)]   # 公司名不是分析師(實測紅:志強)
     return cands[-1] if cands else None
 
 
@@ -341,6 +343,14 @@ def _fin_pages_v0119(doc) -> dict:
 
 _GENERIC_MAILBOX = {"research", "media_request", "service", "info", "contact", "support",
                     "ir", "sales", "admin", "webmaster", "marketing", "news", "press"}
+_EN_NAME_STOP = {"morgan", "broking", "securities", "research", "limited", "ltd", "capital",
+                 "markets", "group", "bank", "global", "asia", "taiwan", "equity", "report",
+                 "stanley", "sachs", "goldman", "questions", "requests", "media", "disclosure"}
+
+
+def _en_namish_v0119(c: str) -> bool:
+    """英文姓名候選不得含公司/機構詞(實測紅:Morgan Broking 被當人名)。"""
+    return not any(t.lower().strip(".,") in _EN_NAME_STOP for t in c.split())
 _ANALYST_PATTERNS = (r"(?:分析師|研究員)[::\s]*([\u4e00-\u9fa5]{2,4})(?![\u4e00-\u9fa5])",
                      r"(?<![\u4e00-\u9fa5])([\u4e00-\u9fa5]{2,3})\s*(?:分析師|研究員)執?筆?")
 
@@ -382,8 +392,9 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                and not any(w in c for w in tw) \
                and not any(w in c for w in _NAME_STOP) \
                and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
-                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
-                name, src = c, "info_zone"   # R1 姓名式驗證(中央冊 7 式):非姓名樣式不收
+                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)) \
+               and (not c.isascii() or _en_namish_v0119(c)):
+                name, src = c, "info_zone"   # R1 姓名式驗證 + EN 公司詞閘
                 break
     if name is None and title:   # R1 後備:職稱同行剝職稱;結果同樣過黑名單+姓名式
         for ln in lines:
@@ -414,7 +425,7 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                         name, src = c, "email_near"
                         break
                     me = crx["name_en"].search(c)
-                    if me and len(c) <= 40:
+                    if me and len(c) <= 40 and _en_namish_v0119(me.group(0)):
                         name, src = me.group(0), "email_near"
                         break
                 break
@@ -435,12 +446,20 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                 if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
                     broker_mail = target
                     break
+    coauthor = None
+    if name and name.isascii() and em and name_en:   # 名與信箱不同人=共同作者(實測紅:Michael Hung vs carrie.liu)
+        local_toks = {t.lower() for t in re.split(r"[._\-]+", em.group(0).partition("@")[0]) if t}
+        name_toks = {t.lower().strip(".,") for t in name.split()}
+        if not (local_toks & name_toks):
+            coauthor, name, src = name, name_en, "email_local(主作者=信箱持有人;原抽名列共同作者)"
+    if name is None and name_en:   # 後備:@前推名律(UBS/Citi 有信箱沒名)
+        name, src = name_en, "email_local"
     first = last = None   # 英文姓名分拆(操作員令:英文姓名要分拆好)
     if name_en:
         parts = name_en.split()
         if len(parts) >= 2:
             first, last = parts[0], parts[-1]
-    return {"analyst_name": name, "analyst_name_source": src,
+    return {"analyst_name": name, "analyst_name_source": src, "analyst_coauthor": coauthor,
             "analyst_contact_generic": bool(em) and ((not re.search(r"[A-Za-z]", em.group(0).partition("@")[0]))
                                                      or em.group(0).partition("@")[0].lower() in _GENERIC_MAILBOX),
             "analyst_title": title, "analyst_title_std": title_std,
@@ -987,7 +1006,7 @@ def deepread_one(path: Path) -> dict:
             row["broker_source"] = src_broker
         row.update(_analyst_v0119(info, whole))
         if row.get("analyst_name") is None:
-            fnn = _fn_analyst_v0119(path.stem, crx)
+            fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
             if fnn:
                 row["analyst_name"], row["analyst_name_source"] = fnn, "filename"   # R4
         if row.get("content_broker") is None and row.get("analyst_broker"):
@@ -1242,6 +1261,14 @@ def selftest() -> int:
         chk("㊳ 公司名+人讀 SIZE 入列:合成檔 company 欄存在 · size_h 格式",
             "company_name" in r and r["size_h"].endswith(("KB", "MB", "B"))
             and r.get("company_source") in ("filename", "universe(VDF 資料家)", "VDF 車道待取(本地無 universe)"))
+        a10 = _analyst_v0119("Michael Hung\nAnalyst\ncarrie.liu@citi.com")
+        a11 = _analyst_v0119("Morgan Broking\nAnalyst\ngokul.hariharan@jpmorgan.com")
+        a12 = _analyst_v0119("x\njerry.su@ubs.com")
+        chk("㊴ 共同作者律+公司詞閘+推名後備:信箱持有人為主作者 · Morgan Broking≠人名 · 有信箱必有名 · 公司名≠分析師",
+            a10["analyst_name"] == "Carrie Liu" and a10["analyst_coauthor"] == "Michael Hung"
+            and a11["analyst_name"] == "Gokul Hariharan" and a11["analyst_coauthor"] is None
+            and a12["analyst_name"] == "Jerry Su"
+            and _fn_analyst_v0119("20251204兆豐個股報告-志強-KY(6768)", crx24, "志強-KY") is None)
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
