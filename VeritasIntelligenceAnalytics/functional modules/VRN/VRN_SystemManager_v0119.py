@@ -307,19 +307,24 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
         import yfinance
     except ImportError:
         return {"state": "UNAVAILABLE", "why": "yfinance 未裝"}
+    import contextlib, io, logging
+    logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+    _sink = io.StringIO()
     try:
         cands = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")
         if len(cands) == 1:   # 已定盤仍留另市後備(實測紅:上櫃股 .TW 404)
             cands.append(cands[0].replace(".TWO", ".X").replace(".TW", ".TWO").replace(".X", ".TW"))
         adj = raw = tk = None
-        for tk in cands:
-            adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
-            if adj is not None and not adj.empty:
-                raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
-                break
+        with contextlib.redirect_stderr(_sink), contextlib.redirect_stdout(_sink):   # 404 雜訊靜音(誠實態照回)
+            for tk in cands:
+                adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
+                if adj is not None and not adj.empty:
+                    raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+                    break
         if adj is None or adj.empty:
             return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料,不猜"}
         out = {"state": "OK", "ticker_used": tk,
+               "price_lane": "yfinance(暫代;正式=VDF 網路統包 SUP_MDL740/AegisNexus)",
                "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
         if report_date:
             upto = adj[adj.index.strftime("%Y-%m-%d") <= report_date]
@@ -1005,10 +1010,26 @@ def deepread_one(path: Path) -> dict:
                 text, lane = path.read_text(encoding="utf-8", errors="replace"), "TXT"
             except OSError as exc:
                 note = f"讀檔失敗 {type(exc).__name__}"
+        elif path.suffix.lower() == ".md":   # MARKDOWN 車道(正主=ENG085 尾版 repair_text)
+            try:
+                raw = path.read_text(encoding="utf-8", errors="replace")
+                try:
+                    cands = sorted(HERE.glob("VRN_ENG085_MarkdownRestore_v*.py"), key=_vnum_v0119)
+                    spec85 = importlib.util.spec_from_file_location("vrn_eng085_for_" + TAG, cands[-1])
+                    m85 = importlib.util.module_from_spec(spec85)
+                    spec85.loader.exec_module(m85)
+                    text, fixes = m85.repair_text(raw)
+                    lane, note = "MD(ENG085)", f"修復 {sum(fixes.values()) if isinstance(fixes, dict) else fixes} 處"
+                except Exception as exc:
+                    text, lane, note = raw, "MD(原文)", f"ENG085 不可用 {type(exc).__name__},原文照抽"
+            except OSError as exc:
+                note = f"讀檔失敗 {type(exc).__name__}"
+        elif path.suffix.lower() == ".doc":   # 舊版二進位 Word:無正主不假讀
+            note = "舊版 .doc 需轉檔車道(OmniFormat 候選/Word 另存 docx)"
         if text and len(text.strip()) >= 20:
             crx = _central_regex_v0119()
             rtw = _pick_rating_v0119(crx, text, "")
-            row.update({"state": "DEEPREAD_" + ("DOCX" if lane.startswith("DOCX") else "TXT"),
+            row.update({"state": "DEEPREAD_" + ("DOCX" if lane.startswith("DOCX") else ("MD" if lane.startswith("MD") else "TXT")),
                         "extract_lane": lane, "lane_note": note, "docx_tables": ntab,
                         "content_date": _content_date_v0119(crx, text),
                         "rating": rtw,
@@ -1017,6 +1038,12 @@ def deepread_one(path: Path) -> dict:
                         "size_h": PRIOR.size_h(row.get("size_bytes")), "lamp": "黃",
                         "next": "平文擷取(docx 無固定版面;表格交表格梯 ENG058)"})
             row.update(_analyst_v0119(text))
+            if row.get("analyst_name") is None or str(row.get("analyst_name") or "").isascii():
+                fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
+                if fnn:   # 中文優先律(平文車道同律)
+                    if row.get("analyst_name") and str(row["analyst_name"]).isascii() and row.get("analyst_name_en") is None:
+                        row["analyst_name_en"] = row["analyst_name"]
+                    row["analyst_name"], row["analyst_name_source"] = fnn, "filename(中文優先)"
             return row
         row.update({"state": "NON_PDF_SKIP", "lamp": "黃",
                     "next": "另路(不假裝讀過)" + ((" · " + note) if note else "")})
@@ -1101,10 +1128,12 @@ def deepread_one(path: Path) -> dict:
         if src_broker:
             row["broker_source"] = src_broker
         row.update(_analyst_v0119(info, whole))
-        if row.get("analyst_name") is None:
+        if row.get("analyst_name") is None or str(row.get("analyst_name") or "").isascii():
             fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
-            if fnn:
-                row["analyst_name"], row["analyst_name_source"] = fnn, "filename"   # R4
+            if fnn:   # 中文優先律(操作員令):中文名為主,英文名齊次(name_en 照留)
+                if row.get("analyst_name") and str(row["analyst_name"]).isascii() and row.get("analyst_name_en") is None:
+                    row["analyst_name_en"] = row["analyst_name"]
+                row["analyst_name"], row["analyst_name_source"] = fnn, "filename(中文優先)"
         if row.get("content_broker") is None and row.get("analyst_broker"):
             row["content_broker"], row["broker_source"] = row["analyst_broker"], "email_domain"
             row["broker_match"] = ("MATCH" if row["content_broker"] == fn["broker_std"]
@@ -1441,6 +1470,15 @@ def selftest() -> int:
             chk("㊸ WORD 車道座誠實(ENG052 缺=UNAVAILABLE)", "UNAVAILABLE" in dx["state"] or dx["mod"] is None)
         chk("㊹ 夾層大小批量統計(os.scandir):folder_size 欄>0 且人讀格式",
             out_b.get("folder_size_bytes", 0) > 0 and out_b.get("folder_size_h", "").endswith(("KB", "MB", "B")))
+        (td / "凱基投顧_9906 測試公司_陳測試_20260101.md").write_text(
+            "# 測試公司(9906)\n評等:買進  目標價:NT$ 88\nJohn Doe Analyst\njohn.doe@kgi.com\n", encoding="utf-8")
+        rmd = deepread_one(td / "凱基投顧_9906 測試公司_陳測試_20260101.md")
+        (td / "舊檔-9905 測試-20260101.doc").write_bytes(b"\xd0\xcf\x11\xe0old-word")
+        rdoc = deepread_one(td / "舊檔-9905 測試-20260101.doc")
+        chk("㊺ MD 車道+中文優先+.doc 誠實:MD 抽評等/TP · 中文名陳測試優先(EN 齊次)· .doc 指路轉檔",
+            rmd["state"] == "DEEPREAD_MD" and rmd["rating"] == "買進" and rmd["target_price"] == 88.0
+            and rmd["analyst_name"] == "陳測試" and rmd["analyst_name_en"] in ("John Doe", "John Doe Analyst".replace(" Analyst", ""))
+            and rdoc["state"] == "NON_PDF_SKIP" and "轉檔" in rdoc["next"])
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
