@@ -66,6 +66,9 @@ via-vcgc registry-sync --apply                                  # 編號登錄(�
 三大區(本文/資訊/財報)+REVERIFY · 梯=非OCR→NLP LAYOUT 修復鏈→輕OCR→重型 · 每步驟掛 LAYOUT NLP 座
 (SUP_MDL866+PRADDLE)· 分析師六律 R1–R6 · 券商短縮寫(MEGA/MCQ)+域名別名 · 頁圖/假ETF 不收 ·
 NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中央冊 · SYN +272 發號三零。
+批1657 新律:外部價 NaN 列濾除取最後有效收盤 · TP 0/負值拒收(OCR 道 0.0)· 只有重申詞(維持/重申)
+=評等誠實 None · TP 合理性燈(TP/報告日前價超出 0.15–8 帶=可疑回查)· REVERIFY 逐欄差異上報
+(`reverify_diff`:哪欄首輪/重建後各是什麼)· REVERIFY 掃描先去自家格線「|」(渲染物非原文)。
 
 ## 五、掛載
 工作流:`VIA_Workflow_VRN_SSOT_v0105.json` **VRN-WKF009(single_stock_report)**,九步,

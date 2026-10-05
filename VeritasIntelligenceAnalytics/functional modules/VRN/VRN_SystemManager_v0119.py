@@ -179,7 +179,10 @@ _TP_UNIT_BAD = ("張", "億", "萬", "股", "倍", "%", "％", "年")
 
 
 def _tp_ok_v0119(v: float) -> bool:
-    """年份樣數值不是目標價(實測紅:儒鴻 target_price=2026)。"""
+    """年份樣數值不是目標價(實測紅:儒鴻 target_price=2026);
+    0/負值不是目標價(實測紅批1657:MQ-1560 OCR 道 TP=0.0)。"""
+    if not (0 < float(v) < 100000):
+        return False
     return not (float(v).is_integer() and re.fullmatch(r"20[2-4]\d", str(int(v))))
 
 
@@ -221,8 +224,8 @@ _RATING_REITERATE = ("維持", "重申", "Reiterate", "Maintain")
 
 def _pick_rating_v0119(crx, info: str, whole: str):
     """評等揀選(實測紅兩案):「維持」「重申」是重申詞不是評等,跳過續找實體評等;
-    超短 ASCII 碼(SS/N/OP…≤2 字母)只在含 評等/Rating/投資建議 的行收,防假命中。"""
-    reit = None
+    超短 ASCII 碼(SS/N/OP…≤2 字母)只在含 評等/Rating/投資建議 的行收,防假命中;
+    全文只有重申詞沒有實體評等=誠實 None(實測紅批1657:宏致 rating=維持)。"""
     for t in (info, whole):
         for m in crx["rating"].finditer(t):
             w = m.group(1)
@@ -233,10 +236,9 @@ def _pick_rating_v0119(crx, info: str, whole: str):
                 if not any(k in line for k in ("評等", "Rating", "rating", "投資建議", "建議")):
                     continue
             if w in _RATING_REITERATE:
-                reit = reit or w
                 continue
             return w
-    return reit
+    return None
 
 
 def _fn_analyst_v0119(stem: str, crx, company: str | None = None) -> str | None:
@@ -321,8 +323,12 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
                 if adj is not None and not adj.empty:
                     raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
                     break
+        if adj is not None and not adj.empty:   # 實測紅(批1657):最新列 Close=NaN 未成交;取最後有效值
+            adj = adj[adj["Close"].notna()]
+        if raw is not None and not raw.empty:
+            raw = raw[raw["Close"].notna()]
         if adj is None or adj.empty:
-            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料,不猜"}
+            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料(或全 NaN),不猜"}
         out = {"state": "OK", "ticker_used": tk,
                "price_lane": "yfinance(暫代;正式=VDF 網路統包 SUP_MDL740/AegisNexus)",
                "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
@@ -922,20 +928,24 @@ def reconstruct(path: str) -> dict:
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
             rebuilt = "\n".join(L[6:zone12_end])   # REVERIFY=區一+區二(表頭/區三/SUMMARY 不入;實測紅:財報頁日期假性不一致)
-            rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
-                  "日期": _content_date_v0119(crx, rebuilt)}
+            rb_scan = re.sub(r"\s*\|\s*", " ", rebuilt)   # 去自家格線「|」(渲染物非原文;實測黃批1657:假性不一致)
+            rv = {"評等": _pick_rating_v0119(crx, rb_scan, ""), "目標價": _target_price_v0119(crx, rb_scan),
+                  "日期": _content_date_v0119(crx, rb_scan)}
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
             L += ["", "REVERIFY(重建後再識別驗證;LAYOUT NLP 支援到底)", "| 項目 | 首輪 | 重建後 | 判 |"]
-            rv_ok = True
+            rv_ok, rv_diff = True, {}
             for k in ("評等", "目標價", "日期"):
                 same = first[k] == rv[k]
                 rv_ok = rv_ok and same
+                if not same:   # 逐欄差異上報(實測黃批1657:~15 檔不一致,矩陣要能直指哪欄)
+                    rv_diff[k] = {"首輪": first[k], "重建後": rv[k]}
                 L.append("| %s | %s | %s | %s |" % (k, first[k] or "-", rv[k] or "-", "一致" if same else "不一致"))
             out_p = ui / ("RECON_" + q.stem + ".txt")
             out_p.write_text("\n".join(L), encoding="utf-8")
             rows.append({"filename": q.name, "state": "RECONSTRUCTED",
                          "pages": [1] + [x for x in fps[:3] if x != 1], "fn_locked": fn_lock,
                          "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
+                         **({"reverify_diff": rv_diff} if rv_diff else {}),
                          "extract_lane": lane, "nlp_hub": _nlp_v0119()["state"],
                          "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
         except Exception as exc:
@@ -1124,6 +1134,11 @@ def deepread_one(path: Path) -> dict:
         if code:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
+            ref = (row["external_price"] or {}).get("adj_close_before_report")
+            if tpv and ref:   # TP 合理性燈(實測紅批1657:宏致 TP=5000 vs 市價兩位數)
+                ratio = tpv / ref
+                if not (0.15 <= ratio <= 8.0):
+                    row["tp_sanity"] = f"可疑:TP/報告日前價={ratio:.1f}×(超出 0.15–8 帶),回查原文"
         row.update(fs)
         if src_broker:
             row["broker_source"] = src_broker
@@ -1365,15 +1380,17 @@ def selftest() -> int:
             a4["analyst_name"] == "李明哲" and a4["analyst_name_en"] == "Michael Lee"
             and _central_regex_v0119()["name_en"].fullmatch("LEE Tzu-Yuan"))
         crx24 = _central_regex_v0119()
-        chk("㉔ 評等揀選:維持買進→買進(重申詞跳過)· SS 不在評等行不收 · 評等行內 SS 可收",
+        chk("㉔ 評等揀選:維持買進→買進(重申詞跳過)· SS 不在評等行不收 · 評等行內 SS 可收 · 只有重申詞=None",
             _pick_rating_v0119(crx24, "投資建議:維持買進,目標價280元", "") == "買進"
+            and _pick_rating_v0119(crx24, "對後市維持審慎看法\n", "") is None
             and _pick_rating_v0119(crx24, "GLASS FIBER\nSS 產線擴充", "") is None
             and _pick_rating_v0119(crx24, "評等:SS\n", "") == "SS"
-            and _pick_rating_v0119(crx24, "維持\n", "") == "維持")
-        chk("㉕ 目標價拒抓:2026 年份不收 · 5,000張不收 · 146元照收",
+            and _pick_rating_v0119(crx24, "維持\n", "") is None)
+        chk("㉕ 目標價拒抓:2026 年份不收 · 5,000張不收 · 146元照收 · 0.0 不收",
             _target_price_v0119(crx24, "目標價由 2026 年展望推導,上調至146元") == 146.0
             and _target_price_v0119(crx24, "目標 5,000張 成交") is None
-            and _target_price_v0119(crx24, "Target Price: 2026") is None)
+            and _target_price_v0119(crx24, "Target Price: 2026") is None
+            and _target_price_v0119(crx24, "目標價 0.0 元") is None)
         chk("㉖ 檔名姓名後備:凱基式取人名 · 華南式公司名不誤收",
             _fn_analyst_v0119("凱基投顧_1476 儒鴻_劉昃恩_20260519", crx24) == "劉昃恩"
             and _fn_analyst_v0119("凱基投顧_Takeaway_3605 宏致_張燾_20260917", crx24) == "張燾"
