@@ -126,7 +126,8 @@ def _central_regex_v0119() -> dict:
             "date": re.compile(pat("RX_TIME_CONTENT_DATE", r"(20[2-3]\d)[./年\-](\d{1,2})[./月\-](\d{1,2})日?")),
             "email": re.compile(pat("RX_EMAIL_STD", r"[\w.+-]+@[\w-]+\.[\w.-]+")),
             "tel": re.compile("(" + pat("RX_TEL_TAIPEI", r"(?:\+?886[- ]?2|\(02\)|02)[- ]?\d{4}[- ]?\d{4}")
-                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}") + ")"),
+                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}")
+                              + "|" + pat("RX_TEL_TW_ANY", r"(?:\+?886[-\s]?|\(0\d\)\s?|0)\d(?:[-\s]?\d){7,9}") + ")"),
             "date_en": re.compile(pat("RX_DATE_ENGLISH",
                 r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(\d{4})")),
             "rating": re.compile("(?i)(" + "|".join(_wordish_v0119(t) for t in rating) + ")"),
@@ -134,6 +135,8 @@ def _central_regex_v0119() -> dict:
                              + r")[^\d]{0,15}((?:\d{1,3}(?:,\d{3})+|\d{2,5})(?:\.\d+)?)"),
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
+            "tp_ntd": re.compile(pat("RX_TARGET_PRICE_NTD",
+                r"(?:NT\$|NT\s?\$|目標價[:：]?\s*)\s*([0-9][0-9,]*\.?\d*)")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
             "rating_code": {str(a).lower(): (std, e.get("code"))
                             for std, e in (syn.get("RATING_CODEBOOK_MASTER") or {}).items()
@@ -196,6 +199,11 @@ def _target_price_v0119(crx, *texts) -> float | None:
                 v2 = float(n2.group(0).replace(",", ""))
                 if _tp_ok_v0119(v2):
                     return v2
+    for t in texts:
+        for m in crx["tp_ntd"].finditer(t):   # NT$ 前綴式(上傳 v0101 實證)先於泛防禦式
+            v = float(m.group(1).replace(",", "")) if m.group(1) else None
+            if v and _tp_ok_v0119(v) and t[m.end():m.end() + 1] not in _TP_UNIT_BAD:
+                return v
     for t in texts:
         for m in crx["tp_defense"].finditer(t):
             n = re.search(r"[\d,]+(?:\.\d+)?", m.group(0))
@@ -1333,6 +1341,11 @@ def selftest() -> int:
             and crx24["rating_code"]["未評等"] == ("Not_Rated", 0)
             and crx24["quarter"].search("25Q1 財測") and len(crx24["tw_fin"]) == 16
             and r["rating_std"] == "Buy" and r["rating_code"] == 2)
+        chk("㊷ 上傳收割接線:全台手機電話可認 · NT$ 目標價式 · Equal-Weight→Hold/3",
+            crx24["tel"].search("0912-345-678")
+            and _target_price_v0119(crx24, "NT$ 1,085 維持") == 1085.0
+            and _pick_rating_v0119(crx24, "評等:Equal-Weight", "") == "Equal-Weight"
+            and crx24["rating_code"]["equal-weight"] == ("Hold", 3))
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",

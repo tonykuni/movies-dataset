@@ -1,0 +1,165 @@
+{
+ "schema": "VIA.VRN.ExtractRules.SSOT.v1",
+ "version": "v0100",
+ "batch": "側線 2026-10-03 b",
+ "ts": "2026-10-02T23:28:46",
+ "law": "L109 / L107 / L108",
+ "purpose": "VRN 擷取規則正本(子系統基層,L108 ①):來源 · 對照 · 工具升級 · 完整性 · 長表 · 預估 · EPS 的可執行細則與門檻;只增不減,改門檻出新版",
+ "sources": [
+  {
+   "id": "SRC-VRN-P1INFO",
+   "zh": "頁 1 資訊區(上 / 左 / 右 / 下)"
+  },
+  {
+   "id": "SRC-VRN-P1BODY",
+   "zh": "頁 1 本文區"
+  },
+  {
+   "id": "SRC-VRN-FINTAB",
+   "zh": "財報表頁(左右 / 上下切)"
+  },
+  {
+   "id": "SRC-EXT-HIST",
+   "zh": "外部歷史(VDF 供;VRN 只讀 ADJ OHLC)"
+  }
+ ],
+ "rules": [
+  {
+   "id": "R-SRC-01",
+   "zh": "每個值一列,不合併",
+   "row": [
+    "field_id",
+    "value",
+    "source_id",
+    "zone",
+    "page",
+    "tool",
+    "bbox",
+    "grade",
+    "doc_sha",
+    "as_of"
+   ]
+  },
+  {
+   "id": "R-CMP-01",
+   "zh": "對照分級",
+   "decision_fields": [
+    "target_price",
+    "rating",
+    "eps",
+    "revenue",
+    "close_price"
+   ],
+   "grade": {
+    "agree_2plus": "measured",
+    "disagree": "RED(兩值都留)",
+    "single": "single-source"
+   },
+   "tolerance": {
+    "target_price": 0.005,
+    "revenue": 0.01,
+    "eps": 0.01
+   }
+  },
+  {
+   "id": "R-TIER-01",
+   "zh": "工具分區升級",
+   "ladder": [
+    {
+     "tier": 0,
+     "tool": "pdf_text_layer+layout",
+     "cost": "free"
+    },
+    {
+     "tier": 1,
+     "tool": "rapidocr",
+     "trigger": "zone_text_chars<20 or garble_ratio>0.15"
+    },
+    {
+     "tier": 2,
+     "tool": "paddle",
+     "trigger": "zone_score<0.80 after tier1"
+    },
+    {
+     "tier": 3,
+     "tool": "rerender",
+     "dpi": [
+      300,
+      350
+     ],
+     "trigger": "zone_score<0.80 after tier2",
+     "scope": "failing cells only"
+    }
+   ],
+   "stop": "zone_score>=0.80"
+  },
+  {
+   "id": "R-COV-01",
+   "zh": "完整性三檢",
+   "ink_coverage": {
+    "uncovered_blob_min_px": 400,
+    "uncovered_ratio_max": 0.03
+   },
+   "table_grid": "ruling_lines vs cells mismatch => RED",
+   "numeric_self_check": [
+    "subtotal==sum(parts)±0.5%",
+    "eps*shares≈net_income±5%",
+    "pct recompute±0.1pp"
+   ],
+   "full_crosscheck_sample": 0.05
+  },
+  {
+   "id": "R-TEMP-01",
+   "zh": "TEMP 分夾",
+   "path": "VIA_TEMP_ROOT/<doc_sha>/<page>/<dpi>/<tool>/",
+   "clear_unit": "per document",
+   "keep_last": 5
+  },
+  {
+   "id": "R-DB-01",
+   "zh": "表格長表",
+   "columns": [
+    "doc_sha",
+    "page",
+    "zone",
+    "table_id",
+    "row",
+    "col",
+    "period_canonical",
+    "account_id",
+    "value",
+    "unit",
+    "grade",
+    "source_id",
+    "bbox",
+    "split_method"
+   ]
+  },
+  {
+   "id": "R-FCST-01",
+   "zh": "預估不覆蓋",
+   "forecast_row": "as_of 必填",
+   "actual_row": "period 必填",
+   "view_rule": "同 period 有 actual 取 actual;兩列皆存"
+  },
+  {
+   "id": "R-EPS-01",
+   "zh": "EPS 裁決",
+   "two_rows": "取較低值為 eps_diluted,其餘 eps_basic 候選;相等亦 diluted",
+   "one_row": "eps_diluted,grade=assumed",
+   "label_explicit": "標籤優先(basic/diluted 明寫)",
+   "normalize_before": [
+    "同期別",
+    "同單位",
+    "負號還原"
+   ],
+   "output": [
+    "eps_diluted",
+    "eps_basic",
+    "eps_rule",
+    "eps_grade",
+    "eps_source_rows"
+   ]
+  }
+ ]
+}
