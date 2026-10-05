@@ -75,7 +75,8 @@ _D8 = re.compile(r"(?<!\d)(20[2-3]\d)(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")        
 _D6 = re.compile(r"(?<!\d)(2[3-9])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")             # 260917
 _ROC = re.compile(r"(?<!\d)(11[3-7])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")           # 1141201
 _MMDD_AFTER_BROKER = re.compile(r"(?<=[A-Za-z])((0\d|1[0-2])([0-2]\d|3[01]))(?!\d)")  # CTBC0915
-_TICKER = re.compile(r"(?<![\dA-Za-z])([1-9]\d{3}|00\d{2})(?![\d])")
+_TICKER = re.compile(r"(?<![\dA-Za-z])(00\d{2,3}(?:[ABDLRTUV](?![A-Za-z]))?(?!\d)|[1-9]\d{3}(?!\d))")
+# ETF 族(MASTER 2026-10-05 只增):4碼舊 ETF(0050)與 5碼新 ETF(00878)皆收,尾碼 A/B/D/L/R/T/U/V 隨碼
 _KIND_WORDS = (("DAILY", ("晨會", "早報", "盤後", "盤勢", "周報", "週報", "晨間", "日股", "美股", "港股", "速報", "Databook", "databook")),
                ("MACRO", ("總經", "債券", "利率", "ETF", "籌碼", "市場觀察", "策略")),
                ("INDUSTRY", ("產業", "專題", "Memory", "ABF", "PCB", "CCL", "Thermal", "Automation", "Hardware", "Power", "hardware")),
@@ -101,8 +102,42 @@ _BROKER_CACHE: dict | None = None
 _BROKER_LOAD_NOTES: list = []   # 字典載入失敗誠實帳
 
 
+_ZH_CO_SUFFIX = ("股份有限公司", "綜合證券", "證券投資顧問", "投資顧問", "證券", "投顧", "期貨", "金控",
+                 "資本", "環球", "銀行", "永昌", "金鼎", "研究部", "證期")
+_EN_CO_STOP = {"securities", "capital", "markets", "group", "holdings", "research", "limited",
+               "ltd", "ltd.", "inc", "inc.", "co", "co.", "international", "(asia)", "asia", "taiwan"}
+
+
+def _name_partials(name: str):
+    """公司中英文名局部識別(操作員令 2026-10-05):剝公司型尾詞,逐層衍生局部鍵。
+    中文:華南永昌綜合證券→華南永昌→華南;英文:Daiwa Capital Markets→Daiwa。
+    單英文字局部須 ≥5 字母(防 Morgan 撞大小摩);撞名由 setdefault 先到先贏=不衝突。"""
+    out = []
+    s = str(name).strip()
+    if s.isascii():
+        toks = s.split()
+        while len(toks) > 1 and toks[-1].lower().strip(",.") in _EN_CO_STOP:
+            toks = toks[:-1]
+            cand = " ".join(toks)
+            if len(toks) > 1 or len(cand) >= 5:
+                out.append(cand)
+    else:
+        cur = s
+        changed = True
+        while changed:
+            changed = False
+            for suf in _ZH_CO_SUFFIX:
+                if cur.endswith(suf) and len(cur) - len(suf) >= 2:
+                    cur = cur[: -len(suf)]
+                    out.append(cur)
+                    changed = True
+                    break
+    return out
+
+
 def _broker_map() -> dict:
-    """SynonymUnion 尾版 broker 同義字 → 標準縮寫(別名長的先比;載一次快取)。"""
+    """SynonymUnion 尾版 broker 同義字 → 標準縮寫(別名長的先比;載一次快取)。
+    v0118 局部識別令:中英文公司名(chinese_name/english_name)與其局部衍生鍵一併入表。"""
     global _BROKER_CACHE
     if _BROKER_CACHE is None:
         m = {}
@@ -119,8 +154,11 @@ def _broker_map() -> dict:
                 items = sec.items() if isinstance(sec, dict) else [(None, e) for e in sec]
                 for key, e in items:
                     if isinstance(e, dict):
-                        for a in e.get("aliases", []) + ([key] if key else []):
+                        names = [e.get("chinese_name"), e.get("english_name")]
+                        for a in e.get("aliases", []) + [n for n in names if n] + ([key] if key else []):
                             m.setdefault(str(a).lower(), e.get("abbr"))
+                            for pa in _name_partials(a):   # 公司名局部識別(令 2026-10-05)
+                                m.setdefault(pa.lower(), e.get("abbr"))
 
         canon = {k.lower(): v for k, v in _union_rulings().items() if not k.startswith("_")}   # 裁定:別拼法 → 正典縮寫
         for alias, target in canon.items():            # 裁定別名本身也入字典(JP/MQ/CLST…)
@@ -403,6 +441,15 @@ def selftest() -> int:
         C([5.51, 9.99], [5.51, 6.02], [5.30, 5.80])["lamp"] == "黃"
         and C([1.0], [5.51], [5.30])["lamp"] == "紅"
         and C([], [5.51], [5.30])["state"] == "NO_DATA")
+    chk("㉑ ETF 代碼族(MASTER):00878 五碼收 · 00878B 尾碼收 · 0050 照收 · CT→CATHAY · DAI→DAIWA",
+        P("00878 高股息月報")["codes"] == ["00878"] and P("00679B 債券ETF追蹤")["codes"] == ["00679B"]
+        and P("0050 台灣五十 分析")["codes"] == ["0050"]
+        and P("【國泰證期研究部】神達(3706 TT)-20250822")["broker_std"] == "CATHAY"
+        and P("Daiwa-3653 20251002")["broker_std"] == "DAIWA")
+    chk("㉒ 公司名局部識別:摩根士丹利證券股份有限公司→MS · Daiwa Capital Markets Research→DAIWA · 群益金鼎→CAPITAL",
+        P("摩根士丹利證券股份有限公司-2330-20250101")["broker_std"] == "MS"
+        and P("Daiwa Capital Markets Research 3653 20250101")["broker_std"] == "DAIWA"
+        and P("群益金鼎證券-2330-20250101")["broker_std"] == "CAPITAL")
     r = P("第二場 2026海外投資展望 - 華南永昌海外商品部")
     r2 = P("第三場 AI潮流下展望2026半導體產業趨勢 - 陳子昂")
     chk("⑳ 非個股型年份樣代號剝除:2026≠代號 · 3706 速報照收",
