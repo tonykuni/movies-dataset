@@ -14,6 +14,8 @@
 #        Enter 空行 = 照現況啟動;打了就當你確認 = 帶 --apply。-NoPrompt 不問。
 #   via-activate-vdf [-Repair] [-SkipCheck] [-NoPrompt] [-NoOpen] [--home <資料庫夾>] [--start …] [--add …] [--remove …] [--import 檔] [--apply]
 #   沒給 --home = 操作台選的資料庫位置(Get-VIAUiDbRoot)。也可 via activate-vdf(總門)。
+#   +via-camelot(別名 表格境)(VCGC-REQ171):Camelot 單獨隔離境 via_camelot_311 + 搭配工具 → CGC_MDL266_CamelotEnv
+#     via-camelot [status|plan|install --apply|verify](預設 status;install 要本視窗雙閘)
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -69,3 +71,9 @@ function global:via-activate-vdf {
 }
 Set-Alias -Name via_activate_vdf -Value via-activate-vdf -Scope Global -Force
 Set-Alias -Name 啟動VDF -Value via-activate-vdf -Scope Global -Force
+
+function global:via-camelot {
+    $a = @($args); if ($a.Count -eq 0) { $a = @('status') }
+    if (Get-Command Invoke-VIACeleritasScoped -ErrorAction SilentlyContinue) { Invoke-VIACeleritasScoped { via-vcgc run CGC_MDL266_CamelotEnv @a } } else { via-vcgc run CGC_MDL266_CamelotEnv @a }
+}
+Set-Alias -Name 表格境 -Value via-camelot -Scope Global -Force
