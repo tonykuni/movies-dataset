@@ -1,0 +1,86 @@
+{
+ "schema": "VIA.VCGC.RelatedIntake.v1",
+ "called": false,
+ "wired_to_report": false,
+ "rule": "add only; skip a file that is already registered; do not start these tools from SyncAll",
+ "imported": [
+  {
+   "id": "azureflow_qa",
+   "name_zh": "天青智流品保",
+   "role": "support_qa",
+   "path": "supportive modules/intake/VIA_AzureFlow_QA_v0110",
+   "source": "VIA_AzureFlow_QA_Plugin_Standalone (4), plus two files only in (3)",
+   "files": 20,
+   "reads": "a selected zip or a local AzureFlow tree",
+   "writes": "its own QA summary only",
+   "ui": "Show the name, the path, and that it does not touch a stock report."
+  },
+  {
+   "id": "azureflow_review",
+   "name_zh": "天青智流報告覆核",
+   "role": "support_qa",
+   "path": "supportive modules/intake/VIA_AzureFlow_ReportReview_v0100",
+   "source": "via-azureflow-system-report-review-20260920 (2)",
+   "files": 3,
+   "reads": "one AzureFlow system report",
+   "writes": "a review note only",
+   "ui": "Show this beside the QA plugin. It is a reviewer, not a second copy of the plugin."
+  },
+  {
+   "id": "mother_inspector",
+   "name_zh": "母系統檢視",
+   "role": "readonly_qa",
+   "path": "supportive modules/intake/VIA_MotherInspector_v0100/VIA_MotherSystemInspector.py",
+   "source": "c99dYOrFl9o72QoT-grok-workspace.zip artifacts/VIA_MotherSystemInspector.py",
+   "files": 1,
+   "reads": "a chosen source tree, offline",
+   "writes": "an inspection report only",
+   "ui": "Show it as read-only QA. It is not a second VCGC governor."
+  },
+  {
+   "id": "azureflow_qa_v0120",
+   "name_zh": "天青智流品保 1.2.0",
+   "role": "support_qa",
+   "path": "supportive modules/intake/VIA_AzureFlow_QA_v0120",
+   "source": "VIA_AzureFlow_QA_Plugin_Standalone_6/_7(同位元組,sha256 8fe86111…;UPLOAD.sha256 在冊)",
+   "files": 22,
+   "reads": "a selected zip or a local AzureFlow tree",
+   "writes": "its own QA summary only",
+   "prior": "VIA_AzureFlow_QA_v0110(1.1.0,凍結)",
+   "diff_vs_prior": "8 檔升版:manifest 1.2.0 · SKILL · qa.py · 部署文件×4 · 互動模板",
+   "note": "manifest 單一契約:inspect/verify/all + complete_system;activation gate 人審,不自動排程"
+  },
+  {
+   "id": "azureflow_report_review_v0101",
+   "name_zh": "天青智流系統報告複核",
+   "role": "support_review",
+   "path": "supportive modules/intake/VIA_AzureFlow_ReportReview_v0101",
+   "source": "via-azureflow-system-report-review-20260920(sha256 1a504f15…;UPLOAD.sha256 在冊)",
+   "files": 4,
+   "reads": "AzureFlow system reports",
+   "writes": "review verdicts only",
+   "prior": "VIA_AzureFlow_ReportReview_v0100(凍結)",
+   "diff_vs_prior": "補 templates/(前版缺)"
+  },
+  {
+   "id": "vrn_sample_reader",
+   "name_zh": "VRN 測試樣本讀器",
+   "role": "vrn_tool",
+   "path": "functional modules/VRN/vrn_sample_reader.py",
+   "source": "操作員上傳 fb2b692a-vrn_sample_reader.py",
+   "files": 1,
+   "reads": "C:\\\\測試樣本報告(PDF/DOCX/TXT/JPG)",
+   "writes": "vrn_sample_out 自家輸出",
+   "note": "缺套件/掃不到誠實 NODATA;GF/廣發檔名 DENY;--selftest 容器 rc 0;不寫正式庫"
+  }
+ ],
+ "skipped_duplicate": [
+  "NLP 1.8, unified v7, consolidated v8, and v5: already registered under the NLP roster",
+  "discussion reconstruction JSON: output of the registered NLP package, not a new engine",
+  "ActiveETF launchers: VDF_ENG077 and VDF_ENG078 already own that lane",
+  "broker evidence zip: evidence, not an engine; broker locks already hold the rule",
+  "VIA_CentralGovernance.py inside the inspector selftest: a fixture, not the live governor"
+ ],
+ "prior": "VIA_RelatedIntake_v0100.json",
+ "updated": "2026-10-05T00:32:36Z"
+}
