@@ -1,0 +1,93 @@
+flowchart TB
+    A[Windows 開發主機] --> B[下載 Plug-in ZIP 與 SHA-256 sidecar]
+    B --> C{SHA-256 是否一致}
+    C -->|否| X[停止安裝並重新取得]
+    C -->|是| D[Expand-Archive 解壓]
+    D --> E[VIA 天青智流 AzureFlow QA Plug-in]
+
+    subgraph P[Plug-in 目錄與單一契約]
+        E1[plugin_manifest.json]
+        E2[Invoke-VIA-AzureFlowQA.ps1]
+        E3[scripts/via_azureflow_qa.py]
+        E4[E2E／ZIP validators]
+        E5[Standalone HTML UI]
+        E6[Windows 安裝／部署手冊]
+        E7[Invoke-VIAAzureFlowQASystem.ps1]
+    end
+    E --> E1
+    E --> E2
+    E --> E3
+    E --> E4
+    E --> E5
+    E --> E6
+    E --> E7
+
+    E2 --> F{PowerShell 找到 python 或 py}
+    F -->|否| Y[安裝 Python 3 並重新開啟 PowerShell]
+    F -->|是| G[Python orchestrator]
+    E5 -.產生命令，不直接執行.-> E2
+
+    subgraph SYS[Complete System Facade]
+        S1[manifest preflight]
+        S2[AzureFlow inspect]
+        S3[ZIP verify]
+        S4[combined QA handoff]
+        S5[scheduler readiness]
+        S6[system JSON／Markdown report]
+        S7{human review gate}
+        S8[READY_FOR_WINDOWS_ACTIVATION]
+        S9[-ActivateSchedule]
+    end
+    E7 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
+    S7 -->|review required| S8
+    S7 -->|explicit Windows switch| S9
+
+    subgraph ACT[三個相容 QA Actions]
+        I[inspect：AzureFlow API、SSOT、runs、jobs]
+        J[verify：SHA、path safety、CRC、package contract]
+        K[all：inspect 加 verify combined handoff]
+    end
+    G --> I
+    G --> J
+    G --> K
+    S2 --> I
+    S3 --> J
+    S4 --> K
+
+    J --> L{Package kind}
+    L -->|VIA all-in-one| M[validate_via_zip.py]
+    L -->|standardized| N[validate_standardized_zip.py]
+    I --> O[AzureFlow localhost API 與 local run fallback]
+    K --> Q[VIA_AzureFlow_QA_Run_Summary.json]
+    M --> Q
+    N --> Q
+    O --> Q
+    S6 --> R[VIA_AzureFlow_QA_System_Report.json／.md]
+
+    subgraph T[Windows Task Scheduler：明確 opt-in]
+        T1[Task action：PowerShell.exe]
+        T2[Invoke-VIA-AzureFlowQA-Scheduled.ps1]
+        T3[timestamped output directory]
+        T4[task_scheduler.log 與 task_result.json]
+        T5[activation_result.json]
+        T1 --> T2 --> T3 --> T4 --> T5
+    end
+    S9 --> T1
+    T2 --> E2
+    T4 --> Q
+    T5 --> R
+
+    Q --> U[人工 review／母系統 handoff]
+    R --> U
+    U --> V[不得自動 promotion、不得自動 command activation]
+
+    classDef install fill:#e7f5f6,stroke:#2b9db0,color:#173f49
+    classDef core fill:#f0f8f4,stroke:#4c9f86,color:#214a3d
+    classDef action fill:#edf7f5,stroke:#267c6b,color:#214a3d
+    classDef safety fill:#fff8e8,stroke:#e8b04e,color:#76561a
+    classDef fail fill:#fff0f0,stroke:#c96868,color:#6d2b2b
+    class A,B,C,D,E,E1,E2,E3,E4,E5,E6,E7,F,G,T1,T2,T3,T4,T5 install
+    class S1,S2,S3,S4,S5,S6,S8,R core
+    class I,J,K,L,M,N,O,Q,U action
+    class S7,S9,V safety
+    class S8,Y,X fail
