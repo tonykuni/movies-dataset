@@ -1,6 +1,6 @@
 # CELERITAS-TEMPLATE-JOIN v1 (library: dot-sourced by its caller, the caller's template covers it; R30)
 # ===== [VIA:PS-TEMPLATE:v0101-lib] no code here on purpose: running Start here would change the caller's session =====
-# Register-VIA-Commands-v0273.ps1 — 2026-10-05:+via-activate-vdf(別名 via_activate_vdf · 啟動VDF)(VCGC-REQ170 · VDF-REQ018)
+# Register-VIA-Commands-v0273.ps1 — 2026-10-05:+via-activate-vdf(別名 via_activate_vdf · 啟動VDF)(VCGC-REQ170)
 #   操作員令「via_activate_vdf … 原始指令用 py 寫並加入加速器 · 啟動 vcgc 對 vrn vdf 所有工具及環境檢查及修復 · 確認所有 py ps 都加速器 ·
 #   vdf 都有加網路工具 · 啟動 vdf 讀取資料庫現況然後跳出 html u/i」;同日裁定「vcgc vdf vrn 為獨立系統 · vdf 啟動指令由 vdf manager 控管 ·
 #   使用者啟動前有改各類型起始時間或要增減項目的權利」「權力下放子系統 · 母系統監控及衝突提醒全力 · 更改由我跟你定案」

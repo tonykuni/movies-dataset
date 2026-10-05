@@ -4,7 +4,7 @@
 
 操作員 2026-10-05:「vcgc vdf vrn 為獨立系統 · vrn vdf 獨立性更強 · vdf 啟動指令應該由 vdf manager 控管 ·
   使用者啟動前有改各類型起始時間或要增減項目的權利」;「現在起權力下放子系統 · 掌握全局 · 母系統監控及衝突提醒全力 · 更改由我跟你定案」;
-  本線(AI)經操作員授權出本版(VDF-REQ018;VCGC-REQ170 的 VDF 段)。
+  本線(AI)經操作員授權出本版(VCGC-REQ170 的 VDF 段;同日裁定記政策冊 L111)。
 activate [--home 資料庫夾] [--start 大類=YYYY-MM-DD|default]… [--add 族群=值[,值]]… [--remove 族群=值[,值]]… [--import 頁上匯出.json] [--apply] [--no-open] [--as-of D]
   ① 現況:MDL012 start(各大類起始日 · 族群)
   ② 啟動前改(你的權利):--start / --add / --remove / --import 交 MDL012 自己的動詞;沒給 --apply = 乾跑只列計畫,成員帳本一個位元都不動
