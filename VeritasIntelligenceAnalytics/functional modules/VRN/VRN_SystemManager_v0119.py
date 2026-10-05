@@ -670,6 +670,97 @@ def _footer_scan_v0119(doc, crx) -> dict:
     return {"footer_broker": broker, "rating_scale_found": len(names) >= 3}
 
 
+_NLP_CACHE = None
+
+
+def _nlp_v0119() -> dict:
+    """LAYOUT NLP 大引擎座(鎖冊 nlp=SUP_MDL866 統包;PRADDLE LAYOUT 修復鏈,段落照
+    閱讀順序,原生在前 OCR 在後)。操作員令 2026-10-05:每個步驟都要用到 LAYOUT NLP——
+    zones/斷句/分類/重建/再識別 全掛本座支援;載一次快取,缺/壞=誠實 UNAVAILABLE。"""
+    global _NLP_CACHE
+    if _NLP_CACHE is None:
+        try:
+            lock = json.loads((HERE.parents[1] / "supportive modules" / "registry" /
+                               "VIA_ToolVersion_Lock_v0100.json").read_text(encoding="utf-8"))
+            np_ = Path(lock["nlp"]["path"])
+            if not np_.is_absolute():
+                np_ = HERE.parents[2] / np_
+            spec = importlib.util.spec_from_file_location("via_nlp_hub_for_vrn", np_)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            try:
+                pin = mod.praddle_pinned()
+                st = f"LOADED({lock['nlp']['version']}·praddle={pin.get('state')})"
+            except Exception as exc:
+                st = f"LOADED({lock['nlp']['version']}·praddle查詢失敗{type(exc).__name__})"
+            _NLP_CACHE = {"state": st, "mod": mod}
+        except Exception as exc:
+            _NLP_CACHE = {"state": "UNAVAILABLE", "why": f"{type(exc).__name__}: {str(exc)[:80]}", "mod": None}
+    return _NLP_CACHE
+
+
+def _nlp_pdf_text_v0119(path: Path) -> tuple:
+    """NLP 大引擎 LAYOUT 修復鏈取文(無文字層候援第一位,在輕OCR 之前)。"""
+    hub = _nlp_v0119()
+    if hub.get("mod") is None:
+        return None, hub["state"]
+    try:
+        r = hub["mod"].pdf_text(str(path), ocr="auto")
+        t = (r or {}).get("text") or ""
+        return (t if len(t.strip()) >= 40 else None), f"NLP_LAYOUT:{(r or {}).get('state')}"
+    except Exception as exc:
+        return None, f"NLP_LAYOUT 失敗 {type(exc).__name__}"
+
+
+_SENT_END = "。!?;…!?"
+
+
+def repair_sentences_v0119(comps) -> list:
+    """第一頁本文斷句修復(操作員令 2026-10-05):行接到句點(。!?;…)才斷段,
+    標題級(≥1.25×body)不用接;CJK 間空格 TRIM。回 [(級, 修復後文)]。"""
+    sizes = sorted(c.get("max_size", 0) for c in comps if c.get("max_size"))
+    body = sizes[(len(sizes) - 1) // 2] if sizes else 0
+    out = []
+    for c in comps:
+        r = (c.get("max_size") or 0) / body if body else 0
+        if r >= 1.25:   # 標題不用接
+            out.append(("標題", re.sub(r"\s+", " ", c["text"]).strip()))
+            continue
+        buf, paras = "", []
+        for ln in c["text"].splitlines():
+            ln = ln.strip()
+            if not ln:
+                continue
+            ln = re.sub(r"(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])", "", ln)   # 去空格 TRIM
+            buf += ln
+            if buf[-1] in _SENT_END:
+                paras.append(buf)
+                buf = ""
+        if buf:
+            paras.append(buf)
+        out.append(("本文" if r < 1.08 else "副標", "\n".join(paras)))
+    return out
+
+
+def _ocr_light_v0119(path: Path) -> tuple:
+    """輕 OCR 座(梯:非OCR→輕OCR→重OCR):pytesseract+渲染;缺=誠實 (None, 指路)。"""
+    try:
+        import pytesseract  # noqa: F401
+        import fitz
+    except ImportError:
+        return None, "輕OCR 未備(pytesseract 缺)→ 重型走 ENG400 OCR 車道(paddle 境)"
+    try:
+        doc = fitz.open(str(path))
+        pix = doc[0].get_pixmap(dpi=200)
+        import PIL.Image, io
+        img = PIL.Image.open(io.BytesIO(pix.tobytes("png")))
+        txt = pytesseract.image_to_string(img, lang="chi_tra+eng")
+        doc.close()
+        return (txt if len(txt.strip()) >= 40 else None), "輕OCR 已試(200dpi 首頁)"
+    except Exception as exc:
+        return None, f"輕OCR 失敗 {type(exc).__name__} → 重型 ENG400 車道"
+
+
 def _render_table_v0119(text: str) -> str:
     """表格重現:垂直線 | 代表格線(連續空白/定位斷欄;單欄行退回逐詞)。"""
     out = []
@@ -706,52 +797,67 @@ def reconstruct(path: str) -> dict:
         try:
             z = first_page_zones(doc)
             fps = _fin_pages_v0119(doc)["fin_pages"]
-            L = ["FILENAME    | " + q.name,
+            fn_lock = bool(fn["report_date"] and fn["codes"] and fn["broker_std"])
+            L = ["FILENAME    | " + q.name + ("  [鎖定]" if fn_lock else ""),
                  "REPORT DATE | " + (fn["report_date"] or "-"),
                  "BROKER      | " + (fn["broker_std"] or "-"),
-                 "REPORT TYPE | " + (fn["doc_kind"] or "-"), ""]
+                 "REPORT TYPE | " + (fn["doc_kind"] or "-"),
+                 "ENGINE      | LAYOUT NLP " + _nlp_v0119()["state"], ""]
             moved = 0
-            for pno in [1] + [x for x in fps[:3] if x != 1]:
-                pz = fin_page_zones(doc[pno - 1])
-                if pno == 1:
-                    info_comps = list(pz[z["info_side"]])
-                    main_comps = list(pz["left" if z["info_side"] == "right" else "right"])
-                else:
-                    main_comps, info_comps = list(pz["left"]), list(pz["right"])
-                keep = []
-                for c in main_comps:   # 本文表格雜湊 → 抓出重建放到資訊區
-                    if _comp_kind_v0119(c["text"]) in ("表格", "矩陣"):
-                        info_comps.append(c)
-                        moved += 1
-                    else:
-                        keep.append(c)
-                main_comps = keep
-                sizes = sorted(c.get("max_size", 0) for c in main_comps if c.get("max_size"))
-                body = sizes[(len(sizes) - 1) // 2] if sizes else 0
-                L.append(f"PAGE {pno}")
-                L.append("TYPE-A 本文重現")
-                for c in main_comps:
-                    r = (c.get("max_size") or 0) / body if body else 0
-                    lv = "標題" if r >= 1.25 else ("副標" if r >= 1.08 else "本文")
-                    L.append(f"[{lv}] " + c["text"].strip())
-                L.append("TYPE-B 資訊區重現")
-                for c in info_comps:
-                    k = _comp_kind_v0119(c["text"])
-                    L.append(f"[{k}]")
-                    L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
-                L.append("")
             whole = z["info_text"] + "\n" + z["main_text"]
-            rt = _pick_rating_v0119(crx, z["info_text"], whole)
+            rt = _pick_rating_v0119(crx, z["info_text"], whole)   # 首輪識別
             tp = _target_price_v0119(crx, z["info_text"], whole)
+            c_date1 = _content_date_v0119(crx, whole)
+            pz1 = fin_page_zones(doc[0])
+            info_comps = list(pz1[z["info_side"]])
+            main_comps = []
+            for c in pz1["left" if z["info_side"] == "right" else "right"]:
+                if _comp_kind_v0119(c["text"]) in ("表格", "矩陣"):   # 本文表格雜湊 → 移資訊區
+                    info_comps.append(c)
+                    moved += 1
+                else:
+                    main_comps.append(c)
+            L.append("PAGE 1")
+            L.append("區一 TYPE-A 本文重現(斷句修復)")
+            for lv, txt in repair_sentences_v0119(main_comps):
+                L.append(f"[{lv}] " + txt)
+            L.append("區二 TYPE-B 資訊區重現")
+            for c in info_comps:
+                k = _comp_kind_v0119(c["text"])
+                L.append(f"[{k}]")
+                L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
+            L.append("")
+            for pno in [x for x in fps[:3] if x != 1]:
+                pz = fin_page_zones(doc[pno - 1])
+                L.append(f"PAGE {pno}")
+                L.append("區三 TYPE-C 財報頁重現")
+                for side in ("left", "right"):
+                    for c in pz[side]:
+                        k = _comp_kind_v0119(c["text"])
+                        L.append(f"[{side}·{k}]")
+                        L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
+                L.append("")
             vm = sorted({std for std, al in crx["val_methods"].items() for a in al
                          if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
+            rebuilt = "\n".join(L)   # REVERIFY:重建後再識別,對首輪
+            rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
+                  "日期": _content_date_v0119(crx, rebuilt)}
+            first = {"評等": rt, "目標價": tp, "日期": c_date1}
+            L += ["", "REVERIFY(重建後再識別驗證;LAYOUT NLP 支援到底)", "| 項目 | 首輪 | 重建後 | 判 |"]
+            rv_ok = True
+            for k in ("評等", "目標價", "日期"):
+                same = first[k] == rv[k]
+                rv_ok = rv_ok and same
+                L.append("| %s | %s | %s | %s |" % (k, first[k] or "-", rv[k] or "-", "一致" if same else "不一致"))
             out_p = ui / ("RECON_" + q.stem + ".txt")
             out_p.write_text("\n".join(L), encoding="utf-8")
             rows.append({"filename": q.name, "state": "RECONSTRUCTED",
-                         "pages": [1] + [x for x in fps[:3] if x != 1],
-                         "moved_tables_to_info": moved, "out": out_p.name, "lamp": "綠"})
+                         "pages": [1] + [x for x in fps[:3] if x != 1], "fn_locked": fn_lock,
+                         "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
+                         "nlp_hub": _nlp_v0119()["state"],
+                         "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
         finally:
             doc.close()
     return {"verb": "reconstruct", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-006",
@@ -763,7 +869,9 @@ def deepread_one(path: Path) -> dict:
     fn = PRIOR.parse_filename(path.stem)
     row = {"filename": path.name, "ext": path.suffix.lower(),
            "size_bytes": path.stat().st_size if path.exists() else None,
-           "fn_date": fn["report_date"], "fn_codes": fn["codes"], "broker": fn["broker_std"]}
+           "fn_date": fn["report_date"], "fn_codes": fn["codes"], "broker": fn["broker_std"],
+           "fn_locked": bool(fn["report_date"] and fn["codes"] and fn["broker_std"])}
+    # FILENAME 識別成功就鎖定(操作員令):三欄齊=鎖,內文互證只作佐證不改寫檔名欄
     if path.suffix.lower() != ".pdf":
         row.update({"state": "NON_PDF_SKIP", "lamp": "黃", "next": "docx/txt 另路(不假裝讀過)"})
         return row
@@ -775,8 +883,22 @@ def deepread_one(path: Path) -> dict:
         z = first_page_zones(doc)
         crx = _central_regex_v0119()
         info, whole = z["info_text"], z["info_text"] + "\n" + z["main_text"]
-        if len(whole.strip()) < 40:   # 掃描檔無文字層(實測紅:MQ-1560 全空)→ 誠實指路 OCR 車道
-            row.update({"state": "NO_TEXT_LAYER", "lamp": "黃",
+        row["extract_lane"] = "NON_OCR"
+        if len(whole.strip()) < 40:   # 無文字層 → 梯:NLP LAYOUT 修復鏈 → 輕OCR → 重型
+            otxt, onote = _nlp_pdf_text_v0119(path)
+            if otxt is None:
+                otxt, onote = _ocr_light_v0119(path)
+            if otxt:
+                row.update({"state": "DEEPREAD_OCR_LIGHT",
+                            "extract_lane": "NLP_LAYOUT" if onote.startswith("NLP_LAYOUT") else "輕OCR",
+                            "ocr_note": onote,
+                            "content_date": _content_date_v0119(crx, otxt),
+                            "rating": _pick_rating_v0119(crx, otxt, ""),
+                            "target_price": _target_price_v0119(crx, otxt), "lamp": "黃",
+                            "next": "輕OCR 平文擷取(無版面);全件還原走重型 ENG400"})
+                return row
+            row.update({"state": "NO_TEXT_LAYER", "lamp": "黃", "extract_lane": "需OCR",
+                        "ocr_note": onote,
                         "next": "無文字層 → OCR 車道(ENG400 四階梯:輕 OCR → 重型)"})
             return row
         c_date = _content_date_v0119(crx, whole)
@@ -831,6 +953,10 @@ def deepread_one(path: Path) -> dict:
                      if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
         row["valuation_methods"] = vm or None   # 估值法字典 × 資訊區+本文區核對
         row.update(_fin_pages_v0119(doc))
+        row["engine_support"] = {"nlp_hub": _nlp_v0119()["state"],   # 每步驟 LAYOUT NLP(操作員令)
+                                 "zones": "LAYOUT(ENG394 律)+NLP hub", "sentence_repair": "NLP 句點律",
+                                 "classify": "NLP(字級+數字密度)", "reverify": "NLP 再識別",
+                                 "ocr_ladder": row["extract_lane"]}
         hits = [row["date_match"], row["ticker_match"], row["broker_match"]].count("MATCH")
         row["lamp"] = "綠" if hits == 3 and tpv else ("黃" if hits else "紅")
     finally:
@@ -1042,6 +1168,18 @@ def selftest() -> int:
         a_dom = _analyst_v0119("x\nkevin.sw.chen@cl-sec.com")
         a_dom2 = _analyst_v0119("x\nhelen.chien@daiwacm-cathay.com.tw")
         a_dom3 = _analyst_v0119("x\n9899@entrust.com.tw")
+        rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
+                                      {"text": "台積電 法說會 快報", "max_size": 16.0}])
+        chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
+            rep[0][0] == "本文" and rep[0][1].splitlines()[0] == "營收成長強勁,我們上修預估。"
+            and "後續動能延續" in rep[0][1] and rep[1][0] == "標題" and rep[1][1] == "台積電 法說會 快報")
+        rc2 = reconstruct(str(td))
+        rt2 = (Path(os.environ["VIA_VRN_UI_DIR"]) / rc2["rows"][0]["out"]).read_text(encoding="utf-8")
+        chk("㉟ 三大區+再識別+NLP 掛點:區一/二/三 · [鎖定] · REVERIFY 一致 · ENGINE 行",
+            "區一 TYPE-A 本文重現(斷句修復)" in rt2 and "區二 TYPE-B 資訊區重現" in rt2
+            and "區三 TYPE-C 財報頁重現" in rt2 and "[鎖定]" in rt2 and "ENGINE" in rt2
+            and rc2["rows"][0]["reverify"] == "一致" and "REVERIFY" in rt2
+            and ("LOADED" in rc2["rows"][0]["nlp_hub"] or "UNAVAILABLE" in rc2["rows"][0]["nlp_hub"]))
         chk("㉝ 無文字層誠實+域名別名:NO_TEXT_LAYER 指路 OCR · cl-sec→CLSA · daiwacm-cathay→DAIWA · entrust→HUANAN",
             rb["state"] == "NO_TEXT_LAYER" and "OCR" in rb["next"]
             and a_dom["analyst_broker"] == "CLSA" and a_dom2["analyst_broker"] == "DAIWA"
