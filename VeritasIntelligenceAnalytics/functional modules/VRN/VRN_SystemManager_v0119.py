@@ -74,6 +74,7 @@ def __getattr__(name):
 # ────────────────── 深讀律 v0119(抽取式全走 SSOT 冊,不散落) ──────────────────
 _INFO_KW = ("目標價", "評等", "收盤", "市值", "股價", "分析師", "Target", "Rating", "Close", "@", "Tel", "TEL", "電話")
 _TITLE_WORDS = ("分析師", "研究員", "協理", "資深副總", "Analyst", "Research")
+_NAME_STOP = ("聯絡", "地址", "免責", "客服", "本報告", "研究部", "部門", "Contact", "Disclaimer", "Address", "傳真")
 _FIN_KW = ("EPS", "每股盈餘", "營收", "淨利", "毛利", "ROE", "股本", "營業利益", "Revenue", "Net income", "稅後")
 _CRX_CACHE = None
 
@@ -223,11 +224,17 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
     except ImportError:
         return {"state": "UNAVAILABLE", "why": "yfinance 未裝"}
     try:
-        tk = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")[0]
-        adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
-        raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+        cands = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")
+        if len(cands) == 1:   # 已定盤仍留另市後備(實測紅:上櫃股 .TW 404)
+            cands.append(cands[0].replace(".TWO", ".X").replace(".TW", ".TWO").replace(".X", ".TW"))
+        adj = raw = tk = None
+        for tk in cands:
+            adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
+            if adj is not None and not adj.empty:
+                raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+                break
         if adj is None or adj.empty:
-            return {"state": "NODATA", "why": f"{tk} 無資料,不猜"}
+            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料,不猜"}
         out = {"state": "OK", "ticker_used": tk,
                "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
         if report_date:
@@ -248,7 +255,7 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
 def _fin_pages_v0119(doc) -> dict:
     """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
     pages, sample = [], ""
-    for i in range(min(len(doc), 30)):
+    for i in range(1, min(len(doc), 30)):   # 首頁另路(first_page_zones),財報頁從第 2 頁起(實測紅:p1 誤入)
         t = doc[i].get_text()
         years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
         kws = sum(1 for k in _FIN_KW if k in t)
@@ -284,11 +291,12 @@ def _analyst_v0119(info: str) -> dict:
                 break
         if title:
             break
-    if blk is not None:   # 律③:區塊上方短行、無數字無 @ = 姓名
+    if blk is not None:   # 律③:區塊上方短行、無數字無 @ = 姓名(標題詞黑名單;實測紅「聯絡方式」)
         for j in range(blk - 1, max(blk - 3, -1), -1):
             c = lines[j]
             if c and len(c) <= 25 and "@" not in c and not re.search(r"\d", c) \
-               and not any(w in c for w in _TITLE_WORDS):
+               and not any(w in c for w in _TITLE_WORDS) \
+               and not any(w in c for w in _NAME_STOP):
                 name = c
                 break
     if name is None and title:   # 後備:職稱同行剝職稱
@@ -300,7 +308,8 @@ def _analyst_v0119(info: str) -> dict:
     name_en = broker_mail = None
     if em:
         local, _, dom = em.group(0).partition("@")
-        name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None   # 律①
+        if re.search(r"[A-Za-z]", local):   # 律①;數字信箱(9899@…)不是姓名,誠實 None
+            name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None
         toks = dom.lower().split(".")
         for alias, target in PRIOR._broker_map().items():   # 律②:短別名要 token 全等,長別名子串
             if alias.isascii():
@@ -358,6 +367,31 @@ def fin_page_zones(page) -> dict:
     return out
 
 
+def _comp_kind_v0119(text: str) -> str:
+    """元件類別(正典一、3:矩陣/表格/長句/文字):數字密度+行結構判;判不準寧給 文字。"""
+    t = text.strip()
+    if not t:
+        return "空"
+    lines = [ln for ln in t.splitlines() if ln.strip()]
+    ratio = len(re.findall(r"\d", t)) / max(len(t), 1)
+    nums = [len(re.findall(r"\d+(?:\.\d+)?", ln)) for ln in lines]
+    if len(lines) >= 3 and max(nums) >= 3 and ratio > 0.2:
+        return "矩陣" if all(n >= 3 for n in nums[1:]) else "表格"
+    if len(lines) >= 2 and max(nums) >= 2 and ratio > 0.12:
+        return "表格"
+    if len(t.replace("\n", "")) >= 36 and ratio < 0.12:   # CJK 密度高,總長判(行寬換行不吃虧)
+        return "長句"
+    return "文字"
+
+
+def _kind_tally_v0119(comps) -> str:
+    out = {}
+    for c in comps:
+        k = _comp_kind_v0119(c["text"])
+        out[k] = out.get(k, 0) + 1
+    return "".join(f"{k}{v}" for k, v in out.items()) or "-"
+
+
 def layout_check(path: str) -> dict:
     """LAYOUT+文字修復實測:首頁左右本文/資訊 · 財務頁左右再上下元件 · 每區壞字統計;
     先清前次結果(清場律)。只驗有代號的個股 PDF。"""
@@ -375,17 +409,22 @@ def layout_check(path: str) -> dict:
         try:
             z = first_page_zones(doc)
             sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
+            p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
+            info_comps = p1["right" if z["info_side"] == "right" else "left"]
+            main_comps = p1["left" if z["info_side"] == "right" else "right"]
             fps = _fin_pages_v0119(doc)["fin_pages"]
             fin_desc, comp_n = [], 0
             for pno in fps[:4]:
                 fz = fin_page_zones(doc[pno - 1])
                 comp_n += len(fz["left"]) + len(fz["right"])
-                fin_desc.append(f"p{pno}:L{len(fz['left'])}/R{len(fz['right'])}")
+                fin_desc.append(f"p{pno}:L{len(fz['left'])}/R{len(fz['right'])}·"
+                                f"{_kind_tally_v0119(fz['left'] + fz['right'])}")
             bad = sm["bad"] + si["bad"]
             lamp = "綠" if sm["chars"] and si["chars"] and bad == 0 else ("黃" if sm["chars"] or si["chars"] else "紅")
             rows.append({"filename": q.name, "state": "LAYOUT_CHECK", "info_side": z["info_side"],
                          "main_chars": sm["chars"], "main_cjk": sm["cjk"], "info_chars": si["chars"],
                          "info_digits": si["digits"], "bad_chars": bad,
+                         "info_types": _kind_tally_v0119(info_comps), "main_types": _kind_tally_v0119(main_comps),
                          "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
         finally:
             doc.close()
@@ -573,6 +612,16 @@ def selftest() -> int:
         lc2 = layout_check(str(td))
         chk("⑱ 清場律:實測前刪前次結果(stale 檔被刪且入刪單)",
             not stale.exists() and any("stale" in x for x in lc2["cleaned_prev"]))
+        chk("⑲ 元件分類(矩陣/表格/長句/文字)+首頁財務頁帶類別",
+            _comp_kind_v0119("損益摘要\n營收 100.1 120.2 140.3\n淨利 10.1 12.2 14.3") in ("表格", "矩陣")
+            and _comp_kind_v0119("本公司受惠AI需求強勁,營運展望樂觀,預期下半年動能延續不墜,評價仍具吸引力。") == "長句"
+            and _comp_kind_v0119("評等:買進") == "文字"
+            and "表" in (lc2["rows"][0]["fin_pages"][0] + lc2["rows"][0]["info_types"]
+                         + lc2["rows"][0]["main_types"]).replace("矩陣", "表"))
+        a2 = _analyst_v0119("聯絡方式\n研究員\n9899@entrust.com.tw")
+        chk("⑳ 實測紅修:聯絡方式≠姓名 · 數字信箱≠英文名 · 財報頁不含首頁",
+            a2["analyst_name"] is None and a2["analyst_name_en"] is None
+            and a2["analyst_email"] == "9899@entrust.com.tw" and r["fin_pages"] == [2])
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
