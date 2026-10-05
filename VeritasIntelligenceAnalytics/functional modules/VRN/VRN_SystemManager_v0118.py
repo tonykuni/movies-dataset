@@ -171,6 +171,37 @@ def _broker_map() -> dict:
     return _BROKER_CACHE
 
 
+def tokenize_filename(stem: str) -> list:
+    """FILENAME 分解規範(操作員令 2026-10-05,記錄入引擎):標點/空白為分隔,
+    並在 中文/英文/數字 交接處拆開,成連續 CJK · LATIN · DIGIT 段。
+    例:3014TT-20231005 → [3014, TT, 20231005];凱基投顧_1476 儒鴻 → [凱基投顧, 1476, 儒鴻]。"""
+    def cls(ch):
+        if ch.isdigit():
+            return "D"
+        o = ord(ch)
+        if 0x4E00 <= o <= 0x9FFF or 0x3400 <= o <= 0x4DBF or 0xF900 <= o <= 0xFAFF:
+            return "C"
+        if "a" <= ch.lower() <= "z":
+            return "L"
+        return None   # 標點/空白=分隔
+    out, cur, ck = [], "", None
+    for ch in stem:
+        k = cls(ch)
+        if k is None:
+            if cur:
+                out.append(cur)
+            cur, ck = "", None
+            continue
+        if ck in (None, k):
+            cur, ck = cur + ch, k
+        else:
+            out.append(cur)
+            cur, ck = ch, k
+    if cur:
+        out.append(cur)
+    return out
+
+
 def parse_filename(stem: str) -> dict:
     """檔名律:日期先剝 → 代號 → 券商正名 → 分型。全部誠實,不硬配。"""
     out = {"report_date": None, "codes": [], "broker_std": None, "broker_raw": None,
@@ -216,6 +247,7 @@ def parse_filename(stem: str) -> dict:
         out["doc_kind"] = "EQUITY"
     else:
         out["doc_kind"] = kind or "UNCLASSIFIED"
+    out["fn_tokens"] = tokenize_filename(stem)   # 分解規範記錄(交接處拆段)
     out["company_name"] = None   # 公司名局部識別(操作員令 2026-10-05):三樣式,抽不到派 VDF 取名
     if out["codes"]:
         c0 = out["codes"][0]
@@ -485,6 +517,10 @@ def selftest() -> int:
         and P("0050 台灣五十 分析")["codes"] == ["0050"]
         and P("【國泰證期研究部】神達(3706 TT)-20250822")["broker_std"] == "CATHAY"
         and P("Daiwa-3653 20251002")["broker_std"] == "DAIWA")
+    chk("㉕ FILENAME 分解規範:3014TT-20231005 → 3014|TT|20231005 · 凱基式三段",
+        P("3014TT-20231005")["fn_tokens"] == ["3014", "TT", "20231005"]
+        and tokenize_filename("凱基投顧_1476 儒鴻") == ["凱基投顧", "1476", "儒鴻"]
+        and tokenize_filename("志強-KY(6768)") == ["志強", "KY", "6768"])
     chk("㉔ 公司名局部識別:志強-KY(括號式) · 儒鴻(空格式) · 慧洋-KY(華南式) · AMAX-KY · GS 檔無名誠實",
         P("20251204兆豐個股報告-志強-KY(6768)")["company_name"] == "志強-KY"
         and P("凱基投顧_1476 儒鴻_劉昃恩_20260519")["company_name"] == "儒鴻"
