@@ -1961,7 +1961,8 @@
       "dependencies": [
         "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py",
         "Register-VIA-Commands-v0273.ps1",
-        "Register-VIA-Commands-v0274.ps1"
+        "Register-VIA-Commands-v0274.ps1",
+        "Register-VIA-Commands-v0275.ps1"
       ],
       "timeout_seconds": 600
     },
@@ -1990,6 +1991,48 @@
         "supportive modules/registry/VIA_EnvGovernance_Baseline_v0101.json"
       ],
       "timeout_seconds": 600
+    },
+    "ui_engine_v0102": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0102",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0102 本版 8/8 · v0101 鏈 PASS · 合計 PASS",
+      "scope": "CGC_MDL261 v0102 操作台:VRN 視覺鎖 v0159 固定左側欄 · 大類 × 輸入 / 輸出 / 驗證 燈矩陣 · 摘要 → 驗證 → 明細矩陣頁序 · 輸入頁大類矩陣零文字框 · 匯出格式不變 · 補擷取路線(VCGC-REQ172)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0102.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_fetch_groups_v0104": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0104",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0104 本版 9/9 · v0103 鏈 PASS · 合計 PASS",
+      "scope": "MDL012 v0104 refill:冊 v0102 分層 · 判定整組 / 部分 NODATA · 鑰只查在不在 · 分層照序重測補到就停 · 沒鑰 SKIP 不假裝 · GATED · 只列計畫零寫檔(VCGC-REQ173)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 1200
+    },
+    "vdf_refill": {
+      "argv": [
+        "VDF_SystemManager_v0130",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0130 本版 4/4 · 前版 PASS · 合計 PASS",
+      "scope": "VDF 管理員 v0130 refill:交 MDL012 尾版 · 只列計畫 · GATED rc 4 零寫檔 · 參數錯拒 · 環境還原 · 不碰同意閘 / FRED 鑰(VCGC-REQ173)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0130.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 1500
     }
   },
   "work_items": [
@@ -4312,6 +4355,36 @@
       "next": "handoff test camelot_env 實跑轉 VERIFIED",
       "case": "camelot_env",
       "receipt": "docs/handoff/evidence/camelot_env.json"
+    },
+    {
+      "id": "VCGC-REQ172:ui_engine_v0102",
+      "requirement": "VCGC-REQ172",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 ui_engine_v0102",
+      "next": "handoff test ui_engine_v0102 實跑轉 VERIFIED",
+      "case": "ui_engine_v0102",
+      "receipt": "docs/handoff/evidence/ui_engine_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ173:vdf_fetch_groups_v0104",
+      "requirement": "VCGC-REQ173",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdf_fetch_groups_v0104",
+      "next": "handoff test vdf_fetch_groups_v0104 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0104",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0104.json"
+    },
+    {
+      "id": "VCGC-REQ173:vdf_refill",
+      "requirement": "VCGC-REQ173",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdf_refill",
+      "next": "handoff test vdf_refill 實跑轉 VERIFIED",
+      "case": "vdf_refill",
+      "receipt": "docs/handoff/evidence/vdf_refill.json"
     }
   ]
 }
