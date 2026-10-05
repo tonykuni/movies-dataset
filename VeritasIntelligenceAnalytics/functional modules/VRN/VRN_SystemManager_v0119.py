@@ -562,7 +562,7 @@ def layout_check(path: str) -> dict:
         if doc is None:
             rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
             continue
-        try:
+        try:   # 單檔不殺整批
             z = first_page_zones(doc)
             sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
             p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
@@ -585,6 +585,9 @@ def layout_check(path: str) -> dict:
                          "info_has_text_and_table": ("文字" in _kind_tally_v0119(info_comps) or "長句" in _kind_tally_v0119(info_comps))
                                                     and ("表格" in _kind_tally_v0119(info_comps) or "矩陣" in _kind_tally_v0119(info_comps)),
                          "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
+        except Exception as exc:
+            rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
+                         "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         finally:
             doc.close()
     return {"verb": "layout_check", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-005",
@@ -701,6 +704,8 @@ def _nlp_v0119() -> dict:
 
 def _nlp_pdf_text_v0119(path: Path) -> tuple:
     """NLP 大引擎 LAYOUT 修復鏈取文(無文字層候援第一位,在輕OCR 之前)。"""
+    if os.environ.get("VIA_VRN_NLP_LANE") != "1":
+        return None, "NLP_LAYOUT 修復鏈未啟(設 VIA_VRN_NLP_LANE=1 單檔啟用;重鏈耗時,不拖死全批)"
     hub = _nlp_v0119()
     if hub.get("mod") is None:
         return None, hub["state"]
@@ -794,7 +799,7 @@ def reconstruct(path: str) -> dict:
         if doc is None:
             rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
             continue
-        try:
+        try:   # 單檔不殺整批
             z = first_page_zones(doc)
             fps = _fin_pages_v0119(doc)["fin_pages"]
             fn_lock = bool(fn["report_date"] and fn["codes"] and fn["broker_std"])
@@ -858,6 +863,9 @@ def reconstruct(path: str) -> dict:
                          "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
                          "nlp_hub": _nlp_v0119()["state"],
                          "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
+        except Exception as exc:
+            rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
+                         "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         finally:
             doc.close()
     return {"verb": "reconstruct", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-006",
@@ -972,7 +980,11 @@ def deepread(path: str) -> dict:
     rows, skipped = [], 0
     for q in files:
         if PRIOR.parse_filename(q.stem)["codes"]:
-            rows.append(deepread_one(q))
+            try:
+                rows.append(deepread_one(q))
+            except Exception as exc:   # 單檔不殺整批(矩陣一定要產)
+                rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
+                             "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         else:
             skipped += 1
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
@@ -1168,6 +1180,15 @@ def selftest() -> int:
         a_dom = _analyst_v0119("x\nkevin.sw.chen@cl-sec.com")
         a_dom2 = _analyst_v0119("x\nhelen.chien@daiwacm-cathay.com.tw")
         a_dom3 = _analyst_v0119("x\n9899@entrust.com.tw")
+        bad = td / "GS-9998 20260101.pdf"
+        bad.write_bytes(b"%PDF-1.4 broken \x00\x01truncated")
+        out_b = deepread(str(td))
+        _, gate_note = _nlp_pdf_text_v0119(bad)
+        chk("㊱ 批次防殺+重鏈閘:壞檔 UNREADABLE/ROW_ERROR 入列整批照走 · NLP 重鏈未啟誠實註記",
+            any(x["state"] in ("UNREADABLE", "ROW_ERROR") for x in out_b["rows"])
+            and any(x["state"] == "DEEPREAD" for x in out_b["rows"])
+            and "VIA_VRN_NLP_LANE" in gate_note)
+        bad.unlink()
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
