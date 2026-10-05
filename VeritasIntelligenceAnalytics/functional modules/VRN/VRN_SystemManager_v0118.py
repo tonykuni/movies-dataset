@@ -123,7 +123,10 @@ def _broker_map() -> dict:
                             m.setdefault(str(a).lower(), e.get("abbr"))
 
         canon = {k.lower(): v for k, v in _union_rulings().items() if not k.startswith("_")}   # 裁定:別拼法 → 正典縮寫
+        for alias, target in canon.items():            # 裁定別名本身也入字典(JP/MQ/CLST…)
+            m.setdefault(alias, target)
         m = {a: canon.get(str(t).lower(), t) for a, t in m.items()}
+        m = {a: t for a, t in m.items() if t != "GF_DENY"}   # DENY 宗別名只供 DENY 律,不正名
         _BROKER_CACHE = dict(sorted(m.items(), key=lambda kv: -len(kv[0])))
     return _BROKER_CACHE
 
@@ -150,7 +153,11 @@ def parse_filename(stem: str) -> dict:
     out["codes"] = sorted(set(_TICKER.findall(s)))
     low = stem.lower()
     for alias, target in _broker_map().items():
-        if alias in low:
+        if alias.isascii():
+            if re.search(r"(?<![A-Za-z])" + re.escape(alias) + r"(?![A-Za-z])", low):
+                out["broker_std"], out["broker_raw"] = target, alias
+                break
+        elif alias in low:
             out["broker_std"], out["broker_raw"] = target, alias
             break
     if not out["codes"]:
@@ -192,6 +199,55 @@ def intake(path: str) -> dict:
     return out
 
 
+# ────────────────── U/I 矩陣報告(每動作自動產出;小字體自動最佳化) ──────────────────
+_LAMP_CSS = {"INTAKE_OK": "#1a7f37", "DENY": "#b42318", "NEEDS_REVIEW": "#b54708",
+             "PASS": "#1a7f37", "BLOCKED": "#b42318", "GREEN": "#1a7f37",
+             "YELLOW": "#b54708", "RED": "#b42318"}
+
+
+def dt_now() -> str:
+    import datetime as _dt
+    return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+
+def emit_matrix_html(verb: str, result: dict) -> str:
+    """動作結果 → 自動最佳化矩陣 HTML(行=項目 · 欄依資料自選 · 10px 小字體);
+    寫 VIA_Reports/vrn/UI_MATRIX_<verb>_latest.html 並自動跳出(VIA_NO_OPEN=抑制)。"""
+    rows = result.get("rows") or [dict(result)]
+    pref = ["filename", "state", "codes", "report_date", "broker_std", "doc_kind",
+            "ext", "size_bytes", "verdict", "lamp", "code", "missing", "next"]
+    cols = [c for c in pref if any(c in r for r in rows)]
+    cols += sorted({k for r in rows for k in r if not str(k).startswith("_")}
+                   - set(cols) - {"file", "rows", "checks"})[:4]
+    def cell(v):
+        s = json.dumps(v, ensure_ascii=False) if isinstance(v, (list, dict)) else ("" if v is None else str(v))
+        s = s.replace("&", "&amp;").replace("<", "&lt;")
+        color = _LAMP_CSS.get(str(v).split("(")[0])
+        return f'<td style="color:{color};font-weight:600">{s[:48]}</td>' if color else f"<td>{s[:48]}</td>"
+    head = "".join(f"<th>{c}</th>" for c in cols)
+    body = "".join("<tr>" + "".join(cell(r.get(c)) for c in cols) + "</tr>" for r in rows)
+    from collections import Counter
+    tally = dict(Counter(str(r.get("state") or r.get("verdict") or r.get("lamp") or "?") for r in rows))
+    html = ("<!doctype html><meta charset='utf-8'><title>VRN " + verb + " matrix</title>"
+            "<style>body{font:10px/1.35 'Segoe UI',system-ui,sans-serif;margin:8px}"
+            "table{border-collapse:collapse;width:100%}th,td{border:1px solid #d0d7de;"
+            "padding:1px 4px;text-align:left;white-space:nowrap}th{background:#f6f8fa;position:sticky;top:0}"
+            "tr:nth-child(even){background:#fbfbfb}h3{margin:2px 0 6px;font-size:12px}</style>"
+            f"<h3>VRN_SystemManager {TAG} · {verb} · {dt_now()} · {len(rows)} 列 · {tally}</h3>"
+            f"<table><tr>{head}</tr>{body}</table>")
+    outdir = Path(os.environ.get("VIA_VRN_UI_DIR") or (HERE.parents[1] / "VIA_Reports" / "vrn"))
+    outdir.mkdir(parents=True, exist_ok=True)
+    out = outdir / f"UI_MATRIX_{verb}_latest.html"
+    out.write_text(html, encoding="utf-8")
+    if os.environ.get("VIA_NO_OPEN"):
+        print(f"  [VIA_NO_OPEN] 抑制跳出 {out}")
+    else:
+        import webbrowser
+        webbrowser.open(out.as_uri())
+        print(f"  [U/I] 矩陣已跳出 {out.name}")
+    return str(out)
+
+
 def main(argv=None) -> int:
     if os.environ.get("VIA_FROM_VCGC") != "YES":
         print("[VRN] 拒絕。只能經 via-vcgc。")
@@ -205,9 +261,22 @@ def main(argv=None) -> int:
         if len(a) < 2:
             print("[拒跑] intake <檔|夾>")
             return 2
-        print(json.dumps(intake(a[1]), ensure_ascii=False, indent=(None if as_json else 1)))
+        out = intake(a[1])
+        emit_matrix_html("intake", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
-    return PRIOR.main(args)   # reconcile / closeout / 其餘動詞照 v0117 前版鏈
+    if a[:1] in (["reconcile"], ["closeout"]):   # 每動作自動矩陣(動詞本體照前版鏈)
+        verb = a[0]
+        kv = dict(zip(a[1::2], a[2::2]))
+        if verb == "reconcile":
+            res = __getattr__("reconcile")(kv.get("--code", ""), kv.get("--name", ""),
+                                           float(kv["--tp"]) if kv.get("--tp") else None)
+        else:
+            res = __getattr__("closeout")(kv.get("--in", ""))
+        emit_matrix_html(verb, res)
+        print(json.dumps(res, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0 if res.get("verdict", "PASS") == "PASS" or verb != "closeout" else 1
+    return PRIOR.main(args)   # 其餘動詞照 v0117 前版鏈
 
 
 def selftest() -> int:
@@ -259,6 +328,19 @@ def selftest() -> int:
         and out["rows"][0]["next"] == "VRN-WKF009-STP002")
     chk("⑬ 前版動詞照常(未知動詞拒跑 · closeout 可達)",
         PRIOR.main(["no_such_verb"]) == 2 and callable(__getattr__("closeout")))
+    chk("⑮ 裁定別名生效:JP→JPM · MQ→MACQUARIE · CLST→CLSA",
+        P("JP-2330 20250718")["broker_std"] == "JPM"
+        and P("MQ-1560 20260520")["broker_std"] == "MACQUARIE"
+        and P("CLST-6669 20251001")["broker_std"] == "CLSA")
+    chk("⑯ 短拉丁邊界比對防假命中:jpg≠JP · GS 照常", P("926708")["broker_std"] is None
+        and P("photo_jpg_dump 20250101")["broker_std"] is None
+        and P("GS-1590 20231012")["broker_std"] == "GS")
+    os.environ["VIA_VRN_UI_DIR"] = str(td / "ui")
+    mp = emit_matrix_html("intake", out)
+    h = Path(mp).read_text(encoding="utf-8")
+    chk("⑰ U/I 矩陣自動產出:10px 小字體 · 欄自動最佳化 · VIA_NO_OPEN 抑制跳出",
+        Path(mp).is_file() and "font:10px" in h and "<table" in h and "state" in h)
+    os.environ.pop("VIA_VRN_UI_DIR", None)
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑭ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
