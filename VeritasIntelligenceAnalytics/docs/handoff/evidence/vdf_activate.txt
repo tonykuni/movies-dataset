@@ -23,10 +23,10 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 RED · 2026-10-04T02:57:12
+  [衝突] 現況 NODATA 先 via-envgov eight-hub
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20261001_222547_156 · RED · 境 4 · 歷史 7
+  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
 [政策] L50 全景 · 尾版 593 · import 0 · 提及 71 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
@@ -35,10 +35,10 @@
   [OK] ① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節 · VDF_InputUniverse_SSOT_v0101.json
   [OK] ② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED · {'2026-09-29': 'GREEN', '2026-09-30': 'YELLOW', '2026-10-01': 'RED'}
   [OK] ③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊) · {'2026-09-29': (2, 2, 2, 2, 'GREEN'), '2026-09-30': (2, 1, 2, 1, 'YELLOW'), '2026-10-01': (1, 0, 1, 0, 'YELLOW')}
-  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmpgil5hmb_/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmpgil5hmb_/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
+  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmpkxsudjep/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmpkxsudjep/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
   [OK] ⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵) · ([], [])
   [OK] ⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)
-  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmpgil5hmb_/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
+  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmpkxsudjep/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
   [OK] ⑧ 資料家不可用 = NODATA(不假寫)
   [OK] ⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock) · ('RELOCK', 'VIA_Workflow_VDF_SSOT_v0104.json')
   [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在
@@ -113,7 +113,7 @@
   [計] VDF_SystemManager v0128 本版 4/4 · 前版 PASS · 合計 PASS
 === VDF_SystemManager v0129 · 薄尾自測(activate:啟動前改 → 讀庫 → U/I)===
   [OK] ① 改動格式:大類=日期 / default 收;斜線日期 · 空大類 · 空值 拒(不猜) · ([('start', 'TW_MARKET', '2022-01-01'), ('start', 'FIN', 'default'), ('add', 'TW_FIN', ['2330', '3324'])], ['--start MACRO=2022/01/01:要 大類=YYYY-MM-DD 或 大類=default(起始日只能按大類改)', '--start =2022-01-01:要 大類=YYYY-MM-DD 或 大類=default(起始日只能按大類改)', '--remove INTL_FIN=:要 族群=值[,值]'])
-  [OK] ② 沒給 --apply = 乾跑:成員帳本一個位元都沒動;改動列成計畫(edit 黃) · e6d004827afa3e5a
+  [OK] ② 沒給 --apply = 乾跑:成員帳本一個位元都沒動;改動列成計畫(edit 黃) · -
   [OK] ③ 四步都跑:現況 · 改動 · 讀庫 · U/I(頁寫 VIA_Reports,不碰倉內已追蹤的 ui_support 頁) · 2
   [OK] ④ 格式錯的改動 = edit RED · 整體 RED(rc 1);拼錯動詞照前版拒跑 rc 2 · (1, 2)
   [OK] ⑤ 結束環境還原(不留 VIA_FROM_VCGC / VIA_FROM_VDFSM)· 報告寫 VIA_Reports/vdf/activate
@@ -125,30 +125,7 @@
   [OK] ③ 參數錯照 argparse 拒(rc 2);結束環境還原
   [OK] ④ refill 進動詞表;加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不寫同意閘 / 不讀 FRED 鑰
   [計] VDF_SystemManager v0130 本版 4/4 · 前版 PASS · 合計 PASS
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
-<unknown>:3: SyntaxWarning: invalid escape sequence '\V'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
-<unknown>:670: SyntaxWarning: invalid escape sequence '\d'
 usage: refill [-h] [--groups GROUPS] [--as-of AS_OF] [--home HOME] [--apply]
               [--timeout TIMEOUT] [--json]
 refill: error: unrecognized arguments: --nope
-[監控] 背景全景監控中 pid 13775 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 320 提交 · 快照 60.7h · 未推 3 · 未登 13 支(Invoke-VIA-AzureFlowQA · Invoke-VIA-AzureFlowQA-Scheduled · Invoke-VIAAzureFlowQASystem …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 638 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 353 提交 · 快照 62.7h · 未登 15 支(Enhanced_PDFTable_Part1_Candidate_b20261005 · Invoke-VIA-AzureFlowQA · Invoke-VIA-AzureFlowQA-Scheduled …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

@@ -126,7 +126,8 @@ def _central_regex_v0119() -> dict:
             "date": re.compile(pat("RX_TIME_CONTENT_DATE", r"(20[2-3]\d)[./年\-](\d{1,2})[./月\-](\d{1,2})日?")),
             "email": re.compile(pat("RX_EMAIL_STD", r"[\w.+-]+@[\w-]+\.[\w.-]+")),
             "tel": re.compile("(" + pat("RX_TEL_TAIPEI", r"(?:\+?886[- ]?2|\(02\)|02)[- ]?\d{4}[- ]?\d{4}")
-                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}") + ")"),
+                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}")
+                              + "|" + pat("RX_TEL_TW_ANY", r"(?:\+?886[-\s]?|\(0\d\)\s?|0)\d(?:[-\s]?\d){7,9}") + ")"),
             "date_en": re.compile(pat("RX_DATE_ENGLISH",
                 r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(\d{4})")),
             "rating": re.compile("(?i)(" + "|".join(_wordish_v0119(t) for t in rating) + ")"),
@@ -134,7 +135,14 @@ def _central_regex_v0119() -> dict:
                              + r")[^\d]{0,15}((?:\d{1,3}(?:,\d{3})+|\d{2,5})(?:\.\d+)?)"),
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
+            "tp_ntd": re.compile(pat("RX_TARGET_PRICE_NTD",
+                r"(?:NT\$|NT\s?\$|目標價[:：]?\s*)\s*([0-9][0-9,]*\.?\d*)")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
+            "rating_code": {str(a).lower(): (std, e.get("code"))
+                            for std, e in (syn.get("RATING_CODEBOOK_MASTER") or {}).items()
+                            for a in e.get("aliases", [])},
+            "quarter": re.compile(pat("RX_YEAR_QUARTER", r"(?:(?:20)?\d{2}(?:\.|\s*)?Q[1-4])")),
+            "tw_fin": dict(syn.get("TW_FIN_DICT") or {}),
             "name_zh": re.compile(pat("RX_NAME_ZH", r"[\u4e00-\u9fa5]{2,4}")),
             "name_en": re.compile("(" + pat("RX_NAME_EN_STD", r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b")
                                   + "|" + pat("RX_NAME_EN_SURNAME_FIRST", r"\b[A-Z][A-Z]+(?:\s+[A-Z][a-zA-Z\-]+){1,3}\b")
@@ -171,7 +179,10 @@ _TP_UNIT_BAD = ("張", "億", "萬", "股", "倍", "%", "％", "年")
 
 
 def _tp_ok_v0119(v: float) -> bool:
-    """年份樣數值不是目標價(實測紅:儒鴻 target_price=2026)。"""
+    """年份樣數值不是目標價(實測紅:儒鴻 target_price=2026);
+    0/負值不是目標價(實測紅批1657:MQ-1560 OCR 道 TP=0.0)。"""
+    if not (0 < float(v) < 100000):
+        return False
     return not (float(v).is_integer() and re.fullmatch(r"20[2-4]\d", str(int(v))))
 
 
@@ -192,6 +203,11 @@ def _target_price_v0119(crx, *texts) -> float | None:
                 if _tp_ok_v0119(v2):
                     return v2
     for t in texts:
+        for m in crx["tp_ntd"].finditer(t):   # NT$ 前綴式(上傳 v0101 實證)先於泛防禦式
+            v = float(m.group(1).replace(",", "")) if m.group(1) else None
+            if v and _tp_ok_v0119(v) and t[m.end():m.end() + 1] not in _TP_UNIT_BAD:
+                return v
+    for t in texts:
         for m in crx["tp_defense"].finditer(t):
             n = re.search(r"[\d,]+(?:\.\d+)?", m.group(0))
             if not n:
@@ -208,8 +224,8 @@ _RATING_REITERATE = ("維持", "重申", "Reiterate", "Maintain")
 
 def _pick_rating_v0119(crx, info: str, whole: str):
     """評等揀選(實測紅兩案):「維持」「重申」是重申詞不是評等,跳過續找實體評等;
-    超短 ASCII 碼(SS/N/OP…≤2 字母)只在含 評等/Rating/投資建議 的行收,防假命中。"""
-    reit = None
+    超短 ASCII 碼(SS/N/OP…≤2 字母)只在含 評等/Rating/投資建議 的行收,防假命中;
+    全文只有重申詞沒有實體評等=誠實 None(實測紅批1657:宏致 rating=維持)。"""
     for t in (info, whole):
         for m in crx["rating"].finditer(t):
             w = m.group(1)
@@ -220,13 +236,12 @@ def _pick_rating_v0119(crx, info: str, whole: str):
                 if not any(k in line for k in ("評等", "Rating", "rating", "投資建議", "建議")):
                     continue
             if w in _RATING_REITERATE:
-                reit = reit or w
                 continue
             return w
-    return reit
+    return None
 
 
-def _fn_analyst_v0119(stem: str, crx) -> str | None:
+def _fn_analyst_v0119(stem: str, crx, company: str | None = None) -> str | None:
     """檔名中的分析師名(實測紅:KGI 式 …_代號 公司_姓名_日期,name 卻 null)。
     代號獨立成段時其下一段視為公司名跳過;首段視為券商;餘 2–4 字純中文段取最後一個。"""
     segs = [x.strip() for x in re.split(r"[_\-]", stem) if x.strip()]
@@ -235,9 +250,11 @@ def _fn_analyst_v0119(stem: str, crx) -> str | None:
     if code_i is not None and not re.search(r"[\u4e00-\u9fa5]", segs[code_i]) and code_i + 1 < len(segs):
         skip.add(code_i + 1)
     bm = PRIOR._broker_map()
+    comp0 = (company or "").replace("-KY", "")
     cands = [sg for i, sg in enumerate(segs)
              if i not in skip and i != 0 and crx["name_zh"].fullmatch(sg)
-             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)]
+             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)
+             and sg not in (company, comp0)]   # 公司名不是分析師(實測紅:志強)
     return cands[-1] if cands else None
 
 
@@ -253,20 +270,74 @@ def _open_pdf_v0119(path: Path):
         return None, f"開檔失敗 {type(exc).__name__}: {str(exc)[:80]}"
 
 
+def _split_parts_v0119(bs, horizontal: bool, W: float) -> list:
+    """資訊區拆獨立元件(批1657 操作員令「拆成獨立後識別」):
+    側欄(左/右切出)→ **上下拆**(縱向空隙 >14pt 斷);帶狀(上/下切出)→ **左右拆**(x 中線分群)。
+    每件帶 bbox/text/kind(矩陣/表格/長句/文字),獨立識別用。"""
+    parts = []
+    if horizontal:
+        for b in sorted(bs, key=lambda b: b[1]):
+            if parts and b[1] - parts[-1]["bbox"][3] <= 14:
+                p = parts[-1]
+                p["text"] += "\n" + b[4]
+                p["bbox"] = [min(p["bbox"][0], b[0]), min(p["bbox"][1], b[1]),
+                             max(p["bbox"][2], b[2]), max(p["bbox"][3], b[3])]
+            else:
+                parts.append({"bbox": [b[0], b[1], b[2], b[3]], "text": b[4]})
+    else:
+        sides = {"L": [], "R": []}
+        for b in bs:
+            sides["L" if (b[0] + b[2]) / 2 <= W / 2 else "R"].append(b)
+        for k in ("L", "R"):
+            if sides[k]:
+                bb = sides[k]
+                parts.append({"bbox": [min(b[0] for b in bb), min(b[1] for b in bb),
+                                       max(b[2] for b in bb), max(b[3] for b in bb)],
+                              "text": "\n".join(b[4] for b in sorted(bb, key=lambda b: (b[1], b[0])))})
+    for p in parts:
+        p["kind"] = _comp_kind_v0119(p["text"])
+        p["bbox"] = [round(v, 1) for v in p["bbox"]]
+    return parts
+
+
 def first_page_zones(doc) -> dict:
-    """首頁切兩區:本文區 vs 資訊區(左右皆可,關鍵詞密度定側;正典一、3)。"""
+    """首頁切兩區 v3(批1657 操作員令):側欄(左/右直切)之外,**資訊區在下方也認**(橫切);
+    右(左)側資訊區再**上下拆**、下方資訊區再**左右拆**成獨立元件(info_parts),拆成獨立後識別。
+    判側:關鍵詞密度(命中/區塊數);下方帶狀要命中數不輸側欄且密度較高才取(不誤搶左右版型);
+    top 不認(大標 KW 如「目標價上調」會誤搶);零命中退回左右命中比較(與前版同判,不退步)。"""
     page = doc[0]
-    W = page.rect.width
-    blocks = page.get_text("blocks")
-    left = "\n".join(b[4] for b in blocks if b[0] <= W * 0.58)
-    right = "\n".join(b[4] for b in blocks if b[0] > W * 0.58)
-    lh = sum(left.count(k) for k in _INFO_KW)
-    rh = sum(right.count(k) for k in _INFO_KW)
-    side = "right" if rh >= lh else "left"
-    info = right if side == "right" else left
-    main = left if side == "right" else right
+    W, H = page.rect.width, page.rect.height
+    blocks = [b for b in page.get_text("blocks") if (b[4] or "").strip()]
+
+    def _hits(bs):
+        t = "\n".join(b[4] for b in bs)
+        return sum(t.count(k) for k in _INFO_KW)
+
+    zones = {"left": [b for b in blocks if b[0] <= W * 0.58],
+             "right": [b for b in blocks if b[0] > W * 0.58],
+             "bottom": [b for b in blocks if b[1] >= H * 0.60]}
+    dens = {s: _hits(bs) / max(1, len(bs)) for s, bs in zones.items()}
+    s_best = max(("right", "left"), key=lambda s: dens[s])
+    bh, sh = _hits(zones["bottom"]), _hits(zones[s_best])
+    # 操作員令只兩型:側欄(左/右,上下拆)與下方帶狀(左右拆);top 不認——大標 KW(目標價上調)會誤搶
+    if bh and bh >= sh and dens["bottom"] > dens[s_best]:
+        side = "bottom"
+    elif sh:
+        side = s_best
+    else:
+        lh, rh = _hits(zones["left"]), _hits(zones["right"])
+        side = "right" if rh >= lh else "left"
+    info_bs = zones[side]
+    info_ids = {id(b) for b in info_bs}
+    main_bs = [b for b in blocks if id(b) not in info_ids]
+    axis = "x" if side in ("left", "right") else "y"
+    cut = W * 0.58 if axis == "x" else H * 0.60
+    info = "\n".join(b[4] for b in info_bs)
+    main = "\n".join(b[4] for b in main_bs)
     return {"info_side": side, "info_text": info, "main_text": main,
-            "info_kw_hits": max(rh, lh), "main_chars": len(main)}
+            "info_kw_hits": int(_hits(info_bs)), "main_chars": len(main),
+            "split_axis": axis, "split_at": round(cut, 1),
+            "info_parts": _split_parts_v0119(info_bs, horizontal=(axis == "x"), W=W)}
 
 
 def _yf_ticker_v0119(code: str) -> dict:
@@ -292,19 +363,28 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
         import yfinance
     except ImportError:
         return {"state": "UNAVAILABLE", "why": "yfinance 未裝"}
+    import contextlib, io, logging
+    logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+    _sink = io.StringIO()
     try:
         cands = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")
         if len(cands) == 1:   # 已定盤仍留另市後備(實測紅:上櫃股 .TW 404)
             cands.append(cands[0].replace(".TWO", ".X").replace(".TW", ".TWO").replace(".X", ".TW"))
         adj = raw = tk = None
-        for tk in cands:
-            adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
-            if adj is not None and not adj.empty:
-                raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
-                break
+        with contextlib.redirect_stderr(_sink), contextlib.redirect_stdout(_sink):   # 404 雜訊靜音(誠實態照回)
+            for tk in cands:
+                adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
+                if adj is not None and not adj.empty:
+                    raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+                    break
+        if adj is not None and not adj.empty:   # 實測紅(批1657):最新列 Close=NaN 未成交;取最後有效值
+            adj = adj[adj["Close"].notna()]
+        if raw is not None and not raw.empty:
+            raw = raw[raw["Close"].notna()]
         if adj is None or adj.empty:
-            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料,不猜"}
+            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料(或全 NaN),不猜"}
         out = {"state": "OK", "ticker_used": tk,
+               "price_lane": "yfinance(暫代;正式=VDF 網路統包 SUP_MDL740/AegisNexus)",
                "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
         if report_date:
             upto = adj[adj.index.strftime("%Y-%m-%d") <= report_date]
@@ -321,13 +401,40 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
         return {"state": "ERROR", "why": f"{type(exc).__name__}: {str(exc)[:80]}"}
 
 
+_FINLEX_CACHE = None
+
+
+def _fin_lex_v0119() -> frozenset:
+    """財報科目詞庫(SYNC ALL 之 fin_account 632 條,聯集冊尾版 + TW_FIN_DICT 16 詞):
+    財報頁偵測共用;正則樣式別名濾除,缺冊退 _FIN_KW 誠實。"""
+    global _FINLEX_CACHE
+    if _FINLEX_CACHE is None:
+        words = set(_FIN_KW) | set(_central_regex_v0119()["tw_fin"].keys())
+        try:
+            reg = HERE.parents[1] / "supportive modules" / "registry"
+            hits = sorted(reg.glob("VIA_SSOT_SynonymUnion_v*.json"))
+            d = json.loads(hits[-1].read_text(encoding="utf-8"))
+            for alias in (d.get("scopes", {}).get("fin_account") or {}):
+                a = str(alias).strip()
+                if 2 <= len(a) <= 8 and re.search(r"[\u4e00-\u9fff]", a) \
+                   and not re.search(r"[()\[\]?*+|\\]", a):
+                    words.add(a)
+        except (OSError, ValueError, KeyError) as exc:
+            words.add(f"_載冊失敗{type(exc).__name__}")   # 誠實記,不吞(偵測照 _FIN_KW 走)
+        _FINLEX_CACHE = frozenset(words)
+    return _FINLEX_CACHE
+
+
 def _fin_pages_v0119(doc) -> dict:
-    """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
+    """年度財務頁偵測:年份序列≥3 + 財報科目詞(fin_account 詞庫)≥2 + 數字密度;
+    回頁碼與樣本列,交 ENG400 表格梯。"""
     pages, sample = [], ""
+    lex = _fin_lex_v0119()
     for i in range(1, min(len(doc), 30)):   # 首頁另路(first_page_zones),財報頁從第 2 頁起(實測紅:p1 誤入)
         t = doc[i].get_text()
         years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
-        kws = sum(1 for k in _FIN_KW if k in t)
+        kws = sum(1 for k in lex if k in t)
+        kws = min(kws, 99)
         nums = len(re.findall(r"\d+\.\d+", t))
         if years >= 3 and kws >= 2 and nums >= 8:
             pages.append(i + 1)
@@ -341,6 +448,14 @@ def _fin_pages_v0119(doc) -> dict:
 
 _GENERIC_MAILBOX = {"research", "media_request", "service", "info", "contact", "support",
                     "ir", "sales", "admin", "webmaster", "marketing", "news", "press"}
+_EN_NAME_STOP = {"morgan", "broking", "securities", "research", "limited", "ltd", "capital",
+                 "markets", "group", "bank", "global", "asia", "taiwan", "equity", "report",
+                 "stanley", "sachs", "goldman", "questions", "requests", "media", "disclosure"}
+
+
+def _en_namish_v0119(c: str) -> bool:
+    """英文姓名候選不得含公司/機構詞(實測紅:Morgan Broking 被當人名)。"""
+    return not any(t.lower().strip(".,") in _EN_NAME_STOP for t in c.split())
 _ANALYST_PATTERNS = (r"(?:分析師|研究員)[::\s]*([\u4e00-\u9fa5]{2,4})(?![\u4e00-\u9fa5])",
                      r"(?<![\u4e00-\u9fa5])([\u4e00-\u9fa5]{2,3})\s*(?:分析師|研究員)執?筆?")
 
@@ -382,8 +497,9 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                and not any(w in c for w in tw) \
                and not any(w in c for w in _NAME_STOP) \
                and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
-                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
-                name, src = c, "info_zone"   # R1 姓名式驗證(中央冊 7 式):非姓名樣式不收
+                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)) \
+               and (not c.isascii() or _en_namish_v0119(c)):
+                name, src = c, "info_zone"   # R1 姓名式驗證 + EN 公司詞閘
                 break
     if name is None and title:   # R1 後備:職稱同行剝職稱;結果同樣過黑名單+姓名式
         for ln in lines:
@@ -414,7 +530,7 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                         name, src = c, "email_near"
                         break
                     me = crx["name_en"].search(c)
-                    if me and len(c) <= 40:
+                    if me and len(c) <= 40 and _en_namish_v0119(me.group(0)):
                         name, src = me.group(0), "email_near"
                         break
                 break
@@ -435,12 +551,20 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                 if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
                     broker_mail = target
                     break
+    coauthor = None
+    if name and name.isascii() and em and name_en:   # 名與信箱不同人=共同作者(實測紅:Michael Hung vs carrie.liu)
+        local_toks = {t.lower() for t in re.split(r"[._\-]+", em.group(0).partition("@")[0]) if t}
+        name_toks = {t.lower().strip(".,") for t in name.split()}
+        if not (local_toks & name_toks):
+            coauthor, name, src = name, name_en, "email_local(主作者=信箱持有人;原抽名列共同作者)"
+    if name is None and name_en:   # 後備:@前推名律(UBS/Citi 有信箱沒名)
+        name, src = name_en, "email_local"
     first = last = None   # 英文姓名分拆(操作員令:英文姓名要分拆好)
     if name_en:
         parts = name_en.split()
         if len(parts) >= 2:
             first, last = parts[0], parts[-1]
-    return {"analyst_name": name, "analyst_name_source": src,
+    return {"analyst_name": name, "analyst_name_source": src, "analyst_coauthor": coauthor,
             "analyst_contact_generic": bool(em) and ((not re.search(r"[A-Za-z]", em.group(0).partition("@")[0]))
                                                      or em.group(0).partition("@")[0].lower() in _GENERIC_MAILBOX),
             "analyst_title": title, "analyst_title_std": title_std,
@@ -570,8 +694,15 @@ def layout_check(path: str) -> dict:
                 continue
             sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
             p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
-            info_comps = p1["right" if z["info_side"] == "right" else "left"]
-            main_comps = p1["left" if z["info_side"] == "right" else "right"]
+            if z["info_side"] in ("left", "right"):
+                info_comps = p1[z["info_side"]]
+                main_comps = p1["left" if z["info_side"] == "right" else "right"]
+            else:   # 批1657:上/下帶狀資訊區——依切線分件(帶狀左右拆見 info_parts)
+                _all = p1["left"] + p1["right"]
+                _below = z["info_side"] == "bottom"
+                info_comps = [c for c in _all if ((c["bbox"][1] + c["bbox"][3]) / 2 > z["split_at"]) == _below]
+                _iid = {id(c) for c in info_comps}
+                main_comps = [c for c in _all if id(c) not in _iid]
             fps = _fin_pages_v0119(doc)["fin_pages"]
             fin_desc, comp_n = [], 0
             for pno in fps[:4]:
@@ -589,6 +720,7 @@ def layout_check(path: str) -> dict:
                          "info_has_text_and_table": ("文字" in _kind_tally_v0119(info_comps) or "長句" in _kind_tally_v0119(info_comps))
                                                     and ("表格" in _kind_tally_v0119(info_comps) or "矩陣" in _kind_tally_v0119(info_comps)),
                          "fin_pages": fin_desc or None, "fin_components": comp_n,
+                         "info_parts": len(z.get("info_parts") or []),   # 批1657:資訊區拆成獨立元件數
                          "extract_lane": lane, "lamp": lamp})
         except Exception as exc:
             rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
@@ -824,9 +956,17 @@ def reconstruct(path: str) -> dict:
             tp = _target_price_v0119(crx, z["info_text"], whole)
             c_date1 = _content_date_v0119(crx, whole)
             pz1 = fin_page_zones(doc[0])
-            info_comps = list(pz1[z["info_side"]])
+            if z["info_side"] in ("left", "right"):
+                info_comps = list(pz1[z["info_side"]])
+                cand_main = pz1["left" if z["info_side"] == "right" else "right"]
+            else:   # 批1657:資訊區在上/下——依切線把左右半的元件分到 info/main(帶狀再左右拆在 info_parts)
+                allc = pz1["left"] + pz1["right"]
+                below = z["info_side"] == "bottom"
+                info_comps = [c for c in allc if ((c["bbox"][1] + c["bbox"][3]) / 2 > z["split_at"]) == below]
+                iid = {id(c) for c in info_comps}
+                cand_main = [c for c in allc if id(c) not in iid]
             main_comps = []
-            for c in pz1["left" if z["info_side"] == "right" else "right"]:
+            for c in cand_main:
                 if _comp_kind_v0119(c["text"]) in ("表格", "矩陣"):   # 本文表格雜湊 → 移資訊區
                     info_comps.append(c)
                     moved += 1
@@ -842,6 +982,7 @@ def reconstruct(path: str) -> dict:
                 L.append(f"[{k}]")
                 L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
             L.append("")
+            zone12_end = len(L)   # REVERIFY 域界:區一+區二止(首輪只掃第一頁,同域才公平)
             for pno in [x for x in fps[:3] if x != 1]:
                 pz = fin_page_zones(doc[pno - 1])
                 L.append(f"PAGE {pno}")
@@ -856,21 +997,25 @@ def reconstruct(path: str) -> dict:
                          if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
-            rebuilt = "\n".join(L[6:])   # REVERIFY 只對三大區本體(表頭 6 行與 SUMMARY 不入,防自證污染)
-            rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
-                  "日期": _content_date_v0119(crx, rebuilt)}
+            rebuilt = "\n".join(L[6:zone12_end])   # REVERIFY=區一+區二(表頭/區三/SUMMARY 不入;實測紅:財報頁日期假性不一致)
+            rb_scan = re.sub(r"\s*\|\s*", " ", rebuilt)   # 去自家格線「|」(渲染物非原文;實測黃批1657:假性不一致)
+            rv = {"評等": _pick_rating_v0119(crx, rb_scan, ""), "目標價": _target_price_v0119(crx, rb_scan),
+                  "日期": _content_date_v0119(crx, rb_scan)}
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
             L += ["", "REVERIFY(重建後再識別驗證;LAYOUT NLP 支援到底)", "| 項目 | 首輪 | 重建後 | 判 |"]
-            rv_ok = True
+            rv_ok, rv_diff = True, {}
             for k in ("評等", "目標價", "日期"):
                 same = first[k] == rv[k]
                 rv_ok = rv_ok and same
+                if not same:   # 逐欄差異上報(實測黃批1657:~15 檔不一致,矩陣要能直指哪欄)
+                    rv_diff[k] = {"首輪": first[k], "重建後": rv[k]}
                 L.append("| %s | %s | %s | %s |" % (k, first[k] or "-", rv[k] or "-", "一致" if same else "不一致"))
             out_p = ui / ("RECON_" + q.stem + ".txt")
             out_p.write_text("\n".join(L), encoding="utf-8")
             rows.append({"filename": q.name, "state": "RECONSTRUCTED",
                          "pages": [1] + [x for x in fps[:3] if x != 1], "fn_locked": fn_lock,
                          "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
+                         **({"reverify_diff": rv_diff} if rv_diff else {}),
                          "extract_lane": lane, "nlp_hub": _nlp_v0119()["state"],
                          "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
         except Exception as exc:
@@ -880,6 +1025,26 @@ def reconstruct(path: str) -> dict:
             doc.close()
     return {"verb": "reconstruct", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-006",
             "cleaned_prev": removed, "reconstructed": len(rows), "rows": rows}
+
+
+_DOCX_CACHE = None
+
+
+def _docx_engine_v0119() -> dict:
+    """WORD TEXT 擷取正主座:VRN_ENG052_DocxEngine 尾版(梯 docx2python→python-docx→
+    內建 XML;extract_docx → (段落, 表格, 引擎名))。缺/壞=誠實 UNAVAILABLE(Zero-Hydra,不自建第二套)。"""
+    global _DOCX_CACHE
+    if _DOCX_CACHE is None:
+        try:
+            cands = sorted(HERE.glob("VRN_ENG052_DocxEngine_v*.py"), key=_vnum_v0119)
+            spec = importlib.util.spec_from_file_location("vrn_eng052_for_" + TAG, cands[-1])
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = mod
+            spec.loader.exec_module(mod)
+            _DOCX_CACHE = {"mod": mod, "state": "LOADED(" + cands[-1].stem.split("_")[-1] + ")"}
+        except Exception as exc:
+            _DOCX_CACHE = {"mod": None, "state": f"UNAVAILABLE {type(exc).__name__}"}
+    return _DOCX_CACHE
 
 
 def _acquire_text_v0119(path: Path, doc) -> tuple:
@@ -907,7 +1072,61 @@ def deepread_one(path: Path) -> dict:
            "fn_locked": bool(fn["report_date"] and fn["codes"] and fn["broker_std"])}
     # FILENAME 識別成功就鎖定(操作員令):三欄齊=鎖,內文互證只作佐證不改寫檔名欄
     if path.suffix.lower() != ".pdf":
-        row.update({"state": "NON_PDF_SKIP", "lamp": "黃", "next": "docx/txt 另路(不假裝讀過)"})
+        text, lane, note, ntab = None, None, "", 0
+        if path.suffix.lower() == ".docx":   # WORD TEXT 擷取(正主=ENG052 尾版)
+            eng = _docx_engine_v0119()
+            if eng["mod"] is not None:
+                try:
+                    paras, tables, engname = eng["mod"].extract_docx(path)
+                    ntab = len(tables)
+                    text = "\n".join(list(paras) + ["\t".join(str(c) for c in r) for t in tables for r in t])
+                    lane, note = "DOCX(ENG052)", f"{engname} · 段 {len(paras)} · 表 {ntab}"
+                except Exception as exc:
+                    note = f"ENG052 擷取失敗 {type(exc).__name__}"
+            else:
+                note = eng["state"]
+        elif path.suffix.lower() == ".txt":
+            try:
+                text, lane = path.read_text(encoding="utf-8", errors="replace"), "TXT"
+            except OSError as exc:
+                note = f"讀檔失敗 {type(exc).__name__}"
+        elif path.suffix.lower() == ".md":   # MARKDOWN 車道(正主=ENG085 尾版 repair_text)
+            try:
+                raw = path.read_text(encoding="utf-8", errors="replace")
+                try:
+                    cands = sorted(HERE.glob("VRN_ENG085_MarkdownRestore_v*.py"), key=_vnum_v0119)
+                    spec85 = importlib.util.spec_from_file_location("vrn_eng085_for_" + TAG, cands[-1])
+                    m85 = importlib.util.module_from_spec(spec85)
+                    spec85.loader.exec_module(m85)
+                    text, fixes = m85.repair_text(raw)
+                    lane, note = "MD(ENG085)", f"修復 {sum(fixes.values()) if isinstance(fixes, dict) else fixes} 處"
+                except Exception as exc:
+                    text, lane, note = raw, "MD(原文)", f"ENG085 不可用 {type(exc).__name__},原文照抽"
+            except OSError as exc:
+                note = f"讀檔失敗 {type(exc).__name__}"
+        elif path.suffix.lower() == ".doc":   # 舊版二進位 Word:無正主不假讀
+            note = "舊版 .doc 需轉檔車道(OmniFormat 候選/Word 另存 docx)"
+        if text and len(text.strip()) >= 20:
+            crx = _central_regex_v0119()
+            rtw = _pick_rating_v0119(crx, text, "")
+            row.update({"state": "DEEPREAD_" + ("DOCX" if lane.startswith("DOCX") else ("MD" if lane.startswith("MD") else "TXT")),
+                        "extract_lane": lane, "lane_note": note, "docx_tables": ntab,
+                        "content_date": _content_date_v0119(crx, text),
+                        "rating": rtw,
+                        "rating_std": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[0],
+                        "target_price": _target_price_v0119(crx, text),
+                        "size_h": PRIOR.size_h(row.get("size_bytes")), "lamp": "黃",
+                        "next": "平文擷取(docx 無固定版面;表格交表格梯 ENG058)"})
+            row.update(_analyst_v0119(text))
+            if row.get("analyst_name") is None or str(row.get("analyst_name") or "").isascii():
+                fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
+                if fnn:   # 中文優先律(平文車道同律)
+                    if row.get("analyst_name") and str(row["analyst_name"]).isascii() and row.get("analyst_name_en") is None:
+                        row["analyst_name_en"] = row["analyst_name"]
+                    row["analyst_name"], row["analyst_name_source"] = fnn, "filename(中文優先)"
+            return row
+        row.update({"state": "NON_PDF_SKIP", "lamp": "黃",
+                    "next": "另路(不假裝讀過)" + ((" · " + note) if note else "")})
         return row
     doc, why = _open_pdf_v0119(path)
     if doc is None:
@@ -953,6 +1172,7 @@ def deepread_one(path: Path) -> dict:
         tpv = _target_price_v0119(crx, info, whole)
         code = c_code or (fn["codes"][0] if fn["codes"] else None)
         row.update({"state": "DEEPREAD", "info_side": z["info_side"],
+                    "info_parts": len(z.get("info_parts") or []),
                     "content_date": c_date, "content_code": c_code, "content_broker": c_broker,
                     "date_match": "MATCH" if (c_date and c_date == fn["report_date"]) else
                                   ("MISS" if c_date and fn["report_date"] else "ONE_SIDE"),
@@ -960,7 +1180,10 @@ def deepread_one(path: Path) -> dict:
                                     ("MISS" if c_code and fn["codes"] else "ONE_SIDE"),
                     "broker_match": "MATCH" if (c_broker and c_broker == fn["broker_std"]) else
                                     ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
-                    "rating": rtw, "target_price": tpv,
+                    "rating": rtw,
+                    "rating_std": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[0],
+                    "rating_code": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[1],
+                    "target_price": tpv,
                     "bloomberg_ticker": f"{code} TT" if code else None})
         row["size_h"] = PRIOR.size_h(row.get("size_bytes"))
         comp, comp_src = fn.get("company_name"), "filename"
@@ -982,14 +1205,21 @@ def deepread_one(path: Path) -> dict:
         if code:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
+            ref = (row["external_price"] or {}).get("adj_close_before_report")
+            if tpv and ref:   # TP 合理性燈(實測紅批1657:宏致 TP=5000 vs 市價兩位數)
+                ratio = tpv / ref
+                if not (0.15 <= ratio <= 8.0):
+                    row["tp_sanity"] = f"可疑:TP/報告日前價={ratio:.1f}×(超出 0.15–8 帶),回查原文"
         row.update(fs)
         if src_broker:
             row["broker_source"] = src_broker
         row.update(_analyst_v0119(info, whole))
-        if row.get("analyst_name") is None:
-            fnn = _fn_analyst_v0119(path.stem, crx)
-            if fnn:
-                row["analyst_name"], row["analyst_name_source"] = fnn, "filename"   # R4
+        if row.get("analyst_name") is None or str(row.get("analyst_name") or "").isascii():
+            fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
+            if fnn:   # 中文優先律(操作員令):中文名為主,英文名齊次(name_en 照留)
+                if row.get("analyst_name") and str(row["analyst_name"]).isascii() and row.get("analyst_name_en") is None:
+                    row["analyst_name_en"] = row["analyst_name"]
+                row["analyst_name"], row["analyst_name_source"] = fnn, "filename(中文優先)"
         if row.get("content_broker") is None and row.get("analyst_broker"):
             row["content_broker"], row["broker_source"] = row["analyst_broker"], "email_domain"
             row["broker_match"] = ("MATCH" if row["content_broker"] == fn["broker_std"]
@@ -1009,6 +1239,33 @@ def deepread_one(path: Path) -> dict:
     return row
 
 
+_SCAN_NOTES: list = []   # 大小統計讀不到的單項(誠實帳,非驗證欄)
+
+
+def _scan_size_v0119(root: Path) -> int:
+    """夾層總大小(os.scandir 遞迴:遍歷時快取 metadata,批量最快;檔案給 stat)。"""
+    if root.is_file():
+        try:
+            return root.stat().st_size
+        except OSError:
+            return 0
+    total = 0
+    try:
+        with os.scandir(root) as it:
+            for e in it:
+                try:
+                    if e.is_file(follow_symlinks=False):
+                        total += e.stat(follow_symlinks=False).st_size
+                    elif e.is_dir(follow_symlinks=False):
+                        total += _scan_size_v0119(Path(e.path))
+                except OSError as exc:
+                    _SCAN_NOTES.append(f"{e.name}: {type(exc).__name__}")   # 誠實記,照數其餘
+                    continue
+    except OSError:
+        return total
+    return total
+
+
 def deepread(path: str) -> dict:
     """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
     removed = _fresh_outputs_v0119("deepread")   # 清場律:先刪前次結果
@@ -1024,9 +1281,128 @@ def deepread(path: str) -> dict:
                              "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         else:
             skipped += 1
+    total = _scan_size_v0119(p)   # os.scandir 批量統計(Top6 之 3:快取 metadata 少 syscalls)
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
             "cleaned_prev": removed, "total_files": len(files), "stock_reports": len(rows),
-            "non_stock_skipped": skipped, "rows": rows}
+            "non_stock_skipped": skipped,
+            "folder_size_bytes": total, "folder_size_h": PRIOR.size_h(total), "rows": rows}
+
+
+def real_test(path: str, max_min: int = 45) -> dict:
+    """實測清點判定(批1657 操作員令「有功能的指令全 PY 寫+加速器;PS 只做啟動與 HTML U/I」):
+    原 Invoke-VIA-RealTest-VRN-v0103.ps1 的**判定段**(L41-47)PY 化入管——
+    ① 樣本數 ② 近 N 分鐘 VRN 輸出清點 ③ CGC_MDL249 check 尾判行 ④ realtest/paste.md 風險行 ⑤ 總判。
+    雙軌引擎(ENG399/393/394/396)照走 via-vcgc 各自動詞;本動詞只做清點與判定,不重跑引擎。
+    .ps1 零觸碰(L70);PS 剩啟動與開頁。"""
+    import subprocess, time
+    via = HERE.parents[1]
+    errors, verdicts = [], []
+    base = Path(path)
+    n_samples = len([q for q in base.rglob("*") if q.suffix.lower() in (".pdf", ".docx", ".pptx")]) if base.is_dir() else 0
+    verdicts.append(f"[樣本] {base} · {n_samples} 件")
+    cutoff = time.time() - max_min * 60
+    outs = []
+    for d in (via / "VIA_Reports" / "vrn", HERE / "output_hub", via / "VIA_Reports" / "review"):
+        if d.is_dir():
+            outs += [q for q in d.rglob("*") if q.is_file() and q.suffix in (".parquet", ".duckdb", ".json", ".html")
+                     and q.stat().st_mtime > cutoff]
+    top = sorted(outs, key=lambda q: -q.stat().st_size)[:6]
+    verdicts.append("[清點] 本輪 VRN 輸出 %d 件:%s" % (len(outs), " · ".join(f"{q.name}({q.stat().st_size // 1024}KB)" for q in top)))
+    locks = sorted((via / "supportive modules" / "registry").glob("CGC_MDL249_DataFrameLock_v*.py"))
+    if locks:
+        try:
+            env = dict(os.environ, VIA_FROM_VCGC="YES", VIA_NO_OPEN="1")
+            cp = subprocess.run([sys.executable, str(locks[-1]), "check"], capture_output=True, text=True, timeout=600, env=env)
+            tail = [l for l in (cp.stdout or "").splitlines() if re.search(r"\[(計|GREEN|RED|YELLOW|FAIL)\]|總判", l)][-3:]
+            for l in tail:
+                (errors if re.search(r"RED|FAIL", l) else verdicts).append("[249] " + l.strip())
+            if not tail:
+                verdicts.append(f"[249] 無判決行(rc={cp.returncode};誠實記)")
+        except Exception as exc:   # 子行程層例外型別雜;誠實記型別不吞判
+            errors.append(f"[249] 跑不動 {type(exc).__name__}: {str(exc)[:60]}")
+    else:
+        verdicts.append("[249] CGC_MDL249 不在(誠實態,不假綠)")
+    pm = via / "VIA_Reports" / "vrn" / "realtest" / "paste.md"
+    if pm.is_file():
+        for l in pm.read_text(encoding="utf-8", errors="replace").splitlines()[:12]:
+            (errors if "[RED]" in l else verdicts).append("[風險] " + l)
+    else:
+        verdicts.append("[風險] realtest/paste.md 不在(ENG399 未跑或清場)")
+    ok = not errors and len(outs) > 0
+    verdicts.append("[判] " + ("成功:輸出清點 %d 件 · 249 無紅 · 風險無紅" % len(outs) if ok else "未成功:看紅字"))
+    return {"verb": "real-test", "manager": TAG, "state": "OK" if ok else "RED",
+            "samples": n_samples, "outputs_recent": len(outs), "max_min": max_min,
+            "verdicts": verdicts, "errors": errors, "lamp": "綠" if ok else "紅",
+            "rows": [{"filename": "(清點判定)", "lamp": "綠" if ok else "紅",
+                      "樣本": n_samples, "輸出": len(outs), "紅字": len(errors)}]}
+
+
+def vdf_fetch(args: list) -> dict:
+    """VRN↔VDF 相連指令(批1657 操作員令「寫一個指令連接 VDF SYSTEM MANAGER…支援擷取自資料庫或單獨擷取」):
+    經 VCGC 資料中介(CGC_MDL239 尾版)一線式要料——① 先讀庫(EngineBus 掃的 duckdb/Parquet 目錄);
+    ② 庫無/不夠新 → 轉交 VDF 項**單獨擷取**(預設乾跑 PLAN,--apply 才真跑;同意閘不代設);結果以 Parquet 回。
+    VRN 不直開 VDF 庫(CGC_MDL239 繞道燈);中介不在=誠實 UNAVAILABLE。
+    用法:vdf-fetch <table> [codes=2330,2317] [start=YYYY-MM-DD] [end=YYYY-MM-DD] [--apply]"""
+    table = args[0]
+    codes, start, end = None, "", ""
+    for a in args[1:]:
+        if a.startswith("codes="):
+            codes = [c.strip() for c in a[6:].split(",") if c.strip()]
+        elif a.startswith("start="):
+            start = a[6:]
+        elif a.startswith("end="):
+            end = a[4:]
+    reg = HERE.parents[1] / "supportive modules" / "registry"
+    hits = sorted(reg.glob("CGC_MDL239_DataBroker_v*.py"), key=_vnum_v0119)
+    if not hits:
+        return {"verb": "vdf-fetch", "manager": TAG, "state": "UNAVAILABLE", "lamp": "紅",
+                "why": "CGC_MDL239 資料中介不在:VRN 不直開 VDF 庫,誠實停",
+                "rows": [{"filename": table, "state": "UNAVAILABLE", "lamp": "紅"}]}
+    spec = importlib.util.spec_from_file_location("cgc239_for_vrnsm", str(hits[-1]))
+    bk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bk)
+    rec = bk.fetch(table, codes=codes, start=start, end=end,
+                   requester=f"VRN_SystemManager_{TAG}", apply="--apply" in args)
+    st = rec.get("state") or "?"
+    lamp = "綠" if st == "OK" else ("紅" if st == "RED" else "黃")
+    row = {"filename": table, "state": st, "codes": codes, "start": start or None, "end": end or None,
+           "parquet": rec.get("parquet") or None, "coverage": rec.get("coverage"),
+           "handoff": rec.get("handoff"), "why": rec.get("why") or None,
+           "broker": hits[-1].name, "lamp": lamp}
+    return {"verb": "vdf-fetch", "manager": TAG, "state": st, "lamp": lamp,
+            "broker": hits[-1].name, "record": rec, "rows": [row]}
+
+
+def emit_matrix_html(verb: str, result: dict) -> str:
+    """矩陣出頁 v0119 殼(批1657「跳出來的介面不動」案):頁首插**執行引擎戳**
+    (引擎檔名 + 檔案 mtime UTC + 出頁 UTC)——介面若不動,一看戳就知道是舊引擎/舊頁,不用猜。"""
+    import datetime
+    p = PRIOR.emit_matrix_html(verb, result)
+    try:
+        me = Path(__file__)
+        stamp = "引擎 %s · mtime %s · 出頁 %s UTC" % (
+            me.name,
+            datetime.datetime.utcfromtimestamp(me.stat().st_mtime).strftime("%m-%d %H:%M"),
+            datetime.datetime.utcnow().strftime("%m-%d %H:%M:%S"))
+        fp = Path(p)
+        h = fp.read_text(encoding="utf-8")
+        fp.write_text(h.replace("<h3>", "<h3>[" + stamp + "] · ", 1), encoding="utf-8")
+        print(f"  [引擎戳] {stamp}")
+    except OSError as exc:
+        print(f"  [引擎戳] 插入失敗 {type(exc).__name__}(頁照出,主流程照走)")
+    return p
+
+
+def _dump_result_v0119(verb: str, out: dict) -> None:
+    """結果落檔 RESULT_<verb>_latest.json(操作員貼回免撈 console;寫不進不擋主流程,誠實印)。"""
+    try:
+        ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+        ui.mkdir(parents=True, exist_ok=True)
+        fp = ui / f"RESULT_{verb}_latest.json"
+        fp.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"  [結果檔] {fp}")
+    except OSError as exc:
+        print(f"  [結果檔] 寫入失敗 {type(exc).__name__}(主流程照走)")
 
 
 def main(argv=None) -> int:
@@ -1043,7 +1419,8 @@ def main(argv=None) -> int:
             print("[拒跑] reconstruct <檔|夾>")
             return 2
         out = reconstruct(a[1])
-        PRIOR.emit_matrix_html("reconstruct", out)
+        emit_matrix_html("reconstruct", out)
+        _dump_result_v0119("reconstruct", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["layout-check"]:
@@ -1051,7 +1428,8 @@ def main(argv=None) -> int:
             print("[拒跑] layout-check <檔|夾>")
             return 2
         out = layout_check(a[1])
-        PRIOR.emit_matrix_html("layout_check", out)
+        emit_matrix_html("layout_check", out)
+        _dump_result_v0119("layout_check", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["deepread"]:
@@ -1059,9 +1437,28 @@ def main(argv=None) -> int:
             print("[拒跑] deepread <檔|夾>")
             return 2
         out = deepread(a[1])
-        PRIOR.emit_matrix_html("deepread", out)
+        emit_matrix_html("deepread", out)
+        _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
+    if a[:1] == ["vdf-fetch"]:   # 批1657:VRN↔VDF 相連(中介讀庫→轉交 VDF 單獨擷取)
+        if len(a) < 2:
+            print("[拒跑] vdf-fetch <table> [codes=…] [start=…] [end=…] [--apply]")
+            return 2
+        out = vdf_fetch(a[1:])
+        emit_matrix_html("vdf_fetch", out)
+        _dump_result_v0119("vdf_fetch", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1), default=str))
+        return 0 if out["state"] == "OK" else 1
+    if a[:1] == ["real-test"]:   # 批1657 PY 功能律:實測判定段 PY 化(PS 只啟動+開頁)
+        if len(a) < 2:
+            print("[拒跑] real-test <樣本夾> [分鐘窗]")
+            return 2
+        out = real_test(a[1], int(a[2]) if len(a) > 2 else 45)
+        emit_matrix_html("real_test", out)
+        _dump_result_v0119("real_test", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0 if out["state"] == "OK" else 1
     return PRIOR.main(args)   # intake/eps-check/reconcile/closeout 照前版鏈
 
 
@@ -1177,15 +1574,17 @@ def selftest() -> int:
             a4["analyst_name"] == "李明哲" and a4["analyst_name_en"] == "Michael Lee"
             and _central_regex_v0119()["name_en"].fullmatch("LEE Tzu-Yuan"))
         crx24 = _central_regex_v0119()
-        chk("㉔ 評等揀選:維持買進→買進(重申詞跳過)· SS 不在評等行不收 · 評等行內 SS 可收",
+        chk("㉔ 評等揀選:維持買進→買進(重申詞跳過)· SS 不在評等行不收 · 評等行內 SS 可收 · 只有重申詞=None",
             _pick_rating_v0119(crx24, "投資建議:維持買進,目標價280元", "") == "買進"
+            and _pick_rating_v0119(crx24, "對後市維持審慎看法\n", "") is None
             and _pick_rating_v0119(crx24, "GLASS FIBER\nSS 產線擴充", "") is None
             and _pick_rating_v0119(crx24, "評等:SS\n", "") == "SS"
-            and _pick_rating_v0119(crx24, "維持\n", "") == "維持")
-        chk("㉕ 目標價拒抓:2026 年份不收 · 5,000張不收 · 146元照收",
+            and _pick_rating_v0119(crx24, "維持\n", "") is None)
+        chk("㉕ 目標價拒抓:2026 年份不收 · 5,000張不收 · 146元照收 · 0.0 不收",
             _target_price_v0119(crx24, "目標價由 2026 年展望推導,上調至146元") == 146.0
             and _target_price_v0119(crx24, "目標 5,000張 成交") is None
-            and _target_price_v0119(crx24, "Target Price: 2026") is None)
+            and _target_price_v0119(crx24, "Target Price: 2026") is None
+            and _target_price_v0119(crx24, "目標價 0.0 元") is None)
         chk("㉖ 檔名姓名後備:凱基式取人名 · 華南式公司名不誤收",
             _fn_analyst_v0119("凱基投顧_1476 儒鴻_劉昃恩_20260519", crx24) == "劉昃恩"
             and _fn_analyst_v0119("凱基投顧_Takeaway_3605 宏致_張燾_20260917", crx24) == "張燾"
@@ -1242,6 +1641,55 @@ def selftest() -> int:
         chk("㊳ 公司名+人讀 SIZE 入列:合成檔 company 欄存在 · size_h 格式",
             "company_name" in r and r["size_h"].endswith(("KB", "MB", "B"))
             and r.get("company_source") in ("filename", "universe(VDF 資料家)", "VDF 車道待取(本地無 universe)"))
+        a10 = _analyst_v0119("Michael Hung\nAnalyst\ncarrie.liu@citi.com")
+        a11 = _analyst_v0119("Morgan Broking\nAnalyst\ngokul.hariharan@jpmorgan.com")
+        a12 = _analyst_v0119("x\njerry.su@ubs.com")
+        chk("㊴ 共同作者律+公司詞閘+推名後備:信箱持有人為主作者 · Morgan Broking≠人名 · 有信箱必有名 · 公司名≠分析師",
+            a10["analyst_name"] == "Carrie Liu" and a10["analyst_coauthor"] == "Michael Hung"
+            and a11["analyst_name"] == "Gokul Hariharan" and a11["analyst_coauthor"] is None
+            and a12["analyst_name"] == "Jerry Su"
+            and _fn_analyst_v0119("20251204兆豐個股報告-志強-KY(6768)", crx24, "志強-KY") is None)
+        _dump_result_v0119("deepread", out_b)
+        rc3 = reconstruct(str(td))
+        chk("㊵ REVERIFY 域=區一+區二 · 結果檔落地",
+            (Path(os.environ["VIA_VRN_UI_DIR"]) / "RESULT_deepread_latest.json").is_file()
+            and [x for x in rc3["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
+        lex = _fin_lex_v0119()
+        chk("㊶ SSOT 全接 VRN Manager:fin_account 詞庫>300 · 評等正碼 買進→Buy/2 SS→Strong_Sell/5 未評等→Not_Rated/0 · 季度式 25Q1 · TW_FIN_DICT 16",
+            len(lex) > 150 and "每股盈餘" in lex and "營業毛利" in lex
+            and crx24["rating_code"]["買進"] == ("Buy", 2)
+            and crx24["rating_code"]["ss"] == ("Strong_Sell", 5)
+            and crx24["rating_code"]["未評等"] == ("Not_Rated", 0)
+            and crx24["quarter"].search("25Q1 財測") and len(crx24["tw_fin"]) == 16
+            and r["rating_std"] == "Buy" and r["rating_code"] == 2)
+        chk("㊷ 上傳收割接線:全台手機電話可認 · NT$ 目標價式 · Equal-Weight→Hold/3",
+            crx24["tel"].search("0912-345-678")
+            and _target_price_v0119(crx24, "NT$ 1,085 維持") == 1085.0
+            and _pick_rating_v0119(crx24, "評等:Equal-Weight", "") == "Equal-Weight"
+            and crx24["rating_code"]["equal-weight"] == ("Hold", 3))
+        dx = _docx_engine_v0119()
+        if dx["mod"] is not None and hasattr(dx["mod"], "_selftest_make_docx"):
+            dpath = td / "華南投顧-9901-測試-Memo-20260101.docx"
+            dx["mod"]._selftest_make_docx(dpath, "評等:買進 目標價:NT$ 120 分析師 王小明 w@entrust.com.tw 2026/09/16",
+                                          [["項目", "2025", "2026"], ["EPS", "5.1", "6.2"]])
+            rdx = deepread_one(dpath)
+            chk("㊸ WORD TEXT 擷取車道:ENG052 正主 · 評等/目標價/券商域/表數出列",
+                rdx["state"] == "DEEPREAD_DOCX" and rdx["rating"] == "買進"
+                and rdx["target_price"] == 120.0 and rdx["docx_tables"] == 1
+                and rdx["analyst_broker"] == "HUANAN")
+        else:
+            chk("㊸ WORD 車道座誠實(ENG052 缺=UNAVAILABLE)", "UNAVAILABLE" in dx["state"] or dx["mod"] is None)
+        chk("㊹ 夾層大小批量統計(os.scandir):folder_size 欄>0 且人讀格式",
+            out_b.get("folder_size_bytes", 0) > 0 and out_b.get("folder_size_h", "").endswith(("KB", "MB", "B")))
+        (td / "凱基投顧_9906 測試公司_陳測試_20260101.md").write_text(
+            "# 測試公司(9906)\n評等:買進  目標價:NT$ 88\nJohn Doe Analyst\njohn.doe@kgi.com\n", encoding="utf-8")
+        rmd = deepread_one(td / "凱基投顧_9906 測試公司_陳測試_20260101.md")
+        (td / "舊檔-9905 測試-20260101.doc").write_bytes(b"\xd0\xcf\x11\xe0old-word")
+        rdoc = deepread_one(td / "舊檔-9905 測試-20260101.doc")
+        chk("㊺ MD 車道+中文優先+.doc 誠實:MD 抽評等/TP · 中文名陳測試優先(EN 齊次)· .doc 指路轉檔",
+            rmd["state"] == "DEEPREAD_MD" and rmd["rating"] == "買進" and rmd["target_price"] == 88.0
+            and rmd["analyst_name"] == "陳測試" and rmd["analyst_name_en"] in ("John Doe", "John Doe Analyst".replace(" Analyst", ""))
+            and rdoc["state"] == "NON_PDF_SKIP" and "轉檔" in rdoc["next"])
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
@@ -1291,9 +1739,53 @@ def selftest() -> int:
     chk("⑮ 英文日期式(MASTER):Jan 22, 2025 → 2025-01-22",
         _content_date_v0119(crx, "Report dated Jan 22, 2025") == "2025-01-22"
         and _content_date_v0119(crx, "2026/09/16") == "2026-09-16")
+    # 批1657 四向資訊區:下方帶狀(左右拆)· 右側欄(上下拆)· reconstruct 下方版型照走
+    import fitz as _fz
+    _d1 = _fz.open()
+    _pg = _d1.new_page(width=595, height=842)
+    _pg.insert_textbox(_fz.Rect(36, 60, 560, 420), "本文區:公司營運與產業展望討論。\n" * 8,
+                       fontname="china-t", fontsize=10)
+    _pg.insert_textbox(_fz.Rect(36, 560, 280, 800), "評等:買進\n目標價:NT$ 120\n2330 TT",
+                       fontname="china-t", fontsize=10)
+    _pg.insert_textbox(_fz.Rect(320, 560, 560, 800), "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw",
+                       fontname="china-t", fontsize=10)
+    _z1 = first_page_zones(_d1)
+    chk("㊼ 下方帶狀資訊區:info_side=bottom · 左右拆成 2 件 · 本文在上",
+        _z1["info_side"] == "bottom" and _z1["split_axis"] == "y"
+        and len(_z1["info_parts"]) == 2 and "評等" in _z1["info_text"] and "本文區" in _z1["main_text"])
+    _d2 = _fz.open()
+    _p2 = _d2.new_page(width=595, height=842)
+    _p2.insert_textbox(_fz.Rect(36, 60, 330, 700), "本文區:法說會後更新與展望。\n" * 8,
+                       fontname="china-t", fontsize=10)
+    _p2.insert_textbox(_fz.Rect(360, 60, 560, 200), "2330 TT\n評等:買進\n目標價:NT$ 850",
+                       fontname="china-t", fontsize=10)
+    _p2.insert_textbox(_fz.Rect(360, 320, 560, 460), "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw",
+                       fontname="china-t", fontsize=10)
+    _z2 = first_page_zones(_d2)
+    chk("㊽ 右側欄資訊區:info_side=right · 縱向空隙上下拆 ≥2 件 · 各件帶 kind",
+        _z2["info_side"] == "right" and len(_z2["info_parts"]) >= 2
+        and all(p.get("kind") for p in _z2["info_parts"]))
+    with tempfile.TemporaryDirectory() as _bt:
+        _bp = Path(_bt) / "測試-2330-下方資訊-20260101.pdf"
+        _d1.save(str(_bp))
+        _rb = reconstruct(str(_bp))["rows"][0]
+        chk("㊾ reconstruct 下方版型照走:RECONSTRUCTED · 不炸 ROW_ERROR",
+            _rb["state"] == "RECONSTRUCTED")
+    _d1.close()
+    _d2.close()
+    _vf = vdf_fetch(["tw_listings", "codes=2330"])
+    chk("㊿ vdf-fetch 相連口:經 CGC_MDL239 中介 · 回 state/record · 誠實態(OK/ABSENT/RED/黃)不吞",
+        _vf.get("verb") == "vdf-fetch" and _vf.get("state")
+        and (_vf["state"] == "UNAVAILABLE" or "record" in _vf))
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
+    with tempfile.TemporaryDirectory() as _rt:
+        _r = real_test(_rt, max_min=1)
+        chk("㊻ real-test PY 判定段(PS 只啟動):空夾=樣本 0 · 誠實 RED/綠 · 判決/清點行在",
+            _r["samples"] == 0 and _r["state"] in ("OK", "RED")
+            and any(l.startswith("[判]") for l in _r["verdicts"])
+            and any(l.startswith("[清點]") for l in _r["verdicts"]))
     for k in ("VIA_NO_NET", "VIA_NO_OPEN", "VIA_VRN_UI_DIR"):
         os.environ.pop(k, None)
     print("[計] VRN_SystemManager_v0119 自測 %d/%d · %s" % (p, p + f, "PASS" if f == 0 else "FAIL"))

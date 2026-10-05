@@ -60,12 +60,47 @@ via-vcgc run VRN_SystemManager deepread "C:\測試樣本報告"      # 首頁深
 via-vcgc run VRN_SystemManager layout-check "C:\測試樣本報告"  # 切割/階層/混排/文字修復驗證
 via-vcgc run VRN_SystemManager reconstruct "C:\測試樣本報告"   # 三大區重現+REVERIFY 再識別
 via-vcgc run VRN_SystemManager eps-check --report … --basic … --diluted …   # EPS 身分核對
+via-vcgc run VRN_SystemManager vdf-fetch tw_listings codes=2330 # VRN↔VDF 相連:中介讀庫→轉交 VDF 單獨擷取(--apply 真跑)
+via-vcgc run VRN_SystemManager real-test "C:\測試樣本報告"       # 實測清點判定(PY 功能律;PS 只啟動)
 via-vcgc registry-sync --apply                                  # 編號登錄(先 commit 再發號)
 ```
 今日新律索引:自動 U/I 矩陣(每動作)· 清場律 · FILENAME 鎖定律 · 斷句修復(接句點/標題不接/TRIM)·
 三大區(本文/資訊/財報)+REVERIFY · 梯=非OCR→NLP LAYOUT 修復鏈→輕OCR→重型 · 每步驟掛 LAYOUT NLP 座
 (SUP_MDL866+PRADDLE)· 分析師六律 R1–R6 · 券商短縮寫(MEGA/MCQ)+域名別名 · 頁圖/假ETF 不收 ·
 NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中央冊 · SYN +272 發號三零。
+批1657 新律:外部價 NaN 列濾除取最後有效收盤 · TP 0/負值拒收(OCR 道 0.0)· 只有重申詞(維持/重申)
+=評等誠實 None · TP 合理性燈(TP/報告日前價超出 0.15–8 帶=可疑回查)· REVERIFY 逐欄差異上報
+(`reverify_diff`:哪欄首輪/重建後各是什麼)· REVERIFY 掃描先去自家格線「|」(渲染物非原文)。
+批1657 三裁定(治理律首輪實行:母系統顯示 → AI+操作員裁 → 子系統落冊):① KEY_BRIDGE 不採用(正典短碼
+為主,記 VRN_FieldRules_SSOT_v0101 broker.key_bridge_ruling);② STRONG_BUY/STRONG_SELL 立獨立正典鍵
+(canon_map 4→6 鍵對齊六級碼冊,樞紐 glob 尾版自動讀);⑤ 包內三守衛入 ENG086 safe_broker 正本 v0120
+(標的段先排除/小寫短碼限檔名黏接/最長優先;drift same 86→90);③④ V 拆型與 K/C/M/S/V 五型=先舉證後裁
+(冊 ticker.pending_evidence,派 VDF 車道取 TWSE/TPEX ISIN 名冊)。
+批1657 版面升級(操作員令):首頁資訊區**三型**——左側欄/右側欄(再**上下拆**,縱向空隙>14pt 斷)
+/**下方帶狀**(再**左右拆**,x 中線分群);拆成獨立元件 `info_parts`(各帶 bbox/text/kind)再識別;
+下方帶狀判準=KW 命中數不輸側欄且密度較高(top 不認:大標 KW 會誤搶);layout-check/deepread 列帶
+`info_parts` 數;reconstruct/layout-check 依切線分件照走。矩陣頁首帶**引擎戳**(引擎檔名+mtime+出頁
+UTC)——介面不動一看戳即辨舊引擎/舊頁。
+
+## 四之二、治理律:子系統獨立性 · 母系統輔助性(操作員令 2026-10-05)
+- **子系統獨立性**:所有 SSOT / REGEX / 同義字 / 邏輯由**子系統(VRN)生成**——中央冊尾版
+  (Central_Synonym_Regex / SynonymUnion / Broker_Dict / ExtractRules)的 VRN 域條目一律出自
+  VRN 工作,VRN System Manager 是唯一載入與使用口(`_central_regex`/`_broker_map`/`_fin_lex`)。
+- **母系統輔助性**:母系統(VCGC)**只檢查衝突並顯示**(`via-vcgc ssot panorama` 七探針、
+  ENG088 drift 攤開列),**不裁定、不自動改**;修改由 **AI + 操作員**依顯示結果裁定後,
+  走子系統冊尾版落冊(只增不減不衝突)。
+- **VRN 統轄確認**:deepread / layout-check / reconstruct / eps-check / intake / reconcile /
+  closeout 全數經 VRN_SystemManager 動詞口(VIA_FROM_VCGC 閘 + 前版鏈),引擎(ENG052/085/
+  SUP_MDL866 NLP 座)只被 Manager 調度,不自行對外。
+
+## 四之三、PY 功能律(操作員令 2026-10-05 批1657)
+- **從 VRN 起,所有有功能的指令都用 PY 寫**,帶加速器橋(L103/L102:Celeritas 契約);
+  **PS 只負責啟動與連結 HTML U/I**,不帶判定邏輯(.ps1 零觸碰,L70)。
+- 首例落實:原 `Invoke-VIA-RealTest-VRN-v0103.ps1` 的判定段(輸出清點/249 判讀/風險判讀/總判)
+  PY 化為 `VRN_SystemManager real-test <樣本夾> [分鐘窗]`(矩陣+RESULT json 照出);雙軌引擎照走各自動詞。
+- **列管律**:VCGC FLOW 親子表(CGC_MDL223 v0101)加四族工具列(role=tool)——省TOKEN(CGC_MDL158)·
+  SSOT全景(CGC_MDL247)· 編號(CGC_MDL237)· 加速器(SUP_MDL737→Celeritas 尾版)· 網路(SUP_MDL740→AegisNexus 尾版);
+  工具列紅=擋動詞,與管理者列同權重。
 
 ## 五、掛載
 工作流:`VIA_Workflow_VRN_SSOT_v0105.json` **VRN-WKF009(single_stock_report)**,九步,

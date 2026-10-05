@@ -30,26 +30,17 @@
 [政策] L50 全景 · 尾版 593 · import 0 · 提及 71 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL265_VdfVrnReadiness_v0100.py(家族 core)
-=== CGC_MDL265_VdfVrnReadiness_v0100 · VCGC 母系統監控自測(零網路 · 不起 VCGC 子行程)===
-  [OK] ① token 卡 6/6 = GREEN;5/6 或 rc≠0 = RED
-  [OK] ② RunGate 判定行照讀;沒有判定行 + rc 1 = RED(不假綠)
-  [OK] ③ LKGC verdict RED = 不可用(修理改走 RunGate 補缺件)
-  [OK] ④ 修理計畫:只修不綠的家族 · 雙閘沒開 = GATED · LKGC 可用走 rollback(不給 --approve-remove = 不刪 base)
-  [OK] ⑤ 覆蓋率:子系統 VRN 的紅 = YELLOW 附歸屬(L111);VDF / VCGC 的紅 = RED;讀出 PY 加速 · VDF 網路比數 (YELLOW · bridge GREEN · celer RED · PY 加速 1796/1796 · VDF 網路 138/138)
-  [OK] ⑨ 雙閘只讀:沒開 = 關、兩個都開才算開;selftest 以外沒有任何一行寫 *_CONSENT(AI 永不代設) (寫入行 [])
-  [OK] ⑩ 帶加速器橋 + VDF 網路工具橋;不碰 TA-Lib(AST 查 import,不比對字串) (talib import 行 [])
-  [OK] ⑫ 歸屬:precheck owner 欄優先(VRN_SystemManager(L111) → VRN);沒有才看路徑;where 去掉 :行
-  [OK] ⑭ PS 短令在尾版 Register:via-activate-vdf · via_activate_vdf · 啟動VDF;兩章在;① VCGC 監控 CGC_MDL265 ② 交 VDF_SystemManager activate (Register-VIA-Commands-v0275.ps1)
-  [OK] ⑮ pwsh:Parser 0 錯 · 兩段各歸各的系統:① CGC_MDL265 --repair ② VDF_SystemManager activate(改動旗標 · --no-open · 操作台 --home)· 都包加速器 scope (CALL=run|CGC_MDL265_VdfVrnReadiness|--repair
-CALL=run|--family|vdf|VDF_SystemManager|activate|--start|TW_MARKET=2022-01-01|--apply|--no-open|--home|/db/x
-CALL=run|CGC_MDL261_UIEngine|build|--home|/db/x)
-  [OK] ⑯ -SkipCheck 只跑 VDF 段 · 陣列參數攤平(TW_FIN=2330,3324)· 互動行解析:大類=日期 → --start · +族群=值 → --add · -族群=值 → --remove · 看不懂 = 拒 (build|--home|/db/x
---- B
-CALL=run|--family|vdf|VDF_SystemManager|activate|--add|TW_FIN=2330,3324|--home|/db/x|--no-open
-CALL=run|CGC_MDL261_UIEngine|build|--home|/db/x
---- C
-EDIT=--start|TW_MARKET=2022-01-01;--add|TW_FIN=2330;--remove|TW_FIN=2330;True
-SCOPED=3)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL265_VdfVrnReadiness_v0101.py(家族 core)
   [計] CGC_MDL265_VdfVrnReadiness_v0100 自測 11/11 · PASS
-[監控] 背景全景監控中 pid 13775 · 觸碰 run CGC_MDL265_VdfVrnReadiness · 交接閘 RED · 落後 315 提交 · 快照 60.3h · 未登 13 支(Invoke-VIA-AzureFlowQA · Invoke-VIA-AzureFlowQA-Scheduled · Invoke-VIAAzureFlowQASystem …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ① v0100 自測照過(11 檢 · 含 pwsh mock)
+  [OK] ② 五個探測同時起(token · RunGate vdf / vrn · LKGC · 覆蓋率):各 0.6s,整輪 < 2s(依序要 3s)
+  [OK] ③ 顯示照原順序、判定照前版:vcgc → env×3 → repair → coverage;報告標 parallel
+  [OK] ④ 掃完存快取(鍵 = git HEAD + 工作區變動);同一棵樹再讀 = 命中
+  [OK] ⑤ 樹沒變再跑 = 覆蓋率沿用、不再起 precheck;燈照算;報告標 coverage_cached
+  [OK] ⑥ --fresh 一律重掃
+  [OK] ⑩ 快取鍵含內容指紋:已改過 / 未追蹤的檔再改 → 鍵變(清單一字不變也一樣);沒動 → 鍵不變;執行時寫的帳本只進清單不進內容(Codex #495 P1)
+  [OK] ⑦ 鍵不同 / 過期 / 空鍵都不命中
+  [OK] ⑧ --only coverage 只跑覆蓋率(命中快取 = 零子行程)
+  [OK] ⑨ 加速器橋 · 網路工具橋在;不碰 TA-Lib;不寫同意閘
+[計] CGC_MDL265_VdfVrnReadiness_v0101 自測 10/10 · v0100 鏈 PASS · PASS
+[監控] 背景全景監控中 pid 820 · 觸碰 run CGC_MDL265_VdfVrnReadiness · 交接閘 RED · 落後 355 提交 · 快照 63.4h · 未推 3 · 未登 15 支(Enhanced_PDFTable_Part1_Candidate_b20261005 · Invoke-VIA-AzureFlowQA · Invoke-VIA-AzureFlowQA-Scheduled …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
