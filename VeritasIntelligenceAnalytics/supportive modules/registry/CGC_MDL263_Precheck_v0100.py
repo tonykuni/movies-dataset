@@ -11,7 +11,7 @@ r"""CGC_MDL263_Precheck v0100 — via_precheck:一行動用 VCGC 全部檢查,�
   ④ ast     全景 AST 稽核(CGC_MDL158 scan:治理七類) ⑪ rungate   三家族境 RunGate(vdf · vrn · vap)
   ⑤ sync    元件 AST 編號同步乾跑(有編號就有註冊)  ⑫ matrix    引擎四態全景矩陣
   ⑥ number  編號只增稽核(遺失 · 改身分 · 重號)      ⑬ temp      DuckDB TEMP 鉤境覆蓋
-  ⑦ ssot    SSOT 全景(VCGC → VDF → VRN → SUP)
+  ⑦ ssot    SSOT 全景(VCGC → VDF → VRN → SUP)   ⑭ accel     25 加速器控制面(CGC_MDL156)
 每個發現:編號 PC-### · 類 · 說明 · 位置(檔:行)· 歸屬(L111:VDF / VRN 由子系統修;L70:舊 .ps1 出新版;凍結收容件不改)· 下一步。
 判讀:PINVER 若是薄尾釘自己家族的前版(<族>_vN-1)= 薄尾設計,記 INFO 不算黃;跨族釘版才算風險。
 用法:via-vcgc run CGC_MDL263_Precheck [--only 站,站] [--skip 站,站] [--json] · --selftest
@@ -117,6 +117,10 @@ def owner_of(path: str) -> str:
     p = (path or "").replace("\\", "/")
     if "/references/intake/" in p or "/intake/" in p or p.startswith("intake/"):
         return "凍結收容件(不改 · 列豁免名冊)"
+    if re.match(r"VRN-REQ\d+", p):
+        return "VRN_SystemManager(L111)"
+    if re.match(r"VDF-REQ\d+", p):
+        return "VDF_SystemManager(L111)"
     if "functional modules/VRN" in p or "70_VRN_Rules" in p or re.search(r"(^|/)VRN_", p):
         return "VRN_SystemManager(L111)"
     if "functional modules/VDF" in p or re.search(r"(^|/)VDF_", p):
@@ -177,12 +181,12 @@ def p_bridge(rc, out):
 def p_celer(rc, out):
     f = []
     for m in re.finditer(r"缺橋 (\S.*\.py)", out):
-        f.append({"cls": "ACCEL", "file": m.group(1).strip(), "line": 1, "detail": "CGC_MDL183:PY 缺加速器橋"})
+        f.append({"cls": "ACCEL", "file": m.group(1).strip(), "line": 1, "detail": "CGC_MDL183:PY 缺加速器橋", "lamp": "RED"})
     py = re.search(r"\[PY \][^\n]*", out); ps = re.search(r"\[PS \][^\n]*", out)
     new = re.search(r"基線外新缺 (\d+)", out); debt = re.search(r"既有債 (\d+)", out)
     if debt and int(debt.group(1)):
-        f.append({"cls": "PSTPL", "file": "", "line": 0, "detail": f"PS 既有債 {debt.group(1)} 支(L70:舊 .ps1 不改,出新版才補)"})
-    lamp = "RED" if (new and int(new.group(1))) else ("YELLOW" if f else "GREEN")
+        f.append({"cls": "PSTPL", "file": "", "line": 0, "detail": f"PS 既有債 {debt.group(1)} 支(L70:舊 .ps1 不改,出新版才補)", "lamp": "YELLOW"})
+    lamp = "RED" if (new and int(new.group(1))) else station_lamp(f, rc)
     return lamp, ((py.group(0).strip() if py else "") + " | " + (ps.group(0).strip() if ps else "")), f
 
 
@@ -200,8 +204,9 @@ def p_ast(rc, out):
         if cls == "PINVER" and is_tail_prior_pin(r.get("file", ""), r.get("detail", "")):
             info += 1
             continue
-        f.append({"cls": cls, "file": r.get("file", ""), "line": r.get("line", 0), "detail": r.get("detail", "")[:160]})
-    lamp = "GREEN" if not f else ("RED" if any(x["cls"] in ("TALIB", "ACCEL", "NET") for x in f) else "YELLOW")
+        f.append({"cls": cls, "file": r.get("file", ""), "line": r.get("line", 0), "detail": r.get("detail", "")[:160],
+                  "lamp": "RED" if cls in RED_CLASSES else "YELLOW"})
+    lamp = station_lamp(f, rc)
     return lamp, f"活檔 {d.get('files_scanned')} · 問題 {d.get('issues')} · 豁免 {sum((d.get('by_class_exempt') or {}).values())} · 薄尾前版釘 {info}(設計) · 待修 {len(f)}", f
 
 
@@ -253,8 +258,8 @@ def p_handoff(rc, out):
         pm = re.search(r"((?:functional|supportive) modules/[^'\"]+?\.(?:py|ps1))", rest)
         idm = re.search(r"'id': '([^']+)'", rest)
         f.append({"cls": cls, "file": pm.group(1) if pm else (idm.group(1) if idm else ""), "line": 0, "detail": f"{kind} {rest[:160]}", "lamp": m.group(1)})
-    lamp = "RED" if any(x["lamp"] == "RED" for x in f) else ("YELLOW" if f else ("GREEN" if rc == 0 else "YELLOW"))
-    return lamp, f"紅 {sum(1 for x in f if x['lamp'] == 'RED')} · 黃 {sum(1 for x in f if x['lamp'] == 'YELLOW')}(REQ_CHANGED 不計)", f
+    lamp = station_lamp(f, rc)
+    return lamp, f"凍結收容件 {sum(1 for x in f if is_frozen(x['file']))} 條記 INFO · 紅 {sum(1 for x in f if x['lamp'] == 'RED')} · 黃 {sum(1 for x in f if x['lamp'] == 'YELLOW')}(REQ_CHANGED 不計)", f
 
 
 def p_test(rc, out):
@@ -275,6 +280,15 @@ def p_rc(cls, ok_word=None):
         f = [] if lamp == "GREEN" else [{"cls": cls, "file": "", "line": 0, "detail": tail[0][:200]}]
         return lamp, f"rc {rc} · {tail[0][:140]}", f
     return parse
+
+
+def p_accel(rc, out):
+    m = re.search(r"\[CGC_MDL156\] (\w+) · (\d+)/(\d+)", out)
+    f = [{"cls": "OTHER", "file": "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py", "line": 0,
+          "detail": x.strip()[:180], "lamp": "RED"} for x in re.findall(r"\[FAIL [^\]]*\][^\n]*", out)]
+    if not m:
+        return "RED", f"rc {rc} · 讀不到控制面判決行", f
+    return ("GREEN" if m.group(1) == "GREEN" and not f else "RED"), m.group(0), f
 
 
 def p_temp(rc, out):
@@ -300,6 +314,7 @@ STATIONS = [
     ("rungate_vrn", "⑪ RunGate vrn", ["run", "CGC_MDL137_RunGate", "probe", "--family", "vrn"], p_rc("ENV")),
     ("rungate_vap", "⑪ RunGate vap", ["run", "CGC_MDL137_RunGate", "probe", "--family", "vap"], p_rc("ENV")),
     ("matrix", "⑫ 引擎四態全景矩陣", ["matrix"], p_rc("OTHER")),
+    ("accel", "⑭ 25 加速器控制面(CGC_MDL156)", ["run", "CGC_MDL156_VIAAcceleratorControl", "--selftest"], p_accel),
     ("temp", "⑬ DuckDB TEMP 鉤", ["run", "CGC_MDL262_DuckTempHook", "status"], p_temp),
 ]
 
@@ -317,14 +332,30 @@ def run_station(key, args, parser):
     return {"rc": rc, "secs": secs, "lamp": lamp, "summary": summ, "findings": f}
 
 
+RED_CLASSES = {"ACCEL", "NET", "TALIB", "SYSEXE"}
+
+
+def is_frozen(path: str) -> bool:
+    p = (path or "").replace("\\", "/")
+    return "/references/intake/" in p or "/intake/" in p or p.startswith("intake/")
+
+
+def station_lamp(findings: list, rc: int = 0) -> str:
+    live = [x for x in findings if not is_frozen(x.get("file", ""))]
+    if any(x.get("lamp") == "RED" for x in live):
+        return "RED"
+    return "YELLOW" if live else "GREEN"
+
+
 def number_findings(stations: dict) -> list:
     out, n = [], 0
     for key, st in stations.items():
         for x in st["findings"]:
             n += 1
             cls = x.get("cls", "OTHER")
+            frozen = is_frozen(x.get("file") or "")
             out.append({"id": f"PC-{n:03d}", "station": key, "class": cls, "class_zh": CLASS_ZH.get(cls, CLASS_ZH["OTHER"]),
-                        "lamp": x.get("lamp") or st["lamp"], "where": (x.get("file") or "") + (f":{x['line']}" if x.get("line") else ""),
+                        "lamp": "INFO" if frozen else (x.get("lamp") or ("RED" if cls in RED_CLASSES else "YELLOW")), "where": (x.get("file") or "") + (f":{x['line']}" if x.get("line") else ""),
                         "owner": owner_of(x.get("file") or ""), "detail": x.get("detail", "")})
     return out
 
@@ -358,20 +389,23 @@ def main(argv=None) -> int:
            "stations": {k: {kk: v for kk, v in s.items() if kk != "findings"} | {"n_findings": len(s["findings"])} for k, s in stations.items()},
            "findings": findings,
            "by_owner": {o: sum(1 for f in findings if f["owner"] == o) for o in sorted({f["owner"] for f in findings})},
-           "by_class": {c: sum(1 for f in findings if f["class"] == c) for c in sorted({f["class"] for f in findings})}}
+           "by_class": {c: sum(1 for f in findings if f["class"] == c) for c in sorted({f["class"] for f in findings})},
+           "by_lamp": {k: sum(1 for f in findings if f["lamp"] == k) for k in ("RED", "YELLOW", "INFO")}}
     d = VIA / "VIA_Reports" / "precheck"
     d.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     for name in (f"PRECHECK_{stamp}.json", "PRECHECK_latest.json"):
         (d / name).write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("\n  ===== [via_precheck] 發現(依歸屬)=====")
+    print("\n  ===== [via_precheck] 發現(依歸屬;INFO = 凍結收容件 / 不算燈)=====")
     for o, n in sorted(rep["by_owner"].items(), key=lambda kv: -kv[1]):
-        print(f"  {o:<34} {n:>4} 條")
-        for f in [x for x in findings if x["owner"] == o][:6]:
+        sub = [x for x in findings if x["owner"] == o]
+        cnt = {k: sum(1 for x in sub if x["lamp"] == k) for k in ("RED", "YELLOW", "INFO")}
+        print(f"  {o:<34} {n:>4} 條(紅 {cnt['RED']} · 黃 {cnt['YELLOW']} · INFO {cnt['INFO']})")
+        for f in sorted(sub, key=lambda x: {"RED": 0, "YELLOW": 1, "INFO": 2}[x["lamp"]])[:6]:
             print(f"     {f['id']} [{f['lamp']:<6}] {f['class']:<8} {f['where'][:70]:<70} {f['detail'][:70]}")
     if "--json" in a:
         print(json.dumps(rep, ensure_ascii=False, indent=1))
-    print(f"\n[via_precheck] {overall} · 站 {len(stations)} · 發現 {len(findings)} · 類 {rep['by_class']} · 報告 VIA_Reports/precheck/PRECHECK_latest.json")
+    print(f"\n[via_precheck] {overall} · 站 {len(stations)} · 發現 {len(findings)}(紅 {rep['by_lamp']['RED']} · 黃 {rep['by_lamp']['YELLOW']} · INFO {rep['by_lamp']['INFO']}) · 類 {rep['by_class']} · 報告 VIA_Reports/precheck/PRECHECK_latest.json")
     return {"GREEN": 0, "YELLOW": 2}.get(overall, 1)
 
 
@@ -395,7 +429,7 @@ def selftest() -> int:
     lamp, summ, f = p_bridge(0, "[橋掃] 四系總表 VDF/accel 138/138 (100.0%) · VDF/net 137/138 (99%) · ALL/accel 1796/1796")
     chk("③ 覆蓋率:任一 < 100% = 黃並列出", lamp == "YELLOW" and len(f) == 1 and "137/138" in f[0]["detail"], (lamp, f))
     lamp, summ, f = p_celer(1, "  [PY ] 掃描面 3390 · 帶橋 3366 · 缺 1\n   · 缺橋 functional modules/VRN/VRN_NewPlugins_v0102.py\n  [PS ] 掃描面 1045 · 既有債 50(L70) · **基線外新缺 0**")
-    chk("④ 政策閘:缺橋定位到檔 · 既有債黃 · 新缺 0 不紅", lamp == "YELLOW" and f[0]["file"].endswith("VRN_NewPlugins_v0102.py") and len(f) == 2, (lamp, f))
+    chk("④ 政策閘:缺橋定位到檔(本體缺橋 = 紅)· 既有債黃", lamp == "RED" and f[1]["lamp"] == "YELLOW" and f[0]["file"].endswith("VRN_NewPlugins_v0102.py") and len(f) == 2, (lamp, f))
     lamp, summ, f = p_number(0, "[編號只增稽核] YELLOW · 列 1 → 2 · 遺失 0 · 改身分 0 · 重號 0 · 冊內不一致 1")
     chk("⑤ 編號稽核:遺失 / 改身分 / 重號 = 紅;冊內不一致 = 黃", lamp == "YELLOW" and len(f) == 1, (lamp, f))
     lamp, summ, f = p_number(0, "遺失 0 · 改身分 2 · 重號 0")
@@ -407,9 +441,14 @@ def selftest() -> int:
     st = {"a": {"lamp": "GREEN", "findings": []}, "b": {"lamp": "YELLOW", "findings": [{"cls": "SYSEXE", "file": "supportive modules/registry/CGC_MDL244_A_v0100.py", "line": 74, "detail": "x"}]}}
     nf = number_findings(st)
     chk("⑨ 編號 PC-### · 類說明 · 位置檔:行 · 歸屬", nf[0]["id"] == "PC-001" and nf[0]["where"].endswith(":74") and nf[0]["owner"] == "VCGC" and "sys.executable" in nf[0]["class_zh"], nf)
+    chk("⑩b 凍結收容件 = INFO,不拉燈", station_lamp([{"file": "supportive modules/intake/X/a.py", "lamp": "RED"}]) == "GREEN"
+        and number_findings({"s": {"lamp": "RED", "findings": [{"cls": "ACCEL", "file": "functional modules/VRN/references/intake/a.py"}]}})[0]["lamp"] == "INFO")
     chk("⑩ 彙總:有紅 = RED · 有黃 = YELLOW · 全綠 = GREEN", aggregate(st) == "YELLOW" and aggregate({"x": {"lamp": "RED"}, "y": {"lamp": "GREEN"}}) == "RED")
-    chk("⑪ 站表 13 類全在(token · bridge · celer · ast · sync · number · ssot · sdd · handoff · test · rungate · matrix · temp)",
-        {k.split("_")[0] for k, *_ in STATIONS} == {"token", "bridge", "celer", "ast", "sync", "number", "ssot", "sdd", "handoff", "test", "rungate", "matrix", "temp"})
+    chk("⑪ 站表 14 類全在(token · bridge · celer · ast · sync · number · ssot · sdd · handoff · test · rungate · matrix · accel · temp)",
+        {k.split("_")[0] for k, *_ in STATIONS} == {"token", "bridge", "celer", "ast", "sync", "number", "ssot", "sdd", "handoff", "test", "rungate", "matrix", "accel", "temp"})
+    chk("⑪b 收據 id 歸屬:VRN-REQ → VRN · VDF-REQ → VDF", owner_of("VRN-REQ008:x").startswith("VRN") and owner_of("VDF-REQ004:y").startswith("VDF"))
+    lamp, summ, f = p_accel(1, "[CGC_MDL156] RED · 36/38 · accelerators=25\n  [FAIL 1/2] QuantGuard x\n  [FAIL 2/2] TA-Lib y")
+    chk("⑪c 控制面:FAIL 逐條定位", lamp == "RED" and len(f) == 2, (lamp, f))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 加速器橋 · 網路工具橋在(__future__ 之後)· 不碰 TA-Lib",
         "[VIA:ACCEL-BRIDGE:v0100]" in src and "[VIA:NET-BRIDGE:v0100]" in src and src.index("from __future__") < src.index("[VIA:ACCEL-BRIDGE:v0100]")
