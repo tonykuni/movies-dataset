@@ -1962,7 +1962,8 @@
         "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py",
         "Register-VIA-Commands-v0273.ps1",
         "Register-VIA-Commands-v0274.ps1",
-        "Register-VIA-Commands-v0275.ps1"
+        "Register-VIA-Commands-v0275.ps1",
+        "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0101.py"
       ],
       "timeout_seconds": 600
     },
@@ -2033,6 +2034,19 @@
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
       ],
       "timeout_seconds": 1500
+    },
+    "vdfvrn_readiness_v0101": {
+      "argv": [
+        "CGC_MDL265_VdfVrnReadiness_v0101",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL265_VdfVrnReadiness_v0101 自測 10/10 · v0100 鏈 PASS · PASS",
+      "scope": "CGC_MDL265 v0101 監控提速:五探測同時起(整輪 < 依序)· 顯示 / 判定照前版 · 覆蓋率快取(鍵 git HEAD + 工作區變動清單 + 變動 / 未追蹤程式 · 設定檔內容指紋,執行時寫的帳本除外;命中零子行程;--fresh 重掃;鍵不同 / 過期不命中)(VCGC-REQ170)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0101.py",
+        "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -4385,6 +4399,16 @@
       "next": "handoff test vdf_refill 實跑轉 VERIFIED",
       "case": "vdf_refill",
       "receipt": "docs/handoff/evidence/vdf_refill.json"
+    },
+    {
+      "id": "VCGC-REQ170:vdfvrn_readiness_v0101",
+      "requirement": "VCGC-REQ170",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdfvrn_readiness_v0101",
+      "next": "handoff test vdfvrn_readiness_v0101 實跑轉 VERIFIED",
+      "case": "vdfvrn_readiness_v0101",
+      "receipt": "docs/handoff/evidence/vdfvrn_readiness_v0101.json"
     }
   ]
 }
