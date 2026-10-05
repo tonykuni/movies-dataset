@@ -1,0 +1,8 @@
+{"_row": 0, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 1, "do": "token → functions → handoff check", "why": "第一步 · 必用卡 · 交接不從記憶推定"}
+{"_row": 1, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 2, "do": "新功能出新版號檔(L04);活冊只增不減;版號冊不就地改", "why": "R01"}
+{"_row": 2, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 3, "do": "先提交程式與冊", "why": "編號 updated_at 取 git 時間(R04)"}
+{"_row": 3, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 4, "do": "VIA_FROM_VCGC=YES via-vcgc registry-sync → registry-sync --apply", "why": "元件註冊(v0179 起新時間寫 UTC)"}
+{"_row": 4, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 5, "do": "via-vcgc run CGC_MDL237_NumberingSystem --apply --scope → audit", "why": "只登本批;遺失 0 · 改身分 0 · 重號 0 · 註冊完整性"}
+{"_row": 5, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 6, "do": "(鎖版工具才要)先登 candidate 列 → tools activate <家> <檔> → --apply", "why": "席位指標 · activated_at"}
+{"_row": 6, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 7, "do": "run CGC_MDL245_SDDValidator check → handoff test <case> → handoff checkpoint", "why": "X-* · 收據(v0102 相依集合變了就重跑)"}
+{"_row": 7, "_sub": "VCGC", "_book": "VIA_Registry_Architecture_SSOT", "_version": "v0100", "step": 8, "do": "提交 → PR → CI → merge commit", "why": "同步 GitHub"}

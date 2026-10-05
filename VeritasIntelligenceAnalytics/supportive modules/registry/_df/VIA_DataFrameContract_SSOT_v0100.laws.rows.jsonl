@@ -1,0 +1,11 @@
+{"_row": 0, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF01", "zh": "形狀律:一冊 = 一張或數張表;表 = rows 列表,每列扁平 dict,同一表每列同一組欄;dict-of-dicts 轉表時外層鍵進 `key` 欄"}
+{"_row": 1, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF02", "zh": "欄名律:snake_case ASCII,不含空白與符號;中文欄名保留在表頭冊 zh 欄,不當程式鍵"}
+{"_row": 2, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF03", "zh": "型別律:一欄一型(str / int / float / bool / date / datetime / json);數字不存字串;布林不存 'Y'/'N' 或 0/1 字串;缺值 = null,不用 '' / '-' / 'N/A'"}
+{"_row": 3, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF04", "zh": "時間律:date = 'YYYY-MM-DD';datetime = ISO-8601 含時區(+08:00 或 Z);不用 Excel 序號 / 民國年 / 'YYYYMMDD' 字串當程式鍵"}
+{"_row": 4, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF05", "zh": "巢狀律:格內不放 dict / list;必要時整塊 JSON 存 `payload_json` 字串欄,並在表頭冊註明"}
+{"_row": 5, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF06", "zh": "鍵律:每表至少一主鍵欄(或組合鍵),非空且不重複;跨冊引用以鍵不以列序;SSOT 冊的鍵 = 子系統|來源|表(L108 ②)"}
+{"_row": 6, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF07", "zh": "治理欄律:每列帶 sub(VCGC/VDF/VRN)· version · status(ACTIVE/DEPRECATED/RETIRED/DORMANT)· updated_at;只增不減,改版出新 version 不改舊列"}
+{"_row": 7, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF08", "zh": "檔案律:UTF-8 無 BOM · LF · JSON 用 ensure_ascii=False indent 1;大冊(>5 萬列)用 .jsonl 一列一 JSON;CSV 僅作交換,主本不用 CSV"}
+{"_row": 8, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF09", "zh": "鏡像律:主本可保原形狀;VCGC 出標準扁平鏡像 registry/_df/<族>_<版>.rows.jsonl 供 pandas.read_json(lines=True) 直讀;鏡像是衍生品,不手改"}
+{"_row": 9, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF10", "zh": "定案律:表進 VIA_Output_Header_SSOT 才算定案,CGC_MDL249 鎖帳;未定案的表由本引擎列入 Candidates(待審區,locked_by 留白)→ 操作員+AI 裁 → 進正冊"}
+{"_row": 10, "_sub": "VCGC", "_book": "VIA_DataFrameContract_SSOT", "_version": "v0100", "id": "DF11", "zh": "子系統律:VDF / VRN 的冊由各自 SystemManager 依本契約出新版;VCGC 只讀、只列、只鏡像,不改子系統冊(L111 ② / L114 ①)"}
