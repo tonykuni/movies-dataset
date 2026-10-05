@@ -74,6 +74,7 @@ def __getattr__(name):
 # ────────────────── 深讀律 v0119(抽取式全走 SSOT 冊,不散落) ──────────────────
 _INFO_KW = ("目標價", "評等", "收盤", "市值", "股價", "分析師", "Target", "Rating", "Close", "@", "Tel", "TEL", "電話")
 _TITLE_WORDS = ("分析師", "研究員", "協理", "資深副總", "Analyst", "Research")
+_NAME_STOP = ("聯絡", "地址", "免責", "客服", "本報告", "研究部", "部門", "Contact", "Disclaimer", "Address", "傳真")
 _FIN_KW = ("EPS", "每股盈餘", "營收", "淨利", "毛利", "ROE", "股本", "營業利益", "Revenue", "Net income", "稅後")
 _CRX_CACHE = None
 
@@ -134,6 +135,18 @@ def _central_regex_v0119() -> dict:
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
+            "name_zh": re.compile(pat("RX_NAME_ZH", r"[\u4e00-\u9fa5]{2,4}")),
+            "name_en": re.compile("(" + pat("RX_NAME_EN_STD", r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b")
+                                  + "|" + pat("RX_NAME_EN_SURNAME_FIRST", r"\b[A-Z][A-Z]+(?:\s+[A-Z][a-zA-Z\-]+){1,3}\b")
+                                  + "|" + pat("RX_NAME_EN_INITIALS", r"\b(?:[A-Z][a-z]+|[A-Z]\.)(?:\s+(?:[A-Z][a-z]+|[A-Z]\.)){1,3}\b") + ")"),
+            "name_mixed": re.compile(pat("RX_NAME_MIXED_PAREN",
+                r"([\u4e00-\u9fa5]{2,4})\s*\(([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\)")),
+            "name_mixed2": re.compile(pat("RX_NAME_MIXED_PLAIN",
+                r"([\u4e00-\u9fa5]{2,4})\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})")),
+            "val_methods": {k: (v.get("en", []) + v.get("zh", []))
+                            for k, v in (syn.get("VALUATION_METHOD_CODEBOOK") or {}).items()},
+            "job_titles": {k: (v.get("en", []) + v.get("zh", []))
+                           for k, v in (syn.get("JOB_TITLE_CODEBOOK") or {}).items()},
             "_notes": notes,
         }
     return _CRX_CACHE
@@ -154,21 +167,78 @@ def _content_date_v0119(crx, text: str) -> str | None:
     return None
 
 
+_TP_UNIT_BAD = ("張", "億", "萬", "股", "倍", "%", "％", "年")
+
+
+def _tp_ok_v0119(v: float) -> bool:
+    """年份樣數值不是目標價(實測紅:儒鴻 target_price=2026)。"""
+    return not (float(v).is_integer() and re.fullmatch(r"20[2-4]\d", str(int(v))))
+
+
 def _target_price_v0119(crx, *texts) -> float | None:
-    """目標價:剝詞(NT$/TWD/上看/元)→ 主式(同義字冊關鍵詞)→ MASTER 防禦式第二道。"""
+    """目標價:剝詞 → 主式逐候選(年份/張億萬股倍%尾拒抓)→ MASTER 防禦式第二道。"""
     for t in texts:
-        for s in crx["tp_strips"]:
-            t = t.replace(s, "")
-        m = crx["tp"].search(t)
-        if m:
-            return float(m.group(1).replace(",", ""))
+        for sp in crx["tp_strips"]:
+            t = t.replace(sp, "")
+        for m in crx["tp"].finditer(t):
+            if t[m.end():m.end() + 1] not in _TP_UNIT_BAD:
+                v = float(m.group(1).replace(",", ""))
+                if _tp_ok_v0119(v):
+                    return v
+            # 候選被拒(年份/單位)→ 30 字前瞻窗找真價(實測紅:「目標價由 2026 年…上調至146元」)
+            n2 = re.search(r"(?:\d{1,3}(?:,\d{3})+|\d{2,5})(?:\.\d+)?", t[m.end():m.end() + 30])
+            if n2 and t[m.end() + n2.end():m.end() + n2.end() + 1] not in _TP_UNIT_BAD:
+                v2 = float(n2.group(0).replace(",", ""))
+                if _tp_ok_v0119(v2):
+                    return v2
     for t in texts:
-        m = crx["tp_defense"].search(t)
-        if m:
+        for m in crx["tp_defense"].finditer(t):
             n = re.search(r"[\d,]+(?:\.\d+)?", m.group(0))
-            if n:
-                return float(n.group(0).replace(",", ""))
+            if not n:
+                continue
+            v = float(n.group(0).replace(",", ""))
+            if _tp_ok_v0119(v) and t[m.start() + n.end():m.start() + n.end() + 1] not in _TP_UNIT_BAD:
+                return v
     return None
+
+
+_BROKER_CONTENT_SKIP = {"first", "capital", "president", "long", "target", "mega"}
+_RATING_REITERATE = ("維持", "重申", "Reiterate", "Maintain")
+
+
+def _pick_rating_v0119(crx, info: str, whole: str):
+    """評等揀選(實測紅兩案):「維持」「重申」是重申詞不是評等,跳過續找實體評等;
+    超短 ASCII 碼(SS/N/OP…≤2 字母)只在含 評等/Rating/投資建議 的行收,防假命中。"""
+    reit = None
+    for t in (info, whole):
+        for m in crx["rating"].finditer(t):
+            w = m.group(1)
+            if w.isascii() and len(w) <= 2:
+                ls = t.rfind("\n", 0, m.start()) + 1
+                le = t.find("\n", m.end())
+                line = t[ls:(len(t) if le < 0 else le)]
+                if not any(k in line for k in ("評等", "Rating", "rating", "投資建議", "建議")):
+                    continue
+            if w in _RATING_REITERATE:
+                reit = reit or w
+                continue
+            return w
+    return reit
+
+
+def _fn_analyst_v0119(stem: str, crx) -> str | None:
+    """檔名中的分析師名(實測紅:KGI 式 …_代號 公司_姓名_日期,name 卻 null)。
+    代號獨立成段時其下一段視為公司名跳過;首段視為券商;餘 2–4 字純中文段取最後一個。"""
+    segs = [x.strip() for x in re.split(r"[_\-]", stem) if x.strip()]
+    code_i = next((i for i, sg in enumerate(segs) if re.search(r"(?<!\d)\d{4}(?!\d)", sg)), None)
+    skip = set()
+    if code_i is not None and not re.search(r"[\u4e00-\u9fa5]", segs[code_i]) and code_i + 1 < len(segs):
+        skip.add(code_i + 1)
+    bm = PRIOR._broker_map()
+    cands = [sg for i, sg in enumerate(segs)
+             if i not in skip and i != 0 and crx["name_zh"].fullmatch(sg)
+             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)]
+    return cands[-1] if cands else None
 
 
 def _open_pdf_v0119(path: Path):
@@ -223,11 +293,17 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
     except ImportError:
         return {"state": "UNAVAILABLE", "why": "yfinance 未裝"}
     try:
-        tk = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")[0]
-        adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
-        raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+        cands = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")
+        if len(cands) == 1:   # 已定盤仍留另市後備(實測紅:上櫃股 .TW 404)
+            cands.append(cands[0].replace(".TWO", ".X").replace(".TW", ".TWO").replace(".X", ".TW"))
+        adj = raw = tk = None
+        for tk in cands:
+            adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
+            if adj is not None and not adj.empty:
+                raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+                break
         if adj is None or adj.empty:
-            return {"state": "NODATA", "why": f"{tk} 無資料,不猜"}
+            return {"state": "NODATA", "why": f"{'/'.join(cands)} 皆無資料,不猜"}
         out = {"state": "OK", "ticker_used": tk,
                "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
         if report_date:
@@ -248,7 +324,7 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
 def _fin_pages_v0119(doc) -> dict:
     """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
     pages, sample = [], ""
-    for i in range(min(len(doc), 30)):
+    for i in range(1, min(len(doc), 30)):   # 首頁另路(first_page_zones),財報頁從第 2 頁起(實測紅:p1 誤入)
         t = doc[i].get_text()
         years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
         kws = sum(1 for k in _FIN_KW if k in t)
@@ -264,23 +340,222 @@ def _fin_pages_v0119(doc) -> dict:
 
 
 def _analyst_v0119(info: str) -> dict:
-    """資訊區抽分析師:email/台北+香港 tel 式(中央冊);name/title 取含職稱詞的行,抽不到誠實 None。"""
+    """資訊區抽分析師(操作員三律 2026-10-05):① @ 前通常是 ANALYST 英文姓名 →
+    analyst_name_en;② @ 後 domain 是 BROKER → analyst_broker(交互證);
+    ③ ANALYST 姓名通常在 職稱/電話/郵箱 區塊上方 → 上一~二行優先。抽不到誠實 None。"""
     crx = _central_regex_v0119()
     em = crx["email"].search(info)
     tel = crx["tel"].search(info)
-    name = title = None
-    for ln in info.splitlines():
-        for w in _TITLE_WORDS:
-            if w in ln:
-                title = w
-                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
-                name = cand[:30] or None
+    lines = [ln.strip() for ln in info.splitlines()]
+    name = title = title_std = None
+    jt = sorted(((a, std) for std, al in crx["job_titles"].items() for a in al),
+                key=lambda x: -len(x[0])) or [(w, None) for w in _TITLE_WORDS]
+    tw = tuple(a for a, _ in jt) + _TITLE_WORDS
+    blk = None
+    for i, ln in enumerate(lines):
+        if any(w in ln for w in tw) or crx["tel"].search(ln) or crx["email"].search(ln):
+            blk = i
+            break
+    for ln in lines:   # 職稱碼冊(JOB_TITLE_CODEBOOK)長別名先比;中文子串、英文邊界
+        for a, std in jt:
+            if (not a.isascii() and a in ln) or (a.isascii() and re.search(_wordish_v0119(a), ln)):
+                title, title_std = a, std
                 break
         if title:
             break
-    return {"analyst_name": name, "analyst_title": title,
+    if blk is not None:   # 律③:區塊上方短行、無數字無 @ = 姓名(標題詞黑名單;實測紅「聯絡方式」)
+        for j in range(blk - 1, max(blk - 3, -1), -1):
+            c = lines[j]
+            if c and len(c) <= 25 and "@" not in c and not re.search(r"\d", c) \
+               and not any(w in c for w in tw) \
+               and not any(w in c for w in _NAME_STOP) \
+               and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
+                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
+                name = c   # 姓名式驗證(中央冊 7 式):非姓名樣式不收
+                break
+    if name is None and title:   # 後備:職稱同行剝職稱
+        for ln in lines:
+            if title in ln:
+                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
+                name = cand[:30] or None
+                break
+    name_en = broker_mail = None
+    if name:   # 混合姓名拆欄:李明哲 (Michael Lee) / 王大明 David Wang
+        mm = crx["name_mixed"].fullmatch(name) or crx["name_mixed2"].fullmatch(name)
+        if mm:
+            name, name_en = mm.group(1), mm.group(2)
+    if em:
+        local, _, dom = em.group(0).partition("@")
+        if name_en is None and re.search(r"[A-Za-z]", local):   # 律①;數字信箱不是姓名;混合姓名已拆者優先
+            name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None
+        toks = dom.lower().split(".")
+        for alias, target in PRIOR._broker_map().items():   # 律②:短別名要 token 全等,長別名子串
+            if alias.isascii():
+                a = alias.lower()
+                if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
+                    broker_mail = target
+                    break
+    return {"analyst_name": name, "analyst_title": title, "analyst_title_std": title_std,
+            "analyst_name_en": name_en, "analyst_broker": broker_mail,
             "analyst_email": em.group(0) if em else None,
             "analyst_tel": tel.group(1).strip() if tel else None}
+
+
+def _repair_stats_v0119(text: str) -> dict:
+    """文字修復統計:字元/CJK/數字/壞字(�與控制碼);誠實照數。"""
+    bad = text.count("\ufffd") + sum(1 for ch in text if ord(ch) < 32 and ch not in "\n\t\r")
+    return {"chars": len(text.strip()), "cjk": len(re.findall(r"[\u4e00-\u9fff]", text)),
+            "digits": len(re.findall(r"\d", text)), "bad": bad}
+
+
+def _fresh_outputs_v0119(verb: str) -> list:
+    """實測清場律(操作員令 2026-10-05):每次實測先刪前一次該動詞輸出,避免混淆;回刪單。"""
+    ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+    removed = []
+    if ui.exists():
+        for f in ui.glob("*" + verb + "*"):
+            try:
+                f.unlink()
+                removed.append(f.name)
+            except OSError as exc:
+                removed.append(f"{f.name}(刪不掉 {type(exc).__name__})")
+    return removed
+
+
+def fin_page_zones(page) -> dict:
+    """財務頁切割(正典一、4):先左右切半,再各半依縱向空隙(>14pt)上下切成視覺元件。"""
+    W = page.rect.width
+    halves = {"left": [], "right": []}
+    for b in page.get_text("blocks"):
+        halves["left" if (b[0] + b[2]) / 2 <= W / 2 else "right"].append(b)
+    out = {}
+    for side, bs in halves.items():
+        bs.sort(key=lambda b: b[1])
+        comps = []
+        for b in bs:
+            if comps and b[1] - comps[-1]["bbox"][3] <= 14:
+                c = comps[-1]
+                c["bbox"] = [min(c["bbox"][0], b[0]), min(c["bbox"][1], b[1]),
+                             max(c["bbox"][2], b[2]), max(c["bbox"][3], b[3])]
+                c["text"] += "\n" + b[4]
+            else:
+                comps.append({"bbox": [round(b[0], 1), round(b[1], 1), round(b[2], 1), round(b[3], 1)],
+                              "text": b[4]})
+        out[side] = comps
+    return out
+
+
+def _comp_kind_v0119(text: str) -> str:
+    """元件類別(正典一、3:矩陣/表格/長句/文字):數字密度+行結構判;判不準寧給 文字。"""
+    t = text.strip()
+    if not t:
+        return "空"
+    lines = [ln for ln in t.splitlines() if ln.strip()]
+    ratio = len(re.findall(r"\d", t)) / max(len(t), 1)
+    nums = [len(re.findall(r"\d+(?:\.\d+)?", ln)) for ln in lines]
+    if len(lines) >= 3 and max(nums) >= 3 and ratio > 0.2:
+        return "矩陣" if all(n >= 3 for n in nums[1:]) else "表格"
+    if len(lines) >= 2 and max(nums) >= 2 and ratio > 0.12:
+        return "表格"
+    if len(t.replace("\n", "")) >= 36 and ratio < 0.12:   # CJK 密度高,總長判(行寬換行不吃虧)
+        return "長句"
+    return "文字"
+
+
+def _kind_tally_v0119(comps) -> str:
+    out = {}
+    for c in comps:
+        k = _comp_kind_v0119(c["text"])
+        out[k] = out.get(k, 0) + 1
+    return "".join(f"{k}{v}" for k, v in out.items()) or "-"
+
+
+def layout_check(path: str) -> dict:
+    """LAYOUT+文字修復實測:首頁左右本文/資訊 · 財務頁左右再上下元件 · 每區壞字統計;
+    先清前次結果(清場律)。只驗有代號的個股 PDF。"""
+    removed = _fresh_outputs_v0119("layout_check")
+    p = Path(path)
+    files = sorted([q for q in p.rglob("*.pdf")]) if p.is_dir() else [p]
+    rows = []
+    for q in files:
+        if not PRIOR.parse_filename(q.stem)["codes"]:
+            continue
+        doc, why = _open_pdf_v0119(q)
+        if doc is None:
+            rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
+            continue
+        try:
+            z = first_page_zones(doc)
+            sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
+            p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
+            info_comps = p1["right" if z["info_side"] == "right" else "left"]
+            main_comps = p1["left" if z["info_side"] == "right" else "right"]
+            fps = _fin_pages_v0119(doc)["fin_pages"]
+            fin_desc, comp_n = [], 0
+            for pno in fps[:4]:
+                fz = fin_page_zones(doc[pno - 1])
+                comp_n += len(fz["left"]) + len(fz["right"])
+                fin_desc.append(f"p{pno}:L{len(fz['left'])}/R{len(fz['right'])}·"
+                                f"{_kind_tally_v0119(fz['left'] + fz['right'])}")
+            bad = sm["bad"] + si["bad"]
+            lamp = "綠" if sm["chars"] and si["chars"] and bad == 0 else ("黃" if sm["chars"] or si["chars"] else "紅")
+            rows.append({"filename": q.name, "state": "LAYOUT_CHECK", "info_side": z["info_side"],
+                         "main_chars": sm["chars"], "main_cjk": sm["cjk"], "info_chars": si["chars"],
+                         "info_digits": si["digits"], "bad_chars": bad,
+                         "info_types": _kind_tally_v0119(info_comps), "main_types": _kind_tally_v0119(main_comps),
+                         "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
+        finally:
+            doc.close()
+    return {"verb": "layout_check", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-005",
+            "cleaned_prev": removed, "checked": len(rows), "rows": rows}
+
+
+def compute_fin_ratios(f: dict) -> dict:
+    """財報比率分析(操作員 2026-10-05;TWSE/TPEX 用字,公式正本=中央冊 FIN_RATIO_CODEBOOK):
+    輸入欄位字典(鍵用 TWSE/TPEX 中文用字,成長率配「上期」前綴鍵)→ 29 式;缺欄/除零誠實 None。"""
+    def g(*ks):
+        for k in ks:
+            v = f.get(k)
+            if v is not None:
+                try:
+                    return float(v)
+                except (TypeError, ValueError):
+                    return None
+        return None
+
+    def div(a, b):
+        return round(a / b, 4) if a is not None and b not in (None, 0) else None
+
+    rev, gp, op, ni = g("營業收入"), g("營業毛利"), g("營業利益"), g("本期淨利")
+    eq, ta, tl = g("股東權益"), g("總資產"), g("總負債")
+    ca, cl, inv, cogs = g("流動資產"), g("流動負債"), g("存貨"), g("銷貨成本")
+    ebit, ebitda, ie = g("EBIT", "息稅前利益"), g("EBITDA"), g("利息費用")
+    shares, price, eps = g("流通在外股數"), g("股價"), g("EPS", "每股盈餘")
+    wc = (ca - cl) if ca is not None and cl is not None else None
+    out = {
+        "毛利率": div(gp, rev), "營業利益率": div(op, rev), "稅後淨利率": div(ni, rev),
+        "ROE": div(ni, eq), "ROA": div(ni, ta),
+        "應收帳款週轉率": div(rev, g("平均應收帳款", "應收帳款")),
+        "存貨週轉率": div(cogs, g("平均存貨", "存貨")),
+        "總資產週轉率": div(rev, g("平均總資產", "總資產")),
+        "應付帳款週轉率": div(cogs, g("平均應付帳款", "應付帳款")),
+        "營運資金週轉率": div(rev, wc),
+        "負債比率": div(tl, ta), "權益比率": div(eq, ta), "流動比率": div(ca, cl),
+        "速動比率": div((ca - inv) if ca is not None and inv is not None else None, cl),
+        "利息保障倍數": div(ebit, ie),
+        "本益比": div(price, eps), "殖利率": div(g("每股股利", "DPS"), price),
+        "股價淨值比": div(price, g("每股淨值", "BVPS")),
+        "EV/EBITDA": div(g("企業價值", "EV"), ebitda),
+        "BVPS": div(eq, shares), "DPS": div(g("現金股利總額", "現金股利"), shares),
+        "EBIT利益率": div(ebit, rev), "EBITDA利益率": div(ebitda, rev),
+    }
+    for nm, cur, prev in (("營收成長率", "營業收入", "上期營業收入"), ("毛利成長率", "營業毛利", "上期營業毛利"),
+                          ("營業利益成長率", "營業利益", "上期營業利益"), ("淨利成長率", "本期淨利", "上期本期淨利"),
+                          ("EPS成長率", "EPS", "上期EPS")):
+        c, p0 = g(cur), g(prev)
+        out[nm] = round((c - p0) / p0, 4) if c is not None and p0 not in (None, 0) else None
+    out["PEG"] = div(out["本益比"], out["EPS成長率"] * 100 if out["EPS成長率"] else None)
+    return out
 
 
 def deepread_one(path: Path) -> dict:
@@ -306,11 +581,17 @@ def deepread_one(path: Path) -> dict:
         c_broker = None
         low = whole.lower()
         for alias, target in PRIOR._broker_map().items():
-            if (alias.isascii() and re.search(r"(?<![A-Za-z])" + re.escape(alias) + r"(?![A-Za-z])", low)) \
-               or (not alias.isascii() and alias in low):
+            if alias.isascii():
+                a = alias.lower()
+                if len(a) <= 2 or a in _BROKER_CONTENT_SKIP:   # 批413 精神:短碼限檔名空間;常用英文詞內文不收
+                    continue
+                if re.search(r"(?<![A-Za-z])" + re.escape(alias) + r"(?![A-Za-z])", low):
+                    c_broker = target
+                    break
+            elif alias in low:
                 c_broker = target
                 break
-        rt = crx["rating"].search(info) or crx["rating"].search(whole)
+        rtw = _pick_rating_v0119(crx, info, whole)
         tpv = _target_price_v0119(crx, info, whole)
         code = c_code or (fn["codes"][0] if fn["codes"] else None)
         row.update({"state": "DEEPREAD", "info_side": z["info_side"],
@@ -321,12 +602,23 @@ def deepread_one(path: Path) -> dict:
                                     ("MISS" if c_code and fn["codes"] else "ONE_SIDE"),
                     "broker_match": "MATCH" if (c_broker and c_broker == fn["broker_std"]) else
                                     ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
-                    "rating": rt.group(1) if rt else None, "target_price": tpv,
+                    "rating": rtw, "target_price": tpv,
                     "bloomberg_ticker": f"{code} TT" if code else None})
         if code:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
         row.update(_analyst_v0119(info))
+        if row.get("analyst_name") is None:
+            fnn = _fn_analyst_v0119(path.stem, crx)
+            if fnn:
+                row["analyst_name"], row["analyst_name_source"] = fnn, "filename"
+        if row.get("content_broker") is None and row.get("analyst_broker"):
+            row["content_broker"], row["broker_source"] = row["analyst_broker"], "email_domain"
+            row["broker_match"] = ("MATCH" if row["content_broker"] == fn["broker_std"]
+                                   else ("MISS" if fn["broker_std"] else "ONE_SIDE"))
+        vm = sorted({std for std, al in crx["val_methods"].items() for a in al
+                     if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
+        row["valuation_methods"] = vm or None   # 估值法字典 × 資訊區+本文區核對
         row.update(_fin_pages_v0119(doc))
         hits = [row["date_match"], row["ticker_match"], row["broker_match"]].count("MATCH")
         row["lamp"] = "綠" if hits == 3 and tpv else ("黃" if hits else "紅")
@@ -337,6 +629,7 @@ def deepread_one(path: Path) -> dict:
 
 def deepread(path: str) -> dict:
     """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
+    removed = _fresh_outputs_v0119("deepread")   # 清場律:先刪前次結果
     p = Path(path)
     files = sorted([q for q in p.rglob("*") if q.suffix.lower() in PRIOR._DOC_EXTS]) if p.is_dir() else [p]
     rows, skipped = [], 0
@@ -346,8 +639,8 @@ def deepread(path: str) -> dict:
         else:
             skipped += 1
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
-            "total_files": len(files), "stock_reports": len(rows), "non_stock_skipped": skipped,
-            "rows": rows}
+            "cleaned_prev": removed, "total_files": len(files), "stock_reports": len(rows),
+            "non_stock_skipped": skipped, "rows": rows}
 
 
 def main(argv=None) -> int:
@@ -359,6 +652,14 @@ def main(argv=None) -> int:
         return selftest()
     as_json = "--json" in args
     a = [x for x in args if x != "--json"]
+    if a[:1] == ["layout-check"]:
+        if len(a) < 2:
+            print("[拒跑] layout-check <檔|夾>")
+            return 2
+        out = layout_check(a[1])
+        PRIOR.emit_matrix_html("layout_check", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0
     if a[:1] == ["deepread"]:
         if len(a) < 2:
             print("[拒跑] deepread <檔|夾>")
@@ -377,15 +678,24 @@ def _mk_pdf_v0119(path: Path):
     pg = doc.new_page(width=595, height=842)
     pg.insert_textbox(fitz.Rect(36, 60, 330, 700),
                       "SYNTHETIC SAMPLE 台積電法說會後更新。本文區:先進製程需求強勁,"
-                      "AI 動能延續。我們上修 2026 年預估。\n" * 6, fontname="china-t", fontsize=10)
+                      "AI 動能延續。我們上修 2026 年預估,評價採本益比法並以 DCF 交叉驗證。\n" * 6,
+                      fontname="china-t", fontsize=10)
     pg.insert_textbox(fitz.Rect(360, 60, 560, 700),
                       "2330 TT\n評等:買進\n目標價:NT$ 850\n收盤價:712\n"
-                      "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
+                      "王小明\n分析師\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
                       fontname="china-t", fontsize=10)
-    p2 = doc.new_page(width=595, height=842)
-    p2.insert_textbox(fitz.Rect(36, 60, 560, 700),
-                      "年度財務摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
-                      "淨利 838.5 1173.1 1450.2 1702.8\nEPS 32.34 45.25 55.93 65.67\nROE 26.0 30.1 32.2 33.5",
+    p2 = doc.new_page(width=595, height=842)   # 財務頁:左右各兩個視覺元件(上下切測試)
+    p2.insert_textbox(fitz.Rect(36, 60, 280, 300),
+                      "損益摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
+                      "淨利 838.5 1173.1 1450.2 1702.8", fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(36, 420, 280, 650),
+                      "資產負債摘要\n股本 259.3 259.3 259.3\n總資產 5532.2 6164.1 7021.8",
+                      fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(320, 60, 560, 300),
+                      "每股數據\nEPS 32.34 45.25 55.93 65.67\nROE 26.0 30.1 32.2 33.5",
+                      fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(320, 420, 560, 650),
+                      "現金流量\n營業現金流 1121.6 1452.7 1680.0\n自由現金流 265.1 303.9 410.2",
                       fontname="china-t", fontsize=10)
     doc.save(str(path))
     doc.close()
@@ -431,6 +741,59 @@ def selftest() -> int:
         chk("⑨ 夾層深讀:docx 誠實 NON_PDF_SKIP · 矩陣自動產出",
             any(x["state"] == "NON_PDF_SKIP" for x in out["rows"])
             and Path(PRIOR.emit_matrix_html("deepread", out)).is_file())
+        chk("⑯ 分析師三律:姓名在職稱上方=王小明 · @前英文名 Wang Xm · jane.doe@gs.com→GS",
+            r["analyst_name"] == "王小明" and r["analyst_name_en"] == "Wang Xm"
+            and _analyst_v0119("Jane Doe\nAnalyst\nTel: +852 2234 5678\njane.doe@gs.com")["analyst_broker"] == "GS"
+            and _analyst_v0119("Jane Doe\nAnalyst\njane.doe@gs.com")["analyst_name"] == "Jane Doe")
+        lc = layout_check(str(td))
+        row0 = lc["rows"][0]
+        chk("⑰ LAYOUT 實測:首頁右資訊 · 財務頁左右各≥2 元件(上下切)· 壞字 0",
+            row0["info_side"] == "right" and row0["fin_components"] >= 4
+            and row0["bad_chars"] == 0 and row0["lamp"] == "綠")
+        stale = Path(os.environ["VIA_VRN_UI_DIR"]) / "UI_MATRIX_layout_check_stale.html"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("舊結果", encoding="utf-8")
+        lc2 = layout_check(str(td))
+        chk("⑱ 清場律:實測前刪前次結果(stale 檔被刪且入刪單)",
+            not stale.exists() and any("stale" in x for x in lc2["cleaned_prev"]))
+        chk("⑲ 元件分類(矩陣/表格/長句/文字)+首頁財務頁帶類別",
+            _comp_kind_v0119("損益摘要\n營收 100.1 120.2 140.3\n淨利 10.1 12.2 14.3") in ("表格", "矩陣")
+            and _comp_kind_v0119("本公司受惠AI需求強勁,營運展望樂觀,預期下半年動能延續不墜,評價仍具吸引力。") == "長句"
+            and _comp_kind_v0119("評等:買進") == "文字"
+            and "表" in (lc2["rows"][0]["fin_pages"][0] + lc2["rows"][0]["info_types"]
+                         + lc2["rows"][0]["main_types"]).replace("矩陣", "表"))
+        a2 = _analyst_v0119("聯絡方式\n研究員\n9899@entrust.com.tw")
+        chk("⑳ 實測紅修:聯絡方式≠姓名 · 數字信箱≠英文名 · 財報頁不含首頁",
+            a2["analyst_name"] is None and a2["analyst_name_en"] is None
+            and a2["analyst_email"] == "9899@entrust.com.tw" and r["fin_pages"] == [2])
+        chk("㉑ 估值法字典 × 資訊區+本文區核對:本益比法→PER · DCF",
+            r["valuation_methods"] == ["DCF", "PER"])
+        a3 = _analyst_v0119("王小明\n資深分析師\n02-2345-6789")
+        chk("㉒ 職稱碼冊:資深分析師→SENIOR_ANALYST · 分析師→ANALYST",
+            a3["analyst_title_std"] == "SENIOR_ANALYST" and r["analyst_title_std"] == "ANALYST")
+        a4 = _analyst_v0119("李明哲 (Michael Lee)\n分析師\nml@kgi.com")
+        chk("㉓ 姓名式 7 式:混合名拆欄 李明哲/Michael Lee · 英文姓前名後可認",
+            a4["analyst_name"] == "李明哲" and a4["analyst_name_en"] == "Michael Lee"
+            and _central_regex_v0119()["name_en"].fullmatch("LEE Tzu-Yuan"))
+        crx24 = _central_regex_v0119()
+        chk("㉔ 評等揀選:維持買進→買進(重申詞跳過)· SS 不在評等行不收 · 評等行內 SS 可收",
+            _pick_rating_v0119(crx24, "投資建議:維持買進,目標價280元", "") == "買進"
+            and _pick_rating_v0119(crx24, "GLASS FIBER\nSS 產線擴充", "") is None
+            and _pick_rating_v0119(crx24, "評等:SS\n", "") == "SS"
+            and _pick_rating_v0119(crx24, "維持\n", "") == "維持")
+        chk("㉕ 目標價拒抓:2026 年份不收 · 5,000張不收 · 146元照收",
+            _target_price_v0119(crx24, "目標價由 2026 年展望推導,上調至146元") == 146.0
+            and _target_price_v0119(crx24, "目標 5,000張 成交") is None
+            and _target_price_v0119(crx24, "Target Price: 2026") is None)
+        chk("㉖ 檔名姓名後備:凱基式取人名 · 華南式公司名不誤收",
+            _fn_analyst_v0119("凱基投顧_1476 儒鴻_劉昃恩_20260519", crx24) == "劉昃恩"
+            and _fn_analyst_v0119("凱基投顧_Takeaway_3605 宏致_張燾_20260917", crx24) == "張燾"
+            and _fn_analyst_v0119("華南投顧-2606-裕民-1141202", crx24) is None)
+        fr = compute_fin_ratios({"營業收入": 1000, "營業毛利": 300, "本期淨利": 120, "股東權益": 800,
+                                 "總資產": 2000, "流通在外股數": 100, "股價": 60, "EPS": 1.2, "上期EPS": 1.0})
+        chk("㉗ 財報比率(TWSE/TPEX 用字):毛利率0.3 · ROE0.15 · BVPS8 · 本益比50 · EPS成長0.2 · 缺欄誠實None",
+            fr["毛利率"] == 0.3 and fr["ROE"] == 0.15 and fr["BVPS"] == 8.0
+            and fr["本益比"] == 50.0 and fr["EPS成長率"] == 0.2 and fr["流動比率"] is None)
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
