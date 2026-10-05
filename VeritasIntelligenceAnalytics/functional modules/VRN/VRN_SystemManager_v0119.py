@@ -1337,6 +1337,42 @@ def real_test(path: str, max_min: int = 45) -> dict:
                       "樣本": n_samples, "輸出": len(outs), "紅字": len(errors)}]}
 
 
+def vdf_fetch(args: list) -> dict:
+    """VRN↔VDF 相連指令(批1657 操作員令「寫一個指令連接 VDF SYSTEM MANAGER…支援擷取自資料庫或單獨擷取」):
+    經 VCGC 資料中介(CGC_MDL239 尾版)一線式要料——① 先讀庫(EngineBus 掃的 duckdb/Parquet 目錄);
+    ② 庫無/不夠新 → 轉交 VDF 項**單獨擷取**(預設乾跑 PLAN,--apply 才真跑;同意閘不代設);結果以 Parquet 回。
+    VRN 不直開 VDF 庫(CGC_MDL239 繞道燈);中介不在=誠實 UNAVAILABLE。
+    用法:vdf-fetch <table> [codes=2330,2317] [start=YYYY-MM-DD] [end=YYYY-MM-DD] [--apply]"""
+    table = args[0]
+    codes, start, end = None, "", ""
+    for a in args[1:]:
+        if a.startswith("codes="):
+            codes = [c.strip() for c in a[6:].split(",") if c.strip()]
+        elif a.startswith("start="):
+            start = a[6:]
+        elif a.startswith("end="):
+            end = a[4:]
+    reg = HERE.parents[1] / "supportive modules" / "registry"
+    hits = sorted(reg.glob("CGC_MDL239_DataBroker_v*.py"), key=_vnum_v0119)
+    if not hits:
+        return {"verb": "vdf-fetch", "manager": TAG, "state": "UNAVAILABLE", "lamp": "紅",
+                "why": "CGC_MDL239 資料中介不在:VRN 不直開 VDF 庫,誠實停",
+                "rows": [{"filename": table, "state": "UNAVAILABLE", "lamp": "紅"}]}
+    spec = importlib.util.spec_from_file_location("cgc239_for_vrnsm", str(hits[-1]))
+    bk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bk)
+    rec = bk.fetch(table, codes=codes, start=start, end=end,
+                   requester=f"VRN_SystemManager_{TAG}", apply="--apply" in args)
+    st = rec.get("state") or "?"
+    lamp = "綠" if st == "OK" else ("紅" if st == "RED" else "黃")
+    row = {"filename": table, "state": st, "codes": codes, "start": start or None, "end": end or None,
+           "parquet": rec.get("parquet") or None, "coverage": rec.get("coverage"),
+           "handoff": rec.get("handoff"), "why": rec.get("why") or None,
+           "broker": hits[-1].name, "lamp": lamp}
+    return {"verb": "vdf-fetch", "manager": TAG, "state": st, "lamp": lamp,
+            "broker": hits[-1].name, "record": rec, "rows": [row]}
+
+
 def emit_matrix_html(verb: str, result: dict) -> str:
     """矩陣出頁 v0119 殼(批1657「跳出來的介面不動」案):頁首插**執行引擎戳**
     (引擎檔名 + 檔案 mtime UTC + 出頁 UTC)——介面若不動,一看戳就知道是舊引擎/舊頁,不用猜。"""
@@ -1405,6 +1441,15 @@ def main(argv=None) -> int:
         _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
+    if a[:1] == ["vdf-fetch"]:   # 批1657:VRN↔VDF 相連(中介讀庫→轉交 VDF 單獨擷取)
+        if len(a) < 2:
+            print("[拒跑] vdf-fetch <table> [codes=…] [start=…] [end=…] [--apply]")
+            return 2
+        out = vdf_fetch(a[1:])
+        emit_matrix_html("vdf_fetch", out)
+        _dump_result_v0119("vdf_fetch", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1), default=str))
+        return 0 if out["state"] == "OK" else 1
     if a[:1] == ["real-test"]:   # 批1657 PY 功能律:實測判定段 PY 化(PS 只啟動+開頁)
         if len(a) < 2:
             print("[拒跑] real-test <樣本夾> [分鐘窗]")
@@ -1728,6 +1773,10 @@ def selftest() -> int:
             _rb["state"] == "RECONSTRUCTED")
     _d1.close()
     _d2.close()
+    _vf = vdf_fetch(["tw_listings", "codes=2330"])
+    chk("㊿ vdf-fetch 相連口:經 CGC_MDL239 中介 · 回 state/record · 誠實態(OK/ABSENT/RED/黃)不吞",
+        _vf.get("verb") == "vdf-fetch" and _vf.get("state")
+        and (_vf["state"] == "UNAVAILABLE" or "record" in _vf))
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)

@@ -60,6 +60,8 @@ via-vcgc run VRN_SystemManager deepread "C:\測試樣本報告"      # 首頁深
 via-vcgc run VRN_SystemManager layout-check "C:\測試樣本報告"  # 切割/階層/混排/文字修復驗證
 via-vcgc run VRN_SystemManager reconstruct "C:\測試樣本報告"   # 三大區重現+REVERIFY 再識別
 via-vcgc run VRN_SystemManager eps-check --report … --basic … --diluted …   # EPS 身分核對
+via-vcgc run VRN_SystemManager vdf-fetch tw_listings codes=2330 # VRN↔VDF 相連:中介讀庫→轉交 VDF 單獨擷取(--apply 真跑)
+via-vcgc run VRN_SystemManager real-test "C:\測試樣本報告"       # 實測清點判定(PY 功能律;PS 只啟動)
 via-vcgc registry-sync --apply                                  # 編號登錄(先 commit 再發號)
 ```
 今日新律索引:自動 U/I 矩陣(每動作)· 清場律 · FILENAME 鎖定律 · 斷句修復(接句點/標題不接/TRIM)·
