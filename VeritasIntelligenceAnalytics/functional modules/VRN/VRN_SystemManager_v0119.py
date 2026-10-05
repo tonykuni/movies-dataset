@@ -563,7 +563,11 @@ def layout_check(path: str) -> dict:
             rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
             continue
         try:   # 單檔不殺整批
-            z = first_page_zones(doc)
+            z, _w, lane, lnote = _acquire_text_v0119(q, doc)
+            if lane == "需OCR":
+                rows.append({"filename": q.name, "state": "NO_TEXT_LAYER", "lamp": "黃",
+                             "extract_lane": lane, "ocr_note": lnote})
+                continue
             sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
             p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
             info_comps = p1["right" if z["info_side"] == "right" else "left"]
@@ -584,7 +588,8 @@ def layout_check(path: str) -> dict:
                          "main_hier": _hier_tally_v0119(main_comps),   # 本文區依文字大小階層
                          "info_has_text_and_table": ("文字" in _kind_tally_v0119(info_comps) or "長句" in _kind_tally_v0119(info_comps))
                                                     and ("表格" in _kind_tally_v0119(info_comps) or "矩陣" in _kind_tally_v0119(info_comps)),
-                         "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
+                         "fin_pages": fin_desc or None, "fin_components": comp_n,
+                         "extract_lane": lane, "lamp": lamp})
         except Exception as exc:
             rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
                          "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
@@ -800,7 +805,12 @@ def reconstruct(path: str) -> dict:
             rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
             continue
         try:   # 單檔不殺整批
-            z = first_page_zones(doc)
+            z, whole0, lane, lnote = _acquire_text_v0119(q, doc)   # 統一核心,與 deepread 同梯
+            if lane == "需OCR":
+                rows.append({"filename": q.name, "state": "NO_TEXT_LAYER", "lamp": "黃",
+                             "extract_lane": lane, "ocr_note": lnote,
+                             "next": "無文字層 → OCR 車道(ENG400 四階梯)"})
+                continue
             fps = _fin_pages_v0119(doc)["fin_pages"]
             fn_lock = bool(fn["report_date"] and fn["codes"] and fn["broker_std"])
             L = ["FILENAME    | " + q.name + ("  [鎖定]" if fn_lock else ""),
@@ -846,7 +856,7 @@ def reconstruct(path: str) -> dict:
                          if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
-            rebuilt = "\n".join(L)   # REVERIFY:重建後再識別,對首輪
+            rebuilt = "\n".join(L[6:])   # REVERIFY 只對三大區本體(表頭 6 行與 SUMMARY 不入,防自證污染)
             rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
                   "日期": _content_date_v0119(crx, rebuilt)}
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
@@ -861,7 +871,7 @@ def reconstruct(path: str) -> dict:
             rows.append({"filename": q.name, "state": "RECONSTRUCTED",
                          "pages": [1] + [x for x in fps[:3] if x != 1], "fn_locked": fn_lock,
                          "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
-                         "nlp_hub": _nlp_v0119()["state"],
+                         "extract_lane": lane, "nlp_hub": _nlp_v0119()["state"],
                          "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
         except Exception as exc:
             rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
@@ -870,6 +880,22 @@ def reconstruct(path: str) -> dict:
             doc.close()
     return {"verb": "reconstruct", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-006",
             "cleaned_prev": removed, "reconstructed": len(rows), "rows": rows}
+
+
+def _acquire_text_v0119(path: Path, doc) -> tuple:
+    """統一取文核心(操作員令 2026-10-05「邏輯統一」:intake→deepread→layout-check→
+    reconstruct 三套不各自為政,梯只此一條):zones 原生取文,不足 40 字走梯
+    NLP LAYOUT 修復鏈 → 輕OCR → 需OCR 誠實。回 (zones, whole, lane, note)。"""
+    z = first_page_zones(doc)
+    whole = z["info_text"] + "\n" + z["main_text"]
+    if len(whole.strip()) >= 40:
+        return z, whole, "NON_OCR", ""
+    otxt, onote = _nlp_pdf_text_v0119(path)
+    if otxt is None:
+        otxt, onote = _ocr_light_v0119(path)
+    if otxt:
+        return z, otxt, ("NLP_LAYOUT" if onote.startswith("NLP_LAYOUT") else "輕OCR"), onote
+    return z, "", "需OCR", onote
 
 
 def deepread_one(path: Path) -> dict:
@@ -888,26 +914,20 @@ def deepread_one(path: Path) -> dict:
         row.update({"state": "UNREADABLE", "lamp": "紅", "why": why})
         return row
     try:
-        z = first_page_zones(doc)
         crx = _central_regex_v0119()
-        info, whole = z["info_text"], z["info_text"] + "\n" + z["main_text"]
-        row["extract_lane"] = "NON_OCR"
-        if len(whole.strip()) < 40:   # 無文字層 → 梯:NLP LAYOUT 修復鏈 → 輕OCR → 重型
-            otxt, onote = _nlp_pdf_text_v0119(path)
-            if otxt is None:
-                otxt, onote = _ocr_light_v0119(path)
-            if otxt:
-                row.update({"state": "DEEPREAD_OCR_LIGHT",
-                            "extract_lane": "NLP_LAYOUT" if onote.startswith("NLP_LAYOUT") else "輕OCR",
-                            "ocr_note": onote,
-                            "content_date": _content_date_v0119(crx, otxt),
-                            "rating": _pick_rating_v0119(crx, otxt, ""),
-                            "target_price": _target_price_v0119(crx, otxt), "lamp": "黃",
-                            "next": "輕OCR 平文擷取(無版面);全件還原走重型 ENG400"})
-                return row
-            row.update({"state": "NO_TEXT_LAYER", "lamp": "黃", "extract_lane": "需OCR",
-                        "ocr_note": onote,
+        z, whole, lane, lnote = _acquire_text_v0119(path, doc)
+        info = z["info_text"]
+        row["extract_lane"] = lane
+        if lane == "需OCR":
+            row.update({"state": "NO_TEXT_LAYER", "lamp": "黃", "ocr_note": lnote,
                         "next": "無文字層 → OCR 車道(ENG400 四階梯:輕 OCR → 重型)"})
+            return row
+        if lane != "NON_OCR":   # 梯取回平文(無版面):平文擷取,全件還原走重型
+            row.update({"state": "DEEPREAD_OCR_LIGHT", "ocr_note": lnote,
+                        "content_date": _content_date_v0119(crx, whole),
+                        "rating": _pick_rating_v0119(crx, whole, ""),
+                        "target_price": _target_price_v0119(crx, whole), "lamp": "黃",
+                        "next": "梯平文擷取(無版面);全件還原走重型 ENG400"})
             return row
         c_date = _content_date_v0119(crx, whole)
         tt = crx["tt_in_text"].search(whole)
@@ -1189,6 +1209,19 @@ def selftest() -> int:
             and any(x["state"] == "DEEPREAD" for x in out_b["rows"])
             and "VIA_VRN_NLP_LANE" in gate_note)
         bad.unlink()
+        blank2 = td / "UBS-9997 20260101.pdf"
+        import fitz as _f2
+        _d2 = _f2.open(); _d2.new_page(); _d2.save(str(blank2)); _d2.close()
+        d_row = deepread_one(blank2)
+        rc_u = reconstruct(str(td))
+        rc_blank = [x for x in rc_u["rows"] if x["filename"] == blank2.name][0]
+        lc_u = layout_check(str(td))
+        lc_blank = [x for x in lc_u["rows"] if x["filename"] == blank2.name][0]
+        chk("㊲ 邏輯統一核心:同一檔三動詞同態同梯(NO_TEXT_LAYER×3)· 良檔 REVERIFY 不受表頭污染",
+            d_row["state"] == rc_blank["state"] == lc_blank["state"] == "NO_TEXT_LAYER"
+            and d_row["extract_lane"] == rc_blank["extract_lane"] == lc_blank["extract_lane"]
+            and [x for x in rc_u["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
+        blank2.unlink()
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
