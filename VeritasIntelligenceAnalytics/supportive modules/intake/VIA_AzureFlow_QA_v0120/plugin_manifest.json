@@ -1,0 +1,79 @@
+{
+  "schema": "VIA_PLUGIN_MANIFEST/1.0",
+  "plugin_id": "via-azureflow-qa-plugin",
+  "display_name": "VIA 天青智流 AzureFlow QA Plug-in",
+  "version": "1.2.0",
+  "role": "standalone_subengine_and_system_facade",
+  "description_zh": "以 manifest 為單一契約，整合 AzureFlow v8 引擎／Job 唯讀檢查、VIA ZIP／E2E／standardized package 驗證、Windows Task Scheduler readiness 與明確 activation gate。",
+  "actions": [
+    {"id": "inspect", "label_zh": "只檢查 AzureFlow", "entrypoint": "scripts/via_azureflow_qa.py inspect"},
+    {"id": "verify", "label_zh": "只驗證 ZIP", "entrypoint": "scripts/via_azureflow_qa.py verify"},
+    {"id": "all", "label_zh": "完整 QA", "entrypoint": "scripts/via_azureflow_qa.py all"}
+  ],
+  "system_mode": {
+    "id": "complete_system",
+    "label_zh": "完整系統一鍵流程",
+    "entrypoint": "Invoke-VIAAzureFlowQASystem.ps1",
+    "python_entrypoint": "scripts/via_azureflow_qa_system.py",
+    "sequence": ["manifest_preflight", "inspect", "verify", "combined_handoff", "scheduler_readiness", "human_review_gate"],
+    "default_activation": "READY_FOR_WINDOWS_ACTIVATION",
+    "activation_switch": "-ActivateSchedule",
+    "automatic_registration": false
+  },
+  "entrypoints": {
+    "python_cli": "scripts/via_azureflow_qa.py",
+    "windows_launcher": "Invoke-VIA-AzureFlowQA.ps1",
+    "unified_system_python": "scripts/via_azureflow_qa_system.py",
+    "unified_system_windows": "Invoke-VIAAzureFlowQASystem.ps1",
+    "scheduled_runner": "scripts/Invoke-VIA-AzureFlowQA-Scheduled.ps1",
+    "task_registration": "scripts/Register-VIAAzureFlowQATask.ps1",
+    "task_test": "scripts/Test-VIAAzureFlowQATask.ps1",
+    "batch_example": "Run-VIAAzureFlowQAScheduled.cmd",
+    "standalone_ui": "templates/VIA_AzureFlow_QA_Standalone.html",
+    "interactive_architecture": "templates/VIA_AzureFlow_Windows_Deployment_Interactive.html",
+    "architecture_source": "references/VIA_AzureFlow_Windows_Deployment_Architecture.mmd"
+  },
+  "input_modes": ["Windows path", "drag_and_drop_zip", "manual_api_url", "local_workspace", "manifest_driven_system_run"],
+  "output_artifacts": [
+    "VIA_AzureFlow_QA_Run_Summary.json",
+    "VIA_AzureFlow_Engine_Job_Inspection.md",
+    "verify/verification.json",
+    "verify/verify_summary.json",
+    "VIA_AzureFlow_QA_System_Report.json",
+    "VIA_AzureFlow_QA_System_Report.md",
+    "activation_result.json",
+    "task_scheduler.log",
+    "task_result.json"
+  ],
+  "visual_assets": [
+    "templates/VIA_AzureFlow_Windows_Deployment_Interactive.html",
+    "references/VIA_AzureFlow_Windows_Deployment_Architecture.mmd",
+    "references/VIA_AzureFlow_Windows_Deployment_Architecture.png"
+  ],
+  "zip_kinds": ["via_all_in_one", "standardized_package"],
+  "activation": {
+    "human_review_required": true,
+    "ssot_promotion": false,
+    "automatic_command_activation": false,
+    "automatic_task_registration": false,
+    "windows_task_registration": "explicit -ActivateSchedule only",
+    "sandbox_status": "not_registered_without_Windows_Task_Scheduler"
+  },
+  "safety": {
+    "source_write": false,
+    "source_delete": false,
+    "code_execution": false,
+    "network_default": false,
+    "localhost_get_only_for_inspect": true,
+    "extracted_e2e_opt_in": true,
+    "human_review_required": true
+  },
+  "parent_handoff": {
+    "summary_schema": "VIA_AZUREFLOW_QA_PLUGIN_RUN/1.0",
+    "system_summary_schema": "VIA_AZUREFLOW_QA_SYSTEM/1.0",
+    "activation_schema": "VIA_AZUREFLOW_QA_SYSTEM_ACTIVATION/1.0",
+    "ssot_promotion": false,
+    "automatic_command_activation": false,
+    "preferred_handoff": "VIA_AzureFlow_QA_System_Report.json"
+  }
+}
