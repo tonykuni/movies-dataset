@@ -380,10 +380,11 @@ def selftest() -> int:
         and out["rows"][0]["next"] == "VRN-WKF009-STP002")
     chk("⑬ 前版動詞照常(未知動詞拒跑 · closeout 可達)",
         PRIOR.main(["no_such_verb"]) == 2 and callable(__getattr__("closeout")))
-    chk("⑮ 裁定別名生效:JP→JPM · MQ→MACQUARIE · CLST→CLSA",
+    chk("⑮ 裁定別名生效:JP→JPM · MQ→MCQ · CLST→CLSA · 兆豐→MEGA(短縮寫令)",
         P("JP-2330 20250718")["broker_std"] == "JPM"
-        and P("MQ-1560 20260520")["broker_std"] == "MACQUARIE"
-        and P("CLST-6669 20251001")["broker_std"] == "CLSA")
+        and P("MQ-1560 20260520")["broker_std"] == "MCQ"
+        and P("CLST-6669 20251001")["broker_std"] == "CLSA"
+        and P("20250819兆豐個股報告-泓德能源(6873)")["broker_std"] == "MEGA")
     chk("⑯ 短拉丁邊界比對防假命中:jpg≠JP · GS 照常", P("926708")["broker_std"] is None
         and P("photo_jpg_dump 20250101")["broker_std"] is None
         and P("GS-1590 20231012")["broker_std"] == "GS")
