@@ -270,20 +270,74 @@ def _open_pdf_v0119(path: Path):
         return None, f"開檔失敗 {type(exc).__name__}: {str(exc)[:80]}"
 
 
+def _split_parts_v0119(bs, horizontal: bool, W: float) -> list:
+    """資訊區拆獨立元件(批1657 操作員令「拆成獨立後識別」):
+    側欄(左/右切出)→ **上下拆**(縱向空隙 >14pt 斷);帶狀(上/下切出)→ **左右拆**(x 中線分群)。
+    每件帶 bbox/text/kind(矩陣/表格/長句/文字),獨立識別用。"""
+    parts = []
+    if horizontal:
+        for b in sorted(bs, key=lambda b: b[1]):
+            if parts and b[1] - parts[-1]["bbox"][3] <= 14:
+                p = parts[-1]
+                p["text"] += "\n" + b[4]
+                p["bbox"] = [min(p["bbox"][0], b[0]), min(p["bbox"][1], b[1]),
+                             max(p["bbox"][2], b[2]), max(p["bbox"][3], b[3])]
+            else:
+                parts.append({"bbox": [b[0], b[1], b[2], b[3]], "text": b[4]})
+    else:
+        sides = {"L": [], "R": []}
+        for b in bs:
+            sides["L" if (b[0] + b[2]) / 2 <= W / 2 else "R"].append(b)
+        for k in ("L", "R"):
+            if sides[k]:
+                bb = sides[k]
+                parts.append({"bbox": [min(b[0] for b in bb), min(b[1] for b in bb),
+                                       max(b[2] for b in bb), max(b[3] for b in bb)],
+                              "text": "\n".join(b[4] for b in sorted(bb, key=lambda b: (b[1], b[0])))})
+    for p in parts:
+        p["kind"] = _comp_kind_v0119(p["text"])
+        p["bbox"] = [round(v, 1) for v in p["bbox"]]
+    return parts
+
+
 def first_page_zones(doc) -> dict:
-    """首頁切兩區:本文區 vs 資訊區(左右皆可,關鍵詞密度定側;正典一、3)。"""
+    """首頁切兩區 v3(批1657 操作員令):側欄(左/右直切)之外,**資訊區在下方也認**(橫切);
+    右(左)側資訊區再**上下拆**、下方資訊區再**左右拆**成獨立元件(info_parts),拆成獨立後識別。
+    判側:關鍵詞密度(命中/區塊數);下方帶狀要命中數不輸側欄且密度較高才取(不誤搶左右版型);
+    top 不認(大標 KW 如「目標價上調」會誤搶);零命中退回左右命中比較(與前版同判,不退步)。"""
     page = doc[0]
-    W = page.rect.width
-    blocks = page.get_text("blocks")
-    left = "\n".join(b[4] for b in blocks if b[0] <= W * 0.58)
-    right = "\n".join(b[4] for b in blocks if b[0] > W * 0.58)
-    lh = sum(left.count(k) for k in _INFO_KW)
-    rh = sum(right.count(k) for k in _INFO_KW)
-    side = "right" if rh >= lh else "left"
-    info = right if side == "right" else left
-    main = left if side == "right" else right
+    W, H = page.rect.width, page.rect.height
+    blocks = [b for b in page.get_text("blocks") if (b[4] or "").strip()]
+
+    def _hits(bs):
+        t = "\n".join(b[4] for b in bs)
+        return sum(t.count(k) for k in _INFO_KW)
+
+    zones = {"left": [b for b in blocks if b[0] <= W * 0.58],
+             "right": [b for b in blocks if b[0] > W * 0.58],
+             "bottom": [b for b in blocks if b[1] >= H * 0.60]}
+    dens = {s: _hits(bs) / max(1, len(bs)) for s, bs in zones.items()}
+    s_best = max(("right", "left"), key=lambda s: dens[s])
+    bh, sh = _hits(zones["bottom"]), _hits(zones[s_best])
+    # 操作員令只兩型:側欄(左/右,上下拆)與下方帶狀(左右拆);top 不認——大標 KW(目標價上調)會誤搶
+    if bh and bh >= sh and dens["bottom"] > dens[s_best]:
+        side = "bottom"
+    elif sh:
+        side = s_best
+    else:
+        lh, rh = _hits(zones["left"]), _hits(zones["right"])
+        side = "right" if rh >= lh else "left"
+    info_bs = zones[side]
+    info_ids = {id(b) for b in info_bs}
+    main_bs = [b for b in blocks if id(b) not in info_ids]
+    axis = "x" if side in ("left", "right") else "y"
+    cut = W * 0.58 if axis == "x" else H * 0.60
+    info = "\n".join(b[4] for b in info_bs)
+    main = "\n".join(b[4] for b in main_bs)
     return {"info_side": side, "info_text": info, "main_text": main,
-            "info_kw_hits": max(rh, lh), "main_chars": len(main)}
+            "info_kw_hits": int(_hits(info_bs)), "main_chars": len(main),
+            "split_axis": axis, "split_at": round(cut, 1),
+            "info_parts": _split_parts_v0119(info_bs, horizontal=(axis == "x"), W=W)}
 
 
 def _yf_ticker_v0119(code: str) -> dict:
@@ -640,8 +694,15 @@ def layout_check(path: str) -> dict:
                 continue
             sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
             p1 = fin_page_zones(doc[0])   # 首頁也切元件供分類(只擷取第一頁+財報頁)
-            info_comps = p1["right" if z["info_side"] == "right" else "left"]
-            main_comps = p1["left" if z["info_side"] == "right" else "right"]
+            if z["info_side"] in ("left", "right"):
+                info_comps = p1[z["info_side"]]
+                main_comps = p1["left" if z["info_side"] == "right" else "right"]
+            else:   # 批1657:上/下帶狀資訊區——依切線分件(帶狀左右拆見 info_parts)
+                _all = p1["left"] + p1["right"]
+                _below = z["info_side"] == "bottom"
+                info_comps = [c for c in _all if ((c["bbox"][1] + c["bbox"][3]) / 2 > z["split_at"]) == _below]
+                _iid = {id(c) for c in info_comps}
+                main_comps = [c for c in _all if id(c) not in _iid]
             fps = _fin_pages_v0119(doc)["fin_pages"]
             fin_desc, comp_n = [], 0
             for pno in fps[:4]:
@@ -659,6 +720,7 @@ def layout_check(path: str) -> dict:
                          "info_has_text_and_table": ("文字" in _kind_tally_v0119(info_comps) or "長句" in _kind_tally_v0119(info_comps))
                                                     and ("表格" in _kind_tally_v0119(info_comps) or "矩陣" in _kind_tally_v0119(info_comps)),
                          "fin_pages": fin_desc or None, "fin_components": comp_n,
+                         "info_parts": len(z.get("info_parts") or []),   # 批1657:資訊區拆成獨立元件數
                          "extract_lane": lane, "lamp": lamp})
         except Exception as exc:
             rows.append({"filename": q.name, "state": "ROW_ERROR", "lamp": "紅",
@@ -894,9 +956,17 @@ def reconstruct(path: str) -> dict:
             tp = _target_price_v0119(crx, z["info_text"], whole)
             c_date1 = _content_date_v0119(crx, whole)
             pz1 = fin_page_zones(doc[0])
-            info_comps = list(pz1[z["info_side"]])
+            if z["info_side"] in ("left", "right"):
+                info_comps = list(pz1[z["info_side"]])
+                cand_main = pz1["left" if z["info_side"] == "right" else "right"]
+            else:   # 批1657:資訊區在上/下——依切線把左右半的元件分到 info/main(帶狀再左右拆在 info_parts)
+                allc = pz1["left"] + pz1["right"]
+                below = z["info_side"] == "bottom"
+                info_comps = [c for c in allc if ((c["bbox"][1] + c["bbox"][3]) / 2 > z["split_at"]) == below]
+                iid = {id(c) for c in info_comps}
+                cand_main = [c for c in allc if id(c) not in iid]
             main_comps = []
-            for c in pz1["left" if z["info_side"] == "right" else "right"]:
+            for c in cand_main:
                 if _comp_kind_v0119(c["text"]) in ("表格", "矩陣"):   # 本文表格雜湊 → 移資訊區
                     info_comps.append(c)
                     moved += 1
@@ -1102,6 +1172,7 @@ def deepread_one(path: Path) -> dict:
         tpv = _target_price_v0119(crx, info, whole)
         code = c_code or (fn["codes"][0] if fn["codes"] else None)
         row.update({"state": "DEEPREAD", "info_side": z["info_side"],
+                    "info_parts": len(z.get("info_parts") or []),
                     "content_date": c_date, "content_code": c_code, "content_broker": c_broker,
                     "date_match": "MATCH" if (c_date and c_date == fn["report_date"]) else
                                   ("MISS" if c_date and fn["report_date"] else "ONE_SIDE"),
@@ -1266,6 +1337,26 @@ def real_test(path: str, max_min: int = 45) -> dict:
                       "樣本": n_samples, "輸出": len(outs), "紅字": len(errors)}]}
 
 
+def emit_matrix_html(verb: str, result: dict) -> str:
+    """矩陣出頁 v0119 殼(批1657「跳出來的介面不動」案):頁首插**執行引擎戳**
+    (引擎檔名 + 檔案 mtime UTC + 出頁 UTC)——介面若不動,一看戳就知道是舊引擎/舊頁,不用猜。"""
+    import datetime
+    p = PRIOR.emit_matrix_html(verb, result)
+    try:
+        me = Path(__file__)
+        stamp = "引擎 %s · mtime %s · 出頁 %s UTC" % (
+            me.name,
+            datetime.datetime.utcfromtimestamp(me.stat().st_mtime).strftime("%m-%d %H:%M"),
+            datetime.datetime.utcnow().strftime("%m-%d %H:%M:%S"))
+        fp = Path(p)
+        h = fp.read_text(encoding="utf-8")
+        fp.write_text(h.replace("<h3>", "<h3>[" + stamp + "] · ", 1), encoding="utf-8")
+        print(f"  [引擎戳] {stamp}")
+    except OSError as exc:
+        print(f"  [引擎戳] 插入失敗 {type(exc).__name__}(頁照出,主流程照走)")
+    return p
+
+
 def _dump_result_v0119(verb: str, out: dict) -> None:
     """結果落檔 RESULT_<verb>_latest.json(操作員貼回免撈 console;寫不進不擋主流程,誠實印)。"""
     try:
@@ -1292,7 +1383,7 @@ def main(argv=None) -> int:
             print("[拒跑] reconstruct <檔|夾>")
             return 2
         out = reconstruct(a[1])
-        PRIOR.emit_matrix_html("reconstruct", out)
+        emit_matrix_html("reconstruct", out)
         _dump_result_v0119("reconstruct", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
@@ -1301,7 +1392,7 @@ def main(argv=None) -> int:
             print("[拒跑] layout-check <檔|夾>")
             return 2
         out = layout_check(a[1])
-        PRIOR.emit_matrix_html("layout_check", out)
+        emit_matrix_html("layout_check", out)
         _dump_result_v0119("layout_check", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
@@ -1310,7 +1401,7 @@ def main(argv=None) -> int:
             print("[拒跑] deepread <檔|夾>")
             return 2
         out = deepread(a[1])
-        PRIOR.emit_matrix_html("deepread", out)
+        emit_matrix_html("deepread", out)
         _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
@@ -1319,7 +1410,7 @@ def main(argv=None) -> int:
             print("[拒跑] real-test <樣本夾> [分鐘窗]")
             return 2
         out = real_test(a[1], int(a[2]) if len(a) > 2 else 45)
-        PRIOR.emit_matrix_html("real_test", out)
+        emit_matrix_html("real_test", out)
         _dump_result_v0119("real_test", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0 if out["state"] == "OK" else 1
@@ -1603,6 +1694,40 @@ def selftest() -> int:
     chk("⑮ 英文日期式(MASTER):Jan 22, 2025 → 2025-01-22",
         _content_date_v0119(crx, "Report dated Jan 22, 2025") == "2025-01-22"
         and _content_date_v0119(crx, "2026/09/16") == "2026-09-16")
+    # 批1657 四向資訊區:下方帶狀(左右拆)· 右側欄(上下拆)· reconstruct 下方版型照走
+    import fitz as _fz
+    _d1 = _fz.open()
+    _pg = _d1.new_page(width=595, height=842)
+    _pg.insert_textbox(_fz.Rect(36, 60, 560, 420), "本文區:公司營運與產業展望討論。\n" * 8,
+                       fontname="china-t", fontsize=10)
+    _pg.insert_textbox(_fz.Rect(36, 560, 280, 800), "評等:買進\n目標價:NT$ 120\n2330 TT",
+                       fontname="china-t", fontsize=10)
+    _pg.insert_textbox(_fz.Rect(320, 560, 560, 800), "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw",
+                       fontname="china-t", fontsize=10)
+    _z1 = first_page_zones(_d1)
+    chk("㊼ 下方帶狀資訊區:info_side=bottom · 左右拆成 2 件 · 本文在上",
+        _z1["info_side"] == "bottom" and _z1["split_axis"] == "y"
+        and len(_z1["info_parts"]) == 2 and "評等" in _z1["info_text"] and "本文區" in _z1["main_text"])
+    _d2 = _fz.open()
+    _p2 = _d2.new_page(width=595, height=842)
+    _p2.insert_textbox(_fz.Rect(36, 60, 330, 700), "本文區:法說會後更新與展望。\n" * 8,
+                       fontname="china-t", fontsize=10)
+    _p2.insert_textbox(_fz.Rect(360, 60, 560, 200), "2330 TT\n評等:買進\n目標價:NT$ 850",
+                       fontname="china-t", fontsize=10)
+    _p2.insert_textbox(_fz.Rect(360, 320, 560, 460), "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw",
+                       fontname="china-t", fontsize=10)
+    _z2 = first_page_zones(_d2)
+    chk("㊽ 右側欄資訊區:info_side=right · 縱向空隙上下拆 ≥2 件 · 各件帶 kind",
+        _z2["info_side"] == "right" and len(_z2["info_parts"]) >= 2
+        and all(p.get("kind") for p in _z2["info_parts"]))
+    with tempfile.TemporaryDirectory() as _bt:
+        _bp = Path(_bt) / "測試-2330-下方資訊-20260101.pdf"
+        _d1.save(str(_bp))
+        _rb = reconstruct(str(_bp))["rows"][0]
+        chk("㊾ reconstruct 下方版型照走:RECONSTRUCTED · 不炸 ROW_ERROR",
+            _rb["state"] == "RECONSTRUCTED")
+    _d1.close()
+    _d2.close()
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
