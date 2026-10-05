@@ -423,26 +423,55 @@ def _fresh_outputs_v0119(verb: str) -> list:
 
 
 def fin_page_zones(page) -> dict:
-    """財務頁切割(正典一、4):先左右切半,再各半依縱向空隙(>14pt)上下切成視覺元件。"""
+    """頁面切割(正典一、3/4):先左右切半,再各半依縱向空隙(>14pt)上下切成視覺元件;
+    v2(操作員令 2026-10-05):dict 抽取帶字級 max_size,供文字大小階層分類。"""
     W = page.rect.width
+    raw = page.get_text("dict")
+    bl = []
+    for b in raw.get("blocks", []):
+        if b.get("type") != 0:
+            continue
+        txt = "\n".join("".join(sp.get("text", "") for sp in ln.get("spans", []))
+                        for ln in b.get("lines", []))
+        if not txt.strip():
+            continue
+        ms = max((sp.get("size", 0) for ln in b.get("lines", []) for sp in ln.get("spans", [])), default=0)
+        x0, y0, x1, y1 = b["bbox"]
+        bl.append((x0, y0, x1, y1, txt, ms))
     halves = {"left": [], "right": []}
-    for b in page.get_text("blocks"):
+    for b in bl:
         halves["left" if (b[0] + b[2]) / 2 <= W / 2 else "right"].append(b)
     out = {}
     for side, bs in halves.items():
         bs.sort(key=lambda b: b[1])
         comps = []
         for b in bs:
-            if comps and b[1] - comps[-1]["bbox"][3] <= 14:
+            if comps and b[1] - comps[-1]["bbox"][3] <= 14 \
+               and abs(b[5] - comps[-1]["max_size"]) <= 2.5:   # 字級差>2.5pt=不同階層,不併(標題獨立成元件)
                 c = comps[-1]
                 c["bbox"] = [min(c["bbox"][0], b[0]), min(c["bbox"][1], b[1]),
                              max(c["bbox"][2], b[2]), max(c["bbox"][3], b[3])]
                 c["text"] += "\n" + b[4]
+                c["max_size"] = max(c["max_size"], round(b[5], 1))
             else:
                 comps.append({"bbox": [round(b[0], 1), round(b[1], 1), round(b[2], 1), round(b[3], 1)],
-                              "text": b[4]})
+                              "text": b[4], "max_size": round(b[5], 1)})
         out[side] = comps
     return out
+
+
+def _hier_tally_v0119(comps) -> str:
+    """本文區文字大小階層(操作員令):body=各元件字級中位數;≥1.25×=標題 · ≥1.08×=副標 · 其餘=本文。"""
+    sizes = sorted(c.get("max_size", 0) for c in comps if c.get("max_size"))
+    if not sizes:
+        return "-"
+    body = sizes[(len(sizes) - 1) // 2]   # 下中位:雙元件(標題+本文)時 body 取小者
+    out = {}
+    for c in comps:
+        r = (c.get("max_size") or 0) / body if body else 0
+        k = "標題" if r >= 1.25 else ("副標" if r >= 1.08 else "本文")
+        out[k] = out.get(k, 0) + 1
+    return "".join(f"{k}{v}" for k, v in out.items())
 
 
 def _comp_kind_v0119(text: str) -> str:
@@ -503,6 +532,9 @@ def layout_check(path: str) -> dict:
                          "main_chars": sm["chars"], "main_cjk": sm["cjk"], "info_chars": si["chars"],
                          "info_digits": si["digits"], "bad_chars": bad,
                          "info_types": _kind_tally_v0119(info_comps), "main_types": _kind_tally_v0119(main_comps),
+                         "main_hier": _hier_tally_v0119(main_comps),   # 本文區依文字大小階層
+                         "info_has_text_and_table": ("文字" in _kind_tally_v0119(info_comps) or "長句" in _kind_tally_v0119(info_comps))
+                                                    and ("表格" in _kind_tally_v0119(info_comps) or "矩陣" in _kind_tally_v0119(info_comps)),
                          "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
         finally:
             doc.close()
@@ -676,6 +708,7 @@ def _mk_pdf_v0119(path: Path):
     import fitz
     doc = fitz.open()
     pg = doc.new_page(width=595, height=842)
+    pg.insert_textbox(fitz.Rect(36, 28, 330, 56), "台積電(2330)目標價上調", fontname="china-t", fontsize=16)
     pg.insert_textbox(fitz.Rect(36, 60, 330, 700),
                       "SYNTHETIC SAMPLE 台積電法說會後更新。本文區:先進製程需求強勁,"
                       "AI 動能延續。我們上修 2026 年預估,評價採本益比法並以 DCF 交叉驗證。\n" * 6,
@@ -684,6 +717,9 @@ def _mk_pdf_v0119(path: Path):
                       "2330 TT\n評等:買進\n目標價:NT$ 850\n收盤價:712\n"
                       "王小明\n分析師\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
                       fontname="china-t", fontsize=10)
+    pg.insert_textbox(fitz.Rect(360, 720, 560, 800),
+                      "本報告僅供內部參考,非投資建議,引用請註明出處。資料截至報告日。",
+                      fontname="china-t", fontsize=8)
     p2 = doc.new_page(width=595, height=842)   # 財務頁:左右各兩個視覺元件(上下切測試)
     p2.insert_textbox(fitz.Rect(36, 60, 280, 300),
                       "損益摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
@@ -794,6 +830,11 @@ def selftest() -> int:
         chk("㉗ 財報比率(TWSE/TPEX 用字):毛利率0.3 · ROE0.15 · BVPS8 · 本益比50 · EPS成長0.2 · 缺欄誠實None",
             fr["毛利率"] == 0.3 and fr["ROE"] == 0.15 and fr["BVPS"] == 8.0
             and fr["本益比"] == 50.0 and fr["EPS成長率"] == 0.2 and fr["流動比率"] is None)
+        lc3 = layout_check(str(td))
+        r3 = lc3["rows"][0]
+        chk("㉘ 階層與混排:本文區帶 標題+本文 字級階層 · 資訊區文表混排=True",
+            "標題" in r3["main_hier"] and "本文" in r3["main_hier"]
+            and r3["info_has_text_and_table"] is True)
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
