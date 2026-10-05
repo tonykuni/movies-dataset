@@ -495,6 +495,25 @@ class FinancialDataTester:
             }
         }
     
+    # 併入自操作員上傳 2026-10-05(只增不減不衝突):同義字擴展測試
+    def run_alias_expansion_tests(self) -> Dict[str, bool]:
+            """測試同義字擴展功能"""
+            results = {}
+        
+            # 測試動態添加同義字
+            test_alias = "測試營收"
+            add_result = self.mapper.add_new_alias("revenue", test_alias)
+            results["dynamic_alias_addition"] = add_result
+        
+            # 測試新同義字是否可以被識別
+            if add_result:
+                standardized = self.mapper.standardize_field_name(test_alias)
+                results["dynamic_alias_recognition"] = (standardized == "revenue")
+        
+            # 測試同義字不重複
+            original_count = len(self.mapper.get_all_aliases_for_field("revenue"))
+            self.mapper.add_new_alias("revenue", test_alias)
+
     def run_field_mapping_tests(self) -> Dict[str, bool]:
         """運行欄位映射測試"""
         results = {}
