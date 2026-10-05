@@ -75,7 +75,8 @@ _D8 = re.compile(r"(?<!\d)(20[2-3]\d)(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")        
 _D6 = re.compile(r"(?<!\d)(2[3-9])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")             # 260917
 _ROC = re.compile(r"(?<!\d)(11[3-7])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")           # 1141201
 _MMDD_AFTER_BROKER = re.compile(r"(?<=[A-Za-z])((0\d|1[0-2])([0-2]\d|3[01]))(?!\d)")  # CTBC0915
-_TICKER = re.compile(r"(?<![\dA-Za-z])([1-9]\d{3}|00\d{2})(?![\d])")
+_TICKER = re.compile(r"(?<![\dA-Za-z])(00\d{2,3}(?:[ABDLRTUV](?![A-Za-z]))?(?!\d)|[1-9]\d{3}(?!\d))")
+# ETF 族(MASTER 2026-10-05 只增):4碼舊 ETF(0050)與 5碼新 ETF(00878)皆收,尾碼 A/B/D/L/R/T/U/V 隨碼
 _KIND_WORDS = (("DAILY", ("晨會", "早報", "盤後", "盤勢", "周報", "週報", "晨間", "日股", "美股", "港股", "速報", "Databook", "databook")),
                ("MACRO", ("總經", "債券", "利率", "ETF", "籌碼", "市場觀察", "策略")),
                ("INDUSTRY", ("產業", "專題", "Memory", "ABF", "PCB", "CCL", "Thermal", "Automation", "Hardware", "Power", "hardware")),
@@ -403,6 +404,11 @@ def selftest() -> int:
         C([5.51, 9.99], [5.51, 6.02], [5.30, 5.80])["lamp"] == "黃"
         and C([1.0], [5.51], [5.30])["lamp"] == "紅"
         and C([], [5.51], [5.30])["state"] == "NO_DATA")
+    chk("㉑ ETF 代碼族(MASTER):00878 五碼收 · 00878B 尾碼收 · 0050 照收 · CT→CATHAY · DAI→DAIWA",
+        P("00878 高股息月報")["codes"] == ["00878"] and P("00679B 債券ETF追蹤")["codes"] == ["00679B"]
+        and P("0050 台灣五十 分析")["codes"] == ["0050"]
+        and P("【國泰證期研究部】神達(3706 TT)-20250822")["broker_std"] == "CATHAY"
+        and P("Daiwa-3653 20251002")["broker_std"] == "DAIWA")
     r = P("第二場 2026海外投資展望 - 華南永昌海外商品部")
     r2 = P("第三場 AI潮流下展望2026半導體產業趨勢 - 陳子昂")
     chk("⑳ 非個股型年份樣代號剝除:2026≠代號 · 3706 速報照收",

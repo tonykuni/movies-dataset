@@ -126,12 +126,49 @@ def _central_regex_v0119() -> dict:
             "email": re.compile(pat("RX_EMAIL_STD", r"[\w.+-]+@[\w-]+\.[\w.-]+")),
             "tel": re.compile("(" + pat("RX_TEL_TAIPEI", r"(?:\+?886[- ]?2|\(02\)|02)[- ]?\d{4}[- ]?\d{4}")
                               + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}") + ")"),
+            "date_en": re.compile(pat("RX_DATE_ENGLISH",
+                r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(\d{4})")),
             "rating": re.compile("(?i)(" + "|".join(_wordish_v0119(t) for t in rating) + ")"),
             "tp": re.compile("(?i)(?:" + "|".join(_wordish_v0119(t) for t in tp_words)
-                             + r")[^\d]{0,15}(\d{2,5}(?:\.\d+)?)"),
+                             + r")[^\d]{0,15}((?:\d{1,3}(?:,\d{3})+|\d{2,5})(?:\.\d+)?)"),
+            "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
+                r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
+            "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
             "_notes": notes,
         }
     return _CRX_CACHE
+
+
+_MON_V0119 = {m: i + 1 for i, m in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))}
+
+
+def _content_date_v0119(crx, text: str) -> str | None:
+    """內文日期:主式(數字/CJK)先;抓不到走英文月份式(MASTER)。"""
+    m = crx["date"].search(text)
+    if m:
+        return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+    e = crx["date_en"].search(text)
+    if e:
+        return f"{e.group(3)}-{_MON_V0119[e.group(1)]:02d}-{int(e.group(2)):02d}"
+    return None
+
+
+def _target_price_v0119(crx, *texts) -> float | None:
+    """目標價:剝詞(NT$/TWD/上看/元)→ 主式(同義字冊關鍵詞)→ MASTER 防禦式第二道。"""
+    for t in texts:
+        for s in crx["tp_strips"]:
+            t = t.replace(s, "")
+        m = crx["tp"].search(t)
+        if m:
+            return float(m.group(1).replace(",", ""))
+    for t in texts:
+        m = crx["tp_defense"].search(t)
+        if m:
+            n = re.search(r"[\d,]+(?:\.\d+)?", m.group(0))
+            if n:
+                return float(n.group(0).replace(",", ""))
+    return None
 
 
 def _open_pdf_v0119(path: Path):
@@ -263,8 +300,7 @@ def deepread_one(path: Path) -> dict:
         z = first_page_zones(doc)
         crx = _central_regex_v0119()
         info, whole = z["info_text"], z["info_text"] + "\n" + z["main_text"]
-        m = crx["date"].search(whole)
-        c_date = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}" if m else None
+        c_date = _content_date_v0119(crx, whole)
         tt = crx["tt_in_text"].search(whole)
         c_code = tt.group(1) if tt else (fn["codes"][0] if fn["codes"] else None)
         c_broker = None
@@ -275,8 +311,7 @@ def deepread_one(path: Path) -> dict:
                 c_broker = target
                 break
         rt = crx["rating"].search(info) or crx["rating"].search(whole)
-        tp = crx["tp"].search(info) or crx["tp"].search(whole)
-        tpv = float(tp.group(1)) if tp else None
+        tpv = _target_price_v0119(crx, info, whole)
         code = c_code or (fn["codes"][0] if fn["codes"] else None)
         row.update({"state": "DEEPREAD", "info_side": z["info_side"],
                     "content_date": c_date, "content_code": c_code, "content_broker": c_broker,
@@ -410,6 +445,13 @@ def selftest() -> int:
         and "TT" in crx["ticker_bbg"] and crx["rating"].search("Conviction Buy")
         and crx["tp"].search("合理價 123.5") and crx["tel"].search("+852 2234 5678")
         and crx["tel"].search("02-2345-6789") and not crx["rating"].search("xNRx"))
+    chk("⑭ MASTER 併入生效:Market Perform 評等 · 剝詞+千分位 TP · 防禦式第二道",
+        crx["rating"].search("Market Perform")
+        and _target_price_v0119(crx, "目標價:NT$ 1,200元") == 1200.0
+        and _target_price_v0119(crx, "Target: 95") == 95.0)
+    chk("⑮ 英文日期式(MASTER):Jan 22, 2025 → 2025-01-22",
+        _content_date_v0119(crx, "Report dated Jan 22, 2025") == "2025-01-22"
+        and _content_date_v0119(crx, "2026/09/16") == "2026-09-16")
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
