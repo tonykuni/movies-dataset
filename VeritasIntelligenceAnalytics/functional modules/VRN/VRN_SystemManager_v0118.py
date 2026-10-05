@@ -160,14 +160,19 @@ def parse_filename(stem: str) -> dict:
         elif alias in low:
             out["broker_std"], out["broker_raw"] = target, alias
             break
-    if not out["codes"]:
-        for kind, words in _KIND_WORDS:
-            if any(w.lower() in low for w in words):
-                out["doc_kind"] = kind
-                break
-        out["doc_kind"] = out["doc_kind"] or "UNCLASSIFIED"
-    else:
+    kind = None
+    for k, words in _KIND_WORDS:
+        if any(w.lower() in low for w in words):
+            kind = k
+            break
+    if kind and out["codes"]:
+        # 非個股型內的年份樣 token(2020–2049)視為年份剝掉(實測紅:「第二場 2026海外投資展望」);
+        # 真代號(如 3706 速報)不受影響;年份區真代號撞型寧缺勿誤,誠實記於 doc_kind。
+        out["codes"] = [c for c in out["codes"] if not re.fullmatch(r"20[2-4]\d", c)]
+    if out["codes"]:
         out["doc_kind"] = "EQUITY"
+    else:
+        out["doc_kind"] = kind or "UNCLASSIFIED"
     return out
 
 
@@ -397,6 +402,12 @@ def selftest() -> int:
         C([5.51, 9.99], [5.51, 6.02], [5.30, 5.80])["lamp"] == "黃"
         and C([1.0], [5.51], [5.30])["lamp"] == "紅"
         and C([], [5.51], [5.30])["state"] == "NO_DATA")
+    r = P("第二場 2026海外投資展望 - 華南永昌海外商品部")
+    r2 = P("第三場 AI潮流下展望2026半導體產業趨勢 - 陳子昂")
+    chk("⑳ 非個股型年份樣代號剝除:2026≠代號 · 3706 速報照收",
+        r["codes"] == [] and r["doc_kind"] == "FORUM"
+        and r2["codes"] == [] and r2["doc_kind"] in ("FORUM", "INDUSTRY")
+        and P("20251128兆豐訪談速報-神達(3706)")["codes"] == ["3706"])
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑭ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
