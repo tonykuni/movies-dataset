@@ -64,6 +64,7 @@ def _via_net():
 import contextlib
 import importlib.util
 import io
+import json
 import re
 import sys
 from pathlib import Path
@@ -103,8 +104,20 @@ for _n in dir(PRIOR):
 
 
 # ---------- 快照補充:無資料族群的補擷取路線(只讀冊,不連網) ----------
-def refill_routes(vdf: dict) -> list:
-    """無資料(NODATA)或部分無資料的族群 → 冊上該族群的引擎與來源,照實列出;冊上沒寫就說沒寫。"""
+def _refill_book() -> dict:
+    """VDF 族群冊尾版裡每個族群的 refill 分層(MDL012 refill 照這個跑);讀不到 = 空(照實退回族群自己的引擎)。"""
+    p = PRIOR._tail(PRIOR.VDF, "VDF_FetchGroups_SSOT_v*.json")
+    try:
+        book = json.loads(p.read_text(encoding="utf-8")) if p else {}
+    except (OSError, ValueError) as exc:
+        PRIOR.SKIPPED.append({"file": str(p), "why": f"{type(exc).__name__}: {exc}"})
+        book = {}
+    return {g.get("id"): g.get("refill") or [] for g in book.get("groups") or []}
+
+
+def refill_routes(vdf: dict, tiers_by_group: dict | None = None) -> list:
+    """無資料(NODATA)或部分無資料的族群 → 冊上的 refill 分層(照順序:提供者 · 引擎 · 要的鑰);冊上沒寫就退族群自己的引擎並註明。"""
+    tiers_by_group = _refill_book() if tiers_by_group is None else tiers_by_group
     io_by = {r.get("group"): r for r in (vdf.get("io") or [])}
     eng_by = {e.get("id"): e for e in (vdf.get("engines") or [])}
     out = []
@@ -113,12 +126,24 @@ def refill_routes(vdf: dict) -> list:
         states = s.get("states") or {}
         if s.get("worst") != "NODATA" and not states.get("NODATA"):
             continue
-        engines = [e for e in (g.get("engines") or [])]
-        srcs = sorted({str(eng_by.get(e, {}).get("group") or "") for e in engines} - {""})
+        tiers = tiers_by_group.get(g.get("id")) or []
+        if tiers:
+            engines = [e for t in tiers for e in (t.get("engines") or [])]
+            providers = []
+            for t in tiers:
+                if t.get("provider") and t["provider"] not in providers:
+                    providers.append(t["provider"])
+            route = " → ".join(f"{i}. {t.get('provider', '')} {','.join(t.get('engines') or [])}" + (f"(要 {t['key']})" if t.get("key") else "")
+                               for i, t in enumerate(tiers, 1))
+        else:
+            engines = list(g.get("engines") or [])
+            providers = sorted({str(eng_by.get(e, {}).get("group") or "") for e in engines} - {""})
+            route = "冊上沒寫 refill → 族群自己的引擎 " + ",".join(engines)
         out.append({"group": g.get("id"), "zh": g.get("zh"), "category": g.get("category"),
                     "nodata": states.get("NODATA", 0) if s.get("worst") != "NODATA" else (s.get("sources") or len(g.get("rows") or [])),
-                    "engines": engines, "sources": srcs, "input": (io_by.get(g.get("id")) or {}).get("input", ""),
-                    "how": "via_activate_vdf → VDF 擷取(工作站;網路要本視窗 VIA_NET_CONSENT)"})
+                    "engines": engines, "sources": providers, "route": route, "tiers": tiers,
+                    "input": (io_by.get(g.get("id")) or {}).get("input", ""),
+                    "how": "via-vdf-refill(看計畫)→ 本視窗開雙閘後 via-vdf-refill -Apply"})
     return out
 
 
@@ -259,7 +284,7 @@ $('#sum').innerHTML='<div class="hero"><div class="hc"><b>'+B(W)+'</b><span>總�
  +'<div class="grid"><div class="card wide"><h4>摘要矩陣 <small>大類 × 輸入 · 引擎 · 輸出 · 驗證(點列看驗證頁)</small></h4><div class="sc">'
  +T(sumRows,[['cat','大類'],['start','起始日'],['inp','輸入'],['eng','引擎'],['rows','輸出列','n'],['max','最晚'],['ver','驗證 綠/黃/紅/無','h'],['w','燈','b']],'go')+'</div></div>'
  +act()+'<div class="card"><h4>無資料 · 補擷取路線 <small>冊上的來源;擷取在工作站跑</small></h4><div class="sc">'
- +T(RF.map(function(r){return {go:'v_'+r.category,g:r.zh,s:r.sources,e:r.engines,n:r.nodata}}),[['g','族群'],['s','來源'],['e','引擎'],['n','缺','n']],'go')+'</div></div></div>';
+ +T(RF.map(function(r){return {go:'v_'+r.category,g:r.zh,s:r.route,n:r.nodata}}),[['g','族群'],['s','補擷取分層(照順序)'],['n','缺','n']],'go')+'</div></div></div>';
 // ---- 02 輸入(矩陣表單)----
 function opt(list,sel,lab){return list.map(function(x){var v=typeof x==='string'?x:x.path;return '<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(lab?lab(x):v)+'</option>'}).join('')}
 var lb=function(x){return x.name+' · '+x.why+' — '+x.path};
@@ -332,7 +357,7 @@ CATS.forEach(function(c){var k=CS[c.id],html='<div class="hero"><div class="hc">
  +'<div class="hc"><b>'+k.cnt.RED+'</b><span>紅 RED</span></div><div class="hc"><b>'+k.cnt.NODATA+'</b><span>無資料 NODATA</span></div><div class="hc"><b>'+N(k.rows)+'</b><span>列 ROWS · 起始 '+esc(c.start)+'</span></div></div><div class="grid">';
  k.gs.forEach(function(g){var s=g.summary||{},rf=RF.filter(function(r){return r.group===g.id})[0];
   html+='<div class="card"><h4>'+esc(g.zh)+' '+B(s.worst||'NODATA')+' <small>'+esc(g.membership)+(g.n===null||g.n===undefined?' · 全部':' · '+g.n+' 個')+' · 最晚 '+esc(s.max_date||'—')+'</small></h4>'
-   +(rf?'<div class="mut" style="margin-bottom:6px">補擷取:'+esc((rf.sources||[]).join(' · ')||'冊上沒寫來源')+' · 引擎 '+esc((rf.engines||[]).join(','))+'</div>':'')
+   +(rf?'<div class="mut" style="margin-bottom:6px">補擷取:'+esc(rf.route||'')+'</div>':'')
    +'<div class="sc">'+T(g.rows,[['table_name','表 / 函式'],['rows_asof','≤as-of','n'],['min_date','最早'],['max_date','最晚'],['lag_days','落後','n'],['state','燈','b'],['note','註']])+'</div></div>'});
  $('#v_'+c.id).innerHTML=html+'</div>'});
 $('#vdb').innerHTML='<div class="hero"><div class="hc"><b>'+N(D.n_dbs||0)+'</b><span>庫 DBS</span></div><div class="hc"><b>'+N(D.n_tables||0)+'</b><span>表 TABLES</span></div><div class="hc"><b>'+N(D.rows||0)+'</b><span>列 ROWS</span></div><div class="hc"><b>'+B(D.locked?'LOCKED':(D.n_dbs?'OK':'NODATA'))+'</b><span>狀態</span></div></div><div class="grid">'
@@ -347,7 +372,7 @@ $('#rec').innerHTML='<div class="d"><div class="card wide" style="margin-bottom:
  +'<div class="card"><h4>工作流步驟</h4><div class="sc">'+T(steps,[['c','代碼'],['n','步'],['e','正主'],['v','動詞'],['ev','證據']])+'</div></div>'
  +'<div class="card"><h4>元件 · 註冊 · 版本鎖</h4><div class="sc">'+T(S.components,[['component','元件'],['kind','類'],['version','版'],['sha12','sha256'],['number','編號'],['registry','註冊碼'],['lock','鎖'],['state','燈','b']])+'</div></div>'
  +'<div class="card"><h4>輸入輸出參數邏輯</h4><div class="sc">'+T(V.io,[['group','族群'],['membership','名單'],['input','輸入'],['engines','引擎'],['asof_args','日期參數'],['output','輸出'],['cadence','頻率']])+'</div></div>'
- +'<div class="card"><h4>無資料 · 補擷取路線</h4><div class="sc">'+T(RF,[['group','族群'],['category','大類'],['sources','來源'],['engines','引擎'],['input','輸入'],['how','怎麼補']])+'</div></div>'
+ +'<div class="card"><h4>無資料 · 補擷取路線</h4><div class="sc">'+T(RF,[['group','族群'],['category','大類'],['route','分層(照順序)'],['sources','提供者'],['input','輸入'],['how','怎麼補']])+'</div></div>'
  +'<div class="card"><h4>regex</h4><div class="sc">'+T(V.regex,[['scope','範圍'],['name','名'],['pattern','式'],['use','用途']])+'</div></div>'
  +'<div class="card"><h4>同義字</h4><div class="sc">'+T(V.synonyms,[['key','鍵'],['canonical','正典'],['aliases','同義字']])+'</div></div>'
  +'<div class="card"><h4>編號</h4><div class="sc">'+T(V.numbering,[['code','編號'],['kind','類'],['name','名'],['version','版']])+'</div></div>'
@@ -424,10 +449,14 @@ def selftest() -> int:
                              {"id": "B", "zh": "乙", "category": "X", "engines": ["e2"], "summary": {"worst": "YELLOW", "states": {"YELLOW": 1, "NODATA": 1}}},
                              {"id": "C", "zh": "丙", "category": "X", "engines": [], "summary": {"worst": "GREEN", "states": {"GREEN": 1}}}],
                   "engines": [{"id": "e1", "group": "FRED"}, {"id": "e2", "group": "AkShare"}], "io": [{"group": "A", "input": "冊"}]}
-        rf = refill_routes(groups)
-        chk("⑦ 補擷取路線:全無 + 部分無資料的族群都列;來源取引擎冊;全綠不列",
-            [r["group"] for r in rf] == ["A", "B"] and rf[0]["sources"] == ["FRED"] and rf[0]["nodata"] == 2 and rf[1]["nodata"] == 1
-            and isinstance(snap.get("refill"), list), rf)
+        tiers = {"A": [{"provider": "FRED", "engines": ["e1"], "key": "FRED_API_KEY"}, {"provider": "GOV", "engines": ["e9"]}]}
+        rf = refill_routes(groups, tiers)
+        live = {r["group"]: r for r in snap.get("refill") or []}
+        chk("⑦ 補擷取路線照冊 refill 分層(順序 · 提供者 · 引擎 · 要的鑰);冊沒寫退族群引擎並註明;全綠不列;真冊 US_MACRO 含 e055fed",
+            [r["group"] for r in rf] == ["A", "B"] and rf[0]["engines"] == ["e1", "e9"] and rf[0]["sources"] == ["FRED", "GOV"]
+            and rf[0]["route"].startswith("1. FRED e1(要 FRED_API_KEY) → 2. GOV e9") and rf[0]["nodata"] == 2
+            and rf[1]["route"].startswith("冊上沒寫 refill") and rf[1]["nodata"] == 1
+            and ("US_MACRO" not in live or "e055fed" in live["US_MACRO"]["engines"]), (rf, live.get("US_MACRO")))
         chk("⑧ 零 CDN / 零 fetch / 不需伺服器(file://)", not re.search(r'(src|href)="https?://', page) and "fetch(" not in script
             and "XMLHttpRequest" not in page)
     finally:

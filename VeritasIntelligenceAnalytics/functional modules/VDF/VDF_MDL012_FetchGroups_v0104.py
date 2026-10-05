@@ -7,7 +7,8 @@ r"""VDF_MDL012_FetchGroups v0104 — 薄尾:+ refill 動詞(無資料族群依 F
     只列寫進同一張表的引擎(不同表不混,免得燈假綠)。
   · refill [--groups X,Y] [--as-of D] [--home H] [--apply] [--timeout S] [--json]
       1. 同一 as-of 測全部(或指定)族群:整組 NODATA 或部分來源 NODATA 才補;
-      2. 逐層:要鑰的層先查鑰(FRED_API_KEY 環境變數或輸出根 .fred_api_key;只查有沒有,不印)→ 沒鑰 = SKIP 照記;
+      2. 逐層:要鑰的層先查鑰(FRED_API_KEY 環境變數,或鑰檔 .fred_api_key:輸出根 · 輸出根/output_hub/mega · VDF/output_hub/mega)→ 沒鑰 = SKIP 照記;
+         鑰只在鑰檔 = 該層跑的期間放進本行程環境讓子行程拿得到(ENG113 只讀環境),跑完拿掉;值永不印;
       3. --apply 才真跑(要本視窗 VIA_NET_CONSENT=YES + VIA_SCRAPE_CONSENT;本檔永不代設;沒開 = GATED rc 4,零子行程);
          每層跑完重測該族群,有資料就停(FILLED · 記哪一層);全部層都試過仍無 = STILL_NODATA 照實報;
       4. 報告 <輸出根上層>/_reports/refill_latest.json(+ 時間戳檔);目錄庫 fg_runs 記一列(mode = refill)。
@@ -100,6 +101,7 @@ TAG = f"VDF_MDL012_FetchGroups v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 for _m in (PRIOR, PRIOR.PRIOR, PRIOR.V0101, V0100):
     _m.TAG = TAG
 KEY_FILE = ".fred_api_key"
+ENGINE_KEY_DIR = HERE / "output_hub" / "mega"     # ENG074 / ENG055 自己的鑰檔預設夾
 
 for _n in dir(PRIOR):
     if not _n.startswith("__") and _n not in globals():
@@ -116,13 +118,38 @@ def needs_refill(summary: dict) -> int:
     return int((summary.get("states") or {}).get("NODATA", 0))
 
 
+def key_file(name: str | None, home: Path) -> Path | None:
+    """鑰檔位置(只給 FRED_API_KEY):輸出根 · 輸出根/output_hub/mega · 引擎自己的預設 VDF/output_hub/mega;第一個存在的。"""
+    if name != "FRED_API_KEY":
+        return None
+    for p in (home, home / "output_hub" / "mega", ENGINE_KEY_DIR):
+        if (p / KEY_FILE).is_file():
+            return p / KEY_FILE
+    return None
+
+
 def key_present(name: str | None, home: Path) -> bool:
-    """只查鑰在不在(環境變數或輸出根的鑰檔);永不讀出、永不印。"""
+    """只查鑰在不在(環境變數或鑰檔);永不印。"""
     if not name:
         return True
-    if os.environ.get(name):
-        return True
-    return name == "FRED_API_KEY" and any((p / KEY_FILE).is_file() for p in (home, home / "output_hub" / "mega"))
+    return bool(os.environ.get(name)) or key_file(name, home) is not None
+
+
+@contextlib.contextmanager
+def key_env(name: str | None, home: Path):
+    """鑰只在鑰檔、環境沒有 → 這一層跑的期間放進本行程環境(子行程繼承;ENG113 只讀環境),跑完拿掉;值永不印。"""
+    if not name or os.environ.get(name):
+        yield
+        return
+    kf = key_file(name, home)
+    val = kf.read_text(encoding="utf-8").strip() if kf else ""
+    if val:
+        os.environ[name] = val
+    try:
+        yield
+    finally:
+        if val:
+            os.environ.pop(name, None)
 
 
 def route_of(book: dict, gid: str) -> list:
@@ -195,7 +222,8 @@ def execute(book, fb, plan, as_of, home, ledger, sel, matrix, timeout) -> list:
                 steps.append(step)
                 continue
             t0 = time.time()
-            res = run(rows, "live", home, logs=home.parent / "_logs", timeout=timeout)
+            with key_env(t.get("key"), home):
+                res = run(rows, "live", home, logs=home.parent / "_logs", timeout=timeout)
             step["rc"] = {x["id"]: x.get("rc") for x in res}
             step["sec"] = round(time.time() - t0, 1)
             after = status_of(book, [gid], as_of, home, ledger, sel, matrix).get(gid, {})
@@ -307,7 +335,9 @@ def selftest() -> int:
         and needs_refill({"worst": "GREEN", "states": {"GREEN": 2}}) == 0 and needs_refill({}) == 0)
     tmp = Path(tempfile.mkdtemp(prefix="mdl012v4_"))
     keep_env = {k: os.environ.get(k) for k in ("FRED_API_KEY", "VIA_NET_CONSENT", "VIA_SCRAPE_CONSENT")}
-    global RUNNER
+    global RUNNER, ENGINE_KEY_DIR
+    keep_kdir = ENGINE_KEY_DIR
+    ENGINE_KEY_DIR = tmp / "engine_default_none"      # 工作站上 VDF/output_hub/mega 可能真有鑰檔 → 自測隔開
     try:
         home = tmp / "mega"
         home.mkdir()
@@ -333,6 +363,14 @@ def selftest() -> int:
                 d.close()
             return [{"id": r["id"], "rc": 0} for r in rows]
 
+        seen = []
+        RUNNER = (lambda rows, mode, home_, logs=None, timeout=None: seen.append(os.environ.get("FRED_API_KEY")) or [{"id": r["id"], "rc": 0} for r in rows], Path("fake"))
+        (home / KEY_FILE).write_text("file-key-for-selftest\n", encoding="utf-8")
+        plan = plan_refill(book, ["US_MACRO"], {"US_MACRO": {"worst": "NODATA", "sources": 1}}, home)
+        execute(book, fb, plan, V0100.resolve_asof("latest"), home, ledger, sel, matrix, 60)
+        (home / KEY_FILE).unlink()
+        chk("⑩ 鑰只在輸出根鑰檔:FRED 層跑的期間子行程環境拿得到(ENG113 只讀環境);跑完環境拿掉",
+            seen and all(x == "file-key-for-selftest" for x in seen) and "FRED_API_KEY" not in os.environ, seen)
         RUNNER = (fake_run, Path("fake"))
         os.environ["FRED_API_KEY"] = "selftest-not-a-key"
         plan = plan_refill(book, ["US_MACRO"], {"US_MACRO": {"worst": "NODATA", "sources": 1}}, home)
@@ -362,6 +400,7 @@ def selftest() -> int:
             and not (tmp / "empty" / "_reports").exists(), b3.getvalue()[-300:])
     finally:
         RUNNER = None
+        ENGINE_KEY_DIR = keep_kdir
         for k, v in keep_env.items():
             if v is None:
                 os.environ.pop(k, None)
