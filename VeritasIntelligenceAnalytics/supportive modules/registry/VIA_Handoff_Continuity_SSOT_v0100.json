@@ -2035,6 +2035,21 @@
       ],
       "timeout_seconds": 1500
     },
+    "vdf_fetch_groups_v0105": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0105",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 薄尾 9/9 · PASS",
+      "scope": "MDL012 v0105 ui 左面板 = 全部輸入控制(as-of · 模式 · 輸出根 · 族群全選 / 清除 · 成員增減 · 起始日按大類 · 補擷取)+ 收尾 · 備份六鈕(打包 via_01_vdf / via_00_vcgc · 驗包 · closeout 乾跑 / --apply --push · 一鍵);右面板多頁照舊;同 id 只一份;頁不執行指令(VCGC-REQ154 · VCGC-REQ159)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0103.json"
+      ],
+      "timeout_seconds": 1200
+    },
     "vdfvrn_readiness_v0101": {
       "argv": [
         "CGC_MDL265_VdfVrnReadiness_v0101",
@@ -4399,6 +4414,16 @@
       "next": "handoff test vdf_refill 實跑轉 VERIFIED",
       "case": "vdf_refill",
       "receipt": "docs/handoff/evidence/vdf_refill.json"
+    },
+    {
+      "id": "VCGC-REQ154:vdf_fetch_groups_v0105",
+      "requirement": "VCGC-REQ154",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "MDL012 v0105 左面板全輸入 · 收尾備份鈕(一鍵收尾每步紅就停 · 清除 ≠ ALL)· 本版 9/9 + 前版鏈 PASS(R53 · 2026-10-05)。原記 PENDING 的『前版鏈 FAIL』查明是本機容器殘留的 gitignore 檔 functional modules/VDF/output_hub/(10/02 舊庫)讓 v0100 ⑫ / v0104 ⑥ 掃到真庫;乾淨 checkout 與移開殘留後實跑 rc 0 · 標記見到 → 已驗:2026-10-05T11:54:14+00:00 rc 0 · 標記見到",
+      "next": "無(改本檔或前版鏈後重跑 handoff test vdf_fetch_groups_v0105)",
+      "case": "vdf_fetch_groups_v0105",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0105.json"
     },
     {
       "id": "VCGC-REQ170:vdfvrn_readiness_v0101",
