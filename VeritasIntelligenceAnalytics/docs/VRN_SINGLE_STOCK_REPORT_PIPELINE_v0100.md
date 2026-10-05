@@ -70,6 +70,17 @@ NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中�
 =評等誠實 None · TP 合理性燈(TP/報告日前價超出 0.15–8 帶=可疑回查)· REVERIFY 逐欄差異上報
 (`reverify_diff`:哪欄首輪/重建後各是什麼)· REVERIFY 掃描先去自家格線「|」(渲染物非原文)。
 
+## 四之二、治理律:子系統獨立性 · 母系統輔助性(操作員令 2026-10-05)
+- **子系統獨立性**:所有 SSOT / REGEX / 同義字 / 邏輯由**子系統(VRN)生成**——中央冊尾版
+  (Central_Synonym_Regex / SynonymUnion / Broker_Dict / ExtractRules)的 VRN 域條目一律出自
+  VRN 工作,VRN System Manager 是唯一載入與使用口(`_central_regex`/`_broker_map`/`_fin_lex`)。
+- **母系統輔助性**:母系統(VCGC)**只檢查衝突並顯示**(`via-vcgc ssot panorama` 七探針、
+  ENG088 drift 攤開列),**不裁定、不自動改**;修改由 **AI + 操作員**依顯示結果裁定後,
+  走子系統冊尾版落冊(只增不減不衝突)。
+- **VRN 統轄確認**:deepread / layout-check / reconstruct / eps-check / intake / reconcile /
+  closeout 全數經 VRN_SystemManager 動詞口(VIA_FROM_VCGC 閘 + 前版鏈),引擎(ENG052/085/
+  SUP_MDL866 NLP 座)只被 Manager 調度,不自行對外。
+
 ## 五、掛載
 工作流:`VIA_Workflow_VRN_SSOT_v0105.json` **VRN-WKF009(single_stock_report)**,九步,
 每步正主可尋尾版;需求 `VRN-REQ017` 雙向掛載(`VIA_Requirements_SSOT_v0172.json`)。
