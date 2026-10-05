@@ -1,0 +1,666 @@
+{
+ "schema": "VDF_FetchGroups_SSOT/1.0",
+ "version": "v0102",
+ "ts": "2026-10-05",
+ "owner": "VDF_MDL012_FetchGroups(尾版讀本冊;VCGC / VDF_SystemManager 皆可呼叫)",
+ "rule": "操作員 2026-10-04:「將輸入輸出分為大族群;國際股市每日行情及財報、國內選定股票的財報可以增減,其他大部分也可以增減;日期固定在同一天,但族群可以更改;結果用 DuckDB 管理監控;資料庫要最佳化」「台股每日資訊、台股股價指數、台股主動式 ETF 是抓全部,也要固定顯示全部」。",
+ "fetch_book": "VDF_FetchSystem_SSOT_v*.json(取尾版;engines 列的 id 對到本冊 groups[].engines)",
+ "as_of": {
+  "default": "latest",
+  "latest_rule": "台北時間最近一個已收盤的交易日(週一至週五;當天 15:00 前算前一交易日)。固定日期 = YYYY-MM-DD。",
+  "how": "一次解析、全族群共用同一天:① 支援日期旗標的引擎帶 asof_args(例 --end {as_of});② DuckDB 族群視圖一律 date <= as_of;③ 監控逐表標『到齊 / 落後 N 天』。不支援日期旗標的引擎不假裝,照抓、靠視圖截齊。",
+  "set_by": "VDF_MDL012 asof --set YYYY-MM-DD|latest(寫進成員帳本,只增)"
+ },
+ "member_ledger": "VDF_FetchGroups_MemberLedger_v0100.jsonl(只增:add / remove / asof 每筆一列;有效名單 = 基底 + add − remove,後寫者勝)",
+ "membership_kinds": {
+  "FIXED_ALL": "抓全部、固定顯示全部;拒絕 add / remove(rc 2)。",
+  "EDITABLE_MATRIX": "名單在 VDF_Input_Interface_Matrix 的 section(既有 InputConsole 同一份;本冊不另存第二份)。",
+  "EDITABLE_SELECTION": "名單 = AkShare 選單某組(可再用 include / exclude 正則切)+ 成員帳本增減;跑時產生有效選單交給 011d。",
+  "EDITABLE_LEDGER": "基底 = 全部(不篩);帳本一有 add 就只留 add 的成員,remove 一律排除。",
+  "EDITABLE_DEFAULT": "名單 = 冊上 default_members(+ Input_Interface_Matrix 該分區已有的代號)+ 成員帳本增減;抓取跟著名單(引擎帶 member_args)"
+ },
+ "cadence_tolerance_days": {
+  "daily": 0,
+  "monthly": 45,
+  "quarterly": 120,
+  "macro": 120,
+  "event": 30
+ },
+ "groups": [
+  {
+   "id": "TW_PRICE_VOL",
+   "zh": "台股每日量價",
+   "en": "Taiwan daily price & volume",
+   "membership": "FIXED_ALL",
+   "members_from": "MDL009 全台股清單(上市 + 上櫃)",
+   "engines": [
+    "009",
+    "e054",
+    "e057"
+   ],
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_daily_prices",
+     "date_col": "date",
+     "key_col": null
+    },
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_trading_daily",
+     "date_col": "date",
+     "key_col": null
+    }
+   ],
+   "category": "TW_MARKET",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:TWSE / TPEx OpenAPI",
+     "engines": [
+      "009",
+      "e054",
+      "e057"
+     ]
+    },
+    {
+     "provider": "YFINANCE",
+     "label": "YFinance 日線補洞(同表 tw_daily_prices)",
+     "engines": [
+      "e064"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TW_CHIP",
+   "zh": "台股籌碼",
+   "en": "Taiwan chips (institutional / margin)",
+   "membership": "FIXED_ALL",
+   "members_from": "MDL009 全台股清單",
+   "engines": [
+    "009",
+    "e054",
+    "e056"
+   ],
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_chip_margin",
+     "date_col": null,
+     "key_col": null
+    },
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_chip_derived",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "category": "TW_MARKET",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:TWSE / TPEx OpenAPI",
+     "engines": [
+      "009",
+      "e054",
+      "e056"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TW_MONTHLY_REV",
+   "zh": "台股月營收",
+   "en": "Taiwan monthly revenue",
+   "membership": "FIXED_ALL",
+   "members_from": "MDL009 全台股清單",
+   "engines": [
+    "009",
+    "e063"
+   ],
+   "cadence": "monthly",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_monthly_revenue",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "category": "TW_MARKET",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:MOPS 月營收",
+     "engines": [
+      "009",
+      "e063"
+     ]
+    },
+    {
+     "provider": "GOV",
+     "label": "政府:MOPS 月營收回補",
+     "engines": [
+      "e075"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TW_INDEX",
+   "zh": "台股股價指數",
+   "en": "Taiwan stock indices",
+   "membership": "FIXED_ALL",
+   "members_from": "TWSE / TPEx 官方指數全部",
+   "engines": [
+    "e232"
+   ],
+   "asof_args": {
+    "e232": [
+     "--start",
+     "{start}",
+     "--end",
+     "{as_of}"
+    ]
+   },
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "VDF_TWIndex_Daily.duckdb",
+     "table": "tw_index_daily",
+     "date_col": "date",
+     "key_col": "index_code"
+    }
+   ],
+   "category": "TW_MARKET",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:TWSE 官方指數",
+     "engines": [
+      "e232"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TW_ACTIVE_ETF",
+   "zh": "台股主動式 ETF",
+   "en": "Taiwan active ETFs",
+   "membership": "FIXED_ALL",
+   "members_from": "MDL010 主動式 ETF 清單(代碼 00xxxA)",
+   "engines": [
+    "010",
+    "e077",
+    "e078"
+   ],
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "ActiveTWETF.duckdb",
+     "table": "active_tw_etf_universe",
+     "date_col": null,
+     "key_col": null
+    },
+    {
+     "type": "duckdb",
+     "db": "ActiveTWETF.duckdb",
+     "table": "holdings_daily",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "category": "TW_MARKET",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:TWSE / TPEx OpenAPI(主動式 ETF)",
+     "engines": [
+      "010",
+      "e077",
+      "e078"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TW_FIN",
+   "zh": "國內選定股財報",
+   "en": "Taiwan selected stocks financials",
+   "membership": "EDITABLE_DEFAULT",
+   "matrix_section": "TW_FIN",
+   "engines": [
+    "e082"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "quarterly",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_tw_market.duckdb",
+     "table": "tw_financial",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "default_members": [
+    "2330",
+    "3324"
+   ],
+   "member_args": {
+    "e082": [
+     "--only",
+     "{members}"
+    ]
+   },
+   "start_args": {
+    "e082": [
+     "--years",
+     "{years}"
+    ]
+   },
+   "category": "FIN",
+   "refill": [
+    {
+     "provider": "GOV",
+     "label": "政府:MOPS / TPEx 財報",
+     "engines": [
+      "e082"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "INTL_FIN",
+   "zh": "國際股市財報",
+   "en": "International equities financials",
+   "membership": "EDITABLE_DEFAULT",
+   "matrix_section": "INTL_FIN",
+   "engines": [
+    "006"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "quarterly",
+   "sources": [
+    {
+     "type": "parquet",
+     "glob": "1-6-FinancialModel/income_statement_quarterly.parquet",
+     "date_col": null,
+     "key_col": null
+    },
+    {
+     "type": "parquet",
+     "glob": "1-6-FinancialModel/income_statement_annual.parquet",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "default_members": [
+    "NVDA"
+   ],
+   "member_args": {
+    "006": [
+     "--tickers",
+     "{members}"
+    ]
+   },
+   "category": "FIN",
+   "refill": [
+    {
+     "provider": "YFINANCE",
+     "label": "YFinance 三大報表",
+     "engines": [
+      "006"
+     ],
+     "note": "國際股沒有政府單一來源;FRED / AkShare 無個股財報"
+    }
+   ]
+  },
+  {
+   "id": "INTL_DAILY",
+   "zh": "國際股市每日行情",
+   "en": "International equities daily",
+   "membership": "EDITABLE_MATRIX",
+   "matrix_section": "INTL_DAILY",
+   "engines": [
+    "e066"
+   ],
+   "asof_args": {
+    "e066": [
+     "--start",
+     "{start}",
+     "--end",
+     "{as_of}"
+    ]
+   },
+   "fetch_follows_members": false,
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_global_market.duckdb",
+     "table": "global_daily",
+     "date_col": "date",
+     "key_col": "ticker"
+    }
+   ],
+   "category": "OTHER",
+   "refill": [
+    {
+     "provider": "YFINANCE",
+     "label": "YFinance 國際日線",
+     "engines": [
+      "e066"
+     ],
+     "note": "FRED 指數序列不同表,不混"
+    }
+   ]
+  },
+  {
+   "id": "CN_MACRO",
+   "zh": "中國經濟",
+   "en": "China macro",
+   "membership": "EDITABLE_SELECTION",
+   "selection_group": "china_macro",
+   "exclude": "^macro_china_nbs",
+   "engines": [
+    "011d"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "macro",
+   "sources": [
+    {
+     "type": "vake"
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "AKSHARE",
+     "label": "AkShare 中國經濟",
+     "engines": [
+      "011d"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "CN_NBS",
+   "zh": "國家統計局 NBS",
+   "en": "China NBS",
+   "membership": "EDITABLE_SELECTION",
+   "selection_group": "china_macro",
+   "include": "^macro_china_nbs",
+   "engines": [
+    "011d"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "macro",
+   "sources": [
+    {
+     "type": "vake"
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "AKSHARE",
+     "label": "AkShare 國家統計局 NBS(政府資料經 AkShare)",
+     "engines": [
+      "011d"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "GLOBAL_MACRO",
+   "zh": "各國經濟",
+   "en": "Global macro",
+   "membership": "EDITABLE_SELECTION",
+   "selection_group": "global_macro",
+   "engines": [
+    "011d"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "macro",
+   "sources": [
+    {
+     "type": "vake"
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "AKSHARE",
+     "label": "AkShare 各國經濟 / 央行利率",
+     "engines": [
+      "011d"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SHIPPING",
+   "zh": "航運指數",
+   "en": "Shipping indices",
+   "membership": "EDITABLE_SELECTION",
+   "selection_group": "shipping",
+   "engines": [
+    "011d"
+   ],
+   "fetch_follows_members": true,
+   "cadence": "daily",
+   "sources": [
+    {
+     "type": "vake"
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "AKSHARE",
+     "label": "AkShare 航運指數",
+     "engines": [
+      "011d"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "US_MACRO",
+   "zh": "美國總經 · Fed",
+   "en": "US macro and Fed",
+   "membership": "EDITABLE_LEDGER",
+   "engines": [
+    "e074",
+    "e113"
+   ],
+   "fetch_follows_members": false,
+   "cadence": "macro",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_global_market.duckdb",
+     "table": "us_macro",
+     "date_col": "date",
+     "key_col": "series"
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "FRED",
+     "label": "FRED(SSOT 190 series)",
+     "engines": [
+      "e074"
+     ],
+     "key": "FRED_API_KEY"
+    },
+    {
+     "provider": "FRED",
+     "label": "FRED + 美國財政部 fiscaldata(TGA)",
+     "engines": [
+      "e113"
+     ],
+     "key": "FRED_API_KEY"
+    },
+    {
+     "provider": "FRED",
+     "label": "FRED(OmniFetch L8,同表 us_macro)",
+     "engines": [
+      "e055fed"
+     ],
+     "key": "FRED_API_KEY"
+    }
+   ]
+  },
+  {
+   "id": "SENTIMENT",
+   "zh": "市場情緒",
+   "en": "Market sentiment",
+   "membership": "EDITABLE_LEDGER",
+   "engines": [
+    "e229",
+    "e116",
+    "e115"
+   ],
+   "fetch_follows_members": false,
+   "cadence": "event",
+   "sources": [
+    {
+     "type": "duckdb",
+     "db": "vdf_global_market.duckdb",
+     "table": "sentiment_daily",
+     "date_col": "date",
+     "key_col": null
+    },
+    {
+     "type": "duckdb",
+     "db": "aaii_sentiment.duckdb",
+     "table": "aaii_sentiment",
+     "date_col": null,
+     "key_col": null
+    }
+   ],
+   "category": "MACRO",
+   "refill": [
+    {
+     "provider": "OTHER",
+     "label": "CNN Fear & Greed · AAII · 情緒",
+     "engines": [
+      "e229",
+      "e116",
+      "e115"
+     ],
+     "note": "FRED UMCSENT 等不同表,不混"
+    }
+   ]
+  }
+ ],
+ "detect": {
+  "date_cols": [
+   "date",
+   "trade_date",
+   "Date",
+   "日期",
+   "period",
+   "month",
+   "ym",
+   "report_date",
+   "data_date",
+   "as_of"
+  ],
+  "key_cols": [
+   "ticker",
+   "code",
+   "stock_id",
+   "symbol",
+   "index_code",
+   "series",
+   "etf_code",
+   "stock_code",
+   "series_id",
+   "證券代號"
+  ]
+ },
+ "duckdb": {
+  "catalog": "VDF_FetchGroups.duckdb(放在輸出根;fg_groups · fg_members · fg_runs · fg_status 只增 + fg_status_latest 視圖)",
+  "db_search": "輸出根底下遞迴找 db 檔名(output_hub/mega · output_hub/tw_index · active_tw_etf_holdings…;工作站與容器同一份冊)",
+  "views": "query 動詞:來源庫唯讀 ATTACH → TEMP 視圖 g_<族群>__<表> = date <= as_of(+ 可增減族群再篩成員)",
+  "optimize": "plan(預設,零寫):庫大小 · WAL 殘留 · 大表 · parquet 小分片;--apply:CHECKPOINT + ANALYZE(被別的行程鎖住 = LOCKED 跳過,不搶鎖)· VAKE 小分片合併走 MDL011 compact(只增歸檔)。大表依 日期 + 代號 重排交給 ENG073 --optimize(會改表結構,另行裁)。"
+ },
+ "why_v0100": "倉內原本:名單散在 InputConsole 矩陣 / AkShare 選單 / 各引擎自己的清單;沒有全族群共用的 as-of 日;DuckDB 監控分散(MDL008 status、VAKE manifest、ENG089/090、MDL139 status)。本冊把輸入(名單)與輸出(庫 · 表)按大族群收成一張,MDL012 讀它做 增減 · as-of · 監控 · 最佳化。",
+ "prior": "VDF_FetchGroups_SSOT_v0101.json",
+ "rule_v0101": "操作員 2026-10-04:「VDF 分大類輸入:台股及主動式台股 ETF 清單式全部抓取每日量價及籌碼資訊及月營收;台股個股財報及國際股財報是單獨擷取,用 2330 3324 NVDA 為 DEFAULT」「分類後的參數其他都有 DEFAULT 可增減;變動的是起始日期,可分大群改,不可單獨改」",
+ "categories": [
+  {
+   "id": "TW_MARKET",
+   "zh": "台股 · 主動式台股 ETF(清單式全部抓取)",
+   "groups": [
+    "TW_PRICE_VOL",
+    "TW_CHIP",
+    "TW_MONTHLY_REV",
+    "TW_INDEX",
+    "TW_ACTIVE_ETF"
+   ],
+   "default_start": "2022-07-01",
+   "note": "每日量價 · 籌碼 · 月營收 · 指數 · 主動式 ETF;清單 = MDL009 全台股 + MDL010 主動式 ETF,固定全部"
+  },
+  {
+   "id": "FIN",
+   "zh": "財報(單獨擷取:台股個股 · 國際股)",
+   "groups": [
+    "TW_FIN",
+    "INTL_FIN"
+   ],
+   "default_start": "2021-01-01",
+   "note": "預設 2330 · 3324 · NVDA,可增減"
+  },
+  {
+   "id": "MACRO",
+   "zh": "總經 · 航運 · 情緒",
+   "groups": [
+    "CN_MACRO",
+    "CN_NBS",
+    "GLOBAL_MACRO",
+    "SHIPPING",
+    "US_MACRO",
+    "SENTIMENT"
+   ],
+   "default_start": "1990-01-01",
+   "note": "AkShare 選單組 + 美國總經 / 情緒"
+  },
+  {
+   "id": "OTHER",
+   "zh": "其他(國際每日行情)",
+   "groups": [
+    "INTL_DAILY"
+   ],
+   "default_start": "2020-01-01",
+   "note": "可增減名單,抓取引擎讀自己的清單、名單只篩視圖"
+  }
+ ],
+ "start_rule": "起始日只能按大類改(start --category X --set YYYY-MM-DD --apply,寫進成員帳本 kind=start);拒絕單一族群或單一成員改起始日。as-of(結束日)仍全族群同一天。",
+ "why_v0101": "分三大類 + 其他;TW_DAILY 拆成 量價 / 籌碼 兩組(可分別打勾);財報兩組改 EDITABLE_DEFAULT(預設 2330 3324 / NVDA,抓取帶 --only / --tickers);起始日按大類;v0100 已隨 PR #446 發布,出新版不就地改",
+ "rule_v0102": "操作員 2026-10-05:「FOR THOSE NO DATA USE FRED KEY AND OTHER GOVERNMENT UNIT AND AKSHARE TO FETCH」",
+ "refill_rule": "無資料(整組或部分來源 NODATA)才補;照 refill 分層依序跑,每層跑完重測該族群,有資料就停。只列寫進同一張表的引擎(不同表不混,免得燈假綠)。key 欄 = 該層要的鑰(FRED_API_KEY:環境變數或輸出根 .fred_api_key;只查有沒有,不印);沒鑰 = 該層 SKIP 照實記。網路要本視窗 VIA_NET_CONSENT=YES + VIA_SCRAPE_CONSENT(本冊與引擎永不代設)。",
+ "providers": {
+  "FRED": "美國聯準會 St. Louis FRED API(要 FRED_API_KEY)",
+  "GOV": "政府單位開放資料(TWSE · TPEx · MOPS · 美國財政部)",
+  "AKSHARE": "AkShare(含國家統計局等政府資料的轉接)",
+  "YFINANCE": "Yahoo Finance",
+  "OTHER": "其他(CNN · AAII)"
+ },
+ "why_v0102": "每個族群加 refill 分層補擷取路線(FRED → 政府單位 → AkShare;台股價量另有 YFinance 同表補洞);v0101 已發布,出新版不就地改"
+}
