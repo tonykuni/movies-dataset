@@ -974,10 +974,10 @@ def deepread_one(path: Path) -> dict:
                             comp = parts[1] if len(parts) > 1 and parts[1] else None
                             comp_src = "universe(VDF 資料家)"
                             break
-                except OSError:
-                    pass
+                except OSError as exc:
+                    comp_src = f"universe 讀取失敗 {type(exc).__name__}"   # 誠實記,不吞
             if comp is None:
-                comp_src = "VDF 車道待取(本地無 universe)"
+                comp_src = comp_src if comp_src.startswith("universe 讀取失敗") else "VDF 車道待取(本地無 universe)"
         row["company_name"], row["company_source"] = comp, comp_src
         if code:
             row.update(_yf_ticker_v0119(code))
