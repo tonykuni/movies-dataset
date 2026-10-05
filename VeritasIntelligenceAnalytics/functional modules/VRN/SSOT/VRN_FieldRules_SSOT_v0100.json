@@ -1,0 +1,959 @@
+{
+ "schema": "VIA.VRNFieldRules.SSOT.v1",
+ "batch": "\u6279634",
+ "ts": "2026-09-20",
+ "owner": "SUP_MDL749_VRNFieldRuleHub",
+ "canonical_source": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0102.py",
+ "why": "\u7814\u5831\u516d\u6b04(\u5238\u5546/\u8a55\u7b49/\u76ee\u6a19\u50f9/\u8ca1\u5831/email/\u96fb\u8a71)\u7684\u898f\u5247,\u4eca\u5929\u6563\u5728\u56db\u652f\u73fe\u5f79\u5f15\u64ce\u88e1\u5404\u6709\u5404\u7684\u7248\u672c:ENG086 35 \u500b\u8a55\u7b49\u8a5e\u3001ENG073 29\u3001TW02 24\u3001\u9996\u9801\u5168\u80fd 13(\u82f1\u6587\u8a55\u7b49\u5168\u7f3a)\u3002\u540c\u4e00\u4ef6\u4e8b\u56db\u5957\u898f\u5247=\u56db\u500b\u6703\u5404\u81ea\u6f02\u79fb\u7684\u771f\u76f8\u3002\u9019\u672c\u518a\u628a**\u5df2\u9a57\u904e\u7684\u90a3\u4e00\u5957**(ENG086 v0102,64 \u4efd\u771f\u7814\u5831\u4e0a\u6253\u51fa\u4f86\u7684)\u7acb\u70ba\u6b63\u672c\u4e26\u9396\u4f4f,\u5176\u9918\u5f15\u64ce\u7684\u843d\u5dee\u9010\u689d\u8a18\u5728 drift \u5340\u2014\u2014**\u5148\u770b\u5f97\u898b,\u518d\u6c7a\u5b9a\u8ab0\u6539**\u3002\u672c\u518a\u8207\u6a1e\u7d10\u90fd\u662f\u7d14\u589e\u91cf:\u4e0d\u6539\u4efb\u4f55\u73fe\u5f79\u5f15\u64ce\u7684\u884c\u70ba(\u53ea\u589e\u4e0d\u6e1b \u00b7 \u4e0d\u5f71\u97ff\u73fe\u6709\u529f\u80fd \u00b7 \u4e0d\u88fd\u9020\u4e5d\u982d\u9f8d)\u3002",
+ "rules": {
+  "rating": {
+   "zh": "\u8a55\u7b49",
+   "canon_map": {
+    "BUY": [
+     "buy",
+     "outperform",
+     "overweight",
+     "strong buy",
+     "\u52a0\u78bc",
+     "\u5f37\u529b\u8cb7\u9032",
+     "\u8cb7\u9032"
+    ],
+    "HOLD": [
+     "equal-weight",
+     "equalweight",
+     "hold",
+     "market perform",
+     "neutral",
+     "\u4e2d\u7acb",
+     "\u5340\u9593",
+     "\u6301\u6709"
+    ],
+    "SELL": [
+     "reduce",
+     "sell",
+     "underperform",
+     "underweight",
+     "\u6e1b\u78bc",
+     "\u8ce3\u51fa"
+    ],
+    "ADD": [
+     "accumulate",
+     "add",
+     "\u9022\u4f4e"
+    ]
+   },
+   "local_scale": {
+    "\u589e\u52a0\u6301\u80a1": "BUY",
+    "\u589e\u6301": "BUY",
+    "\u512a\u65bc\u5927\u76e4": "BUY",
+    "\u5f37\u65bc\u5927\u76e4": "BUY",
+    "\u8868\u73fe\u512a\u65bc\u5927\u76e4": "BUY",
+    "\u6e1b\u5c11\u6301\u80a1": "SELL",
+    "\u6e1b\u6301": "SELL",
+    "\u52a3\u65bc\u5927\u76e4": "SELL",
+    "\u5f31\u65bc\u5927\u76e4": "SELL",
+    "\u8868\u73fe\u52a3\u65bc\u5927\u76e4": "SELL",
+    "\u6301\u6709\u8a55\u7b49": "HOLD",
+    "\u540c\u6b65\u5927\u76e4": "HOLD",
+    "\u8207\u5927\u76e4\u540c\u6b65": "HOLD",
+    "\u5340\u9593\u64cd\u4f5c": "HOLD"
+   },
+   "cue_rx": "(\u6295\u8cc7\u8a55\u7b49|\u8a55\u7b49|\u8a55\u7d1a|\u5efa\u8b70|Rating|Recommendation|Rec\\.)[^\\n]{0,8}?[:\uff1a]?\\s*(\u5f37\u529b\u8cb7\u9032|\u8cb7\u9032|\u52a0\u78bc|\u9022\u4f4e|\u4e2d\u7acb|\u6301\u6709|\u5340\u9593|\u8ce3\u51fa|\u6e1b\u78bc|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)",
+   "title_rx": "[;,\uff0c\u3001:\uff1a\\-\u2013\u2014(\uff08]\\s*(\u5f37\u529b\u8cb7\u9032|\u8cb7\u9032|\u52a0\u78bc|\u9022\u4f4e|\u4e2d\u7acb|\u6301\u6709|\u5340\u9593|\u8ce3\u51fa|\u6e1b\u78bc|Strong Buy|Buy|Outperform|Overweight|Accumulate|Add|Neutral|Hold|Market Perform|Equal-?weight|Sell|Underperform|Underweight|Reduce)\\b",
+   "quoted_rx": "(\u7dad\u6301|\u8abf\u6574\u70ba|\u8abf\u5347\u70ba|\u8abf\u964d\u70ba|\u7d66\u4e88|\u7d66\u8207)?\\s*[\u300c\u300e\\u201c\\\"]\\s*(\u5f37\u529b\u8cb7\u9032|\u8cb7\u9032|\u52a0\u78bc|\u9022\u4f4e|\u4e2d\u7acb|\u6301\u6709|\u5340\u9593|\u8ce3\u51fa|\u6e1b\u78bc)\\s*[\u300d\u300f\u201d\\\"]\\s*(\u8a55\u7b49|\u8a55\u7d1a)?",
+   "not_rated_rx": "\u672a\u8a55\u7b49|NR[_\\s]*\u672a\u8a55\u7b49|Not\\s*Rated|\\bNR\\b",
+   "four_state": {
+    "HIT": "\u547d\u4e2d",
+    "NA_NO_TOKEN": "\u6587\u4e2d\u7121\u8a55\u7b49\u5b57\u6a23",
+    "NOT_STOCK": "\u975e\u500b\u80a1(\u4e0d\u9700)",
+    "MISS": "\u6709\u5b57\u6a23\u6293\u4e0d\u5230(RED)"
+   },
+   "lesson": "LL68 \u672c\u571f\u5238\u5546\u81ea\u6709\u5c3a\u5ea6(\u589e\u52a0\u6301\u80a1=Outperform)\u8981\u6536;\u53ea\u770b\u524d\u6bb5,\u5167\u6587\u300e\u5916\u8cc7\u6301\u6709\u300f\u4e0d\u662f\u8a55\u7b49\u3002"
+  },
+  "target_price": {
+   "zh": "\u76ee\u6a19\u50f9",
+   "cue_rx": [
+    "\u76ee\u6a19\u50f9[^\\d]{0,14}?(\\d[\\d,]*\\.?\\d*)",
+    "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*(?:\\([^)\\n%\uff05]{0,12}\\))?\\s*[:\uff1a]?\\s*(?:\\(?(?:NTD|TWD|HKD|SGD|AUD|USD|JPY|EUR|GBP|RMB|CNY)\\)?|\\(?(?:NT|US|HK|S|A)\\$\\)?|[\u00a5\u20ac\u00a3$])?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
+   ],
+   "cue_any_rx": "\u76ee\u6a19\u50f9|Target\\s*Price|Price\\s*Target|(?<![A-Za-z])TP(?![A-Za-z])|(?<![A-Za-z])PT(?![A-Za-z])",
+   "na_rx": "(?:\u76ee\u6a19\u50f9|Target\\s*Price|Price\\s*Target)\\s*[:\uff1a]?\\s*(?:n\\.\\s?a\\.?|(?<![A-Za-z])na(?![A-Za-z])|not\\s+applicable|\u4e0d\u9069\u7528|\u672a\u63d0\u4f9b|\u672a\u8a55\u7b49)",
+   "upside_rx": "(\u6f5b\u5728)?\u4e0a\u6f32\u7a7a\u9593|\u4e0a\u6a94\u7a7a\u9593|upside",
+   "four_state": {
+    "HIT": "\u547d\u4e2d",
+    "NA_DECLARED": "\u5831\u544a\u81ea\u8ff0 n.a.",
+    "ABSENT_IN_TEXT": "\u6587\u5b57\u7121\u6b64\u6b04",
+    "NOT_STOCK": "\u975e\u500b\u80a1(\u4e0d\u9700)",
+    "MISS": "\u6709\u7dda\u7d22\u6293\u4e0d\u5230(RED)"
+   },
+   "lesson": "LL64 \u76ee\u6a19\u50f9 \u2260 \u6f5b\u5728\u4e0a\u6f32\u7a7a\u9593;\u7121\u7dda\u7d22\u8a5e\u4e0d\u5f97\u7528\u5f31 NT$ \u6b63\u5247(\u6703\u628a\u71df\u6536\u6578\u5b57\u7576\u76ee\u6a19\u50f9)\u3002",
+   "alias_source": "supportive modules/ssot/VIA_Financial_Institution_SSOT_v*.json#registries.research_fields.TARGET_PRICE.aliases",
+   "alias_note": "\u6279554 \u64cd\u4f5c\u54e1\u4ee4\u300c\u76ee\u6a19\u50f9 \u76ee\u6a19 target price price target target\u300d\u3002\u540c\u7fa9\u5b57\u7684\u6b63\u672c\u5728\u6a5f\u69cb SSOT \u90a3\u4e00\u672c(16 \u689d),**\u672c\u518a\u4e0d\u6284\u7b2c\u4e8c\u4efd**\u2014\u2014\u6284\u4e86\u5c31\u662f\u7b2c\u4e8c\u9846\u6703\u6f02\u79fb\u7684\u982d\u3002cue_rx \u9019\u5169\u689d\u662f ENG086 \u5728 64 \u4efd\u771f\u7814\u5831\u4e0a\u9a57\u904e\u7684**\u5f37\u7dda\u7d22**(5 \u8a5e);\u5176\u9918 11 \u689d\u7531\u6a1e\u7d10 tp_terms() \u8b80\u518a\u53d6\u5f97,\u8d70\u52a0\u5bec\u5f31\u9053,\u4e14\u5b88\u885b\u6bd4\u5f37\u7dda\u7d22\u66f4\u7dca(\u898b alias_weak_guard)\u3002",
+   "alias_weak_guard": [
+    "\u8a5e\u8207\u6578\u5b57\u9593\u6700\u591a 6 \u5b57\u5143,\u4e14\u4e0d\u5f97\u593e\u96dc\u767d\u540d\u55ae\u4ee5\u5916\u7684\u4e2d\u6587(\u300e\u76ee\u6a19\u5e02\u5834\u898f\u6a21 2026\u300f\u4e0d\u7b97)",
+    "\u6578\u5b57\u5f8c(\u5bb9\u4e00\u500b\u7a7a\u767d)\u63a5 % \uff0f \u500d \uff0f x \uff0f \u5e74 = \u4e0d\u662f\u50f9\u683c",
+    "\u6578\u5b57\u8981\u5403\u4e7e\u6de8((?![\\d.,]));\u5426\u5247\u6b63\u5247\u56de\u6eaf\u6210\u300e202\u300f\u518d\u770b\u898b\u300e6\u300f\u5c31\u904e\u95dc",
+    "\u6cbf\u7528\u6b63\u672c\u5be6\u4f5c\u7684 _is_upside_context(LL64 \u5e45\u5ea6\u4e0d\u662f\u50f9\u683c)\u8207 _plausible_tp"
+   ],
+   "prev_cues": {
+    "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+    "cues_prev": [
+     "\u524d\u6b21",
+     "\u539f",
+     "\u539f\u5148",
+     "\u5148\u524d",
+     "Previous",
+     "Prev",
+     "Prior",
+     "Old",
+     "Last",
+     "was",
+     "from"
+    ],
+    "cues_current": [
+     "\u672c\u6b21",
+     "\u6700\u65b0",
+     "\u8abf\u6574\u5f8c",
+     "\u65b0",
+     "Current",
+     "New",
+     "to",
+     "revised"
+    ],
+    "rx_prev": "(\u524d\u6b21|\u539f|\u5148\u524d|Previous|Prev|Prior|Old|Last)\\s*(\u76ee\u6a19\u50f9|\u76ee\u6a19|Target\\s*Price|Price\\s*Target|TP)?\\s*[:\uff1a]?\\s*(NT\\$|US\\$|\\$)?\\s*(\\d+(?:\\.\\d+)?)",
+    "rx_arrow": "(\\d+(?:\\.\\d+)?)\\s*(?:\u2192|->|=>|\u81f3|to)\\s*(\\d+(?:\\.\\d+)?)",
+    "arrow_rule": "\u7bad\u865f\u53e5 `100 \u2192 90` \u5de6\u908a\u662f\u524d\u6b21\u3001\u53f3\u908a\u662f\u672c\u6b21\u3002\u9019\u662f\u7814\u5831\u6700\u5e38\u898b\u7684\u5beb\u6cd5,\u6bd4\u95dc\u9375\u5b57\u66f4\u53ef\u9760\u3002",
+    "direction": "\u672c\u6b21 > \u524d\u6b21 = \u8abf\u5347 \u00b7 \u672c\u6b21 < \u524d\u6b21 = \u8abf\u964d \u00b7 \u76f8\u7b49 = \u7dad\u6301",
+    "why": "\u518a\u4e0a\u539f\u672c\u53ea\u6709\u76ee\u6a19\u50f9**\u540c\u7fa9\u5b57**,\u6c92\u6709\u300e\u54ea\u4e00\u500b\u662f\u672c\u6b21\u3001\u54ea\u4e00\u500b\u662f\u524d\u6b21\u300f\u3002\u4e00\u4efd\u5831\u544a\u540c\u6642\u5beb\u5169\u500b\u6578\u5b57,\u6293\u932f\u5c31\u662f\u628a\u8abf\u964d\u8b80\u6210\u8abf\u5347\u2014\u2014\u90a3\u4e0d\u662f\u7f3a\u6599,\u662f\u5224\u932f\u3002",
+    "four_state": "\u5169\u500b\u90fd\u89e3\u5f97\u51fa\u4e14\u65b9\u5411\u4e00\u81f4=GREEN \u00b7 \u53ea\u89e3\u5f97\u51fa\u672c\u6b21=GREEN(\u524d\u6b21\u6b04 NODATA)\u00b7 \u89e3\u51fa\u5169\u500b\u4f46\u77db\u76fe=YELLOW"
+   },
+   "b727": {
+    "ruled_by": "\u64cd\u4f5c\u54e1 2026-09-23\u300cGO ON\u300d(\u6838\u51c6 #85 \u5148\u9032\u518a\u3001\u53ef\u9006);\u8a3a\u65b7\u7531\u672c\u6279\u5be6\u6e2c\u66f4\u6b63",
+    "why": "\u539f\u5148\u5047\u8a2d\u662f\u300e\u82f1\u6587\u6a19\u7c64\u6c92\u9032\u518a / cue_rx \u5340\u5206\u5927\u5c0f\u5beb\u300f\u2014\u2014**\u91cf\u4e0b\u53bb\u662f\u932f\u7684**\u3002\u672c\u6a4b _RATING_CUE \u672c\u4f86\u5c31\u5e36 re.I,\u4e14 `Rating` \u662f\u5b50\u5b57\u4e32\u6bd4\u5c0d,\u6240\u4ee5 `Stock Rating` / `12-month rating` / `STOCK RATING` \u5728 v0113 \u8d77\u5c31\u5168\u4e2d;\u800c\u8a55\u7b49\u6839\u672c\u4e0d\u8b80\u518a\u4e0a\u7684 rating.cue_rx(\u8a5e\u8868\u5beb\u5728\u672c\u6a4b\u81ea\u5df1\u6a94\u88e1),\u5f80\u518a\u88e1\u52a0\u82f1\u6587\u6a19\u7c64\u5c0d\u672c\u6a4b\u662f\u96f6\u6548\u679c\u3002\u771f\u7f3a\u53e3\u53ea\u5728\u76ee\u6a19\u50f9,\u5169\u500b\u539f\u56e0\u90fd\u5728 cue_rx[1]:\u2460 \u6a19\u7c64\u8207\u6578\u5b57\u4e4b\u9593\u7684\u62ec\u865f\u4fee\u98fe\u8a9e(`Price Target (Dec-25):` / `Target Price (12M):`)\u628a\u5f37\u7dda\u7d22\u6253\u65b7;\u2461 \u5e63\u5225\u524d\u7db4\u53ea\u8a8d NT/NTD/TWD,`US$190` / `HK$52.5` \u5168\u6c92\u4e2d\u3002",
+    "measured_2026_09_23": {
+     "engines_ab": "v0113 / v0114 / v0115 \u4e09\u7248\u5c0d\u540c\u4e00\u7d44\u82f1\u6587\u4e03\u5f0f\u540c\u70ba 3/7 \u2014\u2014 PR #75 \u6c92\u78b0\u904e\u9019\u689d\u8def",
+     "v0116": "7/7,\u4e14 `Price Target (Dec-25): NT$250` \u7531\u300c\u6536\u5bb9\u4ef6 NT$ \u6b63\u5247(\u5f31)\u300d\u5347\u7d1a\u70ba\u300cTP \u7dda\u7d22\u300d(\u5f37)",
+     "rating": "\u82f1\u6587\u4e5d\u5f0f\u5728 v0113 \u8d77\u5373 9/9,\u7121\u7f3a\u53e3",
+     "corpus_64": "\u672c\u5883 64 \u4efd\u771f\u7814\u5831\u8a9e\u6599 v0115 \u8207 v0116 **\u5b8c\u5168\u76f8\u540c**(\u8a55\u7b49\u547d\u4e2d 36 \u00b7 \u76ee\u6a19\u50f9\u547d\u4e2d 30 \u00b7 \u771f RED 0)\u2014\u2014\u4e0d\u9000\u6b65,\u4f46\u672c\u5883\u8a9e\u6599\u6c92\u6709\u9019\u4e9b\u82f1\u6587\u7248\u9762,\u8b49\u4e0d\u51fa\u9032\u6b65",
+     "selftest": "v0115 41 \u6aa2 OK 41 \u2192 v0116 56 \u6aa2 OK 56(+\u82f1\u6587\u76ee\u6a19\u50f9\u4e03\u5f0f\u6b63\u63a7 + \u4e03\u5f0f\u8ca0\u63a7 + \u96d9\u982d\u5b88\u885b)"
+    },
+    "impl_is": "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py \u7684 _TP_CUES(\u5c3e\u7248)\u3002\u672c\u518a\u9019\u5169\u689d\u662f\u5b83\u7684**\u96d9\u80de\u80ce\u6284\u672c**,\u4e0d\u662f\u53e6\u4e00\u500b\u6b63\u4e3b;v0116 \u8d77\u7531\u8a72\u6a4b\u81ea\u6e2c\u9010\u5b57\u6bd4\u5c0d,\u6f02\u6389\u6703\u7d05\u3002",
+    "cue_rx_before_b727": [
+     "\u76ee\u6a19\u50f9[^\\d]{0,14}?(\\d[\\d,]*\\.?\\d*)",
+     "(?<![A-Za-z])(?:(?i:target\\s*price|price\\s*target)|TP|PT)(?![A-Za-z])\\s*[:\uff1a]?\\s*(?:\\(?NT\\$?\\)?|NTD|TWD)?\\s*\\$?\\s*(\\d[\\d,]*\\.?\\d*)"
+    ],
+    "b727b_codex_p1": {
+     "found_by": "PR #94 Codex \u81ea\u52d5\u5be9\u67e5 P1(2026-09-23),\u5be6\u6e2c\u8907\u9a57\u5c6c\u5be6",
+     "what_broke": "\u653e\u5bec\u62ec\u865f\u4fee\u98fe\u8a9e\u4e4b\u5f8c,\u5e45\u5ea6\u6b04\u88ab\u7576\u6210\u76ee\u6a19\u50f9:`Up/downside to price target (%)\\n38` \u5728 v0115 \u56de None,v0116 \u56de 38.0 \u4e14\u6a19\u6210**\u5f37\u7dda\u7d22**\u3002",
+     "root_cause": "\u5b88\u885b _UPSIDE_RX \u7684\u8a5e\u8868\u53ea\u6709 `upside`,\u800c **`Up/downside` \u88e1\u6c92\u6709 `upside` \u9019\u500b\u5b50\u5b57\u4e32**,downside \u90a3\u4e00\u985e\u5f9e\u4f86\u6c92\u88ab\u6514\u904e;\u52a0\u4e0a\u62ec\u865f\u63d2\u9032\u4f86\u4e4b\u5f8c,\u5e45\u5ea6\u8a5e\u88ab\u63a8\u51fa\u300c\u6578\u5b57\u524d\u5f8c 26 \u5b57\u300d\u90a3\u500b\u8996\u7a97\u3002",
+     "fix": [
+      "\u62ec\u865f\u4fee\u98fe\u8a9e\u4e0d\u51c6\u542b % / \uff05(\u55ae\u4f4d\u4e0d\u662f\u4fee\u98fe\u8a9e)",
+      "_UPSIDE_RX \u88dc \u4e0b\u8dcc\u7a7a\u9593 / up\\s*/?\\s*downside / downside",
+      "\u5b88\u885b\u9664\u4e86\u6578\u5b57\u5468\u908a,**\u7dda\u7d22\u8a5e\u4e4b\u524d**\u4e5f\u770b\u4e00\u6b21(\u540c\u4e00\u652f _is_upside_context,\u4e0d\u53e6\u958b\u7b2c\u4e8c\u9053)"
+     ],
+     "verified": "\u4e03\u5f0f\u8aa4\u5831\u5168\u6ec5 \u00b7 \u4e03\u5f0f\u6b63\u63a7\u96f6\u9000\u6b65 \u00b7 \u81ea\u6e2c 61 \u6aa2 OK 61 \u00b7 64 \u4efd\u8a9e\u6599\u8207 v0115 \u4ecd\u5b8c\u5168\u76f8\u540c",
+     "lesson": "LL433:\u653e\u5bec\u4e00\u689d\u5f0f\u5b50\u7684\u6642\u5019,\u8981\u540c\u6642\u554f\u300e\u65e2\u6709\u7684\u5b88\u885b\u64cb\u5f97\u4f4f\u653e\u5bec\u5f8c\u7684\u65b0\u5f62\u72c0\u55ce\u300f\u2014\u2014\u9019\u6b21\u5b88\u885b\u4e0d\u4f46\u64cb\u4e0d\u4f4f,\u5b83\u9023\u539f\u672c\u5c31\u8a72\u64cb\u7684 downside \u90fd\u5f9e\u4f86\u6c92\u64cb\u904e,\u662f\u653e\u5bec\u624d\u628a\u9019\u500b\u820a\u6d1e\u7167\u51fa\u4f86\u3002"
+    }
+   }
+  },
+  "broker": {
+   "zh": "\u5238\u5546",
+   "ssot_file": "functional modules/VRN/registry/VRN_BROKER_LIST_v01.json",
+   "extra_table": {
+    "MEGA": [
+     "\u5146\u8c50",
+     "mega securities",
+     "mega sec"
+    ],
+    "CATHAY": [
+     "\u570b\u6cf0\u8b49\u671f",
+     "\u570b\u6cf0\u8b49\u5238",
+     "\u570b\u6cf0\u6295\u9867",
+     "cathay securities",
+     "cathay sec"
+    ],
+    "SINOPAC": [
+     "\u6c38\u8c50",
+     "sinopac"
+    ],
+    "ESUN": [
+     "\u7389\u5c71",
+     "e.sun",
+     "esun"
+    ],
+    "MASTERLINK": [
+     "\u5143\u5bcc",
+     "masterlink"
+    ],
+    "HUANAN": [
+     "\u83ef\u5357\u6c38\u660c",
+     "\u83ef\u5357",
+     "hua nan"
+    ],
+    "JIHSUN": [
+     "\u65e5\u76db",
+     "jih sun",
+     "jihsun"
+    ],
+    "CONCORD": [
+     "\u5eb7\u548c",
+     "concord securities"
+    ],
+    "HONGYUAN": [
+     "\u5b8f\u9060",
+     "hong yuan"
+    ],
+    "TAISHIN": [
+     "\u53f0\u65b0",
+     "taishin"
+    ],
+    "FIRSTSEC": [
+     "\u7b2c\u4e00\u91d1",
+     "first securities"
+    ],
+    "TCB": [
+     "\u5408\u5eab",
+     "\u5408\u4f5c\u91d1\u5eab"
+    ],
+    "SKS": [
+     "\u65b0\u5149",
+     "shin kong"
+    ],
+    "IBF": [
+     "\u570b\u7968",
+     "ibf securities"
+    ],
+    "ORIENTAL": [
+     "\u4e9e\u6771",
+     "oriental securities"
+    ],
+    "DACHANG": [
+     "\u5927\u660c",
+     "ta chang"
+    ],
+    "FUBANG": [
+     "\u798f\u90a6"
+    ],
+    "TACHING": [
+     "\u5fb7\u4fe1"
+    ],
+    "HSBC": [
+     "\u532f\u8c50",
+     "hsbc"
+    ],
+    "BNP": [
+     "\u6cd5\u5df4",
+     "bnp paribas",
+     "bnp"
+    ],
+    "CREDITSUISSE": [
+     "\u745e\u4fe1",
+     "credit suisse"
+    ],
+    "BARCLAYS": [
+     "\u5df4\u514b\u840a",
+     "barclays"
+    ],
+    "JEFFERIES": [
+     "jefferies"
+    ],
+    "MIZUHO": [
+     "\u745e\u7a57",
+     "mizuho"
+    ],
+    "NIKKO": [
+     "\u65e5\u8208",
+     "smbc nikko",
+     "nikko"
+    ],
+    "BERNSTEIN": [
+     "bernstein"
+    ],
+    "JPMORGAN": [
+     "jp",
+     "\u5c0f\u6469"
+    ],
+    "MORGANSTANLEY": [
+     "\u5927\u6469"
+    ],
+    "CLSA": [
+     "clst",
+     "clsa",
+     "\u91cc\u6602"
+    ],
+    "KGI": [
+     "\u51f1\u57fa\u6295\u9867",
+     "\u51f1\u57fa\u8b49\u5238"
+    ],
+    "CAPITAL": [
+     "\u7fa4\u76ca\u6295\u9867",
+     "\u7fa4\u76ca\u8b49\u5238"
+    ],
+    "PRESIDENT": [
+     "\u7d71\u4e00\u6295\u9867",
+     "\u7d71\u4e00\u8b49\u5238"
+    ],
+    "CTBC": [
+     "\u4e2d\u4fe1\u6295\u9867"
+    ]
+   },
+   "generic_latin": [
+    "add",
+    "capital",
+    "concord",
+    "first",
+    "mega",
+    "oriental",
+    "president"
+   ],
+   "evidence_tiers": [
+    "\u6587\u5167(\u53bb\u96fb\u90f5/\u7db2\u5740)",
+    "\u6a94\u540d",
+    "\u96fb\u90f5\u7db2\u57df(\u5f31)"
+   ],
+   "contact_strip_rx": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+|(?:https?://|www\\.)\\S+",
+   "lesson": "LL66 \u96fb\u90f5\u7db2\u57df\u4e0d\u662f\u6587\u5167\u8b49\u64da;LL67 \u6a19\u7684\u516c\u53f8\u540d\u4e0d\u662f\u5238\u5546\u8b49\u64da(\u4e0d\u9760\u5eab,\u7528\u4ee3\u78bc\u76f8\u9130\u5169\u689d\u9435\u8b49)\u3002"
+  },
+  "date": {
+   "zh": "\u6a94\u540d\u65e5\u671f",
+   "four_state": {
+    "HIT": "\u547d\u4e2d",
+    "ABSENT": "\u6a94\u540d\u7121\u65e5\u671f",
+    "MISS": "\u6709\u6578\u5b57\u89e3\u4e0d\u51fa(RED)"
+   },
+   "roc7": "\u6c11\u570b 7 \u78bc 1140822 \u2192 2025-08-22",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279628 \u4ee4\u300c\u65e5\u671f \u5e74\u5206 \u6c11\u570b\u5e74 \u65e5\u671f\u5206\u6578\u5b57\u5404\u985e\u5168\u90e8\u8981\u66f4\u65b0REGEX\u300d)",
+   "why": "VRN \u77e9\u9663\u300e\u5831\u544a\u65e5\u300f\u6b04\u5be6\u6e2c 81 \u4efd\u88e1 13 \u4efd\u7a7a\u3002\u820a\u898f\u5247\u53ea\u8a8d\u4e09\u7a2e**\u7d14\u6578\u5b57**\u5beb\u6cd5(8 \u78bc 20251202 / 7 \u78bc\u6c11\u570b 1141202 / 6 \u78bc 251202),\u5e36\u5206\u9694\u3001\u5e36\u4e2d\u6587\u3001\u5e36\u6c11\u570b\u5b57\u6a23\u7684\u4e00\u6982\u62bd\u4e0d\u5230\u3002",
+   "granularity_rule": "\u62bd\u5230\u5e74\u6708\u65e5=DAY;\u53ea\u6709\u5e74\u6708=MONTH;\u53ea\u6709\u5e74=YEAR\u3002**MONTH/YEAR \u4e0d\u88dc\u6210\u7576\u6708\u4e00\u65e5\u6216\u7576\u5e74\u4e00\u6708\u4e00\u65e5**\u2014\u2014\u88dc\u51fa\u4f86\u7684\u90a3\u4e00\u5929\u662f\u634f\u9020\u7684,\u547c\u53eb\u7aef\u81ea\u5df1\u6c7a\u5b9a\u6536\u4e0d\u6536(\u8aa0\u5be6\u614b,\u4e0d\u662f DAY \u5c31\u5225\u7576 DAY \u7528)\u3002",
+   "roc_rule": "\u6c11\u570b\u5e74 = \u897f\u5143\u5e74 - 1911\u3002\u4e09\u78bc 100~199 \u624d\u7576\u6c11\u570b(\u6c11\u570b 100 \u5e74=2011);\u5169\u78bc\u4e00\u5f8b\u7576\u897f\u5143\u5f8c\u5169\u78bc,\u4e0d\u7576\u6c11\u570b(\u6c11\u570b 99 \u5e74\u4ee5\u524d\u7684\u7814\u5831\u4e0d\u5728\u672c\u7cfb\u7d71\u7bc4\u570d)\u3002",
+   "patterns": [
+    {
+     "id": "AD8",
+     "rx": "(?<!\\d)(20\\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])(?!\\d)",
+     "era": "AD",
+     "gran": "DAY",
+     "eg": "20251202"
+    },
+    {
+     "id": "ROC7",
+     "rx": "(?<!\\d)(1[0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])(?!\\d)",
+     "era": "ROC",
+     "gran": "DAY",
+     "eg": "1141202"
+    },
+    {
+     "id": "AD6",
+     "rx": "(?<!\\d)(2[3-9])(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])(?!\\d)",
+     "era": "AD2",
+     "gran": "DAY",
+     "eg": "251202"
+    },
+    {
+     "id": "AD_SEP",
+     "rx": "(?<!\\d)(20\\d{2})[-/._\u5e74](0?[1-9]|1[0-2])[-/._\u6708](0?[1-9]|[12]\\d|3[01])[\u65e5]?(?!\\d)",
+     "era": "AD",
+     "gran": "DAY",
+     "eg": "2025-12-02 \u00b7 2025/12/2 \u00b7 2025\u5e7412\u67082\u65e5"
+    },
+    {
+     "id": "ROC_SEP",
+     "rx": "(?:\u6c11\u570b|\u4e2d\u83ef\u6c11\u570b)?\\s*(?<!\\d)(1[0-9]{2})[-/._\u5e74](0?[1-9]|1[0-2])[-/._\u6708](0?[1-9]|[12]\\d|3[01])[\u65e5]?(?!\\d)",
+     "era": "ROC",
+     "gran": "DAY",
+     "eg": "114-12-02 \u00b7 \u6c11\u570b114\u5e7412\u67082\u65e5"
+    },
+    {
+     "id": "AD2_SEP",
+     "rx": "(?<!\\d)(2[3-9])[-/.](0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\\d|3[01])(?!\\d)",
+     "era": "AD2",
+     "gran": "DAY",
+     "eg": "25/12/02"
+    },
+    {
+     "id": "AD_MONTH",
+     "rx": "(?<!\\d)(20\\d{2})[-/._\u5e74](0?[1-9]|1[0-2])\u6708?(?![\\d\u65e5])",
+     "era": "AD",
+     "gran": "MONTH",
+     "eg": "2025\u5e7412\u6708 \u00b7 2025-12"
+    },
+    {
+     "id": "ROC_MONTH",
+     "rx": "(?:\u6c11\u570b|\u4e2d\u83ef\u6c11\u570b)?\\s*(?<!\\d)(1[0-9]{2})[-/._\u5e74](0?[1-9]|1[0-2])\u6708?(?![\\d\u65e5])",
+     "era": "ROC",
+     "gran": "MONTH",
+     "eg": "114\u5e7412\u6708"
+    },
+    {
+     "id": "AD_YEAR",
+     "rx": "(?:FY)?(?<!\\d)(20\\d{2})\\s*\u5e74(?![\\d\u6708])",
+     "era": "AD",
+     "gran": "YEAR",
+     "eg": "2025\u5e74 \u00b7 FY2025\u5e74"
+    },
+    {
+     "id": "ROC_YEAR",
+     "rx": "(?:\u6c11\u570b|\u4e2d\u83ef\u6c11\u570b)\\s*(?<!\\d)(1[0-9]{2})\\s*\u5e74(?![\\d\u6708])",
+     "era": "ROC",
+     "gran": "YEAR",
+     "eg": "\u6c11\u570b114\u5e74"
+    },
+    {
+     "id": "EN_DMY",
+     "rx": "(?<![A-Za-z])(0?[1-9]|[12]\\d|3[01])\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\.?,?\\s+(20\\d{2})(?!\\d)",
+     "era": "AD_EN_DMY",
+     "gran": "DAY",
+     "eg": "2 Dec 2025"
+    },
+    {
+     "id": "EN_MDY",
+     "rx": "(?<![A-Za-z])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\.?\\s+(0?[1-9]|[12]\\d|3[01]),?\\s+(20\\d{2})(?!\\d)",
+     "era": "AD_EN_MDY",
+     "gran": "DAY",
+     "eg": "Dec 2, 2025"
+    }
+   ],
+   "order_why": "\u7d14\u6578\u5b57\u4e09\u5f0f\u6392\u6700\u524d(\u820a\u884c\u70ba\u96f6\u56de\u6b78);\u5e36\u5206\u9694\u7684\u6b21\u4e4b;\u5e74\u6708\u3001\u5e74\u6700\u5f8c\u2014\u2014\u5148\u7cbe\u7d30\u5f8c\u7c97\u7565,\u514d\u5f97 `2025\u5e7412\u67082\u65e5` \u88ab AD_MONTH \u5148\u5403\u6389\u53ea\u5269\u5e74\u6708\u3002",
+   "conflicts_known": [
+    "`AD6`(251202)\u8207\u56db\u78bc\u4ee3\u865f\u4e0d\u91cd\u758a(\u516d\u78bc vs \u56db\u78bc),\u4f46**\u8207\u516d\u78bc ETF \u4ee3\u865f `006208` \u5f62\u8fd1**:\u5dee\u5225\u5728\u9996\u5169\u78bc\u662f\u4e0d\u662f `00`,`AD6` \u7684\u5e74\u6bb5\u9650 `2[3-9]` \u5df2\u6392\u9664\u3002",
+    "`ROC7`(1141202)\u4e03\u78bc,\u53f0\u80a1\u7121\u4e03\u78bc\u4ee3\u865f,\u4e0d\u885d\u7a81\u3002",
+    "`AD_SEP` \u8207 `AD_MONTH` \u5c0d `2025\u5e7412\u67082\u65e5` \u90fd\u6703\u8d77\u53cd\u61c9\u2014\u2014\u6240\u4ee5 patterns \u662f**\u6709\u5e8f\u8868**,DAY \u7d1a\u4e00\u5f8b\u6392\u5728 MONTH/YEAR \u4e4b\u524d\u3002\u9806\u5e8f\u4e0d\u662f\u98a8\u683c,\u662f\u5224\u6e96\u7684\u4e00\u90e8\u5206\u3002"
+   ]
+  },
+  "contact": {
+   "zh": "email / \u96fb\u8a71",
+   "source": "\u6536\u5bb9\u4ef6 VIA_VRN_FirstPageEngine_v0101_b522 \u7684 FieldValidation(\u552f\u8b80\u6b63\u672c)",
+   "note": "ENG086 \u4ee5 email \u7db2\u57df\u5c0d\u5238\u5546\u505a email_validation;\u96fb\u8a71\u6a23\u5f0f\u540c\u51fa\u4e00\u6e90\u3002",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+   "why": "\u5206\u6790\u5e2b\u6b04\u5be6\u6e2c 105 \u4efd\u88e1 34 \u4efd\u7a7a\u3002\u59d3\u540d\u55ae\u9760\u5b57\u578b\u8207\u4f4d\u7f6e\u6293\u4e0d\u7a69,\u4f46**\u96fb\u90f5\u662f\u786c\u8b49\u64da**:@ \u524d\u5c0d\u5f97\u4e0a\u82f1\u6587\u59d3\u540d\u3001@ \u5f8c\u5c0d\u5f97\u4e0a\u5238\u5546\u3002",
+   "as_given": {
+    "email": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+    "name_cn": "[\\u4e00-\\u9fa5]{2,4}",
+    "name_en": "[A-Z][a-z]+(\\s[A-Z][a-z]+)+",
+    "phone_tw": "^0[0-9]{1,2}-?[0-9]{6,8}$",
+    "phone_hk": "^[569][0-9]{7}$"
+   },
+   "corrected": {
+    "note": "\u4e94\u689d\u5168\u90e8\u653e\u5bec\u6216\u52a0\u9396,\u7406\u7531\u9010\u689d\u5beb\u5728\u4e0b\u9762\u3002\u539f\u6587\u4e00\u5b57\u4e0d\u6539\u7559\u5728 as_given\u3002",
+    "email": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+    "email_why": "\u539f\u6587\u5c31\u5c0d,\u4e0d\u52d5\u3002",
+    "name_en": "\\b(?:[A-Z][a-z]+|[A-Z]{2,}|Mc[A-Z][a-z]+|O'[A-Z][a-z]+)(?:[ -](?:[A-Z][a-z]+|[A-Z]{2,}|[A-Z]\\.))+\\b",
+    "name_en_why": "\u539f\u6587 `[A-Z][a-z]+(\\s[A-Z][a-z]+)+` \u6293\u4e0d\u5230\u7814\u5831\u5c01\u9762\u6700\u5e38\u898b\u7684\u56db\u7a2e:\u5168\u5927\u5beb(`CHEN WEI-TING`)\u3001\u9023\u5b57\u865f\u540d(`Wei-Ting`)\u3001\u4e2d\u9593\u540d\u7e2e\u5beb(`John A. Smith`)\u3001`McDonald`/`O'Brien`\u3002",
+    "name_cn": "[\\u4e00-\\u9fa5]{2,4}",
+    "name_cn_why": "**\u6b63\u5247\u672c\u8eab\u6c92\u554f\u984c,\u554f\u984c\u662f\u5b83\u4e0d\u53ef\u4ee5\u55ae\u7368\u7528**\u2014\u2014\u5169\u5230\u56db\u500b\u6f22\u5b57\u5728\u7814\u5831\u7b2c\u4e00\u9801\u5230\u8655\u90fd\u662f(\u300e\u7522\u696d\u5206\u6790\u300f\u300e\u6295\u8cc7\u8a55\u7b49\u300f\u90fd\u4e2d)\u3002\u53ea\u51c6\u5728**\u96fb\u90f5/\u96fb\u8a71/\u300e\u5206\u6790\u5e2b\u300f\u5b57\u6a23\u7684\u9130\u57df**\u5167\u53d6,\u9130\u57df\u898f\u5247\u898b proximity\u3002",
+    "phone_tw": "(?:\\+?886[ -]?|\\(?0)\\d{1,2}\\)?[ -]?\\d{3,4}[ -]?\\d{3,4}(?:\\s*(?:ext|\u5206\u6a5f)\\.?\\s*\\d{1,5})?",
+    "phone_tw_why": "\u539f\u6587\u53ea\u6536 `02-12345678` \u9019\u7a2e\u672c\u5730\u5beb\u6cd5\u3002\u7814\u5831\u5c01\u9762\u5be6\u969b\u5beb\u7684\u662f `+886 2 2175-8888`\u3001`(02) 2175-8888`\u3001`886-2-2175 8888`,\u9084\u5e38\u5e36\u5206\u6a5f\u3002",
+    "phone_hk": "(?:\\+?852[ -]?)?[2-9]\\d{3}[ -]?\\d{4}",
+    "phone_hk_why": "\u539f\u6587 `^[569][0-9]{7}$` \u6f0f\u6389 `2`/`3` \u958b\u982d(\u9999\u6e2f\u56fa\u7db2\u6700\u5e38\u898b,\u5916\u8cc7\u7814\u7a76\u90e8\u53f0\u5317/\u9999\u6e2f\u96d9\u639b\u5c31\u662f\u9019\u7a2e),\u4e5f\u6c92\u6536 `+852` \u8207\u4e2d\u9593\u7a7a\u683c\u3002"
+   },
+   "proximity": {
+    "zh": "\u9130\u57df\u898f\u5247",
+    "rule": "\u4e2d\u6587\u59d3\u540d\u53ea\u5728**\u96fb\u90f5\u3001\u96fb\u8a71\u3001\u6216\u300e\u5206\u6790\u5e2b / Analyst / \u7814\u7a76\u54e1\u300f\u5b57\u6a23\u5f80\u5f8c 2 \u884c / \u5f80\u524d 1 \u884c**\u4e4b\u5167\u53d6\u3002",
+    "why": "\u6c92\u6709\u9130\u57df\u5c31\u7b49\u65bc\u62ff\u4e00\u628a\u6293\u5f97\u5230\u6240\u6709\u6771\u897f\u7684\u5c3a\u2014\u2014\u6293\u5230\u5c31\u7b97,\u90a3\u662f\u5047\u7da0\u3002"
+   },
+   "cross_check": {
+    "at_left": "@ \u524d\u901a\u5e38\u662f\u5206\u6790\u5e2b\u82f1\u6587\u59d3\u540d(\u5e38\u898b `first.last` / `firstlast` / `flast`)\u3002\u62c6\u958b\u4e4b\u5f8c\u8207 name_en \u5c0d\u7167,\u5c0d\u5f97\u4e0a\u5c31\u4e92\u76f8\u78ba\u8a8d\u3002",
+    "at_right": "@ \u5f8c\u7684\u7db2\u57df\u5c0d\u7167\u5238\u5546\u518a(broker_of)\u3002\u7db2\u57df\u662f**\u6700\u786c\u7684\u5238\u5546\u8b49\u64da**\u2014\u2014\u6a94\u540d\u6703\u88ab\u6539\u3001\u5c01\u9762\u6703\u63db\u7248\u578b,\u5bc4\u4ef6\u7db2\u57df\u4e0d\u6703\u3002",
+    "four_state": "\u59d3\u540d\u6709\u503c\u4e14\u8207 @ \u524d\u5c0d\u5f97\u4e0a=GREEN \u00b7 \u6709\u503c\u4f46\u5c0d\u4e0d\u4e0a=YELLOW(\u5177\u540d\u885d\u7a81)\u00b7 \u53ea\u6709\u59d3\u540d\u6c92\u6709\u96fb\u90f5=UNVERIFIABLE(\u9a57\u4e0d\u4e86,\u4e0d\u662f\u5224\u932f)\u00b7 \u90fd\u6c92\u6709=NODATA"
+   }
+  },
+  "financial": {
+   "zh": "\u8ca1\u5831",
+   "hub": "supportive modules/70_VRN_Rules/SUP_MDL748_FinancialLogicHub",
+   "note": "\u8ca1\u5831\u6b04\u4f4d\u908f\u8f2f\u7684\u6b63\u4e3b\u4e0d\u5728 VRN \u5f15\u64ce\u88e1,\u5728 70_VRN_Rules \u7684\u8ca1\u5831\u6a1e\u7d10\u3002",
+   "verify": {
+    "zh": "\u8ca1\u5831\u6578\u503c\u9a57\u8b49:\u5b98\u65b9\u5e74\u5ea6\u6838\u5c0d(\u6b77\u53f2\u6578\u64da\u70ba\u4e3b)+ \u52a0\u6e1b\u6cd5/\u9664\u6cd5\u9a57\u7b97",
+    "owner": "\u64cd\u4f5c\u54e1(\u6279685 \u9010\u5b57\u7d66\u5b9a:\u300c\u5e74\u5ea6\u8ca1\u52d9\u5831\u8868\u9801\u5c07\u6240\u6709\u7684\u8cc7\u6599\u622a\u53d6\u4e0b\u4f86\u5f8c\u4e5f\u5c07\u8ca1\u5831 TWSE/TPEX/MOPS \u64f7\u53d6\u5e74\u5ea6\u8cc7\u6599\u53bb\u6838\u5c0d;\u5982\u679c\u662f\u6b77\u53f2\u6578\u64da\u81f3\u5c11\u6703\u6709\u4e00\u8d77\u5c0d\u8d77\u4f86\u5c31\u78ba\u8a8d\u4e4b\u8cc7\u6599\u662f\u76f8\u540c\u7684;\u6b77\u53f2\u6578\u64da\u8ddf\u5831\u544a\u6578\u64da\u90fd\u6709\u7684\u8a71\u4ee5\u6b77\u53f2\u6578\u64da\u70ba\u4e3b;\u5176\u4ed6\u622a\u53d6\u4e0b\u4f86\u7684\u6578\u64da\u53ef\u4ee5\u7528\u52a0\u6e1b\u6cd5\u8ddf\u9664\u6cd5\u4f86\u9a57\u8b49\u300d)",
+    "consumer": "functional modules/VRN/VRN_ENG074_FinancialPages(official_check / arith_check;\u518a\u7f3a=ABSENT \u8aa0\u5be6\u7565,\u5f15\u64ce\u96f6\u5f71\u5b50\u898f\u5247)",
+    "official": {
+     "table": "tw_financial",
+     "writer": "functional modules/VDF/engine/VDF_ENG082_FinStatements(yfinance \u8eca\u9053;MOPS \u63a2\u8def;\u540c\u610f\u9598 VIA_NET_CONSENT \u64cd\u4f5c\u54e1\u81ea\u8a2d)",
+     "ticker_forms": [
+      "{code}.TW",
+      "{code}.TWO"
+     ],
+     "period_type_annual": "annual",
+     "period_is_end_date": "Period \u6b04\u662f\u671f\u672b\u65e5 YYYY-MM-DD;\u5e74\u5ea6\u6838\u5c0d\u53d6\u524d\u56db\u78bc\u7576\u6703\u8a08\u5e74\u5ea6",
+     "raw_unit": "\u5b98\u65b9\u503c\u70ba\u539f\u59cb\u5e63\u5225\u55ae\u4f4d(\u5143);\u5831\u544a\u503c \u00d7 \u518a\u4e0a scale(\u6279615 \u9801\u9762\u5ba3\u544a)\u5f8c\u518d\u6bd4;scale \u672a\u5ba3\u544a=\u4e0d\u53cd\u63a8,\u4ea4 compare \u7684 UNIT_SCALE \u8aa0\u5be6\u614b",
+     "columns": {
+      "revenue": "Revenue",
+      "gross_profit": "Gross_Profit",
+      "op_profit": "Operating_Income",
+      "net_income": "Net_Income",
+      "eps": "EPS",
+      "eps_diluted": "EPS",
+      "gross_margin": "Gross_Margin",
+      "op_margin": "Operating_Margin",
+      "net_margin": "Net_Margin",
+      "roe": "ROE",
+      "roa": "ROA",
+      "total_assets": "Total_Assets",
+      "total_liabilities": "Total_Liabilities",
+      "equity": "Equity",
+      "ocf": "Operating_CF",
+      "fcf": "Free_CF"
+     },
+     "columns_note": "eps_diluted \u2192 EPS:yfinance \u7684 EPS \u6b04\u5373\u7a00\u91cb(\u6536\u5bb9\u518a MOPS \u898f\u5247:\u7a00\u91cb EPS \u70ba\u4e3b);op_margin/net_margin/roa/total_*/equity/ocf/fcf \u76ee\u524d\u4e0d\u5728 VRN_Financial_Synonyms_SSOT \u6b63\u5178,\u5217\u5728\u9019\u88e1\u662f\u70ba\u4e86\u767b\u9304\u5f8c**\u96f6\u6539\u78bc**\u5373\u751f\u6548",
+     "precedence": "OFFICIAL_WINS",
+     "precedence_zh": "\u6b77\u53f2\u6578\u64da\u70ba\u4e3b:\u5b98\u65b9\u6709\u503c\u5c31\u4ee5\u5b98\u65b9\u70ba value_final,\u5831\u544a\u503c\u7559\u4f5c\u8b49\u64da(report_value)\u4e0d\u522a\u4e0d\u6539;\u5b98\u65b9\u7121\u503c\u624d\u7528\u5831\u544a\u503c",
+     "states": {
+      "AGREE": "\u22641%",
+      "ROUNDING": "\u22645%",
+      "UNIT_SCALE": "\u6bd4\u503c\u843d \u5343/\u767e/\u767e\u842c \u500d\u9644\u8fd1=\u55ae\u4f4d\u5dee\u975e\u932f",
+      "DIVERGE": "\u5c0d\u4e0d\u8d77\u4f86(\u8aa0\u5be6\u5217,\u4eba\u5de5\u6838 PDF)",
+      "ONLY_REPORT": "\u5b98\u65b9\u8a72\u6b04\u7121\u503c",
+      "NO_OFFICIAL_COLUMN": "\u6b63\u5178\u79d1\u76ee\u6c92\u6709\u5c0d\u7167\u6b04",
+      "NO_OFFICIAL_PERIOD": "\u5b98\u65b9\u8868\u6709\u9019\u6a94\u4f46\u7121\u8a72\u5e74\u5ea6",
+      "NO_OFFICIAL_TICKER": "\u5b98\u65b9\u8868\u7121\u9019\u6a94(\u5148 VDF_ENG082 run --only)",
+      "NOT_ANNUAL": "\u5b63/\u534a\u5e74\u5217\u4e0d\u5728\u5e74\u5ea6\u6838\u5c0d\u7bc4\u570d",
+      "NO_TICKER": "\u5831\u544a\u7121\u5728\u518a\u56db\u78bc"
+     },
+     "alignment": {
+      "CONFIRMED": "\u81f3\u5c11\u4e00\u9805 AGREE/ROUNDING/UNIT_SCALE=\u5831\u544a\u8207\u5b98\u65b9\u5c0d\u5f97\u8d77\u4f86(\u64cd\u4f5c\u54e1:\u300e\u81f3\u5c11\u6703\u6709\u4e00\u8d77\u5c0d\u8d77\u4f86\u300f)",
+      "UNCONFIRMED": "\u6709\u5b98\u65b9\u5217\u4f46\u5168 DIVERGE/ONLY_REPORT",
+      "NO_STATED": "\u5831\u544a\u7121\u5df2\u5831\u5e74\u5ea6\u503c(\u5168\u9810\u4f30)"
+     }
+    },
+    "identities": [
+     {
+      "id": "GP_SUB",
+      "zh": "\u6bdb\u5229 = \u71df\u6536 \u2212 \u71df\u696d\u6210\u672c",
+      "target": "gross_profit",
+      "op": "sub",
+      "a": "revenue",
+      "b": "cogs",
+      "tol_rel": 0.02
+     },
+     {
+      "id": "GM_DIV",
+      "zh": "\u6bdb\u5229\u7387 = \u6bdb\u5229 \u00f7 \u71df\u6536 \u00d7 100",
+      "target": "gross_margin",
+      "op": "div_pct",
+      "a": "gross_profit",
+      "b": "revenue",
+      "tol_abs_pp": 0.5
+     },
+     {
+      "id": "OP_SUB",
+      "zh": "\u71df\u696d\u5229\u76ca = \u6bdb\u5229 \u2212 \u71df\u696d\u8cbb\u7528",
+      "target": "op_profit",
+      "op": "sub",
+      "a": "gross_profit",
+      "b": "opex",
+      "tol_rel": 0.02
+     },
+     {
+      "id": "OPM_DIV",
+      "zh": "\u71df\u696d\u5229\u76ca\u7387 = \u71df\u696d\u5229\u76ca \u00f7 \u71df\u6536 \u00d7 100",
+      "target": "op_margin",
+      "op": "div_pct",
+      "a": "op_profit",
+      "b": "revenue",
+      "tol_abs_pp": 0.5
+     },
+     {
+      "id": "NM_DIV",
+      "zh": "\u6de8\u5229\u7387 = \u7a05\u5f8c\u6de8\u5229 \u00f7 \u71df\u6536 \u00d7 100",
+      "target": "net_margin",
+      "op": "div_pct",
+      "a": "net_income",
+      "b": "revenue",
+      "tol_abs_pp": 0.5
+     },
+     {
+      "id": "BS_ADD",
+      "zh": "\u8cc7\u7522 = \u8ca0\u50b5 + \u6b0a\u76ca",
+      "target": "total_assets",
+      "op": "add",
+      "a": "total_liabilities",
+      "b": "equity",
+      "tol_rel": 0.01
+     },
+     {
+      "id": "EPS_DIV",
+      "zh": "EPS = \u7a05\u5f8c\u6de8\u5229 \u00f7 \u6d41\u901a\u80a1\u6578",
+      "target": "eps",
+      "op": "div",
+      "a": "net_income",
+      "b": "shares",
+      "tol_rel": 0.03
+     }
+    ],
+    "identity_states": {
+     "PASS": "|\u5be6\u969b\u2212\u671f\u671b| \u5728\u5bb9\u5dee\u5167",
+     "FAIL": "\u8d85\u51fa\u5bb9\u5dee(\u8aa0\u5be6\u5217;\u53ef\u80fd\u662f\u62bd\u932f\u5217\u3001\u55ae\u4f4d\u6df7\u3001\u6216\u5831\u544a\u81ea\u5df1\u7b97\u932f)",
+     "UNIT_SCALE": "\u6bd4\u7387\u4ee5\u5c0f\u6578\u5448\u73fe(0.40 vs 40)",
+     "INSUFFICIENT": "\u7f3a\u904b\u7b97\u5143\u6216\u7f3a\u76ee\u6a19\u503c(note \u9ede\u540d\u7f3a\u54ea\u500b\u6b63\u5178)",
+     "DIV_ZERO": "\u5206\u6bcd\u70ba 0"
+    },
+    "tolerance_why": "\u52a0\u6e1b 2%(\u767e\u842c\u5143\u56db\u6368\u4e94\u5165)\u00b7 \u6bd4\u7387 0.5 \u500b\u767e\u5206\u9ede \u00b7 \u8cc7\u7522\u8ca0\u50b5\u6046\u7b49 1% \u00b7 EPS 3%(\u80a1\u6578\u53e3\u5f91\u52a0\u6b0a/\u671f\u672b\u5dee)\u2014\u2014\u6578\u5b57\u653e\u518a\u4e0a,\u5f15\u64ce\u4e0d\u5e36\u6578\u5b57",
+    "unregistered_canonicals": [
+     "cogs",
+     "opex",
+     "op_margin",
+     "net_margin",
+     "total_assets",
+     "total_liabilities",
+     "equity",
+     "shares",
+     "roa",
+     "ocf",
+     "fcf"
+    ],
+    "unregistered_note": "\u9019\u4e9b\u6b63\u5178\u540d\u76ee\u524d\u4e0d\u5728 VRN_Financial_Synonyms_SSOT.normalize_metric(\u71df\u696d\u6210\u672c/\u71df\u696d\u8cbb\u7528/\u8cc7\u7522\u7e3d\u8a08/\u8ca0\u50b5\u7e3d\u8a08/\u6b0a\u76ca\u7e3d\u8a08 \u56de\u539f\u6587=UNKNOWN);\u9a57\u7b97\u9047\u7f3a=INSUFFICIENT \u4e26\u9ede\u540d \u2192 \u767b\u9304=\u64cd\u4f5c\u54e1\u6c7a\u5b9a(\u53ea\u589e\u4e0d\u6e1b);\u767b\u9304\u5f8c\u672c\u518a\u96f6\u6539\u5373\u751f\u6548"
+   }
+  },
+  "ticker": {
+   "zh": "\u53f0\u80a1\u4ee3\u865f",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279628 \u9010\u5b57\u7d66\u5b9a\u4e09\u5e73\u53f0 \u00d7 \u4e5d\u578b\u898f\u683c)",
+   "why": "VRN \u77e9\u9663\u300e\u80a1\u7968\u4ee3\u865f\u300f\u6b04\u5be6\u6e2c 81 \u4efd\u88e1 34 \u4efd\u7a7a\u3002\u4ee3\u865f\u898f\u5247\u672c\u4f86\u53ea\u6d3b\u5728 ENG073 \u7684\u6a94\u540d\u62c6\u89e3\u5668\u88e1,\u518a\u4e0a\u6c92\u6709\u2014\u2014\u518a\u4e0a\u6c92\u6709\u7684\u6771\u897f,\u7b2c\u4e8c\u652f\u5f15\u64ce\u8981\u7528\u5c31\u53ea\u80fd\u518d\u6284\u4e00\u4efd(\u90a3\u5c31\u662f\u7b2c\u4e8c\u9846\u6703\u6f02\u79fb\u7684\u982d)\u3002",
+   "as_given": {
+    "note": "\u64cd\u4f5c\u54e1 \u6279628 \u539f\u6587,\u9010\u5b57\u4fdd\u7559\u4e0d\u6539\u3002\u4e0b\u9762 corrected \u5340\u662f\u5be6\u6e2c\u5f8c\u7684\u4fee\u6b63,\u5169\u4efd\u90fd\u7559,\u5dee\u5728\u54ea\u8b1b\u6e05\u695a\u3002",
+    "TW_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)$",
+    "TW_YF_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)\\.(TW|TWO)$",
+    "TW_BB_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)\\sTT$",
+    "types": {
+     "\u4e00\u822c\u500b\u80a1": "^([1-9]\\d{3})$",
+     "\u88ab\u52d5\u80a1\u7968ETF": "^(00\\d{3})$",
+     "\u4e3b\u52d5\u80a1\u7968ETF": "^(00\\d{3}A)$",
+     "\u88ab\u52d5\u50b5\u5238ETF": "^(00\\d{3}B)$",
+     "\u4e3b\u52d5\u50b5\u5238ETF": "^(00\\d{3}D)$",
+     "\u69d3\u687f\u578bETF": "^(00\\d{3}L)$",
+     "\u53cd\u5411\u578bETF": "^(00\\d{3}R)$",
+     "\u671f\u8ca8\u578bETF": "^(00\\d{3}[UV])$",
+     "\u5e73\u8861\u578bETF": "^(00\\d{3}T)$"
+    }
+   },
+   "corrected": {
+    "note": "\u6279628 \u5be6\u6e2c:`0050` **\u4e5d\u578b\u5168\u90e8\u6b78\u4e0d\u9032\u53bb**\u3002`^[1-9]\\d{3}$` \u9996\u78bc\u4e0d\u5f97\u70ba 0,\u800c `^00\\d{3}$` \u662f\u4e94\u78bc\u2014\u20140050 \u662f\u56db\u78bc\u3002\u53f0\u80a1 ETF \u4ee3\u865f\u9577\u5ea6\u5be6\u6e2c\u6709\u4e09\u7a2e:\u56db\u78bc 0050 / \u4e94\u78bc 00878 / \u516d\u78bc 006208\u3002\u6240\u4ee5\u88ab\u52d5\u80a1\u7968 ETF \u7684\u4f4d\u6578\u6539\u6210 2~4 \u4f4d\u3002\u9019\u662f\u4f4d\u6578\u7b46\u8aa4\u5c64\u7d1a\u7684\u4fee\u6b63,\u4e0d\u662f\u540c\u7fa9\u5b57\u88c1\u5b9a;\u539f\u5f0f\u7559\u5728 as_given \u4f9b\u4f60\u5c0d\u7167(LL90)\u3002",
+    "TW_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})$",
+    "TW_YF_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})\\.(TW|TWO)$",
+    "TW_BB_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})\\sTT$",
+    "types_ordered": [
+     [
+      "\u4e3b\u52d5\u80a1\u7968ETF",
+      "^(00\\d{3}A)$"
+     ],
+     [
+      "\u88ab\u52d5\u50b5\u5238ETF",
+      "^(00\\d{3}B)$"
+     ],
+     [
+      "\u4e3b\u52d5\u50b5\u5238ETF",
+      "^(00\\d{3}D)$"
+     ],
+     [
+      "\u69d3\u687f\u578bETF",
+      "^(00\\d{3}L)$"
+     ],
+     [
+      "\u53cd\u5411\u578bETF",
+      "^(00\\d{3}R)$"
+     ],
+     [
+      "\u671f\u8ca8\u578bETF",
+      "^(00\\d{3}[UV])$"
+     ],
+     [
+      "\u5e73\u8861\u578bETF",
+      "^(00\\d{3}T)$"
+     ],
+     [
+      "\u88ab\u52d5\u80a1\u7968ETF",
+      "^(00\\d{2,4})$"
+     ],
+     [
+      "\u4e00\u822c\u500b\u80a1",
+      "^([1-9]\\d{3})$"
+     ]
+    ],
+    "order_why": "\u5e36\u5c3e\u78bc\u7684\u5148\u5224,\u7d14\u6578\u5b57\u7684\u5f8c\u5224\u3002\u5012\u904e\u4f86\u7684\u8a71 `00\\d{2,4}` \u6703\u5148\u5403\u6389 `00679` \u518d\u628a `B` \u4e1f\u6389\u3002"
+   },
+   "conflicts_known": [
+    "`^[1-9]\\d{3}$`(\u4e00\u822c\u500b\u80a1)\u8207\u897f\u5143\u56db\u4f4d\u5e74**\u5b8c\u5168\u91cd\u758a**:`2025` / `2026` \u5169\u908a\u90fd\u5408\u6cd5\u3002\u6240\u4ee5**\u88f8\u56db\u78bc\u6578\u5b57\u6c92\u6709\u4e0a\u4e0b\u6587\u5c31\u4e0d\u53ef\u5224**\u2014\u2014ENG073 \u7684 `_date_spans()` \u5148\u628a\u65e5\u671f\u5340\u6bb5\u906e\u6389\u518d\u627e\u4ee3\u865f,\u5c31\u662f\u70ba\u4e86\u9019\u4ef6\u4e8b;\u672c\u518a\u53ea\u628a\u5b83\u8b1b\u660e\u767d,\u4e0d\u6539\u90a3\u500b\u5b88\u885b\u3002",
+    "\u64cd\u4f5c\u54e1\u6279634 \u518d\u6b21\u7d66\u5b9a `00\\d{3}`(00+\u4e09\u78bc=\u4e94\u5b57\u5143)\u3002**\u5be6\u6e2c\u4ecd\u7136\u5c0d\u4e0d\u4e0a**:`0050` \u53ea\u6709\u56db\u5b57\u5143,`006208` \u6709\u516d\u5b57\u5143\u3002\u518a\u4e0a\u7dad\u6301\u6279628 \u7684 `00\\d{2,4}`(\u53ef\u5e36\u578b\u5225\u5c3e\u78bc\u6642\u624d\u662f `00\\d{3}[ABDLRTUV]`)\u3002\u540c\u4e00\u689d\u898f\u683c\u7b2c\u4e8c\u6b21\u4f86,\u91cf\u51fa\u4f86\u7684\u7b54\u6848\u6c92\u8b8a\u2014\u2014\u6240\u4ee5\u9019\u88e1\u8a18\u4e00\u6b21,\u4e0d\u6539\u3002"
+   ],
+   "four_state": {
+    "HIT": "\u547d\u4e2d\u4e14\u6b78\u5f97\u4e86\u578b",
+    "UNCLASSIFIED": "\u50cf\u4ee3\u865f\u4f46\u4e5d\u578b\u90fd\u4e0d\u6536(\u8aa0\u5be6,\u4e0d\u786c\u585e)",
+    "ABSENT": "\u6c92\u6709\u4ee3\u865f\u6a23\u7684\u5b57\u4e32",
+    "MISS": "\u6709\u4f46\u8207\u6a94\u540d\u5c0d\u4e0d\u4e0a"
+   },
+   "platform": {
+    "zh": "\u4e09\u5e73\u53f0\u4ee3\u865f(\u672c\u5730 / Yahoo Finance / Bloomberg)",
+    "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+    "why": "\u6a1e\u7d10\u7684 ticker_kind() \u53ea\u5403\u672c\u5730\u78bc:`2330.TW` / `2330 TT` \u5be6\u6e2c\u90fd\u56de UNCLASSIFIED\u3002\u7b2c\u4e00\u9801\u5e38\u5e38\u4e09\u7a2e\u5beb\u6cd5\u540c\u6642\u51fa\u73fe,\u5c0d\u5f97\u8d77\u4f86\u624d\u7b97\u9a57\u904e\u3002",
+    "as_given": {
+     "TW_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)$",
+     "TW_YF_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)\\.(TW|TWO)$",
+     "TW_BB_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]?)\\sTT$"
+    },
+    "corrected": {
+     "note": "ETF \u90a3\u4e00\u6bb5\u6539\u7528\u518a\u4e0a\u5df2\u7d93\u4fee\u6b63\u904e\u7684 `00\\d{2,4}`\u2014\u2014\u7406\u7531\u898b conflicts_known \u7b2c 2 \u689d,\u9019\u662f\u6279628 \u5c31\u91cf\u904e\u7684\u540c\u4e00\u4ef6\u4e8b\u3002",
+     "TW_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})$",
+     "TW_YF_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})\\.(TW|TWO)$",
+     "TW_BB_TICKER": "^(?:[1-9]\\d{3}|00\\d{3}[ABDLRTUV]|00\\d{2,4})\\s?TT$"
+    },
+    "market_map": {
+     "TW": "TWSE(\u4e0a\u5e02)",
+     "TWO": "TPEX(\u4e0a\u6ac3)",
+     "TT": "Bloomberg \u53f0\u80a1\u7d71\u4e00\u5e02\u5834\u78bc(TWSE+TPEX \u4e0d\u5206)"
+    },
+    "cross_check": "\u540c\u4e00\u652f\u80a1\u7968\u4e09\u5e73\u53f0\u7684**\u672c\u5730\u78bc\u90e8\u5206\u5fc5\u9808\u9010\u5b57\u76f8\u540c**;\u4e0d\u540c\u5c31\u662f\u885d\u7a81,\u8981\u5177\u540d\u5831\u51fa\u4f86,\u4e0d\u53ef\u4ee5\u6311\u4e00\u500b\u7528\u3002Bloomberg \u7684 TT \u5224\u4e0d\u51fa\u4e0a\u5e02/\u4e0a\u6ac3,\u90a3\u4e00\u683c\u662f UNKNOWN \u4e0d\u662f\u731c\u3002",
+    "four_state": "\u89e3\u5f97\u51fa\u4e14\u4e09\u5e73\u53f0\u5c0d\u5f97\u8d77\u4f86=GREEN \u00b7 \u89e3\u5f97\u51fa\u4f46\u4e92\u76f8\u5c0d\u4e0d\u4e0a=YELLOW(\u5177\u540d\u885d\u7a81)\u00b7 \u6c92\u6709\u4ee3\u865f=NODATA \u00b7 \u975e\u500b\u80a1\u5831\u544a=NA(\u9069\u7528\u6027\u518a)",
+    "by_type": {
+     "zh": "\u9010\u578b \u00d7 \u9010\u5e73\u53f0(\u64cd\u4f5c\u54e1\u6279634 \u7b2c\u4e8c\u6b21\u9010\u5b57\u7d66\u5b9a\u7684\u90a3\u5f35\u8868)",
+     "owner": "\u64cd\u4f5c\u54e1(\u578b\u5225\u8207\u5c3e\u78bc)\u00b7 \u518a(ETF \u4f4d\u6578\u4fee\u6b63,\u7406\u7531\u898b length_measured)",
+     "note": "\u4e09\u5e73\u53f0\u7684**\u672c\u5730\u78bc\u90e8\u5206\u9010\u5b57\u76f8\u540c**,\u5dee\u5225\u53ea\u5728\u5f8c\u7db4:Yahoo \u52a0 `.TW`/`.TWO`,Bloomberg \u52a0\u4e00\u500b\u534a\u5f62\u7a7a\u683c\u8207 `TT`\u3002\u6240\u4ee5\u9019\u5f35\u8868\u662f\u5f9e `types_ordered` **\u63a8\u51fa\u4f86\u7684**,\u4e0d\u662f\u53e6\u5916\u6284\u4e00\u4efd\u2014\u2014\u6284\u4e00\u4efd\u5c31\u6703\u6709\u7b2c\u4e8c\u628a\u5c3a\u3002",
+     "rows": [
+      {
+       "type": "\u4e3b\u52d5\u80a1\u7968ETF",
+       "TW_TICKER": "^(00\\d{3}A)$",
+       "TW_YF_TICKER": "^(00\\d{3}A)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}A)\\sTT$"
+      },
+      {
+       "type": "\u88ab\u52d5\u50b5\u5238ETF",
+       "TW_TICKER": "^(00\\d{3}B)$",
+       "TW_YF_TICKER": "^(00\\d{3}B)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}B)\\sTT$"
+      },
+      {
+       "type": "\u4e3b\u52d5\u50b5\u5238ETF",
+       "TW_TICKER": "^(00\\d{3}D)$",
+       "TW_YF_TICKER": "^(00\\d{3}D)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}D)\\sTT$"
+      },
+      {
+       "type": "\u69d3\u687f\u578bETF",
+       "TW_TICKER": "^(00\\d{3}L)$",
+       "TW_YF_TICKER": "^(00\\d{3}L)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}L)\\sTT$"
+      },
+      {
+       "type": "\u53cd\u5411\u578bETF",
+       "TW_TICKER": "^(00\\d{3}R)$",
+       "TW_YF_TICKER": "^(00\\d{3}R)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}R)\\sTT$"
+      },
+      {
+       "type": "\u671f\u8ca8\u578bETF",
+       "TW_TICKER": "^(00\\d{3}[UV])$",
+       "TW_YF_TICKER": "^(00\\d{3}[UV])\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}[UV])\\sTT$"
+      },
+      {
+       "type": "\u5e73\u8861\u578bETF",
+       "TW_TICKER": "^(00\\d{3}T)$",
+       "TW_YF_TICKER": "^(00\\d{3}T)\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{3}T)\\sTT$"
+      },
+      {
+       "type": "\u88ab\u52d5\u80a1\u7968ETF",
+       "TW_TICKER": "^(00\\d{2,4})$",
+       "TW_YF_TICKER": "^(00\\d{2,4})\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^(00\\d{2,4})\\sTT$"
+      },
+      {
+       "type": "\u4e00\u822c\u500b\u80a1",
+       "TW_TICKER": "^([1-9]\\d{3})$",
+       "TW_YF_TICKER": "^([1-9]\\d{3})\\.(TW|TWO)$",
+       "TW_BB_TICKER": "^([1-9]\\d{3})\\sTT$"
+      }
+     ]
+    },
+    "length_measured": {
+     "zh": "ETF \u4f4d\u6578:\u91cf\u51fa\u4f86\u7684",
+     "operator_spec": "^(00\\d{3})$(00 + \u4e09\u78bc = **\u4e94\u5b57\u5143**)",
+     "book": "^(00\\d{2,4})$(\u56db\u5230\u516d\u5b57\u5143)\u00b7 \u5e36\u578b\u5225\u5c3e\u78bc\u6642 ^(00\\d{3}[ABDLRTUV])$(\u516d\u5b57\u5143)",
+     "measured_in_container": {
+      "source": "functional modules/VDF/output_hub/**/*.duckdb \u7684 ticker/stock_id/symbol/code \u6b04",
+      "codes_scanned": 3004,
+      "prefix_00_distinct": 39,
+      "length_histogram": {
+       "4": 8,
+       "5": 0,
+       "6": 31
+      },
+      "eg_len4": [
+       "0050",
+       "0051",
+       "0052",
+       "0053",
+       "0055",
+       "0056"
+      ],
+      "eg_len6": [
+       "00400A",
+       "00401A",
+       "00402A",
+       "00403A",
+       "00404A"
+      ],
+      "operator_spec_hits": 0,
+      "caveat": "**\u9019\u500b\u5eab\u7684 00 \u958b\u982d\u53ea\u6709 39 \u652f,\u662f\u4e0d\u5b8c\u6574\u7684**,\u6240\u4ee5\u300e\u4e94\u5b57\u5143 0 \u652f\u300f\u53ea\u80fd\u8aaa\u9019\u500b\u5eab\u88e1\u6c92\u6709,\u4e0d\u80fd\u8aaa\u5e02\u5834\u4e0a\u6c92\u6709\u2014\u2014`00692`\u3001`00878` \u5c31\u662f\u4e94\u5b57\u5143,\u771f\u5be6\u5b58\u5728\u3002\u800c\u4e14 `000001` \u6df7\u5728\u516d\u5b57\u5143\u90a3\u4e00\u6876\u88e1,\u5b83\u662f\u4e0a\u6d77\u7d9c\u6307\u4e0d\u662f\u53f0\u80a1 ETF,\u662f\u5eab\u88e1\u7684\u96dc\u8a0a\u3002"
+     },
+     "verdict": "\u56db\u3001\u4e94\u3001\u516d\u5b57\u5143**\u4e09\u7a2e\u90fd\u771f\u5be6\u5b58\u5728**(`0050` / `00692` / `00715B`)\u3002\u64cd\u4f5c\u54e1\u898f\u683c `00\\d{3}` \u53ea\u6536\u5f97\u5230\u4e94\u5b57\u5143\u90a3\u4e00\u7a2e,\u5728\u672c\u5bb9\u5668\u5eab\u4e0a **39 \u652f\u4e00\u652f\u90fd\u6536\u4e0d\u5230**\u3002\u518a\u7dad\u6301 `00\\d{2,4}`\u3002",
+     "history": "\u540c\u4e00\u689d\u898f\u683c\u6279628\u3001\u6279634(\u5169\u6b21)\u5171\u4f86\u4e09\u6b21,\u91cf\u51fa\u4f86\u7684\u7b54\u6848\u4e09\u6b21\u4e00\u6a23\u3002**\u8a18\u5230\u7b2c\u4e09\u6b21\u5c31\u628a\u6578\u5b57\u91d8\u5728\u9019\u88e1**,\u4e0b\u6b21\u4e0d\u5fc5\u518d\u5f9e\u982d\u91cf\u4e00\u904d\u3002"
+    }
+   }
+  },
+  "period": {
+   "zh": "\u671f\u9593(\u5b63\u5ea6 / \u5e74\u5ea6 / \u6703\u8a08\u5e74\u5ea6)",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+   "why": "\u6a1e\u7d10\u7684 parse_date_any() \u5c0d `2025Q2` / `25Q2` / `2Q25` / `FY25` / `2025E` **\u5168\u90e8\u56de\u7a7a\u5b57\u5178**(\u5be6\u6e2c)\u3002\u7814\u5831\u6a19\u984c\u8207 EPS \u9810\u4f30\u5340\u6eff\u6eff\u90fd\u662f\u9019\u4e9b\u5beb\u6cd5\u3002",
+   "normalize_to": {
+    "date": "YYYY-MM-DD",
+    "month": "YYYY-MM",
+    "quarter": "YYYY-Qn",
+    "year": "YYYY"
+   },
+   "quarter_patterns": [
+    {
+     "id": "Q_YYYYQn",
+     "rx": "^(19|20)\\d{2}Q([1-4])$",
+     "eg": "2025Q2",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_YYYY_Qn",
+     "rx": "^(19|20)\\d{2}[-/ ]Q([1-4])$",
+     "eg": "2025-Q2",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_YYQn",
+     "rx": "^(\\d{2})Q([1-4])$",
+     "eg": "25Q2",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_nQYYYY",
+     "rx": "^([1-4])Q(19|20)\\d{2}$",
+     "eg": "2Q2025",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_nQYY",
+     "rx": "^([1-4])Q(\\d{2})$",
+     "eg": "2Q25",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_QnYYYY",
+     "rx": "^Q([1-4])[ /-]?(19|20)\\d{2}$",
+     "eg": "Q2 2025",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_QnYY",
+     "rx": "^Q([1-4])[ /-]?(\\d{2})$",
+     "eg": "Q2 25",
+     "out": "2025-Q2"
+    },
+    {
+     "id": "Q_FYYYYYQn",
+     "rx": "^FY[- ]?(19|20)?(\\d{2})Q([1-4])$",
+     "eg": "FY25Q2",
+     "out": "2025-Q2"
+    }
+   ],
+   "quarter_order_why": "\u5148\u9577\u5f8c\u77ed\u3001\u5148\u6709\u4e16\u7d00\u5f8c\u7121\u4e16\u7d00\u3002`2025Q2` \u8981\u5728 `25Q2` \u4e4b\u524d\u8a66,\u4e0d\u7136 `20` \u6703\u88ab\u5403\u6210\u5e74\u3001`25Q2` \u5269\u4e0b\u5c0d\u4e0d\u4e0a\u3002",
+   "year_patterns": [
+    {
+     "id": "Y_YYYY",
+     "rx": "^(19|20)\\d{2}$",
+     "eg": "2025",
+     "out": "2025",
+     "kind": "CY"
+    },
+    {
+     "id": "Y_YYYY_EST",
+     "rx": "^((19|20)\\d{2})[eEfF]$",
+     "eg": "2025E",
+     "out": "2025",
+     "kind": "CY",
+     "est": true
+    },
+    {
+     "id": "Y_FY_YYYY",
+     "rx": "^FY[- ]?((19|20)\\d{2})[eEfF]?$",
+     "eg": "FY2025",
+     "out": "2025",
+     "kind": "FY"
+    },
+    {
+     "id": "Y_FY_YY",
+     "rx": "^FY[- ]?(\\d{2})[eEfF]?$",
+     "eg": "FY-25e",
+     "out": "2025",
+     "kind": "FY"
+    }
+   ],
+   "as_given_rejected": {
+    "Y_YY_bare": {
+     "rx": "^\\d{2}$",
+     "why_rejected": "**\u88f8\u5169\u4f4d\u6578\u4e0d\u53ef\u5224\u5e74\u3002**\u6a94\u540d\u5207\u51fa\u4f86\u7684\u5169\u4f4d\u6578\u591a\u5f97\u662f:\u6708\u3001\u65e5\u3001\u7248\u6b21\u3001\u9801\u6578\u3001`Q2` \u62c6\u51fa\u4f86\u7684 `2`\u3002\u6c92\u6709 `FY`/`Q` \u9019\u7a2e\u524d\u7db4\u7576\u8b49\u64da\u5c31\u7576\u5e74,\u7b49\u65bc\u5728\u88fd\u9020\u5047\u7da0\u3002\u8981\u7528\u53ea\u80fd**\u88ab\u524d\u7db4\u5e36\u8457**(FY25 / 25Q2),\u4e0d\u53ef\u4ee5\u55ae\u7368\u6210\u7acb\u3002"
+    },
+    "D_YYMMDD_bare": {
+     "rx": "^\\d{6}$",
+     "why_rejected": "**\u516d\u4f4d\u6578\u4e0d\u53ef\u88f8\u5224\u65e5\u671f\u3002**`006208` \u662f ETF \u4ee3\u865f\u3001`022175` \u53ef\u80fd\u662f\u96fb\u8a71\u7247\u6bb5\u3002\u518a\u4e0a\u63a1\u7528\u6709\u6708\u65e5\u754c\u7684\u7248\u672c:`^\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])$`\u2014\u2014\u6a1e\u7d10\u65e2\u6709\u7684 AD6 \u5c31\u662f\u9019\u6a23\u5beb\u7684,\u9019\u88e1\u53ea\u662f\u628a\u7406\u7531\u5beb\u9032\u518a\u3002"
+    }
+   },
+   "century_rule": "\u5169\u4f4d\u5e74\u4e00\u5f8b\u88dc 20(\u7814\u5831\u8a9e\u5883\u6c92\u6709 19xx \u7684\u5b63\u5ea6/FY)\u3002\u9019\u689d\u662f**\u5047\u8a2d**,\u5beb\u660e\u5728\u9019\u88e1;\u771f\u9047\u5230 19xx \u8981\u6539\u518a\u4e0d\u662f\u6539\u7a0b\u5f0f\u3002",
+   "four_state": "\u89e3\u5f97\u51fa=GREEN \u00b7 \u89e3\u5f97\u51fa\u4f46\u8207\u53e6\u4e00\u4f86\u6e90\u885d\u7a81=YELLOW \u00b7 \u6c92\u6709\u671f\u9593\u5b57\u6a23=NODATA"
+  },
+  "filename_tokens": {
+   "zh": "\u6a94\u540d\u5207\u5206(\u4e2d / \u82f1 / \u6578 / \u6a19\u9ede)",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+   "classes": {
+    "CJK": "[\\u4e00-\\u9fa5]+",
+    "EN": "[A-Za-z]+",
+    "NUM": "[0-9]+",
+    "PUNCT": "[^\\u4e00-\\u9fa5A-Za-z0-9]+"
+   },
+   "corrected": {
+    "note": "\u5207\u5b8c\u4e4b\u5f8c\u9084\u8981**\u518d\u9ecf\u56de\u53bb\u4e00\u6b21**,\u56e0\u70ba\u6709\u4e09\u7a2e\u6771\u897f\u5929\u751f\u8de8\u985e,\u5207\u958b\u5c31\u6b7b\u4e86\u3002",
+    "rejoin": [
+     "`2330.TW` \u88ab PUNCT \u5207\u6210 `2330` + `.` + `TW`\u2014\u2014\u4e09\u5e73\u53f0\u4ee3\u865f\u5fc5\u9808\u5148\u65bc\u5207\u5206\u6293\u3002",
+     "`00715B` \u88ab\u5207\u6210 `00715` + `B`\u2014\u2014ETF \u5c3e\u78bc\u5fc5\u9808\u5148\u65bc\u5207\u5206\u6293\u3002",
+     "`Jan 22, 2025` \u88ab\u5207\u6210\u4e09\u6bb5\u2014\u2014\u82f1\u6587\u65e5\u671f\u5fc5\u9808\u5148\u65bc\u5207\u5206\u6293\u3002"
+    ],
+    "order": "\u5148\u7528**\u9577\u6a23\u5f0f**(\u4e09\u5e73\u53f0\u4ee3\u865f / \u82f1\u6587\u65e5\u671f / \u5b63\u5ea6 / FY)\u5728\u539f\u5b57\u4e32\u4e0a\u6383\u4e00\u904d\u4e26\u628a\u547d\u4e2d\u5340\u6bb5\u6a19\u8a18\u8d77\u4f86,**\u5269\u4e0b\u7684**\u624d\u505a\u4e2d\u82f1\u6578\u5207\u5206\u3002\u53cd\u904e\u4f86\u505a\u5c31\u662f\u628a\u7b54\u6848\u5148\u526a\u788e\u4e86\u518d\u627e\u3002"
+   },
+   "why": "\u64cd\u4f5c\u54e1\u4ee4:\u300c\u5c07\u6a94\u6848\u7684\u540d\u7a31\u4e2d\u82f1\u6587\u8f49\u63db\u8655\u4ee5\u53ca\u6a19\u9ede\u7b26\u865f\u8f49\u63db\u8655\u5207\u958b\u8b8a\u6210\u7368\u7acb\u7684\u4e2d\u6587\u7368\u7acb\u7684\u82f1\u6587\u8ddf\u7368\u7acb\u7684\u6578\u5b57\u300d\u3002\u5207\u5206\u672c\u8eab\u5f88\u7c21\u55ae,\u96e3\u7684\u662f**\u5207\u4e4b\u524d\u8981\u5148\u4fdd\u8b77\u8de8\u985e\u7684\u6574\u9ad4**\u3002"
+  },
+  "source_priority": {
+   "zh": "\u4e09\u4f86\u6e90\u512a\u5148\u6b0a",
+   "owner": "\u64cd\u4f5c\u54e1(\u6279634 \u9010\u5b57\u7d66\u5b9a)",
+   "order": [
+    "\u672c\u6587",
+    "\u7b2c\u4e00\u9801\u5468\u908a\u8cc7\u8a0a\u5340",
+    "\u6a94\u540d"
+   ],
+   "rule": "\u4e09\u8005\u4e00\u81f4=GREEN \u00b7 \u5169\u8005\u4e00\u81f4\u7b2c\u4e09\u8005\u7f3a=GREEN(\u7f3a\u7684\u90a3\u500b\u6a19 NODATA)\u00b7 \u4e92\u76f8\u885d\u7a81=YELLOW \u4e26**\u628a\u4e09\u500b\u503c\u90fd\u5217\u51fa\u4f86**,\u4e0d\u53ef\u4ee5\u6311\u4e00\u500b\u7528\u3002",
+   "why": "\u64cd\u4f5c\u54e1\u4ee4:\u300c\u82e5\u4e09\u8005\u4e0d\u4e00\u81f4 \u2192 \u4ee5\u672c\u6587\u70ba\u6700\u9ad8\u512a\u5148\u6b0a\u300d\u3002\u4f46\u300e\u4ee5\u672c\u6587\u70ba\u6e96\u300f\u4e0d\u7b49\u65bc\u300e\u628a\u53e6\u5916\u5169\u500b\u4e1f\u6389\u300f\u2014\u2014\u885d\u7a81\u8981\u7559\u5728\u756b\u9762\u4e0a,\u4e0d\u7136\u4e0b\u4e00\u500b\u4eba\u4e0d\u77e5\u9053\u9019\u4e00\u683c\u662f\u731c\u7684\u9084\u662f\u5c0d\u7684\u3002",
+   "exception": "\u5238\u5546\u4f9d fields.broker\uff1a\u6a94\u540d\u5207\u5272\u512a\u5148\uff0c\u7b2c\u4e00\u9801\u5de6\u53f3\u8cc7\u8a0a\u5340\uff08\u5305\u542b\u5c0f\u5b57\u51fa\u7248\u8005\uff0f\u806f\u7d61\u8cc7\u8a0a\u4e2d\u7684\u6a5f\u69cb\u540d\u7a31\uff09\u4ea4\u53c9\u6838\u5c0d\uff1b\u4e0d\u8b80\u6b63\u6587\u4f5c\u5238\u5546\u8b49\u64da\u3002\u96fb\u90f5\u7db2\u57df\u50c5\u4f5c\u5f31\u8b49\u64da\u3002",
+   "history": [
+    {
+     "exception": "\u5238\u5546\u6b04\u4f8b\u5916:**\u96fb\u90f5\u7db2\u57df\u52dd\u904e\u4e09\u8005**\u3002\u6a94\u540d\u6703\u88ab\u6539\u3001\u5c01\u9762\u6703\u63db\u7248\u578b,\u5bc4\u4ef6\u7db2\u57df\u4e0d\u6703\u3002",
+     "superseded_by": "operator broker source instruction 2026-09-21"
+    }
+   ],
+   "fields": {
+    "broker": {
+     "order": [
+      "\u6a94\u540d",
+      "\u7b2c\u4e00\u9801\u5468\u908a\u8cc7\u8a0a\u5340"
+     ],
+     "allowed_sources": [
+      "\u6a94\u540d",
+      "\u7b2c\u4e00\u9801\u5468\u908a\u8cc7\u8a0a\u5340"
+     ],
+     "contact_domain": "weak_only",
+     "owner": "\u64cd\u4f5c\u54e1 2026-09-21 \u672c\u5c0d\u8a71",
+     "rule": "\u885d\u7a81\u4fdd\u7559\u5169\u500b\u4f86\u6e90\u8207 YELLOW\uff1b\u5169\u8005\u7686\u7f3a\u5247 NODATA\u3002"
+    }
+   }
+  }
+ }
+}

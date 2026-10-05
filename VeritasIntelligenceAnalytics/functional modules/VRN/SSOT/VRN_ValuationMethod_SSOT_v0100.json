@@ -1,0 +1,729 @@
+{
+  "ssot": "VIA_VRN_ValuationMethod_SSOT",
+  "version": "v0100",
+  "owner_engine": "VRN_ENG395_ValuationMethodLexicon",
+  "requirement": "VRN-REQ011",
+  "created": "2026-10-01",
+  "purpose": "財務評價方法(valuation_method)單一事實來源:標準代碼 VAL_* · 英文全稱 / 縮寫 · 台灣繁體 · 香港 · 大陸簡體慣用語分區 · 預估 / 歷史等變體 · 需語境判斷的歧義詞。舊詞庫(SYNONYM_LIBRARY_v4 scope valuation_method · VRN_ENG062 VALUATION_METHODS)全數對到本冊代碼(crosswalk),不另寫第二份。",
+  "code_rule": "VAL_<英數底線>;只增,舊碼不改不刪;操作員稿的 VAL_M&A 因含「&」不能當代碼 → 正式碼 VAL_MA,id_alias 保留 VAL_M&A",
+  "match_rule": {
+    "normalize": "NFKC(全形轉半形:Ｐ／Ｅ → P/E)· 斜線兩側空白去掉(P / E → P/E)· 連續空白壓一格",
+    "latin": "前後不得緊貼英數字(EV/EBIT 不會吃進 EV/EBITDA · PE 不會吃進 PEG / operating);全稱不分大小寫",
+    "case_sensitive": "≤4 字母的縮寫(PE · PER · PB · PS · NAV · DCF …)只認大寫,避免 per share / pe 之類英文常字誤判",
+    "cjk": "最長詞優先(本益比河流圖 → VAL_BAND,不是 VAL_PE)",
+    "region": "命中詞只在某一區的清單 → 標該區;多區共用 → 列全部區"
+  },
+  "regions": {
+    "en": "英文",
+    "zh_tw": "台灣繁體",
+    "zh_hk": "香港繁體(港式用語與台灣不同:市盈率 · 市賬率 · 市銷率)",
+    "zh_cn": "大陸簡體"
+  },
+  "region_note": "操作員稿把 ZH-TW / HK 併一欄;實務上香港用「市盈率 / 市賬率」而不用「本益比 / 股價淨值比」,故本冊另開 zh_hk 欄,台灣欄只放台灣用語。",
+  "groups": {
+    "EQUITY_MULTIPLE": "股權乘數估值(Equity Multiples / Relative)",
+    "EV_MULTIPLE": "企業價值乘數(Enterprise Value Multiples)",
+    "ABSOLUTE": "絕對估值與折現模型(Absolute / Discount Models)",
+    "CONTEXTUAL": "混合 / 情境 / 比較分析法(Contextual & Comparative)"
+  },
+  "methods": [
+    {
+      "id": "VAL_PE",
+      "seq": 1,
+      "group": "EQUITY_MULTIPLE",
+      "primary_name": "Price-to-Earnings",
+      "zh_name": "本益比法",
+      "formula": "股價 ÷ 每股盈餘(EPS)",
+      "legacy_canonical": [
+        "PE"
+      ],
+      "en": [
+        "Price-to-Earnings",
+        "Price to Earnings",
+        "Price/Earnings",
+        "P/E",
+        "P/E ratio",
+        "PE ratio",
+        "Price-Earnings Ratio",
+        "Earnings Multiple",
+        "PE multiple",
+        "P/E multiple",
+        "Forward PE",
+        "Forward P/E",
+        "Trailing PE",
+        "Trailing P/E"
+      ],
+      "en_case_sensitive": [
+        "PE",
+        "PER"
+      ],
+      "zh_tw": [
+        "本益比",
+        "本益比法",
+        "本益比評價",
+        "股價盈餘比",
+        "盈餘倍數",
+        "預估本益比",
+        "歷史本益比"
+      ],
+      "zh_hk": [
+        "市盈率",
+        "預測市盈率",
+        "歷史市盈率"
+      ],
+      "zh_cn": [
+        "市盈率",
+        "市盈率法",
+        "静态市盈率",
+        "动态市盈率",
+        "预测市盈率",
+        "PE倍数"
+      ],
+      "variants": {
+        "forward": [
+          "Forward PE",
+          "Forward P/E",
+          "預估本益比",
+          "預測市盈率",
+          "动态市盈率",
+          "预测市盈率"
+        ],
+        "trailing": [
+          "Trailing PE",
+          "Trailing P/E",
+          "歷史本益比",
+          "歷史市盈率",
+          "静态市盈率"
+        ]
+      },
+      "context_required": {
+        "PE": "也可指 Private Equity(私募股權);後面接倍數 / x / 估值字才算評價法"
+      }
+    },
+    {
+      "id": "VAL_PB",
+      "seq": 2,
+      "group": "EQUITY_MULTIPLE",
+      "primary_name": "Price-to-Book",
+      "zh_name": "股價淨值比法",
+      "formula": "股價 ÷ 每股淨值(BVPS)",
+      "legacy_canonical": [
+        "PB"
+      ],
+      "en": [
+        "Price-to-Book",
+        "Price to Book",
+        "P/B",
+        "P/B ratio",
+        "P/BV",
+        "Price-to-Book Ratio",
+        "Price-to-Book Value",
+        "Book Multiple"
+      ],
+      "en_case_sensitive": [
+        "PB",
+        "PBR",
+        "PBV"
+      ],
+      "zh_tw": [
+        "股價淨值比",
+        "股價淨值比法",
+        "淨值比",
+        "股價淨值倍數",
+        "PB倍數"
+      ],
+      "zh_hk": [
+        "市賬率",
+        "市帳率",
+        "市淨率"
+      ],
+      "zh_cn": [
+        "市净率",
+        "市净率法",
+        "股价账面价值比"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_PS",
+      "seq": 3,
+      "group": "EQUITY_MULTIPLE",
+      "primary_name": "Price-to-Sales",
+      "zh_name": "股價營收比法",
+      "formula": "市值 ÷ 營收(或 股價 ÷ 每股營收)",
+      "legacy_canonical": [],
+      "en": [
+        "Price-to-Sales",
+        "Price to Sales",
+        "P/S",
+        "P/S ratio",
+        "Price-to-Sales Ratio",
+        "Sales Multiple",
+        "Revenue Multiple"
+      ],
+      "en_case_sensitive": [
+        "PSR",
+        "PS"
+      ],
+      "zh_tw": [
+        "股價營收比",
+        "股價營收倍數",
+        "市售率",
+        "營收倍數"
+      ],
+      "zh_hk": [
+        "市銷率"
+      ],
+      "zh_cn": [
+        "市销率",
+        "股价营收比"
+      ],
+      "variants": {},
+      "context_required": {
+        "PS": "也是常見縮寫(附言 P.S. · 產品代號);後面接倍數 / x / 估值字才算",
+        "Revenue Multiple": "也可能指 EV/Sales;看分子是市值還是企業價值"
+      }
+    },
+    {
+      "id": "VAL_PEG",
+      "seq": 4,
+      "group": "EQUITY_MULTIPLE",
+      "primary_name": "Price-Earnings-to-Growth",
+      "zh_name": "本益成長比法",
+      "formula": "本益比 ÷ 盈餘成長率(%)",
+      "legacy_canonical": [],
+      "en": [
+        "PEG Ratio",
+        "PE to Growth",
+        "P/E to Growth",
+        "Price-Earnings-to-Growth",
+        "Price/Earnings-to-Growth"
+      ],
+      "en_case_sensitive": [
+        "PEG"
+      ],
+      "zh_tw": [
+        "本益成長比",
+        "本益比成長率",
+        "本益比對盈餘成長比率"
+      ],
+      "zh_hk": [
+        "市盈增長比率"
+      ],
+      "zh_cn": [
+        "PEG指标",
+        "市盈率相对盈利增长比率",
+        "市盈增长比率"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_DY",
+      "seq": 5,
+      "group": "EQUITY_MULTIPLE",
+      "primary_name": "Dividend Yield Method",
+      "zh_name": "殖利率法",
+      "formula": "目標價 = 預估每股股利 ÷ 目標殖利率",
+      "added_by": "AI 補(R36b):台灣券商報告常見,舊詞庫已有 DIVIDEND_YIELD",
+      "legacy_canonical": [
+        "DIVIDEND_YIELD"
+      ],
+      "en": [
+        "Dividend Yield Method",
+        "Dividend Yield Valuation",
+        "Yield-based Valuation",
+        "Dividend Yield"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "殖利率法",
+        "股利殖利率法",
+        "現金殖利率法",
+        "殖利率評價",
+        "股利殖利率"
+      ],
+      "zh_hk": [
+        "股息率估值"
+      ],
+      "zh_cn": [
+        "股息率法",
+        "股息收益率法",
+        "股息率估值"
+      ],
+      "variants": {},
+      "context_required": {
+        "Dividend Yield": "也是表格欄位(Yield %);只有在評價段落 / 目標價推導裡才算評價法",
+        "股利殖利率": "同上:單獨出現多半是指標不是方法"
+      }
+    },
+    {
+      "id": "VAL_EV_EBITDA",
+      "seq": 6,
+      "group": "EV_MULTIPLE",
+      "primary_name": "EV to EBITDA",
+      "zh_name": "企業價值倍數法",
+      "formula": "企業價值 ÷ 息稅折舊攤銷前盈餘",
+      "legacy_canonical": [
+        "EV_EBITDA"
+      ],
+      "en": [
+        "EV/EBITDA",
+        "EV to EBITDA",
+        "EV/EBITDA multiple",
+        "Enterprise Value to EBITDA",
+        "Enterprise Multiple",
+        "EBITDA Multiple",
+        "Firm Value to EBITDA"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "企業價值對EBITDA",
+        "企業價值倍數",
+        "EV/EBITDA倍數",
+        "EV倍數",
+        "息稅折舊攤銷前盈餘倍數"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "企业价值倍数",
+        "息税折旧摊销前利润倍数"
+      ],
+      "variants": {},
+      "context_required": {
+        "EV倍數": "也可能是 EV/Sales 或 EV/EBIT;看分母"
+      }
+    },
+    {
+      "id": "VAL_EV_SALES",
+      "seq": 7,
+      "group": "EV_MULTIPLE",
+      "primary_name": "EV to Sales",
+      "zh_name": "企業價值營收比法",
+      "formula": "企業價值 ÷ 營收",
+      "legacy_canonical": [],
+      "en": [
+        "EV/Sales",
+        "EV to Sales",
+        "Enterprise Value to Sales",
+        "EV/Revenue",
+        "EV to Revenue",
+        "Enterprise Value to Revenue"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "企業價值對營收比",
+        "企業價值營收倍數"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "企业价值对销售收入比",
+        "企业价值营收比"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_EV_EBIT",
+      "seq": 8,
+      "group": "EV_MULTIPLE",
+      "primary_name": "EV to EBIT",
+      "zh_name": "企業價值對息稅前盈餘倍數法",
+      "formula": "企業價值 ÷ 息稅前盈餘",
+      "added_by": "AI 補(R36b):投行報告常見,與 EV/EBITDA 分開",
+      "legacy_canonical": [],
+      "en": [
+        "EV/EBIT",
+        "EV to EBIT",
+        "Enterprise Value to EBIT"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "企業價值對息稅前盈餘倍數"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "企业价值对息税前利润倍数"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_DCF",
+      "seq": 9,
+      "group": "ABSOLUTE",
+      "primary_name": "Discounted Cash Flow",
+      "zh_name": "現金流量折現法",
+      "formula": "未來自由現金流以 WACC(FCFF)或權益成本(FCFE)折現加總",
+      "legacy_canonical": [
+        "DCF"
+      ],
+      "en": [
+        "Discounted Cash Flow",
+        "Discounted Cash Flow Model",
+        "DCF Valuation",
+        "DCF model",
+        "Cash Flow Discount Model",
+        "Free Cash Flow to Firm",
+        "Free Cash Flow to Equity"
+      ],
+      "en_case_sensitive": [
+        "DCF",
+        "FCFF",
+        "FCFE"
+      ],
+      "zh_tw": [
+        "現金流量折現法",
+        "現金流量折現模型",
+        "現金流折現模型",
+        "現金流折現",
+        "折現現金流",
+        "DCF評價",
+        "自由現金流折現",
+        "自由現金流量折現法"
+      ],
+      "zh_hk": [
+        "現金流貼現",
+        "貼現現金流"
+      ],
+      "zh_cn": [
+        "现金流折现法",
+        "现金流贴现模型",
+        "贴现现金流模型",
+        "DCF估值",
+        "自由现金流折现"
+      ],
+      "variants": {
+        "fcff": [
+          "FCFF",
+          "Free Cash Flow to Firm"
+        ],
+        "fcfe": [
+          "FCFE",
+          "Free Cash Flow to Equity"
+        ]
+      },
+      "context_required": {}
+    },
+    {
+      "id": "VAL_DDM",
+      "seq": 10,
+      "group": "ABSOLUTE",
+      "primary_name": "Dividend Discount Model",
+      "zh_name": "股利折現模型",
+      "formula": "未來股利以權益成本折現加總(高登成長:D1 ÷ (r − g))",
+      "legacy_canonical": [
+        "DDM"
+      ],
+      "en": [
+        "Dividend Discount Model",
+        "Dividend Valuation Model",
+        "Gordon Growth Model",
+        "Gordon Model",
+        "Dividend Discount"
+      ],
+      "en_case_sensitive": [
+        "DDM"
+      ],
+      "zh_tw": [
+        "股利折現模型",
+        "股利折現法",
+        "股利折現",
+        "股息折現模型",
+        "高登成長模型"
+      ],
+      "zh_hk": [
+        "股息貼現模型"
+      ],
+      "zh_cn": [
+        "股利贴现模型",
+        "股息贴现模型",
+        "戈登增长模型"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_RIM",
+      "seq": 11,
+      "group": "ABSOLUTE",
+      "primary_name": "Residual Income Model",
+      "zh_name": "剩餘收益模型",
+      "formula": "期初淨值 + 未來剩餘收益(淨利 − 權益成本 × 期初淨值)折現",
+      "legacy_canonical": [
+        "RIM"
+      ],
+      "en": [
+        "Residual Income Model",
+        "Residual Income Valuation",
+        "Economic Profit Model",
+        "Economic Value Added",
+        "Residual Income Approach"
+      ],
+      "en_case_sensitive": [
+        "RIM",
+        "EVA"
+      ],
+      "zh_tw": [
+        "剩餘收益模型",
+        "剩餘收益法",
+        "剩餘盈餘模型",
+        "殘餘盈餘",
+        "殘餘盈餘模型",
+        "經濟利潤模型",
+        "經濟附加價值"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "剩余收益模型",
+        "经济利润模型",
+        "经济增加值"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_NAV",
+      "seq": 12,
+      "group": "ABSOLUTE",
+      "primary_name": "Net Asset Value",
+      "zh_name": "淨資產價值法",
+      "formula": "資產重估值 − 負債(或重置成本)",
+      "legacy_canonical": [
+        "NAV"
+      ],
+      "en": [
+        "Net Asset Value",
+        "Asset-based Valuation",
+        "Asset-Based Approach",
+        "Replacement Cost Method",
+        "NAV-based Valuation"
+      ],
+      "en_case_sensitive": [
+        "NAV"
+      ],
+      "zh_tw": [
+        "淨資產價值法",
+        "淨資產價值",
+        "淨資產法",
+        "淨值法",
+        "資產基礎評價",
+        "重置成本法"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "净资产价值法",
+        "净资产法",
+        "资产重置成本法",
+        "重置成本法"
+      ],
+      "variants": {},
+      "context_required": {
+        "NAV": "基金 / ETF 報告裡 NAV = 每單位淨值,不是評價法",
+        "Net Asset Value": "同上"
+      }
+    },
+    {
+      "id": "VAL_SOTP",
+      "seq": 13,
+      "group": "CONTEXTUAL",
+      "primary_name": "Sum-of-the-Parts",
+      "zh_name": "分部加總法",
+      "formula": "各事業 / 持股分別評價後加總(減淨負債)",
+      "legacy_canonical": [
+        "SOTP"
+      ],
+      "en": [
+        "Sum-of-the-Parts",
+        "Sum of the Parts",
+        "SOTP valuation",
+        "Break-up Valuation",
+        "Breakup Valuation",
+        "Segment-based Valuation",
+        "Parts Valuation"
+      ],
+      "en_case_sensitive": [
+        "SOTP"
+      ],
+      "zh_tw": [
+        "分部加總法",
+        "分部加總估值",
+        "分部加總",
+        "分部估值",
+        "事業群加總估值",
+        "拆解價值法",
+        "各業務估值加總"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "分部加总估值法",
+        "分部加总法",
+        "分部估值",
+        "拆分估值法",
+        "业务分部估值"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_COMPS",
+      "seq": 14,
+      "group": "CONTEXTUAL",
+      "primary_name": "Relative Valuation",
+      "zh_name": "相對評價法",
+      "formula": "取可比公司 / 同業的倍數套到本公司",
+      "legacy_canonical": [],
+      "en": [
+        "Relative Valuation",
+        "Comparable Company Analysis",
+        "Comparable Companies Analysis",
+        "Trading Comps",
+        "Trading Comparables",
+        "Peer Group Analysis",
+        "Peer Multiple",
+        "Peer Multiples",
+        "Sector Multiple"
+      ],
+      "en_case_sensitive": [
+        "CCA"
+      ],
+      "zh_tw": [
+        "相對評價法",
+        "同業比較法",
+        "可比公司分析",
+        "乘數估值法",
+        "同產業倍數",
+        "同業倍數"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "相对估值法",
+        "可比公司法",
+        "可比公司分析",
+        "乘数定价法",
+        "竞品估值"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_MA",
+      "id_alias": "VAL_M&A",
+      "seq": 15,
+      "group": "CONTEXTUAL",
+      "primary_name": "Precedent Transactions",
+      "zh_name": "先前交易法",
+      "formula": "取過往併購案的成交倍數(含控制權溢價)",
+      "legacy_canonical": [],
+      "en": [
+        "Precedent Transactions",
+        "Precedent Transaction Analysis",
+        "Transaction Comps",
+        "Transaction Comparables",
+        "M&A Multiples",
+        "Deal Comps"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "先前交易法",
+        "前例交易法",
+        "歷史交易比較法",
+        "併購交易倍數"
+      ],
+      "zh_hk": [],
+      "zh_cn": [
+        "交易案例比较法",
+        "可比交易法",
+        "历史并购估值法",
+        "并购交易倍数"
+      ],
+      "variants": {},
+      "context_required": {}
+    },
+    {
+      "id": "VAL_BAND",
+      "seq": 16,
+      "group": "CONTEXTUAL",
+      "primary_name": "Valuation Band",
+      "zh_name": "評價區間法(河流圖)",
+      "formula": "歷史倍數區間(高 / 中 / 低)× 預估 EPS 或 BVPS",
+      "legacy_canonical": [],
+      "en": [
+        "Valuation Band",
+        "PE Band",
+        "P/E Band",
+        "PB Band",
+        "P/B Band",
+        "Target PER band",
+        "PER band",
+        "Historical Multiple Range",
+        "Trading Range Multiple",
+        "PE River",
+        "P/E River",
+        "PB River"
+      ],
+      "en_case_sensitive": [],
+      "zh_tw": [
+        "評價區間",
+        "本益比區間",
+        "本益比波段",
+        "本益比河流圖",
+        "股價淨值比河流圖",
+        "淨值比河流圖",
+        "河流圖",
+        "歷史區間法"
+      ],
+      "zh_hk": [
+        "市盈率區間"
+      ],
+      "zh_cn": [
+        "估值区间",
+        "估值通道",
+        "市盈率区间",
+        "市净率区间",
+        "PE河流图"
+      ],
+      "variants": {
+        "pe_basis": [
+          "PE Band",
+          "P/E Band",
+          "Target PER band",
+          "PER band",
+          "PE River",
+          "P/E River",
+          "本益比區間",
+          "本益比波段",
+          "本益比河流圖",
+          "市盈率區間",
+          "市盈率区间",
+          "PE河流图"
+        ],
+        "pb_basis": [
+          "PB Band",
+          "P/B Band",
+          "PB River",
+          "股價淨值比河流圖",
+          "淨值比河流圖",
+          "市净率区间"
+        ]
+      },
+      "context_required": {}
+    }
+  ],
+  "excluded_terms": {
+    "Price Multiple": "太泛(任何倍數都可叫 price multiple);不單獨判方法",
+    "enterprise value": "舊 ENG062 列在 EV_EBITDA 下;單獨出現是金額科目,不是方法 → 不收",
+    "淨資產": "舊 ENG062 列在 NAV 下;單獨出現是資產負債表科目 → 收「淨資產價值 / 淨資產法」,不收單字",
+    "per(小寫)": "只收大寫 PER(VAL_PE);小寫 per(per share / per year)是英文常字 → 不收",
+    "residual income": "舊 ENG062 子字串片段;單獨出現是會計概念(剩餘收益數值)→ 收「Residual Income Model / Valuation / Approach」,不收單詞"
+  },
+  "simplified_traditional_pairs": "价價 净淨 账賬 帐帳 销銷 营營 业業 现現 贴貼 余餘 经經 济濟 润潤 产產 资資 购購 历歷 较較 区區 间間 图圖 数數 旧舊 摊攤 税稅 长長 总總 竞競 对對 态態 动動 静靜 标標 关關 务務 统統 预預 测測 评評 损損 权權 带帶 计計 实實 汇匯 并併 盖蓋 读讀 债債 买買 卖賣 报報 览覽 会會 汤湯 贝貝 华華 门門 银銀 为為 与與 个個 时時 类類 质質",
+  "outputs": {
+    "dir": "VIA_Reports/vrn/valuation_method",
+    "files": [
+      "VALUATION_METHODS_export.json(操作員稿的 lowercase 陣列結構,短縮寫另列 case_sensitive)",
+      "CHECK_latest.json"
+    ]
+  }
+}

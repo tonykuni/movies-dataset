@@ -1,0 +1,44 @@
+{
+ "schema": "VIA_VRN_STAGE_ALIAS_MAP_V1",
+ "version": "v0100",
+ "append_only": true,
+ "policy": "批177(交接報告 P1-3):VRN 階段名 M01-M08=語意層;資產名=Registry 現役正名鏈。單一 Active Owner=資產名;M 名僅作階段引用,不得為第二 Active Pipeline(Hydra 防制)。",
+ "map": {
+  "VRN_M01_UnifiedPDFConverter": {
+   "asset": "VRN_MDL001_Converter.py",
+   "owner": "ASSET"
+  },
+  "VRN_M02_PageClassifier": {
+   "asset": "VRN_MDL002_LayoutExtractor.py",
+   "owner": "ASSET"
+  },
+  "VRN_M03_OCREngine": {
+   "asset": "VRN_MDL004_OCR_FetchingPDFTable_v1.py + VRN_MDL005_OCRFetchingPDFText_v1.py",
+   "owner": "ASSET"
+  },
+  "VRN_M03b_TableRestorer": {
+   "asset": "VRN_MDL003_TableRestorer.py",
+   "owner": "ASSET"
+  },
+  "VRN_M04_FinancialTableExtractor": {
+   "asset": "VRN_MDL004_OCR_FetchingPDFTable_v1.py",
+   "owner": "ASSET"
+  },
+  "VRN_M05_BasicInfoExtractor": {
+   "asset": "vrn_report_digest(十一欄)+VRN_ENG050_ContentStore",
+   "owner": "ASSET"
+  },
+  "VRN_M06_NarrativeAnalyzer": {
+   "asset": "VRN_ENG062_SummarizerV1+VRN_ENG066_NLPSupportHub",
+   "owner": "ASSET"
+  },
+  "VRN_M07_DataNormalizer": {
+   "asset": "VRN_MDL006_ConsolidatorAndPhaseValidator.py",
+   "owner": "ASSET"
+  },
+  "VRN_M08_SummarizerCrossValidator": {
+   "asset": "VRN_MDL008_CrossValidator.py+VRN_ENG069_ConsensusDB",
+   "owner": "ASSET"
+  }
+ }
+}

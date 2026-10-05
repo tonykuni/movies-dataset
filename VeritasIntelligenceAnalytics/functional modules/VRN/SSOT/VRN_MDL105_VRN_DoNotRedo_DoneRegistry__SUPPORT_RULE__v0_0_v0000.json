@@ -1,0 +1,248 @@
+{
+  "Version": "VRN_DO_NOT_REDO_DONE_REGISTRY_v1.0.0",
+  "GeneratedAt": "2026-05-31 06:52:03",
+  "Base": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN",
+  "ReadOnly": true,
+  "Mutation": false,
+  "DbWrite": false,
+  "Delete": false,
+  "Purpose": "Review previous records and base files; avoid redoing completed work",
+  "Decision": {
+    "Status": "READY_FOR_ANCHOR_PATCH_PREVIEW_NO_REDO",
+    "Risk": "GREEN",
+    "Score": 100,
+    "EvidenceFails": 0,
+    "HistoryEvidenceMissing": 0,
+    "NextRunnableSteps": 2,
+    "CanonicalMaster": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+    "PolicyModule": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_HistoricalValidationPolicy_v0100.py",
+    "FinancialCsvRows": 2087,
+    "FinancialRestoredRows": 2100,
+    "TrustMatrixRows": 2087,
+    "Next1": "執行 HistoricalPolicy Anchor Patch Preview，只定位錨點，不修改",
+    "Next2": "通過後再 Append-only Patch，接入 policy module",
+    "Next3": "Post-patch validation 後才做 _vrn_canonical_active read-only seal"
+  },
+  "DoNotRedoRegistry": [
+    {
+      "Item": "Base Review",
+      "Status": "DONE_OR_EVIDENCED",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_base_review_runs\\RUN_20260531_013722\\VRN_Base_Review_Confirm.html",
+      "Reason": "Base 已確認，後續已進入 canonical / policy 階段",
+      "NextAction": "SKIP",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "Master Route Lock + Financial Reconcile",
+      "Status": "DONE",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_master_route_lock_runs\\RUN_20260531_024557\\VRN_MasterRouteLock_FinancialReconcile.html",
+      "Reason": "已找到 canonical financial evidence 與 master route 問題",
+      "NextAction": "SKIP",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "Canonical Active Seal Preview",
+      "Status": "DONE",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_canonical_seal_preview_runs\\RUN_20260531_061541\\VRN_Canonical_Active_Seal_Preview.html",
+      "Reason": "Canonical master 與 financial evidence 已確認",
+      "NextAction": "SKIP",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "Hydra Containment Registry",
+      "Status": "DONE",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_hydra_containment_runs\\RUN_20260531_062606\\VRN_Hydra_Containment_Registry.html",
+      "Reason": "Evidence zone controllers 已納入 denylist / containment",
+      "NextAction": "SKIP unless denylist missing",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "BasicInfo + FinancialData Confidence Review",
+      "Status": "DONE",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_confidence_method_review_runs\\RUN_20260531_064236\\VRN_BasicFinancial_Confidence_Method_Review.html",
+      "Reason": "Confidence Review 已達 GREEN / 100%，不應重跑大掃描",
+      "NextAction": "SKIP",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "Historical Validation Policy Gate",
+      "Status": "DONE",
+      "DoNotRedo": true,
+      "Evidence": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_historical_validation_policy_runs\\RUN_20260531_064659\\VRN_HistoricalValidationPolicy_Gate.html",
+      "Reason": "Policy module / markdown 已建立，self-check PASS",
+      "NextAction": "SKIP",
+      "Risk": "GREEN"
+    },
+    {
+      "Item": "Historical Policy Anchor Patch Preview",
+      "Status": "NEXT_ONLY",
+      "DoNotRedo": false,
+      "Evidence": "",
+      "Reason": "目前真正下一步，只定位 canonical master 錨點，不修改",
+      "NextAction": "RUN_NEXT",
+      "Risk": "GREEN"
+    }
+  ],
+  "CurrentBaseEvidence": [
+    {
+      "Key": "CANONICAL_MASTER",
+      "Type": "CODE",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\modules\\VRN_MDL_SummaryPipelineBridge_AIO_v01.py",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "144E2C824FD0C0AED79E0FD9B3F875D04020C7C9F316FFB2B3E9082C33F62C97",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "POLICY_MODULE",
+      "Type": "CODE",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_HistoricalValidationPolicy_v0100.py",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "9A3D88F76AD637A3CCBDDC50FDFF8B8285C0976187C423C75FCF953776D5380D",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "POLICY_MARKDOWN",
+      "Type": "DOC",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VRN_HistoricalValidationPolicy_v0100.md",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "86CD82B6DC92EBDCECBF3D84F70F1829C6060BE048D6BF10D3EA90BA059526B3",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_CSV",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_FinancialData.csv",
+      "Exists": true,
+      "ExpectedRows": 2087,
+      "ActualRows": 2087,
+      "SHA256": "54F6C8BE1C9728B28CDED76AE2DA532CEC07A3295371151FE16B6F934513891E",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_RESTORED_CSV",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_Financial_Restored.csv",
+      "Exists": true,
+      "ExpectedRows": 2100,
+      "ActualRows": 2100,
+      "SHA256": "AECC46400AE0BF19DD9A28C43539649BA6FD9BFD80DC213407A8F8630D894A85",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "FINANCIAL_PARQUET",
+      "Type": "PARQUET",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_FinancialData.parquet",
+      "Exists": true,
+      "ExpectedRows": "",
+      "ActualRows": "",
+      "SHA256": "E8D23324E09FABFAC10454D3B9DFD61DEAC4633130C10E958B4803C1B4F48840",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    },
+    {
+      "Key": "TRUST_MATRIX",
+      "Type": "CSV",
+      "Path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\temp\\_d8b_runs\\RUN_20260530_215141_VRN_V070_AIO\\VRN_v070_Trust_Matrix.csv",
+      "Exists": true,
+      "ExpectedRows": 2087,
+      "ActualRows": 2087,
+      "SHA256": "54F6C8BE1C9728B28CDED76AE2DA532CEC07A3295371151FE16B6F934513891E",
+      "Status": "PASS",
+      "Risk": "GREEN",
+      "Note": "OK"
+    }
+  ],
+  "NextOrder": [
+    {
+      "Order": 1,
+      "Phase": "DO_NOT_REDO_LOCK",
+      "Action": "把已完成項目視為 sealed evidence，不再重跑大掃描",
+      "DependsOn": "Done Registry",
+      "ShouldRunNow": true,
+      "Mutation": false,
+      "Reason": "避免重做造成 Hydra / 新舊報告互相污染",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 2,
+      "Phase": "ANCHOR_PATCH_PREVIEW_ONLY",
+      "Action": "掃描 canonical master 的 import / financial gate / basicinfo opinion / trust matrix / seal gate 錨點",
+      "DependsOn": "Policy Gate PASS",
+      "ShouldRunNow": true,
+      "Mutation": false,
+      "Reason": "目前下一步只做錨點定位，不修改",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 3,
+      "Phase": "APPEND_ONLY_PATCH",
+      "Action": "把 VIS_VRN_HistoricalValidationPolicy_v0100.py 接到 canonical master / seal gate",
+      "DependsOn": "Anchor Patch Preview PASS",
+      "ShouldRunNow": false,
+      "Mutation": "NEXT_STEP_ONLY_ADD_ONLY",
+      "Reason": "必須等錨點確認後才 patch",
+      "Risk": "YELLOW"
+    },
+    {
+      "Order": 4,
+      "Phase": "POST_PATCH_VALIDATION",
+      "Action": "確認 broker report / pdf_table / report_text 不再當 Financial validation truth",
+      "DependsOn": "Append-only Patch",
+      "ShouldRunNow": false,
+      "Mutation": false,
+      "Reason": "驗證 Historical / AddSub / Division policy 有生效",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 5,
+      "Phase": "READONLY_CANONICAL_SEAL",
+      "Action": "只在 _vrn_canonical_active 寫 reference files",
+      "DependsOn": "Post Patch Validation PASS",
+      "ShouldRunNow": false,
+      "Mutation": "ADD_ONLY_REFERENCE_FILES",
+      "Reason": "最後才 seal，不要在 patch 前 seal",
+      "Risk": "GREEN"
+    },
+    {
+      "Order": 6,
+      "Phase": "DO_NOT_RUN",
+      "Action": "不要再跑 Base Review / Confidence Review / Historical Policy Gate",
+      "DependsOn": "Current evidence",
+      "ShouldRunNow": false,
+      "Mutation": false,
+      "Reason": "已完成，重跑只會產生更多 evidence zone 報告與 Hydra 噪音",
+      "Risk": "GREEN"
+    }
+  ],
+  "Outputs": {
+    "RunDir": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145",
+    "Html": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\VRN_DoNotRedo_DoneRegistry.html",
+    "Json": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\VRN_DoNotRedo_DoneRegistry.json",
+    "DoneCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\VRN_DoNotRedo_Registry.csv",
+    "EvidenceCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\VRN_Current_Base_Evidence_Check.csv",
+    "NextCsv": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\VRN_Next_Order_NoRedo.csv",
+    "NextPreview": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN\\_vrn_done_registry_runs\\RUN_20260531_065145\\NEXT_Invoke_VRN_HistoricalPolicy_AnchorPatch_Preview_ONLY.txt"
+  }
+}
