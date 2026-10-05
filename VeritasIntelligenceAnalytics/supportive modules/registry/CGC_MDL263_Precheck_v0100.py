@@ -322,14 +322,26 @@ STATIONS = [
 def run_station(key, args, parser):
     if key == "ast":
         t0 = time.time()
-        p = subprocess.run([sys.executable, str(token_tool()), "scan", "--json", "--fast"], cwd=str(VIA.parent),
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=TIMEOUT)
-        out = "\n".join(ln for ln in p.stdout.splitlines() if not ln.startswith("@@PROGRESS"))
-        rc, secs = p.returncode, round(time.time() - t0, 1)
+        try:
+            p = subprocess.run([sys.executable, str(token_tool()), "scan", "--json", "--fast"], cwd=str(VIA.parent),
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=TIMEOUT)
+            out, rc = "\n".join(ln for ln in p.stdout.splitlines() if not ln.startswith("@@PROGRESS")), p.returncode
+        except subprocess.TimeoutExpired:
+            out, rc = "", 124                      # 同 run_vcgc:逾時 = rc 124 的站結果,不中斷整輪
+        secs = round(time.time() - t0, 1)
     else:
         rc, out, secs = run_vcgc(args)
     lamp, summ, f = parser(rc, out)
-    return {"rc": rc, "secs": secs, "lamp": lamp, "summary": summ, "findings": f}
+    return finalize_station(key, {"rc": rc, "secs": secs, "lamp": lamp, "summary": summ, "findings": f})
+
+
+def finalize_station(key: str, st: dict) -> dict:
+    """非綠站一定要有可編號的發現:解析不到逐條時,補一條站級發現(站名 · rc · 摘要)。"""
+    live = [x for x in st["findings"] if not is_frozen(x.get("file", ""))]
+    if st["lamp"] != "GREEN" and not live:
+        st["findings"].append({"cls": "STATION", "file": f"station:{key}", "line": 0, "lamp": st["lamp"],
+                               "detail": f"站 {key} {st['lamp']} · rc {st['rc']} · {st['summary']}"[:200]})
+    return st
 
 
 RED_CLASSES = {"ACCEL", "NET", "TALIB", "SYSEXE"}
@@ -341,10 +353,47 @@ def is_frozen(path: str) -> bool:
 
 
 def station_lamp(findings: list, rc: int = 0) -> str:
+    """有紅 = RED;有黃 = YELLOW;一條都沒解析到卻 rc 非 0(逾時 · 崩潰 · 格式變)= rc 2 黃、其餘紅,不冒充綠。
+    解析到的全是凍結收容件(INFO)= 那就是 rc 的原因,照 GREEN。"""
     live = [x for x in findings if not is_frozen(x.get("file", ""))]
     if any(x.get("lamp") == "RED" for x in live):
         return "RED"
-    return "YELLOW" if live else "GREEN"
+    if live:
+        return "YELLOW"
+    if not findings and rc not in (0, None):
+        return "YELLOW" if rc == 2 else "RED"
+    return "GREEN"
+
+
+NEXT_BY_CLASS = {
+    "ACCEL": "出薄尾補 [VIA:ACCEL-BRIDGE](已發布檔不就地改);凍結 / 正典唯讀本列具名豁免",
+    "NET": "VDF 檔出薄尾補 [VIA:NET-BRIDGE]",
+    "PSTPL": "舊 .ps1 不改(L70);新出版號檔時帶兩章",
+    "PINVER": "改以尾版 glob 取檔,或改走前版鏈(薄尾律)",
+    "HARDIMP": "選用庫移入 try / 探針,缺庫照實 ABSENT",
+    "SYSEXE": "派別支引擎改走家族境 python(CGC_MDL157 family_python)",
+    "TALIB": "移除 TA-Lib,改走 QuantGuard(L50)",
+    "EVIDENCE": "via-vcgc handoff test <case> 重開收據;測試本身紅 = 先修引擎",
+    "UNTESTED": "補 --selftest 與交接案,handoff test 轉 VERIFIED",
+    "UNREG": "via-vcgc registry-sync --apply(提交後)",
+    "NUMBER": "run CGC_MDL237_NumberingSystem audit 看紅列,待裁定者送操作員",
+    "SSOT": "via-vcgc ssot plan 看可自動與待裁定",
+    "SDD": "via-vcgc sdd check 看 X- 項;待重驗鎖 = sdd selftests / real → lock --apply",
+    "STATION": "單跑該站看完整輸出:via_precheck --only <站>",
+    "ENV": "via-rungate / via-envgov 看缺哪個庫或境",
+    "COVER": "via-bridge-sweep --subsystems(乾跑)看缺哪支",
+    "SYNC": "via-vcgc registry-sync --apply(提交後)",
+    "OTHER": "看 detail 定位後處理",
+}
+
+
+def next_step(cls: str, owner: str) -> str:
+    base = NEXT_BY_CLASS.get(cls, NEXT_BY_CLASS["OTHER"])
+    if owner.startswith("凍結"):
+        return "凍結收容件不改:列具名豁免名冊即可(INFO)"
+    if "(L111)" in owner or owner.endswith("子系統"):
+        return f"交 {owner.split('(')[0]}(L111:VCGC 只出資訊卡):{base}"
+    return base
 
 
 def number_findings(stations: dict) -> list:
@@ -356,7 +405,8 @@ def number_findings(stations: dict) -> list:
             frozen = is_frozen(x.get("file") or "")
             out.append({"id": f"PC-{n:03d}", "station": key, "class": cls, "class_zh": CLASS_ZH.get(cls, CLASS_ZH["OTHER"]),
                         "lamp": "INFO" if frozen else (x.get("lamp") or ("RED" if cls in RED_CLASSES else "YELLOW")), "where": (x.get("file") or "") + (f":{x['line']}" if x.get("line") else ""),
-                        "owner": owner_of(x.get("file") or ""), "detail": x.get("detail", "")})
+                        "owner": owner_of(x.get("file") or ""), "detail": x.get("detail", ""),
+                        "next": next_step(cls, owner_of(x.get("file") or ""))})
     return out
 
 
@@ -403,6 +453,7 @@ def main(argv=None) -> int:
         print(f"  {o:<34} {n:>4} 條(紅 {cnt['RED']} · 黃 {cnt['YELLOW']} · INFO {cnt['INFO']})")
         for f in sorted(sub, key=lambda x: {"RED": 0, "YELLOW": 1, "INFO": 2}[x["lamp"]])[:6]:
             print(f"     {f['id']} [{f['lamp']:<6}] {f['class']:<8} {f['where'][:70]:<70} {f['detail'][:70]}")
+            print(f"            → {f['next'][:110]}")
     if "--json" in a:
         print(json.dumps(rep, ensure_ascii=False, indent=1))
     print(f"\n[via_precheck] {overall} · 站 {len(stations)} · 發現 {len(findings)}(紅 {rep['by_lamp']['RED']} · 黃 {rep['by_lamp']['YELLOW']} · INFO {rep['by_lamp']['INFO']}) · 類 {rep['by_class']} · 報告 VIA_Reports/precheck/PRECHECK_latest.json")
@@ -443,6 +494,25 @@ def selftest() -> int:
     chk("⑨ 編號 PC-### · 類說明 · 位置檔:行 · 歸屬", nf[0]["id"] == "PC-001" and nf[0]["where"].endswith(":74") and nf[0]["owner"] == "VCGC" and "sys.executable" in nf[0]["class_zh"], nf)
     chk("⑩b 凍結收容件 = INFO,不拉燈", station_lamp([{"file": "supportive modules/intake/X/a.py", "lamp": "RED"}]) == "GREEN"
         and number_findings({"s": {"lamp": "RED", "findings": [{"cls": "ACCEL", "file": "functional modules/VRN/references/intake/a.py"}]}})[0]["lamp"] == "INFO")
+    chk("⑬ rc 非 0 又沒解析到 = 不得綠(rc 2 黃 · 其餘紅)", station_lamp([], 124) == "RED" and station_lamp([], 2) == "YELLOW" and station_lamp([], 0) == "GREEN")
+    st_bad = finalize_station("number", {"rc": 1, "secs": 0, "lamp": "RED", "summary": "遺失 2", "findings": []})
+    chk("⑭ 非綠站沒逐條發現 → 補一條站級發現(可編號)", len(st_bad["findings"]) == 1 and st_bad["findings"][0]["cls"] == "STATION"
+        and finalize_station("token", {"rc": 0, "secs": 0, "lamp": "GREEN", "summary": "", "findings": []})["findings"] == [])
+    nf2 = number_findings({"x": {"lamp": "RED", "findings": [{"cls": "ACCEL", "file": "functional modules/VRN/a_v0100.py"}]}})
+    chk("⑮ 每條發現帶下一步(子系統項標 L111 交辦)", nf2[0]["next"].startswith("交 VRN_SystemManager") and "ACCEL-BRIDGE" in nf2[0]["next"])
+    _orig_tt, _orig_to = token_tool, TIMEOUT
+    globals()["token_tool"] = lambda: Path(sys.executable).parent / "__no_such__"
+    try:
+        st_ast = run_station("ast", None, p_ast)
+    finally:
+        globals()["token_tool"] = _orig_tt
+    chk("⑯ AST 站跑不起來不丟例外:照實紅 + 站級發現", st_ast["lamp"] == "RED" and st_ast["findings"] and st_ast["findings"][0]["cls"] == "STATION", st_ast)
+    globals()["TIMEOUT"] = 0.01
+    try:
+        st_to = run_station("ast", None, p_ast)
+    finally:
+        globals()["TIMEOUT"] = _orig_to
+    chk("⑯b AST 掃描逾時 → rc 124 站結果(不中斷整輪)", st_to["rc"] == 124 and st_to["lamp"] == "RED" and st_to["findings"][0]["cls"] == "STATION", st_to)
     chk("⑩ 彙總:有紅 = RED · 有黃 = YELLOW · 全綠 = GREEN", aggregate(st) == "YELLOW" and aggregate({"x": {"lamp": "RED"}, "y": {"lamp": "GREEN"}}) == "RED")
     chk("⑪ 站表 14 類全在(token · bridge · celer · ast · sync · number · ssot · sdd · handoff · test · rungate · matrix · accel · temp)",
         {k.split("_")[0] for k, *_ in STATIONS} == {"token", "bridge", "celer", "ast", "sync", "number", "ssot", "sdd", "handoff", "test", "rungate", "matrix", "accel", "temp"})
