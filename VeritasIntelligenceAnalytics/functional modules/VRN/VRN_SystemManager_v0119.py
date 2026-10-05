@@ -942,6 +942,26 @@ def reconstruct(path: str) -> dict:
             "cleaned_prev": removed, "reconstructed": len(rows), "rows": rows}
 
 
+_DOCX_CACHE = None
+
+
+def _docx_engine_v0119() -> dict:
+    """WORD TEXT 擷取正主座:VRN_ENG052_DocxEngine 尾版(梯 docx2python→python-docx→
+    內建 XML;extract_docx → (段落, 表格, 引擎名))。缺/壞=誠實 UNAVAILABLE(Zero-Hydra,不自建第二套)。"""
+    global _DOCX_CACHE
+    if _DOCX_CACHE is None:
+        try:
+            cands = sorted(HERE.glob("VRN_ENG052_DocxEngine_v*.py"), key=_vnum_v0119)
+            spec = importlib.util.spec_from_file_location("vrn_eng052_for_" + TAG, cands[-1])
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = mod
+            spec.loader.exec_module(mod)
+            _DOCX_CACHE = {"mod": mod, "state": "LOADED(" + cands[-1].stem.split("_")[-1] + ")"}
+        except Exception as exc:
+            _DOCX_CACHE = {"mod": None, "state": f"UNAVAILABLE {type(exc).__name__}"}
+    return _DOCX_CACHE
+
+
 def _acquire_text_v0119(path: Path, doc) -> tuple:
     """統一取文核心(操作員令 2026-10-05「邏輯統一」:intake→deepread→layout-check→
     reconstruct 三套不各自為政,梯只此一條):zones 原生取文,不足 40 字走梯
@@ -967,7 +987,39 @@ def deepread_one(path: Path) -> dict:
            "fn_locked": bool(fn["report_date"] and fn["codes"] and fn["broker_std"])}
     # FILENAME 識別成功就鎖定(操作員令):三欄齊=鎖,內文互證只作佐證不改寫檔名欄
     if path.suffix.lower() != ".pdf":
-        row.update({"state": "NON_PDF_SKIP", "lamp": "黃", "next": "docx/txt 另路(不假裝讀過)"})
+        text, lane, note, ntab = None, None, "", 0
+        if path.suffix.lower() == ".docx":   # WORD TEXT 擷取(正主=ENG052 尾版)
+            eng = _docx_engine_v0119()
+            if eng["mod"] is not None:
+                try:
+                    paras, tables, engname = eng["mod"].extract_docx(path)
+                    ntab = len(tables)
+                    text = "\n".join(list(paras) + ["\t".join(str(c) for c in r) for t in tables for r in t])
+                    lane, note = "DOCX(ENG052)", f"{engname} · 段 {len(paras)} · 表 {ntab}"
+                except Exception as exc:
+                    note = f"ENG052 擷取失敗 {type(exc).__name__}"
+            else:
+                note = eng["state"]
+        elif path.suffix.lower() == ".txt":
+            try:
+                text, lane = path.read_text(encoding="utf-8", errors="replace"), "TXT"
+            except OSError as exc:
+                note = f"讀檔失敗 {type(exc).__name__}"
+        if text and len(text.strip()) >= 20:
+            crx = _central_regex_v0119()
+            rtw = _pick_rating_v0119(crx, text, "")
+            row.update({"state": "DEEPREAD_" + ("DOCX" if lane.startswith("DOCX") else "TXT"),
+                        "extract_lane": lane, "lane_note": note, "docx_tables": ntab,
+                        "content_date": _content_date_v0119(crx, text),
+                        "rating": rtw,
+                        "rating_std": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[0],
+                        "target_price": _target_price_v0119(crx, text),
+                        "size_h": PRIOR.size_h(row.get("size_bytes")), "lamp": "黃",
+                        "next": "平文擷取(docx 無固定版面;表格交表格梯 ENG058)"})
+            row.update(_analyst_v0119(text))
+            return row
+        row.update({"state": "NON_PDF_SKIP", "lamp": "黃",
+                    "next": "另路(不假裝讀過)" + ((" · " + note) if note else "")})
         return row
     doc, why = _open_pdf_v0119(path)
     if doc is None:
@@ -1072,6 +1124,33 @@ def deepread_one(path: Path) -> dict:
     return row
 
 
+_SCAN_NOTES: list = []   # 大小統計讀不到的單項(誠實帳,非驗證欄)
+
+
+def _scan_size_v0119(root: Path) -> int:
+    """夾層總大小(os.scandir 遞迴:遍歷時快取 metadata,批量最快;檔案給 stat)。"""
+    if root.is_file():
+        try:
+            return root.stat().st_size
+        except OSError:
+            return 0
+    total = 0
+    try:
+        with os.scandir(root) as it:
+            for e in it:
+                try:
+                    if e.is_file(follow_symlinks=False):
+                        total += e.stat(follow_symlinks=False).st_size
+                    elif e.is_dir(follow_symlinks=False):
+                        total += _scan_size_v0119(Path(e.path))
+                except OSError as exc:
+                    _SCAN_NOTES.append(f"{e.name}: {type(exc).__name__}")   # 誠實記,照數其餘
+                    continue
+    except OSError:
+        return total
+    return total
+
+
 def deepread(path: str) -> dict:
     """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
     removed = _fresh_outputs_v0119("deepread")   # 清場律:先刪前次結果
@@ -1087,9 +1166,11 @@ def deepread(path: str) -> dict:
                              "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         else:
             skipped += 1
+    total = _scan_size_v0119(p)   # os.scandir 批量統計(Top6 之 3:快取 metadata 少 syscalls)
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
             "cleaned_prev": removed, "total_files": len(files), "stock_reports": len(rows),
-            "non_stock_skipped": skipped, "rows": rows}
+            "non_stock_skipped": skipped,
+            "folder_size_bytes": total, "folder_size_h": PRIOR.size_h(total), "rows": rows}
 
 
 def _dump_result_v0119(verb: str, out: dict) -> None:
@@ -1346,6 +1427,20 @@ def selftest() -> int:
             and _target_price_v0119(crx24, "NT$ 1,085 維持") == 1085.0
             and _pick_rating_v0119(crx24, "評等:Equal-Weight", "") == "Equal-Weight"
             and crx24["rating_code"]["equal-weight"] == ("Hold", 3))
+        dx = _docx_engine_v0119()
+        if dx["mod"] is not None and hasattr(dx["mod"], "_selftest_make_docx"):
+            dpath = td / "華南投顧-9901-測試-Memo-20260101.docx"
+            dx["mod"]._selftest_make_docx(dpath, "評等:買進 目標價:NT$ 120 分析師 王小明 w@entrust.com.tw 2026/09/16",
+                                          [["項目", "2025", "2026"], ["EPS", "5.1", "6.2"]])
+            rdx = deepread_one(dpath)
+            chk("㊸ WORD TEXT 擷取車道:ENG052 正主 · 評等/目標價/券商域/表數出列",
+                rdx["state"] == "DEEPREAD_DOCX" and rdx["rating"] == "買進"
+                and rdx["target_price"] == 120.0 and rdx["docx_tables"] == 1
+                and rdx["analyst_broker"] == "HUANAN")
+        else:
+            chk("㊸ WORD 車道座誠實(ENG052 缺=UNAVAILABLE)", "UNAVAILABLE" in dx["state"] or dx["mod"] is None)
+        chk("㊹ 夾層大小批量統計(os.scandir):folder_size 欄>0 且人讀格式",
+            out_b.get("folder_size_bytes", 0) > 0 and out_b.get("folder_size_h", "").endswith(("KB", "MB", "B")))
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
