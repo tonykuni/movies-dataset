@@ -248,6 +248,43 @@ def emit_matrix_html(verb: str, result: dict) -> str:
     return str(out)
 
 
+def classify_eps_kind(report, basic, diluted, tol_abs=0.01, tol_rel=0.005) -> dict:
+    """EPS 核對律(操作員令 2026-10-05):報告端 EPS 不可預設 BASIC/DILUTED,只能核對定身分。
+    拿報告內「歷史實際」EPS 序列,對 TWSE/TPEX 擷取的 BASIC / DILUTED 兩路逐期比;
+    吻合容差 = max(tol_abs, tol_rel×|外部值|)(報表常見兩位小數進位)。
+    僅核對不擷取:外部序列由 reconcile/VDF 車道供給。誠實四態,不硬定。"""
+    rep = [float(x) for x in (report or [])]
+    bas = [float(x) for x in (basic or [])]
+    dil = [float(x) for x in (diluted or [])]
+    if not rep or (not bas and not dil):
+        return {"state": "NO_DATA", "eps_kind": "UNCONFIRMED", "lamp": "黃",
+                "basic_hits": 0, "diluted_hits": 0, "n": 0,
+                "note": "缺報告端或外部 BASIC/DILUTED 序列,無從核對"}
+
+    def hits(ext):
+        m = min(len(rep), len(ext))
+        return sum(1 for r, x in zip(rep[:m], ext[:m])
+                   if abs(r - x) <= max(tol_abs, tol_rel * abs(x))), m
+
+    bh, bm = hits(bas) if bas else (0, 0)
+    dh, dm = hits(dil) if dil else (0, 0)
+    b_all = bas and bh == bm and bm > 0
+    d_all = dil and dh == dm and dm > 0
+    if b_all and d_all:
+        kind, lamp, note = "INDISTINGUISHABLE", "綠", "兩路皆全吻合(基本=稀釋同值);數字核對過、身分無法辨"
+    elif b_all:
+        kind, lamp, note = "BASIC", "綠", "歷史實際值與 BASIC 全吻合"
+    elif d_all:
+        kind, lamp, note = "DILUTED", "綠", "歷史實際值與 DILUTED 全吻合"
+    elif bh or dh:
+        kind, lamp, note = "UNCONFIRMED", "黃", "僅部分吻合,不硬定;列出命中數供人裁"
+    else:
+        kind, lamp, note = "UNCONFIRMED", "紅", "兩路皆不吻合:報告值或外部值需回查"
+    return {"state": "EPS_CHECK", "eps_kind": kind, "lamp": lamp,
+            "basic_hits": "%d/%d" % (bh, bm), "diluted_hits": "%d/%d" % (dh, dm),
+            "n": max(bm, dm), "note": note}
+
+
 def main(argv=None) -> int:
     if os.environ.get("VIA_FROM_VCGC") != "YES":
         print("[VRN] 拒絕。只能經 via-vcgc。")
@@ -265,6 +302,16 @@ def main(argv=None) -> int:
         emit_matrix_html("intake", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
+    if a[:1] == ["eps-check"]:   # EPS 身分核對(僅核對不擷取;外部序列來自 reconcile/VDF 車道)
+        kv = dict(zip(a[1::2], a[2::2]))
+
+        def _ser(k):
+            return [float(x) for x in kv.get(k, "").split(",") if x.strip()]
+
+        res = classify_eps_kind(_ser("--report"), _ser("--basic"), _ser("--diluted"))
+        emit_matrix_html("eps_check", res)
+        print(json.dumps(res, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0 if res["lamp"] != "紅" else 1
     if a[:1] in (["reconcile"], ["closeout"]):   # 每動作自動矩陣(動詞本體照前版鏈)
         verb = a[0]
         kv = dict(zip(a[1::2], a[2::2]))
@@ -341,6 +388,15 @@ def selftest() -> int:
     chk("⑰ U/I 矩陣自動產出:10px 小字體 · 欄自動最佳化 · VIA_NO_OPEN 抑制跳出",
         Path(mp).is_file() and "font:10px" in h and "<table" in h and "state" in h)
     os.environ.pop("VIA_VRN_UI_DIR", None)
+    C = classify_eps_kind
+    chk("⑱ EPS 核對律:不預設身分 · 對 BASIC/DILUTED 兩路核對才定",
+        C([5.51, 6.02], [5.51, 6.02], [5.30, 5.80])["eps_kind"] == "BASIC"
+        and C([5.30, 5.80], [5.51, 6.02], [5.30, 5.80])["eps_kind"] == "DILUTED"
+        and C([5.51], [5.51], [5.51])["eps_kind"] == "INDISTINGUISHABLE")
+    chk("⑲ EPS 核對誠實態:部分吻合黃 · 全不合紅 · 缺料 NO_DATA 黃",
+        C([5.51, 9.99], [5.51, 6.02], [5.30, 5.80])["lamp"] == "黃"
+        and C([1.0], [5.51], [5.30])["lamp"] == "紅"
+        and C([], [5.51], [5.30])["state"] == "NO_DATA")
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑭ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
