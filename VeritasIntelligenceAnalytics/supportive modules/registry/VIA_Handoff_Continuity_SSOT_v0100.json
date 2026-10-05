@@ -1798,9 +1798,10 @@
         "CGC_MDL257_AiVerbLadder",
         "--selftest"
       ],
-      "success_marker": "[計] 13 PASS / 0 FAIL",
-      "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159)",
+      "success_marker": "[計] CGC_MDL257_AiVerbLadder v0101 本版 4/4 · PASS",
+      "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159) · v0101 梯次自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0101.py",
         "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0100.py"
       ],
       "timeout_seconds": 900
@@ -1866,6 +1867,46 @@
       "scope": "CGC_MDL262_DuckTempHook v0100 DuckDB TEMP 為主 · 記憶體為輔環境掛鉤 · 輕框清理(VCGC-REQ161)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL262_DuckTempHook_v0100.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "precheck": {
+      "argv": [
+        "CGC_MDL263_Precheck",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL263_Precheck_v0100 自測 15/15 · PASS",
+      "scope": "CGC_MDL263_Precheck v0100 via_precheck 本體:14 站 · 每個黃紅 PC-### 編號 · 分類 · 說明 · 歸屬(VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL263_Precheck_v0100.py",
+        "Register-VIA-Commands-v0271.ps1"
+      ],
+      "timeout_seconds": 900
+    },
+    "accel_control": {
+      "argv": [
+        "CGC_MDL156_VIAAcceleratorControl",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
+      "scope": "CGC_MDL156 v0112 25 加速器控制面:QuantGuard 單向宣告沿薄尾鏈 · TA-Lib 執法字樣不算使用 · 名冊補 supportive 側收容件(VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0112.py",
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py",
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0110.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vrn_logic_add": {
+      "argv": [
+        "CGC_MDL244_VrnLogicAdd",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+      "scope": "CGC_MDL244 v0101 派 VRN 引擎自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0101.py",
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py"
       ],
       "timeout_seconds": 900
     }
@@ -4090,6 +4131,46 @@
       "case": "handoff",
       "receipt": "docs/handoff/evidence/handoff.json",
       "windows_evidence": "https://github.com/tonykuni/movies-dataset/actions/runs/37238706339/job/111542872596"
+    },
+    {
+      "id": "VCGC-REQ167:precheck",
+      "requirement": "VCGC-REQ167",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 precheck",
+      "next": "handoff test precheck 實跑轉 VERIFIED",
+      "case": "precheck",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ167:accel_control",
+      "requirement": "VCGC-REQ167",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 accel_control",
+      "next": "handoff test accel_control 實跑轉 VERIFIED",
+      "case": "accel_control",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ167:vrn_logic_add",
+      "requirement": "VCGC-REQ167",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 vrn_logic_add",
+      "next": "handoff test vrn_logic_add 實跑轉 VERIFIED",
+      "case": "vrn_logic_add",
+      "receipt": null
+    },
+    {
+      "id": "VCGC-REQ167:ai_verb_ladder",
+      "requirement": "VCGC-REQ167",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "via_precheck 本輪新增 / 換版:交接案 ai_verb_ladder",
+      "next": "handoff test ai_verb_ladder 實跑轉 VERIFIED",
+      "case": "ai_verb_ladder",
+      "receipt": null
     }
   ]
 }
