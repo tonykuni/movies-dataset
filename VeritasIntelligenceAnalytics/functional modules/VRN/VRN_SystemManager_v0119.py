@@ -135,6 +135,18 @@ def _central_regex_v0119() -> dict:
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
+            "name_zh": re.compile(pat("RX_NAME_ZH", r"[\u4e00-\u9fa5]{2,4}")),
+            "name_en": re.compile("(" + pat("RX_NAME_EN_STD", r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b")
+                                  + "|" + pat("RX_NAME_EN_SURNAME_FIRST", r"\b[A-Z][A-Z]+(?:\s+[A-Z][a-zA-Z\-]+){1,3}\b")
+                                  + "|" + pat("RX_NAME_EN_INITIALS", r"\b(?:[A-Z][a-z]+|[A-Z]\.)(?:\s+(?:[A-Z][a-z]+|[A-Z]\.)){1,3}\b") + ")"),
+            "name_mixed": re.compile(pat("RX_NAME_MIXED_PAREN",
+                r"([\u4e00-\u9fa5]{2,4})\s*\(([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\)")),
+            "name_mixed2": re.compile(pat("RX_NAME_MIXED_PLAIN",
+                r"([\u4e00-\u9fa5]{2,4})\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})")),
+            "val_methods": {k: (v.get("en", []) + v.get("zh", []))
+                            for k, v in (syn.get("VALUATION_METHOD_CODEBOOK") or {}).items()},
+            "job_titles": {k: (v.get("en", []) + v.get("zh", []))
+                           for k, v in (syn.get("JOB_TITLE_CODEBOOK") or {}).items()},
             "_notes": notes,
         }
     return _CRX_CACHE
@@ -278,16 +290,19 @@ def _analyst_v0119(info: str) -> dict:
     em = crx["email"].search(info)
     tel = crx["tel"].search(info)
     lines = [ln.strip() for ln in info.splitlines()]
-    name = title = None
+    name = title = title_std = None
+    jt = sorted(((a, std) for std, al in crx["job_titles"].items() for a in al),
+                key=lambda x: -len(x[0])) or [(w, None) for w in _TITLE_WORDS]
+    tw = tuple(a for a, _ in jt) + _TITLE_WORDS
     blk = None
     for i, ln in enumerate(lines):
-        if any(w in ln for w in _TITLE_WORDS) or crx["tel"].search(ln) or crx["email"].search(ln):
+        if any(w in ln for w in tw) or crx["tel"].search(ln) or crx["email"].search(ln):
             blk = i
             break
-    for ln in lines:
-        for w in _TITLE_WORDS:
-            if w in ln:
-                title = w
+    for ln in lines:   # 職稱碼冊(JOB_TITLE_CODEBOOK)長別名先比;中文子串、英文邊界
+        for a, std in jt:
+            if (not a.isascii() and a in ln) or (a.isascii() and re.search(_wordish_v0119(a), ln)):
+                title, title_std = a, std
                 break
         if title:
             break
@@ -295,9 +310,11 @@ def _analyst_v0119(info: str) -> dict:
         for j in range(blk - 1, max(blk - 3, -1), -1):
             c = lines[j]
             if c and len(c) <= 25 and "@" not in c and not re.search(r"\d", c) \
-               and not any(w in c for w in _TITLE_WORDS) \
-               and not any(w in c for w in _NAME_STOP):
-                name = c
+               and not any(w in c for w in tw) \
+               and not any(w in c for w in _NAME_STOP) \
+               and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
+                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
+                name = c   # 姓名式驗證(中央冊 7 式):非姓名樣式不收
                 break
     if name is None and title:   # 後備:職稱同行剝職稱
         for ln in lines:
@@ -306,9 +323,13 @@ def _analyst_v0119(info: str) -> dict:
                 name = cand[:30] or None
                 break
     name_en = broker_mail = None
+    if name:   # 混合姓名拆欄:李明哲 (Michael Lee) / 王大明 David Wang
+        mm = crx["name_mixed"].fullmatch(name) or crx["name_mixed2"].fullmatch(name)
+        if mm:
+            name, name_en = mm.group(1), mm.group(2)
     if em:
         local, _, dom = em.group(0).partition("@")
-        if re.search(r"[A-Za-z]", local):   # 律①;數字信箱(9899@…)不是姓名,誠實 None
+        if name_en is None and re.search(r"[A-Za-z]", local):   # 律①;數字信箱不是姓名;混合姓名已拆者優先
             name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None
         toks = dom.lower().split(".")
         for alias, target in PRIOR._broker_map().items():   # 律②:短別名要 token 全等,長別名子串
@@ -317,7 +338,7 @@ def _analyst_v0119(info: str) -> dict:
                 if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
                     broker_mail = target
                     break
-    return {"analyst_name": name, "analyst_title": title,
+    return {"analyst_name": name, "analyst_title": title, "analyst_title_std": title_std,
             "analyst_name_en": name_en, "analyst_broker": broker_mail,
             "analyst_email": em.group(0) if em else None,
             "analyst_tel": tel.group(1).strip() if tel else None}
@@ -476,6 +497,9 @@ def deepread_one(path: Path) -> dict:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
         row.update(_analyst_v0119(info))
+        vm = sorted({std for std, al in crx["val_methods"].items() for a in al
+                     if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
+        row["valuation_methods"] = vm or None   # 估值法字典 × 資訊區+本文區核對
         row.update(_fin_pages_v0119(doc))
         hits = [row["date_match"], row["ticker_match"], row["broker_match"]].count("MATCH")
         row["lamp"] = "綠" if hits == 3 and tpv else ("黃" if hits else "紅")
@@ -535,7 +559,8 @@ def _mk_pdf_v0119(path: Path):
     pg = doc.new_page(width=595, height=842)
     pg.insert_textbox(fitz.Rect(36, 60, 330, 700),
                       "SYNTHETIC SAMPLE 台積電法說會後更新。本文區:先進製程需求強勁,"
-                      "AI 動能延續。我們上修 2026 年預估。\n" * 6, fontname="china-t", fontsize=10)
+                      "AI 動能延續。我們上修 2026 年預估,評價採本益比法並以 DCF 交叉驗證。\n" * 6,
+                      fontname="china-t", fontsize=10)
     pg.insert_textbox(fitz.Rect(360, 60, 560, 700),
                       "2330 TT\n評等:買進\n目標價:NT$ 850\n收盤價:712\n"
                       "王小明\n分析師\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
@@ -622,6 +647,15 @@ def selftest() -> int:
         chk("⑳ 實測紅修:聯絡方式≠姓名 · 數字信箱≠英文名 · 財報頁不含首頁",
             a2["analyst_name"] is None and a2["analyst_name_en"] is None
             and a2["analyst_email"] == "9899@entrust.com.tw" and r["fin_pages"] == [2])
+        chk("㉑ 估值法字典 × 資訊區+本文區核對:本益比法→PER · DCF",
+            r["valuation_methods"] == ["DCF", "PER"])
+        a3 = _analyst_v0119("王小明\n資深分析師\n02-2345-6789")
+        chk("㉒ 職稱碼冊:資深分析師→SENIOR_ANALYST · 分析師→ANALYST",
+            a3["analyst_title_std"] == "SENIOR_ANALYST" and r["analyst_title_std"] == "ANALYST")
+        a4 = _analyst_v0119("李明哲 (Michael Lee)\n分析師\nml@kgi.com")
+        chk("㉓ 姓名式 7 式:混合名拆欄 李明哲/Michael Lee · 英文姓前名後可認",
+            a4["analyst_name"] == "李明哲" and a4["analyst_name_en"] == "Michael Lee"
+            and _central_regex_v0119()["name_en"].fullmatch("LEE Tzu-Yuan"))
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
