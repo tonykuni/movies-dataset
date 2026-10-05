@@ -1,9 +1,9 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
- "version": "v0160",
- "batch": "側線 2026-10-03 f(VCGC-REQ139)",
- "ts": "2026-10-05T19:00:00+00:00",
- "prior": "VIA_VCGC_FunctionInventory_SSOT_v0159.json",
+ "version": "v0161",
+ "batch": "R53:交接案 vdf_fetch_groups_v0105(VDF 頁左面板全輸入 · 收尾備份)",
+ "ts": "2026-10-05T13:50:00+00:00",
+ "prior": "VIA_VCGC_FunctionInventory_SSOT_v0160.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。;+C-vdf_fetch_groups_v0100(VCGC-REQ150);+C-vdf_fetch_groups_v0101(VCGC-REQ151)",
  "measured": "2026-09-30 容器乾淨工作樹逐支經 VCGC 實跑 64 支:rc 0 55 · rc 2(黃,待裁或無資料)8 · workflow 單獨跑 rc 1;寫已追蹤檔 0",
@@ -2925,6 +2925,22 @@
    ]
   },
   {
+   "id": "C-vdf_fetch_groups_v0105",
+   "name": "交接案 vdf_fetch_groups_v0105(MDL012 v0105 ui 左面板全部輸入控制 · 收尾 · 備份六鈕(打包 VDF / VCGC · 驗包 · closeout --apply --push)· 右面板多頁照舊(VCGC-REQ154 · VCGC-REQ159))",
+   "argv": [
+    "run",
+    "VDF_MDL012_FetchGroups_v0105",
+    "--selftest"
+   ],
+   "timeout": 1200,
+   "deps": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+    "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0103.json"
+   ]
+  },
+  {
    "id": "C-vdf_refill",
    "name": "交接案 vdf_refill(VDF 管理員 v0130 refill:計畫 · GATED · 參數拒 · 環境還原(VCGC-REQ173))",
    "argv": [
@@ -3567,6 +3583,9 @@
    },
    "vdfvrn_readiness_v0101": {
     "station": "C-vdfvrn_readiness_v0101"
+   },
+   "vdf_fetch_groups_v0105": {
+    "station": "C-vdf_fetch_groups_v0105"
    }
   },
   "workflow": {
@@ -3911,5 +3930,6 @@
  "why_v0157": "v0156 已隨 PR #470 → 出新版;+站 C-vdfvrn_readiness · C-vdf_activate · C-camelot_env(VCGC-REQ170 / 171)與工作流步覆蓋;其餘一字不動",
  "why_v0158": "v0157 已隨 PR #470 發布 → 出新版;C-vdfvrn_readiness 相依 +Register-VIA-Commands-v0274(via_activate_vdf 由 HTML 操作);其餘一字不動",
  "why_v0159": "+交接案站 C-ui_engine_v0102(VCGC-REQ172)· C-vdf_fetch_groups_v0104 · C-vdf_refill(VCGC-REQ173);C-vdfvrn_readiness 相依 +Register v0275;WKF018-STP009 → C-vdf_refill",
- "why_v0160": "+交接案站 C-vdfvrn_readiness_v0101(CGC_MDL265 v0101 監控提速:探測並行 · 覆蓋率快取;VCGC-REQ170);C-vdfvrn_readiness 相依 +v0101"
+ "why_v0160": "+交接案站 C-vdfvrn_readiness_v0101(CGC_MDL265 v0101 監控提速:探測並行 · 覆蓋率快取;VCGC-REQ170);C-vdfvrn_readiness 相依 +v0101",
+ "why_v0161": "v0160 已隨 PR #495 發布(本批原擬 v0160,撞號依 main 讓位)→ 出新版不就地改;+站 C-vdf_fetch_groups_v0105 與 coverage.case 對應(VCGC-REQ154 · VCGC-REQ159);其餘一字不動"
 }

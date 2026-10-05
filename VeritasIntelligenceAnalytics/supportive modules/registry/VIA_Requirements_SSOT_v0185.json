@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
- "version": "v0184",
- "batch": "via_activate_vdf 監控提速(CGC_MDL265 v0101)· 覆蓋率實測",
- "ts": "2026-10-05T19:00:00+00:00",
+ "version": "v0185",
+ "batch": "VDF 頁左面板全輸入控制 · 收尾打包備份 VDF / VCGC + 上傳(REQ154 / REQ159 補引述與證據)",
+ "ts": "2026-10-05T13:50:00+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -4980,8 +4980,8 @@
     "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0152.json"
    ],
-   "evidence": "CGC_MDL261 v0101 自測 9/9(v0100 PASS)· VDF_MDL012 v0103 自測 11/11(v0102 PASS)· 族群冊 v0101(四大類 TW_MARKET / FIN / MACRO / OTHER;TW_DAILY 拆量價 TW_PRICE_VOL + 籌碼 TW_CHIP;TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA)· Start-VIA-UIEngine-v0101.ps1 pwsh 剖析 0 錯;容器端到端:下載夾匯入 VIA_UI_Input.json(VDF 帳零變動 · ui_config 寫入)· -Run -Mode block(e082 rc 2 · 006 rc 4 誠實擋)· Chromium 截圖 p1 / FIN / 末頁零 JS 錯誤",
-   "next": "工作站:.\\Start-VIA-UIEngine-v0101.ps1(自動開頁、自動匯入下載夾 VIA_UI_Input.json)→ 頁上點選 → 匯出輸入 → 再跑一次 -Run 實抓;台股 / 國際實抓要在工作站(容器 TWSE WAF · Yahoo 429)",
+   "evidence": "CGC_MDL261 v0101 自測 9/9(v0100 PASS)· VDF_MDL012 v0103 自測 11/11(v0102 PASS)· 族群冊 v0101(四大類 TW_MARKET / FIN / MACRO / OTHER;TW_DAILY 拆量價 TW_PRICE_VOL + 籌碼 TW_CHIP;TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA)· Start-VIA-UIEngine-v0101.ps1 pwsh 剖析 0 錯;容器端到端:下載夾匯入 VIA_UI_Input.json(VDF 帳零變動 · ui_config 寫入)· -Run -Mode block(e082 rc 2 · 006 rc 4 誠實擋)· Chromium 截圖 p1 / FIN / 末頁零 JS 錯誤 ‖ 2026-10-05 R53:VDF_MDL012_FetchGroups v0105(薄尾)ui 左面板 = 全部輸入控制(as-of · 模式 · 輸出根 · 族群勾選〔全選 / 清除〕· 成員增減 · 起始日按大類 · 補擷取乾跑 / 真跑)→ 功能 → 收尾 · 備份 → Live log → 頁 → 導覽;右面板多頁照舊(頁 ① 改運作指令 · 引擎 · 結果);自測 9/9(前版鏈 v0104 單獨跑也同樣 2 項 FAIL → 照實回 2);Chromium 無頭點擊探針零 JS 錯誤:全選 14 / 清除 0 · run / refill / start / 打包 / 驗包 / 收尾 指令全對;VDF_SystemManager activate 以 glob 取 MDL012 尾版 → 自動用 v0105",
+   "next": "工作站:.\\Start-VIA-UIEngine-v0101.ps1(自動開頁、自動匯入下載夾 VIA_UI_Input.json)→ 頁上點選 → 匯出輸入 → 再跑一次 -Run 實抓;台股 / 國際實抓要在工作站(容器 TWSE WAF · Yahoo 429) ‖ R53:工作站 via-activate-vdf(或 VDF_SystemManager activate)開 VDF_FetchGroups_latest.html 確認左面板輸入",
    "hand": "AI",
    "quotes": [
     {
@@ -4995,13 +4995,18 @@
     {
      "text": "自動跳出HTMD U/I不走SERVER 自適應式銜接各種模板設計風格",
      "recorded_at": "2026-10-04T09:12:00+00:00"
+    },
+    {
+     "text": "現在VDF以算收尾階段自己可獨立運作? 建立左面滿輸入控制  有面板多頁顯示  收尾就上傳備份VDF VCGC",
+     "recorded_at": "2026-10-05T19:20:00+00:00"
     }
    ],
    "modules": [
     "CGC_MDL261_UIEngine_v0101.py",
     "VDF_MDL012_FetchGroups_v0103.py",
     "VDF_FetchGroups_SSOT_v0101.json",
-    "Start-VIA-UIEngine-v0101.ps1"
+    "Start-VIA-UIEngine-v0101.ps1",
+    "VDF_MDL012_FetchGroups_v0105.py"
    ]
   },
   {
@@ -5126,13 +5131,17 @@
     "VIA_VCGC_FunctionInventory_SSOT_v0154.json",
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "CGC_MDL256 11/11 · MDL257 13/13 · MDL258 11/11 · MDL259 11/11 · MDL260 8/8 自測 PASS(容器);盤點冊 v0154 +5 站;交接案 5 支",
-   "next": "handoff test 5 案轉 VERIFIED;registry-sync;編號補號",
+   "evidence": "CGC_MDL256 11/11 · MDL257 13/13 · MDL258 11/11 · MDL259 11/11 · MDL260 8/8 自測 PASS(容器);盤點冊 v0154 +5 站;交接案 5 支 ‖ 2026-10-05 R53:左面板「收尾 · 備份」六鈕只產生可貼上指令(頁不執行):打包 VDF / VCGC = via-vcgc run CGC_MDL256_SubsystemBundle build via_01_vdf|via_00_vcgc --target(打包冊 VIA_SubsystemBundle_SSOT_v0103:via_01_vdf 921 檔 · via_00_vcgc 6420 檔 · 缺 0)· 驗兩包 = MDL256 verify · VCGC 收尾乾跑 = closeout · 收尾上傳 = closeout --apply --push · 一鍵收尾備份(& { } 包住,前一步紅就停)。獨立性判讀:VDF 程式面可獨立跑(VDF_SystemManager 不經 VCGC · 不呼叫 VRN);收尾未完:工作站實抓與入庫未驗(雙閘 · FRED_API_KEY · 資料家)",
+   "next": "handoff test 5 案轉 VERIFIED;registry-sync;編號補號 ‖ R53:工作站在 VDF 頁左面板按「一鍵收尾備份」貼到 PowerShell(打包寫到冊上 OneDrive 目標夾 = 雲端備份;closeout --push = GitHub)",
    "hand": "AI",
    "quotes": [
     {
      "text": "收尾VCGC VDF",
      "recorded_at": "2026-10-05T04:40:00+00:00"
+    },
+    {
+     "text": "現在VDF以算收尾階段自己可獨立運作? 建立左面滿輸入控制  有面板多頁顯示  收尾就上傳備份VDF VCGC",
+     "recorded_at": "2026-10-05T19:20:00+00:00"
     }
    ],
    "modules": [
@@ -5141,7 +5150,8 @@
     "CGC_MDL258_TempAccel_v0100.py",
     "CGC_MDL259_AiVerbBridge_v0100.py",
     "CGC_MDL260_AiToolPanel_v0100.py",
-    "VDF_ENG234_UiLauncher_v0100.py"
+    "VDF_ENG234_UiLauncher_v0100.py",
+    "VDF_MDL012_FetchGroups_v0105.py"
    ]
   },
   {
@@ -5725,7 +5735,7 @@
    "reason": "截圖;需求見 08:59 那一則(進入環境指令)"
   }
  ],
- "prior": "VIA_Requirements_SSOT_v0183.json",
+ "prior": "VIA_Requirements_SSOT_v0184.json",
  "why_v0104": "側線 i:操作員三則令(全部檢測 · SSOT 六族強化 · 全景上下單向;函式庫建議;盤點缺漏 · 省 Token 再升級 · AI 必用功能)入冊 VCGC-REQ077–083;舊 102 條一字不動",
  "why_v0105": "Codex #377 P1:v0104 已由 PR #376 併入 main,不得就地改;收尾追加的 VCGC-REQ078 範圍令(原話「註冊編號SSOT化更新全部SYNC ALL TO GITHUB」「既有範圍內註冊 不要擴張範圍」· 需求句補「只登本批範圍」· 證據改記範圍外列掛交接待辦)與 reviewed 144 → 149 改以本新版號發布;v0104 與其餘 108 條一字不動",
  "why_v0106": "側線 2026-09-30 a:操作員令重整編號 · 註冊 · SSOT 治理架構與風險 → VCGC-REQ084(PARTIAL:防線落地,對帳與對照表待辦);舊 109 條一字不動",
@@ -5799,5 +5809,6 @@
  "why_v0181": "v0180 已隨 PR #470 → 出新版;+VCGC-REQ170(via_activate_vdf · VDF 啟動歸 VDF manager)· +VCGC-REQ171(Camelot 隔離境);其餘一字不動",
  "why_v0182": "v0181 已隨 PR #470 發布 → 出新版;VCGC-REQ170 補 v0274 由 HTML 操作(頁上匯出 → 套用 → 啟動 → 跳操作頁)實測;其餘一字不動",
  "why_v0183": "v0182 已隨 PR #472 發布 → 出新版;+VCGC-REQ172 操作台重組 · +VCGC-REQ173 無資料族群 FRED / 政府單位 / AkShare 補擷取;其餘一字不動",
- "why_v0184": "v0183 已隨 PR #481 發布 → 出新版;VCGC-REQ170 補提速與覆蓋率實測證據 + 操作員原話;其餘一字不動"
+ "why_v0184": "v0183 已隨 PR #481 發布 → 出新版;VCGC-REQ170 補提速與覆蓋率實測證據 + 操作員原話;其餘一字不動",
+ "why_v0185": "v0184 已隨 PR #495 發布(本批原擬 v0184,撞號依 main 讓位)→ 出新版;VCGC-REQ154 加操作員 2026-10-05 引述「建立左面滿輸入控制 有面板多頁顯示」與 VDF_MDL012 v0105 證據;VCGC-REQ159 加引述「收尾就上傳備份VDF VCGC」與左面板收尾 · 備份鈕證據;兩條仍 PARTIAL(工作站實跑待做);其餘一字不動"
 }
