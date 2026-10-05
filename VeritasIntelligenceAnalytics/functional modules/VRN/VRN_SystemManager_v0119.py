@@ -264,23 +264,133 @@ def _fin_pages_v0119(doc) -> dict:
 
 
 def _analyst_v0119(info: str) -> dict:
-    """資訊區抽分析師:email/台北+香港 tel 式(中央冊);name/title 取含職稱詞的行,抽不到誠實 None。"""
+    """資訊區抽分析師(操作員三律 2026-10-05):① @ 前通常是 ANALYST 英文姓名 →
+    analyst_name_en;② @ 後 domain 是 BROKER → analyst_broker(交互證);
+    ③ ANALYST 姓名通常在 職稱/電話/郵箱 區塊上方 → 上一~二行優先。抽不到誠實 None。"""
     crx = _central_regex_v0119()
     em = crx["email"].search(info)
     tel = crx["tel"].search(info)
+    lines = [ln.strip() for ln in info.splitlines()]
     name = title = None
-    for ln in info.splitlines():
+    blk = None
+    for i, ln in enumerate(lines):
+        if any(w in ln for w in _TITLE_WORDS) or crx["tel"].search(ln) or crx["email"].search(ln):
+            blk = i
+            break
+    for ln in lines:
         for w in _TITLE_WORDS:
             if w in ln:
                 title = w
-                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
-                name = cand[:30] or None
                 break
         if title:
             break
+    if blk is not None:   # 律③:區塊上方短行、無數字無 @ = 姓名
+        for j in range(blk - 1, max(blk - 3, -1), -1):
+            c = lines[j]
+            if c and len(c) <= 25 and "@" not in c and not re.search(r"\d", c) \
+               and not any(w in c for w in _TITLE_WORDS):
+                name = c
+                break
+    if name is None and title:   # 後備:職稱同行剝職稱
+        for ln in lines:
+            if title in ln:
+                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
+                name = cand[:30] or None
+                break
+    name_en = broker_mail = None
+    if em:
+        local, _, dom = em.group(0).partition("@")
+        name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None   # 律①
+        toks = dom.lower().split(".")
+        for alias, target in PRIOR._broker_map().items():   # 律②:短別名要 token 全等,長別名子串
+            if alias.isascii():
+                a = alias.lower()
+                if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
+                    broker_mail = target
+                    break
     return {"analyst_name": name, "analyst_title": title,
+            "analyst_name_en": name_en, "analyst_broker": broker_mail,
             "analyst_email": em.group(0) if em else None,
             "analyst_tel": tel.group(1).strip() if tel else None}
+
+
+def _repair_stats_v0119(text: str) -> dict:
+    """文字修復統計:字元/CJK/數字/壞字(�與控制碼);誠實照數。"""
+    bad = text.count("\ufffd") + sum(1 for ch in text if ord(ch) < 32 and ch not in "\n\t\r")
+    return {"chars": len(text.strip()), "cjk": len(re.findall(r"[\u4e00-\u9fff]", text)),
+            "digits": len(re.findall(r"\d", text)), "bad": bad}
+
+
+def _fresh_outputs_v0119(verb: str) -> list:
+    """實測清場律(操作員令 2026-10-05):每次實測先刪前一次該動詞輸出,避免混淆;回刪單。"""
+    ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+    removed = []
+    if ui.exists():
+        for f in ui.glob("*" + verb + "*"):
+            try:
+                f.unlink()
+                removed.append(f.name)
+            except OSError as exc:
+                removed.append(f"{f.name}(刪不掉 {type(exc).__name__})")
+    return removed
+
+
+def fin_page_zones(page) -> dict:
+    """財務頁切割(正典一、4):先左右切半,再各半依縱向空隙(>14pt)上下切成視覺元件。"""
+    W = page.rect.width
+    halves = {"left": [], "right": []}
+    for b in page.get_text("blocks"):
+        halves["left" if (b[0] + b[2]) / 2 <= W / 2 else "right"].append(b)
+    out = {}
+    for side, bs in halves.items():
+        bs.sort(key=lambda b: b[1])
+        comps = []
+        for b in bs:
+            if comps and b[1] - comps[-1]["bbox"][3] <= 14:
+                c = comps[-1]
+                c["bbox"] = [min(c["bbox"][0], b[0]), min(c["bbox"][1], b[1]),
+                             max(c["bbox"][2], b[2]), max(c["bbox"][3], b[3])]
+                c["text"] += "\n" + b[4]
+            else:
+                comps.append({"bbox": [round(b[0], 1), round(b[1], 1), round(b[2], 1), round(b[3], 1)],
+                              "text": b[4]})
+        out[side] = comps
+    return out
+
+
+def layout_check(path: str) -> dict:
+    """LAYOUT+文字修復實測:首頁左右本文/資訊 · 財務頁左右再上下元件 · 每區壞字統計;
+    先清前次結果(清場律)。只驗有代號的個股 PDF。"""
+    removed = _fresh_outputs_v0119("layout_check")
+    p = Path(path)
+    files = sorted([q for q in p.rglob("*.pdf")]) if p.is_dir() else [p]
+    rows = []
+    for q in files:
+        if not PRIOR.parse_filename(q.stem)["codes"]:
+            continue
+        doc, why = _open_pdf_v0119(q)
+        if doc is None:
+            rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
+            continue
+        try:
+            z = first_page_zones(doc)
+            sm, si = _repair_stats_v0119(z["main_text"]), _repair_stats_v0119(z["info_text"])
+            fps = _fin_pages_v0119(doc)["fin_pages"]
+            fin_desc, comp_n = [], 0
+            for pno in fps[:4]:
+                fz = fin_page_zones(doc[pno - 1])
+                comp_n += len(fz["left"]) + len(fz["right"])
+                fin_desc.append(f"p{pno}:L{len(fz['left'])}/R{len(fz['right'])}")
+            bad = sm["bad"] + si["bad"]
+            lamp = "綠" if sm["chars"] and si["chars"] and bad == 0 else ("黃" if sm["chars"] or si["chars"] else "紅")
+            rows.append({"filename": q.name, "state": "LAYOUT_CHECK", "info_side": z["info_side"],
+                         "main_chars": sm["chars"], "main_cjk": sm["cjk"], "info_chars": si["chars"],
+                         "info_digits": si["digits"], "bad_chars": bad,
+                         "fin_pages": fin_desc or None, "fin_components": comp_n, "lamp": lamp})
+        finally:
+            doc.close()
+    return {"verb": "layout_check", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-005",
+            "cleaned_prev": removed, "checked": len(rows), "rows": rows}
 
 
 def deepread_one(path: Path) -> dict:
@@ -337,6 +447,7 @@ def deepread_one(path: Path) -> dict:
 
 def deepread(path: str) -> dict:
     """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
+    removed = _fresh_outputs_v0119("deepread")   # 清場律:先刪前次結果
     p = Path(path)
     files = sorted([q for q in p.rglob("*") if q.suffix.lower() in PRIOR._DOC_EXTS]) if p.is_dir() else [p]
     rows, skipped = [], 0
@@ -346,8 +457,8 @@ def deepread(path: str) -> dict:
         else:
             skipped += 1
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
-            "total_files": len(files), "stock_reports": len(rows), "non_stock_skipped": skipped,
-            "rows": rows}
+            "cleaned_prev": removed, "total_files": len(files), "stock_reports": len(rows),
+            "non_stock_skipped": skipped, "rows": rows}
 
 
 def main(argv=None) -> int:
@@ -359,6 +470,14 @@ def main(argv=None) -> int:
         return selftest()
     as_json = "--json" in args
     a = [x for x in args if x != "--json"]
+    if a[:1] == ["layout-check"]:
+        if len(a) < 2:
+            print("[拒跑] layout-check <檔|夾>")
+            return 2
+        out = layout_check(a[1])
+        PRIOR.emit_matrix_html("layout_check", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0
     if a[:1] == ["deepread"]:
         if len(a) < 2:
             print("[拒跑] deepread <檔|夾>")
@@ -380,12 +499,20 @@ def _mk_pdf_v0119(path: Path):
                       "AI 動能延續。我們上修 2026 年預估。\n" * 6, fontname="china-t", fontsize=10)
     pg.insert_textbox(fitz.Rect(360, 60, 560, 700),
                       "2330 TT\n評等:買進\n目標價:NT$ 850\n收盤價:712\n"
-                      "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
+                      "王小明\n分析師\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
                       fontname="china-t", fontsize=10)
-    p2 = doc.new_page(width=595, height=842)
-    p2.insert_textbox(fitz.Rect(36, 60, 560, 700),
-                      "年度財務摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
-                      "淨利 838.5 1173.1 1450.2 1702.8\nEPS 32.34 45.25 55.93 65.67\nROE 26.0 30.1 32.2 33.5",
+    p2 = doc.new_page(width=595, height=842)   # 財務頁:左右各兩個視覺元件(上下切測試)
+    p2.insert_textbox(fitz.Rect(36, 60, 280, 300),
+                      "損益摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
+                      "淨利 838.5 1173.1 1450.2 1702.8", fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(36, 420, 280, 650),
+                      "資產負債摘要\n股本 259.3 259.3 259.3\n總資產 5532.2 6164.1 7021.8",
+                      fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(320, 60, 560, 300),
+                      "每股數據\nEPS 32.34 45.25 55.93 65.67\nROE 26.0 30.1 32.2 33.5",
+                      fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(320, 420, 560, 650),
+                      "現金流量\n營業現金流 1121.6 1452.7 1680.0\n自由現金流 265.1 303.9 410.2",
                       fontname="china-t", fontsize=10)
     doc.save(str(path))
     doc.close()
@@ -431,6 +558,21 @@ def selftest() -> int:
         chk("⑨ 夾層深讀:docx 誠實 NON_PDF_SKIP · 矩陣自動產出",
             any(x["state"] == "NON_PDF_SKIP" for x in out["rows"])
             and Path(PRIOR.emit_matrix_html("deepread", out)).is_file())
+        chk("⑯ 分析師三律:姓名在職稱上方=王小明 · @前英文名 Wang Xm · jane.doe@gs.com→GS",
+            r["analyst_name"] == "王小明" and r["analyst_name_en"] == "Wang Xm"
+            and _analyst_v0119("Jane Doe\nAnalyst\nTel: +852 2234 5678\njane.doe@gs.com")["analyst_broker"] == "GS"
+            and _analyst_v0119("Jane Doe\nAnalyst\njane.doe@gs.com")["analyst_name"] == "Jane Doe")
+        lc = layout_check(str(td))
+        row0 = lc["rows"][0]
+        chk("⑰ LAYOUT 實測:首頁右資訊 · 財務頁左右各≥2 元件(上下切)· 壞字 0",
+            row0["info_side"] == "right" and row0["fin_components"] >= 4
+            and row0["bad_chars"] == 0 and row0["lamp"] == "綠")
+        stale = Path(os.environ["VIA_VRN_UI_DIR"]) / "UI_MATRIX_layout_check_stale.html"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("舊結果", encoding="utf-8")
+        lc2 = layout_check(str(td))
+        chk("⑱ 清場律:實測前刪前次結果(stale 檔被刪且入刪單)",
+            not stale.exists() and any("stale" in x for x in lc2["cleaned_prev"]))
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
