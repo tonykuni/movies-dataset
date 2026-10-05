@@ -775,6 +775,10 @@ def deepread_one(path: Path) -> dict:
         z = first_page_zones(doc)
         crx = _central_regex_v0119()
         info, whole = z["info_text"], z["info_text"] + "\n" + z["main_text"]
+        if len(whole.strip()) < 40:   # 掃描檔無文字層(實測紅:MQ-1560 全空)→ 誠實指路 OCR 車道
+            row.update({"state": "NO_TEXT_LAYER", "lamp": "黃",
+                        "next": "無文字層 → OCR 車道(ENG400 四階梯:輕 OCR → 重型)"})
+            return row
         c_date = _content_date_v0119(crx, whole)
         tt = crx["tt_in_text"].search(whole)
         c_code = tt.group(1) if tt else (fn["codes"][0] if fn["codes"] else None)
@@ -1031,6 +1035,17 @@ def selftest() -> int:
             r5["footer_broker"] == "MEGA" and r5["rating_scale_found"] is True)
         rc = reconstruct(str(td))
         rtxt = (Path(os.environ["VIA_VRN_UI_DIR"]) / rc["rows"][0]["out"]).read_text(encoding="utf-8")
+        import fitz as _fz
+        blank = td / "MQ-9999 20260101.pdf"
+        _d = _fz.open(); _d.new_page(); _d.save(str(blank)); _d.close()
+        rb = deepread_one(blank)
+        a_dom = _analyst_v0119("x\nkevin.sw.chen@cl-sec.com")
+        a_dom2 = _analyst_v0119("x\nhelen.chien@daiwacm-cathay.com.tw")
+        a_dom3 = _analyst_v0119("x\n9899@entrust.com.tw")
+        chk("㉝ 無文字層誠實+域名別名:NO_TEXT_LAYER 指路 OCR · cl-sec→CLSA · daiwacm-cathay→DAIWA · entrust→HUANAN",
+            rb["state"] == "NO_TEXT_LAYER" and "OCR" in rb["next"]
+            and a_dom["analyst_broker"] == "CLSA" and a_dom2["analyst_broker"] == "DAIWA"
+            and a_dom3["analyst_broker"] == "HUANAN")
         a7 = _analyst_v0119("聯絡資訊\n02-1234-5678", "本報告由分析師 陳大文 負責撰寫")
         a8 = _analyst_v0119("fabian.lee@ctbcsis.com\nFabian Lee 執筆")
         a9 = _analyst_v0119("Media Questions/Requests\nmedia_request@factset.com")

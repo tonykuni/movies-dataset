@@ -75,7 +75,9 @@ _D8 = re.compile(r"(?<!\d)(20[2-3]\d)(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")        
 _D6 = re.compile(r"(?<!\d)(2[3-9])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")             # 260917
 _ROC = re.compile(r"(?<!\d)(11[3-7])(0\d|1[0-2])([0-2]\d|3[01])(?!\d)")           # 1141201
 _MMDD_AFTER_BROKER = re.compile(r"(?<=[A-Za-z])((0\d|1[0-2])([0-2]\d|3[01]))(?!\d)")  # CTBC0915
-_TICKER = re.compile(r"(?<![\dA-Za-z])(00\d{2,3}(?:[ABDLRTUV](?![A-Za-z]))?(?!\d)|[1-9]\d{3}(?!\d))")
+_TICKER = re.compile(r"(?<![\dA-Za-z])(00(?:[5-9]\d|\d{3})(?:[ABDLRTUV](?![A-Za-z]))?(?!\d)|[1-9]\d{3}(?!\d))")
+# 4 碼 ETF 限 0050–0099(0001–0049 無上市 ETF;實測紅:page_0001 頁圖撞型);5 碼 00xxx 照舊
+_PAGE_IMG_RX = re.compile(r"(?i)page[_\- ]?\d{1,4}")
 # ETF 族(MASTER 2026-10-05 只增):4碼舊 ETF(0050)與 5碼新 ETF(00878)皆收,尾碼 A/B/D/L/R/T/U/V 隨碼
 _KIND_WORDS = (("DAILY", ("晨會", "早報", "盤後", "盤勢", "周報", "週報", "晨間", "日股", "美股", "港股", "速報", "Databook", "databook")),
                ("MACRO", ("總經", "債券", "利率", "ETF", "籌碼", "市場觀察", "策略")),
@@ -173,6 +175,9 @@ def parse_filename(stem: str) -> dict:
     """檔名律:日期先剝 → 代號 → 券商正名 → 分型。全部誠實,不硬配。"""
     out = {"report_date": None, "codes": [], "broker_std": None, "broker_raw": None,
            "deny": bool(_DENY_RX.search(stem)), "doc_kind": None}
+    if _PAGE_IMG_RX.fullmatch(stem.strip()):   # 頁圖輸出(page_0001…)不是報告,不認代號(實測紅 208 列噪音)
+        out["doc_kind"] = "PAGE_IMAGE"
+        return out
     s = stem
     m = _D8.search(s) or None
     if m:
@@ -446,6 +451,10 @@ def selftest() -> int:
         and P("0050 台灣五十 分析")["codes"] == ["0050"]
         and P("【國泰證期研究部】神達(3706 TT)-20250822")["broker_std"] == "CATHAY"
         and P("Daiwa-3653 20251002")["broker_std"] == "DAIWA")
+    chk("㉓ 頁圖與假 ETF 不收:page_0001/page_0063→PAGE_IMAGE 零代號 · 0050 照收 · 0001 不收",
+        P("page_0001")["codes"] == [] and P("page_0001")["doc_kind"] == "PAGE_IMAGE"
+        and P("page_0063")["codes"] == [] and P("0050 台灣五十 分析")["codes"] == ["0050"]
+        and P("測試 0001 清單")["codes"] == [])
     chk("㉒ 公司名局部識別:摩根士丹利證券股份有限公司→MS · Daiwa Capital Markets Research→DAIWA · 群益金鼎→CAPITAL",
         P("摩根士丹利證券股份有限公司-2330-20250101")["broker_std"] == "MS"
         and P("Daiwa Capital Markets Research 3653 20250101")["broker_std"] == "DAIWA"
