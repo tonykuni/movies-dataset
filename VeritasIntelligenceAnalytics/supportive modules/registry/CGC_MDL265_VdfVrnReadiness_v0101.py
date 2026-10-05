@@ -7,7 +7,7 @@ r"""CGC_MDL265_VdfVrnReadiness v0101 — 薄尾:監控提速(各探測同時跑 
   本版只蓋 readiness:
   · token · RunGate vdf · RunGate vrn · LKGC · 覆蓋率 五個探測彼此獨立 → 同時起(執行緒各起一個 VCGC 子行程);
     顯示照原順序、燈與判定一字照 v0100(p_token / p_rungate / p_lkgc / p_coverage / repair_plan 都用前版的)。
-  · 覆蓋率快取:鍵 = git HEAD + 工作區變動(git status --porcelain)的 sha;樹沒變且 24h 內 = 沿用上次報告(照實標「沿用 · 幾時掃的」);
+  · 覆蓋率快取:鍵 = git HEAD + 工作區變動清單 + 每個變動 / 未追蹤的程式 · 設定檔內容指紋(執行時寫的帳本 / 收據除外)的 sha;樹沒變且 24h 內 = 沿用上次報告(照實標「沿用 · 幾時掃的」);
     有改檔 / 換 HEAD / 過期 / 讀不到 git = 重掃。--fresh 一律重掃。快取在 VIA_Reports/activate_vdf/coverage_cache.json(不進 git)。
   · --repair 照 v0100 依序(修了環境要重探,不並行)。
 用法:via-vcgc run CGC_MDL265_VdfVrnReadiness [--repair] [--fresh] [--only 步,步] [--json] · --selftest
@@ -109,16 +109,54 @@ RUN = PRIOR.run_vcgc          # 自測可換
 
 
 # ---------- 覆蓋率快取 ----------
-def tree_key() -> str | None:
-    """git HEAD + 工作區變動清單的 sha;讀不到 git = None(= 不用快取,照掃)。"""
+def _file_sig(path: Path) -> str:
+    """改過 / 沒進版控的檔的內容指紋:8MB 內讀全檔 sha256;更大用 大小 + 修改時間(ns);讀不到 = 標記。"""
     try:
-        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(VIA), capture_output=True, text=True, timeout=60)
-        st = subprocess.run(["git", "status", "--porcelain"], cwd=str(VIA), capture_output=True, text=True, timeout=120)
+        st = path.stat()
+        if not path.is_file():
+            return "dir"
+        if st.st_size > 8 * 1024 * 1024:
+            return f"big:{st.st_size}:{st.st_mtime_ns}"
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except OSError:
+        return "gone"
+
+
+SIG_SUFFIX = {".py", ".ps1", ".psm1", ".psd1", ".json", ".jsonl", ".yml", ".yaml", ".toml"}   # 會影響覆蓋率掃描的檔
+VOLATILE = re.compile(r"Ledger|/evidence/|_latest\.|Lessons", re.I)   # 每次 VCGC 執行都會寫的帳本 / 收據:內容不進鍵(清單照進)
+
+
+def tree_key(root: Path | None = None) -> str | None:
+    """git HEAD + 工作區變動清單 + 每個變動 / 未追蹤檔的內容指紋 的 sha;讀不到 git = None(= 不用快取,照掃)。
+    只看清單不夠:已改過的檔再改,清單一字不變(Codex 審查 #495)→ 內容指紋一定要進鍵。"""
+    root = Path(root or VIA)
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(root), capture_output=True, text=True, timeout=60)
+        st = subprocess.run(["git", "status", "--porcelain", "-uall", "-z"], cwd=str(root), capture_output=True, timeout=120)
+        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=str(root), capture_output=True, text=True, timeout=60)
     except (OSError, subprocess.TimeoutExpired):
         return None
-    if head.returncode or st.returncode:
+    if head.returncode or st.returncode or top.returncode:
         return None
-    return hashlib.sha256((head.stdout.strip() + "\n" + st.stdout).encode("utf-8", "replace")).hexdigest()[:20]
+    h = hashlib.sha256(head.stdout.strip().encode() + b"\n" + st.stdout)
+    base = Path(top.stdout.strip())
+    entries = st.stdout.split(b"\0")
+    i = 0
+    while i < len(entries):
+        e = entries[i]
+        i += 1
+        if len(e) < 4:
+            continue
+        code, rel = e[:2], e[3:].decode("utf-8", "replace")
+        if code[:1] in (b"R", b"C"):            # 改名 / 複製:-z 下來源路徑另佔一格
+            i += 1
+        sig = _file_sig(base / rel) if Path(rel).suffix.lower() in SIG_SUFFIX and not VOLATILE.search(rel) else "-"
+        h.update(rel.encode("utf-8", "replace") + b"=" + sig.encode())
+    return h.hexdigest()[:20]
 
 
 def cache_get(key: str | None, now: float | None = None) -> dict | None:
@@ -309,6 +347,27 @@ def selftest() -> int:
         with contextlib.redirect_stdout(io.StringIO()):
             readiness(fresh=True)
         chk("⑥ --fresh 一律重掃", ran_pre(), calls)
+        repo = tmp / "repo"
+        repo.mkdir()
+        g = (lambda *x: subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", *x], cwd=str(repo), capture_output=True))
+        g("init", "-q")
+        (repo / "a.py").write_text("x = 1\n", encoding="utf-8")
+        g("add", "a.py")
+        g("commit", "-q", "-m", "init")
+        (repo / "a.py").write_text("x = 2\n", encoding="utf-8")
+        (repo / "new.py").write_text("y = 1\n", encoding="utf-8")
+        k1 = tree_key(repo)
+        (repo / "a.py").write_text("x = 3\n", encoding="utf-8")          # 已改過的檔再改:清單不變
+        k2 = tree_key(repo)
+        (repo / "new.py").write_text("y = 2\n", encoding="utf-8")        # 未追蹤檔再改:清單不變
+        k3 = tree_key(repo)
+        k3b = tree_key(repo)
+        (repo / "VIA_Lessons_Ledger_v0100.json").write_text("[1]", encoding="utf-8")
+        k4 = tree_key(repo)
+        (repo / "VIA_Lessons_Ledger_v0100.json").write_text("[1, 2]", encoding="utf-8")   # 每次執行都會寫的帳本:內容變不換鍵
+        k5 = tree_key(repo)
+        chk("⑩ 快取鍵含內容指紋:已改過 / 未追蹤的檔再改 → 鍵變(清單一字不變也一樣);沒動 → 鍵不變;執行時寫的帳本只進清單不進內容(Codex #495 P1)",
+            k1 and k2 and k3 and len({k1, k2, k3}) == 3 and k3 == k3b and k4 == k5 and k4 != k3, (k1, k2, k3, k3b, k4, k5))
         chk("⑦ 鍵不同 / 過期 / 空鍵都不命中", cache_get("other-key") is None and cache_get(key, now=time.time() + CACHE_TTL_S + 5) is None
             and cache_get(None) is None)
         calls.clear()
