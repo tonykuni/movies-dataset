@@ -102,6 +102,13 @@ UTC)——介面不動一看戳即辨舊引擎/舊頁。
   薄尾(glob 前版鏈 + PEP 562 轉接,main 無 rc2 拒絕路,AST 功能檢)。
 
 ## 四之三之一、PY 功能律(操作員令 2026-10-05 批1657)
+- **對帳整併(2026-10-06)**:主機尾版 v0120(SSOT 下放)/v0121(鍵副檔名)/v0122(Index 孤鍵退役)
+  入倉對帳——正規薄尾、職能與深讀七動詞零重疊,全數收編;唯 main 舊拒絕閘與獨立 MAIN 律衝突,
+  出 v0123 薄尾改自立閘座(其餘全轉前版鏈)。編號走主機 registry-sync。
+- **短指令 PY 樞紐**:`CGC_MDL269_PyCommandHub`——`inventory` 盤點 Register-VIA-Commands 整條鏈
+  (237 令/176 檔:綠 10 純轉發 · 黃 118 帶 PS 邏輯=PY 化待辦列表,誠實不消失 · 白 109 PS 原生啟動/UI,
+  照律留 PS);`run <短令>` PY 車道直跑(經 VCGC 政策閘);`edit-parse` 邏輯移植首例
+  (ConvertTo-VIAVdfEdit 三式);`gates` 雙閘只讀不代設。帶加速器橋。
 - **從 VRN 起,所有有功能的指令都用 PY 寫**,帶加速器橋(L103/L102:Celeritas 契約);
   **PS 只負責啟動與連結 HTML U/I**,不帶判定邏輯(.ps1 零觸碰,L70)。
 - 首例落實:原 `Invoke-VIA-RealTest-VRN-v0103.ps1` 的判定段(輸出清點/249 判讀/風險判讀/總判)
