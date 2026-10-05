@@ -186,8 +186,12 @@ _JS_V0105 = r"""
   const mdl = a => `VIA_FROM_VCGC=YES python3 "${PY}" ${a}\n$env:VIA_FROM_VCGC='YES'; python "${win(PY)}" ${a}`;
   const vcgc = a => `VIA_FROM_VCGC=YES python3 "${VC}" ${a}\n$env:VIA_FROM_VCGC='YES'; python "${win(VC)}" ${a}`;
   const GATE = "\n# 真跑先在本視窗開雙閘(操作員的手,頁與產生器永不代設):\n# bash: export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES\n# PS:   $env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'";
+  // 「清除」= 明確不選,不等於 ALL(v0101 空選 = ALL 的慣例只留給從未動過的頁)
+  let cleared = false;
+  const GROUP_VERBS = ['run', 'monitor', 'query', 'refill'];
   cmdOf = function (verb) {
     const gs = $$('.gsel:checked').map(x => x.value).join(',');
+    if (cleared && !gs && GROUP_VERBS.includes(verb)) return '# 族群已清除:沒有選任何族群,不產生指令(空 ≠ 全部;要全部請按「全選」)';
     const asof = $('#asof').value || 'latest', home = $('#home').value;
     const H = home ? ` --home "${home}"` : '';
     if (verb === 'start') {
@@ -205,9 +209,10 @@ _JS_V0105 = r"""
     if (verb === 'closeout_push') return '# 收尾上傳 GitHub(寫冊 · 提交 · 推 origin;不強推)\n' + vcgc('closeout --apply --push');
     if (verb === 'finish_all') {
       const ps = p => `python "${win(VC)}" ${p}; if ($LASTEXITCODE -ne 0) { Write-Host '紅:${p.split(' ')[0]} 停' -ForegroundColor Red; return }`;
+      const pv = n => `python "${win(BT)}" verify "${tgt(n)}"; if ($LASTEXITCODE -ne 0) { Write-Host '紅:verify ${n} 停' -ForegroundColor Red; return }`;
       return '# 一鍵收尾備份(PowerShell · 站在 VIA 根;整段包在 & { } 裡,前一步紅就停,後面不跑)\n& {\n$env:VIA_FROM_VCGC=\'YES\'\n'
         + [ps('closeout --apply --push'), ps('run CGC_MDL256_SubsystemBundle build via_01_vdf --target'), ps('run CGC_MDL256_SubsystemBundle build via_00_vcgc --target')].join('\n')
-        + '\n' + ['via_01_vdf', 'via_00_vcgc'].map(n => `python "${win(BT)}" verify "${tgt(n)}"`).join('\n') + '\n}';
+        + '\n' + ['via_01_vdf', 'via_00_vcgc'].map(pv).join('\n') + '\n}';
     }
     return prevCmdOf(verb);
   };
@@ -219,7 +224,8 @@ _JS_V0105 = r"""
     const re = () => { if (st.verb) $('#cmd').textContent = cmdOf(st.verb); };
     $$('#cat,#catdate,#rfapply').forEach(x => { x.addEventListener('input', re); x.addEventListener('change', re); });
     $('#cat').addEventListener('change', catNow); catNow();
-    const setAll = on => { $$('.gsel').forEach(x => { x.checked = on; }); st.groups = $$('.gsel:checked').map(x => x.value); save(); engines(); re(); };
+    const setAll = on => { cleared = !on; $$('.gsel').forEach(x => { x.checked = on; }); st.groups = $$('.gsel:checked').map(x => x.value); save(); engines(); re(); };
+    $('#gsel').addEventListener('change', () => { if ($$('.gsel:checked').length) cleared = false; re(); });
     $('#gall').addEventListener('click', () => setAll(true));
     $('#gnone').addEventListener('click', () => setAll(false));
     re();
@@ -336,7 +342,9 @@ def selftest() -> int:
     except ValueError:
         emb = {}
     chk("⑦ 內嵌快照帶收尾名字(VCGC 尾版 · 打包包名)", (emb.get("backup") or {}).get("vcgc_tail") == bk["vcgc_tail"] and emb.get("page_tool") == TAG)
-    chk("⑧ 推送只在明打 --push;頁不執行任何指令", "closeout --apply --push" in _JS_V0105 and "fetch(" not in _JS_V0105 and "XMLHttpRequest" not in _JS_V0105)
+    chk("⑧ 推送只在明打 --push;頁不執行任何指令;一鍵收尾每步(含兩包 verify)紅就停;清除 ≠ ALL",
+        "closeout --apply --push" in _JS_V0105 and "fetch(" not in _JS_V0105 and "XMLHttpRequest" not in _JS_V0105
+        and "map(pv)" in _JS_V0105 and "紅:verify" in _JS_V0105 and "cleared && !gs && GROUP_VERBS.includes(verb)" in _JS_V0105)
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑨ 加速器橋 · 網路橋在;前版不動(薄尾)", "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src and PRIOR_PATH.is_file())
     good = all(ok)
