@@ -1923,6 +1923,20 @@
         "supportive modules/ui_support/ui_templates/VIA_StdTemplate_Synchronizer_v0100.html"
       ],
       "timeout_seconds": 600
+    },
+    "celeritas_gate_v0104": {
+      "argv": [
+        "CGC_MDL183_CeleritasPolicyGate",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL183_CeleritasPolicyGate v0104 本版 3/3 · 前版 PASS · 合計 PASS",
+      "scope": "Celeritas 產出契約閘 v0104:supportive modules/intake 收容件 .ps1 = 凍結收容 INFO(ps.intake 照列);收容夾外同名活檔照紅(負控);⑦ 唯讀本 accelerator/VeritasCeleritas.py 在位(VCGC-REQ167 收尾)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0104.py",
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0103.py",
+        "supportive modules/accelerator/VeritasCeleritas.py"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -4195,6 +4209,16 @@
       "next": "handoff test ui_std_templates 實跑轉 VERIFIED",
       "case": "ui_std_templates",
       "receipt": "docs/handoff/evidence/ui_std_templates.json"
+    },
+    {
+      "id": "VCGC-REQ167:celeritas_gate_intake",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "收尾 SDD 自測 CGC_MDL183 v0103 紅 2:⑭ 今日收容 AzureFlow_QA_v0120 的 5 支 .ps1 被當基線外新缺;⑦ 唯讀本 accelerator/VeritasCeleritas.py 被刪(已從 main 還原) → v0104 薄尾 → 已驗:None rc 0 · 標記見到",
+      "next": "handoff test celeritas_gate_v0104 實跑轉 VERIFIED",
+      "case": "celeritas_gate_v0104",
+      "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json"
     }
   ]
 }
