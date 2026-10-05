@@ -962,6 +962,23 @@ def deepread_one(path: Path) -> dict:
                                     ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
                     "rating": rtw, "target_price": tpv,
                     "bloomberg_ticker": f"{code} TT" if code else None})
+        row["size_h"] = PRIOR.size_h(row.get("size_bytes"))
+        comp, comp_src = fn.get("company_name"), "filename"
+        if comp is None and code:   # 公司名抽不到 → 代號走 VDF/universe 取名(操作員令)
+            uf = PRIOR._universe_file() if hasattr(PRIOR, "_universe_file") else None
+            if uf:
+                try:
+                    for ln0 in uf.read_text(encoding="utf-8", errors="replace").splitlines():
+                        if re.match(rf"^\s*\"?{re.escape(code)}\b", ln0):
+                            parts = [x.strip().strip('\"') for x in ln0.split(",")]
+                            comp = parts[1] if len(parts) > 1 and parts[1] else None
+                            comp_src = "universe(VDF 資料家)"
+                            break
+                except OSError:
+                    pass
+            if comp is None:
+                comp_src = "VDF 車道待取(本地無 universe)"
+        row["company_name"], row["company_source"] = comp, comp_src
         if code:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
@@ -1222,6 +1239,9 @@ def selftest() -> int:
             and d_row["extract_lane"] == rc_blank["extract_lane"] == lc_blank["extract_lane"]
             and [x for x in rc_u["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
         blank2.unlink()
+        chk("㊳ 公司名+人讀 SIZE 入列:合成檔 company 欄存在 · size_h 格式",
+            "company_name" in r and r["size_h"].endswith(("KB", "MB", "B"))
+            and r.get("company_source") in ("filename", "universe(VDF 資料家)", "VDF 車道待取(本地無 universe)"))
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",

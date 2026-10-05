@@ -216,6 +216,26 @@ def parse_filename(stem: str) -> dict:
         out["doc_kind"] = "EQUITY"
     else:
         out["doc_kind"] = kind or "UNCLASSIFIED"
+    out["company_name"] = None   # 公司名局部識別(操作員令 2026-10-05):三樣式,抽不到派 VDF 取名
+    if out["codes"]:
+        c0 = out["codes"][0]
+        m = re.search(r"([\u4e00-\u9fa5][\u4e00-\u9fa5A-Za-z0-9]{1,7}(?:-KY)?)\s*[((]\s*" + c0, stem)
+        if m:   # 樣式一:公司(代號 —— 泓德能源(6873)、神達(3706 TT)、志強-KY(6768)
+            out["company_name"] = m.group(1)
+        else:
+            m = re.search(c0 + r"\s+([\u4e00-\u9fa5]{2,6}(?:-KY)?)", stem)
+            if m:   # 樣式二:代號␣公司 —— 1476 儒鴻、2637 慧洋-KY
+                out["company_name"] = m.group(1)
+            else:   # 樣式三:…-代號-公司-… —— 華南式;-KY 斷段回接
+                segs = [x for x in re.split(r"[_\-]", stem) if x]
+                for i, sg in enumerate(segs):
+                    if sg == c0 and i + 1 < len(segs):
+                        nxt = segs[i + 1].strip()
+                        if re.fullmatch(r"[A-Za-z\u4e00-\u9fa5]{2,8}", nxt) and not _PAGE_IMG_RX.fullmatch(nxt):
+                            if i + 2 < len(segs) and segs[i + 2] == "KY":
+                                nxt += "-KY"
+                            out["company_name"] = nxt
+                        break
     return out
 
 
@@ -253,6 +273,19 @@ _LAMP_CSS = {"INTAKE_OK": "#1a7f37", "DENY": "#b42318", "NEEDS_REVIEW": "#b54708
              "YELLOW": "#b54708", "RED": "#b42318"}
 
 
+def size_h(n) -> str:
+    """FILE SIZE 人讀格式(操作員令):698089 → 681.7KB。"""
+    try:
+        n = float(n)
+    except (TypeError, ValueError):
+        return "-"
+    for u in ("B", "KB", "MB", "GB"):
+        if n < 1024 or u == "GB":
+            return f"{n:.1f}{u}" if u != "B" else f"{int(n)}B"
+        n /= 1024
+    return "-"
+
+
 def dt_now() -> str:
     import datetime as _dt
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -262,8 +295,9 @@ def emit_matrix_html(verb: str, result: dict) -> str:
     """動作結果 → 自動最佳化矩陣 HTML(行=項目 · 欄依資料自選 · 10px 小字體);
     寫 VIA_Reports/vrn/UI_MATRIX_<verb>_latest.html 並自動跳出(VIA_NO_OPEN=抑制)。"""
     rows = result.get("rows") or [dict(result)]
-    pref = ["filename", "state", "codes", "report_date", "broker_std", "doc_kind",
-            "ext", "size_bytes", "verdict", "lamp", "code", "missing", "next"]
+    pref = ["filename", "state", "codes", "company_name", "report_date", "broker_std", "doc_kind",
+            "analyst_name", "analyst_first_name", "analyst_last_name", "analyst_broker",
+            "ext", "size_h", "size_bytes", "verdict", "lamp", "code", "missing", "next"]
     cols = [c for c in pref if any(c in r for r in rows)]
     cols += sorted({k for r in rows for k in r if not str(k).startswith("_")}
                    - set(cols) - {"file", "rows", "checks"})[:4]
@@ -451,6 +485,13 @@ def selftest() -> int:
         and P("0050 台灣五十 分析")["codes"] == ["0050"]
         and P("【國泰證期研究部】神達(3706 TT)-20250822")["broker_std"] == "CATHAY"
         and P("Daiwa-3653 20251002")["broker_std"] == "DAIWA")
+    chk("㉔ 公司名局部識別:志強-KY(括號式) · 儒鴻(空格式) · 慧洋-KY(華南式) · AMAX-KY · GS 檔無名誠實",
+        P("20251204兆豐個股報告-志強-KY(6768)")["company_name"] == "志強-KY"
+        and P("凱基投顧_1476 儒鴻_劉昃恩_20260519")["company_name"] == "儒鴻"
+        and P("華南投顧-2637-慧洋-KY-1141202")["company_name"] == "慧洋-KY"
+        and P("6933_AMAX-KY_個股介紹報告")["company_name"] == "AMAX-KY"
+        and P("GS-2317 20251205")["company_name"] is None
+        and size_h(698089) == "681.7KB")
     chk("㉓ 頁圖與假 ETF 不收:page_0001/page_0063→PAGE_IMAGE 零代號 · 0050 照收 · 0001 不收",
         P("page_0001")["codes"] == [] and P("page_0001")["doc_kind"] == "PAGE_IMAGE"
         and P("page_0063")["codes"] == [] and P("0050 台灣五十 分析")["codes"] == ["0050"]
