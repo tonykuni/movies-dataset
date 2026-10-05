@@ -92,12 +92,13 @@ def _union_rulings() -> dict:
             for alias, e in (d.get("key_alias") or {}).items():
                 if isinstance(e, dict) and e.get("canonical"):
                     out[alias] = e["canonical"]
-        except (OSError, ValueError):
-            pass
+        except (OSError, ValueError) as exc:
+            out["_load_note"] = f"{hits[-1].name}: {type(exc).__name__}"   # 誠實記,不吞
     return out
 
 
 _BROKER_CACHE: dict | None = None
+_BROKER_LOAD_NOTES: list = []   # 字典載入失敗誠實帳
 
 
 def _broker_map() -> dict:
@@ -110,7 +111,8 @@ def _broker_map() -> dict:
         for src in cands:
             try:
                 d = json.loads(src.read_text(encoding="utf-8"))
-            except (OSError, ValueError):
+            except (OSError, ValueError) as exc:
+                _BROKER_LOAD_NOTES.append(f"{src.name}: {type(exc).__name__}")   # 誠實記,不吞
                 continue
             for sect in ("brokers", "brokers_extended"):
                 sec = d.get(sect) or {}
@@ -120,7 +122,7 @@ def _broker_map() -> dict:
                         for a in e.get("aliases", []) + ([key] if key else []):
                             m.setdefault(str(a).lower(), e.get("abbr"))
 
-        canon = {k.lower(): v for k, v in _union_rulings().items()}   # 裁定:別拼法 → 正典縮寫
+        canon = {k.lower(): v for k, v in _union_rulings().items() if not k.startswith("_")}   # 裁定:別拼法 → 正典縮寫
         m = {a: canon.get(str(t).lower(), t) for a, t in m.items()}
         _BROKER_CACHE = dict(sorted(m.items(), key=lambda kv: -len(kv[0])))
     return _BROKER_CACHE
