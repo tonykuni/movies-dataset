@@ -2033,6 +2033,21 @@
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
       ],
       "timeout_seconds": 1500
+    },
+    "vdf_fetch_groups_v0105": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0105",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 薄尾 9/9 · PASS",
+      "scope": "MDL012 v0105 ui 左面板 = 全部輸入控制(as-of · 模式 · 輸出根 · 族群全選 / 清除 · 成員增減 · 起始日按大類 · 補擷取)+ 收尾 · 備份六鈕(打包 via_01_vdf / via_00_vcgc · 驗包 · closeout 乾跑 / --apply --push · 一鍵);右面板多頁照舊;同 id 只一份;頁不執行指令(VCGC-REQ154 · VCGC-REQ159)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "supportive modules/registry/VIA_SubsystemBundle_SSOT_v0103.json"
+      ],
+      "timeout_seconds": 1200
     }
   },
   "work_items": [
@@ -4385,6 +4400,15 @@
       "next": "handoff test vdf_refill 實跑轉 VERIFIED",
       "case": "vdf_refill",
       "receipt": "docs/handoff/evidence/vdf_refill.json"
+    },
+    {
+      "id": "VCGC-REQ154:vdf_fetch_groups_v0105",
+      "requirement": "VCGC-REQ154",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "MDL012 v0105 本版自測 9/9 PASS;前版鏈 v0104 單獨跑就 FAIL 2 項(v0104 ⑥ refill 分層測寫入 current_date-1 的列,as-of latest 解到更早交易日 → STILL_NODATA;v0102 ① 鏈)→ v0105 照實回 rc 2,不算綠(R53 · 2026-10-05)",
+      "next": "前版鏈自測修好(v0104 ⑥ 日期相依 · v0102 ①)後 handoff test vdf_fetch_groups_v0105 轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0105"
     }
   ]
 }
