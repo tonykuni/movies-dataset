@@ -98,6 +98,9 @@ UTC)——介面不動一看戳即辨舊引擎/舊頁。
   不拒絕——**自立閘座**(對下游引擎兼容)並把入口誠實記 standalone;經 via-vcgc 進來照舊。
 - **互動照走**:資料請求經中介(`vdf-fetch` → CGC_MDL239 → VDF 項);FLOW 親子表、registry-sync、
   編號等母系統輔助功能不變(治理律 四之二)。
+- **FLOW 針相容律(2026-10-06 實測紅:主機 VDF_SystemManager_v0132 刪掉 VIA_FROM_VCGC 字樣 → FLOW RED
+  → lock_success=false 擋動詞)**:獨立 MAIN 的正確寫法是**自立閘座**——`VIA_FROM_VCGC` 字樣必須保留
+  (環境自設 YES),行為獨立、FLOW 三針(VIA_FROM_VCGC/def main/def selftest)照綠;整個刪閘=紅。
 - 落點:VRN=VRN_SystemManager v0119 main;VDF=v0129+ 原生自立閘(免改);VCGC=CGC_SystemManager_v0112
   薄尾(glob 前版鏈 + PEP 562 轉接,main 無 rc2 拒絕路,AST 功能檢)。
 
