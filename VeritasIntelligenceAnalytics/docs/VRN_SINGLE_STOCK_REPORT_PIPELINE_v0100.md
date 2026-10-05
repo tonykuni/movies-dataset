@@ -74,6 +74,11 @@ NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中�
 (canon_map 4→6 鍵對齊六級碼冊,樞紐 glob 尾版自動讀);⑤ 包內三守衛入 ENG086 safe_broker 正本 v0120
 (標的段先排除/小寫短碼限檔名黏接/最長優先;drift same 86→90);③④ V 拆型與 K/C/M/S/V 五型=先舉證後裁
 (冊 ticker.pending_evidence,派 VDF 車道取 TWSE/TPEX ISIN 名冊)。
+批1657 版面升級(操作員令):首頁資訊區**三型**——左側欄/右側欄(再**上下拆**,縱向空隙>14pt 斷)
+/**下方帶狀**(再**左右拆**,x 中線分群);拆成獨立元件 `info_parts`(各帶 bbox/text/kind)再識別;
+下方帶狀判準=KW 命中數不輸側欄且密度較高(top 不認:大標 KW 會誤搶);layout-check/deepread 列帶
+`info_parts` 數;reconstruct/layout-check 依切線分件照走。矩陣頁首帶**引擎戳**(引擎檔名+mtime+出頁
+UTC)——介面不動一看戳即辨舊引擎/舊頁。
 
 ## 四之二、治理律:子系統獨立性 · 母系統輔助性(操作員令 2026-10-05)
 - **子系統獨立性**:所有 SSOT / REGEX / 同義字 / 邏輯由**子系統(VRN)生成**——中央冊尾版
