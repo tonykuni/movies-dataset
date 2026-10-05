@@ -339,15 +339,27 @@ def _fin_pages_v0119(doc) -> dict:
     return {"fin_pages": pages, "fin_sample": sample or None}
 
 
-def _analyst_v0119(info: str) -> dict:
-    """資訊區抽分析師(操作員三律 2026-10-05):① @ 前通常是 ANALYST 英文姓名 →
-    analyst_name_en;② @ 後 domain 是 BROKER → analyst_broker(交互證);
-    ③ ANALYST 姓名通常在 職稱/電話/郵箱 區塊上方 → 上一~二行優先。抽不到誠實 None。"""
+_GENERIC_MAILBOX = {"research", "media_request", "service", "info", "contact", "support",
+                    "ir", "sales", "admin", "webmaster", "marketing", "news", "press"}
+_ANALYST_PATTERNS = (r"(?:分析師|研究員)[::\s]*([\u4e00-\u9fa5]{2,4})(?![\u4e00-\u9fa5])",
+                     r"(?<![\u4e00-\u9fa5])([\u4e00-\u9fa5]{2,3})\s*(?:分析師|研究員)執?筆?")
+
+
+def _analyst_v0119(info: str, whole: str | None = None) -> dict:
+    """分析師姓名識別條件階梯(操作員令 2026-10-05,樣本定律:KGI=檔名中文名+first.last@、
+    CTBC=人名信箱、華南/FactSet=通用信箱無人名):
+    R1 資訊區區塊上方律(職稱/電話/郵箱上一~二行,過黑名單+姓名式)
+    R2 全頁樣式律(「分析師 陳大文」「陳大文 分析師」樣式,資訊區+本文區)
+    R3 email 鄰近律(email ±2 行內的姓名式行;中文行須短且全匹配,英文可子串)
+    R4 檔名律(deepread 端 _fn_analyst;KGI 式)
+    R5 email local 推英文名(first.last → First Last,並分拆 first/last)
+    R6 通用信箱判(數字/research/media_request/service… → 不造名,analyst_contact_generic=True)
+    每級帶 analyst_name_source;抽不到誠實 None。"""
     crx = _central_regex_v0119()
     em = crx["email"].search(info)
     tel = crx["tel"].search(info)
     lines = [ln.strip() for ln in info.splitlines()]
-    name = title = title_std = None
+    name = title = title_std = src = None
     jt = sorted(((a, std) for std, al in crx["job_titles"].items() for a in al),
                 key=lambda x: -len(x[0])) or [(w, None) for w in _TITLE_WORDS]
     tw = tuple(a for a, _ in jt) + _TITLE_WORDS
@@ -371,16 +383,40 @@ def _analyst_v0119(info: str) -> dict:
                and not any(w in c for w in _NAME_STOP) \
                and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
                     or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
-                name = c   # 姓名式驗證(中央冊 7 式):非姓名樣式不收
+                name, src = c, "info_zone"   # R1 姓名式驗證(中央冊 7 式):非姓名樣式不收
                 break
-    if name is None and title:   # 後備:職稱同行剝職稱;結果同樣要過黑名單+姓名式(實測紅:研究員聯絡方式→聯絡方式)
+    if name is None and title:   # R1 後備:職稱同行剝職稱;結果同樣過黑名單+姓名式
         for ln in lines:
             if title in ln:
                 cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()[:30]
                 if cand and not any(w in cand for w in _NAME_STOP) \
                    and (crx["name_zh"].fullmatch(cand) or crx["name_en"].fullmatch(cand)
                         or crx["name_mixed"].fullmatch(cand) or crx["name_mixed2"].fullmatch(cand)):
-                    name = cand
+                    name, src = cand, "info_zone"
+                break
+    if name is None:   # R2 全頁樣式律
+        for rx in _ANALYST_PATTERNS:
+            mm = re.search(rx, (whole or info))
+            if mm and not any(w in mm.group(1) for w in _NAME_STOP):
+                name, src = mm.group(1), "pattern"
+                break
+    _gen = bool(em) and ((not re.search(r"[A-Za-z]", em.group(0).partition("@")[0]))
+                         or em.group(0).partition("@")[0].lower() in _GENERIC_MAILBOX)
+    if name is None and em and not _gen:   # R3 email 鄰近律(通用信箱不跑:通用聯絡區無分析師)
+        for j, ln in enumerate(lines):
+            if em.group(0) in ln:
+                for k in range(max(0, j - 2), min(len(lines), j + 3)):
+                    c = lines[k]
+                    if not c or "@" in c or any(w in c for w in _NAME_STOP) \
+                       or any(w in c for w in tw):   # 職稱詞行不是姓名(研究員≠名)
+                        continue
+                    if len(c) <= 10 and crx["name_zh"].fullmatch(c):
+                        name, src = c, "email_near"
+                        break
+                    me = crx["name_en"].search(c)
+                    if me and len(c) <= 40:
+                        name, src = me.group(0), "email_near"
+                        break
                 break
     name_en = broker_mail = None
     if name:   # 混合姓名拆欄:李明哲 (Michael Lee) / 王大明 David Wang
@@ -389,7 +425,8 @@ def _analyst_v0119(info: str) -> dict:
             name, name_en = mm.group(1), mm.group(2)
     if em:
         local, _, dom = em.group(0).partition("@")
-        if name_en is None and re.search(r"[A-Za-z]", local):   # 律①;數字信箱不是姓名;混合姓名已拆者優先
+        generic = (not re.search(r"[A-Za-z]", local)) or local.lower() in _GENERIC_MAILBOX
+        if name_en is None and not generic:   # R5;R6 通用信箱(數字/research/media_request…)不造名
             name_en = " ".join(t.capitalize() for t in re.split(r"[._\-]+", local) if t) or None
         toks = dom.lower().split(".")
         for alias, target in PRIOR._broker_map().items():   # 律②:短別名要 token 全等,長別名子串
@@ -403,7 +440,10 @@ def _analyst_v0119(info: str) -> dict:
         parts = name_en.split()
         if len(parts) >= 2:
             first, last = parts[0], parts[-1]
-    return {"analyst_name": name, "analyst_title": title, "analyst_title_std": title_std,
+    return {"analyst_name": name, "analyst_name_source": src,
+            "analyst_contact_generic": bool(em) and ((not re.search(r"[A-Za-z]", em.group(0).partition("@")[0]))
+                                                     or em.group(0).partition("@")[0].lower() in _GENERIC_MAILBOX),
+            "analyst_title": title, "analyst_title_std": title_std,
             "analyst_name_en": name_en, "analyst_first_name": first, "analyst_last_name": last,
             "analyst_broker": broker_mail,
             "analyst_email": em.group(0) if em else None,
@@ -774,11 +814,11 @@ def deepread_one(path: Path) -> dict:
         row.update(fs)
         if src_broker:
             row["broker_source"] = src_broker
-        row.update(_analyst_v0119(info))
+        row.update(_analyst_v0119(info, whole))
         if row.get("analyst_name") is None:
             fnn = _fn_analyst_v0119(path.stem, crx)
             if fnn:
-                row["analyst_name"], row["analyst_name_source"] = fnn, "filename"
+                row["analyst_name"], row["analyst_name_source"] = fnn, "filename"   # R4
         if row.get("content_broker") is None and row.get("analyst_broker"):
             row["content_broker"], row["broker_source"] = row["analyst_broker"], "email_domain"
             row["broker_match"] = ("MATCH" if row["content_broker"] == fn["broker_std"]
@@ -991,6 +1031,14 @@ def selftest() -> int:
             r5["footer_broker"] == "MEGA" and r5["rating_scale_found"] is True)
         rc = reconstruct(str(td))
         rtxt = (Path(os.environ["VIA_VRN_UI_DIR"]) / rc["rows"][0]["out"]).read_text(encoding="utf-8")
+        a7 = _analyst_v0119("聯絡資訊\n02-1234-5678", "本報告由分析師 陳大文 負責撰寫")
+        a8 = _analyst_v0119("fabian.lee@ctbcsis.com\nFabian Lee 執筆")
+        a9 = _analyst_v0119("Media Questions/Requests\nmedia_request@factset.com")
+        chk("㉜ 姓名識別條件階梯:R2 樣式律 陳大文 · R3 email 鄰近 Fabian Lee · R6 通用信箱不造名",
+            a7["analyst_name"] == "陳大文" and a7["analyst_name_source"] == "pattern"
+            and a8["analyst_name"] == "Fabian Lee" and a8["analyst_name_source"] == "email_near"
+            and a9["analyst_name_en"] is None and a9["analyst_name"] is None
+            and a9["analyst_contact_generic"] is True)
         chk("㉛ 報告重現:固定前段+PAGE+TYPE-A/B+| 格線+SUMMARY 評等",
             rc["rows"][0]["state"] == "RECONSTRUCTED" and "FILENAME" in rtxt
             and "PAGE 1" in rtxt and "TYPE-A 本文重現" in rtxt and "TYPE-B 資訊區重現" in rtxt
