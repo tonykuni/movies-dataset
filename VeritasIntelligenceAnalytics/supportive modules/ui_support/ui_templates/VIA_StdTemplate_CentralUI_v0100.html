@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4f5f7" />
+  <meta name="description" content="Veritas Intelligence Analytics 自適應式智慧銜接中央管理系統 UI Template" />
+  <title>VIA｜智慧銜接中央管理系統</title>
+  <style>
+    :root {
+      --bg: #f3f5f2;
+      --bg-deep: #e9eeea;
+      --surface: #ffffff;
+      --surface-soft: #f8faf8;
+      --surface-tint: #f1f6f3;
+      --ink: #17201d;
+      --ink-soft: #32413c;
+      --muted: #778680;
+      --line: #dce5e0;
+      --line-strong: #c8d5cf;
+      --accent: #b53b32;
+      --accent-deep: #852820;
+      --accent-soft: #f8e9e6;
+      --teal: #177066;
+      --teal-soft: #e4f2ef;
+      --blue: #37698f;
+      --blue-soft: #e8f0f7;
+      --gold: #b5822c;
+      --gold-soft: #fbf2df;
+      --danger: #b33e3e;
+      --shadow-sm: 0 4px 14px rgba(27, 53, 44, .06);
+      --shadow-md: 0 18px 50px rgba(25, 48, 40, .10);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --sidebar-width: 264px;
+      --density: 1;
+      --font-size: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 75% -10%, rgba(197, 221, 211, .56), transparent 28rem),
+        linear-gradient(135deg, #f7f9f6 0%, var(--bg) 50%, #eef3ef 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      font-size: var(--font-size);
+      letter-spacing: .01em;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+
+    .app-shell { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 22px 16px 16px;
+      color: #eaf1ed;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(181, 59, 50, .24), transparent 18rem),
+        linear-gradient(180deg, #18221f 0%, #121917 100%);
+      border-right: 1px solid rgba(255,255,255,.07);
+      transition: width .24s ease, transform .24s ease;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 2px 8px 22px; }
+    .brand-mark {
+      width: 38px; height: 38px; flex: 0 0 auto; object-fit: contain;
+      padding: 5px; border-radius: 10px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.16);
+    }
+    .brand-copy { min-width: 0; }
+    .brand-name { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: .14em; white-space: nowrap; }
+    .brand-sub { margin-top: 4px; color: #9caea6; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
+    .sidebar-rule { height: 1px; margin: 0 8px 18px; background: rgba(255,255,255,.10); }
+    .nav-label { padding: 0 10px 8px; color: #71827a; font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .nav { display: grid; gap: 5px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 11px; width: 100%; padding: 11px 11px;
+      color: #a9b8b1; border: 1px solid transparent; border-radius: 11px; background: transparent;
+      text-align: left; transition: .18s ease;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.065); }
+    .nav-item.active { color: #fff; background: linear-gradient(90deg, rgba(181,59,50,.94), rgba(143,47,40,.72)); border-color: rgba(255,255,255,.12); box-shadow: 0 8px 24px rgba(81,24,19,.26); }
+    .nav-item svg { width: 17px; height: 17px; flex: 0 0 auto; opacity: .82; }
+    .nav-text { flex: 1; font-size: 13px; font-weight: 650; }
+    .nav-count { min-width: 22px; padding: 2px 6px; color: #d9e6df; border-radius: 99px; background: rgba(255,255,255,.10); font-size: 10px; text-align: center; }
+    .side-footer { margin-top: auto; padding: 12px 8px 0; }
+    .health-card { padding: 14px; border: 1px solid rgba(255,255,255,.10); border-radius: 14px; background: rgba(255,255,255,.055); }
+    .health-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; color: #dce8e1; font-size: 11px; font-weight: 700; }
+    .health-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; color: #a9dfbc; border-radius: 99px; background: rgba(91,183,117,.13); font-size: 10px; }
+    .health-dot, .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #67cb83; box-shadow: 0 0 0 4px rgba(103,203,131,.14); }
+    .health-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; color: #91a49a; font-size: 11px; }
+    .health-value { color: #dce9e2; font-weight: 700; }
+
+    .main { min-width: 0; padding: 0 30px 34px; }
+    .topbar { display: flex; align-items: center; gap: 16px; min-height: 72px; border-bottom: 1px solid rgba(200,213,207,.72); }
+    .mobile-menu { display: none; }
+    .crumb { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .crumb strong { color: var(--ink-soft); font-weight: 750; }
+    .crumb-separator { color: #b5c2bc; }
+    .topbar-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .search { display: flex; align-items: center; gap: 8px; width: min(250px, 24vw); padding: 9px 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.72); }
+    .search:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(23,112,102,.10); }
+    .search svg { width: 15px; flex: 0 0 auto; }
+    .search input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 12px; }
+    .search input::placeholder { color: #9ba9a3; }
+    .icon-btn, .avatar-btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); background: rgba(255,255,255,.76); }
+    .icon-btn { width: 36px; height: 36px; position: relative; color: var(--ink-soft); border-radius: 10px; }
+    .icon-btn:hover { color: var(--accent); border-color: #e0b2ad; background: #fff; }
+    .icon-btn svg { width: 16px; }
+    .alert-count { position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; padding: 0 4px; color: #fff; border: 2px solid var(--bg); border-radius: 99px; background: var(--accent); font-size: 9px; font-weight: 800; line-height: 12px; }
+    .avatar-btn { gap: 8px; padding: 4px 7px 4px 4px; border-radius: 99px; }
+    .avatar { display: grid; place-items: center; width: 27px; height: 27px; color: #fff; border-radius: 50%; background: linear-gradient(135deg, #2d756c, #173d39); font-size: 10px; font-weight: 800; }
+    .avatar-name { color: var(--ink-soft); font-size: 11px; font-weight: 700; }
+
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 30px 0 22px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 11px; font-weight: 850; letter-spacing: .16em; }
+    .eyebrow-line { width: 24px; height: 2px; background: var(--accent); }
+    h1 { margin: 9px 0 7px; font-size: clamp(26px, 3vw, 38px); letter-spacing: -.04em; line-height: 1.1; }
+    .page-subtitle { max-width: 650px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .head-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 37px; padding: 0 13px; border: 1px solid var(--line-strong); border-radius: 10px; color: var(--ink-soft); background: var(--surface); font-size: 12px; font-weight: 750; transition: .18s ease; }
+    .btn svg { width: 15px; }
+    .btn:hover { border-color: #a9bbb2; box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .btn-primary { color: #fff; border-color: var(--accent); background: linear-gradient(135deg, #bd4339, #9d3029); box-shadow: 0 7px 15px rgba(157,48,41,.16); }
+    .btn-primary:hover { border-color: var(--accent-deep); box-shadow: 0 10px 22px rgba(157,48,41,.24); }
+    .btn-subtle { background: rgba(255,255,255,.54); }
+    .sync-badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 11px; color: var(--teal); border: 1px solid #cde4de; border-radius: 10px; background: #f2fbf7; font-size: 11px; font-weight: 750; }
+    .sync-badge .live-dot { width: 6px; height: 6px; box-shadow: 0 0 0 3px rgba(103,203,131,.12); }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+    .kpi-card { position: relative; overflow: hidden; min-height: 124px; padding: 17px 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255,255,255,.84); box-shadow: var(--shadow-sm); }
+    .kpi-card::after { content: ""; position: absolute; right: -22px; bottom: -30px; width: 100px; height: 100px; border-radius: 50%; background: var(--accent-soft); opacity: .7; }
+    .kpi-card.teal::after { background: var(--teal-soft); }
+    .kpi-card.blue::after { background: var(--blue-soft); }
+    .kpi-card.gold::after { background: var(--gold-soft); }
+    .kpi-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .kpi-icon { display: grid; place-items: center; width: 30px; height: 30px; color: var(--accent); border-radius: 9px; background: var(--accent-soft); }
+    .teal .kpi-icon { color: var(--teal); background: var(--teal-soft); }
+    .blue .kpi-icon { color: var(--blue); background: var(--blue-soft); }
+    .gold .kpi-icon { color: var(--gold); background: var(--gold-soft); }
+    .kpi-icon svg { width: 16px; }
+    .kpi-value { position: relative; z-index: 1; margin-top: 14px; color: var(--ink); font-size: 28px; font-weight: 800; letter-spacing: -.05em; }
+    .kpi-foot { position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; margin-top: 5px; color: var(--muted); font-size: 10px; }
+    .trend-up { color: var(--teal); font-weight: 800; }
+    .trend-warn { color: var(--gold); font-weight: 800; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(290px, .86fr); gap: 14px; margin-top: 14px; }
+    .bottom-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(310px, .85fr); gap: 14px; margin-top: 14px; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); background: rgba(255,255,255,.86); box-shadow: var(--shadow-sm); }
+    .panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; padding: 18px 20px 14px; }
+    .panel-title { margin: 0; color: var(--ink); font-size: 14px; font-weight: 820; letter-spacing: -.01em; }
+    .panel-caption { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .panel-tools { display: flex; align-items: center; gap: 7px; }
+    .mini-btn { display: inline-flex; align-items: center; gap: 5px; min-height: 29px; padding: 0 9px; color: var(--muted); border: 1px solid var(--line); border-radius: 8px; background: rgba(250,252,250,.8); font-size: 10px; font-weight: 700; }
+    .mini-btn:hover { color: var(--teal); border-color: #afd1c8; }
+    .mini-btn svg { width: 13px; }
+    .tabbar { display: flex; gap: 3px; padding: 0 20px; border-bottom: 1px solid var(--line); }
+    .tab { position: relative; padding: 10px 10px 11px; color: var(--muted); border: 0; background: transparent; font-size: 11px; font-weight: 750; }
+    .tab.active { color: var(--accent); }
+    .tab.active::after { content: ""; position: absolute; right: 10px; bottom: -1px; left: 10px; height: 2px; background: var(--accent); }
+    .topology-wrap { padding: 7px 12px 14px; }
+    .topology { width: 100%; height: 285px; overflow: visible; }
+    .topology .grid-line { stroke: #dce7e1; stroke-width: 1; stroke-dasharray: 2 6; }
+    .topology .edge { fill: none; stroke: #a9c7be; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 6 7; animation: dash 10s linear infinite; }
+    .topology .edge.hot { stroke: #d97a70; stroke-width: 2.5; }
+    .topology .edge.cool { stroke: #6fa5bf; }
+    .topology .node-shell { fill: #fff; stroke: #cfe0d8; stroke-width: 1.5; }
+    .topology .node-shell.central { fill: #1a2924; stroke: #2d8a7c; stroke-width: 2; }
+    .topology .node-dot { fill: #45aa7f; }
+    .topology .node-dot.warn { fill: #d58c32; }
+    .topology .node-dot.hot { fill: #ca5449; }
+    .topology .node-label { fill: #3c4d46; font-size: 10px; font-weight: 700; }
+    .topology .central-title { fill: #fff; font-size: 12px; font-weight: 800; }
+    .topology .central-sub { fill: #9dbbb1; font-size: 9px; }
+    .topology .flow-label { fill: #7f9189; font-size: 9px; font-weight: 700; }
+    @keyframes dash { to { stroke-dashoffset: -120; } }
+    .legend { display: flex; align-items: center; gap: 14px; padding: 0 20px; color: var(--muted); font-size: 10px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; background: #45aa7f; }
+    .legend-dot.warn { background: #d58c32; }
+    .legend-dot.hot { background: #ca5449; }
+    .legend-line { width: 18px; border-top: 2px dashed #a9c7be; }
+
+    .decision-panel { overflow: hidden; }
+    .decision-head { padding: 19px 19px 16px; color: #eaf2ee; background: linear-gradient(145deg, #1d332d, #17231f); }
+    .decision-head .panel-title { color: #f6fbf8; }
+    .decision-head .panel-caption { color: #a4bbb1; }
+    .decision-score { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 18px; }
+    .score-label { color: #9bb7ab; font-size: 10px; }
+    .score-value { margin-top: 3px; color: #fff; font-size: 33px; font-weight: 800; letter-spacing: -.06em; }
+    .score-ring { position: relative; display: grid; place-items: center; width: 70px; height: 70px; }
+    .score-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+    .score-ring text { fill: #dbede6; font-size: 13px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; }
+    .decision-list { display: grid; gap: 0; padding: 4px 19px 9px; }
+    .decision-item { display: grid; grid-template-columns: 29px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .decision-item:last-child { border-bottom: 0; }
+    .decision-icon { display: grid; place-items: center; width: 29px; height: 29px; color: var(--teal); border-radius: 9px; background: var(--teal-soft); }
+    .decision-icon.warn { color: var(--gold); background: var(--gold-soft); }
+    .decision-icon svg { width: 14px; }
+    .decision-name { margin: 0; color: var(--ink-soft); font-size: 11px; font-weight: 800; }
+    .decision-desc { margin: 4px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    .decision-time { color: #9aa9a2; font-size: 9px; white-space: nowrap; }
+    .decision-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 4px 19px 18px; padding-top: 13px; border-top: 1px dashed var(--line-strong); }
+    .switch-line { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .switch { position: relative; display: inline-block; width: 33px; height: 19px; }
+    .switch input { width: 0; height: 0; opacity: 0; }
+    .switch-track { position: absolute; inset: 0; border-radius: 99px; background: #cbd6d0; transition: .2s; }
+    .switch-track::before { content: ""; position: absolute; left: 3px; bottom: 3px; width: 13px; height: 13px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,.18); transition: .2s; }
+    .switch input:checked + .switch-track { background: var(--teal); }
+    .switch input:checked + .switch-track::before { transform: translateX(14px); }
+    .decision-more { color: var(--accent); font-size: 10px; font-weight: 800; background: none; border: 0; }
+
+    .table-wrap { overflow-x: auto; padding: 0 20px 18px; }
+    table { width: 100%; min-width: 560px; border-collapse: collapse; }
+    th { padding: 11px 9px; color: #8a9992; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-align: left; white-space: nowrap; }
+    td { padding: 13px 9px; color: var(--ink-soft); border-bottom: 1px solid #edf1ee; font-size: 11px; vertical-align: middle; white-space: nowrap; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #fafcfb; }
+    .endpoint-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; }
+    .endpoint-icon { display: grid; place-items: center; width: 25px; height: 25px; color: var(--blue); border-radius: 7px; background: var(--blue-soft); }
+    .endpoint-icon svg { width: 13px; }
+    .type-label { color: var(--muted); font-size: 10px; }
+    .status { display: inline-flex; align-items: center; gap: 6px; color: var(--teal); font-size: 10px; font-weight: 800; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #44ae7b; }
+    .status-dot.warn { background: #d58c32; }
+    .progress { display: inline-block; width: 68px; height: 5px; overflow: hidden; border-radius: 99px; background: #e6ece8; vertical-align: middle; }
+    .progress > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #6ec5a0); }
+    .table-action { color: var(--muted); background: transparent; border: 0; }
+    .table-action:hover { color: var(--accent); }
+
+    .activity-list { padding: 0 19px 13px; }
+    .activity-item { position: relative; display: grid; grid-template-columns: 27px 1fr; gap: 10px; padding: 12px 0 13px; border-bottom: 1px solid var(--line); }
+    .activity-item:last-child { border-bottom: 0; }
+    .activity-marker { position: relative; display: grid; place-items: center; width: 27px; height: 27px; color: var(--teal); border-radius: 8px; background: var(--teal-soft); }
+    .activity-marker.alert { color: var(--accent); background: var(--accent-soft); }
+    .activity-marker svg { width: 13px; }
+    .activity-title { margin: 0; color: var(--ink-soft); font-size: 11px; font-weight: 800; line-height: 1.45; }
+    .activity-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: var(--muted); font-size: 9px; }
+    .activity-tag { padding: 3px 6px; color: var(--teal); border-radius: 5px; background: var(--teal-soft); font-weight: 800; }
+    .activity-tag.alert { color: var(--accent); background: var(--accent-soft); }
+
+    .drawer-backdrop { position: fixed; inset: 0; z-index: 60; visibility: hidden; opacity: 0; background: rgba(14, 26, 22, .30); transition: .22s ease; }
+    .drawer { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; width: min(390px, 100%); height: 100%; padding: 22px; transform: translateX(100%); background: #fff; box-shadow: -20px 0 50px rgba(22,49,39,.18); transition: .28s ease; }
+    .drawer-backdrop.open { visibility: visible; opacity: 1; }
+    .drawer-backdrop.open .drawer { transform: translateX(0); }
+    .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .drawer-title { margin: 0; font-size: 17px; letter-spacing: -.03em; }
+    .drawer-caption { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .drawer-close { width: 31px; height: 31px; padding: 0; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: #fff; }
+    .setting-group { padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .setting-label { margin-bottom: 11px; color: var(--ink-soft); font-size: 11px; font-weight: 800; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 4px; border-radius: 10px; background: var(--surface-tint); }
+    .segmented button { min-height: 32px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; font-weight: 750; }
+    .segmented button.active { color: var(--ink); background: #fff; box-shadow: 0 2px 7px rgba(31,64,51,.10); }
+    .setting-check { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ink-soft); font-size: 11px; }
+    .setting-check + .setting-check { margin-top: 14px; }
+    .drawer-bottom { display: flex; gap: 8px; margin-top: auto; padding-top: 18px; }
+    .drawer-bottom .btn { flex: 1; }
+
+    .modal-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 20px; visibility: hidden; opacity: 0; background: rgba(14,26,22,.35); transition: .22s ease; }
+    .modal-backdrop.open { visibility: visible; opacity: 1; }
+    .modal { width: min(500px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow-md); transform: translateY(12px) scale(.98); transition: .22s ease; }
+    .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .modal-title { margin: 0; font-size: 18px; letter-spacing: -.035em; }
+    .modal-subtitle { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 20px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { display: block; margin-bottom: 6px; color: var(--ink-soft); font-size: 10px; font-weight: 800; }
+    .field input, .field select { width: 100%; height: 37px; padding: 0 10px; color: var(--ink); border: 1px solid var(--line-strong); border-radius: 9px; outline: 0; background: #fbfdfb; font-size: 11px; }
+    .field input:focus, .field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(23,112,102,.10); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 23px; }
+
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 60; display: flex; align-items: center; gap: 9px; max-width: min(340px, calc(100vw - 32px)); padding: 12px 14px; color: #eaf4ef; border: 1px solid rgba(255,255,255,.10); border-radius: 12px; background: #1a2b25; box-shadow: var(--shadow-md); font-size: 11px; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .24s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast svg { width: 15px; color: #7cdaab; flex: 0 0 auto; }
+
+    .sidebar-collapsed .app-shell { grid-template-columns: 78px minmax(0,1fr); }
+    .sidebar-collapsed .sidebar { width: 78px; padding-inline: 12px; }
+    .sidebar-collapsed .brand { justify-content: center; padding-inline: 0; }
+    .sidebar-collapsed .brand-copy, .sidebar-collapsed .sidebar-rule, .sidebar-collapsed .nav-label, .sidebar-collapsed .nav-text, .sidebar-collapsed .nav-count, .sidebar-collapsed .health-card { display: none; }
+    .sidebar-collapsed .nav-item { justify-content: center; padding-inline: 0; }
+    .sidebar-collapsed .side-footer { display: none; }
+
+    /* Density control is intentionally token-based so the same template can be tuned per operator role. */
+    .kpi-grid, .content-grid, .bottom-grid { gap: calc(14px * var(--density)); }
+    .kpi-card { min-height: calc(124px * var(--density)); padding: calc(17px * var(--density)) calc(18px * var(--density)); }
+    .kpi-value { margin-top: calc(14px * var(--density)); }
+    .panel-header { gap: calc(15px * var(--density)); padding: calc(18px * var(--density)) calc(20px * var(--density)) calc(14px * var(--density)); }
+    .topology-wrap { padding-bottom: calc(14px * var(--density)); }
+    .decision-item { padding-top: calc(14px * var(--density)); padding-bottom: calc(14px * var(--density)); }
+    .activity-item { padding-top: calc(12px * var(--density)); padding-bottom: calc(13px * var(--density)); }
+    .table-wrap { padding-bottom: calc(18px * var(--density)); }
+
+    /* Compact Chinese-style brand treatment: wide transparent mark, no icon frame. */
+    html { font-size: 13px; }
+    .brand { display: block; padding: 2px 5px 13px; }
+    .brand-logo-surface { display: flex; align-items: center; width: 100%; min-height: 34px; padding: 0; background: transparent; }
+    .brand-logo { display: block; width: min(180px, 100%); height: auto; max-height: 45px; object-fit: contain; object-position: left center; }
+    .brand-context { display: flex; align-items: center; gap: 6px; margin: 9px 2px 0; color: #90a59b; font-size: 8px; font-weight: 800; letter-spacing: .12em; white-space: nowrap; }
+    .brand-context-mark { width: 12px; height: 1px; background: var(--accent); }
+    .sidebar { padding: 15px 12px 12px; }
+    .nav { gap: 3px; }
+    .nav-item { gap: 9px; padding: 8px 9px; border-radius: 9px; }
+    .nav-item svg { width: 15px; height: 15px; }
+    .nav-text { font-size: 11px; }
+    .nav-count { min-width: 19px; padding: 1px 5px; font-size: 9px; }
+    .nav-label { padding-bottom: 6px; font-size: 9px; }
+    .side-footer { padding-top: 9px; }
+    .health-card { padding: 11px; }
+    .health-head { margin-bottom: 8px; font-size: 10px; }
+    .health-row { margin-top: 7px; font-size: 10px; }
+    .main { padding: 0 20px 24px; }
+    .topbar { min-height: 58px; gap: 12px; }
+    .topbar-tools { gap: 7px; }
+    .search { width: min(220px, 22vw); padding: 7px 9px; }
+    .search input { font-size: 11px; }
+    .icon-btn { width: 32px; height: 32px; }
+    .avatar-btn { padding: 3px 6px 3px 3px; }
+    .avatar { width: 24px; height: 24px; }
+    .avatar-name, .crumb { font-size: 10px; }
+    .page-head { gap: 18px; padding: 20px 0 16px; }
+    .eyebrow { gap: 6px; font-size: 9px; }
+    h1 { margin: 6px 0 5px; font-size: clamp(22px, 2.5vw, 32px); }
+    .page-subtitle { max-width: 560px; font-size: 12px; line-height: 1.55; }
+    .head-actions { gap: 7px; }
+    .btn { min-height: 32px; padding: 0 10px; font-size: 11px; }
+    .sync-badge { padding: 7px 9px; font-size: 10px; }
+    .kpi-grid { gap: 10px; }
+    .kpi-card { min-height: 104px; padding: 12px 13px; border-radius: 13px; }
+    .kpi-top { font-size: 10px; }
+    .kpi-icon { width: 27px; height: 27px; }
+    .kpi-value { margin-top: 8px; font-size: 25px; }
+    .kpi-foot { gap: 5px; margin-top: 3px; font-size: 9px; }
+    .content-grid, .bottom-grid { gap: 10px; margin-top: 10px; }
+    .panel { border-radius: 17px; }
+    .panel-header { gap: 10px; padding: 13px 15px 10px; }
+    .panel-title { font-size: 13px; }
+    .panel-caption { margin-top: 3px; font-size: 9px; }
+    .mini-btn { min-height: 27px; padding: 0 8px; font-size: 9px; }
+    .tabbar { padding: 0 15px; }
+    .tab { padding: 8px 8px 9px; font-size: 10px; }
+    .topology-wrap { padding: 5px 7px 10px; }
+    .topology { height: 242px; }
+    .legend { gap: 10px; padding: 0 15px; font-size: 9px; }
+    .decision-head { padding: 14px 15px 12px; }
+    .score-value { font-size: 28px; }
+    .decision-list { padding: 2px 15px 6px; }
+    .decision-item { grid-template-columns: 25px minmax(0,1fr) auto; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+    .decision-icon { width: 25px; height: 25px; }
+    .decision-name { font-size: 10px; }
+    .decision-desc { margin-top: 3px; font-size: 9px; }
+    .decision-footer { margin: 3px 15px 13px; padding-top: 10px; }
+    .switch-line, .decision-more { font-size: 9px; }
+    .table-wrap { padding: 0 15px 12px; }
+    th { padding: 8px 7px; font-size: 9px; }
+    td { padding: 9px 7px; font-size: 10px; }
+    .activity-list { padding: 0 15px 8px; }
+    .activity-item { grid-template-columns: 24px 1fr; gap: 8px; padding: 8px 0 9px; }
+    .activity-marker { width: 24px; height: 24px; }
+    .activity-title { font-size: 10px; }
+    .activity-meta { margin-top: 3px; font-size: 8px; }
+
+    @media (max-width: 1180px) {
+      .main { padding-inline: 22px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .content-grid, .bottom-grid { grid-template-columns: 1fr; }
+      .decision-panel { display: grid; grid-template-columns: .9fr 1.1fr; }
+      .decision-head { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+      .decision-list { padding-top: 8px; }
+      .decision-footer { grid-column: 1 / -1; margin-top: 0; }
+    }
+    @media (max-width: 820px) {
+      .app-shell, .sidebar-collapsed .app-shell { display: block; }
+      .sidebar { position: fixed; left: 0; top: 0; width: 264px; transform: translateX(-100%); box-shadow: 12px 0 40px rgba(18,35,29,.22); }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main { padding-inline: 17px; }
+      .mobile-menu { display: inline-flex; width: 35px; height: 35px; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 9px; color: var(--ink-soft); background: #fff; }
+      .mobile-menu svg { width: 16px; }
+      .topbar { gap: 10px; }
+      .crumb { overflow: hidden; text-overflow: ellipsis; }
+      .search { width: 35px; padding: 9px; }
+      .search input { display: none; }
+      .avatar-name { display: none; }
+      .page-head { align-items: flex-start; flex-direction: column; padding-top: 24px; }
+      .head-actions { width: 100%; justify-content: flex-start; }
+      .decision-panel { display: block; }
+      .decision-head { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+      .decision-footer { margin: 4px 19px 18px; }
+    }
+    @media (max-width: 560px) {
+      .main { padding-inline: 12px; }
+      .topbar { min-height: 62px; }
+      .topbar-tools { gap: 6px; }
+      .icon-btn { width: 33px; height: 33px; }
+      .kpi-grid { gap: 9px; }
+      .kpi-card { min-height: 116px; padding: 14px; }
+      .kpi-value { font-size: 24px; }
+      .panel-header { padding-inline: 15px; }
+      .tabbar { padding-inline: 15px; overflow-x: auto; }
+      .tab { white-space: nowrap; }
+      .topology-wrap { padding-inline: 5px; overflow-x: auto; }
+      .topology { min-width: 570px; }
+      .legend { padding-inline: 15px; overflow-x: auto; white-space: nowrap; }
+      .table-wrap { padding-inline: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .head-actions .sync-badge { order: -1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+      /* VIA V2 adaptive compact shell */
+    :root {
+      --header-h: 48px;
+      --footer-h: 27px;
+      --sidebar-width: 244px;
+      --v2-line: #dbe5e0;
+      --v2-paper: #fbfcfb;
+    }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { font-size: 12px; }
+    *, *::before, *::after { scrollbar-width: none; }
+    *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    .app-shell { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); height: 100vh; min-height: 0; }
+    .sidebar { height: 100vh; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 11px 10px 9px; }
+    .brand { padding: 0 5px 9px; }
+    .brand-logo-surface { width: 42px; min-height: 42px; padding: 0; background: transparent; }
+    .brand-logo { width: 39px; height: 39px; max-height: none; object-fit: contain; object-position: center; }
+    .brand-context { margin-top: 6px; font-size: 7px; letter-spacing: .10em; }
+    .sidebar-rule { margin: 0 5px 10px; }
+    .nav { gap: 2px; }
+    .nav-label { padding: 0 8px 5px; font-size: 8px; }
+    .nav-item { gap: 8px; padding: 7px 8px; border-radius: 8px; }
+    .nav-item svg { width: 14px; height: 14px; }
+    .nav-text { font-size: 10px; }
+    .nav-count { min-width: 18px; padding: 1px 4px; font-size: 8px; }
+    .side-footer { padding: 7px 5px 0; }
+    .health-card { padding: 9px; border-radius: 10px; }
+    .health-head { margin-bottom: 6px; font-size: 9px; }
+    .health-row { margin-top: 5px; font-size: 9px; }
+
+    .main { position: relative; height: 100vh; min-height: 0; overflow-x: hidden; overflow-y: auto; padding: var(--header-h) 18px calc(var(--footer-h) + 14px); }
+    .topbar { position: fixed; top: 0; right: 0; left: var(--sidebar-width); z-index: 30; height: var(--header-h); min-height: var(--header-h); padding: 0 18px; border-bottom: 1px solid rgba(200,213,207,.86); background: rgba(247,249,246,.96); box-shadow: 0 3px 12px rgba(25,48,40,.04); backdrop-filter: blur(14px); }
+    .topbar-tools { gap: 6px; }
+    .crumb { font-size: 9px; }
+    .search { width: min(205px, 23vw); padding: 6px 8px; border-radius: 8px; }
+    .search input { font-size: 10px; }
+    .icon-btn { width: 29px; height: 29px; border-radius: 8px; }
+    .avatar-btn { padding: 2px 5px 2px 2px; }
+    .avatar { width: 22px; height: 22px; font-size: 9px; }
+    .avatar-name { font-size: 9px; }
+
+    .page-head { gap: 15px; padding: 14px 0 10px; }
+    .eyebrow { gap: 5px; font-size: 8px; }
+    .eyebrow-line { width: 18px; }
+    h1 { margin: 5px 0 4px; font-size: clamp(20px, 2.2vw, 29px); }
+    .page-subtitle { max-width: 620px; font-size: 10px; line-height: 1.45; }
+    .head-actions { gap: 5px; }
+    .btn { min-height: 28px; padding: 0 8px; border-radius: 8px; font-size: 9px; }
+    .btn svg { width: 13px; }
+    .sync-badge { gap: 5px; padding: 6px 7px; border-radius: 8px; font-size: 8px; }
+
+    .kpi-grid { gap: 8px; }
+    .kpi-card { min-height: 88px; padding: 10px 11px; border-radius: 11px; }
+    .kpi-top { font-size: 8px; }
+    .kpi-icon { width: 23px; height: 23px; border-radius: 7px; }
+    .kpi-icon svg { width: 13px; }
+    .kpi-value { margin-top: 6px; font-size: 22px; }
+    .kpi-foot { margin-top: 2px; font-size: 8px; }
+
+    .content-grid, .bottom-grid { align-items: stretch; gap: 9px; margin-top: 9px; }
+    .content-grid { grid-auto-rows: minmax(330px, auto); }
+    .bottom-grid { grid-auto-rows: minmax(190px, auto); }
+    .content-grid > .panel, .bottom-grid > .panel { height: 100%; min-height: 0; }
+    .panel { border-radius: 13px; background: var(--v2-paper); border-color: var(--v2-line); box-shadow: 0 5px 16px rgba(25,48,40,.055); }
+    .panel-header { gap: 8px; padding: 10px 12px 8px; }
+    .panel-title { font-size: 11px; }
+    .panel-caption { margin-top: 2px; font-size: 8px; }
+    .panel-tools { gap: 4px; }
+    .mini-btn { min-height: 24px; padding: 0 6px; border-radius: 7px; font-size: 8px; }
+    .mini-btn svg { width: 11px; }
+    .tabbar { padding: 0 12px; }
+    .tab { padding: 7px 7px 8px; font-size: 9px; }
+    .topology-panel, .decision-panel { display: flex; flex-direction: column; }
+    .topology-wrap { flex: 1 1 auto; padding: 3px 6px 7px; }
+    .topology { height: 235px; }
+    .legend { gap: 8px; padding: 0 12px; font-size: 8px; }
+    .decision-head { flex: 0 0 auto; padding: 11px 12px 9px; color: var(--ink); border-bottom: 1px solid var(--v2-line); background: linear-gradient(145deg, #f5faf7, #edf5f1); }
+    .decision-head .panel-title { color: var(--ink); }
+    .decision-head .panel-caption { color: var(--muted); }
+    .decision-score { margin-top: 10px; }
+    .score-label { color: var(--muted); font-size: 8px; }
+    .score-value { color: var(--ink); font-size: 26px; }
+    .score-ring { width: 54px; height: 54px; }
+    .score-ring text { fill: var(--teal); font-size: 11px; }
+    .decision-list { flex: 1 1 auto; padding: 1px 12px 4px; }
+    .decision-item { grid-template-columns: 22px minmax(0,1fr) auto; gap: 7px; padding: 8px 0; }
+    .decision-icon { width: 22px; height: 22px; border-radius: 7px; }
+    .decision-icon svg { width: 12px; }
+    .decision-name { font-size: 9px; }
+    .decision-desc { margin-top: 2px; font-size: 8px; line-height: 1.45; }
+    .decision-time { font-size: 8px; }
+    .decision-footer { margin: 2px 12px 10px; padding-top: 8px; }
+    .switch-line, .decision-more { font-size: 8px; }
+    .switch { transform: scale(.86); transform-origin: left center; }
+    .table-wrap { padding: 0 12px 9px; }
+    table { min-width: 500px; }
+    th { padding: 6px 5px; font-size: 8px; }
+    td { padding: 7px 5px; font-size: 9px; }
+    .endpoint-name { gap: 5px; }
+    .endpoint-icon { width: 21px; height: 21px; }
+    .endpoint-icon svg { width: 11px; }
+    .type-label { font-size: 8px; }
+    .status { gap: 4px; font-size: 8px; }
+    .progress { width: 52px; height: 4px; }
+    .activity-list { padding: 0 12px 6px; }
+    .activity-item { grid-template-columns: 21px 1fr; gap: 7px; padding: 7px 0 8px; }
+    .activity-marker { width: 21px; height: 21px; border-radius: 7px; }
+    .activity-marker svg { width: 11px; }
+    .activity-title { font-size: 9px; }
+    .activity-meta { margin-top: 2px; gap: 5px; font-size: 8px; }
+    .activity-tag { padding: 2px 4px; }
+
+    .app-footer { position: fixed; right: 0; bottom: 0; left: var(--sidebar-width); z-index: 31; display: flex; align-items: center; gap: 9px; height: var(--footer-h); padding: 0 18px; color: #72827b; border-top: 1px solid rgba(200,213,207,.86); background: rgba(247,249,246,.97); box-shadow: 0 -3px 12px rgba(25,48,40,.035); font-size: 8px; letter-spacing: .04em; backdrop-filter: blur(14px); }
+    .footer-brand { color: #59716a; font-weight: 800; letter-spacing: .11em; }
+    .footer-divider { width: 1px; height: 11px; background: var(--line-strong); }
+    .footer-status { display: inline-flex; align-items: center; gap: 5px; color: var(--teal); font-weight: 750; }
+    .footer-status-dot { width: 5px; height: 5px; border-radius: 50%; background: #48aa78; box-shadow: 0 0 0 3px rgba(72,170,120,.12); }
+    .footer-meta { margin-left: auto; }
+    .footer-meta strong { color: var(--ink-soft); font-weight: 750; }
+
+    .sidebar-collapsed .topbar, .sidebar-collapsed .app-footer { left: 78px; }
+    .sidebar-collapsed .brand-logo { width: 32px; height: 32px; }
+    .sidebar-collapsed .brand-logo-surface { width: 36px; min-height: 36px; }
+
+    @media (max-width: 1180px) {
+      .main { padding-inline: 14px; }
+      .topbar { padding-inline: 14px; }
+      .app-footer { padding-inline: 14px; }
+    }
+    @media (max-width: 820px) {
+      .app-shell, .sidebar-collapsed .app-shell { display: block; height: 100vh; }
+      .sidebar { position: fixed; top: 0; left: 0; width: 244px; height: 100vh; min-height: 100vh; }
+      .main { width: 100%; height: 100vh; padding: var(--header-h) 12px calc(var(--footer-h) + 12px); }
+      .topbar, .sidebar-collapsed .topbar { left: 0; padding-inline: 12px; }
+      .app-footer, .sidebar-collapsed .app-footer { left: 0; padding-inline: 12px; }
+      .mobile-menu { display: inline-flex; width: 30px; height: 30px; }
+      .crumb { max-width: 30vw; }
+      .search { width: 30px; padding: 7px; }
+      .search input { display: none; }
+      .avatar-name { display: none; }
+      .page-head { align-items: flex-start; flex-direction: column; padding-top: 12px; }
+      .head-actions { width: 100%; justify-content: flex-start; }
+      .content-grid, .bottom-grid { grid-template-columns: 1fr; }
+      .content-grid { grid-auto-rows: auto; }
+      .content-grid > .panel, .bottom-grid > .panel { height: auto; }
+      .decision-panel { display: flex; }
+      .decision-head { border-radius: 13px 13px 0 0; }
+    }
+    @media (max-width: 560px) {
+      .topbar { min-height: 45px; height: 45px; }
+      :root { --header-h: 45px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; }
+      .kpi-card { min-height: 80px; padding: 9px; }
+      .kpi-value { font-size: 20px; }
+      .head-actions .sync-badge { order: -1; }
+      .footer-brand { max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .footer-meta { display: none; }
+      .topology { width: 100%; min-width: 0; height: 220px; }
+    }
+    /* END VIA V2 adaptive compact shell */
+  
+    .sync-launch { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 10px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:rgba(255,255,255,.78); font-size:10px; font-weight:800; letter-spacing:.08em; text-decoration:none; white-space:nowrap; transition:.2s ease; }
+    .sync-launch::before { content:"↔"; color:var(--accent); font-size:14px; }
+    .sync-launch:hover { color:var(--ink); border-color:var(--accent); background:#fff; transform:translateY(-1px); }
+    @media (max-width: 820px) { .sync-launch { width:32px; padding:0; justify-content:center; font-size:0; } .sync-launch::before { font-size:15px; } }
+
+
+    .custom-module-label { margin-top: 16px !important; color: rgba(234,241,237,.55); }
+    .custom-module-nav .nav-item { border-style: dashed; }
+
+
+:root{--ui-font-scale:.94;--ui-panel-h:292px;--ui-surface:#fbfcfb}
+body{font-size:calc(12px * var(--ui-font-scale));background:linear-gradient(135deg,#f7f9f7 0%,#f1f4f2 54%,#edf2ef 100%)}
+.page-head{padding-top:10px;padding-bottom:7px}.content-grid,.bottom-grid{gap:8px;margin-top:8px}.content-grid{grid-auto-rows:minmax(var(--ui-panel-h),auto)}.bottom-grid{grid-auto-rows:minmax(calc(var(--ui-panel-h) * .62),auto)}.content-grid>.panel,.bottom-grid>.panel{min-height:var(--ui-panel-h)}.panel{background:var(--ui-surface);box-shadow:0 4px 13px rgba(25,48,40,.045)}.panel-title{font-size:10px}.panel-caption{font-size:8px}.kpi-card{min-height:78px;padding:8px 10px}.kpi-value{font-size:20px}.topbar{height:var(--header-h);min-height:var(--header-h)}
+
+[data-equal-panels="true"] .content-grid>.panel,[data-equal-panels="true"] .bottom-grid>.panel{min-height:var(--ui-panel-h)}@media(max-width:820px){[data-equal-panels="true"] .content-grid>.panel,[data-equal-panels="true"] .bottom-grid>.panel{min-height:0}}
+
+/* VIA light Plotly dashboard / Seaborn-inspired palette */
+:root{
+  --plotly-blue:#4c78a8;--plotly-teal:#55a868;--plotly-coral:#c44e52;
+  --plotly-purple:#8172b3;--plotly-gold:#ccb974;--plotly-cyan:#64b5cd;
+  --seaborn-paper:#f5f4f0;--seaborn-panel:#fffefb;--seaborn-line:#dbd9d3;
+  --seaborn-ink:#282725;--seaborn-muted:#77736d
+}
+body{background:linear-gradient(135deg,#f7f8f5 0%,#f1f3f0 54%,#ecefeb 100%)}
+.sidebar{color:var(--seaborn-ink);background:linear-gradient(180deg,#fcfcf9 0%,#f1f4f1 100%);border-right:1px solid var(--seaborn-line);box-shadow:5px 0 18px rgba(68,79,71,.05)}
+.brand-name{color:var(--seaborn-ink)}.brand-sub{color:var(--seaborn-muted)}.sidebar-rule{background:var(--seaborn-line)}
+.nav-label{color:var(--seaborn-muted)}.nav-item{color:#5d625d}.nav-item:hover{color:var(--plotly-blue);background:#edf3f8}.nav-item.active{color:#fff;background:linear-gradient(90deg,var(--plotly-blue),#5f8bb5);border-color:rgba(76,120,168,.28);box-shadow:0 7px 18px rgba(76,120,168,.18)}
+.nav-count{color:var(--plotly-blue);background:#e8f0f7}.health-card{border-color:var(--seaborn-line);background:rgba(255,254,251,.88);box-shadow:0 6px 18px rgba(68,79,71,.05)}.health-head{color:var(--seaborn-ink)}.health-row{color:var(--seaborn-muted)}.health-value{color:var(--seaborn-ink)}.health-pill{color:#3e8550;background:#e7f2e8}.health-dot,.live-dot{background:var(--plotly-teal);box-shadow:0 0 0 4px rgba(85,168,104,.15)}
+.kpi-grid .kpi-card:nth-child(4n+1) .kpi-icon{color:var(--plotly-blue);background:#e8f0f7}.kpi-grid .kpi-card:nth-child(4n+2) .kpi-icon{color:var(--plotly-teal);background:#e7f2e8}.kpi-grid .kpi-card:nth-child(4n+3) .kpi-icon{color:var(--plotly-purple);background:#eeeaf6}.kpi-grid .kpi-card:nth-child(4n) .kpi-icon{color:var(--plotly-coral);background:#f6e2e2}
+.status-dot{background:var(--plotly-teal)}.status-dot.warn{background:var(--plotly-gold)}.activity-marker{color:var(--plotly-teal);background:#e7f2e8}.activity-marker.alert{color:var(--plotly-coral);background:#f6e2e2}.activity-tag{color:var(--plotly-blue);background:#e8f0f7}.activity-tag.alert{color:var(--plotly-coral);background:#f6e2e2}
+.panel,.kpi-card{background:var(--seaborn-panel);border-color:var(--seaborn-line)}.decision-head{background:linear-gradient(145deg,#f7f8f5,#edf2f0)}
+
+</style>
+
+<style>
+/* VIA UCC visual integration v1: shared light Muji/console visual language */
+:root {
+  --bg:#f5f4f0; --bg-deep:#ecebe6; --surface:#fff; --surface-soft:#fafaf8; --surface-tint:#f6f4ef;
+  --ink:#1e1d1a; --ink-soft:#33403f; --muted:#6b6860; --line:#dbd9d3; --line-strong:#c9c6bd;
+  --accent:#c96b5a; --accent-deep:#a84f42; --accent-soft:#f6e6e1; --teal:#439a9a; --teal-soft:#e1eeee;
+  --blue:#4c78a8; --blue-soft:#e6edf4; --gold:#c4943a; --gold-soft:#f7efd9;
+  --shadow-sm:none; --shadow-md:none; --radius-sm:0px; --radius-md:0px; --radius-lg:0px;
+}
+html { scrollbar-width:none; -ms-overflow-style:none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar, .main::-webkit-scrollbar { width:0; height:0; }
+body { background:var(--bg); color:var(--ink); font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif; font-size:12px; line-height:1.38; }
+.app-shell { background:var(--bg); }
+.sidebar { background:var(--paper,#fff); color:var(--ink); border-right:1px solid var(--line); box-shadow:none; }
+.brand { padding:2px 8px 15px; }
+.brand-logo-surface { background:transparent !important; box-shadow:none !important; border:0 !important; border-radius:0 !important; padding:0 !important; }
+.brand-logo { width:38px !important; height:38px !important; padding:0 !important; border-radius:0 !important; object-fit:contain; }
+.brand-name { color:var(--ink) !important; font-family:'DM Mono',ui-monospace,monospace; font-size:12px !important; letter-spacing:.12em !important; }
+.brand-sub { color:var(--muted) !important; font-size:9px !important; }
+.sidebar-rule { background:var(--line) !important; margin-bottom:12px !important; }
+.nav-label { color:var(--muted) !important; font-family:'DM Mono',ui-monospace,monospace; font-size:9px !important; letter-spacing:.12em !important; }
+.nav { gap:2px !important; }
+.nav-item { color:var(--muted) !important; border-radius:0 !important; padding:8px 9px !important; border:1px solid transparent !important; }
+.nav-item:hover { color:var(--ink) !important; background:var(--surface-soft) !important; }
+.nav-item.active { color:#fff !important; background:var(--ink) !important; border-color:var(--ink) !important; box-shadow:none !important; }
+.nav-item svg { opacity:.72; }
+.nav-count { color:var(--ink-soft) !important; background:var(--bg-deep) !important; border-radius:0 !important; }
+.nav-item.active .nav-count { color:#fff !important; background:rgba(255,255,255,.16) !important; }
+.health-card { background:var(--surface-soft) !important; border:1px solid var(--line) !important; border-radius:0 !important; }
+.health-head { color:var(--ink-soft) !important; }
+.health-row { color:var(--muted) !important; }
+.health-value { color:var(--ink) !important; }
+.main { min-width:0; padding:0 18px 30px !important; }
+.topbar { position:sticky; top:0; z-index:50; min-height:48px !important; background:rgba(245,244,240,.96) !important; border-bottom:2px solid var(--ink) !important; backdrop-filter:blur(8px); }
+.search,.icon-btn,.avatar-btn { border-radius:0 !important; background:rgba(255,255,255,.72) !important; }
+.search { width:min(290px,28vw); padding:7px 9px !important; }
+.icon-btn { width:32px !important; height:32px !important; }
+.avatar-btn { padding:3px 6px 3px 3px !important; }
+.avatar { border-radius:0 !important; }
+.page-head { padding:20px 0 15px !important; }
+.eyebrow { font-family:'DM Mono',ui-monospace,monospace; font-size:9px !important; letter-spacing:.12em !important; }
+h1 { font-family:'Cormorant Garamond','Noto Serif TC',serif; font-size:clamp(25px,3vw,34px) !important; }
+.btn,.mini-btn { border-radius:0 !important; box-shadow:none !important; font-family:'DM Mono',ui-monospace,monospace; font-size:10.5px !important; min-height:31px !important; }
+.btn-primary { background:var(--accent) !important; border-color:var(--accent) !important; }
+.btn-subtle,.mini-btn { background:var(--surface) !important; }
+.sync-badge { border-radius:0 !important; background:var(--surface) !important; font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px !important; }
+.kpi-grid { gap:9px !important; }
+.kpi-card { min-height:105px !important; padding:13px 14px !important; border-radius:0 !important; background:var(--surface) !important; box-shadow:none !important; border-left:3px solid var(--accent) !important; }
+.kpi-card.teal { border-left-color:var(--teal) !important; } .kpi-card.blue { border-left-color:var(--blue) !important; } .kpi-card.gold { border-left-color:var(--gold) !important; }
+.kpi-card::after { opacity:.35 !important; border-radius:0 !important; }
+.kpi-value { font-family:'DM Mono',ui-monospace,monospace; font-size:24px !important; }
+.content-grid,.bottom-grid { gap:9px !important; margin-top:9px !important; }
+.panel { border-radius:0 !important; background:var(--surface) !important; box-shadow:none !important; border-color:var(--line) !important; }
+.panel-header { padding:12px 14px 10px !important; }
+.panel-title { font-family:'Cormorant Garamond','Noto Serif TC',serif; font-size:15px !important; }
+.panel-caption { font-size:9.5px !important; }
+.tabbar { padding:0 14px !important; background:var(--surface) !important; }
+.tab { padding:8px 9px 9px !important; font-family:'DM Mono',ui-monospace,monospace; font-size:10px !important; }
+.decision-head { border-radius:0 !important; background:var(--ink) !important; }
+.decision-item { padding:10px 0 !important; }
+.decision-icon { border-radius:0 !important; }
+.app-footer { position:sticky; bottom:0; z-index:45; margin:14px 0 -30px !important; padding:6px 0 !important; background:rgba(245,244,240,.98) !important; border-top:1px solid var(--ink) !important; }
+.footer-brand,.footer-status,.footer-meta { font-family:'DM Mono',ui-monospace,monospace; font-size:9px !important; }
+@media (max-width:760px) { .main { padding:0 11px 24px !important; } .topbar { min-height:44px !important; } .app-footer { margin-bottom:-24px !important; } }
+</style>
+
+<style>
+/* VIA investment workspace v1: TradingView-inspired analysis surface + Seaborn semantic color */
+.investment-desk { margin-top:9px; border:1px solid var(--line); background:var(--surface); }
+.investment-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:11px 14px 9px; border-bottom:1px solid var(--line); }
+.investment-kicker { color:var(--blue); font:600 9px 'DM Mono',ui-monospace,monospace; letter-spacing:.12em; text-transform:uppercase; }
+.investment-title { margin:3px 0 0; color:var(--ink); font:700 16px 'Cormorant Garamond','Noto Serif TC',serif; }
+.investment-caption { margin:3px 0 0; color:var(--muted); font-size:9.5px; }
+.investment-tools { display:flex; align-items:center; gap:5px; flex-wrap:wrap; justify-content:flex-end; }
+.investment-tools select,.investment-tools button { height:28px; padding:0 8px; border:1px solid var(--line); border-radius:0; color:var(--ink-soft); background:var(--surface-soft); font:600 9px 'DM Mono',ui-monospace,monospace; }
+.investment-tools button.active { color:#fff; border-color:var(--ink); background:var(--ink); }
+.investment-tools button:hover,.investment-tools select:focus { border-color:var(--blue); }
+.investment-body { display:grid; grid-template-columns:minmax(370px,.9fr) minmax(440px,1.55fr) minmax(190px,.48fr); gap:9px; padding:9px; }
+.market-card { min-width:0; border:1px solid var(--line); background:var(--surface-soft); }
+.market-card-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-bottom:1px solid var(--line); }
+.market-card-title { color:var(--ink-soft); font:700 11px 'DM Mono',ui-monospace,monospace; }
+.market-card-meta { color:var(--muted); font:500 9px 'DM Mono',ui-monospace,monospace; }
+.watchlist-scroll { overflow-x:auto; scrollbar-width:none; }
+.watchlist-scroll::-webkit-scrollbar { width:0; height:0; }
+.investment-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.investment-table th { padding:5px 7px; color:var(--muted); background:var(--bg-deep); border-bottom:1px solid var(--line); text-align:right; font:600 8.5px 'DM Mono',ui-monospace,monospace; letter-spacing:.03em; white-space:nowrap; }
+.investment-table th:first-child,.investment-table td:first-child { text-align:left; }
+.investment-table td { padding:6px 7px; color:var(--ink-soft); border-bottom:1px solid var(--line); text-align:right; font:500 9px 'DM Mono',ui-monospace,monospace; white-space:nowrap; }
+.investment-table tbody tr:last-child td { border-bottom:0; }
+.investment-table tbody tr:hover { background:#f1f4f8; }
+.symbol-cell { display:flex; align-items:center; gap:6px; min-width:0; }
+.symbol-badge { display:grid; place-items:center; width:20px; height:20px; color:#fff; background:var(--blue); font:700 8px 'DM Mono',ui-monospace,monospace; }
+.symbol-badge.tw { background:var(--teal); } .symbol-badge.etf { background:var(--gold); } .symbol-badge.macro { background:#7a6daa; }
+.symbol-name { min-width:0; overflow:hidden; text-overflow:ellipsis; text-align:left; }
+.symbol-name strong { display:block; color:var(--ink); font-size:9.5px; } .symbol-name small { display:block; color:var(--muted); font-size:8px; }
+.market-up { color:#2f7d65 !important; } .market-down { color:#b4534c !important; } .market-flat { color:var(--muted) !important; }
+.chart-wrap { padding:5px 9px 8px; }
+.market-chart { width:100%; height:150px; display:block; }
+.market-chart .grid { stroke:#e2e3df; stroke-width:1; stroke-dasharray:2 4; }
+.market-chart .area { fill:url(#marketArea); opacity:.65; } .market-chart .line { fill:none; stroke:var(--blue); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.market-chart .baseline { stroke:#a8aaa5; stroke-width:1; stroke-dasharray:4 4; }
+.market-chart .point { fill:var(--blue); stroke:#fff; stroke-width:1.5; }
+.chart-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--muted); font:500 8.5px 'DM Mono',ui-monospace,monospace; }
+.chart-legend { display:inline-flex; align-items:center; gap:5px; } .chart-legend i { width:14px; border-top:2px solid var(--blue); }
+.breadth-list { display:grid; gap:7px; padding:9px 10px 10px; }
+.breadth-row { display:grid; grid-template-columns:58px 1fr 38px; gap:6px; align-items:center; color:var(--muted); font:500 8.5px 'DM Mono',ui-monospace,monospace; }
+.breadth-bar { height:5px; background:#e9e9e4; } .breadth-bar i { display:block; height:100%; }
+.breadth-bar.up i { background:var(--teal); } .breadth-bar.watch i { background:var(--gold); } .breadth-bar.risk i { background:var(--accent); }
+.market-disclaimer { padding:0 10px 8px; color:var(--muted); font-size:8px; line-height:1.4; }
+@media(max-width:1100px) { .investment-body { grid-template-columns:minmax(330px,.95fr) minmax(390px,1.25fr); } .market-card.breadth-card { grid-column:1/-1; } .breadth-list { grid-template-columns:repeat(3,1fr); } }
+@media(max-width:760px) { .investment-head { flex-direction:column; } .investment-tools { justify-content:flex-start; } .investment-body { grid-template-columns:1fr; } .market-card.breadth-card { grid-column:auto; } .breadth-list { grid-template-columns:1fr; } .market-chart { height:132px; } }
+</style>
+
+<style>
+/* VIA add-on expansion slot v1 */
+.addon-slot { margin-top:9px; border:1px dashed var(--line-strong); background:var(--surface-soft); }
+.addon-slot-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-bottom:1px dashed var(--line); }
+.addon-slot-title { color:var(--ink-soft); font:700 10px 'DM Mono',ui-monospace,monospace; letter-spacing:.1em; }
+.addon-slot-note { color:var(--muted); font-size:9px; }
+.addon-slot-body { display:flex; align-items:center; gap:8px; min-height:40px; padding:8px 12px; color:var(--muted); font-size:9.5px; }
+.addon-slot-body.is-mounted { color:var(--ink-soft); }
+.addon-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 6px; border:1px solid var(--line); background:var(--surface); color:var(--teal); font:700 9px 'DM Mono',ui-monospace,monospace; }
+.addon-chip::before { content:'+'; color:var(--accent); font-size:12px; }
+@media(max-width:760px) { .addon-slot-body { align-items:flex-start; flex-direction:column; } }
+
+</style>
+
+<style>
+/* VIA modern compact system v2: Chakra-inspired tokens + Capsize-like type rhythm + local motion */
+:root {
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px;
+  --type-xs:10px; --type-sm:11px; --type-md:12px; --type-lg:16px; --type-xl:24px;
+  --leading-tight:1.16; --leading-body:1.42; --ui-sidebar:208px; --ui-header:44px; --ui-footer:25px;
+  --ui-radius:10px; --ui-motion:140ms; --ui-focus:0 0 0 3px rgba(76,120,168,.16);
+  --modern-bg:#f7f9fc; --modern-panel:#fff; --modern-panel-soft:#f9fbfd; --modern-line:#e2e8ef;
+  --modern-ink:#182431; --modern-muted:#6f7f8e; --modern-blue:#386fa4; --modern-teal:#318b83;
+}
+html { font-size:16px; text-rendering:optimizeLegibility; }
+body { font-size:12px; line-height:var(--leading-body); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif; font-size-adjust:.5; background:var(--modern-bg); color:var(--modern-ink); }
+button,input,select { line-height:1.2; }
+h1,.panel-title,.investment-title,.ui-lab-title { line-height:var(--leading-tight); text-wrap:balance; font-kerning:normal; }
+.app-shell { grid-template-columns:var(--ui-sidebar) minmax(0,1fr); }
+.sidebar { padding:10px 9px 8px; background:linear-gradient(180deg,#ffffff 0%,#f5f8fb 100%); border-right:1px solid var(--modern-line); }
+.brand { padding:0 5px 10px; }
+.brand-logo-surface { min-height:34px; }
+.brand-logo { width:34px !important; height:34px !important; }
+.brand-context { margin-top:5px; font-size:7px; letter-spacing:.1em; }
+.sidebar-rule { margin:0 5px 8px; background:var(--modern-line); }
+.nav { gap:2px; }
+.nav-label { padding:0 7px 4px; color:#8a98a7 !important; font-size:8px !important; }
+.nav-item { min-height:30px; gap:7px; padding:5px 7px !important; border-radius:7px !important; color:#627181 !important; }
+.nav-item:hover { color:var(--modern-blue) !important; background:#eef4fa !important; }
+.nav-item.active { color:#fff !important; background:var(--modern-ink) !important; border-color:var(--modern-ink) !important; }
+.nav-text { font-size:10px; }
+.nav-count { min-width:17px; padding:1px 4px; font-size:8px; }
+.health-card { padding:8px; border-radius:8px !important; background:#fff !important; }
+.health-head { margin-bottom:5px; font-size:9px; }
+.health-row { margin-top:4px; font-size:9px; }
+.main { padding:0 12px calc(var(--ui-footer) + 10px) !important; }
+.topbar { height:var(--ui-header) !important; min-height:var(--ui-header) !important; left:var(--ui-sidebar) !important; padding:0 12px !important; border-bottom:1px solid var(--modern-line) !important; background:rgba(247,249,252,.94) !important; box-shadow:0 2px 8px rgba(29,48,68,.04) !important; }
+.crumb { font-size:9px; }
+.search { width:min(240px,25vw); padding:6px 8px; border-radius:7px !important; border-color:var(--modern-line) !important; }
+.search input { font-size:10px; }
+.icon-btn { width:28px !important; height:28px !important; border-radius:7px !important; }
+.avatar-btn { padding:2px 5px 2px 2px !important; }
+.avatar { width:21px; height:21px; }
+.page-head { padding:12px 0 8px !important; gap:12px; }
+.eyebrow { font-size:8px !important; }
+h1 { margin:4px 0 3px !important; font-size:clamp(20px,2.5vw,29px) !important; letter-spacing:-.045em; }
+.page-subtitle { max-width:620px; font-size:9.5px; line-height:1.4; }
+.head-actions { gap:5px; }
+.btn,.mini-btn { min-height:27px !important; padding:0 8px !important; border-radius:7px !important; font-size:9px !important; }
+.sync-badge { padding:5px 7px !important; border-radius:7px !important; font-size:8px !important; }
+.kpi-grid { gap:7px !important; }
+.kpi-card { min-height:78px !important; padding:8px 9px !important; border-radius:9px !important; }
+.kpi-top { font-size:8px; }
+.kpi-icon { width:21px; height:21px; border-radius:6px; }
+.kpi-icon svg { width:12px; }
+.kpi-value { margin-top:4px; font-size:20px !important; }
+.kpi-foot { margin-top:1px; font-size:8px; }
+.content-grid,.bottom-grid { gap:7px !important; margin-top:7px !important; }
+.content-grid { grid-auto-rows:minmax(275px,auto); }
+.bottom-grid { grid-auto-rows:minmax(175px,auto); }
+.panel { border-radius:var(--ui-radius) !important; background:var(--modern-panel) !important; border-color:var(--modern-line) !important; box-shadow:0 2px 9px rgba(29,48,68,.035) !important; }
+.panel-header { padding:9px 11px 7px !important; gap:7px; }
+.panel-title { font-size:11px !important; }
+.panel-caption { margin-top:2px !important; font-size:8px !important; }
+.panel-tools { gap:4px; }
+.tabbar { padding:0 11px !important; }
+.tab { padding:6px 7px 7px !important; font-size:9px !important; }
+.topology-wrap { padding:3px 5px 7px; }
+.topology { height:220px; }
+.legend { gap:7px; padding:0 11px; font-size:8px; }
+.decision-head { padding:10px 11px 8px; }
+.score-value { font-size:24px; }
+.decision-list { padding:1px 11px 4px; }
+.decision-item { grid-template-columns:21px minmax(0,1fr) auto; gap:6px; padding:7px 0; }
+.decision-icon { width:21px; height:21px; border-radius:6px; }
+.decision-name { font-size:9px; }
+.decision-desc { margin-top:1px; font-size:8px; }
+.decision-footer { margin:2px 11px 8px; padding-top:7px; }
+.table-wrap { padding:0 11px 8px; }
+th { padding:6px 5px; font-size:8px; } td { padding:7px 5px; font-size:9px; }
+.activity-list { padding:0 11px 5px; }
+.activity-item { grid-template-columns:20px 1fr; gap:6px; padding:6px 0 7px; }
+.activity-marker { width:20px; height:20px; border-radius:6px; }
+.activity-title { font-size:9px; } .activity-meta { margin-top:2px; font-size:8px; }
+.app-footer { left:var(--ui-sidebar) !important; height:var(--ui-footer) !important; padding:0 12px !important; font-size:8px !important; background:rgba(247,249,252,.96) !important; border-top:1px solid var(--modern-line) !important; }
+.footer-brand,.footer-status,.footer-meta { font-size:8px !important; }
+.investment-desk { margin-top:7px; }
+.investment-head { padding:8px 10px 7px; gap:8px; }
+.investment-kicker { font-size:8px; } .investment-title { font-size:14px; } .investment-caption { font-size:8.5px; }
+.investment-tools { gap:4px; }
+.investment-tools select,.investment-tools button { height:25px; padding:0 6px; font-size:8px; }
+.investment-body { grid-template-columns:minmax(300px,.9fr) minmax(360px,1.55fr) minmax(170px,.48fr); gap:7px; padding:7px; }
+.market-card-head { padding:6px 8px; } .market-card-title { font-size:9px; } .market-card-meta { font-size:8px; }
+.investment-table th { padding:4px 5px; font-size:7.5px; } .investment-table td { padding:5px; font-size:8px; }
+.symbol-badge { width:18px; height:18px; font-size:7px; } .symbol-name strong { font-size:8.5px; } .symbol-name small { font-size:7px; }
+.market-chart { height:126px; } .chart-foot { font-size:7.5px; } .breadth-list { gap:5px; padding:7px 8px 8px; } .breadth-row { font-size:8px; grid-template-columns:48px 1fr 30px; }
+.market-disclaimer { padding:0 8px 7px; font-size:7px; }
+.addon-slot { margin-top:7px; } .addon-slot-head { padding:6px 9px; } .addon-slot-title { font-size:8px; } .addon-slot-note,.addon-slot-body { font-size:8px; } .addon-slot-body { min-height:32px; padding:6px 9px; }
+.ui-lab { display:grid; gap:8px; margin-top:7px; padding:9px; border:1px solid var(--modern-line); border-radius:var(--ui-radius); background:#f8fbff; animation:ui-enter 180ms ease both; }
+.ui-lab[hidden] { display:none; }
+.ui-lab-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ui-lab-title { margin:0; color:var(--modern-ink); font-size:11px; font-weight:800; }
+.ui-lab-note { color:var(--modern-muted); font-size:8px; }
+.ui-lab-grid { display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:7px; }
+.ui-lab-card { display:grid; gap:5px; min-width:0; padding:8px; border:1px solid var(--modern-line); background:#fff; }
+.ui-lab-label { color:var(--modern-muted); font-size:8px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.ui-lab-scale { color:var(--modern-ink); font-weight:750; } .ui-lab-scale.xs{font-size:10px}.ui-lab-scale.sm{font-size:11px}.ui-lab-scale.md{font-size:12px}.ui-lab-scale.lg{font-size:16px}
+.ui-lab-controls { display:flex; flex-wrap:wrap; gap:5px; } .ui-lab-controls button { min-height:24px; padding:0 7px; border:1px solid var(--modern-line); border-radius:6px; color:var(--modern-ink); background:#fff; font-size:8px; } .ui-lab-controls button:hover,.ui-lab-controls button:focus-visible { border-color:var(--modern-blue); box-shadow:var(--ui-focus); }
+.ui-lab-badge { display:inline-flex; width:max-content; align-items:center; gap:4px; padding:3px 6px; border-radius:99px; color:var(--modern-teal); background:#e8f6f3; font-size:8px; font-weight:800; }
+@keyframes ui-enter { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:none; } }
+@media (max-width:1180px) { .main { padding-inline:10px !important; } .topbar { padding-inline:10px !important; } .app-footer { padding-inline:10px !important; } .investment-body { grid-template-columns:minmax(280px,.9fr) minmax(330px,1.35fr); } .breadth-card { grid-column:1/-1; } .breadth-list { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:820px) { .topbar,.sidebar-collapsed .topbar { left:0 !important; } .app-footer,.sidebar-collapsed .app-footer { left:0 !important; } .main { padding:var(--header-h) 9px calc(var(--ui-footer) + 8px) !important; } .investment-body { grid-template-columns:1fr; } .breadth-card { grid-column:auto; } .ui-lab-grid { grid-template-columns:1fr 1fr; } }
+@media (max-width:560px) { .main { padding-inline:7px !important; } .page-head { padding-top:9px !important; } .page-subtitle { font-size:8.5px; } .head-actions { gap:4px; } .kpi-grid { gap:6px !important; } .kpi-card { min-height:72px !important; padding:7px 8px !important; } .kpi-value { font-size:18px !important; } .content-grid,.bottom-grid { margin-top:6px !important; } .investment-head { padding:7px 8px 6px; } .investment-tools { justify-content:flex-start; } .investment-body { padding:6px; } .market-chart { height:116px; } .ui-lab-grid { grid-template-columns:1fr; } .ui-lab-card { padding:7px; } }
+@media (prefers-reduced-motion: reduce) { .ui-lab { animation:none; } }
+</style>
+
+<style>
+/* VIA mobile sync-launch fix v1 */
+@media (max-width:820px) { .sync-launch { width:29px !important; min-width:29px !important; padding:0 !important; justify-content:center !important; overflow:hidden !important; font-size:0 !important; } .sync-launch::before { font-size:14px !important; } }
+
+</style>
+
+<style>
+/* VIA mobile sync-launch fix v2 */
+@media (max-width:820px) { .sync-launch { width:29px !important; max-width:29px !important; min-width:29px !important; flex:0 0 29px !important; padding:0 !important; color:transparent !important; text-indent:-9999px !important; overflow:hidden !important; } .sync-launch::before { color:var(--accent) !important; font-size:14px !important; text-indent:0 !important; } }
+
+</style>
+
+<style>
+/* VIA Plotly dashboard × Seaborn muted/deep light combo v3 */
+:root {
+  --plotly-blue:#4c78a8; --plotly-teal:#72b7b2; --plotly-green:#54a24b; --plotly-coral:#e45756;
+  --plotly-yellow:#f2cf5b; --plotly-purple:#b279a2; --plotly-cyan:#64b5cd; --plotly-brown:#9d755d; --plotly-gray:#79706e;
+  --seaborn-deep-blue:#4c72b0; --seaborn-muted-blue:#7895c1; --seaborn-muted-green:#55a868; --seaborn-muted-red:#c44e52;
+  --seaborn-paper:#f7f8fb; --seaborn-panel:#ffffff; --seaborn-line:#dfe5ec; --seaborn-ink:#243241; --seaborn-muted:#718091;
+}
+body { background:linear-gradient(135deg,#f8fafc 0%,#f4f7fa 52%,#eef3f7 100%) !important; color:var(--seaborn-ink) !important; }
+.sidebar { background:linear-gradient(180deg,#ffffff 0%,#f4f7fb 100%) !important; border-right-color:var(--seaborn-line) !important; }
+.nav-item:hover { color:var(--plotly-blue) !important; background:#edf3fa !important; }
+.nav-item.active { background:var(--plotly-blue) !important; border-color:var(--plotly-blue) !important; box-shadow:0 5px 14px rgba(76,120,168,.18) !important; }
+.nav-count { color:var(--plotly-blue) !important; background:#e8eff8 !important; }
+.nav-item.active .nav-count { color:#fff !important; background:rgba(255,255,255,.18) !important; }
+.topbar,.app-footer { background:rgba(247,249,252,.95) !important; border-color:var(--seaborn-line) !important; }
+.search:focus-within { border-color:var(--plotly-blue) !important; box-shadow:0 0 0 3px rgba(76,120,168,.12) !important; }
+.btn-primary { background:var(--plotly-coral) !important; border-color:var(--plotly-coral) !important; }
+.btn-primary:hover { background:#d94848 !important; border-color:#d94848 !important; }
+.sync-badge { color:#3f7f78 !important; border-color:#cfe8e2 !important; background:#eef8f5 !important; }
+.kpi-card:nth-child(4n+1) { border-left-color:var(--plotly-blue) !important; }
+.kpi-card:nth-child(4n+2) { border-left-color:var(--plotly-teal) !important; }
+.kpi-card:nth-child(4n+3) { border-left-color:var(--plotly-purple) !important; }
+.kpi-card:nth-child(4n) { border-left-color:var(--plotly-yellow) !important; }
+.kpi-grid .kpi-card:nth-child(4n+1) .kpi-icon { color:var(--plotly-blue) !important; background:#e8eff8 !important; }
+.kpi-grid .kpi-card:nth-child(4n+2) .kpi-icon { color:#3f8f86 !important; background:#e5f3f1 !important; }
+.kpi-grid .kpi-card:nth-child(4n+3) .kpi-icon { color:#8f6690 !important; background:#f1eaf3 !important; }
+.kpi-grid .kpi-card:nth-child(4n) .kpi-icon { color:#a77d20 !important; background:#fff6d9 !important; }
+.trend-up { color:#3f8f86 !important; } .trend-warn { color:#a77d20 !important; }
+.panel,.kpi-card,.market-card { border-color:var(--seaborn-line) !important; background:var(--seaborn-panel) !important; }
+.panel-title,.investment-title,.market-card-title { color:var(--seaborn-ink) !important; }
+.panel-caption,.investment-caption,.market-card-meta,.market-disclaimer { color:var(--seaborn-muted) !important; }
+.decision-head { background:linear-gradient(145deg,#4c72b0,#5f82b5) !important; }
+.decision-icon { color:#3f8f86 !important; background:#e5f3f1 !important; }
+.decision-icon.warn { color:#a77d20 !important; background:#fff6d9 !important; }
+.activity-marker { color:#3f8f86 !important; background:#e5f3f1 !important; }
+.activity-marker.alert { color:var(--plotly-coral) !important; background:#fbe8e7 !important; }
+.activity-tag { color:var(--plotly-blue) !important; background:#e8eff8 !important; }
+.activity-tag.alert { color:var(--plotly-coral) !important; background:#fbe8e7 !important; }
+.investment-head { background:linear-gradient(90deg,#fbfcff,#f8fbfd) !important; }
+.investment-tools button.active { background:var(--plotly-blue) !important; border-color:var(--plotly-blue) !important; }
+.investment-tools button:hover,.investment-tools select:focus { border-color:var(--plotly-blue) !important; }
+.symbol-badge { background:var(--plotly-blue) !important; } .symbol-badge.tw { background:var(--plotly-teal) !important; } .symbol-badge.etf { background:var(--plotly-yellow) !important; color:#5c4b16 !important; } .symbol-badge.macro { background:var(--plotly-purple) !important; }
+.market-up { color:#3f8f86 !important; } .market-down { color:var(--plotly-coral) !important; }
+.market-chart .line { stroke:var(--plotly-blue) !important; } .market-chart .point { fill:var(--plotly-blue) !important; }
+.market-chart #marketArea stop:first-child { stop-color:var(--plotly-blue) !important; } .market-chart #marketArea stop:last-child { stop-color:var(--plotly-blue) !important; }
+.breadth-bar.up i { background:var(--plotly-teal) !important; } .breadth-bar.watch i { background:var(--plotly-yellow) !important; } .breadth-bar.risk i { background:var(--plotly-coral) !important; }
+.addon-slot { border-color:#cbd8e5 !important; background:#f8fbfe !important; } .addon-chip { color:var(--plotly-blue) !important; border-color:#cbd8e5 !important; }
+</style>
+
+<style>
+/* VIA Plotly decision contrast fix v1 */
+.decision-head,.decision-head .panel-title,.decision-head .panel-caption,.decision-head .score-label,.decision-head .score-value { color:#fff !important; }
+.decision-head .panel-caption,.decision-head .score-label { opacity:.82; }
+.decision-head .score-ring text { fill:#e9fff8 !important; }
+
+</style>
+
+<style id="via-adaptive-auto-layout-v3">
+/* VIA adaptive compact v3: transparent seal, fluid layout, small professional type */
+:root {
+  --sidebar-width: 192px;
+  --ui-header: 40px;
+  --ui-footer: 23px;
+  --ui-gutter: clamp(8px, 1.1vw, 14px);
+  --ui-scale: .90;
+  --adaptive-line: #dfe6ec;
+  --adaptive-paper: #ffffff;
+  --adaptive-bg: #f5f7f9;
+}
+html { font-size: 16px; }
+body {
+  font-size: 11px !important;
+  line-height: 1.34 !important;
+  background: var(--adaptive-bg) !important;
+  overflow: hidden;
+}
+.app-shell { grid-template-columns: minmax(176px, var(--sidebar-width)) minmax(0, 1fr) !important; }
+.sidebar {
+  width: auto;
+  min-width: 0;
+  padding: 8px 8px 7px !important;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #fff 0%, #f4f7fa 100%) !important;
+  border-right: 1px solid var(--adaptive-line) !important;
+  box-shadow: none !important;
+}
+.brand { gap: 7px !important; padding: 0 4px 8px !important; }
+.brand-logo-surface {
+  display: grid !important;
+  place-items: center !important;
+  width: 29px !important;
+  min-width: 29px !important;
+  height: 29px !important;
+  min-height: 29px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.brand-logo {
+  display: block !important;
+  width: 27px !important;
+  height: 27px !important;
+  max-width: 27px !important;
+  max-height: 27px !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.brand-copy { min-width: 0; }
+.brand-name { font-size: 10px !important; letter-spacing: .08em !important; line-height: 1.1 !important; }
+.brand-sub { margin-top: 2px !important; font-size: 7.5px !important; letter-spacing: .06em !important; }
+.brand-context { margin-top: 4px !important; font-size: 6.5px !important; }
+.sidebar-rule { margin: 0 4px 7px !important; }
+.nav { gap: 1px !important; }
+.nav-label { padding: 0 6px 3px !important; font-size: 7.5px !important; }
+.nav-item { min-height: 27px !important; gap: 6px !important; padding: 4px 6px !important; border-radius: 6px !important; }
+.nav-item svg { width: 13px !important; height: 13px !important; }
+.nav-text { font-size: 9px !important; }
+.nav-count { min-width: 16px !important; padding: 1px 3px !important; font-size: 7.5px !important; }
+.side-footer { padding: 6px 4px 0 !important; }
+.health-card { padding: 7px !important; border-radius: 7px !important; }
+.health-head { margin-bottom: 4px !important; font-size: 8px !important; }
+.health-row { margin-top: 3px !important; font-size: 8px !important; }
+.main {
+  min-width: 0;
+  padding: 0 var(--ui-gutter) calc(var(--ui-footer) + 9px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+.topbar {
+  left: var(--sidebar-width) !important;
+  height: var(--ui-header) !important;
+  min-height: var(--ui-header) !important;
+  padding: 0 var(--ui-gutter) !important;
+  gap: 8px !important;
+  border-bottom: 1px solid var(--adaptive-line) !important;
+  background: rgba(247,249,252,.96) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.topbar-tools { gap: 4px !important; }
+.crumb { font-size: 8px !important; }
+.search { width: min(210px, 24vw) !important; padding: 5px 7px !important; border-radius: 6px !important; }
+.search input { font-size: 9px !important; }
+.icon-btn { width: 26px !important; height: 26px !important; border-radius: 6px !important; }
+.avatar-btn { padding: 1px 4px 1px 2px !important; }
+.avatar { width: 20px !important; height: 20px !important; }
+.avatar-name { font-size: 8px !important; }
+.page-head { gap: 10px !important; padding: 10px 0 6px !important; }
+.eyebrow { gap: 4px !important; font-size: 7px !important; letter-spacing: .1em !important; }
+.eyebrow-line { width: 14px !important; }
+h1 { margin: 3px 0 2px !important; font-size: clamp(18px, 2.15vw, 25px) !important; letter-spacing: -.035em !important; }
+.page-subtitle { max-width: 620px !important; font-size: 8.5px !important; line-height: 1.38 !important; }
+.head-actions { gap: 4px !important; }
+.btn, .mini-btn { min-height: 25px !important; padding: 0 7px !important; border-radius: 6px !important; font-size: 8px !important; box-shadow: none !important; }
+.btn svg, .mini-btn svg { width: 12px !important; }
+.sync-badge { gap: 4px !important; padding: 5px 6px !important; border-radius: 6px !important; font-size: 7px !important; }
+.kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr)) !important;
+  gap: 6px !important;
+}
+.kpi-card { min-height: 69px !important; padding: 7px 8px !important; border-radius: 7px !important; }
+.kpi-top { font-size: 7px !important; }
+.kpi-icon { width: 19px !important; height: 19px !important; border-radius: 5px !important; }
+.kpi-icon svg { width: 11px !important; }
+.kpi-value { margin-top: 3px !important; font-size: 18px !important; }
+.kpi-foot { margin-top: 1px !important; gap: 3px !important; font-size: 7px !important; }
+.investment-desk { margin-top: 7px !important; }
+.investment-head { gap: 8px !important; padding: 8px 10px 7px !important; }
+.investment-kicker { font-size: 7px !important; }
+.investment-title { margin-top: 2px !important; font-size: 13px !important; }
+.investment-caption { margin-top: 2px !important; font-size: 8px !important; }
+.investment-tools { gap: 3px !important; }
+.investment-tools select, .investment-tools button { height: 23px !important; padding: 0 6px !important; font-size: 7.5px !important; }
+.investment-body { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important; gap: 6px !important; padding: 6px !important; }
+.market-card-head { gap: 5px !important; padding: 6px 7px !important; }
+.market-card-title { font-size: 8px !important; }
+.market-card-meta { font-size: 7px !important; }
+.investment-table th { padding: 4px 5px !important; font-size: 7px !important; }
+.investment-table td { padding: 5px !important; font-size: 7.5px !important; }
+.symbol-badge { width: 17px !important; height: 17px !important; font-size: 7px !important; }
+.symbol-cell { gap: 4px !important; }
+.symbol-name strong { font-size: 8px !important; }
+.symbol-name small { font-size: 7px !important; }
+.chart-wrap { padding: 4px 6px 6px !important; }
+.market-chart { height: 112px !important; }
+.chart-foot { gap: 4px !important; font-size: 7px !important; }
+.breadth-list { gap: 5px !important; padding: 6px 7px 7px !important; }
+.breadth-row { grid-template-columns: 44px 1fr 28px !important; gap: 4px !important; font-size: 7px !important; }
+.market-disclaimer { padding: 0 7px 6px !important; font-size: 7px !important; }
+.addon-slot { margin-top: 7px !important; }
+.addon-slot-head { gap: 6px !important; padding: 6px 8px !important; }
+.addon-slot-title { font-size: 8px !important; }
+.addon-slot-note, .addon-slot-body { font-size: 7px !important; }
+.addon-slot-body { min-height: 27px !important; padding: 6px 8px !important; }
+.content-grid, .bottom-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)) !important; gap: 6px !important; margin-top: 6px !important; }
+.content-grid { grid-auto-rows: minmax(250px, auto) !important; }
+.bottom-grid { grid-auto-rows: minmax(165px, auto) !important; content-visibility: auto; contain-intrinsic-size: 340px; }
+.content-grid > .panel, .bottom-grid > .panel { min-height: 0 !important; }
+.panel { border-radius: 8px !important; box-shadow: none !important; }
+.panel-header { gap: 6px !important; padding: 8px 9px 6px !important; }
+.panel-title { font-size: 11px !important; }
+.panel-caption { margin-top: 1px !important; font-size: 7px !important; }
+.tabbar { padding: 0 9px !important; }
+.tab { padding: 6px 6px 7px !important; font-size: 8px !important; }
+.topology-wrap { padding: 2px 4px 5px !important; }
+.topology { height: 205px !important; }
+.legend { gap: 6px !important; padding: 0 9px !important; font-size: 7px !important; }
+.decision-head { padding: 8px 9px 7px !important; }
+.decision-score { margin-top: 6px !important; }
+.score-label { font-size: 7px !important; }
+.score-value { font-size: 22px !important; }
+.score-ring { width: 46px !important; height: 46px !important; }
+.decision-list { padding: 1px 9px 3px !important; }
+.decision-item { grid-template-columns: 19px minmax(0,1fr) auto !important; gap: 5px !important; padding: 6px 0 !important; }
+.decision-icon { width: 19px !important; height: 19px !important; border-radius: 5px !important; }
+.decision-icon svg { width: 10px !important; }
+.decision-name { font-size: 8px !important; }
+.decision-desc { margin-top: 1px !important; font-size: 7px !important; line-height: 1.35 !important; }
+.decision-time { font-size: 7px !important; }
+.decision-footer { margin: 1px 9px 7px !important; padding-top: 6px !important; }
+.switch-line, .decision-more { font-size: 7px !important; }
+.table-wrap { padding: 0 9px 7px !important; }
+th { padding: 5px 4px !important; font-size: 7px !important; }
+td { padding: 6px 4px !important; font-size: 8px !important; }
+.activity-list { padding: 0 9px 4px !important; }
+.activity-item { grid-template-columns: 18px 1fr !important; gap: 5px !important; padding: 5px 0 6px !important; }
+.activity-marker { width: 18px !important; height: 18px !important; border-radius: 5px !important; }
+.activity-marker svg { width: 10px !important; }
+.activity-title { font-size: 8px !important; }
+.activity-meta { margin-top: 1px !important; gap: 4px !important; font-size: 7px !important; }
+.activity-tag { padding: 1px 3px !important; }
+.ui-lab[hidden] { display: none !important; }
+.app-footer { left: var(--sidebar-width) !important; height: var(--ui-footer) !important; min-height: var(--ui-footer) !important; margin: 0 !important; padding: 0 var(--ui-gutter) !important; border-top: 1px solid var(--adaptive-line) !important; background: rgba(247,249,252,.98) !important; box-shadow: none !important; font-size: 7px !important; backdrop-filter: none !important; }
+.footer-brand, .footer-status, .footer-meta { font-size: 7px !important; }
+@media (max-width: 1050px) {
+  :root { --sidebar-width: 176px; }
+  .app-shell { grid-template-columns: minmax(160px, var(--sidebar-width)) minmax(0,1fr) !important; }
+  .search { width: min(175px, 20vw) !important; }
+  .investment-body { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important; }
+}
+@media (max-width: 820px) {
+  :root { --sidebar-width: 220px; }
+  .app-shell { display: block !important; height: 100vh !important; }
+  .sidebar { width: 220px !important; }
+  .main { width: 100% !important; padding-inline: 9px !important; }
+  .topbar, .sidebar-collapsed .topbar { left: 0 !important; padding-inline: 9px !important; }
+  .app-footer, .sidebar-collapsed .app-footer { left: 0 !important; padding-inline: 9px !important; }
+  .mobile-menu { width: 28px !important; height: 28px !important; }
+  .search { width: 28px !important; padding: 6px !important; }
+  .search input { display: none !important; }
+  .avatar-name { display: none !important; }
+  .page-head { align-items: flex-start !important; flex-direction: column !important; padding-top: 9px !important; }
+  .head-actions { width: 100% !important; justify-content: flex-start !important; flex-wrap: wrap !important; }
+  .content-grid, .bottom-grid { grid-template-columns: 1fr !important; }
+  .content-grid { grid-auto-rows: auto !important; }
+  .content-grid > .panel, .bottom-grid > .panel { height: auto !important; }
+  .investment-head { flex-direction: column !important; }
+  .investment-tools { width: 100%; justify-content: flex-start !important; }
+  .investment-body { grid-template-columns: 1fr !important; }
+  .market-card.breadth-card { grid-column: auto !important; }
+  .breadth-list { grid-template-columns: 1fr !important; }
+  .app-footer { overflow: hidden; white-space: nowrap; }
+}
+@media (max-width: 560px) {
+  :root { --ui-header: 42px; --ui-footer: 22px; }
+  .brand-logo-surface { width: 25px !important; min-width: 25px !important; height: 25px !important; min-height: 25px !important; }
+  .brand-logo { width: 23px !important; height: 23px !important; max-width: 23px !important; max-height: 23px !important; }
+  .brand-name { font-size: 8px !important; }
+  .brand-sub { display: none !important; }
+  .crumb { max-width: 25vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-tools { gap: 3px !important; }
+  .topbar .sync-launch { width: 27px !important; height: 27px !important; padding: 0 !important; justify-content: center !important; font-size: 0 !important; }
+  h1 { font-size: 18px !important; }
+  .page-subtitle { font-size: 8px !important; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 5px !important; }
+  .kpi-card { min-height: 64px !important; padding: 6px 7px !important; }
+  .kpi-value { font-size: 17px !important; }
+  .investment-tools select, .investment-tools button { height: 22px !important; padding: 0 5px !important; font-size: 7px !important; }
+  .topology { width: 100% !important; min-width: 0 !important; height: 195px !important; }
+  .legend { overflow-x: auto; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  .footer-meta { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
+</style>
+
+
+<style id="via-responsive-search-fix">
+@media (max-width: 820px) {
+  .search.expanded { width: min(190px, 46vw) !important; padding: 6px 8px !important; }
+  .search.expanded input { display: block !important; min-width: 0; }
+}
+</style>
+
+<style id="via-engine-hub-v4">
+/* VIA Engine Hub v4: Plotly-like geometry + Seaborn semantic palette, all local-only */
+:root {
+  --engine-plotly-blue: #4c78a8;
+  --engine-seaborn-teal: #72b7b2;
+  --engine-seaborn-green: #54a24b;
+  --engine-seaborn-coral: #e45756;
+  --engine-seaborn-yellow: #f2cf5b;
+  --engine-seaborn-purple: #b279a2;
+  --engine-seaborn-cyan: #64b5cd;
+}
+.chart-mode-label { color: var(--muted); font: 700 8px 'DM Mono', ui-monospace, monospace; letter-spacing: .06em; margin-left: 2px; }
+.market-chart { cursor: crosshair; }
+.market-chart .market-bars { opacity: 0; transition: opacity .18s ease; }
+.market-chart.mode-bars .market-bars { opacity: 1; }
+.market-chart.mode-bars .area, .market-chart.mode-bars .line, .market-chart.mode-bars .point, .market-chart.mode-bars .market-points { opacity: .12; }
+.market-chart.mode-line .area { opacity: .14; }
+.market-chart.mode-area .area { opacity: .68; }
+.market-chart.mode-area .line { stroke-width: 2.5; }
+.market-bar { fill: var(--engine-plotly-blue); opacity: .78; }
+.market-bar:nth-child(3n) { fill: var(--engine-seaborn-teal); }
+.market-bar:nth-child(4n) { fill: var(--engine-seaborn-purple); }
+.market-point { fill: var(--engine-seaborn-coral); stroke: #fff; stroke-width: 1.5; opacity: 0; transition: opacity .15s ease, r .15s ease; }
+.market-chart.mode-line .market-point, .market-chart.mode-area .market-point { opacity: .82; }
+.market-crosshair { stroke: var(--engine-seaborn-coral); stroke-width: 1; stroke-dasharray: 3 4; opacity: .7; pointer-events: none; }
+.market-tooltip { position: absolute; z-index: 3; min-width: 105px; padding: 5px 7px; border: 1px solid #cbd8e5; border-radius: 5px; background: rgba(36,50,65,.94); color: #fff; font: 700 8px/1.45 'DM Mono', ui-monospace, monospace; pointer-events: none; transform: translateX(-50%); white-space: nowrap; box-shadow: 0 5px 12px rgba(36,50,65,.14); }
+.chart-wrap { position: relative; }
+.market-chart[data-engine="plotly-seaborn"] .grid { stroke: #dfe5ec; }
+.market-chart[data-engine="plotly-seaborn"] .baseline { stroke: #aab7c4; }
+[data-chart-mode].active { background: var(--engine-plotly-blue) !important; border-color: var(--engine-plotly-blue) !important; color: #fff !important; }
+@media (max-width: 760px) { .chart-mode-label { width: 100%; margin-left: 0; margin-top: 2px; } .market-tooltip { font-size: 7px; } }
+@media (prefers-reduced-motion: reduce) { .market-chart .market-bars,.market-point { transition: none !important; } }
+</style>
+
+<style id="via-reference-light-compact">
+/* VIA Header UI + MatrixControl reference palette: light, compact, restrained */
+:root {
+  --bg: #f4f5f7 !important;
+  --bg-deep: #eceff3 !important;
+  --surface: #ffffff !important;
+  --surface-soft: #f6f8fa !important;
+  --surface-tint: #eef1f5 !important;
+  --ink: #17273a !important;
+  --ink-soft: #526276 !important;
+  --muted: #5b6b7e !important;
+  --line: #d4dce6 !important;
+  --line-strong: #b8c4d1 !important;
+  --accent: #80622e !important;
+  --accent-deep: #765414 !important;
+  --accent-soft: #f1ece2 !important;
+  --teal: #3fb984 !important;
+  --teal-soft: #e6f5ee !important;
+  --blue: #7fb2ff !important;
+  --blue-soft: #edf4ff !important;
+  --gold: #e0b341 !important;
+  --gold-soft: #fff6dc !important;
+  --danger: #e06c60 !important;
+  --shadow-sm: none !important;
+  --shadow-md: 0 12px 32px rgba(23,39,58,.08) !important;
+  --radius-sm: 6px !important;
+  --radius-md: 8px !important;
+  --radius-lg: 10px !important;
+  --sidebar-width: 220px !important;
+  --font-size: 12px !important;
+  --engine-plotly-blue: #80622e !important;
+  --engine-seaborn-teal: #3fb984 !important;
+  --engine-seaborn-green: #3fb984 !important;
+  --engine-seaborn-coral: #e06c60 !important;
+  --engine-seaborn-yellow: #e0b341 !important;
+  --engine-seaborn-purple: #8c99a6 !important;
+  --engine-seaborn-cyan: #7fb2ff !important;
+}
+html, body { background: #f4f5f7 !important; }
+body {
+  color: #17273a !important;
+  background: #f4f5f7 !important;
+  font-family: "Segoe UI Variable", "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif !important;
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+.sidebar {
+  color: #526276 !important;
+  background: #f4f5f7 !important;
+  border-right: 1px solid #d4dce6 !important;
+  box-shadow: none !important;
+}
+.brand { gap: 9px !important; padding: 0 5px 12px !important; }
+.brand-mark { width: 32px !important; height: 32px !important; padding: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+.brand-name { color: #17273a !important; font-size: 11px !important; font-weight: 600 !important; letter-spacing: .11em !important; }
+.brand-sub { margin-top: 2px !important; color: #5b6b7e !important; font-size: 8px !important; letter-spacing: .06em !important; }
+.sidebar-rule { margin: 0 5px 10px !important; background: #d4dce6 !important; }
+.nav-label { padding: 0 8px 5px !important; color: #8c99a6 !important; font-size: 8px !important; letter-spacing: .12em !important; }
+.nav { gap: 1px !important; }
+.nav-item { gap: 8px !important; padding: 7px 8px !important; color: #526276 !important; border-radius: 6px !important; }
+.nav-item:hover { color: #17273a !important; background: #eceff3 !important; }
+.nav-item.active { color: #17273a !important; background: #e5eaf0 !important; border-color: #d4dce6 !important; box-shadow: none !important; }
+.nav-item svg { width: 14px !important; height: 14px !important; }
+.nav-text { font-size: 10px !important; font-weight: 600 !important; }
+.nav-count { color: #526276 !important; background: #eceff3 !important; font-size: 8px !important; }
+.side-footer { padding: 8px 5px 0 !important; }
+.health-card { padding: 9px !important; border: 1px solid #d4dce6 !important; border-radius: 8px !important; background: #fff !important; }
+.health-head { margin-bottom: 6px !important; color: #17273a !important; font-size: 9px !important; }
+.health-row { margin-top: 5px !important; color: #5b6b7e !important; font-size: 9px !important; }
+.health-value { color: #17273a !important; }
+.health-pill { color: #1a7f37 !important; background: #e6f5ee !important; font-size: 8px !important; }
+.main { padding: 0 18px 26px !important; }
+.topbar { min-height: 48px !important; border-bottom: 1px solid #d4dce6 !important; background: #fff !important; box-shadow: none !important; backdrop-filter: none !important; }
+.crumb { color: #5b6b7e !important; font-size: 9px !important; }
+.crumb strong { color: #17273a !important; }
+.topbar-tools { gap: 6px !important; }
+.search, .icon-btn, .avatar-btn { border-color: #d4dce6 !important; background: #fff !important; box-shadow: none !important; }
+.search { width: min(210px, 23vw) !important; padding: 6px 8px !important; border-radius: 6px !important; }
+.search input { color: #17273a !important; font-size: 9px !important; }
+.icon-btn { width: 29px !important; height: 29px !important; border-radius: 6px !important; }
+.icon-btn:hover { color: #80622e !important; border-color: #b8c4d1 !important; background: #f6f8fa !important; }
+.avatar-btn { padding: 2px 5px 2px 2px !important; border-radius: 6px !important; }
+.avatar { width: 22px !important; height: 22px !important; color: #17273a !important; background: #e5eaf0 !important; font-size: 8px !important; }
+.avatar-name { color: #526276 !important; font-size: 9px !important; }
+.page-head { gap: 15px !important; padding: 16px 0 11px !important; }
+.eyebrow { color: #80622e !important; font-size: 8px !important; letter-spacing: .13em !important; }
+.eyebrow-line { width: 18px !important; height: 1px !important; background: #80622e !important; }
+h1 { margin: 5px 0 4px !important; color: #17273a !important; font-size: clamp(21px, 2.2vw, 29px) !important; }
+.page-subtitle { color: #5b6b7e !important; font-size: 9px !important; line-height: 1.45 !important; }
+.head-actions { gap: 5px !important; }
+.btn { min-height: 28px !important; padding: 0 8px !important; border-color: #b8c4d1 !important; border-radius: 6px !important; color: #526276 !important; background: #fff !important; box-shadow: none !important; font-size: 9px !important; }
+.btn:hover { border-color: #80622e !important; box-shadow: none !important; transform: none !important; }
+.btn-primary { color: #fff !important; border-color: #80622e !important; background: #80622e !important; box-shadow: none !important; }
+.btn-primary:hover { border-color: #765414 !important; background: #765414 !important; box-shadow: none !important; }
+.btn-subtle { background: #f6f8fa !important; }
+.sync-badge { gap: 5px !important; padding: 6px 7px !important; color: #1a7f37 !important; border-color: #bfe4d2 !important; border-radius: 6px !important; background: #e6f5ee !important; font-size: 8px !important; }
+.kpi-grid { gap: 7px !important; }
+.kpi-card { min-height: 78px !important; padding: 9px 10px !important; border-color: #d4dce6 !important; border-radius: 8px !important; background: #fff !important; box-shadow: none !important; }
+.kpi-card::after { display: none !important; }
+.kpi-top { color: #5b6b7e !important; font-size: 8px !important; }
+.kpi-icon { width: 22px !important; height: 22px !important; color: #80622e !important; border-radius: 5px !important; background: #f1ece2 !important; }
+.teal .kpi-icon { color: #1a7f37 !important; background: #e6f5ee !important; }
+.blue .kpi-icon { color: #2563eb !important; background: #edf4ff !important; }
+.gold .kpi-icon { color: #b7791f !important; background: #fff6dc !important; }
+.kpi-value { margin-top: 7px !important; color: #17273a !important; font-size: 21px !important; }
+.kpi-foot { margin-top: 2px !important; color: #5b6b7e !important; font-size: 8px !important; }
+.content-grid, .bottom-grid { gap: 8px !important; margin-top: 8px !important; }
+.panel { border-color: #d4dce6 !important; border-radius: 8px !important; background: #fff !important; box-shadow: none !important; }
+.panel-header { gap: 8px !important; padding: 10px 12px 8px !important; }
+.panel-title { color: #17273a !important; font-size: 11px !important; }
+.panel-caption { margin-top: 2px !important; color: #5b6b7e !important; font-size: 8px !important; }
+.mini-btn { min-height: 24px !important; padding: 0 6px !important; color: #526276 !important; border-color: #d4dce6 !important; border-radius: 5px !important; background: #f6f8fa !important; font-size: 8px !important; }
+.mini-btn:hover { color: #80622e !important; border-color: #b8c4d1 !important; }
+.tabbar { padding: 0 12px !important; border-color: #d4dce6 !important; }
+.tab { padding: 7px 7px 8px !important; color: #5b6b7e !important; font-size: 9px !important; }
+.tab.active { color: #80622e !important; }
+.tab.active::after { background: #80622e !important; }
+.topology-wrap { padding: 3px 6px 7px !important; }
+.topology { height: 220px !important; }
+.topology .grid-line { stroke: #d4dce6 !important; }
+.topology .edge { stroke: #8c99a6 !important; }
+.topology .edge.hot { stroke: #e06c60 !important; }
+.topology .edge.cool { stroke: #7fb2ff !important; }
+.topology .node-shell { fill: #fff !important; stroke: #d4dce6 !important; }
+.topology .node-shell.central { fill: #e5eaf0 !important; stroke: #80622e !important; }
+.topology .node-dot { fill: #3fb984 !important; }
+.topology .node-dot.warn { fill: #e0b341 !important; }
+.topology .node-dot.hot { fill: #e06c60 !important; }
+.topology .node-label { fill: #17273a !important; font-size: 9px !important; }
+.topology .central-title { fill: #17273a !important; font-size: 11px !important; }
+.topology .central-sub, .topology .flow-label { fill: #5b6b7e !important; }
+.legend { gap: 8px !important; padding: 0 12px !important; color: #5b6b7e !important; font-size: 8px !important; }
+.legend-dot { background: #3fb984 !important; }
+.legend-dot.warn { background: #e0b341 !important; }
+.legend-dot.hot { background: #e06c60 !important; }
+.legend-line { border-color: #8c99a6 !important; }
+.decision-head { padding: 11px 12px 9px !important; color: #17273a !important; background: #eceff3 !important; }
+.decision-head .panel-title { color: #17273a !important; }
+.decision-head .panel-caption { color: #5b6b7e !important; }
+.decision-score { margin-top: 9px !important; }
+.decision-head .score-label { color: #5b6b7e !important; font-size: 8px !important; }
+.decision-head .score-value { color: #17273a !important; font-size: 25px !important; }
+.score-ring { width: 52px !important; height: 52px !important; }
+.score-ring svg circle:first-child { stroke: #b8c4d1 !important; }
+.score-ring svg circle:nth-child(2) { stroke: #3fb984 !important; }
+.decision-head .score-ring text { fill: #1a7f37 !important; font-size: 10px !important; }
+.decision-list { padding: 1px 12px 4px !important; }
+.decision-item { grid-template-columns: 21px minmax(0,1fr) auto !important; gap: 7px !important; padding: 8px 0 !important; border-color: #d4dce6 !important; }
+.decision-icon { width: 21px !important; height: 21px !important; color: #1a7f37 !important; border-radius: 5px !important; background: #e6f5ee !important; }
+.decision-icon.warn { color: #b7791f !important; background: #fff6dc !important; }
+.decision-name { color: #17273a !important; font-size: 9px !important; }
+.decision-desc { color: #5b6b7e !important; font-size: 8px !important; }
+.decision-time { color: #8c99a6 !important; font-size: 7px !important; }
+.decision-footer { margin: 2px 12px 9px !important; padding-top: 7px !important; border-color: #b8c4d1 !important; }
+.switch-line, .decision-more { color: #5b6b7e !important; font-size: 8px !important; }
+.switch input:checked + .switch-track { background: #3fb984 !important; }
+.table-wrap { padding: 0 12px 8px !important; }
+th { color: #5b6b7e !important; background: #f6f8fa !important; border-color: #d4dce6 !important; padding: 6px 5px !important; font-size: 8px !important; }
+td { color: #526276 !important; border-color: #d4dce6 !important; padding: 7px 5px !important; font-size: 9px !important; }
+.activity-list { padding: 0 12px 6px !important; }
+.activity-item { padding: 7px 0 8px !important; border-color: #d4dce6 !important; }
+.activity-title { color: #17273a !important; font-size: 9px !important; }
+.activity-meta { color: #5b6b7e !important; font-size: 8px !important; }
+.activity-tag { color: #526276 !important; background: #eceff3 !important; }
+.activity-tag.alert { color: #b7791f !important; background: #fff6dc !important; }
+.app-footer { color: #5b6b7e !important; border-color: #d4dce6 !important; background: #fff !important; box-shadow: none !important; backdrop-filter: none !important; font-size: 7px !important; }
+.footer-brand { color: #80622e !important; }
+.footer-status { color: #1a7f37 !important; }
+.footer-meta strong { color: #526276 !important; }
+.investment-desk, .market-card, .addon-slot { border-color: #d4dce6 !important; border-radius: 8px !important; background: #fff !important; box-shadow: none !important; }
+.investment-head, .market-card-head, .addon-slot-head { background: #f6f8fa !important; border-color: #d4dce6 !important; }
+.investment-title, .market-card-title, .addon-slot-title { color: #17273a !important; }
+.investment-caption, .market-card-meta, .addon-slot-note, .addon-slot-body, .market-disclaimer { color: #5b6b7e !important; }
+.investment-kicker { color: #80622e !important; }
+.investment-tools select, .investment-tools button { border-color: #d4dce6 !important; border-radius: 5px !important; background: #fff !important; color: #526276 !important; }
+.investment-tools button.active, [data-chart-mode].active { color: #fff !important; background: #80622e !important; border-color: #80622e !important; }
+.market-chart .grid { stroke: #d4dce6 !important; }
+.market-chart .baseline { stroke: #8c99a6 !important; }
+.market-line { stroke: #80622e !important; }
+.market-area { fill: #f1ece2 !important; }
+.market-bar { fill: #80622e !important; }
+.market-point { fill: #e06c60 !important; stroke: #fff !important; }
+.market-tooltip { border-color: #b8c4d1 !important; background: #17273a !important; color: #fff !important; box-shadow: none !important; }
+.drawer, .modal { border-color: #d4dce6 !important; border-radius: 8px !important; background: #fff !important; box-shadow: 0 12px 32px rgba(23,39,58,.12) !important; }
+.drawer-title, .modal-title { color: #17273a !important; font-size: 14px !important; }
+.drawer-caption, .modal-subtitle, .setting-label, .field label { color: #5b6b7e !important; font-size: 9px !important; }
+@media (max-width: 820px) {
+  .sidebar { width: 220px !important; }
+  .main { padding-inline: 9px !important; }
+  .topbar { padding-inline: 9px !important; }
+  .page-head { padding-top: 9px !important; }
+  .content-grid, .bottom-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 560px) {
+  .brand-mark { width: 25px !important; height: 25px !important; }
+  .brand-name { font-size: 9px !important; }
+  h1 { font-size: 19px !important; }
+  .page-subtitle { font-size: 8px !important; }
+  .kpi-card { min-height: 64px !important; padding: 6px 7px !important; }
+  .kpi-value { font-size: 17px !important; }
+  .topbar .sync-launch { width: 27px !important; height: 27px !important; }
+}
+</style>
+
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo-surface">
+          <img class="brand-logo" id="brandLogo" src="data:image/png;base64,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" alt="Veritas Intelligence Analytics" / width="96" height="96" decoding="async">
+        </div>
+        <div class="brand-context"><span class="brand-context-mark"></span>VIA CENTRAL · SMART BRIDGE</div>
+      </div>
+      <div class="sidebar-rule"></div>
+      <div class="nav-label">工作區域</div>
+      <nav class="nav" aria-label="主要導覽">
+        <button class="nav-item active" type="button" data-nav="總覽"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-text">系統總覽</span></button>
+        <button class="nav-item" type="button" data-nav="銜接拓撲"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m7.4 11 9.1-4M7.4 13l9.1 4"/></svg><span class="nav-text">銜接拓撲</span><span class="nav-count">12</span></button>
+        <button class="nav-item" type="button" data-nav="資料端點"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7"/></svg><span class="nav-text">資料端點</span><span class="nav-count">20</span></button>
+        <button class="nav-item" type="button" data-nav="事件流"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h16"/><circle cx="18" cy="12" r="2"/></svg><span class="nav-text">即時事件流</span></button>
+        <button class="nav-item" type="button" data-nav="變更歷程"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="M8 3v4M16 3v4"/></svg><span class="nav-text">變更歷程</span></button>
+      </nav>
+      <div class="nav-label" style="margin-top: 24px;">治理與設定</div>
+      <nav class="nav" aria-label="治理導覽">
+        <button class="nav-item" type="button" data-nav="權限治理"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 19 6v5c0 4.6-3 8.2-7 10-4-1.8-7-5.4-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg><span class="nav-text">權限治理</span></button>
+        <button class="nav-item" type="button" data-open-settings="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg><span class="nav-text">視圖調整</span></button>
+      </nav>
+      <div class="side-footer">
+        <div class="health-card">
+          <div class="health-head"><span>中央服務健康度</span><span class="health-pill"><span class="health-dot"></span>穩定</span></div>
+          <div class="health-row"><span>核心服務</span><span class="health-value">99.98%</span></div>
+          <div class="health-row"><span>延遲 P95</span><span class="health-value">86 ms</span></div>
+          <div class="health-row"><span>最後同步</span><span class="health-value">剛剛</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="開啟導覽"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <div class="crumb"><span>中央管理</span><span class="crumb-separator">/</span><strong>系統總覽</strong></div>
+        <div class="topbar-tools">
+          <label class="search" aria-label="搜尋系統資料"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg><input id="globalSearch" type="search" placeholder="搜尋端點、事件或服務" /></label>
+          <button class="icon-btn" type="button" id="notifyBtn" aria-label="通知"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="alert-count">3</span></button>
+          <button class="avatar-btn" type="button" id="profileBtn"><span class="avatar">VI</span><span class="avatar-name">VIA 管理員</span><svg viewBox="0 0 24 24" width="13" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m7 10 5 5 5-5"/></svg></button>
+          <a class="sync-launch" id="syncLaunch" href="VIA-SYNCHRONIZER-Standalone.html" target="_blank" rel="noopener" aria-label="開啟本機同步器">SYNCHRONIZER</a>
+        </div>
+      </header>
+
+      <section class="page-head">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-line"></span>ADAPTIVE INTELLIGENCE CONTROL</div>
+          <h1>智慧銜接中央管理系統</h1>
+          <p class="page-subtitle">以可調整的中央視角掌握端點狀態、資料流向與決策建議，讓每一次系統銜接都能被看見、被驗證、被持續優化。</p>
+        </div>
+        <div class="head-actions">
+          <span class="sync-badge"><span class="live-dot"></span><span id="syncText">即時同步中 · 14:32:08</span></span>
+          <button class="btn btn-subtle modern-lab-btn" type="button" id="uiLabBtn">元件檢視</button>
+          <button class="btn btn-subtle" type="button" data-open-settings="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>調整視圖</button>
+          <button class="btn btn-primary" type="button" id="newConnectionBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>新增銜接</button>
+        </div>
+      </section>
+
+      <section class="kpi-grid" aria-label="核心指標">
+        <article class="kpi-card"><div class="kpi-top"><span>可用銜接端點</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="m8.6 10.7 6.1-3.3M8.6 13.3l6.1 3.3"/></svg></span></div><div class="kpi-value">18<span style="font-size:16px;color:var(--muted);font-weight:650;letter-spacing:0;"> / 20</span></div><div class="kpi-foot"><span class="trend-up">↑ 2.4%</span><span>較上週穩定增加</span></div></article>
+        <article class="kpi-card teal"><div class="kpi-top"><span>活躍資料流</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17 9 12l4 3 7-8"/><path d="M16 7h4v4"/></svg></span></div><div class="kpi-value">12</div><div class="kpi-foot"><span class="trend-up">↑ 8.1%</span><span>自動調度 9 條</span></div></article>
+        <article class="kpi-card blue"><div class="kpi-top"><span>24 小時事件量</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18V6M4 18h17"/><path d="m7 15 3-4 3 2 5-6"/></svg></span></div><div class="kpi-value">128.4K</div><div class="kpi-foot"><span class="trend-up">↑ 14.6%</span><span>峰值 18:42</span></div></article>
+        <article class="kpi-card gold"><div class="kpi-top"><span>路由品質指數</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 7v5c0 4.3 3.4 7.9 8 9 4.6-1.1 8-4.7 8-9V7l-8-4Z"/><path d="m8.5 12 2.3 2.3 4.7-4.7"/></svg></span></div><div class="kpi-value">96.8<span style="font-size:16px;letter-spacing:0;">%</span></div><div class="kpi-foot"><span class="trend-warn">↗ 0.6%</span><span>高於治理門檻</span></div></article>
+      </section>
+
+
+      <section class="investment-desk" id="investmentDesk" aria-label="投資研究工作台">
+        <header class="investment-head">
+          <div><div class="investment-kicker">INVESTMENT RESEARCH · STATIC TEMPLATE</div><h2 class="investment-title">市場觀察與銜接風險工作台</h2><p class="investment-caption">以 watchlist、相對績效與風險分層組織研究視角；示意資料僅供版型與互動驗證。</p></div>
+          <div class="investment-tools"><select id="marketScope" aria-label="市場範圍"><option value="all">全部市場</option><option value="tw">台股</option><option value="us">美股</option><option value="etf">ETF／宏觀</option></select><button type="button" data-market-time="1D">1D</button><button type="button" data-market-time="1W" class="active">1W</button><button type="button" data-market-time="1M">1M</button><button type="button" data-market-time="3M">3M</button><span class="chart-mode-label">圖形</span><button type="button" data-chart-mode="line" class="active">折線</button><button type="button" data-chart-mode="area">面積</button><button type="button" data-chart-mode="bars">柱狀</button><button type="button" id="investmentAlertBtn">建立提醒</button></div>
+        </header>
+        <div class="investment-body">
+          <article class="market-card watchlist-card"><div class="market-card-head"><span class="market-card-title">WATCHLIST</span><span class="market-card-meta" id="watchlistCount">6 symbols</span></div><div class="watchlist-scroll"><table class="investment-table"><thead><tr><th>標的</th><th>最後</th><th>漲跌</th><th>變動%</th><th>成交量</th></tr></thead><tbody id="investmentWatchlist">
+            <tr data-market="tw" data-search="twii 台灣加權 台股"><td><span class="symbol-cell"><span class="symbol-badge tw">TW</span><span class="symbol-name"><strong>TAIEX</strong><small>台灣加權</small></span></span></td><td>22,418</td><td class="market-up">+126</td><td class="market-up">+0.57%</td><td>4.1B</td></tr>
+            <tr data-market="tw" data-search="2330 tsmc 台積電 台股"><td><span class="symbol-cell"><span class="symbol-badge tw">TW</span><span class="symbol-name"><strong>2330</strong><small>台積電</small></span></span></td><td>1,080.0</td><td class="market-up">+12.0</td><td class="market-up">+1.12%</td><td>38.6M</td></tr>
+            <tr data-market="us" data-search="spx sp500 s&p 500 美股"><td><span class="symbol-cell"><span class="symbol-badge">US</span><span class="symbol-name"><strong>SPX</strong><small>S&amp;P 500</small></span></span></td><td>5,642.8</td><td class="market-up">+18.4</td><td class="market-up">+0.33%</td><td>—</td></tr>
+            <tr data-market="us" data-search="aapl apple 美股"><td><span class="symbol-cell"><span class="symbol-badge">US</span><span class="symbol-name"><strong>AAPL</strong><small>Apple Inc.</small></span></span></td><td>226.05</td><td class="market-down">−1.18</td><td class="market-down">−0.52%</td><td>41.2M</td></tr>
+            <tr data-market="etf" data-search="qqq nasdaq etf"><td><span class="symbol-cell"><span class="symbol-badge etf">ETF</span><span class="symbol-name"><strong>QQQ</strong><small>Nasdaq 100</small></span></span></td><td>486.71</td><td class="market-up">+2.30</td><td class="market-up">+0.47%</td><td>26.9M</td></tr>
+            <tr data-market="etf" data-search="vix volatility 波動"><td><span class="symbol-cell"><span class="symbol-badge macro">MAC</span><span class="symbol-name"><strong>VIX</strong><small>波動率指數</small></span></span></td><td>16.82</td><td class="market-flat">+0.02</td><td class="market-flat">+0.12%</td><td>—</td></tr>
+          </tbody></table></div></article>
+          <article class="market-card chart-card"><div class="market-card-head"><span class="market-card-title">RELATIVE PERFORMANCE · <span id="marketRangeLabel">1W</span></span><span class="market-card-meta">Plotly light · Seaborn semantic</span></div><div class="chart-wrap"><svg class="market-chart" id="marketChart" viewBox="0 0 720 150" role="img" aria-label="投資市場相對績效示意圖"><defs><linearGradient id="marketArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4c78a8" stop-opacity=".22"/><stop offset="1" stop-color="#4c78a8" stop-opacity="0"/></linearGradient></defs><path class="grid" d="M0 28H720M0 62H720M0 96H720M0 130H720"/><path class="baseline" d="M0 84H720"/><path class="area" id="marketAreaPath" d="M0 94 L80 86 L160 91 L240 70 L320 76 L400 58 L480 64 L560 40 L640 47 L720 28 L720 130 L0 130 Z"/><path class="line" id="marketLinePath" d="M0 94 L80 86 L160 91 L240 70 L320 76 L400 58 L480 64 L560 40 L640 47 L720 28"/><circle class="point" id="marketPoint" cx="720" cy="28" r="4"/><g id="marketBars" class="market-bars" aria-hidden="true"></g><g id="marketPoints" class="market-points" aria-hidden="true"></g><line id="marketCrosshair" class="market-crosshair" x1="720" y1="8" x2="720" y2="130" hidden/></svg><div class="market-tooltip" id="marketTooltip" role="status" hidden></div><div class="chart-foot"><span class="chart-legend"><i></i>相對績效（示意）</span><span id="marketChartValue" class="market-up">+4.82%</span><span>09/08 — 09/14</span></div></div></article>
+          <article class="market-card breadth-card"><div class="market-card-head"><span class="market-card-title">RISK LENS</span><span class="market-card-meta">semantic</span></div><div class="breadth-list"><div class="breadth-row"><span>動能</span><span class="breadth-bar up"><i style="width:72%"></i></span><strong class="market-up">72</strong></div><div class="breadth-row"><span>廣度</span><span class="breadth-bar watch"><i style="width:58%"></i></span><strong class="market-flat">58</strong></div><div class="breadth-row"><span>波動</span><span class="breadth-bar risk"><i style="width:36%"></i></span><strong class="market-down">36</strong></div></div><p class="market-disclaimer">色彩與數值為靜態示意，不構成投資建議。</p></article>
+        </div>
+      </section>
+
+      <section class="addon-slot" id="addonSlot" data-addon-slot="central-after-investment" aria-label="未來擴充插槽">
+        <div class="addon-slot-head"><span class="addon-slot-title">OPTIONAL ADD-ON SLOT</span><span class="addon-slot-note">file:// compatible · no server required</span></div>
+        <div class="addon-slot-body" id="addonSlotBody"><span>此區保留給未來產業卡片、研究插件、資料匯入器或自訂圖表；未註冊時保持最小視覺佔用。</span></div>
+      </section>
+
+
+      <section class="ui-lab" id="uiLab" hidden aria-label="本機元件檢視沙盒"><div class="ui-lab-head"><h2 class="ui-lab-title">LOCAL UI LAB · component sandbox</h2><span class="ui-lab-note">Chakra-inspired · 8pt grid · no CDN</span></div><div class="ui-lab-grid"><div class="ui-lab-card"><span class="ui-lab-label">Typography scale</span><span class="ui-lab-scale xs">Caption 10</span><span class="ui-lab-scale sm">Label 11</span><span class="ui-lab-scale md">Body 12</span><span class="ui-lab-scale lg">Section 16</span></div><div class="ui-lab-card"><span class="ui-lab-label">Controls</span><div class="ui-lab-controls"><button type="button">Ghost</button><button type="button">Outline</button><button type="button">Focus</button></div><span class="ui-lab-badge">● local-only</span></div><div class="ui-lab-card"><span class="ui-lab-label">Layout tokens</span><span class="ui-lab-scale md">4 / 8 / 12 / 16</span><span class="ui-lab-note">Capsize-like fixed baseline rhythm</span></div></div></section>
+
+      <section class="content-grid">
+        <article class="panel topology-panel">
+          <div class="panel-header"><div><h2 class="panel-title">中央銜接拓撲</h2><p class="panel-caption">跨端點即時流向與自適應式路由狀態</p></div><div class="panel-tools"><button class="mini-btn" type="button" id="pauseFlowBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 5v14M17 5v14"/></svg><span>暫停流量</span></button><button class="mini-btn" type="button" id="refreshBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 0 0-14.9-3M4 5v4h4M4 13a8 8 0 0 0 14.9 3M20 19v-4h-4"/></svg>重整</button></div></div>
+          <div class="tabbar"><button class="tab active" type="button" data-tab="即時流量">即時流量</button><button class="tab" type="button" data-tab="銜接拓撲">銜接拓撲</button><button class="tab" type="button" data-tab="變更歷程">變更歷程</button></div>
+          <div class="topology-wrap">
+            <svg class="topology" viewBox="0 0 720 285" role="img" aria-label="中央銜接拓撲示意圖">
+              <g opacity=".75"><path class="grid-line" d="M0 58H720M0 116H720M0 174H720M0 232H720M90 0V285M180 0V285M270 0V285M360 0V285M450 0V285M540 0V285M630 0V285"/></g>
+              <path class="edge hot" d="M118 70 C205 70 212 114 285 126"/><path class="edge cool" d="M118 214 C205 214 218 168 285 153"/><path class="edge" d="M602 70 C520 70 520 113 435 126"/><path class="edge cool" d="M602 214 C520 214 520 168 435 153"/><path class="edge hot" d="M360 56V102"/><path class="edge" d="M360 184V229"/>
+              <text class="flow-label" x="172" y="86">事件流入 1.8K/s</text><text class="flow-label" x="490" y="86">決策分派 642/s</text><text class="flow-label" x="174" y="204">狀態回傳 98%</text><text class="flow-label" x="484" y="204">稽核留存 100%</text>
+              <g transform="translate(58 48)"><rect class="node-shell" width="120" height="45" rx="11"/><circle class="node-dot hot" cx="17" cy="22" r="5"/><text class="node-label" x="31" y="20">資料採集層</text><text class="flow-label" x="31" y="33">4 個端點 · 穩定</text></g>
+              <g transform="translate(58 192)"><rect class="node-shell" width="120" height="45" rx="11"/><circle class="node-dot" cx="17" cy="22" r="5"/><text class="node-label" x="31" y="20">外部服務層</text><text class="flow-label" x="31" y="33">6 個端點 · 穩定</text></g>
+              <g transform="translate(285 102)"><rect class="node-shell central" width="150" height="82" rx="16"/><circle class="node-dot" cx="21" cy="23" r="5"/><text class="central-title" x="34" y="27">VIA 智慧中樞</text><text class="central-sub" x="20" y="49">Adaptive Routing Core</text><rect x="20" y="61" width="110" height="5" rx="3" fill="#31564a"/><rect x="20" y="61" width="92" height="5" rx="3" fill="#74c7a1"/></g>
+              <g transform="translate(542 48)"><rect class="node-shell" width="120" height="45" rx="11"/><circle class="node-dot" cx="17" cy="22" r="5"/><text class="node-label" x="31" y="20">決策應用層</text><text class="flow-label" x="31" y="33">5 個端點 · 穩定</text></g>
+              <g transform="translate(542 192)"><rect class="node-shell" width="120" height="45" rx="11"/><circle class="node-dot warn" cx="17" cy="22" r="5"/><text class="node-label" x="31" y="20">稽核與治理層</text><text class="flow-label" x="31" y="33">3 個端點 · 注意</text></g>
+              <g transform="translate(300 8)"><rect class="node-shell" width="120" height="36" rx="10"/><circle class="node-dot" cx="16" cy="18" r="4"/><text class="node-label" x="29" y="22">規則服務 · v2.6</text></g>
+              <g transform="translate(300 241)"><rect class="node-shell" width="120" height="36" rx="10"/><circle class="node-dot" cx="16" cy="18" r="4"/><text class="node-label" x="29" y="22">觀測服務 · online</text></g>
+            </svg>
+          </div>
+          <div class="legend"><span class="legend-item"><span class="legend-dot"></span>正常運行</span><span class="legend-item"><span class="legend-dot warn"></span>需要關注</span><span class="legend-item"><span class="legend-dot hot"></span>高頻流量</span><span class="legend-item"><span class="legend-line"></span>自適應路由</span></div>
+        </article>
+
+        <article class="panel decision-panel">
+          <div class="decision-head"><h2 class="panel-title">智慧銜接建議</h2><p class="panel-caption">依即時狀態、歷史樣本與治理規則產生</p><div class="decision-score"><div><div class="score-label">本輪建議信心度</div><div class="score-value">94.2%</div></div><div class="score-ring"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="29" fill="none" stroke="#355249" stroke-width="6"/><circle cx="35" cy="35" r="29" fill="none" stroke="#75caa3" stroke-width="6" stroke-linecap="round" stroke-dasharray="182" stroke-dashoffset="10"/><text x="35" y="36">高</text></svg></div></div></div>
+          <div class="decision-list">
+            <div class="decision-item"><div class="decision-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></div><div><p class="decision-name">優先切換至備援路由 B</p><p class="decision-desc">資料採集層延遲持續低於門檻，可降低尖峰阻塞。</p></div><span class="decision-time">2 分鐘前</span></div>
+            <div class="decision-item"><div class="decision-icon warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 10v4M12 17h.01"/></svg></div><div><p class="decision-name">檢查稽核端點配額</p><p class="decision-desc">VIA-AUDIT-03 接近 82% 日配額，建議提前擴容。</p></div><span class="decision-time">8 分鐘前</span></div>
+            <div class="decision-item"><div class="decision-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg></div><div><p class="decision-name">合併低頻事件批次</p><p class="decision-desc">可減少約 12% 跨區傳輸，且不影響服務等級。</p></div><span class="decision-time">16 分鐘前</span></div>
+          </div>
+          <div class="decision-footer"><label class="switch-line"><span class="switch"><input id="autoApply" type="checkbox" checked /><span class="switch-track"></span></span>允許低風險建議自動採納</label><button class="decision-more" type="button" id="viewSuggestions">查看全部 →</button></div>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel">
+          <div class="panel-header"><div><h2 class="panel-title">整合端點矩陣</h2><p class="panel-caption">目前環境的服務連線與路由品質</p></div><button class="mini-btn" type="button" id="exportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>匯出摘要</button></div>
+          <div class="table-wrap"><table><thead><tr><th>端點 / 服務</th><th>類型</th><th>狀態</th><th>品質</th><th>最近活動</th><th></th></tr></thead><tbody id="endpointTable"><tr data-search="vdf analytics 資料湖"><td><span class="endpoint-name"><span class="endpoint-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7"/></svg></span>VDF Analytics</span></td><td><span class="type-label">資料湖</span></td><td><span class="status"><span class="status-dot"></span>已連線</span></td><td><span class="progress"><span style="width:98%"></span></span> <small>98%</small></td><td>12 秒前</td><td><button class="table-action" type="button" aria-label="查看 VDF Analytics">•••</button></td></tr><tr data-search="vrn core rules engine 規則引擎"><td><span class="endpoint-name"><span class="endpoint-icon" style="color:var(--teal);background:var(--teal-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18M5 5l14 14M19 5 5 19"/></svg></span>VRN Core Rules</span></td><td><span class="type-label">規則引擎</span></td><td><span class="status"><span class="status-dot"></span>已連線</span></td><td><span class="progress"><span style="width:96%"></span></span> <small>96%</small></td><td>28 秒前</td><td><button class="table-action" type="button" aria-label="查看 VRN Core Rules">•••</button></td></tr><tr data-search="via audit audit 稽核"><td><span class="endpoint-name"><span class="endpoint-icon" style="color:var(--gold);background:var(--gold-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 7v5c0 4.3 3.4 7.9 8 9 4.6-1.1 8-4.7 8-9V7l-8-4Z"/><path d="M8 12h8"/></svg></span>VIA Audit 03</span></td><td><span class="type-label">稽核服務</span></td><td><span class="status" style="color:var(--gold)"><span class="status-dot warn"></span>需關注</span></td><td><span class="progress"><span style="width:82%;background:linear-gradient(90deg,#b5822c,#dfb764)"></span></span> <small>82%</small></td><td>1 分鐘前</td><td><button class="table-action" type="button" aria-label="查看 VIA Audit 03">•••</button></td></tr><tr data-search="notify hub webhook 通知"><td><span class="endpoint-name"><span class="endpoint-icon" style="color:var(--accent);background:var(--accent-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span>Notify Hub</span></td><td><span class="type-label">通知匯流</span></td><td><span class="status"><span class="status-dot"></span>已連線</span></td><td><span class="progress"><span style="width:99%"></span></span> <small>99%</small></td><td>3 分鐘前</td><td><button class="table-action" type="button" aria-label="查看 Notify Hub">•••</button></td></tr></tbody></table></div>
+        </article>
+        <article class="panel">
+          <div class="panel-header"><div><h2 class="panel-title">最近活動</h2><p class="panel-caption">中央系統的關鍵狀態變更</p></div><button class="mini-btn" type="button" id="activityFilter">全部活動</button></div>
+          <div class="activity-list"><div class="activity-item"><div class="activity-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></div><div><p class="activity-title">自動路由切換完成，VDF → VRN</p><div class="activity-meta"><span class="activity-tag">路由</span><span>剛剛 · 系統自動化</span></div></div></div><div class="activity-item"><div class="activity-marker alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 10v4M12 17h.01"/></svg></div><div><p class="activity-title">VIA Audit 03 配額使用率達 82%</p><div class="activity-meta"><span class="activity-tag alert">注意</span><span>8 分鐘前 · 治理規則</span></div></div></div><div class="activity-item"><div class="activity-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg></div><div><p class="activity-title">新增資料端點「Notify Hub」</p><div class="activity-meta"><span class="activity-tag">端點</span><span>26 分鐘前 · VIA 管理員</span></div></div></div><div class="activity-item"><div class="activity-marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div><div><p class="activity-title">治理規則 v2.6 已發布至中央中樞</p><div class="activity-meta"><span class="activity-tag">變更</span><span>42 分鐘前 · 版本控制</span></div></div></div></div>
+        </article>
+      </section>
+
+      <footer class="app-footer" id="appFooter" aria-label="系統狀態列">
+        <span class="footer-brand">VIA CENTRAL · ADAPTIVE SMART BRIDGE</span>
+        <span class="footer-divider" aria-hidden="true"></span>
+        <span class="footer-status"><span class="footer-status-dot"></span><span id="footerStatus">系統運作正常</span></span>
+        <span class="footer-meta">最後同步 <strong id="footerSync">剛剛</strong></span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="drawer-backdrop" id="settingsBackdrop" role="dialog" aria-modal="true" aria-label="視圖調整"><aside class="drawer"><div class="drawer-head"><div><h2 class="drawer-title">調整視圖</h2><p class="drawer-caption">依管理情境調整密度、顯示與智慧輔助。</p></div><button class="drawer-close" type="button" data-close-settings="true" aria-label="關閉">×</button></div><div class="setting-group"><div class="setting-label">內容密度</div><div class="segmented" id="densityControl"><button type="button" data-density="comfortable">舒適</button><button class="active" type="button" data-density="balanced">平衡</button><button type="button" data-density="compact">緊湊</button></div></div><div class="setting-group"><div class="setting-label">色彩模式</div><div class="segmented" id="themeControl"><button class="active" type="button" data-theme="light">明亮</button><button type="button" data-theme="highContrast">高對比</button><button type="button" data-theme="system">系統</button></div></div><div class="setting-group"><div class="setting-check"><span>顯示動態資料流</span><label class="switch"><input id="motionToggle" type="checkbox" checked /><span class="switch-track"></span></label></div><div class="setting-check"><span>顯示細節輔助提示</span><label class="switch"><input id="hintToggle" type="checkbox" checked /><span class="switch-track"></span></label></div><div class="setting-check"><span>自動更新事件數據</span><label class="switch"><input id="liveToggle" type="checkbox" checked /><span class="switch-track"></span></label></div></div><div class="drawer-bottom"><button class="btn" type="button" id="resetSettings">重設</button><button class="btn btn-primary" type="button" data-close-settings="true">套用調整</button></div></aside></div>
+
+  <div class="modal-backdrop" id="connectionBackdrop" role="dialog" aria-modal="true" aria-label="新增銜接"><section class="modal"><div class="modal-head"><div><h2 class="modal-title">新增智慧銜接</h2><p class="modal-subtitle">建立一條可被中央中樞觀測、治理與自動調度的服務路由。</p></div><button class="drawer-close" type="button" data-close-connection="true" aria-label="關閉">×</button></div><div class="form-grid"><div class="field full"><label for="connectionName">銜接名稱</label><input id="connectionName" placeholder="例如：VIA Insight Stream" /></div><div class="field"><label for="sourceType">來源端點</label><select id="sourceType"><option>VDF Analytics</option><option>VRN Core Rules</option><option>Notify Hub</option></select></div><div class="field"><label for="targetType">目標端點</label><select id="targetType"><option>VIA Audit 03</option><option>Decision Console</option><option>Data Lake Archive</option></select></div><div class="field"><label for="routeMode">路由策略</label><select id="routeMode"><option>自適應式（建議）</option><option>固定路由</option><option>備援優先</option></select></div><div class="field"><label for="securityLevel">治理層級</label><select id="securityLevel"><option>標準治理</option><option>嚴格稽核</option><option>低風險快速通道</option></select></div></div><div class="modal-actions"><button class="btn" type="button" data-close-connection="true">取消</button><button class="btn btn-primary" type="button" id="createConnectionBtn">建立銜接</button></div></section></div>
+
+  <div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg><span id="toastText">設定已更新</span></div>
+
+  <script>
+    (function () {
+      'use strict';
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const toast = (message) => { const el = $('#toast'); $('#toastText').textContent = message; el.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2600); };
+      window.__viaToast = toast; // v2026-09-25: shared notification API, separate from id="toast".
+      const settingsBackdrop = $('#settingsBackdrop');
+      const connectionBackdrop = $('#connectionBackdrop');
+      const searchSurface = $('.search');
+      const globalSearchInput = $('#globalSearch');
+      const openSettings = () => settingsBackdrop.classList.add('open');
+      const closeSettings = () => settingsBackdrop.classList.remove('open');
+      const openConnection = () => { connectionBackdrop.classList.add('open'); setTimeout(() => $('#connectionName').focus(), 80); };
+      const closeConnection = () => connectionBackdrop.classList.remove('open');
+
+      $$('[data-open-settings]').forEach((button) => button.addEventListener('click', openSettings));
+      $$('[data-close-settings]').forEach((button) => button.addEventListener('click', closeSettings));
+      $$('[data-close-connection]').forEach((button) => button.addEventListener('click', closeConnection));
+      $('#newConnectionBtn').addEventListener('click', openConnection);
+      [settingsBackdrop, connectionBackdrop].forEach((backdrop) => backdrop.addEventListener('click', (event) => { if (event.target === backdrop) backdrop.classList.remove('open'); }));
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeSettings(); closeConnection(); $('#sidebar').classList.remove('mobile-open'); } });
+
+      $('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('mobile-open'));
+      searchSurface.addEventListener('click', () => { if (window.innerWidth <= 820 && !searchSurface.classList.contains('expanded')) { searchSurface.classList.add('expanded'); setTimeout(() => globalSearchInput.focus(), 0); } });
+      globalSearchInput.addEventListener('blur', () => { if (window.innerWidth <= 820 && !globalSearchInput.value.trim()) searchSurface.classList.remove('expanded'); });
+      $$('.nav-item').forEach((item) => item.addEventListener('click', () => { if (item.dataset.openSettings) return; $$('.nav-item').forEach((node) => node.classList.remove('active')); item.classList.add('active'); if (window.innerWidth <= 820) $('#sidebar').classList.remove('mobile-open'); toast('已切換至「' + item.dataset.nav + '」工作區'); }));
+      $('#notifyBtn').addEventListener('click', () => toast('目前有 3 則待處理通知，其中 1 則需要關注。'));
+      $('#profileBtn').addEventListener('click', () => toast('目前登入角色：VIA 中央管理員')); 
+      $('#refreshBtn').addEventListener('click', () => { toast('拓撲資料已重新同步'); $('#syncText').textContent = '即時同步中 · ' + new Date().toLocaleTimeString('zh-TW', { hour12: false }); });
+      $('#pauseFlowBtn').addEventListener('click', (event) => { const paused = event.currentTarget.dataset.paused === 'true'; event.currentTarget.dataset.paused = String(!paused); event.currentTarget.querySelector('span').textContent = paused ? '暫停流量' : '恢復流量'; toast(paused ? '即時資料流已恢復' : '即時資料流已暫停'); });
+      $('#viewSuggestions').addEventListener('click', () => toast('已展開全部 7 項智慧銜接建議。'));
+      $('#activityFilter').addEventListener('click', (event) => { const filtered = event.currentTarget.dataset.filtered === 'true'; const nextFiltered = !filtered; event.currentTarget.dataset.filtered = String(nextFiltered); event.currentTarget.textContent = nextFiltered ? '僅需關注' : '全部活動'; $$('.activity-item').forEach((item) => { const attention = item.querySelector('.activity-marker.alert, .activity-tag.alert'); item.style.display = nextFiltered && !attention ? 'none' : ''; }); toast(nextFiltered ? '已篩選需關注活動' : '已顯示全部活動'); });
+      $('#exportBtn').addEventListener('click', () => { const rows = $$('table tr').map((row) => $$('th,td', row).slice(0, 5).map((cell) => cell.textContent.trim())); const csv = '\ufeff' + rows.map((row) => row.map((cell) => '"' + cell.replaceAll('"', '""') + '"').join(',')).join('\n'); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'via-endpoint-summary.csv'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 0); toast('端點矩陣摘要已下載。'); });
+
+      $$('.tab').forEach((tab) => tab.addEventListener('click', () => { $$('.tab').forEach((node) => node.classList.remove('active')); tab.classList.add('active'); toast('已切換至「' + tab.dataset.tab + '」視圖'); }));
+
+      // Optional local add-on API: future modules can mount without a server or bundler.
+      window.VIA_ADDONS = window.VIA_ADDONS || [];
+      window.VIA_REGISTER_ADDON = (addon) => {
+        if (!addon || !addon.id || !addon.name || typeof addon.mount !== 'function') throw new TypeError('VIA add-on requires id, name and mount(slot, api)');
+        const slot = $('#addonSlotBody');
+        if (!slot) return false;
+        const record = { id: String(addon.id), name: String(addon.name), version: String(addon.version || '0.1.0'), mount: addon.mount };
+        if (window.VIA_ADDONS.some((item) => item.id === record.id)) return false;
+        const host = document.createElement('div'); host.className = 'addon-chip'; host.dataset.addonId = record.id; host.textContent = record.name + ' · v' + record.version;
+        slot.replaceChildren(host); slot.classList.add('is-mounted');
+        record.mount(host, { version: '1.0.0', toast, stateKey: 'via.sync.state.v2' });
+        window.VIA_ADDONS.push(record);
+        return true;
+      };
+      window.VIA_ADDON_API = { version: '1.0.0', slot: '#addonSlotBody', register: window.VIA_REGISTER_ADDON, list: () => window.VIA_ADDONS.map(({ id, name, version }) => ({ id, name, version })) };
+
+      const marketSeries = {
+        '1D': { d:'M0 91 L80 96 L160 88 L240 93 L320 74 L400 81 L480 66 L560 72 L640 54 L720 61', area:'M0 91 L80 96 L160 88 L240 93 L320 74 L400 81 L480 66 L560 72 L640 54 L720 61 L720 130 L0 130 Z', value:'+0.38%', dates:'09/14 intraday', labels:['09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00'] },
+        '1W': { d:'M0 94 L80 86 L160 91 L240 70 L320 76 L400 58 L480 64 L560 40 L640 47 L720 28', area:'M0 94 L80 86 L160 91 L240 70 L320 76 L400 58 L480 64 L560 40 L640 47 L720 28 L720 130 L0 130 Z', value:'+4.82%', dates:'09/08 — 09/14', labels:['09/08','09/09','09/10','09/11','09/12','09/13','09/14'] },
+        '1M': { d:'M0 110 L80 98 L160 105 L240 86 L320 92 L400 72 L480 80 L560 58 L640 44 L720 30', area:'M0 110 L80 98 L160 105 L240 86 L320 92 L400 72 L480 80 L560 58 L640 44 L720 30 L720 130 L0 130 Z', value:'+8.64%', dates:'08/15 — 09/14', labels:['08/15','08/19','08/23','08/27','08/31','09/04','09/08','09/12','09/14'] },
+        '3M': { d:'M0 121 L80 110 L160 114 L240 102 L320 91 L400 99 L480 73 L560 80 L640 48 L720 22', area:'M0 121 L80 110 L160 114 L240 102 L320 91 L400 99 L480 73 L560 80 L640 48 L720 22 L720 130 L0 130 Z', value:'+12.38%', dates:'06/15 — 09/14', labels:['06/15','06/27','07/09','07/21','08/02','08/14','08/26','09/07','09/14'] }
+      };
+      const chart = $('#marketChart');
+      const chartTooltip = $('#marketTooltip');
+      const parsePoints = (path) => [...path.matchAll(/[ML](\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/g)].map((match) => [Number(match[1]), Number(match[2])]);
+      const chartState = { range: '1W', mode: 'line', points: [] };
+      const renderChartDecorations = (data) => {
+        const points = parsePoints(data.d);
+        chartState.points = points;
+        const bars = $('#marketBars');
+        const pointLayer = $('#marketPoints');
+        bars.replaceChildren(); pointLayer.replaceChildren();
+        points.forEach(([x, y], index) => {
+          const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          bar.setAttribute('class', 'market-bar'); bar.setAttribute('x', String(x - 17)); bar.setAttribute('y', String(y)); bar.setAttribute('width', '34'); bar.setAttribute('height', String(130 - y)); bar.dataset.index = String(index); bars.append(bar);
+          const point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          point.setAttribute('class', 'market-point'); point.setAttribute('cx', String(x)); point.setAttribute('cy', String(y)); point.setAttribute('r', '3.2'); point.dataset.index = String(index); pointLayer.append(point);
+        });
+      };
+      const setChartMode = (mode) => { chartState.mode = ['line', 'area', 'bars'].includes(mode) ? mode : 'line'; chart.dataset.engine = 'plotly-seaborn'; chart.classList.remove('mode-line', 'mode-area', 'mode-bars'); chart.classList.add('mode-' + chartState.mode); $$('[data-chart-mode]').forEach((node) => node.classList.toggle('active', node.dataset.chartMode === chartState.mode)); };
+      const applyMarketSeries = (range) => { const data = marketSeries[range] || marketSeries['1W']; chartState.range = range; $('#marketLinePath').setAttribute('d', data.d); $('#marketAreaPath').setAttribute('d', data.area); const last = data.d.match(/L720 ([0-9.]+)/); if (last) { $('#marketPoint').setAttribute('cy', last[1]); } $('#marketRangeLabel').textContent = range; $('#marketChartValue').textContent = data.value; $('#marketChartValue').className = data.value.startsWith('-') ? 'market-down' : 'market-up'; $('.chart-foot span:last-child').textContent = data.dates; renderChartDecorations(data); setChartMode(chartState.mode); };
+      const showChartTooltip = (index, clientX) => { const point = chartState.points[index]; if (!point || !chartTooltip) return; const [x, y] = point; const data = marketSeries[chartState.range]; const label = data.labels[index] || data.labels[data.labels.length - 1] || chartState.range; const rect = chart.getBoundingClientRect(); const xPct = x / 720; $('#marketCrosshair').hidden = false; $('#marketCrosshair').setAttribute('x1', String(x)); $('#marketCrosshair').setAttribute('x2', String(x)); chartTooltip.hidden = false; chartTooltip.textContent = chartState.range + ' · ' + label + ' · ' + data.value; chartTooltip.style.left = Math.max(58, Math.min(rect.width - 58, (clientX - rect.left))) + 'px'; chartTooltip.style.top = Math.max(2, (y / 150) * rect.height - 8) + 'px'; };
+      const hideChartTooltip = () => { if (chartTooltip) chartTooltip.hidden = true; $('#marketCrosshair').hidden = true; };
+      chart.addEventListener('pointermove', (event) => { const rect = chart.getBoundingClientRect(); const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)); const index = Math.round(ratio * Math.max(0, chartState.points.length - 1)); showChartTooltip(index, event.clientX); });
+      chart.addEventListener('pointerleave', hideChartTooltip);
+      $$('[data-market-time]').forEach((button) => button.addEventListener('click', () => { $$('[data-market-time]').forEach((node) => node.classList.remove('active')); button.classList.add('active'); applyMarketSeries(button.dataset.marketTime); toast('市場時間範圍已切換至 ' + button.dataset.marketTime); }));
+      $$('[data-chart-mode]').forEach((button) => button.addEventListener('click', () => { setChartMode(button.dataset.chartMode); toast('圖表引擎已切換至「' + button.textContent + '」'); }));
+      $('#marketScope').addEventListener('change', (event) => { const scope = event.target.value; const rows = $$('#investmentWatchlist tr'); rows.forEach((row) => { row.style.display = scope === 'all' || row.dataset.market === scope ? '' : 'none'; }); $('#watchlistCount').textContent = rows.filter((row) => row.style.display !== 'none').length + ' symbols'; });
+      applyMarketSeries('1W');
+      window.VIA_ENGINE_HUB = { version: '4.0.0', mode: 'local-only', engines: ['layout', 'visualization', 'interaction', 'state', 'addon'], visualization: { palette: { plotlyBlue: '#4c78a8', seabornTeal: '#72b7b2', seabornCoral: '#e45756', seabornYellow: '#f2cf5b', seabornPurple: '#b279a2' }, setRange: applyMarketSeries, setMode: setChartMode, getState: () => ({ range: chartState.range, mode: chartState.mode }) }, layout: { refresh: () => document.documentElement.dataset.viaViewport = innerWidth <= 560 ? 'mobile' : innerWidth <= 820 ? 'tablet' : 'desktop' } };
+      window.VIA_ENGINE_HUB.layout.refresh(); window.addEventListener('resize', () => window.VIA_ENGINE_HUB.layout.refresh(), { passive: true });
+      $('#investmentAlertBtn').addEventListener('click', () => toast('投資提醒草稿已建立，可在本機 SYNCHRONIZER 進一步配置。'));
+
+      $('#globalSearch').addEventListener('input', (event) => { const keyword = event.target.value.trim().toLowerCase(); $$('#endpointTable tr, #investmentWatchlist tr').forEach((row) => { row.style.display = !keyword || (row.dataset.search || '').includes(keyword) ? '' : 'none'; }); });
+      $('#createConnectionBtn').addEventListener('click', () => { const name = $('#connectionName').value.trim(); if (!name) { $('#connectionName').focus(); toast('請先輸入銜接名稱'); return; } closeConnection(); toast('銜接「' + name + '」已送入中央中樞佈署佇列。'); $('#connectionName').value = ''; });
+      $('#autoApply').addEventListener('change', (event) => toast(event.target.checked ? '已開啟低風險建議自動採納' : '已關閉自動採納，建議將改為人工確認'));
+
+      const setDensity = (density) => { const values = { comfortable: '1.15', balanced: '1', compact: '.86' }; document.documentElement.style.setProperty('--density', values[density]); $$('#densityControl button').forEach((button) => button.classList.toggle('active', button.dataset.density === density)); toast('內容密度已調整為「' + ({ comfortable: '舒適', balanced: '平衡', compact: '緊湊' }[density]) + '」'); };
+      $$('#densityControl button').forEach((button) => button.addEventListener('click', () => setDensity(button.dataset.density)));
+      const applyTheme = (theme) => { $$('#themeControl button').forEach((node) => node.classList.toggle('active', node.dataset.theme === theme)); document.body.dataset.theme = theme; document.documentElement.style.setProperty('--line', theme === 'highContrast' ? '#b7c8bf' : '#dce5e0'); document.documentElement.style.setProperty('--muted', theme === 'highContrast' ? '#5f7169' : '#778680'); };
+      $$('#themeControl button').forEach((button) => button.addEventListener('click', () => { applyTheme(button.dataset.theme); toast('色彩模式已切換為「' + button.textContent + '」'); }));
+      $('#motionToggle').addEventListener('change', (event) => { document.body.classList.toggle('motion-off', !event.target.checked); $$('.topology .edge').forEach((edge) => edge.style.animationPlayState = event.target.checked ? 'running' : 'paused'); toast(event.target.checked ? '已顯示動態資料流' : '已停用動態資料流'); });
+      $('#hintToggle').addEventListener('change', (event) => { document.body.classList.toggle('hints-off', !event.target.checked); toast(event.target.checked ? '輔助提示已開啟' : '輔助提示已隱藏'); });
+      $('#liveToggle').addEventListener('change', (event) => toast(event.target.checked ? '自動更新事件數據已開啟' : '自動更新事件數據已暫停'));
+      $('#resetSettings').addEventListener('click', () => { setDensity('balanced'); applyTheme('light'); $('#motionToggle').checked = true; $('#hintToggle').checked = true; $('#liveToggle').checked = true; document.body.classList.remove('motion-off', 'hints-off'); $$('.topology .edge').forEach((edge) => edge.style.animationPlayState = 'running'); toast('視圖設定已重設'); });
+
+      let seconds = 8;
+      setInterval(() => { seconds = (seconds + 1) % 60; const now = new Date(); now.setSeconds(seconds); if ($('#liveToggle').checked) $('#syncText').textContent = '即時同步中 · ' + now.toLocaleTimeString('zh-TW', { hour12: false }); }, 1000);
+    })();
+  </script>
+<script>
+(function () {
+  'use strict';
+  const toast = window.__viaToast;
+  const KEY = 'via.sync.state.v2';
+  const LEGACY_KEY = 'via.sync.state.v1';
+  const CHANNEL = 'via.sync.v2';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const canStore = (() => { try { const key = '__via_storage_test__'; localStorage.setItem(key, '1'); localStorage.removeItem(key); return true; } catch (error) { return false; } })();
+  const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel(CHANNEL) : null;
+  const typeNames = { dashboard: '儀表板', data: '資料端點', automation: '自動化', governance: '治理稽核', integration: '外部整合' };
+  const defaultModules = [
+    { id: 'overview', name: '系統總覽', type: 'dashboard', enabled: true, pinned: true, order: 1, system: true },
+    { id: 'topology', name: '銜接拓撲', type: 'integration', enabled: true, pinned: true, order: 2, system: true },
+    { id: 'endpoints', name: '資料端點', type: 'data', enabled: true, pinned: false, order: 3, system: true },
+    { id: 'events', name: '即時事件流', type: 'automation', enabled: true, pinned: false, order: 4, system: true },
+    { id: 'governance', name: '權限治理', type: 'governance', enabled: true, pinned: false, order: 5, system: true }
+  ];
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+  const timeLabel = (iso) => { try { return new Date(iso).toLocaleTimeString('zh-TW', { hour12: false }); } catch (error) { return '剛剛'; } };
+  const slugify = (value) => String(value || 'module').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'module';
+  const normalizeModules = (input) => {
+    const list = Array.isArray(input) && input.length ? input : clone(defaultModules);
+    return list.map((raw, index) => ({
+      id: slugify(raw.id || raw.name || `module-${index + 1}`), name: String(raw.name || raw.id || `模組 ${index + 1}`),
+      type: typeNames[raw.type] ? raw.type : 'dashboard', enabled: raw.enabled !== false, pinned: raw.pinned === true,
+      order: Number(raw.order) || index + 1, system: raw.system === true
+    })).sort((a, b) => a.order - b.order);
+  };
+  const DEFAULT_LAYOUT = { fontScale: 0.94, headerHeight: 44, panelHeight: 292, equalPanels: true, surface: 'light' };
+  const normalizeLayout = (input) => { const value = input && typeof input === 'object' ? input : {}; return { fontScale: Math.max(0.88, Math.min(1, Number(value.fontScale) || 0.94)), headerHeight: Math.max(36, Math.min(72, Number(value.headerHeight) || 44)), panelHeight: Math.max(220, Math.min(560, Number(value.panelHeight) || 292)), equalPanels: value.equalPanels !== false, surface: ['light', 'soft'].includes(value.surface) ? value.surface : 'light' }; };
+  const legacyToV2 = (raw) => ({ version: 2, updatedAt: raw.updatedAt || new Date().toISOString(), source: raw.source || 'legacy-v1', view: {
+    density: raw.density === '1.15' ? 'comfortable' : raw.density === '.86' ? 'compact' : 'balanced', theme: raw.theme || 'light', motion: raw.motion !== false, hints: raw.hints !== false, live: raw.live !== false, autoApply: raw.autoApply !== false, paused: raw.paused === true, activeTab: raw.activeTab || '即時流量', activeNav: raw.activeNav || '總覽'
+  }, modules: clone(defaultModules), layout: clone(DEFAULT_LAYOUT), sync: { scope: 'all', conflict: 'latest', debounceMs: 250, revision: 0 } });
+  const normalize = (raw) => {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    if (Number(source.version) < 2 || !source.view) return legacyToV2(source);
+    const view = source.view || {}, sync = source.sync || {};
+    return { version: 2, updatedAt: source.updatedAt || new Date().toISOString(), source: source.source || 'UI', view: {
+      density: ['comfortable', 'balanced', 'compact'].includes(view.density) ? view.density : 'balanced', theme: ['light', 'highContrast', 'system'].includes(view.theme) ? view.theme : 'light', motion: view.motion !== false, hints: view.hints !== false, live: view.live !== false, autoApply: view.autoApply !== false, paused: view.paused === true, activeTab: view.activeTab || '即時流量', activeNav: view.activeNav || '總覽'
+    }, modules: normalizeModules(source.modules), analytics: source.analytics && typeof source.analytics === 'object' ? source.analytics : { templateId: 'blank', templateName: '一般空白', charts: [], history: [], pivot: { rowField: 'date', columnField: 'metric', valueField: 'value', aggregation: 'sum' } }, layout: normalizeLayout(source.layout), sync: {
+      scope: ['all', 'view-only', 'modules-only', 'manual'].includes(sync.scope) ? sync.scope : 'all', conflict: ['latest', 'local', 'remote'].includes(sync.conflict) ? sync.conflict : 'latest', debounceMs: Math.max(0, Math.min(5000, Number(sync.debounceMs) || 250)), revision: Number(sync.revision) || 0
+    } };
+  };
+  const read = () => { if (!canStore) return null; try { return JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY) || 'null'); } catch (error) { return null; } };
+  let activeState = normalize(read() || {}), applying = false, originId = `ui-${Math.random().toString(36).slice(2, 9)}`;
+  const write = (state, broadcast = true) => {
+    if (canStore) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (error) {} }
+    if (broadcast && channel && state.sync.scope !== 'manual') channel.postMessage({ type: 'via-state-v2', originId, state: clone(state) });
+    if ($('#syncText')) $('#syncText').textContent = '本機同步 · ' + timeLabel(state.updatedAt);
+    if ($('#footerSync')) $('#footerSync').textContent = timeLabel(state.updatedAt);
+  };
+  const renderCustomModules = () => {
+    const primary = $('.sidebar .nav');
+    if (!primary) return;
+    let label = $('#customModuleLabel'), nav = $('#customModuleNav');
+    if (!label) { label = document.createElement('div'); label.id = 'customModuleLabel'; label.className = 'nav-label custom-module-label'; label.textContent = '自定義模組'; primary.after(label); }
+    if (!nav) { nav = document.createElement('nav'); nav.id = 'customModuleNav'; nav.className = 'nav custom-module-nav'; nav.setAttribute('aria-label', '自定義管理模組'); label.after(nav); }
+    nav.replaceChildren();
+    const modules = activeState.modules.filter((module) => module.enabled && !module.system);
+    label.hidden = modules.length === 0; nav.hidden = modules.length === 0;
+    modules.forEach((module) => {
+      const button = document.createElement('button'); button.className = 'nav-item'; button.type = 'button'; button.dataset.nav = module.id; button.title = module.note || typeNames[module.type] || '自定義模組';
+      button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/></svg>';
+      const text = document.createElement('span'); text.className = 'nav-text'; text.textContent = module.name; button.append(text);
+      button.addEventListener('click', () => { $$('.nav-item').forEach((item) => item.classList.remove('active')); button.classList.add('active'); activeState.view.activeNav = module.id; publish('UI'); toast('已切換至自定義模組「' + module.name + '」'); });
+      nav.append(button);
+    });
+    $$('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.nav === activeState.view.activeNav));
+  };
+  const apply = (incoming, notify = false) => {
+    if (!incoming) return;
+    const state = normalize(incoming);
+    applying = true;
+    if (state.sync.scope !== 'modules-only') { document.documentElement.style.setProperty('--ui-font-scale', String(state.layout.fontScale)); document.documentElement.style.setProperty('--header-h', state.layout.headerHeight + 'px'); document.documentElement.style.setProperty('--ui-panel-h', state.layout.panelHeight + 'px'); document.documentElement.style.setProperty('--ui-surface', state.layout.surface === 'soft' ? '#f4f8f5' : '#fbfcfb'); document.body.dataset.equalPanels = String(state.layout.equalPanels); }
+    const scope = state.sync.scope;
+    if (scope !== 'modules-only') {
+      document.documentElement.style.setProperty('--density', ({ comfortable: '1.15', balanced: '1', compact: '.86' }[state.view.density] || '1'));
+      $$('#densityControl button').forEach((button) => button.classList.toggle('active', button.dataset.density === state.view.density));
+      document.body.dataset.theme = state.view.theme;
+      document.documentElement.style.setProperty('--line', state.view.theme === 'highContrast' ? '#b7c8bf' : '#dce5e0');
+      document.documentElement.style.setProperty('--muted', state.view.theme === 'highContrast' ? '#5f7169' : '#778680');
+      $$('#themeControl button').forEach((button) => button.classList.toggle('active', button.dataset.theme === state.view.theme));
+      $('#motionToggle').checked = state.view.motion; $('#hintToggle').checked = state.view.hints; $('#liveToggle').checked = state.view.live; $('#autoApply').checked = state.view.autoApply;
+      document.body.classList.toggle('motion-off', !state.view.motion); document.body.classList.toggle('hints-off', !state.view.hints);
+      $$('.topology .edge').forEach((edge) => edge.style.animationPlayState = state.view.motion ? 'running' : 'paused');
+      $('#pauseFlowBtn').dataset.paused = String(state.view.paused); $('#pauseFlowBtn').querySelector('span').textContent = state.view.paused ? '恢復流量' : '暫停流量';
+      $$('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.tab === state.view.activeTab));
+    }
+    if (scope !== 'view-only') { activeState.modules = state.modules; activeState.analytics = state.analytics; }
+    if (scope !== 'modules-only') activeState.layout = state.layout;
+    activeState.view = scope === 'modules-only' ? activeState.view : state.view;
+    activeState.sync = state.sync; activeState.updatedAt = state.updatedAt; activeState.source = state.source; activeState.version = 2;
+    renderCustomModules(); applying = false; write(activeState, false);
+    if (notify) toast('已套用本機同步狀態');
+  };
+  const current = () => normalize({ ...activeState, version: 2, source: 'UI', updatedAt: new Date().toISOString(), view: { ...activeState.view, density: ({ '1.15': 'comfortable', '1': 'balanced', '.86': 'compact' }[getComputedStyle(document.documentElement).getPropertyValue('--density').trim()] || 'balanced'), theme: document.body.dataset.theme || 'light', motion: $('#motionToggle').checked, hints: $('#hintToggle').checked, live: $('#liveToggle').checked, autoApply: $('#autoApply').checked, paused: $('#pauseFlowBtn').dataset.paused === 'true', activeTab: $('.tab.active')?.dataset.tab || activeState.view.activeTab, activeNav: $('.nav-item.active')?.dataset.nav || activeState.view.activeNav } });
+  const publish = (source = 'UI') => { if (applying || activeState.sync.scope === 'manual') return; activeState = current(); activeState.source = source; activeState.sync.revision += 1; write(activeState, true); };
+  window.__viaToast = window.__viaToast || ((message) => toast(message));
+  $$('#densityControl button, #themeControl button, #motionToggle, #hintToggle, #liveToggle, #autoApply, #pauseFlowBtn, .tab, .nav-item').forEach((element) => element.addEventListener('click', () => setTimeout(() => publish('UI'), 0)));
+  $$('#motionToggle, #hintToggle, #liveToggle, #autoApply').forEach((element) => element.addEventListener('change', () => setTimeout(() => publish('UI'), 0)));
+  if (channel) channel.onmessage = (event) => { if (event.data?.originId !== originId && event.data?.type === 'via-state-v2') apply(event.data.state, true); if (event.data?.type === 'via-clear-v2') apply(normalize({}), true); };
+  window.addEventListener('storage', (event) => { if (event.key === KEY && event.newValue) { try { apply(JSON.parse(event.newValue), true); } catch (error) {} } });
+  apply(activeState, false);
+  window.VIA_ENGINE_HUB = window.VIA_ENGINE_HUB || {};
+  window.VIA_ENGINE_HUB.state = { version: '2', storageKey: KEY, channel: CHANNEL, snapshot: () => clone(activeState), publish };
+  window.VIA_ENGINE_HUB.addon = { register: window.VIA_REGISTER_ADDON, list: () => (window.VIA_ADDONS || []).map(({ id, name, version }) => ({ id, name, version })) };
+})();
+</script>
+
+<script>
+(()=>{const btn=document.getElementById('uiLabBtn'),lab=document.getElementById('uiLab');if(!btn||!lab)return;btn.addEventListener('click',()=>{lab.hidden=!lab.hidden;btn.setAttribute('aria-expanded',String(!lab.hidden));if(typeof window.toast==='function')window.toast(lab.hidden?'元件檢視已收合':'已開啟本機 UI 元件沙盒');});})();
+</script>
+</body>
+</html>

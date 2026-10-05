@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VIA Complete System</title>
+  <style>
+    :root{color-scheme:light;--bg:#f3f6f8;--surface:#fff;--ink:#24313a;--muted:#6f7b83;--line:#d9e1e5;--accent:#4c78a8;--ok:#2f855a;--gold:#c28f35}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Noto Sans TC",sans-serif}
+    .shell{width:min(1080px,calc(100% - 28px));margin:0 auto;padding:20px 0 28px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:10px 0 14px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:10px}.mark{width:30px;height:30px;object-fit:contain}.brand strong{font-size:15px;letter-spacing:.02em}.brand small{display:block;color:var(--muted);font-size:11px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid #c9e2d2;border-radius:999px;background:#f4fbf6;color:var(--ok);font-size:11px;font-weight:700}.dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+    .hero{padding:24px 0 18px}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.hero h1{margin:5px 0 7px;font-size:clamp(24px,4vw,38px);line-height:1.12;letter-spacing:-.03em}.hero p{max-width:680px;margin:0;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:15px;min-height:172px;display:flex;flex-direction:column}.card h2{margin:0 0 5px;font-size:15px}.card p{margin:0;color:var(--muted);font-size:12px}.card ul{margin:12px 0 0;padding-left:17px;color:#50606a;font-size:12px}.card li+li{margin-top:3px}.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto;padding-top:14px}.btn{appearance:none;border:1px solid #c9d6df;background:#fff;color:#334957;border-radius:7px;padding:7px 10px;font:600 12px inherit;text-decoration:none;cursor:pointer}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.gold{background:#fbf6eb;border-color:#e7d3a8;color:#79581f}.btn:hover{filter:brightness(.98);transform:translateY(-1px)}.btn:focus-visible{outline:2px solid #8cb3d8;outline-offset:2px}
+    .status{margin-top:12px;background:#eef4f7;border:1px solid #d7e3e9;border-radius:10px;padding:12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.status div{min-width:0}.status b{display:block;font-size:16px}.status span{color:var(--muted);font-size:11px}.footer{display:flex;justify-content:space-between;gap:12px;margin-top:20px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+    @media(max-width:760px){.shell{width:min(100% - 20px,560px);padding-top:10px}.topbar{align-items:flex-start}.grid{grid-template-columns:1fr}.card{min-height:0}.status{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding-top:18px}.footer{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="shell" aria-label="VIA 完整系統入口">
+    <header class="topbar">
+      <div class="brand">
+        <img class="mark" src="../assets/via-stamp-transparent-96.png" alt="VIA 印章 Logo">
+        <div><strong>VIA Complete System</strong><small>Local-only Universal Control Console</small></div>
+      </div>
+      <span class="badge"><span class="dot"></span>standalone ready</span>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">VIA STANDARD TEMPLATE</div>
+      <h1>中央管理、同步、產業模組與品質驗證</h1>
+      <p>單一入口管理兩個正式 HTML 入口；不需要 Server、CDN、資料庫或外部 chart runtime。所有資料留在本機 file origin 或 loopback 測試環境。</p>
+    </section>
+
+    <section class="grid" aria-label="正式系統入口">
+      <article class="card">
+        <h2>中央管理 UI</h2>
+        <p>投資研究工作台與 Plotly × Seaborn inspired Engine Hub。</p>
+        <ul><li>圖表模式與時間範圍</li><li>watchlist、搜尋與風險視圖</li><li>UI Lab、add-on slot 與 v2 state</li></ul>
+        <div class="actions"><a class="btn primary" id="openUi" href="VIA-UI-Standalone-NoServer.html" target="_blank" rel="noopener">開啟中央 UI</a></div>
+      </article>
+      <article class="card">
+        <h2>SYNCHRONIZER</h2>
+        <p>產業管理模組、同步規則、歷史趨勢與資料匯出。</p>
+        <ul><li>四個產業 profile</li><li>BroadcastChannel／localStorage v2</li><li>JSON、CSV、SpreadsheetML Excel</li></ul>
+        <div class="actions"><a class="btn primary" id="openSync" href="VIA-SYNCHRONIZER-Standalone.html" target="_blank" rel="noopener">開啟 SYNCHRONIZER</a></div>
+      </article>
+      <article class="card" data-quality-gate="ci/run_complete_system.sh">
+        <h2>品質與本地 companion</h2>
+        <p>自動化檢查、跨裝置 E2E、跨頁同步與可選 Python 工作流。</p>
+        <ul><li>18 項 offline smoke（run_offline_smoke.sh）</li><li>54 項 Desktop／Tablet／Mobile E2E</li><li>Streamlit CSV／Graphviz／Agraph companion</li></ul>
+        <div class="actions"><a class="btn gold" id="openOffline" href="../docs/OFFLINE-DEPLOYMENT-AND-TESTING.md" target="_blank" rel="noopener">查看離線指南</a></div>
+      </article>
+    </section>
+
+    <section class="status" aria-label="系統狀態">
+      <div><b id="statusLocal">READY</b><span>runtime</span></div>
+      <div><b>v2</b><span>state envelope</span></div>
+      <div><b>4 × 5</b><span>industry modules</span></div>
+      <div><b id="statusOrigin">file://</b><span>origin mode</span></div>
+    </section>
+
+    <footer class="footer"><span>VIA Standardized Template · local-only</span><span id="statusText">可直接以 file:// 開啟</span></footer>
+  </main>
+  <script>
+    (() => {
+      const status = document.querySelector('#statusText');
+      const origin = document.querySelector('#statusOrigin');
+      const local = document.querySelector('#statusLocal');
+      origin.textContent = location.protocol === 'file:' ? 'file://' : location.origin;
+      local.textContent = location.protocol === 'file:' ? 'READY' : 'LOOPBACK';
+      const links = [['openUi','中央 UI'],['openSync','SYNCHRONIZER'],['openOffline','離線指南']];
+      links.forEach(([id,label]) => document.getElementById(id)?.addEventListener('click', () => { status.textContent = `已開啟：${label}`; }));
+    })();
+  </script>
+</body>
+</html>
