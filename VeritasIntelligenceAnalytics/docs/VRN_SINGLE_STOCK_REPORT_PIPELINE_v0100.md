@@ -86,6 +86,15 @@ NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中�
   closeout 全數經 VRN_SystemManager 動詞口(VIA_FROM_VCGC 閘 + 前版鏈),引擎(ENG052/085/
   SUP_MDL866 NLP 座)只被 Manager 調度,不自行對外。
 
+## 四之三、PY 功能律(操作員令 2026-10-05 批1657)
+- **從 VRN 起,所有有功能的指令都用 PY 寫**,帶加速器橋(L103/L102:Celeritas 契約);
+  **PS 只負責啟動與連結 HTML U/I**,不帶判定邏輯(.ps1 零觸碰,L70)。
+- 首例落實:原 `Invoke-VIA-RealTest-VRN-v0103.ps1` 的判定段(輸出清點/249 判讀/風險判讀/總判)
+  PY 化為 `VRN_SystemManager real-test <樣本夾> [分鐘窗]`(矩陣+RESULT json 照出);雙軌引擎照走各自動詞。
+- **列管律**:VCGC FLOW 親子表(CGC_MDL223 v0101)加四族工具列(role=tool)——省TOKEN(CGC_MDL158)·
+  SSOT全景(CGC_MDL247)· 編號(CGC_MDL237)· 加速器(SUP_MDL737→Celeritas 尾版)· 網路(SUP_MDL740→AegisNexus 尾版);
+  工具列紅=擋動詞,與管理者列同權重。
+
 ## 五、掛載
 工作流:`VIA_Workflow_VRN_SSOT_v0105.json` **VRN-WKF009(single_stock_report)**,九步,
 每步正主可尋尾版;需求 `VRN-REQ017` 雙向掛載(`VIA_Requirements_SSOT_v0172.json`)。

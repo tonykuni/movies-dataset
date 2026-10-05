@@ -1217,6 +1217,55 @@ def deepread(path: str) -> dict:
             "folder_size_bytes": total, "folder_size_h": PRIOR.size_h(total), "rows": rows}
 
 
+def real_test(path: str, max_min: int = 45) -> dict:
+    """實測清點判定(批1657 操作員令「有功能的指令全 PY 寫+加速器;PS 只做啟動與 HTML U/I」):
+    原 Invoke-VIA-RealTest-VRN-v0103.ps1 的**判定段**(L41-47)PY 化入管——
+    ① 樣本數 ② 近 N 分鐘 VRN 輸出清點 ③ CGC_MDL249 check 尾判行 ④ realtest/paste.md 風險行 ⑤ 總判。
+    雙軌引擎(ENG399/393/394/396)照走 via-vcgc 各自動詞;本動詞只做清點與判定,不重跑引擎。
+    .ps1 零觸碰(L70);PS 剩啟動與開頁。"""
+    import subprocess, time
+    via = HERE.parents[1]
+    errors, verdicts = [], []
+    base = Path(path)
+    n_samples = len([q for q in base.rglob("*") if q.suffix.lower() in (".pdf", ".docx", ".pptx")]) if base.is_dir() else 0
+    verdicts.append(f"[樣本] {base} · {n_samples} 件")
+    cutoff = time.time() - max_min * 60
+    outs = []
+    for d in (via / "VIA_Reports" / "vrn", HERE / "output_hub", via / "VIA_Reports" / "review"):
+        if d.is_dir():
+            outs += [q for q in d.rglob("*") if q.is_file() and q.suffix in (".parquet", ".duckdb", ".json", ".html")
+                     and q.stat().st_mtime > cutoff]
+    top = sorted(outs, key=lambda q: -q.stat().st_size)[:6]
+    verdicts.append("[清點] 本輪 VRN 輸出 %d 件:%s" % (len(outs), " · ".join(f"{q.name}({q.stat().st_size // 1024}KB)" for q in top)))
+    locks = sorted((via / "supportive modules" / "registry").glob("CGC_MDL249_DataFrameLock_v*.py"))
+    if locks:
+        try:
+            env = dict(os.environ, VIA_FROM_VCGC="YES", VIA_NO_OPEN="1")
+            cp = subprocess.run([sys.executable, str(locks[-1]), "check"], capture_output=True, text=True, timeout=600, env=env)
+            tail = [l for l in (cp.stdout or "").splitlines() if re.search(r"\[(計|GREEN|RED|YELLOW|FAIL)\]|總判", l)][-3:]
+            for l in tail:
+                (errors if re.search(r"RED|FAIL", l) else verdicts).append("[249] " + l.strip())
+            if not tail:
+                verdicts.append(f"[249] 無判決行(rc={cp.returncode};誠實記)")
+        except Exception as exc:   # 子行程層例外型別雜;誠實記型別不吞判
+            errors.append(f"[249] 跑不動 {type(exc).__name__}: {str(exc)[:60]}")
+    else:
+        verdicts.append("[249] CGC_MDL249 不在(誠實態,不假綠)")
+    pm = via / "VIA_Reports" / "vrn" / "realtest" / "paste.md"
+    if pm.is_file():
+        for l in pm.read_text(encoding="utf-8", errors="replace").splitlines()[:12]:
+            (errors if "[RED]" in l else verdicts).append("[風險] " + l)
+    else:
+        verdicts.append("[風險] realtest/paste.md 不在(ENG399 未跑或清場)")
+    ok = not errors and len(outs) > 0
+    verdicts.append("[判] " + ("成功:輸出清點 %d 件 · 249 無紅 · 風險無紅" % len(outs) if ok else "未成功:看紅字"))
+    return {"verb": "real-test", "manager": TAG, "state": "OK" if ok else "RED",
+            "samples": n_samples, "outputs_recent": len(outs), "max_min": max_min,
+            "verdicts": verdicts, "errors": errors, "lamp": "綠" if ok else "紅",
+            "rows": [{"filename": "(清點判定)", "lamp": "綠" if ok else "紅",
+                      "樣本": n_samples, "輸出": len(outs), "紅字": len(errors)}]}
+
+
 def _dump_result_v0119(verb: str, out: dict) -> None:
     """結果落檔 RESULT_<verb>_latest.json(操作員貼回免撈 console;寫不進不擋主流程,誠實印)。"""
     try:
@@ -1265,6 +1314,15 @@ def main(argv=None) -> int:
         _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
+    if a[:1] == ["real-test"]:   # 批1657 PY 功能律:實測判定段 PY 化(PS 只啟動+開頁)
+        if len(a) < 2:
+            print("[拒跑] real-test <樣本夾> [分鐘窗]")
+            return 2
+        out = real_test(a[1], int(a[2]) if len(a) > 2 else 45)
+        PRIOR.emit_matrix_html("real_test", out)
+        _dump_result_v0119("real_test", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0 if out["state"] == "OK" else 1
     return PRIOR.main(args)   # intake/eps-check/reconcile/closeout 照前版鏈
 
 
@@ -1548,6 +1606,12 @@ def selftest() -> int:
     body = Path(__file__).read_text(encoding="utf-8")
     chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
         and "VIA_FROM_VCGC" in body)
+    with tempfile.TemporaryDirectory() as _rt:
+        _r = real_test(_rt, max_min=1)
+        chk("㊻ real-test PY 判定段(PS 只啟動):空夾=樣本 0 · 誠實 RED/綠 · 判決/清點行在",
+            _r["samples"] == 0 and _r["state"] in ("OK", "RED")
+            and any(l.startswith("[判]") for l in _r["verdicts"])
+            and any(l.startswith("[清點]") for l in _r["verdicts"]))
     for k in ("VIA_NO_NET", "VIA_NO_OPEN", "VIA_VRN_UI_DIR"):
         os.environ.pop(k, None)
     print("[計] VRN_SystemManager_v0119 自測 %d/%d · %s" % (p, p + f, "PASS" if f == 0 else "FAIL"))
