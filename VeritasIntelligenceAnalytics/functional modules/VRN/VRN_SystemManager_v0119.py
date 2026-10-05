@@ -1124,6 +1124,33 @@ def deepread_one(path: Path) -> dict:
     return row
 
 
+_SCAN_NOTES: list = []   # 大小統計讀不到的單項(誠實帳,非驗證欄)
+
+
+def _scan_size_v0119(root: Path) -> int:
+    """夾層總大小(os.scandir 遞迴:遍歷時快取 metadata,批量最快;檔案給 stat)。"""
+    if root.is_file():
+        try:
+            return root.stat().st_size
+        except OSError:
+            return 0
+    total = 0
+    try:
+        with os.scandir(root) as it:
+            for e in it:
+                try:
+                    if e.is_file(follow_symlinks=False):
+                        total += e.stat(follow_symlinks=False).st_size
+                    elif e.is_dir(follow_symlinks=False):
+                        total += _scan_size_v0119(Path(e.path))
+                except OSError as exc:
+                    _SCAN_NOTES.append(f"{e.name}: {type(exc).__name__}")   # 誠實記,照數其餘
+                    continue
+    except OSError:
+        return total
+    return total
+
+
 def deepread(path: str) -> dict:
     """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
     removed = _fresh_outputs_v0119("deepread")   # 清場律:先刪前次結果
@@ -1139,9 +1166,11 @@ def deepread(path: str) -> dict:
                              "why": f"{type(exc).__name__}: {str(exc)[:100]}"})
         else:
             skipped += 1
+    total = _scan_size_v0119(p)   # os.scandir 批量統計(Top6 之 3:快取 metadata 少 syscalls)
     return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
             "cleaned_prev": removed, "total_files": len(files), "stock_reports": len(rows),
-            "non_stock_skipped": skipped, "rows": rows}
+            "non_stock_skipped": skipped,
+            "folder_size_bytes": total, "folder_size_h": PRIOR.size_h(total), "rows": rows}
 
 
 def _dump_result_v0119(verb: str, out: dict) -> None:
@@ -1410,6 +1439,8 @@ def selftest() -> int:
                 and rdx["analyst_broker"] == "HUANAN")
         else:
             chk("㊸ WORD 車道座誠實(ENG052 缺=UNAVAILABLE)", "UNAVAILABLE" in dx["state"] or dx["mod"] is None)
+        chk("㊹ 夾層大小批量統計(os.scandir):folder_size 欄>0 且人讀格式",
+            out_b.get("folder_size_bytes", 0) > 0 and out_b.get("folder_size_h", "").endswith(("KB", "MB", "B")))
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
