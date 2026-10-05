@@ -1337,6 +1337,70 @@ def real_test(path: str, max_min: int = 45) -> dict:
                       "樣本": n_samples, "輸出": len(outs), "紅字": len(errors)}]}
 
 
+def _fn_b_ruler_v0119():
+    """另一支負責引擎(收容件 audit_ssot;零觸碰,import 不跑它的 main):回 (module, rules, brokers) 或 (None, why)。"""
+    pkg = HERE / "references" / "intake" / "VIA_SSOT_Additive_Audit_v0100_b20260921"
+    try:
+        spec = importlib.util.spec_from_file_location("audit_ssot_for_fncheck", str(pkg / "audit_ssot.py"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        inst = m.read_json(pkg / "baseline" / "VIA_Financial_Institution_SSOT_v0100.json")["registries"]
+        rules = m.read_json(pkg / "baseline" / "VRN_FieldRules_SSOT_v0100.json")["rules"]
+        brokers, _ = m.indexes(inst, rules, m.read_json(pkg / "baseline" / "broker_list.json"),
+                               m.read_json(pkg / "baseline" / "intake_rating.json"))
+        return (m, rules, brokers), None
+    except Exception as exc:   # 收容件層例外型別雜;B 路缺=誠實單路,不吞
+        return None, f"{type(exc).__name__}: {str(exc)[:80]}"
+
+
+def fn_check(path: str) -> dict:
+    """FILENAME 五步對照(批1657 操作員令「中英文標點轉換處切開 · 四碼=台股 TICKER · 長數字=REPORT DATE ·
+    四碼去資料庫抓中文簡稱 Name · 剩下段=券商同義字 · 檔案大小格式加入 · 對照另一個負責引擎看差異」):
+    A 路=VRN 正統鏈(v0118 parse_filename:tokenize 切段→codes→date→company_name→broker_std;
+    universe 資料庫補中文簡稱;size_h 大小格式);B 路=收容件 audit_ssot.parse_filename/extract_broker。
+    逐檔逐欄對照,diff 列出不同欄與兩路值;B 路載不到=誠實 B_UNAVAILABLE 照出 A 路。"""
+    base = Path(path)
+    files = sorted(q for q in base.rglob("*") if q.is_file()) if base.is_dir() else [base]
+    b, b_why = _fn_b_ruler_v0119()
+    uf = PRIOR._universe_file() if hasattr(PRIOR, "_universe_file") else None
+    rows = []
+    for q in files:
+        fn = PRIOR.parse_filename(q.stem)
+        name, nsrc = fn.get("company_name"), "filename"
+        if name is None and fn["codes"] and uf:   # 四碼去資料庫抓中文簡稱
+            try:
+                for ln0 in uf.read_text(encoding="utf-8", errors="replace").splitlines():
+                    if re.match(rf"^\s*\"?{re.escape(fn['codes'][0])}\b", ln0):
+                        parts = [x.strip().strip('"') for x in ln0.split(",")]
+                        name, nsrc = (parts[1] if len(parts) > 1 and parts[1] else None), "universe(資料庫)"
+                        break
+            except OSError:
+                nsrc = "universe 讀取失敗"
+        row = {"filename": q.name, "切段": "|".join(fn.get("fn_tokens") or []),
+               "ticker_A": ",".join(fn["codes"]) or None, "date_A": fn["report_date"],
+               "name": name, "name_source": (nsrc if name else ("VDF 車道待取" if fn["codes"] else None)),
+               "broker_A": fn["broker_std"], "size_h": PRIOR.size_h(q.stat().st_size if q.exists() else None)}
+        if b:
+            m, rules, brokers = b
+            pb = m.parse_filename(q.name, rules, brokers)
+            row.update({"ticker_B": ",".join(pb["ticker_candidates"]) or None,
+                        "date_B": pb["report_date"], "broker_B": pb["broker"]["value"]})
+            diff = [k for k, a2, b2 in (("ticker", row["ticker_A"], row["ticker_B"]),
+                                        ("date", row["date_A"], row["date_B"]),
+                                        ("broker", row["broker_A"], row["broker_B"])) if a2 != b2]
+            row["diff"] = diff or None
+            row["lamp"] = "綠" if not diff else "黃"
+            row["state"] = "兩路同" if not diff else "差異:" + ",".join(diff)
+        else:
+            row.update({"state": "B_UNAVAILABLE(" + (b_why or "?") + ")", "lamp": "黃"})
+        rows.append(row)
+    from collections import Counter
+    return {"verb": "fn-check", "manager": TAG, "b_ruler": ("audit_ssot(收容件)" if b else "缺:" + (b_why or "")),
+            "total": len(rows), "tally": dict(Counter(r["lamp"] for r in rows)),
+            "diff_tally": dict(Counter(d for r in rows for d in (r.get("diff") or []))),
+            "rows": rows}
+
+
 def vdf_fetch(args: list) -> dict:
     """VRN↔VDF 相連指令(批1657 操作員令「寫一個指令連接 VDF SYSTEM MANAGER…支援擷取自資料庫或單獨擷取」):
     經 VCGC 資料中介(CGC_MDL239 尾版)一線式要料——① 先讀庫(EngineBus 掃的 duckdb/Parquet 目錄);
@@ -1439,6 +1503,15 @@ def main(argv=None) -> int:
         out = deepread(a[1])
         emit_matrix_html("deepread", out)
         _dump_result_v0119("deepread", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0
+    if a[:1] == ["fn-check"]:   # 批1657:FILENAME 五步對照(A=VRN 鏈 · B=收容件引擎 · 差異表)
+        if len(a) < 2:
+            print("[拒跑] fn-check <檔|夾>")
+            return 2
+        out = fn_check(a[1])
+        emit_matrix_html("fn_check", out)
+        _dump_result_v0119("fn_check", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["vdf-fetch"]:   # 批1657:VRN↔VDF 相連(中介讀庫→轉交 VDF 單獨擷取)
@@ -1773,6 +1846,16 @@ def selftest() -> int:
             _rb["state"] == "RECONSTRUCTED")
     _d1.close()
     _d2.close()
+    with tempfile.TemporaryDirectory() as _ft:
+        for _n in ("凱基投顧_1476 儒鴻_劉昃恩_20260519.pdf", "3014TT-20231005.pdf", "華南投顧-6143-振曜-1141128.pdf"):
+            (Path(_ft) / _n).write_text("x", encoding="utf-8")
+        _fc = fn_check(_ft)
+        _r36 = next(r for r in _fc["rows"] if r["filename"].startswith("3014TT"))
+        chk("51 fn-check 五步對照:切段/ticker/date/name/broker/size 欄在 · B 路(收容件)對得上 3014TT · ROC 日期兩路同",
+            _fc["total"] == 3 and all(k in _r36 for k in ("切段", "ticker_A", "date_A", "size_h"))
+            and (_fc["b_ruler"].startswith("audit_ssot")
+                 and _r36.get("ticker_B") == "3014" and _r36.get("lamp") in ("綠", "黃")
+                 or _fc["b_ruler"].startswith("缺")))
     _vf = vdf_fetch(["tw_listings", "codes=2330"])
     chk("㊿ vdf-fetch 相連口:經 CGC_MDL239 中介 · 回 state/record · 誠實態(OK/ABSENT/RED/黃)不吞",
         _vf.get("verb") == "vdf-fetch" and _vf.get("state")
