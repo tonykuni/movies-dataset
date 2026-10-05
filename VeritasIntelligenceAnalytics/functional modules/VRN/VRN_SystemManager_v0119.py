@@ -126,7 +126,8 @@ def _central_regex_v0119() -> dict:
             "date": re.compile(pat("RX_TIME_CONTENT_DATE", r"(20[2-3]\d)[./年\-](\d{1,2})[./月\-](\d{1,2})日?")),
             "email": re.compile(pat("RX_EMAIL_STD", r"[\w.+-]+@[\w-]+\.[\w.-]+")),
             "tel": re.compile("(" + pat("RX_TEL_TAIPEI", r"(?:\+?886[- ]?2|\(02\)|02)[- ]?\d{4}[- ]?\d{4}")
-                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}") + ")"),
+                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}")
+                              + "|" + pat("RX_TEL_TW_ANY", r"(?:\+?886[-\s]?|\(0\d\)\s?|0)\d(?:[-\s]?\d){7,9}") + ")"),
             "date_en": re.compile(pat("RX_DATE_ENGLISH",
                 r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(\d{4})")),
             "rating": re.compile("(?i)(" + "|".join(_wordish_v0119(t) for t in rating) + ")"),
@@ -134,7 +135,14 @@ def _central_regex_v0119() -> dict:
                              + r")[^\d]{0,15}((?:\d{1,3}(?:,\d{3})+|\d{2,5})(?:\.\d+)?)"),
             "tp_defense": re.compile(pat("RX_TARGET_PRICE_DEFENSE",
                 r"(?i)(?:Target|目標(?:價)?)\s*[:：$]?\s*[\d,]+(\.\d+)?")),
+            "tp_ntd": re.compile(pat("RX_TARGET_PRICE_NTD",
+                r"(?:NT\$|NT\s?\$|目標價[:：]?\s*)\s*([0-9][0-9,]*\.?\d*)")),
             "tp_strips": [str(x) for x in (syn.get("TARGET_PRICE_STRIPS") or ["NT$", "TWD", "上看", "下看", "元"])],
+            "rating_code": {str(a).lower(): (std, e.get("code"))
+                            for std, e in (syn.get("RATING_CODEBOOK_MASTER") or {}).items()
+                            for a in e.get("aliases", [])},
+            "quarter": re.compile(pat("RX_YEAR_QUARTER", r"(?:(?:20)?\d{2}(?:\.|\s*)?Q[1-4])")),
+            "tw_fin": dict(syn.get("TW_FIN_DICT") or {}),
             "name_zh": re.compile(pat("RX_NAME_ZH", r"[\u4e00-\u9fa5]{2,4}")),
             "name_en": re.compile("(" + pat("RX_NAME_EN_STD", r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b")
                                   + "|" + pat("RX_NAME_EN_SURNAME_FIRST", r"\b[A-Z][A-Z]+(?:\s+[A-Z][a-zA-Z\-]+){1,3}\b")
@@ -192,6 +200,11 @@ def _target_price_v0119(crx, *texts) -> float | None:
                 if _tp_ok_v0119(v2):
                     return v2
     for t in texts:
+        for m in crx["tp_ntd"].finditer(t):   # NT$ 前綴式(上傳 v0101 實證)先於泛防禦式
+            v = float(m.group(1).replace(",", "")) if m.group(1) else None
+            if v and _tp_ok_v0119(v) and t[m.end():m.end() + 1] not in _TP_UNIT_BAD:
+                return v
+    for t in texts:
         for m in crx["tp_defense"].finditer(t):
             n = re.search(r"[\d,]+(?:\.\d+)?", m.group(0))
             if not n:
@@ -226,7 +239,7 @@ def _pick_rating_v0119(crx, info: str, whole: str):
     return reit
 
 
-def _fn_analyst_v0119(stem: str, crx) -> str | None:
+def _fn_analyst_v0119(stem: str, crx, company: str | None = None) -> str | None:
     """檔名中的分析師名(實測紅:KGI 式 …_代號 公司_姓名_日期,name 卻 null)。
     代號獨立成段時其下一段視為公司名跳過;首段視為券商;餘 2–4 字純中文段取最後一個。"""
     segs = [x.strip() for x in re.split(r"[_\-]", stem) if x.strip()]
@@ -235,9 +248,11 @@ def _fn_analyst_v0119(stem: str, crx) -> str | None:
     if code_i is not None and not re.search(r"[\u4e00-\u9fa5]", segs[code_i]) and code_i + 1 < len(segs):
         skip.add(code_i + 1)
     bm = PRIOR._broker_map()
+    comp0 = (company or "").replace("-KY", "")
     cands = [sg for i, sg in enumerate(segs)
              if i not in skip and i != 0 and crx["name_zh"].fullmatch(sg)
-             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)]
+             and sg.lower() not in bm and not any(w in sg for w in _NAME_STOP)
+             and sg not in (company, comp0)]   # 公司名不是分析師(實測紅:志強)
     return cands[-1] if cands else None
 
 
@@ -321,13 +336,40 @@ def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> di
         return {"state": "ERROR", "why": f"{type(exc).__name__}: {str(exc)[:80]}"}
 
 
+_FINLEX_CACHE = None
+
+
+def _fin_lex_v0119() -> frozenset:
+    """財報科目詞庫(SYNC ALL 之 fin_account 632 條,聯集冊尾版 + TW_FIN_DICT 16 詞):
+    財報頁偵測共用;正則樣式別名濾除,缺冊退 _FIN_KW 誠實。"""
+    global _FINLEX_CACHE
+    if _FINLEX_CACHE is None:
+        words = set(_FIN_KW) | set(_central_regex_v0119()["tw_fin"].keys())
+        try:
+            reg = HERE.parents[1] / "supportive modules" / "registry"
+            hits = sorted(reg.glob("VIA_SSOT_SynonymUnion_v*.json"))
+            d = json.loads(hits[-1].read_text(encoding="utf-8"))
+            for alias in (d.get("scopes", {}).get("fin_account") or {}):
+                a = str(alias).strip()
+                if 2 <= len(a) <= 8 and re.search(r"[\u4e00-\u9fff]", a) \
+                   and not re.search(r"[()\[\]?*+|\\]", a):
+                    words.add(a)
+        except (OSError, ValueError, KeyError) as exc:
+            words.add(f"_載冊失敗{type(exc).__name__}")   # 誠實記,不吞(偵測照 _FIN_KW 走)
+        _FINLEX_CACHE = frozenset(words)
+    return _FINLEX_CACHE
+
+
 def _fin_pages_v0119(doc) -> dict:
-    """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
+    """年度財務頁偵測:年份序列≥3 + 財報科目詞(fin_account 詞庫)≥2 + 數字密度;
+    回頁碼與樣本列,交 ENG400 表格梯。"""
     pages, sample = [], ""
+    lex = _fin_lex_v0119()
     for i in range(1, min(len(doc), 30)):   # 首頁另路(first_page_zones),財報頁從第 2 頁起(實測紅:p1 誤入)
         t = doc[i].get_text()
         years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
-        kws = sum(1 for k in _FIN_KW if k in t)
+        kws = sum(1 for k in lex if k in t)
+        kws = min(kws, 99)
         nums = len(re.findall(r"\d+\.\d+", t))
         if years >= 3 and kws >= 2 and nums >= 8:
             pages.append(i + 1)
@@ -341,6 +383,14 @@ def _fin_pages_v0119(doc) -> dict:
 
 _GENERIC_MAILBOX = {"research", "media_request", "service", "info", "contact", "support",
                     "ir", "sales", "admin", "webmaster", "marketing", "news", "press"}
+_EN_NAME_STOP = {"morgan", "broking", "securities", "research", "limited", "ltd", "capital",
+                 "markets", "group", "bank", "global", "asia", "taiwan", "equity", "report",
+                 "stanley", "sachs", "goldman", "questions", "requests", "media", "disclosure"}
+
+
+def _en_namish_v0119(c: str) -> bool:
+    """英文姓名候選不得含公司/機構詞(實測紅:Morgan Broking 被當人名)。"""
+    return not any(t.lower().strip(".,") in _EN_NAME_STOP for t in c.split())
 _ANALYST_PATTERNS = (r"(?:分析師|研究員)[::\s]*([\u4e00-\u9fa5]{2,4})(?![\u4e00-\u9fa5])",
                      r"(?<![\u4e00-\u9fa5])([\u4e00-\u9fa5]{2,3})\s*(?:分析師|研究員)執?筆?")
 
@@ -382,8 +432,9 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                and not any(w in c for w in tw) \
                and not any(w in c for w in _NAME_STOP) \
                and (crx["name_zh"].fullmatch(c) or crx["name_en"].fullmatch(c)
-                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
-                name, src = c, "info_zone"   # R1 姓名式驗證(中央冊 7 式):非姓名樣式不收
+                    or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)) \
+               and (not c.isascii() or _en_namish_v0119(c)):
+                name, src = c, "info_zone"   # R1 姓名式驗證 + EN 公司詞閘
                 break
     if name is None and title:   # R1 後備:職稱同行剝職稱;結果同樣過黑名單+姓名式
         for ln in lines:
@@ -414,7 +465,7 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                         name, src = c, "email_near"
                         break
                     me = crx["name_en"].search(c)
-                    if me and len(c) <= 40:
+                    if me and len(c) <= 40 and _en_namish_v0119(me.group(0)):
                         name, src = me.group(0), "email_near"
                         break
                 break
@@ -435,12 +486,20 @@ def _analyst_v0119(info: str, whole: str | None = None) -> dict:
                 if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
                     broker_mail = target
                     break
+    coauthor = None
+    if name and name.isascii() and em and name_en:   # 名與信箱不同人=共同作者(實測紅:Michael Hung vs carrie.liu)
+        local_toks = {t.lower() for t in re.split(r"[._\-]+", em.group(0).partition("@")[0]) if t}
+        name_toks = {t.lower().strip(".,") for t in name.split()}
+        if not (local_toks & name_toks):
+            coauthor, name, src = name, name_en, "email_local(主作者=信箱持有人;原抽名列共同作者)"
+    if name is None and name_en:   # 後備:@前推名律(UBS/Citi 有信箱沒名)
+        name, src = name_en, "email_local"
     first = last = None   # 英文姓名分拆(操作員令:英文姓名要分拆好)
     if name_en:
         parts = name_en.split()
         if len(parts) >= 2:
             first, last = parts[0], parts[-1]
-    return {"analyst_name": name, "analyst_name_source": src,
+    return {"analyst_name": name, "analyst_name_source": src, "analyst_coauthor": coauthor,
             "analyst_contact_generic": bool(em) and ((not re.search(r"[A-Za-z]", em.group(0).partition("@")[0]))
                                                      or em.group(0).partition("@")[0].lower() in _GENERIC_MAILBOX),
             "analyst_title": title, "analyst_title_std": title_std,
@@ -842,6 +901,7 @@ def reconstruct(path: str) -> dict:
                 L.append(f"[{k}]")
                 L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
             L.append("")
+            zone12_end = len(L)   # REVERIFY 域界:區一+區二止(首輪只掃第一頁,同域才公平)
             for pno in [x for x in fps[:3] if x != 1]:
                 pz = fin_page_zones(doc[pno - 1])
                 L.append(f"PAGE {pno}")
@@ -856,7 +916,7 @@ def reconstruct(path: str) -> dict:
                          if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
-            rebuilt = "\n".join(L[6:])   # REVERIFY 只對三大區本體(表頭 6 行與 SUMMARY 不入,防自證污染)
+            rebuilt = "\n".join(L[6:zone12_end])   # REVERIFY=區一+區二(表頭/區三/SUMMARY 不入;實測紅:財報頁日期假性不一致)
             rv = {"評等": _pick_rating_v0119(crx, rebuilt, ""), "目標價": _target_price_v0119(crx, rebuilt),
                   "日期": _content_date_v0119(crx, rebuilt)}
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
@@ -960,7 +1020,10 @@ def deepread_one(path: Path) -> dict:
                                     ("MISS" if c_code and fn["codes"] else "ONE_SIDE"),
                     "broker_match": "MATCH" if (c_broker and c_broker == fn["broker_std"]) else
                                     ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
-                    "rating": rtw, "target_price": tpv,
+                    "rating": rtw,
+                    "rating_std": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[0],
+                    "rating_code": (crx["rating_code"].get((rtw or "").lower()) or (None, None))[1],
+                    "target_price": tpv,
                     "bloomberg_ticker": f"{code} TT" if code else None})
         row["size_h"] = PRIOR.size_h(row.get("size_bytes"))
         comp, comp_src = fn.get("company_name"), "filename"
@@ -987,7 +1050,7 @@ def deepread_one(path: Path) -> dict:
             row["broker_source"] = src_broker
         row.update(_analyst_v0119(info, whole))
         if row.get("analyst_name") is None:
-            fnn = _fn_analyst_v0119(path.stem, crx)
+            fnn = _fn_analyst_v0119(path.stem, crx, fn.get("company_name"))
             if fnn:
                 row["analyst_name"], row["analyst_name_source"] = fnn, "filename"   # R4
         if row.get("content_broker") is None and row.get("analyst_broker"):
@@ -1029,6 +1092,18 @@ def deepread(path: str) -> dict:
             "non_stock_skipped": skipped, "rows": rows}
 
 
+def _dump_result_v0119(verb: str, out: dict) -> None:
+    """結果落檔 RESULT_<verb>_latest.json(操作員貼回免撈 console;寫不進不擋主流程,誠實印)。"""
+    try:
+        ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+        ui.mkdir(parents=True, exist_ok=True)
+        fp = ui / f"RESULT_{verb}_latest.json"
+        fp.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"  [結果檔] {fp}")
+    except OSError as exc:
+        print(f"  [結果檔] 寫入失敗 {type(exc).__name__}(主流程照走)")
+
+
 def main(argv=None) -> int:
     if os.environ.get("VIA_FROM_VCGC") != "YES":
         print("[VRN] 拒絕。只能經 via-vcgc。")
@@ -1044,6 +1119,7 @@ def main(argv=None) -> int:
             return 2
         out = reconstruct(a[1])
         PRIOR.emit_matrix_html("reconstruct", out)
+        _dump_result_v0119("reconstruct", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["layout-check"]:
@@ -1052,6 +1128,7 @@ def main(argv=None) -> int:
             return 2
         out = layout_check(a[1])
         PRIOR.emit_matrix_html("layout_check", out)
+        _dump_result_v0119("layout_check", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     if a[:1] == ["deepread"]:
@@ -1060,6 +1137,7 @@ def main(argv=None) -> int:
             return 2
         out = deepread(a[1])
         PRIOR.emit_matrix_html("deepread", out)
+        _dump_result_v0119("deepread", out)
         print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
         return 0
     return PRIOR.main(args)   # intake/eps-check/reconcile/closeout 照前版鏈
@@ -1242,6 +1320,32 @@ def selftest() -> int:
         chk("㊳ 公司名+人讀 SIZE 入列:合成檔 company 欄存在 · size_h 格式",
             "company_name" in r and r["size_h"].endswith(("KB", "MB", "B"))
             and r.get("company_source") in ("filename", "universe(VDF 資料家)", "VDF 車道待取(本地無 universe)"))
+        a10 = _analyst_v0119("Michael Hung\nAnalyst\ncarrie.liu@citi.com")
+        a11 = _analyst_v0119("Morgan Broking\nAnalyst\ngokul.hariharan@jpmorgan.com")
+        a12 = _analyst_v0119("x\njerry.su@ubs.com")
+        chk("㊴ 共同作者律+公司詞閘+推名後備:信箱持有人為主作者 · Morgan Broking≠人名 · 有信箱必有名 · 公司名≠分析師",
+            a10["analyst_name"] == "Carrie Liu" and a10["analyst_coauthor"] == "Michael Hung"
+            and a11["analyst_name"] == "Gokul Hariharan" and a11["analyst_coauthor"] is None
+            and a12["analyst_name"] == "Jerry Su"
+            and _fn_analyst_v0119("20251204兆豐個股報告-志強-KY(6768)", crx24, "志強-KY") is None)
+        _dump_result_v0119("deepread", out_b)
+        rc3 = reconstruct(str(td))
+        chk("㊵ REVERIFY 域=區一+區二 · 結果檔落地",
+            (Path(os.environ["VIA_VRN_UI_DIR"]) / "RESULT_deepread_latest.json").is_file()
+            and [x for x in rc3["rows"] if x["filename"] == pdf.name][0]["reverify"] == "一致")
+        lex = _fin_lex_v0119()
+        chk("㊶ SSOT 全接 VRN Manager:fin_account 詞庫>300 · 評等正碼 買進→Buy/2 SS→Strong_Sell/5 未評等→Not_Rated/0 · 季度式 25Q1 · TW_FIN_DICT 16",
+            len(lex) > 150 and "每股盈餘" in lex and "營業毛利" in lex
+            and crx24["rating_code"]["買進"] == ("Buy", 2)
+            and crx24["rating_code"]["ss"] == ("Strong_Sell", 5)
+            and crx24["rating_code"]["未評等"] == ("Not_Rated", 0)
+            and crx24["quarter"].search("25Q1 財測") and len(crx24["tw_fin"]) == 16
+            and r["rating_std"] == "Buy" and r["rating_code"] == 2)
+        chk("㊷ 上傳收割接線:全台手機電話可認 · NT$ 目標價式 · Equal-Weight→Hold/3",
+            crx24["tel"].search("0912-345-678")
+            and _target_price_v0119(crx24, "NT$ 1,085 維持") == 1085.0
+            and _pick_rating_v0119(crx24, "評等:Equal-Weight", "") == "Equal-Weight"
+            and crx24["rating_code"]["equal-weight"] == ("Hold", 3))
         rep = repair_sentences_v0119([{"text": "營收成長強勁,\n我們上修預估。\n後續動能 延續", "max_size": 10.0},
                                       {"text": "台積電 法說會 快報", "max_size": 16.0}])
         chk("㉞ 斷句修復:接到句點成段 · CJK 去空格 · 標題不接",
