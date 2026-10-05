@@ -998,9 +998,18 @@ def reconstruct(path: str) -> dict:
             L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
                   "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
             rebuilt = "\n".join(L[6:zone12_end])   # REVERIFY=區一+區二(表頭/區三/SUMMARY 不入;實測紅:財報頁日期假性不一致)
-            rb_scan = re.sub(r"\s*\|\s*", " ", rebuilt)   # 去自家格線「|」(渲染物非原文;實測黃批1657:假性不一致)
+            rb_scan = re.sub(r"^\[[^\]\n]{1,12}\]$", "", rebuilt, flags=re.M)   # 去自家元件標記行([文字]/[表格]/[Lv]…渲染物非原文)
+            rb_scan = re.sub(r"\s*\|\s*", " ", rb_scan)   # 去自家格線「|」(實測黃批1657:假性不一致)
             rv = {"評等": _pick_rating_v0119(crx, rb_scan, ""), "目標價": _target_price_v0119(crx, rb_scan),
                   "日期": _content_date_v0119(crx, rb_scan)}
+            rv_lane = "標準"
+            if (rv["目標價"] is None and tp is not None) or (rv["日期"] is None and c_date1 is not None):
+                flat = re.sub(r"\n+", " ", rb_scan)   # 二次攤平掃:斷行是自家渲染,label 與數值被切行時補救(評等行閘不攤)
+                if rv["目標價"] is None and tp is not None:
+                    rv["目標價"] = _target_price_v0119(crx, flat)
+                if rv["日期"] is None and c_date1 is not None:
+                    rv["日期"] = _content_date_v0119(crx, flat)
+                rv_lane = "攤平二掃"
             first = {"評等": rt, "目標價": tp, "日期": c_date1}
             L += ["", "REVERIFY(重建後再識別驗證;LAYOUT NLP 支援到底)", "| 項目 | 首輪 | 重建後 | 判 |"]
             rv_ok, rv_diff = True, {}
@@ -1015,6 +1024,7 @@ def reconstruct(path: str) -> dict:
             rows.append({"filename": q.name, "state": "RECONSTRUCTED",
                          "pages": [1] + [x for x in fps[:3] if x != 1], "fn_locked": fn_lock,
                          "moved_tables_to_info": moved, "reverify": "一致" if rv_ok else "不一致",
+                         "reverify_lane": rv_lane,
                          **({"reverify_diff": rv_diff} if rv_diff else {}),
                          "extract_lane": lane, "nlp_hub": _nlp_v0119()["state"],
                          "out": out_p.name, "lamp": "綠" if rv_ok else "黃"})
