@@ -53,6 +53,20 @@
 RATING_FIELD 等詞彙已在 `VIA_SSOT_SynonymUnion_v0103`(SYN285–297,中央聯集);
 券商簡稱 SYN199–282 在冊。**本流程無新增同義字缺口**;新詞一律走中央聯集冊尾版,不散落。
 
+## 四之一、短主令(2026-10-05 全面盤點;以後每輪更新附一個短指令群不漏)
+```powershell
+via-vcgc run VRN_SystemManager intake "C:\測試樣本報告"        # 檔名律+自動矩陣
+via-vcgc run VRN_SystemManager deepread "C:\測試樣本報告"      # 首頁深讀互證(FILENAME 鎖定·OCR 梯·NLP 座)
+via-vcgc run VRN_SystemManager layout-check "C:\測試樣本報告"  # 切割/階層/混排/文字修復驗證
+via-vcgc run VRN_SystemManager reconstruct "C:\測試樣本報告"   # 三大區重現+REVERIFY 再識別
+via-vcgc run VRN_SystemManager eps-check --report … --basic … --diluted …   # EPS 身分核對
+via-vcgc registry-sync --apply                                  # 編號登錄(先 commit 再發號)
+```
+今日新律索引:自動 U/I 矩陣(每動作)· 清場律 · FILENAME 鎖定律 · 斷句修復(接句點/標題不接/TRIM)·
+三大區(本文/資訊/財報)+REVERIFY · 梯=非OCR→NLP LAYOUT 修復鏈→輕OCR→重型 · 每步驟掛 LAYOUT NLP 座
+(SUP_MDL866+PRADDLE)· 分析師六律 R1–R6 · 券商短縮寫(MEGA/MCQ)+域名別名 · 頁圖/假ETF 不收 ·
+NO_TEXT_LAYER 誠實態 · 估值法/職稱/姓名式/財報比率 29 式入中央冊 · SYN +272 發號三零。
+
 ## 五、掛載
 工作流:`VIA_Workflow_VRN_SSOT_v0105.json` **VRN-WKF009(single_stock_report)**,九步,
 每步正主可尋尾版;需求 `VRN-REQ017` 雙向掛載(`VIA_Requirements_SSOT_v0172.json`)。
