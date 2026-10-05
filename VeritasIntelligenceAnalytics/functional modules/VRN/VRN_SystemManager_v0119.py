@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""VRN_SystemManager v0119 — 薄尾:deepread 首頁深讀驗證(操作員令 2026-10-05「58檔實際讀取PDF內容」)。
+
+對 intake 認定的個股報告,實際開 PDF 讀內容,引擎實測驗證並擴欄:
+  ① 檔名律 vs 內文互證:REPORT DATE / TICKER / BROKER 內文重抽,逐項 MATCH/MISS 燈語
+  ② 版面兩區(照正典一、3):首頁切 左=本文區(left main text)· 右=資訊區(right info segment);
+     資訊區側別由關鍵詞密度定(目標價/評等/收盤/分析師/@/Tel…),左右都可
+  ③ 資訊區抽取:rating(評等)· target price(目標價)· analyst name/title/email/tel
+  ④ 代號衍生:bloomberg ticker=「#### TT」· yfinance ticker=####.TW/.TWO
+     (市別查本地 universe 清單;查不到=兩候選並列,派 VDF 車道定盤,不猜)
+  ⑤ 年度財務頁(financial data on annual financial pages):年份序列+財務關鍵詞+數字密度
+     合格頁清單與樣本列(EPS/營收/淨利…),供 ENG400 表格梯接手
+  ⑥ 外部價:adj close(最新)· adj close before report date(報告日前最後交易日)·
+     target price(adj)=TP×(調整後/未調整收盤比);VIA_NO_NET 或 yfinance 缺=誠實 SKIPPED
+  ⑦ SIZE 實量測(stat bytes);.docx/.txt 誠實 NON_PDF_SKIP(另路,不假裝讀過)
+每動作自動 U/I 矩陣照 v0118 律(deepread 也跳);券商一律短英文縮寫(兆豐=MEGA·麥格理=MCQ,
+同義字冊 v0105 裁定)。intake/eps-check/reconcile/closeout 照前版鏈。
+自測: VIA_FROM_VCGC=YES python VRN_SystemManager_v0119.py --selftest(合成 PDF 實開實讀)
+"""
+from __future__ import annotations
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: F401
+except ImportError:
+    VIA_ACCEL = None
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+import importlib.util
+import json
+import os
+import re
+import sys
+import tempfile
+from pathlib import Path
+
+TAG = "v0119"
+HERE = Path(__file__).resolve().parent
+_STEM = "VRN_SystemManager"
+
+
+def _vnum_v0119(path) -> int:
+    m = re.search(r"_v(\d{4})$", Path(path).stem)
+    return int(m.group(1)) if m else -1
+
+
+def _load_v0119(path: Path, name: str):
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, path)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        spec.loader.exec_module(mod)
+    return sys.modules[name]
+
+
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0119(p) < _vnum_v0119(__file__)),
+                 key=_vnum_v0119)
+PRIOR = _load_v0119(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
+
+
+def __getattr__(name):
+    return getattr(PRIOR, name)
+
+
+# ────────────────── 深讀律 v0119(抽取式全走 SSOT 冊,不散落) ──────────────────
+_INFO_KW = ("目標價", "評等", "收盤", "市值", "股價", "分析師", "Target", "Rating", "Close", "@", "Tel", "TEL", "電話")
+_TITLE_WORDS = ("分析師", "研究員", "協理", "資深副總", "Analyst", "Research")
+_FIN_KW = ("EPS", "每股盈餘", "營收", "淨利", "毛利", "ROE", "股本", "營業利益", "Revenue", "Net income", "稅後")
+_CRX_CACHE = None
+
+
+def _wordish_v0119(term: str) -> str:
+    """ASCII 詞加字母邊界(TP≠STOP);CJK 原樣。"""
+    e = re.escape(term)
+    return r"(?<![A-Za-z])" + e + r"(?![A-Za-z])" if term.isascii() else e
+
+
+def _central_regex_v0119() -> dict:
+    """中央 REGEX/同義字冊尾版(VIA_Central_Synonym_Regex_v*;操作員令 2026-10-05):
+    三種台股代碼(TWEquityTicker/TWEquityYFTicker/TWEquityBBGTicker,批118 LOCKED)·
+    RATING_* 字典 · TARGET_PRICE 字典 · TIME/EMAIL/台北+香港 TEL 式全走冊;
+    BROKER 字典照 _broker_map(VRN_Broker_Dict+SynonymUnion 尾版)。缺鍵=誠實記 _notes 用內建後備。"""
+    global _CRX_CACHE
+    if _CRX_CACHE is None:
+        reg = HERE.parents[1] / "supportive modules" / "registry"
+        hits = sorted(reg.glob("VIA_Central_Synonym_Regex_v*.json"))
+        rx, syn, notes = {}, {}, []
+        if hits:
+            try:
+                d = json.loads(hits[-1].read_text(encoding="utf-8"))
+                rx = {k: v.get("pattern") for k, v in (d.get("regex") or {}).items() if isinstance(v, dict)}
+                syn = d.get("synonyms") or {}
+            except (OSError, ValueError) as exc:
+                notes.append(f"{hits[-1].name}: {type(exc).__name__}")
+        else:
+            notes.append("VIA_Central_Synonym_Regex 冊不在")
+
+        def pat(key, fallback):
+            if rx.get(key):
+                return rx[key]
+            notes.append(f"{key}: 冊缺,用引擎內建後備")
+            return fallback
+
+        rating = sorted({str(t) for k, v in syn.items() if k.startswith("RATING_") and isinstance(v, list)
+                         for t in v} or {"買進", "中立", "賣出", "未評等"}, key=len, reverse=True)
+        if len(rating) == 4 and "買進" in rating:
+            pass  # 可能是後備;只有冊載入失敗時才會走到,notes 已記
+        tp_words = sorted({str(t) for k in ("TARGET_PRICE", "FINANCIAL_FIELD_TARGET_PRICE")
+                           for t in (syn.get(k) or [])} or {"目標價", "Target Price", "TP"}, key=len, reverse=True)
+        bbg = pat("TWEquityBBGTicker", r"^([1-9]\d{3})\s+TT$")
+        _CRX_CACHE = {
+            "ticker_bare": pat("TWEquityTicker", r"^(?:[1-9]\d{3})$"),
+            "ticker_yf": pat("TWEquityYFTicker", r"^([1-9]\d{3})\.(TW|TWO)$"),
+            "ticker_bbg": bbg,
+            "tt_in_text": re.compile(r"(?<!\d)" + bbg.strip("^$").replace(r"\s+", r"\s?")),
+            "date": re.compile(pat("RX_TIME_CONTENT_DATE", r"(20[2-3]\d)[./年\-](\d{1,2})[./月\-](\d{1,2})日?")),
+            "email": re.compile(pat("RX_EMAIL_STD", r"[\w.+-]+@[\w-]+\.[\w.-]+")),
+            "tel": re.compile("(" + pat("RX_TEL_TAIPEI", r"(?:\+?886[- ]?2|\(02\)|02)[- ]?\d{4}[- ]?\d{4}")
+                              + "|" + pat("RX_TEL_HK", r"\+?852[- ]?\d{4}[- ]?\d{4}") + ")"),
+            "rating": re.compile("(?i)(" + "|".join(_wordish_v0119(t) for t in rating) + ")"),
+            "tp": re.compile("(?i)(?:" + "|".join(_wordish_v0119(t) for t in tp_words)
+                             + r")[^\d]{0,15}(\d{2,5}(?:\.\d+)?)"),
+            "_notes": notes,
+        }
+    return _CRX_CACHE
+
+
+def _open_pdf_v0119(path: Path):
+    """PDF 引擎座:pymupdf(fitz)實開;缺/壞=誠實 (None, why),不吞。"""
+    try:
+        import fitz  # pymupdf;延遲載入
+    except ImportError:
+        return None, "pymupdf(fitz) 未裝:深讀引擎座 UNAVAILABLE,派環境計畫閘"
+    try:
+        return fitz.open(str(path)), None
+    except Exception as exc:  # fitz 開檔失敗型別不一;誠實記型別不吞細節
+        return None, f"開檔失敗 {type(exc).__name__}: {str(exc)[:80]}"
+
+
+def first_page_zones(doc) -> dict:
+    """首頁切兩區:本文區 vs 資訊區(左右皆可,關鍵詞密度定側;正典一、3)。"""
+    page = doc[0]
+    W = page.rect.width
+    blocks = page.get_text("blocks")
+    left = "\n".join(b[4] for b in blocks if b[0] <= W * 0.58)
+    right = "\n".join(b[4] for b in blocks if b[0] > W * 0.58)
+    lh = sum(left.count(k) for k in _INFO_KW)
+    rh = sum(right.count(k) for k in _INFO_KW)
+    side = "right" if rh >= lh else "left"
+    info = right if side == "right" else left
+    main = left if side == "right" else right
+    return {"info_side": side, "info_text": info, "main_text": main,
+            "info_kw_hits": max(rh, lh), "main_chars": len(main)}
+
+
+def _yf_ticker_v0119(code: str) -> dict:
+    """市別定盤:本地 universe 清單(VDF 資料家)查 上市/上櫃;查不到=兩候選並列不猜。"""
+    uf = PRIOR._universe_file() if hasattr(PRIOR, "_universe_file") else None
+    if uf:
+        try:
+            for line in uf.read_text(encoding="utf-8", errors="replace").splitlines():
+                if re.match(rf"^\s*\"?{re.escape(code)}\b", line):
+                    if any(k in line for k in ("TWO", "上櫃", "TPEx", "TPEX", "OTC")):
+                        return {"yfinance_ticker": f"{code}.TWO", "market_source": uf.name}
+                    return {"yfinance_ticker": f"{code}.TW", "market_source": uf.name}
+        except OSError as exc:
+            return {"yfinance_ticker": f"{code}.TW|{code}.TWO", "market_source": f"讀清單失敗 {type(exc).__name__}"}
+    return {"yfinance_ticker": f"{code}.TW|{code}.TWO", "market_source": "無本地清單:候選並列,派 VDF 車道定盤"}
+
+
+def _adj_close_v0119(code: str, report_date: str | None, tp: float | None) -> dict:
+    """外部價三欄:最新 adj close · 報告日前 adj close · TP(adj)=TP×調整比;離線/缺=誠實 SKIPPED。"""
+    if os.environ.get("VIA_NO_NET"):
+        return {"state": "SKIPPED_NO_NET", "why": "VIA_NO_NET=1:離線模式不碰網路"}
+    try:
+        import yfinance
+    except ImportError:
+        return {"state": "UNAVAILABLE", "why": "yfinance 未裝"}
+    try:
+        tk = _yf_ticker_v0119(code)["yfinance_ticker"].split("|")[0]
+        adj = yfinance.Ticker(tk).history(period="2y", auto_adjust=True)
+        raw = yfinance.Ticker(tk).history(period="2y", auto_adjust=False)
+        if adj is None or adj.empty:
+            return {"state": "NODATA", "why": f"{tk} 無資料,不猜"}
+        out = {"state": "OK", "ticker_used": tk,
+               "adj_close": round(float(adj["Close"].iloc[-1]), 2)}
+        if report_date:
+            upto = adj[adj.index.strftime("%Y-%m-%d") <= report_date]
+            if not upto.empty:
+                out["adj_close_before_report"] = round(float(upto["Close"].iloc[-1]), 2)
+                if tp and raw is not None and not raw.empty:
+                    rupto = raw[raw.index.strftime("%Y-%m-%d") <= report_date]
+                    if not rupto.empty and float(rupto["Close"].iloc[-1]):
+                        factor = float(upto["Close"].iloc[-1]) / float(rupto["Close"].iloc[-1])
+                        out["target_price_adj"] = round(tp * factor, 2)
+                        out["adj_factor"] = round(factor, 4)
+        return out
+    except Exception as exc:  # 網路層例外型別雜;誠實記型別
+        return {"state": "ERROR", "why": f"{type(exc).__name__}: {str(exc)[:80]}"}
+
+
+def _fin_pages_v0119(doc) -> dict:
+    """年度財務頁偵測:年份序列≥3 + 財務關鍵詞≥2 + 數字密度;回頁碼與樣本列,交 ENG400 表格梯。"""
+    pages, sample = [], ""
+    for i in range(min(len(doc), 30)):
+        t = doc[i].get_text()
+        years = len(set(re.findall(r"(?<!\d)20[1-3]\d(?!\d)", t)))
+        kws = sum(1 for k in _FIN_KW if k in t)
+        nums = len(re.findall(r"\d+\.\d+", t))
+        if years >= 3 and kws >= 2 and nums >= 8:
+            pages.append(i + 1)
+            if not sample:
+                for ln in t.splitlines():
+                    if any(k in ln for k in ("EPS", "每股盈餘")) and re.search(r"\d+\.\d+", ln):
+                        sample = ln.strip()[:120]
+                        break
+    return {"fin_pages": pages, "fin_sample": sample or None}
+
+
+def _analyst_v0119(info: str) -> dict:
+    """資訊區抽分析師:email/台北+香港 tel 式(中央冊);name/title 取含職稱詞的行,抽不到誠實 None。"""
+    crx = _central_regex_v0119()
+    em = crx["email"].search(info)
+    tel = crx["tel"].search(info)
+    name = title = None
+    for ln in info.splitlines():
+        for w in _TITLE_WORDS:
+            if w in ln:
+                title = w
+                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
+                name = cand[:30] or None
+                break
+        if title:
+            break
+    return {"analyst_name": name, "analyst_title": title,
+            "analyst_email": em.group(0) if em else None,
+            "analyst_tel": tel.group(1).strip() if tel else None}
+
+
+def deepread_one(path: Path) -> dict:
+    """單檔深讀:檔名律 → 開 PDF → 兩區 → 抽欄 → 互證燈語。全部誠實,不硬配。"""
+    fn = PRIOR.parse_filename(path.stem)
+    row = {"filename": path.name, "ext": path.suffix.lower(),
+           "size_bytes": path.stat().st_size if path.exists() else None,
+           "fn_date": fn["report_date"], "fn_codes": fn["codes"], "broker": fn["broker_std"]}
+    if path.suffix.lower() != ".pdf":
+        row.update({"state": "NON_PDF_SKIP", "lamp": "黃", "next": "docx/txt 另路(不假裝讀過)"})
+        return row
+    doc, why = _open_pdf_v0119(path)
+    if doc is None:
+        row.update({"state": "UNREADABLE", "lamp": "紅", "why": why})
+        return row
+    try:
+        z = first_page_zones(doc)
+        crx = _central_regex_v0119()
+        info, whole = z["info_text"], z["info_text"] + "\n" + z["main_text"]
+        m = crx["date"].search(whole)
+        c_date = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}" if m else None
+        tt = crx["tt_in_text"].search(whole)
+        c_code = tt.group(1) if tt else (fn["codes"][0] if fn["codes"] else None)
+        c_broker = None
+        low = whole.lower()
+        for alias, target in PRIOR._broker_map().items():
+            if (alias.isascii() and re.search(r"(?<![A-Za-z])" + re.escape(alias) + r"(?![A-Za-z])", low)) \
+               or (not alias.isascii() and alias in low):
+                c_broker = target
+                break
+        rt = crx["rating"].search(info) or crx["rating"].search(whole)
+        tp = crx["tp"].search(info) or crx["tp"].search(whole)
+        tpv = float(tp.group(1)) if tp else None
+        code = c_code or (fn["codes"][0] if fn["codes"] else None)
+        row.update({"state": "DEEPREAD", "info_side": z["info_side"],
+                    "content_date": c_date, "content_code": c_code, "content_broker": c_broker,
+                    "date_match": "MATCH" if (c_date and c_date == fn["report_date"]) else
+                                  ("MISS" if c_date and fn["report_date"] else "ONE_SIDE"),
+                    "ticker_match": "MATCH" if (c_code and fn["codes"] and c_code in fn["codes"]) else
+                                    ("MISS" if c_code and fn["codes"] else "ONE_SIDE"),
+                    "broker_match": "MATCH" if (c_broker and c_broker == fn["broker_std"]) else
+                                    ("MISS" if c_broker and fn["broker_std"] else "ONE_SIDE"),
+                    "rating": rt.group(1) if rt else None, "target_price": tpv,
+                    "bloomberg_ticker": f"{code} TT" if code else None})
+        if code:
+            row.update(_yf_ticker_v0119(code))
+            row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
+        row.update(_analyst_v0119(info))
+        row.update(_fin_pages_v0119(doc))
+        hits = [row["date_match"], row["ticker_match"], row["broker_match"]].count("MATCH")
+        row["lamp"] = "綠" if hits == 3 and tpv else ("黃" if hits else "紅")
+    finally:
+        doc.close()
+    return row
+
+
+def deepread(path: str) -> dict:
+    """深讀動詞:檔或夾;只深讀有代號的個股檔(STOCK REPORT ONLY),其餘列 SKIP 一行誠實。"""
+    p = Path(path)
+    files = sorted([q for q in p.rglob("*") if q.suffix.lower() in PRIOR._DOC_EXTS]) if p.is_dir() else [p]
+    rows, skipped = [], 0
+    for q in files:
+        if PRIOR.parse_filename(q.stem)["codes"]:
+            rows.append(deepread_one(q))
+        else:
+            skipped += 1
+    return {"verb": "deepread", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP002-004",
+            "total_files": len(files), "stock_reports": len(rows), "non_stock_skipped": skipped,
+            "rows": rows}
+
+
+def main(argv=None) -> int:
+    if os.environ.get("VIA_FROM_VCGC") != "YES":
+        print("[VRN] 拒絕。只能經 via-vcgc。")
+        return 2
+    args = list(sys.argv[1:] if argv is None else argv)
+    if "--selftest" in args[:2]:
+        return selftest()
+    as_json = "--json" in args
+    a = [x for x in args if x != "--json"]
+    if a[:1] == ["deepread"]:
+        if len(a) < 2:
+            print("[拒跑] deepread <檔|夾>")
+            return 2
+        out = deepread(a[1])
+        PRIOR.emit_matrix_html("deepread", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0
+    return PRIOR.main(args)   # intake/eps-check/reconcile/closeout 照前版鏈
+
+
+def _mk_pdf_v0119(path: Path):
+    """自測合成 PDF(標明 SYNTHETIC):左本文 + 右資訊區 + 第二頁年度財務;實開實讀不造假判。"""
+    import fitz
+    doc = fitz.open()
+    pg = doc.new_page(width=595, height=842)
+    pg.insert_textbox(fitz.Rect(36, 60, 330, 700),
+                      "SYNTHETIC SAMPLE 台積電法說會後更新。本文區:先進製程需求強勁,"
+                      "AI 動能延續。我們上修 2026 年預估。\n" * 6, fontname="china-t", fontsize=10)
+    pg.insert_textbox(fitz.Rect(360, 60, 560, 700),
+                      "2330 TT\n評等:買進\n目標價:NT$ 850\n收盤價:712\n"
+                      "分析師 王小明\nTel: 02-2345-6789\nwang.xm@brokerx.tw\n2025/08/19",
+                      fontname="china-t", fontsize=10)
+    p2 = doc.new_page(width=595, height=842)
+    p2.insert_textbox(fitz.Rect(36, 60, 560, 700),
+                      "年度財務摘要\n項目 2023 2024 2025F 2026F\n營收 2161.7 2894.3 3570.1 4210.5\n"
+                      "淨利 838.5 1173.1 1450.2 1702.8\nEPS 32.34 45.25 55.93 65.67\nROE 26.0 30.1 32.2 33.5",
+                      fontname="china-t", fontsize=10)
+    doc.save(str(path))
+    doc.close()
+
+
+def selftest() -> int:
+    p = f = 0
+
+    def chk(name, cond):
+        nonlocal p, f
+        if cond:
+            p += 1
+            print("  [OK] %s" % name)
+        else:
+            f += 1
+            print("  [FAIL] %s" % name)
+
+    os.environ["VIA_NO_NET"] = "1"
+    os.environ["VIA_NO_OPEN"] = "1"
+    td = Path(tempfile.mkdtemp(prefix="vrnsm119-"))
+    os.environ["VIA_VRN_UI_DIR"] = str(td / "ui")
+    try:
+        import fitz  # noqa: F401
+        have_fitz = True
+    except ImportError:
+        have_fitz = False
+    if have_fitz:
+        pdf = td / "MEGA-2330 20250819.pdf"
+        _mk_pdf_v0119(pdf)
+        r = deepread_one(pdf)
+        chk("① 實開實讀:state=DEEPREAD · SIZE 實量測>0", r["state"] == "DEEPREAD" and r["size_bytes"] > 0)
+        chk("② 兩區切割:資訊區=右 · 本文在左", r["info_side"] == "right")
+        chk("③ 互證三欄:date/ticker 內文=檔名 MATCH", r["date_match"] == "MATCH" and r["ticker_match"] == "MATCH")
+        chk("④ 評等+目標價:買進 · 850", r["rating"] == "買進" and r["target_price"] == 850.0)
+        chk("⑤ 分析師四欄:email/tel/職稱抽到 · 缺名誠實", r["analyst_email"] == "wang.xm@brokerx.tw"
+            and r["analyst_tel"] and r["analyst_title"] == "分析師")
+        chk("⑥ 代號衍生:bloomberg=2330 TT · yfinance 候選/定盤", r["bloomberg_ticker"] == "2330 TT"
+            and "2330.TW" in r["yfinance_ticker"])
+        chk("⑦ 年度財務頁:第 2 頁入列 · EPS 樣本列", r["fin_pages"] == [2] and "EPS" in (r["fin_sample"] or ""))
+        chk("⑧ 外部價離線誠實:SKIPPED_NO_NET", r["external_price"]["state"] == "SKIPPED_NO_NET")
+        (td / "華南投顧-3038-全台-Memo-20260916.docx").write_text("x", encoding="utf-8")
+        out = deepread(str(td))
+        chk("⑨ 夾層深讀:docx 誠實 NON_PDF_SKIP · 矩陣自動產出",
+            any(x["state"] == "NON_PDF_SKIP" for x in out["rows"])
+            and Path(PRIOR.emit_matrix_html("deepread", out)).is_file())
+    else:
+        print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
+        chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
+    chk("⑩ 短縮寫令:兆豐→MEGA · MQ/MAQ→MCQ(同義字冊 v0105)",
+        PRIOR.parse_filename("20250819兆豐個股報告-泓德能源(6873)")["broker_std"] == "MEGA"
+        and PRIOR.parse_filename("MQ-1560 20260520")["broker_std"] == "MCQ")
+    chk("⑪ 前版鏈完好:intake/eps-check/closeout 可達", callable(PRIOR.intake)
+        and callable(PRIOR.classify_eps_kind) and callable(__getattr__("closeout")))
+    crx = _central_regex_v0119()
+    chk("⑬ 抽取式全走 SSOT 冊:三代號/RATING/TP/TIME/EMAIL/台北+香港 TEL 零缺鍵",
+        crx["_notes"] == [] and crx["ticker_bare"] and ".(TW|TWO)" in crx["ticker_yf"]
+        and "TT" in crx["ticker_bbg"] and crx["rating"].search("Conviction Buy")
+        and crx["tp"].search("合理價 123.5") and crx["tel"].search("+852 2234 5678")
+        and crx["tel"].search("02-2345-6789") and not crx["rating"].search("xNRx"))
+    body = Path(__file__).read_text(encoding="utf-8")
+    chk("⑫ 帶加速器橋 · VIA_FROM_VCGC 閘 · glob 取前版", "[VIA:ACCEL-BRIDGE:v0100]" in body
+        and "VIA_FROM_VCGC" in body)
+    for k in ("VIA_NO_NET", "VIA_NO_OPEN", "VIA_VRN_UI_DIR"):
+        os.environ.pop(k, None)
+    print("[計] VRN_SystemManager_v0119 自測 %d/%d · %s" % (p, p + f, "PASS" if f == 0 else "FAIL"))
+    return 0 if f == 0 else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
