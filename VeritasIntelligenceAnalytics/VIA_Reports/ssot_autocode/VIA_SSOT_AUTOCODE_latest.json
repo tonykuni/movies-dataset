@@ -1,6 +1,6 @@
 {
  "schema": "VIA.UnifiedSSOT.AutoCode.v0100",
- "ts": "2026-10-04T02:21:33Z",
+ "ts": "2026-10-05T01:26:33Z",
  "policy": {
   "source_of_truth": "existing VIA registries remain canonical",
   "append_only": true,
@@ -145,10 +145,10 @@
    {
     "key": "stock_duckdb",
     "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
-    "exists": true,
+    "exists": false,
     "kind": "duckdb",
-    "sha256": "6c048e95425d8f5c29aba1ad78d3b4e93323911518c8aa4228c51ca87b7d8701",
-    "bytes": 1323008
+    "sha256": null,
+    "bytes": null
    },
    {
     "key": "active_etf_duckdb",
@@ -197,8 +197,8 @@
     "path": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
     "exists": true,
     "kind": "json",
-    "sha256": "369361b3248624092a9c72aecdebf98199c3c04842ec52124d91c260ed432eb0",
-    "bytes": 5824881
+    "sha256": "a201f201ed9ac6a34c1cb70aa0f83ada45658cd280435e4cf18ce65e88107025",
+    "bytes": 6042023
    },
    {
     "key": "interface_registry",
@@ -255,8 +255,8 @@
     "path": "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.json",
     "exists": true,
     "kind": "json",
-    "sha256": "87e73ef2d2af04d1a96101801c67428be74b6ac9e26fdf34281dea7e1deeb5bc",
-    "bytes": 9911
+    "sha256": "e224bd5dab539ae9b3fbe4fc74929606f4642b657d0d9cd81dc4221dc168bcec",
+    "bytes": 10453
    }
   ],
   "quarantine": [
@@ -301,8 +301,9 @@
   },
   "databases": {
    "declared": 3,
-   "present": 2,
+   "present": 1,
    "missing": [
+    "stock_duckdb",
     "active_etf_duckdb"
    ]
   },
@@ -722,11 +723,12 @@
   "engine_state": "GREEN",
   "data_state": "YELLOW",
   "missing_data_sources": [
+   "stock_duckdb",
    "active_etf_duckdb"
   ],
   "subsystem_state": {
    "VRN": "GREEN",
-   "VDF": "GREEN",
+   "VDF": "YELLOW",
    "VAP": "GREEN",
    "CGC": "GREEN"
   },
