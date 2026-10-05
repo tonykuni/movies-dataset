@@ -1950,6 +1950,45 @@
         "Register-VIA-Commands-v0272.ps1"
       ],
       "timeout_seconds": 300
+    },
+    "vdfvrn_readiness": {
+      "argv": [
+        "CGC_MDL265_VdfVrnReadiness",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL265_VdfVrnReadiness_v0100 自測 11/11 · PASS",
+      "scope": "VCGC 監控 VRN / VDF:token · RunGate · LKGC · 修理計畫(雙閘 GATED)· 覆蓋率 + L111 歸屬 · PS 短令兩段接線(pwsh mock)(VCGC-REQ170)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py",
+        "Register-VIA-Commands-v0273.ps1"
+      ],
+      "timeout_seconds": 600
+    },
+    "vdf_activate": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0129 本版 6/6 · 前版 PASS · 合計 PASS",
+      "scope": "VDF 管理員 v0129 activate:啟動前改乾跑不動帳本 · 格式錯拒 · 讀庫 · 頁寫 VIA_Reports · 環境還原(VCGC-REQ170)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py"
+      ],
+      "timeout_seconds": 1200
+    },
+    "camelot_env": {
+      "argv": [
+        "CGC_MDL266_CamelotEnv",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL266_CamelotEnv_v0100 自測 5/5 · PASS",
+      "scope": "Camelot 隔離境:境名 / python 照治理冊 · 家族件齊 · 乾跑 / GATED 不裝 · 不寫雙閘 · status 照實(VCGC-REQ171)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL266_CamelotEnv_v0100.py",
+        "supportive modules/registry/VIA_EnvGovernance_Baseline_v0101.json"
+      ],
+      "timeout_seconds": 600
     }
   },
   "work_items": [
@@ -4242,6 +4281,36 @@
       "next": "handoff test via_unified 實跑轉 VERIFIED",
       "case": "via_unified",
       "receipt": "docs/handoff/evidence/via_unified.json"
+    },
+    {
+      "id": "VCGC-REQ170:vdfvrn_readiness",
+      "requirement": "VCGC-REQ170",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdfvrn_readiness",
+      "next": "handoff test vdfvrn_readiness 實跑轉 VERIFIED",
+      "case": "vdfvrn_readiness",
+      "receipt": "docs/handoff/evidence/vdfvrn_readiness.json"
+    },
+    {
+      "id": "VCGC-REQ170:vdf_activate",
+      "requirement": "VCGC-REQ170",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdf_activate",
+      "next": "handoff test vdf_activate 實跑轉 VERIFIED",
+      "case": "vdf_activate",
+      "receipt": "docs/handoff/evidence/vdf_activate.json"
+    },
+    {
+      "id": "VCGC-REQ171:camelot_env",
+      "requirement": "VCGC-REQ171",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 camelot_env",
+      "next": "handoff test camelot_env 實跑轉 VERIFIED",
+      "case": "camelot_env",
+      "receipt": "docs/handoff/evidence/camelot_env.json"
     }
   ]
 }

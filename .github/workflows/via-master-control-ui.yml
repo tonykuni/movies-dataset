@@ -369,7 +369,7 @@ jobs:
           if (-not $tool) { Write-Host "absent Inspect-VIA-Tooling-v*.ps1"; exit 0 }
           $bad = 0
           foreach ($run in @(
-              @{ name = "cmds"; args = @{ Commands = $true; Recent = 8; PythonExe = "python" }; want = "via-tools" },
+              @{ name = "cmds"; args = @{ Commands = $true; Recent = 0; PythonExe = "python" }; want = "via-tools" },   # Recent 0 = 全部:新短令會把 via-tools 擠出「最新 8 個」,斷言不該靠新舊順序
               @{ name = "card"; args = @{ Card = "supportive modules\registry\CGC_MDL253_ToolingInventory_v0100.py"; PythonExe = "python" }; want = "via-tools" })) {
             $p = $run.args
             $out = & $tool.FullName @p 2>&1 | Out-String
