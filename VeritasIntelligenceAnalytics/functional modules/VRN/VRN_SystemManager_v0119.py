@@ -373,11 +373,14 @@ def _analyst_v0119(info: str) -> dict:
                     or crx["name_mixed"].fullmatch(c) or crx["name_mixed2"].fullmatch(c)):
                 name = c   # 姓名式驗證(中央冊 7 式):非姓名樣式不收
                 break
-    if name is None and title:   # 後備:職稱同行剝職稱
+    if name is None and title:   # 後備:職稱同行剝職稱;結果同樣要過黑名單+姓名式(實測紅:研究員聯絡方式→聯絡方式)
         for ln in lines:
             if title in ln:
-                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()
-                name = cand[:30] or None
+                cand = re.sub(r"(?i)(分析師|研究員|協理|資深副總|Analyst|Research|[::])", " ", ln).strip()[:30]
+                if cand and not any(w in cand for w in _NAME_STOP) \
+                   and (crx["name_zh"].fullmatch(cand) or crx["name_en"].fullmatch(cand)
+                        or crx["name_mixed"].fullmatch(cand) or crx["name_mixed2"].fullmatch(cand)):
+                    name = cand
                 break
     name_en = broker_mail = None
     if name:   # 混合姓名拆欄:李明哲 (Michael Lee) / 王大明 David Wang
@@ -395,8 +398,14 @@ def _analyst_v0119(info: str) -> dict:
                 if (len(a) <= 3 and a in toks) or (len(a) > 3 and a in dom.lower()):
                     broker_mail = target
                     break
+    first = last = None   # 英文姓名分拆(操作員令:英文姓名要分拆好)
+    if name_en:
+        parts = name_en.split()
+        if len(parts) >= 2:
+            first, last = parts[0], parts[-1]
     return {"analyst_name": name, "analyst_title": title, "analyst_title_std": title_std,
-            "analyst_name_en": name_en, "analyst_broker": broker_mail,
+            "analyst_name_en": name_en, "analyst_first_name": first, "analyst_last_name": last,
+            "analyst_broker": broker_mail,
             "analyst_email": em.group(0) if em else None,
             "analyst_tel": tel.group(1).strip() if tel else None}
 
@@ -590,6 +599,125 @@ def compute_fin_ratios(f: dict) -> dict:
     return out
 
 
+def _footer_scan_v0119(doc, crx) -> dict:
+    """小字體頁尾/報告後方附錄(操作員令 2026-10-05):首頁底部 12% + 最後兩頁;
+    不相關小字與附錄標題可抓券商與全評等名稱(外資附錄常列整套評等定義)。"""
+    texts = [""]
+    try:
+        pg = doc[0]
+        H = pg.rect.height
+        texts.append("\n".join(b[4] for b in pg.get_text("blocks") if b[1] >= H * 0.88))
+        for i in range(max(1, len(doc) - 2), len(doc)):
+            texts.append(doc[i].get_text())
+    except Exception as exc:
+        return {"footer_broker": None, "rating_scale_found": False,
+                "footer_note": f"頁尾掃描失敗 {type(exc).__name__}"}
+    joined = "\n".join(texts)
+    low = joined.lower()
+    broker = None
+    for alias, target in PRIOR._broker_map().items():
+        if alias.isascii():
+            a = alias.lower()
+            if len(a) <= 2 or a in _BROKER_CONTENT_SKIP:
+                continue
+            if re.search(r"(?<![A-Za-z])" + re.escape(alias) + r"(?![A-Za-z])", low):
+                broker = target
+                break
+        elif alias in low:
+            broker = target
+            break
+    names = {m.group(1) for m in crx["rating"].finditer(joined) if not (m.group(1).isascii() and len(m.group(1)) <= 2)}
+    return {"footer_broker": broker, "rating_scale_found": len(names) >= 3}
+
+
+def _render_table_v0119(text: str) -> str:
+    """表格重現:垂直線 | 代表格線(連續空白/定位斷欄;單欄行退回逐詞)。"""
+    out = []
+    for ln in text.splitlines():
+        if not ln.strip():
+            continue
+        cells = [c for c in re.split(r"\s{2,}|\t", ln.strip()) if c]
+        if len(cells) == 1:
+            cells = ln.strip().split()
+        out.append("| " + " | ".join(cells) + " |")
+    return "\n".join(out)
+
+
+def reconstruct(path: str) -> dict:
+    """報告重現(操作員令 2026-10-05):固定前段 FILENAME/REPORT DATE/BROKER/REPORT TYPE
+    (一個報告前面都相同),自頁數起 PAGE n → TYPE-A 本文重現(文字大小階層標記)·
+    TYPE-B 資訊區重現(表格用 | 格線)· 末段 SUMMARY 重現;本文出現表格雜湊 →
+    抓出重建放到資訊區(moved 記數)。只處理第一頁+財報頁;清場律先刪前次。"""
+    removed = _fresh_outputs_v0119("reconstruct")
+    ui = Path(os.environ.get("VIA_VRN_UI_DIR") or HERE.parents[1] / "VIA_Reports" / "vrn")
+    ui.mkdir(parents=True, exist_ok=True)
+    p = Path(path)
+    files = sorted(p.rglob("*.pdf")) if p.is_dir() else [p]
+    rows = []
+    crx = _central_regex_v0119()
+    for q in files:
+        fn = PRIOR.parse_filename(q.stem)
+        if not fn["codes"]:
+            continue
+        doc, why = _open_pdf_v0119(q)
+        if doc is None:
+            rows.append({"filename": q.name, "state": "UNREADABLE", "lamp": "紅", "why": why})
+            continue
+        try:
+            z = first_page_zones(doc)
+            fps = _fin_pages_v0119(doc)["fin_pages"]
+            L = ["FILENAME    | " + q.name,
+                 "REPORT DATE | " + (fn["report_date"] or "-"),
+                 "BROKER      | " + (fn["broker_std"] or "-"),
+                 "REPORT TYPE | " + (fn["doc_kind"] or "-"), ""]
+            moved = 0
+            for pno in [1] + [x for x in fps[:3] if x != 1]:
+                pz = fin_page_zones(doc[pno - 1])
+                if pno == 1:
+                    info_comps = list(pz[z["info_side"]])
+                    main_comps = list(pz["left" if z["info_side"] == "right" else "right"])
+                else:
+                    main_comps, info_comps = list(pz["left"]), list(pz["right"])
+                keep = []
+                for c in main_comps:   # 本文表格雜湊 → 抓出重建放到資訊區
+                    if _comp_kind_v0119(c["text"]) in ("表格", "矩陣"):
+                        info_comps.append(c)
+                        moved += 1
+                    else:
+                        keep.append(c)
+                main_comps = keep
+                sizes = sorted(c.get("max_size", 0) for c in main_comps if c.get("max_size"))
+                body = sizes[(len(sizes) - 1) // 2] if sizes else 0
+                L.append(f"PAGE {pno}")
+                L.append("TYPE-A 本文重現")
+                for c in main_comps:
+                    r = (c.get("max_size") or 0) / body if body else 0
+                    lv = "標題" if r >= 1.25 else ("副標" if r >= 1.08 else "本文")
+                    L.append(f"[{lv}] " + c["text"].strip())
+                L.append("TYPE-B 資訊區重現")
+                for c in info_comps:
+                    k = _comp_kind_v0119(c["text"])
+                    L.append(f"[{k}]")
+                    L.append(_render_table_v0119(c["text"]) if k in ("表格", "矩陣") else c["text"].strip())
+                L.append("")
+            whole = z["info_text"] + "\n" + z["main_text"]
+            rt = _pick_rating_v0119(crx, z["info_text"], whole)
+            tp = _target_price_v0119(crx, z["info_text"], whole)
+            vm = sorted({std for std, al in crx["val_methods"].items() for a in al
+                         if (a in whole if not a.isascii() else re.search("(?i)" + _wordish_v0119(a), whole))})
+            L += ["SUMMARY", "| 評等 | %s |" % (rt or "-"), "| 目標價 | %s |" % (tp or "-"),
+                  "| 估值法 | %s |" % (",".join(vm) or "-"), "| 本文表格移置 | %d |" % moved]
+            out_p = ui / ("RECON_" + q.stem + ".txt")
+            out_p.write_text("\n".join(L), encoding="utf-8")
+            rows.append({"filename": q.name, "state": "RECONSTRUCTED",
+                         "pages": [1] + [x for x in fps[:3] if x != 1],
+                         "moved_tables_to_info": moved, "out": out_p.name, "lamp": "綠"})
+        finally:
+            doc.close()
+    return {"verb": "reconstruct", "manager": TAG, "workflow": "VRN-WKF009", "step": "STP003-006",
+            "cleaned_prev": removed, "reconstructed": len(rows), "rows": rows}
+
+
 def deepread_one(path: Path) -> dict:
     """單檔深讀:檔名律 → 開 PDF → 兩區 → 抽欄 → 互證燈語。全部誠實,不硬配。"""
     fn = PRIOR.parse_filename(path.stem)
@@ -623,6 +751,10 @@ def deepread_one(path: Path) -> dict:
             elif alias in low:
                 c_broker = target
                 break
+        fs = _footer_scan_v0119(doc, crx)
+        src_broker = None
+        if c_broker is None and fs.get("footer_broker"):
+            c_broker, src_broker = fs["footer_broker"], "footer"
         rtw = _pick_rating_v0119(crx, info, whole)
         tpv = _target_price_v0119(crx, info, whole)
         code = c_code or (fn["codes"][0] if fn["codes"] else None)
@@ -639,6 +771,9 @@ def deepread_one(path: Path) -> dict:
         if code:
             row.update(_yf_ticker_v0119(code))
             row["external_price"] = _adj_close_v0119(code, fn["report_date"] or c_date, tpv)
+        row.update(fs)
+        if src_broker:
+            row["broker_source"] = src_broker
         row.update(_analyst_v0119(info))
         if row.get("analyst_name") is None:
             fnn = _fn_analyst_v0119(path.stem, crx)
@@ -684,6 +819,14 @@ def main(argv=None) -> int:
         return selftest()
     as_json = "--json" in args
     a = [x for x in args if x != "--json"]
+    if a[:1] == ["reconstruct"]:
+        if len(a) < 2:
+            print("[拒跑] reconstruct <檔|夾>")
+            return 2
+        out = reconstruct(a[1])
+        PRIOR.emit_matrix_html("reconstruct", out)
+        print(json.dumps(out, ensure_ascii=False, indent=(None if as_json else 1)))
+        return 0
     if a[:1] == ["layout-check"]:
         if len(a) < 2:
             print("[拒跑] layout-check <檔|夾>")
@@ -733,6 +876,9 @@ def _mk_pdf_v0119(path: Path):
     p2.insert_textbox(fitz.Rect(320, 420, 560, 650),
                       "現金流量\n營業現金流 1121.6 1452.7 1680.0\n自由現金流 265.1 303.9 410.2",
                       fontname="china-t", fontsize=10)
+    p2.insert_textbox(fitz.Rect(36, 780, 560, 830),
+                      "兆豐證券股份有限公司 投資評等說明:買進/中立/賣出/未評等 僅供參考",
+                      fontname="china-t", fontsize=7)
     doc.save(str(path))
     doc.close()
 
@@ -835,6 +981,20 @@ def selftest() -> int:
         chk("㉘ 階層與混排:本文區帶 標題+本文 字級階層 · 資訊區文表混排=True",
             "標題" in r3["main_hier"] and "本文" in r3["main_hier"]
             and r3["info_has_text_and_table"] is True)
+        a5 = _analyst_v0119("研究員聯絡方式\n9899@entrust.com.tw")
+        a6 = _analyst_v0119("Jane Doe\nAnalyst\njane.doe@gs.com")
+        chk("㉙ 分析師更新:剝職稱殘詞過姓名式(聯絡方式→None)· 英文名分拆 Jane/Doe",
+            a5["analyst_name"] is None
+            and a6["analyst_first_name"] == "Jane" and a6["analyst_last_name"] == "Doe")
+        r5 = deepread_one(pdf)
+        chk("㉚ 小字頁尾/附錄:券商 MEGA 抓到 · 全評等名稱 ≥3 判附錄",
+            r5["footer_broker"] == "MEGA" and r5["rating_scale_found"] is True)
+        rc = reconstruct(str(td))
+        rtxt = (Path(os.environ["VIA_VRN_UI_DIR"]) / rc["rows"][0]["out"]).read_text(encoding="utf-8")
+        chk("㉛ 報告重現:固定前段+PAGE+TYPE-A/B+| 格線+SUMMARY 評等",
+            rc["rows"][0]["state"] == "RECONSTRUCTED" and "FILENAME" in rtxt
+            and "PAGE 1" in rtxt and "TYPE-A 本文重現" in rtxt and "TYPE-B 資訊區重現" in rtxt
+            and "| 評等 | 買進 |" in rtxt and rtxt.count("|") > 20)
     else:
         print("  [誠實記] pymupdf 未裝:①–⑨ 深讀站 SKIP(座仍可載,引擎 UNAVAILABLE 誠實)")
         chk("①' 引擎座誠實 UNAVAILABLE", _open_pdf_v0119(Path("x.pdf"))[0] is None)
