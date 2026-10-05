@@ -1,0 +1,2838 @@
+{
+ "schema": "via-central-synonym-regex-v1",
+ "policy": "append-only;LOCKED 不改;衝突=RED 燈;新規先入此冊再落引擎;側線 2026-10-03 c:v0100 的 7 同義字 / 12 regex 一字不動;新增 synonyms 依命名空間前綴,regex 候選 locked=false,rulings 只增",
+ "regex": {
+  "TW_TICKER_LOCKED": {
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true,
+   "note": "台股代碼;年區 2021-2030 排除",
+   "defect_note": "批472 實測:`^(?:[1-9]\\d{3})$` 這個選項已經全收,後面 `^(?!202[1-9]|2030)\\d{4}$` 的負向前瞻永遠輪不到=死碼。所以本式對 2026 照收。式子原樣保留,判年份請改綁 YEAR_BY_ROSTER(需帶冊),本式只負責字形。"
+  },
+  "YEAR_SUSPECT": {
+   "pattern": "^(?:202[1-9]|2030)$",
+   "owner": "vrn_lexicon_v0101",
+   "locked": true,
+   "note": "年份疑碼——收割不自動抓",
+   "superseded_by": "YEAR_BY_ROSTER",
+   "defect_note": "批472 實測:此式把 2023 燁輝 / 2027 大成鋼 / 2030 彰源 三支**真代號**判成年份,而真正該擋的 2026 它擋不住上游(TW_TICKER_LOCKED 第一個選項 ^[1-9]\\d{3}$ 已全收,第二個選項的負向前瞻是死碼)。年份與代號在字形上無法分辨,只能拿冊對帳。式子依 locked 律原樣保留,消費者請改綁 YEAR_BY_ROSTER。"
+  },
+  "TW_YFINANCE": {
+   "pattern": "^[1-9]\\d{3}\\.(TW|TWO)$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true
+  },
+  "TW_BLOOMBERG": {
+   "pattern": "^[1-9]\\d{3}\\s*TT$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true
+  },
+  "VERSION_SUFFIX": {
+   "pattern": "[_-]v?\\d{2,4}[a-z]?$",
+   "owner": "via_namereg(TOOL-047)",
+   "locked": true,
+   "note": "家族鍵版尾剝離"
+  },
+  "PRODUCT_CODE": {
+   "pattern": "^VIA-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+   "owner": "via_product_ui(TOOL-048)",
+   "locked": true,
+   "note": "商品號綁一機"
+  },
+  "TW_ACTIVE_ETF": {
+   "pattern": "^\\d{5}A$",
+   "owner": "flow_tw_active_etf(TOOL-060)",
+   "locked": false,
+   "note": "主動式台股 ETF 代號尾 A+名稱含「主動」"
+  },
+  "TWEquityTicker": {
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_TICKER_LOCKED",
+   "note": "台股官方代碼(四碼;年區 2021-2030 排除);批118 正名=台股個股專用,與全球碼區隔"
+  },
+  "TWEquityYFTicker": {
+   "pattern": "^([1-9]\\d{3})\\.(TW|TWO)$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_YFINANCE_REGEX(canonical 冊)",
+   "note": "台股個股 yfinance 碼(上市 .TW/上櫃 .TWO);YF 全域碼含全球商品,本式僅驗台股個股=命名分層目的"
+  },
+  "TWEquityBBGTicker": {
+   "pattern": "^([1-9]\\d{3})\\s+TT$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_BLOOMBERG_REGEX(canonical 冊)",
+   "note": "台股個股 Bloomberg 碼(四碼+空格+TT)"
+  },
+  "ActiveTWETFTicker": {
+   "pattern": "^00\\d{2,3}[AD]$",
+   "locked": true,
+   "owner": "VIA 主動式台股 ETF 政策(批118 升格 LOCKED)",
+   "note": "主動式台股 ETF 代碼:00+2~3 位數+尾碼 A(股票/海外)或 D(債券);ENG046/ENG051 共用"
+  },
+  "YEAR_BY_ROSTER": {
+   "pattern": "^[1-9]\\d{3}$",
+   "owner": "VIA_VRN_FirstPageEngine.is_valid_bare",
+   "locked": false,
+   "supersedes": "YEAR_SUSPECT",
+   "kind": "ROSTER_ADJUDICATED",
+   "note": "年份 vs 代號:**字形判不了,只能拿冊對帳**(操作員批472 裁示 A)",
+   "rule": [
+    "① 不是四碼(首位非 0)→ 不是代號,也不是年份形狀,不判",
+    "② 代號冊不可得 → **不判年份**,並把 roster_state 標成「未經庫對帳」(不假裝驗過)",
+    "③ 冊在 且 值落在 1990–2100 且 **不在冊上** → 年份",
+    "④ 其餘 → 代號"
+   ],
+   "roster_source": "tw_listings_industry(VDF 每日雙所官方冊;批465c CGC_MDL142 正主)",
+   "why_not_range": "**不能用排除區間修**。實測 1,978 檔名冊:2002 中鋼 · 2015 豐興 · 2023 燁輝 · 2027 大成鋼 · 2030 彰源——整個鋼鐵類股都住在 2000–2030 裡。舊 YEAR_SUSPECT 的 202[1-9]|2030 會一次誤殺其中三支。",
+   "evidence": "操作員 64 份真檔名實測(批472):有冊時「第一場 2026年投資大趨勢」等三份研討會全部不給代號,而 2002/2015/2023/2027/2030 一支沒誤殺;分類 64/64、代號 42/42、日期 61/64(缺 3 是檔名本來就沒日期)、誤判 0。"
+  },
+  "RX_VERSION_001": {
+   "pattern": "_v(\\d+)$",
+   "owner": "shared:CGC_MDL058_Lessons_v0103.py,CGC_MDL089_UIBaseTemplate_v0101.py,CGC_MDL107_UISpecManager_v0101.py",
+   "locked": false,
+   "files": 62,
+   "hits": 62,
+   "flags": [
+    "Path(p).stem",
+    "Path(path).stem",
+    "p.stem"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 62 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_002": {
+   "pattern": "^\\s*(import|from)\\s+talib",
+   "owner": "shared:CGC_MDL058_Lessons_v0103.py,CGC_MDL140_HandoverConsole_v0104.py,CGC_MDL149_VeritasCentralGovernanceConsole_v0190.py",
+   "locked": false,
+   "files": 22,
+   "hits": 22,
+   "flags": [
+    "src",
+    "src_text",
+    "text"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 22 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_003": {
+   "pattern": "_v\\d+$",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL156_VIAAcceleratorControl_v0111.py,CGC_MDL157_VIAUniqueEntryControl_v0106.py",
+   "locked": false,
+   "files": 9,
+   "hits": 11,
+   "flags": [
+    "''",
+    "p.stem"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 9 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_HTML_XML_004": {
+   "pattern": "<[^>]+>",
+   "owner": "shared:CGC_MDL041_ArticleIntake_v0100.py,CGC_MDL130_UIBridge_v0101.py,CGC_MDL254_ReviewOnePage_v0102.py",
+   "locked": false,
+   "files": 7,
+   "hits": 8,
+   "flags": [
+    "' '",
+    "''",
+    "'\\n'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 7 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_005": {
+   "pattern": "_v\\d{4}\\.py$",
+   "owner": "shared:CGC_MDL142_AccelImport_v0101.py,CGC_MDL153_WorkflowComposer_v0102.py,CGC_MDL164_GovernanceCompletenessAudit_v0109.py",
+   "locked": false,
+   "files": 7,
+   "hits": 7,
+   "flags": [
+    "''",
+    "p.name"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 7 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_006": {
+   "pattern": "[一-鿿]",
+   "owner": "shared:CGC_MDL085_IssueArbiter_v0100.py,VIA_VRN_FirstPageEngine_v0129.py,VRN_ENG086_FirstPageLogicBridge_v0119.py",
+   "locked": false,
+   "files": 5,
+   "hits": 5,
+   "flags": [
+    "a",
+    "s",
+    "s or ''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 5 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_007": {
+   "pattern": "[\\u4e00-\\u9fff]",
+   "owner": "shared:CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE_v0611.py,VIA_VRNLogic_AllInOne_v0201.py,VRN_ENG111_StockIdentity_v0104.py",
+   "locked": false,
+   "files": 4,
+   "hits": 6,
+   "flags": [
+    "alias",
+    "filename + first_page_text",
+    "getattr(summary, 'name', '') o"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_008": {
+   "pattern": "function global:(via[\\w-]*)",
+   "owner": "shared:CGC_MDL122_IntakeRoster_v0113.py,CGC_MDL131_ProjectCompletion_v0106.py,CGC_MDL133_ProductGate_v0102.py",
+   "locked": false,
+   "files": 4,
+   "hits": 5,
+   "flags": [
+    "hits[-1].read_text(encoding='u",
+    "text"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_009": {
+   "pattern": "\\D",
+   "owner": "shared:VDF_ENG093_LaunchConsole_v0103.py,VDF_ENG094_ActiveETFActivity_v0101.py,VIA_VRN_FirstPageEngine_v0129.py",
+   "locked": false,
+   "files": 4,
+   "hits": 4,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_VERSION_010": {
+   "pattern": "_v(\\d{4})$",
+   "owner": "shared:CGC_MDL161_PEISCapabilityEngine_v0107.py,CGC_MDL252_ManagerParity_v0100.py,VDF_SystemManager_v0123.py",
+   "locked": false,
+   "files": 4,
+   "hits": 4,
+   "flags": [
+    "Path(p).stem",
+    "Path(path).stem",
+    "p.stem"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_DATE_011": {
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "owner": "shared:CGC_MDL095_DeckServer_v0161.py,CGC_MDL139_InputConsole_v0111.py,VDF_ENG066_GlobalUniverse_v0102.py",
+   "locked": false,
+   "files": 4,
+   "hits": 4,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_VERSION_012": {
+   "pattern": "_v(\\d{4})\\.py$",
+   "owner": "shared:VDF_ENG087_MarketListGovernance_v0106.py,VDF_ENG094_ActiveETFActivity_v0101.py,VDF_ENG232_TWIndexOfficial_v0101.py",
+   "locked": false,
+   "files": 4,
+   "hits": 4,
+   "flags": [
+    "Path(path).name",
+    "p.name",
+    "str(p or '')"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 4 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_013": {
+   "pattern": "(?!0)(?!202[1-9])(?!2030)([1-9]\\d{3})",
+   "owner": "shared:VRN_MDL001_Converter_v0121.py,VRN_MDL002_LayoutExtractor_v0100.py,via_aegis_netcore_v0100.py",
+   "locked": false,
+   "files": 3,
+   "hits": 5,
+   "flags": [
+    "tok.strip()"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_DATE_014": {
+   "pattern": "\\d{4}-\\d{2}-\\d{2}",
+   "owner": "shared:CGC_MDL140_HandoverConsole_v0104.py,VDF_ENG093_LaunchConsole_v0103.py,vdf_input_matrix_v0100.py",
+   "locked": false,
+   "files": 3,
+   "hits": 4,
+   "flags": [
+    "hi[:10]",
+    "since",
+    "str(m.get('day', ''))"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_VERSION_015": {
+   "pattern": "_v(\\d{4})",
+   "owner": "shared:CGC_MDL128_SystemCharter_v0102.py,CGC_MDL130_UIBridge_v0101.py,VRN_ENG086_FirstPageLogicBridge_v0119.py",
+   "locked": false,
+   "files": 3,
+   "hits": 4,
+   "flags": [
+    "Path(__file__).name",
+    "Path(f).name",
+    "cur.name"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_016": {
+   "pattern": "\\W",
+   "owner": "shared:VRN_ENG393_DocClassVerify_v0101.py,VRN_ENG394_LayoutRestore_v0101.py,VRN_ENG396_ReportEntities_v0100.py",
+   "locked": false,
+   "files": 3,
+   "hits": 4,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_017": {
+   "pattern": "[-_.]+",
+   "owner": "shared:CGC_MDL046_DepSuper_v0101.py,CGC_MDL050_EnvRebuild_v0109.py,CGC_MDL135_EnvGovernance_v0117.py",
+   "locked": false,
+   "files": 3,
+   "hits": 4,
+   "flags": [
+    "'-'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_018": {
+   "pattern": "<style>(.*?)</style>",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL128_SystemCharter_v0102.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 4,
+   "flags": [
+    "fix_style",
+    "raw"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_019": {
+   "pattern": "\\b[1-9]\\d{3} TT\\b",
+   "owner": "shared:VDF_MDL002_YFinanceFetchingEngine_v0100.py,VRN_TW01_TickerBridge_v0102.py,VRN_TW02_ReportParser_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_020": {
+   "pattern": "\\b[1-9]\\d{3}\\.(TW|TWO)\\b",
+   "owner": "shared:VDF_MDL002_YFinanceFetchingEngine_v0100.py,VRN_TW01_TickerBridge_v0102.py,VRN_TW02_ReportParser_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_021": {
+   "pattern": "\\b([1-9]\\d{3})(?:\\s+TT|\\.TWO?|\\b)",
+   "owner": "shared:VDF_MDL002_YFinanceFetchingEngine_v0100.py,VRN_TW01_TickerBridge_v0102.py,VRN_TW02_ReportParser_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_022": {
+   "pattern": "(?<!\\d)([1-9]\\d{3})(?!\\d)",
+   "owner": "shared:VIA_VRNLogic_AllInOne_v0201.py,VIA_VRN_FirstPageEngine_v0129.py,VRN_ENG086_FirstPageLogicBridge_v0119.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "full",
+    "text"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_023": {
+   "pattern": "_v\\d{1,4}$",
+   "owner": "shared:CGC_MDL064_SelftestGrid_v0504.py,CGC_MDL147_EngineSmokeGate_v0103.py,CGC_MDL180_FreezeSealAudit_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_024": {
+   "pattern": "[^a-z0-9]",
+   "owner": "shared:CGC_MDL085_IssueArbiter_v0100.py,CGC_MDL161_PEISCapabilityEngine_v0107.py,CGC_MDL241_TemplateAdapter_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_025": {
+   "pattern": "(style=\"[^\"]*font-size\\s*:\\s*)([0-9.]+)px",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL128_SystemCharter_v0102.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "lambda x: x.group(1) + fmt(sna"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_026": {
+   "pattern": "(font(?:-size)?\\s*:\\s*)([0-9.]+)px",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL128_SystemCharter_v0102.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "lambda x: x.group(1) + fmt(sna"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_027": {
+   "pattern": "(font-size\\s*:\\s*)([0-9.]+)px",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL128_SystemCharter_v0102.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "lambda x: x.group(1) + fmt(sna"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_028": {
+   "pattern": "(font\\s*:\\s*)([0-9.]+)px",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL128_SystemCharter_v0102.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "lambda x: x.group(1) + fmt(sna"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_029": {
+   "pattern": "^[A-Za-z]:[\\\\/]",
+   "owner": "shared:CGC_MDL123_DataHome_v0106.py,CGC_MDL147_EngineSmokeGate_v0103.py,via_subsys_manager_v0104.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "raw",
+    "t"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_030": {
+   "pattern": "_sha[0-9a-f]{6,}",
+   "owner": "shared:CGC_MDL135_EnvGovernance_v0117.py,CGC_MDL147_EngineSmokeGate_v0103.py,via_mother_takeover_v0100.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "''",
+    "f.name"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_031": {
+   "pattern": "_v\\d{4}$",
+   "owner": "shared:CGC_MDL164_GovernanceCompletenessAudit_v0109.py,CGC_MDL185_SsotBookSync_v0101.py,CGC_MDL226_StepMatrix_v0103.py",
+   "locked": false,
+   "files": 3,
+   "hits": 3,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 3 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_032": {
+   "pattern": "_v\\d{1,4}\\.py$",
+   "owner": "shared:CGC_MDL064_SelftestGrid_v0504.py,CGC_MDL147_EngineSmokeGate_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 5,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_033": {
+   "pattern": "\\.(?:TW|TWO)$",
+   "owner": "shared:VDF_ENG051_ActiveTWETF_Holdings_v0103.py,VIA_VRNLogic_AllInOne_v0201.py",
+   "locked": false,
+   "files": 2,
+   "hits": 3,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_034": {
+   "pattern": "[\\u4e00-\\u9fff]{2,4}",
+   "owner": "shared:VRN_TW02_ReportParser_v0101.py,vrn_report_digest_v0117.py",
+   "locked": false,
+   "files": 2,
+   "hits": 3,
+   "flags": [
+    "stem",
+    "win"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_035": {
+   "pattern": "^00\\d{3}A$",
+   "owner": "shared:VDF_ENG051_ActiveTWETF_Holdings_v0103.py,VDF_ENG094_ActiveETFActivity_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_PERCENT_NUMBER_036": {
+   "pattern": "-?\\d+(?:\\.\\d+)?",
+   "owner": "shared:VDF_ENG051_ActiveTWETF_Holdings_v0103.py,vrn_fin_extract_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "t",
+    "text"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_037": {
+   "pattern": "^\\s*(?:import|from)\\s+(?:requests|httpx|urllib)\\b",
+   "owner": "shared:VDF_ENG054_TWDailyBackfill_v0111.py,VDF_ENG089_IncrementalFetchGate_v0108.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "body",
+    "src"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_HTML_XML_038": {
+   "pattern": "<tr[^>]*>(.*?)</tr>",
+   "owner": "shared:CGC_MDL130_UIBridge_v0101.py,VRN_ENG058_TableOmni_v0105.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "html",
+    "re.S"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_HTML_XML_039": {
+   "pattern": "<w:p[ >].*?</w:p>",
+   "owner": "shared:VRN_ENG063_Lexicon_v0101.py,VRN_ENG392_TextCompleteness_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "xml"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_040": {
+   "pattern": "(?<=[。!?!?])\\s*",
+   "owner": "shared:VRN_ENG064_KnowledgeStack_v0103.py,VRN_ENG066_NLPSupportHub_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_041": {
+   "pattern": "^Register-VIA-Commands-v\\d{4}\\.ps1$",
+   "owner": "shared:CGC_MDL157_VIAUniqueEntryControl_v0106.py,VRN_ENG073_ReportStructuredDB_v0139.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_042": {
+   "pattern": "\\d{4,6}[A-Z]?",
+   "owner": "shared:CGC_MDL095_DeckServer_v0161.py,VRN_ENG083_VerifiedMatrix_v0120.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "code or ''",
+    "s"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_043": {
+   "pattern": "[ \\t]{2,}",
+   "owner": "shared:VRN_ENG085_MarkdownRestore_v0106.py,VRN_ENG392_TextCompleteness_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "' '"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_044": {
+   "pattern": "'((?:[^'\\\\]|\\\\.)*)'",
+   "owner": "shared:VRN_ENG089_TemplateView_v0103.py,VRN_ENG090_FinStatementsTemplate_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "keep",
+    "lambda m: json.dumps(m.group(1"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_045": {
+   "pattern": "([{,]\\s*)([A-Za-z_]\\w*)\\s*:",
+   "owner": "shared:VRN_ENG089_TemplateView_v0103.py,VRN_ENG090_FinStatementsTemplate_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "'\\\\1\"\\\\2\":'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_046": {
+   "pattern": "<head\\b[^>]*>",
+   "owner": "shared:CGC_MDL227_ConsoleBlueprint_v0101.py,VRN_ENG089_TemplateView_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "html"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_047": {
+   "pattern": "20\\d{2}",
+   "owner": "shared:VRN_ENG112_FinancialRead_v0100.py,VRN_MDL002_LayoutExtractor_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "raw"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_048": {
+   "pattern": "[一-鿿]$",
+   "owner": "shared:CGC_MDL041_ArticleIntake_v0100.py,VRN_ENG393_DocClassVerify_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "out[-1]",
+    "txt"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_049": {
+   "pattern": "[ \\t]+",
+   "owner": "shared:CGC_MDL041_ArticleIntake_v0100.py,VRN_ENG396_ReportEntities_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "' '"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_050": {
+   "pattern": "(\\d+)(?:-(\\d+))?",
+   "owner": "shared:VRN_ENG396_ReportEntities_v0100.py,VRN_ENG397_PluginHub_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "pages or '1'",
+    "spec or '1'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_051": {
+   "pattern": "\\b(?!0)(?!202[1-9])(?!2030)([1-9]\\d{3})\\s+TT\\b",
+   "owner": "shared:VRN_MDL001_Converter_v0121.py,VRN_MDL002_LayoutExtractor_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_052": {
+   "pattern": "\\b(?!0)(?!202[1-9])(?!2030)([1-9]\\d{3})\\.(TW|TWO)\\b",
+   "owner": "shared:VRN_MDL001_Converter_v0121.py,VRN_MDL002_LayoutExtractor_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_053": {
+   "pattern": "(20\\d{2})[_\\-]?(\\d{2})[_\\-]?(\\d{2})",
+   "owner": "shared:VRN_MDL001_Converter_v0121.py,VRN_MDL002_LayoutExtractor_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TICKER_054": {
+   "pattern": "\\b[1-9]\\d{3}\\b",
+   "owner": "shared:VRN_TW01_TickerBridge_v0102.py,VRN_TW02_ReportParser_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_055": {
+   "pattern": "^[A-Za-z]",
+   "owner": "shared:vrn_fin_extract_v0101.py,vrn_report_digest_v0117.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "p",
+    "val"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_056": {
+   "pattern": "\\n{3,}",
+   "owner": "shared:CGC_MDL041_ArticleIntake_v0100.py,vrn_report_digest_v0117.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "'\\n\\n'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_057": {
+   "pattern": "v(\\d+)\\.(\\d+)(?:\\.(\\d+))?",
+   "owner": "shared:SUP_MDL744_NLPApplicationHub_v0102.py,SUP_MDL745_MarkdownStructureHub_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "d.name + '|' + d.parent.name",
+    "names"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_058": {
+   "pattern": "[()\\[\\]（）【】{}:：,，.。/／\\\\|｜\\-_ ]+",
+   "owner": "shared:VETF_VIS_VRN_FinancialSSOT_v0608.py,VIS_VRN_FinancialSSOT_v0608.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_059": {
+   "pattern": "<title[^>]*>(.*?)</title>",
+   "owner": "shared:CGC_MDL041_ArticleIntake_v0100.py,CGC_MDL241_TemplateAdapter_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "html",
+    "text"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_060": {
+   "pattern": "v\\d{3,4}[a-z]?\\.(py|ps1)",
+   "owner": "shared:CGC_MDL061_PanoramaSix_v0100.py,via_conflict_guard_v0102.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "l"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_061": {
+   "pattern": "_v\\d+\\.py$",
+   "owner": "shared:CGC_MDL069_SystemManager_v0114.py,CGC_MDL087_TestPyramid_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_062": {
+   "pattern": "([_-]v?\\d{2,4}[a-z]?)$",
+   "owner": "shared:CGC_MDL077_RenameEngine_v0100.py,via_rename_engine_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "re.IGNORECASE"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_063": {
+   "pattern": "\"([a-z_]+)\"",
+   "owner": "shared:CGC_MDL079_MatrixConsole_v0100.py,via_matrix_console_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "m.group(1)"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_064": {
+   "pattern": "OK (\\d+) · FAIL (\\d+) · SKIP (\\d+)",
+   "owner": "shared:CGC_MDL082_MasterAutorun_v0101.py,CGC_MDL087_TestPyramid_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "out",
+    "tail[-1] if tail else ''"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_065": {
+   "pattern": "(_sha[0-9a-f]{4,})+(?=\\.[A-Za-z0-9]+$|$)",
+   "owner": "shared:CGC_MDL085_IssueArbiter_v0100.py,CGC_MDL086_CanonArbiter_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_066": {
+   "pattern": "^[a-z0-9_]{2,48}$",
+   "owner": "shared:CGC_MDL095_DeckServer_v0161.py,CGC_MDL139_InputConsole_v0111.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_067": {
+   "pattern": "font(?:-size)?\\\\s*:\\\\s*([0-9.]+)px",
+   "owner": "shared:CGC_MDL116_UnifiedShell_v0114.py,CGC_MDL129_LifecycleRACI_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "apply_type_scale(page)",
+    "p"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_068": {
+   "pattern": "<script id=\"snap\" type=\"application/json\">(.*?)</script>",
+   "owner": "shared:CGC_MDL120_SystemUI_v0107.py,CGC_MDL139_InputConsole_v0111.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "page"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_069": {
+   "pattern": "font(?:-size)?\\s*:\\s*([0-9.]+)px",
+   "owner": "shared:CGC_MDL128_SystemCharter_v0102.py,CGC_MDL130_UIBridge_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "apply_type_scale(page)",
+    "page"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_070": {
+   "pattern": "[^A-Za-z0-9]+",
+   "owner": "shared:CGC_MDL132_VesBridge_v0104.py,CGC_MDL241_TemplateAdapter_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "'_'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_HTML_XML_071": {
+   "pattern": "<(?:script|link)[^>]+(?:src|href)=[\\\"']https?://",
+   "owner": "shared:CGC_MDL138_FamilyUI_v0103.py,CGC_MDL139_InputConsole_v0111.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "re.I"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_072": {
+   "pattern": "^[\\^A-Za-z0-9_.=\\-]{1,24}$",
+   "owner": "shared:CGC_MDL139_InputConsole_v0111.py,CGC_MDL239_DataBroker_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_073": {
+   "pattern": "[0-9a-f]{64}",
+   "owner": "shared:CGC_MDL140_HandoverConsole_v0104.py,CGC_MDL187_ModuleChangeKillGate_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "str(m.get('manifest_sha256', '",
+    "str(p.get('sha256') or '')"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_074": {
+   "pattern": "[^A-Za-z0-9_-]",
+   "owner": "shared:CGC_MDL148_EngineBus_v0131.py,CGC_MDL241_TemplateAdapter_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "''",
+    "'_'"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_075": {
+   "pattern": "^\\s*(?:import|from)\\s+(urllib|requests|httpx|aiohttp)",
+   "owner": "shared:CGC_MDL165_CommandRunGate_v0101.py,CGC_MDL166_LibraryConsolidationGate_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "src",
+    "src_self"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_076": {
+   "pattern": "environ\\[\\s*['\\\"]VIA_(?:NET|SCRAPE)_CONSENT",
+   "owner": "shared:CGC_MDL184_SisterMirrorSync_v0100.py,CGC_MDL185_SsotBookSync_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "src"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_077": {
+   "pattern": "[-_]v(\\d{4})$",
+   "owner": "shared:CGC_MDL226_StepMatrix_v0103.py,CGC_MDL248_FullCheck_v0101.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "path.stem"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_HTML_XML_078": {
+   "pattern": "(src|href)=['\\\"]https?://",
+   "owner": "shared:CGC_MDL231_MatrixPages_v0102.py,CGC_MDL254_ReviewOnePage_v0102.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "page"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_079": {
+   "pattern": "_sha[0-9a-f]{6,}$",
+   "owner": "shared:CGC_MDL235_EngineVersionLedger_v0100.py,CGC_MDL253_ToolingInventory_v0100.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "f.stem",
+    "stem"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_OTHER_080": {
+   "pattern": "^\\s*(?:import|from)\\s+(urllib|requests|httpx|aiohttp|yfinance|akshare|playwright|websockets?)\\b",
+   "owner": "shared:CGC_MDL253_ToolingInventory_v0100.py,via_bridge_sweeper_v0103.py",
+   "locked": false,
+   "files": 2,
+   "hits": 2,
+   "flags": [
+    "re.M"
+   ],
+   "note": "側線 2026-10-03 c:同一句在 2 支各抄一份 → 入中央冊一句一號;引擎改引用要各自出新版號(L108 ③)"
+  },
+  "RX_TIME_CONTENT_DATE": {
+   "pattern": "(20[2-3]\\d)[./年\\-](\\d{1,2})[./月\\-](\\d{1,2})日?",
+   "owner": "VRN_SystemManager_v0119(deepread)",
+   "locked": false,
+   "note": "內文日期(2025/08/19 · 2025年8月19日 · 2025.8.19 · 2025-08-19);三群組=年/月/日"
+  },
+  "RX_EMAIL_STD": {
+   "pattern": "[\\w.+-]+@[\\w-]+\\.[\\w.-]+",
+   "owner": "VRN_SystemManager_v0119(deepread)",
+   "locked": false,
+   "note": "分析師 email 標準式"
+  },
+  "RX_TEL_TAIPEI": {
+   "pattern": "(?:\\+?886[- ]?2|\\(02\\)|02)[- ]?\\d{4}[- ]?\\d{4}",
+   "owner": "VRN_SystemManager_v0119(deepread)",
+   "locked": false,
+   "note": "台北市話:+886-2 / (02) / 02 + 8碼"
+  },
+  "RX_TEL_HK": {
+   "pattern": "\\+?852[- ]?\\d{4}[- ]?\\d{4}",
+   "owner": "VRN_SystemManager_v0119(deepread)",
+   "locked": false,
+   "note": "香港電話:+852 + 8碼(外資港辦分析師)"
+  },
+  "RX_DATE_FILENAME_MASTER": {
+   "pattern": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:11\\d{5})|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+\\d{1,2},?\\s+\\d{4})",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "MASTER 檔名日期總式:8碼/6碼/民國7碼/ISO/英文月份;檔名日期須與首頁資訊區報告日期完全對照"
+  },
+  "RX_DATE_ENGLISH": {
+   "pattern": "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+(\\d{1,2}),?\\s+(\\d{4})",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "英文日期(Jan 22, 2025 / January 22 2025);三群組=月字/日/年"
+  },
+  "RX_YEAR_QUARTER": {
+   "pattern": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "季度式:2025Q1 · 2025.Q1 · 25Q1;財報/財測欄位對齊用"
+  },
+  "RX_DATE_LOOSE_MASTER": {
+   "pattern": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:(?:20)?\\d{2}[-/]\\d{2})|(?:(?:20)?\\d{2})",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "MASTER 寬鬆日期式(含 YYYY 單年/YYYY/MM);僅對照用",
+   "defect_note": "寬鬆式裸 YYYY 會咬年份與代號,引擎抽取不用本式(寧缺勿誤);原樣入冊供表格欄位對齊"
+  },
+  "RX_TARGET_PRICE_DEFENSE": {
+   "pattern": "(?i)(?:Target|目標(?:價)?)\\s*[:：$]?\\s*[\\d,]+(\\.\\d+)?",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "MASTER 目標價防禦式(主式抓不到時第二道);前處理剝詞見 TARGET_PRICE_STRIPS"
+  },
+  "TWETF_Passive": {
+   "pattern": "^(00\\d{3})$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動股票 ETF(無尾碼);本地碼",
+   "defect_note": "MASTER 式 00\\d{3} 為 5 碼;舊 4 碼 ETF(0050/0056)不匹本式,由既有 00\\d{2} 式照收;兩式並行只增不衝突"
+  },
+  "TWETF_Passive_YF": {
+   "pattern": "^(00\\d{3})\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動股票 ETF(無尾碼);yfinance 碼"
+  },
+  "TWETF_Passive_BBG": {
+   "pattern": "^(00\\d{3})\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動股票 ETF(無尾碼);Bloomberg 碼"
+  },
+  "TWETF_ActiveA": {
+   "pattern": "^(00\\d{3}A)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動股票 ETF(尾碼 A);本地碼"
+  },
+  "TWETF_ActiveA_YF": {
+   "pattern": "^(00\\d{3}A)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動股票 ETF(尾碼 A);yfinance 碼"
+  },
+  "TWETF_ActiveA_BBG": {
+   "pattern": "^(00\\d{3}A)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動股票 ETF(尾碼 A);Bloomberg 碼"
+  },
+  "TWETF_BondB": {
+   "pattern": "^(00\\d{3}B)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動債券 ETF(尾碼 B);本地碼"
+  },
+  "TWETF_BondB_YF": {
+   "pattern": "^(00\\d{3}B)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動債券 ETF(尾碼 B);yfinance 碼"
+  },
+  "TWETF_BondB_BBG": {
+   "pattern": "^(00\\d{3}B)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "被動債券 ETF(尾碼 B);Bloomberg 碼"
+  },
+  "TWETF_BondActiveD": {
+   "pattern": "^(00\\d{3}D)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動債券 ETF(尾碼 D);本地碼"
+  },
+  "TWETF_BondActiveD_YF": {
+   "pattern": "^(00\\d{3}D)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動債券 ETF(尾碼 D);yfinance 碼"
+  },
+  "TWETF_BondActiveD_BBG": {
+   "pattern": "^(00\\d{3}D)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "主動債券 ETF(尾碼 D);Bloomberg 碼"
+  },
+  "TWETF_LeveragedL": {
+   "pattern": "^(00\\d{3}L)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "槓桿型 ETF(尾碼 L);本地碼"
+  },
+  "TWETF_LeveragedL_YF": {
+   "pattern": "^(00\\d{3}L)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "槓桿型 ETF(尾碼 L);yfinance 碼"
+  },
+  "TWETF_LeveragedL_BBG": {
+   "pattern": "^(00\\d{3}L)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "槓桿型 ETF(尾碼 L);Bloomberg 碼"
+  },
+  "TWETF_InverseR": {
+   "pattern": "^(00\\d{3}R)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "反向型 ETF(尾碼 R);本地碼"
+  },
+  "TWETF_InverseR_YF": {
+   "pattern": "^(00\\d{3}R)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "反向型 ETF(尾碼 R);yfinance 碼"
+  },
+  "TWETF_InverseR_BBG": {
+   "pattern": "^(00\\d{3}R)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "反向型 ETF(尾碼 R);Bloomberg 碼"
+  },
+  "TWETF_FuturesUV": {
+   "pattern": "^(00\\d{3}[UV])$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "期貨型 ETF(尾碼 U 台幣/V 外幣);本地碼"
+  },
+  "TWETF_FuturesUV_YF": {
+   "pattern": "^(00\\d{3}[UV])\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "期貨型 ETF(尾碼 U 台幣/V 外幣);yfinance 碼"
+  },
+  "TWETF_FuturesUV_BBG": {
+   "pattern": "^(00\\d{3}[UV])\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "期貨型 ETF(尾碼 U 台幣/V 外幣);Bloomberg 碼"
+  },
+  "TWETF_BalancedT": {
+   "pattern": "^(00\\d{3}T)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "平衡型 ETF(尾碼 T);本地碼"
+  },
+  "TWETF_BalancedT_YF": {
+   "pattern": "^(00\\d{3}T)\\.(TW|TWO)$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "平衡型 ETF(尾碼 T);yfinance 碼"
+  },
+  "TWETF_BalancedT_BBG": {
+   "pattern": "^(00\\d{3}T)\\sTT$",
+   "owner": "VIA_MASTER_SSOT_DICTIONARY(操作員 2026-10-05)",
+   "locked": false,
+   "note": "平衡型 ETF(尾碼 T);Bloomberg 碼"
+  },
+  "RX_NAME_ZH": {
+   "pattern": "[\\u4e00-\\u9fa5]{2,4}",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "中文姓名 2–4 字(繁/簡;CJK 無 \\b,搭上下文職稱/email/電話過濾)"
+  },
+  "RX_NAME_ZH_COMPOUND": {
+   "pattern": "(?:歐陽|司馬|諸葛|夏侯|尉遲|皇甫|公孫|令狐|東方|上官|長孫|慕容|司徒|司空|軒轅|南宮|聞人|澹台|公羊|公冶|宗政|濮陽|淳于|單于|太叔|申屠|公良|公輸|公皙|公伯|公仲|公上|公門|公山|公堯|公晏|萬俟|赫連)[\\u4e00-\\u9fa5]{1,2}",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "複姓優先式;貼文枚舉大量重覆已收斂為唯一集(語意等價,只增不減)· \\p{Han} Python re 不支援改 CJK 區段"
+  },
+  "RX_NAME_EN_STD": {
+   "pattern": "\\b[A-Z][a-z]+(?:\\s+[A-Z][a-z]+){1,3}\\b",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "西式 First Last / First Middle Last"
+  },
+  "RX_NAME_EN_INITIALS": {
+   "pattern": "\\b(?:[A-Z][a-z]+|[A-Z]\\.)(?:\\s+(?:[A-Z][a-z]+|[A-Z]\\.)){1,3}\\b",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "含縮寫點號(T. S. Lee)"
+  },
+  "RX_NAME_EN_SURNAME_FIRST": {
+   "pattern": "\\b[A-Z][A-Z]+(?:\\s+[A-Z][a-zA-Z\\-]+){1,3}\\b",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "姓前名後全大寫姓(LEE Tzu-Yuan)"
+  },
+  "RX_NAME_MIXED_PAREN": {
+   "pattern": "([\\u4e00-\\u9fa5]{2,4})\\s*\\(([A-Z][a-z]+(?:\\s+[A-Z][a-z]+){0,2})\\)",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "混合:李明哲 (Michael Lee);群組1=中文 群組2=英文"
+  },
+  "RX_NAME_MIXED_PLAIN": {
+   "pattern": "([\\u4e00-\\u9fa5]{2,4})\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+){0,2})",
+   "owner": "操作員口授 2026-10-05(估值法/職稱/姓名式;只增不減不衝突)",
+   "locked": false,
+   "note": "混合:王大明 David Wang"
+  }
+ },
+ "synonyms": {
+  "RATING_BUY": [
+   "買進",
+   "Buy",
+   "加碼",
+   "Overweight",
+   "強烈買進",
+   "優於大盤",
+   "Outperform",
+   "OP",
+   "OW",
+   "Long",
+   "增持",
+   "買進(維持)",
+   "買進(調升)",
+   "買進(重申)",
+   "Accumulate",
+   "收集",
+   "逢低買進",
+   "買進(初次)"
+  ],
+  "RATING_SELL": [
+   "賣出",
+   "Sell",
+   "減碼",
+   "Underweight",
+   "落後大盤",
+   "Underperform",
+   "UP",
+   "UW",
+   "Short",
+   "劣於大盤",
+   "賣出(調降)",
+   "賣出(重申)",
+   "Reduce",
+   "減持",
+   "逢高減碼",
+   "賣出(初次)"
+  ],
+  "RATING_HOLD": [
+   "持有",
+   "Hold",
+   "中立",
+   "Neutral",
+   "維持",
+   "N",
+   "Market Perform",
+   "MP",
+   "Equal Weight",
+   "EW",
+   "區間操作",
+   "觀望",
+   "維持中立",
+   "中立(調降)",
+   "中立(調升)",
+   "Sector Perform",
+   "Peer Perform",
+   "中性"
+  ],
+  "FLOW_IN": [
+   "流入",
+   "淨申購",
+   "吸金",
+   "inflow"
+  ],
+  "FLOW_OUT": [
+   "流出",
+   "淨贖回",
+   "失血",
+   "outflow"
+  ],
+  "EPS": [
+   "每股盈餘",
+   "EPS",
+   "basic_eps",
+   "diluted_eps",
+   "earnings_per_share"
+  ],
+  "TARGET_PRICE": [
+   "目標價",
+   "Target Price",
+   "target_price",
+   "TP",
+   "合理價",
+   "Price Target",
+   "Target",
+   "Tgt",
+   "Fair Value",
+   "FV",
+   "Valuation",
+   "目標股價",
+   "目標",
+   "合理股價",
+   "預期價",
+   "目標區間",
+   "Base Case",
+   "Bull Case",
+   "Bear Case",
+   "TARGET PRICE",
+   "PRICE TARGET",
+   "TARGET",
+   "PT"
+  ],
+  "COLUMN_PARAM_BBG_TICKER": [
+   "bloomberg",
+   "bloomberg_ticker"
+  ],
+  "COLUMN_PARAM_DATE": [
+   "asof_date",
+   "dt",
+   "obs_date",
+   "snapshot_at",
+   "trade_date"
+  ],
+  "COLUMN_PARAM_FETCH.BATCH_SIZE": [
+   "BATCH_SIZE"
+  ],
+  "COLUMN_PARAM_FETCH.MAX_RETRIES": [
+   "MAX_RETRIES"
+  ],
+  "COLUMN_PARAM_FETCH.RETRY_DELAY_S": [
+   "RETRY_DELAY",
+   "RETRY_DELAY_S"
+  ],
+  "COLUMN_PARAM_FETCH.TIMEOUT_S": [
+   "HTTP_TIMEOUT",
+   "TIMEOUT",
+   "TIMEOUT_S"
+  ],
+  "COLUMN_PARAM_ISSUER": [
+   "fund_house",
+   "投信"
+  ],
+  "COLUMN_PARAM_NAME": [
+   "etf_name",
+   "short_name",
+   "stock_name"
+  ],
+  "COLUMN_PARAM_OUTPUT.CSV_ENCODING": [
+   "CSV_ENCODING"
+  ],
+  "COLUMN_PARAM_OUTPUT.ROOT": [
+   "OUTPUT_DIR",
+   "OUTPUT_ROOT"
+  ],
+  "COLUMN_PARAM_TICKER": [
+   "code",
+   "etf_ticker",
+   "stock_id",
+   "symbol"
+  ],
+  "COLUMN_PARAM_TIME.END_DATE": [
+   "END_DATE"
+  ],
+  "COLUMN_PARAM_TIME.START_DATE": [
+   "START_DATE"
+  ],
+  "COLUMN_PARAM_TW_INDUSTRY": [
+   "industry_tw",
+   "twse_industry",
+   "台灣產業分類",
+   "產業分類"
+  ],
+  "COLUMN_PARAM_YF_INDUSTRY": [
+   "industry",
+   "yfinance_industry"
+  ],
+  "COLUMN_PARAM_YF_SECTOR": [
+   "gics_sector",
+   "sector"
+  ],
+  "COLUMN_PARAM_YF_TICKER": [
+   "yahoo_ticker",
+   "yfinance_ticker"
+  ],
+  "COMPANY_1101": [
+   "TAIWAN CEMENT",
+   "台泥"
+  ],
+  "COMPANY_2303": [
+   "UMC",
+   "聯電"
+  ],
+  "COMPANY_2317": [
+   "FOXCONN",
+   "HON HAI",
+   "鴻海"
+  ],
+  "COMPANY_2330": [
+   "TAIWAN SEMICONDUCTOR",
+   "TSMC",
+   "台積電"
+  ],
+  "COMPANY_2454": [
+   "MEDIATEK",
+   "聯發科"
+  ],
+  "COMPANY_2603": [
+   "EVERGREEN",
+   "長榮"
+  ],
+  "COMPANY_3017": [
+   "AVC",
+   "奇鋐"
+  ],
+  "COMPANY_3324": [
+   "AURAS",
+   "雙鴻"
+  ],
+  "COMPANY_6533": [
+   "ANDES",
+   "晶心科"
+  ],
+  "COMPANY_8069": [
+   "E INK",
+   "元太"
+  ],
+  "FINANCIAL_FIELD_EPS": [
+   "Basic_EPS",
+   "Diluted_EPS",
+   "EPS",
+   "EPS (NT$)",
+   "Earnings Per Share",
+   "Fully Diluted EPS",
+   "basic eps",
+   "diluted eps",
+   "基本EPS",
+   "基本每股盈餘",
+   "完全稀釋EPS",
+   "每股盈餘",
+   "每股盈餘 (元)",
+   "稀釋EPS",
+   "稀釋每股盈餘"
+  ],
+  "FINANCIAL_FIELD_EQUITY": [
+   "Book_Value",
+   "Shareholders Equity",
+   "Total Equity",
+   "shareholders equity",
+   "total equity",
+   "帳面價值",
+   "權益總計",
+   "淨值",
+   "股東權益"
+  ],
+  "FINANCIAL_FIELD_BVPS": [
+   "Book Value Per Share",
+   "每股帳面價值",
+   "每股淨值"
+  ],
+  "FINANCIAL_FIELD_CASH_AND_EQUIVALENTS": [
+   "現金及約當現金"
+  ],
+  "FINANCIAL_FIELD_COGS": [
+   "cost_of_revenue"
+  ],
+  "FINANCIAL_FIELD_COST_OF_REVENUE": [
+   "營業成本"
+  ],
+  "FINANCIAL_FIELD_CURRENT_ASSETS": [
+   "流動資產"
+  ],
+  "FINANCIAL_FIELD_CURRENT_LIABILITIES": [
+   "流動負債"
+  ],
+  "FINANCIAL_FIELD_DILUTED_SHARES": [
+   "Fully Diluted Shares",
+   "完全稀釋後股本",
+   "稀釋後股本",
+   "稀釋股數"
+  ],
+  "FINANCIAL_FIELD_DPS": [
+   "Cash Dividend",
+   "Dividend Per Share",
+   "每股現金股利",
+   "每股股利"
+  ],
+  "FINANCIAL_FIELD_FCF": [
+   "free cash flow",
+   "自由現金流"
+  ],
+  "FINANCIAL_FIELD_FINANCING_CF": [
+   "financing_cash_flow",
+   "financing_cashflow"
+  ],
+  "FINANCIAL_FIELD_GROSS_MARGIN": [
+   "毛利率",
+   "毛利率 (%)"
+  ],
+  "FINANCIAL_FIELD_GROSS_PROFIT": [
+   "GP",
+   "gross income",
+   "毛利",
+   "營業毛利",
+   "營業毛利淨額"
+  ],
+  "FINANCIAL_FIELD_INVESTING_CF": [
+   "investing_cash_flow",
+   "investing_cashflow"
+  ],
+  "FINANCIAL_FIELD_NET_INCOME": [
+   "Net Income",
+   "Net profit",
+   "Net_Profit",
+   "Profit After Tax",
+   "net profit",
+   "pat",
+   "本期淨利",
+   "歸屬母公司淨利",
+   "歸母淨利",
+   "淨利",
+   "稅後淨利",
+   "稅後純益"
+  ],
+  "FINANCIAL_FIELD_NET_MARGIN": [
+   "淨利率",
+   "淨利率 (%)"
+  ],
+  "FINANCIAL_FIELD_NON_OPERATING_INCOME": [
+   "Non-op profit"
+  ],
+  "FINANCIAL_FIELD_OCF": [
+   "cash from operations",
+   "operating cash flow",
+   "營業活動現金流",
+   "營運現金流"
+  ],
+  "FINANCIAL_FIELD_OPERATING_CF": [
+   "operating_cash_flow",
+   "operating_cashflow"
+  ],
+  "FINANCIAL_FIELD_OPERATING_INCOME": [
+   "OP",
+   "Operating Profit",
+   "Operating profit",
+   "ebit",
+   "operating profit",
+   "operating_profit",
+   "營利",
+   "營業利潤",
+   "營業利益"
+  ],
+  "FINANCIAL_FIELD_OPERATING_MARGIN": [
+   "OP margin",
+   "營利率",
+   "營利率 (%)",
+   "營業利益率"
+  ],
+  "FINANCIAL_FIELD_PBR": [
+   "PBR (X)"
+  ],
+  "FINANCIAL_FIELD_PER": [
+   "PER (X)"
+  ],
+  "FINANCIAL_FIELD_PRETAX_INCOME": [
+   "PBT",
+   "Pre-tax profit",
+   "income_before_tax",
+   "稅前淨利",
+   "稅前獲利"
+  ],
+  "FINANCIAL_FIELD_REVENUE": [
+   "Revenues",
+   "Revenues (NT$m)",
+   "net sales",
+   "sales",
+   "營收",
+   "營業收入",
+   "營業收入淨額",
+   "銷貨收入"
+  ],
+  "FINANCIAL_FIELD_REVENUE_TWD_BN": [
+   "Revenues (NT$ in bn)"
+  ],
+  "FINANCIAL_FIELD_REVENUE_USD": [
+   "Revenues (US$ in mn)"
+  ],
+  "FINANCIAL_FIELD_ROA": [
+   "return_on_assets"
+  ],
+  "FINANCIAL_FIELD_ROE": [
+   "ROE (%)",
+   "Return on Equity",
+   "return_on_equity",
+   "股東權益報酬率"
+  ],
+  "FINANCIAL_FIELD_TARGET_PRICE": [
+   "tp",
+   "目標價",
+   "目標價格"
+  ],
+  "FINANCIAL_FIELD_TOTAL_ASSETS": [
+   "總資產",
+   "資產總計"
+  ],
+  "FINANCIAL_FIELD_TOTAL_LIABILITIES": [
+   "總負債"
+  ],
+  "FINANCIAL_FIELD_WEIGHTED_SHARES": [
+   "Avg Shares",
+   "Weighted Average Shares",
+   "加權平均流通股數",
+   "加權平均股本",
+   "平均股本"
+  ],
+  "RATING_NOT_RATED": [
+   "N/A",
+   "NR",
+   "Not Covered",
+   "暫無評等",
+   "未評等",
+   "未評級",
+   "無評等",
+   "Not Rated",
+   "No Rating",
+   "未覆蓋",
+   "未納入研究範圍",
+   "Coverage Dropped",
+   "CD",
+   "停止覆蓋",
+   "Under Review",
+   "UR",
+   "評等審視中",
+   "Restricted",
+   "受限"
+  ],
+  "BROKER_CATHAY": [
+   "國泰",
+   "國泰證券",
+   "國泰證期"
+  ],
+  "BROKER_CTBC": [
+   "中信",
+   "中信金",
+   "中國信託"
+  ],
+  "BROKER_HUANAN": [
+   "華南",
+   "華南投顧",
+   "華南永昌"
+  ],
+  "BROKER_KGI": [
+   "凱基",
+   "凱基投顧"
+  ],
+  "BROKER_MEGABANK": [
+   "兆豐",
+   "兆豐投顧",
+   "兆豐證券"
+  ],
+  "BROKER_MQ": [
+   "Macquarie",
+   "Macquarie Capital",
+   "麥格理",
+   "麥格理資本"
+  ],
+  "BROKER_PRESIDENT": [
+   "統一",
+   "統一投顧",
+   "統一證券"
+  ],
+  "BROKER_TAISHIN": [
+   "台新",
+   "台新投顧",
+   "台新證券"
+  ],
+  "RATING_STRENGTH_STRONG": [
+   "強力買進",
+   "強烈買進",
+   "積極買進",
+   "Strong Buy",
+   "strong-buy",
+   "Conviction Buy",
+   "Top Pick",
+   "強力賣出",
+   "強烈賣出",
+   "Strong Sell"
+  ],
+  "RATING_STRENGTH_ACCUMULATE": [
+   "Accumulate",
+   "Add",
+   "逢低加碼",
+   "逢低買進",
+   "增持"
+  ],
+  "RATING_STRONG_BUY_MASTER": [
+   "Strong Buy",
+   "SB",
+   "強力買進",
+   "積極買進",
+   "買進(強烈)",
+   "買進(強力)",
+   "Conviction Buy",
+   "Trading Buy"
+  ],
+  "RATING_STRONG_SELL_MASTER": [
+   "Strong Sell",
+   "SS",
+   "強力賣出",
+   "積極賣出",
+   "Conviction Sell"
+  ],
+  "RATING_CODEBOOK_MASTER": {
+   "Strong_Buy": {
+    "code": 1,
+    "aliases": [
+     "Strong Buy",
+     "SB",
+     "強力買進",
+     "積極買進",
+     "買進(強烈)",
+     "買進(強力)",
+     "Conviction Buy",
+     "Trading Buy"
+    ]
+   },
+   "Buy": {
+    "code": 2,
+    "aliases": [
+     "Buy",
+     "Outperform",
+     "OP",
+     "Overweight",
+     "OW",
+     "Long",
+     "買進",
+     "優於大盤",
+     "加碼",
+     "增持",
+     "買進(維持)",
+     "買進(調升)",
+     "買進(重申)",
+     "Accumulate",
+     "收集",
+     "逢低買進",
+     "買進(初次)"
+    ]
+   },
+   "Hold": {
+    "code": 3,
+    "aliases": [
+     "Hold",
+     "Neutral",
+     "N",
+     "Market Perform",
+     "MP",
+     "Equal Weight",
+     "EW",
+     "中立",
+     "持有",
+     "區間操作",
+     "觀望",
+     "維持中立",
+     "中立(調降)",
+     "中立(調升)",
+     "Sector Perform",
+     "Peer Perform",
+     "中性"
+    ]
+   },
+   "Sell": {
+    "code": 4,
+    "aliases": [
+     "Sell",
+     "Underperform",
+     "UP",
+     "Underweight",
+     "UW",
+     "Short",
+     "賣出",
+     "減碼",
+     "劣於大盤",
+     "賣出(調降)",
+     "賣出(重申)",
+     "Reduce",
+     "減持",
+     "逢高減碼",
+     "賣出(初次)"
+    ]
+   },
+   "Strong_Sell": {
+    "code": 5,
+    "aliases": [
+     "Strong Sell",
+     "SS",
+     "強力賣出",
+     "積極賣出",
+     "Conviction Sell"
+    ]
+   },
+   "Not_Rated": {
+    "code": 0,
+    "aliases": [
+     "Not Rated",
+     "NR",
+     "未評等",
+     "No Rating",
+     "N/A",
+     "無評等",
+     "暫無評等",
+     "未覆蓋",
+     "未納入研究範圍",
+     "Coverage Dropped",
+     "CD",
+     "停止覆蓋",
+     "Under Review",
+     "UR",
+     "評等審視中",
+     "Restricted",
+     "受限"
+    ]
+   }
+  },
+  "TARGET_PRICE_STRIPS": [
+   "NT$",
+   "TWD",
+   "上看",
+   "下看",
+   "元"
+  ],
+  "VALUATION_METHOD_CODEBOOK": {
+   "PER": {
+    "en": [
+     "PER",
+     "P/E",
+     "PE multiple",
+     "earnings multiple",
+     "price-earnings ratio"
+    ],
+    "zh": [
+     "本益比",
+     "本益比法",
+     "盈餘倍數",
+     "股價盈餘比",
+     "市盈率"
+    ]
+   },
+   "EV_EBITDA": {
+    "en": [
+     "EV/EBITDA",
+     "EV to EBITDA",
+     "enterprise value to EBITDA",
+     "EV multiple"
+    ],
+    "zh": [
+     "EV/EBITDA",
+     "企業價值倍數",
+     "企業價值對EBITDA",
+     "EV倍數"
+    ]
+   },
+   "DCF": {
+    "en": [
+     "DCF",
+     "discounted cash flow",
+     "DCF valuation",
+     "cash flow discount model"
+    ],
+    "zh": [
+     "DCF",
+     "折現現金流",
+     "折現現金流量模型",
+     "現金流折現法"
+    ]
+   },
+   "DDM": {
+    "en": [
+     "DDM",
+     "dividend discount model",
+     "dividend discount",
+     "dividend-based valuation"
+    ],
+    "zh": [
+     "股利折現模型",
+     "股利折現法",
+     "股息折現",
+     "股利折現"
+    ]
+   },
+   "PB": {
+    "en": [
+     "P/B",
+     "PB multiple",
+     "price-to-book",
+     "price book ratio"
+    ],
+    "zh": [
+     "股價淨值比",
+     "股價淨值倍數",
+     "PB倍數",
+     "市淨率"
+    ]
+   },
+   "SOTP": {
+    "en": [
+     "SOTP",
+     "sum-of-the-parts",
+     "break-up valuation",
+     "segment-based valuation"
+    ],
+    "zh": [
+     "分部加總法",
+     "分部估值",
+     "SOTP",
+     "事業群加總估值"
+    ]
+   },
+   "RELATIVE": {
+    "en": [
+     "relative valuation",
+     "peer multiple",
+     "peer comparison",
+     "sector multiple"
+    ],
+    "zh": [
+     "相對評價",
+     "同業比較法",
+     "同產業倍數",
+     "同業倍數法"
+    ]
+   },
+   "PER_BAND": {
+    "en": [
+     "target PER band",
+     "valuation band",
+     "PE band",
+     "trading range multiple"
+    ],
+    "zh": [
+     "本益比區間",
+     "評價區間",
+     "本益比波段",
+     "估值區間"
+    ]
+   },
+   "PEG": {
+    "en": [
+     "PEG",
+     "PE to growth",
+     "price-earnings-to-growth"
+    ],
+    "zh": [
+     "PEG",
+     "本益成長比",
+     "本益比成長比率"
+    ]
+   },
+   "RI": {
+    "en": [
+     "residual income model",
+     "RI model",
+     "economic profit model"
+    ],
+    "zh": [
+     "剩餘收益模型",
+     "剩餘收益法",
+     "經濟利潤模型"
+    ]
+   },
+   "NAV": {
+    "en": [
+     "NAV",
+     "net asset value",
+     "NAV valuation"
+    ],
+    "zh": [
+     "淨值法",
+     "資產淨值",
+     "NAV估值"
+    ]
+   },
+   "ROIC_VAL": {
+    "en": [
+     "ROIC valuation",
+     "return on invested capital model"
+    ],
+    "zh": [
+     "ROIC估值",
+     "投入資本報酬率估值"
+    ]
+   },
+   "EVA": {
+    "en": [
+     "EVA",
+     "economic value added",
+     "EVA valuation"
+    ],
+    "zh": [
+     "EVA",
+     "經濟附加價值",
+     "EVA估值"
+    ]
+   },
+   "FCF": {
+    "en": [
+     "FCFF",
+     "FCFE",
+     "free cash flow valuation"
+    ],
+    "zh": [
+     "自由現金流估值",
+     "FCFF",
+     "FCFE"
+    ]
+   },
+   "REG_VAL": {
+    "en": [
+     "regression valuation",
+     "statistical valuation"
+    ],
+    "zh": [
+     "迴歸估值",
+     "統計估值"
+    ]
+   }
+  },
+  "JOB_TITLE_CODEBOOK": {
+   "ANALYST": {
+    "en": [
+     "Analyst",
+     "Research Analyst",
+     "Equity Analyst",
+     "Associate Analyst"
+    ],
+    "zh": [
+     "分析師",
+     "研究員",
+     "研究分析師",
+     "股票分析師"
+    ]
+   },
+   "SENIOR_ANALYST": {
+    "en": [
+     "Senior Analyst",
+     "Lead Analyst",
+     "Principal Analyst"
+    ],
+    "zh": [
+     "資深分析師",
+     "首席分析師",
+     "主分析師"
+    ]
+   },
+   "ASSOCIATE": {
+    "en": [
+     "Associate",
+     "Research Associate",
+     "Junior Analyst"
+    ],
+    "zh": [
+     "助理分析師",
+     "研究助理",
+     "初級分析師"
+    ]
+   },
+   "STRATEGIST": {
+    "en": [
+     "Strategist",
+     "Market Strategist",
+     "Equity Strategist",
+     "Macro Strategist"
+    ],
+    "zh": [
+     "策略師",
+     "市場策略師",
+     "股票策略師",
+     "宏觀策略師"
+    ]
+   },
+   "ECONOMIST": {
+    "en": [
+     "Economist",
+     "Senior Economist",
+     "Macro Economist"
+    ],
+    "zh": [
+     "經濟學家",
+     "資深經濟學家",
+     "宏觀經濟學家"
+    ]
+   },
+   "HEAD_RESEARCH": {
+    "en": [
+     "Head of Research",
+     "Research Director",
+     "Research Head"
+    ],
+    "zh": [
+     "研究主管",
+     "研究部主管",
+     "研究總監"
+    ]
+   },
+   "RESEARCH_DIRECTOR": {
+    "en": [
+     "Research Director",
+     "Director of Research"
+    ],
+    "zh": [
+     "研究總監",
+     "研究部總監"
+    ]
+   },
+   "PORTFOLIO_MANAGER": {
+    "en": [
+     "Portfolio Manager",
+     "Fund Manager",
+     "PM"
+    ],
+    "zh": [
+     "投資組合經理",
+     "基金經理人",
+     "基金經理"
+    ]
+   },
+   "QUANT": {
+    "en": [
+     "Quant",
+     "Quantitative Analyst",
+     "Quant Researcher"
+    ],
+    "zh": [
+     "量化研究員",
+     "量化分析師",
+     "量化人員"
+    ]
+   },
+   "TRADER": {
+    "en": [
+     "Trader",
+     "Equity Trader",
+     "Derivatives Trader"
+    ],
+    "zh": [
+     "交易員",
+     "股票交易員",
+     "衍生品交易員"
+    ]
+   },
+   "CIO": {
+    "en": [
+     "Chief Investment Officer",
+     "CIO"
+    ],
+    "zh": [
+     "投資長",
+     "首席投資官"
+    ]
+   },
+   "CHIEF_ECONOMIST": {
+    "en": [
+     "Chief Economist"
+    ],
+    "zh": [
+     "首席經濟學家"
+    ]
+   },
+   "MD": {
+    "en": [
+     "Managing Director",
+     "MD"
+    ],
+    "zh": [
+     "董事總經理",
+     "總監"
+    ]
+   },
+   "VP": {
+    "en": [
+     "Vice President",
+     "VP"
+    ],
+    "zh": [
+     "副總裁",
+     "副總"
+    ]
+   },
+   "ASSOCIATE_DIRECTOR": {
+    "en": [
+     "Associate Director"
+    ],
+    "zh": [
+     "副總監"
+    ]
+   },
+   "INTERN": {
+    "en": [
+     "Research Intern",
+     "Intern"
+    ],
+    "zh": [
+     "研究實習生",
+     "實習生"
+    ]
+   }
+  }
+ },
+ "version": "v0105",
+ "prior": "VIA_Central_Synonym_Regex_v0104.json(凍結)",
+ "batch": "側線 2026-10-03 d(操作員:黃燈的地方請修正 → 同義字黃燈的裁定)",
+ "ts": "2026-10-05T00:00:00+00:00",
+ "rulings": {
+  "R-SYN-01": {
+   "namespace": "financial_field",
+   "aliases": [
+    "稅後淨利",
+    "淨利",
+    "net profit",
+    "Net Profit"
+   ],
+   "canonical": "net_income",
+   "why": "兩本冊一詞兩主(net_income vs net_profit);裁 net_income 為正典,net_profit 記拼法變體;依 L108 ④ 一別名一正典",
+   "who": "AI 依操作員「你懂你決定」起草 · 待操作員確認"
+  },
+  "R-SYN-02": {
+   "namespace": "financial_field",
+   "aliases": [
+    "每股盈餘",
+    "EPS",
+    "基本每股盈餘",
+    "稀釋每股盈餘",
+    "Basic EPS",
+    "Diluted EPS"
+   ],
+   "canonical": "eps",
+   "why": "EPS 粗細不由同義字裁:同義字只映到粗正典 eps;basic_eps / diluted_eps 是 R-EPS-01 裁決後的輸出欄位,不是別名(L109 ⑦;VIA_VRN_ExtractRules_SSOT R-EPS-01)",
+   "resolve_by": "R-EPS-01",
+   "who": "操作員 2026-10-03 口述裁定"
+  },
+  "R-SYN-03": {
+   "namespace": "financial_field",
+   "aliases": [
+    "股東權益",
+    "Total Equity",
+    "shareholders equity",
+    "book value"
+   ],
+   "canonical": "equity",
+   "why": "三本冊三個正典(equity / book_value / shareholders_equity);裁 equity 為正典;book_value 若為每股口徑另立 bvps(不在本批)",
+   "who": "AI 起草 · 待操作員確認"
+  },
+  "R-SYN-04": {
+   "namespace": "rating",
+   "aliases": [
+    "strong buy",
+    "conviction buy",
+    "top pick",
+    "強力買進",
+    "積極買進",
+    "strong sell",
+    "強力賣出",
+    "強烈賣出",
+    "accumulate",
+    "add"
+   ],
+   "rule": "同義字只映粗正典(BUY / HOLD / SELL / ADD / NOT_RATED);STRONG_BUY / STRONG_SELL / conviction / top pick 不是第二個正典,是強度 → 另立欄位 rating_strength(strong · conviction · top_pick · accumulate)",
+   "why": "SUP_MDL749 additive 量到 10 條同詞多義全在 rating,樞紐正典本來就是粗桶(BUY),增補冊另有細桶(STRONG_BUY)。與 R-EPS-01 同一裁法:粗細同軸不由同義字裁。accumulate / add 樞紐已有 ADD 桶,維持 ADD(不併 BUY)",
+   "who": "AI 依操作員「黃燈請修正」裁 · 待操作員確認"
+  },
+  "R-SYN-05": {
+   "namespace": "broker_domain",
+   "aliases": [
+    "jpmorgan.com"
+   ],
+   "canonical": "JPM",
+   "why": "CGC_MDL185 E2 兩本網域冊:jpmorgan.com 在增補冊映到 'J'(非正典鍵);institution 正典鍵是 JPM",
+   "who": "AI 裁 · 待操作員確認"
+  },
+  "b20261005_deepread": {
+   "ruled_by": "AI(操作員令 2026-10-05「三種台股代碼REGEX要擷取SSOT · TIME/EMAIL/HK TAIPEI TEL REGEX 入冊」;LL90)",
+   "what": "deepread 抽取式全走本冊:三代號(TWEquityTicker/YF/BBG LOCKED 照用)· RATING_* · TARGET_PRICE · 新增 TIME/EMAIL/台北+香港 TEL 四式"
+  },
+  "b20261005_master_dict": {
+   "ruled_by": "AI(操作員令 2026-10-05「VIA_MASTER_SSOT_DICTIONARY 併入;只增不減不衝突」;LL90)",
+   "what": "MASTER SSOT 併入:日期/季度/英文月份式 · 九類 ETF×三平台代碼族 · RATING 六級(含碼冊)· TARGET_PRICE 擴充+剝詞+防禦式;既有 LOCKED 條目一字未動"
+  },
+  "b20261005_names_valuation_titles": {
+   "ruled_by": "AI(操作員令 2026-10-05「只增不減不衝突就好」;LL90)",
+   "what": "估值法 15 法/職稱 16 職碼冊 + 中英/混合姓名 7 式;三平台台股代號前四碼同一=互證鍵;估值法與資訊區/本文區核對、職稱與分析師區核對"
+  }
+ },
+ "synonyms_meta": {
+  "COLUMN_PARAM_BBG_TICKER": {
+   "namespace": "column_param",
+   "canonical": "bbg_ticker",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_DATE": {
+   "namespace": "column_param",
+   "canonical": "date",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_FETCH.BATCH_SIZE": {
+   "namespace": "column_param",
+   "canonical": "fetch.batch_size",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_FETCH.MAX_RETRIES": {
+   "namespace": "column_param",
+   "canonical": "fetch.max_retries",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_FETCH.RETRY_DELAY_S": {
+   "namespace": "column_param",
+   "canonical": "fetch.retry_delay_s",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_FETCH.TIMEOUT_S": {
+   "namespace": "column_param",
+   "canonical": "fetch.timeout_s",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_ISSUER": {
+   "namespace": "column_param",
+   "canonical": "issuer",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_NAME": {
+   "namespace": "column_param",
+   "canonical": "name",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_OUTPUT.CSV_ENCODING": {
+   "namespace": "column_param",
+   "canonical": "output.csv_encoding",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_OUTPUT.ROOT": {
+   "namespace": "column_param",
+   "canonical": "output.root",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_TICKER": {
+   "namespace": "column_param",
+   "canonical": "ticker",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_TIME.END_DATE": {
+   "namespace": "column_param",
+   "canonical": "time.end_date",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_TIME.START_DATE": {
+   "namespace": "column_param",
+   "canonical": "time.start_date",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_TW_INDUSTRY": {
+   "namespace": "column_param",
+   "canonical": "tw_industry",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_YF_INDUSTRY": {
+   "namespace": "column_param",
+   "canonical": "yf_industry",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_YF_SECTOR": {
+   "namespace": "column_param",
+   "canonical": "yf_sector",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COLUMN_PARAM_YF_TICKER": {
+   "namespace": "column_param",
+   "canonical": "yf_ticker",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_1101": {
+   "namespace": "company",
+   "canonical": "1101",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_2303": {
+   "namespace": "company",
+   "canonical": "2303",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_2317": {
+   "namespace": "company",
+   "canonical": "2317",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_2330": {
+   "namespace": "company",
+   "canonical": "2330",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_2454": {
+   "namespace": "company",
+   "canonical": "2454",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_2603": {
+   "namespace": "company",
+   "canonical": "2603",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_3017": {
+   "namespace": "company",
+   "canonical": "3017",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_3324": {
+   "namespace": "company",
+   "canonical": "3324",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_6533": {
+   "namespace": "company",
+   "canonical": "6533",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "COMPANY_8069": {
+   "namespace": "company",
+   "canonical": "8069",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_EPS": {
+   "namespace": "financial_field",
+   "canonical": "eps",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_EQUITY": {
+   "namespace": "financial_field",
+   "canonical": "equity",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_BVPS": {
+   "namespace": "financial_field",
+   "canonical": "bvps",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_CASH_AND_EQUIVALENTS": {
+   "namespace": "financial_field",
+   "canonical": "cash_and_equivalents",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_COGS": {
+   "namespace": "financial_field",
+   "canonical": "cogs",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_COST_OF_REVENUE": {
+   "namespace": "financial_field",
+   "canonical": "cost_of_revenue",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_CURRENT_ASSETS": {
+   "namespace": "financial_field",
+   "canonical": "current_assets",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_CURRENT_LIABILITIES": {
+   "namespace": "financial_field",
+   "canonical": "current_liabilities",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_DILUTED_SHARES": {
+   "namespace": "financial_field",
+   "canonical": "diluted_shares",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_DPS": {
+   "namespace": "financial_field",
+   "canonical": "dps",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_FCF": {
+   "namespace": "financial_field",
+   "canonical": "fcf",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_FINANCING_CF": {
+   "namespace": "financial_field",
+   "canonical": "financing_cf",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_GROSS_MARGIN": {
+   "namespace": "financial_field",
+   "canonical": "gross_margin",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_GROSS_PROFIT": {
+   "namespace": "financial_field",
+   "canonical": "gross_profit",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_INVESTING_CF": {
+   "namespace": "financial_field",
+   "canonical": "investing_cf",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_NET_INCOME": {
+   "namespace": "financial_field",
+   "canonical": "net_income",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_NET_MARGIN": {
+   "namespace": "financial_field",
+   "canonical": "net_margin",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_NON_OPERATING_INCOME": {
+   "namespace": "financial_field",
+   "canonical": "non_operating_income",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_OCF": {
+   "namespace": "financial_field",
+   "canonical": "ocf",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_OPERATING_CF": {
+   "namespace": "financial_field",
+   "canonical": "operating_cf",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_OPERATING_INCOME": {
+   "namespace": "financial_field",
+   "canonical": "operating_income",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_OPERATING_MARGIN": {
+   "namespace": "financial_field",
+   "canonical": "operating_margin",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_PBR": {
+   "namespace": "financial_field",
+   "canonical": "pbr",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_PER": {
+   "namespace": "financial_field",
+   "canonical": "per",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_PRETAX_INCOME": {
+   "namespace": "financial_field",
+   "canonical": "pretax_income",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_REVENUE": {
+   "namespace": "financial_field",
+   "canonical": "revenue",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_REVENUE_TWD_BN": {
+   "namespace": "financial_field",
+   "canonical": "revenue_twd_bn",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_REVENUE_USD": {
+   "namespace": "financial_field",
+   "canonical": "revenue_usd",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_ROA": {
+   "namespace": "financial_field",
+   "canonical": "roa",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_ROE": {
+   "namespace": "financial_field",
+   "canonical": "roe",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_TARGET_PRICE": {
+   "namespace": "financial_field",
+   "canonical": "target_price",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_TOTAL_ASSETS": {
+   "namespace": "financial_field",
+   "canonical": "total_assets",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_TOTAL_LIABILITIES": {
+   "namespace": "financial_field",
+   "canonical": "total_liabilities",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "FINANCIAL_FIELD_WEIGHTED_SHARES": {
+   "namespace": "financial_field",
+   "canonical": "weighted_shares",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "RATING_BUY": {
+   "namespace": "rating",
+   "canonical": "buy",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "RATING_HOLD": {
+   "namespace": "rating",
+   "canonical": "hold",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "RATING_NOT_RATED": {
+   "namespace": "rating",
+   "canonical": "not_rated",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "RATING_SELL": {
+   "namespace": "rating",
+   "canonical": "sell",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_CATHAY": {
+   "namespace": "broker",
+   "canonical": "cathay",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_CTBC": {
+   "namespace": "broker",
+   "canonical": "ctbc",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_HUANAN": {
+   "namespace": "broker",
+   "canonical": "huanan",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_KGI": {
+   "namespace": "broker",
+   "canonical": "kgi",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_MEGABANK": {
+   "namespace": "broker",
+   "canonical": "megabank",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_MQ": {
+   "namespace": "broker",
+   "canonical": "mq",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_PRESIDENT": {
+   "namespace": "broker",
+   "canonical": "president",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "BROKER_TAISHIN": {
+   "namespace": "broker",
+   "canonical": "taishin",
+   "source": "CGC_MDL255 union(13 本 dict,9 支引擎)",
+   "grade": "M",
+   "batch": "側線 2026-10-03 c"
+  },
+  "RATING_STRENGTH_STRONG": {
+   "namespace": "rating",
+   "canonical": "rating_strength=strong",
+   "source": "R-SYN-04",
+   "grade": "P",
+   "batch": "側線 2026-10-03 d"
+  },
+  "RATING_STRENGTH_ACCUMULATE": {
+   "namespace": "rating",
+   "canonical": "rating_strength=accumulate",
+   "source": "R-SYN-04",
+   "grade": "P",
+   "batch": "側線 2026-10-03 d"
+  }
+ }
+}
