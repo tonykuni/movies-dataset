@@ -1,0 +1,10 @@
+C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VRN\bridges\lopdf_cli\target\release\deps\log-5f44852a2a2cb61b.d: C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\lib.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\macros.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\serde.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\__private_api.rs
+
+C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VRN\bridges\lopdf_cli\target\release\deps\liblog-5f44852a2a2cb61b.rlib: C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\lib.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\macros.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\serde.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\__private_api.rs
+
+C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VRN\bridges\lopdf_cli\target\release\deps\liblog-5f44852a2a2cb61b.rmeta: C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\lib.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\macros.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\serde.rs C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\__private_api.rs
+
+C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\lib.rs:
+C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\macros.rs:
+C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\serde.rs:
+C:\Users\tonyk\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\log-0.4.34\src\__private_api.rs:
