@@ -4,43 +4,17 @@
 
 ## 貼回包
 ```
-[計] vcgc registry govern(dry-run 不寫號) · 表 264(紅 23 黃 200 綠 41 發 0)· 功 21546(紅 36 黃 7814 綠 13696 發 0)· RED
-  [RED] 表 VCGC|via_activationgateway_v03_stablehotfix_manifest|77346f5e095960a6 · T2 無主鍵(DF06)
-  [RED] 表 VCGC|via_activationgateway_v04_inlineready_manifest|77346f5e095960a6 · T2 無主鍵(DF06)
-  [RED] 表 VCGC|via_activationgateway_v05_paramfirst_manifest|e429aebd45fffde1 · T2 無主鍵(DF06)
-  [RED] 表 VCGC|via_canon_registry_entries|d753b3150d73a495 · T2 無主鍵(DF06)
-  [RED] 表 VCGC|via_ssot_synonymunion_deny_leak|152e637df5ce6e18 · T2 無主鍵(DF06)
-  [RED] 表 VCGC|via_ssot_synonymunion_rulings|2e2acd06aa8dbb6b · TEST 主鍵 key 空或重複
-  [RED] 表 VDF|stockreportfinancialdata|583fea2c922f1f96 · T2 無主鍵(DF06)
-  [RED] 表 VDF|vdf_param_registry_params|de265717569b6490 · T2 無主鍵(DF06)
-  [RED] 表 VDF|vdf_tw_focus_universe_members|197429d4b3f52d6d · T2 無主鍵(DF06)
-  [RED] 表 VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 · T2 無主鍵(DF06)
-  [RED] 表 VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__issues|839216bb877b059b · T2 無主鍵(DF06)
-  [RED] 表 VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 · T2 無主鍵(DF06)
-  [RED] 表 … 另 11 在卡
-  [RED] 功 VCGC|MDL|VDF_MDL007_SSOTResolver|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VDF_MDL103_MasterRegistry|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VDF_MDL104_RegistryLoader|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VDF_MDL105_CrossValidator|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VDF_MDL201_GenerateFullRegistry|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VDF_MDL303_RegistryActivation|v0000 · F1 同模組族在 VCGC,VDF
-  [RED] 功 VCGC|MDL|VIS_VRN_TableGeometryReconstructor|v0101 · F1 同模組族在 VCGC,VRN
-  [RED] 功 VCGC|MDL|VIS_VRN_TableHeaderPeriodOriginalRestore|v0100 · F1 同模組族在 VCGC,VRN
-  [RED] 功 VCGC|MDL|VRN_MDL002_LayoutExtractor|v0000 · F1 同模組族在 VCGC,VRN
-  [RED] 功 VCGC|MDL|VRN_MDL004_OCR_FetchingPDFTable_v1|v0000 · F1 同模組族在 VCGC,VRN
-  [RED] 功 VCGC|MDL|VRN_MDL005_OCRFetchingPDFText_v1|v0000 · F1 同模組族在 VCGC,VRN
-  [RED] 功 VCGC|MDL|VRN_MDL006_ConsolidatorAndPhaseValidator|v0000 · F1 同模組族在 VCGC,VRN
-  [RED] 功 … 另 24 在卡
-[計] 黃燈提醒分類 · F3=11018 · T5=139 · T6=195
+[計] vcgc registry govern --apply · 表 269(紅 0 黃 229 綠 40 發 0)· 功 20587(紅 0 黃 6677 綠 13879 發 0)· YELLOW
+[計] 黃燈提醒分類 · F3=8199 · T5=147 · T6=198
   [YEL] 表 VCGC|via_activationgateway_v02_hotfix_manifest|77346f5e095960a6 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非
+  [YEL] 表 VCGC|via_activationgateway_v03_stablehotfix_manifest|77346f5e095960a6 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非
+  [YEL] 表 VCGC|via_activationgateway_v04_inlineready_manifest|77346f5e095960a6 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非
+  [YEL] 表 VCGC|via_activationgateway_v05_paramfirst_manifest|e429aebd45fffde1 · 同欄名異型(跨表):Time,Value | 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:FixClass;非snake:Metric;數字存字串:Value
+  [YEL] 表 VCGC|via_canon_registry_entries|d753b3150d73a495 · 同欄名異型(跨表):group,ts | 格內巢狀:group;格內巢狀:yields;格內巢狀:mislabeled;格內巢狀:members;無主鍵候選
   [YEL] 表 VCGC|via_central_params_ssot_locked_alignment|cf200273cf177b97 · 格內巢狀:drift
   [YEL] 表 VCGC|via_central_params_ssot_books|1f34ff41fdab810a · 格內巢狀:top_keys
   [YEL] 表 VCGC|via_central_synonym_regex_regex|c657206549457a82 · 同欄名異型(跨表):rule,files | 格內巢狀:rule;格內巢狀:flags
-  [YEL] 表 VCGC|via_central_synonym_regex_rulings|711d8f78f27fd875 · 同欄名異型(跨表):rule | 格內巢狀:aliases
-  [YEL] 表 VCGC|via_central_synonym_regex_synonyms_meta|3aa6a298abee1c34 · 同欄名異型(跨表):source | 數字存字串:canonical
-  [YEL] 表 VCGC|via_dataframecontract_ssot_laws|d0355d728d8df946 · 同欄名異型(跨表):zh
-  [YEL] 表 VCGC|via_dataframe_lock_ledger|51f338f17fb8e61e · 同欄名異型(跨表):rows,keys | 格內巢狀:keys
-NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)→ 子系統重登記 → 本引擎重跑;綠已發號 → 子系統 table/fn number pull
+NEXT: 零紅 → 子系統跑 table number pull / fn number pull 讀號;黃表留卡逐批裁
 ```
 
 ## 表(每鍵一列)
@@ -48,10 +22,10 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 |---|---|---|---|---|
 | VCGC|governanceregistry_language_adapters|e57046547d500202 | GREEN | SSOT-VCGC-VCGC-TBL0001 | — |  |
 | VCGC|via_activationgateway_v02_hotfix_manifest|77346f5e095960a6 | YELLOW | SSOT-VCGC-VCGC-TBL0002 | — | T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非sna |
-| VCGC|via_activationgateway_v03_stablehotfix_manifest|77346f5e095960a6 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非sna |
-| VCGC|via_activationgateway_v04_inlineready_manifest|77346f5e095960a6 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非sna |
-| VCGC|via_activationgateway_v05_paramfirst_manifest|e429aebd45fffde1 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:FixClass;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非s |
-| VCGC|via_canon_registry_entries|d753b3150d73a495 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):group,ts; T6 格內巢狀:group;格內巢狀:yields;格內巢狀:mislabeled;格內巢狀:members;無主鍵候選 |
+| VCGC|via_activationgateway_v03_stablehotfix_manifest|77346f5e095960a6 | YELLOW | SSOT-VCGC-VCGC-TBL0063 | — | T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非sna |
+| VCGC|via_activationgateway_v04_inlineready_manifest|77346f5e095960a6 | YELLOW | SSOT-VCGC-VCGC-TBL0064 | — | T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:Action;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非sna |
+| VCGC|via_activationgateway_v05_paramfirst_manifest|e429aebd45fffde1 | YELLOW | SSOT-VCGC-VCGC-TBL0065 | — | T5 同欄名異型(跨表):Time,Value; T6 非snake:Time;非snake:Round;非snake:Layer;非snake:Name;非snake:Status;非snake:Risk;非snake:FixClass;非snake:Metric;數字存字串:Value;非snake:Value;非snake:Message;非snake:Path;非s |
+| VCGC|via_canon_registry_entries|d753b3150d73a495 | YELLOW | SSOT-VCGC-VCGC-TBL0066 | — | T5 同欄名異型(跨表):group,ts; T6 格內巢狀:group;格內巢狀:yields;格內巢狀:mislabeled;格內巢狀:members;無主鍵候選 |
 | VCGC|via_central_params_ssot_locked_alignment|cf200273cf177b97 | YELLOW | SSOT-VCGC-VCGC-TBL0003 | — | T6 格內巢狀:drift |
 | VCGC|via_central_params_ssot_books|1f34ff41fdab810a | YELLOW | SSOT-VCGC-VCGC-TBL0004 | — | T6 格內巢狀:top_keys |
 | VCGC|via_central_synonym_regex_regex|c657206549457a82 | YELLOW | SSOT-VCGC-VCGC-TBL0005 | — | T5 同欄名異型(跨表):rule,files; T6 格內巢狀:rule;格內巢狀:flags |
@@ -67,7 +41,6 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|via_essentia_cardbook_vdf_cards|d7942522c0422595 | YELLOW | SSOT-VCGC-VCGC-TBL0015 | — | T6 數字存字串:version;格內巢狀:verbs;格內巢狀:flags;格內巢狀:contract;格內巢狀:owns;格內巢狀:tables;格內巢狀:deps |
 | VCGC|via_essentia_cardbook_vrn_cards|d7942522c0422595 | YELLOW | SSOT-VCGC-VCGC-TBL0016 | — | T6 數字存字串:version;格內巢狀:verbs;格內巢狀:flags;格內巢狀:contract;格內巢狀:owns;格內巢狀:tables;格內巢狀:deps |
 | VCGC|via_essentia_product_ssot_verbs|2065070f1e0d2594 | GREEN | SSOT-VCGC-VCGC-TBL0017 | — |  |
-| VCGC|via_finalparameters_canonicalregistry|5e765f194d2527e1 | YELLOW | SSOT-VCGC-VCGC-TBL0018 | — | T6 數字存字串:def_preferred_value |
 | VCGC|via_lamplock_wkf|09a71903e699f512 | YELLOW | SSOT-VCGC-VCGC-TBL0019 | — | T5 同欄名異型(跨表):level; T6 格內巢狀:versions;格內巢狀:numbered;格內巢狀:registered |
 | VCGC|via_lamplock_wkf_open|74228630944aac4a | YELLOW | SSOT-VCGC-VCGC-TBL0020 | — | T6 格內巢狀:open;格內巢狀:steps |
 | VCGC|via_libregistry_items|a7e01a80090e2da4 | YELLOW | SSOT-VCGC-VCGC-TBL0021 | — | T5 同欄名異型(跨表):Exists; T6 非snake:Path;非snake:Name;非snake:Exists;非snake:Role;非snake:Kind;非snake:Ext;非snake:SizeKB;非snake:LastWriteTime;非snake:HasSSOT;非snake:HasRegex;非snake:HasSchema;非sna |
@@ -102,9 +75,9 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|via_ssot_regexdict_top_shared|4a127bb178243b76 | YELLOW | SSOT-VCGC-VCGC-TBL0050 | — | T5 同欄名異型(跨表):files; T6 格內巢狀:files |
 | VCGC|via_ssot_regexdict_synonyms|989f86e22a14c443 | YELLOW | SSOT-VCGC-VCGC-TBL0051 | — | T5 同欄名異型(跨表):keys |
 | VCGC|via_ssot_synonymunion_key_alias|40e8ff997f9dce99 | GREEN | SSOT-VCGC-VCGC-TBL0052 | — |  |
-| VCGC|via_ssot_synonymunion_deny_leak|152e637df5ce6e18 | RED | 留白 | — | T2 無主鍵(DF06); T6 無主鍵候選 |
+| VCGC|via_ssot_synonymunion_deny_leak|152e637df5ce6e18 | YELLOW | SSOT-VCGC-VCGC-TBL0067 | — | T6 無主鍵候選 |
 | VCGC|via_ssot_synonymunion_gate_bypass|fd3aad6395ebf081 | GREEN | SSOT-VCGC-VCGC-TBL0053 | — |  |
-| VCGC|via_ssot_synonymunion_rulings|2e2acd06aa8dbb6b | RED | 留白 | FAIL:主鍵 key 空或重複 | T5 同欄名異型(跨表):base,kept; T6 格內巢狀:base;格內巢狀:upload;格內巢狀:base_src;格內巢狀:demoted;格內巢狀:upload_said;格內巢狀:kept; TEST 主鍵 key 空或重複 |
+| VCGC|via_ssot_synonymunion_rulings|2e2acd06aa8dbb6b | YELLOW | SSOT-VCGC-VCGC-TBL0068 | — | T5 同欄名異型(跨表):base,kept; T6 格內巢狀:base;格內巢狀:upload;格內巢狀:base_src;格內巢狀:demoted;格內巢狀:upload_said;格內巢狀:kept |
 | VCGC|via_ssot_synonymunion_unverified|ec6795bcb6b6864e | GREEN | SSOT-VCGC-VCGC-TBL0054 | — |  |
 | VCGC|via_statuslock_locked|354aabe9abf59f38 | YELLOW | SSOT-VCGC-VCGC-TBL0055 | — | T6 格內巢狀:lamps;格內巢狀:cycles |
 | VCGC|via_toolregistry_items|a7e01a80090e2da4 | YELLOW | SSOT-VCGC-VCGC-TBL0056 | — | T5 同欄名異型(跨表):Exists; T6 非snake:Path;非snake:Name;非snake:Exists;非snake:Role;非snake:Kind;非snake:Ext;非snake:SizeKB;非snake:LastWriteTime;非snake:HasSSOT;非snake:HasRegex;非snake:HasSchema;非sna |
@@ -114,12 +87,11 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|via_workflow_vcgc_ssot_workflows|a5cb283c4da232cb | YELLOW | SSOT-VCGC-VCGC-TBL0060 | — | T5 同欄名異型(跨表):spec; T6 格內巢狀:spec;格內巢狀:plan;格內巢狀:steps;格內巢狀:tests |
 | VCGC|via_workflow_vdf_ssot_workflows|a5cb283c4da232cb | YELLOW | SSOT-VCGC-VCGC-TBL0061 | — | T5 同欄名異型(跨表):spec; T6 格內巢狀:spec;格內巢狀:plan;格內巢狀:steps;格內巢狀:tests |
 | VCGC|via_workflow_vrn_ssot_workflows|a5cb283c4da232cb | YELLOW | SSOT-VCGC-VCGC-TBL0062 | — | T5 同欄名異型(跨表):spec; T6 格內巢狀:spec;格內巢狀:plan;格內巢狀:steps;格內巢狀:tests |
-| VDF|stockreportfinancialdata|583fea2c922f1f96 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Page; T6 非snake:SourceFile;數字存字串:Ticker;非snake:Ticker;非snake:Broker;非snake:ReportDate;混型:Page;數字存字串:Page;非snake:Page;混型:TableIndex;數字存字串:TableIndex;非snake:TableIndex;混型: |
+| VCGC|via_finalparameters_canonicalregistry_h2|fe6b440cb3fd6519 | YELLOW | SSOT-VCGC-VCGC-TBL0069 | — | T5 同欄名異型(跨表):def_occurrences,def_distinct_values,def_is_noise,def_score; T6 數字存字串:def_preferred_value;數字存字串:def_occurrences;數字存字串:def_distinct_values;數字存字串:def_score |
 | VDF|taiwanstockgroup_sources|85edc9756ecc9afd | YELLOW | SSOT-VCGC-VDF-TBL0001 | — | T5 同欄名異型(跨表):rows |
 | VDF|taiwanstockgroup_categories|5ff7b05ceab8ba82 | YELLOW | SSOT-VCGC-VDF-TBL0002 | — | T6 格內巢狀:subcategories |
 | VDF|taiwanstockgroup_themes|6e01554e387b87cc | YELLOW | SSOT-VCGC-VDF-TBL0003 | — | T6 格內巢狀:mentioned |
 | VDF|taiwanstockgroup_tickers|0729aa3e67ef8fa3 | YELLOW | SSOT-VCGC-VDF-TBL0004 | — | T6 格內巢狀:groups |
-| VDF|vdf_2_enginecapability|9c97833f0ca4d518 | GREEN | SSOT-VCGC-VDF-TBL0005 | — |  |
 | VDF|vdf_adjprice_rule_ssot_rules|7b5d3381528924f7 | YELLOW | SSOT-VCGC-VDF-TBL0006 | — | T5 同欄名異型(跨表):zh; T6 格內巢狀:raw_columns;格內巢狀:factor_row;格內巢狀:adj_columns;格內巢狀:markets;格內巢狀:second_source_sample |
 | VDF|vdf_akshareselection_macroshipping_overrides|7d95887e1b55f998 | YELLOW | SSOT-VCGC-VDF-TBL0007 | — | T5 同欄名異型(跨表):symbol; T6 格內巢狀:symbol;格內巢狀:__rows__ |
 | VDF|vdf_fetchgroups_ssot_groups|f859275ff106a3d3 | YELLOW | SSOT-VCGC-VDF-TBL0008 | — | T5 同欄名異型(跨表):zh,en,exclude; T6 格內巢狀:engines;格內巢狀:sources;格內巢狀:refill;格內巢狀:asof_args;格內巢狀:default_members;格內巢狀:member_args;格內巢狀:start_args |
@@ -140,14 +112,14 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VDF|vdf_mdl403_registryfull_items|e3938eb800b58e97 | YELLOW | SSOT-VCGC-VDF-TBL0023 | — | T5 同欄名異型(跨表):freq; T6 格內巢狀:sources;格內巢狀:validation;格內巢狀:downstream_modules;格內巢狀:tags |
 | VDF|vdf_param_engine_map_by_engine|33749fa8142c80dd | YELLOW | SSOT-VCGC-VDF-TBL0024 | — | T6 格內巢狀:cli;格內巢狀:consts |
 | VDF|vdf_param_engine_map_by_param|2b3987b418d3610d | YELLOW | SSOT-VCGC-VDF-TBL0025 | — | T6 格內巢狀:engines;格內巢狀:values;格內巢狀:governance |
-| VDF|vdf_param_registry_params|de265717569b6490 | RED | 留白 | — | T2 無主鍵(DF06); T6 數字存字串:value;無主鍵候選 |
+| VDF|vdf_param_registry_params|de265717569b6490 | YELLOW | SSOT-VCGC-VDF-TBL0074 | — | T6 數字存字串:value;無主鍵候選 |
 | VDF|vdf_param_registry_canonical|b891deb0ec3579ef | YELLOW | SSOT-VCGC-VDF-TBL0026 | — | T6 數字存字串:ruling;格內巢狀:variants |
 | VDF|vdf_subsystem_manifest_artifacts|f214675308fa44d0 | GREEN | SSOT-VCGC-VDF-TBL0027 | — |  |
 | VDF|vdf_ta_engine_spec_universe|1b564dbec3172d69 | YELLOW | SSOT-VCGC-VDF-TBL0028 | — | T5 同欄名異型(跨表):zh |
 | VDF|vdf_ta_engine_spec_changelog|5607445de5ba51de | YELLOW | SSOT-VCGC-VDF-TBL0029 | — | T5 同欄名異型(跨表):ts,op |
 | VDF|vdf_twequity_dailyrow_schema_columns|cb328599b2958307 | YELLOW | SSOT-VCGC-VDF-TBL0030 | — | T5 同欄名異型(跨表):zh,source,required |
 | VDF|vdf_twequity_dailyrow_schema_changelog|5607445de5ba51de | YELLOW | SSOT-VCGC-VDF-TBL0031 | — | T5 同欄名異型(跨表):ts,op |
-| VDF|vdf_tw_focus_universe_members|197429d4b3f52d6d | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):market,group; T6 數字存字串:ticker;無主鍵候選 |
+| VDF|vdf_tw_focus_universe_members|197429d4b3f52d6d | YELLOW | SSOT-VCGC-VDF-TBL0075 | — | T5 同欄名異型(跨表):market,group; T6 數字存字串:ticker;無主鍵候選 |
 | VDF|vdf_usmacro_agencies_agencies|bca818322e1de506 | YELLOW | SSOT-VCGC-VDF-TBL0032 | — | T5 同欄名異型(跨表):zh,rows; T6 格內巢狀:rows |
 | VDF|vdf_usmacro_coverage_map_assets_measured|21d2866e448a5b5c | YELLOW | SSOT-VCGC-VDF-TBL0033 | — | T5 同欄名異型(跨表):columns,rows; T6 格內巢狀:column_list;格內巢狀:series |
 | VDF|vdf_usmacro_detail_fetch_roster_changelog|5607445de5ba51de | YELLOW | SSOT-VCGC-VDF-TBL0034 | — | T5 同欄名異型(跨表):ts,op |
@@ -187,6 +159,10 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VDF|via_extraction_matrix_v8|93d5c1cd126053ca | YELLOW | SSOT-VCGC-VDF-TBL0068 | — | T6 數字存字串:#;非snake:#;非snake:大項目;非snake:小項目;非snake:標的/代碼;非snake:主要來源;非snake:頻率;非snake:多來源並存;非snake:證據層;非snake:用途;非snake:QA |
 | VDF|via_vdf_fetch_contract_domains|45657c8065489a19 | YELLOW | SSOT-VCGC-VDF-TBL0069 | — | T6 格內巢狀:items |
 | VDF|via_vdf_fetch_contract_revisions|d6e1650ff3f6e8a5 | GREEN | SSOT-VCGC-VDF-TBL0070 | — |  |
+| VDF|vdf_2_enginecapability_h2|d71b3cb7967e7dc0 | YELLOW | SSOT-VCGC-VDF-TBL0071 | — | T5 同欄名異型(跨表):found |
+| VDF|vdf_dormant_ledger|ccf0a8d239804a96 | YELLOW | SSOT-VCGC-VDF-TBL0076 | — | T5 同欄名異型(跨表):base,ts |
+| VDF|vdf_functionmatrix_items_h2|c1849daf33afd0b6 | YELLOW | SSOT-VCGC-VDF-TBL0077 | — | T5 同欄名異型(跨表):source; T6 數字存字串:body_sha;格內巢狀:issues;格內巢狀:similar;格內巢狀:history |
+| VDF|stockreportfinancialdata_h2|929567135d8551a1 | YELLOW | SSOT-VCGC-VDF-TBL0078 | — | T5 同欄名異型(跨表):Page,TableIndex,RowIndex,ColumnIndex,PeriodOk; T6 非snake:SourceFile;數字存字串:Ticker;非snake:Ticker;非snake:Broker;非snake:ReportDate;數字存字串:Page;非snake:Page;數字存字串:TableIndex;非snake:TableIndex;數字存字串:RowIndex;非snake:Row |
 | VRN|vrn_audit_evidence_findings|339959b67747763a | GREEN | SSOT-VCGC-VRN-TBL0001 | — |  |
 | VRN|vrn_audit_evidence_verified_sources|5f52aae043a46f06 | GREEN | SSOT-VCGC-VRN-TBL0002 | — |  |
 | VRN|vrn_chainnodeledger_timeouts|d8a197c628f04d53 | GREEN | SSOT-VCGC-VRN-TBL0003 | — |  |
@@ -214,8 +190,8 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__source_manifest_validated|42e438e35c2f08b9 | YELLOW | SSOT-VCGC-VRN-TBL0025 | — | T5 同欄名異型(跨表):Exists; T6 非snake:Validation Status;非snake:Source ID;非snake:Filename;非snake:Path;非snake:Extension;非snake:Exists;非snake:Allowed For D8;數字存字串:Parsed Ticker;非snake:Parsed Tic |
 | VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__text_anchor_evidence|1fdb6743cc0cf479 | YELLOW | SSOT-VCGC-VRN-TBL0026 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Filename;非snake:Path;非snake:Extract Method;非snake:Text Chars;數字存字串:Ticker From Filename;非snake:Ticker From File |
 | VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__basic_info_candidates|a20e3a430e891f34 | YELLOW | SSOT-VCGC-VRN-TBL0027 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Report Date;非snake:Report Code;非snake:Filename;非snake:Broker;非snake:Analyst;數字存字串:Ticker;非snake:Ticker;非snake:Y |
-| VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Value; T6 非snake:Validation Status;數字存字串:Ticker;非snake:Ticker;非snake:Filename;非snake:Category;非snake:Account;數字存字串:Year;非snake:Year;非snake:Unit;數字存字串:Value;非snake:Value;非 |
-| VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__issues|839216bb877b059b | RED | 留白 | — | T2 無主鍵(DF06); T6 非snake:Validation Status;非snake:Dataset;非snake:Source ID;非snake:Filename;非snake:Issue Type;非snake:Problem;非snake:Suggested Fix;無主鍵候選 |
+| VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 | YELLOW | SSOT-VCGC-VRN-TBL0127 | — | T5 同欄名異型(跨表):Value; T6 非snake:Validation Status;數字存字串:Ticker;非snake:Ticker;非snake:Filename;非snake:Category;非snake:Account;數字存字串:Year;非snake:Year;非snake:Unit;數字存字串:Value;非snake:Value;非 |
+| VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__issues|839216bb877b059b | YELLOW | SSOT-VCGC-VRN-TBL0112 | — | T6 非snake:Validation Status;非snake:Dataset;非snake:Source ID;非snake:Filename;非snake:Issue Type;非snake:Problem;非snake:Suggested Fix;無主鍵候選 |
 | VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__lineage|ef9a482c499db90c | YELLOW | SSOT-VCGC-VRN-TBL0028 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Origin File;非snake:Origin SHA256;非snake:Run ID;非snake:Module Chain;非snake:Page Evidence;非snake:Table Evidence;非 |
 | VRN|vrn_mdl089_vrn_v141d8a2_safegetter_sourcemanifestextractor__module__d9_gate|99bc06970b47e044 | YELLOW | SSOT-VCGC-VRN-TBL0029 | — | T6 非snake:Validation Status;非snake:Target Output;非snake:Source Candidate;非snake:Write Enable;非snake:Manual Gate Required;非snake:Validation Note |
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__summary|7eb5592307ae3775 | YELLOW | SSOT-VCGC-VRN-TBL0030 | — | T5 同欄名異型(跨表):Time,Value,Expected; T6 非snake:Validation Status;非snake:Time;非snake:Category;非snake:Item;數字存字串:Value;非snake:Value;數字存字串:Expected;非snake:Expected;非snake:Pass;非snake:Severity;非snake:Vali |
@@ -223,14 +199,14 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__source_manifest_validated|42e438e35c2f08b9 | YELLOW | SSOT-VCGC-VRN-TBL0032 | — | T5 同欄名異型(跨表):Exists; T6 非snake:Validation Status;非snake:Source ID;非snake:Filename;非snake:Path;非snake:Extension;非snake:Exists;非snake:Allowed For D8;數字存字串:Parsed Ticker;非snake:Parsed Tic |
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__text_anchor_evidence|1fdb6743cc0cf479 | YELLOW | SSOT-VCGC-VRN-TBL0033 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Filename;非snake:Path;非snake:Extract Method;非snake:Text Chars;數字存字串:Ticker From Filename;非snake:Ticker From File |
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__basic_info_candidates|a20e3a430e891f34 | YELLOW | SSOT-VCGC-VRN-TBL0034 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Report Date;非snake:Report Code;非snake:Filename;非snake:Broker;非snake:Analyst;數字存字串:Ticker;非snake:Ticker;非snake:Y |
-| VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Value; T6 非snake:Validation Status;數字存字串:Ticker;非snake:Ticker;非snake:Filename;非snake:Category;非snake:Account;數字存字串:Year;非snake:Year;非snake:Unit;數字存字串:Value;非snake:Value;非 |
-| VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__issues|839216bb877b059b | RED | 留白 | — | T2 無主鍵(DF06); T6 非snake:Validation Status;非snake:Dataset;非snake:Source ID;非snake:Filename;非snake:Issue Type;非snake:Problem;非snake:Suggested Fix;無主鍵候選 |
+| VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__financial_data_text_candidates|c317bea1f2374258 | YELLOW | SSOT-VCGC-VRN-TBL0128 | — | T5 同欄名異型(跨表):Value; T6 非snake:Validation Status;數字存字串:Ticker;非snake:Ticker;非snake:Filename;非snake:Category;非snake:Account;數字存字串:Year;非snake:Year;非snake:Unit;數字存字串:Value;非snake:Value;非 |
+| VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__issues|839216bb877b059b | YELLOW | SSOT-VCGC-VRN-TBL0113 | — | T6 非snake:Validation Status;非snake:Dataset;非snake:Source ID;非snake:Filename;非snake:Issue Type;非snake:Problem;非snake:Suggested Fix;無主鍵候選 |
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__lineage|ef9a482c499db90c | YELLOW | SSOT-VCGC-VRN-TBL0035 | — | T6 非snake:Validation Status;非snake:Source ID;非snake:Origin File;非snake:Origin SHA256;非snake:Run ID;非snake:Module Chain;非snake:Page Evidence;非snake:Table Evidence;非 |
 | VRN|vrn_mdl090_vrn_v141d8a3_singlequoted_sourcemanifestextractor__module__d9_gate|99bc06970b47e044 | YELLOW | SSOT-VCGC-VRN-TBL0036 | — | T6 非snake:Validation Status;非snake:Target Output;非snake:Source Candidate;非snake:Write Enable;非snake:Manual Gate Required;非snake:Validation Note |
 | VRN|vrn_mdl105_vrn_donotredo_doneregistry__support_rule__v0_0_donotredoregistry|5c7377db36326608 | YELLOW | SSOT-VCGC-VRN-TBL0037 | — | T6 非snake:Item;非snake:Status;非snake:DoNotRedo;非snake:Evidence;非snake:Reason;非snake:NextAction;非snake:Risk |
 | VRN|vrn_mdl105_vrn_donotredo_doneregistry__support_rule__v0_0_currentbaseevidence|25341170dde825dc | YELLOW | SSOT-VCGC-VRN-TBL0038 | — | T5 同欄名異型(跨表):Exists; T6 非snake:Key;非snake:Type;非snake:Path;非snake:Exists;非snake:ExpectedRows;非snake:ActualRows;非snake:SHA256;非snake:Status;非snake:Risk;非snake:Note |
 | VRN|vrn_mdl105_vrn_donotredo_doneregistry__support_rule__v0_0_nextorder|6cd4818c71fac9fa | YELLOW | SSOT-VCGC-VRN-TBL0039 | — | T5 同欄名異型(跨表):Mutation; T6 非snake:Order;非snake:Phase;非snake:Action;非snake:DependsOn;非snake:ShouldRunNow;混型:Mutation;非snake:Mutation;非snake:Reason;非snake:Risk |
-| VRN|vrn_mdl117_vrn_activation_registryonly_dry_v1_0_27__support_rule__v1_0|128ec8cd77ac5e02 | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):Page,Value; T6 非snake:Page;非snake:Gate;數字存字串:Value;非snake:Value;非snake:Status;非snake:Severity;非snake:Message;無主鍵候選 |
+| VRN|vrn_mdl117_vrn_activation_registryonly_dry_v1_0_27__support_rule__v1_0|128ec8cd77ac5e02 | YELLOW | SSOT-VCGC-VRN-TBL0114 | — | T5 同欄名異型(跨表):Page,Value; T6 非snake:Page;非snake:Gate;數字存字串:Value;非snake:Value;非snake:Status;非snake:Severity;非snake:Message;無主鍵候選 |
 | VRN|vrn_mdl130_vrn_v140r_release_index_pointer_module|29dce0d3b4993ee3 | YELLOW | SSOT-VCGC-VRN-TBL0040 | — | T6 非snake:Flow;非snake:Pass;非snake:Severity;非snake:Message;格內巢狀:Outputs;非snake:Outputs;格內巢狀:Rows;非snake:Rows;非snake:PSComputerName;非snake:RunspaceId;非snake:PSShowCo |
 | VRN|vrn_mdl133_vrn_v140j_registry_sidecar_write_gate__support_rule__matrix|b9d443a131294d25 | YELLOW | SSOT-VCGC-VRN-TBL0041 | — | T5 同欄名異型(跨表):Time,Page,Value; T6 非snake:Time;非snake:Page;非snake:Gate;非snake:Value;非snake:Status;非snake:Severity;非snake:Message |
 | VRN|vrn_mdl133_vrn_v140j_registry_sidecar_write_gate__support_rule__validation|8d62e0f5a8c56ca2 | YELLOW | SSOT-VCGC-VRN-TBL0042 | — | T5 同欄名異型(跨表):Value,Expected; T6 非snake:Check;混型:Value;非snake:Value;混型:Expected;非snake:Expected;非snake:Pass |
@@ -255,8 +231,8 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_report_parser_integrated_ssot_support_modules|bf5645c9d0b0de3b | YELLOW | SSOT-VCGC-VRN-TBL0061 | — | T6 格內巢狀:functions;格內巢狀:classes |
 | VRN|vrn_report_parser_integrated_ssot_date_regex|6b5cc9b2db38dd99 | YELLOW | SSOT-VCGC-VRN-TBL0062 | — | T6 格內巢狀:flags;格內巢狀:examples_pass;格內巢狀:examples_fail |
 | VRN|vrn_report_parser_integrated_ssot_report_date_regex|61bbaf85ccf3d554 | GREEN | SSOT-VCGC-VRN-TBL0063 | — |  |
-| VRN|vrn_report_parser_integrated_ssot_broker_aliases|ef7a78b1c42536ae | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):source,gate; T6 格內巢狀:aliases;格內巢狀:meta;無主鍵候選 |
-| VRN|vrn_report_parser_integrated_ssot_financial_accounts|ef12e130d863b28f | RED | 留白 | — | T2 無主鍵(DF06); T5 同欄名異型(跨表):source; T6 格內巢狀:aliases;無主鍵候選 |
+| VRN|vrn_report_parser_integrated_ssot_broker_aliases|ef7a78b1c42536ae | YELLOW | SSOT-VCGC-VRN-TBL0115 | — | T5 同欄名異型(跨表):source,gate; T6 格內巢狀:aliases;格內巢狀:meta;無主鍵候選 |
+| VRN|vrn_report_parser_integrated_ssot_financial_accounts|ef12e130d863b28f | YELLOW | SSOT-VCGC-VRN-TBL0116 | — | T5 同欄名異型(跨表):source; T6 格內巢狀:aliases;無主鍵候選 |
 | VRN|vrn_report_parser_integrated_ssot_via_raw_regex|78d8af48b00f4632 | YELLOW | SSOT-VCGC-VRN-TBL0064 | — | T6 格內巢狀:flags;格內巢狀:examples_pass;格內巢狀:examples_fail |
 | VRN|vrn_report_parser_integrated_ssot_via_raw_lists|185244608c6de473 | YELLOW | SSOT-VCGC-VRN-TBL0065 | — | T6 格內巢狀:items |
 | VRN|vrn_report_parser_integrated_ssot_via_raw_synonyms|f8d1af2c596aca59 | YELLOW | SSOT-VCGC-VRN-TBL0066 | — | T5 同欄名異型(跨表):group; T6 格內巢狀:aliases |
@@ -269,19 +245,18 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_s05_fieldregistry_financialdata_fields|247a2c5699ce0036 | YELLOW | SSOT-VCGC-VRN-TBL0073 | — | T6 格內巢狀:tolerance;格內巢狀:source_layer;格內巢狀:validation_layers |
 | VRN|vrn_sisterlineage_sync_files|f3f4453df0312db4 | GREEN | SSOT-VCGC-VRN-TBL0074 | — |  |
 | VRN|vrn_sourceprovenance_ssot_sources|92956847a14c0d7c | GREEN | SSOT-VCGC-VRN-TBL0075 | — |  |
-| VRN|vrn_sourceprovenance_ssot_escalation|71aeab06339f1d24 | RED | 留白 | — | T2 無主鍵(DF06); T6 無主鍵候選 |
+| VRN|vrn_sourceprovenance_ssot_escalation|71aeab06339f1d24 | YELLOW | SSOT-VCGC-VRN-TBL0117 | — | T6 無主鍵候選 |
 | VRN|vrn_stagealias_map_map|e95049abd4f53226 | GREEN | SSOT-VCGC-VRN-TBL0076 | — |  |
 | VRN|vrn_tabfields_tabs|87cdbcc709e736ae | YELLOW | SSOT-VCGC-VRN-TBL0077 | — | T5 同欄名異型(跨表):fields; T6 格內巢狀:fields;格內巢狀:cells |
 | VRN|vrn_valuationmethod_ssot_methods|85e864f381159929 | YELLOW | SSOT-VCGC-VRN-TBL0078 | — | T5 同欄名異型(跨表):group,en; T6 格內巢狀:legacy_canonical;格內巢狀:en;格內巢狀:en_case_sensitive;格內巢狀:zh_tw;格內巢狀:zh_hk;格內巢狀:zh_cn;格內巢狀:variants;格內巢狀:context_required |
-| VRN|vrn_verified_module_registry|15ef0ee1f3c839a2 | YELLOW | SSOT-VCGC-VRN-TBL0079 | — | T6 非snake:ModuleNo;非snake:ModuleId;非snake:Name;非snake:Role;非snake:Phase;非snake:SourcePath;非snake:TargetPath;非snake:Extension;非snake:SizeBytes;非snake:Sha256;非snake: |
 | VRN|vrn_workflow_vrn_ssot_workflows|a5cb283c4da232cb | YELLOW | SSOT-VCGC-VRN-TBL0080 | — | T5 同欄名異型(跨表):spec; T6 格內巢狀:spec;格內巢狀:plan;格內巢狀:steps;格內巢狀:tests |
-| VRN|vrn_researchreport_ssot_record_schema_v2_allof|e235f1d58ea7f56f | RED | 留白 | — | T2 無主鍵(DF06); T6 格內巢狀:else;格內巢狀:if;格內巢狀:then;無主鍵候選 |
+| VRN|vrn_researchreport_ssot_record_schema_v2_allof|e235f1d58ea7f56f | YELLOW | SSOT-VCGC-VRN-TBL0118 | — | T6 格內巢狀:else;格內巢狀:if;格內巢狀:then;無主鍵候選 |
 | VRN|vrn_researchreport_ssot_record_schema_v2_properties|add44235a4f66847 | YELLOW | SSOT-VCGC-VRN-TBL0081 | — | T6 混型:type;格內巢狀:type;非snake:x-via-observed-null-count;非snake:x-via-observed-present-count;非snake:x-via-source;格內巢狀:items;格內巢狀:enum |
-| VRN|vrn_researchreport_ssot_schema_v2_full_conditional_rules_materialized|e235f1d58ea7f56f | RED | 留白 | — | T2 無主鍵(DF06); T6 格內巢狀:else;格內巢狀:if;格內巢狀:then;無主鍵候選 |
+| VRN|vrn_researchreport_ssot_schema_v2_full_conditional_rules_materialized|e235f1d58ea7f56f | YELLOW | SSOT-VCGC-VRN-TBL0119 | — | T6 格內巢狀:else;格內巢狀:if;格內巢狀:then;無主鍵候選 |
 | VRN|vrn_researchreport_ssot_schema_v2_full_fields|c7d9d16d3cd358ec | YELLOW | SSOT-VCGC-VRN-TBL0082 | — | T5 同欄名異型(跨表):required |
-| VRN|vrn_researchreport_ssot_v2|50e72043a5997938 | RED | 留白 | FAIL:主鍵 full_path 空或重複 | T5 同欄名異型(跨表):confidence; T6 數字存字串:confidence;數字存字串:filtered_target_price_proposals;數字存字串:final_primary_ticker_proposals;數字存字串:final_primary_tickers_review_ready;數字存字串:final_ticker_proposal; TEST 主鍵 full_path 空或重複 |
+| VRN|vrn_researchreport_ssot_v2|50e72043a5997938 | YELLOW | SSOT-VCGC-VRN-TBL0120 | — | T5 同欄名異型(跨表):confidence; T6 數字存字串:confidence;數字存字串:filtered_target_price_proposals;數字存字串:final_primary_ticker_proposals;數字存字串:final_primary_tickers_review_ready;數字存字串:final_ticker_proposal |
 | VRN|vrn_researchreport_ssot_v2_records60_pre_promote_f124bc875468191e|50e72043a5997938 | YELLOW | SSOT-VCGC-VRN-TBL0083 | — | T5 同欄名異型(跨表):confidence; T6 數字存字串:confidence;數字存字串:filtered_target_price_proposals;數字存字串:final_primary_ticker_proposals;數字存字串:final_primary_tickers_review_ready;數字存字串:final_ticker_proposal |
-| VRN|vrn_researchreport_ssot_v2_records64_v0155_2f771c00c6dd8d6e|50e72043a5997938 | RED | 留白 | FAIL:主鍵 full_path 空或重複 | T5 同欄名異型(跨表):confidence; T6 數字存字串:confidence;數字存字串:filtered_target_price_proposals;數字存字串:final_primary_ticker_proposals;數字存字串:final_primary_tickers_review_ready;數字存字串:final_ticker_proposal; TEST 主鍵 full_path 空或重複 |
+| VRN|vrn_researchreport_ssot_v2_records64_v0155_2f771c00c6dd8d6e|50e72043a5997938 | YELLOW | SSOT-VCGC-VRN-TBL0121 | — | T5 同欄名異型(跨表):confidence; T6 數字存字串:confidence;數字存字串:filtered_target_price_proposals;數字存字串:final_primary_ticker_proposals;數字存字串:final_primary_tickers_review_ready;數字存字串:final_ticker_proposal |
 | VRN|vrn_keywordssot_keywords|d92b7f6ad1d3dafc | YELLOW | SSOT-VCGC-VRN-TBL0084 | — | T5 同欄名異型(跨表):freq; T6 格內巢狀:aliases;格內巢狀:sources;格內巢狀:cooccur |
 | VRN|vrn_keywordssot_ingest_log|a51c03a46ab9ff21 | YELLOW | SSOT-VCGC-VRN-TBL0085 | — | T5 同欄名異型(跨表):ts,source |
 | VRN|synonym_library_v3_scopes|1bd8821d88a78610 | YELLOW | SSOT-VCGC-VRN-TBL0086 | — | T5 同欄名異型(跨表):op,n; T6 格內巢狀:元大;非snake:元大;格內巢狀:元大證券;非snake:元大證券;格內巢狀:元大投顧;非snake:元大投顧;格內巢狀:yuanta;格內巢狀:yuanta securities;非snake:yuanta securities;格內巢狀:凱基;非snake:凱基;格內巢狀:凱基證券;非snake:凱基證 |
@@ -294,7 +269,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_lexicon_fill_template_tree|15e3d0717ba52c5a | YELLOW | SSOT-VCGC-VRN-TBL0093 | — | T5 同欄名異型(跨表):zh,en; T6 格內巢狀:children |
 | VRN|vrn_lexicon_tree|15e3d0717ba52c5a | YELLOW | SSOT-VCGC-VRN-TBL0094 | — | T5 同欄名異型(跨表):zh,en; T6 格內巢狀:children |
 | VRN|vrn_lexicon_entries|2b5c84276897e9c0 | YELLOW | SSOT-VCGC-VRN-TBL0095 | — | T5 同欄名異型(跨表):zh,en; T6 格內巢狀:aliases;格內巢狀:sources |
-| VRN|vrn_lexicon_history|bb2e1e1d3597509d | RED | 留白 | FAIL:主鍵 seed_new 空或重複 | T5 同欄名異型(跨表):op,ts,rejected,kept; T6 格內巢狀:docs; TEST 主鍵 seed_new 空或重複 |
+| VRN|vrn_lexicon_history|bb2e1e1d3597509d | YELLOW | SSOT-VCGC-VRN-TBL0122 | — | T5 同欄名異型(跨表):op,ts,rejected,kept; T6 格內巢狀:docs |
 | VRN|vrn_rating_dict_levels|7b7a4ab98400ca3e | YELLOW | SSOT-VCGC-VRN-TBL0096 | — | T5 同欄名異型(跨表):level,zh,en,source; T6 格內巢狀:score_range;格內巢狀:zh;格內巢狀:en |
 | VRN|vrn_broker_list_brokers|5040e556eb9b251e | YELLOW | SSOT-VCGC-VRN-TBL0097 | — | T6 格內巢狀:aliases;格內巢狀:source_layers;格內巢狀:merged_b541 |
 | VRN|vrn_broker_list_merge_log|a4bdfe7fca90ec80 | GREEN | SSOT-VCGC-VRN-TBL0098 | — |  |
@@ -309,47 +284,15 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|vrn_report_data_ssot_index_def_artifact_manifest|01bdea8b2ff11184 | GREEN | SSOT-VCGC-VRN-TBL0107 | — |  |
 | VRN|vrn_report_financial_data_ssot_def_validation_gates|ad96797d0a099a89 | GREEN | SSOT-VCGC-VRN-TBL0108 | — |  |
 | VRN|vrn_report_financial_data_ssot_def_historical_quality_evidence_not_revalidated_here|79a241a446fb66c2 | GREEN | SSOT-VCGC-VRN-TBL0109 | — |  |
-| VRN|vrn_ssot_adopt_ledger|e025c46716d8a38a | RED | 留白 | FAIL:主鍵 superseded_by 空或重複 | T5 同欄名異型(跨表):ts; TEST 主鍵 superseded_by 空或重複 |
+| VRN|vrn_ssot_adopt_ledger|e025c46716d8a38a | YELLOW | SSOT-VCGC-VRN-TBL0123 | — | T5 同欄名異型(跨表):ts |
+| VRN|vrn_verified_module_registry_h2|fb2366d307046ce1 | YELLOW | SSOT-VCGC-VRN-TBL0110 | — | T5 同欄名異型(跨表):ModuleNo,SizeBytes; T6 數字存字串:ModuleNo;非snake:ModuleNo;非snake:ModuleId;非snake:Name;非snake:Role;非snake:Phase;非snake:SourcePath;非snake:TargetPath;非snake:Extension;數字存字串:SizeBytes;非snake: |
+| VRN|vrn_finlexicon_ssot|275a1bf11b086bba | YELLOW | SSOT-VCGC-VRN-TBL0126 | — | T5 同欄名異型(跨表):zh,en; T6 格內巢狀:zh;格內巢狀:en;無主鍵候選 |
+| VRN|vrn_dormant_ledger|ccf0a8d239804a96 | YELLOW | SSOT-VCGC-VRN-TBL0124 | — | T5 同欄名異型(跨表):base,ts |
+| VRN|vrn_functionmatrix_items_h2|c1849daf33afd0b6 | YELLOW | SSOT-VCGC-VRN-TBL0125 | — | T5 同欄名異型(跨表):source; T6 數字存字串:body_sha;格內巢狀:issues;格內巢狀:similar;格內巢狀:history |
 
 ## 功(只列紅/黃與本輪發號)
 | 鍵 | 類 | 燈 | 號 | 測 | 旗 |
 |---|---|---|---|---|---|
-| VCGC|MDL|VDF_MDL007_SSOTResolver|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VDF_MDL103_MasterRegistry|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VDF_MDL104_RegistryLoader|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VDF_MDL105_CrossValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VDF_MDL201_GenerateFullRegistry|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VDF_MDL303_RegistryActivation|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|MDL|VIS_VRN_TableGeometryReconstructor|v0101 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VIS_VRN_TableHeaderPeriodOriginalRestore|v0100 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL002_LayoutExtractor|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL004_OCR_FetchingPDFTable_v1|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL005_OCRFetchingPDFText_v1|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL006_ConsolidatorAndPhaseValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL007_APIDataFetcher|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|VRN_MDL008_CrossValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|MDL|panorama_xcheck|v110 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VDF|MDL|VDF_MDL007_SSOTResolver|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|MDL|VDF_MDL103_MasterRegistry|v0100R | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|MDL|VDF_MDL104_RegistryLoader|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|MDL|VDF_MDL105_CrossValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|MDL|VDF_MDL201_GenerateFullRegistry|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|MDL|VDF_MDL303_RegistryActivation|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VRN|MDL|VIS_VRN_TableGeometryReconstructor|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VIS_VRN_TableHeaderPeriodOriginalRestore|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL002_LayoutExtractor|v0100 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL004_OCR_FetchingPDFTable_v1|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL005_OCRFetchingPDFText_v1|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL006_ConsolidatorAndPhaseValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL007_APIDataFetcher|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|VRN_MDL008_CrossValidator|v0000 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VRN|MDL|panorama_xcheck|v112 | MDL | RED | 留白 | — | F1 同模組族在 VCGC,VRN |
-| VCGC|ENG|VDF_Engine_cnn_fear_greed_proxy|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|ENG|VDF_MDL001_TWEquityEngine|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VCGC|ENG|VDF_MDL002_YFinanceFetchingEngine|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|ENG|VDF_Engine_cnn_fear_greed_proxy|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|ENG|VDF_MDL001_TWEquityEngine|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
-| VDF|ENG|VDF_MDL002_YFinanceFetchingEngine|v0000 | ENG | RED | 留白 | — | F1 同模組族在 VCGC,VDF |
 | VCGC|CLS|AdvancedNetworkDataFetcher_OPTIMIZED|UserAgentRotator|v0000 | CLS | YELLOW | VIA-SUP-MDL908-CLS003 | — | F3 同名 UserAgentRotator 散在 3 模組 |
 | VCGC|CLS|FLOW_MDL003_FlowSystemOneShot|SystemManager|v0101 | CLS | YELLOW | VIA-SUP-MDL269-CLS007 | — | F3 同名 SystemManager 散在 2 模組 |
 | VCGC|CLS|SUP_MDL001_RuntimeImportFirewall|VIA_RuntimeImportFirewall|v0000 | CLS | YELLOW | VIA-SUP-MDL001-CLS001 | — | F3 同名 VIA_RuntimeImportFirewall 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
@@ -387,29 +330,6 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|CLS|SUP_MDL713_Console20260626173918Dup|Console|v0000 | CLS | YELLOW | VIA-SUP-MDL1089-CLS016 | — | F3 同名 Console 散在 5 模組 |
 | VCGC|CLS|SUP_MDL716_Requirements20260626173916Dup|Requirement|v0000 | CLS | YELLOW | VIA-SUP-MDL1090-CLS002 | — | F3 同名 Requirement 散在 2 模組 |
 | VCGC|CLS|SUP_MDL738_InvokeVIASSDResourceGuard|ResourceSnapshot|v0100 | CLS | YELLOW | VIA-SUP-MDL194-CLS004 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|EnhancedStockProcessor|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS008 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|EquityFileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|IndexFileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|IntelligentDependencyChecker|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|IntelligentModuleImporter|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|RealEquityFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS006 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|RealIndexFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL001_TWEquityEngine|SmartAutoDeployController|v0000 | CLS | YELLOW | VIA-VDF-MDL150-CLS007 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL002_YFinanceFetchingEngine|DataValidator|v0000 | CLS | YELLOW | VIA-VDF-MDL143-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB); F3 同名 DataValidator 散在 2 模組 |
-| VCGC|CLS|VDF_MDL002_YFinanceFetchingEngine|ETFFundFlowCalculator|v0000 | CLS | YELLOW | VIA-VDF-MDL143-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL002_YFinanceFetchingEngine|FileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL143-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL002_YFinanceFetchingEngine|FinancialDataFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL143-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL002_YFinanceFetchingEngine|YFinanceUniverseTool|v0000 | CLS | YELLOW | VIA-VDF-MDL143-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|FactSetSource|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS006 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|MOPSSource|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|SSOTResolverEngine|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS007 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|TPEXSource|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|TWSESource|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|TickerResolver|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL007_SSOTResolver|YFinanceSource|v0000 | CLS | YELLOW | VIA-VDF-MDL149-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL103_MasterRegistry|MasterRegistryEngine|v0000 | CLS | YELLOW | VIA-VDF-MDL145-CLS001 | — | F3 同名跨系統 VCGC,VDF |
-| VCGC|CLS|VDF_MDL104_RegistryLoader|RegistryLoader|v0000 | CLS | YELLOW | VIA-VDF-MDL146-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VDF_MDL105_CrossValidator|CrossValidator|v0000 | CLS | YELLOW | VIA-VDF-MDL141-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|CLS|VETF_VIA_RegistryCore_v1|def_ModuleIdentity|v0000 | CLS | YELLOW | VIA-VCGC-MDL1294-CLS001 | — | F3 同名 def_ModuleIdentity 散在 2 模組;同名 def_ModuleIdentity 散在 2 模組;同 body 另見 5 處(候選共用 LIB);同 body 另見 5 處(候選共用 LIB) |
 | VCGC|CLS|VETF_VIA_RegistryCore_v1|def_ModuleRecord|v0000 | CLS | YELLOW | VIA-VCGC-MDL1294-CLS002 | — | F3 同名 def_ModuleRecord 散在 2 模組;同名 def_ModuleRecord 散在 2 模組;同 body 另見 5 處(候選共用 LIB);同 body 另見 5 處(候選共用 LIB) |
 | VCGC|CLS|VETF_VIA_RegistryCore_v1|def_RegistryState|v0000 | CLS | YELLOW | VIA-VCGC-MDL1294-CLS003 | — | F3 同名 def_RegistryState 散在 2 模組;同名 def_RegistryState 散在 2 模組;同 body 另見 5 處(候選共用 LIB);同 body 另見 5 處(候選共用 LIB) |
@@ -433,7 +353,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|CLS|VIA_DownwardController|Console|v0000 | CLS | YELLOW | VIA-SUP-MDL233-CLS001 | — | F3 同名 Console 散在 5 模組;同 body 另見 2 處(候選共用 LIB) |
 | VCGC|CLS|VIA_FilePriorityRouter|Console|v0000 | CLS | YELLOW | VIA-SUP-MDL234-CLS001 | — | F3 同名 Console 散在 5 模組;同 body 另見 2 處(候選共用 LIB) |
 | VCGC|CLS|VIA_FilePriorityRouter|FileRecord|v0000 | CLS | YELLOW | VIA-SUP-MDL234-CLS003 | — | F3 同名 FileRecord 散在 2 模組 |
-| VCGC|CLS|VIA_Financial_Institution_SSOT|TextBlock|v0100 | CLS | YELLOW | VIA-SUP-MDL1066-CLS008 | — | F3 同名跨系統 VCGC,VRN; F3 同名 TextBlock 散在 2 模組 |
+| VCGC|CLS|VIA_Financial_Institution_SSOT|TextBlock|v0100 | CLS | YELLOW | VIA-SUP-MDL1066-CLS008 | — | F3 同名跨系統 VCGC,VRN |
 | VCGC|CLS|VIA_RegistryCore_v1|def_ModuleIdentity|v0000 | CLS | YELLOW | VIA-VCGC-MDL1303-CLS001 | — | F3 同名 def_ModuleIdentity 散在 2 模組;同名 def_ModuleIdentity 散在 2 模組;同名 def_ModuleIdentity 散在 2 模組;同名 def_ModuleIdentity 散在 2 模組; |
 | VCGC|CLS|VIA_RegistryCore_v1|def_ModuleRecord|v0000 | CLS | YELLOW | VIA-VCGC-MDL1303-CLS002 | — | F3 同名 def_ModuleRecord 散在 2 模組;同名 def_ModuleRecord 散在 2 模組;同名 def_ModuleRecord 散在 2 模組;同名 def_ModuleRecord 散在 2 模組;同 body 另 |
 | VCGC|CLS|VIA_RegistryCore_v1|def_RegistryState|v0000 | CLS | YELLOW | VIA-VCGC-MDL1303-CLS003 | — | F3 同名 def_RegistryState 散在 2 模組;同名 def_RegistryState 散在 2 模組;同名 def_RegistryState 散在 2 模組;同名 def_RegistryState 散在 2 模組;同 bo |
@@ -446,26 +366,6 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|CLS|VIS_InstallHealthRegistry|VISHealthRecord|v0000 | CLS | YELLOW | VIA-VCGC-MDL1304-CLS001 | — | F3 同名 VISHealthRecord 散在 2 模組;同名 VISHealthRecord 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候選共用 LIB) |
 | VCGC|CLS|VIS_VRN_HistoricalValidationPolicy|def_ValidationSource|v0100 | CLS | YELLOW | VIA-VRN-MDL255-CLS001 | — | F3 同名 def_ValidationSource 散在 2 模組;同名 def_ValidationSource 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候選共用 LIB) |
 | VCGC|CLS|VIS_VRN_NewReportCompatibilityGate|CompatibilityDecision|v01 | CLS | YELLOW | VIA-VRN-MDL256-CLS001 | — | F3 同名 CompatibilityDecision 散在 2 模組;同名 CompatibilityDecision 散在 2 模組;同 body 另見 2 處(候選共用 LIB);同 body 另見 2 處(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL002_LayoutExtractor|MDL002DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL279-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL002_LayoutExtractor|TableRecord|v0000 | CLS | YELLOW | VIA-VRN-MDL279-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL002_LayoutExtractor|TextBlock|v0000 | CLS | YELLOW | VIA-VRN-MDL279-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 TextBlock 散在 2 模組 |
-| VCGC|CLS|VRN_MDL002_LayoutExtractor|VRN_MDL002_LayoutExtractor|v0000 | CLS | YELLOW | VIA-VRN-MDL279-CLS004 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|FixedTable|v0000 | CLS | YELLOW | VIA-VRN-MDL264-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|MDL004DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL264-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|RawTableResult|v0000 | CLS | YELLOW | VIA-VRN-MDL264-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|VRN_MDL004_OCRFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL264-CLS004 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL005_OCRFetchingPDFText_v1|FixedTextBlock|v0000 | CLS | YELLOW | VIA-VRN-MDL265-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL005_OCRFetchingPDFText_v1|MDL005DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL265-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL005_OCRFetchingPDFText_v1|RawTextBlock|v0000 | CLS | YELLOW | VIA-VRN-MDL265-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL005_OCRFetchingPDFText_v1|VRN_MDL005_TextFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL265-CLS004 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL006_ConsolidatorAndPhaseValidator|CompareResult|v0000 | CLS | YELLOW | VIA-VRN-MDL257-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL006_ConsolidatorAndPhaseValidator|VRN_MDL006_Consolidator|v0000 | CLS | YELLOW | VIA-VRN-MDL257-CLS002 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VRN_MDL007_APIDataFetcher|MDL007DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL266-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL007_APIDataFetcher|VRN_MDL007_APIDataFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL266-CLS002 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VRN_MDL008_CrossValidator|ForecastCheck|v0000 | CLS | YELLOW | VIA-VRN-MDL258-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL008_CrossValidator|MDL008DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL258-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|CLS|VRN_MDL008_CrossValidator|VRN_MDL008_CrossValidator|v0000 | CLS | YELLOW | VIA-VRN-MDL258-CLS004 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VRN_MDL008_CrossValidator|VerifyResult|v0000 | CLS | YELLOW | VIA-VRN-MDL258-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|CLS|VeritasAegisNexus|AntiAntiScrape|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS001 | — | F3 同名 AntiAntiScrape 散在 2 模組;同名 AntiAntiScrape 散在 2 模組;同名 AntiAntiScrape 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候選共用 |
 | VCGC|CLS|VeritasAegisNexus|AsyncHTTPClient|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS002 | — | F3 同名 AsyncHTTPClient 散在 2 模組;同名 AsyncHTTPClient 散在 2 模組;同名 AsyncHTTPClient 散在 2 模組 |
 | VCGC|CLS|VeritasAegisNexus|AsyncVDSFetcher|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS003 | — | F3 同名 AsyncVDSFetcher 散在 2 模組;同名 AsyncVDSFetcher 散在 2 模組;同名 AsyncVDSFetcher 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候 |
@@ -507,10 +407,8 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|CLS|VeritasAegisNexus|_VIAStateBox|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS039 | — | F3 同 body 另見 11 處(候選共用 LIB);同 body 另見 11 處(候選共用 LIB);同 body 另見 11 處(候選共用 LIB) |
 | VCGC|CLS|VeritasAegisNexus|yFinanceShield|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS040 | — | F3 同名 yFinanceShield 散在 2 模組;同名 yFinanceShield 散在 2 模組;同名 yFinanceShield 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候選共用 |
 | VCGC|CLS|VeritasAegisNexus|yFinanceShieldX|v0000 | CLS | YELLOW | VIA-SUP-ENG019-CLS041 | — | F3 同名 yFinanceShieldX 散在 2 模組;同名 yFinanceShieldX 散在 2 模組;同名 yFinanceShieldX 散在 2 模組;同 body 另見 3 處(候選共用 LIB);同 body 另見 3 處(候 |
-| VCGC|CLS|VeritasCeleritas|DataValidator|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS009 | — | F3 同名跨系統 VCGC,VDF; F3 同名 DataValidator 散在 2 模組;同名 DataValidator 散在 2 模組 |
+| VCGC|CLS|VeritasCeleritas|DataValidator|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS009 | — | F3 同名跨系統 VCGC,VDF |
 | VCGC|CLS|VeritasCeleritas|FinanceEngine|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS026 | — | F3 同名 FinanceEngine 散在 2 模組;同名 FinanceEngine 散在 2 模組 |
-| VCGC|CLS|VeritasCeleritas|GCTuner|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS027 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|CLS|VeritasCeleritas|MemoryPool|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS035 | — | F3 同名跨系統 VCGC,VRN |
 | VCGC|CLS|VeritasCeleritas|Timer|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS045 | — | F3 同名 Timer 散在 2 模組;同名 Timer 散在 2 模組 |
 | VCGC|CLS|VeritasCeleritas|_VIAStateBox|v1141 | CLS | YELLOW | VIA-SUP-ENG014-CLS102 | — | F3 同 body 另見 11 處(候選共用 LIB);同 body 另見 11 處(候選共用 LIB) |
 | VCGC|CLS|_dists|Distribution|v0000 | CLS | YELLOW | VIA-SUP-MDL554-CLS002 | — | F3 同名 Distribution 散在 2 模組 |
@@ -601,39 +499,15 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|CLS|via_pmine|SSOTEngine|v0000 | CLS | YELLOW | VIA-SUP-MDL307-CLS003 | — | F3 同名 SSOTEngine 散在 2 模組 |
 | VCGC|CLS|via_server|Handler|v0000 | CLS | YELLOW | VIA-SUP-MDL310-CLS001 | — | F3 同名 Handler 散在 4 模組 |
 | VDF|CLS|VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher|DataValidator|v0000 | CLS | YELLOW | VIA-VDF-ENG002-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同名 DataValidator 散在 2 模組 |
-| VDF|CLS|VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher|FileManager|v0000 | CLS | YELLOW | VIA-VDF-ENG002-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同名 FileManager 散在 2 模組 |
-| VDF|CLS|VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher|FinancialDataFetcher|v0000 | CLS | YELLOW | VIA-VDF-ENG002-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同名 FinancialDataFetcher 散在 2 模組 |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|EnhancedStockProcessor|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS008 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|EquityFileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|IndexFileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|IntelligentDependencyChecker|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|IntelligentModuleImporter|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|RealEquityFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS006 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|RealIndexFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWEquityEngine|SmartAutoDeployController|v0000 | CLS | YELLOW | VIA-VDF-MDL064-CLS007 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL001_TWUniverseVerify|OutputManager|v0000 | CLS | YELLOW | VIA-VDF-MDL156-CLS003 | — | F3 同名 OutputManager 散在 5 模組 |
-| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|DataValidator|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB); F3 同名 DataValidator 散在 2 模組;同名 DataValidator 散在 2 模組 |
-| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|ETFFundFlowCalculator|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|FileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB); F3 同名 FileManager 散在 2 模組;同名 FileManager 散在 2 模組 |
-| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|FinancialDataFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB); F3 同名 FinancialDataFetcher 散在 2 模組;同名 FinancialDataFetcher 散在 2 模組 |
-| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|YFinanceUniverseTool|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL003_SentimentMacroEngine|OutputManager|v0000 | CLS | YELLOW | VIA-VDF-MDL127-CLS005 | — | F3 同名 OutputManager 散在 5 模組;同名 OutputManager 散在 5 模組;同名 OutputManager 散在 5 模組 |
-| VDF|CLS|VDF_MDL004_TWFullMarketEngine|FactSetConsensusFetcher|v0100 | CLS | YELLOW | VIA-VDF-MDL072-CLS005 | — | F3 同名 FactSetConsensusFetcher 散在 2 模組 |
-| VDF|CLS|VDF_MDL005_TWStockFilter|FactSetConsensusFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL158-CLS002 | — | F3 同名 FactSetConsensusFetcher 散在 2 模組 |
-| VDF|CLS|VDF_MDL005_TWStockFilter|OutputManager|v0000 | CLS | YELLOW | VIA-VDF-MDL158-CLS003 | — | F3 同名 OutputManager 散在 5 模組 |
-| VDF|CLS|VDF_MDL006_FinancialModel|OutputManager|v0100 | CLS | YELLOW | VIA-VDF-MDL159-CLS003 | — | F3 同名 OutputManager 散在 5 模組 |
-| VDF|CLS|VDF_MDL007_SSOTResolver|FactSetSource|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS006 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|MOPSSource|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS004 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|SSOTResolverEngine|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS007 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|TPEXSource|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS003 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|TWSESource|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|TickerResolver|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL007_SSOTResolver|YFinanceSource|v0000 | CLS | YELLOW | VIA-VDF-MDL128-CLS005 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
+| VDF|CLS|VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher|FileManager|v0000 | CLS | YELLOW | VIA-VDF-ENG002-CLS001 | — | F3 同名 FileManager 散在 2 模組 |
+| VDF|CLS|VDF_ENG044_MDLXXXYFinanceGlobalDataFetcher|FinancialDataFetcher|v0000 | CLS | YELLOW | VIA-VDF-ENG002-CLS003 | — | F3 同名 FinancialDataFetcher 散在 2 模組 |
+| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|DataValidator|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS002 | — | F3 同名跨系統 VCGC,VDF; F3 同名 DataValidator 散在 2 模組;同名 DataValidator 散在 2 模組 |
+| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|FileManager|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS001 | — | F3 同名 FileManager 散在 2 模組;同名 FileManager 散在 2 模組 |
+| VDF|CLS|VDF_MDL002_YFinanceFetchingEngine|FinancialDataFetcher|v0000 | CLS | YELLOW | VIA-VDF-MDL126-CLS004 | — | F3 同名 FinancialDataFetcher 散在 2 模組;同名 FinancialDataFetcher 散在 2 模組 |
+| VDF|CLS|VDF_MDL003_SentimentMacroEngine|OutputManager|v0000 | CLS | YELLOW | VIA-VDF-MDL127-CLS005 | — | F3 同名 OutputManager 散在 3 模組;同名 OutputManager 散在 3 模組;同名 OutputManager 散在 3 模組 |
+| VDF|CLS|VDF_MDL006_FinancialModel|OutputManager|v0100 | CLS | YELLOW | VIA-VDF-MDL159-CLS003 | — | F3 同名 OutputManager 散在 3 模組 |
 | VDF|CLS|VDF_MDL012_FetchGroups|LayoutError|v0105 | CLS | YELLOW | VIA-VDF-MDL193-CLS001 | — | F3 同名跨系統 VCGC,VDF |
-| VDF|CLS|VDF_MDL101_OutputManager|OutputManager|v0100R | CLS | YELLOW | VIA-VDF-MDL160-CLS001 | — | F3 同名 OutputManager 散在 5 模組;同名 OutputManager 散在 5 模組 |
-| VDF|CLS|VDF_MDL103_MasterRegistry|MasterRegistryEngine|v0100R | CLS | YELLOW | VIA-VDF-MDL161-CLS001 | — | F3 同名跨系統 VCGC,VDF |
-| VDF|CLS|VDF_MDL104_RegistryLoader|RegistryLoader|v0000 | CLS | YELLOW | VIA-VDF-MDL082-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VDF|CLS|VDF_MDL105_CrossValidator|CrossValidator|v0000 | CLS | YELLOW | VIA-VDF-MDL084-CLS001 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
+| VDF|CLS|VDF_MDL101_OutputManager|OutputManager|v0100R | CLS | YELLOW | VIA-VDF-MDL160-CLS001 | — | F3 同名 OutputManager 散在 3 模組;同名 OutputManager 散在 3 模組 |
 | VRN|CLS|InvestmentRegexPattern_VALIDATED|ValidationResult|v0000 | CLS | YELLOW | VIA-VRN-MDL019-CLS009 | — | F3 同名 ValidationResult 散在 2 模組 |
 | VRN|CLS|VIA_SummarizerEngine_2|ResourceSnapshot|v0000 | CLS | YELLOW | VIA-VRN-MDL043-CLS002 | — | F3 同名跨系統 VCGC,VRN |
 | VRN|CLS|VIA_VRN_FirstPageEngine|Layout|v0000 | CLS | YELLOW | VIA-VRN-MDL150-CLS002 | — | F3 同名跨系統 VCGC,VRN |
@@ -641,41 +515,18 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VRN|CLS|VIA_WebScraping_Compliance|ComplianceFinding|v0101 | CLS | YELLOW | VIA-VRN-MDL221-CLS001 | — | F3 同名 ComplianceFinding 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VRN|CLS|VIA_WebScraping_DualEngine_Governance_Controller|Capability|v0000 | CLS | YELLOW | VIA-VRN-MDL222-CLS001 | — | F3 同名跨系統 VCGC,VRN |
 | VRN|CLS|VRN_Complete_FeatureAudit_Ultra|ValidationResult|v0000 | CLS | YELLOW | VIA-VRN-MDL078-CLS004 | — | F3 同名 ValidationResult 散在 2 模組 |
-| VRN|CLS|VRN_MDL001_StockReportPipeline|GCTuner|v0000 | CLS | YELLOW | VIA-VRN-MDL089-CLS003 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL001_StockReportPipeline|MemoryPool|v0000 | CLS | YELLOW | VIA-VRN-MDL089-CLS004 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL001_StockReportPipeline|TextRepairEngine|v0000 | CLS | YELLOW | VIA-VRN-MDL089-CLS009 | — | F3 同名 TextRepairEngine 散在 2 模組 |
-| VRN|CLS|VRN_MDL002_LayoutExtractor|MDL002DBWriter|v0100 | CLS | YELLOW | VIA-VRN-MDL092-CLS004 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL002_LayoutExtractor|TableRecord|v0100 | CLS | YELLOW | VIA-VRN-MDL092-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL002_LayoutExtractor|TextBlock|v0100 | CLS | YELLOW | VIA-VRN-MDL092-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL002_LayoutExtractor|VRN_MDL002_LayoutExtractor|v0100 | CLS | YELLOW | VIA-VRN-MDL092-CLS008 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL003_TableRestorer|TextRepairEngine|v0000 | CLS | YELLOW | VIA-VRN-MDL093-CLS001 | — | F3 同名 TextRepairEngine 散在 2 模組;同名 TextRepairEngine 散在 2 模組 |
-| VRN|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|FixedTable|v0000 | CLS | YELLOW | VIA-VRN-MDL096-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|MDL004DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL096-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|RawTableResult|v0000 | CLS | YELLOW | VIA-VRN-MDL096-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL004_OCR_FetchingPDFTable_v1|VRN_MDL004_OCRFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL096-CLS004 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL005_OCRFetchingPDFText_v1|FixedTextBlock|v0000 | CLS | YELLOW | VIA-VRN-MDL097-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL005_OCRFetchingPDFText_v1|MDL005DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL097-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL005_OCRFetchingPDFText_v1|RawTextBlock|v0000 | CLS | YELLOW | VIA-VRN-MDL097-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL005_OCRFetchingPDFText_v1|VRN_MDL005_TextFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL097-CLS004 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL006_ConsolidatorAndPhaseValidator|CompareResult|v0000 | CLS | YELLOW | VIA-VRN-MDL098-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL006_ConsolidatorAndPhaseValidator|VRN_MDL006_Consolidator|v0000 | CLS | YELLOW | VIA-VRN-MDL098-CLS005 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL007_APIDataFetcher|MDL007DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL100-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL007_APIDataFetcher|VRN_MDL007_APIDataFetcher|v0000 | CLS | YELLOW | VIA-VRN-MDL100-CLS005 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL008_CrossValidator|ForecastCheck|v0000 | CLS | YELLOW | VIA-VRN-MDL102-CLS002 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL008_CrossValidator|MDL008DBWriter|v0000 | CLS | YELLOW | VIA-VRN-MDL102-CLS003 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
-| VRN|CLS|VRN_MDL008_CrossValidator|VRN_MDL008_CrossValidator|v0000 | CLS | YELLOW | VIA-VRN-MDL102-CLS007 | — | F3 同名跨系統 VCGC,VRN |
-| VRN|CLS|VRN_MDL008_CrossValidator|VerifyResult|v0000 | CLS | YELLOW | VIA-VRN-MDL102-CLS001 | — | F3 同名跨系統 VCGC,VRN; F3 同 body 跨系統(候選共用 LIB) |
+| VRN|CLS|VRN_MDL002_LayoutExtractor|TextBlock|v0100 | CLS | YELLOW | VIA-VRN-MDL092-CLS002 | — | F3 同名跨系統 VCGC,VRN |
 | VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|OptimizedYFinanceFetcher.format_name|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC017 | — | F3 同名 format_name 散在 2 模組 |
 | VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|SmartExchangeDetector.is_valid_tw_ticker|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC026 | — | F3 同名 is_valid_tw_ticker 散在 3 模組 |
-| VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|SmartHTTPSession.get|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC029 | — | F3 同名跨系統 VCGC,VRN; F3 同名 get 散在 27 模組 |
-| VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|_via_net|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|_via_net|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|SmartHTTPSession.get|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC029 | — | F3 同名 get 散在 27 模組 |
+| VCGC|FNC|AdvancedNetworkDataFetcher_OPTIMIZED|_via_net|v0000 | FNC | YELLOW | VIA-SUP-MDL908-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|_via_net|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|add_synonym|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC022 | — | F3 同名 add_synonym 散在 3 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|append_ledger|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC014 | — | F3 同名 append_ledger 散在 2 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|family_of|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC027 | — | F3 同名 family_of 散在 3 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|harvest|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC017 | — | F3 同名跨系統 VCGC,VRN; F3 同名 harvest 散在 4 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|load_json|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC012 | — | F3 同名 load_json 散在 7 模組 |
-| VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|norm|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 norm 散在 8 模組 |
+| VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|norm|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 norm 散在 7 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|normalize_temporal|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC032 | — | F3 同名 normalize_temporal 散在 2 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|now_iso|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC009 | — | F3 同名跨系統 VCGC,VRN; F3 同名 now_iso 散在 6 模組 |
 | VCGC|FNC|CGC_MDL001_CentralGovernanceEngine|ratio|v0402 | FNC | YELLOW | VIA-VCGC-MDL006-FNC004 | — | F3 同名 ratio 散在 2 模組 |
@@ -699,7 +550,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_make_top10_libs|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC028 | — | F3 同名 def_make_top10_libs 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_normalize_duplicate_key|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC019 | — | F3 同名 def_normalize_duplicate_key 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_now_utc|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC001 | — | F3 同名 def_now_utc 散在 3 模組 |
-| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_read_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC003 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_read_json 散在 19 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_read_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC003 | — | F3 同名 def_read_json 散在 19 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_read_text_sniff|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC014 | — | F3 同名 def_read_text_sniff 散在 2 模組 |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_safe_filename|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC013 | — | F3 同名 def_safe_filename 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_safe_rel|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC012 | — | F3 同名 def_safe_rel 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
@@ -708,12 +559,12 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_sha12_text|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC005 | — | F3 同名 def_sha12_text 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_stage_files|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC023 | — | F3 同名 def_stage_files 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_status_counts|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC033 | — | F3 同名 def_status_counts 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_table_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC032 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_table_html 散在 28 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_table_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC032 | — | F3 同名 def_table_html 散在 28 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_version_score|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC020 | — | F3 同名 def_version_score 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_write_df|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC030 | — | F3 同名 def_write_df 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_write_duckdb|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC031 | — | F3 同名 def_write_duckdb 散在 4 模組 |
-| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_write_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC034 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_write_html 散在 50 模組 |
-| VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|_via_net|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL023_AutoCodeRegistryEngine|def_write_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL042-FNC034 | — | F3 同名 def_write_html 散在 50 模組 |
+| VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|_via_net|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_align_wide|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC017 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_apply_transforms|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC018 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_audit_python_modules|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC008 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
@@ -735,32 +586,32 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_start_minus_years|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC012 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_write_frame|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC019 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL028_ManifestFetchAdapter|def_write_long|v0000 | FNC | YELLOW | VIA-VCGC-MDL043-FNC020 | — | F3 同名跨系統 VCGC,VDF; F3 同 body 跨系統(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_clean|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC001 | — | F3 同名跨系統 VCGC,VRN; F3 同名 def_clean 散在 13 模組;同 body 另見 8 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_clean|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC001 | — | F3 同名 def_clean 散在 13 模組;同 body 另見 8 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_find_latest_dir|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC003 | — | F3 同名 def_find_latest_dir 散在 14 模組;同 body 另見 3 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_html_table|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC009 | — | F3 同名 def_html_table 散在 12 模組 |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_light|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_light 散在 15 模組 |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_light|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC002 | — | F3 同名 def_light 散在 15 模組 |
 | VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_main|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC012 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_main 散在 77 模組 |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_read_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC005 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_read_json 散在 19 模組;同 body 另見 7 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_read_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC005 | — | F3 同名 def_read_json 散在 19 模組;同 body 另見 7 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_sha256_file|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC004 | — | F3 同名跨系統 VCGC,VRN; F3 同名 def_sha256_file 散在 5 模組;同 body 另見 3 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_csv|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_write_csv 散在 51 模組;同 body 另見 3 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC010 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_write_html 散在 50 模組 |
-| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 def_write_json 散在 64 模組;同 body 另見 22 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_csv|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC007 | — | F3 同名 def_write_csv 散在 51 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_html|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC010 | — | F3 同名 def_write_html 散在 50 模組 |
+| VCGC|FNC|CGC_MDL034_MDL015VrnFinalProductionLockRegistryV061573SUPPORTRULEV061573|def_write_json|v0000 | FNC | YELLOW | VIA-VCGC-MDL044-FNC006 | — | F3 同名 def_write_json 散在 64 模組;同 body 另見 22 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_main|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC013 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_main 散在 77 模組 |
 | VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_normalize_header|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC010 | — | F3 同名 def_normalize_header 散在 3 模組 |
 | VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_scan_module|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC006 | — | F3 同名 def_scan_module 散在 3 模組 |
 | VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_sha256|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_sha256 散在 5 模組 |
-| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_status_lights|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC001 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_status_lights 散在 8 模組 |
-| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_table_html|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC011 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_table_html 散在 28 模組 |
-| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_csv|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 def_write_csv 散在 51 模組;同 body 另見 3 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_html|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC012 | — | F3 同名跨系統 VCGC,VDF; F3 同名 def_write_html 散在 50 模組 |
-| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_json|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 def_write_json 散在 64 模組;同 body 另見 6 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_status_lights|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC001 | — | F3 同名 def_status_lights 散在 8 模組 |
+| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_table_html|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC011 | — | F3 同名 def_table_html 散在 28 模組 |
+| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_csv|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC003 | — | F3 同名 def_write_csv 散在 51 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_html|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC012 | — | F3 同名 def_write_html 散在 50 模組 |
+| VCGC|FNC|CGC_MDL035_MDL256RestoreVisVrnMasterRegistryBridgeV0611ManifestGOVERNANCE|def_write_json|v0611 | FNC | YELLOW | VIA-VCGC-MDL045-FNC004 | — | F3 同名 def_write_json 散在 64 模組;同 body 另見 6 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL036_BuildPkgPointers|build|v0101 | FNC | YELLOW | VIA-VCGC-MDL047-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL037_BuildSpecMaster|build|v0100 | FNC | YELLOW | VIA-VCGC-MDL048-FNC005 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL037_BuildSpecMaster|esc|v0100 | FNC | YELLOW | VIA-VCGC-MDL048-FNC001 | — | F3 同名 esc 散在 9 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL038_BuildSubsystemPages|build|v0103 | FNC | YELLOW | VIA-VCGC-MDL052-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL039_BuildViaMother|build|v0106 | FNC | YELLOW | VIA-VCGC-MDL059-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL039_BuildViaMother|esc|v0106 | FNC | YELLOW | VIA-VCGC-MDL059-FNC001 | — | F3 同名 esc 散在 9 模組;同 body 另見 2 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL041_ArticleIntake|export|v0100 | FNC | YELLOW | VIA-VCGC-MDL061-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 export 散在 6 模組 |
+| VCGC|FNC|CGC_MDL041_ArticleIntake|export|v0100 | FNC | YELLOW | VIA-VCGC-MDL061-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 export 散在 4 模組 |
 | VCGC|FNC|CGC_MDL041_ArticleIntake|fetch_url|v0100 | FNC | YELLOW | VIA-VCGC-MDL061-FNC006 | — | F3 同名 fetch_url 散在 3 模組 |
 | VCGC|FNC|CGC_MDL041_ArticleIntake|segment|v0100 | FNC | YELLOW | VIA-VCGC-MDL061-FNC005 | — | F3 同名跨系統 VCGC,VRN |
 | VCGC|FNC|CGC_MDL043_AutocoderEngine|CentralRegistrationEngine.listing|v0100 | FNC | YELLOW | VIA-VCGC-MDL066-FNC005 | — | F3 同名 listing 散在 2 模組 |
@@ -769,7 +620,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL045_DedupIndex|sha256_of|v0000 | FNC | YELLOW | VIA-VCGC-MDL068-FNC001 | — | F3 同名跨系統 VCGC,VRN; F3 同名 sha256_of 散在 3 模組 |
 | VCGC|FNC|CGC_MDL046_DepSuper|_arg_after|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC032 | — | F3 同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL046_DepSuper|_via_load|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC002 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 1 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL046_DepSuper|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL046_DepSuper|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL046_DepSuper|analyze|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC015 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 analyze 散在 5 模組 |
 | VCGC|FNC|CGC_MDL046_DepSuper|canon|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC004 | — | F3 同名 canon 散在 4 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL046_DepSuper|cmd_selftest|v0101 | FNC | YELLOW | VIA-VCGC-MDL070-FNC031 | — | F3 同名 cmd_selftest 散在 4 模組 |
@@ -787,6 +638,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL050_EnvRebuild|_arg_after|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC034 | — | F3 同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL050_EnvRebuild|canon|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC002 | — | F3 同名 canon 散在 4 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL050_EnvRebuild|cmd_selftest|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC033 | — | F3 同名 cmd_selftest 散在 4 模組 |
+| VCGC|FNC|CGC_MDL050_EnvRebuild|discover_envs|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC009 | — | F3 同名 discover_envs 散在 2 模組 |
 | VCGC|FNC|CGC_MDL050_EnvRebuild|dryrun_stage|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC029 | — | F3 同名 dryrun_stage 散在 2 模組 |
 | VCGC|FNC|CGC_MDL050_EnvRebuild|scan_env|v0109 | FNC | YELLOW | VIA-VCGC-MDL086-FNC011 | — | F3 同名 scan_env 散在 2 模組 |
 | VCGC|FNC|CGC_MDL053_GovernanceConsole|check|v0100 | FNC | YELLOW | VIA-VCGC-MDL091-FNC001 | — | F3 同名跨系統 VCGC,VDF,VRN |
@@ -838,7 +690,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL077_RenameEngine|commit|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC007 | — | F3 同名 commit 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL077_RenameEngine|load_reg|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC001 | — | F3 同名 load_reg 散在 5 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL077_RenameEngine|migrate_reg_key|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC006 | — | F3 同名 migrate_reg_key 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL077_RenameEngine|plan|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC005 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL077_RenameEngine|plan|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC005 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL077_RenameEngine|save_reg|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC002 | — | F3 同名 save_reg 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL077_RenameEngine|strip_ver|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC003 | — | F3 同名 strip_ver 散在 2 模組;同 body 另見 1 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL077_RenameEngine|undo|v0100 | FNC | YELLOW | VIA-VCGC-MDL557-FNC008 | — | F3 同名 undo 散在 6 模組 |
@@ -864,7 +716,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL080_Wrapup|sha256|v0101 | FNC | YELLOW | VIA-VCGC-MDL561-FNC001 | — | F3 同名 sha256 散在 5 模組 |
 | VCGC|FNC|CGC_MDL081_SubsystemManagerV2|adjudicate|v0101 | FNC | YELLOW | VIA-VCGC-MDL563-FNC003 | — | F3 同名 adjudicate 散在 2 模組 |
 | VCGC|FNC|CGC_MDL083_CentralGovernment|run_audit|v0100 | FNC | YELLOW | VIA-VCGC-MDL566-FNC003 | — | F3 同名跨系統 VCGC,VRN |
-| VCGC|FNC|CGC_MDL087_TestPyramid|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL571-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL087_TestPyramid|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL571-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL087_TestPyramid|build_ui|v0101 | FNC | YELLOW | VIA-VCGC-MDL571-FNC006 | — | F3 同名 build_ui 散在 4 模組 |
 | VCGC|FNC|CGC_MDL088_SystemTestPages|assemble|v0104 | FNC | YELLOW | VIA-VCGC-MDL576-FNC004 | — | F3 同名 assemble 散在 2 模組 |
 | VCGC|FNC|CGC_MDL088_SystemTestPages|build_ui|v0104 | FNC | YELLOW | VIA-VCGC-MDL576-FNC012 | — | F3 同名 build_ui 散在 4 模組 |
@@ -878,7 +730,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL090_SystemHub|build|v0102 | FNC | YELLOW | VIA-VCGC-MDL580-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL090_SystemHub|harvest|v0102 | FNC | YELLOW | VIA-VCGC-MDL580-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 harvest 散在 4 模組 |
 | VCGC|FNC|CGC_MDL090_SystemHub|render|v0102 | FNC | YELLOW | VIA-VCGC-MDL580-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
-| VCGC|FNC|CGC_MDL091_CharterAudit|audit|v0101 | FNC | YELLOW | VIA-VCGC-MDL582-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 9 模組 |
+| VCGC|FNC|CGC_MDL091_CharterAudit|audit|v0101 | FNC | YELLOW | VIA-VCGC-MDL582-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 11 模組 |
 | VCGC|FNC|CGC_MDL091_CharterAudit|build|v0101 | FNC | YELLOW | VIA-VCGC-MDL582-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL093_GovernanceMatrix|build|v0100 | FNC | YELLOW | VIA-VCGC-MDL594-FNC005 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL093_GovernanceMatrix|harvest|v0100 | FNC | YELLOW | VIA-VCGC-MDL594-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 harvest 散在 4 模組 |
@@ -899,7 +751,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL099_GlobalMarkets|render|v0101 | FNC | YELLOW | VIA-VCGC-MDL675-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL100_ReportCards|gather|v0100 | FNC | YELLOW | VIA-VCGC-MDL676-FNC001 | — | F3 同名跨系統 VCGC,VRN; F3 同名 gather 散在 10 模組 |
 | VCGC|FNC|CGC_MDL100_ReportCards|render|v0100 | FNC | YELLOW | VIA-VCGC-MDL676-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
-| VCGC|FNC|CGC_MDL101_PSAstRepair|inventory|v0100 | FNC | YELLOW | VIA-VCGC-MDL677-FNC002 | — | F3 同名跨系統 VCGC,VDF; F3 同名 inventory 散在 3 模組 |
+| VCGC|FNC|CGC_MDL101_PSAstRepair|inventory|v0100 | FNC | YELLOW | VIA-VCGC-MDL677-FNC002 | — | F3 同名跨系統 VCGC,VDF; F3 同名 inventory 散在 4 模組 |
 | VCGC|FNC|CGC_MDL101_PSAstRepair|render|v0100 | FNC | YELLOW | VIA-VCGC-MDL677-FNC008 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL101_PSAstRepair|scan|v0100 | FNC | YELLOW | VIA-VCGC-MDL677-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL101_PSAstRepair|zone_of|v0100 | FNC | YELLOW | VIA-VCGC-MDL677-FNC003 | — | F3 同名 zone_of 散在 4 模組 |
@@ -909,12 +761,12 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL103_AccelCoverage|scan|v0101 | FNC | YELLOW | VIA-VCGC-MDL681-FNC002 | — | F3 同名跨系統 VCGC,VDF,VRN |
 | VCGC|FNC|CGC_MDL104_TestResultsHub|gather|v0103 | FNC | YELLOW | VIA-VCGC-MDL685-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 gather 散在 10 模組 |
 | VCGC|FNC|CGC_MDL104_TestResultsHub|render|v0103 | FNC | YELLOW | VIA-VCGC-MDL685-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
-| VCGC|FNC|CGC_MDL105_GovernanceConsole|gates|v0125 | FNC | YELLOW | VIA-VCGC-MDL711-FNC002 | — | F3 同名 gates 散在 3 模組 |
+| VCGC|FNC|CGC_MDL105_GovernanceConsole|gates|v0125 | FNC | YELLOW | VIA-VCGC-MDL711-FNC002 | — | F3 同名 gates 散在 4 模組 |
 | VCGC|FNC|CGC_MDL105_GovernanceConsole|page_families|v0125 | FNC | YELLOW | VIA-VCGC-MDL711-FNC001 | — | F3 同名 page_families 散在 2 模組 |
 | VCGC|FNC|CGC_MDL105_GovernanceConsole|render|v0125 | FNC | YELLOW | VIA-VCGC-MDL711-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL106_GovConsole|banner|v0101 | FNC | YELLOW | VIA-VCGC-MDL713-FNC001 | — | F3 同名 banner 散在 3 模組 |
 | VCGC|FNC|CGC_MDL106_GovConsole|classify_ps|v0101 | FNC | YELLOW | VIA-VCGC-MDL713-FNC011 | — | F3 同名 classify_ps 散在 2 模組 |
-| VCGC|FNC|CGC_MDL106_GovConsole|inventory|v0101 | FNC | YELLOW | VIA-VCGC-MDL713-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 inventory 散在 3 模組 |
+| VCGC|FNC|CGC_MDL106_GovConsole|inventory|v0101 | FNC | YELLOW | VIA-VCGC-MDL713-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 inventory 散在 4 模組 |
 | VCGC|FNC|CGC_MDL106_GovConsole|zone_of|v0101 | FNC | YELLOW | VIA-VCGC-MDL713-FNC003 | — | F3 同名 zone_of 散在 4 模組 |
 | VCGC|FNC|CGC_MDL107_UISpecManager|__getattr__|v0101 | FNC | YELLOW | VIA-VCGC-MDL1398-FNC003 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 13 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL107_UISpecManager|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL1398-FNC006 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
@@ -946,11 +798,11 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL116_UnifiedShell|gather|v0114 | FNC | YELLOW | VIA-VCGC-MDL738-FNC018 | — | F3 同名跨系統 VCGC,VRN; F3 同名 gather 散在 10 模組 |
 | VCGC|FNC|CGC_MDL116_UnifiedShell|page_families|v0114 | FNC | YELLOW | VIA-VCGC-MDL738-FNC004 | — | F3 同名 page_families 散在 2 模組 |
 | VCGC|FNC|CGC_MDL117_AccelCoverage|scan|v0101 | FNC | YELLOW | VIA-VCGC-MDL740-FNC003 | — | F3 同名跨系統 VCGC,VDF,VRN |
-| VCGC|FNC|CGC_MDL118_PlotDataLaw|audit|v0102 | FNC | YELLOW | VIA-VCGC-MDL743-FNC009 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 9 模組 |
+| VCGC|FNC|CGC_MDL118_PlotDataLaw|audit|v0102 | FNC | YELLOW | VIA-VCGC-MDL743-FNC009 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 11 模組 |
 | VCGC|FNC|CGC_MDL119_SystemAPI|home|v0106 | FNC | YELLOW | VIA-VCGC-MDL750-FNC009 | — | F3 同名 home 散在 2 模組 |
 | VCGC|FNC|CGC_MDL119_SystemAPI|revenue|v0106 | FNC | YELLOW | VIA-VCGC-MDL750-FNC016 | — | F3 同名跨系統 VCGC,VDF |
 | VCGC|FNC|CGC_MDL120_SystemUI|build|v0107 | FNC | YELLOW | VIA-VCGC-MDL758-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN |
-| VCGC|FNC|CGC_MDL121_CompletionAutomator|plan|v0105 | FNC | YELLOW | VIA-VCGC-MDL764-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組 |
+| VCGC|FNC|CGC_MDL121_CompletionAutomator|plan|v0105 | FNC | YELLOW | VIA-VCGC-MDL764-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
 | VCGC|FNC|CGC_MDL122_IntakeRoster|render|v0113 | FNC | YELLOW | VIA-VCGC-MDL778-FNC005 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL122_IntakeRoster|roster|v0113 | FNC | YELLOW | VIA-VCGC-MDL778-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 roster 散在 5 模組 |
 | VCGC|FNC|CGC_MDL123_DataHome|_is_sandbox|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC008 | — | F3 同 body 另見 1 處(候選共用 LIB) |
@@ -958,10 +810,10 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL123_DataHome|catalog|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC021 | — | F3 同名跨系統 VCGC,VRN; F3 同名 catalog 散在 3 模組 |
 | VCGC|FNC|CGC_MDL123_DataHome|find|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC016 | — | F3 同名 find 散在 3 模組 |
 | VCGC|FNC|CGC_MDL123_DataHome|link|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC018 | — | F3 同名 link 散在 3 模組 |
-| VCGC|FNC|CGC_MDL123_DataHome|plan|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC022 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組 |
+| VCGC|FNC|CGC_MDL123_DataHome|plan|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC022 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
 | VCGC|FNC|CGC_MDL123_DataHome|status|v0106 | FNC | YELLOW | VIA-VCGC-MDL785-FNC015 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 status 散在 26 模組 |
 | VCGC|FNC|CGC_MDL124_BridgeSweeper|main|v0110 | FNC | YELLOW | VIA-VCGC-MDL1559-FNC004 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 4 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL125_FixAll|plan|v0111 | FNC | YELLOW | VIA-VCGC-MDL806-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組 |
+| VCGC|FNC|CGC_MDL125_FixAll|plan|v0111 | FNC | YELLOW | VIA-VCGC-MDL806-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
 | VCGC|FNC|CGC_MDL127_SixStreams|render|v0102 | FNC | YELLOW | VIA-VCGC-MDL811-FNC013 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL128_SystemCharter|_type_scale|v0102 | FNC | YELLOW | VIA-VCGC-MDL813-FNC001 | — | F3 同 body 另見 2 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL128_SystemCharter|apply_type_scale|v0102 | FNC | YELLOW | VIA-VCGC-MDL813-FNC002 | — | F3 同名 apply_type_scale 散在 3 模組;同 body 另見 2 處(候選共用 LIB) |
@@ -987,19 +839,19 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL133_ProductGate|register_tail|v0102 | FNC | YELLOW | VIA-VCGC-MDL830-FNC005 | — | F3 同名 register_tail 散在 2 模組 |
 | VCGC|FNC|CGC_MDL133_ProductGate|render|v0102 | FNC | YELLOW | VIA-VCGC-MDL830-FNC030 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL133_ProductGate|verdict|v0102 | FNC | YELLOW | VIA-VCGC-MDL830-FNC025 | — | F3 同名跨系統 VCGC,VDF; F3 同名 verdict 散在 3 模組 |
-| VCGC|FNC|CGC_MDL134_ParallelLanes|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL134_ParallelLanes|_via_net|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL134_ParallelLanes|assign|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC005 | — | F3 同名 assign 散在 3 模組 |
 | VCGC|FNC|CGC_MDL134_ParallelLanes|digest|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC022 | — | F3 同名跨系統 VCGC,VRN; F3 同名 digest 散在 4 模組 |
-| VCGC|FNC|CGC_MDL134_ParallelLanes|plan|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC021 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組 |
+| VCGC|FNC|CGC_MDL134_ParallelLanes|plan|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC021 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
 | VCGC|FNC|CGC_MDL134_ParallelLanes|preflight|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC014 | — | F3 同名跨系統 VCGC,VDF; F3 同名 preflight 散在 3 模組 |
 | VCGC|FNC|CGC_MDL134_ParallelLanes|render|v0101 | FNC | YELLOW | VIA-VCGC-MDL832-FNC024 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL135_EnvGovernance|__getattr__|v0118 | FNC | YELLOW | VIA-VCGC-MDL1561-FNC003 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 17 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL135_EnvGovernance|_via_net|v0118 | FNC | YELLOW | VIA-VCGC-MDL1561-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 32 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL135_EnvGovernance|_via_net|v0118 | FNC | YELLOW | VIA-VCGC-MDL1561-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 28 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL135_EnvGovernance|main|v0118 | FNC | YELLOW | VIA-VCGC-MDL1561-FNC008 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 4 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL136_EntryBridge|_ts|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC001 | — | F3 同 body 另見 3 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL136_EntryBridge|env_roots|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC011 | — | F3 同名 env_roots 散在 3 模組 |
 | VCGC|FNC|CGC_MDL136_EntryBridge|lamp|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC003 | — | F3 同名 lamp 散在 4 模組 |
-| VCGC|FNC|CGC_MDL136_EntryBridge|plan|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC019 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 18 模組 |
+| VCGC|FNC|CGC_MDL136_EntryBridge|plan|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC019 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
 | VCGC|FNC|CGC_MDL136_EntryBridge|render_html|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC018 | — | F3 同名跨系統 VCGC,VDF; F3 同名 render_html 散在 8 模組 |
 | VCGC|FNC|CGC_MDL136_EntryBridge|roster|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC010 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 roster 散在 5 模組 |
 | VCGC|FNC|CGC_MDL136_EntryBridge|status|v0100 | FNC | YELLOW | VIA-VCGC-MDL851-FNC017 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 status 散在 26 模組 |
@@ -1060,7 +912,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL148_EngineBus|child_env|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC010 | — | F3 同名 child_env 散在 4 模組 |
 | VCGC|FNC|CGC_MDL148_EngineBus|data_home|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC002 | — | F3 同名跨系統 VCGC,VDF; F3 同名 data_home 散在 2 模組 |
 | VCGC|FNC|CGC_MDL148_EngineBus|load_spec|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC015 | — | F3 同名 load_spec 散在 4 模組 |
-| VCGC|FNC|CGC_MDL148_EngineBus|matrix|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC023 | — | F3 同名跨系統 VCGC,VRN; F3 同名 matrix 散在 5 模組 |
+| VCGC|FNC|CGC_MDL148_EngineBus|matrix|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC023 | — | F3 同名跨系統 VCGC,VRN; F3 同名 matrix 散在 7 模組 |
 | VCGC|FNC|CGC_MDL148_EngineBus|python_for|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC016 | — | F3 同名 python_for 散在 2 模組 |
 | VCGC|FNC|CGC_MDL148_EngineBus|render|v0131 | FNC | YELLOW | VIA-VCGC-MDL943-FNC033 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
 | VCGC|FNC|CGC_MDL149_BoxesFlow|_load|v0100 | FNC | YELLOW | VIA-VCGC-MDL944-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 9 處(候選共用 LIB) |
@@ -1070,7 +922,7 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL149_ChainAll|_load|v0101 | FNC | YELLOW | VIA-VCGC-MDL946-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 8 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL149_Closeout|score|v0101 | FNC | YELLOW | VIA-VCGC-MDL948-FNC001 | — | F3 同名 score 散在 3 模組 |
 | VCGC|FNC|CGC_MDL149_EntryLock|canon|v0101 | FNC | YELLOW | VIA-VCGC-MDL950-FNC002 | — | F3 同名 canon 散在 4 模組;同 body 另見 1 處(候選共用 LIB) |
-| VCGC|FNC|CGC_MDL149_EntryLock|matrix|v0101 | FNC | YELLOW | VIA-VCGC-MDL950-FNC003 | — | F3 同名跨系統 VCGC,VRN; F3 同名 matrix 散在 5 模組 |
+| VCGC|FNC|CGC_MDL149_EntryLock|matrix|v0101 | FNC | YELLOW | VIA-VCGC-MDL950-FNC003 | — | F3 同名跨系統 VCGC,VRN; F3 同名 matrix 散在 7 模組 |
 | VCGC|FNC|CGC_MDL149_FilenameCut|_load|v0100 | FNC | YELLOW | VIA-VCGC-MDL951-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 9 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL149_FilenameCut|sample_dir|v0100 | FNC | YELLOW | VIA-VCGC-MDL951-FNC002 | — | F3 同名 sample_dir 散在 7 模組;同 body 另見 6 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL149_GreenMatrix|render|v0100 | FNC | YELLOW | VIA-VCGC-MDL952-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
@@ -1114,3 +966,130 @@ NEXT: 紅表/紅功貼給 AI 裁(改頭出新版 / 補主鍵 / 退役帶替代)�
 | VCGC|FNC|CGC_MDL149_WorkflowMatrix|real_calls|v0100 | FNC | YELLOW | VIA-VCGC-MDL1040-FNC005 | — | F3 同名 real_calls 散在 2 模組 |
 | VCGC|FNC|CGC_MDL150_CentralGovernanceFamily|_arg|v0103 | FNC | YELLOW | VIA-VCGC-MDL1044-FNC022 | — | F3 同 body 另見 4 處(候選共用 LIB) |
 | VCGC|FNC|CGC_MDL150_CentralGovernanceFamily|_ts|v0103 | FNC | YELLOW | VIA-VCGC-MDL1044-FNC001 | — | F3 同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL150_CentralGovernanceFamily|child_env|v0103 | FNC | YELLOW | VIA-VCGC-MDL1044-FNC015 | — | F3 同名 child_env 散在 4 模組 |
+| VCGC|FNC|CGC_MDL150_CentralGovernanceFamily|plan|v0103 | FNC | YELLOW | VIA-VCGC-MDL1044-FNC020 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL150_CentralGovernanceFamily|status|v0103 | FNC | YELLOW | VIA-VCGC-MDL1044-FNC019 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 status 散在 26 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|_arg|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC012 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL152_VtmraGate|child_env|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC003 | — | F3 同名 child_env 散在 4 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|family_python|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC002 | — | F3 同名 family_python 散在 4 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|render_html|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC008 | — | F3 同名跨系統 VCGC,VDF; F3 同名 render_html 散在 8 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|status|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC010 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 status 散在 26 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|test|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC009 | — | F3 同名 test 散在 5 模組 |
+| VCGC|FNC|CGC_MDL152_VtmraGate|verdict|v0103 | FNC | YELLOW | VIA-VCGC-MDL1411-FNC007 | — | F3 同名跨系統 VCGC,VDF; F3 同名 verdict 散在 3 模組 |
+| VCGC|FNC|CGC_MDL153_WorkflowComposer|_arg|v0102 | FNC | YELLOW | VIA-VCGC-MDL1050-FNC002 | — | F3 同 body 另見 4 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL153_WorkflowComposer|_now|v0102 | FNC | YELLOW | VIA-VCGC-MDL1050-FNC001 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL153_WorkflowComposer|page_html|v0102 | FNC | YELLOW | VIA-VCGC-MDL1050-FNC022 | — | F3 同名跨系統 VCGC,VRN; F3 同名 page_html 散在 3 模組 |
+| VCGC|FNC|CGC_MDL153_WorkflowComposer|validate|v0102 | FNC | YELLOW | VIA-VCGC-MDL1050-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 validate 散在 6 模組 |
+| VCGC|FNC|CGC_MDL153_WorkflowComposer|write_page|v0102 | FNC | YELLOW | VIA-VCGC-MDL1050-FNC023 | — | F3 同名 write_page 散在 4 模組 |
+| VCGC|FNC|CGC_MDL154_VIAFunctionalAcceptance|child_env|v0100 | FNC | YELLOW | VIA-VCGC-MDL1051-FNC003 | — | F3 同名 child_env 散在 4 模組 |
+| VCGC|FNC|CGC_MDL154_VIAFunctionalAcceptance|now|v0100 | FNC | YELLOW | VIA-VCGC-MDL1051-FNC001 | — | F3 同名 now 散在 15 模組 |
+| VCGC|FNC|CGC_MDL154_VIAFunctionalAcceptance|render_html|v0100 | FNC | YELLOW | VIA-VCGC-MDL1051-FNC010 | — | F3 同名跨系統 VCGC,VDF; F3 同名 render_html 散在 8 模組 |
+| VCGC|FNC|CGC_MDL154_VIAFunctionalAcceptance|run_station|v0100 | FNC | YELLOW | VIA-VCGC-MDL1051-FNC004 | — | F3 同名 run_station 散在 2 模組 |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|_normalise_argv_b534|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC019 | — | F3 同 body 跨系統(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|classify|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC017 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 classify 散在 20 模組 |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|now_iso|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC001 | — | F3 同名跨系統 VCGC,VRN; F3 同名 now_iso 散在 6 模組 |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|render_html|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC015 | — | F3 同名跨系統 VCGC,VDF; F3 同名 render_html 散在 8 模組 |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|resolve|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC003 | — | F3 同名跨系統 VCGC,VRN; F3 同名 resolve 散在 16 模組 |
+| VCGC|FNC|CGC_MDL155_VIAUnifiedSSOTAutoCode|sha256|v0101 | FNC | YELLOW | VIA-VCGC-MDL1053-FNC002 | — | F3 同名 sha256 散在 5 模組 |
+| VCGC|FNC|CGC_MDL156_VIAAcceleratorControl|_vnum|v0112 | FNC | YELLOW | VIA-VCGC-MDL1573-FNC001 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL157_VIAUniqueEntryControl|__getattr__|v0106 | FNC | YELLOW | VIA-VCGC-MDL1418-FNC003 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL157_VIAUniqueEntryControl|_via_net|v0106 | FNC | YELLOW | VIA-VCGC-MDL1418-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL157_VIAUniqueEntryControl|_vnum|v0106 | FNC | YELLOW | VIA-VCGC-MDL1418-FNC002 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 12 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL157_VIAUniqueEntryControl|read|v0106 | FNC | YELLOW | VIA-VCGC-MDL1418-FNC006 | — | F3 同名跨系統 VCGC,VRN; F3 同名 read 散在 22 模組 |
+| VCGC|FNC|CGC_MDL158_VIAPanoramaAuditRepair|__getattr__|v0117 | FNC | YELLOW | VIA-VCGC-MDL1477-FNC003 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL158_VIAPanoramaAuditRepair|_via_net|v0117 | FNC | YELLOW | VIA-VCGC-MDL1477-FNC001 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL158_VIAPanoramaAuditRepair|_vnum|v0117 | FNC | YELLOW | VIA-VCGC-MDL1477-FNC002 | — | F3 同 body 另見 6 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL158_VIAPanoramaAuditRepair|route|v0117 | FNC | YELLOW | VIA-VCGC-MDL1477-FNC019 | — | F3 同名 route 散在 3 模組 |
+| VCGC|FNC|CGC_MDL159_VIAUnifiedConsole|build_html|v0101 | FNC | YELLOW | VIA-VCGC-MDL1089-FNC010 | — | F3 同名 build_html 散在 5 模組 |
+| VCGC|FNC|CGC_MDL159_VIAUnifiedConsole|collect|v0101 | FNC | YELLOW | VIA-VCGC-MDL1089-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 collect 散在 13 模組 |
+| VCGC|FNC|CGC_MDL160_UIUnifyGate|owners|v0109 | FNC | YELLOW | VIA-VCGC-MDL1099-FNC017 | — | F3 同名跨系統 VCGC,VRN |
+| VCGC|FNC|CGC_MDL160_UIUnifyGate|plan|v0109 | FNC | YELLOW | VIA-VCGC-MDL1099-FNC021 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL160_UIUnifyGate|scan|v0109 | FNC | YELLOW | VIA-VCGC-MDL1099-FNC018 | — | F3 同名跨系統 VCGC,VDF,VRN |
+| VCGC|FNC|CGC_MDL160_UIUnifyGate|write_out|v0109 | FNC | YELLOW | VIA-VCGC-MDL1099-FNC022 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|book|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC019 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 book 散在 2 模組 |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|call|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC008 | — | F3 同名 call 散在 4 模組 |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|report|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC031 | — | F3 同名跨系統 VCGC,VDF; F3 同名 report 散在 8 模組 |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|scan|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC014 | — | F3 同名跨系統 VCGC,VDF,VRN |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|status|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC013 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 status 散在 26 模組 |
+| VCGC|FNC|CGC_MDL161_PEISCapabilityEngine|write_out|v0107 | FNC | YELLOW | VIA-VCGC-MDL1105-FNC032 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 write_out 散在 7 模組 |
+| VCGC|FNC|CGC_MDL162_CommandCardFreeze|parse|v0100 | FNC | YELLOW | VIA-VCGC-MDL1106-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 parse 散在 5 模組 |
+| VCGC|FNC|CGC_MDL162_CommandCardFreeze|verify|v0100 | FNC | YELLOW | VIA-VCGC-MDL1106-FNC008 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 verify 散在 5 模組 |
+| VCGC|FNC|CGC_MDL162_CommandCardFreeze|write_out|v0100 | FNC | YELLOW | VIA-VCGC-MDL1106-FNC010 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL163_MasterFileCard|build|v0100 | FNC | YELLOW | VIA-VCGC-MDL1107-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN |
+| VCGC|FNC|CGC_MDL163_MasterFileCard|render|v0100 | FNC | YELLOW | VIA-VCGC-MDL1107-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
+| VCGC|FNC|CGC_MDL163_MasterFileCard|write_out|v0100 | FNC | YELLOW | VIA-VCGC-MDL1107-FNC008 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL164_GovernanceCompletenessAudit|audit|v0109 | FNC | YELLOW | VIA-VCGC-MDL1117-FNC004 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 11 模組 |
+| VCGC|FNC|CGC_MDL164_GovernanceCompletenessAudit|plan|v0109 | FNC | YELLOW | VIA-VCGC-MDL1117-FNC013 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL164_GovernanceCompletenessAudit|write_out|v0109 | FNC | YELLOW | VIA-VCGC-MDL1117-FNC014 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL165_CommandRunGate|classify|v0101 | FNC | YELLOW | VIA-VCGC-MDL1119-FNC005 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 classify 散在 20 模組 |
+| VCGC|FNC|CGC_MDL165_CommandRunGate|plan|v0101 | FNC | YELLOW | VIA-VCGC-MDL1119-FNC008 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL165_CommandRunGate|register|v0101 | FNC | YELLOW | VIA-VCGC-MDL1119-FNC001 | — | F3 同名跨系統 VCGC,VRN; F3 同名 register 散在 10 模組 |
+| VCGC|FNC|CGC_MDL165_CommandRunGate|scan|v0101 | FNC | YELLOW | VIA-VCGC-MDL1119-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN |
+| VCGC|FNC|CGC_MDL165_CommandRunGate|write_out|v0101 | FNC | YELLOW | VIA-VCGC-MDL1119-FNC009 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL166_LibraryConsolidationGate|audit|v0100 | FNC | YELLOW | VIA-VCGC-MDL1120-FNC005 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 audit 散在 11 模組 |
+| VCGC|FNC|CGC_MDL166_LibraryConsolidationGate|plan|v0100 | FNC | YELLOW | VIA-VCGC-MDL1120-FNC006 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL166_LibraryConsolidationGate|write_out|v0100 | FNC | YELLOW | VIA-VCGC-MDL1120-FNC007 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同 body 跨系統(候選共用 LIB); F3 同名 write_out 散在 7 模組;同 body 另見 3 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL167_RegenRevert|classify|v0100 | FNC | YELLOW | VIA-VCGC-MDL1121-FNC006 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 classify 散在 20 模組 |
+| VCGC|FNC|CGC_MDL167_RegenRevert|load_book|v0100 | FNC | YELLOW | VIA-VCGC-MDL1121-FNC004 | — | F3 同名跨系統 VCGC,VDF; F3 同名 load_book 散在 2 模組 |
+| VCGC|FNC|CGC_MDL167_RegenRevert|repo_root|v0100 | FNC | YELLOW | VIA-VCGC-MDL1121-FNC003 | — | F3 同名跨系統 VCGC,VRN |
+| VCGC|FNC|CGC_MDL167_RegenRevert|report|v0100 | FNC | YELLOW | VIA-VCGC-MDL1121-FNC009 | — | F3 同名跨系統 VCGC,VDF; F3 同名 report 散在 8 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|_spec_mod|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC025 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|collect|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC024 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 collect 散在 13 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|grid_evidence|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC010 | — | F3 同名 grid_evidence 散在 2 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|load_json|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC005 | — | F3 同名 load_json 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|newest|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 newest 散在 11 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|rel|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC004 | — | F3 同名 rel 散在 5 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|render|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC030 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|row|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC006 | — | F3 同名 row 散在 2 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|scan_env|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC012 | — | F3 同名 scan_env 散在 2 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|write_html|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC034 | — | F3 同名跨系統 VCGC,VRN; F3 同名 write_html 散在 20 模組 |
+| VCGC|FNC|CGC_MDL169_VIAStateMatrix|write_log|v0104 | FNC | YELLOW | VIA-VCGC-MDL1128-FNC035 | — | F3 同名 write_log 散在 4 模組 |
+| VCGC|FNC|CGC_MDL170_VDFChainRunner|__getattr__|v0105 | FNC | YELLOW | VIA-VCGC-MDL1515-FNC002 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 17 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL170_VDFChainRunner|_body|v0105 | FNC | YELLOW | VIA-VCGC-MDL1515-FNC003 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL170_VDFChainRunner|_vnum|v0105 | FNC | YELLOW | VIA-VCGC-MDL1515-FNC001 | — | F3 同 body 另見 6 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL170_VDFChainRunner|run_one|v0105 | FNC | YELLOW | VIA-VCGC-MDL1515-FNC005 | — | F3 同名跨系統 VCGC,VDF; F3 同名 run_one 散在 3 模組 |
+| VCGC|FNC|CGC_MDL170_VDFChainRunner|say|v0105 | FNC | YELLOW | VIA-VCGC-MDL1515-FNC004 | — | F3 同名 say 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|_spec_mod|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC001 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|build|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC017 | — | F3 同名跨系統 VCGC,VDF,VRN |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|collect|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC015 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 collect 散在 13 模組 |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|load_json|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC007 | — | F3 同名 load_json 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|newest|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC006 | — | F3 同名跨系統 VCGC,VRN; F3 同名 newest 散在 11 模組 |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|rel|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC005 | — | F3 同名 rel 散在 5 模組 |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|render|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC021 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|write_html|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC024 | — | F3 同名跨系統 VCGC,VRN; F3 同名 write_html 散在 20 模組 |
+| VCGC|FNC|CGC_MDL171_PanoramaBatchPlanner|write_log|v0101 | FNC | YELLOW | VIA-VCGC-MDL1134-FNC025 | — | F3 同名 write_log 散在 4 模組 |
+| VCGC|FNC|CGC_MDL172_VRNChainRunner|__getattr__|v0108 | FNC | YELLOW | VIA-VCGC-MDL1516-FNC002 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 17 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL172_VRNChainRunner|_body|v0108 | FNC | YELLOW | VIA-VCGC-MDL1516-FNC003 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL172_VRNChainRunner|_vnum|v0108 | FNC | YELLOW | VIA-VCGC-MDL1516-FNC001 | — | F3 同 body 另見 6 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL172_VRNChainRunner|main|v0108 | FNC | YELLOW | VIA-VCGC-MDL1516-FNC007 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL172_VRNChainRunner|say|v0108 | FNC | YELLOW | VIA-VCGC-MDL1516-FNC004 | — | F3 同名 say 散在 7 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|console|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC003 | — | F3 同名 console 散在 4 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|css|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC005 | — | F3 同名 css 散在 2 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|demo|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC012 | — | F3 同名 demo 散在 2 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|html_table|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC009 | — | F3 同名 html_table 散在 2 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|page|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC008 | — | F3 同名 page 散在 4 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|page_html|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC010 | — | F3 同名跨系統 VCGC,VRN; F3 同名 page_html 散在 3 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|rel|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC001 | — | F3 同名 rel 散在 5 模組 |
+| VCGC|FNC|CGC_MDL173_MatrixReportSpec|table|v0100 | FNC | YELLOW | VIA-VCGC-MDL1143-FNC004 | — | F3 同名 table 散在 8 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|_head_ct|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC010 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL174_PackagingGate|collect|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC021 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 collect 散在 13 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|excluded|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC005 | — | F3 同名 excluded 散在 3 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|grid_evidence|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC011 | — | F3 同名 grid_evidence 散在 2 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|newest|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC002 | — | F3 同名跨系統 VCGC,VRN; F3 同名 newest 散在 11 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|print_plain|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC026 | — | F3 同名 print_plain 散在 2 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|rel|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC001 | — | F3 同名 rel 散在 5 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL174_PackagingGate|render|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC024 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|roster|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC008 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 roster 散在 5 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|row|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC003 | — | F3 同名 row 散在 2 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|to_markdown|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC023 | — | F3 同名跨系統 VCGC,VRN; F3 同名 to_markdown 散在 4 模組 |
+| VCGC|FNC|CGC_MDL174_PackagingGate|write_log|v0101 | FNC | YELLOW | VIA-VCGC-MDL1145-FNC025 | — | F3 同名 write_log 散在 4 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|_head_ct|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC003 | — | F3 同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|plan|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC007 | — | F3 同名跨系統 VCGC,VDF; F3 同名 plan 散在 19 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|print_plain|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC013 | — | F3 同名 print_plain 散在 2 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|rel|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC002 | — | F3 同名 rel 散在 5 模組;同 body 另見 1 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|render|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC011 | — | F3 同名跨系統 VCGC,VDF,VRN; F3 同名 render 散在 53 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|step|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC006 | — | F3 同名 step 散在 2 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|to_markdown|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC009 | — | F3 同名跨系統 VCGC,VRN; F3 同名 to_markdown 散在 4 模組 |
+| VCGC|FNC|CGC_MDL175_AutoDeploy|write_log|v0101 | FNC | YELLOW | VIA-VCGC-MDL1147-FNC012 | — | F3 同名 write_log 散在 4 模組 |
+| VCGC|FNC|CGC_MDL176_SynonymUnion|__getattr__|v0103 | FNC | YELLOW | VIA-VCGC-MDL1501-FNC002 | — | F3 同 body 跨系統(候選共用 LIB); F3 同 body 另見 15 處(候選共用 LIB) |
+| VCGC|FNC|CGC_MDL176_SynonymUnion|_vnum|v0103 | FNC | YELLOW | VIA-VCGC-MDL1501-FNC001 | — | F3 同 body 跨系統(候選共用 LIB) |
