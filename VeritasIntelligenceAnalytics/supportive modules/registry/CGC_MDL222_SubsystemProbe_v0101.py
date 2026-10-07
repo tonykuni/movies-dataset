@@ -8,6 +8,9 @@ v0100 → v0101(2026-10-06;操作員令「VRN 已是獨立系統、你負責;不
   流程閘 CGC_MDL223 擋下所有 via-vcgc run。
   本版:mark 改成「尾版自帶,或沿 PRIOR 鏈繼承」才算 GREEN;每一版都要有 PRIOR 連結才往前走,
   鏈斷就停(照舊 YELLOW)。列上記 mark_from(帶記號的那一版)。其餘(座位同步、頁、入口)照前版。
+  沿鏈繼承只認「讀進來做比較」的版(os.environ.get("VIA_FROM_VCGC") == / != …):守衛或入口來源判斷;
+  只設值 / 存值 / 還原(如 VDF v0130 refill 分支自己設 YES)不算(PR #518 Codex P1)。
+  VDF 自 v0128 起依操作員 2026-10-03 令獨立運作(獨立啟動或經 VCGC 都收,v0128 讀此變數標入口來源)→ 繼承來源是 v0128。
   inherited_contract() 是唯一正本:CGC_MDL223 v0102 直接用這支,不另寫一份。
 """
 from __future__ import annotations
@@ -37,6 +40,8 @@ HERE = Path(__file__).resolve().parent
 _STEM = "CGC_MDL222_SubsystemProbe"
 CONTRACT = "VIA_FROM_VCGC"
 _LINK = re.compile(r"^\s*PRIOR\s*=", re.M)
+# 讀進來做比較才算契約(守衛 / 入口來源判斷);只設值、存值、還原不算
+_READ = re.compile(r"""os\.environ(?:\.get\(\s*["']VIA_FROM_VCGC["'][^)]*\)|\[\s*["']VIA_FROM_VCGC["']\s*\])\s*(?:==|!=)""")
 
 
 def _vnum(p) -> int:
@@ -61,11 +66,13 @@ PAGE = PRIOR.PAGE
 
 
 def inherited_contract(folder, pattern: str, needle: str = CONTRACT):
-    """尾版往舊版走:某版帶針 → 回那一版;某版沒有 PRIOR 連結(鏈斷)或走完都沒有 → None。"""
+    """尾版往舊版走:某版真的讀 VIA_FROM_VCGC 做比較 → 回那一版;某版沒有 PRIOR 連結(鏈斷)或走完都沒有 → None。"""
     versions = sorted((p for p in Path(folder).glob(pattern) if _vnum(p) >= 0), key=_vnum, reverse=True)
     for p in versions:
         text = p.read_text(encoding="utf-8", errors="ignore")
-        if needle in text:
+        if needle == CONTRACT and _READ.search(text):
+            return p
+        if needle != CONTRACT and needle in text:
             return p
         if not _LINK.search(text):
             return None
@@ -117,7 +124,7 @@ def selftest() -> int:
     print(f"=== {_STEM} v0101 · 薄尾自測(VCGC 記號沿 PRIOR 鏈繼承)===")
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
-        (d / "X_SystemManager_v0100.py").write_text("import os\nos.environ.get('VIA_FROM_VCGC')\n", encoding="utf-8")
+        (d / "X_SystemManager_v0100.py").write_text("import os\nif os.environ.get('VIA_FROM_VCGC') != 'YES':\n    raise SystemExit(2)\n", encoding="utf-8")
         (d / "X_SystemManager_v0101.py").write_text("PRIOR = object()\n", encoding="utf-8")
         (d / "X_SystemManager_v0102.py").write_text("PRIOR = object()\n", encoding="utf-8")
         got = inherited_contract(d, "X_SystemManager_v*.py")
@@ -126,6 +133,9 @@ def selftest() -> int:
         chk("② 中間一版沒有 PRIOR(鏈斷)→ 不算繼承", inherited_contract(d, "X_SystemManager_v*.py") is None)
         (d / "Y_SystemManager_v0100.py").write_text("PRIOR = object()\n", encoding="utf-8")
         chk("③ 整條鏈都沒有記號 → 不算繼承", inherited_contract(d, "Y_SystemManager_v*.py") is None)
+        (d / "Z_SystemManager_v0100.py").write_text("x = 1\n", encoding="utf-8")
+        (d / "Z_SystemManager_v0101.py").write_text("PRIOR = object()\nimport os\nkeep = os.environ.get('VIA_FROM_VCGC')\nos.environ['VIA_FROM_VCGC'] = 'YES'\n", encoding="utf-8")
+        chk("③b 只設值 / 存值(沒有讀進來比較)→ 不算繼承(PR #518 Codex P1)", inherited_contract(d, "Z_SystemManager_v*.py") is None)
     os.environ["VIA_FROM_VCGC"] = "YES"
     card = check()
     rows = {r["system"]: r for r in card["rows"]}

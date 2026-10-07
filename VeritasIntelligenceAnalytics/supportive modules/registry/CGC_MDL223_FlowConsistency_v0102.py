@@ -7,7 +7,8 @@ v0101 → v0102(2026-10-06;操作員令「VRN 已是獨立系統、你負責;不
         VCGC 入口契約 VIA_FROM_VCGC 寫在本體鏈(v0130 以前),尾版檔面沒有這個字 →
         v0101 只讀尾版檔面 → VDF 列 RED → 流程閘擋下所有 via-vcgc run(handoff check 也跑不了)。
   修法:管理者列(parent / child)三根針照舊,但 VIA_FROM_VCGC 准許「沿 PRIOR 鏈繼承」
-        (判斷正本在座位探針 CGC_MDL222 v0101 的 inherited_contract,本檔直接用,不重寫):
+        (判斷正本在座位探針 CGC_MDL222 v0101 的 inherited_contract,本檔直接用,不重寫;
+        只認讀進來做比較的版 — 守衛或入口來源判斷,只設值 / 存值不算 → VDF 繼承來源 = v0128 獨立入口判斷):
         從尾版往舊版走,每一版都要有 PRIOR 連結才繼續;走到有針的版 = 繼承(列上記 inherited_from);
         鏈斷(某版沒有 PRIOR)前都沒針 = 照舊 RED。def main / def selftest 仍須在尾版檔面(入口是尾版自己的)。
   不放寬:針不改、族不改、工具列不改、閘的其餘判準(policy_step · book · seat · weak)一字不動;
@@ -117,7 +118,7 @@ def selftest() -> int:
     print(f"=== {_STEM} v0102 · 薄尾自測(契約針沿 PRIOR 鏈繼承)===")
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
-        (d / "X_SystemManager_v0100.py").write_text("import os\nos.environ.get('VIA_FROM_VCGC')\ndef main(): pass\ndef selftest(): pass\n", encoding="utf-8")
+        (d / "X_SystemManager_v0100.py").write_text("import os\ndef main():\n    if os.environ.get('VIA_FROM_VCGC') != 'YES':\n        return 2\ndef selftest(): pass\n", encoding="utf-8")
         (d / "X_SystemManager_v0101.py").write_text("PRIOR = object()\ndef main(): pass\ndef selftest(): pass\n", encoding="utf-8")
         (d / "X_SystemManager_v0102.py").write_text("PRIOR = object()\ndef main(): pass\ndef selftest(): pass\n", encoding="utf-8")
         got = inherited_contract(d, "X_SystemManager_v*.py")
@@ -126,6 +127,9 @@ def selftest() -> int:
         chk("② 中間一版沒有 PRIOR(鏈斷)→ 不算繼承,照舊紅", inherited_contract(d, "X_SystemManager_v*.py") is None)
         (d / "Y_SystemManager_v0100.py").write_text("def main(): pass\n", encoding="utf-8")
         chk("③ 整條鏈都沒有針 → 不算繼承", inherited_contract(d, "Y_SystemManager_v*.py") is None)
+        (d / "Z_SystemManager_v0100.py").write_text("def main(): pass\n", encoding="utf-8")
+        (d / "Z_SystemManager_v0101.py").write_text("PRIOR = object()\nimport os\nos.environ['VIA_FROM_VCGC'] = 'YES'\ndef main(): pass\ndef selftest(): pass\n", encoding="utf-8")
+        chk("③b 只設值(沒有讀進來比較)→ 不算繼承(PR #518 Codex P1)", inherited_contract(d, "Z_SystemManager_v*.py") is None)
     os.environ["VIA_VCGC_PUSH"] = "NO"
     os.environ["VIA_FROM_VCGC"] = "YES"
     card = gate()

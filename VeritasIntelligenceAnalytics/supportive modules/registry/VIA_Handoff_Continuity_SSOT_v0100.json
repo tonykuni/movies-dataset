@@ -2068,12 +2068,12 @@
         "CGC_MDL222_SubsystemProbe_v0101",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL222_SubsystemProbe v0101 本版 7/7 · PASS",
-      "scope": "座位探針 v0101:VCGC 記號沿 PRIOR 鏈繼承(尾版自帶或照實記 mark_from;鏈斷即停照舊 YELLOW);inherited_contract 唯一正本(VCGC-REQ174)",
+      "success_marker": "[計] CGC_MDL222_SubsystemProbe v0101 本版 8/8 · PASS",
+      "scope": "座位探針 v0101:VCGC 記號沿 PRIOR 鏈繼承(尾版自帶或照實記 mark_from;鏈斷即停照舊 YELLOW);inherited_contract 唯一正本(VCGC-REQ174) · 沿鏈只認讀進來比較的版(守衛 / 入口來源判斷),只設值不算(PR #518 Codex P1)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
         "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0100.py",
-        "functional modules/VDF/VDF_SystemManager_v0130.py"
+        "functional modules/VDF/VDF_SystemManager_v0128.py"
       ],
       "timeout_seconds": 600
     },
@@ -2082,13 +2082,13 @@
         "CGC_MDL223_FlowConsistency_v0102",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL223_FlowConsistency v0102 本版 8/8 · 閘 放行 · PASS",
-      "scope": "流程閘 v0102:管理者列契約針 VIA_FROM_VCGC 准許沿 PRIOR 鏈繼承(列記 inherited_from;main/selftest 仍須在尾版);針 · 族 · 工具列 · policy_step/book/seat 判準不動;閘放行(VCGC-REQ174)",
+      "success_marker": "[計] CGC_MDL223_FlowConsistency v0102 本版 9/9 · 閘 放行 · PASS",
+      "scope": "流程閘 v0102:管理者列契約針 VIA_FROM_VCGC 准許沿 PRIOR 鏈繼承(列記 inherited_from;main/selftest 仍須在尾版);針 · 族 · 工具列 · policy_step/book/seat 判準不動;閘放行(VCGC-REQ174) · 沿鏈只認讀進來比較的版(守衛 / 入口來源判斷),只設值不算(PR #518 Codex P1)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py",
         "supportive modules/registry/CGC_MDL223_FlowConsistency_v0101.py",
         "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
-        "functional modules/VDF/VDF_SystemManager_v0130.py"
+        "functional modules/VDF/VDF_SystemManager_v0128.py"
       ],
       "timeout_seconds": 900
     },
@@ -4483,22 +4483,20 @@
     {
       "id": "VCGC-REQ174:subsystem_probe_v0101",
       "requirement": "VCGC-REQ174",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "座位探針沿薄尾鏈認 VCGC 記號(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:31+00:00 rc 0 · 標記見到",
-      "next": "無(改本檔或相依後重跑 handoff test subsystem_probe_v0101)",
-      "case": "subsystem_probe_v0101",
-      "receipt": "docs/handoff/evidence/subsystem_probe_v0101.json"
+      "reason": "座位探針沿薄尾鏈認 VCGC 記號(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:31+00:00 rc 0 · 標記見到 ;PR #518 Codex P1:沿鏈比對收緊為讀進來比較(v0130 只設值不算 → 繼承來源 v0128)→ 重驗",
+      "next": "handoff test subsystem_probe_v0101 實跑轉 VERIFIED",
+      "case": "subsystem_probe_v0101"
     },
     {
       "id": "VCGC-REQ174:flow_gate_v0102",
       "requirement": "VCGC-REQ174",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "owner": "AI",
-      "reason": "流程閘沿薄尾鏈認入口契約,閘恢復放行(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:42+00:00 rc 0 · 標記見到",
-      "next": "無(改本檔或相依後重跑 handoff test flow_gate_v0102)",
-      "case": "flow_gate_v0102",
-      "receipt": "docs/handoff/evidence/flow_gate_v0102.json"
+      "reason": "流程閘沿薄尾鏈認入口契約,閘恢復放行(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:42+00:00 rc 0 · 標記見到 ;PR #518 Codex P1:沿鏈比對收緊為讀進來比較(v0130 只設值不算 → 繼承來源 v0128)→ 重驗",
+      "next": "handoff test flow_gate_v0102 實跑轉 VERIFIED",
+      "case": "flow_gate_v0102"
     },
     {
       "id": "VCGC-REQ174:vcgc_console_v0191",
