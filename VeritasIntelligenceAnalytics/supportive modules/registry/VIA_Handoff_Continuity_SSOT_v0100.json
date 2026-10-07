@@ -2091,6 +2091,22 @@
         "functional modules/VDF/VDF_SystemManager_v0130.py"
       ],
       "timeout_seconds": 900
+    },
+    "vcgc_console_v0191": {
+      "argv": [
+        "CGC_MDL149_VeritasCentralGovernanceConsole_v0191",
+        "--selftest"
+      ],
+      "success_marker": "[計] VCGC v0191 本版 6/6 · PASS",
+      "scope": "VCGC v0191:v0159 流程閘門由釘死 v0100 改取 CGC_MDL223 尾版;經 v0159 的門跑閘放行;前版鏈自測過(VCGC-REQ174)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py",
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0190.py",
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0159.py",
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py"
+      ],
+      "timeout_seconds": 1500
     }
   },
   "work_items": [
@@ -4481,6 +4497,15 @@
       "reason": "流程閘沿薄尾鏈認入口契約,閘恢復放行(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE)",
       "next": "handoff test flow_gate_v0102 實跑轉 VERIFIED",
       "case": "flow_gate_v0102"
+    },
+    {
+      "id": "VCGC-REQ174:vcgc_console_v0191",
+      "requirement": "VCGC-REQ174",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "registry-sync 等 v0159 動詞仍走釘死的 CGC_MDL223 v0100 → VDF 列 RED → 什麼都不寫;v0191 改取尾版",
+      "next": "handoff test vcgc_console_v0191 實跑轉 VERIFIED",
+      "case": "vcgc_console_v0191"
     },
     {
       "id": "VCGC-REQ174:vrn-watch-scope",
