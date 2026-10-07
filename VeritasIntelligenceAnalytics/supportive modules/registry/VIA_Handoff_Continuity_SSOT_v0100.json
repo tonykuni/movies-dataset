@@ -2062,6 +2062,35 @@
         "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py"
       ],
       "timeout_seconds": 900
+    },
+    "subsystem_probe_v0101": {
+      "argv": [
+        "CGC_MDL222_SubsystemProbe_v0101",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL222_SubsystemProbe v0101 本版 7/7 · PASS",
+      "scope": "座位探針 v0101:VCGC 記號沿 PRIOR 鏈繼承(尾版自帶或照實記 mark_from;鏈斷即停照舊 YELLOW);inherited_contract 唯一正本(VCGC-REQ174)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0100.py",
+        "functional modules/VDF/VDF_SystemManager_v0130.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "flow_gate_v0102": {
+      "argv": [
+        "CGC_MDL223_FlowConsistency_v0102",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL223_FlowConsistency v0102 本版 8/8 · 閘 放行 · PASS",
+      "scope": "流程閘 v0102:管理者列契約針 VIA_FROM_VCGC 准許沿 PRIOR 鏈繼承(列記 inherited_from;main/selftest 仍須在尾版);針 · 族 · 工具列 · policy_step/book/seat 判準不動;閘放行(VCGC-REQ174)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py",
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0101.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
+        "functional modules/VDF/VDF_SystemManager_v0130.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -4434,6 +4463,32 @@
       "next": "handoff test vdfvrn_readiness_v0101 實跑轉 VERIFIED",
       "case": "vdfvrn_readiness_v0101",
       "receipt": "docs/handoff/evidence/vdfvrn_readiness_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ174:subsystem_probe_v0101",
+      "requirement": "VCGC-REQ174",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "座位探針沿薄尾鏈認 VCGC 記號(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE)",
+      "next": "handoff test subsystem_probe_v0101 實跑轉 VERIFIED",
+      "case": "subsystem_probe_v0101"
+    },
+    {
+      "id": "VCGC-REQ174:flow_gate_v0102",
+      "requirement": "VCGC-REQ174",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "流程閘沿薄尾鏈認入口契約,閘恢復放行(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE)",
+      "next": "handoff test flow_gate_v0102 實跑轉 VERIFIED",
+      "case": "flow_gate_v0102"
+    },
+    {
+      "id": "VCGC-REQ174:vrn-watch-scope",
+      "requirement": "VCGC-REQ174",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "reason": "把 functional modules/VRN/**(含 references/intake 正本參考區)由 VCGC 交接閘改交 VRN_SystemManager 自管、已登帳退役檔不算遺失,需改交接閘監看規則;AI 端執行時被權限分類器判為稽核紀錄變更擋下(2026-10-06),未做。",
+      "next": "操作員明示授權 AI 改交接閘監看規則(或在工作站自行套用)後再做;未授權前 VRN 290 + 113 條照舊列紅"
     }
   ]
 }
