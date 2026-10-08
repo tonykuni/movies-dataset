@@ -1,0 +1,644 @@
+{
+  "overall_status": "PASS_WITH_SOURCE_LIMITATIONS",
+  "checks": [
+    {
+      "檢查": "整批來源重讀",
+      "結果": "PASS",
+      "證據": "43 表每次重跑均重新讀原 PDF，沒有沿用快照 PASS"
+    },
+    {
+      "檢查": "年度範圍",
+      "結果": "PASS",
+      "證據": "4415 年度格；季度欄 0"
+    },
+    {
+      "檢查": "來源文字數字全格一致",
+      "結果": "PASS",
+      "證據": "5462 格，含項目與分段；增加的 18 格為 MS 分段格"
+    },
+    {
+      "檢查": "全格單位已校準",
+      "結果": "PASS",
+      "證據": "單位未判定 0；SOURCE_UNIT 與判定依據保留"
+    },
+    {
+      "檢查": "年度算式及期間",
+      "結果": "PASS",
+      "證據": "409 項完整精度、原印精度區間 PASS"
+    },
+    {
+      "檢查": "語意勾稽",
+      "結果": "PASS",
+      "證據": "11 項；Net cash 不轉 0"
+    },
+    {
+      "檢查": "來源缺值不回填",
+      "結果": "PASS",
+      "證據": "GS -- 維持來源空值；推算診斷分欄"
+    },
+    {
+      "檢查": "原文矛盾可追溯",
+      "結果": "PASS",
+      "證據": "CLST 10%／約 20.0106% 保留；整體狀態含來源限制"
+    },
+    {
+      "檢查": "禁止驗算前捨入",
+      "結果": "PASS",
+      "證據": "全批驗算完成前不修改最終顯示值"
+    },
+    {
+      "檢查": "金額政策測試",
+      "結果": "PASS",
+      "證據": "16 項，含千元合成案例及過早捨入拒絕測試"
+    },
+    {
+      "檢查": "全精度後捨入",
+      "結果": "PASS",
+      "證據": "2547 金額格；來源整數→整數，有小數→一位"
+    },
+    {
+      "檢查": "Excel 原值及格式讀回",
+      "結果": "PASS",
+      "證據": "4415 原值格保留，Excel 0／0.0 格式正確"
+    },
+    {
+      "檢查": "Parquet／JSON 資料量一致",
+      "結果": "PASS",
+      "證據": "16 組資料集回讀；CSV 編碼為 utf-8-sig"
+    },
+    {
+      "檢查": "中文 PDF 可讀且有來源限制",
+      "結果": "PASS",
+      "證據": "中文成果報告無缺字 NUL；保留來源限制"
+    },
+    {
+      "檢查": "年度裁切頁範圍",
+      "結果": "PASS",
+      "證據": "12 頁；季度標頭排除，Dec 年度依來源 metadata 認定"
+    },
+    {
+      "檢查": "AST／compile／import",
+      "結果": "PASS",
+      "證據": "5 個主模組三輪檢查 PASS；現有引擎原樣共用"
+    },
+    {
+      "檢查": "Windows 啟動檔換行",
+      "結果": "PASS",
+      "證據": "CRLF 正確；未宣稱 Windows 實機執行"
+    }
+  ],
+  "source_limitations": {
+    "missing": [
+      {
+        "檔案": "GS-6415 20260517.pdf",
+        "來源頁": 2,
+        "年度": "2028",
+        "項目": "Other operating cash flow",
+        "原表值": "--",
+        "來源數值": null,
+        "推算餘額完整精度": "0.0",
+        "推算餘額單位": "NT$m",
+        "捨入不確定下界": "-0.25",
+        "捨入不確定上界": "0.25",
+        "公式": "CFO − Net income − D&A add-back − Minority interest add-back − Working capital change",
+        "算式輸入": "[\"11,694.6\", \"12,595.9\", \"686.6\", \"(123.2)\", \"(1,464.7)\"]",
+        "處理": "原表 -- 與數值空值保留；推算餘額另列，禁止回填來源或改列算式 PASS",
+        "來源驗證": "NOT_CHECKABLE_SOURCE_NOT_REPORTED",
+        "問題狀態": "CLOSED_WITH_SOURCE_LIMITATION"
+      }
+    ],
+    "conflict": [
+      {
+        "檔案": "CLST-6669 20251001(20261006-052156).pdf",
+        "問題": "本文與年度表的 2026 營收年增率矛盾",
+        "本文頁": 1,
+        "年度表頁": 5,
+        "本文原文": "we forecast 2026 sales to grow 10% YoY",
+        "本文年增率": "10%",
+        "年度表驗算": "20.010637608720111558511962195575163911230519026660%",
+        "採用來源": "年度財報表原值；本文 10% 留作來源矛盾證據",
+        "來源判定": "SOURCE_CONFLICT_RETAINED",
+        "問題狀態": "OPEN_SOURCE_CORRECTION_REQUIRED",
+        "處理": "可完成擷取與驗算；不能自行改寫券商原文或宣稱來源矛盾已消失"
+      }
+    ]
+  },
+  "fresh_reader_calls": [
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0148
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.5979
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0061
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0069
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0075
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.5909
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0104
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0129
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0063
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.4738
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0065
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0061
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0065
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.006
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0066
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0065
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0063
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.1917
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0041
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0086
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0039
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.006
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0085
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.1779
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0037
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0056
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0028
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0039
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0022
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0039
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0124
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.1928
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0056
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0082
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0037
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0076
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0038
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0051
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0033
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0046
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0164
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.1372
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0027
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0061
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0025
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.006
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0032
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0076
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0033
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0074
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0249
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.2959
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0108
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0061
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0095
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0049
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0108
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0049
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0192
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.2304
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0047
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0065
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.005
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0059
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0044
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0063
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0045
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0038
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0082
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.4065
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0033
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0088
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0035
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0093
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.003
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0073
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0135
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.2064
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0036
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0043
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0037
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.004
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0118
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.2088
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0037
+    },
+    {
+      "role": "geometry",
+      "function": "read",
+      "status": "PASS",
+      "seconds": 0.0058
+    }
+  ]
+}

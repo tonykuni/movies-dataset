@@ -1,0 +1,226 @@
+VRN v0108 完整部署、調度與結果驗證技術提示詞
+交接版：v0108-handover-v0100｜建立日期：2026/10/07（Asia/Taipei）
+
+本文件可完整貼給下一位 AI／工程師。請先閱讀全部限制，再執行。它同時是本包的使用與驗收說明。
+
+01｜你的任務與完成標準
+你是本地 VRN 年度財報調度與驗證工程師。請使用本包的新增調度層控制既有引擎，先確認環境與檔案完整性，再用隨包來源完成可重現的年度擷取、完整精度驗算、格式輸出與獨立讀回驗證。不得以「程式有結束」「畫面顯示綠色」或舊收據取代當次結果驗證。
+請以繁體中文報告，保留完整函式 def，所有可調參數放在檔頭，新增修復放在新增模組／適配層。不得覆蓋正式 VIA／VRN 引擎，不得推送 GitHub，不得聯絡券商，不得自行填造原報告缺值。
+本包整體正確狀態為 PASS_WITH_SOURCE_LIMITATIONS；不是「來源完全無矛盾」，也不是「已核實券商預估為真」。
+
+02｜部署界線：不整包取代正式系統
+請將整個交接 ZIP 解壓到新的獨立資料夾，例如：
+C:\Users\tonyk\Downloads\VRN_v0108_Complete_Handover
+根目錄有 RunAndVerify.ps1、tools、docs、evidence、pack。pack 是原交付 v0108 的完整展開內容；根目錄的新工具只提供部署與額外驗證，不修改 pack 中的引擎。
+保持 pack 為基準唯讀；人工檢視 Excel 時不要存回改動，需註記請另存副本。每次執行用新的 runs\時間_亂數\results，紀錄與驗證收據留在其父資料夾，不能寫進已雜湊鎖定的 results。
+正式 VRN System Manager 的整合、正式資料庫增量寫入、替換正式入口、授權機制嫁接，均不屬於這次「獨立試跑」；不得因試跑通過就自動部署。
+
+03｜包內結構與各檔職責
+pack\VRN_AnnualFinancial_v0108.py：總調度器。參數、來源選擇、年度欄、資料正規化、跨模組檢查、最終捨入、工作簿及封裝。
+pack\VRN_AnnualLayouts_v0108.py：GS／MS／Daiwa 三種來源鎖定版面；原生讀取、年度表格與跨表算式。
+pack\VRN_AnnualAmounts_v0108.py：Decimal 50 位精度、千元轉百萬元、來源顯示精度區間、金額最後捨入、16 項政策測試。
+pack\VRN_AnnualCloseout_v0108.py：裁切、逐列識別、單位維度證據、EVA／ROIC／EPS／BVPS 等勾稽、來源缺值／矛盾、可讀還原表及 PDF。
+pack\VRN_AnnualAudit_v0108.py：每欄來源座標、逐來源讀取快取、43 表重新讀取、17 項品質閘門、資料輸出讀回與 ZIP 雜湊。
+pack\engine\VRN_LocalDispatcher_v0104.py：既有調度引擎原樣副本。
+pack\engine\tools：既有恢復、版面、系統管理、NLP、規則及支援工具原樣快照；「有收錄」不代表這批全部有執行。
+pack\engine\profiles：既有版面／來源雜湊設定。
+pack\engine\fixtures\REAL_TEST_INPUT：舊批測試原報告。
+pack\engine\real_test\documents\*\result.json：舊引擎結果快照，提供既有來源的表格定位與基本結構。
+pack\inputs：本批新增來源與排除／去重核對來源。
+pack\documents：每份年度表、驗算視圖、財務輸出及算式。
+pack\data：16 組 JSON／CSV／Parquet，對應同一組資料。
+pack\NotoSansTC-Regular.ttf：中文 PDF 字型，須保留。
+pack\requirements_annual.txt：已測環境使用的套件版本。
+pack\StartAnnual.ps1、RunAnnual.cmd：原版啟動器，保留原樣。
+根目錄 RunAndVerify.ps1：本交接新增入口，使用獨立 via_ 環境、唯一 run 目錄、執行紀錄及獨立驗證。
+tools\RunAnnual_v0108.py：呼叫原主程式；只對當次載入的 audit 封裝函式加上跨平台路徑適配，以 as_posix() 統一 ZIP 成員及 manifest 名稱。原版在 Windows 使用反斜線可能與 ZIP 成員名稱不一致；不修改 pack 或既有引擎原檔。
+tools\TestVerifier_v0108.py：六項刻意錯誤的可重跑測試，不修改基準。
+tools\VerifyPack_v0108.py：本交接新增唯讀驗證器，完整性與結果驗證分成兩種模式。
+
+04｜既有引擎是否有改動
+v0107／v0108 的 engine/ 共 54 檔（含 18 個 Python 檔），逐檔 SHA256 一致，新增／移除／變更均為 0。UPSTREAM_LOCK.json 中的 26 檔也全部與原鎖定值一致。這項結論針對交付包內的快照；不能直接推論使用者目前正式電腦上的檔案也相同。
+主程式透過 def_import 載入 VRN_LocalDispatcher_v0104.py，再呼叫 def_discover、def_load('restore')、def_table_schema、def_csv 與 def_table_fast_validate；原有恢復模組提供 canonical_metric 等能力。
+重要：def_fresh_validate 在同一 Python 行程中，暫時替換 engine.def_words_to_row、engine.def_native_table_words、engine.def_plumber_table_words，再於 finally 還原。這是記憶體中的執行期適配，沒有改寫既有 .py 原檔；不能宣稱當次行為完全未改變。
+由於有此執行期替換，不得在同一個共享 Python 模組實例內同時平行調用該驗證流程。若未來需要並行，先採獨立行程或設計明確隔離，不能直接開多執行緒共用 engine。
+
+05｜工具實際使用範圍
+本批是原生文字 PDF：fitz／PyMuPDF + pdfplumber + 既有 geometry／restore 能力。讀取器在單份來源內快取並於每份完成後關閉，以減少重開檔和記憶體占用。
+本批未直接動用 OCR、Camelot、Tabula、NLP 推論或全部 25 個加速器；def_table_fast_validate 的 accelerator 參數為 None。不得把收錄的工具清單當成已執行清單。
+需要圖片 PDF 時，未來才以版面識別後的局部區域依序非 OCR → 輕 OCR → 重 OCR，保留信心與人工覆核，不得用 NLP 猜數字。本包沒有完成圖片 OCR 能力接入。
+
+06｜資料範圍：固定年度驗收資料集
+這是一組固定且來源雜湊鎖定的實測包，不是「任意 PDF 丟進資料夾就能自動支援」的通用服務。
+範圍：9 份報告、12 個年度來源頁、43 個年度表、4,415 個年度資料格；不抓四季、不做四季加總、不把季度資料變成年度。日期為 Dec 或季末，本身不能證明是全年。
+舊批 6 份資料先用既有 result.json 的定位／結構，再重新讀原 PDF 驗證全部年度表；新增 3 份用已校準 layout 重新擷取。因此「43 表當次重讀」不等於「對所有版面重新做不帶設定的全頁發現」。
+測試報告與年度格數：
+CLST-6669 20251001(20261006-052156).pdf：1120
+JP-2330 20250718.pdf：292
+MS-3661 20251203.pdf：292
+凱基投顧_2637 慧洋-KY_賴偉中_20260915.pdf：520
+凱基投顧_3665 貿聯-KY_李承泰_20260519.pdf：520
+晶心科(6533,N,中立)-CTBC251208.pdf：237
+GS-6415 20260517.pdf：368
+MS-2308 20251128.pdf：370
+Daiwa-1319 20231011(20261006-122413).pdf：696
+首頁、本文、SUMMARIZER 與非個股報告的完整處理不是本年度包的輸出範圍；CLST 本文只用來保留來源矛盾證據。
+
+07｜參數與路徑
+所有 Python 主模組檔頭都有 PARAMS。主要 CLI：
+--dispatcher-root：既有引擎根目錄，需含 tools／profiles／fixtures／real_test。
+--input-root：GS／MS／Daiwa 等預期原檔所在的 inputs。
+--output-root：本次新的輸出位置；不可與 engine 或 inputs 包含／重疊。
+不提供參數時以主程式所在目錄解析包內預設位置；從任何工作目錄都應可執行。
+不要把 --dispatcher-root 指向不明的正式資料夾，這個包需要符合既有目錄契約的快照；先用 pack\engine 重現基準。
+檔案新增、來源 SHA 變更、年度表格數改變，都可能使固定驗收數量不符。不得為了讓測試變綠而直接修改 expected_* 或雜湊。
+
+08｜Windows 首次使用：推薦單一 PowerShell
+先確認安裝 Python 3.12；本包不自動下載 Python 執行器。以 PowerShell 7 開啟解壓後的根目錄，不需要管理員。
+首次指令：
+& .\RunAndVerify.ps1 -InstallDependencies
+若無法自動找到正確 Python：
+& .\RunAndVerify.ps1 -PythonPath 'C:\Users\tonyk\envs\via_vrn_312\Scripts\python.exe' -InstallDependencies
+這裡的 PythonPath 是建立獨立環境的 Python 3.12 來源。新入口會建立本包根目錄下 envs\via_vrn_annual_v0108，再把 requirements 安裝到該環境；不會把依賴直接灌入正式 via_core。若你自行把 EnvironmentPath 指到正式環境，則安裝仍會改到該環境，禁止這樣做。
+後續重跑：
+& .\RunAndVerify.ps1
+入口先以純標準函式庫驗證 pack 的 199 檔及 26 檔上游鎖定值，再準備專用環境、pip check、載入檢查、跑年度引擎、執行獨立結果驗證。
+每次使用時間＋亂數產生唯一 runs 目錄；RUN.lock 使用 OS 檔案鎖阻止同一入口重複啟動。它不會關閉 PowerShell，也不會 Stop-Process。進度條為階段進度，不是每格的精確完成比例。
+若組織政策阻擋 PowerShell 腳本，保留錯誤並使用允許的直接 Python 流程，不要擅自修改機器全域執行政策。
+
+09｜原版啟動器注意事項
+pack\StartAnnual.ps1 可以使用，但 -InstallDependencies 會安裝到它選中的既有環境；它的 catch 會印出錯誤，不能只靠外層 PowerShell 是否回到提示符號判定成功。原版預設 rerun_output 也可能被再次使用。
+因此推薦根目錄新入口，以獨立環境、唯一輸出目錄和 RUN_STATUS.json 判定結果。原版檔案保持原樣，不修改它來修正部署體驗。
+
+10｜直接 Python 流程與診斷指令
+下列指令請在交接根目錄執行，將 Python 路徑換成自己的專用環境；不要貼 PS C:\...> 之類提示符號。
+完整性（不需額外 Python 套件）：
+python -X utf8 .\tools\VerifyPack_v0108.py --pack .\pack --integrity-only --receipt .\runs\manual_precheck.json
+直接跑年度引擎（先安裝 requirements）：
+python -X utf8 .\tools\RunAnnual_v0108.py --dispatcher-root .\pack\engine --input-root .\pack\inputs --output-root .\runs\manual_001\results
+獨立驗證本次結果：
+python -X utf8 .\tools\VerifyPack_v0108.py --pack .\pack --results .\runs\manual_001\results --receipt .\runs\manual_001\RESULT_VERIFICATION.json
+驗證隨包成果而不重跑：
+python -X utf8 .\tools\VerifyPack_v0108.py --pack .\pack --receipt .\runs\baseline_verification.json
+manual_001 僅為範例；每次請換新名稱。receipt 必須在 pack／results 之外，避免更動已鎖定成果。
+完整性模式只證明位元組與原交付一致，成功狀態為 PASS_INTEGRITY_ONLY；不能當成資料與財務算式已重跑。
+結果驗證器失敗回傳 exit code 1，成功為 0；RUN_STATUS.json 的 status 應為 PASS_WITH_SOURCE_LIMITATIONS。
+
+11｜實際處理順序
+(1) 鎖定來源檔與版本，核對 SHA256；讀舊來源結構或新 layout。
+(2) 明確選取年度表與年度欄；依原印表頭識別 actual／forecast，季度排除。
+(3) 原表逐格 trim／正規化，保留 VALUE_RAW 與來源座標；不把跨欄數字拼成一格。
+(4) CTBC 表頭黏欄按原 PDF 座標重建；JP income／balance 的裁切及註記範圍修復。
+(5) 用每欄自己的字形座標比對，處理中文標籤與數字字型基線不同；fitz 與 pdfplumber 重新讀 43 表。
+(6) 用 SOURCE_ROW_INDEX 保留重複列名，不以 METRIC 單獨去重。綁定來源、表、列、年度。
+(7) 判定貨幣、百分比、倍數、天數、元／股、百萬股；維度不明不得直接填成 NT$m。
+(8) 千元先乘 0.001 轉百萬元，建立完整 Decimal 驗算值與原印精度區間。
+(9) 完成年度表內及跨表公式、來源缺值診斷、原文矛盾保留與品質閘門。
+(10) 全部驗算結束後才做金額最後捨入；輸出 CSV／JSON／Parquet／Excel／PDF。
+(11) 讀回輸出、AST／compile／import、封裝全部檔案並核對 ZIP CRC 與 SHA256。
+(12) 用新增的唯讀驗證器再對本次 results 與固定 v0108 基準作獨立比對。
+
+12｜原值、驗算值與顯示值的契約
+VALUE_RAW：來源印刷原值，含逗號／括號／百分比／--；不可用算式答案覆蓋。
+VALUE_TRIM：逐格正規化／去空白比對值，仍保留符號語意。
+SOURCE_VALUE_DECIMAL：解析後的來源精確十進位字串。
+SOURCE_UNIT：原始金額單位。
+SCALE_FACTOR：千元轉百萬元為 0.001，其他為 1。
+VALUE_CHECK_DECIMAL：單位統一後完整精度的驗算基礎。
+VALUE_NUMERIC：驗算全部完成後的最終數值；禁止拿它倒回當驗算輸入。
+VALUE_DISPLAY：最終顯示字串。
+SOURCE_DECIMAL_PLACES／OUTPUT_DECIMAL_PLACES：來源印刷位數與最終金額位數。
+ROUNDING_STAGE：金額必須為 AFTER_ALL_ANNUAL_CHECKS；非金額／缺值不套金額捨入。
+FILENAME_SHA256、TABLE_ID、SOURCE_ROW_INDEX、PERIOD：本批逐格唯一鍵。
+ANCHORS_JSON：來源座標。重複項目名稱必須靠表與列序區分。
+SOURCE_STATUS／VERSION_ROLE／COLUMN_ROLE：實際、券商預估與版本角色，不能混用。
+UNIT_RESOLUTION_BASIS、UPSTREAM_VALIDATION_STATUS、SOURCE_QA_STATUS：證據與狀態沿革，不可只留最後一個 PASS。
+
+13｜金額政策與驗算方法
+只把貨幣千元轉百萬元；股數、EPS、百分比、倍數、天數不是貨幣百萬元，不可一起除 1000。
+來源整數格式 → 最終金額取整數；來源有小數 → 最終金額取一位小數。用 Decimal + ROUND_HALF_UP，不使用 Python float 的銀行家捨入當最終規則。
+合成例：1234 千元 → 完整精度 1.234 百萬元 → 整數來源最終 1；1250.0 千元 → 1.2500 → 小數來源最終 1.3；(1500) 千元 → -1.500 → -2。來源數值仍保留在別欄。
+本批實際來源中千元格數為 0；千元規則由合成政策測試驗證，不能宣稱有真實千元報告實測。
+原印 n 位小數通常形成 x ± 0.5×10^(-n) 的顯示捨入區間；金額縮放時，區間也同步縮放。加減法及乘除法傳遞區間，檢查計算結果區間與來源結果區間是否重疊。
+區間方法用於辨識顯示精度下可相容的數字，不證明未印出的底層精確值相同。不加固定寬鬆容差把明顯差異放行。
+分母為零或區間跨零時，應列為不可算／覆核，不能產生 Infinity 再標 PASS。不得混用不同年度、不同預估版本、單季／累計或不同單位。
+
+14｜基準預期數量
+來源報告 9；來源頁 12；年度表 43；年度格 4415；可讀年度還原列 821。
+來源逐格比對 5462 PASS／0 REVIEW（含文字標籤與分段格，不等於 5462 個財務數字）。
+年度算式 409 PASS／0 FAIL_REVIEW；來源缺值不可算 1，必須另列，不能算進 PASS。
+語意檢查 11 PASS；金額政策測試 16 PASS；自動品質閘門 17 PASS。
+未判定單位 0；單位置換證據 83＝79 格校準＋4 格百分比標籤修復。
+最終捨入金額格 2547；季度欄 0；原資料／原座標與 v0107 基準一致。
+JSON／CSV／Parquet 資料集 16；ZIP 有自己的完整 manifest。
+交付的 CLOSEOUT_QA_v0108.json 含當時的 21 項額外覆核，並非每次主程式都自動再生成。每次自動生成的是 17 項 ReleaseGate；新增 VerifyPack 提供不同的一組獨立檢查，不要將三組檢查數量混算成財務公式數。
+
+15｜16 組資料集與用途
+AnnualFinancialData：4415，逐格年度財務資料。
+AnnualEquations：409，原值／重算值／差異／精度區間。
+AnnualSourceCells：5462，同 PDF 兩讀取器的逐格結果。
+AnnualPages：12，檔名、原頁與裁切 PDF 頁碼對照。
+FormulaSkips：1，來源缺值不可算的公式。
+AmountPolicyTests：16，金額政策與拒絕案例。
+IssueRegister：12，問題、處理與來源限制。
+UnitEvidence：83，原始單位判定、確認單位及證據。
+LayoutRepairs：1，JP 前次 5 格裁切覆核修復紀錄。
+SemanticChecks：11，資金成本與 Net cash 等語意勾稽。
+MissingDiagnostics：1，缺值的另列推算診斷。
+SourceConflicts：1，CLST 本文矛盾。
+ReadableAnnualTables：821，人可讀年度表，保留來源列序。
+FreshSourceTables：43，當次重新讀取紀錄。
+ReleaseGate：17，本次自動品質閘門。
+CropCompleteness：1，JP 末列與 Source／Note 補齊證據。
+CSV 使用 utf-8-sig。部分混合型說明欄在 Parquet 中會成為字串；不能只比 row count，應逐值按已聲明型別語意核對。年度精確金額字串不可透過 float 再轉回。
+
+16｜自動驗收與人工驗收
+自動先核對 pack 的原始 manifest 固定雜湊，再核對 199 檔與 26 上游鎖定檔；驗證器不可為了方便而自動重寫這個基準。
+重跑後獨立核對：當次 manifest、4415 格全部欄位與基準、唯一鍵、年度期間、金額精度、來源限制、409 算式明細、5462 來源格、43 表重讀、16 資料集三格式逐格讀回、Excel 原值與位數、PDF 頁數／文字、5 主模組及 54 個既有引擎樹檔案未變、重跑 ZIP CRC／SHA256。
+人工檢視 Excel：來源摘要 → 問題總表 → 年度還原表 → 算式驗證 → 單位證據 → 來源缺值處理／來源矛盾 → 結案品質閘門。
+檔名 VRN_RealTest_v0104.xlsx 是保留的既有成果名稱；內容是 v0108，不應只從檔名猜版本。
+人工檢視年度來源 PDF：用 AnnualPages 對照原報告頁碼，放大 JP 股數列 25,933、balance 最末 y/y Growth 與 Source／Note；檢視 CTBC 2024 與 3Q25 已分欄且只留年度、3 個中文標籤完整；確認沒有半截字、漏列、跨欄拼接或季度標頭。
+對照原表、年度還原表及逐格資料；圖像看起來整齊不等於數字正確，算式通過也不能取代逐格來源核對。
+
+17｜必須保留的兩項來源限制
+GS-6415，2028 Other operating cash flow 原表為 --：VALUE_NUMERIC／VALUE_CHECK_DECIMAL 保持 None。推算餘額為 0.0 百萬元，原印位數所致區間為 -0.25～0.25；這只是 MissingDiagnostics，不是原表已披露 0。算式維持 NOT_CALCULABLE。
+CLST-6669，第 1 頁本文稱 2026 sales grow 10% YoY；第 5 頁年度收入 2025=879897、2026=1055970，驗算約 20.0106%。保留本文原句與年度表原值，維持 OPEN_SOURCE_CORRECTION_REQUIRED。只有有證據的來源更正版才能另版解決，不得擅自把 10 改成 20。
+同 PDF 的 fitz／pdfplumber 相符不是獨立官方真實性核對。本次沒有 TWSE／TPEX／MOPS 官方歷史財報比對，也沒有證明券商預估實現。
+
+18｜失敗時如何定位
+MISSING_FILE／FILE_SHA256_MISMATCH：先看路徑／解壓完整性，從原包重解到新目錄；不要重算 manifest 把未知修改認列為正確。
+REFERENCE_MANIFEST_PIN_MISMATCH：基準版本或內容不同。停止，辨識版本；不要移除 pin。
+SOURCE_SHA256_MISMATCH：來源報告不是已校準版本。保留新原檔並走新版面校準。
+找不到引擎／來源資料夾：檢查 --dispatcher-root、--input-root 及根目錄結構，不要讓程式默默改讀其他正式資料。
+OUTPUT_ROOT_OVERLAPS_SOURCE_ROOT：換一個獨立 runs 輸出目錄，保留原檔。
+Fresh source validation requires review／SOURCE_GLYPH_CUT：查看表格 id、來源頁、row_index；先檢查邊界與逐欄座標，再決定是否需要更重工具。
+FACTS_DIFFER_FROM_VERIFIED_REFERENCE：逐格比對 VALUE_RAW、PERIOD、UNIT、VALUE_CHECK_DECIMAL；不能只看最終金額是否相同。
+ROUNDING_POLICY_MISMATCH：查 SOURCE_DECIMAL_PLACES、SCALE_FACTOR、ROUNDING_STAGE，禁止在驗算前捨入。
+CSV／Parquet／Excel 不符：查 UTF-8 編碼、空值與字串型別、欄位名、表格列序，禁止使用靜默轉型把異常吞掉。
+pip／import 問題：確認專用環境為 Python 3.12、requirements 版本與 pip check，留 install.log；不要在正式環境反覆升降版。
+PDF 字型問題：保留 NotoSansTC-Regular.ttf，重新產生 PDF 並檢查文字與實際畫面。
+RUN.lock 競爭：另一份同入口可能仍在執行。等待或檢查其 RUN_STATUS，不得 Stop-Process；正常或異常離開都會由 finally 釋放 OS 鎖。
+舊成果仍在：只看本次新的 run_id 與本次 RESULT_VERIFICATION，不得拿上一次 PASS 當本次通過。
+
+19｜刻意錯誤測試原則
+在交接根目錄執行：
+python -X utf8 .\tools\TestVerifier_v0108.py --receipt .\runs\negative_tests.json
+預期 status=PASS、rejected_cases=6；這代表六項錯誤均被拒絕，不是錯誤資料被接受。
+只在臨時副本或記憶體測試，不改 pack 基準：例如改一格 VALUE_NUMERIC、把頻率改 QUARTERLY、製造重複唯一鍵、把 GS 的 -- 補成 0、修改一個引擎檔，驗證器必須拒絕。
+測試後丟棄臨時副本，不得把負面測試的數字寫回正式輸出。測試失敗要帶有明確原因與 exit code 1；缺依賴必須回報 FAIL，不得跳過之後宣稱完整 PASS。
+
+20｜如何新增報告或接入正式系統
+先在獨立新版本保留新的 filename／來源 SHA／年度版面／欄位角色／單位；校準原生讀取與座標，逐格對照原報告，再新增公式適用條件與反例。
+修改新增模組或配置；要更改既有 engine 原檔時，先提出具體差異及理由，不得以套件整包覆蓋。
+9／12／43／4415／409 等數字是目前固定基準，擴增資料後應新建測試規格與新版本，而非放寬或刪掉檢查。
+System Manager 整合只登錄新入口、參數契約、版本、依賴、輸出路徑與驗證狀態。原始引擎採唯讀快照，既有正式系統和這個試跑包分開。
+本包目前是整批固定資料重跑，沒有完整的正式資料庫增量、斷點續傳、DuckDB 管理、授權控管或 25 加速器調度實作；不要將這些宣稱已完成。
+
+21｜最終你必須交付的執行報告
+列明 OS／Python 版本、專用環境絕對路徑、run_id、來源版本與雜湊、主程式實際命令、開始與結束時間。
+列明 PRECHECK／引擎退出碼／RESULT_VERIFICATION／RUN_STATUS；統計本次實際文件、頁、表、格、算式、不可算項目、單位未判定、來源矛盾。
+附本次成果檔及日誌位置；列明既有引擎的 before／after 雜湊是否一致。
+明確區分「通過」「來源限制」「尚未執行」。Windows 只有真正在 Windows 執行後才能標記已測；不能拿 Linux 通過紀錄代替。本交接已完成 Linux 重跑與資料驗證；Windows／PowerShell 入口尚未實機測試。
+若本次失敗，保留失敗階段與錯誤，修復已授權的新增層後再用新的 run_id 重跑。不要為了結案改成假 PASS。
+當本包驗證完成時停在可重現、可回查的獨立成果；不自動推送 GitHub、不自行替換正式系統。
+
+附錄｜本次交接實測紀錄
+evidence 保留基準核對、重跑核對、負面測試、引擎版本比較與環境版本。本次第一次額外驗證發現現存重跑 ZIP 缺少有效中央目錄，回報 BadZipFile；原因未定，未更改來源或財務數值。重新呼叫原封裝函式後 17 項額外檢查通過。失敗收據保留為 INITIAL_RERUN_FAILURE.json；其後新增入口第一次試跑因當次輸出 PDF 為空而停止（原因未定），再以全新目錄完整重跑並核對成功，見 PORTABLE_RUN_VERIFICATION.json。所有經過保留於 evidence/EXECUTION_NOTES.txt。不可只依原主程式 stdout 的 PASS 判定封裝完整。
