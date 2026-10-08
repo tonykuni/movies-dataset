@@ -1,0 +1,9 @@
+本次交接驗證：
+1. 原始 pack 基準逐檔及資料驗證 PASS。
+2. 首次原主程式重跑退出碼 0，但額外讀回發現 ZIP 中央目錄缺失（BadZipFile），原因未定；保留 INITIAL_RERUN_FAILURE.json。重新呼叫原 audit.def_package 後讀回 17 項 PASS，見 REPACKED_RUN_VERIFICATION.json。
+3. 新增 RunAnnual_v0108.py 跨平台 ZIP 路徑適配，不修改原模組。第一次試跑因當次來源裁切輸出 PDF 為空而停止（EmptyFileError），原因未定；未填補數字、未放寬任何驗證。
+4. 改用全新 handover_final_run 目錄重新完整執行新增入口，退出碼 0；最後獨立驗證 17 項全通過，見 PORTABLE_RUN_VERIFICATION.json。此目錄另有自身封裝，CRC 與所有 manifest 雜湊通過。
+5. 六項負面測試成功攔截；不存在的結果目錄使 CLI 返回 1 並寫出 FAIL 收據。
+6. 所有原始 pack 199 檔及 26 檔 upstream lock 仍一致；v0107 vs v0108 的 54 個 engine 樹檔案一致。
+7. Windows/PowerShell 未實機測試；無官方財報獨立比對。不能把 Linux 結果表述為 Windows 成功。
+8. 本包 pack/ 保留原交付資料；evidence/ 是本輪再驗證證據。未重複收錄整個重跑目錄，以避免雙份相同來源與混淆版本。

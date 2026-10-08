@@ -1,0 +1,220 @@
+{
+  "amount_policy": "ANNUAL_ONLY_NORMALIZE_THOUSAND_TO_MILLION_BEFORE_CHECK_ROUND_AFTER_ALL_CHECKS",
+  "money_output_precision": "SOURCE_INTEGER_ELSE_ONE_DECIMAL",
+  "decimal_precision": 50,
+  "amount_policy_tests_pass": 16,
+  "actual_thousand_source_facts": 0,
+  "money_facts_output_rounded": 2547,
+  "version": "v0108",
+  "scope": "ANNUAL_FINANCIAL_DETAIL_ONLY",
+  "documents": 9,
+  "source_pages": 12,
+  "annual_tables": 43,
+  "annual_facts": 4415,
+  "annual_equations_pass": 409,
+  "annual_equations_review": 0,
+  "source_cells_pass": 5462,
+  "source_cells_review": 0,
+  "unit_unresolved_facts": 0,
+  "annual_equations_not_calculable": 1,
+  "new_attachments": 6,
+  "new_unique_sources": 5,
+  "new_duplicate_sources": 1,
+  "source_readers_basis": "Same PDF, two native readers; this verifies extraction agreement, not independent economic truth",
+  "year_labels_restored": 20,
+  "quarter_columns_in_financial_output": 0,
+  "readbacks": [
+    {
+      "資料集": "AnnualFinancialData",
+      "筆數": 4415,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "AnnualEquations",
+      "筆數": 409,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "AnnualSourceCells",
+      "筆數": 5462,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "AnnualPages",
+      "筆數": 12,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "FormulaSkips",
+      "筆數": 1,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "AmountPolicyTests",
+      "筆數": 16,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "IssueRegister",
+      "筆數": 12,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "UnitEvidence",
+      "筆數": 83,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "LayoutRepairs",
+      "筆數": 1,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "SemanticChecks",
+      "筆數": 11,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "MissingDiagnostics",
+      "筆數": 1,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "SourceConflicts",
+      "筆數": 1,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "ReadableAnnualTables",
+      "筆數": 821,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "FreshSourceTables",
+      "筆數": 43,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "ReleaseGate",
+      "筆數": 17,
+      "CSV_JSON_Parquet讀回": "PASS"
+    },
+    {
+      "資料集": "CropCompleteness",
+      "筆數": 1,
+      "CSV_JSON_Parquet讀回": "PASS"
+    }
+  ],
+  "source_history_retained": [
+    {
+      "問題": "年度／季度黏欄與多出行列",
+      "數量": "CTBC 2 表；全體 43 表",
+      "判定": "已修復／完成結構核對",
+      "處理": "來源鎖定，按印刷表頭與座標重建；年度輸出排除季度。每格核對兩原生讀取器，保留原列序避免重複項目被合併。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "末列裁切造成 JP 千分位逗號缺漏",
+      "數量": 5,
+      "判定": "已修復，重新驗證 PASS",
+      "處理": "裁切線移到末列字形與下一表頭之間；重跑既有兩讀取器驗證，原值 25,933 保留，無需 OCR。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "單位未判定",
+      "數量": 79,
+      "判定": "依來源維度校準；剩餘 0 格",
+      "處理": "EVA 金額／利率、資本周轉公式倍數、百萬股、Net cash 文字狀態；以印刷單位及年度算式交叉勾稽，證據逐格列示。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "Sales/Assets 標籤寫 (x)，數值印 %",
+      "數量": 4,
+      "判定": "擷取單位已修復；來源標籤差異留存",
+      "處理": "以原值 % 作單位，不縮放；(x) 原標籤及原始單位保留於證據欄。",
+      "狀態": "FIXED_WITH_SOURCE_LABEL_RETAINED"
+    },
+    {
+      "問題": "凱基驗算年度空白",
+      "數量": 20,
+      "判定": "已修復",
+      "處理": "依已確認年度 metadata 輸出 YYYY；日期為 Dec 本身不代表全年。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "金額轉換與過早四捨五入",
+      "數量": "16 項政策測試",
+      "判定": "已完成；完整精度再驗算",
+      "處理": "千元先轉百萬元；全部年度驗算完成後才捨入：來源整數輸出整數、有小數輸出一位。保留原值、完整精度與最終值。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "固定容差可能掩蓋錯誤",
+      "數量": 409,
+      "判定": "已移除固定寬鬆門檻",
+      "處理": "來源格按原印精度建立捨入區間，完整精度計算，判定輸出區間與來源結果區間是否重疊；不逐步捨入。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "GS 2028 Other operating cash flow 缺值",
+      "數量": 1,
+      "判定": "處理已完成；來源無法驗證",
+      "處理": "原表 -- 與空值保留；另列推算餘額 0.0 百萬元（區間 −0.25～0.25）；原算式維持 NOT_CALCULABLE，禁止回填 0。",
+      "狀態": "CLOSED_WITH_SOURCE_LIMITATION"
+    },
+    {
+      "問題": "CLST 2026 本文 10%／年度表約 20.0106%",
+      "數量": 1,
+      "判定": "來源矛盾仍存在",
+      "處理": "年度表原值與本文原句都保留；只能由來源更正版解決，不能由擷取程式改寫。",
+      "狀態": "OPEN_SOURCE_CORRECTION_REQUIRED"
+    },
+    {
+      "問題": "字型基線不同造成通用讀取器漏抓 3 個項目名稱",
+      "數量": 3,
+      "判定": "已修復並整批重新讀 PDF",
+      "處理": "每一欄依自己的原始座標比對，避免文字／數字的垂直字型位移；原值和座標不改寫。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "重跑成果缺少最終驗證收據／預覽",
+      "數量": "整個程式包",
+      "判定": "已修復",
+      "處理": "輸出前執行明確品質閘門；將重讀證據、AST／compile／import、輸出讀回與預覽納入每次重跑。",
+      "狀態": "FIXED"
+    },
+    {
+      "問題": "JP 資產負債表末列與單位註記被裁切",
+      "數量": 1,
+      "判定": "已修復；字形完整性檢查通過",
+      "處理": "年度來源 PDF 補齊末列與原印 Source／Note，所有年度資料格座標均落在裁切內，原始值未變。",
+      "狀態": "FIXED"
+    }
+  ],
+  "source_file_hashes_pass": true,
+  "official_history": "NOT_RUN",
+  "windows": "NOT_RUN",
+  "overall_status": "PASS_WITH_SOURCE_LIMITATIONS",
+  "fresh_native_table_reads": 43,
+  "fresh_native_source_cells": 5462,
+  "source_values_repaired_this_round": 0,
+  "baseline_label_adapter_repairs": 3,
+  "source_crop_completeness_repairs": 1,
+  "all_source_glyphs_within_crops": true,
+  "release_gate_checks_pass": 17,
+  "source_review_coverage": "All 43 annual tables freshly re-read each run",
+  "as_of_taipei": "2026-10-06T22:42:23+08:00",
+  "unit_resolution_facts": 79,
+  "literal_percent_unit_repairs": 4,
+  "source_clip_cells_repaired": 5,
+  "semantic_checks_pass": 11,
+  "source_conflicts_open": 1,
+  "source_missing_closed_with_limitation": 1,
+  "rounding_tolerance_basis": "Original printed precision intervals; no fixed slack",
+  "final_external_qa_pass": 21,
+  "package_replay": "PASS_FROM_SEPARATE_LINUX_WORKING_DIRECTORY_WITH_PACKAGE_DEFAULT_PATHS",
+  "package_replay_facts_exact_match": 4415,
+  "final_round_completed": true,
+  "remaining_extraction_errors": 0,
+  "remaining_formula_failures": 0
+}

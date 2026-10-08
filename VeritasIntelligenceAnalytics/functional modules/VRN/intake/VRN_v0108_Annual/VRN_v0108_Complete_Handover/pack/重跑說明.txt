@@ -1,0 +1,10 @@
+﻿VRN v0108 重跑說明
+1. Python 3.12。先安裝：python -m pip install -r requirements_annual.txt
+2. Windows：解壓縮後執行 RunAnnual.cmd。
+3. 其他環境：python -X utf8 VRN_AnnualFinancial_v0108.py --dispatcher-root engine --input-root inputs --output-root rerun_output
+4. engine/tools 為原有引擎原樣快照；來源 PDF、來源 result.json、字型與新年度模組皆隨包附上。原檔 SHA 鎖定，未校準檔案不能直接套用既有版面。
+5. 此重跑驗證年度處理，不會重新執行全報告／四季／OCR。來源 result.json 是既有引擎的基礎輸出；新增報告版面重新讀取 PDF。
+6. 本次在 Linux 實測完成；Windows 啟動檔尚未實機驗證。
+
+PowerShell：& .\StartAnnual.ps1 -InstallDependencies
+會選用已啟用的 via_ 環境或 via_vrn_312／via_core 的 Python 3.12；也可 -PythonPath 明確指定。需求已齊備時不重複安裝。PowerShell 保持開啟，含階段進度；Windows 尚未實機驗證。
