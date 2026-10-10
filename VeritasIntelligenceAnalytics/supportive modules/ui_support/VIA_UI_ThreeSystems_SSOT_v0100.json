@@ -1,0 +1,107 @@
+{
+  "schema": "VIA.UI.ThreeSystems.SSOT/1",
+  "version": "v0100",
+  "ts": "2026-10-10T20:10:00+00:00",
+  "ruling": "操作員 2026-10-10:「三個系統統一設計自適應式對任何模板但功能獨立只有左面板可折疊下方有通往各系統的GATE」(政策 L121;承 L120 三系統對等獨立)",
+  "note": "只放資料(版面規則 + 三系統各自的 U/I 與閘頁),不放程式。VCGC · VDF · VRN 各自的 U/I 引擎只讀本冊;讀不到時用各自內建的同一份預設照常出頁(互不影響)。路徑一律相對 VIA 根。 指令欄照工作站已驗的寫法(via-vcgc run <manager> <動詞>:VCGC 只是啟動器之一,L120 ⑥ 甲);各系統也可用自己的 manager 直接跑同一個動詞。",
+  "layout": {
+    "left_collapsible": true,
+    "right_collapsible": false,
+    "gates_at": "left_bottom",
+    "gate_title": "GATE · 三系統",
+    "gate_rule": "只讀跳轉、互相監控(L120 ③);不是唯一入口。檔不在 = 灰燈 + 產生它的指令"
+  },
+  "systems": [
+    {
+      "id": "VCGC",
+      "zh": "VCGC 治理",
+      "manager": "CGC_MDL149_VeritasCentralGovernanceConsole 尾版",
+      "ui": {
+        "zh": "VCGC 操作台",
+        "file": "VIA_Reports/ui_engine/VIA_UI_Engine_latest.html",
+        "cmd": "via-vcgc run CGC_MDL261_UIEngine build --open"
+      },
+      "gates": [
+        {
+          "zh": "全綠閘",
+          "file": "VIA_Reports/gate/GATE_latest.json",
+          "cmd": "via-vcgc gate"
+        },
+        {
+          "zh": "交接閘",
+          "file": "docs/handoff/HANDOFF_latest.json",
+          "cmd": "via-vcgc handoff check"
+        },
+        {
+          "zh": "總檢頁",
+          "file": "VIA_Reports/review/ONEPAGE_latest.html",
+          "cmd": "via-vcgc run CGC_MDL254_ReviewOnePage build"
+        },
+        {
+          "zh": "健康矩陣",
+          "file": "VIA_Reports/review/vcgc_health/HEALTH_MATRIX_latest.html",
+          "cmd": "via-vcgc run CGC_MDL274_HealthMatrix matrix"
+        }
+      ]
+    },
+    {
+      "id": "VDF",
+      "zh": "VDF 資料",
+      "manager": "functional modules/VDF/VDF_SystemManager 尾版",
+      "ui": {
+        "zh": "VDF 操作頁",
+        "file": "VIA_Reports/vdf/VDF_UI_latest.html",
+        "cmd": "via-vcgc run VDF_SystemManager ui"
+      },
+      "gates": [
+        {
+          "zh": "資料庫閘",
+          "file": "VIA_Reports/vdf/DB_CHECK_latest.html",
+          "cmd": "via-vcgc run VDF_SystemManager db check"
+        },
+        {
+          "zh": "引擎矩陣",
+          "file": "VIA_Reports/vdf/ENGINE_MATRIX_latest.html",
+          "cmd": "via-vcgc run VDF_SystemManager engine matrix"
+        },
+        {
+          "zh": "全景",
+          "file": "VIA_Reports/vdf/PANORAMA_latest.html",
+          "cmd": "via-vcgc run VDF_SystemManager panorama"
+        },
+        {
+          "zh": "健康",
+          "file": "VIA_Reports/vdf/HEALTH_latest.json",
+          "cmd": "via-vcgc run VDF_SystemManager health"
+        }
+      ]
+    },
+    {
+      "id": "VRN",
+      "zh": "VRN 報告",
+      "manager": "functional modules/VRN/VRN_SystemManager 尾版",
+      "ui": {
+        "zh": "VRN 操作頁",
+        "file": "VIA_Reports/vrn/VRN_UI_latest.html",
+        "cmd": "via-vcgc run VRN_SystemManager ui"
+      },
+      "gates": [
+        {
+          "zh": "報告矩陣",
+          "file": "VIA_Reports/vrn/VRN_REPORT_MATRIX.html",
+          "cmd": "via-vcgc run VIA_VRN_FirstPageEngine --report"
+        },
+        {
+          "zh": "全景",
+          "file": "VIA_Reports/vrn/PANORAMA_latest.html",
+          "cmd": "via-vcgc run VRN_SystemManager panorama"
+        },
+        {
+          "zh": "健康",
+          "file": "VIA_Reports/vrn/HEALTH_latest.json",
+          "cmd": "via-vcgc run VRN_SystemManager health"
+        }
+      ]
+    }
+  ]
+}
