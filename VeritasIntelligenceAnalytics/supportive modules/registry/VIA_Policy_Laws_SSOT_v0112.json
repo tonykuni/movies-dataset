@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "側線 2026-10-10 R65(+L120 三系統對等獨立 · 互相監控 · +L121 三系統統一 U/I)",
+ "batch": "側線 2026-10-10 R65(+L120 三系統對等獨立 · +L121 統一 U/I · +L122 SSOT 空號 → 衝突檢 → 自動發號)",
  "ts": "2026-10-10T19:40:00+00:00",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -860,6 +860,16 @@
    "zh": "【三系統統一 U/I 律】(承 L100 正典 TEMPLATE · L118 操作律 · L120 對等獨立)① 統一設計:VCGC · VDF · VRN 三個 SYSTEM MANAGER 的 U/I 用同一套版面骨架與元件(色票 · 矩陣 · 燈號 · 頁序),自適應任何模板(模板正本 + 自適應對應:CGC_MDL241 範本轉接 · UI 同步器),換模板不改功能。② 功能獨立:每個系統的 U/I 只呈現並操作自己系統的功能與資料;頁面由該系統自己的 manager 產生(L116 自報 · L118 ④),不代他系統操作。③ 只有左面板可折疊:左面板放該系統唯一會變更的輸入與動作,可整個收合;右側顯示區不做收合。④ 左面板最下方是 GATE 區:固定列出通往三個系統的閘(VCGC · VDF · VRN 各自的 U/I 與閘頁),只讀跳轉、互相監控(L120 ③),不是唯一入口。",
    "origin": "操作員原文 2026-10-10:「三個系統統一設計自適應式對任何模板但功能獨立只有左面板可折疊下方有通往各系統的GATE」",
    "enforcement": "三系統 U/I 引擎(CGC_MDL261 · VDF_SystemManager ui · VRN_SystemManager ui)出新版時照本律;頁面自測檢「左面板可折疊 · 右側不折疊 · 左下 GATE 三系統齊」(VCGC-REQ177)"
+  },
+  {
+   "id": "L122",
+   "batch": "側線 2026-10-10 R65",
+   "cat": "SSOT",
+   "status": "ACTIVE",
+   "key": "SSOT_BLANK_NUMBER_CONFLICT_THEN_ASSIGN",
+   "zh": "【SSOT 空號 → 衝突檢 → 自動發號律】(承 L108 正本在基層 · L116 下建上監 · L120 對等獨立)① 三系統各有自己的 MAIN SSOT · REGEX · 同義字冊,正本歸各自系統。② VDF / VRN 新增或改動冊列時,自己生成 SSOT 列、編號欄留空(不自行發號、不寫 VCGC 號冊)。③ VCGC 自動監控、只讀擷取三系統的冊,做衝突檢(CONFLICT:同號異名 · 同名異義 · 跨冊 regex / 同義字互撞 · 缺號 / 重號),只攤開、點名歸屬,不改子系統的冊。④ 有衝突:由 AI 跟操作員一起裁定解法(裁定書),由該系統自己的 manager 修自己的冊;修完 VCGC 自動重檢 CONFLICT。⑤ 衝突排除:VCGC 自動發 SSOT 編號(只寫 VCGC 號冊,只增,不改身分、不重號)。⑥ 子系統自動讀取 VCGC 發的號,填進自己冊上的空號欄(子系統自己寫自己的冊)。⑦ 全程自動監控、各自運作、互不改變對方;任何一方停機,其他照跑,等它回來再接續。",
+   "origin": "操作員原文 2026-10-10:「三系統各自有MAIN SSOT REGEX 同義字  VRN/VDF生成 SSOT號碼空白  VCGC監控擷取檢查CONFLICT  衝突由AI跟我解決後 他自動檢查CONFLICT若排除衝突就自動給SSOT編號  子系統自動讀取填入編號  自動監控各自運作互不改變」",
+   "enforcement": "子系統 manager:register / adopt(空號)· pull(讀號填冊);VCGC:RegistryGovernor govern / resolve(衝突檢 · 發號)· CGC_MDL237 編號只增稽核(遺失 0 · 改身分 0 · 重號 0)· 裁定書 VIA_KeyRulings;全流程照 VCGC-REQ178 逐步落地"
   }
  ],
  "lessons": [
@@ -2904,5 +2914,5 @@
  "why_v0109": "VIA_Policy_Laws_SSOT_v0108.json 已發布 → 出新版;+L117(操作員原文下令 2026-10-06:所有指令 PY 化導入加速器;PS 檔加加速器用來啟動跟連結 U/I);其餘一字不動。CGC_MDL270_RegistryGovernor_v0105 v0105",
  "why_v0110": "VIA_Policy_Laws_SSOT_v0109.json 已發布 → 出新版;+L118(操作員原文下令 2026-10-06:操作介面 WINDOW I/O 拖曳式 下拉選單勾選 等動滑鼠不動鍵盤為原則);其餘一字不動。CGC_MDL270_RegistryGovernor_v0105 v0105",
  "why_v0111": "VIA_Policy_Laws_SSOT_v0110.json 已發布 → 出新版;+L119(操作員原文 2026-10-08:VCGC 不再是單獨入口;VCGC VRN VDF 互不影響;子系統獨立,母系統監控;);其餘一字不動。CGC_MDL270_RegistryGovernor_v0105 v0105",
- "why_v0112": "VIA_Policy_Laws_SSOT_v0111.json 已發布 → 出新版;+L120(操作員原文 2026-10-10:不再視為一入口 · 三系統獨立 · VCGC VRN VDF SYSTEM MANAGER 獨立互不影響但互相監控而獨立運作);L111 加 amended_by(③⑥ 改為對等互相監控)· L119 加 extended_by;+L121(操作員原文 2026-10-10:三系統統一設計 · 自適應任何模板 · 功能獨立 · 只有左面板可折疊 · 左下通往各系統 GATE);其餘律文一字不動"
+ "why_v0112": "VIA_Policy_Laws_SSOT_v0111.json 已發布 → 出新版;+L120(操作員原文 2026-10-10:不再視為一入口 · 三系統獨立 · VCGC VRN VDF SYSTEM MANAGER 獨立互不影響但互相監控而獨立運作);L111 加 amended_by(③⑥ 改為對等互相監控)· L119 加 extended_by;+L121(操作員原文 2026-10-10:三系統統一設計 · 自適應任何模板 · 功能獨立 · 只有左面板可折疊 · 左下通往各系統 GATE);+L122(操作員原文 2026-10-10:三系統各有 MAIN SSOT / REGEX / 同義字 · VRN / VDF 生成空號 · VCGC 監控擷取檢 CONFLICT · 裁定後自動發號 · 子系統自動讀取填號 · 互不改變);其餘律文一字不動"
 }

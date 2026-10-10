@@ -1,7 +1,7 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0188",
- "batch": "R65 三系統對等獨立 · 互相監控(L120)· 統一 U/I(L121)· VCGC-REQ176 · VCGC-REQ177",
+ "batch": "R65 三系統對等獨立(L120)· 統一 U/I(L121)· SSOT 空號自動發號(L122)· VCGC-REQ176 – REQ178",
  "ts": "2026-10-10T19:55:00+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
@@ -80,7 +80,7 @@
  "tally": {
   "RECORDED": 23,
   "COVERED": 121,
-  "PARTIAL": 72,
+  "PARTIAL": 73,
   "MISSING": 1
  },
  "requirements": [
@@ -5744,6 +5744,26 @@
    "modules": [
     "CGC_MDL261_UIEngine_v0103.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ178",
+   "subsystem": "VCGC",
+   "topic": "SSOT 空號 → VCGC 衝突檢 → 裁定排除後自動發號 → 子系統自動讀號填冊;三系統各有 MAIN SSOT · REGEX · 同義字,自動監控、互不改變(政策 L122)",
+   "requirement": "操作員令(2026-10-10):「三系統各自有MAIN SSOT REGEX 同義字  VRN/VDF生成 SSOT號碼空白  VCGC監控擷取檢查CONFLICT  衝突由AI跟我解決後 他自動檢查CONFLICT若排除衝突就自動給SSOT編號  子系統自動讀取填入編號  自動監控各自運作互不改變」",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Policy_Laws_SSOT_v0112.json"
+   ],
+   "evidence": "政策 v0112 +L122 入冊。既有零件:L116 上下分工(下建上監 · number pull)· RegistryGovernor downstream / resolve / govern · CGC_MDL237 只增編號稽核;子系統自動擷取(REQ158)待建。",
+   "next": "盤點現有零件 → 補齊四段自動化:① VDF / VRN 冊列空號生成 ② VCGC 衝突檢(只讀擷取)③ 裁定排除後自動發號 ④ 子系統 pull 讀號填冊;每段經各自 manager,收據入交接冊",
+   "hand": "AI / 操作員",
+   "quotes": [
+    {
+     "text": "三系統各自有MAIN SSOT REGEX 同義字  VRN/VDF生成 SSOT號碼空白  VCGC監控擷取檢查CONFLICT  衝突由AI跟我解決後 他自動檢查CONFLICT若排除衝突就自動給SSOT編號  子系統自動讀取填入編號  自動監控各自運作互不改變",
+     "recorded_at": "2026-10-10T20:15:00+00:00"
+    }
+   ],
+   "modules": []
   }
  ],
  "non_requirements": [
@@ -5926,5 +5946,5 @@
  "why_v0185": "v0184 已隨 PR #495 發布(本批原擬 v0184,撞號依 main 讓位)→ 出新版;VCGC-REQ154 加操作員 2026-10-05 引述「建立左面滿輸入控制 有面板多頁顯示」與 VDF_MDL012 v0105 證據;VCGC-REQ159 加引述「收尾就上傳備份VDF VCGC」與左面板收尾 · 備份鈕證據;兩條仍 PARTIAL(工作站實跑待做);其餘一字不動",
  "why_v0186": "v0185 已發布 → 出新版;+VCGC-REQ174(操作員 2026-10-06 交接債授權原話 · 流程閘修正證據 · VRN 監看範圍待授權);其餘一字不動",
  "why_v0187": "v0186 已發布 → 出新版;+VCGC-REQ175(操作員 2026-10-10 VIA 操作台令,原話逐字;PARTIAL:容器實測過,工作站真資料庫實跑與資料夾備份待操作員);其餘一字不動",
- "why_v0188": "v0187 已發布 → 出新版;+VCGC-REQ176(操作員 2026-10-10 五則原話逐字:不再視為一入口 · 三系統獨立互不影響互相監控;PARTIAL)· +VCGC-REQ177(三系統統一 U/I · 左面板可折疊 · 左下 GATE;PARTIAL);其餘一字不動"
+ "why_v0188": "v0187 已發布 → 出新版;+VCGC-REQ176(操作員 2026-10-10 五則原話逐字:不再視為一入口 · 三系統獨立互不影響互相監控;PARTIAL)· +VCGC-REQ177(三系統統一 U/I · 左面板可折疊 · 左下 GATE;PARTIAL) · +VCGC-REQ178(SSOT 空號 → 衝突檢 → 自動發號 → 子系統填號;PARTIAL);其餘一字不動"
 }
