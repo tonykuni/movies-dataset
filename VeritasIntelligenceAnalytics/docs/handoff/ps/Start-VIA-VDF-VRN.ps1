@@ -1,3 +1,4 @@
+# CELERITAS-TEMPLATE-JOIN v1
 # Start-VIA-VDF-VRN.ps1 — 開 VDF 與 VRN 各自的 U/I(L119 各自入口;邏輯在 Invoke-VIA-Launch → 各 SystemManager)
 # 2026-10-10:原檔三行換行遺失併成一行('…ps1'& pwsh …:PS7 把 & 當背景運算子,$L 傳不到後兩道)→ 拆回三行 · 補 PS-ACCEL 橋
 # ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====

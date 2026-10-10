@@ -1,3 +1,4 @@
+# CELERITAS-TEMPLATE-JOIN v1
 # VIA-Commands-Override-v0102.ps1(薄尾:骨架 / 加速器用的助手不蓋 — Test-VIAPageTarget · Test-VIABookFresh · Invoke-VIACeleritasScoped · Get-VIAPinnedDir · ConvertTo-VIACleanArgs;v0101 不動)· 操作員令 2026-10-08:「過去的快捷指令等全部覆蓋刪除取代避免錯誤」
 # 作法(L108 只增不減 · L117 指令 PY 化 · L119 入口各自):Register-VIA-Commands 原檔不動;本檔在 $PROFILE 最後一行 dot-source,
 # 把所有已載入的 via-* / Set-VIA* / Test-VIA* 等舊短令「覆蓋」成 DEPRECATED 殘樁(印去處,不執行),只留下面 4 個現行指令。
