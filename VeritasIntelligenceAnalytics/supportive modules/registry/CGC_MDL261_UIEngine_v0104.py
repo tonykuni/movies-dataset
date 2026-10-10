@@ -185,19 +185,21 @@ _GATES3_JS = r"""function gates3(){var L=O.three||{},SY=L.systems||[];
 """
 
 _CSS_V0104 = (".side{display:flex;flex-direction:column}.side>*{flex:none}"
-              ".gates3{margin-top:auto;border-top:2px solid var(--ink);padding-top:6px}"
+              ".side{padding-bottom:10px}"
+              ".gates3{margin-top:auto;border-top:2px solid var(--ink);padding-top:6px;position:sticky;bottom:-10px;z-index:2;"
+              "max-height:46vh;overflow:auto;background:var(--paper);box-shadow:0 -8px 10px -8px rgba(30,29,26,.18)}"
               ".g3t{font-weight:700;font-size:12px;letter-spacing:.05em;margin:4px 0 6px}"
               ".g3s{border:1px solid var(--line);border-radius:var(--r);background:var(--paper2);padding:6px 9px;margin:6px 0}"
               ".g3s.self{border-color:var(--blue);background:#eef3f9}"
               ".g3n{display:flex;align-items:center;gap:6px;font-size:12.5px}.g3n a{color:var(--blue)}"
-              ".gate .note{white-space:nowrap}"
-              ".g3mini{display:none}.g3m{display:block;font-size:10px;font-weight:700;text-align:center;border:1px solid var(--line);"
-              "border-radius:6px;padding:4px 0;color:var(--blue);text-decoration:none;background:var(--paper2)}.g3m.on{background:var(--ink);color:#fff}"
+              ".gate .note{white-space:nowrap}.gates3 .gate{margin:2px 0}.gates3 .fold-btn{padding:1px 6px;font-size:11px}"
+              ".g3mini{display:none}.g3m{display:block;font-size:9px;font-weight:700;text-align:center;border:1px solid var(--line);"
+              "border-radius:6px;padding:4px 1px;overflow:hidden;color:var(--blue);text-decoration:none;background:var(--paper2)}.g3m.on{background:var(--ink);color:#fff}"
               ".app.fold .side>.gates3{display:block;border-top:1px solid var(--line)}.app.fold .gates3>*:not(.g3mini){display:none}"
               ".app.fold .gates3>.g3mini{display:flex;flex-direction:column;gap:4px}"
               ".cathd{padding:9px 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}.cathd b{font-size:13.5px}.cat>.tw{margin:0 10px 10px}"
               ".seg.docs{max-height:132px;overflow:auto}")
-_CSS_V0104_MOBILE = ("@media (max-width:900px){.app.fold .side>.gates3{display:block;margin-top:6px}"
+_CSS_V0104_MOBILE = ("@media (max-width:900px){.gates3{position:static;max-height:none;box-shadow:none}.app.fold .side>.gates3{display:block;margin-top:6px}"
                      ".app.fold .gates3>.g3mini{flex-direction:row;flex-wrap:wrap}.app.fold .g3m{padding:4px 8px}}\n")
 
 
@@ -318,9 +320,9 @@ def selftest() -> int:
         chk("⑦ 只有左面板可折疊:右側五頁 0 個 <details>;第一頁大類 = 固定標頭 + 表;第四頁文件清單固定列",
             right_segment(script) and "<details" not in right_segment(script) and 'class="cat"><div class="cathd">' in script
             and 'class="seg docs"' in script and 'id="fold"' in script, right_segment(script).count("<details"))
-        chk("⑧ 版面:左面板直欄、GATE 推到底(margin-top:auto);收合時留三個系統代號小鈕;手機寬也留",
-            all(k in page for k in (".side{display:flex;flex-direction:column}", ".gates3{margin-top:auto", ".app.fold .side>.gates3{display:block",
-                                    ".app.fold .gates3>.g3mini{display:flex", "@media (max-width:900px){.app.fold .side>.gates3")))
+        chk("⑧ 版面:左面板直欄、GATE 釘在左面板底部(margin-top:auto + sticky,不用捲就看得到);收合時留三個系統代號小鈕;手機寬也留",
+            all(k in page for k in (".side{display:flex;flex-direction:column}", ".gates3{margin-top:auto", "position:sticky;bottom:-10px", ".app.fold .side>.gates3{display:block",
+                                    ".app.fold .gates3>.g3mini{display:flex", "@media (max-width:900px){.gates3{position:static", ".app.fold .side>.gates3{display:block;margin-top:6px}")))
         chk("⑨ 不再寫一對二(VCGC → VDF × VRN);匯出標本版號;零 CDN · 零 fetch",
             "VCGC → VDF × VRN" not in page and "from:'CGC_MDL261_UIEngine v0104'" in script
             and not re.search(r'(src|href)="https?://', page) and "fetch(" not in script and "XMLHttpRequest" not in page)
