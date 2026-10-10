@@ -1,0 +1,83 @@
+{
+  "schema": "VIA.UI.OperatorConsole.SSOT/1",
+  "version": "v0100",
+  "ts": "2026-10-10T17:45:00+00:00",
+  "owner": "CGC_MDL261_UIEngine v0103",
+  "ruling": "操作員 2026-10-10:左面板 = 功能(可伸縮),右面板 = 顯示;左面板唯一會變更的輸入 = 各大類起始日 · 國內外個股財報增減 · 國外個股資料增減 · 啟動 · 跳 VCGC / VDF 閘;右面板 第一頁 輸入矩陣(全選)+ 引擎狀態矩陣 + 結果矩陣 + 結果驗證摘要 · 第二頁 BASIC INFO · 第三頁 FINANCIAL DATA · 第四頁 修正後首頁全文(一句一行 · 一標題一行 · 自動分行)+ 首頁 INFO AREA + 標題 + 四點摘要 · 第五頁 SSOT / REGEX / 同義字 / 關聯註冊引擎(版本號 · 編號)/ 邏輯 / 輸入 / 參數 / 輸出 自動編號矩陣;視覺 = 資料總冊 Fetch Registry 白底矩陣報告;結果自動跳出使用者介面",
+  "registry_book": "functional modules/VDF/VDF_FetchOne_Matrix_Registry_v*.json",
+  "input_categories": [
+    {
+      "id": "IN_TW_MARKET",
+      "zh": "台灣股市 · 加權 / 櫃買兩大指數 · 全部主動式台股 ETF(每日量價 · 籌碼 · 相關資訊)",
+      "select": "ALL",
+      "start_category": "TW_MARKET",
+      "ids": ["PX-01", "PX-02", "PX-04C", "PX-06F", "MX-A1", "MX-A2", "MX-A3", "MX-A12", "MX-D1", "MX-D2",
+              "SE-05", "SE-12", "EF-04", "EF-06", "EF-07", "EF-09", "EF-10", "EF-21", "EF-42", "EF-43"],
+      "prefixes": ["EF-01", "EF-40", "EF-41", "FQ-"]
+    },
+    {
+      "id": "IN_FIN_REV",
+      "zh": "國內外股票財報 · 月營收 · 共識評價",
+      "select": "ALL",
+      "start_category": "FIN",
+      "ids": ["AI-10", "AI-11", "AI-12", "MX-E1"],
+      "prefixes": ["FN-", "CS-"]
+    },
+    {
+      "id": "IN_ETF_ALL",
+      "zh": "各類 ETF(被動 · 區域 · 行業 · 債券 · 商品 · 加密)",
+      "select": "ALL",
+      "start_category": "OTHER",
+      "ids": ["PX-06B", "PX-06C", "PX-06D", "PX-06E", "CM-10", "CM-11", "CM-12", "CM-13", "CM-14", "CM-15", "CM-16", "CM-17",
+              "CY-03", "CY-04", "CY-05", "CY-06", "CY-07", "MX-A11", "MX-C1", "MX-C2", "MX-C3", "MX-C4", "GL-04E", "AI-15"],
+      "prefixes": ["EF-", "PX-05"]
+    },
+    {
+      "id": "IN_OTHER_MACRO",
+      "zh": "其他擷取商品 · 國際行情 · 總體經濟數據",
+      "select": "ALL",
+      "start_category": "MACRO",
+      "ids": [],
+      "prefixes": [],
+      "default": true
+    }
+  ],
+  "editable": {
+    "start": "categories(TW_MARKET · FIN · MACRO · OTHER;只能按大類改,族群冊 start_rule)",
+    "members": {
+      "TW_FIN": {"zh": "國內個股財報", "pick": "TW", "via": "ui-import(成員帳本)"},
+      "INTL_FIN": {"zh": "國外個股財報", "pick": "INTL", "pick_groups": ["us_jp"], "pick_rule": "財報只收公司:國外個股(美 / 日);指數 ^ · ETF · 匯率 =X · 期貨 =F 拒收(頁面不列、匯入拒整份)", "via": "ui-import(成員帳本)"},
+      "INTL_DAILY": {"zh": "國外個股資料(每日行情)", "pick": "INTL", "via": "MDL012 add / remove(Input_Interface_Matrix)"}
+    }
+  },
+  "gates": [
+    {"id": "G_VCGC_GATE", "zh": "VCGC 全綠閘", "file": "VIA_Reports/gate/GATE_latest.json", "cmd": "via-vcgc gate"},
+    {"id": "G_VCGC_HANDOFF", "zh": "VCGC 交接閘", "file": "docs/handoff/HANDOFF_latest.json", "cmd": "via-vcgc handoff check"},
+    {"id": "G_VCGC_ONEPAGE", "zh": "VCGC 唯一總檢頁", "file": "VIA_Reports/review/ONEPAGE_latest.html", "cmd": "via-vcgc run CGC_MDL254_ReviewOnePage build"},
+    {"id": "G_VCGC_HEALTH", "zh": "VCGC 健康矩陣", "file": "VIA_Reports/review/vcgc_health/HEALTH_MATRIX_latest.html", "cmd": "via-vcgc run CGC_MDL274_HealthMatrix matrix"},
+    {"id": "G_VDF_DB", "zh": "VDF 資料庫閘(缺庫 / 缺表 / 落後)", "file": "VIA_Reports/vdf/DB_CHECK_latest.html", "cmd": "via-vcgc run VDF_SystemManager db check"},
+    {"id": "G_VDF_ENGINE", "zh": "VDF 引擎矩陣(啟動前閘 · 備料燈)", "file": "VIA_Reports/vdf/ENGINE_MATRIX_latest.html", "cmd": "via-vcgc run VDF_SystemManager engine matrix"},
+    {"id": "G_VDF_UI", "zh": "VDF 操作頁", "file": "VIA_Reports/vdf/VDF_UI_latest.html", "cmd": "via-vcgc run VDF_SystemManager ui"},
+    {"id": "G_VRN_MATRIX", "zh": "VRN 報告矩陣", "file": "VIA_Reports/vrn/VRN_REPORT_MATRIX.html", "cmd": "via-vcgc run VIA_VRN_FirstPageEngine --report"}
+  ],
+  "commands": [
+    {"id": "C_IMPORT", "zh": "① 套用左面板輸入(先乾跑,確認後加 --apply)", "cmd": "via-vcgc run CGC_MDL261_UIEngine import \"%USERPROFILE%\\Downloads\\VIA_UI_Input.json\""},
+    {"id": "C_IMPORT_APPLY", "zh": "① 套用左面板輸入(寫入)", "cmd": "via-vcgc run CGC_MDL261_UIEngine import \"%USERPROFILE%\\Downloads\\VIA_UI_Input.json\" --apply"},
+    {"id": "C_VDF_TEST", "zh": "② VDF 離線整合實測(不連網)", "cmd": "via-vcgc run VDF_SystemManager fetch test"},
+    {"id": "C_VDF_PLAN", "zh": "③ VDF 擷取計畫(只列,不抓)", "cmd": ".\\Invoke-VDF-FetchFill-v0100.ps1 -Plan"},
+    {"id": "C_VDF_FETCH", "zh": "④ VDF 實抓(操作員先開 VIA_NET_CONSENT;AI 不代設)", "cmd": ".\\Invoke-VDF-FetchFill-v0100.ps1"},
+    {"id": "C_VRN", "zh": "⑤ VRN 報告擷取(C:\\測試樣本報告)", "cmd": ".\\Invoke-VIA-VRN-v0105.ps1"},
+    {"id": "C_OPEN", "zh": "⑥ 重建本頁並自動跳出", "cmd": ".\\docs\\handoff\\ps\\Start-VIA-OperatorConsole-v0100.ps1"}
+  ],
+  "page5_sections": [
+    {"id": "SSOT", "zh": "SSOT 冊", "prefix": "P5-SSOT"},
+    {"id": "RGX", "zh": "REGEX", "prefix": "P5-RGX"},
+    {"id": "SYN", "zh": "同義字", "prefix": "P5-SYN"},
+    {"id": "ENG", "zh": "關聯註冊引擎(版本號 · 編號)", "prefix": "P5-ENG"},
+    {"id": "LGC", "zh": "邏輯", "prefix": "P5-LGC"},
+    {"id": "IN", "zh": "輸入", "prefix": "P5-IN"},
+    {"id": "PRM", "zh": "參數", "prefix": "P5-PRM"},
+    {"id": "OUT", "zh": "輸出", "prefix": "P5-OUT"}
+  ],
+  "summary_policy": "四點摘要 = 報告原句節錄(quote-or-abstain:不改寫、不歸納、不補字);有 NLP 分數取分數最高 4 句(依原文順序排列),沒有分數取本文前 4 句;不足 4 句照實少列"
+}
