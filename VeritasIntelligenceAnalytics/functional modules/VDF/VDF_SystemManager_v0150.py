@@ -154,7 +154,10 @@ def verb_problem(args: list) -> str:
 # ---------- ③ chain:從真尾版往下走(v0142 的 chain 從 v0142 自己起算,看不到 v0143 以後的函式 → 假紅) ----------
 def _chain_v0150() -> list:
     import types as _types
-    out, mod, seen = [], sys.modules[__name__], set()
+    top = sys.modules.get("__main__")
+    start = top if (top is not None and Path(getattr(top, "__file__", "") or "x").stem.startswith(_STEM + "_v")
+                    and _vnum_v0150(top.__file__) >= _vnum_v0150(__file__)) else sys.modules[__name__]
+    out, mod, seen = [], start, set()          # 從真正在跑的尾版起算(之後的新尾版也看得到)
     while isinstance(mod, _types.ModuleType) and id(mod) not in seen:
         seen.add(id(mod))
         v = vars(mod)
@@ -182,7 +185,7 @@ def chain_report_v0150(names) -> dict:
                 broken = {"at": r["version"], "blocks": need}
             break
     missing = [n for n, s in found.items() if not s]
-    return {"verb": "chain", "tail": Path(__file__).stem, "depth": len(rows), "rows": rows, "found": found, "missing": missing,
+    return {"verb": "chain", "tail": chain[0][0] if chain else Path(__file__).stem, "depth": len(rows), "rows": rows, "found": found, "missing": missing,
             "broken": broken, "lamp": "RED" if (missing or broken) else "GREEN"}
 
 
@@ -540,7 +543,7 @@ def selftest() -> int:
         chk("② matrix → v0113(共用管理員清單)rc0;policy → v0111(流程閘)rc0", main(["matrix"]) == 0 and main(["policy"]) == 0)
         o = chain_report_v0150(CHAIN_NAMES_VDF)
         chk("③ chain 從真尾版 v0150 起算 · 用 VDF 自己的函式名 → 全找到(quote / extend / engine_run / engine_matrix 都在)",
-            o["lamp"] != "RED" and o["tail"].endswith("v0150") and o["found"].get("engine_matrix"), (o["lamp"], o["missing"]))
+            o["lamp"] != "RED" and _vnum_v0150(o["tail"]) >= 150 and o["found"].get("engine_matrix"), (o["lamp"], o["missing"]))
         fake = td / "via"
         (fake / "docs" / "handoff" / "evidence").mkdir(parents=True)
         (fake / "functional modules" / "VDF" / "registry").mkdir(parents=True)
