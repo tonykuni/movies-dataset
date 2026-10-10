@@ -688,12 +688,18 @@
         "VRN_ENG086_FirstPageLogicBridge",
         "--selftest"
       ],
-      "success_marker": "[計] 118 檢 OK 118 · FAIL 0",
+      "success_marker": "[計] 121 檢 OK 121 · FAIL 0",
       "scope": "VRN 第一頁邏輯補缺橋:⑤ 券商正典鍵跟 CGC_MDL176 裁定(MORGANSTANLEY→MS)· ⑤' 一家一名;第一頁文字 / 表格 / 摘要擷取一字不動(R43 · VCGC-REQ099)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] 118 檢 OK 118 · FAIL 0",
+        "to_version": "v0120",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "VRN_ENG086 tail v0120 counts checks live; 118 → 121 checks, all OK (superset, DRIFT); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "monitor": {
       "argv": [
@@ -1670,31 +1676,47 @@
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
         "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
         "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
-        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json"
+        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0101": {
       "argv": [
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
-        "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py"
+        "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0102": {
       "argv": [
@@ -1730,28 +1752,43 @@
         "CGC_MDL261_UIEngine",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+      "success_marker": "[計] CGC_MDL261_UIEngine v0102 本版 8/8 · v0101 鏈 PASS · 合計 PASS",
       "scope": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
         "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
-        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json"
+        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0102.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+        "to_version": "v0102",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "v0102 tail runs the v0101 selftest as its chain ('v0101 鏈 PASS') and prints only the tail line (DRIFT); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0103": {
       "argv": [
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
-        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 1200
+      "timeout_seconds": 1200,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vrn_newplugins_v0103": {
       "argv": [
@@ -1909,13 +1946,20 @@
         "CGC_MDL244_VrnLogicAdd",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0102 本版 4/4 · PASS",
       "scope": "CGC_MDL244 v0101 派 VRN 引擎自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0101.py",
-        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py"
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py",
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0102.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+        "to_version": "v0102",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "v0101 ② misread the bus fallback label `bus:base 退路(境未見)`; v0102 tail fixes the check and drops the machine path from the marker line (dispatch behaviour unchanged); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "ui_std_templates": {
       "argv": [
@@ -2141,16 +2185,26 @@
     {
       "id": "VRN-REQ007:manager",
       "requirement": "VRN-REQ007",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "manager",
-      "receipt": "docs/handoff/evidence/manager.json"
+      "receipt": "docs/handoff/evidence/manager.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([VRN 來源入口] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test manager",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ007:provenance",
       "requirement": "VRN-REQ007",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "provenance",
-      "receipt": "docs/handoff/evidence/provenance.json"
+      "receipt": "docs/handoff/evidence/provenance.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "host-live",
@@ -2464,9 +2518,14 @@
     {
       "id": "VRN-REQ008:vrn_ssot_consistency",
       "requirement": "VRN-REQ008",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_ssot_consistency",
-      "receipt": "docs/handoff/evidence/vrn_ssot_consistency.json"
+      "receipt": "docs/handoff/evidence/vrn_ssot_consistency.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: tail SUP_MDL749 v0117 prints only its own 7/7 and does not chain v0116; run directly, v0116 is 13/15 FAIL — ⑦ two regex book examples RED (EMAIL_FULL '10863@entrust.com.tw' no match; TARGET_PRICE_LABEL 'Target Price NT$1,100' captured '1' = VALUE_TRUNCATED) and ⑤/⑭ ruler checks from v0115. Real VRN regex failure, VRN deferred by operator",
+      "next": "operator rules on the two regex examples (VRN regex SSOT) → fix in a new regex book / hub tail that also re-chains v0116 → via-vcgc handoff test vrn_ssot_consistency",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ008:s05-regex",
@@ -2576,9 +2635,14 @@
     {
       "id": "VRN-REQ010:vrn_layout",
       "requirement": "VRN-REQ010",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ010:workstation-real",
@@ -2665,9 +2729,14 @@
     {
       "id": "VRN-REQ015:layout-v0101",
       "requirement": "VRN-REQ015",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ016:vrn_plugin_hub",
@@ -2818,9 +2887,14 @@
     {
       "id": "VCGC-REQ099:provenance",
       "requirement": "VCGC-REQ099",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "provenance",
-      "receipt": "docs/handoff/evidence/provenance.json"
+      "receipt": "docs/handoff/evidence/provenance.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ102:monitor",
@@ -2987,9 +3061,14 @@
     {
       "id": "VDF-REQ017:vrn_outputs",
       "requirement": "VDF-REQ017",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_outputs",
-      "receipt": "docs/handoff/evidence/vrn_outputs.json"
+      "receipt": "docs/handoff/evidence/vrn_outputs.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0111 薄尾 11/11 · 前版 PASS · 合計 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_outputs",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VDF-REQ017:manager_parity",
@@ -3075,12 +3154,14 @@
     {
       "id": "VCGC-REQ117:vrn_engine",
       "requirement": "VCGC-REQ117",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_engine",
-      "owner": "VCGC closeout",
-      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
-      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
-      "receipt": "docs/handoff/evidence/vrn_engine.json"
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_engine",
+      "receipt": "docs/handoff/evidence/vrn_engine.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ117:workstation",
@@ -3469,12 +3550,14 @@
     {
       "id": "VCGC-REQ133:vrn-params-verb",
       "requirement": "VCGC-REQ133",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "VRN 管理員沒有單引擎啟動前備料動詞 → 已驗:2026-10-03T12:41:24+00:00 rc 0 · 標記見到",
-      "next": "handoff test vrn_engine_params 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0115 本版 7/7 · 前版 PASS · 合計 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_engine_params",
       "case": "vrn_engine_params",
-      "receipt": "docs/handoff/evidence/vrn_engine_params.json"
+      "receipt": "docs/handoff/evidence/vrn_engine_params.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ134:outputs-tools-ast",
@@ -3519,12 +3602,14 @@
     {
       "id": "VCGC-REQ139:qg_onebridge",
       "requirement": "VCGC-REQ139",
-      "state": "VERIFIED",
-      "owner": "operator",
-      "reason": "#439 新增 VDF_ENG086_QuantGuardOneBridge 沒有交接案(CHANGED_CODE_WITHOUT_TEST)· 要 polars,容器 / CI 沒有 → 照實 ABSENT → 已驗:2026-10-04T02:28:20+00:00 rc 0 · 標記見到",
-      "next": "handoff test qg_onebridge(工作站有 polars 的境) 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: polars absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test qg_onebridge → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "qg_onebridge",
-      "receipt": "docs/handoff/evidence/qg_onebridge.json"
+      "receipt": "docs/handoff/evidence/qg_onebridge.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ139:usmacro_probe",
@@ -3579,12 +3664,14 @@
     {
       "id": "VCGC-REQ140:vrn_unknown_verb",
       "requirement": "VCGC-REQ140",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位 → 已驗:2026-10-03T16:48:16+00:00 rc 0 · 標記見到",
-      "next": "handoff test vrn_unknown_verb 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0116 本版 6/6) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_unknown_verb",
       "case": "vrn_unknown_verb",
-      "receipt": "docs/handoff/evidence/vrn_unknown_verb.json"
+      "receipt": "docs/handoff/evidence/vrn_unknown_verb.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ141:vdf_fetch_verb",
@@ -3839,12 +3926,14 @@
     {
       "id": "VCGC-REQ147:vdf_akshare_v0101",
       "requirement": "VCGC-REQ147",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "MDL011 v0101 params 無註冊表 = NODATA rc 2(不再 KeyError);有註冊表照 v0100(VCGC-REQ147) → 已驗:2026-10-04T02:50:03+00:00 rc 0 · 標記見到",
-      "next": "handoff test vdf_akshare_v0101 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: akshare absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdf_akshare_v0101 → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdf_akshare_v0101",
-      "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json"
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ148:celeritas_gate_v0103",
@@ -3899,12 +3988,14 @@
     {
       "id": "VCGC-REQ149:vdf_akshare_v0102",
       "requirement": "VCGC-REQ149",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149) → 已驗:2026-10-04T04:11:29+00:00 rc 0 · 標記見到",
-      "next": "handoff test vdf_akshare_v0102 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: akshare absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdf_akshare_v0102 → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdf_akshare_v0102",
-      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json"
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ149:deep-full-tier",
@@ -4129,12 +4220,14 @@
     {
       "id": "VCGC-REQ157:vcgc-assist-env",
       "requirement": "VCGC-REQ157",
-      "state": "VERIFIED",
-      "owner": "AI(VCGC 協助)",
-      "reason": "L111 ④:VCGC 代裝 reportlab / fonttools / opencv-python-headless / pytesseract / markitdown / beautifulsoup4 進 via_vrn_312(uv pip check 全相容,numpy 不變);VRN_ENG394 v0102 自測由 rc 1 → rc 0 · failed 0(容器) → 已驗:2026-10-04T18:11:00+00:00 rc 0 · 標記見到(交接案 vrn_layout)",
-      "next": "工作站境照同一份清單補(子系統跑自測確認)",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ158:vdf-multisource",
@@ -4400,22 +4493,26 @@
     {
       "id": "VCGC-REQ169:via_unified",
       "requirement": "VCGC-REQ169",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "操作員令 integrate all short command into one → Register-VIA-Commands-v0272 via 總門 + CGC_MDL264 驗證器 → 已驗:None rc 0 · 標記見到",
-      "next": "handoff test via_unified 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: rc 2 SKIP — no pwsh in the container, so the dynamic PowerShell checks did not run (SKIP is not a pass)",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test via_unified → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "via_unified",
-      "receipt": "docs/handoff/evidence/via_unified.json"
+      "receipt": "docs/handoff/evidence/via_unified.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ170:vdfvrn_readiness",
       "requirement": "VCGC-REQ170",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "新交接案 vdfvrn_readiness → 已驗:None rc 0 · 標記見到",
-      "next": "handoff test vdfvrn_readiness 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: without pwsh the v0100 selftest runs 9 of its 11 checks (pwsh mock skipped), so the pinned 11/11 line cannot be produced here; re-pinning would hide the skipped checks",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdfvrn_readiness → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdfvrn_readiness",
-      "receipt": "docs/handoff/evidence/vdfvrn_readiness.json"
+      "receipt": "docs/handoff/evidence/vdfvrn_readiness.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ170:vdf_activate",
