@@ -2419,6 +2419,20 @@
         "supportive modules/ui_support/VIA_UI_OperatorConsole_SSOT_v0100.json"
       ],
       "timeout_seconds": 900
+    },
+    "sweeper_v0111": {
+      "argv": [
+        "CGC_MDL124_BridgeSweeper_v0111",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL124_BridgeSweeper v0111 本版 6/6 · v0110 PASS · 合計 PASS",
+      "scope": "掃橋器 v0111:PY 掃描豁免 _sha<12 碼> 存證副本(與交接閘 SHA_COPY 同一規則);VDF 網路橋 137/137(操作員 2026-10-10 問覆蓋率 · VCGC-REQ146)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0111.py",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0110.py",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0109.py"
+      ],
+      "timeout_seconds": 900
     }
   },
   "work_items": [
@@ -5024,6 +5038,16 @@
       "owner": "操作員",
       "reason": "容器沒有真資料庫(db check RED 62 照實)、不能代設網路同意、寫不到 C:;操作台在工作站的真資料實跑與資料夾備份要操作員的手",
       "next": "工作站:.\\docs\\handoff\\ps\\Start-VIA-OperatorConsole-v0100.ps1(要實抓先設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT 再加 -Fetch)→ .\\docs\\handoff\\ps\\Invoke-VIA-SyncFolders-v0100.ps1 備份 via_00_vcgc / via_01_vdf"
+    },
+    {
+      "id": "VCGC-REQ146:sweeper_v0111",
+      "requirement": "VCGC-REQ146",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 sweeper_v0111(_sha 存證副本豁免) → 已驗:2026-10-10T19:32:00+00:00 rc 0 · 標記見到",
+      "next": "handoff test sweeper_v0111 實跑轉 VERIFIED",
+      "case": "sweeper_v0111",
+      "receipt": "docs/handoff/evidence/sweeper_v0111.json"
     }
   ]
 }
