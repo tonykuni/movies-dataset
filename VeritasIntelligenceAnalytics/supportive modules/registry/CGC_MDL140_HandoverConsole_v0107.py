@@ -163,11 +163,12 @@ def selftest():
         t = Path(tmp)
         d = t / "functional modules" / "VDF"
         d.mkdir(parents=True)
-        (d / "A.py").write_text("x = 1\n", encoding="utf-8")
-        (d / "A_v0100.py").write_text("x = 1\r\n", encoding="utf-8")
-        (d / "B.py").write_text("y = 1\n", encoding="utf-8")
-        (d / "B_v0100.py").write_text("y = 2\n", encoding="utf-8")
-        (d / "C.py").write_text("z = 1\n", encoding="utf-8")
+        # write_bytes:Windows 文字模式會把 "\r\n" 再轉成 "\r\r\n"(PR #518 CI 實錄),夾具要逐位元組寫
+        (d / "A.py").write_bytes(b"x = 1\n")
+        (d / "A_v0100.py").write_bytes(b"x = 1\r\n")
+        (d / "B.py").write_bytes(b"y = 1\n")
+        (d / "B_v0100.py").write_bytes(b"y = 2\n")
+        (d / "C.py").write_bytes(b"z = 1\n")
         fams = {"functional modules/VDF/A", "functional modules/VDF/B"}
         rows = [{"lamp": "RED", "rule": "MODULE_UNREGISTERED", "detail": "functional modules/VDF/" + n + ".py"} for n in "ABC"]
         rows.append({"lamp": "RED", "rule": "CHANGED_CODE_WITHOUT_TEST", "detail": "functional modules/VDF/A.py"})

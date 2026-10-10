@@ -115,11 +115,13 @@ def selftest() -> int:
         t = Path(tmp)
         (t / "functional modules" / "VDF").mkdir(parents=True)
         a = t / "functional modules" / "VDF" / "X.py"
-        a.write_text("# [VIA:ACCEL-BRIDGE:v0100]\n# [VIA:NET-BRIDGE:v0100]\nx = 1\nif __name__ == '__main__':\n    pass\n", encoding="utf-8")
-        (t / "functional modules" / "VDF" / "X_v0100.py").write_text(a.read_text(encoding="utf-8") + "y = 2\n", encoding="utf-8")
+        # write_bytes:Windows 文字模式會把 "\r\n" 再轉成 "\r\r\n",夾具要逐位元組寫
+        body = b"# [VIA:ACCEL-BRIDGE:v0100]\n# [VIA:NET-BRIDGE:v0100]\nx = 1\nif __name__ == '__main__':\n    pass\n"
+        a.write_bytes(body)
+        (t / "functional modules" / "VDF" / "X_v0100.py").write_bytes(body + b"y = 2\n")
         r = probe_pair("functional modules/VDF/X.py", t)
         chk("負控:雙胞內容不同 → twin_identical 判 FAIL", not r["checks"]["twin_identical"] and not r["pass"])
-        (t / "functional modules" / "VDF" / "X_v0100.py").write_text(a.read_text(encoding="utf-8").replace("\n", "\r\n"), encoding="utf-8")
+        (t / "functional modules" / "VDF" / "X_v0100.py").write_bytes(body.replace(b"\n", b"\r\n"))
         r = probe_pair("functional modules/VDF/X.py", t)
         chk("CRLF 簽出不算內容不同", r["checks"]["twin_identical"] and r["pass"])
     text = Path(__file__).read_text(encoding="utf-8")

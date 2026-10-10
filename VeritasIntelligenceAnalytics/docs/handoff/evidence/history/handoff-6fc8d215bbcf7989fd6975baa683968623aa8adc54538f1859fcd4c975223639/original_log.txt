@@ -32,6 +32,20 @@
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · CGC_MDL140_HandoverConsole_v0107.py(家族 core)
+[交接回歸] fail=0; tests=33
+  [OK] ① 相依集合沒變:v0101 的檢查照舊、不多報
+  [OK] ② 新尾版落地(符合樣式、不在收據)= 證據失效(沿用擋下) · ['dependency set changed: +1 new / -0 gone CGC_MDL999_Demo_v0101.py']
+  [OK] ③ 收據上的檔不見了 = 證據失效(雜湊檢查與集合檢查都報) · ['dependency changed: supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py', 'dependency set changed: +0 new / -1 gone CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py']
+  [OK] ④ check 與 test 走同一支:本版裝進 v0101 的模組全域
+  [OK] ⑤ 檔頭 · 加速器橋 · 網路橋在;不碰 TA-Lib
+[交接 v0102] 本版 5/5
+  [OK] ① 沿用:照舊印「[沿用成功]」、回 0 · ['[沿用成功] demo · command / dependency / evidence unchanged']
+  [OK] ② 沿用:補印 closeout 讀的判決行(marker true · reused true · scope 照收據) · {'case': 'demo', 'rc': 0, 'marker': True, 'scope': 'demo-scope', 'reused': True}
+  [OK] ③ 沿用不寫收據(位元組一樣)
+  [OK] ④ v0101 main() 的 test 動詞走本版
+  [OK] ⑤ 沿用判定仍走 v0102 的 evidence_status(相依集合檢查還在)
+  [OK] ⑥ 檔頭 · 加速器橋 · 網路橋在;不碰 TA-Lib
+[交接 v0103] 本版 6/6
   [OK] ① git:分支 main · SHA-16 = HEAD · 當日 1 提交 · 乾淨 = 綠
   [OK] ② ledger:5 次 · 成功 3 · 黃 1 · 紅 1 · 成功率 0.6 = 黃
   [OK] ② ledger:--ledger 讀別本帳(status=success 算成功)· 壞行 = 紅
@@ -55,6 +69,35 @@
   [OK] 只收 VCGC 呼叫:沒帶 VIA_FROM_VCGC → DENY rc 2
   [OK] 檔頭:加速器橋 · 網路橋在 · 不碰 TA-Lib · 頂層只 import 標準庫(選用庫全探針)
 [交接 v0104] 本版 22/22 · 每日交接十點 · PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'CGC_MD → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 1, 'stale': 0, 'expected': 17469, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 9514 · 觸碰 run CGC_MDL140_HandoverConsole · 交接閘 RED · 落後 429 提交 · 快照 180.1h · 未登 104 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL267_SsotNumberingVRN …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ① .html:CRLF 與 LF 同雜湊(Windows autocrlf 簽出不再判 dependency changed)
+  [OK] ② LF 檔雜湊 = v0101(既有收據照舊有效)
+  [OK] ③ v0101 原有 8 類照舊正規化
+  [OK] ④ 二進位(.png)不正規化:位元組不同 = 雜湊不同
+  [OK] ⑤ 副檔名大小寫不拘(.CSS = .css)
+  [OK] ⑥ 已裝進 v0101 模組全域(audit · evidence_status 走本版)
+  [OK] ⑦ 檔頭:加速器橋 · 網路橋在(__future__ 之後)· 不碰 TA-Lib
+[交接 v0105] 本版 7/7 · 前版 PASS · CRLF 正規化 · PASS
+  [OK] ① 凍結收容件三條變更規則 → 豁免;只剩它們時燈 GREEN
+  [OK] ② 收容件被刪 = FILE_REMOVED 照舊紅;改字 = CHECKPOINT_STALE 照舊
+  [OK] ③ 收容件以外的程式一條都不豁免
+  [OK] ④ 成功鎖 / 收據規則不豁免;待辦在 → 驗收燈不會是 GREEN
+  [OK] ⑤ 交接燈 GREEN 時,有待辦 → 驗收燈 YELLOW(照 v0101 算法)
+  [OK] ⑥ 家族已登(同夾同家族有版登冊)= 已登;別夾同名 · 沒版號 · 沒測試照舊紅
+  [OK] ⑦ 已裝進 v0101 模組全域(check / checkpoint 經本版 audit)
+  [OK] ⑧ 檔頭:加速器橋 · 網路橋在(__future__ 之後)· 不碰 TA-Lib
+[交接 v0106] 本版 8/8 · 前版 PASS · 凍結收容件具名豁免 · PASS
+  [OK] ① 雙胞同內容 + 家族已登 → 未登改記 z281_handover
+  [OK] ② 雙胞內容不同 / 沒雙胞 → 照舊紅
+  [OK] ③ 改了沒測不在此列(照舊紅)· 有移交 → 驗收燈不是 GREEN
+  [OK] ④ 只剩移交時交接燈 GREEN、驗收燈 YELLOW
+  [OK] ⑤ 雙胞家族沒登冊 → 照舊紅
+  [OK] ⑥ 已裝進 v0101 模組全域(check / checkpoint 經本版 audit)
+  [OK] ⑦ 檔頭:加速器橋 · 網路橋在(__future__ 之後)· 不碰 TA-Lib
+[交接 v0107] 本版 7/7 · 前版 PASS · Z281 雙胞移交 · PASS
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0105.py', 'CGC_MDL → via-vcgc sdd check
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.148s
+
+OK
+[監控] 背景全景監控中 pid 9514 · 觸碰 run CGC_MDL140_HandoverConsole · 交接閘 RED · 落後 427 提交 · 快照 179.7h · 未登 103 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL267_SsotNumberingVRN …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
