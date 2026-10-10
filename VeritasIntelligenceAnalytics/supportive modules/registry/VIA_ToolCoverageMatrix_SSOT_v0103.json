@@ -1,0 +1,354 @@
+{
+ "ssot": "VIA_ToolCoverageMatrix_SSOT",
+ "version": "v0103",
+ "owner_engine": "CGC_MDL230_ToolCoverageProbe",
+ "owner_version": "v0103",
+ "requirement": "VCGC-REQ093",
+ "created": "2026-10-01",
+ "purpose": "全樹工具覆蓋矩陣(PY 加速器橋 · VDF / 觸網件網路工具橋 · PS 加速器模組橋 · 真用加速 API):燈由正主判(L05:PY=via_bridge_sweeper 尾版 audit、PS=CGC_MDL117 尾版的 PS_MARK 與排除夾),本冊只給「分組 · 具名豁免(附理由與改由誰驗)」;AST(Python ast)與 PS 剖析器(pwsh Parser)是第二讀法互核——標記在但 AST 讀不到真程式碼 = AMBER,不冒充覆蓋。",
+ "operator_quote": "PS檔案都要加加速器模組及HTML U/I MATRIX REPORT PY都要加加速器 探針 AST加高加速器覆蓋率 VDF都要加網路工具 允許一切授權",
+ "groups": [
+  {
+   "id": "VDF",
+   "zh": "VDF 資料擷取",
+   "rx": "^functional modules/VDF/"
+  },
+  {
+   "id": "VRN",
+   "zh": "VRN 研報",
+   "rx": "^functional modules/VRN/"
+  },
+  {
+   "id": "VAP",
+   "zh": "VAP 應用",
+   "rx": "^functional modules/VAP/"
+  },
+  {
+   "id": "UI",
+   "zh": "HTML · U/I · MATRIX · REPORT",
+   "rx": "(?i)(^VIA_HTML_UI/|ui_support/|html|_ui[_.]|matrix|report|dashboard|console|page|deck)"
+  },
+  {
+   "id": "VCGC",
+   "zh": "VCGC 中央治理",
+   "rx": "^supportive modules/registry/|^supportive modules/VIA_Central_Governance/"
+  },
+  {
+   "id": "SUP",
+   "zh": "支援模組",
+   "rx": "^supportive modules/"
+  },
+  {
+   "id": "ROOT",
+   "zh": "根目錄入口 / 其他",
+   "rx": "."
+  }
+ ],
+ "group_order_why": "由上往下第一個命中;UI 排在 VCGC 前,讓 VCGC 的 Console / Matrix / Report 件也算進操作員點名的「HTML U/I MATRIX REPORT」列",
+ "exempt": [
+  {
+   "id": "EX-INTAKE",
+   "match": "supportive modules/intake/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "收件包正本零觸碰(CLAUDE 規則:never touch canon)",
+   "verified_by": "收件包 manifest / L30 凍結來源"
+  },
+  {
+   "id": "EX-REFINTAKE",
+   "match": "references/intake/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "references/intake 正本零觸碰",
+   "verified_by": "收件包 manifest"
+  },
+  {
+   "id": "EX-HTMLUI",
+   "match": "VIA_HTML_UI/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "正典 U/I TEMPLATE(批647 操作員裁定);注入橋會打破 manifest.json 逐檔 sha256(LL280:正本零觸碰優先)",
+   "verified_by": "VIA_HTML_UI/manifest.json 逐檔 sha256(改由 manifest 驗)"
+  },
+  {
+   "id": "EX-ENG112",
+   "match": "functional modules/VRN/VRN_ENG112_FinancialRead_v0100.py",
+   "sides": [
+    "py_accel",
+    "py_net"
+   ],
+   "why": "釘版正本(pinned FinancialRead v0100)",
+   "verified_by": "VIA_FinancialReadLock 鎖 sha"
+  },
+  {
+   "id": "EX-ACCEL-SELF",
+   "match": "supportive modules/accelerator/",
+   "sides": [
+    "py_accel"
+   ],
+   "why": "加速器本體(自指;本體不掛自己的橋)",
+   "verified_by": "CGC_MDL230 Ⓐ 工具註冊(冊 · 載入器 · 鎖 · 啟動層同名)"
+  },
+  {
+   "id": "EX-NET-SELF",
+   "match": "supportive modules/network/",
+   "sides": [
+    "py_net"
+   ],
+   "why": "網路工具本體(自指)",
+   "verified_by": "CGC_MDL230 Ⓐ 工具註冊"
+  },
+  {
+   "id": "EX-PS7-SELF",
+   "match": "supportive modules/ps7/VeritasCeleritas.PS7",
+   "sides": [
+    "ps_accel"
+   ],
+   "why": "PS7 加速器模板本體(自指)",
+   "verified_by": "CGC_MDL230 Ⓑ 上游包比對"
+  },
+  {
+   "id": "EX-PSACCEL-SELF",
+   "match": "supportive modules/VIA_PS_Accel_Module.ps1",
+   "sides": [
+    "ps_accel"
+   ],
+   "why": "PS 加速器模組本體(自指)",
+   "verified_by": "CGC_MDL117 啟動面"
+  },
+  {
+   "id": "EX-PSROSTER",
+   "match": "supportive modules/registry/VIA_PS_Accelerators_25_Roster_",
+   "sides": [
+    "ps_accel"
+   ],
+   "why": "PS 加速器名冊(自指)",
+   "verified_by": "CGC_MDL117 啟動面"
+  },
+  {
+   "id": "EX-PSMODULE",
+   "match": "supportive modules/VIA_PS_PyProgress_Module.ps1",
+   "sides": [
+    "ps_accel"
+   ],
+   "why": "被 dot-source 的函式模組;呼叫端已掛 PS-ACCEL,模組再掛會重複載入",
+   "verified_by": "呼叫端(VIA_PS_PyProgress_Selftest 尾版)PS-ACCEL"
+  },
+  {
+   "id": "EX-PASTEBLOCK",
+   "match": "VIA-Review-OneClick-v",
+   "sides": [
+    "ps_accel"
+   ],
+   "why": "貼上即跑的區塊(整檔包在 &{ … } 裡,操作員貼進視窗執行):貼上時 $PSScriptRoot 是空的,PS-ACCEL 橋的往上找模組迴圈一圈都不跑 = 掛了也是空殼;它只負責找到並呼叫 Invoke-VIA-Review 尾版。改它要 L70 逐次許可",
+   "verified_by": "被呼叫的 Invoke-VIA-Review 尾版(v0106 起)自帶 [VIA:PS-ACCEL:v0101] 橋;模板章由檔首 CELERITAS-TEMPLATE-JOIN 章 + CGC_MDL183 ④ 驗"
+  },
+  {
+   "id": "EX-VAPSRC",
+   "match": "functional modules/VAP/input/SOURCE_VAP_MODULE/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "VAP 收件來源與 _output 產物(凍結來源不改)",
+   "verified_by": "L30 凍結來源"
+  },
+  {
+   "id": "EX-B514",
+   "match": "VIA_CentralGovernanceFamily_b514/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "舊治理家族 b514 凍結(其 .py 全為非活樹)",
+   "verified_by": "CGC_MDL158 活樹判準"
+  },
+  {
+   "id": "EX-ACCELMOD-SELF",
+   "match": "supportive modules/VIA_SuperAccel_Module.py",
+   "sides": [
+    "py_accel"
+   ],
+   "why": "PY 加速器模組本體(自指;它就是被橋載入的那支)",
+   "verified_by": "CGC_MDL117 啟動面 activate()"
+  },
+  {
+   "id": "EX-VAPBACKUP",
+   "match": "functional modules/VAP/BACKUP/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "VAP 刪除封存備份(歷史件,不執行)",
+   "verified_by": "L30 凍結來源"
+  },
+  {
+   "id": "EX-UPLOADS",
+   "match": "/uploads/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "操作員上傳原件夾(收件原樣,正本零觸碰)",
+   "verified_by": "收件原件(上傳時的樣子)"
+  },
+  {
+   "id": "EX-CANDIDATE",
+   "match": "functional modules/WorkOps/candidates/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "外部候選件(ReviewOnly;未併入現役)",
+   "verified_by": "WorkOps 候選審查"
+  },
+  {
+   "id": "EX-VRN0108PACK",
+   "match": "functional modules/VRN/intake/VRN_v0108_Annual/",
+   "sides": [
+    "py_accel",
+    "py_net",
+    "ps_accel"
+   ],
+   "why": "VRN v0108 年報交接包(92e1f912 隔離 PASS)逐檔 sha256 封印;注入橋會打破 HANDOVER_SHA256.json / pack/SHA256_MANIFEST.json(同 EX-HTMLUI 理由:正本零觸碰優先)",
+   "verified_by": "HANDOVER_SHA256.json + pack/SHA256_MANIFEST.json 逐檔 sha256(2026-10-10 實核:14 支 .py 全 match;不一致僅 CSV/CMD 的 CRLF)"
+  }
+ ],
+ "ast": {
+  "py_accel_real": "模組層 try: 內有 import VIA_SuperAccel_Module(as VIA_ACCEL)或 from … import VIA_SuperAccel_Module",
+  "py_net_real": "模組層有 VIA_NET_TOOL_PATH 指派 + def _via_net()",
+  "py_net_need_mods": [
+   "urllib",
+   "requests",
+   "httpx",
+   "aiohttp",
+   "yfinance",
+   "akshare",
+   "playwright",
+   "websocket",
+   "websockets"
+  ],
+  "py_net_need_why": "與 via_bridge_sweeper NET_IMPORT_RX 同一份模組名(第一層);AST 看得到函式內的 import,regex 只看行首",
+  "py_use": {
+   "names": [
+    "accel_map",
+    "run_fast",
+    "celeritas"
+   ],
+   "attr_of": "VIA_ACCEL"
+  },
+  "ps_accel_real": "頂層 TryStatement,本體 dot-source VIA_PS_Accel_Module.ps1(pwsh Parser;沒有 pwsh 就文字判讀並標明)",
+  "ps_family_rx": "^(?P<fam>.*?)[-_]v(?P<v>\\d{3,4})(?P<s>[A-Z]?)\\.ps1$",
+  "ps_tail_why": "PS 只算尾版(同家族最大版號;無版號 = 自己就是尾);舊版號是版史,列數不列缺(L04)",
+  "py_net_safe": [
+   "urllib.parse"
+  ],
+  "py_net_safe_why": "urllib.parse 只剖析 URL 字串、不開連線;from urllib import parse 同理(DeckServer 的 NET-BRIDGE:NOTE 即此)",
+  "py_net_note": "[VIA:NET-BRIDGE:NOTE]",
+  "py_net_note_why": "檔內具名豁免:寫了 NOTE 說明只用非觸網子模組;AST 也讀不到觸網 import 時才採信(AST 讀得到就仍要橋)",
+  "ps_parse_error_why": "pwsh 7 剖析錯誤是檔案本身的語法錯(不是橋的問題);照實列 AMBER「剖析錯誤(既有)」,不改不算有",
+  "ps_family_rx_why": "尾碼字母是同版號的後繼(v0136A 取代 v0136,前者剖析過、後者不過);排序 = (版號, 尾碼)",
+  "ps_tpl_mark": "CELERITAS-TEMPLATE-JOIN",
+  "ps_tpl_real": "頂層敘述(含 if PS7 守門)的本體點源 supportive modules/ps7/VeritasCeleritas.PS7.ps1;或函式庫章 [VIA:PS-TEMPLATE:vNNNN-lib] 且頂層只有函式定義 / 指派 / Set-StrictMode · Set-Alias · Export-ModuleMember(被點源的庫由呼叫端模板接管,依 Invoke-VIA-PSTemplateJoin 規則只蓋章不執行)"
+ },
+ "lamps": {
+  "RED": "有非豁免的缺件(可補而未補)",
+  "AMBER": "正主說有、AST / 剖析器讀不到真程式碼,或 PS 檔本身剖析錯誤(既有)",
+  "GREEN": "非豁免件全有,且兩法一致"
+ },
+ "outputs": {
+  "dir": "VIA_Reports/toolprobe",
+  "files": [
+   "COVERAGE_MATRIX_latest.json",
+   "COVERAGE_MATRIX_latest.html(矩陣 · 前次對照 · 缺件 · 豁免理由)",
+   "AST_CATALOG_latest.json(PY 逐檔 AST 分類 · 說明 · 函式數)"
+  ]
+ },
+ "prior": "VIA_ToolCoverageMatrix_SSOT_v0102.json",
+ "operator_quote_v0101": "以成功的部份編號註冊鎖定不動 專注VCGC VCGC-VDF VCGC-VRN 每個PY擋都要加入加速器 AST分類 說明 PS擋要加加速器模板 整個結果矩陣全部整則只增不減 不衝突 用VCGC 監控系統更完善化用他呈現自動跳出 淺色 字小一點 LAYOUT緊湊 自動最佳化HTML U/I",
+ "why_v0101": "R38:+⑥ PS 加速器模板章面(正主 CGC_MDL183 的章 + PaidDebt 未還理由 = 具名豁免)· +⑦ PY AST 分類與說明目錄(分類尺 = VIA_VRN_PluginHub_SSOT ast_categories,L05 不另立)· 版號尾碼(v0136 < v0136A)· 只增帳本 · 淺色緊湊頁 · SYNCHRONIZER 來源",
+ "ps_tpl": {
+  "owner": "CGC_MDL183_CeleritasPolicyGate(章字 CELERITAS-TEMPLATE-JOIN)+ VIA_CeleritasPolicy_PaidDebt 尾版 not_paid(未還理由 = 具名豁免,原樣引用)",
+  "joiner": "Invoke-VIA-PSTemplateJoin-v0100.ps1 -Apply -Files …(剖析器定位 · 接後驗證 · 寫前備份)",
+  "lamp_groups": [
+   "VCGC",
+   "VDF",
+   "VRN"
+  ],
+  "lamp_groups_why": "操作員 R38「專注 VCGC VCGC-VDF VCGC-VRN」:這三組判燈;其餘組照實列數但標 INFO(範圍外不判)",
+  "exempt_rx": [
+   {
+    "id": "EXT-SHACOPY",
+    "rx": "_sha[0-9a-f]{6,}",
+    "why": "雜湊快照副本(同名正本另在;接章會多出第二個頭 = 九頭龍)",
+    "verified_by": "正本那支的章"
+   },
+   {
+    "id": "EXT-INBOX",
+    "rx": "/_inbox_to_classify/",
+    "why": "收容待分類夾(未入籍)",
+    "verified_by": "入籍時由接章工具處理"
+   },
+   {
+    "id": "EXT-SUPERSEDED",
+    "rx": "/_superseded_redundant/",
+    "why": "已被取代的冗餘副本",
+    "verified_by": "取代者的章"
+   },
+   {
+    "id": "EXT-SCOPECOPY",
+    "rx": "/SCOPE_COPY/",
+    "why": "VAP 範圍複本(凍結)",
+    "verified_by": "L30 凍結來源"
+   },
+   {
+    "id": "EXT-VENV",
+    "rx": "/_vdf_envs/",
+    "why": "虛擬環境自帶腳本(第三方產出,不是 VIA 程式)",
+    "verified_by": "環境計畫"
+   }
+  ]
+ },
+ "catalog": {
+  "groups": [
+   "VCGC",
+   "VDF",
+   "VRN",
+   "UI"
+  ],
+  "categories_from": "VIA_VRN_PluginHub_SSOT 尾版 ast_categories(函式名 → 功能分類;L05 同一把尺)",
+  "description": "模組 docstring 第一行;沒有就由 AST 推導(開頭註解 / 主要定義名)並標「推導」—— 不寫進原檔(避免為補說明動上百支檔 = 九頭龍與傷害既有成功)",
+  "lamp": "INFO(說明覆蓋率照實列;推導的不冒充原檔說明)"
+ },
+ "ledger": {
+  "path": "supportive modules/registry/VIA_ToolCoverage_Ledger_v0100.jsonl",
+  "rule": "只增不減:每輪 matrix --ledger 追加一行(UTC · 引擎版 · 各面數字 · 總判);不改舊行;git merge=union 不衝突",
+  "verb": "matrix --ledger"
+ },
+ "ui": {
+  "theme": "light",
+  "font_px": 12,
+  "density": "compact",
+  "auto_open": "matrix --open(有桌面才開;容器 / 無桌面印略過)",
+  "sync_source_id": "toolcov"
+ },
+ "why_v0102": "側線 2026-10-02 b:+EX-PASTEBLOCK(VIA-Review-OneClick 貼上區塊 ps_accel 具名豁免;交接案 tool_coverage_matrix 重測照出 711/712 的唯一缺件,性質同 EX-PSMODULE:由被呼叫端帶橋);其餘一字不動",
+ "operator_quote_v0102": "1. 依照你的提案最佳化 2. 檢視短指令PS指令中有無單獨啟動YFINANCE的指令他PS U/I呈現很美 可採用加入標準PS模板",
+ "created_v0103": "2026-10-10",
+ "why_v0103": "操作員令 2026-10-10「所有 py ps 指令都有加入加速器 · VDF 工具都有加入網路工具覆蓋率 100%」:覆蓋矩陣 ① 缺 14 / ② 缺 1 全在 VRN v0108 封印交接包 → 具名豁免(附改由誰驗);其餘缺口照實補橋,不豁免。",
+ "operator_quote_v0103": "用vcgc全景式檢視ast工具確認所有py ps指令都有加入加速器 vdf工具都有加入網路工具覆蓋率100趴"
+}

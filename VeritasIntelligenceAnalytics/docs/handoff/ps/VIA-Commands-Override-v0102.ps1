@@ -1,6 +1,10 @@
 # VIA-Commands-Override-v0102.ps1(薄尾:骨架 / 加速器用的助手不蓋 — Test-VIAPageTarget · Test-VIABookFresh · Invoke-VIACeleritasScoped · Get-VIAPinnedDir · ConvertTo-VIACleanArgs;v0101 不動)· 操作員令 2026-10-08:「過去的快捷指令等全部覆蓋刪除取代避免錯誤」
 # 作法(L108 只增不減 · L117 指令 PY 化 · L119 入口各自):Register-VIA-Commands 原檔不動;本檔在 $PROFILE 最後一行 dot-source,
 # 把所有已載入的 via-* / Set-VIA* / Test-VIA* 等舊短令「覆蓋」成 DEPRECATED 殘樁(印去處,不執行),只留下面 4 個現行指令。
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
+try { $VIAPSAccelProbe = if ($PSScriptRoot) { $PSScriptRoot } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics' }
+  while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) { $m = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"; if (Test-Path $m) { . $m; break }; $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent } } catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $script:VIA_Launcher = Join-Path $env:USERPROFILE 'Downloads\Invoke-VIA-Launch-v0111.ps1'
 $latest = Get-ChildItem -LiteralPath (Join-Path $env:USERPROFILE 'Downloads') -Filter 'Invoke-VIA-Launch-v0*.ps1' -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '\(\d+\)' } | Sort-Object Name | Select-Object -Last 1
 if ($latest) { $script:VIA_Launcher = $latest.FullName }
