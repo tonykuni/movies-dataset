@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_ENG093_LaunchConsole v0104 — 薄尾:啟動器預設值與步清單沿薄尾鏈讀(2026-10-10 VDF 管理員 engine launch 實測抓到)。
-
-v0103 的 launcher_defaults 只讀最新的 Invoke-VIA-VdfFetch-v*.ps1。R52(2026-10-02)起最新是 v0108 = 薄尾
-(「先清單、再並行全步」,步清單 $stepBook 仍在前版 v0107)→ 讀不到步清單,自測 ③ ⑩ 從那天起紅。
-本版:沒給 text 時,從最新往前逐支讀:起始日預設取最新那支(param() 的 -Since / -Year),步清單取鏈上第一支有 $stepBook / $steps 的;
-回傳多一欄 steps_launcher(步清單出自哪支)。給了 text 照 v0103 原樣(自測的合成 / 負控不變)。其餘函式、動詞全照 v0103。
+# ===== VDF_ENG093_LaunchConsole_v0104(2026-10-10)=====
+# 薄尾:啟動器預設值與步清單沿薄尾鏈讀(2026-10-10 VDF 管理員 engine launch 實測抓到)。
+#
+# v0103 的 launcher_defaults 只讀最新的 Invoke-VIA-VdfFetch-v*.ps1。R52(2026-10-02)起最新是 v0108 = 薄尾
+# (「先清單、再並行全步」,步清單 $stepBook 仍在前版 v0107)→ 讀不到步清單,自測 ③ ⑩ 從那天起紅。
+# 本版:沒給 text 時,從最新往前逐支讀:起始日預設取最新那支(param() 的 -Since / -Year),步清單取鏈上第一支有 $stepBook / $steps 的;
+# 回傳多一欄 steps_launcher(步清單出自哪支)。給了 text 照 v0103 原樣(自測的合成 / 負控不變)。其餘函式、動詞全照 v0103。
+"""VDF_ENG093_LaunchConsole — VDF 一鍵啟動台(問參數頁 + 資料庫狀況頁)
+本版 v0104 薄尾見上方檔頭;用法見 USAGE(python VDF_ENG093_LaunchConsole_v0104.py help)。
 """
 from __future__ import annotations
 
