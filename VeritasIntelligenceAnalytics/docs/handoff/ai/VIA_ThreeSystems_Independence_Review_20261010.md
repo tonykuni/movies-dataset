@@ -30,7 +30,16 @@
 | 全樹 | `monitor scan` | ACCEL 557/557 · NET 123/123 · PS 模板 177/177;**ACCEL-USE 6/557**(橋在、幾乎沒有程式真的呼叫加速器) |
 | 子系統座位 | `run CGC_MDL222_SubsystemProbe` | VDF / VRN 各自座位 GREEN |
 
-## 三、還沒改(要操作員選)
+## 三、後續(操作員 2026-10-10 選定順序:U/I → 工作流冊 → 速度)
+
+| 項 | 狀態 | 新版 / 證據 |
+|---|---|---|
+| 三系統 U/I 照 L121 | 已做 | 版面冊 `supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json` · VCGC 操作台 `CGC_MDL261_UIEngine_v0104`(10/10)· `VDF_SystemManager_v0152` · `VRN_SystemManager_v0152`(各 11/11,前版鏈全跑)· 交接案 ui_engine_v0104 / vdf_manager_v0152 / vrn_manager_v0152 rc 0 |
+| 工作流冊三方對等 | 已做 | VCGC v0127 · VDF v0105 · VRN v0106 · Hub v0103(`three_peers_mutual_monitor` + peers + 互相只讀監控;sequence 四段照舊 = VCGC 編排一輪)· SDD 驗證器 `CGC_MDL245_SDDValidator_v0106`(X-PEER · X-PEER-TEXT) |
+| 程式閘 `VIA_FROM_VCGC` | 甲(只改定義) | L120 ⑥,零程式變更 |
+| 速度修正 | 待做 | 排第三 |
+
+下面是當初列給操作員選的原文(留作紀錄):
 
 1. **工作流冊**:`VIA_Workflow_VCGC_SSOT_v0126.json` 8 處(WKF001 實測「唯一入口 v0106 起」· WKF004 「唯一入口一輪」· WKF008 「VIA 唯一接觸口控制」· WKF009 「唯一接觸口閘」· WKF020 「L111 一對二」)
    與 `VIA_Workflow_Hub_SSOT_v0102.json`(組成 hub VCGC-WKF001 → loop_vdf → loop_vrn → exit;executor「唯一編排」)。
