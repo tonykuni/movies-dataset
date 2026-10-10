@@ -2419,6 +2419,83 @@
         "supportive modules/ui_support/VIA_UI_OperatorConsole_SSOT_v0100.json"
       ],
       "timeout_seconds": 900
+    },
+    "sweeper_v0111": {
+      "argv": [
+        "CGC_MDL124_BridgeSweeper_v0111",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL124_BridgeSweeper v0111 本版 6/6 · v0110 PASS · 合計 PASS",
+      "scope": "掃橋器 v0111:PY 掃描豁免 _sha<12 碼> 存證副本(與交接閘 SHA_COPY 同一規則);VDF 網路橋 137/137(操作員 2026-10-10 問覆蓋率 · VCGC-REQ146)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0111.py",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0110.py",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v0109.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "ui_engine_v0104": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0104",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0104 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
+      "scope": "CGC_MDL261 v0104 三系統統一版面(政策 L121):左下 GATE · 三系統(VCGC · VDF · VRN 各自 U/I 頁 + 閘頁 · 燈 · 指令;本頁標記)· 只有左面板可折疊(收合留三系統代號小鈕)· 右側五頁 0 個 details · 版面冊讀不到用內建預設 · 不再寫一對二(VCGC-REQ177)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0104.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0103.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0102.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
+        "supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json",
+        "supportive modules/ui_support/VIA_UI_OperatorConsole_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_manager_v0152": {
+      "argv": [
+        "VDF_SystemManager_v0152",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0152 自測 11/11 · PASS",
+      "scope": "VDF_SystemManager v0152 ui 套 L121 三系統統一版面:左面板可折疊 · 左下 GATE · 三系統(相對連結 · 燈 · 指令;VDF 標本頁)· 右側 details 改固定 · 散卡移進左面板 · 開頁腳本缺欄守門 · 先套版再開頁 · 不是一個 aside + 一個 main 就不硬改 · 真跑 ui · 前版鏈全跑(VCGC-REQ177)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0152.py",
+        "functional modules/VDF/VDF_SystemManager_v0151.py",
+        "supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 1500
+    },
+    "vrn_manager_v0152": {
+      "argv": [
+        "VRN_SystemManager_v0152",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_SystemManager_v0152 自測 11/11 · PASS",
+      "scope": "VRN_SystemManager v0152 ui 套 L121 三系統統一版面:左面板可折疊 · 左下 GATE · 三系統(相對連結 · 燈 · 指令;VRN 標本頁)· 右側 details 改固定 · 散卡移進左面板 · 開頁腳本缺欄守門 · 先套版再開頁 · 不是一個 aside + 一個 main 就不硬改 · 真跑 ui · 前版鏈全跑(VCGC-REQ177)",
+      "dependencies": [
+        "functional modules/VRN/VRN_SystemManager_v0152.py",
+        "functional modules/VRN/VRN_SystemManager_v0151.py",
+        "supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 1500
+    },
+    "sdd_validator_v0106": {
+      "argv": [
+        "CGC_MDL245_SDDValidator_v0106",
+        "--selftest"
+      ],
+      "success_marker": "[CGC_MDL245_SDDValidator_v0106] 薄尾 6/6 PASS",
+      "scope": "CGC_MDL245 v0106 X-PEER 三方對等組成(model.shape three_peers_mutual_monitor · 三系統各自入口尾版與工作流)+ X-PEER-TEXT 現行字不再寫唯一入口(版史欄除外;否定句不算);實樹 GREEN;前版鏈全跑(VCGC-REQ176)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL245_SDDValidator_v0106.py",
+        "supportive modules/registry/CGC_MDL245_SDDValidator_v0105.py",
+        "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0103.json",
+        "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v0127.json",
+        "supportive modules/registry/VIA_Workflow_VDF_SSOT_v0105.json",
+        "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0106.json"
+      ],
+      "timeout_seconds": 1500
     }
   },
   "work_items": [
@@ -5024,6 +5101,56 @@
       "owner": "操作員",
       "reason": "容器沒有真資料庫(db check RED 62 照實)、不能代設網路同意、寫不到 C:;操作台在工作站的真資料實跑與資料夾備份要操作員的手",
       "next": "工作站:.\\docs\\handoff\\ps\\Start-VIA-OperatorConsole-v0100.ps1(要實抓先設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT 再加 -Fetch)→ .\\docs\\handoff\\ps\\Invoke-VIA-SyncFolders-v0100.ps1 備份 via_00_vcgc / via_01_vdf"
+    },
+    {
+      "id": "VCGC-REQ146:sweeper_v0111",
+      "requirement": "VCGC-REQ146",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 sweeper_v0111(_sha 存證副本豁免) → 已驗:2026-10-10T19:32:00+00:00 rc 0 · 標記見到",
+      "next": "handoff test sweeper_v0111 實跑轉 VERIFIED",
+      "case": "sweeper_v0111",
+      "receipt": "docs/handoff/evidence/sweeper_v0111.json"
+    },
+    {
+      "id": "VCGC-REQ177:ui_engine_v0104",
+      "requirement": "VCGC-REQ177",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 ui_engine_v0104(政策 L121 三系統統一版面) → 已驗:2026-10-10T20:12:41+00:00 rc 0 · 標記見到",
+      "next": "handoff test ui_engine_v0104 實跑轉 VERIFIED",
+      "case": "ui_engine_v0104",
+      "receipt": "docs/handoff/evidence/ui_engine_v0104.json"
+    },
+    {
+      "id": "VCGC-REQ177:vdf_manager_v0152",
+      "requirement": "VCGC-REQ177",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 vdf_manager_v0152(政策 L121 三系統統一版面) → 已驗:2026-10-10T20:15:01+00:00 rc 0 · 標記見到",
+      "next": "handoff test vdf_manager_v0152 實跑轉 VERIFIED",
+      "case": "vdf_manager_v0152",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0152.json"
+    },
+    {
+      "id": "VCGC-REQ177:vrn_manager_v0152",
+      "requirement": "VCGC-REQ177",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 vrn_manager_v0152(政策 L121 三系統統一版面) → 已驗:2026-10-10T20:15:14+00:00 rc 0 · 標記見到",
+      "next": "handoff test vrn_manager_v0152 實跑轉 VERIFIED",
+      "case": "vrn_manager_v0152",
+      "receipt": "docs/handoff/evidence/vrn_manager_v0152.json"
+    },
+    {
+      "id": "VCGC-REQ176:sdd_validator_v0106",
+      "requirement": "VCGC-REQ176",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 sdd_validator_v0106(政策 L120 工作流冊三方對等 · SDD X-PEER) → 已驗:2026-10-10T20:47:08+00:00 rc 0 · 標記見到",
+      "next": "handoff test sdd_validator_v0106 實跑轉 VERIFIED",
+      "case": "sdd_validator_v0106",
+      "receipt": "docs/handoff/evidence/sdd_validator_v0106.json"
     }
   ]
 }
