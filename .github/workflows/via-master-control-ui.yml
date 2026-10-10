@@ -208,6 +208,9 @@ jobs:
         if: ${{ !cancelled() }}
         shell: pwsh
         run: |
+          # VRN_SystemManager selftest renders a PDF page with PyMuPDF (fitz); roster env via_vrn_312 carries it
+          python -m pip install pymupdf==1.28.2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $env:VIA_FROM_VCGC = "YES"
           $env:VIA_VCGC_PUSH = "NO"
           $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
