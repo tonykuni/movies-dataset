@@ -30,6 +30,7 @@ SYSTEM MANAGER:
   擷取完成只標記 EXTRACTED_UNVERIFIED / 黃燈，實報完整性由宿主驗證。
   型別/語法/契約測試不等於 Windows、依賴版本或實際 PDF 擷取認證。
 """
+from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] 加速器橋(2026-10-08 accel sweep 注入;L103 最高政策 PY 導入加速器;缺席不擋,記黃) =====
 import sys as _ab_sys
 from pathlib import Path as _ab_Path
@@ -44,8 +45,6 @@ try:
 except Exception:  # noqa: BLE001
     _ACCEL = None
 # ===== [VIA:ACCEL-BRIDGE:END] =====
-
-from __future__ import annotations
 
 import ast
 import copy

@@ -174,11 +174,181 @@ jobs:
           path: VIA_UI_Test_Artifacts
           if-no-files-found: warn
 
-      - name: Run VRN value and template regressions
+  vdf-uat:
+    # 操作員 2026-10-10 裁定 A:VDF / VRN / VCGC 各自一條 job,一條紅不讓另一條被跳過(PR #518 實錄:第 10 步紅 → 裝 pandas 的步被跳過 → 下游缺 pandas)
+    name: VDF · manager and daily data contracts (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py
+            /VeritasIntelligenceAnalytics/Register-VIA-Commands-v*.ps1
+            /VeritasIntelligenceAnalytics/supportive modules/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/references/intake/**/manifest.json
+            /VeritasIntelligenceAnalytics/VIA.ps1
+            /VeritasIntelligenceAnalytics/VIA_HTML_UI/**
+            /VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install pinned Playwright and bundled Chromium
+        shell: pwsh
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx playwright install chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install VDF data dependencies
         shell: pwsh
         run: |
           python -m pip install duckdb==1.5.5 pandas==2.2.3
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: VDF manager self-test through the sole entry
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_VCGC_PUSH = "NO"
+          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          Push-Location $via
+          try {
+            $registry = Join-Path $via "supportive modules\registry"
+            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
+              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+              Select-Object -Last 1).FullName
+            if (-not $vcgc) { throw "VCGC entry absent" }
+            python $vcgc run VDF_SystemManager --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
+
+      - name: Verify daily database-first orchestration and provider contracts
+        shell: pwsh
+        run: |
+          $tests = ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests"
+          foreach ($case in @('test_via_boot_daily_v0100.py', 'test_via_consensus_daily_v0100.py', 'test_via_monthly_scope_v0100.py', 'test_via_global_incremental_v0100.py', 'test_via_etf_universe_daily_v0100.py')) {
+            python (Join-Path $tests $case)
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Verify ETF activity estimates and canonical template
+        shell: pwsh
+        run: |
+          $env:VIA_ETF_UAT_OUT = Join-Path $PWD "VIA_VDF_Test_Artifacts\etf-activity"
+          $env:VIA_SELFTEST = "1"
+          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\test_via_etf_activity_v0100.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_etf_activity_v0100.js" $env:VIA_ETF_UAT_OUT
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload VDF browser evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: via-vdf-browser-evidence
+          path: VIA_VDF_Test_Artifacts
+          if-no-files-found: warn
+          retention-days: 14
+
+  vrn-uat:
+    # VRN 自己一條 job(裁定 A);VRN_SystemManager 自測要 PyMuPDF(fitz),名冊境 via_vrn_312 帶它
+    name: VRN · value, template and manager contracts (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py
+            /VeritasIntelligenceAnalytics/Register-VIA-Commands-v*.ps1
+            /VeritasIntelligenceAnalytics/supportive modules/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/references/intake/**/manifest.json
+            /VeritasIntelligenceAnalytics/VIA.ps1
+            /VeritasIntelligenceAnalytics/VIA_HTML_UI/**
+            /VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install pinned Playwright and bundled Chromium
+        shell: pwsh
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx playwright install chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install VRN dependencies
+        shell: pwsh
+        run: |
+          python -m pip install duckdb==1.5.5 pandas==2.2.3 pymupdf==1.28.2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run VRN value and template regressions
+        shell: pwsh
+        run: |
           $env:VIA_SELFTEST = "1"
           $env:NODE_PATH = Join-Path $PWD "node_modules"
           $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
@@ -204,8 +374,7 @@ jobs:
           foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
           Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
 
-      - name: Verify VCGC dispatch and manager contracts through the sole entry
-        if: ${{ !cancelled() }}
+      - name: VRN manager contracts through the sole entry
         shell: pwsh
         run: |
           $env:VIA_FROM_VCGC = "YES"
@@ -219,23 +388,9 @@ jobs:
               Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
               Select-Object -Last 1).FullName
             if (-not $vcgc) { throw "VCGC entry absent" }
-            python $vcgc token
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc run CGC_MDL237_NumberingSystem --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc run VDF_SystemManager --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             python $vcgc run VRN_SystemManager logic
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc run CGC_MDL140_HandoverConsole --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             python $vcgc run VRN_SystemManager provenance --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc run CGC_MDL245_SDDValidator --selftest
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc handoff check
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } finally {
             Pop-Location
@@ -272,25 +427,6 @@ jobs:
           node ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\uxtest_via_sync_pending_v0100.js"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Verify daily database-first orchestration and provider contracts
-        shell: pwsh
-        run: |
-          $tests = ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests"
-          foreach ($case in @('test_via_boot_daily_v0100.py', 'test_via_consensus_daily_v0100.py', 'test_via_monthly_scope_v0100.py', 'test_via_global_incremental_v0100.py', 'test_via_etf_universe_daily_v0100.py')) {
-            python (Join-Path $tests $case)
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-
-      - name: Verify ETF activity estimates and canonical template
-        shell: pwsh
-        run: |
-          $env:VIA_ETF_UAT_OUT = Join-Path $PWD "VIA_VRN_Test_Artifacts\etf-activity"
-          $env:VIA_SELFTEST = "1"
-          python ".\VeritasIntelligenceAnalytics\supportive modules\registry\tests\test_via_etf_activity_v0100.py"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node ".\VeritasIntelligenceAnalytics\supportive modules\registry\uxtest_etf_activity_v0100.js" $env:VIA_ETF_UAT_OUT
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
       - name: Upload VRN browser evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -299,6 +435,79 @@ jobs:
           path: VIA_VRN_Test_Artifacts
           if-no-files-found: warn
           retention-days: 14
+
+  vcgc-contracts:
+    # VCGC 自己一條 job(裁定 A):只驗治理入口本身,不代跑 VDF / VRN
+    name: VCGC · sole entry, numbering, handoff and SDD contracts (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Enable long paths for sparse checkout
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git config --global core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            /.github/workflows/via-master-control-ui.yml
+            /VeritasIntelligenceAnalytics/VIA_SYSTEM_MANAGER_v*.py
+            /VeritasIntelligenceAnalytics/Register-VIA-Commands-v*.ps1
+            /VeritasIntelligenceAnalytics/supportive modules/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/references/intake/**/manifest.json
+            /VeritasIntelligenceAnalytics/VIA.ps1
+            /VeritasIntelligenceAnalytics/VIA_HTML_UI/**
+            /VeritasIntelligenceAnalytics/Invoke-VIA-VRN-v*.ps1
+            /VeritasIntelligenceAnalytics/docs/**
+            /VeritasIntelligenceAnalytics/functional modules/**/*.py
+            /VeritasIntelligenceAnalytics/supportive modules/registry/**
+            /VeritasIntelligenceAnalytics/supportive modules/ui_support/**
+            /VeritasIntelligenceAnalytics/**/*.py
+            /VeritasIntelligenceAnalytics/**/*.ps1
+            /VeritasIntelligenceAnalytics/**/*.json
+            /VeritasIntelligenceAnalytics/**/*.jsonl
+            /VeritasIntelligenceAnalytics/**/*.md
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Verify VCGC dispatch and governance contracts through the sole entry
+        shell: pwsh
+        run: |
+          $env:VIA_FROM_VCGC = "YES"
+          $env:VIA_VCGC_PUSH = "NO"
+          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
+          Push-Location $via
+          try {
+            $registry = Join-Path $via "supportive modules\registry"
+            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
+              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+              Select-Object -Last 1).FullName
+            if (-not $vcgc) { throw "VCGC entry absent" }
+            python $vcgc token
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL237_NumberingSystem --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL140_HandoverConsole --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc run CGC_MDL245_SDDValidator --selftest
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            python $vcgc handoff check
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            Pop-Location
+          }
 
   vcgc-pwsh-gate:
     name: VCGC PowerShell 7 · conflict guard · all-green gate (Windows)

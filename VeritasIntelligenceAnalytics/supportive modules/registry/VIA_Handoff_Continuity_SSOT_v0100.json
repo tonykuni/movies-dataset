@@ -688,12 +688,18 @@
         "VRN_ENG086_FirstPageLogicBridge",
         "--selftest"
       ],
-      "success_marker": "[計] 118 檢 OK 118 · FAIL 0",
+      "success_marker": "[計] 121 檢 OK 121 · FAIL 0",
       "scope": "VRN 第一頁邏輯補缺橋:⑤ 券商正典鍵跟 CGC_MDL176 裁定(MORGANSTANLEY→MS)· ⑤' 一家一名;第一頁文字 / 表格 / 摘要擷取一字不動(R43 · VCGC-REQ099)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v*.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] 118 檢 OK 118 · FAIL 0",
+        "to_version": "v0120",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "VRN_ENG086 tail v0120 counts checks live; 118 → 121 checks, all OK (superset, DRIFT); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "monitor": {
       "argv": [
@@ -1670,31 +1676,47 @@
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
         "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
         "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
-        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json"
+        "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 600
+      "timeout_seconds": 600,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0100 本版 14/14 · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0101": {
       "argv": [
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
         "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
-        "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py"
+        "supportive modules/ui_support/SUP_MDL750_VeritasUIHead_v0102.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0101 本版 8/8 · v0100 PASS · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0102": {
       "argv": [
@@ -1730,28 +1752,43 @@
         "CGC_MDL261_UIEngine",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+      "success_marker": "[計] CGC_MDL261_UIEngine v0102 本版 8/8 · v0101 鏈 PASS · 合計 PASS",
       "scope": "CGC_MDL261 v0101 左輸入右多頁:純滑鼠(兩個位置下拉 + 拖曳 · 大類起始日 · 群組打勾 · 成員晶片)· 第一頁三矩陣 · 末頁流程圖 + 元件註冊 / 版本鎖 + 細節矩陣 · import 白名單 · 不走 server(VCGC-REQ154)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL261_UIEngine_v0101.py",
         "supportive modules/registry/CGC_MDL261_UIEngine_v0100.py",
-        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json"
+        "supportive modules/ui_support/VIA_UI_EngineConfig_v0100.json",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0102.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL261_UIEngine v0101 本版 9/9 · v0100 PASS · 合計 PASS",
+        "to_version": "v0102",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "v0102 tail runs the v0101 selftest as its chain ('v0101 鏈 PASS') and prints only the tail line (DRIFT); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vdf_fetch_groups_v0103": {
       "argv": [
         "VDF_MDL012_FetchGroups",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0105 本版 10/10 · v0103 鏈 PASS · 合計 PASS",
       "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
         "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
-        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py"
       ],
-      "timeout_seconds": 1200
+      "timeout_seconds": 1200,
+      "repinned": {
+        "from": "[計] VDF_MDL012_FetchGroups v0103 本版 11/11 · v0102 PASS · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "tail chain v0105 → v0104 → v0103 runs the older selftests in-process and prints only the tail line; the pinned older line is no longer printed (DRIFT, checks still exercised: 'v0103 鏈 PASS'); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vrn_newplugins_v0103": {
       "argv": [
@@ -1798,13 +1835,20 @@
         "CGC_MDL257_AiVerbLadder",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL257_AiVerbLadder v0101 本版 4/4 · PASS",
+      "success_marker": "[計] CGC_MDL257_AiVerbLadder v0102 本版 4/4 · PASS",
       "scope": "CGC_MDL257_AiVerbLadder v0100 AI 動詞梯(一步不過不放行 · 灰階狀態)(VCGC-REQ159) · v0101 梯次自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0102.py",
         "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0101.py",
         "supportive modules/registry/CGC_MDL257_AiVerbLadder_v0100.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL257_AiVerbLadder v0101 本版 4/4 · PASS",
+        "to_version": "v0102",
+        "at": "2026-10-10T08:05:00+00:00",
+        "why": "v0101 ③ misread the bus fallback label `bus:base 退路(境未見)`; v0102 tail fixes the check (engine behaviour unchanged); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "temp_accel": {
       "argv": [
@@ -1888,27 +1932,41 @@
         "CGC_MDL156_VIAAcceleratorControl",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
+      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0113 本版 5/5 · PASS",
       "scope": "CGC_MDL156 v0112 25 加速器控制面:QuantGuard 單向宣告沿薄尾鏈 · TA-Lib 執法字樣不算使用 · 名冊補 supportive 側收容件(VCGC-REQ167)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0113.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0112.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0110.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
+        "to_version": "v0113",
+        "at": "2026-10-10T08:23:51+00:00",
+        "why": "v0113 tail (VRN intake named exemption) chains the v0112 selftest (8/8 still printed) and adds 5 own checks; marker moves to the tail so the new tail is under test; operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "vrn_logic_add": {
       "argv": [
         "CGC_MDL244_VrnLogicAdd",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+      "success_marker": "[計] CGC_MDL244_VrnLogicAdd v0102 本版 4/4 · PASS",
       "scope": "CGC_MDL244 v0101 派 VRN 引擎自測走家族境 python(修 SYSEXE;VCGC-REQ167)",
       "dependencies": [
         "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0101.py",
-        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py"
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0100.py",
+        "supportive modules/registry/CGC_MDL244_VrnLogicAdd_v0102.py"
       ],
-      "timeout_seconds": 900
+      "timeout_seconds": 900,
+      "repinned": {
+        "from": "[計] CGC_MDL244_VrnLogicAdd v0101 本版 4/4",
+        "to_version": "v0102",
+        "at": "2026-10-10T08:12:49+00:00",
+        "why": "v0101 ② misread the bus fallback label `bus:base 退路(境未見)`; v0102 tail fixes the check and drops the machine path from the marker line (dispatch behaviour unchanged); operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "ui_std_templates": {
       "argv": [
@@ -1929,14 +1987,21 @@
         "CGC_MDL183_CeleritasPolicyGate",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL183_CeleritasPolicyGate v0104 本版 3/3 · 前版 PASS · 合計 PASS",
+      "success_marker": "[計] CGC_MDL183_CeleritasPolicyGate v0105 本版 5/5 · 前版 PASS · 合計 PASS",
       "scope": "Celeritas 產出契約閘 v0104:supportive modules/intake 收容件 .ps1 = 凍結收容 INFO(ps.intake 照列);收容夾外同名活檔照紅(負控);⑦ 唯讀本 accelerator/VeritasCeleritas.py 在位(VCGC-REQ167 收尾)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0105.py",
         "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0104.py",
         "supportive modules/registry/CGC_MDL183_CeleritasPolicyGate_v0103.py",
         "supportive modules/accelerator/VeritasCeleritas.py"
       ],
-      "timeout_seconds": 1200
+      "timeout_seconds": 1200,
+      "repinned": {
+        "from": "[計] CGC_MDL183_CeleritasPolicyGate v0104 本版 3/3 · 前版 PASS · 合計 PASS",
+        "to_version": "v0105",
+        "at": "2026-10-10T08:23:51+00:00",
+        "why": "v0105 tail (tool-lock removed seats + PS retire ledger + VRN intake INFO) chains v0101–v0104; marker moves to the tail so the new tail is under test; operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      }
     },
     "via_unified": {
       "argv": [
@@ -2062,6 +2127,282 @@
         "supportive modules/registry/CGC_MDL265_VdfVrnReadiness_v0100.py"
       ],
       "timeout_seconds": 900
+    },
+    "subsystem_probe_v0101": {
+      "argv": [
+        "CGC_MDL222_SubsystemProbe_v0101",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL222_SubsystemProbe v0101 本版 8/8 · PASS",
+      "scope": "座位探針 v0101:VCGC 記號沿 PRIOR 鏈繼承(尾版自帶或照實記 mark_from;鏈斷即停照舊 YELLOW);inherited_contract 唯一正本(VCGC-REQ174) · 沿鏈只認讀進來比較的版(守衛 / 入口來源判斷),只設值不算(PR #518 Codex P1)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0100.py",
+        "functional modules/VDF/VDF_SystemManager_v0128.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "flow_gate_v0102": {
+      "argv": [
+        "CGC_MDL223_FlowConsistency_v0102",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL223_FlowConsistency v0102 本版 9/9 · 閘 放行 · PASS",
+      "scope": "流程閘 v0102:管理者列契約針 VIA_FROM_VCGC 准許沿 PRIOR 鏈繼承(列記 inherited_from;main/selftest 仍須在尾版);針 · 族 · 工具列 · policy_step/book/seat 判準不動;閘放行(VCGC-REQ174) · 沿鏈只認讀進來比較的版(守衛 / 入口來源判斷),只設值不算(PR #518 Codex P1)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py",
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0101.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py",
+        "functional modules/VDF/VDF_SystemManager_v0128.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vcgc_console_v0191": {
+      "argv": [
+        "CGC_MDL149_VeritasCentralGovernanceConsole_v0191",
+        "--selftest"
+      ],
+      "success_marker": "[計] VCGC v0191 本版 6/6 · PASS",
+      "scope": "VCGC v0191:v0159 流程閘門由釘死 v0100 改取 CGC_MDL223 尾版;經 v0159 的門跑閘放行;前版鏈自測過(VCGC-REQ174)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py",
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0190.py",
+        "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0159.py",
+        "supportive modules/registry/CGC_MDL223_FlowConsistency_v0102.py",
+        "supportive modules/registry/CGC_MDL222_SubsystemProbe_v0101.py"
+      ],
+      "timeout_seconds": 1500
+    },
+    "cov_vdf_eng093": {
+      "argv": [
+        "VDF_ENG093_LaunchConsole",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG093_LaunchConsole_v0104 4/4 · PASS",
+      "scope": "VDF_ENG093 LaunchConsole 尾版 v0104(引擎名留在文件開頭 · MasterControl 契約) · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_eng114": {
+      "argv": [
+        "VRN_ENG114_SourceProvenance",
+        "--selftest"
+      ],
+      "success_marker": "[來源回歸] fail=0; tests=23",
+      "scope": "VRN_ENG114 來源出處回歸 23 測 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG114_SourceProvenance_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_eng399": {
+      "argv": [
+        "VRN_ENG399_RealTestHarness",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_ENG399_RealTestHarness_v0100 自測 8/8 · PASS",
+      "scope": "VRN_ENG399 實測工作台 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG399_RealTestHarness_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_eng400": {
+      "argv": [
+        "VRN_ENG400_SixEngineShell",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_ENG400_SixEngineShell_v0101 自測 10/10 · PASS",
+      "scope": "VRN_ENG400 六引擎外殼 v0100–v0101 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG400_SixEngineShell_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_libplugins": {
+      "argv": [
+        "VRN_LibPlugins",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_LibPlugins_v0100 自測 10/10 · PASS",
+      "scope": "VRN 函式庫插件 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VRN_LibPlugins_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_ocrplugins": {
+      "argv": [
+        "VRN_OCRPlugins",
+        "--selftest"
+      ],
+      "success_marker": "[計] VRN_OCRPlugins_v0100 自測 11/11 · PASS",
+      "scope": "VRN OCR 插件 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VRN_OCRPlugins_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl186": {
+      "argv": [
+        "CGC_MDL186_EnvGovernance_8Hub",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL186_EnvGovernance_8Hub_v0101 4/4 · PASS",
+      "scope": "CGC_MDL186 環境治理八樞紐(文件工具車道 v0101) · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL186_EnvGovernance_8Hub_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl267": {
+      "argv": [
+        "CGC_MDL267_SsotNumberingVRN",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL267_SsotNumberingVRN_v0101 自測 16/16 · PASS",
+      "scope": "CGC_MDL267 VRN SSOT 編號 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL267_SsotNumberingVRN_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl268": {
+      "argv": [
+        "CGC_MDL268_PanoramaConsistency",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL268_PanoramaConsistency_v0101 自測 12/12 · PASS",
+      "scope": "CGC_MDL268 全景一致性 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL268_PanoramaConsistency_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl269": {
+      "argv": [
+        "CGC_MDL269_PyCommandHub",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL269_PyCommandHub_v0101 自測 8/8 · PASS",
+      "scope": "CGC_MDL269 PY 指令樞紐 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL269_PyCommandHub_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl270": {
+      "argv": [
+        "CGC_MDL270_RegistryGovernor",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL270_RegistryGovernor_v0106 自測 20/20 · PASS",
+      "scope": "CGC_MDL270 註冊治理 v0100–v0106 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL270_RegistryGovernor_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl271": {
+      "argv": [
+        "CGC_MDL271_BookStandardizer",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL271_BookStandardizer_v0100 自測 12/12 · PASS",
+      "scope": "CGC_MDL271 冊標準化 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL271_BookStandardizer_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl272": {
+      "argv": [
+        "CGC_MDL272_ToolkitMatrix",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL272_ToolkitMatrix_v0100 自測 9/9 · PASS",
+      "scope": "CGC_MDL272 工具套件矩陣 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL272_ToolkitMatrix_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl273": {
+      "argv": [
+        "CGC_MDL273_EnvToolAudit",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL273_EnvToolAudit_v0102 自測 7/7 · PASS",
+      "scope": "CGC_MDL273 環境工具稽核 v0100–v0102 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL273_EnvToolAudit_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_mdl274": {
+      "argv": [
+        "CGC_MDL274_HealthMatrix",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL274_HealthMatrix_v0112 自測 17/17 · PASS",
+      "scope": "CGC_MDL274 健康矩陣 v0100–v0112(R59 元件矩陣的底) · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_vrn_firstpage_engine": {
+      "argv": [
+        "VIA_VRN_FirstPageEngine",
+        "--selftest"
+      ],
+      "success_marker": "[計] VIA_VRN_FirstPageEngine_v0130 薄尾 3/3 · 前版 rc=0 · 合計 PASS",
+      "scope": "VIA_VRN_FirstPageEngine v0130 薄尾 + 前版鏈 · 交接覆蓋補測(PR #518,2026-10-10):main 894779cb 前後新增 / 變動的家族沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS(鏈前版)才登案",
+      "dependencies": [
+        "functional modules/VRN/VIA_VRN_FirstPageEngine_v*.py"
+      ],
+      "timeout_seconds": 1200,
+      "registered_at": "2026-10-10T08:33:32+00:00"
+    },
+    "cov_z281_twins": {
+      "argv": [
+        "CGC_MDL275_Z281TwinProbe",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL275_Z281TwinProbe v0100 自測 8/8 · 結構檢(非行為測試)· PASS",
+      "scope": "Z281 無版號 5 支 × _v0100 雙胞結構檢(同位元組 · 編譯 · __main__ 防護 · 橋 · 不碰 TA-Lib);非行為測試,照實標明(操作員 2026-10-10 裁定)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL275_Z281TwinProbe_v*.py",
+        "functional modules/VDF/VDF_MDL001_TWEquityEngine.py",
+        "functional modules/VDF/VDF_MDL201_GenerateFullRegistry.py",
+        "functional modules/VDF/VDF_MDL303_RegistryActivation.py",
+        "functional modules/VRN/financial_data_standardization.py",
+        "functional modules/VRN/vrn_sample_reader.py",
+        "functional modules/VDF/VDF_MDL001_TWEquityEngine_v0100.py",
+        "functional modules/VDF/VDF_MDL201_GenerateFullRegistry_v0100.py",
+        "functional modules/VDF/VDF_MDL303_RegistryActivation_v0100.py",
+        "functional modules/VRN/financial_data_standardization_v0100.py",
+        "functional modules/VRN/vrn_sample_reader_v0100.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-10T08:48:16+00:00"
     }
   },
   "work_items": [
@@ -2089,16 +2430,26 @@
     {
       "id": "VRN-REQ007:manager",
       "requirement": "VRN-REQ007",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "manager",
-      "receipt": "docs/handoff/evidence/manager.json"
+      "receipt": "docs/handoff/evidence/manager.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([VRN 來源入口] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test manager",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ007:provenance",
       "requirement": "VRN-REQ007",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "provenance",
-      "receipt": "docs/handoff/evidence/provenance.json"
+      "receipt": "docs/handoff/evidence/provenance.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "host-live",
@@ -2412,9 +2763,15 @@
     {
       "id": "VRN-REQ008:vrn_ssot_consistency",
       "requirement": "VRN-REQ008",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_ssot_consistency",
-      "receipt": "docs/handoff/evidence/vrn_ssot_consistency.json"
+      "receipt": "docs/handoff/evidence/vrn_ssot_consistency.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "2026-10-10 operator ruled the two regex examples; VRN_S05_FieldRegistry_v0103 applied them (EMAIL_FULL numeric-local example → EMAIL_LOCAL_NUMERIC · TARGET_PRICE_LABEL thousands separators): book examples now 94 OK / 0 RED. Still FAIL, separate from that ruling: v0116 ⑦ parameter record YELLOW (was YELLOW before too) and v0115 ⑤ / ⑭ ruler negative controls — ⑭ expects TW02 not to read the book, but main now has TW02 reading it (讀冊=True), so the control is stale",
+      "next": "operator rules on v0115 ⑤ / ⑭ ruler controls and the v0116 ⑦ parameter record → a new SUP_MDL749 tail that re-chains v0116 → via-vcgc handoff test vrn_ssot_consistency",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED",
+      "reason_updated_at": "2026-10-10T09:06:31+00:00"
     },
     {
       "id": "VRN-REQ008:s05-regex",
@@ -2524,9 +2881,14 @@
     {
       "id": "VRN-REQ010:vrn_layout",
       "requirement": "VRN-REQ010",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ010:workstation-real",
@@ -2613,9 +2975,14 @@
     {
       "id": "VRN-REQ015:layout-v0101",
       "requirement": "VRN-REQ015",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VRN-REQ016:vrn_plugin_hub",
@@ -2766,9 +3133,14 @@
     {
       "id": "VCGC-REQ099:provenance",
       "requirement": "VCGC-REQ099",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "provenance",
-      "receipt": "docs/handoff/evidence/provenance.json"
+      "receipt": "docs/handoff/evidence/provenance.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ102:monitor",
@@ -2935,9 +3307,14 @@
     {
       "id": "VDF-REQ017:vrn_outputs",
       "requirement": "VDF-REQ017",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_outputs",
-      "receipt": "docs/handoff/evidence/vrn_outputs.json"
+      "receipt": "docs/handoff/evidence/vrn_outputs.json",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0111 薄尾 11/11 · 前版 PASS · 合計 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_outputs",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VDF-REQ017:manager_parity",
@@ -3023,12 +3400,14 @@
     {
       "id": "VCGC-REQ117:vrn_engine",
       "requirement": "VCGC-REQ117",
-      "state": "VERIFIED",
+      "state": "PENDING",
       "case": "vrn_engine",
-      "owner": "VCGC closeout",
-      "reason": "SYSTEM MANAGER 新尾版加 engine 動詞,要經交接案取收據",
-      "next": "via-vcgc closeout --apply --push(③ test 過即轉 VERIFIED)",
-      "receipt": "docs/handoff/evidence/vrn_engine.json"
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0114 本版 6/6 · 前版 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_engine",
+      "receipt": "docs/handoff/evidence/vrn_engine.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ117:workstation",
@@ -3417,12 +3796,14 @@
     {
       "id": "VCGC-REQ133:vrn-params-verb",
       "requirement": "VCGC-REQ133",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "VRN 管理員沒有單引擎啟動前備料動詞 → 已驗:2026-10-03T12:41:24+00:00 rc 0 · 標記見到",
-      "next": "handoff test vrn_engine_params 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0115 本版 7/7 · 前版 PASS · 合計 PASS) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_engine_params",
       "case": "vrn_engine_params",
-      "receipt": "docs/handoff/evidence/vrn_engine_params.json"
+      "receipt": "docs/handoff/evidence/vrn_engine_params.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ134:outputs-tools-ast",
@@ -3467,12 +3848,14 @@
     {
       "id": "VCGC-REQ139:qg_onebridge",
       "requirement": "VCGC-REQ139",
-      "state": "VERIFIED",
-      "owner": "operator",
-      "reason": "#439 新增 VDF_ENG086_QuantGuardOneBridge 沒有交接案(CHANGED_CODE_WITHOUT_TEST)· 要 polars,容器 / CI 沒有 → 照實 ABSENT → 已驗:2026-10-04T02:28:20+00:00 rc 0 · 標記見到",
-      "next": "handoff test qg_onebridge(工作站有 polars 的境) 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: polars absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test qg_onebridge → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "qg_onebridge",
-      "receipt": "docs/handoff/evidence/qg_onebridge.json"
+      "receipt": "docs/handoff/evidence/qg_onebridge.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ139:usmacro_probe",
@@ -3527,12 +3910,14 @@
     {
       "id": "VCGC-REQ140:vrn_unknown_verb",
       "requirement": "VCGC-REQ140",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "VRN 管理員 v0116 未知動詞拒跑 · read logic 歸位 → 已驗:2026-10-03T16:48:16+00:00 rc 0 · 標記見到",
-      "next": "handoff test vrn_unknown_verb 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
+      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([計] VRN_SystemManager v0116 本版 6/6) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
+      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test vrn_unknown_verb",
       "case": "vrn_unknown_verb",
-      "receipt": "docs/handoff/evidence/vrn_unknown_verb.json"
+      "receipt": "docs/handoff/evidence/vrn_unknown_verb.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ141:vdf_fetch_verb",
@@ -3787,12 +4172,14 @@
     {
       "id": "VCGC-REQ147:vdf_akshare_v0101",
       "requirement": "VCGC-REQ147",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "MDL011 v0101 params 無註冊表 = NODATA rc 2(不再 KeyError);有註冊表照 v0100(VCGC-REQ147) → 已驗:2026-10-04T02:50:03+00:00 rc 0 · 標記見到",
-      "next": "handoff test vdf_akshare_v0101 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: akshare absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdf_akshare_v0101 → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdf_akshare_v0101",
-      "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json"
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0101.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ148:celeritas_gate_v0103",
@@ -3847,12 +4234,14 @@
     {
       "id": "VCGC-REQ149:vdf_akshare_v0102",
       "requirement": "VCGC-REQ149",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "MDL011 v0102 deep-macro(中國經濟 · 各國經濟 · 航運指數)· __rows__ 參數列 · tier core/full · 選單正本 v0100(VCGC-REQ149) → 已驗:2026-10-04T04:11:29+00:00 rc 0 · 標記見到",
-      "next": "handoff test vdf_akshare_v0102 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: akshare absent in the container (roster env via_vdf carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdf_akshare_v0102 → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdf_akshare_v0102",
-      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json"
+      "receipt": "docs/handoff/evidence/vdf_akshare_v0102.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ149:deep-full-tier",
@@ -4077,12 +4466,14 @@
     {
       "id": "VCGC-REQ157:vcgc-assist-env",
       "requirement": "VCGC-REQ157",
-      "state": "VERIFIED",
-      "owner": "AI(VCGC 協助)",
-      "reason": "L111 ④:VCGC 代裝 reportlab / fonttools / opencv-python-headless / pytesseract / markitdown / beautifulsoup4 進 via_vrn_312(uv pip check 全相容,numpy 不變);VRN_ENG394 v0102 自測由 rc 1 → rc 0 · failed 0(容器) → 已驗:2026-10-04T18:11:00+00:00 rc 0 · 標記見到(交接案 vrn_layout)",
-      "next": "工作站境照同一份清單補(子系統跑自測確認)",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: ModuleNotFoundError reportlab (roster env via_vrn_312 carries it); no pip install allowed here",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vrn_layout → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vrn_layout",
-      "receipt": "docs/handoff/evidence/vrn_layout.json"
+      "receipt": "docs/handoff/evidence/vrn_layout.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ158:vdf-multisource",
@@ -4348,22 +4739,26 @@
     {
       "id": "VCGC-REQ169:via_unified",
       "requirement": "VCGC-REQ169",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "操作員令 integrate all short command into one → Register-VIA-Commands-v0272 via 總門 + CGC_MDL264 驗證器 → 已驗:None rc 0 · 標記見到",
-      "next": "handoff test via_unified 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: rc 2 SKIP — no pwsh in the container, so the dynamic PowerShell checks did not run (SKIP is not a pass)",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test via_unified → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "via_unified",
-      "receipt": "docs/handoff/evidence/via_unified.json"
+      "receipt": "docs/handoff/evidence/via_unified.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ170:vdfvrn_readiness",
       "requirement": "VCGC-REQ170",
-      "state": "VERIFIED",
-      "owner": "AI",
-      "reason": "新交接案 vdfvrn_readiness → 已驗:None rc 0 · 標記見到",
-      "next": "handoff test vdfvrn_readiness 實跑轉 VERIFIED",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "container rerun 2026-10-10: without pwsh the v0100 selftest runs 9 of its 11 checks (pwsh mock skipped), so the pinned 11/11 line cannot be produced here; re-pinning would hide the skipped checks",
+      "next": "workstation (roster env carries the package): via-vcgc handoff test vdfvrn_readiness → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "vdfvrn_readiness",
-      "receipt": "docs/handoff/evidence/vdfvrn_readiness.json"
+      "receipt": "docs/handoff/evidence/vdfvrn_readiness.json",
+      "pended_at": "2026-10-10T08:12:49+00:00",
+      "pended_from": "VERIFIED"
     },
     {
       "id": "VCGC-REQ170:vdf_activate",
@@ -4434,6 +4829,167 @@
       "next": "handoff test vdfvrn_readiness_v0101 實跑轉 VERIFIED",
       "case": "vdfvrn_readiness_v0101",
       "receipt": "docs/handoff/evidence/vdfvrn_readiness_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ174:subsystem_probe_v0101",
+      "requirement": "VCGC-REQ174",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "座位探針沿薄尾鏈認 VCGC 記號(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:31+00:00 rc 0 · 標記見到 ;PR #518 Codex P1:沿鏈比對收緊為讀進來比較(v0130 只設值不算 → 繼承來源 v0128)→ 重驗 → 已驗:2026-10-07T09:48:21+00:00 rc 0 · 標記見到",
+      "next": "無(改本檔或相依後重跑 handoff test subsystem_probe_v0101)",
+      "case": "subsystem_probe_v0101",
+      "receipt": "docs/handoff/evidence/subsystem_probe_v0101.json"
+    },
+    {
+      "id": "VCGC-REQ174:flow_gate_v0102",
+      "requirement": "VCGC-REQ174",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "流程閘沿薄尾鏈認入口契約,閘恢復放行(main 6e9219f4 起 VDF 薄尾 v0131–v0146 檔面沒有 VIA_FROM_VCGC → via-vcgc run 全回 GATE) → 已驗:2026-10-07T08:37:42+00:00 rc 0 · 標記見到 ;PR #518 Codex P1:沿鏈比對收緊為讀進來比較(v0130 只設值不算 → 繼承來源 v0128)→ 重驗 → 已驗:2026-10-07T09:44:28+00:00 rc 0 · 標記見到",
+      "next": "無(改本檔或相依後重跑 handoff test flow_gate_v0102)",
+      "case": "flow_gate_v0102",
+      "receipt": "docs/handoff/evidence/flow_gate_v0102.json"
+    },
+    {
+      "id": "VCGC-REQ174:vcgc_console_v0191",
+      "requirement": "VCGC-REQ174",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "registry-sync 等 v0159 動詞仍走釘死的 CGC_MDL223 v0100 → VDF 列 RED → 什麼都不寫;v0191 改取尾版 → 已驗:2026-10-07T08:38:28+00:00 rc 0 · 標記見到",
+      "next": "無(改本檔或相依後重跑 handoff test vcgc_console_v0191)",
+      "case": "vcgc_console_v0191",
+      "receipt": "docs/handoff/evidence/vcgc_console_v0191.json"
+    },
+    {
+      "id": "VCGC-REQ174:vrn-watch-scope",
+      "requirement": "VCGC-REQ174",
+      "state": "BLOCKED",
+      "owner": "操作員",
+      "reason": "把 functional modules/VRN/**(含 references/intake 正本參考區)由 VCGC 交接閘改交 VRN_SystemManager 自管、已登帳退役檔不算遺失,需改交接閘監看規則;AI 端執行時被權限分類器判為稽核紀錄變更擋下(2026-10-06),未做。",
+      "next": "操作員明示授權 AI 改交接閘監看規則(或在工作站自行套用)後再做;未授權前 VRN 290 + 113 條照舊列紅"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vdf_eng093",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vdf_eng093",
+      "receipt": "docs/handoff/evidence/cov_vdf_eng093.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_eng114",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vrn_eng114",
+      "receipt": "docs/handoff/evidence/cov_vrn_eng114.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_eng399",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vrn_eng399",
+      "receipt": "docs/handoff/evidence/cov_vrn_eng399.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_eng400",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vrn_eng400",
+      "receipt": "docs/handoff/evidence/cov_vrn_eng400.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_libplugins",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vrn_libplugins",
+      "receipt": "docs/handoff/evidence/cov_vrn_libplugins.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_ocrplugins",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vrn_ocrplugins",
+      "receipt": "docs/handoff/evidence/cov_vrn_ocrplugins.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl186",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl186",
+      "receipt": "docs/handoff/evidence/cov_mdl186.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl267",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl267",
+      "receipt": "docs/handoff/evidence/cov_mdl267.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl268",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl268",
+      "receipt": "docs/handoff/evidence/cov_mdl268.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl269",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl269",
+      "receipt": "docs/handoff/evidence/cov_mdl269.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl270",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl270",
+      "receipt": "docs/handoff/evidence/cov_mdl270.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl271",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl271",
+      "receipt": "docs/handoff/evidence/cov_mdl271.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl272",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl272",
+      "receipt": "docs/handoff/evidence/cov_mdl272.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl273",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl273",
+      "receipt": "docs/handoff/evidence/cov_mdl273.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_mdl274",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_mdl274",
+      "receipt": "docs/handoff/evidence/cov_mdl274.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vrn_firstpage_engine",
+      "requirement": "VCGC-REQ075",
+      "state": "PENDING",
+      "case": "cov_vrn_firstpage_engine",
+      "owner": "操作員(工作站)",
+      "reason": "container probe 2026-10-10: v0130 tail 3/3 OK; ㊳ reads the real sidecar library VIA_Reports/first_page_text/*.json (regenerated output, not in git) — the container has 4 of the 66, all 4 with 0 regressions vs v0129 (absurd ratio 0 → 0 · target price changed 0), but ㊳ requires the full library, so it cannot pass here (ENV, not a code failure)",
+      "next": "workstation: docs/handoff/ps/Invoke-VIA-WorkstationHandoff-v0100.ps1 (case cov_vrn_firstpage_engine) → commit the receipt",
+      "pended_at": "2026-10-10T08:33:32+00:00",
+      "reason_updated_at": "2026-10-10T08:59:00+00:00"
+    },
+    {
+      "id": "VCGC-REQ075:cov_z281_twins",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_z281_twins",
+      "receipt": "docs/handoff/evidence/cov_z281_twins.json"
     }
   ]
 }
