@@ -26,6 +26,21 @@
     python VIA_DownwardController.py --root <VIA_ROOT> --tools <工具目錄>
     python VIA_DownwardController.py --root . --tools ./tools --token "==VEM-APPROVE==..." --commit
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] 加速器橋(2026-10-08 accel sweep 注入;L103 最高政策 PY 導入加速器;缺席不擋,記黃) =====
+import sys as _ab_sys
+from pathlib import Path as _ab_Path
+_ab_p = _ab_Path(__file__).resolve()
+while _ab_p.parent != _ab_p:
+    if (_ab_p / "supportive modules").is_dir():
+        _ab_sys.path.insert(0, str(_ab_p / "supportive modules"))
+        break
+    _ab_p = _ab_p.parent
+try:
+    import VeritasCeleritas_v1141 as _ACCEL  # noqa: F401
+except Exception:  # noqa: BLE001
+    _ACCEL = None
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
 
 from __future__ import annotations
 
