@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CGC EnvToolAudit v0102 — 薄尾:外部程式(非 pip)探測 + 安裝計畫 + 還原點閘(操作員令 2026-10-10:VCGC 環境及工具管理協助安裝尚未安裝的工具
+"""CGC EnvToolAudit v0102 — 環境工具全景檢查(v0102 薄尾:外部程式 ext 探測 + 安裝計畫 + 還原點閘;其餘同 v0101) + 補缺 + PDF 工具獨立隔離環境(操作員令 2026-10-10:VCGC 環境及工具管理協助安裝尚未安裝的工具
 pdfplumber fitz pypdfium2 PIL docx reportlab pikepdf win32com docx2pdf soffice pdftoppm ps_word_com;紀錄造冊編碼一定要安裝;修正所有環境無衝突,以還原點進行新增)。
   ext              讀工具冊尾版 VIA_ToolRoster_SSOT_v*.json 的 external_tools 段(唯一來源,本支不另寫清單)逐件探:
                    exe(PATH + Windows 預設安裝路徑)· ps_word_com(登錄檔 ProgID Word.Application\CLSID;非 Windows = N/A)→ OK / MISSING + winget 計畫
