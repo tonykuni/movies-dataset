@@ -1,0 +1,143 @@
+{
+ "schema": "VIA.Workflow.HubSSOT.v2",
+ "version": "v0103",
+ "batch": "R34",
+ "ts": "2026-10-10T21:00:00+00:00",
+ "prior": "supportive modules/registry/VIA_Workflow_Hub_SSOT_v0102.json",
+ "source": "操作員 R33(2026-09-28):「Implement SDD structures and build up workflow SSOT and register them and keep them a code VCGC-WKF001 … apply this logic to build up workflow SSOT VRN and VDF … integrate and consolidate … SSOT without conflict … self testing, cross testing, output validating SSOT」 · R34(2026-09-30):「VCGC VCGC-VRN VCGC-VDF 可同步進行 各自 WORKFLOW SSOT 若一個步驟在等待其他 其他不用等的步驟可直接先進行實測 避免交互等待」「將 PANORAMA 為第一步啟動監控」 · R65(2026-10-10):操作員 2026-10-10:「不再視為一入口 三系統獨立 政策及全部寫入 VCGC VRN VDF SYSTEM MANAGER獨立互不影響但互相監控而獨立運作功能」(政策 L120)",
+ "sdd": {
+  "layers": [
+   "spec(目標 · 需求 REQ 代碼 · 驗收)",
+   "plan(進出口 · 順序 · 正主)",
+   "steps(STP 代碼 · 引擎 · 動詞 · 中樞觀測鍵)",
+   "tests(自測 self · 交叉 cross · 實測 real)",
+   "validation(CGC_MDL245 SDD 驗證器 → 燈鎖冊 VIA_LampLock 尾版 wkf 區記成功版本與時間)"
+  ],
+  "code_rule": "工作流 <子系統>-WKF<三碼>;步 <工作流>-STP<三碼>;需求 <子系統>-REQ<三碼>;編號冊全名加 VIA- 前綴(CGC_MDL237 v0104 起 WKF · STP · REQ 三類);只增,舊號不改不刪",
+  "validator": "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+ },
+ "books": {
+  "VCGC": "supportive modules/registry/VIA_Workflow_VCGC_SSOT_v*.json",
+  "VDF": "supportive modules/registry/VIA_Workflow_VDF_SSOT_v*.json",
+  "VRN": "supportive modules/registry/VIA_Workflow_VRN_SSOT_v*.json",
+  "VAP": "supportive modules/registry/VIA_Workflow_VAP_SSOT_v*.json"
+ },
+ "sequence": [
+  {
+   "section": "hub",
+   "wkf": "VCGC-WKF001"
+  },
+  {
+   "section": "loop_vdf",
+   "wkf": "VDF-WKF001"
+  },
+  {
+   "section": "loop_vrn",
+   "wkf": "VRN-WKF001"
+  },
+  {
+   "section": "exit",
+   "wkf": "VCGC-WKF002"
+  }
+ ],
+ "supersedes": {
+  "VIA_Workflow_Hub_SSOT_v0100.json": "步驟移到 VCGC-WKF001/002 · VDF-WKF001 · VRN-WKF001(代碼 STP;舊 id H0…X4 留作 alias)",
+  "VIA_Workflow_SSOT_v0100.json": "18 條項鏈流程整併成 VCGC-WKF005…010 · VDF-WKF004…010 · VRN-WKF004…007 · VAP-WKF001(舊 id 留作 alias;舊冊凍結,讀舊冊的 CGC_MDL157 / MDL236 照舊;驗證器 X-OLD 核對兩邊項序一致)"
+ },
+ "model": {
+  "shape": "three_peers_mutual_monitor",
+  "hub": "VCGC(只指 VCGC 編排的這一輪;不是唯一入口,L120)",
+  "loops": [
+   "VCGC→VDF(編排)",
+   "VCGC→VRN(編排)"
+  ],
+  "rules": [
+   "三系統對等(L120 ①):VCGC · VDF · VRN 三個 SYSTEM MANAGER 各是自己系統的入口,各自啟動 · 自測 · 出 U/I;本冊的 sequence 只是 VCGC 編排一輪時的順序,不是唯一入口。",
+   "互不影響 · 互相只讀監控(L120 ②③):跨系統只讀對方自報的結果;VRN 要行情現行經 CGC_MDL239 資料中介(VCGC 協助,L120 ⑤),也可讀 VDF 自報的庫(唯讀)或呼叫 VDF 自己的 quote 動詞;不直讀 VDF 引擎、不改 VDF 的冊。",
+   "兩個迴圈各自獨立:VDF 迴圈可單獨跑、可逐站單測(不同引擎);VRN 迴圈照 L0→L5 順序,不跳層。",
+   "中樞步驟順序鎖死:H1 流程閘沒過(沒有「[流程] 政策過」)後面一步都不跑(PSGATE-1)。",
+   "網路只在 VDF 迴圈、只經統包網路工具橋、只在操作員自己開 VIA_NET_CONSENT=YES 之後(AI 不代設,L07/L08)。",
+   "TA-Lib 禁用(L50 第一條):任何一步量到 TA-Lib 活指令即紅;QuantGuard 為唯一技術分析路徑。",
+   "過關就鎖定:綠燈進燈鎖冊(VIA_LampLock_v*),回歸 = 紅,不反覆。",
+   "R34 兩迴圈並行:VDF 迴圈與 VRN 迴圈同時跑(Invoke-VIA-Sweep v0106 起兩個背景工作;-Serial 退回一先一後),互不等待;各自照自己的工作流冊。",
+   "R34 不用等的先跑:某一步在等別的線(例:VRN 要 VDF 的庫、要操作員開同意閘、要樣本夾)時,同一迴圈裡不依賴它的步驟先實測,不交互空等;等待中的步照實記 GATED / NODATA,不冒充綠。",
+   "R34 第一步監控:流程閘一過,第一件事是 VIA_Panorama first(掃描 + monitor 一條線一盞燈);只報不擋,看完就知道問題在哪一條線;收尾再 monitor 一次。"
+  ],
+  "parallel": {
+   "loops": [
+    "VCGC↔VDF",
+    "VCGC↔VRN"
+   ],
+   "since": "v0102",
+   "executor": "Invoke-VIA-Sweep-v0106.ps1(Start-Job × 2)· 入口 Invoke-VIA-OperatorConsole-v0109.ps1 取 Sweep 尾版",
+   "fallback": "-Serial 或 Start-Job 不可用 → 一先一後"
+  },
+  "monitor_first": {
+   "engine": "supportive modules/registry/VIA_Panorama_v*.py(v0103 起 first / monitor)",
+   "when": "流程閘之後第一步 + 收尾",
+   "blocks": false
+  },
+  "shape_before_v0103": "hub_and_two_loops",
+  "peers": [
+   {
+    "id": "VCGC",
+    "entry": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py",
+    "workflow": "VCGC-WKF001"
+   },
+   {
+    "id": "VDF",
+    "entry": "functional modules/VDF/VDF_SystemManager_v*.py",
+    "workflow": "VDF-WKF001"
+   },
+   {
+    "id": "VRN",
+    "entry": "functional modules/VRN/VRN_SystemManager_v*.py",
+    "workflow": "VRN-WKF001"
+   }
+  ],
+  "monitor": {
+   "mode": "mutual_read_only",
+   "reads": "對方自報的燈 · 收據 · 清單 · 矩陣 JSON(交接 · 健康 · 掃橋 · 編號 · SSOT 全景 · 資料庫閘 · 引擎矩陣)",
+   "never": "不改寫他系統的正本 · 冊 · 號 · 檔;不替他系統出新版號;只攤開、點名歸屬,問題由該系統自己的 manager 修"
+  },
+  "rules_before_v0103": [
+   "外部世界(操作員輸入 · 樣本夾 · 資料夾 · 網路 · GitHub)只經 VCGC 進出;VDF / VRN 不直接對外。",
+   "VDF 與 VRN 互不直連:VRN 要資料 → 向 VCGC 要 → VCGC 讀庫或轉交 VDF 迴圈 → 經 VCGC 回 VRN(CGC_MDL239 資料中介)。"
+  ]
+ },
+ "executor": {
+  "entry": "各系統自己的 manager / 啟動器(三方對等,L120);VCGC 編排一輪時 = Invoke-VIA-OperatorConsole-v*.ps1(尾版)",
+  "start": "via-vcgc go(VCGC 編排一輪)· VDF_SystemManager 尾版 · VRN_SystemManager 尾版(各自單獨跑)",
+  "note": "本冊宣告 VCGC 編排一輪時的組成與順序;步驟的正主在各系統自己的工作流冊(一步只寫一處);每一步的判準在各自正主裡(L05)。",
+  "entry_before_v0103": "Invoke-VIA-OperatorConsole-v*.ps1(尾版;唯一編排)"
+ },
+ "conformance": {
+  "checker": "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py(v0168 起)· 動詞 workflow [輪號]",
+  "evidence": "VIA_Reports/vcgc/events/EVENTS_*.jsonl:入口每一步 python 都經 VCGC(主控台動詞或 run)留一筆事件;輪號 = 入口設的 VIA_HUB_RUN",
+  "match_rule": "match = [引擎 stem, 動詞](動詞 null = 不限);一筆事件對到某步 = 該步本輪有跑;取每步第一次出現的位置",
+  "rules": [
+   "本輪第一筆事件必須是 H1 流程閘(PSGATE-1),否則紅",
+   "中樞段 → 兩迴圈 → 出口段;段內照 id 順序;兩迴圈彼此不排序(各自獨立)。第一次出現的位置倒置 = 紅(v0102:兩迴圈並行時事件交錯是預期的,只核各迴圈內部順序)",
+   "after_gate 的步(H0 記住資料夾)只要求在 H1 之後(選夾在閘前、寫入在閘後)",
+   "inside 的步在鏈內或 PowerShell 內跑,不要求中樞事件;其餘宣告步本輪沒出現 = 黃(可能是 -SkipSweep 或沿用)"
+  ],
+  "grade": "紅 rc 1 · 黃 rc 2 · 綠 rc 0;只讀事件,不重跑、不寫冊"
+ },
+ "grading": {
+  "slow": "VIA_Reports/operator_console/TIMING_latest.json(各步秒數)· VIA_Reports/vdf_chain/VDFCHAIN_latest.json · VIA_Reports/vrn_chain/VRNCHAIN_latest.json(各節點 secs)由大到小",
+  "weak": "兩條鏈上非 GREEN 的節點(RED > ABSENT > GATED > NODATA)+ 全景稽核問題數",
+  "rule": "分級只讀正主剛寫的存證,不重跑、不另判"
+ },
+ "scope": {
+  "closeout": [
+   "VCGC",
+   "VDF",
+   "VRN"
+  ],
+  "registered_only": [
+   "VAP"
+  ],
+  "why": "操作員令「VAP 暫不動,先做 VCGC/VDF/VRN 三個子系統」(VCGC 需求冊 R-079):VAP 工作流只登錄代碼,不納入收尾與加鎖"
+ },
+ "why_v0103": "政策 L120 三方對等:model.shape hub_and_two_loops → three_peers_mutual_monitor;+peers(三系統各自入口與工作流)· +monitor(互相只讀);前兩條「只經 VCGC 進出 / VRN 向 VCGC 要料」改寫(舊文留 rules_before_v0103);executor 不再寫唯一編排。sequence 四段(hub · loop_vdf · loop_vrn · exit)照舊 = VCGC 編排一輪的順序,SDD X-COMP 與 VCGC workflow 對照不受影響。"
+}
