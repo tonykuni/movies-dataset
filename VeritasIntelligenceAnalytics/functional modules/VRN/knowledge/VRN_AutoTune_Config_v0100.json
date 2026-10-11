@@ -1,0 +1,71 @@
+{
+ "schema": "VIA.VRN.AutoTune.v1",
+ "version": "v0100",
+ "prior": "",
+ "ts": "2026-10-11T03:53:51",
+ "rule": "auto 依實測決策 · 有門檻才動 · 變差自動回滾;layout / restore / basicinfo 都套",
+ "config": {
+  "rescue_order": [
+   "camelot_stream",
+   "pymupdf_text",
+   "img2table",
+   "pymupdf_lines",
+   "pdfplumber_text",
+   "pdfplumber_lines",
+   "tabula_lattice",
+   "tabula_stream",
+   "camelot_lattice"
+  ],
+  "disabled_backends": [],
+  "tr_dual": "on",
+  "postextract": "on",
+  "rescue_budget": 900,
+  "ocr_budget": 450,
+  "ocr_dpi": 200,
+  "basic_ocr_budget": 180,
+  "bench_budget": 300
+ },
+ "decisions": [
+  {
+   "key": "rescue_order",
+   "old": [
+    "pymupdf_lines",
+    "pymupdf_text",
+    "pdfplumber_lines",
+    "pdfplumber_text",
+    "camelot_lattice",
+    "camelot_stream",
+    "tabula_lattice",
+    "tabula_stream",
+    "img2table"
+   ],
+   "new": [
+    "camelot_stream",
+    "pymupdf_text",
+    "img2table",
+    "pymupdf_lines",
+    "pdfplumber_text",
+    "pdfplumber_lines",
+    "tabula_lattice",
+    "tabula_stream",
+    "camelot_lattice"
+   ],
+   "why": "依實測救回率排序(高 → 低 · 同率比速度)",
+   "evidence": "camelot_stream 1/6 7176ms · pymupdf_text 0/7 232ms · img2table 0/6 369ms · pymupdf_lines 0/7 519ms · pdfplumber_text 0/7 598ms · pdfplumber_lines 0/7 656ms · tabula_lattice 0/6 4312ms · tabula_stream 0/6 4557ms · camelot_lattice 0/7 8879ms"
+  },
+  {
+   "key": "rescue_budget",
+   "old": 600,
+   "new": 900,
+   "why": "救回預算用完還有表沒試完 → 放寬",
+   "evidence": "用 600 秒 · 仍失敗 46"
+  },
+  {
+   "key": "ocr_budget",
+   "old": 300,
+   "new": 450,
+   "why": "OCR 預算用完還有表沒試完 → 放寬",
+   "evidence": "用 305 秒 · 仍失敗 46"
+  }
+ ]
+}

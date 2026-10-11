@@ -1,0 +1,323 @@
+{
+ "schema": "VIA.VRN.RatingDict.v1",
+ "generated": "2026-09-20 18:11:43",
+ "policy": "評等字庫;收割自倉內正本,逐節標來源",
+ "levels": {
+  "BUY": {
+   "level": 1,
+   "sentiment": "positive",
+   "score_range": [
+    4.0,
+    5.0
+   ],
+   "zh": [
+    "買進",
+    "買入",
+    "增持",
+    "強力買進",
+    "推薦",
+    "加碼",
+    "積極買進",
+    "強烈推薦",
+    "建議買進",
+    "值得買進",
+    "優於大盤",
+    "超配",
+    "強力推薦",
+    "極力推薦",
+    "買進評等",
+    "推薦買進",
+    "優先買進",
+    "強烈買進"
+   ],
+   "en": [
+    "Buy",
+    "Strong Buy",
+    "Outperform",
+    "Overweight",
+    "Accumulate",
+    "Add",
+    "Long",
+    "Conviction Buy",
+    "Top Pick",
+    "Recommended Buy",
+    "Strong Outperform",
+    "Aggressive Buy",
+    "Active Buy",
+    "Sector Outperform"
+   ],
+   "source": "financial_classification_rules.py"
+  },
+  "HOLD": {
+   "level": 2,
+   "sentiment": "neutral",
+   "score_range": [
+    2.5,
+    3.9
+   ],
+   "zh": [
+    "持有",
+    "中立",
+    "觀望",
+    "平衡",
+    "續抱",
+    "維持",
+    "中性",
+    "觀望評等",
+    "持有評等",
+    "中立評等",
+    "符合大盤",
+    "持平",
+    "標準配置",
+    "區間操作"
+   ],
+   "en": [
+    "Hold",
+    "Neutral",
+    "Market Perform",
+    "Equal Weight",
+    "Wait and see",
+    "Maintain",
+    "Peer Perform",
+    "In-Line",
+    "Market Weight",
+    "Sector Perform",
+    "Fair Value",
+    "Sector Weight"
+   ],
+   "source": "financial_classification_rules.py"
+  },
+  "SELL": {
+   "level": 3,
+   "sentiment": "negative",
+   "score_range": [
+    1.0,
+    2.4
+   ],
+   "zh": [
+    "賣出",
+    "減持",
+    "下調",
+    "減碼",
+    "避險",
+    "轉弱",
+    "建議賣出",
+    "劣於大盤",
+    "低配",
+    "強烈賣出",
+    "賣出評等",
+    "建議減碼",
+    "不推薦"
+   ],
+   "en": [
+    "Sell",
+    "Reduce",
+    "Underperform",
+    "Underweight",
+    "Strong Sell",
+    "Short",
+    "Trim",
+    "Lighten",
+    "Avoid",
+    "Below Market",
+    "Downgrade",
+    "Sector Underperform"
+   ],
+   "source": "financial_classification_rules.py"
+  },
+  "NOT_RATED": {
+   "level": 0,
+   "sentiment": "unknown",
+   "score_range": [
+    0,
+    0
+   ],
+   "zh": [
+    "未評等",
+    "未評級",
+    "無評等",
+    "暫無評等",
+    "無覆蓋",
+    "不予評等",
+    "暫不評等",
+    "尚未評級",
+    "無研究覆蓋"
+   ],
+   "en": [
+    "N/A",
+    "Not Rated",
+    "No Rating",
+    "NR",
+    "Not Covered",
+    "No Recommendation",
+    "Under Review",
+    "Rating Suspended",
+    "No Opinion",
+    "Not Available",
+    "Coverage Dropped"
+   ],
+   "source": "financial_classification_rules.py"
+  }
+ },
+ "keyword_sets": {
+  "strong_buy": [
+   "強力買進",
+   "Strong Buy",
+   "積極買進",
+   "Outperform"
+  ],
+  "buy": [
+   "買進",
+   "買入",
+   "增持",
+   "推薦",
+   "加碼",
+   "Buy",
+   "Accumulate",
+   "Add",
+   "Long"
+  ],
+  "hold": [
+   "持有",
+   "中立",
+   "觀望",
+   "平衡",
+   "Hold",
+   "Neutral",
+   "Market Perform"
+  ],
+  "sell": [
+   "賣出",
+   "減持",
+   "賣超",
+   "Sell",
+   "Underperform",
+   "Reduce"
+  ],
+  "strong_sell": [
+   "強力賣出",
+   "Strong Sell",
+   "避免",
+   "Avoid"
+  ],
+  "not_rated": [
+   "未評等",
+   "未評級",
+   "無評等",
+   "暫無評等",
+   "N/A",
+   "Not Rated",
+   "No Rating",
+   "NR"
+  ]
+ },
+ "keyword_sets_source": "financial_data_standardization.py(AST)",
+ "master_codes": {
+  "Strong_Buy": {
+   "code": 1,
+   "maps_to_level": "BUY",
+   "aliases": [
+    "Strong Buy",
+    "強力買進",
+    "積極買進",
+    "買進(強烈)",
+    "買進(強力)",
+    "Conviction Buy",
+    "Trading Buy"
+   ]
+  },
+  "Buy": {
+   "code": 2,
+   "maps_to_level": "BUY",
+   "aliases": [
+    "Buy",
+    "Outperform",
+    "Overweight",
+    "Long",
+    "買進",
+    "優於大盤",
+    "加碼",
+    "增持",
+    "買進(維持)",
+    "買進(調升)",
+    "買進(重申)",
+    "Accumulate",
+    "逢低買進",
+    "買進(初次)"
+   ]
+  },
+  "Hold": {
+   "code": 3,
+   "maps_to_level": "HOLD",
+   "aliases": [
+    "Hold",
+    "Neutral",
+    "Market Perform",
+    "Equal Weight",
+    "中立",
+    "持有",
+    "區間操作",
+    "觀望",
+    "維持中立",
+    "中立(調降)",
+    "中立(調升)",
+    "Sector Perform",
+    "Peer Perform",
+    "中性"
+   ]
+  },
+  "Sell": {
+   "code": 4,
+   "maps_to_level": "SELL",
+   "aliases": [
+    "Sell",
+    "Underperform",
+    "Underweight",
+    "Short",
+    "賣出",
+    "減碼",
+    "劣於大盤",
+    "賣出(調降)",
+    "賣出(重申)",
+    "Reduce",
+    "減持",
+    "逢高減碼",
+    "賣出(初次)"
+   ]
+  },
+  "Strong_Sell": {
+   "code": 5,
+   "maps_to_level": "SELL",
+   "aliases": [
+    "Strong Sell",
+    "強力賣出",
+    "積極賣出",
+    "Conviction Sell"
+   ]
+  },
+  "Not_Rated": {
+   "code": 0,
+   "maps_to_level": "NOT_RATED",
+   "aliases": [
+    "Not Rated",
+    "未評等",
+    "No Rating",
+    "無評等",
+    "暫無評等",
+    "未覆蓋",
+    "未納入研究範圍",
+    "Coverage Dropped",
+    "停止覆蓋",
+    "Under Review",
+    "評等審視中",
+    "Restricted"
+   ]
+  }
+ },
+ "master_note": "主字典(操作員)評等 0~5 碼:強買 1 · 買 2 · 持有 3 · 賣 4 · 強賣 5 · 未評等 0;對到本冊 levels 見 maps_to_level",
+ "field_only_codes": "CD | EW | MP | N | N/A | NR | OP | OW | SB | SS | UP | UR | UW | 受限 | 收集",
+ "field_only_rule": "1~3 字母短碼與 2 字常用詞只在評等欄位(結構化)比對,不進全文 —— 用一個字串存,避免被當全文詞",
+ "prior": "VRN_Rating_Dict_v0100.json",
+ "ts": "2026-10-10T18:41:36",
+ "version": "v0101"
+}

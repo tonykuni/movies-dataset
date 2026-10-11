@@ -1,0 +1,1210 @@
+{
+ "schema": "VIA.VRN.PostExtract.AST.v1",
+ "engine": "VRN_Generic_PostExtract_Engine_v0101.py",
+ "sha12": "de15004b1ab9",
+ "rule": "原檔不動;本冊 = AST 分類區隔 + 介面 + F01~F25 對應函式",
+ "interface": {
+  "entry": "repair_extracted_data",
+  "reconcile": "reconcile_extractor_results",
+  "selfcheck": "run_self_checks",
+  "inventory": "tool_inventory"
+ },
+ "categories": {
+  "其他": 1,
+  "輸入正規化": 13,
+  "表格重建": 21,
+  "修復": 9,
+  "輸出": 10,
+  "介面": 8,
+  "驗證": 9,
+  "文字/表格分離": 4
+ },
+ "fcodes": {
+  "F01": [
+   "repair_matrix"
+  ],
+  "F02": [
+   "repair_matrix"
+  ],
+  "F03": [
+   "repair_matrix"
+  ],
+  "F04": [
+   "repair_matrix"
+  ],
+  "F05": [
+   "repair_matrix"
+  ],
+  "F06": [
+   "repair_matrix"
+  ],
+  "F07": [
+   "parse_cell_value",
+   "failure_case_evidence"
+  ],
+  "F08": [
+   "failure_case_evidence"
+  ],
+  "F09": [
+   "parse_cell_value"
+  ],
+  "F10": [
+   "failure_case_evidence"
+  ],
+  "F11": [
+   "failure_case_evidence"
+  ],
+  "F12": [
+   "failure_case_evidence"
+  ],
+  "F13": [
+   "failure_case_evidence"
+  ],
+  "F14": [
+   "failure_case_evidence"
+  ],
+  "F15": [
+   "repair_matrix"
+  ],
+  "F16": [
+   "repair_matrix"
+  ],
+  "F17": [
+   "repair_matrix"
+  ],
+  "F18": [
+   "repair_matrix",
+   "failure_case_evidence"
+  ],
+  "F19": [
+   "parse_cell_value"
+  ],
+  "F20": [
+   "repair_matrix"
+  ],
+  "F21": [
+   "repair_matrix",
+   "run_self_checks",
+   "failure_case_evidence"
+  ],
+  "F22": [
+   "repair_matrix",
+   "run_self_checks",
+   "failure_case_evidence"
+  ],
+  "F23": [
+   "repair_matrix",
+   "run_self_checks"
+  ],
+  "F24": [
+   "failure_case_evidence"
+  ],
+  "F25": [
+   "failure_case_evidence"
+  ]
+ },
+ "functions": [
+  {
+   "name": "_net",
+   "args": [],
+   "lines": [
+    34,
+    40
+   ],
+   "cat": "其他",
+   "doc": "正本網路工具(只在需要出網時載入;本引擎不出網)。",
+   "fcodes": []
+  },
+  {
+   "name": "legacy_load_words",
+   "args": [
+    "key"
+   ],
+   "lines": [
+    211,
+    212
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "legacy_inside",
+   "args": [
+    "word",
+    "bbox"
+   ],
+   "lines": [
+    214,
+    217
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "legacy_join_words",
+   "args": [
+    "words"
+   ],
+   "lines": [
+    219,
+    222
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "legacy_rounding_half_width",
+   "args": [
+    "raw"
+   ],
+   "lines": [
+    224,
+    227
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "normalize_label",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    229,
+    230
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_period",
+   "args": [
+    "text",
+    "scope"
+   ],
+   "lines": [
+    232,
+    258
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_value",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    260,
+    286
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "cluster_rows",
+   "args": [
+    "words"
+   ],
+   "lines": [
+    288,
+    305
+   ],
+   "cat": "表格重建",
+   "doc": "Different fonts can have shifted centers despite overlapping baselines.",
+   "fcodes": []
+  },
+  {
+   "name": "get_cell_bbox",
+   "args": [
+    "words"
+   ],
+   "lines": [
+    307,
+    310
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "infer_unit",
+   "args": [
+    "label",
+    "values",
+    "default",
+    "section"
+   ],
+   "lines": [
+    312,
+    325
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "reconstruct_table",
+   "args": [
+    "config",
+    "supplied_words"
+   ],
+   "lines": [
+    327,
+    376
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "annual_indices",
+   "args": [
+    "table"
+   ],
+   "lines": [
+    378,
+    379
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "find_row",
+   "args": [
+    "table",
+    "label"
+   ],
+   "lines": [
+    381,
+    383
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "load_dependencies",
+   "args": [],
+   "lines": [
+    385,
+    399
+   ],
+   "cat": "輸入正規化",
+   "doc": "只匯入實際需要的套件；不在背景變更使用者環境。",
+   "fcodes": []
+  },
+  {
+   "name": "json_bytes",
+   "args": [
+    "value"
+   ],
+   "lines": [
+    401,
+    402
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "file_sha256",
+   "args": [
+    "path"
+   ],
+   "lines": [
+    404,
+    409
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "write_json",
+   "args": [
+    "path",
+    "value"
+   ],
+   "lines": [
+    411,
+    421
+   ],
+   "cat": "輸出",
+   "doc": "原子寫入；正式輸出位於唯一 run_id，既有 run 不覆寫。",
+   "fcodes": []
+  },
+  {
+   "name": "read_page_cache",
+   "args": [
+    "path"
+   ],
+   "lines": [
+    423,
+    436
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "extract_source",
+   "args": [
+    "path",
+    "source_hash",
+    "profile",
+    "output_root",
+    "run_dir",
+    "extraction_options",
+    "stats",
+    "progress"
+   ],
+   "lines": [
+    438,
+    502
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "get_region_context",
+   "args": [
+    "payload",
+    "bbox"
+   ],
+   "lines": [
+    504,
+    509
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "canonical_amount",
+   "args": [
+    "value",
+    "unit"
+   ],
+   "lines": [
+    511,
+    514
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "build_annual_records",
+   "args": [
+    "tables",
+    "source_lookup",
+    "run_id"
+   ],
+   "lines": [
+    516,
+    533
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "write_tabular",
+   "args": [
+    "records",
+    "fields",
+    "stem",
+    "run_dir"
+   ],
+   "lines": [
+    535,
+    546
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "build_review_queue",
+   "args": [
+    "records",
+    "tables",
+    "checks",
+    "failures",
+    "diagnostics"
+   ],
+   "lines": [
+    548,
+    576
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "write_matrix",
+   "args": [
+    "summary",
+    "run_dir"
+   ],
+   "lines": [
+    578,
+    587
+   ],
+   "cat": "輸出",
+   "doc": "自包含靜態矩陣，欄位值先 escape；檢查明細可下載 JSON。",
+   "fcodes": []
+  },
+  {
+   "name": "read_annual_dataframe",
+   "args": [
+    "run_dir"
+   ],
+   "lines": [
+    589,
+    591
+   ],
+   "cat": "介面",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "infer_header_scope",
+   "args": [
+    "word",
+    "payload"
+   ],
+   "lines": [
+    593,
+    608
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "split_period_header",
+   "args": [
+    "words"
+   ],
+   "lines": [
+    610,
+    628
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "infer_label_left_edge",
+   "args": [
+    "groups",
+    "endpoints",
+    "header_bottom",
+    "right_edge"
+   ],
+   "lines": [
+    630,
+    658
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "infer_default_unit",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    660,
+    665
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "infer_region_label",
+   "args": [
+    "words",
+    "bbox",
+    "y"
+   ],
+   "lines": [
+    667,
+    672
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "detect_lightweight_regions",
+   "args": [
+    "record",
+    "payload"
+   ],
+   "lines": [
+    674,
+    730
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "reconstruct_row_year_tables",
+   "args": [
+    "record",
+    "payload",
+    "covered"
+   ],
+   "lines": [
+    732,
+    777
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "validate_table_structure",
+   "args": [
+    "table"
+   ],
+   "lines": [
+    779,
+    785
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "reconstruct_unknown_pages",
+   "args": [
+    "records",
+    "layout_command",
+    "run_dir"
+   ],
+   "lines": [
+    787,
+    823
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "boxes_overlap",
+   "args": [
+    "a",
+    "b"
+   ],
+   "lines": [
+    825,
+    828
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "find_account_role",
+   "args": [
+    "label"
+   ],
+   "lines": [
+    830,
+    835
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "validate_generic_financial",
+   "args": [
+    "tables"
+   ],
+   "lines": [
+    837,
+    879
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "validate_oracle",
+   "args": [
+    "annual",
+    "oracle_path",
+    "source_lookup"
+   ],
+   "lines": [
+    881,
+    893
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "export_all_table_cells",
+   "args": [
+    "records",
+    "tables",
+    "run_dir"
+   ],
+   "lines": [
+    895,
+    912
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "prepare_visible_candidate_words",
+   "args": [
+    "payload",
+    "page_dir"
+   ],
+   "lines": [
+    914,
+    933
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "export_page_evidence",
+   "args": [
+    "records",
+    "tables",
+    "run_dir",
+    "render"
+   ],
+   "lines": [
+    935,
+    963
+   ],
+   "cat": "輸出",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "run_engine",
+   "args": [
+    "input_paths",
+    "output_root",
+    "render",
+    "max_pages",
+    "selftest",
+    "oracle_path",
+    "reconcile_path",
+    "progress",
+    "workers",
+    "office_exports"
+   ],
+   "lines": [
+    965,
+    1023
+   ],
+   "cat": "介面",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_arguments",
+   "args": [
+    "argv"
+   ],
+   "lines": [
+    1025,
+    1042
+   ],
+   "cat": "介面",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "main",
+   "args": [
+    "argv"
+   ],
+   "lines": [
+    1044,
+    1063
+   ],
+   "cat": "介面",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "tool_inventory",
+   "args": [],
+   "lines": [
+    1065,
+    1075
+   ],
+   "cat": "介面",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "find_pdf_inputs",
+   "args": [
+    "input_paths"
+   ],
+   "lines": [
+    1077,
+    1087
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "normalize_word",
+   "args": [
+    "word",
+    "page_height",
+    "coordinate_space",
+    "width",
+    "height"
+   ],
+   "lines": [
+    1089,
+    1117
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_html_tables",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    1119,
+    1157
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_markdown_tables",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    1159,
+    1171
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "normalize_extractor_result",
+   "args": [
+    "data",
+    "extractor"
+   ],
+   "lines": [
+    1173,
+    1303
+   ],
+   "cat": "輸入正規化",
+   "doc": "支援共同 schema、Tabula、Docling、Unstructured 及二維矩陣。",
+   "fcodes": []
+  },
+  {
+   "name": "normalize_cell_text",
+   "args": [
+    "raw"
+   ],
+   "lines": [
+    1305,
+    1310
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "parse_cell_value",
+   "args": [
+    "raw",
+    "decimal_style"
+   ],
+   "lines": [
+    1312,
+    1340
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": [
+    "F07",
+    "F09",
+    "F19"
+   ]
+  },
+  {
+   "name": "repair_matrix",
+   "args": [
+    "table"
+   ],
+   "lines": [
+    1342,
+    1460
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F20",
+    "F21",
+    "F22",
+    "F23"
+   ]
+  },
+  {
+   "name": "reconstruct_matrix_period_table",
+   "args": [
+    "record",
+    "table",
+    "number"
+   ],
+   "lines": [
+    1462,
+    1500
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "extract_imported_source",
+   "args": [
+    "path",
+    "digest",
+    "run_dir",
+    "max_pages"
+   ],
+   "lines": [
+    1502,
+    1535
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "repair_body_text",
+   "args": [
+    "payload"
+   ],
+   "lines": [
+    1537,
+    1554
+   ],
+   "cat": "文字/表格分離",
+   "doc": "保留觀測區塊；只接同 block 的行，不跨欄猜測敘事。",
+   "fcodes": []
+  },
+  {
+   "name": "sort_block_reading_order",
+   "args": [
+    "entries"
+   ],
+   "lines": [
+    1556,
+    1565
+   ],
+   "cat": "文字/表格分離",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "reconcile_extractor_results",
+   "args": [
+    "results"
+   ],
+   "lines": [
+    1567,
+    1586
+   ],
+   "cat": "介面",
+   "doc": "共同 source_id/table_key/row/column 才可比對；獨立兩工具同值可補缺。",
+   "fcodes": []
+  },
+  {
+   "name": "extract_page_payload",
+   "args": [
+    "page",
+    "plumber_page",
+    "cache_dir",
+    "render",
+    "ocr_mode",
+    "ocr_language",
+    "source_hash"
+   ],
+   "lines": [
+    1588,
+    1610
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "collect_merged_cell_candidates",
+   "args": [
+    "payload"
+   ],
+   "lines": [
+    1612,
+    1623
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "classify_page_roles",
+   "args": [
+    "record",
+    "payload",
+    "tables"
+   ],
+   "lines": [
+    1625,
+    1645
+   ],
+   "cat": "文字/表格分離",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "run_self_checks",
+   "args": [],
+   "lines": [
+    1647,
+    1718
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": [
+    "F21",
+    "F22",
+    "F23"
+   ]
+  },
+  {
+   "name": "failure_case_evidence",
+   "args": [
+    "records",
+    "tables",
+    "reviews"
+   ],
+   "lines": [
+    1720,
+    1756
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": [
+    "F07",
+    "F08",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F18",
+    "F21",
+    "F22",
+    "F24",
+    "F25"
+   ]
+  },
+  {
+   "name": "is_parent_year_header",
+   "args": [
+    "word",
+    "groups"
+   ],
+   "lines": [
+    1758,
+    1770
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "semantic_account_key",
+   "args": [
+    "label"
+   ],
+   "lines": [
+    1772,
+    1781
+   ],
+   "cat": "驗證",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "resolve_month_scopes_by_evidence",
+   "args": [
+    "tables",
+    "source_lookup"
+   ],
+   "lines": [
+    1783,
+    1815
+   ],
+   "cat": "表格重建",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "raw_cell_text",
+   "args": [
+    "value"
+   ],
+   "lines": [
+    1817,
+    1829
+   ],
+   "cat": "修復",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "repair_extracted_data",
+   "args": [
+    "data",
+    "extractor",
+    "source_id"
+   ],
+   "lines": [
+    1831,
+    1868
+   ],
+   "cat": "介面",
+   "doc": "Pure stdlib post-processing. No file writes, PDF opening, OCR or model loading.",
+   "fcodes": []
+  },
+  {
+   "name": "extract_source_job",
+   "args": [
+    "path_string",
+    "digest",
+    "output_root_string",
+    "run_dir_string",
+    "extraction_options"
+   ],
+   "lines": [
+    1870,
+    1876
+   ],
+   "cat": "輸入正規化",
+   "doc": "Independent worker opens its own PDF; never shares fitz objects across threads.",
+   "fcodes": []
+  },
+  {
+   "name": "extract_input_jobs",
+   "args": [
+    "paths",
+    "output_root",
+    "run_dir",
+    "extraction_options",
+    "workers",
+    "progress"
+   ],
+   "lines": [
+    1878,
+    1921
+   ],
+   "cat": "輸入正規化",
+   "doc": "",
+   "fcodes": []
+  },
+  {
+   "name": "export_office_candidates",
+   "args": [
+    "records",
+    "run_dir",
+    "formats"
+   ],
+   "lines": [
+    1923,
+    1979
+   ],
+   "cat": "輸出",
+   "doc": "Optional exporters only; packages are never installed automatically.",
+   "fcodes": []
+  },
+  {
+   "name": "watch_folder",
+   "args": [
+    "input_paths",
+    "output_root",
+    "interval",
+    "stable_polls",
+    "iterations",
+    "workers",
+    "render",
+    "max_pages"
+   ],
+   "lines": [
+    1981,
+    2052
+   ],
+   "cat": "介面",
+   "doc": "Polling watch; historical completed hashes persist; sources are never moved.",
+   "fcodes": []
+  },
+  {
+   "name": "html_body_text",
+   "args": [
+    "text"
+   ],
+   "lines": [
+    2054,
+    2086
+   ],
+   "cat": "文字/表格分離",
+   "doc": "Tables stay in the table channel; preserve paragraph breaks in body text.",
+   "fcodes": []
+  }
+ ]
+}
