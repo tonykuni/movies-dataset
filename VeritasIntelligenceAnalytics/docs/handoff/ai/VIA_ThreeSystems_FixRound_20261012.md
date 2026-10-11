@@ -94,3 +94,21 @@ python $V run CGC_MDL274_HealthMatrix matrix
 python $V run CGC_MDL261_UIEngine build --open
 ```
 VRN 自己的尾版(工作站 v0194)編號:先提交那支,再 `python $V run CGC_MDL237_NumberingSystem --apply --scope "functional modules/VRN/VRN_SystemManager_v0194.py"` → `audit`(正斜線路徑;絕對路徑不算)。
+
+## 五、VRN 自報(工作站 `C:\Users\tonyk\VIA-VDF-VRN` · VRN-MAIN 2026-10-12T06:26;L120 只攤開不代修)
+
+來源:操作員貼回的 VRN_Main 報告(RED · FAIL 2 · WARN 6 · PASS 41;樣本 個股 58/534 · 頁 117/477)。VRN 的 VRN_Main / autotest / titletrim / 表頭冊 v0102 / 鎖帳本都只在工作站鏈,不在本倉(容器只到 ENG086 v0120 · ENG394 v0102 · 表頭冊 v0101),所以錨點只到本倉有的規則本體;改 VRN 檔要操作員令,VRN 自己的手。
+
+| # | 閘 | 現況 | 根因(照報告與規則本體讀) | 類 | 修法(給 VRN) |
+|---|---|---|---|---|---|
+| V1 | G16 DATAFRAME | 19 張:綠 15 · 紅 4 | 驗法 `CGC_MDL249_DataFrameLock_v0100.check_table`(L142–199):`required` 欄 NaN / 空字串 = 紅「必填但 N 筆空」;型別轉不過 = 紅 | — | 每一紅先分「引擎留空」或「冊上必填訂太嚴」兩種,看 `autotest\round1\dataframes` 的那幾列就能定 |
+| V1a | vrn_basic_info | 58 × 70 · `AdjCloseReportDate` 1 筆不是 date | 報告日沒有調整收盤(假日 / 無價)時寫了哨兵字串而不是空值 | 可同時 | 無價寫 NULL,狀態放 `_state` 欄;冊上該欄 nullable |
+| V1b | vrn_financial_data | 4219 × 55 · `PeriodLabelRaw` 必填但 48 空 | 期別表頭(合併格 / 直排)沒跟著數字列帶下來 | 可同時 | 期別標籤沿欄向下傳;帶不到的列 `REVIEW` 不留空 |
+| V1c | vrn_regions_rows | 605 × 13 · `metric_raw` 必填但 52 空 | 數字格沒有科目字(TRIM 掉字 / 跨列科目) | 可同時 | 科目沿列傳;TRIM 不得吃掉科目字(與 P1「TRIM 掉字」同源) |
+| V1d | vrn_title_parts | 58 × 22 · 一份報告五個 `*_state` 空 | def02 七段拆不開的那一份,狀態欄寫了空白 | 可同時 | 狀態欄永不空:拆不開寫 `UNPARSED`(狀態是設計上的必填) |
+| V2 | G18 引擎鎖 | HELD 38 · UNLOCKED 1(`VRN_PanoramaProbe.py`) | 沒有已知答案證明(沒有固定樣本的自測) | 可同時 | 給探針一個已知答案自測,或鎖規則對唯讀探針豁免 → 39/39 |
+| V3 | G18 輸出鎖 | NEW 398 · OPEN 1013(NOT_PRINTED 323 · CONFLICT 107 · SINGLE 280 · MISSING 30 · UNMAPPED 261 · REVIEW 12) | 第一輪建鎖;待修 690 = CONFLICT 107 + MISSING 30(優先 1 = 137)+ UNMAPPED 261 + REVIEW 12(優先 2 = 273)+ SINGLE 280(優先 3) | 順序 | 先修 V4(優先 1 的根因集中在 TRIM 讀法)→ 第二輪再鎖;SINGLE 280 要第二個讀法(ENG396 全文)才有證明 |
+| V4 | 優先 1 讀法不一致(8 例樣本) | 8 例裡 7 例是「首頁(TRIM)」讀法落單:broker FIRST vs MEGA · date 2024-12-09 / 2026-06-03 vs 檔名日 · current_price 2025.0(年份當價格)· 標題多「 - 」 | TRIM 讀法的正則:價格吃到四位數年份;日期抓到頁上另一個日期(前次報告日 / 資料日 / 有效期);券商抓到免責聲明裡的別名;標題比對沒先正規化 | 可同時 | ① 價格正則排除年份 / 日期 token ② `cover.date` 只認等於檔名日的那個,其餘日期進 `data_date` / `valid_until` ③ 券商只在刊頭區抓,否則照檔名 + 首頁引擎多數 ④ 標題先正規化(去「 - 」「－」空白)再比,免得假衝突 |
+| V5 | 優先 1 目標價仲裁 | 泓德(6873):TRIM + ENG396 = 345 vs 首頁引擎 = 208;印 22.7% vs 重算 103.54%(def03) | 多數決(2 比 1)選了 345,但 def03 `upside_pct`(kernel v0102 L120)用 208 才算回印的 22.7%(標題也印「逢低買進 $208」);345 是別的數(如 52 週高) | 順序(V4 之後) | 仲裁順序改:先用 def03「哪個候選算回印的上漲空間」選目標價,算不回再多數決;神達(3706)78 vs 128 同法 |
+
+量尺(第二輪要看的):G16 紅 4 → 0;引擎鎖 39/39;CONFLICT 107 與 MISSING 30 歸零後 OPEN 降 137;SINGLE 280 要第二讀法才動。
