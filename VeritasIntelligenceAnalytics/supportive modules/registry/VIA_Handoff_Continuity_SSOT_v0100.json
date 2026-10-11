@@ -2534,6 +2534,48 @@
         "supportive modules/registry/VIA_UI_Template_SSOT_v0101.json"
       ],
       "timeout_seconds": 1500
+    },
+    "vdf_manager_v0154": {
+      "argv": [
+        "VDF_SystemManager_v0154",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0154 自測 8/8 · PASS",
+      "scope": "VDF_SystemManager v0154 展現規則:燈欄第一 · 問題在前 · 燈號列 + 只看紅黃 · 空值 — · 路徑縮檔名 · 燈號 JSON 改人話 · #via-pick · 健康頁籤開在 VDF · 換行一欄一條 · 前版鏈全跑(VCGC-REQ179)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0154.py",
+        "functional modules/VDF/VDF_SystemManager_v0153.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 1800
+    },
+    "ui_engine_v0106": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0106",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0106 本版 7/7 · PASS",
+      "scope": "CGC_MDL261 v0106 VCGC 操作台展現規則(同冊同規則;前版 v0105 build 改走 v2 套件)(VCGC-REQ179)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0106.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0105.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "health_matrix_v0114": {
+      "argv": [
+        "CGC_MDL274_HealthMatrix_v0114",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL274_HealthMatrix v0114 本版 7/7 · PASS",
+      "scope": "CGC_MDL274 v0114 健康矩陣頁展現規則(問題在前 · 空值 — · 路徑縮檔名 · #via-pick 預選;頁上已有篩選鈕不加燈號列)(VCGC-REQ179)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0114.py",
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0113.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 1500
     }
   },
   "work_items": [
@@ -5257,8 +5299,48 @@
       "requirement": "VCGC-REQ179",
       "state": "PENDING",
       "owner": "操作員 / AI",
-      "reason": "操作員「很多展現都要重新思考整理」:字級 / 版面 / 日期本批已統一;各頁內容取捨與排列順序(哪些卡片 / 欄位留、先後次序)是下一步",
-      "next": "操作員點名先整理哪幾頁(例:VDF 頁右側五頁籤 · 健康矩陣 · 全景頁)→ AI 出各頁新版"
+      "reason": "操作員「很多展現都要重新思考整理」:字級 / 版面 / 日期本批已統一;各頁內容取捨與排列順序(哪些卡片 / 欄位留、先後次序)是下一步 → 2026-10-11 操作員「GO ON」:AI 照預設規則整理(燈欄第一 · 問題在前 · 燈號列 · 空值 — · 路徑縮檔名 · 燈號 JSON 改人話 · VDF 頁健康頁籤開在 VDF),VDF / VCGC 頁實跑量測過;待交接案 vdf_manager_v0154 收據轉 VERIFIED",
+      "next": "handoff test vdf_manager_v0154 實跑轉 VERIFIED;操作員看過新頁再點名的部分記在 VCGC-REQ179:review_pages",
+      "case": "vdf_manager_v0154",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0154.json"
+    },
+    {
+      "id": "VCGC-REQ179:vdf_manager_v0154",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdf_manager_v0154(操作員 2026-10-11「很多展現都要重新思考整理」→「GO ON」:展現規則)",
+      "next": "handoff test vdf_manager_v0154 實跑轉 VERIFIED",
+      "case": "vdf_manager_v0154",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0154.json"
+    },
+    {
+      "id": "VCGC-REQ179:ui_engine_v0106",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 ui_engine_v0106(操作員 2026-10-11「很多展現都要重新思考整理」→「GO ON」:展現規則)",
+      "next": "handoff test ui_engine_v0106 實跑轉 VERIFIED",
+      "case": "ui_engine_v0106",
+      "receipt": "docs/handoff/evidence/ui_engine_v0106.json"
+    },
+    {
+      "id": "VCGC-REQ179:health_matrix_v0114",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 health_matrix_v0114(操作員 2026-10-11「很多展現都要重新思考整理」→「GO ON」:展現規則)",
+      "next": "handoff test health_matrix_v0114 實跑轉 VERIFIED",
+      "case": "health_matrix_v0114",
+      "receipt": "docs/handoff/evidence/health_matrix_v0114.json"
+    },
+    {
+      "id": "VCGC-REQ179:review_pages",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "展現規則第一輪已套(VDF / VCGC 頁);哪一頁 · 哪一欄還不順,由操作員看過工作站新頁後點出",
+      "next": "操作員點名 → AI 出該頁新版"
     }
   ]
 }
