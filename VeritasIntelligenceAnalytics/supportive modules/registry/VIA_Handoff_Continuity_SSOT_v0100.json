@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-11T18:55:50+00:00",
+ "updated_at": "2026-10-11T19:03:57+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5415,40 +5415,44 @@
   {
    "id": "VCGC-REQ180:validation_ssot_v0101",
    "requirement": "VCGC-REQ180",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "新交接案 validation_ssot_v0101(V-val 紅根因:多段交叉代碼沒登 → MDL246 v0101 + 冊 v0101)",
+   "reason": "新交接案 validation_ssot_v0101(V-val 紅根因:多段交叉代碼沒登 → MDL246 v0101 + 冊 v0101) → 已驗:validation_ssot_v0101 2026-10-11T19:00:30+00:00 rc 0 標記見到",
    "next": "handoff test validation_ssot_v0101 實跑轉 VERIFIED",
    "case": "validation_ssot_v0101",
-   "receipt": "docs/handoff/evidence/validation_ssot_v0101.json"
+   "receipt": "docs/handoff/evidence/validation_ssot_v0101.json",
+   "resolved": "2026-10-11T19:03:57+00:00"
   },
   {
    "id": "VCGC-REQ180:ps_station_chain",
    "requirement": "VCGC-REQ180",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "P-ui_cmds 紅根因:Register-VIA-Commands 自 v0270 是 PS 薄尾(點源前版),站只讀尾版文字 → TestAuto v0106 驗整條點源鏈;交接案 chain 標記釘 v0106",
+   "reason": "P-ui_cmds 紅根因:Register-VIA-Commands 自 v0270 是 PS 薄尾(點源前版),站只讀尾版文字 → TestAuto v0106 驗整條點源鏈;交接案 chain 標記釘 v0106 → 已驗:chain 2026-10-11T19:00:55+00:00 rc 0 標記見到",
    "next": "handoff test chain 實跑轉 VERIFIED;VCGC test 站 P-ui_cmds 不再「少了串測步」",
    "case": "chain",
-   "receipt": "docs/handoff/evidence/chain.json"
+   "receipt": "docs/handoff/evidence/chain.json",
+   "resolved": "2026-10-11T19:03:57+00:00"
   },
   {
    "id": "VCGC-REQ180:fetch_groups_isolation",
    "requirement": "VCGC-REQ180",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "C-vdf_fetch_groups_v0100–v0105 六站紅根因:v0100 自測 ⑫ 算到 VDF 活資料樞的 vdf_tw_market.duckdb(4 庫 ≠ 3)→ VDF_MDL012 v0106 自測鏈隔離活樞;六案標記釘 v0106(v0102 / v0104 / v0105 改跑尾版)",
+   "reason": "C-vdf_fetch_groups_v0100–v0105 六站紅根因:v0100 自測 ⑫ 算到 VDF 活資料樞的 vdf_tw_market.duckdb(4 庫 ≠ 3)→ VDF_MDL012 v0106 自測鏈隔離活樞;六案標記釘 v0106(v0102 / v0104 / v0105 改跑尾版) → 已驗:vdf_fetch_groups_v0100 2026-10-11T19:01:09+00:00 rc 0 標記見到 · vdf_fetch_groups_v0101 2026-10-11T19:01:23+00:00 rc 0 標記見到 · vdf_fetch_groups_v0102 2026-10-11T19:01:37+00:00 rc 0 標記見到 · vdf_fetch_groups_v0103 2026-10-11T19:01:51+00:00 rc 0 標記見到 · vdf_fetch_groups_v0104 2026-10-11T19:02:05+00:00 rc 0 標記見到 · vdf_fetch_groups_v0105 2026-10-11T19:02:18+00:00 rc 0 標記見到",
    "next": "handoff test vdf_fetch_groups_v0100 … v0105 六案實跑轉 VERIFIED",
    "case": "vdf_fetch_groups_v0105",
-   "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0105.json"
+   "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0105.json",
+   "resolved": "2026-10-11T19:03:57+00:00"
   },
   {
    "id": "VCGC-REQ180:numbering_batch",
    "requirement": "VCGC-REQ180",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "SDD X-NUM 紅:CGC_MDL183_CeleritasPolicyGate_v0105 · CGC_MDL140_HandoverConsole_v0107 沒編號;健康矩陣另列 VCGC 7 支 · VDF 4 支尾版沒號(MDL186 v0101 · MDL244 v0102 · MDL257 v0102 · MDL270 v0106 · MDL273 v0102 · MDL275 v0100 · test_master_control_contract v0103 · VDF_ENG093 v0104 · VDF_MDL001 / MDL201 / MDL303 v0100 雙胞)+ 本輪三支新尾版",
-   "next": "registry-sync --apply → run CGC_MDL237_NumberingSystem --apply --scope <清單> → audit 遺失 0 · 改身分 0 · 重號 0 → sdd check X-NUM 只剩 VRN 兩支"
+   "reason": "SDD X-NUM 紅:CGC_MDL183_CeleritasPolicyGate_v0105 · CGC_MDL140_HandoverConsole_v0107 沒編號;健康矩陣另列 VCGC 7 支 · VDF 4 支尾版沒號(MDL186 v0101 · MDL244 v0102 · MDL257 v0102 · MDL270 v0106 · MDL273 v0102 · MDL275 v0100 · test_master_control_contract v0103 · VDF_ENG093 v0104 · VDF_MDL001 / MDL201 / MDL303 v0100 雙胞)+ 本輪三支新尾版 → 已驗:2026-10-11 registry-sync --apply 新 7 · 變 18;MDL237 --apply --scope 19 檔 +288 列;audit 遺失 0 · 改身分 0 · 重號 0;sdd check X-NUM 只剩 VRN 兩支",
+   "next": "registry-sync --apply → run CGC_MDL237_NumberingSystem --apply --scope <清單> → audit 遺失 0 · 改身分 0 · 重號 0 → sdd check X-NUM 只剩 VRN 兩支",
+   "resolved": "2026-10-11T19:03:57+00:00"
   },
   {
    "id": "VCGC-REQ180:vrn_xnum",
