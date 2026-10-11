@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """CGC_MDL261_UIEngine v0105 — 薄尾:VCGC 操作台字體 / 階層一致 + 版面自動最佳化 + 日期一律 YYYY-MM-DD(字級套件)
 
-操作員令(2026-10-11):「u/i請字體一致或階層一致姓  左右面板都凌亂」「很多展現都要重新思考整理」「日期規格一律用YYYY-MM-DD」。
+操作員令(2026-10-11):「u/i請字體一致或階層一致姓  左右面板都凌亂」「很多展現都要重新思考整理」「日期規格一慮用YYYY-MM-DD」。
   ① 字級套件:讀 registry 的 VIA_UI_Template_SSOT 尾版(v0101 起有字級 token;只讀資料冊)→ 頁內一段 CSS + 一小段 JS:
      四級字(標題 / 段頭 / 內文 / 註記)· 兩種字重 · 一種主字體(等寬只給指令與代碼)· 按鈕輸入框繼承字體;頁上任何字級吸到最近一級
      (之後 JS 產的內容也跟,MutationObserver 只處理新元素)。短欄不換行 · 長欄限寬 · 寬表外包橫捲 · 左面板有輸入框 / 按鈕的表兩行一列。
@@ -103,7 +103,7 @@ def __getattr__(name: str):
 
 TAG = f"CGC_MDL261_UIEngine v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 
-# 閘戳時間一律 YYYY-MM-DD HH:MM(操作員 2026-10-11「日期規格一律用YYYY-MM-DD」;v0104 範本是 slice(5,16) = MM-DD HH:MM,沒有年)
+# 閘戳時間一律 YYYY-MM-DD HH:MM(操作員 2026-10-11「日期規格一慮用YYYY-MM-DD」;v0104 範本是 slice(5,16) = MM-DD HH:MM,沒有年)
 _TS_OLD = "String(g.ts).slice(5,16).replace('T',' ')"
 _TS_NEW = "String(g.ts).slice(0,16).replace('T',' ')"
 PATCH_MISSES_V0105 = [] if PRIOR.BUILTIN_V0104.count(_TS_OLD) == 1 else [_TS_OLD]

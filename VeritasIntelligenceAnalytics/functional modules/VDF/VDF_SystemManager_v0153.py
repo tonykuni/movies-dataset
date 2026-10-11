@@ -13,7 +13,7 @@
   ③ 範圍:只動 VDF 自己的頁 —— VIA_Reports/vdf/ 直下的 *_latest.html(ui 套完 L121 後套;其他動詞跑完也補套;冪等;冊換 token 就換新);
      他系統的頁(VCGC 健康矩陣 · VRN)不碰(L120),由各自的 manager 照同一本冊套。
   ④ 冊讀不到 / 沒有字級 token → 內建同一份預設照常套,並寫明原因;頁 body 加 data-via-typekit="off" 可關。
-  ⑤ 日期一律 YYYY-MM-DD(操作員 2026-10-11「日期規格一律用YYYY-MM-DD」):日期框(瀏覽器依語系顯示 01/01/2015)改成 YYYY-MM-DD 文字框 + 日曆鈕
+  ⑤ 日期一律 YYYY-MM-DD(操作員 2026-10-11「日期規格一慮用YYYY-MM-DD」):日期框(瀏覽器依語系顯示 01/01/2015)改成 YYYY-MM-DD 文字框 + 日曆鈕
      (滑鼠選日照用,L118);頁上 2026/10/11 · 2026.10.11 · 2026年10月11日 · 2026-1-5 改寫成 YYYY-MM-DD;左下閘戳時間 MM-DD HH:MM → YYYY-MM-DD HH:MM。
      指令 / 代碼 / 檔名 / 代號裡的日期(例 20260928_050809)不動。
 其餘照 v0152(L121 版面)。只收 VIA_FROM_VCGC=YES(舊名;= 經任一系統自己的 manager / 啟動器啟動,L120 ⑥ 甲)。不抓網、不碰 TA-Lib。
@@ -119,7 +119,7 @@ def __getattr__(name):
 
 
 def _stamp_v0153(x: dict, root: Path, page_dir: Path) -> dict:
-    """閘戳時間一律 YYYY-MM-DD HH:MM(操作員 2026-10-11「日期規格一律用YYYY-MM-DD」;v0152 是 MM-DD HH:MM,沒有年)。"""
+    """閘戳時間一律 YYYY-MM-DD HH:MM(操作員 2026-10-11「日期規格一慮用YYYY-MM-DD」;v0152 是 MM-DD HH:MM,沒有年)。"""
     p = root / (x.get("file") or "")
     ok = bool(x.get("file")) and p.is_file()
     return {**x, "exists": ok, "href": PRIOR._href(p, page_dir) if ok else None,
