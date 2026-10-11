@@ -45,9 +45,7 @@ except Exception:
     VIA_NET_TOOL_PATH = None
 # ===== [VIA:NET-BRIDGE:END] =====
 
-import contextlib
 import importlib.util
-import io
 import re
 import sys
 import tempfile
@@ -142,10 +140,7 @@ def main(argv=None) -> int:
 
 def selftest() -> int:
     print(f"=== {ENGINE} · 薄尾自測(PS 站的章驗整條點源鏈)===")
-    buf = io.StringIO()
-    with contextlib.redirect_stdout(buf):
-        rc = PRIOR.selftest()
-    print("  ── 前版鏈自測(摘末行)── " + (buf.getvalue().strip().splitlines() or ["(無輸出)"])[-1])
+    rc = PRIOR.selftest()                                 # 前版鏈照印(交接案 chain 的標記在鏈上的 [計] 行,不吞)
     ok = []
 
     def chk(name, cond, note=""):
