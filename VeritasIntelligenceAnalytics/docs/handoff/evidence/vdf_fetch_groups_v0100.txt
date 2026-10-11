@@ -31,7 +31,16 @@
 [政策] L50 全景 · 尾版 620 · import 0 · 提及 78 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL012_FetchGroups_v0106.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_MDL012_FetchGroups_v0107.py(家族 vdf)
+=== VDF_MDL012_FetchGroups v0107 · 薄尾自測(清單先跑 · 分道並行 · 守門 · 頁 USER-TEST)===
+  [OK] ① 沿鏈找到 v0100(cmd_run · _ctx)· v0101(build_page)· v0105(relayout)本體;render 已換上本版;TAG 不蓋(六案標記照印)
+  [OK] ② 真冊分道:清單 = 009+010 · 每支引擎只在一道 · 相依不跨道 · vake 四族群一道一列(011d)· 台股四族群同庫一道 · 道 ≥ 4
+  [OK] ③ 替身並行:清單 009 → 010 先跑完才起道;jobs 2 不同道有重疊 · 同道 a1 → a2 不重疊;jobs 1 全無重疊;子行程環境帶 VIA_FROM_VCGC · TEMP · 流程數
+  [OK] ④ 清單引擎紅就停:009 rc 1 → aborted · 道一支都沒起
+  [OK] ⑤ 守門:CPU 99 → 99 → 10 等兩輪(2s)後放行;DRAM 1 GB < 2 GB 等到上限 6s 照跑(forced);量不到(None)不擋;真量測有 CPU / DRAM / TEMP 數
+  [OK] ⑥ run --dry:走本版並行路徑、流程夾到 5、列道與資源、不起子行程不寫檔 rc 0
+  [OK] ⑦ 頁:多一頁「並行擷取 · USER-TEST」(頁籤在上也在左面板「頁」)· 左面板有並行流程選項與並行 / USER-TEST 鈕 · 指令 cmdOf 有分支 · 輸入 id 唯一 · 快照頁工具 = 本版 · 靜態驗全綠
+  [OK] ⑧ 加速器橋 · 網路橋在;前版不動(薄尾);不碰 TA-Lib;頁與指令不執行任何東西(無 fetch / XMLHttpRequest)
 === VDF_MDL012_FetchGroups v0106 · 薄尾自測(自測鏈隔離活資料樞)===
   [OK] ① 沿鏈找到 find_db / _db_files 的本體(v0100)· 活樞 = 它的 output_hub
   [OK] ② 隔離版 find_db:自測家的庫照找到 · 只在活樞的庫找不到(None)· 原版 find_db 仍找得到(正式路徑不變)
@@ -60,5 +69,7 @@
 [計] VDF_MDL012_FetchGroups v0106 本版 10/10 · v0103 鏈 PASS · 合計 PASS
   [OK] ④ 前版鏈自測(v0105 → … → v0100,活樞隔離)rc 0;跑完 find_db 已換回原版
   [計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'VRN_Sy → via-vcgc sdd check
-[監控] 背景全景監控中 pid 595 · 觸碰 run VDF_MDL012_FetchGroups · 交接閘 RED · 落後 487 提交 · 快照 213.8h · 未推 5 · 未登 102 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL267_SsotNumberingVRN …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ⑨ 前版鏈自測(v0106 → … → v0100)rc 0;跑完 render 已換回本版
+  [計] VDF_MDL012_FetchGroups v0107 本版 9/9 · 前版鏈 PASS · 合計 PASS
+  [同步] SDD 驗證 RED:X-REQ 需求代碼不合 [] · 歸屬指到不存在 ['VDF-REQ018→VDF_FetchGroups_SSOT_v0102.json', 'VDF-REQ018→V → via-vcgc sdd check
+[監控] 背景全景監控中 pid 1568 · 觸碰 run VDF_MDL012_FetchGroups · 交接閘 RED · 落後 495 提交 · 快照 216.7h · 未推 1 · 未登 102 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL267_SsotNumberingVRN …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
