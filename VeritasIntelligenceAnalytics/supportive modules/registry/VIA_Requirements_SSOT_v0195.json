@@ -5849,11 +5849,9 @@
    "status": "PARTIAL",
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0169.json",
-    "VDF_FetchGroups_SSOT_v0102.json",
-    "VDF_FetchSystem_SSOT_v0106.json"
+    "VIA_VCGC_FunctionInventory_SSOT_v0169.json"
    ],
-   "evidence": "容器:① 橋稽核(乾跑,只讀)NET 橋 VDF 掃 524 · 掛 137 · 缺 0 · 100%;ACCEL 計畫 0;PS 入口已帶 Invoke-VIACeleritasScoped(.ps1 不改,L70)。② 清單引擎 = 擷取冊 009 VDF_MDL009_TWStockList(自動更新台股全市場清單)· 010 VDF_MDL010_ActiveETFList(主動式 ETF 清單),冊上每支擷取引擎都 needs 這兩支 → VDF_MDL012_FetchGroups v0107 run:兩支先跑(紅就停)→ 其餘族群依 DuckDB 庫 / 同引擎 / 相依分道(真冊:vdf_tw_market 4 族群一道 · vake 4 族群一道一列 · ETF · 指數 · 全球 · parquet)· --jobs 1~5(auto = CPU − 1)· 起每支前 CPU% / DRAM 可用 / TEMP 可用守門(psutil;退 stdlib)· 子行程 VIA_TEMP_ROOT / VIA_DUCKDB_TEMP_DIR / VIA_DUCKDB_MEM_PCT = 50 ÷ 流程(MDL262 規則)· 子行程直接從 MDL008 尾版起(run_v0107 的 __file__ 換裝不是執行緒安全)· fg_runs + PARALLEL_latest.json;自測 9/9 · 前版鏈 v0106 → v0100 PASS;fixture 煙霧(暫存家):清單先跑 rc 0 → 兩道同時起 · 目錄 ok(引擎 fixture 下照自己的閘回 rc 2/3/4)。③ 頁:多一頁「並行擷取 · USER-TEST」+ 左面板「並行流程」「並行跑族群」「USER-TEST」鈕;usertest 動詞:建頁 → 靜態驗 → Chromium headless 逐鍵點 79 綠 0 紅(功能鈕 · 收尾鈕 · 頁籤 · 全選 / 清除 · 快照)→ 結果掛頁。④ VCGC 檢視工具:pdftoppm 缺(MDL273 ext → winget 計畫)· pdfplumber 缺(VRN)· polars / reportlab / pwsh 缺(容器);不裝套件。⑤ BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT / 1ST INFO AREA 書實測 = VRN 首頁(L120 VRN 自己;工作站 via-realtest)。",
+   "evidence": "容器:① 橋稽核(乾跑,只讀)NET 橋 VDF 掃 524 · 掛 137 · 缺 0 · 100%;ACCEL 計畫 0;PS 入口已帶 Invoke-VIACeleritasScoped(.ps1 不改,L70)。② 清單引擎 = 擷取冊 009 VDF_MDL009_TWStockList(自動更新台股全市場清單)· 010 VDF_MDL010_ActiveETFList(主動式 ETF 清單),冊上每支擷取引擎都 needs 這兩支 → VDF_MDL012_FetchGroups v0107 run:兩支先跑(紅就停)→ 其餘族群依 DuckDB 庫 / 同引擎 / 相依分道(真冊:vdf_tw_market 4 族群一道 · vake 4 族群一道一列 · ETF · 指數 · 全球 · parquet)· --jobs 1~5(auto = CPU − 1)· 起每支前 CPU% / DRAM 可用 / TEMP 可用守門(psutil;退 stdlib)· 子行程 VIA_TEMP_ROOT / VIA_DUCKDB_TEMP_DIR / VIA_DUCKDB_MEM_PCT = 50 ÷ 流程(MDL262 規則)· 子行程直接從 MDL008 尾版起(run_v0107 的 __file__ 換裝不是執行緒安全)· fg_runs + PARALLEL_latest.json;自測 9/9 · 前版鏈 v0106 → v0100 PASS;fixture 煙霧(暫存家):清單先跑 rc 0 → 兩道同時起 · 目錄 ok(引擎 fixture 下照自己的閘回 rc 2/3/4)。③ 頁:多一頁「並行擷取 · USER-TEST」+ 左面板「並行流程」「並行跑族群」「USER-TEST」鈕;usertest 動詞:建頁 → 靜態驗 → Chromium headless 逐鍵點 79 綠 0 紅(功能鈕 · 收尾鈕 · 頁籤 · 全選 / 清除 · 快照)→ 結果掛頁。④ VCGC 檢視工具:pdftoppm 缺(MDL273 ext → winget 計畫)· pdfplumber 缺(VRN)· polars / reportlab / pwsh 缺(容器);不裝套件。⑤ BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT / 1ST INFO AREA 書實測 = VRN 首頁(L120 VRN 自己;工作站 via-realtest)。 冊:VDF_FetchGroups_SSOT_v0102.json(族群 → 庫 → 分道)· VDF_FetchSystem_SSOT_v0106.json(引擎列 009 / 010 與 needs)在 functional modules/VDF(VDF 自己的冊,不列 homes;X-REQ 歸屬只認 registry 冊)。",
    "next": "工作站(操作員的手):registry-sync --apply → EnvToolAudit ext(--apply 要雙閘)→ VDF_SystemManager universe → VDF_MDL012_FetchGroups run --groups ALL --jobs 4 --mode live(雙閘)→ usertest → ui 跳出頁 → handoff test(vdf_fetch_groups_v0107 · usertest · 工作站五案)→ checkpoint → via-realtest(VRN 首頁四區)→ sdd real → lock --apply → HealthMatrix matrix · UIEngine build --open",
    "hand": "AI / 操作員(雙閘 · 工作站 · 環境)/ VRN(首頁四區)",
    "quotes": [
@@ -6067,5 +6065,5 @@
  "why_v0192": "v0191 已發布 → 出新版;VCGC-REQ179 evidence / homes / modules / next 補展現重整這一輪,原話 +「GO ON」;狀態仍 PARTIAL;其餘一字不動",
  "why_v0193": "v0192 已發布 → 出新版;+VCGC-REQ180(操作員 2026-10-12 兩則原話逐字;PARTIAL:容器三件修正已自測,交接 / 編號 / 加鎖與工作站環境待下一步);其餘一字不動",
  "why_v0194": "v0193 已發布 → 出新版;VCGC-REQ180 evidence 補事後全景計數與 MDL237 v0118(IMMUT 不算交接收據);其餘一字不動",
- "why_v0195": "v0194 已發布 → 出新版;+VDF-REQ018(操作員 2026-10-12 兩則原話:VDF 引擎加速器 / 網路工具 · PS 加速模塊 · 清單引擎先跑 → 3~5 流程並行 · CPU / DRAM / TEMP 上限 · 工具檢視 · 跳出 U/I 帶驗證 · 功能鍵 USER-TEST);tally PARTIAL +1;其餘一字不動"
+ "why_v0195": "v0194 已發布 → 出新版;+VDF-REQ018(操作員 2026-10-12 兩則原話:VDF 引擎加速器 / 網路工具 · PS 加速模塊 · 清單引擎先跑 → 3~5 流程並行 · CPU / DRAM / TEMP 上限 · 工具檢視 · 跳出 U/I 帶驗證 · 功能鍵 USER-TEST);tally PARTIAL +1;其餘一字不動;homes 只列 registry 冊(VDF 兩冊改記在 evidence;X-REQ 歸屬規則)"
 }
