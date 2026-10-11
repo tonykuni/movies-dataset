@@ -1,8 +1,8 @@
 # VIA 健康矩陣卡
 
 ```
-[計] vcgc health matrix · 總燈 RED · 2026-10-11T18:22:33 · VCGC=YELLOW · VDF=YELLOW · VRN=RED
-  [YEL] VCGC 檔族 1158(紅 0 黃 74 綠 1084)· 有號 1148 · 登記 1135 · 橋 1153 · 網橋缺 0 · 語意 33 · 功 16593/16645 · 表 69/69 · 冊 387 · lib 缺 0
+[計] vcgc health matrix · 總燈 RED · 2026-10-11T19:34:53 · VCGC=YELLOW · VDF=YELLOW · VRN=RED
+  [YEL] VCGC 檔族 1158(紅 0 黃 66 綠 1092)· 有號 1157 · 登記 1135 · 橋 1153 · 網橋缺 0 · 語意 33 · 功 16593/16645 · 表 69/69 · 冊 387 · lib 缺 0
     [YEL] VCGC SUP_MDL737_SuperAccelModule · 版號有洞(100–110 共 5)
     [YEL] VCGC VIA_EnvManager_shae9aeb598 · 副本檔名((1)/_sha)→ DORMANT 候選
     [YEL] VCGC VIA_Panorama_AST_RuntimeInjector_sha63cefe28 · 副本檔名((1)/_sha)→ DORMANT 候選
