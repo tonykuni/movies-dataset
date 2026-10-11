@@ -57,6 +57,8 @@
 
 登錄:交接案 `vdf_fetch_groups_v0107` · `vdf_fetch_groups_usertest`(+ v0100 / v0101 / v0103 三案相依 +v0107)· 站 `C-vdf_fetch_groups_v0107` · `C-vdf_fetch_groups_usertest`(盤點冊 v0169)· VDF-REQ018(需求冊 v0195)· 編號批(v0107 · 兩冊)。
 
+收尾量測(容器,2026-10-12):registry-sync 新 36 · 變 8;編號批 +49(FNC 43 · ENV 2 · MDL 1 · REQ 1 · SSOT 2)· audit 遺失 0 · 改身分 0 · 重號 0(冊內不一致 1 · FPSTALE 為既有黃);sdd check YELLOW(X-REQ 綠;X-LOCK / X-REQ-OPEN 黃照舊);交接案 vdf_fetch_groups_v0107 · usertest · v0100 / v0101 / v0103 · vdf_activate · numbering ×4 · chain 全 rc 0 標記在;handoff check 回到同 5 紅(工作站 / VRN 的 CHANGED_CODE_WITHOUT_TEST);test --quick 站 7(綠 5 · 黃 2 · 紅 0)· 盤點 案 172/172 · 尾版 279 支 compile 錯 0 · 缺橋 0。
+
 ## 四、工作站一貼(操作員;v3)
 ```powershell
 cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
