@@ -22,8 +22,24 @@
 | 12 | VCGC | 工作站主控台印 `SyntaxWarning: invalid escape sequence` | 黃 | 79 處 docstring 帶反斜線沒用 r"""(MDL156 v0114 L3 `\*` · MDL273 v0102 L6 `\C` …);Python 3.12+ 編譯時警告,容器 3.11 不印;掃描器重剖「變更檔」時冒出 | — | 各檔第 3 行 docstring | 不就地改已發布檔;各家族下一版用 r""";本輪新尾版已照做 | 黃(工作站 registry-sync --apply 後不再重剖) | AI(各家族下一版) |
 | 13 | 三系統 | 健康矩陣「副本檔名 → DORMANT 候選」黃 · 版號有洞 | 黃 | `_sha` 存證副本是操作員 2026-10-10 裁定保留的;版號洞是歷史 | — | `CGC_MDL274_HealthMatrix` 語意判定 | 展現層可改「存證副本(裁定保留)」不計黃;本輪不擴 | 黃 | AI(下一輪) |
 
-## 二、事後全景(容器)
-(見本檔末「改後計數」;整輪 `test` 與健康矩陣在推送前重跑)
+## 二、事後全景(容器,修完第一輪再量一次)
+
+| 量尺 | 改前 | 改後 | 說明 |
+|---|---|---|---|
+| VCGC 全功能串測(整輪) | 252 站 · 紅 17 · 黃 15 · 綠 220 | 250 站 · 紅 10 · 黃 15 · 綠 225 | 清掉 V-val · P-ui_cmds · C-vdf_fetch_groups ×6;新紅 1 = E-number-audit(IMMUT 誤判交接收據 → MDL237 v0118,見 #14) |
+| 剩下的紅 | — | V-sdd · V-closeout(VRN X-NUM + 交接 5 紅)· V-systems(VRN logic 紅)· C-vrn_layout(reportlab)· C-first_page_engine · C-cov_vrn_firstpage_engine(sidecar)· C-vdf_akshare ×2(polars)· C-via_unified(pwsh)· E-number-audit(→ v0118) | 全屬 VRN / 環境 / 工作站,容器不代裝不代修 |
+| 交接檢查 | 紅 5 | 紅 5(同五支) | 本輪新案 / 改釘案 11 案全 rc 0 標記在:validation_ssot_v0101 · chain · vdf_fetch_groups ×6 · progress_journal · vdf_activate · numbering |
+| SDD check | X-NUM 紅 4 支 | X-NUM 紅 2 支(VRN) | X-LOCK 黃 6 · X-REQ-OPEN 黃 75 不變 |
+| 驗證 SSOT(val) | 紅 rc 1 | 綠 rc 0(交叉代碼 27) | 冊 v0101 + MDL246 v0101 |
+| 編號稽核 | 黃(FPSTALE 529) | 列 115859 → 116263(+404)· 遺失 0 · 改身分 0 · 重號 0 · FPSTALE 529 | IMMUT 6 → 0(v0118) |
+| 健康矩陣 | VCGC 黃 · VDF 黃 · VRN 紅 | 同 | VRN 紅 = pdfplumber 缺(容器);VCGC 有號 1148 → 全部 CGC 尾版有號 |
+| SSOT 全景 | 黃 rc 2 | 黃 rc 2(探針 7,沿用 5) | 上下單向 VCGC → VDF → VRN → SUP 無新發現 |
+
+| # | 系統 | 項 | 改前 | 根因 | 類 | 錨點 | 修法 | 改後 | 歸屬 |
+|---|---|---|---|---|---|---|---|---|---|
+| 14 | VCGC | 串測 E-number-audit(事後新紅) | 紅 | 六份交接收據 `docs/handoff/evidence/vdf_fetch_groups_v010x.json` 重跑後改了;v0109 IMMUT 把「檔名 *_vNNNN.json + 同夾 ≥ 2 版」當已發布版號冊,收據的 _vNNNN 其實是案名,依設計覆寫(MDL140 先按 SHA 封存) | 順序(修規則 → 重編 → 重跑案) | `CGC_MDL237_NumberingSystem_v0109.immut_violations` L316 | MDL237 **v0118**:IMMUT 具名豁免 `docs/handoff/evidence/`,其餘規則不動;5/5 · v0117 7/7 | 黃(FPSTALE 529 照舊) | AI |
+
+鎖定與記錄:成功版都釘在交接案(釘版 + UTC 時間 + 原因)與編號冊(版號 + 時間);SDD 燈鎖(`lock --apply`)被交接閘擋(容器 5 紅屬工作站 / VRN),在工作站一貼裡做。
 
 ## 三、工作站一貼(操作員)
 ```powershell
