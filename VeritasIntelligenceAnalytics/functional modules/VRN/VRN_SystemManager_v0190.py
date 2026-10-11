@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VRN_SystemManager v0152 — 薄尾:ui 套三系統統一版面(政策 L121;承 L120 三系統對等獨立)
+"""VRN_SystemManager v0190 — 薄尾:ui 套三系統統一版面(政策 L121;承 L120 三系統對等獨立)
+
+改號紀錄(2026-10-11):本檔原為 main 上的 VRN_SystemManager_v0152(PR #520),內容照舊。工作站另有一條只在本機產生的
+VRN 鏈 v0152–v0189(備份分支 via-local-backup-20261011),其 v0152 與本檔同號不同內容。操作員「你建議」→ 採甲:
+工作站鏈號碼不動,本檔改號 v0190 疊在最上層,三系統版面最後套;不同來源不因值相同合併編號。
+舊旗標 VIA_FROM_VCGC 照 L120 ⑥ 甲保留原意(經任一系統自己的 manager / 啟動器啟動);本版行為照前版鏈(v0151 起 setdefault)。
 
 操作員令(2026-10-10):「三個系統統一設計自適應式對任何模板但功能獨立只有左面板可折疊下方有通往各系統的GATE」。
   ui  照前版鏈產出 VIA_Reports/vrn/VRN_UI_latest.html(含 v0151 主作業卡),再由本版就地套版面:
@@ -73,16 +78,16 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 VIA_ROOT = HERE.parents[1]
 _STEM = "VRN_SystemManager"
-TAG = "v0152"
+TAG = "v0190"
 SELF_ID = "VRN"
 
 
-def _vnum_v0152(path) -> int:
+def _vnum_v0190(path) -> int:
     m = re.search(r"_v(\d{4})$", Path(path).stem)
     return int(m.group(1)) if m else -1
 
 
-def _load_v0152(path: Path, name: str):
+def _load_v0190(path: Path, name: str):
     if name not in sys.modules:
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
@@ -91,8 +96,8 @@ def _load_v0152(path: Path, name: str):
     return sys.modules[name]
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0152(p) < _vnum_v0152(__file__)), key=_vnum_v0152)
-PRIOR = _load_v0152(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0190(p) < _vnum_v0190(__file__)), key=_vnum_v0190)
+PRIOR = _load_v0190(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
 
 
 def __getattr__(name):
@@ -127,7 +132,7 @@ def three_book(path=None, root=None) -> dict:
     """→ 三系統版面冊(尾版)。讀不到 / 壞掉 / 少系統 → 內建預設,並寫明原因。"""
     root = Path(root or VIA_ROOT)
     if path is None:
-        hits = sorted((root / "supportive modules" / "ui_support").glob("VIA_UI_ThreeSystems_SSOT_v*.json"), key=_vnum_v0152)
+        hits = sorted((root / "supportive modules" / "ui_support").glob("VIA_UI_ThreeSystems_SSOT_v*.json"), key=_vnum_v0190)
         path = hits[-1] if hits else None
     why = "找不到 VIA_UI_ThreeSystems_SSOT_v*.json"
     if path is not None:
@@ -442,7 +447,7 @@ def selftest() -> int:
             else:
                 os.environ[k] = v
         shutil.rmtree(td, ignore_errors=True)
-    print("[計] %s_v0152 自測 %d/%d · %s" % (_STEM, p, p + f, "PASS" if f == 0 else "FAIL"))
+    print("[計] %s_v0190 自測 %d/%d · %s" % (_STEM, p, p + f, "PASS" if f == 0 else "FAIL"))
     return 0 if f == 0 else 1
 
 
