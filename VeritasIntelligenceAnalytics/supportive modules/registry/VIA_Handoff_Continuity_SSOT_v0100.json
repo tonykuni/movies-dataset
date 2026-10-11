@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-11T20:00:29+00:00",
+ "updated_at": "2026-10-11T21:48:23+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1685,6 +1685,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
     "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
@@ -1718,6 +1719,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
@@ -1807,6 +1809,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
@@ -2646,6 +2649,41 @@
    ],
    "timeout_seconds": 600,
    "registered_at": "2026-10-11T18:55:50+00:00"
+  },
+  "vdf_fetch_groups_v0107": {
+   "argv": [
+    "VDF_MDL012_FetchGroups_v0107",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL012_FetchGroups v0107 本版 9/9 · 前版鏈 PASS · 合計 PASS",
+   "scope": "MDL012 v0107 run:清單引擎 009(台股全市場清單)· 010(主動式 ETF 清單)先跑(紅就停 rc 5)→ 其餘族群依 DuckDB 庫 / 同引擎 / 相依分道,3~5 流程同時跑(--jobs,auto = CPU − 1)· 起每支前 CPU / DRAM / TEMP 守門 · 子行程 TEMP 為主(MDL262 規則)· 直接從 MDL008 尾版起(執行緒安全)· fg_runs + PARALLEL_latest.json;ui 多頁「並行擷取 · USER-TEST」與並行 / USER-TEST 鈕;前版鏈 v0106 → v0100 照跑(VDF-REQ018)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+    "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+    "supportive modules/registry/CGC_MDL262_DuckTempHook_v*.py"
+   ],
+   "timeout_seconds": 1200,
+   "registered_at": "2026-10-11T21:48:23+00:00"
+  },
+  "vdf_fetch_groups_usertest": {
+   "argv": [
+    "VDF_MDL012_FetchGroups",
+    "usertest"
+   ],
+   "success_marker": "紅 0 · 驗法 browser",
+   "scope": "MDL012 v0107 usertest:建頁(報告夾,不碰已追蹤正式頁)→ 靜態驗(功能鍵有分支 · 頁籤有頁 · 快照 · id 唯一)→ 瀏覽器 headless 逐鍵實測(Chromium / Chrome / Edge;找不到照實紅)→ USERTEST_latest.json 掛頁;標記要「紅 0 · 驗法 browser」(VDF-REQ018)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-10-11T21:48:23+00:00"
   }
  },
  "work_items": [
@@ -5460,10 +5498,13 @@
   {
    "id": "VCGC-REQ180:vrn_xnum",
    "requirement": "VCGC-REQ180",
-   "state": "BLOCKED",
+   "state": "VERIFIED",
    "owner": "VRN / 操作員",
-   "reason": "SDD X-NUM 列 VRN_ENG086_FirstPageLogicBridge_v0120 · VRN_SystemManager_v0151(容器;工作站是 v0192)沒編號;L120 三系統對等,VCGC 不動 VRN 的號(操作員 2026-10-10「不改他系統的正本 / 冊 / 號 / 檔」)",
-   "next": "VRN 自己編號(工作站:via-vrn 或操作員授權 VCGC run CGC_MDL237_NumberingSystem --apply --scope 那兩支);編完 X-NUM 綠、V-sdd 轉黃(X-LOCK / X-REQ-OPEN 仍黃)"
+   "reason": "SDD X-NUM 列 VRN_ENG086_FirstPageLogicBridge_v0120 · VRN_SystemManager_v0151(容器;工作站是 v0192)沒編號;L120 三系統對等,VCGC 不動 VRN 的號(操作員 2026-10-10「不改他系統的正本 / 冊 / 號 / 檔」) → 操作員 2026-10-12「全副同意授權自行最佳化處理」:VCGC 代編 VRN 兩支(VRN_ENG086_FirstPageLogicBridge_v0120 · VRN_SystemManager_v0151;commit 18ab0a67)· audit 遺失 0 · 改身分 0 · 重號 0 · sdd check X-NUM 綠",
+   "next": "工作站 VRN v0194 自己的尾版編號(先提交再 --apply --scope,正斜線路徑)",
+   "case": "numbering",
+   "receipt": "docs/handoff/evidence/numbering.json",
+   "resolved": "2026-10-11T21:48:23+00:00"
   },
   {
    "id": "VCGC-REQ180:handoff_env_cases",
@@ -5499,6 +5540,50 @@
    "case": "numbering",
    "receipt": "docs/handoff/evidence/numbering.json",
    "resolved": "2026-10-11T20:00:29+00:00"
+  },
+  {
+   "id": "VDF-REQ018:fetch_groups_parallel",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "VDF_MDL012_FetchGroups v0107:清單引擎先跑 → 分道並行(3~5 流程)· CPU / DRAM / TEMP 守門 · TEMP 為主;容器自測 9/9 · 前版鏈 PASS;fixture 煙霧跑(暫存家,TW_INDEX + TW_ACTIVE_ETF):010 清單先跑 rc 0 → 兩道同時起、目錄 fg_runs 寫入 ok(引擎本身 fixture 下照自己的閘回 rc 2/3/4)",
+   "next": "handoff test vdf_fetch_groups_v0107 實跑轉 VERIFIED",
+   "case": "vdf_fetch_groups_v0107",
+   "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0107.json"
+  },
+  {
+   "id": "VDF-REQ018:usertest_browser",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "頁功能鍵 USER-TEST:容器 Chromium headless 逐鍵點 79 綠 0 紅(功能鈕 · 收尾鈕 · 頁籤 · 全選 / 清除 · 快照);結果掛頁「並行擷取 · USER-TEST」",
+   "next": "handoff test vdf_fetch_groups_usertest 實跑轉 VERIFIED",
+   "case": "vdf_fetch_groups_usertest",
+   "receipt": "docs/handoff/evidence/vdf_fetch_groups_usertest.json"
+  },
+  {
+   "id": "VDF-REQ018:bridges_ps_accel",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI / 操作員(工作站對照)",
+   "reason": "容器稽核(乾跑,只讀):NET 橋 functional modules/VDF 掃 524 · 已掛 137 · 缺 0 · 覆蓋 100%;ACCEL 橋計畫 0;PS 入口(Invoke-VIA-VdfFetch-v0108 · Invoke-VDF-FetchFill-v0100 · Invoke-VIA-RealTest-v0106 · Invoke-VDF-FetchGroupsUI-v0100 …)已帶 Invoke-VIACeleritasScoped / Invoke-VIAPython;沒有缺可補(.ps1 不改,L70)",
+   "next": "工作站 via-vcgc run CGC_MDL124_BridgeSweeper 乾跑對照(應仍缺 0)後轉 VERIFIED(用 sweeper 收據)"
+  },
+  {
+   "id": "VDF-REQ018:live_parallel_run",
+   "requirement": "VDF-REQ018",
+   "state": "BLOCKED",
+   "owner": "操作員(雙閘 · 工作站)",
+   "reason": "live 擷取要 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT(操作員的手,AI 永不代設);容器無閘,只能 fixture 煙霧",
+   "next": "工作站一貼:run --family vdf VDF_SystemManager universe → run --family vdf VDF_MDL012_FetchGroups run --groups ALL --jobs 4 --mode live → usertest → ui(見 docs/handoff/ai/VIA_ThreeSystems_FixRound_20261012.md 三)"
+  },
+  {
+   "id": "VDF-REQ018:env_tools",
+   "requirement": "VDF-REQ018",
+   "state": "BLOCKED",
+   "owner": "操作員(環境)",
+   "reason": "VCGC 檢視沒裝的工具(容器):pdftoppm 缺(CGC_MDL273 ext 出 winget 計畫 oschwartz10612.Poppler)· pdfplumber 缺(VRN 首頁文字)· polars / reportlab / pwsh 缺(容器專屬);不裝套件(操作員令)",
+   "next": "工作站:run CGC_MDL273_EnvToolAudit ext(--apply 要本視窗 VIA_NET_CONSENT=YES)· run CGC_MDL240_EnvManager 對照;裝完轉 VERIFIED"
   }
  ]
 }

@@ -41,24 +41,54 @@
 
 鎖定與記錄:成功版都釘在交接案(釘版 + UTC 時間 + 原因)與編號冊(版號 + 時間);SDD 燈鎖(`lock --apply`)被交接閘擋(容器 5 紅屬工作站 / VRN),在工作站一貼裡做。
 
-## 三、工作站一貼(操作員)
+## 三、R71 VDF 並行擷取 · 頁 USER-TEST(VDF-REQ018;容器,2026-10-12)
+
+操作員令原話入冊 VDF-REQ018(`VIA_Requirements_SSOT_v0195.json`)。做了什麼、量到什麼:
+
+| # | 項 | 做法 | 容器實測 | 歸屬 |
+|---|---|---|---|---|
+| 15 | VDF 引擎全帶版號加速器 / 網路工具 | 稽核(乾跑,只讀):`run CGC_MDL124_BridgeSweeper`(NET 根 functional modules/VDF · ACCEL 根) | NET 掃 524 · 已掛 137 · 缺 0 · 覆蓋 100%;ACCEL 計畫 0 | 齊,無缺可補 |
+| 16 | PS 加速模塊 | PS 入口(Invoke-VIA-VdfFetch-v0108 · Invoke-VDF-FetchFill-v0100 · Invoke-VIA-RealTest-v0106 · Invoke-VDF-FetchGroupsUI-v0100 …)查 Invoke-VIACeleritasScoped / Invoke-VIAPython | 已帶;`.ps1` 不改(L70) | 齊 |
+| 17 | 清單引擎先跑 | 擷取冊 `009` VDF_MDL009_TWStockList(台股全市場清單,自動更新)· `010` VDF_MDL010_ActiveETFList(主動式 ETF 清單);冊上每支擷取引擎都 `needs` 這兩支 → `VDF_MDL012_FetchGroups_v0107 run` 先跑兩支,紅就停(rc 5) | fixture 煙霧(暫存家):010 rc 0 → 才起道 | AI |
+| 18 | 3~5 流程並行 · CPU / DRAM / TEMP 上限 | v0107:族群依 DuckDB 庫 / 同引擎 / 相依分道(真冊:vdf_tw_market 4 族群一道 · vake 4 族群一道一列 011d · ETF · 指數 · 全球 · parquet)· `--jobs 1~5`(auto = CPU − 1)· 起每支前量 CPU% / DRAM 可用 / TEMP 可用(psutil,退 stdlib),超限等(`--cpu-max 85 --mem-min-gb 2 --temp-min-gb 5 --govern-wait 600`)· 子行程 `VIA_TEMP_ROOT` / `VIA_DUCKDB_TEMP_DIR` / `VIA_DUCKDB_MEM_PCT = 50 ÷ 流程`(MDL262 規則,TEMP 為主)· 子行程直接從 MDL008 尾版起(`run_v0107` 的 `__file__` 換裝不是執行緒安全)· 一筆 fg_runs + `_fetch_groups/PARALLEL_latest.json` | 自測 9/9 · 前版鏈 v0106 → v0100 PASS(六案標記照印);fixture 煙霧:兩道同時起、目錄 ok,引擎 fixture 下照自己的閘回 rc 2/3/4(不是本版的錯) | AI;live 要雙閘(工作站) |
+| 19 | 跳出 HTML U/I 帶驗證結果 · 功能鍵 USER-TEST | 頁多一頁「並行擷取 · USER-TEST」+ 左面板「並行流程」「並行跑族群」「USER-TEST」鈕;`usertest` 動詞:建頁(報告夾)→ 靜態驗 → Chromium / Chrome / Edge headless 逐鍵點、讀 #cmd、切頁籤、全選 / 清除 → 結果掛頁 | Chromium headless:79 綠 · 0 紅(功能鈕 11 · 收尾鈕 6 · 新鈕 2 · 頁籤 17 · 全選 / 清除 · 快照);正式頁已重建(含結果) | AI |
+| 20 | VCGC 檢視沒裝的工具 | `run CGC_MDL273_EnvToolAudit ext` · `run CGC_MDL240_EnvManager` | pdftoppm 缺 → winget 計畫(oschwartz10612.Poppler;`ext --apply` 要本視窗 VIA_NET_CONSENT=YES)· pdfplumber 缺(VRN 首頁文字)· polars / reportlab / pwsh 缺(容器專屬);不裝套件 | 操作員(環境) |
+| 21 | BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT / 1ST INFO AREA 書實測 | VRN 首頁四區 = VRN 自己(L120);工作站 `via-realtest` | 容器無樣本、無 pdfplumber | VRN / 工作站 |
+
+登錄:交接案 `vdf_fetch_groups_v0107` · `vdf_fetch_groups_usertest`(+ v0100 / v0101 / v0103 三案相依 +v0107)· 站 `C-vdf_fetch_groups_v0107` · `C-vdf_fetch_groups_usertest`(盤點冊 v0169)· VDF-REQ018(需求冊 v0195)· 編號批(v0107 · 兩冊)。
+
+## 四、工作站一貼(操作員;v3)
 ```powershell
 cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
 git fetch origin claude/kind-cannon-pti15g
-git merge --ff-only origin/claude/kind-cannon-pti15g
+git merge --ff-only origin/claude/kind-cannon-pti15g      # 印出結果;不是 Fast-forward / Already up to date 就先停
 cd VeritasIntelligenceAnalytics
 $V = (Get-ChildItem "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName
-$env:VIA_FROM_VCGC = "YES"
-# 1 交接五案(容器過不了的:polars · pwsh · sidecar · VRN 暫緩的唯讀自測)
-foreach ($c in @("qg_onebridge","via_unified","first_page_engine","cov_vrn_firstpage_engine","vrn_ssot_consistency")) { python $V handoff test $c }
+$env:VIA_FROM_VCGC = "YES"; Remove-Item Env:VIA_NO_OPEN -ErrorAction SilentlyContinue
+# 0 冊同步(工作站本機 VRN 檔登錄;已授權)→ sdd
+python $V registry-sync --apply
+python $V sdd check
+# 1 工具:沒裝的列出(pdftoppm → winget 計畫;--apply 要本視窗 $env:VIA_NET_CONSENT='YES',操作員的手)
+python $V run CGC_MDL273_EnvToolAudit ext
+python $V run CGC_MDL240_EnvManager
+python $V run CGC_MDL262_DuckTempHook status
+# 2 VDF:清單引擎先跑 → 分道並行(live 要雙閘,本視窗:$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES')
+python $V run --family vdf VDF_SystemManager universe
+python $V run --family vdf VDF_MDL012_FetchGroups run --groups ALL --jobs 4 --mode live
+# 3 頁:功能鍵實測 → 重建正式頁(結果掛頁)→ 跳出
+python $V run --family vdf VDF_MDL012_FetchGroups usertest
+python $V run --family vdf VDF_MDL012_FetchGroups ui
+python $V run --family vdf VDF_SystemManager ui
+via-groups-ui
+# 4 交接 → 快照 → 真跑 → 鎖成功版
+foreach ($c in @("vdf_fetch_groups_v0107","vdf_fetch_groups_usertest","qg_onebridge","via_unified","first_page_engine","cov_vrn_firstpage_engine","vrn_ssot_consistency")) { python $V handoff test $c }
 python $V handoff check
-# 2 交接綠才做:快照 → 鎖成功版(燈鎖冊下一版)
 python $V handoff checkpoint
+via-realtest
 python $V run CGC_MDL245_SDDValidator real
 python $V run CGC_MDL245_SDDValidator lock --apply
-# 3 跳出 U/I
+# 5 VCGC 頁
 python $V run CGC_MDL274_HealthMatrix matrix
-python $V run --family vdf VDF_SystemManager ui
 python $V run CGC_MDL261_UIEngine build --open
 ```
-VRN 兩支編號(VRN 自己決定;若授權 VCGC):`python $V run CGC_MDL237_NumberingSystem --apply --scope "functional modules/VRN/VRN_ENG086_FirstPageLogicBridge_v0120.py" "functional modules/VRN/VRN_SystemManager_v0192.py"` → `audit`。
+VRN 自己的尾版(工作站 v0194)編號:先提交那支,再 `python $V run CGC_MDL237_NumberingSystem --apply --scope "functional modules/VRN/VRN_SystemManager_v0194.py"` → `audit`(正斜線路徑;絕對路徑不算)。
