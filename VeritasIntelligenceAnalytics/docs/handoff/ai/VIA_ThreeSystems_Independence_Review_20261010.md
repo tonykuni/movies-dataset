@@ -34,7 +34,7 @@
 
 | 項 | 狀態 | 新版 / 證據 |
 |---|---|---|
-| 三系統 U/I 照 L121 | 已做 | 版面冊 `supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json` · VCGC 操作台 `CGC_MDL261_UIEngine_v0104`(10/10)· `VDF_SystemManager_v0152` · `VRN_SystemManager_v0190`(原 v0152,與工作站本地 v0152–v0189 撞號 → 依裁定甲改號;各 11/11,前版鏈全跑)· 交接案 ui_engine_v0104 / vdf_manager_v0152 / vrn_manager_v0190 rc 0 |
+| 三系統 U/I 照 L121 | VCGC · VDF 已做;VRN 交 VRN 自己的 manager | 版面冊 `supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json` · VCGC 操作台 `CGC_MDL261_UIEngine_v0104`(10/10)· `VDF_SystemManager_v0152` (各 11/11,前版鏈全跑)· 交接案 ui_engine_v0104 / vdf_manager_v0152 rc 0 · **VRN 部分撤回**:VCGC 側寫的 `VRN_SystemManager` L121 尾版先 v0152、改號 v0190,兩次都和工作站 VRN 自己的鏈撞號(工作站鏈已到 v0190);VCGC 側佔用 VRN 任何號碼不是撞號就是變成工作站 VRN 的尾版(L120 不許)→ 撤回,交 VRN 自己的 manager 下一版照版面冊套用(可照抄 `VDF_SystemManager_v0152` 的 `l121_patch`);VCGC-REQ177 → PARTIAL |
 | 工作流冊三方對等 | 已做 | VCGC v0127 · VDF v0105 · VRN v0106 · Hub v0103(`three_peers_mutual_monitor` + peers + 互相只讀監控;sequence 四段照舊 = VCGC 編排一輪)· SDD 驗證器 `CGC_MDL245_SDDValidator_v0106`(X-PEER · X-PEER-TEXT) |
 | 程式閘 `VIA_FROM_VCGC` | 甲(只改定義) | L120 ⑥,零程式變更 |
 | 速度修正 | BLOCKED(VCGC-REQ175:speed) | 操作員 2026-10-11「不要擴大範圍已成功的功能內完善收尾」→ 暫停;工作站基準留冊:fetch test 524 s · engine matrix 688 s · rebuild 151 s |
