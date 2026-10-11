@@ -5151,6 +5151,22 @@
       "next": "handoff test sdd_validator_v0106 實跑轉 VERIFIED",
       "case": "sdd_validator_v0106",
       "receipt": "docs/handoff/evidence/sdd_validator_v0106.json"
+    },
+    {
+      "id": "VCGC-REQ175:speed",
+      "requirement": "VCGC-REQ175",
+      "state": "BLOCKED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-11「不要擴大範圍已成功的功能內完善收尾」→ 速度修正(操作員原排第三)本批不開工。工作站實測基準(Start-VIA-OperatorConsole-v0100):② VDF fetch test 524.1s · ⑤ db check 36.3s · ⑤ engine matrix 688s · ⑥ 重建操作台 151.1s,合計約 23 分鐘;容器同動作 vdf_fetch_integration 58s。已知根因候選:CGC_MDL253 重複 AST 解析(停車版 v0103 快取反而慢,未入倉)· ACCEL-USE 6/557;工作站另有 SyntaxWarning(VDF_MDL011 v0100 第 11 行 '\\V' 等)每次解析都印",
+      "next": "操作員重新放行後:先以本基準重量,再出 Start-VIA-OperatorConsole-v0101(L70 已許可)與 MDL253 新版;不在本批"
+    },
+    {
+      "id": "VCGC-REQ177:vrn_v0152_collision",
+      "requirement": "VCGC-REQ177",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "工作站備份分支 origin/via-local-backup-20261011(1 提交 · 109 檔)有只在工作站產生的 VRN 鏈 VRN_SystemManager v0152–v0189 與約 25 支 VRN 檔;其 v0152(尺量對)與 main 的 v0152(L121 三系統版面)同號不同內容 → 工作站 pull main 被擋。不同來源不得因值相同合併編號",
+      "next": "操作員裁:甲 = 工作站 VRN 鏈號碼不動,L121 版面改出 v0190 疊在 v0189 上(動 1 支);乙 = main 為正,工作站鏈順延一號(動 38 支)。裁定前不併、不刪任何一邊"
     }
   ]
 }
