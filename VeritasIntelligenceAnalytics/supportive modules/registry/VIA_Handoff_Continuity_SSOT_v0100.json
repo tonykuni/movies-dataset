@@ -2491,6 +2491,49 @@
         "supportive modules/registry/VIA_Workflow_VRN_SSOT_v0106.json"
       ],
       "timeout_seconds": 1500
+    },
+    "vdf_manager_v0153": {
+      "argv": [
+        "VDF_SystemManager_v0153",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0153 自測 11/11 · PASS",
+      "scope": "VDF_SystemManager v0153 字級套件:四級字 · 兩種字重 · 一種主字體 · 按鈕輸入框繼承字體 · 短欄不換行 · 寬表橫捲 · 左面板表兩行一列 · 日期框 YYYY-MM-DD + 日曆鈕 · 閘戳 YYYY-MM-DD HH:MM · 只動 VDF 自己的頁 · 冪等 · 真跑 ui · 前版鏈全跑(VCGC-REQ179)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0153.py",
+        "functional modules/VDF/VDF_SystemManager_v0152.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0101.json",
+        "supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 1500
+    },
+    "ui_engine_v0105": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0105",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0105 本版 7/7 · PASS",
+      "scope": "CGC_MDL261 v0105 VCGC 操作台字級套件(同冊同規則)· build 先不開 → 套件 → 要開才開 · 閘戳 YYYY-MM-DD HH:MM(範本換段一處)· 前版 v0104 鏈全跑(VCGC-REQ179)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0105.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0104.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 900
+    },
+    "health_matrix_v0113": {
+      "argv": [
+        "CGC_MDL274_HealthMatrix_v0113",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL274_HealthMatrix v0113 本版 7/7 · PASS",
+      "scope": "CGC_MDL274 v0113 健康矩陣頁(VDF 頁「健康」頁籤)字級套件 · matrix / ui 先不開 → 套件 → 要開才開 · 只動 VCGC 健康矩陣夾 · 只收 VCGC 呼叫 · 前版 v0112 自測(VCGC-REQ179)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0113.py",
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0112.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0101.json"
+      ],
+      "timeout_seconds": 1500
     }
   },
   "work_items": [
@@ -5170,6 +5213,52 @@
       "owner": "VRN(工作站 VRN manager)/ 操作員",
       "reason": "工作站備份分支 origin/via-local-backup-20261011(1 提交 · 109 檔)有只在工作站產生的 VRN 鏈 VRN_SystemManager v0152–v0189 與約 25 支 VRN 檔;其 v0152(尺量對)與 main 的 v0152(L121 三系統版面)同號不同內容 → 工作站 pull main 被擋。不同來源不得因值相同合併編號。連帶:VCGC 串測站 V-probe 紅 —— 主控台 probe 動詞釘子系統探針 v0100(只看尾版檔內有無 VIA_FROM_VCGC 字樣),main 的 VRN v0152 沒寫這幾個字(行為照 v0151 setdefault 不變;探針 v0101 沿鏈判 GREEN);工作站鏈 v0152 / v0170 / v0189 都帶字樣。裁定:操作員 2026-10-11「你建議」→ AI 建議甲(最小):main 的 L121 VRN 尾版 v0152 改號 v0190,工作站鏈 v0152–v0189 號碼不動、不併進 main(VRN 自己的工作由 VRN manager 送上來) → 已驗:2026-10-11T01:49:37+00:00 vrn_manager_v0190 rc 0 · VCGC probe 不再報 VRN 沒記號(unmarked [] · missing []) → 2026-10-11 轉 BLOCKED(撤回):工作站 2026-10-11 合併分支被擋:工作站 VRN 自己的鏈已到 v0190(本機未追蹤,比備份分支 v0189 新),與 VCGC 側的 L121 VRN 尾版 v0190 再撞號;VCGC 側佔用 VRN_SystemManager 任何號碼,不是撞號就是變成工作站 VRN 的尾版(L120 互不影響不許)→ 撤回 VCGC 側 VRN 尾版(main 的 v0152 與本分支 v0190 都不留),L121 VRN 版面交 VRN 自己的 manager 下一版套用:照 supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json,可照抄 VDF_SystemManager_v0152 的 l121_patch(同一套);撤回前的草稿在 git 提交 ade21518(functional modules/VRN/VRN_SystemManager_v0190.py);交接案 vrn_manager_v0190 移除,舊收據 docs/handoff/evidence/vrn_manager_v0190.json 留作紀錄",
       "next": "VRN 自己的 manager 下一版照版面冊套 L121 後,由 VRN 自己登交接案轉 VERIFIED"
+    },
+    {
+      "id": "VCGC-REQ179:vdf_manager_v0153",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 vdf_manager_v0153(操作員 2026-10-11 字體 / 階層一致 · 左右面板整齊 · 日期一律 YYYY-MM-DD)",
+      "next": "handoff test vdf_manager_v0153 實跑轉 VERIFIED",
+      "case": "vdf_manager_v0153",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0153.json"
+    },
+    {
+      "id": "VCGC-REQ179:ui_engine_v0105",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 ui_engine_v0105(操作員 2026-10-11 字體 / 階層一致 · 左右面板整齊 · 日期一律 YYYY-MM-DD)",
+      "next": "handoff test ui_engine_v0105 實跑轉 VERIFIED",
+      "case": "ui_engine_v0105",
+      "receipt": "docs/handoff/evidence/ui_engine_v0105.json"
+    },
+    {
+      "id": "VCGC-REQ179:health_matrix_v0113",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "新交接案 health_matrix_v0113(操作員 2026-10-11 字體 / 階層一致 · 左右面板整齊 · 日期一律 YYYY-MM-DD)",
+      "next": "handoff test health_matrix_v0113 實跑轉 VERIFIED",
+      "case": "health_matrix_v0113",
+      "receipt": "docs/handoff/evidence/health_matrix_v0113.json"
+    },
+    {
+      "id": "VCGC-REQ179:vrn_typekit",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "VRN(工作站 VRN manager)",
+      "reason": "VRN 頁照同一本冊(VIA_UI_Template_SSOT 尾版)套字級套件與日期規則;VCGC 側不寫 VRN 的檔(L120;VRN 號碼由工作站 VRN 鏈持有)",
+      "next": "VRN 自己的 manager 下一版套用(可照抄 VDF_SystemManager_v0153 的字級套件段);套完由 VRN 自己登交接案"
+    },
+    {
+      "id": "VCGC-REQ179:rethink",
+      "requirement": "VCGC-REQ179",
+      "state": "PENDING",
+      "owner": "操作員 / AI",
+      "reason": "操作員「很多展現都要重新思考整理」:字級 / 版面 / 日期本批已統一;各頁內容取捨與排列順序(哪些卡片 / 欄位留、先後次序)是下一步",
+      "next": "操作員點名先整理哪幾頁(例:VDF 頁右側五頁籤 · 健康矩陣 · 全景頁)→ AI 出各頁新版"
     }
   ]
 }

@@ -1,0 +1,101 @@
+{
+ "schema": "VIA.UI.Template.SSOT.v1",
+ "version": "v0101",
+ "prior": "VIA_UI_Template_SSOT_v0100.json",
+ "status": "TEMPORARY_STANDARD",
+ "rule": "所有子系統 U/I 只用 var(--token);換設計模板 = 出新版冊改 tokens;燈四色(綠/黃/紅/灰)鎖定不隨模板變;history 只增;v0101 起字級 / 字重 / 字體也走 token(四級字 · 兩種字重 · 主字體一種 + 等寬只給指令與代碼)",
+ "tokens": {
+  "bg": "#ffffff",
+  "panel": "#f7f7f7",
+  "line": "#e0e0e0",
+  "txt": "#1f2937",
+  "dim": "#6b7280",
+  "acc": "#2563eb",
+  "head": "#111827",
+  "head-txt": "#ffffff",
+  "zebra": "#fafafa",
+  "font": "\"Microsoft JhengHei UI\",\"Microsoft JhengHei\",\"PingFang TC\",\"Noto Sans TC\",\"Noto Sans CJK TC\",\"Segoe UI\",sans-serif",
+  "mono": "Consolas,\"Cascadia Mono\",\"Noto Sans Mono\",\"DejaVu Sans Mono\",monospace",
+  "fs": "12px",
+  "radius": "8px",
+  "pad": "6px",
+  "lamp-green": "#16a34a",
+  "lamp-yellow": "#f59e0b",
+  "lamp-red": "#dc2626",
+  "lamp-gray": "#9ca3af",
+  "fs-title": "16px",
+  "fs-h": "13px",
+  "fs-note": "11px",
+  "lh": "1.45",
+  "w-normal": "400",
+  "w-bold": "700",
+  "date": "YYYY-MM-DD",
+  "datetime": "YYYY-MM-DD HH:MM"
+ },
+ "locked": [
+  "lamp-green",
+  "lamp-yellow",
+  "lamp-red",
+  "lamp-gray"
+ ],
+ "typography": {
+  "levels": {
+   "fs-title": "頁標題(h1)",
+   "fs-h": "段頭 / 卡片標題 / 表頭群組",
+   "fs": "內文 · 表格 · 按鈕 · 輸入框",
+   "fs-note": "註記 · 時間 · 路徑 · 說明小字"
+  },
+  "weights": "只用 w-normal(400)與 w-bold(700);600 以上一律算粗",
+  "snap": "頁面上任何字級吸到最近的一級(分界取相鄰兩級中點);字重吸到 400 / 700;字體只留 font(主)與 mono(只給 code / pre / kbd / samp / textarea / .cmd / .mono)",
+  "controls": "按鈕 · 輸入框 · 下拉 · 多行框繼承主字體(瀏覽器預設會換成系統字體,這是頁面字體不一致的主因)",
+  "opt_out": "body 加 data-via-typekit=\"off\" 不套(照實保留原頁)"
+ },
+ "auto_layout": {
+  "cell_nowrap_max_chars": 24,
+  "cell_long_max_ch": 48,
+  "wide_table_scroll": true,
+  "stack_side_tables_with_controls": true,
+  "side_selectors": "aside, .side",
+  "method": "純 CSS(Grid / Flex)+ 頁內一小段 JS(量字級 · 吸附 · 表格欄寬);不連網、不裝套件、不載外部函式庫",
+  "rules": [
+   "短欄(≤ cell_nowrap_max_chars 字)不換行:窄欄逐字換行會把整列撐高(VDF 全景頁實測每列 61px → 38px)",
+   "長欄限寬 cell_long_max_ch 字寬,超過才換行",
+   "表格比外框寬 → 外包一層橫捲(不擠欄)",
+   "左面板裡有輸入框 / 按鈕的表 → 每列改兩行(名稱一行;輸入框 + 按鈕一行),不再被擠成直排字或超出卡片",
+   "頁面之後才長出來的內容(JS 產頁)照樣吸附(MutationObserver,只處理新元素)"
+  ]
+ },
+ "adoption": {
+  "VCGC": [
+   "CGC_MDL261_UIEngine 尾版(操作台)",
+   "CGC_MDL274_HealthMatrix 尾版(健康矩陣頁)"
+  ],
+  "VDF": [
+   "VDF_SystemManager 尾版(VDF 頁 + VIA_Reports/vdf 底下 VDF 自己的頁)"
+  ],
+  "VRN": "VRN 自己的 manager 下一版照本冊套(L120:VCGC 側不寫 VRN 的檔)",
+  "pinned_v0100": "既有讀冊點(VDF_SystemManager v0144 · VRN_SystemManager v0143 · CGC_MDL274 v0105–v0112)釘 v0100 名字讀顏色;v0101 顏色一字不動,所以舊頁不變"
+ },
+ "history": [
+  {
+   "ts": "2026-10-11T10:00:00+00:00",
+   "version": "v0101",
+   "what": "+字級 token(fs-title 16 · fs-h 13 · fs 12 · fs-note 11 · lh 1.45 · w-normal 400 · w-bold 700)· font / mono 補中文與等寬後備字;+typography · auto_layout 兩節(只放資料);顏色與燈四色一字不動;+日期一律 YYYY-MM-DD(dates 節 · date / datetime token)",
+   "origin": "操作員 2026-10-11:「u/i請字體一致或階層一致姓  左右面板都凌亂」「很多展現都要重新思考整理」(附 HTML UI 佈局自動最佳化文:CSS Grid auto-fit/minmax · Flex wrap · 容器查詢 · 演算法排版) · 「日期規格一律用YYYY-MM-DD」"
+  }
+ ],
+ "created_at": "2026-10-06T22:10:22",
+ "origin": "操作員令 2026-10-06:未來自適應式會接上任何 U/I 設計模板顏色的暫時標準模板",
+ "ts": "2026-10-11T10:00:00+00:00",
+ "why_v0101": "v0100 已發布 → 出新版;操作員 2026-10-11:「u/i請字體一致或階層一致姓  左右面板都凌亂」「很多展現都要重新思考整理」(附 HTML UI 佈局自動最佳化文:CSS Grid auto-fit/minmax · Flex wrap · 容器查詢 · 演算法排版) → 容器實測 VDF 頁左面板 4 種字級 + Arial 混用(按鈕 / 輸入框不繼承字體)、右側各報告頁 5–6 種字級 3 種字體;加字級 token 與自動版面參數,三系統頁照同一份吸附。 另依操作員「日期規格一律用YYYY-MM-DD」加 dates 節:日期框 · 頁上文字 · 閘戳時間一律 YYYY-MM-DD。",
+ "dates": {
+  "format": "YYYY-MM-DD(日期時間 YYYY-MM-DD HH:MM)",
+  "rules": [
+   "日期框:瀏覽器的日期框依語系顯示(01/01/2015 · 2015/1/1),改成 YYYY-MM-DD 文字框 + 日曆鈕(滑鼠選日照用,L118);值一律存 YYYY-MM-DD,輸入錯紅框",
+   "頁上文字:2026/10/11 · 2026.10.11 · 2026年10月11日 · 2026-1-5 → YYYY-MM-DD(月 1–12 · 日 1–31 才改;年限 19xx / 20xx)",
+   "不動:指令 / 代碼(code · pre · kbd · samp · textarea · .cmd · .mono · 指令鈕)、檔名與代號裡的緊湊日期(例 20260928_050809)、ISO 時間戳(2026-10-11T09:16 本來就是 YYYY-MM-DD)",
+   "閘戳 / 頁首時間:YYYY-MM-DD HH:MM(不再只有 MM-DD)"
+  ],
+  "origin": "操作員 2026-10-11:「日期規格一律用YYYY-MM-DD」"
+ }
+}
