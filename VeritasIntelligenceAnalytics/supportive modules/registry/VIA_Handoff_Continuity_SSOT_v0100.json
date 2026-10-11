@@ -1932,9 +1932,10 @@
         "CGC_MDL156_VIAAcceleratorControl",
         "--selftest"
       ],
-      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0113 本版 5/5 · PASS",
-      "scope": "CGC_MDL156 v0112 25 加速器控制面:QuantGuard 單向宣告沿薄尾鏈 · TA-Lib 執法字樣不算使用 · 名冊補 supportive 側收容件(VCGC-REQ167)",
+      "success_marker": "[計] CGC_MDL156_VIAAcceleratorControl v0114 本版 6/6 · PASS",
+      "scope": "CGC_MDL156 v0112 25 加速器控制面:QuantGuard 單向宣告沿薄尾鏈 · TA-Lib 執法字樣不算使用 · 名冊補 supportive 側收容件· v0114 名冊補 /envs/ 第三方虛擬環境(工作站 envs/via_pdf_tools/Scripts 兩支 pip 指令檔)(VCGC-REQ167)",
       "dependencies": [
+        "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0114.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0113.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0112.py",
         "supportive modules/registry/CGC_MDL156_VIAAcceleratorControl_v0111.py",
@@ -1942,11 +1943,19 @@
       ],
       "timeout_seconds": 900,
       "repinned": {
-        "from": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
-        "to_version": "v0113",
-        "at": "2026-10-10T08:23:51+00:00",
-        "why": "v0113 tail (VRN intake named exemption) chains the v0112 selftest (8/8 still printed) and adds 5 own checks; marker moves to the tail so the new tail is under test; operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
-      }
+        "from": "[計] CGC_MDL156_VIAAcceleratorControl v0113 本版 5/5 · PASS",
+        "to_version": "v0114",
+        "at": "2026-10-11T03:20:00+00:00",
+        "why": "v0114 tail (third-party venv envs/ named exemption, workstation readiness FAIL missing=2 dumppdf.py / pdf2txt.py) chains the v0113 selftest (5/5 still printed) and adds its own ②b check; marker moves to the tail so the new tail is under test; operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+      },
+      "repinned_before": [
+        {
+          "from": "[計] CGC_MDL156_VIAAcceleratorControl v0112 本版 8/8 · PASS",
+          "to_version": "v0113",
+          "at": "2026-10-10T08:23:51+00:00",
+          "why": "v0113 tail (VRN intake named exemption) chains the v0112 selftest (8/8 still printed) and adds 5 own checks; marker moves to the tail so the new tail is under test; operator 2026-10-10 version-lock rule: pin to the successful version with version+time"
+        }
+      ]
     },
     "vrn_logic_add": {
       "argv": [
@@ -4786,6 +4795,16 @@
       "owner": "AI",
       "reason": "via_precheck 本輪新增 / 換版:交接案 accel_control → 已驗:2026-10-05T00:17:14+00:00 rc 0 · 標記見到",
       "next": "handoff test accel_control 實跑轉 VERIFIED",
+      "case": "accel_control",
+      "receipt": "docs/handoff/evidence/accel_control.json"
+    },
+    {
+      "id": "VCGC-REQ167:accel_envs_v0114",
+      "requirement": "VCGC-REQ167",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員工作站 2026-10-11「啟動VDF」① 準備度:加速器控制面 FAIL「every live tail .py carries the accelerator bridge」tails=1912 missing=2(envs/via_pdf_tools/Scripts/dumppdf.py · pdf2txt.py = pip 為 pdfminer 產生的指令檔,倉內追蹤 0 支、.gitignore **/envs/)→ CGC_MDL156 v0114 名冊補 /envs/(具名免驗,不注橋);容器重現:v0113 FAIL → v0114 PASS;precheck accel 站帶兩支假檔 GREEN 38/38 → 已驗:None rc 0 · 標記見到(v0114 本版 6/6)",
+      "next": "handoff test accel_control 實跑轉 VERIFIED;工作站合併後重跑 via-activate-vdf ① 確認",
       "case": "accel_control",
       "receipt": "docs/handoff/evidence/accel_control.json"
     },

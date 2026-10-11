@@ -34,10 +34,11 @@
 
 | 項 | 狀態 | 新版 / 證據 |
 |---|---|---|
-| 三系統 U/I 照 L121 | 已做 | 版面冊 `supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json` · VCGC 操作台 `CGC_MDL261_UIEngine_v0104`(10/10)· `VDF_SystemManager_v0152` · `VRN_SystemManager_v0152`(各 11/11,前版鏈全跑)· 交接案 ui_engine_v0104 / vdf_manager_v0152 / vrn_manager_v0152 rc 0 |
+| 三系統 U/I 照 L121 | 已做 | 版面冊 `supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json` · VCGC 操作台 `CGC_MDL261_UIEngine_v0104`(10/10)· `VDF_SystemManager_v0152` · `VRN_SystemManager_v0190`(原 v0152,與工作站本地 v0152–v0189 撞號 → 依裁定甲改號;各 11/11,前版鏈全跑)· 交接案 ui_engine_v0104 / vdf_manager_v0152 / vrn_manager_v0190 rc 0 |
 | 工作流冊三方對等 | 已做 | VCGC v0127 · VDF v0105 · VRN v0106 · Hub v0103(`three_peers_mutual_monitor` + peers + 互相只讀監控;sequence 四段照舊 = VCGC 編排一輪)· SDD 驗證器 `CGC_MDL245_SDDValidator_v0106`(X-PEER · X-PEER-TEXT) |
 | 程式閘 `VIA_FROM_VCGC` | 甲(只改定義) | L120 ⑥,零程式變更 |
-| 速度修正 | 待做 | 排第三 |
+| 速度修正 | BLOCKED(VCGC-REQ175:speed) | 操作員 2026-10-11「不要擴大範圍已成功的功能內完善收尾」→ 暫停;工作站基準留冊:fetch test 524 s · engine matrix 688 s · rebuild 151 s |
+| 工作站準備度 FAIL(envs/ 兩支 pip 指令檔缺橋) | 已修 | `CGC_MDL156_VIAAcceleratorControl_v0114`(名冊具名免驗 `/envs/`,6/6);容器重現 v0113 FAIL → v0114 PASS;交接案 accel_control rc 0 |
 
 下面是當初列給操作員選的原文(留作紀錄):
 
