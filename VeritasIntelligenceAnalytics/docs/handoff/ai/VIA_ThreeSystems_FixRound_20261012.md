@@ -161,3 +161,21 @@ python $V registry-sync --apply
 python $V run --family vdf VDF_SystemManager all     # 問參數頁跳出 → 在頁上按啟動 → 其餘自動 → 族群頁跳出
 ```
 跑完貼回視窗最後的 `[計] VDF_SystemManager_v0155 all · …` 那一行與 `VIA_Reports\vdf\ONE_LAUNCH_latest.json`;之後交接:`handoff test vdf_manager_v0155`、`vdf_fetch_groups_v0108`、`vdf_fetch_groups_usertest` 與工作站五案 → `handoff checkpoint` → `via-realtest` → `sdd real` → `lock --apply`。
+
+## 九、R74 短令 `activate_vdf`(VDF 前後端一鍵,從 HTML U/I 操作;VDF-REQ019;容器 2026-10-12)
+操作員令:「設立一個指令啟動VDF 短指令activate_vdf 啟動前後端系統介面 從html u/i操作」
+- `Register-VIA-Commands-v0276.ps1`(點源 v0275;v0275 以前一字不動;L70 這一次的許可):`function global:activate_vdf` + 別名 `activate-vdf` · `啟動VDF全部`;同名梭 `activate_vdf.cmd`(不設 VIA_NO_OPEN:頁要跳)。
+- 四段:① `CGC_MDL265_VdfVrnReadiness` 母系統監控(只提醒不擋;`-SkipCheck` 略過 · `-Repair` 修)② 啟動前改(下載夾 `VIA_UI_Input.json` → `CGC_MDL261_UIEngine import`;`--start / --add / --remove / --import` → `VDF_SystemManager activate`;沒 `-Apply` = 乾跑)③ `VDF_SystemManager all`(健康 → 啟動就緒 → 問參數頁[前端:頁上按啟動 → 11 步擷取 → 狀況頁] → 族群並行[後端] → 輸入清單 → USER-TEST → 族群頁 → 主頁 → 跳出族群頁)④ `CGC_MDL261_UIEngine build` → 跳出操作頁;收尾一行 `[activate_vdf] 燈 · 各步 rc · 報告 VIA_Reports\vdf\ONE_LAUNCH_latest.json`。
+- 旗標:`-SkipCheck · -Repair · -Apply · -NoAsk · -NoOpen · -Dry · --groups · --jobs · --mode · --skip · --home · --start · --add · --remove · --import`;雙閘永不代設。
+- 容器驗法(無 pwsh):PS 文字剖析問題 0(v0276 · 梭)· `CGC_MDL157 status`:冊上 208 支 via-* 短令原缺梭 23 支(含 via-activate-vdf · via-groups-ui)本輪補範本梭 → 全有梭 · 零釘死;剩「失門 via-activate-vdf 樣式取不出」「別名歧指 總檢→via-precheck/via-review」兩項是 v0274/v0275 既有(只攤開不代修)· `CGC_MDL265` 自測 10/10 · 交接案 `activate_vdf_v0276`(MDL157 自測:命令冊沿鏈讀到 v0276)。函式本體要工作站實跑。
+- 工作站(操作員的手):
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
+git fetch origin claude/kind-cannon-pti15g
+git merge --ff-only origin/claude/kind-cannon-pti15g
+cd VeritasIntelligenceAnalytics
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 或任何殼直打 activate_vdf(同名 .cmd 梭)
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'   # 要抓才開(本令永不代設)
+activate_vdf        # 問參數頁跳出 → 頁上按啟動 → 其餘自動 → 族群頁 + 操作頁跳出;只看計畫:activate_vdf -Dry -NoAsk
+```
+跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0276` · `tooling` → `handoff checkpoint`。

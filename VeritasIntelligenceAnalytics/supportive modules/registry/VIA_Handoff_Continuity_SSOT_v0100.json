@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-12T03:06:22+00:00",
+ "updated_at": "2026-10-12T03:51:31+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2726,6 +2726,22 @@
    ],
    "timeout_seconds": 1800,
    "registered_at": "2026-10-12T02:34:47+00:00"
+  },
+  "activate_vdf_v0276": {
+   "argv": [
+    "CGC_MDL157_VIAUniqueEntryControl",
+    "--selftest"
+   ],
+   "success_marker": "[OK] 撞號以編號系統唯一碼為準:同號群組每支有碼 = 不算撞號;沒碼 = 撞號",
+   "scope": "短令 activate_vdf(VDF-REQ019):Register-VIA-Commands-v0276 尾版 function global:activate_vdf(別名 activate-vdf · 啟動VDF全部)+ 同名梭 activate_vdf.cmd;CGC_MDL157 自測 = 命令冊沿 dot-source 鏈讀(尾版 v0276 → v0275 …)· 尾版拆掉的函式不算 · 鏈防環 · 撞號以編號唯一碼;梭檢(status)全有梭 · 零釘死。容器無 pwsh:函式本體要工作站實跑(activate_vdf 貼回 [activate_vdf] 行)",
+   "dependencies": [
+    "Register-VIA-Commands-v0276.ps1",
+    "Register-VIA-Commands-v0275.ps1",
+    "activate_vdf.cmd",
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v*.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-10-12T03:51:31+00:00"
   }
  },
  "work_items": [
@@ -5650,6 +5666,16 @@
    "case": "vdf_manager_v0155",
    "receipt": "docs/handoff/evidence/vdf_manager_v0155.json",
    "resolved": "2026-10-12T03:06:22+00:00"
+  },
+  {
+   "id": "VDF-REQ019:activate_vdf",
+   "requirement": "VDF-REQ019",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "操作員 2026-10-12「設立一個指令啟動VDF  短指令activate_vdf  啟動前後端系統介面 從html u/i操作」:Register-VIA-Commands-v0276(點源 v0275)+ activate_vdf(① CGC_MDL265 監控 ② 啟動前改 ③ VDF_SystemManager all 前後端 ④ CGC_MDL261 操作頁跳出)+ 同名梭;冊上 via-* 缺梭 23 支本輪補範本梭(MDL157 梭檢轉綠;失門 via-activate-vdf · 別名歧指 總檢 為既有,只攤開)",
+   "next": "handoff test activate_vdf_v0276 收據 → VERIFIED;工作站:點源尾版 Register → 開雙閘 → activate_vdf → 貼回 [activate_vdf] 行與 [計] VDF_SystemManager_v0155 all 行",
+   "case": "activate_vdf_v0276",
+   "receipt": "docs/handoff/evidence/activate_vdf_v0276.json"
   }
  ]
 }
