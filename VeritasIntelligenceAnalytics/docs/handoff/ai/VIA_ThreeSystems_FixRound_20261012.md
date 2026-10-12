@@ -199,3 +199,5 @@ $env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'   # 要抓才開
 activate_vdf        # 只看計畫:activate_vdf -Dry -NoAsk
 ```
 跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0277` · `tooling` → `handoff checkpoint`。
+
+操作員重申(2026-10-12):「重申vcgc vrn vdf為三個獨立系統 可動到彼此 但相互查」→ 讀作三個獨立系統、互不改動彼此、只相互查(只讀監控);入 VCGC-REQ181 第二則原話(需求冊 v0200)。v0277 照此:`-Check` 只讀不修,啟動前改只動 VDF 自己的帳本。
