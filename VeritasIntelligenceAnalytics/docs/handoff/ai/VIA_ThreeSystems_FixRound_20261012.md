@@ -126,3 +126,24 @@ VRN 自己的尾版(工作站 v0194)編號:先提交那支,再 `python $V run CG
 
 不變:功能鍵 / 頁籤 / 輸入 id 集合與 v0107 完全相同(自測 ④ 逐一比對);正式路徑(run · usertest · 各動詞)一字不動。自測 7/7 · 前版鏈 v0107 → v0100 PASS。
 工作站看法:合併分支後 `via-groups-ui`(或 `python $V run --family vdf VDF_MDL012_FetchGroups ui`)重建頁再開。
+
+## 七、R73 一鍵全部(VDF-REQ018「INTEGRATE ALL ABOVE INTO ONE」;容器 2026-10-12)
+
+之前分開給的六件(Open-VIA-VDF 問參數頁 · 族群並行 run · usertest · 族群頁 ui · 主頁 ui · via-groups-ui 跳出)合成 VDF_SystemManager v0155 的一個動詞:
+
+```powershell
+python $V run --family vdf VDF_SystemManager all        # 問參數頁跳出 → 在頁上按啟動 → 其餘自動;跑完族群頁跳出
+```
+
+| 步 | 做什麼 | 燈的意思 |
+|---|---|---|
+| health | VDF 健康(檔族 · 號 · 登記 · 橋) | 黃 = 版號語意等既有黃 |
+| ready | 啟動就緒(本版 read_launch 門;問參數頁上那一格之前 ABSENT 的根因 = 薄尾鏈接不到 v0104 的本體) | GATED / ABSENT 黃不擋;RED = 啟動器 / 鏈缺 |
+| ask | Open-VIA-VDF 尾版(pwsh 子行程):問參數頁 → 你按啟動 → 11 步擷取 → 資料庫狀況頁 | rc 0 完成或不啟動;2 逾時沒決定;沒有 pwsh 跳過照實 |
+| groups | VDF_MDL012 run --groups ALL --jobs auto --mode live(清單 009 · 010 先跑 → 分道並行) | rc 4 GATED 黃(本視窗沒開雙閘);rc 5 清單紅 → 後面全 SKIP |
+| lists | universe list(範圍冊 + 市場清單 → 輸入清單 OUT-01) | rc 2 NODATA 黃 |
+| usertest · page · hub | 功能鍵實測 → 族群頁重建(結果掛頁)→ 主頁 | — |
+| open | 跳出族群頁(VIA_NO_OPEN=1 / --no-open 不開),主頁路徑印出 | — |
+
+旗標:`--no-ask`(不問、不跑 11 步)· `--skip a,b` · `--groups X,Y` · `--jobs 3~5` · `--mode fixture|block` · `--dry`(只列計畫)。報告 `VIA_Reports/vdf/ONE_LAUNCH_latest.json`(+ runs.jsonl)。
+容器實測:自測 8/8 · 前版鏈 PASS;`all --dry` 經 VCGC 列 9 步、pwsh 缺就跳過 ask 並講原因;fixture 整跑見下。

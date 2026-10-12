@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-12T00:12:47+00:00",
+ "updated_at": "2026-10-12T02:34:47+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2707,6 +2707,25 @@
    ],
    "timeout_seconds": 1500,
    "registered_at": "2026-10-12T00:05:14+00:00"
+  },
+  "vdf_manager_v0155": {
+   "argv": [
+    "VDF_SystemManager_v0155",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager_v0155 自測 8/8 · PASS",
+   "scope": "VDF_SystemManager v0155 all 一鍵全部:health → 啟動就緒(read_launch 門回來,v0104 本體代答)→ Open-VIA-VDF 問參數頁(pwsh;容器無 pwsh 跳過照實)→ VDF_MDL012 run 清單先跑分道並行(rc 4 GATED 黃 · rc 5 清單紅停)→ universe list → usertest → 族群頁 → 主頁 → 跳出;每步一列、總燈最壞、ONE_LAUNCH_latest.json;python 子行程走前版 run_path、pwsh 只在 run_cmd_v0155 一處;前版鏈全跑(VDF-REQ018)",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0155.py",
+    "functional modules/VDF/VDF_SystemManager_v0154.py",
+    "functional modules/VDF/VDF_SystemManager_v0153.py",
+    "functional modules/VDF/VDF_SystemManager_v0149.py",
+    "functional modules/VDF/VDF_SystemManager_v0104.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
+    "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py"
+   ],
+   "timeout_seconds": 1800,
+   "registered_at": "2026-10-12T02:34:47+00:00"
   }
  },
  "work_items": [
@@ -5620,6 +5639,16 @@
    "case": "vdf_fetch_groups_v0108",
    "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0108.json",
    "resolved": "2026-10-12T00:12:47+00:00"
+  },
+  {
+   "id": "VDF-REQ018:one_launch",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "操作員 2026-10-12「給我一個啟動VDF啟動全部及HTML U/I 的指令並在上面操作」→「INTEGRATE ALL ABOVE INTO ONE」:VDF_SystemManager v0155 `all` 一個動詞串起 健康 → 啟動就緒 → 問參數頁啟動 11 步擷取 → 族群並行擷取 → 輸入清單 → USER-TEST → 族群頁 → 主頁 → 跳出;問參數頁「啟動就緒」ABSENT 的根因 = 薄尾鏈接不到 v0104 的 read_launch → 本版門代答",
+   "next": "handoff test vdf_manager_v0155 實跑轉 VERIFIED;工作站 python $V run --family vdf VDF_SystemManager all(問參數頁 → 在頁上按啟動)",
+   "case": "vdf_manager_v0155",
+   "receipt": "docs/handoff/evidence/vdf_manager_v0155.json"
   }
  ]
 }
