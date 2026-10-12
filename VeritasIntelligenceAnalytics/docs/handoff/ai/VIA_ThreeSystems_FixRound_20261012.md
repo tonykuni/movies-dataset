@@ -235,3 +235,32 @@ python $V run --family vdf VDF_ENG065_DbImport import "$D"                 # ⑤
 python $V run --family vdf VDF_SystemManager db check                      #    看庫:表 · 列數 · 最晚日
 ```
 貼回 ①③ 的 `[計] VDF_ENG235_MojibakeRepair_v0100 scan · 燈 …` 兩行、④ ⑤ 最後的 `[計]` 行;不可逆的欄(U+FFFD)列出來,我再回源對應到該抓的引擎。
+
+## 十三、R76 設計稿「Veritas Header」視覺:1a VCGC · 1b VRN · 1c VDF 只跟視覺設計與顏色(VCGC-REQ182;容器 2026-10-12)
+操作員令:「1a for vcgc html u/i design 1b for vrn 1c for vdf only follow visual design and colors.」(Claude Design 分享連結容器連不到)→「… sent to claude code web, check the workspace」(兩檔上傳;只差一個縮圖模板)。承同日「vrn vdf vcgc都是獨立操作台 只是顏色及lauout基本規劃相同」。
+- 設計稿正本:`supportive modules/ui_support/VIA_UI_Design_VeritasHeader_v0100.dc.html`(sha256 入冊);稿全是行內樣式(無 `:root` 變數,CGC_MDL241 `plan` 對不上)→ 容器逐節取值。
+  - 1a 母系統:米白紙底 `#f2f1ec` · 白卡 · 線 `#dbd9d3` · 字 `#1b1a17` · 淡 `#6b6860` · 青 `#2f6f6f` · 印泥紅 `#9e2b25`;左欄 268px;標題襯線(Cormorant Garamond)· 標籤等寬(SFMono / Consolas)· 中文襯線(Noto Serif CJK TC)。
+  - 1b VRN 青花:頁首條 `#ccd8ea` · 字 `#16233d` · 鈷藍 `#24457f` · 白瓷左欄 274px · 六色頂條 · ADOPTED `#3d7a52`。
+  - 1c VDF 汝窯天青:頁首條 `#cfe0dc` · 字 `#16302b` · 青瓷綠 `#3c6660` · 左欄 `#f2f8f6`(線 `#cfdcd8`)232px · 主鈕青瓷綠白字。
+  - 不收:8–9.5px 等寬小字(低於 10px 硬條件)· 設計稿的 PASS / REVIEW / HOLD 文字色不當燈色(燈四色鎖定 2026-10-06)· 外部字型連結(零網路:本機有才用,否則 Georgia)· 未內嵌的印章 / 底圖(`assets/*.png`)。
+- 冊:`VIA_UI_Template_SSOT_v0103.json`(v0102 不動):tokens 改色 + 新 token(serif · cjk-serif · seal · hair · chip · shadow · sys · sys-bg · panel-2 · nav · nav-dim · caption · aside-w · tag · brand · brand-sub · brand-zh)+ `systems`(VCGC / VRN / VDF / VAP 各自覆蓋)+ `design`(來源 · sha · 取值法 · 頁首規劃 · `css` 只用 `var(--token)` · `serif_selector`);字級 / 字重 / 日期 / auto_layout / presentation / 燈四色一字不動。
+- 三系統各自的尾版(各讀冊上自己那一組;L120 互不寫檔):
+  - `VDF_SystemManager_v0157.py`(1c):字級套件本體(v0154 v2;鏈上每份 `typekit_book` / `typekit_block`)換成本版 → 同一段 `<style>` 尾端接 `:root{全部 token}` + design.css(仍一段 style + 一段 script,冪等換新);JS 字體吸附對 `h1 / .via-serif / .brand` 放行;v0144 的 `ui_theme_load` 改讀冊尾版 + systems.VDF(via-theme 段 / 清單 theme 名跟冊走)。自測 9/9 + 前版鏈 v0131–v0156 全 PASS。VDF 頁 · vdf 夾 `*_latest.html` · 族群頁(MDL012 經尾版 `typekit_block`)全套。
+  - `CGC_MDL274_HealthMatrix_v0115.py`(1a):同法(v0114 v2 本體;v0112 `ui_theme_load`);`portal` 後把入口頁 `VIA_Reports/VIA_UI_latest.html` 也補套;`theme preview` 出三系統頁首預覽頁 `VIA_Reports/review/vcgc_health/VIA_UI_DesignPreview_latest.html`(1a / 1b / 1c 各一區,inline token 覆蓋,只攤開冊值)。自測 11/11 + 前版鏈 PASS。
+  - `CGC_MDL261_UIEngine_v0107.py`(1a 操作台):同法(v0106 v2 本體 · v0105 build 用的那份);design.css 把範本自己的 `--paper / --paper2 / --ink / --mute / --blue / --co / --soft / --r` 對到冊 token,所以 v0103 範本不改字就換色。自測 9/9 + 前版鏈 PASS。
+  - 1b VRN:倉內不出 VRN 尾版(衝突裁定甲 / 撤回令);冊 `adoption.VRN` 寫了讀法 = 冊尾版 tokens + `systems.VRN`(燈四色仍鎖)+ `design.css` 接在字級套件 CSS 後;預覽頁 1b 區可先看。
+- 容器實跑(全經 VCGC `run`):VDF `ui`(5 頁 新套 5)· `VDF_MDL012_FetchGroups ui` · MDL274 `ui` / `portal`(入口頁補套 inserted)/ `theme preview`(WRITTEN)· MDL261 `build`(3.4 MB 一段套件);每頁 `[VIA:DESIGN:VIA_UI_Template_SSOT_v0103.json]` 各一段;Chromium 無頭截圖核對(襯線在容器退 DejaVu Serif;工作站有 Cormorant Garamond / 新細明體才是設計稿字)。
+- 冊:需求 v0203(+VCGC-REQ182 原話兩則)· 盤點 v0176(+C-vdf_manager_v0157 · C-health_matrix_v0115 · C-ui_engine_v0107;`theme preview` 豁免理由)· 交接案三件 + 工作項 VCGC-REQ182:vdf_1c · vcgc_1a_matrix · vcgc_1a_console(收據後 VERIFIED)· vrn_1b(操作員 VRN 側)· workstation_view(操作員)。
+- 工作站一貼(看頁;改色只改冊出 v0104):
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+via-medic sync --apply --branch claude/kind-cannon-pti15g
+activate_vdf                                                            # 1c:VDF 頁(汝窯天青)+ 族群頁
+$V = (Get-ChildItem "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName
+$env:VIA_FROM_VCGC = "YES"
+python $V run CGC_MDL274_HealthMatrix theme preview                      # 1a / 1b / 1c 三區預覽頁(開 VIA_Reports\review\vcgc_health\VIA_UI_DesignPreview_latest.html)
+python $V run CGC_MDL274_HealthMatrix ui                                 # 1a:VCGC 頁 + 健康矩陣頁
+python $V run CGC_MDL261_UIEngine build --open                           # 1a:操作台
+```
+貼回:哪一頁 · 哪個顏色 / 字體 / 邊角要改(對照冊 `tokens` / `systems` 鍵名);1b 等 VRN-MAIN 下一版照冊套後貼 `[計]` 行。
