@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-11T21:55:33+00:00",
+ "updated_at": "2026-10-12T00:05:14+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -1685,6 +1685,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0100 擷取大族群(13 群:台股每日 / 月營收 / 指數 / 主動式 ETF 固定全部 · 國際每日 / 國際財報 / 國內選定股財報 / 中國經濟 / NBS / 各國經濟 / 航運 / 美國總經 / 情緒 可增減)· 全族群同一 as-of 日 · DuckDB 目錄監控 fg_* · query 視圖截到 as-of · optimize CHECKPOINT + ANALYZE(VCGC-REQ150)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
@@ -1719,6 +1720,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0101 ui:族群操作頁(左面板 回母系統 · 跳其他系統 · 功能 · Live log;右面板 ① 輸入 · 引擎 · 運作 · 結果 · 每族群一頁 · 末頁流程圖 + 編號 / 引擎 / SSOT / regex / 同義字 / 輸入輸出參數邏輯矩陣;零 CDN · file:// · SNAPSHOT 內嵌)(VCGC-REQ151)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
@@ -1809,6 +1811,7 @@
    "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 4/4 · 前版鏈 PASS · 合計 PASS",
    "scope": "MDL012 v0103 四大類 · TW_FIN 預設 2330 3324 · INTL_FIN 預設 NVDA · 起始日只按大類 · ui-import 只寫差異冪等(VCGC-REQ154)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
@@ -2678,12 +2681,32 @@
    "success_marker": "紅 0 · 驗法 browser",
    "scope": "MDL012 v0107 usertest:建頁(報告夾,不碰已追蹤正式頁)→ 靜態驗(功能鍵有分支 · 頁籤有頁 · 快照 · id 唯一)→ 瀏覽器 headless 逐鍵實測(Chromium / Chrome / Edge;找不到照實紅)→ USERTEST_latest.json 掛頁;標記要「紅 0 · 驗法 browser」(VDF-REQ018)",
    "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py"
    ],
    "timeout_seconds": 600,
    "registered_at": "2026-10-11T21:48:23+00:00"
+  },
+  "vdf_fetch_groups_v0108": {
+   "argv": [
+    "VDF_MDL012_FetchGroups_v0108",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL012_FetchGroups v0108 本版 7/7 · 前版鏈 PASS · 合計 PASS",
+   "scope": "MDL012 v0108 族群頁版面最佳化:VDF 字級套件(VIA_UI_Template_SSOT 尾版,經 VDF_SystemManager typekit_block,套一次不重複)· 左面板每節 <details>(① 輸入控制 · ② 功能 開;③ 收尾 · 頁 · 回母系統 · 跳到其他系統 收並標鈕數;Live log 擷取中才開)· 展現規則 JS(燈欄第一 · 空值 — · 路徑縮檔名 · 表頭不換行)· 鈕 / 頁籤 / id 與 v0107 完全相同 · usertest 探針讀法放寬(套件給 <pre> 補 style);前版鏈 v0107 → v0100 照跑(VDF-REQ018)",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+    "functional modules/VDF/VDF_SystemManager_v0153.py",
+    "functional modules/VDF/VDF_SystemManager_v0154.py",
+    "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
+   ],
+   "timeout_seconds": 1500,
+   "registered_at": "2026-10-12T00:05:14+00:00"
   }
  },
  "work_items": [
@@ -5586,6 +5609,16 @@
    "owner": "操作員(環境)",
    "reason": "VCGC 檢視沒裝的工具(容器):pdftoppm 缺(CGC_MDL273 ext 出 winget 計畫 oschwartz10612.Poppler)· pdfplumber 缺(VRN 首頁文字)· polars / reportlab / pwsh 缺(容器專屬);不裝套件(操作員令)",
    "next": "工作站:run CGC_MDL273_EnvToolAudit ext(--apply 要本視窗 VIA_NET_CONSENT=YES)· run CGC_MDL240_EnvManager 對照;裝完轉 VERIFIED"
+  },
+  {
+   "id": "VDF-REQ018:page_layout",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "操作員 2026-10-12 看過 via-groups-ui 跳出的頁:「字體大小有位階但畫面凌亂,要用工具最佳化」→ v0108 套 VDF 字級套件 + 左面板摺疊 + 展現規則;容器 headless 截圖對照:左面板 2000px 一條到底 → 兩節開其餘收;引擎表短欄逐字直排 → 不換行;燈欄移第一;路徑縮檔名;空值 —;瀏覽器逐鍵實測 79 綠 0 紅",
+   "next": "handoff test vdf_fetch_groups_v0108 實跑轉 VERIFIED;工作站 via-groups-ui 再看一次",
+   "case": "vdf_fetch_groups_v0108",
+   "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0108.json"
   }
  ]
 }
