@@ -146,4 +146,18 @@ python $V run --family vdf VDF_SystemManager all        # 問參數頁跳出 →
 | open | 跳出族群頁(VIA_NO_OPEN=1 / --no-open 不開),主頁路徑印出 | — |
 
 旗標:`--no-ask`(不問、不跑 11 步)· `--skip a,b` · `--groups X,Y` · `--jobs 3~5` · `--mode fixture|block` · `--dry`(只列計畫)。報告 `VIA_Reports/vdf/ONE_LAUNCH_latest.json`(+ runs.jsonl)。
-容器實測:自測 8/8 · 前版鏈 PASS;`all --dry` 經 VCGC 列 9 步、pwsh 缺就跳過 ask 並講原因;fixture 整跑見下。
+容器實測:自測 8/8 · 前版鏈 v0154 → v0131 全 PASS;`all --dry` 經 VCGC 列 9 步、啟動器取 Open-VIA-VDF-v0103、pwsh 缺就跳過 ask 並講原因;`all --skip ask --mode fixture --groups TW_INDEX --no-open` 整跑:health GREEN · ready RED(容器沒有短令冊「啟動器/鏈缺:Register via-vdffetch」,工作站應 GREEN / GATED)· groups RED(fixture 下引擎照自己的閘回紅,同 R71)· lists YELLOW(容器無清單)· usertest GREEN 79/0 · page GREEN · hub GREEN · 總燈 RED 照實,九步一列都在 ONE_LAUNCH_latest.json。
+
+## 八、工作站一貼(操作員;v4 = 一個指令)
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
+git fetch origin claude/kind-cannon-pti15g
+git merge --ff-only origin/claude/kind-cannon-pti15g
+cd VeritasIntelligenceAnalytics
+$V = (Get-ChildItem "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName
+$env:VIA_FROM_VCGC = "YES"; Remove-Item Env:VIA_NO_OPEN -ErrorAction SilentlyContinue
+python $V registry-sync --apply
+# 族群並行那一步要本視窗先開雙閘(操作員的手):$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'
+python $V run --family vdf VDF_SystemManager all     # 問參數頁跳出 → 在頁上按啟動 → 其餘自動 → 族群頁跳出
+```
+跑完貼回視窗最後的 `[計] VDF_SystemManager_v0155 all · …` 那一行與 `VIA_Reports\vdf\ONE_LAUNCH_latest.json`;之後交接:`handoff test vdf_manager_v0155`、`vdf_fetch_groups_v0108`、`vdf_fetch_groups_usertest` 與工作站五案 → `handoff checkpoint` → `via-realtest` → `sdd real` → `lock --apply`。
