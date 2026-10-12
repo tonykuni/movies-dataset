@@ -201,3 +201,10 @@ activate_vdf        # 只看計畫:activate_vdf -Dry -NoAsk
 跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0277` · `tooling` → `handoff checkpoint`。
 
 操作員重申(2026-10-12):「重申vcgc vrn vdf為三個獨立系統 可動到彼此 但相互查」→ 讀作三個獨立系統、互不改動彼此、只相互查(只讀監控);入 VCGC-REQ181 第二則原話(需求冊 v0200)。v0277 照此:`-Check` 只讀不修,啟動前改只動 VDF 自己的帳本。
+
+## 十一、R74c 問參數頁「啟動就緒」假紅修正(VDF_SystemManager v0156;VDF-REQ018;容器 2026-10-12)
+工作站問參數頁(14:59,來源 `VDF_SystemManager_v0155.py` = 分支已併):「啟動就緒 RED · [修] 這些是樹上的檔,不是設定:git pull…」。
+- 根因:v0104 `read_launch` ④ 只讀 Register 尾版一檔找 16 個啟動短令(`function global:via-vdffetch {` …);冊自 v0244 起是薄尾,16 個短令全在 v0243 → 尾版單檔永遠找不到 → 假紅(容器也一樣,之前誤判為「容器無短令冊」)。
+- v0156(薄尾):代答前把 v0104 的 `_src` 換成「Register 冊沿 dot-source 鏈讀」的讀器(尾版 → 前版;只讀不執行;防環;非 Register 檔照舊),代答完還原;v0155 的 `READY` 指到本版門(`all` 的 ready 步同);鏈的讀法 = VCGC 唯一入口控制 v0106 的同一條正則(抄尺不抄程式,不載 VCGC)。自測 8/8 + 前版鏈 v0149 → v0155 全 PASS;ENG093 `readiness()` 經尾版門 `cmds_missing` 空。
+- 問參數頁同時報的資料庫狀況(VDF 自報,照攤):目錄 STALE 4.1 小時 · 分類燈 RED(營收 NODATA 202607 · ETF 滯後 47 · 宏觀 48 · 國際 46 · 其他 103)· 增量缺口 32 表(多數止於 2026-08-25/27)。11 步擷取已送出 → 跑完 `via-datahome catalog` → `via-vdfinc plan`。
+- 冊:交接案 vdf_manager_v0156 + 工作項 VDF-REQ018:ready_door(PENDING → 收據後 VERIFIED)· 盤點 v0174(+C-vdf_manager_v0156)· 需求 v0201(VDF-REQ018 evidence / next)。v0156 加入 `VDF_SystemManager_v*.py` 相依 glob → 12 案重跑。

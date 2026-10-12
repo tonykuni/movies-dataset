@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-12T06:56:45+00:00",
+ "updated_at": "2026-10-12T07:08:26+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2759,6 +2759,23 @@
    ],
    "timeout_seconds": 600,
    "registered_at": "2026-10-12T06:46:38+00:00"
+  },
+  "vdf_manager_v0156": {
+   "argv": [
+    "VDF_SystemManager_v0156",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager_v0156 自測 8/8 · PASS",
+   "scope": "VDF_SystemManager v0156 啟動就緒假紅修正:v0104 本體代答前把 _src 換成 Register 冊沿 dot-source 鏈讀(尾版 → 前版;只讀;防環;非 Register 檔照舊),16 個啟動短令沿鏈全找到 · why 不再含「Register via-vdffetch」· 代答完還原 · v0155 的 READY 指到本版門(all 的 ready 步)· all --dry 直通;前版鏈全跑(VDF-REQ018;工作站問參數頁 2026-10-12 14:59 實錄)",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0156.py",
+    "functional modules/VDF/VDF_SystemManager_v0155.py",
+    "functional modules/VDF/VDF_SystemManager_v0104.py",
+    "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py",
+    "Register-VIA-Commands-v*.ps1"
+   ],
+   "timeout_seconds": 1800,
+   "registered_at": "2026-10-12T07:08:26+00:00"
   }
  },
  "work_items": [
@@ -5694,6 +5711,16 @@
    "case": "activate_vdf_v0277",
    "receipt": "docs/handoff/evidence/activate_vdf_v0277.json",
    "resolved": "2026-10-12T06:56:45+00:00"
+  },
+  {
+   "id": "VDF-REQ018:ready_door",
+   "requirement": "VDF-REQ018",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "工作站問參數頁(2026-10-12 14:59,來源 VDF_SystemManager_v0155.py)「啟動就緒 RED · [修] 這些是樹上的檔,不是設定:git pull…」是假紅:v0104 read_launch ④ 只讀 Register 尾版一檔找 16 個啟動短令,冊自 v0244 起是薄尾、短令全在 v0243 → 永遠找不到。v0156:代答前換成沿點源鏈讀的讀器(只讀 · 防環 · 代答完還原),all 的 ready 步也走本版門;自測 8/8 + 前版鏈 PASS",
+   "next": "handoff test vdf_manager_v0156 收據 → VERIFIED;工作站:再併一次分支 → 問參數頁重開看「啟動就緒」(應不再是「啟動器/鏈缺」)",
+   "case": "vdf_manager_v0156",
+   "receipt": "docs/handoff/evidence/vdf_manager_v0156.json"
   }
  ]
 }
