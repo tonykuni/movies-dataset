@@ -190,8 +190,14 @@ def _run_in(argv: list) -> dict:
 RUN_PY, RUN_CMD, RUN_IN, READY = _run_py, run_cmd_v0155, _run_in, read_launch   # 自測換替身(不起真子行程 · 不量真環境)
 
 
+def _vnum_any(path) -> int:
+    """版號:_vNNNN(python 尾版)或 -vNNNN(PowerShell 啟動器 Open-VIA-VDF-v0103.ps1)都認;沒有版號 = -1。"""
+    m = re.search(r"[-_]v(\d{4})$", Path(path).stem)
+    return int(m.group(1)) if m else -1
+
+
 def _tail(glob: str, folder: Path):
-    hits = sorted(folder.glob(glob), key=_vnum_v0155)
+    hits = sorted(folder.glob(glob), key=_vnum_any)
     return hits[-1] if hits else None
 
 
@@ -403,8 +409,11 @@ def selftest() -> int:
         with contextlib.redirect_stdout(buf):
             rc_dry = main(["all", "--dry", "--jobs", "9"])
         txt = buf.getvalue()
-        chk("③ all --dry:列 9 步 · 流程夾到 5 · pwsh 缺就跳過 ask 並講原因 · 不寫檔 rc 0",
-            rc_dry == 0 and all(s in txt for s in STEPS_V0155) and "流程 5" in txt and ("跳過 ask" in txt or "pwsh" in txt) and not (td / "out").exists(), txt[:400])
+        openers = sorted(VIA_ROOT.glob("Open-VIA-VDF-v*.ps1"), key=_vnum_any)
+        chk("③ all --dry:列 9 步 · 流程夾到 5 · 啟動器取 Open-VIA-VDF 最大版號(-vNNNN 也認)· pwsh 缺就跳過 ask 並講原因 · 不寫檔 rc 0",
+            rc_dry == 0 and all(s in txt for s in STEPS_V0155) and "流程 5" in txt and ("跳過 ask" in txt or "pwsh" in txt) and not (td / "out").exists()
+            and (not openers or f"啟動器 {openers[-1].name}" in txt) and _vnum_any("Open-VIA-VDF-v0103.ps1") == 103 and _vnum_any("X_v0155.py") == 155,
+            (txt[:300], openers[-1].name if openers else None))
         calls = []
 
         def st_py(path, args, capture, timeout=None):
