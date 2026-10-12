@@ -208,3 +208,30 @@ activate_vdf        # 只看計畫:activate_vdf -Dry -NoAsk
 - v0156(薄尾):代答前把 v0104 的 `_src` 換成「Register 冊沿 dot-source 鏈讀」的讀器(尾版 → 前版;只讀不執行;防環;非 Register 檔照舊),代答完還原;v0155 的 `READY` 指到本版門(`all` 的 ready 步同);鏈的讀法 = VCGC 唯一入口控制 v0106 的同一條正則(抄尺不抄程式,不載 VCGC)。自測 8/8 + 前版鏈 v0149 → v0155 全 PASS;ENG093 `readiness()` 經尾版門 `cmds_missing` 空。
 - 問參數頁同時報的資料庫狀況(VDF 自報,照攤):目錄 STALE 4.1 小時 · 分類燈 RED(營收 NODATA 202607 · ETF 滯後 47 · 宏觀 48 · 國際 46 · 其他 103)· 增量缺口 32 表(多數止於 2026-08-25/27)。11 步擷取已送出 → 跑完 `via-datahome catalog` → `via-vdfinc plan`。
 - 冊:交接案 vdf_manager_v0156 + 工作項 VDF-REQ018:ready_door(PENDING → 收據後 VERIFIED)· 盤點 v0174(+C-vdf_manager_v0156)· 需求 v0201(VDF-REQ018 evidence / next)。v0156 加入 `VDF_SystemManager_v*.py` 相依 glob → 12 案重跑。
+
+## 十二、R75 VDF 單元檔亂碼:先修檔 → 擷取工具加解碼器 → 真抓一次 · 真匯出一次(VDF-REQ020;容器 2026-10-12)
+操作員令:21 個 `via_database\vdf_database\tw__*.parquet · gl__*.parquet`「先把它修正為非亂碼 再回朔到擷取他的工具加上亂碼問題解碼器 解取實用一次 輸出實用一次」。
+- 根因(倉內實錄,只攤開):網路工具「當文字」那一步 — Aegis `fetch_text` 用 `resp.text`(無 charset 的 Big5 回應被當 latin-1 → 可逆亂碼)· SUP_MDL740 標準庫退路 `decode("utf-8","replace")`(U+FFFD,不可逆)· urllib 退路 `errors='ignore'`(丟位元組)。單元檔由 ENG065 檔名協定(tw__ → vdf_tw_market · gl__ → vdf_global_market)匯入 DuckDB。
+- 四支(全經 VCGC `run` 由名解析 rc 0):
+  - `supportive modules/network/SUP_MDL756_SmartDecode_v0100.py` 亂碼問題解碼器:`smart_decode`(BOM → 宣告 charset → `<meta charset>` → utf-8 嚴格 → cp950 / big5hkscs / gb18030 嚴格 + 常用字可信度門檻;永不 replace / ignore)· `demojibake`(可逆反解 latin1→utf8 / latin1→cp950 / cp950→utf8 …;U+FFFD 誠實 UNRECOVERABLE)· `plan_values`(一欄一種轉換多數決)。自測 13/13。
+  - `SUP_MDL740_NetUnified_v0119.py` 薄尾:`http_text` 雙閘先行 → 先位元組(Aegis `fetch_bytes` → 標準庫 `http_bytes` 重試道)→ 智慧解碼 → `{data · via+smartdecode · encoding · lossy}`;拿不到位元組退前版 + 可逆反解。`via_net_unified` 轉接件自動接到尾版,所有走 `http_text` 的引擎(ENG063 月營收 MOPS CSV · ENG082 · …)不改一字即受惠。自測 9/9 + 前版鏈(鎖冊核心 v1652 不動)。
+  - `functional modules/VDF/engine/VDF_ENG235_MojibakeRepair_v0100.py`:`scan <路徑>`(每檔每欄 可修 / 不可逆 + 樣本;GREEN / YELLOW / RED)· `fix <路徑> [--apply] [--backup-dir] [--no-db-backup] [--units-only]`(parquet 先備份 `_pre_mojibake/` 再 DuckDB 重寫,欄序 · 型別 · 列數核對;DuckDB 表整檔備份後 `UPDATE … FROM` 對應表;U+FFFD 原樣不猜;冪等)。報告 `VIA_Reports\vdf\mojibake\`。自測 8/8。
+  - `VDF_ENG065_DbImport_v0102.py` 薄尾:匯入前先 `ENG235 fix --apply --units-only`(`VIA_MOJIBAKE_FIX=0` 關掉);自測 6/6 + 前版鏈。
+- 冊:交接案 smartdecode_v0100 · netunified_v0119 · mojibake_repair_v0100 · db_import_v0102;工作項 VDF-REQ020:fetch_decoder · repair_tool(收據後 VERIFIED)· workstation_run(操作員的手);需求 v0202(VDF-REQ020 原話 + 21 檔名)· 盤點 v0175(+4 站)。
+- 工作站(操作員的手;容器看不到那 21 個檔):
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+via-medic sync --apply --branch claude/kind-cannon-pti15g
+$V = (Get-ChildItem "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName
+$env:VIA_FROM_VCGC = "YES"
+$D = "C:\Users\tonyk\OneDrive\Documents\VeritasIntelligenceAnalytics\via_database\vdf_database"
+python $V run --family vdf VDF_ENG235_MojibakeRepair scan "$D"            # ① 只讀:每檔每欄 可修 / 不可逆 + 樣本 → 先貼回這張
+python $V run --family vdf VDF_ENG235_MojibakeRepair fix "$D" --apply     # ② 修:原檔備份到 $D\_pre_mojibake\;parquet 重寫(欄序型別不變)
+python $V run --family vdf VDF_ENG235_MojibakeRepair scan "$D"            # ③ 複掃:應只剩不可逆(U+FFFD,要回源重抓)
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'                # ④ 解取實用一次(擷取工具已帶解碼器;閘是你的手)
+python $V run --family vdf VDF_ENG063_MonthlyRevenue run                   #    MOPS Big5 CSV 走 http_text → 正字
+python $V run --family vdf VDF_ENG065_DbImport import "$D"                 # ⑤ 輸出實用一次:修好的單元匯進 DuckDB(匯入前再過一次解碼器)
+python $V run --family vdf VDF_SystemManager db check                      #    看庫:表 · 列數 · 最晚日
+```
+貼回 ①③ 的 `[計] VDF_ENG235_MojibakeRepair_v0100 scan · 燈 …` 兩行、④ ⑤ 最後的 `[計]` 行;不可逆的欄(U+FFFD)列出來,我再回源對應到該抓的引擎。

@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-12T07:38:52+00:00",
+ "updated_at": "2026-10-12T09:26:35+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2776,6 +2776,67 @@
    ],
    "timeout_seconds": 1800,
    "registered_at": "2026-10-12T07:08:26+00:00"
+  },
+  "smartdecode_v0100": {
+   "argv": [
+    "SUP_MDL756_SmartDecode",
+    "--selftest"
+   ],
+   "success_marker": "[計] SUP_MDL756_SmartDecode v0100 自測 13/13 · PASS",
+   "scope": "亂碼問題解碼器(純函式 · 零網路):smart_decode(BOM → 宣告 charset → meta → utf-8 嚴格 → cp950 / big5hkscs / gb18030 嚴格 + 常用字可信度;永不 replace / ignore)· demojibake(可逆亂碼反解 latin1→utf8 / latin1→cp950 / cp950→utf8 …;U+FFFD 誠實 UNRECOVERABLE)· plan_values(一欄一種轉換多數決)· 長句 Big5 不被 gb18030 假字搶走(VDF-REQ020)",
+   "dependencies": [
+    "supportive modules/network/SUP_MDL756_SmartDecode_v0100.py"
+   ],
+   "timeout_seconds": 300,
+   "registered_at": "2026-10-12T09:26:35+00:00"
+  },
+  "netunified_v0119": {
+   "argv": [
+    "SUP_MDL740_NetUnified",
+    "--selftest"
+   ],
+   "success_marker": "[計] SUP_MDL740_NetUnified v0119 自測 9/9 · PASS",
+   "scope": "網路工具薄尾 v0119:http_text 雙閘先行 → 先位元組(Aegis fetch_bytes → 標準庫 http_bytes 重試道)→ SUP_MDL756 智慧解碼 → {data · via+smartdecode · encoding · lossy};拿不到位元組退前版 http_text + 可逆反解;閘沒開零抓取;名稱沿前版;前版鏈(v0118 鎖冊核心)全跑(VDF-REQ020)",
+   "dependencies": [
+    "supportive modules/network/SUP_MDL740_NetUnified_v0119.py",
+    "supportive modules/network/SUP_MDL740_NetUnified_v0118.py",
+    "supportive modules/network/SUP_MDL740_NetUnified_v0115.py",
+    "supportive modules/network/SUP_MDL756_SmartDecode_v*.py",
+    "supportive modules/network/VeritasAegisNexus_v*.py",
+    "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-10-12T09:26:35+00:00"
+  },
+  "mojibake_repair_v0100": {
+   "argv": [
+    "VDF_ENG235_MojibakeRepair",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG235_MojibakeRepair_v0100 自測 8/8 · PASS",
+   "scope": "VDF 亂碼修復引擎:scan(每檔每欄 可修 / 不可逆 + 樣本;燈 GREEN / YELLOW / RED)· fix 乾跑只列計畫 · --apply 先備份 _pre_mojibake 再用 DuckDB 重寫 parquet(欄序 · 型別 · 列數核對)/ UPDATE … FROM 對應表改 DuckDB 表 · U+FFFD 原樣不猜 · 冪等 · --units-only;報告 VIA_Reports/vdf/mojibake(VDF-REQ020)",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG235_MojibakeRepair_v0100.py",
+    "supportive modules/network/SUP_MDL756_SmartDecode_v*.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-10-12T09:26:35+00:00"
+  },
+  "db_import_v0102": {
+   "argv": [
+    "VDF_ENG065_DbImport",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG065_DbImport_v0102 自測 6/6 · PASS",
+   "scope": "單元檔匯入薄尾 v0102:run_import 前先 ENG235 fix --apply --units-only(可逆亂碼修回正字、備份、U+FFFD 照實)再照 v0101 anti-join 匯入;VIA_MOJIBAKE_FIX=0 關掉;ENG235 缺席誠實印一行照舊匯入;前版鏈全跑(VDF-REQ020)",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG065_DbImport_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG065_DbImport_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG235_MojibakeRepair_v*.py",
+    "supportive modules/SUP_MDL753_*.py"
+   ],
+   "timeout_seconds": 900,
+   "registered_at": "2026-10-12T09:26:35+00:00"
   }
  },
  "work_items": [
@@ -5722,6 +5783,36 @@
    "case": "vdf_manager_v0156",
    "receipt": "docs/handoff/evidence/vdf_manager_v0156.json",
    "resolved": "2026-10-12T07:38:52+00:00"
+  },
+  {
+   "id": "VDF-REQ020:fetch_decoder",
+   "requirement": "VDF-REQ020",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "操作員 2026-10-12「…再回朔到擷取他的工具加上亂碼問題解碼器」:根因在網路工具當文字那一步(resp.text 無 charset 當 latin-1 · decode utf-8 replace / ignore)。SUP_MDL756_SmartDecode v0100(解碼器)+ SUP_MDL740_NetUnified v0119(http_text 先位元組再智慧解碼;via_net_unified 轉接件自動接到尾版)",
+   "next": "handoff test smartdecode_v0100 · netunified_v0119 收據 → VERIFIED",
+   "case": "netunified_v0119",
+   "receipt": "docs/handoff/evidence/netunified_v0119.json"
+  },
+  {
+   "id": "VDF-REQ020:repair_tool",
+   "requirement": "VDF-REQ020",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "「先把它修正為非亂碼」的工具:VDF_ENG235_MojibakeRepair v0100(scan / fix parquet 與 DuckDB 表;備份只增;不可逆照實)+ VDF_ENG065_DbImport v0102(匯入前先修單元檔)",
+   "next": "handoff test mojibake_repair_v0100 · db_import_v0102 收據 → VERIFIED",
+   "case": "mojibake_repair_v0100",
+   "receipt": "docs/handoff/evidence/mojibake_repair_v0100.json"
+  },
+  {
+   "id": "VDF-REQ020:workstation_run",
+   "requirement": "VDF-REQ020",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "21 個單元檔在工作站 C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database(容器看不到):scan → fix --apply → 複掃;「解取實用一次 輸出實用一次」要雙閘與真資料(操作員的手)",
+   "next": "照交接文件第十二節一貼:scan → fix --apply → 複掃 → 開雙閘真抓一次(http_text 已帶解碼器)→ ENG065 import 匯入一次 → db check;貼回三段 [計] 行與 MOJIBAKE_SCAN_latest.json 的 lamp / 不可逆數",
+   "case": null,
+   "receipt": null
   }
  ]
 }
