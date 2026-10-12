@@ -172,10 +172,14 @@ python $V run --family vdf VDF_SystemManager all     # 問參數頁跳出 → �
 ```powershell
 cd C:\Users\tonyk\OneDrive\Documents\movies-dataset
 git fetch origin claude/kind-cannon-pti15g
-git merge --ff-only origin/claude/kind-cannon-pti15g
+git merge --no-edit origin/claude/kind-cannon-pti15g      # 本機有自己的提交也能併(--ff-only 會拒;衝突就把訊息貼回)
 cd VeritasIntelligenceAnalytics
+Test-Path .\Register-VIA-Commands-v0276.ps1                 # 要 True;False = 併入沒成,先看上面 merge 的訊息
 . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 或任何殼直打 activate_vdf(同名 .cmd 梭)
+Get-Command activate_vdf | Select-Object Name, Source       # 要看到 activate_vdf;沒有 = 點到的尾版不是 v0276
 $env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'   # 要抓才開(本令永不代設)
 activate_vdf        # 問參數頁跳出 → 頁上按啟動 → 其餘自動 → 族群頁 + 操作頁跳出;只看計畫:activate_vdf -Dry -NoAsk
 ```
 跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0276` · `tooling` → `handoff checkpoint`。
+
+實錄 2026-10-12(工作站第一次):`activate_vdf` 無法辨識 → 點源的尾版不是 v0276(`--ff-only` 在本機有自己提交時會拒併,之後的指令照跑)。一貼改成 `git merge --no-edit`,並加 `Test-Path` / `Get-Command` 兩道檢查。
