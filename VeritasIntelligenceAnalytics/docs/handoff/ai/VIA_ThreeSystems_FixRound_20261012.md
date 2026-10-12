@@ -183,3 +183,19 @@ activate_vdf        # 問參數頁跳出 → 頁上按啟動 → 其餘自動 �
 跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0276` · `tooling` → `handoff checkpoint`。
 
 實錄 2026-10-12(工作站第一次):`activate_vdf` 無法辨識 → 點源的尾版不是 v0276(`--ff-only` 在本機有自己提交時會拒併,之後的指令照跑)。一貼改成 `git merge --no-edit`,並加 `Test-Path` / `Get-Command` 兩道檢查。
+
+## 十、R74b 三台獨立操作台裁定 → `activate_vdf` 改純 VDF(Register v0277;VCGC-REQ181 · VDF-REQ019;容器 2026-10-12)
+操作員裁定:「vrn vdf vcgc都是獨立操作台 只是顏色及layout基本規劃相同」。工作站實錄(第一次真跑):`activate_vdf` 起來了,但 `VDF_SystemManager` 尾版仍是 v0154 → 「未知動詞 'all'」rc 2(分支 68 筆沒併全,只拿到兩個 Register 檔);④ 開的是 VCGC 的統一操作頁(CGC_MDL261)。
+- `Register-VIA-Commands-v0277.ps1`(點源 v0276;v0276 以前一字不動)蓋過 `activate_vdf`:① 啟動前改走 VDF 自己的 `activate --import` / 文字改動 ② `VDF_SystemManager all`(尾版 < v0155 → 紅、不起,不假跑)③ 經 `via-open` 跳出 VDF 主頁 `VIA_Reports\vdf\VDF_UI_latest.html` + 族群頁;`-Check` 才跑 VCGC 只讀監控(不帶 --repair);載入印「[VIA] Register 尾版 v0277 …」旗標行。VIA_NO_OPEN 只管 VCGC 自己的頁。
+- 冊:需求 v0199(+VCGC-REQ181 裁定原話;VDF-REQ019 evidence / next 更新)· 盤點 v0173(+C-activate_vdf_v0277)· 交接案 activate_vdf_v0277 + 工作項 VDF-REQ019:activate_vdf 帶理由轉回 PENDING → 收據後 VERIFIED。
+- 工作站(操作員的手;本機有自己的提交 → 用拉齊醫生真併,帳本聯集):
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 先載現有尾版,拿到 via-medic
+via-medic sync --apply --branch claude/kind-cannon-pti15g      # 真併(stash 髒樹 → merge → 帳本按律聯集 → 還原);有紅就整段貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 再載:要看到「[VIA] Register 尾版 v0277」
+Get-Command activate_vdf | Select-Object Name, Source
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'   # 要抓才開
+activate_vdf        # 只看計畫:activate_vdf -Dry -NoAsk
+```
+跑完貼回 `[activate_vdf] …` 那一行與 `[計] VDF_SystemManager_v0155 all · …` 那一行;之後 `handoff test activate_vdf_v0277` · `tooling` → `handoff checkpoint`。
