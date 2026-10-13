@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-13T19:39:11+00:00",
+ "updated_at": "2026-10-13T20:33:26+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -3028,6 +3028,36 @@
     "supportive modules/registry/CGC_MDL133_ProductGate_v0102.py",
     "Register-VIA-Commands-v0278.ps1",
     "Register-VIA-Commands-v0243.ps1"
+   ],
+   "timeout_seconds": 900
+  },
+  "vdf_manager_v0159": {
+   "argv": [
+    "VDF_SystemManager_v0159",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager_v0159 自測 6/6 · PASS",
+   "scope": "VDF_SystemManager v0159(VDF-REQ022):VDF_SystemManager_v0159(薄尾):自測先照印 v0157 整條鏈,再重做 v0158 六檢,run / all / ask 行為一字不差。SUP_MDL740_NetUnified_v0119 補進版本登記冊(VIA-TOOL-0249,只增一列",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0159.py",
+    "functional modules/VDF/VDF_SystemManager_v0158.py",
+    "functional modules/VDF/VDF_SystemManager_v0157.py",
+    "functional modules/VDF/VDF_SystemManager_v0155.py"
+   ],
+   "timeout_seconds": 1500
+  },
+  "mdl134_v0103": {
+   "argv": [
+    "CGC_MDL134_ParallelLanes",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL134_ParallelLanes v0103 薄尾 9/9 · PASS",
+   "scope": "CGC_MDL134_ParallelLanes v0103(VDF-REQ022 S7):S7 道上的 DuckDB 鎖:鏈冊 tw 鏈本來就序跑(hist_probe → hist_2023 → group_class → revenue_backfill → consensus → revenue_consensus),單寫者律沒破;持鎖的 PID 372 是**前一趟**(20:32 那趟被 Invoke-VIAPython 1800 秒天花板殺掉)留下的引擎子行程 —— 外層只殺到 MDL134 本體,_exec 的 p.kill() 來不及跑,孤兒抓著 vdf_tw_market.duckdb;Hydra 律 H3 只看 FixAll 心跳與步鎖(鎖記本體 PID,本體死了就回收),看不到孤兒。CGC_MDL134_ParallelLanes_v0103(薄尾;本體 v0101 / v0102 不動):① Windows 子行程起在 Job Object(KILL_ON_JOB_CLOSE,編排被殺子樹一起死;逾時殺整個 job)② 子行程 PID 記進該趟 CHILDREN.json,preflight 加 H3b 孤兒(沒 ended 且 PID 活)列 pid 與步名(WARN,零 force 不代殺)③ 步 log 的 DuckDB 鎖訊息 → 道上 note 前綴 DB_BUSY pid N 持 <庫名>;自測 9/9(含 v0102 8/8 · v0101 九檢)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v0103.py",
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v0102.py",
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v0101.py",
+    "supportive modules/registry/VIA_ParallelLanes_v0100.json"
    ],
    "timeout_seconds": 900
   }
@@ -6271,8 +6301,9 @@
    "requirement": "VDF-REQ022",
    "state": "PENDING",
    "owner": "操作員(貼 log)→ AI",
-   "reason": "e054 e057 e056 e078 e082 e066 rc 1 自測全綠 = 執行期例外;e074 rc 1 紅冊設計;011d rc 124 要看是否卡呼叫",
-   "next": "貼 VIA_Reports\\vdf_fetch\\_logs\\{e054,e057,e056,e078,e082,e066,e074,011d}_live.log 各最後 30 行(每次同 id 覆寫,先複製)→ AI 逐支定根因;e074 先 via-fred status → --retry-parked"
+   "reason": "貼回 ② 已解 2 條道:revenue_backfill(ENG075)與 consensus(VRN_ENG071)= DuckDB 鎖(PID 372 孤兒);etf_universe = 00998A(v0106 已修)。FG_20261012 那趟 e054 e057 e056 e078 e082 e066 rc 1 仍沒 log(自測全綠 = 執行期例外,可能同一把鎖,不猜);e074 rc 1 紅冊設計",
+   "next": "操作員:① 先看 PID 372 是誰:Get-CimInstance Win32_Process -Filter \"ProcessId=372\" | fl ProcessId,ParentProcessId,CreationDate,CommandLine;是 VIA 引擎孤兒就 Stop-Process -Id 372,再跑 revenue_backfill / consensus(或整趟);② 併分支後 activate_vdf:ask 逾時應 YELLOW rc 2、00998A 印 [退役]、e232 逐段入庫;③ 仍要 e054 e057 e056 e078 e082 e066 e074 的 _logs\\<id>_live.log 尾 30 行(FG 那趟的 rc 1 不一定同一把鎖)",
+   "reason_updated_at": "2026-10-13T20:33:26+00:00"
   },
   {
    "id": "VDF-REQ022:key_guard_g6",
@@ -6321,6 +6352,28 @@
    "owner": "操作員(L70)",
    "reason": "PS 模板既有債 28 支(VDF 0 支;根層活尾 2:Test-VIA-TheoryAudit.ps1 · VIA_WorkflowEngine.ps1,其餘 VAP / WorkOps / intake / new modules)",
    "next": "L70 准再補模板章;sweeper 無此動作"
+  },
+  {
+   "id": "VDF-REQ022:manager_selftest_output",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "v0158 自測把前版鏈輸出導進緩衝 → 交接閘 9 案 marker False",
+   "next": "工作站 handoff check:vdf_master_control 等 9 案 VERIFIED 不再 EVIDENCE_INVALID",
+   "case": "vdf_manager_v0159",
+   "receipt": "docs/handoff/evidence/vdf_manager_v0159.json",
+   "resolved": "S8 收尾實錄:v0158 的自測把 v0157 → v0128 前版鏈輸出導進緩衝 → 交接閘 9 案(argv 尾版 VDF_SystemManager --selftest,標記是 v0128/v0129 的 [計])rc 0 但 marker False → EVIDENCE_INVALID;VDF_SystemManager_v0159(薄尾):自測先照印 v0157 整條鏈,再重做 v0158 六檢,run / all / ask 行為一字不差。SUP_MDL740_NetUnified_v0119 補進版本登記冊(VIA-TOOL-0249,只增一列;VIA-SUP-TOOL 由 CGC_MDL237 依冊發)"
+  },
+  {
+   "id": "VDF-REQ022:lanes_db_lock_orphan",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI(薄尾)/ 操作員(停孤兒 · 工作站實跑)",
+   "reason": "RUN_20261013_235304 revenue_backfill · consensus 都倒在 vdf_tw_market.duckdb 被 PID 372 抓著;前一趟被天花板殺掉留下的引擎孤兒",
+   "next": "工作站:先查 / 停 PID 372 → 重跑;之後被殺的趟次子行程會跟著死(Job Object),道上會直接印 DB_BUSY pid N 與 H3b 孤兒",
+   "case": "mdl134_v0103",
+   "receipt": "docs/handoff/evidence/mdl134_v0103.json",
+   "resolved": "S7 道上的 DuckDB 鎖:鏈冊 tw 鏈本來就序跑(hist_probe → hist_2023 → group_class → revenue_backfill → consensus → revenue_consensus),單寫者律沒破;持鎖的 PID 372 是**前一趟**(20:32 那趟被 Invoke-VIAPython 1800 秒天花板殺掉)留下的引擎子行程 —— 外層只殺到 MDL134 本體,_exec 的 p.kill() 來不及跑,孤兒抓著 vdf_tw_market.duckdb;Hydra 律 H3 只看 FixAll 心跳與步鎖(鎖記本體 PID,本體死了就回收),看不到孤兒。CGC_MDL134_ParallelLanes_v0103(薄尾;本體 v0101 / v0102 不動):① Windows 子行程起在 Job Object(KILL_ON_JOB_CLOSE,編排被殺子樹一起死;逾時殺整個 job)② 子行程 PID 記進該趟 CHILDREN.json,preflight 加 H3b 孤兒(沒 ended 且 PID 活)列 pid 與步名(WARN,零 force 不代殺)③ 步 log 的 DuckDB 鎖訊息 → 道上 note 前綴 DB_BUSY pid N 持 <庫名>;自測 9/9(含 v0102 8/8 · v0101 九檢)"
   }
  ]
 }
