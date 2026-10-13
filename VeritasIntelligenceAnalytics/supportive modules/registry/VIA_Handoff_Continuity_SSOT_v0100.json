@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-13T10:08:23+00:00",
+ "updated_at": "2026-10-13T12:52:00+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -6044,10 +6044,35 @@
   {
    "id": "VDF-REQ021:workstation_run",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "操作員",
    "reason": "真抓清單與一鍵啟動要工作站雙閘與網路(容器離線:清單步 SKIP 誠實);每日自動更新倉內沒有排程器,掛不掛每日鏈是操作員的手",
-   "next": "工作站:併分支 → activate_vdf → 問參數頁前兩列鎖定 → 啟動;貼回 lanes 存證(tw_list · etf_list OK)與 0-1 / 0-2 的 verify_report.json 燈 → 轉 VERIFIED(理由:工作站實錄)"
+   "next": "選:工作站 `python $V run --family vdf VDF_MDL009_TWStockList status` 貼回 verify_report.json 燈;每日自動更新 = 操作員把 via-vdffetch 掛進每日鏈",
+   "resolved": "工作站貼回 2026-10-13 20:32(工作站本地時間;Invoke-VIA-VdfFetch v0108 → v0107 → CGC_MDL134 run):道 1/13 datahome OK 11.1s · 2/13 tw_list OK 121.5s · 3/13 etf_list OK 46.3s · 4/13 hist_2023 OK 26.3s · 5/13 revenue_backfill OK 5.9s(清單兩步在 datahome 之後、資料步之前);單跑 VDF_MDL009_TWStockList v0102 run OK · 1,985 筆 · 12.4s(status 卡沒貼;verify_report 燈未見);⑦ 每日兩張清單檔 GREEN(台股個股 1,985 · 主動式 ETF 22 已驗證 22);PLAN 步 20 · 鏈 9(lists:tw_list → etf_list)· LIVE 13 步 = 問參數頁 11 步 + 清單 2 步(問參數頁決定行仍印「步 11/11」:鎖定列不經 -Steps,道上自動帶上 —— 設計如此;道橫幅印前版 ENGINE_TAG v0101,功能已是 v0102)"
+  },
+  {
+   "id": "VDF-REQ021:one_launch_ceiling",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "操作員(本次 env)/ AI(Register v0278,待 L70 逐件准)",
+   "reason": "工作站 activate_vdf 一鍵:清單先行 OK 之後整程被 Invoke-VIAPython 預設天花板 1800s 停掉 → all rc 124 · RED;步 7–13 沒跑完。天花板根因:activate_vdf(Register v0277)→ via-vcgc run --family vdf VDF_SystemManager all → Invoke-VIAPython 沒帶 -TimeoutSec → 預設 1800s(VIA_PS_PyProgress_Module;$env:VIA_PY_TIMEOUT_SEC 可調,0 = 不設限);問參數頁等待(≤ 15 分)+ ① 7 步 698s + ② 道並行都在同一支 python 子樹內,整程被殺 → rc 124。VdfFetch-v0107 內層那次 Invoke-VIAPython 也沒帶 -TimeoutSec(同一條 env 可解)",
+   "next": "本次:工作站 `$env:VIA_PY_TIMEOUT_SEC = 0`(或 14400)後 `activate_vdf`;長久:操作員准 Register v0278(activate_vdf 比照 via-in v0263:呼叫前天花板 < 14400 就放寬到 14400,結束還原)→ AI 出版 + 實測 + 冊"
+  },
+  {
+   "id": "VDF-REQ021:etf_universe_00998A",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "操作員裁定",
+   "reason": "道 etf_universe FAIL 47.3s:ENG077 v0105 rc 2 = 官方冊消失 1(00998A 主動復華金融股息;TWSE 冊 A 碼 31 · 既有快照 32)→ 標 MISSING_FROM_SOURCE 候查不刪;道上 rc≠0 = FAIL → etf 鏈後三步(etf_fetch · etf_history · etf_revenue)沒起;① 7 步裡同一支也 NODATA rc 2(黃)。清單引擎 MDL010 與 ENG231 仍 GREEN 22 檔,不受影響",
+   "next": "操作員查 00998A 是否下市 / 改碼:是 → 冊標退役(ENG077 規則內,不刪);否 → 來源缺口回報;若裁「候查不擋道」→ AI 出 ENG077 新尾版把既有碼消失降為 WARN rc 0"
+  },
+  {
+   "id": "VDF-REQ021:lanes_banner_tag",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI(下一次 MDL134 出尾版時)",
+   "reason": "並行道橫幅印前版 ENGINE_TAG「CGC_MDL134_ParallelLanes v0101」(v0102 薄尾沒蓋 ENGINE_TAG);功能已是 v0102(PLAN 20 步 9 鏈含 lists · LIVE 13 步含 tw_list · etf_list)。問參數頁決定行「步 11/11」同理:鎖定列不經 -Steps,設計如此",
+   "next": "下次 MDL134 出尾版順手 PRIOR.ENGINE_TAG 蓋成本版;ENG093 決定行可加印「+ 清單先行 2」;不單獨出版(不擴大範圍)"
   }
  ]
 }
