@@ -295,3 +295,4 @@ activate_vdf                                                    # ③ 問參數�
   - 00998A(主動復華金融股息)官方冊消失 → ENG077 rc 2 → 道 etf 鏈停:操作員裁定下市 / 改碼或「候查不擋道」(VDF-REQ021:etf_universe_00998A)。持股 PENDING_SOURCE 22 = 揭露時點,資訊而已。
   - 工作站自報(L120 只攤開):VRN_SystemManager 尾版 v0198 未入註冊冊 / 未編號、註冊冊待同步 new 1916 · changed 108 · stale 85、main 本地獨有 112 提交未推 —— 工作站 `via-vcgc registry-sync --apply` 與推送是操作員的手。
   - 冊:需求 v0207(evidence ⑤ + next + 貼回原話)· 交接項 workstation_run VERIFIED + 新三項 one_launch_ceiling · etf_universe_00998A · lanes_banner_tag。
+  - 收尾(容器 2026-10-13 13:10 UTC):需求 v0207 → registry-sync 新 0 · 編號稽核 遺失 0 · 改身分 0 · 重號 0 · SDD YELLOW(X-REQ GREEN)· 交接項 workstation_run 掛 lanes_v0102 收據(交接閘 VERIFIED 需收據;受理憑據 = 工作站貼回)· numbering 收據重跑綠 · handoff check 回到既有五紅 · test --quick YELLOW 紅 0(verb 46/46 · case 187/187)。
