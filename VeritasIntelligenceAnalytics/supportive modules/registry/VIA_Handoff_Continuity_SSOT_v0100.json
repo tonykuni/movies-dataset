@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-13T10:01:06+00:00",
+ "updated_at": "2026-10-13T10:08:23+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -5989,52 +5989,57 @@
   {
    "id": "VDF-REQ021:list_engines_ok",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "兩支清單生成引擎正常作業(容器離線自測:MDL009 v0100 7/7 · v0101 9/9 · v0102 5/5;MDL010 v0100 7/7;來源 TWSE / TPEX OpenAPI;驗證七項;輸出 *_latest.parquet / csv + vdf_master_lists.duckdb 增量);FetchSystem 冊 35 支引擎 needs 009 · 010 = 輸出作為其他引擎的輸入",
+   "reason": "兩支清單生成引擎正常作業(容器離線自測:MDL009 v0100 7/7 · v0101 9/9 · v0102 5/5;MDL010 v0100 7/7;來源 TWSE / TPEX OpenAPI;驗證七項;輸出 *_latest.parquet / csv + vdf_master_lists.duckdb 增量);FetchSystem 冊 35 支引擎 needs 009 · 010 = 輸出作為其他引擎的輸入 → 已驗:vdf_list_stock_v0102 2026-10-07T09:37:41+00:00 rc 0 標記見到",
    "next": "handoff test vdf_list_stock_v0102 · vdf_list_etf 收據 → VERIFIED;真抓在工作站",
    "case": "vdf_list_stock_v0102",
-   "receipt": "docs/handoff/evidence/vdf_list_stock_v0102.json"
+   "receipt": "docs/handoff/evidence/vdf_list_stock_v0102.json",
+   "resolved": "2026-10-13T10:08:23+00:00"
   },
   {
    "id": "VDF-REQ021:list_engines_ok_etf",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "主動式台股 ETF 清單引擎(MDL010 v0100 7/7;t187ap47_L · ENG077 代碼律 / 揭露律)",
+   "reason": "主動式台股 ETF 清單引擎(MDL010 v0100 7/7;t187ap47_L · ENG077 代碼律 / 揭露律) → 已驗:vdf_list_etf 2026-10-07T09:37:03+00:00 rc 0 標記見到",
    "next": "handoff test vdf_list_etf 收據 → VERIFIED",
    "case": "vdf_list_etf",
-   "receipt": "docs/handoff/evidence/vdf_list_etf.json"
+   "receipt": "docs/handoff/evidence/vdf_list_etf.json",
+   "resolved": "2026-10-13T10:08:23+00:00"
   },
   {
    "id": "VDF-REQ021:lists_first_book",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "一鍵啟動 ② 步冊 CGC_MDL125 沒有清單步 → v0112 在 datahome 之後插 tw_list · etf_list;容器自測 6/6 + 前版七檢",
+   "reason": "一鍵啟動 ② 步冊 CGC_MDL125 沒有清單步 → v0112 在 datahome 之後插 tw_list · etf_list;容器自測 6/6 + 前版七檢 → 已驗:fixall_v0112 2026-10-13T10:07:08+00:00 rc 0 標記見到",
    "next": "handoff test fixall_v0112 收據 → VERIFIED",
    "case": "fixall_v0112",
-   "receipt": "docs/handoff/evidence/fixall_v0112.json"
+   "receipt": "docs/handoff/evidence/fixall_v0112.json",
+   "resolved": "2026-10-13T10:08:23+00:00"
   },
   {
    "id": "VDF-REQ021:lists_first_lanes",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "並行道 CGC_MDL134 v0102:lists 鏈先跑、資料鏈全等 etf_list、--only 子集自動帶上(啟動器 $stepBook 不必改)、清單步帶 VCGC 入口標記;容器 plan 20 步 9 鏈 · run --only … --dry 清單步自動加入並先於資料步;自測 8/8 + 前版九檢",
+   "reason": "並行道 CGC_MDL134 v0102:lists 鏈先跑、資料鏈全等 etf_list、--only 子集自動帶上(啟動器 $stepBook 不必改)、清單步帶 VCGC 入口標記;容器 plan 20 步 9 鏈 · run --only … --dry 清單步自動加入並先於資料步;自測 8/8 + 前版九檢 → 已驗:lanes_v0102 2026-10-13T10:07:21+00:00 rc 0 標記見到",
    "next": "handoff test lanes_v0102 收據 → VERIFIED",
    "case": "lanes_v0102",
-   "receipt": "docs/handoff/evidence/lanes_v0102.json"
+   "receipt": "docs/handoff/evidence/lanes_v0102.json",
+   "resolved": "2026-10-13T10:08:23+00:00"
   },
   {
    "id": "VDF-REQ021:lists_first_page",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
+   "state": "VERIFIED",
    "owner": "AI",
-   "reason": "問參數頁 VDF_ENG093 v0105:矩陣最前兩列 tw_list · etf_list 鎖定必跑(不經 -Steps);容器渲染截圖核對;自測 7/7 + 前版鏈",
+   "reason": "問參數頁 VDF_ENG093 v0105:矩陣最前兩列 tw_list · etf_list 鎖定必跑(不經 -Steps);容器渲染截圖核對;自測 7/7 + 前版鏈 → 已驗:launch_console_v0105 2026-10-13T10:07:40+00:00 rc 0 標記見到",
    "next": "handoff test launch_console_v0105 收據 → VERIFIED",
    "case": "launch_console_v0105",
-   "receipt": "docs/handoff/evidence/launch_console_v0105.json"
+   "receipt": "docs/handoff/evidence/launch_console_v0105.json",
+   "resolved": "2026-10-13T10:08:23+00:00"
   },
   {
    "id": "VDF-REQ021:workstation_run",
