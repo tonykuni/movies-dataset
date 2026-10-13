@@ -1686,7 +1686,7 @@
   "vdf_fetchsystem_ssot_engines": {
    "tid": "vdf_fetchsystem_ssot_engines",
    "sub": "VDF",
-   "source": "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+   "source": "functional modules/VDF/VDF_FetchSystem_SSOT_v0107.json",
    "table": "engines",
    "columns": [
     {
@@ -6879,7 +6879,7 @@
     "to"
    ],
    "header_sha": "ccf0a8d239804a96",
-   "rows_seen": 33,
+   "rows_seen": 54,
    "issues": [],
    "status": "ACTIVE",
    "table_no": "SSOT-VCGC-VDF-TBL0076",
@@ -7205,7 +7205,186 @@
    "key_ruling": "composite",
    "key_ruled_at": "2026-10-06T15:44:03",
    "numbered_at": "2026-10-06T15:44:07"
+  },
+  "vdf_config_groups": {
+   "tid": "vdf_config_groups",
+   "sub": "VDF",
+   "source": "functional modules/VDF/SSOT/VDF_Config_v0100.json",
+   "table": "groups",
+   "columns": [
+    {
+     "name": "key",
+     "dtype": "str",
+     "required": true,
+     "pk": true
+    },
+    {
+     "name": "zh",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "start_date",
+     "dtype": "date",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "items",
+     "dtype": "json",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "updated_at",
+     "dtype": "date",
+     "required": true,
+     "pk": false
+    }
+   ],
+   "keys": [
+    "key",
+    "zh"
+   ],
+   "header_sha": "b0b0fc6920f2e085",
+   "rows_seen": 5,
+   "issues": [
+    "格內巢狀:items"
+   ],
+   "status": "ACTIVE",
+   "table_no": "",
+   "registered_at": "2026-10-13T19:32:35",
+   "history": []
+  },
+  "vdf_activeetf_retired_ssot_retired": {
+   "tid": "vdf_activeetf_retired_ssot_retired",
+   "sub": "VDF",
+   "source": "functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v0100.json",
+   "table": "retired",
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "pk": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "ruling",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "reason",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "retired_at",
+     "dtype": "date",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "revoked_at",
+     "dtype": "str",
+     "required": false,
+     "pk": false
+    }
+   ],
+   "keys": [
+    "ticker",
+    "name",
+    "ruling"
+   ],
+   "header_sha": "5da9aee312b16056",
+   "rows_seen": 1,
+   "issues": [],
+   "status": "ACTIVE",
+   "table_no": "",
+   "registered_at": "2026-10-13T19:32:35",
+   "history": []
+  },
+  "vdf_extend_ledger": {
+   "tid": "vdf_extend_ledger",
+   "sub": "VDF",
+   "source": "functional modules/VDF/registry/VDF_Extend_Ledger.jsonl",
+   "table": "rows",
+   "columns": [
+    {
+     "name": "ts",
+     "dtype": "date",
+     "required": true,
+     "pk": true
+    },
+    {
+     "name": "days",
+     "dtype": "int",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "universe_src",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "n",
+     "dtype": "int",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "ok",
+     "dtype": "int",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "added",
+     "dtype": "int",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "store_rows",
+     "dtype": "int",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "max_date",
+     "dtype": "date",
+     "required": true,
+     "pk": false
+    },
+    {
+     "name": "lamp",
+     "dtype": "str",
+     "required": true,
+     "pk": false
+    }
+   ],
+   "keys": [
+    "ts"
+   ],
+   "header_sha": "d2381d3223919cb5",
+   "rows_seen": 6,
+   "issues": [],
+   "status": "ACTIVE",
+   "table_no": "",
+   "registered_at": "2026-10-13T19:32:35",
+   "history": []
   }
  },
- "updated_at": "2026-10-06T16:00:00"
+ "updated_at": "2026-10-13T19:32:35"
 }

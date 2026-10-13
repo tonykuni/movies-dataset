@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-13T14:07:25+00:00",
+ "updated_at": "2026-10-13T19:39:11+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2966,6 +2966,68 @@
     "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
     "functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v*.json",
     "supportive modules/registry/CGC_MDL224_ScrapeGate_v*.py"
+   ],
+   "timeout_seconds": 900
+  },
+  "vdf_manager_v0158": {
+   "argv": [
+    "VDF_SystemManager_v0158",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_SystemManager_v0158 自測 7/7 · PASS",
+   "scope": "VDF_SystemManager v0158(VDF-REQ022):S2 ask 燈:VDF_SystemManager_v0158(薄尾;本體 v0155 不動):Open-VIA-VDF-v0103.ps1 只設 $global:LASTEXITCODE 不 exit,pwsh -Command \". '<opener>'\" 回 0 → 步燈假綠;v0158 把那條 -Command 補 `; exit $LASTEXITCODE`(只在 pwsh · -Command · 點源形狀 · 沒 exit 時),RUN_CMD 本體換成本版、冪等(MDL012 v0108 再載本檔不疊層);自測 7/7(含 v0157 → v0155 前版自測)",
+   "dependencies": [
+    "functional modules/VDF/VDF_SystemManager_v0158.py",
+    "functional modules/VDF/VDF_SystemManager_v0157.py",
+    "functional modules/VDF/VDF_SystemManager_v0156.py",
+    "functional modules/VDF/VDF_SystemManager_v0155.py",
+    "Open-VIA-VDF-v0103.ps1"
+   ],
+   "timeout_seconds": 1500
+  },
+  "eng232_v0102": {
+   "argv": [
+    "VDF_ENG232_TWIndexOfficial_v0102",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG232_TWIndexOfficial_v0102 薄尾 10/10 · PASS",
+   "scope": "VDF_ENG232_TWIndexOfficial v0102(VDF-REQ022):分段逐段入庫 · 接續 · 彙總判決;本體 v0100 / v0101 不動;零外呼自測(替身網路)",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0102.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0101.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0100.py"
+   ],
+   "timeout_seconds": 900
+  },
+  "mdl008_v0108": {
+   "argv": [
+    "VDF_MDL008_FetchSystem_v0108",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_MDL008_FetchSystem v0108 本版 8/8 · v0107 PASS · 合計 PASS",
+   "scope": "VDF_MDL008_FetchSystem v0108(VDF-REQ022):擷取冊按尾版 glob(v0107:e077 → v0106 · e232 → v0102 + timeout_s 14400 · e054 仍 v0109 · 其他 34 支同 v0106)· 子行程從本版起 · 列上限照 v0107 · 新行程探針讀到 v0107",
+   "dependencies": [
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0108.py",
+    "functional modules/VDF/VDF_MDL008_FetchSystem_v0107.py",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0107.json",
+    "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py",
+    "functional modules/VDF/engine/VDF_ENG232_TWIndexOfficial_v0102.py"
+   ],
+   "timeout_seconds": 1500
+  },
+  "productgate_v0103": {
+   "argv": [
+    "CGC_MDL133_ProductGate",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL133_ProductGate_v0103 薄尾 7/7 · PASS",
+   "scope": "CGC_MDL133_ProductGate v0103(VDF-REQ022 S6):G2 register_fns 沿 Register dot-source 鏈收 function global: · 梭名小寫比對(Windows 大小寫不分);G6 key_scan 不動;報表型,不改任何追蹤檔",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL133_ProductGate_v0103.py",
+    "supportive modules/registry/CGC_MDL133_ProductGate_v0102.py",
+    "Register-VIA-Commands-v0278.ps1",
+    "Register-VIA-Commands-v0243.ps1"
    ],
    "timeout_seconds": 900
   }
@@ -6129,6 +6191,136 @@
    "owner": "操作員(貼 log)→ AI(定根因)",
    "reason": "VDF 資料庫狀況頁貼回(VDF_ENG093 v0105 · 2026-10-13 21:03:17):各步結果 PART 但那份是 LANES_20260924_145157(頁自己註明比本次決定早 = 今天那趟被殺前沒寫 LANES_*.json);資料庫目錄 FRESH(21:03 重點)· 分類燈 RED(ETF 滯後 48 · 宏觀 49 · 國際 47 · 其他 104;營收 NODATA)· 增量缺口 表 73 有缺口 32(tw__tw_daily_prices → 2026-08-25 缺 49 · tw_chip_inst / margin → 2026-08-25 缺 415 · gl__global_daily → 2026-08-25 缺 49 …)· 引擎狀況(FG_20261012T113922Z 族群跑):RED rc 1 = e054 TWDailyBackfill · e057 TradingValueBackfill · e056 ChipBackfill · e078 ActiveETFHoldingsHistory · e082 FinStatements · e066 GlobalUniverse · e074 FredMacroSSOT;rc 124 = e232 TWIndexOfficial · 011d AkshareFetcher;YELLOW e063 rc 2;GREEN 009 · 010 · e077 · 006 · e113 · e229 · e116 · e115。rc 124 兩支 = 族群跑的逾時(同一類天花板);rc 1 七支容器看不到 log,不猜",
    "next": "貼 VIA_Reports/vdf/fg_runs/FG_20261012T113922Z/ 各引擎 log 最後 30 行(或 VDF_SystemManager engine matrix 的紅列詳情)→ AI 逐支定根因、出修法;分類燈與缺口表在一鍵跑完後重看"
+  },
+  {
+   "id": "VDF-REQ022:ask_lamp_honest",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "ask 步逾時沒點卻 GREEN rc 0(啟動器只設 LASTEXITCODE 不 exit)",
+   "next": "工作站 activate_vdf:逾時不點 → [2/9] 應 YELLOW rc 2;點了 → GREEN",
+   "case": "vdf_manager_v0158",
+   "receipt": "docs/handoff/evidence/vdf_manager_v0158.json",
+   "resolved": "S2 ask 燈:VDF_SystemManager_v0158(薄尾;本體 v0155 不動):Open-VIA-VDF-v0103.ps1 只設 $global:LASTEXITCODE 不 exit,pwsh -Command \". '<opener>'\" 回 0 → 步燈假綠;v0158 把那條 -Command 補 `; exit $LASTEXITCODE`(只在 pwsh · -Command · 點源形狀 · 沒 exit 時),RUN_CMD 本體換成本版、冪等(MDL012 v0108 再載本檔不疊層);自測 7/7(含 v0157 → v0155 前版自測)"
+  },
+  {
+   "id": "VDF-REQ022:e232_timeout_chunked",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI(薄尾)/ 操作員(工作站實跑)",
+   "reason": "e232 rc 124:整段抓完才 upsert,1800 s 被殺零進度",
+   "next": "工作站族群跑 TW_INDEX:看 e232_live.log segments 逐段 OK、庫內 tw_index_daily 日期前進;下一次從庫內最新日接續",
+   "case": "eng232_v0102",
+   "receipt": "docs/handoff/evidence/eng232_v0102.json",
+   "resolved": "S3 引擎紅 / 逾時:e232 rc 124 根因 = 族群冊帶 --start 2022-07-01 關掉 v0101 增量、v0100 整段(1,118 營業日 × 7 外呼 + 1.4 s/日)抓完才 upsert 一次 → 1800 s 被殺零進度;VDF_ENG232_TWIndexOfficial_v0102(薄尾):31 天一段逐段 upsert · 給 --start 但庫內兩指數已過它就從 next_start 接續 · 任一段 OK = OK · DENY/FAIL 當段即停;自測 10/10(v0101 8/8 · v0100 9/9)。冊 VDF_FetchSystem_SSOT_v0107:e232 → v0102 + timeout_s 14400 · e077 → v0106(退役冊生效)· e054 仍 v0109(v0110/v0111 是唯讀狀態卡,why_v0104 裁)· 其他 34 支同 v0106;VDF_MDL008_FetchSystem_v0108(薄尾):冊按尾版 glob(MDL012 早就 glob,兩邊同一本)· 子行程從本版起;自測 8/8(v0107 → v0101 鏈全 PASS)。011d:14400 s 列上限已照 MDL012 launch_child / MDL008 run_v0107;_call 無逐呼叫逾時,要 011d_live.log 再定。e074 rc 1 = 任一 FRED 序列 FAIL 即紅(紅冊設計;via-fred status → --retry-parked)。e054 e057 e056 e078 e082 e066 rc 1:自測全綠,rc 1 只能是執行期例外([MDL008] 例外 行)→ 要 VIA_Reports\\vdf_fetch\\_logs\\<id>_live.log(每次同 id 覆寫,重跑前先複製);e054 是道頭,e057/e056 的「交易日曆空」多半是它的連鎖"
+  },
+  {
+   "id": "VDF-REQ022:fetch_book_v0107_pins",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "FetchSystem 冊 e077 釘 v0105(退役冊不生效)· e232 無 timeout_s;MDL008 釘死冊名與 MDL012 的 glob 不同本",
+   "next": "工作站:MDL008 / MDL012 子行程都讀 v0107(e077 印 [退役] · e232 列上限 14400)",
+   "case": "mdl008_v0108",
+   "receipt": "docs/handoff/evidence/mdl008_v0108.json",
+   "resolved": "VDF_FetchSystem_SSOT_v0107 + VDF_MDL008_FetchSystem_v0108(冊按尾版 glob · 子行程從本版起;自測 8/8 鏈全 PASS);容器 MDL012 usertest static 39/0 不變"
+  },
+  {
+   "id": "VDF-REQ022:celeritas_seat_compile",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "accelerator/VeritasCeleritas.py 正本座 SyntaxError(894779cb 把橋注在 from __future__ 之前;token 卡 COMPILE)",
+   "next": "無;sweeper UNTOUCHABLE 名單照舊",
+   "case": "celeritas_gate_v0104",
+   "receipt": "docs/handoff/evidence/celeritas_gate_v0104.json",
+   "resolved": "橋段移到 from __future__ 之後(py_compile 過 · 80276330 之前是沒橋的 38 行 shim;R2 P1 同類修法;執行期本來不走此座,SUP_MDL737 直接服 v1141)"
+  },
+  {
+   "id": "VDF-REQ022:productgate_g2_shims",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "產品閘 G2 WARN 孤梭 3 = v0102 只讀最新 Register 檔(v0278 只有 activate_vdf → 函式 0)+ 大小寫集合差",
+   "next": "工作站 via-vcgc 產品閘重跑:G2 應 OK",
+   "case": "productgate_v0103",
+   "receipt": "docs/handoff/evidence/productgate_v0103.json",
+   "resolved": "ProductGate v0103 薄尾:register_fns 沿 dot-source 鏈 · 梭名小寫;自測 [計] CGC_MDL133_ProductGate_v0103 薄尾 7/7 · PASS"
+  },
+  {
+   "id": "VDF-REQ022:mdl740_v0119_register",
+   "requirement": "VDF-REQ022",
+   "state": "VERIFIED",
+   "owner": "AI",
+   "reason": "SUP_MDL740_NetUnified_v0119 不在版本登記冊(VIA-TOOL 只到 v0118)→ ToolProbe RED · EnvManager ⑥ RED",
+   "next": "工作站 via-vcgc 的 tool probe 應不再列 not registered",
+   "case": "tool_probe_v0106",
+   "receipt": "docs/handoff/evidence/tool_probe_v0106.json",
+   "resolved": "R78 編號 scope 帶 supportive modules/network/SUP_MDL740_NetUnified_v0119.py(CGC_MDL237 v0109 寫版本登記冊);稽核 遺失 0 · 改身分 0 · 重號 0"
+  },
+  {
+   "id": "VDF-REQ022:usertest_static_red",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(貼紅列)→ AI",
+   "reason": "S1 usertest:容器 MDL012 v0108 usertest --browser off = 綠 39 · 紅 0(冊 v0107 之後仍 39/0);工作站那 1 紅是資料相依的 static 列,容器看不到 → 要 VIA_Reports\\vdf\\ui\\VDF_FetchGroups_USERTEST_latest.json 的紅列(cmd_usertest 本來就印 [RED] key · note);find_browser 已含 VIA_BROWSER_EXE → Playwright → PATH → Program Files Chrome / Edge",
+   "next": "貼 VDF_FetchGroups_USERTEST_latest.json 的紅列或 usertest 印的 [RED] key · note 一行 → AI 定根因(資料相依 static 列,容器 39/0)"
+  },
+  {
+   "id": "VDF-REQ022:engine_reds_logs",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(貼 log)→ AI",
+   "reason": "e054 e057 e056 e078 e082 e066 rc 1 自測全綠 = 執行期例外;e074 rc 1 紅冊設計;011d rc 124 要看是否卡呼叫",
+   "next": "貼 VIA_Reports\\vdf_fetch\\_logs\\{e054,e057,e056,e078,e082,e066,e074,011d}_live.log 各最後 30 行(每次同 id 覆寫,先複製)→ AI 逐支定根因;e074 先 via-fred status → --retry-parked"
+  },
+  {
+   "id": "VDF-REQ022:key_guard_g6",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(換鑰 · 准遮罩)",
+   "reason": "S6 鑰匙守衛 G6:同一把 32 hex 鑰(sha256 指紋 = ProductGate KEY_HASHES 第 2 筆)在 10 支追蹤檔 15 行:new modules engines/VDF_MDL003_SentimentMacroEngine.py(34 · 92)· VDF_final/{README.md 156 · cockpit/index.html 447 · 1254 · config/macro_ssot.json 9 · vdf_fetch_matrix.json 8 · vdf_fetch_matrix.md 11 · via_master_ssot.json 49 · 164 · src/vdf_core.py 91 · src/vdf_fetchers_macro.py 138 · 219}+ references/intake/VIA_VDF_Engines_b716/VDF_MDL003_SentimentMacroEngine_2.py(34 · 76;MANIFEST 鎖位元);活讀者 0(ENG074 本體 v0103 fred_key 只讀 env / .fred_api_key / 提示;ssot_path 讀已遮罩的 b360);鑰已在 git 歷史與 origin/main(660834a5)→ 無論遮不遮都要換鑰。遮罩法(待准):13 行換 <REDACTED:VDF_FRED_API_KEY>(b360 / _from_vap 已用同款);收容區「原件零觸碰」與 b716 MANIFEST 要操作員裁;AI 不自改。G2 孤梭 WARN = ProductGate v0102 只讀最新 Register 檔 + 大小寫集合差(Windows 大小寫不分)→ ProductGate v0103 薄尾:register_fns 沿 dot-source 鏈(v0278 → … → v0243)收 function global: · 梭名小寫比對;G6 key_scan 不動;自測 [計] CGC_MDL133_ProductGate_v0103 薄尾 7/7 · PASS",
+   "next": "① 換 FRED 鑰(已在 git 歷史 / origin/main)② 准不准遮罩 13 行(含 b716 收容件 + MANIFEST 或 ProductGate KEY_EXCLUDE)→ AI 才動;活讀者 0,遮罩不影響引擎"
+  },
+  {
+   "id": "VDF-REQ022:dormant_sha_copies",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(裁定)",
+   "reason": "dormant 乾跑 22 支 _sha 副本 = 2026-10-10 還原裁定的那批;VDF_AutoCodeRegistryEngine_shad7fd781ac69f.py 無號無登記",
+   "next": "不跑 dormant --apply(會再搬走 MDL008 要的 001u/005);裁 VDF_AutoCodeRegistryEngine_sha…:改版號薄尾 + 編號,或搬 _superseded 補帳本一列"
+  },
+  {
+   "id": "VDF-REQ022:param_map_stale",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "AI(下一輪)",
+   "reason": "VDF_Param_Engine_Map_v0100 27/57 by_engine 鍵指不存在檔 · Fetch_Orders 004 九道不在 map(ENG053 寫死 v0100 就地)",
+   "next": "ENG053 v0103 薄尾 MAP_OUT 版本前進 + SystemManager read_factor / CGC_MDL116 讀者 glob;一併重產"
+  },
+  {
+   "id": "VDF-REQ022:groups_gated_window",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(視窗閘)",
+   "reason": "[4/9] groups GATED rc 4 = 視窗沒設 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT(冊與引擎永不代設)",
+   "next": "在自己視窗設閘再 activate_vdf;AI 不代設"
+  },
+  {
+   "id": "VDF-REQ022:vrn_v0204_registry",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(VRN 的手)",
+   "reason": "工作站 SDD RED = VRN FirstPageEngine v0204 未登記;此對話不動 VRN(L120)",
+   "next": "工作站 via-vcgc registry-sync --apply(VRN 自己的登記)"
+  },
+  {
+   "id": "VDF-REQ022:ps_template_debt_28",
+   "requirement": "VDF-REQ022",
+   "state": "PENDING",
+   "owner": "操作員(L70)",
+   "reason": "PS 模板既有債 28 支(VDF 0 支;根層活尾 2:Test-VIA-TheoryAudit.ps1 · VIA_WorkflowEngine.ps1,其餘 VAP / WorkOps / intake / new modules)",
+   "next": "L70 准再補模板章;sweeper 無此動作"
   }
  ]
 }
