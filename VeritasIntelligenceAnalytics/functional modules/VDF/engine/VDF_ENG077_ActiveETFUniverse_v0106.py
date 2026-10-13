@@ -5,7 +5,7 @@ v0105→v0106(2026-10-13;操作員裁定「00998A 標退役」;VDF-REQ021):
   → 並行道 etf 鏈 FAIL,後三步(etf_fetch · etf_history · etf_revenue)沒起。候查律本身沒錯(不刪、誠實回 2),
   但裁定退役之後要有地方登記,不然每天都紅。
   本支:讀 VDF 自己的退役冊 functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v*.json(尾版;只增不減,撤銷填 revoked_at):
-    ① unify 之後濾掉退役碼(不入當日宇宙列 · 不入 SSOT csv · ENG051 不再抓它的持股)
+    ① unify 之後濾掉退役碼(不入當日宇宙列 · 不入 SSOT csv · ENG051 不再抓它的持股)—— 三支換裝函式 _unify_v0106 / _persist_v0106 / _run_v0106 經 globals 掛回本體的名字
     ② persist 之後把退役碼在註冊表標 status=RETIRED · daily_required=FALSE(本體先標 MISSING_FROM_SOURCE,本支再改;不刪列,版史留)
     ③ 退役碼不計入「官方冊消失」→ 不因它回 rc 2;run 收尾印一行 [退役]
   本體 / ScrapeGate / 橋全照 v0105(尾版律取本體 = 最後一版具體實作;今天是 v0101)。舊版全留作版史(L04)。selftest 不抓網路。
@@ -148,14 +148,14 @@ def retired_tickers() -> dict:
     return out
 
 
-def unify(primary, fallback, existing):  # noqa: F811
+def _unify_v0106(primary, fallback, existing):
     """本體聯集之後濾掉退役碼:不入當日宇宙列、不入 SSOT csv。"""
     rows = _body_unify(primary, fallback, existing)
     ret = retired_tickers()
     return [r for r in rows if r["ticker"] not in ret]
 
 
-def persist(rows, ts, observed_tickers=None):  # noqa: F811
+def _persist_v0106(rows, ts, observed_tickers=None):
     """本體落地之後:註冊表裡的退役碼改標 RETIRED · daily_required=FALSE(不刪列),並從「官方冊消失」名單拿掉。"""
     p = _body_persist(rows, ts, observed_tickers)
     ret = retired_tickers()
@@ -178,7 +178,7 @@ def persist(rows, ts, observed_tickers=None):  # noqa: F811
     return p
 
 
-def run(args):  # noqa: F811
+def _run_v0106(args):
     _LAST.update(retired=[], book="")
     rc = _body_run(args)
     ret = retired_tickers()
@@ -186,6 +186,10 @@ def run(args):  # noqa: F811
         book = _retired_book()
         print(f"  [退役] 冊 {book.name if book else '—'} · {len(ret)} 檔 {sorted(ret)} · 註冊表改標 RETIRED {len(_LAST['retired'])} 檔 · 不入宇宙列 · 不計官方冊消失(操作員裁定)", flush=True)
     return rc
+
+
+# 本體的名字用 globals 換裝(不在本支靜態重定義 unify / persist / run):註冊冊掃描照舊把本體函式記在 v0101,本支只多三支 _v0106
+globals()["unify"], globals()["persist"], globals()["run"] = _unify_v0106, _persist_v0106, _run_v0106
 
 
 def main() -> int:  # noqa: F811
