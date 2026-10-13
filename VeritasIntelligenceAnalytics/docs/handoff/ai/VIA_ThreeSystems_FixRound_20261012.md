@@ -288,3 +288,4 @@ python $V run --family vdf VDF_MDL009_TWStockList status       #    看 0-1 / 0-
 activate_vdf                                                    # ③ 問參數頁:前兩列 tw_list · etf_list 鎖定 → 按「用預設參數啟動」
 ```
 貼回 ①② 的 `[計]` 行、`status` 那張、以及啟動後 lanes 存證裡 tw_list · etf_list 兩列(OK · 秒數)。
+- 收尾(容器 2026-10-13 10:30 UTC):需求 v0206(VDF-REQ021 homes 只留交接冊 + 盤點冊 v0178;三支模組在 modules 欄)→ SDD X-REQ GREEN · 整體 YELLOW(X-REQ-OPEN 80 · X-LOCK 6 既有)· registry-sync 新 0 · 編號稽核 遺失 0 · 改身分 0 · 重號 0(冊內不一致 1 既有)· 重跑收據 cov_vdf_eng093 · vdf_manager_v0155 · vdf_manager_v0156 · chain(新 0 · 缺 0)· numbering 五件全綠 · handoff check 回到既有五紅(ENG086 v0102 · VRN FirstPageEngine v0130 · SUP_MDL749 v0116 / v0117 · CGC_MDL264 v0100)· test --quick YELLOW 紅 0(verb 46/46 · case 187/187 · 279 支 compile 錯 0;黃 = V-handoff-check 既有五紅 · P-entry 容器沒 pwsh)。提交 6a2e8dc8 → 55f74cd8 → 01d2f72a → dda04e7d → a4d50727 → e66668dc → b4540707 → d1a2c5b2 → 本次。
