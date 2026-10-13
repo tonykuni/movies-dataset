@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-12T16:54:51+00:00",
+ "updated_at": "2026-10-13T10:01:06+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2887,6 +2887,55 @@
    ],
    "timeout_seconds": 900,
    "registered_at": "2026-10-12T16:47:41+00:00"
+  },
+  "fixall_v0112": {
+   "argv": [
+    "CGC_MDL125_FixAll_v0112",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL125_FixAll v0112 薄尾 6/6 · PASS",
+   "scope": "CGC_MDL125_FixAll v0112 清單先行:步冊 = 前版 18 步 + datahome 之後 tw_list(VDF_MDL009 尾版 run)· etf_list(VDF_MDL010 尾版 run);net · 逾時 600 · 引擎缺照實;前版 run / main 走本版步冊;DRY 全鏈 20 步零執行;前版七檢(VDF-REQ021)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL125_FixAll_v0112.py",
+    "supportive modules/registry/CGC_MDL125_FixAll_v0111.py",
+    "functional modules/VDF/VDF_MDL009_TWStockList_v*.py",
+    "functional modules/VDF/VDF_MDL010_ActiveETFList_v*.py"
+   ],
+   "timeout_seconds": 600,
+   "registered_at": "2026-10-13T10:01:06+00:00"
+  },
+  "lanes_v0102": {
+   "argv": [
+    "CGC_MDL134_ParallelLanes_v0102",
+    "--selftest"
+   ],
+   "success_marker": "[計] CGC_MDL134_ParallelLanes v0102 薄尾 8/8 · PASS",
+   "scope": "CGC_MDL134_ParallelLanes v0102 清單先行:鏈冊 += lists(tw_list 等 datahome · etf_list 等 tw_list)· 資料鏈每步 after += etf_list(安裝鏈除外)· --only 子集自動帶上清單步 · 清單步子行程 VIA_FROM_VCGC=YES · 排程實測清單跑完資料鏈才起 · 真步冊 20 步全入鏈;前版九檢(VDF-REQ021)",
+   "dependencies": [
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v0102.py",
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v0101.py",
+    "supportive modules/registry/CGC_MDL125_FixAll_v*.py"
+   ],
+   "timeout_seconds": 900,
+   "registered_at": "2026-10-13T10:01:06+00:00"
+  },
+  "launch_console_v0105": {
+   "argv": [
+    "VDF_ENG093_LaunchConsole_v0105",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG093_LaunchConsole v0105 薄尾 7/7 · PASS",
+   "scope": "VDF_ENG093_LaunchConsole v0105 清單先行鎖定列:矩陣最前兩列 tw_list · etf_list(lock · checked · disabled,JS boxes() 與 -Steps 不含)· 決定 / validate 不變(清單步交 CGC_MDL134 自動先跑)· 頁首 v0105 · 真樹矩陣與渲染;前版鏈 v0104 → v0103(VDF-REQ021)",
+   "dependencies": [
+    "functional modules/VDF/VDF_ENG093_LaunchConsole_v0105.py",
+    "functional modules/VDF/VDF_ENG093_LaunchConsole_v0104.py",
+    "functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py",
+    "supportive modules/registry/CGC_MDL125_FixAll_v*.py",
+    "supportive modules/registry/CGC_MDL134_ParallelLanes_v*.py",
+    "Invoke-VIA-VdfFetch-v*.ps1"
+   ],
+   "timeout_seconds": 900,
+   "registered_at": "2026-10-13T10:01:06+00:00"
   }
  },
  "work_items": [
@@ -5936,6 +5985,64 @@
    "owner": "操作員",
    "reason": "容器只有無頭截圖(襯線 Cormorant Garamond 本機沒裝 → 退 Georgia / 系統襯線;工作站字體不同);頁面實看在工作站",
    "next": "工作站看 VDF 頁 · 預覽頁 · 操作台;要改的顏色 / 字體貼回 → 出冊 v0104(只改冊,引擎不動)"
+  },
+  {
+   "id": "VDF-REQ021:list_engines_ok",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "兩支清單生成引擎正常作業(容器離線自測:MDL009 v0100 7/7 · v0101 9/9 · v0102 5/5;MDL010 v0100 7/7;來源 TWSE / TPEX OpenAPI;驗證七項;輸出 *_latest.parquet / csv + vdf_master_lists.duckdb 增量);FetchSystem 冊 35 支引擎 needs 009 · 010 = 輸出作為其他引擎的輸入",
+   "next": "handoff test vdf_list_stock_v0102 · vdf_list_etf 收據 → VERIFIED;真抓在工作站",
+   "case": "vdf_list_stock_v0102",
+   "receipt": "docs/handoff/evidence/vdf_list_stock_v0102.json"
+  },
+  {
+   "id": "VDF-REQ021:list_engines_ok_etf",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "主動式台股 ETF 清單引擎(MDL010 v0100 7/7;t187ap47_L · ENG077 代碼律 / 揭露律)",
+   "next": "handoff test vdf_list_etf 收據 → VERIFIED",
+   "case": "vdf_list_etf",
+   "receipt": "docs/handoff/evidence/vdf_list_etf.json"
+  },
+  {
+   "id": "VDF-REQ021:lists_first_book",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "一鍵啟動 ② 步冊 CGC_MDL125 沒有清單步 → v0112 在 datahome 之後插 tw_list · etf_list;容器自測 6/6 + 前版七檢",
+   "next": "handoff test fixall_v0112 收據 → VERIFIED",
+   "case": "fixall_v0112",
+   "receipt": "docs/handoff/evidence/fixall_v0112.json"
+  },
+  {
+   "id": "VDF-REQ021:lists_first_lanes",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "並行道 CGC_MDL134 v0102:lists 鏈先跑、資料鏈全等 etf_list、--only 子集自動帶上(啟動器 $stepBook 不必改)、清單步帶 VCGC 入口標記;容器 plan 20 步 9 鏈 · run --only … --dry 清單步自動加入並先於資料步;自測 8/8 + 前版九檢",
+   "next": "handoff test lanes_v0102 收據 → VERIFIED",
+   "case": "lanes_v0102",
+   "receipt": "docs/handoff/evidence/lanes_v0102.json"
+  },
+  {
+   "id": "VDF-REQ021:lists_first_page",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "AI",
+   "reason": "問參數頁 VDF_ENG093 v0105:矩陣最前兩列 tw_list · etf_list 鎖定必跑(不經 -Steps);容器渲染截圖核對;自測 7/7 + 前版鏈",
+   "next": "handoff test launch_console_v0105 收據 → VERIFIED",
+   "case": "launch_console_v0105",
+   "receipt": "docs/handoff/evidence/launch_console_v0105.json"
+  },
+  {
+   "id": "VDF-REQ021:workstation_run",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "操作員",
+   "reason": "真抓清單與一鍵啟動要工作站雙閘與網路(容器離線:清單步 SKIP 誠實);每日自動更新倉內沒有排程器,掛不掛每日鏈是操作員的手",
+   "next": "工作站:併分支 → activate_vdf → 問參數頁前兩列鎖定 → 啟動;貼回 lanes 存證(tw_list · etf_list OK)與 0-1 / 0-2 的 verify_report.json 燈 → 轉 VERIFIED(理由:工作站實錄)"
   }
  ]
 }

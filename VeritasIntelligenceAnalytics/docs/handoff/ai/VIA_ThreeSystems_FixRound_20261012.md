@@ -264,3 +264,27 @@ python $V run CGC_MDL274_HealthMatrix ui                                 # 1a:VC
 python $V run CGC_MDL261_UIEngine build --open                           # 1a:操作台
 ```
 貼回:哪一頁 · 哪個顏色 / 字體 / 邊角要改(對照冊 `tokens` / `systems` 鍵名);1b 等 VRN-MAIN 下一版照冊套後貼 `[計]` 行。
+
+## 十四、R77 清單先行:台股個股清單(VDF_MDL009)+ 主動式台股 ETF 清單(VDF_MDL010)先跑、輸出作為其他引擎的輸入、VDF 一鍵啟動(VDF-REQ021;容器 2026-10-13)
+操作員令:「要先確令台股個股清單生成引擎自動更新以及主動式台股ETF清單自動更新生成引擎正常作業  輸出作為其他引擎的輸入  VDF 一鍵啟動」+ 問參數頁貼回(v0103 · 11 步矩陣沒有清單引擎 · 啟動就緒 GREEN 來源 v0157 · 資料庫目錄 STALE 25.8h · 分類 RED · 缺口 43 表自 2026-08-25)。
+- 兩支清單引擎(擷取第一步 ①②,2026-10-03):`VDF_MDL009_TWStockList`(v0100–v0102;TWSE STOCK_DAY_ALL + t187ap03_L · TPEX OpenAPI;驗證 V1–V7;輸出 `0-1-TWStockList/tw_stock_list_latest.parquet/.csv` + `vdf_master_lists.duckdb` 表 `tw_stock_list` 增量)· `VDF_MDL010_ActiveETFList`(v0100;t187ap47_L · ENG077 代碼律 / 揭露律;輸出 `0-2-ActiveETFList/active_etf_list_latest.*` + 表 `tw_active_etf_list`)。容器自測(經 VCGC run):MDL009 7/7 · 9/9 · 5/5;MDL010 7/7。入口律 `VIA_FROM_VDFSM=YES` 或 VCGC;網路只走鎖版工具(雙閘在工具裡)。
+- 「輸出作為其他引擎的輸入」本來就是冊上的硬規則:`VDF_FetchSystem_SSOT_v0106.json` 35 支引擎 `needs ['009','010']`;`VDF_MDL008` 清單不在不檢其他輸出;`VDF_MDL012` 族群頁清單先行(紅就停 rc 5)→ `activate_vdf` / `VDF_SystemManager all` 的 groups 步本來就先跑它們。
+- 缺口 = 問參數頁那條一鍵(`via-vdffetch` → `CGC_MDL134 run --only $stepBook`):步冊 `CGC_MDL125` 沒有這兩步 → 矩陣看不到、並行道不先跑。三支薄尾(都不動 .ps1):
+  - `CGC_MDL125_FixAll_v0112.py`:plan() = 前版 18 步 + datahome 之後插 `tw_list`(MDL009 尾版 run)· `etf_list`(MDL010 尾版 run);net · 逾時 600;自測 6/6 + 前版七檢。
+  - `CGC_MDL134_ParallelLanes_v0102.py`:鏈冊 += lists(tw_list 等 datahome · etf_list 等 tw_list;同鏈序跑);資料鏈每步 after += etf_list(pip / node 安裝鏈除外);`--only` 子集沒列清單步也自動帶上(啟動器 `$stepBook` 與 `-Steps` 照舊);清單步子行程帶 `VIA_FROM_VCGC=YES`;自測 8/8 + 前版九檢。容器 `plan`:步 20 · 鏈 9(lists:tw_list → etf_list);`run --only datahome,hist_2023,global --dry`:5 步,清單步自動加入並先於 hist_2023 / global(離線全 SKIP,誠實)。
+  - `VDF_ENG093_LaunchConsole_v0105.py`:矩陣最前兩列 tw_list · etf_list 鎖定必跑(checked · disabled · class lock;JS 的 boxes() 與 -Steps 不含它們,交並行道自動先跑);逐一引擎自測也測它們;頁首 v0105;自測 7/7 + 前版鏈;容器渲染截圖核對。
+- 自動更新 = 每次一鍵啟動都先重抓當日清單並增量進庫;倉內沒有獨立排程器(`via_boot_update.ps1` / `VIA.ps1` 不呼叫清單引擎)—— 要每日自動就把 `via-vdffetch` 掛進每日鏈(操作員的手)。
+- 冊:需求 v0204(+VDF-REQ021 原話 + 貼回)· 盤點 v0178(+C-fixall_v0112 · C-lanes_v0102 · C-launch_console_v0105)· 交接案三件 + 工作項 VDF-REQ021:list_engines_ok / list_engines_ok_etf / lists_first_book / lists_first_lanes / lists_first_page(收據後 VERIFIED)· workstation_run(操作員)。
+- 工作站一貼:
+```powershell
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+via-medic sync --apply --branch claude/kind-cannon-pti15g
+$V = (Get-ChildItem "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName
+$env:VIA_FROM_VCGC = "YES"
+python $V run --family vdf VDF_MDL009_TWStockList run          # ① 台股個股清單:真抓今天(雙閘在工具裡;閘關 = DENY 誠實)
+python $V run --family vdf VDF_MDL010_ActiveETFList run        # ② 主動式台股 ETF 清單
+python $V run --family vdf VDF_MDL009_TWStockList status       #    看 0-1 / 0-2 的 verify_report.json 燈與 vdf_master_lists.duckdb 列數
+activate_vdf                                                    # ③ 問參數頁:前兩列 tw_list · etf_list 鎖定 → 按「用預設參數啟動」
+```
+貼回 ①② 的 `[計]` 行、`status` 那張、以及啟動後 lanes 存證裡 tw_list · etf_list 兩列(OK · 秒數)。
