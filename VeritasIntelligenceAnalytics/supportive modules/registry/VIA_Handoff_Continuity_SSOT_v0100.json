@@ -1,7 +1,7 @@
 {
  "schema": "VIA.HandoffContinuity.SSOT.v1",
  "version": "v0100",
- "updated_at": "2026-10-13T13:04:05+00:00",
+ "updated_at": "2026-10-13T14:07:25+00:00",
  "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
  "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
  "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -2936,6 +2936,38 @@
    ],
    "timeout_seconds": 900,
    "registered_at": "2026-10-13T10:01:06+00:00"
+  },
+  "activate_vdf_v0278": {
+   "argv": [
+    "CGC_MDL157_VIAUniqueEntryControl",
+    "--selftest"
+   ],
+   "success_marker": "[OK] 撞號以編號系統唯一碼為準:同號群組每支有碼 = 不算撞號;沒碼 = 撞號",
+   "scope": "短令 activate_vdf v0278(VDF-REQ021;操作員准 2026-10-13「准 Register v0278 出版」):Register-VIA-Commands-v0278 蓋過 v0277 的 activate_vdf —— ② all 呼叫前 $env:VIA_PY_TIMEOUT_SEC 沒設 / 不是數字 / < 14400 就放寬到 14400 秒,跑完還原;其餘一字不差;CGC_MDL157 自測 = 命令冊沿 dot-source 鏈讀(v0278 → v0277 → v0276 …)· 梭檢全有梭 · 零釘死。容器無 pwsh:函式本體要工作站實跑",
+   "dependencies": [
+    "Register-VIA-Commands-v0278.ps1",
+    "Register-VIA-Commands-v0277.ps1",
+    "Register-VIA-Commands-v0276.ps1",
+    "activate_vdf.cmd",
+    "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v*.py"
+   ],
+   "timeout_seconds": 600
+  },
+  "eng077_v0106": {
+   "argv": [
+    "VDF_ENG077_ActiveETFUniverse_v0106",
+    "--selftest"
+   ],
+   "success_marker": "[計] VDF_ENG077_ActiveETFUniverse v0106 薄尾 9/9 · PASS",
+   "scope": "VDF_ENG077_ActiveETFUniverse v0106 退役冊(VDF-REQ021;操作員裁定「00998A 標退役」):unify 濾掉退役碼 · persist 後註冊表 RETIRED · daily_required=FALSE · 不計官方冊消失 · run 印 [退役];撤銷(revoked_at)不算退役;本體照尾版律 v0101 · ScrapeGate 尾版 · 橋在 · PINVER 0;離線 rc 2 誠實",
+   "dependencies": [
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py",
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+    "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
+    "functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v*.json",
+    "supportive modules/registry/CGC_MDL224_ScrapeGate_v*.py"
+   ],
+   "timeout_seconds": 900
   }
  },
  "work_items": [
@@ -6055,18 +6087,24 @@
   {
    "id": "VDF-REQ021:one_launch_ceiling",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
-   "owner": "操作員(本次 env)/ AI(Register v0278,待 L70 逐件准)",
+   "state": "VERIFIED",
+   "owner": "AI(出版)/ 操作員(准 · 工作站實跑)",
    "reason": "工作站 activate_vdf 一鍵:清單先行 OK 之後整程被 Invoke-VIAPython 預設天花板 1800s 停掉 → all rc 124 · RED;步 7–13 沒跑完。天花板根因:activate_vdf(Register v0277)→ via-vcgc run --family vdf VDF_SystemManager all → Invoke-VIAPython 沒帶 -TimeoutSec → 預設 1800s(VIA_PS_PyProgress_Module;$env:VIA_PY_TIMEOUT_SEC 可調,0 = 不設限);問參數頁等待(≤ 15 分)+ ① 7 步 698s + ② 道並行都在同一支 python 子樹內,整程被殺 → rc 124。VdfFetch-v0107 內層那次 Invoke-VIAPython 也沒帶 -TimeoutSec(同一條 env 可解)",
-   "next": "本次:工作站 `$env:VIA_PY_TIMEOUT_SEC = 0`(或 14400)後 `activate_vdf`;長久:操作員准 Register v0278(activate_vdf 比照 via-in v0263:呼叫前天花板 < 14400 就放寬到 14400,結束還原)→ AI 出版 + 實測 + 冊"
+   "next": "工作站併分支後 activate_vdf 一次:旗標行印「尾版 v0278」、② 前印「天花板放寬到 14400 秒」→ lanes 跑完 13/13(見 one_launch_rerun)",
+   "case": "activate_vdf_v0278",
+   "receipt": "docs/handoff/evidence/activate_vdf_v0278.json",
+   "resolved": "操作員 2026-10-13「准 Register v0278 出版」→ Register-VIA-Commands-v0278.ps1(操作員准 2026-10-13;L70):點源 v0277、只蓋 activate_vdf —— ② all 呼叫前比照 via-in(v0263):$env:VIA_PY_TIMEOUT_SEC 沒設 / 不是數字 / 小於 14400 就放寬到 14400 秒,跑完還原,設 0 照你的;env 由 pwsh 子行程(問參數頁 → VdfFetch)繼承,內層那次 Invoke-VIAPython 同受惠;其餘與 v0277 一字不差(diff = 點源行 + 10 行天花板段 + 旗標行);activate_vdf.cmd 梭照 glob 取尾版自動接上;容器無 pwsh:括號平衡 73/73 · 全景剖析 問題 0 · CGC_MDL157 自測 rc 0,函式本體要工作站實跑"
   },
   {
    "id": "VDF-REQ021:etf_universe_00998A",
    "requirement": "VDF-REQ021",
-   "state": "PENDING",
-   "owner": "操作員裁定",
+   "state": "VERIFIED",
+   "owner": "操作員裁定 → AI",
    "reason": "道 etf_universe FAIL 47.3s:ENG077 v0105 rc 2 = 官方冊消失 1(00998A 主動復華金融股息;TWSE 冊 A 碼 31 · 既有快照 32)→ 標 MISSING_FROM_SOURCE 候查不刪;道上 rc≠0 = FAIL → etf 鏈後三步(etf_fetch · etf_history · etf_revenue)沒起;① 7 步裡同一支也 NODATA rc 2(黃)。清單引擎 MDL010 與 ENG231 仍 GREEN 22 檔,不受影響",
-   "next": "操作員查 00998A 是否下市 / 改碼:是 → 冊標退役(ENG077 規則內,不刪);否 → 來源缺口回報;若裁「候查不擋道」→ AI 出 ENG077 新尾版把既有碼消失降為 WARN rc 0"
+   "next": "工作站下一次 etf_universe 跑到:印 [退役] 一行 · 註冊表 00998A 改標 RETIRED · rc 不再因它回 2 → etf 鏈後三步起;再有退役就加進冊(新版號),撤銷填 revoked_at",
+   "case": "eng077_v0106",
+   "receipt": "docs/handoff/evidence/eng077_v0106.json",
+   "resolved": "操作員 2026-10-13「00998A 標退役」→ VDF_ENG077_ActiveETFUniverse_v0106.py(薄尾,本體照尾版律仍是 v0101)+ 退役冊 functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v0100.json(00998A 主動復華金融股息 · 裁定「00998A 標退役」2026-10-13 · 只增不減,撤銷填 revoked_at):① unify 之後濾掉退役碼(不入當日宇宙列 · 不入 SSOT csv · ENG051 不再抓其持股)② persist 之後註冊表 status=RETIRED · daily_required=FALSE(不刪列)③ 不計官方冊消失(rc 不因它回 2)· run 收尾印 [退役];自測 9/9(冊在 · 濾 · 撤銷不濾 · RETIRED · 離線 rc 2 誠實)。工作站下一次一鍵 / etf_universe 跑到就把 00998A 那列改標"
   },
   {
    "id": "VDF-REQ021:lanes_banner_tag",
@@ -6075,6 +6113,22 @@
    "owner": "AI(下一次 MDL134 出尾版時)",
    "reason": "並行道橫幅印前版 ENGINE_TAG「CGC_MDL134_ParallelLanes v0101」(v0102 薄尾沒蓋 ENGINE_TAG);功能已是 v0102(PLAN 20 步 9 鏈含 lists · LIVE 13 步含 tw_list · etf_list)。問參數頁決定行「步 11/11」同理:鎖定列不經 -Steps,設計如此",
    "next": "下次 MDL134 出尾版順手 PRIOR.ENGINE_TAG 蓋成本版;ENG093 決定行可加印「+ 清單先行 2」;不單獨出版(不擴大範圍)"
+  },
+  {
+   "id": "VDF-REQ021:one_launch_rerun",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "操作員(工作站)",
+   "reason": "一鍵整程要在 v0278(天花板)+ ENG077 v0106(退役)之後重跑一次才算驗:今天那趟 rc 124、LANES_*.json 沒寫,資料庫狀況頁還掛 2026-09-24 那份報告",
+   "next": "併分支 → activate_vdf → 貼回 [道] 1..13/13 各列(OK · 秒數)· [退役] 行 · 資料庫狀況頁(分類燈 · 增量缺口表數)→ VERIFIED(理由:工作站實錄)"
+  },
+  {
+   "id": "VDF-REQ021:db_stale_engines",
+   "requirement": "VDF-REQ021",
+   "state": "PENDING",
+   "owner": "操作員(貼 log)→ AI(定根因)",
+   "reason": "VDF 資料庫狀況頁貼回(VDF_ENG093 v0105 · 2026-10-13 21:03:17):各步結果 PART 但那份是 LANES_20260924_145157(頁自己註明比本次決定早 = 今天那趟被殺前沒寫 LANES_*.json);資料庫目錄 FRESH(21:03 重點)· 分類燈 RED(ETF 滯後 48 · 宏觀 49 · 國際 47 · 其他 104;營收 NODATA)· 增量缺口 表 73 有缺口 32(tw__tw_daily_prices → 2026-08-25 缺 49 · tw_chip_inst / margin → 2026-08-25 缺 415 · gl__global_daily → 2026-08-25 缺 49 …)· 引擎狀況(FG_20261012T113922Z 族群跑):RED rc 1 = e054 TWDailyBackfill · e057 TradingValueBackfill · e056 ChipBackfill · e078 ActiveETFHoldingsHistory · e082 FinStatements · e066 GlobalUniverse · e074 FredMacroSSOT;rc 124 = e232 TWIndexOfficial · 011d AkshareFetcher;YELLOW e063 rc 2;GREEN 009 · 010 · e077 · 006 · e113 · e229 · e116 · e115。rc 124 兩支 = 族群跑的逾時(同一類天花板);rc 1 七支容器看不到 log,不猜",
+   "next": "貼 VIA_Reports/vdf/fg_runs/FG_20261012T113922Z/ 各引擎 log 最後 30 行(或 VDF_SystemManager engine matrix 的紅列詳情)→ AI 逐支定根因、出修法;分類燈與缺口表在一鍵跑完後重看"
   }
  ]
 }
