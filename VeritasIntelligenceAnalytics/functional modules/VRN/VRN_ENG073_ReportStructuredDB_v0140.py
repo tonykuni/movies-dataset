@@ -11,6 +11,7 @@ r"""VRN_ENG073_ReportStructuredDB v0140 — 薄尾:vrn_report_metrics 同期多�
   ② 併:同 report_file+metric+period+value 只留第一筆(原文出現次序);
   ③ 標:同 report_file+metric+period 仍有兩個以上不同值 → 每列 status 改成「CONFLICT:<原狀態>」,值都留(不替操作員挑值);
      下游 ENG080 每年取第一筆、來源欄會帶出 metrics:CONFLICT:…,看得出來不是乾淨值。
+  自測結束碼:0 全綠 · 3 本版全過但前版鏈因環境缺件(pydantic)紅、且收斂沒新增任何紅 · 1 其餘。
   入庫路徑:run 內的 extract_one 包一層 resolve_metrics(換的是本體模組的全域,run 照本體原樣跑);
   既有資料:`metrics-resolve [--db 庫] [--apply]` 依 report_file 先刪再插(與 run 同一寫法);不帶 --apply 一律乾跑;
            `metrics-resolve --selftest` 只跑本版收斂五檢(完整 --selftest 另接前版鏈,前版自身的紅照實傳出);
@@ -260,9 +261,13 @@ def selftest(chain: bool = True) -> int:
     chk("⑥ 前版自測鏈:本版收斂不新增任何紅(與不掛收斂時的 FAIL 集合相同;前版自身的紅照實列出)",
         now == base, f"{_PRIOR_PATH.name} rc={rc1} · {tally} · 新增紅 {sorted(now - base) or 0}")
     ok = all(results)
+    missing = [m for m in ("pydantic",) if importlib.util.find_spec(m) is None]
     print(f"  [v0140] 自測 {sum(results)}/{len(results)} · {'PASS' if ok else 'FAIL'}"
-          + ("" if rc1 == 0 else f" · 前版鏈 rc={rc1}(既有紅照實傳出,不因本版綠而洗綠)"))
-    return 0 if ok and rc1 == 0 else 1
+          + ("" if rc1 == 0 else f" · 前版鏈 rc={rc1}(既有紅照實傳出,不因本版綠而洗綠)")
+          + (f" · 環境缺件 {missing}(裝件是操作員的手)" if missing and rc1 else ""))
+    if ok and rc1 == 0:
+        return 0
+    return 3 if ok and missing and now == base else 1   # 3 = 環境缺件(誠實態);缺件之外的紅照回 1
 
 
 def main() -> int:
