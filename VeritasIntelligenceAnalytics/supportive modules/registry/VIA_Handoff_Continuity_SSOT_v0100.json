@@ -180,10 +180,11 @@
         "--selftest"
       ],
       "success_marker": "[來源回歸] fail=0",
-      "scope": "四來源 ID／空值／相同字形不重複計票／表格保留／失敗才升級規劃",
+      "scope": "四來源 ID／空值／相同字形不重複計票／表格保留／失敗才升級規劃;2026-10-14 VRN_SystemManager v0152:provenance 動詞放回自測攔截之前(v0111 起 `--selftest in args[:2]` 把它吃成管理器自測鏈)",
       "dependencies": [
         "functional modules/VRN/VRN_ENG114_SourceProvenance_v0100.py",
         "functional modules/VRN/VRN_SystemManager_v0110.py",
+        "functional modules/VRN/VRN_SystemManager_v0152.py",
         "functional modules/VRN/tests/test_SourceProvenance_v0100.py",
         "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
         "supportive modules/registry/CGC_MDL237_NumberingSystem_v0107.py",
@@ -2661,14 +2662,12 @@
     {
       "id": "VRN-REQ007:provenance",
       "requirement": "VRN-REQ007",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "case": "provenance",
       "receipt": "docs/handoff/evidence/provenance.json",
-      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
-      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
-      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
       "pended_at": "2026-10-10T08:12:49+00:00",
-      "pended_from": "VERIFIED"
+      "pended_from": "VERIFIED",
+      "note": "2026-10-14 操作員「繼續修 VRN provenance」→ VRN_SystemManager v0152(VRN 自己的 manager · L120):provenance 動詞放回自測攔截之前;handoff test provenance rc 0 · 標記「[來源回歸] fail=0; tests=23」見到。前因:v0111 起 main 以 `--selftest in args[:2]` 攔自測,把 provenance --selftest 吃成管理器自測鏈"
     },
     {
       "id": "host-live",
@@ -3352,14 +3351,12 @@
     {
       "id": "VCGC-REQ099:provenance",
       "requirement": "VCGC-REQ099",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "case": "provenance",
       "receipt": "docs/handoff/evidence/provenance.json",
-      "owner": "操作員裁定(VRN 暫緩,2026-10-10)",
-      "reason": "container rerun 2026-10-10: VRN_SystemManager chain v0119–v0151 all PASS (rc 0), but from v0119 the selftest chain no longer re-runs the ≤v0118 selftests, so the pinned line ([來源回歸] fail=0) is never printed. Re-pinning to the tail line would leave the ≤v0118 checks unverified — not done (no fake green)",
-      "next": "operator choose: (a) re-pin to the tail line with repinned_from kept, accepting that ≤v0118 checks are retired; or (b) a new VRN_SystemManager thin tail re-chains the ≤v0118 selftests, then via-vcgc handoff test provenance",
       "pended_at": "2026-10-10T08:12:49+00:00",
-      "pended_from": "VERIFIED"
+      "pended_from": "VERIFIED",
+      "note": "2026-10-14 操作員「繼續修 VRN provenance」→ VRN_SystemManager v0152(VRN 自己的 manager · L120):provenance 動詞放回自測攔截之前;handoff test provenance rc 0 · 標記「[來源回歸] fail=0; tests=23」見到。前因:v0111 起 main 以 `--selftest in args[:2]` 攔自測,把 provenance --selftest 吃成管理器自測鏈"
     },
     {
       "id": "VCGC-REQ102:monitor",
