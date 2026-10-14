@@ -141,7 +141,10 @@
     "supportive modules/registry/CGC_MDL252_ManagerParity_v0100.py",
     "supportive modules/VIA_FlowSystem/FlowSystem_v2/engines/FLOW_ENG023_FlowTwActiveEtf_v0101.py",
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0187.py",
-    "supportive modules/registry/CGC_MDL185_SsotBookSync_v0101.py"
+    "supportive modules/registry/CGC_MDL185_SsotBookSync_v0101.py",
+    "supportive modules/registry/CGC_MDL276_QuarantineRecover_v0100.py",
+    "supportive modules/registry/CGC_MDL277_AiOps_v0100.py",
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v0101.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -379,10 +382,12 @@
         "CGC_MDL249_DataFrameLock",
         "--selftest"
       ],
-      "success_marker": "[DataFrame 鎖] 自測 15/15 PASS",
-      "scope": "輸出表頭定案 → DataFrame 鎖定:欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數 · NODATA 照實 · 鎖帳只增 · 表頭指紋變了冊沒新版 = 拒寫(R34)",
+      "success_marker": "CGC_MDL249_DataFrameLock_v0101 selftest 5/5 PASS",
+      "scope": "輸出表頭定案 → DataFrame 鎖定:欄位 = 表頭 · 型別 · 必填 · 主鍵 · 列數 · NODATA 照實 · 鎖帳只增 · 表頭指紋變了冊沒新版 = 拒寫(R34);v0101 +json 型別 · coverage(VDF / VRN 全部輸出庫每表對表頭冊)· all(check → coverage → lock)(S20261014)",
       "dependencies": [
-        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py"
+        "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py",
+        "supportive modules/registry/VIA_Output_Header_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL277_AiOps_v*.py"
       ],
       "timeout_seconds": 300
     },
@@ -2576,6 +2581,47 @@
         "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
       ],
       "timeout_seconds": 1500
+    },
+    "quarantine_recover": {
+      "argv": [
+        "CGC_MDL276_QuarantineRecover",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL276_QuarantineRecover_v0100 selftest 7/7 PASS",
+      "scope": "隔離區找回:索引(清單 + 無清單批次推回原路徑)· 丟失掃描(登記冊引用 · 樹上不在)· 還原只複製 · sha256 · 目的地有檔拒絕 · 只增帳(S20261014 · VCGC-REQ180)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL276_QuarantineRecover_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "aiops": {
+      "argv": [
+        "CGC_MDL277_AiOps",
+        "--selftest"
+      ],
+      "success_marker": "CGC_MDL277_AiOps_v0100 selftest 6/6 PASS",
+      "scope": "AI 常用動作引擎:狀態索引(etag / 304)· 庫卡(唯讀)· 撞號(--base 只報新增)· PS 檢查(重用 FullCheck + BridgeSweeper)· 總頁(S20261014 · VCGC-REQ181)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL277_AiOps_v*.py",
+        "supportive modules/registry/CGC_MDL248_FullCheck_v*.py",
+        "supportive modules/registry/CGC_MDL124_BridgeSweeper_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "ps_ownpage": {
+      "argv": [
+        "CGC_MDL277_AiOps",
+        "pslint"
+      ],
+      "success_marker": "[PS 檢查] GREEN",
+      "scope": "PS 尾版:缺 PS-ACCEL 加速器橋 0 · 自設 VIA_NO_OPEN=1 後自壓自己的頁 0(唯一入口 v0112 · RunAll v0103 · 兩支收尾鏈 v0101 · SyncFolders v0101 · 收尾一鍵 v0100;S20261014 · VCGC-REQ086 / 184)",
+      "dependencies": [
+        "Invoke-VIA-*.ps1",
+        "launchers/Invoke-VIA-*.ps1",
+        "docs/handoff/ps/Invoke-VIA-*.ps1",
+        "supportive modules/registry/CGC_MDL277_AiOps_v*.py"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -2867,18 +2913,18 @@
     {
       "id": "VCGC-REQ086:console-runall-own-page",
       "requirement": "VCGC-REQ086",
-      "state": "PENDING",
-      "owner": "操作員(L70 逐次許可)→ AI",
-      "reason": "唯一入口 v0108(①e 模板預覽 L400 · 結尾簡單版驗證頁 L665)與 RunAll v0102(多頁矩陣 L258)同病:自設 VIA_NO_OPEN=1 後自己開頁被零跳出閘吃掉;.ps1 未經操作員逐次許可 AI 不得改(KILL-05 · L70)",
-      "next": "操作員說一聲許可 → 新版 Invoke-VIA-OperatorConsole-v0109 · Invoke-VIA-RunAll-v0103(已備妥:同一個 Open-VIAOwnPage · finally 還原 VIA_NO_OPEN · 其餘一字不動;pwsh 剖析 0 錯 · 函式在零跳出閘下單測過)入樹,許可冊記 sha256"
+      "state": "VERIFIED",
+      "case": "ps_ownpage",
+      "receipt": "docs/handoff/evidence/ps_ownpage.json",
+      "note": "S20261014 操作員許可(許可冊 P013–P017):新版 Open-VIAOwnPage + finally 還原 VIA_NO_OPEN;舊版一字不動"
     },
     {
       "id": "VCGC-REQ086:closeout-own-page",
       "requirement": "VCGC-REQ086",
-      "state": "PENDING",
-      "owner": "AI",
-      "reason": "PR #386 新進的兩支收尾鏈 PS(launchers/Invoke-VIA-GitHubFirst-Closeout-v0100 L409 · Invoke-VIA-VCGC-CloseoutChain-v0100 L338)同病:自設 VIA_NO_OPEN=1 後 Start-Process 開頁,還原在下一行 → 頁被零跳出閘吃掉;兩支也缺 PS-ACCEL 橋。另一個 session 正在活動,本批不就地出新版以免撞號",
-      "next": "出 v0101:把還原那一行移到 Start-Process 之前(或改 Open-VIAOwnPage),補 PS-ACCEL 橋,同步改檔內自我複製 / git add 的 -v0100 檔名;跑 CGC_MDL248_FullCheck ⓪ 應 自擋開頁 0 · PS-ACCEL 缺 0"
+      "state": "VERIFIED",
+      "case": "ps_ownpage",
+      "receipt": "docs/handoff/evidence/ps_ownpage.json",
+      "note": "S20261014 操作員許可(許可冊 P013–P017):新版 Open-VIAOwnPage + finally 還原 VIA_NO_OPEN;舊版一字不動"
     },
     {
       "id": "VCGC-REQ086:roster-template-own",
@@ -2931,7 +2977,7 @@
       "state": "PENDING",
       "owner": "操作員",
       "reason": "實抓要同意閘(VIA_NET_CONSENT + VIA_SCRAPE_CONSENT,AI 不代設)與資料家",
-      "next": "工作站:L1 清單 → ENG087 diff → ENG077 → ENG078 daily → ENG094 fetch --apply(兩個交易日)→ breakdown --apply → CGC_MDL249 check / lock --apply"
+      "next": "工作站一行:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>(-Consent = 操作員親手開同意閘)→ 清單 → 全步擷取 → ENG094 fetch --apply(兩個交易日)→ breakdown --apply → CGC_MDL249 all --apply;毛申購 / 毛贖回待操作員給官方端點"
     },
     {
       "id": "VRN-REQ008:vrn_ssot_consistency",
@@ -5341,6 +5387,43 @@
       "owner": "操作員",
       "reason": "展現規則第一輪已套(VDF / VCGC 頁);哪一頁 · 哪一欄還不順,由操作員看過工作站新頁後點出",
       "next": "操作員點名 → AI 出該頁新版"
+    },
+    {
+      "id": "VCGC-REQ180:quarantine_recover",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "case": "quarantine_recover",
+      "receipt": "docs/handoff/evidence/quarantine_recover.json"
+    },
+    {
+      "id": "VCGC-REQ181:aiops",
+      "requirement": "VCGC-REQ181",
+      "state": "VERIFIED",
+      "case": "aiops",
+      "receipt": "docs/handoff/evidence/aiops.json"
+    },
+    {
+      "id": "VCGC-REQ182:ps_ownpage",
+      "requirement": "VCGC-REQ182",
+      "state": "VERIFIED",
+      "case": "ps_ownpage",
+      "receipt": "docs/handoff/evidence/ps_ownpage.json"
+    },
+    {
+      "id": "VCGC-REQ182:workstation-real",
+      "requirement": "VCGC-REQ182",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "抓網(清單 · 全步擷取 · ETF NAV / AUM / 流量)要同意閘,AI 不代設;容器只跑乾跑 / 零網路段",
+      "next": "工作站:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>;VRN 管理器 status RED(邏輯索引過期 2)由 VRN 自己的 manager 處理(L120)"
+    },
+    {
+      "id": "VCGC-REQ158:header-coverage",
+      "requirement": "VCGC-REQ158",
+      "state": "PENDING",
+      "owner": "VDF_SystemManager · VRN_SystemManager",
+      "reason": "CGC_MDL249 coverage(2026-10-14 容器):冊外有資料 28 張(vdf_global_market 9 · vdf_tw_market 12 · VDF_CrossValidation 2 · vrn_reports 5)· 冊外空表 6;冊上有、庫沒有 4(etf_breakdown · etf_daily_metrics · tw_listings_industry · vrn_report_basic@vdf_tw_market,工作站才有)",
+      "next": "各 manager 照寫入程式逐張補表頭(evidence 帶檔:行)→ 冊新版 → CGC_MDL249 all --apply;CGC_MDL249 coverage 每輪點名"
     }
   ]
 }
