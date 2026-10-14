@@ -92,11 +92,26 @@ pwsh -NoProfile -File VeritasIntelligenceAnalytics\launchers\Invoke-VIA-OneShot-
 - **工作站**(庫不進 git 的那幾本由操作員在自己的庫跑;經 VCGC):
 
 ```powershell
-via-vdfsys engine run VDF_ENG229_CNNFearGreedHistory dedupe            # 乾跑看重複(經 VDF 自己的 manager)
-via-vdfsys engine run VDF_ENG229_CNNFearGreedHistory dedupe --apply
-via-vrnsys metrics-resolve                                             # 乾跑(VRN_SystemManager v0153 直送 ENG073)
-via-vrnsys metrics-resolve --apply
+cd C:\Users\tonyk\OneDrive\Documents\movies-dataset; git pull --ff-only; cd VeritasIntelligenceAnalytics
+$env:VIA_FROM_VCGC = 'YES'      # 經系統自己的 manager 進入的旗(不是網路同意閘)
+$vdf = (Get-ChildItem 'functional modules\VDF\VDF_SystemManager_v*.py' | Sort-Object Name | Select-Object -Last 1).FullName
+$vrn = (Get-ChildItem 'functional modules\VRN\VRN_SystemManager_v*.py' | Sort-Object Name | Select-Object -Last 1).FullName
+# 家族 python(依賴裝在 via_vdf_312 / via_vrn_312 等各自的境;裸 python 可能缺 duckdb):有 Get-VIAEnvPython 用它,沒有照同一命名規則找
+function Get-VIAFamPy([string]$f) {
+  if (Get-Command Get-VIAEnvPython -ErrorAction SilentlyContinue) { return (Get-VIAEnvPython $f) }
+  $ov = [Environment]::GetEnvironmentVariable('VIA_PY_' + $f.ToUpper()); if ($ov -and (Test-Path -LiteralPath $ov)) { return $ov }
+  foreach ($r in @($env:VIA_ENV_ROOT, "$env:USERPROFILE\envs", "$env:USERPROFILE\miniconda3\envs", "$env:USERPROFILE\anaconda3\envs") | Where-Object { $_ }) {
+    foreach ($n in @("via_${f}_312", "via_$f", "via_${f}_313")) { foreach ($sub in @('python.exe', 'Scripts\python.exe')) { $p = Join-Path (Join-Path $r $n) $sub; if (Test-Path -LiteralPath $p) { return $p } } } }
+  return 'python' }
+$pyVdf = Get-VIAFamPy vdf; $pyVrn = Get-VIAFamPy vrn; "VDF python: $pyVdf"; "VRN python: $pyVrn"
+& $pyVdf $vdf engine run VDF_ENG229_CNNFearGreedHistory dedupe            # 乾跑看重複
+& $pyVrn $vrn metrics-resolve                                             # 乾跑(VRN_SystemManager v0153 直送 ENG073)
+& $pyVdf $vdf engine run VDF_ENG229_CNNFearGreedHistory dedupe --apply
+& $pyVrn $vrn metrics-resolve --apply
 ```
+
+- 更正(S20261014d):本節初版寫 `via-vdfsys` / `via-vrnsys` —— 這兩個短令 2026-10-08 已覆蓋成 DEPRECATED 殘樁(工作站實錄印 [DEPRECATED]、rc 2,沒執行)。
+  現行短令 `via-vdf` / `via-vrn` 的參數是 `[string[]]$VerbArgs`,位置參數只收得到第一個,多參數動詞(engine run … dedupe --apply)要直呼 manager 尾版,如上;直譯器用家族境(同 `via-vrnsys` 原本的 `Get-VIAEnvPython`;PR #524 審查)。
 
 - 交接:工作站庫另立待辦 VCGC-REQ158:sentiment-dup-workstation · VRN-REQ008:metrics-workstation(PENDING,主機收據到了才轉 VERIFIED;AGENTS 6)。
 - PR #523 審查四條:① 收斂只動 eps(目標價 / 殖利率原樣通過)② ENG073 v0140 自測 rc 3 只在前版紅逐檢都歸得到缺件(㉑㉒㉓ ← pydantic)時給;前版另有既有紅(㉝ 寫死 NLP 樞紐 v1.8.0)→ rc 2 YELLOW ③ 工作站庫待辦另立 ④ 交接案改經各自 manager(VDF_SystemManager engine run · VRN_SystemManager v0153 metrics-resolve / logic)。
