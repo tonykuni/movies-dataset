@@ -78,6 +78,13 @@ PRIOR.DTYPES = DTYPES          # v0100 的 check_table 讀模組層 DTYPES / _ca
 PRIOR._castable = _castable
 load_book, check, lock, plan, read_ledger, resolve_source = (PRIOR.load_book, PRIOR.check, PRIOR.lock, PRIOR.plan,
                                                              PRIOR.read_ledger, PRIOR.resolve_source)
+# 前版公開面照轉(TAILAPI):VDF / VRN 管理器與 VRN_ENG393 取尾版後直呼 check_table 等;沒列到的名稱由 __getattr__ 轉給前版
+check_table, header_sha, load_frame, book_path = PRIOR.check_table, PRIOR.header_sha, PRIOR.load_frame, PRIOR.book_path
+BOOK_GLOB, VIA_ROOT = PRIOR.BOOK_GLOB, PRIOR.VIA
+
+
+def __getattr__(name):
+    return getattr(PRIOR, name)
 
 
 def _output_dbs(via: Path) -> tuple:
@@ -222,6 +229,10 @@ def selftest() -> int:
     chk("④ 實樹輸出庫清單與 AiOps 庫卡同一份 · 只收 VCGC · 加速器橋在 · 不碰 TA-Lib",
         isinstance(real, tuple) and denied and "VIA:ACCEL-BRIDGE" in src and not re.search(r"^\s*(import|from)\s+talib", src, re.M),
         f"輸出庫 {len(real)}")
+    names = [n for n in dir(PRIOR) if not n.startswith("_") and callable(getattr(PRIOR, n)) and getattr(getattr(PRIOR, n), "__module__", "") == PRIOR.__name__]
+    me = sys.modules[__name__]
+    chk("⑤ 前版公開函式全部可從尾版取用(check_table 等;TAILAPI 轉接)", all(callable(getattr(me, n, None)) for n in names)
+        and check_table is PRIOR.check_table, f"{len(names)} 個")
     print(f"  {ENGINE} selftest {sum(ok)}/{len(ok)} {'PASS' if all(ok) else 'FAIL'}")
     return 0 if all(ok) else 1
 

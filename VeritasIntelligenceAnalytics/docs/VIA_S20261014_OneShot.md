@@ -41,7 +41,7 @@ pwsh -NoProfile -File VeritasIntelligenceAnalytics\launchers\Invoke-VIA-OneShot-
 
 - **CGC_MDL276_QuarantineRecover v0100**:隔離區(`functional modules/VIA_RetiredEngines` · `VIA_RetiredEngines`)索引 446 檔(清單 414 · 無清單批次推回 32);`lost` 掃登記冊引用 → 丟失 0;`restore` 只複製、核 sha256、目的地有檔拒絕,隔離區沒有才從 git 取回;只增帳。自測 7/7。
 - **CGC_MDL277_AiOps v0100**:AI 每輪重做的動作 → 一個動詞一張卡。`status`(93 份報告判決 + 交接頭 · etag / 304)· `dbcard`(輸出庫每表列數 · 日期區間,先看卡再決定抓不抓)· `collide --base`(只報新增撞號)· `pslint`(重用 FullCheck + BridgeSweeper)· `killgate` · `report`。自測 6/6。
-- **CGC_MDL249_DataFrameLock v0101**:+json 型別 · `coverage`(VDF / VRN 全部輸出庫每表 vs 表頭冊)· `all`(check → coverage → lock)。自測 4/4(+v0100 15/15)。
+- **CGC_MDL249_DataFrameLock v0101**:+json 型別 · `coverage`(VDF / VRN 全部輸出庫每表 vs 表頭冊)· `all`(check → coverage → lock)。自測 5/5(+v0100 15/15;前版公開面 check_table 等照轉)。
 - **VIA_Output_Header_SSOT_v0102**:+7 表(etf_book · tw_listings · active_tw_etf_universe · etf_holdings_changes · etf_fetch_status · etf_holdings_coverage · etf_stats_daily),欄位照寫入程式 DDL / 列字典(evidence 帶檔:行)。容器實資料 9 表 GREEN → 鎖帳 +9。
 - **自壓頁五支新版**(許可冊 P013–P017):唯一入口 v0112 · RunAll v0103 · CloseoutChain v0101 · GitHubFirst-Closeout v0101 · SyncFolders v0101 —— 自己的頁改走 `Open-VIAOwnPage`(cmdlet 全名,不經零跳出閘代理)+ 還原 `VIA_NO_OPEN`;pslint 自壓頁 6 → 0。
 - **收尾一鍵 v0100**(許可冊 P018):本文第一節。
