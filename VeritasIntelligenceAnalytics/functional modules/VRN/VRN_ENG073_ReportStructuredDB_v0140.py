@@ -6,12 +6,14 @@ r"""VRN_ENG073_ReportStructuredDB v0140 — 薄尾:vrn_report_metrics 同期多�
   ① 年份被當成 EPS:「2027 年EPS 預估維持不變。 2025」→ 2025.0、「…我們新增2028」→ 2028.0(EPS_RX 的數字欄吃到下一句的年份);
   ② 同值重複:「2026 年EPS 預估10」與「2026 年 EPS 預估10」→ 兩列 10.0;
   ③ 真的兩個值:「2024 EPS 11.00」vs「2024 年EPS 9.53」、「2027年EPS 分別為12.95」vs「2027 年EPS 及18」。
-本版規則(只動 eps 以外不碰;VRN 自己的引擎 L120):
+本版規則(只動 eps,其他指標不碰;VRN 自己的引擎 L120):
+  只動 metric=eps(目標價 · 殖利率等原樣通過):
   ① 丟:metric=eps 且數字原文是 19xx/20xx/21xx 四位整數(不帶小數)—— 那是年份,不是 EPS;
   ② 併:同 report_file+metric+period+value 只留第一筆(原文出現次序);
   ③ 標:同 report_file+metric+period 仍有兩個以上不同值 → 每列 status 改成「CONFLICT:<原狀態>」,值都留(不替操作員挑值);
      下游 ENG080 每年取第一筆、來源欄會帶出 metrics:CONFLICT:…,看得出來不是乾淨值。
-  自測結束碼:0 全綠 · 3 本版全過但前版鏈因環境缺件(pydantic)紅、且收斂沒新增任何紅 · 1 其餘。
+  自測結束碼:0 全綠 · 3 本版全過、前版鏈的紅逐檢都歸得到缺件(㉑㉒㉓ ← pydantic)且收斂沒新增 ·
+           2 本版全過、收斂沒新增,但前版有缺件以外的既有紅(例 ㉝ 寫死 NLP 樞紐 v1.8.0,樹上已 v1.9.0)· 1 其餘。
   入庫路徑:run 內的 extract_one 包一層 resolve_metrics(換的是本體模組的全域,run 照本體原樣跑);
   既有資料:`metrics-resolve [--db 庫] [--apply]` 依 report_file 先刪再插(與 run 同一寫法);不帶 --apply 一律乾跑;
            `metrics-resolve --selftest` 只跑本版收斂五檢(完整 --selftest 另接前版鏈,前版自身的紅照實傳出);
@@ -98,10 +100,13 @@ def year_like(m: dict) -> bool:
 
 
 def resolve_metrics(mets: list) -> tuple:
-    """① 丟年份 EPS ② 同鍵同值併 ③ 同鍵多值標 CONFLICT:<原狀態>。回 (新列, 計數)。次序照原文。"""
+    """只動 eps:① 丟年份 EPS ② 同鍵同值併 ③ 同鍵多值標 CONFLICT:<原狀態>;其他指標原樣通過。回 (新列, 計數)。次序照原文。"""
     stats = {"year_like": 0, "same_value": 0, "conflict_keys": 0, "conflict_rows": 0}
     kept, seen = [], set()
     for m in mets:
+        if str(m.get("metric", "")).lower() != "eps":
+            kept.append(m)                      # eps 以外原樣通過(目標價 · 殖利率等不併不標)
+            continue
         if year_like(m):
             stats["year_like"] += 1
             continue
@@ -113,7 +118,8 @@ def resolve_metrics(mets: list) -> tuple:
         kept.append(dict(m))
     groups: dict = {}
     for m in kept:
-        groups.setdefault((m.get("report_file"), m.get("metric"), m.get("period")), []).append(m)
+        if str(m.get("metric", "")).lower() == "eps":
+            groups.setdefault((m.get("report_file"), m.get("metric"), m.get("period")), []).append(m)
     for rows in groups.values():
         if len(rows) > 1:
             stats["conflict_keys"] += 1
@@ -207,13 +213,16 @@ def selftest(chain: bool = True) -> int:
         {"report_file": rf, "metric": "eps", "period": "2024", "status": "STATED", "value": 9.53, "raw_text": "2024 年EPS 9.53"},
         {"report_file": rf, "metric": "eps", "period": "2025", "status": "ESTIMATE", "value": 2000.5, "raw_text": "2025E EPS 2,000.5"},
         {"report_file": rf, "metric": "target_price", "period": "2025", "status": "ESTIMATE", "value": 2025.0, "raw_text": "目標價 2025"},
+        {"report_file": rf, "metric": "target_price", "period": "2025", "status": "ESTIMATE", "value": 2025.0, "raw_text": "目標價 2025"},
+        {"report_file": rf, "metric": "target_price", "period": "2025", "status": "ESTIMATE", "value": 2100.0, "raw_text": "目標價 2100"},
     ]
     new, st = resolve_metrics(sample)
     got = [(m["period"], m["value"], m["status"]) for m in new]
-    chk("② 年份 EPS 丟 2 · 同值併 1 · 多值標 CONFLICT 1 組(值都留)· 帶小數的大 EPS 與目標價不誤殺",
+    chk("② 年份 EPS 丟 2 · 同值併 1 · 多值標 CONFLICT 1 組(值都留)· 帶小數的大 EPS 不誤殺 · eps 以外(目標價重複 / 多值)原樣不動",
         st == {"year_like": 2, "same_value": 1, "conflict_keys": 1, "conflict_rows": 2}
         and got == [("2026", 10.0, "ESTIMATE"), ("2024", 11.0, "CONFLICT:STATED"), ("2024", 9.53, "CONFLICT:STATED"),
-                    ("2025", 2000.5, "ESTIMATE"), ("2025", 2025.0, "ESTIMATE")], f"{st} · {got}")
+                    ("2025", 2000.5, "ESTIMATE"), ("2025", 2025.0, "ESTIMATE"), ("2025", 2025.0, "ESTIMATE"),
+                    ("2025", 2100.0, "ESTIMATE")], f"{st} · {got}")
     again, st2 = resolve_metrics(new)
     chk("③ 冪等:收斂過的再收一次不變(CONFLICT 不疊)", again == new and st2["year_like"] == 0 and st2["same_value"] == 0, str(st2))
     chk("④ run 的入庫路徑換成本版 extract_one(本體模組的全域)", BODY.extract_one is extract_one, f"本體 {Path(BODY.__file__).name}")
@@ -231,8 +240,8 @@ def selftest(chain: bool = True) -> int:
         ok_rows = con.execute("SELECT COUNT(*) FROM vrn_report_metrics WHERE report_file = 'OK'").fetchone()[0]
         con.close()
         re_ap = metrics_resolve(p, apply=True)["dbs"][0]
-        chk("⑤ metrics-resolve 乾跑不寫 · --apply 只改有變的報告(9 → 6)· 沒變的報告不動 · 再跑 CLEAN",
-            dry["state"] == "DRY" and dry["rows_after"] == 9 and ap["state"] == "APPLIED" and ap["rows_after"] == 6
+        chk("⑤ metrics-resolve 乾跑不寫 · --apply 只改有變的報告(11 → 8)· 沒變的報告不動 · 再跑 CLEAN",
+            dry["state"] == "DRY" and dry["rows_after"] == 11 and ap["state"] == "APPLIED" and ap["rows_after"] == 8
             and ap["reports_changed"] == 1 and ok_rows == 1 and re_ap["state"] == "CLEAN",
             f"{dry['state']} {dry['rows_after']} → {ap['state']} {ap['rows_after']} → {re_ap['state']}")
     if not chain:
@@ -261,13 +270,18 @@ def selftest(chain: bool = True) -> int:
     chk("⑥ 前版自測鏈:本版收斂不新增任何紅(與不掛收斂時的 FAIL 集合相同;前版自身的紅照實列出)",
         now == base, f"{_PRIOR_PATH.name} rc={rc1} · {tally} · 新增紅 {sorted(now - base) or 0}")
     ok = all(results)
-    missing = [m for m in ("pydantic",) if importlib.util.find_spec(m) is None]
+    # 前版的紅能不能歸到缺件:只認逐檢對得上的(㉑㉒㉓ 金融機構 SSOT 三檢要 pydantic,批412);其餘一律不算環境
+    need = {"㉑": "pydantic", "㉒": "pydantic", "㉓": "pydantic"}
+    tags = {next((c for c in ln if c in need), "") for ln in now}
+    env_only = bool(now) and "" not in tags and all(importlib.util.find_spec(need[t]) is None for t in tags)
     print(f"  [v0140] 自測 {sum(results)}/{len(results)} · {'PASS' if ok else 'FAIL'}"
           + ("" if rc1 == 0 else f" · 前版鏈 rc={rc1}(既有紅照實傳出,不因本版綠而洗綠)")
-          + (f" · 環境缺件 {missing}(裝件是操作員的手)" if missing and rc1 else ""))
+          + ("" if rc1 == 0 else (" · 全部可歸缺件 pydantic(裝件是操作員的手)" if env_only else " · 前版有缺件以外的既有紅 → YELLOW")))
     if ok and rc1 == 0:
         return 0
-    return 3 if ok and missing and now == base else 1   # 3 = 環境缺件(誠實態);缺件之外的紅照回 1
+    if ok and now == base:
+        return 3 if env_only else 2   # 3 = 前版紅全屬缺件 · 2 = 前版有其他既有紅、本版沒新增(YELLOW,不冒充環境)
+    return 1
 
 
 def main() -> int:

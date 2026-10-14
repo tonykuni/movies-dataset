@@ -92,7 +92,12 @@ pwsh -NoProfile -File VeritasIntelligenceAnalytics\launchers\Invoke-VIA-OneShot-
 - **工作站**(庫不進 git 的那幾本由操作員在自己的庫跑;經 VCGC):
 
 ```powershell
-via-vcgc run --family vdf VDF_ENG229_CNNFearGreedHistory dedupe            # 乾跑看重複
-via-vcgc run --family vdf VDF_ENG229_CNNFearGreedHistory dedupe --apply
-via-vcgc run --family vrn VRN_ENG073_ReportStructuredDB metrics-resolve --apply
+via-vdfsys engine run VDF_ENG229_CNNFearGreedHistory dedupe            # 乾跑看重複(經 VDF 自己的 manager)
+via-vdfsys engine run VDF_ENG229_CNNFearGreedHistory dedupe --apply
+via-vrnsys metrics-resolve                                             # 乾跑(VRN_SystemManager v0153 直送 ENG073)
+via-vrnsys metrics-resolve --apply
 ```
+
+- 交接:工作站庫另立待辦 VCGC-REQ158:sentiment-dup-workstation · VRN-REQ008:metrics-workstation(PENDING,主機收據到了才轉 VERIFIED;AGENTS 6)。
+- PR #523 審查四條:① 收斂只動 eps(目標價 / 殖利率原樣通過)② ENG073 v0140 自測 rc 3 只在前版紅逐檢都歸得到缺件(㉑㉒㉓ ← pydantic)時給;前版另有既有紅(㉝ 寫死 NLP 樞紐 v1.8.0)→ rc 2 YELLOW ③ 工作站庫待辦另立 ④ 交接案改經各自 manager(VDF_SystemManager engine run · VRN_SystemManager v0153 metrics-resolve / logic)。
+- CI「VDF · manager and daily data contracts」第一輪紅:tests/test_via_global_incremental_v0100 在尾版模組上換屬性,v0123 初稿用「前版模組 + __getattr__」換不到 → v0123 改回 v0122 的做法(本體 exec 進自己的全域)。
