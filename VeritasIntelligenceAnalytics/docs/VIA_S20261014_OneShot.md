@@ -71,3 +71,10 @@ pwsh -NoProfile -File VeritasIntelligenceAnalytics\launchers\Invoke-VIA-OneShot-
 - 單一路徑版本不齊 3
 - 格子存證 366.7h 舊
 - 交接驗收 RED)· ⑭ closeout(乾跑)RED:停在 VRN provenance 案(rc 0 但標記「[來源回歸] fail=0」沒印,VRN 自己的)· ⑮ status:98 份報告紅 17;總頁 AIOPS_RUN_latest.html 經 Open-VIAOwnPage 實際跳出(xdg-open 記錄 07:38:24)
+
+## 六、S20261014b 續修(操作員「繼續修 VRN provenance 和表頭補齊」)
+
+- **VRN provenance**:VRN_SystemManager v0152 —— v0111 起 main 以 `"--selftest" in args[:2]` 攔自測,`provenance --selftest` 被吃成管理器自測鏈,來源回歸測試從沒跑到(收據自 10/07 標記都沒見到)。本版 provenance 先直送 VRN_ENG114 尾版;自測 5/5;handoff test provenance rc 0 ·「[來源回歸] fail=0; tests=23」。待辦 VRN-REQ007 / VCGC-REQ099:provenance → VERIFIED。
+- **表頭補齊**:VIA_Output_Header_SSOT_v0103 +34 表(冊外有資料 28 + 空表 6),每張附寫入程式檔:行與 upsert 鍵;整表重建 / VIEW 的表記每列一筆的邏輯鍵;先刪再插、沒有逐列鍵的表不設主鍵。CGC_MDL249 coverage:輸出庫 5 · 表 43 · 有表頭 **43** · 冊外 0;check GREEN 42 · NODATA 12 · RED 1;鎖帳 +33。
+- **照實**:gl_sentiment_daily RED = 資料重複(Z297,歸 VDF);vrn_report_metrics 同期多候選值 = 擷取歧義(Z298,歸 VRN);VRN 管理器 status 的邏輯索引過期 2 仍待 VRN。
+- 需求冊 v0194:VCGC-REQ180/181/182 的 homes 改成 SDD 認得的歸屬(v0193 寫模組檔名 → X-REQ「歸屬指到不存在」)。
