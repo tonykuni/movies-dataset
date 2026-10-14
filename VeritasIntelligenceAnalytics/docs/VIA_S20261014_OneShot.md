@@ -78,3 +78,21 @@ pwsh -NoProfile -File VeritasIntelligenceAnalytics\launchers\Invoke-VIA-OneShot-
 - **表頭補齊**:VIA_Output_Header_SSOT_v0103 +34 表(冊外有資料 28 + 空表 6),每張附寫入程式檔:行與 upsert 鍵;整表重建 / VIEW 的表記每列一筆的邏輯鍵;先刪再插、沒有逐列鍵的表不設主鍵。CGC_MDL249 coverage:輸出庫 5 · 表 43 · 有表頭 **43** · 冊外 0;check GREEN 42 · NODATA 12 · RED 1;鎖帳 +33。
 - **照實**:gl_sentiment_daily RED = 資料重複(Z297,歸 VDF);vrn_report_metrics 同期多候選值 = 擷取歧義(Z298,歸 VRN);VRN 管理器 status 的邏輯索引過期 2 仍待 VRN。
 - 需求冊 v0194:VCGC-REQ180/181/182 的 homes 改成 SDD 認得的歸屬(v0193 寫模組檔名 → X-REQ「歸屬指到不存在」)。
+
+## 七、S20261014c 續修(操作員「繼續修 Z297 Z298 和 VRN 邏輯索引」)
+
+- **Z297 sentiment 重鍵(VDF)**:根因 = VDF_ENG055 L11 把 CNN graphdata 歷史序列(最近幾天同一 UTC 日有好幾個時間點)和「今值」接成一批送正典 `upsert_rows`;正典 anti-join 只擋庫裡已在的鍵,同一批裡的重鍵照插(v0110 起 `dedup_source=False`,正典不改,不擴範圍)。
+  - VDF_ENG055 **v0123** 薄尾:L11 送庫前依 (date, index) 留最後一筆(今值在最後 = 當日最新;與 ENG229 同判準),LANES L11 換成本版;自測 6/6(⑥ 前版同一份輸入插 5 列 / 相異鍵 3 = 測得到 Z297)。
+  - VDF_ENG229 **v0101** 薄尾 +`dedupe`:乾跑只報;`--apply` 刪整列重複多出的列;同鍵不同值只報 CONFLICT,`--keep-last` 才留最後寫入那筆;只增帳 `sentiment_dedupe_ledger.jsonl`。自測 7/7 + 前版 10/10。容器庫 256 → 252。
+  - CGC_MDL249:gl_sentiment_daily GREEN 252 列並鎖帳。
+- **Z298 研報指標多候選(VRN)**:VRN_ENG073 **v0140** 薄尾 `resolve_metrics` 掛在 run 的 `extract_one`:① eps 原文是 19xx–21xx 四位整數 = 年份,丟 ② 同鍵同值併 ③ 同鍵仍多值 → status 標 `CONFLICT:<原狀態>`、值都留(不替操作員挑值;ENG080 摘要來源欄會帶出 `metrics:CONFLICT:…`)。`metrics-resolve [--db] [--apply]` 收斂既有資料(依 report_file 先刪再插,與 run 同寫法)。容器 `VRN/db/vrn_reports.duckdb`(有追蹤,一併提交)77 → 74 列;CGC_MDL249 vrn_report_metrics GREEN 74 列並重鎖。
+  - 照實:完整 `--selftest` 接前版鏈,前版 ㉑㉒㉓(缺 pydantic)· ㉝(NLP)四紅是既有環境缺件,本版不洗綠(rc 照傳 1;收斂五檢 `metrics-resolve --selftest` 5/5)。真衝突 2 組:3014TT 2024 EPS 11.00 / 9.53 · 南亞 2027 EPS 12.95 / 18(原文「2026、2027 年 EPS 分別為 12.95 及 18」→ 擷取把兩個值都記到 2027)待人看原文。
+- **VRN 邏輯索引**:`via_vrn_logic_book_v0112 build`(冊是產物)→ 指標 55 在位且為尾版 55 · 過期 0(ENG086 v0119→v0120 · SUP_MDL749 v0116→v0117 · 本批 ENG073 v0139→v0140)。VRN 管理器 status:邏輯 GREEN · 連結 RED 0;剩 ABSENT 3(參數冊缺 VRN_RESEARCHREPORT_SSOT_ACTIVE · 引擎鏈缺件)是既有狀況,非本批。
+- 交接:新案 sentiment_dedupe · omnifetch_sentiment · metrics_resolve · vrn_logic_index(皆 rc 0、標記見到);待辦 VCGC-REQ158:sentiment-dup · VRN-REQ008:metrics-multi-candidate → VERIFIED,新增 VRN-REQ008:logic-index VERIFIED。需求冊 v0195(既有條補證據,不開新號)。
+- **工作站**(庫不進 git 的那幾本由操作員在自己的庫跑;經 VCGC):
+
+```powershell
+via-vcgc run --family vdf VDF_ENG229_CNNFearGreedHistory dedupe            # 乾跑看重複
+via-vcgc run --family vdf VDF_ENG229_CNNFearGreedHistory dedupe --apply
+via-vcgc run --family vrn VRN_ENG073_ReportStructuredDB metrics-resolve --apply
+```

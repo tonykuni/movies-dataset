@@ -2623,6 +2623,56 @@
         "supportive modules/registry/CGC_MDL277_AiOps_v*.py"
       ],
       "timeout_seconds": 300
+    },
+    "sentiment_dedupe": {
+      "argv": [
+        "VDF_ENG229_CNNFearGreedHistory",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG229_CNNFearGreedHistory_v0101 自測 7/7 · PASS",
+      "scope": "Z297:sentiment_daily 既有重複列清理 dedupe(乾跑 / --apply 刪整列重複 / --keep-last 處理同鍵不同值;只增帳)+ 前版 v0100 十檢(S20261014c · VCGC-REQ158)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "omnifetch_sentiment": {
+      "argv": [
+        "VDF_ENG055_OmniFetch",
+        "--selftest"
+      ],
+      "success_marker": "PASS 6/6",
+      "scope": "Z297 根因:ENG055 L11 同批重鍵(CNN 歷史同日多點 + 今值)送庫前依 date+index 留最後一筆;⑥ 前版同輸入照插重鍵 = 測得到(S20261014c · VCGC-REQ158)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v*.py",
+        "supportive modules/SUP_MDL753_VIACommonUtils_v*.py"
+      ],
+      "timeout_seconds": 300
+    },
+    "metrics_resolve": {
+      "argv": [
+        "VRN_ENG073_ReportStructuredDB",
+        "metrics-resolve",
+        "--selftest"
+      ],
+      "success_marker": "[v0140] 收斂自測 5/5 · PASS",
+      "scope": "Z298:vrn_report_metrics 同期多候選 —— 年份 EPS 丟 · 同值併 · 多值標 CONFLICT:<原狀態>(不替人挑值)· metrics-resolve 收斂既有資料(S20261014c · VRN-REQ008);完整 --selftest 另接前版鏈,前版缺 pydantic 的紅照實傳出",
+      "dependencies": [
+        "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "vrn_logic_index": {
+      "argv": [
+        "via_vrn_logic_book"
+      ],
+      "success_marker": "[計] GREEN",
+      "scope": "VRN 邏輯架構索引冊守門:指標全在位且為尾版(過期 0 · 不在 0);冊是產物,過期就 build 重建(S20261014c · VCGC-REQ182 收尾一鍵 ⑨)",
+      "dependencies": [
+        "supportive modules/registry/via_vrn_logic_book_v*.py",
+        "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json"
+      ],
+      "timeout_seconds": 300
     }
   },
   "work_items": [
@@ -5412,7 +5462,8 @@
       "state": "PENDING",
       "owner": "操作員",
       "reason": "抓網(清單 · 全步擷取 · ETF NAV / AUM / 流量)要同意閘,AI 不代設;容器只跑乾跑 / 零網路段",
-      "next": "工作站:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>;VRN 管理器 status RED(邏輯索引過期 2)由 VRN 自己的 manager 處理(L120)"
+      "next": "工作站:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>;VRN 管理器 status RED(邏輯索引過期 2)由 VRN 自己的 manager 處理(L120)",
+      "note": "S20261014c:VRN 管理器 status 的邏輯索引過期 2 已由 VRN 邏輯冊 build 清掉(案 vrn_logic_index;過期 0);本條其餘(工作站抓網)仍待操作員"
     },
     {
       "id": "VCGC-REQ158:header-coverage",
@@ -5425,18 +5476,32 @@
     {
       "id": "VCGC-REQ158:sentiment-dup",
       "requirement": "VCGC-REQ158",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "VDF_SystemManager(L120)",
       "reason": "vdf_global_market.sentiment_daily 主鍵 date+index(ENG055 v0118:696 · ENG229 v0100:201 同鍵)卻有 CNN_FEAR_GREED 2026-09-23 / 09-24 各 3 筆完全相同列(容器庫);表頭照寫入程式,本表照實 RED 不鎖(Z297)",
-      "next": "VDF 自己的 manager:查是哪一版寫入沒走 upsert_rows(或舊版無鍵 INSERT)→ 去重(只留一筆)→ CGC_MDL249 check / lock --apply"
+      "next": "VDF 自己的 manager:查是哪一版寫入沒走 upsert_rows(或舊版無鍵 INSERT)→ 去重(只留一筆)→ CGC_MDL249 check / lock --apply",
+      "case": "sentiment_dedupe",
+      "receipt": "docs/handoff/evidence/sentiment_dedupe.json",
+      "note": "S20261014c:根因 ENG055 L11 同批重鍵(正典 upsert_rows anti-join 只擋庫裡已在的鍵)→ VDF_ENG055 v0123 送庫前去重(案 omnifetch_sentiment)· VDF_ENG229 v0101 dedupe --apply 容器庫 256 → 252 · CGC_MDL249 gl_sentiment_daily GREEN 並鎖;工作站庫由操作員跑同一指令(見 docs/VIA_S20261014_OneShot.md 七)"
     },
     {
       "id": "VRN-REQ008:metrics-multi-candidate",
       "requirement": "VRN-REQ008",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "VRN_SystemManager(L120)",
       "reason": "vrn_reports.vrn_report_metrics 同一 report_file+metric+period 有多個候選值(例:3014TT-20231005 eps 2024 = 11.00 與 9.53;2027 EPS 擷到年份 2025 / 2028 當值)= 擷取歧義;寫入程式先刪再插、無逐列鍵,表頭不設主鍵(Z298)",
-      "next": "VRN 擷取邏輯(ENG073)下一版:同期多候選標 CONFLICT / 取最高信心一筆;年份誤當數值的樣式排除"
+      "next": "VRN 擷取邏輯(ENG073)下一版:同期多候選標 CONFLICT / 取最高信心一筆;年份誤當數值的樣式排除",
+      "case": "metrics_resolve",
+      "receipt": "docs/handoff/evidence/metrics_resolve.json",
+      "note": "S20261014c:VRN_ENG073 v0140 resolve_metrics 掛入 run + metrics-resolve --apply 容器 vrn_reports.duckdb 77 → 74(年份 EPS 丟 2 · 同值併 1 · CONFLICT 2 組值都留);真衝突(3014TT 2024 11.00/9.53 · 南亞 2027 12.95/18)待人看原文,不替人挑"
+    },
+    {
+      "id": "VRN-REQ008:logic-index",
+      "requirement": "VRN-REQ008",
+      "state": "VERIFIED",
+      "case": "vrn_logic_index",
+      "receipt": "docs/handoff/evidence/vrn_logic_index.json",
+      "note": "S20261014c:via_vrn_logic_book_v0112 build → 指標 55 在位且為尾版 55 · 過期 0(ENG086 v0120 · SUP_MDL749 v0117 · ENG073 v0140)· VRN 管理器 status 邏輯 GREEN"
     }
   ]
 }
