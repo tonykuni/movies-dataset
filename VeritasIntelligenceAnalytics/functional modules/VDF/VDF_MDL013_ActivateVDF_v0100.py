@@ -351,18 +351,29 @@ def fetch_ids(book_dir: Path = HERE) -> tuple:
     return first, rest, b.name
 
 
-def engine_ids(env: dict, log_dir: Path, manager: Path | None = None, py: str | None = None) -> list:
+SUPERSEDED_DIRS = ("_rebuilds_superseded", "VIA_RetiredEngines", "_quarantine")   # 已被取代 / 退役 / 隔離:不啟動、照實列
+
+
+def engine_ids(env: dict, log_dir: Path, manager: Path | None = None, py: str | None = None) -> tuple:
+    """→ (要啟動的 eid, 跳過的 [{eid, path}])。已被取代的重建件不啟動(管理員 engine sources 同一條律),照實列在跳過。"""
     mgr = manager or manager_path()
     if mgr is None:
-        return []
+        return [], []
     try:
         p = subprocess.run([py or sys.executable, str(mgr), "engine", "list", "--json"], cwd=str(mgr.parent), env=env,
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         txt = p.stdout[p.stdout.find("{"):]
         rows = json.JSONDecoder().raw_decode(txt)[0].get("engines", [])
     except (subprocess.TimeoutExpired, ValueError, OSError):
-        return []
-    return [r["eid"] for r in rows if r.get("eid")]
+        return [], []
+    keep, skip = [], []
+    for r in rows:
+        if not r.get("eid"):
+            continue
+        parts = set(Path(str(r.get("path", ""))).parts)
+        (skip.append({"eid": r["eid"], "path": r.get("path")}) if parts & set(SUPERSEDED_DIRS)
+         else keep.append(r["eid"]))
+    return list(dict.fromkeys(keep)), skip
 
 
 def fetch_args(verb: str, ids: list, opt) -> list:
@@ -403,11 +414,12 @@ def flow_fetch(opt, res, gate, log_dir, lists: dict, manager=None, py=None) -> d
 
 def flow_engines(opt, res, gate, log_dir, manager=None, py=None) -> dict:
     env = flow_env(res, "engines")
-    ids = engine_ids(env, log_dir, manager, py)
+    ids, skipped = engine_ids(env, log_dir, manager, py)
     if not ids:
-        return {"flow": "engines", "lamp": "RED", "steps": [], "note": "engine list 拿不到引擎"}
+        return {"flow": "engines", "lamp": "RED", "steps": [], "note": "engine list 拿不到引擎", "skipped": skipped}
     st = run_step("engine_launch", ["engine", "launch", *ids], env, log_dir, gate, opt.timeout, manager, py)
-    out = {"flow": "engines", "lamp": st["lamp"], "steps": [st], "n_engines": len(ids)}
+    out = {"flow": "engines", "lamp": st["lamp"], "steps": [st], "n_engines": len(ids), "skipped": skipped,
+           "note": f"已被取代 / 退役的 {len(skipped)} 支不啟動(照實列在 skipped)" if skipped else ""}
     rj = VIA / "VIA_Reports" / "vdf" / "RESULT_engine_launch_latest.json"
     if rj.is_file() and manager is None:
         try:
@@ -493,6 +505,8 @@ def render_html(card: dict, ui_dir: Path) -> str:
                     f"<li>{html.escape(z)} — 還沒產生</li>" for z, n in UI_LINKS)
     eng = next((f for f in card["flows"] if f["flow"] == "engines"), {})
     red = "".join(f"<li>{html.escape(x)}</li>" for x in eng.get("red") or []) or "<li>—</li>"
+    skip = "".join(f"<li>{html.escape(str(x.get('eid')))} · {html.escape(str(x.get('path')))}</li>"
+                   for x in eng.get("skipped") or []) or "<li>—</li>"
     return f"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VDF 啟動總覽</title><style>
 :root{{--bg:#fff;--fg:#1f2328;--mut:#59636e;--bd:#d1d9e0}}
@@ -518,6 +532,7 @@ td,th{{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left;vertica
 </div>
 <div class="wrap"><table><tr><th>燈</th><th>流程</th><th>步</th><th>rc</th><th>秒</th><th>結果</th></tr>{''.join(rows)}</table></div>
 <h3>引擎啟動紅 / 不可啟動</h3><ul>{red}</ul>
+<h3>已被取代 / 退役(不啟動,不計分母)</h3><ul>{skip}</ul>
 <p class="mut">同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT)是操作員的手:本頁與 ActivateVDF 不讀值、不寫;閘關 = GATED(不是壞掉)。</p>
 </body></html>"""
 
@@ -625,7 +640,9 @@ with open(log, "a", encoding="utf-8") as fh:
                          "tmp": os.environ.get("TMPDIR"), "vdfsm": os.environ.get("VIA_FROM_VDFSM"),
                          "consent": os.environ.get("VIA_NET_CONSENT")}) + "\n")
 if args[:2] == ["engine", "list"]:
-    print(json.dumps({"engines": [{"eid": "ENG001"}, {"eid": "MDL009"}]}))
+    print(json.dumps({"engines": [{"eid": "ENG001", "path": "functional modules/VDF/engine/VDF_ENG001_X_v0100.py"},
+                                  {"eid": "MDL009", "path": "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"},
+                                  {"eid": "MDL005", "path": "functional modules/VDF/_rebuilds_superseded/VDF_MDL005_X_v0100R.py"}]}))
     sys.exit(0)
 time.sleep(float(os.environ.get("ACT_FAKE_SLEEP", "0.6")))
 if args[:2] == ["fetch", "run"]:
@@ -700,6 +717,10 @@ def selftest() -> int:
             overlap = spans[1][0] < spans[0][1] and spans[2][0] < spans[0][1]
             chk("⑥ 三條流程同時跑(slots 3:起跑時間互相重疊);每條都 GREEN", overlap and all(f["lamp"] == "GREEN" for f in flows),
                 [f["lamp"] for f in flows])
+            eng = next(f for f in flows if f["flow"] == "engines")
+            launched = next(cl["args"] for cl in calls if cl["args"][:2] == ["engine", "launch"])
+            chk("⑥b 已被取代的重建件(_rebuilds_superseded)不啟動、照實列在 skipped;其餘照啟動",
+                launched[2:] == ["ENG001", "MDL009"] and [x["eid"] for x in eng["skipped"]] == ["MDL005"])
             chk("⑦ 子行程拿到流程環境(VDF 總控標記 · 執行緒上限 · 本輪 temp);同意閘照本視窗原樣(沒設就沒有)",
                 all(cl["vdfsm"] == "YES" and cl["thr"] and cl["tmp"] for cl in calls)
                 and all(cl["consent"] == os.environ.get("VIA_NET_CONSENT") for cl in calls))
