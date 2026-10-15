@@ -355,7 +355,8 @@ SUPERSEDED_DIRS = ("_rebuilds_superseded", "VIA_RetiredEngines", "_quarantine") 
 
 
 def engine_ids(env: dict, log_dir: Path, manager: Path | None = None, py: str | None = None) -> tuple:
-    """→ (要啟動的 eid, 跳過的 [{eid, path}])。已被取代的重建件不啟動(管理員 engine sources 同一條律),照實列在跳過。"""
+    """→ (要啟動的家族全名, 跳過的 [{eid, family, path}])。按家族全名啟動(全名唯一;同號異名的 ENG110 / 117 / 118 各自都起,
+    同號的活件與被取代件不會互相蓋掉);已被取代的重建件不啟動(管理員 engine sources 同一條律),照實列在跳過。"""
     mgr = manager or manager_path()
     if mgr is None:
         return [], []
@@ -368,11 +369,12 @@ def engine_ids(env: dict, log_dir: Path, manager: Path | None = None, py: str | 
         return [], []
     keep, skip = [], []
     for r in rows:
-        if not r.get("eid"):
+        name = r.get("family") or r.get("eid")
+        if not name:
             continue
         parts = set(Path(str(r.get("path", ""))).parts)
-        (skip.append({"eid": r["eid"], "path": r.get("path")}) if parts & set(SUPERSEDED_DIRS)
-         else keep.append(r["eid"]))
+        (skip.append({"eid": r.get("eid"), "family": name, "path": r.get("path")}) if parts & set(SUPERSEDED_DIRS)
+         else keep.append(name))
     return list(dict.fromkeys(keep)), skip
 
 
@@ -505,7 +507,7 @@ def render_html(card: dict, ui_dir: Path) -> str:
                     f"<li>{html.escape(z)} — 還沒產生</li>" for z, n in UI_LINKS)
     eng = next((f for f in card["flows"] if f["flow"] == "engines"), {})
     red = "".join(f"<li>{html.escape(x)}</li>" for x in eng.get("red") or []) or "<li>—</li>"
-    skip = "".join(f"<li>{html.escape(str(x.get('eid')))} · {html.escape(str(x.get('path')))}</li>"
+    skip = "".join(f"<li>{html.escape(str(x.get('family')))} · {html.escape(str(x.get('path')))}</li>"
                    for x in eng.get("skipped") or []) or "<li>—</li>"
     return f"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VDF 啟動總覽</title><style>
@@ -640,9 +642,12 @@ with open(log, "a", encoding="utf-8") as fh:
                          "tmp": os.environ.get("TMPDIR"), "vdfsm": os.environ.get("VIA_FROM_VDFSM"),
                          "consent": os.environ.get("VIA_NET_CONSENT")}) + "\n")
 if args[:2] == ["engine", "list"]:
-    print(json.dumps({"engines": [{"eid": "ENG001", "path": "functional modules/VDF/engine/VDF_ENG001_X_v0100.py"},
-                                  {"eid": "MDL009", "path": "functional modules/VDF/VDF_MDL009_TWStockList_v0102.py"},
-                                  {"eid": "MDL005", "path": "functional modules/VDF/_rebuilds_superseded/VDF_MDL005_X_v0100R.py"}]}))
+    print(json.dumps({"engines": [
+        {"eid": "ENG110", "family": "VDF_ENG110_AKShareProbe", "path": "functional modules/VDF/engine/VDF_ENG110_AKShareProbe_v0102.py"},
+        {"eid": "ENG110", "family": "VDF_ENG110_USMacroProbe", "path": "functional modules/VDF/engine/VDF_ENG110_USMacroProbe_v0102.py"},
+        {"eid": "MDL003", "family": "VDF_MDL003_SentimentMacroEngine", "path": "functional modules/VDF/VDF_MDL003_SentimentMacroEngine_v0100.py"},
+        {"eid": "MDL003", "family": "VDF_MDL003_SentimentMacroEngine_v0100R",
+         "path": "functional modules/VDF/_rebuilds_superseded/VDF_MDL003_SentimentMacroEngine_v0100R.py"}]}))
     sys.exit(0)
 time.sleep(float(os.environ.get("ACT_FAKE_SLEEP", "0.6")))
 if args[:2] == ["fetch", "run"]:
@@ -719,8 +724,9 @@ def selftest() -> int:
                 [f["lamp"] for f in flows])
             eng = next(f for f in flows if f["flow"] == "engines")
             launched = next(cl["args"] for cl in calls if cl["args"][:2] == ["engine", "launch"])
-            chk("⑥b 已被取代的重建件(_rebuilds_superseded)不啟動、照實列在 skipped;其餘照啟動",
-                launched[2:] == ["ENG001", "MDL009"] and [x["eid"] for x in eng["skipped"]] == ["MDL005"])
+            chk("⑥b 按家族全名啟動:同號異名(ENG110 ×2)都起;同號的活件照起、被取代的重建件(_rebuilds_superseded)不起並照實列 skipped",
+                launched[2:] == ["VDF_ENG110_AKShareProbe", "VDF_ENG110_USMacroProbe", "VDF_MDL003_SentimentMacroEngine"]
+                and [x["family"] for x in eng["skipped"]] == ["VDF_MDL003_SentimentMacroEngine_v0100R"], launched[2:])
             chk("⑦ 子行程拿到流程環境(VDF 總控標記 · 執行緒上限 · 本輪 temp);同意閘照本視窗原樣(沒設就沒有)",
                 all(cl["vdfsm"] == "YES" and cl["thr"] and cl["tmp"] for cl in calls)
                 and all(cl["consent"] == os.environ.get("VIA_NET_CONSENT") for cl in calls))
