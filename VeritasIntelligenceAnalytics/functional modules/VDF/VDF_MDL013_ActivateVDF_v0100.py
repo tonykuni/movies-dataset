@@ -422,15 +422,29 @@ def flow_engines(opt, res, gate, log_dir, manager=None, py=None) -> dict:
     st = run_step("engine_launch", ["engine", "launch", *ids], env, log_dir, gate, opt.timeout, manager, py)
     out = {"flow": "engines", "lamp": st["lamp"], "steps": [st], "n_engines": len(ids), "skipped": skipped,
            "note": f"已被取代 / 退役的 {len(skipped)} 支不啟動(照實列在 skipped)" if skipped else ""}
+    out.update(launch_summary(st.get("summary", "")))
+    if out["lamp"] == "GREEN" and out.get("launch_lamp") in ("YELLOW", "RED"):
+        out["lamp"] = out["launch_lamp"]          # 管理員判 NODATA(缺套件)= 黃:照實,不因 rc 0 算綠
     rj = VIA / "VIA_Reports" / "vdf" / "RESULT_engine_launch_latest.json"
-    if rj.is_file() and manager is None:
+    t0 = time.time() - (st.get("secs") or 0) - 1
+    if rj.is_file() and manager is None and rj.stat().st_mtime >= t0:      # 共用的 latest 檔會被別的啟動覆寫:只認本步之後寫的、筆數對得上的
         try:
             o = json.loads(rj.read_text(encoding="utf-8"))
-            out.update(launchable=o.get("launchable"), n=o.get("n"), selftest=o.get("selftest"), launch_lamp=o.get("lamp"),
-                       red=[p["family"] for p in o.get("per", []) if p.get("selftest_lamp") == "RED" or not p.get("launchable")][:40])
+            if o.get("n") == out.get("n"):
+                out["red"] = [p["family"] for p in o.get("per", []) if p.get("selftest_lamp") == "RED" or not p.get("launchable")][:40]
         except (ValueError, OSError):
             pass
     return out
+
+
+def launch_summary(line: str) -> dict:
+    """本步自己的日誌摘要 → 數字(不讀共用的 latest 檔;那份會被同時跑的其他啟動覆寫)。"""
+    m = re.search(r"(\d+)/(\d+)\s*可啟動.*?GREEN\s*(\d+).*?NODATA\s*(\d+).*?RED\s*(\d+).*?沒自測\s*(\d+)\s*·\s*([A-Z]+)", line or "")
+    if not m:
+        return {}
+    ok_n, n, g, nd, r, none, lamp = m.groups()
+    return {"launchable": int(ok_n), "n": int(n), "launch_lamp": lamp,
+            "selftest": {"GREEN": int(g), "NODATA": int(nd), "RED": int(r), "—": int(none)}}
 
 
 def flow_db(opt, res, gate, log_dir, manager=None, py=None) -> dict:
@@ -760,6 +774,10 @@ def selftest() -> int:
         threading.Timer(0.3, lambda: state.update(m={"avail_mb": 9000, "total_mb": 16000})).start()
         w = mg.wait("probe", max_wait=5)
         mg.close()
+        ls = launch_summary("[計] VDF 單引擎啟動 94/94 可啟動 · 自測 GREEN 67 · NODATA 8 · RED 0 · 沒自測 19 · YELLOW · /x.json")
+        chk("⑪b 引擎結果從本步日誌摘要判讀(94/94 · GREEN 67 · NODATA 8 · RED 0 · 沒自測 19 · YELLOW);認不出 = 空(不猜)",
+            ls == {"launchable": 94, "n": 94, "launch_lamp": "YELLOW", "selftest": {"GREEN": 67, "NODATA": 8, "RED": 0, "—": 19}}
+            and launch_summary("garbage") == {}, ls)
         chk("⑪ 記憶體壓力閘:可用過低時新步驟先等,壓力解除才放行(有記等待)", 0.2 <= w < 5 and mg.card()["waits"], round(w, 2))
         card = {"tag": TAG, "ts": "t", "stamp": "x", "manager": "VDF_SystemManager_v9999.py", "lamp": "YELLOW",
                 "resources": res, "memgate": {"min_avail_mb": 1, "waits": []}, "lists": l2, "flows": list(f2.values())}
