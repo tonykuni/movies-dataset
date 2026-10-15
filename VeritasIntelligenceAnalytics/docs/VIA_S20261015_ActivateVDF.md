@@ -56,5 +56,7 @@ rc:0 全綠 · 2 有黃 / 閘關 / 擋下(不算綠)· 1 有紅。
 
 ## 留給下一步
 
-- `VDF_FetchSystem_SSOT` 尾版(v0106)仍把 MDL011 釘在 v0102;要讓擷取系統走 v0103 的缺套件 NODATA,需出擷取冊 v0107 + MDL008 v0108(兩支自測都釘冊內容),本批沒動。
+- 已查清不必動:`VDF_FetchSystem_SSOT` v0106 把 MDL011 釘在 v0102,但擷取系統(MDL008 v0101 起)起子行程前先比對列上的
+  `requires`(akshare · polars · duckdb),缺件直接 rc 3、零子行程(容器實測 `fetch run 011 --mode block` → `[rc3] MDL011 0.0s`)。
+  MDL011 v0103 管的是「直接起引擎」(`engine run MDL011`)那條路。
 - 工作站跑一次 `ActivateVDF.py`(開閘)拿真清單與補不足的收據。
