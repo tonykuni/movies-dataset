@@ -83,3 +83,20 @@ worktree `C:\Users\tonyk\via-main`(origin/main `b1e0064`)· 家族境 `via_vdf_3
 | 清單間歇 rc 1 | 兩支清單引擎都寫 `vdf_master_lists.duckdb`,v0100 讓它們同時跑 → `IO Error: Could not set lock on file ... Conflicting lock is held`(容器重現 3 次中 2 次;工作站那輪 GREEN 是時機錯開) | 兩張清單依序跑;資料庫流程(db check / refill)等擷取流程寫完才開庫;引擎流程(自測在沙盒)照樣並行 | 自測 ⑨⑩ · 容器 fixture 連跑 3 輪清單 3/3 GREEN、資料庫流程確實等擷取 |
 
 v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(債 1 = 薄尾委派前版自測)。
+
+## PR #527 Codex 兩條 P1 與登錄收尾(2026-10-16)
+
+- **P1 記憶體閘等待不理會 Ctrl+C**(成立):壓力中卡在 `MemGate.wait`(最多 600 秒)的步還沒有子行程,`interrupt()` 收不到;收尾又逐條各等 60 秒。
+  → v0101 `gate_wait`:每 0.5 秒看停止旗標;中斷收尾改全部流程共用一個 60 秒期限。自測 ④b:壓力中按 Ctrl+C 1.0 秒放手、零子行程。v0101 自測 11/11。
+- **P1 新版沒登錄**(成立,PR #526 也漏):交接閘報 `MODULE_UNREGISTERED`(ActivateVDF.py · MDL013 v0100 / v0101)與 `CHANGED_CODE_WITHOUT_TEST`。補齊:
+  - 需求冊 v0196 新增 **VDF-REQ018**(PARTIAL;工作站 v0101 全流程收據待回)· 編號 `VIA-VDF-REQ018`
+  - `ActivateVDF_v0100.py` = 固定入口的內容相同雙胞(照 PR #518 裁定),讓 registry-sync 登冊;原檔照用
+  - registry-sync --apply:新 65 · 變更 15(先在暫存副本試寫核對 = 全部是 VDF 本批元件,零他系統條目)
+  - 交接案 `vdf_activatevdf` · `vdf_fetchgroups_home`(經 VDF_SystemManager engine run)rc 0 · 標記見到 → VERIFIED;重測 `vdf_activate` · `vdf_akshare_card` · `numbering` · `chain` 全 rc 0
+  - 盤點冊 v0170 登兩新案站(CGC_MDL224 ⑧)
+  - 編號(R04 先提交再編號):REQ +1 · LGC +5 · MDL +3 · FNC_VDF +43 · ENV +2(含補 PR #526 漏編的 MDL012 v0106 / MDL011 v0103);稽核 遺失 0 · 改身分 0 · 重號 0
+  - SDD:X-NUM 的 VDF 項清零(REQ 453 全編);剩 CGC_MDL140 v0107 · CGC_MDL183 v0105 · VRN_ENG086 v0120 三支他系統尾版未編號(主線既有)
+- 交接閘:本批 VDF 項全清。剩 5 條 RED 都是開工前第一次 `handoff check` 就在的(ENG086 v0102 容器缺 polars 自測 rc 3、交接案要 rc 0 → 待工作站;VRN FirstPage v0130 · SUP_MDL749 v0116/v0117 · CGC_MDL264 屬他系統),checkpoint 照實記 RED,**不寫成成功**。
+- 擊斃閘:KILL-11 對 `ActivateVDF_v0100.py` 誤判(**VCGC 工具缺陷,未改**):CGC_MDL187 `_tail_on_ref` 的正則 `ActivateVDF_v(\d{4})\.py$` 用 `search` 沒錨定檔名開頭,
+  配到 origin/main 上的 `VDF_MDL013_ActivateVDF_v0100.py` 當同家族 → 判「版號比基線舊」;以檔名錨定比對,同家族在 origin/main 上 0 支 = 全新一族,本該放行。
+  其餘 10 條全過。修法建議(給 VCGC 自己的線):`rx.search(line)` 改比對 basename 全名(`re.fullmatch`)。
