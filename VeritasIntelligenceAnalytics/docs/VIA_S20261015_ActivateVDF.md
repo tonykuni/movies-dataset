@@ -64,3 +64,22 @@ rc:0 全綠 · 2 有黃 / 閘關 / 擋下(不算綠)· 1 有紅。
   `requires`(akshare · polars · duckdb),缺件直接 rc 3、零子行程(容器實測 `fetch run 011 --mode block` → `[rc3] MDL011 0.0s`)。
   MDL011 v0103 管的是「直接起引擎」(`engine run MDL011`)那條路。
 - 工作站跑一次 `ActivateVDF.py`(開閘)拿真清單與補不足的收據。
+
+## 工作站實測 · v0101(2026-10-16)
+
+worktree `C:\Users\tonyk\via-main`(origin/main `b1e0064`)· 家族境 `via_vdf_312`:
+
+- `ActivateVDF.py --selftest`:**16/16 PASS**(8 核 · psutil)· `plan`:管理員 v0154 · 擷取冊 v0106 · 並行 3 條。
+- 真跑(雙閘由操作員本視窗開;`--fetch-home <OneDrive 倉 VDF 夾> --db-home <同上>\output_hub --refill-apply`):
+  ① 8 核 · 可用 7.7/16.1 GB → 並行 3 條 · 每條 2 執行緒 · DuckDB 1335 MB;**② 兩張清單 GREEN(本輪產出且驗收過)**;
+  ③ 三條流程起跑後 v0100 一行都不印 → 操作員看成「卡斷」按 Ctrl+C → traceback、總覽沒寫(讀到的是更早一輪的舊 JSON)。
+
+### v0100 → v0101 修的三件(`VDF_MDL013_ActivateVDF_v0101.py`;固定入口 `ActivateVDF.py` 自動取尾版)
+
+| 件 | 根因 | 修法 | 證據 |
+|---|---|---|---|
+| 看起來卡住 | 流程跑完前完全沒輸出(擷取 34 列,單列上限可到 4 小時) | 心跳:每 `VIA_ACT_HEARTBEAT_S` 秒(預設 30)印在跑的步 · 已跑時間 · 它日誌最後一行 · 可用記憶體;每步完成一行。子行程 `PYTHONUNBUFFERED=1` | 自測 ①② · 容器真跑心跳 63 段 |
+| Ctrl+C 收不乾淨 | 主執行緒 KeyboardInterrupt 直接拋;子行程(管理員 → 引擎)沒收、可能還握 DuckDB 鎖;沒寫總覽 | 子行程自成行程組;SIGINT 處理器先收整棵樹(Windows `taskkill /T /F`、POSIX 行程組)再設停止旗標;還沒起的步不再起;照寫總覽,燈 `INTERRUPTED`、rc 130 | 自測 ③④⑥⑧(⑧ = 清單階段真送 SIGINT,端到端:0 殘留、無 traceback) |
+| 清單間歇 rc 1 | 兩支清單引擎都寫 `vdf_master_lists.duckdb`,v0100 讓它們同時跑 → `IO Error: Could not set lock on file ... Conflicting lock is held`(容器重現 3 次中 2 次;工作站那輪 GREEN 是時機錯開) | 兩張清單依序跑;資料庫流程(db check / refill)等擷取流程寫完才開庫;引擎流程(自測在沙盒)照樣並行 | 自測 ⑨⑩ · 容器 fixture 連跑 3 輪清單 3/3 GREEN、資料庫流程確實等擷取 |
+
+v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(債 1 = 薄尾委派前版自測)。
