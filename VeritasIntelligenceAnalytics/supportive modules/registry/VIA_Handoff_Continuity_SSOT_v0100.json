@@ -2684,6 +2684,42 @@
         "supportive modules/registry/VIA_VRN_LogicArchitecture_SSOT_v0100.json"
       ],
       "timeout_seconds": 300
+    },
+    "vdf_activatevdf": {
+      "argv": [
+        "VDF_SystemManager",
+        "engine",
+        "run",
+        "VDF_MDL013_ActivateVDF",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL013_ActivateVDF v0101 本版 11/11 · PASS",
+      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0101 心跳 · Ctrl+C 收子行程樹照寫總覽 · 清單依序(DuckDB 寫入鎖)· 資料庫流程等擷取 · 記憶體閘理會停止旗標 + 前版 v0100 十六檢(CPU/DRAM · 兩張清單 · 三流程 · U/I);經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL013_ActivateVDF_v*.py",
+        "functional modules/VDF/ActivateVDF.py",
+        "functional modules/VDF/ActivateVDF_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-16T15:50:00+00:00"
+    },
+    "vdf_fetchgroups_home": {
+      "argv": [
+        "VDF_SystemManager",
+        "engine",
+        "run",
+        "VDF_MDL012_FetchGroups",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0106 薄尾 6/6 · PASS",
+      "scope": "VDF_MDL012_FetchGroups v0106(VDF-REQ018 同批):find_db 根序即優先序(--home 的庫先於倉內 output_hub)· 前版鏈自測封倉(不再對倉內真庫 CHECKPOINT/ANALYZE)+ v0105…v0100 全鏈;經 VDF 自己的 manager(engine run)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-16T15:50:00+00:00"
     }
   },
   "work_items": [
@@ -5537,6 +5573,34 @@
       "case": "vrn_logic_index",
       "receipt": "docs/handoff/evidence/vrn_logic_index.json",
       "note": "S20261014c:via_vrn_logic_book_v0112 build → 指標 55 在位且為尾版 55 · 過期 0(ENG086 v0120 · SUP_MDL749 v0117 · ENG073 v0140)· VRN 管理器 status 邏輯 GREEN"
+    },
+    {
+      "id": "VDF-REQ018:activatevdf",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 vdf_activatevdf(ActivateVDF v0101 + 固定入口 + 雙胞) → 已驗:2026-10-16T15:48:18+00:00 rc 0 · 標記見到(經 VDF_SystemManager engine run)",
+      "next": "handoff test vdf_activatevdf 實跑轉 VERIFIED",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
+      "id": "VDF-REQ018:fetchgroups-home",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 vdf_fetchgroups_home(MDL012 v0106 家優先 · 封倉) → 已驗:2026-10-16T15:48:35+00:00 rc 0 · 標記見到(經 VDF_SystemManager engine run)",
+      "next": "handoff test vdf_fetchgroups_home 實跑轉 VERIFIED",
+      "case": "vdf_fetchgroups_home",
+      "receipt": "docs/handoff/evidence/vdf_fetchgroups_home.json"
+    },
+    {
+      "id": "VDF-REQ018:workstation-v0101",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "操作員 / AI",
+      "reason": "工作站 v0101 全流程(雙閘開 · 擷取 34 列 + refill --apply)收據未回;2026-10-16 v0100 那輪兩張清單 GREEN,三流程跑時被 Ctrl+C(v0101 已修無輸出與中斷收尾)",
+      "next": "工作站 worktree 更新到含 v0101 的 main → 本視窗開雙閘 → ActivateVDF.py --fetch-home <VDF 夾> --db-home <VDF 夾>\\output_hub --refill-apply → 回貼 ② ③ [計] 與 ACTIVATE_VDF_latest.json 摘要 → AI 入冊轉 VERIFIED"
     }
   ]
 }
