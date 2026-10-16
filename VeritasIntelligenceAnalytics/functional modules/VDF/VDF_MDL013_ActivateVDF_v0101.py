@@ -201,6 +201,20 @@ def interrupt(reason: str = "Ctrl+C") -> int:
     return len(procs)
 
 
+def gate_wait(gate, who: str, max_wait: float = 600.0) -> float:
+    """同 v0100 MemGate.wait(壓力時新步驟先等,最多 max_wait 秒),但每 0.5 秒看一次停止旗標:
+    Ctrl+C 時卡在記憶體閘的步立刻放手(它還沒有子行程,interrupt() 收不到它)。PR #527 Codex P1。"""
+    if gate is None:
+        return 0.0
+    t0 = time.time()
+    if not gate.ok.is_set():
+        while not gate.ok.wait(0.5):
+            if STOP.is_set() or time.time() - t0 >= max_wait:
+                break
+        gate.waits.append({"who": who, "secs": round(time.time() - t0, 1)})
+    return time.time() - t0
+
+
 def _on_sigint(signum, frame):
     """Ctrl+C 一到就先收子行程樹、設停止旗標,再丟 KeyboardInterrupt:
     清單階段 v0100 的 with ThreadPoolExecutor 離開時會等 worker,worker 要看到停止旗標才會收手 —— 先設旗標才不會互等。"""
@@ -217,7 +231,7 @@ def run_step(name: str, args: list, env: dict, log_dir: Path, gate=None,
         return dict(rec, rc=None, lamp="RED", secs=0, note=f"{PRIOR.MANAGER_GLOB} 不在 {HERE}")
     if STOP.is_set():
         return dict(rec, rc=None, lamp="INTERRUPTED", secs=0, note="已中斷:這一步沒起")
-    waited = gate.wait(name) if gate else 0.0
+    waited = gate_wait(gate, name)
     if STOP.is_set():
         return dict(rec, rc=None, lamp="INTERRUPTED", secs=0, note="已中斷:這一步沒起")
     log = Path(log_dir) / (re.sub(r"[^A-Za-z0-9_.-]+", "_", name) + ".log")
@@ -286,11 +300,12 @@ def run_flows(opt, res, gate, log_dir, lists, manager=None, py=None) -> list:
     except KeyboardInterrupt:
         n = interrupt()
         _say(f"  [中斷] Ctrl+C:收掉 {n} 支在跑的子行程樹;還沒起的步不再起;照寫總覽")
+        deadline = time.time() + 60             # 全部流程共用一個收尾期限(不是每條各等 60 秒)
         for f in pick:
             if f in out:
                 continue
             try:
-                out[f] = futs[f].result(timeout=60)
+                out[f] = futs[f].result(timeout=max(0.1, deadline - time.time()))
             except Exception:  # noqa: BLE001 — 收尾中拿不到結果就照實記中斷
                 out[f] = {"flow": f, "lamp": "INTERRUPTED", "steps": [], "note": "已中斷"}
             if out[f].get("lamp") not in ("RED",) and any(s.get("lamp") == "INTERRUPTED" for s in out[f].get("steps", [])):
@@ -501,6 +516,20 @@ def selftest() -> int:
             r3 = run_step("after_stop", ["db", "check"], env, logs, None, None, mgr)
             chk("④ 中斷後還沒起的步不再起(零子行程,回 INTERRUPTED)", r3["lamp"] == "INTERRUPTED" and r3["secs"] == 0
                 and not (logs / "after_stop.log").exists())
+            STOP.clear()
+            pressured = PRIOR.MemGate(reader=lambda: {"avail_mb": 100, "total_mb": 16000}, interval=0.05).start()
+            box2 = {}
+            t1 = time.time()
+            th2 = threading.Thread(target=lambda: box2.update(r=run_step("mem_wait", ["db", "check"], env, logs, pressured, None, mgr)))
+            th2.start()
+            time.sleep(0.6)
+            interrupt()
+            th2.join(timeout=10)
+            pressured.close()
+            r4 = box2.get("r") or {}
+            chk("④b 卡在記憶體閘(壓力中、還沒起子行程)時 Ctrl+C:幾秒內放手回 INTERRUPTED,不等滿 600 秒、零子行程",
+                r4.get("lamp") == "INTERRUPTED" and time.time() - t1 < 5 and not (logs / "mem_wait.log").exists(),
+                (r4.get("lamp"), round(time.time() - t1, 1)))
             STOP.clear()
             chk("⑤ 總燈:有 INTERRUPTED = INTERRUPTED(不是綠);沒中斷照 v0100",
                 overall({"lamp": "GREEN"}, [{"lamp": "INTERRUPTED"}]) == "INTERRUPTED"
