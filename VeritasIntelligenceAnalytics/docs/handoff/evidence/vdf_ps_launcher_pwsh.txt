@@ -66,3 +66,76 @@ exit=2
 - 反證 B:engine 夾放一支在冊(git add)、會觸網、沒橋的 .py → 3b RED 指名 VDF_ENG999_CoverageProbe · exit 1
       3b │ 覆蓋 · Py 加速器 + 網路橋                    │ RED   │     1.2 │ RED · 加速器 93/94 缺 ['VDF_ENG999_CoverageProbe'] · 網路 93/94 真擷取 10 缺 ['VDF_ENG999…
 - selftest(numexpr 替身)→ exit 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘過(P020 位元吻合)
+
+## v0102(視窗殘件三件)容器 pwsh 7.4.6 實跑(2026-10-18)
+- 仿操作員視窗 v0101 preflight(重現):
+      8:  [①加速器·PS] Celeritas PS7 模板沒接上(supportive modules\ps7\VeritasCeleritas.PS7.ps1 不在,或不是 PowerShell 7)· 照跑,不加速
+      11:[DEPRECATED] Set-VIABoot 已覆蓋
+      12:2
+      43:[DEPRECATED] Set-VIABoot 已覆蓋
+      44:2
+- 仿操作員視窗 v0102 selftest → exit 0:
+      priority before=Normal
+      ━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 53748 ms ━━
+        1  │ 加速器 · PS 端                               │ GREEN │       — │ 視窗裡的 Celeritas 殘件不能用 → 正主已在本支範圍重接 · Celeritas PS7 v1141 · 執行緒 4 / 4…
+        2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.8 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+        3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.2 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+        3b │ 覆蓋 · Py 加速器 + 網路橋                    │ GREEN │     1.1 │ GREEN · 加速器 93/93 缺 [] · 網路 93/93 真擷取 9 缺 [] · 排除 0
+        3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ GREEN │       — │ 每族尾版 161 支 · 模板章 161 · PS-ACCEL 161 · 缺 0
+        4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+        5  │ ActivateVDF 自測                             │ GREEN │    49.2 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+        [計] 7 步 · OK 6 · SKIP 1 · WARN 0 · FAIL 0 · 53.3 秒 → GREEN
+      rc=0
+      POST: PYTHONPATH=[] VIA_ROOT=[]
+      progress calls: 76 · prefs=SilentlyContinue
+      priority after=Normal
+- 乾淨視窗 v0102:preflight exit 0 · selftest exit 0
+        [計] 7 步 · OK 6 · SKIP 1 · WARN 0 · FAIL 0 · 50.1 秒 → GREEN
+- Parser 錯 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘 11 條全過(P021 位元吻合)
+
+## v0102 收據的指令與位元(PR #531 Codex P1;可重現)
+- 測試時的提交:0c42e9ae0(v0102 + P021);pwsh 7.4.6(Linux 容器);python3 3.11.15
+- 受測與相依檔 sha256:
+      965fa48f68fb848cc44f9766c2e68b50f432186d5539cf028c5163f00c4919b6  functional modules/VDF/Invoke-VDF-Activate-v0101.ps1
+      dd1a412d88f5dabd5479f561f930729e1b182567ff9cf215d4d28c21da085f56  functional modules/VDF/Invoke-VDF-Activate-v0102.ps1
+      adb4c519ee170fc508858716452a5fde3751ea48222652d58049608f4d1cc057  supportive modules/ps7/VeritasCeleritas.PS7.ps1
+      4d2957d5052a311a064d16c53ad434c0f789a2aebd860e08ecb34c41fe5a1da1  supportive modules/VIA_PS_PyProgress_Module.ps1
+      f1438c7131e1245b2fe7d033a175d4ad4d839788a0c2804fe14ecd8e720d2709  supportive modules/VIA_PS_Accel_Module.ps1
+      88afa9fa0dc766a02007309a363f8053965f5022fb9f5bc0047196293196bf2e  Register-VIA-Commands-v0243.ps1
+      43a48fd5b9664895e4c3223f8fb8946c9f888480ce84f166dc6cf744f3fb2895  docs/handoff/ps/VIA-Commands-Override-v0102.ps1
+      d37629acad7fdbfbf601c423dc6864b98c1e052316fbe47d34ec41c1aaf5c116  functional modules/VDF/VDF_MDL013_ActivateVDF_v0103.py
+      4e8ea80b81864a6f0da6ee8ecb5e362eda2ce62988aa3cae3e75336dc6688ac8  supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py
+      58855f19ec2d05ff38705eb2cfa11698f6551f8254ff4c139e15fe3977325bf4  supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py
+- 仿操作員視窗的兩支探針(只在容器 scratchpad;不入倉,全文附下):
+    celscoped.ps1 = Register-VIA-Commands-v0243.ps1 第 1309–1350 行($VIACelScopedSrc + Set-Item function:global:Invoke-VIACeleritasScoped),路徑反斜線換成 /
+      sed -n '1309,1350p' Register-VIA-Commands-v0243.ps1 > celscoped.ps1; sed -i 's#\\\\#/#g' celscoped.ps1   → sha256 d12f26549a3d9fcf0defd365bdad97c00234870305f0bd57ac3e86511b428861
+    opsession.ps1(sha256 bd8baf24a3d7f36e1d25e207fa87e6ccc29db44be71d2474576286d938552a7c;最後一版 = selftest;v0101 重現那次同檔但 -Action preflight、沒有 priority 兩行):
+      | param([string]$Ver)
+      | $global:VIA = '/home/user/movies-dataset/VeritasIntelligenceAnalytics'
+      | $VIA = $global:VIA
+      | . "$PSScriptRoot/celscoped.ps1"
+      | . "$VIA/supportive modules/VIA_PS_PyProgress_Module.ps1"
+      | # stale summary function with empty state (like the workstation header "Celeritas  applied=False workers=")
+      | $null = New-Module -Name StaleCel -ArgumentList "$VIA/supportive modules/ps7/VeritasCeleritas.PS7.ps1" -ScriptBlock { param($f); $null = . $f -RestoreOnly; $script:CeleritasPS7 = $null; Export-ModuleMember -Function Write-CeleritasMatrixSummary, Get-CeleritasStatus } | Import-Module -Global -PassThru -Force
+      | # operator override stub
+      | Set-Item -Path Function:\global:Set-VIABoot -Value ([scriptblock]::Create("Write-Host ('[DEPRECATED] Set-VIABoot 已覆蓋') -ForegroundColor Yellow; return 2")) -Force
+      | # progress probe
+      | $global:ProgSeen = [System.Collections.Generic.List[string]]::new()
+      | function global:Write-VIAProgress { param([string]$Activity, [string]$Status, [int]$Percent = -1, [int]$Id = 11) $global:ProgSeen.Add("$ProgressPreference") }
+      | Invoke-VIACeleritasScoped { "warm-up scoped call" } | Out-Null
+      | "priority before=" + (Get-Process -Id $PID).PriorityClass
+      | "PRE: PYTHONPATH=[$env:PYTHONPATH] VIA_ROOT=[$env:VIA_ROOT]"
+      | & "$VIA/functional modules/VDF/Invoke-VDF-Activate-$Ver.ps1" -Action selftest -NoOpen
+      | "rc=$LASTEXITCODE"
+      | "POST: PYTHONPATH=[$env:PYTHONPATH] VIA_ROOT=[$env:VIA_ROOT]"
+      | "progress calls: " + $global:ProgSeen.Count + " · prefs=" + (($global:ProgSeen | Sort-Object -Unique) -join ',')
+      | "after: Restore cmd source=" + (Get-Command Restore-CeleritasPS7).Source ; "priority after=" + (Get-Process -Id $PID).PriorityClass
+- 指令(站在 VeritasIntelligenceAnalytics;PW = pwsh 7.4.6):
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession.ps1 -Ver v0101          # preflight 版:重現三件
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession.ps1 -Ver v0102          # preflight 版 → selftest 版:三件全消,rc 0
+      VIA_NO_OPEN=1 $PW -NoProfile -File 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1' -Action preflight -NoOpen   # rc 0
+      VIA_NO_OPEN=1 $PW -NoProfile -File 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1' -Action selftest -NoOpen    # rc 0
+      $PW -NoProfile -c '[System.Management.Automation.Language.Parser]::ParseFile("functional modules/VDF/Invoke-VDF-Activate-v0102.ps1",[ref]$t,[ref]$e)'   # 錯 0
+      python3 'supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py' --base origin/main --run-selftest      # rc 0 · 11 條全過 · P021
+      VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 'supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py' run --family core CGC_MDL277_AiOps pslint   # PS 檢查 GREEN
+      VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 $V run CGC_MDL237_NumberingSystem --apply --scope 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1'; python3 $V run CGC_MDL237_NumberingSystem audit   # +11 · 遺失 0 · 改身分 0 · 重號 0

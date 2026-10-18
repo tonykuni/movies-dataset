@@ -166,3 +166,21 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
 - 3c PS:VDF 夾內每族尾版 `.ps1` 要有模板章 `CELERITAS-TEMPLATE-JOIN` 與 `[VIA:PS-ACCEL]`(排除 history / intake / 虛擬環境 / 已取代)。
 - 缺 = 結束碼紅,並印 VCGC 的 AST 注入補橋指令(CGC_MDL124 `--subsystems` / `--ps --ps-tail` 先看計畫再 `--apply`);本支不代改任何檔(模板章是 .ps1 改動,L70)。
 - 反證:放一支沒橋的 .ps1 → 3c RED;放一支在冊、會觸網、沒橋的 .py → 3b RED 指名;兩支都 exit 1(探針已刪)。
+
+## PS 一鍵 v0102:工作站視窗殘件三件(2026-10-18)
+
+操作員貼回工作站實跑(當時 main 還在 v0100;PR #530 合併前一刻拉的):自測全綠(v0103 2/2 · v0102 6/6 · v0101 10/11 而 ⑩ 由 ⑫ 取代 · v0100 16/16;v0102 ⑭ 的 TypeError 已不再出現),
+結束碼 0 · AMBER,但有三件不是 VDF 程式本身、而是**操作員視窗裡別的東西**造成的毛病。L70 許可 P021(新檔 v0102;v0100 / v0101 一字不動)。
+
+| 現象 | 根因(容器 pwsh 7.4.6 重現) | v0102 怎麼修 |
+|---|---|---|
+| ① 「Celeritas PS7 模板沒接上」黃;總表頭 `Celeritas  applied=False workers=` | Register 的 `Invoke-VIACeleritasScoped` 只匯出 `Restore-CeleritasPS7` 進視窗;模板塊看到它就以為已接而略過;`Get-CeleritasStatus` 不在 / 狀態空 | 模板塊沒由本支接上時,把正主點源進**本支範圍**重接(`[VDF:CEL-REJOIN:v0102]`);跑完還原;優先權前後都 Normal |
+| 每個 Python 步驟前多印 `[DEPRECATED] Set-VIABoot 已覆蓋…` 與一行 `2` | 操作員 `$PROFILE` 最後點源的短令覆蓋檔把 `Set-VIABoot` 換成殘樁(印一行、`return 2`);中央 `Invoke-VIAPython` 每次都叫它 | **只在偵測到殘樁時**給本支範圍一個做原本那件事的安靜同名函式(`[VDF:BOOT-SHIM:v0102]`:VIA_ROOT + bootstrap 進 PYTHONPATH),跑完兩個環境變數還原;視窗裡那一個不動 |
+| 每行尾巴殘字(`…_NET_CONSENT…` `]`) | 中央 `Invoke-VIAPython` 的進度條與本支逐行直播搶同一列 | 子步驟期間本範圍 `$ProgressPreference = 'SilentlyContinue'`(本支已逐行直播) |
+
+重現與驗證(證據 `docs/handoff/evidence/vdf_ps_launcher_pwsh.txt`):仿操作員視窗(先跑一次 scoped 助手 + 殘樁 Set-VIABoot + 空狀態的總表函式 + 進度探針)——
+v0101:① YELLOW、`[DEPRECATED]` + `2` 三次、進度條 Continue;v0102:① GREEN(重接)、雜訊 0、進度條 SilentlyContinue、PYTHONPATH / VIA_ROOT 前後相同、優先權前後 Normal、selftest exit 0。
+乾淨視窗 v0102:preflight 0 · selftest 0(7 步 OK 6 · SKIP 1 · GREEN)。Parser 錯 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘 11 條全過(P021 位元吻合)。
+
+**他系統的根(只報不改,L120):** `docs/handoff/ps/VIA-Commands-Override-v0102.ps1` 的 `$keep` 沒列 `Set-VIABoot`(中央 `Invoke-VIAPython` 要叫它),
+建議 VCGC 側下一版把它加進 `$keep`;Register 的 scoped 助手匯出 `Restore-CeleritasPS7` 進視窗也會讓其他用 `Get-Command Restore-CeleritasPS7` 判「已接」的 PS 尾版誤判。
