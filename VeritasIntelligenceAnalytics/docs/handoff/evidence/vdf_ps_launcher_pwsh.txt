@@ -52,3 +52,17 @@ exit=2
 - D -Action selftest(numexpr 替身)→ exit 0
       5  │ ActivateVDF 自測                             │ GREEN │    45.7 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
 - pslint GREEN(704 · no_accel 0 · own_page 0);擊斃閘 11 條全過(P019 重算 sha256 · 位元吻合)
+
+## v0101(③b 覆蓋檢查)容器 pwsh 7.4.6 實跑(2026-10-18)
+- preflight → exit 0:
+      1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+      2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     3.2 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+      3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.4 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+      3b │ 覆蓋 · Py 加速器 + 網路橋                    │ GREEN │     1.2 │ GREEN · 加速器 93/93 缺 [] · 網路 93/93 真擷取 9 缺 [] · 排除 0
+      3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ GREEN │       — │ 每族尾版 161 支 · 模板章 161 · PS-ACCEL 161 · 缺 0
+      4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+- 反證 A:VDF 夾放一支沒模板章 / 沒 PS-ACCEL 的 .ps1 → 3c RED · exit 1(印 CGC_MDL124 --ps 補橋指令)
+      3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ RED   │       — │ 每族尾版 162 支 · 模板章 161 · PS-ACCEL 161 · 缺 Invoke-VDF-CoverageProbe-v0100.ps1 缺模…
+- 反證 B:engine 夾放一支在冊(git add)、會觸網、沒橋的 .py → 3b RED 指名 VDF_ENG999_CoverageProbe · exit 1
+      3b │ 覆蓋 · Py 加速器 + 網路橋                    │ RED   │     1.2 │ RED · 加速器 93/94 缺 ['VDF_ENG999_CoverageProbe'] · 網路 93/94 真擷取 10 缺 ['VDF_ENG999…
+- selftest(numexpr 替身)→ exit 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘過(P020 位元吻合)
