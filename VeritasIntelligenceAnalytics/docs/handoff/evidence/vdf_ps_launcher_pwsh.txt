@@ -1,0 +1,41 @@
+# Invoke-VDF-Activate-v0100.ps1 · 容器 pwsh 7.4.6 實跑收據(2026-10-18;python3 = 3.11)
+## 剖析:Parser::ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint(CGC_MDL277)tails 704 no_accel 0 own_page 0 GREEN · 全景 read 問題 0
+
+## -Action preflight → exit 0
+━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 3140 ms ━━
+  ID │ STEP                                         │ STATE │     SEC │ NOTE
+  1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.6 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.2 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  [計] 4 步 · OK 3 · SKIP 1 · WARN 0 · FAIL 0 · 2.8 秒 → GREEN
+  [計時] 全程 3 秒 · 結束碼 0(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=0
+
+## -Action selftest(PYTHONPATH 帶 numexpr 替身,模擬工作站有 numexpr)→ exit 0
+━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 49714 ms ━━
+  ID │ STEP                                         │ STATE │     SEC │ NOTE
+  1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.6 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.8 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  5  │ ActivateVDF 自測                             │ GREEN │    46.0 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+  [計] 5 步 · OK 4 · SKIP 1 · WARN 0 · FAIL 0 · 49.4 秒 → GREEN
+  [計時] 全程 49.8 秒 · 結束碼 0(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=0
+
+## -Action run -SkipSelftest -Flows engines → exit 2(YELLOW:同意閘沒開 → 清單 GATED;引擎 94/94 RED 0)
+━━ VDF 獨立一鍵 · 結束碼 2 · AMBER · Celeritas v1141 applied=True workers=4 · 393499 ms ━━
+  ID        │ STEP                                         │ STATE  │     SEC │ NOTE
+  1         │ 加速器 · PS 端                               │ GREEN  │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2         │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN  │     1.8 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3         │ 網路模組 via_net_unified_v0101               │ GREEN  │     1.4 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4         │ 同意閘                                       │ GATED  │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  6①        │ CPU/DRAM                                     │ GREEN  │       — │ 核 4 · 可用 15318/16093 MB · 並行 1 條 · 每條 4 執行緒
+  6②        │ 兩張清單                                     │ GATED  │     0.8 │ 同意閘沒開(操作員的手)且沒有既有清單 → 擷取流程停,其餘兩條照跑
+  6③engines │ 流程 · engines                               │ YELLOW │   373.6 │ 94/94 可啟動 · 自測 GREEN 67 · NODATA 8 · RED 0
+  6④        │ U/I                                          │ GREEN  │     4.7 │ [計] VDF ui v0154 · 展現規則(燈欄第一 · 問題在前 · 燈號列 · 空值 — · 路徑縮檔名 · 燈號 JS…
+  6         │ ActivateVDF 總燈 · VDF_MDL013_ActivateVDF v… │ YELLOW │   389.8 │ 總覽 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/activate/ACTI…
+  [計] 9 步 · OK 5 · SKIP 2 · WARN 2 · FAIL 0 · 772.1 秒 → AMBER
+  [計時] 全程 393.3 秒 · 結束碼 2(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=2

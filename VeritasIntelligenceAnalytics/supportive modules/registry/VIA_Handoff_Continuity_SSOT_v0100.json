@@ -2693,8 +2693,8 @@
         "VDF_MDL013_ActivateVDF",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL013_ActivateVDF v0102 本版 6/6 · PASS",
-      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0102 並行判法不靠起行程快(⑫ 取代 v0101 ⑩)· engine list 登記在跑(心跳 · Ctrl+C)· 載入前版不印編譯警告 · numexpr 上限天花板 · 心跳略過編譯雜訊 + v0101 心跳 · Ctrl+C 收子行程樹照寫總覽 · 清單依序(DuckDB 寫入鎖)· 資料庫流程等擷取 · 記憶體閘理會停止旗標 + 前版 v0100 十六檢(CPU/DRAM · 兩張清單 · 三流程 · U/I);經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "success_marker": "[計] VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS",
+      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL013_ActivateVDF_v*.py",
         "functional modules/VDF/ActivateVDF.py",
@@ -5605,12 +5605,31 @@
       "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
     },
     {
+      "id": "VDF-REQ018:activatevdf-v0103",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "工作站 2026-10-18 跑 v0102 --selftest:⑭ 真測段(有裝 numexpr 才跑)TypeError: dict() got multiple values for keyword argument 'NUMEXPR_NUM_THREADS' → v0103 ⑰ 取代 → 已驗:2026-10-18T08:59:43+00:00 rc 0 · v0103 標記見到(經 VDF_SystemManager engine run)",
+      "next": "handoff test vdf_activatevdf(rc 0 + v0103 標記)轉 VERIFIED;工作站重跑 --selftest 應見 v0103 2/2 · v0102 6/6 · v0101(⑩ 由 ⑫ 取代)· v0100 16/16",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
+      "id": "VDF-REQ018:ps-launcher",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-18「FIX ALL AND INTEGRATE ALL INTI A PS CODE WITH ACCELERATORS AND NETWORK MODULES.」→ 新檔 functional modules/VDF/Invoke-VDF-Activate-v0100.ps1(許可 P019):模板塊 + PS-ACCEL + SUP_MDL737 --selftest + via_net_unified --selftest + 同意閘只讀 + ActivateVDF 自測 → 真跑 + MATRIX SUMMARY + 跳總覽頁。容器 pwsh 7.4.6 實跑:preflight exit 0 · selftest exit 0 · run(engines)exit 2(同意閘沒開 → 清單 GATED;引擎 94/94 RED 0);ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint GREEN · 擊斃閘過(P019 位元吻合)",
+      "next": "工作站 pwsh 實跑(雙閘由操作員自己開)回貼 MATRIX SUMMARY",
+      "receipt": "docs/handoff/evidence/vdf_ps_launcher_pwsh.txt"
+    },
+    {
       "id": "VDF-REQ018:workstation-v0101",
       "requirement": "VDF-REQ018",
       "state": "PENDING",
       "owner": "操作員 / AI",
       "reason": "工作站 2026-10-18 v0101 全流程(雙閘開):② 兩張清單 GREEN(依序跑,沒撞寫入鎖)· 擷取與引擎並行 · 資料庫等擷取 · 心跳正常;跑到擷取 + 引擎流程中段時回報(收據未完:③ 結果 · [計] · ACTIVATE_VDF_latest.json 摘要還沒回)。自測 ⑩ / SyntaxWarning / numexpr 三件由 v0102 修",
-      "next": "工作站 worktree 更新到含 v0102 的 main → --selftest(應見 v0102 6/6 PASS)→ 本視窗開雙閘 → ActivateVDF.py --fetch-home <VDF 夾> --db-home <VDF 夾>\\output_hub --refill-apply → 回貼 ② ③ [計] 與 ACTIVATE_VDF_latest.json 摘要 → AI 入冊轉 VERIFIED"
+      "next": "工作站 worktree 更新到含 v0103 + Invoke-VDF-Activate-v0100.ps1 的 main → pwsh 跑 Invoke-VDF-Activate(-Action selftest 應見 v0103 2/2 PASS)→ 本視窗開雙閘 → -FetchHome <VDF 夾> -RefillApply → 回貼 MATRIX SUMMARY 與 ACTIVATE_VDF_latest.json 摘要 → AI 入冊轉 VERIFIED"
     }
   ]
 }
