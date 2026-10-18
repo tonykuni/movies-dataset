@@ -14,7 +14,7 @@
 
 容器實測(PowerShell 7.4 · 情境 = 使用者機器:先跑過 v0124 · 遠端被別台推了新提交 · 本機有別的系統的提交):第 1 次 備份 v0124 → 換 v0125 → ⑧ 完成 紅 0 → ⑨ 只送 VRN-2 船包(別的系統的提交沒被推)→ 獨立驗證錯值 0 + 摘要(約 1 分 40 秒)· 第 2 次 ⑨ 已是最新(約 1 分 10 秒)。
 
-程式碼 SHA-256(本文):`4da718558ed3`
+程式碼 SHA-256(本文):`85df9104a3f8`
 
 ```powershell
 & {
@@ -97,7 +97,7 @@ runpy.run_path(target, run_name="__main__")
       Copy-Item -LiteralPath $new -Destination $A -Force
       Say GREEN "③ 啟動器 v0125 就位(SHA-256 $($Want.Substring(0,12)) · 來源 GitHub $Br)→ $A"
     } else { Say GREEN "③ 本機已是 v0125(SHA-256 $($Want.Substring(0,12)))" }
-    # ④ 執行(啟動器自己做 ①~⑩:CPU/DRAM · 定位 · 船包補回 · 落地 v0231→v0234 · 補裝 · 加速器 · 平行段 · 登記 · 測試 · vrn2 --run · 完成判定 · 上船 · 封存 · U/I)
+    # ④ 執行(啟動器自己做 ①~⑩:CPU/DRAM · 定位 · 船包補回 · 落地 v0231→v0235 · 補裝 · 加速器 · 平行段 · 登記 · 測試 · vrn2 --run · 完成判定 · 上船 · 封存 · U/I)
     if ($NoPush) { $env:VIA_VRN2_NO_PUSH = '1' } else { Remove-Item Env:\VIA_VRN2_NO_PUSH -ErrorAction SilentlyContinue }
     Write-Host ("[計] VRN-2 · ActivateVRN-2 v0125 · {0}" -f $(if ($NoPush) { '只實測不上船' } else { '完成後自動上船(VRN-2 船包)' })) -ForegroundColor Yellow
     & $py $A @LArgs
