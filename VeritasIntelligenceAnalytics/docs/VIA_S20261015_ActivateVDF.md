@@ -207,3 +207,13 @@ v0101:① YELLOW、`[DEPRECATED]` + `2` 三次、進度條 Continue;v0102:① GR
 
 **他系統的根(L120:只報不改):** `supportive modules/bootstrap/sitecustomize.py` 的 `_chain_shadowed()` 只排除自己那一夾;PYTHONPATH 上有兩棵 VIA 樹的 bootstrap 時會互相接力到遞迴上限。
 建議中央下一版:接力時跳過「也是 VIA bootstrap 的 sitecustomize」(同檔名 + 同標頭),或以環境旗標防重入。
+
+## PS 一鍵 v0104 + ActivateVDF v0105:去重時空段照留(PR #532 Codex P2,2026-10-18)
+
+PR #532(v0103 / v0104)由操作員合併後,Codex 的 P2 才到:去重先把 PYTHONPATH 的**空段**丟掉再拼回去;
+Python 把空段當「目前目錄」,`bootstrapA::bootstrapB` 這種正好要去重的情況會連帶拿掉目前目錄。
+已發布版不改,出新版(L70 許可 P023;v0100–v0103 與 ActivateVDF v0100–v0104 一字不動):
+- **PS 一鍵 v0104**:只拿掉第一份之後的 bootstrap;空段、重複的一般路徑原樣原序保留(不再 `Select-Object -Unique`)。
+  三例實測:`/a/b::/b/b:/z → /a/b::/z` · 只一份不動 · `:/a/b:x:/b/b/: → :/a/b:x:`。
+- **ActivateVDF v0105**(薄尾):換上保留空段的 `dedupe_bootstrap`(v0104 的 flow_env 與 numexpr 探針呼叫時查模組全域 → 一換即生效)。
+  自測 ㉓ 空段 / 開頭結尾空段 / 重複一般路徑都保留、子行程環境同樣保留;㉔ 橋。突變(改回丟空段)→ ㉓ FAIL。
