@@ -145,3 +145,24 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
   P1 先決步驟(加速器 / 網路模組自測)紅了結束碼還是 0 → `Merge-VDFExit` 取較壞者(0 < 2 < 1 < 124 < 130),preflight / selftest / run 都帶進結束碼;
   P2 本輪沒寫出新總覽仍開舊頁 → 只在總覽 JSON 是本輪寫的才開頁,否則印黃字不開。
   pwsh 實跑:正常 preflight 0 · 壞 python(/bin/false)preflight 1(兩列 RED)· 失敗真跑 1 且不開舊頁 · selftest 0;pslint GREEN;擊斃閘過。
+
+## PS 一鍵 v0101:每次跑都確認全部 VDF 模組接了加速器與網路工具(2026-10-18)
+
+操作員令「INTEGRATE INTO ONE PS CODE WITH 加速器模板並確保所有VDF模組都有導入網路工具 善用VCGC節省TOKEN工具注入AST上加速覆蓋到7全部」= L70 許可 P020(新檔 v0101;v0100 一字不動)。
+
+**先量(經 VCGC 的橋掃器 CGC_MDL124 v0111 + 契約閘 CGC_MDL183 v0105,只讀):覆蓋已經全滿,這次沒有要注入的。**
+
+| 面 | 量法 | 結果 |
+|---|---|---|
+| VDF Py 加速器橋 | `CGC_MDL124 --subsystems` | 140/140(100%);排除 393 = 版史 + `_sha` 存證副本(具名理由) |
+| VDF Py 網路橋 | 同上 | 140/140(100%) |
+| 全樹 Py 加速器橋 | 同上 | 1781/1781(100%) |
+| VDF PS-ACCEL | `CGC_MDL124 --ps --ps-tail --root "functional modules/VDF"` | 掃 172 · 已掛 165 · 缺 0 · 排除 7 |
+| PS 模板章 | `CGC_MDL183` | 全樹基線外新缺 0;既有債 28 支**沒有一支是 VDF**(VAP / WorkOps / intake 等,L70 操作員的手) |
+| VDF 管理員自己的尺 | `VDF_SystemManager bridges` | 加速器 93/93 · 網路 93/93(真擷取 9)· 缺 0 |
+
+**v0101 多一步 ③b 覆蓋檢查**(每次一鍵都跑,缺了就紅,不靠記得):
+- 3b Py:VDF 自己的管理員 `bridges`(尾版逐支;尺 = CGC_MDL124 排除清單與真擷取判定,只讀)—— VDF 獨立,不經 VCGC 主控台。
+- 3c PS:VDF 夾內每族尾版 `.ps1` 要有模板章 `CELERITAS-TEMPLATE-JOIN` 與 `[VIA:PS-ACCEL]`(排除 history / intake / 虛擬環境 / 已取代)。
+- 缺 = 結束碼紅,並印 VCGC 的 AST 注入補橋指令(CGC_MDL124 `--subsystems` / `--ps --ps-tail` 先看計畫再 `--apply`);本支不代改任何檔(模板章是 .ps1 改動,L70)。
+- 反證:放一支沒橋的 .ps1 → 3c RED;放一支在冊、會觸網、沒橋的 .py → 3b RED 指名;兩支都 exit 1(探針已刪)。
