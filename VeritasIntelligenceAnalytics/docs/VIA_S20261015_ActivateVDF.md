@@ -122,3 +122,26 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
 - PR #528 Codex P1(成立):委派尾段 `return 0 if rc1 == 0 else (rc1 if rc1 in (2, 3) else 2)` 會把前版自測的紅(rc 1)改成 2,
   管理員把 2 判 NODATA → 真退步被降級、模組照樣可啟動。改成前版回什麼就回什麼(0 / 1 / 2 / 3;其他值 → 1)。
   變異測:v0101 其他條紅 → 1 · 只 ⑩ 紅但 v0100 紅 → 1 · 前版 2 → 2 · 前版 0 → 0;全鏈自測正常 / 慢 0.8 秒都 rc 0;擊斃閘 11 條全過;交接案重測 rc 0。
+
+## 工作站實測 · v0102 → v0103 + PS 一鍵(2026-10-18)
+
+工作站更新到 `bd32a6717`(含 v0102)後 `--selftest`:⑪ ⑫ ⑬ 過,⑭ 丟 `TypeError: dict() got multiple values for keyword argument 'NUMEXPR_NUM_THREADS'`。
+⑭ 的「有裝 numexpr 才真測」段把子行程環境寫成 `dict(os.environ, **{…NUMEXPR_*…}, NUMEXPR_NUM_THREADS=…)`,同鍵給兩次;
+容器沒裝 numexpr 走「只驗數字」分支,所以沒現形(容器用 numexpr 測試替身重現)。執行邏輯(用量 = 每條執行緒數 · 上限 = 核數 × 2)本身沒錯。
+
+- **v0103 薄尾**:⑰ 取代 v0102 ⑭ 的真測段 —— 加速器把用量拉到核數時本鏈環境不印 `nthreads cannot be larger`,
+  同一探針在 v0100 環境(上限 = 每條執行緒數)必印得出(證明抓得到病);沒裝 numexpr 用照同一規則的替身。
+  委派 v0102 自測時讓那一段 `import numexpr` 走 ImportError 分支(數字照驗),其餘照跑;前版紅照實回。
+  有 numexpr(替身)/ 沒 numexpr 兩種全鏈 rc 0;擊斃閘 11 條全過;交接案 `vdf_activatevdf` 改 v0103 標記 rc 0。
+- **PS 一鍵 `functional modules/VDF/Invoke-VDF-Activate-v0100.ps1`**(操作員令「FIX ALL AND INTEGRATE ALL INTI A PS CODE WITH ACCELERATORS AND NETWORK MODULES.」= L70 許可 P019,新檔、不動任何舊 .ps1):
+  ① 加速器 PS 端(`[VIA:PS-TEMPLATE:v0101]` Celeritas PS7 模板 + `[VIA:PS-ACCEL:v0101]` 25 格)② 加速器 Py 端(SUP_MDL737 尾版 `--selftest`)
+  ③ 網路模組(`via_net_unified` 尾版 `--selftest` → SUP_MDL740 → VeritasAegisNexus 鎖版;離線)④ 同意閘只讀不寫(沒開照跑,印兩行讓操作員自己打)
+  ⑤ ActivateVDF 自測(紅 = 停)⑥ ActivateVDF 真跑(`--no-open`;`-FetchHome` 給了 `-DbHome` 預設 `<FetchHome>\output_hub`;上限 `-TimeoutHours` 預設 12)
+  ⑦ MATRIX SUMMARY(每步一列 + 總覽 JSON 拆成 CPU/DRAM · 清單 · 三流程 · U/I)+ `Open-VIAOwnPage` 跳總覽頁。python 只經 `Invoke-VIAPython`(VDF 家族環境)。
+  容器 pwsh 7.4.6 實跑:preflight exit 0 · selftest exit 0 · run(engines)exit 2(同意閘沒開 → 清單 GATED;引擎 94/94 RED 0);
+  ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint GREEN(tails 704 · no_accel 0 · own_page 0)· 全景 read 問題 0 · 擊斃閘過(P019 位元吻合)。
+  收據 `docs/handoff/evidence/vdf_ps_launcher_pwsh.txt`。
+- PR #529 Codex 兩條(都成立,未進線前同一許可 P019 重算 sha256):
+  P1 先決步驟(加速器 / 網路模組自測)紅了結束碼還是 0 → `Merge-VDFExit` 取較壞者(0 < 2 < 1 < 124 < 130),preflight / selftest / run 都帶進結束碼;
+  P2 本輪沒寫出新總覽仍開舊頁 → 只在總覽 JSON 是本輪寫的才開頁,否則印黃字不開。
+  pwsh 實跑:正常 preflight 0 · 壞 python(/bin/false)preflight 1(兩列 RED)· 失敗真跑 1 且不開舊頁 · selftest 0;pslint GREEN;擊斃閘過。
