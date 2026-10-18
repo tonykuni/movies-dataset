@@ -32,7 +32,13 @@
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0154.py(家族 vdf)
-  [VDF engine run] MDL013 VDF_MDL013_ActivateVDF · 閘 YELLOW · VDF_MDL013_ActivateVDF_v0103.py
+  [VDF engine run] MDL013 VDF_MDL013_ActivateVDF · 閘 GREEN · VDF_MDL013_ActivateVDF_v0104.py
+=== VDF_MDL013_ActivateVDF v0104 · 薄尾自測(PYTHONPATH 只留一份 bootstrap · numexpr 探針不當機;沙盒 · 零網路)===
+  [OK] ⑲ PYTHONPATH 只留第一份 bootstrap:其他路徑原序不動;只有一份 / 沒有就一字不動;Windows 反斜線同判 · {'兩份→': 'A/supportive modules/bootstrap:X:Y', '拿掉': 1, 'Windows 拿掉': 1}
+  [OK] ⑳ 真跑:母環境掛兩份 bootstrap(本樹 + 另一棵樹的同一支 sitecustomize)→ 子行程環境只剩本樹那份,子行程不再接力到另一棵樹;其他流程鍵照 v0102(numexpr 上限) · {'拿掉': '1', '子行程接力': '/usr/lib/python3.11/sitecustomize.py'}
+  [OK] ㉑ numexpr 探針的子行程逾時:不丟 traceback,照實回「出錯」並說明(v0103 ⑰ 因此判 FAIL 而不是當機) · 子行程 1 秒逾時(Python 起跑卡住;查 PYTHONPATH 是否掛了兩份 supportive modules
+  [OK] ㉒ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
+  [計] VDF_MDL013_ActivateVDF v0104 本版 4/4 · PASS
 === VDF_MDL013_ActivateVDF v0103 · 薄尾自測(numexpr 真測段改正;沙盒 · 零網路)===
   [OK] ⑰ 取代 v0102 ⑭ 的真測段:加速器把 numexpr 用量拉到核數時,本鏈環境不印 nthreads cannot be larger;同一探針在 v0100 環境下必印得出(證明抓得到病) · {'numexpr': 'stub', '拉到': 4, '本鏈上限': '8', '本鏈出錯': False, 'v0100 上限': '1', 'v0100 出錯': True}
   [OK] ⑱ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
@@ -40,35 +46,35 @@
   [取代] v0102 ⑭ 的真測段(有裝 numexpr 才跑,子行程環境同鍵給兩次 → TypeError)由本版 ⑰ 取代;委派時 v0102 ⑭ 走「只驗數字」分支,其餘照跑
 === VDF_MDL013_ActivateVDF v0102 · 薄尾自測(並行判法不靠起行程快 · engine list 登記 · 編譯警告 · numexpr 上限;沙盒 · 假管理員 · 零網路)===
   [OK] ⑪ 載入本版(連帶前版鏈,重新編譯、警告全開)不印 invalid escape;本版原始碼自己沒有無效跳脫 · (0, [], [])
-  [OK] ⑫ 取代 v0101 ⑩(門檻 0.55 秒把 Linux 起行程快當前提,Windows 必 FAIL):子行程每支起慢 0.8 秒時 —— 清單依序 · 清單跑完才起 engine list · engine launch 起跑時擷取還在跑(並行)· 資料庫等擷取跑完才起 · 三條 GREEN · {'010-009': 3.87, 'engine-fetch': 0.87, 'db-fetch': 3.86, 'flows': ['GREEN', 'GREEN', 'GREEN']}
+  [OK] ⑫ 取代 v0101 ⑩(門檻 0.55 秒把 Linux 起行程快當前提,Windows 必 FAIL):子行程每支起慢 0.8 秒時 —— 清單依序 · 清單跑完才起 engine list · engine launch 起跑時擷取還在跑(並行)· 資料庫等擷取跑完才起 · 三條 GREEN · {'010-009': 3.87, 'engine-fetch': 0.87, 'db-fetch': 3.87, 'flows': ['GREEN', 'GREEN', 'GREEN']}
   [OK] ⑬ engine list 跑到一半按 Ctrl+C:心跳列得到 engine_list;子行程樹被收(不等滿 30 秒)· 引擎流程記 INTERRUPTED(不是紅) · (1, 0.0, 'INTERRUPTED', [])
   [OK] ⑭ numexpr:用量 = 每條執行緒數;上限天花板 ≥ 加速器可能設的用量(不再印 nthreads cannot be larger);其餘上限不動 · ('1', '8', '1')
   [OK] ⑮ 心跳的「日誌最後一行」略過編譯警告雜訊,顯示真正的進度行 · [步] 第 3 段 抓 0050
   [OK] ⑯ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
   [計] VDF_MDL013_ActivateVDF v0102 本版 6/6 · PASS
 === VDF_MDL013_ActivateVDF v0101 · 薄尾自測(心跳 · 每步完成 · Ctrl+C 收乾淨;沙盒 · 假管理員 · 零網路)===
-  [OK] ① 心跳:步在跑時每段印「進行中」+ 步名 + 已跑時間 + 它日誌最後一行(子行程不緩衝,即時讀得到) · ['  [進行中 08:59:16] 1 步在跑 · 可用記憶體 14.9 GB', '     · slow_fetch 00:00 · [步] 第 1 段', '  [進行中 08:59:16] 1 步在跑 · 可用記憶體 14.9 GB']
+  [OK] ① 心跳:步在跑時每段印「進行中」+ 步名 + 已跑時間 + 它日誌最後一行(子行程不緩衝,即時讀得到) · ['  [進行中 14:02:32] 1 步在跑 · 可用記憶體 14.7 GB', '     · slow_fetch 00:00 · [步] 第 1 段', '  [進行中 14:02:32] 1 步在跑 · 可用記憶體 14.7 GB']
   [OK] ② 每步完成印一行(燈 · rc · 秒 · 摘要);回傳欄位同 v0100
   [OK] ③ 中斷:在跑的子行程樹被收(不留背景行程)· 步回 INTERRUPTED · 不用等它跑完 30 秒 · (1, 'INTERRUPTED', 0.8, False)
   [OK] ④ 中斷後還沒起的步不再起(零子行程,回 INTERRUPTED)
   [OK] ④b 卡在記憶體閘(壓力中、還沒起子行程)時 Ctrl+C:幾秒內放手回 INTERRUPTED,不等滿 600 秒、零子行程 · ('INTERRUPTED', 1.0)
   [OK] ⑤ 總燈:有 INTERRUPTED = INTERRUPTED(不是綠);沒中斷照 v0100
   [OK] ⑥ 整輪跑到一半中斷:照寫總覽(JSON + HTML),燈 INTERRUPTED,interrupted=true;main rc 不是 0 · ('INTERRUPTED', [])
-  [OK] ⑨ 兩張清單依序跑(010 等 009 跑完才起;同寫 vdf_master_lists.duckdb 不撞鎖)· 清單 GREEN · 0.66
-  [OK] ⑩ 資料庫流程等擷取流程寫完才開庫;引擎流程照樣與擷取並行;三條都 GREEN · (0.65, 0.01, ['GREEN', 'GREEN', 'GREEN'])
+  [OK] ⑨ 兩張清單依序跑(010 等 009 跑完才起;同寫 vdf_master_lists.duckdb 不撞鎖)· 清單 GREEN · 0.67
+  [OK] ⑩ 資料庫流程等擷取流程寫完才開庫;引擎流程照樣與擷取並行;三條都 GREEN · (0.66, 0.07, ['GREEN', 'GREEN', 'GREEN'])
   [OK] ⑧ 端到端:清單階段真送 SIGINT(Ctrl+C)→ 數秒內收掉、不互等;照寫總覽(INTERRUPTED);沒有殘留子行程;沒有 traceback · ({'lamp': 'INTERRUPTED', 'interrupted': True}, 0.0, [], ['CARD {"lamp": "INTERRUPTED", "interrupted": true}'])
   [OK] ⑦ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
   [計] VDF_MDL013_ActivateVDF v0101 本版 11/11 · PASS
 === VDF_MDL013_ActivateVDF v0100 · 自測(沙盒 · 假管理員 · 零網路)===
   [OK] ① CPU/DRAM 計畫:資源夠 = 3 條;記憶體緊 = 1 條且開溢寫;單核 / 量不到 = 1 條(照順序,不放棄) · (3, 1, 1)
-  [OK] ② 量測誠實:核數 ≥ 1;記憶體有值就 0 < 可用 ≤ 總量,量不到 = None(不猜) · ({'logical': 4, 'usable': 4, 'load1': 0.1826171875}, 'psutil')
+  [OK] ② 量測誠實:核數 ≥ 1;記憶體有值就 0 < 可用 ≤ 總量,量不到 = None(不猜) · ({'logical': 4, 'usable': 4, 'load1': 1.361328125}, 'psutil')
   [OK] ③ temp 滾動:只清本工具的輪夾、留最近 5 輪;別的夾不碰;不是 ActivateVDF 夾一律不清 · ['run_20261015_100000', 'run_20261015_100001']
   [OK] ④ 子行程環境:執行緒上限 · temp 指本輪夾 · DuckDB 上限 · VDF 總控標記;同意閘原樣傳(不改值)、本行程環境不動
   [完成] lists_run_009 · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] lists_run_010 · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] lists_verify · GREEN · rc 0 · 0.7s · [驗收] 輸出 4/4
   [等候] 資料庫流程等擷取流程寫完才開庫(DuckDB 一檔一次只准一個行程寫)
-  [完成] engine_list · GREEN · rc 0 · 0.1s · 3 支要啟動 · 1 支已被取代(不啟動)
+  [完成] engine_list · GREEN · rc 0 · 0.0s · 3 支要啟動 · 1 支已被取代(不啟動)
   [完成] fetch_run_all · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] engine_launch · GREEN · rc 0 · 0.7s · [計] fake engine launch
   [完成] db_check · GREEN · rc 0 · 0.7s · [計] fake db check
@@ -78,7 +84,7 @@
   [OK] ⑥b 按家族全名啟動:同號異名(ENG110 ×2)都起;同號的活件照起、被取代的重建件(_rebuilds_superseded)不起並照實列 skipped · ['VDF_ENG110_AKShareProbe', 'VDF_ENG110_USMacroProbe', 'VDF_MDL003_SentimentMacroEngine']
   [OK] ⑦ 子行程拿到流程環境(VDF 總控標記 · 執行緒上限 · 本輪 temp);同意閘照本視窗原樣(沒設就沒有)
   [完成] fetch_run_all · GREEN · rc 0 · 0.3s · [計] fake run OK
-  [完成] engine_list · GREEN · rc 0 · 0.0s · 3 支要啟動 · 1 支已被取代(不啟動)
+  [完成] engine_list · GREEN · rc 0 · 0.1s · 3 支要啟動 · 1 支已被取代(不啟動)
   [完成] engine_launch · GREEN · rc 0 · 0.3s · [計] fake engine launch
   [完成] db_check · GREEN · rc 0 · 0.3s · [計] fake db check
   [完成] db_refill · GREEN · rc 0 · 0.3s · [計] fake refill
@@ -101,6 +107,5 @@
   [OK] ⑬ VDF 獨立:不匯入他系統程式(CGC_ · VRN_ · VCGC);只起 VDF 自己的管理員尾版
   [OK] ⑭ 加速器橋 · 網路橋在;不碰 TA-Lib;同意閘不寫(只原樣傳)
   [計] VDF_MDL013_ActivateVDF v0100 16/16 · PASS
-  [VDF engine run] VDF_MDL013_ActivateVDF rc=0 · 45.6s · python base 退路(境未見)
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0105.py', 'CGC_MDL → via-vcgc sdd check
-[監控] 已在背景起全景監控 pid 8564 · 閒置 1800 秒自停 · 交接閘 RED · 落後 519 提交 · 快照 371.8h · 未推 1 · 未登 106 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [VDF engine run] VDF_MDL013_ActivateVDF rc=0 · 45.5s · python base 退路(境未見)
+[監控] 背景全景監控中 pid 4093 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 530 提交 · 快照 376.9h · 未推 1 · 未登 107 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
