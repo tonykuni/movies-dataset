@@ -119,3 +119,6 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
 - 引擎啟動那段心跳的另一行 `<unknown>:3: SyntaxWarning: invalid escape sequence '\*'` 來自 **VCGC 自己的** `CGC_MDL156_VIAAcceleratorControl_v0114.py` 第 3 行 docstring(`Scripts\*.py`),
   依 L120 三系統獨立不代修,只記在這裡給 VCGC 的線。VDF 自己另有三支舊檔有同類警告(都是已發佈的前版,本批沒碰):
   `VDF_MDL011_AkshareFetcher_v0100.py:3` `\V` · `VDF_ENG093_LaunchConsole_v0101.py:591` `\d` · `engine/VDF_ENG051_ActiveTWETF_Holdings(_v0101).py:2` `\d`。
+- PR #528 Codex P1(成立):委派尾段 `return 0 if rc1 == 0 else (rc1 if rc1 in (2, 3) else 2)` 會把前版自測的紅(rc 1)改成 2,
+  管理員把 2 判 NODATA → 真退步被降級、模組照樣可啟動。改成前版回什麼就回什麼(0 / 1 / 2 / 3;其他值 → 1)。
+  變異測:v0101 其他條紅 → 1 · 只 ⑩ 紅但 v0100 紅 → 1 · 前版 2 → 2 · 前版 0 → 0;全鏈自測正常 / 慢 0.8 秒都 rc 0;擊斃閘 11 條全過;交接案重測 rc 0。

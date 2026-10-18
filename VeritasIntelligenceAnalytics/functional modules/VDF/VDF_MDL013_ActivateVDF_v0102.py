@@ -415,7 +415,7 @@ def selftest() -> int:
         print("  [取代] v0101 ⑩(0.55 秒門檻,起行程慢的機器必 FAIL)由本版 ⑫ 取代;v0101 其餘 10 條照過。"
               "v0101 在 ⑩ 失敗時不往下委派 → 本版補跑 v0100 自測")
         rc1 = PRIOR.PRIOR.selftest()
-    return 0 if rc1 == 0 else (rc1 if rc1 in (2, 3) else 2)
+    return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅(rc 1)照實回紅,不降成 2(管理員把 2 判 NODATA;PR #528 Codex P1)
 
 
 class _Tee:
