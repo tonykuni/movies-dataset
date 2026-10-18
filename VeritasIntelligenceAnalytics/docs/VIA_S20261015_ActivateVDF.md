@@ -100,3 +100,22 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
 - 擊斃閘:KILL-11 對 `ActivateVDF_v0100.py` 誤判(**VCGC 工具缺陷,未改**):CGC_MDL187 `_tail_on_ref` 的正則 `ActivateVDF_v(\d{4})\.py$` 用 `search` 沒錨定檔名開頭,
   配到 origin/main 上的 `VDF_MDL013_ActivateVDF_v0100.py` 當同家族 → 判「版號比基線舊」;以檔名錨定比對,同家族在 origin/main 上 0 支 = 全新一族,本該放行。
   其餘 10 條全過。修法建議(給 VCGC 自己的線):`rx.search(line)` 改比對 basename 全名(`re.fullmatch`)。
+
+## 工作站實測 · v0101 → v0102(2026-10-18)
+
+工作站(8 核 · 可用 4.4 GB · Python 3.12 · worktree 在 main `7339d5d88`)回報:自測兩次 **10/11 FAIL**(⑩);開雙閘真跑 ② 兩張清單 **GREEN**
+(009 70.2 秒 · 010 54.2 秒 · verify 17.4 秒 · 依序跑,沒撞寫入鎖)→ 擷取 `fetch_run_all` 15:25 起、資料庫流程照設計 `[等候]`、引擎 15:26 起與擷取並行,心跳每 30 秒一段。
+回報時擷取與引擎流程還在跑(③ 結果 · `[計]` · `ACTIVATE_VDF_latest.json` 摘要待回)。看到三個問題,v0102 薄尾修(v0100 / v0101 一個位元都沒動):
+
+| 工作站看到 | 根因(容器重現) | v0102 修法 | 證據 |
+|---|---|---|---|
+| 自測 ⑩ FAIL `(2.21, 1.43, GREEN×3)` | ⑩ 要 engine launch 在擷取起跑後 0.55 秒內起;引擎流程要先起 engine list 子行程、再起 engine launch,Windows 起一支 Python 約 1 秒 → 必超過。容器用 sitecustomize 讓每支子行程慢 0.8 秒,v0101 ⑩ 同樣 FAIL `(1.47, 0.83)` | ⑩ 的門檻寫錯(把 Linux 起行程快當前提),流程本身是對的(真跑兩條確實並行)。**不能**把 engine list 挪到清單階段:v0100 ⑤ 釘住「清單跑完才起三條流程(含 engine list)」= 操作員令「清單引擎先跑」。→ 本版 ⑫ 換掉 ⑩:同一性質(清單依序 · 清單後才 engine list · engine launch 起跑時擷取還在跑 · 資料庫等擷取跑完),每支假步驟 3 秒、子行程慢 0.8 秒照樣要過;委派前版自測只容 v0101 ⑩ 這一條失敗(照印「由 ⑫ 取代」),其餘任何一條失敗照判 FAIL,並補跑 v0100 自測(v0101 失敗時不往下委派) | 慢 0.8 秒:v0102 6/6 · v0101 ⑩ 被取代、其餘 10 條過 · v0100 16/16 · rc 0;正常:v0102 6/6 · v0101 11/11 · v0100 16/16(Python 3.11 / 3.12 都 rc 0) |
+| `VDF_MDL013_ActivateVDF_v0101.py:635: SyntaxWarning: invalid escape sequence '\]'`(每次載入都印;引擎啟動那段心跳的「最後一行」也被它佔走) | v0101 ⑦ 的同意閘正則後半段少了 `r` 前綴;Python 3.12 編譯時警告 | v0101 已發佈不改;本版載入前版時只在載入那一刻擋 SyntaxWarning / DeprecationWarning(執行期警告照常)。心跳「日誌最後一行」略過 `SyntaxWarning` · `DeprecationWarning` · `<unknown>:N:` 這種編譯雜訊,顯示真正的進度行 | ⑪ 重新編譯(`-X pycache_prefix` 新夾 · `-W always`)零 invalid escape;⑮ |
+| lists_run_010:`Error. nthreads cannot be larger than environment variable "NUMEXPR_MAX_THREADS" (2)`(不致命,清單照樣 GREEN) | v0100 把 `NUMEXPR_MAX_THREADS` 設成每條執行緒數(2);子行程裡的加速器 Celeritas `apply_thread_limits` 再把 `NUMEXPR_NUM_THREADS` 拉高 → numexpr 拒絕 | `NUMEXPR_NUM_THREADS` = 每條執行緒數(用量照舊受限);`NUMEXPR_MAX_THREADS` = 核數 × 2(只是天花板,不再比加速器設的用量小)。OMP / MKL / OPENBLAS / POLARS / VIA_DUCKDB_THREADS 不動 | ⑭ |
+| 引擎流程起跑前約 68 秒心跳只列擷取一步 | v0100 的 engine list 用 `subprocess.run`(沒登記):心跳看不到;Ctrl+C 也收不到它(最多再跑 600 秒) | engine list 改 Popen 登記在跑:心跳列得到 `engine_list`、Ctrl+C 一起收、引擎流程記 INTERRUPTED(不是紅);完成印一行「N 支要啟動 · M 支已被取代」 | ⑬;容器真跑 `[完成] engine_list · GREEN · rc 0 · 8.9s · 94 支要啟動 · 6 支已被取代(不啟動)` |
+
+- 擊斃閘 CGC_MDL187 v0103 `--run-selftest`:11 條全過(債 1 = 薄尾委派前版自測)。
+- 交接案 `vdf_activatevdf` 標記改 `[計] VDF_MDL013_ActivateVDF v0102 本版 6/6 · PASS`;新交接項 `VDF-REQ018:activatevdf-v0102`;`VDF-REQ018:workstation-v0101` 照實留 PENDING(收據未完)。
+- 引擎啟動那段心跳的另一行 `<unknown>:3: SyntaxWarning: invalid escape sequence '\*'` 來自 **VCGC 自己的** `CGC_MDL156_VIAAcceleratorControl_v0114.py` 第 3 行 docstring(`Scripts\*.py`),
+  依 L120 三系統獨立不代修,只記在這裡給 VCGC 的線。VDF 自己另有三支舊檔有同類警告(都是已發佈的前版,本批沒碰):
+  `VDF_MDL011_AkshareFetcher_v0100.py:3` `\V` · `VDF_ENG093_LaunchConsole_v0101.py:591` `\d` · `engine/VDF_ENG051_ActiveTWETF_Holdings(_v0101).py:2` `\d`。
