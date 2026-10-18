@@ -2693,8 +2693,8 @@
         "VDF_MDL013_ActivateVDF",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS",
-      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "success_marker": "[計] VDF_MDL013_ActivateVDF v0104 本版 4/4 · PASS",
+      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL013_ActivateVDF_v*.py",
         "functional modules/VDF/ActivateVDF.py",
@@ -5615,12 +5615,22 @@
       "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
     },
     {
+      "id": "VDF-REQ018:activatevdf-v0104",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "工作站 2026-10-18 跑 PS 一鍵 v0102:② ③ 各 300 秒逾時 · 3b 357 秒 · v0103 ⑰ numexpr 探針 120 秒逾時丟 TimeoutExpired traceback;根因 = PYTHONPATH 兩份 supportive modules/bootstrap(v0102 Set-VIABoot 替身疊上本樹那份)→ sitecustomize _chain_shadowed 互相接力(容器量 1.5 秒 → 10 秒)→ v0104 薄尾:flow_env 子行程只留一份 bootstrap、numexpr 探針去重 + 逾時照實回出錯(⑲ ⑳ ㉑ ㉒;兩個突變都被抓)",
+      "next": "handoff test vdf_activatevdf(rc 0 + v0104 標記)轉 VERIFIED",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
       "id": "VDF-REQ018:ps-launcher",
       "requirement": "VDF-REQ018",
       "state": "PENDING",
       "owner": "操作員 / AI",
-      "reason": "操作員 2026-10-18「FIX ALL AND INTEGRATE ALL INTI A PS CODE WITH ACCELERATORS AND NETWORK MODULES.」→ 新檔 functional modules/VDF/Invoke-VDF-Activate-v0100.ps1(許可 P019):模板塊 + PS-ACCEL + SUP_MDL737 --selftest + via_net_unified --selftest + 同意閘只讀 + ActivateVDF 自測 → 真跑 + MATRIX SUMMARY + 跳總覽頁。容器 pwsh 7.4.6 實跑:preflight exit 0 · selftest exit 0 · run(engines)exit 2(同意閘沒開 → 清單 GATED;引擎 94/94 RED 0);ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint GREEN · 擊斃閘過(P019 位元吻合);2026-10-18 v0101(許可 P020):多 ③b 覆蓋檢查(Py 管理員 bridges 加速器 93/93 · 網路 93/93;PS 每族尾版模板章 + PS-ACCEL 161/161),缺 = 紅 + 印 CGC_MDL124 補橋指令;反證兩支都 exit 1;容器 pwsh preflight 0 · selftest 0;2026-10-18 工作站實跑 v0100 -Action selftest 回貼:自測全綠(v0103 2/2 · v0102 6/6 · v0100 16/16;v0102 ⑭ TypeError 不再)· 結束碼 0 AMBER;① 黃 + [DEPRECATED] Set-VIABoot / 2 + 行尾殘字 = 操作員視窗殘件 → v0102(許可 P021):Celeritas 正主重接本支範圍 · Set-VIABoot 殘樁才換安靜替身並還原環境 · 子步驟關進度條;仿操作員視窗 v0101 重現三件 / v0102 三件全消 · selftest exit 0",
-      "next": "工作站 pwsh 實跑 Invoke-VDF-Activate 尾版(v0102;-Action selftest 應見 ① GREEN「正主已在本支範圍重接」、沒有 [DEPRECATED] 行)→ 雙閘由操作員自己開 → 回貼 MATRIX SUMMARY → AI 入冊轉 VERIFIED",
+      "reason": "操作員 2026-10-18「FIX ALL AND INTEGRATE ALL INTI A PS CODE WITH ACCELERATORS AND NETWORK MODULES.」→ 新檔 functional modules/VDF/Invoke-VDF-Activate-v0100.ps1(許可 P019):模板塊 + PS-ACCEL + SUP_MDL737 --selftest + via_net_unified --selftest + 同意閘只讀 + ActivateVDF 自測 → 真跑 + MATRIX SUMMARY + 跳總覽頁。容器 pwsh 7.4.6 實跑:preflight exit 0 · selftest exit 0 · run(engines)exit 2(同意閘沒開 → 清單 GATED;引擎 94/94 RED 0);ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint GREEN · 擊斃閘過(P019 位元吻合);2026-10-18 v0101(許可 P020):多 ③b 覆蓋檢查(Py 管理員 bridges 加速器 93/93 · 網路 93/93;PS 每族尾版模板章 + PS-ACCEL 161/161),缺 = 紅 + 印 CGC_MDL124 補橋指令;反證兩支都 exit 1;容器 pwsh preflight 0 · selftest 0;2026-10-18 工作站實跑 v0100 -Action selftest 回貼:自測全綠(v0103 2/2 · v0102 6/6 · v0100 16/16;v0102 ⑭ TypeError 不再)· 結束碼 0 AMBER;① 黃 + [DEPRECATED] Set-VIABoot / 2 + 行尾殘字 = 操作員視窗殘件 → v0102(許可 P021):Celeritas 正主重接本支範圍 · Set-VIABoot 殘樁才換安靜替身並還原環境 · 子步驟關進度條;仿操作員視窗 v0101 重現三件 / v0102 三件全消 · selftest exit 0;2026-10-18 工作站實跑 v0102:① GREEN(重接成功)· [DEPRECATED] 消失,但 ② ③ 各 300 秒逾時、3b 357 秒、⑤ numexpr 探針逾時 → 根因 v0102 替身疊上第二份 bootstrap(sitecustomize 互相接力)→ v0103(許可 P022):替身在已有 bootstrap / 已設 VIA_ROOT 時一字不動;起跑 PYTHONPATH 兩份以上只留第一份、跑完還原;仿操作員視窗(另一棵樹的 bootstrap + VIA_ROOT)v0102 preflight 86 秒 → v0103 6 秒;兩份 bootstrap 的視窗 v0103 自測 52 秒 GREEN",
+      "next": "工作站 pwsh 實跑 Invoke-VDF-Activate 尾版(v0103;-Action selftest 應見 ② ③ 各數十秒內 GREEN、⑤ v0104 4/4 PASS)→ 雙閘由操作員自己開 → 回貼 MATRIX SUMMARY → AI 入冊轉 VERIFIED",
       "evidence": "docs/handoff/evidence/vdf_ps_launcher_pwsh.txt(容器 pwsh 實跑紀錄;交接案只收 JSON 收據,PS 沒有可宣告的 handoff 案 → 不寫 VERIFIED)"
     },
     {
@@ -5629,7 +5639,7 @@
       "state": "PENDING",
       "owner": "操作員 / AI",
       "reason": "工作站 2026-10-18 v0101 全流程(雙閘開):② 兩張清單 GREEN(依序跑,沒撞寫入鎖)· 擷取與引擎並行 · 資料庫等擷取 · 心跳正常;跑到擷取 + 引擎流程中段時回報(收據未完:③ 結果 · [計] · ACTIVATE_VDF_latest.json 摘要還沒回)。自測 ⑩ / SyntaxWarning / numexpr 三件由 v0102 修;2026-10-18 工作站 -Action selftest(經 PS 一鍵 v0100)自測全綠:v0103 ⑰ 在有 numexpr 的工作站上 本鏈出錯 False / v0100 出錯 True(病抓得到也修好了)",
-      "next": "工作站 worktree 更新到含 Invoke-VDF-Activate-v0102.ps1 的 main → pwsh 跑 Invoke-VDF-Activate 尾版 v0102(-Action selftest 應見 ① GREEN「正主已在本支範圍重接」· 沒有 [DEPRECATED] 行 · v0103 2/2 PASS)→ 本視窗開雙閘 → -FetchHome <VDF 夾> -RefillApply → 回貼 MATRIX SUMMARY 與 ACTIVATE_VDF_latest.json 摘要 → AI 入冊轉 VERIFIED"
+      "next": "工作站 worktree 更新到含 Invoke-VDF-Activate-v0103.ps1 的 main → pwsh 跑 Invoke-VDF-Activate 尾版 v0103(-Action selftest 應見 ① GREEN「正主已在本支範圍重接」· 沒有 [DEPRECATED] 行 · v0104 4/4 PASS)→ 本視窗開雙閘 → -FetchHome <VDF 夾> -RefillApply → 回貼 MATRIX SUMMARY 與 ACTIVATE_VDF_latest.json 摘要 → AI 入冊轉 VERIFIED"
     }
   ]
 }

@@ -184,3 +184,26 @@ v0101:① YELLOW、`[DEPRECATED]` + `2` 三次、進度條 Continue;v0102:① GR
 
 **他系統的根(只報不改,L120):** `docs/handoff/ps/VIA-Commands-Override-v0102.ps1` 的 `$keep` 沒列 `Set-VIABoot`(中央 `Invoke-VIAPython` 要叫它),
 建議 VCGC 側下一版把它加進 `$keep`;Register 的 scoped 助手匯出 `Restore-CeleritasPS7` 進視窗也會讓其他用 `Get-Command Restore-CeleritasPS7` 判「已接」的 PS 尾版誤判。
+
+## PS 一鍵 v0103 + ActivateVDF v0104:每支 Python 起跑慢到逾時(2026-10-18)
+
+操作員貼回工作站實跑 PS 一鍵 v0102。好的部分:① GREEN(Celeritas 正主重接成功),`[DEPRECATED] Set-VIABoot` 與 `2` 都消失了。壞的部分:
+
+| 步 | v0100(工作站) | v0102(工作站) |
+|---|---|---|
+| ② 加速器自測 | 38.1 秒 | **300 秒逾時** |
+| ③ 網路模組自測 | 15.7 秒 | **300 秒逾時** |
+| 3b 覆蓋檢查 | — | 357.5 秒(容器約 1 秒) |
+| ⑤ ActivateVDF 自測 | GREEN | v0103 ⑰ 的 `python -c "import numexpr"` **120 秒逾時**,丟 `TimeoutExpired` traceback |
+
+**根因(容器重現):** v0102 的 Set-VIABoot 替身做「原本那件事」——把**本樹**(`C:\Users\tonyk\via-main`)的 `supportive modules\bootstrap` 疊到 PYTHONPATH 最前面。
+但操作員 `$PROFILE` 早就放了**另一棵樹**(OneDrive)的同一夾。兩份 `sitecustomize.py` 同時在 PYTHONPATH 上,它的 `_chain_shadowed()` 會執行「sys.path 上下一份同名檔」→ 兩份互相接力,直到遞迴上限才停;每支 Python(連子行程)起跑都重做一大段 `_boot()`。
+容器量:一份 bootstrap `python -c` 1.5 秒 → 兩份 10 秒;仿操作員視窗(另一棵樹的 bootstrap + VIA_ROOT 已設)跑 v0102 preflight 86 秒(② 39.7 秒)→ v0103 6 秒(② 1.3 秒)。工作站全裝 88 件冊、Windows 起行程更慢,就逾時了。
+
+**修法(只動 VDF;v0100–v0102 與 ActivateVDF v0100–v0103 一字不動):**
+- **PS 一鍵 v0103**(L70 許可 P022):替身只在 PYTHONPATH **還沒有任何** bootstrap 時才補本樹那一份,VIA_ROOT 已設就不動(= v0100 在工作站的環境);起跑先查 PYTHONPATH,兩份以上只留第一份(印 `[開機]` 一行),跑完還原。
+- **ActivateVDF v0104**(薄尾):子行程環境(flow_env)只留一份 bootstrap(記 `VIA_BOOTSTRAP_DEDUPED`);numexpr 探針同樣去重,逾時照實回「出錯」不當機。
+  自測 ⑲ 去重規則(含 Windows 反斜線)· ⑳ 真跑兩份 bootstrap → 子行程不再接力到另一棵樹 · ㉑ 探針逾時不丟 traceback · ㉒ 橋 / 他系統 / TA-Lib / 同意閘;兩個突變(拿掉去重、拿掉逾時捕捉)各被 ⑳ / ㉑ 抓到。
+
+**他系統的根(L120:只報不改):** `supportive modules/bootstrap/sitecustomize.py` 的 `_chain_shadowed()` 只排除自己那一夾;PYTHONPATH 上有兩棵 VIA 樹的 bootstrap 時會互相接力到遞迴上限。
+建議中央下一版:接力時跳過「也是 VIA bootstrap 的 sitecustomize」(同檔名 + 同標頭),或以環境旗標防重入。
