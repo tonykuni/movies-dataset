@@ -1,0 +1,158 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0127",
+ "date": "2026-10-19",
+ "operator_decision": "都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成(2026-10-18)→ VRN-2 不寫進別的系統的家族 · 不經 VCGC 核號 · 不登 VCGC 中央冊",
+ "operator_order_2026_10_19": "開閘 授權 + 完成一切測試修正工作 並生成 HTML U/I 上有驗證過的 OUTPUT",
+ "supersedes": "ActivateVRN-2 v0126(docs/handoff/ai/vrn2_release_v0126)",
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_SystemManager_v0233.py",
+   "bytes": 10066,
+   "sha256": "25e33a7148609b969b1c340db54a73e0cf682a2470f4832536fe836dd49d86a6"
+  },
+  {
+   "file": "VRN_SystemManager_v0234.py",
+   "bytes": 27553,
+   "sha256": "d8a564b2c442f37960ad73215e67da0ec90f5b8692d8b74857c0def329658b42"
+  },
+  {
+   "file": "VRN_SystemManager_v0235.py",
+   "bytes": 22840,
+   "sha256": "53ea452b978e2cb3d25179b9dae1bf2ec376a6c49155ac59cbe100ccbbb4d033"
+  },
+  {
+   "file": "VRN_SystemManager_v0236.py",
+   "bytes": 33760,
+   "sha256": "872f7fde9452d3b3eb4255a7368c581c89e37b5c455631c7e144bb23b67b1e8a"
+  },
+  {
+   "file": "VRN_SystemManager_v0237.py",
+   "bytes": 37036,
+   "sha256": "514962c4f0bd735f706abeb60b20f23337f97615953b8f15a297684728113374"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0114.py",
+   "bytes": 63825,
+   "sha256": "62beeaf655760c2bcfb828782839721d727594a91ca0b804863ec2f383ac578d"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN2_IndependentVerifier_v0100.py",
+   "bytes": 67717,
+   "sha256": "d3577ef63eb5308be00a9ed9060bd1065cada48a92fde19ae1b143e172054df4"
+  },
+  {
+   "file": "VRN2_Handover_v0127.md",
+   "bytes": 20066,
+   "sha256": "ae1869e5032a8f609f8b7a5d7bac972318092422d18f87ed17f7d331749e01be"
+  }
+ ],
+ "tested_in": {
+  "where": "Claude Code 雲端容器 · Linux · Python 3.13 · 測試用隔離 venv(--system-site-packages)加裝 VRN-2 引擎相依:PyMuPDF 1.28.2 · polars · psutil · scikit-learn · pyarrow(只在暫存區 · repo 與系統 Python 未動)",
+  "inputs": "repo 內真實 PDF 19 份(functional modules/VRN/intake/VRN_v0108_Annual/...)· 個股範圍 14 份",
+  "chain_stub": "使用者機器的管理器前版鏈 v0154–v0230 不在 repo → 測試替身(TESTSTUB · 只供 p1loop / _rep / input_dir 等)· 測試樹的船包含替身 · 不可提交"
+ },
+ "results": {
+  "selftests": {
+   "launcher_v0127": "20/20",
+   "manager_v0231": "33/33",
+   "v0232": "11/11",
+   "v0233": "6/6",
+   "v0234": "14/14",
+   "v0235": "7/7",
+   "v0236": "13/13",
+   "v0237": "12/12",
+   "independent_verifier_v0100": "16/16",
+   "ENG397_v0127": "34/34"
+  },
+  "container_run_14_stock_pdfs": {
+   "completion": "完成 · 紅 0 · 黃 7(已知例外 MQ-1560 影像 PDF)",
+   "FinancialData": 4916,
+   "FinancialData_change_v0236_to_v0237": "+65 一格整列拆開 · −9 完全重複",
+   "Rejected": 733,
+   "independent_verification": {
+    "BasicInfo": "PASS 194/194",
+    "Summary": "PASS 63/63",
+    "FinancialData": {
+     "ALIGNED": 4389,
+     "SUBALIGNED": 452,
+     "TRANSALIGNED": 75,
+     "bad": 0,
+     "PRESENT": 0
+    }
+   }
+  },
+  "verifier_mutation_suite": {
+   "next_row_value": "v3 漏 2,917/3,000 → v0100 0",
+   "prev_row_value": "v3 131 → 0",
+   "same_row_adjacent_column": "v3 20 → 0",
+   "quarterly_as_annual": "v3 4/4 → 0",
+   "subcol_other_row": "v3 29/40 → 0",
+   "transposed_other_year": "0",
+   "basic_tp_cp_swap": "0",
+   "rating_from_definition_page": "0",
+   "summary_composed_numbers": "0",
+   "original_cases_1_to_10": "10/10"
+  },
+  "v0100_on_v0126_output": "DUPROW 18(9 對完全重複)→ v0237 修正後 0",
+  "ui_real_browser": "35/35(驗證過的輸出分頁 14 項 · 頁面 4,916 格 = 年度數據冊逐筆相同)",
+  "runs": {
+   "fresh_tree": "run1 ⑧ 完成 · ⑨ 上船 · ⑪ 綠 · run2 ⑨ 已是最新 · 四本冊逐位元相同",
+   "upgrade_from_v0126_oneclick_ps": "run1 備份 v0126 → 換 v0127 · 只落 v0237 + 獨立驗證器 · ⑨ 只送 VRN-2 船包(本機 VCGC 提交不推)· ⑪ 綠 · U/I 判決寫回指紋相同 · run2 已是 v0127 · ⑨ 已是最新",
+   "new_machine_clone": "② 船包補回 16/16 · 四本冊與原機逐位元相同"
+  },
+  "not_verified": [
+   "vrn2:// 註冊(Windows)",
+   "os.startfile 開 U/I(Windows)",
+   "OCR 隔離環境",
+   "③ 補裝(容器 --no-install → ③ 紅 · 不擋 ⑧)",
+   "使用者機器 52 份"
+  ]
+ },
+ "launcher": {
+  "file": "ActivateVRN-2_v0127.py",
+  "bytes": 1677419,
+  "sha256": "333e906e78e7852a30413b913044493b9d2d0c3bbc7dd0f1082edd17c5518552"
+ },
+ "launcher_zip": {
+  "file": "ActivateVRN-2_v0127.zip",
+  "bytes": 498449,
+  "sha256": "841556e9a8f6ce8e1eee6dbea12065b75b664900a826058ba2e15e5cc833acc4"
+ },
+ "test_tools_zip": {
+  "file": "vrn2_test_tools_v0127.zip",
+  "bytes": 179835,
+  "sha256": "af94eb3061e42a6fbcfaf15006ffc5d31e05552237bea3387f67b9f5bbbd78f1"
+ }
+}
