@@ -144,9 +144,22 @@ $VIA = if ($SystemDir) { $SystemDir } else { Split-Path -Parent (Split-Path -Par
 $StartDir = (Get-Location).Path
 $prev = @{ OPEN = $env:VIA_NO_OPEN; FAMILY = $env:VIA_FAMILY }
 $script:exitCode = 0
+$script:preExit = 0     # ①–③ 先決步驟的較壞結束碼(加速器 / 網路模組自測紅了要帶進最後的結束碼)
 $rows = [System.Collections.Generic.List[object]]::new()
 function Add-VDFRow { param($Id, $Title, $State, $Sec, $Note) $rows.Add([pscustomobject]@{ id = "" + $Id; title = $Title; state = $State; sec = "" + $Sec; note = $Note }) }
 function Get-VDFLamp { param([int]$Rc) switch ($Rc) { 0 { "GREEN" } 2 { "YELLOW" } 3 { "YELLOW" } 4 { "GATED" } 124 { "TIMEOUT" } 130 { "INTERRUPTED" } default { "RED" } } }
+function Merge-VDFExit {
+    # 兩個結束碼取較壞的一個(0 綠 < 2 黃 < 1 紅 < 124 逾時 < 130 中斷);先決步驟紅了不得被後面的綠蓋掉(PR #529 Codex P1)
+    param([int]$A, [int]$B)
+    $rank = @{ 0 = 0; 2 = 1; 3 = 1; 4 = 1; 1 = 2; 124 = 3; 130 = 4 }
+    $ra = if ($rank.ContainsKey($A)) { $rank[$A] } else { 2 }
+    $rb = if ($rank.ContainsKey($B)) { $rank[$B] } else { 2 }
+    $hi = if ($ra -ge $rb) { $A } else { $B }
+    if ($hi -in 3, 4) { return 2 }
+    if (-not $rank.ContainsKey($hi)) { return 1 }
+    return $hi
+}
+function ConvertTo-VDFExit { param([int]$Rc) switch ($Rc) { 0 { 0 } 2 { 2 } 3 { 2 } 4 { 2 } 124 { 124 } 130 { 130 } default { 1 } } }
 $clock = [Diagnostics.Stopwatch]::StartNew()
 function Invoke-VDFActivateMain {
     # 主體寫成函式:return 只離開函式,腳本尾的 exit $script:exitCode 一定跑得到
@@ -215,8 +228,10 @@ function Invoke-VDFActivateMain {
     if ($acc) {
         Write-Host ("  [②加速器·Py] " + $acc.Name + " --selftest") -ForegroundColor DarkCyan
         $r = & $runPy "加速器 · Py 端" 300 @($acc.FullName, "--selftest")
+        $script:preExit = Merge-VDFExit $script:preExit (ConvertTo-VDFExit $r.rc)
         Add-VDFRow 2 ("加速器 · Py 端 " + $acc.BaseName) (Get-VDFLamp $r.rc) $r.sec $r.last
     } else {
+        $script:preExit = Merge-VDFExit $script:preExit 2
         Add-VDFRow 2 "加速器 · Py 端" "YELLOW" "0" "SUP_MDL737_SuperAccelModule 尾版不在(ActivateVDF 的 ACCEL 橋缺席零影響)"
     }
 
@@ -225,9 +240,11 @@ function Invoke-VDFActivateMain {
     if ($net) {
         Write-Host ("  [③網路模組] " + $net.Name + " --selftest(→ SUP_MDL740_NetUnified → VeritasAegisNexus;離線)") -ForegroundColor DarkCyan
         $r = & $runPy "網路模組" 300 @($net.FullName, "--selftest")
+        $script:preExit = Merge-VDFExit $script:preExit (ConvertTo-VDFExit $r.rc)
         $aeg = ($r.lines | Where-Object { $_ -match 'VeritasAegisNexus_v\d+' } | Select-Object -Last 1)
         Add-VDFRow 3 ("網路模組 " + $net.BaseName) (Get-VDFLamp $r.rc) $r.sec $(if ($aeg) { ("" + $aeg).Trim() } else { $r.last })
     } else {
+        $script:preExit = Merge-VDFExit $script:preExit 1
         Add-VDFRow 3 "網路模組" "RED" "0" "supportive modules\network\via_net_unified_v*.py 不在(ActivateVDF 的擷取要它)"
     }
 
@@ -246,6 +263,8 @@ function Invoke-VDFActivateMain {
         Write-Host ("      `$env:" + $kScr + " = " + "'YES'") -ForegroundColor Yellow
         Add-VDFRow 4 "同意閘" "GATED" "0" "沒開(操作員的手;AI 不代開)· 擷取段照實 GATED"
     }
+    $script:exitCode = $script:preExit             # 先決步驟的燈帶進結束碼(GATED 是操作員的手,不算錯)
+    if ($script:preExit -ne 0) { Write-Host ("  [先決] 加速器 / 網路模組有紅或黃 → 結束碼 " + $script:preExit + "(看上表)") -ForegroundColor $(if ($script:preExit -eq 2) { 'Yellow' } else { 'Red' }) }
     if ($Action -eq 'preflight') { return }
 
     # ⑤ ActivateVDF 自測
@@ -256,7 +275,7 @@ function Invoke-VDFActivateMain {
         Add-VDFRow 5 "ActivateVDF 自測" (Get-VDFLamp $r.rc) $r.sec $(if ($marks.Count) { $marks -join ' ‖ ' } else { $r.last })
         if ($r.rc -ne 0) {
             Write-Host ("  [⑤ActivateVDF 自測] rc " + $r.rc + " → 不真跑(先修自測紅)") -ForegroundColor Red
-            $script:exitCode = if ($r.rc -in 2, 3) { 2 } else { 1 }
+            $script:exitCode = Merge-VDFExit $script:preExit (ConvertTo-VDFExit $r.rc)
             return
         }
     }
@@ -275,9 +294,10 @@ function Invoke-VDFActivateMain {
     Write-Host ("  [⑥ActivateVDF 真跑] " + (($argList | Select-Object -Skip 1) -join ' ') + " · 上限 " + $TimeoutHours + " 小時(Ctrl+C = 子行程樹收乾淨並照寫總覽)") -ForegroundColor DarkCyan
     $t0 = [DateTime]::UtcNow
     $r = & $runPy "ActivateVDF 真跑" ([Math]::Max(1, $TimeoutHours) * 3600) $argList
-    $script:exitCode = if ($r.rc -in 0, 1, 2, 124, 130) { $r.rc } else { 1 }
+    $script:exitCode = Merge-VDFExit $script:preExit (ConvertTo-VDFExit $r.rc)
     $json = Join-Path $VIA "VIA_Reports\vdf\activate\ACTIVATE_VDF_latest.json"
-    if ((Test-Path -LiteralPath $json) -and ((Get-Item -LiteralPath $json).LastWriteTimeUtc -ge $t0.AddSeconds(-2))) {
+    $fresh = (Test-Path -LiteralPath $json) -and ((Get-Item -LiteralPath $json).LastWriteTimeUtc -ge $t0.AddSeconds(-2))
+    if ($fresh) {
         try {
             $card = Get-Content -LiteralPath $json -Raw -Encoding utf8 | ConvertFrom-Json
             $res = $card.resources
@@ -300,7 +320,9 @@ function Invoke-VDFActivateMain {
     }
     $env:VIA_NO_OPEN = $prev.OPEN
     $page = Join-Path $VIA "VIA_Reports\vdf\activate\ACTIVATE_VDF_latest.html"
-    if (-not $NoOpen) { [void](Open-VIAOwnPage -Page $page -CallerNoOpen $prev.OPEN) } else { Write-Host ("  [頁] " + $page) -ForegroundColor Cyan }
+    if (-not $fresh) {
+        Write-Host ("  [頁] 本輪沒寫出新的總覽(看上面紅字)→ 不開舊頁,免得把上一輪當成這一輪(PR #529 Codex P2):" + $page) -ForegroundColor Yellow
+    } elseif (-not $NoOpen) { [void](Open-VIAOwnPage -Page $page -CallerNoOpen $prev.OPEN) } else { Write-Host ("  [頁] " + $page) -ForegroundColor Cyan }
 }
 try {
     Invoke-VDFActivateMain

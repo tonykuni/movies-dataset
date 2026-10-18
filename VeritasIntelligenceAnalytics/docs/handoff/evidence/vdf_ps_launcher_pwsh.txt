@@ -39,3 +39,16 @@ exit=0
   [計] 9 步 · OK 5 · SKIP 2 · WARN 2 · FAIL 0 · 772.1 秒 → AMBER
   [計時] 全程 393.3 秒 · 結束碼 2(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
 exit=2
+
+## PR #529 Codex P1/P2 修正後重跑(同日)
+- A -Action preflight(正常)→ exit 0
+- B -Action preflight -Python /bin/false(加速器 / 網路模組自測紅)→ exit 1(P1:先決紅帶進結束碼)
+      1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+      2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ RED   │     0.2 │ 
+      3  │ 網路模組 via_net_unified_v0101               │ RED   │     0.1 │ 
+      4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+- C -Action run -SkipSelftest -Python /bin/false(本輪沒寫出新總覽、舊頁在)→ exit 1,不開舊頁(P2)
+      [頁] 本輪沒寫出新的總覽(看上面紅字)→ 不開舊頁,免得把上一輪當成這一輪(PR #529 Codex P2):/home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/activate/ACTIVATE_VDF_latest.html
+- D -Action selftest(numexpr 替身)→ exit 0
+      5  │ ActivateVDF 自測                             │ GREEN │    45.7 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+- pslint GREEN(704 · no_accel 0 · own_page 0);擊斃閘 11 條全過(P019 重算 sha256 · 位元吻合)

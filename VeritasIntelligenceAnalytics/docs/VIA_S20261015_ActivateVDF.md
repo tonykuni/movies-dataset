@@ -141,3 +141,7 @@ v0101 自測 10/10(連跑 3 輪穩定)+ 前版鏈 16/16;擊斃閘 11 條全過(�
   容器 pwsh 7.4.6 實跑:preflight exit 0 · selftest exit 0 · run(engines)exit 2(同意閘沒開 → 清單 GATED;引擎 94/94 RED 0);
   ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint GREEN(tails 704 · no_accel 0 · own_page 0)· 全景 read 問題 0 · 擊斃閘過(P019 位元吻合)。
   收據 `docs/handoff/evidence/vdf_ps_launcher_pwsh.txt`。
+- PR #529 Codex 兩條(都成立,未進線前同一許可 P019 重算 sha256):
+  P1 先決步驟(加速器 / 網路模組自測)紅了結束碼還是 0 → `Merge-VDFExit` 取較壞者(0 < 2 < 1 < 124 < 130),preflight / selftest / run 都帶進結束碼;
+  P2 本輪沒寫出新總覽仍開舊頁 → 只在總覽 JSON 是本輪寫的才開頁,否則印黃字不開。
+  pwsh 實跑:正常 preflight 0 · 壞 python(/bin/false)preflight 1(兩列 RED)· 失敗真跑 1 且不開舊頁 · selftest 0;pslint GREEN;擊斃閘過。
