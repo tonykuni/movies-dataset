@@ -43,7 +43,8 @@
 | 獨立驗證器 v0100 自測 | **16/16** | `logs/verifier_selftest.log` |
 | 新樹實跑 ×2 | 第 1 次 ⑧ 完成 紅 0 · ⑨ 上船 · ⑩ 封存 · **⑪ 綠 錯值 0** · 第 2 次 ⑨ 已是最新 · 四本冊逐位元相同 | `logs/run_fresh_1.log` · `run_fresh_2_no_change.log` |
 | 從 v0126 升級(一鍵 PS v0127 · pwsh 7.4)| 情境:先跑過 v0126 並上船 · 遠端被別台推了新提交 · 本機有別的系統的提交(未推)· 遠端放 v0127 發行分支 → 第 1 次 備份 v0126 → 換 v0127(雜湊對)→ 只落 v0237 + 獨立驗證器 → ⑧ 完成 → ⑨ **只送 VRN-2 船包**(疊在遠端最新上 · 本機 VCGC 提交沒推 · 遠端沒有那個檔)→ ⑪ 綠 → PS 摘要「U/I 判決已寫回 · 冊指紋相同」· 第 2 次 本機已是 v0127 · ⑨ 已是最新 | `logs/run_0_v0126_before.log` · `oneclick_ps_run1.log` · `oneclick_ps_run2.log` · `ship_commit_remote_run1.log` |
-| **cmd / PowerShell 都能貼的一行**(`-EncodedCommand`) | 情境同上(先跑過 v0126)→ 讀分支上的一鍵程式碼 · SHA-256 `d248eac591b7` 相符 → 執行 → 備份 v0126 → 換 v0127 → ⑧ 完成 · ⑨ 只送 VRN-2 船包 · ⑪ 綠 · 第 2 次 已是 v0127 · ⑨ 已是最新;分支上的程式碼被改一個字 → SHA-256 不對 → **不執行** | `logs/oneclick_cmd_oneliner_run1.log` · `run2.log` · `tamper.log` |
+| **cmd / PowerShell 都能貼的一行**(`-EncodedCommand`) | 情境同上(先跑過 v0126)→ 讀分支上的一鍵程式碼 · SHA-256 相符(當時版本 `d248eac591b7`) → 執行 → 備份 v0126 → 換 v0127 → ⑧ 完成 · ⑨ 只送 VRN-2 船包 · ⑪ 綠 · 第 2 次 已是 v0127 · ⑨ 已是最新;分支上的程式碼被改一個字 → SHA-256 不對 → **不執行** | `logs/oneclick_cmd_oneliner_run1.log` · `run2.log` · `tamper.log` |
+| **環境變數 VIA_ROOT 指錯**(使用者機器 2026-10-19 第一次跑 v0127:啟動器 ② 找不到 functional modules\VRN · rc 2)| 容器重現:VIA_ROOT=/nonexistent → 啟動器 ② 紅「找不到 VRN-2 程式夾」(同一句)· 一鍵 PS 加 ③b:先確認 VIA 根底下有 functional modules\VRN → VIA_ROOT 指錯就改用找到的(只在這個視窗 · 結束還原)· VIA_ROOT 加 VeritasIntelligenceAnalytics / 倉裡搜尋也試 · 都找不到 → 印診斷不啟動(四種情況單元測試)· 實跑:一行 → SHA-256 `1b8bacc17efa` 相符 → ③b 改正 → ⑦ ~ ⑪ 全綠 · 錯值 0 | `logs/oneclick_cmd_oneliner_wrong_VIA_ROOT.log` |
 | 新電腦(從遠端 clone) | ② 船包補回 **16/16**(含獨立驗證器)· ⑧ 完成 · ⑪ 綠 · 四本冊與原機逐位元相同 | `logs/run_new_machine_clone.log` |
 | v0126 輸出交給新驗證器 | DUPROW 18(v0126 就有的重複列 · 舊驗證器抓不到) | `logs/verifier_v0100_on_v0126_output.log` |
 
