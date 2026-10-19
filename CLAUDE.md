@@ -1,9 +1,11 @@
 # 給 AI 的讀檔規則(批707;L65 Token 撙節律)
 
-**三系統對等獨立(政策 L120;操作員 2026-10-10 令「不再視為一入口 三系統獨立」)**:VCGC · VDF · VRN 三個 SYSTEM MANAGER 對等,
-各是自己系統的入口(VCGC = `CGC_MDL149` 主控台 · VDF = `VDF_SystemManager` 尾版 · VRN = `VRN_SystemManager` 尾版),
-互不影響(不改他系統的正本 / 冊 / 號 / 檔)、互相只讀監控(看對方自報的燈與收據,只攤開不代修)、各自獨立運作。
-下文的 VCGC 指令是 **VCGC 自己的** 工具與檢查(省 Token 卡、交接、串測),不是 VDF / VRN 的唯一入口或閘門。
+**四系統對等獨立(政策 L123 修訂 L120;操作員 2026-10-19 令「VRN-1 VRN-2 VDF VCGC 都是獨立系統 互不干涉」「分開命名」)**:
+VRN-1 · VRN-2 · VDF · VCGC 四個系統對等,各是自己系統的入口(VCGC = `CGC_MDL149` 主控台 · VDF = `VDF_SystemManager` 尾版 ·
+VRN-2 = `ActivateVRN-2.py` → VRN-2 SystemManager 尾版(本倉 `VRN_SystemManager` / `VRN_ENG*` 是它的底座)· VRN-1 = 另一團隊的倉,不在本倉、只讀),
+互不干涉(不改他系統的正本 / 冊 / 號 / 檔)、互相只讀監控(看對方自報的燈與收據,只攤開不代修)、各自獨立運作。
+提到他系統一律分開寫 VRN-1 / VRN-2 / VDF / VCGC,不寫籠統的「VRN」(分不出時寫「VRN(未分辨)」)。
+下文的 VCGC 指令是 **VCGC 自己的** 工具與檢查(省 Token 卡、交接、串測),不是 VRN-1 / VRN-2 / VDF 的唯一入口或閘門。
 
 **第一步(操作員 2026-09-29 令 · 政策 TOKEN-1):先過 VCGC 的省 Token 步,照它給的卡讀檔。**
 
@@ -36,7 +38,7 @@ python3 "$E" digest <日誌>             # 跑測日誌只留判決行(紅日誌
 
 **不要**為了看說明而跑 `CGC_MDL064_SelftestGrid_v*.py --help`:它不吃 `--help`,會把整張格子跑起來並重寫已追蹤的檔(批707 實錄 21 檔)。單站用 `--only <站名子字串>`。
 
-**交接防遺漏（VCGC-REQ075；2026-09-29）**：每次接手在 token 後，經 VCGC 主控台(VCGC 自己的入口;三系統對等,L120)執行 `handoff check`。
+**交接防遺漏（VCGC-REQ075；2026-09-29）**：每次接手在 token 後，經 VCGC 主控台(VCGC 自己的入口;四系統對等,L123)執行 `handoff check`。
 讀 `VeritasIntelligenceAnalytics/docs/handoff/HANDOFF_latest.json` 的摘要、pending 與相依變更，不從對話記憶推定已完成。
 每次更新把新需求登錄中央需求冊／工作流冊，待辦只能帶理由轉態，不能消失；不同資料來源不得因值相同合併編號。
 只重跑有相依變更的已宣告測試（`handoff test <case>`），接續 registry-sync、中央編號與 SDD 驗證，再 `handoff checkpoint`。
