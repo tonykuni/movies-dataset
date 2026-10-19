@@ -38,12 +38,12 @@
   [OK] ② 清點摘要多 other_by;總覽卡逐系統列(名字跳脫)、寫 L123 四系統,不再是「VRN / VCGC 寫的表」
   [OK] ③ 舊摘要沒有 other_by(前版寫的)→ 卡上照 other_rows 現算;NOT_RUN 卡不動
   [OK] ④ v0106 總覽頁走本版(render_html 查模組全域 db_section / write_report 查 db_inventory);頁 CSS 多卡片 / 清單項可斷行(手機寬不橫捲)
-  [OK] ⑤ 本輪資料庫流程:先 db where(選到的家換進 --home,check / refill 同一個家)· 末尾 db_xcheck(universe xcheck --days 20;--dry 帶 --dry);燈併進流程(黃蓋綠);流程被中斷不跑 xcheck;不在本版一輪 = 照前版
+  [OK] ⑤ 本輪資料庫流程:先 db where(選到的家換進 --home,check / refill / xcheck 同一個家)· 末尾 db_xcheck(universe xcheck --days 20 --home 家;--dry 帶 --dry);燈併進流程(黃蓋綠);流程被中斷不跑 xcheck;不在本版一輪 = 照前版
   [OK] ⑥ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
   [計] VDF_MDL013_ActivateVDF v0108 本版 6/6 · PASS
 === VDF_MDL013_ActivateVDF v0107 · 薄尾自測(記憶體 / TEMP 本輪鉤 + 起跑實測;沙盒 · 零網路)===
-  [OK] ㉙ 本輪環境:鉤夾在本輪 temp(不在倉內)且排 PYTHONPATH 最後;前版自測的環境不加鉤(它們驗的 PYTHONPATH 照舊) · /tmp/activatevdf107_s5o5pis7/ActivateVDF/run_20261019_120000/pyhook
-  [OK] ㉚ 子行程與孫行程的 duckdb.connect() 都生效:溢寫夾 = 本輪流程 temp/p<pid> · 記憶體 = 每條預算 · 執行緒 = 每條執行緒;VIA_DUCK_TEMP=0 → 不掛(回原生);起跑實測 GREEN 且三項都 ok · {'子': {'hook': 'vdf-activate-v0107', 'memory_limit': '2.5 GiB', 'threads': '1'}, '孫': 'vdf-activate-v0107', '關': None, '實測': 'DuckDB 溢寫 → /tmp/activatevdf107_s5o5pis7/ActivateVDF/run_20261019_120000/probe/p4560 · 記憶體 2.5 GiB(預算 2765 MB)· 執行緒 1 · 鉤 VDF 本輪鉤 · temp 剩 6923 MB'}
+  [OK] ㉙ 本輪環境:鉤夾在本輪 temp(不在倉內)且排 PYTHONPATH 最後;前版自測的環境不加鉤(它們驗的 PYTHONPATH 照舊) · /tmp/activatevdf107_qjgd_lku/ActivateVDF/run_20261019_120000/pyhook
+  [OK] ㉚ 子行程與孫行程的 duckdb.connect() 都生效:溢寫夾 = 本輪流程 temp/p<pid> · 記憶體 = 每條預算 · 執行緒 = 每條執行緒;VIA_DUCK_TEMP=0 → 不掛(回原生);起跑實測 GREEN 且三項都 ok · {'子': {'hook': 'vdf-activate-v0107', 'memory_limit': '2.5 GiB', 'threads': '1'}, '孫': 'vdf-activate-v0107', '關': None, '實測': 'DuckDB 溢寫 → /tmp/activatevdf107_qjgd_lku/ActivateVDF/run_20261019_120000/probe/p27392 · 記憶體 2.5 GiB(預算 2766 MB)· 執行緒 1 · 鉤 VDF 本輪鉤 · temp 剩 6905 MB'}
   [OK] ㉛ 接力:中央 bootstrap 在前 → bootstrap 跑一次、接力到本鉤、本鉤再往後接力(後面那份照跑一次,不遞迴不回頭);沒有 bootstrap → 本鉤就是第一份,後面那份照跑一次;沒用 duckdb 的行程不預先 import duckdb · {'有 bootstrap': ['boot', 'tail'], '沒有': ['tail'], 'duckdb 預載': ['no duckdb', 'no duckdb']}
   [OK] ㉜ 環境已有 VCGC 的 via_duck_temp 鉤 → temp / 記憶體讓位(不疊兩層、溢寫夾不是本鉤給的),但 VCGC 鉤沒管的執行緒照補每條預算(PR #536 Codex P1) · {'hook': None, 'threads_hook': 'vdf-activate-v0107', 'threads': '1', 'temp_directory': '.tmp'}
   [OK] ㉝ 總覽頁「記憶體 / TEMP」卡:燈 + 實測一句(跳脫);沒實測 = 不出卡
@@ -79,28 +79,28 @@
   [OK] ⑯ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
   [計] VDF_MDL013_ActivateVDF v0102 本版 6/6 · PASS
 === VDF_MDL013_ActivateVDF v0101 · 薄尾自測(心跳 · 每步完成 · Ctrl+C 收乾淨;沙盒 · 假管理員 · 零網路)===
-  [OK] ① 心跳:步在跑時每段印「進行中」+ 步名 + 已跑時間 + 它日誌最後一行(子行程不緩衝,即時讀得到) · ['  [進行中 20:03:27] 1 步在跑 · 可用記憶體 14.6 GB', '     · slow_fetch 00:00 · [步] 第 1 段', '  [進行中 20:03:27] 1 步在跑 · 可用記憶體 14.6 GB']
+  [OK] ① 心跳:步在跑時每段印「進行中」+ 步名 + 已跑時間 + 它日誌最後一行(子行程不緩衝,即時讀得到) · ['  [進行中 20:43:41] 1 步在跑 · 可用記憶體 14.6 GB', '     · slow_fetch 00:00 · [步] 第 1 段', '  [進行中 20:43:41] 1 步在跑 · 可用記憶體 14.6 GB']
   [OK] ② 每步完成印一行(燈 · rc · 秒 · 摘要);回傳欄位同 v0100
   [OK] ③ 中斷:在跑的子行程樹被收(不留背景行程)· 步回 INTERRUPTED · 不用等它跑完 30 秒 · (1, 'INTERRUPTED', 0.8, False)
   [OK] ④ 中斷後還沒起的步不再起(零子行程,回 INTERRUPTED)
   [OK] ④b 卡在記憶體閘(壓力中、還沒起子行程)時 Ctrl+C:幾秒內放手回 INTERRUPTED,不等滿 600 秒、零子行程 · ('INTERRUPTED', 1.0)
   [OK] ⑤ 總燈:有 INTERRUPTED = INTERRUPTED(不是綠);沒中斷照 v0100
   [OK] ⑥ 整輪跑到一半中斷:照寫總覽(JSON + HTML),燈 INTERRUPTED,interrupted=true;main rc 不是 0 · ('INTERRUPTED', [])
-  [OK] ⑨ 兩張清單依序跑(010 等 009 跑完才起;同寫 vdf_master_lists.duckdb 不撞鎖)· 清單 GREEN · 0.67
-  [OK] ⑩ 資料庫流程等擷取流程寫完才開庫;引擎流程照樣與擷取並行;三條都 GREEN · (0.68, 0.07, ['GREEN', 'GREEN', 'GREEN'])
+  [OK] ⑨ 兩張清單依序跑(010 等 009 跑完才起;同寫 vdf_master_lists.duckdb 不撞鎖)· 清單 GREEN · 0.68
+  [OK] ⑩ 資料庫流程等擷取流程寫完才開庫;引擎流程照樣與擷取並行;三條都 GREEN · (0.67, 0.03, ['GREEN', 'GREEN', 'GREEN'])
   [OK] ⑧ 端到端:清單階段真送 SIGINT(Ctrl+C)→ 數秒內收掉、不互等;照寫總覽(INTERRUPTED);沒有殘留子行程;沒有 traceback · ({'lamp': 'INTERRUPTED', 'interrupted': True}, 0.0, [], ['CARD {"lamp": "INTERRUPTED", "interrupted": true}'])
   [OK] ⑦ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
   [計] VDF_MDL013_ActivateVDF v0101 本版 11/11 · PASS
 === VDF_MDL013_ActivateVDF v0100 · 自測(沙盒 · 假管理員 · 零網路)===
   [OK] ① CPU/DRAM 計畫:資源夠 = 3 條;記憶體緊 = 1 條且開溢寫;單核 / 量不到 = 1 條(照順序,不放棄) · (3, 1, 1)
-  [OK] ② 量測誠實:核數 ≥ 1;記憶體有值就 0 < 可用 ≤ 總量,量不到 = None(不猜) · ({'logical': 4, 'usable': 4, 'load1': 0.72900390625}, 'psutil')
+  [OK] ② 量測誠實:核數 ≥ 1;記憶體有值就 0 < 可用 ≤ 總量,量不到 = None(不猜) · ({'logical': 4, 'usable': 4, 'load1': 0.72607421875}, 'psutil')
   [OK] ③ temp 滾動:只清本工具的輪夾、留最近 5 輪;別的夾不碰;不是 ActivateVDF 夾一律不清 · ['run_20261015_100000', 'run_20261015_100001']
   [OK] ④ 子行程環境:執行緒上限 · temp 指本輪夾 · DuckDB 上限 · VDF 總控標記;同意閘原樣傳(不改值)、本行程環境不動
   [完成] lists_run_009 · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] lists_run_010 · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] lists_verify · GREEN · rc 0 · 0.7s · [驗收] 輸出 4/4
   [等候] 資料庫流程等擷取流程寫完才開庫(DuckDB 一檔一次只准一個行程寫)
-  [完成] engine_list · GREEN · rc 0 · 0.0s · 3 支要啟動 · 1 支已被取代(不啟動)
+  [完成] engine_list · GREEN · rc 0 · 0.1s · 3 支要啟動 · 1 支已被取代(不啟動)
   [完成] fetch_run_all · GREEN · rc 0 · 0.7s · [計] fake run OK
   [完成] engine_launch · GREEN · rc 0 · 0.7s · [計] fake engine launch
   [完成] db_check · GREEN · rc 0 · 0.7s · [計] fake db check
@@ -134,6 +134,5 @@
   [OK] ⑭ 加速器橋 · 網路橋在;不碰 TA-Lib;同意閘不寫(只原樣傳)
   [計] VDF_MDL013_ActivateVDF v0100 16/16 · PASS
   [VDF engine run] VDF_MDL013_ActivateVDF rc=0 · 46.9s · python base 退路(境未見)
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL140_HandoverConsole_v0107.py', 'VRN_ENG086_ → via-vcgc sdd check
-  [同步] 樹有變 · 註冊冊待同步 {'new': 0, 'changed': 2, 'stale': 0, 'expected': 17712, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-[監控] 背景全景監控中 pid 1588 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 558 提交 · 快照 406.9h · 未登 108 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL140_HandoverConsole_v0107.py', 'CGC_MDL183_ → via-vcgc sdd check
+[監控] 背景全景監控中 pid 24111 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 560 提交 · 快照 407.5h · 未登 108 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
