@@ -8,6 +8,10 @@ v0106 的總覽卡寫死「VRN / VCGC 寫的表」,沒分 VRN-1 / VRN-2。本版
      舊結果(v0155 寫的「VRN 寫」)照原字計,不猜成 VRN-1 / VRN-2。
   ② 總覽卡「他系統表」一格改逐系統列(例:VRN-2 6 · VRN 未分辨 6),註明 L123 四系統互不干涉、只攤開不代修。
   ③ 終端多一行「[他系統表] VRN-2 n · …」。本輪 JSON / 頁頭標 v0108。
+  ④ 資料庫流程在 db check → refill 之後多一步 db_xcheck = 管理員 universe xcheck(操作員令「互對照兩個以上相同即算對照成功」;
+     判法在 VDF_SystemManager v0156):加權收盤三來源 · 三表同日代號互對照,步驟摘要讀它末行「[計] VDF 互對照 …」,燈併進資料庫流程;
+     --dry 時帶 --dry(不寫 OUT-06 / OUT-07);資料庫流程被中斷就不跑;只在本版的一輪裡加(前版自測照舊)。
+  ⑤ 手機寬(390 px)不橫捲:v0107 記憶體 / TEMP 卡的 temp 長路徑與頁尾連結清單的長路徑撐到 697 px → 卡片與清單項可斷行(表格照舊在 .wrap 內橫捲)。
 其餘全照 v0107(記憶體 / TEMP 鉤 · 起跑實測)。VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境。
 """
 from __future__ import annotations
@@ -137,6 +141,30 @@ def db_section(db: dict | None) -> str:
 
 DBM.db_inventory = db_inventory
 DBM.db_section = db_section
+WRAP_CSS = "section.card,li{overflow-wrap:anywhere;min-width:0}"
+if WRAP_CSS not in DBM.PAGE_CSS:                  # v0106 render_html 每次讀模組全域 PAGE_CSS
+    DBM.PAGE_CSS = DBM.PAGE_CSS + WRAP_CSS
+
+FLM = _owner("flow_db")                            # v0101:等擷取寫完才開庫的那一版(run_flows 查模組全域 flow_db)
+_FLOW_DB_V0101 = FLM.flow_db
+LAMP_RANK = ["GREEN", "YELLOW", "GATED", "RED"]
+_RUN8 = {"on": False}
+
+
+def flow_db(opt, res, gate, log_dir, manager=None, py=None) -> dict:
+    """同 v0101 資料庫流程;db check → refill 之後多跑 universe xcheck(兩個以上來源相同即算對照成功)。"""
+    out = _FLOW_DB_V0101(opt, res, gate, log_dir, manager, py)
+    if not _RUN8["on"] or out.get("lamp") == "INTERRUPTED" or FLM.STOP.is_set():
+        return out
+    args = ["universe", "xcheck", "--days", "20"] + (["--dry"] if getattr(opt, "dry", False) else [])
+    s3 = FLM.run_step("db_xcheck", args, V0100.flow_env(res, "db"), log_dir, gate, getattr(opt, "timeout", None), manager, py)
+    steps = list(out.get("steps") or []) + [s3]
+    lamps = [x.get("lamp") for x in steps]
+    worst = max(lamps, key=lambda x: LAMP_RANK.index(x) if x in LAMP_RANK else 3)
+    return dict(out, lamp=worst, steps=steps)
+
+
+FLM.flow_db = flow_db
 _ACTIVATE_V0107 = PRIOR.activate
 
 
@@ -150,11 +178,13 @@ def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path
         return prev(c, u) if u is not None else prev(c)
     PRIOR.TAG = TAG
     DBM._WRITE_REPORT_V0100 = _stamp_then_write
+    _RUN8["on"] = True
     try:
         card = _ACTIVATE_V0107(opt, manager, py, temp)
     finally:
         PRIOR.TAG = keep
         DBM._WRITE_REPORT_V0100 = prev
+        _RUN8["on"] = False
     by = (card.get("db") or {}).get("other_by")
     if by:
         print("  [他系統表] " + " · ".join("%s %d" % kv for kv in sorted(by.items()))
@@ -212,13 +242,44 @@ def selftest() -> int:
         old.pop("other_by")
         chk("③ 舊摘要沒有 other_by(前版寫的)→ 卡上照 other_rows 現算;NOT_RUN 卡不動",
             "VRN-2 1" in db_section(old) and db_section({"lamp": "NOT_RUN", "why": "x"}) == _DB_SECTION_V0106({"lamp": "NOT_RUN", "why": "x"}))
-        chk("④ v0106 總覽頁走本版(render_html 查模組全域 db_section / write_report 查 db_inventory)",
-            DBM.db_section is db_section and DBM.db_inventory is db_inventory)
+        chk("④ v0106 總覽頁走本版(render_html 查模組全域 db_section / write_report 查 db_inventory);頁 CSS 多卡片 / 清單項可斷行(手機寬不橫捲)",
+            DBM.db_section is db_section and DBM.db_inventory is db_inventory and DBM.PAGE_CSS.endswith(WRAP_CSS)
+            and DBM.PAGE_CSS.count(WRAP_CSS) == 1)
     finally:
         shutil.rmtree(td, ignore_errors=True)
+    import types
+    calls = []
+    keep = (FLM._FLOW_DB_V0100, FLM.run_step, FLM.FETCH_DONE.is_set(), V0100.flow_env)
+
+    def fake_db(opt, res, gate, log_dir, manager=None, py=None):
+        return {"flow": "db", "lamp": opt.base, "steps": [{"step": "db_check", "lamp": "GREEN"}, {"step": "db_refill", "lamp": "GREEN"}]}
+
+    def fake_step(name, args, env, log_dir, gate=None, timeout=None, manager=None, py=None):
+        calls.append((name, list(args)))
+        return {"step": name, "args": args, "lamp": "YELLOW", "summary": "[計] VDF 互對照(兩個以上來源相同即算對照成功)· …"}
+    FLM._FLOW_DB_V0100, FLM.run_step, V0100.flow_env = fake_db, fake_step, lambda res, flow, base_env=None: {"VDF_T_FLOW": flow}
+    FLM.FETCH_DONE.set()
+    _RUN8["on"] = True
+    try:
+        res = {"plan": {"slots": 1}, "temp_run": str(Path(tempfile.gettempdir()))}
+        r1 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        r2 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=True, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        r3 = FLM.flow_db(types.SimpleNamespace(base="INTERRUPTED", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        _RUN8["on"] = False
+        r4 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+    finally:
+        _RUN8["on"] = False
+        FLM._FLOW_DB_V0100, FLM.run_step, V0100.flow_env = keep[0], keep[1], keep[3]
+        if not keep[2]:
+            FLM.FETCH_DONE.clear()
+    chk("⑤ 本輪資料庫流程多一步 db_xcheck(universe xcheck --days 20;--dry 帶 --dry);燈併進流程(黃蓋綠);流程被中斷不跑;不在本版一輪 = 照前版",
+        [s["step"] for s in r1["steps"]] == ["db_check", "db_refill", "db_xcheck"] and r1["lamp"] == "YELLOW"
+        and calls == [("db_xcheck", ["universe", "xcheck", "--days", "20"]), ("db_xcheck", ["universe", "xcheck", "--days", "20", "--dry"])]
+        and r2["lamp"] == "YELLOW" and r3["lamp"] == "INTERRUPTED" and len(r3["steps"]) == 2
+        and r4["lamp"] == "GREEN" and len(r4["steps"]) == 2 and len(calls) == 2, (r1, calls, r3, r4))
     src = Path(__file__).read_text(encoding="utf-8")
     imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
-    chk("⑤ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫",
+    chk("⑥ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫",
         "VIA:ACCEL-BRIDGE" in src and "def _via_net" in src
         and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VRN2_", "VCGC"))]
         and not re.search(r"^\s*(import|from)\s+" + "talib", src, re.M)

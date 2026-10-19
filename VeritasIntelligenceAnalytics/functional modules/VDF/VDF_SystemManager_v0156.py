@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_SystemManager v0156 — 薄尾:db check 的他系統表分開命名 VRN-1 / VRN-2 / VCGC(政策 L123 四系統對等獨立)
+"""VDF_SystemManager v0156 — 薄尾:db check 的他系統表分開命名 VRN-1 / VRN-2 / VCGC(政策 L123 四系統對等獨立)· 互對照兩個以上相同即成功
 
 操作員令(2026-10-19):「VRN-1 VRN-2 VDF VCGC都是獨立系統  互不干涉」「1. 分開命名  2. CHANGE TO 4 SYSTEMS.」;
   問答:VRN-1 = 另一團隊的倉(C:\\Users\\tonyk\\VIA-VDF-VRN,不在本倉)。
@@ -13,8 +13,16 @@
   ④ 冊上沒登寫入者、表名 vrn_ 開頭 → 「VRN 未分辨」(分不出 VRN-1 / VRN-2 就明寫,不猜;L123 ②)。
   ⑤ 一張表多個他系統寫入者 → 名字以「 + 」相連(例 VRN-2 + VCGC);有任何 VDF_ 寫入者 → 仍是 VDF 的表(同 v0155)。
   ⑥ 結果 other_system 多 by_system(每個系統幾列)與 vrn1_codes;終端摘要行逐系統印。
-作法:換掉 v0151 模組的 db_check / _print_db(v0151 main 的 db 動詞查模組全域);v0155 的 min0_rows 照用。
-只讀本倉 VRN 夾的檔名與 VRN-2 船單(他系統自報),不載入、不寫他系統的檔;不抓網、不碰 TA-Lib。
+  ⑦ 互對照(操作員 2026-10-19「互對照兩個以上相同即算對照成功  自測實測自改自完成」):v0122 的 universe xcheck 判法改
+     「兩個以上來源相同即算對照成功」(容許差與來源照冊 VDF_InputUniverse_SSOT xcheck 節,不改冊)——
+     加權收盤:當日有值的來源兩兩比(官方↔ENG055 用 official_vs_agg;有 yf 的對用 vs_yf);至少一對在容許內 → GREEN(第三個列 outlier,不擋);
+       兩個以上來源但沒有任何一對相同 → RED;只一個來源 → YELLOW(沒得對照);一個都沒有 → NODATA。
+     三表同日代號:有資料的表兩兩比代號集合;至少兩表完全相同 → GREEN;兩表以上有資料但都不同 → YELLOW(列缺漏樣本);
+       庫裡不到兩張表 → YELLOW(沒得對照);表在但當日少於兩表有資料 → 最新日 YELLOW(日更未齊)、舊日 RED。
+     universe xcheck 末行多印「[計] VDF 互對照 …」(ActivateVDF 的步驟摘要讀這行)。前版 v0122 自測跑前換回原判法。
+作法:換掉 v0151 模組的 db_check / _print_db(v0151 main 的 db 動詞查模組全域);v0155 的 min0_rows 照用;
+      換掉 v0122 模組的 xcheck_index / xcheck_counts / xcheck / universe(查模組全域)。
+只讀本倉 VRN 夾的檔名與 VRN-2 船單(他系統自報)與 VDF 自己的庫,不載入、不寫他系統的檔;不抓網、不碰 TA-Lib。
 只收 VIA_FROM_VCGC=YES(舊名;= 經任一系統自己的 manager / 啟動器啟動,L120 ⑥ · L123 ③)。
 """
 from __future__ import annotations
@@ -93,6 +101,7 @@ SELF_ID = "VDF"
 VRN_DIR = VIA_ROOT / "functional modules" / "VRN"
 VRN2_BUNDLE = VIA_ROOT / "docs" / "handoff" / "ai" / "vrn2_ship" / "VRN2_Bundle_latest.json"
 UNSURE = "VRN 未分辨"
+RULE = "兩個以上來源相同即算對照成功"
 
 
 def _vnum_v0156(path) -> int:
@@ -235,11 +244,242 @@ DB_MOD.db_check = db_check
 DB_MOD._print_db = _print_db
 
 
+def _owner_module(name: str):
+    """沿前版鏈往下找真正定義 name 的那一版模組(xcheck_index / xcheck_counts / universe 在 v0122)。"""
+    m = PRIOR
+    for _ in range(64):
+        if name in vars(m) and getattr(vars(m)[name], "__module__", None) == m.__name__:
+            return m
+        m = vars(m).get("PRIOR")
+        if m is None:
+            break
+    return None
+
+
+XM = _owner_module("xcheck_index")
+_UNIVERSE_V0122 = XM.universe
+_XCHECK_V0122 = XM.xcheck
+_LAST = {}
+
+
+def agree_pairs(vals: dict, tol: dict) -> tuple:
+    """當日有值的來源兩兩比 → (相同的對, 全部比過的對 [(a, b, 相對差)])。官方↔ENG055 用 official_vs_agg;有 yf 用 vs_yf。"""
+    have = [k for k in ("official", "agg", "yf") if vals.get(k)]
+    pairs, ok = [], []
+    for i, a in enumerate(have):
+        for b in have[i + 1:]:
+            base = vals["official"] if "official" in (a, b) else vals[a]
+            d = abs(vals[a] - vals[b]) / base
+            t = tol["official_vs_agg"] if {a, b} == {"official", "agg"} else tol["vs_yf"]
+            pairs.append((a, b, d))
+            if d <= t:
+                ok.append((a, b))
+    return ok, pairs
+
+
+def xcheck_index(days: int = 20, dbs: dict | None = None) -> dict:
+    dbs = dbs or {"idx": XM.DB_IDX, "tw": XM.DB_TW, "gl": XM.DB_GL}
+    tol = XM.book()["xcheck"]["index"]["tolerance"]
+    off = XM._series(dbs["idx"], "tw_index_daily", "date", "close", "index_code = 'TAIEX'")
+    agg = XM._series(dbs["tw"], "tw_market_agg", "date", "taiex")
+    yf = XM._series(dbs["gl"], "global_daily", "date", "close", "ticker = '^TWII'")
+    dates = sorted(set(off) | set(agg) | set(yf), reverse=True)[:days]
+    rows, run = [], XM._today()
+    for d in sorted(dates):
+        v = {"official": off.get(d), "agg": agg.get(d), "yf": yf.get(d)}
+        n = sum(1 for x in v.values() if x)
+        ok, pairs = agree_pairs(v, tol)
+        same = sorted({k for p in ok for k in p})
+        lamp = "NODATA" if n == 0 else ("YELLOW" if n == 1 else ("GREEN" if ok else "RED"))
+        rows.append({"date": d, "official_close": v["official"], "agg_taiex": v["agg"], "yf_close": v["yf"], "n_sources": n,
+                     "max_rel_diff": round(max((x for _a, _b, x in pairs), default=0.0), 6), "lamp": lamp, "run": run,
+                     "agree": "+".join(same), "outlier": "+".join(k for k in ("official", "agg", "yf") if v[k] and k not in same) if ok else ""})
+    lamps = [r["lamp"] for r in rows]
+    verdict = "NODATA" if not rows else ("RED" if "RED" in lamps else ("GREEN" if all(x == "GREEN" for x in lamps) else "YELLOW"))
+    return {"rows": rows, "verdict": verdict, "have": {"official": len(off), "agg": len(agg), "yf": len(yf)}, "rule": RULE}
+
+
+def same_sets(s: dict) -> list:
+    """有資料的表兩兩比代號集合 → 完全相同的對 [(a, b)]。"""
+    names = [k for k, v in s.items() if v]
+    return [(a, b) for i, a in enumerate(names) for b in names[i + 1:] if s[a] == s[b]]
+
+
+def xcheck_counts(days: int = 20, db: Path | None = None) -> dict:
+    db = db or XM.DB_TW
+    rx = XM.book()["inputs"][0]["code_regex"]
+    con = XM._con(db)
+    if con is None:
+        return {"rows": [], "verdict": "NODATA", "note": f"庫不在:{db}"}
+    try:
+        have = XM._tables(con)
+        if "tw_daily_prices" not in have:
+            return {"rows": [], "verdict": "NODATA", "note": "tw_daily_prices 不在"}
+        dates = [r[0] for r in con.execute("SELECT DISTINCT substr(CAST(date AS VARCHAR), 1, 10) d FROM tw_daily_prices "
+                                           f"ORDER BY d DESC LIMIT {int(days)}").fetchall()]
+        if not dates:
+            return {"rows": [], "verdict": "NODATA", "note": "價表空"}
+        lo = min(dates)
+        sets, missing = {}, []
+        for name, t, code in XM.COUNT_SRC:
+            if t not in have:
+                missing.append(t)
+                continue
+            q = (f"SELECT DISTINCT substr(CAST(date AS VARCHAR), 1, 10) d, {code} c FROM \"{t}\" "
+                 f"WHERE substr(CAST(date AS VARCHAR), 1, 10) >= ? AND regexp_full_match({code}, ?)")
+            per = {}
+            for d, c in con.execute(q, [lo, rx]).fetchall():
+                per.setdefault(d, set()).add(c)
+            sets[name] = per
+    finally:
+        con.close()
+    rows, run, newest = [], XM._today(), max(dates)
+    for d in sorted(dates):
+        s = {n: sets[n].get(d, set()) for n in sets}
+        ns = {n: len(v) for n, v in s.items()}
+        filled = [n for n in s if s[n]]
+        allv = [s[n] for n in filled]
+        inter = set.intersection(*allv) if allv else set()
+        union = set.union(*allv) if allv else set()
+        pairs = same_sets(s)
+        same = sorted({k for p in pairs for k in p})
+        if pairs:
+            lamp = "GREEN"
+        elif len(filled) >= 2 or len(s) < 2:
+            lamp = "YELLOW"                                     # 兩表以上有資料但不同 · 或冊上的表本庫不到兩張(沒得對照)
+        else:
+            lamp = "YELLOW" if d == newest else "RED"            # 少於兩表有資料:最新日 = 日更未齊(黃);舊日 = 紅
+        rows.append({"date": d, "prices_n": ns.get("prices"), "chips_n": ns.get("chips"), "trading_n": ns.get("trading"),
+                     "all3_n": len(inter), "only_sample": ",".join(sorted(union - inter)[:8]), "lamp": lamp, "run": run,
+                     "agree": "+".join(same)})
+    lamps = [r["lamp"] for r in rows]
+    verdict = "RED" if "RED" in lamps else ("GREEN" if all(x == "GREEN" for x in lamps) else "YELLOW")
+    return {"rows": rows, "verdict": verdict, "missing_tables": missing, "rule": RULE}
+
+
+def xcheck(days: int = 20, write: bool = True, dbs: dict | None = None, out_db=None, reports=None) -> dict:
+    kw = {k: v for k, v in (("out_db", out_db), ("reports", reports)) if v is not None}
+    rep = _XCHECK_V0122(days, write, dbs, **kw)
+    _LAST.clear()
+    _LAST.update(rep)
+    return rep
+
+
+def summary_line(rep: dict) -> str:
+    ix, ct = rep.get("index") or {}, rep.get("counts") or {}
+    g = lambda rows: sum(1 for r in rows or [] if r.get("lamp") == "GREEN")     # noqa: E731
+    return ("[計] VDF 互對照(%s)· 加權收盤 %s(%d/%d 日兩來源以上相同)· 三表同日代號 %s(%d/%d 日兩表以上相同)"
+            % (RULE, ix.get("verdict"), g(ix.get("rows")), len(ix.get("rows") or []),
+               ct.get("verdict"), g(ct.get("rows")), len(ct.get("rows") or [])))
+
+
+def universe(args: list) -> int:
+    _LAST.clear()
+    rc = _UNIVERSE_V0122(args)
+    if (args[:1] or [""])[0] == "xcheck" and _LAST:
+        print("  " + summary_line(_LAST))
+    return rc
+
+
+_ORIG = (XM.xcheck_index, XM.xcheck_counts, XM.xcheck, XM.universe)   # v0122 原判法:前版自測照它驗
+XM.xcheck_index = xcheck_index
+XM.xcheck_counts = xcheck_counts
+XM.xcheck = xcheck
+XM.universe = universe
+
+
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in args[:2]:
         return selftest()
     return PRIOR.main(args)
+
+
+def _selftest_xcheck(chk) -> None:
+    """互對照的六檢(⑧–⑬);沙盒庫 · 零網路。"""
+    import contextlib
+    import io
+    import shutil
+    import tempfile
+    tol = {"official_vs_agg": 0.0005, "vs_yf": 0.005}
+    cases = [({"official": 100.0, "agg": 100.01, "yf": 120.0}, [("official", "agg")]),
+             ({"official": 100.0, "agg": 103.0, "yf": 100.2}, [("official", "yf")]),
+             ({"official": None, "agg": 100.0, "yf": 100.3}, [("agg", "yf")]),
+             ({"official": 100.0, "agg": 103.0, "yf": 110.0}, []),
+             ({"official": 100.0, "agg": None, "yf": None}, []),
+             ({"official": 100.0, "agg": 100.2, "yf": None}, [])]           # 差 0.2%:官方↔ENG055 容許 0.05% → 不相同
+    got = [agree_pairs(v, tol)[0] for v, _e in cases]
+    chk("⑧ 兩兩比:官方↔ENG055 用 0.0005、有 yf 的對用 0.005;相同的對照列(第三個不合不擋)", got == [e for _v, e in cases], got)
+    s = {"prices": {"1101", "2330"}, "chips": {"1101"}, "trading": {"1101", "2330"}}
+    chk("⑨ 代號集合:完全相同的兩表才算相同;空表不算", same_sets(s) == [("prices", "trading")]
+        and same_sets({"prices": {"1"}, "chips": set(), "trading": {"1"}}) == [("prices", "trading")]
+        and same_sets({"prices": {"1"}, "chips": {"2"}, "trading": set()}) == [], same_sets(s))
+    try:
+        import duckdb
+    except ImportError:
+        duckdb = None
+    td = Path(tempfile.mkdtemp(prefix="vdfmgr157_"))
+    try:
+        if duckdb is None:
+            chk("⑬ duckdb 不在本境 → 互對照只驗判法(不代裝;⑩–⑫ 要 duckdb 才跑)", True)
+        else:
+            idx, tw, gl = td / "idx.duckdb", td / "tw.duckdb", td / "gl.duckdb"
+            c = duckdb.connect(str(idx))
+            c.execute("create table tw_index_daily(date date, index_code varchar, close double)")
+            c.execute("insert into tw_index_daily values ('2026-10-01','TAIEX',100),('2026-10-02','TAIEX',100),('2026-10-03','TAIEX',100),"
+                      "('2026-10-05','TAIEX',100)")
+            c.close()
+            c = duckdb.connect(str(tw))
+            c.execute("create table tw_market_agg(date date, taiex double)")
+            c.execute("insert into tw_market_agg values ('2026-10-01',100.01),('2026-10-02',103),('2026-10-03',103),('2026-10-06',99)")
+            c.execute("create table tw_daily_prices(date date, ticker varchar)")
+            c.execute("create table tw_chip_inst(date date, code varchar)")
+            c.execute("create table tw_trading_daily(date date, code varchar)")
+            for d, pr, ch, trd in (("2026-10-01", ["1101.TW", "2330.TW"], ["1101"], ["1101", "2330"]),
+                                   ("2026-10-02", ["1101.TW", "2330.TW"], ["1101"], ["1101"]),
+                                   ("2026-10-03", ["1101.TW"], [], [])):
+                for t, xs in (("tw_daily_prices", pr), ("tw_chip_inst", ch), ("tw_trading_daily", trd)):
+                    for x in xs:
+                        c.execute("insert into %s values (?, ?)" % t, [d, x])
+            c.close()
+            c = duckdb.connect(str(gl))
+            c.execute("create table global_daily(date date, ticker varchar, close double)")
+            c.execute("insert into global_daily values ('2026-10-01','^TWII',130),('2026-10-02','^TWII',100.2),('2026-10-03','^TWII',110)")
+            c.close()
+            ix = xcheck_index(20, {"idx": idx, "tw": tw, "gl": gl})
+            lam = {str(r["date"])[:10]: (r["lamp"], r["agree"], r["outlier"]) for r in ix["rows"]}
+            chk("⑩ 加權收盤真庫:官方+ENG055 相同、yf 偏 → GREEN(yf 列 outlier);官方+yf 相同 → GREEN;三個都不同 → RED;"
+                "只一個來源 → YELLOW;總判 RED",
+                lam.get("2026-10-01") == ("GREEN", "agg+official", "yf") and lam.get("2026-10-02") == ("GREEN", "official+yf", "agg")
+                and lam.get("2026-10-03")[0] == "RED" and lam.get("2026-10-05")[0] == "YELLOW" and lam.get("2026-10-06")[0] == "YELLOW"
+                and ix["verdict"] == "RED", lam)
+            solo = td / "solo.duckdb"
+            c = duckdb.connect(str(solo))
+            c.execute("create table tw_daily_prices(date date, ticker varchar)")
+            c.execute("insert into tw_daily_prices values ('2026-10-01','1101.TW'),('2026-10-02','1101.TW')")
+            c.close()
+            cs = xcheck_counts(20, solo)
+            ct = xcheck_counts(20, tw)
+            lc = {str(r["date"])[:10]: (r["lamp"], r["agree"]) for r in ct["rows"]}
+            chk("⑪ 三表同日代號真庫:價量=成交值 → GREEN(籌碼少照列);籌碼=成交值 → GREEN(價量多照列);最新日只一表有 → YELLOW;庫裡只一張表 → 舊日也 YELLOW(沒得對照)",
+                lc == {"2026-10-01": ("GREEN", "prices+trading"), "2026-10-02": ("GREEN", "chips+trading"),
+                       "2026-10-03": ("YELLOW", "")}
+                and [r["lamp"] for r in cs["rows"]] == ["YELLOW", "YELLOW"] and cs["verdict"] == "YELLOW", (lc, cs.get("rows")))
+            buf = io.StringIO()
+            prev = {k: getattr(XM, k) for k in ("DB_IDX", "DB_TW", "DB_GL")}
+            XM.DB_IDX, XM.DB_TW, XM.DB_GL = idx, tw, gl
+            try:
+                with contextlib.redirect_stdout(buf):
+                    rc = XM.universe(["xcheck", "--dry"])
+            finally:
+                for k, v in prev.items():
+                    setattr(XM, k, v)
+            out = buf.getvalue()
+            chk("⑫ universe xcheck 動詞走本版:末行「[計] VDF 互對照」帶規則 · 兩判;紅 → rc 1;--dry 不寫",
+                re.search(r"\[計\] VDF 互對照\(" + RULE + r"\)· 加權收盤 RED\(2/5 日.*三表同日代號 YELLOW\(2/3 日", out) is not None and rc == 1,
+                (rc, out[-400:]))
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
 
 
 def selftest() -> int:
@@ -257,7 +497,7 @@ def selftest() -> int:
             f += 1
             print("  [FAIL] %s%s" % (name, (" · " + str(note)[:300]) if note else ""))
 
-    print("=== %s %s · 薄尾自測(他系統表分開命名 VRN-1 / VRN-2 / VCGC;沙盒 · 零網路)===" % (_STEM, TAG))
+    print("=== %s %s · 薄尾自測(他系統表分開命名 VRN-1 / VRN-2 / VCGC · 互對照 %s;沙盒 · 零網路)===" % (_STEM, TAG, RULE))
     td = Path(tempfile.mkdtemp(prefix="vdfmgr156_"))
     keep = os.environ.get("VIA_VDF_HEALTH_OUT")
     try:
@@ -339,6 +579,7 @@ def selftest() -> int:
                 and "VRN-1 寫" in page and rc in (0, 1, 2) and re.search(r"\[他系統表\] \d+ 列.*VRN-2 \d+", out)
                 and "VRN 未分辨" in out and "L123" in out,
                 (o["lamp"], st, o.get("other_system"), rc, out[-400:]))
+        _selftest_xcheck(chk)
         src = Path(__file__).read_text(encoding="utf-8")
         imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
         chk("⑦ 加速器橋 · 網路橋在;不匯入他系統程式(只讀檔名與船單);不碰 TA-Lib;同意閘不寫",
@@ -355,7 +596,14 @@ def selftest() -> int:
     print("  [計] %s %s 本版 %d/%d · %s" % (_STEM, TAG, p, p + f, "PASS" if not f else "FAIL"))
     if f:
         return 1
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
+    if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1":
+        return 0
+    keep = (XM.xcheck_index, XM.xcheck_counts, XM.xcheck, XM.universe)
+    XM.xcheck_index, XM.xcheck_counts, XM.xcheck, XM.universe = _ORIG   # 前版自測照前版判法驗
+    try:
+        prc = PRIOR.selftest()
+    finally:
+        XM.xcheck_index, XM.xcheck_counts, XM.xcheck, XM.universe = keep
     return 0 if prc == 0 else 1
 
 

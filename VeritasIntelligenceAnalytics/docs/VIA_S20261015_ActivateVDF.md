@@ -282,3 +282,29 @@ sha256:
 **PR #536 Codex P1(未合併,直接改 v0107):** 環境已有 VCGC `via_duck_temp` 鉤時,本鉤整個讓位 → VCGC 鉤只補 temp / 記憶體,**執行緒沒人管**(三條並行又互搶全部核)。
 改:VCGC 鉤在 → temp / 記憶體照讓它管(不疊兩層),本鉤只另包一層補 `threads`(冪等標記 `_vdf_duck_threads`)。自測 ㉜ 改驗「讓位 + 執行緒照補」;
 突變「VCGC 在就整個不掛」→ ㉜ FAIL。全鏈自測 0 FAIL · 擊斃閘過 · vdf_activatevdf / numbering 重測 rc 0。
+
+## 2026-10-19 · 四系統分開命名 · 互對照「兩個以上相同即成功」· 收尾範圍
+
+操作員令:「VRN-1 VRN-2 VDF VCGC都是獨立系統  互不干涉」「1. 分開命名  2. CHANGE TO 4 SYSTEMS.」(問答:VRN-1 = 另一團隊的倉)·
+「這個對話只完成VDF專案完成HTML U/I可運作  增量擷取快速擷取所需的資料庫成功清點後即收尾」·「互對照兩個以上相同即算對照成功  自測實測自改自完成」。
+
+**四系統(政策冊 v0113 +L123):** VRN-1 · VRN-2 · VDF · VCGC 對等、互不干涉;L120 加 amended_by · L121 / L122 加 extended_by(舊字樣留版史);CLAUDE.md · AGENTS.md 改四系統字樣。
+
+**VDF_SystemManager v0156(db check 分開命名):** 他系統表標 VRN-2(寫入者代碼在本倉 VRN 夾或 VRN-2 自報船單 `vrn2_ship/VRN2_Bundle_latest.json`)·
+VRN-1(本倉與船單都沒有 → 另一團隊的倉,代碼列進 `other_system.vrn1_codes`)· VCGC(`CGC_`)· VRN 未分辨(冊上沒登寫入者、表名 `vrn_`;不猜)。
+`other_system.by_system` 逐系統計數,終端逐系統印。自測 7/7 · 突變 5 個全抓。
+
+**VDF_SystemManager v0156 同檔(互對照;擊斃閘 KILL-11 不准同批跳兩版,併進 v0156):** `universe xcheck` 判法改「兩個以上來源相同即算對照成功」——
+加權收盤三來源兩兩比(官方↔ENG055 容許 0.05% · 有 yf 的對 0.5%,照冊):至少一對相同 = GREEN(第三個列 outlier)· 兩個以上都不同 = RED · 只一個 = YELLOW;
+三表同日代號集合:兩表以上完全相同 = GREEN · 有資料但都不同 = YELLOW · 庫裡不到兩張表 = YELLOW · 表在但舊日只一表有資料 = RED。末行印 `[計] VDF 互對照 …`。
+前版 v0122 自測跑前換回原判法(照前版驗)。v0156 自測合計 11/11 · 突變 5 個全抓。
+
+**ActivateVDF v0108:** 總覽卡「他系統表」逐系統列(VRN-2 n · VRN 未分辨 n …,L123);本輪資料庫流程 db check → refill 之後自動跑 `db_xcheck`
+(universe xcheck;燈併進流程;--dry 帶 --dry;只在本版一輪);卡片 / 清單項可斷行(手機寬原 697 px → 390 px 不橫捲)。自測 6/6 · 突變 6 個全抓。
+
+**容器真跑(ActivateVDF.py run · 雙閘沒開):** 396 秒 · ①b 記憶體 / TEMP GREEN · 清單 YELLOW(閘關,既有清單驗收過)· 擷取 GATED ·
+引擎 94/94 可啟動 · 自測 GREEN 67 · NODATA 8 · RED 0 · U/I GREEN · 資料庫清點 RED 18(容器庫是部分副本)· 他系統表 VRN-2 6 · VRN 未分辨 6 ·
+互對照:加權收盤 YELLOW(容器只有 yf 一個來源)· 三表同日代號 RED(容器沒有籌碼表、成交值表舊日沒列;價量 893 vs 成交值 890 差 4804 / 4806 / 8183)。
+頁面:總覽頁 · VDF 操作頁 · 資料庫閘頁 三種寬度 0 JS 錯、手機寬不橫捲。
+
+**收尾要在工作站跑(容器做不到的部分):** 增量擷取要觸網,同意閘是操作員的手(AI 不代設)。工作站 PS 一鍵(本視窗先開雙閘)→ 擷取寫完 → db check 0 紅 · db_xcheck 綠 = 收尾。
