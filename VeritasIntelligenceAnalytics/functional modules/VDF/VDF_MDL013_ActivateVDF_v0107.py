@@ -15,7 +15,8 @@ r"""VDF_MDL013_ActivateVDF v0107 — 薄尾:記憶體 / TEMP 本輪真生效(Duc
   ② 鉤只在 duckdb 被 import 那一刻掛(沒用 duckdb 的行程零成本);每個 connect() 呼叫端沒給的才補:
      temp_directory = VIA_DUCKDB_TEMP_DIR/p<pid>(本機 TEMP · 每行程一夾不撞檔)· memory_limit = VIA_DUCKDB_MEM(每條預算,超過落 TEMP)·
      threads = VIA_DUCKDB_THREADS(每條執行緒;三條並行不互搶)。呼叫端自己給的照舊優先。子行程再起的孫行程同樣生效(環境繼承)。
-  ③ 環境已裝 VCGC 的 via_duck_temp 鉤 → 本鉤讓位(不疊兩層);VIA_DUCK_TEMP=0 → 整個不掛(回原生 duckdb)。
+  ③ 環境已裝 VCGC 的 via_duck_temp 鉤 → temp / 記憶體讓它管(不疊兩層),只補它沒管的 threads(PR #536 Codex P1);
+     VIA_DUCK_TEMP=0 → 整個不掛(回原生 duckdb)。
   ④ 起跑實測(約 1 秒):用流程同一支 python 起子行程開一次 duckdb,讀回 temp_directory · memory_limit · threads 與是哪個鉤生效;
      temp 根在 OneDrive / 剩餘空間 < 2 GB 照實標黃。結果進總覽 JSON(resources.memtemp)、終端一行、總覽頁一張卡。
   ⑤ 只在本版的一輪裡生效(前版自測照舊,不碰它們驗的 PYTHONPATH)。
@@ -153,7 +154,39 @@ def _patch(mod):
     return mod
 
 
+def _patch_threads(mod):
+    # 環境已有 VCGC 鉤時只補 threads(VCGC 鉤只補 temp / 記憶體);冪等
+    if getattr(mod, "_vdf_duck_threads", None):
+        return mod
+    th = _defaults().get("threads")
+    if not th:
+        return mod
+    orig = mod.connect
+
+    def connect(*args, **kw):
+        try:
+            a = list(args)
+            cfg = dict((a[2] if len(a) >= 3 else kw.get("config")) or {})
+            cfg.setdefault("threads", int(os.environ.get("VIA_DUCKDB_THREADS") or th))
+            if len(a) >= 3:
+                a[2] = cfg
+            else:
+                kw["config"] = cfg
+            return orig(*a, **kw)
+        except TypeError:
+            return orig(*args, **kw)
+
+    connect.__doc__ = orig.__doc__
+    connect.__wrapped__ = orig
+    mod.connect = connect
+    mod._vdf_duck_threads = _TAG
+    return mod
+
+
 class _VdfDuckFinder:
+    def __init__(self, threads_only=False):
+        self.threads_only = threads_only
+
     def find_spec(self, name, path=None, target=None):
         if name != "duckdb":
             return None
@@ -167,10 +200,12 @@ class _VdfDuckFinder:
             return spec
         real = spec.loader.exec_module
 
+        threads_only = self.threads_only
+
         def exec_module(module):
             real(module)
             try:
-                _patch(module)
+                _patch_threads(module) if threads_only else _patch(module)
             except Exception:  # noqa: BLE001 — 掛不上 = 原生 duckdb 照用
                 return
         spec.loader.exec_module = exec_module
@@ -178,12 +213,13 @@ class _VdfDuckFinder:
 
 
 def _install():
-    if os.environ.get("VIA_DUCK_TEMP", "1") == "0" or "via_duck_temp" in sys.modules:
-        return                                     # 關掉 / 環境已有 VCGC 的鉤 → 讓它管,不疊兩層
+    if os.environ.get("VIA_DUCK_TEMP", "1") == "0":
+        return
+    threads_only = "via_duck_temp" in sys.modules    # 環境已有 VCGC 的鉤 → temp / 記憶體讓它管(不疊兩層),只補它沒管的 threads
     if "duckdb" in sys.modules:
-        _patch(sys.modules["duckdb"])
+        (_patch_threads if threads_only else _patch)(sys.modules["duckdb"])
     elif not any(type(f).__name__ == "_VdfDuckFinder" for f in sys.meta_path):
-        sys.meta_path.insert(0, _VdfDuckFinder())
+        sys.meta_path.insert(0, _VdfDuckFinder(threads_only))
 
 
 def _chain_after_me():
@@ -225,6 +261,7 @@ except ImportError:
 else:
     out["duckdb"] = duckdb.__version__
     out["hook"] = getattr(duckdb, "_via_duck_temp", None)
+    out["threads_hook"] = getattr(duckdb, "_vdf_duck_threads", None)
     c = duckdb.connect()
     for k in ("temp_directory", "memory_limit", "threads"):
         try:
@@ -528,8 +565,12 @@ def selftest() -> int:
             (vc / "sitecustomize.py").write_text(_FAKE_VCGC, encoding="utf-8")
             e = dict(env, PYTHONPATH=os.pathsep.join([str(vc), hd]), VDF_T_MARK=str(mark))
             got2 = run(e)
-            chk("㉜ 環境已有 VCGC 的 via_duck_temp 鉤 → 本鉤讓位(不疊兩層):本行程 duckdb 不被本鉤包",
-                got2.get("hook") != HOOK_TAG and "duckdb" in json.dumps(got2), got2.get("hook"))
+            chk("㉜ 環境已有 VCGC 的 via_duck_temp 鉤 → temp / 記憶體讓位(不疊兩層、溢寫夾不是本鉤給的),"
+                "但 VCGC 鉤沒管的執行緒照補每條預算(PR #536 Codex P1)",
+                got2.get("hook") != HOOK_TAG and got2.get("threads_hook") == HOOK_TAG
+                and str(got2.get("threads")) == str(plan["threads_per_flow"])
+                and not str(got2.get("temp_directory", "")).startswith(env["VIA_DUCKDB_TEMP_DIR"]),
+                {k: got2.get(k) for k in ("hook", "threads_hook", "threads", "temp_directory")})
         mt = {"lamp": "YELLOW", "summary": "DuckDB 溢寫 → <x> · 記憶體 1 MiB"}
         page = memtemp_card(mt)
         chk("㉝ 總覽頁「記憶體 / TEMP」卡:燈 + 實測一句(跳脫);沒實測 = 不出卡",
