@@ -10,9 +10,9 @@
     "VDF_MDL013_ActivateVDF",
     "--selftest"
   ],
-  "case_sha256": "129c13ee17bd5fb958bc3bf9b95586309ce0ab2c97ea488319ad5f3dd1c67a58",
-  "started_at": "2026-10-19T15:15:09+00:00",
-  "completed_at": "2026-10-19T15:16:16+00:00",
+  "case_sha256": "08b85226ebd42dc6b96df505cefebbbd53cc84354d1d7af8e6dc377ff2f527f6",
+  "started_at": "2026-10-19T18:35:33+00:00",
+  "completed_at": "2026-10-19T18:36:35+00:00",
   "rc": 0,
   "target_marker_seen": true,
   "dependencies": {
@@ -21,6 +21,7 @@
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py": "6ac6badea1a7fe2740c8ee4a99bab527ac7dbc0bd6fee8ea3ed3505f82c52b16",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0105.py": "77681bce9a378a59180ffd0cf3ec3d5d0d8f7802a20e6e6fdcad9eb5ec91aec0",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0101.py": "a59dfa58d9f75dea855aceee2867683c2860d7e774c77383377f66006574a1f2",
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0108.py": "572b5559e434215ad3abf35826d7501b16d3db842d84d5884d8ce13feb60e2eb",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0103.py": "d37629acad7fdbfbf601c423dc6864b98c1e052316fbe47d34ec41c1aaf5c116",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0104.py": "d0b7887d2fac252e37e6237a663a68217544b6774ac81398acbedcf9b8770365",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py": "fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5",
@@ -37,6 +38,7 @@
     "functional modules/VDF/VDF_SystemManager_v0152.py": "765040f6a366c7fe59e5eac9e9bfad6bbf6e93314b7be51a1406d28030294105",
     "functional modules/VDF/VDF_SystemManager_v0108.py": "23af0f2c8b6c40eaaced7e814d52b7fa690b2ed8a8de1139b815fe3dbb793f11",
     "functional modules/VDF/VDF_SystemManager_v0148.py": "6ffb468574b496c84113bd4c89195002ee9b022495f521ead3b0f16730b16e15",
+    "functional modules/VDF/VDF_SystemManager_v0156.py": "070dbc6450b580c0cdcc86a52bc6b6127aa865a78684d0a9a7342e60daac5865",
     "functional modules/VDF/VDF_SystemManager_v0132.py": "aeffac17c2c1fc7b133411dd58a3cb6a543205b336ece4ab5e20965b2f3b4dc3",
     "functional modules/VDF/VDF_SystemManager_v0117.py": "eca4104cec126b1be186bfc094d49dd04f5cf5b5b86af00f5f5437a9b3e98820",
     "functional modules/VDF/VDF_SystemManager_v0141.py": "798b2d82bf4b835b1e110e4bb9c3346cc72adc5ea52935fac0816d5501f7a8d9",
@@ -177,7 +179,7 @@
     "platform": "linux"
   },
   "log": "docs/handoff/evidence/vdf_activatevdf.txt",
-  "log_sha256": "619352b70c15c6f03b880f7386e3140e8f47695c23901a85f91e567a2fde3441",
-  "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
+  "log_sha256": "e8de61e15a06d3027242b36f95cdbdfbb3f759a577d7bc25fdcbb5e9e4dff248",
+  "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0108 總覽卡他系統表分開命名 VRN-1 / VRN-2 / VCGC(L123 四系統)· 本輪資料庫流程多一步 db_xcheck(universe xcheck:兩個以上來源相同即算對照成功)+ v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
   "production_database_verified": false
 }
