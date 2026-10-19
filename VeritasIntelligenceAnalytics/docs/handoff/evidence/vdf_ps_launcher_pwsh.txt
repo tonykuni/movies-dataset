@@ -184,3 +184,14 @@ exit=2
       0b738b925d753c1183fe0e7b5ae16330ddbbfee578ed65cf85dc6d5a9237ad44  functional modules/VDF/Invoke-VDF-Activate-v0105.ps1
       fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
       44041f4bc0731754710dcddf8ba9ecb4752f5571052782717b03979aca2aa47b  functional modules/VDF/VDF_SystemManager_v0155.py
+
+## ActivateVDF v0107(記憶體 / TEMP 本輪鉤)+ ENG045 v0102 · 容器 pwsh 7.4.6 全流程(2026-10-19)
+- pwsh -NoProfile -File opsession6.ps1 -Ver v0105(-Action run -Mode live -NoOpen -RefillApply -FetchHome <VDF>;雙閘沒開)
+  第一次 593 秒:①b GREEN(溢寫 → 本輪 temp/probe/p<pid> · 記憶體 2.6 GiB = 預算 · 執行緒 1 · 鉤 VDF 本輪鉤)· 引擎 94/94 · 自測 GREEN 65 · NODATA 8 · RED 2(ENG045 · ActivateVDF v0107)
+  查因:ENG045 自測共用夾併跑互撞(四支併跑三輪各 2 支 FAIL 重現)· v0107 自測吃到父輪 VIA_VDF_DUCK_HOOK → 修 ENG045 v0102 · v0107 自測基底
+  第二次 505 秒:①b GREEN · 引擎 94/94 · 自測 GREEN 67 · NODATA 8 · RED 0 · 3b Py 93/93 · 3c PS 161/161 · 6⑤ 資料庫清點 RED 18(容器部分副本)· 結束碼 1
+- 自測:v0107 ㉙–㉞ 6/6(突變:鉤不裝 ㉚ / 不往後接力 ㉛ / 不讓位 ㉜ 各 FAIL)· ENG045 v0102 3/3 三輪(突變:改回共用夾 ① FAIL)
+- 擊斃閘 11 條全過 · CGC_MDL158 read 兩檔問題 0 · 編號 +25 / +9(遺失 0 · 改身分 0 · 重號 0)· registry-sync
+- sha256:
+      6ac6badea1a7fe2740c8ee4a99bab527ac7dbc0bd6fee8ea3ed3505f82c52b16  functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py
+      80af855844a199bf23d9a62b4b6bf1486894a8b7685b854138ec6b3a52aea55f  functional modules/VDF/VDF_ENG045_OutputHub_v0102.py

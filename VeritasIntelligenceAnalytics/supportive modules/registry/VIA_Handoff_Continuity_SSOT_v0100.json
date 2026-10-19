@@ -2693,8 +2693,8 @@
         "VDF_MDL013_ActivateVDF",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL013_ActivateVDF v0106 本版 4/4 · PASS",
-      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "success_marker": "[計] VDF_MDL013_ActivateVDF v0107 本版 6/6 · PASS",
+      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL013_ActivateVDF_v*.py",
         "functional modules/VDF/ActivateVDF.py",
@@ -5677,6 +5677,16 @@
       "owner": "操作員 / AI",
       "reason": "操作員令「清點資料庫沒問題就是收尾」:收尾條件 = 工作站 Invoke-VDF-Activate v0105 真跑(雙閘由操作員本視窗親手開 · -RefillApply)後,自動跳出的總覽頁「資料庫清點」VDF 自己的表 0 紅(終端末段印「[收尾] 資料庫清點沒問題」)",
       "next": "操作員回貼 MATRIX SUMMARY(含 6⑤ 資料庫清點列與 [收尾] 行)→ 0 紅 = AI 把 ps-launcher / workstation-v0101 / 本項轉 VERIFIED 並收尾;有紅 = 照頁上「怎麼補」逐列處理後重跑"
+    },
+    {
+      "id": "VDF-REQ018:activatevdf-v0107-memtemp",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-19「繼續 跑完貼回結果 對於記憶體跟TEMP支援方式用最快最佳的方法 自動完成」:量測 —— 子行程早有 TMP/TEMP/POLARS_TEMP_DIR/VIA_DUCKDB_TEMP_DIR/VIA_DUCKDB_MEM,但 VDF 267 支直接 duckdb.connect() 而 DuckDB 不讀環境變數;只有 VCGC CGC_MDL262 代裝進環境的 .pth 鉤才補 → 沒裝的境溢寫落資料庫旁(工作站 = OneDrive)、每行程吃實體記憶體 80%、執行緒 = 全部核。v0107:每輪把小鉤寫進本輪 temp 夾、排子行程 PYTHONPATH 最後(中央 bootstrap 接力;往後接力不回頭),duckdb import 那刻才掛,connect 補 temp_directory = 本輪流程 temp/p<pid> · memory_limit = 每條預算 · threads = 每條執行緒(呼叫端自己給的優先);環境已有 VCGC via_duck_temp 則讓位;VIA_DUCK_TEMP=0 關;起跑實測 1 秒(①b 一行 + 總覽頁卡 + resources.memtemp)。自測 ㉙–㉞ 6/6;突變:鉤不裝 → ㉚ FAIL · 不往後接力 → ㉛ FAIL · 不讓位 → ㉜ FAIL;擊斃閘過 → 已驗:2026-10-19T14:20:38+00:00 rc 0 · v0107 標記見到(經 VDF_SystemManager engine run)",
+      "next": "handoff test vdf_activatevdf(rc 0 + v0107 標記)轉 VERIFIED;工作站真跑看 ①b 行「鉤 VDF 本輪鉤 / VCGC 環境鉤」與溢寫夾在 %LOCALAPPDATA%\\VIA_TEMP",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
     }
   ]
 }
