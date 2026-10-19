@@ -20,6 +20,7 @@
      三表同日代號:有資料的表兩兩比代號集合;至少兩表完全相同 → GREEN;兩表以上有資料但都不同 → YELLOW(列缺漏樣本);
        庫裡不到兩張表 → YELLOW(沒得對照);表在但當日少於兩表有資料 → 最新日 YELLOW(日更未齊)、舊日 RED。
      universe xcheck 末行多印「[計] VDF 互對照 …」(ActivateVDF 的步驟摘要讀這行)。前版 v0122 自測跑前換回原判法。
+     universe xcheck [--home 夾]:讀 db check 同一個家的三本庫(⑧ 的選法;每本用 db check 同一個找法,家裡沒有的才退回倉內路徑)。
   ⑧ 庫在哪(操作員 2026-10-19「查之前的對話紀錄,找到資料庫的位置位於文件之中」):文件記載資料家 = VIA_DataHome_SSOT home_win
      C:\\Users\\tonyk\\VIA System\\via_database(批490 操作員宣告;鏡根 via_database\\movies-dataset\\data\\…\\VDF\\output_hub;
      db move 的目的地例 via_database\\vdf_database)。v0151 的 db_home 只認 --home > VIA_VDF_DB_HOME > 倉內 output_hub,
@@ -336,6 +337,23 @@ XM = _owner_module("xcheck_index")
 _UNIVERSE_V0122 = XM.universe
 _XCHECK_V0122 = XM.xcheck
 _LAST = {}
+_XDBS = {}
+XCHECK_DB_NAMES = {"idx": "VDF_TWIndex_Daily.duckdb", "tw": "vdf_tw_market.duckdb", "gl": "vdf_global_market.duckdb"}
+
+
+def xcheck_dbs(home: str | None = None, reg: Path | None = None) -> dict:
+    """互對照讀哪三本庫:跟 db check 同一個家(--home 照用;沒給 = locate_db_home 選的),每本用 db check 同一個找法;
+    家裡找不到的那本才退回 v0122 寫死的倉內路徑。回 {dbs, home, why, from_home: [找到的鍵]}。"""
+    pick = locate_db_home(home, reg)
+    h = Path(pick["picked"])
+    dbs, hit = {"idx": XM.DB_IDX, "tw": XM.DB_TW, "gl": XM.DB_GL}, []
+    if h.is_dir():
+        for k, name in XCHECK_DB_NAMES.items():
+            found = DB_MOD._find_db(h, name)[0]
+            if found is not None:
+                dbs[k] = found
+                hit.append(k)
+    return {"dbs": dbs, "home": str(h), "why": pick["why"], "from_home": hit}
 
 
 def agree_pairs(vals: dict, tol: dict) -> tuple:
@@ -435,6 +453,8 @@ def xcheck_counts(days: int = 20, db: Path | None = None) -> dict:
 
 def xcheck(days: int = 20, write: bool = True, dbs: dict | None = None, out_db=None, reports=None) -> dict:
     kw = {k: v for k, v in (("out_db", out_db), ("reports", reports)) if v is not None}
+    if dbs is None and _XDBS.get("dbs"):              # universe xcheck 動詞:讀 db check 同一個家(PR #537 Codex P1)
+        dbs = _XDBS["dbs"]
     rep = _XCHECK_V0122(days, write, dbs, **kw)
     _LAST.clear()
     _LAST.update(rep)
@@ -451,7 +471,16 @@ def summary_line(rep: dict) -> str:
 
 def universe(args: list) -> int:
     _LAST.clear()
-    rc = _UNIVERSE_V0122(args)
+    _XDBS.clear()
+    if (args[:1] or [""])[0] == "xcheck":
+        h = args[args.index("--home") + 1] if "--home" in args and args.index("--home") + 1 < len(args) else None
+        _XDBS.update(xcheck_dbs(h))
+        print("  [庫位置] 互對照讀 %s · %s · 家裡找到 %s(其餘照倉內路徑)"
+              % (_XDBS["home"], _XDBS["why"], "/".join(_XDBS["from_home"]) or "0 本"))
+    try:
+        rc = _UNIVERSE_V0122(args)
+    finally:
+        _XDBS.clear()
     if (args[:1] or [""])[0] == "xcheck" and _LAST:
         print("  " + summary_line(_LAST))
     return rc
@@ -511,7 +540,10 @@ def _selftest_xcheck(chk) -> None:
         if duckdb is None:
             chk("⑬ duckdb 不在本境 → 互對照只驗判法(不代裝;⑩–⑫ 要 duckdb 才跑)", True)
         else:
-            idx, tw, gl = td / "idx.duckdb", td / "tw.duckdb", td / "gl.duckdb"
+            hh = td / "hh"
+            (hh / "tw_index").mkdir(parents=True)
+            (hh / "mega").mkdir()
+            idx, tw, gl = hh / "tw_index" / XCHECK_DB_NAMES["idx"], hh / "mega" / XCHECK_DB_NAMES["tw"], hh / "mega" / XCHECK_DB_NAMES["gl"]
             c = duckdb.connect(str(idx))
             c.execute("create table tw_index_daily(date date, index_code varchar, close double)")
             c.execute("insert into tw_index_daily values ('2026-10-01','TAIEX',100),('2026-10-02','TAIEX',100),('2026-10-03','TAIEX',100),"
@@ -554,18 +586,18 @@ def _selftest_xcheck(chk) -> None:
                        "2026-10-03": ("YELLOW", "")}
                 and [r["lamp"] for r in cs["rows"]] == ["YELLOW", "YELLOW"] and cs["verdict"] == "YELLOW", (lc, cs.get("rows")))
             buf = io.StringIO()
-            prev = {k: getattr(XM, k) for k in ("DB_IDX", "DB_TW", "DB_GL")}
-            XM.DB_IDX, XM.DB_TW, XM.DB_GL = idx, tw, gl
-            try:
-                with contextlib.redirect_stdout(buf):
-                    rc = XM.universe(["xcheck", "--dry"])
-            finally:
-                for k, v in prev.items():
-                    setattr(XM, k, v)
+            with contextlib.redirect_stdout(buf):
+                rc = XM.universe(["xcheck", "--dry", "--home", str(hh)])
             out = buf.getvalue()
-            chk("⑫ universe xcheck 動詞走本版:末行「[計] VDF 互對照」帶規則 · 兩判;紅 → rc 1;--dry 不寫",
-                re.search(r"\[計\] VDF 互對照\(" + RULE + r"\)· 加權收盤 RED\(2/5 日.*三表同日代號 YELLOW\(2/3 日", out) is not None and rc == 1,
-                (rc, out[-400:]))
+            chk("⑫ universe xcheck --home 動詞走本版:讀那個家的三本庫(不是倉內寫死路徑);末行「[計] VDF 互對照」帶規則 · 兩判;紅 → rc 1;--dry 不寫",
+                re.search(r"\[計\] VDF 互對照\(" + RULE + r"\)· 加權收盤 RED\(2/5 日.*三表同日代號 YELLOW\(2/3 日", out) is not None and rc == 1
+                and "[庫位置] 互對照讀 %s" % hh in out and "idx/tw/gl" in out and not _XDBS, (rc, out[-400:]))
+            empty = td / "empty_home"
+            empty.mkdir()
+            xd = xcheck_dbs(str(empty))
+            chk("⑰ 家裡沒有的那本才退回倉內路徑(v0122 寫死的 DB_IDX / DB_TW / DB_GL);家裡有的用家裡的",
+                xd["from_home"] == [] and xd["dbs"] == {"idx": XM.DB_IDX, "tw": XM.DB_TW, "gl": XM.DB_GL}
+                and xcheck_dbs(str(hh))["dbs"] == {"idx": idx, "tw": tw, "gl": gl}, xd)
     finally:
         shutil.rmtree(td, ignore_errors=True)
 

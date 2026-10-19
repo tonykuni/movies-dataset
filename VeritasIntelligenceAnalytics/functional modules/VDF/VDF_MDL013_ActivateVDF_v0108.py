@@ -13,7 +13,7 @@ v0106 的總覽卡寫死「VRN / VCGC 寫的表」,沒分 VRN-1 / VRN-2。本版
      --dry 時帶 --dry(不寫 OUT-06 / OUT-07);資料庫流程被中斷就不跑;只在本版的一輪裡加(前版自測照舊)。
   ④b 庫在哪:資料庫流程一開始先問管理員 db where(VDF_SystemManager v0156:沒給 --db-home 或給的是倉內預設 output_hub →
      照 VIA_DataHome_SSOT 的資料家 C:\Users\tonyk\VIA System\via_database 等候選,選找到最多本庫的那個),
-     db check / refill 用同一個家(--home 換成選到的);操作員給了別的 --db-home / VIA_VDF_DB_HOME 照用。
+     db check / refill / universe xcheck 用同一個家(--home 換成選到的;xcheck 也帶 --home);操作員給了別的 --db-home / VIA_VDF_DB_HOME 照用。
   ⑤ 手機寬(390 px)不橫捲:v0107 記憶體 / TEMP 卡的 temp 長路徑與頁尾連結清單的長路徑撐到 697 px → 卡片與清單項可斷行(表格照舊在 .wrap 內橫捲)。
 其餘全照 v0107(記憶體 / TEMP 鉤 · 起跑實測)。VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境。
 """
@@ -171,7 +171,8 @@ def flow_db(opt, res, gate, log_dir, manager=None, py=None) -> dict:
         out = dict(out, steps=pre + list(out.get("steps") or []), db_home=getattr(opt, "db_home", None))
     if not _RUN8["on"] or out.get("lamp") == "INTERRUPTED" or FLM.STOP.is_set():
         return out
-    args = ["universe", "xcheck", "--days", "20"] + (["--dry"] if getattr(opt, "dry", False) else [])
+    args = (["universe", "xcheck", "--days", "20"] + (["--dry"] if getattr(opt, "dry", False) else [])
+            + (["--home", opt.db_home] if getattr(opt, "db_home", None) else []))   # 跟 check / refill 同一個家(PR #537 Codex P1)
     s3 = FLM.run_step("db_xcheck", args, V0100.flow_env(res, "db"), log_dir, gate, getattr(opt, "timeout", None), manager, py)
     steps = list(out.get("steps") or []) + [s3]
     lamps = [x.get("lamp") for x in steps]
@@ -290,12 +291,12 @@ def selftest() -> int:
         FLM._FLOW_DB_V0100, FLM.run_step, V0100.flow_env = keep[0], keep[1], keep[3]
         if not keep[2]:
             FLM.FETCH_DONE.clear()
-    chk("⑤ 本輪資料庫流程:先 db where(選到的家換進 --home,check / refill 同一個家)· 末尾 db_xcheck(universe xcheck --days 20;--dry 帶 --dry);"
+    chk("⑤ 本輪資料庫流程:先 db where(選到的家換進 --home,check / refill / xcheck 同一個家)· 末尾 db_xcheck(universe xcheck --days 20 --home 家;--dry 帶 --dry);"
         "燈併進流程(黃蓋綠);流程被中斷不跑 xcheck;不在本版一輪 = 照前版",
         [s["step"] for s in r1["steps"]] == ["db_where", "db_check", "db_refill", "db_xcheck"] and r1["lamp"] == "YELLOW"
         and r1.get("db_home") == "/data/home/vdf_database" and homes[:2] == ["/data/home/vdf_database", "/data/home/vdf_database"]
-        and calls[:2] == [("db_where", ["db", "where"]), ("db_xcheck", ["universe", "xcheck", "--days", "20"])]
-        and calls[3] == ("db_xcheck", ["universe", "xcheck", "--days", "20", "--dry"])
+        and calls[:2] == [("db_where", ["db", "where"]), ("db_xcheck", ["universe", "xcheck", "--days", "20", "--home", "/data/home/vdf_database"])]
+        and calls[3] == ("db_xcheck", ["universe", "xcheck", "--days", "20", "--dry", "--home", "/data/home/vdf_database"])
         and r2["lamp"] == "YELLOW" and r3["lamp"] == "INTERRUPTED" and [s["step"] for s in r3["steps"]] == ["db_where", "db_check", "db_refill"]
         and r4["lamp"] == "GREEN" and len(r4["steps"]) == 2 and homes[3] is None and len(calls) == 5, (r1, calls, homes, r3, r4))
     src = Path(__file__).read_text(encoding="utf-8")

@@ -325,3 +325,7 @@ PS 啟動器預設把它當 `--db-home` 傳,而 v0151 的 `db_home` 只認 `--ho
 選「冊上的庫找到最多本」的那一個(同分取前面);給了別的 `--db-home` / `VIA_VDF_DB_HOME` = 操作員指定照用。
 新動詞 `db where`;ActivateVDF 本輪資料庫流程先跑 `db_where`,db check / refill 用同一個家;db check 終端印 `[庫位置] …` 與每個候選找到幾本。
 自測 ⑭–⑯(v0156 本版 14/14);突變 6 個全抓。
+PR #537 Codex P1(未合併,直接改 v0156 / v0108):`universe xcheck` 原本讀 v0122 寫死的倉內 output_hub 三本庫,跟 check / refill 不是同一個家。
+改:`universe xcheck [--home 夾]` 先照 ⑧ 選家,三本庫(VDF_TWIndex_Daily · vdf_tw_market · vdf_global_market)用 db check 同一個找法,家裡沒有的才退回倉內路徑,
+終端印 `[庫位置] 互對照讀 …`;ActivateVDF 的 db_xcheck 帶 `--home` 選到的家。自測 ⑫(--home 真跑)· ⑰(退回倉內);突變 3 個全抓。
+Codex P2(⑭ 假設倉內 output_hub 在):已於 955016c4d 修(CI 稀疏檢出沒有那個夾)。
