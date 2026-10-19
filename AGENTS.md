@@ -2,7 +2,7 @@
 
 適用本倉。操作員授權與本次指令優先；不得從舊對話推定未跑的實測已成功。
 
-0. 三系統對等獨立(政策 L120;操作員 2026-10-10):VCGC · VDF · VRN 三個 SYSTEM MANAGER 對等,各是自己系統的入口,互不影響、互相只讀監控、各自獨立運作;不再有唯一入口。下面的 VCGC 步驟是 VCGC 自己的工具與檢查。
+0. 四系統對等獨立(政策 L123 修訂 L120;操作員 2026-10-19):VRN-1 · VRN-2 · VDF · VCGC 四個系統對等,各是自己系統的入口,互不干涉、互相只讀監控、各自獨立運作;不再有唯一入口。提到他系統一律分開寫 VRN-1 / VRN-2 / VDF / VCGC(VRN-1 = 另一團隊的倉,不在本倉、只讀;VRN-2 = `ActivateVRN-2.py` → VRN-2 SystemManager,本倉 `VRN_SystemManager` 是它的底座)。下面的 VCGC 步驟是 VCGC 自己的工具與檢查。
 
 1. 第一個專案操作經 VCGC 的 `token`，使用鎖定的 read / slice / digest / etag；讀檔方式見 `CLAUDE.md`。不要改選工具尾版或全量重跑已成功擷取。
 2. 接著經 VCGC 主控台(VCGC 自己的入口)執行 `handoff check`，讀 `VeritasIntelligenceAnalytics/docs/handoff/HANDOFF_latest.json` 的 findings、pending、reusable_successes。RED／YELLOW 先處理差異，不可略過後宣告成功。
