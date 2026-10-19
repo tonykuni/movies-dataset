@@ -168,3 +168,19 @@ exit=2
 - sha256:
       8ea8f106fb6224410d9578497af276e9c855ba4bf87434b89baea59dab53b6ca  functional modules/VDF/Invoke-VDF-Activate-v0104.ps1
       77681bce9a378a59180ffd0cf3ec3d5d0d8f7802a20e6e6fdcad9eb5ec91aec0  functional modules/VDF/VDF_MDL013_ActivateVDF_v0105.py
+
+## v0105 + ActivateVDF v0106 + VDF_SystemManager v0155(資料庫清點 · 中斷 130)容器 pwsh 7.4.6 實跑(2026-10-19)
+- VIA_SKIP_PRIOR_SELFTEST=1 python3 'functional modules/VDF/VDF_SystemManager_v0155.py' --selftest → 本版 6/6 PASS;不跳前版 → 全鏈 0 FAIL rc 0
+- python3 'functional modules/VDF/ActivateVDF.py' --selftest → rc 0(v0106 4/4 · v0105 2/2 · v0104 4/4 · v0103 2/2 · v0102 6/6 · v0101 · v0100 16/16)
+- VIA_VDF_HEALTH_OUT=<scratch> VIA_FROM_VCGC=YES python3 'functional modules/VDF/VDF_SystemManager_v0155.py' db check → RED 18 · YELLOW 29 · GREEN 4 · INFO 14(他系統 12 原判紅 9 · min0 改黃 7);v0151 同庫 RED 34
+- VIA_FROM_VCGC=YES python3 'functional modules/VDF/ActivateVDF.py' run --no-open --mode fixture --flows db → [資料庫清點] RED · VDF 表 紅 18 · 黃 29 · 綠 4 · 他系統 12 · 還不能收尾
+- Chromium(Playwright)開 ACTIVATE_VDF_latest.html:寬 1200 淺 / 深、390 px → scrollWidth 1200 / 1200 / 390 · pageerror 0 · #db-inventory 1
+- pwsh -NoProfile -File opsession5.ps1 -Ver v0105(仿操作員視窗;-Action run -Mode fixture -Flows db -SkipSelftest -NoOpen -FetchHome <VDF>)
+  → 開頭「[同意閘] 沒開(…=(空))」· 6⑤ 資料庫清點 RED · [收尾] 還不能:VDF 自己的表 紅 18 列 · 結束碼 1
+- SIGINT(= Ctrl+C)在 ② 加速器自測中途送給 pwsh(opsig.ps1 -Action preflight):
+  v0104 → 「━━ 結束碼 0 · GREEN」(假綠)· v0105 → 「━━ 結束碼 130」+ 列「! 中斷 INTERRUPTED 主體沒走完」
+- Parser 錯 0 · pslint GREEN(尾版 704 · 缺加速器 0 · 自壓頁 0)· 擊斃閘 rc 0(P024 位元吻合;KILL-09 撞號 ② 已改 ⑦)· CGC_MDL158 read 三檔問題 0
+- sha256:
+      0b738b925d753c1183fe0e7b5ae16330ddbbfee578ed65cf85dc6d5a9237ad44  functional modules/VDF/Invoke-VDF-Activate-v0105.ps1
+      167a1162d848aaafd2533f3d1f80baf89810a151cd53150f2d60ad0a884f2031  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
+      44041f4bc0731754710dcddf8ba9ecb4752f5571052782717b03979aca2aa47b  functional modules/VDF/VDF_SystemManager_v0155.py
