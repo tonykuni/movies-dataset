@@ -458,7 +458,7 @@ def selftest() -> int:
         res = V0100.optimize_resources(want=3, stamp="20261019_120000", root=t)
         plan = res["plan"]
         base = dict(os.environ)
-        for k in ("PYTHONPATH", "VIA_DUCK_TEMP"):
+        for k in ("PYTHONPATH", "VIA_DUCK_TEMP", "VIA_VDF_DUCK_HOOK"):   # 自測可能在一輪真跑裡被啟動(引擎啟動檢查)→ 父輪的鉤標記不帶進來
             base.pop(k, None)
         mark = t / "mark.txt"
         _RUN7["on"] = True
