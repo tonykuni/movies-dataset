@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""VDF_MDL013_ActivateVDF v0107 — 薄尾:溢寫模式時記憶體閘不等(操作員令 2026-10-19:「自動修改 VDF 讓溢寫模式時不用等 · 用最快的方法完成指令」)
+r"""VDF_MDL013_ActivateVDF v0107 — 薄尾:記憶體 / TEMP 本輪真生效(DuckDB 溢寫到本機 TEMP · 記憶體與執行緒照每條流程預算)+ 起跑實測
 
-  工作站實跑(launcher v0104 · ActivateVDF v0105):16 GB 只剩 620 / 1,142 MB 可用 → 每一步起跑前都卡記憶體閘
-  (可用 < 總量 10% ≈ 1,608 MB = 壓力)滿 600 秒,等的時候一行不印 → 40 分鐘裡約 30 分鐘在空等、看起來像當機。
-  但記憶體少的時候 v0100 本來就已經開溢寫:子行程 TMP / TEMP / POLARS_TEMP_DIR / VIA_DUCKDB_TEMP_DIR 指本輪 temp 夾、
-  DuckDB 上限壓到 256 MB 起、VIA_SPILL_TO_DISK=1 —— 溢寫模式下再等記憶體只是浪費時間。
-本版:
-  ① 本輪起跑時資源計畫是溢寫模式(plan["spill"]:可用 < 保留 1,024 + 每條 1,024 × 3 條 ≈ 4 GB)→ 記憶體閘不等:
-     有壓力也直接起這一步,印一行「[溢寫不等] 步名 · 可用 X MB」(不再空白 10 分鐘);沒壓力照常直接起。
-  ② 不是溢寫模式 → 一字不改照 v0101 gate_wait(壓力就等,最多 600 秒,Ctrl+C 立刻放手)。
-  ③ VIA_ACT_SPILL_NOWAIT=0 → 關掉本版行為(溢寫模式也照等)。
-  ④ 總覽 JSON 多一節 spill_nowait(是否溢寫模式 · 起跑可用 · 沒等的步與當下可用)· 跑完印一行。
-  ⑤ 資料庫流程等擷取流程寫完才開庫(DuckDB 一檔一次只准一個行程寫)不是記憶體閘 → 照舊等(保資料)。
-  做法:只換 v0101 模組的 gate_wait(它的 run_step 起步前查模組全域)與 v0100 的 optimize_resources / write_report 外包一層;
-  前版檔一字不動 · 只在本版 activate 跑的那一輪生效(前版自測不受影響)。
-VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib。
+操作員令(2026-10-19):「繼續 跑完貼回結果 對於記憶體跟TEMP支援方式用最快最佳的方法 自動完成」。
+量測(改前):v0100 起每條流程已給子行程 TMP / TEMP / TMPDIR / POLARS_TEMP_DIR / VIA_DUCKDB_TEMP_DIR(本輪 temp 夾)·
+  VIA_DUCKDB_MEM(每條預算)· 執行緒上限;但 VDF 有 267 支直接 duckdb.connect(),**DuckDB 不讀環境變數** ——
+  只有 VCGC 的 CGC_MDL262_DuckTempHook 代裝進環境(.pth)後,connect 才會補 temp_directory / memory_limit。
+  沒裝那個鉤的境:DuckDB 溢寫檔落在**資料庫旁邊**(工作站 = OneDrive 夾,同步拖慢)、每支行程各吃實體記憶體 80%、
+  執行緒 = 全部核(三條流程並行時互搶)。
+最快最佳解(不改任何引擎、不裝進環境、不改他系統):
+  ① 每輪把一支小啟動鉤寫進**本輪 temp 夾**(<temp>/ActivateVDF/run_*/pyhook/sitecustomize.py;不在倉內,舊輪照滾動清),
+     放在子行程 PYTHONPATH **最後**。中央 bootstrap 的 sitecustomize 本來就會接力「sys.path 上下一份同名檔」→ 跑到本鉤;
+     沒有 bootstrap 時本鉤就是那一份。本鉤跑完再往**後面**接力(原本會載的那一份照載,不遞迴、不回頭)。
+  ② 鉤只在 duckdb 被 import 那一刻掛(沒用 duckdb 的行程零成本);每個 connect() 呼叫端沒給的才補:
+     temp_directory = VIA_DUCKDB_TEMP_DIR/p<pid>(本機 TEMP · 每行程一夾不撞檔)· memory_limit = VIA_DUCKDB_MEM(每條預算,超過落 TEMP)·
+     threads = VIA_DUCKDB_THREADS(每條執行緒;三條並行不互搶)。呼叫端自己給的照舊優先。子行程再起的孫行程同樣生效(環境繼承)。
+  ③ 環境已裝 VCGC 的 via_duck_temp 鉤 → temp / 記憶體讓它管(不疊兩層),只補它沒管的 threads(PR #536 Codex P1);
+     VIA_DUCK_TEMP=0 → 整個不掛(回原生 duckdb)。
+  ④ 起跑實測(約 1 秒):用流程同一支 python 起子行程開一次 duckdb,讀回 temp_directory · memory_limit · threads 與是哪個鉤生效;
+     temp 根在 OneDrive / 剩餘空間 < 2 GB 照實標黃。結果進總覽 JSON(resources.memtemp)、終端一行、總覽頁一張卡。
+  ⑤ 只在本版的一輪裡生效(前版自測照舊,不碰它們驗的 PYTHONPATH)。
+其餘全照 v0106。VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -63,13 +68,15 @@ def _via_net():
     except Exception:
         return None
 
+import html
 import importlib.util
+import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import threading
-import time
 import warnings
 from pathlib import Path
 
@@ -98,75 +105,354 @@ def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-_GATE_WAIT_V0101 = PRIOR.gate_wait                 # v0101 定義的那一支(v0102 起的薄尾只是把名字抄進自己的全域)
-_V0101 = _GATE_WAIT_V0101.__globals__              # v0101 模組全域:它的 run_step 起步前在這裡查 gate_wait
-_OPTIMIZE_V0100 = V0100.optimize_resources
-_WRITE_REPORT_PRIOR = V0100.write_report           # v0106 換上的總覽落檔(含資料庫清點)
-_SPILL = {"armed": False, "on": False, "avail_mb": None, "skipped": []}
-_SPILL_LOCK = threading.Lock()
+HOOK_TAG = "vdf-activate-v0107"
+HOOK_SRC = r"""# VDF ActivateVDF 本輪 DuckDB TEMP / 記憶體 / 執行緒掛鉤(VDF_MDL013_ActivateVDF v0107 每輪寫進本輪 temp 夾;不在倉內、不進環境)
+# 中央 bootstrap 接力到本檔,或本檔就是第一份 sitecustomize;跑完往 sys.path 後面接力(不回頭、不遞迴)。VIA_DUCK_TEMP=0 不掛。
+import os, sys
+_TAG = "vdf-activate-v0107"
 
 
-def spill_nowait_enabled() -> bool:
-    return str(os.environ.get("VIA_ACT_SPILL_NOWAIT", "1")).strip() not in ("0", "no", "NO", "false", "False")
+def _defaults():
+    d = {}
+    base = os.environ.get("VIA_DUCKDB_TEMP_DIR")
+    if base and os.path.isdir(base):
+        d["temp_directory"] = os.path.join(base, "p%d" % os.getpid())
+    if os.environ.get("VIA_DUCKDB_MEM"):
+        d["memory_limit"] = os.environ["VIA_DUCKDB_MEM"]
+    try:
+        th = int(os.environ.get("VIA_DUCKDB_THREADS") or 0)
+    except ValueError:
+        th = 0
+    if th > 0:
+        d["threads"] = th
+    return d
 
 
-def optimize_resources(*a, **k) -> dict:
-    """同 v0100 optimize_resources;本版 activate 跑的那一輪記下資源計畫是不是溢寫模式。"""
-    res = _OPTIMIZE_V0100(*a, **k)
-    with _SPILL_LOCK:
-        if _SPILL["armed"]:
-            _SPILL["on"] = bool((res.get("plan") or {}).get("spill")) and spill_nowait_enabled()
-            _SPILL["avail_mb"] = (res.get("mem") or {}).get("avail_mb")
+def _patch(mod):
+    if getattr(mod, "_via_duck_temp", None):
+        return mod
+    orig = mod.connect
+
+    def connect(*args, **kw):
+        try:
+            a = list(args)
+            cfg = dict((a[2] if len(a) >= 3 else kw.get("config")) or {})
+            for k, v in _defaults().items():
+                cfg.setdefault(k, v)
+            if len(a) >= 3:
+                a[2] = cfg
+            else:
+                kw["config"] = cfg
+            return orig(*a, **kw)
+        except TypeError:
+            return orig(*args, **kw)
+
+    connect.__doc__ = orig.__doc__
+    connect.__wrapped__ = orig
+    mod.connect = connect
+    mod._via_duck_temp = _TAG
+    return mod
+
+
+def _patch_threads(mod):
+    # 環境已有 VCGC 鉤時只補 threads(VCGC 鉤只補 temp / 記憶體);冪等
+    if getattr(mod, "_vdf_duck_threads", None):
+        return mod
+    th = _defaults().get("threads")
+    if not th:
+        return mod
+    orig = mod.connect
+
+    def connect(*args, **kw):
+        try:
+            a = list(args)
+            cfg = dict((a[2] if len(a) >= 3 else kw.get("config")) or {})
+            cfg.setdefault("threads", int(os.environ.get("VIA_DUCKDB_THREADS") or th))
+            if len(a) >= 3:
+                a[2] = cfg
+            else:
+                kw["config"] = cfg
+            return orig(*a, **kw)
+        except TypeError:
+            return orig(*args, **kw)
+
+    connect.__doc__ = orig.__doc__
+    connect.__wrapped__ = orig
+    mod.connect = connect
+    mod._vdf_duck_threads = _TAG
+    return mod
+
+
+class _VdfDuckFinder:
+    def __init__(self, threads_only=False):
+        self.threads_only = threads_only
+
+    def find_spec(self, name, path=None, target=None):
+        if name != "duckdb":
+            return None
+        try:
+            sys.meta_path.remove(self)
+        except ValueError:
+            pass
+        import importlib.util
+        spec = importlib.util.find_spec("duckdb")
+        if spec is None or spec.loader is None or not hasattr(spec.loader, "exec_module"):
+            return spec
+        real = spec.loader.exec_module
+
+        threads_only = self.threads_only
+
+        def exec_module(module):
+            real(module)
+            try:
+                _patch_threads(module) if threads_only else _patch(module)
+            except Exception:  # noqa: BLE001 — 掛不上 = 原生 duckdb 照用
+                return
+        spec.loader.exec_module = exec_module
+        return spec
+
+
+def _install():
+    if os.environ.get("VIA_DUCK_TEMP", "1") == "0":
+        return
+    threads_only = "via_duck_temp" in sys.modules    # 環境已有 VCGC 的鉤 → temp / 記憶體讓它管(不疊兩層),只補它沒管的 threads
+    if "duckdb" in sys.modules:
+        (_patch_threads if threads_only else _patch)(sys.modules["duckdb"])
+    elif not any(type(f).__name__ == "_VdfDuckFinder" for f in sys.meta_path):
+        sys.meta_path.insert(0, _VdfDuckFinder(threads_only))
+
+
+def _chain_after_me():
+    here = os.path.dirname(os.path.abspath(__file__))
+    seen = False
+    for d in list(sys.path):
+        if d and os.path.abspath(d) == here:
+            seen = True
+            continue
+        if not seen or not d:
+            continue
+        cand = os.path.join(d, "sitecustomize.py")
+        if os.path.isfile(cand):
+            import runpy
+            try:
+                runpy.run_path(cand, run_name="sitecustomize_after_vdf")
+            except Exception:  # noqa: BLE001 — 後面那份壞了不連累本行程
+                return
+            return
+
+
+try:
+    _install()
+except Exception:  # noqa: BLE001
+    pass
+try:
+    _chain_after_me()
+except Exception:  # noqa: BLE001
+    pass
+"""
+
+PROBE = r"""
+import json, os, sys
+out = {"python": sys.version.split()[0], "hook": None}
+try:
+    import duckdb
+except ImportError:
+    out["duckdb"] = None
+else:
+    out["duckdb"] = duckdb.__version__
+    out["hook"] = getattr(duckdb, "_via_duck_temp", None)
+    out["threads_hook"] = getattr(duckdb, "_vdf_duck_threads", None)
+    c = duckdb.connect()
+    for k in ("temp_directory", "memory_limit", "threads"):
+        try:
+            out[k] = str(c.execute("select current_setting('%s')" % k).fetchone()[0])
+        except Exception as exc:
+            out[k] = "?" + type(exc).__name__
+    c.close()
+print("VDFPROBE " + json.dumps(out))
+"""
+
+_RUN7 = {"on": False, "py": None}
+_LOCK7 = threading.Lock()
+
+
+def hook_dir(res: dict) -> Path:
+    """本輪鉤夾 = <本輪 temp>/pyhook;沒有就寫(冪等;內容不同就換新)。"""
+    d = Path(res["temp_run"]) / "pyhook"
+    f = d / "sitecustomize.py"
+    if not (f.is_file() and f.read_text(encoding="utf-8") == HOOK_SRC):
+        d.mkdir(parents=True, exist_ok=True)
+        f.write_text(HOOK_SRC, encoding="utf-8")
+    return d
+
+
+def with_hook(env: dict, res: dict) -> dict:
+    """子行程環境加本輪鉤:鉤夾放 PYTHONPATH 最後(中央 bootstrap 在前就由它接力;沒有就本鉤是第一份)。"""
+    d = str(hook_dir(res))
+    parts = [p for p in (env.get("PYTHONPATH") or "").split(os.pathsep)] if env.get("PYTHONPATH") else []
+    if d not in parts:
+        parts.append(d)
+    env["PYTHONPATH"] = os.pathsep.join(parts)
+    env["VIA_VDF_DUCK_HOOK"] = d
+    return env
+
+
+_FLOW_ENV_PRIOR = V0100.flow_env                   # = v0104 的 flow_env(v0102 numexpr + bootstrap 去重)
+
+
+def flow_env(res: dict, flow: str, base_env: dict | None = None) -> dict:
+    """同前版 flow_env;本版一輪裡多加本輪 DuckDB 鉤(前版自測照舊,不加)。"""
+    env = _FLOW_ENV_PRIOR(res, flow, base_env)
+    return with_hook(env, res) if _RUN7["on"] else env
+
+
+def _bytes(s) -> float | None:
+    """大小字串 → 位元組:'687MB' 十進位(DuckDB 的 MB = 1000²)· '655.1 MiB' 二進位;認不出 = None。"""
+    m = re.match(r"\s*([\d.]+)\s*([KMGT])(i?)B", str(s or ""), re.I)
+    if not m:
+        return None
+    n = "KMGT".index(m.group(2).upper()) + 1
+    return float(m.group(1)) * ((1024 if m.group(3) else 1000) ** n)
+
+
+def probe_memtemp(res: dict, py: str | None = None, timeout: float = 60) -> dict:
+    """起跑實測:用流程同一支 python、同一份流程環境起子行程開一次 duckdb,讀回實際生效的 temp / 記憶體 / 執行緒。"""
+    env = flow_env(res, "probe")
+    plan = res["plan"]
+    want_tmp = env.get("VIA_DUCKDB_TEMP_DIR") or ""
+    root = str(Path(res["temp_run"]).parent.parent)
+    out = {"temp_root": root, "temp_free_mb": res.get("temp_free_mb"), "want_mem_mb": plan.get("duckdb_mem_mb"),
+           "want_threads": plan.get("threads_per_flow"), "hook_dir": env.get("VIA_VDF_DUCK_HOOK")}
+    try:
+        cp = subprocess.run([py or sys.executable, "-c", PROBE], env=env, capture_output=True, text=True, timeout=timeout,
+                            encoding="utf-8", errors="replace")
+        line = next((ln for ln in cp.stdout.splitlines() if ln.startswith("VDFPROBE ")), None)
+        got = json.loads(line[9:]) if line else {}
+        if not line:
+            out["why"] = "子行程沒回實測(rc %s):%s" % (cp.returncode, (cp.stderr or "").strip()[-160:])
+    except subprocess.TimeoutExpired:
+        got, out["why"] = {}, "子行程實測逾時 %d 秒" % timeout
+    except OSError as exc:
+        got, out["why"] = {}, "起不了子行程:%s" % type(exc).__name__
+    out.update(got)
+    td = str(got.get("temp_directory") or "")
+    mem = _bytes(got.get("memory_limit"))
+    want_mem = _bytes(env.get("VIA_DUCKDB_MEM"))
+    notes, lamp = [], "GREEN"
+    if got.get("duckdb") is None:
+        lamp, notes = "YELLOW", ["這支 python 沒有 duckdb(不代裝)"]
+    else:
+        out["temp_ok"] = bool(want_tmp) and os.path.normcase(os.path.abspath(td)).startswith(os.path.normcase(os.path.abspath(want_tmp)))
+        out["mem_ok"] = mem is not None and bool(want_mem) and abs(mem - want_mem) <= 0.05 * want_mem
+        out["threads_ok"] = str(got.get("threads")) == str(plan.get("threads_per_flow"))
+        if not (out["temp_ok"] and out["mem_ok"] and out["threads_ok"]):
+            lamp = "YELLOW"
+            notes.append("沒生效:" + " · ".join(k for k, ok in (("TEMP", out["temp_ok"]), ("記憶體", out["mem_ok"]), ("執行緒", out["threads_ok"])) if not ok))
+    if "onedrive" in root.lower():
+        lamp = "YELLOW"
+        notes.append("temp 根在 OneDrive(同步拖慢):設 VIA_TEMP_ROOT 指到本機磁碟")
+    if res.get("temp_low"):
+        lamp = "YELLOW"
+        notes.append("temp 剩 %s MB(< 2 GB)" % res.get("temp_free_mb"))
+    out["lamp"] = lamp if not out.get("why") else "YELLOW"
+    hook = {HOOK_TAG: "VDF 本輪鉤"}.get(str(out.get("hook")), ("VCGC 環境鉤 " + str(out.get("hook"))) if out.get("hook") else "無")
+    out["summary"] = ("DuckDB 溢寫 → %s · 記憶體 %s(預算 %s MB)· 執行緒 %s · 鉤 %s · temp 剩 %s MB" % (
+        td or "—", got.get("memory_limit") or "—", plan.get("duckdb_mem_mb"), got.get("threads") or "—", hook, res.get("temp_free_mb"))
+        + (" · " + ";".join(notes) if notes else "") + (" · " + out["why"] if out.get("why") else ""))
+    return out
+
+
+_OPT_PRIOR = V0100.optimize_resources
+
+
+def optimize_resources(want: int = 3, stamp: str | None = None, root: Path | None = None) -> dict:
+    """同 v0100;本版一輪裡多做起跑實測(記憶體 / TEMP 真生效嗎),結果放 res['memtemp']。"""
+    res = _OPT_PRIOR(want=want, stamp=stamp, root=root)
+    if _RUN7["on"]:
+        res["memtemp"] = probe_memtemp(res, _RUN7["py"])
+        print(f"  ①b 記憶體 / TEMP {res['memtemp']['lamp']}:{res['memtemp']['summary']}", flush=True)
     return res
 
 
-def gate_wait(gate, who: str, max_wait: float = 600.0) -> float:
-    """溢寫模式 → 不等(有壓力也直接起 · 印一行);不是溢寫模式 → 照 v0101(壓力就等,最多 max_wait 秒,Ctrl+C 立刻放手)。"""
-    with _SPILL_LOCK:
-        on = _SPILL["armed"] and _SPILL["on"]
-    if gate is None or not on:
-        return _GATE_WAIT_V0101(gate, who, max_wait)
-    if not gate.ok.is_set():
-        s = [x for x in getattr(gate, "samples", []) if x is not None]
-        avail = s[-1] if s else None
-        with _SPILL_LOCK:
-            _SPILL["skipped"].append({"who": who, "avail_mb": avail})
-        _V0101["_say"](f"  [溢寫不等] {who} · 可用 {avail if avail is not None else '?'} MB(記憶體閘有壓力)· 溢寫模式直接起跑 · TEMP / DuckDB 溢寫已開")
-    return 0.0
+def _chain_modules():
+    m, out = PRIOR, []
+    for _ in range(16):
+        out.append(m)
+        m = vars(m).get("PRIOR")
+        if m is None:
+            break
+    return out
 
 
-def write_report(card: dict, ui_dir: Path | None = None) -> dict:
-    """同前版總覽落檔;本版那一輪多一節 spill_nowait。"""
-    with _SPILL_LOCK:
-        if _SPILL["armed"]:
-            card["spill_nowait"] = {"enabled": spill_nowait_enabled(), "spill_mode": _SPILL["on"], "avail_mb_at_start": _SPILL["avail_mb"],
-                                    "skipped": list(_SPILL["skipped"]), "tag": TAG}
-    return _WRITE_REPORT_PRIOR(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_PRIOR(card)
+for _m in _chain_modules():                        # 前版鏈各自叫模組全域的 flow_env / optimize_resources → 換上本版(冪等)
+    if "flow_env" in vars(_m):
+        _m.flow_env = flow_env
+    if "optimize_resources" in vars(_m):
+        _m.optimize_resources = optimize_resources
+
+_RENDER_V0106 = V0100.render_html
 
 
-_V0101["gate_wait"] = gate_wait                    # v0101 run_step 查模組全域 → 換上本版(前版檔一字不動)
-V0100.optimize_resources = optimize_resources      # v0101 activate 呼叫 PRIOR(= v0100).optimize_resources
-V0100.write_report = write_report
+def memtemp_card(mt: dict | None) -> str:
+    if not mt:
+        return ""
+    c = {"GREEN": "#1a7f37", "YELLOW": "#9a6700"}.get(mt.get("lamp"), "#cf222e")
+    return (f'<section id="mem-temp" class="card" style="margin:12px 0"><b>記憶體 / TEMP</b> '
+            f'<span class="lamp" style="background:{c}">{html.escape(str(mt.get("lamp")))}</span><br>'
+            f'{html.escape(str(mt.get("summary")))}<br><span class="mut">DuckDB 溢寫到本機 TEMP(不落資料庫旁的 OneDrive 夾)· 記憶體與執行緒照每條流程預算 · '
+            f'呼叫端自己給的設定優先 · VIA_DUCK_TEMP=0 可關</span></section>')
+
+
+def render_html(card: dict, ui_dir: Path) -> str:
+    h = _RENDER_V0106(card, ui_dir)
+    sec = memtemp_card((card.get("resources") or {}).get("memtemp"))
+    if not sec:
+        return h
+    i = h.find('<section id="db-inventory"')
+    if i < 0:
+        i = h.find('<div class="wrap"><table>')
+    return (h[:i] + sec + h[i:]) if i >= 0 else h.replace("</body>", sec + "</body>")
+
+
+V0100.render_html = render_html
+_ACTIVATE_V0106 = PRIOR.activate
 
 
 def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path | None = None) -> dict:
-    """同 v0106 activate;這一輪溢寫模式時記憶體閘不等;跑完印一行。"""
+    """同 v0106 activate;本輪開記憶體 / TEMP 鉤與起跑實測(只在本輪)。"""
     keep = PRIOR.TAG
     PRIOR.TAG = TAG
-    with _SPILL_LOCK:
-        _SPILL.update(armed=True, on=False, avail_mb=None, skipped=[])
+    with _LOCK7:
+        _RUN7["on"], _RUN7["py"] = True, py
     try:
-        card = PRIOR.activate(opt, manager, py, temp)
+        card = _ACTIVATE_V0106(opt, manager, py, temp)
     finally:
         PRIOR.TAG = keep
-        with _SPILL_LOCK:
-            sp = dict(_SPILL, skipped=list(_SPILL["skipped"]))
-            _SPILL.update(armed=False, on=False)
-    if sp["on"]:
-        print(f"  [溢寫不等] 本輪溢寫模式(起跑可用 {sp['avail_mb']} MB)· 記憶體閘沒等的步 {len(sp['skipped'])} 個"
-              + (":" + "、".join(x["who"] for x in sp["skipped"][:8]) if sp["skipped"] else "") + " · VIA_ACT_SPILL_NOWAIT=0 可關", flush=True)
+        with _LOCK7:
+            _RUN7["on"], _RUN7["py"] = False, None
     return card
 
+
+_WRITE_REPORT_V0106 = V0100.write_report
+
+
+def write_report(card: dict, ui_dir: Path | None = None) -> dict:
+    """同 v0106(先標本版再落檔);本版一輪裡 schema 標 v0107。"""
+    if _RUN7["on"]:
+        prev = PRIOR._WRITE_REPORT_V0100
+
+        def _stamp_then_write(c, u=None):
+            c["schema"], c["tag"] = "VDF_ActivateVDF_v0107", TAG
+            return prev(c, u) if u is not None else prev(c)
+        PRIOR._WRITE_REPORT_V0100 = _stamp_then_write
+        try:
+            return _WRITE_REPORT_V0106(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_V0106(card)
+        finally:
+            PRIOR._WRITE_REPORT_V0100 = prev
+    return _WRITE_REPORT_V0106(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_V0106(card)
+
+
+V0100.write_report = write_report
 
 for _n in dir(PRIOR):
     if not _n.startswith("__") and _n not in globals():
@@ -174,82 +460,135 @@ for _n in dir(PRIOR):
 
 
 # ---------------------------------------------------------------- 自測
+_FAKE_BOOT = """import os, runpy, sys
+open(os.environ['VDF_T_MARK'], 'a').write('boot\\n')
+here = os.path.dirname(os.path.abspath(__file__))
+for d in list(sys.path):
+    if not d or os.path.abspath(d) == here:
+        continue
+    c = os.path.join(d, 'sitecustomize.py')
+    if os.path.isfile(c):
+        runpy.run_path(c, run_name='sitecustomize_shadowed')
+        break
+"""
+_FAKE_TAIL = "import os\nopen(os.environ['VDF_T_MARK'], 'a').write('tail\\n')\n"
+_FAKE_VCGC = "import via_duck_temp\n" + _FAKE_BOOT          # 環境鉤(.pth)先載 via_duck_temp,bootstrap 照樣接力到本鉤
+_GRANDCHILD = ("import subprocess, sys, os\n"
+               "print(subprocess.run([sys.executable, '-c', sys.argv[1]], capture_output=True, text=True, env=os.environ).stdout)")
+
+
 def selftest() -> int:
     ok = []
 
     def chk(name, cond, note=""):
         ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}" + (f" · {note}" if note != "" else ""), flush=True)
-    print(f"=== {TAG} · 薄尾自測(溢寫模式時記憶體閘不等;沙盒 · 零網路)===", flush=True)
-    keep_env = os.environ.get("VIA_ACT_SPILL_NOWAIT")
+        print(f"  [{'OK' if cond else 'FAIL'}] {name}{(' · ' + str(note)) if note else ''}")
+
+    print(f"=== {TAG} · 薄尾自測(記憶體 / TEMP 本輪鉤 + 起跑實測;沙盒 · 零網路)===")
     try:
-        state = {"m": {"avail_mb": 300, "total_mb": 16000}}
-        g = V0100.MemGate(reader=lambda: state["m"], interval=0.05).start()
+        import duckdb  # noqa: F401
+        have_duck = True
+    except ImportError:
+        have_duck = False
+    with tempfile.TemporaryDirectory(prefix="activatevdf107_") as td:
+        t = Path(td)
+        res = V0100.optimize_resources(want=3, stamp="20261019_120000", root=t)
+        plan = res["plan"]
+        base = dict(os.environ)
+        for k in ("PYTHONPATH", "VIA_DUCK_TEMP", "VIA_VDF_DUCK_HOOK"):   # 自測可能在一輪真跑裡被啟動(引擎啟動檢查)→ 父輪的鉤標記不帶進來
+            base.pop(k, None)
+        mark = t / "mark.txt"
+        _RUN7["on"] = True
         try:
-            os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=True, avail_mb=300, skipped=[])
-            t0 = time.time()
-            w = _V0101["run_step"].__globals__["gate_wait"](g, "lists_run_009", 5.0)
-            dt = time.time() - t0
-            chk("㉕ 溢寫模式 + 記憶體閘有壓力(可用 300 / 16,000 MB)→ 不等(直接起)· 記一筆沒等的步 · v0101 run_step 用的就是本版 gate_wait",
-                w == 0.0 and dt < 0.5 and _SPILL["skipped"] and _SPILL["skipped"][0]["who"] == "lists_run_009" and not g.waits
-                and _V0101["run_step"].__globals__["gate_wait"] is gate_wait and PRIOR.run_step is _V0101["run_step"], f"{round(dt, 2)} 秒 · {_SPILL['skipped'][:1]}")
-            with _SPILL_LOCK:
-                _SPILL.update(on=False, skipped=[])
-            t0 = time.time()
-            gate_wait(g, "db_check", 0.4)
-            dt = time.time() - t0
-            chk("㉖ 不是溢寫模式 + 有壓力 → 照 v0101 等(本測最多 0.4 秒)· 記在記憶體閘的等待", 0.35 <= dt < 2 and g.waits and g.waits[-1]["who"] == "db_check", round(dt, 2))
-            with _SPILL_LOCK:
-                _SPILL.update(armed=False, on=True)
-            t0 = time.time()
-            gate_wait(g, "fetch_run_all", 0.4)
-            dt = time.time() - t0
-            chk("㉗ 不是本版 activate 那一輪(前版自測 / 直接叫)→ 照 v0101 等(溢寫旗標不生效)", 0.35 <= dt < 2, round(dt, 2))
-            state["m"] = {"avail_mb": 9000, "total_mb": 16000}
-            time.sleep(0.15)
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=True, skipped=[])
-            t0 = time.time()
-            gate_wait(g, "engine_list", 5.0)
-            chk("㉘ 溢寫模式但沒壓力 → 直接起 · 不印也不記", time.time() - t0 < 0.3 and not _SPILL["skipped"])
+            env = flow_env(res, "engines", base_env=dict(base))
+            env_off = dict(env, VIA_DUCK_TEMP="0")
+            probe = probe_memtemp(res) if have_duck else {}
         finally:
-            g.close()
-            with _SPILL_LOCK:
-                _SPILL.update(armed=False, on=False, avail_mb=None, skipped=[])
-        os.environ["VIA_ACT_SPILL_NOWAIT"] = "0"
-        off = spill_nowait_enabled()
-        os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
-        chk("㉙ VIA_ACT_SPILL_NOWAIT=0 → 關掉本版行為 · 沒設 = 開", off is False and spill_nowait_enabled() is True)
-        with tempfile.TemporaryDirectory() as td:
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=False, avail_mb=None, skipped=[])
-            res = V0100.optimize_resources(want=3, stamp="20261019_200000", root=Path(td))
-            with _SPILL_LOCK:
-                rec = (_SPILL["on"], _SPILL["avail_mb"])
-                _SPILL.update(armed=False, on=False, avail_mb=None)
-            chk("㉚ 起跑資源計畫 → 記下溢寫模式(= plan[\"spill\"])與起跑可用記憶體 · v0101 activate 用的 optimize_resources 是本版",
-                rec == (bool(res["plan"]["spill"]), res["mem"]["avail_mb"]) and V0100.optimize_resources is optimize_resources,
-                f"spill={res['plan']['spill']} · 可用 {res['mem']['avail_mb']} MB")
-    finally:
-        if keep_env is None:
-            os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
+            _RUN7["on"] = False
+        plain = flow_env(res, "engines", base_env=dict(base))
+        hd = env.get("VIA_VDF_DUCK_HOOK", "")
+
+        def run(e, code=PROBE, extra=()):
+            e = dict(e, VDF_T_MARK=str(mark))
+            cp = subprocess.run([sys.executable, *extra, "-c", code] if not extra else [sys.executable, "-c", _GRANDCHILD, PROBE],
+                                env=e, capture_output=True, text=True, timeout=120)
+            line = next((ln for ln in cp.stdout.splitlines() if ln.startswith("VDFPROBE ")), None)
+            return json.loads(line[9:]) if line else {"rc": cp.returncode, "err": cp.stderr[-300:]}
+
+        chk("㉙ 本輪環境:鉤夾在本輪 temp(不在倉內)且排 PYTHONPATH 最後;前版自測的環境不加鉤(它們驗的 PYTHONPATH 照舊)",
+            hd and Path(hd).is_relative_to(Path(res["temp_run"])) and env["PYTHONPATH"].split(os.pathsep)[-1] == hd
+            and (Path(hd) / "sitecustomize.py").read_text(encoding="utf-8") == HOOK_SRC and "VIA_VDF_DUCK_HOOK" not in plain
+            and hd not in (plain.get("PYTHONPATH") or ""), env.get("PYTHONPATH"))
+        if not have_duck:
+            chk("㉟ duckdb 不在本境 → 只驗環境與接力(不代裝;㉚ ㉜ 要 duckdb 才跑)", True)
         else:
-            os.environ["VIA_ACT_SPILL_NOWAIT"] = keep_env
+            want_tmp = env["VIA_DUCKDB_TEMP_DIR"]
+            got, grand, off = run(env), run(env, extra=("grand",)), run(env_off)
+            mem = _bytes(got.get("memory_limit"))
+            chk("㉚ 子行程與孫行程的 duckdb.connect() 都生效:溢寫夾 = 本輪流程 temp/p<pid> · 記憶體 = 每條預算 · 執行緒 = 每條執行緒;"
+                "VIA_DUCK_TEMP=0 → 不掛(回原生);起跑實測 GREEN 且三項都 ok",
+                got.get("hook") == HOOK_TAG and str(got.get("temp_directory", "")).startswith(want_tmp)
+                and mem and abs(mem - plan["duckdb_mem_mb"] * 1e6) <= 0.05 * plan["duckdb_mem_mb"] * 1e6
+                and str(got.get("threads")) == str(plan["threads_per_flow"])
+                and grand.get("hook") == HOOK_TAG and str(grand.get("temp_directory", "")).startswith(want_tmp)
+                and off.get("hook") is None and not str(off.get("temp_directory", "")).startswith(want_tmp)
+                and probe.get("lamp") == "GREEN" and probe.get("temp_ok") and probe.get("mem_ok") and probe.get("threads_ok"),
+                {"子": {k: got.get(k) for k in ("hook", "memory_limit", "threads")}, "孫": grand.get("hook"), "關": off.get("hook"),
+                 "實測": probe.get("summary")})
+        # 接力:假 bootstrap 在前 + 假「發行版」sitecustomize 在後 → 三份各跑一次、照順序
+        boot, tail = t / "boot", t / "tail"
+        boot.mkdir()
+        tail.mkdir()
+        (boot / "sitecustomize.py").write_text(_FAKE_BOOT, encoding="utf-8")
+        (tail / "sitecustomize.py").write_text(_FAKE_TAIL, encoding="utf-8")
+        code = "import sys; print('duckdb loaded' if 'duckdb' in sys.modules else 'no duckdb')"
+
+        outs = []
+
+        def marks(pp):
+            mark.write_text("", encoding="utf-8")
+            e = dict(env, PYTHONPATH=os.pathsep.join(pp), VDF_T_MARK=str(mark))
+            cp = subprocess.run([sys.executable, "-c", code], env=e, capture_output=True, text=True, timeout=60)
+            outs.append(cp.stdout.strip())
+            return mark.read_text(encoding="utf-8").split()
+
+        with_boot = marks([str(boot), hd, str(tail)])
+        alone = marks([hd, str(tail)])
+        chk("㉛ 接力:中央 bootstrap 在前 → bootstrap 跑一次、接力到本鉤、本鉤再往後接力(後面那份照跑一次,不遞迴不回頭);"
+            "沒有 bootstrap → 本鉤就是第一份,後面那份照跑一次;沒用 duckdb 的行程不預先 import duckdb",
+            with_boot == ["boot", "tail"] and alone == ["tail"] and outs == ["no duckdb", "no duckdb"],
+            {"有 bootstrap": with_boot, "沒有": alone, "duckdb 預載": outs})
+        if have_duck:
+            vc = t / "vcgc"
+            vc.mkdir()
+            (vc / "via_duck_temp.py").write_text("HOOK_VERSION = 'v0100'\n", encoding="utf-8")
+            (vc / "sitecustomize.py").write_text(_FAKE_VCGC, encoding="utf-8")
+            e = dict(env, PYTHONPATH=os.pathsep.join([str(vc), hd]), VDF_T_MARK=str(mark))
+            got2 = run(e)
+            chk("㉜ 環境已有 VCGC 的 via_duck_temp 鉤 → temp / 記憶體讓位(不疊兩層、溢寫夾不是本鉤給的),"
+                "但 VCGC 鉤沒管的執行緒照補每條預算(PR #536 Codex P1)",
+                got2.get("hook") != HOOK_TAG and got2.get("threads_hook") == HOOK_TAG
+                and str(got2.get("threads")) == str(plan["threads_per_flow"])
+                and not str(got2.get("temp_directory", "")).startswith(env["VIA_DUCKDB_TEMP_DIR"]),
+                {k: got2.get(k) for k in ("hook", "threads_hook", "threads", "temp_directory")})
+        mt = {"lamp": "YELLOW", "summary": "DuckDB 溢寫 → <x> · 記憶體 1 MiB"}
+        page = memtemp_card(mt)
+        chk("㉝ 總覽頁「記憶體 / TEMP」卡:燈 + 實測一句(跳脫);沒實測 = 不出卡",
+            'id="mem-temp"' in page and "&lt;x&gt;" in page and "<x>" not in page and memtemp_card(None) == "")
     src = Path(__file__).read_text(encoding="utf-8")
     imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
-    chk("㉛ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫",
-        "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src and "def _via_net" in src
+    chk("㉞ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫;不裝套件、不寫環境(鉤只寫本輪 temp 夾)",
+        "VIA:ACCEL-BRIDGE" in src and "def _via_net" in src
         and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VCGC"))]
         and not re.search(r"^\s*(import|from)\s+" + "talib", src, re.M)
-        and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + r"CONSENT[\"']\]\s*=(?!=)", src))
-    n_ok = sum(ok)
-    print(f"  [計] {TAG} 本版 {n_ok}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}", flush=True)
-    rc1 = PRIOR.selftest()
-    if not all(ok):
+        and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + r"CONSENT[\"']\]\s*=(?!=)", src)
+        and ("pip" + " install") not in src and ("site" + "-packages") not in src)
+    n = sum(ok)
+    print(f"  [計] {TAG} 本版 {n}/{len(ok)} · {'PASS' if n == len(ok) else 'FAIL'}")
+    if n != len(ok):
         return 1
-    return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅照實回(同 v0102 / v0106)
+    rc1 = PRIOR.selftest()
+    return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅照實回(同 v0102;PR #528 Codex P1)
 
 
 def main(argv=None) -> int:
