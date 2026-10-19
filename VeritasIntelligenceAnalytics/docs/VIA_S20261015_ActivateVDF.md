@@ -217,3 +217,30 @@ Python 把空段當「目前目錄」,`bootstrapA::bootstrapB` 這種正好要�
   三例實測:`/a/b::/b/b:/z → /a/b::/z` · 只一份不動 · `:/a/b:x:/b/b/: → :/a/b:x:`。
 - **ActivateVDF v0105**(薄尾):換上保留空段的 `dedupe_bootstrap`(v0104 的 flow_env 與 numexpr 探針呼叫時查模組全域 → 一換即生效)。
   自測 ㉓ 空段 / 開頭結尾空段 / 重複一般路徑都保留、子行程環境同樣保留;㉔ 橋。突變(改回丟空段)→ ㉓ FAIL。
+
+## PS 一鍵 v0105 + ActivateVDF v0106 + VDF_SystemManager v0155:跑完自動跳出的頁直接清點資料庫(2026-10-19)
+
+操作員令:「這裡專注 修正獨立系統VDF 自動跳出HTML U/I清點資料庫沒問題就是收尾」。
+工作站 v0104 真跑:④ 雙閘沒開(新視窗)→ 清單 / 擷取 / refill GATED;**db_check RED**,但終端那一行被截斷,總覽頁只有一條「資料庫閘」連結 → 看不到哪幾張表、為什麼紅,也沒有「能不能收尾」。
+
+**查因(容器同一支 db check,家 = VDF\output_hub,與工作站同一個預設):** RED 34 列裡
+- 12 列是 **VRN 寫進 vdf_tw_market.duckdb 的表**(vrn_report_* · vrn_four_point_digest · via_policy_* …;寫入者 VRN_ENG074 / VRN_ENG082,或沒登寫入者但表名 vrn_)。VDF 的 refill 補不了也不該補(L120),卻把 VDF 的燈染紅 → 清點永遠過不了。
+- 7 列是冊上 **min_rows = 0**(冊自己說可為空:tw_financial_mops · fwd_valuation_daily …),但 v0151 用 `min_rows or 1` 把 0 當 1 判。
+- 其餘 18 列是容器部分副本的真缺(工作站的庫不同,要看工作站真跑的頁)。
+
+**修法(只動 VDF;已發布版一字不動):**
+- **VDF_SystemManager v0155**(薄尾,換 v0151 模組的 db_check / _print_db):他系統表 → INFO 照列不計燈(狀態寫「他系統表(VRN 寫)· 原狀態 · VDF 只攤開不代修」);min_rows 0:空 = 綠、缺表 / 缺庫 = 黃(待首寫);VDF 自己 min ≥ 1 的表判法不改。自測 ①–⑥(⑦ = 沒 duckdb 的分支)+ 全鏈 0 FAIL。容器真跑 RED 34 → 18。
+- **ActivateVDF v0106**(薄尾):總覽 JSON 加 `db` 節;自動跳出的總覽頁在步驟表之前加「資料庫清點」:判定一句話(VDF 自己的表 0 紅 = 可收尾;黃不擋)· 計數卡 · 紅黃逐列(庫 · 表 · 狀態 · 列數 / 上次 · 最新日 · 寫入者 · 怎麼補)· 收合的綠列與他系統表。只認本輪起跑後寫出的 DB_CHECK_latest.json(舊檔 = NOT_RUN,不冒充)。卡片長路徑可折行(390 px 原本被 temp 路徑撐到 418 px)。自測 ㉕–㉘。
+- **PS 一鍵 v0105**(L70 許可 P024):開跑即印同意閘(沒開就印要打的兩行,不用等到 ④);**Ctrl+C / 中途停 = INTERRUPTED 結束碼 130**(v0104 在 ② 中途 Ctrl+C 印「結束碼 0 GREEN」,容器 SIGINT 重現);主體丟錯 = 紅 1;總表多 **6⑤ 資料庫清點** 列,末段印 `[收尾]` 一行;-DbHome 沒給時操作員設的 VIA_VDF_DB_HOME 優先。
+
+**收尾條件:** 工作站 v0105 真跑(雙閘本視窗親手開 · -RefillApply)→ 總覽頁「資料庫清點」VDF 自己的表 0 紅、終端印「[收尾] 資料庫清點沒問題」。
+
+sha256:
+- 0b738b925d753c1183fe0e7b5ae16330ddbbfee578ed65cf85dc6d5a9237ad44  functional modules/VDF/Invoke-VDF-Activate-v0105.ps1
+- fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
+- 44041f4bc0731754710dcddf8ba9ecb4752f5571052782717b03979aca2aa47b  functional modules/VDF/VDF_SystemManager_v0155.py
+
+**PR #535 Codex 兩條 P2(未合併,直接改 v0106):**
+- 落檔標成 v0102:v0102 外層在跑時把 schema 改回 v0102 再寫 → 本版先標 v0106 再直接交 v0100 原版寫;自測 ㉗ 照真跑開著 v0102 的 _IN_RUN(突變:改回走 v0102 外層 → ㉗ FAIL)。
+- 2 秒容差可能吃到前一輪的 DB_CHECK:改成起跑記檔的指紋(mtime_ns · 大小 · sha256),寫總覽時指紋沒變 = NOT_RUN,沒有時間容差;自測 ㉕(突變:指紋永不相等 → ㉕ FAIL)。
+  容器真跑:--flows db → 落檔 schema VDF_ActivateVDF_v0106;接著 --flows fetch(不跑資料庫)→ 清點 NOT_RUN「本輪起跑後沒重寫」。
