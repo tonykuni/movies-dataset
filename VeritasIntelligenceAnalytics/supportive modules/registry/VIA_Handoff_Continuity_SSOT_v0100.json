@@ -5681,9 +5681,9 @@
     {
       "id": "VDF-REQ018:activatevdf-v0107-memtemp",
       "requirement": "VDF-REQ018",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "AI",
-      "reason": "操作員 2026-10-19「繼續 跑完貼回結果 對於記憶體跟TEMP支援方式用最快最佳的方法 自動完成」:量測 —— 子行程早有 TMP/TEMP/POLARS_TEMP_DIR/VIA_DUCKDB_TEMP_DIR/VIA_DUCKDB_MEM,但 VDF 267 支直接 duckdb.connect() 而 DuckDB 不讀環境變數;只有 VCGC CGC_MDL262 代裝進環境的 .pth 鉤才補 → 沒裝的境溢寫落資料庫旁(工作站 = OneDrive)、每行程吃實體記憶體 80%、執行緒 = 全部核。v0107:每輪把小鉤寫進本輪 temp 夾、排子行程 PYTHONPATH 最後(中央 bootstrap 接力;往後接力不回頭),duckdb import 那刻才掛,connect 補 temp_directory = 本輪流程 temp/p<pid> · memory_limit = 每條預算 · threads = 每條執行緒(呼叫端自己給的優先);環境已有 VCGC via_duck_temp 則讓位;VIA_DUCK_TEMP=0 關;起跑實測 1 秒(①b 一行 + 總覽頁卡 + resources.memtemp)。自測 ㉙–㉞ 6/6;突變:鉤不裝 → ㉚ FAIL · 不往後接力 → ㉛ FAIL · 不讓位 → ㉜ FAIL;擊斃閘過",
+      "reason": "操作員 2026-10-19「繼續 跑完貼回結果 對於記憶體跟TEMP支援方式用最快最佳的方法 自動完成」:量測 —— 子行程早有 TMP/TEMP/POLARS_TEMP_DIR/VIA_DUCKDB_TEMP_DIR/VIA_DUCKDB_MEM,但 VDF 267 支直接 duckdb.connect() 而 DuckDB 不讀環境變數;只有 VCGC CGC_MDL262 代裝進環境的 .pth 鉤才補 → 沒裝的境溢寫落資料庫旁(工作站 = OneDrive)、每行程吃實體記憶體 80%、執行緒 = 全部核。v0107:每輪把小鉤寫進本輪 temp 夾、排子行程 PYTHONPATH 最後(中央 bootstrap 接力;往後接力不回頭),duckdb import 那刻才掛,connect 補 temp_directory = 本輪流程 temp/p<pid> · memory_limit = 每條預算 · threads = 每條執行緒(呼叫端自己給的優先);環境已有 VCGC via_duck_temp 則讓位;VIA_DUCK_TEMP=0 關;起跑實測 1 秒(①b 一行 + 總覽頁卡 + resources.memtemp)。自測 ㉙–㉞ 6/6;突變:鉤不裝 → ㉚ FAIL · 不往後接力 → ㉛ FAIL · 不讓位 → ㉜ FAIL;擊斃閘過 → 已驗:2026-10-19T14:20:38+00:00 rc 0 · v0107 標記見到(經 VDF_SystemManager engine run)",
       "next": "handoff test vdf_activatevdf(rc 0 + v0107 標記)轉 VERIFIED;工作站真跑看 ①b 行「鉤 VDF 本輪鉤 / VCGC 環境鉤」與溢寫夾在 %LOCALAPPDATA%\\VIA_TEMP",
       "case": "vdf_activatevdf",
       "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
