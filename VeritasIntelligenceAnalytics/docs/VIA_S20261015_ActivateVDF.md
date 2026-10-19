@@ -282,3 +282,107 @@ sha256:
 **PR #536 Codex P1(未合併,直接改 v0107):** 環境已有 VCGC `via_duck_temp` 鉤時,本鉤整個讓位 → VCGC 鉤只補 temp / 記憶體,**執行緒沒人管**(三條並行又互搶全部核)。
 改:VCGC 鉤在 → temp / 記憶體照讓它管(不疊兩層),本鉤只另包一層補 `threads`(冪等標記 `_vdf_duck_threads`)。自測 ㉜ 改驗「讓位 + 執行緒照補」;
 突變「VCGC 在就整個不掛」→ ㉜ FAIL。全鏈自測 0 FAIL · 擊斃閘過 · vdf_activatevdf / numbering 重測 rc 0。
+
+## ActivateVDF v0108 → v0109 → v0110:溢寫不等 · VCGC 鉤機器自測 · 擷取後日期格式 + 跨來源對照(2026-10-19 ~ 20 · 分支 claude/optimistic-goodall-yhalc5)
+
+範圍同上:只有 `functional modules/VDF/` 的 ActivateVDF 鏈(只增不改;前版檔一個位元都沒動)。VCGC / VRN 的檔、冊、號沒改;
+VCGC 的 DuckDB 鉤只從子行程「看」它有沒有生效(不 import、不裝、不改)。三版都只在**自己 activate 那一輪**換上東西,跑完換回原樣
+(前版自測驗的函式身分不變)。**編號 / 登錄冊沒寫**(那是 VCGC 的冊,本分支不碰;要登錄由 VCGC 自己的流程做)。
+
+**v0108 — 溢寫模式時記憶體閘不等**(操作員令 2026-10-19:「自動修改 VDF 讓溢寫模式時不用等 · 用最快的方法完成指令」)
+- 工作站(16 GB · 可用 620 / 1,142 MB):每步起跑前卡記憶體閘(可用 < 10% = 壓力)滿 600 秒、一行不印 → 40 分鐘裡約 30 分鐘空等。
+  記憶體少時 v0100 本來就開溢寫(子行程 TEMP / DuckDB 上限 256 MB 起),v0107 再讓 DuckDB 真的溢寫到本機 TEMP → 溢寫模式再等是浪費。
+- 起跑資源計畫是溢寫模式(可用 < 約 4 GB)→ 記憶體閘有壓力也直接起,每步印 `[溢寫不等]`;不是溢寫模式照 v0101 等;`VIA_ACT_SPILL_NOWAIT=0` 可關;
+  資料庫等擷取寫完才開庫照舊(保資料)。總覽 JSON `spill_nowait` 節 · 總覽頁「溢寫不等」卡 · 長路徑手機寬折行。自測 ㉟–㊸。
+- 端到端(記憶體固定 620 MB · 假管理員):2.8 秒 · 記憶體閘等待 0 次(7 步直接起);關掉(=0)→ 等 7 次。
+
+**v0109 — 自測 ㊹ 取代 v0107 ㉚**(工作站一鍵 ⑤ 紅 → 不真跑)
+- 工作站 `via_vdf_312` 境裡已有 VCGC(CGC_MDL262)代裝的 `via_duck_temp` 鉤。v0107 照自己的設計讓位,實際值全對
+  (溢寫夾在本輪 temp · 記憶體 974.6 MiB = 預算 1,022 MB · 執行緒 2 = 預算 · `VIA_DUCK_TEMP=0` 不掛),但 ㉚ 寫死「生效的鉤必須是 v0107 自己的」;
+  而且 v0107 在 ㉚ 失敗時不往下委派 → 工作站上 v0106…v0100 自測沒跑到。
+- ㊹ 同一個性質重驗(先看境裡本來有沒有鉤 → 應生效的是它或 v0107 本輪鉤);委派時只容 v0107 ㉚ 一條失敗(印 `[取代]`)並補跑 v0106 → … → v0100
+  (同 v0102 ⑫ 取代 v0101 ⑩)。反向:VCGC 鉤把記憶體設錯(300MB)→ ㊹ FAIL · rc 1 · 不往下委派。
+- 工作站實跑(2026-10-20 02:05):⑤ 自測 v0109 5/5 · v0108 9/9 · `[取代]` · v0106…v0100 全 PASS → 進真跑:清單 GREEN(009 83.7 秒 · 010 73.0 秒 · 驗收過)·
+  engine list GREEN(94 支要啟動 · 6 支已被取代)· 擷取 / 引擎啟動進行中(本文寫時尚未回報結束)。
+
+**v0110 — 擷取後日期格式一律 YYYY / YYYY-MM / YYYY-MM-DD · 不同來源寫中間檔(TEMP · 標註來源)交叉對照 · 兩個以上來源相同 = 對照成功**
+(操作員令 2026-10-20;「剩餘的你決定」)
+- 現況(倉內盤點):TW 日收盤有兩個來源 —— 交易所 `tw_trading_daily`(TWSE / TPEX 官方 · 日期原樣存民國 7 碼 `1150824`,ENG057 又寫 ISO → 同一欄混兩種)
+  × Yahoo `tw_daily_prices`(`2330.TW` / `.TWO`);月營收 `tw_monthly_revenue` 有 `source` 欄(MOPS_OFFICIAL × CNYES · `ym` 存 YYYYMM)。
+  擷取流程裡沒有任何一步拿不同來源互相比對(ENG063 只取官方那筆;ENG098 / ENG102 不在擷取冊)。總經 `us_macro` 三支都是 FRED = 單一來源。
+- 三條流程跑完後(資料庫只唯讀開):
+  - ⑦ 日期格式體檢:資料庫家底下每個 `.duckdb` 的 VDF 表、每個日期欄 → 標準(YYYY / YYYY-MM / YYYY-MM-DD 字串或 DATE 型別)· 不標準格式與筆數 ·
+    同一欄混兩種以上格式。他系統 `vrn_` / `via_policy` 表與 `fetched_at` 這類紀錄時間不列。
+  - ⑧ 跨來源對照:TW 日收盤(最近 10 個交易日,`VIA_XSRC_DAYS` 可改)· 同表有 `source` 欄且兩個以上來源的(同來源同期多次取最新)。
+    中間檔:`<本輪 temp>/xsrc/<資料集>/<資料集>__<來源>.csv`(`source` 欄標來源 · `date` 標準格式 · `date_raw` 原寫法 · `origin` 庫:表)+ `<資料集>__對照結果.csv`。
+    判定:兩個以上來源相同 = 成功(第三個不同記離群)· 沒有任兩個相同 = 衝突 · 只有一個來源 = 沒得對照;價格到 0.01 · 營收整數 · 其他數值照兩邊較粗的小數位;
+    衝突多半固定倍數 → 標「疑單位不同」。
+  - 總燈:綠 + 有衝突 → 黃(不擋、不紅)。總覽 JSON `datefmt` / `xsrc` 兩節 · 總覽頁「擷取後:跨來源對照」卡(資料庫清點之前)· 終端 ⑦ ⑧。
+- **決定:引擎的表不改寫成標準格式。** 各引擎 upsert 用自己的日期格式當鍵(例:`tw_trading_daily` 鍵 date+code+market),改寫既有列 → 下一輪原格式再寫進來就成重複列。
+  標準格式寫在中間檔與對照結果;體檢逐欄列出還不是標準的欄。要讓庫本身也統一 = 逐支改寫入引擎 + 舊列搬鍵(下一步,另開)。
+- 心跳:日誌最後一行另略過「警告下一行被印出的原始碼」(工作站每步都顯示 `VDF_SystemManager_v0155.py` 第 6 行那句舊說明;那支說明文字的 `\o` 只是警告)。
+- 自測 Ⓐ–Ⓙ(有 duckdb 10 檢 · 沒有 7 檢):日期 53 種寫法 + 民國 7 / 5 碼 · 整欄判斷(成交量不當日期)· 對照規則 · 心跳 · 測試庫(工作站同名表)對照 / 中間檔 / 體檢 ·
+  頁面卡跳脫 · 總燈 · 落檔標 v0110 · 換上的函式跑完換回 · 唯讀(沒有寫入語句)。
+- 端到端(假管理員 · 測試庫):⑦ 不標準 3 欄(交易所 date 混用)· ⑧ 成功 5 · 衝突 1 · 單一 3 → 總燈黃;中間檔 7 個(`2026-08-24` · 原寫法 `1150824`)·
+  頁面卡在資料庫清點之前 · Chromium 390 / 1280 寬不橫捲。
+
+**驗證總表(容器 · 乾淨 checkout `b66ad194`)**
+
+| 項目 | 結果 |
+|---|---|
+| `ActivateVDF.py --selftest`(境裡有 VCGC 鉤 · 仿工作站) | rc 0 · v0110 10/10 · v0109 5/5 · v0108 9/9 · v0107 5/6 → `[取代]` · v0106…v0100 全 PASS |
+| 同上(沒 VCGC 鉤 · 有 duckdb)/(沒 duckdb) | rc 0 / rc 0(全 PASS,不需取代) |
+| `VDF_SystemManager_v0155.py bridges` | GREEN · 加速器 93/93 · 網路 93/93 · 排除 0 |
+| 一鍵(下面那一行)· 仿工作站 via-main(main e4ccd40e + 未追蹤 v0108 / v0109)· 跑兩次 | ② v0108 / v0109 / v0110 就位(git blob 核對)· ⑤ 替身跑真的自測鏈 rc 0 + v0110 端到端 · 結束碼 0 |
+| 一鍵的其他情境(v0109 版時驗) | 本機 VDF_ROOT 指非 git 夾(工作站真況)→ 自動找 `%USERPROFILE%\via-main` · VDF_ROOT 不動;不能快轉 → 黃照跑;v0107 被改 → 紅不跑;blob 不對 → 紅不跑 |
+
+**沒驗到的(不寫成綠):** 工作站真資料的 ⑦ ⑧ 數字(倉內沒有 VDF 資料庫);擷取 / 引擎啟動 / 資料庫流程在工作站跑完的結果(v0109 那輪進行中);
+⑦ 的時間上限 120 秒只在換庫時檢查(單一超大庫可能多跑一點);`VDF_SystemManager_v0155.py` 說明文字的 SyntaxWarning 本身沒改(心跳已略過)。
+
+sha256 · git blob:
+- VDF_MDL013_ActivateVDF_v0108.py:cb6539bf13f4f4b63a733de4ae99417cefb23677810a7bd3499ec029c1ad8dee · 022689247f66210d85391e3a150679a6aa98b4bc
+- VDF_MDL013_ActivateVDF_v0109.py:2af9633f3cad75d6a6662635950f5af2849c82515fded711d02385d301ca8949 · c3d6a62ba3c70373c01f566120ad3448e6e1e1cd
+- VDF_MDL013_ActivateVDF_v0110.py:6575675356a205826349794795715d2326fa4e142561669c93d020b9d74067ce · 92f5c39fdbe548232679edca611dcdac02fa3c9a
+
+**工作站一鍵(cmd 或 PowerShell 都能貼;要 PowerShell 7)**:更新 via-main(main 有的未追蹤舊檔先移到 `%TEMP%\vdf1_bk_*`)→ 從本分支放 v0108 / v0109 / v0110
+(git blob 核對;main 收了就用 main 的)→ 開雙閘(操作員貼這一行 = 親手開 · 只在那個 PowerShell 行程)→ `Invoke-VDF-Activate` 尾版 `-FetchHome <VDF> -RefillApply`。
+找倉:`VDF_GIT` > `%USERPROFILE%\via-main` > 目前夾 > `%USERPROFILE%\OneDrive\Documents\movies-dataset`(要有 `.git` 與 VDF 夾;不讀 `VDF_ROOT`,那是 VAP / 舊 VDF 工具的變數)。
+
+```
+pwsh -NoProfile -ExecutionPolicy Bypass -EncodedCommand dAByAHkAewBbAEMAbwBuAHMAbwBsAGUAXQA6ADoATwB1AHQAcAB1AHQARQBuAGMAbwBkAGkAbgBnAD0AWwBUAGUAeAB0AC4ARQBuAGMAbwBkAGkAbgBnAF0AOgA6AFUAVABGADgAfQBjAGEAdABjAGgAewB9AAoAJABCAHIAPQAnAGMAbABhAHUAZABlAC8AbwBwAHQAaQBtAGkAcwB0AGkAYwAtAGcAbwBvAGQAYQBsAGwALQB5AGgAYQBsAGMANQAnADsAJABEAD0AJwBWAGUAcgBpAHQAYQBzAEkAbgB0AGUAbABsAGkAZwBlAG4AYwBlAEEAbgBhAGwAeQB0AGkAYwBzAC8AZgB1AG4AYwB0AGkAbwBuAGEAbAAgAG0AbwBkAHUAbABlAHMALwBWAEQARgAnADsAJABGADcAPQAiACQARAAvAFYARABGAF8ATQBEAEwAMAAxADMAXwBBAGMAdABpAHYAYQB0AGUAVgBEAEYAXwB2ADAAMQAwADcALgBwAHkAIgAKACQAUgA9AEAAKAAkAGUAbgB2ADoAVgBEAEYAXwBHAEkAVAAsACIAJABIAE8ATQBFAC8AdgBpAGEALQBtAGEAaQBuACIALAAkAFAAVwBEAC4AUABhAHQAaAAsACIAJABIAE8ATQBFAC8ATwBuAGUARAByAGkAdgBlAC8ARABvAGMAdQBtAGUAbgB0AHMALwBtAG8AdgBpAGUAcwAtAGQAYQB0AGEAcwBlAHQAIgApAHwAPwB7ACQAXwAgAC0AYQBuAGQAKABUAGUAcwB0AC0AUABhAHQAaAAgAC0ATABpAHQAZQByAGEAbABQAGEAdABoACAAIgAkAF8ALwAuAGcAaQB0ACIAKQAtAGEAbgBkACgAVABlAHMAdAAtAFAAYQB0AGgAIAAtAEwAaQB0AGUAcgBhAGwAUABhAHQAaAAgACIAJABfAC8AJABEACIAKQB9AHwAcwBlAGwAZQBjAHQAIAAtAEYAaQByAHMAdAAgADEACgBpAGYAKAAkAFIAKQB7ACQAUgA9AFsASQBPAC4AUABhAHQAaABdADoAOgBHAGUAdABGAHUAbABsAFAAYQB0AGgAKAAkAFIAKQB9AAoAJABIAD0AQAB7ACcAMAAxADAAOAAnAD0AJwAwADIAMgA2ADgAOQAyADQANwBmADYANgAyADEAMABkADgANQAzADkAMQBlADMAYQAxADUAMAA2ADcAOQBhADYAYQBhADkAOABiADQAYgBjACcAOwAnADAAMQAwADkAJwA9ACcAYwAzAGQANgBhADYAMgBiAGEAMwBjADcAMAAzADcAMwBjADAAMQBmADUANgA2ADEAMgAwAGEAZAAzADQANAA4AGUANgBlADEAZQAxAGMAZAAnADsAJwAwADEAMQAwACcAPQAnADkAMgBmADUAYwAzADkAZgBkAGIAZQA1ADQAOAAyADMAMgA2ADcAOQBlAGQAYwBhADYAMQAxAGQAYwBkAGEAYwAwADIAZgBhADMAYwA5AGEAJwB9AAoAZgB1AG4AYwB0AGkAbwBuACAAUwBhAHkAKAAkAGMALAAkAG0AKQB7AFcAcgBpAHQAZQAtAEgAbwBzAHQAIAAkAG0AIAAtAEYAbwByAGUAZwByAG8AdQBuAGQAQwBvAGwAbwByACAAJABjAH0ACgBmAHUAbgBjAHQAaQBvAG4AIABHAHsAZwBpAHQAIAAtAEMAIAAkAFIAIABAAGEAcgBnAHMAIAAyAD4AJABuAHUAbABsAH0ACgBTAGEAeQAgAFkAZQBsAGwAbwB3ACAAIgBbAFYARABGACAAAE51k10AIABQAG8AdwBlAHIAUwBoAGUAbABsACAAJAAoACQAUABTAFYAZQByAHMAaQBvAG4AVABhAGIAbABlAC4AUABTAFYAZQByAHMAaQBvAG4AKQAgALcAIABnAGkAdAAgAAlQIAAkAFIAIgAKAGkAZgAoACQAUABTAFYAZQByAHMAaQBvAG4AVABhAGIAbABlAC4AUABTAFYAZQByAHMAaQBvAG4ALgBNAGEAagBvAHIAIAAtAGwAdAAgADcAKQB7AFMAYQB5ACAAUgBlAGQAIAAnAFsAUgBFAEQAXQAgAIGJIABQAG8AdwBlAHIAUwBoAGUAbABsACAANwAoAHAAdwBzAGgAKQAnADsAcgBlAHQAdQByAG4AfQAKAGkAZgAoACEAJABSACkAewBTAGEAeQAgAFIAZQBkACAAJwBbAFIARQBEAF0AIAB+Yg1OMFIgAHYAaQBhAC0AbQBhAGkAbgAoAIGJCWcgAC4AZwBpAHQAIAAHgiAAVgBEAEYAIAA+WSkAtwAgAEhRIABzAGUAdAAgAFYARABGAF8ARwBJAFQAPQA8AAlQ742RXz4AIACNUbyMJwA7AHIAZQB0AHUAcgBuAH0ACgBmAG8AcgBlAGEAYwBoACgAJAB3ACAAaQBuACAAMAAsADIALAA0ACwAOAApAHsAUwB0AGEAcgB0AC0AUwBsAGUAZQBwACAAJAB3ADsARwAgAGYAZQB0AGMAaAAgAC0AcQAgAG8AcgBpAGcAaQBuACAAbQBhAGkAbgAgACQAQgByAHwATwB1AHQALQBOAHUAbABsADsAaQBmACgAIQAkAEwAQQBTAFQARQBYAEkAVABDAE8ARABFACkAewBiAHIAZQBhAGsAfQB9AAoAaQBmACgAJABMAEEAUwBUAEUAWABJAFQAQwBPAEQARQApAHsAUwBhAHkAIABZAGUAbABsAG8AdwAgACcAWwBZAEUATABMAE8AVwBdACAAYCQgAJNiDU4wUiAARwBpAHQASAB1AGIAKACyfe+NKQC3ACAAZ3EsZ19q/nPBbNGNJwB9AAoAJABiAGsAPQBKAG8AaQBuAC0AUABhAHQAaAAgACgAWwBJAE8ALgBQAGEAdABoAF0AOgA6AEcAZQB0AFQAZQBtAHAAUABhAHQAaAAoACkAKQAgACIAdgBkAGYAMQBfAGIAawBfACQAKABHAGUAdAAtAEQAYQB0AGUAIAAtAGYAIAB5AHkAeQB5AE0ATQBkAGQAXwBIAEgAbQBtAHMAcwApACIACgBmAG8AcgBlAGEAYwBoACgAJABwACAAaQBuACAAQAAoAEcAIABsAHMALQBmAGkAbABlAHMAIAAtAG8AIAAtAC0AZQB4AGMAbAB1AGQAZQAtAHMAdABhAG4AZABhAHIAZAAgAC0ALQAgACIAJABEAC8AVgBEAEYAXwBNAEQATAAwADEAMwBfAEEAYwB0AGkAdgBhAHQAZQBWAEQARgBfAHYAKgAuAHAAeQAiACkAKQB7AEcAIABjAGEAdAAtAGYAaQBsAGUAIAAtAGUAIAAiAG8AcgBpAGcAaQBuAC8AbQBhAGkAbgA6ACQAcAAiADsAaQBmACgAIQAkAEwAQQBTAFQARQBYAEkAVABDAE8ARABFACkAewAkAG4AdQBsAGwAPQBOAGUAdwAtAEkAdABlAG0AIAAtAEkAdABlAG0AVAB5AHAAZQAgAEQAaQByAGUAYwB0AG8AcgB5ACAALQBGAG8AcgBjAGUAIAAtAFAAYQB0AGgAIAAkAGIAawA7AE0AbwB2AGUALQBJAHQAZQBtACAALQBMAGkAdABlAHIAYQBsAFAAYQB0AGgAIAAiACQAUgAvACQAcAAiACAAJABiAGsAIAAtAEYAbwByAGMAZQA7AFMAYQB5ACAAQwB5AGEAbgAgACIAWwAIil0AIABgJCAALGdfaipn/Y9kjoR2IAAkACgAUwBwAGwAaQB0AC0AUABhAHQAaAAgACQAcAAgAC0ATABlAGEAZgApACAAbQBhAGkAbgAgAPJdCWcgAJIhIAD7eTBSIAAkAGIAawAoAA1Oy2TrX0mPKQAiAH0AfQAKAEcAIABtAGUAcgBnAGUAIAAtAHEAIAAtAC0AZgBmAC0AbwBuAGwAeQAgAG8AcgBpAGcAaQBuAC8AbQBhAGkAbgB8AE8AdQB0AC0ATgB1AGwAbAAKAGkAZgAoACEAJABMAEEAUwBUAEUAWABJAFQAQwBPAEQARQApAHsAUwBhAHkAIABHAHIAZQBlAG4AIAAiAFsARwBSAEUARQBOAF0AIABgJCAAdgBpAGEALQBtAGEAaQBuACAAPQAgAG0AYQBpAG4AIAAAZ7BlIAAkACgARwAgAHIAZQB2AC0AcABhAHIAcwBlACAALQAtAHMAaABvAHIAdAAgAEgARQBBAEQAKQAiAH0AZQBsAHMAZQB7AFMAYQB5ACAAWQBlAGwAbABvAHcAIAAnAFsAWQBFAEwATABPAFcAXQAgAGAkIAANTv2A619JjzBSIABtAGEAaQBuACgALGdfaglnJVKEdtBjpE4gAC8AIAA5ZdVSKQC3ACAAZ3H+c8Fs0Y0nAH0ACgBpAGYAKAAtAG4AbwB0ACgAVABlAHMAdAAtAFAAYQB0AGgAIAAtAEwAaQB0AGUAcgBhAGwAUABhAHQAaAAgACIAJABSAC8AJABGADcAIgApACkAewBHACAAcgBlAHMAdABvAHIAZQAgAC0ALQBzAG8AdQByAGMAZQA9AG8AcgBpAGcAaQBuAC8AbQBhAGkAbgAgAC0ALQB3AG8AcgBrAHQAcgBlAGUAIAAtAC0AIAAkAEYANwB8AE8AdQB0AC0ATgB1AGwAbAB9AAoAaQBmACgAKABHACAAaABhAHMAaAAtAG8AYgBqAGUAYwB0ACAALQAtACAAJABGADcAKQAgAC0AbgBlACAAKABHACAAcgBlAHYALQBwAGEAcgBzAGUAIAAiAG8AcgBpAGcAaQBuAC8AbQBhAGkAbgA6ACQARgA3ACIAKQApAHsAUwBhAHkAIABSAGUAZAAgACcAWwBSAEUARABdACAAYSQgACxnX2ogAHYAMAAxADAANwAgAA1OL2YgAG0AYQBpAG4AIACEdkhyLGcgALcAIAANTtGNJwA7AHIAZQB0AHUAcgBuAH0ACgAkAG4APQAnACcACgBmAG8AcgBlAGEAYwBoACgAJAB2ACAAaQBuACAAJwAwADEAMAA4ACcALAAnADAAMQAwADkAJwAsACcAMAAxADEAMAAnACkAewAkAGYAPQAiACQARAAvAFYARABGAF8ATQBEAEwAMAAxADMAXwBBAGMAdABpAHYAYQB0AGUAVgBEAEYAXwB2ACQAdgAuAHAAeQAiADsARwAgAGMAYQB0AC0AZgBpAGwAZQAgAC0AZQAgACIAbwByAGkAZwBpAG4ALwBtAGEAaQBuADoAJABmACIAOwBpAGYAKAAkAEwAQQBTAFQARQBYAEkAVABDAE8ARABFACkAewBHACAAcgBlAHMAdABvAHIAZQAgAC0ALQBzAG8AdQByAGMAZQA9ACIAbwByAGkAZwBpAG4ALwAkAEIAcgAiACAALQAtAHcAbwByAGsAdAByAGUAZQAgAC0ALQAgACQAZgB8AE8AdQB0AC0ATgB1AGwAbAA7ACQAYgA9AEcAIABoAGEAcwBoAC0AbwBiAGoAZQBjAHQAIAAtAC0AIAAkAGYAOwBpAGYAKAAkAGIAIAAtAG4AZQAgACQASABbACQAdgBdACkAewBTAGEAeQAgAFIAZQBkACAAIgBbAFIARQBEAF0AIABhJCAAdgAkAHYAIAD/Yg1OMFIWYmdRuVsNTg1cKABnAGkAdAAgAGIAbABvAGIAIAAkAGIAKQC3ACAADU7RjSIAOwByAGUAdAB1AHIAbgB9ADsAJABuACsAPQAiACAAdgAkAHYAKAAkACgAJABiAC4AUwB1AGIAcwB0AHIAaQBuAGcAKAAwACwANwApACkAKQAiAH0AZQBsAHMAZQB7ACQAbgArAD0AIgAgAHYAJAB2ACgAbQBhAGkAbgAgAPJdNmUpACIAfQB9AAoAUwBhAHkAIABHAHIAZQBlAG4AIAAiAFsARwBSAEUARQBOAF0AIABhJCAAQQBjAHQAaQB2AGEAdABlAFYARABGACQAbgAgADFcTU8gALcAIACKdShXIABtAGEAaQBuACAAhHYgAHYAMAAxADAANwAiAAoAdAByAHkAewAkAG8APQBHAGUAdAAtAEMAaQBtAEkAbgBzAHQAYQBuAGMAZQAgAFcAaQBuADMAMgBfAE8AcABlAHIAYQB0AGkAbgBnAFMAeQBzAHQAZQBtADsAJABmAHIAPQBbAGkAbgB0AF0AKAAkAG8ALgBGAHIAZQBlAFAAaAB5AHMAaQBjAGEAbABNAGUAbQBvAHIAeQAvADEASwBCACkAOwBTAGEAeQAgAEMAeQBhAG4AIAAiAFsACIpdACAAYiQgAO9TKHUYirZh1JogACQAZgByACAALwAgACQAKABbAGkAbgB0AF0AKAAkAG8ALgBUAG8AdABhAGwAVgBpAHMAaQBiAGwAZQBNAGUAbQBvAHIAeQBTAGkAegBlAC8AMQBLAEIAKQApACAATQBCACQAKABpAGYAKAAkAGYAcgAgAC0AbAB0ACAANAAwADkANgApAHsAJwAgALcAIACibutbIWoPXyAAkiEgABiKtmHUmpiVDU5JeygAdgAwADEAMAA4ACkAJwB9ACkAIgB9AGMAYQB0AGMAaAB7AH0ACgAkAGUAbgB2ADoAVgBJAEEAXwBOAEUAVABfAEMATwBOAFMARQBOAFQAPQAnAFkARQBTACcAOwAkAGUAbgB2ADoAVgBJAEEAXwBTAEMAUgBBAFAARQBfAEMATwBOAFMARQBOAFQAPQAnAFkARQBTACcACgBTAGEAeQAgAEMAeQBhAG4AIAAnAFsACIpdACAAYyQgAAxUD2GYlYuVKADNZFxP4VS8jBmQAE5MiCAAPQAgAKqJS2KLlSAAtwAgAOpTKFcZkAtQIABQAG8AdwBlAHIAUwBoAGUAbABsACAATIgLeikAJwAKACQAVgA9ACIAJABSAC8AJABEACIAOwAkAGkAbgB2AD0ARwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0ATABpAHQAZQByAGEAbABQAGEAdABoACAAJABWACAALQBGAGkAbAB0AGUAcgAgACcASQBuAHYAbwBrAGUALQBWAEQARgAtAEEAYwB0AGkAdgBhAHQAZQAtAHYAKgAuAHAAcwAxACcAfABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABOAGEAbQBlAHwAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ATABhAHMAdAAgADEACgBpAGYAKAAhACQAaQBuAHYAKQB7AFMAYQB5ACAAUgBlAGQAIAAnAFsAUgBFAEQAXQAgAGQkIAB+Yg1OMFIgAEkAbgB2AG8AawBlAC0AVgBEAEYALQBBAGMAdABpAHYAYQB0AGUAJwA7AHIAZQB0AHUAcgBuAH0ACgBTAGEAeQAgAEMAeQBhAG4AIAAiAFsACIpdACAAZCQgACQAKAAkAGkAbgB2AC4ATgBhAG0AZQApACAALQBGAGUAdABjAGgASABvAG0AZQAgADwAVgBEAEYAPgAgAC0AUgBlAGYAaQBsAGwAQQBwAHAAbAB5ACIACgBQAHUAcwBoAC0ATABvAGMAYQB0AGkAbwBuACAAJABSADsAdAByAHkAewAmACAAJABpAG4AdgAuAEYAdQBsAGwATgBhAG0AZQAgAC0ARgBlAHQAYwBoAEgAbwBtAGUAIAAkAFYAIAAtAFIAZQBmAGkAbABsAEEAcABwAGwAeQA7ACQAcgBjAD0AJABMAEEAUwBUAEUAWABJAFQAQwBPAEQARQB9AGYAaQBuAGEAbABsAHkAewBQAG8AcAAtAEwAbwBjAGEAdABpAG8AbgB9AAoAUwBhAHkAIABDAHkAYQBuACAAIgBbAAiKXQAgAFYARABGACAAUH1fZ7x4IAAkAHIAYwAoADAAIACgfSAAtwAgADIAIADDniAAtwAgADEAIAAFfSAAtwAgADEAMgA0ACAAPpBCZiAAtwAgADEAMwAwACAALU63ZSkAIgAKAA==
+```
+
+上面那一行解碼後的原文(UTF-16LE base64;換版時改 `$H` 與版號清單後重新編碼):
+
+```powershell
+try{[Console]::OutputEncoding=[Text.Encoding]::UTF8}catch{}
+$Br='claude/optimistic-goodall-yhalc5';$D='VeritasIntelligenceAnalytics/functional modules/VDF';$F7="$D/VDF_MDL013_ActivateVDF_v0107.py"
+$R=@($env:VDF_GIT,"$HOME/via-main",$PWD.Path,"$HOME/OneDrive/Documents/movies-dataset")|?{$_ -and(Test-Path -LiteralPath "$_/.git")-and(Test-Path -LiteralPath "$_/$D")}|select -First 1
+if($R){$R=[IO.Path]::GetFullPath($R)}
+$H=@{'0108'='022689247f66210d85391e3a150679a6aa98b4bc';'0109'='c3d6a62ba3c70373c01f566120ad3448e6e1e1cd';'0110'='92f5c39fdbe548232679edca611dcdac02fa3c9a'}
+function Say($c,$m){Write-Host $m -ForegroundColor $c}
+function G{git -C $R @args 2>$null}
+Say Yellow "[VDF 一鍵] PowerShell $($PSVersionTable.PSVersion) · git 倉 $R"
+if($PSVersionTable.PSVersion.Major -lt 7){Say Red '[RED] 要 PowerShell 7(pwsh)';return}
+if(!$R){Say Red '[RED] 找不到 via-main(要有 .git 與 VDF 夾)· 先 set VDF_GIT=<倉路徑> 再貼';return}
+foreach($w in 0,2,4,8){Start-Sleep $w;G fetch -q origin main $Br|Out-Null;if(!$LASTEXITCODE){break}}
+if($LASTEXITCODE){Say Yellow '[YELLOW] ① 抓不到 GitHub(網路)· 照本機現況跑'}
+$bk=Join-Path ([IO.Path]::GetTempPath()) "vdf1_bk_$(Get-Date -f yyyyMMdd_HHmmss)"
+foreach($p in @(G ls-files -o --exclude-standard -- "$D/VDF_MDL013_ActivateVDF_v*.py")){G cat-file -e "origin/main:$p";if(!$LASTEXITCODE){$null=New-Item -ItemType Directory -Force -Path $bk;Move-Item -LiteralPath "$R/$p" $bk -Force;Say Cyan "[計] ① 本機未追蹤的 $(Split-Path $p -Leaf) main 已有 → 移到 $bk(不擋快轉)"}}
+G merge -q --ff-only origin/main|Out-Null
+if(!$LASTEXITCODE){Say Green "[GREEN] ① via-main = main 最新 $(G rev-parse --short HEAD)"}else{Say Yellow '[YELLOW] ① 不能快轉到 main(本機有別的提交 / 改動)· 照現況跑'}
+if(-not(Test-Path -LiteralPath "$R/$F7")){G restore --source=origin/main --worktree -- $F7|Out-Null}
+if((G hash-object -- $F7) -ne (G rev-parse "origin/main:$F7")){Say Red '[RED] ② 本機 v0107 不是 main 的版本 · 不跑';return}
+$n=''
+foreach($v in '0108','0109','0110'){$f="$D/VDF_MDL013_ActivateVDF_v$v.py";G cat-file -e "origin/main:$f";if($LASTEXITCODE){G restore --source="origin/$Br" --worktree -- $f|Out-Null;$b=G hash-object -- $f;if($b -ne $H[$v]){Say Red "[RED] ② v$v 拿不到或內容不對(git blob $b)· 不跑";return};$n+=" v$v($($b.Substring(0,7)))"}else{$n+=" v$v(main 已收)"}}
+Say Green "[GREEN] ② ActivateVDF$n 就位 · 疊在 main 的 v0107"
+try{$o=Get-CimInstance Win32_OperatingSystem;$fr=[int]($o.FreePhysicalMemory/1KB);Say Cyan "[計] ③ 可用記憶體 $fr / $([int]($o.TotalVisibleMemorySize/1KB)) MB$(if($fr -lt 4096){' · 溢寫模式 → 記憶體閘不等(v0108)'})"}catch{}
+$env:VIA_NET_CONSENT='YES';$env:VIA_SCRAPE_CONSENT='YES'
+Say Cyan '[計] ④ 同意閘開(操作員貼這一行 = 親手開 · 只在這個 PowerShell 行程)'
+$V="$R/$D";$inv=Get-ChildItem -LiteralPath $V -Filter 'Invoke-VDF-Activate-v*.ps1'|Sort-Object Name|Select-Object -Last 1
+if(!$inv){Say Red '[RED] ⑤ 找不到 Invoke-VDF-Activate';return}
+Say Cyan "[計] ⑤ $($inv.Name) -FetchHome <VDF> -RefillApply"
+Push-Location $R;try{& $inv.FullName -FetchHome $V -RefillApply;$rc=$LASTEXITCODE}finally{Pop-Location}
+Say Cyan "[計] VDF 結束碼 $rc(0 綠 · 2 黃 · 1 紅 · 124 逾時 · 130 中斷)"
+```
+
