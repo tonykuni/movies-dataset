@@ -276,5 +276,9 @@ sha256:
 擷取 GATED(閘沒開)· 資料庫清點 RED 18(容器部分副本;工作站要看自己的頁)· 結束碼 1(只因資料庫清點)。
 
 sha256:
-- 53aff72c0628ffb9bee4139119017ecdbf808cdf382b57fb5f44b50bb92685f6  functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py
+- 6ac6badea1a7fe2740c8ee4a99bab527ac7dbc0bd6fee8ea3ed3505f82c52b16  functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py
 - 80af855844a199bf23d9a62b4b6bf1486894a8b7685b854138ec6b3a52aea55f  functional modules/VDF/VDF_ENG045_OutputHub_v0102.py
+
+**PR #536 Codex P1(未合併,直接改 v0107):** 環境已有 VCGC `via_duck_temp` 鉤時,本鉤整個讓位 → VCGC 鉤只補 temp / 記憶體,**執行緒沒人管**(三條並行又互搶全部核)。
+改:VCGC 鉤在 → temp / 記憶體照讓它管(不疊兩層),本鉤只另包一層補 `threads`(冪等標記 `_vdf_duck_threads`)。自測 ㉜ 改驗「讓位 + 執行緒照補」;
+突變「VCGC 在就整個不掛」→ ㉜ FAIL。全鏈自測 0 FAIL · 擊斃閘過 · vdf_activatevdf / numbering 重測 rc 0。
