@@ -598,9 +598,11 @@ def _selftest_where(chk) -> None:
             (envh / "vdf_database" / n).write_bytes(b"x")
         p0 = locate_db_home(None, reg)
         p1 = locate_db_home(str(repo_hub()), reg)
-        chk("⑭ 沒給 --home(或給的是倉內預設 output_hub)→ 照冊上的資料家比候選:找到最多本的贏(家本身 2/2 > 鏡根 1/2 > 倉內 0/2)",
+        chk("⑭ 沒給 --home(或給的是倉內預設 output_hub)→ 照冊上的資料家比候選:找到最多本的贏(家本身 2/2 > 鏡根 1/2 > 倉內 0/2;倉內夾不在就不列)",
             Path(p0["picked"]) == Path(os.path.realpath(book_home)) and p1["picked"] == p0["picked"]
-            and [c["found"] for c in p0["candidates"]] == [1, 2, 0] and "倉內預設" in p1["why"], (p0, p1))
+            and [c["found"] for c in p0["candidates"] if not c["why"].startswith("倉內")] == [1, 2]
+            and all(c["found"] == 0 for c in p0["candidates"] if c["why"].startswith("倉內"))   # 倉內 output_hub 不在(CI 稀疏檢出)= 不列,在 = 0 本
+            and "倉內預設" in p1["why"], (p0, p1))
         os.environ["VIA_DATA_HOME"] = str(envh)
         p2 = locate_db_home(None, reg)
         os.environ["VIA_VDF_DB_HOME"] = str(td / "op")
