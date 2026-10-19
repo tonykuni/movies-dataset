@@ -1,8 +1,9 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0127 · 2026-10-19(開閘授權:完成一切測試修正 · HTML U/I 顯示驗證過的輸出)
+# VRN-2 交接報告 · ActivateVRN-2 v0128 · 2026-10-19(使用者機器 v0127 第一次跑:② 找不到 VRN-2 程式夾 → 依 MAIN 登記紀錄定位 · 邊測邊修:表頭列移出年度數據(管理器 v0238 · 驗證器 v0101)· v0127:HTML U/I 顯示驗證過的輸出)
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的貼包(結尾 `NEXT:`)與**驗證摘要**(`VIA_Reports\vrn2\verify_independent\*.digest.txt` · ≤150 行)。不要重讀整份程式;要看程式先用省 Token 卡(`read` / `slice` / `chain`)。
 > **操作員裁決(2026-10-18)**:「都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成」→ VRN-2 / VCGC / VDF 三系統各自獨立:VRN-2 不寫進別的系統的家族、不經 VCGC 核號、不登 VCGC 中央冊。
 > **操作員令(2026-10-19)**:「開閘 授權 + 完成一切測試修正工作 並生成 HTML U/I 上有驗證過的 OUTPUT」。
+> **本輪(v0128 · 啟動器依紀錄定位 · 邊測邊修:管理器 v0238 · 獨立驗證器 v0101)**:使用者機器 2026-10-19 第一次跑 v0127:先把 PowerShell 程式貼進 cmd(每行被 cmd 拒絕 · 什麼都沒跑)→ 改用 cmd / PowerShell 都能貼的一行(Windows PowerShell 5.1 · 雜湊相符 · 啟動器 v0122 → v0127)→ 啟動器 ② 紅「找不到 VRN-2 程式夾 functional modules\VRN」rc 2(上次成功是 2026-10-18 23:48 的 v0125 · 船包清單 manager_tail v0235 · 程式夾在 VIA 根\functional modules\VRN)。原因:啟動器以前**環境變數 VIA_ROOT 有設就只看它**(容器把 VIA_ROOT 指錯 → 同一句紅燈)· 不看自己的紀錄。**v0128 依 MAIN 登記紀錄定位**:VIA_ROOT · 交接報告的 VIA 根 · 本支所在夾 · 目前夾 · MAIN 成功紀錄的鎖檔路徑 · git 倉裡找;多個候選選本機登記的 MAIN 管理器(檔在且 sha 相同);② 印來源與登記版號 · 找不到印查過的地方。**邊測邊修再找到一類錯**:把 U/I「驗證過的輸出」逐格看一遍 → 3 列**表頭被當數據**(凱基 2637 現金流量表「NT$百萬 Dec-23A …」· JP 2330「Balance Sheet & Cash Flow Statement FY24A …」· GS 6415「Jul-25 Oct-25」· 共 11 筆)· 獨立驗證器 v0100 判對位(表頭字本來就印在期間那一欄)→ 管理器 v0238 把表頭列移剔除冊(帶理由)· 驗證器 v0101 另查值的種類(HDRVAL)· 年度數據 4,916 → 4,905 · 剔除冊 733 → 744 · 錯值 0。
 > **本輪(v0127 · 管理器 v0237 · 獨立驗證器 v0100 內嵌)**:① U/I 第一個分頁「**驗證過的輸出**」:每份個股的基本資料 / 一標題四重點 / 年度數據,每格是值 + 驗證徽章(✓✓ = VRN-2 兩讀取器 + 獨立驗證都對位)② 獨立驗證由啟動器 ⑪ 在背景跑(與 ⑧⑨⑩ 同時)· 判決寫回 U/I · **冊指紋相同才套用** · 寫回後才開 U/I ③ **驗證器自己被驗出洞並補上**:v3 只看「值在不在期間那一欄」,別一列的值也會過(反向測試 3,000 筆裡 2,917 筆漏抓)→ v0100 先定「這個科目那一列」再找值(0 / 3,000 漏抓)· 基本資料目標價 / 股價要在自己的標籤旁 · 重點裡的數字對到基本資料 / 年度數據 ④ 新驗證器一掃抓到兩個輸出問題並修好:**凱基財務比率表 13 列整列漏掉**(擷取把「流動比率 (x) 0.6 0.8 …」塞進一格)· **9 對完全重複的列**(季度段與年度段同一個期間字、兩格同值)。
 
 ---
@@ -23,8 +24,8 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | 類別 | 位置 | 說明 |
 |---|---|---|
-| **啟動器(MAIN)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | **v0127** · 雜湊見 `docs/handoff/ai/vrn2_release_v0127/VRN2_Release_v0127.json` · 一鍵 PS:`vrn2_release_v0127/VRN2_OneClick_v0127.md` |
-| 程式夾(本機執行) | `<ROOT>\functional modules\VRN\` | 管理器鏈 v0154–v0237 / ENG397 / ENG062 / 處理器 / **`VRN2_IndependentVerifier_v0100.py`**(VRN-2 的檔都不在 git 追蹤 · 都進船包) |
+| **啟動器(MAIN)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | **v0128** · 雜湊見 `docs/handoff/ai/vrn2_release_v0128/VRN2_Release_v0128.json` · 一鍵:`vrn2_release_v0128/VRN2_OneClick_v0128.md`(**cmd / PowerShell 都能貼的一行**)· 程式夾定位依 MAIN 登記紀錄(v0128) |
+| 程式夾(本機執行) | `<ROOT>\functional modules\VRN\` | 管理器鏈 v0154–v0238 / ENG397 / ENG062 / 處理器 / **`VRN2_IndependentVerifier_v0101.py`**(v0100 留著不刪 · 啟動器用最新版 · VRN-2 的檔都不在 git 追蹤 · 都進船包) |
 | **U/I** | `<ROOT>\VIA_Reports\vrn2\VRN2_UI_latest.html` | 左側操作面板 + 右側分頁 · **第一個分頁「驗證過的輸出」**(v0127)· ⑪ 寫回驗證判決後自動跳出 |
 | **獨立驗證報告** | `<ROOT>\VIA_Reports\vrn2\verify_independent\VRN2_IndependentVerify_<時間>.json` + `.txt` + **`.digest.txt`(貼給 AI)** | v0127 起啟動器 ⑪ 自動產生(只讀 · 不改輸出)· 報告多 `fp`(冊指紋)· `fin_rows`(每筆判決) |
 | **VRN-2 船包(GitHub)** | `<ROOT>\docs\handoff\ai\vrn2_ship\VRN2_Bundle_latest.zip` + `.json` | ⑨ 完成時寫入並提交 · 只含 VRN-2 自己的檔(含獨立驗證器)· 內容沒變位元組就不變 |
@@ -39,20 +40,20 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | 封存 / 隔離 | `…\VRN\_archive_vrn2\`(+ `ARCHIVE_MANIFEST.jsonl`)· `…\VRN\_quarantine\` | ⑩ 只搬 VRN-2 自己的舊版 |
 | U/I 處理器 / 協定 | `…\VRN\VRN2_UIAction_v0102.py` + `VRN2_UIAction_Config.json` · `HKCU\Software\Classes\vrn2` | |
 | OCR 隔離環境 | `C:\Users\tonyk\envs\vrn2_ocr\` + `VRN2_OCRBridge_v0100.py` | |
-| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0127.md`) | ⑨ 自動落地(與 repo 同一份) |
-| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0127\` | 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
+| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0128.md`) | ⑨ 自動落地(與 repo 同一份) |
+| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0128\`(v0127:`vrn2_release_v0127\`)| 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
 
 ---
 
 ## 3. 版本紀錄
 
-### 3.1 現役版本(v0127 內嵌 · 依序自動落地)
+### 3.1 現役版本(v0128 內嵌 · 依序自動落地)
 
 | 元件 | 版本 | 大小 | SHA-256(前 12) | 本輪 |
 |---|---|---|---|---|
-| ActivateVRN-2.py | **v0127** | 見發行清單 | 見發行清單 | 新(管理器鏈加 v0237 · 內嵌獨立驗證器 · ⑪) |
-| VRN-2 SystemManager | v0231 → … → v0236 → **v0237** | v0231 215,605 · v0232 43,966 · v0233 10,066 · v0234 27,553 · v0235 22,840 · v0236 33,760 · v0237 37,036 | `ddff2743b478` / `42e682ba5074` / `25e33a714860` / `d8a564b2c442` / `53ea452b978e` / `872f7fde9452` / `514962c4f0bd` | v0237 新(薄尾 · 前版必須 v0236) |
-| **VRN2_IndependentVerifier** | **v0100** | 67,717 | `d3577ef63eb5` | 新(由 tools/verify_outputs v3 升版 · 內嵌 · 不 import VRN-2 程式) |
+| ActivateVRN-2.py | **v0128** | 見發行清單 | 見發行清單 | 新(依 MAIN 登記紀錄定位程式夾 · ⑨ git 失敗訊息一行 · 管理器鏈加 v0238 · 驗證器 v0101)· v0127:管理器鏈加 v0237 · 內嵌獨立驗證器 · ⑪ |
+| VRN-2 SystemManager | v0231 → … → v0237 → **v0238** | v0231 215,605 · v0232 43,966 · v0233 10,066 · v0234 27,553 · v0235 22,840 · v0236 33,760 · v0237 37,036 · v0238 11,887 | `ddff2743b478` / `42e682ba5074` / `25e33a714860` / `d8a564b2c442` / `53ea452b978e` / `872f7fde9452` / `514962c4f0bd` / `87a3c4d7ab51` | **v0238 新**(薄尾 · 前版必須 v0237 · 表頭列移剔除冊) |
+| **VRN2_IndependentVerifier** | **v0101** | 72,067 | `918ba49d87ff` | **新**(v0100 + HDRVAL 表頭列檢查 · 整檔複本 · 內嵌 · 不 import VRN-2 程式)· v0100 67,717 `d3577ef63eb5` 留在本機 |
 | VRN_ENG397_P1Segment | v0127 | 180,699 | `c2e8e39e5584` | 未變 |
 | VRN_ENG062_SummarizerV1 | v0114 | 63,825 | `62beeaf65576` | 未變 |
 | VRN2_UIAction · VRN2_OCRBridge · rule_catalog | v0102 · v0100 · — | — | `56d5b20689e3` · `4b21f0694d0e` · `e5b881716c84` | 未變 |
@@ -69,8 +70,9 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | v0125 | → v0235 | v0127 | v0114 | ⑨ 只送 VRN-2 船包 · 第三讀法閘(使用者機器第 39 輪) |
 | v0126 | → v0236 | v0127 | v0114 | 轉置表 · 表頭在表外 · 季度欄移出 · ROW / SECTION |
 | **v0127** | → **v0237** | v0127 | v0114 | U/I「驗證過的輸出」· ⑪ 背景獨立驗證寫回 · 一格整列拆開 · 重複列只留一筆 · 驗證器 v0100 |
+| **v0128** | → **v0238** | v0127 | v0114 | 依 MAIN 登記紀錄定位 VRN-2 程式夾(VIA_ROOT 指錯不再擋)· cmd / PowerShell 都能貼的一行 · 表頭列移出 · 驗證器 v0101 |
 
-> 使用者機器:GitHub 有 VCGC 側 v0114–v0153;本機有 VRN-2 的 v0154–v0228 → v0231 的前版是 v0228。v0127 依序落地 v0231 → v0237,每支自測過才落下一支。跑過 v0126 → 前六支「已在且 hash 同」,只落 v0237 + 獨立驗證器。
+> 使用者機器:GitHub 有 VCGC 側 v0114–v0153;本機有 VRN-2 的 v0154–v0228 → v0231 的前版是 v0228。v0127 依序落地 v0231 → v0237,每支自測過才落下一支。跑過 v0126 → 前六支「已在且 hash 同」,只落 v0237 + 獨立驗證器。v0128 依序落地到 v0238(使用者機器上次成功 v0235 → 落 v0236 → v0237 → v0238 + 驗證器 v0101)。
 
 ---
 
@@ -106,6 +108,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ⑧ 完成 · 紅 0 · 黃 5 · 年度數據 11,544 筆 · P1 黃 11 份(轉置表 / 表頭在表外 → v0126 修)· 沒貼回 ⑨ 那一行與驗證摘要。
 
+### 6.1b 使用者機器 2026-10-19(v0127 第一次跑)
+
+① 把 PowerShell 程式貼進 cmd → 每行被 cmd 拒絕 · 什麼都沒跑 ② 改貼「一行」→ Windows PowerShell 5.1 · 雜湊相符 · 啟動器 v0122 → v0127(舊的備份)· 啟動器 ② 紅「找不到 VRN-2 程式夾 functional modules\VRN」· rc 2 · 輸出冊仍是 v0125 那輪(52 份 · 年度數據 11,544)· 本機另有 131 個別的系統的提交沒推(不是 VRN-2 的)。→ v0128 修定位。
+
 ### 6.2 容器實測(v0127 · 19 份真實 PDF · 個股 14 份)
 
 | 項目 | 結果 |
@@ -117,9 +123,30 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | U/I 真瀏覽器(Chromium) | **35/35**(新增 14 項:第一個分頁 · 指紋相同才套用 · **頁面每一格 = 年度數據冊那一筆(4,916 / 4,916)**· 總表 · 選檔 · 徽章 · 提示 · 搜尋 · 只看待核對 · 下載 CSV · 指紋不同不套用) |
 | 實跑(新樹 ×2 · 從 v0126 升級的一鍵 PS ×2 · 新電腦 clone)| 每次 ⑧ 完成 紅 0 · ⑪ 綠 錯值 0 · 再跑四本冊逐位元相同 · ⑨ 只送 VRN-2 船包(別的系統本機提交不推)· clone 補回 16/16 · 細節見 `vrn2_release_v0127/VRN2_Verification_v0127.md` |
 
+### 6.3 容器實測(v0128 · 同 19 份 PDF · 個股 14 份)
+
+| 項目 | 結果 |
+|---|---|
+| 自測 | **啟動器 v0128 23/23**(新增:依紀錄定位 · 新 clone 的定位說明 · git 失敗訊息一行 · 內嵌 15 個元件)· **管理器 v0238 7/7**(鏈 v0231 33/33 … v0237 12/12 全過)· **獨立驗證器 v0101 17/17** |
+| **使用者機器情境重現** | 上次成功 v0125(管理器鏈到 v0235)· Downloads 的啟動器已被一行換成 v0127 · 環境變數 VIA_ROOT 指錯 · 遠端放 v0128 發行分支 → 一行 → 雜湊相符 → ③b 改正 VIA_ROOT(只在這個視窗)→ ② 「來源 VIA_ROOT · 登記 VRN_SystemManager_v0235.py sha 相符」→ 落地 v0236 → v0237 → v0238 + 驗證器 v0101 → ⑧ 完成 · ⑨ 只送 VRN-2 船包 · ⑪ 綠 錯值 0 · U/I 寫回(冊指紋相同) |
+| 從 v0126 升級 + VIA_ROOT 指錯 | 一行 → 備份 v0126 → 換 v0128 → ② 登記 VRN_SystemManager_v0236.py sha 相符 → ⑧ 完成 · ⑨ 只送船包 · ⑪ 綠 · 第 2 次 已是 v0128 · ⑨ 已是最新 |
+| 只跑啟動器(不經 PS)· VIA_ROOT 指到別的夾 | ② 黃「來源 git 倉裡找到 · 登記 VRN_SystemManager_v0238.py sha 相符 · VIA_ROOT … 那裡沒有 VRN-2 程式夾 → 不用」· 其餘全綠 |
+| 一行的竄改測試 | 分支上的一鍵程式碼被改一個字 → SHA-256 不對 → 不執行 |
+| 新電腦(從遠端 clone) | ② 綠(船包清單的管理器下一步補回)· 船包補回 17/17 · ⑧ 完成 · ⑪ 綠 · 沒設 git 使用者 → ⑨ 黃且一行寫明要跑的 git config · 設了 → ⑨ 上船 |
+| 輸出 | 年度數據 4,916 → **4,905**(表頭列 3 列 11 筆移剔除冊 · 剔除冊 733 → 744)· 基本資料 / 一標題四重點與 v0127 **逐位元相同** · 每次跑出來的四本冊彼此逐位元相同 · **獨立驗證 v0101** 194/194 · 63/63 · 4,905 錯值 0(ALIGNED 4,378 · SUBALIGNED 452 · TRANSALIGNED 75 · HDRVAL 0)· 反向測試漏抓 0(新增:表頭列 11 筆放回 → v0101 全抓 · v0100 全漏 · 混進整本冊 → 一般列不誤標)· U/I 真瀏覽器 35/35 |
+
 ---
 
-## 7. 本輪修正(v0126 → v0127)
+## 7. 本輪修正(v0127 → v0128)
+
+| # | 發現 | 修法 | 實測 |
+|---|---|---|---|
+| 1 | 使用者把 PowerShell 程式貼進 cmd → 全部被 cmd 拒絕 | 「cmd / PowerShell 都能貼的一行」:`powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand …` → 讀分支上的一鍵程式碼 → SHA-256 相符才執行(被改一個字 → 不執行) | 容器 pwsh 7.4 實跑 · 竄改測試 |
+| 2 | **啟動器 ② 找不到 VRN-2 程式夾**:環境變數 VIA_ROOT 有設就只看它(指錯 → 找不到 · 不看預設路徑 · 不看自己的紀錄) | v0128 `locate()`:候選 VIA 根(VIA_ROOT 與其下 VeritasIntelligenceAnalytics · 交接報告的 VIA 根 · 本支所在夾 · 目前夾)· MAIN 成功紀錄 `VIA_Reports\vrn2\VRN2_Success_latest.json` 的鎖檔路徑 · git 倉裡找;多個候選 → 本機登記的 MAIN 管理器(`registry\VRN2_Module_Success_Register.json` 檔在且 sha 相同)→ 船包 / 交接紀錄的 manager_tail;② 印來源與登記版號(VIA_ROOT 被略過 → 黃)· 找不到 → 列出查過的地方 · 一鍵 PS 加 ③b 同樣定位 | 啟動器自測新增 1 項 · 容器 VIA_ROOT 指錯實跑 |
+| 3 | 新電腦實測(從遠端 clone · 沒設 git 使用者):⑨ 黃燈只印「t your account's default identity.」(git 多行訊息取最後 160 字 · 開頭被切掉)· ② 寫「沒有登記紀錄可比對」(其實船包清單有寫管理器尾版) | `_git_why()`:git 失敗訊息濃縮成一行(沒設使用者 → 直接寫要跑的 `git config --global user.name / user.email` · 其他 → fatal / error / remote 那幾行)· ⑨ 提交 / 抓遠端 / 建提交 / 推送失敗都用它;② 新 clone 寫「船包清單的管理器 VRN_SystemManager_v0237.py 下一步依船包補回」 | 啟動器自測新增 2 項 · 容器新電腦 clone 實跑(沒設使用者 → ⑨ 黃 · 一行說怎麼設;設了 → ⑨ 上船) |
+| 4 | **把 U/I「驗證過的輸出」逐格看一遍 → 3 列表頭被當數據**(凱基 2637 P5 現金流量表「NT$百萬 Dec-23A … Dec-27F」5 筆 · JP 2330 P20「Balance Sheet & Cash Flow Statement FY24A … FY27E」4 筆 · GS 6415 P2「Jul-25 Oct-25」Jan-26 / Apr-26 2 筆)· 獨立驗證器 v0100 判對位(表頭字本來就印在期間那一欄 → 位置檢查一定過) | 管理器 **v0238**(薄尾):值是期間字 / 科目整個是期間字 / 一整列的值都等於期間的年份 → 整列移剔除冊(理由「表頭列(…)· 不進年度數據」)· 獨立驗證器 **v0101**:同樣三條另查值的種類(HDRVAL · 跟讀法無關 · 整列都標) | 管理器自測 7/7 · 驗證器自測 17/17 · 反向測試:11 筆放回 → v0101 全抓 · v0100 全漏 · 混進整本冊 → 一般列不誤標 · 年度數據 4,916 → 4,905 · 剔除冊 733 → 744 · ⑪ 錯值 0 |
+
+## 7b. v0126 → v0127
 
 | # | 發現 | 修法 | 實測 |
 |---|---|---|---|
@@ -138,7 +165,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | # | 項目 | 狀態 | 需要 |
 |---|---|---|---|
-| 1 | **使用者用一鍵 PS v0127 再跑** | 待執行 | 預期:U/I 自動跳出時第一個分頁就是「驗證過的輸出」· ⑪ 綠 · **貼回 ⑨ / ⑪ 兩行 + 驗證摘要**(52 份 · 新驗證器第一次在使用者機器跑 · 有 ✗ 格先看原文再判) |
+| 1 | **使用者用 v0128 的一行再跑**(cmd / PowerShell 都能貼) | 待執行 | 預期:一鍵程式碼雜湊相符 · ③b / ② 印出程式夾來源與登記版號(本機上次成功 v0235)· 落地 v0236 → v0237 → v0238 + 獨立驗證器 v0101 · ⑧ 完成 · ⑪ 綠 · U/I 自動跳出時第一個分頁就是「驗證過的輸出」· **貼回 ② / ③b / ⑨ / ⑪ 那幾行 + 驗證摘要**(52 份 · 新驗證器第一次在使用者機器跑 · 有 ✗ 格先看原文再判) |
 | 2 | 使用者機器其他 P1 黃燈(260914_daiwa_aspeed · GFHK Apple · 南亞 · 啟碁)| 不在容器 | 看 ⑪ 摘要與 U/I ✗ 格 |
 | 3 | 期間下有子欄、表頭在表外的表(華南 P4 銷售金額 / 占比)· 季度表 | 不收(剔除冊帶理由) | 若要季度數據 → 另開季度冊 |
 | 4 | 一標題四重點 3/4 · MQ-1560 影像 PDF 標題 | 待 OCR / ENG062 | — |
@@ -155,7 +182,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | FILENAME / 首頁 / 年度財報 / 評價資訊 | ✅ 使用者 52/52 全綠(第 39 輪) |
 | 年度數據 | ✅ 主冊只留兩個讀取器對得上的年度值 · 一格整列拆開 · 重複列只留一筆 · 🟡 剔除冊帶理由 |
 | 一標題四重點 | 🟡 51/52 綠 |
-| 輸出驗證無誤 | ✅ 容器三本冊錯值 0(驗證器 v0100 · 反向測試漏抓 0)· 🟡 使用者機器待 v0127 ⑪ 摘要 |
+| 輸出驗證無誤 | ✅ 容器三本冊錯值 0(驗證器 v0101 · 反向測試漏抓 0 · 表頭列 0)· 🟡 使用者機器待 v0127 ⑪ 摘要 |
 | **HTML U/I 上看得到驗證過的輸出** | ✅ 第一個分頁 · 每格值 + 徽章 · 指紋相同才套用 |
 | 完成後上船 GitHub | 🟡 v0125 起只送船包(使用者機器 ⑨ 結果還沒貼回) |
 | 指令接加速器 · 第一步 CPU / DRAM · 平行段 · 驗證背景平行 | ✅ |
@@ -164,7 +191,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 10. 執行方式
 
-一鍵 PowerShell(取得 v0127 → 驗雜湊 → 執行(啟動器自己跑 ①~⑪ · 開 U/I)→ 摘要 → 印驗證摘要):`docs/handoff/ai/vrn2_release_v0127/VRN2_OneClick_v0127.md`(整段貼進 PowerShell)。
+一鍵(取得 v0128 → 驗雜湊 → ③b 定位 → 執行(啟動器自己跑 ①~⑪ · 開 U/I)→ 摘要 → 印驗證摘要):`docs/handoff/ai/vrn2_release_v0128/VRN2_OneClick_v0128.md` · **用檔裡那一行(cmd / PowerShell 都能貼)**· 或在 PowerShell(提示字元 `PS C:\…>`)貼整段程式碼 · **不要把整段程式碼貼進 cmd**。
 
 - 只實測不上船:PS 檔頭 `$NoPush = $true` · 不跑獨立驗證:`$env:VIA_VRN2_NO_VERIFY = '1'` · 驗證平行路數:`$env:VRN2_VERIFY_PAR = '2'` · 驗證等待上限:`$env:VIA_VRN2_VERIFY_WAIT = '3600'`。
 - 新電腦:clone repo → 跑一鍵 PS(② 自動依船包補回 VRN-2 檔 · 含獨立驗證器)。
@@ -173,6 +200,11 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 ---
 
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
+
+- **對位不等於是數據**:表頭字本來就印在期間那一欄 → 位置檢查一定判對;驗證器還要查值的種類(值是期間字 · 科目是期間字 · 整列等於年份 → 表頭列 HDRVAL)。每輪把 U/I 的格子看一遍,怪值(Dec-23A · FY24A 當成值)先懷疑表頭。
+- **定位靠紀錄,不靠猜**:找程式夾先看 MAIN 自己寫的紀錄(成功紀錄的鎖檔路徑 · 成功登記冊的管理器檔與 sha · 船包清單的 manager_tail);環境變數只是候選之一,指錯要能被略過並說出來。找不到時把查過的地方全部印出來(使用者貼回就能判斷)。
+- **先問清楚貼在哪個殼**:提示字元 `C:\…>` = cmd · `PS C:\…>` = PowerShell;給使用者的一鍵指令要兩邊都能貼(`-EncodedCommand` + 雜湊核對)。
+- **使用者貼回的紀錄先比時間戳記與雜湊**:同一份紀錄重貼時(開始時間 · 雜湊 · 備份檔名都一樣)不要當成新結果。
 
 - **驗證器要先被驗**:每一種檢查都要做反向測試(把一種真的會發生的錯放回輸出 → 一定要抓到),而且要「量漏抓率」。v3 的「值在期間那一欄」看起來很嚴,反向測試一跑 3,000 筆漏 2,917 → 驗證說「錯值 0」不代表輸出對。
 - **先定列,再找值**:找值之前先決定「這個科目是哪一列」(科目字相同 · 不是只含),值只從那一列找;不要拿值去挑列(拿值挑列 → 哪一列有這個值就說對)。鄰列只在科目列沒有數值時用,而且要互為最近。
