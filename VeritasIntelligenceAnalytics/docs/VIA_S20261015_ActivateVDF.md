@@ -244,3 +244,37 @@ sha256:
 - 落檔標成 v0102:v0102 外層在跑時把 schema 改回 v0102 再寫 → 本版先標 v0106 再直接交 v0100 原版寫;自測 ㉗ 照真跑開著 v0102 的 _IN_RUN(突變:改回走 v0102 外層 → ㉗ FAIL)。
 - 2 秒容差可能吃到前一輪的 DB_CHECK:改成起跑記檔的指紋(mtime_ns · 大小 · sha256),寫總覽時指紋沒變 = NOT_RUN,沒有時間容差;自測 ㉕(突變:指紋永不相等 → ㉕ FAIL)。
   容器真跑:--flows db → 落檔 schema VDF_ActivateVDF_v0106;接著 --flows fetch(不跑資料庫)→ 清點 NOT_RUN「本輪起跑後沒重寫」。
+
+## ActivateVDF v0107 + ENG045 v0102:記憶體 / TEMP 本輪真生效 · 全流程跑完(2026-10-19)
+
+操作員令:「繼續 跑完貼回結果 對於記憶體跟TEMP支援方式用最快最佳的方法 自動完成」。
+
+**量測(改前):** v0100 起每條流程已給子行程 TMP / TEMP / TMPDIR / POLARS_TEMP_DIR / VIA_DUCKDB_TEMP_DIR(本輪 temp 夾,
+`%LOCALAPPDATA%\VIA_TEMP\ActivateVDF\run_*`,不在 OneDrive)· VIA_DUCKDB_MEM(每條預算)· 執行緒上限。
+但 VDF 有 267 支直接 `duckdb.connect()`,**DuckDB 不讀環境變數** —— 只有 VCGC 的 CGC_MDL262_DuckTempHook 代裝進環境(.pth)後才補。
+沒裝的境:DuckDB 溢寫落在**資料庫旁邊**(工作站 = `VDF\output_hub`,OneDrive 同步拖慢)、每支行程各吃實體記憶體 80%、執行緒 = 全部核(三條並行互搶)。
+
+**最快最佳解(不改任何引擎、不裝進環境、不改他系統):ActivateVDF v0107**
+- 每輪把一支小啟動鉤寫進本輪 temp 夾(`run_*/pyhook/sitecustomize.py`,不在倉內,舊輪照滾動清),排子行程 PYTHONPATH **最後**:
+  中央 bootstrap 的 sitecustomize 本來就接力「sys.path 上下一份同名檔」→ 跑到本鉤;沒有 bootstrap 時本鉤就是那一份;本鉤跑完只往**後面**接力(不回頭、不遞迴)。
+- duckdb 被 import 那一刻才掛(沒用 duckdb 的行程零成本);每個 `connect()` 呼叫端沒給的才補:
+  `temp_directory` = 本輪流程 temp/p<pid> · `memory_limit` = 每條預算 · `threads` = 每條執行緒。子行程再起的孫行程同樣生效。
+- 環境已裝 VCGC 的 `via_duck_temp` 鉤 → 本鉤讓位(不疊兩層);`VIA_DUCK_TEMP=0` → 不掛。
+- 起跑實測約 1 秒:終端 `①b 記憶體 / TEMP` 一行 · 總覽頁「記憶體 / TEMP」卡 · `resources.memtemp`。
+- 自測 ㉙–㉞(㉟ = 沒 duckdb 分支);突變:鉤不裝 → ㉚ FAIL · 不往後接力 → ㉛ FAIL · 不讓位 → ㉜ FAIL。
+
+**容器全流程真跑(PS 一鍵 v0105 · 仿操作員視窗 · 雙閘沒開):** 593 秒 · `①b 記憶體 / TEMP GREEN`(溢寫 → 本輪 temp/probe/p<pid> · 記憶體 2.6 GiB = 預算 2841 MB · 執行緒 1 = 每條 · 鉤 VDF 本輪鉤);
+加速器 / 網路 / 覆蓋 GREEN(Py 93/93 · PS 161/161);擷取 GATED(閘沒開);引擎 94/94 可啟動 · 自測 GREEN 65 · NODATA 8 · **RED 2**;資料庫清點 RED 18(容器庫是部分副本)。
+
+**RED 2 查因 + 修正:**
+- ENG045_OutputHub v0101 6/7:自測固定寫共用夾 `VIA_Reports/vdfout_runs/selftest_out`(每次先改名 .bak,已累積 150 支)。同一秒兩支自測 → 互相改名 / 占 DuckDB 檔。
+  容器四支併跑三輪各 2 支 FAIL(parquet / duckdb 往返)重現;單跑永遠 7/7。→ **ENG045 v0102**(薄尾):自測把 EV 暫換成本次私有暫存夾再跑前版七檢,跑完刪;共用夾一字不動。新檢 ① 共用夾不動 · ② 四支併跑全過;突變(改回共用夾)→ ① FAIL。真跑照 v0101。
+- ActivateVDF v0107 自測 5/6:在一輪真跑裡被引擎啟動檢查叫起時,帶到父輪的 `VIA_VDF_DUCK_HOOK` → ㉙ 誤判。→ 自測基底環境拿掉該標記(未合併,直接改)。
+  兩支都在真跑環境經管理員 `engine run … --selftest` 驗過 rc 0。
+
+**修正後第二次容器全流程真跑:** 505 秒 · ①b 記憶體 / TEMP GREEN · 引擎 94/94 可啟動 · 自測 GREEN 67 · NODATA 8 · **RED 0** · 加速器 / 網路 / 覆蓋 GREEN ·
+擷取 GATED(閘沒開)· 資料庫清點 RED 18(容器部分副本;工作站要看自己的頁)· 結束碼 1(只因資料庫清點)。
+
+sha256:
+- 53aff72c0628ffb9bee4139119017ecdbf808cdf382b57fb5f44b50bb92685f6  functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py
+- 80af855844a199bf23d9a62b4b6bf1486894a8b7685b854138ec6b3a52aea55f  functional modules/VDF/VDF_ENG045_OutputHub_v0102.py
