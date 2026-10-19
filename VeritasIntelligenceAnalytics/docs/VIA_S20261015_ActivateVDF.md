@@ -308,3 +308,20 @@ VRN-1(本倉與船單都沒有 → 另一團隊的倉,代碼列進 `other_system
 頁面:總覽頁 · VDF 操作頁 · 資料庫閘頁 三種寬度 0 JS 錯、手機寬不橫捲。
 
 **收尾要在工作站跑(容器做不到的部分):** 增量擷取要觸網,同意閘是操作員的手(AI 不代設)。工作站 PS 一鍵(本視窗先開雙閘)→ 擷取寫完 → db check 0 紅 · db_xcheck 綠 = 收尾。
+
+### 資料庫在哪(操作員:「查之前的對話紀錄,找到資料庫的位置位於文件之中」)
+
+文件記載(`VIA_DataHome_SSOT_v0100.json` · 批490 交接 `VIA_Handover_20260913_B474.md` / `VIA_Handover_20260914_B498.md` · `VIA_B655_TwoFilesOneTable.md`):
+- 資料家 `C:\Users\tonyk\VIA System\via_database`(操作員 2026-09-14 宣告;parquet 存、duckdb 管;搬 = link 不複製;刪 = 操作員的手)。
+- 鏡根 `…\via_database\movies-dataset\data\VeritasIntelligenceAnalytics\functional modules\VDF\output_hub\`(倉內 output_hub 的搬家位);
+  ENG073 的庫解析實錄:`資料家目錄頁→C:\Users\tonyk\VIA System\via_database\…\VDF\output_hub\mega\vdf_tw_market.duckdb`。
+- `db move` 的目的地例 `…\via_database\vdf_database`(VDF 自己的資料家)。
+
+工作站 10-19 真跑的 db check 量的卻是倉內 `C:\Users\tonyk\OneDrive\Documents\movies-dataset\…\VDF\output_hub`:
+PS 啟動器預設把它當 `--db-home` 傳,而 v0151 的 `db_home` 只認 `--home > VIA_VDF_DB_HOME > 倉內 output_hub`,不看資料家。
+
+**修(VDF_SystemManager v0156 · ActivateVDF v0108):** 沒給 `--home` 或給的就是倉內預設 → 照冊上優先序比候選
+(`VIA_VDF_DB_HOME` > `VIA_DATA_HOME` > 冊 `home_win` 的 vdf_database · 鏡根 VDF output_hub · 家本身 > 倉內 output_hub 退路),
+選「冊上的庫找到最多本」的那一個(同分取前面);給了別的 `--db-home` / `VIA_VDF_DB_HOME` = 操作員指定照用。
+新動詞 `db where`;ActivateVDF 本輪資料庫流程先跑 `db_where`,db check / refill 用同一個家;db check 終端印 `[庫位置] …` 與每個候選找到幾本。
+自測 ⑭–⑯(v0156 本版 14/14);突變 6 個全抓。

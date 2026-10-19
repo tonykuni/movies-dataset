@@ -20,6 +20,14 @@
      三表同日代號:有資料的表兩兩比代號集合;至少兩表完全相同 → GREEN;兩表以上有資料但都不同 → YELLOW(列缺漏樣本);
        庫裡不到兩張表 → YELLOW(沒得對照);表在但當日少於兩表有資料 → 最新日 YELLOW(日更未齊)、舊日 RED。
      universe xcheck 末行多印「[計] VDF 互對照 …」(ActivateVDF 的步驟摘要讀這行)。前版 v0122 自測跑前換回原判法。
+  ⑧ 庫在哪(操作員 2026-10-19「查之前的對話紀錄,找到資料庫的位置位於文件之中」):文件記載資料家 = VIA_DataHome_SSOT home_win
+     C:\\Users\\tonyk\\VIA System\\via_database(批490 操作員宣告;鏡根 via_database\\movies-dataset\\data\\…\\VDF\\output_hub;
+     db move 的目的地例 via_database\\vdf_database)。v0151 的 db_home 只認 --home > VIA_VDF_DB_HOME > 倉內 output_hub,
+     而 PS 啟動器預設把倉內 output_hub 當 --home 傳進來 → 工作站 db check 量的是倉內夾,不是資料家。本版:
+     沒給 --home、或給的就是倉內預設 output_hub → 照冊上優先序比候選(VIA_VDF_DB_HOME > VIA_DATA_HOME > 冊 home_win / home_posix
+     [各看 vdf_database · 鏡根 VDF output_hub · 家本身] > 倉內 output_hub),選「冊上的庫找到最多本」的那一個(同分取前面的);
+     給了別的 --home 或設了 VIA_VDF_DB_HOME = 操作員指定,照用。結果多 home_pick(選誰 · 為什麼 · 每個候選找到幾本),
+     終端印「[庫位置] …」;新動詞 db where [--home 夾] [--json] 只回選到的庫位置(ActivateVDF 先問它,check / refill 用同一個家)。
 作法:換掉 v0151 模組的 db_check / _print_db(v0151 main 的 db 動詞查模組全域);v0155 的 min0_rows 照用;
       換掉 v0122 模組的 xcheck_index / xcheck_counts / xcheck / universe(查模組全域)。
 只讀本倉 VRN 夾的檔名與 VRN-2 船單(他系統自報)與 VDF 自己的庫,不載入、不寫他系統的檔;不抓網、不碰 TA-Lib。
@@ -208,8 +216,71 @@ def split_rows(rows: list, v2: set | None = None) -> dict:
     return {"n": n, "was_red": red, "was_yellow": yel, "by_system": by, "vrn1_codes": sorted(v1)}
 
 
+DATAHOME_GLOB = "VIA_DataHome_SSOT_v*.json"
+MIRROR_REL = Path("movies-dataset") / "data" / "VeritasIntelligenceAnalytics" / "functional modules" / "VDF" / "output_hub"
+
+
+def repo_hub() -> Path:
+    return Path(os.path.realpath(HERE / "output_hub"))
+
+
+def datahome_roots(reg: Path | None = None) -> list:
+    """資料家根(照冊 precedence):env VIA_DATA_HOME > 冊 home_win(Windows)/ home_posix。只讀冊,不載入 VCGC 程式。"""
+    out = []
+    if os.environ.get("VIA_DATA_HOME"):
+        out.append(("env VIA_DATA_HOME", Path(os.environ["VIA_DATA_HOME"])))
+    hits = sorted((reg or DB_MOD.REG).glob(DATAHOME_GLOB), key=_vnum_v0156)
+    if hits:
+        try:
+            j = json.loads(hits[-1].read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            j = {}
+        key = "home_win" if os.name == "nt" else "home_posix"
+        if j.get(key):
+            out.append(("%s %s" % (hits[-1].name, key), Path(j[key])))
+    return out
+
+
+def home_candidates(reg: Path | None = None) -> list:
+    """候選家(優先序):VIA_VDF_DB_HOME 已在 locate 先處理;資料家各根的 vdf_database · 鏡根 VDF output_hub · 根本身;最後倉內 output_hub(退路)。"""
+    cands, seen = [], set()
+
+    def add(why, p):
+        rp = os.path.realpath(str(p))
+        if rp not in seen and Path(rp).is_dir():
+            seen.add(rp)
+            cands.append((why, Path(rp)))
+    for why, root in datahome_roots(reg):
+        add(why + " → vdf_database", root / "vdf_database")
+        add(why + " → 鏡根 VDF output_hub", root / MIRROR_REL)
+        add(why, root)
+    add("倉內 output_hub(退路)", repo_hub())
+    return cands
+
+
+def locate_db_home(explicit: str | None = None, reg: Path | None = None) -> dict:
+    """選庫位置:給了別的 --home / 設了 VIA_VDF_DB_HOME = 照用;否則候選裡「冊上的庫找到最多本」的那個(同分取前面)。"""
+    if explicit and os.path.realpath(explicit) != str(repo_hub()):
+        return {"picked": str(Path(explicit)), "why": "--home 指定(照用)", "candidates": []}
+    if os.environ.get("VIA_VDF_DB_HOME"):
+        return {"picked": os.environ["VIA_VDF_DB_HOME"], "why": "env VIA_VDF_DB_HOME 指定(照用)", "candidates": []}
+    _src, book = DB_MOD.table_book(reg)
+    names = sorted({t["db"] for t in book})
+    rows = []
+    for why, p in home_candidates(reg):
+        found = sum(1 for n in names if DB_MOD._find_db(p, n)[0] is not None)
+        rows.append({"home": str(p), "why": why, "found": found, "total": len(names)})
+    if not rows:
+        return {"picked": str(repo_hub()), "why": "沒有候選在(照倉內 output_hub)", "candidates": []}
+    best = max(rows, key=lambda r: (r["found"], -rows.index(r)))
+    tail = "(倉內預設 --home 不算指定)" if explicit else ""
+    return {"picked": best["home"], "why": "%s · 冊上 %d 本庫找到 %d 本%s" % (best["why"], best["total"], best["found"], tail), "candidates": rows}
+
+
 def db_check(home: str | None = None, reg: Path | None = None, today=None, write: bool = True) -> dict:
-    o = _DB_CHECK_V0151(home, reg, today, write=False)
+    pick = locate_db_home(home, reg)
+    o = _DB_CHECK_V0151(pick["picked"], reg, today, write=False)
+    o["home_pick"] = pick
     if not o.get("rows"):
         if write and o.get("lamp") != "NODATA":
             o["files"] = DB_MOD._write_db(o)
@@ -228,6 +299,11 @@ def db_check(home: str | None = None, reg: Path | None = None, today=None, write
 
 def _print_db(o: dict) -> None:
     _PRINT_DB_V0151(o)
+    hp = o.get("home_pick")
+    if hp:
+        print("  [庫位置] %s · %s" % (hp["picked"], hp["why"]))
+        for c in hp.get("candidates") or []:
+            print("    候選 %s · 找到 %d/%d · %s" % (c["home"], c["found"], c["total"], c["why"]))
     ot = o.get("other_system")
     if ot and ot.get("n"):
         by = " · ".join("%s %d" % kv for kv in sorted((ot.get("by_system") or {}).items()))
@@ -392,6 +468,18 @@ def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in args[:2]:
         return selftest()
+    if args[:2] == ["db", "where"]:
+        if os.environ.get("VIA_FROM_VCGC") != "YES":
+            print("[VDF] 拒絕。只能經 VDF 啟動器 / via-vcgc(VIA_FROM_VCGC=YES)。")
+            return 2
+        h = args[args.index("--home") + 1] if "--home" in args and args.index("--home") + 1 < len(args) else None
+        pick = locate_db_home(h)
+        if "--json" in args:
+            print(json.dumps(pick, ensure_ascii=False))
+        for c in pick["candidates"]:
+            print("  候選 %s · 找到 %d/%d · %s" % (c["home"], c["found"], c["total"], c["why"]))
+        print("[計] VDF db where · %s · %s" % (pick["picked"], pick["why"]))
+        return 0
     return PRIOR.main(args)
 
 
@@ -479,6 +567,68 @@ def _selftest_xcheck(chk) -> None:
                 re.search(r"\[計\] VDF 互對照\(" + RULE + r"\)· 加權收盤 RED\(2/5 日.*三表同日代號 YELLOW\(2/3 日", out) is not None and rc == 1,
                 (rc, out[-400:]))
     finally:
+        shutil.rmtree(td, ignore_errors=True)
+
+
+def _selftest_where(chk) -> None:
+    """庫在哪的三檢(⑭–⑯);沙盒冊與沙盒家 · 不碰真資料家。"""
+    import contextlib
+    import io
+    import shutil
+    import tempfile
+    td = Path(tempfile.mkdtemp(prefix="vdfwhere156_"))
+    keep = {k: os.environ.get(k) for k in ("VIA_DATA_HOME", "VIA_VDF_DB_HOME", "VIA_FROM_VCGC")}
+    try:
+        for k in ("VIA_DATA_HOME", "VIA_VDF_DB_HOME"):
+            os.environ.pop(k, None)
+        reg = td / "reg"
+        reg.mkdir()
+        (reg / "VIA_DB_Table_SSOT_v0100.json").write_text(json.dumps({"tables": [
+            {"db": "w_a_test.duckdb", "table": "t1"}, {"db": "w_b_test.duckdb", "table": "t2"}]}), encoding="utf-8")
+        book_home = td / "bookhome"
+        mirror = book_home / MIRROR_REL / "mega"
+        mirror.mkdir(parents=True)
+        (mirror / "w_a_test.duckdb").write_bytes(b"x")
+        (book_home / "w_b_test.duckdb").write_bytes(b"x")               # 家本身也有一本:鏡根只找到 1 本 · 家本身 rglob 找到 2 本
+        key = "home_win" if os.name == "nt" else "home_posix"
+        (reg / "VIA_DataHome_SSOT_v0100.json").write_text(json.dumps({key: str(book_home)}), encoding="utf-8")
+        envh = td / "envhome"
+        (envh / "vdf_database").mkdir(parents=True)
+        for n in ("w_a_test.duckdb", "w_b_test.duckdb"):
+            (envh / "vdf_database" / n).write_bytes(b"x")
+        p0 = locate_db_home(None, reg)
+        p1 = locate_db_home(str(repo_hub()), reg)
+        chk("⑭ 沒給 --home(或給的是倉內預設 output_hub)→ 照冊上的資料家比候選:找到最多本的贏(家本身 2/2 > 鏡根 1/2 > 倉內 0/2)",
+            Path(p0["picked"]) == Path(os.path.realpath(book_home)) and p1["picked"] == p0["picked"]
+            and [c["found"] for c in p0["candidates"]] == [1, 2, 0] and "倉內預設" in p1["why"], (p0, p1))
+        os.environ["VIA_DATA_HOME"] = str(envh)
+        p2 = locate_db_home(None, reg)
+        os.environ["VIA_VDF_DB_HOME"] = str(td / "op")
+        p3 = locate_db_home(None, reg)
+        p4 = locate_db_home(str(td / "given"), reg)
+        chk("⑮ 優先序:env VIA_DATA_HOME 的 vdf_database(2/2)排在冊 home 前、同分取前面;VIA_VDF_DB_HOME / 給了別的 --home = 操作員指定,照用",
+            Path(p2["picked"]) == Path(os.path.realpath(envh / "vdf_database")) and p2["candidates"][0]["why"].startswith("env VIA_DATA_HOME")
+            and p3["picked"] == str(td / "op") and p4["picked"] == str(td / "given") and not p4["candidates"], (p2, p3, p4))
+        os.environ.pop("VIA_VDF_DB_HOME", None)
+        oc = db_check(None, reg, write=False)
+        os.environ["VIA_FROM_VCGC"] = "YES"
+        buf = io.StringIO()
+        keep_reg = DB_MOD.REG
+        DB_MOD.REG = reg
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = main(["db", "where", "--json"])
+        finally:
+            DB_MOD.REG = keep_reg
+        out = buf.getvalue()
+        chk("⑯ db check 量的就是選到的家(home · home_pick 同一個);db where 動詞:回 JSON 與「[計] VDF db where · <家> · 為什麼」;rc 0",
+            Path(oc["home"]) == Path(p2["picked"]) and oc.get("home_pick", {}).get("picked") == p2["picked"] and rc == 0 and json.loads(out.splitlines()[0])["picked"] == p2["picked"] and "[計] VDF db where · " + p2["picked"] in out, out[-300:])
+    finally:
+        for k, v in keep.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
         shutil.rmtree(td, ignore_errors=True)
 
 
@@ -580,6 +730,7 @@ def selftest() -> int:
                 and "VRN 未分辨" in out and "L123" in out,
                 (o["lamp"], st, o.get("other_system"), rc, out[-400:]))
         _selftest_xcheck(chk)
+        _selftest_where(chk)
         src = Path(__file__).read_text(encoding="utf-8")
         imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
         chk("⑦ 加速器橋 · 網路橋在;不匯入他系統程式(只讀檔名與船單);不碰 TA-Lib;同意閘不寫",
