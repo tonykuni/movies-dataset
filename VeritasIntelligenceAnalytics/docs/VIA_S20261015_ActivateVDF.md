@@ -237,5 +237,10 @@ Python 把空段當「目前目錄」,`bootstrapA::bootstrapB` 這種正好要�
 
 sha256:
 - 0b738b925d753c1183fe0e7b5ae16330ddbbfee578ed65cf85dc6d5a9237ad44  functional modules/VDF/Invoke-VDF-Activate-v0105.ps1
-- 167a1162d848aaafd2533f3d1f80baf89810a151cd53150f2d60ad0a884f2031  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
+- fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
 - 44041f4bc0731754710dcddf8ba9ecb4752f5571052782717b03979aca2aa47b  functional modules/VDF/VDF_SystemManager_v0155.py
+
+**PR #535 Codex 兩條 P2(未合併,直接改 v0106):**
+- 落檔標成 v0102:v0102 外層在跑時把 schema 改回 v0102 再寫 → 本版先標 v0106 再直接交 v0100 原版寫;自測 ㉗ 照真跑開著 v0102 的 _IN_RUN(突變:改回走 v0102 外層 → ㉗ FAIL)。
+- 2 秒容差可能吃到前一輪的 DB_CHECK:改成起跑記檔的指紋(mtime_ns · 大小 · sha256),寫總覽時指紋沒變 = NOT_RUN,沒有時間容差;自測 ㉕(突變:指紋永不相等 → ㉕ FAIL)。
+  容器真跑:--flows db → 落檔 schema VDF_ActivateVDF_v0106;接著 --flows fetch(不跑資料庫)→ 清點 NOT_RUN「本輪起跑後沒重寫」。

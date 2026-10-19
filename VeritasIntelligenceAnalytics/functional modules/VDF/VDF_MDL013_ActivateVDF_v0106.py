@@ -10,6 +10,8 @@ r"""VDF_MDL013_ActivateVDF v0106 — 薄尾:跑完自動跳出的總覽頁直接
      → 燈 · 家 · 冊 · 紅 / 黃 / 綠 / 他系統 列數 · VDF 自己的紅黃列 · 收尾判定(VDF 自己的表 0 紅 = 可收尾)。
   ② 自動跳出的總覽頁最上方加「資料庫清點」一節:判定一句話 + 計數卡 + VDF 紅黃表逐列(庫 · 表 · 狀態 · 列數 / 上次 · 最新日 ·
      寫入者 · 怎麼補)+ 收合的綠列與他系統表(只攤開不代修,L120)。本輪沒清點(資料庫流程沒跑 / 中斷)照實寫,不拿舊結果冒充。
+  ②b 本輪判定用指紋:起跑記 DB_CHECK_latest.json 的 mtime_ns · 大小 · sha256,寫總覽時一樣 = 本輪沒重寫 → NOT_RUN(沒有時間容差);
+     落檔前先標 schema / tag = v0106 再交 v0100 原版寫(v0102 外層會把落檔標回 v0102)—— 都是 PR #535 Codex P2。
   ③ 頁面:卡片內長路徑可折行(手機寬 390 px 原本被 temp 路徑撐到 418 px 橫捲)。
   ④ 他系統表 / 冊上最少 0 列的判法在 VDF_SystemManager v0155(db check 本身);本檔只讀它寫的 JSON,不重判。
 其餘全照 v0105。VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib。
@@ -61,6 +63,7 @@ def _via_net():
         return None
 
 import datetime as _dt
+import hashlib
 import html
 import importlib.util
 import json
@@ -99,7 +102,8 @@ def __getattr__(name):
 
 
 LAMP_ORDER = {"RED": 0, "YELLOW": 1, "GREEN": 2, "INFO": 3}
-_RUN = {"t0": None}                                # 本輪起跑時間(判 DB_CHECK_latest.json 是不是本輪寫的)
+_RUN = {"t0": None, "pre": None}                   # 本輪起跑時間 + 起跑當下 DB_CHECK_latest.json 的指紋(判是不是本輪寫的)
+_UNSET = object()
 _RUN_LOCK = threading.Lock()
 
 
@@ -124,17 +128,28 @@ def _fix_hint(r: dict) -> str:
     return "開閘(操作員親手)後 refill --apply;" + who
 
 
-def db_inventory(ui_dir: Path | None = None, since: float | None = None) -> dict:
-    """讀本輪 db check 的 JSON → 清點摘要;不是本輪寫的(或不在)= NOT_RUN,不冒充。"""
+def db_signature(j: Path) -> tuple | None:
+    """檔的指紋(mtime_ns · 大小 · sha256);不在 = None。起跑記一次,寫總覽時比對 → 沒變 = 不是本輪寫的。"""
+    try:
+        b = j.read_bytes()
+        return (j.stat().st_mtime_ns, len(b), hashlib.sha256(b).hexdigest())
+    except OSError:
+        return None
+
+
+def db_inventory(ui_dir: Path | None = None, pre=_UNSET) -> dict:
+    """讀本輪 db check 的 JSON → 清點摘要;不是本輪寫的(或不在)= NOT_RUN,不冒充。
+    pre = 起跑當下同一檔的指紋(None = 起跑時檔不在);檔的指紋跟起跑時一樣 = 本輪沒重寫 → NOT_RUN(不靠時間容差,PR #535 Codex P2)。"""
     d = db_report_dir(ui_dir)
     j = d / "DB_CHECK_latest.json"
-    since = _RUN["t0"] if since is None else since
+    if pre is _UNSET:
+        pre = _RUN["pre"] if _RUN["t0"] is not None else _UNSET
     base = {"json": str(j), "page": str(d / "DB_CHECK_latest.html")}
     if not j.is_file():
         return dict(base, lamp="NOT_RUN", closeout=False, why="本輪沒有 db check 結果(資料庫流程沒跑 / 被中斷)")
-    if since is not None and j.stat().st_mtime < since - 2:
+    if pre is not _UNSET and pre is not None and db_signature(j) == pre:
         return dict(base, lamp="NOT_RUN", closeout=False,
-                    why="DB_CHECK_latest.json 是上一輪的(%s);本輪資料庫流程沒寫出新結果 → 不拿舊結果冒充"
+                    why="DB_CHECK_latest.json 本輪起跑後沒重寫(上一輪 %s 寫的);本輪資料庫流程沒寫出新結果 → 不拿舊結果冒充"
                     % _dt.datetime.fromtimestamp(j.stat().st_mtime).isoformat(timespec="seconds"))
     try:
         o = json.loads(j.read_text(encoding="utf-8"))
@@ -197,7 +212,23 @@ def db_section(db: dict | None) -> str:
 
 
 _RENDER_V0100 = V0100.render_html
-_WRITE_REPORT_PRIOR = V0100.write_report          # = v0102 的 write_report(標本版 schema / tag)
+_WRITE_REPORT_PRIOR = V0100.write_report          # = v0102 的 write_report(跑時把 schema 標成 v0102 再寫)
+
+
+def _chain_var(name: str, default=None):
+    """沿前版鏈找第一個自己定義 name 的模組,回那個值(v0102 的 _WRITE_REPORT_V0100 · _IN_RUN)。"""
+    m = PRIOR
+    for _ in range(16):
+        if name in vars(m):
+            return vars(m)[name]
+        m = vars(m).get("PRIOR")
+        if m is None:
+            break
+    return default
+
+
+# v0102 存下的 v0100 原版 write_report;本版先標 v0106 再直接交它寫,免得 v0102 外層把落檔標回 v0102(PR #535 Codex P2)
+_WRITE_REPORT_V0100 = _chain_var("_WRITE_REPORT_V0100", _WRITE_REPORT_PRIOR)
 
 
 PAGE_CSS = ".grid>.card{overflow-wrap:anywhere;min-width:0}details{margin:6px 0}"   # 長路徑(temp 夾)在手機寬不撐出橫捲
@@ -213,12 +244,11 @@ def render_html(card: dict, ui_dir: Path) -> str:
 
 
 def write_report(card: dict, ui_dir: Path | None = None) -> dict:
-    if _RUN["t0"] is not None:
-        card["db"] = db_inventory(ui_dir)
-    out = _WRITE_REPORT_PRIOR(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_PRIOR(card)
-    if _RUN["t0"] is not None:
-        card["schema"], card["tag"] = "VDF_ActivateVDF_v0106", TAG
-    return out
+    if _RUN["t0"] is None:                         # 不在本版的一輪裡(前版自測直呼)= 照前版
+        return _WRITE_REPORT_PRIOR(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_PRIOR(card)
+    card["db"] = db_inventory(ui_dir)
+    card["schema"], card["tag"] = "VDF_ActivateVDF_v0106", TAG   # 先標本版再落檔(JSON 與頁頭都是 v0106)
+    return _WRITE_REPORT_V0100(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_V0100(card)
 
 
 V0100.render_html = render_html
@@ -233,12 +263,13 @@ def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path
     PRIOR.TAG = TAG
     with _RUN_LOCK:
         _RUN["t0"] = time.time()
+        _RUN["pre"] = db_signature(db_report_dir() / "DB_CHECK_latest.json")
     try:
         card = _ACTIVATE_V0105(opt, manager, py, temp)
     finally:
         PRIOR.TAG = keep
         with _RUN_LOCK:
-            _RUN["t0"] = None
+            _RUN["t0"], _RUN["pre"] = None, None
     db = card.get("db") or {}
     c = db.get("counts") or {}
     print(f"  [資料庫清點] {db.get('lamp')} · " + (f"VDF 表 紅 {c.get('RED')} · 黃 {c.get('YELLOW')} · 綠 {c.get('GREEN')} · 他系統 {db.get('other')} · "
@@ -274,17 +305,17 @@ def selftest() -> int:
                     {"庫": "vdf_tw_market.duckdb", "表": "vrn_report_basic", "狀態": "他系統表(VRN 寫)· 缺表 · VDF 只攤開不代修", "燈": "INFO", "寫入者": ""}]
             red = {"ts": "2026-10-19T10:00:00", "tag": "VDF_SystemManager v0155", "home": "H", "book": "B", "lamp": "RED", "rows": rows}
             j = ui / "DB_CHECK_latest.json"
+            pre0 = db_signature(j)                     # 起跑時檔不在 = None
             j.write_text(json.dumps(red, ensure_ascii=False), encoding="utf-8")
-            t0 = time.time()
-            d1 = db_inventory(ui, since=t0)
+            d1 = db_inventory(ui, pre=pre0)
+            pre1 = db_signature(j)                     # 上一輪剛寫完(< 2 秒)就起下一輪
             green = dict(red, lamp="YELLOW", rows=[r for r in rows if r["燈"] != "RED"])
             j.write_text(json.dumps(green, ensure_ascii=False), encoding="utf-8")
-            d2 = db_inventory(ui, since=t0)
-            os.utime(j, (t0 - 3600, t0 - 3600))
-            d3 = db_inventory(ui, since=t0)
-            d4 = db_inventory(t / "nowhere", since=t0)
+            d2 = db_inventory(ui, pre=pre1)
+            d3 = db_inventory(ui, pre=db_signature(j))  # 起跑後沒重寫:就算檔是 1 秒前寫的也不算本輪
+            d4 = db_inventory(t / "nowhere", pre=None)
             chk("㉕ 清點摘要:本輪的 DB_CHECK JSON → VDF 表紅黃綠 · 他系統另計;VDF 0 紅才可收尾(黃不擋);"
-                "上一輪的舊檔 / 沒檔 = NOT_RUN 不能收尾(不拿舊結果冒充)",
+                "起跑後沒重寫(指紋同起跑時,沒有時間容差)/ 沒檔 = NOT_RUN 不能收尾(不拿舊結果冒充)",
                 d1["lamp"] == "RED" and not d1["closeout"] and d1["counts"] == {"RED": 1, "YELLOW": 1, "GREEN": 1, "INFO": 0}
                 and d1["other"] == 1 and [r["表"] for r in d1["problems"]] == ["tw_chip_inst<script>", "us_macro"]
                 and "refill --apply" in d1["problems"][0]["怎麼補"]
@@ -303,15 +334,21 @@ def selftest() -> int:
                     "lists": {"lamp": "YELLOW", "note": "n", "runs": [], "verify": {"lamp": "GREEN", "step": "lists_verify", "rc": 0, "secs": 1}},
                     "flows": [{"flow": "db", "lamp": "RED", "steps": [{"lamp": "RED", "step": "db_check", "rc": 1, "secs": 2, "summary": "s"}]}],
                     "ui": None, "lamp": "RED"}
-            _RUN["t0"] = time.time() - 5
+            in_run_v0102 = _chain_var("_IN_RUN")          # 真跑時 v0102 activate 開著它 → 它的外層會改 schema;照真跑開著測
+            _RUN["t0"], _RUN["pre"] = time.time() - 5, None
+            if in_run_v0102 is not None:
+                in_run_v0102.set()
             try:
                 rep = V0100.write_report(card, ui)
             finally:
-                _RUN["t0"] = None
+                _RUN["t0"], _RUN["pre"] = None, None
+                if in_run_v0102 is not None:
+                    in_run_v0102.clear()
             h = Path(rep["html"]).read_text(encoding="utf-8")
             js = json.loads(Path(rep["json"]).read_text(encoding="utf-8"))
-            chk("㉗ 前版鏈寫總覽時走本版:JSON 有 db 節(燈 · 計數 · 收尾判定)· 自動跳出的那一頁在步驟表之前就有資料庫清點;卡片長路徑可折行",
+            chk("㉗ 前版鏈寫總覽時走本版:落檔 JSON 的 schema / tag 是本版(不是 v0102)· 有 db 節(燈 · 計數 · 收尾判定)· 自動跳出的那一頁在步驟表之前就有資料庫清點;卡片長路徑可折行",
                 js.get("db", {}).get("lamp") == "RED" and js["db"]["closeout"] is False and card["tag"] == TAG
+                and js.get("schema") == "VDF_ActivateVDF_v0106" and js.get("tag") == TAG and TAG in h
                 and 'id="db-inventory"' in h and h.index('id="db-inventory"') < h.index("<th>流程</th>") and PAGE_CSS in h, js.get("db", {}).get("lamp"))
     finally:
         V0100.REPORT_DIR = keep_rep
