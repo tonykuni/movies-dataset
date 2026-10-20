@@ -7,6 +7,8 @@
 #   但頁與 CSV 的整數欄印成小數(列數 1163.0 · 最少 1.0;181 格)、空的寫入者格是空白(27 格,其他空值頁內 JS 已改 —)。
 #   根因:v0151 _write_db 用 pandas DataFrame,有 None 的整數欄被轉成 float64。本版在 db check 寫檔時接手 CSV 與頁上那張表:
 #   整數照整數印、空值頁上一律 —(CSV 留空)、燈色與頁殼照前版;JSON 不動(本來就是整數)。自測 ⑨⑩⑪。
+#   截圖再看:頁內燈號列寫「綠 18」,同頁摘要寫「綠 4 · 資訊 14」—— v0154 展現腳本的嚴重度表把 INFO 歸綠(INFO:2),
+#   表上 INFO 卻是灰字。本版把 v0154 模組的 _TK_JS 換成 INFO:3(歸灰;字級套件每次產生都讀它)→ 燈號列「綠 4 · 灰 14」與摘要一致。自測 ⑫。
 """VDF_SystemManager v0156 — 薄尾:啟動就緒的短令檢查沿 Register 點源鏈讀(問參數頁「啟動器/鏈缺:Register via-vdffetch」假紅修正)
 
 工作站實錄(2026-10-12 14:59 問參數頁):「啟動就緒 RED · 來源 VDF_SystemManager_v0155.py · [修] 這些是樹上的檔,不是設定:git pull…」。
@@ -208,6 +210,22 @@ def _write_db_v0160(o: dict) -> dict:
     return files
 
 
+def _mod_v0160(tag: str):
+    """沿前版鏈(各支模組自己的 PRIOR,不走 __getattr__ 轉接)找本族指定版號那支模組。"""
+    m = PRIOR
+    while m is not None:
+        if vars(m).get("TAG") == tag:
+            return m
+        m = vars(m).get("PRIOR")
+    return None
+
+
+TK_MOD_V0160 = _mod_v0160("v0154")              # 字級套件 v2 本體(typekit_block 每次讀它的 _TK_JS)
+_TK_JS_ORIG_V0160 = vars(TK_MOD_V0160).setdefault("_TK_JS_ORIG_V0160", TK_MOD_V0160._TK_JS) if TK_MOD_V0160 else ""
+if TK_MOD_V0160 is not None:
+    TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,")   # INFO 歸灰(表上本來就是灰字),燈號列與摘要同數
+
+
 # 原版存在 v0151 模組上(同一行程本檔被載兩次也拿得到原版,不會包兩層);db check 經 DB_MOD._write_db 寫 → 走本版;自測前版鏈時換回
 _WRITE_DB_PRIOR_V0160 = vars(DB_MOD_V0160).setdefault("_WRITE_DB_ORIG_V0160", DB_MOD_V0160._write_db)
 DB_MOD_V0160._write_db = _write_db_v0160
@@ -309,16 +327,25 @@ def selftest() -> int:
         chk("⑪ 接手點:v0151 模組的 _write_db = 本版(db check 經它寫)· 原版存在模組上(再載一次不包兩層)",
             DB_MOD_V0160._write_db is _write_db_v0160 and vars(DB_MOD_V0160).get("_WRITE_DB_ORIG_V0160") is _WRITE_DB_PRIOR_V0160
             and getattr(_WRITE_DB_PRIOR_V0160, "__name__", "") == "_write_db")
+        blk = TK_MOD_V0160.typekit_block() if TK_MOD_V0160 is not None else ""
+        chk("⑫ 展現腳本:INFO 歸灰(INFO:3)· 綠只算 GREEN / OK / PASS · 原本存在 v0154 模組上 · 只改這一處",
+            TK_MOD_V0160 is not None and "INFO:3," in blk and "INFO:2," not in blk and "GREEN:2,OK:2,PASS:2," in blk
+            and "INFO:2," in _TK_JS_ORIG_V0160 and TK_MOD_V0160._TK_JS == _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,"),
+            blk[blk.find("var SEV"):blk.find("var SEV") + 160] if blk else "v0154 找不到")
     finally:
         shutil.rmtree(td, ignore_errors=True)
     print("  ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──")
-    PRIOR.READY = PRIOR.read_launch          # 前版自測用它自己的門與它自己的寫檔
+    PRIOR.READY = PRIOR.read_launch          # 前版自測用它自己的門、它自己的寫檔與它自己的展現腳本
     DB_MOD_V0160._write_db = _WRITE_DB_PRIOR_V0160
+    if TK_MOD_V0160 is not None:
+        TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160
     try:
         prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
     finally:
         PRIOR.READY = read_launch
         DB_MOD_V0160._write_db = _write_db_v0160
+        if TK_MOD_V0160 is not None:
+            TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,")
     chk("⑧ 前版鏈 %s 自測 rc 0" % PRIOR_PATH.stem, prc == 0)
     print("[計] %s_%s 自測 %d/%d · %s" % (_STEM, TAG, p, p + f, "PASS" if f == 0 else "FAIL"))
     return 0 if f == 0 else 1
