@@ -5750,6 +5750,26 @@
       "next": "handoff test vdf_manager_split_xcheck · vdf_activatevdf rc 0 → VERIFIED;工作站真跑看 db_where 步驟「[計] VDF db where · C:\\Users\\tonyk\\VIA System\\via_database\\…」與 db check 紅數",
       "case": "vdf_manager_split_xcheck",
       "receipt": "docs/handoff/evidence/vdf_manager_split_xcheck.json"
+    },
+    {
+      "id": "VDF-REQ018:db-verify",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「run VDF again to output summary of database(verified 100% correct)」→「好,把檢查器加進 VDF 指令並開 PR 合併  善用VCGC的全景式分析  定位分類錯誤  安全第一輪修復」:VDF_SystemManager v0157 新動詞 db verify —— 不用 db check 的程式,唯讀重推每列 檔 · 列數 · 最新日 · 狀態 · 燈 5 欄 + 摘要 · 總燈 · 他系統分類比對 DB_CHECK_latest(PASS 0 · FAIL 1 · NODATA 2);庫打不開時他系統表照樣標 INFO(PR #538 Codex P2);冊上沒登寫入者的表列程式碼候選(只攤開)。自測 6/6;突變全抓;容器真庫 65 表 × 5 欄 = 325 欄差異 0 → 已驗:vdf_manager_db_verify 2026-10-20T03:21:17+00:00 rc 0(標記見到)。PR #538 / #539 合併",
+      "next": "工作站真跑看 db_verify 步驟「[計] VDF db verify · N 表 × 5 欄 … PASS」",
+      "case": "vdf_manager_db_verify",
+      "receipt": "docs/handoff/evidence/vdf_manager_db_verify.json"
+    },
+    {
+      "id": "VDF-REQ018:activatevdf-db-verify-step",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "ActivateVDF v0113:本輪資料庫流程最後跑 db_verify(refill 真寫過先重跑 db check)· 總覽卡獨立核對行 · 核對 FAIL 不准收尾 · 核對步中斷壓過前面的紅(PR #538 Codex P2);全景定位修正 v0111 db_files 同檔名兩份時驗證器回原表核錯庫(同名只留本輪的家;main 上 v0112 自測 Ⓛ 6/8 → 8/8) → 已驗:vdf_activatevdf 2026-10-20T02:53:46+00:00 rc 0(v0113 標記見到)",
+      "next": "工作站真跑:資料庫清點 0 紅 · db_xcheck 綠 · 獨立核對 PASS = 收尾",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
     }
   ]
 }
