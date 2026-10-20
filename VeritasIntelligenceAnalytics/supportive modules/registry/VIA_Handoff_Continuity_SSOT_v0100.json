@@ -3165,6 +3165,35 @@
       ],
       "timeout_seconds": 2700,
       "registered_at": "2026-10-20T10:21:38+00:00"
+    },
+    "vdf_ws_manager_design": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0161 自測 11/11 · PASS",
+      "scope": "VDF_SystemManager v0161(工作站 v0157 改號:設計稿 1c 汝窯天青視覺;共用冊沒有 systems.VDF 時改讀 VDF 自己的設計稿冊 VDF_UI_Design_SSOT)經尾版全鏈跑;工作站分岔接回第三批:延後兩支改成 VDF 自足版接上(操作員 2026-10-20 令「把 VCGC 待辦的兩支接上 VDF」;四系統對等獨立 L123,不改 VCGC 的冊與程式)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py",
+        "functional modules/VDF/VDF_UI_Design_SSOT_v*.json"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-20T12:30:25+00:00"
+    },
+    "vdf_ws_eng093_lists": {
+      "argv": [
+        "VDF_ENG093_LaunchConsole",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG093_LaunchConsole v0105 薄尾 16/16 · PASS",
+      "scope": "VDF_ENG093_LaunchConsole v0105(工作站 v0105 原號:問參數頁清單兩步 tw_list · etf_list 鎖定在最前;VCGC 步冊沒有清單步時 ask 自己用 VDF_MDL012_FetchGroups 清單先行跑 009 → 010,紅就不啟動;手機寬路徑斷行);工作站分岔接回第三批:延後兩支改成 VDF 自足版接上(操作員 2026-10-20 令「把 VCGC 待辦的兩支接上 VDF」;四系統對等獨立 L123,不改 VCGC 的冊與程式)",
+      "dependencies": [
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v*.py",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v*.json"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-20T12:30:25+00:00"
     }
   },
   "work_items": [
@@ -6426,11 +6455,18 @@
     {
       "id": "VDF-REQ018:ws-fork-deferred",
       "requirement": "VDF-REQ018",
-      "state": "PENDING",
-      "owner": "操作員 / VCGC",
-      "reason": "工作站分岔接回(操作員 2026-10-20 裁定「接到 main 上」;工作站分支 workstation-20261020):延後兩支 —— 管理員工作站 v0157(汝窯天青頁首)要共用字級冊 VIA_UI_Template_SSOT v0103(三操作台共用,加進 main 會改他系統外觀);ENG093 工作站 v0105(清單兩步鎖定先跑)自測要 VCGC 步驟冊 CGC_MDL125 v0112(工作站獨有)。兩支原文在 workstation-20261020 分支 ‖ 2026-10-20T10:50:22+00:00 更新:第二批(管理員 v0160 · FetchGroups v0108)已接,本項只剩上述兩支",
-      "next": "VCGC 接回 CGC_MDL125 v0112 與共用字級冊 v0103(或操作員裁定)後,再把管理員工作站 v0157 與 ENG093 工作站 v0105 改號接上 VDF",
-      "pended_at": "2026-10-20T09:49:39+00:00"
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "工作站分岔接回(操作員 2026-10-20 裁定「接到 main 上」;工作站分支 workstation-20261020):延後兩支 —— 管理員工作站 v0157(汝窯天青頁首)要共用字級冊 VIA_UI_Template_SSOT v0103(三操作台共用,加進 main 會改他系統外觀);ENG093 工作站 v0105(清單兩步鎖定先跑)自測要 VCGC 步驟冊 CGC_MDL125 v0112(工作站獨有)。兩支原文在 workstation-20261020 分支 ‖ 2026-10-20T10:50:22+00:00 更新:第二批(管理員 v0160 · FetchGroups v0108)已接,本項只剩上述兩支 ‖ 2026-10-20T13:04:00+00:00 轉 VERIFIED:兩支改成 VDF 自足版接上 —— 管理員 v0161(共用冊沒有 systems.VDF 就讀 VDF 自己的設計稿冊 VDF_UI_Design_SSOT_v0100,共用冊 v0103 不搬進 main)· ENG093 v0105(VCGC 步冊沒有清單步就由 ask 自己跑 VDF 清單先行);已驗 vdf_ws_manager_design(2026-10-20T12:51:23+00:00) · vdf_ws_eng093_lists(2026-10-20T13:00:25+00:00)",
+      "next": "無(VCGC 若自己接回共用字級冊 v0103 / CGC_MDL125 v0112 / CGC_MDL134 v0102,兩支自動讓位給 VCGC 的版本,VDF 不動 VCGC 的檔)",
+      "pended_at": "2026-10-20T09:49:39+00:00",
+      "cases": [
+        "vdf_ws_manager_design",
+        "vdf_ws_eng093_lists"
+      ],
+      "verified_at": "2026-10-20T13:04:00+00:00",
+      "case": "vdf_ws_eng093_lists",
+      "receipt": "docs/handoff/evidence/vdf_ws_eng093_lists.json"
     },
     {
       "id": "VDF-REQ018:ws-fork-vdf_ws_fetch_groups",
@@ -6461,6 +6497,26 @@
       "next": "無",
       "case": "vdf_ws_fetch_groups_layout",
       "receipt": "docs/handoff/evidence/vdf_ws_fetch_groups_layout.json"
+    },
+    {
+      "id": "VDF-REQ018:ws-fork-vdf_ws_manager_design",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "工作站分岔接回第三批:延後兩支改成 VDF 自足版接上(操作員 2026-10-20 令「把 VCGC 待辦的兩支接上 VDF」;四系統對等獨立 L123,不改 VCGC 的冊與程式):VDF_SystemManager v0161(工作站 v0157 改號:設計稿 1c 汝窯天青視覺;共用冊沒有 systems.VDF 時改讀 VDF 自己的設計稿冊 VDF_UI_Design_SSOT)經尾版全鏈跑 → 已驗:vdf_ws_manager_design 2026-10-20T12:51:23+00:00 rc 0(標記見到)",
+      "next": "無",
+      "case": "vdf_ws_manager_design",
+      "receipt": "docs/handoff/evidence/vdf_ws_manager_design.json"
+    },
+    {
+      "id": "VDF-REQ018:ws-fork-vdf_ws_eng093_lists",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "工作站分岔接回第三批:延後兩支改成 VDF 自足版接上(操作員 2026-10-20 令「把 VCGC 待辦的兩支接上 VDF」;四系統對等獨立 L123,不改 VCGC 的冊與程式):VDF_ENG093_LaunchConsole v0105(工作站 v0105 原號:問參數頁清單兩步 tw_list · etf_list 鎖定在最前;VCGC 步冊沒有清單步時 ask 自己用 VDF_MDL012_FetchGroups 清單先行跑 009 → 010,紅就不啟動;手機寬路徑斷行) → 已驗:vdf_ws_eng093_lists 2026-10-20T13:00:25+00:00 rc 0(標記見到)",
+      "next": "無",
+      "case": "vdf_ws_eng093_lists",
+      "receipt": "docs/handoff/evidence/vdf_ws_eng093_lists.json"
     }
   ]
 }
