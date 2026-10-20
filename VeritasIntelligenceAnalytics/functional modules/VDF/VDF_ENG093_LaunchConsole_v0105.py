@@ -364,7 +364,7 @@ def _selftest_lists_v0105(chk) -> None:
     import tempfile
     fg = _fg_v0105()
     if fg is None:
-        chk("v0105-⑧ VDF 族群引擎尾版在位(清單先行要它)", False)
+        chk("v0105-⑧0 VDF 族群引擎尾版在位(清單先行要它;不在就只報這一條)", False)
         return
     V = fg.V0100
     host = sys.modules[fg.run_parallel.__module__]
