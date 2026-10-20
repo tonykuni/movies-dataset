@@ -38,6 +38,7 @@
   [OK] ② 預設開:匯入前單元檔亂碼修回正字 → DuckDB 表是正字 · 備份 _pre_mojibake 在 · rc 0 · 印 [亂碼解碼器] 行
   [OK] ③ 重跑冪等:再修 0 值 · anti-join 0 新增 · 列數不變
   [OK] ④ VIA_MOJIBAKE_FIX=0:不修,照 v0101 匯入(亂碼原樣進庫;舊行為)· 沒有備份夾
+  [OK] ⑦ 修復失敗(ENG235 回 action=FAIL)→ 不匯入 · rc 1 · 庫檔沒建 · 印出失敗檔與原因
   [OK] ⑤ 橋在(ACCEL · LIB · NET)· 零網路 · 不碰 TA-Lib · 不載 VCGC 程式 · 匯入正典仍是 upsert_select(前版)
   ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──
   [OK] ① 零網路宣告(無 http 庫/僅本地檔案系統) 
@@ -55,7 +56,7 @@
   [SKIP] bad.parquet(不合檔名協定 tw__|gl__)
   [OK] tw:demo +0 列(anti-join 僅補缺;既有零觸碰)
 [匯入計] OK 1 · SKIP 1 · 新增 0 列(冪等:重跑=0 新增)
-[匯入] /tmp/tmpdcn1xnwo/nothing_here_x 無 parquet=誠實無事可做
+[匯入] /tmp/tmpjhve357t/nothing_here_x 無 parquet=誠實無事可做
   [OK] ⑦ 誠實三態(不合協定=SKIP;空夾=rc2) 
   [OK] ⑧ 只增不減紀律宣告(僅 INSERT;正表路徑無刪除/覆寫語句) 
   [OK] tw:dups +3 列(anti-join 僅補缺;既有零觸碰)
@@ -67,6 +68,8 @@
   [OK] ⑨ v0101 交正典 upsert_select 邊界照舊(fresh 庫自舉=整批照搬,完全重複的列也照搬 3 列;重跑 0;零共同欄=狀態 SKIP、不加欄不動列) (dups 3 · other ('SKIP', 0) [('keep',)] ['code'])
   [計] 九檢 OK 9 · FAIL 0
   [OK] ⑥ 前版鏈 VDF_ENG065_DbImport_v0101 自測 rc 0
-[計] VDF_ENG065_DbImport_v0102 自測 6/6 · PASS
-  [VDF engine run] VDF_ENG065_DbImport rc=0 · 1.2s · python base 退路(境未見)
-[監控] 背景全景監控中 pid 18708 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 607 提交 · 快照 420.5h · 未推 8 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[計] VDF_ENG065_DbImport_v0102 自測 7/7 · PASS
+  [VDF engine run] VDF_ENG065_DbImport rc=0 · 1.1s · python base 退路(境未見)
+  [字級] VDF 動詞 engine 跑完補套 · 冊 VIA_UI_Template_SSOT_v0102.json · VDF 頁 5 支(新套 / 換新 1)
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL140_HandoverConsole_v0107.py', 'CGC_MDL183_ → via-vcgc sdd check
+[監控] 已在背景起全景監控 pid 29371 · 閒置 1800 秒自停 · 交接閘 RED · 落後 612 提交 · 快照 421.0h · 未推 3 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
