@@ -165,8 +165,10 @@ def own_checks() -> int:
                 old = "拋 %s" % type(exc).__name__
         finally:
             os.scandir = real_scandir
-        chk("① 資料家裡有一個夾掃不了(OSError,非權限錯):本版記下略過、照找到好的那份;v0109 整段放棄退回舊主路徑(或往外拋)",
-            got == good and len(_LAST["skipped"]) == 1 and "flaky" in _LAST["skipped"][0] and old != good, (got, old, _LAST))
+        legacy = "退回舊主路徑" if old == PRIOR.DB_TW else ("找到好的那份" if old == good else str(old))
+        chk("① 資料家裡有一個夾掃不了(OSError,非權限錯):本版記下略過、照找到好的那份"
+            "(v0109 在本 Python 的結果只照記不判:%s —— 3.11 退回舊主路徑,3.13+ 的 rglob 自己吞錯;PR #541 Codex P2)" % legacy,
+            got == good and len(_LAST["skipped"]) == 1 and "flaky" in _LAST["skipped"][0], (got, old, _LAST))
         bad = td / "home" / "stale" / "vdf_tw_market.duckdb"
         bad.parent.mkdir(parents=True)
         bad.symlink_to(td / "gone.duckdb")         # 斷掉的連結:stat 丟 FileNotFoundError → 本版略過照記
