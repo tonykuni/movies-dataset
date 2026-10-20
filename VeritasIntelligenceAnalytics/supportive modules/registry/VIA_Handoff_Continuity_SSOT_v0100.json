@@ -5682,7 +5682,7 @@
       "state": "PENDING",
       "owner": "操作員 / AI",
       "reason": "工作站 2026-10-18 v0101 全流程(雙閘開):② 兩張清單 GREEN(依序跑,沒撞寫入鎖)· 擷取與引擎並行 · 資料庫等擷取 · 心跳正常;跑到擷取 + 引擎流程中段時回報(收據未完:③ 結果 · [計] · ACTIVATE_VDF_latest.json 摘要還沒回)。自測 ⑩ / SyntaxWarning / numexpr 三件由 v0102 修;2026-10-18 工作站 -Action selftest(經 PS 一鍵 v0100)自測全綠:v0103 ⑰ 在有 numexpr 的工作站上 本鏈出錯 False / v0100 出錯 True(病抓得到也修好了)",
-      "next": "工作站 worktree 更新到含 Invoke-VDF-Activate-v0105.ps1 的 main → 本視窗開雙閘 → pwsh 跑 Invoke-VDF-Activate 尾版 v0105 -FetchHome <VDF 夾> -RefillApply → 自動跳出的總覽頁看「資料庫清點」→ 回貼 MATRIX SUMMARY 與 [收尾] 行 → AI 入冊轉 VERIFIED"
+      "next": "工作站 worktree 更新到含 Invoke-VDF-Activate-v0105.ps1 的 main → 本視窗開雙閘 → pwsh 跑 Invoke-VDF-Activate 尾版 v0105 -FetchHome <VDF 夾> -RefillApply → 自動跳出的總覽頁看「資料庫清點」與「獨立核對」(收尾三道閘見 VDF-REQ018:db-inventory-closeout)→ 回貼 MATRIX SUMMARY 與 [收尾] 行 → AI 入冊轉 VERIFIED"
     },
     {
       "id": "VDF-REQ018:activatevdf-v0106",
@@ -5708,8 +5708,8 @@
       "requirement": "VDF-REQ018",
       "state": "PENDING",
       "owner": "操作員 / AI",
-      "reason": "操作員令「清點資料庫沒問題就是收尾」:收尾條件 = 工作站 Invoke-VDF-Activate v0105 真跑(雙閘由操作員本視窗親手開 · -RefillApply)後,自動跳出的總覽頁「資料庫清點」VDF 自己的表 0 紅(終端末段印「[收尾] 資料庫清點沒問題」)",
-      "next": "操作員回貼 MATRIX SUMMARY(含 6⑤ 資料庫清點列與 [收尾] 行)→ 0 紅 = AI 把 ps-launcher / workstation-v0101 / 本項轉 VERIFIED 並收尾;有紅 = 照頁上「怎麼補」逐列處理後重跑"
+      "reason": "操作員令「清點資料庫沒問題就是收尾」:收尾條件 = 工作站 Invoke-VDF-Activate v0105 真跑(雙閘由操作員本視窗親手開 · -RefillApply)後,自動跳出的總覽頁「資料庫清點」VDF 自己的表 0 紅(終端末段印「[收尾] 資料庫清點沒問題」)。2026-10-20 收尾條件加嚴(PR #540 Codex P1):Invoke-VDF-Activate v0105 經固定入口 ActivateVDF.py 自動取 ActivateVDF 尾版 —— 工作站 git pull 到含 VDF_MDL013_ActivateVDF_v0113 / VDF_SystemManager_v0157 的 main 後才算數;三道閘全過才收尾:① 資料庫清點 VDF 自己的表 0 紅(「[收尾] 資料庫清點沒問題」)② db_xcheck 互對照 GREEN(「[計] VDF 互對照 …」)③ db_verify 獨立核對 PASS(終端「[獨立核對] PASS · N 表 × 5 欄 … 差異 0」;總覽卡「獨立核對:PASS」);任一不過(含核對 FAIL / NODATA、互對照 RED)= 不能收尾,v0113 也會把總覽卡收尾判定改成不行",
+      "next": "工作站 git pull(main 含 ActivateVDF v0113 · 管理員 v0157)→ 本視窗開雙閘 → pwsh Invoke-VDF-Activate 尾版 -FetchHome <VDF 夾> -RefillApply → 回貼 MATRIX SUMMARY(6⑤ + [收尾] 行)與資料庫流程三步摘要(db check · db_xcheck · db_verify)→ ① 資料庫清點 VDF 自己的表 0 紅(「[收尾] 資料庫清點沒問題」)② db_xcheck 互對照 GREEN(「[計] VDF 互對照 …」)③ db_verify 獨立核對 PASS(終端「[獨立核對] PASS · N 表 × 5 欄 … 差異 0」;總覽卡「獨立核對:PASS」) 三道全過 = AI 把 ps-launcher / workstation-v0101 / 本項轉 VERIFIED 並收尾;任一不過 = 照總覽頁「怎麼補」/ VERIFY_latest.html 逐列處理後重跑"
     },
     {
       "id": "VDF-REQ018:activatevdf-v0107-memtemp",
@@ -5750,6 +5750,26 @@
       "next": "handoff test vdf_manager_split_xcheck · vdf_activatevdf rc 0 → VERIFIED;工作站真跑看 db_where 步驟「[計] VDF db where · C:\\Users\\tonyk\\VIA System\\via_database\\…」與 db check 紅數",
       "case": "vdf_manager_split_xcheck",
       "receipt": "docs/handoff/evidence/vdf_manager_split_xcheck.json"
+    },
+    {
+      "id": "VDF-REQ018:db-verify",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「run VDF again to output summary of database(verified 100% correct)」→「好,把檢查器加進 VDF 指令並開 PR 合併  善用VCGC的全景式分析  定位分類錯誤  安全第一輪修復」:VDF_SystemManager v0157 新動詞 db verify —— 不用 db check 的程式,唯讀重推每列 檔 · 列數 · 最新日 · 狀態 · 燈 5 欄 + 摘要 · 總燈 · 他系統分類比對 DB_CHECK_latest(PASS 0 · FAIL 1 · NODATA 2);庫打不開時他系統表照樣標 INFO(PR #538 Codex P2);冊上沒登寫入者的表列程式碼候選(只攤開)。自測 6/6;突變全抓;容器真庫 65 表 × 5 欄 = 325 欄差異 0 → 已驗:vdf_manager_db_verify 2026-10-20T03:21:17+00:00 rc 0(標記見到)。PR #538 / #539 合併",
+      "next": "工作站真跑看 db_verify 步驟「[計] VDF db verify · N 表 × 5 欄 … PASS」",
+      "case": "vdf_manager_db_verify",
+      "receipt": "docs/handoff/evidence/vdf_manager_db_verify.json"
+    },
+    {
+      "id": "VDF-REQ018:activatevdf-db-verify-step",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "ActivateVDF v0113:本輪資料庫流程最後跑 db_verify(refill 真寫過先重跑 db check)· 總覽卡獨立核對行 · 核對 FAIL 不准收尾 · 核對步中斷壓過前面的紅(PR #538 Codex P2);全景定位修正 v0111 db_files 同檔名兩份時驗證器回原表核錯庫(同名只留本輪的家;main 上 v0112 自測 Ⓛ 6/8 → 8/8) → 已驗:vdf_activatevdf 2026-10-20T02:53:46+00:00 rc 0(v0113 標記見到)",
+      "next": "工作站真跑:資料庫清點 0 紅 · db_xcheck 綠 · 獨立核對 PASS = 收尾",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
     }
   ]
 }
