@@ -16,6 +16,7 @@
 #      你在頁上按「啟動」後、啟動器起跑之前,ask 先用 VDF 族群引擎的清單先行(VDF_MDL012_FetchGroups 尾版 run_parallel)跑 009 → 010:
 #      全綠才放行;紅 → 決定檔改 lists_failed(rc 5)、雙閘沒開 → lists_gated(rc 4),開啟器照決定不是 launch 就不啟動;只看計畫(dry)不跑。
 #   清單兩步仍不送 -Steps(validate 照舊);同意閘不讀寫以外不碰(只看在不在)。
+# [Codex #548 兩條 P2] ① VCGC 步冊兩列在、但引擎不在或並行道 < v0102 → 不讓位(VDF 自己跑);② 擷取冊 009 / 010 缺一 → ABSENT 不放行。
 # [U/I 實測 2026-10-20] 手機寬(390)問參數頁橫向溢出到 660:資料庫卡上的目錄路徑 <code> 一長串不斷行(v0104 起就有)。
 #   本版在問參數頁與資料庫狀況頁頭加一行 code{overflow-wrap:anywhere}(只加樣式,不改內容)。
 """VDF_ENG093_LaunchConsole — VDF 一鍵啟動台(問參數頁 + 資料庫狀況頁)
@@ -172,14 +173,26 @@ def vdf_list_rows(fg=None) -> list:
     return rows
 
 
+LANES_MIN_V0105 = 102                         # CGC_MDL134 v0102 起並行道才自動先跑清單(工作站版);更舊的跑不了清單先行
+
+
+def _vcgc_lists_ok(mx: dict) -> bool:
+    """VCGC 那條路真的跑得動清單先行才讓位:步冊兩列都在(不是 missing)· 兩支引擎在位(engine_ok)· 並行道 CGC_MDL134 ≥ v0102。
+    步冊只更新一半(列在、引擎檔不在)或並行道還是舊版 → 不讓位,VDF 自己跑(Codex #548 P2)。"""
+    rows = {r.get("id"): r for r in mx.get("rows") or [] if r.get("id") in LIST_STEPS_V0105}
+    src = mx.get("src") if isinstance(mx.get("src"), dict) else {}
+    lanes = str(src.get("lanes") or "")
+    return (all(s in rows and not rows[s].get("missing") and rows[s].get("engine_ok") for s in LIST_STEPS_V0105)
+            and bool(lanes) and _vnum_v0105(lanes) >= LANES_MIN_V0105)
+
+
 def lists_owner(since: str) -> str:
-    """誰負責清單先行:VCGC 步冊有清單兩步 → "VCGC";沒有 → "VDF"(本版自己跑)。"""
+    """誰負責清單先行:VCGC 那條路跑得動(_vcgc_lists_ok)→ "VCGC";否則 → "VDF"(本版自己跑)。"""
     try:
         mx = _ORIG_MATRIX(since, list(LIST_STEPS_V0105))
     except Exception:
         return "VDF"
-    have = {r.get("id") for r in mx.get("rows") or [] if not r.get("missing")}
-    return "VCGC" if all(x in have for x in LIST_STEPS_V0105) else "VDF"
+    return "VCGC" if _vcgc_lists_ok(mx) else "VDF"
 
 
 def steps_matrix(since: str, steps: list | None) -> dict:
@@ -189,9 +202,10 @@ def steps_matrix(since: str, steps: list | None) -> dict:
         want = [x for x in LIST_STEPS_V0105 if x not in steps] + list(steps)
     mx = _ORIG_MATRIX(since, want)
     rows, vdf = [], None
+    use_vcgc = _vcgc_lists_ok(mx)
     for r in mx.get("rows") or []:
         if r.get("id") in LIST_STEPS_V0105:
-            if r.get("missing"):                 # VCGC 步冊沒有清單步 → VDF 自己的擷取冊列(VDF 自己先跑)
+            if not use_vcgc:                     # VCGC 那條路跑不動清單先行 → VDF 自己的擷取冊列(VDF 自己先跑)
                 if vdf is None:
                     vdf = {x["id"]: x for x in vdf_list_rows()}
                 r = vdf.get(r["id"])
@@ -202,7 +216,7 @@ def steps_matrix(since: str, steps: list | None) -> dict:
                 r = dict(r, lock=True, why=((r.get("why") or "") + " · " + LOCK_NOTE_V0105).strip(" ·"))
         rows.append(r)
     mx["rows"] = rows
-    mx["lists_by"] = "VDF" if vdf is not None else "VCGC"
+    mx["lists_by"] = "VCGC" if use_vcgc else "VDF"
     return mx
 
 
@@ -236,8 +250,11 @@ def run_lists(dec: dict, budget_s: float, fg=None) -> dict:
     lists = [dict(by[LIST_ENGINES_V0105[s][0]], run_args=list(by[LIST_ENGINES_V0105[s][0]].get("run_args") or []), timeout_s=0, needs=[])
              for s in LIST_STEPS_V0105 if LIST_ENGINES_V0105[s][0] in by]
     mp = V.tail(V.MDL008_GLOB)
-    if not lists or mp is None:
-        return {"by": "VDF", "state": "ABSENT", "rows": [], "why": "擷取冊沒有 009 / 010 或 MDL008 不在"}
+    lack = [LIST_ENGINES_V0105[s][0] for s in LIST_STEPS_V0105 if LIST_ENGINES_V0105[s][0] not in by]
+    if lack or mp is None:                       # 兩支都要在才跑(只跑一支就放行 = 另一份清單沒更新;Codex #548 P2)
+        return {"by": "VDF", "state": "ABSENT", "rows": [],
+                "why": "擷取冊 %s 缺 %s%s → 不啟動(清單兩支都是前提)" % (fb_p.name if fb_p else "VDF_FetchSystem_SSOT_v*.json(不在)", lack or "—",
+                                                            "" if mp is not None else " · VDF_MDL008_FetchSystem 不在")}
     home = V.default_home(fb)
     tp = fg.temp_plan()
     per = max(60, int(budget_s // max(1, len(lists))))
@@ -443,8 +460,11 @@ def _selftest_lists_v0105(chk) -> None:
             chk("v0105-⑫ 雙閘沒開 → rc 4 · action lists_gated(不代設同意閘)",
                 rc_g == 4 and d_g["action"] == "lists_gated" and d_g["lists"]["state"] == "GATED", (rc_g, d_g.get("action")))
 
+            vc = {"ok": {s: True for s in LIST_STEPS_V0105}, "lanes": "CGC_MDL134_ParallelLanes_v0102.py"}
+
             def vcgc_matrix(since, want):
-                return {"rows": [{"id": s, "why": "VCGC", "engine_ok": True} for s in LIST_STEPS_V0105] + [{"id": "x", "why": ""}], "src": "fake"}
+                return {"rows": [{"id": s, "why": "VCGC", "engine_ok": vc["ok"][s], "missing": False} for s in LIST_STEPS_V0105] + [{"id": "x", "why": ""}],
+                        "src": {"fixall": "CGC_MDL125_FixAll_v0112.py", "lanes": vc["lanes"]}}
 
             g["lists_owner"] = keep["owner"]
             g["_ORIG_MATRIX"] = vcgc_matrix
@@ -453,6 +473,27 @@ def _selftest_lists_v0105(chk) -> None:
             chk("v0105-⑬ VCGC 步冊有清單兩步 → 照工作站版(lists_by VCGC · VCGC 註記 · 不換 VDF 列)· lists_owner = VCGC",
                 mx_v["lists_by"] == "VCGC" and owner_v == "VCGC" and all(LOCK_NOTE_V0105 in r["why"] and r.get("by") != "VDF" for r in mx_v["rows"][:2]),
                 (mx_v["lists_by"], owner_v))
+            vc["ok"]["etf_list"] = False                # 步冊兩列在、但 010 的引擎檔不在
+            mx_h, own_h = steps_matrix("2024-03-15", None), lists_owner("2024-03-15")
+            vc["ok"]["etf_list"], vc["lanes"] = True, "CGC_MDL134_ParallelLanes_v0101.py"   # 兩列都好、並行道太舊
+            mx_l, own_l = steps_matrix("2024-03-15", None), lists_owner("2024-03-15")
+            chk("v0105-⑬b VCGC 那條路跑不動就不讓位:列在但引擎不在 / 並行道 < v0102 → lists_owner VDF · 兩列換成 VDF 列(VDF 註記)",
+                own_h == "VDF" and own_l == "VDF" and mx_h["lists_by"] == "VDF" and mx_l["lists_by"] == "VDF"
+                and all(r.get("by") == "VDF" and LOCK_NOTE_VDF_V0105 in r["why"] for m in (mx_h, mx_l) for r in m["rows"][:2])
+                and [r["id"] for r in mx_h["rows"][:2]] == list(LIST_STEPS_V0105), (own_h, own_l, mx_h["lists_by"], mx_l["lists_by"]))
+            g["_ORIG_MATRIX"] = keep["matrix"]
+            half = Path(td) / "VDF_FetchSystem_SSOT_v9999.json"
+            real_fb = json.loads(V.tail(V.FETCH_GLOB).read_text(encoding="utf-8"))
+            half.write_text(json.dumps(dict(real_fb, engines=[e for e in real_fb.get("engines") or [] if e.get("id") != "010"])), encoding="utf-8")
+            keep_tail = V.tail
+            V.tail = lambda glob, *a, **k: half if glob == V.FETCH_GLOB else keep_tail(glob, *a, **k)
+            calls[:] = []
+            try:
+                r_half = run_lists({"action": "launch"}, 600, fg)
+            finally:
+                V.tail = keep_tail
+            chk("v0105-⑩b 擷取冊只有 009(缺 010)→ ABSENT · 零子行程 · why 點名缺的那支(不只跑一支就放行)",
+                r_half["state"] == "ABSENT" and not calls and "010" in r_half["why"], (r_half["state"], len(calls), r_half["why"][:80]))
         finally:
             host.LAUNCH, V.gates_open = keep["LAUNCH"], keep["gates"]
             g = globals()
