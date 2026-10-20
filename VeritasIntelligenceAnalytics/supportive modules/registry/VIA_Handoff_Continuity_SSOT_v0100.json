@@ -5991,6 +5991,136 @@
       "next": "工作站真跑:資料庫清點 0 紅 · db_xcheck 綠 · 獨立核對 PASS = 收尾",
       "case": "vdf_activatevdf",
       "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「繼續第二輪修復 SWALLOW 與 TAILAPI」:VCGC 全景 TAILAPI 12 支,執行期實測 10 族真的取不到前版公開名稱(MDL009 / ENG052 誤報:globals 抄入 / 賦值綁正典)。ENG056 v0107 · ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)由新到舊取;直接執行原樣 runpy 交給前版;自測 5 項 + 前版自測;突變 5 種全抓 → 已驗:vdf_r2_tailapi_eng056 2026-10-20T04:55:15+00:00 rc 0 · vdf_r2_tailapi_eng057 2026-10-20T04:55:32+00:00 rc 0 · vdf_r2_tailapi_eng059 2026-10-20T04:55:48+00:00 rc 0 · vdf_r2_tailapi_eng075 2026-10-20T04:56:05+00:00 rc 0 · vdf_r2_tailapi_eng100 2026-10-20T04:56:20+00:00 rc 0 · vdf_r2_tailapi_eng102 2026-10-20T04:56:36+00:00 rc 0 · vdf_r2_tailapi_eng110 2026-10-20T04:56:52+00:00 rc 0 · vdf_r2_tailapi_eng113 2026-10-20T04:57:08+00:00 rc 0 · vdf_r2_tailapi_eng115 2026-10-20T04:57:24+00:00 rc 0 · vdf_r2_tailapi_eng116 2026-10-20T04:57:41+00:00 rc 0",
+      "next": "無(轉接不改行為;呼叫端照舊取尾版)",
+      "case": "vdf_r2_tailapi_eng056",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng056.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-swallow",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VCGC 全景 SWALLOW 現役 60 處分類(設計如此 / 低風險 / 不在現役路徑照列不動,見 VIA_S20261015_ActivateVDF.md 第二輪節);只修資料路徑把錯吞掉、資料默默變少的 3 處:ENG050 v0102 TWSE 道逐日出錯照實記 · 全天出錯 = FAIL;ENG052 v0104 全球 yf 道逐檔出錯照實記 · parquet 缺席不當掉;ENG069 v0110 主庫解析 os.walk 掃不了的夾記下續找 · 逐候選 stat 壞的略過照記。換在前版模組全域;自測含舊行為對照;突變 9 種全抓 → 已驗:vdf_r2_swallow_eng050 2026-10-20T04:58:02+00:00 rc 0 · vdf_r2_swallow_eng052 2026-10-20T04:58:19+00:00 rc 0 · vdf_r2_swallow_eng069 2026-10-20T04:58:36+00:00 rc 0",
+      "next": "工作站真跑擷取時看 ENG050 / ENG052 結果的 errors · skipped 欄與 ENG069 [庫解析] 行",
+      "case": "vdf_r2_swallow_eng050",
+      "receipt": "docs/handoff/evidence/vdf_r2_swallow_eng050.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng057",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG057 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng057 2026-10-20T04:55:32+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng057",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng057.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng059",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG059 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng059 2026-10-20T04:55:48+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng059",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng059.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng075",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG075 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng075 2026-10-20T04:56:05+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng075",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng075.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng100",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG100 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng100 2026-10-20T04:56:20+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng100",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng100.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng102",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG102 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng102 2026-10-20T04:56:36+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng102",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng102.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng110",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG110 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng110 2026-10-20T04:56:52+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng110",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng110.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng113",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG113 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng113 2026-10-20T04:57:08+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng113",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng113.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng115",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG115 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng115 2026-10-20T04:57:24+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng115",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng115.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng116",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 TAILAPI)ENG116 新尾版:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng116 2026-10-20T04:57:41+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-tailapi",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng116",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng116.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-swallow-eng052",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 SWALLOW)ENG052 新尾版:全球 yf 道逐檔出錯照實記(skipped · skip_examples · note)· parquet 缺席不當掉;換在前版模組全域 + 前版自測;經 VDF 自己的 manager(engine run) → 已驗:vdf_r2_swallow_eng052 2026-10-20T04:58:19+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-swallow",
+      "next": "無",
+      "case": "vdf_r2_swallow_eng052",
+      "receipt": "docs/handoff/evidence/vdf_r2_swallow_eng052.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-swallow-eng069",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "第二輪(VCGC 全景 SWALLOW)ENG069 新尾版:主庫解析:os.walk 掃不了的夾記下續找 · 逐候選 stat 壞的略過照記(不再整段退回舊主路徑);換在前版模組全域 + 前版自測;經 VDF 自己的 manager(engine run) → 已驗:vdf_r2_swallow_eng069 2026-10-20T04:58:36+00:00 rc 0(標記見到)。總述見 VDF-REQ018:r2-swallow",
+      "next": "無",
+      "case": "vdf_r2_swallow_eng069",
+      "receipt": "docs/handoff/evidence/vdf_r2_swallow_eng069.json"
     }
   ]
 }
