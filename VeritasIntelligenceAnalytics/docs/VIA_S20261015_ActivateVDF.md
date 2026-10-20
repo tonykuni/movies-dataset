@@ -705,3 +705,37 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 - 工作項:`VDF-REQ018:r2-tailapi`、`VDF-REQ018:r2-swallow`。
 
 四系統互不干涉:只動 VDF 自己的檔;VCGC / VRN-1 / VRN-2 的程式、冊、號都沒改。
+
+## 2026-10-20 · 第二輪收尾:ENG056 TAILAPI(管理員 v0158 解 v0150 凍結樣本)
+
+操作員令:「好,做 ENG056,測完開PR合併  儘快將VDF收尾」。
+
+### 病因(PR #541 CI 實錄)
+
+- v0150 自測 ⑤ / ⑥a 用一張樣本卡跑 engine matrix,卡上寫死 `VDF_ENG056_ChipBackfill_v0106.py`。
+- `launch_paths` 只認引擎冊。引擎冊由 VCGC 的檢視本體 MDL253 依檔案現況算出,每個家族只有尾版一列。
+- ENG056 一出 v0107,樣本路徑就「不在引擎冊」,⑤ 可啟動 = 否,v0151–v0157 整條自測跟著紅。
+- 已發佈檔不改、測試不跳,所以要再出一支管理員新版處理。
+
+### VDF_SystemManager v0158(薄尾;正式動詞一字不改)
+
+- `SampleBook`:包住冊檢視。VDF 冊上照舊是尾版那一列,另補「凍結樣本路徑」一列:
+  - 只補冊上已有的家族、檔真的在、冊上還沒有的路徑;
+  - 拷同家族尾版那列,只換 path / version(閘、旗標照尾版判);
+  - 冊上沒有的家族、檔不在都不補(不猜);別的系統原樣。
+- `scoped_prior_selftest`:只在 v0150 那一層自測期間換冊(v0150 的 `launch_paths` 走 `v0149._inv`)。
+  - v0150 尾端呼叫的 v0149 自測、其他各層都看原冊;
+  - 結束(含例外)全部還原;例外照拋,不吞。
+- VCGC 的 MDL253 檔一字不動,只在本行程包一層。
+- 自測本版 6/6,過了再跑前版鏈。突變 7 種:抓到 6 種;「最外層不還原 `_inv`」是等價突變(v0150 那層的 finally 已經還原),照實記。
+
+### ENG056 v0107(轉接薄尾)
+
+- 範本同第二輪其他 9 支(ENG057 v0110 原樣換族名、換鏈):鏈 v0106 → v0105 → v0104(本體)。
+- 轉接 34 名,本版 5/5。
+
+### 已知、未觸發的舊案
+
+- 交接案 `vdf_manager_v0152`–`v0154`、`vdf_manager_split_xcheck`(v0156)、`vdf_manager_db_verify`(v0157)直接跑舊版自測,不經 v0158 的樣本冊。
+- 這些案的依賴不含 ENG056,這次不會被觸發重跑;但若單獨重跑,v0150 ⑤ 會紅。
+- 要驗管理員,請走尾版:`VDF_SystemManager --selftest` 或 `vdf_manager_frozen_sample`。
