@@ -648,3 +648,58 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 - 引擎 94/94 可啟動。
 
 四系統互不干涉:本批只動 VDF 自己的檔;VCGC / VRN-1 / VRN-2 的程式、冊、號都沒改(編號經 VCGC 的 MDL237 只增寫入)。
+
+## 2026-10-20 · 第二輪:SWALLOW 與 TAILAPI(VCGC 全景)
+
+操作員令:「繼續第二輪修復 SWALLOW 與 TAILAPI」。
+
+### 範圍怎麼算
+
+- 工具:VCGC token 工具 `CGC_MDL158 read --json`(VDF 全夾)。原始報數 SWALLOW 94 · TAILAPI 12,但含舊版、未編號舊檔與 `_` 封存夾。
+- 只算**現役尾版**:每族最高版號;`_` 開頭的夾不算;未編號檔只在同族沒有編號版時算。現役 SWALLOW = **60 處 / 26 支**。
+- 每處看上下文分類,只修「會讓資料默默變少、結果仍報成功」的;其餘照列理由不動(只增新版檔,不改已發行檔)。
+
+### TAILAPI(12 → 修 10 · 誤報 2)
+
+先用執行期實測(載入尾版,逐一 `hasattr`)確認被報缺的名稱是不是真的取不到:
+
+| 族 | 尾版 | 實測 | 處理 |
+|---|---|---|---|
+| MDL009 TWStockList | v0102 | 8 名全取得(`globals()` 抄入) | 誤報,不動 |
+| ENG052 MegaFetch | v0103 | `upsert_duckdb` 取得(第 192 行賦值綁正典 `upsert_rows`) | 誤報(本輪另因 SWALLOW 出 v0104) |
+| ENG056 / 057 / 059 / 075 / 100 / 102 / 110 / 113 / 115 / 116 | 見下 | 2–8 名取不到 | 出新尾版補轉接 |
+
+新尾版:ENG056 v0107 · ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102。
+
+- 模組層 `__getattr__` 沿**實際委派鏈**(照 `CGC_MDL158 chain` 圖,尾版 → 本體;例 ENG056 v0106 → v0105 → v0104)由新到舊找,回最新的定義。本體重寫時刻意拿掉的更舊版名稱不轉。
+- 直接執行原樣交給前版(`runpy` 當 `__main__` 跑:參數、輸出、結束碼、同意閘行為不變)。
+- 自測 ①–⑤:鏈上公開名稱全取得 · 同名取最新 · 雙底線不轉、找不到照實 AttributeError · 鏈完整到本體 · 治理檢查;再跑前版自測。
+- 突變 5 種(倒序找 · 轉雙底線 · 沒有 `__getattr__` · 鏈只留一支 · 鏈跳過中間)全抓到。
+
+### SWALLOW 分類(現役 60 處)
+
+| 類 | 處數 | 位置(例) | 判 |
+|---|---|---|---|
+| 按 Enter 退出的 `input()` 吃 EOF / Ctrl+C | 8 | MDL001 / 002 / 003 / 006 / 007 結尾 | 設計如此 |
+| 多格式日期 / 數字逐一試(試下一個格式) | 9 | XsrcVerifier ×3 · ENG102 · ENG116 · MDL006 ×2 · ENG051 · MDL105 | 設計如此 |
+| 加速器 / 網路 / 註冊橋 graceful · 選配套件探測 · stdout 設定 | 13 | MDL003 / 006 開頭橋 · MDL008 探測 · ENG074 預載 · ENG019 · MDL001 版本探測 · ENG047 parquet 選配 | 設計如此 |
+| 備份清理失敗不擋主流程 | 12 | MDL001 / 002 / 003 · MDL101 · ENG044 | 低風險,不動 |
+| 讀檔失敗略過(掃描 / 報表) · 開瀏覽器失敗 · logger 退回 print | 8 | 管理員 v0157 候選掃描 · ENG073 · MDL001 · MDL105 | 低風險,不動 |
+| 狀態頁欄位取不到就留空 | 5 | ENG068 ×2 · ENG073 ×2 · ENG090 | 低(欄位缺可見),不動 |
+| 已不在現行擷取冊的引擎 | 2 | MDL004 v0100(`VDF_FetchSystem_SSOT` v0104 起不列) | 不在現役資料路徑,不動 |
+| **資料路徑把錯吞掉 → 資料默默變少** | **3** | ENG050 · ENG052 · ENG069 | **本輪修** |
+
+本輪修的 3 處:
+
+- **ENG050 v0102** `fetch_twse_lane`:逐日請求出錯照實記 `errors` / `error_examples` / `note`;全部日子都出錯、一筆沒拿到 = FAIL(v0101 記 EMPTY,跟真的沒資料分不出來)。拿到的資料一字不改。
+- **ENG052 v0104** `lane_global_yf`:逐檔出錯照實記 `skipped` / `skip_examples` / note 尾巴「略過 N 標的」(最常見是 yfinance 回的表少了某檔、`df[t]` 丟 KeyError,v0103 整檔默默不見)。順手修同函式:parquet 缺席時 `write_parquet` 回 None,v0103 接著取 `pq.name` 會當掉。
+- **ENG069 v0110** `resolve_db`:改用 `os.walk`(掃不了的夾記下、照樣往下找)+ 逐候選 stat(壞的略過照記)。v0109 用 `rglob`,碰到非權限的 OSError(例:工作站 OneDrive 夾 I/O 錯、掃到一半被移走)就整段放棄、默默退回舊主路徑,可能讀到另一份舊庫。
+
+三支都換在前版模組全域(前版 run / main 走新的),自測含「前版在同情境的舊行為」對照;突變 9 種全抓到(以 `[FAIL]` 呈現,不讓自測崩潰)。
+
+### 交接
+
+- 新增 13 個交接案 `vdf_r2_tailapi_*` / `vdf_r2_swallow_*`,都經 VDF 自己的管理員 `engine run <族> --selftest`。
+- 工作項:`VDF-REQ018:r2-tailapi`、`VDF-REQ018:r2-swallow`。
+
+四系統互不干涉:只動 VDF 自己的檔;VCGC / VRN-1 / VRN-2 的程式、冊、號都沒改。
