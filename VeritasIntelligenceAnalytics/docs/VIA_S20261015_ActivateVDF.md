@@ -659,7 +659,7 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 - 只算**現役尾版**:每族最高版號;`_` 開頭的夾不算;未編號檔只在同族沒有編號版時算。現役 SWALLOW = **60 處 / 26 支**。
 - 每處看上下文分類,只修「會讓資料默默變少、結果仍報成功」的;其餘照列理由不動(只增新版檔,不改已發行檔)。
 
-### TAILAPI(12 → 修 10 · 誤報 2)
+### TAILAPI(12 → 修 9 · 延後 1 · 誤報 2)
 
 先用執行期實測(載入尾版,逐一 `hasattr`)確認被報缺的名稱是不是真的取不到:
 
@@ -667,14 +667,16 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 |---|---|---|---|
 | MDL009 TWStockList | v0102 | 8 名全取得(`globals()` 抄入) | 誤報,不動 |
 | ENG052 MegaFetch | v0103 | `upsert_duckdb` 取得(第 192 行賦值綁正典 `upsert_rows`) | 誤報(本輪另因 SWALLOW 出 v0104) |
-| ENG056 / 057 / 059 / 075 / 100 / 102 / 110 / 113 / 115 / 116 | 見下 | 2–8 名取不到 | 出新尾版補轉接 |
+| ENG057 / 059 / 075 / 100 / 102 / 110 / 113 / 115 / 116 | 見下 | 2–8 名取不到 | 出新尾版補轉接 |
+| ENG056 ChipBackfill | v0106 | 7 名取不到 | **延後**(見下) |
 
-新尾版:ENG056 v0107 · ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102。
+新尾版:ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102。
 
-- 模組層 `__getattr__` 沿**實際委派鏈**(照 `CGC_MDL158 chain` 圖,尾版 → 本體;例 ENG056 v0106 → v0105 → v0104)由新到舊找,回最新的定義。本體重寫時刻意拿掉的更舊版名稱不轉。
+- 模組層 `__getattr__` 沿**實際委派鏈**(照 `CGC_MDL158 chain` 圖,尾版 → 本體;例 ENG057 v0109 → v0108 → v0107)由新到舊找,回最新的定義。本體重寫時刻意拿掉的更舊版名稱不轉。
 - 直接執行原樣交給前版(`runpy` 當 `__main__` 跑:參數、輸出、結束碼、同意閘行為不變)。
 - 自測 ①–⑤:鏈上公開名稱全取得 · 同名取最新 · 雙底線不轉、找不到照實 AttributeError · 鏈完整到本體 · 治理檢查;再跑前版自測。
 - 突變 5 種(倒序找 · 轉雙底線 · 沒有 `__getattr__` · 鏈只留一支 · 鏈跳過中間)全抓到。
+- **ENG056 延後**:管理員 v0150 的自測 ⑤ 把 `VDF_ENG056_ChipBackfill_v0106.py` 寫死成樣本路徑,而引擎冊只收各族尾版。ENG056 一升版,v0150 ⑤ 就「不在引擎冊」變紅,並帶紅 v0151–v0157 整條前版鏈自測(PR #541 第一次 CI 實錄)。已發行檔不改、自測不跳過,所以本輪撤回 ENG056 v0107;要升 ENG056,須先由操作員決定這個寫死版號的自測怎麼處理。
 
 ### SWALLOW 分類(現役 60 處)
 
@@ -699,7 +701,7 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 
 ### 交接
 
-- 新增 13 個交接案 `vdf_r2_tailapi_*` / `vdf_r2_swallow_*`,都經 VDF 自己的管理員 `engine run <族> --selftest`。
+- 新增 12 個交接案 `vdf_r2_tailapi_*` / `vdf_r2_swallow_*`,都經 VDF 自己的管理員 `engine run <族> --selftest`。
 - 工作項:`VDF-REQ018:r2-tailapi`、`VDF-REQ018:r2-swallow`。
 
 四系統互不干涉:只動 VDF 自己的檔;VCGC / VRN-1 / VRN-2 的程式、冊、號都沒改。
