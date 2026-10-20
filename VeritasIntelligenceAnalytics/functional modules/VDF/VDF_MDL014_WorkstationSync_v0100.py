@@ -20,6 +20,8 @@
   python "functional modules\\VDF\\VDF_MDL014_WorkstationSync_v0100.py"            預演
   python "functional modules\\VDF\\VDF_MDL014_WorkstationSync_v0100.py" --apply    執行(預設案 qg_onebridge;--case 可多次)
 VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境;git 走本機憑證。
+[PR #546 審查 P2 修正] 分支名時間到秒;本機或遠端已有同名(重試 · 同一秒再跑)就加 -2、-3 …(_free_name),
+  不會在 git switch -c 撞名中斷,也不覆蓋別次的分支。自測 ⑮。
 """
 from __future__ import annotations
 
@@ -146,11 +148,20 @@ def survey(root: Path, remote: str, wt: Path, fetch: bool = True) -> dict:
             "main_dirty": [ln for ln in git(["status", "--porcelain"], root).splitlines() if ln.strip()]}
 
 
+def _free_name(prefix: str, stamp: str, repo: Path, remote: str) -> str:
+    """分支名 <前綴><時間>;本機或遠端已有同名就加 -2、-3 …(重跑不撞名、不覆蓋)。"""
+    used = set(git(["for-each-ref", "--format=%(refname:short)", "refs/heads", "refs/remotes/" + remote], repo, check=False).splitlines())
+    name, k = prefix + stamp, 2
+    while name in used or "%s/%s" % (remote, name) in used:
+        name, k = "%s%s-%d" % (prefix, stamp, k), k + 1
+    return name
+
+
 def backup(root: Path, remote: str, s: dict, stamp: str) -> str:
     """本機獨有提交推到新分支(從不 force,從不動 main)。已有遠端分支收著就不重推。"""
     if not s["backup_needed"]:
         return s["holders"][0] if s["holders"] else ""
-    name = BACKUP_PREFIX + stamp
+    name = _free_name(BACKUP_PREFIX, stamp, root, remote)
     git(["push", remote, "HEAD:refs/heads/%s" % name], root)
     return "%s/%s" % (remote, name)
 
@@ -233,7 +244,7 @@ def publish(wt: Path, remote: str, picked: list, ran: list, stamp: str) -> str:
     """收據提交到新分支並推上去(從不 force · 從不推 main);沒東西就不提交。"""
     if not picked:
         return ""
-    name = RECEIPT_PREFIX + stamp
+    name = _free_name(RECEIPT_PREFIX, stamp, wt, remote)
     git(["switch", "-c", name], wt)
     msg = "交接收據(工作站 · %s):%s\n\n由 %s 在 VDF 工作樹(固定在 main)真的重跑;只收 VDF 的案。" % (
         stamp, " · ".join("%s rc %s" % (r["case"], r["rc"]) for r in ran), TAG)
@@ -261,7 +272,7 @@ def main(argv=None) -> int:
     root = Path(git(["rev-parse", "--show-toplevel"], HERE))
     wt = Path(a.worktree).resolve() if a.worktree else default_worktree(root)
     cases = a.case or list(DEFAULT_CASES)
-    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M")
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     print("=== %s · %s ===" % (TAG, "執行" if a.apply else "預演(加 --apply 才動手)"))
     s = survey(root, a.remote, wt)
     print("  [倉] %s · 本機 HEAD %s · 落後 %s %d 提交 · 本機獨有 %d 提交" % (root, s["head"][:9], s["up"], s["behind"], s["ahead"]))
@@ -406,6 +417,15 @@ def selftest() -> int:
             and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VRN2_", "VCGC"))]
             and not re.search(r"^\s*(import|from)\s+" + "talib", src, re.M)
             and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + r"CONSENT[\"']\]\s*=(?!=)", src))
+        rc_txt = wt / VIA_DIR / EVID / "vdf_case.txt"
+        rc_txt.write_text("log 第二次", encoding="utf-8")
+        git(["add", "--", EVID + "/vdf_case.txt"], wt / VIA_DIR)
+        br2 = publish(wt, "origin", [str(rc_txt)], ran, "T1")
+        git(["fetch", "origin"], work)
+        bk2 = _free_name(BACKUP_PREFIX, "T1", work, "origin")
+        chk("⑮ 同一時間戳再跑:收據分支 T1 已在(本機 + 遠端)→ 改名 T1-2 照推 · 備份名也避開遠端既有的 T1 → T1-2 · 原分支不被覆蓋",
+            br2 == RECEIPT_PREFIX + "T1-2" and git(["rev-parse", "refs/heads/" + br2], remote) and bk2 == BACKUP_PREFIX + "T1-2"
+            and git(["log", "-1", "--format=%s", "refs/heads/" + RECEIPT_PREFIX + "T1"], remote).startswith("交接收據"), (br2, bk2))
     finally:
         for k, v in keep.items():
             if v is None:

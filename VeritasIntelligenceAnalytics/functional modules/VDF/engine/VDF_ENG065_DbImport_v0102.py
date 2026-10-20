@@ -9,6 +9,8 @@
   ENG235 缺席 = 誠實印一行、照 v0101 直接匯入。VIA_MOJIBAKE_FIX=0 = 關掉(舊行為)。
 其餘(檔名協定 · 雙庫路由 · upsert_select · 冪等)照 v0101。零網路。
 用法:python3 VDF_ENG065_DbImport_v0102.py import <資料夾> | --selftest
+[接回 main 修正 2026-10-20 · PR #546 審查 P1] 修復有任一檔失敗(ENG235 回 action=FAIL:重寫 parquet / 更新 DuckDB 炸了或列數核對不過)→
+  不匯入、rc 1、印出哪幾檔與原因(原本丟掉修復報告照樣匯入,亂碼原樣進庫還回成功)。要硬匯入 = 操作員明示 VIA_MOJIBAKE_FIX=0。自測 ⑦。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -132,7 +134,12 @@ def pre_fix(folder) -> dict:
 
 
 def run_import(folder: str, dbs=None) -> int:
-    pre_fix(folder)
+    rep = pre_fix(folder)
+    bad = [t for t in rep.get("targets") or [] if t.get("action") == "FAIL"]
+    if bad:
+        print("  [亂碼解碼器] 修復失敗 %d 檔 → 不匯入(免得原亂碼進庫);修好再跑,或操作員明示 VIA_MOJIBAKE_FIX=0 照舊匯入:%s" % (
+            len(bad), " · ".join("%s(%s)" % (Path(t.get("file") or "?").name, t.get("why") or "?") for t in bad[:5])))
+        return 1
     return PRIOR.run_import(folder, dbs)
 
 
@@ -210,6 +217,26 @@ def selftest() -> int:
         got3 = [r[0] for r in con.execute("SELECT name FROM demo ORDER BY n").fetchall()]
         con.close()
         chk("④ VIA_MOJIBAKE_FIX=0:不修,照 v0101 匯入(亂碼原樣進庫;舊行為)· 沒有備份夾", rc3 == 0 and got3 == moj and not (f2 / "_pre_mojibake").exists(), got3)
+        f3 = td / "u3"
+        dbs3 = make(f3)
+        os.environ.pop("VIA_MOJIBAKE_FIX", None)
+
+        class _FailRepair:
+            @staticmethod
+            def fix(folder, **kw):
+                return {"lamp": "RED", "targets": [{"file": str(Path(folder) / "tw__demo.parquet"), "action": "FAIL", "why": "OSError: disk full"}],
+                        "changed_values": 0, "files_rewritten": 0, "unrecoverable": 0}
+        keep_rep = dict(_REPAIR)
+        _REPAIR.update(mod=_FailRepair, why=None)
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc5 = run_import(str(f3), dbs3)
+        finally:
+            _REPAIR.clear()
+            _REPAIR.update(keep_rep)
+        chk("⑦ 修復失敗(ENG235 回 action=FAIL)→ 不匯入 · rc 1 · 庫檔沒建 · 印出失敗檔與原因",
+            rc5 == 1 and not dbs3["tw"].exists() and "修復失敗 1 檔" in buf.getvalue() and "tw__demo.parquet(OSError: disk full)" in buf.getvalue(), (rc5, buf.getvalue()[-200:]))
         body = Path(__file__).read_text(encoding="utf-8")
         chk("⑤ 橋在(ACCEL · LIB · NET)· 零網路 · 不碰 TA-Lib · 不載 VCGC 程式 · 匯入正典仍是 upsert_select(前版)",
             all(x in body for x in ("[VIA:ACCEL-BRIDGE:v0100]", "[VIA:LIB-BRIDGE:v0100]", "[VIA:NET-BRIDGE:v0100]"))
