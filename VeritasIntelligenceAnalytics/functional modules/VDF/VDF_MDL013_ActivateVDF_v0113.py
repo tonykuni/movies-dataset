@@ -128,7 +128,10 @@ def flow_db(opt, res, gate, log_dir, manager=None, py=None) -> dict:
     if getattr(opt, "refill_apply", False) and not getattr(opt, "dry", False):
         steps.append(FLM.run_step("db_check_after_refill", ["db", "check"] + (["--home", home] if home else []), env, log_dir, gate, 1800, manager, py))
     steps.append(FLM.run_step("db_verify", ["db", "verify"], env, log_dir, gate, 1800, manager, py))
-    worst = max((x.get("lamp") for x in steps), key=lambda x: LAMP_RANK.index(x) if x in LAMP_RANK else 3)
+    lamps = [out.get("lamp")] + [x.get("lamp") for x in steps]      # v0108 自己的總燈也算(不只看步驟)
+    if "INTERRUPTED" in lamps:                     # Ctrl+C 在核對步 = 整條中斷(壓過前面的紅;main 回 130)
+        return dict(out, lamp="INTERRUPTED", steps=steps)
+    worst = max(lamps, key=lambda x: LAMP_RANK.index(x) if x in LAMP_RANK else 3)
     return dict(out, lamp=worst, steps=steps)
 
 
@@ -233,7 +236,8 @@ def selftest() -> int:
 
     def fake_v0108(opt, res, gate, log_dir, manager=None, py=None):
         return {"flow": "db", "lamp": opt.base, "db_home": "/data/home/vdf_database",
-                "steps": [{"step": s, "lamp": "GREEN"} for s in ("db_where", "db_check", "db_refill", "db_xcheck")]}
+                "steps": [{"step": s, "lamp": opt.base if s == "db_check" and opt.base != "INTERRUPTED" and not getattr(opt, "quiet", False) else "GREEN"}
+                          for s in ("db_where", "db_check", "db_refill", "db_xcheck")]}
 
     def fake_step(name, args, env, log_dir, gate=None, timeout=None, manager=None, py=None):
         calls.append((name, list(args)))
@@ -250,6 +254,10 @@ def selftest() -> int:
         r3 = flow_db(types.SimpleNamespace(base="GREEN", dry=True, refill_apply=True), {}, None, tmp)
         fake_step.verify = "RED"
         r4 = flow_db(types.SimpleNamespace(base="GREEN", dry=False, refill_apply=False), {}, None, tmp)
+        fake_step.verify = "INTERRUPTED"            # 前面已紅 + 核對步按 Ctrl+C → 整條中斷(PR #538 Codex P2)
+        r7 = flow_db(types.SimpleNamespace(base="RED", dry=False, refill_apply=False), {}, None, tmp)
+        fake_step.verify = "GREEN"                  # v0108 總燈紅、步驟全綠 → 照紅(總燈也算)
+        r8 = flow_db(types.SimpleNamespace(base="RED", quiet=True, dry=False, refill_apply=False), {}, None, tmp)
         r5 = flow_db(types.SimpleNamespace(base="INTERRUPTED", dry=False, refill_apply=False), {}, None, tmp)
         _RUN13["on"] = False
         n_before = len(calls)
@@ -259,10 +267,10 @@ def selftest() -> int:
         _FLOW_DB_V0108, FLM.run_step, V0100.flow_env = keep
     names = lambda r: [s["step"] for s in r["steps"]]       # noqa: E731
     chk("① 本輪資料庫流程最後多 db_verify;refill 真寫過(--refill-apply 且非 --dry)先 db_check_after_refill(帶同一個家)再核對;"
-        "核對紅併進流程;中斷 / 不在本版一輪 = 照前版",
+        "核對紅併進流程;核對步中斷壓過前面的紅;中斷 / 不在本版一輪 = 照前版",
         names(r1)[-1] == "db_verify" and r1["lamp"] == "GREEN"
         and names(r2)[-2:] == ["db_check_after_refill", "db_verify"] and ("db_check_after_refill", ["db", "check", "--home", "/data/home/vdf_database"]) in calls
-        and "db_check_after_refill" not in names(r3) and r4["lamp"] == "RED" and r5["lamp"] == "INTERRUPTED" and len(r5["steps"]) == 4
+        and "db_check_after_refill" not in names(r3) and r4["lamp"] == "RED" and r7["lamp"] == "INTERRUPTED" and r8["lamp"] == "RED" and r5["lamp"] == "INTERRUPTED" and len(r5["steps"]) == 4
         and len(r6["steps"]) == 4 and len(calls) == n_before, (names(r1), names(r2), names(r3), r4["lamp"]))
     td = Path(tempfile.mkdtemp(prefix="vdfact109_"))
     try:

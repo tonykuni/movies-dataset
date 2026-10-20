@@ -201,10 +201,15 @@ def rederive(home: Path, book: list, today: datetime.date, v2: set) -> dict:
             try:
                 con = duckdb.connect(str(path), read_only=True)
                 have = {r[0]: r[1] for r in con.execute("select table_name, table_schema from information_schema.tables").fetchall()}
-            except Exception as exc:                   # 打不開 = 每列照實記「庫打不開」(跟 check 比)
+            except Exception as exc:                   # 打不開 = 每列照實記「庫打不開」(跟 check 比);他系統表照樣標 INFO(check 的 split_rows 也套在這些列)
                 for t in tables:
-                    out[(dbname, t["table"])] = {"檔": str(path), "列數": None, "最新日": None, "狀態": "庫打不開:%s" % type(exc).__name__,
-                                                 "燈": "RED", "_writers": t.get("writers") or [], "_min": t.get("min_rows", 1)}
+                    tn, writers = t["table"], t.get("writers") or []
+                    st, lamp, osys = "庫打不開:%s" % type(exc).__name__, "RED", _osys(tn, writers, v2)
+                    if osys:
+                        why = "· 冊上沒登寫入者,表名 vrn_ 開頭 " if osys == "VRN 未分辨" else ""
+                        st, lamp = "他系統表(%s 寫)%s· %s · VDF 只攤開不代修" % (osys, why, st), "INFO"
+                    out[(dbname, tn)] = {"檔": str(path), "列數": None, "最新日": None, "狀態": st, "燈": lamp,
+                                         "_writers": writers, "_min": t.get("min_rows", 1), "_osys": osys}
                 continue
         for t in tables:
             tn, mn, writers = t["table"], t.get("min_rows", 1), t.get("writers") or []
@@ -460,7 +465,10 @@ def selftest() -> int:
             con.execute("insert into tw_old values ('2020-01-02')")
             con.execute("create table extra_tbl(x int)")
             con.close()
+            (home / "vdf_broken.duckdb").write_bytes(b"not a duckdb file" * 64)     # 打不開的庫:他系統表照樣標 INFO(PR #538 Codex P2)
             book = [{"db": "vdf_tw_market.duckdb", "table": "tw_daily_prices", "writers": ["VDF_ENG073"], "min_rows": 1},
+                    {"db": "vdf_broken.duckdb", "table": "cgc_gate_log", "writers": ["CGC_MDL149"], "min_rows": 1},
+                    {"db": "vdf_broken.duckdb", "table": "tw_broken", "writers": ["VDF_ENG073"], "min_rows": 1},
                     {"db": "vdf_tw_market.duckdb", "table": "tw_empty0", "writers": ["VDF_ENG082"], "min_rows": 0},
                     {"db": "vdf_tw_market.duckdb", "table": "tw_old", "writers": ["VDF_ENG056"], "min_rows": 1},
                     {"db": "vdf_tw_market.duckdb", "table": "tw_missing", "writers": ["VDF_ENG056"], "min_rows": 1},
@@ -470,8 +478,10 @@ def selftest() -> int:
             (reg / "VIA_DB_Table_SSOT_v0100.json").write_text(json.dumps({"tables": book}), encoding="utf-8")
             o = PRIOR.db_check(str(td / "home"), reg)
             v = verify(out, reg, roots=(code,))
-            chk("② 真庫:db check 寫的清點,本版自己重推每列每欄 → 0 差異 = PASS(含缺庫 · 缺表 · 空表 · 過舊 · 最少 0 列 · 他系統 · 冊外表)",
-                v["lamp"] == "PASS" and v["rows_compared"] == 8 and v["fields_compared"] == 40 and not v["mismatches"]
+            rows_o = {r["表"]: r for r in o["rows"]}
+            chk("② 真庫:db check 寫的清點,本版自己重推每列每欄 → 0 差異 = PASS(含缺庫 · 缺表 · 空表 · 過舊 · 最少 0 列 · 他系統 · 冊外表 · 庫打不開:VDF 表紅、他系統表 INFO)",
+                v["lamp"] == "PASS" and v["rows_compared"] == 10 and v["fields_compared"] == 50 and not v["mismatches"]
+                and rows_o["cgc_gate_log"]["燈"] == "INFO" and "庫打不開" in rows_o["cgc_gate_log"]["狀態"] and rows_o["tw_broken"]["燈"] == "RED"
                 and v["check_ts"] == o["ts"] and Path(v["files"]["html"]).is_file(), (v["lamp"], v["mismatches"][:3], v["rows_compared"]))
             j = out / "DB_CHECK_latest.json"
             orig = j.read_text(encoding="utf-8")
@@ -498,8 +508,8 @@ def selftest() -> int:
                 finally:
                     DB_MOD.REG = keep_reg
             s = buf.getvalue()
-            chk("④ db verify 動詞:印 JSON 與「[計] VDF db verify · 8 表 × 5 欄 = 40 欄比對 · 差異 0 … PASS」;rc 0;候選寫入者一行",
-                rc == 0 and json.loads(s.splitlines()[0])["lamp"] == "PASS" and "[計] VDF db verify · 8 表 × 5 欄 = 40 欄比對 · 差異 0" in s
+            chk("④ db verify 動詞:印 JSON 與「[計] VDF db verify · 10 表 × 5 欄 = 50 欄比對 · 差異 0 … PASS」;rc 0;候選寫入者一行",
+                rc == 0 and json.loads(s.splitlines()[0])["lamp"] == "PASS" and "[計] VDF db verify · 10 表 × 5 欄 = 50 欄比對 · 差異 0" in s
                 and "[候選寫入者]" in s, s[-400:])
             (out / "DB_CHECK_latest.json").unlink()
             with contextlib.redirect_stdout(io.StringIO()):
