@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # [接線 2026-10-20] 本檔 = 工作站分支 workstation-20261020 的同號原文(main 沒有此版,不撞號)。工作站 v0106(自測鏈隔離活資料樞)不搬:
 #   main v0106 已在前版鏈自測期間封倉(_SEAL_REPO_HUB),同一目的;本檔前版照 glob 取 main v0106。
+# [接回 main 修正 2026-10-20 · U/I 實測] 手機 390:v0105 無條件寫 .fg{grid-template-columns:340px …},蓋掉 v0101 的 900px 一欄規則 →
+#   左面板 340px、右側只剩 30px 一字一行。本版版面 CSS(在頁尾,層疊最後)補 @media (max-width:900px) 一欄 + 左面板不黏頂。自測 ⑧。
 """VDF_MDL012_FetchGroups v0108 — 薄尾:族群頁版面最佳化(字級套件 · 左面板摺疊 · 短欄不換行 · 燈欄第一 · 空值 — · 路徑縮檔名)
 
 操作員(2026-10-12,工作站 via-groups-ui 跳出的頁看過):「字體大小有位階但畫面凌亂,要用工具最佳化」。
@@ -174,6 +176,7 @@ _CSS_V0108 = """
 .fg-right td.via-path{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28ch}
 .tabs{gap:3px}.tabs button{padding:3px 8px}
 .via-layout-note{opacity:.6;font-size:var(--via-t4,11px);margin:0 0 6px}
+@media (max-width:900px){.fg{grid-template-columns:1fr}.fg-left{position:static;max-height:none}}
 """
 
 _JS_V0108 = r"""
@@ -344,6 +347,9 @@ def selftest() -> int:
     chk("⑥ usertest 探針讀法放寬:<pre id=\"VIA_UT\"> 有沒有套件補的 style 都讀得到;v0107 的讀法已換成本版",
         _UT_RX_V0108.search('<pre id="VIA_UT">{"a":1}</pre>') is not None and _UT_RX_V0108.search('<pre id="VIA_UT" style="font-family: var(--via-mono);">{"a":1}</pre>') is not None
         and _UT_RX_V0108.search('<pre id="OTHER">x</pre>') is None and V0107.usertest_browser is usertest_browser_v0108)
+    narrow = "@media (max-width:900px){.fg{grid-template-columns:1fr}"
+    chk("⑧ 窄版一欄:頁尾版面 CSS 有 900px 一欄規則,而且排在 v0105 的 340px 規則之後(層疊勝出)",
+        narrow in page and page.rfind(narrow) > page.find(".fg{grid-template-columns:340px"), (narrow in page,))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑤ 加速器橋 · 網路橋在;前版不動(薄尾);不碰 TA-Lib;頁內程式只動 DOM(無 fetch / XMLHttpRequest / eval)",
         "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src and PRIOR_PATH.is_file() and "import " + "talib" not in src

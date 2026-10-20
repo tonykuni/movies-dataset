@@ -11,6 +11,11 @@
 #   表上 INFO 卻是灰字。本版把 v0154 模組的 _TK_JS 換成 INFO:3(歸灰;字級套件每次產生都讀它)→ 燈號列「綠 4 · 灰 14」與摘要一致。自測 ⑫。
 #   手機 390 再看:長欄(> 24 字)套 overflow-wrap:anywhere,表格把「表」「狀態」欄壓到一字一行(aaii_sentiment 拆成 9 行),
 #   表也因此永遠不比手機寬、橫捲框不會出現。改 break-word(長字不拆,表變寬 → 字級套件自己的橫捲框接手);CSS 與 JS 兩處。自測 ⑬。
+#   VDF 操作頁一打開的「健康」頁籤是白的:它指向 VCGC 的健康矩陣頁(../review/vcgc_health/…),容器裡沒有;「本輪 PS U/I」頁籤 src 是空的。
+#   照本頁自己的規則(檔不在 = 說明 + 產生它的指令),ui 跑完後把「檔不在 / 空」的頁籤補 srcdoc 說明(哪個檔 · 誰的頁 · 指令 · 產生後重跑 ui);
+#   檔在的頁籤不動;重跑換新不疊。自測 ⑭。
+#   手機 390:左面板被壓成 30px 一字一行。根因:窄版 @media 把格線改一欄,但 header 寫死 grid-column:1/3,
+#   逼出一條隱形第二欄 → 左面板與右側並排。ui 跑完補一行 header{grid-column:1/-1}(桌面等於 1/3;手機跨唯一一欄 → 上下排)。自測 ⑮。
 """VDF_SystemManager v0156 — 薄尾:啟動就緒的短令檢查沿 Register 點源鏈讀(問參數頁「啟動器/鏈缺:Register via-vdffetch」假紅修正)
 
 工作站實錄(2026-10-12 14:59 問參數頁):「啟動就緒 RED · 來源 VDF_SystemManager_v0155.py · [修] 這些是樹上的檔,不是設定:git pull…」。
@@ -248,11 +253,84 @@ _WRITE_DB_PRIOR_V0160 = vars(DB_MOD_V0160).setdefault("_WRITE_DB_ORIG_V0160", DB
 DB_MOD_V0160._write_db = _write_db_v0160
 
 
+IFRAME_RX_V0160 = re.compile(r'<iframe\b([^>]*?)\bsrc="([^"]*)"([^>]*)>')
+HEALTH_CMD_V0160 = "via-vcgc run CGC_MDL274_HealthMatrix matrix"
+
+
+def _frame_note_v0160(src: str, cmd: str) -> str:
+    import html as _h
+    if src:
+        who = "VCGC 的頁(VDF 只讀跳轉,不代產)" if "vcgc" in src.lower() else "VDF 的頁"
+        body = ("<b>這一頁還沒產生</b><p>檔:<code>%s</code><br>%s</p><p>產生它:<code>%s</code><br>產生後重跑:<code>via-vcgc run VDF_SystemManager ui</code></p>"
+                % (_h.escape(src), who, _h.escape(cmd)))
+    else:
+        body = "<b>本輪還沒有 PS U/I 結果頁</b><p>PS 操作台跑過才有;跑完重跑:<code>via-vcgc run VDF_SystemManager ui</code></p>"
+    return ("<!doctype html><meta charset=utf-8><style>body{font:13px/1.6 system-ui,sans-serif;margin:24px;color:#374151;background:#fff}"
+            "b{font-size:15px;color:#111827}code{background:#f3f4f6;padding:1px 4px;border-radius:3px;word-break:break-all}</style>" + body)
+
+
+def ui_frames_v0160(page) -> dict:
+    """VDF 操作頁右側頁籤:目標檔不在或 src 空 → 補 srcdoc 說明;檔在的不動;重跑換新不疊。回 {frames, missing, changed}。"""
+    import html as _h
+    page = Path(page)
+    if not page.is_file():
+        return {"frames": 0, "missing": 0, "changed": False, "why": "頁不在"}
+    h = page.read_text(encoding="utf-8")
+    m = re.search(r"<span>健康矩陣</span><button[^>]*data-l121cmd='([^']+)'", h)
+    hcmd = m.group(1) if m else HEALTH_CMD_V0160
+    out = {"frames": 0, "missing": 0}
+
+    def fix(mm):
+        pre, src, post = mm.group(1), mm.group(2), mm.group(3)
+        pre, post = re.sub(r'\ssrcdoc="[^"]*"', "", pre), re.sub(r'\ssrcdoc="[^"]*"', "", post)
+        out["frames"] += 1
+        target = src.split("#", 1)[0]
+        if target and (page.parent / target).is_file():
+            return '<iframe%ssrc="%s"%s>' % (pre, src, post)
+        out["missing"] += 1
+        cmd = hcmd if "HEALTH_MATRIX" in target else "via-vcgc run VDF_SystemManager ui"
+        return '<iframe%ssrc="%s"%s srcdoc="%s">' % (pre, src, post, _h.escape(_frame_note_v0160(target, cmd), quote=True))
+    new = IFRAME_RX_V0160.sub(fix, h)
+    out["changed"] = new != h
+    if out["changed"]:
+        page.write_text(new, encoding="utf-8")
+    return out
+
+
+NARROW_V0160 = '<style id="via-v0160-narrow">header{grid-column:1/-1}</style>'
+NARROW_RX_V0160 = re.compile(r'<style id="via-v0160-narrow">.*?</style>', re.S)
+
+
+def ui_narrow_v0160(page) -> str:
+    """header 跨全部欄(1/-1):窄版一欄時左面板與右側上下排,不被隱形第二欄壓成一條。回 inserted / same / missing。"""
+    page = Path(page)
+    if not page.is_file():
+        return "missing"
+    h = page.read_text(encoding="utf-8")
+    if NARROW_RX_V0160.search(h):
+        new = NARROW_RX_V0160.sub(NARROW_V0160, h, count=1)
+        how = "same" if new == h else "replaced"
+    else:
+        i = h.lower().rfind("</head>")
+        new = (h[:i] + NARROW_V0160 + h[i:]) if i >= 0 else (NARROW_V0160 + h)
+        how = "inserted"
+    if new != h:
+        page.write_text(new, encoding="utf-8")
+    return how
+
+
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in args[:2]:
         return selftest()
-    return PRIOR.main(args)
+    rc = PRIOR.main(args)
+    if args[:1] == ["ui"]:
+        page = PRIOR._out_dir() / "VDF_UI_latest.html"
+        r = ui_frames_v0160(page)
+        nw = ui_narrow_v0160(page)
+        print("[計] VDF ui %s · 頁籤檔不在就寫說明(不留白頁)· 頁籤 %d · 缺檔 / 空 %d · 窄版上下排 %s · %s" % (
+            TAG, r["frames"], r["missing"], nw, "GREEN" if r["frames"] and nw != "missing" else "YELLOW"))
+    return rc
 
 
 def selftest() -> int:
@@ -349,6 +427,39 @@ def selftest() -> int:
             TK_MOD_V0160 is not None and "INFO:3," in blk and "INFO:2," not in blk and "GREEN:2,OK:2,PASS:2," in blk
             and "INFO:2," in _TK_JS_ORIG_V0160 and TK_MOD_V0160._TK_JS == _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,").replace(*WRAP_V0160),
             blk[blk.find("var SEV"):blk.find("var SEV") + 160] if blk else "v0154 找不到")
+        pg = td / "ui" / "VDF_UI_latest.html"
+        pg.parent.mkdir()
+        (pg.parent / "HEADER_MATRIX_latest.html").write_text("<p>x</p>", encoding="utf-8")
+        pg.write_text("<div><span>健康矩陣</span><button type='button' class='l121-cmd' data-l121cmd='via-vcgc run CGC_MDL274_HealthMatrix matrix'>指令</button></div>"
+                      '<iframe id="f0" src="../review/vcgc_health/HEALTH_MATRIX_latest.html#via-pick=VDF"></iframe>'
+                      '<iframe id="f1" src="HEADER_MATRIX_latest.html"></iframe><iframe id="f4" src=""></iframe>', encoding="utf-8")
+        r1 = ui_frames_v0160(pg)
+        h1 = pg.read_text(encoding="utf-8")
+        r2 = ui_frames_v0160(pg)
+        h2 = pg.read_text(encoding="utf-8")
+        keep_main, keep_out = vars(PRIOR).get("main"), vars(PRIOR).get("_out_dir")
+        PRIOR.main, PRIOR._out_dir = (lambda a: 0), (lambda: pg.parent)
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc_ui = main(["ui"])
+        finally:
+            PRIOR.main = keep_main
+            if keep_out is None:
+                del PRIOR._out_dir
+            else:
+                PRIOR._out_dir = keep_out
+        chk("⑭ 頁籤檔不在 / src 空 → srcdoc 說明(檔名 · VCGC 的頁 · 產生指令 · 重跑 ui);檔在的不動;重跑不疊;ui 動詞跑完自動補",
+            r1 == {"frames": 3, "missing": 2, "changed": True} and h1.count("srcdoc=") == 2 and "HealthMatrix matrix" in h1 and "VCGC 的頁" in h1
+            and "本輪還沒有 PS U/I 結果頁" in h1 and '<iframe id="f1" src="HEADER_MATRIX_latest.html">' in h1
+            and r2["changed"] is False and h2 == h1 and rc_ui == 0 and "缺檔 / 空 2" in buf.getvalue(), (r1, r2, buf.getvalue()[-120:]))
+        pn = td / "ui" / "narrow.html"
+        pn.write_text("<html><head><style>body{display:grid;grid-template-columns:320px 1fr}header{grid-column:1/3}</style></head><body><header>h</header></body></html>", encoding="utf-8")
+        n1, n2 = ui_narrow_v0160(pn), ui_narrow_v0160(pn)
+        hn = pn.read_text(encoding="utf-8")
+        chk("⑮ 窄版:header{grid-column:1/-1} 插在 </head> 前(在原版面樣式之後,蓋過 1/3)· 重跑不疊 · ui 動詞也套(⑭ 那一跑)",
+            (n1, n2) == ("inserted", "same") and hn.count('id="via-v0160-narrow"') == 1 and hn.index("grid-column:1/3") < hn.index("grid-column:1/-1") < hn.index("</head>")
+            and 'id="via-v0160-narrow"' in pg.read_text(encoding="utf-8") and "窄版上下排 inserted" in buf.getvalue(), (n1, n2, buf.getvalue()[-80:]))
         css_b = blk[blk.find("<style"):blk.find("</style>")]
         js_b = blk[blk.find("<script"):]
         chk("⑬ 長欄換行:字級套件 CSS 與 JS 都是 overflow-wrap:break-word、沒有 anywhere(手機不把長字壓成一字一行;表變寬由橫捲框接手)· 前版原文兩處都是 anywhere",
