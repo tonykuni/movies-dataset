@@ -9,6 +9,8 @@
 #   整數照整數印、空值頁上一律 —(CSV 留空)、燈色與頁殼照前版;JSON 不動(本來就是整數)。自測 ⑨⑩⑪。
 #   截圖再看:頁內燈號列寫「綠 18」,同頁摘要寫「綠 4 · 資訊 14」—— v0154 展現腳本的嚴重度表把 INFO 歸綠(INFO:2),
 #   表上 INFO 卻是灰字。本版把 v0154 模組的 _TK_JS 換成 INFO:3(歸灰;字級套件每次產生都讀它)→ 燈號列「綠 4 · 灰 14」與摘要一致。自測 ⑫。
+#   手機 390 再看:長欄(> 24 字)套 overflow-wrap:anywhere,表格把「表」「狀態」欄壓到一字一行(aaii_sentiment 拆成 9 行),
+#   表也因此永遠不比手機寬、橫捲框不會出現。改 break-word(長字不拆,表變寬 → 字級套件自己的橫捲框接手);CSS 與 JS 兩處。自測 ⑬。
 """VDF_SystemManager v0156 — 薄尾:啟動就緒的短令檢查沿 Register 點源鏈讀(問參數頁「啟動器/鏈缺:Register via-vdffetch」假紅修正)
 
 工作站實錄(2026-10-12 14:59 問參數頁):「啟動就緒 RED · 來源 VDF_SystemManager_v0155.py · [修] 這些是樹上的檔,不是設定:git pull…」。
@@ -222,8 +224,23 @@ def _mod_v0160(tag: str):
 
 TK_MOD_V0160 = _mod_v0160("v0154")              # 字級套件 v2 本體(typekit_block 每次讀它的 _TK_JS)
 _TK_JS_ORIG_V0160 = vars(TK_MOD_V0160).setdefault("_TK_JS_ORIG_V0160", TK_MOD_V0160._TK_JS) if TK_MOD_V0160 else ""
-if TK_MOD_V0160 is not None:
-    TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,")   # INFO 歸灰(表上本來就是灰字),燈號列與摘要同數
+_TK_CSS_ORIG_V0160 = vars(TK_MOD_V0160).setdefault("_TK_CSS_ORIG_V0160", TK_MOD_V0160._TK_CSS) if TK_MOD_V0160 else ""
+WRAP_V0160 = ("overflow-wrap:anywhere", "overflow-wrap:break-word")
+
+
+def _tk_install_v0160():
+    """INFO 歸灰(表上本來就是灰字,燈號列與摘要同數)· 長欄 break-word(手機不一字一行;表變寬 → 橫捲框接手)。"""
+    if TK_MOD_V0160 is not None:
+        TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,").replace(*WRAP_V0160)
+        TK_MOD_V0160._TK_CSS = _TK_CSS_ORIG_V0160.replace(*WRAP_V0160)
+
+
+def _tk_restore_v0160():
+    if TK_MOD_V0160 is not None:
+        TK_MOD_V0160._TK_JS, TK_MOD_V0160._TK_CSS = _TK_JS_ORIG_V0160, _TK_CSS_ORIG_V0160
+
+
+_tk_install_v0160()
 
 
 # 原版存在 v0151 模組上(同一行程本檔被載兩次也拿得到原版,不會包兩層);db check 經 DB_MOD._write_db 寫 → 走本版;自測前版鏈時換回
@@ -330,22 +347,25 @@ def selftest() -> int:
         blk = TK_MOD_V0160.typekit_block() if TK_MOD_V0160 is not None else ""
         chk("⑫ 展現腳本:INFO 歸灰(INFO:3)· 綠只算 GREEN / OK / PASS · 原本存在 v0154 模組上 · 只改這一處",
             TK_MOD_V0160 is not None and "INFO:3," in blk and "INFO:2," not in blk and "GREEN:2,OK:2,PASS:2," in blk
-            and "INFO:2," in _TK_JS_ORIG_V0160 and TK_MOD_V0160._TK_JS == _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,"),
+            and "INFO:2," in _TK_JS_ORIG_V0160 and TK_MOD_V0160._TK_JS == _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,").replace(*WRAP_V0160),
             blk[blk.find("var SEV"):blk.find("var SEV") + 160] if blk else "v0154 找不到")
+        css_b = blk[blk.find("<style"):blk.find("</style>")]
+        js_b = blk[blk.find("<script"):]
+        chk("⑬ 長欄換行:字級套件 CSS 與 JS 都是 overflow-wrap:break-word、沒有 anywhere(手機不把長字壓成一字一行;表變寬由橫捲框接手)· 前版原文兩處都是 anywhere",
+            "overflow-wrap:anywhere" not in blk and "td.via-long{max-width:" in css_b and "overflow-wrap:break-word" in css_b and "overflow-wrap:break-word" in js_b
+            and "overflow-wrap:anywhere" in _TK_CSS_ORIG_V0160 and "overflow-wrap:anywhere" in _TK_JS_ORIG_V0160, blk.count("anywhere"))
     finally:
         shutil.rmtree(td, ignore_errors=True)
     print("  ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──")
     PRIOR.READY = PRIOR.read_launch          # 前版自測用它自己的門、它自己的寫檔與它自己的展現腳本
     DB_MOD_V0160._write_db = _WRITE_DB_PRIOR_V0160
-    if TK_MOD_V0160 is not None:
-        TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160
+    _tk_restore_v0160()
     try:
         prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
     finally:
         PRIOR.READY = read_launch
         DB_MOD_V0160._write_db = _write_db_v0160
-        if TK_MOD_V0160 is not None:
-            TK_MOD_V0160._TK_JS = _TK_JS_ORIG_V0160.replace("INFO:2,", "INFO:3,")
+        _tk_install_v0160()
     chk("⑧ 前版鏈 %s 自測 rc 0" % PRIOR_PATH.stem, prc == 0)
     print("[計] %s_%s 自測 %d/%d · %s" % (_STEM, TAG, p, p + f, "PASS" if f == 0 else "FAIL"))
     return 0 if f == 0 else 1
