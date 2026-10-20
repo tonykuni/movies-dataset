@@ -10,10 +10,10 @@
 | 工作站檔 | 處理 | 原因 |
 |---|---|---|
 | `VDF_SystemManager` v0155(`all` 一鍵) | 改號 **v0159** 接上 main | 兩線同號不同內容 |
-| `VDF_SystemManager` v0156(啟動就緒沿 Register 鏈) | 改號 **v0160** | 同上 |
+| `VDF_SystemManager` v0156(啟動就緒沿 Register 鏈) | 改號 **v0160**(第二批 PR) | 同上;擊斃閘 KILL-11:同一 PR 不能連加兩版 |
 | `VDF_SystemManager` v0157(汝窯天青頁首) | **延後** | 要共用字級冊 `VIA_UI_Template_SSOT` v0103(冊號 ≥ 103);該冊是三操作台共用的,加進 main 會改到他系統外觀 → 等操作員 / VCGC 決定 |
 | `VDF_MDL012_FetchGroups` v0106(自測鏈隔離活資料樞) | **不搬** | 同號不同內容;main v0106 已在前版鏈自測期間封倉(`_SEAL_REPO_HUB`),同一目的。工作站版接到 main 上反而裝錯地方(main v0106 換掉了鏈上的 `find_db`,隔離只會裝在 v0106 模組上,v0100 呼叫的那個沒被換)|
-| `VDF_MDL012_FetchGroups` v0107(清單先跑 · DuckDB 分道並行)· v0108(族群頁版面) | **原號加入** | main 只到 v0106,不撞號;自測裡寫死的「前版 = v0106」照樣對得上 |
+| `VDF_MDL012_FetchGroups` v0107(清單先跑 · DuckDB 分道並行)· v0108(族群頁版面) | **原號加入**(v0108 走第二批 PR) | main 只到 v0106,不撞號;自測裡寫死的「前版 = v0106」照樣對得上 |
 | `VDF_ENG093_LaunchConsole` v0105(清單兩步鎖定先跑) | **延後** | 自測要 VCGC 的步驟冊 `CGC_MDL125` v0112(工作站獨有);main 上 4/7 紅 → 等 VCGC 把它的冊接回 |
 | `VDF_ENG065_DbImport` v0102 · `VDF_ENG235_MojibakeRepair` v0100 · `SUP_MDL756_SmartDecode` v0100 | 原號加入 | main 沒有;亂碼修復一組 |
 | `VDF_ENG077_ActiveETFUniverse` v0106 · `VDF_ActiveETF_Retired_SSOT` v0100 | 原號加入 | main 沒有;退役冊 |

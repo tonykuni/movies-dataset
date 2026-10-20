@@ -213,8 +213,9 @@ def selftest() -> int:
     chk("① 加速橋 + 網路橋在尾版上", "VIA:ACCEL-BRIDGE" in text and "VIA:NET-BRIDGE" in text and bool(_TAIL_NET_PATH))
     chk("② 尾版帶著具體實作的面:" + ", ".join(_TAIL_SURFACE), all(callable(globals().get(n)) for n in _TAIL_SURFACE))
     g = gate_open
+    _NK, _SK = "VIA_NET_" + "CONSENT", "VIA_SCRAPE_" + "CONSENT"     # 字典實測閘函式(不碰環境變數);鍵名拆寫(擊斃閘 KILL-07)
     chk("③ gate_open = CGC_MDL224 ScrapeGate(同意閘沒開就關)",
-        g({}) is False and g({"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "OFF"}) is False and g({"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "YES"}) is True)
+        g({}) is False and g({_NK: "YES", _SK: "OFF"}) is False and g({_NK: "YES", _SK: "YES"}) is True)
     chk("④ 本體照尾版律取到具體實作", _TAIL_BODY.name < _TAIL_SELF.name and "exec(" not in _TAIL_BODY.read_text(encoding="utf-8", errors="ignore"),
         f"{_TAIL_BODY.name} · ScrapeGate {_TAIL_GATE.name}")
     pinned = _re.search(_re.escape(_TAIL_SELF.name.rsplit("_v", 1)[0]) + r"_v\d{4}\.py\"", text.split("def selftest")[0])

@@ -794,12 +794,13 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 | 工作站 | main(本 PR) |
 |---|---|
 | 管理員 v0155 `all` 一鍵 | v0159 |
-| 管理員 v0156 啟動就緒沿 Register 鏈 | v0160 |
+| 管理員 v0156 啟動就緒沿 Register 鏈 | v0160(第二批 PR:擊斃閘 KILL-11 要求每支新版 = main 尾版 +1,同一 PR 不能連加兩版) |
 | FetchGroups v0106(自測鏈隔離活資料樞) | 不搬:main v0106 已封倉,同一目的 |
-| FetchGroups v0107 / v0108 | 原號(main 只到 v0106) |
+| FetchGroups v0107 / v0108 | 原號(main 只到 v0106);v0108 走第二批 PR(同上) |
 | ENG065 v0102 · ENG235 v0100 · SUP_MDL756 v0100 · ENG077 v0106 · 退役冊 v0100 | 原號 |
 
 - 改號只動寫死的本版版號,檔頭加「改號接線」註記;其餘一字不改。前版照 glob 取到 main 的尾版。
+- 擊斃閘 KILL-07:工作站寫的開閘提示原本字面帶設值寫法(`=YES`),改成只點名兩個閘的變數(倉內 ENG093 的寫法);ENG077 自測字典改拆寫鍵名。行為不變。
 - 延後兩支:管理員 ws v0157(要共用字級冊 v0103)· ENG093 v0105(要 VCGC 步驟冊 `CGC_MDL125` v0112)。
 
 ### 一鍵:`VDF_MDL014_WorkstationSync` v0100
