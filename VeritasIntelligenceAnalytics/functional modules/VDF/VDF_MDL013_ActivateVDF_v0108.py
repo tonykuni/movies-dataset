@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""VDF_MDL013_ActivateVDF v0108 — 薄尾:溢寫模式時記憶體閘不等(操作員令 2026-10-19:「自動修改 VDF 讓溢寫模式時不用等 · 用最快的方法完成指令」)
+r"""VDF_MDL013_ActivateVDF v0108 — 薄尾:總覽頁「資料庫清點」的他系統表分開命名 VRN-1 / VRN-2 / VCGC(政策 L123 四系統)
 
-  工作站實跑(launcher v0104 · ActivateVDF v0105):16 GB 只剩 620 / 1,142 MB 可用 → 每一步起跑前都卡記憶體閘
-  (可用 < 總量 10% ≈ 1,608 MB = 壓力)滿 600 秒,等的時候一行不印 → 40 分鐘裡約 30 分鐘在空等、看起來像當機。
-  但記憶體少的時候 v0100 本來就已經開溢寫(子行程 TMP / TEMP / POLARS_TEMP_DIR / VIA_DUCKDB_TEMP_DIR 指本輪 temp 夾 ·
-  DuckDB 上限壓到 256 MB 起 · VIA_SPILL_TO_DISK=1),v0107(PR #536)再讓每個 duckdb.connect() 真的補上 temp_directory /
-  memory_limit / threads(溢寫落本機 TEMP)—— 溢寫模式下再等記憶體只是浪費時間。
-本版(疊在 v0107 上;v0107 號碼已由 PR #536 用掉,本變更改出 v0108 · 只增不改):
-  ① 本輪起跑時資源計畫是溢寫模式(plan["spill"]:可用 < 保留 1,024 + 每條 1,024 × 3 條 ≈ 4 GB)→ 記憶體閘不等:
-     有壓力也直接起這一步,印一行「[溢寫不等] 步名 · 可用 X MB」(不再空白 10 分鐘);沒壓力照常直接起。
-  ② 不是溢寫模式 → 一字不改照 v0101 gate_wait(壓力就等,最多 600 秒,Ctrl+C 立刻放手)。
-  ③ VIA_ACT_SPILL_NOWAIT=0 → 關掉本版行為(溢寫模式也照等)。
-  ④ 總覽 JSON 多一節 spill_nowait(是否溢寫模式 · 起跑可用 · 沒等的步與當下可用)· 總覽頁多一張「溢寫不等」卡 ·
-     落檔的 schema / tag 標 v0108 · 跑完印一行 · 頁面長路徑(本輪 temp 夾 · 清點頁 · 模組路徑)手機寬折行(不撐出橫捲)。
-  ⑤ 資料庫流程等擷取流程寫完才開庫(DuckDB 一檔一次只准一個行程寫)不是記憶體閘 → 照舊等(保資料)。
-  做法:只換 v0101 模組的 gate_wait(它的 run_step 起步前查模組全域)與前版鏈的 optimize_resources / write_report / render_html 外包一層;
-  前版檔一字不動 · 只在本版 activate 跑的那一輪生效(前版自測不受影響)· v0107 的記憶體 / TEMP 鉤與起跑實測照跑。
-VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境。
+操作員令(2026-10-19):「VRN-1 VRN-2 VDF VCGC都是獨立系統  互不干涉」「1. 分開命名  2. CHANGE TO 4 SYSTEMS.」。
+v0106 的總覽卡寫死「VRN / VCGC 寫的表」,沒分 VRN-1 / VRN-2。本版:
+  ① 讀 db check 每列狀態的「他系統表(<系統> 寫)」(VDF_SystemManager v0156 寫的名字)逐系統計數 → 清點摘要多 other_by;
+     舊結果(v0155 寫的「VRN 寫」)照原字計,不猜成 VRN-1 / VRN-2。
+  ② 總覽卡「他系統表」一格改逐系統列(例:VRN-2 6 · VRN 未分辨 6),註明 L123 四系統互不干涉、只攤開不代修。
+  ③ 終端多一行「[他系統表] VRN-2 n · …」。本輪 JSON / 頁頭標 v0108。
+  ④ 資料庫流程在 db check → refill 之後多一步 db_xcheck = 管理員 universe xcheck(操作員令「互對照兩個以上相同即算對照成功」;
+     判法在 VDF_SystemManager v0156):加權收盤三來源 · 三表同日代號互對照,步驟摘要讀它末行「[計] VDF 互對照 …」,燈併進資料庫流程;
+     --dry 時帶 --dry(不寫 OUT-06 / OUT-07);資料庫流程被中斷就不跑;只在本版的一輪裡加(前版自測照舊)。
+  ④b 庫在哪:資料庫流程一開始先問管理員 db where(VDF_SystemManager v0156:沒給 --db-home 或給的是倉內預設 output_hub →
+     照 VIA_DataHome_SSOT 的資料家 C:\Users\tonyk\VIA System\via_database 等候選,選找到最多本庫的那個),
+     db check / refill / universe xcheck 用同一個家(--home 換成選到的;xcheck 也帶 --home);操作員給了別的 --db-home / VIA_VDF_DB_HOME 照用。
+  ⑤ 手機寬(390 px)不橫捲:v0107 記憶體 / TEMP 卡的 temp 長路徑與頁尾連結清單的長路徑撐到 697 px → 卡片與清單項可斷行(表格照舊在 .wrap 內橫捲)。
+其餘全照 v0107(記憶體 / TEMP 鉤 · 起跑實測)。VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -65,20 +63,18 @@ def _via_net():
     except Exception:
         return None
 
+import copy
 import html
 import importlib.util
-import os
 import re
 import sys
-import tempfile
-import threading
-import time
 import warnings
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 _STEM = "VDF_MDL013_ActivateVDF"
 TAG = f"{_STEM} v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
+OTHER_RE = re.compile(r"^他系統表[((](.+?) 寫[))]")
 
 
 def _vnum_v0108(p) -> int:
@@ -101,131 +97,114 @@ def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-def _chain_modules() -> list:
-    """本版的前版鏈(v0107 → v0106 → … → v0100)。"""
-    m, out = PRIOR, []
+def _owner(name: str):
+    """沿前版鏈找真正定義 name 的那一版模組(db_inventory / db_section 在 v0106)。"""
+    m = PRIOR
     for _ in range(16):
-        out.append(m)
+        if name in vars(m) and getattr(vars(m)[name], "__module__", None) == m.__name__:
+            return m
         m = vars(m).get("PRIOR")
         if m is None:
             break
+    return None
+
+
+DBM = _owner("db_section")
+_DB_INVENTORY_V0106 = DBM.db_inventory
+_DB_SECTION_V0106 = DBM.db_section
+OLD_NOTE = "VRN / VCGC 寫的表:只攤開不代修,不計 VDF 的燈(L120)"
+
+
+def other_by(rows) -> dict:
+    """他系統表逐系統計數(名字照 db check 寫的;認不出名字的記「他系統(未標)」)。"""
+    out = {}
+    for r in rows or []:
+        m = OTHER_RE.match(str(r.get("狀態") or ""))
+        k = m.group(1).strip() if m else "他系統(未標)"
+        out[k] = out.get(k, 0) + 1
     return out
 
 
-_GATE_WAIT_V0101 = PRIOR.gate_wait                 # v0101 定義的那一支(v0102 起的薄尾只是把名字抄進自己的全域)
-_V0101 = _GATE_WAIT_V0101.__globals__              # v0101 模組全域:它的 run_step 起步前在這裡查 gate_wait
-_OPT_PRIOR = V0100.optimize_resources              # = v0107 的(本輪多做記憶體 / TEMP 起跑實測)
-_WRITE_REPORT_PRIOR = V0100.write_report           # = v0107 的(本輪標 v0107 再交 v0106 落檔 · 含資料庫清點)
-_RENDER_PRIOR = V0100.render_html                  # = v0107 的(記憶體 / TEMP 卡 · 資料庫清點)
-_V0106 = vars(PRIOR).get("PRIOR")                  # v0106:本輪總覽最後經它的 _WRITE_REPORT_V0100 落檔
-_SPILL = {"armed": False, "on": False, "avail_mb": None, "skipped": []}
-_SPILL_LOCK = threading.Lock()
+def db_inventory(ui_dir: Path | None = None, pre=DBM._UNSET) -> dict:
+    db = _DB_INVENTORY_V0106(ui_dir, pre)
+    if "other_rows" in db:
+        db["other_by"] = other_by(db["other_rows"])
+    return db
 
 
-def spill_nowait_enabled() -> bool:
-    return str(os.environ.get("VIA_ACT_SPILL_NOWAIT", "1")).strip() not in ("0", "no", "NO", "false", "False")
+def db_section(db: dict | None) -> str:
+    s = _DB_SECTION_V0106(db)
+    if not s or not db or OLD_NOTE not in s:
+        return s
+    by = db.get("other_by")
+    if by is None:
+        by = other_by(db.get("other_rows"))
+    names = " · ".join("%s %d" % (html.escape(k), v) for k, v in sorted(by.items())) or "0"
+    return s.replace(OLD_NOTE, "%s<br>只攤開不代修,不計 VDF 的燈(L123 四系統 VRN-1 · VRN-2 · VDF · VCGC 互不干涉)" % names, 1)
 
 
-def optimize_resources(want: int = 3, stamp: str | None = None, root: Path | None = None) -> dict:
-    """同 v0107 optimize_resources;本版 activate 跑的那一輪記下資源計畫是不是溢寫模式。"""
-    res = _OPT_PRIOR(want=want, stamp=stamp, root=root)
-    with _SPILL_LOCK:
-        if _SPILL["armed"]:
-            _SPILL["on"] = bool((res.get("plan") or {}).get("spill")) and spill_nowait_enabled()
-            _SPILL["avail_mb"] = (res.get("mem") or {}).get("avail_mb")
-    return res
+DBM.db_inventory = db_inventory
+DBM.db_section = db_section
+WRAP_CSS = "section.card,li{overflow-wrap:anywhere;min-width:0}"
+if WRAP_CSS not in DBM.PAGE_CSS:                  # v0106 render_html 每次讀模組全域 PAGE_CSS
+    DBM.PAGE_CSS = DBM.PAGE_CSS + WRAP_CSS
+
+FLM = _owner("flow_db")                            # v0101:等擷取寫完才開庫的那一版(run_flows 查模組全域 flow_db)
+_FLOW_DB_V0101 = FLM.flow_db
+LAMP_RANK = ["GREEN", "YELLOW", "GATED", "RED"]
+_RUN8 = {"on": False}
 
 
-def gate_wait(gate, who: str, max_wait: float = 600.0) -> float:
-    """溢寫模式 → 不等(有壓力也直接起 · 印一行);不是溢寫模式 → 照 v0101(壓力就等,最多 max_wait 秒,Ctrl+C 立刻放手)。"""
-    with _SPILL_LOCK:
-        on = _SPILL["armed"] and _SPILL["on"]
-    if gate is None or not on:
-        return _GATE_WAIT_V0101(gate, who, max_wait)
-    if not gate.ok.is_set():
-        s = [x for x in getattr(gate, "samples", []) if x is not None]
-        avail = s[-1] if s else None
-        with _SPILL_LOCK:
-            _SPILL["skipped"].append({"who": who, "avail_mb": avail})
-        _V0101["_say"](f"  [溢寫不等] {who} · 可用 {avail if avail is not None else '?'} MB(記憶體閘有壓力)· 溢寫模式直接起跑 · TEMP / DuckDB 溢寫已開")
-    return 0.0
+def flow_db(opt, res, gate, log_dir, manager=None, py=None) -> dict:
+    """同 v0101 資料庫流程;先問 db where(庫在哪,check / refill 同一個家),db check → refill 之後多跑 universe xcheck。"""
+    pre = []
+    if _RUN8["on"] and not FLM.STOP.is_set():
+        w = FLM.run_step("db_where", ["db", "where"] + (["--home", opt.db_home] if getattr(opt, "db_home", None) else []),
+                         V0100.flow_env(res, "db"), log_dir, gate, 600, manager, py)
+        pre.append(w)
+        m = re.search(r"\[計\] VDF db where · (.+?) · ", str(w.get("summary") or ""))
+        if m and m.group(1) != getattr(opt, "db_home", None):
+            opt = copy.copy(opt)
+            opt.db_home = m.group(1)
+    out = _FLOW_DB_V0101(opt, res, gate, log_dir, manager, py)
+    if pre:
+        out = dict(out, steps=pre + list(out.get("steps") or []), db_home=getattr(opt, "db_home", None))
+    if not _RUN8["on"] or out.get("lamp") == "INTERRUPTED" or FLM.STOP.is_set():
+        return out
+    args = (["universe", "xcheck", "--days", "20"] + (["--dry"] if getattr(opt, "dry", False) else [])
+            + (["--home", opt.db_home] if getattr(opt, "db_home", None) else []))   # 跟 check / refill 同一個家(PR #537 Codex P1)
+    s3 = FLM.run_step("db_xcheck", args, V0100.flow_env(res, "db"), log_dir, gate, getattr(opt, "timeout", None), manager, py)
+    steps = list(out.get("steps") or []) + [s3]
+    lamps = [x.get("lamp") for x in steps]
+    worst = max(lamps, key=lambda x: LAMP_RANK.index(x) if x in LAMP_RANK else 3)
+    return dict(out, lamp=worst, steps=steps)
 
 
-def spill_card(sp: dict | None) -> str:
-    """總覽頁的「溢寫不等」卡(本輪溢寫模式才有)。"""
-    if not sp or not sp.get("spill_mode"):
-        return ""
-    sk = sp.get("skipped") or []
-    who = "、".join(html.escape(str(x.get("who"))) for x in sk[:12]) + (" …" if len(sk) > 12 else "")
-    return (f'<section id="spill-nowait" class="card" style="margin:12px 0"><b>溢寫不等</b> '
-            f'<span class="lamp" style="background:#1a7f37">ON</span><br>'
-            f'本輪溢寫模式(起跑可用 {html.escape(str(sp.get("avail_mb_at_start")))} MB)· 記憶體閘沒等的步 {len(sk)} 個'
-            + (f":{who}" if who else "")
-            + '<br><span class="mut">記憶體少時直接起跑,暫存落本機 TEMP(DuckDB / Polars 溢寫)· 資料庫等擷取寫完才開庫照舊 · '
-              'VIA_ACT_SPILL_NOWAIT=0 可關(改回照記憶體閘等)</span></section>')
-
-
-PAGE_CSS8 = "section.card,li,p{overflow-wrap:anywhere;min-width:0}"   # 長路徑(v0107 記憶體 / TEMP 卡 · 清點頁 · 模組路徑)在手機寬不撐出橫捲
-
-
-def render_html(card: dict, ui_dir: Path) -> str:
-    h = _RENDER_PRIOR(card, ui_dir).replace("</style>", PAGE_CSS8 + "</style>", 1)
-    sec = spill_card(card.get("spill_nowait"))
-    if not sec:
-        return h
-    for key in ('<section id="db-inventory"', '<div class="wrap"><table>'):
-        i = h.find(key)
-        if i >= 0:
-            return h[:i] + sec + h[i:]
-    return h.replace("</body>", sec + "</body>")
-
-
-def write_report(card: dict, ui_dir: Path | None = None) -> dict:
-    """同前版總覽落檔;本版那一輪多一節 spill_nowait,落檔的 schema / tag 標 v0108。"""
-    with _SPILL_LOCK:
-        armed = _SPILL["armed"]
-        if armed:
-            card["spill_nowait"] = {"enabled": spill_nowait_enabled(), "spill_mode": _SPILL["on"], "avail_mb_at_start": _SPILL["avail_mb"],
-                                    "skipped": list(_SPILL["skipped"]), "tag": TAG}
-    prev = vars(_V0106).get("_WRITE_REPORT_V0100") if (armed and _V0106 is not None) else None
-    if prev is None:
-        return _WRITE_REPORT_PRIOR(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_PRIOR(card)
-
-    def _stamp_then_write(c, u=None):              # 最內層(v0107 標完之後)再標本版,才交 v0100 原版寫
-        c["schema"], c["tag"] = "VDF_ActivateVDF_v0108", TAG
-        return prev(c, u) if u is not None else prev(c)
-    _V0106._WRITE_REPORT_V0100 = _stamp_then_write
-    try:
-        return _WRITE_REPORT_PRIOR(card, ui_dir) if ui_dir is not None else _WRITE_REPORT_PRIOR(card)
-    finally:
-        _V0106._WRITE_REPORT_V0100 = prev
-
-
-_V0101["gate_wait"] = gate_wait                    # v0101 run_step 查模組全域 → 換上本版(前版檔一字不動)
-for _m in _chain_modules():                        # 前版鏈各自叫模組全域的 optimize_resources → 換上本版(冪等)
-    if "optimize_resources" in vars(_m):
-        _m.optimize_resources = optimize_resources
-V0100.render_html = render_html
-V0100.write_report = write_report
-_ACTIVATE_PRIOR = PRIOR.activate
+FLM.flow_db = flow_db
+_ACTIVATE_V0107 = PRIOR.activate
 
 
 def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path | None = None) -> dict:
-    """同 v0107 activate;這一輪溢寫模式時記憶體閘不等;跑完印一行。"""
+    """同 v0107 activate;本輪 JSON / 頁頭標 v0108,跑完逐系統印他系統表。"""
     keep = PRIOR.TAG
+    prev = DBM._WRITE_REPORT_V0100
+
+    def _stamp_then_write(c, u=None):
+        c["schema"], c["tag"] = "VDF_ActivateVDF_v0108", TAG
+        return prev(c, u) if u is not None else prev(c)
     PRIOR.TAG = TAG
-    with _SPILL_LOCK:
-        _SPILL.update(armed=True, on=False, avail_mb=None, skipped=[])
+    DBM._WRITE_REPORT_V0100 = _stamp_then_write
+    _RUN8["on"] = True
     try:
-        card = _ACTIVATE_PRIOR(opt, manager, py, temp)
+        card = _ACTIVATE_V0107(opt, manager, py, temp)
     finally:
         PRIOR.TAG = keep
-        with _SPILL_LOCK:
-            sp = dict(_SPILL, skipped=list(_SPILL["skipped"]))
-            _SPILL.update(armed=False, on=False)
-    if sp["on"]:
-        print(f"  [溢寫不等] 本輪溢寫模式(起跑可用 {sp['avail_mb']} MB)· 記憶體閘沒等的步 {len(sp['skipped'])} 個"
-              + (":" + "、".join(x["who"] for x in sp["skipped"][:8]) if sp["skipped"] else "") + " · VIA_ACT_SPILL_NOWAIT=0 可關", flush=True)
+        DBM._WRITE_REPORT_V0100 = prev
+        _RUN8["on"] = False
+    by = (card.get("db") or {}).get("other_by")
+    if by:
+        print("  [他系統表] " + " · ".join("%s %d" % kv for kv in sorted(by.items()))
+              + " → 只攤開不代修,不計 VDF 的燈(L123 四系統互不干涉)", flush=True)
     return card
 
 
@@ -234,113 +213,106 @@ for _n in dir(PRIOR):
         globals()[_n] = getattr(PRIOR, _n)
 
 
-# ---------------------------------------------------------------- 自測
 def selftest() -> int:
-    global _RENDER_PRIOR, _WRITE_REPORT_PRIOR
-    ok = []
+    import json
+    import os
+    import shutil
+    import tempfile
+    p = f = 0
 
     def chk(name, cond, note=""):
-        ok.append(bool(cond))
-        print(f"  [{'OK' if cond else 'FAIL'}] {name}" + (f" · {note}" if note != "" else ""), flush=True)
-    print(f"=== {TAG} · 薄尾自測(溢寫模式時記憶體閘不等;沙盒 · 零網路)===", flush=True)
-    keep_env = os.environ.get("VIA_ACT_SPILL_NOWAIT")
-    try:
-        state = {"m": {"avail_mb": 300, "total_mb": 16000}}
-        g = V0100.MemGate(reader=lambda: state["m"], interval=0.05).start()
-        try:
-            os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=True, avail_mb=300, skipped=[])
-            t0 = time.time()
-            w = _V0101["run_step"].__globals__["gate_wait"](g, "lists_run_009", 5.0)
-            dt = time.time() - t0
-            chk("㉟ 溢寫模式 + 記憶體閘有壓力(可用 300 / 16,000 MB)→ 不等(直接起)· 記一筆沒等的步 · v0101 run_step 用的就是本版 gate_wait",
-                w == 0.0 and dt < 0.5 and _SPILL["skipped"] and _SPILL["skipped"][0]["who"] == "lists_run_009" and not g.waits
-                and _V0101["run_step"].__globals__["gate_wait"] is gate_wait and PRIOR.run_step is _V0101["run_step"], f"{round(dt, 2)} 秒 · {_SPILL['skipped'][:1]}")
-            with _SPILL_LOCK:
-                _SPILL.update(on=False, skipped=[])
-            t0 = time.time()
-            gate_wait(g, "db_check", 0.4)
-            dt = time.time() - t0
-            chk("㊱ 不是溢寫模式 + 有壓力 → 照 v0101 等(本測最多 0.4 秒)· 記在記憶體閘的等待", 0.35 <= dt < 2 and g.waits and g.waits[-1]["who"] == "db_check", round(dt, 2))
-            with _SPILL_LOCK:
-                _SPILL.update(armed=False, on=True)
-            t0 = time.time()
-            gate_wait(g, "fetch_run_all", 0.4)
-            dt = time.time() - t0
-            chk("㊲ 不是本版 activate 那一輪(前版自測 / 直接叫)→ 照 v0101 等(溢寫旗標不生效)", 0.35 <= dt < 2, round(dt, 2))
-            state["m"] = {"avail_mb": 9000, "total_mb": 16000}
-            time.sleep(0.15)
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=True, skipped=[])
-            t0 = time.time()
-            gate_wait(g, "engine_list", 5.0)
-            chk("㊳ 溢寫模式但沒壓力 → 直接起 · 不印也不記", time.time() - t0 < 0.3 and not _SPILL["skipped"])
-        finally:
-            g.close()
-            with _SPILL_LOCK:
-                _SPILL.update(armed=False, on=False, avail_mb=None, skipped=[])
-        os.environ["VIA_ACT_SPILL_NOWAIT"] = "0"
-        off = spill_nowait_enabled()
-        os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
-        chk("㊴ VIA_ACT_SPILL_NOWAIT=0 → 關掉本版行為 · 沒設 = 開", off is False and spill_nowait_enabled() is True)
-        with tempfile.TemporaryDirectory() as td:
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=False, avail_mb=None, skipped=[])
-            res = V0100.optimize_resources(want=3, stamp="20261019_200000", root=Path(td))
-            with _SPILL_LOCK:
-                rec = (_SPILL["on"], _SPILL["avail_mb"])
-                _SPILL.update(armed=False, on=False, avail_mb=None)
-            wired = [m for m in _chain_modules() if "optimize_resources" in vars(m)]
-            chk("㊵ 起跑資源計畫 → 記下溢寫模式(= plan[\"spill\"])與起跑可用記憶體 · 前版鏈叫的 optimize_resources 都是本版(包 v0107 的起跑實測)",
-                rec == (bool(res["plan"]["spill"]), res["mem"]["avail_mb"]) and V0100.optimize_resources is optimize_resources
-                and all(m.optimize_resources is optimize_resources for m in wired) and _OPT_PRIOR is not optimize_resources,
-                f"spill={res['plan']['spill']} · 可用 {res['mem']['avail_mb']} MB · 換上 {len(wired)} 個模組")
-        keep_r, keep_w = _RENDER_PRIOR, _WRITE_REPORT_PRIOR
-        got = {}
-        try:
-            _RENDER_PRIOR = lambda c, u: '<html><style></style><body><section id="mem-temp"></section><section id="db-inventory"></section></body></html>'
-            sp = {"spill_mode": True, "avail_mb_at_start": 620, "skipped": [{"who": "fetch_run_all"}, {"who": "lists_run_<x>"}]}
-            page = render_html({"spill_nowait": sp}, Path(td))
-            page_off = render_html({"spill_nowait": dict(sp, spill_mode=False)}, Path(td))
-            _WRITE_REPORT_PRIOR = lambda c, u=None: got.update(c) or c
-            with _SPILL_LOCK:
-                _SPILL.update(armed=True, on=True, avail_mb=620, skipped=[{"who": "db_check", "avail_mb": 610}])
-            write_report({"lamp": "GREEN"})
-            with _SPILL_LOCK:
-                _SPILL.update(armed=False, on=False, avail_mb=None, skipped=[])
-            got_off = {}
-            _WRITE_REPORT_PRIOR = lambda c, u=None: got_off.update(c) or c
-            write_report({"lamp": "GREEN"})
-        finally:
-            _RENDER_PRIOR, _WRITE_REPORT_PRIOR = keep_r, keep_w
-        i_m, i_s, i_d = page.find('id="mem-temp"'), page.find('id="spill-nowait"'), page.find('id="db-inventory"')
-        chk("㊶ 總覽:本版那一輪 JSON 多 spill_nowait(溢寫模式 · 起跑可用 · 沒等的步)· 頁面「溢寫不等」卡在記憶體 / TEMP 卡之後、資料庫清點之前 · 步名跳脫 · 長路徑折行 CSS · 不是溢寫模式 / 不在本輪 → 不加卡",
-            0 <= i_m < i_s < i_d and page.count(PAGE_CSS8) == 1 and PAGE_CSS8 in page_off and "lists_run_&lt;x&gt;" in page and "沒等的步 2 個" in page and 'id="spill-nowait"' not in page_off
-            and (got.get("spill_nowait") or {}).get("skipped") == [{"who": "db_check", "avail_mb": 610}] and got["spill_nowait"]["avail_mb_at_start"] == 620
-            and "spill_nowait" not in got_off and V0100.render_html is render_html and V0100.write_report is write_report,
-            f"卡位置 {i_m} < {i_s} < {i_d}")
-        chk("㊷ 前版必須是 v0107(記憶體 / TEMP 鉤 · PR #536)· 它的前版 v0106 有 _WRITE_REPORT_V0100(本版落檔標 v0108 用)",
-            Path(PRIOR_PATH).stem.endswith("_v0107") and hasattr(PRIOR, "probe_memtemp") and _V0106 is not None and "_WRITE_REPORT_V0100" in vars(_V0106),
-            Path(PRIOR_PATH).name)
-    finally:
-        if keep_env is None:
-            os.environ.pop("VIA_ACT_SPILL_NOWAIT", None)
+        nonlocal p, f
+        if cond:
+            p += 1
+            print("  [OK] %s" % name)
         else:
-            os.environ["VIA_ACT_SPILL_NOWAIT"] = keep_env
+            f += 1
+            print("  [FAIL] %s%s" % (name, (" · " + str(note)[:300]) if note else ""))
+
+    print(f"=== {TAG} · 薄尾自測(總覽卡他系統表分開命名;沙盒 · 零網路)===")
+    rows = [{"狀態": "他系統表(VRN-2 寫)· 缺表 · VDF 只攤開不代修"}, {"狀態": "他系統表(VRN-2 寫)· 空表"},
+            {"狀態": "他系統表(VRN-1 寫)· 缺表"}, {"狀態": "他系統表(VCGC 寫)· 缺表"},
+            {"狀態": "他系統表(VRN-1 + VRN-2 寫)· 缺表"}, {"狀態": "他系統表(VRN 未分辨 寫)· 冊上沒登寫入者,表名 vrn_ 開頭 · 缺表"},
+            {"狀態": "他系統表(VRN 寫)· 缺表"}, {"狀態": "他系統表?"}]
+    by = other_by(rows)
+    chk("① 逐系統計數:照 db check 寫的名字(VRN-2 / VRN-1 / VCGC / 多系統 / VRN 未分辨);舊結果「VRN」照原字,不猜",
+        by == {"VRN-2": 2, "VRN-1": 1, "VCGC": 1, "VRN-1 + VRN-2": 1, "VRN 未分辨": 1, "VRN": 1, "他系統(未標)": 1}, by)
+    td = Path(tempfile.mkdtemp(prefix="vdfact108_"))
+    try:
+        ui = td / "ui"
+        d = DBM.db_report_dir(ui)
+        d.mkdir(parents=True, exist_ok=True)
+        j = d / "DB_CHECK_latest.json"
+        j.write_text(json.dumps({"lamp": "GREEN", "tag": "VDF_SystemManager v0156", "rows": [
+            {"庫": "a.duckdb", "表": "tw_x", "狀態": "OK", "燈": "GREEN", "列數": 3},
+            {"庫": "a.duckdb", "表": "vrn_report_basic", "狀態": "他系統表(VRN 未分辨 寫)· 缺表", "燈": "INFO", "寫入者": ""},
+            {"庫": "a.duckdb", "表": "via_policy_x<b>", "狀態": "他系統表(VRN-2 寫)· 缺表", "燈": "INFO", "寫入者": "VRN_ENG082"},
+            {"庫": "a.duckdb", "表": "c", "狀態": "他系統表(VCGC<i> 寫)· 缺表", "燈": "INFO", "寫入者": "CGC_X"}]}, ensure_ascii=False),
+            encoding="utf-8")
+        db = db_inventory(ui, pre=None)
+        sec = db_section(db)
+        chk("② 清點摘要多 other_by;總覽卡逐系統列(名字跳脫)、寫 L123 四系統,不再是「VRN / VCGC 寫的表」",
+            db.get("other_by") == {"VRN 未分辨": 1, "VRN-2": 1, "VCGC<i>": 1} and OLD_NOTE not in sec
+            and "VCGC&lt;i&gt; 1 · VRN 未分辨 1 · VRN-2 1" in sec and "L123 四系統" in sec and "<i>" not in sec, (db.get("other_by"), sec[-600:]))
+        old = dict(db)
+        old.pop("other_by")
+        chk("③ 舊摘要沒有 other_by(前版寫的)→ 卡上照 other_rows 現算;NOT_RUN 卡不動",
+            "VRN-2 1" in db_section(old) and db_section({"lamp": "NOT_RUN", "why": "x"}) == _DB_SECTION_V0106({"lamp": "NOT_RUN", "why": "x"}))
+        chk("④ v0106 總覽頁走本版(render_html 查模組全域 db_section / write_report 查 db_inventory);頁 CSS 多卡片 / 清單項可斷行(手機寬不橫捲)",
+            DBM.db_section is db_section and DBM.db_inventory is db_inventory and DBM.PAGE_CSS.endswith(WRAP_CSS)
+            and DBM.PAGE_CSS.count(WRAP_CSS) == 1)
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+    import types
+    calls, homes = [], []
+    keep = (FLM._FLOW_DB_V0100, FLM.run_step, FLM.FETCH_DONE.is_set(), V0100.flow_env)
+
+    def fake_db(opt, res, gate, log_dir, manager=None, py=None):
+        homes.append(opt.db_home)
+        return {"flow": "db", "lamp": opt.base, "steps": [{"step": "db_check", "lamp": "GREEN"}, {"step": "db_refill", "lamp": "GREEN"}]}
+
+    def fake_step(name, args, env, log_dir, gate=None, timeout=None, manager=None, py=None):
+        calls.append((name, list(args)))
+        if name == "db_where":
+            return {"step": name, "args": args, "lamp": "GREEN", "summary": "[計] VDF db where · /data/home/vdf_database · 冊上 5 本庫找到 5 本"}
+        return {"step": name, "args": args, "lamp": "YELLOW", "summary": "[計] VDF 互對照(兩個以上來源相同即算對照成功)· …"}
+    FLM._FLOW_DB_V0100, FLM.run_step, V0100.flow_env = fake_db, fake_step, lambda res, flow, base_env=None: {"VDF_T_FLOW": flow}
+    FLM.FETCH_DONE.set()
+    _RUN8["on"] = True
+    try:
+        res = {"plan": {"slots": 1}, "temp_run": str(Path(tempfile.gettempdir()))}
+        r1 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        r2 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=True, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        r3 = FLM.flow_db(types.SimpleNamespace(base="INTERRUPTED", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+        _RUN8["on"] = False
+        r4 = FLM.flow_db(types.SimpleNamespace(base="GREEN", dry=False, timeout=60, db_home=None), res, None, Path(tempfile.gettempdir()))
+    finally:
+        _RUN8["on"] = False
+        FLM._FLOW_DB_V0100, FLM.run_step, V0100.flow_env = keep[0], keep[1], keep[3]
+        if not keep[2]:
+            FLM.FETCH_DONE.clear()
+    chk("⑤ 本輪資料庫流程:先 db where(選到的家換進 --home,check / refill / xcheck 同一個家)· 末尾 db_xcheck(universe xcheck --days 20 --home 家;--dry 帶 --dry);"
+        "燈併進流程(黃蓋綠);流程被中斷不跑 xcheck;不在本版一輪 = 照前版",
+        [s["step"] for s in r1["steps"]] == ["db_where", "db_check", "db_refill", "db_xcheck"] and r1["lamp"] == "YELLOW"
+        and r1.get("db_home") == "/data/home/vdf_database" and homes[:2] == ["/data/home/vdf_database", "/data/home/vdf_database"]
+        and calls[:2] == [("db_where", ["db", "where"]), ("db_xcheck", ["universe", "xcheck", "--days", "20", "--home", "/data/home/vdf_database"])]
+        and calls[3] == ("db_xcheck", ["universe", "xcheck", "--days", "20", "--dry", "--home", "/data/home/vdf_database"])
+        and r2["lamp"] == "YELLOW" and r3["lamp"] == "INTERRUPTED" and [s["step"] for s in r3["steps"]] == ["db_where", "db_check", "db_refill"]
+        and r4["lamp"] == "GREEN" and len(r4["steps"]) == 2 and homes[3] is None and len(calls) == 5, (r1, calls, homes, r3, r4))
     src = Path(__file__).read_text(encoding="utf-8")
     imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
-    chk("㊸ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫",
-        "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src and "def _via_net" in src
-        and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VCGC"))]
+    chk("⑥ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫",
+        "VIA:ACCEL-BRIDGE" in src and "def _via_net" in src
+        and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VRN2_", "VCGC"))]
         and not re.search(r"^\s*(import|from)\s+" + "talib", src, re.M)
         and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + r"CONSENT[\"']\]\s*=(?!=)", src))
-    n_ok = sum(ok)
-    print(f"  [計] {TAG} 本版 {n_ok}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}", flush=True)
-    if not all(ok):
+    print(f"  [計] {TAG} 本版 {p}/{p + f} · {'PASS' if not f else 'FAIL'}")
+    if f:
         return 1
+    if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1":
+        return 0
     rc1 = PRIOR.selftest()
-    return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅照實回(同 v0102 / v0107)
+    return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅照實回(同 v0107)
 
 
 def main(argv=None) -> int:

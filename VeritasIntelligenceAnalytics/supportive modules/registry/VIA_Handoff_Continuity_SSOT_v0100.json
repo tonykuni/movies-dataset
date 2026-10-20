@@ -2693,8 +2693,8 @@
         "VDF_MDL013_ActivateVDF",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_MDL013_ActivateVDF v0107 本版 6/6 · PASS",
-      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "success_marker": "[計] VDF_MDL013_ActivateVDF v0108 本版 6/6 · PASS",
+      "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0108 總覽卡他系統表分開命名 VRN-1 / VRN-2 / VCGC(L123 四系統)· 本輪資料庫流程多一步 db_xcheck(universe xcheck:兩個以上來源相同即算對照成功)+ v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
       "dependencies": [
         "functional modules/VDF/VDF_MDL013_ActivateVDF_v*.py",
         "functional modules/VDF/ActivateVDF.py",
@@ -2720,6 +2720,23 @@
       ],
       "timeout_seconds": 900,
       "registered_at": "2026-10-16T15:50:00+00:00"
+    },
+    "vdf_manager_split_xcheck": {
+      "argv": [
+        "VDF_SystemManager_v0156",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0156 本版 15/15 · PASS",
+      "scope": "VDF_SystemManager v0156:db check 他系統表分開命名 VRN-1 / VRN-2 / VCGC(L123)+ 互對照「兩個以上來源相同即算對照成功」(加權收盤三來源兩兩比 · 三表同日代號集合兩兩比 · universe xcheck 末行 [計];前版 v0122 自測照原判法)+ 庫在哪(沒給 --home 或給倉內預設 output_hub → 照 VIA_DataHome_SSOT 資料家等候選選找到最多本庫的;db where 動詞;universe xcheck --home 讀同一個家的三本庫,家裡沒有的才退回倉內路徑 · PR #537 Codex P1)+ 前版鏈全跑(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0156.py",
+        "functional modules/VDF/VDF_SystemManager_v0155.py",
+        "functional modules/VDF/VDF_InputUniverse_SSOT_v*.json",
+        "docs/handoff/ai/vrn2_ship/VRN2_Bundle_latest.json",
+        "supportive modules/registry/VIA_DataHome_SSOT_v*.json"
+      ],
+      "timeout_seconds": 1800,
+      "registered_at": "2026-10-19T19:00:00+00:00"
     }
   },
   "work_items": [
@@ -5687,6 +5704,36 @@
       "next": "handoff test vdf_activatevdf(rc 0 + v0107 標記)轉 VERIFIED;工作站真跑看 ①b 行「鉤 VDF 本輪鉤 / VCGC 環境鉤」與溢寫夾在 %LOCALAPPDATA%\\VIA_TEMP",
       "case": "vdf_activatevdf",
       "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
+      "id": "VDF-REQ018:four-systems-split-names",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-19「VRN-1 VRN-2 VDF VCGC都是獨立系統  互不干涉」「1. 分開命名  2. CHANGE TO 4 SYSTEMS.」(VRN-1 = 另一團隊的倉):政策冊 v0113 +L123 四系統對等獨立(L120 amended_by · L121/L122 extended_by);CLAUDE.md / AGENTS.md 改四系統;VDF_SystemManager v0156 db check 他系統表分開標 VRN-2(本倉 VRN 夾 / VRN-2 船單找得到)· VRN-1(都找不到)· VCGC(CGC_)· VRN 未分辨(冊上沒登寫入者,不猜);ActivateVDF v0108 總覽卡逐系統計數。自測 v0156 7/7 · v0108 6/6;突變 8 個全抓;擊斃閘過 → 已驗:vdf_manager_split_xcheck 2026-10-19T18:35:26+00:00 rc 0(v0156 本版 11/11 標記見到)· vdf_activatevdf 2026-10-19T18:36:35+00:00 rc 0(v0108 本版 6/6 標記見到);容器真跑 396 秒(U/I GREEN · 引擎 94/94 · 自測 RED 0 · db_xcheck 自動跑)",
+      "next": "handoff test vdf_manager_split_xcheck · vdf_activatevdf rc 0 → VERIFIED",
+      "case": "vdf_manager_split_xcheck",
+      "receipt": "docs/handoff/evidence/vdf_manager_split_xcheck.json"
+    },
+    {
+      "id": "VDF-REQ018:xcheck-two-agree",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-19「互對照兩個以上相同即算對照成功  自測實測自改自完成」:v0122 universe xcheck 要三來源都有才綠、任一對超差就紅;v0156 改兩兩比 —— 至少一對在容許內(官方↔ENG055 0.05% · 有 yf 0.5%,照冊)= GREEN(第三個列 outlier);兩個以上都不同 = RED;只一個 = YELLOW;三表同日代號集合兩表以上完全相同 = GREEN。ActivateVDF v0108 本輪資料庫流程 db check → refill 之後自動跑 db_xcheck,燈併進流程。前版 v0122 自測照前版判法驗(跑前換回) → 已驗:vdf_manager_split_xcheck 2026-10-19T18:35:26+00:00 rc 0(v0156 本版 11/11 標記見到)· vdf_activatevdf 2026-10-19T18:36:35+00:00 rc 0(v0108 本版 6/6 標記見到);容器真跑 396 秒(U/I GREEN · 引擎 94/94 · 自測 RED 0 · db_xcheck 自動跑)",
+      "next": "handoff test vdf_manager_split_xcheck · vdf_activatevdf rc 0 → VERIFIED;工作站真跑看 db_xcheck 步驟摘要「[計] VDF 互對照 …」",
+      "case": "vdf_activatevdf",
+      "receipt": "docs/handoff/evidence/vdf_activatevdf.json"
+    },
+    {
+      "id": "VDF-REQ018:db-home-from-datahome",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-19「查之前的對話紀錄,找到資料庫的位置位於文件之中」:文件(VIA_DataHome_SSOT_v0100 · 批490 交接 B474/B498 · VIA_B655)記載資料家 C:\\Users\\tonyk\\VIA System\\via_database(鏡根 via_database\\movies-dataset\\data\\…\\VDF\\output_hub);工作站 10-19 真跑 db check 的家卻是倉內 OneDrive\\Documents\\movies-dataset\\…\\VDF\\output_hub(PS 預設把它當 --db-home 傳進來;v0151 db_home 不看資料家)。VDF_SystemManager v0156:沒給 / 給倉內預設 → 照冊上優先序比候選(VIA_VDF_DB_HOME > VIA_DATA_HOME > 冊 home_win 的 vdf_database · 鏡根 · 家本身 > 倉內退路),選找到最多本庫的;db where 動詞;ActivateVDF v0108 資料庫流程先問 db where,check / refill 同一個家。自測 ⑭–⑯;突變 6 個全抓 → 已驗:vdf_manager_split_xcheck 2026-10-19T19:36:29+00:00 rc 0(v0156 本版 14/14)· vdf_activatevdf 2026-10-19T19:21:35+00:00 rc 0(v0108 本版 6/6);容器沒有 via_database(選到倉內退路 3/5 照實),工作站真跑看 db_where 選到的家",
+      "next": "handoff test vdf_manager_split_xcheck · vdf_activatevdf rc 0 → VERIFIED;工作站真跑看 db_where 步驟「[計] VDF db where · C:\\Users\\tonyk\\VIA System\\via_database\\…」與 db check 紅數",
+      "case": "vdf_manager_split_xcheck",
+      "receipt": "docs/handoff/evidence/vdf_manager_split_xcheck.json"
     }
   ]
 }
