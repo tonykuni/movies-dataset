@@ -1,19 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""VDF_MDL013_ActivateVDF v0111 — 薄尾:跨來源對照的結果交獨立驗證器逐筆核對(100%)· 可操作的對照頁(HTML U/I)· 收尾判定
+r"""VDF_MDL013_ActivateVDF v0111 — 薄尾:擷取後日期格式一律 YYYY / YYYY-MM / YYYY-MM-DD · 不同來源同一筆資料寫中間檔(TEMP · 標註來源)交叉對照
+  (合併 main 撞號:main 的 v0108 = 他系統表分開命名 VRN-1 / VRN-2 / VCGC · 資料庫流程 db where + db_xcheck(PR #537);
+   本變更在分支上原為 v0110,改出 v0111 疊在 main 的 v0108 → v0109 → v0110 之上。
+   另兩處:① 體檢 / 對照 / 驗證讀的資料庫家 = 資料庫流程 db where 選的那個(流程結果 db_home;沒跑資料庫流程才照 --db-home …)
+   ② 只有一個來源的那筆「一致的來源」是空的(分支舊 v0111 才修的,併進來))
+(兩個以上來源相同 = 對照成功)· 心跳略過警告的原始碼行
 
-操作員令(2026-10-20):「GO ON TO RESULTS VERIFIED 100% CORRECT AND HTML U/I · 收尾變成功」。
-本版(只在本版 activate 那一輪 · v0110 的 ⑦ 體檢 / ⑧ 對照之後):
-  ⑨ 結果獨立驗證:VDF_XsrcVerifier 尾版(另一支檔 · 不匯入 ActivateVDF · 自己的日期解析與判定寫法)逐項核對 ——
-     V0 中間檔每檔一來源 · V1 每一筆回資料庫原表整批比對(值與來源一字不差 · 同來源多次抓取取最新)· V2 日期標準且等於原寫法獨立重算 ·
-     V3 判定 / 一致 / 離群 / 每個來源的值獨立重算 · V4 計數 · V5 日期體檢重掃 → 不符 0 = PASS(結果 100% 正確)。
-  ⑩ 收尾判定:驗證 FAIL → 紅(結果不可信;總燈紅)· 沒有多來源資料 → INFO · 驗證 100% 且沒有衝突 → 綠「收尾成功」·
-     驗證 100% 但有衝突 → 黃(列出待查;總燈照 v0110 黃)。引擎表的舊日期格式只在體檢列出,不擋收尾(改寫既有列會成重複列)。
-  對照頁:VIA_Reports/vdf/xsrc/VDF_XSRC_latest.html(+ 本輪一份 · 驗證 JSON)—— 收尾判定 · 計數 · 驗證六項 · 逐筆表(資料集 / 判定篩選 ·
-     搜尋 · 排序 · 分頁 · 每個來源的值)· 日期體檢 · 中間檔清單;頁面資料讀磁碟上的對照結果(= 驗證器核對的那份),頁面指紋 = 驗證指紋才套用判決。
-     總覽卡多「結果獨立驗證 · 收尾 · 打開對照頁」;終端多 ⑨ ⑩ 兩行。
-  修 v0110 一處(驗證器抓到):只有一個來源的那筆,「一致的來源」寫成那個來源本身 → 改成空的。
-  其餘全照 v0110;本版一輪落檔標 v0111;換上的函式只在這一輪(跑完換回原樣)。
+操作員令(2026-10-20):「時間擷取後格式一律為 YYYY YYYY-MM YYYY-MM-DD;擷取的資料後不同來源擷取相同資料將有中間檔 TEMP 標註不同來源
+用來交叉對照使用;相互對照兩個以上相同即算對照成功;自測實測自改自完成,剩餘的你決定」。
+現況(倉內盤點):TW 日收盤 交易所(tw_trading_daily · TWSE / TPEX 官方 · 日期原樣存民國 7 碼 1150824,ENG057 又寫 ISO → 同一欄混兩種)
+  × Yahoo(tw_daily_prices · 2330.TW);月營收 tw_monthly_revenue 有 source 欄(MOPS_OFFICIAL × CNYES · ym 存 YYYYMM)——
+  擷取流程裡沒有任何一步拿不同來源的值互相比對(ENG063 只取官方那筆;ENG098 / ENG102 不在擷取冊)。
+本版(只在本版 activate 那一輪 · 擷取 / 引擎 / 資料庫三條流程跑完之後 · 資料庫只唯讀開):
+  ⑦ 日期格式體檢:VDF 資料庫家底下每個 .duckdb 的 VDF 表、每個日期欄(欄名看得出是日期;fetched_at 這類紀錄時間不算;他系統 vrn_ 表不列)→
+     標準(YYYY / YYYY-MM / YYYY-MM-DD 字串或 DATE 型別)· 不標準的格式與筆數 · 同一欄混兩種以上格式(同一天可能存成兩列)。
+     引擎的表照它原本的格式存、本版不改寫:各引擎 upsert 用自己的日期格式當鍵,改寫既有列 → 下一輪原格式再寫進來就成重複列。
+  ⑧ 跨來源對照:不同來源抓到的同一筆(資料集 · 代號 · 日期 · 欄位)→ 本輪 temp/xsrc/<資料集>/<資料集>__<來源>.csv(source 欄標註來源 ·
+     日期一律標準格式 · 原寫法另欄留)+ <資料集>__對照結果.csv;判定:兩個以上來源相同 = 成功(第三個不同記離群)· 有兩個以上來源但
+     沒有任兩個相同 = 衝突 · 只有一個來源 = 沒得對照。相同:價格到 0.01 · 營收整數 · 其他數值照兩邊較粗的小數位(浮點雜訊不算不同)·
+     文字全半形 / 大小寫 / 空白統一。資料集:TW 日收盤(最近 10 個交易日,VIA_XSRC_DAYS 可改)· 同一張表有 source 欄且兩個以上來源的
+     (月營收等;同一來源同一期抓了好幾次用最新那次)。衝突多半是固定倍數 → 標「疑單位不同」。
+  總燈:綠 + 有衝突 → 黃(資料沒對照成功;不擋、不紅)。總覽 JSON 多 datefmt / xsrc 兩節;總覽頁多一張卡;終端 ⑦ ⑧ 兩行。
+  心跳:日誌最後一行另外略過「警告的下一行」(Python 印 SyntaxWarning 時下一行縮排印出那行原始碼;工作站每一步都顯示
+     VDF_SystemManager_v0155.py 第 6 行那句舊說明)。
+  其餘全照 v0110;本版一輪落檔標 v0111;換上的函式只在這一輪(跑完換回原樣,前版自測驗的函式身分不變)。
 VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件、不寫環境;資料庫只唯讀。
 """
 from __future__ import annotations
@@ -62,15 +73,21 @@ def _via_net():
     except Exception:
         return None
 
+import copy
+import csv
 import html
 import importlib.util
+import io
 import json
 import os
 import re
-import shutil
 import sys
 import tempfile
+import threading
+import time
+import unicodedata
 import warnings
+from datetime import date, datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -92,135 +109,807 @@ with warnings.catch_warnings():                    # 同 v0102:前版鏈只擋�
     warnings.simplefilter("ignore", DeprecationWarning)
     _spec.loader.exec_module(PRIOR)
 V0100 = PRIOR.V0100
-_V0101 = vars(PRIOR).get("_V0101")
-_V0106 = vars(PRIOR).get("_V0106")
-
-_VER_PATH = max((p for p in HERE.glob("VDF_XsrcVerifier_v*.py") if _vnum_v0111(p) >= 0), key=_vnum_v0111)   # 獨立驗證器尾版(VDF 自己的)
-_vspec = importlib.util.spec_from_file_location("VDF_XsrcVerifier_for_" + Path(__file__).stem, _VER_PATH)
-VER = importlib.util.module_from_spec(_vspec)
-sys.modules[_vspec.name] = VER
-_vspec.loader.exec_module(VER)
+_V0101 = vars(PRIOR).get("_V0101")                 # v0101 模組全域(run_step / run_flows / overall / _last_line / STOP 都在這裡查)
+_V0106 = vars(PRIOR).get("_V0106")                 # v0106:本輪總覽最後經它的 _WRITE_REPORT_V0100 落檔
 
 
 def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-# ---------------------------------------------------------------- 驗證器抓到的 v0110 一處:只有一個來源 → 「一致的來源」應是空的
-def _cross_check_layer(prev):
-    def cross_check(rows: list) -> dict:
-        r = prev(rows)
-        for i in r["items"]:
-            if i["status"] == "SINGLE":
-                i["agree"] = []                    # v0110 寫成那一個來源本身(頁面會誤讀成「有一致」)→ 獨立驗證器 V3 不符
-        return r
-    return cross_check
+# ---------------------------------------------------------------- 日期統一(YYYY · YYYY-MM · YYYY-MM-DD)
+_MON = {m: i for i, m in enumerate(("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1)}
+_DATE_HINT = re.compile(r"(?i)date|period|month|year|quarter|timestamp|(^|_)(dt|day|time|ts|ym|yyyymm|yr|qtr|asof)($|_)|日期|年月|年度|年份|月份|季別|期間|期別|時間|交易日|資料日")
+_TIME_TAIL = re.compile(r"^(?P<d>.+?)(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)$")
+_YMD = re.compile(r"^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$")
+_ROC_YMD = re.compile(r"^(?:民國)?\s*(\d{2,3})[-/.](\d{1,2})[-/.](\d{1,2})$")
+_CJK_YMD = re.compile(r"^(?:民國)?\s*(\d{2,4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?$")
+_AB_Y = re.compile(r"^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$")
+_EN_DMY = re.compile(r"^(\d{1,2})[- ]([A-Za-z]{3})[a-z]*\.?[-, ]+(\d{4})$")
+_EN_MDY = re.compile(r"^([A-Za-z]{3})[a-z]*\.?[- ](\d{1,2}),?[- ](\d{4})$")
+_YM = re.compile(r"^(\d{4})[-/.](\d{1,2})$")
+_ROC_YM = re.compile(r"^(?:民國)?\s*(\d{2,3})[-/.](\d{1,2})$")
+_CJK_YM = re.compile(r"^(?:民國)?\s*(\d{2,4})\s*年\s*(\d{1,2})\s*月份?$")
+_YMM = re.compile(r"^(\d{4})\s*M(\d{1,2})$", re.I)
+_EN_MY = re.compile(r"^([A-Za-z]{3})[a-z]*\.?[-' ]+(\d{2}|\d{4})$")
+_MY = re.compile(r"^(\d{1,2})[-/.](\d{4})$")
+_Q = re.compile(r"^(?:(\d{4}|\d{2,3})\s*-?\s*Q([1-4])|Q([1-4])\s*[-' ]?\s*(\d{4})|(?:民國)?\s*(\d{2,4})\s*年\s*第?\s*([1-4一二三四])\s*季)$", re.I)
+_H = re.compile(r"^(\d{4})\s*-?\s*H([12])$", re.I)
+_Y = re.compile(r"^(?:FY|CY)?\s*(\d{4})\s*年?(?:度)?$", re.I)
+_ROC_Y = re.compile(r"^(?:民國)?\s*(\d{2,3})\s*年度?$")
+_CN_Q = {"一": 1, "二": 2, "三": 3, "四": 4}
 
 
-def _post_fetch_layer(prev):
-    def post_fetch(opt, res: dict) -> dict:
-        post = prev(opt, res)
-        xs = post.get("xsrc") or {}
-        if xs.get("note") and not (xs.get("temp") or {}).get("files"):
-            xs["verify"] = {"verdict": "EMPTY", "checks": {}, "rows": 0, "items": 0}
-            xs["closeout"] = closeout(xs, xs["verify"])
-            return post
+def _ok_ymd(y: int, m: int, d: int) -> str | None:
+    try:
+        return date(y, m, d).isoformat() if 1900 <= y <= 2100 else None
+    except ValueError:
+        return None
+
+
+def _ok_ym(y: int, m: int) -> str | None:
+    return "%04d-%02d" % (y, m) if 1900 <= y <= 2100 and 1 <= m <= 12 else None
+
+
+def _roc(y: int) -> int:
+    return y + 1911 if y < 1000 else y
+
+
+def _digits(s: str, hinted: bool) -> tuple:
+    """純數字:8 碼 YYYYMMDD · 7 碼民國 YYYMMDD(交易所 1150824)· 6 碼 YYYYMM · 5 碼民國 YYYMM(11507)· 4 碼 YYYY;欄名不像日期 → 不當日期。"""
+    if not hinted:
+        return None, None, "純數字(欄名不是日期)"
+    n = len(s)
+    if n == 8:
+        r = _ok_ymd(int(s[:4]), int(s[4:6]), int(s[6:]))
+        return (r, "D", "YYYYMMDD") if r else (None, None, "不是日期")
+    if n == 7:
+        r = _ok_ymd(int(s[:3]) + 1911, int(s[3:5]), int(s[5:]))
+        return (r, "D", "民國 YYYMMDD") if r else (None, None, "不是日期")
+    if n == 6:
+        r = _ok_ym(int(s[:4]), int(s[4:]))
+        return (r, "M", "YYYYMM") if r else (None, None, "不是日期")
+    if n == 5:
+        r = _ok_ym(int(s[:3]) + 1911, int(s[3:]))
+        return (r, "M", "民國 YYYMM") if r else (None, None, "不是日期")
+    if n == 4 and 1900 <= int(s) <= 2100:
+        return s, "Y", "YYYY"
+    return None, None, "不是日期"
+
+
+def iso_date(v, hinted: bool = True, order: str = "MDY") -> tuple:
+    """一個值 → (標準字串 YYYY / YYYY-MM / YYYY-MM-DD, 粒度 Y/M/D/None, 原格式名)。認不出 → (None, None, 原因)。
+    hinted = 欄名看得出是日期欄(純數字 20241001 / 202410 / 2024 才當日期);order = 'a/b/YYYY' 兩邊都 ≤ 12 時的讀法(整欄推)。
+    季 → 該季最後一個月(2024Q3 → 2024-09)· 半年 → 6 / 12 月 · 有時刻的只留日期。"""
+    if v is None:
+        return None, None, "空"
+    if isinstance(v, datetime):
+        return v.date().isoformat(), "D", "datetime"
+    if isinstance(v, date):
+        return v.isoformat(), "D", "date"
+    if isinstance(v, bool):
+        return None, None, "不是日期"
+    if isinstance(v, float):
+        if v != v:
+            return None, None, "空"
+        if not v.is_integer():
+            return None, None, "不是日期"
+        v = int(v)
+    if isinstance(v, int):
+        return _digits(str(v), hinted) if v >= 0 else (None, None, "不是日期")
+    s = str(v).strip()
+    if not s or s.lower() in ("nan", "nat", "none", "null", "-", "--"):
+        return None, None, "空"
+    if re.fullmatch(r"\d+", s):
+        return _digits(s, hinted)
+    m = _TIME_TAIL.match(s)
+    if m and re.search(r"\d", m.group("d")):
+        r = iso_date(m.group("d"), hinted, order)
+        return (r[0], r[1], r[2] + "+時刻") if r[0] else r
+    for rx, f, name in ((_YMD, lambda g: _ok_ymd(int(g[0]), int(g[1]), int(g[2])), "Y-M-D"),
+                        (_ROC_YMD, lambda g: _ok_ymd(_roc(int(g[0])), int(g[1]), int(g[2])), "民國 Y/M/D"),
+                        (_CJK_YMD, lambda g: _ok_ymd(_roc(int(g[0])), int(g[1]), int(g[2])), "Y年M月D日"),
+                        (_EN_DMY, lambda g: _ok_ymd(int(g[2]), _MON.get(g[1].lower(), 0), int(g[0])), "D Mon Y"),
+                        (_EN_MDY, lambda g: _ok_ymd(int(g[2]), _MON.get(g[0].lower(), 0), int(g[1])), "Mon D, Y")):
+        g = rx.match(s)
+        if g:
+            r = f(g.groups())
+            return (r, "D", name) if r else (None, None, "不是日期")
+    g = _AB_Y.match(s)
+    if g:
+        a, b, y = int(g[1]), int(g[2]), int(g[3])
+        if a > 12 or (b <= 12 and order == "DMY"):
+            r, name = _ok_ymd(y, b, a), "D/M/Y"
+        else:
+            r, name = _ok_ymd(y, a, b), "M/D/Y"
+        return (r, "D", name) if r else (None, None, "不是日期")
+    for rx, f, name in ((_YM, lambda g: _ok_ym(int(g[0]), int(g[1])), "Y-M"),
+                        (_ROC_YM, lambda g: _ok_ym(_roc(int(g[0])), int(g[1])), "民國 Y/M"),
+                        (_CJK_YM, lambda g: _ok_ym(_roc(int(g[0])), int(g[1])), "Y年M月"),
+                        (_YMM, lambda g: _ok_ym(int(g[0]), int(g[1])), "YYYYMmm"),
+                        (_EN_MY, lambda g: _ok_ym(int(g[1]) if len(g[1]) == 4 else 2000 + int(g[1]), _MON.get(g[0].lower(), 0)), "Mon Y"),
+                        (_MY, lambda g: _ok_ym(int(g[1]), int(g[0])), "M/Y")):
+        g = rx.match(s)
+        if g:
+            r = f(g.groups())
+            return (r, "M", name) if r else (None, None, "不是日期")
+    g = _Q.match(s)
+    if g:
+        if g[1]:
+            y, q = int(g[1]), int(g[2])
+        elif g[3]:
+            y, q = int(g[4]), int(g[3])
+        else:
+            y, q = int(g[5]), _CN_Q.get(g[6]) or int(g[6])
+        r = _ok_ym(_roc(y), q * 3)
+        return (r, "M", "季→季末月") if r else (None, None, "不是日期")
+    g = _H.match(s)
+    if g:
+        r = _ok_ym(int(g[1]), 6 * int(g[2]))
+        return (r, "M", "半年→期末月") if r else (None, None, "不是日期")
+    for rx, f, name in ((_Y, lambda g: int(g[0]), "YYYY"), (_ROC_Y, lambda g: _roc(int(g[0])), "民國年")):
+        g = rx.match(s)
+        if g:
+            y = f(g.groups())
+            return ("%04d" % y, "Y", name) if 1900 <= y <= 2100 else (None, None, "不是日期")
+    return None, None, "認不出"
+
+
+def date_column(name: str, values: list) -> dict | None:
+    """判一欄是不是日期欄並整欄轉:欄名像日期,或(欄名不像)非空值 ≥ 95% 是有分隔的日期字串。
+    回 {"values": 轉好的(認不出的照原值), "grain": 主粒度, "formats": {原格式: 筆數}, "bad": 認不出筆數, "n": 非空筆數};不是日期欄 → None。"""
+    hinted = bool(_DATE_HINT.search(str(name)))
+    vals = list(values)
+    order = "MDY"
+    for v in vals:                                 # a/b/YYYY 整欄推讀法:有一筆 a > 12 → D/M/Y
+        g = _AB_Y.match(str(v).strip()) if isinstance(v, str) else None
+        if g and int(g[1]) > 12:
+            order = "DMY"
+            break
+    out, fmts, grains, bad, n = [], {}, {}, 0, 0
+    for v in vals:
+        r, gr, how = iso_date(v, hinted, order)
+        if how == "空":
+            out.append(None if v is None or (isinstance(v, float) and v != v) else v)
+            continue
+        n += 1
+        if r is None:
+            bad += 1
+            out.append(v)
+            continue
+        fmts[how] = fmts.get(how, 0) + 1
+        grains[gr] = grains.get(gr, 0) + 1
+        out.append(r)
+    if not n:
+        return None
+    good = n - bad
+    if not hinted and (good < 0.95 * n or all(k in ("YYYYMMDD", "YYYYMM", "YYYY", "民國 YYYMMDD", "民國 YYYMM") for k in fmts)):
+        return None
+    if hinted and good < 0.5 * n:                  # 欄名像日期但多半不是(例如「日成交量」)→ 不當日期欄
+        return None
+    return {"values": out, "grain": max(grains, key=grains.get) if grains else None, "formats": fmts, "bad": bad, "n": n}
+
+
+# ---------------------------------------------------------------- 跨來源對照(兩個以上來源相同 = 對照成功)
+_NUM = re.compile(r"^\(?[-+]?[\d,]*\.?\d+(?:[eE][-+]?\d+)?\)?%?$")
+
+
+def _num(v):
+    """'1,234.50' / 1234.5 / '(12.3)' / '12.3%' → (數值, 小數位);整數(沒有小數點)當精確值 = 6 位;不是數 → None。"""
+    if isinstance(v, bool) or v is None:
+        return None
+    if isinstance(v, int):
+        return float(v), 6
+    if isinstance(v, float):
+        if v != v or v in (float("inf"), float("-inf")):
+            return None
+        r = repr(v)
+        return v, (min(len(r.split(".")[1]), 6) if "." in r and "e" not in r else 6)
+    s = unicodedata.normalize("NFKC", str(v)).strip().replace(" ", "")
+    if not s or not _NUM.match(s):
+        return None
+    neg = s.startswith("(") and s.endswith(")")
+    t = s.strip("()").rstrip("%").replace(",", "")
+    try:
+        x = float(t)
+    except ValueError:
+        return None
+    dec = min(len(t.split(".")[1]), 6) if "." in t and "e" not in t.lower() else 6
+    return (-x if neg else x), dec
+
+
+def same(a, b, dec: int | None = None) -> bool:
+    """兩個來源的值算不算相同:數值 → 差距在兩邊較粗的那個小數位的半格內(1045.00 = 1045.0 = 1044.9999999 · 100 ≠ 100.4);
+    dec 給定(資料集規格:價格 2 位 · 營收 0 位)→ 差距在 dec 位的半格內(10.3 ≠ 10.35);
+    文字 → NFKC 全半形統一、去空白、不分大小寫後相等。"""
+    na, nb = _num(a), _num(b)
+    if na and nb:
+        d = dec if dec is not None else min(na[1], nb[1], 6)
+        return abs(na[0] - nb[0]) <= 0.5 * 10 ** (-d) + 1e-12 * max(1.0, abs(na[0]), abs(nb[0]))
+    if na or nb:
+        return False
+    ta = re.sub(r"\s+", "", unicodedata.normalize("NFKC", str(a or ""))).casefold()
+    tb = re.sub(r"\s+", "", unicodedata.normalize("NFKC", str(b or ""))).casefold()
+    return bool(ta) and ta == tb
+
+
+def cross_check(rows: list) -> dict:
+    """rows:[{dataset, key, date, field, value, source(, dec)}] → 每個(資料集 · 代號 · 日期 · 欄位)一筆判定:
+    VERIFIED = 兩個以上來源相同(有第三個不同 → 記 outliers)· CONFLICT = 兩個以上來源但沒有任兩個相同 · SINGLE = 只有一個來源(沒得對照)。"""
+    g: dict = {}
+    decs: dict = {}
+    for r in rows:
+        k = (r["dataset"], str(r["key"]), r["date"], r["field"])
+        g.setdefault(k, {}).setdefault(r["source"], r["value"])
+        decs.setdefault(k, r.get("dec"))
+    items, cnt = [], {"VERIFIED": 0, "CONFLICT": 0, "SINGLE": 0}
+    for k, by in sorted(g.items(), key=lambda kv: tuple(str(x) for x in kv[0])):
+        srcs = sorted(by)
+        if len(srcs) < 2:
+            st, agree, out = "SINGLE", [], []        # 只有一個來源:沒有「一致」可言(頁面不誤讀)
+        else:
+            best: list = []
+            for i, a in enumerate(srcs):
+                grp = [a] + [b for b in srcs[i + 1:] if same(by[a], by[b], decs.get(k))]
+                if len(grp) > len(best):
+                    best = grp
+            st = "VERIFIED" if len(best) >= 2 else "CONFLICT"
+            agree = best if st == "VERIFIED" else []
+            out = [s for s in srcs if s not in agree] if st == "VERIFIED" else srcs
+        cnt[st] += 1
+        items.append({"dataset": k[0], "key": k[1], "date": k[2], "field": k[3], "status": st, "sources": srcs,
+                      "agree": agree, "outliers": out if st == "VERIFIED" else [], "values": {s: by[s] for s in srcs}})
+    pairs = cnt["VERIFIED"] + cnt["CONFLICT"]
+    return {"counts": cnt, "comparable": pairs, "rate": (cnt["VERIFIED"] / pairs) if pairs else None, "items": items}
+
+
+# ---------------------------------------------------------------- 擷取後:讀 VDF 資料庫(唯讀)
+_OTHER_SYS = re.compile(r"(?i)^(vrn_|vrn2_|via_policy|cgc_|vcgc_)")      # 他系統寫進來的表:只攤開不代修(同 VDF_SystemManager v0155)
+_META_COL = re.compile(r"(?i)^(fetched_at|updated_at|created_at|inserted_at|loaded_at|ingested_at|_?ts|run_ts|write_ts)$")
+_KEY_COL = re.compile(r"(?i)^(code|ticker|symbol|stock_id|series|series_id|isin|代號|證券代號|股票代號)$")
+_STD = re.compile(r"^\d{4}(-\d{2}(-\d{2})?)?$")
+_SPEC_DEC = {"close": 2, "open": 2, "high": 2, "low": 2, "revenue": 0}     # 價格到 0.01 · 營收整數(千元)
+
+
+def _duck():
+    try:
+        import duckdb
+        return duckdb
+    except ImportError:
+        return None
+
+
+def _q(name: str) -> str:
+    return '"' + str(name).replace('"', '""') + '"'
+
+
+def _connect_ro(path: Path, tries: int = 3):
+    """唯讀開庫;被別的行程鎖著 → 等一下再試;還是不行 → (None, 原因)。"""
+    duckdb = _duck()
+    why = ""
+    for i in range(tries):
         try:
-            rep = VER.verify(Path(xs["temp"]["dir"]), xs, PRIOR.db_files(opt), post.get("datefmt"))
-        except Exception as exc:                   # noqa: BLE001 — 驗證器自己出錯 = 結果沒驗到 → 照實算 FAIL(不可信)
-            rep = {"verdict": "FAIL", "checks": {"驗證器出錯": {"n": 0, "bad": 1, "examples": ["%s %s" % (type(exc).__name__, str(exc)[:200])], "note": ""}},
-                   "fingerprint": "", "rows": 0, "items": 0}
-        xs["verify"] = rep
-        xs["closeout"] = closeout(xs, rep)
-        stamp = Path(res["temp_run"]).name.replace("run_", "") or "now"
+            return duckdb.connect(str(path), read_only=True), ""
+        except Exception as exc:                   # noqa: BLE001 — 鎖 / 版本不合 / 壞檔都照實回原因,不中斷整輪
+            why = "%s:%s" % (type(exc).__name__, str(exc).splitlines()[0][:120] if str(exc) else "")
+            time.sleep(0.5 * (i + 1))
+    return None, why
+
+
+def db_files(opt) -> list:
+    """本輪資料庫家:--db-home > VIA_VDF_DB_HOME > --fetch-home/output_hub > 本夾 output_hub;底下所有 .duckdb(去重)。"""
+    roots = [getattr(opt, "db_home", None), os.environ.get("VIA_VDF_DB_HOME")]
+    fh = getattr(opt, "fetch_home", None)
+    if fh:
+        roots.append(str(Path(fh) / "output_hub"))
+    roots.append(str(HERE / "output_hub"))
+    seen, out = set(), []
+    for r in roots:
+        if not r or not Path(r).is_dir():
+            continue
+        for f in sorted(Path(r).rglob("*.duckdb")):
+            k = os.path.normcase(str(f.resolve()))
+            if k not in seen and not f.name.endswith(".wal"):
+                seen.add(k)
+                out.append(f)
+    return out
+
+
+def _tables(con) -> list:
+    rows = con.execute("SELECT table_schema, table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' "
+                       "AND table_schema NOT IN ('information_schema', 'pg_catalog')").fetchall()
+    return [(s, t) for s, t in rows]
+
+
+def _columns(con, schema: str, table: str) -> list:
+    return con.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_schema = ? AND table_name = ? "
+                       "ORDER BY ordinal_position", [schema, table]).fetchall()
+
+
+def datefmt_audit(dbs: list, budget_s: float = 120.0) -> dict:
+    """日期格式體檢(唯讀):VDF 的表裡每個日期欄 → 標準(YYYY / YYYY-MM / YYYY-MM-DD 或 DATE 型別)· 不標準的格式與筆數 ·
+    同一欄混了兩種以上格式(同一天可能存成兩列)。他系統的表 · 紀錄時間戳(fetched_at …)不列。"""
+    t0, cols, skipped, locked = time.time(), [], 0, []
+    for f in dbs:
+        if time.time() - t0 > budget_s:
+            skipped += 1
+            continue
+        con, why = _connect_ro(f)
+        if con is None:
+            locked.append({"db": f.name, "why": why})
+            continue
         try:
-            xs["ui"] = write_ui(xs, post.get("datefmt") or {}, rep, stamp, V0100.REPORT_DIR.parent / "xsrc")
-        except OSError as exc:
-            xs["ui"] = {"error": "%s %s" % (type(exc).__name__, exc)}
-        return post
-    return post_fetch
+            for sch, tb in _tables(con):
+                if _OTHER_SYS.match(tb):
+                    continue
+                for col, typ in _columns(con, sch, tb):
+                    if _META_COL.match(col) or not _DATE_HINT.search(col):
+                        continue
+                    typ_u = str(typ).upper()
+                    ref = "%s.%s" % (_q(sch), _q(tb))
+                    row = {"db": f.name, "table": tb if sch == "main" else "%s.%s" % (sch, tb), "column": col, "type": typ_u}
+                    try:
+                        if typ_u == "DATE":
+                            row.update(standard=True, formats={"DATE 型別": 1}, nonstd=0, examples=[])
+                        elif typ_u.startswith("TIMESTAMP"):
+                            n_t = con.execute("SELECT count(*) FROM %s WHERE %s IS NOT NULL AND CAST(%s AS TIME) <> TIME '00:00:00'"
+                                              % (ref, _q(col), _q(col))).fetchone()[0]
+                            row.update(standard=n_t == 0, formats={"TIMESTAMP(有時刻)" if n_t else "TIMESTAMP(都是 00:00)": 1},
+                                       nonstd=int(n_t), examples=[])
+                        elif any(k in typ_u for k in ("CHAR", "TEXT", "STRING", "INT")):
+                            vals = [r[0] for r in con.execute("SELECT DISTINCT CAST(%s AS VARCHAR) FROM %s WHERE %s IS NOT NULL LIMIT 20000"
+                                                              % (_q(col), ref, _q(col))).fetchall()]
+                            fm, bad_ex, nonstd = {}, [], 0
+                            for v in vals:
+                                r_, gr, how = iso_date(v, True)
+                                if r_ is not None and r_ == v and _STD.match(v):
+                                    how = "標準"
+                                elif r_ is None:
+                                    how = "認不出"
+                                fm[how] = fm.get(how, 0) + 1
+                                if how != "標準":
+                                    nonstd += 1
+                                    if len(bad_ex) < 3:
+                                        bad_ex.append(v)
+                            if not vals or (fm.get("認不出", 0) > 0.5 * len(vals)):
+                                continue                   # 欄名像日期但多半不是日期(例如 day_volume)→ 不列
+                            row.update(standard=nonstd == 0, formats=fm, nonstd=nonstd, examples=bad_ex, distinct=len(vals))
+                        else:
+                            continue
+                    except Exception as exc:       # noqa: BLE001 — 一欄讀不到不擋整張體檢
+                        row.update(standard=None, formats={}, nonstd=0, examples=[], error=type(exc).__name__)
+                    row["mixed"] = len([k for k in row.get("formats", {}) if k not in ("認不出",)]) > 1
+                    cols.append(row)
+        finally:
+            con.close()
+    bad = [c for c in cols if c.get("standard") is False]
+    lamp = "INFO" if not cols and not dbs else ("YELLOW" if bad or locked else "GREEN")
+    return {"lamp": lamp, "dbs": len(dbs), "columns": len(cols), "standard": sum(1 for c in cols if c.get("standard")),
+            "nonstandard": len(bad), "mixed": sum(1 for c in bad if c.get("mixed")), "locked": locked, "skipped_budget": skipped,
+            "items": cols, "secs": round(time.time() - t0, 1)}
 
 
-def _summary_layer(prev):
-    def summary_lines(post: dict) -> list:
-        out = list(prev(post))
-        xs = post.get("xsrc") or {}
-        rep, co, ui = xs.get("verify") or {}, xs.get("closeout") or {}, xs.get("ui") or {}
-        if rep:
-            bad = ["%s 不符 %s" % (k.split(" ")[0], v["bad"]) for k, v in (rep.get("checks") or {}).items() if v.get("bad")]
-            out.append("  ⑨ 結果獨立驗證 %s:中間檔 %s 筆回原表逐筆核對 · 日期 · 判定重算 · 計數 · 體檢重掃%s · 指紋 %s" % (
-                rep.get("verdict"), rep.get("rows"), (" · " + ";".join(bad)) if bad else "(不符 0 → 100%)", str(rep.get("fingerprint", ""))[:16]))
-        if co:
-            out.append("  ⑩ 收尾 %s:%s" % (co.get("lamp"), co.get("text")))
-        if ui.get("latest"):
-            out.append("     · 對照頁(可篩選 · 驗證過的結果)→ %s" % ui["latest"])
+def _find(dbs: list, table: str):
+    for f in dbs:
+        con, _why = _connect_ro(f, 1)
+        if con is None:
+            continue
+        try:
+            if any(t == table and s == "main" for s, t in _tables(con)):
+                return f, {c.lower(): c for c, _t in _columns(con, "main", table)}
+        finally:
+            con.close()
+    return None, {}
+
+
+def _pick_dates(con, table: str, col: str, n: int, grain: str) -> dict:
+    """這張表最近 n 個(標準化後)日期 → {原始字串: 標準日期};同一天不同格式都收(對照用標準日期)。"""
+    raw = [r[0] for r in con.execute("SELECT DISTINCT CAST(%s AS VARCHAR) FROM %s WHERE %s IS NOT NULL" % (_q(col), _q(table), _q(col))).fetchall()]
+    m = {}
+    for v in raw:
+        r_, gr, _how = iso_date(v, True)
+        if r_ and gr == grain:
+            m[v] = r_
+    keep = set(sorted(set(m.values()))[-n:])
+    return {k: v for k, v in m.items() if v in keep}
+
+
+def extract_tw_close(dbs: list, n_days: int = 10) -> tuple:
+    """TW 日收盤:交易所(tw_trading_daily · TWSE / TPEX 官方收盤)× Yahoo(tw_daily_prices)· 同代號同日同欄位。"""
+    rows, notes = [], []
+    fe, ce = _find(dbs, "tw_trading_daily")
+    fy, cy = _find(dbs, "tw_daily_prices")
+    if not fe or not fy:
+        return rows, ["缺表:" + "、".join(t for t, f in (("tw_trading_daily", fe), ("tw_daily_prices", fy)) if not f)]
+    fields = [k for k in ("close", "open", "high", "low") if k in ce and k in cy]
+    con, why = _connect_ro(fe)
+    if con is None:
+        return rows, ["%s 開不了:%s" % (fe.name, why)]
+    try:
+        dm = _pick_dates(con, "tw_trading_daily", ce["date"], n_days, "D")
+        want = sorted(set(dm.values()))
+        sel = ", ".join(_q(ce[k]) for k in fields)
+        for d, code, mkt, *vals in con.execute(
+                "SELECT CAST(%s AS VARCHAR), CAST(%s AS VARCHAR), CAST(%s AS VARCHAR), %s FROM tw_trading_daily WHERE list_contains(?, CAST(%s AS VARCHAR))"
+                % (_q(ce["date"]), _q(ce["code"]), _q(ce.get("market", "market")), sel, _q(ce["date"])), [list(dm)]).fetchall():
+            for k, v in zip(fields, vals):
+                if v is not None:
+                    rows.append({"dataset": "tw_daily_close", "source": str(mkt or "交易所").upper(), "key": str(code).strip(), "date": dm[d],
+                                 "field": k, "value": v, "date_raw": d, "origin": "%s:tw_trading_daily" % fe.name, "dec": _SPEC_DEC.get(k)})
+    finally:
+        con.close()
+    con, why = _connect_ro(fy)
+    if con is None:
+        return rows, ["%s 開不了:%s" % (fy.name, why)]
+    try:
+        dmy = {k: v for k, v in _pick_dates(con, "tw_daily_prices", cy["date"], n_days + 5, "D").items() if v in set(want)}
+        sel = ", ".join(_q(cy[k]) for k in fields)
+        for d, tk, *vals in con.execute(
+                "SELECT CAST(%s AS VARCHAR), CAST(%s AS VARCHAR), %s FROM tw_daily_prices WHERE list_contains(?, CAST(%s AS VARCHAR))"
+                % (_q(cy["date"]), _q(cy["ticker"]), sel, _q(cy["date"])), [list(dmy)]).fetchall():
+            code = str(tk).split(".")[0].strip()
+            for k, v in zip(fields, vals):
+                if v is not None:
+                    rows.append({"dataset": "tw_daily_close", "source": "YAHOO", "key": code, "date": dmy[d], "field": k, "value": v,
+                                 "date_raw": d, "origin": "%s:tw_daily_prices" % fy.name, "dec": _SPEC_DEC.get(k)})
+    finally:
+        con.close()
+    notes.append("最近 %d 個交易日(%s → %s)· 欄位 %s" % (len(want), want[0] if want else "—", want[-1] if want else "—", "/".join(fields)))
+    return rows, notes
+
+
+def extract_source_tables(dbs: list, n_periods: dict | None = None) -> tuple:
+    """同一張表裡有 source 欄、兩個以上來源(例如月營收 MOPS_OFFICIAL × CNYES)→ 同代號同期別的數值欄逐欄對照;
+    同一來源同一期抓了好幾次 → 用最新那次(fetched_at)。"""
+    n_periods = n_periods or {"D": 10, "M": 3, "Y": 2}
+    rows, notes = [], []
+    for f in dbs:
+        con, why = _connect_ro(f)
+        if con is None:
+            continue
+        try:
+            for sch, tb in _tables(con):
+                if sch != "main" or _OTHER_SYS.match(tb):
+                    continue
+                cols = _columns(con, sch, tb)
+                names = {c.lower(): c for c, _t in cols}
+                if "source" not in names:
+                    continue
+                keys = [c for c, _t in cols if _KEY_COL.match(c)]
+                dcol = next((c for c, _t in cols if _DATE_HINT.search(c) and not _META_COL.match(c)), None)
+                nums = [c for c, t in cols if any(x in str(t).upper() for x in ("INT", "DOUBLE", "DECIMAL", "FLOAT", "REAL", "NUMERIC"))
+                        and c not in keys and c != dcol and not _META_COL.match(c)]
+                if not keys or not dcol or not nums:
+                    continue
+                nsrc = con.execute("SELECT count(DISTINCT source) FROM %s" % _q(tb)).fetchone()[0]
+                if nsrc < 2:
+                    continue
+                gr = "M" if re.search(r"(?i)ym|month|年月|月份", dcol) else ("Y" if re.search(r"(?i)year|年度|年份", dcol) else "D")
+                dm = _pick_dates(con, tb, dcol, n_periods.get(gr, 3), gr)
+                if not dm:
+                    continue
+                order = ("ORDER BY %s DESC" % _q(names["fetched_at"])) if "fetched_at" in names else ""
+                kexpr = " || '|' || ".join("CAST(%s AS VARCHAR)" % _q(k) for k in keys)
+                q = ("SELECT CAST(%s AS VARCHAR) AS d, %s AS k, CAST(source AS VARCHAR) AS s, %s FROM %s WHERE list_contains(?, CAST(%s AS VARCHAR)) "
+                     "QUALIFY row_number() OVER (PARTITION BY CAST(%s AS VARCHAR), %s, source %s) = 1"
+                     % (_q(dcol), kexpr, ", ".join(_q(c) for c in nums), _q(tb), _q(dcol), _q(dcol), kexpr, order))
+                n0 = len(rows)
+                for d, k, src, *vals in con.execute(q, [list(dm)]).fetchall():
+                    for c, v in zip(nums, vals):
+                        if v is not None:
+                            rows.append({"dataset": tb, "source": str(src), "key": k, "date": dm[d], "field": c, "value": v, "date_raw": d,
+                                         "origin": "%s:%s" % (f.name, tb), "dec": _SPEC_DEC.get(c.lower())})
+                notes.append("%s:來源 %d 個 · 最近 %d 期 · %d 筆" % (tb, nsrc, len(set(dm.values())), len(rows) - n0))
+        finally:
+            con.close()
+    return rows, notes
+
+
+def write_temp(xdir: Path, rows: list, result: dict) -> dict:
+    """中間檔(本輪 temp):每個資料集每個來源一檔(標註來源)+ 一份對照結果;日期一律 YYYY / YYYY-MM / YYYY-MM-DD。"""
+    files = []
+    by: dict = {}
+    for r in rows:
+        by.setdefault((r["dataset"], r["source"]), []).append(r)
+    for (ds, src), rs in sorted(by.items()):
+        d = xdir / re.sub(r"[^\w.-]+", "_", ds)
+        d.mkdir(parents=True, exist_ok=True)
+        p = d / ("%s__%s.csv" % (re.sub(r"[^\w.-]+", "_", ds), re.sub(r"[^\w.-]+", "_", src)))
+        with open(p, "w", encoding="utf-8-sig", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["dataset", "source", "key", "date", "field", "value", "date_raw", "origin"])
+            for r in sorted(rs, key=lambda x: (x["key"], x["date"], x["field"])):
+                w.writerow([r["dataset"], r["source"], r["key"], r["date"], r["field"], r["value"], r["date_raw"], r["origin"]])
+        files.append(str(p))
+    for ds in sorted({i["dataset"] for i in result["items"]}):
+        d = xdir / re.sub(r"[^\w.-]+", "_", ds)
+        d.mkdir(parents=True, exist_ok=True)
+        p = d / ("%s__對照結果.csv" % re.sub(r"[^\w.-]+", "_", ds))
+        with open(p, "w", encoding="utf-8-sig", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["dataset", "key", "date", "field", "status", "sources", "agree", "outliers", "values"])
+            for i in result["items"]:
+                if i["dataset"] == ds:
+                    w.writerow([i["dataset"], i["key"], i["date"], i["field"], i["status"], "/".join(i["sources"]), "/".join(i["agree"]),
+                                "/".join(i["outliers"]), json.dumps(i["values"], ensure_ascii=False, default=str)])
+        files.append(str(p))
+    return {"dir": str(xdir), "files": files}
+
+
+def _unit_hint(items: list) -> str:
+    """衝突多半是固定倍數(×1000 / ÷1000)→ 疑單位不同(千元 ↔ 元)。"""
+    rs = []
+    for i in items:
+        v = [x for x in (_num(i["values"][s]) for s in i["sources"]) if x]
+        if len(v) == 2 and v[0][0]:
+            rs.append(v[1][0] / v[0][0])
+    if len(rs) < 5:
+        return ""
+    rs.sort()
+    med = rs[len(rs) // 2]
+    for f in (1000.0, 0.001, 100.0, 0.01):
+        if abs(med / f - 1) < 0.01:
+            return "衝突多半差 ×%g(疑單位不同,不是抓錯)" % f
+    return ""
+
+
+def post_fetch(opt, res: dict) -> dict:
+    """擷取流程跑完後:① 日期格式體檢 ② 跨來源對照(中間檔 → 本輪 temp/xsrc)。全程唯讀資料庫;任何一段出錯照實記,不擋整輪。"""
+    t0 = time.time()
+    out = {"datefmt": None, "xsrc": None}
+    if _duck() is None:
+        msg = "這支 python 沒有 duckdb(不代裝)· 不體檢、不對照"
+        out["datefmt"] = {"lamp": "INFO", "note": msg, "items": []}
+        out["xsrc"] = {"lamp": "INFO", "note": msg, "datasets": {}, "items": []}
         return out
-    return summary_lines
+    dbs = db_files(opt)
+    try:
+        out["datefmt"] = datefmt_audit(dbs, float(os.environ.get("VIA_XSRC_BUDGET_S", "120")))
+    except Exception as exc:                       # noqa: BLE001
+        out["datefmt"] = {"lamp": "YELLOW", "note": "體檢出錯:%s" % type(exc).__name__, "items": []}
+    rows, notes = [], []
+    for fn in (lambda: extract_tw_close(dbs, int(os.environ.get("VIA_XSRC_DAYS", "10"))), lambda: extract_source_tables(dbs)):
+        try:
+            r_, n_ = fn()
+            rows += r_
+            notes += n_
+        except Exception as exc:                   # noqa: BLE001
+            notes.append("讀取出錯:%s %s" % (type(exc).__name__, str(exc)[:120]))
+    result = cross_check(rows)
+    xdir = Path(res["temp_run"]) / "xsrc"
+    files = write_temp(xdir, rows, result) if rows else {"dir": str(xdir), "files": []}
+    per = {}
+    for i in result["items"]:
+        c = per.setdefault(i["dataset"], {"VERIFIED": 0, "CONFLICT": 0, "SINGLE": 0, "sources": set()})
+        c[i["status"]] += 1
+        c["sources"].update(i["sources"])
+    for ds, c in per.items():
+        c["sources"] = sorted(c["sources"])
+        cmp_ = c["VERIFIED"] + c["CONFLICT"]
+        c["rate"] = round(c["VERIFIED"] / cmp_, 4) if cmp_ else None
+        c["hint"] = _unit_hint([i for i in result["items"] if i["dataset"] == ds and i["status"] == "CONFLICT"])
+    cnt = result["counts"]
+    lamp = "INFO" if not result["comparable"] else ("YELLOW" if cnt["CONFLICT"] else "GREEN")
+    conflicts = [i for i in result["items"] if i["status"] == "CONFLICT"]
+    out["xsrc"] = {"lamp": lamp, "counts": cnt, "comparable": result["comparable"], "rate": result["rate"], "datasets": per, "notes": notes,
+                   "temp": files, "dbs": [f.name for f in dbs], "conflicts_top": conflicts[:30], "secs": round(time.time() - t0, 1)}
+    return out
 
 
-def _card_layer(prev):
-    def xsrc_card(card: dict) -> str:
-        h = prev(card)
-        xs = card.get("xsrc") or {}
-        rep, co, ui = xs.get("verify") or {}, xs.get("closeout") or {}, xs.get("ui") or {}
-        if not h or not (rep or co):
-            return h
-        e = html.escape
-        col = {"GREEN": "#1a7f37", "PASS": "#1a7f37", "YELLOW": "#9a6700", "INFO": "#57606a", "EMPTY": "#57606a"}
-        link = ""
-        if ui.get("latest"):
-            rel = os.path.relpath(ui["latest"], V0100.REPORT_DIR) if os.path.isabs(ui["latest"]) else ui["latest"]
-            link = f'<br><a href="{e(Path(rel).as_posix())}">打開對照頁(可篩選 · 驗證過的結果)</a> <span class="mut">{e(ui["latest"])}</span>'
-        blk = (f'<br><b>結果獨立驗證</b> <span class="lamp" style="background:{col.get(rep.get("verdict"), "#cf222e")}">{e(str(rep.get("verdict")))}</span> '
-               f'中間檔 {e(str(rep.get("rows")))} 筆回原表逐筆核對 · 日期 · 判定重算 · 計數 · 體檢重掃 · 指紋 {e(str(rep.get("fingerprint", ""))[:16])}'
-               f'<br><b>收尾</b> <span class="lamp" style="background:{col.get(co.get("lamp"), "#cf222e")}">{e(str(co.get("lamp")))}</span> {e(str(co.get("text")))}{link}')
-        i = h.rfind("</section>")
-        return h[:i] + blk + h[i:] if i >= 0 else h + blk
-    return xsrc_card
+# ---------------------------------------------------------------- 心跳:警告的下一行(縮排印出的那行原始碼)也略過
+_WARN_HEAD = re.compile(r"(^|\s)(\S.*?\.py|<unknown>|<string>):\d+: \w*Warning\b|SyntaxWarning|DeprecationWarning")
+
+
+def _last_line(log: Path) -> str:
+    """同 v0102 _last_line(日誌最後一行,最多 110 字 · 略過編譯警告),另外略過警告「下一行」那行被印出來的原始碼
+    (工作站:VDF_SystemManager_v0155.py:6 的 SyntaxWarning 後面跟著它說明文字那一行 → 每一步的心跳都顯示同一句舊說明)。"""
+    try:
+        with open(log, "rb") as fh:
+            fh.seek(0, 2)
+            n = fh.tell()
+            fh.seek(max(0, n - 8192))
+            tail = fh.read().decode("utf-8", "replace")
+    except OSError:
+        return ""
+    keep, skip_next = [], False
+    for ln in tail.splitlines():
+        if skip_next:
+            skip_next = False
+            if ln[:1] in (" ", "\t"):
+                continue
+        st = ln.strip()
+        if not st:
+            continue
+        if _WARN_HEAD.search(st):
+            skip_next = True
+            continue
+        keep.append(st)
+    return keep[-1][:110] if keep else ""
+
+
+# ---------------------------------------------------------------- 本輪:流程跑完 → 體檢 + 對照;總燈 / 總覽 / 頁面
+_POST: dict = {}
+_LOCK10 = threading.Lock()
+
+
+def _home_from_flows(flows) -> str | None:
+    """main v0108 的資料庫流程先問 db where,選到的家記在流程結果 db_home;體檢 / 對照 / 驗證用同一個家(PR #537 Codex P1 同理)。"""
+    for f in flows or []:
+        h = (f or {}).get("db_home")
+        if h:
+            return str(h)
+    return None
+
+
+def _with_home(opt, flows):
+    h = _home_from_flows(flows)
+    if not h or h == getattr(opt, "db_home", None):
+        return opt
+    o = copy.copy(opt)
+    o.db_home = h
+    return o
+
+
+def _run_flows_layer(prev):
+    def run_flows(opt, res, gate, log_dir, lists, manager=None, py=None):
+        flows = prev(opt, res, gate, log_dir, lists, manager, py)
+        if _V0101["STOP"].is_set():
+            return flows
+        print("  ⑦ 擷取後:日期格式體檢 + 跨來源對照(唯讀資料庫 · 中間檔寫本輪 temp)…", flush=True)
+        opt2 = _with_home(opt, flows)
+        if getattr(opt2, "db_home", None):
+            print("     · 資料庫家 %s%s" % (opt2.db_home, "(資料庫流程 db where 選的)" if opt2 is not opt else ""), flush=True)
+        try:
+            post = post_fetch(opt2, res)
+        except Exception as exc:                   # noqa: BLE001 — 這一段出錯不擋整輪,照實寫進總覽
+            post = {"datefmt": {"lamp": "YELLOW", "note": "出錯:%s" % type(exc).__name__, "items": []},
+                    "xsrc": {"lamp": "YELLOW", "note": "出錯:%s %s" % (type(exc).__name__, str(exc)[:160]), "datasets": {}, "items": []}}
+        with _LOCK10:
+            _POST.update(post)
+        for line in summary_lines(post):
+            print(line, flush=True)
+        return flows
+    return run_flows
+
+
+def summary_lines(post: dict) -> list:
+    df, xs = post.get("datefmt") or {}, post.get("xsrc") or {}
+    out = []
+    if df.get("note"):
+        out.append("  ⑦ 日期格式 %s:%s" % (df.get("lamp"), df["note"]))
+    else:
+        bad = [c for c in df.get("items", []) if c.get("standard") is False]
+        ex = ";".join("%s.%s %s" % (c["table"], c["column"], "/".join("%s×%s" % kv for kv in c["formats"].items() if kv[0] != "標準"))
+                      for c in bad[:3])
+        out.append("  ⑦ 日期格式 %s:資料庫 %s 個 · 日期欄 %s · 標準 %s · 不標準 %s(混兩種以上格式 %s)%s%s" % (
+            df.get("lamp"), df.get("dbs"), df.get("columns"), df.get("standard"), df.get("nonstandard"), df.get("mixed"),
+            (" · " + ex) if ex else "", (" · 鎖住 %d 個庫" % len(df["locked"])) if df.get("locked") else ""))
+    if xs.get("note"):
+        out.append("  ⑧ 跨來源對照 %s:%s" % (xs.get("lamp"), xs["note"]))
+    else:
+        c = xs.get("counts") or {}
+        out.append("  ⑧ 跨來源對照 %s:可對照 %s 筆 · 成功(兩個以上來源相同)%s · 衝突 %s · 只有一個來源 %s · 成功率 %s" % (
+            xs.get("lamp"), xs.get("comparable"), c.get("VERIFIED"), c.get("CONFLICT"), c.get("SINGLE"),
+            ("%.2f%%" % (100 * xs["rate"])) if xs.get("rate") is not None else "—"))
+        for ds, d in (xs.get("datasets") or {}).items():
+            out.append("     · %s(%s):成功 %d · 衝突 %d · 單一來源 %d%s" % (ds, "/".join(d["sources"]), d["VERIFIED"], d["CONFLICT"], d["SINGLE"],
+                                                                     (" · " + d["hint"]) if d.get("hint") else ""))
+        for n in xs.get("notes") or []:
+            out.append("     · " + n)
+        if (xs.get("temp") or {}).get("files"):
+            out.append("     · 中間檔(依來源分檔 + 對照結果)→ %s" % xs["temp"]["dir"])
+    return out
 
 
 def _overall_layer(prev):
     def overall(lists, flows):
         lamp = prev(lists, flows)
-        xs = (vars(PRIOR).get("_POST") or {}).get("xsrc") or {}
-        if (xs.get("verify") or {}).get("verdict") == "FAIL":
-            return "RED"                           # 結果驗證沒過 = 結果不可信 → 紅
+        with _LOCK10:
+            xs = _POST.get("xsrc") or {}
+        if lamp == "GREEN" and xs.get("lamp") == "YELLOW":
+            return "YELLOW"                        # 有來源對不上(衝突)= 資料沒對照成功 → 黃(不擋、不紅)
         return lamp
     return overall
 
 
 def _stamp_layer(prev):
+    """總覽落檔最內層:標 v0111 + 放進體檢 / 對照兩節(總覽落檔函式本身不換 → v0109 ㊶ · v0110 ㊼ 照驗)。"""
     def _stamp_then_write(c, u=None):
         c["schema"], c["tag"] = "VDF_ActivateVDF_v0111", TAG
+        with _LOCK10:
+            if _POST:
+                c["datefmt"] = _POST.get("datefmt")
+                c["xsrc"] = {k: (sorted(v) if isinstance(v, set) else v) for k, v in (_POST.get("xsrc") or {}).items()}
         return prev(c, u) if u is not None else prev(c)
     return _stamp_then_write
+
+
+def xsrc_card(card: dict) -> str:
+    """總覽頁「擷取後:日期格式 · 跨來源對照」卡(本輪有跑才有)。"""
+    df, xs = card.get("datefmt"), card.get("xsrc")
+    if not df and not xs:
+        return ""
+    e = html.escape
+    color = {"GREEN": "#1a7f37", "YELLOW": "#9a6700", "INFO": "#57606a"}
+    parts = ['<section id="xsrc" class="card" style="margin:12px 0"><b>擷取後:跨來源對照</b> '
+             f'<span class="lamp" style="background:{color.get((xs or {}).get("lamp"), "#cf222e")}">{e(str((xs or {}).get("lamp")))}</span>']
+    if xs and xs.get("note"):
+        parts.append(f"<br>{e(xs['note'])}")
+    elif xs:
+        c = xs.get("counts") or {}
+        rate = ("%.2f%%" % (100 * xs["rate"])) if xs.get("rate") is not None else "—"
+        parts.append(f"<br>可對照 {e(str(xs.get('comparable')))} 筆 · <b>成功 {e(str(c.get('VERIFIED')))}</b>(兩個以上來源相同)· "
+                     f"衝突 {e(str(c.get('CONFLICT')))} · 只有一個來源 {e(str(c.get('SINGLE')))} · 成功率 {e(rate)}")
+        rows = "".join(f"<tr><td>{e(ds)}</td><td>{e('/'.join(d['sources']))}</td><td>{d['VERIFIED']}</td><td>{d['CONFLICT']}</td>"
+                       f"<td>{d['SINGLE']}</td><td>{e(d.get('hint') or '')}</td></tr>" for ds, d in (xs.get("datasets") or {}).items())
+        if rows:
+            parts.append('<div class="wrap" style="overflow-x:auto"><table><tr><th>資料集</th><th>來源</th><th>成功</th><th>衝突</th>'
+                         f'<th>單一來源</th><th>備註</th></tr>{rows}</table></div>')
+        cf = xs.get("conflicts_top") or []
+        if cf:
+            li = "".join(f"<li>{e(i['dataset'])} · {e(i['key'])} · {e(i['date'])} · {e(i['field'])}:"
+                         f"{e(' / '.join('%s %s' % (s, i['values'][s]) for s in i['sources']))}</li>" for i in cf[:15])
+            parts.append(f"<details><summary>衝突前 {min(15, len(cf))} 筆</summary><ul>{li}</ul></details>")
+        if (xs.get("temp") or {}).get("dir"):
+            parts.append(f'<br><span class="mut">中間檔(本輪 temp · 依來源分檔、日期一律 YYYY / YYYY-MM / YYYY-MM-DD):{e(xs["temp"]["dir"])}</span>')
+    if df:
+        parts.append(f'<br><b>日期格式體檢</b> <span class="lamp" style="background:{color.get(df.get("lamp"), "#cf222e")}">{e(str(df.get("lamp")))}</span> ')
+        if df.get("note"):
+            parts.append(e(df["note"]))
+        else:
+            parts.append(f"日期欄 {e(str(df.get('columns')))} · 標準 {e(str(df.get('standard')))} · 不標準 {e(str(df.get('nonstandard')))}"
+                         f"(混兩種以上格式 {e(str(df.get('mixed')))})")
+            bad = [c for c in df.get("items", []) if c.get("standard") is False]
+            if bad:
+                li = "".join(f"<li>{e(c['db'])} · {e(c['table'])}.{e(c['column'])}({e(c['type'])}):"
+                             f"{e(', '.join('%s ×%s' % kv for kv in c['formats'].items()))}"
+                             f"{(' · 例 ' + e(' / '.join(map(str, c.get('examples') or [])))) if c.get('examples') else ''}</li>" for c in bad[:20])
+                parts.append(f"<details><summary>不標準的欄 {len(bad)} 個</summary><ul>{li}</ul></details>")
+            parts.append('<br><span class="mut">引擎的表照它原本的格式存(它們的 upsert 用這個格式當鍵,改了下一輪會重複列);'
+                         '標準格式寫在對照中間檔與結果裡,這裡列出還不是標準的欄</span>')
+    parts.append("</section>")
+    return "".join(parts)
+
+
+def _render_layer(prev):
+    def render_html(card: dict, ui_dir: Path) -> str:
+        h = prev(card, ui_dir)
+        sec = xsrc_card(card)
+        if not sec:
+            return h
+        for key in ('<section id="db-inventory"', '<div class="wrap"><table>'):
+            i = h.find(key)
+            if i >= 0:
+                return h[:i] + sec + h[i:]
+        return h.replace("</body>", sec + "</body>")
+    return render_html
 
 
 _ACTIVATE_PRIOR = PRIOR.activate
 
 
 def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path | None = None) -> dict:
-    """同 v0110 activate;這一輪對照完 → 獨立驗證器(⑨)→ 收尾判定(⑩)→ 對照頁;單一來源的「一致的來源」改成空。
-    換上的東西只在這一輪(跑完換回原樣)。"""
+    """同 v0110 activate;這一輪:流程跑完 → 日期格式體檢 + 跨來源對照(⑦ ⑧;資料庫家同 db where)· 心跳略過警告的原始碼行 · 版號與落檔標 v0111。
+    換上的東西只在這一輪(跑完全部換回原樣,前版自測驗的函式身分不變)。"""
     keep_tag = PRIOR.TAG
     PRIOR.TAG = TAG
-    saved = {k: vars(PRIOR)[k] for k in ("cross_check", "post_fetch", "summary_lines", "xsrc_card")}
-    keep_overall = _V0101["overall"]
+    with _LOCK10:
+        _POST.clear()
+    saved = {k: _V0101[k] for k in ("run_flows", "overall", "_last_line")}
+    keep_render = V0100.render_html
     prev_w = vars(_V0106).get("_WRITE_REPORT_V0100") if _V0106 is not None else None
-    PRIOR.cross_check = _cross_check_layer(saved["cross_check"])
-    PRIOR.post_fetch = _post_fetch_layer(saved["post_fetch"])
-    PRIOR.summary_lines = _summary_layer(saved["summary_lines"])
-    PRIOR.xsrc_card = _card_layer(saved["xsrc_card"])
-    _V0101["overall"] = _overall_layer(keep_overall)
+    _V0101["run_flows"] = _run_flows_layer(saved["run_flows"])
+    _V0101["overall"] = _overall_layer(saved["overall"])
+    _V0101["_last_line"] = _last_line
+    V0100.render_html = _render_layer(keep_render)
     if prev_w is not None:
         _V0106._WRITE_REPORT_V0100 = _stamp_layer(prev_w)
     try:
         return _ACTIVATE_PRIOR(opt, manager, py, temp)
     finally:
         PRIOR.TAG = keep_tag
-        for k, v in saved.items():
-            setattr(PRIOR, k, v)
-        _V0101["overall"] = keep_overall
+        _V0101.update(saved)
+        V0100.render_html = keep_render
         if prev_w is not None:
             _V0106._WRITE_REPORT_V0100 = prev_w
 
@@ -230,209 +919,153 @@ for _n in dir(PRIOR):
         globals()[_n] = getattr(PRIOR, _n)
 
 
-# ---------------------------------------------------------------- 對照頁(可操作的 HTML U/I:篩選 · 搜尋 · 分頁 · 驗證判決 · 收尾)
-_PAGE = r"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VDF 跨來源對照</title><style>
-:root{--bg:#f6f8fa;--card:#fff;--fg:#1f2328;--mut:#59636e;--line:#d1d9e0;--g:#1a7f37;--y:#9a6700;--r:#cf222e;--i:#57606a;--acc:#0969da}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--card:#161b22;--fg:#e6edf3;--mut:#9198a1;--line:#30363d;--g:#3fb950;--y:#d29922;--r:#f85149;--i:#8b949e;--acc:#4493f8}}
-:root[data-theme="dark"]{--bg:#0d1117;--card:#161b22;--fg:#e6edf3;--mut:#9198a1;--line:#30363d;--g:#3fb950;--y:#d29922;--r:#f85149;--i:#8b949e;--acc:#4493f8}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:16px}h1{font-size:20px;margin:0 0 4px}h2{font-size:16px;margin:18px 0 8px}
-.mut{color:var(--mut)}.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin:10px 0;overflow-wrap:anywhere}
-.lamp{display:inline-block;color:#fff;border-radius:10px;padding:0 8px;font-size:12px;font-weight:600;vertical-align:middle;white-space:nowrap}
-.GREEN,.PASS,.VERIFIED{background:var(--g)}.YELLOW,.CONFLICT{background:var(--y)}.RED,.FAIL{background:var(--r)}.INFO,.EMPTY,.SINGLE{background:var(--i)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px}
-.tile b{display:block;font-size:22px}.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
-select,input,button{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0}
-input{flex:1 1 160px}.tw{overflow-x:auto}table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
-th{position:sticky;top:0;background:var(--card);cursor:pointer;white-space:nowrap}td.v{font-family:ui-monospace,Consolas,monospace;font-size:12px}
-.ok{color:var(--g)}.bad{color:var(--r)}details{margin:6px 0}code{font-size:12px;overflow-wrap:anywhere}#meta,h1{overflow-wrap:anywhere}
-</style></head><body><div class="wrap">
-<h1>VDF 擷取後 · 跨來源對照 <span id="lamp" class="lamp"></span></h1><div class="mut" id="meta"></div>
-<div class="card" id="closeout"></div>
-<div class="tiles" id="tiles"></div>
-<h2>獨立驗證(VDF_XsrcVerifier)</h2><div class="card"><div id="verdict"></div><div class="tw"><table id="checks"></table></div></div>
-<h2>逐筆對照(驗證過的結果)</h2>
-<div class="bar"><select id="fd"></select><select id="fs"><option value="">全部判定</option><option value="VERIFIED">成功(兩個以上來源相同)</option>
-<option value="CONFLICT">衝突</option><option value="SINGLE">只有一個來源</option></select><input id="fq" placeholder="代號 / 日期 / 欄位 / 來源"><span class="mut" id="cnt"></span></div>
-<div class="tw"><table id="tbl"><thead><tr><th data-k="dataset">資料集</th><th data-k="key">代號</th><th data-k="date">日期</th><th data-k="field">欄位</th>
-<th data-k="status">判定</th><th data-k="agree">一致的來源</th><th data-k="outliers">離群</th><th>各來源的值</th></tr></thead><tbody></tbody></table></div>
-<div class="bar"><button id="prev">上一頁</button><span id="pg" class="mut"></span><button id="next">下一頁</button></div>
-<h2>日期格式體檢(引擎的表)</h2><div class="card" id="dfm"></div>
-<h2>中間檔(本輪 TEMP · 依來源分檔)</h2><div class="card" id="files"></div>
-<p class="mut">規則:同一筆(資料集 · 代號 · 日期 · 欄位)兩個以上來源相同 = 對照成功(第三個不同記離群);有兩個以上來源但沒有任兩個相同 = 衝突;只有一個來源 = 沒得對照。
-相同:價格到 0.01 · 營收整數 · 其他數值照兩邊較粗的小數位。中間檔與結果的日期一律 YYYY / YYYY-MM / YYYY-MM-DD(原寫法另欄留)。
-頁面資料的指紋 = 驗證報告的指紋,判決才套用到這一頁。</p></div>
-<script type="application/json" id="data">__DATA__</script>
-<script>
-(function(){
-var D=JSON.parse(document.getElementById('data').textContent),it=D.items,$=function(i){return document.getElementById(i)};
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-var ZH={VERIFIED:'成功',CONFLICT:'衝突',SINGLE:'單一來源',PASS:'PASS',FAIL:'FAIL',EMPTY:'沒有資料',GREEN:'GREEN',YELLOW:'YELLOW',RED:'RED',INFO:'INFO'};
-var co=D.closeout||{};$('lamp').className='lamp '+(co.lamp||'INFO');$('lamp').textContent=co.lamp||'INFO';
-$('meta').textContent=D.tag+' · '+D.stamp+' · 中間檔 '+D.temp_dir;
-$('closeout').innerHTML='<b>收尾判定</b> <span class="lamp '+esc(co.lamp)+'">'+esc(co.lamp)+'</span> '+esc(co.text||'');
-var c=D.counts||{},rate=D.rate==null?'—':(D.rate*100).toFixed(2)+'%';
-$('tiles').innerHTML=[['成功(兩個以上來源相同)',c.VERIFIED],['衝突',c.CONFLICT],['只有一個來源',c.SINGLE],['可對照',D.comparable],['成功率',rate]]
- .map(function(t){return '<div class="tile"><span class="mut">'+esc(t[0])+'</span><b>'+esc(t[1])+'</b></div>'}).join('');
-var V=D.verify||{},same=V.fingerprint&&V.fingerprint===D.page_fingerprint;
-$('verdict').innerHTML='判決 <span class="lamp '+esc(V.verdict)+'">'+esc(V.verdict)+'</span> · 中間檔 '+esc(V.rows)+' 筆 · 結果 '+esc(V.items)+' 列 · '
- +(same?'<span class="ok">頁面指紋 = 驗證報告指紋('+esc(String(V.fingerprint).slice(0,16))+')→ 判決套用</span>'
-       :'<span class="bad">頁面指紋 '+esc(String(D.page_fingerprint).slice(0,16))+' ≠ 驗證報告 '+esc(String(V.fingerprint).slice(0,16))+' → 判決不套用</span>')
- +(V.dup_count?' · <span class="mut">同一來源同一筆兩個值 '+esc(V.dup_count)+' 處(第一列生效)</span>':'');
-$('checks').innerHTML='<tr><th>核對</th><th>筆數</th><th>不符</th><th>說明</th></tr>'+Object.keys(V.checks||{}).map(function(k){var x=V.checks[k];
- return '<tr><td>'+esc(k)+'</td><td>'+esc(x.n)+'</td><td class="'+(x.bad?'bad':'ok')+'">'+esc(x.bad)+'</td><td>'+esc(x.note||'')+(x.examples&&x.examples.length?'<br><code>'+x.examples.map(esc).join('<br>')+'</code>':'')+'</td></tr>'}).join('');
-var ds=Array.from(new Set(it.map(function(r){return r.dataset}))).sort();
-$('fd').innerHTML='<option value="">全部資料集</option>'+ds.map(function(d){return '<option>'+esc(d)+'</option>'}).join('');
-var sortK='',sortD=1,page=0,PER=100,view=it;
-function apply(){var d=$('fd').value,s=$('fs').value,q=$('fq').value.trim().toLowerCase();
- view=it.filter(function(r){return(!d||r.dataset===d)&&(!s||r.status===s)&&(!q||(r.key+' '+r.date+' '+r.field+' '+r.sources).toLowerCase().indexOf(q)>=0)});
- if(sortK)view=view.slice().sort(function(a,b){return(a[sortK]>b[sortK]?1:a[sortK]<b[sortK]?-1:0)*sortD});page=0;draw()}
-function draw(){var n=view.length,pages=Math.max(1,Math.ceil(n/PER));if(page>=pages)page=pages-1;
- $('cnt').textContent='符合 '+n+' 筆';$('pg').textContent='第 '+(page+1)+' / '+pages+' 頁';
- $('tbl').tBodies[0].innerHTML=view.slice(page*PER,page*PER+PER).map(function(r){var vs=r.values||{};
-  return '<tr><td>'+esc(r.dataset)+'</td><td>'+esc(r.key)+'</td><td>'+esc(r.date)+'</td><td>'+esc(r.field)+'</td><td><span class="lamp '+esc(r.status)+'">'+esc(ZH[r.status]||r.status)+'</span></td><td>'
-   +esc(r.agree)+'</td><td>'+esc(r.outliers)+'</td><td class="v">'+Object.keys(vs).map(function(k){return esc(k)+' '+esc(vs[k])}).join('<br>')+'</td></tr>'}).join('')}
-['fd','fs'].forEach(function(i){$(i).addEventListener('change',apply)});$('fq').addEventListener('input',apply);
-$('prev').onclick=function(){if(page>0){page--;draw()}};$('next').onclick=function(){page++;draw()};
-Array.prototype.forEach.call(document.querySelectorAll('#tbl th[data-k]'),function(th){th.onclick=function(){var k=th.getAttribute('data-k');sortD=(sortK===k)?-sortD:1;sortK=k;apply()}});
-var F=D.datefmt||{};$('dfm').innerHTML=F.note?esc(F.note):('<span class="lamp '+esc(F.lamp)+'">'+esc(F.lamp)+'</span> 日期欄 '+esc(F.columns)+' · 標準 '+esc(F.standard)+' · 不標準 '+esc(F.nonstandard)
- +'(混兩種以上格式 '+esc(F.mixed)+')<div class="tw"><table><tr><th>庫</th><th>表.欄</th><th>型別</th><th>標準</th><th>格式(筆數)</th><th>例</th></tr>'
- +(F.items||[]).map(function(x){return '<tr><td>'+esc(x.db)+'</td><td>'+esc(x.table)+'.'+esc(x.column)+'</td><td>'+esc(x.type)+'</td><td class="'+(x.standard?'ok':'bad')+'">'+(x.standard?'是':'否')+(x.mixed?'(混用)':'')
-  +'</td><td>'+Object.keys(x.formats||{}).map(function(k){return esc(k)+' ×'+esc(x.formats[k])}).join('<br>')+'</td><td><code>'+(x.examples||[]).map(esc).join(' / ')+'</code></td></tr>'}).join('')
- +'</table></div><p class="mut">引擎的表照它原本的格式存(各引擎 upsert 用自己的日期格式當鍵,改寫既有列下一輪會成重複列);標準格式在中間檔與這頁的結果裡。</p>');
-$('files').innerHTML=(D.files||[]).map(function(f){return '<code>'+esc(f)+'</code>'}).join('<br>')||'—';
-apply();
-})();
-</script></body></html>"""
-
-
-def closeout(xs: dict, rep: dict) -> dict:
-    """收尾判定:驗證器 FAIL = 紅(結果不可信)· 沒有可對照資料 = INFO · 驗證 100% 且沒有衝突 = 綠(收尾成功)· 驗證 100% 但有衝突 = 黃(列出待查)。"""
-    v = (rep or {}).get("verdict")
-    c = (xs or {}).get("counts") or {}
-    if v == "FAIL":
-        bad = [k.split(" ")[0] for k, x in (rep.get("checks") or {}).items() if x.get("bad")]
-        return {"lamp": "RED", "text": "結果驗證沒過(%s 有不符)→ 結果不可信,不能收尾" % "、".join(bad)}
-    if v != "PASS":
-        return {"lamp": "INFO", "text": "本輪沒有兩個以上來源的資料可對照(%s)" % ((xs or {}).get("note") or "資料庫裡沒有多來源的表")}
-    if c.get("CONFLICT"):
-        return {"lamp": "YELLOW", "text": "結果 100%% 驗證過;成功 %s · 衝突 %s 筆(來源對不上,見下表「衝突」)· 單一來源 %s" % (c.get("VERIFIED"), c.get("CONFLICT"), c.get("SINGLE"))}
-    return {"lamp": "GREEN", "text": "收尾成功:結果 100%% 驗證過 · 可對照 %s 筆全部兩個以上來源相同 · 單一來源 %s" % (xs.get("comparable"), c.get("SINGLE"))}
-
-
-def write_ui(xs: dict, datefmt: dict, rep: dict, stamp: str, out_dir: Path) -> dict:
-    """對照頁:讀磁碟上的對照結果(= 驗證器核對的那份)嵌進頁面;頁面指紋 = 驗證報告指紋才套用判決。"""
-    xdir = Path((xs.get("temp") or {}).get("dir", ""))
-    rows = VER.result_rows(xdir) if xdir.is_dir() else []
-    items = []
-    for r in rows:
-        try:
-            vals = json.loads(r["values"])
-        except (ValueError, TypeError):
-            vals = {}
-        items.append({k: r[k] for k in ("dataset", "key", "date", "field", "status", "sources", "agree", "outliers")}
-                     | {"values": {s: str(v) for s, v in vals.items()}})   # 原值照中間檔那格的字串(200.0 不變成 200)
-    data = {"tag": TAG, "stamp": stamp, "temp_dir": str(xdir), "counts": xs.get("counts"), "comparable": xs.get("comparable"), "rate": xs.get("rate"),
-            "verify": {k: rep.get(k) for k in ("verdict", "checks", "fingerprint", "rows", "items", "dup_count")}, "page_fingerprint": VER.fingerprint(rows),
-            "closeout": xs.get("closeout"), "datefmt": datefmt, "files": (xs.get("temp") or {}).get("files", []), "items": items}
-    blob = json.dumps(data, ensure_ascii=False, default=str).replace("</", "<\\/")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    page = out_dir / ("VDF_XSRC_%s.html" % stamp)
-    page.write_text(_PAGE.replace("__DATA__", blob), encoding="utf-8")
-    latest = out_dir / "VDF_XSRC_latest.html"
-    latest.write_text(page.read_text(encoding="utf-8"), encoding="utf-8")
-    j = out_dir / ("XSRC_VERIFY_%s.json" % stamp)
-    j.write_text(json.dumps({"verify": rep, "closeout": xs.get("closeout"), "page_fingerprint": data["page_fingerprint"]}, ensure_ascii=False, indent=1, default=str),
-                 encoding="utf-8")
-    (out_dir / "XSRC_VERIFY_latest.json").write_text(j.read_text(encoding="utf-8"), encoding="utf-8")
-    return {"html": str(page), "latest": str(latest), "json": str(j), "page_fingerprint": data["page_fingerprint"]}
-
-
 # ---------------------------------------------------------------- 自測
+def make_fixture(root: Path) -> Path:
+    """測試用資料庫家(工作站同名表 · 同欄位):交易所民國日期混 ISO · Yahoo 浮點雜訊 · 月營收兩來源(同一來源抓兩次取新)· 他系統表 · 整數日期欄。"""
+    duckdb = _duck()
+    (root / "mega").mkdir(parents=True, exist_ok=True)
+    (root / "tw_index").mkdir(parents=True, exist_ok=True)
+    c = duckdb.connect(str(root / "mega" / "vdf_tw_market.duckdb"))
+    c.execute("CREATE TABLE tw_trading_daily(date VARCHAR, code VARCHAR, market VARCHAR, volume DOUBLE, close DOUBLE)")
+    c.execute("INSERT INTO tw_trading_daily VALUES ('1150824','2330','TWSE',1,1045.0),('2026-08-25','2330','TWSE',1,1050.0),"
+              "('1150824','2317','TWSE',1,200.0),('1150824','5347','TPEX',1,30.35),('1150824','0050','TWSE',1,190.0),('1150701','2330','TWSE',1,900.0)")
+    c.execute("CREATE TABLE tw_daily_prices(date DATE, ticker VARCHAR, close DOUBLE, adj_close DOUBLE)")
+    c.execute("INSERT INTO tw_daily_prices VALUES ('2026-08-24','2330.TW',1044.9999389648438,1.0),('2026-08-25','2330.TW',1050.0,1.0),"
+              "('2026-08-24','2317.TW',201.0,1.0),('2026-08-24','5347.TWO',30.35,1.0)")
+    c.execute("CREATE TABLE tw_monthly_revenue(code VARCHAR, ym VARCHAR, revenue BIGINT, source VARCHAR, fetched_at TIMESTAMP)")
+    c.execute("INSERT INTO tw_monthly_revenue VALUES ('2330','202607',100,'MOPS_OFFICIAL','2026-08-10 09:00'),('2330','202607',100,'CNYES','2026-08-10 09:00'),"
+              "('2317','202607',500,'MOPS_OFFICIAL','2026-08-10 09:00'),('2317','202607',400,'CNYES','2026-08-09 09:00'),"
+              "('2317','202607',500,'CNYES','2026-08-11 09:00'),('6488','202607',77,'MOPS_OFFICIAL','2026-08-10 09:00')")
+    c.execute("CREATE TABLE vrn_report_x(report_date VARCHAR, v DOUBLE)")
+    c.execute("INSERT INTO vrn_report_x VALUES ('亂寫', 1)")
+    c.close()
+    c = duckdb.connect(str(root / "tw_index" / "VDF_TWIndex_Daily.duckdb"))
+    c.execute("CREATE TABLE twii(trade_date INTEGER, close DOUBLE)")
+    c.execute("INSERT INTO twii VALUES (20260824, 23000.5), (20260825, 23100.0)")
+    c.close()
+    return root
+
+
 def selftest() -> int:
     ok = []
 
     def chk(name, cond, note=""):
         ok.append(bool(cond))
         print(f"  [{'OK' if cond else 'FAIL'}] {name}" + (f" · {note}" if note != "" else ""), flush=True)
-    print(f"=== {TAG} · 薄尾自測(結果獨立驗證 + 對照頁 + 收尾判定;沙盒 · 零網路)===", flush=True)
-    rows = [{"dataset": "d", "key": k, "date": "2026-08-24", "field": "close", "value": v, "source": s, "dec": 2}
-            for k, s, v in (("A", "TWSE", 1.0), ("A", "YAHOO", 1.0), ("B", "TWSE", 2.0))]
-    r = _cross_check_layer(PRIOR.cross_check)(rows)
-    a_, b_ = (next(i for i in r["items"] if i["key"] == k) for k in ("A", "B"))
-    chk("Ⓚ 只有一個來源 → 「一致的來源」是空的(v0110 寫成那個來源本身,獨立驗證器 V3 抓到)· 成功那筆照舊",
-        b_["status"] == "SINGLE" and b_["agree"] == [] and a_["agree"] == ["TWSE", "YAHOO"], (a_["agree"], b_["agree"]))
-    cs = {"VERIFIED": 5, "CONFLICT": 1, "SINGLE": 3}
-    co = [closeout({"counts": c_, "comparable": 6}, {"verdict": v_, "checks": {"V1 x": {"bad": 1}} if v_ == "FAIL" else {}})["lamp"]
-          for c_, v_ in ((cs, "FAIL"), (cs, "EMPTY"), (cs, "PASS"), (dict(cs, CONFLICT=0), "PASS"))]
-    chk("Ⓝ 收尾判定:驗證 FAIL → 紅(不可信)· 沒資料 → INFO · 驗證 100% 有衝突 → 黃 · 驗證 100% 沒衝突 → 綠(收尾成功)", co == ["RED", "INFO", "YELLOW", "GREEN"], co)
-    have = PRIOR._duck() is not None
-    keep_rep = V0100.REPORT_DIR
+    print(f"=== {TAG} · 薄尾自測(擷取後日期格式體檢 + 跨來源對照 + 心跳略過警告原始碼行;沙盒 · 零網路)===", flush=True)
+    cases = [("2024-10-01", "2024-10-01"), ("20241001", "2024-10-01"), ("1150824", "2026-08-24"), ("113/10/01", "2024-10-01"),
+             ("114年09月12日", "2025-09-12"), ("2024/9/5", "2024-09-05"), ("2024-10-01 13:30:00", "2024-10-01"), ("Oct 1, 2024", "2024-10-01"),
+             ("202410", "2024-10"), ("11507", "2026-07"), ("113/10", "2024-10"), ("2024Q3", "2024-09"), ("113年第3季", "2024-09"),
+             ("2024", "2024"), ("FY2024", "2024"), ("113年度", "2024"), (datetime(2024, 10, 1, 9, 30), "2024-10-01"),
+             ("2024-02-30", None), ("1151399", None), ("abc", None), ("1,234", None), (12.5, None)]
+    got = [(v, iso_date(v)[0], w) for v, w in cases]
+    chk("Ⓐ 日期一律 YYYY / YYYY-MM / YYYY-MM-DD:西元 · 8 碼 · 民國 7 碼(交易所)· 民國斜線 · 中文年月日 · 帶時刻 · 英文月份 · YYYYMM · 民國 5 碼 · "
+        "季 → 季末月 · 年度;不存在的日期 / 非日期 → 不轉", all(g == w for _v, g, w in got), [x for x in got if x[1] != x[2]] or f"{len(cases)} 種")
+    c1 = date_column("trade_date", [20241001, 20241002, None])
+    chk("Ⓑ 整欄判斷:欄名像日期的整數欄才當日期(成交量 20241001 不轉)· 民國年月欄 → YYYY-MM · a/b/YYYY 整欄推讀法",
+        date_column("volume", [20241001, 20241002]) is None and c1 and c1["values"] == ["2024-10-01", "2024-10-02", None]
+        and date_column("年月", ["113/09", "113/10"])["values"] == ["2024-09", "2024-10"]
+        and date_column("x", ["01/02/2024", "13/02/2024"])["values"] == ["2024-02-01", "2024-02-13"])
+    r = cross_check([{"dataset": "d", "key": "2330", "date": "2026-08-24", "field": "close", "value": v, "source": s, "dec": 2}
+                     for s, v in (("TWSE", 1045.0), ("YAHOO", 1044.9999389648438), ("X", 1050.0))]
+                    + [{"dataset": "d", "key": "2317", "date": "2026-08-24", "field": "close", "value": v, "source": s, "dec": 2}
+                       for s, v in (("TWSE", 10.3), ("YAHOO", 10.35))]
+                    + [{"dataset": "d", "key": "0050", "date": "2026-08-24", "field": "close", "value": 190, "source": "TWSE", "dec": 2}])
+    v = next(i for i in r["items"] if i["key"] == "2330")
+    chk("Ⓒ 對照規則:兩個以上來源相同 = 成功(第三個不同記離群)· 沒有任兩個相同 = 衝突(10.30 ≠ 10.35)· 只有一個來源 = 單一 · 浮點雜訊 1044.99994 = 1045.00",
+        r["counts"] == {"VERIFIED": 1, "CONFLICT": 1, "SINGLE": 1} and v["agree"] == ["TWSE", "YAHOO"] and v["outliers"] == ["X"]
+        and next(i for i in r["items"] if i["key"] == "0050")["agree"] == []
+        and same("1,045.00", 1045) and not same(100, "100.4") and same("ＡＢＣ", "abc"), r["counts"])
+    with tempfile.TemporaryDirectory(prefix="activatevdf110_") as td:
+        lg = Path(td) / "step.log"
+        lg.write_text("[步] 第 2 段 抓 2330\nC:\\x\\VDF\\VDF_SystemManager_v0155.py:6: SyntaxWarning: invalid escape sequence '\\o'\n"
+                      "  工作站 ActivateVDF 真跑:db_check RED。容器同一支 db check 實看(VDF\\output_hub)\n", encoding="utf-8")
+        a = _last_line(lg)
+        lg.write_text("[步] 第 2 段\n  [進行中] 縮排的真進度行\n", encoding="utf-8")
+        b = _last_line(lg)
+    chk("Ⓓ 心跳最後一行:略過 SyntaxWarning 與它下一行被印出來的原始碼(工作站每步都顯示同一句舊說明);一般縮排的進度行照顯示",
+        a == "[步] 第 2 段 抓 2330" and b == "[進行中] 縮排的真進度行", (a, b))
+    have = _duck() is not None
     if not have:
-        chk("Ⓛ duckdb 不在本境 → 對照 / 驗證不跑(不代裝);收尾 INFO", closeout({"note": "沒有 duckdb"}, {"verdict": "EMPTY"})["lamp"] == "INFO")
+        chk("Ⓔ duckdb 不在本境 → 資料庫段不驗(不代裝);擷取後那一步照實寫「沒有 duckdb」", "沒有 duckdb" in post_fetch(
+            type("O", (), {"db_home": None, "fetch_home": None})(), {"temp_run": tempfile.gettempdir()})["xsrc"]["note"])
     else:
-        with tempfile.TemporaryDirectory(prefix="activatevdf111_") as td:
+        with tempfile.TemporaryDirectory(prefix="activatevdf110_db_") as td:
             t = Path(td)
-            home = PRIOR.make_fixture(t / "output_hub")
+            home = make_fixture(t / "output_hub")
             opt = type("O", (), {"db_home": str(home), "fetch_home": None})()
-            keep_cc = PRIOR.cross_check
-            V0100.REPORT_DIR = t / "rep" / "activate"
+            keep_days = os.environ.get("VIA_XSRC_DAYS")
+            os.environ["VIA_XSRC_DAYS"] = "2"              # 最近 2 個交易日:2330 的 07-01(只有交易所有)要被窗口排除
             try:
-                PRIOR.cross_check = _cross_check_layer(keep_cc)
-                post = _post_fetch_layer(PRIOR.post_fetch)(opt, {"temp_run": str(t / "tmp" / "run_20261020_090000")})
+                post = post_fetch(opt, {"temp_run": str(t / "run")})
             finally:
-                PRIOR.cross_check = keep_cc
-                V0100.REPORT_DIR = keep_rep
-            xs = post["xsrc"]
-            rep, ui = xs.get("verify") or {}, xs.get("ui") or {}
-            page = Path(ui.get("latest", "/nonexistent")).read_text(encoding="utf-8") if ui.get("latest") else ""
-            chk("Ⓛ 測試庫整段:對照 → 獨立驗證 PASS(六項不符 0 · 回原表逐筆)→ 收尾 黃(有 1 筆衝突)→ 對照頁 + 驗證 JSON;頁面指紋 = 驗證指紋",
-                rep.get("verdict") == "PASS" and xs["closeout"]["lamp"] == "YELLOW" and ui.get("page_fingerprint") == rep.get("fingerprint")
-                and '"verdict": "PASS"' in page and Path(ui["json"]).is_file() and Path(ui["latest"]).name == "VDF_XSRC_latest.html",
-                {k.split(" ")[0]: v["bad"] for k, v in (rep.get("checks") or {}).items()})
-            f = next(Path(p) for p in xs["temp"]["files"] if p.endswith("tw_daily_close__TWSE.csv"))
-            txt = f.read_text(encoding="utf-8-sig").replace(",1045.0,", ",1046.0,")
-            f.write_text(txt, encoding="utf-8-sig")
-            rep2 = VER.verify(Path(xs["temp"]["dir"]), xs, PRIOR.db_files(opt), post["datefmt"])
-            keep_post = dict(vars(PRIOR)["_POST"])
-            vars(PRIOR)["_POST"].clear()
-            vars(PRIOR)["_POST"]["xsrc"] = dict(xs, verify=rep2)
-            lamp = _overall_layer(lambda lists, flows: "GREEN")(None, None)
-            vars(PRIOR)["_POST"].clear()
-            vars(PRIOR)["_POST"].update(keep_post)
-            chk("Ⓜ 中間檔被改一個值(1045.0 → 1046.0)→ 獨立驗證 FAIL(V1 回原表不符)→ 收尾 紅 · 總燈 紅",
-                rep2["verdict"] == "FAIL" and rep2["checks"][next(k for k in rep2["checks"] if k.startswith("V1"))]["bad"] >= 1
-                and closeout(xs, rep2)["lamp"] == "RED" and lamp == "RED", lamp)
-            h = PRIOR.xsrc_card({"xsrc": xs, "datefmt": post["datefmt"]})
-            h2 = _card_layer(PRIOR.xsrc_card)({"xsrc": xs, "datefmt": post["datefmt"]})
-            sl = _summary_layer(PRIOR.summary_lines)(post)
-            chk("Ⓞ 總覽卡多「結果獨立驗證 · 收尾 · 打開對照頁」(在同一張卡裡)· 終端多 ⑨ ⑩ 兩行與對照頁路徑",
-                h and h2.startswith(h[:h.rfind("</section>")]) and "結果獨立驗證" in h2 and "打開對照頁" in h2 and h2.endswith("</section>")
-                and any(x.startswith("  ⑨ 結果獨立驗證 PASS") for x in sl) and any(x.startswith("  ⑩ 收尾 YELLOW") for x in sl), [x[:30] for x in sl[-3:]])
-            evil = dict(xs, temp={"dir": str(t / "nope"), "files": []})
-            u2 = write_ui(evil, {"note": "</script><b>x"}, {"verdict": "EMPTY", "checks": {}}, "evil", t / "ui2")
-            pg2 = Path(u2["latest"]).read_text(encoding="utf-8")
-            chk("Ⓟ 對照頁資料嵌入安全:資料裡有 </script> 也不會提早結束(轉成 <\\/script>)· 篩選 / 搜尋 / 分頁 / 排序元件都在 · 深色模式",
-                pg2.count("</script>") == 2 and "<\\/script>" in pg2 and all(x in pg2 for x in ('id="fd"', 'id="fs"', 'id="fq"', 'id="prev"', 'data-k="key"', "prefers-color-scheme:dark")))
-    chk("Ⓠ 本輪換上的函式不在一輪裡時都是原樣(v0110 的 cross_check / post_fetch / summary_lines / xsrc_card · v0101 overall)",
-        all("<locals>" not in getattr(vars(PRIOR)[k], "__qualname__", "") for k in ("cross_check", "post_fetch", "summary_lines", "xsrc_card"))
-        and "<locals>" not in getattr(_V0101["overall"], "__qualname__", ""))
+                if keep_days is None:
+                    os.environ.pop("VIA_XSRC_DAYS", None)
+                else:
+                    os.environ["VIA_XSRC_DAYS"] = keep_days
+            xs, df = post["xsrc"], post["datefmt"]
+            ds = xs["datasets"]
+            tw, rv = ds.get("tw_daily_close", {}), ds.get("tw_monthly_revenue", {})
+            files = [Path(f).name for f in xs["temp"]["files"]]
+            yh = (t / "run" / "xsrc" / "tw_daily_close" / "tw_daily_close__YAHOO.csv")
+            yrows = list(csv.DictReader(open(yh, encoding="utf-8-sig"))) if yh.is_file() else []
+            chk("Ⓔ 跨來源對照(測試庫 · 最近 2 個交易日):TW 日收盤 交易所 × Yahoo → 成功 3(民國 1150824 與 ISO 同一天對得上)· 衝突 1(2317 200 ≠ 201)· 單一 1(0050)· 窗口外的 07-01 不列;"
+                "月營收 MOPS × CNYES → 成功 2(同來源抓兩次取最新)· 單一 1;他系統表不讀",
+                (tw.get("VERIFIED"), tw.get("CONFLICT"), tw.get("SINGLE")) == (3, 1, 1) and (rv.get("VERIFIED"), rv.get("CONFLICT"), rv.get("SINGLE")) == (2, 0, 1)
+                and xs["lamp"] == "YELLOW" and tw.get("sources") == ["TPEX", "TWSE", "YAHOO"]
+                and not any(i.get("date") == "2026-07-01" for i in xs["conflicts_top"]) and "2026-08-24 → 2026-08-25" in " ".join(xs["notes"]),
+                {k: (d["VERIFIED"], d["CONFLICT"], d["SINGLE"]) for k, d in ds.items()})
+            chk("Ⓕ 中間檔(本輪 temp/xsrc):每個資料集每個來源一檔(source 欄標註來源)+ 對照結果;日期欄一律標準格式、原始寫法另欄留",
+                {"tw_daily_close__TWSE.csv", "tw_daily_close__TPEX.csv", "tw_daily_close__YAHOO.csv", "tw_daily_close__對照結果.csv",
+                 "tw_monthly_revenue__MOPS_OFFICIAL.csv", "tw_monthly_revenue__CNYES.csv", "tw_monthly_revenue__對照結果.csv"} <= set(files)
+                and yrows and all(r_["source"] == "YAHOO" and _STD.match(r_["date"]) for r_ in yrows)
+                and all(_STD.match(r_["date"]) for f in xs["temp"]["files"] for r_ in csv.DictReader(open(f, encoding="utf-8-sig"))), files)
+            bad = {(c["table"], c["column"]): c for c in df["items"] if c.get("standard") is False}
+            std = {(c["table"], c["column"]) for c in df["items"] if c.get("standard")}
+            chk("Ⓖ 日期格式體檢:交易所 date 民國 7 碼混 ISO(標混用)· 月營收 ym YYYYMM · 指數 trade_date 整數 YYYYMMDD → 不標準;DATE 型別 = 標準;"
+                "fetched_at(紀錄時間)與他系統表(vrn_)不列",
+                ("tw_trading_daily", "date") in bad and bad[("tw_trading_daily", "date")]["mixed"] and ("tw_monthly_revenue", "ym") in bad
+                and ("twii", "trade_date") in bad and ("tw_daily_prices", "date") in std
+                and not any(k[1] == "fetched_at" or k[0].startswith("vrn_") for k in list(bad) + list(std)) and df["lamp"] == "YELLOW",
+                sorted("%s.%s" % k for k in bad))
+            page = xsrc_card({"xsrc": dict(xs, conflicts_top=[dict(xs["conflicts_top"][0], key="<b>")]) if xs["conflicts_top"] else xs, "datefmt": df})
+            chk("Ⓗ 總覽頁卡:對照計數 · 每資料集一列 · 衝突明細(跳脫)· 中間檔位置 · 日期不標準的欄;沒有結果 → 不出卡",
+                'id="xsrc"' in page and "&lt;b&gt;" in page and "<b>2330" not in page and "tw_trading_daily" in page and xsrc_card({}) == "")
+    saved = {k: _V0101[k] for k in ("run_flows", "overall", "_last_line")}
+    keep_r, keep_w = V0100.render_html, (vars(_V0106).get("_WRITE_REPORT_V0100") if _V0106 is not None else None)
+    lay = _overall_layer(lambda lists, flows: lists)
+    with _LOCK10:
+        _POST.clear()
+        _POST["xsrc"] = {"lamp": "YELLOW"}
+    l1, l2 = lay("GREEN", []), lay("RED", [])
+    with _LOCK10:
+        _POST["xsrc"] = {"lamp": "GREEN"}
+    l3 = lay("GREEN", [])
+    with _LOCK10:
+        _POST.clear()
+    seen = []
+    _stamp_layer(lambda c, u=None: seen.append(dict(c)) or c)({"lamp": "GREEN", "schema": "VDF_ActivateVDF_v0110"})
+    chk("Ⓘ 總燈:綠 + 對照有衝突 → 黃(不擋、不紅)· 紅照紅 · 沒衝突照綠;落檔最內層標 v0111;本輪換上的函式不在一輪裡時都是原樣(前版自測驗的身分不變)",
+        (l1, l2, l3) == ("YELLOW", "RED", "GREEN") and seen and seen[0]["schema"] == "VDF_ActivateVDF_v0111" and seen[0]["tag"] == TAG
+        and V0100.render_html is keep_r and V0100.write_report is PRIOR.write_report and saved["_last_line"] is not _last_line
+        and (keep_w is None or vars(_V0106).get("_WRITE_REPORT_V0100") is keep_w))
+    o0 = type("O", (), {"db_home": "repo/output_hub", "fetch_home": None})()
+    o1 = _with_home(o0, [{"flow": "fetch"}, {"flow": "db", "db_home": "C:/via_database/vdf_database"}])
+    chk("Ⓣ 資料庫家 = 資料庫流程 db where 選的(流程結果 db_home)· 沒選 / 同一個 → 照原本 · 原 opt 不改",
+        o1.db_home == "C:/via_database/vdf_database" and o0.db_home == "repo/output_hub" and _with_home(o0, [{"flow": "db"}]) is o0
+        and _with_home(o0, [{"db_home": "repo/output_hub"}]) is o0)
     src = Path(__file__).read_text(encoding="utf-8")
     imports = re.findall(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", src, re.M)
-    vsrc = Path(_VER_PATH).read_text(encoding="utf-8")
-    chk("Ⓡ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫;驗證器是另一支檔(不匯入 ActivateVDF)",
+    chk("Ⓙ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫;資料庫只唯讀開(read_only=True · 沒有寫入語句)",
         "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src and "def _via_net" in src
         and not [x for x in imports if x.startswith(("CGC_", "VRN_", "VCGC", "via_duck_temp"))]
         and not re.search(r"^\s*(import|from)\s+" + "talib", src, re.M)
         and not re.search(r"\[[\"']VIA_(NET|SCRAPE)_" + r"CONSENT[\"']\]\s*=(?!=)", src)
-        and not re.search(r"^\s*(import|from)\s+(VDF_MDL013|ActivateVDF)", vsrc, re.M), _VER_PATH.name)
+        and "read_only=True" in src and not re.search(r"\b(INSERT\s+INTO|UPDATE\s+\S+\s+SET|DELETE\s+FROM|ALTER\s+TABLE|DROP\s+TABLE|CREATE\s+TABLE)\b",
+                                                       src.split("def make_fixture", 1)[0]))
     n_ok = sum(ok)
     print(f"  [計] {TAG} 本版 {n_ok}/{len(ok)} · {'PASS' if all(ok) else 'FAIL'}", flush=True)
     if not all(ok):
-        return 1
-    print(f"  ── 獨立驗證器 {_VER_PATH.name} 自測 ──", flush=True)
-    if VER.selftest() != 0:
         return 1
     rc1 = PRIOR.selftest()
     return rc1 if rc1 in (0, 1, 2, 3) else 1        # 前版紅照實回(同 v0102 / v0107 … v0110)
