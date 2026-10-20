@@ -31,7 +31,19 @@
 [政策] L50 全景 · 尾版 628 · import 0 · 提及 100 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0159.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0160.py(家族 vdf)
+=== VDF_SystemManager v0160 · 薄尾自測(啟動就緒短令沿 Register 點源鏈讀)===
+  [OK] ① 鏈讀:尾版 v0003 → v0002 → v0001(尾版在前 · 只同夾 · 只讀)
+  [OK] ② 薄尾單檔找不到 via-vdffetch,沿鏈讀找得到(v0104 ④ 的同一條判準)
+  [OK] ③ 防環(互相點源 = 2 本)· 不是 Register 的檔照舊讀單檔 · 缺檔回空字串
+  [OK] ④ 真樹:read_launch 由本版門代答,16 個啟動短令沿鏈全找到(cmds_missing 空)· why 不再含「Register via-vdffetch」· 同意閘只讀
+  [OK] ⑤ 代答完 v0104 本體的 _src 還原(不留替身)· v0155 的 READY 指到本版門(all 的 ready 步走本版)
+  [OK] ⑥ all --dry 經本版 main 直通 v0155(列 9 步 · rc 0 · 不寫檔)
+  [OK] ⑦ 橋在(__future__ 之後)· 不碰 TA-Lib · 不代設同意閘 · 不載入 VCGC 程式 · 本檔不起子行程 · 零網路
+  [OK] ⑨ 一格的字:1163.0 → 1163 · None / NaN / 空字串 → — · 0 → 0 · 0.5 照印 · 日期照印 · CSV 空值留空
+  [OK] ⑩ 寫檔(暫存夾):CSV 整數照整數、空值留空、沒有 .0 · 頁上表整數照整數、空值 —、燈色照前版 · 頁殼(標題 · 摘要)照前版 · JSON 照前版
+  [OK] ⑪ 接手點:v0151 模組的 _write_db = 本版(db check 經它寫)· 原版存在模組上(再載一次不包兩層)
+  ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──
 === VDF_SystemManager v0159 · 薄尾自測(all 一鍵全部 + 啟動就緒門)===
   [OK] ① 啟動就緒門:read_launch 由 v0104 本體代答(有 state · consent · python · hist_limit;同意閘只讀)
   [OK] ② 問參數頁那一格:ENG093 readiness() 經尾版門拿到狀態(不再是 ABSENT 空因由)
@@ -118,7 +130,7 @@
   [OK] ① db check:px OK(哨兵列不算最新日)· gone 缺表 · rev 列數不足 · old 過舊 · nodb 缺庫 · extra 冊上沒列 · 寫出 html/csv/json · {'RED': 3, 'YELLOW': 1, 'GREEN': 1, 'INFO': 1}
   [OK] ② db move 乾跑:列複製計畫 · 一檔都不寫
   [OK] ③ --apply 沒還原點:資料複製 + 驗證列數一致,但接點不切 · 舊家原樣 · 資料已複製且驗證通過,但還原點帳沒有紀錄(先跑 CGC_MDL274_HealthMatrix restorepoint) → 接點不切(先建還原點再重跑)
-  [OK] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-gmjse1j4/repo/output_hub → /tmp/vdfsm151-gmjse1j4/vdf_database/output_hub(舊家 /tmp/vdfsm151-gmjse1j4/home/output_hub 原樣保留)
+  [OK] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-7dud7z_v/repo/output_hub → /tmp/vdfsm151-7dud7z_v/vdf_database/output_hub(舊家 /tmp/vdfsm151-7dud7z_v/home/output_hub 原樣保留)
   [OK] ⑤ 再跑:已在新家 = GREEN 不動
 [拒跑] db 子動詞:check [--home 夾] · move --to 夾 [--apply]
   [OK] ⑥ 未知動詞清單含 db · db 子動詞錯 = rc2
@@ -318,13 +330,13 @@
   [OK] ① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節 · VDF_InputUniverse_SSOT_v0101.json
   [OK] ② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED · {'2026-09-29': 'GREEN', '2026-09-30': 'YELLOW', '2026-10-01': 'RED'}
   [OK] ③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊) · {'2026-09-29': (2, 2, 2, 2, 'GREEN'), '2026-09-30': (2, 1, 2, 1, 'YELLOW'), '2026-10-01': (1, 0, 1, 0, 'YELLOW')}
-  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmpzgb_wag6/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmpzgb_wag6/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
+  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmpxcvc7d_0/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmpxcvc7d_0/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
   [OK] ⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵) · ([], [])
   [OK] ⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)
-  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmpzgb_wag6/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
+  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmpxcvc7d_0/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
   [OK] ⑧ 資料家不可用 = NODATA(不假寫)
   [OK] ⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock) · ('RELOCK', 'VIA_Workflow_VDF_SSOT_v0105.json')
-  [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在
+  [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在 · {'vcgc_only': False}
   [OK] ⑪ 加速器橋 · 網路橋 · 正典橋在;不碰 TA-Lib;不代設同意閘
 === VDF_SystemManager v0121 · 薄尾自測(輸入範圍 · 輸出項目與表頭)===
   [OK] ① 冊:三組輸入(個股 · 主動股票 ETF · 指數)+ 五項輸出
@@ -475,9 +487,10 @@
   [樣本冊] v0150 自測期間補冊:VDF_ENG056_ChipBackfill_v0106.py
   [OK] ⑧ 前版鏈 VDF_SystemManager_v0158 自測 rc 0
 [計] VDF_SystemManager_v0159 自測 8/8 · PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'CGC_MD → via-vcgc sdd check
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0159 自測 rc 0
+[計] VDF_SystemManager_v0160 自測 11/11 · PASS
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0105.py', 'VRN_ENG → via-vcgc sdd check
 usage: refill [-h] [--groups GROUPS] [--as-of AS_OF] [--home HOME] [--apply]
               [--timeout TIMEOUT] [--json]
 refill: error: unrecognized arguments: --nope
-  [沿用] sync_check · 鑰匙 af6a682fffcc4fd2 · 0s 前算的(--fresh 強制重算)
-[監控] 背景全景監控中 pid 18708 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 607 提交 · 快照 420.4h · 未推 8 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 4196 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 615 提交 · 快照 421.4h · 未推 3 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
