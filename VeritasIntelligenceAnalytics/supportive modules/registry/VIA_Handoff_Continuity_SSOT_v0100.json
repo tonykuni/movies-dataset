@@ -6207,6 +6207,16 @@
       "next": "無",
       "case": "vdf_xsrc_verifier",
       "receipt": "docs/handoff/evidence/vdf_xsrc_verifier.json"
+    },
+    {
+      "id": "VDF-REQ018:r3-effchain",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "PR #542 Codex P1(實測確認):第二輪轉接尾版把前版鏈各支另載,繞過中間層 _prior() 的補丁(gate_open 換成 CGC_MDL224 ScrapeGate),經尾版取 gate_open / run 拿到沒補丁的舊定義(雙同意字典:舊尾版 False · 新尾版 True)。ENG056 v0108 · ENG057 v0111 · ENG059 v0105 · ENG075 v0107 改走生效鏈(上一層無參 _prior() 的回傳,沒有才另載);自測加 ⑥ 生效鏈 · ⑦ gate_open 字典實測 · ⑧ 防呆,四支 8/8;突變 6 抓 5(1 等價)。另 6 族(ENG100/102/110/113/115/116)中間層 _prior() 不補丁,逐函式比對等價,不改 → 已驗:vdf_r2_tailapi_eng056 2026-10-20T06:28:02+00:00 rc 0 · vdf_r2_tailapi_eng057 2026-10-20T06:28:25+00:00 rc 0 · vdf_r2_tailapi_eng059 2026-10-20T06:28:49+00:00 rc 0 · vdf_r2_tailapi_eng075 2026-10-20T06:29:12+00:00 rc 0",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng056",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng056.json"
     }
   ]
 }
