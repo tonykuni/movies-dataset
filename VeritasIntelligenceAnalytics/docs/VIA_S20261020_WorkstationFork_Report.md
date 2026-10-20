@@ -262,3 +262,31 @@ Codex 審查(#548)兩條 P2 已修:① VCGC 步冊兩列在、但引擎檔不在
 ② 擷取冊 009 / 010 缺一 → ABSENT 不放行(原本只跑剩下那支就回 OK;自測 ⑩b)。各加突變(不看引擎 · 不看並行道版 · 缺一照跑)全被抓到。
 
 交接案:`vdf_ws_manager_design` · `vdf_ws_eng093_lists`;延後項 `VDF-REQ018:ws-fork-deferred` 帶理由轉 VERIFIED。
+
+## 第四批:工作站同步到 main —— `VDF_MDL014_WorkstationSync_v0101.py`(操作員令「用 MDL014 把工作站同步到 main」)
+
+MDL014 的「同步」= **VDF 改從自己固定在 `origin/main` 的工作樹跑**;工作站原 checkout(含 VRN-2 / VCGC 的本機工作)一個位元組都不動(L123)。
+v0100 在工作站實況下有兩個缺口,v0101(薄尾)補上:
+
+| 缺口 | v0100 | v0101 |
+|---|---|---|
+| 工作站 checkout 是分岔、沒有 MDL014 這支檔 → 只能從工作樹裡跑 | 把工作樹當原 checkout:量不到分岔、不備份,還再建一個 `<工作樹>-vdf-main` | 原 checkout = `git worktree list` 第一個;本檔在工作樹裡 → 就用這個工作樹;`--repo` 可明指(自測 ①③) |
+| VDF 資料不在 git(`output_hub` 的 DuckDB · `VIA_Reports/vdf_fetch`) | 工作樹裡的 VDF 是空的 | `--apply` 時以目錄接點(junction,免管理員)接到原 checkout 的實體夾;已有實體夾不動 · 原處沒有不接 · 已接照舊(自測 ④⑥⑦) |
+| 接點被 git 當未追蹤(`output_hub/` 帶斜線只擋實體夾)| 第二次跑會誤判工作樹髒而停 | 量髒時濾掉本版的接點(自測 ⑤) |
+
+自測 9/9(含前版 v0100 15/15);突變 10 個全抓到(其中「不用本檔所在工作樹」第一次活下來:自測假倉的工作樹剛好放在 v0100 預設位置,改放別處後抓到)。
+容器內對真倉只做預演(`--apply` 會把收據分支推到 GitHub;本線只推指定分支)。
+
+### 工作站步驟(PowerShell)
+
+```powershell
+cd <你的倉根>
+git fetch origin
+$wt = "$env:LOCALAPPDATA\VIA\" + (Split-Path -Leaf (git rev-parse --show-toplevel)) + "-vdf-main"
+if (Test-Path $wt) { git -C $wt checkout --detach origin/main } else { git worktree add --detach $wt origin/main }
+$m = "$wt\VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL014_WorkstationSync_v0101.py"
+python $m --case qg_onebridge --case vdf_ws_manager_design --case vdf_ws_eng093_lists            # 預演:只量不動
+python $m --case qg_onebridge --case vdf_ws_manager_design --case vdf_ws_eng093_lists --apply    # 執行
+```
+
+之後 VDF 一律從 `$wt` 跑(管理員 · 啟動台 · 開啟器);兩邊共用同一份資料,同一時間只從一邊跑 VDF。
