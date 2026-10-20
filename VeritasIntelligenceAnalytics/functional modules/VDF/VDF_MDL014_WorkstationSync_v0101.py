@@ -123,15 +123,38 @@ def main_checkout(start: Path) -> Path:
     return Path(git(["rev-parse", "--show-toplevel"], start))
 
 
+def _same(a: Path, b: Path) -> bool:
+    return os.path.normcase(os.path.realpath(a)) == os.path.normcase(os.path.realpath(b))
+
+
 def resolve_roots(here: Path, repo: str | None = None, worktree: str | None = None) -> tuple:
-    """→ (原 checkout, VDF 工作樹, 怎麼定的)。本檔在 VDF 工作樹裡 → 工作樹就是它(不另建);否則照 v0100 的預設位置。"""
+    """→ (原 checkout, VDF 工作樹, 怎麼定的)。本檔在別的工作樹裡跑:只有那正是 VDF 的預設位置(%LOCALAPPDATA%\\VIA\\<倉名>-vdf-main)
+    才沿用;其他工作樹(他系統的功能分支等)一律不接手 —— 要用就 --worktree 明指(Codex #549 P1;四系統對等獨立 L123)。"""
     top = Path(git(["rev-parse", "--show-toplevel"], here)).resolve()
     root = Path(repo).resolve() if repo else main_checkout(top).resolve()
     if worktree:
         return root, Path(worktree).resolve(), "--worktree 指定"
-    if top != root:
-        return root, top, "本檔就在 VDF 工作樹裡"
-    return root, PRIOR.default_worktree(root), "預設位置"
+    default = PRIOR.default_worktree(root)
+    if not _same(top, root) and not _same(top, default):
+        raise RuntimeError("本檔所在的工作樹 %s 不是 VDF 的工作樹(預設 %s)—— 不接手別人的工作樹;"
+                           "要用它就加 --worktree \"%s\"" % (top, default, top))
+    return root, default, ("本檔就在 VDF 工作樹裡" if _same(top, default) else "預設位置")
+
+
+def _next_cmd(a) -> str:
+    """預演印的 NEXT:照這次給的全部參數重組(--case · --repo · --worktree · --remote · --no-link-data),只多一個 --apply(Codex #549 P2)。"""
+    q = lambda x: '"%s"' % x if (" " in str(x) or not str(x)) else str(x)
+    parts = ["python", q(Path(__file__).name)]
+    for c in a.case or []:
+        parts += ["--case", q(c)]
+    for flag, val in (("--repo", a.repo), ("--worktree", a.worktree)):
+        if val:
+            parts += [flag, q(val)]
+    if a.remote != "origin":
+        parts += ["--remote", q(a.remote)]
+    if a.no_link_data:
+        parts.append("--no-link-data")
+    return " ".join(parts + ["--apply"])
 
 
 def make_link(dst: Path, src: Path, apply: bool, nt: bool | None = None) -> str:
@@ -188,7 +211,11 @@ def run(argv=None, here: Path = HERE) -> int:
     a = ap.parse_args(argv)
     if a.selftest:
         return selftest()
-    root, wt, how = resolve_roots(here, a.repo, a.worktree)
+    try:
+        root, wt, how = resolve_roots(here, a.repo, a.worktree)
+    except RuntimeError as exc:
+        print("=== %s · 停 ===\n  [VDF MAIN] %s" % (TAG, exc))
+        return 2
     cases = a.case or list(PRIOR.DEFAULT_CASES)
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     print("=== %s · %s ===" % (TAG, "執行" if a.apply else "預演(加 --apply 才動手)"))
@@ -205,7 +232,7 @@ def run(argv=None, here: Path = HERE) -> int:
             print("  [資料] %s:%s" % (rel, st))
     print("  [交接案] %s(先移開舊收據 → 真的重跑;只收 VDF 的收據)" % ", ".join(cases))
     if not a.apply:
-        print("NEXT: python \"%s\" %s--apply" % (Path(__file__).name, "".join("--case %s " % c for c in a.case or [])))
+        print("NEXT: " + _next_cmd(a))
         return 0
     held = PRIOR.backup(root, a.remote, s, stamp)
     if held:
@@ -301,7 +328,8 @@ def selftest() -> int:
         git(["commit", "-m", "upstream"], seed)
         git(["push", "origin", "main"], seed)
         git(["fetch", "origin"], work)
-        wt = td / "LocalAppData" / "VIA" / "movies-dataset-vdf-main"            # 不在 v0100 的預設位置(倉旁)→ 驗「用本檔所在的工作樹」
+        os.environ["LOCALAPPDATA"] = str(td / "LocalAppData")
+        wt = td / "LocalAppData" / "VIA" / "movies-dataset-vdf-main"            # VDF 的預設位置(工作站用法:先手動建在這裡)
         git(["worktree", "add", "--detach", str(wt), "origin/main~1"], work)     # 舊的 main(使用說明:先手動建)
         here_wt = wt / VIA / "functional modules" / "VDF"
         head0 = git(["rev-parse", "HEAD"], work)
@@ -311,14 +339,36 @@ def selftest() -> int:
         r_rep = resolve_roots(here_wt, repo=str(work), worktree=str(td / "elsewhere"))
         chk("v0101-① 認原 checkout:在 VDF 工作樹裡跑 → 原 checkout = 主工作樹、工作樹 = 本身(不另建 *-vdf-main-vdf-main);"
             "在原 checkout 跑 → 照 v0100 預設位置;--repo / --worktree 明指照用",
-            r_wt[0] == work.resolve() and r_wt[1] == wt.resolve() and r_root[0] == work.resolve()
+            r_wt[0] == work.resolve() and _same(r_wt[1], wt) and r_root[0] == work.resolve()
             and r_root[1] == PRIOR.default_worktree(work.resolve()) and r_rep[1] == (td / "elsewhere").resolve(), (r_wt, r_root[1]))
+        other = td / "vrn-feature"                                         # 他系統的另一個工作樹(乾淨)
+        git(["worktree", "add", "-b", "vrn-feature", str(other), "origin/main"], work)
+        here_other = other / VIA / "functional modules" / "VDF"
+        head_other = git(["rev-parse", "HEAD"], other)
+        PRIOR.GIT_LOG.clear()
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc_other = run(["--case", "vdf_case", "--apply"], here=here_other)
+        r_explicit = resolve_roots(here_other, worktree=str(other))
+        chk("v0101-①b 不接手別的工作樹:從他系統的工作樹跑 --apply → rc 2 · 停在動手前(沒 fetch / 沒推 / 沒切 / 沒接資料)· 分支照舊;--worktree 明指才用它",
+            rc_other == 2 and "不接手" in out.getvalue()
+            and not [c for c in PRIOR.GIT_LOG if c and c[0] in ("fetch", "push", "checkout", "switch", "commit", "add", "worktree") and c[:2] != ["worktree", "list"]] and git(["rev-parse", "HEAD"], other) == head_other
+            and git(["rev-parse", "--abbrev-ref", "HEAD"], other) == "vrn-feature" and not os.path.lexists(other / VIA / DATA_LINKS_V0101[0])
+            and _same(r_explicit[1], other), (rc_other, out.getvalue()[-200:], PRIOR.GIT_LOG[:3]))
+        git(["worktree", "remove", "--force", str(other)], work)
 
         PRIOR.GIT_LOG.clear()
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
             rc_pre = run(["--case", "vdf_case"], here=here_wt)
         pre = out.getvalue()
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            run(["--case", "vdf_case", "--case", "x y", "--remote", "origin", "--no-link-data", "--repo", str(work)], here=here_wt)
+        nxt = [ln for ln in out.getvalue().splitlines() if ln.startswith("NEXT: ")]
+        chk("v0101-②b 預演的 NEXT 照這次全部參數重組(--case 含空白加引號 · --repo · --no-link-data)只多 --apply;--no-link-data 時不報資料夾",
+            len(nxt) == 1 and nxt[0].endswith(" --apply") and "--case vdf_case --case \"x y\"" in nxt[0] and "--no-link-data" in nxt[0]
+            and ("--repo \"%s\"" % work if " " in str(work) else "--repo %s" % work) in nxt[0] and "[資料]" not in out.getvalue(), nxt)
         chk("v0101-② 預演零動作:量得到原 checkout 分岔(落後 1 · 獨有 1 · 要備份)· 資料夾只報「會接上」· 沒推分支 · 沒接資料",
             rc_pre == 0 and "本機獨有 1 提交" in pre and "需要:推到新分支" in pre and "會接上" in pre
             and not [c for c in PRIOR.GIT_LOG if c and c[0] == "push"] and not os.path.lexists(wt / VIA / DATA_LINKS_V0101[0]), pre[-300:])
