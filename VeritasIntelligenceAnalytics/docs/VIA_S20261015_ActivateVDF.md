@@ -593,3 +593,58 @@ Push-Location $R;try{& $inv.FullName -FetchHome $V -RefillApply;$rc=$LASTEXITCOD
 Say Cyan "[計] VDF 結束碼 $rc(0 綠 · 2 黃 · 1 紅 · 124 逾時 · 130 中斷)· 對照頁 VIA_Reports\vdf\xsrc\VDF_XSRC_latest.html"
 ```
 
+
+## 2026-10-20 · 資料庫清點獨立核對(db verify)· ActivateVDF v0113 · VCGC 全景分類 · 第一輪修復
+
+操作員令:
+- 「run VDF again to output summary of database(verified 100% correct)」
+- 「好,把檢查器加進 VDF 指令並開 PR 合併  善用VCGC的全景式分析  定位分類錯誤  安全第一輪修復」
+
+### 新指令 `db verify`(VDF_SystemManager v0157)
+
+```bash
+python3 "VeritasIntelligenceAnalytics/functional modules/VDF/ActivateVDF.py" run     # 一輪裡自動跑(資料庫流程最後一步 db_verify)
+python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0157.py" db verify [--json]   # 單獨跑
+```
+
+- 讀本輪 `DB_CHECK_latest.json`,用**自己的程式**(不呼叫 db check 的找庫 / 判燈函式)唯讀重推每一列。
+- 每列比 5 欄:檔 · 列數 · 最新日 · 狀態 · 燈;另比摘要計數、總燈、他系統分類(by_system)。
+- 規則順序照 db check:先標他系統表(INFO),「冊上最少 0 列」只改 VDF 自己的紅列。
+- 結果:PASS rc 0 · FAIL rc 1(逐欄點名)· NODATA rc 2(沒有清點可核)。
+- 寫 `VERIFY_latest.json` / `VERIFY_latest.html`(和 DB_CHECK 同一夾)。
+- 冊上沒登寫入者的表:掃 VDF / 共用模組尾版的程式碼,列出「可能的寫入者」候選。只攤開,不改冊、不改燈。
+- 容器實測:65 表 × 5 欄 = 325 欄比對 · 差異 0 · PASS · 2.3 秒;沒登寫入者 27 表,其中 9 表找到候選。
+
+### ActivateVDF v0113(薄尾,疊在 v0112 之上)
+
+1. 資料庫流程:db_where → db check → refill → db_xcheck 之後,多跑 `db_verify`。refill 真寫過(`--refill-apply` 且非 `--dry`)先重跑一次 db check(同一個家)再核對。
+2. 清點摘要接核對結果:只認 `check_ts` 對得上本輪那份 check;FAIL → 不准收尾並說明。
+3. 總覽卡「資料庫清點」多一行「獨立核對:PASS · N 表 × 5 欄 = M 欄 · 差異 0」,連核對頁。
+4. **修正(全景定位)**:v0111 `db_files` 照根序收每個根的 `.duckdb`,資料家與倉內 `output_hub` 有同名檔時兩份都收;
+   v0112 的獨立驗證器按檔名建表,後到的倉內那份蓋掉本輪的家 → 回原表逐筆核錯庫。
+   - 容器實錄:v0112 自測 Ⓛ V1 不符 15、V5 不符 2(工作站倉內 output_hub 也有庫,同樣會中)。
+   - 本版:同一個檔名只留第一個(本輪的家優先),對照 / 體檢 / 驗證三方看同一份庫。換在 v0111 模組全域,不設本輪閘(前版也該用對的庫)。
+   - 跑前版自測時暫把 v0108 的三支(db_inventory / db_section / flow_db)換回,跑完換回本版。
+5. 自測:本版 5/5;全鏈(v0112 8/8 · 驗證器 6/6 · v0111 … v0100)rc 0。突變 7 種(不重跑 check · FAIL 照收尾 · 任何 ts 都認 · 沒核對步 · 沒換上 · 不去重 · 沒換進 v0111 全域)全抓到。
+
+### VCGC 全景分類(token `read --json`,VDF 尾版 94 支)
+
+| 類 | 數 | 判 | 處理 |
+|---|---|---|---|
+| 執行期錯(v0111 db_files 同名蓋庫) | 1 | 真錯,影響驗證結果 | **本輪修**(v0113) |
+| SWALLOW(except 本體只有 pass / continue) | 45 | 多半是「探測失敗就略過」,要逐支看語意 | 第二輪 |
+| PINVER(釘版號) | 18 | 薄尾釘自己的前版,設計如此 | 不修 |
+| TAILAPI(尾版公開名稱比前版少) | 12 | 目前沒有呼叫端斷掉 | 第二輪 |
+| BAREEXC(裸 except) | 2 | MDL004 v0100,檔名被 VDF_FetchSystem_SSOT 釘住 | 第二輪(要出新版並改冊) |
+| 同碼異名(ENG110 / ENG117 / ENG118 三組) | 3 組 | 要決定留哪個名字 | 操作員決定 |
+| 冊上沒登寫入者的表 | 27 | 程式碼證據雜,不自動登冊 | db verify 列候選,待確認 |
+
+「安全第一輪」只修會讓結果錯的那一件;其餘分類只報位置,不自動改(VCGC token 工具「只報不修」)。
+
+### 容器真跑(v0113 尾版,6 分 40 秒)
+
+- db_verify PASS(325 欄 · 差異 0);⑧ 跨來源 GREEN 4348/4348;⑨ 驗證 PASS;⑩ 收尾 GREEN。
+- 資料庫清點 RED 18:容器裡的庫是部分副本(工作站跑才算數)。
+- 引擎 94/94 可啟動。
+
+四系統互不干涉:本批只動 VDF 自己的檔;VCGC / VRN-1 / VRN-2 的程式、冊、號都沒改(編號經 VCGC 的 MDL237 只增寫入)。
