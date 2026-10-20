@@ -28,10 +28,21 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
-[政策] L50 全景 · 尾版 628 · import 0 · 提及 100 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 628 · import 0 · 提及 101 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0160.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0161.py(家族 vdf)
+=== VDF_SystemManager v0161 · 薄尾自測(設計稿 1c 汝窯天青視覺)===
+  [OK] ① 設計稿冊:共用冊有 systems.VDF 就用共用冊,沒有就用 VDF 自己的冊(VDF_UI_Design_SSOT_v0100.json)· design.css · serif / cjk-serif token · serif_selector(冊 VIA_UI_Template_SSOT_v0102.json + VDF_UI_Design_SSOT_v0100.json)
+  [OK] ② 1c 覆蓋:頁首條 #cfe0dc / #16302b · 青瓷綠 acc #3c6660 · 左欄 #f2f8f6 · 標 "1c" · 品牌 VERITAS DATA FORGE · 燈四色仍鎖(#dc2626)· 主字體仍微軟正黑體
+  [OK] ③ 套件仍一段 style + 一段 script:尾端接 [VIA:DESIGN] :root(--sys:#3c6660 · --lamp-red:#dc2626 · --serif)+ design.css · 零外部連結 · JS 字體吸附對 h1 / .via-serif / .brand 放行
+  [OK] ④ 冪等:插在 </head> 前(頁自己的 style 之後)→ 第二次 same · 只一段;頁上 :root 有 --head:#cfe0dc(壓過頁內固定色)
+  [OK] ⑤ 本體已換:字級套件本體 v0154 的 typekit_block / _TK_JS · 鏈上每份 typekit_book · v0144 的 ui_theme_load 都指到本版(MDL012 族群頁 · 其他動詞補套 · via-theme 段都走本版)
+  [OK] ⑥ via-theme 段改讀冊尾版 + systems.VDF:--head:#cfe0dc · --acc:#3c6660 · --lamp-red:#dc2626 · 冊名 = 尾版
+  [OK] ⑦b VDF 自足:共用冊沒有 systems.VDF → VDF 自己的冊蓋上(head #cfe0dc · design.css · serif_selector · 燈紅仍鎖 #dc2626 · 共用 tokens 打底 panel #ffffff)· 自己的冊壞了照實寫 why · 共用冊有 systems.VDF + design.css 就用共用冊(VDF 讓位)
+  [OK] ⑦ 誠實退路:冊沒 systems.VDF / design.css 壞(@import)→ css 不收 · why 寫明 · 燈紅仍 #dc2626;沒冊 → why · 不套
+  [OK] ⑧ 橋在(__future__ 之後)· 不碰 TA-Lib · 不代設同意閘 · 不載入 VCGC 程式 · 本檔不起子行程 · 零網路 · 不寫冊
+  ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──
 === VDF_SystemManager v0160 · 薄尾自測(啟動就緒短令沿 Register 點源鏈讀)===
   [OK] ① 鏈讀:尾版 v0003 → v0002 → v0001(尾版在前 · 只同夾 · 只讀)
   [OK] ② 薄尾單檔找不到 via-vdffetch,沿鏈讀找得到(v0104 ④ 的同一條判準)
@@ -134,7 +145,7 @@
   [OK] ① db check:px OK(哨兵列不算最新日)· gone 缺表 · rev 列數不足 · old 過舊 · nodb 缺庫 · extra 冊上沒列 · 寫出 html/csv/json · {'RED': 3, 'YELLOW': 1, 'GREEN': 1, 'INFO': 1}
   [OK] ② db move 乾跑:列複製計畫 · 一檔都不寫
   [OK] ③ --apply 沒還原點:資料複製 + 驗證列數一致,但接點不切 · 舊家原樣 · 資料已複製且驗證通過,但還原點帳沒有紀錄(先跑 CGC_MDL274_HealthMatrix restorepoint) → 接點不切(先建還原點再重跑)
-  [OK] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-fgxo9kvz/repo/output_hub → /tmp/vdfsm151-fgxo9kvz/vdf_database/output_hub(舊家 /tmp/vdfsm151-fgxo9kvz/home/output_hub 原樣保留)
+  [OK] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-_2rbitvb/repo/output_hub → /tmp/vdfsm151-_2rbitvb/vdf_database/output_hub(舊家 /tmp/vdfsm151-_2rbitvb/home/output_hub 原樣保留)
   [OK] ⑤ 再跑:已在新家 = GREEN 不動
 [拒跑] db 子動詞:check [--home 夾] · move --to 夾 [--apply]
   [OK] ⑥ 未知動詞清單含 db · db 子動詞錯 = rc2
@@ -227,7 +238,7 @@
  "panorama": "MDL205",
  "tails": 628,
  "imports": 0,
- "mentions": 100,
+ "mentions": 101,
  "installed": false,
  "lamp": "GREEN",
  "lock_success": true
@@ -334,10 +345,10 @@
   [OK] ① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節 · VDF_InputUniverse_SSOT_v0101.json
   [OK] ② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED · {'2026-09-29': 'GREEN', '2026-09-30': 'YELLOW', '2026-10-01': 'RED'}
   [OK] ③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊) · {'2026-09-29': (2, 2, 2, 2, 'GREEN'), '2026-09-30': (2, 1, 2, 1, 'YELLOW'), '2026-10-01': (1, 0, 1, 0, 'YELLOW')}
-  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmp426pgccz/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmp426pgccz/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
+  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmph375xbkx/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmph375xbkx/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
   [OK] ⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵) · ([], [])
   [OK] ⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)
-  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmp426pgccz/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
+  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmph375xbkx/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
   [OK] ⑧ 資料家不可用 = NODATA(不假寫)
   [OK] ⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock) · ('RELOCK', 'VIA_Workflow_VDF_SSOT_v0105.json')
   [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在 · {'vcgc_only': False}
@@ -493,8 +504,11 @@
 [計] VDF_SystemManager_v0159 自測 8/8 · PASS
   [OK] ⑧ 前版鏈 VDF_SystemManager_v0159 自測 rc 0
 [計] VDF_SystemManager_v0160 自測 15/15 · PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0105.py', 'VRN_ENG → via-vcgc sdd check
+  [OK] ⑩ 跑完前版鏈自測後本版又換上(typekit_block · _TK_JS 襯線吸附)
+  [OK] ⑨ 前版鏈 VDF_SystemManager_v0160 自測 rc 0
+[計] VDF_SystemManager_v0161 自測 11/11 · PASS
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL183_CeleritasPolicyGate_v0105.py', 'CGC_MDL → via-vcgc sdd check
 usage: refill [-h] [--groups GROUPS] [--as-of AS_OF] [--home HOME] [--apply]
               [--timeout TIMEOUT] [--json]
 refill: error: unrecognized arguments: --nope
-[監控] 背景全景監控中 pid 18174 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 622 提交 · 快照 422.1h · 未推 11 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 11463 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 627 提交 · 快照 423.5h · 未推 5 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
