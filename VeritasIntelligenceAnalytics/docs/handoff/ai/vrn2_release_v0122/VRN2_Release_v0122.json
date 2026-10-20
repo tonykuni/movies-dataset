@@ -1,0 +1,117 @@
+{
+ "system": "VRN-2",
+ "release": "ActivateVRN-2 v0122",
+ "date": "2026-10-18",
+ "prior_release": {
+  "file": "ActivateVRN-2.py",
+  "version": "v0121",
+  "sha256": "aba53554d84acc42232afa0386c8bb881dfaa6b64b64bdadee644f07a0ce9e65"
+ },
+ "launcher": {
+  "file": "ActivateVRN-2.py",
+  "bytes": 1385343,
+  "sha256": "3d53fb142dfd986293d88de742dfbbe63c4c5ad800baa3d9d3358d6a059eb4eb"
+ },
+ "launcher_zip": {
+  "file": "ActivateVRN-2_v0122.zip",
+  "bytes": 385837,
+  "sha256": "a9b91a919df86bf363a392dee90898f4442e15c7e99b47f43ffe5cb85340a882"
+ },
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0112.py",
+   "bytes": 62297,
+   "sha256": "e6d73e29fc48ce8e264dfe5c6af5db2ee4b918ab07866fcb39e2ca743156893a"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN2_Handover_v0122.md",
+   "bytes": 20941,
+   "sha256": "8459f90e40ff008f46c11f04204a67679d84bd2bc9a08ead022e2b3ff95d85f3"
+  }
+ ],
+ "tested_in": {
+  "where": "Claude Code 雲端容器(Linux · Python 3.13 · pdfplumber 0.11.10 · pypdfium2 5.13.0 · 無 PyMuPDF / psutil / pyarrow · 不裝套件)",
+  "inputs": "repo 內真實 PDF 19 份(functional modules/VRN/intake/VRN_v0108_Annual/.../REAL_TEST_INPUT + pack/inputs)· 個股範圍 14 份",
+  "chain_stub": "使用者機器的管理器前版鏈 v0154–v0230 不在 repo → 以測試 stub(只供 p1loop / _rep / input_dir 等)代表 · 不上船 · 不進 repo"
+ },
+ "results": {
+  "launcher_selftest": "12/12 PASS",
+  "manager_v0231_selftest": "33/33 PASS",
+  "manager_v0232_selftest": "11/11 PASS",
+  "eng397_v0127_selftest": "34/34 PASS(v0126 在沒有 PyMuPDF 時 33/34)",
+  "handler_v0102_urls": "合法 6/6 收 · 惡意 / 他協定 6/6 拒",
+  "e2e_cold_seconds": 43,
+  "e2e_warm_seconds": 32,
+  "parallel_phase": "6 步同時 3 路 · 新增九頭龍頭 0",
+  "idempotent_books": "連跑兩次四本冊逐位元相同",
+  "output_verification_v0122": {
+   "basic_fields": {
+    "PASS": 145
+   },
+   "financial_values": {
+    "ALIGNED": 3949,
+    "PRESENT": 24
+   },
+   "wrong_values": 0,
+   "rejected_with_reason": 212
+  },
+  "output_verification_v0121_baseline": {
+   "basic_fields": {
+    "PASS": 135,
+    "FAIL": 10
+   },
+   "financial_values": {
+    "ALIGNED": 3949,
+    "BADVALUE": 210,
+    "PRESENT": 24,
+    "MISALIGNED": 2
+   }
+  },
+  "ui_real_browser": "20/20 PASS(Chromium · Playwright)",
+  "ship_archive": "⑨ 上船 11 檔(含管理器前版鏈)· 新 clone 尾版自測 rc 0 · ⑩ 保留 GitHub 上的 ENG062 v0103(v0121:新 clone rc 1 · 刪掉 v0103)",
+  "not_verified_here": [
+   "⑤ 一標題四重點(ENG062 需要 PyMuPDF)→ BLOCKED",
+   "vrn2:// 註冊(非 Windows)",
+   "OCR 隔離環境(未建)",
+   "③ 補裝(不裝套件)",
+   "Parquet(無 pyarrow)"
+  ]
+ },
+ "vcgc": {
+  "token": "6/6 啟用",
+  "functions": "OK",
+  "handoff_check": "RED(repo 全域既有 · 第 353 次重複 · 非 VRN-2)",
+  "test_quick": "YELLOW(綠 6 · 黃 2 · 紅 0)"
+ },
+ "next": "使用者執行 v0122(第 10 節指令)· 貼回貼包"
+}

@@ -1,0 +1,134 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0126",
+ "date": "2026-10-19",
+ "operator_decision": "都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成(2026-10-18)→ VRN-2 不寫進別的系統的家族 · 不經 VCGC 核號 · 不登 VCGC 中央冊",
+ "supersedes": "ActivateVRN-2 v0125(docs/handoff/ai/vrn2_release_v0125 · 使用者機器第 39 輪實跑)",
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_SystemManager_v0233.py",
+   "bytes": 10066,
+   "sha256": "25e33a7148609b969b1c340db54a73e0cf682a2470f4832536fe836dd49d86a6"
+  },
+  {
+   "file": "VRN_SystemManager_v0234.py",
+   "bytes": 27553,
+   "sha256": "d8a564b2c442f37960ad73215e67da0ec90f5b8692d8b74857c0def329658b42"
+  },
+  {
+   "file": "VRN_SystemManager_v0235.py",
+   "bytes": 22840,
+   "sha256": "53ea452b978e2cb3d25179b9dae1bf2ec376a6c49155ac59cbe100ccbbb4d033"
+  },
+  {
+   "file": "VRN_SystemManager_v0236.py",
+   "bytes": 33760,
+   "sha256": "872f7fde9452d3b3eb4255a7368c581c89e37b5c455631c7e144bb23b67b1e8a"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0114.py",
+   "bytes": 63825,
+   "sha256": "62beeaf655760c2bcfb828782839721d727594a91ca0b804863ec2f383ac578d"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN2_Handover_v0126.md",
+   "bytes": 19629,
+   "sha256": "900c622b8e7a24549f3a3a387951bb69a3463cd67b7462d46d4d5ee989077db9"
+  }
+ ],
+ "tested_in": {
+  "where": "Claude Code 雲端容器 · Linux · Python 3.13 · 測試用隔離 venv(--system-site-packages)加裝 VRN-2 引擎相依:PyMuPDF 1.28.2 · polars · psutil · scikit-learn · pyarrow(只在暫存區 · repo 與系統 Python 未動)",
+  "inputs": "repo 內真實 PDF 19 份(functional modules/VRN/intake/VRN_v0108_Annual/...)· 個股範圍 14 份",
+  "chain_stub": "使用者機器的管理器前版鏈 v0154–v0230 不在 repo → 測試替身(TESTSTUB · 只供 p1loop / _rep / input_dir 等)· 測試樹的船包含替身 · 不可提交"
+ },
+ "results": {
+  "user_machine_round39_v0125": "52 份 · ⑧ 完成 紅 0 黃 5 · 閘移出 子欄 218 / 未定位 50 / 科目 68 · 年度數據 11,544 · P1 黃 11 份(財報表沒對到期間欄)+ Citi-3231 沒找到財報頁",
+  "launcher_selftest": "16/16",
+  "manager_selftests": {
+   "v0231": "33/33",
+   "v0232": "11/11",
+   "v0233": "6/6",
+   "v0234": "14/14",
+   "v0235": "7/7",
+   "v0236": "13/13"
+  },
+  "financial_14_files": "4,411 → 4,860(華南 0→40 · Citi 0→35 · CLST 224→1,078 · JP 232→315 · MS-3661 366→430 · 凱基季度值移出 627)· 剔除冊 88 → 719",
+  "oneclick_ps_run1": "③ 備份 v0125 → 換 v0126 → ⑧ 完成 紅 0 → ⑨ 只送 VRN-2 船包 → 獨立驗證錯值 0 · 約 1 分 45 秒",
+  "oneclick_ps_run2": "⑨ 已是最新 · 約 1 分 10 秒",
+  "new_machine_clone": "② 補回 14/14 → ⑧ 完成 · 四本輸出冊與原機逐位元相同",
+  "user_pull_merge": "整檔衝突 · 取遠端 → 0 未解",
+  "output_verification_v3": {
+   "basic": {
+    "PASS": 194
+   },
+   "summary": {
+    "PASS": 63
+   },
+   "financial_rows": {
+    "ALIGNED": 4323,
+    "TRANSALIGNED": 75,
+    "PRESENT": 10,
+    "SUBALIGNED": 452
+   },
+   "financial_bad": 0
+  },
+  "verifier_mutation_test": "9/9",
+  "ui_real_browser": "21/21"
+ },
+ "launcher": {
+  "file": "ActivateVRN-2_v0126.py",
+  "bytes": 1526438,
+  "sha256": "bcc80896309733b815203cd9bd27ef6b35347b187e227cf89a7be22bc5380551"
+ },
+ "launcher_zip": {
+  "file": "ActivateVRN-2_v0126.zip",
+  "bytes": 438747,
+  "sha256": "7363cde5aba0cfa6ef65dba96d9fcccc73fc3b329887dc443884e6042a9cbce8"
+ },
+ "test_tools_zip": {
+  "file": "vrn2_test_tools_v0126.zip",
+  "bytes": 92052,
+  "sha256": "adf197ebba622f8c689aea2bdc2ae9dbebbcbcc9433d2711a5ce45e299cf5258"
+ },
+ "changes": [
+  "管理器 v0236:轉置表(年份在第一欄)與表頭在表外兩種版型補進年度數據(兩個讀取器對得上才收)· 季度欄(月-年每 3 個月一欄)移出年度數據 · 每列 ROW / SECTION",
+  "獨立驗證 v3:DUPKEY 一致性(同一列同期間只能一個值)· 轉置表用 PyMuPDF 另查"
+ ],
+ "not_verified_here": [
+  "使用者機器 52 份",
+  "Windows PowerShell 5.1",
+  "③ 補裝(容器 --no-install)"
+ ],
+ "next": "使用者跑一鍵 PS v0126 → 貼回 [RED]/[YELLOW] 行 + ⑨ 那一行 + 驗證摘要"
+}
