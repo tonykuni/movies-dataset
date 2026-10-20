@@ -2957,6 +2957,39 @@
       ],
       "timeout_seconds": 900,
       "registered_at": "2026-10-20T06:00:00+00:00"
+    },
+    "vdf_r2_tailapi_eng056": {
+      "argv": [
+        "VDF_SystemManager",
+        "engine",
+        "run",
+        "VDF_ENG056_ChipBackfill",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG056_ChipBackfill v0107 轉接 34 名 · 本版 5/5 · PASS",
+      "scope": "VDF_ENG056_ChipBackfill v0107(第二輪 TAILAPI 延後項;管理員 v0158 解 v0150 凍結樣本後補上):模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)取前版公開名稱;直接執行原樣交給前版;自測驗名稱全取得 · 同名取最新 · 雙底線不轉 · 鏈完整到本體 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-20T05:47:45+00:00"
+    },
+    "vdf_manager_frozen_sample": {
+      "argv": [
+        "VDF_SystemManager_v0158",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager v0158 本版 6/6 · PASS",
+      "scope": "VDF_SystemManager v0158:前版鏈自測的凍結樣本冊 —— v0150 自測 ⑤ / ⑥a 的樣本卡寫死 ENG056 v0106 路徑,引擎冊只收尾版,ENG056 升 v0107 後樣本路徑「不在引擎冊」;本版只在 v0150 那一層自測期間包一層樣本冊(補冊上已有家族的凍結樣本路徑一列,拷尾版那列只換 path / version;不猜),v0149 與其他各層看原冊,結束全部還原;正式動詞一字不改 + 前版鏈全跑(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0158.py",
+        "functional modules/VDF/VDF_SystemManager_v0150.py",
+        "functional modules/VDF/VDF_SystemManager_v0149.py",
+        "functional modules/VDF/engine/VDF_ENG056_ChipBackfill_v*.py"
+      ],
+      "timeout_seconds": 2400,
+      "registered_at": "2026-10-20T05:47:45+00:00"
     }
   },
   "work_items": [
@@ -5980,8 +6013,8 @@
       "requirement": "VDF-REQ018",
       "state": "VERIFIED",
       "owner": "AI",
-      "reason": "操作員 2026-10-20「繼續第二輪修復 SWALLOW 與 TAILAPI」:VCGC 全景 TAILAPI 12 支,執行期實測 10 族真的取不到前版公開名稱(MDL009 / ENG052 誤報:globals 抄入 / 賦值綁正典)。ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)由新到舊取;直接執行原樣 runpy 交給前版;自測 5 項 + 前版自測;突變 5 種全抓 → 已驗:vdf_r2_tailapi_eng057 2026-10-20T04:55:32+00:00 rc 0 · vdf_r2_tailapi_eng059 2026-10-20T04:55:48+00:00 rc 0 · vdf_r2_tailapi_eng075 2026-10-20T04:56:05+00:00 rc 0 · vdf_r2_tailapi_eng100 2026-10-20T04:56:20+00:00 rc 0 · vdf_r2_tailapi_eng102 2026-10-20T04:56:36+00:00 rc 0 · vdf_r2_tailapi_eng110 2026-10-20T04:56:52+00:00 rc 0 · vdf_r2_tailapi_eng113 2026-10-20T04:57:08+00:00 rc 0 · vdf_r2_tailapi_eng115 2026-10-20T04:57:24+00:00 rc 0 · vdf_r2_tailapi_eng116 2026-10-20T04:57:41+00:00 rc 0。ENG056 延後(第三輪):管理員 v0150 自測樣本釘 VDF_ENG056_ChipBackfill_v0106.py 路徑,引擎冊只收尾版 → ENG056 一升版 v0150 ⑤ 即紅並帶紅整條前版鏈(PR #541 CI 實錄);已發行檔不改、自測不跳 → 須操作員決定解法後再升",
-      "next": "ENG056 TAILAPI 待操作員決定(見 reason 末段)",
+      "reason": "操作員 2026-10-20「繼續第二輪修復 SWALLOW 與 TAILAPI」:VCGC 全景 TAILAPI 12 支,執行期實測 10 族真的取不到前版公開名稱(MDL009 / ENG052 誤報:globals 抄入 / 賦值綁正典)。ENG057 v0110 · ENG059 v0104 · ENG075 v0106 · ENG100 v0102 · ENG102 v0102 · ENG110 v0103 · ENG113 v0102 · ENG115 v0102 · ENG116 v0102:模組層 __getattr__ 沿實際委派鏈(CGC_MDL158 chain 圖,尾版 → 本體)由新到舊取;直接執行原樣 runpy 交給前版;自測 5 項 + 前版自測;突變 5 種全抓 → 已驗:vdf_r2_tailapi_eng057 2026-10-20T04:55:32+00:00 rc 0 · vdf_r2_tailapi_eng059 2026-10-20T04:55:48+00:00 rc 0 · vdf_r2_tailapi_eng075 2026-10-20T04:56:05+00:00 rc 0 · vdf_r2_tailapi_eng100 2026-10-20T04:56:20+00:00 rc 0 · vdf_r2_tailapi_eng102 2026-10-20T04:56:36+00:00 rc 0 · vdf_r2_tailapi_eng110 2026-10-20T04:56:52+00:00 rc 0 · vdf_r2_tailapi_eng113 2026-10-20T04:57:08+00:00 rc 0 · vdf_r2_tailapi_eng115 2026-10-20T04:57:24+00:00 rc 0 · vdf_r2_tailapi_eng116 2026-10-20T04:57:41+00:00 rc 0。ENG056 原延後(已補:v0107 · 見 VDF-REQ018:r2-tailapi-eng056 / r3-manager-frozen-sample):管理員 v0150 自測樣本釘 VDF_ENG056_ChipBackfill_v0106.py 路徑,引擎冊只收尾版 → ENG056 一升版 v0150 ⑤ 即紅並帶紅整條前版鏈(PR #541 CI 實錄);已發行檔不改、自測不跳 → 須操作員決定解法後再升",
+      "next": "無(ENG056 已補,見 VDF-REQ018:r2-tailapi-eng056)",
       "case": "vdf_r2_tailapi_eng057",
       "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng057.json"
     },
@@ -6104,6 +6137,26 @@
       "next": "無",
       "case": "vdf_r2_swallow_eng069",
       "receipt": "docs/handoff/evidence/vdf_r2_swallow_eng069.json"
+    },
+    {
+      "id": "VDF-REQ018:r2-tailapi-eng056",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「好,做 ENG056,測完開PR合併  儘快將VDF收尾」:第二輪 TAILAPI 延後項 ENG056 新尾版 v0107(範本同 ENG057 v0110):模組層 __getattr__ 沿實際委派鏈 v0106 → v0105 → v0104(本體)取前版公開名稱 34 名;直接執行原樣交給前版;自測 5 項 + 前版自測;經 VDF 自己的 manager(engine run;AGENTS 5) → 已驗:vdf_r2_tailapi_eng056 2026-10-20T06:04:26+00:00 rc 0(標記見到)。前提:管理員 v0158 解 v0150 凍結樣本(VDF-REQ018:r3-manager-frozen-sample)",
+      "next": "無",
+      "case": "vdf_r2_tailapi_eng056",
+      "receipt": "docs/handoff/evidence/vdf_r2_tailapi_eng056.json"
+    },
+    {
+      "id": "VDF-REQ018:r3-manager-frozen-sample",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VDF_SystemManager v0158:v0150 自測 ⑤ / ⑥a 樣本卡寫死 ENG056 v0106 路徑,引擎冊(VCGC 檢視本體 MDL253,只收尾版)在 ENG056 升 v0107 後不再有該路徑 → 整條管理員自測紅(PR #541 CI 實錄)。已發佈檔不改、測試不跳:本版只在 v0150 那一層自測期間包一層樣本冊(補冊上已有家族的凍結樣本路徑一列,拷尾版那列只換 path / version;冊上沒有的家族 · 檔不在都不補),v0149 與其他各層看原冊,結束(含例外)全部還原;MDL253 檔不動;正式動詞一字不改。本版 6/6,突變 7 種抓 6(1 種等價:最外層 _inv 還原,v0150 那層 finally 已還原) → 已驗:vdf_manager_frozen_sample 2026-10-20T06:01:54+00:00 rc 0(含前版鏈全跑;v0150 10/10,補冊 ENG056 v0106)。已知未觸發:vdf_manager_v0152–v0154 · split_xcheck(v0156)· db_verify(v0157)直接跑舊版自測,若單獨重跑 v0150 ⑤ 會紅 → 驗管理員走尾版",
+      "next": "無",
+      "case": "vdf_manager_frozen_sample",
+      "receipt": "docs/handoff/evidence/vdf_manager_frozen_sample.json"
     }
   ]
 }
