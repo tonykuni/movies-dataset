@@ -293,3 +293,41 @@ python $m --case qg_onebridge --case vdf_ws_manager_design --case vdf_ws_eng093_
 ```
 
 之後 VDF 一律從 `$wt` 跑(管理員 · 啟動台 · 開啟器);兩邊共用同一份資料,同一時間只從一邊跑 VDF。
+
+### 工作站步驟(cmd.exe —— 工作站的視窗是 cmd,不是 PowerShell)
+
+2026-10-20 實錄:上面的 PowerShell 指令貼進 cmd,`$wt` 被當字面 → `git worktree add` 在倉內(OneDrive)建了一個叫 `$wt` 的整份工作樹(47,847 檔),
+其餘指令都失敗、沒有副作用。先清掉它(視窗不要停在那個夾裡;OneDrive 若卡住檔案就先暫停同步):
+
+```bat
+cd /d C:\Users\tonyk\OneDrive\Documents\movies-dataset
+git worktree remove --force "VeritasIntelligenceAnalytics/$wt"
+git worktree prune
+git worktree list
+```
+
+同步(cmd.exe;VDF 工作樹放 %LOCALAPPDATA%,不進 OneDrive):
+
+```bat
+cd /d C:\Users\tonyk\OneDrive\Documents\movies-dataset
+git fetch origin
+set "WT=%LOCALAPPDATA%\VIA\movies-dataset-vdf-main"
+if exist "%WT%\.git" (git -C "%WT%" checkout --detach origin/main) else (git worktree add --detach "%WT%" origin/main)
+set "M=%WT%\VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL014_WorkstationSync_v0101.py"
+python "%M%" --case qg_onebridge --case vdf_ws_manager_design --case vdf_ws_eng093_lists
+python "%M%" --case qg_onebridge --case vdf_ws_manager_design --case vdf_ws_eng093_lists --apply
+```
+
+同步後在 VDF 工作樹裡看 U/I(cmd.exe):
+
+```bat
+cd /d "%WT%\VeritasIntelligenceAnalytics"
+set VIA_FROM_VCGC=YES
+for /f "delims=" %F in ('dir /b /o:n "supportive modules\registry\CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"') do set "V=%CD%\supportive modules\registry\%F"
+python "%V%" run VDF_SystemManager --selftest
+python "%V%" run VDF_ENG093_LaunchConsole --selftest
+python "%V%" run VDF_SystemManager db check
+python "%V%" run VDF_SystemManager ui
+start "" "VIA_Reports\vdf\VDF_UI_latest.html"
+python "%V%" run VDF_ENG093_LaunchConsole ask --open --out "%TEMP%\vdf_ask_check.json"
+```
