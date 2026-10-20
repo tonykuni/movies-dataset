@@ -1,0 +1,147 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN-2 一鍵 v0130(啟動器 ActivateVRN-2 v0129 不變)",
+ "date": "2026-10-20",
+ "operator_order_2026_10_20": "自動修正直到100%正確 收尾成功 合併進 main",
+ "supersedes": "VRN2_OneClick_v0129.md(PR #534 Codex 審查三處:⑪ 報告只掃年度數據 · PS 自驗會驗舊冊 · 只看啟動器 rc 就宣告跑完)",
+ "launcher": {
+  "file": "ActivateVRN-2_v0129.py",
+  "bytes": 1763114,
+  "sha256": "600637bf6454af5e49140e3ec0f44903c3961de47a9c927bfa8154f0cd4163a7"
+ },
+ "launcher_from": "docs/handoff/ai/vrn2_release_v0129/ActivateVRN-2_v0129.zip(同一份 · 雜湊不變)",
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_SystemManager_v0233.py",
+   "bytes": 10066,
+   "sha256": "25e33a7148609b969b1c340db54a73e0cf682a2470f4832536fe836dd49d86a6"
+  },
+  {
+   "file": "VRN_SystemManager_v0234.py",
+   "bytes": 27553,
+   "sha256": "d8a564b2c442f37960ad73215e67da0ec90f5b8692d8b74857c0def329658b42"
+  },
+  {
+   "file": "VRN_SystemManager_v0235.py",
+   "bytes": 22840,
+   "sha256": "53ea452b978e2cb3d25179b9dae1bf2ec376a6c49155ac59cbe100ccbbb4d033"
+  },
+  {
+   "file": "VRN_SystemManager_v0236.py",
+   "bytes": 33760,
+   "sha256": "872f7fde9452d3b3eb4255a7368c581c89e37b5c455631c7e144bb23b67b1e8a"
+  },
+  {
+   "file": "VRN_SystemManager_v0237.py",
+   "bytes": 37036,
+   "sha256": "514962c4f0bd735f706abeb60b20f23337f97615953b8f15a297684728113374"
+  },
+  {
+   "file": "VRN_SystemManager_v0238.py",
+   "bytes": 11887,
+   "sha256": "87a3c4d7ab511fe7499843d971f873a4a51cf26b783e987dd1ccc4495a1c0761"
+  },
+  {
+   "file": "VRN_SystemManager_v0239.py",
+   "bytes": 18415,
+   "sha256": "b1eb69452d1c91609dae287c19e21e0699f48d056e482b7e3969c133a43092e2"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0114.py",
+   "bytes": 63825,
+   "sha256": "62beeaf655760c2bcfb828782839721d727594a91ca0b804863ec2f383ac578d"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN2_IndependentVerifier_v0102.py",
+   "bytes": 76509,
+   "sha256": "a43079aa94151c637346a51a7f2371820e268ba52db8ad1e60924319e8354172"
+  },
+  {
+   "file": "VRN2_Handover_v0129.md",
+   "bytes": 34663,
+   "sha256": "297a8045da4e63b9a7c506e4610f1a82b8e4cb73cf116b10c7be0c0f2da57ef7"
+  }
+ ],
+ "oneclick": {
+  "file": "VRN2_OneClick_v0130.md",
+  "bytes": 33784,
+  "sha256": "afc0743e741f66c63c946db81ab070089b26ed9ca789a5f8b664e943699a58d5",
+  "code_sha256": "0aaef20cf6b0be6717bda03224fe6212ccb4fc84c1661448aa7994dc342da0f4",
+  "oneliner_chars": 5694
+ },
+ "fixes": [
+  {
+   "codex": "P1 Include basic and summary failures in $vok",
+   "fix": "讀 ⑪ 報告 JSON:基本資料 / 一標題四重點任一欄 FAIL* 或 fin_bad 非空 = 沒過(同驗證器結束碼規則)+ 日誌 [FAIL] 行 · 讀不到 = 沒過"
+  },
+  {
+   "codex": "P1 Require current-run outputs before fallback verification",
+   "fix": "VRN2_FinancialData_latest.json 修改時間 ≥ 開始 - 5 秒才由 PS 補驗(同啟動器 ⑪)· 舊冊 → 黃 · 不寫 U/I"
+  },
+  {
+   "codex": "P2 Propagate red completion through the launcher exit code",
+   "fix": "成功 = 啟動器 rc 0 且本輪 ⑧ 完成燈綠 · NEXT [GREEN/YELLOW/RED] · $LASTEXITCODE 0/2/1"
+  }
+ ],
+ "tested_in": "Claude Code 雲端容器 · PowerShell 7.4.6 · Python 3.12 venv",
+ "results": {
+  "stub_scenarios": {
+   "green": "v0129 GREEN / v0130 GREEN rc0",
+   "basicfail": "v0129 GREEN(錯) / v0130 YELLOW rc2",
+   "basicfail_jsononly": "v0129 GREEN(錯) / v0130 YELLOW rc2",
+   "summaryfail": "v0129 GREEN(錯) / v0130 YELLOW rc2",
+   "stale": "v0129 驗舊冊 GREEN(錯) / v0130 不驗舊冊 RED rc1",
+   "red8": "v0129 跑完(錯) / v0130 RED rc1",
+   "corrupt": "v0129 GREEN(錯) / v0130 YELLOW rc2",
+   "noreport": "v0130 PS 自驗本輪冊 GREEN rc0(基本資料 PASS 194 · 一標題四重點 PASS 63 · 年度數據 4905 對位 · 錯值 0)"
+  },
+  "e2e_oneliner": {
+   "branch_run1": "GREEN · 備份 v0127 → 換 v0129 · ⑧ 完成 · ⑪ 錯值 0 · ⑨ 已上船",
+   "branch_run2": "GREEN · 本機已是 v0129",
+   "main_run1": "GREEN · 分支不在 → 一鍵碼與啟動器都從 main",
+   "main_run2": "GREEN",
+   "tamper": "RED · SHA-256 不符 · 不執行"
+  }
+ },
+ "logs_zip": {
+  "file": "logs_v0130.zip",
+  "bytes": 73372,
+  "sha256": "82a5e7d899a65fea7d1c47f51558decfbdf5112ba42ba6d0a276a3cad65b9953"
+ },
+ "test_tools_zip": {
+  "file": "vrn2_test_tools_v0130.zip",
+  "bytes": 11743,
+  "sha256": "e3dee73534b972e8987787e1b2bfc46c7cc0133d3f8b48277cd68c20272dad9a"
+ }
+}
