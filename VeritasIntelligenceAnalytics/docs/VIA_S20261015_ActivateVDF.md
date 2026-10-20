@@ -746,3 +746,31 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 - `vdf_xsrc_verifier`:`VDF_XsrcVerifier` 檔名沒有引擎號,不在引擎冊,經 VCGC `run` 直接跑自測,6/6。
 - 兩個工作項目 VERIFIED(`VDF-REQ018:closeout-eng045-test` · `closeout-xsrc-test`)。
 - VDF 的 `handoff check` 紅只剩 ENG086 v0102:要 polars,容器沒有(照規定不裝套件)。已有待辦 `VCGC-REQ139:qg_onebridge`,交工作站跑 `via-vcgc handoff test qg_onebridge` 後提交收據。
+
+## 2026-10-20 · 轉接改走生效鏈(PR #542 Codex P1)
+
+### 病因(實測確認)
+
+- 第二輪的轉接尾版把前版鏈每一支各自另載一份,再從裡面取名稱。
+- 但鏈上中間層的 `_prior()` 會在取前版時補丁,例如把前版的 `gate_open` 換成 ScrapeGate 的 `gate_open`。另載的那份沒有補丁。
+- 結果:經尾版取 `gate_open()` / `run()`,拿到的是沒補丁的舊定義,同意閘判法跟實際執行路徑不同。
+- 實測(傳入雙同意字典,不碰環境變數):
+
+| 族 | 舊尾版 `gate_open` | 新尾版 `gate_open` |
+|---|---|---|
+| ENG056 | v0107 → False(v0104 自己的) | v0108 → True(ScrapeGate) |
+| ENG057 | v0110 → False(v0107 自己的) | v0111 → True(ScrapeGate) |
+| ENG059 | v0104 → False(v0101 自己的) | v0105 → True(ScrapeGate) |
+| ENG075 | v0106 → False(v0103 自己的) | v0107 → True(ScrapeGate) |
+
+- 另 6 族(ENG100 / 102 / 110 / 113 / 115 / 116):中間層的 `_prior()` 不補丁,和另載逐函式比對一致,不需要改。
+
+### 新版(四族各出一支)
+
+- 生效鏈:第一支照常載入;往下每層,上一層有無參 `_prior()` 就用它回的模組(含補丁),沒有才另載。
+- 自測新增:
+  - ⑥ 每層有 `_prior()` 就用它;函式(含補丁進來的)跟前版自己再取一次同碼。
+  - ⑦ `gate_open` 有補丁時,用字典實測:沒同意 False,雙同意 True。
+  - ⑧ 防呆:`_prior()` 回錯檔 → 另載;要參數的 `_prior` 不當取前版。
+- 四支都是本版 8/8。
+- 突變 6 種抓 5 種;「⑥ 不比補丁」是等價突變(生效模組本來就是 `_prior()` 的回傳,行為由 ② ⑦ 把關)。
