@@ -774,3 +774,9 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
   - ⑧ 防呆:`_prior()` 回錯檔 → 另載;要參數的 `_prior` 不當取前版。
 - 四支都是本版 8/8。
 - 突變 6 種抓 5 種;「⑥ 不比補丁」是等價突變(生效模組本來就是 `_prior()` 的回傳,行為由 ② ⑦ 把關)。
+
+### 舊版管理員交接案改經尾版跑(收掉「已知、未觸發」項)
+
+- `vdf_manager_v0152`–`v0154` · `vdf_manager_split_xcheck`(v0156)· `vdf_manager_db_verify`(v0157)原本直接跑該版自測。前版鏈的 v0150 ⑤ 凍結樣本釘 ENG056 v0106,ENG056 升到 v0108 後直接跑必紅。
+- 改為 `VDF_SystemManager --selftest`(尾版 v0158,只在 v0150 那層換樣本冊)。各版自己的 `[計]` 標記照樣出現在尾版輸出裡,所以標記不變;依賴加管理員 glob。
+- `vdf_refill`(v0130)的前版鏈碰不到 v0150,維持原樣。
