@@ -739,3 +739,10 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
 - 交接案 `vdf_manager_v0152`–`v0154`、`vdf_manager_split_xcheck`(v0156)、`vdf_manager_db_verify`(v0157)直接跑舊版自測,不經 v0158 的樣本冊。
 - 這些案的依賴不含 ENG056,這次不會被觸發重跑;但若單獨重跑,v0150 ⑤ 會紅。
 - 要驗管理員,請走尾版:`VDF_SystemManager --selftest` 或 `vdf_manager_frozen_sample`。
+
+### 交接收尾:補登兩支長期沒測試的 VDF 檔(只測不改程式)
+
+- `vdf_eng045_outputhub`:經 VDF 管理員 `engine run VDF_ENG045_OutputHub --selftest`,7/7。
+- `vdf_xsrc_verifier`:`VDF_XsrcVerifier` 檔名沒有引擎號,不在引擎冊,經 VCGC `run` 直接跑自測,6/6。
+- 兩個工作項目 VERIFIED(`VDF-REQ018:closeout-eng045-test` · `closeout-xsrc-test`)。
+- VDF 的 `handoff check` 紅只剩 ENG086 v0102:要 polars,容器沒有(照規定不裝套件)。已有待辦 `VCGC-REQ139:qg_onebridge`,交工作站跑 `via-vcgc handoff test qg_onebridge` 後提交收據。

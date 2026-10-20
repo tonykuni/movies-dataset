@@ -2990,6 +2990,36 @@
       ],
       "timeout_seconds": 2400,
       "registered_at": "2026-10-20T05:47:45+00:00"
+    },
+    "vdf_eng045_outputhub": {
+      "argv": [
+        "VDF_SystemManager",
+        "engine",
+        "run",
+        "VDF_ENG045_OutputHub",
+        "--selftest"
+      ],
+      "success_marker": "[計] 7/7 檢通過",
+      "scope": "VDF_ENG045_OutputHub v0102:自測寫私有暫存夾(多支併跑不互撞)· 輸出中樞 7 檢(gsheet 相容道誠實標註 · 統一參數檔在位 …);經 VDF 自己的 manager(engine run;AGENTS 5)(VDF-REQ018 收尾:補交接測試)",
+      "dependencies": [
+        "functional modules/VDF/VDF_ENG045_OutputHub_v*.py",
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-20T06:15:56+00:00"
+    },
+    "vdf_xsrc_verifier": {
+      "argv": [
+        "VDF_XsrcVerifier",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_XsrcVerifier v0100 自測 6/6 · PASS",
+      "scope": "VDF_XsrcVerifier v0100:跨來源對照結果獨立驗證(中間檔欄位與來源標註 · 回原表逐筆一字不差 · 同來源多次抓取取最新;反向測試 8 種錯全 FAIL);檔名無引擎號不在引擎冊 → 經 VCGC run 直接跑自測(VDF-REQ018 收尾:補交接測試)",
+      "dependencies": [
+        "functional modules/VDF/VDF_XsrcVerifier_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-20T06:15:56+00:00"
     }
   },
   "work_items": [
@@ -6157,6 +6187,26 @@
       "next": "無",
       "case": "vdf_manager_frozen_sample",
       "receipt": "docs/handoff/evidence/vdf_manager_frozen_sample.json"
+    },
+    {
+      "id": "VDF-REQ018:closeout-eng045-test",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「儘快將VDF收尾」「一路實測修復到底」:VDF_ENG045_OutputHub v0102(批:自測寫私有暫存夾)上線時沒有登交接測試 → handoff check 長期 CHANGED_CODE_WITHOUT_TEST 紅;本輪補登交接案(只測不改程式) → 已驗:vdf_eng045_outputhub 2026-10-20T06:16:16+00:00 rc 0(標記見到)",
+      "next": "無",
+      "case": "vdf_eng045_outputhub",
+      "receipt": "docs/handoff/evidence/vdf_eng045_outputhub.json"
+    },
+    {
+      "id": "VDF-REQ018:closeout-xsrc-test",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-20「儘快將VDF收尾」「一路實測修復到底」:VDF_XsrcVerifier v0100(ActivateVDF v0111 的跨來源對照獨立驗證器)上線時沒有登交接測試 → handoff check 長期 CHANGED_CODE_WITHOUT_TEST 紅;本輪補登交接案(只測不改程式) → 已驗:vdf_xsrc_verifier 2026-10-20T06:16:32+00:00 rc 0(標記見到)",
+      "next": "無",
+      "case": "vdf_xsrc_verifier",
+      "receipt": "docs/handoff/evidence/vdf_xsrc_verifier.json"
     }
   ]
 }
