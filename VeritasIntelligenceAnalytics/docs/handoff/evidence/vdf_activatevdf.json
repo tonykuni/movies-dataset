@@ -10,9 +10,9 @@
     "VDF_MDL013_ActivateVDF",
     "--selftest"
   ],
-  "case_sha256": "d98ceaba92f41ca133624f7f9ac94f13d760e5afcfe5e1720936d9ee1857b6f0",
-  "started_at": "2026-10-20T12:45:25+00:00",
-  "completed_at": "2026-10-20T12:46:33+00:00",
+  "case_sha256": "6c698a002e01486ed00100703ccb0d388d771490ae7f04df336ddbb755602d1d",
+  "started_at": "2026-10-21T03:08:27+00:00",
+  "completed_at": "2026-10-21T03:09:27+00:00",
   "rc": 0,
   "target_marker_seen": true,
   "dependencies": {
@@ -27,6 +27,7 @@
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0108.py": "7b91e8ec86625008877838eb7d925c25f7c3f88d512ce8762f7b7adcb47c7162",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0113.py": "c4718979fb4ab8bdf62b55a9b4e675663758a164d3075d6df83d0676ad652e1c",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0103.py": "d37629acad7fdbfbf601c423dc6864b98c1e052316fbe47d34ec41c1aaf5c116",
+    "functional modules/VDF/VDF_MDL013_ActivateVDF_v0114.py": "ecdf2d23f6f4cc4f8de47cee5bb4191f02327298a3849418442ea32e10fc74bd",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0112.py": "ed241539dfd9310465f1a497e3d18a71c4a5ff277dae5c1f00d869f3ae8836b5",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0104.py": "d0b7887d2fac252e37e6237a663a68217544b6774ac81398acbedcf9b8770365",
     "functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py": "fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5",
@@ -185,11 +186,11 @@
     "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0161.py": "02bde419048e77e0ceddba610125da4208985f1e96796cc6ba8d1356e858be61"
   },
   "environment": {
-    "python": "3.11.15",
+    "python": "3.11.17",
     "platform": "linux"
   },
   "log": "docs/handoff/evidence/vdf_activatevdf.txt",
-  "log_sha256": "4eebe614d9684c2c0440fb2874e1e2b3740b49f5739d16a75f6ff0ebc93de337",
-  "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0113 本輪資料庫流程最後跑 db_verify(管理員 db verify 獨立核對清點 · refill 真寫過先重跑 db check)· 總覽卡加「獨立核對」行 · 核對 FAIL 不准收尾 + 修正 v0111 db_files 同檔名兩份時驗證器回原表核錯庫(同名只留本輪的家;v0112 自測 Ⓛ 轉綠)+ v0112 跨來源對照結果獨立驗證 · 對照頁 · 收尾判定 + v0109–v0111 跨來源對照 + v0108 總覽卡他系統表分開命名 VRN-1 / VRN-2 / VCGC(L123 四系統)· 本輪資料庫流程多一步 db_xcheck(universe xcheck:兩個以上來源相同即算對照成功)+ v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
+  "log_sha256": "073bbe663f941db240d677270713879f0eaad8dbf65947d4d15f1ee1d5c20543",
+  "scope": "VDF 獨立啟動 ActivateVDF(VDF-REQ018):v0114 一鍵全程(--sync 先經 VDF_MDL014 同步到 main → 擷取改走 VDF_MDL012_FetchGroups 分道並行 → 資料家冊 VDF_DataHome_SSOT(操作員 2026-10-21:via_01_vdf)→ 總覽頁同步 · 分道擷取 · 操作入口三塊 → 同步綠後改派更新後工作樹重跑(Codex #553 P1);自測 9/9)+ v0113 本輪資料庫流程最後跑 db_verify(管理員 db verify 獨立核對清點 · refill 真寫過先重跑 db check)· 總覽卡加「獨立核對」行 · 核對 FAIL 不准收尾 + 修正 v0111 db_files 同檔名兩份時驗證器回原表核錯庫(同名只留本輪的家;v0112 自測 Ⓛ 轉綠)+ v0112 跨來源對照結果獨立驗證 · 對照頁 · 收尾判定 + v0109–v0111 跨來源對照 + v0108 總覽卡他系統表分開命名 VRN-1 / VRN-2 / VCGC(L123 四系統)· 本輪資料庫流程多一步 db_xcheck(universe xcheck:兩個以上來源相同即算對照成功)+ v0107 記憶體 / TEMP 本輪真生效(每輪鉤:DuckDB 溢寫到本機 TEMP · 記憶體 / 執行緒照每條預算;子孫行程都生效;環境有 VCGC 鉤則讓位)+ 起跑實測 + v0106 跑完自動跳出的總覽頁直接清點資料庫(紅黃逐列 · 寫入者 · 怎麼補 · 收尾判定;只認本輪 DB_CHECK)+ v0105 去重時空段(= 目前目錄)照留 + v0104 子行程 PYTHONPATH 只留一份 bootstrap(兩份 = sitecustomize 互相接力,每支 Python 起跑慢到逾時)+ numexpr 探針逾時不當機 + v0103 numexpr 真測段改正(⑰ 取代 v0102 ⑭;有 / 沒有 numexpr 都真測)+ v0102 並行判法不靠起行程快 · engine list 登記在跑 · 編譯警告 · numexpr 上限天花板 + v0101 心跳 · Ctrl+C · 清單依序 · 資料庫等擷取 + v0100 十六檢;經 VDF 自己的 manager(engine run;AGENTS 5)",
   "production_database_verified": false
 }
