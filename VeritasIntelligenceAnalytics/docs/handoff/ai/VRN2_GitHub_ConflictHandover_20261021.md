@@ -45,7 +45,8 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 09:46 | movies-dataset | 操作員令「解決衝突問題」:#562 與 main 無檔案交集(main 多 2 個 VDF 收據提交 `6633ab3e4` · `755a815ba`,只動 `docs/handoff/evidence/qg_onebridge.*`)· `git merge-tree` 乾淨 · GitHub mergeable(unstable = 新 head 的 CI 還在跑)→ 把 main 併進分支(merge commit · 不改寫歷史)· 推 | #562 |
 | 10-21 10:39 | movies-dataset | 操作員合併 PR #562(v0135)| main `0111b0c5f` |
 | 10-21 10:5x | VIA-VDF-VRN | 操作員令「解決所有衝突問題 PR #81」:merge-base = main tip · 衝突 0 · GitHub mergeable;紅的是 CI —— 自 10-20 03:17 起該倉每條 workflow 在 2–3 秒內 failure(runner_id 0 · 無 step · log 404 · main 自己一樣)· PR #76 → #77 之間 .github 沒改 · 同帳號 movies-dataset 正常 → 私有倉 Actions 額度 / 付款 / 開關,只有倉主能處理 · 留言在 #81 | #81(未動)|
-| 10-21 11:0x ~ | movies-dataset | 操作員令「integrate INTO ONE CODE TO HANDLE ALL ABOVE」(第二回)→ v0136:驗證器 v0105(DUPKEY 位置證據 · 對調診斷 · EPS 格 · 摘要每類都出現)+ 啟動器 ⑫a VRN-1 倉同步 · 全部測試重跑 · 推 · 新 PR | 見最新 PR |
+| 10-21 11:0x ~ | movies-dataset | 操作員令「integrate INTO ONE CODE TO HANDLE ALL ABOVE」(第二回)→ v0136:驗證器 v0105(DUPKEY 位置證據 · 對調診斷 · EPS 格 · 摘要每類都出現)+ 啟動器 ⑫a VRN-1 倉同步 · 全部測試重跑 · 推 · PR #563(操作員 11:38 合併 · main `12e8d9642`)| #563 |
+| 10-21 11:4x ~ | movies-dataset + VIA-VDF-VRN(只讀 / 只複製)| 操作員令「ONE CODE TO HANDLE ALL.」→ 操作員一鍵 v0102(`vrn1_vrn2_oneclick_v0102`):② 改指 VRN-2 一鍵 v0136;沙盒 VRN-1 真的從 GitHub 複製(main `d7a12e2` = PR #81 已合併)· 貼兩次 · 四張 HTML Chromium 全過 · 推 · 新 PR | 見最新 PR |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
