@@ -24,14 +24,22 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 RED · 2026-09-21T02:45:15
+  [衝突] 現況 NODATA 先 via-envgov eight-hub
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
+  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
 [政策] L50 全景 · 尾版 628 · import 0 · 提及 101 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_MDL014_WorkstationSync_v0101.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_MDL014_WorkstationSync_v0102.py(家族 vdf)
+=== VDF_MDL014_WorkstationSync v0102 · 薄尾自測(離線假倉;不連網 · 不碰真倉)===
+  [OK] v0102-① 分堆:三個髒檔(stage 的 · 改的 · 未追蹤的)都認成本工具的收據、沒有別的
+  [OK] v0102-② 殘留的收據自動清掉(印一行)· 工作樹移到最新 main · 交接重跑 · 收據分支推上去 · [計] PASS
+  [OK] v0102-③ 推完收據後工作樹回到 origin/main(detached · 乾淨);收據留在分支上(分支的 HEAD 比工作樹多一個提交);從不 force · 從不推 main
+  [OK] v0102-④ 有別的髒檔 → 收據也不動 · 拒絕 · [VDF MAIN] 停 一行 + rc 2(沒 traceback)· 訊息帶 git status 指引 · 沒跑交接 · 沒推
+  [OK] v0102-⑤ 預演:NEXT 印本版檔名(不是前版)· 還原殘留只在 --apply 才做(預演只報髒)· 標籤是本版
+  [OK] v0102-⑥ 三橋在 · 不匯入他系統程式 · 不碰 TA-Lib · 同意閘不寫 · 不寫環境變數(自測外)· 本體的 ensure_worktree / publish 已換上本版
+  ── 前版鏈自測(VIA_SKIP_PRIOR_SELFTEST=1 略過)──
 === VDF_MDL014_WorkstationSync v0101 · 薄尾自測(離線假倉;不連網 · 不碰真倉)===
   [OK] v0101-① 認原 checkout:在 VDF 工作樹裡跑 → 原 checkout = 主工作樹、工作樹 = 本身(不另建 *-vdf-main-vdf-main);在原 checkout 跑 → 照 v0100 預設位置;--repo / --worktree 明指照用
   [OK] v0101-①b 不接手別的工作樹:從他系統的工作樹跑 --apply → rc 2 · 停在動手前(沒 fetch / 沒推 / 沒切 / 沒接資料)· 分支照舊;--worktree 明指才用它
@@ -63,5 +71,7 @@
   [計] VDF_MDL014_WorkstationSync v0100 自測 15/15 · PASS
   [OK] v0101-⑨ 前版 VDF_MDL014_WorkstationSync_v0100 自測 rc 0
   [計] VDF_MDL014_WorkstationSync v0101 薄尾 11/11 · PASS
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL140_HandoverConsole_v0107.py', 'CGC_MDL183_ → via-vcgc sdd check
-[監控] 背景全景監控中 pid 19524 · 觸碰 run VDF_MDL014_WorkstationSync · 交接閘 RED · 落後 640 提交 · 快照 427.8h · 未推 3 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] v0102-⑦ 前版 VDF_MDL014_WorkstationSync_v0101 自測 rc 0
+  [計] VDF_MDL014_WorkstationSync v0102 薄尾 7/7 · PASS
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'CGC_MD → via-vcgc sdd check
+[監控] 背景全景監控中 pid 5770 · 觸碰 run VDF_MDL014_WorkstationSync · 交接閘 RED · 落後 176 提交 · 快照 443.1h · 未登 2380 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

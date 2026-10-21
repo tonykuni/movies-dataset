@@ -331,3 +331,15 @@ python "%V%" run VDF_SystemManager ui
 start "" "VIA_Reports\vdf\VDF_UI_latest.html"
 python "%V%" run VDF_ENG093_LaunchConsole ask --open --out "%TEMP%\vdf_ask_check.json"
 ```
+
+## 第五批(2026-10-21 16:03 工作站實錄 → MDL014 v0102)
+
+操作員在 cmd 跑 `VDF_MDL014_WorkstationSync_v0101.py --apply`,停在 `ensure_worktree`:
+`RuntimeError: VDF 工作樹有未提交的改動 … ['M  …/docs/handoff/evidence/qg_onebridge.json', ' M …/qg_onebridge.txt']`。
+根因:那兩個檔是 MDL014 自己上一次 `--apply` 跑完交接案後寫的收據(stage 了、沒交完);v0100 的 `ensure_worktree` 把它們當別人的改動拒絕,
+而 v0100 的 `publish` 交完收據停在收據分支上、沒回 main。
+
+- **v0102(薄尾)**:① 髒檔全在 `docs/handoff/evidence/` → 還原 + 清未追蹤、印「清掉上次沒交完的收據 N 檔」再照常移到最新 main;有別的檔 → 一個都不動、拒絕(訊息帶 `git -C <工作樹> status`)。
+  ② `publish` 推完收據分支後 `git checkout --detach origin/main`:工作樹回到 main、乾淨。③ `run` 裡的 RuntimeError → 一行 `[VDF MAIN] 停:…` 回 rc 2,不噴 traceback。
+- 自測 7/7(假倉重演工作站實況:stage 一個 · 改一個 · 多一個未追蹤 → 清掉 → 同步 → 收據分支 → 回 main;別的髒檔 → 拒絕 rc 2;預演 NEXT 印本版檔名);前版鏈 v0101 11/11 · v0100 15/15。
+- 工作站當下的解法(v0102 進 main 前):`git restore --staged --worktree -- "VeritasIntelligenceAnalytics/docs/handoff/evidence"` 再跑 `--apply`。
