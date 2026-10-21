@@ -28,10 +28,10 @@
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
   [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
-[政策] L50 全景 · 尾版 625 · import 0 · 提及 96 · 已裝 False · GREEN
+[政策] L50 全景 · 尾版 628 · import 0 · 提及 101 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0158.py(家族 vdf)
+  [via-vcgc run] [流程] 政策過 · VDF_SystemManager_v0161.py(家族 vdf)
   [VDF engine run] ENG050 VDF_ENG050_OrderFetch · 閘 GREEN · VDF_ENG050_OrderFetch_v0102.py
 === VDF_ENG050_OrderFetch v0102 · 薄尾自測(TWSE 道逐日出錯照實記;沙盒零網路)===
   [OK] ① 有一天出錯:照實記 errors 1 · 示例帶日期與錯誤類別;其餘兩天照收、state OK(資料一字不改)
@@ -49,21 +49,22 @@
   [OK] ④ 同意閘未開=rc2 
 === 擷取單 #001 · 車道 2:twse_official,yfinance · 窗口 最新交易日往前 5 個交易日 ===
 [NETWORK_POLICY_BLOCKED] 雙車道預檢全封:twse_official:CONNECT 403 Forbidden(沙盒) | yfinance:CONNECT 403 Forbidden(沙盒)
-  誠實結束存證:ORDER_001_20261020_060255;可達網路環境重跑即實抓
+  誠實結束存證:ORDER_001_20261020_125435;可達網路環境重跑即實抓
   [OK] ⑤ 雙道封鎖=rc3 誠實存證 
 === 擷取單 #001 · 車道 2:twse_official,yfinance · 窗口 最新交易日往前 5 個交易日 ===
-  [計] twse OK 7/7 · yfinance 檔 1 列 1 · 存 ORDER_001_20261020_060255
+  [計] twse OK 7/7 · yfinance 檔 1 列 1 · 存 ORDER_001_20261020_125435
   [OK] ⑥ 替身雙道通(rc0) 
   [OK] ⑦ run 存證(twse 7 結果+yf 列) 
   [OK] ⑧ csv 落檔(utf-8-sig) 
 === 擷取單 #002 · 車道 8:twse_official,etf_holdings,cnyes_consensus,yf_consensus,financials,yf_market,akshare,rates_jp · 窗口 清單=全量;行情=最新 5 交易日;財報=指定期別 ===
-  [計] twse OK 7/7 · etf_holdings=DELEGATED · cnyes_consensus OK 2/2 · yf_consensus OK 2/3 · financials OK 1/3 · yf_market 檔 1 列 1 · akshare=PENDING_DEPS · rates_jp=PENDING_DEPS · 存 ORDER_002_20261020_060301
+  [計] twse OK 7/7 · etf_holdings=DELEGATED · cnyes_consensus OK 2/2 · yf_consensus OK 2/3 · financials OK 1/3 · yf_market 檔 1 列 1 · akshare=PENDING_DEPS · rates_jp=PENDING_DEPS · 存 ORDER_002_20261020_125441
   [OK] ⑨ 002 八車道分派齊 ['akshare', 'cnyes_consensus', 'etf_holdings', 'financials', 'rates_jp', 'twse', 'yf_consensus', 'yf_market']
   [OK] ⑩ MOPS 誠實候驗+ETF 委外 
   [計] 十檢 OK 10 · FAIL 0
-  [VDF engine run] VDF_ENG050_OrderFetch rc=0 · 5.9s · python base 退路(境未見)
-  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'CGC_MD → via-vcgc sdd check
+  [VDF engine run] VDF_ENG050_OrderFetch rc=0 · 6.1s · python base 退路(境未見)
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['CGC_MDL140_HandoverConsole_v0107.py', 'VRN_ENG086_ → via-vcgc sdd check
+Crumb fetch rate-limited (HTTP 429), continuing without crumb
 HTTP Error 401: Unauthorized{"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
 HTTP Error 404: Not Found{"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: 3324.TW"}}}
 HTTP Error 401: Unauthorized{"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
-[監控] 背景全景監控中 pid 7446 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 591 提交 · 快照 416.9h · 未推 2 · 未登 122 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 11463 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 627 提交 · 快照 423.7h · 未推 5 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html

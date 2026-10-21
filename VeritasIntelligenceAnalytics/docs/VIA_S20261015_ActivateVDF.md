@@ -774,3 +774,46 @@ python3 "VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v
   - ⑧ 防呆:`_prior()` 回錯檔 → 另載;要參數的 `_prior` 不當取前版。
 - 四支都是本版 8/8。
 - 突變 6 種抓 5 種;「⑥ 不比補丁」是等價突變(生效模組本來就是 `_prior()` 的回傳,行為由 ② ⑦ 把關)。
+
+### 舊版管理員交接案改經尾版跑(收掉「已知、未觸發」項)
+
+- `vdf_manager_v0152`–`v0154` · `vdf_manager_split_xcheck`(v0156)· `vdf_manager_db_verify`(v0157)原本直接跑該版自測。前版鏈的 v0150 ⑤ 凍結樣本釘 ENG056 v0106,ENG056 升到 v0108 後直接跑必紅。
+- 改為 `VDF_SystemManager --selftest`(尾版 v0158,只在 v0150 那層換樣本冊)。各版自己的 `[計]` 標記照樣出現在尾版輸出裡,所以標記不變;依賴加管理員 glob。
+- `vdf_refill`(v0130)的前版鏈碰不到 v0150,維持原樣。
+
+## 2026-10-20 · 工作站分岔接回(VDF 部分)+ 一鍵工作站同步
+
+### 發生什麼事
+
+- 工作站推 `main` 被拒(non-fast-forward)。把本機推到 `workstation-20261020` 後比對:本機獨有 133 提交、落後 181 提交,分岔點 10/12。
+- 兩條線各自發了同號版本,內容不同:`VDF_SystemManager` v0155–v0157、`VDF_MDL012_FetchGroups` v0106;VCGC 的冊也有。
+- 操作員裁定:VDF 接到 main 上;VCGC / VRN / VRN-2 只列清單不動(見 `docs/VIA_S20261020_WorkstationFork_Report.md`)。
+
+### 接回對照
+
+| 工作站 | main(本 PR) |
+|---|---|
+| 管理員 v0155 `all` 一鍵 | v0159 |
+| 管理員 v0156 啟動就緒沿 Register 鏈 | v0160(第二批 PR:擊斃閘 KILL-11 要求每支新版 = main 尾版 +1,同一 PR 不能連加兩版) |
+| FetchGroups v0106(自測鏈隔離活資料樞) | 不搬:main v0106 已封倉,同一目的 |
+| FetchGroups v0107 / v0108 | 原號(main 只到 v0106);v0108 走第二批 PR(同上) |
+| ENG065 v0102 · ENG235 v0100 · SUP_MDL756 v0100 · ENG077 v0106 · 退役冊 v0100 | 原號 |
+
+- 改號只動寫死的本版版號,檔頭加「改號接線」註記;其餘一字不改。前版照 glob 取到 main 的尾版。
+- 擊斃閘 KILL-07:工作站寫的開閘提示原本字面帶設值寫法(`=YES`),改成只點名兩個閘的變數(倉內 ENG093 的寫法);ENG077 自測字典改拆寫鍵名。行為不變。
+- 延後兩支:管理員 ws v0157(要共用字級冊 v0103)· ENG093 v0105(要 VCGC 步驟冊 `CGC_MDL125` v0112)。
+
+### 一鍵:`VDF_MDL014_WorkstationSync` v0100
+
+工作站 cmd(在倉內 `VeritasIntelligenceAnalytics` 夾):
+
+```bat
+python "functional modules\VDF\VDF_MDL014_WorkstationSync_v0100.py"           & rem 預演
+python "functional modules\VDF\VDF_MDL014_WorkstationSync_v0100.py" --apply   & rem 執行
+```
+
+1. fetch;本機獨有提交若沒有遠端分支收著 → 推到 `workstation-backup-<時間>`(不動 main、不 force)。
+2. VDF 自己的 MAIN:固定在 `origin/main` 的 git 工作樹(預設 `%LOCALAPPDATA%\VIA\<倉名>-vdf-main`,不進 OneDrive)。本機原 checkout 不碰,他系統的工作照留。
+3. 在 VDF MAIN 裡經 VCGC 跑交接案:先移開舊收據 → 真的重跑(不沿用);VCGC 的冊還原不提交。
+4. 只收 VDF 的案的收據,提交到 `vdf-workstation-receipts-<時間>` 並推上去,印 PR 連結。
+- 自測 14/14(離線假倉);突變 8 種全抓。

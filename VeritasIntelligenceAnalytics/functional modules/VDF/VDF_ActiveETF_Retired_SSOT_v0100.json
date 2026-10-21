@@ -1,0 +1,17 @@
+{
+ "schema": "VDF.ActiveETF.Retired.SSOT.v1",
+ "version": "v0100",
+ "ts": "2026-10-13T14:03:35+00:00",
+ "owner": "VDF(VDF_ENG077_ActiveETFUniverse 讀;操作員裁定寫入)",
+ "rule": "冊上的 A 碼 = 操作員裁定退役(下市 / 改碼 / 官方冊長期消失)。ENG077 跑時:① unify 之後濾掉(不入當日宇宙列、不入 SSOT csv、ENG051 不再抓其持股)② 註冊表 active_tw_etf_registry 標 status=RETIRED · daily_required=false(不刪列,版史留)③ 不計入「官方冊消失」(rc 不因它回 2)。只增不減:撤銷退役填 revoked_at(有值 = 不算退役)。",
+ "retired": [
+  {
+   "ticker": "00998A",
+   "name": "主動復華金融股息",
+   "ruling": "操作員 2026-10-13「00998A 標退役」",
+   "reason": "工作站 2026-10-13 20:3x 一鍵實錄:TWSE t187ap47_L A 碼 31 · 既有快照 32 → ENG077 報官方冊消失 1 ['00998A'] → MISSING_FROM_SOURCE 候查 → rc 2 → 並行道 etf 鏈 FAIL(etf_fetch · etf_history · etf_revenue 沒起)",
+   "retired_at": "2026-10-13",
+   "revoked_at": null
+  }
+ ]
+}
