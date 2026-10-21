@@ -180,6 +180,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | 5 | 留意是否都有註冊成功 | ⑥c vrn2:// 寫完讀回核對(不同 → 黃)· 貼包「註冊核對」一行(⑤ 元件登記 · ⑥c 協定 · ② 定位登記)· NEXT 未全綠會說 | 啟動器自測 啟動器 --selftest 31 / 31(多 4 條:內嵌處理器 v0103 · 處理器自測 · 步驟次序 · ②b 來源寫 VRN2_SSOT / 設定檔還沒寫也能稽核) |
 | 6 | 非 PDF(word / txt / 影像)| 對話框與稽核都收;主體(ENG397 / vrn2scope)只擷取 PDF → 照實記「已收下 · 本版主體只擷取 PDF」,不假裝有處理;要真的擷取 Word / TXT / 影像是主體的下一輪 | 稽核行:非 PDF n(已收下 · 本版主體只擷取 PDF)|
 | 7 | Codex #550(P1 / P2):一鍵最後的燈沒把 ⑤b 算進去(vrn2:// 沒註冊也 GREEN / rc 0)· 處理器只比檔名(舊的 / 搬走的檢出也算接上)| ⑤b 併進 NEXT(紅 → 紅 · 黃 → 最多黃 · GREEN / rc 0 只在前後端真的接上 + 有輸入紀錄)· HKCU 指令解析成 python + 處理器 · 整條路徑正規化後比對 + 檔在(或那一夾有啟動器本輪寫的 `VRN2_UIAction_Config.json` v0133)· python 檔在 · 訊息寫明要的是哪一條路徑 | 單元測試 19 / 19(pwsh · 從 ps1 抽出 Chk5b 與 $lamp / $msg 原文 · 正確 → GREEN rc 0 · 同檔名別的檢出 / 不存在 / v0102 / python 不在 / 沒引號 → RED · 沒註冊 → YELLOW rc 2 · 沒輸入紀錄 → YELLOW · .. 正規化 / v0133 設定檔 / python 別夾 → GREEN)· Linux 沙盒一鍵重跑:①~⑫ 全綠 · ⑤b 黃(HKCU 沒註冊)→ NEXT 由 GREEN 變 YELLOW「vrn2:// 沒註冊 … 把 ⑤b 那兩行貼回」(誠實 · 143 秒)· 一鍵程式碼 SHA-256 21ab900abfd0 |
+| 8 | Codex #551(P2 ×2):一行(boot)的早退 `return` 讓 rc 變 0 · ⑤b 沒檢查 `"%1"` | boot 三個紅燈 `exit 1` · 一鍵四個早退紅燈先設 `$global:LASTEXITCODE = 1` · ③ 缺 zip / 發行冊 → 紅燈 · boot `try / catch` 例外 → RED rc 1;`Chk5b` 第三段必須是 `%1` 才綠 | boot 三個紅燈 return → exit 1 · 一鍵四個早退紅燈先設 LASTEXITCODE 1 · ③ 缺 zip / 發行冊 → 紅燈 · boot try/catch 例外 → RED rc 1;⑤b 第三段必須是 "%1";單元測試 22 / 22 · boot 失敗路徑 (a)~(e) 全 rc 1 · 最終一鍵程式碼 SHA-256 149832822f95 |
 
 ## 7.0b v0131 → v0132(借不到時說清楚下一步)
 

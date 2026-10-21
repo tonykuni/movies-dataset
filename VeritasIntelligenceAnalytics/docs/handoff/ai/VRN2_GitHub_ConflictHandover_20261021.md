@@ -29,7 +29,10 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 01:58 | movies-dataset | Codex 兩個修正提交 · 推到分支(此時 PR #550 已合併 → 這個提交不在 main)· 兩條討論串各回一次並解決 | `6d2dd5096` |
 | 10-21 01:59 | movies-dataset | 想把修正 rebase 到新 main 並 `--force-with-lease` 推 → 被權限分類器擋下(Git Destructive)→ **改用不改寫歷史的做法**:`git merge origin/main` 進分支(0 衝突)· 一般推送 | `4951a4272` |
 | 10-21 02:00 | movies-dataset | 開 **PR #551**(只帶 Codex 修正 · base = 已合併的 main);CI 3 工作起跑;訂閱 PR 事件 · 安全檢查排在 02:51 | #551 |
-| 10-21 02:03 | movies-dataset | CI:VRN contracts ✅ · Chromium UAT ✅ · VDF contracts 進行中 | #551 |
+| 10-21 02:03 | movies-dataset | CI:VRN contracts ✅ · Chromium UAT ✅ · VDF contracts 進行中(02:05 全綠 3 / 3) | #551 |
+| 10-21 02:04 | movies-dataset | Codex 在 #551 再給兩個 P2(boot 早退 `return` rc 0 · ⑤b 沒檢查 `"%1"`);security review 無發現 | #551 |
+| 10-21 02:06 | movies-dataset | 推本報告 + 交接 §11 連結(CI 重跑) | `551023d61` |
+| 10-21 02:3x | movies-dataset | Codex #551 兩個修正 + 一鍵失敗路徑 rc 實測(a)~(e)· 單元 22 / 22 · 沙盒一鍵重跑 → 推;兩條討論串各回一次並解決 | 見 PR #551 最新提交 |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
@@ -81,6 +84,7 @@ PR 已合併之後還有後續提交(本輪 01:53 → 01:58 就是這種情況):
 | `e6cb9d7f0`(PR #550 · 已合併) | `vrn2_release_v0133/`(啟動器 v0133 zip · 發行冊 · 一鍵 md = ActivateVRN-2.ps1 程式碼 · 實測紀錄 · logs zip · 測試工具 zip)· `VRN2_Handover_v0133.md` · `VRN2_Handover_latest.md` |
 | `6d2dd5096` + 合併 `4951a4272`(PR #551 · 開著) | Codex #550 兩個修正:一鍵 ⑤b 處理器整條路徑核對 · ⑤b 的燈併進 NEXT · boot 把燈帶回 rc;實測紀錄 §4 / §4b · 交接 · 發行冊 · logs(單元測試 19/19 + 修正前後兩輪一鍵)· 測試工具 |
 | 本報告 | `VRN2_GitHub_ConflictHandover_20261021.md`;`VRN2_Handover_v0133.md` / `latest` §11 加一條指到這裡 |
+| Codex #551 修正(PR #551 後續提交) | 一鍵程式碼最終 SHA-256 `149832822f95…`:boot / 一鍵的失敗路徑都回 rc 1 · ⑤b 檢查 `"%1"`;實測紀錄 §4c · logs(boot_fail_a~e · 單元 22/22 · 沙盒一鍵)|
 
 不放 `.ps1` 檔(一鍵程式碼嵌在 md 裡 · 一行會核對 SHA-256);不放 VCGC 的冊;提交訊息不含模型識別。
 
