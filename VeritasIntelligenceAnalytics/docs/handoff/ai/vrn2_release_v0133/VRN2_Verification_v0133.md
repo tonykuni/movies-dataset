@@ -13,7 +13,7 @@
 |---|---|
 | `ActivateVRN-2_v0133.py`(1,902,460 bytes) | `d9411dcb333ba253dfc5eb640ddcf5ed3ae6a75f5b0000e25708276d06f45c10` |
 | `ActivateVRN-2_v0133.zip`(成員 `ActivateVRN-2.py`) | `78997365c230ae7ecf712b4cf7e8e361714ea7d5ca89412f1a2e034a375ce303` |
-| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1)| `71bb2c9e228d…`(一鍵自己核對 · Codex #550 + #551 修正 + ⑤c U/I 代開;#551 修正後 `149832822f95…`;#550 修正後 `21ab900abfd0…` · 修正前 `9008c34b70bc…`)|
+| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1)| `0f9af29a5bf2…`(一鍵自己核對 · Codex #550 / #551 / #559 修正 + ⑤c U/I 代開;⑤c 第一版 `71bb2c9e228d…`;#551 修正後 `149832822f95…`;#550 修正後 `21ab900abfd0…` · 修正前 `9008c34b70bc…`)|
 
 ## 2. 自測
 
@@ -112,11 +112,13 @@ Downloads 是 **v0132** 啟動器 · 發行夾 `vrn2_release_v0133` 在 GitHub �
 * 基本資料 FAIL 9:CURRENT_PRICE_REPORT ×3 / TARGET_PRICE ×3 / UPSIDE_PCT ×2(值不在前兩頁或旁邊標籤不對 —— MS / GS 把現價、目標價印在第 3 頁以後或表格裡)· TITLE ×1。
 * 年度數據:BADITEM 23 全是 MS 的 ModelWare 科目(`ModelWare net inc (NT $ mn)` 原文寫法有空格差異 · `EPS (NT$)**` 星號)· DUPKEY 82 同鍵重複 · FAIL 1(Daiwa PBR n.a.)。
 
-### 4e. 操作員 Windows 實跑抓到的問題 → 一鍵再修(程式碼 `71bb2c9e228d`)
+### 4e. 操作員 Windows 實跑抓到的問題 → 一鍵再修(程式碼 `0f9af29a5bf2`)
 
 | 問題 | 修法 |
 |---|---|
 | U/I 沒跳出來:`VIA_NO_OPEN=1` 來自 VIA 的 PS 設定檔,啟動器 `_ui_open` 尊重它 | 一鍵跑啟動器前拿掉 `VIA_NO_OPEN`(結束還原);啟動器紀錄仍寫「沒有自動開啟」就 ⑤c 一鍵 `Start-Process` 開 U/I;`$env:VRN2_NO_UI = 1` 才不開 |
+| Codex #559 P2:`VRN2_NO_UI=1` 只跳過拿掉 `VIA_NO_OPEN`,啟動器自己還是會開 | `VRN2_NO_UI=1` 時改成替啟動器設 `VIA_NO_OPEN=1`(結束照原值還原 / 刪掉)|
+| Codex #559 P2:啟動器 `os.startfile` 失敗寫的是「開不了」,⑤c 只認「沒有自動開啟」→ 不代開還說已開 | ⑤c 兩種都代開;一鍵也開不了或找不到 U/I → `$c5cBad` → NEXT 最多 YELLOW「U/I 開不了 → 請手動開」(單元測試 +1 → 23 / 23)|
 | 處理器 `excl_rule` 取檔名規則時拿到最舊的管理器(`VRN_SystemManager_v0210.py`,容器只有 v0231+ 所以沒看出來)| 這一輪兩邊結果一致(範圍外 42 = ⑥b 排除 42),不改主體;下一輪處理器 v0104 改成取最新版(啟動器 v0134 內嵌)|
 
 ## 5. 註冊核對(操作員要的「是否都有註冊成功」)
