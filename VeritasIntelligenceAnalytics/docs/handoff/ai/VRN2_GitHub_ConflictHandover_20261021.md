@@ -40,6 +40,7 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 06:42 | movies-dataset | Codex #559 兩個 P2(`VRN2_NO_UI` 沒真的關 · 「開不了」沒代開)→ 修 · 推 · 回覆並解決 | #559 |
 | 10-21 08:21 | movies-dataset | 操作員合併 PR #559 | main `590c18c5c` |
 | 10-21 08:3x ~ | movies-dataset | 操作員令「integrate into one code to handle all above」→ v0134 整合一支(處理器 v0104 · 驗證器 v0103 · 啟動器 U/I 開不開只認 VRN2_NO_UI · ⑨ 交接不回退 · 交接 v0134)· 沙盒 e2e / 一鍵 / U/I 全過 · 推 · 新 PR | 見最新 PR |
+| 10-21 09:00 ~ | movies-dataset | Codex #561 P1(空值記號一律 NILVAL 沒看該格)· P2(字距把空白分開的兩個數黏成一個)→ 驗證器 v0104(v0103 沒落地過 · 內嵌換成 v0104)· 啟動器 v0134 重建 · 全部測試重跑 · 推 · 回覆並解決 | #561 |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
