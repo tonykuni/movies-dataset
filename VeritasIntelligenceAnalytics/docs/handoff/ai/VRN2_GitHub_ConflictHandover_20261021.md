@@ -32,7 +32,11 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 02:03 | movies-dataset | CI:VRN contracts ✅ · Chromium UAT ✅ · VDF contracts 進行中(02:05 全綠 3 / 3) | #551 |
 | 10-21 02:04 | movies-dataset | Codex 在 #551 再給兩個 P2(boot 早退 `return` rc 0 · ⑤b 沒檢查 `"%1"`);security review 無發現 | #551 |
 | 10-21 02:06 | movies-dataset | 推本報告 + 交接 §11 連結(CI 重跑) | `551023d61` |
-| 10-21 02:3x | movies-dataset | Codex #551 兩個修正 + 一鍵失敗路徑 rc 實測(a)~(e)· 單元 22 / 22 · 沙盒一鍵重跑 → 推;兩條討論串各回一次並解決 | 見 PR #551 最新提交 |
+| 10-21 02:15 | movies-dataset | 操作員合併 PR #551(Codex #551 修正還沒推上)| main `9ab53b02b` |
+| 10-21 02:20 | movies-dataset | Codex #551 兩個修正 + 一鍵失敗路徑 rc 實測(a)~(e)· 單元 22 / 22 · 沙盒一鍵重跑 → 推 `097a41368` · 開 PR #552 · 兩條討論串各回一次並解決 | #552 |
+| 10-21 02:40 | movies-dataset | 操作員合併 PR #552 · CI 3 / 3 綠 · Codex 無發現 | main `8beace226` |
+| 10-21 05:06(13:06 +08) | movies-dataset | 操作員 Windows 實跑一鍵 v0133(`C:\測試樣本報告`):②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑨ 船包上船 `51fd0421e` · ⑪ 黃 106 筆待核對 · U/I 沒自動開(`VIA_NO_OPEN=1` 來自 PS 設定檔)| 見實測紀錄 §4d |
+| 10-21 05:4x | movies-dataset | 一鍵 ⑤c:拿掉 `VIA_NO_OPEN` 跑啟動器 + 代開 U/I → 推 · 新 PR | 見最新 PR |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 

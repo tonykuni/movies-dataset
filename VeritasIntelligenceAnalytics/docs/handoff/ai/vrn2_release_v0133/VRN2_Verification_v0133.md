@@ -13,7 +13,7 @@
 |---|---|
 | `ActivateVRN-2_v0133.py`(1,902,460 bytes) | `d9411dcb333ba253dfc5eb640ddcf5ed3ae6a75f5b0000e25708276d06f45c10` |
 | `ActivateVRN-2_v0133.zip`(成員 `ActivateVRN-2.py`) | `78997365c230ae7ecf712b4cf7e8e361714ea7d5ca89412f1a2e034a375ce303` |
-| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1)| `149832822f95…`(一鍵自己核對 · Codex #550 + #551 修正後;#550 修正後 `21ab900abfd0…` · 修正前 `9008c34b70bc…`)|
+| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1)| `71bb2c9e228d…`(一鍵自己核對 · Codex #550 + #551 修正 + ⑤c U/I 代開;#551 修正後 `149832822f95…`;#550 修正後 `21ab900abfd0…` · 修正前 `9008c34b70bc…`)|
 
 ## 2. 自測
 
@@ -82,6 +82,42 @@ Downloads 是 **v0132** 啟動器 · 發行夾 `vrn2_release_v0133` 在 GitHub �
 | (c) 分支 / 路徑都讀不到 | `[RED] 讀不到 GitHub 分支 … 的一鍵程式碼` · **rc 1** |
 | (d) 發行夾只有 md、沒有 zip / 發行冊 | 以前:`Expand-Archive` 丟例外 · rc 0;現在:`[RED] ③ GitHub 分支的發行夾 … 缺 ActivateVRN-2_v0133.zip / VRN2_Release_v0133.json` · **rc 1** |
 | (e) 完整發行夾 · 本機沒啟動器 · python 是 `/bin/false` | 下載 v0133 雜湊相符 → 啟動器跑不起來 → `NEXT: [RED] VRN-2 有紅燈(… 啟動器 rc 不是 0)` · **rc 1** |
+
+### 4d. 操作員 Windows 實跑(2026-10-21 13:06 ~ 13:44 +08 · `C:\測試樣本報告` · 一鍵 `149832822f95` · 啟動器 v0133 `d9411dcb333b`)
+
+操作員貼回的貼包(117 行 · 2,317 秒):
+
+| 步驟 | 結果 |
+|---|---|
+| ③ | 舊啟動器 v0128 備份 · v0133 就位(雜湊相符 · 來源 GitHub 分支)|
+| ② | 程式夾定位綠 · 船包 83 檔已在 · 管理器鏈 v0231 → v0239 自測全 PASS(33/33 … 10/10)· 處理器 v0103 / 驗證器 v0102 / 工具橋 v0101 落地 · 159 秒 |
+| ②b | **綠** · 啟動器 --source · `C:\測試樣本報告` · 檔 534(PDF 97 · Word 7 · TXT 1 · 影像 201 · 其他型別 228)· 個股範圍 55 · 範圍外 42 · 非 PDF 209(已收下 · 本版主體只擷取 PDF)|
+| ③ 環境 | 黃:65 套件已裝 58 · 補裝 docling / gspread-dataframe / yake 失敗(pip 網路 IncompleteRead)· superextract / via-nlp-engine 是 VIA 內部名稱不補裝 · 不擋 |
+| ⑥c | **綠** · vrn2:// 已註冊 HKCU · **讀回核對相同** · 處理器 v0103 |
+| ⑥b | 綠 · 範圍夾 55(與 ②b 個股範圍一致)· 排除 42 |
+| ⑤ | 綠 · 元件登記 現役 2,990 · 新登 59 · 內容變 62 |
+| ⑦ | **綠** · 55 份 · 第 43 輪 · 燈 綠 44 黃 11 紅 0 · 個股四項 52 份全綠 · 交互驗證 55/55 · 鎖定 + 備份 · 冪等閘綠 · 916 秒 |
+| ⑧ | 綠 · 完成 · 紅 0 黃 5 |
+| ⑨ | 綠 · VRN-2 船包上船 origin/main `51fd0421e`(fast-forward)· 本機另有 132 個非 VRN-2 提交不代推 |
+| ⑪ | **黃 · 有待核對**:基本資料 52 份 FAIL 9 · 一標題四重點 FAIL 12 · 年度數據 11,513 筆(ALIGNED 10,387 · SUBALIGNED 752 · TRANSALIGNED 190 · PRESENT 78 · DUPKEY 82 · BADITEM 23 · FAIL 1)→ 「錯值 106」= FAIL 1 + BADITEM 23 + DUPKEY 82 · U/I 已寫回 |
+| ⑫ | 灰 · `C:\Users\tonyk\VIA-VDF-VRN` 這一版沒有工具冊 → 那個倉 `git switch main; git pull` 後再跑即可(PR #80 已把工具冊合進 main)|
+| ⑫b | 綠 · 輸入區塊新放進面板 |
+| 註冊核對 | **⑤ GREEN · ⑥c GREEN · ② GREEN · 處理器 v0103 · 全部登記成功** |
+| ⑤b | **綠** · vrn2:// → `…\functional modules\VRN\VRN2_UIAction_v0103.py`(整條路徑 = 本機 VRN-2 程式夾 · 檔在 · 帶 "%1")· python `C:\Python313\pythonw.exe` · 目前輸入 `C:\測試樣本報告` 稽核同 ②b |
+| NEXT | YELLOW(獨立驗證有待核對)· 啟動器 rc 0 |
+| U/I | **沒有自動開啟** —— 原因:VIA 的 PowerShell 設定檔(`Register-VIA-Commands`)把 `VIA_NO_OPEN=1` 設在環境,啟動器尊重它 → 見 4e |
+
+⑪ 的 106 筆分類(都是 VRN-2 主體 / 驗證器的下一輪工作,本輪沒動主體):
+* 一標題四重點 FAIL 12:7 筆是「報告上漲空間 X% 不在原文上漲空間標籤旁」(GS ×5 · 兆豐 · MS-8210 —— 摘要器把目標價 ÷ 現價算出上漲空間,原文沒印這個數)· 2 筆原文句覆蓋 78 ~ 83%(句子被截)· MS-6669 POINT_2 的 EPS 來自 ModelWare 列 · MS-1590 TITLE 覆蓋 75%。
+* 基本資料 FAIL 9:CURRENT_PRICE_REPORT ×3 / TARGET_PRICE ×3 / UPSIDE_PCT ×2(值不在前兩頁或旁邊標籤不對 —— MS / GS 把現價、目標價印在第 3 頁以後或表格裡)· TITLE ×1。
+* 年度數據:BADITEM 23 全是 MS 的 ModelWare 科目(`ModelWare net inc (NT $ mn)` 原文寫法有空格差異 · `EPS (NT$)**` 星號)· DUPKEY 82 同鍵重複 · FAIL 1(Daiwa PBR n.a.)。
+
+### 4e. 操作員 Windows 實跑抓到的問題 → 一鍵再修(程式碼 `71bb2c9e228d`)
+
+| 問題 | 修法 |
+|---|---|
+| U/I 沒跳出來:`VIA_NO_OPEN=1` 來自 VIA 的 PS 設定檔,啟動器 `_ui_open` 尊重它 | 一鍵跑啟動器前拿掉 `VIA_NO_OPEN`(結束還原);啟動器紀錄仍寫「沒有自動開啟」就 ⑤c 一鍵 `Start-Process` 開 U/I;`$env:VRN2_NO_UI = 1` 才不開 |
+| 處理器 `excl_rule` 取檔名規則時拿到最舊的管理器(`VRN_SystemManager_v0210.py`,容器只有 v0231+ 所以沒看出來)| 這一輪兩邊結果一致(範圍外 42 = ⑥b 排除 42),不改主體;下一輪處理器 v0104 改成取最新版(啟動器 v0134 內嵌)|
 
 ## 5. 註冊核對(操作員要的「是否都有註冊成功」)
 

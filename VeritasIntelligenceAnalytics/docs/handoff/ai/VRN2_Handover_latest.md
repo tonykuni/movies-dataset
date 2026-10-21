@@ -181,6 +181,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | 6 | 非 PDF(word / txt / 影像)| 對話框與稽核都收;主體(ENG397 / vrn2scope)只擷取 PDF → 照實記「已收下 · 本版主體只擷取 PDF」,不假裝有處理;要真的擷取 Word / TXT / 影像是主體的下一輪 | 稽核行:非 PDF n(已收下 · 本版主體只擷取 PDF)|
 | 7 | Codex #550(P1 / P2):一鍵最後的燈沒把 ⑤b 算進去(vrn2:// 沒註冊也 GREEN / rc 0)· 處理器只比檔名(舊的 / 搬走的檢出也算接上)| ⑤b 併進 NEXT(紅 → 紅 · 黃 → 最多黃 · GREEN / rc 0 只在前後端真的接上 + 有輸入紀錄)· HKCU 指令解析成 python + 處理器 · 整條路徑正規化後比對 + 檔在(或那一夾有啟動器本輪寫的 `VRN2_UIAction_Config.json` v0133)· python 檔在 · 訊息寫明要的是哪一條路徑 | 單元測試 19 / 19(pwsh · 從 ps1 抽出 Chk5b 與 $lamp / $msg 原文 · 正確 → GREEN rc 0 · 同檔名別的檢出 / 不存在 / v0102 / python 不在 / 沒引號 → RED · 沒註冊 → YELLOW rc 2 · 沒輸入紀錄 → YELLOW · .. 正規化 / v0133 設定檔 / python 別夾 → GREEN)· Linux 沙盒一鍵重跑:①~⑫ 全綠 · ⑤b 黃(HKCU 沒註冊)→ NEXT 由 GREEN 變 YELLOW「vrn2:// 沒註冊 … 把 ⑤b 那兩行貼回」(誠實 · 143 秒)· 一鍵程式碼 SHA-256 21ab900abfd0 |
 | 8 | Codex #551(P2 ×2):一行(boot)的早退 `return` 讓 rc 變 0 · ⑤b 沒檢查 `"%1"` | boot 三個紅燈 `exit 1` · 一鍵四個早退紅燈先設 `$global:LASTEXITCODE = 1` · ③ 缺 zip / 發行冊 → 紅燈 · boot `try / catch` 例外 → RED rc 1;`Chk5b` 第三段必須是 `%1` 才綠 | boot 三個紅燈 return → exit 1 · 一鍵四個早退紅燈先設 LASTEXITCODE 1 · ③ 缺 zip / 發行冊 → 紅燈 · boot try/catch 例外 → RED rc 1;⑤b 第三段必須是 "%1";單元測試 22 / 22 · boot 失敗路徑 (a)~(e) 全 rc 1 · 最終一鍵程式碼 SHA-256 149832822f95 |
+| 9 | 操作員 Windows 實跑(C:\測試樣本報告):U/I 沒跳出來 —— VIA 的 PS 設定檔把 `VIA_NO_OPEN=1` 設在環境,啟動器尊重它 | 一鍵跑啟動器前拿掉 `VIA_NO_OPEN`(結束還原)· 啟動器紀錄仍寫「沒有自動開啟」就 ⑤c 一鍵 `Start-Process` 開 U/I · `$env:VRN2_NO_UI = 1` 才不開 | 操作員 Windows 實跑 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55):②b 綠 · ⑥c 綠(HKCU 讀回相同)· ⑦ 55 份 綠 44 黃 11 紅 0 · 四項 52 全綠 · ⑧ 完成 · ⑨ 上船 51fd0421e · ⑪ 黃(FAIL 9 + 12 · 年度 11,513 錯值 106)· ⑫ 灰(本機 VIA-VDF-VRN 沒 pull)· 註冊核對 全部登記成功 · ⑤b 綠(整條路徑 · 帶 %1 · pythonw)· U/I 沒自動開(VIA_NO_OPEN=1 來自 PS 設定檔)→ 一鍵 ⑤c 代開 · 程式碼 71bb2c9e228d |
 
 ## 7.0b v0131 → v0132(借不到時說清楚下一步)
 
@@ -233,7 +234,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | # | 項目 | 狀態 | 需要 |
 |---|---|---|---|
-| 0 | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| 待執行 | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
+| 0 | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| **已執行 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55 · ②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑪ 黃 106 筆待核對 · U/I 沒自動開 → ⑤c 修)** | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
 | 0b | **VRN-1 合併 PR tonykuni/VIA-VDF-VRN#79**(另一團隊的倉 · 第十三 / 十四輪 · 操作員決定)| 待操作員 | 合併(或切到該分支)後 VRN-1 的工具冊就在 → VRN-2 ⑫ 才借得到;VRN-1 跑 MAIN 時 G23 借 VRN-2 的段落標題(先跑過一次 VRN-2 v0131,工具冊才在)|
 | 1 | 使用者用 v0129 的一行再跑(cmd / PowerShell 都能貼 · v0128 那一行也還能用 · 只是少了段落標題修正) | 待執行 | 預期:一鍵程式碼雜湊相符 · ③b / ② 印出程式夾來源與登記版號(本機上次成功 v0235)· 落地 v0236 → v0237 → v0238 → v0239 + 獨立驗證器 v0102 · ⑧ 完成 · ⑪ 綠 · U/I 自動跳出時第一個分頁就是「驗證過的輸出」· **貼回 ② / ③b / ⑨ / ⑪ 那幾行 + 驗證摘要**(52 份 · 新驗證器第一次在使用者機器跑 · 有 ✗ 格先看原文再判) |
 | 2 | 使用者機器其他 P1 黃燈(260914_daiwa_aspeed · GFHK Apple · 南亞 · 啟碁)| 不在容器 | 看 ⑪ 摘要與 U/I ✗ 格 |
