@@ -32,48 +32,16 @@
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
   [via-vcgc run] [流程] 政策過 · VDF_ENG093_LaunchConsole_v0105.py(家族 vdf)
-=== VDF_ENG093_LaunchConsole v0105 · 薄尾自測(清單先行鎖定列)===
-  [OK] v0105-① 真樹:矩陣最前兩列 tw_list · etf_list(鎖定 · 引擎在位 · 註記照誰先跑)· 啟動器的步照舊在後 · lists_by 與 lists_owner 一致 · (['tw_list', 'etf_list', 'datahome', 'hist_2023'], 'VDF', {'fixall': 'CGC_MDL125_FixAll_v0111.py', 'lanes': 'CGC_MDL134_ParallelLanes_v0101.py'})
-  [OK] v0105-② 鎖定列:兩列 class lock · checked · disabled · 提示 = 誰先跑的註記;其餘 .stp 數 = allowed 數(JS boxes() 與 -Steps 不含清單步) · (11, 11)
-  [OK] v0105-③ 決定不變:頁上勾的步照舊送 -Steps;清單步不送(validate 照舊只收啟動器的步 → 'tw_list' 被拒;清單由 ask 先跑或 VCGC 並行道先跑) · (['datahome', 'hist_2023'], {'field': 'steps', 'why': '不認得的步:tw_list'})
-  [OK] v0105-④ 本體已換:v0103 的 steps_matrix / _matrix_rows 指到本版 · 頁首版號 = 本版
-  [OK] v0105-⑤ 問參數頁渲染:v0105 字樣 · 兩列鎖定在矩陣最前 · 清單先行註記在頁上
-  [OK] v0105-⑤b 窄螢幕:問參數頁頭有 code 斷行樣式(一次)· 資料庫狀況頁同一支 · 重套不重複 · 沒 </head> 也加
-  [OK] v0105-⑥ 檔頭:加速器橋 · 網路橋在(__future__ 之後)· 不碰 TA-Lib · 不代設同意閘 · 不直派子行程
-  [lists] 009      rc 0 · 0s
-  [lists] 010      rc 0 · 0s
-  [OK] v0105-⑧ 清單先行全綠:009 → 010 依序 · 清單道 · live · 只放清單不放擷取道 · 日誌在資料家旁(暫存)· 每支時限 = 預算均分 · ('OK', ['009', '010'])
-  [lists] 009      rc 1 · 0s
-[停] 清單引擎失敗 ['009'] → 後面的擷取不起(清單是全部引擎的前提)
-  [OK] v0105-⑨ 009 紅 → 停在 009(010 不起)· 狀態 FAIL · ('FAIL', ['009'])
-  [OK] v0105-⑩ 不跑的三種:雙閘沒開 GATED(提示只點名閘名)· 只看計畫 SKIP_DRY · 時間不夠 NO_TIME —— 全都零子行程 · ('GATED', 'SKIP_DRY', 'NO_TIME', 0)
-  [OK] v0105-⑪ ask 包裝:launch + 清單綠 → rc 0 · 決定照舊 launch · lists OK 寫回;010 紅 → rc 5 · action lists_failed(開啟器不啟動);不是 launch → 不碰;清單歸 VCGC → 零子行程 rc 0 · {'ok': (0, 'launch', ['009', '010']), 'bad': (5, 'lists_failed', ['009', '010']), 'cancel': (0, 'cancel', []), 'vcgc': (0, 'launch', [])}
-  [OK] v0105-⑫ 雙閘沒開 → rc 4 · action lists_gated(不代設同意閘) · (4, 'lists_gated')
-  [OK] v0105-⑬ VCGC 步冊有清單兩步 → 照工作站版(lists_by VCGC · VCGC 註記 · 不換 VDF 列)· lists_owner = VCGC · ('VCGC', 'VCGC')
-  [OK] v0105-⑬b VCGC 那條路跑不動就不讓位:列在但引擎不在 / 並行道 < v0102 → lists_owner VDF · 兩列換成 VDF 列(VDF 註記) · ('VDF', 'VDF', 'VDF', 'VDF')
-  [OK] v0105-⑩b 擷取冊只有 009(缺 010)→ ABSENT · 零子行程 · why 點名缺的那支(不只跑一支就放行) · ('ABSENT', 0, "擷取冊 VDF_FetchSystem_SSOT_v9999.json 缺 ['010'] → 不啟動(清單兩支都是前提)")
-  ── 前版鏈自測(用它們自己的矩陣;VIA_SKIP_PRIOR_SELFTEST=1 略過)──
-  [OK] v0104-① 真樹:最新啟動器是薄尾也讀得到步清單(出自鏈上前版)· 起始日照最新那支 · ('Invoke-VIA-VdfFetch-v0108.ps1', 'Invoke-VIA-VdfFetch-v0107.ps1', 11)
-  [OK] v0104-② 合成鏈:起始日取最新(2024-05-06)· 步清單取前版(a_1,b_2)· 負控:鏈上都沒有 → 空清單並講明 · ('2024-05-06', ['a_1', 'b_2'], '啟動器鏈讀不到步清單($stepBook / $steps 那一行)')
-  [OK] v0104-③ 雙橋
-  ── v0103 自測(原樣;launcher_defaults 已換成鏈讀)──
-🧪 VDF_ENG093_LaunchConsole v0103 --selftest(零網路 · 只寫暫存)
-  ✓ ① 宣告符號齊備(13 個)
-  ✓ ② 橋接件完好(ACCEL/NET)
-  ✓ ③ 預設起始日與步清單讀自啟動器正本(-Since 優先,沒有退 -Year 的 1/1;$stepBook 那一行,舊版 $steps 也認)· 負控:讀不到就講明並退 2023-01-01、步清單空
-  ✓ ④ 參數驗證:正控(自訂 2024-03-15 · 兩步依啟動器順序排 · 截止=今天;預設模式忽略頁上亂填)· 負控 14 條逐欄點名(日期格式/假日期/未來/太早/空步/非清單/不認得/重複/旗標型別/送 limit 被拒且講明全抓/year/until/consent/亂動作)· 步清單讀不到=不能啟動
-  ✓ ⑤ 本機頁往返:無權杖 403 · 帶權杖 200 · GET /decide 405 · 錯權杖 403 · 跨源 403 · 壞起始日 400 點名 since · 送 limit 400 點名 limit · 正確 200 · 第二次 409
-  ✓ ⑥ 逾時 → action=timeout 且決定檔照寫(不啟動)
-  ✓ ⑦ 資料庫狀況:同名表取最新那一本 · 分類燈委派 CGC_MDL153 · 缺口委派 VDF_ENG089 · 頁上有「本次輸入參數」與「各步結果」(取最近一次非 PLAN 報告,紅步帶紀錄檔)· 主控台印紅步 · 「頁:」獨佔一行絕對路徑 · 負控:目錄不在=ABSENT rc3
-  ✓ ⑩ 要抓的資料矩陣:列序=啟動器步清單 · 引擎尾版都在 · hist_2023 帶起始日與今天 · 月營收帶起始月 · 沒有一步帶 --limit(全抓) · 觸網/鏈取自正主 · 環境用完即還原 · 負控:不認得的步=缺列
-  ✓ ⑧ 本檔零寫同意閘(AST)· 兩頁零外部資源(零 CDN)· 問參數頁沒有檔數上限欄
-  ✓ ⑨ stdout 導到檔(同 Invoke-VIAPython)·「頁:網址」在決定之前就落檔 · 頁上送「不啟動」→ 200 · rc 0 · 決定檔 cancel
-  ✓ ⑪ 逐一引擎自測台:開跑 200 · 跑的時候按啟動 409(點名 selftest)· 兩支都有結果(綠一紅一)· 錯權杖 403 · 跑完才收啟動 200
-  ✓ ⑫ 單支引擎自測器:rc0=OK(取「計」那一行)· rc1=FAIL · 逾時=TIMEOUT · 檔不在=ABSENT · 子行程環境零 CONSENT 變數、零跳出
-  ✓ ⑬ 滯後交邏輯庫正本:月營收 202608=0(10/10 才到期)· 財報 6/30=0(Q3 11/14 才到期)· etf_book 民國 1150913=11 日 · 籌碼 9/21=3 日(與 v0102 同)· 鏡像庫兩表=凍結不計燈;**負控**:正本缺席=退回 v0102 日頻(月營收算不出、財報 86 日)
-[計] OK 13 · FAIL 0 · NODATA 0 → rc=0 (GREEN)
-  [OK] v0104-④ v0103 自測 rc 0 · 0
-[計] VDF_ENG093_LaunchConsole_v0104 4/4 · PASS
-  [OK] v0105-⑦ 前版 VDF_ENG093_LaunchConsole_v0104 自測 rc 0
-  [計] VDF_ENG093_LaunchConsole v0105 薄尾 16/16 · PASS
-[監控] 背景全景監控中 pid 22352 · 觸碰 run VDF_ENG093_LaunchConsole · 交接閘 RED · 落後 641 提交 · 快照 437.9h · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 C:\Users\tonyk\AppData\Local\VIA\movies-dataset-vdf-main\VeritasIntelligenceAnalytics\VIA_Reports\panorama\dashboard_latest.html
+Traceback (most recent call last):
+  File "C:\Users\tonyk\AppData\Local\VIA\movies-dataset-vdf-main\VeritasIntelligenceAnalytics\functional modules\VDF\VDF_ENG093_LaunchConsole_v0105.py", line 72, in <module>
+    import json
+  File "C:\Users\tonyk\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\__init__.py", line 106, in <module>
+    from .decoder import JSONDecoder, JSONDecodeError
+  File "C:\Users\tonyk\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\decoder.py", line 3, in <module>
+    import re
+  File "C:\Users\tonyk\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\re\__init__.py", line 125, in <module>
+    from . import _compiler, _parser
+  File "C:\Users\tonyk\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\re\_compiler.py", line 18, in <module>
+    assert _sre.MAGIC == MAGIC, "SRE module mismatch"
+AssertionError: SRE module mismatch
+[監控] 背景全景監控中 pid 25728 · 觸碰 run VDF_ENG093_LaunchConsole · 交接閘 RED · 落後 647 提交 · 快照 443.5h · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 C:\Users\tonyk\AppData\Local\VIA\movies-dataset-vdf-main\VeritasIntelligenceAnalytics\VIA_Reports\panorama\dashboard_latest.html
