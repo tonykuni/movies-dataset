@@ -40,7 +40,9 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 06:42 | movies-dataset | Codex #559 兩個 P2(`VRN2_NO_UI` 沒真的關 · 「開不了」沒代開)→ 修 · 推 · 回覆並解決 | #559 |
 | 10-21 08:21 | movies-dataset | 操作員合併 PR #559 | main `590c18c5c` |
 | 10-21 08:3x ~ | movies-dataset | 操作員令「integrate into one code to handle all above」→ v0134 整合一支(處理器 v0104 · 驗證器 v0103 · 啟動器 U/I 開不開只認 VRN2_NO_UI · ⑨ 交接不回退 · 交接 v0134)· 沙盒 e2e / 一鍵 / U/I 全過 · 推 · 新 PR | 見最新 PR |
-| 10-21 09:00 ~ | movies-dataset | Codex #561 P1(空值記號一律 NILVAL 沒看該格)· P2(字距把空白分開的兩個數黏成一個)→ 驗證器 v0104(v0103 沒落地過 · 內嵌換成 v0104)· 啟動器 v0134 重建 · 全部測試重跑 · 推 · 回覆並解決 | #561 |
+| 10-21 09:00 ~ | movies-dataset | Codex #561 P1(空值記號一律 NILVAL 沒看該格)· P2(字距把空白分開的兩個數黏成一個)→ PR #561 在修的途中被合併 MAIN → 已合併的版本不改,出 v0135(驗證器 v0104 · 啟動器 v0135 · 發行夾 · 一鍵 · 交接)· 全部測試重跑 · 推 · 新 PR;#561 的兩個討論串回覆並解決(指向 #562)| #561 → #562 |
+| 10-21 09:35 ~ 09:44 | movies-dataset | Codex #562 P1(`_nil_cell` 值在鄰列沒看)→ 驗證器 v0104 `_val_row`(與 `_row_hits` 同一套定值列 · 表頭字樣不算值)· 啟動器 v0135 重建 `ea6d4ebbb` · e2e / 一鍵 / U/I 重跑 · 推 · 回覆並解決 | #562 |
+| 10-21 09:46 | movies-dataset | 操作員令「解決衝突問題」:#562 與 main 無檔案交集(main 多 2 個 VDF 收據提交 `6633ab3e4` · `755a815ba`,只動 `docs/handoff/evidence/qg_onebridge.*`)· `git merge-tree` 乾淨 · GitHub mergeable(unstable = 新 head 的 CI 還在跑)→ 把 main 併進分支(merge commit · 不改寫歷史)· 推 | #562 |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
