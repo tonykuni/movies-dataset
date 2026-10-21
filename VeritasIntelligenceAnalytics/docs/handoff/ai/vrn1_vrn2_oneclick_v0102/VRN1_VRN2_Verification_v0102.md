@@ -17,7 +17,7 @@ v0102 = v0101 + ② 改指 VRN-2 一鍵 v0136(驗證器 v0105:DUPKEY 看位置�
 
 | 頁 | 實測 |
 |---|---|
-| VRN-2 U/I `VRN2_UI_latest.html`(第一個分頁「驗證過的輸出」) | 0 / 0 · 獨立驗證 v0105 寫回 4,905 筆 |
+| VRN-2 U/I `VRN2_UI_latest.html`(第一個分頁「驗證過的輸出」) | 35 / 35 · 獨立驗證 v0105 寫回 4,905 筆 |
 | VRN-2 PIVOT `pivot\VRN_Pivot_v0100.html` | 29 / 29(年度 PIVOT 1,060 列)|
 | VRN-1 驗證過的輸出 `VRN_Verified_Output_v0100.html` | 28 / 28(年度數據 1,686 · 年度財報格 354 · 代號紀錄 14 · 自動修正 7)|
 | VRN-1 PIVOT `VRN_Pivot_v0100.html` | 29 / 29(年度 PIVOT 221 列)|
