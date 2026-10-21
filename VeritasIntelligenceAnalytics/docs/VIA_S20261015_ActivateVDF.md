@@ -847,5 +847,5 @@ python "<VDF 工作樹>\VeritasIntelligenceAnalytics\functional modules\VDF\Acti
 
 - 新冊 `functional modules/VDF/VDF_DataHome_SSOT_v0100.json`(VDF 自己的冊):`homes[workstation].db_home = …\via_01_vdf`(= VCGC 的 VIA_SubsystemBundle_SSOT 裡 via_01_vdf 的 target;那本只讀不改)。
 - v0114 `resolve_homes`:`--db-home` / `VIA_VDF_DB_HOME` 沒給 → 冊上在這台機器存在的家;家本身或底下唯一放 `.duckdb` 的夾就是本輪資料庫家(寫回 `opt.db_home`,前版 db where / check / refill / xcheck 照 `--home` 帶);擷取家沒給 → 冊上 `fetch_home`,沒寫就由家底下唯一的 `output_hub` 上一層推。冊上的家不在(容器 / CI)→ 不猜、照前版並標黃。
-- `run` / `plan` 印 `[資料家] …` 一行;總覽頁操作入口卡也列;自測 ⑦(七種情況)+ ⑧(activate 蓋章:同步 · 資料家 · schema / tag;殺掉突變 no-sync-in-card)→ 8/8。
+- `run` / `plan` 印 `[資料家] …` 一行;總覽頁操作入口卡也列;自測 ⑦(七種情況)+ ⑧(activate 蓋章:同步 · 資料家 · schema / tag;殺掉突變 no-sync-in-card)→ 8/8;Codex #553 P1 → ⑤ 與 ⑤b 同步後重啟(同步綠後改派更新後工作樹的 ActivateVDF.py 不帶 --sync 重跑一輪、回它的 rc;同步結果寫 logs/sync/sync_result.json 經 VIA_ACT_SYNC_RESULT 接回總覽卡)→ 9/9、突變 32 個全抓到。
 - 換家不改程式:出 `VDF_DataHome_SSOT_v0101.json`。

@@ -17,6 +17,9 @@ FOR THE SOURCE AND I CAN OPERATE IN HTML U/I.」
      VDF 自己的冊 VDF_DataHome_SSOT 尾版(本夾)登記操作員的家;--db-home / VIA_VDF_DB_HOME 沒給時,冊上在這台機器存在的家就是
      本輪資料庫家(家本身或底下唯一放 .duckdb 的夾);擷取家沒給時照冊上 fetch_home,沒寫就由家底下唯一的 output_hub 上一層推。
      冊上的家在這台機器不在 → 不猜、照前版(倉內 output_hub)並標黃。run / plan 都印 [資料家] 一行;總覽頁操作入口卡也列。
+  ④ 同步後重啟(Codex #553 P1):--sync 綠之後工作樹的檔已是最新 main,但本行程載入的仍是同步前的程式;所以把同步結果寫成
+     JSON(logs/sync/sync_result.json),改派更新後工作樹的 ActivateVDF.py(不帶 --sync,避免無限重啟;VIA_ACT_SYNC_RESULT 指到那份
+     JSON)重跑一輪、回它的 rc;重啟後那一輪把同步結果接回總覽卡。
   用法(工作站,站在 VDF 工作樹裡;PowerShell 或 cmd 都一樣):
     python "<VDF 工作樹>\VeritasIntelligenceAnalytics\functional modules\VDF\ActivateVDF.py" run --sync --refill-apply
   PS 一鍵 Invoke-VDF-Activate v0105 的參數表是固定的(沒有 --sync / --lanes 直通),要經 PS 一鍵走本版要另一次 L70 許可改 .ps1;本線不改 .ps1。
@@ -374,6 +377,39 @@ def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path
     return card
 
 
+def reexec_argv(opt) -> list:
+    """重啟用的參數:v0100 那段照舊 + 本版旗標,但不帶 --sync / --sync-case / --sync-only(已同步過,避免無限重啟)。"""
+    a = list(opt.rest_argv) + ["--groups", opt.groups, "--jobs", opt.jobs]
+    if not opt.lanes:
+        a.append("--no-lanes")
+    return a
+
+
+def reexec_after_sync(opt, s: dict, log_dir: Path, py: str | None = None, folder: Path = HERE) -> int:
+    """同步綠之後:工作樹的檔已換成最新 main,本行程載入的仍是同步前的程式 → 同步結果寫成 JSON,派更新後工作樹的 ActivateVDF.py
+    (不帶 --sync)重跑一輪,回它的 rc(Codex #553 P1)。"""
+    log_dir.mkdir(parents=True, exist_ok=True)
+    hand = log_dir / "sync_result.json"
+    hand.write_text(json.dumps(s, ensure_ascii=False, indent=1), encoding="utf-8")
+    launcher = folder / "ActivateVDF.py"
+    if not launcher.is_file():
+        launcher = Path(__file__)
+    args = [py or sys.executable, str(launcher)] + reexec_argv(opt)
+    print(f"  [同步後重啟] 樹已是最新 main → 用更新後的啟動器重跑(不帶 --sync):{' '.join(args[1:])}", flush=True)
+    return subprocess.call(args, env=dict(os.environ, VIA_ACT_SYNC_RESULT=str(hand)))
+
+
+def sync_handover(env: dict | None = None) -> dict | None:
+    """重啟後那一輪:VIA_ACT_SYNC_RESULT 指到的 JSON 就是上一行程的同步結果(接回總覽卡);沒有 → None;讀不到 → YELLOW 卡照實說。"""
+    hand = (os.environ if env is None else env).get("VIA_ACT_SYNC_RESULT")
+    if not hand:
+        return None
+    try:
+        return json.loads(Path(hand).read_text(encoding="utf-8"))
+    except Exception as e:                        # noqa: BLE001 — 接不回就照實標黃,不讓一鍵倒
+        return {"lamp": "YELLOW", "rc": None, "path": hand, "secs": 0, "lines": [], "branch": None, "pr_url": None, "note": f"同步結果讀不到:{type(e).__name__}: {e}"}
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv[:1] == ["--selftest"]:
@@ -386,6 +422,7 @@ def main(argv=None) -> int:
             print(f"  ① 擷取 {'分道並行 ' + FG_FAMILY_V0114 + ' run --groups ' + opt.groups + ' --jobs ' + opt.jobs if opt.lanes else '逐列 fetch run(--no-lanes)'}")
             print("  ③ " + homes_line(resolve_homes(opt)))
         return rc
+    _RUN14["sync"] = None
     if opt.sync:
         s = run_sync(opt.sync_cases, log_dir=V0100.REPORT_DIR / "logs" / "sync")
         _RUN14["sync"] = s
@@ -398,6 +435,8 @@ def main(argv=None) -> int:
             return 1
         if opt.sync_only:
             return 0
+        return reexec_after_sync(opt, s, V0100.REPORT_DIR / "logs" / "sync")   # 本行程是同步前的碼 → 交給更新後的樹
+    _RUN14["sync"] = sync_handover()
     _RUN14["homes"] = resolve_homes(opt)
     print("  " + homes_line(_RUN14["homes"]), flush=True)
     card = activate(opt)
@@ -555,7 +594,9 @@ def selftest() -> int:
 
     acts, g = [], globals()
     keep_a, keep_s = g["activate"], g["run_sync"]
-    g["activate"] = lambda opt, *a, **k: (acts.append(opt), {"lamp": "GREEN", "report": {"html": "h"}, "flows": []})[1]
+    g["activate"] = lambda opt, *a, **k: (acts.append((opt, _RUN14["sync"])), {"lamp": "GREEN", "report": {"html": "h"}, "flows": []})[1]
+    reex, keep_x = [], g["reexec_after_sync"]
+    g["reexec_after_sync"] = lambda opt, s, log_dir, **k: (reex.append((reexec_argv(opt), s, log_dir)), 7)[1]
     g["run_sync"] = lambda cases, **k: {"lamp": g["_FAKE_SYNC_LAMP"], "rc": 0 if g["_FAKE_SYNC_LAMP"] == "GREEN" else 2, "secs": 1, "path": "m", "lines": [], "branch": None, "note": "n"}
     try:
         g["_FAKE_SYNC_LAMP"] = "RED"
@@ -566,12 +607,43 @@ def selftest() -> int:
             rc_ok = main(["run", "--sync", "--no-open"])
             rc_only = main(["run", "--sync-only"])
             rc_plain = main(["run", "--no-open"])
-        chk("⑤ 主流程:--sync 紅 → rc 1 且不啟動(不在錯的樹上抓);綠 → 接著啟動(opt 帶 sync / lanes);--sync-only 只同步 rc 0;不帶 --sync 直接啟動",
-            rc_red == 1 and rc_ok == 0 and rc_only == 0 and rc_plain == 0 and len(acts) == 2
-            and acts[0].sync and acts[0].lanes and not acts[1].sync, (rc_red, rc_ok, rc_only, rc_plain, len(acts)))
+            td5 = Path(tempfile.mkdtemp(prefix="vdfact114s_"))
+            hand = td5 / "sync_result.json"
+            hand.write_text(json.dumps({"lamp": "GREEN", "path": "m", "lines": ["[備份] 不需要"], "branch": "b1"}), encoding="utf-8")
+            keep_env = os.environ.get("VIA_ACT_SYNC_RESULT")
+            os.environ["VIA_ACT_SYNC_RESULT"] = str(hand)
+            try:
+                rc_hand = main(["run", "--no-open", "--no-lanes", "--groups", "TW_FIN"])
+            finally:
+                if keep_env is None:
+                    os.environ.pop("VIA_ACT_SYNC_RESULT", None)
+                else:
+                    os.environ["VIA_ACT_SYNC_RESULT"] = keep_env
+            bad = sync_handover({"VIA_ACT_SYNC_RESULT": str(td5 / "nope.json")})
+        chk("⑤ 主流程:--sync 紅 → rc 1 且不啟動(不在錯的樹上抓);綠 → 不在本行程啟動,改派更新後工作樹的啟動器重跑(參數不帶 --sync、本版旗標照帶)並回它的 rc;"
+            " --sync-only 只同步 rc 0;不帶 --sync 直接啟動(sync 卡空);重啟後那一輪 VIA_ACT_SYNC_RESULT 的同步結果接回卡;接不到 → YELLOW 卡",
+            rc_red == 1 and rc_ok == 7 and rc_only == 0 and rc_plain == 0 and rc_hand == 0 and len(acts) == 2 and len(reex) == 1
+            and reex[0][0] == ["run", "--no-open", "--groups", "ALL", "--jobs", "auto"] and reex[0][1]["lamp"] == "GREEN" and reex[0][2] == V0100.REPORT_DIR / "logs" / "sync"
+            and not acts[0][0].sync and acts[0][1] is None and acts[1][1] == {"lamp": "GREEN", "path": "m", "lines": ["[備份] 不需要"], "branch": "b1"}
+            and not acts[1][0].lanes and acts[1][0].groups == "TW_FIN" and bad["lamp"] == "YELLOW" and "讀不到" in bad["note"],
+            (rc_red, rc_ok, rc_only, rc_plain, rc_hand, len(acts), reex, bad))
+        shutil.rmtree(td5, ignore_errors=True)
     finally:
-        g["activate"], g["run_sync"] = keep_a, keep_s
+        g["activate"], g["run_sync"], g["reexec_after_sync"] = keep_a, keep_s, keep_x
         g.pop("_FAKE_SYNC_LAMP", None)
+        _RUN14["sync"] = None
+    td5 = Path(tempfile.mkdtemp(prefix="vdfact114x_"))
+    try:
+        (td5 / "ActivateVDF.py").write_text("import os, sys, pathlib\npathlib.Path(sys.argv[0]).with_name('seen.txt').write_text(' '.join(sys.argv[1:]) + '|' + os.environ.get('VIA_ACT_SYNC_RESULT', ''), encoding='utf-8')\nsys.exit(3)\n", encoding="utf-8")
+        o5 = types.SimpleNamespace(rest_argv=["run", "--no-open", "--dry"], groups="ALL", jobs="4", lanes=False)
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc5 = reexec_after_sync(o5, {"lamp": "GREEN", "branch": "b"}, td5 / "logs", folder=td5)
+        seen = (td5 / "seen.txt").read_text(encoding="utf-8")
+        chk("⑤b 同步後重啟真派:更新後夾裡的 ActivateVDF.py 收到 v0100 參數 + 本版旗標、沒有 --sync;VIA_ACT_SYNC_RESULT 指到寫好的 sync_result.json(內容 = 同步結果);回子行程 rc",
+            rc5 == 3 and seen.split("|")[0] == "run --no-open --dry --groups ALL --jobs 4 --no-lanes" and seen.split("|")[1] == str(td5 / "logs" / "sync_result.json")
+            and json.loads((td5 / "logs" / "sync_result.json").read_text(encoding="utf-8")) == {"lamp": "GREEN", "branch": "b"}, (rc5, seen))
+    finally:
+        shutil.rmtree(td5, ignore_errors=True)
     td = Path(tempfile.mkdtemp(prefix="vdfact114h_"))
     try:
         home = td / "home"
