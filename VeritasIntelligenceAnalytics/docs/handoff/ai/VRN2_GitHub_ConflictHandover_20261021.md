@@ -38,6 +38,8 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 05:06(13:06 +08) | movies-dataset | 操作員 Windows 實跑一鍵 v0133(`C:\測試樣本報告`):②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑨ 船包上船 `51fd0421e` · ⑪ 黃 106 筆待核對 · U/I 沒自動開(`VIA_NO_OPEN=1` 來自 PS 設定檔)| 見實測紀錄 §4d |
 | 10-21 06:38 | movies-dataset | 一鍵 ⑤c:拿掉 `VIA_NO_OPEN` 跑啟動器 + 代開 U/I → 推 `3f40b660f` · 合 main(操作員 ⑨ 推上的舊版交接 v0133 / latest 取本分支新版)`5dd6873e8` · 開 PR #559 | #559 |
 | 10-21 06:42 | movies-dataset | Codex #559 兩個 P2(`VRN2_NO_UI` 沒真的關 · 「開不了」沒代開)→ 修 · 推 · 回覆並解決 | #559 |
+| 10-21 08:21 | movies-dataset | 操作員合併 PR #559 | main `590c18c5c` |
+| 10-21 08:3x ~ | movies-dataset | 操作員令「integrate into one code to handle all above」→ v0134 整合一支(處理器 v0104 · 驗證器 v0103 · 啟動器 U/I 開不開只認 VRN2_NO_UI · ⑨ 交接不回退 · 交接 v0134)· 沙盒 e2e / 一鍵 / U/I 全過 · 推 · 新 PR | 見最新 PR |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
@@ -90,6 +92,7 @@ PR 已合併之後還有後續提交(本輪 01:53 → 01:58 就是這種情況):
 | `6d2dd5096` + 合併 `4951a4272`(PR #551 · 開著) | Codex #550 兩個修正:一鍵 ⑤b 處理器整條路徑核對 · ⑤b 的燈併進 NEXT · boot 把燈帶回 rc;實測紀錄 §4 / §4b · 交接 · 發行冊 · logs(單元測試 19/19 + 修正前後兩輪一鍵)· 測試工具 |
 | 本報告 | `VRN2_GitHub_ConflictHandover_20261021.md`;`VRN2_Handover_v0133.md` / `latest` §11 加一條指到這裡 |
 | Codex #551 修正(PR #551 後續提交) | 一鍵程式碼最終 SHA-256 `149832822f95…`:boot / 一鍵的失敗路徑都回 rc 1 · ⑤b 檢查 `"%1"`;實測紀錄 §4c · logs(boot_fail_a~e · 單元 22/22 · 沙盒一鍵)|
+| v0134(整合一支) | `vrn2_release_v0134/`(啟動器 v0134 zip · 發行冊 · 一鍵 md · 實測紀錄 · logs · 測試工具)+ `VRN2_Handover_v0134.md` / `latest`;⑨ 從 v0134 起不回退交接 |
 
 不放 `.ps1` 檔(一鍵程式碼嵌在 md 裡 · 一行會核對 SHA-256);不放 VCGC 的冊;提交訊息不含模型識別。
 

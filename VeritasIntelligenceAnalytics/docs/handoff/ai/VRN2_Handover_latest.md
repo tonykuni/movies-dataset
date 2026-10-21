@@ -1,4 +1,4 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0133 · 2026-10-21(前後端連結:U/I 左側「輸入(window I/O)」→ vrn2://pick 開 Windows 對話框選檔案夾 / 檔案(pdf · word · txt · 影像)→ 稽核 → 當來源夾 · 三類只開「個股報告/訊息」· vrn2:// 註冊讀回核對 · 貼包「註冊核對」· v0132:工具橋 v0101 借不到時說清楚下一步 · v0131:工具相互取用 · 四系統各自獨立 · VRN-2 主體一個位元組都不動)
+# VRN-2 交接報告 · ActivateVRN-2 v0134 · 2026-10-21(整合一支:操作員 Windows 實跑抓到的事全部進啟動器 —— U/I 處理器 v0104(檔名規則取最新版管理器)· 獨立驗證器 v0103(標籤旁看前 4 頁 · 字距拆開的數字 · 上漲空間推算 · 覆蓋率去標點 · 科目名去 * $ · 空值記號 NILVAL 不算錯值)· U/I 開不開只認 --no-open / VRN2_NO_UI=1 · ⑨ 不再用內嵌交接蓋掉倉裡較新的交接 · v0133:前後端連結 + U/I window I/O 輸入 · 四系統各自獨立)
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的貼包(結尾 `NEXT:`)與**驗證摘要**(`VIA_Reports\vrn2\verify_independent\*.digest.txt` · ≤150 行)。不要重讀整份程式;要看程式先用省 Token 卡(`read` / `slice` / `chain`)。
 > **操作員裁決(2026-10-18)**:「都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成」→ VRN-2 / VCGC / VDF 三系統各自獨立:VRN-2 不寫進別的系統的家族、不經 VCGC 核號、不登 VCGC 中央冊。
@@ -7,8 +7,10 @@
 > **操作員重申(2026-10-20)**:「重申VCGC VRN-1  VRN-2 VDF皆是獨立系統有獨立的MAIN獨立運作互不影響」→ 工具相互取用只在執行時**讀**對方的工具冊與檔(逐檔核對 sha256),不改、不複製、不寫對方的夾;對方不在 / 沒有工具冊 / 檔換過 → 各自只用自己的工具照常跑完(灰 / 黃,不是紅)。容器實測兩邊各自單獨跑:VRN-2 關掉借用(`VIA_VRN2_NO_BORROW=1`)→ ⑫ 灰「這次不借」· ⑦ 14 / 14 綠 · ⑧ 完成 · ⑪ 錯值 0;VRN-1 那邊關掉借用(`VRN_NO_BORROW=1`)與 VRN-2 不在場各跑一次 19 份真報告 → FAIL 0 · 收尾完成(VRN-2 不在場時 G23 說「VRN-2 在 …,但還沒有工具冊 → 先跑一次 VRN-2 一鍵 v0131 以上」)。
 > **操作員令(2026-10-20)**:「用中文回復 一路實測修復到底 TEST DEBUG OPTIMIZE … FACILITATE … USER-TEST … ACTIVATE … TILL THEY WORKS PERFECTLY. 授權全自動完成」。
 > **操作員令(2026-10-21)**:「用vcgc的節省token工具來進行工作之後都是:做好啟動系統實測準備善用vcgc節省token工具進行最後一大修,檢查用ActivateVRN-2.ps1啟動前後端並連結讓使用者在html上用window i/o輸入檔案夾或檔案可以為pdf word txt image檔案夾 分為三種 個股報告/訊息 產業報告/展望 其他投資報告 現在進行的是個股報告/訊息其他功能關閉準備好測試無誤後留意是否都有註冊成功並上傳github github有無衝突問題一併解決 下一步換輸入檔案audit"C:\測試樣本報告"」。
-> **本輪(v0133 · 啟動器 + U/I 處理器 VRN2_UIAction_v0103 · 交接報告 v0133 · 管理器鏈 / ENG397 / 摘要器 / 獨立驗證器 / 工具橋 / OCR 橋一個位元組都不動)**:① 前端 = `VIA_Reports\vrn2\VRN2_UI_latest.html`,後端 = vrn2:// 協定(HKCU)→ 處理器 v0103 → 啟動器;一鍵 ⑤b 檢查兩端有接上(HKCU 的指令解析成 python + 處理器 · 處理器整條路徑 = 本機 VRN-2 程式夾的 v0103 且檔在 · python 檔在 · U/I 有輸入區塊)· ⑤b 的燈併進最後 NEXT(Codex #550 修正)。② U/I 左側新區塊「輸入(window I/O)」:三類 radio(只有 個股報告/訊息 可選;產業報告/展望 · 其他投資報告 disabled「尚未開放」,處理器收到也拒絕)· 📁 選擇檔案夾(`vrn2://pick?kind=folder&cat=stock` → Windows 原生資料夾對話框)· 📄 選擇檔案(`kind=files` → 多選 pdf / docx / doc / txt / png / jpg / jpeg / tif / tiff / bmp → 複製到 `VIA_Reports\vrn2\input_pick\<時間>\`)· 🔎 重新稽核;選好 → 稽核(型別 · 個股範圍 / 範圍外 · 非 PDF)→ `VRN2_Input_latest.json` → 區塊更新 → 重開 U/I → 按「▶ 完整重跑」。③ 啟動器 ②b 輸入來源:`--source`(一鍵 `$env:VRN2_SOURCE`)> 環境 VIA_VRN_INPUT > U/I 選的 > VRN2_SSOT > 預設 `C:\測試樣本報告`;來源不同就寫新一版 VRN2_SSOT(管理器 vrn2scope 讀它,管理器本身不動)。④ ⑥c vrn2:// 寫完讀回核對 · ⑫b ⑦ 重寫 U/I 之後把輸入區塊補回(同一塊不疊加)· 貼包多一行「註冊核對」(⑤ 元件登記 · ⑥c 協定 · ② 定位登記)。⑤ 非 PDF 照實記「已收下 · 本版主體只擷取 PDF」(ENG397 / 管理器 vrn2scope 只收 PDF,本輪不動主體);型別表與 ENG397 的 EXT 逐鍵核對。容器實測:沙盒樹(倉內 19 份 PDF · OCR 隔離環境是真的 · VRN-1 = 本機倉):A1 預設來源 → ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑥b 14 · ⑦ 14 / 14 全綠 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 事實 4653 / 4905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(掛鉤 · 子集 9 檔 = PDF 6 · Word 1 · TXT 1 · 影像 1)→ 稽核 個股 5 · 範圍外 1 · 非 PDF 3 → 重跑(不帶環境變數)②b「U/I 選的(資料夾)」· VRN2_SSOT 新一版 · ⑥b 範圍夾只剩 5 · ⑦ 5 / 5 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 2056 / 2214;P2 U/I 選檔案(2 PDF + 1 txt → 複製到 input_pick\<時間>\)→ ②b「U/I 選的(檔案 → 暫存夾)」· ⑦ 2 / 2 · ⑧ 完成 · ⑪ 錯值 0;產業報告/展望 · 其他投資報告 → 處理器拒絕(rc 3);vrn2://audit 重新稽核 綠 · 輸入歷史 6 筆
-> **前一輪(v0132 · 工具橋 VRN2_ToolBridge_v0101 · 交接報告 v0132 · 啟動器流程 ①~⑫ 與 VRN-2 主體一個位元組都不動)**:① 工具橋 v0101:VRN-1 的倉在、那一版沒有工具冊(例:VRN-1 還在 main)→ ⑫ 灰,說明裡印出 `cd <VRN-1 倉>; git fetch origin; git switch claude/optimistic-goodall-yhalc5`(已合併進 main:`git pull`)· 指令放前面、路徑只出現一次(啟動器那一行最多顯示 260 字 —— 第一版放在後面,長路徑時被截在 `git switch claude/opt`,實測抓到、改掉)· sha256 不符 → 印出在 VRN-1 倉跑 `python VRN_Main_v0100.py build`。 ② VRN-1 這邊(另一團隊的倉 · VRN-1 自己的 MAIN):第十四輪(PR tonykuni/VIA-VDF-VRN#79 的 Codex 三條全部成立、全部修掉):科目括號只去單位 / 限定詞(`Turnover (X)` 週轉率 4 筆曾以營收身分進了驗證過的輸出)· 組合段落要同一頁依序的原文片段 · 代號要在代號的位置(檔名獨立一段 / `2330.TW` · `2330 TT` · `(3017)`)· 19 份真報告驗證過的年度數據 1,686 / 1,725(和第十三輪只差那 8 筆)· PIVOT PASS · 收尾完成 · VRN-2 借的 `table.pivot_db` 檔沒變(sha256 `74b97b8bf02d` 相同)。
+> **操作員令(2026-10-21 · 第二段)**:「integrate into one code to handle all above」—— 把 Windows 實跑(`C:\測試樣本報告` · 534 檔 · 個股 55)抓到的事全部整進同一支啟動器,不再靠一鍵補。
+> **本輪(v0134 · 啟動器 + 處理器 VRN2_UIAction_v0104 + 獨立驗證器 VRN2_IndependentVerifier_v0103 · 交接報告 v0134 · 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:① 處理器 v0104:個股範圍外的檔名規則取**最新版**管理器的 `_SK_EXCL`(Windows 上整條鏈 v0154~v0239 都在,v0103 取到最舊的 v0210;與 ⑥b 用的尾版同一條)。② 驗證器 v0103(⑪ 自動取最新版 · v0102 留著):標籤旁檢查看前 4 頁、一列裡被字距拆開的數字(「3, 190.00」)也對得到(MS / GS 的現價 · 目標價印在第 3 頁或拆字);一標題四重點的「報告上漲空間」原文沒有上漲空間標籤 → 用基本資料目標價 ÷ 現價 − 1 重算相符就過(註記推算 · GS ×5 / 兆豐 / MS-8210 那 7 筆);原文句 / 標題覆蓋率兩邊去標點再量一次取高者(摘要器用「、」接的句子 · 標題的「|」不再被扣分);科目名去 * † $ 括號再比(MS ModelWare「(NT $ mn)」「EPS (NT$)**」那 23 筆 BADITEM);空值記號(n.a. / - / NM)原文找不到 → NILVAL 不算錯值(Daiwa PBR n.a. 那 1 筆)。③ U/I 開不開只認 `--no-open` / `VRN2_NO_UI=1`:VIA 設定檔(Register-VIA-Commands)設的 `VIA_NO_OPEN=1` 是給別的 VIA 工具的,VRN-2 一鍵的目的就是跳出 U/I。④ ⑨ 上船的交接落地改成「不回退」:內嵌的 `VRN2_Handover_v0134.md` 只在倉裡沒有時寫;`VRN2_Handover_latest.md` = 倉裡版號最高那份(Windows 實跑的 ⑨ 曾把內嵌舊版蓋掉 Codex 兩輪與 GitHub 報告連結 → 以後不會)。⑤ 沒動的(照實說):DUPKEY 82 筆(同鍵不同值 · 要看原文兩張表)· 現價 / 目標價旁邊標籤對調的 3 筆 · MS-6669 POINT_2 的 ModelWare EPS —— 是擷取 / 摘要器的下一輪,本輪驗證器不假裝它們過。
+> **前一輪(v0133 · 啟動器 + U/I 處理器 VRN2_UIAction_v0103 · 交接報告 v0133 · 管理器鏈 / ENG397 / 摘要器 / 獨立驗證器 / 工具橋 / OCR 橋一個位元組都不動)**:① 前端 = `VIA_Reports\vrn2\VRN2_UI_latest.html`,後端 = vrn2:// 協定(HKCU)→ 處理器 v0103 → 啟動器;一鍵 ⑤b 檢查兩端有接上(HKCU 的指令解析成 python + 處理器 · 處理器整條路徑 = 本機 VRN-2 程式夾的 v0103 且檔在 · python 檔在 · U/I 有輸入區塊)· ⑤b 的燈併進最後 NEXT(Codex #550 修正)。② U/I 左側新區塊「輸入(window I/O)」:三類 radio(只有 個股報告/訊息 可選;產業報告/展望 · 其他投資報告 disabled「尚未開放」,處理器收到也拒絕)· 📁 選擇檔案夾(`vrn2://pick?kind=folder&cat=stock` → Windows 原生資料夾對話框)· 📄 選擇檔案(`kind=files` → 多選 pdf / docx / doc / txt / png / jpg / jpeg / tif / tiff / bmp → 複製到 `VIA_Reports\vrn2\input_pick\<時間>\`)· 🔎 重新稽核;選好 → 稽核(型別 · 個股範圍 / 範圍外 · 非 PDF)→ `VRN2_Input_latest.json` → 區塊更新 → 重開 U/I → 按「▶ 完整重跑」。③ 啟動器 ②b 輸入來源:`--source`(一鍵 `$env:VRN2_SOURCE`)> 環境 VIA_VRN_INPUT > U/I 選的 > VRN2_SSOT > 預設 `C:\測試樣本報告`;來源不同就寫新一版 VRN2_SSOT(管理器 vrn2scope 讀它,管理器本身不動)。④ ⑥c vrn2:// 寫完讀回核對 · ⑫b ⑦ 重寫 U/I 之後把輸入區塊補回(同一塊不疊加)· 貼包多一行「註冊核對」(⑤ 元件登記 · ⑥c 協定 · ② 定位登記)。⑤ 非 PDF 照實記「已收下 · 本版主體只擷取 PDF」(ENG397 / 管理器 vrn2scope 只收 PDF,本輪不動主體);型別表與 ENG397 的 EXT 逐鍵核對。容器實測:沙盒樹(倉內 19 份 PDF · OCR 隔離環境是真的 · VRN-1 = 本機倉):A1 預設來源 → ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑥b 14 · ⑦ 14 / 14 全綠 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 事實 4653 / 4905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(掛鉤 · 子集 9 檔 = PDF 6 · Word 1 · TXT 1 · 影像 1)→ 稽核 個股 5 · 範圍外 1 · 非 PDF 3 → 重跑(不帶環境變數)②b「U/I 選的(資料夾)」· VRN2_SSOT 新一版 · ⑥b 範圍夾只剩 5 · ⑦ 5 / 5 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 2056 / 2214;P2 U/I 選檔案(2 PDF + 1 txt → 複製到 input_pick\<時間>\)→ ②b「U/I 選的(檔案 → 暫存夾)」· ⑦ 2 / 2 · ⑧ 完成 · ⑪ 錯值 0;產業報告/展望 · 其他投資報告 → 處理器拒絕(rc 3);vrn2://audit 重新稽核 綠 · 輸入歷史 6 筆
+> **v0132( · 工具橋 VRN2_ToolBridge_v0101 · 交接報告 v0132 · 啟動器流程 ①~⑫ 與 VRN-2 主體一個位元組都不動)**:① 工具橋 v0101:VRN-1 的倉在、那一版沒有工具冊(例:VRN-1 還在 main)→ ⑫ 灰,說明裡印出 `cd <VRN-1 倉>; git fetch origin; git switch claude/optimistic-goodall-yhalc5`(已合併進 main:`git pull`)· 指令放前面、路徑只出現一次(啟動器那一行最多顯示 260 字 —— 第一版放在後面,長路徑時被截在 `git switch claude/opt`,實測抓到、改掉)· sha256 不符 → 印出在 VRN-1 倉跑 `python VRN_Main_v0100.py build`。 ② VRN-1 這邊(另一團隊的倉 · VRN-1 自己的 MAIN):第十四輪(PR tonykuni/VIA-VDF-VRN#79 的 Codex 三條全部成立、全部修掉):科目括號只去單位 / 限定詞(`Turnover (X)` 週轉率 4 筆曾以營收身分進了驗證過的輸出)· 組合段落要同一頁依序的原文片段 · 代號要在代號的位置(檔名獨立一段 / `2330.TW` · `2330 TT` · `(3017)`)· 19 份真報告驗證過的年度數據 1,686 / 1,725(和第十三輪只差那 8 筆)· PIVOT PASS · 收尾完成 · VRN-2 借的 `table.pivot_db` 檔沒變(sha256 `74b97b8bf02d` 相同)。
 > **v0131( · 啟動器 + 工具橋 VRN2_ToolBridge_v0100 · 管理器鏈 / ENG397 / 摘要器 / 驗證器 / 處理器一個位元組都不動)**:兩個系統各寫各的工具橋、各有自己的**工具冊**(每支工具的檔 · sha256 · 入口 · 契約 · 能不能用)· 借之前逐檔核對對方工具冊的 sha256(不符 = 不借 · 照實寫)· 只讀對方的檔(不改 · 不複製 · 載入時不寫 __pycache__)· 借不到 = 只用自己的工具(灰 / 黃,不是紅)。① **② 寫 VRN-2 的借出工具冊** `VIA_Reports\vrn2\tools\VRN2_ToolManifest_v0100.json`:`section.near`(段落標題 —— VRN-2 管理器的第三讀法 + v0239 的 `_sec_near`)· `ocr.image`(OCR 隔離環境)。② **⑫ 借 VRN-1 的 PIVOT 資料庫工具**(`table.pivot_db` · VRN-1 工具冊 `<VRN-1 倉>\functional modules\VRN\ssot\VRN_ToolManifest_v0100.json`)→ `VIA_Reports\vrn2\pivot\`:事實表(一格一列)+ 年度 PIVOT(表層 · 報告層)· SQLite 一定有 · DuckDB 有才寫 · CSV · Parquet · HTML · **只收 ⑪ 獨立驗證判對位的格(冊指紋相同才用)** · 同一格兩個不同的證實值 → 格子留空、列進衝突表(不挑)· U/I 最後多一塊「PIVOT 資料庫」連結。③ 容器實測:沙盒樹(倉內 19 份樣本 · 個股 14)連跑兩次:② 借出工具冊綠(`section.near` 能用 · `ocr.image` 容器沒有隔離環境 → 照實標不能用)· ⑦ 綠 · ⑧ 完成 · ⑨ 上船(船包 19 檔 · 含工具橋)· ⑪ 錯值 0(年度數據 4,905 筆:對位 4,378 · 轉置 75 · 子欄 452)· ⑫ 綠:借 VRN-1 `table.pivot_db`(sha256 與 VRN-1 工具冊相同)· 事實 4,653 / 4,905 收進(沒收的 252 筆是空值記號 - / n.a.)· 年度 PIVOT 1,060 列 · 衝突 18(全在報告層:符號慣例 5 · 跨表同名 13 —— 都回原檔看過,是原檔本身兩張表印的不同,不是 VRN-2 讀錯)· 第二次跑指紋相同(冪等)· U/I 只有一塊 PIVOT 連結 · PIVOT 頁 Chromium 實測 29 / 29 · 啟動器自測 27 / 27 · 工具橋自測 14 / 14。VRN-1 工具冊的 sha256 不同時 ⑫ 照實拒借(已實測)。 ④ VRN-1 這邊(另一團隊的倉 · 只讀 · 修改另以 patch 交給操作員):VRN-1 借 VRN-2 的段落標題(G23 · sha256 核對)→ G21 多剔除 39 筆真錯(MS 3661 第 10 頁右表 Growth(%) / Margins (%) 底下 24 筆 · MS 2308 第 6 頁 QoQ / YoY Growth (%) 底下 15 筆:成長率 / 比率被歸成營收 / 營業利益 / 稅前 / 淨利 / EPS 的金額)· VRN-1 自己的 PIVOT 衝突 4 → 0 · 年度數據 1,694 / 1,733 · 收尾完成;不借(VRN_NO_BORROW=1)時這 39 筆仍在證實輸出裡、PIVOT 衝突表列 4 筆(黃燈)—— 所以兩個系統要一起在。
 > **v0129(邊測邊修:管理器 v0239 · 獨立驗證器 v0102 · 啟動器邏輯同 v0128)**:操作員令「繼續完成」→ v0128 推上去後繼續把 U/I「驗證過的輸出」逐表看、逐欄稽核 → **凱基 2637 第 5 頁左「財務比率」、右「投資回報率」兩張表並排、同一高度交錯 → 段落標題(SECTION)互相拿錯**:左表 流動比率 / 速動比率 / 淨負債 拿到右表的公式項「1 - 營業成本/營業收入」· 右表 1 / (營業運用資金 … = 稅後 ROIC 拿到左表的「每股資料分析」/「資產運用狀況」· 右表 銷管費用 / 營業利益率 拿到公式項(共 13 列 65 筆 · **值都對** · 驗證器只查值所以沒抓到)→ 管理器 v0239 依科目欄改回(值一個都不動)· 驗證器 v0102 另查段落標題(SECFAIL)。其他欄位(TICKER / BROKER / 日期 / 期間)與基本資料冊逐筆一致 · 科目折行 1 列(完整存放)。
 > **v0128(啟動器依紀錄定位 · 邊測邊修:管理器 v0238 · 獨立驗證器 v0101)**:使用者機器 2026-10-19 第一次跑 v0127:先把 PowerShell 程式貼進 cmd(每行被 cmd 拒絕 · 什麼都沒跑)→ 改用 cmd / PowerShell 都能貼的一行(Windows PowerShell 5.1 · 雜湊相符 · 啟動器 v0122 → v0127)→ 啟動器 ② 紅「找不到 VRN-2 程式夾 functional modules\VRN」rc 2(上次成功是 2026-10-18 23:48 的 v0125 · 船包清單 manager_tail v0235 · 程式夾在 VIA 根\functional modules\VRN)。原因:啟動器以前**環境變數 VIA_ROOT 有設就只看它**(容器把 VIA_ROOT 指錯 → 同一句紅燈)· 不看自己的紀錄。**v0128 依 MAIN 登記紀錄定位**:VIA_ROOT · 交接報告的 VIA 根 · 本支所在夾 · 目前夾 · MAIN 成功紀錄的鎖檔路徑 · git 倉裡找;多個候選選本機登記的 MAIN 管理器(檔在且 sha 相同);② 印來源與登記版號 · 找不到印查過的地方。**邊測邊修再找到一類錯**:把 U/I「驗證過的輸出」逐格看一遍 → 3 列**表頭被當數據**(凱基 2637 現金流量表「NT$百萬 Dec-23A …」· JP 2330「Balance Sheet & Cash Flow Statement FY24A …」· GS 6415「Jul-25 Oct-25」· 共 11 筆)· 獨立驗證器 v0100 判對位(表頭字本來就印在期間那一欄)→ 管理器 v0238 把表頭列移剔除冊(帶理由)· 驗證器 v0101 另查值的種類(HDRVAL)· 年度數據 4,916 → 4,905 · 剔除冊 733 → 744 · 錯值 0。
@@ -32,9 +34,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | 類別 | 位置 | 說明 |
 |---|---|---|
-| **啟動器(MAIN)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | **v0133** · 雜湊見 `docs/handoff/ai/vrn2_release_v0133/VRN2_Release_v0133.json` · 一鍵:`vrn2_release_v0133/VRN2_OneClick_v0133.md`(**cmd / PowerShell 都能貼的一行**)· 程式夾定位依 MAIN 登記紀錄(v0128 起) |
+| **啟動器(MAIN)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | **v0134** · 雜湊見 `docs/handoff/ai/vrn2_release_v0134/VRN2_Release_v0134.json` · 一鍵:`vrn2_release_v0134/VRN2_OneClick_v0134.md`(**cmd / PowerShell 都能貼的一行**)· 程式夾定位依 MAIN 登記紀錄(v0128 起) |
 | **工具橋** | `<ROOT>\functional modules\VRN\VRN2_ToolBridge_v0101.py` | v0132 落地(v0131 落的 `VRN2_ToolBridge_v0100.py` 照舊留著 · 只增不改)· 借出 `section.near` / `ocr.image` · 借入 VRN-1 `table.pivot_db` · 進船包 |
-| **U/I 處理器** | `<ROOT>\functional modules\VRN\VRN2_UIAction_v0103.py` | v0133 落地(v0102 照舊留著 · 只增不改)· `vrn2://pick?kind=folder|files&cat=stock`(Windows 原生對話框)· `vrn2://audit` · `--set-source` / `--refresh-ui`(啟動器 ②b / ⑫b 叫)· 進船包 |
+| **U/I 處理器** | `<ROOT>\functional modules\VRN\VRN2_UIAction_v0104.py` | v0134 落地(v0102 / v0103 照舊留著 · 只增不改)· 檔名規則取最新版管理器 · 其餘同 v0103(`vrn2://pick` · `--set-source` · `--audit <路徑>` · `--refresh-ui`)|
+| **獨立驗證器** | `<ROOT>\functional modules\VRN\VRN2_IndependentVerifier_v0103.py` | v0134 落地(v0102 留著 · ⑪ 取最新版)· 標籤旁前 4 頁 · 字距拆開的數字 · 上漲空間推算 · 覆蓋率去標點 · 科目名去 * $ · NILVAL |
 | **輸入紀錄** | `<ROOT>\VIA_Reports\vrn2\VRN2_Input_latest.json`(+ `VRN2_Input_History.jsonl` 只增 · 多檔暫存 `input_pick\<時間>\`) | U/I 選的來源 + 稽核(型別 · 個股範圍 / 範圍外 · 非 PDF)· 啟動器 ②b 讀它當來源夾 · U/I 區塊顯示它 |
 | **借出工具冊** | `<ROOT>\VIA_Reports\vrn2\tools\VRN2_ToolManifest_v0100.json` | ② 寫 · ⑫ 之後再寫一次(本輪才建好的 OCR 隔離環境 → `ocr.image` 標能用)· VRN-1 借之前核對 sha256 |
 | **PIVOT 資料庫** | `<ROOT>\VIA_Reports\vrn2\pivot\` | ⑫ 寫:`VRN_Pivot_v0100.sqlite`(+ `.duckdb` 有 duckdb 才寫)· `facts` / `pivot_report_annual` / `pivot_annual` / `conflicts` / `precision_merges` 的 CSV + Parquet · `VRN_Pivot_v0100.html` · `VRN2_Pivot_Borrow_latest.json`(借用紀錄:來源 · sha256)|
@@ -54,24 +57,24 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | 封存 / 隔離 | `…\VRN\_archive_vrn2\`(+ `ARCHIVE_MANIFEST.jsonl`)· `…\VRN\_quarantine\` | ⑩ 只搬 VRN-2 自己的舊版 |
 | U/I 處理器 / 協定 | `…\VRN\VRN2_UIAction_v0103.py`(v0102 留著)+ `VRN2_UIAction_Config.json` · `HKCU\Software\Classes\vrn2`(⑥c 寫完讀回核對) | 動作:run · run?nopush=1 · run-clean · restore-archive · **pick · audit** |
 | OCR 隔離環境 | `C:\Users\tonyk\envs\vrn2_ocr\` + `VRN2_OCRBridge_v0100.py` | |
-| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0133.md`) | ⑨ 自動落地(與 repo 同一份) |
-| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0133\`(v0132:`vrn2_release_v0132\` · v0131:`vrn2_release_v0131\` · v0130:一鍵判定)| 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
+| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0134.md`) | ⑨ 自動落地(與 repo 同一份) |(⑨ v0134 起不回退:同版已在不蓋 · latest = 最高版號)
+| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0134\`(v0133:`vrn2_release_v0133\` · v0132:`vrn2_release_v0132\` · v0131:`vrn2_release_v0131\` · v0130:一鍵判定)| 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
 
 ---
 
 ## 3. 版本紀錄
 
-### 3.1 現役版本(v0133 內嵌 · 依序自動落地)
+### 3.1 現役版本(v0134 內嵌 · 依序自動落地)
 
 | 元件 | 版本 | 大小 | SHA-256(前 12) | 本輪 |
 |---|---|---|---|---|
-| ActivateVRN-2.py | **v0133** | 見發行清單 | 見發行清單(本檔內嵌在啟動器裡,不寫啟動器自己的雜湊)| 新(內嵌 U/I 處理器 v0103 · ②b 輸入來源 · ⑥c 讀回核對 · ⑫b U/I 輸入區塊 · 註冊核對 · 其餘流程同 v0132)|
+| ActivateVRN-2.py | **v0134** | 見發行清單 | 見發行清單(本檔內嵌在啟動器裡,不寫啟動器自己的雜湊)| 新(內嵌處理器 v0104 + 驗證器 v0103 · U/I 開不開只認 VRN2_NO_UI · ⑨ 不回退)|
 | **VRN2_ToolBridge** | **v0101** | 見發行清單 | 見發行清單 | **新**(= v0100 + 借不到時說清楚下一步 · 借用規則不變)· v0100(v0131)照舊留著 |
 | VRN-2 SystemManager | v0231 → … → v0238 → **v0239** | v0231 215,605 · v0232 43,966 · v0233 10,066 · v0234 27,553 · v0235 22,840 · v0236 33,760 · v0237 37,036 · v0238 11,887 · v0239 18,415 | `ddff2743b478` / `42e682ba5074` / `25e33a714860` / `d8a564b2c442` / `53ea452b978e` / `872f7fde9452` / `514962c4f0bd` / `87a3c4d7ab51` / `b1eb69452d1c` | **v0239 新**(薄尾 · 前版必須 v0238 · 段落標題改回同一欄)· v0238:表頭列移剔除冊 |
-| **VRN2_IndependentVerifier** | **v0102** | 76,509 | `a43079aa9415` | **新**(v0101 + SECFAIL 段落標題檢查 · 整檔複本 · 內嵌 · 不 import VRN-2 程式)· v0101 72,067 `918ba49d87ff`(HDRVAL)· v0100 67,717 `d3577ef63eb5` 留在本機 |
+| **VRN2_IndependentVerifier** | **v0103**(v0102 留著)| 81,822 | `5a0c2467feea` | **新**(v0102 + 標籤旁前 4 頁 · 字距拆開的數字 · 上漲空間推算 · 覆蓋率去標點 · 科目名去 * $ · NILVAL · 自測 23 / 23)|
 | VRN_ENG397_P1Segment | v0127 | 180,699 | `c2e8e39e5584` | 未變 |
 | VRN_ENG062_SummarizerV1 | v0114 | 63,825 | `62beeaf65576` | 未變 |
-| VRN2_UIAction · VRN2_OCRBridge · rule_catalog | **v0103**(v0102 留著)· v0100 · — | — | `3e478229c8e1` · `4b21f0694d0e` · `e5b881716c84` | **新**:處理器 v0103(vrn2://pick / audit · --set-source / --refresh-ui)· OCR 橋 / 規則目錄未變 |
+| VRN2_UIAction · VRN2_OCRBridge · rule_catalog | **v0104**(v0102 / v0103 留著)· v0100 · — | — | `0d9df0c87d0e` · `4b21f0694d0e` · `e5b881716c84` | **新**:處理器 v0104 檔名規則取最新版管理器(自測 11 / 11)· 其餘未變 |
 
 ### 3.2 版本鏈
 
@@ -90,7 +93,8 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | (一鍵 v0130) | 同 v0129 | | | 一鍵判定三處(⑪ 三段 · 只驗本輪的冊 · 成功看本輪 ⑧)|
 | v0131 | 同 v0239 | v0127 | v0114 | 工具相互取用:② 借出工具冊 · ⑫ 借 VRN-1 PIVOT 資料庫 · 工具橋 v0100 |
 | v0132 | 同 v0239 | v0127 | v0114 | 工具橋 v0101:借不到 VRN-1 的工具時說清楚下一步 |
-| **v0133** | 同 v0239 | v0127 | v0114 | 前後端連結:U/I「輸入(window I/O)」區塊 · 處理器 v0103 · ②b 輸入來源 · ⑥c 讀回核對 · ⑫b · 註冊核對 |
+| v0133 | 同 v0239 | v0127 | v0114 | 前後端連結:U/I「輸入(window I/O)」區塊 · 處理器 v0103 · ②b 輸入來源 · ⑥c 讀回核對 · ⑫b · 註冊核對 |
+| **v0134** | 同 v0239 | v0127 | v0114 | 整合一支:處理器 v0104 · 驗證器 v0103 · U/I 開不開只認 VRN2_NO_UI · ⑨ 交接不回退 · 主體不動 |
 
 > 使用者機器:GitHub 有 VCGC 側 v0114–v0153;本機有 VRN-2 的 v0154–v0228 → v0231 的前版是 v0228。v0127 依序落地 v0231 → v0237,每支自測過才落下一支。跑過 v0126 → 前六支「已在且 hash 同」,只落 v0237 + 獨立驗證器。v0129 依序落地到 v0239(使用者機器上次成功 v0235 → 落 v0236 → v0237 → v0238 → v0239 + 驗證器 v0102;跑過 v0128 → 只落 v0239 + v0102)。
 
@@ -169,7 +173,23 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ---
 
-## 7. 本輪修正(v0132 → v0133 · 前後端連結 · U/I window I/O 輸入)
+## 7. 本輪修正(v0133 → v0134 · 整合一支)
+
+| # | Windows 實跑抓到的 | 做法(都在啟動器 v0134 內嵌的元件裡) | 實測 |
+|---|---|---|---|
+| 1 | 一鍵才處理 `VIA_NO_OPEN=1`,啟動器自己仍不開 U/I | 啟動器 `no_open` 只認 `--no-open` / `VRN2_NO_UI=1` | 自測:no_open 那行沒有 VIA_NO_OPEN |
+| 2 | ⑨ 把內嵌舊版交接蓋掉倉裡較新的 | `_handover_land`:同版已在不蓋 · latest = 最高版號 | 自測:同版不蓋 · latest 跟 v0199 · 空夾落地內嵌版 |
+| 3 | 處理器檔名規則取到最舊管理器 v0210 | 處理器 v0104 由大到小找 | 處理器自測 11 / 11 |
+| 4 | ⑪ 基本資料「前兩頁沒有這個數」(MS / GS 現價 · 目標價印在第 3 頁或被字距拆開)| 驗證器 v0103 標籤旁看前 4 頁 · 一列去空白再找數字並映回位置 | 驗證器自測 · 容器回歸 容器同一本冊(14 份 · 4,905 筆) |
+| 5 | ⑪ 一標題四重點「報告上漲空間不在原文標籤旁」×7 | 原文沒有上漲空間標籤 → 基本資料目標價 ÷ 現價 − 1 重算(容忍 0.6 點)相符就過 · 註記推算 | 驗證器自測 |
+| 6 | ⑪ 原文句覆蓋 78 ~ 83% · 標題 75% | 兩邊去標點再量一次取高者(字本身仍要在原文) | 驗證器自測 |
+| 7 | ⑪ BADITEM 23(MS ModelWare 科目寫法 `(NT $ mn)` · `EPS (NT$)**`)| 科目名去 * † $ 括號引號再比(BADITEM 與科目列兩處) | 驗證器自測 |
+| 8 | ⑪ FAIL 1(Daiwa PBR n.a.)| 空值記號原文找不到 → NILVAL 不算錯值 | 容器回歸 |
+| 9 | 沒動(照實說)| DUPKEY 82(同鍵不同值)· 標籤對調 3 筆 · MS-6669 ModelWare EPS → 擷取 / 摘要器下一輪 | — |
+
+一鍵 v0134:沙盒一鍵 v0133 → v0134:一鍵程式碼雜湊相符 · ③ 舊啟動器 v0133 備份 · v0134 就位(雜湊相符)· ①~⑫ 全綠(⑦ 14/14 · ⑪ v0103 錯值 0 · ⑫b 綠 · 註冊核對 處理器 v0104)· ⑤b 黃(Linux 沒 HKCU)· ⑤c 黃(無瀏覽器)→ NEXT YELLOW rc 2(Windows 應 GREEN · U/I 自己跳出)
+
+## 7.0c v0132 → v0133(前後端連結 · U/I window I/O 輸入)
 
 | # | 需求 / 發現 | 做法 | 實測 |
 |---|---|---|---|
@@ -235,7 +255,8 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | # | 項目 | 狀態 | 需要 |
 |---|---|---|---|
-| 0 | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| **已執行 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55 · ②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑪ 黃 106 筆待核對 · U/I 沒自動開 → ⑤c 修)** | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
+| 0 | **使用者用 v0134 的一行跑**(`vrn2_release_v0134/VRN2_OneClick_v0134.md`)| 待執行 | 預期:U/I 自己跳出(不用再管 VIA_NO_OPEN)· ⑪ 基本資料 / 一標題四重點 FAIL 從 9 + 12 降(現價 / 目標價頁位 · 上漲空間推算 · 覆蓋去標點)· BADITEM 23 → 0 · NILVAL 1 · DUPKEY 82 照舊待看原文 · ⑨ 不蓋交接。貼回 ⑪ 驗證摘要 + ②b / ⑤b。 |
+| 0b | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| **已執行 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55 · ②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑪ 黃 106 筆待核對 · U/I 沒自動開 → ⑤c 修)** | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
 | 0b | **VRN-1 合併 PR tonykuni/VIA-VDF-VRN#79**(另一團隊的倉 · 第十三 / 十四輪 · 操作員決定)| 待操作員 | 合併(或切到該分支)後 VRN-1 的工具冊就在 → VRN-2 ⑫ 才借得到;VRN-1 跑 MAIN 時 G23 借 VRN-2 的段落標題(先跑過一次 VRN-2 v0131,工具冊才在)|
 | 1 | 使用者用 v0129 的一行再跑(cmd / PowerShell 都能貼 · v0128 那一行也還能用 · 只是少了段落標題修正) | 待執行 | 預期:一鍵程式碼雜湊相符 · ③b / ② 印出程式夾來源與登記版號(本機上次成功 v0235)· 落地 v0236 → v0237 → v0238 → v0239 + 獨立驗證器 v0102 · ⑧ 完成 · ⑪ 綠 · U/I 自動跳出時第一個分頁就是「驗證過的輸出」· **貼回 ② / ③b / ⑨ / ⑪ 那幾行 + 驗證摘要**(52 份 · 新驗證器第一次在使用者機器跑 · 有 ✗ 格先看原文再判) |
 | 2 | 使用者機器其他 P1 黃燈(260914_daiwa_aspeed · GFHK Apple · 南亞 · 啟碁)| 不在容器 | 看 ⑪ 摘要與 U/I ✗ 格 |
@@ -265,7 +286,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 10. 執行方式
 
-一鍵(取得 v0133 → 驗雜湊 → ③b 定位 → 執行(啟動器自己跑 ①~⑫ · 開 U/I)→ 摘要 → 印驗證摘要 → ⑤b 前後端連結檢查 → NEXT 燈 = ⑧ + 獨立驗證 + ⑤b):`docs/handoff/ai/vrn2_release_v0133/VRN2_OneClick_v0133.md`(= ActivateVRN-2.ps1)
+一鍵(取得 v0134 → 驗雜湊 → ③b 定位 → 執行(啟動器自己跑 ①~⑫ · 開 U/I)→ 摘要 → 印驗證摘要 → ⑤b 前後端連結檢查 → NEXT 燈 = ⑧ + 獨立驗證 + ⑤b):`docs/handoff/ai/vrn2_release_v0134/VRN2_OneClick_v0134.md`(= ActivateVRN-2.ps1)
 
 - 不借 VRN-1 的工具:`$env:VIA_VRN2_NO_BORROW = '1'` · VRN-1 不在預設位置:`$env:VIA_VRN1_ROOT = '<VRN-1 倉>'`
 - 只實測不上船:PS 檔頭 `$NoPush = $true` · 不跑獨立驗證:`$env:VIA_VRN2_NO_VERIFY = '1'` · 驗證平行路數:`$env:VRN2_VERIFY_PAR = '2'` · 驗證等待上限:`$env:VIA_VRN2_VERIFY_WAIT = '3600'`。
@@ -275,6 +296,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 ---
 
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
+
+- **全部整進一支**:操作員實跑抓到的事(U/I 不開 · ⑨ 回退 · 規則取錯版 · 驗證器的頁位 / 字距 / 標點 / 科目名 / 空值)都改在啟動器內嵌的元件裡(處理器 v0104 · 驗證器 v0103 · 啟動器 v0134),一鍵只是取啟動器 + 摘要 + 備援;下一輪也這樣,不要靠一鍵補主體的洞。
+- **驗證器放寬只放「讀法」不放「值」**:前 4 頁、字距、標點、科目符號、空值記號都是讀法;值對不上(標籤對調 · DUPKEY 不同值 · ModelWare EPS)仍是 FAIL,照實留給擷取 / 摘要器。
+- **⑨ 交接只增不回退**:內嵌交接同版已在就不蓋,latest 永遠指倉裡最高版號;要更新交接就出新版號檔。
 
 - **GitHub 衝突與分支的交接**(2026-10-21 · PR #550 在 Codex 修正推上前就被合併 → 修正改走 PR #551;不改寫歷史、不強推、每次推之前先 `git fetch origin main` + `git merge-tree` 核對 0 衝突):詳細時間線、檢查方法、其他開著的 PR 狀態與規則見 `docs/handoff/ai/VRN2_GitHub_ConflictHandover_20261021.md`。
 - **前後端連結是可驗的,不是假設的**:前端 = U/I 檔,後端 = vrn2:// 協定 + 處理器 + 啟動器;每次都要讀回 HKCU 核對註冊指向目前的處理器、U/I 檔裡要有輸入區塊,兩樣都在才叫「已連結」;**核對整條路徑不只檔名**(別的檢出 / 搬走的 / 不存在的處理器 → 紅)· **⑤b 的燈併進一鍵最後的 NEXT**(⑤b 紅 → NEXT 紅 · 黃 → 最多黃;vrn2:// 沒註冊就不能 GREEN / rc 0 —— Codex #550)。
