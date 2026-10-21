@@ -273,6 +273,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
 
+- **GitHub 衝突與分支的交接**(2026-10-21 · PR #550 在 Codex 修正推上前就被合併 → 修正改走 PR #551;不改寫歷史、不強推、每次推之前先 `git fetch origin main` + `git merge-tree` 核對 0 衝突):詳細時間線、檢查方法、其他開著的 PR 狀態與規則見 `docs/handoff/ai/VRN2_GitHub_ConflictHandover_20261021.md`。
 - **前後端連結是可驗的,不是假設的**:前端 = U/I 檔,後端 = vrn2:// 協定 + 處理器 + 啟動器;每次都要讀回 HKCU 核對註冊指向目前的處理器、U/I 檔裡要有輸入區塊,兩樣都在才叫「已連結」;**核對整條路徑不只檔名**(別的檢出 / 搬走的 / 不存在的處理器 → 紅)· **⑤b 的燈併進一鍵最後的 NEXT**(⑤b 紅 → NEXT 紅 · 黃 → 最多黃;vrn2:// 沒註冊就不能 GREEN / rc 0 —— Codex #550)。
 - **輸入只從對話框與啟動器寫的設定來**:處理器不從網址讀路徑;U/I 選的落在 `VRN2_Input_latest.json`,啟動器 ②b 讀它寫 VRN2_SSOT,管理器照常讀 VRN2_SSOT —— 主體不動。
 - **三類只開個股**:產業報告/展望 · 其他投資報告 在 U/I disabled、處理器拒絕;要開放是主體(範圍 / 擷取 / 驗證)的工作,不是把 radio 打開。
