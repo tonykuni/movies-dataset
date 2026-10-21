@@ -24,10 +24,10 @@
   [環境計畫] 自測通過才裝該裝的。刪除段只印命令,不自動砍境。
   [回覆] AI 用全景讀倉,不讀整檔。下一動只執行貼回裡 NEXT: 那一行。
   [衝突] L08 L12 L13 L19 L24 L32 L82 L84 L88 L107
-  [衝突] 現況 NODATA 先 via-envgov eight-hub
+  [衝突] 現況 RED · 2026-09-21T02:45:15
   [還原] **過關就鎖定 · 最佳還原點自動建置(系統政策)。** 操作員 2026-09-25 三道令:「檢視VCGC及測試要求過關就鎖定不要一直重複」「之前最成功的兩
   [還原] 1找 → 2還原 → 3新增 → 4衝突檢查 → 5裝
-  [還原] 最佳點 NODATA 沒有過關紀錄,不新建假的 · 歷史 0
+  [還原] 候選不可鎖定 20260921_024512_162 · RED · 境 0 · 歷史 2
 [政策] L50 全景 · 尾版 628 · import 0 · 提及 101 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
@@ -78,28 +78,37 @@
   [計] VDF_SystemManager v0158 本版 6/6 · PASS
 === VDF_SystemManager v0157 · 薄尾自測(db verify 獨立核對 · 候選寫入者;沙盒 · 零網路)===
   [OK] ① 候選寫入者:只掃家族尾版(舊版 · 底線夾不算)· 排除管理員自測沙盒與測試檔 · 同名副本只記一次;列 系統 · 檔:行;找不到 = 空(不猜)
-  [OK] ⑦ duckdb 不在本境 → 只驗候選與 NODATA(不代裝)
+  [OK] ② 真庫:db check 寫的清點,本版自己重推每列每欄 → 0 差異 = PASS(含缺庫 · 缺表 · 空表 · 過舊 · 最少 0 列 · 他系統 · 冊外表 · 庫打不開:VDF 表紅、他系統表 INFO)
+  [OK] ③ 竄改清點就抓得到:列數 · 燈 · 狀態(他系統分類)· 少一列 · 摘要計數 → 各自 FAIL 並點名那一欄
+  [OK] ④ db verify 動詞:印 JSON 與「[計] VDF db verify · 10 表 × 5 欄 = 50 欄比對 · 差異 0 … PASS」;rc 0;候選寫入者一行
+  [OK] ⑤ 沒有本輪 check 結果 → NODATA rc 2(不冒充)
   [OK] ⑥ 獨立:重推段不呼叫 db check 的函式(db_check · _find_db · split_rows · min0_rows · other_system);加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
-  [計] VDF_SystemManager v0157 本版 3/3 · PASS
+  [計] VDF_SystemManager v0157 本版 6/6 · PASS
 === VDF_SystemManager v0156 · 薄尾自測(他系統表分開命名 VRN-1 / VRN-2 / VCGC · 互對照 兩個以上來源相同即算對照成功;沙盒 · 零網路)===
   [OK] ① VRN-2 鍵:本倉 VRN 夾檔名(代碼 + 去版號幹名)∪ 船單 files / depends_on_tracked(含反斜線路徑);非 .py/.ps1 不算
   [OK] ② 分開命名:本倉 / 船單有 → VRN-2;都沒有 → VRN-1;CGC_ → VCGC;多系統以 + 相連;沒登寫入者的 vrn_ 表 → VRN 未分辨(不猜);有 VDF_ 或認不出的寫入者 → VDF 的(不放水)
   [OK] ③ split_rows:他系統列改 INFO、狀態寫系統名(原狀態照留);by_system 逐系統計數;VRN-1 代碼列出;VDF 的列不動
   [OK] ④ 本倉實讀:VRN 夾有檔 → VRN-2 鍵非空(VRN_ENG074 · VRN_ENG082 在本倉 → 冊上這兩個寫入者判 VRN-2)
-  [OK] ⑤ duckdb 不在本境 → 只驗判法(不代裝;⑥ 要 duckdb 才跑)
+  [OK] ⑥ db check 真跑:他系統三張 INFO 分標 VRN-2 / VRN-1 / VRN 未分辨;VDF 那張 GREEN;總燈 GREEN;頁上照列;管理員 db 動詞走本版(本倉真冊),終端逐系統印
   [OK] ⑧ 兩兩比:官方↔ENG055 用 0.0005、有 yf 的對用 0.005;相同的對照列(第三個不合不擋)
   [OK] ⑨ 代號集合:完全相同的兩表才算相同;空表不算
-  [OK] ⑬ duckdb 不在本境 → 互對照只驗判法(不代裝;⑩–⑫ 要 duckdb 才跑)
+  [OK] ⑩ 加權收盤真庫:官方+ENG055 相同、yf 偏 → GREEN(yf 列 outlier);官方+yf 相同 → GREEN;三個都不同 → RED;只一個來源 → YELLOW;總判 RED
+  [OK] ⑪ 三表同日代號真庫:價量=成交值 → GREEN(籌碼少照列);籌碼=成交值 → GREEN(價量多照列);最新日只一表有 → YELLOW;庫裡只一張表 → 舊日也 YELLOW(沒得對照)
+  [OK] ⑫ universe xcheck --home 動詞走本版:讀那個家的三本庫(不是倉內寫死路徑);末行「[計] VDF 互對照」帶規則 · 兩判;紅 → rc 1;--dry 不寫
+  [OK] ⑰ 家裡沒有的那本才退回倉內路徑(v0122 寫死的 DB_IDX / DB_TW / DB_GL);家裡有的用家裡的
   [OK] ⑭ 沒給 --home(或給的是倉內預設 output_hub)→ 照冊上的資料家比候選:找到最多本的贏(家本身 2/2 > 鏡根 1/2 > 倉內 0/2;倉內夾不在就不列)
   [OK] ⑮ 優先序:env VIA_DATA_HOME 的 vdf_database(2/2)排在冊 home 前、同分取前面;VIA_VDF_DB_HOME / 給了別的 --home = 操作員指定,照用
   [OK] ⑯ db check 量的就是選到的家(home · home_pick 同一個);db where 動詞:回 JSON 與「[計] VDF db where · <家> · 為什麼」;rc 0
   [OK] ⑦ 加速器橋 · 網路橋在;不匯入他系統程式(只讀檔名與船單);不碰 TA-Lib;同意閘不寫
-  [計] VDF_SystemManager v0156 本版 12/12 · PASS
+  [計] VDF_SystemManager v0156 本版 15/15 · PASS
 === VDF_SystemManager v0155 · 薄尾自測(db check 分 VDF 自己的表 / 他系統表;沙盒 · 零網路)===
   [OK] ① 判他系統:寫入者全是 VRN_ / CGC_ → 他系統;有任何 VDF_ 寫入者 → VDF 的;沒登寫入者看表名 vrn_;認不出 = VDF 的(不放水)
-  [OK] ⑦ duckdb 不在本境 → 只驗判法(不代裝;②–⑤ 要 duckdb 才跑)
+  [OK] ② 他系統兩張缺表 → INFO(狀態寫「他系統表(VRN 寫)· 缺表」,頁上照列);VDF 自己那張有資料 → GREEN;總燈 GREEN
+  [OK] ③ VDF 自己的表判法不改:缺表 / 缺庫照紅,總燈 RED(不放水)
+  [OK] ④ 冊上最少 0 列:表在但空 → GREEN(允許);缺表 → YELLOW 待首寫(列寫入者);最少 1 列的空表照紅
+  [OK] ⑤ 管理員 db check 動詞走本版(v0151 main 查模組全域):終端印「他系統表」「最少 0 列」兩行;紅 → 結束碼 1
   [OK] ⑥ 加速器橋 · 網路橋在;不匯入他系統程式;不碰 TA-Lib;同意閘不寫
-  [計] VDF_SystemManager v0155 本版 3/3 · PASS
+  [計] VDF_SystemManager v0155 本版 6/6 · PASS
 === VDF_SystemManager v0154 · 薄尾自測(展現規則 + 健康頁籤開在 VDF)===
   [OK] ① 冊尾版有 presentation 節:燈號列門檻 8 列 · 燈欄比例 0.6 · 路徑 40 字 · 預選 via-pick(冊 VIA_UI_Template_SSOT_v0102.json)
   [OK] ② 套件 v2:燈欄第一 · 問題在前 · 燈號列 · 空值 — · 路徑縮檔名 · 燈號 JSON 改人話 · #via-pick · 換行一欄一條;門檻來自冊;仍只一段 style + 一段 script · 零外部連結
@@ -133,11 +142,11 @@
   [OK] ⑧ 真跑 ui(前版鏈產頁 → 本版套版):rc 0 · 頁有左下 GATE · 三系統 · 右側 0 details · 清單 layout=L121
   [OK] ⑨ 橋在(__future__ 之後)· 不碰 TA-Lib · 不代設同意閘 · 不載入 VCGC 程式(只讀資料冊)· 不直派子行程
   ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──
-  [FAIL] ① db check:px OK(哨兵列不算最新日)· gone 缺表 · rev 列數不足 · old 過舊 · nodb 缺庫 · extra 冊上沒列 · 寫出 html/csv/json · {}
-  [FAIL] ② db move 乾跑:列複製計畫 · 一檔都不寫
-  [FAIL] ③ --apply 沒還原點:資料複製 + 驗證列數一致,但接點不切 · 舊家原樣 · 資料已複製且驗證通過,但還原點帳沒有紀錄(先跑 CGC_MDL274_HealthMatrix restorepoint) → 接點不切(先建還原點再重跑)
-  [FAIL] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-0boa7vhy/repo/output_hub → /tmp/vdfsm151-0boa7vhy/vdf_database/output_hub(舊家 /tmp/vdfsm151-0boa7vhy/home/output_hub 原樣保留)
-  [FAIL] ⑤ 再跑:已在新家 = GREEN 不動
+  [OK] ① db check:px OK(哨兵列不算最新日)· gone 缺表 · rev 列數不足 · old 過舊 · nodb 缺庫 · extra 冊上沒列 · 寫出 html/csv/json · {'RED': 3, 'YELLOW': 1, 'GREEN': 1, 'INFO': 1}
+  [OK] ② db move 乾跑:列複製計畫 · 一檔都不寫
+  [OK] ③ --apply 沒還原點:資料複製 + 驗證列數一致,但接點不切 · 舊家原樣 · 資料已複製且驗證通過,但還原點帳沒有紀錄(先跑 CGC_MDL274_HealthMatrix restorepoint) → 接點不切(先建還原點再重跑)
+  [OK] ④ 有還原點 + 驗證過:接點切到新家 · 舊家資料原樣保留 · 同檔跳過不重複 · 接點已切:/tmp/vdfsm151-5ymxrgh9/repo/output_hub → /tmp/vdfsm151-5ymxrgh9/vdf_database/output_hub(舊家 /tmp/vdfsm151-5ymxrgh9/home/output_hub 原樣保留)
+  [OK] ⑤ 再跑:已在新家 = GREEN 不動
 [拒跑] db 子動詞:check [--home 夾] · move --to 夾 [--apply]
   [OK] ⑥ 未知動詞清單含 db · db 子動詞錯 = rc2
   [OK] ⑦ 三橋 · 不碰 TA-Lib · 不代設同意閘 · 不載入 VCGC 程式(只讀冊)
@@ -296,12 +305,9 @@
   [OK] ② --apply:t_nokey 採合成鍵 _rid(加欄標 synthetic)· t_old RETIRED 帶 replaced_by 號留 · 別系統裁定不碰 · 裁定覆蓋自動鍵留 prev_keys
   [OK] ③ 冪等:再採納 鍵 0 退役 0
   ── 前版鏈自測(原樣印出)──
-[計] VDF health · 檔族 3(紅 2 黃 1 綠 0)· 有號 0 · 已登記 1 · 有橋 2 · 網橋缺 1 舊橋 0 · 版號語意 1 · 功 1/1 有號 · 表 1/1 有號 · 冊 3 · lib 缺 3 · RED
+[計] VDF health · 檔族 3(紅 2 黃 1 綠 0)· 有號 0 · 已登記 1 · 有橋 2 · 網橋缺 1 舊橋 0 · 版號語意 1 · 功 1/1 有號 · 表 1/1 有號 · 冊 3 · lib 缺 0 · RED
   [RED] VDF VDF_ENG002_B_v0100.py · 無網橋
   [RED] VDF VDF_ENG003_C_v0100.py · AST 壞
-  [RED] VDF lib 缺 pandas(本直譯器 /usr/local/bin/python3)
-  [RED] VDF lib 缺 duckdb(本直譯器 /usr/local/bin/python3)
-  [RED] VDF lib 缺 requests(本直譯器 /usr/local/bin/python3)
   [OK] ① 檔族 3:ENG001 尾版 v0102 · 版號有洞語意黃 · 已登記
   [OK] ② ENG002 出網無網橋 → 紅;ENG003 AST 壞 → 紅
   [OK] ③ 冊:Thing_SSOT 有表頭有號 → 綠
@@ -309,12 +315,9 @@
   [OK] ⑤ dormant:dry-run 列 1 副本不動;--apply 移 _superseded 不刪 · 記 VDF_Dormant_Ledger
   [OK] ⑥ 副本檔最多黃:退役後總燈仍紅是因 ENG002 出網無橋(真紅)· ENG003 AST 壞
   ── 前版鏈自測(原樣印出)──
-[計] VDF health · 檔族 3(紅 2 黃 1 綠 0)· 有號 0 · 已登記 1 · 有橋 2 · 網橋缺 1 舊橋 0 · 版號語意 1 · 功 1/1 有號 · 表 1/1 有號 · 冊 3 · lib 缺 3 · RED
+[計] VDF health · 檔族 3(紅 2 黃 1 綠 0)· 有號 0 · 已登記 1 · 有橋 2 · 網橋缺 1 舊橋 0 · 版號語意 1 · 功 1/1 有號 · 表 1/1 有號 · 冊 3 · lib 缺 0 · RED
   [RED] VDF VDF_ENG002_B_v0100.py · 無網橋
   [RED] VDF VDF_ENG003_C_v0100.py · AST 壞
-  [RED] VDF lib 缺 pandas(本直譯器 /usr/local/bin/python3)
-  [RED] VDF lib 缺 duckdb(本直譯器 /usr/local/bin/python3)
-  [RED] VDF lib 缺 requests(本直譯器 /usr/local/bin/python3)
   [OK] ① 檔族 3:ENG001 尾版 v0102 · 版號有洞語意黃 · 已登記
   [OK] ② ENG002 出網無網橋 → 紅;ENG003 AST 壞 → 紅
   [OK] ③ 冊:Thing_SSOT 有表頭有號 → 綠
@@ -340,7 +343,13 @@
   ── 前版鏈自測(原樣印出)──
 === VDF_SystemManager v0122 · 薄尾自測(三方對照 · Parquet 增量 · 鎖 · 互比;暫存庫,零網路)===
   [OK] ① 冊 v0101:七項輸出(+OUT-06 加權三來源 · OUT-07 三表代號數)· 順序 15 站收在 E-11:lock · xcheck/parquet/lock 三節 · VDF_InputUniverse_SSOT_v0101.json
-  [略過] ②–⑧ 要 duckdb 建暫存庫;本直譯器沒有 duckdb → 照實略過(其餘照驗)
+  [OK] ② 加權三來源:三來源齊且差在容許內 = GREEN · 少 yf = YELLOW · ENG055 與官方差 1% = RED · {'2026-09-29': 'GREEN', '2026-09-30': 'YELLOW', '2026-10-01': 'RED'}
+  [OK] ③ 三表同日代號數:只算個股四碼(0050 不算)· 齊 = GREEN · 籌碼缺 6488 = YELLOW 列樣本 · 最新日籌碼 0 = 黃(日更未齊) · {'2026-09-29': (2, 2, 2, 2, 'GREEN'), '2026-09-30': (2, 1, 2, 1, 'YELLOW'), '2026-10-01': (1, 0, 1, 0, 'YELLOW')}
+  [OK] ④ 對照結果入 DuckDB(OUT-06 / OUT-07,鍵 date + run)只增:同日重跑 +0 · {'OUT-06': {'db': '/tmp/tmphaylov8k/uni.duckdb', 'table': 'xcheck_index', 'added': 0, 'total': 3}, 'OUT-07': {'db': '/tmp/tmphaylov8k/uni.duckdb', 'table': 'xcheck_counts', 'added': 0, 'total': 3}}
+  [OK] ⑤ OUT-06 / OUT-07 表頭 → DataFrame → CGC_MDL249 驗證過(必填 · 型別 · 主鍵) · ([], [])
+  [OK] ⑥ OUT-01 清單入 DuckDB:空字串 = NULL · 型別照冊 · 同鍵不動(只增)
+  [OK] ⑦ Parquet 增量:只挑冊上的表 · 列數沒變略過 · 乾跑不寫 · --apply 只寫變了的(寫手 = CGC_MDL238) · ({'state': 'OK', 'home': '/tmp/tmphaylov8k/home', 'src': 'test', 'plan': 2, 'todo': ['vdf_tw_market__tw_chip_inst'], 'skip': 1, 'applied': False}, ['vdf_tw_market__tw_chip_inst'])
+  [OK] ⑧ 資料家不可用 = NODATA(不假寫)
   [OK] ⑨ 鎖:VDF-WKF011 在工作流冊;各站尾版解得到;沒鎖 = OPEN / 已鎖 = LOCKED(版號 + 時間在 VIA_LampLock) · ('RELOCK', 'VIA_Workflow_VDF_SSOT_v0105.json')
   [OK] ⑩ 互比(CGC_MDL252):本管理員 universe 七項能力全在 · {'vcgc_only': False}
   [OK] ⑪ 加速器橋 · 網路橋 · 正典橋在;不碰 TA-Lib;不代設同意閘
@@ -355,144 +364,152 @@
 [VDF] 拒絕。只能經 via-vcgc。
   [OK] ⑧ 不經 VCGC 拒跑
   [OK] ⑩ 順序:12 站照 main 工作流冊(E-01 清單起 · E-11 驗證收);E-10 指數正主 = VDF_ENG232 尾版在 · ['OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK']
-  [教訓] 重複出錯:run VDF_SystemManager · rc=1 · ModuleNotFoundError: No module named 'pandas' · 第 4 次 · 帳本 CGC_MDL058(via-lessons)
-Traceback (most recent call last):
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0161.py", line 395, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0161.py", line 293, in main
-    return selftest()
-           ^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0161.py", line 384, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0160.py", line 475, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0159.py", line 473, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0158.py", line 284, in selftest
-    prc, added = scoped_prior_selftest(mods[150], mods[149], FROZEN_SAMPLES_V0150, VIA_ROOT, PRIOR.selftest)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0158.py", line 192, in scoped_prior_selftest
-    return run(), sorted({p for b in books for p in b.added})
-           ^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0157.py", line 538, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0156.py", line 789, in selftest
-    prc = PRIOR.selftest()
-          ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0155.py", line 321, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0154.py", line 433, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0153.py", line 457, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0152.py", line 448, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0151.py", line 477, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0158.py", line 186, in s150
-    return orig150()
-           ^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0150.py", line 585, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0158.py", line 179, in s149
-    return orig149()
-           ^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0149.py", line 357, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0148.py", line 284, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0147.py", line 230, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0146.py", line 170, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0145.py", line 184, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0144.py", line 211, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0143.py", line 283, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0142.py", line 237, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0141.py", line 259, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0140.py", line 356, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0139.py", line 226, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0137.py", line 173, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0136.py", line 318, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0135.py", line 270, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0134.py", line 269, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0133.py", line 253, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0132.py", line 462, in selftest
-    prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
-                                                                     ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0131.py", line 403, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0130.py", line 139, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0129.py", line 281, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0128.py", line 171, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0127.py", line 158, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0126.py", line 140, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0125.py", line 151, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0124.py", line 152, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0123.py", line 148, in selftest
-    prior_rc = PRIOR.selftest()
-               ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0122.py", line 532, in selftest
-    rc = PRIOR.selftest()
-         ^^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0121.py", line 477, in selftest
-    f3 = frame("OUT-03")
-         ^^^^^^^^^^^^^^^
-  File "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/VDF_SystemManager_v0121.py", line 290, in frame
-    import pandas as pd
-ModuleNotFoundError: No module named 'pandas'
-[監控] 背景全景監控中 pid 5770 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 176 提交 · 快照 443.1h · 未登 2380 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+  [OK] ⑪ 表頭 → DataFrame:OUT-03 欄 = 中央表頭冊 etf_holdings_daily(不抄);日期欄是時間型
+  [OK] ⑫ 驗證 OUT-01 走 CGC_MDL249:列數 < 1600 記紅(假資料只有 5 列),主鍵不重 · ['列數 5 < 最少 1600']
+  [OK] ⑬ 驗證抓得到主鍵重複(OUT-04 同一筆兩列) · ["主鍵 ['portfolio_date', 'etf_ticker', 'holding_ticker'] 重複 1 筆"]
+  [OK] ⑭ 本冊沒有可直讀來源的項不假造:不給資料 = NODATA
+  [OK] ⑨ 加速器橋 · 網路橋在;不碰 TA-Lib;不代設同意閘
+[VDF] 拒絕。只能經 via-vcgc。
+  [OK]
+  [計] VDF_SystemManager v0121 薄尾 14/14 · 前版 PASS · 合計 PASS
+  [計] VDF_SystemManager v0122 薄尾 11/11 · 前版 PASS · 合計 PASS
+[VDF] 拒絕。只能經 via-vcgc。
+  [OK] ① 未經 VCGC 拒絕(engine 也一樣)
+  [OK] ② 檢視本體是 VCGC 的 CGC_MDL253(共用一份 engine_main / gate)
+  [OK] ③ 真樹:VDF 引擎冊有料 · 229 解析到 ENG229 · 啟動前閘不紅 · (106, 'GREEN')
+  [OK] ④ 單引擎短令走 VCGC run(不自起子行程)
+{"engine_gate": {"sub": "VDF", "key": "NO_SUCH_ENGINE_ZZZ", "lamp": "NODATA", "candidates": []}}
+  [VDF_SystemManager v0123] 找不到:NO_SUCH_ENGINE_ZZZ
+  [OK] ⑤ 找不到的引擎回 3(不猜)
+  [OK] ⑥ 加速器橋 · 網路工具橋在;不碰 TA-Lib
+  [計] VDF_SystemManager v0123 本版 6/6 · 前版 PASS
+=== VDF_SystemManager v0124 · 薄尾自測(自測隨冊:前版釘出貨冊 · 尾冊只增不減)===
+  [OK] ① 前版鏈自測過(v0123 → v0122 → v0121 …;前版照出貨冊 v0101 跑) · rc 0 · 釘 VDF_InputUniverse_SSOT_v0101.json
+  [OK] ② 跑完已還原:book_path 回到取尾冊那支(不留釘)
+  [OK] ③ 尾冊只增不減:v0101 七項輸出全在 · 順序收在 E-11:xcheck/parquet/lock · 三節在(項數照冊算) · VDF_InputUniverse_SSOT_v0103.json · 輸出 8 項 · 缺 []
+  [OK] ④ 尺本身:少一項 = 紅(點名缺的)· 多一項 = 照過(冊再長不紅)
+  [OK] ⑤ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不代設同意閘
+  [計] VDF_SystemManager v0124 本版 5/5 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0125 · 薄尾自測(單引擎備料:params / prep)===
+[VDF] 拒絕。只能經 via-vcgc。
+  [OK] ① 未經 VCGC 拒絕(params 也一樣)
+  [OK] ② 檢視本體 = VCGC 的 CGC_MDL253 尾版且有 params / prep(兩個管理員同一份) · CGC_MDL253_ToolingInventory_v0102.py
+  [OK] ③ params <引擎>:備料卡七段都在(參數 · 環境變數 · SSOT · regex · 同義字 · 工作流步 · 短令)· rc 照燈 · (0, 'GREEN', ['v0123'], 'via-vdfeng ENG055')
+  [OK] ④ engine params 與 params 同一條路(rc 相同) · (0, 0)
+  [OK] ⑤ prep:VDF 每支引擎一列 · json + html 落地 · 沒有被擋的紅燈 · {'engines': 102, 'lamps': {'GREEN': 26, 'YELLOW': 76, 'RED': 0, 'NA': 0}, 'with_cli': 89, 'with_books': 35, 'local_synonym_tables': 34}
+  [OK] ⑥ 找不到的引擎回 3(不猜)
+  [OK] ⑦ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib
+  [計] VDF_SystemManager v0125 本版 7/7 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0126 · 薄尾自測(未知動詞拒跑 · 抬頭註明尾版)===
+  [OK] ① 未知動詞 4 種:rc 2 · 不進前版 · 印 [拒跑] 與真動詞表 · ([2, 2, 2, 2], 7)
+  [OK] ② 已知動詞 / 旗標 7 種放行;前版收到的 sys.argv = 本次參數 · [([], []), (['status'], ['status']), (['--json'], ['--json'])]
+  [OK] ③ 看狀態印尾版抬頭(--json 不印,不汙染 JSON) · 2
+  [OK] ④ 未經 VCGC 仍先拒(閘在動詞判定之前)
+  [OK] ⑤ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib
+  [計] VDF_SystemManager v0126 本版 5/5 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0127 · 薄尾自測(fetch 動詞 → MDL008 獨立擷取系統)===
+  [OK] ① 未知動詞 4 種:rc 2 · 不進前版 · 印 [拒跑] 與真動詞表 · ([2, 2, 2, 2], 7)
+  [OK] ② 已知動詞 / 旗標 7 種放行;前版收到的 sys.argv = 本次參數 · [([], []), (['status'], ['status']), (['--json'], ['--json'])]
+  [OK] ③ 看狀態印尾版抬頭(--json 不印,不汙染 JSON) · 2
+  [OK] ④ 未經 VCGC 仍先拒(閘在動詞判定之前)
+  [OK] ⑤b fetch 轉 MDL008:list 七支全在 rc0 · plan 依相依排序 · 未知子動詞 rc2 · (0, 0, 2)
+  [OK] ⑤ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib
+  [計] VDF_SystemManager v0127 本版 6/6 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0128 · 薄尾自測(獨立運作 · VDF System Manager 總控)===
+  [OK] ① 不經 VCGC 獨立啟動:fetch list / plan rc0(總控標記下發到 MDL008)· 未知動詞仍 rc2 · (0, 0, 2)
+  [OK] ② 擷取計畫第一步 = 兩支清單引擎(MDL009 全台股 · MDL010 主動式 ETF),MDL001–007 在後
+  [OK] ③ 呼叫結束環境還原(不留 VIA_FROM_VCGC / VIA_FROM_VDFSM)
+  [OK] ④ 加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_SystemManager v0128 本版 4/4 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0129 · 薄尾自測(activate:啟動前改 → 讀庫 → U/I)===
+  [OK] ① 改動格式:大類=日期 / default 收;斜線日期 · 空大類 · 空值 拒(不猜) · ([('start', 'TW_MARKET', '2022-01-01'), ('start', 'FIN', 'default'), ('add', 'TW_FIN', ['2330', '3324'])], ['--start MACRO=2022/01/01:要 大類=YYYY-MM-DD 或 大類=default(起始日只能按大類改)', '--start =2022-01-01:要 大類=YYYY-MM-DD 或 大類=default(起始日只能按大類改)', '--remove INTL_FIN=:要 族群=值[,值]'])
+  [OK] ② 沒給 --apply = 乾跑:成員帳本一個位元都沒動;改動列成計畫(edit 黃) · -
+  [OK] ③ 四步都跑:現況 · 改動 · 讀庫 · U/I(頁寫 VIA_Reports,不碰倉內已追蹤的 ui_support 頁) · 2
+  [OK] ④ 格式錯的改動 = edit RED · 整體 RED(rc 1);拼錯動詞照前版拒跑 rc 2 · (1, 2)
+  [OK] ⑤ 結束環境還原(不留 VIA_FROM_VCGC / VIA_FROM_VDFSM)· 報告寫 VIA_Reports/vdf/activate
+  [OK] ⑥ activate 進動詞表;加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不寫同意閘
+  [計] VDF_SystemManager v0129 本版 6/6 · 前版 PASS · 合計 PASS
+=== VDF_SystemManager v0130 · 薄尾自測(refill:無資料族群補擷取)===
+  [OK] ① refill 交 MDL012 尾版:沒 --apply = 只列計畫 rc 0(兩族群都在 · 分層都列)
+  [OK] ② --apply 沒開雙閘 = GATED rc 4、零寫檔(本版不代設同意閘)
+  [OK] ③ 參數錯照 argparse 拒(rc 2);結束環境還原
+  [OK] ④ refill 進動詞表;加速器橋 · 網路工具橋 · 正典橋在;不碰 TA-Lib;不寫同意閘 / 不讀 FRED 鑰
+  [計] VDF_SystemManager v0130 本版 4/4 · 前版 PASS · 合計 PASS
+  [OK] ① 表頭自創:dry-run 不寫;--apply 登記 2 表(registry 冊 + 頂層 csv)· 留白 · 主鍵 group / ticker
+  [OK] ② 讀號填回 1 · 已號表改頭 → 原列鎖死另開 vdf_lists_h2 留白(遵守既發號)
+  [OK] ③ status 表 3 · 已號 1 · 留白 2 · 漂移 1 · 中央只讀(1 冊)
+  [OK] ④ 帶加速器橋 · 表頭共用段 · glob 取前版 · 前版鏈 rc 0
+[計] VDF_SystemManager_v0131 自測 4/4 · PASS
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0131 自測 rc 0
+[計] VDF_SystemManager_v0132 自測 8/8 · PASS
+  [OK] ⑤ 前版鏈 VDF_SystemManager_v0132 自測 rc 0
+  [OK] ⑥ 帶加速器橋 · 健康共用段 · glob 取前版
+[計] VDF_SystemManager_v0133 自測 6/6 · PASS
+  [OK] ⑤ 前版鏈 VDF_SystemManager_v0133 自測 rc 0
+  [OK] ⑥ 帶加速器橋 · 健康共用段 · glob 取前版
+[計] VDF_SystemManager_v0134 自測 6/6 · PASS
+  [OK] ⑤ 前版鏈 VDF_SystemManager_v0134 自測 rc 0
+  [OK] ⑥ 帶加速器橋 · 健康共用段 · glob 取前版
+[計] VDF_SystemManager_v0135 自測 6/6 · PASS
+  [OK] ⑦ 前版鏈 VDF_SystemManager_v0135 自測 rc 0
+  [OK] ⑧ 帶加速器橋 · 健康共用段 · 退役段 · glob 取前版
+[計] VDF_SystemManager_v0136 自測 8/8 · PASS
+  [OK] ④ 前版鏈 VDF_SystemManager_v0136 自測 rc 0
+  [OK] ⑤ 帶加速器橋 · glob 取前版
+[計] VDF_SystemManager_v0137 自測 5/5 · PASS
+  [OK] ④ 前版鏈 VDF_SystemManager_v0137 自測 rc 0
+  [OK] ⑤ 三標準橋齊:ACCEL · NET(via_net_unified 尾版)· LIB(VIA_LibCanon)· glob 取前版
+[計] VDF_SystemManager_v0139 自測 5/5 · PASS
+  [OK] ⑥ 前版鏈 VDF_SystemManager_v0139 自測 rc 0
+  [OK] ⑦ 帶加速器橋 · glob 取前版
+[計] VDF_SystemManager_v0140 自測 8/8 · PASS
+  [OK] ④ 前版鏈 VDF_SystemManager_v0140 自測 rc 0
+  [OK] ⑤ 帶加速器橋 · NET/LIB 橋 · UI2 共用段
+[計] VDF_SystemManager_v0141 自測 5/5 · PASS
+  [OK] ③ 前版鏈 VDF_SystemManager_v0141 自測 rc 0
+  [OK] ④ 帶加速器橋 · NET/LIB 橋 · 鏈解析器
+[計] VDF_SystemManager_v0142 自測 4/4 · PASS
+  [OK] ⑤ 前版鏈 VDF_SystemManager_v0142 自測 rc 0
+  [OK] ⑥ 三橋 · glob 取前版
+[計] VDF_SystemManager_v0143 自測 6/6 · PASS
+  [OK] ③ 前版鏈 VDF_SystemManager_v0143 自測 rc 0
+  [OK] ④ 橋齊 · 模板段
+[計] VDF_SystemManager_v0144 自測 4/4 · PASS
+  [OK] ③ 前版鏈 VDF_SystemManager_v0144 自測 rc 0
+  [OK] ④ 橋齊 · 滑鼠段
+[計] VDF_SystemManager_v0145 自測 4/4 · PASS
+  [OK] ② 前版鏈 VDF_SystemManager_v0145 自測 rc 0
+  [OK] ③ 橋齊 · 清單段
+[計] VDF_SystemManager_v0146 自測 3/3 · PASS
+  [OK] ③ 前版鏈 VDF_SystemManager_v0146 自測 rc 0
+  [OK] ④ 三橋
+[計] VDF_SystemManager_v0147 自測 4/4 · PASS
+  [OK] ④ 前版鏈 VDF_SystemManager_v0147 自測 rc 0
+  [OK] ⑤ 三橋
+[計] VDF_SystemManager_v0148 自測 5/5 · PASS
+  [OK] ⑨ 前版鏈 VDF_SystemManager_v0148 自測 rc 0
+[計] VDF_SystemManager_v0149 自測 9/9 · PASS
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0149 自測 rc 0
+[計] VDF_SystemManager_v0150 自測 10/10 · PASS
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0150 自測 rc 0
+[計] VDF_SystemManager_v0151 自測 8/8 · PASS
+  [OK] ⑩ 前版鏈 VDF_SystemManager_v0151 自測 rc 0
+[計] VDF_SystemManager_v0152 自測 11/11 · PASS
+  [OK] ⑩ 前版鏈 VDF_SystemManager_v0152 自測 rc 0
+[計] VDF_SystemManager_v0153 自測 11/11 · PASS
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0153 自測 rc 0
+[計] VDF_SystemManager_v0154 自測 8/8 · PASS
+  [樣本冊] v0150 自測期間補冊:VDF_ENG056_ChipBackfill_v0106.py
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0158 自測 rc 0
+[計] VDF_SystemManager_v0159 自測 8/8 · PASS
+  [OK] ⑧ 前版鏈 VDF_SystemManager_v0159 自測 rc 0
+[計] VDF_SystemManager_v0160 自測 15/15 · PASS
+  [OK] ⑩ 跑完前版鏈自測後本版又換上(typekit_block · _TK_JS 襯線吸附)
+  [OK] ⑨ 前版鏈 VDF_SystemManager_v0160 自測 rc 0
+[計] VDF_SystemManager_v0161 自測 11/11 · PASS
+  [同步] SDD 驗證 RED:X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VRN_ENG086_FirstPageLogicBridge_v0120.py', 'CGC_MD → via-vcgc sdd check
+usage: refill [-h] [--groups GROUPS] [--as-of AS_OF] [--home HOME] [--apply]
+              [--timeout TIMEOUT] [--json]
+refill: error: unrecognized arguments: --nope
+  [沿用] sync_check · 鑰匙 52bd6e07354aa789 · 66s 前算的(--fresh 強制重算)
+[監控] 背景全景監控中 pid 11463 · 觸碰 run VDF_SystemManager · 交接閘 RED · 落後 627 提交 · 快照 423.6h · 未推 5 · 未登 127 支(ACTIVATE_AND_CROSS_VALIDATE_shab1340658 · CGC_MDL186_EnvGovernance_8Hub · CGC_MDL249_DataFrameLock …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
