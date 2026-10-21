@@ -43,6 +43,9 @@ PR #551 的 CI(3 個 Windows 工作):`VRN · value, template and manager contrac
 | 10-21 09:00 ~ | movies-dataset | Codex #561 P1(空值記號一律 NILVAL 沒看該格)· P2(字距把空白分開的兩個數黏成一個)→ PR #561 在修的途中被合併 MAIN → 已合併的版本不改,出 v0135(驗證器 v0104 · 啟動器 v0135 · 發行夾 · 一鍵 · 交接)· 全部測試重跑 · 推 · 新 PR;#561 的兩個討論串回覆並解決(指向 #562)| #561 → #562 |
 | 10-21 09:35 ~ 09:44 | movies-dataset | Codex #562 P1(`_nil_cell` 值在鄰列沒看)→ 驗證器 v0104 `_val_row`(與 `_row_hits` 同一套定值列 · 表頭字樣不算值)· 啟動器 v0135 重建 `ea6d4ebbb` · e2e / 一鍵 / U/I 重跑 · 推 · 回覆並解決 | #562 |
 | 10-21 09:46 | movies-dataset | 操作員令「解決衝突問題」:#562 與 main 無檔案交集(main 多 2 個 VDF 收據提交 `6633ab3e4` · `755a815ba`,只動 `docs/handoff/evidence/qg_onebridge.*`)· `git merge-tree` 乾淨 · GitHub mergeable(unstable = 新 head 的 CI 還在跑)→ 把 main 併進分支(merge commit · 不改寫歷史)· 推 | #562 |
+| 10-21 10:39 | movies-dataset | 操作員合併 PR #562(v0135)| main `0111b0c5f` |
+| 10-21 10:5x | VIA-VDF-VRN | 操作員令「解決所有衝突問題 PR #81」:merge-base = main tip · 衝突 0 · GitHub mergeable;紅的是 CI —— 自 10-20 03:17 起該倉每條 workflow 在 2–3 秒內 failure(runner_id 0 · 無 step · log 404 · main 自己一樣)· PR #76 → #77 之間 .github 沒改 · 同帳號 movies-dataset 正常 → 私有倉 Actions 額度 / 付款 / 開關,只有倉主能處理 · 留言在 #81 | #81(未動)|
+| 10-21 11:0x ~ | movies-dataset | 操作員令「integrate INTO ONE CODE TO HANDLE ALL ABOVE」(第二回)→ v0136:驗證器 v0105(DUPKEY 位置證據 · 對調診斷 · EPS 格 · 摘要每類都出現)+ 啟動器 ⑫a VRN-1 倉同步 · 全部測試重跑 · 推 · 新 PR | 見最新 PR |
 
 ## 3. 衝突檢查方法(每次推之前都做;下一個 AI 照抄)
 
