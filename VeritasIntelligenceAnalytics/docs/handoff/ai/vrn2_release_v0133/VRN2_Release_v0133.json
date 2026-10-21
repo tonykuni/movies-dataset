@@ -17,7 +17,7 @@
    "other": "其他投資報告(尚未開放 · 同上)"
   },
   "file_types": "pdf · docx · doc · txt · png · jpg · jpeg · tif · tiff · bmp(同 ENG397 EXT · 自測逐鍵核對)· 本版主體只擷取 PDF · 非 PDF 照實記「已收下 · 本版主體只擷取 PDF」",
-  "registration_check": "貼包多一行「註冊核對」:⑤ 元件登記 · ⑥c vrn2://(讀回核對)· ② 定位登記;一鍵 ⑤b 再查 HKCU 與 U/I 區塊",
+  "registration_check": "貼包多一行「註冊核對」:⑤ 元件登記 · ⑥c vrn2://(讀回核對)· ② 定位登記;一鍵 ⑤b 把 HKCU 指令解析成 python + 處理器,處理器整條路徑(正規化)= 本機 VRN-2 程式夾的 VRN2_UIAction_v0103.py 且檔在(或那一夾有啟動器本輪寫的 VRN2_UIAction_Config.json v0133)· python 檔在 · U/I 有輸入區塊;⑤b 的燈併進一鍵 NEXT(紅 → 紅 · 黃 → 最多黃;Codex #550 修正)",
   "rules": "只增不減(處理器 v0102 留著)· VRN-2 主體一個位元組都不動 · 路徑只從對話框與啟動器寫的設定讀 · 不從網址讀路徑"
  },
  "embedded_components_landing_order": [
@@ -124,7 +124,8 @@
   "selftest_ua": "11 / 11(解析 · 型別表 = ENG397 EXT · 稽核分類 · 選資料夾 / 選檔案暫存 · 拒絕未開放 · 取消 · --set-source · v0102 動作照舊)",
   "e2e": "沙盒樹(倉內 19 份 PDF · OCR 隔離環境是真的 · VRN-1 = 本機倉):A1 預設來源 → ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑥b 14 · ⑦ 14 / 14 全綠 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 事實 4653 / 4905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(掛鉤 · 子集 9 檔 = PDF 6 · Word 1 · TXT 1 · 影像 1)→ 稽核 個股 5 · 範圍外 1 · 非 PDF 3 → 重跑(不帶環境變數)②b「U/I 選的(資料夾)」· VRN2_SSOT 新一版 · ⑥b 範圍夾只剩 5 · ⑦ 5 / 5 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 2056 / 2214;P2 U/I 選檔案(2 PDF + 1 txt → 複製到 input_pick\\<時間>\\)→ ②b「U/I 選的(檔案 → 暫存夾)」· ⑦ 2 / 2 · ⑧ 完成 · ⑪ 錯值 0;產業報告/展望 · 其他投資報告 → 處理器拒絕(rc 3);vrn2://audit 重新稽核 綠 · 輸入歷史 6 筆",
   "ui": "輸入區塊真瀏覽器(Chromium)14 / 14 × 3 頁(A1 · P1 · P2):只有一塊 · 三類 radio(個股已選 · 另外兩類 disabled 且點不動)· 三個 vrn2:// 按鈕 · 稽核文字 · 在 190px 面板內、「這次不上船」之後「開啟」之前 · 原 4 個動作不變 · 分頁腳本照常 · 手機寬度 · 無腳本錯誤;既有 U/I 實測(35 條)A1 頁見驗證紀錄",
-  "oneclick": "一鍵 v0133 沙盒情境(從 v0132 升級 · 雜湊核對 · ①~⑫ · ⑤b 前後端連結檢查)結果見 VRN2_Verification_v0133.md §4(用最終啟動器跑)"
+  "oneclick": "一鍵 v0133 沙盒情境(從 v0132 升級 · 雜湊核對 · ①~⑫ · ⑤b 前後端連結檢查 · ⑤b 併進 NEXT):Linux 上 NEXT YELLOW(HKCU 沒註冊 · Windows 應 GREEN)· 見 VRN2_Verification_v0133.md §4 / §4b",
+  "codex550": "單元測試 19 / 19(pwsh · 從 ps1 抽出 Chk5b 與 $lamp / $msg 原文 · 正確 → GREEN rc 0 · 同檔名別的檢出 / 不存在 / v0102 / python 不在 / 沒引號 → RED · 沒註冊 → YELLOW rc 2 · 沒輸入紀錄 → YELLOW · .. 正規化 / v0133 設定檔 / python 別夾 → GREEN)· Linux 沙盒一鍵重跑:①~⑫ 全綠 · ⑤b 黃(HKCU 沒註冊)→ NEXT 由 GREEN 變 YELLOW「vrn2:// 沒註冊 … 把 ⑤b 那兩行貼回」(誠實 · 143 秒)· 一鍵程式碼 SHA-256 21ab900abfd0"
  },
  "launcher": {
   "file": "ActivateVRN-2_v0133.py",

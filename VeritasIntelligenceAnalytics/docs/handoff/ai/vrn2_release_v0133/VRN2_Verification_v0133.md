@@ -13,7 +13,7 @@
 |---|---|
 | `ActivateVRN-2_v0133.py`(1,902,460 bytes) | `d9411dcb333ba253dfc5eb640ddcf5ed3ae6a75f5b0000e25708276d06f45c10` |
 | `ActivateVRN-2_v0133.zip`(成員 `ActivateVRN-2.py`) | `78997365c230ae7ecf712b4cf7e8e361714ea7d5ca89412f1a2e034a375ce303` |
-| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1) | `9008c34b70bc…`(一鍵自己核對) |
+| 一鍵程式碼(`VRN2_OneClick_v0133.md` 內 · 即 ActivateVRN-2.ps1)| `21ab900abfd0…`(一鍵自己核對 · Codex #550 修正後;修正前 `9008c34b70bc…`)|
 
 ## 2. 自測
 
@@ -46,12 +46,23 @@
 ## 4. 一鍵(使用者機器情境 · 沙盒 · pwsh 7.4)
 
 Downloads 是 **v0132** 啟動器 · 發行夾 `vrn2_release_v0133` 在 GitHub 分支 · `$env:VRN2_SOURCE` 指向樣本夾 · 貼「一行」:
-一鍵程式碼 SHA-256 `9008c34b70bc` 相符 → ③ 舊啟動器備份 `ActivateVRN-2_v0132_<時間>.py.bak` · 取 v0133(雜湊相符)→ ①~⑫ 全走(②b 綠「啟動器 --source」· ⑦ 14 / 14 · ⑧ 完成 · ⑨ 上船 · ⑪ 錯值 0 · ⑫ 綠 · ⑫b 綠)→
+一鍵程式碼 SHA-256 `21ab900abfd0`(Codex #550 修正後;修正前那一輪 `9008c34b70bc` 的紀錄在 `logs_v0133.zip/scen_oneclick_v0132_to_v0133_pre_codex550.log`)相符 → ③ 舊啟動器備份 `ActivateVRN-2_v0132_<時間>.py.bak` · 取 v0133(雜湊相符)→ ①~⑫ 全走(②b 綠「啟動器 --source」· ⑦ 14 / 14 · ⑧ 完成 · ⑨ 上船 · ⑪ 錯值 0 · ⑫ 綠 · ⑫b 綠)→
 **⑤b 前後端連結檢查**:
 * `[YELLOW] ⑤b U/I 有輸入區塊,但 vrn2:// 沒註冊(HKCU)` —— 容器是 Linux,沒有 HKCU,所以啟動器 ⑥c 是灰、一鍵 ⑤b 是黃;**在 Windows 上 ⑥c 會寫 HKCU 並讀回核對,⑤b 應為綠**(黃燈的下一步寫在燈上:重跑啟動器或用 `$env:VRN2_SOURCE`)。
 * `[GREEN] ⑤b 目前輸入 · 個股報告/訊息 · <樣本夾>(啟動器 --source)· 檔 19(PDF 19 · Word 0 · TXT 0 · 影像 0)· 個股範圍 14 · 範圍外 5`
-* `NEXT: [GREEN] VRN-2 一鍵 v0133 跑完 · ⑧ 本輪完成 · 獨立驗證錯值 0 · U/I 已開在「驗證過的輸出」(左側「輸入」可選檔案夾 / 檔案 · 目前只開個股報告/訊息)`
-rc 0。
+* 修正前:`NEXT: [GREEN] VRN-2 一鍵 v0133 跑完 …`(⑤b 黃卻 GREEN —— Codex P1 抓到的問題)
+* **修正後**:`NEXT: [YELLOW] VRN-2 ⑧ 本輪完成 · 但 vrn2:// 沒註冊(HKCU)→ U/I 按鈕不會動 · 在 Windows 重跑一次啟動器(⑥c 會註冊並讀回核對)或用 $env:VRN2_SOURCE · 把 ⑤b 那兩行貼回 · … · 啟動器 rc 0 · 143 秒`;一行(boot)結尾把燈帶回子行程 → **行程 rc 2**(再跑一次確認:①~⑫ 仍全綠 · NEXT YELLOW · rc 2)。
+①~⑫ 仍全綠(⑦ 14 / 14 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 4,653 / 4,905 · ⑫b 綠 · 註冊核對 全部登記成功);黃只來自 ⑤b,在 Windows(⑥c 寫 HKCU 並讀回核對)應為 GREEN。
+
+## 4b. Codex #550 兩個發現 → 一鍵修正(只動一鍵程式碼 · 啟動器 v0133 與主體不動)
+
+| 發現 | 問題 | 修法 |
+|---|---|---|
+| P1 最後的燈沒算 ⑤b | ⑤b 黃 / 紅(vrn2:// 沒註冊 · 指向別的處理器 · U/I 沒區塊)時 NEXT 仍 GREEN、rc 0 | `$lamp`:⑧ 不綠或 rc≠0 或 ⑤b 紅 → RED;⑧ 綠 + 驗證錯值 0 + ⑤b 綠 + 有輸入紀錄 → GREEN;其餘 YELLOW(rc 2)· 訊息寫明是 ⑤b 哪一種;一行的 boot 結尾 `exit $LASTEXITCODE`,燈帶回子行程 rc(cmd 的 `%ERRORLEVEL%`)|
+| P2 處理器只比檔名 | HKCU 指令只要含 `VRN2_UIAction_v0103.py` 就算接上(舊的 / 搬走的檢出 / 不存在的檔也過) | `Chk5b`:把指令解析成「python」「處理器」兩段 · 處理器整條路徑正規化後 = 本機 VRN-2 程式夾的 v0103 且檔在(或那一夾有啟動器本輪寫的 `VRN2_UIAction_Config.json` v0133)· python 檔在 · 訊息寫明要的是哪一條 |
+
+單元測試 `tools/test_chk5b.py`(從 ps1 抽出 `Chk5b` 與 `$lamp` / `$msg` 原文 · pwsh 7.4 · 假 HKCU 指令 / U/I / 輸入紀錄):**19 / 19**
+—— 正確 → GREEN rc 0;同檔名別的檢出 → RED「舊的 / 搬走的檢出」+ NEXT RED rc 1;不存在的檔 → RED;舊處理器 v0102 → RED;沒註冊 + 區塊在 → YELLOW + NEXT YELLOW rc 2「vrn2:// 沒註冊」;沒註冊 + 沒區塊 → RED;python 不在 → RED;沒輸入紀錄 → YELLOW「沒有輸入紀錄」;路徑含 `..` → 正規化相同 GREEN;別的夾但有 v0133 設定檔 → GREEN;設定檔是 v0132 → RED;python 別的夾 → GREEN 註明不同夾;驗證有待核對 → YELLOW;啟動器 rc 1 → RED;沒引號 → RED「解析不出處理器」。(紀錄 `logs_v0133.zip/chk5b_unit_v0133.log`)
 
 ## 5. 註冊核對(操作員要的「是否都有註冊成功」)
 
@@ -64,7 +75,7 @@ rc 0。
 * **非 PDF(word / txt / 影像)**:U/I 會收下、稽核會逐型別點數並寫「已收下 · 本版主體只擷取 PDF」;VRN-2 主體(ENG397 · 管理器 vrn2scope)這一版只擷取 PDF,不假裝有處理。
 * **產業報告/展望 · 其他投資報告**:U/I 灰掉「尚未開放」,處理器也拒絕(rc 3);只開 個股報告/訊息。
 * ③ 環境檢查沙盒紅是 `--no-install` 的既有燈(見 §3)。
-* 一鍵 ⑤b 的 HKCU 核對只能在 Windows 變綠(§4)。
+* 一鍵 ⑤b 的 HKCU 核對只能在 Windows 變綠(§4);修正後 ⑤b 不綠 NEXT 就不綠 —— Linux 沙盒的一鍵 NEXT 因此是黃(rc 2),這是照實說,不是退步。
 
 ## 7. 下一步(操作員)
 
