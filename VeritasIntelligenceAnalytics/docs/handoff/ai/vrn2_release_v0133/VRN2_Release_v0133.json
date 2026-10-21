@@ -1,0 +1,142 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0133",
+ "date": "2026-10-21",
+ "operator_order_2026_10_21": [
+  "用vcgc的節省token工具來進行工作之後都是: 做好啟動系統實測準備善用vcwg節省token工具進行最後一大修，檢查用ActivateVRN-2.psl啟動前後端並連結讓使用者在html上用window i/o輸入檔案夾或檔案可以為pdf word txt image檔案夾 分為三種  個股報告/訊息  產業報告/展望  其他投資報告  現在進行的是個股報告/訊息其他功能關閉準備好測試無誤後留意是否都有註冊成功百並上傳github  guthub有無衝突問題一併解決  下一步換輸入檔案audit\"C:\\測試樣本報告\""
+ ],
+ "supersedes": "ActivateVRN-2 v0132(docs/handoff/ai/vrn2_release_v0132)· 主體 16 個元件逐位元組相同(管理器鏈 · ENG397 · 摘要器 · 獨立驗證器 · 處理器 v0102 · 工具橋 v0101 · OCR 橋 · 規則目錄)· 新增 U/I 處理器 v0103 與交接報告 v0133",
+ "design": {
+  "frontend": "VIA_Reports/vrn2/VRN2_UI_latest.html(管理器 ⑦ 產生 · 啟動器 ⑪ 寫回驗證 · ⑫ PIVOT 連結 · ⑫b 輸入區塊)",
+  "backend": "vrn2:// 協定(HKCU 註冊 · 寫完讀回核對)→ VRN2_UIAction_v0103.py → 啟動器 ActivateVRN-2.py(①~⑫)",
+  "window_io": "vrn2://pick?kind=folder|files&cat=stock → Windows 原生對話框(System.Windows.Forms · tkinter 備援)→ 稽核 → VRN2_Input_latest.json → ②b 當來源夾(寫新一版 VRN2_SSOT · 管理器不動)",
+  "categories": {
+   "stock": "個股報告/訊息(開放)",
+   "industry": "產業報告/展望(尚未開放 · U/I disabled · 處理器拒絕)",
+   "other": "其他投資報告(尚未開放 · 同上)"
+  },
+  "file_types": "pdf · docx · doc · txt · png · jpg · jpeg · tif · tiff · bmp(同 ENG397 EXT · 自測逐鍵核對)· 本版主體只擷取 PDF · 非 PDF 照實記「已收下 · 本版主體只擷取 PDF」",
+  "registration_check": "貼包多一行「註冊核對」:⑤ 元件登記 · ⑥c vrn2://(讀回核對)· ② 定位登記;一鍵 ⑤b 再查 HKCU 與 U/I 區塊",
+  "rules": "只增不減(處理器 v0102 留著)· VRN-2 主體一個位元組都不動 · 路徑只從對話框與啟動器寫的設定讀 · 不從網址讀路徑"
+ },
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_SystemManager_v0233.py",
+   "bytes": 10066,
+   "sha256": "25e33a7148609b969b1c340db54a73e0cf682a2470f4832536fe836dd49d86a6"
+  },
+  {
+   "file": "VRN_SystemManager_v0234.py",
+   "bytes": 27553,
+   "sha256": "d8a564b2c442f37960ad73215e67da0ec90f5b8692d8b74857c0def329658b42"
+  },
+  {
+   "file": "VRN_SystemManager_v0235.py",
+   "bytes": 22840,
+   "sha256": "53ea452b978e2cb3d25179b9dae1bf2ec376a6c49155ac59cbe100ccbbb4d033"
+  },
+  {
+   "file": "VRN_SystemManager_v0236.py",
+   "bytes": 33760,
+   "sha256": "872f7fde9452d3b3eb4255a7368c581c89e37b5c455631c7e144bb23b67b1e8a"
+  },
+  {
+   "file": "VRN_SystemManager_v0237.py",
+   "bytes": 37036,
+   "sha256": "514962c4f0bd735f706abeb60b20f23337f97615953b8f15a297684728113374"
+  },
+  {
+   "file": "VRN_SystemManager_v0238.py",
+   "bytes": 11887,
+   "sha256": "87a3c4d7ab511fe7499843d971f873a4a51cf26b783e987dd1ccc4495a1c0761"
+  },
+  {
+   "file": "VRN_SystemManager_v0239.py",
+   "bytes": 18415,
+   "sha256": "b1eb69452d1c91609dae287c19e21e0699f48d056e482b7e3969c133a43092e2"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0114.py",
+   "bytes": 63825,
+   "sha256": "62beeaf655760c2bcfb828782839721d727594a91ca0b804863ec2f383ac578d"
+  },
+  {
+   "file": "VRN2_IndependentVerifier_v0102.py",
+   "bytes": 76509,
+   "sha256": "a43079aa94151c637346a51a7f2371820e268ba52db8ad1e60924319e8354172"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_UIAction_v0103.py",
+   "bytes": 30341,
+   "sha256": "3e478229c8e12ce8e26e4bfb822e8830c2961f2dd7439debeafc8d89a52d6ed1"
+  },
+  {
+   "file": "VRN2_ToolBridge_v0101.py",
+   "bytes": 38052,
+   "sha256": "489c5d5738c72c6e0cae459697a95b606be8d2ab127d7594780666b5c277e9d3"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "VRN2_Handover_v0133.md",
+   "bytes": 56616,
+   "sha256": "b3677ad134c1ff2099aea7a75528a262bea32fc3eca1d379373210f3ea59ee78"
+  }
+ ],
+ "tested_in": {
+  "where": "Claude Code 雲端容器 · Linux · Python 3.13 · 測試用隔離 venv(repo 與系統 Python 未動)· OCR 隔離環境另建 Python 3.11 venv(rapidocr_onnxruntime · numpy<2)只在暫存區",
+  "inputs": "repo 內真實 PDF 19 份(個股 14)· U/I 選資料夾子集 6 PDF(個股 5)+ txt / docx / png · U/I 選檔案 2 PDF + 1 txt → 暫存夾",
+  "chain_stub": "使用者機器的管理器前版鏈 v0154–v0230 不在 repo → 測試替身(只供 p1loop / _rep / input_dir 等)· 不可提交",
+  "vrn1": "VIA-VDF-VRN 倉 claude/optimistic-goodall-yhalc5 @ e10679c(PR tonykuni/VIA-VDF-VRN#79 · 第十四輪 · 工具冊 ssot/VRN_ToolManifest_v0100.json)· 另一份 = main 62475b0(沒有工具冊 · 實測 ⑫ 灰 + git switch 指令)"
+ },
+ "results": {
+  "ua_sha12": "3e478229c8e1",
+  "selftest": "啟動器 --selftest 31 / 31(多 4 條:內嵌處理器 v0103 · 處理器自測 · 步驟次序 · ②b 來源寫 VRN2_SSOT / 設定檔還沒寫也能稽核)",
+  "selftest_ua": "11 / 11(解析 · 型別表 = ENG397 EXT · 稽核分類 · 選資料夾 / 選檔案暫存 · 拒絕未開放 · 取消 · --set-source · v0102 動作照舊)",
+  "e2e": "沙盒樹(倉內 19 份 PDF · OCR 隔離環境是真的 · VRN-1 = 本機倉):A1 預設來源 → ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑥b 14 · ⑦ 14 / 14 全綠 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 事實 4653 / 4905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(掛鉤 · 子集 9 檔 = PDF 6 · Word 1 · TXT 1 · 影像 1)→ 稽核 個股 5 · 範圍外 1 · 非 PDF 3 → 重跑(不帶環境變數)②b「U/I 選的(資料夾)」· VRN2_SSOT 新一版 · ⑥b 範圍夾只剩 5 · ⑦ 5 / 5 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 2056 / 2214;P2 U/I 選檔案(2 PDF + 1 txt → 複製到 input_pick\\<時間>\\)→ ②b「U/I 選的(檔案 → 暫存夾)」· ⑦ 2 / 2 · ⑧ 完成 · ⑪ 錯值 0;產業報告/展望 · 其他投資報告 → 處理器拒絕(rc 3);vrn2://audit 重新稽核 綠 · 輸入歷史 6 筆",
+  "ui": "輸入區塊真瀏覽器(Chromium)14 / 14 × 3 頁(A1 · P1 · P2):只有一塊 · 三類 radio(個股已選 · 另外兩類 disabled 且點不動)· 三個 vrn2:// 按鈕 · 稽核文字 · 在 190px 面板內、「這次不上船」之後「開啟」之前 · 原 4 個動作不變 · 分頁腳本照常 · 手機寬度 · 無腳本錯誤;既有 U/I 實測(35 條)A1 頁見驗證紀錄",
+  "oneclick": "一鍵 v0133 沙盒情境(從 v0132 升級 · 雜湊核對 · ①~⑫ · ⑤b 前後端連結檢查)結果見 VRN2_Verification_v0133.md §4(用最終啟動器跑)"
+ },
+ "launcher": {
+  "file": "ActivateVRN-2_v0133.py",
+  "bytes": 1902460,
+  "sha256": "d9411dcb333ba253dfc5eb640ddcf5ed3ae6a75f5b0000e25708276d06f45c10"
+ },
+ "launcher_zip": {
+  "file": "ActivateVRN-2_v0133.zip",
+  "sha256": "78997365c230ae7ecf712b4cf7e8e361714ea7d5ca89412f1a2e034a375ce303",
+  "member": "ActivateVRN-2.py"
+ },
+ "oneclick": "VRN2_OneClick_v0133.md",
+ "test_tools_zip": "vrn2_test_tools_v0133.zip",
+ "logs_zip": "logs_v0133.zip"
+}
