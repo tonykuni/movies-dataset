@@ -817,3 +817,35 @@ python "functional modules\VDF\VDF_MDL014_WorkstationSync_v0100.py" --apply   & 
 3. 在 VDF MAIN 裡經 VCGC 跑交接案:先移開舊收據 → 真的重跑(不沿用);VCGC 的冊還原不提交。
 4. 只收 VDF 的案的收據,提交到 `vdf-workstation-receipts-<時間>` 並推上去,印 PR 連結。
 - 自測 14/14(離線假倉);突變 8 種全抓。
+
+## 2026-10-21 · 一鍵全程 v0114:同步到 main → 分道並行擷取 → 核對 → 操作入口
+
+操作員令:「INTEGRATE ALL INTO ONE CODE TO HANDLE THE REMAINING WORKS TO ENSURE DATA CAN BE FETCH FAST AND CORRECTLY FOR THE SOURCE AND I CAN OPERATE IN HTML U/I.」
+疊在 v0113 之上的薄尾 `VDF_MDL013_ActivateVDF_v0114.py`(v0100–v0113 一字不動;固定入口 `ActivateVDF.py` 自動取尾版)。
+
+| 段 | 做什麼 | 來源 |
+|---|---|---|
+| ⓪ `--sync` | 起跑前派 `VDF_MDL014_WorkstationSync` 尾版 `--apply --case …`(備份分岔 · VDF 工作樹移到最新 main · VDF 資料夾接過去 · 交接真的重跑 · 只交 VDF 收據);紅(含 rc 2「不是 VDF 的工作樹」)→ 停在擷取之前,不在錯的樹上抓資料。`--sync-case` 可多次;`--sync-only` 只同步 | MDL014 v0101 |
+| ① 擷取 | 流程一改走 `VDF_MDL012_FetchGroups` 尾版 `run --groups ALL --jobs auto --no-lists-first`:依 DuckDB 庫分道(本容器 6 道 · 15 引擎)、3~5 流程同時跑、CPU / DRAM / TEMP 守門;清單 009 · 010 已由 ② 先跑過。`--groups` / `--jobs` 可改;`--no-lanes` 回逐列 `fetch run`。rc 4 GATED · rc 5 清單紅 · rc 1 有道紅 | FetchGroups v0108 |
+| ② 總覽頁 | 多三塊:「⓪ 同步」卡(八類行 · 收據分支 → 開 PR 連結)·「① 分道擷取」(道 · 結束一行)·「操作入口」(VDF 操作頁 · 資料庫檢查 · 獨立核對 · 跨來源對照 · 表頭彙整 · 全景;檔在的才連結 · 問參數頁與重跑指令)。JSON / 頁頭標 v0114 | 本版 |
+
+其餘(① CPU/DRAM · ② 兩張清單 · 流程二引擎 · 流程三資料庫 check → refill → xcheck → verify · ⑦⑧⑨⑩ 跨來源對照與獨立驗證 · 心跳 · Ctrl+C)全照 v0101–v0113。
+
+- 自測 6/6(假 MDL014 · 假步驟 · 假頁;零網路 · 不碰真倉)+ 前版鏈;突變 14 個(同步紅照啟動 · rc 2 當綠 · 不帶 --apply · 掉案名 · 清單沒就緒照派 · 清單跑兩次 · 掉 --dry · 不在本輪也分道 · 預設不分道 · 頁永遠插 / 永不插 · 同步沒進 JSON · --sync-only 也啟動 · 收據分支沒抓)。
+- 容器實跑(`run --dry --flows fetch --mode block`):清單 GREEN → 分道擷取 GREEN(6 道 · --dry 只列計畫)→ 跨來源對照 4348 筆 100% · 獨立驗證 PASS → 總覽頁 schema v0114、三塊都在;手機 390 不橫向溢出。`--sync` 不在容器真跑(會把收據分支推上 GitHub;工作站才跑)。
+- PS 一鍵 `Invoke-VDF-Activate` v0105 的參數表是固定的(沒有 `--sync` 直通);要經 PS 一鍵走本版要另一次 L70 許可改 .ps1,本線不改。
+
+工作站用法(站在 VDF 工作樹裡;PowerShell 或 cmd 都一樣):
+
+```
+python "<VDF 工作樹>\VeritasIntelligenceAnalytics\functional modules\VDF\ActivateVDF.py" run --sync --refill-apply
+```
+
+跑完自動開總覽頁;要連網擷取請操作員先在本視窗開雙閘(本檔不讀不寫)。交接案 `vdf_activatevdf` 標記改 `v0114 本版 8/8`。
+
+### 資料家(操作員 2026-10-21 令「VDF資料庫位於 C:\Users\tonyk\OneDrive\Documents\VeritasIntelligenceAnalytics\via_01_vdf」)
+
+- 新冊 `functional modules/VDF/VDF_DataHome_SSOT_v0100.json`(VDF 自己的冊):`homes[workstation].db_home = …\via_01_vdf`(= VCGC 的 VIA_SubsystemBundle_SSOT 裡 via_01_vdf 的 target;那本只讀不改)。
+- v0114 `resolve_homes`:`--db-home` / `VIA_VDF_DB_HOME` 沒給 → 冊上在這台機器存在的家;家本身或底下唯一放 `.duckdb` 的夾就是本輪資料庫家(寫回 `opt.db_home`,前版 db where / check / refill / xcheck 照 `--home` 帶);擷取家沒給 → 冊上 `fetch_home`,沒寫就由家底下唯一的 `output_hub` 上一層推。冊上的家不在(容器 / CI)→ 不猜、照前版並標黃。
+- `run` / `plan` 印 `[資料家] …` 一行;總覽頁操作入口卡也列;自測 ⑦(七種情況)+ ⑧(activate 蓋章:同步 · 資料家 · schema / tag;殺掉突變 no-sync-in-card)→ 8/8。
+- 換家不改程式:出 `VDF_DataHome_SSOT_v0101.json`。
