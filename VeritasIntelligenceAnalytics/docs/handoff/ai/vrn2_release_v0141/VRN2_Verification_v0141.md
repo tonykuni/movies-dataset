@@ -12,7 +12,7 @@ runtime v0140 的 155 個成員(管理器鏈 v0100 → v0242 · ENG397 v0127 · 
 | `VRN2_Closeout_v0141.zip`(套件 · 一鍵 ③ 核對的就是這個)| `11b2de30419f2107e898f27e6fe0278515fc5fd0e9c43c36069394c4d63e51f9` |
 | `ActivateVRN-2_v0141.py` | `fe1b03cd72687df7fc8eb1bdb8086efab632d130760e0ebf82b80b78c1ae2e71` |
 | `VRN2_Runtime_v0141.zip` | `b41b6dc65ba52c6ed6d497faaa7230230745811437a3b2c0940160ac3b3f1242` |
-| 一鍵程式碼(`VRN2_OneClick_v0141.md` 內)| `0282a31e9205…` |
+| 一鍵程式碼(`VRN2_OneClick_v0141.md` 內)| `1dcf40389bbf…` |
 
 ## 2. 貼回的問題 → 根因 → 做法
 
@@ -46,17 +46,17 @@ runtime v0140 的 155 個成員(管理器鏈 v0100 → v0242 · ENG397 v0127 · 
 
 ## 5. 一鍵 v0141(pwsh 7.4.6 · 假 GitHub 分支 · 本機沒有套件)
 
-結束碼:`first rc 1 · again rc 1 · done`(RED 1 只因沙盒的 ③ 環境檢查:加速器 VeritasCeleritas 的 7 個相依套件不在 venv —— accelerator · curl_cffi · cv2 · duckdb · lz4 · pyvips · watchdog;v0140 起任一紅燈步驟 rc 1。VRN-2 自己的閘全綠:⑧ 完成 · 冪等 GREEN · ⑪ 錯值 0 · 四點 52 PASS + 4 OCR;Windows 上 ③ 綠 → 最多 YELLOW 2(OCR 待核對))
+結束碼:`first rc 1 · again rc 1 · tamper rc 1 · done`(RED 1 只因沙盒的 ③ 環境檢查:加速器 VeritasCeleritas 的 7 個相依套件不在 venv —— accelerator · curl_cffi · cv2 · duckdb · lz4 · pyvips · watchdog;v0140 起任一紅燈步驟 rc 1。VRN-2 自己的閘全綠:⑧ 完成 · 冪等 GREEN · ⑪ 錯值 0 · 四點 52 PASS + 4 OCR;Windows 上 ③ 綠 → 最多 YELLOW 2(OCR 待核對))
 
 第一次(從 GitHub 取套件):
 ```
 [GREEN] ③ 套件 v0141 就位(SHA-256 11b2de30419f · 套件內 10 檔逐檔核對相符 · 來源 GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/Downloads/VRN2_Closeout_v0141
-→ RED ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 2 秒
+→ RED ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
 → GREEN ③b OCR 隔離環境 · 沿用指定的 OCR 環境 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v131/ocrenv/vrn2_ocr/bin/python · official ONNX telemetry opt-out bridge v0101 · 耗時 0 秒(平行)
 → GREEN ⑦ 啟動 VRN-2 · [計] VRN-2 個股四項 · 14 份(全綠 14)· 檔名 綠14黃0紅0灰0 · 首頁 綠14黃0紅0灰0 · 年度財報 綠12黃0紅0灰2 · 評價資訊 綠12黃0紅0灰2 · 本輪新鎖 52 項 · 累計鎖 52 項 · 退步 0 · U/I /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t14
 → GREEN ⑧ 完成判定 · VRN-2 完成 · 輸出驗證 紅 0 黃 3 · 耗時 0 秒
 → GREEN ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4905 筆 · {'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentV
-[RED] ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 2 秒
+[RED] ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
 NEXT: VRN-2 完成 · 自測 / 實測全過 · 獨立驗證錯值 0(U/I「驗證過的輸出」每格有驗證徽章) · PIVOT 沒寫(VIA_VRN2_NO_VRN1_SYNC=1 · 這次不同步 VRN-1 的倉 · 耗時 0 秒)
 NEXT: [RED] VRN-2 v0141 · rc 1 · 跑了 1 輪 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/VIA_Reports/vrn2/VRN2_Closeout_v0141.json
 [GREEN] ⑧ 完成判定 · 完成 · 紅 0 · 黃 3 · VRN-2 SystemManager v0243 · 本輪
@@ -67,21 +67,42 @@ NEXT: [RED] VRN-2 v0141 · rc 1 · 跑了 1 輪 · /tmp/claude-0/-home-user/a589
 [GRAY] ⑤c U/I 不開(VRN2_NO_UI = 1)
 NEXT: [RED] VRN-2 有紅燈(⑧ 完成判定不是本輪的綠 或 啟動器 rc 1:紅燈步驟 / 四點原文核對 FAIL / 冪等非冪等)· 看 ⑧b 收尾收據與冪等閘那兩行 · 把貼包(≤300 行 · 結尾 NEXT)貼回 · 交接報告 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/docs/handoff/ai/
 ```
-再貼一次(本機已是 v0141 套件):
+再貼一次(本機已是 v0141 套件 · 套件夾逐檔對已驗證的 zip):
 ```
-[GREEN] ③ 本機已是 v0141 套件(SHA-256 11b2de30419f)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/Downloads/VRN2_Closeout_v0141
-→ RED ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 2 秒
+[GREEN] ③ 本機已是 v0141 套件(SHA-256 11b2de30419f · 套件夾 11 檔與已驗證的 zip 逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/Downloads/VRN2_Closeout_v0141
+→ RED ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
 → GREEN ③b OCR 隔離環境 · 沿用指定的 OCR 環境 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v131/ocrenv/vrn2_ocr/bin/python · official ONNX telemetry opt-out bridge v0101 · 耗時 0 秒(平行)
 → GREEN ⑦ 啟動 VRN-2 · [計] VRN-2 個股四項 · 14 份(全綠 14)· 檔名 綠14黃0紅0灰0 · 首頁 綠14黃0紅0灰0 · 年度財報 綠12黃0紅0灰2 · 評價資訊 綠12黃0紅0灰2 · 本輪新鎖 0 項 · 累計鎖 52 項 · 退步 0 · U/I /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141
 → GREEN ⑧ 完成判定 · VRN-2 完成 · 輸出驗證 紅 0 黃 3 · 耗時 0 秒
 → GREEN ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4905 筆 · {'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentV
-[RED] ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 2 秒
+[RED] ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
 NEXT: VRN-2 完成 · 自測 / 實測全過 · 獨立驗證錯值 0(U/I「驗證過的輸出」每格有驗證徽章) · PIVOT 沒寫(VIA_VRN2_NO_VRN1_SYNC=1 · 這次不同步 VRN-1 的倉 · 耗時 0 秒)
 NEXT: [RED] VRN-2 v0141 · rc 1 · 跑了 1 輪 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/VIA_Reports/vrn2/VRN2_Closeout_v0141.json
 [GREEN] ⑧ 完成判定 · 完成 · 紅 0 · 黃 3 · VRN-2 SystemManager v0243 · 本輪
 [RED] ⑧b 收尾收據 v0141 · rc 1 · 跑了 1 輪(idempotence GREEN)· 四點原文核對 REVIEW_OCR {'PASS': 52, 'OCR_PENDING': 4} · 輸出缺項 1
 [RED]    紅燈步驟 · ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網
 [GREEN] 冪等閘 · GREEN · Daiwa-1319 20231011(2026 · GS-6415 20260517.pdf · JP-2330 20250718.pdf · same shard subprocess path as the main run (python -W ignore ENG397 --
+[GREEN] ⑤b 目前輸入 · 個股報告/訊息 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/samples(啟動器 --source)· 檔 19(PDF 19 · Word 0 · TXT 0 · 影像 0)· 個股範圍 14 · 範圍外 5(產業 / 其他 · 檔名規則 VRN_SystemManager_v0231.p
+[GRAY] ⑤c U/I 不開(VRN2_NO_UI = 1)
+NEXT: [RED] VRN-2 有紅燈(⑧ 完成判定不是本輪的綠 或 啟動器 rc 1:紅燈步驟 / 四點原文核對 FAIL / 冪等非冪等)· 看 ⑧b 收尾收據與冪等閘那兩行 · 把貼包(≤300 行 · 結尾 NEXT)貼回 · 交接報告 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/docs/handoff/ai/
+```
+第三次(Codex #566:套件夾裡的啟動器被改一行 → 快路徑逐檔核對抓到 → 從本機已驗證的 zip 重新解壓 · 舊夾改名備份):
+```
+[YELLOW] ③ 本機套件夾有 1 個檔與已驗證的 zip 不同或不在(ActivateVRN-2_v0141.py)→ 不用它,從本機這份 zip 重新解壓
+[GREEN] ③ 舊套件夾已改名備份 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/Downloads/VRN2_Closeout_v0141_20261022_080341.bak
+[GREEN] ③b VRN-2 程式夾 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/functional modules/VRN(來源 VIA 根)· 私有 runtime → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/
+→ RED ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
+→ GREEN ③b OCR 隔離環境 · 沿用指定的 OCR 環境 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v131/ocrenv/vrn2_ocr/bin/python · official ONNX telemetry opt-out bridge v0101 · 耗時 0 秒(平行)
+→ GREEN ⑦ 啟動 VRN-2 · [計] VRN-2 個股四項 · 14 份(全綠 14)· 檔名 綠14黃0紅0灰0 · 首頁 綠14黃0紅0灰0 · 年度財報 綠12黃0紅0灰2 · 評價資訊 綠12黃0紅0灰2 · 本輪新鎖 0 項 · 累計鎖 52 項 · 退步 0 · U/I /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141
+→ GREEN ⑧ 完成判定 · VRN-2 完成 · 輸出驗證 紅 0 黃 3 · 耗時 0 秒
+→ GREEN ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4905 筆 · {'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentV
+[RED] ③ 環境檢查與補裝 · [計] 環境檢查(envcheck · /tmp/claude-0/-home-user-movies-dataset/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/venv_vrn2/bin/python)· 掃 加速器 / 網路工具 2 檔 + VRN-2 尾版 9 · 仍缺 7 · 耗時 3 秒
+NEXT: VRN-2 完成 · 自測 / 實測全過 · 獨立驗證錯值 0(U/I「驗證過的輸出」每格有驗證徽章) · PIVOT 沒寫(VIA_VRN2_NO_VRN1_SYNC=1 · 這次不同步 VRN-1 的倉 · 耗時 0 秒)
+NEXT: [RED] VRN-2 v0141 · rc 1 · 跑了 1 輪 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/VIA_Reports/vrn2/VRN2_Closeout_v0141.json
+[GREEN] ⑧ 完成判定 · 完成 · 紅 0 · 黃 3 · VRN-2 SystemManager v0243 · 本輪
+[RED] ⑧b 收尾收據 v0141 · rc 1 · 跑了 1 輪(idempotence GREEN)· 四點原文核對 REVIEW_OCR {'PASS': 52, 'OCR_PENDING': 4} · 輸出缺項 1
+[GREEN] 冪等閘 · GREEN · Daiwa-1319 20231011(2026 · GS-6415 20260517.pdf · JP-2330 20250718.pdf · same shard subprocess path as the main run (python -W ignore ENG397 --
+[YELLOW] ⑤b U/I 有輸入區塊,但 vrn2:// 沒註冊(HKCU)→ 按鈕不會有反應;在 Windows 重跑一次啟動器(⑥c 會註冊並讀回核對)或用 $env:VRN2_SOURCE
 [GREEN] ⑤b 目前輸入 · 個股報告/訊息 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/samples(啟動器 --source)· 檔 19(PDF 19 · Word 0 · TXT 0 · 影像 0)· 個股範圍 14 · 範圍外 5(產業 / 其他 · 檔名規則 VRN_SystemManager_v0231.p
 [GRAY] ⑤c U/I 不開(VRN2_NO_UI = 1)
 NEXT: [RED] VRN-2 有紅燈(⑧ 完成判定不是本輪的綠 或 啟動器 rc 1:紅燈步驟 / 四點原文核對 FAIL / 冪等非冪等)· 看 ⑧b 收尾收據與冪等閘那兩行 · 把貼包(≤300 行 · 結尾 NEXT)貼回 · 交接報告 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v141/t141oc/VIA/docs/handoff/ai/

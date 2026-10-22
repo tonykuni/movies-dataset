@@ -317,10 +317,11 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | # | 項目 | 狀態 | 需要 |
 |---|---|---|---|
-| 0 | **使用者用 v0136 的一行跑**(`vrn2_release_v0136/VRN2_OneClick_v0136.md`)| 待執行 | 預期:U/I 自己跳出 · ⑪ 用驗證器 v0105 → 「貼給 AI」會有 DUPKEY 的例子(每類至少 6 筆)、對調的 3 筆寫明哪種對調、MS-6669 EPS 寫出年度數據那一格 · ⑫a 自己把 VIA-VDF-VRN fast-forward 到 main → ⑫ 應轉綠(借到 PIVOT 工具)。貼回 ⑪ 驗證摘要 + ⑫a / ⑫ 兩行。 |
-| 0b | **使用者用 v0135 的一行跑**(`vrn2_release_v0135/VRN2_OneClick_v0135.md`)| 被 v0136 取代(v0135 已合併 MAIN · 可跑,但 ⑪ 是驗證器 v0104、⑫ 要手動 pull)| 預期:同 v0134(U/I 自己跳出 · ⑪ 用驗證器 v0104 · 註冊核對 處理器 v0104);Daiwa PBR n.a. 那筆會寫「原文該格是 …」:空白 / 別的記號 → NILVAL · 數字 → FAIL 照實留。貼回 ⑪ 驗證摘要 + ②b / ⑤b。 |
-| 0c | **使用者用 v0134 的一行跑**(`vrn2_release_v0134/VRN2_OneClick_v0134.md`)| 被 v0135 取代(v0134 已合併 MAIN · 可跑,但 ⑪ 是驗證器 v0103)| 預期:U/I 自己跳出(不用再管 VIA_NO_OPEN)· ⑪ 基本資料 / 一標題四重點 FAIL 從 9 + 12 降(現價 / 目標價頁位 · 上漲空間推算 · 覆蓋去標點)· BADITEM 23 → 0 · NILVAL 1 · DUPKEY 82 照舊待看原文 · ⑨ 不蓋交接。貼回 ⑪ 驗證摘要 + ②b / ⑤b。 |
-| 0d | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| **已執行 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55 · ②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑪ 黃 106 筆待核對 · U/I 沒自動開 → ⑤c 修)** | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
+| 0 | **使用者用 v0141 的一行跑**(`vrn2_release_v0141/VRN2_OneClick_v0141.md`)| 待執行 | 預期:③ 套件就位(逐檔核對)· ⑧ 完成 · 冪等 GREEN(或 STALE_RECORD → 自動第 2 輪)· 四點原文核對 PASS / MISSING / OCR · ⑪ v0110 · 貼回 `VRN2_Closeout_v0141.json` + `IDEMPOTENCE_latest.json` + digest(含 6933 / 2891 的 ✗ 證據)|
+| 0b | **使用者用 v0136 的一行跑**(`vrn2_release_v0136/VRN2_OneClick_v0136.md`)| 待執行 | 預期:U/I 自己跳出 · ⑪ 用驗證器 v0105 → 「貼給 AI」會有 DUPKEY 的例子(每類至少 6 筆)、對調的 3 筆寫明哪種對調、MS-6669 EPS 寫出年度數據那一格 · ⑫a 自己把 VIA-VDF-VRN fast-forward 到 main → ⑫ 應轉綠(借到 PIVOT 工具)。貼回 ⑪ 驗證摘要 + ⑫a / ⑫ 兩行。 |
+| 0c | **使用者用 v0135 的一行跑**(`vrn2_release_v0135/VRN2_OneClick_v0135.md`)| 被 v0136 取代(v0135 已合併 MAIN · 可跑,但 ⑪ 是驗證器 v0104、⑫ 要手動 pull)| 預期:同 v0134(U/I 自己跳出 · ⑪ 用驗證器 v0104 · 註冊核對 處理器 v0104);Daiwa PBR n.a. 那筆會寫「原文該格是 …」:空白 / 別的記號 → NILVAL · 數字 → FAIL 照實留。貼回 ⑪ 驗證摘要 + ②b / ⑤b。 |
+| 0d | **使用者用 v0134 的一行跑**(`vrn2_release_v0134/VRN2_OneClick_v0134.md`)| 被 v0135 取代(v0134 已合併 MAIN · 可跑,但 ⑪ 是驗證器 v0103)| 預期:U/I 自己跳出(不用再管 VIA_NO_OPEN)· ⑪ 基本資料 / 一標題四重點 FAIL 從 9 + 12 降(現價 / 目標價頁位 · 上漲空間推算 · 覆蓋去標點)· BADITEM 23 → 0 · NILVAL 1 · DUPKEY 82 照舊待看原文 · ⑨ 不蓋交接。貼回 ⑪ 驗證摘要 + ②b / ⑤b。 |
+| 0e | **使用者用 v0133 的一行跑**(`vrn2_release_v0133/VRN2_OneClick_v0133.md` · 可存成 `ActivateVRN-2.ps1`)| **已執行 2026-10-21 13:06(C:\測試樣本報告 · 534 檔 · 個股 55 · ②b / ⑥c / ⑤b / 註冊核對全綠 · ⑦ 綠 44 黃 11 紅 0 · ⑪ 黃 106 筆待核對 · U/I 沒自動開 → ⑤c 修)** | 預期:②b 輸入來源 綠(預設 `C:\測試樣本報告` 或 `$env:VRN2_SOURCE`)· ⑥c vrn2:// 讀回核對相同 · ⑫b U/I 輸入區塊 · ⑤b 前後端已連結(整條路徑 · 檔在)· NEXT 綠(⑤b 不綠 NEXT 就不綠);然後在 U/I 按「📁 選擇檔案夾…」選 `C:\測試樣本報告` → 區塊顯示稽核 → 「▶ 完整重跑」。貼回 ②b / ⑥c / ⑫b / 註冊核對 / ⑤b 幾行。 |
 | 0b | **VRN-1 合併 PR tonykuni/VIA-VDF-VRN#79**(另一團隊的倉 · 第十三 / 十四輪 · 操作員決定)| 待操作員 | 合併(或切到該分支)後 VRN-1 的工具冊就在 → VRN-2 ⑫ 才借得到;VRN-1 跑 MAIN 時 G23 借 VRN-2 的段落標題(先跑過一次 VRN-2 v0131,工具冊才在)|
 | 1 | 使用者用 v0129 的一行再跑(cmd / PowerShell 都能貼 · v0128 那一行也還能用 · 只是少了段落標題修正) | 待執行 | 預期:一鍵程式碼雜湊相符 · ③b / ② 印出程式夾來源與登記版號(本機上次成功 v0235)· 落地 v0236 → v0237 → v0238 → v0239 + 獨立驗證器 v0102 · ⑧ 完成 · ⑪ 綠 · U/I 自動跳出時第一個分頁就是「驗證過的輸出」· **貼回 ② / ③b / ⑨ / ⑪ 那幾行 + 驗證摘要**(52 份 · 新驗證器第一次在使用者機器跑 · 有 ✗ 格先看原文再判) |
 | 2 | 使用者機器其他 P1 黃燈(260914_daiwa_aspeed · GFHK Apple · 南亞 · 啟碁)| 不在容器 | 看 ⑪ 摘要與 U/I ✗ 格 |
@@ -350,7 +351,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 10. 執行方式(v0141:貼 `vrn2_release_v0141/VRN2_OneClick_v0141.md` 的一行;或 `python <套件夾>\ActivateVRN-2_v0141.py --source C:\測試樣本報告`;`$env:VRN2_NO_REPASS=1` 不自動再跑)
 
-一鍵(取得 v0136 → 驗雜湊 → ③b 定位 → 執行(啟動器自己跑 ①~⑫ · ⑫a 同步 VRN-1 倉 · 開 U/I)→ 摘要 → 印驗證摘要 → ⑤b 前後端連結檢查 → NEXT 燈 = ⑧ + 獨立驗證 + ⑤b):`docs/handoff/ai/vrn2_release_v0134/VRN2_OneClick_v0134.md`(= ActivateVRN-2.ps1)
+一鍵 v0141(③ 取套件 `VRN2_Closeout_v0141.zip`:雜湊 + `PACKAGE_SHA256.json` 逐檔 · 本機已有也逐檔對已驗證的 zip,不同就重新解壓 → ③b 定位(VRN2_ROOT / VIA_ROOT)→ ④ `ActivateVRN-2_v0141.py`(①~⑫ · ⑧ 冪等閘 STALE_RECORD 自動第 2 輪 · 四點原文核對 → 收據)→ ⑤ 摘要(⑧ · ⑧b 收尾收據 · 冪等閘 · 獨立驗證摘要)→ ⑤b 前後端連結(處理器在 functional modules\VRN2)→ NEXT 燈 = ⑧ + 啟動器 rc + 獨立驗證 + ⑤b):`docs/handoff/ai/vrn2_release_v0141/VRN2_OneClick_v0141.md`(舊版 v0133 ~ v0136 的一行仍可跑,但走的是單檔啟動器,沒有本輪的冪等分類 / 四點補齊 / 驗證器 v0110)
 
 - 不借 VRN-1 的工具:`$env:VIA_VRN2_NO_BORROW = '1'` · VRN-1 不在預設位置:`$env:VIA_VRN1_ROOT = '<VRN-1 倉>'`
 - 只實測不上船:PS 檔頭 `$NoPush = $true` · 不跑獨立驗證:`$env:VIA_VRN2_NO_VERIFY = '1'` · 驗證平行路數:`$env:VRN2_VERIFY_PAR = '2'` · 驗證等待上限:`$env:VIA_VRN2_VERIFY_WAIT = '3600'`。
