@@ -1,4 +1,4 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0136 · 2026-10-21(整合一支 · 第二回:操作員「integrate INTO ONE CODE TO HANDLE ALL ABOVE」—— 獨立驗證器 v0105(DUPKEY 看位置證據只標不對位那筆 · 目標價 / 現價對調直接說 · EPS 不符印年度數據那一格 · 貼給 AI 的摘要每類錯值都出現)· ⑫a 借工具前自己把 VRN-1 的本機倉 fast-forward 到它的 main · v0102 / v0103 / v0104 留著 · 處理器 / 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動 · 其餘同 v0135)
+# VRN-2 交接報告 · ActivateVRN-2 v0141 · 2026-10-22(收尾套件:另一團隊 v0104 套件的 v0140 入口 + 本輪修正 —— 摘要器 ENG062 v0116 四點補齊階梯 · 管理器 v0243 冪等閘像對像重跑兩次並分類 + 啟動器自動再跑一輪 · 原文核對 v0104 缺句 = 待核對 · 獨立驗證器 v0110 · 備援指令回 v0136 契約)
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的貼包(結尾 `NEXT:`)與**驗證摘要**(`VIA_Reports\vrn2\verify_independent\*.digest.txt` · ≤150 行)。不要重讀整份程式;要看程式先用省 Token 卡(`read` / `slice` / `chain`)。
 > **操作員裁決(2026-10-18)**:「都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成」→ VRN-2 / VCGC / VDF 三系統各自獨立:VRN-2 不寫進別的系統的家族、不經 VCGC 核號、不登 VCGC 中央冊。
@@ -8,8 +8,10 @@
 > **操作員令(2026-10-20)**:「用中文回復 一路實測修復到底 TEST DEBUG OPTIMIZE … FACILITATE … USER-TEST … ACTIVATE … TILL THEY WORKS PERFECTLY. 授權全自動完成」。
 > **操作員令(2026-10-21)**:「用vcgc的節省token工具來進行工作之後都是:做好啟動系統實測準備善用vcgc節省token工具進行最後一大修,檢查用ActivateVRN-2.ps1啟動前後端並連結讓使用者在html上用window i/o輸入檔案夾或檔案可以為pdf word txt image檔案夾 分為三種 個股報告/訊息 產業報告/展望 其他投資報告 現在進行的是個股報告/訊息其他功能關閉準備好測試無誤後留意是否都有註冊成功並上傳github github有無衝突問題一併解決 下一步換輸入檔案audit"C:\測試樣本報告"」。
 > **操作員令(2026-10-21 · 第二段)**:「integrate into one code to handle all above」—— 把 Windows 實跑(`C:\測試樣本報告` · 534 檔 · 個股 55)抓到的事全部整進同一支啟動器,不再靠一鍵補。
-> **本輪(v0136 · 啟動器 + 獨立驗證器 VRN2_IndependentVerifier_v0105 · 交接報告 v0136 · 處理器 / 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:操作員在 v0135 合併後再令「integrate INTO ONE CODE TO HANDLE ALL ABOVE」。v0135 之後還留著的四件,全部整進同一支啟動器:① **DUPKEY 82**:Windows 那份 ⑪ 的 82 筆同鍵不同值,一行都沒進「貼給 AI」—— 摘要 150 行的上限先被基本資料 25 筆 + BADITEM 吃掉。v0105 摘要改成每一類錯值先各印 6 筆再補滿,而且 DUPKEY 看位置證據:同鍵兩個值裡只有一個對位(ALIGNED / SUBALIGNED / TRANSALIGNED)→ 那筆保留判決、另一筆才是錯值(⑫ PIVOT 只收對位的格,所以對的那筆進得了 PIVOT);都對位 / 都不對位 → 分不出,照舊兩筆都 DUPKEY。② **標籤對調 3 筆**(MS-6669 現價在目標價標籤旁 · GS-2317 目標價旁沒標籤 · 神達上漲空間在目標價標籤旁):v0105 `_swap_hint` 在目標價 / 現價不在自己標籤旁時再看是不是在對方的標籤旁,訊息直接寫「對調」「現價被填成目標價」「可能把目標價當成現價」—— 值仍 FAIL(照實),擷取端下一輪就有明確證據。③ **MS-6669 EPS**(一標題四重點 2025 年 EPS 251.50 不是年度數據的值):v0105 `_eps_ok` 不符時把年度數據同年度那一格印出來(「年度數據 2025 年 EPS 是 EPS (NT$) 2025E=…」),摘要器下一輪就知道該用哪一格。④ **⑫ 要操作員手動 `git switch main; git pull`**:v0136 啟動器 ⑫a 在借工具前自己做 —— 找 VRN-1 的本機倉(VIA_VRN1_ROOT · C:\Users\tonyk\VIA-VDF-VRN · 家目錄 · VIA 倉旁邊),已追蹤的檔沒改動才動:fetch origin main → 不在 main 就 switch main(原分支名印在說明 · `git switch -` 切得回)→ `merge --ff-only`;有改動 / 沒網路 / 分岔 → 不動、照實說,⑫ 照舊。只 fast-forward、不改寫歷史、不提交、不推(四系統各自獨立)。`VIA_VRN2_NO_VRN1_SYNC=1` 不同步。實測:驗證器 v0105 自測 30 / 30(v0105:v0104 的 26 條 + 4 條:DUPKEY 位置證據 · 對調診斷 · EPS 不符印年度數據那一格 · 摘要每類都出現) · 容器同一本冊(14 份 · 4,905 筆):v0104 與 v0105 判決逐類相同(ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 錯值 0 · 冊指紋相同) · 啟動器 啟動器 --selftest 35 / 35(多 1 條:⑫a VRN-1 倉同步 git 夾具 —— feature 落後 1 → 切回 main 並 fast-forward · 改過 → 黃不動 · 關閉 → 灰;內嵌驗證器檢查改認 v0105) · 沙盒樹(19 份 PDF · 個股 14 · 處理器 v0104 · 驗證器 v0105):A1 ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ 錯值 0(v0105 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 年度 4,905)· ⑫a 綠(容器的 VRN-1 clone 原在 claude/optimistic-goodall-yhalc5 → 切回 main 876a4f6 · fast-forward 0 · 原分支名在說明)· ⑫ 綠 4,653/4,905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(9 檔 → 個股 5)→ ⑦ 5/5 · ⑪ 0;P2 U/I 選檔案 → ⑦ 2/2 · ⑪ 0;產業 / 其他 拒絕 rc 3;audit 綠 —— 與 v0135 同一組數字(無退步) · 沙盒一鍵 v0135(MAIN)→ v0136:一鍵程式碼雜湊相符 · ③ 舊啟動器 v0135 備份 · v0136 就位(雜湊相符)· 啟動器 ①~⑫ 綠(③ 環境檢查紅 = 沙盒 --no-install 仍缺 7 套件 · ② 船包 / ⑥c vrn2:// 灰 = 非 Windows;與 v0135 情境相同)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ v0105 錯值 0 · ⑫a 綠(VRN-1 倉已在 main 最新)· ⑫ 綠 · ⑫b 綠 · 註冊核對 處理器 v0104 · ⑤b 黃(Linux 沒 HKCU)· ⑤c 黃(無瀏覽器)→ NEXT YELLOW rc 2(Windows 應 GREEN · U/I 自己跳出) · Chromium:既有 U/I 35/35 · 輸入區塊 14/14(一鍵情境頁)。
-> **前一輪(v0135 · 啟動器 + 獨立驗證器 VRN2_IndependentVerifier_v0104 · 交接報告 v0135 · 處理器 / 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:PR #561(v0134)操作員已合併 MAIN,Codex 在合併前後指出驗證器 v0103 兩點:① P1 空值記號(n.a. / NM / -)原文找不到就一律 NILVAL、沒看該格 —— 擷取出 `Revenue = n.a.` 而原文該列該欄印 `12.3` 會從錯值裡消失 → v0104 `_nil_cell`:先定科目列,用同一套表頭對欄(`_align` · 同一個 dx 門檻)看該格印了什麼:數字 → 仍 FAIL(註記「原文該格是數字」)· 空白 / 別的空值記號 → NILVAL · 定不出科目列或這頁沒有這個期間表頭 → 仍 FAIL;② P2 `_num_cands` 把整列空白全去掉再找,「Price target 3 190」會黏成 3190 → 只接「千分位逗點後的空白」「小數點後的空白」(`3, 190.00` · `1, 234. 5`),`3 190` · `12 345` · `Dec 3, 2025` 不黏。PR #562 上 Codex 再指出 P1:科目在這列、值在鄰列(`_row_hits` 支援的版面)時 `_nil_cell` 只看科目列會把下一列的數字當成空白 → `_val_row` 用與 `_row_hits` 同一套規則定值列(鄰列 < 14 pt · 科目欄不是別的科目 · 互為最近;期間表頭字樣不算值)再看該格。三項都只讓驗證器更嚴。已合併 MAIN 的 v0134 一個檔都不改:出 v0135(啟動器 · 發行夾 `vrn2_release_v0135` · 一鍵 · 本交接)。實測:驗證器 v0104 自測 26 / 26(v0104:v0103 的 23 條 + Codex #561 兩條:空白分開的兩個數不黏 · 空值記號看該格 + Codex #562 一條:值在鄰列也看) · 容器同一本冊(14 份 · 4,905 筆):v0102 · v0103 · v0104 判決逐類相同(ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 錯值 0 · 冊指紋相同) · 啟動器 啟動器 --selftest 34 / 34(內嵌驗證器檢查改認 v0104:_nil_cell · _val_row · _SPLITNUM · 自測 rc 0 · 內嵌清單 v0102 / v0103 / v0104) · 沙盒樹(19 份 PDF · 個股 14 · 處理器 v0104 · 驗證器 v0104):A1 ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ 錯值 0(v0104 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 年度 4,905:ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452)· ⑫ 4,653/4,905 · ⑫b 綠 · 註冊核對 全部登記成功(處理器 v0104);P1 U/I 選資料夾(9 檔 → 個股 5)→ ⑥b 5 · ⑦ 5/5 · ⑪ 0(2,214 筆)· ⑫ 2,056/2,214;P2 U/I 選檔案(2 PDF + txt → 暫存夾)→ ⑦ 2/2 · ⑪ 0(848 筆);產業 / 其他 拒絕 rc 3;audit 綠 —— 與 v0134 同一組數字(無退步) · 沙盒一鍵 v0134(MAIN)→ v0135:一鍵程式碼雜湊相符 · ③ 舊啟動器 v0134 備份 · v0135 就位(雜湊相符)· 啟動器 ①~⑫ 綠(③ 環境檢查紅 = 沙盒 --no-install 仍缺 7 套件 · ② 船包 / ⑥c vrn2:// 灰 = 非 Windows;三者與 v0134 情境相同)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ v0104 錯值 0 · ⑫b 綠 · 註冊核對 處理器 v0104 · ⑤b 黃(Linux 沒 HKCU)· ⑤c 黃(無瀏覽器)→ NEXT YELLOW rc 2(Windows 應 GREEN · U/I 自己跳出) · Chromium:既有 U/I 35/35 · 輸入區塊 14/14(一鍵情境頁)。
+> **操作員令(2026-10-22)**:「自動完成VRN-2所有問題 自己測試自完成」+ 上傳 `VRN2_Closeout_v0104.zip`(另一團隊:啟動器 v0140 · 管理器 v0242 · 驗證器 v0109 · 私有 runtime v0140 落 `functional modules\VRN2`)與 `VRN2_VDF_Closeout_v0103.zip`(v0139 前版 + VDF v0115/v0116 · VDF 本輪不碰)+ v0140 在 `C:\測試樣本報告` 的 U/I 貼回(RED 冪等 神達 3706 · 四點原文核對 FAIL 8 / OCR_PENDING 4 · 輸出冊缺項 6 · 獨立驗證 ✗ 45:6933 AMAX 37 · 凱基 2891 8)。
+> **本輪(v0141 · 套件 = v0140 入口 + runtime v0141 · 新增 ENG062 v0116 · 管理器 v0243 · 原文核對 v0104 · 驗證器 v0110 · 交接報告 v0141 · v0140 的 155 個 runtime 成員與啟動器底座 v0136 一個位元組都不動)**:① **冪等 RED**:v0242 的閘拿「主跑紀錄(可能來自擷取快取或子行程)」和「同行程重跑一次」比,不是像對像、也分不出紀錄過期與引擎非冪等;v0243 走主跑同一條子行程路徑(`python -W ignore ENG397 --shard`)重跑**兩次**:全同 GREEN;重跑一致、主跑不同 = STALE_RECORD → 清該檔擷取快取 → 啟動器 v0141 **自動再跑一輪**(`VRN2_NO_REPASS=1` 關);重跑就不同 = NONDETERMINISTIC(RED · 印第一個差異路徑);收據記錄執行環境(python · -I · fitz · PYTHONHASHSEED · 快取夾 · OCR 階梯)。容器 13 份真實多頁檔三條路徑 ×4 次語意差異 0;神達原檔不在容器。② **四點原文核對 FAIL 8 / 缺項 6**:摘要器 v0115 只挑嚴格句,短訊 / bullet / 英文 update 湊不滿 4 點,空點被 v0103 算 FAIL → ENG062 v0116 先跑 v0115,缺的點用階梯補齊(放寬句 → 單行 bullet → 整頁文字行 · 去掉開頭 bullet / 控制字元),每點仍是來源區塊精確字串(頁碼 · 字元區間 · bbox · 雜湊 · evidence.selection 記層級);原文核對 v0104:缺句 = MISSING(rc 2 待核對)、讀不到的 PDF 一列 FAIL、比對忽略 bullet / 控制字元;驗證器 v0110 四點判決多 MISSING。合成 GFHK / 欣銓式 PDF:v0115 0/4 · 1/4 → v0116 4/4 · 4/4(純數字頁仍 MISSING)。③ **備援「複製執行指令」**:v0242 換成只有 PS7 模板(真瀏覽器 3 條不過)→ v0243 回到 v0136 契約(升優先權 → PS 加速器 → PS7 模板 → 實際啟動器 · 不上船版)。④ **✗ 45**:兩份 PDF 不在容器,財務核心 v0105 不動,要原檔或 digest。⑤ 沙盒 19 份:⑦ 14/14 · ⑧ 完成 紅 0 黃 3 · 冪等 GREEN · 四點 {'PASS': 52, 'OCR_PENDING': 4} · ⑪ 錯值 0 · 自癒情境 第 1 輪 STALE_RECORD → 第 2 輪 GREEN · U/I 35 / 35。
+> **前一輪(v0136 · 啟動器 + 獨立驗證器 VRN2_IndependentVerifier_v0105 · 交接報告 v0136 · 處理器 / 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:操作員在 v0135 合併後再令「integrate INTO ONE CODE TO HANDLE ALL ABOVE」。v0135 之後還留著的四件,全部整進同一支啟動器:① **DUPKEY 82**:Windows 那份 ⑪ 的 82 筆同鍵不同值,一行都沒進「貼給 AI」—— 摘要 150 行的上限先被基本資料 25 筆 + BADITEM 吃掉。v0105 摘要改成每一類錯值先各印 6 筆再補滿,而且 DUPKEY 看位置證據:同鍵兩個值裡只有一個對位(ALIGNED / SUBALIGNED / TRANSALIGNED)→ 那筆保留判決、另一筆才是錯值(⑫ PIVOT 只收對位的格,所以對的那筆進得了 PIVOT);都對位 / 都不對位 → 分不出,照舊兩筆都 DUPKEY。② **標籤對調 3 筆**(MS-6669 現價在目標價標籤旁 · GS-2317 目標價旁沒標籤 · 神達上漲空間在目標價標籤旁):v0105 `_swap_hint` 在目標價 / 現價不在自己標籤旁時再看是不是在對方的標籤旁,訊息直接寫「對調」「現價被填成目標價」「可能把目標價當成現價」—— 值仍 FAIL(照實),擷取端下一輪就有明確證據。③ **MS-6669 EPS**(一標題四重點 2025 年 EPS 251.50 不是年度數據的值):v0105 `_eps_ok` 不符時把年度數據同年度那一格印出來(「年度數據 2025 年 EPS 是 EPS (NT$) 2025E=…」),摘要器下一輪就知道該用哪一格。④ **⑫ 要操作員手動 `git switch main; git pull`**:v0136 啟動器 ⑫a 在借工具前自己做 —— 找 VRN-1 的本機倉(VIA_VRN1_ROOT · C:\Users\tonyk\VIA-VDF-VRN · 家目錄 · VIA 倉旁邊),已追蹤的檔沒改動才動:fetch origin main → 不在 main 就 switch main(原分支名印在說明 · `git switch -` 切得回)→ `merge --ff-only`;有改動 / 沒網路 / 分岔 → 不動、照實說,⑫ 照舊。只 fast-forward、不改寫歷史、不提交、不推(四系統各自獨立)。`VIA_VRN2_NO_VRN1_SYNC=1` 不同步。實測:驗證器 v0105 自測 30 / 30(v0105:v0104 的 26 條 + 4 條:DUPKEY 位置證據 · 對調診斷 · EPS 不符印年度數據那一格 · 摘要每類都出現) · 容器同一本冊(14 份 · 4,905 筆):v0104 與 v0105 判決逐類相同(ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 錯值 0 · 冊指紋相同) · 啟動器 啟動器 --selftest 35 / 35(多 1 條:⑫a VRN-1 倉同步 git 夾具 —— feature 落後 1 → 切回 main 並 fast-forward · 改過 → 黃不動 · 關閉 → 灰;內嵌驗證器檢查改認 v0105) · 沙盒樹(19 份 PDF · 個股 14 · 處理器 v0104 · 驗證器 v0105):A1 ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ 錯值 0(v0105 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 年度 4,905)· ⑫a 綠(容器的 VRN-1 clone 原在 claude/optimistic-goodall-yhalc5 → 切回 main 876a4f6 · fast-forward 0 · 原分支名在說明)· ⑫ 綠 4,653/4,905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(9 檔 → 個股 5)→ ⑦ 5/5 · ⑪ 0;P2 U/I 選檔案 → ⑦ 2/2 · ⑪ 0;產業 / 其他 拒絕 rc 3;audit 綠 —— 與 v0135 同一組數字(無退步) · 沙盒一鍵 v0135(MAIN)→ v0136:一鍵程式碼雜湊相符 · ③ 舊啟動器 v0135 備份 · v0136 就位(雜湊相符)· 啟動器 ①~⑫ 綠(③ 環境檢查紅 = 沙盒 --no-install 仍缺 7 套件 · ② 船包 / ⑥c vrn2:// 灰 = 非 Windows;與 v0135 情境相同)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ v0105 錯值 0 · ⑫a 綠(VRN-1 倉已在 main 最新)· ⑫ 綠 · ⑫b 綠 · 註冊核對 處理器 v0104 · ⑤b 黃(Linux 沒 HKCU)· ⑤c 黃(無瀏覽器)→ NEXT YELLOW rc 2(Windows 應 GREEN · U/I 自己跳出) · Chromium:既有 U/I 35/35 · 輸入區塊 14/14(一鍵情境頁)。
+> **v0135( · 啟動器 + 獨立驗證器 VRN2_IndependentVerifier_v0104 · 交接報告 v0135 · 處理器 / 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:PR #561(v0134)操作員已合併 MAIN,Codex 在合併前後指出驗證器 v0103 兩點:① P1 空值記號(n.a. / NM / -)原文找不到就一律 NILVAL、沒看該格 —— 擷取出 `Revenue = n.a.` 而原文該列該欄印 `12.3` 會從錯值裡消失 → v0104 `_nil_cell`:先定科目列,用同一套表頭對欄(`_align` · 同一個 dx 門檻)看該格印了什麼:數字 → 仍 FAIL(註記「原文該格是數字」)· 空白 / 別的空值記號 → NILVAL · 定不出科目列或這頁沒有這個期間表頭 → 仍 FAIL;② P2 `_num_cands` 把整列空白全去掉再找,「Price target 3 190」會黏成 3190 → 只接「千分位逗點後的空白」「小數點後的空白」(`3, 190.00` · `1, 234. 5`),`3 190` · `12 345` · `Dec 3, 2025` 不黏。PR #562 上 Codex 再指出 P1:科目在這列、值在鄰列(`_row_hits` 支援的版面)時 `_nil_cell` 只看科目列會把下一列的數字當成空白 → `_val_row` 用與 `_row_hits` 同一套規則定值列(鄰列 < 14 pt · 科目欄不是別的科目 · 互為最近;期間表頭字樣不算值)再看該格。三項都只讓驗證器更嚴。已合併 MAIN 的 v0134 一個檔都不改:出 v0135(啟動器 · 發行夾 `vrn2_release_v0135` · 一鍵 · 本交接)。實測:驗證器 v0104 自測 26 / 26(v0104:v0103 的 23 條 + Codex #561 兩條:空白分開的兩個數不黏 · 空值記號看該格 + Codex #562 一條:值在鄰列也看) · 容器同一本冊(14 份 · 4,905 筆):v0102 · v0103 · v0104 判決逐類相同(ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 錯值 0 · 冊指紋相同) · 啟動器 啟動器 --selftest 34 / 34(內嵌驗證器檢查改認 v0104:_nil_cell · _val_row · _SPLITNUM · 自測 rc 0 · 內嵌清單 v0102 / v0103 / v0104) · 沙盒樹(19 份 PDF · 個股 14 · 處理器 v0104 · 驗證器 v0104):A1 ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ 錯值 0(v0104 · 基本資料 PASS 193 OCR 1 · 一標題四重點 PASS 64 OCR 4 · 年度 4,905:ALIGNED 4,378 · TRANSALIGNED 75 · SUBALIGNED 452)· ⑫ 4,653/4,905 · ⑫b 綠 · 註冊核對 全部登記成功(處理器 v0104);P1 U/I 選資料夾(9 檔 → 個股 5)→ ⑥b 5 · ⑦ 5/5 · ⑪ 0(2,214 筆)· ⑫ 2,056/2,214;P2 U/I 選檔案(2 PDF + txt → 暫存夾)→ ⑦ 2/2 · ⑪ 0(848 筆);產業 / 其他 拒絕 rc 3;audit 綠 —— 與 v0134 同一組數字(無退步) · 沙盒一鍵 v0134(MAIN)→ v0135:一鍵程式碼雜湊相符 · ③ 舊啟動器 v0134 備份 · v0135 就位(雜湊相符)· 啟動器 ①~⑫ 綠(③ 環境檢查紅 = 沙盒 --no-install 仍缺 7 套件 · ② 船包 / ⑥c vrn2:// 灰 = 非 Windows;三者與 v0134 情境相同)· ⑦ 14/14 · ⑧ 完成 紅 0 黃 4 · ⑪ v0104 錯值 0 · ⑫b 綠 · 註冊核對 處理器 v0104 · ⑤b 黃(Linux 沒 HKCU)· ⑤c 黃(無瀏覽器)→ NEXT YELLOW rc 2(Windows 應 GREEN · U/I 自己跳出) · Chromium:既有 U/I 35/35 · 輸入區塊 14/14(一鍵情境頁)。
 > **v0134( · 啟動器 + 處理器 VRN2_UIAction_v0104 + 獨立驗證器 VRN2_IndependentVerifier_v0103 · 交接報告 v0134 · 管理器鏈 / ENG397 / 摘要器 / 工具橋 / OCR 橋一個位元組都不動)**:① 處理器 v0104:個股範圍外的檔名規則取**最新版**管理器的 `_SK_EXCL`(Windows 上整條鏈 v0154~v0239 都在,v0103 取到最舊的 v0210;與 ⑥b 用的尾版同一條)。② 驗證器 v0103(⑪ 自動取最新版 · v0102 留著):標籤旁檢查看前 4 頁、一列裡被字距拆開的數字(「3, 190.00」)也對得到(MS / GS 的現價 · 目標價印在第 3 頁或拆字);一標題四重點的「報告上漲空間」原文沒有上漲空間標籤 → 用基本資料目標價 ÷ 現價 − 1 重算相符就過(註記推算 · GS ×5 / 兆豐 / MS-8210 那 7 筆);原文句 / 標題覆蓋率兩邊去標點再量一次取高者(摘要器用「、」接的句子 · 標題的「|」不再被扣分);科目名去 * † $ 括號再比(MS ModelWare「(NT $ mn)」「EPS (NT$)**」那 23 筆 BADITEM);空值記號(n.a. / - / NM)原文找不到 → NILVAL 不算錯值(Daiwa PBR n.a. 那 1 筆)。③ U/I 開不開只認 `--no-open` / `VRN2_NO_UI=1`:VIA 設定檔(Register-VIA-Commands)設的 `VIA_NO_OPEN=1` 是給別的 VIA 工具的,VRN-2 一鍵的目的就是跳出 U/I。④ ⑨ 上船的交接落地改成「不回退」:內嵌的 `VRN2_Handover_v0134.md` 只在倉裡沒有時寫;`VRN2_Handover_latest.md` = 倉裡版號最高那份(Windows 實跑的 ⑨ 曾把內嵌舊版蓋掉 Codex 兩輪與 GitHub 報告連結 → 以後不會)。⑤ 沒動的(照實說):DUPKEY 82 筆(同鍵不同值 · 要看原文兩張表)· 現價 / 目標價旁邊標籤對調的 3 筆 · MS-6669 POINT_2 的 ModelWare EPS —— 是擷取 / 摘要器的下一輪,本輪驗證器不假裝它們過。
 > **v0133( · 啟動器 + U/I 處理器 VRN2_UIAction_v0103 · 交接報告 v0133 · 管理器鏈 / ENG397 / 摘要器 / 獨立驗證器 / 工具橋 / OCR 橋一個位元組都不動)**:① 前端 = `VIA_Reports\vrn2\VRN2_UI_latest.html`,後端 = vrn2:// 協定(HKCU)→ 處理器 v0103 → 啟動器;一鍵 ⑤b 檢查兩端有接上(HKCU 的指令解析成 python + 處理器 · 處理器整條路徑 = 本機 VRN-2 程式夾的 v0103 且檔在 · python 檔在 · U/I 有輸入區塊)· ⑤b 的燈併進最後 NEXT(Codex #550 修正)。② U/I 左側新區塊「輸入(window I/O)」:三類 radio(只有 個股報告/訊息 可選;產業報告/展望 · 其他投資報告 disabled「尚未開放」,處理器收到也拒絕)· 📁 選擇檔案夾(`vrn2://pick?kind=folder&cat=stock` → Windows 原生資料夾對話框)· 📄 選擇檔案(`kind=files` → 多選 pdf / docx / doc / txt / png / jpg / jpeg / tif / tiff / bmp → 複製到 `VIA_Reports\vrn2\input_pick\<時間>\`)· 🔎 重新稽核;選好 → 稽核(型別 · 個股範圍 / 範圍外 · 非 PDF)→ `VRN2_Input_latest.json` → 區塊更新 → 重開 U/I → 按「▶ 完整重跑」。③ 啟動器 ②b 輸入來源:`--source`(一鍵 `$env:VRN2_SOURCE`)> 環境 VIA_VRN_INPUT > U/I 選的 > VRN2_SSOT > 預設 `C:\測試樣本報告`;來源不同就寫新一版 VRN2_SSOT(管理器 vrn2scope 讀它,管理器本身不動)。④ ⑥c vrn2:// 寫完讀回核對 · ⑫b ⑦ 重寫 U/I 之後把輸入區塊補回(同一塊不疊加)· 貼包多一行「註冊核對」(⑤ 元件登記 · ⑥c 協定 · ② 定位登記)。⑤ 非 PDF 照實記「已收下 · 本版主體只擷取 PDF」(ENG397 / 管理器 vrn2scope 只收 PDF,本輪不動主體);型別表與 ENG397 的 EXT 逐鍵核對。容器實測:沙盒樹(倉內 19 份 PDF · OCR 隔離環境是真的 · VRN-1 = 本機倉):A1 預設來源 → ②b 綠(檔 19 · 個股 14 · 範圍外 5)· ⑥b 14 · ⑦ 14 / 14 全綠 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 事實 4653 / 4905 · ⑫b 綠 · 註冊核對 全部登記成功;P1 U/I 選資料夾(掛鉤 · 子集 9 檔 = PDF 6 · Word 1 · TXT 1 · 影像 1)→ 稽核 個股 5 · 範圍外 1 · 非 PDF 3 → 重跑(不帶環境變數)②b「U/I 選的(資料夾)」· VRN2_SSOT 新一版 · ⑥b 範圍夾只剩 5 · ⑦ 5 / 5 · ⑧ 完成 · ⑪ 錯值 0 · ⑫ 2056 / 2214;P2 U/I 選檔案(2 PDF + 1 txt → 複製到 input_pick\<時間>\)→ ②b「U/I 選的(檔案 → 暫存夾)」· ⑦ 2 / 2 · ⑧ 完成 · ⑪ 錯值 0;產業報告/展望 · 其他投資報告 → 處理器拒絕(rc 3);vrn2://audit 重新稽核 綠 · 輸入歷史 6 筆
 > **v0132( · 工具橋 VRN2_ToolBridge_v0101 · 交接報告 v0132 · 啟動器流程 ①~⑫ 與 VRN-2 主體一個位元組都不動)**:① 工具橋 v0101:VRN-1 的倉在、那一版沒有工具冊(例:VRN-1 還在 main)→ ⑫ 灰,說明裡印出 `cd <VRN-1 倉>; git fetch origin; git switch claude/optimistic-goodall-yhalc5`(已合併進 main:`git pull`)· 指令放前面、路徑只出現一次(啟動器那一行最多顯示 260 字 —— 第一版放在後面,長路徑時被截在 `git switch claude/opt`,實測抓到、改掉)· sha256 不符 → 印出在 VRN-1 倉跑 `python VRN_Main_v0100.py build`。 ② VRN-1 這邊(另一團隊的倉 · VRN-1 自己的 MAIN):第十四輪(PR tonykuni/VIA-VDF-VRN#79 的 Codex 三條全部成立、全部修掉):科目括號只去單位 / 限定詞(`Turnover (X)` 週轉率 4 筆曾以營收身分進了驗證過的輸出)· 組合段落要同一頁依序的原文片段 · 代號要在代號的位置(檔名獨立一段 / `2330.TW` · `2330 TT` · `(3017)`)· 19 份真報告驗證過的年度數據 1,686 / 1,725(和第十三輪只差那 8 筆)· PIVOT PASS · 收尾完成 · VRN-2 借的 `table.pivot_db` 檔沒變(sha256 `74b97b8bf02d` 相同)。
@@ -36,10 +38,12 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | 類別 | 位置 | 說明 |
 |---|---|---|
-| **啟動器(MAIN)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | **v0136** · 雜湊見 `docs/handoff/ai/vrn2_release_v0136/VRN2_Release_v0136.json` · 一鍵:`vrn2_release_v0136/VRN2_OneClick_v0136.md`(**cmd / PowerShell 都能貼的一行**)· 程式夾定位依 MAIN 登記紀錄(v0128 起) |
+| **收尾套件(MAIN)** | `C:\Users\tonyk\Downloads\VRN2_Closeout_v0141\`(一鍵 ③ 解壓;`ActivateVRN-2_v0141.py` + 底座 `ActivateVRN-2_v0136.py` + `VRN2_Runtime_v0141.zip/.json` + 橋 + 原文核對 v0104 + OCR 橋 v0101)| **v0141** · 套件雜湊見 `docs/handoff/ai/vrn2_release_v0141/VRN2_Release_v0141.json` · 另一團隊的 v0104 套件夾(v0140)留著 |
+| **私有 runtime** | `<ROOT>\functional modules\VRN2\` | v0140 起:runtime 清單逐檔雜湊還原(已在且同 = 沿用 · 不同 = 停不覆寫)· v0141 多 4 檔:ENG062 v0116 · 管理器 v0243 · 原文核對 v0104 · 驗證器 v0110 · 共用 `functional modules\VRN` 不碰 |
+| **收尾收據** | `<ROOT>\VIA_Reports\vrn2\VRN2_Closeout_v0141.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` | rc 0 / 2 / 1 · 每輪(passes)· 冪等分類 + 執行環境 + 差異路徑 · 四點原文核對(PASS / MISSING / OCR_PENDING / FAIL)|
 | **工具橋** | `<ROOT>\functional modules\VRN\VRN2_ToolBridge_v0101.py` | v0132 落地(v0131 落的 `VRN2_ToolBridge_v0100.py` 照舊留著 · 只增不改)· 借出 `section.near` / `ocr.image` · 借入 VRN-1 `table.pivot_db` · 進船包 |
 | **U/I 處理器** | `<ROOT>\functional modules\VRN\VRN2_UIAction_v0104.py` | v0134 落地(v0102 / v0103 照舊留著 · 只增不改)· 檔名規則取最新版管理器 · 其餘同 v0103(`vrn2://pick` · `--set-source` · `--audit <路徑>` · `--refresh-ui`)|
-| **獨立驗證器** | `<ROOT>\functional modules\VRN\VRN2_IndependentVerifier_v0105.py` | v0136 落地(v0102 / v0103 / v0104 留著 · ⑪ 取最新版)· DUPKEY 看位置證據 `_ALIGNED_V` · 對調診斷 `_swap_hint` · EPS 不符印年度數據那一格 · 摘要每類錯值都出現 · 其餘同 v0104(空值記號看該格 · 字距 · 標籤旁前 4 頁 · 上漲空間推算 · 覆蓋率去標點 · 科目名去 * $)|
+| **獨立驗證器** | `<ROOT>\functional modules\VRN2\VRN2_IndependentVerifier_v0110.py` | v0141 落地(v0102 ~ v0109 留著)· 財務核心 v0105 · 四點判決 PASS / OCR / MISSING / FAIL |
 | **輸入紀錄** | `<ROOT>\VIA_Reports\vrn2\VRN2_Input_latest.json`(+ `VRN2_Input_History.jsonl` 只增 · 多檔暫存 `input_pick\<時間>\`) | U/I 選的來源 + 稽核(型別 · 個股範圍 / 範圍外 · 非 PDF)· 啟動器 ②b 讀它當來源夾 · U/I 區塊顯示它 |
 | **借出工具冊** | `<ROOT>\VIA_Reports\vrn2\tools\VRN2_ToolManifest_v0100.json` | ② 寫 · ⑫ 之後再寫一次(本輪才建好的 OCR 隔離環境 → `ocr.image` 標能用)· VRN-1 借之前核對 sha256 |
 | **PIVOT 資料庫** | `<ROOT>\VIA_Reports\vrn2\pivot\` | ⑫ 寫:`VRN_Pivot_v0100.sqlite`(+ `.duckdb` 有 duckdb 才寫)· `facts` / `pivot_report_annual` / `pivot_annual` / `conflicts` / `precision_merges` 的 CSV + Parquet · `VRN_Pivot_v0100.html` · `VRN2_Pivot_Borrow_latest.json`(借用紀錄:來源 · sha256)|
@@ -59,18 +63,22 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | 封存 / 隔離 | `…\VRN\_archive_vrn2\`(+ `ARCHIVE_MANIFEST.jsonl`)· `…\VRN\_quarantine\` | ⑩ 只搬 VRN-2 自己的舊版 |
 | U/I 處理器 / 協定 | `…\VRN\VRN2_UIAction_v0103.py`(v0102 留著)+ `VRN2_UIAction_Config.json` · `HKCU\Software\Classes\vrn2`(⑥c 寫完讀回核對) | 動作:run · run?nopush=1 · run-clean · restore-archive · **pick · audit** |
 | OCR 隔離環境 | `C:\Users\tonyk\envs\vrn2_ocr\` + `VRN2_OCRBridge_v0100.py` | |
-| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0136.md`) | ⑨ 自動落地(與 repo 同一份) |(⑨ v0134 起不回退:同版已在不蓋 · latest = 最高版號)
-| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0136\`(v0135:`vrn2_release_v0135\` · v0134:`vrn2_release_v0134\` · v0133:`vrn2_release_v0133\` · v0132:`vrn2_release_v0132\` · v0131:`vrn2_release_v0131\` · v0130:一鍵判定)| 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
+| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ `VRN2_Handover_v0141.md`) | ⑨ 自動落地(與 repo 同一份) |(⑨ v0134 起不回退:同版已在不蓋 · latest = 最高版號)
+| 本輪證據 | `<ROOT>\docs\handoff\ai\vrn2_release_v0141\`(v0136:`vrn2_release_v0136\` · v0135:`vrn2_release_v0135\` · v0134:`vrn2_release_v0134\` · v0133:`vrn2_release_v0133\` · v0132:`vrn2_release_v0132\` · v0131:`vrn2_release_v0131\` · v0130:一鍵判定)| 發行清單 · 驗證紀錄 · 日誌 · 截圖 · 測試工具(含驗證器反向測試總表) |
 
 ---
 
 ## 3. 版本紀錄
 
-### 3.1 現役版本(v0136 內嵌 · 依序自動落地)
+### 3.1 現役版本(v0141 套件 · 私有 runtime v0141 逐檔雜湊還原)
 
 | 元件 | 版本 | 大小 | SHA-256(前 12) | 本輪 |
 |---|---|---|---|---|
-| ActivateVRN-2.py | **v0136** | 見發行清單 | 見發行清單(本檔內嵌在啟動器裡,不寫啟動器自己的雜湊)| **新**(= v0135 + 內嵌獨立驗證器 v0105 + ⑫a VRN-1 倉同步;其餘元件逐位元組相同)|
+| ActivateVRN-2_v0141.py(套件 · 底座 v0136)| **v0141** | 見發行清單 | 見發行清單 | **新**(= v0140 入口 + 管理器 v0243 + 原文核對 v0104 + runtime v0141 + STALE_RECORD 自動再跑一輪)|
+| **VRN_SystemManager** | **v0243**(v0239 底座 · v0240 ~ v0242 留著)| 見 runtime 清單 | 見 runtime 清單 | **新**(冪等閘像對像 ×2 + 分類 + 清過期快取 · 備援指令回 v0136 契約)|
+| **VRN_ENG062_SummarizerV1** | **v0116**(v0114 / v0115 留著)| 見 runtime 清單 | 見 runtime 清單 | **新**(四點補齊階梯 · 每點精確字串)|
+| **VRN2_VerbatimVerifier** | **v0104**(v0100 ~ v0103 留著)| 見 runtime 清單 | 見 runtime 清單 | **新**(缺句 MISSING · 讀不到 PDF 一列 FAIL · 忽略 bullet / 控制字元)|
+| **VRN2_IndependentVerifier** | **v0110**(v0105 核心 · v0106 ~ v0109 留著)| 見 runtime 清單 | 見 runtime 清單 | **新**(四點 MISSING 判決)|
 | **VRN2_ToolBridge** | **v0101** | 見發行清單 | 見發行清單 | **新**(= v0100 + 借不到時說清楚下一步 · 借用規則不變)· v0100(v0131)照舊留著 |
 | VRN-2 SystemManager | v0231 → … → v0238 → **v0239** | v0231 215,605 · v0232 43,966 · v0233 10,066 · v0234 27,553 · v0235 22,840 · v0236 33,760 · v0237 37,036 · v0238 11,887 · v0239 18,415 | `ddff2743b478` / `42e682ba5074` / `25e33a714860` / `d8a564b2c442` / `53ea452b978e` / `872f7fde9452` / `514962c4f0bd` / `87a3c4d7ab51` / `b1eb69452d1c` | **v0239 新**(薄尾 · 前版必須 v0238 · 段落標題改回同一欄)· v0238:表頭列移剔除冊 |
 | **VRN2_IndependentVerifier** | **v0105**(v0102 / v0103 / v0104 留著)| 94,467 | `f16abb73b282` | **新**(v0104 + DUPKEY 位置證據 · 對調診斷 · EPS 格 · 摘要每類都出現 · 自測 30 / 30)|
@@ -99,6 +107,9 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | v0132 | 同 v0239 | v0127 | v0114 | 工具橋 v0101:借不到 VRN-1 的工具時說清楚下一步 |
 | v0133 | 同 v0239 | v0127 | v0114 | 前後端連結:U/I「輸入(window I/O)」區塊 · 處理器 v0103 · ②b 輸入來源 · ⑥c 讀回核對 · ⑫b · 註冊核對 |
 | **v0134** | 同 v0239 | v0127 | v0114 | 整合一支:處理器 v0104 · 驗證器 v0103 · U/I 開不開只認 VRN2_NO_UI · ⑨ 交接不回退 · 主體不動 |
+| v0135 / v0136 | 同 v0239 | v0127 | v0114 | Codex #561 / #562 · 整合一支第二回(驗證器 v0104 / v0105 · ⑫a)|
+| (另一團隊 v0137 ~ v0140 · 套件 v0102 ~ v0104)| v0240 ~ v0242 | v0127 | v0115 | 私有 runtime · 原文四點(SOURCE_VERBATIM)· 冪等語意比較 · 緊湊 U/I · 完成驗收容許缺值 |
+| **v0141** | → **v0243** | v0127 | **v0116** | 收尾套件:四點補齊階梯 · 冪等閘像對像 ×2 + 分類 + 自動再跑一輪 · 原文核對 v0104 · 驗證器 v0110 · 備援指令回 v0136 契約 |
 
 > 使用者機器:GitHub 有 VCGC 側 v0114–v0153;本機有 VRN-2 的 v0154–v0228 → v0231 的前版是 v0228。v0127 依序落地 v0231 → v0237,每支自測過才落下一支。跑過 v0126 → 前六支「已在且 hash 同」,只落 v0237 + 獨立驗證器。v0129 依序落地到 v0239(使用者機器上次成功 v0235 → 落 v0236 → v0237 → v0238 → v0239 + 驗證器 v0102;跑過 v0128 → 只落 v0239 + v0102)。
 
@@ -177,7 +188,20 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ---
 
-## 7. 本輪修正(v0135 → v0136 · 整合一支 第二回)
+## 7. 本輪修正(v0136 / 另一團隊 v0140 → v0141 · 收尾套件)
+
+| # | 貼回(v0140 · C:\測試樣本報告)| 追到的根因 | v0141 做法 | 實測 |
+|---|---|---|---|---|
+| 1 | 冪等 RED:神達 3706 主跑紀錄 ≠ 重跑 | v0242 閘:主跑紀錄(快取 / 子行程)vs 同行程重跑一次;分不出紀錄過期與引擎非冪等;神達原檔不在容器 | 管理器 v0243:主跑同一條子行程路徑重跑 ×2 → GREEN / STALE_RECORD(清該檔擷取快取 → 啟動器自動第 2 輪)/ NONDETERMINISTIC(RED · 第一個差異路徑)· 收據記錄執行環境 | 13 份真實檔三路徑 ×4 差異 0 · 沙盒冪等 GREEN · 自癒情境 STALE_RECORD → 第 2 輪 GREEN |
+| 2 | 四點原文核對 FAIL 8(GFHK P1~4 · 欣銓 P3~4 · 3014TT · 華南 2606)| v0115 只挑嚴格句;空點被原文核對 v0103 算 FAIL | ENG062 v0116 階梯補齊(每點精確字串 · 去 bullet / 控制字元)· 原文核對 v0104 缺句 = MISSING rc 2 · 驗證器 v0110 | 合成 GFHK / 欣銓式 PDF 0/4 · 1/4 → 4/4 · 4/4;真實 13 份 TOTAL {'PASS': 48, 'FAIL': 0, 'OCR_PENDING': 0, 'MISSING': 0};沙盒 {'PASS': 52, 'OCR_PENDING': 4} |
+| 3 | 輸出冊缺項 6 | 同 2 | 同 2 | 沙盒一標題四重點 14 份全 4/4 |
+| 4 | U/I 備援「複製執行指令」| v0242 換成只有 PS7 模板 | 管理器 v0243 回 v0136 契約 + PS7 模板 + VRN2_ROOT + finally Restore | Chromium 35 / 35 |
+| 5 | 獨立驗證 ✗ 45(6933 AMAX 37 · 凱基 2891 8)| 兩份 PDF 不在容器 | 財務核心 v0105 不動;要原檔或 digest | — |
+| 6 | 入口 | 另一團隊的 Invoke-VRN2-Closeout_v0104.ps1 寫死 v0140 | 不出 .ps1:一鍵 `VRN2_OneClick_v0141.md`(③ 套件雜湊 + 套件內逐檔雜湊 · ⑤ 收尾收據 / 冪等閘 · ⑤b 處理器在 functional modules\VRN2)| pwsh 情境見 VRN2_Verification_v0141.md |
+
+---
+
+## 7.0f v0135 → v0136(整合一支 第二回)
 
 | # | v0135 之後還留著的 | 做法(都在啟動器 v0136 內嵌的元件裡) | 實測 |
 |---|---|---|---|
@@ -287,6 +311,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 8. 已知問題與待辦(依優先序)
 
+| 0 | **(v0141)** 獨立驗證 ✗ 45(6933 AMAX 37 · 凱基 2891 8)與 神達 / GFHK / 欣銓 原檔不在容器:要操作員用 v0141 跑一次 `C:\測試樣本報告`,把 `VRN2_Closeout_v0141.json` + `IDEMPOTENCE_latest.json` + `verify_independent\*.digest.txt` 貼回 | 下一輪 |
+| 0b | **(v0141)** 冪等閘若回 NONDETERMINISTIC:收據 `differences_rerun_vs_rerun` 第一個路徑就是擷取端非冪等的位置(ENG397 v0127 要出 v0128)| 看收據 |
+| 0c | **(v0141)** MQ-1560 影像頁四點 OCR_PENDING 是設計(rc 2 黃);要綠需人工核對原圖 | 不改 |
+
 | # | 項目 | 狀態 | 需要 |
 |---|---|---|---|
 | 0 | **使用者用 v0136 的一行跑**(`vrn2_release_v0136/VRN2_OneClick_v0136.md`)| 待執行 | 預期:U/I 自己跳出 · ⑪ 用驗證器 v0105 → 「貼給 AI」會有 DUPKEY 的例子(每類至少 6 筆)、對調的 3 筆寫明哪種對調、MS-6669 EPS 寫出年度數據那一格 · ⑫a 自己把 VIA-VDF-VRN fast-forward 到 main → ⑫ 應轉綠(借到 PIVOT 工具)。貼回 ⑪ 驗證摘要 + ⑫a / ⑫ 兩行。 |
@@ -320,7 +348,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ---
 
-## 10. 執行方式
+## 10. 執行方式(v0141:貼 `vrn2_release_v0141/VRN2_OneClick_v0141.md` 的一行;或 `python <套件夾>\ActivateVRN-2_v0141.py --source C:\測試樣本報告`;`$env:VRN2_NO_REPASS=1` 不自動再跑)
 
 一鍵(取得 v0136 → 驗雜湊 → ③b 定位 → 執行(啟動器自己跑 ①~⑫ · ⑫a 同步 VRN-1 倉 · 開 U/I)→ 摘要 → 印驗證摘要 → ⑤b 前後端連結檢查 → NEXT 燈 = ⑧ + 獨立驗證 + ⑤b):`docs/handoff/ai/vrn2_release_v0134/VRN2_OneClick_v0134.md`(= ActivateVRN-2.ps1)
 
@@ -332,6 +360,12 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 ---
 
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
+
+- **(v0141)** 另一團隊的收尾套件(v0137 ~ v0140 · 私有 runtime `functional modules\VRN2`)是現役入口:改 VRN-2 = 出新 runtime 成員 + 新入口版號,runtime 清單逐檔雜湊、舊成員一個都不少;不要再把元件 base64 內嵌回單檔啟動器。
+- **(v0141)** 冪等閘三分類:GREEN / STALE_RECORD(清快取 · 啟動器自動再跑一輪)/ NONDETERMINISTIC(RED);RED 時先看收據 `context`(-I · fitz · PYTHONHASHSEED · 快取夾)與第一個差異路徑,再動擷取端。
+- **(v0141)** 四點:缺句是 MISSING(待核對 · 黃),不是 FAIL;FAIL 只留給「有文字但第二讀取器讀不到 / PDF 換過 / 雜湊不對」。階梯補的點 evidence.selection = relaxed / line / page,仍是精確字串。
+- **(v0141)** U/I 備援指令契約:升優先權 → PS 加速器 → PS7 模板 → `& $py $A`;不上船版帶 `VIA_VRN2_NO_PUSH='1'`。真瀏覽器測試(`ui_test141.js`)會查。
+- **(v0141)** 不出 .ps1;一鍵 md 的 ③ 要核對套件雜湊 + `PACKAGE_SHA256.json` 逐檔。
 
 - **錯值要全部看得到**:貼給 AI 的摘要每一類錯值都要出現(先各印幾筆再補滿),不能讓前面的類別把後面的擠掉 —— DUPKEY 82 筆隱形了一整輪。
 - **同鍵不同值用位置證據分**:對位的那筆是對的、保留;不對位的才是錯值;分不出就兩筆都標。
