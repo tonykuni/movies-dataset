@@ -1,9 +1,33 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0123 · 2026-10-27
+# VRN-2 交接報告 · ActivateVRN-2 v0127 · 2026-10-27
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的黃 / 紅貼包(≤300 行,結尾 NEXT:)。不要重讀整份程式。
-> **重要**:v0119 ~ v0123 只在沙盒驗證過;**10/27 使用者機器出現外來版本 管理器 v0233~v0239 / ENG397 v0127(來源不明)**,v0123 起 ②x 血緣檢查會回報,本鏈版號跳到 v0240 / v0128;使用者機器最後一次實跑是**第 35 輪(v0118)**。下一步是請使用者執行 v0123 並附上 v0232(機器上那份)/ v0239 / ENG397 v0127 供比對。
+> **重要**:**10/27 第 48 輪(v0123)使用者機器:完成 · 紅 0 黃 4 · 52/52 個股全綠**。同日發現同一家族在 v0231 之後分成兩線(見 §0),v0124 以 v0243 合併;使用者機器最後一次實跑是**第 35 輪(v0118)**。下一步是請使用者執行 v0127(合併版 · v0124 因使用者機器缺另一線 v0242 而失敗,v0125 先落地 v0242)· 之後兩線都以 v0243 為前版。
 
 ---
+
+## 0. 兩線合併(2026-10-27 · 最重要)
+
+| | 線 A(本線) | 線 B(另一工作階段 · Closeout 包) |
+|---|---|---|
+| 共同祖先 | **VRN_SystemManager_v0231.py**(雜湊 `ddff2743b478` 兩邊相同) | 同 |
+| 尾版風格 | 全文複製(v0232 218 KB · v0240 220 KB) | 薄尾包裝(v0232~v0242 各 10~44 KB · `_rebind` + `__getattr__`)|
+| 入口 | `ActivateVRN-2.py` v0109~v0124(Downloads) | `ActivateVRN-2_v0136~v0140.py` + `Invoke-VRN2-Closeout_v01xx.ps1` |
+| 線 B 的修正 | — | v0233 數字回原文改比數值 · v0234 一格多值拆子欄 · v0235 第三讀法閘 · **v0236 轉置表(華南 / Citi Earnings Summary)** · v0237 U/I「驗證過的輸出」· v0238 表頭列不當數據 · v0239 並排表 SECTION · v0240~v0242 原文逐字摘要 / 精簡 U/I / 可稽核冪等 · ENG397 v0127 · ENG062 v0114 / v0115 · UIAction v0102~v0104 · ToolBridge · IndependentVerifier · VerbatimVerifier |
+| 發生的問題 | 線 A 的 v0240(全文)落地後成為最新版,**遮蔽了線 B v0233~v0239 的同名函式**(第 48 輪 Citi-3231 年度數據仍缺,即線 B v0236 的轉置表修正被遮蔽) | 線 B 的 v0104 包也含 v0240~v0242,與線 A 的 v0240 同名不同內容 |
+| **合併點** | **`VRN_SystemManager_v0243.py`**:線 B 薄尾機制 · 前版 = 線 B v0242 · 只放線 A 相對 v0231 的淨增量(13 個線 B 沒碰的定義 + `_out_books` 包裝加欄 + 驗收分片重綁到本版)· 不遮蔽線 B 任何函式 | |
+| 規則 | 之後**兩線都以 v0243 為前版**,新版號 ≥ v0244;同名不同內容立即停止不覆寫;`registry\VRN2_Lineage_Register.json` 記兩線已知雜湊與合併點 | |
+| 第 49 輪(v0243)實證 | 分片驗收漏綁 `_acc_parallel` → 子行程跑 v0231 雙讀、命中舊快取 → 慧洋 ⑦ 假退步;對方冪等閘 Windows PermissionError;對方「四點原文證據未齊」28 份被我的輸出冊帳本算成退步 → **v0244 全部修正** | |
+| 本線已成功項接回 v0243 | 標準化層 · 雙讀修正 · TEL · Regex / 風險目錄 · 補裝帳本 · **⑦ 雙讀只准變好 · 輸出冊只准變好 · 階段列印**(全部以包裝接回 · 不遮蔽線 B)| |
+| 線 A 跳過的檔 | v0232(全文)/ v0240(全文)/ ENG397 v0128 保留在資料夾不刪(⑩ 會把 v0128 封存) | |
+
+**問題分類(第 48 輪 + 附件分析)**
+
+| 可同時處理(彼此獨立 · 本輪已做) | 必須依序處理 |
+|---|---|
+| ENG397 v0129 併線 B 頁數後援 | ① 先執行 v0124 確認合併版在實檔上完成判定通過 |
+| v0243 標準化欄位 / TEL / 雙讀 / Regex 冊 / 風險目錄 | ② 再評估線 B 入口(`Invoke-VRN2-Closeout`)與線 A 入口合一 |
+| ⑨ 遠端有新提交先 pull --rebase | ③ 階段列印與 ⑦ / 輸出冊退步鎖(需動線 B 的主流程 · 等合併穩定)|
+| 血緣登記兩線聯集 | ④ 兩線入口合一後才做 DuckDB 增量庫與 U/I 輸入面板 |
 
 ## 1. 系統定義(已鎖定)
 
@@ -21,7 +45,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | 類別 | 位置 | 說明 |
 |---|---|---|
-| **啟動器(MAIN 入口)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | v0123 · 一鍵完成全部步驟 |
+| **啟動器(MAIN 入口)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | v0127 · 一鍵完成全部步驟 |
 | 程式夾 | `<ROOT>\functional modules\VRN\` | 管理器 / 引擎 / 摘要器 / 處理器 |
 | **VRN-2 設定冊** | `<ROOT>\functional modules\VRN\SSOT\VRN2_SSOT_v0100.json` | 來源夾 · 範圍 · 交付項 · 取用規則 · 漏斗參數 |
 | 輸入設定冊 | `…\VRN\SSOT\VRN_Config_v####.json` | 最新版 `input_dir` 指向範圍夾;`vrn2_source_dir` 記原來源 |
@@ -56,14 +80,14 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 3. 版本紀錄
 
-### 3.1 現役版本(v0123 內嵌 · 啟動時自動落地)
+### 3.1 現役版本(v0127 內嵌 · 啟動時自動落地)
 
 | 元件 | 版本 | 大小 | SHA-256(前 12) |
 |---|---|---|---|
-| ActivateVRN-2.py | **v0123** | — | — |
-| VRN-2 SystemManager | **v0240** | — | 見啟動器 MGR_SHA(v0233~v0239 為外來版本 · 跳號)|
-| VRN_ENG397_P1Segment(擷取) | **v0128** | — | 見啟動器 ENGINES(v0127 為外來版本 · 跳號)|
-| VRN_ENG062_SummarizerV1(摘要) | **v0113** | — | 見啟動器 EXTRAS |
+| ActivateVRN-2.py | **v0127** | — | 另內嵌另一線 v0242 作為 v0243 前版(缺才落地)|
+| VRN-2 SystemManager | **v0244** | — | v0243 的兄弟版(前版同為另一線 v0242)· v0243 留存不動 · v0244 修正第 49 輪:_acc_parallel 綁定(分片真的跑本版)· 冪等閘退回 · 輸出冊退步只算既有類別 |
+| VRN_ENG397_P1Segment(擷取) | **v0129** | — | 本線 v0128 + 另一線 v0127(頁數不靠 PyMuPDF)|
+| VRN_ENG062_SummarizerV1(摘要) | v0113(內嵌)· 現役為另一線 **v0115** | — | 管理器取最新版號 |
 | VRN2_UIAction(U/I 處理器) | **v0100** | 3,059 | `21dc93de2f37` |
 | VRN2_OCRBridge(OCR 橋) | **v0100** | 4,778 | `4b21f0694d0e` |
 | VRN_ENG396_AssetIndex | v0102 | — | 未變(前鏈) |
@@ -83,7 +107,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | v0120 | v0230 | v0126 | v0112 | 擷取 / 驗收快取 · 成功模組登記 · 精簡(4.2 → 1.3 MB)· ⑩ 整併封存 |
 | v0121 | v0231 | v0126 | v0112 | U/I 左側操作面板 + 9 分頁 · `vrn2://` 協定 · 補裝帳本 |
 | v0122 | v0232 | v0126 | v0113 | 待辦收尾:MQ 目標價(OCR · 候選消歧)· 凱基雙讀字型插字 · ⑦ 與輸出冊納入只准變好 |
-| **v0123** | **v0240** | **v0128** | v0113 | 標準化層(年 / 月 / 日 / 季去前後綴 · 數值化 · EPS 基本 / 稀釋)· VRN2_Regex 冊 · 風險目錄 55 項 · 接回合理性 · 左上角 ITEM · 血緣檢查 · 靜態檢查快取 · 階段列印 |
+| v0123 | v0240 | v0128 | v0113 | 標準化層(年 / 月 / 日 / 季去前後綴 · 數值化 · EPS 基本 / 稀釋)· VRN2_Regex 冊 · 風險目錄 55 項 · 接回合理性 · 左上角 ITEM · 血緣檢查 · 靜態檢查快取 · 階段列印 |
 
 ---
 
@@ -219,10 +243,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 ```powershell
 & {
   $A = "C:\Users\tonyk\Downloads\ActivateVRN-2.py"
-  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A · 請先下載 ActivateVRN-2.py v0123" -ForegroundColor Red; return }
+  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A · 請先下載 ActivateVRN-2.py v0127" -ForegroundColor Red; return }
   $m = Select-String -LiteralPath $A -Pattern 'VERSION = "ActivateVRN-2 v(\d{4})"' -List
   $V = if ($m) { [int]$m.Matches[0].Groups[1].Value } else { 0 }
-  if ($V -lt 123) { Write-Host "[RED] Downloads 裡這份是 v$('{0:D4}' -f $V) · 請重新下載 v0123" -ForegroundColor Red; return }
+  if ($V -lt 127) { Write-Host "[RED] Downloads 裡這份是 v$('{0:D4}' -f $V) · 請重新下載 v0127" -ForegroundColor Red; return }
   $py = Get-Command python, py -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch 'WindowsApps' } | Select-Object -First 1
   if (-not $py) { Write-Host "[RED] 找不到 python" -ForegroundColor Red; return }
   Remove-Item Env:\VIA_VRN2_NO_PUSH -ErrorAction SilentlyContinue
