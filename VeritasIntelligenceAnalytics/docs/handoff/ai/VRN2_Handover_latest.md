@@ -1,7 +1,7 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0122 · 2026-10-18
+# VRN-2 交接報告 · ActivateVRN-2 v0123 · 2026-10-27
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的黃 / 紅貼包(≤300 行,結尾 NEXT:)。不要重讀整份程式。
-> **重要**:v0119 ~ v0122 只在沙盒驗證過;使用者機器最後一次實跑是**第 35 輪(v0118)**。下一步是請使用者執行 v0122。
+> **重要**:v0119 ~ v0123 只在沙盒驗證過;**10/27 使用者機器出現外來版本 管理器 v0233~v0239 / ENG397 v0127(來源不明)**,v0123 起 ②x 血緣檢查會回報,本鏈版號跳到 v0240 / v0128;使用者機器最後一次實跑是**第 35 輪(v0118)**。下一步是請使用者執行 v0123 並附上 v0232(機器上那份)/ v0239 / ENG397 v0127 供比對。
 
 ---
 
@@ -21,7 +21,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 | 類別 | 位置 | 說明 |
 |---|---|---|
-| **啟動器(MAIN 入口)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | v0122 · 一鍵完成全部步驟 |
+| **啟動器(MAIN 入口)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | v0123 · 一鍵完成全部步驟 |
 | 程式夾 | `<ROOT>\functional modules\VRN\` | 管理器 / 引擎 / 摘要器 / 處理器 |
 | **VRN-2 設定冊** | `<ROOT>\functional modules\VRN\SSOT\VRN2_SSOT_v0100.json` | 來源夾 · 範圍 · 交付項 · 取用規則 · 漏斗參數 |
 | 輸入設定冊 | `…\VRN\SSOT\VRN_Config_v####.json` | 最新版 `input_dir` 指向範圍夾;`vrn2_source_dir` 記原來源 |
@@ -56,13 +56,13 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 3. 版本紀錄
 
-### 3.1 現役版本(v0122 內嵌 · 啟動時自動落地)
+### 3.1 現役版本(v0123 內嵌 · 啟動時自動落地)
 
 | 元件 | 版本 | 大小 | SHA-256(前 12) |
 |---|---|---|---|
-| ActivateVRN-2.py | **v0122** | — | — |
-| VRN-2 SystemManager | **v0232** | — | 見啟動器 MGR_SHA |
-| VRN_ENG397_P1Segment(擷取) | **v0126** | 180,293 | `17652875168c` |
+| ActivateVRN-2.py | **v0123** | — | — |
+| VRN-2 SystemManager | **v0240** | — | 見啟動器 MGR_SHA(v0233~v0239 為外來版本 · 跳號)|
+| VRN_ENG397_P1Segment(擷取) | **v0128** | — | 見啟動器 ENGINES(v0127 為外來版本 · 跳號)|
 | VRN_ENG062_SummarizerV1(摘要) | **v0113** | — | 見啟動器 EXTRAS |
 | VRN2_UIAction(U/I 處理器) | **v0100** | 3,059 | `21dc93de2f37` |
 | VRN2_OCRBridge(OCR 橋) | **v0100** | 4,778 | `4b21f0694d0e` |
@@ -82,11 +82,29 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | v0119 | v0229 | v0125 | v0112 | 第 35 輪修正:對齊口徑統一 · 年度數據冊表頭判斷 · 退步寫檔名 |
 | v0120 | v0230 | v0126 | v0112 | 擷取 / 驗收快取 · 成功模組登記 · 精簡(4.2 → 1.3 MB)· ⑩ 整併封存 |
 | v0121 | v0231 | v0126 | v0112 | U/I 左側操作面板 + 9 分頁 · `vrn2://` 協定 · 補裝帳本 |
-| **v0122** | **v0232** | v0126 | **v0113** | 待辦收尾:MQ 目標價(OCR · 候選消歧)· 凱基雙讀字型插字 · ⑦ 與輸出冊納入只准變好 |
+| v0122 | v0232 | v0126 | v0113 | 待辦收尾:MQ 目標價(OCR · 候選消歧)· 凱基雙讀字型插字 · ⑦ 與輸出冊納入只准變好 |
+| **v0123** | **v0240** | **v0128** | v0113 | 標準化層(年 / 月 / 日 / 季去前後綴 · 數值化 · EPS 基本 / 稀釋)· VRN2_Regex 冊 · 風險目錄 55 項 · 接回合理性 · 左上角 ITEM · 血緣檢查 · 靜態檢查快取 · 階段列印 |
 
 ---
 
 ## 4. SSOT 現況
+
+### 4.0 v0123 新增冊
+
+| 冊 | 內容 |
+|---|---|
+| `SSOT\VRN2_Regex_v0100.json` | TW_TICKER(VRN v2 規則 · 不排除年份)· TW_YFINANCE · TW_BLOOMBERG · YEAR / MONTH / QUARTER / DATE / NUMBER(去前後綴)· 向其他子系統取用不衝突則只增不減 |
+| `SSOT\VRN2_RestoreRiskCatalog_v0100.json` | 擷取還原潛在錯誤 55 項(因素 / 識別 / 修復 / 狀態)· 已實作 53 · 規劃 2(OCR 數字自動修正 · 單位混用)|
+| `registry\VRN2_Foreign_Versions.json` | ②x 血緣檢查發現的外來版本清單 |
+| `registry\VRN2_StaticCheck_Ledger.json` | 程式夾指紋 + 上次 ④⑤ 結果(未變則沿用)|
+
+### 4.0b 標準化層(v0240 · 年度數據冊)
+
+- PERIOD 保留原文;新增 PERIOD_STD / PERIOD_KIND:年 `YYYY`(FY23 / FY-23 / 12/23 / Dec-24 / 2023A / 112年)· 月 `YYYY-MM`(Apr-12 / 2024/04 / 113年4月)· 日 `YYYY-MM-DD`(2025/8/19 · 19 May 2026 · 114/12/02 · 20250819)· 季 `YYYY-Qn`(1Q25A · 25Q3(F) · Q1 2025 · 2025年第1季)。
+- VALUE 保留原文;新增 VALUE_NUM(數值 · 去空格 / 千分位 / 全形 · 括號為負)與 UNIT(% / x / 倍 / bps / ppts)。
+- EPS_KIND:同表同期間兩列 EPS 取較低者為 diluted,單列視為 diluted;科目寫明 basic / 稀釋則依科目。
+- 表格左上角空格由引擎補「ITEM」。
+
 
 ### 4.1 `VRN2_SSOT_v0100.json`(VRN-2 獨立設定冊)
 
@@ -201,10 +219,10 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 ```powershell
 & {
   $A = "C:\Users\tonyk\Downloads\ActivateVRN-2.py"
-  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A · 請先下載 ActivateVRN-2.py v0122" -ForegroundColor Red; return }
+  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A · 請先下載 ActivateVRN-2.py v0123" -ForegroundColor Red; return }
   $m = Select-String -LiteralPath $A -Pattern 'VERSION = "ActivateVRN-2 v(\d{4})"' -List
   $V = if ($m) { [int]$m.Matches[0].Groups[1].Value } else { 0 }
-  if ($V -lt 122) { Write-Host "[RED] Downloads 裡這份是 v$('{0:D4}' -f $V) · 請重新下載 v0122" -ForegroundColor Red; return }
+  if ($V -lt 123) { Write-Host "[RED] Downloads 裡這份是 v$('{0:D4}' -f $V) · 請重新下載 v0123" -ForegroundColor Red; return }
   $py = Get-Command python, py -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch 'WindowsApps' } | Select-Object -First 1
   if (-not $py) { Write-Host "[RED] 找不到 python" -ForegroundColor Red; return }
   Remove-Item Env:\VIA_VRN2_NO_PUSH -ErrorAction SilentlyContinue
