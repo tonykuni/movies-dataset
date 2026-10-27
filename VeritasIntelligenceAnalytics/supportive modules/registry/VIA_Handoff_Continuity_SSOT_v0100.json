@@ -3207,6 +3207,19 @@
       ],
       "timeout_seconds": 2700,
       "registered_at": "2026-10-20T16:41:17+00:00"
+    },
+    "vdf_ws_manager_fetch_quiet": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0162 自測 6/6 · PASS",
+      "scope": "VDF_SystemManager v0162(工作站 2026-10-27 實錄:fetch 動詞不產頁卻每支多跑一遍字級套件 → fetch 那一輪借位 v0153 的 typekit_dir 零動作、跑完還原;載前版鏈壓掉 v0155 的無效跳脫編譯警告,正本不改)經尾版全鏈跑;四系統對等獨立 L123,不改 VCGC 的冊與程式",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-27T10:17:32+00:00"
     }
   },
   "work_items": [
@@ -6540,6 +6553,17 @@
       "next": "無",
       "case": "vdf_ws_sync_worktree",
       "receipt": "docs/handoff/evidence/vdf_ws_sync_worktree.json"
+    },
+    {
+      "id": "VDF-REQ018:ws-fetch-quiet-vdf_ws_manager_fetch_quiet",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "工作站 2026-10-27 逐支啟動 36 支擷取引擎(操作員令「先啟動這兩個清單後單獨啟動每一個VDF的引擎」)實錄:每個 fetch 動詞跑完都對 VIA_Reports/vdf 補一遍字級套件(不產頁的白工;操作員在 fetch status 收尾按 Ctrl+C)· 每次印 v0155 的 SyntaxWarning。管理員 v0162:fetch 不補套 · 載前版鏈壓掉編譯警告。本版自測 6/6 · 突變 9 個全抓到;全鏈自測在本容器因沒有 pandas(v0151 的 db 自測)跑不動 → 收據待工作站 / CI(Windows 有 pandas · duckdb)",
+      "next": "工作站或 CI 跑 handoff test vdf_ws_manager_fetch_quiet(需 pandas · duckdb);綠了轉 VERIFIED",
+      "pended_at": "2026-10-27T10:17:32+00:00",
+      "case": "vdf_ws_manager_fetch_quiet",
+      "receipt": "docs/handoff/evidence/vdf_ws_manager_fetch_quiet.json"
     }
   ]
 }

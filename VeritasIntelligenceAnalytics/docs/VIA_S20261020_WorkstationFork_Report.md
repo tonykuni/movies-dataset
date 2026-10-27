@@ -343,3 +343,14 @@ python "%V%" run VDF_ENG093_LaunchConsole ask --open --out "%TEMP%\vdf_ask_check
   ② `publish` 推完收據分支後 `git checkout --detach origin/main`:工作樹回到 main、乾淨。③ `run` 裡的 RuntimeError → 一行 `[VDF MAIN] 停:…` 回 rc 2,不噴 traceback。
 - 自測 7/7(假倉重演工作站實況:stage 一個 · 改一個 · 多一個未追蹤 → 清掉 → 同步 → 收據分支 → 回 main;別的髒檔 → 拒絕 rc 2;預演 NEXT 印本版檔名);前版鏈 v0101 11/11 · v0100 15/15。
 - 工作站當下的解法(v0102 進 main 前):`git restore --staged --worktree -- "VeritasIntelligenceAnalytics/docs/handoff/evidence"` 再跑 `--apply`。
+
+## 第六批(2026-10-27 工作站實錄 → 管理員 v0162)
+
+操作員令「先啟動這兩個清單後單獨啟動每一個VDF的引擎」。工作站 PowerShell 逐支 `python $M fetch run <代號> --apply --mode live --home …\via_01_vdf`:
+兩張清單 GREEN(全台股 1983 列 · 主動式 ETF 32 列)、001u GREEN、002 YELLOW rc 2(NODATA,yfinance 零列)、003 GREEN;其餘未跑完(操作員中斷)。
+
+兩個實錄問題 → `VDF_SystemManager_v0162`(薄尾):
+- 每個 fetch 動詞(run / verify / status / list)跑完,v0153 的 main 都再對 `VIA_Reports/vdf` 直下 `*_latest.html` 補一遍字級套件;fetch 不產頁,36 支 = 36 遍白工(操作員在 `fetch status` 收尾按了 Ctrl+C,traceback 停在 `typekit_block`)。v0162:`args[0] == "fetch"` 那一輪把 v0153 的 `typekit_dir` 換成零動作替身、跑完(含例外)還原;其他動詞照舊。
+- 每次印 `VDF_SystemManager_v0155.py:6: SyntaxWarning: invalid escape sequence '\o'`(v0155 說明字串裡的 `VDF\output_hub`;正本不改)。v0162:載前版鏈那一刻 `warnings.catch_warnings` 只擋 SyntaxWarning / DeprecationWarning;本檔自己零無效跳脫(自測驗)。
+- 自測 6/6(找得到補套主人 v0153 · fetch 經本版不補套 / 直走前版會補 / 非 fetch 照舊 · 炸掉也還原 · 兩個探針檔證明前版載入器會印、本版不印 · 橋 / 不起子行程 / 版面功能燈程式一行沒動);突變 9 個全抓到。
+- 誠實說:本容器沒有 pandas,管理員全鏈自測(v0151 的 db 自測)在這裡跑不動;交接案 `vdf_ws_manager_fetch_quiet` 的綠收據要靠工作站或 Windows CI(有 pandas · duckdb)。
