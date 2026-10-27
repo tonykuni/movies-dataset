@@ -1,274 +1,104 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0127 · 2026-10-27
+# VRN-2 交接報告 v0145 · 2026-10-27（第 48 → 59 輪 · 啟動器 v0124 → v0145）
 
-> 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的黃 / 紅貼包(≤300 行,結尾 NEXT:)。不要重讀整份程式。
-> **重要**:**10/27 第 48 輪(v0123)使用者機器:完成 · 紅 0 黃 4 · 52/52 個股全綠**。同日發現同一家族在 v0231 之後分成兩線(見 §0),v0124 以 v0243 合併;使用者機器最後一次實跑是**第 35 輪(v0118)**。下一步是請使用者執行 v0127(合併版 · v0124 因使用者機器缺另一線 v0242 而失敗,v0125 先落地 v0242)· 之後兩線都以 v0243 為前版。
+> 給人看的在前（進度總表、缺漏清單），給下一個 AI 的在後（技術決定、規則、路徑）。
+> 原則不變：只增不減 · 薄尾新版（前版不動）· 同名不同內容不覆寫 · 基層建、VCGC 審核編號 · 缺套件交 VCGC。
 
----
+## 1. 今日結果（第 59 輪 · 2026-10-27 23:16）
 
-## 0. 兩線合併(2026-10-27 · 最重要)
+| 項目 | 狀態 |
+|---|---|
+| 完成判定 ⑧ | **完成** · 紅 0 黃 5 · 52 份個股報告全綠 · 退步 0 · 鎖定 `VRN2_Lock_20261027_230231.json` |
+| 上船 ⑨ | 主分支 298 筆落後無法自動合併 → 推到 `vrn2-auto`（81dc26dfc）。**v0144 起改持續解衝突推主分支**（第 60 輪驗證） |
+| 封存 ⑩ | 完成（被取代舊版 0） |
+| 市場資料 ⑥e | 路徑問題已解（橋接根），卡在鎖冊雜湊（CRLF）→ **v0106 修**（第 60 輪驗證） |
+| 發布層 | 已跑：累計 BasicInfo 52 · Summary 52 · FinancialData 8,391（11,513 去重後）· VIA 根在 OneDrive 自動同步 · Google Sheet 未啟用 |
+| SSOT 統一冊 | 145 條（regex 41 · 同義字 101 · 規則 3）· 衝突 0 · VCGC 冊未找到 |
+| U/I 處理器 | `VRN2_UIAction_v0105.py`（publish 動作 + 轉交另一線 v0103 的 pick / audit） |
 
-| | 線 A(本線) | 線 B(另一工作階段 · Closeout 包) |
+## 2. 現役版本
+
+| 元件 | 版本 | 內容 |
 |---|---|---|
-| 共同祖先 | **VRN_SystemManager_v0231.py**(雜湊 `ddff2743b478` 兩邊相同) | 同 |
-| 尾版風格 | 全文複製(v0232 218 KB · v0240 220 KB) | 薄尾包裝(v0232~v0242 各 10~44 KB · `_rebind` + `__getattr__`)|
-| 入口 | `ActivateVRN-2.py` v0109~v0124(Downloads) | `ActivateVRN-2_v0136~v0140.py` + `Invoke-VRN2-Closeout_v01xx.ps1` |
-| 線 B 的修正 | — | v0233 數字回原文改比數值 · v0234 一格多值拆子欄 · v0235 第三讀法閘 · **v0236 轉置表(華南 / Citi Earnings Summary)** · v0237 U/I「驗證過的輸出」· v0238 表頭列不當數據 · v0239 並排表 SECTION · v0240~v0242 原文逐字摘要 / 精簡 U/I / 可稽核冪等 · ENG397 v0127 · ENG062 v0114 / v0115 · UIAction v0102~v0104 · ToolBridge · IndependentVerifier · VerbatimVerifier |
-| 發生的問題 | 線 A 的 v0240(全文)落地後成為最新版,**遮蔽了線 B v0233~v0239 的同名函式**(第 48 輪 Citi-3231 年度數據仍缺,即線 B v0236 的轉置表修正被遮蔽) | 線 B 的 v0104 包也含 v0240~v0242,與線 A 的 v0240 同名不同內容 |
-| **合併點** | **`VRN_SystemManager_v0243.py`**:線 B 薄尾機制 · 前版 = 線 B v0242 · 只放線 A 相對 v0231 的淨增量(13 個線 B 沒碰的定義 + `_out_books` 包裝加欄 + 驗收分片重綁到本版)· 不遮蔽線 B 任何函式 | |
-| 規則 | 之後**兩線都以 v0243 為前版**,新版號 ≥ v0244;同名不同內容立即停止不覆寫;`registry\VRN2_Lineage_Register.json` 記兩線已知雜湊與合併點 | |
-| 第 49 輪(v0243)實證 | 分片驗收漏綁 `_acc_parallel` → 子行程跑 v0231 雙讀、命中舊快取 → 慧洋 ⑦ 假退步;對方冪等閘 Windows PermissionError;對方「四點原文證據未齊」28 份被我的輸出冊帳本算成退步 → **v0244 全部修正** | |
-| 本線已成功項接回 v0243 | 標準化層 · 雙讀修正 · TEL · Regex / 風險目錄 · 補裝帳本 · **⑦ 雙讀只准變好 · 輸出冊只准變好 · 階段列印**(全部以包裝接回 · 不遮蔽線 B)| |
-| 線 A 跳過的檔 | v0232(全文)/ v0240(全文)/ ENG397 v0128 保留在資料夾不刪(⑩ 會把 v0128 封存) | |
+| 啟動器 | **ActivateVRN-2 v0145** | 內嵌下列全部 · 缺才落地 · 雜湊比對 · CRLF 容忍 |
+| VRN-2 SystemManager | **v0249**（鏈 v0244→v0245→v0246→v0247→v0248→v0249） | v0245 分析師標籤 / 四重點補滿 · v0246 市場資料接回 · v0247 V2 規範 · v0248 Headers V3 · v0249 發布層 + 面板 |
+| 擷取引擎 ENG397 | v0129（鎖 `33ff9eae8c11`） | 未動 |
+| 摘要器 ENG062 | v0114 現役 | 未動 |
+| MarketFetch | **v0106**（v0100～v0105 保留） | 包 VDF_TW_DataFetchEngine v036（不改一字） |
+| VDF 引擎包 | `_vdf_fetch\VDF_TW_DataFetchEngine_v036.py`（24 檔） | 離線回歸 28/28 |
+| 發布引擎 | VRN2_Publish v0100 | 累計 / 格式 / 雲端 / Google Sheet |
+| U/I 處理器 | VRN2_UIAction v0105 | 另一線 v0102～v0104 保留 |
+| SSOT 統一引擎 | VIA_SSOT_Unify v0100 | 每輪 ②s |
+| SSOT 冊 | VRN2_Regex v0103 · VRN2_Synonyms v0101 · VRN2_BasicInfo_Headers v0100 · VRN2_Publish_Config v0100 | 只增不減 |
 
-**問題分類(第 48 輪 + 附件分析)**
+## 3. 今日時間軸（啟動器版本 → 做了什麼）
 
-| 可同時處理(彼此獨立 · 本輪已做) | 必須依序處理 |
-|---|---|
-| ENG397 v0129 併線 B 頁數後援 | ① 先執行 v0124 確認合併版在實檔上完成判定通過 |
-| v0243 標準化欄位 / TEL / 雙讀 / Regex 冊 / 風險目錄 | ② 再評估線 B 入口(`Invoke-VRN2-Closeout`)與線 A 入口合一 |
-| ⑨ 遠端有新提交先 pull --rebase | ③ 階段列印與 ⑦ / 輸出冊退步鎖(需動線 B 的主流程 · 等合併穩定)|
-| 血緣登記兩線聯集 | ④ 兩線入口合一後才做 DuckDB 增量庫與 U/I 輸入面板 |
-
-## 1. 系統定義(已鎖定)
-
-- **VRN-2** = 完全獨立的子系統:自己的 MAIN(`ActivateVRN-2.py` → `VRN-2 SystemManager`)、自己的 SSOT(`VRN2_SSOT_v####.json`)、自己的 U/I 協定(`vrn2://`)。
-- **VRN-1** = 另一團隊(`C:\Users\tonyk\VIA-VDF-VRN`,`VRN-MAIN`)。可互相學方法與工具,**不可照抄程式碼**。
-- 參數可向 VDF / VCGC 取用,**不衝突即可**。
-- **範圍**:只做**個股報告** → FILENAME · 首頁(本文 + 資訊區)· 年度財報頁(年度財報及數據分解)· 100% 還原 · 一標題四重點 · 輸出驗證無誤 · U/I 自動跳出且可操作。
-- **治理**:只增不減(新版號,前版不動)· 成功即鎖、只准變好 · 精準 AST 錨點修正 · 不產生九頭龍 · 每版過修正閘 · 漏斗原則(輕的先用,不夠才升層)。
-
----
-
-## 2. 檔案位置(使用者機器)
-
-VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics`(以下簡稱 `<ROOT>`)
-
-| 類別 | 位置 | 說明 |
+| 版 | 管理器 | 內容 |
 |---|---|---|
-| **啟動器(MAIN 入口)** | `C:\Users\tonyk\Downloads\ActivateVRN-2.py` | v0127 · 一鍵完成全部步驟 |
-| 程式夾 | `<ROOT>\functional modules\VRN\` | 管理器 / 引擎 / 摘要器 / 處理器 |
-| **VRN-2 設定冊** | `<ROOT>\functional modules\VRN\SSOT\VRN2_SSOT_v0100.json` | 來源夾 · 範圍 · 交付項 · 取用規則 · 漏斗參數 |
-| 輸入設定冊 | `…\VRN\SSOT\VRN_Config_v####.json` | 最新版 `input_dir` 指向範圍夾;`vrn2_source_dir` 記原來源 |
-| 原始樣本 | `C:\測試樣本報告` | 97 份 PDF(另 TXT 1 / WORD 7 / IMG 201 不在範圍) |
-| 個股範圍夾 | `<ROOT>\VIA_Reports\vrn2\scope_in\` | 每輪自動同步(只放個股報告) |
-| 範圍冊 | `<ROOT>\VIA_Reports\vrn2\VRN2_Scope_latest.json` | stock / non_stock 判定(下一輪沿用) |
-| **三本輸出冊** | `<ROOT>\VIA_Reports\vrn2\output\` | `VRN2_BasicInfo / FinancialData / Summary_latest.{json,csv}`(有 pyarrow 時加 `.parquet`) |
-| **U/I** | `<ROOT>\VIA_Reports\vrn2\VRN2_UI_latest.html` | 左側操作面板 + 右側 9 分頁 · 每輪自動跳出 |
-| 切割檢視 | `<ROOT>\VIA_Reports\vrn2\p1view\P1VIEW_latest.html / .md` | AI 讀 `.md`,不用截圖 |
-| 完成判定 | `<ROOT>\VIA_Reports\vrn2\VRN2_Completion_latest.json`(+ `_Rounds.jsonl`) | |
-| 驗收明細 | `<ROOT>\VIA_Reports\vrn2\VRN2_Acceptance_latest.{json,csv}` | |
-| 擷取快取 | `<ROOT>\VIA_Reports\vrn2\p1_cache\` | 刪掉即全部重新擷取 |
-| 驗收快取 | `<ROOT>\VIA_Reports\vrn2\acc_cache\` | `VIA_VRN2_NO_ACC_CACHE=1` 可停用 |
-| OCR 快取 | `<ROOT>\VIA_Reports\vrn2\ocr_cache\` | |
-| 摘要快取 | `<ROOT>\VIA_Reports\vrn2\summary\` | |
-| 備份 | `<ROOT>\VIA_Reports\vrn2\backup\<時間>\` | 每次鎖定時備份 |
-| U/I 動作紀錄 | `<ROOT>\VIA_Reports\vrn2\ui_actions.log` | |
-| 鎖定 | `…\VRN\registry\VRN2_Lock_<時間>.json`、`VRN2_Lock_latest.json`、`VRN2_Stock_Lock_latest.json` | |
-| **成功模組登記冊** | `…\VRN\registry\VRN2_Module_Success_Register.json`(+ `_History.jsonl`) | 判定完成才寫 |
-| 元件登記冊 | `…\VRN\registry\VRN2_Component_Register_v####.json` | |
-| 補裝帳本 | `…\VRN\registry\VRN_PipLedger.json` | PyPI 沒有的不再重試 · 網路錯誤 24h 不重試 |
-| 加速器帳本 | `…\VRN\registry\VRN_AccelFix_Ledger.jsonl` | |
-| **封存夾** | `…\VRN\_archive_vrn2\` + `ARCHIVE_MANIFEST.jsonl` | ⑩ 移入的被取代舊版 · `--restore-archive` 可還原 |
-| 隔離區 | `…\VRN\_quarantine\` | 落地檢查失敗的檔 |
-| U/I 處理器 | `…\VRN\VRN2_UIAction_v0100.py` + `VRN2_UIAction_Config.json` | `vrn2://` 白名單動作 |
-| 協定登錄 | `HKCU\Software\Classes\vrn2` | 只寫目前使用者 · 不碰 `via://` |
-| OCR 隔離環境 | `C:\Users\tonyk\envs\vrn2_ocr\` + 橋 `VRN2_OCRBridge_v0100.py` | 主環境不裝 OCR 套件 |
-| **交接報告** | `<ROOT>\docs\handoff\ai\VRN2_Handover_latest.md`(+ 版本檔) | ⑨ 上船時自動落地 |
-| GitHub | `tonykuni/movies-dataset`(使用者的 repo) | ⑨ 只提交 VRN-2 程式 / 設定冊 / 交接報告 |
+| v0124～v0129 | v0243→v0244 | 兩線合併（共同祖先 v0231 · 合併點 v0243/v0244）· `_acc_parallel` 重綁（假退步）· ⑨ 假綠 / 未追蹤衝突 / vrn2-auto 備援 |
+| v0130～v0133 | v0244 | ⑥d VDF 橋探測 · SSOT 冊 · ③ LIBS 交 VCGC · `--diagnose` · CRLF 容忍 · ②r 鏈修復（v0152/v0153 內嵌） |
+| v0134 | v0245 | 分析師「研究員：」標籤（兆豐 4 份抓到）· 四重點不足本文平均取 |
+| v0135～v0136 | v0246 | MarketFetch v0100/v0101 · Regex v0103 三種代碼 × 9 類 ETF · 市場資料接回基本資料 / 摘要 |
+| v0137 | v0246 | ②s 三系統 SSOT 統一冊（VRN + VDF + VCGC 若在 · 編號留 VCGC） |
+| v0138 | v0246 | MarketFetch v0102 只抓必要日期（最新 7 天 + 報告日前 7 天 · 相近合併）+ 年度財報 n-3～n |
+| v0139 | **v0247** | V2 規範：純小數 · ROE 平均權益 · PER 稀釋 · 實際蓋過預估一期核對（減法 + 除法 · 自動辨單位）· STATUS 末欄 · ②s `v2` 未定義修 · ⑥e 失敗自動 `--doctor` |
+| v0140 | **v0248** | Headers V3：固定 16 欄 + 7 項 × 三年 + 近期雙月內暨財報發布前標註（倒數第二欄）+ STATUS 末欄 · 表頭冊 + 正式英文 CSV |
+| v0141 | **v0249** | 發布層：累計去重（duckdb · TEMP 溢寫）· parquet / CSV UTF-8 BOM / Google Sheet 服務帳戶 · 雲端同步夾偵測 · 面板「發布設定」區 |
+| v0142 | v0249 | MarketFetch v0104：價格每輪重抓 · 財報只補缺 · latest 過期才抓 |
+| v0143 | v0249 | MarketFetch v0105 橋接根（鎖冊 path 相對 movies-dataset 多一層）· UIAction v0105 · ⑥e 失敗黃燈不擋完成 |
+| v0144 | v0249 | MarketFetch v0106 鎖冊雜湊 CRLF 正規化（真換版不繞過）· ⑨ 持續解衝突 |
+| **v0145** | v0249 | 本交接報告 |
 
----
+## 4. 缺漏清單（依優先序）
 
-## 3. 版本紀錄
-
-### 3.1 現役版本(v0127 內嵌 · 啟動時自動落地)
-
-| 元件 | 版本 | 大小 | SHA-256(前 12) |
-|---|---|---|---|
-| ActivateVRN-2.py | **v0127** | — | 另內嵌另一線 v0242 作為 v0243 前版(缺才落地)|
-| VRN-2 SystemManager | **v0244** | — | v0243 的兄弟版(前版同為另一線 v0242)· v0243 留存不動 · v0244 修正第 49 輪:_acc_parallel 綁定(分片真的跑本版)· 冪等閘退回 · 輸出冊退步只算既有類別 |
-| VRN_ENG397_P1Segment(擷取) | **v0129** | — | 本線 v0128 + 另一線 v0127(頁數不靠 PyMuPDF)|
-| VRN_ENG062_SummarizerV1(摘要) | v0113(內嵌)· 現役為另一線 **v0115** | — | 管理器取最新版號 |
-| VRN2_UIAction(U/I 處理器) | **v0100** | 3,059 | `21dc93de2f37` |
-| VRN2_OCRBridge(OCR 橋) | **v0100** | 4,778 | `4b21f0694d0e` |
-| VRN_ENG396_AssetIndex | v0102 | — | 未變(前鏈) |
-
-### 3.2 本階段版本鏈(2026-10-16 ~ 10-18)
-
-| 啟動器 | 管理器 | ENG397 | ENG062 | 主要內容 |
-|---|---|---|---|---|
-| v0110 | v0221 | v0119 | v0107 | OCR 隔離環境 · OCR 階梯 · 數字碎片接合 |
-| v0111 – v0113 | v0222 – v0224 | v0120 – v0121 | v0108 – v0109 | OCR 表重建 · 假綠鎖校正 · OCR 快取 · OCR 檔驗收 900 秒 |
-| v0114 | v0225 | v0122 | v0110 | 全景黃燈:不適用改備註 · 非資料框 · 並排表拆開 · 逐行 PDF 接段落 · 免責不當重點 · OCR 算術交叉驗證 |
-| v0115 | v0225 | v0123 | v0111 | GS 填色資訊框救回 · GS Forecast 表重建 · 其他頁資訊框取目標價 |
-| v0116 | v0226 | v0123 | v0111 | 向 VRN-1 學:⑦ 基本資料雙讀 · 資產恆等式 · 冪等閘 |
-| v0117 | v0227 | v0123 | v0111 | 獨立收尾:VRN2_SSOT · 範圍聚焦 · 三本輸出冊 |
-| v0118 | v0228 | v0124 | v0111 | 調節輪(漏斗)交 MAIN · ⑨ 上船 GitHub |
-| v0119 | v0229 | v0125 | v0112 | 第 35 輪修正:對齊口徑統一 · 年度數據冊表頭判斷 · 退步寫檔名 |
-| v0120 | v0230 | v0126 | v0112 | 擷取 / 驗收快取 · 成功模組登記 · 精簡(4.2 → 1.3 MB)· ⑩ 整併封存 |
-| v0121 | v0231 | v0126 | v0112 | U/I 左側操作面板 + 9 分頁 · `vrn2://` 協定 · 補裝帳本 |
-| v0122 | v0232 | v0126 | v0113 | 待辦收尾:MQ 目標價(OCR · 候選消歧)· 凱基雙讀字型插字 · ⑦ 與輸出冊納入只准變好 |
-| v0123 | v0240 | v0128 | v0113 | 標準化層(年 / 月 / 日 / 季去前後綴 · 數值化 · EPS 基本 / 稀釋)· VRN2_Regex 冊 · 風險目錄 55 項 · 接回合理性 · 左上角 ITEM · 血緣檢查 · 靜態檢查快取 · 階段列印 |
-
----
-
-## 4. SSOT 現況
-
-### 4.0 v0123 新增冊
-
-| 冊 | 內容 |
-|---|---|
-| `SSOT\VRN2_Regex_v0100.json` | TW_TICKER(VRN v2 規則 · 不排除年份)· TW_YFINANCE · TW_BLOOMBERG · YEAR / MONTH / QUARTER / DATE / NUMBER(去前後綴)· 向其他子系統取用不衝突則只增不減 |
-| `SSOT\VRN2_RestoreRiskCatalog_v0100.json` | 擷取還原潛在錯誤 55 項(因素 / 識別 / 修復 / 狀態)· 已實作 53 · 規劃 2(OCR 數字自動修正 · 單位混用)|
-| `registry\VRN2_Foreign_Versions.json` | ②x 血緣檢查發現的外來版本清單 |
-| `registry\VRN2_StaticCheck_Ledger.json` | 程式夾指紋 + 上次 ④⑤ 結果(未變則沿用)|
-
-### 4.0b 標準化層(v0240 · 年度數據冊)
-
-- PERIOD 保留原文;新增 PERIOD_STD / PERIOD_KIND:年 `YYYY`(FY23 / FY-23 / 12/23 / Dec-24 / 2023A / 112年)· 月 `YYYY-MM`(Apr-12 / 2024/04 / 113年4月)· 日 `YYYY-MM-DD`(2025/8/19 · 19 May 2026 · 114/12/02 · 20250819)· 季 `YYYY-Qn`(1Q25A · 25Q3(F) · Q1 2025 · 2025年第1季)。
-- VALUE 保留原文;新增 VALUE_NUM(數值 · 去空格 / 千分位 / 全形 · 括號為負)與 UNIT(% / x / 倍 / bps / ppts)。
-- EPS_KIND:同表同期間兩列 EPS 取較低者為 diluted,單列視為 diluted;科目寫明 basic / 稀釋則依科目。
-- 表格左上角空格由引擎補「ITEM」。
-
-
-### 4.1 `VRN2_SSOT_v0100.json`(VRN-2 獨立設定冊)
-
-| 欄位 | 值 |
-|---|---|
-| system / owner / independent | `VRN-2` / `VRN-2 SystemManager` / `true` |
-| source_dir | 第一次執行時取自當時的 `VRN_Config.input_dir`(使用者機器應為 `C:\測試樣本報告`) |
-| scope / scope_dir | `stock_only` / `<ROOT>\VIA_Reports\vrn2\scope_in` |
-| deliverables | FILENAME · 首頁(本文 / 資訊區)· 年度財報頁(年度財報及數據分解)· 100% 還原 · 一標題四重點 · 輸出驗證 · HTML U/I |
-| borrow_rule | 參數可向其他系統取用(VDF 上市櫃清單 / 股價庫等)· 不衝突即可 · 不照抄程式 |
-| funnel.order | T0 文字層 → T1 換引擎 → T2 OCR 200 DPI → T3 OCR 325 DPI + 前處理 → T4 待人工 |
-| funnel.ocr_ladder / min_conf / min_chars / max_tier | `200,325p` / `0.85` / `40` / `T3` |
-
-- 內容有變才出新版(`v0101`…),由 `vrn2scope` 動詞維護。
-- 漏斗參數由啟動器帶入引擎環境變數(`VIA_VRN2_OCR_LADDER` / `_MIN_CONF` / `_MIN_CHARS`);`max_tier` 設 `T0` / `T1` 時不啟用 OCR。
-
-### 4.2 其他設定 / 帳本
-
-| 冊 | 現況 |
-|---|---|
-| `VRN_Config_v####.json` | v0117 起每輪若 `input_dir` 不是範圍夾就出新版指向它(只增不減) |
-| `VRN2_Scope_latest.json` | 每輪寫出;下一輪排除上輪判定的非個股(第一次執行只能靠檔名排除) |
-| `VRN_PipLedger.json` | v0121 新增;使用者機器上預計記入 `VIS-UltimateAccelerator-V12-MEGA` / `superextract` / `via-nlp-engine`(PyPI 沒有)與 `docling` / `gspread-dataframe` / `yake`(網路) |
-| `VRN2_Module_Success_Register.json` | v0230 新增;尚未在使用者機器產生 |
-
-### 4.3 待確認的 SSOT 事項
-
-- 元件登記冊的「黃 = 暫編待 VCGC 核號」仍未核號。
-- 管理器檔名家族 `VRN_SystemManager_v####`(修正閘靠它找尾版)改名需交 VCGC。
-- VRN2_SSOT 尚未登記到 VCGC 的 Policy / 書冊目錄。
-
----
-
-## 5. 完成判定(⑧)現行條件
-
-| 條件 | 擋完成? |
-|---|---|
-| 實測退步(鎖過的檔不得退步 · 紅燈會寫出檔名) | 紅擋 |
-| 交互驗證 JSON ↔ CSV ↔ 燈號 | 紅擋 |
-| 鎖定 + 備份 | 紅擋 |
-| 冪等(重跑 3 份 · 不吃快取 · 逐字相同) | 紅擋 |
-| 輸出冊完整(基本資料 / 年度數據 / 一標題四重點) | 黃提醒 |
-| 調節輪(有 T4 待人工判黃) | 黃提醒 |
-| ① 計算驗證(利潤率 · 上漲空間 · 摘要 EPS · 資產恆等式 · OCR 算術交叉驗證) | 同表不平才紅 |
-| ② 覆蓋 ≥97%(排除圖內座標字 · 旋轉字 · 頁面最底 8%) | 紅擋 |
-| ③ 數字回原文 | 紅擋 |
-| ⑤ 一標題四重點(含成功紀錄比對 3 份) | 紅擋 |
-| ⑥ AUDIT 新輸入 | 紅擋 |
-| ⑦ 基本資料雙讀 | 最多黃 |
-| 個股四項 | 紅擋 |
-
-通過後依序:成功模組登記 → ⑨ 上船 GitHub → ⑩ 整併封存 → U/I 自動跳出。
-
----
-
-## 6. 實測結果
-
-| 環境 | 版本 | 結果 |
+| # | 項目 | 狀態 / 下一步 |
 |---|---|---|
-| 使用者機器 · 第 34 輪 | v0115 等級 | 97 份 · 擷取燈 綠 83 / 黃 14 · 個股四項 52/52 全綠 · **完成 · 紅 0 黃 1** |
-| 使用者機器 · 第 35 輪 | v0118 | 範圍聚焦 55 份 · **未完成**(實測退步 1,推斷 Citi-3231,對齊口徑不一致)· 其餘紅 0 |
-| 沙盒 · v0121 | 21 份(含 GS 3 份) | 連跑兩次皆 **完成 · 紅 0 黃 2** · 冪等綠 · 輸出逐字相同 · ⑨ 提交 9 檔 · ⑩ 封存 13 個 · U/I 9 分頁(jsdom 實測可操作) |
-| 沙盒 · v0120 速度 | 21 份 | 連跑三次:189 → 96 → 22 秒(擷取 / 驗收快取) |
-| 修正閘 | 每版 | 新增九頭龍頭 0 · 既有檔被改 0 · 在地測試新增失敗 0 |
+| 1 | ⑥e 市場資料 | v0106 正規化雜湊：第 60 輪看「只差行尾」是否出現並轉綠。若印「鎖冊過期」= 網路工具真的換版 → **交 VCGC 重鎖**（VRN 不繞過） |
+| 2 | 市場填值 / V2 核對 / V3 比率 | 全部依賴 ⑥e；通了之後看「市場填值 代號 n · 完整 x」「v0247 V2 規範 … 通過 / 不過」「三年 EPS 有值」 |
+| 3 | ⑨ 主分支 | v0144 持續解衝突第一次會併回落後的 298 筆（衝突留本機 · 對方新增保留 · 帳本 `registry\VRN2_GitMerge_Ledger.jsonl`）。若仍退 vrn2-auto，貼包會印原因 |
+| 4 | DPS 遞延規則（V2 第 5 條） | **未實作**：VDF v036 無股利資料集。需在 VDF 加 TWSE 除權息 OpenAPI 擷取後才能認列；目前 STATUS 註記 |
+| 5 | U/I 依設計模板 1b 簡化 | **未做**：`claude.ai/design/...Veritas Header.dc.html` 讀取需核准或匯出附檔 |
+| 6 | VCGC `governance_vocab.json` | 統一冊每輪找不到 → 需告知路徑或 VCGC 把它放到 VIA 根下固定位置；三份副本在 `VIA_Reports\vrn2\ssot_unified\` 等 VCGC 核號 |
+| 7 | ③ 缺必裝 3 | docling（PyPI）· superextract · via_nlp_engine（後兩者是內部模組，pip 不到 → 路徑掛載 / 本機 wheel）· 請求冊 `registry\VRN2_ENV_REQUEST_latest.json` · 交 VCGC |
+| 8 | Google Sheet | 引擎與面板就緒；需服務帳戶 JSON + 試算表分享 + gspread（缺 → 交 VCGC） |
+| 9 | 輸出冊缺項 8 份 | Daiwa-6278 / 欣銓 / 振曜 年度數據 · MQ-1560 TITLE · 兆豐 4 份「四點原文證據未齊」（另一線口徑） |
+| 10 | 華南 Email CONFLICT | `1-450@entrust.com.tw` ≠ `450@entrust.com.tw`（疑分機黏在前）· 判 CONFLICT 不輸出是對的 · 需原文片段定案 |
+| 11 | 兆豐基本資料一格多值 / 本文碎片 | ENG397 下一輪 |
+| 12 | 兩線入口合一 | Closeout `Invoke-VRN2-Closeout` + ActivateVRN-2 · 穩定後 |
 
----
+## 5. 規則與技術決定（給下一個 AI）
 
-## 7. 已知問題與待辦(依優先序)
+- **薄尾鏈**：v0244 是兩線合併點；新版 ≥ v0245；每版 `PRIOR_NAME` 指前版；`_acc_parallel` 等必須 `_rebind` 本版；`vrn2 / _native_vrn2` 內部的 `_out_books / _ui_panel_html / completion` 走本版。
+- **血緣**：`LINEAGE`（原始 sha）+ `LINEAGE_NORM`（CRLF→LF 正規化 sha）；工作樹 CRLF 不算外來 / 退步 / 不覆蓋。使用者機器上的 v0246 是「寫死 MarketFetch v0100」版（sha `c95ad0eda610`），v0247 以它為前版。
+- **只增不減**：同名不同內容立即停止不覆寫；U/I 處理器版號跨兩線取最高（v0105 轉交 v0103）。
+- **市場資料**：價格 / 還原價每輪重抓（Yahoo 因子會變）；財報 (代號, 年度) 已落盤不再打 MOPS；latest 只在缺或過法定期限（3/31 · 5/15 · 8/14 · 11/14）才抓。缺 Adj Close 不拿 Close 冒充；核對超差 MISMATCH 留空。
+- **橋接根**：`%TEMP%\VIA_progress\vrn2_via_root\supportive modules\registry\VIA_ToolVersion_Lock_v0100.json`（path 絕對化 · sha 正規化後相同才改用實際位元組雜湊）+ 加速器轉接；引擎 `--via-root` 指向它；引擎仍走鎖版網路工具並驗雜湊。
+- **V2 規範**（v0247）：歷史實際蓋過預估需「一期重複核對」通過（比率 0.97～1.03 · 差額記錄）才允許同檔預估被蓋；原值不刪（`VALUE` / `VALUE_FINAL` / `VALUE_SOURCE` / `RECON_RATIO` / `RECON_DIFF`）；百分比純小數；ROE = NI / 平均權益；PER 嚴格稀釋 EPS；STATUS 末欄。
+- **Headers V3**（v0248）：欄序固定；程式鍵不變，介面 / 匯出用 Formal English Title Case（`SSOT\VRN2_BasicInfo_Headers_v0100.json` · `VRN2_BasicInfo_latest_formal.csv`）；N = 報告年；標註欄 = 兩個月內（≤ 61 天）+ 最近已結束期間的法定期限之前 / 之後。
+- **發布層**：累計主鍵（BasicInfo / Summary = FILENAME · FinancialData = FILENAME|ITEM|PERIOD_STD|PAGE|ZONE）去重保留最新 RUN_TS；duckdb `temp_directory` = TEMP；CSV UTF-8 BOM；Excel 1,048,576 列 / Sheet 1,000 萬格提醒；Google 三步（服務帳戶 JSON → 分享給 client_email → 面板選檔 + 貼網址）；VIA 根已在 OneDrive 內不另複製。
+- **SSOT 統一**：基層（VRN）建一本 + 衝突清單，三份副本內容相同，`number` 留空給 VCGC；regex 等價寫法（測試向量相同）= EQUIVALENT 不算衝突。
+- **⑨**：只提交 VRN-2 自己的檔；完成才推；持續解衝突（merge upstream · 衝突留本機 · 對方新增保留 · 我方刪對方改留對方 · 帳本）；仍失敗退 vrn2-auto。
+- **環境**：LIBS / ENV 由 VCGC 安裝；VRN-2 只檢查並寫請求冊；OCR 隔離環境 `envs\vrn2_ocr`；VDF 包另有 `envs\via_tw_fetch`。
 
-| # | 項目 | 狀態 | 需要 |
-|---|---|---|---|
-| 1 | **使用者執行 v0121** | 待執行 | 確認第 35 輪的退步(Citi-3231)已因 v0125 對齊口徑統一而解除;確認快取、U/I 按鈕、⑨⑩ 在使用者機器運作 |
-| 2 | 第 35 輪 10 份「財報表沒對到期間欄」(daiwa / CLST / GFHK / MS-3661 / 南亞 / 啟碁 / 華南 4) | v0125 已改口徑,**未在實檔驗證** | 執行結果;仍黃時附原檔 |
-| 3 | 華南 4 份:目標價未擷取 · ⑤ 3/4 · 分析師空白 · Email 帳號被截(`450@entrust.com.tw`) | 未修 | **華南原檔**(沙盒只有 Memo 版) |
-| 4 | JP-2330 資產恆等式差約 350 億 | 真實發現,維持黃 | 人工確認(報告科目口徑) |
-| 5 | 凱基慧洋分析師電話 | ✅ v0232 已修(字型插字「88)6」)· ⑦ 轉綠 | — |
-| 6 | MQ-1560 目標價 | ✅ v0113 已修(855.00 · 上漲空間 32.8%)| — |
-| 7 | ADJ CLOSE · 報告日前收盤價 · 外資報告中文名稱 · yfinance `.TW` / `.TWO` | 標「待 VDF」 | **VDF 股價庫與上市櫃清單的路徑 / 格式** |
-| 8 | Parquet 輸出 | 需使用者環境有 pandas + pyarrow | 執行結果確認 |
-| 9 | `vrn2://` 第一次使用 | 瀏覽器會詢問是否開啟 pythonw | 使用者允許一次 |
-| 10 | ⑦ 雙讀與輸出冊只准變好 | ✅ v0232 已做 | — |
-| 10b | 基本資料冊 TEL 欄誤填狀態說明(「1/1 一致」)| ✅ v0232 已修:改填號碼並統一格式 +國碼-區碼-號碼 | — |
-| 11 | 從 VRN-1 尚未學的:合成真值語料閘 · 輸出逐欄位鎖 · 標題分解 · 現價對資料庫收盤價(分兩欄) | 未做 | 第 7 項的 VDF 路徑 |
-| 12 | 元件核號 · 管理器檔名改名 · SSOT 登記 | 交 VCGC | — |
+## 6. 路徑
 
----
+- VIA 根 `<ROOT>` = `C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics`
+- 程式夾 `<ROOT>\functional modules\VRN\` · SSOT `…\VRN\SSOT\` · 血緣 `…\VRN\registry\VRN2_Lineage_Register.json` · VDF 包 `…\VRN\_vdf_fetch\` · 封存 `…\VRN\_archive_vrn2\`
+- 輸出 `<ROOT>\VIA_Reports\vrn2\output\VRN2_{BasicInfo,FinancialData,Summary}_latest.*`（+ `_formal.csv` · `VRN2_Reconcile_latest.json`）· 市場 `…\vrn2\market\VRN2_Market_latest.json` · VDF 落盤 `…\vrn2\market\vdf\` · 發布 `…\vrn2\publish\cumulative\` · 統一冊 `…\vrn2\ssot_unified\`
+- 鎖冊 `<ROOT>\supportive modules\registry\VIA_ToolVersion_Lock_v0100.json`（network.path 相對 movies-dataset）
+- 啟動器 `C:\Users\tonyk\Downloads\ActivateVRN-2.py` · git 分支 main / `vrn2-auto`
 
-## 8. 收尾進度(對照範圍交付項)
-
-| 交付項 | 狀態 |
-|---|---|
-| FILENAME 解析(代號 / 日期 / 券商) | ✅ 個股四項 52/52 |
-| 首頁本文 + 資訊區切割擷取 | ✅ |
-| 年度財報頁 + 數據分解 | ✅(年度數據冊 · 華南待原檔) |
-| 100% 還原 | 🟡 覆蓋門檻 ≥97%(頁尾 / 圖內座標字依規則排除)· 未達 VRN-1 的 99.9% 目標 |
-| 一標題四重點 | ✅(⑤ · 華南 / Note 類部分 3/3 不適用) |
-| 輸出驗證無誤 | ✅ ①②③⑤⑥⑦ + 冪等 + 交互驗證 |
-| HTML U/I 自動跳出 + 可操作 | ✅ 沙盒(使用者機器待驗) |
-| 基本資料 BASIC INFO | 🟡 18 欄中 ADJ CLOSE 類待 VDF |
-| 輸出 JSON / CSV / Parquet | 🟡 Parquet 視環境 |
-| 漏斗調節輪由 MAIN 控制 | ✅ |
-| 成功即鎖 · 成功模組登記 | ✅ |
-| 精簡整併(不留一堆類似檔) | ✅ 啟動器 4.2 → 1.3 MB · 舊引擎封存 |
-| 完成後上船 GitHub | ✅ 沙盒(使用者機器待驗) |
-
-**整體**:功能面在沙盒已全部完成並驗證;等使用者機器跑 v0121 確認後,剩下的是第 7 節的資料型待辦(華南原檔、VDF 路徑)。
-
----
-
-## 9. 執行方式
+## 7. 執行
 
 ```powershell
 & {
   $A = "C:\Users\tonyk\Downloads\ActivateVRN-2.py"
-  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A · 請先下載 ActivateVRN-2.py v0127" -ForegroundColor Red; return }
+  if (-not (Test-Path -LiteralPath $A)) { Write-Host "[RED] 找不到 $A" -ForegroundColor Red; return }
   $m = Select-String -LiteralPath $A -Pattern 'VERSION = "ActivateVRN-2 v(\d{4})"' -List
   $V = if ($m) { [int]$m.Matches[0].Groups[1].Value } else { 0 }
-  if ($V -lt 127) { Write-Host "[RED] Downloads 裡這份是 v$('{0:D4}' -f $V) · 請重新下載 v0127" -ForegroundColor Red; return }
+  if ($V -lt 145) { Write-Host "[RED] v$('{0:D4}' -f $V) · 請重新下載 v0145" -ForegroundColor Red; return }
   $py = Get-Command python, py -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch 'WindowsApps' } | Select-Object -First 1
   if (-not $py) { Write-Host "[RED] 找不到 python" -ForegroundColor Red; return }
   Remove-Item Env:\VIA_VRN2_NO_PUSH -ErrorAction SilentlyContinue
-  Write-Host "[計] VRN-2 · ActivateVRN-2 v$('{0:D4}' -f $V) · 完成後自動上船 GitHub" -ForegroundColor Yellow
   & $py.Source $A
 }
 ```
-
-- 只實測不上船:改設 `$env:VIA_VRN2_NO_PUSH = '1'`(或 U/I 勾「這次不上船」)。
-- 還原封存的舊版:`python ActivateVRN-2.py --restore-archive`(或 U/I「↩ 還原封存舊版」)。
-- 全部重新擷取:U/I「↻ 清快取後重跑」。
-
----
-
-## 10. 給下一個 AI 的關鍵規則
-
-- **先分診再修**:紅燈分「中斷 / 環境 / 真紅」;只對真紅出新版(前版不動)。
-- **口徑一致**:同一件事(例:年度表是否對齊)全系統只能有一個判斷標準;擷取燈、個股四項、輸出冊必須共用。
-- **假綠校正**:上輪的綠建立在錯誤內容上(橫幅標題、免責重點、圖例)不算退步,但必須在貼包列出。
-- **不適用 ≠ 黃燈**:記入 `na` 備註,U/I 以灰字顯示;個股四項判斷同時看 reasons 與 na。
-- **快取**:鍵值必須包含所有會影響結果的輸入(內容雜湊 + 程式指紋 + 參數);冪等閘不得吃快取。
-- **後援只在需要時啟用**(摘要器接段落、短風險句、其他頁資訊框),其他券商路徑不變,成功紀錄比對不得受影響。
-- **交付前必驗**:自測 → 真檔回歸(與上一版逐字比對並說明差異)→ 修正閘 → 從乾淨環境完整實跑(必要時連跑多次)→ 檢查輸出**內容**品質(不只檢查檔案存在)→ 前端腳本用 jsdom 實際執行。
-- **自測不得寫入真正的 registry**(與鎖定共用注入的 `reg` 參數)。
-- **上船只提交 VRN-2 自己的檔**,絕不提交 PDF / 輸出 / 範圍夾,不動使用者其他暫存變更。
