@@ -1,0 +1,197 @@
+# Invoke-VDF-Activate-v0100.ps1 · 容器 pwsh 7.4.6 實跑收據(2026-10-18;python3 = 3.11)
+## 剖析:Parser::ParseFile 錯 0 · CGC_MDL168 參數道 GREEN · pslint(CGC_MDL277)tails 704 no_accel 0 own_page 0 GREEN · 全景 read 問題 0
+
+## -Action preflight → exit 0
+━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 3140 ms ━━
+  ID │ STEP                                         │ STATE │     SEC │ NOTE
+  1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.6 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.2 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  [計] 4 步 · OK 3 · SKIP 1 · WARN 0 · FAIL 0 · 2.8 秒 → GREEN
+  [計時] 全程 3 秒 · 結束碼 0(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=0
+
+## -Action selftest(PYTHONPATH 帶 numexpr 替身,模擬工作站有 numexpr)→ exit 0
+━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 49714 ms ━━
+  ID │ STEP                                         │ STATE │     SEC │ NOTE
+  1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.6 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.8 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  5  │ ActivateVDF 自測                             │ GREEN │    46.0 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+  [計] 5 步 · OK 4 · SKIP 1 · WARN 0 · FAIL 0 · 49.4 秒 → GREEN
+  [計時] 全程 49.8 秒 · 結束碼 0(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=0
+
+## -Action run -SkipSelftest -Flows engines → exit 2(YELLOW:同意閘沒開 → 清單 GATED;引擎 94/94 RED 0)
+━━ VDF 獨立一鍵 · 結束碼 2 · AMBER · Celeritas v1141 applied=True workers=4 · 393499 ms ━━
+  ID        │ STEP                                         │ STATE  │     SEC │ NOTE
+  1         │ 加速器 · PS 端                               │ GREEN  │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+  2         │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN  │     1.8 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+  3         │ 網路模組 via_net_unified_v0101               │ GREEN  │     1.4 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+  4         │ 同意閘                                       │ GATED  │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+  6①        │ CPU/DRAM                                     │ GREEN  │       — │ 核 4 · 可用 15318/16093 MB · 並行 1 條 · 每條 4 執行緒
+  6②        │ 兩張清單                                     │ GATED  │     0.8 │ 同意閘沒開(操作員的手)且沒有既有清單 → 擷取流程停,其餘兩條照跑
+  6③engines │ 流程 · engines                               │ YELLOW │   373.6 │ 94/94 可啟動 · 自測 GREEN 67 · NODATA 8 · RED 0
+  6④        │ U/I                                          │ GREEN  │     4.7 │ [計] VDF ui v0154 · 展現規則(燈欄第一 · 問題在前 · 燈號列 · 空值 — · 路徑縮檔名 · 燈號 JS…
+  6         │ ActivateVDF 總燈 · VDF_MDL013_ActivateVDF v… │ YELLOW │   389.8 │ 總覽 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/activate/ACTI…
+  [計] 9 步 · OK 5 · SKIP 2 · WARN 2 · FAIL 0 · 772.1 秒 → AMBER
+  [計時] 全程 393.3 秒 · 結束碼 2(0 綠 · 2 黃 · 1 紅 · 3 環境缺件 · 124 逾時 · 130 中斷)
+exit=2
+
+## PR #529 Codex P1/P2 修正後重跑(同日)
+- A -Action preflight(正常)→ exit 0
+- B -Action preflight -Python /bin/false(加速器 / 網路模組自測紅)→ exit 1(P1:先決紅帶進結束碼)
+      1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+      2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ RED   │     0.2 │ 
+      3  │ 網路模組 via_net_unified_v0101               │ RED   │     0.1 │ 
+      4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+- C -Action run -SkipSelftest -Python /bin/false(本輪沒寫出新總覽、舊頁在)→ exit 1,不開舊頁(P2)
+      [頁] 本輪沒寫出新的總覽(看上面紅字)→ 不開舊頁,免得把上一輪當成這一輪(PR #529 Codex P2):/home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/activate/ACTIVATE_VDF_latest.html
+- D -Action selftest(numexpr 替身)→ exit 0
+      5  │ ActivateVDF 自測                             │ GREEN │    45.7 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+- pslint GREEN(704 · no_accel 0 · own_page 0);擊斃閘 11 條全過(P019 重算 sha256 · 位元吻合)
+
+## v0101(③b 覆蓋檢查)容器 pwsh 7.4.6 實跑(2026-10-18)
+- preflight → exit 0:
+      1  │ 加速器 · PS 端                               │ GREEN │       — │ Celeritas PS7 v1141 · 執行緒 4 / 4 核 · 優先權 AboveNormal · 本支套上,跑完還原 · PS 加速…
+      2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     3.2 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+      3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.4 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+      3b │ 覆蓋 · Py 加速器 + 網路橋                    │ GREEN │     1.2 │ GREEN · 加速器 93/93 缺 [] · 網路 93/93 真擷取 9 缺 [] · 排除 0
+      3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ GREEN │       — │ 每族尾版 161 支 · 模板章 161 · PS-ACCEL 161 · 缺 0
+      4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+- 反證 A:VDF 夾放一支沒模板章 / 沒 PS-ACCEL 的 .ps1 → 3c RED · exit 1(印 CGC_MDL124 --ps 補橋指令)
+      3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ RED   │       — │ 每族尾版 162 支 · 模板章 161 · PS-ACCEL 161 · 缺 Invoke-VDF-CoverageProbe-v0100.ps1 缺模…
+- 反證 B:engine 夾放一支在冊(git add)、會觸網、沒橋的 .py → 3b RED 指名 VDF_ENG999_CoverageProbe · exit 1
+      3b │ 覆蓋 · Py 加速器 + 網路橋                    │ RED   │     1.2 │ RED · 加速器 93/94 缺 ['VDF_ENG999_CoverageProbe'] · 網路 93/94 真擷取 10 缺 ['VDF_ENG999…
+- selftest(numexpr 替身)→ exit 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘過(P020 位元吻合)
+
+## v0102(視窗殘件三件)容器 pwsh 7.4.6 實跑(2026-10-18)
+- 仿操作員視窗 v0101 preflight(重現):
+      8:  [①加速器·PS] Celeritas PS7 模板沒接上(supportive modules\ps7\VeritasCeleritas.PS7.ps1 不在,或不是 PowerShell 7)· 照跑,不加速
+      11:[DEPRECATED] Set-VIABoot 已覆蓋
+      12:2
+      43:[DEPRECATED] Set-VIABoot 已覆蓋
+      44:2
+- 仿操作員視窗 v0102 selftest → exit 0:
+      priority before=Normal
+      ━━ VDF 獨立一鍵 · 結束碼 0 · GREEN · Celeritas v1141 applied=True workers=4 · 53748 ms ━━
+        1  │ 加速器 · PS 端                               │ GREEN │       — │ 視窗裡的 Celeritas 殘件不能用 → 正主已在本支範圍重接 · Celeritas PS7 v1141 · 執行緒 4 / 4…
+        2  │ 加速器 · Py 端 SUP_MDL737_SuperAccelModule_… │ GREEN │     1.8 │ [計] SUP_MDL737_SuperAccelModule_v0110 7/7 PASS
+        3  │ 網路模組 via_net_unified_v0101               │ GREEN │     1.2 │ [註] 鎖 VeritasAegisNexus_v1652.py · 夾內最新 VeritasAegisNexus_v1652.py
+        3b │ 覆蓋 · Py 加速器 + 網路橋                    │ GREEN │     1.1 │ GREEN · 加速器 93/93 缺 [] · 網路 93/93 真擷取 9 缺 [] · 排除 0
+        3c │ 覆蓋 · PS 模板章 + PS-ACCEL                  │ GREEN │       — │ 每族尾版 161 支 · 模板章 161 · PS-ACCEL 161 · 缺 0
+        4  │ 同意閘                                       │ GATED │       — │ 沒開(操作員的手;AI 不代開)· 擷取段照實 GATED
+        5  │ ActivateVDF 自測                             │ GREEN │    49.2 │ VDF_MDL013_ActivateVDF v0103 本版 2/2 · PASS ‖ VDF_MDL013_ActivateVDF v0102 本版 6/6 · PA…
+        [計] 7 步 · OK 6 · SKIP 1 · WARN 0 · FAIL 0 · 53.3 秒 → GREEN
+      rc=0
+      POST: PYTHONPATH=[] VIA_ROOT=[]
+      progress calls: 76 · prefs=SilentlyContinue
+      priority after=Normal
+- 乾淨視窗 v0102:preflight exit 0 · selftest exit 0
+        [計] 7 步 · OK 6 · SKIP 1 · WARN 0 · FAIL 0 · 50.1 秒 → GREEN
+- Parser 錯 0 · pslint GREEN(704 · no_accel 0 · own_page 0)· 擊斃閘 11 條全過(P021 位元吻合)
+
+## v0102 收據的指令與位元(PR #531 Codex P1;可重現)
+- 測試時的提交:0c42e9ae0(v0102 + P021);pwsh 7.4.6(Linux 容器);python3 3.11.15
+- 受測與相依檔 sha256:
+      965fa48f68fb848cc44f9766c2e68b50f432186d5539cf028c5163f00c4919b6  functional modules/VDF/Invoke-VDF-Activate-v0101.ps1
+      dd1a412d88f5dabd5479f561f930729e1b182567ff9cf215d4d28c21da085f56  functional modules/VDF/Invoke-VDF-Activate-v0102.ps1
+      adb4c519ee170fc508858716452a5fde3751ea48222652d58049608f4d1cc057  supportive modules/ps7/VeritasCeleritas.PS7.ps1
+      4d2957d5052a311a064d16c53ad434c0f789a2aebd860e08ecb34c41fe5a1da1  supportive modules/VIA_PS_PyProgress_Module.ps1
+      f1438c7131e1245b2fe7d033a175d4ad4d839788a0c2804fe14ecd8e720d2709  supportive modules/VIA_PS_Accel_Module.ps1
+      88afa9fa0dc766a02007309a363f8053965f5022fb9f5bc0047196293196bf2e  Register-VIA-Commands-v0243.ps1
+      43a48fd5b9664895e4c3223f8fb8946c9f888480ce84f166dc6cf744f3fb2895  docs/handoff/ps/VIA-Commands-Override-v0102.ps1
+      d37629acad7fdbfbf601c423dc6864b98c1e052316fbe47d34ec41c1aaf5c116  functional modules/VDF/VDF_MDL013_ActivateVDF_v0103.py
+      4e8ea80b81864a6f0da6ee8ecb5e362eda2ce62988aa3cae3e75336dc6688ac8  supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py
+      58855f19ec2d05ff38705eb2cfa11698f6551f8254ff4c139e15fe3977325bf4  supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py
+- 仿操作員視窗的兩支探針(只在容器 scratchpad;不入倉,全文附下):
+    celscoped.ps1 = Register-VIA-Commands-v0243.ps1 第 1309–1350 行($VIACelScopedSrc + Set-Item function:global:Invoke-VIACeleritasScoped),路徑反斜線換成 /
+      sed -n '1309,1350p' Register-VIA-Commands-v0243.ps1 > celscoped.ps1; sed -i 's#\\\\#/#g' celscoped.ps1   → sha256 d12f26549a3d9fcf0defd365bdad97c00234870305f0bd57ac3e86511b428861
+    opsession.ps1(sha256 bd8baf24a3d7f36e1d25e207fa87e6ccc29db44be71d2474576286d938552a7c;最後一版 = selftest;v0101 重現那次同檔但 -Action preflight、沒有 priority 兩行):
+      | param([string]$Ver)
+      | $global:VIA = '/home/user/movies-dataset/VeritasIntelligenceAnalytics'
+      | $VIA = $global:VIA
+      | . "$PSScriptRoot/celscoped.ps1"
+      | . "$VIA/supportive modules/VIA_PS_PyProgress_Module.ps1"
+      | # stale summary function with empty state (like the workstation header "Celeritas  applied=False workers=")
+      | $null = New-Module -Name StaleCel -ArgumentList "$VIA/supportive modules/ps7/VeritasCeleritas.PS7.ps1" -ScriptBlock { param($f); $null = . $f -RestoreOnly; $script:CeleritasPS7 = $null; Export-ModuleMember -Function Write-CeleritasMatrixSummary, Get-CeleritasStatus } | Import-Module -Global -PassThru -Force
+      | # operator override stub
+      | Set-Item -Path Function:\global:Set-VIABoot -Value ([scriptblock]::Create("Write-Host ('[DEPRECATED] Set-VIABoot 已覆蓋') -ForegroundColor Yellow; return 2")) -Force
+      | # progress probe
+      | $global:ProgSeen = [System.Collections.Generic.List[string]]::new()
+      | function global:Write-VIAProgress { param([string]$Activity, [string]$Status, [int]$Percent = -1, [int]$Id = 11) $global:ProgSeen.Add("$ProgressPreference") }
+      | Invoke-VIACeleritasScoped { "warm-up scoped call" } | Out-Null
+      | "priority before=" + (Get-Process -Id $PID).PriorityClass
+      | "PRE: PYTHONPATH=[$env:PYTHONPATH] VIA_ROOT=[$env:VIA_ROOT]"
+      | & "$VIA/functional modules/VDF/Invoke-VDF-Activate-$Ver.ps1" -Action selftest -NoOpen
+      | "rc=$LASTEXITCODE"
+      | "POST: PYTHONPATH=[$env:PYTHONPATH] VIA_ROOT=[$env:VIA_ROOT]"
+      | "progress calls: " + $global:ProgSeen.Count + " · prefs=" + (($global:ProgSeen | Sort-Object -Unique) -join ',')
+      | "after: Restore cmd source=" + (Get-Command Restore-CeleritasPS7).Source ; "priority after=" + (Get-Process -Id $PID).PriorityClass
+- 指令(站在 VeritasIntelligenceAnalytics;PW = pwsh 7.4.6):
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession.ps1 -Ver v0101          # preflight 版:重現三件
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession.ps1 -Ver v0102          # preflight 版 → selftest 版:三件全消,rc 0
+      VIA_NO_OPEN=1 $PW -NoProfile -File 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1' -Action preflight -NoOpen   # rc 0
+      VIA_NO_OPEN=1 $PW -NoProfile -File 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1' -Action selftest -NoOpen    # rc 0
+      $PW -NoProfile -c '[System.Management.Automation.Language.Parser]::ParseFile("functional modules/VDF/Invoke-VDF-Activate-v0102.ps1",[ref]$t,[ref]$e)'   # 錯 0
+      python3 'supportive modules/registry/CGC_MDL187_ModuleChangeKillGate_v0103.py' --base origin/main --run-selftest      # rc 0 · 11 條全過 · P021
+      VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 'supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0191.py' run --family core CGC_MDL277_AiOps pslint   # PS 檢查 GREEN
+      VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO python3 $V run CGC_MDL237_NumberingSystem --apply --scope 'functional modules/VDF/Invoke-VDF-Activate-v0102.ps1'; python3 $V run CGC_MDL237_NumberingSystem audit   # +11 · 遺失 0 · 改身分 0 · 重號 0
+
+## v0103 + ActivateVDF v0104(兩份 bootstrap)容器 pwsh 7.4.6 實跑(2026-10-18)
+- 根因量測(python3 3.11.15):VIA_ROOT=本樹 VIA_FAMILY=vdf python3 -c 'import os;print(os.environ.get("VIA_BOOT_CHAINED"))'
+      PYTHONPATH=本樹 bootstrap                       → 1.47 秒 · 接力 /usr/lib/python3.11/sitecustomize.py(發行版那份,正常)
+      PYTHONPATH=本樹 bootstrap:另一棵樹 bootstrap     → 10.15 秒 · 接力到另一棵樹的 sitecustomize(互相接力)
+- 仿操作員視窗 opsession2.ps1(sha256 4960b319f547df28ebbe66fe3ac3d77088faa073f33debfb08b3c43405ade29f;= opsession.ps1 + VIA_ROOT/PYTHONPATH 指另一棵樹的 bootstrap;-Boot two 再加本樹那份):
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession2.ps1 -Ver v0102 -Boot one   → 86 秒 · ② 39.7 · ③ 14.2 · 3b 21.0 · rc 0
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession2.ps1 -Ver v0103 -Boot one   → 6 秒 · ② 1.3 · ③ 1.2 · 3b 0.9 · rc 0 · PYTHONPATH 前後相同
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession2.ps1 -Ver v0103 -Boot two   → 5 秒 · 印「[開機] PYTHONPATH 有 2 份 bootstrap → 本支只留第一份」· rc 0 · 跑完還原
+      VIA_NO_OPEN=1 $PW -NoProfile -File opsession3.ps1 -Ver v0103 -Boot two   (= opsession2 的 selftest 版)→ 52 秒 · 7 步 GREEN · ⑤ v0104 4/4 PASS · 優先權前後 Normal
+- 乾淨視窗:VIA_NO_OPEN=1 $PW -NoProfile -File 'functional modules/VDF/Invoke-VDF-Activate-v0103.ps1' -Action selftest -NoOpen → rc 0 · 7 步 GREEN
+- python3 'functional modules/VDF/VDF_MDL013_ActivateVDF_v0104.py' --selftest → rc 0(v0104 4/4 · v0103 2/2 · v0102 6/6 · v0101 11/11 · v0100 16/16)
+- 突變(暫換 v0104 本檔,測完還原、sha256 前後相同):flow_env 不去重 → ⑳ FAIL rc 1;探針不捕 TimeoutExpired → ㉑ FAIL rc 1
+- Parser 錯 0 · 擊斃閘 11 條全過(P022 位元吻合;KILL-10 債 1 筆 = 委派前版檢號照跑)· pslint GREEN(704 · no_accel 0 · own_page 0)· CGC_MDL124 --subsystems VDF 加速器 140/140 · 網路 140/140 · 全樹 1781/1781
+- sha256:
+      3860af964465facb0f80e566cf70123c815e11613432fe80b6cc55469fe6ac44  functional modules/VDF/Invoke-VDF-Activate-v0103.ps1
+      d0b7887d2fac252e37e6237a663a68217544b6774ac81398acbedcf9b8770365  functional modules/VDF/VDF_MDL013_ActivateVDF_v0104.py
+      1564fea9493c91d3c9f36d9ef7edfc921dfa77ecaf0fc9ba8b18ad8d575ae8c5  supportive modules/bootstrap/sitecustomize.py
+
+## v0104 + ActivateVDF v0105(去重空段照留;PR #532 Codex P2)容器 pwsh 7.4.6 實跑(2026-10-18)
+- PS 去重區塊(從 v0104 抽出,dedupe_test.ps1 三例):[/a/b::/b/b:/z → /a/b::/z] · [/a/b:/z 不動] · [:/a/b:x:/b/b/: → :/a/b:x:]
+- python3 'functional modules/VDF/VDF_MDL013_ActivateVDF_v0105.py' --selftest → rc 0(v0105 2/2 · v0104 4/4 · v0103 2/2 · v0102 6/6 · v0101 11/11 · v0100 16/16)
+- 突變(暫換 v0105 本檔改回丟空段,測完 cmp 還原)→ ㉓ FAIL rc 1
+- VIA_NO_OPEN=1 $PW -NoProfile -File opsession3.ps1 -Ver v0104 -Boot two → selftest rc 0 · 7 步 GREEN · ② 1.3 秒 · ⑤ v0105 2/2 · PYTHONPATH 跑完還原
+- VIA_NO_OPEN=1 $PW -NoProfile -File opsession4.ps1 -Ver v0104 -Boot twoempty(bootstrapA::bootstrapB:/tmp/zz)→ preflight rc 0 · ② 1.6 秒
+- Parser 錯 0 · 擊斃閘 11 條全過(P023 位元吻合)· pslint GREEN · CGC_MDL158 read 兩檔零錯
+- sha256:
+      8ea8f106fb6224410d9578497af276e9c855ba4bf87434b89baea59dab53b6ca  functional modules/VDF/Invoke-VDF-Activate-v0104.ps1
+      77681bce9a378a59180ffd0cf3ec3d5d0d8f7802a20e6e6fdcad9eb5ec91aec0  functional modules/VDF/VDF_MDL013_ActivateVDF_v0105.py
+
+## v0105 + ActivateVDF v0106 + VDF_SystemManager v0155(資料庫清點 · 中斷 130)容器 pwsh 7.4.6 實跑(2026-10-19)
+- VIA_SKIP_PRIOR_SELFTEST=1 python3 'functional modules/VDF/VDF_SystemManager_v0155.py' --selftest → 本版 6/6 PASS;不跳前版 → 全鏈 0 FAIL rc 0
+- python3 'functional modules/VDF/ActivateVDF.py' --selftest → rc 0(v0106 4/4 · v0105 2/2 · v0104 4/4 · v0103 2/2 · v0102 6/6 · v0101 · v0100 16/16)
+- VIA_VDF_HEALTH_OUT=<scratch> VIA_FROM_VCGC=YES python3 'functional modules/VDF/VDF_SystemManager_v0155.py' db check → RED 18 · YELLOW 29 · GREEN 4 · INFO 14(他系統 12 原判紅 9 · min0 改黃 7);v0151 同庫 RED 34
+- VIA_FROM_VCGC=YES python3 'functional modules/VDF/ActivateVDF.py' run --no-open --mode fixture --flows db → [資料庫清點] RED · VDF 表 紅 18 · 黃 29 · 綠 4 · 他系統 12 · 還不能收尾
+- Chromium(Playwright)開 ACTIVATE_VDF_latest.html:寬 1200 淺 / 深、390 px → scrollWidth 1200 / 1200 / 390 · pageerror 0 · #db-inventory 1
+- pwsh -NoProfile -File opsession5.ps1 -Ver v0105(仿操作員視窗;-Action run -Mode fixture -Flows db -SkipSelftest -NoOpen -FetchHome <VDF>)
+  → 開頭「[同意閘] 沒開(…=(空))」· 6⑤ 資料庫清點 RED · [收尾] 還不能:VDF 自己的表 紅 18 列 · 結束碼 1
+- SIGINT(= Ctrl+C)在 ② 加速器自測中途送給 pwsh(opsig.ps1 -Action preflight):
+  v0104 → 「━━ 結束碼 0 · GREEN」(假綠)· v0105 → 「━━ 結束碼 130」+ 列「! 中斷 INTERRUPTED 主體沒走完」
+- Parser 錯 0 · pslint GREEN(尾版 704 · 缺加速器 0 · 自壓頁 0)· 擊斃閘 rc 0(P024 位元吻合;KILL-09 撞號 ② 已改 ⑦)· CGC_MDL158 read 三檔問題 0
+- sha256:
+      0b738b925d753c1183fe0e7b5ae16330ddbbfee578ed65cf85dc6d5a9237ad44  functional modules/VDF/Invoke-VDF-Activate-v0105.ps1
+      fb40540a3fdbfd779584892e48f9801717434d90eebfa1c893582700576005f5  functional modules/VDF/VDF_MDL013_ActivateVDF_v0106.py
+      44041f4bc0731754710dcddf8ba9ecb4752f5571052782717b03979aca2aa47b  functional modules/VDF/VDF_SystemManager_v0155.py
+
+## ActivateVDF v0107(記憶體 / TEMP 本輪鉤)+ ENG045 v0102 · 容器 pwsh 7.4.6 全流程(2026-10-19)
+- pwsh -NoProfile -File opsession6.ps1 -Ver v0105(-Action run -Mode live -NoOpen -RefillApply -FetchHome <VDF>;雙閘沒開)
+  第一次 593 秒:①b GREEN(溢寫 → 本輪 temp/probe/p<pid> · 記憶體 2.6 GiB = 預算 · 執行緒 1 · 鉤 VDF 本輪鉤)· 引擎 94/94 · 自測 GREEN 65 · NODATA 8 · RED 2(ENG045 · ActivateVDF v0107)
+  查因:ENG045 自測共用夾併跑互撞(四支併跑三輪各 2 支 FAIL 重現)· v0107 自測吃到父輪 VIA_VDF_DUCK_HOOK → 修 ENG045 v0102 · v0107 自測基底
+  第二次 505 秒:①b GREEN · 引擎 94/94 · 自測 GREEN 67 · NODATA 8 · RED 0 · 3b Py 93/93 · 3c PS 161/161 · 6⑤ 資料庫清點 RED 18(容器部分副本)· 結束碼 1
+- 自測:v0107 ㉙–㉞ 6/6(突變:鉤不裝 ㉚ / 不往後接力 ㉛ / 不讓位 ㉜ 各 FAIL)· ENG045 v0102 3/3 三輪(突變:改回共用夾 ① FAIL)
+- 擊斃閘 11 條全過 · CGC_MDL158 read 兩檔問題 0 · 編號 +25 / +9(遺失 0 · 改身分 0 · 重號 0)· registry-sync
+- sha256:
+      6ac6badea1a7fe2740c8ee4a99bab527ac7dbc0bd6fee8ea3ed3505f82c52b16  functional modules/VDF/VDF_MDL013_ActivateVDF_v0107.py
+      80af855844a199bf23d9a62b4b6bf1486894a8b7685b854138ec6b3a52aea55f  functional modules/VDF/VDF_ENG045_OutputHub_v0102.py

@@ -1,0 +1,123 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0124",
+ "date": "2026-10-18",
+ "operator_decision": "都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成(2026-10-18)→ VRN-2 不寫進別的系統的家族 · 不經 VCGC 核號 · 不登 VCGC 中央冊",
+ "supersedes": "ActivateVRN-2 v0123(docs/handoff/ai/vrn2_release_v0123)",
+ "launcher": {
+  "file": "ActivateVRN-2_v0124.py",
+  "bytes": 1443293,
+  "sha256": "1c90b731a914ae6a3775bbeadcfde62dd8f06f9cd7b696172c8b3a5087b46814"
+ },
+ "launcher_zip": {
+  "file": "ActivateVRN-2_v0124.zip",
+  "bytes": 408767,
+  "sha256": "319e8b332c340570263c7408241a15f10e60ec2f5b95131184c1a83d561d6396"
+ },
+ "embedded_components_landing_order": [
+  {
+   "file": "VRN_SystemManager_v0231.py",
+   "bytes": 215605,
+   "sha256": "ddff2743b4785b504e03233fc9b066a3c79ec824822e882a4ea9b6b6c3784647"
+  },
+  {
+   "file": "VRN_SystemManager_v0232.py",
+   "bytes": 43966,
+   "sha256": "42e682ba50748297a5e6d9f0c76a18a75b42fbc6a9acfce2fa14a8ae9012a868"
+  },
+  {
+   "file": "VRN_SystemManager_v0233.py",
+   "bytes": 10066,
+   "sha256": "25e33a7148609b969b1c340db54a73e0cf682a2470f4832536fe836dd49d86a6"
+  },
+  {
+   "file": "VRN_SystemManager_v0234.py",
+   "bytes": 27553,
+   "sha256": "d8a564b2c442f37960ad73215e67da0ec90f5b8692d8b74857c0def329658b42"
+  },
+  {
+   "file": "VRN_ENG397_P1Segment_v0127.py",
+   "bytes": 180699,
+   "sha256": "c2e8e39e558431d6ae3051d49b98f204f7f6ede6e07167cc6d0041e63e2f5fa9"
+  },
+  {
+   "file": "VRN_ENG062_SummarizerV1_v0114.py",
+   "bytes": 63825,
+   "sha256": "62beeaf655760c2bcfb828782839721d727594a91ca0b804863ec2f383ac578d"
+  },
+  {
+   "file": "VRN2_UIAction_v0102.py",
+   "bytes": 5180,
+   "sha256": "56d5b20689e3443a8d0916cebf8f225a0458f2c378acc62f2f3871fc94903c5b"
+  },
+  {
+   "file": "VRN2_OCRBridge_v0100.py",
+   "bytes": 4778,
+   "sha256": "4b21f0694d0ef524d470b178db01608df489ddf1999bcc5f2aae552890f5e5fc"
+  },
+  {
+   "file": "rule_catalog_runtime.json",
+   "bytes": 449121,
+   "sha256": "e5b881716c84d2f7401ec4a995589c3160b9690a7c58af440b5842374bcfc69a"
+  },
+  {
+   "file": "VRN2_Handover_v0124.md",
+   "bytes": 19738,
+   "sha256": "9f03d0a3a622899c7c448cf834328e4f584ec13d61c719adb074a181ad9c2a9f"
+  }
+ ],
+ "changes": [
+  "管理器 v0234(薄尾 · 前版必須 v0233):一格多值依子表頭拆成「期間 + 子欄(SUBCOL)」· 擷取分組錯的格依子表頭更正(VERIFY 標記)· 下一個表頭就停 · 電話第三讀取器(pypdfium2 ∩ PyMuPDF)· Parquet 舊檔移 output/_stale · U/I 子欄拆分分頁 · 完成判定管理器欄寫實際尾版",
+  "摘要器 ENG062 v0114:八碼日期(YYYYMMDD / 民國 YYYMMDD)不當價格 → 華南目標價 1,780"
+ ],
+ "tested_in": {
+  "where": "Claude Code 雲端容器 · Linux · Python 3.13 · 測試用隔離 venv(--system-site-packages)加裝 VRN-2 引擎相依:PyMuPDF 1.28.2 · polars · psutil · scikit-learn · pyarrow(只在暫存區 · repo 與系統 Python 未動)",
+  "inputs": "repo 內真實 PDF 19 份(functional modules/VRN/intake/VRN_v0108_Annual/...)· 個股範圍 14 份",
+  "chain_stub": "使用者機器的管理器前版鏈 v0154–v0230 不在 repo → 測試替身(TESTSTUB · 只供 p1loop / _rep / input_dir 等)· 測試樹的船包含替身 · 不可提交"
+ },
+ "results": {
+  "launcher_selftest": "15/15",
+  "manager_selftests": {
+   "v0231": "33/33",
+   "v0232": "11/11",
+   "v0233": "6/6",
+   "v0234": "14/14"
+  },
+  "eng397_v0127_selftest": "34/34",
+  "complete_run": "⑧ VRN-2 完成 · 紅 0 · 黃 7 → ⑨ VRN-2 船包 12 檔(管理器鏈 5 支 · 相依 GitHub 檔 2)→ ⑩",
+  "repeat_run": "⑨ GitHub 已是最新 · 船包無變更 · 四本輸出冊逐位元相同",
+  "upgrade_from_v0123": "只落 v0234 + ENG062 v0114 → ⑧ 完成 → ⑨ 船包 11 → 12 檔 → ⑩ 封存 ENG062 v0113 · 四本輸出冊與新樹逐位元相同",
+  "new_machine_clone": "② 船包補回 12/12 → ⑧ 完成 → ⑨ · 四本輸出冊與原機逐位元相同",
+  "ship_commit_files": [
+   "docs/handoff/ai/VRN2_Handover_latest.md",
+   "docs/handoff/ai/VRN2_Handover_v0124.md",
+   "docs/handoff/ai/vrn2_ship/VRN2_Bundle_latest.json",
+   "docs/handoff/ai/vrn2_ship/VRN2_Bundle_latest.zip"
+  ],
+  "output_verification": {
+   "basic_fields": {
+    "PASS": 194
+   },
+   "summary_fields": {
+    "PASS": 63
+   },
+   "financial_rows": {
+    "ALIGNED": 3949,
+    "PRESENT": 24,
+    "SUBALIGNED": 452
+   },
+   "financial_bad": 0
+  },
+  "subcol_verifier_mutation_test": "4/4 種錯被抓到 · 原樣 0 錯",
+  "ui_real_browser": "21/21",
+  "rejected_left": 74
+ },
+ "not_verified_here": [
+  "vrn2:// 註冊(Windows)",
+  "OCR 隔離環境(未建)",
+  "③ 補裝(加速器 VeritasCeleritas 的相依 · 容器 --no-install → ③ 紅 · 不擋 ⑧)",
+  "使用者機器管理器鏈(v0228 為前版)"
+ ],
+ "next": "使用者執行 v0124(交接報告第 10 節)· 第一次完成時 ⑨ 送出真正的 VRN-2 船包"
+}

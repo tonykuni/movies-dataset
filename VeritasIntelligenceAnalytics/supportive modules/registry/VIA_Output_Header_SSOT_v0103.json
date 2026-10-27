@@ -1,0 +1,4616 @@
+{
+ "schema": "VIA.OutputHeader.SSOT.v1",
+ "version": "v0103",
+ "batch": "S20261014b",
+ "ts": "2026-10-14T10:00:00+00:00",
+ "source": "操作員 R34 2026-09-30:「將輸出HEADER檢視定案後建立DATAFRAME鎖定 以DATAFRAME中資料的輸出即驗證即結果驗證為範圍目標不發散」 ‖ 操作員 2026-10-14:「VDF VRN 輸出 HEADER 還要檢查全面 … ETF 資料要抓到 NAV AUM CASH INFLOW AND OUT FLOW AND BREAKDOWN 輸出 HEADER 完整確認然後 DATAFRAME 固定」 ‖ 操作員 2026-10-14:「繼續修 VRN provenance 和表頭補齊」",
+ "owner": "supportive modules/registry/CGC_MDL249_DataFrameLock_v*.py(check / lock)",
+ "rule": [
+  "每張表的欄位從正主程式照抄(evidence 帶檔:行),不發明;唯一例外 = 操作員指名要的 ETF 四項(etf_daily_metrics · etf_breakdown)",
+  "表頭定案 = 本冊版號;改表頭先出本冊新版,鎖帳才收(CGC_MDL249 拒寫同版改表頭)",
+  "來源不在 = NODATA(照實);資料在工作站資料家,容器只驗自測",
+  "毛申購 / 毛贖回(units_subscribed · units_redeemed)查無官方來源,照實留 NULL(非必填);資金流入 / 流出 = 淨流量正負拆分,標 kind=ESTIMATE",
+  "v0102 只增台股清單 / ETF 八張輸出表(欄位照寫入程式 DDL 或列字典;evidence 帶檔:行);CGC_MDL249 v0101 coverage 掃到的其餘冊外表留待下一版逐張照寫入程式補,不從庫推斷代寫",
+  "v0103 只增 34 張冊外輸出表(CGC_MDL249 coverage 點名的全部冊外表:有資料 28 + 空表 6):寫入程式檔:行 · upsert 鍵照寫入程式;欄名 / 型別 = 寫入程式 DDL / SELECT / 列字典建出的實表結構(容器庫逐欄核對);整表重建 / VIEW 的表沒有 upsert 鍵,主鍵記每列一筆的邏輯鍵(evidence 註明);必填只標主鍵欄"
+ ],
+ "fragments": [
+  "docs/r34/VDF_OUTPUT_HEADERS_r34.json",
+  "docs/r34/VRN_OUTPUT_HEADERS_r34.json"
+ ],
+ "tables": {
+  "tw_stock_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_VDF_TW_MARKET",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_listings_industry"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "industry_code",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "industry_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:336-341 (row columns) · :343 (upsert keys code,market) · :168 (DB_TW) · reader VDF_ENG087_MarketListGovernance_v0105.py:159 load_stock_list · min_rows = SOFT_MIN TWSE 900 + TPEX 700 at VDF_ENG087_MarketListGovernance_v0105.py:93 · db_env at VDF_ENG087_MarketListGovernance_v0105.py:129"
+  },
+  "tw_stock_list_diff": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG087_MarketListGovernance",
+   "source": {
+    "kind": "json",
+    "db_env": "",
+    "path": "VIA_Reports/vdf/central_lists/TW_STOCK_LIST_SNAPSHOT_latest.json",
+    "table": "rows"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "industry",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "first_seen",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "last_seen",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "delisted_on",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "relisted",
+     "dtype": "bool",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1600,
+   "evidence": "functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0106.py:161-166 (row columns) · :96 (SNAPSHOT path) · status in ACTIVE|NEW|DELISTED (:95 STATUSES)"
+  },
+  "active_etf_list": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG077_ActiveETFUniverse",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "active_tw_etf_registry"
+   },
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "fund_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "domestic",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "daily_required",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "first_seen",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "last_seen",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py:192-193 (DDL, ticker PRIMARY KEY; first_seen/last_seen VARCHAR) · locked tail VDF_ENG077_ActiveETFUniverse_v0105.py (VIA_LampLock_v0107 VDF-WKF006) · db_env at VDF_ENG087_MarketListGovernance_v0105.py:137"
+  },
+  "etf_holdings_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG078_ActiveETFHoldingsHistory",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "holdings_daily"
+   },
+   "columns": [
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "etf_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "holding_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "holding_yf_ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "holding_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "weight_pct",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "shares",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source_url",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fetched_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259-2273 (DDL; ENG051 owns structure) · writer VDF_ENG078_ActiveETFHoldingsHistory_v0107.py:994-997 (_HOLD_MAP) and :1000-1031 (upsert key portfolio_date,etf_ticker,holding_ticker) · locked tail VDF_ENG078_ActiveETFHoldingsHistory_v0113.py (VDF-WKF006)"
+  },
+  "etf_daily_metrics": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "etf_daily_metrics"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "aum",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "nav",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_outstanding",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_subscribed",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "units_redeemed",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "net_units",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "inflow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "outflow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "net_flow_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source_url",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fetched_at",
+     "dtype": "datetime",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:109-114 (METRICS_COLS, METRICS_DDL; operator-defined table) · kind OFFICIAL|ESTIMATE · units_subscribed/units_redeemed are ABSENT (always NULL: no gross creation/redemption source in code or quarantine; see SOURCES in the same file)"
+  },
+  "etf_breakdown": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG094_ActiveETFActivity",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "etf_breakdown"
+   },
+   "columns": [
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "group_kind",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "group",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "weight_pct",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "n_holdings",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG094_ActiveETFActivity_v0101.py:115-117 (BREAKDOWN_COLS, BREAKDOWN_DDL) · group_kind in industry|asset · inputs holdings_daily (VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2259) × tw_listings_industry.industry_name (VDF_ENG055_OmniFetch_v0118.py:339)"
+  },
+  "vrn_basic_info": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG110_TabReport",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/output_hub/vrn/basic/vrn_basic.duckdb",
+    "table": "basic_info"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportType",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "yfinanceTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bloombergTicker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "tickerKind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "companyName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "brokerAbbr",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportDate",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "reportCode",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "language",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pages",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ratingCat",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationStatus",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "validationRisk",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG110_TabReport_v0116.py:30"
+  },
+  "vrn_financial": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/financial/part-*.parquet",
+    "table": "vrn_financial"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "category",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "statement",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "item",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "dataName",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "unit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "confidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "grade",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "defects",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG109_TabStore_v0100.py:20"
+  },
+  "vrn_page1": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG109_TabStore",
+   "source": {
+    "kind": "parquet",
+    "path": "functional modules/VRN/output_hub/vrn/page1/part-*.parquet",
+    "table": "vrn_page1"
+   },
+   "columns": [
+    {
+     "name": "fileId",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fileName",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "page",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fixed_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_page1",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "supportive modules/registry/VIA_VRN_TabFields_v0100.json:15"
+  },
+  "vrn_report_basic": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "name_official",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_raw",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_report",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "title_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "summary_head",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "conflicts",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "extracted_at",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_db",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_latest_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_adj_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_close",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_adj",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_prev_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_factor_basis",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_retro_ratio",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_event",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_age_days",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_freshness",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_raw_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "price_raw_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "adj_block_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_zh",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_name_en",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_src",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_code",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_direction",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_n",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "ssot_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "kind_reason",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:1489"
+  },
+  "vrn_firstpage_matrix": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG083_VerifiedMatrix",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG083_VerifiedMatrix_v0120.py:419",
+   "extra_ok": true
+  },
+  "vrn_regex_selfcheck": {
+   "subsystem": "VRN",
+   "owner": "SUP_MDL749_VRNFieldRuleHub",
+   "source": {
+    "kind": "csv",
+    "path": "VIA_Reports/vrn/regex_selfcheck_latest.csv",
+    "table": ""
+   },
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "file_kind",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "text_scope",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "chars",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "family",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "pattern_id",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "hits",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "first_hit",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "bucket",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "evidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "supportive modules/70_VRN_Rules/SUP_MDL749_VRNFieldRuleHub_v0116.py:681"
+  },
+  "vrn_doc_class": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG393_DocClassVerify",
+   "min_rows": 1,
+   "extra_ok": true,
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "doc_class",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "doc_class_zh",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "class_confidence",
+     "dtype": "float",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "class_rule",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "class_evidence",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "route",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "needs_review",
+     "dtype": "bool",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "fine_kind_eng073",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fine_type_eng114",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "stock_fields_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "source": {
+    "kind": "json",
+    "path": "VIA_Reports/vrn/doc_class/DOCCLASS_latest.json",
+    "table": "rows"
+   },
+   "evidence": "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py classify payload 'rows'(verify 另帶 class_rows)· 提案 VIA_VRN_DocClass_SSOT_v0100.json proposed_headers.vrn_doc_class"
+  },
+  "vrn_firstpage_xcheck": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG393_DocClassVerify",
+   "min_rows": 0,
+   "extra_ok": true,
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "doc_class",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "text_state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "text_coverage",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "text_numbers_missing",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "text_quality",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "zones_xcheck",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "table_methods",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "tables",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "numeric_cells",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "multi_cells",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "single_source_cells",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "presence_diffs",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "seed",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "triples",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "triples_mismatch",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "zero_drills",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "last_group_size",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "cell_diffs",
+     "dtype": "int",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "verdict",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "verdict_why",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    }
+   ],
+   "source": {
+    "kind": "json",
+    "path": "VIA_Reports/vrn/doc_class/XCHECK_latest.json",
+    "table": "rows"
+   },
+   "evidence": "functional modules/VRN/VRN_ENG393_DocClassVerify_v0100.py verify payload 'rows' · 提案 VIA_VRN_DocClass_SSOT_v0100.json proposed_headers.vrn_firstpage_xcheck"
+  },
+  "etf_book": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_VDF_TW_MARKET",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "etf_book"
+   },
+   "columns": [
+    {
+     "name": "fund_code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fund_name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "fund_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "is_active",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "tracking_index",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "as_of",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0106.py:292-306 (lane_etf_book 列字典 · upsert 鍵 fund_code+as_of) · as_of ISO 起於 ENG055 v0112 · 全 ETF 名冊(主動 + 被動)= 主動式台股 ETF 全清單的上游"
+  },
+  "tw_listings": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG054_TWDailyBackfill",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_VDF_TW_MARKET",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_listings"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "yf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "industry",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "isin",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0100.py:124-130 (列字典) · v0105:348-349 (upsert tw_listings 鍵 code+market) · 台股上市櫃清單"
+  },
+  "active_tw_etf_universe": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG077_ActiveETFUniverse",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "active_tw_etf_universe"
+   },
+   "columns": [
+    {
+     "name": "snapshot_at",
+     "dtype": "datetime",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "universe_source",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py:16,72,323 (UNI_TABLE · append-only 快照 DDL)"
+  },
+  "etf_holdings_changes": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG051_ActiveTWETF_Holdings",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "holdings_changes"
+   },
+   "columns": [
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "previous_date",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "holding_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "holding_name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "change_type",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "shares_previous",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "shares_current",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "shares_change",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "weight_previous",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "weight_current",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "weight_change",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2293-2306 (CREATE TABLE holdings_changes)"
+  },
+  "etf_fetch_status": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG051_ActiveTWETF_Holdings",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "fetch_status"
+   },
+   "columns": [
+    {
+     "name": "run_at",
+     "dtype": "datetime",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "etf_ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "source_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "holding_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "portfolio_date",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "errors",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings_v0103.py:2279-2287 (CREATE TABLE fetch_status)"
+  },
+  "etf_holdings_coverage": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG078_ActiveETFHoldingsHistory",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_ACTIVETWETF",
+    "path": "functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+    "table": "active_etf_holdings_coverage"
+   },
+   "columns": [
+    {
+     "name": "asof_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "name",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "issuer",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "listing",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "listing_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "first_snapshot",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "last_snapshot",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "expected_days",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "have_days",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "missing_days",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "no_source_days",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "coverage_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "state",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "computed_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0110.py:120,1210-1212 (COV_TABLE DDL)"
+  },
+  "etf_stats_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "db_env": "VIA_DB_VDF_GLOBAL_MARKET",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "etf_stats_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "symbol",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "aum",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "nav",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "market_cap",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "shares_outstanding",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "trailing_pe",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "forward_pe",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_to_book",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yield_",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "currency",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "extra_ok": true,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0106.py:321-332 (lane_etf_stats:{date, **quoteSummary 列} · upsert 鍵 date+symbol)· 被動 / 海外 ETF 的 NAV · AUM(主動式台股 ETF 另見 etf_daily_metrics)· quoteSummary 欄由網路工具給 → extra_ok"
+  },
+  "gl_cross_macro": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "cross_macro",
+    "db_env": "VIA_DB_VDF_GLOBAL_MARKET"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "region",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "metric",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "series",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:609(FRED)· :1108(Eurostat)upsert 鍵 date+region+metric · 列 L604 / L1103"
+  },
+  "gl_factset_earnings": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "factset_earnings",
+    "db_env": "VIA_DB_VDF_GLOBAL_MARKET"
+   },
+   "columns": [
+    {
+     "name": "published",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "metric",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "value",
+     "dtype": "float",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "flag",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:1038 upsert 鍵 published+metric+period+value · 列 L1018/L1022/L1053/L1071"
+  },
+  "gl_features_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG061_FeatureStore",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "features_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ret_1d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_5d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_20d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_60d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "vol_20d_ann",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ma20_ratio",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ma60_ratio",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "hi252_dist",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "lo252_dist",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volu_z20",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rng_1d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG061_FeatureStore_v0105.py:128(_build_one · build L136-140)· 欄 _SQL_FEATURES L92-118 · 整表重建(CREATE OR REPLACE … AS SELECT),寫入程式沒有 upsert 鍵;主鍵 = 每列一筆的邏輯鍵"
+  },
+  "gl_prices_adj": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG060_AdjPriceLayer",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "gl_prices_adj"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "factor",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v0107.py:127(build L144)· 欄 _SQL_ADJ L102-115 · 整表重建(CREATE OR REPLACE … AS SELECT),寫入程式沒有 upsert 鍵;主鍵 = 每列一筆的邏輯鍵"
+  },
+  "gl_global_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "global_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:527 upsert 鍵 date+ticker(fill)· 另 VDF_ENG052_MegaFetch_v0103.py:239 · 欄 functional modules/VDF/engine/VDF_ENG066_GlobalUniverse_v0102.py:116-124"
+  },
+  "gl_index_valuation_proxy": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "index_valuation_proxy"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "proxy_flag",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "symbol",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "aum",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "nav",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "market_cap",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "shares_outstanding",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "trailing_pe",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "forward_pe",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_to_book",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yield_",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "currency",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:543 upsert 鍵 date+symbol · 列 L541({date, proxy_flag, **quoteSummary})"
+  },
+  "gl_prices_canonical": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG060_AdjPriceLayer",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "prices_canonical"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v0107.py:130-134 VIEW(gl_prices_adj 的 adj_* 改名)· 主鍵 = 底表邏輯鍵"
+  },
+  "gl_sentiment_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_global_market.duckdb",
+    "table": "sentiment_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "index",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "score",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rating",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:696 upsert 鍵 date+index · 列 L685/L690;另 functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v0100.py:201 同鍵 date+index;容器庫 CNN_FEAR_GREED 2026-09-23/24 各 3 筆完全相同列(主鍵重複 = 資料問題,掉球 Z297,本表不鎖)"
+  },
+  "tw_features_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG061_FeatureStore",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "features_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ret_1d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_5d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_20d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ret_60d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "vol_20d_ann",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ma20_ratio",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ma60_ratio",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "hi252_dist",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "lo252_dist",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volu_z20",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rng_1d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG061_FeatureStore_v0105.py:128(DB_TW)· 欄 _SQL_FEATURES L92-118 · 整表重建(CREATE OR REPLACE … AS SELECT),寫入程式沒有 upsert 鍵;主鍵 = 每列一筆的邏輯鍵"
+  },
+  "tw_group_features_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG062_GroupFeatureLayer",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "group_features_daily"
+   },
+   "columns": [
+    {
+     "name": "gid",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "n_members",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_ma20",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "above_ma20",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "avg_ret_20d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "med_ret_60d",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "win60",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "lose60",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "avg_volu_z20",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG062_GroupFeatureLayer_v0104.py:125 · 欄 _SQL_GROUP L86-101(GROUP BY gid,date)· 整表重建(CREATE OR REPLACE … AS SELECT),寫入程式沒有 upsert 鍵;主鍵 = 每列一筆的邏輯鍵"
+  },
+  "tw_prices_canonical": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG060_AdjPriceLayer",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "prices_canonical"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v0107.py:130-134 VIEW(tw_prices_adj)"
+  },
+  "tw_daily_prices": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG054_TWDailyBackfill",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_daily_prices"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0109.py:497(upsert_duckdb L214 → UTILS.upsert_rows)· 欄 PRICE_DDL L196-197 · 鍵 date+ticker"
+  },
+  "tw_daytrade_market": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_daytrade_market"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "dt_volume",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "dt_volume_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "dt_buy_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "dt_sell_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:720 upsert 鍵 date+market · 列 L711"
+  },
+  "tw_prices_adj": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG060_AdjPriceLayer",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_prices_adj"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "factor",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "volume",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "data_class",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "factor_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG060_AdjPriceLayer_v0107.py:127(build L141,自 tw_daily_prices)· 欄 _SQL_ADJ L102-115 · 整表重建(CREATE OR REPLACE … AS SELECT),寫入程式沒有 upsert 鍵;主鍵 = 每列一筆的邏輯鍵"
+  },
+  "tw_rates_cbc": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_rates_cbc"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "demand_deposit_float",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "savings_float",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "fixed_1m",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "honesty_flag",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:652 upsert 鍵 date+source · 列 L644"
+  },
+  "tw_shares_issued": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_shares_issued"
+   },
+   "columns": [
+    {
+     "name": "asof_date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "shares_issued",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:320/:345/:389(SHARES_KEYS L278)· 列 _shares_rows L298 · L381-382;另 functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0107.py:474(_parse_shares L410)"
+  },
+  "tw_trading_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG057_TradingValueBackfill",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_trading_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "volume",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "trade_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "transactions",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "open",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG057_TradingValueBackfill_v0107.py:318(upsert fill · no_fill src)· 列 parse_twse_mi L248 · parse_tpex L274;另 functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:387(L2 當日)· 列 L356/L369"
+  },
+  "tw_valuation_daily": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG055_OmniFetch",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_valuation_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "market",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "pe",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "pb",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "dividend_yield",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "dps",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v0118.py:422 upsert 鍵 date+code+market · 列 L404/L414"
+  },
+  "via_handover": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG082_ExtractionLogic",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "via_handover"
+   },
+   "columns": [
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "batch",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ts",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "sha1",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "chars",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "body",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py:716(CREATE OR REPLACE)· :719 INSERT · sync_db L632 → vdf_tw_market(L442/447)· 每輪整表替換"
+  },
+  "via_policy_factors": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG082_ExtractionLogic",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "via_policy_factors"
+   },
+   "columns": [
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "key",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "value",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "synced_at",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py:706 · :709 executemany · 列 policy_factors() L451 · 每輪整表替換"
+  },
+  "via_policy_sync": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG082_ExtractionLogic",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "via_policy_sync"
+   },
+   "columns": [
+    {
+     "name": "sync_id",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ts",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "host",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "logic_rows",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "policy_rows",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "policy_hash",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "engine",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py:711 · :712 INSERT · 每輪整表替換"
+  },
+  "vdf_xval_validation_summary": {
+   "subsystem": "VDF",
+   "owner": "VDF_MDL105_CrossValidator",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/registry_output/0-2-CrossValidation/VDF_CrossValidation.duckdb",
+    "table": "validation_summary"
+   },
+   "columns": [
+    {
+     "name": "via_code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "theme",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_sources_total",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_sources_ok",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "pairs_passed",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "pairs_total",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "max_diff_abs",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "max_diff_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "consensus_value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "consensus_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "color",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "reason",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "validated_at",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/VDF_MDL105_CrossValidator.py:321(mgr.save · VDF_MDL101_OutputManager.py:292-293 DROP + CREATE AS SELECT)· 列 L280-295(去 pair_details)· 每次整表替換"
+  },
+  "vdf_xval_pairwise_details": {
+   "subsystem": "VDF",
+   "owner": "VDF_MDL105_CrossValidator",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/registry_output/0-2-CrossValidation/VDF_CrossValidation.duckdb",
+    "table": "pairwise_details"
+   },
+   "columns": [
+    {
+     "name": "via_code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "src_a",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "src_b",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "val_a",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "val_b",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "diff_abs",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "diff_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ok",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VDF/VDF_MDL105_CrossValidator.py:323 · 列 L315 {via_code, **d} · d L168-170 · 每次整表替換"
+  },
+  "vrn_nlp_text_summary": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG087_NLPTextSummaryBridge",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "table": "vrn_nlp_text_summary"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "source_sha256",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "normalized_text",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "normalized_sha256",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "raw_char_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "normalized_char_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "text_processor_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "summary_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "summary_points_json",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "evidence_spans_valid",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "segment_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "table_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "layout_block_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "role_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "roles_why",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "extraction_tag",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "logic_json",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "generated_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py:272 DELETE · :274 INSERT · DDL L221-240(PRIMARY KEY report_file)"
+  },
+  "vrn_pipeline_runs": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG087_NLPTextSummaryBridge",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "table": "vrn_pipeline_runs"
+   },
+   "columns": [
+    {
+     "name": "run_id",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "input_path",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "input_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "sidecar_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "summary_ok_count",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eng072_rc",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eng073_rc",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "vdf_rc",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "verdict",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "db_path",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "output_dir",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "started_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "finished_at",
+     "dtype": "datetime",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "accelerator",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "network_mode",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py:293 DELETE · :295 INSERT · DDL L243-259(PRIMARY KEY run_id)"
+  },
+  "vrn_report_basic_vrndb": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "table": "vrn_report_basic"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ticker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "name_official",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "report_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rating_raw",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_price",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_report",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_calc",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "title_head",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "summary_head",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "conflicts",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "extracted_at",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_db",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_db",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_name_zh",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_name_en",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rating_ssot_key",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rating_code",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rating_direction",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "analyst_names",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "analyst_n",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "ssot_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "report_kind",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "kind_reason",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_factor",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_factor_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_price_adj",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_latest_adj",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_latest_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_adj",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_adj_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_prev_close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_prev_adj",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_prev_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_prev_raw",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_factor_basis",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_retro_ratio",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_event",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "report_age_days",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_freshness",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_raw",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_raw_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_raw",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_raw_date",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "price_raw_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adj_block_reason",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:2366 DELETE · :2375 INSERT(具名欄)· DDL L1489-1494 + BASIC_EXTRA_COLS L1459-1485(ALTER L1495-1497)· 經 functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0101.py:475 --db 寫進 vrn_reports(ENG073 單跑預設寫 vdf_tw_market,冊上另有 vrn_report_basic 指那一庫)"
+  },
+  "vrn_report_analyst": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "table": "vrn_report_analyst"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "analyst_en",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "analyst_en_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "analyst_zh",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "analyst_zh_src",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "zh_shared",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "email",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "phones",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "domain",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "institution",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "broker_ssot_key",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "is_research",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "zone",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "anchor_type",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "name_match_score",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "confidence",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "extracted_at",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:2370 DELETE · :2379 INSERT · DDL L1500-1506 · 列 ssot_analysts L1439-1449(每檔多位分析師) · 寫入程式依 report_file 先刪再插,沒有逐列鍵 → 不設主鍵(report_file 必填)"
+  },
+  "vrn_report_metrics": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG073_ReportStructuredDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VRN/db/vrn_reports.duckdb",
+    "table": "vrn_report_metrics"
+   },
+   "columns": [
+    {
+     "name": "report_file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "metric",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "period",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "status",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "value",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "raw_text",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 1,
+   "evidence": "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0138.py:2368 DELETE · :2383 INSERT(6 值)· DDL L1507-1509 · 列 L1028/L1037/L1044 · 寫入程式依 report_file 先刪再插,沒有逐列鍵 → 不設主鍵(report_file 必填);容器資料同一 report_file+metric+period 有多個候選值(擷取歧義,掉球 Z298)"
+  },
+  "tw_consensus_daily": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG071_CnyesFusion",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "consensus_daily"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "target_high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_mean",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_median",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_analysts",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eps_fy0",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eps_fy1",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adopted_eps",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "validated",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG071_CnyesFusion_v0103.py:149-154(_ensure_schema DDL)· :165 INSERT · upsert 同鍵 date+code+source 先刪後插(L158) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  },
+  "tw_consensus_latest": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG069_ConsensusDB",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "consensus_latest"
+   },
+   "columns": [
+    {
+     "name": "date",
+     "dtype": "date",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "target_high",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_low",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_mean",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "target_median",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_analysts",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eps_fy0",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "eps_fy1",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "adopted_eps",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "close",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "upside_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "validated",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "rn",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG069_ConsensusDB_v0107.py:287-291 VIEW(consensus_daily 每 code+source 最新一筆 · rn) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  },
+  "tw_monthly_revenue": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG063_MonthlyRevenue",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "tw_monthly_revenue"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ym",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "revenue",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "source",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "fetched_at",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0104.py:271-273 DDL · :255/:258 DELETE+INSERT · :309/:312(CNYES 段) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  },
+  "tw_monthly_revenue_analysis": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG063_MonthlyRevenue",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "monthly_revenue_analysis"
+   },
+   "columns": [
+    {
+     "name": "code",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ym",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "revenue",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "mom_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yoy_pct",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "cum_12m",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "high_60m",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yoy_streak",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0104.py:99 VIEW(_SQL_ANALYSIS_VIEW,自 tw_monthly_revenue) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  },
+  "tw_revenue_group_analysis": {
+   "subsystem": "VDF",
+   "owner": "VDF_ENG063_MonthlyRevenue",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "revenue_group_analysis"
+   },
+   "columns": [
+    {
+     "name": "gid",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "ym",
+     "dtype": "str",
+     "required": true,
+     "key": true
+    },
+    {
+     "name": "n_members",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "revenue_sum",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "yoy_median",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_yoy_pos",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_yoy",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "n_high60",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0104.py:341 VIEW(族群 × 月;成員 csv 靠工作站輪動快照) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  },
+  "vrn_extraction_logic": {
+   "subsystem": "VRN",
+   "owner": "VRN_ENG082_ExtractionLogic",
+   "source": {
+    "kind": "duckdb",
+    "path": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+    "table": "vrn_extraction_logic"
+   },
+   "columns": [
+    {
+     "name": "ts",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "file",
+     "dtype": "str",
+     "required": true,
+     "key": false
+    },
+    {
+     "name": "sha1",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "verdict",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "method",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "stage",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "chars",
+     "dtype": "int",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "xcheck_state",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "xcheck_bag",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "xcheck_seq",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "labels_ok",
+     "dtype": "bool",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "repair_json",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "secs",
+     "dtype": "float",
+     "required": false,
+     "key": false
+    },
+    {
+     "name": "tag",
+     "dtype": "str",
+     "required": false,
+     "key": false
+    }
+   ],
+   "min_rows": 0,
+   "evidence": "functional modules/VRN/VRN_ENG082_ExtractionLogic_v0110.py:702 CREATE OR REPLACE · :705 executemany(每輪整表替換;無逐列鍵 → 不設主鍵,file 必填) · 容器庫此表 0 列(工作站資料家才有料)→ min_rows 0"
+  }
+ },
+ "prior": "VIA_Output_Header_SSOT_v0100.json",
+ "why_v0101": "R35 操作員 2026-09-30「VRN目前這條路徑只擷取個股報告 為 產業/展望 新聞摘要 / 其他投資報告(無關個股) 其他分類好就好」「格子若有數字則可用亂數選三格相乘…再亂選三個直到選完」:新增兩表 vrn_doc_class(五類分類 · 路由 · 非個股的個股欄 NULL 不猜)與 vrn_firstpage_xcheck(首頁文字 / 表格還原 + 多法亂數三格乘積互核);欄位照 VRN_ENG393_DocClassVerify_v0100 的輸出照抄(提案在 VIA_VRN_DocClass_SSOT_v0100.proposed_headers)。vrn_firstpage_matrix 七欄仍是個股必填,非個股不進該表。v0100 十二表一字不動。"
+}
