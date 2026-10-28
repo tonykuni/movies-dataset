@@ -25,6 +25,7 @@
 | 發布引擎 VRN2_Publish | v0101 | v0100 · v0101 在位 | 綠 |
 | U/I 處理器 VRN2_UIAction | v0107(轉交 v0106 → v0105) | v0100 · v0101 · v0105 · v0107;**v0106 不在** | 黃(轉交目標缺一層) |
 | SSOT VRN2_SSOT | 最高版 · funnel.ocr_ladder 325p,400p | v0101 已是 `325p,400p`(v0254 `ensure_ssot_funnel` 不會再出版) | 綠 |
+| VRN-2 自己的 Regex / 同義字 / 表頭 / 發布設定冊 | VRN2_Regex v0103 · VRN2_Synonyms v0101 · VRN2_BasicInfo_Headers v0100 · VRN2_Publish_Config v0100(`functional modules/VRN/SSOT/`,owner VRN-2 · independent) | **倉上一本都沒有**;v0240 / v0244 `vrn2scope` 在桌機生成,未隨船。VRN2_SSOT v0101 `independent=True` ✓ | 黃(獨立冊未入倉) |
 | 帳本 / 輸出冊 / 收尾包 | registry\VRN2_*Ledger · VIA_Reports\vrn2\{output,loop} | 倉上皆無(未入倉,屬桌機本地) | 灰 |
 
 ## 3. 實測證據(只讀 · 本容器)
@@ -56,6 +57,7 @@ git log --all -- '*VRN_SystemManager_v025[0-3]*' → 空(v0250~v0253 從未進�
 ## 6. 決定(2026-10-28 · 操作員令「依我最大利益決定」· 雲端代決 · 可推翻)
 
 1. **前版鏈隨船 = 是。** 已搜遍 origin 全部 272 個分支(含 `vrn2-auto` edc215ad):v0242 / v0246 / v0247 / v0248 / v0253 · ENG062 v0114 · UIAction v0106 · VDF v036 **沒有任何一個分支有**,只在桌機。
+   **VRN-2 獨立冊一起隨船**(操作員 2026-10-28 令「VRN-2 為獨立子系統,有自己的 SSOT / Regex / 同義字」):VRN2_Regex · VRN2_Synonyms · VRN2_BasicInfo_Headers · VRN2_Publish_Config 全部版本,放 VRN-2 自己的 `VRN/SSOT/`;不借 VCGC / VDF / VRN-1 的冊,也不把它們登進他系統的冊。
    桌機下一輪 ⑨ 必須把鏈上所有在位前版一起上船(只增 · 同名不同內容出 v+1 · 不覆寫),否則工作 11 不能算過。雲端做不到,不冒充。
 2. **VCGC 座位冊不帶上船。** `handoff check` 自動把 `VIA_VCGC_SubsystemSeat_v0100.json` 的 VRN 座位改成 v0254、VDF 改成 v0162;那是 VCGC 的冊,已還原到提交版、未入本分支。要改經 VCGC `registry-sync --apply`。
 3. **本分支不開 PR、不推 main。** 審核冊只放 `claude/vrn2-closeout-authorization-y4ixl7`;要進 main 由桌機 ⑨ 或 Tony 決定。
