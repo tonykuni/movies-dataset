@@ -14,15 +14,15 @@
 | 影響 | 任何從倉啟動的 VRN-2(雲端 Claude · 另一台機 · CI)都載不起管理器;缺漏清單 #12「兩線入口合一」沒有前提 |
 | 旁證 | 另一條雲端分支 `claude/vrn2-closeout-authorization-y4ixl7` 的 `VRN2_CloudAudit_20261028.md` §2 / §6 同判定(它選擇不出工具、不開 PR) |
 
-## 2. 工具:`functional modules/VRN/VRN2_ChainShip_v0100.py`(sha256 `c9bddf78fa505502d188cd49a97ed5412bfe610402cb4558f9bd4997e73bb3f6`)
+## 2. 工具:`functional modules/VRN/VRN2_ChainShip_v0100.py`(sha256 `cfee9e2d056d3eca063b8693889a148db0959e4c46c468f412266582cd7ab608`)
 
 | 動詞 | 做什麼 | rc |
 |---|---|---|
 | `check` | 每一個 VRN-2 版號檔的釘名前版(`PRIOR_NAME` / 字串釘名,同家族且版號較小才算)往回走到底;每一環判 TRACKED(夾內在位)/ BUNDLED(只在 `docs/handoff/ai/vrn2_ship/VRN2_Bundle_latest.zip`)/ MISSING;另列「引用的 VRN2_ 冊未入倉」 | MISSING>0 → 1 · 只有 BUNDLED / 引用冊缺 → 2 · 全在位 → 0 |
 | `check --heads` | 只走各家族尾版(短版) | 同上 |
-| `ship` | 用 git 找「本機在位但未入倉」的白名單檔 → `git add`;已追蹤但內容不同 = 同名不同內容 → 只列不覆寫;語法不過的 .py / 不合法 JSON / >8 MB 不帶 | 有同名不同內容 / 跳過 / push 被拒 → 2 |
+| `ship` | 用 git 找「本機在位但未入倉」的白名單檔(未追蹤 + 已暫存但 HEAD 沒有的)→ `git add`;已追蹤但內容不同 = 同名不同內容 → 只列不覆寫;語法不過的 .py / 不合法 JSON / >8 MB 不帶 | 有同名不同內容 / 跳過 / push 被拒 → 2 |
 | `ship --commit --push` | 只含這些檔落一筆提交,推當前分支(被拒 = 分支落後 → 黃,交 ⑨ 持續解衝突) | 同上;不是 git 倉 → 1 |
-| `--selftest` | 臨時 git 倉 + 合成鏈,18 項(尾版判定 · 鏈走到底 · BUNDLED / MISSING / 引用冊 · 白名單 · 語法跳過 · 同名不同內容不覆寫 · 提交只含加入檔 · 收據 · 非 git 倉拒跑) | 0 / 1 |
+| `--selftest` | 臨時 git 倉 + 合成鏈,19 項(先 ship 再 ship --commit 也進提交 · 尾版判定 · 鏈走到底 · BUNDLED / MISSING / 引用冊 · 白名單 · 語法跳過 · 同名不同內容不覆寫 · 提交只含加入檔 · 收據 · 非 git 倉拒跑) | 0 / 1 |
 
 收據:`VIA_Reports/vrn2/VRN2_ChainShip_latest.json`(被 .gitignore 排除)。白名單以外(輸出冊 · 帳本 · `_archive_vrn2/` · `registry/` · 任何他系統的檔)一律不帶。
 
@@ -35,7 +35,7 @@
 & {
   $REPO = "C:\Users\tonyk\OneDrive\Documents\movies-dataset"
   $REL  = "VeritasIntelligenceAnalytics/functional modules/VRN/VRN2_ChainShip_v0100.py"
-  $WANT = "c9bddf78fa505502d188cd49a97ed5412bfe610402cb4558f9bd4997e73bb3f6"
+  $WANT = "cfee9e2d056d3eca063b8693889a148db0959e4c46c468f412266582cd7ab608"
   if (-not (Test-Path -LiteralPath (Join-Path $REPO ".git"))) { Write-Host "[RED] 不是 git 倉:$REPO" -ForegroundColor Red; return }
   $T = Join-Path $REPO ($REL -replace '/', '\')
   $py = Get-Command python, py, python3 -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch 'WindowsApps' } | Select-Object -First 1
@@ -78,7 +78,7 @@
 
 | 測試 | 結果 |
 |---|---|
-| `VRN2_ChainShip_v0100.py --selftest` | OK 18 · FAIL 0 |
+| `VRN2_ChainShip_v0100.py --selftest` | OK 19 · FAIL 0 |
 | `check`(倉 origin/main 918461d4 + 本工具) | RED · 起點 426(家族尾版 71)· 環 522 · MISSING 3 · BUNDLED 0 · 引用冊缺 8 列(3 本) |
 | `check --heads` | RED · MISSING 1(v0253;v0244 / v0249 非尾版不在短版裡)|
 | `ship`(容器,乾跑) | 只抓到本工具自己(未入倉時)· 跳過 0 · 同名不同內容 0 |
@@ -97,14 +97,22 @@
 | 語法壞的 `VRN2_BadSyntax_v0100.py` | `[SKIP] SYNTAX 行 1` · 不進提交 | ✓ |
 | 已追蹤的 `VRN_SystemManager_v0245.py` 加一行 | `[YEL] 同名不同內容 · 不覆寫` · 不進提交 · 工作樹原樣 | ✓ |
 | 垃圾檔 `VRN2_run_notes.txt` | 不帶 | ✓(未出現) |
-| 提交 / 推送 | 一筆只含 13 檔 · 推當前分支 | `[COMMIT] 859c9f09 · 補 13 個` · `[PUSH] 推上 desk-test` ✓ |
+| 已暫存但沒提交的 `VRN_SystemManager_v0253.py`(模擬「先 ship 再 ship --commit」· Codex P2) | 也進 `[ADD]` 與提交 | ✓(第二次模擬加入) |
+| 提交 / 推送 | 一筆只含 13 檔 · 推當前分支 | `[COMMIT] e14a756c · 補 13 個` · `[PUSH] 推上 desk-test2` ✓ |
 | 補船後 `check` | MISSING 0 | GREEN · 起點 436 · 環 541 · MISSING 0 ✓ |
 | 總燈 | ship rc 2(有同名不同內容 + 跳過)→ YELLOW | `[結果] YELLOW · 補船前 check rc 0 · ship rc 2 · 補船後 check rc 0` ✓ |
 
 第一次模擬(誤以本機舊 main 為底)另外證明:底不同時 `check` 會老實報缺的那一環(v0240 / v0249),不會冒充綠。
-模擬用的分支 `desk-test` 只在容器本機,已刪;沒有推到 GitHub。
+模擬用的分支 `desk-test` / `desk-test2` 只在容器本機,已刪;沒有推到 GitHub。
 
-## 7. 下一步(桌機)
+## 7. Codex 審查(PR #570)回覆
+
+| 發現 | 處置 |
+|---|---|
+| P1 新 Python 沒帶既有加速器橋(AGENTS.md 第 4 條;全景 `read` 報 ACCEL) | 已加同家族既有的 `# [VIA:ACCEL-BRIDGE:v0111]` 標記(與 VRN2_Publish / UIAction / SystemManager v0254 同款);`from __future__` 位置不變;全景 `read` ACCEL 消失 |
+| P2 先 `ship` 再 `ship --commit --push` 第二次靜默不提交(已暫存的檔不在 `ls-files --others`) | 候選 = 未追蹤 ∪ `git diff --cached --diff-filter=A`(已暫存但 HEAD 沒有);自測 ⑲ + 桌機模擬(預先暫存 v0253)都進提交 |
+
+## 8. 下一步(桌機)
 
 1. 本 PR 合併後(或直接用本分支),在桌機貼 §3 → 看 `[ADD]` 清單與 `[結果]`。
 2. 推被拒 → 下一輪 ActivateVRN-2 ⑨ 會帶上去;推成功 → 雲端 / CI 再跑 `check` 應轉綠(只剩「只在船包」的黃,若有)。
