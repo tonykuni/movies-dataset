@@ -43,7 +43,7 @@
 
 | 庫 / 夾 | 表 · 檔 | 誰寫 |
 |---|---|---|
-| `vdf_tw_market.duckdb`(32 表) | tw_daily_prices · tw_prices_adj · prices_canonical · features_daily · tw_trading_daily · tw_chip_inst/margin/derived · tw_monthly_revenue · tw_universe · tw_listings(_industry) · etf_book · tw_valuation_daily · consensus_* · analyst_estimates · tw_daytrade_* · tw_market_agg · tw_rates_cbc · etf_revenue_* · tw_financial(_mops) · **vrn_report_* 等 VRN 的 9 表**(db check 紅 34 列裡 14 列是 VRN 寫進來的,四系統對等:VDF 只攤開不代修) | e054 · e057 · e056 · e063 · e055 · e059 · e082 · e088 · (VRN) |
+| `vdf_tw_market.duckdb`(32 表) | tw_daily_prices · tw_prices_adj · prices_canonical · features_daily · tw_trading_daily · tw_chip_inst/margin/derived · tw_monthly_revenue · tw_universe · tw_listings(_industry) · etf_book · tw_valuation_daily · consensus_* · analyst_estimates · tw_daytrade_* · tw_market_agg · tw_rates_cbc · etf_revenue_* · tw_financial(_mops) · **vrn_report_* 等 VRN-2 的 9 表**(寫入者 = 本倉 `VRN_ENG073_ReportStructuredDB` 系列,即 VRN-2;VRN-1 是另一團隊的倉、只讀、不寫本庫;db check 紅 34 列裡 14 列是 VRN-2 寫進來的,四系統對等:VDF 只攤開不代修) | e054 · e057 · e056 · e063 · e055 · e059 · e082 · e088 · (VRN-2:VRN_ENG073) |
 | `vdf_global_market.duckdb`(14 表) | global_daily · gl_prices_adj · prices_canonical · features_daily · us_macro · cross_macro · sentiment_daily · macro_series_registry · factset_earnings · etf_stats_daily · index_valuation_proxy · fwd_valuation_daily(+candidates) · us_listings · jp_listings | e066 · e055 · e074 · e113 · e230 · e231 |
 | `ActiveTWETF.duckdb`(6 表) | holdings_daily · holdings_changes · active_tw_etf_universe · active_tw_etf_registry · active_etf_holdings_coverage · fetch_status | ENG051 · e078 · e077 |
 | `output_hub/tw_index/VDF_TWIndex_Daily.duckdb` | tw_index_daily(TAIEX · TPEX) | e232 |
@@ -65,7 +65,7 @@ TW_INDEX · TW_ACTIVE_ETF · TW_FIN · INTL_FIN · INTL_DAILY · CN_MACRO · CN_
 
 **輸出:兩層並存,所以亂。** MDL00x 系寫 parquet 夾(擷取家 `0-1 … 1-7`),ENG0xx 系寫 DuckDB(`output_hub` 各庫);同一題材兩邊都有
 (量價:tw_daily_prices vs 1-4-TWFullMarket;清單:vdf_master_lists vs tw_listings vs tw_universe;ETF 冊:etf_book 兩處)。表冊 63 表的 `writers` 欄多數空白;
-`vdf_tw_market.duckdb` 混進 VRN 的 9 張表。
+`vdf_tw_market.duckdb` 混進 VRN-2 的 9 張表(`VRN_ENG073_ReportStructuredDB` 寫入;不是 VRN-1,VRN-1 不在本倉)。
 
 ## 四 · 缺口(現在沒有任何引擎抓的)
 
@@ -78,6 +78,6 @@ TW_INDEX · TW_ACTIVE_ETF · TW_FIN · INTL_FIN · INTL_DAILY · CN_MACRO · CN_
 ## 五 · 建議的整併順序(不動既有,只增)
 
 1. 輸入範圍冊加 IN-04 國際(美 · 日清單 = e231)、IN-05 總經選單(= AkShare 選單 + FRED 系列冊)、IN-06 情緒,讓「名單」只有一本正本。
-2. 表冊 63 表補 `writers`(每表唯一寫手),VRN 的 9 表移出 `vdf_tw_market.duckdb`(VRN 自己決定,VDF 只報)。
+2. 表冊 63 表補 `writers`(每表唯一寫手),VRN-2 的 9 表移出 `vdf_tw_market.duckdb`(VRN-2 自己決定,VDF 只報;VRN-1 另倉只讀,與此無關)。
 3. MDL00x 的 parquet 夾改由 DuckDB 管理(R-DB-01 已規定,尚未落到 002 · 003 · 004 · 005 · 006 · 007)。
 4. 缺口 1 立專案:主動 ETF 淨值 · 單位數 · 申贖引擎(先從 TWSE/TPEX 官方表與投信 PCF 驗證車道開始);缺口 3 的台指期 / 選擇權另立。
