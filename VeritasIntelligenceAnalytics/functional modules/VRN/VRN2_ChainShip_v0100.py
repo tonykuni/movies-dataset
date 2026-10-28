@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# [VIA:ACCEL-BRIDGE:v0111]
 """VRN2_ChainShip v0100 — VRN-2 薄尾鏈隨船(VRN-2 自己的工具 · 只增不減 · 不改任何既有版本檔)。
 
 起因(2026-10-28 容器實測):倉上 VRN_SystemManager_v0254 `--selftest` → FileNotFoundError「前版 v0253 不在」;
@@ -11,7 +12,7 @@
                                  每一環判 TRACKED(VRN 夾在位)/ BUNDLED(只在 vrn2_ship 船包)/ MISSING(都沒有)
                                  MISSING > 0 → rc 1(紅);只有 BUNDLED 或引用冊未入倉 → rc 2(黃);全在位 → rc 0
                                  注意:MISSING 那一環再往前(例 v0253 之前的 v0250~v0252)看不到;補上後再跑一次
-  ship  [--commit] [--push]      桌機:用 git 找出 VRN 夾內「本機在位但未入倉」的 VRN-2 自己的版號檔(白名單)→ 加進暫存區;
+  ship  [--commit] [--push]      桌機:用 git 找出 VRN 夾內「本機在位但未入倉」的 VRN-2 自己的版號檔(白名單;未追蹤 + 已暫存但 HEAD 沒有的)→ 加進暫存區;
                                  已追蹤但內容不同 = 同名不同內容 → 只列出、不覆寫(rc 2);語法不過的 .py 不帶;
                                  --commit 落一筆只含這些檔的提交;--push 推當前分支(被拒只報 rc 2,交 ⑨ 持續解衝突)
   --selftest                     臨時 git 倉 + 合成鏈,驗 check / ship 全部判定
@@ -267,6 +268,8 @@ def ship(vrn: Path, root: Path | None, do_commit: bool = False, do_push: bool = 
     rc, branch = git(["rev-parse", "--abbrev-ref", "HEAD"], vrn)
     rc, others = git(["ls-files", "--others", "--exclude-standard", "--", "."], vrn)
     untracked = [l.strip() for l in others.splitlines() if l.strip()]
+    rc, cached = git(["diff", "--cached", "--name-only", "--diff-filter=A", "--relative", "--", "."], vrn)  # 已暫存但 HEAD 沒有(上一次 ship 沒 --commit · 或 commit 失敗後重跑)
+    untracked = sorted(set(untracked) | {l.strip() for l in cached.splitlines() if l.strip()})
     rc, diff = git(["diff", "--name-only", "--relative", "--", "."], vrn)  # --relative:路徑相對本夾(porcelain 是相對倉根)
     modified = [l.strip() for l in diff.splitlines() if l.strip()]
     staged, skipped, conflicts = [], [], []
@@ -276,7 +279,8 @@ def ship(vrn: Path, root: Path | None, do_commit: bool = False, do_push: bool = 
         p = vrn / rel
         try:
             size = p.stat().st_size
-        except OSError:
+        except OSError as exc:
+            skipped.append({"file": rel, "why": "讀不到:%s" % exc.__class__.__name__})
             continue
         if size > MAX_SHIP_BYTES:
             skipped.append({"file": rel, "why": "超過 %d MB" % (MAX_SHIP_BYTES // (1024 * 1024))})
@@ -456,6 +460,13 @@ def selftest() -> int:
         chk("⑰ 收據落在 VIA_Reports/vrn2/VRN2_ChainShip_latest.json", rp is not None and rp.is_file() and json.loads(rp.read_text(encoding="utf-8"))["lamp"] == "YELLOW")
         nr = ship(Path(td), None)
         chk("⑱ 不是 git 倉 → RED 不動作", nr["lamp"] == "RED")
+        _w(vrn / "VRN_ENG700_Late_v0100.py", "L = 0\n")
+        s3 = ship(vrn, root)  # 乾跑:只暫存不提交
+        s4 = ship(vrn, root, do_commit=True)  # 再跑要把已暫存的帶進提交
+        rc, shown = git(["show", "--stat", "--format=%s", "HEAD"], vrn)
+        chk("⑲ 先 ship 再 ship --commit:已暫存未提交的檔也進提交(不會靜默跳過)",
+            [x["file"] for x in s3["staged"]] == ["VRN_ENG700_Late_v0100.py"] and [x["file"] for x in s4["staged"]] == ["VRN_ENG700_Late_v0100.py"]
+            and s4["commit"] is not None and "VRN_ENG700_Late_v0100.py" in shown and shown.count("|") == 1)
     say("[計] %s %s --selftest · OK %d · FAIL %d" % (DISPLAY_NAME, TAG, len(oks), len(fails)))
     return 0 if not fails else 1
 
