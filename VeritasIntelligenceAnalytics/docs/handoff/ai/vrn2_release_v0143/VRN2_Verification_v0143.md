@@ -38,15 +38,15 @@
 
 | 項 | 結果 |
 |---|---|
-| 單機閘 | 接手過期鎖(PID 1569 已不在) · 結束後鎖檔已移除 True |
+| 單機閘 | 新鎖 · 結束後鎖檔已移除 True |
 | 上限 | {'VRN2_UI_REFRESH_WAIT': 600, 'VRN2_SILENT_MAX': 3600, 'VRN2_MANIFEST_WAIT': 900, 'VIA_VRN2_VERIFY_WAIT': 3600} |
-| ⑫b | [計] ⑫b U/I 輸入區塊(window I/O) · [鎖驗證] accelerator=EXACT · network=EXACT · 耗時 1 秒 · ui_block {'lamp': 'GREEN', 'how': 'in-process', 'detail': 'v0143 本支補放(處理器子行程 沒跑)· U/I 輸入區塊 換掉同一塊(三類 · 只開個股報告/訊息)'} |
+| ⑫b | [計] ⑫b U/I 輸入區塊(window I/O) · [鎖驗證] accelerator=EXACT · network=EXACT · 耗時 1 秒 · ui_block {'lamp': 'GREEN', 'how': '子行程', 'detail': '[鎖驗證] accelerator=EXACT · network=EXACT · 耗時 1 秒'} |
 | 收尾 rc | 1(③ 環境檢查 RED in the Linux sandbox only (accelerator deps not in venv; --no-install); same as v0142)|
-| 非綠步驟 | [('③ 環境檢查與補裝', 'RED'), ('⑦ 啟動 VRN-2', 'GRAY')] |
+| 非綠步驟 | [('③ 環境檢查與補裝', 'RED'), ('⑥c U/I 操作協定', 'GRAY'), ('⑨ 上船 GitHub', 'GRAY'), ('⑩ 整併封存', 'GRAY'), ('⑫a VRN-1 倉同步(借工具前 · 只 fast-forward)', 'GRAY'), ('⑫ PIVOT 資料庫(借用 VRN-1)', 'GRAY')] |
 | 輪數 / 冪等 | [(1, 0, 'idempotence GREEN')] · GREEN |
 | ⑧ 完成判定 | 完成 · 紅 0 黃 3 · VRN-2 SystemManager v0243 |
 | ⑦ 個股四項 | 14 份 · 全綠 14 |
-| 四點原文核對 | None · 缺項 [{'book': '四點原文核對', 'reason': 'NOT_RUN · RuntimeError: 本輪輸出未齊，不驗舊冊'}] |
+| 四點原文核對 | {'PASS': 52, 'OCR_PENDING': 4} · 缺項 [{'book': '四點原文核對', 'reason': "REVIEW_OCR · {'PASS': 52, 'OCR_PENDING': 4}"}] |
 | ⑪ 獨立驗證 | 基本資料 {'PASS': 193, 'OCR': 2} · 四點 {'PASS': 65, 'OCR': 5} · 年度 4905 筆 {'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} |
 | Workbench | GREEN · 舊版 U/I 連結 True |
 
