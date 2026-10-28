@@ -1,0 +1,131 @@
+# VRN-2 本地實測一輪 v0100(一段 PowerShell 貼上:logo → 補船 → 跑 v0142(開 Workbench)→ 打包貼回材料)
+
+操作員令(2026-10-28):「回到電腦本地實測修正」→「generate a ps code to handle all above」。
+雲端工作階段碰不到桌機(Remote Control 只接 Mac / Linux),所以本地實測由這一段在桌機跑完,把要貼回的東西打包成一個 zip,上傳給 AI 接著修。
+
+做的事(每步有燈,任一步紅不擋下一步,最後總結):
+
+| 步 | 做什麼 | 開關 |
+|---|---|---|
+| ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `Downloads` / `Desktop` / `Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
+| ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0100.md` 的程式碼(核對 SHA-256)→ 執行:`check` → `ship --commit --push` → `check`(把桌機在位、倉上沒有的前版推上去;被拒只黃) | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
+| ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0103.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:v0142 套件 → ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
+| ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0142.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
+
+```powershell
+& {
+  # ===== VRN-2 本地實測一輪 v0100(2026-10-28 · 操作員「回到電腦本地實測修正」「generate a ps code to handle all above」)=====
+  $ErrorActionPreference = 'Continue'
+  try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch { }
+  $R   = if ($env:VRN2_ROOT) { $env:VRN2_ROOT } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics' }
+  $Br  = 'claude/optimistic-goodall-yhalc5'
+  $SRC = if ($env:VRN2_SOURCE) { $env:VRN2_SOURCE } else { 'C:\測試樣本報告' }
+  $H_OP = '46f47a48a67b3f466fe5ed0248a39705713da0c49ee9ce65fa2f6ce0473dc0cd'   # 操作員一鍵 v0103 程式碼 SHA-256(VRN1_VRN2_OneClick_v0103.md powershell 區塊)
+  $H_CS = '7a41c9713c3ead24e07a6a5a620dc343b708aa02fd31f8f4afa188373e7b39e3'   # VRN2_ChainShip_v0100.md §3 程式碼 SHA-256
+  $PDFS = @('3706', 'GFHK', '3264', '6933', '2891')                             # 要裝進貼回包的五份(檔名含這些字)
+  $t0 = Get-Date; $stamp = $t0.ToString('yyyyMMdd_HHmmss')
+  $Dl = Join-Path $env:USERPROFILE 'Downloads'; $out = Join-Path $Dl ('VRN2_PasteBack_' + $stamp); New-Item -ItemType Directory -Force -Path $out | Out-Null
+  $log = Join-Path $out 'transcript.txt'; try { Start-Transcript -LiteralPath $log -Force | Out-Null } catch { }
+  $res = [ordered]@{}; $col = @{ GREEN = 'Green'; YELLOW = 'Yellow'; RED = 'Red'; GRAY = 'DarkGray' }
+  function Say([string]$k, [string]$lamp, [string]$msg) { $res[$k] = @($lamp, $msg); Write-Host ("[{0}] {1} · {2}" -f $lamp, $k, $msg) -ForegroundColor $col[$lamp] }
+  function Sha([string]$s) { -join ([Security.Cryptography.SHA256]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes($s)) | ForEach-Object { $_.ToString('x2') }) }
+  function FetchCode([string]$rel, [string]$name, [string]$want) {   # 從 GitHub 分支(讀不到 → main)讀 md 的 powershell 區塊 · 核對 SHA-256 · 回程式碼或 $null
+    $top = "$(git -C $R rev-parse --show-toplevel 2>$null)".Trim(); if (-not $top) { Write-Host "  [RED] $R 不是 git 倉或找不到 git" -ForegroundColor Red; return $null }
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) ('vrn2_round_' + $stamp + '_' + [IO.Path]::GetFileNameWithoutExtension($name)); New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+    $z = Join-Path $tmp 'doc.zip'; $src = ''
+    foreach ($b in $Br, 'main') {
+      foreach ($w in 0, 2, 4, 8, 16) { if ($w) { Start-Sleep -Seconds $w }; git -C $top fetch -q origin $b 2>&1 | Out-Null; if ($LASTEXITCODE -eq 0) { break } }
+      git -C $top archive --format=zip -o $z ('origin/' + $b + ':' + $rel) $name 2>&1 | Out-Null
+      if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $z)) { $src = $b; break }
+    }
+    if (-not $src) { Write-Host "  [RED] 讀不到 GitHub 分支 $Br 或 main 的 $name(網路 / git)" -ForegroundColor Red; return $null }
+    Expand-Archive -LiteralPath $z -DestinationPath $tmp -Force
+    $md = [IO.File]::ReadAllText((Join-Path $tmp $name), [Text.Encoding]::UTF8) -replace "`r`n", "`n"
+    $code = [regex]::Match($md, '(?s)```powershell\n(.*?)\n```').Groups[1].Value
+    $sha = Sha $code
+    if ($sha -ne $want) { Write-Host ("  [RED] {0} 程式碼 SHA-256 不對({1} ≠ {2})· 不執行(GitHub 上的版本換了 → 重新取得本段)" -f $name, $sha.Substring(0, 12), $want.Substring(0, 12)) -ForegroundColor Red; return $null }
+    Write-Host ("  [計] {0} 程式碼 SHA-256 {1} 相符(GitHub {2})" -f $name, $sha.Substring(0, 12), $src) -ForegroundColor DarkGray
+    return $code
+  }
+  $dry = ($env:VRN_ROUND_DRY -eq '1')
+  Write-Host ("[VRN-2 本地實測一輪 v0100] VIA 根 {0} · 來源 {1} · 貼回包 {2}{3}" -f $R, $SRC, $out, $(if ($dry) { ' · 乾跑(不執行子段)' } else { '' })) -ForegroundColor Yellow
+  if (-not (Test-Path -LiteralPath $R)) { Say '⓪ VIA 根' RED "找不到 $R · 設 `$env:VRN2_ROOT 後再貼" } else { Say '⓪ VIA 根' GREEN $R }
+
+  # ① logo:找圖 → 放到 SSOT(渲染時自動去白底)
+  $k1 = '① logo'
+  $cands = @(); if ($env:VRN2_LOGO) { $cands += $env:VRN2_LOGO }
+  foreach ($d in (Join-Path $env:USERPROFILE 'Downloads'), (Join-Path $env:USERPROFILE 'Desktop'), (Join-Path $env:USERPROFILE 'OneDrive\Desktop'), (Join-Path $env:USERPROFILE 'Pictures')) { foreach ($e in 'png', 'jpg', 'jpeg', 'webp') { $cands += (Join-Path $d ('VRN2_Logo.' + $e)) } }
+  $logo = $cands | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) } | Select-Object -First 1
+  $ssot = Join-Path $R 'functional modules\VRN\SSOT'
+  $have = Get-ChildItem -LiteralPath $ssot -Filter 'VRN2_Logo.*' -ErrorAction SilentlyContinue | Select-Object -First 1
+  if ($logo) {
+    New-Item -ItemType Directory -Force -Path $ssot | Out-Null
+    $dst = Join-Path $ssot ('VRN2_Logo' + [IO.Path]::GetExtension($logo).ToLower())
+    if ($dry) { Say $k1 GREEN "乾跑:會把 $logo 複製到 $dst" }
+    else { Copy-Item -LiteralPath $logo -Destination $dst -Force; Say $k1 GREEN "$logo → $dst(Workbench 渲染時自動去白底 · 無框無特效)" }
+  } elseif ($have) { Say $k1 GREEN "SSOT 已有 $($have.Name) · 沿用" }
+  else { Say $k1 YELLOW "沒找到印章圖(`$env:VRN2_LOGO 或 Downloads / Desktop / Pictures 的 VRN2_Logo.png|jpg)· Workbench 先用範本「理」字 · 之後放了再跑一次即可" }
+
+  # ② 補船:VRN2_ChainShip check → ship --commit --push → check
+  $k2 = '② 補船 ChainShip'
+  if ($env:VRN_ROUND_NO_SHIP -eq '1') { Say $k2 GRAY '跳過(VRN_ROUND_NO_SHIP=1)' }
+  else {
+    $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai' 'VRN2_ChainShip_v0100.md' $H_CS
+    if (-not $code) { Say $k2 RED '取不到或雜湊不符 · 沒跑' }
+    elseif ($dry) { Say $k2 GREEN '乾跑:程式碼已核對,不執行' }
+    else {
+      $global:LASTEXITCODE = 1
+      try { & ([scriptblock]::Create($code)) } catch { Write-Host ('  [RED] 補船中斷:' + $_.Exception.Message) -ForegroundColor Red; $global:LASTEXITCODE = 1 }
+      $rc2 = [int]$global:LASTEXITCODE
+      $rcp = Join-Path $R 'VIA_Reports\vrn2\VRN2_ChainShip_latest.json'
+      Say $k2 $(if ($rc2 -eq 0) { 'GREEN' } elseif ($rc2 -eq 2) { 'YELLOW' } else { 'RED' }) ("rc {0} · 收據 {1}" -f $rc2, $(if (Test-Path -LiteralPath $rcp) { $rcp } else { '(沒寫出)' }))
+    }
+  }
+
+  # ③ 跑:操作員一鍵 v0103(→ VRN-2 一鍵 v0142 → 套件 → 全流程 → Workbench)
+  $k3 = '③ 跑 VRN-2 v0142'
+  $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai/vrn1_vrn2_oneclick_v0103' 'VRN1_VRN2_OneClick_v0103.md' $H_OP
+  if (-not $code) { Say $k3 RED '取不到或雜湊不符 · 沒跑' }
+  elseif ($dry) { Say $k3 GREEN '乾跑:程式碼已核對,不執行' }
+  else {
+    if (Test-Path -LiteralPath $SRC -PathType Container) { $env:VRN2_SOURCE = $SRC } else { Write-Host "  [YELLOW] 來源夾 $SRC 不在 · 一鍵用上次 U/I 選的輸入" -ForegroundColor Yellow }
+    $skip0 = $env:VRN_PAIR_SKIP; if ($env:VRN_ROUND_WITH_VRN1 -ne '1') { $env:VRN_PAIR_SKIP = 'VRN-1' }
+    $global:LASTEXITCODE = 1
+    try { & ([scriptblock]::Create($code)) } catch { Write-Host ('  [RED] 一鍵中斷:' + $_.Exception.Message) -ForegroundColor Red; $global:LASTEXITCODE = 1 }
+    $rc3 = [int]$global:LASTEXITCODE
+    if ($null -ne $skip0) { $env:VRN_PAIR_SKIP = $skip0 } else { Remove-Item Env:\VRN_PAIR_SKIP -ErrorAction SilentlyContinue }
+    Say $k3 $(if ($rc3 -eq 0) { 'GREEN' } elseif ($rc3 -eq 2) { 'YELLOW' } else { 'RED' }) ("結束碼 {0}(0 綠 · 2 黃:待核對 · 1 紅)" -f $rc3)
+  }
+
+  # ④ 打包貼回材料
+  $k4 = '④ 貼回包'
+  $v2 = Join-Path $R 'VIA_Reports\vrn2'; $n = 0; $miss = @()
+  foreach ($rel in 'VRN2_Closeout_v0142.json', 'IDEMPOTENCE_latest.json', 'VRN2_VerbatimVerify_latest.json', 'VRN2_Completion_latest.json', 'VRN2_Activate_latest.json', 'VRN2_Input_latest.json', 'VRN2_ChainShip_latest.json', 'VRN2_Workbench_latest.html', 'output\VRN2_Summary_latest.csv', 'output\VRN2_BasicInfo_latest.csv', 'output\VRN2_Rejected_latest.csv', 'output\VRN2_FinancialData_latest.csv') {
+    $p = Join-Path $v2 $rel; if (Test-Path -LiteralPath $p) { Copy-Item -LiteralPath $p -Destination (Join-Path $out ($rel -replace '\\', '_')) -Force; $n++ } else { $miss += $rel }
+  }
+  $dg = Get-ChildItem -LiteralPath (Join-Path $v2 'verify_independent') -Filter '*.digest.txt' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
+  if ($dg) { Copy-Item -LiteralPath $dg.FullName -Destination $out -Force; $n++ } else { $miss += 'verify_independent\*.digest.txt' }
+  $npdf = 0
+  if ($env:VRN_ROUND_NO_PDF -ne '1' -and (Test-Path -LiteralPath $SRC -PathType Container)) {
+    $pd = Join-Path $out 'pdf'; New-Item -ItemType Directory -Force -Path $pd | Out-Null
+    foreach ($key in $PDFS) { Get-ChildItem -LiteralPath $SRC -Filter '*.pdf' -ErrorAction SilentlyContinue | Where-Object { $_.Name -like ('*' + $key + '*') } | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $pd -Force; $npdf++ } }
+  }
+  try { Stop-Transcript | Out-Null } catch { }
+  if (Test-Path -LiteralPath $log) { $lines = Get-Content -LiteralPath $log -Encoding UTF8; ($lines | Select-Object -Last 300) | Set-Content -LiteralPath (Join-Path $out 'NEXT_last300.txt') -Encoding UTF8 }
+  $zip = $out + '.zip'; try { Compress-Archive -LiteralPath (Get-ChildItem -LiteralPath $out | ForEach-Object { $_.FullName }) -DestinationPath $zip -Force } catch { Write-Host ('  [YELLOW] 壓縮失敗:' + $_.Exception.Message) -ForegroundColor Yellow }
+  Say $k4 $(if ($miss.Count -eq 0) { 'GREEN' } else { 'YELLOW' }) ("收據 / 輸出冊 {0} 份 · PDF {1} 份 · 缺 {2}{3}" -f $n, $npdf, $miss.Count, $(if ($miss.Count) { '(' + ($miss -join ' · ') + ')' } else { '' }))
+
+  # 總結
+  Write-Host ''; Write-Host ('===== 本地實測一輪 · {0:N0} 秒 ====='.Replace('{0:N0}', [string][int]((Get-Date) - $t0).TotalSeconds)) -ForegroundColor Yellow
+  foreach ($k in $res.Keys) { Write-Host ("  [{0}] {1} · {2}" -f $res[$k][0], $k, $res[$k][1]) -ForegroundColor $col[$res[$k][0]] }
+  $lamps = @($res.Values | ForEach-Object { $_[0] })
+  $final = if ($lamps -contains 'RED') { 'RED' } elseif ($lamps -contains 'YELLOW') { 'YELLOW' } else { 'GREEN' }
+  Write-Host ("[結果] {0} · 要貼回 / 上傳的只有這一個:{1}" -f $final, $(if (Test-Path -LiteralPath $zip) { $zip } else { $out })) -ForegroundColor $col[$final]
+  Write-Host 'NEXT: 把上面那個 zip 上傳給 AI(裡面有貼包 · 收據 · 輸出冊 · Workbench 頁 · 五份 PDF)· Workbench 若沒自動開:VIA_Reports\vrn2\VRN2_Workbench_latest.html' -ForegroundColor Yellow
+  try { Start-Process -FilePath 'explorer.exe' -ArgumentList ('/select,"' + $zip + '"') -ErrorAction SilentlyContinue } catch { }
+  $global:LASTEXITCODE = @{ GREEN = 0; YELLOW = 2; RED = 1 }[$final]
+}
+```
+
+開關一覽:`$env:VRN2_ROOT`(VIA 根)· `$env:VRN2_SOURCE`(來源夾)· `$env:VRN2_LOGO`(印章圖路徑)· `$env:VRN_ROUND_NO_SHIP='1'` 不補船 · `$env:VRN_ROUND_WITH_VRN1='1'` 連 VRN-1 一起跑 · `$env:VRN_ROUND_NO_PDF='1'` 不裝 PDF · `$env:VRN_ROUND_DRY='1'` 乾跑(只取碼、核對雜湊,不執行)。
+程式碼只讀 GitHub 上已核對 SHA-256 的兩段(操作員一鍵 v0103 · ChainShip 一鍵),GitHub 上那兩段若換版,本段會紅並停,不會跑到未核對的碼。
