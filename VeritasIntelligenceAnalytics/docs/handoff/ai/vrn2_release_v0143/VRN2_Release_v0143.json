@@ -87,7 +87,112 @@
  },
  "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · 19 real sample files (shipF)",
  "results": {
-  "status": "see VRN2_Verification_v0143.md"
+  "selftests": {
+   "VRN2_ChainShip_v0101": "[計] VRN2_ChainShip v0101 --selftest · OK 27 · FAIL 0",
+   "ActivateVRN-2_v0143": "[PASS] v0143: v0142 checks + single-instance lock (live / stale / forced / foreign), child limits (env · floor · mapping), ⑫b in-process fallback (missing page · patched · already present · handler er",
+   "pwsh_hash_chain": [
+    "Run-VRN2-v0143.ps1 parse errors: 0",
+    "boot143.ps1 parse errors: 0",
+    "Run-VRN1-VRN2-v0104.ps1 parse errors: 0",
+    "boot_pair104.ps1 parse errors: 0",
+    "cs101.ps1 parse errors: 0",
+    "round.ps1 parse errors: 0",
+    "vrn2 one-click v0143: code sha = boot H → True (4652f05bc4f7)",
+    "one-liner decodes to boot → True",
+    "package zip sha = \\1fd30c4ee23ea06edd2f9dba931d5a1f5953246c2426b274b050968ebd7b205c → True",
+    "operator v0104: code sha = boot H → True (c0c7511e009f)",
+    "operator H2 = vrn2 one-click v0143 code sha → True",
+    "operator banner says v0104 → True",
+    "localround H_OP = operator v0104 code sha → True",
+    "localround H_CS = chainship md v0101 code sha → True",
+    "chainship md WANT = tool v0101 sha → True"
+   ]
+  },
+  "chainship_recover_container": "[計] VRN2_ChainShip v0101 · recover · YELLOW · 缺 5 · 複製 0 · 多份不同 0 · 找不到 5 · 內容不過 0",
+  "full_run_v0143_19_real": {
+   "closeout_rc": 1,
+   "rc_reason": "③ 環境檢查 RED in the Linux sandbox only (accelerator deps not in venv; --no-install); same as v0142",
+   "non_green_steps": [
+    [
+     "③ 環境檢查與補裝",
+     "RED"
+    ],
+    [
+     "⑦ 啟動 VRN-2",
+     "GRAY"
+    ]
+   ],
+   "guard": "接手過期鎖(PID 1569 已不在)",
+   "guard_line": "[計] 單機閘 · 新鎖 · 鎖 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v143/t143/VIA/VIA_Reports/vrn2/VRN2_Launcher.lock · 子行程上限 ⑫b 600 秒 · ⑦ 無輸出 3600 秒 · 工具冊 900 秒 · ⑪ 等驗證 3600 秒",
+   "limits": {
+    "VRN2_UI_REFRESH_WAIT": 600,
+    "VRN2_SILENT_MAX": 3600,
+    "VRN2_MANIFEST_WAIT": 900,
+    "VIA_VRN2_VERIFY_WAIT": 3600
+   },
+   "ui_block": {
+    "lamp": "GREEN",
+    "how": "in-process",
+    "detail": "v0143 本支補放(處理器子行程 沒跑)· U/I 輸入區塊 換掉同一塊(三類 · 只開個股報告/訊息)"
+   },
+   "lock_removed_after_run": true,
+   "passes": [
+    [
+     1,
+     0,
+     "idempotence GREEN"
+    ]
+   ],
+   "completion": {
+    "verdict": "完成",
+    "red": 0,
+    "yellow": 3,
+    "manager": "VRN-2 SystemManager v0243"
+   },
+   "stock_reports": {
+    "n": 14,
+    "all_green": 14
+   },
+   "idempotence": "GREEN",
+   "source_quotes": null,
+   "output_gaps": [
+    {
+     "book": "四點原文核對",
+     "reason": "NOT_RUN · RuntimeError: 本輪輸出未齊，不驗舊冊"
+    }
+   ],
+   "independent_verifier": {
+    "basic": "{'PASS': 193, 'OCR': 2}",
+    "summary": "{'PASS': 65, 'OCR': 5}",
+    "financial_rows": 4905,
+    "financial_verdicts": "{'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}"
+   },
+   "step12b": "[計] ⑫b U/I 輸入區塊(window I/O) · [鎖驗證] accelerator=EXACT · network=EXACT · 耗時 1 秒",
+   "workbench": {
+    "lamp": "GREEN",
+    "legacy_linked": true
+   }
+  },
+  "guard_scenario": {
+   "live_pid_lock": "second launcher printed [RED] 單機閘 · 另一個 VRN-2 啟動器還在跑(PID …)and exited rc 1 before ① (nothing ran)",
+   "stale_pid_lock": "taken over: [計] 單機閘 · 接手過期鎖(PID … 已不在)",
+   "lock_file_after_exit": "removed"
+  },
+  "oneclick_scenario_pwsh": {
+   "rc": "first rc 1 · again rc 1 · tamper rc 1 · done",
+   "first": "<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"information\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.InformationRecord</T><T>System.Object</T></",
+   "again": "<Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"><Obj S=\"information\" RefId=\"0\"><TN RefId=\"0\"><T>System.Management.Automation.InformationRecord</T><T>System.Object</T></",
+   "tamper": "ng>[GREEN] ③ 套件 v0143 就位(SHA-256 1fd30c4ee23e · 套件內 10 檔逐檔核對相符 · 來源 本機已驗證的 zip)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v143/t143oc/Downloads/VRN2_Closeout_v0143</ToS",
+   "workbench_line": "32><U32 N=\"ManagedThreadId\">12</U32></Props></Obj><Obj S=\"information\" RefId=\"39\"><TNRef RefId=\"0\" /><ToString>[GREEN] Parquet 4 / 4</ToString><Props><Obj N=\"Me",
+   "closeout_line": "32><U32 N=\"ManagedThreadId\">12</U32></Props></Obj><Obj S=\"information\" RefId=\"39\"><TNRef RefId=\"0\" /><ToString>[GREEN] Parquet 4 / 4</ToString><Props><Obj N=\"MessageData\" RefId=\"40\"><TNRef RefId=\"1\" /"
+  },
+  "not_claimed": [
+   "Windows desktop run of v0143: not yet (the operator's next paste-back); the 2026-10-29 paste-back was v0142",
+   "Why the second launcher started at 01:35 on the desktop: needs transcript.txt from VRN2_PasteBack_20261029_013350.zip; v0143 only prevents the overlap",
+   "Where v0248 / v0253 live on the desktop: only ChainShip v0101 recover on the desktop can tell ([FIND] / [FIND?] / [FIND-])",
+   "Verifier v0110 wall time on 52 desktop files under normal RAM: no clean measurement yet (both desktop runs were starved)",
+   "四點原文核對 FAIL 1 · ⑧ 黃 4 · 缺項 3 份年度數據 on the desktop: untouched this round (needs the paste-back zip)"
+  ]
  },
  "package": {
   "name": "VRN2_Closeout_v0143.zip",
