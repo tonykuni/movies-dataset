@@ -1,0 +1,311 @@
+{
+  "id": "VRN2_POLICY_v0104",
+  "baseline": "保留已成功 Extractor/OCR/Layout/四點原文流程，外接工作台、稽核及增量層",
+  "exchange": "JSON UTF-8 ensure_ascii=false, allow_nan=false",
+  "canonical_database": "Parquet only; ZSTD; atomically switched versioned catalog; DuckDB reads/merges/spills to TEMP",
+  "exports": {
+    "all_pages": [
+      "PDF",
+      "Markdown",
+      "JSON"
+    ],
+    "CSV": "explicit UTF-8 BOM view copy, formula-safe text",
+    "Google Sheets": "CSV import available; direct cloud write blocked until locked transport adapter is verified"
+  },
+  "input": {
+    "native_dialog": true,
+    "drag_drop": "File API chunks → native WebView2 JS API; no HTTP listener",
+    "duplicates": "format+size first; filename second; report identity third; SHA256 exact verification",
+    "delete": "managed import copies -> recoverable recycle; originals untouched",
+    "source_directory": "C:\\測試樣本報告",
+    "scope": "All supported report files recursively; no ticker/broker/file-count/size filter",
+    "extensions": [
+      "PDF",
+      "DOC",
+      "DOCX",
+      "TXT",
+      "PNG",
+      "JPEG",
+      "TIFF",
+      "BMP",
+      "WEBP",
+      "GIF"
+    ]
+  },
+  "incremental": {
+    "identity": "Original source SHA256; normalized PDF hash separately recorded",
+    "invalidate": [
+      "content change",
+      "raw extractor/OCR parameters change",
+      "missing extracted fields"
+    ],
+    "external_missing": "WAITING_EVIDENCE; no repeated PDF extraction",
+    "partial_grain": "missing report file only; existing extractor caches retained; per-field targeted read not claimed",
+    "policy_change": "AUDIT_ONLY; UI/policy/finance contract changes do not repeat raw extraction",
+    "successful_summary": "preserve existing four points on OCR repairs; re-audit before marking verified"
+  },
+  "validation": [
+    "official historical actual over forecast with original retained",
+    "one historical overlap",
+    "explicit units/currency/scope/annual periods",
+    "addition/subtraction",
+    "division with zero guard",
+    "multiplication with independent diluted numerator basis",
+    "adjusted price/target and report anchor dates",
+    "ROE average equity; PER diluted EPS",
+    "DPS confirmed payment windows",
+    "source quotations; missing provenance remains unverified"
+  ],
+  "coverage": {
+    "AST_instrumentation": "all defs in external VDF source, runtime trace, hash verified before in-memory decoration",
+    "real_Celeritas": "UNVERIFIED until verified real API and per-verb runtime evidence",
+    "locked_network": "mandatory for every external data fetch; no standalone fallback"
+  },
+  "limits": [
+    "PC prior chain and v1652 not available in sandbox",
+    "Parquet has no spreadsheet row cap but resource limits remain",
+    "company deadlines and dividends need official evidence; never auto-fill verified=true",
+    "Gate commands require explicit local registration",
+    "converted inputs require visual review; conversion alone cannot certify finance or quotations",
+    "Windows WebView2/PS7 and full private manager chain require PC acceptance",
+    "DOCX uses installed renderer when available; otherwise text/table/embedded-image projection stays unverified. Binary DOC needs installed Word/LibreOffice.",
+    "All-page ContentData supplements the original selected-page financial extractor; raw OCR does not certify arithmetic or a four-point quotation."
+  ],
+  "acceptance": "No complete/active label when financial or transport proof is missing",
+  "headers": [
+    {
+      "key": "REPORT_DATE",
+      "en": "Report Date",
+      "zh": "報告日期"
+    },
+    {
+      "key": "FILENAME",
+      "en": "File Name",
+      "zh": "檔案名稱"
+    },
+    {
+      "key": "TICKER",
+      "en": "Ticker Symbol",
+      "zh": "股票代號"
+    },
+    {
+      "key": "YFINANCE_TICKER",
+      "en": "Yahoo Finance Ticker",
+      "zh": "Yahoo 財經代號"
+    },
+    {
+      "key": "BLOOMBERG_TICKER",
+      "en": "Bloomberg Ticker",
+      "zh": "彭博代號"
+    },
+    {
+      "key": "NAME",
+      "en": "Company Name",
+      "zh": "公司名稱"
+    },
+    {
+      "key": "BROKER",
+      "en": "Broker",
+      "zh": "券商"
+    },
+    {
+      "key": "ANALYST",
+      "en": "Analyst",
+      "zh": "分析師"
+    },
+    {
+      "key": "RATING",
+      "en": "Rating",
+      "zh": "評等"
+    },
+    {
+      "key": "TARGET_PRICE",
+      "en": "Target Price",
+      "zh": "目標價（原始證據）"
+    },
+    {
+      "key": "TARGET_PRICE(ADJ)",
+      "en": "Adjusted Target Price",
+      "zh": "調整後目標價"
+    },
+    {
+      "key": "CURRENT_PRICE_REPORT",
+      "en": "Current Price at Report",
+      "zh": "報告發布時股價（調整後）"
+    },
+    {
+      "key": "UPSIDE_ADJ",
+      "en": "Adjusted Upside Percentage",
+      "zh": "調整後潛在上漲空間"
+    },
+    {
+      "key": "ADJ_CLOSE",
+      "en": "Adjusted Close",
+      "zh": "調整後收盤價"
+    },
+    {
+      "key": "ADJ_CLOSE_BEFORE_REPORT",
+      "en": "Adjusted Close Before Report",
+      "zh": "報告前調整後收盤價"
+    },
+    {
+      "key": "TOPIC_SUMMARY",
+      "en": "Topic and Summary",
+      "zh": "主題與摘要"
+    },
+    {
+      "key": "DILUTED_EPS_Y0",
+      "en": "Diluted EPS Year N",
+      "zh": "N+0年 稀釋每股盈餘"
+    },
+    {
+      "key": "DILUTED_EPS_Y1",
+      "en": "Diluted EPS Year N+1",
+      "zh": "N+1年 稀釋每股盈餘"
+    },
+    {
+      "key": "DILUTED_EPS_Y2",
+      "en": "Diluted EPS Year N+2",
+      "zh": "N+2年 稀釋每股盈餘"
+    },
+    {
+      "key": "DPS_Y0",
+      "en": "DPS Year N",
+      "zh": "N+0年 未來一年現金股息"
+    },
+    {
+      "key": "DPS_Y1",
+      "en": "DPS Year N+1",
+      "zh": "N+1年 未來一年現金股息"
+    },
+    {
+      "key": "DPS_Y2",
+      "en": "DPS Year N+2",
+      "zh": "N+2年 未來一年現金股息"
+    },
+    {
+      "key": "BVPS_Y0",
+      "en": "BVPS Year N",
+      "zh": "N+0年 每股淨值"
+    },
+    {
+      "key": "BVPS_Y1",
+      "en": "BVPS Year N+1",
+      "zh": "N+1年 每股淨值"
+    },
+    {
+      "key": "BVPS_Y2",
+      "en": "BVPS Year N+2",
+      "zh": "N+2年 每股淨值"
+    },
+    {
+      "key": "ROE_Y0",
+      "en": "ROE Year N",
+      "zh": "N+0年 平均權益報酬率"
+    },
+    {
+      "key": "ROE_Y1",
+      "en": "ROE Year N+1",
+      "zh": "N+1年 平均權益報酬率"
+    },
+    {
+      "key": "ROE_Y2",
+      "en": "ROE Year N+2",
+      "zh": "N+2年 平均權益報酬率"
+    },
+    {
+      "key": "PER_Y0",
+      "en": "PER Year N",
+      "zh": "N+0年 本益比"
+    },
+    {
+      "key": "PER_Y1",
+      "en": "PER Year N+1",
+      "zh": "N+1年 本益比"
+    },
+    {
+      "key": "PER_Y2",
+      "en": "PER Year N+2",
+      "zh": "N+2年 本益比"
+    },
+    {
+      "key": "PBR_Y0",
+      "en": "PBR Year N",
+      "zh": "N+0年 股價淨值比"
+    },
+    {
+      "key": "PBR_Y1",
+      "en": "PBR Year N+1",
+      "zh": "N+1年 股價淨值比"
+    },
+    {
+      "key": "PBR_Y2",
+      "en": "PBR Year N+2",
+      "zh": "N+2年 股價淨值比"
+    },
+    {
+      "key": "CASH_YIELD_Y0",
+      "en": "Cash Yield Year N",
+      "zh": "N+0年 現金殖利率"
+    },
+    {
+      "key": "CASH_YIELD_Y1",
+      "en": "Cash Yield Year N+1",
+      "zh": "N+1年 現金殖利率"
+    },
+    {
+      "key": "CASH_YIELD_Y2",
+      "en": "Cash Yield Year N+2",
+      "zh": "N+2年 現金殖利率"
+    },
+    {
+      "key": "RECENT_REPORT_PRE_EARNINGS_FLAG",
+      "en": "Recent Report and Pre Earnings Flag",
+      "zh": "近期雙月內報告暨財報發布前標註"
+    },
+    {
+      "key": "STATUS",
+      "en": "Status",
+      "zh": "狀態"
+    }
+  ],
+  "math_tolerances": {
+    "overlap_relative": 0.03,
+    "arithmetic_relative": 1e-06,
+    "arithmetic_absolute_twd": 1.0,
+    "ratio_absolute": 1e-06,
+    "rounding_disagreement": "flag unverified; do not guess precision"
+  },
+  "ui_transport": "WebView2 html=source with native JS API, http_server=False; no localhost listener",
+  "dedup_priority": [
+    "format+size",
+    "filename",
+    "verified ticker+broker+report_date+title",
+    "SHA256 exact identity"
+  ],
+  "company_master": {
+    "endpoints": {
+      "TWSE": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+      "TPEX": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+    },
+    "TWSE_en_short_key": "英文簡稱",
+    "TPEX_en_short_key": "Symbol",
+    "en_full": "not present in observed responses; remain null",
+    "cache_days": 7,
+    "network": "locked bridge only"
+  },
+  "reconcile": {
+    "mode": "READ_ONLY_ZERO_DATABASE_WRITES",
+    "coverage": "FIRSTPAGE is not full content acceptance",
+    "probe": "All PDF pages lightweight text probe; no rasterization/no OCR during scan",
+    "table_rows": "Unknown unless extracted evidence exists; never invent zero",
+    "visual_lock": "user-selected original HTML hash, read-only sandboxed iframe; no claim exact CSS clone without source",
+    "production_repair": "Separate explicit action writes ContentData Parquet; read-only probe and visual reference never write the lake"
+  },
+  "canonical_datasets": [
+    "BasicInfo",
+    "FinancialData",
+    "Summary",
+    "ContentData"
+  ]
+}

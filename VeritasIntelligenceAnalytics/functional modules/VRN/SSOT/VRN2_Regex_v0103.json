@@ -1,0 +1,165 @@
+{
+ "book": "VRN2_Regex",
+ "owner": "VRN-2",
+ "rule": "向其他子系統取用(VRN TW_TICKER_REGEX v2 等)· 不衝突則只增不減 · 本冊為 VRN-2 現役",
+ "TW_TICKER": "(?<!\\d)([1-9]\\d{3})(?!\\d)",
+ "TW_YFINANCE": "(?<!\\d)([1-9]\\d{3})\\.(TW|TWO)\\b",
+ "TW_BLOOMBERG": "(?<!\\d)([1-9]\\d{3})\\s+TT\\b",
+ "YEAR": "^(?:FY|CY|年度)?[\\s\\-]?(?:(19|20)?(\\d{2}))\\s*(?:年度?)?\\s*[\\(（]?(?:[AEFPaefp]|實際|預估|Act|Est|F)?[\\)）]?$|^(?:1[0-2])/(\\d{2})[AEFPaefp]?$|^(1[01]\\d)\\s*年[AEFP]?$",
+ "MONTH": "^(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\\s\\-/']?(\\d{2,4}))$|^(\\d{4})[\\-/\\.](\\d{1,2})$|^(\\d{2,4})\\s*年\\s*(\\d{1,2})\\s*月$",
+ "QUARTER": "^([1-4])Q[\\s\\-]?(\\d{2,4})\\s*[\\(（]?[AEFPaefp]?[\\)）]?$|^(\\d{2,4})Q([1-4])\\s*[\\(（]?[AEFPaefp]?[\\)）]?$|^Q([1-4])[\\s\\-']?(\\d{2,4})$|^(\\d{2,4})\\s*年?\\s*第?([1-4])\\s*季$",
+ "DATE": "^(\\d{4})[\\-/\\.](\\d{1,2})[\\-/\\.](\\d{1,2})$|^(\\d{4})(\\d{2})(\\d{2})$|^(\\d{1,2})\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+(\\d{4})$|^(1[01]\\d)[\\-/\\.](\\d{1,2})[\\-/\\.](\\d{1,2})$|^(\\d{2,4})\\s*年\\s*(\\d{1,2})\\s*月\\s*(\\d{1,2})\\s*日$",
+ "NUMBER": "^[\\(（]?[\\-−+]?[\\d,]+(?:\\.\\d+)?[\\)）]?\\s*(%|x|倍|bps|ppts?)?$",
+ "version": "v0103",
+ "prior": "VRN2_Regex_v0102.json",
+ "provenance": {
+  "v0100": "VRN-2 本線",
+  "v0101_added": "VRN_MasterDict_v0100(VDF / VCGC 共用 · 4 版 VIA_MASTER_SSOT_DICTIONARY 聯集)· 不衝突只增不減",
+  "v0102_added": "VDF_TW_DataFetch v036 身分 / 還原規則對照(無衝突 · 只增)",
+  "v0103_added": "操作員 2026-10-27 三種代碼 × 證券 / ETF 類型表(9 類 · 只增不減 · 個股規則不動)"
+ },
+ "TW_TICKER_BASE": "^([1-9]\\d{3})$",
+ "TW_TICKER_BASE_desc": "4碼數字,且第1碼不可以為零。",
+ "TW_TICKER_THREE_FORMS": {
+  "TWSE_TPEX": {
+   "form": "XXXX",
+   "regex": "^([1-9]\\d{3})$",
+   "note": "證交所 / 櫃買中心代號 · 4 碼 · 首碼非 0(ETF 00XXX 5 碼 · 權證 6 碼 · 暫不在個股報告範圍)"
+  },
+  "YFINANCE": {
+   "form": "XXXX.TW | XXXX.TWO",
+   "regex": "^([1-9]\\d{3})\\.(TW|TWO)$",
+   "note": ".TW = 上市(TWSE)· .TWO = 上櫃(TPEX)· 市場別需查上市櫃清單(VDF)或報告首頁印出"
+  },
+  "BLOOMBERG": {
+   "form": "XXXX TT",
+   "regex": "^([1-9]\\d{3})\\s+TT$",
+   "note": "上市上櫃皆 TT · 可由基礎代號直接推算"
+  }
+ },
+ "FIRST4_PRINCIPLE": {
+  "rule": "需與第一頁 TWSE (4碼)、Yahoo Finance (4碼+.TW/.TWO) 或 Bloomberg (4碼+ TT) 三平台規格對照完全一致。若檔名萃取出的前4個數字與首頁的定義相符,即確認代碼擷取成功。",
+  "check": "檔名萃取的前 4 碼數字 == 首頁代號(TWSE 4 碼 / yfinance 4 碼 / Bloomberg 4 碼)→ 代碼擷取成功;三種形式共用同一 4 碼基礎,只差市場後綴 · 相互填滿:有任一種即可推出 BLOOMBERG;YFINANCE 需市場別"
+ },
+ "DATE_AND_TIME_PATTERNS": {
+  "Date_Extraction": {
+   "Regex": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:11\\d{5})|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\s+\\d{1,2},?\\s+\\d{4})",
+   "Validation_Rule": "從檔案名稱擷取之日期,必須與首頁左右資訊區所截取之報告日期完全對照相同。",
+   "Patterns": [
+    "8碼數字 (例如: 20250122)",
+    "7碼數字 (包含民國年, 例如: 1140122)",
+    "6碼數字 (省略二零, 例如: 250122)",
+    "YYYY-MM-DD",
+    "YYYY/MM/DD",
+    "英文日期格式 (包含英文月份全寫如 January 或簡寫如 Jan)",
+    "YYYY年 (例如: 2025)",
+    "YYYY/MM (例如: 2025/01)"
+   ],
+   "legacy_regex": {
+    "Regex": "(?:(?:20)?\\d{2}[-/]?\\d{2}[-/]?\\d{2})|(?:(?:20)?\\d{2}[-/]\\d{2})|(?:(?:20)?\\d{2})",
+    "from": "A",
+    "note": "最後一段 (?:(?:20)?\\d{2}) 單獨兩位數也會中(過寬)→ 留檔不採用"
+   }
+  },
+  "Year_Quarter_Extraction": {
+   "Regex": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])|(?:(?:20)?\\d{2}(?:年)?)",
+   "Validation_Rule": "支援各類券商財報/財測季度預估寫法,需與報告內文及表格欄位對齊。",
+   "Patterns": [
+    "YYYY年 (例如: 2025, 2026)",
+    "YY年 (例如: 25, 26)",
+    "YYYY.Q# (例如: 2025.Q1, 2025.Q2)",
+    "YYYYQ# (例如: 2025Q1, 2025Q3)",
+    "YYQ# (例如: 25Q1, 26Q4)"
+   ],
+   "legacy_regex": {
+    "Regex": "(?:(?:20)?\\d{2}(?:\\.|\\s*)?Q[1-4])",
+    "from": "A",
+    "note": "只認季度"
+   },
+   "caution": "第二段 (?:(?:20)?\\d{2}(?:年)?) 單獨兩位數也會中 → 只在表頭期間欄用,不做全文搜尋"
+  }
+ },
+ "short_alias_rule": "1~2 字母代碼(N · B · H · S · OP · OW · UP · UW · MP · EW · SB · SS · NR · UR · CD · MS · GS · JP · CS · ML · MQ)只在結構化欄位(評等欄 / 檔名券商槽)比對,不做全文搜尋;全文要字邊界",
+ "updated": "2026-10-27T11:56:06",
+ "VDF_PARITY": {
+  "STOCK_REGEX": "^[1-9]\\d{3}$",
+  "identity": "def_identity:TWSE→.TW · TPEX→.TWO · 'XXXX TT' · 市場不明不猜尾綴",
+  "universe": "官方上市櫃名冊選普通股 · 排除 ETF / 權證 / 興櫃",
+  "adj_rule": "adjustment_factor = yf_adj_close / yf_close · 缺 Adj Close 不拿 Close 冒充 · 核對超差 MISMATCH 留空",
+  "source": "VDF_TW_DataFetchEngine_v036(VRN 端 VRN2_MarketFetch v0100 包住)"
+ },
+ "TW_TICKER_TYPES": {
+  "STOCK": {
+   "zh": "一般個股 (Stock)",
+   "TW_TICKER": "^([1-9]\\d{3})$",
+   "TW_YF_TICKER": "^([1-9]\\d{3})\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^([1-9]\\d{3})\\sTT$",
+   "suffix": "無尾碼 · 4 位純數字"
+  },
+  "ETF_EQUITY_PASSIVE": {
+   "zh": "被動股票 ETF",
+   "TW_TICKER": "^(00\\d{2,3})$",
+   "TW_YF_TICKER": "^(00\\d{2,3})\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3})\\sTT$",
+   "suffix": "無尾碼(如 0050、0056)",
+   "note": "原表 00\\d{3} 只對 5 碼(00878);0050 / 0056 是 4 碼 → 冊內用 00\\d{2,3}(涵蓋 4 / 5 碼)· 其餘尾碼類同樣放寬"
+  },
+  "ETF_EQUITY_ACTIVE": {
+   "zh": "主動股票 ETF",
+   "TW_TICKER": "^(00\\d{2,3}A)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}A)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}A)\\sTT$",
+   "suffix": "尾碼 A"
+  },
+  "ETF_BOND_PASSIVE": {
+   "zh": "被動債券 ETF",
+   "TW_TICKER": "^(00\\d{2,3}B)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}B)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}B)\\sTT$",
+   "suffix": "尾碼 B"
+  },
+  "ETF_BOND_ACTIVE": {
+   "zh": "主動債券 ETF",
+   "TW_TICKER": "^(00\\d{2,3}D)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}D)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}D)\\sTT$",
+   "suffix": "尾碼 D"
+  },
+  "ETF_LEVERAGED": {
+   "zh": "槓桿型 ETF",
+   "TW_TICKER": "^(00\\d{2,3}L)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}L)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}L)\\sTT$",
+   "suffix": "尾碼 L"
+  },
+  "ETF_INVERSE": {
+   "zh": "反向型 ETF",
+   "TW_TICKER": "^(00\\d{2,3}R)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}R)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}R)\\sTT$",
+   "suffix": "尾碼 R"
+  },
+  "ETF_FUTURES": {
+   "zh": "期貨型 ETF",
+   "TW_TICKER": "^(00\\d{2,3}[UV])$",
+   "TW_YF_TICKER": "^(00\\d{2,3}[UV])\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}[UV])\\sTT$",
+   "suffix": "尾碼 U(台幣)/ V(外幣)"
+  },
+  "ETF_BALANCED": {
+   "zh": "平衡型 ETF",
+   "TW_TICKER": "^(00\\d{2,3}T)$",
+   "TW_YF_TICKER": "^(00\\d{2,3}T)\\.(TW|TWO)$",
+   "TW_BB_TICKER": "^(00\\d{2,3}T)\\sTT$",
+   "suffix": "尾碼 T"
+  }
+ },
+ "TW_TICKER_ANY": {
+  "TW_TICKER": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))$",
+  "TW_YF_TICKER": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))\\.(TW|TWO)$",
+  "TW_BB_TICKER": "^((?:[1-9]\\d{3})|(?:00\\d{2,3}[ABDLRTUV]?))\\sTT$",
+  "note": "個股 4 碼 + ETF 00XXX(+尾碼)· 三種形式共用同一本地代碼 · 市場後綴仍由官方名冊決定"
+ },
+ "TW_TICKER_TYPES_rule": "VRN-2 個股報告範圍只擷取 STOCK · ETF 九類只分類不擷取(VDF 引擎名冊亦排除 ETF)· 前四碼原則對 ETF 改為前五碼(00XXX)",
+ "TW_TICKER_TYPES_as_given": "操作員原表:ETF 各類均為 00\\d{3}(+尾碼);冊內實作為 00\\d{2,3} 以涵蓋 0050 / 0056 · 原表保留於此條供對照"
+}

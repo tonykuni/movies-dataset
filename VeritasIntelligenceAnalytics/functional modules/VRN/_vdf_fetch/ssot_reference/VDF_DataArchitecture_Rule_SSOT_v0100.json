@@ -1,0 +1,79 @@
+{
+ "schema": "VIA.VDF.DataArchitecture.SSOT.v1",
+ "version": "v0100",
+ "batch": "側線 2026-10-03 f",
+ "ts": "2026-10-03T05:35:00",
+ "law": "L103 / L106 / L107 / L108 / L110",
+ "purpose": "VDF 所有 DataFrame 來源引擎對齊同一套資料庫架構(操作員 2026-10-03:全部 parquet 由 duckdb 管理 · 最少 API / token · 最新鎖冊加速器 · 擷取前看現況 · 增量不重複 · 批次 · 定時存檔 · TEMP 取代記憶體)",
+ "rules": [
+  {
+   "id": "R-DB-01",
+   "zh": "唯一格式",
+   "parquet": "分區 ticker=/year=(hive);zstd",
+   "duckdb": "每子題一庫(VDF_TWEquity_Daily · ActiveTWETF · VDF_TWIndex_Daily · VDF_Universe);duckdb 只管理 parquet(read_parquet / VIEW),不另存第二份",
+   "header": "VDF_InputUniverse_SSOT OUT-xx.Cnn;CGC_MDL249 鎖",
+   "engine": "VDF_ENG079_LocalDbConsolidate · CGC_MDL249_DataFrameLock"
+  },
+  {
+   "id": "R-DB-02",
+   "zh": "擷取前看現況",
+   "coverage": "(ticker × 交易日) 已有 / 缺口 / 過期 三態圖;只對缺口與過期出請求",
+   "engine": "VDF_ENG089_IncrementalFetchGate · VDF_ENG090_DataCoverageGate"
+  },
+  {
+   "id": "R-DB-03",
+   "zh": "增量不重複",
+   "key": "主鍵(date, ticker)anti-join 後才寫;upsert 不覆寫原始欄;重複 = RED 不靜默去重",
+   "engine": "VDF_ENG054_TWDailyBackfill · VDF_ENG064_HistoryBackfill"
+  },
+  {
+   "id": "R-DB-04",
+   "zh": "批次抓取 · token 預算",
+   "yfinance": "batch download 多檔一請求(batch_size 50 · 間隔 ≥ 1s)",
+   "twse_tpex": "按日端點整頁(一日一請求)",
+   "budget": "每輪請求數 · 位元組 · 失敗數記 fetch_ledger.jsonl;超預算停",
+   "engine": "SUP_MDL740_NetUnified(鎖冊 VeritasAegisNexus 尾版)"
+  },
+  {
+   "id": "R-DB-05",
+   "zh": "定時存檔",
+   "checkpoint": "每 5 分或 20,000 列落一個 parquet part(.tmp 原子換名)+ manifest(part · 列數 · sha16 · 進度);中斷從 manifest 續",
+   "engine": "CGC_MDL251_ProgressJournal"
+  },
+  {
+   "id": "R-DB-06",
+   "zh": "TEMP 取代記憶體",
+   "spill": "VIA_TEMP_ROOT/<run>/;duckdb temp_directory · polars streaming · 大 join 落碟;文件 / 輪做完才清(L107)"
+  },
+  {
+   "id": "R-DB-07",
+   "zh": "加速器",
+   "py": "[VIA:ACCEL-BRIDGE] → SuperAccel → SUP_MDL737 尾版 → 鎖冊 Celeritas;不釘死版號",
+   "net": "[VIA:NET-BRIDGE] → SUP_MDL740 → 鎖冊 AegisNexus",
+   "ps": "CELERITAS-TEMPLATE-JOIN + [VIA:PS-ACCEL"
+  },
+  {
+   "id": "R-DB-08",
+   "zh": "環境",
+   "install": "CGC_MDL240 check 總判 → EnvGovernance tools --approve(RESTORE→REPAIR→INSTALL→EXTERNAL→VERIFY);via_ 境;LIB 版號回填"
+  },
+  {
+   "id": "R-DB-09",
+   "zh": "介面表頭",
+   "display": "正式英文 Title Case · 空格取代底線 · 縮寫全大寫;程式鍵 snake_case 不動;來源 VDF_InputUniverse_SSOT R-HDR-01"
+  },
+  {
+   "id": "R-DB-10",
+   "zh": "輸出驗證",
+   "checks": [
+    "列數 ≥ min_rows",
+    "主鍵不重",
+    "欄位 = 冊",
+    "日期欄時間型",
+    "三方對照相對差門檻",
+    "grade 四態"
+   ],
+   "engine": "CGC_MDL249 check / lock --apply · VDF_SystemManager universe"
+  }
+ ]
+}

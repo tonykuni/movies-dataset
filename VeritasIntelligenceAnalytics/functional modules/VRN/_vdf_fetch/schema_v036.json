@@ -1,0 +1,167 @@
+{
+  "engine": "VDF_TW_DataFetchEngine",
+  "version": "v036",
+  "central_id": null,
+  "registration": "NOT_SUBMITTED",
+  "equity_columns": [
+    "date",
+    "ticker",
+    "yfinance_ticker",
+    "bloomberg_ticker",
+    "name",
+    "open",
+    "low",
+    "high",
+    "close",
+    "adj_open",
+    "adj_low",
+    "adj_high",
+    "adj_close",
+    "volume",
+    "turnover",
+    "volume_ex_daytrade",
+    "turnover_ex_daytrade",
+    "market_cap",
+    "inst_foreign_net",
+    "inst_trust_net",
+    "inst_dealer_net",
+    "inst_total_net",
+    "inst_foreign_ex_dealer_net",
+    "inst_foreign_dealer_net",
+    "margin_balance",
+    "short_balance",
+    "day_trade_volume",
+    "day_trade_buy_value",
+    "day_trade_sell_value",
+    "day_trade_value",
+    "yf_close",
+    "yf_adj_close",
+    "yf_volume",
+    "adjustment_factor",
+    "close_check",
+    "adjustment_status",
+    "daytrade_status",
+    "daytrade_value_method",
+    "inst_check",
+    "market",
+    "currency",
+    "market_cap_source",
+    "shares_outstanding",
+    "source",
+    "source_date",
+    "fetched_at",
+    "adj_as_of",
+    "quality"
+  ],
+  "financial_columns": [
+    "date",
+    "ticker",
+    "yfinance_ticker",
+    "bloomberg_ticker",
+    "name",
+    "financial_statement",
+    "account",
+    "unit",
+    "value",
+    "source",
+    "basis",
+    "fiscal_year",
+    "quarter",
+    "period_start",
+    "report_scope",
+    "is_derived",
+    "derivation",
+    "source_report_period",
+    "source_date",
+    "fetched_at",
+    "currency"
+  ],
+  "csv_headers": {
+    "date": "DATE",
+    "ticker": "TICKER",
+    "yfinance_ticker": "YFINANCE TICKER",
+    "bloomberg_ticker": "BLOOMBERG TICKER",
+    "name": "NAME",
+    "open": "OPEN",
+    "low": "LOW",
+    "high": "HIGH",
+    "close": "CLOSE",
+    "adj_open": "ADJ OPEN",
+    "adj_low": "ADJ LOW",
+    "adj_high": "ADJ HIGH",
+    "adj_close": "ADJ CLOSE",
+    "volume": "VOLUME",
+    "turnover": "TURNOVER",
+    "volume_ex_daytrade": "VOLUME(扣除當沖)",
+    "turnover_ex_daytrade": "TURNOVER(扣除當沖)",
+    "market_cap": "MARKET CAP",
+    "financial_statement": "FINANCIAL STATEMENT",
+    "account": "ACCOUNT",
+    "unit": "UNIT",
+    "value": "VALUE",
+    "source": "SOURCE"
+  },
+  "keys": {
+    "tw_equity_daily": [
+      "date",
+      "ticker"
+    ],
+    "tw_index_daily": [
+      "date",
+      "ticker"
+    ],
+    "tw_financial": [
+      "date",
+      "ticker",
+      "financial_statement",
+      "account",
+      "unit",
+      "basis",
+      "report_scope",
+      "source"
+    ],
+    "tw_monthly_revenue": [
+      "date",
+      "ticker",
+      "account",
+      "unit",
+      "source"
+    ],
+    "tw_universe": [
+      "date",
+      "ticker"
+    ]
+  },
+  "separate_databases": {
+    "VDF_TWEquity_Daily": [
+      "tw_equity_daily",
+      "tw_universe"
+    ],
+    "VDF_TWIndex_Daily": [
+      "tw_index_daily"
+    ],
+    "VDF_TWFinancial": [
+      "tw_financial",
+      "tw_monthly_revenue"
+    ]
+  },
+  "index_identity": {
+    "TAIEX": {
+      "ticker": "TAIEX",
+      "yfinance_ticker": "^TWII",
+      "bloomberg_ticker": "TWSE Index",
+      "name": "發行量加權股價指數",
+      "market": "TWSE"
+    },
+    "TPEX": {
+      "ticker": "TPEX",
+      "yfinance_ticker": "^TWOII",
+      "bloomberg_ticker": null,
+      "name": "櫃買指數",
+      "market": "TPEX"
+    }
+  },
+  "missing_data": "NULL; never zero-fill missing day-trade data",
+  "stock_scope": "current TWSE/TPEX four-digit ordinary stocks",
+  "source_of_truth": "official raw OHLC; Yahoo only cross-check and adjustment factor"
+}
