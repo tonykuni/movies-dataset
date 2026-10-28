@@ -7,7 +7,7 @@
 
 | 步 | 做什麼 | 開關 |
 |---|---|---|
-| ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `Downloads` / `Desktop` / `Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
+| ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `OneDrive\Pictures\seal-logo-square.png`(操作員 2026-10-28 指定)→ `Downloads` / `Desktop` / `Pictures` / `OneDrive\Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
 | ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0100.md` 的程式碼(核對 SHA-256)→ 綁到本輪的倉(`$REPO` ← VIA 根所在的 git 倉;結束碼 = 它的綜合燈,push 被拒 = 黃)→ 執行:`check` → `ship --commit --push` → `check`(把桌機在位、倉上沒有的前版推上去) | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
 | ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0103.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:v0142 套件 → ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
 | ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0142.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
@@ -76,7 +76,8 @@
   # ① logo:找圖 → 放到 SSOT(渲染時自動去白底)
   $k1 = '① logo'
   $cands = @(); if ($env:VRN2_LOGO) { $cands += $env:VRN2_LOGO }
-  foreach ($d in (Join-Path $env:USERPROFILE 'Downloads'), (Join-Path $env:USERPROFILE 'Desktop'), (Join-Path $env:USERPROFILE 'OneDrive\Desktop'), (Join-Path $env:USERPROFILE 'Pictures')) { foreach ($e in 'png', 'jpg', 'jpeg', 'webp') { $cands += (Join-Path $d ('VRN2_Logo.' + $e)) } }
+  $cands += (Join-Path $env:USERPROFILE 'OneDrive\Pictures\seal-logo-square.png')   # 操作員 2026-10-28 指定的印章檔
+  foreach ($d in (Join-Path $env:USERPROFILE 'Downloads'), (Join-Path $env:USERPROFILE 'Desktop'), (Join-Path $env:USERPROFILE 'OneDrive\Desktop'), (Join-Path $env:USERPROFILE 'Pictures'), (Join-Path $env:USERPROFILE 'OneDrive\Pictures')) { foreach ($e in 'png', 'jpg', 'jpeg', 'webp') { $cands += (Join-Path $d ('VRN2_Logo.' + $e)) } }
   $logo = $cands | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) } | Select-Object -First 1
   $ssot = Join-Path $R 'functional modules\VRN\SSOT'
   $have = Get-ChildItem -LiteralPath $ssot -Filter 'VRN2_Logo.*' -ErrorAction SilentlyContinue | Select-Object -First 1
