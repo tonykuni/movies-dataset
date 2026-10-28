@@ -1,0 +1,217 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0142",
+ "date": "2026-10-28",
+ "operator_order_2026_10_28": [
+  "回到電腦本地實測修正(貼回 v0136 線 52 份輸出:四點截斷 / 頁首混入 · 剔除 654 · 缺項 10)",
+  "模板視覺鎖定作為前端 html u/i 與後端連棟整合為一個系統 · 透明去背 logo 無框無特效取代模板 logo(上傳 VIA_VRN-2_Workbench_-_Standalone.html)"
+ ],
+ "base_package": {
+  "name": "VRN2_Closeout_v0141 (launcher v0141 · runtime v0141 159 members · manager v0243 · ENG062 v0116 · verifier v0110 · verbatim v0104)",
+  "retained": "all 159 runtime members byte-identical; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0141 for the closeout entry; VRN-2 one-click v0141 for the operator paste; operator one-click v0102 → v0103",
+ "design": {
+  "ENG062_v0117": "after v0116 selection, the left edge of a chosen span is moved past leading page-banner lines (Company | Asia Pacific), lines that are (part of) the report title (also when glued to the first sentence), and short section headings followed by a new sentence; wrapped first words and preposition-led lines are kept; remaining span must still be eligible; raw_span/quote/quote_sha256 rewritten; validate_summary re-checked",
+  "Workbench_v0100": "template CSS/markup locked verbatim; {{ fields }} / sc-for / sc-if expanded server-side from receipts + output books; vrn2:// actions; gates only for registered entries; dataset paging / CSV / extract / page export in vanilla JS; logo auto-transparent (white → alpha, un-premultiplied edges, cropped) as data URI with no background / radius / shadow; fonts from VRN2_Workbench_Assets_v0100.zip (117 woff2) referenced relatively; falls back to system fonts and the template glyph",
+  "ActivateVRN-2_v0142": "v0141 + runtime v0142; after the closeout receipt: render Workbench, add a link bar to the legacy U/I page, open the Workbench (fallback legacy); receipt gains 'workbench'"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0142.py",
+   "sha256": "082c887eb63e81da0ed1af9dc673731781579f99c9ec9c193d1291e6e9727717",
+   "bytes": 23658
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "e81c55706ee09bd3fb76fc4be874fa0afc9ad0e3ff4e9d6d0354b2193e9542de",
+   "bytes": 1429
+  },
+  {
+   "path": "README.txt",
+   "sha256": "6dd84abeec9f67c98d5ca3c9db8a88bbb3629055d6205b59e690171c4a19c830",
+   "bytes": 992
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "17bb36e35cc8f1988ef093a11c58f02205c76e3aa44735b8e936dc0272a00a9d",
+   "bytes": 3469
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0142.json",
+   "sha256": "d2d4198a65e579439cc179fb40be47a818fdc64a039bbd26cc467e54b847d16d",
+   "bytes": 21531
+  },
+  {
+   "path": "VRN2_Runtime_v0142.zip",
+   "sha256": "94af4b90470e8ec1d479902a54c6039aa81b6ae45a9d94f963d5e3d46c293041",
+   "bytes": 6689581
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  }
+ ],
+ "runtime": {
+  "system": "VRN-2",
+  "version": "v0142",
+  "zip_sha256": "94af4b90470e8ec1d479902a54c6039aa81b6ae45a9d94f963d5e3d46c293041",
+  "based_on": "VRN2_Runtime_v0141.zip b41b6dc65ba52c6ed6d497faaa7230230745811437a3b2c0940160ac3b3f1242",
+  "retained_members": 159,
+  "new_members": [
+   "VRN_ENG062_SummarizerV1_v0117.py",
+   "VRN2_Workbench_v0100.py",
+   "VRN2_Workbench_Assets_v0100.zip"
+  ],
+  "files": "see VRN2_Runtime_v0142.json inside the package"
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · Chromium (Playwright) · 19 real sample files (shipF) + 9 real files of the operator's 52 (others synthetic only)",
+ "results": {
+  "selftests": {
+   "ENG062_v0117": "PASS (banner / title / glued title / heading trimmed · wrapped word · preposition · CJK heading · exact spans · tamper rejected)",
+   "Workbench_v0100": "16/16",
+   "manager_v0243_with_v0117": "PASS",
+   "launcher_v0142": "PASS (+ workbench link / render fallback / open fallback)"
+  },
+  "eng062_real9_diff": {
+   "files": 8,
+   "points_changed": [
+    {
+     "file": "GS-6415 20260517.pdf",
+     "point": 1,
+     "before": "Dual growth engines moving into focus  \nWe are turning more constructive on Sile",
+     "after": "We are turning more constructive on Silergy and upgrading the stock \nto Buy from"
+    },
+    {
+     "file": "MS-3661 20251203.pdf",
+     "point": 2,
+     "before": "Alchip Technologies Ltd | Asia Pacific\nRead-across from AWS re:Invent \nand Marve",
+     "after": "Trainium3's revenue contribution to Alchip should stay intact, \nwhile Alchip sho"
+    }
+   ],
+   "note": "all other points byte-identical to v0116"
+  },
+  "operator_upload_v0114": {
+   "files": 52,
+   "points_no_sentence_end": 87,
+   "source": "operator upload 2026-10-28 (v0136 line · ENG062 v0114)"
+  },
+  "full_run_v0142_19_real": {
+   "closeout_rc": 1,
+   "rc_reason": "③ 環境檢查 RED in the Linux sandbox only (accelerator deps not in venv; --no-install); every VRN-2 gate GREEN unless listed",
+   "non_green_steps": [
+    [
+     "③ 環境檢查與補裝",
+     "RED"
+    ],
+    [
+     "⑥c U/I 操作協定",
+     "GRAY"
+    ],
+    [
+     "⑨ 上船 GitHub",
+     "GRAY"
+    ],
+    [
+     "⑩ 整併封存",
+     "GRAY"
+    ],
+    [
+     "⑫a VRN-1 倉同步(借工具前 · 只 fast-forward)",
+     "GRAY"
+    ],
+    [
+     "⑫ PIVOT 資料庫(借用 VRN-1)",
+     "GRAY"
+    ]
+   ],
+   "passes": [
+    [
+     1,
+     0,
+     "idempotence GREEN"
+    ]
+   ],
+   "completion": {
+    "verdict": "完成",
+    "red": 0,
+    "yellow": 3,
+    "manager": "VRN-2 SystemManager v0243"
+   },
+   "stock_reports": {
+    "n": 14,
+    "all_green": 14
+   },
+   "idempotence": "GREEN",
+   "source_quotes": {
+    "PASS": 52,
+    "OCR_PENDING": 4
+   },
+   "output_gaps": [
+    {
+     "book": "四點原文核對",
+     "reason": "REVIEW_OCR · {'PASS': 52, 'OCR_PENDING': 4}"
+    }
+   ],
+   "summary_rows": 14,
+   "points_4_of_4": true,
+   "selection_levels": {
+    "?": 56
+   },
+   "independent_verifier": {
+    "version": "VRN2_IndependentVerifier_v0110",
+    "fin_bad": 0,
+    "basic": "{'PASS': 193, 'OCR': 2}",
+    "summary": "{'PASS': 65, 'OCR': 5}",
+    "financial_rows": 4905,
+    "financial_verdicts": "{'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}"
+   },
+   "workbench": {
+    "lamp": "GREEN",
+    "path": "ad/v142/t142/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+    "legacy_linked": true
+   }
+  },
+  "workbench_real_browser": {
+   "on_t141f_receipts": "17/17",
+   "on_full_run_v0142": "17/17"
+  },
+  "legacy_ui_real_browser": "35/35",
+  "oneclick_scenario_pwsh": "first rc 1 · again rc 1 · tamper rc 1 · done"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0142.zip",
+  "sha256": "fee4d61db2af2e45b9325289b195e4c1196888bc63ad5643704fc09eb55db047",
+  "bytes": 7455216,
+  "layout": "VRN2_Closeout_v0142/<files> (no .ps1 · the one-click md is the entry)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0142.py",
+  "sha256": "082c887eb63e81da0ed1af9dc673731781579f99c9ec9c193d1291e6e9727717"
+ },
+ "oneclick": "VRN2_OneClick_v0142.md",
+ "test_tools_zip": "vrn2_test_tools_v0142.zip",
+ "logs_zip": "logs_v0142.zip"
+}
