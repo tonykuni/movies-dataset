@@ -12,6 +12,14 @@
 | ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0103.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:v0142 套件 → ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
 | ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0142.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
 
+## 一行啟動(桌機 PowerShell 貼這一行就好;從 GitHub 分支讀本檔的程式碼區塊再執行,不必複製整段)
+
+```text
+& { $r = if ($env:VRN2_REPO) { $env:VRN2_REPO } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset' }; $b = 'claude/optimistic-goodall-yhalc5'; $t = Join-Path ([IO.Path]::GetTempPath()) 'vrn2_round_boot'; New-Item -ItemType Directory -Force -Path $t | Out-Null; git -C $r fetch -q origin $b; git -C $r archive --format=zip -o (Join-Path $t 'doc.zip') ('origin/' + $b + ':VeritasIntelligenceAnalytics/docs/handoff/ai') VRN2_LocalRound_v0100.md; if ($LASTEXITCODE -ne 0) { Write-Host "[RED] 讀不到 GitHub 分支 $b 的 VRN2_LocalRound_v0100.md(倉 $r · 網路 / git)" -ForegroundColor Red; return }; Expand-Archive -LiteralPath (Join-Path $t 'doc.zip') -DestinationPath $t -Force; $m = [IO.File]::ReadAllText((Join-Path $t 'VRN2_LocalRound_v0100.md'), [Text.Encoding]::UTF8) -replace "`r`n", "`n"; $c = [regex]::Match($m, '(?s)```powershell\n(.*?)\n```').Groups[1].Value; Write-Host ("[啟動] VRN2_LocalRound_v0100 · {0} 行 · 自 origin/{1}" -f ($c -split "`n").Count, $b) -ForegroundColor Yellow; & ([scriptblock]::Create($c)) }
+```
+
+倉不在預設路徑就先 `$env:VRN2_REPO = 'D:\...\movies-dataset'`;乾跑先加 `$env:VRN_ROUND_DRY = '1'`。整段程式碼(同一份,下面)供人讀與核對:
+
 ```powershell
 & {
   # ===== VRN-2 本地實測一輪 v0100(2026-10-28 · 操作員「回到電腦本地實測修正」「generate a ps code to handle all above」)=====
