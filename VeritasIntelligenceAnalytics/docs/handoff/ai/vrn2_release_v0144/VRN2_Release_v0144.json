@@ -1,0 +1,292 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0144",
+ "date": "2026-10-29",
+ "operator_policy_2026_10_29": "三系統獨立 · SSOT / Regex / 同義字 / 政策由基層提出(ID 空白)→ VCGC 核號 → 子系統自動補填;VRN-2 快速收尾用 HTML U/I:輸出位置 Windows I/O(拖曳 / 對話框)或連接雲端 · 輸出 Parquet 增量擷取 · 增量擷取用 DuckDB 管理",
+ "base_package": {
+  "name": "VRN2_Closeout_v0143 (launcher v0143 · runtime v0142)",
+  "retained": "runtime v0142 members byte-identical inside runtime v0144; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0143 for the closeout entry; VRN-2 one-click v0143; operator one-click v0104 → v0105",
+ "design": {
+  "ActivateVRN-2_v0144": "⑤b SSOT-ID sync after ⑤ · ⑬ output store after the closeout receipt (GRAY until an output folder is chosen · VRN2_OUTPUT_DIR seeds) · handler v0108 registered · Workbench v0101 · receipt v0144 gains ssot_sync / output_store",
+  "VRN2_OutputStore_v0100": "mirror + DuckDB incremental store (catalog by SHA-256 · per-book tables with run_id/file_sha · Parquet partitions per run · catalog.parquet) · pyarrow fallback · receipt VRN2_OutputStore_latest.json",
+  "VRN2_SSOTSync_v0100": "request (enriched · ssot_id blank · self-conflicts) · apply (grants → ssot_id · conflicts → 待人判 · new register version) · sync",
+  "VRN2_UIAction_v0108": "vrn2://pick?kind=outdir (FolderBrowserDialog · ShowNewFolderButton) · vrn2://outdir?reset=1 · --set-outdir · 輸出位置 block in the legacy U/I (number skips the desktop line's v0105 / v0107)",
+  "VRN2_Workbench_v0101": "export tab: 輸出位置 panel (buttons · drop zone → dialog · store receipt table); handover tab: SSOT-ID status table"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0144.py",
+   "sha256": "885632b1f289b0a86fe51cdb2340c83da071050a5a16040c5887351c9079cd1f",
+   "bytes": 43585
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "bcf89ac4b2d3c93aa89fa04a35b89f7e3996cd3cf0d99b4a32ee991db5f8d08a",
+   "bytes": 1429
+  },
+  {
+   "path": "README.txt",
+   "sha256": "2bc4c0e23ca72e0582cd69509716737f308f7a5196c6c5963033ca31c4b93830",
+   "bytes": 1507
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "2aa33f7ac6e9b1fc97416ebe01979ac84131de8686fe6b1ffcfc6d4f694a0106",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0144.json",
+   "sha256": "c71a106fc62bd5d0e523d093d1ba0d22ab8381eb883a87ba4857f7e192a070ba",
+   "bytes": 22051
+  },
+  {
+   "path": "VRN2_Runtime_v0144.zip",
+   "sha256": "0de690a4ee0fba48c811851e0b0606c3018e7f035a0c1af2aec77be519ce60c4",
+   "bytes": 6741846
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  }
+ ],
+ "runtime": {
+  "version": "v0144",
+  "zip_sha256": "0de690a4ee0fba48c811851e0b0606c3018e7f035a0c1af2aec77be519ce60c4",
+  "based_on": "VRN2_Runtime_v0142.zip 94af4b90470e8ec1d479902a54c6039aa81b6ae45a9d94f963d5e3d46c293041",
+  "retained_members": 162,
+  "new_members": [
+   "VRN2_UIAction_v0108.py",
+   "VRN2_OutputStore_v0100.py",
+   "VRN2_SSOTSync_v0100.py",
+   "VRN2_Workbench_v0101.py"
+  ],
+  "files": "see VRN2_Runtime_v0144.json inside the package"
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 (pyarrow · no duckdb) + venv_duck (duckdb 1.5.6) · pwsh 7.4.6 · 19 real sample files",
+ "results": {
+  "selftests": {
+   "ActivateVRN-2_v0144": "[PASS] v0144: ⑤b SSOT-ID sync (no register → GRAY · pending → GREEN + request) · ⑬ output store (unset → GRAY · VRN2_OUTPUT_DIR seeds config · incremental append · idempotent re-run)",
+   "VRN2_SSOTSync_v0100": "[計] VRN2_SSOTSync v0100 --selftest · OK 9 · FAIL 0",
+   "VRN2_OutputStore_v0100": "[計] VRN2_OutputStore v0100 --selftest · OK 9 · FAIL 0",
+   "VRN2_UIAction_v0108": "[計] VRN2_UIAction v0108 自測 14/14 · PASS",
+   "VRN2_Workbench_v0101": "[計] VRN2_Workbench v0101 --selftest · OK 18 · FAIL 0"
+  },
+  "pwsh_hash_chain": [
+   "Run-VRN2-v0144.ps1 parse errors: 0",
+   "boot144.ps1 parse errors: 0",
+   "Run-VRN1-VRN2-v0105.ps1 parse errors: 0",
+   "boot_pair105.ps1 parse errors: 0",
+   "cs101.ps1 parse errors: 0",
+   "round.ps1 parse errors: 0",
+   "vrn2 one-click v0144: code sha = boot H → True (9adeab66d446)",
+   "one-liner decodes to boot → True",
+   "package zip sha = \\41c49c5ed19a4f361a7ebaa4c961473f93762ae3de6928be64a673407a4fc284 → True",
+   "operator v0105: code sha = boot H → True (c1dfe6d2f676)",
+   "operator H2 = vrn2 one-click v0144 code sha → True",
+   "operator banner says v0105 → True",
+   "localround H_OP = operator v0105 code sha → True",
+   "localround H_CS = chainship md v0101 code sha → True",
+   "chainship md WANT = tool v0101 sha → True"
+  ],
+  "full_run_v0144_19_real": {
+   "closeout_rc": 1,
+   "rc_reason": "③ 環境檢查 RED in the Linux sandbox only (accelerator deps not in venv; --no-install); same as v0142 / v0143",
+   "non_green_steps": [
+    [
+     "③ 環境檢查與補裝",
+     "RED"
+    ],
+    [
+     "⑥c U/I 操作協定",
+     "GRAY"
+    ],
+    [
+     "⑨ 上船 GitHub",
+     "GRAY"
+    ],
+    [
+     "⑩ 整併封存",
+     "GRAY"
+    ],
+    [
+     "⑫a VRN-1 倉同步(借工具前 · 只 fast-forward)",
+     "GRAY"
+    ],
+    [
+     "⑫ PIVOT 資料庫(借用 VRN-1)",
+     "GRAY"
+    ],
+    [
+     "⑬ 輸出位置 · 增量庫(DuckDB)",
+     "YELLOW"
+    ]
+   ],
+   "lock_removed_after_run": true,
+   "limits": {
+    "VRN2_UI_REFRESH_WAIT": 600,
+    "VRN2_SILENT_MAX": 3600,
+    "VRN2_MANIFEST_WAIT": 900,
+    "VIA_VRN2_VERIFY_WAIT": 3600
+   },
+   "ui_block": {
+    "lamp": "GREEN",
+    "how": "子行程",
+    "detail": "[鎖驗證] accelerator=EXACT · network=EXACT · 耗時 1 秒"
+   },
+   "passes": [
+    [
+     1,
+     0,
+     "idempotence GREEN"
+    ]
+   ],
+   "completion": {
+    "verdict": "完成",
+    "red": 0,
+    "yellow": 3,
+    "manager": "VRN-2 SystemManager v0243"
+   },
+   "stock_reports": {
+    "n": 14,
+    "all_green": 14
+   },
+   "idempotence": "GREEN",
+   "source_quotes": {
+    "PASS": 52,
+    "OCR_PENDING": 4
+   },
+   "output_gaps": [
+    {
+     "book": "四點原文核對",
+     "reason": "REVIEW_OCR · {'PASS': 52, 'OCR_PENDING': 4}"
+    }
+   ],
+   "independent_verifier": {
+    "basic": "{'PASS': 193, 'OCR': 2}",
+    "summary": "{'PASS': 65, 'OCR': 5}",
+    "financial_rows": 4905,
+    "financial_verdicts": "{'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}"
+   },
+   "registration_line": "[計] 註冊核對 · ⑤ 元件登記 GREEN · ⑥c U/I 操作協定 GRAY · ② 定位 VRN-2 程式夾 GREEN · 處理器 VRN2_UIAction_v0108.py · 全部登記成功",
+   "ssot_sync": {
+    "lamp": "GREEN",
+    "detail": "核發 0 · 衝突 0 · 待核號 371(SSOT 類 82 · 程式類 289)· 自撞 0 · 登記冊 VRN2_Component_Register_v0101.json · 核發冊 尚無(VCGC 還沒核發)",
+    "apply": {
+     "granted": 0,
+     "conflicts": 0,
+     "pending": 371,
+     "register": "VRN2_Component_Register_v0101.json",
+     "grant_sources": []
+    },
+    "request_counts": {
+     "ssot_like": 82,
+     "program": 289,
+     "self_conflicts": 0
+    },
+    "request_file": "functional modules/VRN2/contract/VRN2_NUMBER_REQUEST_latest.json",
+    "state_file_written": true
+   },
+   "output_store": {
+    "lamp": "YELLOW",
+    "why": "沒有 duckdb 套件 → pyarrow 備援(功能同 · 沒有 SQL 查詢;桌機裝 duckdb 即走正式路徑)",
+    "store_engine": "pyarrow",
+    "cloud_hint": "OneDrive 同步夾(本機寫入 · 由同步軟體上雲)",
+    "mirrored": 17,
+    "new_files": 14,
+    "known_files": 0,
+    "appended": {
+     "BasicInfo": 14,
+     "FinancialData": 4905,
+     "Summary": 14,
+     "Rejected": 815
+    },
+    "totals": {
+     "BasicInfo": 14,
+     "FinancialData": 4905,
+     "Summary": 14,
+     "Rejected": 815
+    },
+    "parquet_files": 5
+   },
+   "workbench": {
+    "lamp": "GREEN",
+    "legacy_linked": true
+   }
+  },
+  "duckdb_real_path": {
+   "env": "venv_duck · python 3.13 · duckdb 1.5.6 (no pyarrow)",
+   "first_sync": "[計] VRN2_OutputStore v0100 · GREEN · 輸出夾 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/duck/out(本機夾(要上雲就選 OneDrive / Google Drive / Dropbox 的同步夾))· 鏡像 13 檔 · 增量庫 duckdb(/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/duck/out/VRN2/vrn2_store.duckdb)· 本輪新檔 14 · 已知檔 0 · 追加列 BasicInfo 14 / FinancialData 4905 / Summary 14 / Rejected 815 · 累",
+   "second_sync": "[計] VRN2_OutputStore v0100 · GREEN · 輸出夾 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/duck/out(本機夾(要上雲就選 OneDrive / Google Drive / Dropbox 的同步夾))· 鏡像 13 檔 · 增量庫 duckdb(/tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/duck/out/VRN2/vrn2_store.duckdb)· 本輪新檔 0 · 已知檔 14 · 追加列 BasicInfo 0 / FinancialData 0 / Summary 0 / Rejected 0 · 累計 Basic",
+   "first_new": 14,
+   "second_new": 0,
+   "catalog_files": 14,
+   "sql": [
+    "tables ['book_basicinfo', 'book_financialdata', 'book_rejected', 'book_summary', 'catalog']",
+    "catalog [(14, '20261029_000001', '20261029_000002', 28)]",
+    "BasicInfo [('20261029_000001', 14, 14)]",
+    "FinancialData [('20261029_000001', 4905, 11)]",
+    "Summary [('20261029_000001', 14, 14)]",
+    "Rejected [('20261029_000001', 815, 8)]",
+    "parquet scan [(4905,)]",
+    "join sample [('CLST-6669 20251001(20261006-052156).pdf', 1078), ('Daiwa-1319 20231011(20261006-122413).pdf', 813), ('凱基投顧_2637 慧洋-KY_賴偉中_20260915.pdf', 781)]"
+   ],
+   "selftest": "[計] VRN2_OutputStore v0100 --selftest · OK 9 · FAIL 0"
+  },
+  "oneclick_scenario_pwsh": {
+   "rc": "first rc 1 · again rc 1 · tamper rc 1 · done",
+   "first": "[GREEN] ③ 套件 v0144 就位(SHA-256 41c49c5ed19a · 套件內 10 檔逐檔核對相符 · 來源 GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/t144oc/Download",
+   "again": "[GREEN] ③ 本機已是 v0144 套件(SHA-256 41c49c5ed19a · 套件夾 11 檔與已驗證的 zip 逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/t144oc/Downloads/VRN2_Closeout_v0144",
+   "tamper": "[YELLOW] ③ 本機套件夾有 1 個檔與已驗證的 zip 不同或不在(ActivateVRN-2_v0144.py)→ 不用它,從本機這份 zip 重新解壓 → [GREEN] ③ 舊套件夾已改名備份 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/t144oc/Downloads",
+   "workbench_line": "",
+   "closeout_line": "[RED] ⑧b 收尾收據 v0144 · rc 1 · 跑了 1 輪(idempotence GREEN)· 四點原文核對 REVIEW_OCR {'PASS': 52, 'OCR_PENDING': 4} · 輸出缺項 1",
+   "step13_line": "[YELLOW] ⑬ 輸出位置 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v144/t144oc/OneDrive/VRN2_out · 增量庫 pyarrow · 新檔 14 / 已知 0 · 追加 BasicInfo 14 / FinancialData 4905 / Summary 14 / Rejected 815 · parquet 5 · 沒有 duckdb 套件 → pyarrow 備援(功能同 ·",
+   "step5b_ssot_line": "[GREEN] ⑤b SSOT-ID 核號同步 · 核發 0 · 衝突 0 · 待核號 371(SSOT 類 82 · 程式類 289)· 自撞 0 · 登記冊 VRN2_Component_Register_v0101.json · 核發冊 尚無(VCGC 還沒核發)",
+   "handler_line": ""
+  },
+  "not_claimed": [
+   "Windows desktop run of v0144: not yet (next paste-back); the desktop has not run v0143 either",
+   "VCGC side of the SSOT-ID protocol (reading VRN2_NUMBER_REQUEST_latest.json, writing VCGC_NUMBER_GRANT_latest.json): contract only (VIA_SSOT_ID_Protocol_v0100.md); not implemented by this line (VCGC is another system)",
+   "A real Windows FolderBrowserDialog for vrn2://pick?kind=outdir: not exercised in the container (handler selftest uses the VRN2_PICK_OUTDIR hook); the dialog code path is the same as vrn2://pick for input (v0133 · desktop-proven)",
+   "Browser drag-and-drop cannot read the dropped folder's real path (browser sandbox); the drop zone opens the dialog instead",
+   "DuckDB path inside the launcher: the launcher sandbox venv has no duckdb (pyarrow fallback · YELLOW); the DuckDB engine was proven with the OutputStore CLI in venv_duck on the same output books",
+   "Items carried from v0143: PasteBack zip 013350 transcript, v0248 / v0253 location on the desktop, verifier wall time on 52 files, 四點 FAIL 1 / 缺項 3 份年度數據"
+  ]
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0144.zip",
+  "sha256": "41c49c5ed19a4f361a7ebaa4c961473f93762ae3de6928be64a673407a4fc284",
+  "bytes": 7511675,
+  "layout": "VRN2_Closeout_v0144/<files> (no .ps1 · the one-click md is the entry)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0144.py",
+  "sha256": "885632b1f289b0a86fe51cdb2340c83da071050a5a16040c5887351c9079cd1f"
+ },
+ "oneclick": "VRN2_OneClick_v0144.md",
+ "test_tools_zip": "vrn2_test_tools_v0144.zip",
+ "logs_zip": "logs_v0144.zip"
+}
