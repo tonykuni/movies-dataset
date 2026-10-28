@@ -1,8 +1,8 @@
 {
  "schema": "VIA.Requirements.SSOT.v1",
  "version": "v0195",
- "batch": "R71 VDF 並行擷取(清單先跑 · 3~5 流程 · 守門)· 頁 USER-TEST(VDF-REQ018)",
- "ts": "2026-10-11T21:48:23+00:00",
+ "batch": "S20261014c Z297 sentiment 重鍵(VDF_ENG055 v0123 · VDF_ENG229 v0101 dedupe)· Z298 研報指標多候選(VRN_ENG073 v0140)· VRN 邏輯索引重建",
+ "ts": "2026-10-14T14:30:00+00:00",
  "source": "操作員 2026-09-29:「先檢查更新近三日關於VCGC的功能要求更新  SSOT VCGC WORKFLOW  相關管理引擎功能檢查實測無誤收尾」",
  "reviewed": {
   "messages": 156,
@@ -79,8 +79,8 @@
  "code_rule": "<子系統>-REQ<三碼>(ALL 歸 VCGC 中樞);只增,舊號不改不刪;編號冊全名加 VIA- 前綴",
  "tally": {
   "RECORDED": 23,
-  "COVERED": 122,
-  "PARTIAL": 75,
+  "COVERED": 124,
+  "PARTIAL": 74,
   "MISSING": 1
  },
  "requirements": [
@@ -2566,15 +2566,21 @@
    "homes": [
     "VRN-WKF008"
    ],
-   "evidence": "VIA_Handoff_Continuity_SSOT_v0100 / VRN_SourceProvenance_SSOT_v0100；實際測試證據見 docs/handoff/evidence",
+   "evidence": "VIA_Handoff_Continuity_SSOT_v0100 / VRN_SourceProvenance_SSOT_v0100；實際測試證據見 docs/handoff/evidence → 2026-10-14 S20261014b:VRN_SystemManager v0152(VRN 自己的 manager · L120)把 provenance 動詞放回自測攔截之前 —— v0111 起 main 以 `--selftest in args[:2]` 攔自測,`provenance --selftest` 被吃成管理器自測鏈,來源回歸測試從沒跑到(10/07 起收據標記都沒見到);handoff test provenance rc 0 · 「[來源回歸] fail=0; tests=23」",
    "quotes": [
     {
      "text": "所有相同數據來源不同視為不同SSOT編號",
      "recorded_at": "2026-09-29T15:38:10+00:00"
+    },
+    {
+     "text": "繼續修 VRN provenance 和表頭補齊",
+     "recorded_at": "2026-10-14T09:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
    "next": "目前完成來源觀測層；補齊全部樣本、年度頁判型、單位期間正規化與受控重試實測",
-   "hand": "AI"
+   "hand": "AI",
+   "s1014b": true
   },
   {
    "code": "VCGC-REQ077",
@@ -2802,8 +2808,8 @@
     "VIA_VCGC_FunctionInventory_SSOT_v0102.json",
     "docs/VIA_S20260930b_VCGCChain.md"
    ],
-   "evidence": "【更正 · Z290】v0100 的「跳 HTML」不成立:launcher v0100 自設 VIA_NO_OPEN=1 到 finally 才還原,同一行程的 PS 加速器模組零跳出閘(批366)把自己的 Invoke-Item 靜默吃掉(pwsh 實跑印「[VIA_NO_OPEN] 抑制跳出」);v0100 實跑都帶 -NoOpen,開頁那段從沒被跑到。修:launchers/Invoke-VIA-FullCheck-v0101.ps1(開自己的頁用 cmdlet 全名 · 呼叫端設 1 照守並印黃字 · 標準模板塊 [VIA:PS-TEMPLATE:v0101] · 開跑印 Celeritas 狀態 · 結尾 MATRIX SUMMARY · 邊跑邊印;pwsh -File 與熱 PS「&」兩式實跑:假 xdg-open 收到 FULLCHECK_latest.html · 優先權 / 環境變數 / 資料夾跑完原樣還原)· CGC_MDL248_FullCheck v0101(⓪ 段加「PS 自擋開頁」:PS 尾版自設 1 後不帶模組名開頁 = 紅並點名檔 · 行;自測 5/5 + 前版 9/9)· 同病:唯一入口 v0108 · RunAll v0102(新版 v0109 / v0103 已備妥並實測,.ps1 要操作員 L70 逐次許可才入樹;⓪ 段每輪點名)。先前證據(照留):CGC_MDL248_FullCheck v0100(六段 · 自測 9/9)· 橋掃 --apply:VDF 網路橋 131/131 · PS 25 加速器橋 928/928 · 載入 Celeritas v1141 / Aegis v1652 = 樹上最新;紀錄冊 VIA_VCGC_FullCheck_Ledger_v0100.jsonl",
-   "next": "同病待辦(⓪ 段每輪點名):唯一入口 v0108 · RunAll v0102 → 新版已備妥,待操作員 L70 許可(交接待辦 VCGC-REQ086:console-runall-own-page);#386 兩支收尾鏈 PS → VCGC-REQ086:closeout-own-page",
+   "evidence": "【更正 · Z290】v0100 的「跳 HTML」不成立:launcher v0100 自設 VIA_NO_OPEN=1 到 finally 才還原,同一行程的 PS 加速器模組零跳出閘(批366)把自己的 Invoke-Item 靜默吃掉(pwsh 實跑印「[VIA_NO_OPEN] 抑制跳出」);v0100 實跑都帶 -NoOpen,開頁那段從沒被跑到。修:launchers/Invoke-VIA-FullCheck-v0101.ps1(開自己的頁用 cmdlet 全名 · 呼叫端設 1 照守並印黃字 · 標準模板塊 [VIA:PS-TEMPLATE:v0101] · 開跑印 Celeritas 狀態 · 結尾 MATRIX SUMMARY · 邊跑邊印;pwsh -File 與熱 PS「&」兩式實跑:假 xdg-open 收到 FULLCHECK_latest.html · 優先權 / 環境變數 / 資料夾跑完原樣還原)· CGC_MDL248_FullCheck v0101(⓪ 段加「PS 自擋開頁」:PS 尾版自設 1 後不帶模組名開頁 = 紅並點名檔 · 行;自測 5/5 + 前版 9/9)· 同病:唯一入口 v0108 · RunAll v0102(新版 v0109 / v0103 已備妥並實測,.ps1 要操作員 L70 逐次許可才入樹;⓪ 段每輪點名)。先前證據(照留):CGC_MDL248_FullCheck v0100(六段 · 自測 9/9)· 橋掃 --apply:VDF 網路橋 131/131 · PS 25 加速器橋 928/928 · 載入 Celeritas v1141 / Aegis v1652 = 樹上最新;紀錄冊 VIA_VCGC_FullCheck_Ledger_v0100.jsonl → 2026-10-14(S20261014):S20261014 操作員許可(許可冊 P013–P018)出新版:唯一入口 v0112 · RunAll v0103 · 收尾鏈 v0101 · GitHub 為主收尾 v0101 · SyncFolders v0101,自己的頁改走 Open-VIAOwnPage + 還原 VIA_NO_OPEN(舊版一字不動);CGC_MDL277 pslint:自壓頁 6 → 0",
+   "next": "唯一入口 · RunAll · 兩支收尾鏈 · SyncFolders 自壓頁已出新版(CGC_MDL277 pslint 自壓頁 0);剩 Z291(Roster 模板塊蓋旗標,動共用載入點需另許可)",
    "quotes": [
     {
      "text": "先把這個面檢視實測的工具整合為一  我們先看一下況 確認一下VCGC已經結案上傳全部版本耗時間等都記錄好",
@@ -2829,9 +2835,15 @@
      "text": "這個ＰＳ指令一定沒有加加速模板自動跳出ＨＴＭＬ",
      "recorded_at": "2026-09-30T17:57:26+00:00",
      "said_in": "側線 2026-09-30 b session(逐字;對 VCGC-REQ086 的缺陷回報 → Z290)"
+    },
+    {
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
-   "s0930b": true
+   "s0930b": true,
+   "s1014": true
   },
   {
    "code": "VCGC-REQ087",
@@ -2899,8 +2911,8 @@
     "VDF-WKF010",
     "VDF-WKF006"
    ],
-   "evidence": "(本批進行中)",
-   "next": "ENG087 新版 diff · ENG094 新版 fetch / breakdown · 單引擎測試冊;實抓由操作員在工作站開同意閘跑;R51b:工作站開閘跑 FLOW_ENG023 v0101 --refresh 定奪 3 檔名碼衝突 + 34 檔待驗(衝突哨兵 ③ 轉綠 → CI PS7 閘綠)",
+   "evidence": "(本批進行中) → 2026-10-14(S20261014):收尾一鍵 v0100 第 ⑤ 段 = Invoke-VIA-VdfFetch 尾版 v0108(① 台股清單 + 主動式台股 ETF 全清單補齊 → ② 全步並行;容器 -Dry 計畫 GREEN)· 第 ⑥ 段 ENG094 fetch(NAV · AUM · 單位數 · 淨流入 / 流出)容器同意閘關 → 照實 NO_CONSENT(SKIP)· 第 ⑦ 段 ENG094 breakdown 零網路 143 列 GREEN(industry 多數未分類:容器沒有 tw_listings_industry)· 表頭冊 v0102 收 etf_stats_daily(被動 / 海外 ETF NAV · AUM)· 毛申購 / 毛贖回仍查無官方來源 → NULL",
+   "next": "工作站一行:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>(-Consent = 操作員親手開同意閘)→ 清單 → 全步擷取 → ENG094 fetch --apply(兩個交易日)→ breakdown --apply → CGC_MDL249 all --apply;毛申購 / 毛贖回待操作員給官方端點",
    "hand": "AI · 操作員(同意閘與實抓)",
    "quotes": [
     {
@@ -2922,11 +2934,17 @@
      "text": "從vcgc進vdf啟動他時測2023-06-01~最 新  所有資料啟動",
      "recorded_at": "2026-10-02T13:30:00+00:00",
      "said_in": "R52 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
    "r34": true,
    "evidence_r51b": "FLOW_ENG023_FlowTwActiveEtf_v0101(薄尾):--refresh 收 t187ap47_L + STOCK_DAY_ALL 官方名錄(經 SuperAccel.fetch、同意閘在工具裡),CONFLICT_PENDING_VERIFY 取與官方名一致的候選 → VERIFIED_OPENAPI(原值留 seed_*),兩候選都不符照實留衝突;PENDING_VERIFY / SEED_KNOWN 名稱一致轉綠、不符記 NAME_MISMATCH_OPENAPI。自測 10/10(記憶體內冊、零網路);容器閘關 → SKIP rc 2、冊不動。第三方佐證(Yahoo TAI meta):00980A 野村 · 00981A 統一 · 00982A 群益,與批104 矩陣一致。實抓待操作員在工作站開閘:via-vcgc run \"supportive modules/VIA_FlowSystem/FlowSystem_v2/engines/FLOW_ENG023_FlowTwActiveEtf_v0101.py\" --refresh",
-   "evidence_r52": "Invoke-VIA-VdfFetch-v0108.ps1(薄尾;v0107 不動):① 依 VDF_ENG087 refresh --plan 的順序經 VCGC 補兩張清單(ENG055 L1 上市櫃清單 · ENG077 主動 ETF 宇宙 · ENG078 持股驗證 · FLOW_ENG023 名碼定奪 · ENG081 股票日快照 · ENG087 diff · ENG231 清單檔),閘關 = 誠實 GATE/SKIP 不中斷 → ② 原參數交 v0107(plan → Hydra 哨兵 → CGC_MDL134 全部步並行)。PS 加速器橋 + Celeritas 模板章(CGC_MDL230 ④ 708/708 · ⑥ 188/188 GREEN)。容器經 VCGC 逐步驗 argv:5 步 --dry rc 0、名碼定奪閘關 SKIP rc 2、清單 diff/檔 HOLD(容器無清單庫);via-vdffetch 取尾版即本檔。實抓 2023-06-01→今:pwsh -File Invoke-VIA-VdfFetch-v0108.ps1 -Since 2023-06-01(工作站開同意閘)"
+   "evidence_r52": "Invoke-VIA-VdfFetch-v0108.ps1(薄尾;v0107 不動):① 依 VDF_ENG087 refresh --plan 的順序經 VCGC 補兩張清單(ENG055 L1 上市櫃清單 · ENG077 主動 ETF 宇宙 · ENG078 持股驗證 · FLOW_ENG023 名碼定奪 · ENG081 股票日快照 · ENG087 diff · ENG231 清單檔),閘關 = 誠實 GATE/SKIP 不中斷 → ② 原參數交 v0107(plan → Hydra 哨兵 → CGC_MDL134 全部步並行)。PS 加速器橋 + Celeritas 模板章(CGC_MDL230 ④ 708/708 · ⑥ 188/188 GREEN)。容器經 VCGC 逐步驗 argv:5 步 --dry rc 0、名碼定奪閘關 SKIP rc 2、清單 diff/檔 HOLD(容器無清單庫);via-vdffetch 取尾版即本檔。實抓 2023-06-01→今:pwsh -File Invoke-VIA-VdfFetch-v0108.ps1 -Since 2023-06-01(工作站開同意閘)",
+   "s1014": true
   },
   {
    "code": "VRN-REQ008",
@@ -2939,7 +2957,7 @@
     "VIA_SSOT_SynonymUnion_v0100.json",
     "VIA_Central_Synonym_Regex_v0100.json"
    ],
-   "evidence": "(本批進行中)",
+   "evidence": "(本批進行中) → 2026-10-14(S20261014):CGC_MDL249 v0101(+json 型別 · coverage · all;--selftest 5/5 + v0100 15/15 · 前版公開面照轉)· 表頭冊 VIA_Output_Header_SSOT_v0102(+7 表:etf_book · tw_listings · active_tw_etf_universe · etf_holdings_changes · etf_fetch_status · etf_holdings_coverage · etf_stats_daily,欄位照寫入程式 DDL / 列字典帶檔:行)· 容器實資料 check:9 表 GREEN(新 7 + active_etf_list · etf_holdings_daily)· 12 表 NODATA(工作站資料家)· 0 RED · 鎖帳 +9(lock --apply)· coverage:輸出庫 5 · 表 43 · 有表頭 9 · 冊外有資料 28 · 冊外空表 6(待各 manager 照寫入程式補) → 2026-10-14 S20261014b:VIA_Output_Header_SSOT_v0103 +34 表(冊外有資料 28 + 空表 6;寫入程式檔:行 · upsert 鍵照寫入程式;整表重建 / VIEW 記邏輯鍵;先刪再插無逐列鍵的 vrn_report_analyst / metrics · vrn_extraction_logic 不設主鍵)→ CGC_MDL249 coverage 輸出庫 5 · 表 43 · 有表頭 43 · 冊外 0;check GREEN 42 · NODATA 12(工作站資料家)· RED 1(gl_sentiment_daily:CNN_FEAR_GREED 9/23、9/24 各 3 筆完全相同列 = 資料問題 Z297);鎖帳 +33 → 2026-10-14 S20261014c(Z298):VRN_ENG073 v0140 薄尾 resolve_metrics(① eps 原文是 19xx–21xx 四位整數 = 年份,丟 ② 同鍵同值併 ③ 同鍵多值 status 標 CONFLICT:<原狀態>、值都留不替人挑)掛在 run 的 extract_one;+metrics-resolve [--apply] 收斂既有資料(依 report_file 先刪再插)· 收斂自測 5/5 · 完整自測前版鏈 FAIL 集合不變(㉑㉒㉓ 缺 pydantic · ㉝ NLP = 既有紅照實傳出 rc1)→ 容器 vrn_reports.duckdb 77 → 74 列(年份 EPS 丟 2 · 同值併 1 · CONFLICT 2 組);VRN 邏輯索引冊重建(via_vrn_logic_book_v0112 build:ENG086 v0119→v0120 · SUP_MDL749 v0116→v0117 · ENG073 v0139→v0140)→ 指標 55 在位且為尾版 55 · 過期 0 · GREEN",
    "next": "一致性檢查 · 表頭冊 · DataFrame 鎖定引擎;操作員在工作站以樣本實測",
    "hand": "AI · 操作員(實測樣本)",
    "quotes": [
@@ -2947,9 +2965,27 @@
      "text": "VCGC-VRN所有SSOT REGEX同義字等邏輯  全部以GITHUB已成功鎖定的架構為主不要外擴範圍  將輸出HEADER檢視定案後建立DATAFRAME鎖定 以DATAFRAME中資料的輸出即驗證即結果驗證為範圍目標不發散",
      "recorded_at": "2026-09-30T19:35:29+00:00",
      "said_in": "R34 session 2026-09-30(逐字;原話時間以 session 紀錄為準)"
+    },
+    {
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
+    },
+    {
+     "text": "繼續修 VRN provenance 和表頭補齊",
+     "recorded_at": "2026-10-14T09:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
+    },
+    {
+     "text": "繼續修 Z297 Z298 和 VRN 邏輯索引",
+     "recorded_at": "2026-10-14T13:30:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
-   "r34": true
+   "r34": true,
+   "s1014": true,
+   "s1014b": true,
+   "s1014c": true
   },
   {
    "code": "VRN-REQ009",
@@ -3467,7 +3503,7 @@
     "VIA_Handoff_Continuity_SSOT_v0100.json",
     "VIA_VCGC_FunctionInventory_SSOT_v0117.json"
    ],
-   "evidence": "容器:CGC_MDL240 v0101 自測 5/5 + v0100 13/13 · 真跑逐行 [進度] ENV 1/8…8/8;VRN_ENG086 v0119 自測 118/118;test_SourceProvenance 單獨 23/23 OK · 經 ENG114 run(module) 23/23;Invoke-VIA-RealTest-v0101 pwsh 剖析 0 錯",
+   "evidence": "容器:CGC_MDL240 v0101 自測 5/5 + v0100 13/13 · 真跑逐行 [進度] ENV 1/8…8/8;VRN_ENG086 v0119 自測 118/118;test_SourceProvenance 單獨 23/23 OK · 經 ENG114 run(module) 23/23;Invoke-VIA-RealTest-v0101 pwsh 剖析 0 錯 → 2026-10-14 S20261014b:VRN_SystemManager v0152(VRN 自己的 manager · L120)把 provenance 動詞放回自測攔截之前 —— v0111 起 main 以 `--selftest in args[:2]` 攔自測,`provenance --selftest` 被吃成管理器自測鏈,來源回歸測試從沒跑到(10/07 起收據標記都沒見到);handoff test provenance rc 0 · 「[來源回歸] fail=0; tests=23」",
    "next": "工作站:git pull → . .\\Register-VIA-Commands-v0265.ps1 → via-realtest(自動取 v0101)",
    "hand": "AI(實作 · 登錄 · 實測)",
    "quotes": [
@@ -3490,9 +3526,15 @@
      "text": "自動完成到vcgc-vdf  vcgc-vrn成功結果驗證無誤收尾為止",
      "recorded_at": "2026-10-02T03:40:00+00:00",
      "said_in": "R43 session 2026-10-02(逐字)"
+    },
+    {
+     "text": "繼續修 VRN provenance 和表頭補齊",
+     "recorded_at": "2026-10-14T09:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
-   "r43": true
+   "r43": true,
+   "s1014b": true
   },
   {
    "code": "VCGC-REQ100",
@@ -5103,7 +5145,7 @@
     "VIA_Policy_Laws_SSOT_v0104.json",
     "VIA_Handoff_Continuity_SSOT_v0100.json"
    ],
-   "evidence": "政策冊 v0104 L111 補充 ⑦;普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.json:輸出 260 張(VDF 255 · VRN 5;庫 12 個 + VAKE store)· 旗標 {\"NO_CODE(待母系統發號)\": 253, \"NO_SOURCE(來源未登)\": 30, \"MULTI_SOURCE_ONE_CODE(L108 要分號)\": 5};現有號碼只有中央 IDX 冊 7 張核心表(以表名為鍵、不分來源)",
+   "evidence": "政策冊 v0104 L111 補充 ⑦;普查 docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.json:輸出 260 張(VDF 255 · VRN 5;庫 12 個 + VAKE store)· 旗標 {\"NO_CODE(待母系統發號)\": 253, \"NO_SOURCE(來源未登)\": 30, \"MULTI_SOURCE_ONE_CODE(L108 要分號)\": 5};現有號碼只有中央 IDX 冊 7 張核心表(以表名為鍵、不分來源) → 2026-10-14(S20261014):CGC_MDL249 v0101(+json 型別 · coverage · all;--selftest 5/5 + v0100 15/15 · 前版公開面照轉)· 表頭冊 VIA_Output_Header_SSOT_v0102(+7 表:etf_book · tw_listings · active_tw_etf_universe · etf_holdings_changes · etf_fetch_status · etf_holdings_coverage · etf_stats_daily,欄位照寫入程式 DDL / 列字典帶檔:行)· 容器實資料 check:9 表 GREEN(新 7 + active_etf_list · etf_holdings_daily)· 12 表 NODATA(工作站資料家)· 0 RED · 鎖帳 +9(lock --apply)· coverage:輸出庫 5 · 表 43 · 有表頭 9 · 冊外有資料 28 · 冊外空表 6(待各 manager 照寫入程式補) → 2026-10-14 S20261014b:VIA_Output_Header_SSOT_v0103 +34 表(冊外有資料 28 + 空表 6;寫入程式檔:行 · upsert 鍵照寫入程式;整表重建 / VIEW 記邏輯鍵;先刪再插無逐列鍵的 vrn_report_analyst / metrics · vrn_extraction_logic 不設主鍵)→ CGC_MDL249 coverage 輸出庫 5 · 表 43 · 有表頭 43 · 冊外 0;check GREEN 42 · NODATA 12(工作站資料家)· RED 1(gl_sentiment_daily:CNN_FEAR_GREED 9/23、9/24 各 3 筆完全相同列 = 資料問題 Z297);鎖帳 +33 → 2026-10-14 S20261014c(Z297):根因 = VDF_ENG055 L11 把 CNN 歷史序列(最近幾天同一 UTC 日多個時間點)+ 今值接成一批送正典 upsert_rows,正典 anti-join 只擋庫裡已在的鍵、同批重鍵照插;VDF_ENG055 v0123 薄尾送庫前依 date+index 留最後一筆(自測 6/6,⑥ 前版同輸入照插 5 列 / 相異鍵 3 = 測得到 Z297);VDF_ENG229 v0101 +dedupe(乾跑 / --apply / --keep-last;只增帳;自測 7/7 + 前版 10/10)→ 容器庫 256 → 252 列;CGC_MDL249 check gl_sentiment_daily GREEN 252 · RED 0 · 鎖帳 +1",
    "next": "VDF / VRN 依普查補來源、拆多源表;VCGC 建『偵測無誤才發 OUT 號 + 子系統依鍵自動擷取』機制(待操作員點頭再建)",
    "hand": "VCGC / VDF / VRN",
    "quotes": [
@@ -5114,12 +5156,30 @@
     {
      "text": "用VCGC 節省TOKEN工具  擷取VRN VDF 各種輸出資料的HEADER也就是SSOT CODE + DATAFREAME HEADERS + SOURCE不同來源就是不同的輸出SSOT CODE即使同一個資料",
      "recorded_at": "2026-10-05T03:25:00+00:00"
+    },
+    {
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
+    },
+    {
+     "text": "繼續修 VRN provenance 和表頭補齊",
+     "recorded_at": "2026-10-14T09:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
+    },
+    {
+     "text": "繼續修 Z297 Z298 和 VRN 邏輯索引",
+     "recorded_at": "2026-10-14T13:30:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
    "modules": [
     "VIA_Policy_Laws_SSOT_v0104.json",
     "docs/handoff/ai/VCGC_OutputHeaderCensus_20261005.json"
-   ]
+   ],
+   "s1014": true,
+   "s1014b": true,
+   "s1014c": true
   },
   {
    "code": "VCGC-REQ159",
@@ -5813,64 +5873,76 @@
   {
    "code": "VCGC-REQ180",
    "subsystem": "VCGC",
-   "topic": "三系統全景式檢視(VCGC / VDF SYSTEM MANAGER · SSOT · regex · 同義字 · 參數關聯)→ 問題矩陣三燈 → 分批安全修正(AST 錨點 · 不擴大範圍)→ 每修一輪全景複檢 → 成功鎖定記錄 → 直到 VCGC · VDF 無誤 → 跳出 HTML U/I",
-   "requirement": "操作員令(2026-10-12):「用VCGC節省TOKEN工具全景式檢是VCGC/VDF SYSTEM MANAGER及相關SSOT引擎REGEX同義字 收尾完成VCGC VDF後並啟動VCGC及VDF系統跳出HTML U/I完成功能」「用VCGC的節省TOKEN工具全景式檢是VRN SYSTEM MANAGER 相關引擎SSOT REGEX 同義字 輸入輸出參數關聯全部矩陣式管理三燈號檢視用  識別系統整合引擎各類問題  將問題分為可同時修正及應順序修正用精準或彈性AST定位點錨點在不影響系統及指令健康前提下 不產生九頭龍風險前提下  進行一輪安全修正後  再進行一次事後全景式顯示來檢查狀況  修一次都要進行一次全景式檢查現況  成功被鎖定及記錄  錯誤越來越少  實測實修直到VDF VCGC這2個獨立系統完美運作無誤。自動完成鎖住成功持續減少問題在鎖住修復後的部分直到無誤跳出HTML U/I」",
-   "status": "PARTIAL",
+   "topic": "丟失檔先到隔離區找 · 再到 git 歷史找 · 單檔還原(只複製、核 sha256)",
+   "requirement": "登記冊(元件冊 ACTIVE · 交接冊 managed / watch · 需求冊尾版 homes)引用但樹上不在的檔,先到隔離區 VIA_RetiredEngines(清單 + 無清單批次)找,再到 git 刪除歷史找;還原只複製不搬、核 sha256、目的地有檔拒絕、只增帳",
+   "status": "COVERED",
    "homes": [
-    "VIA_Validation_SSOT_v0101.json",
     "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0168.json"
+    "docs/VIA_S20261014_OneShot.md"
    ],
-   "evidence": "全景(容器,只讀):VCGC 串測 252 站 紅 17 · 交接閘紅 5 · SDD X-NUM 紅(4 支)/ X-LOCK 黃(6)/ X-REQ-OPEN 黃(74)· 健康矩陣 VCGC 黃 VDF 黃 VRN 紅(pdfplumber)。逐紅讀日誌(read / slice / digest)歸因:① V-val 紅 = 驗證冊沒登多段交叉代碼(X-REQ-BACK · X-REQ-OPEN · X-PEER · X-PEER-TEXT),v0100 正則只認單段 → MDL246 v0101(8/8)+ 冊 v0101;② P-ui_cmds 紅 = Register-VIA-Commands 自 v0270 是 PS 薄尾,站只讀尾版 → TestAuto v0106 驗點源鏈(6/6;實樹 P-ui_cmds 章全在);③ C-vdf_fetch_groups 六紅 = v0100 自測 ⑫ 算到 VDF 活資料樞的 vdf_tw_market.duckdb(不是網路)→ VDF_MDL012 v0106 自測鏈隔離活樞(4/4,鏈 10/10 · 9/9);④ V-sdd / V-closeout 紅 = X-NUM 沒編號(VCGC 兩支本輪編;VRN 兩支 L120 交 VRN)+ 交接閘 5 紅(polars · pwsh · sidecar · VRN 暫緩 → 工作站);⑤ 其餘紅 / 黃屬容器環境(polars · reportlab · pwsh · VIA_ENV_ROOT · pdfplumber;不裝套件)。可同時修(① ② ③ 互不相依)先做;需順序的(編號 → sdd check → 交接 → 加鎖)排後。 事後全景(容器,整輪 test):紅 17 → 10(清掉 V-val · P-ui_cmds · C-vdf_fetch_groups ×6;新紅 E-number-audit = IMMUT 誤判交接收據 → MDL237 v0118 豁免 docs/handoff/evidence/);健康矩陣 VCGC 黃 VDF 黃 VRN 紅(pdfplumber)不變;SSOT 全景黃不變;交接閘回到原本 5 紅(全屬工作站 / VRN)。",
-   "next": "① handoff test 新 / 改釘案(validation_ssot_v0101 · chain · vdf_fetch_groups ×6)→ VERIFIED;② 編號批 → audit 0/0/0 → sdd check;③ 事後全景(健康矩陣 · sdd · test 整輪)對照紅數;④ 工作站:handoff test 五案 → checkpoint → sdd real / lock --apply(鎖成功版)· VRN 兩支編號(VRN 自己);⑤ 跳出 U/I:run CGC_MDL274_HealthMatrix matrix · run --family vdf VDF_SystemManager ui · run CGC_MDL261_UIEngine build --open",
-   "hand": "AI / 操作員(工作站 · 環境)/ VRN",
+   "evidence": "CGC_MDL276_QuarantineRecover v0100(index · lost · find · restore [--apply] · --selftest 7/7):實樹隔離區索引 446 檔(清單 414 · 無清單批次推回 32)→ VIA_Reports/quarantine/QUARANTINE_INDEX_latest.json;lost 掃元件冊 ACTIVE · 交接冊 managed / watch · 需求冊尾版 homes = 丟失 0(GREEN);還原只複製不搬、核 sha256、目的地有檔拒絕、隔離區沒有才從 git 刪除前提交取回,只增帳 VIA_Quarantine_Restore_Ledger_v0100.jsonl",
    "quotes": [
     {
-     "text": "用VCGC節省TOKEN工具全景式檢是VCGC/VDF SYSTEM MANAGER及相關SSOT引擎REGEX同義字 收尾完成VCGC VDF後並啟動VCGC及VDF系統跳出HTML U/I完成功能",
-     "recorded_at": "2026-10-11T18:30:00+00:00"
-    },
-    {
-     "text": "用VCGC的節省TOKEN工具全景式檢是VRN SYSTEM MANAGER 相關引擎SSOT REGEX 同義字 輸入輸出參數關聯全部矩陣式管理三燈號檢視用  識別系統整合引擎各類問題  將問題分為可同時修正及應順序修正用精準或彈性AST定位點錨點在不影響系統及指令健康前提下 不產生九頭龍風險前提下  進行一輪安全修正後  再進行一次事後全景式顯示來檢查狀況  修一次都要進行一次全景式檢查現況  成功被鎖定及記錄  錯誤越來越少  實測實修直到VDF VCGC這2個獨立系統完美運作無誤。自動完成鎖住成功持續減少問題在鎖住修復後的部分直到無誤跳出HTML U/I",
-     "recorded_at": "2026-10-11T18:30:00+00:00"
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
    "modules": [
-    "CGC_MDL246_ValidationSSOT_v0101.py",
-    "CGC_MDL224_TestAuto_v0106.py",
-    "VDF_MDL012_FetchGroups_v0106.py",
-    "CGC_MDL237_NumberingSystem_v0118.py"
+    "CGC_MDL276_QuarantineRecover_v0100.py"
    ]
   },
   {
-   "code": "VDF-REQ018",
-   "subsystem": "VDF",
-   "topic": "VDF 引擎全帶版號加速器 / 網路工具 · PS 加速模塊 · 清單引擎(台股全市場 · 主動式 ETF)先跑 → 3~5 流程並行擷取(CPU · DRAM · TEMP 上限)· VCGC 檢視沒裝的工具 · 實測後跳出 HTML U/I 帶驗證結果 · 功能鍵 USER-TEST",
-   "requirement": "操作員令(2026-10-12):「VDF所有引擎都要加入最新有版本號的加速器及有版本號的網路工具    PS要加入加速模塊  找到自動更新台股所有個股清單引擎 及主動式台股ETF清單生成引擎先跑後  後面的擷取動作所有動作都要被PS加速器100%覆蓋  在CPU可容忍 記憶體有限 TEMP強力支援下進行3~5流程同步引擎其跑的動作要考量CPU   DRAM+TEMP的能力上限  書實測BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT   1ST INFO AREA  用VCGC將沒安裝的工具請他檢視更新  然後實測修復成功後立刻跳出HTML U/I上面有驗證成功後的結果  VDF完美收工」「下一步一糗收尾VDF VCGC  自動跳出HTNL U/I最佳畫面結構  功能鍵USER-TEST 都有了正常功能」",
-   "status": "PARTIAL",
+   "code": "VCGC-REQ181",
+   "subsystem": "VCGC",
+   "topic": "AI 常做動作做成引擎:叫一個動詞 → 拿一張小卡(判決 + 指紋 · 304)→ 下一步",
+   "requirement": "回顧對話紀錄 AI 每輪重做的動作(讀幾十份報告找判決 · 讀交接大檔 · 查庫現況決定抓不抓 · 撞號掃描 · PS 自壓頁 / 加速器檢查 · 刪除閘 · 總頁)做成引擎,AI 啟動 → 接受結果 → 反饋,省 Token 與 API 擷取",
+   "status": "COVERED",
    "homes": [
     "VIA_Handoff_Continuity_SSOT_v0100.json",
-    "VIA_VCGC_FunctionInventory_SSOT_v0169.json"
+    "docs/VIA_S20261014_OneShot.md"
    ],
-   "evidence": "容器:① 橋稽核(乾跑,只讀)NET 橋 VDF 掃 524 · 掛 137 · 缺 0 · 100%;ACCEL 計畫 0;PS 入口已帶 Invoke-VIACeleritasScoped(.ps1 不改,L70)。② 清單引擎 = 擷取冊 009 VDF_MDL009_TWStockList(自動更新台股全市場清單)· 010 VDF_MDL010_ActiveETFList(主動式 ETF 清單),冊上每支擷取引擎都 needs 這兩支 → VDF_MDL012_FetchGroups v0107 run:兩支先跑(紅就停)→ 其餘族群依 DuckDB 庫 / 同引擎 / 相依分道(真冊:vdf_tw_market 4 族群一道 · vake 4 族群一道一列 · ETF · 指數 · 全球 · parquet)· --jobs 1~5(auto = CPU − 1)· 起每支前 CPU% / DRAM 可用 / TEMP 可用守門(psutil;退 stdlib)· 子行程 VIA_TEMP_ROOT / VIA_DUCKDB_TEMP_DIR / VIA_DUCKDB_MEM_PCT = 50 ÷ 流程(MDL262 規則)· 子行程直接從 MDL008 尾版起(run_v0107 的 __file__ 換裝不是執行緒安全)· fg_runs + PARALLEL_latest.json;自測 9/9 · 前版鏈 v0106 → v0100 PASS;fixture 煙霧(暫存家):清單先跑 rc 0 → 兩道同時起 · 目錄 ok(引擎 fixture 下照自己的閘回 rc 2/3/4)。③ 頁:多一頁「並行擷取 · USER-TEST」+ 左面板「並行流程」「並行跑族群」「USER-TEST」鈕;usertest 動詞:建頁 → 靜態驗 → Chromium headless 逐鍵點 79 綠 0 紅(功能鈕 · 收尾鈕 · 頁籤 · 全選 / 清除 · 快照)→ 結果掛頁。④ VCGC 檢視工具:pdftoppm 缺(MDL273 ext → winget 計畫)· pdfplumber 缺(VRN)· polars / reportlab / pwsh 缺(容器);不裝套件。⑤ BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT / 1ST INFO AREA 書實測 = VRN 首頁(L120 VRN 自己;工作站 via-realtest)。 冊:VDF_FetchGroups_SSOT_v0102.json(族群 → 庫 → 分道)· VDF_FetchSystem_SSOT_v0106.json(引擎列 009 / 010 與 needs)在 functional modules/VDF(VDF 自己的冊,不列 homes;X-REQ 歸屬只認 registry 冊)。",
-   "next": "工作站(操作員的手):registry-sync --apply → EnvToolAudit ext(--apply 要雙閘)→ VDF_SystemManager universe → VDF_MDL012_FetchGroups run --groups ALL --jobs 4 --mode live(雙閘)→ usertest → ui 跳出頁 → handoff test(vdf_fetch_groups_v0107 · usertest · 工作站五案)→ checkpoint → via-realtest(VRN 首頁四區)→ sdd real → lock --apply → HealthMatrix matrix · UIEngine build --open",
-   "hand": "AI / 操作員(雙閘 · 工作站 · 環境)/ VRN(首頁四區)",
+   "evidence": "CGC_MDL277_AiOps v0100(--selftest 6/6):status = 93 份 *_latest.json 只留判決鍵 + 交接頭 + git 對 main → STATUS_INDEX_latest.json(etag,--if-etag 沒變回 304;取代讀 93 份報告與 600 KB 交接檔)· dbcard = VDF / VRN 5 個輸出庫 43 表列數 · 欄數 · 日期欄區間(唯讀;先看卡再決定抓不抓,省 API)· collide --base origin/main = 新增撞號 0(既有同號不同名 17 照列)· pslint 重用 CGC_MDL248 own_page_scan + CGC_MDL124 BridgeSweeper scan_ps:PS 尾版 702 · 缺加速器 0 · 自壓頁 0 · killgate 包 CGC_MDL187 · report → AIOPS_RUN_latest.html",
    "quotes": [
     {
-     "text": "VDF所有引擎都要加入最新有版本號的加速器及有版本號的網路工具    PS要加入加速模塊  找到自動更新台股所有個股清單引擎 及主動式台股ETF清單生成引擎先跑後  後面的擷取動作所有動作都要被PS加速器100%覆蓋  在CPU可容忍 記憶體有限 TEMP強力支援下進行3~5流程同步引擎其跑的動作要考量CPU   DRAM+TEMP的能力上限  書實測BASIC INFO / FINANCIAL DATA / 1ST PAGE MAIN TEXT   1ST INFO AREA  用VCGC將沒安裝的工具請他檢視更新  然後實測修復成功後立刻跳出HTML U/I上面有驗證成功後的結果  VDF完美收工",
-     "recorded_at": "2026-10-12T00:30:00+00:00"
-    },
-    {
-     "text": "下一步一糗收尾VDF VCGC  自動跳出HTNL U/I最佳畫面結構  功能鍵USER-TEST 都有了正常功能",
-     "recorded_at": "2026-10-12T01:40:00+00:00"
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
     }
    ],
    "modules": [
-    "VDF_MDL012_FetchGroups_v0107.py",
-    "VDF_MDL008_FetchSystem_v0107.py",
-    "VDF_MDL009_TWStockList_v0102.py",
-    "VDF_MDL010_ActiveETFList_v0100.py",
-    "CGC_MDL262_DuckTempHook_v0100.py"
+    "CGC_MDL277_AiOps_v0100.py"
    ]
+  },
+  {
+   "code": "VCGC-REQ182",
+   "subsystem": "VCGC",
+   "topic": "收尾一鍵:一支 PS(加速模板 + PS-ACCEL)串起本輪全部指令 · 紅了照跑 · 一頁總報告自動跳出",
+   "requirement": "上面很多指令未執行 → 整合進一個 PS 指令一起執行:省 Token → 交接 → 隔離區找回 → 庫卡 → VDF 台股清單 + 主動式台股 ETF 全清單 → 全步擷取 → ETF NAV / AUM / 流入流出 / breakdown → VDF · VRN 管理器 → 表頭全面 + DataFrame 固定 → PS 檢查 → 撞號 → 全景實測 → VCGC 收尾 → 狀態索引;所有 PY 走最新加速器 / 網路工具(鎖版),PS 帶加速器",
+   "status": "PARTIAL",
+   "homes": [
+    "VIA_Handoff_Continuity_SSOT_v0100.json",
+    "docs/VIA_S20261014_OneShot.md"
+   ],
+   "evidence": "launchers/Invoke-VIA-OneShot-v0100.ps1(模板塊 [VIA:PS-TEMPLATE:v0101] + PS-ACCEL 橋 + Open-VIAOwnPage;15 段只叫既有正主,紅了照跑;鎖版工具印 accelerator v1141 · network v1652 · token v0117 · nlp v0106 · frame v0100)。容器 pwsh 實跑(同意閘關 · 乾跑):2026-10-14 容器 pwsh 7 實跑 2118 秒 · 結束碼 1:① 省 Token GREEN 3.9s · ② 交接 check RED(本批新模組未登錄 · 相依證據因新檔失效 → 登錄後重測)· ③ 隔離區找回 GREEN(丟失 0)· ④ 庫卡 GREEN · ⑤ VdfFetch v0108 -Dry GREEN 37.9s · ⑥ ENG094 fetch SKIP(同意閘關 NO_CONSENT)· ⑦ breakdown GREEN(143 列)· ⑧ VDF 管理器 YELLOW(邏輯 STALE;容器實跑時誤標 SKIP,已改為只有抓網段才可 SKIP)· ⑨ VRN 管理器 RED(邏輯索引過期 2,VRN 自己的)· ⑩ 表頭 all YELLOW(NODATA 12 · 冊外 28)· ⑪ pslint GREEN · ⑫ collide GREEN(新增 0)· ⑬ FullCheck RED 1899.6s(三橋 GREEN:ACCEL 1645/1645 · NET 137/137 · PS-ACCEL 993/993 · 自擋開頁 0;串測逾時 1800s · 單一路徑版本不齊 3 · 格子存證 366.7h 舊 · 交接驗收 RED)· ⑭ closeout(乾跑)RED:停在 VRN provenance 案(rc 0 但標記「[來源回歸] fail=0」沒印,VRN 自己的)· ⑮ status:98 份報告紅 17;總頁 AIOPS_RUN_latest.html 經 Open-VIAOwnPage 實際跳出(xdg-open 記錄 07:38:24) → 2026-10-14 S20261014c:收尾一鍵第 ⑨ 段 VRN 管理器 status 的「邏輯 RED 索引過期 2」已由 VRN 自己的邏輯冊 build 清掉(過期 0 · 邏輯 GREEN;剩 ABSENT 3 = 參數冊缺 VRN_RESEARCHREPORT_SSOT_ACTIVE · 引擎鏈缺件,既有,非本批)",
+   "next": "工作站:pwsh -NoProfile -File VeritasIntelligenceAnalytics\\launchers\\Invoke-VIA-OneShot-v0100.ps1 -Consent -Apply -Since <YYYY-MM-DD>;VRN 管理器 status RED(邏輯索引過期 2)由 VRN 自己的 manager 處理(L120)",
+   "hand": "操作員(工作站 -Consent -Apply 實跑)· VRN 管理器(邏輯索引過期 2)",
+   "quotes": [
+    {
+     "text": "丟失的文件可到隔離區尋找　　修正完善收尾功能不要發散　　ＶＤＦ　ＶＲＮ　輸出ＨＥＡＤＥＲ還要檢查權全面　　自動更新台股權清單及主動式台股ＥＴＦ全清單　　ＥＴＦ資料要抓到ＮＡＶ　ＡＵＭ　ＣＡＳＨ　ＩＮＦＬＯＷ　ＡＮＤ　ＯＵＴ　ＦＬＯＷ　ＡＮＤ　ＢＲＥＡＫＤＯＷＮ　　　輸出ＨＥＡＤＥＲ完整確認然後ＤＡＴＡＦＲＡＭＥ固定　　ＤＡＤＡＢＡＳＥ結構最佳化省ＡＰＩ擷取ＴＯＫＥＮ及ＡＩ讀取現況　回顧對話紀錄ＡＩ常做的動作做引擎讓ＡＩ啟動接受結果在反饋以節省ＴＯＫＥＮ 5 上面有很多指令未執行  整合起來進一個ps指令一起執行 integrate all above into one code with all modules and engines with the latest accelerator modules and network modules 100% coverage. ps code are also equipped with acceleraor function. 上面很多還沒執行",
+     "recorded_at": "2026-10-14T06:00:00+00:00",
+     "said_in": "側線 2026-10-14 session(逐字)"
+    }
+   ],
+   "modules": [
+    "Invoke-VIA-OneShot-v0100.ps1",
+    "Invoke-VIA-OperatorConsole-v0112.ps1",
+    "Invoke-VIA-RunAll-v0103.ps1",
+    "Invoke-VIA-VCGC-CloseoutChain-v0101.ps1",
+    "Invoke-VIA-GitHubFirst-Closeout-v0101.ps1",
+    "Invoke-VIA-SyncFolders-v0101.ps1"
+   ],
+   "s1014c": true
   }
  ],
  "non_requirements": [
@@ -6063,7 +6135,7 @@
  "why_v0190": "v0189 已發布 → 出新版;VCGC-REQ177 COVERED → PARTIAL:工作站 2026-10-11 合併分支被擋:工作站 VRN 自己的鏈已到 v0190(本機未追蹤,比備份分支 v0189 新),與 VCGC 側的 L121 VRN 尾版 v0190 再撞號;VCGC 側佔用 VRN_SystemManager 任何號碼,不是撞號就是變成工作站 VRN 的尾版(L120 互不影響不許)→ 撤回 VCGC 側 VRN 尾版(main 的 v0152 與本分支 v0190 都不留),L121 VRN 版面交 VRN 自己的 manager 下一版套用:照 supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json,可照抄 VDF_SystemManager_v0152 的 l121_patch(同一套);撤回前的草稿在 git 提交 ade21518(functional modules/VRN/VRN_SystemManager_v0190.py);tally 照實重算;其餘一字不動",
  "why_v0191": "v0190 已發布 → 出新版;+VCGC-REQ179(操作員 2026-10-11 三則原話逐字;VDF / VCGC 已套,VRN 交 VRN 自己的 manager,展現重整待點名)· 非需求 +1(local libs 提問);tally 照實重算;其餘一字不動",
  "why_v0192": "v0191 已發布 → 出新版;VCGC-REQ179 evidence / homes / modules / next 補展現重整這一輪,原話 +「GO ON」;狀態仍 PARTIAL;其餘一字不動",
- "why_v0193": "v0192 已發布 → 出新版;+VCGC-REQ180(操作員 2026-10-12 兩則原話逐字;PARTIAL:容器三件修正已自測,交接 / 編號 / 加鎖與工作站環境待下一步);其餘一字不動",
- "why_v0194": "v0193 已發布 → 出新版;VCGC-REQ180 evidence 補事後全景計數與 MDL237 v0118(IMMUT 不算交接收據);其餘一字不動",
- "why_v0195": "v0194 已發布 → 出新版;+VDF-REQ018(操作員 2026-10-12 兩則原話:VDF 引擎加速器 / 網路工具 · PS 加速模塊 · 清單引擎先跑 → 3~5 流程並行 · CPU / DRAM / TEMP 上限 · 工具檢視 · 跳出 U/I 帶驗證 · 功能鍵 USER-TEST);tally PARTIAL +1;其餘一字不動;homes 只列 registry 冊(VDF 兩冊改記在 evidence;X-REQ 歸屬規則)"
+ "why_v0193": "v0192 已發布 → 出新版(連號 v0193:刪除閘 KILL-11 版號不得跳);+VCGC-REQ180/181/182(需求碼照主線連號);VDF-REQ014 · VRN-REQ008 · VCGC-REQ158 · VCGC-REQ086 補本輪證據;其餘一字不動。註:未併分支 claude/kind-cannon-pti15g 也用了 v0193–v0199 與 VCGC-REQ180/181,該分支若之後併入由後併者改號(LL334)",
+ "why_v0194": "v0193 已發布 → 出新版;VCGC-REQ180/181/182 homes 改成 SDD 認得的歸屬(交接冊 · 批次文件;模組名留 modules — v0193 寫模組檔名 = X-REQ 歸屬指到不存在);VRN-REQ007 · VCGC-REQ099 · VCGC-REQ158 · VRN-REQ008 補本輪證據;其餘一字不動",
+ "why_v0195": "v0194 已發布 → 出新版;VCGC-REQ158 · VRN-REQ008 · VCGC-REQ182 補本輪證據(操作員「繼續修 Z297 Z298 和 VRN 邏輯索引」= 既有條續修,不開新號);其餘一字不動"
 }
