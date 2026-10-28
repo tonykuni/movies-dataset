@@ -1,0 +1,105 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0143",
+ "date": "2026-10-29",
+ "operator_paste_back_2026_10_29": [
+  "本地實測一輪 v0100 桌機實跑(01:33 · 7305 秒):② ChainShip RED(ship 後仍缺 v0248 / v0253)· ③ VRN-2 v0142 rc 1(兩個啟動器重疊 → RAM 0.16 GB → ⑦ 1500 秒無輸出被停 · ⑪ 1800 秒超時 · ⑫b 120 秒超時 → ⑤b 紅)· ① logo 沒找到 · ④ 貼回包 13 收據 + 7 PDF",
+  "C:\\Users\\tonyk\\OneDrive\\Pictures\\seal-logo-square.png 用一個 PS 取解決上述所有問題"
+ ],
+ "base_package": {
+  "name": "VRN2_Closeout_v0142 (launcher v0142 · runtime v0142 162 members · manager v0243 · ENG062 v0117 · verifier v0110 · verbatim v0104 · Workbench v0100)",
+  "retained": "runtime v0142 zip + manifest byte-identical; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0142 for the closeout entry; VRN-2 one-click v0142; operator one-click v0103 → v0104; ChainShip v0100 → v0101 (desktop recover)",
+ "design": {
+  "ActivateVRN-2_v0143": "single-instance lock VIA_Reports/vrn2/VRN2_Launcher.lock (live PID → refuse rc 1; stale → take over; VRN2_FORCE_PARALLEL=1 overrides) · child limits from env with wider defaults (VRN2_UI_REFRESH_WAIT 600 · VRN2_SILENT_MAX 3600 · VRN2_MANIFEST_WAIT 900 · VIA_VRN2_VERIFY_WAIT 3600) · ⑫b in-process fallback (same patch_ui) · receipt VRN2_Closeout_v0143.json gains guard / limits / ui_block",
+  "VRN2_ChainShip_v0101": "ship first recovers each MISSING link / book from the VIA tree (incl. functional modules/VRN2 and backups), --extra folders and %USERPROFILE%\\Downloads VRN2_* folders and zips (nested runtime zips); unique content + ast/json ok → copied into VRN (or SSOT/) then shipped; ambiguous → listed only"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0143.py",
+   "sha256": "90904b09d7ed69613cffa567dabccf56ffd8eaec63a874dea13300bd5af1bb52",
+   "bytes": 35094
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "f73a3b7903803e9d4ccf2bd50a80f82d854a9114a8208bc680be22874157fca8",
+   "bytes": 1429
+  },
+  {
+   "path": "README.txt",
+   "sha256": "8c24505e607e0e4dc9ee444b3f66885213462e536f3719f7b6bbe4a76d9d6fb1",
+   "bytes": 1267
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "c2558040d0edb3c395a36ffcef4169e68668bde03c0d80535c39e57b7d8e1633",
+   "bytes": 89
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0142.json",
+   "sha256": "d2d4198a65e579439cc179fb40be47a818fdc64a039bbd26cc467e54b847d16d",
+   "bytes": 21531
+  },
+  {
+   "path": "VRN2_Runtime_v0142.zip",
+   "sha256": "94af4b90470e8ec1d479902a54c6039aa81b6ae45a9d94f963d5e3d46c293041",
+   "bytes": 6689581
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  }
+ ],
+ "runtime": {
+  "version": "v0142",
+  "zip_sha256": "94af4b90470e8ec1d479902a54c6039aa81b6ae45a9d94f963d5e3d46c293041",
+  "based_on": "VRN2_Runtime_v0141.zip b41b6dc65ba52c6ed6d497faaa7230230745811437a3b2c0940160ac3b3f1242",
+  "retained_members": 159,
+  "new_members": [
+   "VRN_ENG062_SummarizerV1_v0117.py",
+   "VRN2_Workbench_v0100.py",
+   "VRN2_Workbench_Assets_v0100.zip"
+  ],
+  "files": "see VRN2_Runtime_v0142.json inside the package"
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · 19 real sample files (shipF)",
+ "results": {
+  "status": "see VRN2_Verification_v0143.md"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0143.zip",
+  "sha256": "1fd30c4ee23ea06edd2f9dba931d5a1f5953246c2426b274b050968ebd7b205c",
+  "bytes": 7456928,
+  "layout": "VRN2_Closeout_v0143/<files> (no .ps1 · the one-click md is the entry)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0143.py",
+  "sha256": "90904b09d7ed69613cffa567dabccf56ffd8eaec63a874dea13300bd5af1bb52"
+ },
+ "oneclick": "VRN2_OneClick_v0143.md",
+ "test_tools_zip": "vrn2_test_tools_v0143.zip",
+ "logs_zip": "logs_v0143.zip"
+}
