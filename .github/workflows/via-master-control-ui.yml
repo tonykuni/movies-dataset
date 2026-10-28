@@ -375,23 +375,36 @@ jobs:
           foreach ($h in $late) { $null = [scriptblock]::Create($h.Right.Expression.Value) }
           Write-Host ("Register parsed: " + (Split-Path -Leaf $register) + " · late-compiled helpers " + @($late).Count)
 
-      - name: VRN manager contracts through the sole entry
+      # 操作員 2026-10-19 令(政策 L123 · 2026-10-28 重申):VRN-1 / VRN-2 / VDF / VCGC 四系統對等獨立、互不干涉;VRN-2 有自己的 MAIN(),
+      # 這一步直接啟動 VRN_SystemManager 尾版(VRN-2 的底座),不經 VCGC 的 run 閘(registry-sync / 編號是 VCGC 自己的冊,不擋 VRN-2 的契約測)
+      - name: VRN-2 thin-tail chain check (own tool · read-only)
         shell: pwsh
         run: |
-          $env:VIA_FROM_VCGC = "YES"
-          $env:VIA_VCGC_PUSH = "NO"
-          $env:VIA_HUB_RUN = "ci-contracts-$env:GITHUB_RUN_ID"
+          $env:PYTHONUTF8 = "1"
+          $vrn = Join-Path (Resolve-Path ".\VeritasIntelligenceAnalytics") "functional modules\VRN"
+          $ship = (Get-ChildItem $vrn -Filter "VRN2_ChainShip_v*.py" -File |
+            Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+            Select-Object -Last 1).FullName
+          if (-not $ship) { throw "VRN2_ChainShip absent" }
+          python $ship check
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::VRN-2 薄尾鏈缺前版(桌機跑 VRN2_ChainShip ship --commit --push 補船)"; exit $LASTEXITCODE }
+
+      - name: VRN-2 manager contracts through its own MAIN
+        shell: pwsh
+        run: |
+          $env:PYTHONUTF8 = "1"
           $via = Resolve-Path ".\VeritasIntelligenceAnalytics"
-          Push-Location $via
+          $vrn = Join-Path $via "functional modules\VRN"
+          $mgr = (Get-ChildItem $vrn -Filter "VRN_SystemManager_v*.py" -File |
+            Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
+            Select-Object -Last 1).FullName
+          if (-not $mgr) { throw "VRN-2 manager absent" }
+          Write-Host ("VRN-2 MAIN: " + (Split-Path -Leaf $mgr))
+          Push-Location $vrn
           try {
-            $registry = Join-Path $via "supportive modules\registry"
-            $vcgc = (Get-ChildItem $registry -Filter "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py" -File |
-              Sort-Object { [int]([regex]::Match($_.BaseName, '_v(\d+)$').Groups[1].Value) } |
-              Select-Object -Last 1).FullName
-            if (-not $vcgc) { throw "VCGC entry absent" }
-            python $vcgc run VRN_SystemManager logic
+            python $mgr logic
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            python $vcgc run VRN_SystemManager provenance --selftest
+            python $mgr provenance --selftest
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } finally {
             Pop-Location
