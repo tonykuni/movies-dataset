@@ -8,7 +8,7 @@
 | 步 | 做什麼 | 開關 |
 |---|---|---|
 | ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `Downloads` / `Desktop` / `Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
-| ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0100.md` 的程式碼(核對 SHA-256)→ 執行:`check` → `ship --commit --push` → `check`(把桌機在位、倉上沒有的前版推上去;被拒只黃) | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
+| ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0100.md` 的程式碼(核對 SHA-256)→ 綁到本輪的倉(`$REPO` ← VIA 根所在的 git 倉;結束碼 = 它的綜合燈,push 被拒 = 黃)→ 執行:`check` → `ship --commit --push` → `check`(把桌機在位、倉上沒有的前版推上去) | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
 | ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0103.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:v0142 套件 → ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
 | ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0142.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
 
@@ -47,6 +47,20 @@
     Write-Host ("  [計] {0} 程式碼 SHA-256 {1} 相符(GitHub {2})" -f $name, $sha.Substring(0, 12), $src) -ForegroundColor DarkGray
     return $code
   }
+  function BindChainShip([string]$c) {   # 雜湊相符後再綁(Codex #571 P1/P2):$REPO ← $R 所在的倉 · 早退與綜合燈都寫進 $global:LASTEXITCODE(0 綠 · 2 黃 · 1 紅)
+    $top = "$(git -C $R rev-parse --show-toplevel 2>$null)".Trim(); if (-not $top) { Write-Host "  [RED] $R 不在 git 倉內 · ChainShip 不執行" -ForegroundColor Red; return $null }
+    if ($top -notmatch '^/') { $top = $top -replace '/', '\' }
+    $mRepo = [regex]::Match($c, '(?m)^[ \t]*\$REPO = "[^"\n]*"[ \t]*$'); $nRepo = [regex]::Matches($c, '(?m)^[ \t]*\$REPO = "[^"\n]*"[ \t]*$').Count
+    $nRet = [regex]::Matches($c, '; return \}').Count
+    $mLamp = [regex]::Match($c, '(?m)^([ \t]*)\$lamp = if .*$'); $nLamp = [regex]::Matches($c, '(?m)^[ \t]*\$lamp = if .*$').Count
+    if ($nRepo -ne 1 -or $nRet -ne 4 -or $nLamp -ne 1) { Write-Host ("  [RED] ChainShip 程式碼結構不如預期(REPO {0} · return {1} · lamp {2};要 1 · 4 · 1)· 不執行" -f $nRepo, $nRet, $nLamp) -ForegroundColor Red; return $null }
+    $q = [regex]::Match($mRepo.Value, '"[^"]*"').Value
+    $c = $c.Replace($mRepo.Value, $mRepo.Value.Replace($q, '"' + $top + '"'))
+    $c = $c.Replace('; return }', '; $global:LASTEXITCODE = 1; return }')
+    $c = $c.Replace($mLamp.Value, $mLamp.Value + "`n" + $mLamp.Groups[1].Value + '$global:LASTEXITCODE = @{ GREEN = 0; YELLOW = 2; RED = 1 }[$lamp]')
+    Write-Host ("  [綁] ChainShip 倉 {0} · 結束碼 = 綜合燈" -f $top) -ForegroundColor DarkGray
+    return $c
+  }
   $dry = ($env:VRN_ROUND_DRY -eq '1')
   Write-Host ("[VRN-2 本地實測一輪 v0100] VIA 根 {0} · 來源 {1} · 貼回包 {2}{3}" -f $R, $SRC, $out, $(if ($dry) { ' · 乾跑(不執行子段)' } else { '' })) -ForegroundColor Yellow
   if (-not (Test-Path -LiteralPath $R)) { Say '⓪ VIA 根' RED "找不到 $R · 設 `$env:VRN2_ROOT 後再貼" } else { Say '⓪ VIA 根' GREEN $R }
@@ -71,7 +85,8 @@
   if ($env:VRN_ROUND_NO_SHIP -eq '1') { Say $k2 GRAY '跳過(VRN_ROUND_NO_SHIP=1)' }
   else {
     $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai' 'VRN2_ChainShip_v0100.md' $H_CS
-    if (-not $code) { Say $k2 RED '取不到或雜湊不符 · 沒跑' }
+    if ($code) { $code = BindChainShip $code }
+    if (-not $code) { Say $k2 RED '取不到、雜湊不符或結構不如預期 · 沒跑' }
     elseif ($dry) { Say $k2 GREEN '乾跑:程式碼已核對,不執行' }
     else {
       $global:LASTEXITCODE = 1
@@ -129,3 +144,4 @@
 
 開關一覽:`$env:VRN2_ROOT`(VIA 根)· `$env:VRN2_SOURCE`(來源夾)· `$env:VRN2_LOGO`(印章圖路徑)· `$env:VRN_ROUND_NO_SHIP='1'` 不補船 · `$env:VRN_ROUND_WITH_VRN1='1'` 連 VRN-1 一起跑 · `$env:VRN_ROUND_NO_PDF='1'` 不裝 PDF · `$env:VRN_ROUND_DRY='1'` 乾跑(只取碼、核對雜湊,不執行)。
 程式碼只讀 GitHub 上已核對 SHA-256 的兩段(操作員一鍵 v0103 · ChainShip 一鍵),GitHub 上那兩段若換版,本段會紅並停,不會跑到未核對的碼。
+ChainShip 那段核對後只做三處確定性改寫(`$REPO` 行 1 處 → 本輪的倉 · 4 處早退補 `$global:LASTEXITCODE = 1` · `$lamp` 行後加一行把綜合燈寫成結束碼);三處數目不符(1 · 4 · 1)就紅不執行。
