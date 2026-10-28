@@ -53,4 +53,12 @@ git log --all -- '*VRN_SystemManager_v025[0-3]*' → 空(v0250~v0253 從未進�
 - 「需要刪除 / 覆寫既有版本」:無。「需改 VRN-1 / VDF / VCGC / v1652」:無。MOPS DENY:未觸及。
 - 本段停在:**執行環境不符**(§0「執行指令必須自己找檔(Downloads 最新版)」→ [RED] Downloads 沒有 v0158)。
 
-NEXT:請在桌機貼 §6 指令跑 `--loop 3 --closeout`;Day 2 工作 11 前先決定「前版鏈隨船」是否納入 ⑨。
+## 6. 決定(2026-10-28 · 操作員令「依我最大利益決定」· 雲端代決 · 可推翻)
+
+1. **前版鏈隨船 = 是。** 已搜遍 origin 全部 272 個分支(含 `vrn2-auto` edc215ad):v0242 / v0246 / v0247 / v0248 / v0253 · ENG062 v0114 · UIAction v0106 · VDF v036 **沒有任何一個分支有**,只在桌機。
+   桌機下一輪 ⑨ 必須把鏈上所有在位前版一起上船(只增 · 同名不同內容出 v+1 · 不覆寫),否則工作 11 不能算過。雲端做不到,不冒充。
+2. **VCGC 座位冊不帶上船。** `handoff check` 自動把 `VIA_VCGC_SubsystemSeat_v0100.json` 的 VRN 座位改成 v0254、VDF 改成 v0162;那是 VCGC 的冊,已還原到提交版、未入本分支。要改經 VCGC `registry-sync --apply`。
+3. **本分支不開 PR、不推 main。** 審核冊只放 `claude/vrn2-closeout-authorization-y4ixl7`;要進 main 由桌機 ⑨ 或 Tony 決定。
+4. **不疊版。** 不在雲端出 v0255 / ENG397 v0130 / ENG062 v0115:缺前版與樣本,出了也驗不了(§7「連續兩版同家族仍無法轉綠」防線)。
+
+NEXT(桌機):貼授權書 §6 指令跑 `--loop 3 --closeout`;貼包出來後把本冊 §2 表與 §6 第 1 條一起貼給桌面端 Claude,Day 2 工作 11 先補鏈再上船。
