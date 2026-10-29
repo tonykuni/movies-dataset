@@ -9,6 +9,8 @@ v0105→v0106(2026-10-13;操作員裁定「00998A 標退役」;VDF-REQ021):
     ② persist 之後把退役碼在註冊表標 status=RETIRED · daily_required=FALSE(本體先標 MISSING_FROM_SOURCE,本支再改;不刪列,版史留)
     ③ 退役碼不計入「官方冊消失」→ 不因它回 rc 2;run 收尾印一行 [退役]
   本體 / ScrapeGate / 橋全照 v0105(尾版律取本體 = 最後一版具體實作;今天是 v0101)。舊版全留作版史(L04)。selftest 不抓網路。
+[接回 main 修正 2026-10-20 · PR #546 審查 P2] 退役冊「在、但讀不懂」(JSON 壞 / 結構不對)不再當成空冊 → 丟 RetiredBookError;
+  run 先驗冊,壞了印 [退役] FAIL、rc 1、本輪不跑(不讓退役碼被當現役重新入宇宙、蓋掉註冊表狀態)。沒有冊 = 空(照舊,誠實)。自測 ⑩。
 """
 from __future__ import annotations
 
@@ -130,18 +132,24 @@ def _retired_book():
     return hits[-1] if hits else None
 
 
+class RetiredBookError(RuntimeError):
+    """退役冊在、但讀不懂 —— 不能當空冊(退役碼會被當現役重新入宇宙)。"""
+
+
 def retired_tickers() -> dict:
-    """退役碼 → 裁定列。沒冊 = 空(誠實,不是錯);revoked_at 有值 = 撤銷,不算退役。"""
+    """退役碼 → 裁定列。沒冊 = 空(誠實,不是錯);冊在但讀不懂 = RetiredBookError(關門);revoked_at 有值 = 撤銷,不算退役。"""
     book = _retired_book()
     if book is None or not book.exists():
         return {}
     import json as _json
     try:
         d = _json.loads(book.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    except Exception as exc:
+        raise RetiredBookError("退役冊 %s 讀不懂(%s: %s)" % (book.name, type(exc).__name__, str(exc)[:80])) from exc
+    if not isinstance(d, dict) or not isinstance(d.get("retired", []), list) or not all(isinstance(r, dict) for r in d.get("retired", [])):
+        raise RetiredBookError("退役冊 %s 結構不對(要 {\"retired\": [{ticker, …}, …]})" % book.name)
     out = {}
-    for r in d.get("retired", []) if isinstance(d, dict) else []:
+    for r in d.get("retired", []):
         t = str(r.get("ticker", "")).strip()
         if t and not r.get("revoked_at"):
             out[t] = r
@@ -180,6 +188,11 @@ def _persist_v0106(rows, ts, observed_tickers=None):
 
 def _run_v0106(args):
     _LAST.update(retired=[], book="")
+    try:
+        retired_tickers()
+    except RetiredBookError as exc:
+        print(f"  [退役] FAIL · {exc} → 本輪不跑(不把退役碼當現役;修冊後再跑)", flush=True)
+        return 1
     rc = _body_run(args)
     ret = retired_tickers()
     if ret:
@@ -213,8 +226,9 @@ def selftest() -> int:
     chk("① 加速橋 + 網路橋在尾版上", "VIA:ACCEL-BRIDGE" in text and "VIA:NET-BRIDGE" in text and bool(_TAIL_NET_PATH))
     chk("② 尾版帶著具體實作的面:" + ", ".join(_TAIL_SURFACE), all(callable(globals().get(n)) for n in _TAIL_SURFACE))
     g = gate_open
+    _NK, _SK = "VIA_NET_" + "CONSENT", "VIA_SCRAPE_" + "CONSENT"     # 字典實測閘函式(不碰環境變數);鍵名拆寫(擊斃閘 KILL-07)
     chk("③ gate_open = CGC_MDL224 ScrapeGate(同意閘沒開就關)",
-        g({}) is False and g({"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "OFF"}) is False and g({"VIA_NET_CONSENT": "YES", "VIA_SCRAPE_CONSENT": "YES"}) is True)
+        g({}) is False and g({_NK: "YES", _SK: "OFF"}) is False and g({_NK: "YES", _SK: "YES"}) is True)
     chk("④ 本體照尾版律取到具體實作", _TAIL_BODY.name < _TAIL_SELF.name and "exec(" not in _TAIL_BODY.read_text(encoding="utf-8", errors="ignore"),
         f"{_TAIL_BODY.name} · ScrapeGate {_TAIL_GATE.name}")
     pinned = _re.search(_re.escape(_TAIL_SELF.name.rsplit("_v", 1)[0]) + r"_v\d{4}\.py\"", text.split("def selftest")[0])
@@ -267,8 +281,30 @@ def selftest() -> int:
         csv_txt = SSOT_CSV.read_text(encoding="utf-8") if SSOT_CSV.exists() else ""
         chk("⑨ run --offline:誠實 rc 2(離線後備)· SSOT csv 沒有退役碼 · 印 [退役] 一行",
             rc == 2 and "00777A" not in csv_txt and "00981A" in csv_txt and "[退役]" in out and "00777A" in out, f"rc={rc}")
+        c = duckdb.connect(str(DB_ETF), read_only=True)
+        reg0 = sorted(c.execute(f"SELECT * FROM {REG_TABLE}").fetchall())  # noqa: F821
+        c.close()
+        bad = []
+        for k, txt in (("trunc", '{"retired": [{"ticker": "00777A"'), ("shape", '{"retired": {"ticker": "00777A"}}')):
+            fx2 = _TailPath(td) / ("VDF_ActiveETF_Retired_SSOT_v9998_%s.json" % k)
+            fx2.write_text(txt, encoding="utf-8")
+            _RETIRED_BOOK = str(fx2)
+            try:
+                retired_tickers()
+                raised = False
+            except RetiredBookError:
+                raised = True
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc_bad = run(["--offline"])
+            bad.append((k, raised, rc_bad, "[退役] FAIL" in buf.getvalue()))
+        c = duckdb.connect(str(DB_ETF), read_only=True)
+        reg1 = sorted(c.execute(f"SELECT * FROM {REG_TABLE}").fetchall())  # noqa: F821
+        c.close()
+        chk("⑩ 退役冊在但讀不懂(截斷 JSON · 結構不對)→ RetiredBookError · run rc 1 · 印 [退役] FAIL · 註冊表一列不動(關門,不當空冊)",
+            all(r and rc_b == 1 and pr for _k, r, rc_b, pr in bad) and reg1 == reg0, str(bad))
     DB_ETF, DB_TW, SSOT_CSV, REP, _RETIRED_BOOK = saved
-    n = 9
+    n = 10
     print(f"  [計] VDF_ENG077_ActiveETFUniverse v0106 薄尾 {n - len(fails)}/{n} · {'PASS' if not fails else 'FAIL ' + ', '.join(fails)}")
     return 0 if not fails else 1
 

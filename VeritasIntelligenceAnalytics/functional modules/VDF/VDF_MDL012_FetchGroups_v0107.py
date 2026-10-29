@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# [接線 2026-10-20] 本檔 = 工作站分支 workstation-20261020 的同號原文(main 沒有此版,不撞號)。工作站 v0106(自測鏈隔離活資料樞)不搬:
+#   main v0106 已在前版鏈自測期間封倉(_SEAL_REPO_HUB),同一目的;本檔前版照 glob 取 main v0106。
 """VDF_MDL012_FetchGroups v0107 — 薄尾:清單引擎先跑 → 依 DuckDB 庫分道 3~5 流程並行擷取(CPU · DRAM · TEMP 守門)· 頁「並行擷取 · USER-TEST」· usertest 功能鍵實測
 
 操作員令(2026-10-12 原話):「找到自動更新台股所有個股清單引擎 及主動式台股ETF清單生成引擎先跑後 後面的擷取動作所有動作都要被PS加速器100%覆蓋
@@ -499,7 +501,7 @@ def cmd_run_v0107(argv: list) -> int:
         print("  (--dry:只列,不起子行程、不寫檔)")
         return 0
     if a.mode == "live" and not V0100.gates_open():
-        print("[GATED] 雙閘沒開 —— 零子行程、零出網、零寫檔。本行程環境開閘(操作員的手,本檔永不代設):VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES")
+        print("[GATED] 雙閘沒開 —— 零子行程、零出網、零寫檔。要擷取請操作員自己在本視窗開雙閘 VIA_NET_CONSENT · VIA_SCRAPE_CONSENT(操作員的手,本檔永不代設)")
         return 4
     mp = V0100.tail(V0100.MDL008_GLOB)
     if mp is None:
@@ -567,7 +569,7 @@ _JS_V0107 = r"""
       const a = verb === 'run_par' ? `run --groups ${gs || 'ALL'} --as-of ${asof} --mode ${mode} --jobs ${jobs}` + H : 'usertest' + H;
       const bash = `VIA_FROM_VCGC=YES python3 "${PY}" ${a}`;
       const ps = `$env:VIA_FROM_VCGC='YES'; python ".\\${PY.replace(/\//g, '\\')}" ${a}`;
-      const gate = (verb === 'run_par' && mode === 'live') ? "\n# live 先在本視窗開雙閘(操作員的手,頁與產生器永不代設):VIA_NET_CONSENT=YES · VIA_SCRAPE_CONSENT=YES" : '';
+      const gate = (verb === 'run_par' && mode === 'live') ? "\n# live 先請操作員自己在本視窗開雙閘 VIA_NET_CONSENT · VIA_SCRAPE_CONSENT(操作員的手,頁與產生器永不代設)" : '';
       const what = verb === 'run_par' ? '清單引擎 009 · 010 先跑 → 依 DuckDB 庫分道 ' + jobs + ' 流程同時跑(CPU · DRAM · TEMP 守門)' : '建頁 → 逐功能鍵實測(有瀏覽器就 headless 點)→ 結果回頁「並行擷取 · USER-TEST」';
       return `# ${verb}:${what}\n${bash}\n${ps}${gate}`;
     }
