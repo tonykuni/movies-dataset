@@ -387,6 +387,7 @@ jobs:
             Select-Object -Last 1).FullName
           if (-not $ship) { throw "VRN2_ChainShip absent" }
           python $ship check
+          if ($LASTEXITCODE -eq 2) { Write-Host "::warning::VRN-2 薄尾鏈完整;引用冊只在桌機 / 船包(黃 · 不擋)"; exit 0 }
           if ($LASTEXITCODE -ne 0) { Write-Host "::error::VRN-2 薄尾鏈缺前版(桌機跑 VRN2_ChainShip ship --commit --push 補船)"; exit $LASTEXITCODE }
 
       - name: VRN-2 manager contracts through its own MAIN

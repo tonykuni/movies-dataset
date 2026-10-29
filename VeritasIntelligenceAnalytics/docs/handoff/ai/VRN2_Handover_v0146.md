@@ -417,7 +417,22 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ---
 
+## 10b. 結案輪(2026-10-29 · 操作員:「將所有相關未修復衝突全部修復完 結案」· PR #571 / #572)
+
+| # | 現況 | 根因 | 做法 | 證據 |
+|---|---|---|---|---|
+| 1 | #571 與 #572 | 檔案零重疊、無文字衝突(`git merge-tree` 乾淨) | 先合 #572(f9ea8805:還原被 VRN-2 auto-merge 蓋掉的 68 檔 + VDF 盤點文件),#571 再合 main(a2b564cf8) | 合併無衝突 |
+| 2 | CI VRN job 紅 | `VRN2_ChainShip check` MISSING 2:v0249 / v0254 的釘名前版 **v0248 / v0253 從未進倉**(任何分支 · 任何 zip · 桌機 VRN 夾都沒有;桌機 01:33 `ship` 後仍缺)→ v0254 一載入就 FileNotFoundError | **補環** `VRN_SystemManager_v0248.py`(直通 v0245)· `v0253.py`(直通 v0249 + v0254 從原 v0253 接來的六個名稱 `_blank` `_status_append` `_fill_analyst` `_fin_v2_shape` `_summ_status` `blank_audit`,依 v0254 呼叫處還原最小語意;Headers V3 的 `HEADERS_V3` 只從桌機 SSOT 冊 `SSOT\VRN2_BasicInfo_Headers_v0100.json` 讀,冊不在就空、不手編 39 欄);檔頭寫明「不宣稱原檔內容」;CI 鏈檢查黃(引用冊只在桌機)不再算失敗 | ChainShip check `MISSING 0 · 引用冊缺 8` YELLOW · v0248 自測 8/8 · v0253 11/11 · v0249 `provenance --selftest` 4/4 |
+| 3 | CI VDF job 紅(VCGC 閘 `GATE why ["VRN"]`) | CGC_MDL223 v0102 要每系統**最新尾版檔面**有 `def main` / `def selftest`(`VIA_FROM_VCGC` 可沿 PRIOR 鏈繼承 → VRN 鏈到 v0123);桌機線尾版 v0254 的 main 是 `_rebind(getattr(PRIOR,"main"))`,檔面沒有 `def main` → VRN 列 RED → `via-vcgc run` 全擋 | 新尾版 **`VRN_SystemManager_v0256.py`**(釘名 v0254 · 檔面 `def main` / `def selftest` · `__main__` 收 `--selftest` · 不加 VIA_FROM_VCGC 守門,VRN-2 仍獨立)· 三支新檔帶 `[VIA:ACCEL-BRIDGE]` 標記 | 容器 `via-vcgc run VDF_SystemManager --selftest`:閘放行(不再 GATE),接著跑 VDF 自測(容器沒 duckdb 才停;CI 有裝)· v0256 `logic` rc 0 · `provenance --selftest` 6/6 |
+| 4 | 號 | v0255 = 私有 runtime 線(ActivateVRN-2 v0145 · 釘名 v0243 · 只在 runtime zip);共用夾桌機線接 v0256 | 兩線分開寫在 §11 規則 | — |
+
+**沒有宣稱 / 桌機要做的**:桌機線的 v0246 / v0247(MarketFetch · V2 規範)與 SSOT 三冊 + `VRN2_BasicInfo_Headers_v0100.json` 只在桌機(`VRN2_Handover_v0145.md` §3 §5);補環 v0248 直通 v0245,跳過 v0246 / v0247 的內容。桌機請先看 `functional modules\VRN\_archive_vrn2\` 有沒有原 v0248 / v0253 / v0246 / v0247,有就用 ChainShip `ship` 推上(同名不同內容會列 `[FIND?]` 交人判);之後可出 v0257 重新釘名到真正的前版。SDD 的 X-REG / X-NUM(註冊冊 · 編號)是 VCGC 的冊,`via-vcgc registry-sync --apply` / `CGC_MDL237 --apply` 要在閘開後由 VCGC 線跑,不在本 PR 代寫。
+
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
+
+- **(結案輪)** **鏈斷到找不到原檔時,用「補環」接,不手編原檔內容**:補環 = 直通前版的薄尾 + 檔頭寫明不是原檔 + 原檔依賴的名稱依呼叫處還原最小語意並自測;規格正本在別處(桌機 SSOT 冊)就只讀不編。原檔日後出現 → `[FIND?]` 交人判,再出新版重新釘名。
+- **(結案輪)** **VCGC 閘的針看檔面**:每系統最新尾版要有字面的 `def main` / `def selftest`;`_rebind(getattr(PRIOR,"main"))` 閘看不到。`__main__` 要收 `--selftest`(CI 用 `provenance --selftest`)。新 .py 帶 `[VIA:ACCEL-BRIDGE]` 標記,否則 SDD X-ACCEL 紅、啟動器 ④ 會出 v+1。
+- **(結案輪)** 兩線版號:共用夾 `functional modules\VRN` 的 VRN_SystemManager 是桌機線(…v0254 → v0256);私有 runtime 線是 v0243 → v0255。出新版前 `chain VRN_SystemManager` 兩邊都看。
 
 - **(v0145)** **慢先拆帳,不猜**:v0255 起 ⑦ 每階段有 `[計] 階段 · X · 耗時` 與收尾 `[計] 階段耗時` 一行(`VRN2_Phase_Timing_latest.json`);貼回來先看這一行,再決定動哪裡。桌機 08:14 的 1050 秒無輸出是推論(v0243 的 R*.log 在 GREEN 時被刪),v0255 的 timing 會證實或推翻。
 - **(v0145)** **長時間子行程一定要有心跳**:管理器內部任何 > 30 秒的子行程迴圈要印進度(啟動器的沉默看門狗只認輸出)。
