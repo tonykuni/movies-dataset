@@ -1,9 +1,10 @@
-# VRN-2 本地實測一輪 v0100(一段 PowerShell 貼上:logo → 補船 → 跑 v0149(開 Workbench)→ 打包貼回材料)
+# VRN-2 本地實測一輪 v0100(一段 PowerShell 貼上:logo → 補船 → 跑 v0150(開 Workbench)→ 打包貼回材料)
 
 操作員令(2026-10-28):「回到電腦本地實測修正」→「generate a ps code to handle all above」。
 雲端工作階段碰不到桌機(Remote Control 只接 Mac / Linux),所以本地實測由這一段在桌機跑完,把要貼回的東西打包成一個 zip,上傳給 AI 接著修。
 
-> **2026-10-29 v0149 改指(桌機 17:01 跑 VRN2_RoundAll_v0101 的貼回):** 本段現在指 操作員一鍵 **v0110** → VRN-2 一鍵 **v0149**(四點原文核對認得 PDFium 的行尾連字號 · ⑥e 擷取 Python 照 VDF 引擎版本界線)。另一支 Python 升 **`vrn2_release_v0149/VRN2_RoundAll_v0102.py`**(一個指令:`VRN2_RoundAll_v0102.md` 的 pwsh 那行 · ⑪ FAIL 印原文證據);本段 ④ 貼回包多收 `VRN2_FailEvidence_latest.json`。
+> **2026-10-29 v0150 改指(桌機 19:00 跑 VRN2_RoundAll_v0102 的貼回):** 本段現在指 操作員一鍵 **v0111** → VRN-2 一鍵 **v0150**(⑪ 價格標籤第二種讀法 · ⑥f 鉅亨沒有 FactSet 頁的代號不納閘)。另一支 Python 升 **`vrn2_release_v0150/VRN2_RoundAll_v0103.py`**(不重抓 ⑥e · ⑪ 證據逐值 · MOPS 被拒的說明)。
+> **2026-10-29 v0149 改指(桌機 17:01 跑 VRN2_RoundAll_v0101 的貼回):** 本段當時指 操作員一鍵 **v0110** → VRN-2 一鍵 **v0149**(四點原文核對認得 PDFium 的行尾連字號 · ⑥e 擷取 Python 照 VDF 引擎版本界線)。另一支 Python 升 **`vrn2_release_v0149/VRN2_RoundAll_v0102.py`**(一個指令:`VRN2_RoundAll_v0102.md` 的 pwsh 那行 · ⑪ FAIL 印原文證據);本段 ④ 貼回包多收 `VRN2_FailEvidence_latest.json`。
 > **2026-10-29 v0148 改指(桌機 14:40 第一次跑 VRN2_RoundAll_v0100 的貼回):** 本段當時指 操作員一鍵 **v0109** → VRN-2 一鍵 **v0148**(處理器 v0110 自測不受殼的 VIA_ROOT 影響 · ⑥f 上櫃股 Yahoo 用 .TWO · ⑬b 科目對應更嚴 + 檢驗分「不過 / 口徑不明」)。另一支 Python 升 **`vrn2_release_v0148/VRN2_RoundAll_v0101.py`**(擷取 Python 不用退役環境 · 除錯報告帶摘錄 / 錯誤原文 · 最後印兩種殼都能貼的重跑指令);本段 ④ 貼回包多收 `consensus\VRN2_YFTickerMap_latest.json`。
 > **2026-10-29 v0147 改指(操作員「generate a py code to handle all above and fix all test all debug all」):** 本段當時指 操作員一鍵 **v0108** → VRN-2 一鍵 **v0147**(長線 Parquet 庫收 Combined / FinancialAligned / Deleted 並補缺 · ⑬b 在 ⑬ 前 · 舊資料庫掃描限深 + 只問像 VRN-2 的檔 · ⑥e 用擷取 Python · 自測從 runtime zip 取模組)。另有一支 Python **`vrn2_release_v0147/VRN2_RoundAll_v0100.py`** 跑全流程(取套件 → 診斷 → 全部自測 → 跑 → 自動修 → 除錯 → 貼回包 · 用法見同夾 `VRN2_RoundAll_v0100.md`);本段 ④ 貼回包多收 `VRN2_RoundAll_latest.json`。
 > **2026-10-29 v0146 改指(桌機 10:25 實跑 v0145 貼回:2546 秒 · CPU 被佔 87.5% → 1 路 · 冪等閘並行有效 · ⑬ duckdb 綠;操作員 U/I 與資料需求 + 上傳共識引擎 v0120):** 本段當時指 操作員一鍵 **v0107** → VRN-2 一鍵 **v0146**(Workbench v0102:雙語表頭 · 靠上 · 百萬台幣千分位 · 自動縮放 · 左欄輸出夾 · 右欄去重矩陣 + 引擎狀態 · logo 180%;⑥e 市場擷取(借共用 MarketFetch)· ⑥f 共識 Combined(FactSet / YFinance 中位數 · 真實年度 EPS / PER)· ⑬b 歷史對齊 · ⑬c 舊資料庫整合;其餘同 v0145)。④ 貼回包多收 `VRN2_HistoryAlign_latest.json` · `VRN2_Integrate_latest.json` · `market\VRN2_Market_latest.json` · `consensus\VRN2_Consensus_latest.json` · `output\VRN2_Combined_latest.csv`。
@@ -17,8 +18,8 @@
 |---|---|---|
 | ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `OneDrive\Pictures\seal-logo-square.png`(操作員 2026-10-28 指定)→ `Downloads` / `Desktop` / `Pictures` / `OneDrive\Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
 | ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0101.md` 的程式碼(核對 SHA-256)→ 綁到本輪的倉(`$REPO` ← VIA 根所在的 git 倉;結束碼 = 它的綜合燈,push 被拒 = 黃)→ 執行:`check` → `ship --commit --push`(**v0101:先 recover** —— 缺的 v0248 / v0253 / SSOT 冊在 VIA 樹、`functional modules\VRN2`、備份夾、`Downloads\VRN2_*` 夾與 zip 裡找同名檔,內容唯一就複製進 VRN 夾再推;兩份不同內容只列 `[FIND?]`)→ `check` | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
-| ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0110.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:**v0149 套件**(啟動器 v0149 → 四點原文核對 v0105 · ⑥e 擷取 Python 照 VDF 界線;v0148 的 處理器 v0110 · ⑥f 上櫃 .TWO · ⑬b 科目對應更嚴;v0147 的 長線庫收新冊並補缺 · ⑬b 在 ⑬ 前 · 整合掃描限深;v0146 的 Workbench v0102 · ⑥e 市場擷取 · ⑥f 共識 Combined · ⑬b 歷史對齊 · ⑬c 舊資料庫整合;v0145 的管理器 v0255:冪等閘每波 3 份並行 · 30 秒心跳 · 階段計時;v0144 的 ⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108(v0105 / v0107 是桌機線的號)· Workbench v0101 與 v0143 的單機閘 / 上限 / ⑫b 補放照舊;可先 `$env:VRN2_OUTPUT_DIR = 'C:\Users\tonyk\OneDrive\VRN2_out'` 預設輸出夾,或之後在 Workbench 按「選擇輸出夾…」)→ ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
-| ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0149.json` · `VRN2_RoundAll_latest.json` · `VRN2_HistoryAlign_latest.json` · `VRN2_Integrate_latest.json` · `market\VRN2_Market_latest.json` · `consensus\VRN2_Consensus_latest.json` · `VRN2_Phase_Timing_latest.json` · `VRN2_OutputStore_latest.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
+| ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0111.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:**v0150 套件**(啟動器 v0150 → ⑪ 驗證器 v0112 · ⑥f ConsensusJoin v0102;v0149 的 四點原文核對 v0105 · ⑥e 擷取 Python 照 VDF 界線;v0148 的 處理器 v0110 · ⑥f 上櫃 .TWO · ⑬b 科目對應更嚴;v0147 的 長線庫收新冊並補缺 · ⑬b 在 ⑬ 前 · 整合掃描限深;v0146 的 Workbench v0102 · ⑥e 市場擷取 · ⑥f 共識 Combined · ⑬b 歷史對齊 · ⑬c 舊資料庫整合;v0145 的管理器 v0255:冪等閘每波 3 份並行 · 30 秒心跳 · 階段計時;v0144 的 ⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108(v0105 / v0107 是桌機線的號)· Workbench v0101 與 v0143 的單機閘 / 上限 / ⑫b 補放照舊;可先 `$env:VRN2_OUTPUT_DIR = 'C:\Users\tonyk\OneDrive\VRN2_out'` 預設輸出夾,或之後在 Workbench 按「選擇輸出夾…」)→ ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
+| ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0150.json` · `VRN2_RoundAll_latest.json` · `VRN2_HistoryAlign_latest.json` · `VRN2_Integrate_latest.json` · `market\VRN2_Market_latest.json` · `consensus\VRN2_Consensus_latest.json` · `VRN2_Phase_Timing_latest.json` · `VRN2_OutputStore_latest.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
 
 ## 一行啟動(桌機 PowerShell 貼這一行就好;從 GitHub 分支讀本檔的程式碼區塊再執行,不必複製整段)
 
@@ -36,7 +37,7 @@
   $R   = if ($env:VRN2_ROOT) { $env:VRN2_ROOT } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics' }
   $Br  = 'claude/optimistic-goodall-yhalc5'
   $SRC = if ($env:VRN2_SOURCE) { $env:VRN2_SOURCE } else { 'C:\測試樣本報告' }
-  $H_OP = 'e643a00d7567acaf5e03f3b40922b857c7d9ebb94bcc19b1b8f6f87f90129dfc'   # 操作員一鍵 v0110 程式碼 SHA-256(VRN1_VRN2_OneClick_v0110.md powershell 區塊 · ② 指 VRN-2 一鍵 v0149)
+  $H_OP = 'a8bf8ecdde312385735df3b91b7ef15df808149f4039c2fbd2f3c59e5421fc45'   # 操作員一鍵 v0111 程式碼 SHA-256(VRN1_VRN2_OneClick_v0111.md powershell 區塊 · ② 指 VRN-2 一鍵 v0150)
   $H_CS = '78ef9852c1dc1a902f342f10d7a0b37e03531ae34c72a7010dd350a85607bcd6'   # VRN2_ChainShip_v0101.md §3 程式碼 SHA-256(ship 先 recover:缺的環在本機別處找)
   $PDFS = @('3706', 'GFHK', '3264', '6933', '2891')                             # 要裝進貼回包的五份(檔名含這些字)
   $t0 = Get-Date; $stamp = $t0.ToString('yyyyMMdd_HHmmss')
@@ -115,8 +116,8 @@
   }
 
   # ③ 跑:操作員一鍵 v0103(→ VRN-2 一鍵 v0142 → 套件 → 全流程 → Workbench)
-  $k3 = '③ 跑 VRN-2 v0149'
-  $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai/vrn1_vrn2_oneclick_v0110' 'VRN1_VRN2_OneClick_v0110.md' $H_OP
+  $k3 = '③ 跑 VRN-2 v0150'
+  $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai/vrn1_vrn2_oneclick_v0111' 'VRN1_VRN2_OneClick_v0111.md' $H_OP
   if (-not $code) { Say $k3 RED '取不到或雜湊不符 · 沒跑' }
   elseif ($dry) { Say $k3 GREEN '乾跑:程式碼已核對,不執行' }
   else {
@@ -132,7 +133,7 @@
   # ④ 打包貼回材料
   $k4 = '④ 貼回包'
   $v2 = Join-Path $R 'VIA_Reports\vrn2'; $n = 0; $miss = @()
-  foreach ($rel in 'VRN2_Closeout_v0149.json', 'VRN2_RoundAll_latest.json', 'VRN2_FailEvidence_latest.json', 'consensus\VRN2_YFTickerMap_latest.json', 'VRN2_HistoryAlign_latest.json', 'VRN2_Integrate_latest.json', 'market\VRN2_Market_latest.json', 'consensus\VRN2_Consensus_latest.json', 'output\VRN2_Combined_latest.csv', 'VRN2_Phase_Timing_latest.json', 'VRN2_OutputStore_latest.json', 'VRN2_Output_Config.json', 'IDEMPOTENCE_latest.json', 'VRN2_VerbatimVerify_latest.json', 'VRN2_Completion_latest.json', 'VRN2_Activate_latest.json', 'VRN2_Input_latest.json', 'VRN2_ChainShip_latest.json', 'VRN2_Workbench_latest.html', 'output\VRN2_Summary_latest.csv', 'output\VRN2_BasicInfo_latest.csv', 'output\VRN2_Rejected_latest.csv', 'output\VRN2_FinancialData_latest.csv') {
+  foreach ($rel in 'VRN2_Closeout_v0150.json', 'VRN2_RoundAll_latest.json', 'VRN2_FailEvidence_latest.json', 'consensus\VRN2_YFTickerMap_latest.json', 'VRN2_HistoryAlign_latest.json', 'VRN2_Integrate_latest.json', 'market\VRN2_Market_latest.json', 'consensus\VRN2_Consensus_latest.json', 'output\VRN2_Combined_latest.csv', 'VRN2_Phase_Timing_latest.json', 'VRN2_OutputStore_latest.json', 'VRN2_Output_Config.json', 'IDEMPOTENCE_latest.json', 'VRN2_VerbatimVerify_latest.json', 'VRN2_Completion_latest.json', 'VRN2_Activate_latest.json', 'VRN2_Input_latest.json', 'VRN2_ChainShip_latest.json', 'VRN2_Workbench_latest.html', 'output\VRN2_Summary_latest.csv', 'output\VRN2_BasicInfo_latest.csv', 'output\VRN2_Rejected_latest.csv', 'output\VRN2_FinancialData_latest.csv') {
     $p = Join-Path $v2 $rel; if (Test-Path -LiteralPath $p) { Copy-Item -LiteralPath $p -Destination (Join-Path $out ($rel -replace '\\', '_')) -Force; $n++ } else { $miss += $rel }
   }
   $dg = Get-ChildItem -LiteralPath (Join-Path $v2 'verify_independent') -Filter '*.digest.txt' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
