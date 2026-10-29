@@ -1,8 +1,8 @@
 {
  "schema": "VIA.VCGC.FunctionInventory.v1",
  "version": "v0169",
- "batch": "R71 VDF 並行擷取 · 頁 USER-TEST(VDF-REQ018)",
- "ts": "2026-10-11T21:48:23+00:00",
+ "batch": "S20261014c",
+ "ts": "2026-10-14T15:00:00+00:00",
  "prior": "VIA_VCGC_FunctionInventory_SSOT_v0168.json",
  "req": "VCGC-REQ085",
  "why": "操作員令「VCGC所有功能盤點 … 用一個PS檔案串聯測試啟動一切不遺漏 且AI進入系統也會跑這流程 後面生成的指令也會跑這個流程 任何更新留紀錄版本及時間 範圍不發散完成VCGC」。本冊是 VCGC 全功能串測的站表正本:CGC_MDL224_TestAuto v0101 照冊跑站、照冊核盤點(樹上有冊上沒 = 新 · 冊上有樹上沒 = 缺);每一站都在容器乾淨工作樹實測過 rc 與秒數,沒有一站寫已追蹤檔。;+C-vdf_fetch_groups_v0100(VCGC-REQ150);+C-vdf_fetch_groups_v0101(VCGC-REQ151)",
@@ -2501,8 +2501,6 @@
    ],
    "timeout": 600,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
     "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
     "functional modules/VDF/VDF_AkshareSelection_MacroShipping_v0100.json",
@@ -2520,8 +2518,6 @@
    ],
    "timeout": 900,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
     "functional modules/VDF/VDF_FetchGroups_SSOT_v0100.json",
@@ -2533,12 +2529,11 @@
    "name": "交接案 vdf_fetch_groups_v0102(MDL012 v0102 ui --template:任何 .html 範本套族群快照(Jinja 沙盒 / 無 jinja2 逐變數代換 · 注入 window.VIA + 鎖定色 + 四燈 · 範本零觸碰)· 對接快照 VDF_FetchGroups_SNAPSHOT_latest.json · PS 啟動器 Invoke-VDF-FetchGroupsUI-v0100.ps1(VCGC-REQ152))",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups_v0106",
+    "VDF_MDL012_FetchGroups_v0102",
     "--selftest"
    ],
    "timeout": 900,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
@@ -2587,8 +2582,6 @@
    ],
    "timeout": 900,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0102.py",
     "functional modules/VDF/VDF_FetchGroups_SSOT_v0101.json"
@@ -2921,12 +2914,11 @@
    "name": "交接案 vdf_fetch_groups_v0104(MDL012 v0104 refill:無資料族群 FRED → 政府單位 → AkShare 分層補擷取(VCGC-REQ173))",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups_v0106",
+    "VDF_MDL012_FetchGroups_v0104",
     "--selftest"
    ],
    "timeout": 1200,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0103.py",
     "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json"
@@ -2937,12 +2929,11 @@
    "name": "交接案 vdf_fetch_groups_v0105(MDL012 v0105 ui 左面板全部輸入控制 · 收尾 · 備份六鈕(打包 VDF / VCGC · 驗包 · closeout --apply --push)· 右面板多頁照舊(VCGC-REQ154 · VCGC-REQ159))",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups_v0106",
+    "VDF_MDL012_FetchGroups_v0105",
     "--selftest"
    ],
    "timeout": 1200,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0104.py",
     "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
@@ -3430,54 +3421,113 @@
    ]
   },
   {
-   "id": "C-validation_ssot_v0101",
-   "name": "交接案 validation_ssot_v0101(CGC_MDL246 v0101 交叉代碼准多段 + 驗證冊 v0101 登記 X-REQ-BACK · X-REQ-OPEN · X-PEER · X-PEER-TEXT(VCGC-REQ180))",
+   "id": "C-quarantine",
+   "name": "交接案 quarantine_recover(CGC_MDL276_QuarantineRecover --selftest;隔離區 / git 歷史找回丟失檔)",
    "argv": [
     "run",
-    "CGC_MDL246_ValidationSSOT_v0101",
+    "--family",
+    "core",
+    "CGC_MDL276_QuarantineRecover",
     "--selftest"
    ],
-   "timeout": 600,
    "deps": [
-    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0101.py",
-    "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py",
-    "supportive modules/registry/VIA_Validation_SSOT_v0101.json"
-   ]
+    "supportive modules/registry/CGC_MDL276_QuarantineRecover_v*.py"
+   ],
+   "timeout": 600
   },
   {
-   "id": "C-vdf_fetch_groups_v0107",
-   "name": "交接案 vdf_fetch_groups_v0107(MDL012 v0107 清單引擎 009 · 010 先跑 → 依 DuckDB 庫分道 3~5 流程並行 · CPU / DRAM / TEMP 守門 · TEMP 為主 · 頁「並行擷取 · USER-TEST」(VDF-REQ018))",
+   "id": "C-aiops",
+   "name": "交接案 aiops(CGC_MDL277_AiOps --selftest;狀態索引 · 庫卡 · 撞號 · PS 檢查 · 總頁)",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups_v0107",
+    "--family",
+    "core",
+    "CGC_MDL277_AiOps",
     "--selftest"
    ],
-   "timeout": 1200,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
-    "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json",
-    "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
-    "supportive modules/registry/CGC_MDL262_DuckTempHook_v*.py"
-   ]
+    "supportive modules/registry/CGC_MDL277_AiOps_v*.py"
+   ],
+   "timeout": 600
   },
   {
-   "id": "C-vdf_fetch_groups_usertest",
-   "name": "交接案 vdf_fetch_groups_usertest(MDL012 v0107 usertest:建頁(報告夾)→ 靜態驗 → 瀏覽器 headless 逐鍵實測 → 結果掛頁;沒瀏覽器照實紅)(VDF-REQ018)",
+   "id": "C-pslint",
+   "name": "PS 檢查(CGC_MDL277_AiOps pslint:PS 尾版缺加速器橋 0 · 自壓頁 0)",
    "argv": [
     "run",
-    "VDF_MDL012_FetchGroups",
-    "usertest"
+    "--family",
+    "core",
+    "CGC_MDL277_AiOps",
+    "pslint"
    ],
-   "timeout": 600,
    "deps": [
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
-    "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py"
-   ]
+    "supportive modules/registry/CGC_MDL277_AiOps_v*.py",
+    "launchers/Invoke-VIA-OneShot-v*.ps1"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-sentiment_dedupe",
+   "name": "交接案 sentiment_dedupe(VDF_SystemManager engine run VDF_ENG229 --selftest;Z297 sentiment 既有重複列清理)",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_ENG229_CNNFearGreedHistory",
+    "--selftest"
+   ],
+   "deps": [
+    "functional modules/VDF/engine/VDF_ENG229_CNNFearGreedHistory_v*.py",
+    "functional modules/VDF/VDF_SystemManager_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-omnifetch_sentiment",
+   "name": "交接案 omnifetch_sentiment(VDF_SystemManager engine run VDF_ENG055 --selftest;Z297 L11 同批重鍵去重)",
+   "argv": [
+    "run",
+    "VDF_SystemManager",
+    "engine",
+    "run",
+    "VDF_ENG055_OmniFetch",
+    "--selftest"
+   ],
+   "deps": [
+    "functional modules/VDF/engine/VDF_ENG055_OmniFetch_v*.py",
+    "functional modules/VDF/VDF_SystemManager_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-metrics_resolve",
+   "name": "交接案 metrics_resolve(VRN_SystemManager metrics-resolve --selftest;Z298 研報 eps 多候選收斂)",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "metrics-resolve",
+    "--selftest"
+   ],
+   "deps": [
+    "functional modules/VRN/VRN_ENG073_ReportStructuredDB_v*.py",
+    "functional modules/VRN/VRN_SystemManager_v*.py"
+   ],
+   "timeout": 600
+  },
+  {
+   "id": "C-vrn_logic_index",
+   "name": "交接案 vrn_logic_index(VRN_SystemManager logic;邏輯索引冊指標全在位且為尾版)",
+   "argv": [
+    "run",
+    "VRN_SystemManager",
+    "logic"
+   ],
+   "deps": [
+    "functional modules/VRN/VRN_SystemManager_v*.py",
+    "supportive modules/registry/via_vrn_logic_book_v*.py"
+   ],
+   "timeout": 300
   }
  ],
  "coverage": {
@@ -4190,14 +4240,26 @@
    "health_matrix_v0114": {
     "station": "C-health_matrix_v0114"
    },
-   "validation_ssot_v0101": {
-    "station": "C-validation_ssot_v0101"
+   "quarantine_recover": {
+    "station": "C-quarantine"
    },
-   "vdf_fetch_groups_v0107": {
-    "station": "C-vdf_fetch_groups_v0107"
+   "aiops": {
+    "station": "C-aiops"
    },
-   "vdf_fetch_groups_usertest": {
-    "station": "C-vdf_fetch_groups_usertest"
+   "ps_ownpage": {
+    "station": "C-pslint"
+   },
+   "sentiment_dedupe": {
+    "station": "C-sentiment_dedupe"
+   },
+   "omnifetch_sentiment": {
+    "station": "C-omnifetch_sentiment"
+   },
+   "metrics_resolve": {
+    "station": "C-metrics_resolve"
+   },
+   "vrn_logic_index": {
+    "station": "C-vrn_logic_index"
    }
   },
   "workflow": {
@@ -4550,6 +4612,6 @@
  "why_v0165": "v0164 已發布 → 出新版;站 C-vrn_manager_v0190 與 coverage.case.vrn_manager_v0190 移除(交接案撤回:工作站 2026-10-11 合併分支被擋:工作站 VRN 自己的鏈已到 v0190(本機未追蹤,比備份分支 v0189 新),與 VCGC 側的 L121 VRN 尾版 v0190 再撞號;VCGC 側佔用 VRN_SystemManager 任何號碼,不是撞號就是變成工作站 VRN 的尾版(L120 互不影響不許)→ 撤回 VCGC 側 VRN 尾版(main 的 v0152 與本分支 v0190 都不留),L121 VRN 版面交 VRN 自己的 manager 下一版套用:照 supportive modules/ui_support/VIA_UI_ThreeSystems_SSOT_v0100.json,可照抄 VDF_SystemManager_v0152 的 l121_patch(同一套);撤回前的草稿在 git 提交 ade21518(functional modules/VRN/VRN_SystemManager_v0190.py));其餘一字不動",
  "why_v0166": "v0165 已發布 → 出新版;+3 站 C-vdf_manager_v0153 · C-ui_engine_v0105 · C-health_matrix_v0113(交接案同名;VCGC-REQ179 字體 / 階層一致 · 版面自動最佳化 · 日期一律 YYYY-MM-DD);其餘一字不動",
  "why_v0167": "v0166 已發布 → 出新版;+3 站 C-vdf_manager_v0154 · C-ui_engine_v0106 · C-health_matrix_v0114(交接案同名;VCGC-REQ179 展現規則);其餘一字不動",
- "why_v0168": "v0167 已發布 → 出新版;+站 C-validation_ssot_v0101(交接案同名;V-val 紅根因:多段交叉代碼);C-vdf_fetch_groups_v0102 / v0104 / v0105 改跑 VDF_MDL012_FetchGroups_v0106(六案標記釘 v0106:v0100 自測 ⑫ 算到活資料樞的庫,v0106 自測鏈隔離);六站相依 +v0106;C-chain 站不動(交接案 chain 標記釘 TestAuto v0106,站 argv 跑尾版);其餘一字不動",
- "why_v0169": "v0168 已發布 → 出新版;+2 站 C-vdf_fetch_groups_v0107 · C-vdf_fetch_groups_usertest 與 coverage.case 對應(交接案同名;VDF-REQ018 清單引擎先跑 → 分道並行 · 守門 · 頁 USER-TEST);C-vdf_fetch_groups_v0100 / v0101 / v0103(跑家族尾版)相依 +v0107;usertest 站預設建頁在報告夾(VIA_Reports/vdf/ui),不寫已追蹤檔;其餘一字不動"
+ "why_v0168": "+C-quarantine(CGC_MDL276)· +C-aiops(CGC_MDL277)· +C-pslint(PS 自壓頁 / 加速器橋 = 0)· coverage.case 登三新案;連號 v0168(KILL-11);未併分支 claude/kind-cannon-pti15g 也用了 v0168–v0177,若之後併入由後併者改號",
+ "why_v0169": "S20261014c +C-sentiment_dedupe · +C-omnifetch_sentiment(經 VDF_SystemManager engine run)· +C-metrics_resolve · +C-vrn_logic_index(經 VRN_SystemManager)· coverage.case 登四新案(CGC_MDL224 實樹 ⑧ 抓到新案沒登 = 本批漏登);連號 v0169(KILL-11)"
 }

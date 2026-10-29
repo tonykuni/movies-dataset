@@ -354,3 +354,20 @@ python "%V%" run VDF_ENG093_LaunchConsole ask --open --out "%TEMP%\vdf_ask_check
 - 每次印 `VDF_SystemManager_v0155.py:6: SyntaxWarning: invalid escape sequence '\o'`(v0155 說明字串裡的 `VDF\output_hub`;正本不改)。v0162:載前版鏈那一刻 `warnings.catch_warnings` 只擋 SyntaxWarning / DeprecationWarning;本檔自己零無效跳脫(自測驗)。
 - 自測 6/6(找得到補套主人 v0153 · fetch 經本版不補套 / 直走前版會補 / 非 fetch 照舊 · 炸掉也還原 · 兩個探針檔證明前版載入器會印、本版不印 · 橋 / 不起子行程 / 版面功能燈程式一行沒動);突變 9 個全抓到。
 - 誠實說:本容器沒有 pandas,管理員全鏈自測(v0151 的 db 自測)在這裡跑不動;交接案 `vdf_ws_manager_fetch_quiet` 的綠收據要靠工作站或 Windows CI(有 pandas · duckdb)。
+
+## 第七批(2026-10-28)· main 被 VRN-2 auto-merge `9e494a2a` 覆蓋的修復 + VCGC 閘被 VRN-2 斷鏈擋住
+
+**事實(git 三方比對:base `bed850de` 10-12 · ours `ee55265d` = 合併當時 main 這一側 10-27 · theirs = 現在 main)**
+- `9e494a2a`「VRN-2 auto-merge origin/main (conflicts → local, additions kept)」把 68 個 main 已改的檔用 VRN-2 本機舊版蓋掉(全部是兩邊都改過的真衝突,VRN-2 合併後再沒碰):
+  VDF 程式 10 支(ENG093 v0105 · FetchGroups v0106–v0108 · SystemManager v0155–v0157 · ENG065 v0102 · ENG077 v0106 · ENG235 v0100)、交接收據 32 檔、
+  共用冊 21 本(元件清冊 18515 → 18076 列 · 編號冊 FNC_VDF 10225 → 9647 列 · 編號 SSOT · 交接冊 209 案 → 189 案 · 370 項 → 349 項 · 需求冊 v0193–v0196 · VCGC 功能盤點冊 v0168–v0170 / 帳本)。
+  VDF 這一側自 10-13 起的登錄全數消失(v0162 · MDL014 v0102 · ActivateVDF v0114 · 交接案 vdf_ws_manager_fetch_quiet / vdf_ws_sync_worktree …)。
+- 修法(只增不減):VDF 程式 · 收據 · 已發布版本冊 → 還原 ours;只增冊 → 聯集(ours 全部 + theirs 新增:元件 +41 · 交接案 +20 · 工作項 +39 · 編號 SSOT +19 · 各編號冊 +0~178 列;同號異文 110+ 列留 ours,待閘開後跑 `run CGC_MDL237 audit`);VRN-2 自己的 5 份交接文件不動。
+- 驗證:三本 JSON 冊格式照舊、所有編號冊 code 唯一、我方案子與標記都回來;還原的 ENG093 v0105 自測 16/16(其餘要 duckdb,容器沒有)。
+
+**VCGC 閘(擋住 CI · closeout · sdd · registry-sync · 編號 · handoff test 全部 `run`)**
+- `CGC_MDL223 FlowConsistency.gate()` → `missing ["VRN"]`:main 上 VRN-2 的管理器尾版 `VRN_SystemManager_v0254.py` 沒有 `VIA_FROM_VCGC`、沒有 `def main`;而且 VRN-2 自己的 `VRN2_ChainShip check` 判 RED:**缺 `VRN_SystemManager_v0242.py` · `v0248.py` · `v0253.py`**(v0244 / v0249 / v0254 的前版,倉內與任何分支都沒有)· 引用冊缺 8。
+- 這三個檔只在 VRN-2 的桌機;要由 VRN-2 跑 `VRN2_ChainShip ship --commit` 補船,閘才會開。VDF 只攤開不代修(四系統對等)。
+- 在閘開之前:VDF 的擷取 / 管理員直接跑(`python VDF_SystemManager_v0162.py …`)不受影響;只有經 `via-vcgc run` 的路徑被擋。
+
+**閘開之後要補的 VDF 債(本批先登記)**:`VDF_ENG056_ChipBackfill_v0108.py` · `VDF_MDL011_AkshareFetcher_v0103.py` 編號 + registry-sync;closeout ② 點名的 VDF 案(qg_onebridge · vdf_akshare_v0101 · vdf_akshare)重跑;編號 audit 遺失 0 · 改身分 0 · 重號 0。
