@@ -1,0 +1,323 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0145",
+ "date": "2026-10-29",
+ "trigger": "桌機 2026-10-29 08:14 實跑 v0144(52 份 · 2422 秒):前後端已連結(⑥c · ⑤b · ⑫b · ⑬ 綠)· ⑦ 1201 秒其中約 1050 秒管理器無輸出(擷取快取 52/52 命中 · 真正在跑的是冪等閘 3 份 ×2 單路序跑)· ⑪ 691 秒 · ④ 92 秒;操作員問「是第一次啟動還是加速器沒作用」→ 都不是,是冪等閘序跑",
+ "base_package": {
+  "name": "VRN2_Closeout_v0144 (launcher v0144 · runtime v0144)",
+  "retained": "runtime v0144 members byte-identical inside runtime v0145; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0144 for the closeout entry; VRN-2 one-click v0144; operator one-click v0105 → v0106",
+ "design": {
+  "VRN_SystemManager_v0255": "thin tail over v0243 (number skips the desktop line's v0244–v0254): _idem_check waves run one single-lane shard subprocess per file concurrently (VRN2_IDEM_LANES · default 3) · R1 before R2 · heartbeat 30 s · timing in IDEMPOTENCE_latest.json · phase timers (_resolve p1loop · acceptance · _out_books · _out_html · _funnel · gate) → [計] 階段耗時 line + VRN2_Phase_Timing_latest.json · completion.manager = v0255",
+  "ActivateVRN-2_v0145": "MANAGER v0255 · receipt v0145 · runtime v0145; v0144 ⑤b / ⑬ / handler v0108 / Workbench v0101 / v0143 guard & limits unchanged"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0145.py",
+   "sha256": "a4c76d1d1e28a699b698e68c8d43cafc5888361eeab76dbdeaabd21360eb5b0f",
+   "bytes": 44584
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "5cde433de6415c60e516eb736bc6bb50386efec0d88f0a4e8d9dfed4613c1e65",
+   "bytes": 1429
+  },
+  {
+   "path": "README.txt",
+   "sha256": "399a1e3062ddf199d8c99c15e0f6b448778c9c5a2f0c5c10f8e2b53ad1680e48",
+   "bytes": 1116
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "3df2835891c3c923b8417a2d295dcaf40af9a390406f9500b45e5572627b5023",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0145.json",
+   "sha256": "b49da0206c2d075a68d0b63e7f56d51a11cc75a8d4f99ce8242c83a4de34297e",
+   "bytes": 22097
+  },
+  {
+   "path": "VRN2_Runtime_v0145.zip",
+   "sha256": "453e80724eaa9688f51ad48b0272619a722a9b96e7fba03d5ed5a1d9b512ce12",
+   "bytes": 6748988
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  }
+ ],
+ "runtime": {
+  "version": "v0145",
+  "zip_sha256": "453e80724eaa9688f51ad48b0272619a722a9b96e7fba03d5ed5a1d9b512ce12",
+  "based_on": "VRN2_Runtime_v0144.zip 0de690a4ee0fba48c811851e0b0606c3018e7f035a0c1af2aec77be519ce60c4",
+  "retained_members": 166,
+  "new_members": [
+   "VRN_SystemManager_v0255.py"
+  ],
+  "files": "see VRN2_Runtime_v0145.json inside the package"
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 (pyarrow · no duckdb) · pwsh 7.4.6 · 19 real sample files",
+ "results": {
+  "selftests": {
+   "ActivateVRN-2_v0145": "[PASS] v0145: manager v0255 is the active manager (parallel idempotence gate · phase timing) · receipt v0145",
+   "VRN_SystemManager_v0255": "[PASS] v0255: idempotence gate per-file parallel waves (GREEN · NONDETERMINISTIC · lanes 1) with timing in the receipt; phase timers bound into the native flow; success register names v0255; v0243 code reached through PRIOR"
+  },
+  "pwsh_hash_chain": [
+   "Run-VRN2-v0145.ps1 parse errors: 0",
+   "boot145.ps1 parse errors: 0",
+   "Run-VRN1-VRN2-v0106.ps1 parse errors: 0",
+   "boot_pair106.ps1 parse errors: 0",
+   "cs101.ps1 parse errors: 0",
+   "round.ps1 parse errors: 0",
+   "vrn2 one-click v0145: code sha = boot H → True (c834b06e8702)",
+   "one-liner decodes to boot → True",
+   "package zip sha = \\8aa7efe6e50b227b5f65f8d2378e46152ce578c3dce0c50b175e1d4dc92211e5 → True",
+   "operator v0106: code sha = boot H → True (b625cfbc6a3d)",
+   "operator H2 = vrn2 one-click v0145 code sha → True",
+   "operator banner says v0106 → True",
+   "localround H_OP = operator v0106 code sha → True",
+   "localround H_CS = chainship md v0101 code sha → True",
+   "chainship md WANT = tool v0101 sha → True"
+  ],
+  "full_run_v0145_19_real": {
+   "closeout_rc": 1,
+   "rc_reason": "③ 環境檢查 RED in the Linux sandbox only (accelerator deps not in venv; --no-install); same as v0142–v0144",
+   "non_green_steps": [
+    [
+     "③ 環境檢查與補裝",
+     "RED"
+    ],
+    [
+     "⑥c U/I 操作協定",
+     "GRAY"
+    ],
+    [
+     "⑨ 上船 GitHub",
+     "GRAY"
+    ],
+    [
+     "⑩ 整併封存",
+     "GRAY"
+    ],
+    [
+     "⑫a VRN-1 倉同步(借工具前 · 只 fast-forward)",
+     "GRAY"
+    ],
+    [
+     "⑫ PIVOT 資料庫(借用 VRN-1)",
+     "GRAY"
+    ],
+    [
+     "⑬ 輸出位置 · 增量庫(DuckDB)",
+     "YELLOW"
+    ]
+   ],
+   "lock_removed_after_run": true,
+   "passes": [
+    [
+     1,
+     0,
+     "idempotence GREEN"
+    ]
+   ],
+   "completion": {
+    "verdict": "完成",
+    "red": 0,
+    "yellow": 3,
+    "manager": "VRN-2 SystemManager v0255"
+   },
+   "stock_reports": {
+    "n": 14,
+    "all_green": 14,
+    "step7_seconds": 136
+   },
+   "idempotence": "GREEN",
+   "idempotence_timing": {
+    "R1": {
+     "elapsed_s": 3.5,
+     "files": {
+      "JP-2330 20250718.pdf": 2.0,
+      "GS-6415 20260517.pdf": 2.5,
+      "Daiwa-1319 20231011(20261006-122413).pdf": 3.5
+     },
+     "lanes": 3,
+     "parallel": true
+    },
+    "R2": {
+     "elapsed_s": 4.0,
+     "files": {
+      "JP-2330 20250718.pdf": 2.0,
+      "GS-6415 20260517.pdf": 2.5,
+      "Daiwa-1319 20231011(20261006-122413).pdf": 4.0
+     },
+     "lanes": 3,
+     "parallel": true
+    },
+    "total_s": 7.6
+   },
+   "idempotence_method": "same shard subprocess path as the main run (python -W ignore ENG397 --shard) · twice (R1 then R2) · one single-lane subprocess per file, 3 lanes · no extraction cache · OCR cache shared",
+   "gate_line": "[計] 冪等閘 · GREEN · 重跑 3 份 ×2(同主跑的子行程路徑 · 每波 3 路並行),文字／表格／數值／期間／位置一致 · 耗時 8 秒(R1 4 · R2 4) · 詳細差異 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v145/t145",
+   "gate_progress_lines": [
+    "[計] 冪等閘 · 開始 · 3 份 ×2(R1 → R2)· 每波 3 路並行 · 單路 · 不吃擷取快取 · Daiwa-1319 20231011(20261006-122413).pdf、GS-6415 20260517.pdf、JP-2330 20250718.pdf",
+    "[計] 冪等閘 · R1 完成 · 耗時 4 秒 · Daiwa-1319 20231011(20261006-122413).pdf 4 · GS-6415 20260517.pdf 2 · JP-2330 20250718.pdf 2",
+    "[計] 冪等閘 · R2 完成 · 耗時 4 秒",
+    "[計] 冪等閘 · 開始 · 3 份 ×2(R1 → R2)· 每波 3 路並行 · 單路 · 不吃擷取快取 · Daiwa-1319 20231011(20261006-122413).pdf、GS-6415 20260517.pdf、JP-2330 20250718.pdf",
+    "[計] 冪等閘 · R1 完成 · 耗時 4 秒 · Daiwa-1319 20231011(20261006-122413).pdf 4 · GS-6415 20260517.pdf 2 · JP-2330 20250718.pdf 2",
+    "[計] 冪等閘 · R2 完成 · 耗時 4 秒"
+   ],
+   "phase_timing": {
+    "manager": "VRN-2 SystemManager v0255",
+    "generated_at": "2026-10-29T01:24:51",
+    "total_s": 133.0,
+    "timed_s": 132.4,
+    "untimed_s": 0.6,
+    "phases": [
+     {
+      "phase": "擷取迴圈 p1loop",
+      "seconds": 35.1
+     },
+     {
+      "phase": "驗收 + 摘要",
+      "seconds": 60.7
+     },
+     {
+      "phase": "輸出冊",
+      "seconds": 29.0
+     },
+     {
+      "phase": "U/I 輸出冊頁",
+      "seconds": 0.0
+     },
+     {
+      "phase": "冪等閘",
+      "seconds": 7.6
+     },
+     {
+      "phase": "調節輪",
+      "seconds": 0.0
+     }
+    ]
+   },
+   "phase_lines": [
+    "[計] 階段 · 擷取迴圈 p1loop · 完成 · 耗時 35 秒",
+    "[計] 階段 · 驗收 + 摘要 · 完成 · 耗時 61 秒",
+    "[計] 階段 · 輸出冊 · 完成 · 耗時 29 秒",
+    "[計] 階段 · U/I 輸出冊頁 · 完成 · 耗時 0 秒",
+    "[計] 階段 · 調節輪 · 完成 · 耗時 0 秒",
+    "[計] 階段 · 擷取迴圈 p1loop · 完成 · 耗時 35 秒",
+    "[計] 階段 · 驗收 + 摘要 · 完成 · 耗時 61 秒",
+    "[計] 階段 · 輸出冊 · 完成 · 耗時 29 秒",
+    "[計] 階段 · U/I 輸出冊頁 · 完成 · 耗時 0 秒",
+    "[計] 階段 · 調節輪 · 完成 · 耗時 0 秒"
+   ],
+   "phase_summary_line": "[計] 階段耗時(秒)· 擷取迴圈 p1loop 35 · 驗收 + 摘要 61 · 輸出冊 29 · U/I 輸出冊頁 0 · 冪等閘 8 · 調節輪 0 · 其他 1 · 總 133 · 收據 VRN2_Phase_Timing_latest.json",
+   "source_quotes": {
+    "PASS": 52,
+    "OCR_PENDING": 4
+   },
+   "output_gaps": [
+    {
+     "book": "四點原文核對",
+     "reason": "REVIEW_OCR · {'PASS': 52, 'OCR_PENDING': 4}"
+    }
+   ],
+   "independent_verifier": {
+    "basic": "{'PASS': 193, 'OCR': 2}",
+    "summary": "{'PASS': 65, 'OCR': 5}",
+    "financial_rows": 4905,
+    "financial_verdicts": "{'ALIGNED': 4378, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}"
+   },
+   "registration_line": "[計] 註冊核對 · ⑤ 元件登記 GREEN · ⑥c U/I 操作協定 GRAY · ② 定位 VRN-2 程式夾 GREEN · 處理器 VRN2_UIAction_v0108.py · 全部登記成功",
+   "ssot_sync": {
+    "lamp": "GREEN",
+    "detail": "核發 0 · 衝突 0 · 待核號 368(SSOT 類 83 · 程式類 285)· 自撞 0 · 登記冊 VRN2_Component_Register_v0101.json · 核發冊 尚無(VCGC 還沒核發)"
+   },
+   "output_store": {
+    "lamp": "YELLOW",
+    "store_engine": "pyarrow",
+    "new_files": 14,
+    "appended": {
+     "BasicInfo": 14,
+     "FinancialData": 4905,
+     "Summary": 14,
+     "Rejected": 815
+    }
+   },
+   "workbench": {
+    "lamp": "GREEN",
+    "legacy_linked": true
+   }
+  },
+  "oneclick_scenario_pwsh": {
+   "rc": "first rc 1 · again rc 1 · tamper rc 1 · done",
+   "first": "[GREEN] ③ 套件 v0145 就位(SHA-256 8aa7efe6e50b · 套件內 10 檔逐檔核對相符 · 來源 GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v145/t145oc/Download",
+   "again": "[GREEN] ③ 本機已是 v0145 套件(SHA-256 8aa7efe6e50b · 套件夾 11 檔與已驗證的 zip 逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v145/t145oc/Downloads/VRN2_Closeout_v0145",
+   "tamper": "[YELLOW] ③ 本機套件夾有 1 個檔與已驗證的 zip 不同或不在(ActivateVRN-2_v0145.py)→ 不用它,從本機這份 zip 重新解壓 → [GREEN] ③ 舊套件夾已改名備份 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v145/t145oc/Downloads/VRN",
+   "closeout_line": "[RED] ⑧b 收尾收據 v0145 · rc 1 · 跑了 1 輪(idempotence GREEN)· 四點原文核對 REVIEW_OCR {'PASS': 52, 'OCR_PENDING': 4} · 輸出缺項 1",
+   "phase_line": "[GRAY] 階段耗時(秒 · 管理器 VRN-2 SystemManager v0255)· 擷取迴圈 p1loop 36 · 驗收 + 摘要 62 · 輸出冊 29 · U/I 輸出冊頁 0 · 冪等閘 8 · 調節輪 0 · 其他 0 · 總 136",
+   "gate_line": "[計] 冪等閘 · GREEN · 重跑 3 份 ×2(同主跑的子行程路徑 · 每波 3 路並行),文字／表格／數值／期間／位置一致 · 耗時 8 秒(R1 4 · R2 4) · 詳細差異 /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v145/t145",
+   "registration_line": "[計] 註冊核對 · ⑤ 元件登記 GREEN · ⑥c U/I 操作協定 GRAY · ② 定位 VRN-2 程式夾 GREEN · 處理器 VRN2_UIAction_v0108.py · 全部登記成功"
+  },
+  "desktop_v0144_2026_10_29_0814": {
+   "total_s": 2422,
+   "launcher_s": 2401,
+   "step7_s": 1201,
+   "silent_gap_s": "~1050 (heartbeat 距上次輸出 1068 秒 before the manager's [計] lines)",
+   "step11_s": 691,
+   "step4_s": 92,
+   "cache": "擷取沿用 52/52 · 驗收沿用 51/52",
+   "accelerators": "VeritasCeleritas v1141 loaded · PS accelerator bound · accelfix 0 missing · 6-way parallel segment 55 s vs 177 s serial",
+   "ui_binding": "⑥c vrn2:// → VRN2_UIAction_v0108 read back equal · ⑤b 前後端已連結 GREEN · ⑫b input block GREEN · 驗證過的輸出 written back (fingerprint 9888cecc1a7f291f) · Workbench v0101 GREEN opened · ⑬ duckdb GREEN 52 files · ⑤b SSOT-ID GREEN pending 371",
+   "red": "⑧b closeout rc 1 ← 四點原文核對 FAIL 1 (3014TT-20231005 POINT_3 · second reader did not reproduce the complete source excerpt) · 輸出缺項 3 份年度數據 (Daiwa-6278 · 欣銓 3264 · 華南 6143)",
+   "diagnosis": "not a first launch; accelerators worked; the silent 1050 s is consistent with the v0243 idempotence gate: 3 兆豐 PDFs × 2 waves in ONE single-lane subprocess per wave, no extraction cache, serial — main extraction itself was all cache hits"
+  },
+  "not_claimed": [
+   "Windows desktop run of v0145: not yet (next paste-back); the 1050 s attribution to the idempotence gate is an inference from the console (the R*.log evidence is deleted on GREEN by v0243); v0255 records R1/R2 timing so the next paste-back proves or refutes it",
+   "⑪ independent verifier 691 s and ④ accelfix double pass 92 s: not changed this round",
+   "3014TT POINT_3 FAIL and the 3 missing annual-data books: need the paste-back zip (VRN2_PasteBack_20261029_081428.zip) — not in the container samples",
+   "OneDrive-synced repository folder slows file I/O: not measured; the phase timing will show it",
+   "Items carried from v0143 / v0144: PasteBack 013350 transcript, v0248 / v0253 location on the desktop, VCGC side of the SSOT-ID protocol"
+  ]
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0145.zip",
+  "sha256": "8aa7efe6e50b227b5f65f8d2378e46152ce578c3dce0c50b175e1d4dc92211e5",
+  "bytes": 7518869,
+  "layout": "VRN2_Closeout_v0145/<files> (no .ps1 · the one-click md is the entry)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0145.py",
+  "sha256": "a4c76d1d1e28a699b698e68c8d43cafc5888361eeab76dbdeaabd21360eb5b0f"
+ },
+ "manager": {
+  "name": "VRN_SystemManager_v0255.py",
+  "sha256": "0a73b4efd17f8db6d48ef10372105e677d2182b1f311f330647407c652f5b6c4"
+ },
+ "oneclick": "VRN2_OneClick_v0145.md",
+ "test_tools_zip": "vrn2_test_tools_v0145.zip",
+ "logs_zip": "logs_v0145.zip"
+}

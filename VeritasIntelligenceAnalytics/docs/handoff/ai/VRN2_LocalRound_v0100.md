@@ -1,9 +1,10 @@
-# VRN-2 本地實測一輪 v0100(一段 PowerShell 貼上:logo → 補船 → 跑 v0144(開 Workbench)→ 打包貼回材料)
+# VRN-2 本地實測一輪 v0100(一段 PowerShell 貼上:logo → 補船 → 跑 v0145(開 Workbench)→ 打包貼回材料)
 
 操作員令(2026-10-28):「回到電腦本地實測修正」→「generate a ps code to handle all above」。
 雲端工作階段碰不到桌機(Remote Control 只接 Mac / Linux),所以本地實測由這一段在桌機跑完,把要貼回的東西打包成一個 zip,上傳給 AI 接著修。
 
-> **2026-10-29 v0144 改指(操作員:「先把這兩天有更新的部分抓下來再 PC 測試 · 先不要讓 GitHub 影響 · 這是獨立系統」):** 本段現在指 操作員一鍵 **v0105** → VRN-2 一鍵 **v0144**(⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108 · Workbench v0101)。GitHub 只當 git 遠端用來**抓**這兩天更新的檔(`git fetch` + `git archive`,逐檔 SHA-256 核對);CI 紅綠不影響本機實測。只測不推:先設 `$env:VRN_ROUND_NO_SHIP = '1'`(② 不補船、不 commit、不 push;套件啟動器 ⑨ 本來就只驗證不推),再貼頂端那一行。
+> **2026-10-29 v0145 改指(桌機 08:14 實跑 v0144 貼回:前後端已連結 · 2422 秒慢在 ⑦ 冪等閘序跑約 1050 秒無輸出;操作員問「是第一次啟動還是加速器沒作用」→ 都不是):** 本段現在指 操作員一鍵 **v0106** → VRN-2 一鍵 **v0145**(管理器 v0255:冪等閘每波 3 份並行 · 30 秒心跳 · 階段計時 `VRN2_Phase_Timing_latest.json`;其餘同 v0144)。④ 貼回包改收 `VRN2_Closeout_v0145.json` 與 `VRN2_Phase_Timing_latest.json`,不再把前一版收據與(跑完本來就會移除的)鎖檔算成「缺」。
+> **2026-10-29 v0144 改指(操作員:「先把這兩天有更新的部分抓下來再 PC 測試 · 先不要讓 GitHub 影響 · 這是獨立系統」):** 本段當時指 操作員一鍵 **v0105** → VRN-2 一鍵 **v0144**(⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108 · Workbench v0101)。GitHub 只當 git 遠端用來**抓**這兩天更新的檔(`git fetch` + `git archive`,逐檔 SHA-256 核對);CI 紅綠不影響本機實測。只測不推:先設 `$env:VRN_ROUND_NO_SHIP = '1'`(② 不補船、不 commit、不 push;套件啟動器 ⑨ 本來就只驗證不推),再貼頂端那一行。
 > **2026-10-29 第一次桌機實跑(01:33 · 7305 秒)貼回後本段改指:** ChainShip **v0101**(缺的環先在本機別處找)· 操作員一鍵 **v0104** → VRN-2 一鍵 **v0143**(單機閘 · 子行程上限加寬 · ⑫b 補放)· ① 印章改找 `OneDrive\Pictures\seal-logo-square.png`。那一輪的結果:① 黃(當時沒指定印章檔)· ② 紅(ship 後仍缺 v0248 / v0253 → v0101 的 recover)· ③ 紅(同一 VIA 根兩個啟動器重疊 → RAM 0.16 GB → ⑦ / ⑪ / ⑫b 逾時 → ⑤b 紅;⑧ 其實完成 紅 0 黃 4 · 冪等 GREEN · 四點原文 PASS 203 FAIL 1)· ④ 綠(13 收據 + 7 PDF)。
 
 做的事(每步有燈,任一步紅不擋下一步,最後總結):
@@ -12,8 +13,8 @@
 |---|---|---|
 | ① logo | 找印章圖:`$env:VRN2_LOGO` 指定的檔 → `OneDrive\Pictures\seal-logo-square.png`(操作員 2026-10-28 指定)→ `Downloads` / `Desktop` / `Pictures` / `OneDrive\Pictures` 裡的 `VRN2_Logo.(png|jpg|jpeg|webp)` → 複製到 `<VIA>\functional modules\VRN\SSOT\VRN2_Logo.<副檔名>`(Workbench 渲染時自動去白底;沒找到就用範本「理」字,不擋) | `$env:VRN2_LOGO = 'C:\...\seal.png'` |
 | ② 補船 | 從 GitHub 讀 `VRN2_ChainShip_v0101.md` 的程式碼(核對 SHA-256)→ 綁到本輪的倉(`$REPO` ← VIA 根所在的 git 倉;結束碼 = 它的綜合燈,push 被拒 = 黃)→ 執行:`check` → `ship --commit --push`(**v0101:先 recover** —— 缺的 v0248 / v0253 / SSOT 冊在 VIA 樹、`functional modules\VRN2`、備份夾、`Downloads\VRN2_*` 夾與 zip 裡找同名檔,內容唯一就複製進 VRN 夾再推;兩份不同內容只列 `[FIND?]`)→ `check` | `$env:VRN_ROUND_NO_SHIP = '1'` 跳過 |
-| ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0105.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:**v0144 套件**(啟動器 v0144:⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108(v0105 / v0107 是桌機線的號)· Workbench v0101;v0143 的單機閘 / 上限 / ⑫b 補放照舊;可先 `$env:VRN2_OUTPUT_DIR = 'C:\Users\tonyk\OneDrive\VRN2_out'` 預設輸出夾,或之後在 Workbench 按「選擇輸出夾…」)→ ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
-| ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0144.json` · `VRN2_OutputStore_latest.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
+| ③ 跑 | 從 GitHub 讀操作員一鍵 `VRN1_VRN2_OneClick_v0106.md` 的程式碼(核對 SHA-256)→ 執行(預設只跑 VRN-2:**v0145 套件**(啟動器 v0145 → 管理器 v0255:冪等閘每波 3 份並行 · 30 秒心跳 · 階段計時;v0144 的 ⑤b SSOT-ID 核號同步 · ⑬ 輸出位置 / DuckDB 增量庫 · 處理器 v0108(v0105 / v0107 是桌機線的號)· Workbench v0101 與 v0143 的單機閘 / 上限 / ⑫b 補放照舊;可先 `$env:VRN2_OUTPUT_DIR = 'C:\Users\tonyk\OneDrive\VRN2_out'` 預設輸出夾,或之後在 Workbench 按「選擇輸出夾…」)→ ①~⑫ → 四點原文核對 → **Workbench 自動開**;VRN-1 那段跳過) | `$env:VRN_ROUND_WITH_VRN1 = '1'` 連 VRN-1 一起跑 · `$env:VRN2_SOURCE` 來源夾(預設 `C:\測試樣本報告`) |
+| ④ 打包 | `Downloads\VRN2_PasteBack_<時間>.zip`:整段逐字稿(transcript)· 最後 300 行貼包 · `VRN2_Closeout_v0145.json` · `VRN2_Phase_Timing_latest.json` · `VRN2_OutputStore_latest.json` · `IDEMPOTENCE_latest.json` · `VRN2_VerbatimVerify_latest.json` · `VRN2_Completion_latest.json` · `VRN2_Workbench_latest.html` · 四本輸出冊 csv · 最新的 `verify_independent\*.digest.txt` · 補船收據 · **來源夾裡這五份報告的 PDF**(神達 3706 兆豐訪談速報 · GFHK Apple update · 欣銓 3264 · 6933 AMAX · 凱基 2891)→ 上傳這個 zip 給 AI 就夠 | `$env:VRN_ROUND_NO_PDF = '1'` 不裝 PDF |
 
 ## 一行啟動(桌機 PowerShell 貼這一行就好;從 GitHub 分支讀本檔的程式碼區塊再執行,不必複製整段)
 
@@ -31,7 +32,7 @@
   $R   = if ($env:VRN2_ROOT) { $env:VRN2_ROOT } else { 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics' }
   $Br  = 'claude/optimistic-goodall-yhalc5'
   $SRC = if ($env:VRN2_SOURCE) { $env:VRN2_SOURCE } else { 'C:\測試樣本報告' }
-  $H_OP = 'c1dfe6d2f67632d3a37846ce4ed8707baf5febc94617b32714963b31a7101c18'   # 操作員一鍵 v0105 程式碼 SHA-256(VRN1_VRN2_OneClick_v0105.md powershell 區塊 · ② 指 VRN-2 一鍵 v0144)
+  $H_OP = 'b625cfbc6a3de4c41dd73082021f49585157974cc6b9e232d2f1c9b943ef29ca'   # 操作員一鍵 v0106 程式碼 SHA-256(VRN1_VRN2_OneClick_v0106.md powershell 區塊 · ② 指 VRN-2 一鍵 v0145)
   $H_CS = '78ef9852c1dc1a902f342f10d7a0b37e03531ae34c72a7010dd350a85607bcd6'   # VRN2_ChainShip_v0101.md §3 程式碼 SHA-256(ship 先 recover:缺的環在本機別處找)
   $PDFS = @('3706', 'GFHK', '3264', '6933', '2891')                             # 要裝進貼回包的五份(檔名含這些字)
   $t0 = Get-Date; $stamp = $t0.ToString('yyyyMMdd_HHmmss')
@@ -110,8 +111,8 @@
   }
 
   # ③ 跑:操作員一鍵 v0103(→ VRN-2 一鍵 v0142 → 套件 → 全流程 → Workbench)
-  $k3 = '③ 跑 VRN-2 v0144'
-  $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai/vrn1_vrn2_oneclick_v0105' 'VRN1_VRN2_OneClick_v0105.md' $H_OP
+  $k3 = '③ 跑 VRN-2 v0145'
+  $code = FetchCode 'VeritasIntelligenceAnalytics/docs/handoff/ai/vrn1_vrn2_oneclick_v0106' 'VRN1_VRN2_OneClick_v0106.md' $H_OP
   if (-not $code) { Say $k3 RED '取不到或雜湊不符 · 沒跑' }
   elseif ($dry) { Say $k3 GREEN '乾跑:程式碼已核對,不執行' }
   else {
@@ -127,7 +128,7 @@
   # ④ 打包貼回材料
   $k4 = '④ 貼回包'
   $v2 = Join-Path $R 'VIA_Reports\vrn2'; $n = 0; $miss = @()
-  foreach ($rel in 'VRN2_Closeout_v0144.json', 'VRN2_Closeout_v0143.json', 'VRN2_OutputStore_latest.json', 'VRN2_Output_Config.json', 'VRN2_Launcher.lock', 'IDEMPOTENCE_latest.json', 'VRN2_VerbatimVerify_latest.json', 'VRN2_Completion_latest.json', 'VRN2_Activate_latest.json', 'VRN2_Input_latest.json', 'VRN2_ChainShip_latest.json', 'VRN2_Workbench_latest.html', 'output\VRN2_Summary_latest.csv', 'output\VRN2_BasicInfo_latest.csv', 'output\VRN2_Rejected_latest.csv', 'output\VRN2_FinancialData_latest.csv') {
+  foreach ($rel in 'VRN2_Closeout_v0145.json', 'VRN2_Phase_Timing_latest.json', 'VRN2_OutputStore_latest.json', 'VRN2_Output_Config.json', 'IDEMPOTENCE_latest.json', 'VRN2_VerbatimVerify_latest.json', 'VRN2_Completion_latest.json', 'VRN2_Activate_latest.json', 'VRN2_Input_latest.json', 'VRN2_ChainShip_latest.json', 'VRN2_Workbench_latest.html', 'output\VRN2_Summary_latest.csv', 'output\VRN2_BasicInfo_latest.csv', 'output\VRN2_Rejected_latest.csv', 'output\VRN2_FinancialData_latest.csv') {
     $p = Join-Path $v2 $rel; if (Test-Path -LiteralPath $p) { Copy-Item -LiteralPath $p -Destination (Join-Path $out ($rel -replace '\\', '_')) -Force; $n++ } else { $miss += $rel }
   }
   $dg = Get-ChildItem -LiteralPath (Join-Path $v2 'verify_independent') -Filter '*.digest.txt' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
