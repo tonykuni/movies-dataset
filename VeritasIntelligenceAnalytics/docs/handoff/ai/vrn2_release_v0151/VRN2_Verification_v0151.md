@@ -15,6 +15,8 @@
 | 收尾頁 · 端到端產生的那一頁(chromium) | desk scrollWidth 1366 VCGC rows 8 VCGC+MS-8358 0 errors [] / dark scrollWidth 1366 VCGC rows 8 VCGC+MS-8358 0 errors [] / phone scrollWidth 390 VCGC rows 8 VCGC+MS-8358 0 errors [] |
 | 端到端:pwsh 一行指令取 RoundAll v0104 | [VRN-2] PowerShell 7.4.6 · 從 GitHub 讀 VRN2_RoundAll_v0104.py(核對 SHA-256 後執行) · [GREEN] VRN2_RoundAll_v0104.py SHA-256 8333c1719127 相符 |
 | 端到端:⑧ 收尾頁 | [YELLOW] ⑧ 收尾頁(HTML U/I) · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 9 項等 VCGC 決定 / 安裝 · VRN-2 0 · VCGC 9 · 人工 2 · 資料源 0 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_Reports/vrn2/VRN2_CloseoutUI_latest.html |
+| PowerShell 7 原生一行(貼在 pwsh 視窗 · 沙盒實跑) | [GREEN] VRN2_RoundAll_v0104.py SHA-256 8333c1719127 相符(GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575 / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關) |
+| PowerShell 7 原生一行 · 雜湊不對 | [RED] VRN2_RoundAll_v0104.py SHA-256 不對(8333c1719127488b5e09ca9b2b426380a46c3650950104a7bb46e298fc474f08)· 不執行 / STILL-HERE(視窗沒關) |
 
 ## 1. 自測
 
@@ -50,6 +52,7 @@ oneline_roundall_pwsh.txt = md pwsh line → True
 roundall py sha (LF-normalised) = boot $H → True (8333c1719127)
 roundall pinned package sha = zip sha → True
 roundall CRLF checkout (git autocrlf) still verifies → True
+roundall md PowerShell 7 line parse errors: 0 · no exit → True · pins roundall sha → True
 ```
 
 ## 3. 端到端:一個指令(pwsh -EncodedCommand)在仿桌機沙盒取 RoundAll v0104 跑全流程(殼有 VIA_ROOT · envs 有退役環境 + 沒裝套件的 via_tw_fetch · 套件從假 GitHub 分支取 · 19 份真實樣本)
@@ -182,10 +185,10 @@ NEXT: [RED] VRN2_RoundAll · 紅 2 · 黃 14 · 貼回包 /tmp/claude-0/-home-us
 
 | 項目 | 值 |
 |---|---|
-| 收尾頁(修後)| {"state": "BLOCKED", "state_label": "等 VCGC", "state_text": "VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝", "vrn2_closed": true, "per_owner": {"VCGC": 8, "資料源": 1, "人工": 2}, "counts": {"GREEN": 21, "YELLOW": 13, "RED": 2, "GRAY": 9}, "items": [["VCGC", "YELLOW", "② 擷取 Python(⑥e / ⑥f)"], ["VCGC", "YELLOW", "② 擷取 Python · VDF 版本界線(⑥e)"], ["VCGC", "YELLOW", "⑤ 修 · ⑬ 增量庫補寫(本輪有修正)"], ["彙總", "RED", "⑥ 收尾收據"], ["VCGC", "RED", "⑥ 步驟 ③ 環境檢查與補裝"], ["VCGC", "YELLOW", "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market"], ["資料源", "YELLOW", "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)"], ["VCGC", "YELLOW", "⑥ 步驟 ⑬ 輸出位置 · 增量庫(DuckDB)"], ["人工", "YELLOW", "⑥ 四點原文核對"], ["人工", "YELLOW", "⑥ 輸出缺項"], ["提醒", "YELLOW", "⑥ 完成判定 · ① 結果計算驗證"], ["提醒", "YELLOW", "⑥ 完成判定 · ⑦ 基本資料雙讀"], ["提醒", "YELLOW", "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)"], ["VCGC", "YELLOW", "⑥ 長線 Parquet 庫"], ["VCGC", "YELLOW", "⑥ ⑥e 擷取 Python(VDF 版本界線)"]]} |
+| 收尾頁(修後)| {"state": "BLOCKED", "state_label": "等 VCGC", "state_text": "VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝", "vrn2_closed": true, "per_owner": {"VCGC": 8, "資料源": 1, "人工": 2}, "counts": {"GREEN": 20, "YELLOW": 13, "RED": 2, "GRAY": 9}, "items": [["VCGC", "YELLOW", "② 擷取 Python(⑥e / ⑥f)"], ["VCGC", "YELLOW", "② 擷取 Python · VDF 版本界線(⑥e)"], ["VCGC", "YELLOW", "⑤ 修 · ⑬ 增量庫補寫(本輪有修正)"], ["彙總", "RED", "⑥ 收尾收據"], ["VCGC", "RED", "⑥ 步驟 ③ 環境檢查與補裝"], ["VCGC", "YELLOW", "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market"], ["資料源", "YELLOW", "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)"], ["VCGC", "YELLOW", "⑥ 步驟 ⑬ 輸出位置 · 增量庫(DuckDB)"], ["人工", "YELLOW", "⑥ 四點原文核對"], ["人工", "YELLOW", "⑥ 輸出缺項"], ["提醒", "YELLOW", "⑥ 完成判定 · ① 結果計算驗證"], ["提醒", "YELLOW", "⑥ 完成判定 · ⑦ 基本資料雙讀"], ["提醒", "YELLOW", "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)"], ["VCGC", "YELLOW", "⑥ 長線 Parquet 庫"], ["VCGC", "YELLOW", "⑥ ⑥e 擷取 Python(VDF 版本界線)"]]} |
 | 長線庫(修後)| {"lamp": "YELLOW", "store_engine": "pyarrow", "totals": {"BasicInfo": 14, "FinancialData": 4905, "Summary": 14, "Rejected": 812, "Combined": 28, "FinancialAligned": 4905, "Deleted": 12}} |
-| 收尾收據的 roundall 欄 | {"version": "VRN2_RoundAll v0104", "at": "2026-10-29T14:59:25", "fixed": {"⑬b": {"lamp": "GREEN", "detail": "歷史對齊 v0102 · 對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)"}, "⑬ ": {"lamp": "YELLOW", "detail": "pyarrow · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 14, \"FinancialAligned\": 4905, \"Deleted\": 12} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 14, \"FinancialAligned |
-| 貼回包 | {"name": "VRN2_PasteBack_20261029_145926.zip", "members": 32, "has": ["transcript.txt", "vrn2/VRN2_Closeout_v0151.before_roundall.json", "vrn2/VRN2_RoundAll_latest.json", "vrn2/VRN2_CloseoutUI_latest.html", "vrn2/VRN2_CloseoutUI_latest.json"]} |
+| 收尾收據的 roundall 欄 | {"version": "VRN2_RoundAll v0104", "at": "2026-10-29T15:04:47", "fixed": {"⑬b": {"lamp": "GREEN", "detail": "歷史對齊 v0102 · 對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)"}, "⑬ ": {"lamp": "YELLOW", "detail": "pyarrow · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, |
+| 貼回包 | {"name": "VRN2_PasteBack_20261029_150448.zip", "members": 32, "has": ["transcript.txt", "vrn2/VRN2_Closeout_v0151.before_roundall.json", "vrn2/VRN2_RoundAll_latest.json", "vrn2/VRN2_CloseoutUI_latest.html", "vrn2/VRN2_CloseoutUI_latest.json"]} |
 
 ## 5. 一鍵 v0151 使用者情境(pwsh · 假 GitHub 分支 → 跑 → 再貼 → 竄改)
 
