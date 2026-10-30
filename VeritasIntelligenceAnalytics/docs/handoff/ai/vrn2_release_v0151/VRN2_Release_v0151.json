@@ -1,15 +1,16 @@
 {
  "system": "VRN-2",
  "independent": true,
- "release": "ActivateVRN-2 v0151 + VRN2_RoundAll_v0104",
+ "release": "ActivateVRN-2 v0151 + VRN2_RoundAll_v0105",
  "date": "2026-10-29",
  "trigger": "操作員 2026-10-29「解決剩餘系統問題 HTML U/I CLOSE OUT」(貼回的是桌機 19:00 跑 VRN2_RoundAll_v0102 的主控台 · 紅 0 黃 20 · v0150 已處理的不重做)",
  "base_package": {
   "name": "VRN2_Closeout_v0150 (launcher v0150 · runtime v0150)",
   "retained": "runtime v0150 members byte-identical inside runtime v0151; ActivateVRN-2_v0136.py base unchanged"
  },
- "supersedes": "v0150 for the closeout entry; VRN2_RoundAll v0103 → v0104; VRN-2 one-click v0150 → v0151; operator one-click v0111 → v0112; local round v0100 → v0101 (v0100 is in main and stays as is)",
+ "supersedes": "v0150 for the closeout entry; VRN2_RoundAll v0103 → v0104 → v0105 (2026-10-30: v0104 crashed on a package zip the desktop could not read — PermissionError Errno 13); VRN-2 one-click v0150 → v0151; operator one-click v0111 → v0112; local round v0100 → v0101 (v0100 is in main and stays as is)",
  "fixes": {
+  "RoundAll_v0105_locked_zip": "desktop 2026-10-30 13:15 / 13:21: v0104 step 1 read Downloads\\VRN2_Closeout_v0151\\VRN2_Closeout_v0151.zip → PermissionError [Errno 13] twice (6 min apart) → traceback, no close-out page / paste-back; v0105: retry (0.5/1/2/4 s) → evidence (launcher lock PID · icacls · attrib) → package from GitHub → package folder unusable → fresh folder VRN2_Closeout_v0151_<time> (old one untouched); every step guarded (an exception marks that step red, the close-out page and paste-back are still written; unreadable files skipped and listed); stale 6f 'Combined YELLOW' after step 5 → reminder; selftest 34 items",
   "IndependentVerifier_v0113": "annual-data BADITEM 19 on the desktop (MS-3665 / MS-8358 / MS-8210 / Daiwa aspeed; values on the page) came from the character-box reader only → the item is read a second way (PDFium whole-page text + pdfplumber lines; whole item · wrapped · words in order within three lines) before BADITEM; container: 4,378 unchanged rows 0 verdict changes · 60 / 60 fabricated items still BADITEM · 59 / 59 simulated desktop char-box misses back to PRESENT; full run v0112 vs v0113 identical (4,905 annual rows)",
   "RoundAll_v0104_closeout_ui": "VIA_Reports/vrn2/VRN2_CloseoutUI_latest.html + .json: every non-green result with its owner (VRN-2 / VCGC / human check / data source / reminder / aggregate), close-out state OPEN > BLOCKED > REVIEW > DATA_GAP > PASS (only PASS is success; unknown → VRN-2), filters / search / file links / next commands with copy, offline, light / dark, phone width; opened at the end on Windows (--no-open / VRN2_NO_UI=1 skip); in the paste-back zip",
   "RoundAll_v0104_combined_gaps": "Combined empties split by reason: no target price in the report (not a gap) · no market data · no daily data before the report date · cnyes has no FactSet page (404) · source has no such field",
@@ -94,15 +95,21 @@
   ],
   "files": "see VRN2_Runtime_v0151.json inside the package"
  },
- "roundall": {
+ "roundall_previous": {
   "name": "VRN2_RoundAll_v0104.py",
   "sha256": "8333c1719127488b5e09ca9b2b426380a46c3650950104a7bb46e298fc474f08",
+  "status": "superseded 2026-10-30 (crashes when the local package zip cannot be read); file kept"
+ },
+ "roundall": {
+  "name": "VRN2_RoundAll_v0105.py",
+  "sha256": "9edb8912770fa8190f9a08efa3c98edbd8edf6196cf10496081486a674bead00",
   "pinned_package_sha256": "680d47e7009f78d75f80a1ab8469842aa80ce7e7fa0055e0f9ad2ee271165ceb",
-  "guide": "VRN2_RoundAll_v0104.md"
+  "guide": "VRN2_RoundAll_v0105.md"
  },
  "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · 19 real sample files · chromium (close-out page)",
  "results": {
   "selftests": {
+   "VRN2_RoundAll_v0105(2026-10-30 · 檔被鎖不當掉)": "[PASS] VRN2_RoundAll v0105 --selftest · 34 項 · 不過 0",
    "VRN2_RoundAll_v0104": "[PASS] VRN2_RoundAll v0104 --selftest · 29 項 · 不過 0",
    "VRN2_IndependentVerifier_v0113(VIA 樹內 · 含 v0105 30/30 · v0110 ~ v0112)": "[PASS] v0113: BADITEM read a second way — item on the page (whole · wrapped · words in order) keeps PRESENT / ALIGNED; fabricated / renamed item stays BADITEM with the closest source line; FAIL keeps FAIL with the item's",
    "ActivateVRN-2_v0151(建置夾)": "[PASS] v0151: runtime's newest IndependentVerifier = v0113 (BADITEM read a second way before 'item not on this page' · structural copy, its own --shard) · v0112 kept",
@@ -128,7 +135,7 @@
    "roundall one-liner (pwsh) decodes to boot_roundall → True",
    "roundall one-liner (powershell) decodes to boot_roundall → True",
    "oneline_roundall_pwsh.txt = md pwsh line → True",
-   "roundall py sha (LF-normalised) = boot $H → True (8333c1719127)",
+   "roundall py sha (LF-normalised) = boot $H → True (9edb8912770f)",
    "roundall pinned package sha = zip sha → True",
    "roundall CRLF checkout (git autocrlf) still verifies → True",
    "roundall md PowerShell 7 line parse errors: 0 · no exit → True · pins roundall sha → True"
@@ -269,11 +276,10 @@
    "vrn2_closed": true,
    "per_owner": {
     "VCGC": 8,
-    "資料源": 1,
     "人工": 2
    },
    "counts": {
-    "GREEN": 20,
+    "GREEN": 21,
     "YELLOW": 13,
     "RED": 2,
     "GRAY": 9
@@ -310,7 +316,7 @@
      "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market"
     ],
     [
-     "資料源",
+     "提醒",
      "YELLOW",
      "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)"
     ],
@@ -374,8 +380,8 @@
    "why": "對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)"
   },
   "receipt_roundall": {
-   "version": "VRN2_RoundAll v0104",
-   "at": "2026-10-29T15:04:47",
+   "version": "VRN2_RoundAll v0105",
+   "at": "2026-10-30T05:24:47",
    "fixed": {
     "⑬b": {
      "lamp": "GREEN",
@@ -397,11 +403,14 @@
    "收尾頁 · 端到端產生的那一頁(chromium)": "desk scrollWidth 1366 VCGC rows 8 VCGC+MS-8358 0 errors [] / dark scrollWidth 1366 VCGC rows 8 VCGC+MS-8358 0 errors [] / phone scrollWidth 390 VCGC rows 8 VCGC+MS-8358 0 errors []",
    "端到端:pwsh 一行指令取 RoundAll v0104": "[VRN-2] PowerShell 7.4.6 · 從 GitHub 讀 VRN2_RoundAll_v0104.py(核對 SHA-256 後執行) · [GREEN] VRN2_RoundAll_v0104.py SHA-256 8333c1719127 相符",
    "端到端:⑧ 收尾頁": "[YELLOW] ⑧ 收尾頁(HTML U/I) · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 9 項等 VCGC 決定 / 安裝 · VRN-2 0 · VCGC 9 · 人工 2 · 資料源 0 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_Reports/vrn2/VRN2_CloseoutUI_latest.html",
-   "PowerShell 7 原生一行(貼在 pwsh 視窗 · 沙盒實跑)": "[GREEN] VRN2_RoundAll_v0104.py SHA-256 8333c1719127 相符(GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575 / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關)",
-   "PowerShell 7 原生一行 · 雜湊不對": "[RED] VRN2_RoundAll_v0104.py SHA-256 不對(8333c1719127488b5e09ca9b2b426380a46c3650950104a7bb46e298fc474f08)· 不執行 / STILL-HERE(視窗沒關)"
+   "PowerShell 7 原生一行(貼在 pwsh 視窗 · 沙盒實跑)": "收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關)",
+   "PowerShell 7 原生一行 · 雜湊不對": "[RED] VRN2_RoundAll_v0104.py SHA-256 不對(8333c1719127488b5e09ca9b2b426380a46c3650950104a7bb46e298fc474f08)· 不執行 / STILL-HERE(視窗沒關)",
+   "桌機 2026-10-30 13:15 / 13:21:v0104 ① 讀本機套件 zip PermissionError [Errno 13] → Traceback(兩次 · 隔 6 分鐘)": "v0105 修(見下兩列 + 自測 ㉘ ~ ㉜)",
+   "v0105 · 模擬本機 zip 讀不到(同一行程讓讀檔丟 PermissionError)": "[GRAY] ① 套件 zip 讀不到(改從 GitHub 取) · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_Closeout_v0151/VRN2_Closeout_v01 / [GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0151(11 檔逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_Closeout_v0151 · / [GREEN] ⑦ 貼回包 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_PasteBack_20261030_052447.zip(0.5 MB) / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_Reports/vrn2/VRN2_Cl",
+   "v0105 · PowerShell 7 原生一行(沙盒)": "[GREEN] VRN2_RoundAll_v0105.py SHA-256 9edb8912770f 相符(GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575 / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關)"
   },
   "pasteback_zip": {
-   "name": "VRN2_PasteBack_20261029_150448.zip",
+   "name": "VRN2_PasteBack_20261030_052447.zip",
    "members": 32,
    "has": [
     "transcript.txt",
@@ -417,7 +426,7 @@
    "again": "[GREEN] ③ 本機已是 v0151 套件(SHA-256 680d47e7009f · 套件夾 12 檔與已驗證的 zip 逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151oc/Downloads/VRN2_Closeout_v0151",
    "tamper": "[GREEN] ③ 舊套件夾已改名備份 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151oc/Downloads/VRN2_Closeout_v0151_20261029_145720.bak",
    "closeout": "[RED] ⑧b 收尾收據 v0151 · rc 1 · 跑了 1 輪(idempotence GREEN)· 四點原文核對 REVIEW_OCR {'PASS': 52, 'OCR_PENDING': 4} · 輸出缺項 1",
-   "roundall_hint": "[GRAY] 更完整的除錯 / 自動修 / 貼回包:python VRN2_RoundAll_v0104.py --skip-run(見 vrn2_release_v0151/VRN2_RoundAll_v0104.md)"
+   "roundall_hint": ""
   },
   "not_claimed": [
    "Windows desktop run of v0151 / RoundAll v0104: not yet (next paste-back)",
