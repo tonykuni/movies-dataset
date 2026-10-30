@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-13T14:07:25+00:00",
+  "updated_at": "2026-10-30T04:15:29+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -3508,8 +3508,8 @@
         "VDF_ENG093_LaunchConsole_v0105",
         "--selftest"
       ],
-      "success_marker": "[計] VDF_ENG093_LaunchConsole v0105 薄尾 7/7 · PASS",
-      "scope": "VDF_ENG093_LaunchConsole v0105 清單先行鎖定列:矩陣最前兩列 tw_list · etf_list(lock · checked · disabled,JS boxes() 與 -Steps 不含)· 決定 / validate 不變(清單步交 CGC_MDL134 自動先跑)· 頁首 v0105 · 真樹矩陣與渲染;前版鏈 v0104 → v0103(VDF-REQ021)",
+      "success_marker": "[計] VDF_ENG093_LaunchConsole v0105 薄尾 16/16 · PASS",
+      "scope": "VDF_ENG093_LaunchConsole v0105 清單先行鎖定列:矩陣最前兩列 tw_list · etf_list(lock · checked · disabled,JS boxes() 與 -Steps 不含)· 決定 / validate 不變(清單步交 CGC_MDL134 自動先跑)· 頁首 v0105 · 真樹矩陣與渲染;前版鏈 v0104 → v0103(VDF-REQ021);2026-10-30 標記 7/7 → 16/16:v0105 於 PR #548(2026-10-20,清單先行 ask 自己跑 009 → 010 · Codex #548 兩條 P2)就地擴充為 16 檢,原 7/7 標記已無對應輸出(收據 rc 1 只因標記對不上;自測本身 16/16 PASS)",
       "dependencies": [
         "functional modules/VDF/VDF_ENG093_LaunchConsole_v0105.py",
         "functional modules/VDF/VDF_ENG093_LaunchConsole_v0104.py",
@@ -3552,6 +3552,19 @@
         "supportive modules/registry/CGC_MDL224_ScrapeGate_v*.py"
       ],
       "timeout_seconds": 900
+    },
+    "vdf_ws_manager_junction": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0163 自測 6/6 · PASS",
+      "scope": "VDF_SystemManager v0163(工作站 2026-10-21 實錄:全鏈自測到 v0151 布置舊接點 os.symlink → WinError 1314 一般帳號沒有建符號連結特權,之後全鏈沒跑;CI 的 Windows runner 是管理員所以綠)→ 自測跑前版鏈時把 v0151 看到的 os 換成代理,目錄連結走 link_dir(Windows = mklink /J,同 v0151 正式 db move;其他 = 符號連結),跑完還原;v0151 正本不改;四系統對等獨立 L123,不改 VCGC 的冊與程式",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-30T04:15:29+00:00"
     }
   },
   "work_items": [
@@ -7292,6 +7305,17 @@
       "owner": "操作員(貼 log)→ AI(定根因)",
       "reason": "VDF 資料庫狀況頁貼回(VDF_ENG093 v0105 · 2026-10-13 21:03:17):各步結果 PART 但那份是 LANES_20260924_145157(頁自己註明比本次決定早 = 今天那趟被殺前沒寫 LANES_*.json);資料庫目錄 FRESH(21:03 重點)· 分類燈 RED(ETF 滯後 48 · 宏觀 49 · 國際 47 · 其他 104;營收 NODATA)· 增量缺口 表 73 有缺口 32(tw__tw_daily_prices → 2026-08-25 缺 49 · tw_chip_inst / margin → 2026-08-25 缺 415 · gl__global_daily → 2026-08-25 缺 49 …)· 引擎狀況(FG_20261012T113922Z 族群跑):RED rc 1 = e054 TWDailyBackfill · e057 TradingValueBackfill · e056 ChipBackfill · e078 ActiveETFHoldingsHistory · e082 FinStatements · e066 GlobalUniverse · e074 FredMacroSSOT;rc 124 = e232 TWIndexOfficial · 011d AkshareFetcher;YELLOW e063 rc 2;GREEN 009 · 010 · e077 · 006 · e113 · e229 · e116 · e115。rc 124 兩支 = 族群跑的逾時(同一類天花板);rc 1 七支容器看不到 log,不猜",
       "next": "貼 VIA_Reports/vdf/fg_runs/FG_20261012T113922Z/ 各引擎 log 最後 30 行(或 VDF_SystemManager engine matrix 的紅列詳情)→ AI 逐支定根因、出修法;分類燈與缺口表在一鍵跑完後重看"
+    },
+    {
+      "id": "VDF-REQ018:ws-junction-vdf_ws_manager_junction",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI / 工作站(要 duckdb · pandas)",
+      "reason": "工作站 vdf_ws_manager_design 收據(2026-10-21 · win32)實錄全鏈自測崩在 v0151 第 458 行 os.symlink → [WinError 1314] 用戶端沒有這項特殊權限;凡指令 VDF_SystemManager --selftest 的 16 案在工作站一般帳號一律紅。管理員 v0163:自測窗內 v0151 布置接點改走 mklink /J(同正式 db move)。本版自測 6/6(前版鏈略過)· 模擬 Windows 實跑 v0151 自測確認改走 mklink /J、參數順序對、os 換回原樣 · 突變 10 個全抓到;全鏈自測在本容器因沒有 duckdb(v0151 db 自測 · FetchGroups 來源狀態)跑不動 → 收據待工作站 / CI(Windows 有 duckdb · pandas)",
+      "next": "併入 main 後工作站跑 VDF_MDL014_WorkstationSync 尾版 --apply --case vdf_ws_manager_junction(與其他 VDF 失效案同一輪);綠了轉 VERIFIED",
+      "pended_at": "2026-10-30T04:15:29+00:00",
+      "case": "vdf_ws_manager_junction",
+      "receipt": "docs/handoff/evidence/vdf_ws_manager_junction.json"
     }
   ]
 }
