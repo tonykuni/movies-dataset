@@ -1,0 +1,204 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0158 (step 3b OCR environment: no pip from VRN-2 · not ready → VCGC) + VRN2_RoundAll_v0114 + VRN2_HandleAll_v0106",
+ "date": "2026-10-31",
+ "trigger": "操作員 2026-10-31:「依照你的建議進行」(v0157 回覆:③b OCR 隔離環境還在自己的 venv 裡 pip · 要不要也預設關掉)· 桌機 04:55 Handle-All v0105 repair = BLOCKED · VRN-2 0 · VCGC 1 · 人工 3 · 資料源 2",
+ "base_package": {
+  "name": "VRN2_Closeout_v0157 (launcher v0157 · runtime v0156)",
+  "retained": "runtime v0156 zip byte-identical; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0157 package for the closeout entry; VRN2_RoundAll v0113 → v0114; VRN2_HandleAll v0105 → v0106",
+ "install_route": {
+  "step3": "manager envcheck check-only (this entry drops the base's --install; the manager's in-place pip used numpy>=1.24,<2.0)",
+  "gate": "supportive modules/registry/CGC_MDL056_InstallGate_v#### highest (v0104 in the repo · same pick as VCGC EnvGovernance) · one package per call · pip check before / after · VIA_Lib_Registry · import smoke · SuperAccel install lane behind VIA_NET_CONSENT",
+  "ledger": "VIA_Reports/vrn2/VRN2_VCGCInstall_latest.json · gate failures not retried for 24 h · VIA_VRN2_INSTALL_RETRY=1 retries",
+  "opt_out": "--no-install / --plan: check only, no gate call",
+  "legacy": "--pip-install or VIA_VRN2_PIP_INSTALL=1: old in-place pip (operator's explicit choice only)",
+  "not_changed": "VDF's via_tw_fetch build commands are printed for VCGC as before (VRN-2 never ran them)",
+  "step3b": "ready / assigned OCR env used as before · not ready → no venv, no pip from VRN-2 · YELLOW with build commands for VCGC · OCR stays queued · --pip-install / VIA_VRN2_PIP_INSTALL=1 keeps the old behaviour"
+ },
+ "fixes": {
+  "launcher_v0158": "receipt VRN2_Closeout_v0158.json · ocr_environment wrapper: ocr_ready() (assigned env or envs/vrn2_ocr imports rapidocr + wordninja) → base ocr_env; else ocr_handoff() YELLOW · selftest block v0158",
+  "RoundAll_v0114": "package v0158 · close-out: '③b OCR' rows → VCGC (no rule before → default VRN-2) · selftest 58",
+  "HandleAll_v0106": "v0105 pointed at RoundAll v0114 (vrn2_release_v0158)"
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0158.py",
+   "sha256": "5850196fc0cb387f7dd08c0405819df1eaec239a119e58244cc03010d082efe1",
+   "bytes": 110707
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "46895a7d48e1bae13bd42cef045052fd9ef7bdd6eb809db33cc1bb7c713c7f0b",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "de86ac4ed03887b6f1b2f06138c66fc2546211d53cba1844af0549e752201de0",
+   "bytes": 1054
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "09ff1f22bc500ccebe68ca58279d9e044e8da9a8a217b60feaa9155ea0f96b8f",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0156.json",
+   "sha256": "4941d2333d839aea877622309f9118e8dd3bd909dc87047bff752fc2ca6c9234",
+   "bytes": 25508
+  },
+  {
+   "path": "VRN2_Runtime_v0156.zip",
+   "sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+   "bytes": 6993877
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0156",
+  "zip_sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+  "based_on": "VRN2_Runtime_v0154.zip 5b8a4acca6a1b6fb9874ab45c172ee6b0b8e8e82f9e74c20a6188c3c84d05546",
+  "retained_members": 190,
+  "new_members": [
+   "VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122.py",
+   "VRN2_ConsensusJoin_v0104.py"
+  ],
+  "files": "see VRN2_Runtime_v0156.json inside the package",
+  "changed": false
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0113.py",
+   "sha256": "891df58a576e42260e856f053387ac1c5aa4fc772fe58d9d407b3de8aedd4df9",
+   "status": "superseded 2026-10-31 (package v0157 · step 3b pip in its own venv); file kept in vrn2_release_v0157"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0114.py",
+  "sha256": "425397f5d72451619c0247354acc5c7bd7dc387d632522936a49f02145ad1b73",
+  "pinned_package_sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "guide": "VRN2_RoundAll_v0114.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0106.md",
+  "line_sha256": "99598c668e4b3f263365e8a47318821e0341f4cae23caa68d7153cbd687f31a3",
+  "line_chars": 9758,
+  "boot_file": "VRN2_HandleAll_v0106_boot.txt",
+  "boot_line_sha256": "5aba98f6172f0eed0ed292f4f06db0501034889976e89af772e6b66f228b231a",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 4640
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · sandbox VIA with no OCR venv (step 3b not ready → handed to VCGC)",
+ "results": {
+  "roundall_selftest": [
+   "[PASS] 57 收尾頁:② 磁碟可用不到 2 GB → 人工(清空間 · 不是 VRN-2 要改碼;沙盒整輪 v0157 實錄被算成 VRN-2 2 項)",
+   "[PASS] 58 收尾頁:③b OCR 隔離環境沒就緒(啟動器 v0158 不建不 pip)→ VCGC(以前落到預設 VRN-2)",
+   "[PASS] VRN2_RoundAll v0114 --selftest · 58 項 · 不過 0"
+  ],
+  "launcher_selftest": [
+   "[PASS] v0158: step 3b uses a ready / assigned OCR environment as before · not ready → no venv, no pip from VRN-2 · YELLOW with the build commands for VCGC · OCR stays queued · old behaviour only with --pip-install / VIA_",
+   "[PASS] v0157: step 3 runs envcheck check-only (no pip in this Python) · missing packages go one by one through VCGC's newest CGC_MDL056_InstallGate · re-checked after an install · gate failures not retried for 24 h · --n"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析 0 錯 · Handle-All 一行 = 可讀版 · 開機行 = 可讀版 · 最短一行 0 錯",
+  "e2e_rc": [
+   "report rc 0",
+   "auto rc 0",
+   "full rc 0",
+   "tamper rc 0",
+   "venv unchanged",
+   "ocr venv not created"
+  ],
+  "e2e": {
+   "report": [
+    "[GREEN] boot: Handle-All v0106 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 5 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 5 項",
+    "  [人工] 2 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 0 秒(視窗不會關)"
+   ],
+   "auto": [
+    "[GREEN] boot: Handle-All v0106 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(輸出冊是啟動器 v0153 以後做的 · 這版只改 ⑥f 共識出網 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項",
+    "  [人工] 2 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 3 秒(視窗不會關)"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0106 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 7 項",
+    "  [人工] 1 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 2 · 124 秒(視窗不會關)"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "full_step3": [
+   "    → GREEN ③ 環境檢查與補裝 · [計] 環境檢查(只檢查 · 不 pip · 缺的經 VCGC 安裝閘)· 沒有缺的 · 缺:必裝 0 · 選裝 0 · 耗時 3 秒",
+   "    → YELLOW ③b OCR 隔離環境 · OCR 隔離環境沒就緒(<v158>/t158a/home/envs/vrn2_ocr)· VRN-2 不建、不 pip(VCGC 安裝閘只裝進呼叫它的 Python · 裝不進別的 venv)→ 交 VCGC 建:python3 -m venv \"<v158>/t158a/home/envs/vrn2_ocr\" ; \"<scratch>",
+   "  [計] ③b OCR 隔離環境 · OCR 隔離環境沒就緒(<v158>/t158a/home/envs/vrn2_ocr)· VRN-2 不建、不 pip(VCGC 安裝閘只裝進呼叫它的 Python · 裝不進別的 venv)→ 交 VCGC 建:python3 -m venv \"<v158>/t158a/home/envs/vrn2_ocr\" ; \"<scratch>",
+   "[YELLOW] ⑥ 步驟 ③b OCR 隔離環境 · OCR 隔離環境沒就緒(<v158>/t158a/home/envs/vrn2_ocr)· VRN-2 不建、不 pip(VCGC 安裝閘只裝進呼叫它的 Python · 裝不進別的 venv)→ 交 VCGC 建:python3 -m venv \"<scratch>",
+   "    · ⑥ 步驟 ③b OCR 隔離環境 · OCR 隔離環境沒就緒(<v158>/t158a/home/envs/vrn2_ocr)· VRN-2 不建、不 pip(VCGC 安裝閘只裝進呼叫它的 Py"
+  ]
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0158.zip",
+  "sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "bytes": 7787162,
+  "layout": "VRN2_Closeout_v0158/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0158.py",
+  "sha256": "5850196fc0cb387f7dd08c0405819df1eaec239a119e58244cc03010d082efe1"
+ },
+ "test_tools_zip": "vrn2_test_tools_v0158.zip",
+ "logs_zip": "logs_v0158.zip"
+}

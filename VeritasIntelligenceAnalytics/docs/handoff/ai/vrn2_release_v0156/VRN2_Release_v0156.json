@@ -1,0 +1,299 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0156 (ConsensusJoin v0104 · consensus engine v0122 through the VIA network tool + accelerator) + VRN2_RoundAll_v0112 + VRN2_HandleAll_v0104",
+ "date": "2026-10-31",
+ "trigger": "操作員 2026-10-31:「新版有版本號 · 加速器跟網路工具最新版都有版本號 · 直接透過 VCGC 的環境工具管理引擎下載所有不足工具及環境並確認無衝突 · 改成經網路工具和加速器出網再抓」(上傳 Fusion v0120 · Matrix v0111)",
+ "base_package": {
+  "name": "VRN2_Closeout_v0154 (launcher v0154 · runtime v0154)",
+  "retained": "runtime v0154 members byte-identical inside runtime v0156; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0154 package for the closeout entry; VRN2_RoundAll v0111 → v0112; VRN2_HandleAll v0103 → v0104",
+ "network": {
+  "tool": "supportive modules/network/SUP_MDL740_NetUnified (highest version · v0119 in the repo)",
+  "core": "VeritasAegisNexus_v1652 (lock book VIA_ToolVersion_Lock_v0100.json · network)",
+  "accelerator": "VeritasCeleritas (highest version · lock book v1141) loaded by the engine's accelerator bridge; the network tool's text lane uses VIA_SuperAccel",
+  "lanes": {
+   "cnyes FactSet page": "http_bytes (stdlib · retries · 404 not retried)",
+   "YFinance": "yahoo_quote_summary_raw (requests · cookie + crumb)"
+  },
+  "gate": "VIA_NET_CONSENT == 'YES' and VIA_SCRAPE_CONSENT in {'YES', 'I_ACCEPT_RESPONSIBLE_SCRAPING'} (same as CGC_MDL224_ScrapeGate) · operator's decision · never set by VRN-2",
+  "compliance": "AegisNexus v1652 overlay: cnyes / Yahoo policy rows are signals (allowed); MOPS keeps the body's DENY; VIA_COMPLIANCE_ENFORCE=YES restores blocking"
+ },
+ "vcgc_env": {
+  "EnvPlan": "CGC_MDL049_EnvPlan_v0103 --offline · pip conflicts 0 · dry-run skipped (offline / consent)",
+  "InstallGate_check": "CGC_MDL056_InstallGate_v0101 --check-only · conflicts 0 · aux network / accelerator OK",
+  "InstallGate_install": "duckdb 2.0.0 into the container's sandbox venv via InstallGate (conflicts 0 before / after); desktop: anything missing goes through via-install (VCGC)",
+  "engine_needs": "network-tool engine: requests in the fetch Python (yfinance no longer needed by v0122); duckdb optional"
+ },
+ "fixes": {
+  "Fusion_v0122": "v0121 + NET-TOOL block: def_http_get → net.http_bytes (DENY → PermissionError VIA_NET_DENY · failure → RuntimeError HTTP_GET_FAILED … via=VIA_NET); def_fetch_yfinance_info → net.yahoo_quote_summary_raw + flatten + analysis tables; pre-check prints 'def Net tool' and stops on VIA_NET_TOOL_MISSING / closed gate (live mode)",
+  "Matrix_v0112": "v0111 + accelerator bridge + the same network-tool routing (delivered as a file · not wired into VRN-2)",
+  "ConsensusJoin_v0104": "thin tail over v0103: requests probe · net_tool / net_deny in the receipt · provenance refresh (today's checkpoint from the direct engine + gate open → archive → refetch through the network tool; sidecar consensus/VRN2_Consensus_NetTool.json) · VIA_VRN2_CONSENSUS_REFRESH=1 forced refresh · net_engine when the network-tool engine never reached its network step (no net_tool · not counted as fetched through the tool) · selftest ① ~ ⑨",
+  "RoundAll_v0112": "step 5 consensus_refresh · close-out net_deny → 人工 (gate closed) / VCGC (compliance) · Combined 'VIA 網路工具 DENY' gaps split the same way · debug rows · MOPS rule no longer swallows 6f / Combined DENY rows · selftests 52 ~ 55",
+  "launcher_v0156": "receipt VRN2_Closeout_v0156.json · CONSENSUS_JOIN v0104 · ⑥f receipt keeps net_tool / net_deny / refresh / engine_no_output · selftest checks engine v0122 is the newest and goes through the network tool",
+  "HandleAll_v0104": "v0103 pointed at RoundAll v0112 (vrn2_release_v0156) + ③b prints the consent gate state read-only and how the operator opens it"
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0156.py",
+   "sha256": "75c0bcfe5eecf8131a4b69456832576ec4c91c83ba8088fa058a43083315ee3e",
+   "bytes": 94876
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "b35727b52113c1c6cdb982dc666015a2f848ac86fb94cf73c7fe11b6ea7fbc74",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "5c1c9c4b774dacb79acb52299ceaf73672fea38fb919e82d818e35c2739401f7",
+   "bytes": 2026
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "d4e69125281ad8a84f061ed0e99cf8a246234effbb64135ed0a83ba5ae06062b",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0156.json",
+   "sha256": "4941d2333d839aea877622309f9118e8dd3bd909dc87047bff752fc2ca6c9234",
+   "bytes": 25508
+  },
+  {
+   "path": "VRN2_Runtime_v0156.zip",
+   "sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+   "bytes": 6993877
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0156",
+  "zip_sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+  "based_on": "VRN2_Runtime_v0154.zip 5b8a4acca6a1b6fb9874ab45c172ee6b0b8e8e82f9e74c20a6188c3c84d05546",
+  "retained_members": 190,
+  "new_members": [
+   "VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122.py",
+   "VRN2_ConsensusJoin_v0104.py"
+  ],
+  "files": "see VRN2_Runtime_v0156.json inside the package"
+ },
+ "engines": [
+  {
+   "name": "VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122.py",
+   "sha256": "7eea60fd30198402d5b2c6b72b5cb5ea235eff0f6a12928f4ae478c065b075bc"
+  },
+  {
+   "name": "VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112.py",
+   "sha256": "573c167d618641a2246c3a5cab986f0015709c1fa0c3a6f2224229cbbbf03ed9"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0111.py",
+   "sha256": "1d094c0d5c3602167eee8c5c5c5d55e3783c75db854afc9499dd13829754c4c7",
+   "status": "superseded 2026-10-31 (package v0154 · consensus engine direct); file kept in vrn2_release_v0155"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0112.py",
+  "sha256": "5f032bc73f2f8bc7608754107dcd4dcede05be4a349f38599a12d0e5bfe18fff",
+  "pinned_package_sha256": "182bc1486bb48e2f39e077f2c08ad67975bedbbfa821ce08c5f6bb9386e0920a",
+  "guide": "VRN2_RoundAll_v0112.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0104.md",
+  "line_sha256": "986cdad74e65ef3e106739cfd9ebbeeb7ad287919881585dfb11e11e35597148",
+  "line_chars": 9732,
+  "boot_file": "VRN2_HandleAll_v0104_boot.txt",
+  "boot_line_sha256": "5d39098af2673b889769bedb279bf14ee3a3b1478ee23c9b25b4f7272421339e",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 4640
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · VIA network tool v0119 with the gate closed",
+ "results": {
+  "roundall_selftest": [
+   "[PASS] 52 收尾頁:共識經 VIA 網路工具被 DENY · 同意閘未開 → 人工(操作員決定 · 不代設)· 合規 DENY → VCGC · Combined 那幾格同樣分",
+   "[PASS] 53 同意閘判斷同 VCGC 的 ScrapeGate(YES + YES / 合規 token 才算開 · OFF 不算)· 閘關 → 不排重抓 · 除錯報告寫「共識還沒經 VIA 網路工具 · 操作員決定」",
+   "[PASS] 54 ⑤ 自動修:共識是直連引擎抓的 + 同意閘開(替身)→ 經網路工具重抓 ⑥f + 重組 Combined · 閘值不對 → 不排 · 已經經網路工具 → 不排 · 經網路工具的引擎沒跑到出網(缺 requests)→ 不排 · 不列綠",
+   "[PASS] 55 除錯報告:共識是經 VIA 網路工具抓的 → 綠列(網路工具版號 · 閘 · 加速器)",
+   "[PASS] VRN2_RoundAll v0112 --selftest · 55 項 · 不過 0"
+  ],
+  "consensusjoin_selftest_in_via": [
+   "[PASS] ① 欄序照操作員清單:目標價 → 調整後目標價 → FactSet / YFinance 中位數 → 2026 / 2027 / 2028 EPS → 2026 / 2027 / 2028 PER → 現價 → 調整後上漲 → 還原收盤 → 主題與摘要 → 狀態",
+   "[PASS] ② 代號來自基本資料冊:2330 · 2454 · 9999(去重 · 4 碼)",
+   "[PASS] ③ 引擎離線 fixture 實跑:3 代號 · FactSet 中位數 1450 / 1600 · YFinance 中位數 1500 / 1550 · EPS 2026 60 · 2027 75 · 2028 90 · PER 2026 = 1000 / 60 · 收據在 consensus/",
+   "[PASS] ④ join:3 列 · 欄序 = 清單 · 2330 調整後目標價 1470.00 · 上漲 45.5 · 還原收盤 1010.50 · NAME 由 VDF 補 · 主題與摘要 = 標題 + 三點(空點略)",
+   "[PASS] ⑤ join 共識欄:2330 FactSet 1450.00 · YFinance 1500.00 · 2026 EPS 60.00 · 2028 EPS 90.00 · 2026 PER 16.67 · 2454 2028 空 · 9999 有共識但沒市場 → 調整後目標價空且說缺 · 綠 / 黃",
+   "[PASS] ⑥ 輸出:json / csv(+ parquet 有 pyarrow)· 基本資料冊沒動(3 列 · _STATUS 還在)",
+   "[PASS] ⑦ VIA_VRN2_NO_CONSENSUS=1 → 灰不跑 · 收據照寫",
+   "[PASS] ⑧ 對應表:市場冊 per_ticker → 5274 → 5274.TWO · 2330 → 2330.TW · 壞值不收",
+   "[PASS] ⑨ 引擎原本:鉅亨 TWS:5274 → 5274.TW(桌機 404 的根因)· patch 後 → 5274.TWO · 2330 照舊 .TW",
+   "[PASS] ① v0101 自測(含 v0100 · 上櫃 .TWO)照過",
+   "[PASS] ② 只有 404 頁面不存在的列 → 那幾檔不納入(6933 · 4171)",
+   "[PASS] ③ 還有別的不過列(2330 HTTP 500)→ 不動(照 FAIL_CLOSED)· 全部代號都 404 → 不動",
+   "[PASS] ④ gate FAIL_CLOSED 只因 404 → 拿掉 6933 · 4171 再跑一次 → 第二次 PASS · 收據記 no_coverage / first_gate",
+   "[PASS] ⑤ Combined:沒覆蓋的代號 STATUS 加「鉅亨沒有 FactSet 頁(404)」· 其他列不動",
+   "[PASS] ⑥ 啟動器叫的 run / join 與 CLI 的 run / join 都是本版(v0101 · v0100 的模組也指過來)",
+   "[PASS] ① v0102 自測(含 v0101 · v0100 · 引擎離線實跑)照過",
+   "[PASS] ② 分類:6933 404 = 沒有 FactSet 頁 · 8358 沒有 __NEXT_DATA__ / 2891 連線中斷 = 一時抓不到 · 1234 HTTP 404 / 2330 品質列 = 其他",
+   "[PASS] ③ 搬 checkpoint:今天的 [2330,6933,8358] → [2330,8358] 搬 2 份 · 引擎自己的 def_initialize_checkpoint 認它可續跑 · 兩份 payload 讀得回 · 舊的封存",
+   "[PASS] ④ 不是今天的 checkpoint → 不搬(照引擎一天一抓)",
+   "[PASS] ⑤ 桌機 20:09 重演:404 重試 1 次 → 拿掉 6933 / 4171 再跑 → 8358 / 2891 不再上網(沿用第一次)→ PASS · 綠 · no_coverage 2 · source_gap 0",
+   "[PASS] ⑥ 同一劇本給 v0102:第二次清單一變 checkpoint 對不上 → 8358 / 2891 重抓 → FAIL_CLOSED(桌機的樣子 · v0103 才修)",
+   "[PASS] ⑦ 一時抓不到:8358 第一次沒有 __NEXT_DATA__ · 第二次有 → 重試 1 次就過閘 · 只重抓 8358 · 綠",
+   "[PASS] ⑧ 一直抓不到:2891 抓 3 次(重試 2 次)仍沒有 → source_gap · 拿掉再跑不上網 → PASS 但黃(鉅亨這次沒給)",
+   "[PASS] ⑨ 別的不過(HTTP 404 網頁本身不在)→ 不重試、不拿掉 · FAIL_CLOSED 原樣(VRN-2 的事)",
+   "[PASS] ① v0103 自測(含 v0102 ~ v0100 · 直連引擎 VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0120.py)照過",
+   "[PASS] ② runtime 最高版號的共識引擎經 VIA 網路工具(VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122.py)· 直連引擎留作前版",
+   "[PASS] ③ 擷取 Python 檢查:經網路工具的引擎 → 查 requests · 其他呼叫照原樣 · 直連引擎照查 yfinance",
+   "[PASS] ⑨ 引擎沒跑到出網那步(擷取環境缺 requests · 沒有「def Net tool」行)→ 不寫 net_tool(不算經網路工具抓過)· net_engine 記引擎名 · why 寫缺 requests 交 VCGC 環境工具",
+   "[PASS] ④ 網路工具 DENY:同意閘未開 → net_deny gate_closed · 黃 · why 寫「操作員的決定」· 共識欄清空(這次沒抓)· 合規 DENY → gate_closed False(VCGC 決定)",
+   "[PASS] ⑤ 重抓(VIA_VRN2_CONSENSUS_REFRESH=1):今天的 checkpoint 用引擎自己的函式封存 · 檔移走 → 這輪全部經網路工具重抓",
+   "[PASS] ⑧ 今天的 checkpoint 是直連引擎抓的(沒有 VRN2_Consensus_NetTool.json)+ 閘開 → 封存 · 經網路工具重抓 · 閘關 → 不封存 · 經網路工具抓過的(記號對得上)→ 照續跑",
+   "[PASS] ⑥ 真引擎 + 真網路工具(SUP_MDL740_NetUnified_v0119 · 閘關):開跑前就停 · net_deny gate_closed · 不換道直連",
+   "[PASS] ⑦ 啟動器 / CLI 的 run 都是本版(v0103 ~ v0100 的模組都指過來)· join 照 v0103",
+   "[PASS] VRN2_ConsensusJoin v0104 --selftest · 不過 0"
+  ],
+  "consensusjoin_selftest_outside_via": [
+   "[SKIP] ⑥ 這個 runtime 夾不在 VIA 樹裡(找不到 supportive modules\\network)· 真網路工具那段不跑",
+   "[PASS] VRN2_ConsensusJoin v0104 --selftest · 不過 0"
+  ],
+  "launcher_selftest": [
+   "[PASS] v0156: ConsensusJoin v0104 is the active consensus join · engine v0122 (highest in the runtime) goes out through the VIA network tool SUP_MDL740_NetUnified + accelerator bridge · gate closed → ",
+   "[PASS] v0154: ConsensusJoin v0103 kept as PRIOR of v0104 (today's payloads resumed on a new code list · 404 / transient retried · still failing → no_coverage / source_gap, out of the gate) · v0102 kep"
+  ],
+  "engines_test": [
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ⓪ 網路工具 = NetUnified 最高版號 · 閘關 · 加速器在 · {\"net_tool\": \"SUP_MDL740_NetUnified_v0119\", \"gate_open\": false, \"gate\": {\"gate1_net_consent\": false, \"gate2_scrape_token_set\": false, \"gate1_raw\": \"(未設)\", \"scrape_value\": \"UNSET\"}, \"accelerator\": \"VIA_SuperAccel_Module ·",
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ① 閘關:即時模式開跑前就停(VIA_NET_DENY)· 本機伺服器 0 次請求 · 不換道直連 · VIA_NET_DENY: VIA 網路工具同意閘未開(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 操作員決定 · 引擎不代設 · 不換道直連)",
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ② 閘開(替身):鉅亨頁 + 4 個 API 經網路工具 http_bytes 打本機 · Yahoo 經 yahoo_quote_summary_raw · 引擎閘 PASS_WITH_WARNINGS · FactSet 中位數 1450.0 · YFinance 中位數 1500.0 ·  · 請求 ['TWS:2330:STOCK', 'overview']",
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ③ 輸出:矩陣 CSV · 品質 CSV · HTML · manifest · DuckDB · consensus_checkpoint.json, consensus_checkpoint_payloads, consensus_history.duckdb, consensus_long_current.csv, consensus_long_current.parquet, factset_yfinance_consensus_manifest.json, factset_yfinan",
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ④ YFinance 分析表(quoteSummary → 同名方法):目標價 · EPS 預估 · 評等摘要 · {\"get_analyst_price_targets\": true, \"get_earnings_estimate\": true, \"get_revenue_estimate\": true, \"get_eps_trend\": true, \"get_eps_revisions\": true, \"get_growth_estimates\": true, \"get_recommendations_summary\": true}",
+   "[PASS] VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122 ⑤ 替身還原後:網路工具照樣 DENY(閘關)· 0 次請求 · {'state': 'DENY', 'note': 'fail-closed:閘一未開(誠實拒絕,零網路)'}",
+   "[PASS] VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112 ⓪ 網路工具 = NetUnified 最高版號 · 閘關 · 加速器在 · {\"net_tool\": \"SUP_MDL740_NetUnified_v0119\", \"gate_open\": false, \"gate\": {\"gate1_net_consent\": false, \"gate2_scrape_token_set\": false, \"gate1_raw\": \"(未設)\", \"scrape_value\": \"UNSET\"}, \"accelerator\": \"VIA_SuperAccel_Module ·",
+   "[PASS] VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112 ① 閘關:即時模式開跑前就停(VIA_NET_DENY)· 本機伺服器 0 次請求 · 不換道直連 · VIA_NET_DENY: VIA 網路工具同意閘未開(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 操作員決定 · 引擎不代設 · 不換道直連)",
+   "[PASS] VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112 ② 閘開(替身):鉅亨頁 + 4 個 API 經網路工具 http_bytes 打本機 · Yahoo 經 yahoo_quote_summary_raw · 引擎閘 PASS_WITH_WARNINGS · FactSet 中位數 1450.0 · YFinance 中位數 1500.0 ·  · 請求 ['TWS:2330:STOCK', 'overview']",
+   "[PASS] VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112 ③ 輸出:矩陣 CSV · 品質 CSV · HTML · manifest · factset_yfinance_consensus_manifest.json, factset_yfinance_consensus_matrix.csv, factset_yfinance_consensus_matrix.html, factset_yfinance_consensus_payload.json, factset_yfinance_consensus_quality_mat",
+   "[PASS] VIA_FactSet_YFinance_Consensus_Matrix_Engine_v0112 ⑤ 替身還原後:網路工具照樣 DENY(閘關)· 0 次請求 · {'state': 'DENY', 'note': 'fail-closed:閘一未開(誠實拒絕,零網路)'}",
+   "[PASS] 共識引擎新版實測 · 不過 0"
+  ],
+  "vcgc_env": {
+   "envplan_offline.log": [
+    "  [快照] Python 3.13.16 · 發行版 98 · pip 衝突 0 條 · 磁碟餘 3.0 GB",
+    "  [快照] EnvManager 母版:導入 OK",
+    "     防:選 camelot=降級(unstructured-client 出衝突);選 unstructured=維持現狀——操作員裁",
+    "     裝:duckdb polars · 由:資料品質查核/高速增量管線——T3/T4/R06/VDF",
+    "     防:duckdb 已在(勿變版!核心庫變版=YELLOW 候裁);polars 原生輪較大",
+    "── ③ 可行性實測:SKIP(--offline,零網路)──"
+   ],
+   "installgate_check.log": [
+    "  [裝前] pip check 衝突 0 條(無衝突 base)",
+    "  [裝後] 衝突 0 條 · 新增 0 · 解除 0",
+    "  [輔助] Unified:OK · VeritasAegisNexus:OK · VeritasCeleritas:OK · NetSupport:OK · v1:OK"
+   ],
+   "installgate_duckdb.log": [
+    "=== 安裝治理閘 v0101 · 安裝 duckdb ===",
+    "  [裝前] pip check 衝突 0 條(無衝突 base)",
+    "  [驗] duckdb 2.0.0 · import OK",
+    "  [裝後] 衝突 0 條 · 新增 0 · 解除 0",
+    "  [輔助] Unified:OK · VeritasAegisNexus:OK · VeritasCeleritas:OK · NetSupport:OK · v1:OK"
+   ]
+  },
+  "pwsh_parse": "pwsh 7.4.6 剖析 0 錯 · Handle-All 一行 = 可讀版 · 開機行 = 可讀版(詞序列相同)· 最短一行 0 錯",
+  "e2e_rc": [
+   "report rc 0",
+   "auto rc 0",
+   "full rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "report": [
+    "[GREEN] boot: Handle-All v0104 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 5 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 5 項",
+    "  [人工] 2 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 1 秒(視窗不會關)"
+   ],
+   "auto": [
+    "[GREEN] boot: Handle-All v0104 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(輸出冊是啟動器 v0153 以後做的 · 這版只改 ⑥f 共識出網 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[計] ⑤ 自動修計畫:市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項",
+    "  [人工] 2 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 3 秒(視窗不會關)"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0104 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· repair 不重抓 ⑥f(現有共識不動)· 整輪的 ⑥f 會被 DENY · 收尾頁列「人工」",
+    "[計] ④ 模式 full:整輪(取套件 v0156 → 診斷 → 全部自測 → 跑啟動器 v0156(管理器 v0257 · ⑥f ConsensusJoin v0104 · 共識引擎 v0122 經 VIA 網路工具 + 加速器)→ 自動修 → 除錯報告 → 收尾頁 → 貼回包 · 桌機約 40 分鐘)",
+    "[YELLOW] ② 擷取 Python(⑥e / ⑥f) · 沒有裝齊 yfinance / lxml / pandas / pyarrow / duckdb 的 Python(看過 via_tw_fetch 缺 yfinance,lxml,pandas,pyarrow,duckdb ; venv_vrn2 缺 yfinance,pyarrow)",
+    "  [計] ⑥f 共識合併 · YELLOW · 共識 YELLOW:擷取環境缺 requests(新引擎經 VIA 網路工具 · Yahoo 車道要它 · 交 VCGC 環境工具補)(<v156>/t156a/home/envs/via_tw_fetch/bin/python)→ 交 VCGC 安裝或用 VDF 包的 via_tw_fetch 環境 · 本輪共識欄留空 · Combined YELLOW:Combined ",
+    "[YELLOW] ⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊) · 共識 YELLOW:擷取環境缺 requests(新引擎經 VIA 網路工具 · Yahoo 車道要它 · 交 VCGC 環境工具補)(<v156>/t156a/home/envs/via_tw_fetch/bin/python)→ 交 VCGC 安裝或用 VDF 包的 via_tw_fetch ",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 6 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 6 項",
+    "    · ② 擷取 Python(⑥e / ⑥f) · 沒有裝齊 yfinance / lxml / pandas / pyarrow / duckdb 的 Python(看過 via_tw_fetch 缺 yfinance,lxml,pandas,pyarrow,duckdb ; venv_vrn2 缺 yfinance,pyarrow)",
+    "  [人工] 1 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 2 · 874 秒(視窗不會關)"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  }
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0156.zip",
+  "sha256": "182bc1486bb48e2f39e077f2c08ad67975bedbbfa821ce08c5f6bb9386e0920a",
+  "bytes": 7782238,
+  "layout": "VRN2_Closeout_v0156/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0156.py",
+  "sha256": "75c0bcfe5eecf8131a4b69456832576ec4c91c83ba8088fa058a43083315ee3e"
+ },
+ "test_tools_zip": "vrn2_test_tools_v0156.zip",
+ "logs_zip": "logs_v0156.zip"
+}
