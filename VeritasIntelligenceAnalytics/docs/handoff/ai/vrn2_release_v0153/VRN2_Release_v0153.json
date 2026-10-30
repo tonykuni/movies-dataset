@@ -1,0 +1,214 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0153 (manager v0257) + VRN2_RoundAll_v0109 + VRN2_HandleAll_v0101 (PowerShell 7)",
+ "date": "2026-10-30",
+ "trigger": "桌機 2026-10-30 18:34 貼回 Handle-All v0100 的主控台 + 貼回包(RoundAll v0108 verify:收尾 BLOCKED · VRN-2 0 · VCGC 3 · 人工 5 · 資料源 2 · 驗證器 DUPKEY 45)",
+ "base_package": {
+  "name": "VRN2_Closeout_v0152 (launcher v0152 · runtime v0152)",
+  "retained": "runtime v0152 members byte-identical inside runtime v0153; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0152 for the closeout entry; VRN2_RoundAll v0108 → v0109; VRN2_HandleAll v0100 → v0101. VRN-2 one-click v0151 / operator one-click v0112 / local round v0101 are not changed this round (they still point at v0151 and stay as published)",
+ "fixes": {
+  "VRN_SystemManager_v0257": "desktop 2026-10-30 18:34: the independent verifier v0114 counted DUPKEY 45 — 6933_AMAX-KY page 8 (37): two tables side by side, the right table's values written under the left table's item (流動資產 2020 = 1,331,956 and 3,411,492; the verifier: 'aligned value 1,331,956 · this 3,411,492 not aligned → wrong value'); 凱基 2891 page 5 (8): row-less duplicates ('cannot tell'). v0257 (thin tail over v0255): same file · page · table · row · item · period · section · sub-column with different values → the leftmost cell of that extracted row keeps the item, a later value takes the label written in its own row (renamed, VERIFY noted) or moves to Rejected with a reason; row-less duplicates move to Rejected; same item on different rows untouched. Desktop book replayed: exactly those 45 rows rejected; the 14 container PDFs: 0 rows change; selftest 10",
+  "RoundAll_v0109_dupkey_owner": "step 11 with DUPKEY > 0 → VRN-2 (was human check: the verifier itself says wrong value / cannot tell); selftest ㊸",
+  "RoundAll_v0109_one_row_per_root": "close-out rows with the same root cause merged (owner = heaviest · lamp = worst · 'see also' in why): step 11b + receipt step 11 · four-point check + missing items (four points) · 6e step + last_error + MOPS DENY; desktop 18:34 rows replayed: 14 → 10, BLOCKED · VCGC 1 · human 3 · data source 2 (OPEN · VRN-2 1 while DUPKEY is still there); selftest ㊹",
+  "HandleAll_v0101": "v0100 + package v0153 / RoundAll v0109; auto picks verify only when the last receipt is launcher v0153 (otherwise full: the books are rebuilt by manager v0257)",
+  "launcher_v0153": "receipt VRN2_Closeout_v0153.json · active manager v0257 · selftest checks the runtime's newest manager is v0257 (v0255 / v0243 kept)"
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "EST_1": "凱基投顧_6147 ANALYST 'Lucas Liu' derived from the e-mail account (the report does not print that form) → human check",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0153.py",
+   "sha256": "fbab46f20202c1c6ec8d0e4a3a523916144074612568f61f0fbf7d0699b2c90d",
+   "bytes": 87755
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "fb2fb213112a5f664817b22decafa9bc4afa4c5099e73712de15077a3571777c",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "6b47299d3dd7bb440586e71c0adf778fd9dfad19d60c70e0f68f142d6fc323d2",
+   "bytes": 1635
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "e6b15d0594ef72b1d7daaacd407c9fe9c590bd1c8a310d99e0247fa5918169e9",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0153.json",
+   "sha256": "a557f47386ae9acbd580b7a88cb45449e27bc65be68e77397ade8fa21c523909",
+   "bytes": 25017
+  },
+  {
+   "path": "VRN2_Runtime_v0153.zip",
+   "sha256": "2b8dc6d58ea344620181e97a1b5bf783bfd287beab1a62f148cfda6ec9a376eb",
+   "bytes": 6931209
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0153",
+  "zip_sha256": "2b8dc6d58ea344620181e97a1b5bf783bfd287beab1a62f148cfda6ec9a376eb",
+  "based_on": "VRN2_Runtime_v0152.zip d984a4add47a1e241c5a714733742926fc4f60163cec68050996142ebb77d43b",
+  "retained_members": 188,
+  "new_members": [
+   "VRN_SystemManager_v0257.py"
+  ],
+  "files": "see VRN2_Runtime_v0153.json inside the package"
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0108.py",
+   "sha256": "58576a79c441c1dfc41a15ea4ca5c0230a437433e59291e9fba4ad1dc1241479",
+   "status": "superseded 2026-10-30 (package v0152 · DUPKEY counted as human check · repeated close-out rows); file kept in vrn2_release_v0152"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0109.py",
+  "sha256": "716bfe2bd911710d4c3ce06271404b4466f004428a10044910dab379d2884e89",
+  "pinned_package_sha256": "4beed2bc7a8439de949db1f57ea4c21b93fa970e8efa20bca2f23d4521bd71de",
+  "guide": "VRN2_RoundAll_v0109.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0101.md",
+  "line_sha256": "c4374130f9f6a99cccf8640d9df64bb4de51d4c2326aa14c77998a5fe2d00f4b",
+  "line_chars": 8695,
+  "runs": "VRN2_RoundAll_v0109.py 716bfe2bd911710d4c3ce06271404b4466f004428a10044910dab379d2884e89"
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · 19 real sample files",
+ "results": {
+  "selftests": {
+   "VRN_SystemManager_v0257(VIA 樹內 · PRIOR v0255 → v0243 …)": "[PASS] v0257: one row, one item — side-by-side right-table values renamed to their own row label or moved to Rejected · row-less duplicates rejected · repeated item names on different rows untouched · v0255 gate selftest",
+   "VRN2_RoundAll_v0109": "[PASS] VRN2_RoundAll v0109 --selftest · 46 項 · 不過 0",
+   "ActivateVRN-2_v0153(套件夾複本 · 不靠 ../new)": "[PASS] v0153: manager v0257 is the active manager (one row, one item: side-by-side right-table values renamed to their own row label or moved to Rejected · row-less duplicates rejected) · v0255 kept as PRIOR"
+  },
+  "replay_desktop_book_v0257": [
+   "== 桌機 18:34(52 份) · 年度數據 11513 → 留 11468 · 改名 0 · 剔除 45 [('6933_AMAX-KY_個股介紹報告.pd', 37), ('凱基投顧_2891 中信金_施志鴻_2026', 8)]",
+   "    凱基投顧_2891 中信金_施志 p5 「現金及約當現金」FY25 沒有列號 → 剔除 2 筆",
+   "    凱基投顧_2891 中信金_施志 p5 「國內債券」FY25 沒有列號 → 剔除 2 筆",
+   "    凱基投顧_2891 中信金_施志 p5 「國外債券」FY25 沒有列號 → 剔除 2 筆",
+   "    凱基投顧_2891 中信金_施志 p5 「保單貸款」FY25 沒有列號 → 剔除 2 筆",
+   "    6933_AMAX-KY_個股介 p8 P8·F·02·TB 第 4 列「流動資產」→ 改名 0 · 剔除 3",
+   "    6933_AMAX-KY_個股介 p8 P8·F·02·TB 第 5 列「不動產、廠房及設備」→ 改名 0 · 剔除 3",
+   "    剔除例: 流動資產 2020 3,411,492 · 並排的另一張表:同一列「流動資產」2020 有 2 個不同的值 · 留最左邊的 1,331,956 · 這個值在這一列找不到它自己的科目名 → 不掛在「流動資產」名下",
+   "    剔除例: 流動資產 2021 5,212,499 · 並排的另一張表:同一列「流動資產」2021 有 2 個不同的值 · 留最左邊的 2,155,768 · 這個值在這一列找不到它自己的科目名 → 不掛在「流動資產」名下",
+   "    剔除例: 流動資產 2022 6,748,900 · 並排的另一張表:同一列「流動資產」2022 有 2 個不同的值 · 留最左邊的 2,112,693 · 這個值在這一列找不到它自己的科目名 → 不掛在「流動資產」名下",
+   "== 容器 t152(14 份 · 有擷取快取) · 年度數據 4905 → 留 4905 · 改名 0 · 剔除 0 []"
+  ],
+  "reclassify_desktop_closeout_v0109": [
+   "18:34 原判: BLOCKED {'人工': 5, 'VCGC': 3, '資料源': 2}",
+   "v0109 規則 · 同一份結果(DUPKEY 45 還在) → OPEN · VRN-2 還有 1 項要修 · {'VRN-2': 1, 'VCGC': 1, '人工': 2, '資料源': 2} · 列 14 → 10",
+   "   [VRN-2] ⑪b 重跑獨立驗證  (+⑥ 步驟 ⑪ 獨立驗證(背景 · 只讀))",
+   "   [VCGC] ⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market  (+⑥ ⑥e 擷取錯誤(last_error.txt、⑥ ⑥e MOPS 財報被拒(VIA 網路工具 )",
+   "   [人工] ⑥ 四點原文核對  (+⑥ 輸出缺項)",
+   "   [人工] ⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點)",
+   "   [資料源] ⑥ Combined 冊",
+   "   [資料源] ⑥ 市場資料",
+   "v0109 規則 · 整輪重跑後(管理器 v0257 → DUPKEY 0 的預期) → BLOCKED · VRN-2 側沒有待修 · 1 項等 VCGC 決定 / 安裝 · {'人工': 3, 'VCGC': 1, '資料源': 2} · 列 14 → 10",
+   "   [人工] ⑪b 重跑獨立驗證  (+⑥ 步驟 ⑪ 獨立驗證(背景 · 只讀))",
+   "   [VCGC] ⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market  (+⑥ ⑥e 擷取錯誤(last_error.txt、⑥ ⑥e MOPS 財報被拒(VIA 網路工具 )",
+   "   [人工] ⑥ 四點原文核對  (+⑥ 輸出缺項)",
+   "   [人工] ⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點)",
+   "   [資料源] ⑥ Combined 冊",
+   "   [資料源] ⑥ 市場資料"
+  ],
+  "pwsh_hash_chain": [
+   "[PASS] 套件 zip = RoundAll 釘的 = 發行清單 · 4beed2bc7a84",
+   "[PASS] RoundAll 檔 = Handle-All 一行 / 可讀版 / PS7 一行 / 解開版的 $H = 發行清單 · 716bfe2bd911",
+   "[PASS] HandleAll md:第一段 = 一行檔 · 第二段 = 可讀版 · 一行 SHA-256 標在 md 與發行清單 · c4374130f9f6",
+   "[PASS] RoundAll md:PS7 一行 = 檔 · 兩行 -EncodedCommand 解開 = 解開版 · 都在 8191 字元內",
+   "[PASS] Handle-All / PS7 一行沒有 exit(視窗不關)· 沒有 # 註解 · 8695 字元",
+   "[PASS] PowerShell 剖析(pwsh 7.4.6)0 錯:handleall_line.txt 1231 詞 · handleall_src.ps1 1243 詞 · oneline_roundall_ps7.txt 378 詞 · boot_roundall.ps1 501 詞",
+   "[PASS] Handle-All 一行版 = 可讀版(去掉換行 / 分號後詞序列相同)"
+  ],
+  "rc": "d_auto_full rc 0 · d_auto_verify rc 0 · d_report rc 0 · d_tamper rc 0 · done-drive",
+  "desktop_like_sandbox": {
+   "auto → 模式(只有 v0151 收據)": "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0151.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0153 以前做的 · 管理器 v0257 要重做輸出冊)(只重驗:先貼 $env:VRN2_MODE = 'verify')",
+   "⑤ 取 RoundAll": "[GREEN] ⑤ VRN2_RoundAll_v0109.py SHA-256 716bfe2bd911 相符(GitHub claude/optimistic-goodall-yhalc5)→ <v153>/t153d/home/Downloads/VRN2_RoundAll_v0109.py",
+   "① 套件": "[GREEN] ① 套件 · 套件就位 <v153>/t153d/home/Downloads/VRN2_Closeout_v0153(SHA-256 4beed2bc7a84 · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+   "③ 自測": "14 支 · 綠 14 · 紅 / 黃 0 · 管理器 v0257:[GREEN] ③ 自測 · VRN_SystemManager_v0257.py · [PASS] v0257: one row, one item — side-by-side right-table values renamed to",
+   "④ 啟動器 v0153": "  [RED] ④ 跑啟動器 ActivateVRN-2_v0153.py · rc 1 · 124 秒",
+   "管理器": "  [計] 成功模組登記 · VRN-2 SystemManager VRN_SystemManager_v0257.py · 擷取引擎 ENG397 VRN_ENG397_P1Segment_v0127.py · 摘要器 ENG062 VRN_ENG062_SummarizerV1_v0117.py · VRN-2 設定冊 VRN2_SSOT_v0103.json · OCR 橋 VRN2_OC",
+   "v0257 一列一科目(容器 14 份 · 應該沒有撞鍵)": "沒有印(0 列撞鍵 · 輸出冊不重寫)",
+   "年度數據冊 v0255 做的 vs v0257 做的": "4905 列 → 4905 列 · 逐列(檔 · 頁 · 表 · 列 · 段落 · 科目 · 期間 · 子欄 · 值)完全相同",
+   "⑥ ⑪ 驗證器版本": "[GREEN] ⑥ ⑪ 驗證器版本 · VRN2_IndependentVerifier_v0114 · VRN2_IndependentVerify_20261030_111937.json",
+   "總表(full)": "總表 · 綠 35 · 黃 12 · 紅 3 · 灰 8 · 145 秒",
+   "再貼(auto → 模式 · 收據 v0153)": "[計] ④ 自動選模式 verify · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(只重驗:先貼 $env:VRN2_MODE = 'verify')",
+   "再貼 ⑪b": "[GREEN] ⑪b 重跑獨立驗證 · VRN2_IndependentVerifier_v0114 · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4905 筆 · {'ALIGNED': 4378, 'TRANSALIGNED': 75, '",
+   "report": "[計] Handle-All 結束 · RoundAll 結束碼 1 · 1 秒(視窗不會關)",
+   "收尾頁(最後)": "BLOCKED · VRN-2 側沒有待修 · 5 項等 VCGC 決定 / 安裝 · {\"VCGC\": 5, \"人工\": 1} · 列 10(其中合併 1 列)",
+   "v0153 收據 roundall.fixed": [
+    "⑪"
+   ],
+   "貼回包帶收據": [
+    "vrn2/VRN2_Closeout_v0153.json",
+    "vrn2/VRN2_Closeout_v0153.before_roundall.json",
+    "vrn2/VRN2_CloseoutUI_latest.html",
+    "vrn2/VRN2_CloseoutUI_latest.json"
+   ],
+   "RoundAll 被竄改": "[RED] ⑤ VRN2_RoundAll_v0109.py SHA-256 不對(91220570b053decb78db734c8e0788cb2cdf3ea163beca4c3f32df6309a14ce9)· 不執行 · 存檔:沒有(不執行)",
+   "容器才有的 VCGC 項": "③ 環境檢查缺 7(accelerator / curl_cffi / cv2 / duckdb / lz4 / pyvips / watchdog)· ⑥e 擷取 Python 沒有合 VDF 界線的 —— 容器沒裝,桌機有"
+  },
+  "handover_line": "桌機情境(複製 v0151 沙盒:只有 v0151 收據)貼 Handle-All v0101 → auto 選 full → 套件 v0153 · ③ 自測 14 支 · 綠 14 · 紅 / 黃 0 · 啟動器 v0153(管理器 v0257)→ 年度數據冊與 v0255 做的逐列完全相同 → 再貼 auto 選 verify → report;收尾 BLOCKED(VRN-2 0);RoundAll 被竄改 → ⑤ 紅、不執行。",
+  "not_claimed": [
+   "Windows desktop run of package v0153 / manager v0257 / RoundAll v0109 / Handle-All v0101: not yet (next paste-back); the 6933 AMAX and 凱基 2891 PDFs are only on the desktop — v0257 is proven by its selftest (side-by-side rows built like page 8 · fused label+value cell · row-less pairs) and by replaying the desktop's own annual book (exactly the 45 DUPKEY rows rejected); whether the desktop's extracted row also holds the right table's labels (rename instead of reject) shows only in the next run",
+   "the close-out merge rules (one row per root cause) are proven on the desktop 18:34 rows; a new step name is not merged",
+   "MOPS DENY (VCGC) · MQ-1560 OCR / EST 1 / annual gaps 3 (human) · Apple not a TW stock / 3706 · 6669 no adjusted close in the week before the report date (VDF daily windows PARTIAL · data source): not changed",
+   "VDF_v0102_Redownload_4.zip (VDF's own system): read only — not installed, not changed, not committed (four systems independent)",
+   "the container's VCGC items (missing accelerator packages, fetch Python outside VDF bounds) are container-only; the desktop has them"
+  ]
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0153.zip",
+  "sha256": "4beed2bc7a8439de949db1f57ea4c21b93fa970e8efa20bca2f23d4521bd71de",
+  "bytes": 7717134,
+  "layout": "VRN2_Closeout_v0153/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0153.py",
+  "sha256": "fbab46f20202c1c6ec8d0e4a3a523916144074612568f61f0fbf7d0699b2c90d"
+ },
+ "test_tools_zip": "vrn2_test_tools_v0153.zip",
+ "logs_zip": "logs_v0153.zip"
+}
