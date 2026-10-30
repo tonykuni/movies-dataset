@@ -1,4 +1,4 @@
-# VRN-2 v0151 + VRN2_RoundAll_v0105 容器實測紀錄(2026-10-29 · 收尾輪)
+# VRN-2 v0151 + VRN2_RoundAll_v0106 容器實測紀錄(2026-10-29 · 收尾輪)
 
 操作員 2026-10-29「解決剩餘系統問題 HTML U/I CLOSE OUT」(貼回的是桌機 19:00 跑 VRN2_RoundAll_v0102 的主控台 · v0150 已處理的不重做)→ v0151(見發行清單 `fixes` · `not_fixed_here`)。
 
@@ -18,13 +18,16 @@
 | PowerShell 7 原生一行(貼在 pwsh 視窗 · 沙盒實跑) | 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關) |
 | PowerShell 7 原生一行 · 雜湊不對 | [RED] VRN2_RoundAll_v0104.py SHA-256 不對(8333c1719127488b5e09ca9b2b426380a46c3650950104a7bb46e298fc474f08)· 不執行 / STILL-HERE(視窗沒關) |
 | 桌機 2026-10-30 13:15 / 13:21:v0104 ① 讀本機套件 zip PermissionError [Errno 13] → Traceback(兩次 · 隔 6 分鐘) | v0105 修(見下兩列 + 自測 ㉘ ~ ㉜) |
+| 桌機 2026-10-30 14:41(RoundAll v0105):紅 0 · 黃 16 · ⑪ 基本資料 FAIL 0 · 年度 BADITEM 19 → 0(PRESENT 82 → 101)· 收尾 OPEN「VRN-2 2 項」= ② CPU 忙碌 + ⑥ Combined 1 格代號不是 4 碼 · icacls 舊 zip Access is denied | v0106 修(自測 ㉝ ~ ㊲) |
+| v0106 · 用桌機 14:41 那 10 項重算收尾分類 | 桌機 14:41 那 10 項用 v0106 規則重算(⑪ 年度 FAIL 證據列看下一輪對齊結果另計):冊裡 TICKER 空白 → BLOCKED · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝 · {'人工': 5, 'VCGC': 3, '資料源': 1} · ② CPU → 提醒 · Combined → 人工 \|\| 冊裡 TICKER 'ASPEED' → BLOCKED · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝 · {'人工': 4, 'VCGC': 3, '資料源': 2} · ② CPU → 提醒 · Combined → 資料源 |
 | v0105 · 模擬本機 zip 讀不到(同一行程讓讀檔丟 PermissionError) | [GRAY] ① 套件 zip 讀不到(改從 GitHub 取) · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_Closeout_v0151/VRN2_Closeout_v01 / [GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0151(11 檔逐檔相符)· /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_Closeout_v0151 · / [GREEN] ⑦ 貼回包 · /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/home/Downloads/VRN2_PasteBack_20261030_052447.zip(0.5 MB) / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_Reports/vrn2/VRN2_Cl |
-| v0105 · PowerShell 7 原生一行(沙盒) | [GREEN] VRN2_RoundAll_v0105.py SHA-256 9edb8912770f 相符(GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575 / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關) |
+| v0106 · PowerShell 7 原生一行(沙盒) | [GREEN] VRN2_RoundAll_v0106.py SHA-256 5870c77d1708 相符(GitHub claude/optimistic-goodall-yhalc5)→ /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575 / 收尾頁 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝 → /tmp/claude-0/-home-user/a5893bdc-578f-5cd1-ac75-9575fa695b26/scratchpad/v151/t151/VIA/VIA_ / [計] RoundAll 結束碼 1(視窗不會關) / STILL-HERE(視窗沒關) |
 
 ## 1. 自測
 
 | 檔 | 結果 |
 |---|---|
+| VRN2_RoundAll_v0106(2026-10-30 14:41 貼回:收尾分類 · ⑪ 年度 FAIL 證據 · 安裝權限) | [PASS] VRN2_RoundAll v0106 --selftest · 39 項 · 不過 0 |
 | VRN2_RoundAll_v0105(2026-10-30 · 檔被鎖不當掉) | [PASS] VRN2_RoundAll v0105 --selftest · 34 項 · 不過 0 |
 | VRN2_RoundAll_v0104 | [PASS] VRN2_RoundAll v0104 --selftest · 29 項 · 不過 0 |
 | VRN2_IndependentVerifier_v0113(VIA 樹內 · 含 v0105 30/30 · v0110 ~ v0112) | [PASS] v0113: BADITEM read a second way — item on the page (whole · wrapped · words in order) keeps PRESENT / ALIGNED; fabricated / renamed item stays BADITEM with the closest source line; FAIL keeps FAIL with the item's |
@@ -53,7 +56,7 @@ roundall md has pwsh + powershell one-liners → True
 roundall one-liner (pwsh) decodes to boot_roundall → True
 roundall one-liner (powershell) decodes to boot_roundall → True
 oneline_roundall_pwsh.txt = md pwsh line → True
-roundall py sha (LF-normalised) = boot $H → True (9edb8912770f)
+roundall py sha (LF-normalised) = boot $H → True (5870c77d1708)
 roundall pinned package sha = zip sha → True
 roundall CRLF checkout (git autocrlf) still verifies → True
 roundall md PowerShell 7 line parse errors: 0 · no exit → True · pins roundall sha → True
@@ -189,10 +192,10 @@ NEXT: [RED] VRN2_RoundAll · 紅 2 · 黃 14 · 貼回包 /tmp/claude-0/-home-us
 
 | 項目 | 值 |
 |---|---|
-| 收尾頁(修後)| {"state": "BLOCKED", "state_label": "等 VCGC", "state_text": "VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝", "vrn2_closed": true, "per_owner": {"VCGC": 8, "人工": 2}, "counts": {"GREEN": 21, "YELLOW": 13, "RED": 2, "GRAY": 9}, "items": [["VCGC", "YELLOW", "② 擷取 Python(⑥e / ⑥f)"], ["VCGC", "YELLOW", "② 擷取 Python · VDF 版本界線(⑥e)"], ["VCGC", "YELLOW", "⑤ 修 · ⑬ 增量庫補寫(本輪有修正)"], ["彙總", "RED", "⑥ 收尾收據"], ["VCGC", "RED", "⑥ 步驟 ③ 環境檢查與補裝"], ["VCGC", "YELLOW", "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market"], ["提醒", "YELLOW", "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)"], ["VCGC", "YELLOW", "⑥ 步驟 ⑬ 輸出位置 · 增量庫(DuckDB)"], ["人工", "YELLOW", "⑥ 四點原文核對"], ["人工", "YELLOW", "⑥ 輸出缺項"], ["提醒", "YELLOW", "⑥ 完成判定 · ① 結果計算驗證"], ["提醒", "YELLOW", "⑥ 完成判定 · ⑦ 基本資料雙讀"], ["提醒", "YELLOW", "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)"], ["VCGC", "YELLOW", "⑥ 長線 Parquet 庫"], ["VCGC", "YELLOW", "⑥ ⑥e 擷取 Python(VDF 版本界線)"]]} |
+| 收尾頁(修後)| {"state": "BLOCKED", "state_label": "等 VCGC", "state_text": "VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝", "vrn2_closed": true, "per_owner": {"VCGC": 8, "人工": 2}, "counts": {"GREEN": 21, "YELLOW": 13, "RED": 2, "GRAY": 8}, "items": [["VCGC", "YELLOW", "② 擷取 Python(⑥e / ⑥f)"], ["VCGC", "YELLOW", "② 擷取 Python · VDF 版本界線(⑥e)"], ["VCGC", "YELLOW", "⑤ 修 · ⑬ 增量庫補寫(本輪有修正)"], ["彙總", "RED", "⑥ 收尾收據"], ["VCGC", "RED", "⑥ 步驟 ③ 環境檢查與補裝"], ["VCGC", "YELLOW", "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market"], ["提醒", "YELLOW", "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)"], ["VCGC", "YELLOW", "⑥ 步驟 ⑬ 輸出位置 · 增量庫(DuckDB)"], ["人工", "YELLOW", "⑥ 四點原文核對"], ["人工", "YELLOW", "⑥ 輸出缺項"], ["提醒", "YELLOW", "⑥ 完成判定 · ① 結果計算驗證"], ["提醒", "YELLOW", "⑥ 完成判定 · ⑦ 基本資料雙讀"], ["提醒", "YELLOW", "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)"], ["VCGC", "YELLOW", "⑥ 長線 Parquet 庫"], ["VCGC", "YELLOW", "⑥ ⑥e 擷取 Python(VDF 版本界線)"]]} |
 | 長線庫(修後)| {"lamp": "YELLOW", "store_engine": "pyarrow", "totals": {"BasicInfo": 14, "FinancialData": 4905, "Summary": 14, "Rejected": 812, "Combined": 28, "FinancialAligned": 4905, "Deleted": 12}} |
-| 收尾收據的 roundall 欄 | {"version": "VRN2_RoundAll v0105", "at": "2026-10-30T05:24:47", "fixed": {"⑬b": {"lamp": "GREEN", "detail": "歷史對齊 v0102 · 對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)"}, "⑬ ": {"lamp": "YELLOW", "detail": "pyarrow · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, |
-| 貼回包 | {"name": "VRN2_PasteBack_20261030_052447.zip", "members": 32, "has": ["transcript.txt", "vrn2/VRN2_Closeout_v0151.before_roundall.json", "vrn2/VRN2_RoundAll_latest.json", "vrn2/VRN2_CloseoutUI_latest.html", "vrn2/VRN2_CloseoutUI_latest.json"]} |
+| 收尾收據的 roundall 欄 | {"version": "VRN2_RoundAll v0106", "at": "2026-10-30T08:13:47", "fixed": {"⑬b": {"lamp": "GREEN", "detail": "歷史對齊 v0102 · 對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)"}, "⑬ ": {"lamp": "YELLOW", "detail": "pyarrow · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, |
+| 貼回包 | {"name": "VRN2_PasteBack_20261030_081347.zip", "members": 32, "has": ["transcript.txt", "vrn2/VRN2_Closeout_v0151.before_roundall.json", "vrn2/VRN2_RoundAll_latest.json", "vrn2/VRN2_CloseoutUI_latest.html", "vrn2/VRN2_CloseoutUI_latest.json"]} |
 
 ## 5. 一鍵 v0151 使用者情境(pwsh · 假 GitHub 分支 → 跑 → 再貼 → 竄改)
 
