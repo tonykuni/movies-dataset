@@ -1,0 +1,88 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0115 + VRN2_HandleAll_v0107 (package v0158 unchanged)",
+ "date": "2026-10-31",
+ "trigger": "操作員 2026-10-31:「繼續下一步,依照你的建議進行」· 桌機 05:30 Handle-All v0106 repair 經 VIA 網路工具真抓共識成功(⑥f GREEN)· ⑥f 擷取 Python 是 envs/via_core_312(Raw Parquet WARN)而 ⑥e 是 C:/Python313",
+ "package": {
+  "name": "VRN2_Closeout_v0158.zip",
+  "folder": "vrn2_release_v0158",
+  "sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "changed": false
+ },
+ "fixes": {
+  "RoundAll_v0115_fetch_python": "VIA_FETCH_PY for the launcher and for step 5 re-runs of 6f: the Python that passes the VDF engine's own version bounds (step 2 · MarketFetchRun · same as 6e) first; repair without step 2 → the Python the last launcher's 6e receipt recorded (still there · FETCH_REQUIRED import OK); else the first import-only pick as before; steps 4 / 5 print which and why; selftest 59",
+  "HandleAll_v0107": "v0106 pointed at RoundAll v0115 (vrn2_release_v0159); sources recovered from the v0106 md readable blocks (re-joined byte-identical to the published line)"
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0114.py",
+   "sha256": "425397f5d72451619c0247354acc5c7bd7dc387d632522936a49f02145ad1b73",
+   "status": "superseded 2026-10-31 (6f fetch Python import-only pick); file kept in vrn2_release_v0158"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0115.py",
+  "sha256": "92ea3b3e4b1f78c5cb0b8c3c65576b936a8cd555051bd9b98aa1d44813b74561",
+  "pinned_package_sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "guide": "VRN2_RoundAll_v0115.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0107.md",
+  "line_sha256": "800f391be2167534c9629d4e85ea59567ad4e4c1acc9ee0dd2a6657aa07fdad7",
+  "line_chars": 9758,
+  "boot_file": "VRN2_HandleAll_v0107_boot.txt",
+  "boot_line_sha256": "b2a7a9d07e53a73c8dcbb4faecb9ad0caa1790996b15c9e97425d3f40eca8d22",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 4640
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 59 ⑥e / ⑥f 同一個擷取 Python:合 VDF 版本界線的優先(桌機 ⑥f 用 via_core_312 · Raw Parquet WARN)· repair 沒跑 ② → 上一輪 ⑥e 收據的(匯入齊)· 不齊 / 不在 → 只看匯入的",
+   "[PASS] VRN2_RoundAll v0115 --selftest · 59 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "report rc 0",
+   "repair rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "report": [
+    "[GREEN] boot: Handle-All v0107 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[VRN-2] Handle-All v0107 · PowerShell 7.4.6 · 模式 report · VIA <sbx>/VIA",
+    "[YELLOW] ④ 模式 report 要上一輪的輸出冊 · 這裡沒有 → 改跑整輪",
+    "[GREEN] ⑤ VRN2_RoundAll_v0115.py SHA-256 92ea3b3e4b1f 相符(GitHub claude/optimistic-goodall-yhalc5)→ <sbx>/home/Downloads/VRN2_RoundAll_v0115.py",
+    "══════ VRN2_RoundAll v0115 · 2026-10-31 03:40:36 · Python 3.13.16 · package → preflight → selftest → run → fix → report → closeout → pasteback ══════",
+    "[RED] ⓪ VIA 根 · 找不到(查過:--root · <sbx>/VIA · 不是 | VRN2_ROOT · <sbx>/VIA · 不是 | VIA_ROOT · <sbx>/VIA · 不是 | 預設位置 · <sbx>/home/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics · 不是 | 預設位置 ·",
+    "  [RED] ⓪ VIA 根 · 找不到(查過:--root · <sbx>/VIA · 不是 | VRN2_ROOT · <sbx>/VIA · 不是 | VIA_ROOT · <sbx>/VIA · 不是 | 預設位置 · /home/user/",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 4 秒(視窗不會關)"
+   ],
+   "repair": [
+    "[GREEN] boot: Handle-All v0107 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[VRN-2] Handle-All v0107 · PowerShell 7.4.6 · 模式 repair · VIA <sbx>/VIA",
+    "[GREEN] ⑤ VRN2_RoundAll_v0115.py SHA-256 92ea3b3e4b1f 相符(GitHub claude/optimistic-goodall-yhalc5)→ <sbx>/home/Downloads/VRN2_RoundAll_v0115.py",
+    "══════ VRN2_RoundAll v0115 · 2026-10-31 03:40:41 · Python 3.13.16 · package → preflight → selftest → run → fix → report → closeout → pasteback ══════",
+    "[RED] ⓪ VIA 根 · 找不到(查過:--root · <sbx>/VIA · 不是 | VRN2_ROOT · <sbx>/VIA · 不是 | VIA_ROOT · <sbx>/VIA · 不是 | 預設位置 · <sbx>/home/OneDrive/Documents/movies-dataset/VeritasIntelligenceAnalytics · 不是 | 預設位置 ·",
+    "  [RED] ⓪ VIA 根 · 找不到(查過:--root · <sbx>/VIA · 不是 | VRN2_ROOT · <sbx>/VIA · 不是 | VIA_ROOT · <sbx>/VIA · 不是 | 預設位置 · /home/user/",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 1 秒(視窗不會關)"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "not_run": "repair through a desktop-like VIA root: the container's desktop-state sandbox lived in the session scratchpad that is no longer available, and the 05:41 paste-back carries CSV books only (no JSON books / scope_in) → the 6f fetch-Python pick is covered by selftest 59 (3 cases), the hash chain by the small sandbox"
+ }
+}
