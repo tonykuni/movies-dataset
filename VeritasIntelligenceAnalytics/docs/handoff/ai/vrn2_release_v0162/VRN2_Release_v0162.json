@@ -1,0 +1,105 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0118 + VRN2_HandleAll_v0110 (package v0158 unchanged)",
+ "date": "2026-10-31",
+ "trigger": "桌機 2026-10-31 16:11(主控台文字 · 貼回包 VRN2_PasteBack_20261031_161126 未上傳):RoundAll v0117 repair 2518 秒 · 過期鎖 PID 20940 移開成功 · MOPS 財報這次沒被擋(VCGC 0)· ⑤ 重抓 ⑥e 2400 秒逾時(第 3 組財報 17/22)· 收尾 OPEN · VRN-2 5 項(⑥e / ⑬b 同一件事)· 主控台被進度列文字灌滿",
+ "package": {
+  "name": "VRN2_Closeout_v0158.zip",
+  "folder": "vrn2_release_v0158",
+  "sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "changed": false
+ },
+ "fixes": {
+  "RoundAll_v0118": "step 5 6e re-fetch limit 2400 → market_fetch_sec() = VRN2_MARKET_FETCH_SEC or 5400 (fill keeps 2400) · receipt 6e 'RoundAll 修正後 · 擷取 RED:逾時 N 秒' → step 5 re-fetches again (VDF engine caches MOPS responses 12 h) · close-out: 6e rows (step 5 / step / last_error / lock) share one root; 13b rows join it while 6e is incomplete, own root otherwise · owner text for the RoundAll time limit · selftest 72",
+  "HandleAll_v0110": "$PSStyle.Progress.MaxWidth = half the window width while running (CJK / circled digits / middle dots take two cells; a wrapped progress line is redrawn with the wrong line count and piles up) · Handle-All stage bar completed while RoundAll runs (only its real-percent bar) · ASCII activity · ceilings full 8 h / other 4 h · restore MaxWidth at the end"
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0117.py",
+   "sha256": "9136cc21a2306cc415a614f497a6865be7257f23cc38e1a1e7912b38dbae768d",
+   "status": "superseded 2026-10-31 (step 5 6e re-fetch fixed at 2400 s · 6e / 13b rows counted separately); file kept in vrn2_release_v0161"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0118.py",
+  "sha256": "9a770b113b34e95789eb9776cd7d71721c845397deaa85cfbe2ce30f65ba9f20",
+  "pinned_package_sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "guide": "VRN2_RoundAll_v0118.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0110.md",
+  "line_sha256": "5fd2053f8ed626b16ceb155987053f9a4d6d5e7c65ddfb5aa6eae186ad599e3a",
+  "line_chars": 13322,
+  "boot_file": "VRN2_HandleAll_v0110_boot.txt",
+  "boot_line_sha256": "aacbdb11c29018ecef71fa570a9620dd4b66ccf629b16ef7fd1a27abc3e01df0",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 70 ⑤ 上一輪 RoundAll 重抓 ⑥e 逾時(收據「RoundAll 修正後 · 擷取 RED:逾時 2400 秒」)→ 接著抓 · ⑥e 綠了 / VIA_VRN2_NO_MARKET=1 → 不抓 · 擷取上限預設 5400 秒(VRN2_MARKET_FETCH_SEC 可調 · 亂填照預設)",
+   "[PASS] 71 收尾頁:⑤ 重抓 ⑥e / ⑥ 步驟 ⑥e / ⑬b 三列 = 桌機 16:11 的 VRN-2 5 項 → ⑥e 沒抓完時合成 1 項(說明重抓上限 · 歷史對齊跟著不完整)· ⑥e 完整時 ⑥e / ⑬b 各 1 項",
+   "[PASS] 72 ⑤ 重抓 ⑥e 的擷取(--fetch)用 market_fetch_sec() 當上限 · 填值(--fill)照舊 2400 秒",
+   "[PASS] VRN2_RoundAll v0118 --selftest · 72 項 · 不過 0"
+  ],
+  "selftest_venv": [
+   "[PASS] VRN2_RoundAll v0118 --selftest · 74 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "stale rc 0",
+   "live rc 0",
+   "full rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "stale": [
+    "[GREEN] boot: Handle-All v0110 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GREEN] ⑤ 修 · ⑥e 擷取鎖過期(PID 999999 已不在(上一個擷取被強制結束 · 鎖沒清) · 2026-10-31T02:40 · 擷取鎖 PID 999999 已不在(上一個擷取被強制結束 · 鎖沒清) · 鎖時間 2026-10-31T02:40:00+00:00 → 移到 RUNNING.lock.stale_20261031_095557(不刪)",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 1 項要修",
+    "  [VRN-2] 1 項",
+    "  [VCGC] 2 項",
+    "  [人工] 2 項",
+    "PYPROG={\"name\":\"VRN2_RoundAll_v0118.py\",\"pct\":100,\"n\":19,\"d\":19,\"secs\":19.247}",
+    "MAXWIDTH=120"
+   ],
+   "live": [
+    "[GREEN] boot: Handle-All v0110 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 2 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 2 項",
+    "  [人工] 3 項",
+    "PYPROG={\"pct\":100,\"d\":6,\"name\":\"VRN2_RoundAll_v0118.py\",\"n\":6,\"secs\":0.882}",
+    "MAXWIDTH=120"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0110 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GREEN] ④ ⑥e 擷取鎖 · 過期 · PID 999998 已不在(上一個擷取被強制結束 · 鎖沒清) · 鎖時間 2026-10-31T03:00:00+00:00 → 移到 RUNNING.lock.stale_20261031_095638(不刪)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 7 項",
+    "  [人工] 1 項",
+    "PYPROG={\"d\":94,\"pct\":100,\"n\":94,\"name\":\"VRN2_RoundAll_v0118.py\",\"secs\":132.005}",
+    "MAXWIDTH=120"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run",
+    "PYPROG=null",
+    "MAXWIDTH=120"
+   ]
+  },
+  "desktop_1611": "console text only (paste-back VRN2_PasteBack_20261031_161126.zip not uploaded): v0117 moved the stale lock (PID 20940, 2026-10-30T23:09:15Z) · 6e re-fetch ran · MOPS financial fetched ticker by ticker (no DENY · VCGC 0) · step 5 fetch stopped at 2400 s (3rd financial group 17/22) · close-out OPEN · VRN-2 5 (6e + 13b) · console flooded by progress text",
+  "not_run": "the real re-fetch continuing after the 2400 s stop and the Windows console progress rendering (Linux container; PSStyle.Progress.MaxWidth set / restored is checked in e2e)"
+ }
+}
