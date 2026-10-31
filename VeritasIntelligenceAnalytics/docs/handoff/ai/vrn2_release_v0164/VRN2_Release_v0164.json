@@ -1,0 +1,308 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0164 (ConsensusJoin v0105 · OutputStore v0102 · runtime v0157) + VRN2_RoundAll_v0120 + VRN2_HandleAll_v0112",
+ "date": "2026-11-01",
+ "trigger": "操作員 2026-11-01:「Yahoo 和共識照用 · 增量庫 MOPS 資料清掉 · Target Price(Adj) 也應該同步還原才有可比較性 · 兩個單位所算的目標價中位數並存方便比較 · 最後把他跟 TWSE / TPEX 輸出個格式依樣在合併即可」 + 桌機 2026-11-01 03:08 收尾(RoundAll v0119 repair):OPEN · VRN-2 1 =「⑥e 擷取 YELLOW · 跑 10 次 · 失敗 0」· TARGET_PRICE(ADJ) MISSING 5(3706 / 6669)· 增量庫 FinancialAligned 16588 / Deleted 38",
+ "policy": {
+  "MOPS": "not used (step 6e --no-financial · quarantined on disk · now also purged from the long-term store with a backup)",
+  "domestic": "TWSE / TPEX official lanes",
+  "yahoo": "kept (operator 2026-11-01): VDF engine's adjustment factor · TARGET_PRICE(ADJ) uses the same factor",
+  "consensus": "kept: FactSet (cnyes) + YFinance medians side by side",
+  "format": "consensus written in the VDF (TWSE / TPEX) output format and merged with the TWSE / TPEX daily rows"
+ },
+ "base_package": {
+  "name": "VRN2_Closeout_v0163 (launcher v0163 · runtime v0156)",
+  "retained": "runtime v0156's 192 members byte-identical inside runtime v0157; every package member except launcher / runtime byte-identical to v0158 / v0163"
+ },
+ "fixes": {
+  "ConsensusJoin_v0105": "thin tail over v0104: tp_adj_sync (VDF daily partitions read-only · VDF_ADJUSTED / SYNC_YAHOO_RATIO / MISSING with the real reason · evidence market/VRN2_TPAdjSync_latest.json incl. VDF status.json + per-ticker CLOSE_MISMATCH) · join on an augmented copy of the market JSON (file not modified) · STATUS names the rule · consensus_dataset: tw_consensus / tw_consensus_estimate / tw_market_consensus in the VDF layout under consensus/dataset + output/VRN2_MarketConsensus_latest · selftest 18",
+  "OutputStore_v0102": "thin tail over v0101: mops_marked / mops_index (Deleted all · FinancialAligned whole (run_id, file_sha) groups with a history marker) · purge-mops (dry run · --apply: DuckDB file copied + SHA-256 · removed rows to removed/<book>.parquet · touched run files moved + rewritten · PURGE_MANIFEST.json) · restore-purge · sync = purge then append (MOPS rows filtered · mops_skipped) · MarketConsensus dataset book (DATE, TICKER, row hash · not in catalog) · selftest duckdb + pyarrow",
+  "launcher_v0164": "runtime v0157 · step 6f loads ConsensusJoin v0105 · step 13 loads OutputStore v0102 (detail leads with the purge) · earlier selftest blocks get the active modules next to their priors · selftest block v0164",
+  "RoundAll_v0120": "package v0164 · step 5: combined when not yet synced (ConsensusJoin v0105 chain placed add-only) · store when the store is not confirmed clean (OutputStore v0102 chain placed add-only) · closeout: 6e 'fetch YELLOW · 0 failures' = VDF rc 2 PARTIAL → data source with the anchor · '不用 MOPS' text no longer read as MOPS DENY · Combined MISSING reasons not split by dates / ratios · paste-back + purge receipt / sync evidence / VDF status / merged book · selftest 78",
+  "SSOTSync_v0102": "thin tail over v0101 (flow unchanged): proposals book v0101 = v0100's 9 entries + 8 new (VRN2-PROP-0010 ~ 0017 · ssot_id blank · sent by step 5b for VCGC to conflict-test and number) · v0101's selftest isolated with only the v0100 book",
+  "HandleAll_v0112": "v0111 pointed at RoundAll v0120 (vrn2_release_v0164) · texts package v0164 / ConsensusJoin v0105 / store purge"
+ },
+ "not_fixed_here": {
+  "3706_6669_tp_adj": "root cause not yet visible from the desktop (paste-back zip 2026-11-01 03:08 not uploaded): v0105 either synchronises (Yahoo split / stock-dividend adjustment) or writes the exact reason + evidence into market/VRN2_TPAdjSync_latest.json",
+  "6e_partial": "VDF rc 2 PARTIAL is the VDF engine's own quality verdict (read-only for VRN-2); anchored, not changed"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0164.py",
+   "sha256": "b28b8c3e0886ecb78d2d066a1df879668030b817984aafbcb818ddd11a5468cf",
+   "bytes": 124050
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "d9c3eec78616cbc26d079da2959db92764e534031bdc12d6397b5bf51737e1a7",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "53e84fc7e5d2844bdc2eb7a43311fe243452c67220abdd04e0da91fb283f3a35",
+   "bytes": 1972
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "00cbf821d4cc89e95efe1d69ee84f5c68f7a4f2e3a64d5ce4ed8bd9ec9adf119",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0157.json",
+   "sha256": "7b906647cdd55d2dd434b9cb2f96114a85636cbccdbc67acf728eaee07b17e3a",
+   "bytes": 26058
+  },
+  {
+   "path": "VRN2_Runtime_v0157.zip",
+   "sha256": "cdd2920f5da5395e208c046e754bca4034b3a55540e8fbccee406583e66a30af",
+   "bytes": 7026077
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0157",
+  "zip_sha256": "cdd2920f5da5395e208c046e754bca4034b3a55540e8fbccee406583e66a30af",
+  "based_on": "VRN2_Runtime_v0156.zip 762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+  "retained_members": 192,
+  "new_members": [
+   "VRN2_ConsensusJoin_v0105.py",
+   "VRN2_OutputStore_v0102.py",
+   "VRN2_SSOTSync_v0102.py",
+   "VRN2_SSOT_Proposals_v0101.json"
+  ],
+  "changed": true
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0119.py",
+   "sha256": "0960759c8c242df96450c204088be1b7fd3f10fcd5cec3e4b3408826769efb06",
+   "status": "superseded 2026-11-01 (package v0163); file kept in vrn2_release_v0163"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0120.py",
+  "sha256": "860cdd5b5fd476d345857e9aa2052dd59177cc5b355efd03f74bc77e720230c5",
+  "pinned_package_sha256": "84834e330fac243f6e1629fdcc0b591310a337df8cf3c0920d6471386043acef",
+  "guide": "VRN2_RoundAll_v0120.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0112.md",
+  "line_sha256": "cb172a7140834da5d776c34c32c102cff01d27ba902009f2899a9113b6454302",
+  "line_chars": 13428,
+  "boot_file": "VRN2_HandleAll_v0112_boot.txt",
+  "boot_line_sha256": "d1e0fb0cd8fa0496663d30fc3f617fa498e679f53e406d3bc6800b0baccd5239",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0164.zip",
+  "sha256": "84834e330fac243f6e1629fdcc0b591310a337df8cf3c0920d6471386043acef",
+  "bytes": 7823927,
+  "layout": "VRN2_Closeout_v0164/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0164.py",
+  "sha256": "b28b8c3e0886ecb78d2d066a1df879668030b817984aafbcb818ddd11a5468cf"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 75 ⑥e「擷取 YELLOW · 失敗 0」= VDF rc 2 PARTIAL → 資料源(錨點:status PARTIAL · 3706 MISMATCH 7 列 · 填值缺 = 非台股 · 同步還原 3)· 失敗 2 → VRN-2 · 逾時照舊 VRN-2 · 「不用 MOPS」說明字不算 DENY(真的 DENY 照舊 VCGC)",
+   "[PASS] 76 ⑤ 計畫:增量庫沒確認乾淨 → store「清掉 MOPS 算的列(先備份 · 可還原)」· 沒同步還原過 → combined(ConsensusJoin v0105)· 清過且綠 + 同步還原比市場新 → 都不排 · 市場資料還帶 MOPS 財報 → market_fill(只重新填值)→ ⑬b → Combined",
+   "[PASS] 77 Combined TARGET_PRICE(ADJ) 缺:同步還原寫的 MISSING(…) 原因 → 資料源 · 日期 / 比值不同不拆類(2 類 · 3 份)",
+   "[PASS] 78 套件 v0164(啟動器 v0164 · runtime v0157)· ③ 自測跑 OutputStore v0102 / ConsensusJoin v0105 · 貼回包收清 MOPS 列收據 / 同步還原證據 / VDF status / 合併冊 · ⑤ 補放 v0102 鏈",
+   "[PASS] VRN2_RoundAll v0120 --selftest · 78 項 · 不過 0"
+  ],
+  "selftest_venv": [
+   "[PASS] VRN2_RoundAll v0120 --selftest · 80 項 · 不過 0"
+  ],
+  "launcher_selftest": [
+   "[PASS] v0164: step 6f loads ConsensusJoin v0105 (TARGET_PRICE(ADJ) synchronous adjustment · consensus in the TWSE / TPEX format · merged) · step 13 loads OutputStore v0102 (MOPS rows purged with a bac"
+  ],
+  "module_selftests": {
+   "cj105": [
+    "[PASS] VRN2_ConsensusJoin v0100 --selftest · 7 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0101 --selftest · 11 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0102 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0103 --selftest · 13 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0104 --selftest · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0105 --selftest · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0100 --selftest · 7 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0101 --selftest · 11 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0102 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0103 --selftest · 13 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0104 --selftest · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0105 --selftest · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0100 --selftest · 7 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0101 --selftest · 11 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0102 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0103 --selftest · 13 項 · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0104 --selftest · 不過 0",
+    "[PASS] VRN2_ConsensusJoin v0105 --selftest · 不過 0"
+   ],
+   "st102": [
+    "[PASS] VRN2_OutputStore v0102(v0101 / v0100 薄尾) --selftest · 引擎 duckdb · 8 項 · 不過 0",
+    "[PASS] VRN2_OutputStore v0102 --selftest · 引擎 duckdb · 不過 0",
+    "[PASS] VRN2_OutputStore v0102(v0101 / v0100 薄尾) --selftest · 引擎 duckdb · 8 項 · 不過 0",
+    "[PASS] VRN2_OutputStore v0102 --selftest · 引擎 duckdb+pyarrow · 不過 0",
+    "[PASS] VRN2_OutputStore v0102(v0101 / v0100 薄尾) --selftest · 引擎 pyarrow · 8 項 · 不過 0",
+    "[PASS] VRN2_OutputStore v0102 --selftest · 引擎 pyarrow · 不過 0"
+   ],
+   "ss102": [
+    "[PASS] ① v0101 自測(隔離在只有 v0100 提案冊的夾)照過:[PASS] VRN2_SSOTSync v0101 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_SSOTSync v0102 --selftest · 4 項 · 不過 0",
+    "[PASS] ① v0101 自測(隔離在只有 v0100 提案冊的夾)照過:[PASS] VRN2_SSOTSync v0101 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_SSOTSync v0102 --selftest · 4 項 · 不過 0",
+    "[PASS] ① v0101 自測(隔離在只有 v0100 提案冊的夾)照過:[PASS] VRN2_SSOTSync v0101 --selftest · 6 項 · 不過 0",
+    "[PASS] VRN2_SSOTSync v0102 --selftest · 4 項 · 不過 0"
+   ]
+  },
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "repair rc 0",
+   "full rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "repair": [
+    "[GREEN] boot: Handle-All v0112 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ⑤ 自動修計畫:市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫清掉 MOPS 算的列(先備份 · 可還原)+ 補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+    "    [Combined] [GREEN] 共識合併 v0105 · join · Combined 14 列 · 調整後目標價 11 · FactSet 中位數 14 · YFinance 中位數 14 · EPS 格 42 · 年 2026 ~ 2028 · 同步還原:TARGET_PRICE(ADJ) 補 1 · 仍缺 0(SYNC_YAHOO_RATIO 1) · TWSE / TPEX 格式:tw_consensus 13 · tw_conse",
+    "[GREEN] ⑤ 修 · ⑬ 增量庫清掉 MOPS 算的列(先備份 · 可還原)+ 補寫(本輪有修正) · 清 MOPS 列 {\"FinancialAligned\": 4935, \"Deleted\": 13}(備份 _mops_purge_20261031_195741)· duckdb · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 1",
+    "[GRAY] ⑥ TARGET_PRICE(ADJ) 同步還原 · ⑥e 錨點 · TARGET_PRICE(ADJ) 補 1 · 仍缺 0(SYNC_YAHOO_RATIO 1) · VDF status PARTIAL · CLOSE_MISMATCH 6669 7 列",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項",
+    "  [人工] 2 項"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0112 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "  [計] ⑬ 輸出位置 · 增量庫 · GREEN · 擋 MOPS 列 {\"FinancialAligned\": 4905, \"Deleted\": 12} · <sbx>/OneDrive/VRN2_out(OneDrive 同步夾)· 鏡像 22 · 引擎 duckdb · 新檔 0 / 已知 14 · 追加 BasicInfo 0 / FinancialData 0 / Summary 0 / Rejected 0 / Combined 14 / ",
+    "  NEXT: [YELLOW] VRN-2 v0164 · rc 2 · 跑了 1 輪 · <sbx>/VIA/VIA_Reports/vrn2/VRN2_Closeout_v0164.json",
+    "[YELLOW] ④ 跑啟動器 ActivateVRN-2_v0164.py · rc 2 · 103 秒 · NEXT: [YELLOW] VRN-2 v0164 · rc 2 · 跑了 1 輪 · <sbx>/VIA/VIA_Reports/vrn2/VRN2_Closeout_v0164.json",
+    "[GRAY] ⑥ TARGET_PRICE(ADJ) 同步還原 · ⑥e 錨點 · TARGET_PRICE(ADJ) 補 1 · 仍缺 0(SYNC_YAHOO_RATIO 1) · VDF status PARTIAL · CLOSE_MISMATCH 6669 7 列",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 7 項",
+    "  [人工] 1 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "e2e_purge": {
+   "lamp": "GREEN",
+   "removed": {
+    "FinancialAligned": 4935,
+    "Deleted": 13
+   },
+   "removed_total": 4948,
+   "totals_before": {
+    "FinancialAligned": 4935,
+    "Deleted": 13
+   },
+   "totals_after": {
+    "FinancialAligned": 0,
+    "Deleted": 0
+   },
+   "backup_sha256": "14e1eabfdc841474031cdf24e6e16aa5edcafb632adf8936c44099d1b18fd7c0",
+   "folder": "_mops_purge_20261031_195741"
+  },
+  "e2e_tp_sync": {
+   "mode": "SYNC_YAHOO_RATIO",
+   "before_date": "2025-09-30",
+   "ratio": 0.5,
+   "factor": 0.485,
+   "target_price": 4200.0,
+   "target_price_adj": 2037.0,
+   "match_from": "2026-10-30"
+  },
+  "e2e_store_after": [
+   ".",
+   "./_mops_purge_20261031_195741",
+   "./_mops_purge_20261031_195741/PURGE_MANIFEST.json",
+   "./_mops_purge_20261031_195741/parquet",
+   "./_mops_purge_20261031_195741/removed",
+   "./_mops_purge_20261031_195741/vrn2_store.duckdb.bak",
+   "./integrated",
+   "./integrated/VRN2_Integrated_BasicInfo_20261029_145919.csv",
+   "./integrated/VRN2_Integrated_BasicInfo_20261029_145919.json",
+   "./integrated/VRN2_Integrated_BasicInfo_20261029_145919.parquet",
+   "./integrated/VRN2_Integrated_BasicInfo_latest.csv",
+   "./integrated/VRN2_Integrated_BasicInfo_latest.json",
+   "./integrated/VRN2_Integrated_BasicInfo_latest.parquet",
+   "./latest",
+   "./latest/IDEMPOTENCE_latest.json",
+   "./latest/VRN2_Acceptance_latest.json",
+   "./latest/VRN2_BasicInfo_latest.csv",
+   "./latest/VRN2_BasicInfo_latest.json",
+   "./latest/VRN2_BasicInfo_latest.parquet",
+   "./latest/VRN2_Combined_latest.csv",
+   "./latest/VRN2_Combined_latest.json",
+   "./latest/VRN2_Combined_latest.parquet",
+   "./latest/VRN2_Completion_latest.json",
+   "./latest/VRN2_Deleted_latest.csv",
+   "./latest/VRN2_Deleted_latest.json",
+   "./latest/VRN2_Deleted_latest.parquet",
+   "./latest/VRN2_FinancialAligned_latest.csv",
+   "./latest/VRN2_FinancialAligned_latest.json",
+   "./latest/VRN2_FinancialData_latest.csv",
+   "./latest/VRN2_FinancialData_latest.json",
+   "./latest/VRN2_FinancialData_latest.parquet",
+   "./latest/VRN2_Input_latest.json",
+   "./latest/VRN2_MarketConsensus_latest.csv",
+   "./latest/VRN2_MarketConsensus_latest.json",
+   "./latest/VRN2_Rejected_latest.csv",
+   "./latest/VRN2_Rejected_latest.json",
+   "./latest/VRN2_Rejected_latest.parquet",
+   "./latest/VRN2_Summary_latest.csv",
+   "./latest/VRN2_Summary_latest.json",
+   "./latest/VRN2_Summary_latest.parquet",
+   "./latest/VRN2_VerbatimVerify_latest.json",
+   "./latest/VRN2_Workbench_latest.html",
+   "./parquet",
+   "./parquet/BasicInfo",
+   "./parquet/Combined",
+   "./parquet/Deleted",
+   "./parquet/FinancialAligned",
+   "./parquet/FinancialData",
+   "./parquet/MarketConsensus",
+   "./parquet/Rejected",
+   "./parquet/Summary",
+   "./parquet/catalog.parquet",
+   "./store_pyarrow",
+   "./store_pyarrow/catalog.json",
+   "./vrn2_store.duckdb"
+  ],
+  "desktop_scale": "16588 FinancialAligned rows (12004 clean + 4584 marked in 44 files) + 38 Deleted → purge plan 0.08 s · apply 2.9 s · 12004 / 0 left · next sync 0 rows (duckdb 2.0 · container)",
+  "not_run": "the desktop store itself (next repair purges it) · the 3706 / 6669 VDF daily rows on the desktop (the sync evidence file will show which rule applies) · a real consensus fetch (gate closed in the container)"
+ }
+}
