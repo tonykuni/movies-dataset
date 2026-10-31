@@ -1,0 +1,201 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0163 (step 6e no MOPS) + VRN2_RoundAll_v0119 + VRN2_HandleAll_v0111",
+ "date": "2026-10-31",
+ "trigger": "操作員 2026-10-31:「不可用 MOPS · 全部國內使用 TWSE TPEX」(桌機 16:11 那輪 ⑤ 重抓 ⑥e 經 VDF 引擎逐檔打 MOPS 財報)",
+ "policy": {
+  "MOPS": "not used by VRN-2 (no request, MOPS-sourced financial data on disk moved aside · not deleted)",
+  "domestic": "TWSE / TPEX official lanes (prices · indices · universe · monthly revenue)",
+  "open_question": "Yahoo: the VDF engine's daily adjusted-price factor (yfinance · engine has no switch) and VRN-2's YFinance consensus median (step 6f) are still used — asked the operator"
+ },
+ "base_package": {
+  "name": "VRN2_Closeout_v0158 (launcher v0158 · runtime v0156)",
+  "retained": "runtime v0156 zip byte-identical; every member except the launcher byte-identical to v0158"
+ },
+ "fixes": {
+  "launcher_v0163": "market_fetch: --no-financial on --fetch · quarantine_mops_financial(output) before the fetch (market/vdf/_mops_quarantine_<stamp> · sequence suffix within one second) · step label '… · 不用 MOPS' · receipt VRN2_Closeout_v0163.json · selftest block v0163",
+  "RoundAll_v0119": "package v0163 · step 4 quarantines MOPS financial data before the launcher · step 5 plan: MOPS data on disk → mops_quarantine, then market (prices --no-financial + fill) → 13b → Combined → store → Workbench · step 5 re-fetch always --no-financial · selftest 74",
+  "HandleAll_v0111": "v0110 pointed at RoundAll v0119 (vrn2_release_v0163) · texts package v0163 / no MOPS"
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "store_note": "the incremental store (OneDrive VRN2_out) already holds FinancialAligned 4584 / Deleted 38 rows appended at 16:11 with MOPS history coverage · append-only · left as is · operator decides",
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0163.py",
+   "sha256": "b3c4a0a75fad9ff29c62f3bdf899b8646779d1c395a3d643f209410be19afa06",
+   "bytes": 115745
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "38c385726dfbded52967cea2d8ce460ffc7b9dc6c16abcee813a031be54d45cd",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "d47e4d3981c80ce3e6b1520a48f1d016694403453b67fa81f64cb2262b34ce9b",
+   "bytes": 1020
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "72f302c3aade123311f68d2a9ea1c616b408a3bfdc8cbd6cd5ff9784a7e9108f",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0156.json",
+   "sha256": "4941d2333d839aea877622309f9118e8dd3bd909dc87047bff752fc2ca6c9234",
+   "bytes": 25508
+  },
+  {
+   "path": "VRN2_Runtime_v0156.zip",
+   "sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+   "bytes": 6993877
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0156",
+  "zip_sha256": "762a2d4f9185beaa5f8144b78e0b6c5230484bae85b805c8343cebefd017694f",
+  "based_on": "VRN2_Runtime_v0154.zip 5b8a4acca6a1b6fb9874ab45c172ee6b0b8e8e82f9e74c20a6188c3c84d05546",
+  "retained_members": 190,
+  "new_members": [
+   "VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0122.py",
+   "VRN2_ConsensusJoin_v0104.py"
+  ],
+  "changed": false
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0118.py",
+   "sha256": "9a770b113b34e95789eb9776cd7d71721c845397deaa85cfbe2ce30f65ba9f20",
+   "status": "superseded 2026-10-31 (package v0158 · 6e financial from MOPS); file kept in vrn2_release_v0162"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0119.py",
+  "sha256": "0960759c8c242df96450c204088be1b7fd3f10fcd5cec3e4b3408826769efb06",
+  "pinned_package_sha256": "fd216929c5f19b4031043fbf788e128c57f5dcc2eb6ec9399e08167303a23782",
+  "guide": "VRN2_RoundAll_v0119.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0111.md",
+  "line_sha256": "62ce977ea53982e5bea82c5d3ffbd904a1fc961a5ea1dc9b6f8e243d65bf8b3b",
+  "line_chars": 13359,
+  "boot_file": "VRN2_HandleAll_v0111_boot.txt",
+  "boot_line_sha256": "1772092eda9a387f175661bedfb9cc665f5a9c77dac66e4ca87a11221530e1c9",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0163.zip",
+  "sha256": "fd216929c5f19b4031043fbf788e128c57f5dcc2eb6ec9399e08167303a23782",
+  "bytes": 7788614,
+  "layout": "VRN2_Closeout_v0163/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0163.py",
+  "sha256": "b3c4a0a75fad9ff29c62f3bdf899b8646779d1c395a3d643f209410be19afa06"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 73 不用 MOPS:已落盤的 MOPS 財報(tw_financial)→ ⑤ 先移到 _mops_quarantine(不刪 · 同一秒第二次加序號)再重抓價格 + 重新填值 · 沒有擷取 Python 也照移 · 移完就不再排 · 價格資料不動",
+   "[PASS] 74 ⑤ 重抓 ⑥e 的 --fetch 帶 --no-financial(--fill 不帶)· ④ 跑啟動器前先移 MOPS 財報 · 套件 / 啟動器 v0163(--no-financial 也在啟動器裡)",
+   "[PASS] VRN2_RoundAll v0119 --selftest · 74 項 · 不過 0"
+  ],
+  "selftest_venv": [
+   "[PASS] VRN2_RoundAll v0119 --selftest · 76 項 · 不過 0"
+  ],
+  "launcher_selftest": [
+   "[PASS] v0163: step 6e never asks for MOPS · MarketFetch --fetch gets --no-financial (--fill unchanged) · MOPS financial data already on disk moved to market/vdf/_mops_qua"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "repair rc 0",
+   "full rc 0",
+   "tamper rc 0",
+   "receipt ActivateVRN-2 v0163 · ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 MarketFetch · 不用 MOPS) · VRN2_MarketFetch_v0112.py · Python 沒有合 VDF 界線的(填值用 via_tw_fetch) · 不用 MOPS(--no-financial) · 擷取 YELLOW:沒有合 VDF 引擎版本界線的擷取 Python(--python via_tw_fetch(3.13.16):p",
+   "market {'no_mops': True, 'mops_quarantine': ''}"
+  ],
+  "e2e": {
+   "repair": [
+    "[GREEN] boot: Handle-All v0111 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 模式 repair:取套件 v0163 → ⑤ 自動修(同意閘開:⑥f 共識改經 VIA 網路工具重抓 · ConsensusJoin v0104 + 引擎 v0122 · ⑥e 不用 MOPS(MOPS 財報移開 · 只用 TWSE / TPEX)· 擷取鎖過期 → 移開後重抓 ⑥e · 重組 Combined · 增量庫 · Workbench;閘關:現有共識不",
+    "[計] ⑤ 自動修計畫:MOPS 財報(操作員 2026-10-31:不可用 MOPS)移到 market\\vdf\\_mops_quarantine(不刪) · 市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+    "[進度] 3/19 ⑤ 自動修 1/5 · MOPS 財報(操作員 2026-10-31:不可用 MOPS)移到 market\\vdf\\_mop",
+    "[GREEN] ⑤ 修 · MOPS 財報(操作員 2026-10-31:不可用 MOPS)移到 market\\vdf\\_mops_quaranti · MOPS 財報移到 market\\vdf\\_mops_quarantine_20261031_105646(不刪)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項",
+    "  [人工] 2 項"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0111 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GREEN] ④ 不用 MOPS · 已落盤的 MOPS 財報移到 market\\vdf\\_mops_quarantine_20261031_105719(不刪 · ⑬b 不再用它)",
+    "  [計] ⑥e 市場擷取 · YELLOW · VRN2_MarketFetch_v0112.py · Python 沒有合 VDF 界線的(填值用 via_tw_fetch) · 不用 MOPS(--no-financial) · 擷取 YELLOW:沒有合 VDF 引擎版本界線的擷取 Python(--python via_tw_fetch(3.13.16):pandas",
+    "[YELLOW] ⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market · VRN2_MarketFetch_v0112.py · Python 沒有合 VDF 界線的(填值用 via_tw_fetch) · 不用 MOPS(--no-financial) · 擷取 YELLOW:沒有合 VDF 引擎版本界線的擷取 Python(--pyt",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 7 項",
+    "    · ⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market · VRN2_MarketFetch_v0112.py · Python 沒有合 VDF 界線的(填值用 via_tw_fetch) · 不用 MOPS(--no-financial) · 擷取 YELLOW:沒有合 VDF 引擎版本界線的擷取 Python(--python",
+    "  [人工] 1 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "vdf_folder_after": {
+   "repair": [
+    "./_mops_quarantine_20261031_105646",
+    "./_mops_quarantine_20261031_105646/parquet",
+    "./_mops_quarantine_20261031_105646/tw_financial.parquet"
+   ],
+   "full": [
+    "./_mops_quarantine_20261031_105646",
+    "./_mops_quarantine_20261031_105646/parquet",
+    "./_mops_quarantine_20261031_105646/tw_financial.parquet",
+    "./_mops_quarantine_20261031_105719",
+    "./_mops_quarantine_20261031_105719/parquet",
+    "./_mops_quarantine_20261031_105719/tw_financial.parquet"
+   ]
+  },
+  "not_run": "the desktop re-fetch of prices with --no-financial (no Python inside the VDF engine's bounds in the container) · the MOPS data on the desktop (moved by the next repair)"
+ }
+}
