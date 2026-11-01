@@ -137,3 +137,34 @@ NEXT: <收尾頁印的下一步>
 VRN 之後照令做 VDF / VCGC:共用模板冊 `VIA_UI_Template_SSOT_v0104.json`(= VeritasReportNova Workbench 範本)+ 共用印章 / 字型;
 VCGC `CGC_MDL274_HealthMatrix_v0116`(操作台印章頁首 · VRN 分頁改指 VeritasReportNova)· VDF `VDF_ENG236_FetchMatrixUI_v0101`(DataFrame 表頭欄 · 印章頁首)+ `VDF_SystemManager_v0167`。
 細節、測試與桌機步驟:`docs/handoff/ai/VIA_UI_TemplateLock_Closeout_20261101.md`。桌機:拉分支後跑 `via-vcgc` 與 `via-vdf` 看頁首;VDF 表頭欄第一次會讀庫。
+
+## 12. 更新 · 2026-11-02(Release Closure 令 · VRN 兩個缺陷修正 · 取代第 10 節那一行)
+
+桌機 2026-11-02 04:24 用第 10 節那一行跑完 v0169(RoundAll v0125 · repair 45 秒)→ Workbench v0104 畫面已是 VeritasReportNova · 收尾 **REVIEW**(VRN 0 · VCGC 0 · 人工 2 · 資料源 3)。同一段主控台有兩個 VRN 自己的缺陷:
+
+| # | 現象(桌機原文) | 根因 | 修正(新版號 · 前版一字不改) |
+|---|---|---|---|
+| 1 | `Write-Host: 無法繫結參數 'ForegroundColor' … "Yellow · 看過原文沒問題 → …"`(兩次) | Handle-All v0117 收尾燈顏色表的 REVIEW 值寫成「顏色 + 一句提示」 | `VRN2_HandleAll_v0118.md`:REVIEW 顏色只寫 `Yellow`,提示句移到「下一步」那一行 |
+| 2 | `UserWarning: Duplicate name: 'vrn2/VRN2_Closeout_v0166.json'`(兩次) | 沿用前版收據時 extra 跟貼回清單同名 → 同一檔寫進 zip 兩次 | `VRN2_RoundAll_v0126.py`:貼回清單先去重(先後照舊)· 自測 90 / 90(新增第 90 項) |
+
+套件、啟動器、Workbench、輸出冊都不變(仍是 `VRN2_Closeout_v0169`)。版本鎖換 `VRN2_FreezeLock_v0103.json`(v0102 不動)。
+
+### 桌機要做的(PowerShell 7 · 依序貼)
+
+1. **先讓桌機跟 GitHub 一致**(桌機落後 719 個提交、另有 2 個沒推的提交 → `--ff-only` 一直不成功,所以 VDF 還在跑舊的 v0162)。這一行用合併(不 rebase、不強推、不丟桌機的提交);不成功會自動還原:
+   ```powershell
+   $r="$HOME\OneDrive\Documents\movies-dataset";git -C $r pull --no-rebase --no-edit origin claude/vrn2-closeout-authorization-y4ixl7;if($LASTEXITCODE){git -C $r merge --abort 2>$null;'[RED] pull 沒成功 - 已還原 · 把上面整段貼回給 AI'}else{'[GREEN] 桌機已跟 GitHub 同步'}
+   ```
+2. VRN 一行(從檔案複製 · 開機檔 `VRN2_HandleAll_v0118_boot.txt`):
+   ```powershell
+   $r="$HOME\OneDrive\Documents\movies-dataset";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;$c=(git -C $r show "FETCH_HEAD:VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_HandleAll_v0118_boot.txt")-join"`n";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]][char[]]$c))).Hash-eq'dfbfd9fd0109cbfc07d1a85fcb59fed54226c35d1610412391c3f9d4e9082a03'){iex $c}else{'[RED] boot SHA-256 mismatch - not run'}
+   ```
+   第一行應是 `[GREEN] boot: Handle-All v0118 SHA-256 OK` → repair 幾分鐘 → 收尾仍 REVIEW,但不再有 ForegroundColor 紅字與 Duplicate name 警告。
+3. VDF:`via-vdf`(ui)。
+
+### VDF ui RED(桌機 04:35 · `VDF_SystemManager_v0162.py ui · rc 1`)
+
+- 桌機的 VDF 尾版是 v0162;GitHub 上 main 已到 v0166、本分支 v0167(v0163 起修過 Windows 一般帳號的前版鏈問題)。桌機落後是因為第 1 步一直沒成功。
+- 雲端容器用 v0162 那一代的樹(`efeea85a4^`)、用現在的樹(v0167)、裝上 duckdb、換工作目錄各跑一次 `ui` → **都是 rc 0 GREEN**,在容器裡重現不出來。
+- 紅字只有前版鏈轉手那兩行(v0128 第 104 行 → v0127 第 108 行 `__getattr__`),最後一行錯誤訊息被截掉了。
+- **第 1 步做完再跑 `via-vdf`**;還是紅 → 把 `VIA_Reports\review\ps_<時間>\B.python.log` 整個檔上傳給 AI(最後一行才是真正的錯誤名)。VRN 不改 VDF 的檔(四系統互不干涉)。
