@@ -8,6 +8,8 @@ r"""VDF_MDL013_ActivateVDF v0116 — 薄尾:總覽頁操作入口多「擷取矩
      一輪裡 ui 在 db check 之後,所以矩陣的庫況是這一輪的)。檔在才出連結(同 v0114 規則)。
   ② 總覽頁寫完,經 VDF_ENG236_FetchMatrixUI.apply_spec 套 VDF_UI_VisualSpec_SSOT(= VRN-2 vrn2-professional-v0242 鎖定原文)+ 色票對照;
      鎖對不上就不套(照實黃)。終端印一行矩陣總結。
+  ③ 收尾跑 VDF_SSOTSync 尾版 sync(VDF 自己的 SSOT / 正則 / 同義字 / 參數 / 政策帳本):登記 → 讀 VCGC 核發冊補 ssot_id → 未核號的寫請求;
+     印「[VDF 編號同步] …」一行。同步出錯只記一行紅,不擋啟動(編號是 VCGC 的事,VDF 只提請求 · 只讀核發冊)。
 VDF 自己的模組:不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib;不裝套件。
 """
 from __future__ import annotations
@@ -72,6 +74,7 @@ _STEM = "VDF_MDL013_ActivateVDF"
 TAG = f"{_STEM} v{Path(__file__).stem.rsplit('_v', 1)[-1]}"
 LINK_V0116 = ("擷取矩陣", "FETCH_MATRIX_latest.html")
 FM_GLOB_V0116 = "VDF_ENG236_FetchMatrixUI_v*.py"
+SYNC_GLOB_V0116 = "VDF_SSOTSync_v*.py"
 
 
 def _vnum_v0116(p) -> int:
@@ -99,18 +102,33 @@ _LINKS_ORIG = tuple(_V0114_G["OPERATE_LINKS_V0114"])
 _ACTIVATE_V0115 = PRIOR.activate
 
 
-def fm_module():
-    hits = [p for p in (HERE / "engine").glob(FM_GLOB_V0116) if _vnum_v0116(p) >= 0]
+def _tail_module(folder: Path, glob: str, prefix: str):
+    hits = [p for p in folder.glob(glob) if _vnum_v0116(p) >= 0]
     if not hits:
         return None
     p = max(hits, key=_vnum_v0116)
-    name = "_vdf_act_fm_" + p.stem
+    name = prefix + p.stem
     if name not in sys.modules:
         sp = importlib.util.spec_from_file_location(name, p)
         mod = importlib.util.module_from_spec(sp)
         sys.modules[name] = mod
         sp.loader.exec_module(mod)
     return sys.modules[name]
+
+
+def fm_module():
+    return _tail_module(HERE / "engine", FM_GLOB_V0116, "_vdf_act_fm_")
+
+
+def ssot_sync(vdf: Path = HERE) -> dict:
+    """VDF 編號同步(VDF_SSOTSync 尾版 sync);出錯回紅一行,不擋啟動。"""
+    try:
+        mod = _tail_module(HERE, SYNC_GLOB_V0116, "_vdf_act_sync_")
+        if mod is None:
+            return {"lamp": "GRAY", "line": "[VDF 編號同步] GRAY · 沒有 VDF_SSOTSync 尾版"}
+        return mod.sync(Path(vdf))
+    except Exception as exc:  # noqa: BLE001 — 同步是收尾步,錯誤照實報、不擋啟動
+        return {"lamp": "RED", "line": "[VDF 編號同步] RED · %s: %s" % (type(exc).__name__, str(exc)[:200])}
 
 
 def matrix_line(ui_dir: Path) -> str:
@@ -124,7 +142,7 @@ def matrix_line(ui_dir: Path) -> str:
 
 
 def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path | None = None) -> dict:
-    """同 v0115 activate;收尾:總覽頁套 VRN-2 視覺規格 · 印擷取矩陣一行。"""
+    """同 v0115 activate;收尾:總覽頁套 VRN-2 視覺規格 · 印擷取矩陣一行 · VDF 編號同步一行。"""
     card = _ACTIVATE_V0115(opt, manager, py, temp)
     ui_dir = V0100.VIA / "VIA_Reports" / "vdf"
     fm = fm_module()
@@ -133,6 +151,9 @@ def activate(opt, manager: Path | None = None, py: str | None = None, temp: Path
     print("  " + matrix_line(ui_dir), flush=True)
     print("  [視覺規格] 總覽頁套 VRN-2 vrn2-professional-v0242:%s" % how, flush=True)
     card["visual_spec"] = how
+    sy = ssot_sync()
+    print("  " + sy["line"], flush=True)
+    card["ssot_sync"] = {"lamp": sy.get("lamp"), "line": sy.get("line")}
     return card
 
 
@@ -187,6 +208,16 @@ def selftest() -> int:
         (tmp / "FETCH_MATRIX_latest.json").write_text(json.dumps({"counts": {"tables": 58, "GREEN": 26, "YELLOW": 25, "RED": 0, "NONE": 7, "endpoints_verified": 7,
                                                                              "endpoints": 32}}), encoding="utf-8")
         chk("③ 收尾印矩陣一行", matrix_line(tmp).startswith("[擷取矩陣] 表 58 · 到齊 26"), matrix_line(tmp))
+        vdf = tmp / "via" / "functional modules" / "VDF"
+        vdf.mkdir(parents=True)
+        (vdf / "VDF_Demo_SSOT_v0100.json").write_text(json.dumps({"code_regex": r"^\d{4}$"}), encoding="utf-8")
+        sy = ssot_sync(vdf)
+        chk("③b 收尾 VDF 編號同步一行(VDF_SSOTSync 尾版 sync;只寫 VDF 自己的 registry / contract)· %s" % sy.get("line"),
+            str(sy.get("line", "")).startswith("[VDF 編號同步] ") and sy.get("lamp") in ("GREEN", "YELLOW")
+            and any((vdf / "registry").glob("VDF_SSOT_Register_v*.json")) and (vdf / "contract" / "VDF_NUMBER_REQUEST_latest.json").is_file())
+        bad = ssot_sync(ov / "VDF")                       # 父層是檔案 → 寫冊必失敗
+        chk("③c 同步出錯 → 紅燈一行照實報(不丟例外、不擋啟動)· %s" % bad.get("line"),
+            bad.get("lamp") == "RED" and str(bad.get("line", "")).startswith("[VDF 編號同步] RED · "), bad)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     chk("④ 換裝在位:v0114 全域 OPERATE_LINKS 多一條 · main 叫的 activate = 本版", LINK_V0116 in _V0114_G["OPERATE_LINKS_V0114"] and _V0114_G["activate"] is activate)
