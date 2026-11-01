@@ -114,3 +114,20 @@ NEXT: <收尾頁印的下一步>
 3. 自動跳出的 Workbench 開頁就是「00 系統現況」。收尾仍應是 REVIEW(VRN-2 0 · 人工 2 · 資料源 3)。人工兩項照第 3 節第 4 步。
 
 雲端沒有 PowerShell:這一行沒在 pwsh 實跑過,雜湊在 Python 端核過。若印 `[RED]`,貼回給 AI。
+
+## 10. 更新 · 2026-11-01 深夜(VeritasReportNova · 印章 · v0169 · 取代第 9 節那一行)
+
+- **第 9 節那行在桌機印 `[RED] boot SHA-256 mismatch`**:是 AI 在對話裡手打的雜湊打錯,不是檔案壞了。這一節的一行直接從檔案複製。
+- **新版**:Workbench v0104 · 啟動器 v0169 · 套件 v0169 · RoundAll v0125 · Handle-All v0117(發行夾 `vrn2_release_v0169`)· 版本鎖 `VRN2_FreezeLock_v0102.json`。輸出冊不變。
+- **畫面**:名稱 VeritasReportNova / VRN(檔名與指令不改)· 00 頁只讀互看列 VDF · VCGC · 印章透明去背無框無特效 · 主印框上下緣對齊頁首文字 · 小印垂右下。
+- **印章來源**:桌機沒有 `VRN2_Logo.*` 時用內建的這顆;桌機有自己的 logo 檔照舊用桌機的。
+
+### 桌機要做的
+
+1. 新的 PowerShell 7 視窗;要經 VIA 網路工具抓共識,先貼 `$env:VIA_SCRAPE_CONSENT = 'YES'`(你決定)。
+2. 貼這一行:
+   ```powershell
+   $r="$HOME\OneDrive\Documents\movies-dataset";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;$c=(git -C $r show "FETCH_HEAD:VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169/VRN2_HandleAll_v0117_boot.txt")-join"`n";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]][char[]]$c))).Hash-eq'0b9eb106465d3dcc3098131f176834f74089630d3c47c1ea24df41d9b975f259'){iex $c}else{'[RED] boot SHA-256 mismatch - not run'}
+   ```
+   第一行應是 `[GREEN] boot: Handle-All v0117 SHA-256 OK` → auto 選 repair(幾分鐘)→ 自動跳出的 Workbench 標題是 VeritasReportNova。
+3. 收尾仍應是 REVIEW(VRN 0 · 人工 2 · 資料源 3);人工兩項照第 3 節第 4 步。印 `[RED]` → 整段貼回。
