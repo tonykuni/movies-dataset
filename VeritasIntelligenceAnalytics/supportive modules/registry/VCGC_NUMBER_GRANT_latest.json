@@ -1,0 +1,538 @@
+{
+ "schema": "VIA.VCGC.NumberGrant.v2",
+ "engine": "CGC_MDL278_NumberGrant v0100",
+ "ts": "2026-11-01T16:06:26",
+ "rule": "號只由 CGC_MDL237 中央編號發(三系統共用一本帳);本冊是中央號的投影:登記鍵 / 候選編號 / 暫編號 → 中央號;assets 給版本與內容指紋(子系統對得上才確認);conflicts = 跨系統衝突 · 契約不合 · 中央檢測擋下(人 + AI 修好後重跑)",
+ "sources": [
+  "functional modules/VDF/contract/VDF_NUMBER_REQUEST_latest.json"
+ ],
+ "grants": {
+  "VDF-RGX-0001": "VIA-VDF-RGX007",
+  "VDF-RGX-0002": "VIA-VDF-RGX008",
+  "VDF:CFG:VDF_AdjPrice_Rule_SSOT": "VIA-VDF-PLCY107",
+  "VDF:CFG:VDF_DataArchitecture_Rule_SSOT": "VIA-VDF-PLCY108",
+  "VDF:PRM:BASE_DIR": "VIA-VDF-PRMT721",
+  "VDF:PRM:BATCH_SIZE": "VIA-VDF-PRMT722",
+  "VDF:PRM:DUCKDB_FILENAME": "VIA-VDF-PRMT723",
+  "VDF:PRM:END_DATE": "VIA-VDF-PRMT724",
+  "VDF:PRM:HTTP_HEADERS": "VIA-VDF-PRMT725",
+  "VDF:PRM:HTTP_TIMEOUT": "VIA-VDF-PRMT726",
+  "VDF:PRM:HTTP_USER_AGENT": "VIA-VDF-PRMT727",
+  "VDF:PRM:MARKETS": "VIA-VDF-PRMT728",
+  "VDF:PRM:MAX_BACKUP_FILES": "VIA-VDF-PRMT729",
+  "VDF:PRM:OUTPUT_DIR": "VIA-VDF-PRMT730",
+  "VDF:PRM:OUTPUT_JSON": "VIA-VDF-PRMT731",
+  "VDF:PRM:PROJECT_NAME": "VIA-VDF-PRMT732",
+  "VDF:PRM:RETRY_DELAY": "VIA-VDF-PRMT733",
+  "VDF:PRM:START_DATE": "VIA-VDF-PRMT734",
+  "VDF:PRM:THREADPOOL_WORKERS": "VIA-VDF-PRMT735",
+  "VDF:PRM:TWEquityBBGTicker": "VIA-VDF-PRMT736",
+  "VDF:PRM:TWEquityYFTicker": "VIA-VDF-PRMT737",
+  "VDF:PRM:TWSE_LISTING_URL": "VIA-VDF-PRMT738",
+  "VDF:PRM:TW_BLOOMBERG_REGEX": "VIA-VDF-PRMT739",
+  "VDF:PRM:TW_TICKER_REGEX": "VIA-VDF-PRMT740",
+  "VDF:PRM:TW_YFINANCE_REGEX": "VIA-VDF-PRMT741",
+  "VDF:PRM:UNIVERSE_SOURCE": "VIA-VDF-PRMT742",
+  "VDF:PRM:VERSION": "VIA-VDF-PRMT743",
+  "VDF:PRM:YF_BATCH_SIZE": "VIA-VDF-PRMT744",
+  "VDF:PRM:YF_HISTORY_PERIOD": "VIA-VDF-PRMT745",
+  "VDF:PRM:YF_TIMEOUT": "VIA-VDF-PRMT746",
+  "VDF:PRM:unified.fetch.batch_size": "VIA-VDF-PRMT747",
+  "VDF:PRM:unified.fetch.http_headers.Accept": "VIA-VDF-PRMT748",
+  "VDF:PRM:unified.fetch.http_headers.User-Agent": "VIA-VDF-PRMT749",
+  "VDF:PRM:unified.fetch.max_retries": "VIA-VDF-PRMT750",
+  "VDF:PRM:unified.fetch.retry_delay_s": "VIA-VDF-PRMT751",
+  "VDF:PRM:unified.fetch.timeout_s": "VIA-VDF-PRMT752",
+  "VDF:PRM:unified.honesty.simulation_data": "VIA-VDF-PRMT753",
+  "VDF:PRM:unified.markets.CURRENCIES": "VIA-VDF-PRMT754",
+  "VDF:PRM:unified.markets.INTERNATIONAL": "VIA-VDF-PRMT755",
+  "VDF:PRM:unified.markets.TAIWAN_INDICES": "VIA-VDF-PRMT756",
+  "VDF:PRM:unified.markets.US_INDICES": "VIA-VDF-PRMT757",
+  "VDF:PRM:unified.output.csv_encoding": "VIA-VDF-PRMT758",
+  "VDF:PRM:unified.output.formats": "VIA-VDF-PRMT759",
+  "VDF:PRM:unified.output.gsheet": "VIA-VDF-PRMT760",
+  "VDF:PRM:unified.output.root": "VIA-VDF-PRMT761",
+  "VDF:PRM:unified.time.end_date": "VIA-VDF-PRMT762",
+  "VDF:PRM:unified.time.start_date": "VIA-VDF-PRMT763",
+  "VDF:PRM:unified.time.use_current_as_end": "VIA-VDF-PRMT764",
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex": "VIA-VDF-RGX007",
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex": "VIA-VDF-RGX008",
+  "VDF:SSOT:VDF_ActiveETF_Retired_SSOT": "VIA-VDF-SSOT087",
+  "VDF:SSOT:VDF_AkshareSelection_MacroShipping": "VIA-VDF-SSOT088",
+  "VDF:SSOT:VDF_DataHome_SSOT": "VIA-VDF-SSOT089",
+  "VDF:SSOT:VDF_FetchGroups_SSOT": "VIA-VDF-SSOT090",
+  "VDF:SSOT:VDF_FetchMatrixUI_SSOT": "VIA-VDF-SSOT091",
+  "VDF:SSOT:VDF_FetchOne_Matrix_Registry": "VIA-VDF-SSOT092",
+  "VDF:SSOT:VDF_FetchSystem_SSOT": "VIA-VDF-SSOT093",
+  "VDF:SSOT:VDF_Fetch_Orders": "VIA-VDF-SSOT094",
+  "VDF:SSOT:VDF_InputUniverse_SSOT": "VIA-VDF-SSOT113",
+  "VDF:SSOT:VDF_Input_Interface_Matrix": "VIA-VDF-SSOT096",
+  "VDF:SSOT:VDF_Param_Engine_Map": "VIA-VDF-SSOT097",
+  "VDF:SSOT:VDF_Param_Registry": "VIA-VDF-SSOT098",
+  "VDF:SSOT:VDF_TA_Engine_Spec": "VIA-VDF-SSOT099",
+  "VDF:SSOT:VDF_TWEquity_DailyRow_Schema": "VIA-VDF-SSOT100",
+  "VDF:SSOT:VDF_TW_Focus_Universe": "VIA-VDF-SSOT101",
+  "VDF:SSOT:VDF_UI_Design_SSOT": "VIA-VDF-SSOT102",
+  "VDF:SSOT:VDF_UI_VisualSpec_SSOT": "VIA-VDF-SSOT103",
+  "VDF:SSOT:VDF_USMacro_Agencies": "VIA-VDF-SSOT104",
+  "VDF:SSOT:VDF_USMacro_Coverage_Map": "VIA-VDF-SSOT105",
+  "VDF:SSOT:VDF_USMacro_Detail_Fetch_Roster": "VIA-VDF-SSOT106",
+  "VDF:SSOT:VDF_USMacro_FedMore": "VIA-VDF-SSOT107",
+  "VDF:SSOT:VDF_USMacro_Gap": "VIA-VDF-SSOT108",
+  "VDF:SSOT:VDF_USMacro_Method": "VIA-VDF-SSOT109",
+  "VDF:SSOT:VDF_USMacro_Probe": "VIA-VDF-SSOT110",
+  "VDF:SSOT:VDF_USMacro_Tree": "VIA-VDF-SSOT111",
+  "VDF:SSOT:VDF_Unified_Params": "VIA-VDF-SSOT112",
+  "VDF:SYN:BATCH_SIZE": "VIA-VDF-SYN2201",
+  "VDF:SYN:CSV_ENCODING": "VIA-VDF-SYN2202",
+  "VDF:SYN:END_DATE": "VIA-VDF-SYN2203",
+  "VDF:SYN:HTTP_TIMEOUT": "VIA-VDF-SYN2204",
+  "VDF:SYN:MARKETS": "VIA-VDF-SYN2205",
+  "VDF:SYN:MAX_RETRIES": "VIA-VDF-SYN2206",
+  "VDF:SYN:OUTPUT_DIR": "VIA-VDF-SYN2207",
+  "VDF:SYN:OUTPUT_ROOT": "VIA-VDF-SYN2208",
+  "VDF:SYN:RETRY_DELAY": "VIA-VDF-SYN2209",
+  "VDF:SYN:RETRY_DELAY_S": "VIA-VDF-SYN2210",
+  "VDF:SYN:START_DATE": "VIA-VDF-SYN2211",
+  "VDF:SYN:TIMEOUT": "VIA-VDF-SYN2212",
+  "VDF:SYN:TIMEOUT_S": "VIA-VDF-SYN2213"
+ },
+ "assets": {
+  "VDF:CFG:VDF_AdjPrice_Rule_SSOT": {
+   "code": "VIA-VDF-PLCY107",
+   "version": "1.0.0",
+   "source_sha256": "e4a3f35dc6a73842ba0f683fe8a64d5b051483d2b2fbc1725dc5eba08d59f303"
+  },
+  "VDF:CFG:VDF_DataArchitecture_Rule_SSOT": {
+   "code": "VIA-VDF-PLCY108",
+   "version": "1.0.0",
+   "source_sha256": "529a64fd79a4809eefd819e4598b516f5be146d91fca2cbb960fc43513f0a7d7"
+  },
+  "VDF:PRM:BASE_DIR": {
+   "code": "VIA-VDF-PRMT721",
+   "version": "1.0.0",
+   "source_sha256": "4388c6ca0c7fc95489bdbb8fa6e207a6f398ec242b8bd6c4ec8374ea26b5fb9f"
+  },
+  "VDF:PRM:BATCH_SIZE": {
+   "code": "VIA-VDF-PRMT722",
+   "version": "1.0.0",
+   "source_sha256": "f0cbae97249dd59a01ae99cfe92c6dd2ee22217ada5446d18076ffd1eb3b2a4a"
+  },
+  "VDF:PRM:DUCKDB_FILENAME": {
+   "code": "VIA-VDF-PRMT723",
+   "version": "1.0.0",
+   "source_sha256": "1ca479a3c6cc8a3ecf2e44959e7556c8719d25390ed74c21b7f9f80bcf1ce073"
+  },
+  "VDF:PRM:END_DATE": {
+   "code": "VIA-VDF-PRMT724",
+   "version": "1.0.0",
+   "source_sha256": "639820129c5059954236a9b49225a3fe55c7da171bf81591534a97e3b9f68d9b"
+  },
+  "VDF:PRM:HTTP_HEADERS": {
+   "code": "VIA-VDF-PRMT725",
+   "version": "1.0.0",
+   "source_sha256": "3152135394518a66deda357cca4453cdc55a4d652c28524cf29bd9ef339a1325"
+  },
+  "VDF:PRM:HTTP_TIMEOUT": {
+   "code": "VIA-VDF-PRMT726",
+   "version": "1.0.0",
+   "source_sha256": "4e151e032aaeb618a835cbc937eb3fbfde3a1769316961322b908ffd50499b49"
+  },
+  "VDF:PRM:HTTP_USER_AGENT": {
+   "code": "VIA-VDF-PRMT727",
+   "version": "1.0.0",
+   "source_sha256": "5360433c86bf5a6baa083d3d6bd91a0d4b0063baf31b5bf06cb2df4c6250d72e"
+  },
+  "VDF:PRM:MARKETS": {
+   "code": "VIA-VDF-PRMT728",
+   "version": "1.0.0",
+   "source_sha256": "f44131a4df4b000d4b95c3424a4d6ebdb2c2e8a91761871474d032cb482ecc41"
+  },
+  "VDF:PRM:MAX_BACKUP_FILES": {
+   "code": "VIA-VDF-PRMT729",
+   "version": "1.0.0",
+   "source_sha256": "3b8cb4fbb0aeb0a1e0668a447baceae60272764a460ee060d93fedb01b421045"
+  },
+  "VDF:PRM:OUTPUT_DIR": {
+   "code": "VIA-VDF-PRMT730",
+   "version": "1.0.0",
+   "source_sha256": "af04a3e7b771d58da3555d203455614b5f1c059efc1aea0e63f6fec694678f33"
+  },
+  "VDF:PRM:OUTPUT_JSON": {
+   "code": "VIA-VDF-PRMT731",
+   "version": "1.0.0",
+   "source_sha256": "edda6e47cec079d9e26b84108fa5bca0743a22403f562358824c4d406c899eeb"
+  },
+  "VDF:PRM:PROJECT_NAME": {
+   "code": "VIA-VDF-PRMT732",
+   "version": "1.0.0",
+   "source_sha256": "4c6947931bd7f6f840cfe25c94c993f34bf45c92e6faff9ec6bfe23b0a2f7a19"
+  },
+  "VDF:PRM:RETRY_DELAY": {
+   "code": "VIA-VDF-PRMT733",
+   "version": "1.0.0",
+   "source_sha256": "ba9495385bb25b5d8e238f4012709a8c678a8365b0460ad52cf0fd5e52c38214"
+  },
+  "VDF:PRM:START_DATE": {
+   "code": "VIA-VDF-PRMT734",
+   "version": "1.0.0",
+   "source_sha256": "160501fde50d7fc863e405be29700a4dfce52adb0b11dbc35d9a99791b802a65"
+  },
+  "VDF:PRM:THREADPOOL_WORKERS": {
+   "code": "VIA-VDF-PRMT735",
+   "version": "1.0.0",
+   "source_sha256": "36fde1a7420166cabc5ddbfd9bc457d53ddd8df1fb8f519d527da8469031b6dc"
+  },
+  "VDF:PRM:TWEquityBBGTicker": {
+   "code": "VIA-VDF-PRMT736",
+   "version": "1.0.0",
+   "source_sha256": "f3e53df75ce4871347499a782ee6a5c50fef55dd759c618cf9a39fdd67ec7757"
+  },
+  "VDF:PRM:TWEquityYFTicker": {
+   "code": "VIA-VDF-PRMT737",
+   "version": "1.0.0",
+   "source_sha256": "8f3a147201c13c54e39b533f1031321a08dd99a269a5914e2d81cec9d8085d34"
+  },
+  "VDF:PRM:TWSE_LISTING_URL": {
+   "code": "VIA-VDF-PRMT738",
+   "version": "1.0.0",
+   "source_sha256": "9cf33650cd6c26b5876f74621205b76423385bbb8a0ad3f7915cd831f9739977"
+  },
+  "VDF:PRM:TW_BLOOMBERG_REGEX": {
+   "code": "VIA-VDF-PRMT739",
+   "version": "1.0.0",
+   "source_sha256": "102f509f12a293773ba434e6ad892fb9cd6938a9baa212fa919ef2f6a4134049"
+  },
+  "VDF:PRM:TW_TICKER_REGEX": {
+   "code": "VIA-VDF-PRMT740",
+   "version": "1.0.0",
+   "source_sha256": "550f72b1a5c03363be31746b1b6d1fd80aca79bddd6d4d4ef7210d5684c9e712"
+  },
+  "VDF:PRM:TW_YFINANCE_REGEX": {
+   "code": "VIA-VDF-PRMT741",
+   "version": "1.0.0",
+   "source_sha256": "355824ef77d7c995ada16ab8a77679235df89d0fcf5f1a3586ba6a4e78d0914a"
+  },
+  "VDF:PRM:UNIVERSE_SOURCE": {
+   "code": "VIA-VDF-PRMT742",
+   "version": "1.0.0",
+   "source_sha256": "cf2f440d021bab4cf12806e0779f105ecba5783be32f8d336e66f5b531ed13a0"
+  },
+  "VDF:PRM:VERSION": {
+   "code": "VIA-VDF-PRMT743",
+   "version": "1.0.0",
+   "source_sha256": "3d90a7f536513a5ae0e53c8633953d0c2723581fbc6a72e39cbf44d73d7def4d"
+  },
+  "VDF:PRM:YF_BATCH_SIZE": {
+   "code": "VIA-VDF-PRMT744",
+   "version": "1.0.0",
+   "source_sha256": "7f228e9e83730da4614dc57d4d2da4fd35b174034d3993027a90b25969c6ce86"
+  },
+  "VDF:PRM:YF_HISTORY_PERIOD": {
+   "code": "VIA-VDF-PRMT745",
+   "version": "1.0.0",
+   "source_sha256": "f2a428546fcde0142d51e87144d2f92327610ef138a6014d25aa673a3233664e"
+  },
+  "VDF:PRM:YF_TIMEOUT": {
+   "code": "VIA-VDF-PRMT746",
+   "version": "1.0.0",
+   "source_sha256": "83abdf97ec06d8426c6322aeec72dfd8b70f0ca04cdb7408c68a824c6e4a0d46"
+  },
+  "VDF:PRM:unified.fetch.batch_size": {
+   "code": "VIA-VDF-PRMT747",
+   "version": "1.0.0",
+   "source_sha256": "8bcc0b982cc350de0b474a04f376b4397c696d3431098acf7e5354fa0e9fac0e"
+  },
+  "VDF:PRM:unified.fetch.http_headers.Accept": {
+   "code": "VIA-VDF-PRMT748",
+   "version": "1.0.0",
+   "source_sha256": "9d9e4c1a9bb644c4347edc6f8ebaa48a2a1ea32dd0641342f88f5af4f8d43e74"
+  },
+  "VDF:PRM:unified.fetch.http_headers.User-Agent": {
+   "code": "VIA-VDF-PRMT749",
+   "version": "1.0.0",
+   "source_sha256": "a485a4fbe5983d1792bf1249aea18d80a0629ff492784fb1979a7a03ccb57de7"
+  },
+  "VDF:PRM:unified.fetch.max_retries": {
+   "code": "VIA-VDF-PRMT750",
+   "version": "1.0.0",
+   "source_sha256": "97b3589d03119e756b9077f2eee34e834e1c80ca33eb30400b89a9b249ea2e9c"
+  },
+  "VDF:PRM:unified.fetch.retry_delay_s": {
+   "code": "VIA-VDF-PRMT751",
+   "version": "1.0.0",
+   "source_sha256": "235f247e6b6ad298b888f1023b60478cc4aa9cbd26b1f11cf8c6d4ef5044b112"
+  },
+  "VDF:PRM:unified.fetch.timeout_s": {
+   "code": "VIA-VDF-PRMT752",
+   "version": "1.0.0",
+   "source_sha256": "a9ea2e93a72f56e4820859ec589d12d1a2803445e4853938760a978e113eb0f2"
+  },
+  "VDF:PRM:unified.honesty.simulation_data": {
+   "code": "VIA-VDF-PRMT753",
+   "version": "1.0.0",
+   "source_sha256": "7622a589b44af49076e7ddfd906165d9424f236979314cd66d38a7d5c7ad8dc7"
+  },
+  "VDF:PRM:unified.markets.CURRENCIES": {
+   "code": "VIA-VDF-PRMT754",
+   "version": "1.0.0",
+   "source_sha256": "f66d34276cf8231335437b3ebd7785bfedb6ec49f09b6e06b65fb2dc229d4040"
+  },
+  "VDF:PRM:unified.markets.INTERNATIONAL": {
+   "code": "VIA-VDF-PRMT755",
+   "version": "1.0.0",
+   "source_sha256": "41300a88cee21016c72b5ca856a6325ace303f30d74a004eecdd81cea4674b22"
+  },
+  "VDF:PRM:unified.markets.TAIWAN_INDICES": {
+   "code": "VIA-VDF-PRMT756",
+   "version": "1.0.0",
+   "source_sha256": "11c96dcbeb760c4733ce3a351fef68ef9d36ce4fd893032d28ff593006c73539"
+  },
+  "VDF:PRM:unified.markets.US_INDICES": {
+   "code": "VIA-VDF-PRMT757",
+   "version": "1.0.0",
+   "source_sha256": "b75c2cacd267db4b550a60736f286ab8cdbf5c131e8d1c606dbddabe8738ae39"
+  },
+  "VDF:PRM:unified.output.csv_encoding": {
+   "code": "VIA-VDF-PRMT758",
+   "version": "1.0.0",
+   "source_sha256": "2ea8309e60c0a600cecaa17927f8ec0f2d53514c00717343bfd5e2d22bd0b834"
+  },
+  "VDF:PRM:unified.output.formats": {
+   "code": "VIA-VDF-PRMT759",
+   "version": "1.0.0",
+   "source_sha256": "adc06a5241997c92ddc81a2272a4d68cd1afc1ba3d85f31ce4222df4a4866293"
+  },
+  "VDF:PRM:unified.output.gsheet": {
+   "code": "VIA-VDF-PRMT760",
+   "version": "1.0.0",
+   "source_sha256": "0ea8491a6febb503f319db6b38ecff7695a6eebb6da99d8e914c4545c400c244"
+  },
+  "VDF:PRM:unified.output.root": {
+   "code": "VIA-VDF-PRMT761",
+   "version": "1.0.0",
+   "source_sha256": "c2d11d402104c502bcd160ba23ac568c0dc51a8ab469a79ac68fd500633fbd9a"
+  },
+  "VDF:PRM:unified.time.end_date": {
+   "code": "VIA-VDF-PRMT762",
+   "version": "1.0.0",
+   "source_sha256": "d33ccbc1f9af51512623cdd319e7191c203955a04e7d9c20ab4418fb730ce9f5"
+  },
+  "VDF:PRM:unified.time.start_date": {
+   "code": "VIA-VDF-PRMT763",
+   "version": "1.0.0",
+   "source_sha256": "35bd6c6ce869fed8baf6828f736d4e806d6b61e2afa8e49c3505972e91d22fb3"
+  },
+  "VDF:PRM:unified.time.use_current_as_end": {
+   "code": "VIA-VDF-PRMT764",
+   "version": "1.0.0",
+   "source_sha256": "bf25a9db09d2d8eafe0952272a0a66f356f642d0ce020c5b79d8ed715edb0f69"
+  },
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex": {
+   "code": "VIA-VDF-RGX007",
+   "version": "1.0.0",
+   "source_sha256": "ff532ef8fb420d49bb4246448fd9cd8667d99b8c263d90b198575a49339b5707"
+  },
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex": {
+   "code": "VIA-VDF-RGX008",
+   "version": "1.0.0",
+   "source_sha256": "a094fd549a772c7a47a61984bcb5a66ae88bdcf2949723ab24c1f65be6ccd589"
+  },
+  "VDF:SSOT:VDF_ActiveETF_Retired_SSOT": {
+   "code": "VIA-VDF-SSOT087",
+   "version": "1.0.0",
+   "source_sha256": "6457159eed6126bcae7bf9b89565b9727c47f236b3d53fab2ff4d9b776a632ad"
+  },
+  "VDF:SSOT:VDF_AkshareSelection_MacroShipping": {
+   "code": "VIA-VDF-SSOT088",
+   "version": "1.0.0",
+   "source_sha256": "c703385fdaff5f0a69de51b3927533f84ab099b93422b2491e340c60ed1d1d1a"
+  },
+  "VDF:SSOT:VDF_DataHome_SSOT": {
+   "code": "VIA-VDF-SSOT089",
+   "version": "1.0.0",
+   "source_sha256": "dd182b885f3c653d6e4db7b0249afc88d1d5bce122ddf276cf5e05adb47794ca"
+  },
+  "VDF:SSOT:VDF_FetchGroups_SSOT": {
+   "code": "VIA-VDF-SSOT090",
+   "version": "1.0.0",
+   "source_sha256": "2b4aca4e6b1f532f79231c9806a0f0d8e3cf8eda135a516333daab3f3513c119"
+  },
+  "VDF:SSOT:VDF_FetchMatrixUI_SSOT": {
+   "code": "VIA-VDF-SSOT091",
+   "version": "1.0.0",
+   "source_sha256": "c59d87d224fa5183087abc5e5cc51de1621905633a9936531778b5e0f809ac85"
+  },
+  "VDF:SSOT:VDF_FetchOne_Matrix_Registry": {
+   "code": "VIA-VDF-SSOT092",
+   "version": "1.0.0",
+   "source_sha256": "b36f12db6392945262ffa3a17a10f2be2125a3923e34f9c4de0fce997c74db6b"
+  },
+  "VDF:SSOT:VDF_FetchSystem_SSOT": {
+   "code": "VIA-VDF-SSOT093",
+   "version": "1.0.0",
+   "source_sha256": "72c379e1ea2e6613f1dbbcde379872e8d990037ecf49c432f338210ab8b0776e"
+  },
+  "VDF:SSOT:VDF_Fetch_Orders": {
+   "code": "VIA-VDF-SSOT094",
+   "version": "1.0.0",
+   "source_sha256": "d576d8ecec5ea63b60d3198318b430d6d21d65b3c7bd11dc230521f1b757a9b5"
+  },
+  "VDF:SSOT:VDF_InputUniverse_SSOT": {
+   "code": "VIA-VDF-SSOT113",
+   "version": "1.1.0",
+   "source_sha256": "9dfef8060e4687648f57dcf53db401f0a2a6ea63d89ca243f96f9b9f2889a518"
+  },
+  "VDF:SSOT:VDF_Input_Interface_Matrix": {
+   "code": "VIA-VDF-SSOT096",
+   "version": "1.0.0",
+   "source_sha256": "94c3ca6d8da0db9f44e598ee95e5eb6e7d9ce8d3e059a3ac6828badc7f0c3ef8"
+  },
+  "VDF:SSOT:VDF_Param_Engine_Map": {
+   "code": "VIA-VDF-SSOT097",
+   "version": "1.0.0",
+   "source_sha256": "ebced0eab73c24081e01e5b9f04721cae322a72b0ed828d0c3c407e798bda0c7"
+  },
+  "VDF:SSOT:VDF_Param_Registry": {
+   "code": "VIA-VDF-SSOT098",
+   "version": "1.0.0",
+   "source_sha256": "1562abe3a87f482be7e8d253445229de3722ebd1ac3015ce317f8fd47a77cc27"
+  },
+  "VDF:SSOT:VDF_TA_Engine_Spec": {
+   "code": "VIA-VDF-SSOT099",
+   "version": "1.0.0",
+   "source_sha256": "2259b7eb0450ea6fa1e2f27f0811fdfcce188f065e0d88a03c54ccfae471b675"
+  },
+  "VDF:SSOT:VDF_TWEquity_DailyRow_Schema": {
+   "code": "VIA-VDF-SSOT100",
+   "version": "1.0.0",
+   "source_sha256": "411f1eb79130c16dd2be66d1318071d050af3791891a79b090f86de27d4f030c"
+  },
+  "VDF:SSOT:VDF_TW_Focus_Universe": {
+   "code": "VIA-VDF-SSOT101",
+   "version": "1.0.0",
+   "source_sha256": "1af652b177c286c83922c4a110e47f0e5704c145780767e9b84aac9a40bf951a"
+  },
+  "VDF:SSOT:VDF_UI_Design_SSOT": {
+   "code": "VIA-VDF-SSOT102",
+   "version": "1.0.0",
+   "source_sha256": "a9fc9a7bb7e8bcbf7cdc2e76ee3e4b894a422c9167408780739860b81ec0c623"
+  },
+  "VDF:SSOT:VDF_UI_VisualSpec_SSOT": {
+   "code": "VIA-VDF-SSOT103",
+   "version": "1.0.0",
+   "source_sha256": "553a947b4502e4a9e4440666e475471eb6b76ea020e0ddff9d8b41b3bde45812"
+  },
+  "VDF:SSOT:VDF_USMacro_Agencies": {
+   "code": "VIA-VDF-SSOT104",
+   "version": "1.0.0",
+   "source_sha256": "91293abe8b3063bbac08625087969da943a01fa5bc25b00f1341fb5053bfb6c9"
+  },
+  "VDF:SSOT:VDF_USMacro_Coverage_Map": {
+   "code": "VIA-VDF-SSOT105",
+   "version": "1.0.0",
+   "source_sha256": "f6ca0aaff3b60762599715587c8499d3bbe46b2e8cd0763be732b4a40faf057e"
+  },
+  "VDF:SSOT:VDF_USMacro_Detail_Fetch_Roster": {
+   "code": "VIA-VDF-SSOT106",
+   "version": "1.0.0",
+   "source_sha256": "8f8a55c573932fd1cbf7717096cfa744359f84bbed6b94016093f5a6b922b2fa"
+  },
+  "VDF:SSOT:VDF_USMacro_FedMore": {
+   "code": "VIA-VDF-SSOT107",
+   "version": "1.0.0",
+   "source_sha256": "f80f079ffbe3c1c31743fe1460bebae12b010484a91441e1810a6c4d9e0c68fa"
+  },
+  "VDF:SSOT:VDF_USMacro_Gap": {
+   "code": "VIA-VDF-SSOT108",
+   "version": "1.0.0",
+   "source_sha256": "abe6463b309cbb0e034a7d28272bedec0d365d797bbd3abb296666f083742eeb"
+  },
+  "VDF:SSOT:VDF_USMacro_Method": {
+   "code": "VIA-VDF-SSOT109",
+   "version": "1.0.0",
+   "source_sha256": "b62aba28b302599057888d9647f2bd8effe1f23921e4e734c5d6f2e11ef9ed84"
+  },
+  "VDF:SSOT:VDF_USMacro_Probe": {
+   "code": "VIA-VDF-SSOT110",
+   "version": "1.0.0",
+   "source_sha256": "af8ac88f82a153117c855640febe8d25d94645acff4c5bfc5bb414d9581e74f1"
+  },
+  "VDF:SSOT:VDF_USMacro_Tree": {
+   "code": "VIA-VDF-SSOT111",
+   "version": "1.0.0",
+   "source_sha256": "45957dfc05340bd842efad0597d84cd3b18ce8c98270fe669684ffad2859271c"
+  },
+  "VDF:SSOT:VDF_Unified_Params": {
+   "code": "VIA-VDF-SSOT112",
+   "version": "1.0.0",
+   "source_sha256": "e4b561d9ad66036c7395e9908ec9608352a365cbb676c454e4bc44b4cef53745"
+  },
+  "VDF:SYN:BATCH_SIZE": {
+   "code": "VIA-VDF-SYN2201",
+   "version": "1.0.0",
+   "source_sha256": "e50c1f86b0010216f116be17c0048bf37aaf8e9e894041fedcbaf0645f99915f"
+  },
+  "VDF:SYN:CSV_ENCODING": {
+   "code": "VIA-VDF-SYN2202",
+   "version": "1.0.0",
+   "source_sha256": "6e81d1e467f41be8f5e291de0223818ac069ce24c9878601194eb5b00062b94a"
+  },
+  "VDF:SYN:END_DATE": {
+   "code": "VIA-VDF-SYN2203",
+   "version": "1.0.0",
+   "source_sha256": "8ac1a417932d55c79886986f7b9fce9f0374f75d6ca57ac0598e9c5a97e25a43"
+  },
+  "VDF:SYN:HTTP_TIMEOUT": {
+   "code": "VIA-VDF-SYN2204",
+   "version": "1.0.0",
+   "source_sha256": "7be682a24273f3d0e3cd58a8357de793e6d96edfec25a178675c9a2599d48a5b"
+  },
+  "VDF:SYN:MARKETS": {
+   "code": "VIA-VDF-SYN2205",
+   "version": "1.0.0",
+   "source_sha256": "78b23dd8a047743678563d05f55a7d0458c5b38e1ecfa6f985fcbf18cfad4367"
+  },
+  "VDF:SYN:MAX_RETRIES": {
+   "code": "VIA-VDF-SYN2206",
+   "version": "1.0.0",
+   "source_sha256": "00d555a4731b40dce04c5b04fd7d49ace2e81fdf065f6fc5ac11aaf519249b46"
+  },
+  "VDF:SYN:OUTPUT_DIR": {
+   "code": "VIA-VDF-SYN2207",
+   "version": "1.0.0",
+   "source_sha256": "db82b7ac7f98c77290011e15d3b5f31b123f9ddc5e7750c9d8dd9af02c6a7aa0"
+  },
+  "VDF:SYN:OUTPUT_ROOT": {
+   "code": "VIA-VDF-SYN2208",
+   "version": "1.0.0",
+   "source_sha256": "cd6d371e7749b5c14fdb7deeff1b21498e17d92ab9081079b6a3b2f5fe0669e9"
+  },
+  "VDF:SYN:RETRY_DELAY": {
+   "code": "VIA-VDF-SYN2209",
+   "version": "1.0.0",
+   "source_sha256": "8964cbd4ffec4dedabffb41f4814f65d0833bda625021df6d295bc611fe47ce9"
+  },
+  "VDF:SYN:RETRY_DELAY_S": {
+   "code": "VIA-VDF-SYN2210",
+   "version": "1.0.0",
+   "source_sha256": "9a4d2ea2005678f3eda838e2c18b71fc77ecc501c8de2794abfe55e123e1c4c4"
+  },
+  "VDF:SYN:START_DATE": {
+   "code": "VIA-VDF-SYN2211",
+   "version": "1.0.0",
+   "source_sha256": "e11b7d69f74955aa1b1ea33350132d9cf89fa81296d0b8f04cc89c925f8931a6"
+  },
+  "VDF:SYN:TIMEOUT": {
+   "code": "VIA-VDF-SYN2212",
+   "version": "1.0.0",
+   "source_sha256": "769db87e22fb87e9045f1357904385e1ce06d21bbefcda484cefd4b55adf12e2"
+  },
+  "VDF:SYN:TIMEOUT_S": {
+   "code": "VIA-VDF-SYN2213",
+   "version": "1.0.0",
+   "source_sha256": "c8fb69dc21ab853c2051fff22570f2c9bac0c79d0013dfb57c8d1b15852bfe20"
+  }
+ },
+ "conflicts": []
+}

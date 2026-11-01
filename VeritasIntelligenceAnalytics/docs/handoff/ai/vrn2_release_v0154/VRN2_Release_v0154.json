@@ -1,0 +1,237 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0154 (ConsensusJoin v0103) + VRN2_RoundAll_v0110 + VRN2_HandleAll_v0102 (PowerShell 7 · short paste line)",
+ "date": "2026-10-30",
+ "trigger": "桌機 2026-10-30 20:09 貼回 Handle-All v0101 整輪的主控台(2225 秒 · DUPKEY 0 · 收尾 OPEN · VRN-2 2 = ⑥f 共識 8358 / 2891 ASSIGNED_JSON_NOT_FOUND)+ 之後貼長行時 PSReadLine 2.4.5 當掉",
+ "base_package": {
+  "name": "VRN2_Closeout_v0153 (launcher v0153 · runtime v0153)",
+  "retained": "runtime v0153 members byte-identical inside runtime v0154; ActivateVRN-2_v0136.py base unchanged"
+ },
+ "supersedes": "v0153 for the closeout entry; VRN2_RoundAll v0109 → v0110; VRN2_HandleAll v0101 → v0102. VRN-2 one-click v0151 / operator one-click v0112 / local round v0101 are not changed this round",
+ "fixes": {
+  "VRN2_ConsensusJoin_v0103": "desktop 20:09 step 6f: first pass 43 codes, 6933 / 7728 / 4171 → 404 (no FactSet page); v0102 dropped them and ran the engine again, but the engine's checkpoint hash includes the code list → no resume → all 40 codes fetched again → 8358 / 2891 answered pages without __NEXT_DATA__ (ASSIGNED_JSON_NOT_FOUND) → gate FAIL_CLOSED · rc 1. v0103 (thin tail over v0102): before every engine pass, today's payloads move into the checkpoint of the list being run (engine's own def_compute_pipeline_input_hash / def_save_checkpoint_payload / def_archive_checkpoint) → resumed offline; gate FAIL rows classed 404 / transient / other; 404 and transient retried after VIA_VRN2_CONSENSUS_RETRY_WAIT (30 s × n · transient up to VIA_VRN2_CONSENSUS_RETRIES = 2 · 404 once); still failing → no_coverage / source_gap (YELLOW) and left out of the gate; other FAIL → FAIL_CLOSED as before; join writes each row's own reason; engine produced nothing this pass (rc ≠ 0 · no Gate line) → the previous matrix is not reused (engine_no_output). selftest 13 incl. a real engine run with no network",
+  "RoundAll_v0110_owner": "gate rows 404 / transient / other (same classes as v0103); transient made by ConsensusJoin < v0103 → VRN-2 (root cause named); source_gap → data source; other → VRN-2; selftest ㊻",
+  "RoundAll_v0110_combined_reason": "Combined gaps by the row's own code (no_coverage / source_gap); the batch summary's '…不納入閘:4171,6933,7728' no longer marks other codes as 404 (desktop: 6 rows, 2 wrong); selftest ㊺",
+  "RoundAll_v0110_repair": "step 5: gate FAIL_CLOSED only from 404 / transient and made before v0103 → place the package runtime's ConsensusJoin chain + engine (manifest hash · add-only · same name different content refused) → re-run 6f with v0103 → Combined → store → Workbench; selftests ㊼ ㊾",
+  "RoundAll_v0110_one_item": "6f step row + gate FAIL rows + 'Combined' whose VRN-2 gaps are all consensus gaps = one close-out item; selftest ㊽",
+  "HandleAll_v0102": "auto → repair when the last receipt is launcher v0153+ and the books exist (only 6f changed this round); new mode repair = --only package,fix,report,closeout,pasteback",
+  "HandleAll_v0102_short_line": "PSReadLine 2.4.5 crashed (IndexOutOfRangeException · ConvertOffsetToPoint) on the ~8.7k-char pasted line in a 133×33 console: a 1719-char ASCII boot line fetches VRN2_HandleAll_v0102.md from GitHub, checks the SHA-256 of the marked Handle-All line and runs it; the cmd line runs the same boot through pwsh -EncodedCommand (no PSReadLine)",
+  "launcher_v0154": "receipt VRN2_Closeout_v0154.json · CONSENSUS_JOIN v0103 · ⑥f receipt keeps no_coverage / source_gap / first_gate / retries / seed · selftest checks the runtime's newest ConsensusJoin is v0103 (v0102 kept)"
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0154.py",
+   "sha256": "91e27fdeb537edb298d1c13c0db2bd247f781a8af633c95927b9487c0e664d2d",
+   "bytes": 90989
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "c14378d6f421a705872e1c2a2e65de7e8beb0ed2eb88f9a305bcbad3b3d7ed6b",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "05f644cdcf635b54943e0e9cf6e568b77a771cb32e6084fcccfd6376c9e2d194",
+   "bytes": 1838
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "df1e206dd4fff9ed1a0cf992d95affa10f29776e7fb47e520d78d9ee88603077",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0154.json",
+   "sha256": "94e49796b030afed5352c766fa5bca92151e081d04b7b023241f3c0a7f7976f5",
+   "bytes": 25149
+  },
+  {
+   "path": "VRN2_Runtime_v0154.zip",
+   "sha256": "5b8a4acca6a1b6fb9874ab45c172ee6b0b8e8e82f9e74c20a6188c3c84d05546",
+   "bytes": 6942011
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0154",
+  "zip_sha256": "5b8a4acca6a1b6fb9874ab45c172ee6b0b8e8e82f9e74c20a6188c3c84d05546",
+  "based_on": "VRN2_Runtime_v0153.zip 2b8dc6d58ea344620181e97a1b5bf783bfd287beab1a62f148cfda6ec9a376eb",
+  "retained_members": 189,
+  "new_members": [
+   "VRN2_ConsensusJoin_v0103.py"
+  ],
+  "files": "see VRN2_Runtime_v0154.json inside the package"
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0109.py",
+   "sha256": "716bfe2bd911710d4c3ce06271404b4466f004428a10044910dab379d2884e89",
+   "status": "superseded 2026-10-30 (package v0153 · 6f transient counted as other · Combined 404 from batch summary); file kept in vrn2_release_v0153"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0110.py",
+  "sha256": "cc1d4b5d7a04783faa6363baf2b9c35cb6f298e32432b32104e0f9b682c49484",
+  "pinned_package_sha256": "a74f476610b9282ec5a85c869cea914fd6933ea677bb570a4716258f0478baf7",
+  "guide": "VRN2_RoundAll_v0110.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0102.md",
+  "line_sha256": "a3d4dc8b9f8bf3d47eff359ad7c56548f5779a80968db6e3ee6178746c37f34b",
+  "line_chars": 9009,
+  "runs": "VRN2_RoundAll_v0110.py cc1d4b5d7a04783faa6363baf2b9c35cb6f298e32432b32104e0f9b682c49484",
+  "boot_line_sha256": "62d8706c9992cccefb91ca43654acfaae1da02d614d087f5d58798558bc52d14",
+  "boot_line_chars": 1719,
+  "boot_line_ascii": true,
+  "cmd_line_chars": 4640
+ },
+ "tested_in": "Linux container · python 3.13 venv_vrn2 · pwsh 7.4.6 · desktop 20:09 consensus state replayed (13-code sandbox)",
+ "results": {
+  "selftests": {
+   "VRN2_ConsensusJoin_v0103(引擎 v0121)": "[PASS] VRN2_ConsensusJoin v0103 --selftest · 13 項 · 不過 0",
+   "VRN2_ConsensusJoin_v0103(只有 runtime 的引擎 v0120)": "[PASS] VRN2_ConsensusJoin v0103 --selftest · 13 項 · 不過 0",
+   "VRN2_RoundAll_v0110": "[PASS] VRN2_RoundAll v0110 --selftest · 50 項 · 不過 0",
+   "ActivateVRN-2_v0154(套件夾複本)": "12 段 PASS · [PASS] v0154: ConsensusJoin v0103 is the active consensus join (today's payloads resumed on a new code list · 404 / transient retried · still failing "
+  },
+  "consensus_selftest_lines": [
+   "[PASS] ② 代號來自基本資料冊:2330 · 2454 · 9999(去重 · 4 碼)",
+   "[PASS] ③ 引擎離線 fixture 實跑:3 代號 · FactSet 中位數 1450 / 1600 · YFinance 中位數 1500 / 1550 · EPS 2026 60 · 2027 75 · 2028 90 · PER 2026 = 1000 / 60 · 收據在 consensus/",
+   "[PASS] ④ join:3 列 · 欄序 = 清單 · 2330 調整後目標價 1470.00 · 上漲 45.5 · 還原收盤 1010.50 · NAME 由 VDF 補 · 主題與摘要 = 標題 + 三點(空點略)",
+   "[PASS] ⑤ join 共識欄:2330 FactSet 1450.00 · YFinance 1500.00 · 2026 EPS 60.00 · 2028 EPS 90.00 · 2026 PER 16.67 · 2454 2028 空 · 9999 有共識但沒市場 → 調整後目標價空且說缺 · 綠 / 黃",
+   "[PASS] ⑥ 輸出:json / csv(+ parquet 有 pyarrow)· 基本資料冊沒動(3 列 · _STATUS 還在)",
+   "[PASS] ⑦ VIA_VRN2_NO_CONSENSUS=1 → 灰不跑 · 收據照寫",
+   "[PASS] ⑧ 對應表:市場冊 per_ticker → 5274 → 5274.TWO · 2330 → 2330.TW · 壞值不收",
+   "[PASS] ⑨ 引擎原本:鉅亨 TWS:5274 → 5274.TW(桌機 404 的根因)· patch 後 → 5274.TWO · 2330 照舊 .TW",
+   "[PASS] ② 只有 404 頁面不存在的列 → 那幾檔不納入(6933 · 4171)",
+   "[PASS] ③ 還有別的不過列(2330 HTTP 500)→ 不動(照 FAIL_CLOSED)· 全部代號都 404 → 不動",
+   "[PASS] ④ gate FAIL_CLOSED 只因 404 → 拿掉 6933 · 4171 再跑一次 → 第二次 PASS · 收據記 no_coverage / first_gate",
+   "[PASS] ⑤ Combined:沒覆蓋的代號 STATUS 加「鉅亨沒有 FactSet 頁(404)」· 其他列不動",
+   "[PASS] ⑥ 啟動器叫的 run / join 與 CLI 的 run / join 都是本版(v0101 · v0100 的模組也指過來)",
+   "[PASS] ② 分類:6933 404 = 沒有 FactSet 頁 · 8358 沒有 __NEXT_DATA__ / 2891 連線中斷 = 一時抓不到 · 1234 HTTP 404 / 2330 品質列 = 其他",
+   "[PASS] ③ 搬 checkpoint:今天的 [2330,6933,8358] → [2330,8358] 搬 2 份 · 引擎自己的 def_initialize_checkpoint 認它可續跑 · 兩份 payload 讀得回 · 舊的封存",
+   "[PASS] ④ 不是今天的 checkpoint → 不搬(照引擎一天一抓)",
+   "[PASS] ⑤ 桌機 20:09 重演:404 重試 1 次 → 拿掉 6933 / 4171 再跑 → 8358 / 2891 不再上網(沿用第一次)→ PASS · 綠 · no_coverage 2 · source_gap 0",
+   "[PASS] ⑥ 同一劇本給 v0102:第二次清單一變 checkpoint 對不上 → 8358 / 2891 重抓 → FAIL_CLOSED(桌機的樣子 · v0103 才修)",
+   "[PASS] ⑦ 一時抓不到:8358 第一次沒有 __NEXT_DATA__ · 第二次有 → 重試 1 次就過閘 · 只重抓 8358 · 綠",
+   "[PASS] ⑧ 一直抓不到:2891 抓 3 次(重試 2 次)仍沒有 → source_gap · 拿掉再跑不上網 → PASS 但黃(鉅亨這次沒給)",
+   "[PASS] ⑨ 別的不過(HTTP 404 網頁本身不在)→ 不重試、不拿掉 · FAIL_CLOSED 原樣(VRN-2 的事)",
+   "[PASS] ⑩ join:2891 寫「鉅亨這次沒給資料(抓了 3 次)」· 6933 寫「鉅亨沒有 FactSet 頁(404)」· 不再抄整批摘要 · 2330 不動",
+   "[PASS] ⑪ 引擎實跑(不連網:代理指到關著的埠 · yfinance 用空殼):離線抓的 2330 / 5274 搬進即時清單 [2330,5274,6933] → 引擎 Resume 沿用 · 6933 連不上 = 一時抓不到 → 重試 1 次 → 拿掉再跑 → 引擎自己的閘過 · 黃 · source_gap 6933",
+   "[PASS] ⑫ 引擎這次沒有產出(rc 1 · 沒有 Gate 行 · NO_PAYLOAD_FETCHED)而矩陣是昨天的 → 不沿用:per_code 清空 · 黃 · engine_no_output · 「共識引擎這次沒有產出」",
+   "[PASS] ⑬ 啟動器叫的 run / join 與 CLI 的 run / join 都是本版(v0102 · v0101 · v0100 的模組都指過來)"
+  ],
+  "engine_run_no_network": "引擎實跑:離線 gate PASS_WITH_WARNINGS · 即時 gate PASS_WITH_WARNINGS · rc 0 · 引擎輸出 136 行(收起來)· Resume 6 · Fetch 2 · 抓不到 2 · 閘 FAIL_CLOSED / FAIL_CLOSED / PASS_WITH_WARNINGS",
+  "pscheck": [
+   "[PASS] 套件 zip = RoundAll 釘的 = 發行清單 · a74f476610b9",
+   "[PASS] RoundAll 檔 = Handle-All 一行 / 可讀版 / PS7 一行 / 解開版的 $H = 發行清單 · cc1d4b5d7a04",
+   "[PASS] HandleAll md:第 1 段 = 短開機行 · 標記的那段 = Handle-All 一行檔 · 可讀版 × 2 · 一行 SHA-256 標在 md 與發行清單 · a3d4dc8b9f8b",
+   "[PASS] 短開機行:只有 ASCII · 1719 字元(133 欄約 13 行)· 釘的是 Handle-All 一行的 SHA-256 · cmd 一行解開 = 短開機行 · 都在 8191 內",
+   "[PASS] RoundAll md:PS7 一行 = 檔 · 兩行 -EncodedCommand 解開 = 解開版 · 都在 8191 字元內",
+   "[PASS] Handle-All / PS7 一行沒有 exit(視窗不關)· 沒有 # 註解 · 9009 字元",
+   "[PASS] PowerShell 剖析(pwsh 7.4.6)0 錯:handleall_line.txt 1243 詞 · handleall_src.ps1 1255 詞 · oneline_roundall_ps7.txt 378 詞 · boot_roundall.ps1 501 詞 · boot_line.txt 284 詞 · boot_src.ps1 288 詞",
+   "[PASS] Handle-All 一行版 = 可讀版(去掉換行 / 分號後詞序列相同)",
+   "[PASS] 短開機行 = 它的可讀版(詞序列相同)"
+  ],
+  "desktop_2009_replay": {
+   "h154_before_VRN2_RoundAll_v0109": {
+    "closeout": "v0109 before · 收尾 OPEN 未結案 {\"VCGC\": 4, \"VRN-2\": 2, \"人工\": 1, \"資料源\": 1}",
+    "consensus": "共識收據: VRN2_ConsensusJoin 共識合併 v0102 · gate FAIL_CLOSED · lamp YELLOW · source_gap [] · no_coverage ['4171'] · retries — · seed []"
+   },
+   "h154_before_VRN2_RoundAll_v0110": {
+    "closeout": "v0110 before · 收尾 OPEN 未結案 {\"VCGC\": 4, \"VRN-2\": 1, \"人工\": 1}",
+    "consensus": "共識收據: VRN2_ConsensusJoin 共識合併 v0102 · gate FAIL_CLOSED · lamp YELLOW · source_gap [] · no_coverage ['4171'] · retries — · seed []"
+   },
+   "h154_repair_v0110": {
+    "closeout": "v0110 repair · 收尾 BLOCKED 等 VCGC {\"資料源\": 2, \"VCGC\": 5, \"人工\": 1}",
+    "consensus": "共識收據: VRN2_ConsensusJoin 共識合併 v0103 · gate PASS_WITH_WARNINGS · lamp YELLOW · source_gap ['2330', '3661', '4171'] · no_coverage [] · retries 2 · seed [10, 0, 0, 10]"
+   }
+  },
+  "repair_lines": [
+   "[計] ⑤ 自動修計畫:⑥f 共識閘只因 404 / 一時抓不到(2330,3661) → 用 ConsensusJoin v0103 重跑(沿用今天抓到的 · 重試 · 暫缺不納入閘) · 市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+   "    [⑥f]     [⑥f] [計] 今天的 checkpoint 是別份代號清單 → 抓到的 10 / 13 份搬進這次的(引擎續跑沿用 · 只抓沒抓過的)",
+   "    [⑥f]     [⑥f] [計] 品質閘 FAIL_CLOSED · 一時抓不到:2330,3661,4171(HTTP_GET_FAILED: url=https://www.cnyes.com/twstock/2330/summ) → 等 0 秒 · 同一份清單再跑一次(續跑:抓到的沿用 · 只重抓 2330,3661,4171)· 第 1 次",
+   "    [⑥f]     [⑥f] [計] 品質閘 FAIL_CLOSED · 一時抓不到:2330,3661,4171(HTTP_GET_FAILED: url=https://www.cnyes.com/twstock/2330/summ) → 等 0 秒 · 同一份清單再跑一次(續跑:抓到的沿用 · 只重抓 2330,3661,4171)· 第 2 次",
+   "    [⑥f]     [⑥f] [計] 品質閘 FAIL_CLOSED 只因 一時抓不到:2330,3661,4171(HTTP_GET_FAILED: url=https://www.cnyes.com/twstock/2330/summ) → 這些代號不納入、同一個引擎再跑一次",
+   "    [⑥f]     [⑥f] [計] 今天的 checkpoint 是別份代號清單 → 抓到的 10 / 10 份搬進這次的(引擎續跑沿用 · 只抓沒抓過的)",
+   "[YELLOW] ⑤ 修 · ⑥f 共識閘只因 404 / 一時抓不到(2330,3661) · 補放 VRN2_ConsensusJoin_v0103.py · 共識合併 v0103 · run · 共識 10 / 10 代號 · FactSet 中位數 10 · YFinance 中位數 10 · gate PASS_WITH_WARNINGS · rc 0 · 鉅亨這次沒給資料(抓了 3 次)暫不納入閘:2330,3661,4171",
+   "[GREEN] ⑤ 修 · 市場資料比歷史對齊新 / 歷史對齊沒跑 · 歷史對齊 v0102 · 對上 11 · 沒對上 0 · 無歷史 0(共 11 份)· 覆蓋 64 格 · 刪除區 12 列 · 檢驗 192(不過 5 · 口徑不明 6)",
+   "[GREEN] ⑤ 修 · Combined 比市場 / 共識舊(或不在)→ 重組 · 共識合併 v0103 · join · Combined 14 列 · 調整後目標價 11 · FactSet 中位數 10 · YFinance 中位數 10 · EPS 格 30 · 年 2026 ~ 2028",
+   "[YELLOW] ⑤ 修 · ⑬ 增量庫補寫(本輪有修正) · pyarrow · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialA",
+   "[GREEN] ⑤ 修 · Workbench 重渲染(最新收據) · VRN2_Workbench v0102 · <v154>/t154d/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html"
+  ],
+  "handleall_e2e": {
+   "e_report(VRN2_MODE=report · 短開機行)": "收尾 · OPEN · 未結案 · VRN-2 還有 1 項要修 · [VRN-2] 1 項 · [VCGC] 4 項 · [人工] 1 項",
+   "e_auto_repair(auto → repair)": "收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 5 項等 VCGC 決定 / 安裝 · [VCGC] 5 項 · [人工] 1 項 · [資料源] 2 項",
+   "e_auto_again(auto → repair · 再一次)": "收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 4 項等 VCGC 決定 / 安裝 · [VCGC] 4 項 · [人工] 1 項 · [資料源] 2 項",
+   "e_cmd_report(cmd 一行 · pwsh -EncodedCommand)": "收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 4 項等 VCGC 決定 / 安裝 · [VCGC] 4 項 · [人工] 1 項 · [資料源] 2 項",
+   "e_tamper(分支上的 md 被改)": "[RED] boot: SHA-256 7d203955c9985bae0271dce08599904f7d47b2a5701c700b31355a7ec4a5db3b is not a3d4dc8b9f8bf3d47eff359ad7c56548f5779a80968db6e3ee6178746c37f34b - not run",
+   "f_full_fixture(整輪 · ⑥f 離線 fixture)": "收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝 · [VCGC] 7 項 · [人工] 1 項",
+   "g_full_live(整輪 · ⑥f 即時 · 全部連不上)": "收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝 · [VCGC] 7 項 · [人工] 1 項 · [資料源] 1 項"
+  },
+  "auto_mode": {
+   "e_auto_repair": "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(輸出冊是啟動器 v0153 以後做的 · 這版只改 ⑥f 共識 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+   "e_auto_again": "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(輸出冊是啟動器 v0153 以後做的 · 這版只改 ⑥f 共識 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')"
+  },
+  "second_repair": "[GREEN] ⑤ 自動修 · 沒有要修的(能自動修的都已綠 / 灰)",
+  "full_run_6f": {
+   "f_full_fixture": "  [計] ⑥f 共識合併 · GREEN · 共識 GREEN:共識 13 / 13 代號 · FactSet 中位數 13 · YFinance 中位數 13 · gate PASS_WITH_WARNINGS · rc 0 · Combined GREEN:Combined 14 列 · 調整後目標價 11 · FactSet 中位數 14 · YFinance 中位數 14 · EPS 格 42 · 年 2026 ~ 2028",
+   "g_full_live": "  [計] ⑥f 共識合併 · YELLOW · 共識 YELLOW:共識引擎這次沒有產出(rc 1 · RuntimeError: NO_PAYLOAD_FETCHED: [{'code': '6669', 'status': 'FAIL', 'error': 'HTTP_GET_FAILED: url=https://www.cnyes.c)· 上次的矩陣(2026-10-30 11:20)不算這次的 · Combined YELLOW:Combined 14 列(共識欄全空:共識引擎這次沒有產出(rc 1 · RuntimeError: NO_PAYLOAD"
+  },
+  "full_run_selftests": {
+   "f_full_fixture": "14 支 · 綠 14 · 非綠 0",
+   "g_full_live": "14 支 · 綠 14 · 非綠 0"
+  },
+  "rc": "e_report rc 0 · e_auto_repair rc 0 · e_auto_again rc 0 · e_cmd_report rc 0 · e_tamper rc 0 · done-drive · f_full_fixture rc 0 · g_full_live rc 0",
+  "handover_line": "沙盒(桌機 20:09 ⑥f 狀態 · 13 檔版):RoundAll v0109 = v0109 before · 收尾 OPEN 未結案 {\"VCGC\": 4, \"VRN-2\": 2, \"人工\": 1, \"資料源\": 1} → v0110 = v0110 before · 收尾 OPEN 未結案 {\"VCGC\": 4, \"VRN-2\": 1, \"人工\": 1} → v0110 repair = v0110 repair · 收尾 BLOCKED 等 VCGC {\"資料源\": 2, \"VCGC\": 5, \"人工\": 1}"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0154.zip",
+  "sha256": "a74f476610b9282ec5a85c869cea914fd6933ea677bb570a4716258f0478baf7",
+  "bytes": 7729124,
+  "layout": "VRN2_Closeout_v0154/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0154.py",
+  "sha256": "91e27fdeb537edb298d1c13c0db2bd247f781a8af633c95927b9487c0e664d2d"
+ },
+ "test_tools_zip": "vrn2_test_tools_v0154.zip",
+ "logs_zip": "logs_v0154.zip"
+}

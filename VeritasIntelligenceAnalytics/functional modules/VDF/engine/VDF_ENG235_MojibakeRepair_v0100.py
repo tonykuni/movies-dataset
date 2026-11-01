@@ -15,6 +15,8 @@
   --selftest
 報告:VIA_Reports/vdf/mojibake/MOJIBAKE_SCAN_latest.json · MOJIBAKE_FIX_latest.json(+ *_runs.jsonl 只增);VIA_MOJIBAKE_OUT 可改報告夾。
 零網路 · 不碰 TA-Lib · 不載 VCGC 程式(解碼器在 supportive modules/network,共用層)。
+[接回 main 修正 2026-10-20 · PR #546 審查 P2] 備份照「相對掃描根」的路徑放(<夾>/_pre_mojibake/<子夾>/<檔名>):
+  原本只用檔名,遞迴掃到兩個同名檔(不同子夾)時第二個的備份被第一個占住、它的原檔卻照換 → 還原不回來。不在掃描根下的檔才只用檔名。自測 ⑨。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -250,7 +252,16 @@ def scan(path, limit: int = SCAN_LIMIT, units_only: bool = False, write: bool = 
     return rep
 
 
-def _rewrite_parquet(duckdb, file: Path, plans: list, backup_dir: Path) -> dict:
+def _bk_path(bdir: Path, root: Path, file: Path) -> Path:
+    """備份路徑:照掃描根之下的相對路徑放(同名不同夾不互占);不在根下才只用檔名。"""
+    try:
+        rel = Path(file).resolve().relative_to(Path(root).resolve())
+    except ValueError:
+        rel = Path(Path(file).name)
+    return Path(bdir) / "_pre_mojibake" / rel
+
+
+def _rewrite_parquet(duckdb, file: Path, plans: list, bk: Path) -> dict:
     """用對應表重寫 parquet:欄序 · 型別不變;先備份(同名已在 = 不覆蓋);列數核對後才換檔。"""
     con = duckdb.connect()
     try:
@@ -279,7 +290,6 @@ def _rewrite_parquet(duckdb, file: Path, plans: list, backup_dir: Path) -> dict:
             return {"ok": False, "why": "列數不同 %d → %d,不換檔" % (n0, n1)}
     finally:
         con.close()
-    bk = backup_dir / "_pre_mojibake" / file.name
     bk.parent.mkdir(parents=True, exist_ok=True)
     if not bk.exists():
         shutil.copy2(file, bk)
@@ -312,7 +322,8 @@ def fix(path, apply: bool = False, backup_dir=None, db_backup: bool = True, unit
         rep.update(lamp="ABSENT", notes=[_CODEC["why"] or "duckdb 不在家族境"])
         return rep
     p0 = Path(path)
-    bdir = Path(backup_dir) if backup_dir else (p0 if p0.is_dir() else p0.parent)
+    root = p0 if p0.is_dir() else p0.parent
+    bdir = Path(backup_dir) if backup_dir else root
     db_backed = set()
     for t in targets(path, units_only=units_only):
         row = dict(t)
@@ -345,7 +356,7 @@ def fix(path, apply: bool = False, backup_dir=None, db_backup: bool = True, unit
         if n_fix and apply:
             try:
                 if t["kind"] == "parquet":
-                    res = _rewrite_parquet(duckdb, Path(t["file"]), plans, bdir)
+                    res = _rewrite_parquet(duckdb, Path(t["file"]), plans, _bk_path(bdir, root, Path(t["file"])))
                     row["action"] = "REWRITTEN" if res.get("ok") else "FAIL"
                     if res.get("ok"):
                         rep["files_rewritten"] += 1
@@ -356,7 +367,7 @@ def fix(path, apply: bool = False, backup_dir=None, db_backup: bool = True, unit
                 else:
                     f = Path(t["file"])
                     if db_backup and str(f) not in db_backed:
-                        bk = bdir / "_pre_mojibake" / f.name
+                        bk = _bk_path(bdir, root, f)
                         bk.parent.mkdir(parents=True, exist_ok=True)
                         if not bk.exists():
                             shutil.copy2(f, bk)
@@ -493,6 +504,20 @@ def selftest() -> int:
         s_u = scan(td / "u2", units_only=True)
         s_all = scan(td / "u2", units_only=False)
         chk("⑦ --units-only 只看 <前綴>__<表>.parquet 單元檔", [Path(t["file"]).name for t in s_u["targets"]] == ["tw__demo.parquet"] and len(s_all["targets"]) == 2)
+        dup = td / "dup"
+        srcs = {}
+        for sub, word in (("a", "台積電"), ("b", "鴻海")):
+            fp = dup / sub / "tw__same.parquet"
+            fp.parent.mkdir(parents=True)
+            con = duckdb.connect()
+            con.execute("COPY (SELECT '%s' AS name) TO '%s' (FORMAT PARQUET)" % (word.encode("utf-8").decode("latin-1"), _esc(str(fp))))
+            con.close()
+            srcs[sub] = fp.read_bytes()
+        d9 = fix(dup, apply=True, backup_dir=td / "bk9", units_only=True)
+        b9 = {sub: td / "bk9" / "_pre_mojibake" / sub / "tw__same.parquet" for sub in ("a", "b")}
+        chk("⑨ 同名不同夾的兩個單元檔:各自備份在 _pre_mojibake/<子夾>/(不互占)· 兩份都還原得回原檔 · 兩檔都改",
+            d9["files_rewritten"] == 2 and all(b9[s_].is_file() and b9[s_].read_bytes() == srcs[s_] for s_ in b9)
+            and not (td / "bk9" / "_pre_mojibake" / "tw__same.parquet").exists(), (d9.get("files_rewritten"), [str(x) for x in (td / "bk9").rglob("*.parquet")]))
         body = Path(__file__).read_text(encoding="utf-8")
         chk("⑧ 橋在(ACCEL + NET,__future__ 之後)· 零網路 · 不碰 TA-Lib · 不載 VCGC 程式 · 不用 replace / ignore 解碼",
             all(x in body for x in ("[VIA:ACCEL-BRIDGE:v0100]", "[VIA:NET-BRIDGE:v0100]")) and body.index("from __future__") < body.index("[VIA:ACCEL-BRIDGE:v0100]")
