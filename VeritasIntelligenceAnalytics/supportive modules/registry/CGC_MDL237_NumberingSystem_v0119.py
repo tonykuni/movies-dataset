@@ -113,22 +113,25 @@ def book_path(source: str) -> Path | None:
 
 
 def resolve_path(obj, path: str):
-    """冊上路徑取值;鍵名本身可能帶點(verbs → vdf.verb.start → regex),每層取最長相符鍵;取不到回 None。"""
+    """冊上路徑取值;鍵名本身可能帶點(verbs → vdf.verb.start → regex),每層取最長相符鍵;
+    陣列索引照 R22 目錄的寫法 `name[1].pattern` / `a[0][2].rx`(也收 `a.1.rx`);取不到回 None。"""
     if path == "":
         return obj
+    if isinstance(obj, list):
+        m = re.match(r"^\[(\d+)\]\.?(.*)$", path) or re.match(r"^(\d+)(?:\.(.*))?$", path)
+        if m and int(m.group(1)) < len(obj):
+            return resolve_path(obj[int(m.group(1))], m.group(2) or "")
+        return None
     if isinstance(obj, dict):
         for k in sorted((str(x) for x in obj), key=len, reverse=True):
             if path == k:
                 return obj[k]
-            if path.startswith(k + "."):
-                hit = resolve_path(obj[k], path[len(k) + 1:])
-                if hit is not None:
-                    return hit
+            for sep in (".", "["):
+                if path.startswith(k + sep):
+                    hit = resolve_path(obj[k], path[len(k) + 1:] if sep == "." else path[len(k):])
+                    if hit is not None:
+                        return hit
         return None
-    if isinstance(obj, list):
-        head, _, rest = path.partition(".")
-        if head.isdigit() and int(head) < len(obj):
-            return resolve_path(obj[int(head)], rest)
     return None
 
 
@@ -216,6 +219,10 @@ def selftest() -> int:
     chk("② 冊上那一欄是引用不是正則(「正本 TW_TICKER」)→ 只記 pattern_ref,不假造 pattern · %s" % et.get("pattern_ref"),
         et.get("scope", "").startswith("legacy.via_vdf_twmarketendpoints_ssot.") and "pattern" not in et and et.get("pattern_ref") == "正本 TW_TICKER")
     chk("③ 非 RGX / 非 R22 的項原樣不動", eo is other and enrich(dict(verb, key="rx|x")) == dict(verb, key="rx|x"))
+    doc = {"locked_alignment": [{"pattern": "^A$"}, {"pattern": "^B[0-9]$"}], "g": {"a.b": [[{"rx": "^X$"}], [{"rx": "^Y$"}]]}}
+    got = [resolve_path(doc, x) for x in ("locked_alignment[1].pattern", "locked_alignment.0.pattern", "g.a.b[1][0].rx", "locked_alignment[9].pattern")]
+    chk("③b 陣列索引:name[1].pattern · name.0.pattern · 帶點鍵 + 多層索引 a.b[1][0].rx 都取得到;越界回 None · %s" % got,
+        got == ["^B[0-9]$", "^A$", "^Y$", None])
     C = PRIOR
     cand = {"candidate_id": "VDF:RGX:IN-01", "ssot_code": None, "asset_type": "REGEX", "owner": "VDF", "source_id": "vdf-ssotsync:t",
             "source_pointer": "VDF:RGX:IN-01", "source_sha256": "a" * 64, "version": "1.0.0", "supersedes": None,
@@ -238,6 +245,12 @@ def selftest() -> int:
     chk("⑥ 換裝在位:v0100 collect 叫的 r22_items = 本版 · 真倉 VDF 那 4 列都有 scope(%d 列 · 原式 %d · 引用 %d)"
         % (len(real), sum(1 for x in real if x.get("pattern")), sum(1 for x in real if x.get("pattern_ref"))),
         BASE.r22_items is r22_items and len(real) == 4 and all(x.get("scope") for x in real) and sum(1 for x in real if x.get("pattern")) == 3)
+    allrx = [it for it in BASE.r22_items() if it.get("kind") == "RGX"]
+    br = [it for it in allrx if "[" in str(it.get("name"))]
+    chk("⑥a 真倉 R22 正則 %d 列:帶陣列索引的 %d 列取到原式 / 引用 %d 列(只有冊讀不到或那一欄不在才缺)"
+        % (len(allrx), len(br), sum(1 for x in br if x.get("pattern") or x.get("pattern_ref"))),
+        br and sum(1 for x in br if x.get("pattern") or x.get("pattern_ref")) >= 0.9 * len(br),
+        [(x.get("source"), x.get("name")) for x in br if not (x.get("pattern") or x.get("pattern_ref"))][:5])
     st = BASE.load_state()
     vdf4 = {r.get("code"): r for r in st["rows"].values() if r.get("code") in ("VIA-VDF-RGX001", "VIA-VDF-RGX002", "VIA-VDF-RGX003", "VIA-VDF-RGX004")}
     raw = json.loads((HERE / "VIA_Numbering_SSOT_v0100.json").read_text(encoding="utf-8")) if (HERE / "VIA_Numbering_SSOT_v0100.json").is_file() else {}
