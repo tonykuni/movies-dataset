@@ -64,3 +64,27 @@ git log --all -- '*VRN_SystemManager_v025[0-3]*' → 空(v0250~v0253 從未進�
 4. **不疊版。** 不在雲端出 v0255 / ENG397 v0130 / ENG062 v0115:缺前版與樣本,出了也驗不了(§7「連續兩版同家族仍無法轉綠」防線)。
 
 NEXT(桌機):貼授權書 §6 指令跑 `--loop 3 --closeout`;貼包出來後把本冊 §2 表與 §6 第 1 條一起貼給桌面端 Claude,Day 2 工作 11 先補鏈再上船。
+
+## 7. 更正 · 2026-11-01(併入 origin/main 926fbfba 後重測 · 只增:上文保留原貌)
+
+10-28 之後其他工作階段已把 VRN-2 推到啟動器 v0158 · RoundAll v0114 · Handle-All v0106 · 管理器 v0256。上文 §2~§4 的「真紅」已被 main 解掉。
+
+| 項 | 10-28(本冊 §2) | 2026-11-01 重測(乾淨工作樹 · 只讀) | 燈 |
+|---|---|---|---|
+| 管理器鏈 | v0254 缺 v0253 · rc1 | v0256 → v0254 → v0253 → v0249 → v0248 → v0245 → v0244 → v0242 → v0239 全在 · `v0256 --selftest` 6/6 PASS | 綠 |
+| 全家族鏈 | 未盤 | `VRN2_ChainShip_v0101 check --heads`:起點 71 · 環 108 · **MISSING 0** · 自測 27/27 | 綠 |
+| RoundAll v0114 | — | `--selftest` 58 項 · 不過 0 | 綠 |
+| VRN-2 自己的冊 | 未入倉 | 仍缺 4 本:VRN2_BasicInfo_Headers_v0100 · VRN2_Regex_v0100 · VRN2_RestoreRiskCatalog_v0100 · VRN2_Publish_Config_v0100(桌機生成;v0248 補環刻意不手編 39 欄規格;Publish_Config 可能帶憑證路徑)| 黃 · 不在雲端代造 |
+| v0254 單獨自測 | rc1 | 仍 rc1(缺 Headers 冊);現役 v0256 已把它改成黃燈跳過、不假裝過 | 黃 |
+| 交接 latest | v0145 | 本次改為 v0159 的同內容副本(沿用 latest = 最新版副本的慣例) | 綠 |
+
+**結案狀態(以桌機收尾頁為準 · 2026-10-31 04:55 Handle-All v0105 repair)= BLOCKED**:VRN-2 0 · VCGC 1 · 人工 3 · 資料源 2。
+VRN-2 側沒有待修;BLOCKED 不是成功,不寫成 PASS。剩下的都不是 VRN-2 能代做的:
+
+- **VCGC 1**:MOPS 被 v1652 合規層 DENY(或整輪時 OCR 隔離環境 `envs\vrn2_ocr` 待 VCGC 建)→ VCGC 決定是否在 `get_scraping_strategy` 放行 mops.twse.com.tw。
+- **人工 3**:`VIA_SCRAPE_CONSENT` 同意閘要操作員自己設(AI 禁代設)· MQ-1560 影像頁四點對原圖 · 3 份年度缺項確認原文有無年度表。
+- **資料源 2**:鉅亨 / Yahoo 本來沒有的頁(已附證據)。
+
+本冊 §6 第 1 條「前版鏈隨船」已由 main 完成;第 3 條改為「開 PR 進 main」(操作員 2026-11-01 令);第 2、4 條照舊。
+
+NEXT(桌機):PowerShell 7 貼 `vrn2_release_v0158/VRN2_HandleAll_v0106.md` 最上面那行 → 預期 BLOCKED · VRN-2 0;先設 `$env:VIA_SCRAPE_CONSENT='YES'` → 人工 2。
