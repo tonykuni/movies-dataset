@@ -1,0 +1,148 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0121 + VRN2_HandleAll_v0113 (package v0164 unchanged)",
+ "date": "2026-11-01",
+ "trigger": "桌機 2026-11-01 04:11(v0164 repair):收尾 REVIEW · VRN-2 0 · 人工 2 · 資料源 3 · 操作員「繼續下一步,依照你的建議進行」(上一輪建議:人工確認紀錄 · 不必整輪就送 SSOT 新提案)",
+ "fixes": {
+  "RoundAll_v0121": "--confirm list / H-code [--note] / revoke H-code (operator only · append-only VRN2_HumanConfirm.json · unknown code not recorded · closeout rebuilt from the last results) · closeout: 人工 items carry a code (root + content fingerprint) and a copyable --confirm line · confirmed → 人工已核 (not counted) · output-book gap files read from the newest launcher log · step 5 ssot: newer proposals book in the package runtime → place proposals v0101 + SSOTSync chain add-only → ⑤b sync · paste-back + confirm book · selftest 83",
+  "HandleAll_v0113": "v0112 pointed at RoundAll v0121 (vrn2_release_v0165) · REVIEW hint mentions --confirm · repair text mentions SSOT proposals"
+ },
+ "policy": {
+  "human_confirm": "only the operator's own --confirm command writes the confirmation book; AI and automated steps never do; a confirmation applies only while the item's content fingerprint is unchanged",
+  "ssot": "VRN-2 proposes with ssot_id blank; VCGC detects conflicts and grants numbers; VRN-2 applies them (unchanged)"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0164.zip",
+  "sha256": "84834e330fac243f6e1629fdcc0b591310a337df8cf3c0920d6471386043acef",
+  "release_folder": "vrn2_release_v0164",
+  "changed": false
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0120.py",
+   "sha256": "860cdd5b5fd476d345857e9aa2052dd59177cc5b355efd03f74bc77e720230c5",
+   "status": "superseded 2026-11-01; file kept in vrn2_release_v0164"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0121.py",
+  "sha256": "627f6af3fd9b4eafcad36f35ee28197891c9cde6f9088c3dfb476f5b3f356280",
+  "pinned_package_sha256": "84834e330fac243f6e1629fdcc0b591310a337df8cf3c0920d6471386043acef",
+  "guide": "VRN2_RoundAll_v0121.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0113.md",
+  "line_sha256": "6ffe1f970276e2ccf8cabac08b0acf7a20bb18db9addb360338ae5b19b962668",
+  "line_chars": 13488,
+  "boot_file": "VRN2_HandleAll_v0113_boot.txt",
+  "boot_line_sha256": "4a904c294227d312ef8645f1dc72a727814fa2a61ce27644717f506a88812b03",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 79 人工確認代碼:同內容(空白不同)同代碼 · 內容變了代碼就變 · revoke 之後不算",
+   "[PASS] 80 收尾頁:人工項帶代碼 + 複製用的 --confirm 指令 · 打錯代碼不記(rc 1)· 確認後重做收尾頁 → 人工已核 · REVIEW → DATA_GAP · revoke → 回 REVIEW · 紀錄只增(2 筆)",
+   "[PASS] 81 ⑤ ssot:套件 runtime 的提案冊 v0101 比核號請求用的 v0100 新 → 排 ssot · 一樣新 → 不排 · 沒有套件 → 不排",
+   "[PASS] 83 「輸出冊 · 缺項 N 份」寫出哪幾份(讀最新啟動器日誌的「輸出冊缺項 · 檔:缺什麼」· 去色碼)· 代碼含檔名(檔變了要重核)",
+   "[PASS] 82 v0121:套件照舊 v0164 · 貼回包收人工確認紀錄 · 只有 step_confirm 寫確認冊(流程裡不呼叫)· ⑤ ssot 補放提案冊鏈",
+   "[PASS] VRN2_RoundAll v0121 --selftest · 83 項 · 不過 0"
+  ],
+  "selftest_venv": [
+   "[PASS] VRN2_RoundAll v0121 --selftest · 85 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "repair rc 0",
+   "confirm list rc 0",
+   "confirm bad rc 1",
+   "confirm ok rc 0 · H-43073c23 H-764d04e4 ",
+   "report rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "repair": [
+    "[GREEN] boot: Handle-All v0113 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GREEN] ⑤ 修 · SSOT 提案冊 VRN2_SSOT_Proposals_v0101.json(這輪新規則 · ssot_id 空白)送 · 提案冊 VRN2_SSOT_Proposals_v0101.json · 提案 17 · 待核號 503(ssot_id 空白 · 等 VCGC 核發)",
+    "[GRAY] ⑥ SSOT-ID 請求 · 待核號 503 · 提案 17 · 自撞 0(等 VCGC 核發)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項",
+    "  [人工] 2 項"
+   ],
+   "report": [
+    "[GREEN] boot: Handle-All v0113 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GRAY] ⑥ SSOT-ID 請求 · 待核號 503 · 提案 17 · 自撞 0(等 VCGC 核發)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 3 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "confirm": [
+   "[待核] H-764d04e4 · ⑥ 四點原文核對 · REVIEW_OCR · {\"PASS\": 52, \"OCR_PENDING\": 4} · 不過 4 點:MQ-1560 20260520.pdf 第 1 點 OCR_PENDING(image page; OCR excerpt needs image verification) | MQ-1560 20260520.pdf 第 2 點 ",
+   "       你核對過原文 / 做了決定 → python \"<sbx>/home/Downloads/VRN2_RoundAll_v0121.py\" --confirm H-764d04e4",
+   "[待核] H-43073c23 · ⑥ ⑥f 共識還沒經 VIA 網路工具 · 這份共識是直連引擎抓的(VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0121.py)· 同意閘未開 → 這輪沒重抓(現有共識不動)",
+   "       你核對過原文 / 做了決定 → python \"<sbx>/home/Downloads/VRN2_RoundAll_v0121.py\" --confirm H-43073c23",
+   "[RED] H-deadbeef 不在上一輪收尾頁的人工核對項(打錯 · 或內容已變 → 先 --confirm list 看現在的代碼)· 沒記",
+   "[GREEN] 已記確認 H-43073c23 · ⑥ ⑥f 共識還沒經 VIA 網路工具",
+   "[GREEN] 已記確認 H-764d04e4 · ⑥ 四點原文核對",
+   "收尾頁(用上一輪的結果重做)· BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 3 項等 VCGC 決定 / 安裝 → <sbx>/VIA/VIA_Reports/vrn2/VRN2_CloseoutUI_latest.html"
+  ],
+  "closeout_states": {
+   "repair": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 3,
+     "人工": 2
+    },
+    "codes": [
+     [
+      "人工",
+      "H-764d04e4"
+     ],
+     [
+      "人工",
+      "H-43073c23"
+     ]
+    ]
+   },
+   "confirmed": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 3
+    },
+    "codes": [
+     [
+      "人工已核",
+      "H-764d04e4"
+     ],
+     [
+      "人工已核",
+      "H-43073c23"
+     ]
+    ]
+   },
+   "report": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 3
+    },
+    "codes": [
+     [
+      "人工已核",
+      "H-764d04e4"
+     ],
+     [
+      "人工已核",
+      "H-43073c23"
+     ]
+    ]
+   }
+  },
+  "dry_run_desktop_0308": "RoundAll v0121 build_closeout on the 03:08 paste-back state: REVIEW (人工 2 · 資料源 3) → both 人工 items confirmed → DATA_GAP (資料源 3)",
+  "not_run": "the desktop itself (next repair: ⑤ ssot → 提案 17 · closeout shows the --confirm lines) · the operator's own confirmation (by design only the operator runs --confirm)"
+ }
+}

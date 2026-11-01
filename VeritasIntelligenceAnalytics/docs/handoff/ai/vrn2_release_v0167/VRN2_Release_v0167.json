@@ -1,0 +1,99 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0123 + VRN2_HandleAll_v0115 (package v0166 unchanged)",
+ "date": "2026-11-01",
+ "trigger": "桌機 2026-11-01 09:19(Handle-All v0114 整輪 · 套件 v0166 · 管理器 v0258)收尾 OPEN「VRN-2 1 項」= ⑥e 市場擷取列 · 操作員「繼續下一步,依照你的建議進行」",
+ "desktop_0919": {
+  "annual_rows": "11505 → 11865 (+363 incl. 欣銓 225 · Daiwa 30 · 南亞 32 · 啟碁 32 · 晶心科 32 · 6933 AMAX +9 values and 3 EPS rows with the corrected SECTION) · Rejected 2609 → 2548 (Daiwa 63 out · 欣銓 '- -' 2 in)",
+  "independent_verifier": "錯值 0 · 11865 = ALIGNED 10821 · SUBALIGNED 752 · TRANSALIGNED 190 · PRESENT 101 (unchanged from 06:32) · NILVAL 1",
+  "books_phase_s": "1279 (v0257 full run 1429)",
+  "gaps": "華南投顧-6143 only (original not uploaded)"
+ },
+ "root_cause": "launcher receipt keeps 300 chars of the 6e detail ('… · 失敗 0 · …'); RoundAll v0122 built the closeout row with detail[:220] → '… · 失' → the v0120 rule '失敗 0 = VDF rc 2 PARTIAL → 資料源' did not match → fallback owner VRN-2",
+ "fixes": {
+  "RoundAll_v0123": "keep_facts(detail, 220): key facts cut by the truncation (失敗 N · 擷取 / 填值 lamp · 逾時 N 秒 · Traceback · 致命錯) are moved in front ('要點 … |'); owner rules unchanged",
+  "HandleAll_v0115": "v0114 pointed at RoundAll v0123 (vrn2_release_v0167) · auto: receipt v0166 → repair"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0166.zip",
+  "sha256": "68d6d03d3fd1634cab5d0870c708f7f736dfa23c349bcb0ced08261a143d640e",
+  "release_folder": "vrn2_release_v0166",
+  "changed": false
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0122.py",
+   "sha256": "9d63be0ebd65b17503e2de995a805d1e81144b4d0f1aba40cd1652afa4ce4eff",
+   "status": "superseded 2026-11-01; file kept in vrn2_release_v0166"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0123.py",
+  "sha256": "fc9f640cacd78d66d6927ed882ba50a6ec42ececc9ed21fa821f6972f01d79eb",
+  "pinned_package_sha256": "68d6d03d3fd1634cab5d0870c708f7f736dfa23c349bcb0ced08261a143d640e",
+  "guide": "VRN2_RoundAll_v0123.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0115.md",
+  "line_sha256": "ded97b49bb1262fcd4253d27888c0db71ec05152c0115d4587ec35dbf3fd59ea",
+  "line_chars": 13496,
+  "boot_file": "VRN2_HandleAll_v0115_boot.txt",
+  "boot_line_sha256": "a25ea4d00f1ec86fa7f4ce7da1ad04eb5ca2c1b3ffe028505591343e63c64e58",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 87 v0123:收據步驟列超過 220 字 → 截掉的「失敗 0」移到最前面 → ⑥e「擷取 YELLOW · 失敗 0」= 資料源(桌機 09:19 被算成 VRN-2 1 項)· 後面有 Traceback → 還是 VRN-2 · 短的不動",
+   "[PASS] VRN2_RoundAll v0123 --selftest · 89 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "auto1": [
+    "[GREEN] boot: Handle-All v0115 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0166 以前做的 · 管理器 v0258 要重做輸出冊:補回原文有、以前漏掉的年度表)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 套件就位 <sbx>/home/Downloads/VRN2_Closeout_v0166(SHA-256 68d6d03d3fd1 · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 8 項",
+    "  [人工] 1 項"
+   ],
+   "auto2": [
+    "[GREEN] boot: Handle-All v0115 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0166.json · 上一輪輸出冊 有(輸出冊是啟動器 v0166 做的 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0166(SHA-256 68d6d03d3fd1 · 11 檔逐檔相符)· <sbx>/home/Downloads/VRN2_Closeout_v0166",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 6 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 6 項",
+    "  [人工] 1 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "closeout_states": {
+   "auto1": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 8,
+     "人工": 1
+    }
+   },
+   "auto2": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 6,
+     "人工": 1
+    }
+   }
+  },
+  "dry_run_desktop_0919": "RoundAll v0122 vs v0123, --only report,closeout on the 09:19 paste-back state (Combined json rebuilt from its csv): v0122 OPEN (VRN-2 1 = 6e row cut at '· 失') → v0123 REVIEW (VRN-2 0 · 人工 2 · 資料源 3 · 6e row '要點 失敗 0 | …' = 資料源 · VDF rc 2 PARTIAL)",
+  "not_run": "the desktop itself (next: auto → repair, a few minutes) · the operator's own --confirm · 華南-6143 original"
+ }
+}

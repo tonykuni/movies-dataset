@@ -1,0 +1,122 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0117 + VRN2_HandleAll_v0109 (package v0158 unchanged)",
+ "date": "2026-10-31",
+ "trigger": "桌機 2026-10-31 14:33 貼回(VRN2_PasteBack_20261031_143304 · RoundAll v0116 repair):收尾 OPEN · VRN-2 2 項 = ⑥e;last_error.txt = RuntimeError: Another writer may be active (market/vdf/RUNNING.lock) · 上午整輪(啟動器 v0158 · 3802 秒)⑥e 5 次全失敗",
+ "root_cause": "VDF_TW_AllInOne_v039 def_run_lock: O_CREAT|O_EXCL lock in the output folder, released only in finally → a force-killed engine (timeout kill / closed window) leaves RUNNING.lock; every later 6e run stops on it. The output folder is VRN-2's own (VIA_Reports/vrn2/market/vdf); the engine and the shared MarketFetch are read-only for VRN-2.",
+ "package": {
+  "name": "VRN2_Closeout_v0158.zip",
+  "folder": "vrn2_release_v0158",
+  "sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "changed": false
+ },
+ "fixes": {
+  "RoundAll_v0117": "vdf_lock_state (PID gone / PID reused by a non-python program / process started after the lock → stale; unreadable → treated as running) · stale lock moved to RUNNING.lock.stale_<stamp> (kept) before step 4 and as a step 5 fix · step 5 re-fetches 6e through MarketFetchRun when the last 6e hit the lock (repair finds the shared MarketFetch itself) · '6e 擷取錯誤' row shows the error before the shortened CMD · new row '6e 擷取鎖擋住' · close-out: lock still running = 人工, stale / gone = VRN-2, the 3 rows merged · paste-back carries market/vdf/RUNNING.lock · last_error.txt of the previous run moved aside before step 4 and before the step 5 re-fetch (MarketFetch writes it only on failure) · selftest 69",
+  "HandleAll_v0109": "v0108 pointed at RoundAll v0117 (vrn2_release_v0161) · repair description mentions the 6e lock"
+ },
+ "vdf_note": "VDF 引擎的 RUNNING.lock 只看檔案在不在(不記錄 / 不檢查 PID 是否還活著)· 被強制結束就留鎖。VRN-2 只讀不改 VDF,攤開給 VDF 自己決定(例:啟動時判 PID 過期)。",
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0116.py",
+   "sha256": "e518022ba4d01ed1646f08ce98a44a295e4933aae0c0a47a83ef3e8c2035f17c",
+   "status": "superseded 2026-10-31 (6e stale RUNNING.lock not handled · error tail cut by the CMD line); file kept in vrn2_release_v0160"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0117.py",
+  "sha256": "9136cc21a2306cc415a614f497a6865be7257f23cc38e1a1e7912b38dbae768d",
+  "pinned_package_sha256": "dfca4f6b13fb7ce727184ab25721cb8d7ea14c6c989b10cfbf7e7f662edced62",
+  "guide": "VRN2_RoundAll_v0117.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0109.md",
+  "line_sha256": "1d0c8a92b7b64aefc9fafb942410a063f0085e17aa491f4160105aa115152d94",
+  "line_chars": 13000,
+  "boot_file": "VRN2_HandleAll_v0109_boot.txt",
+  "boot_line_sha256": "348a293e60dbaa69da342df551dcf11b4691b9e1a46761d076c403735cb49887",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run",
+  "live_fetch_unverified_in_container": "the container cannot open the operator's consent gate and is not the desktop network: the network-tool lanes were verified against a local fake server with the gate stubbed open, and against the real network tool with the gate closed (DENY · zero requests)",
+  "container_venv_side_effect": "sandbox full run: launcher step 3 (envcheck --install, existing VRN-2 manager behaviour) pip-installed into the container test venv; numpy went 2.x -> 1.26.4 and pyarrow no longer imports. VCGC InstallGate installs with --user only and pip refuses that inside a venv, so the container venv was left as is (test env only). Desktop: if step 3 changes numpy, hand it to VCGC; RoundAll --launcher-args \"--no-install\" skips step 3 installs"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 65 ⑥e 擷取鎖過期判斷:沒有鎖 · PID 已不在 = 過期 · 還在跑的 python 比鎖早起 = 不動 · 號碼現在是別的程式 / 比鎖晚起 = 過期(重用)· 讀不到程式名 = 不動 · 鎖讀不到 PID = 過期",
+   "[PASS] 66 過期擷取鎖移到 RUNNING.lock.stale_<時間>(不刪 · 內容照留)· 原位置空出來 · 貼回包帶 market/vdf/RUNNING.lock",
+   "[PASS] 67 ⑤ 自動修:上一輪 ⑥e 被擷取鎖擋住 + 鎖過期 → 先移鎖再重抓 ⑥e(順序)· 鎖還在跑 → 都不做 · 鎖已不在 → 只重抓 · VIA_VRN2_NO_MARKET=1 → 不重抓",
+   "[PASS] 68 「⑥e 擷取錯誤」錯誤訊息在前 · CMD 在後(43 檔代號縮成「43 檔」)· 收尾頁:擷取鎖還在跑 = 人工 · 鎖過期 / 已不在 = VRN-2(跑 repair 自己修)· 同一件事三列合一列",
+   "[PASS] 69 上一輪的 last_error.txt 在 ④ 跑啟動器前 / ⑤ 重抓 ⑥e 前移到 last_error.before_<時間>.txt(不刪)· MarketFetch 只在失敗時寫 → 這輪抓成功就不會留著舊錯誤 · 沒有檔 = 不動",
+   "[PASS] VRN2_RoundAll v0117 --selftest · 69 項 · 不過 0"
+  ],
+  "selftest_venv": [
+   "[PASS] VRN2_RoundAll v0117 --selftest · 71 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "stale rc 0",
+   "live rc 0",
+   "full rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "stale": [
+    "[GREEN] boot: Handle-All v0109 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ⑤ 自動修計畫:⑥e 擷取鎖過期(PID 999999 已不在(上一個擷取被強制結束 · 鎖沒清) · 2026-10-31T02:40:00+00:00)→ 移開(不刪) · 市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+    "[GREEN] ⑤ 修 · ⑥e 擷取鎖過期(PID 999999 已不在(上一個擷取被強制結束 · 鎖沒清) · 2026-10-31T02:40 · 擷取鎖 PID 999999 已不在(上一個擷取被強制結束 · 鎖沒清) · 鎖時間 2026-10-31T02:40:00+00:00 → 移到 RUNNING.lock.stale_20261031_070748(不刪)",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 1 項要修",
+    "  [VRN-2] 1 項",
+    "  [VCGC] 2 項",
+    "  [人工] 2 項"
+   ],
+   "live": [
+    "[GREEN] boot: Handle-All v0109 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 2 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 2 項",
+    "  [人工] 3 項"
+   ],
+   "full": [
+    "[GREEN] boot: Handle-All v0109 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[GREEN] ④ ⑥e 擷取鎖 · 過期 · PID 999998 已不在(上一個擷取被強制結束 · 鎖沒清) · 鎖時間 2026-10-31T03:00:00+00:00 → 移到 RUNNING.lock.stale_20261031_070825(不刪)",
+    "[計] ④ 上一輪的 ⑥e last_error.txt 移到 last_error.before_20261031_070825.txt(這輪 ⑥e 失敗才會再寫)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 7 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 7 項",
+    "  [人工] 1 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "vdf_folder_after": {
+   "stale": [
+    "RUNNING.lock.stale_20261031_070748",
+    "last_error.txt"
+   ],
+   "live": [
+    "RUNNING.lock",
+    "RUNNING.lock.stale_20261031_070748",
+    "last_error.txt"
+   ],
+   "full": [
+    "RUNNING.lock.stale_20261031_070748",
+    "RUNNING.lock.stale_20261031_070825",
+    "last_error.before_20261031_070825.txt"
+   ]
+  },
+  "replay_desktop_report": [
+   "RoundAll v0116 · OPEN · {\"VRN-2\": 3, \"人工\": 2, \"資料源\": 1} · ⑥e 項 2(VRN-2、VRN-2)· 「擷取錯誤」列開頭:CMD:",
+   "RoundAll v0117 · OPEN · {\"VRN-2\": 2, \"人工\": 2, \"資料源\": 1} · ⑥e 項 1(VRN-2(合併 3 列))· 「擷取錯誤」列開頭:(合進 ⑥e 那一項)"
+  ],
+  "not_run": "the real 6e re-fetch after the lock is moved: the container has no Python inside the VDF engine's version bounds (pyarrow / yfinance / tzdata missing) and VRN-2 installs nothing (VCGC's job) → plan order (move lock, then re-fetch) is selftest 67; the re-fetch branch itself is the existing step 5 'market' fix (MarketFetchRun)"
+ }
+}

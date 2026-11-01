@@ -1,0 +1,476 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0166 (manager v0258 · runtime v0158) + VRN2_RoundAll_v0122 + VRN2_HandleAll_v0114",
+ "date": "2026-11-01",
+ "trigger": "操作員 2026-11-01 上傳原文 4 份(MQ-1560 · 3014TT · Daiwa-6278 · 欣銓 3264)· 收尾頁人工項 H-fd2ea35f(MQ-1560 四點 OCR)與 H-275f449a(輸出冊缺項 3 份 · 年度數據)",
+ "finding": {
+  "3264_CTBC": "page 5 prints 資產負債表 / 現金流量表 / 損益表 / 比率分析 (2022 – 2027F); item names ~3 pt below their numbers → value-only + label-only rows, both skipped by the books (not even Rejected)",
+  "6278_Daiwa": "page 2 financial summary: year banner (2024 · 2025 · 2026) above the real header (1Q24 … 1Q26 · 2024 · 2025 · 3M26) → 3-5 numbers per cell, rejected as 一格多值; annual 2024 / 2025 actuals never reached the book (report has no forecasts · Target price n.a.)",
+  "6143_華南": "original not uploaded; desktop Rejected 40 values with reason 轉置表第三讀法對不上 → needs the original to check",
+  "MQ-1560": "image-only; four OCR points match the original wording and numbers; OCR spacing glitches; one word wrong (chi players → chip layers); its OCR'd annual table stays in Rejected (4 of 68 OCR values wrong vs the image)"
+ },
+ "base_package": {
+  "name": "VRN2_Closeout_v0164 (launcher v0164 · runtime v0157)",
+  "retained": "runtime v0157's 196 members byte-identical inside runtime v0158; every package member except launcher / runtime byte-identical to v0164"
+ },
+ "fixes": {
+  "SystemManager_v0258": "thin tail over v0257: _zone_repair on a copy of the extraction result (P1VIEW untouched) → v0257 books unchanged · half-line pairing confirmed by the second reader (label + annual numbers on one printed line · unique) · two-level period header re-grid confirmed by the second reader (header line once · each row once · nearest label one-to-one within 0.4 column gap) · unplaced rows to Rejected with the reason · repair error → books from the original result",
+  "launcher_v0166": "runtime v0158 · manager v0258 · receipt VRN2_Closeout_v0166.json · selftest block v0166 (launcher number v0165 skipped)",
+  "RoundAll_v0122": "package v0166 · step 3 selftest runs manager v0258 · closeout hint for 輸出冊缺項: upload the originals to the AI first (annual table present = extraction miss) · owner: a step-5 row saying the fetch environment lacks requests / yfinance → VCGC (was VRN-2 since v0120)",
+  "HandleAll_v0114": "v0113 pointed at RoundAll v0122 (vrn2_release_v0166) · auto picks full when the last receipt is older than launcher v0166 (books must be rebuilt by v0258)"
+ },
+ "tests": {
+  "originals": "3264 225 · 6278 30 · independent verifier 685 / 685 ALIGNED · v0257 rows kept (0 removed)",
+  "regression_14_real": "FinancialData 4905 → 4937 (0 removed · +32 晶心科 6533 CTBC p5) · Rejected / BasicInfo / Summary unchanged · independent verifier 4937 / 4937"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0166.py",
+   "sha256": "06bf8b2a3719fd571c76a64c0e6bc348921f73730b4d7c8a1ad574151036cd12",
+   "bytes": 126400
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "48231c746fffc6863f5168a2d64903d3ca8c8fa952a5bc8e49245b1589099b3e",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "d26624d01a78a0ef4ac85f49bd8a4b5b2a8816b1ef450586405fbd1fe2c8d80a",
+   "bytes": 1504
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "f3be21ba55bdc6a349942b72bc75b82253b9451e69b99103f553110884650619",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0158.json",
+   "sha256": "256a178c72596e60d06d5f2d1fca4a48893d092e85303c7540fef5aebb9374a3",
+   "bytes": 26092
+  },
+  {
+   "path": "VRN2_Runtime_v0158.zip",
+   "sha256": "5cc42b34834485e50630c05ea9c7711f4e10b45478d85b026903f2af4c284aec",
+   "bytes": 7036482
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0158",
+  "zip_sha256": "5cc42b34834485e50630c05ea9c7711f4e10b45478d85b026903f2af4c284aec",
+  "based_on": "VRN2_Runtime_v0157.zip cdd2920f5da5395e208c046e754bca4034b3a55540e8fbccee406583e66a30af",
+  "retained_members": 196,
+  "new_members": [
+   "VRN_SystemManager_v0258.py"
+  ],
+  "changed": true
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0121.py",
+   "sha256": "627f6af3fd9b4eafcad36f35ee28197891c9cde6f9088c3dfb476f5b3f356280",
+   "status": "superseded 2026-11-01 (package v0164); file kept in vrn2_release_v0165"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0122.py",
+  "sha256": "9d63be0ebd65b17503e2de995a805d1e81144b4d0f1aba40cd1652afa4ce4eff",
+  "pinned_package_sha256": "68d6d03d3fd1634cab5d0870c708f7f736dfa23c349bcb0ced08261a143d640e",
+  "guide": "VRN2_RoundAll_v0122.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0114.md",
+  "line_sha256": "48cef1e897b684a557704f49bb44a48a17e16bc4cf15fc6691904a00aa495002",
+  "line_chars": 13496,
+  "boot_file": "VRN2_HandleAll_v0114_boot.txt",
+  "boot_line_sha256": "26774199d3e6f22d1f1b9ce27705077f42439ddbd639010d32773bc55e85ddc6",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0166.zip",
+  "sha256": "68d6d03d3fd1634cab5d0870c708f7f736dfa23c349bcb0ced08261a143d640e",
+  "bytes": 7834786,
+  "layout": "VRN2_Closeout_v0166/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0166.py",
+  "sha256": "06bf8b2a3719fd571c76a64c0e6bc348921f73730b4d7c8a1ad574151036cd12"
+ },
+ "results": {
+  "manager_v0258_selftest": [
+   "[PASS] v0258: table repair before the books — label half-line pairing and two-level period header re-grid, both confirmed by the second reader · unplaced rows to Rejected · 14 checks · failed 0"
+  ],
+  "launcher_v0166_selftest": [
+   "[PASS] v0166: manager v0258 is the active manager (table repair before the books: half-line label pairing · two-level period header re-grid · both confirmed by the second reader · unplaced rows to Rejected) · v0257 kept as PRIOR"
+  ],
+  "roundall_v0122_selftest": [
+   "[PASS] 84 v0122:套件 v0166(啟動器 v0166 · runtime v0158 · 收據 VRN2_Closeout_v0166.json)· ③ 自測跑管理器 v0258(它再跑 v0257 / v0255 的自測)· 不再單跑 v0257",
+   "[PASS] 85 v0122:輸出冊缺項 → 人工 · 提示先把原 PDF 上傳給 AI 對(有年度表 = 擷取漏 · 要修)· 不再寫「原文沒有就是真的沒有」",
+   "[PASS] VRN2_RoundAll v0122 --selftest · 88 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0",
+   "b_full rc 0"
+  ],
+  "e2e": {
+   "auto1": [
+    "[GREEN] boot: Handle-All v0114 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0166 以前做的 · 管理器 v0258 要重做輸出冊:補回原文有、以前漏掉的年度表)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 套件就位 <sbx>/home/Downloads/VRN2_Closeout_v0166(SHA-256 68d6d03d3fd1 · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "      [計] v0258 表格修補:科目半行配對 8 列(2 表)· 子表頭重排 0 表 0 列 · 對不上 0 列(剔除冊) · 晶心科(6533,N,中立)-CTBC25120 P5·F·01·TB 科目半行配對 2 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·02·TB 科目半行配對 6 列",
+    "    → GREEN ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4937 筆 · {'ALIGNED': 4410, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentVerify_",
+    "  [計] v0258 表格修補:科目半行配對 8 列(2 表)· 子表頭重排 0 表 0 列 · 對不上 0 列(剔除冊) · 晶心科(6533,N,中立)-CTBC25120 P5·F·01·TB 科目半行配對 2 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·02·TB 科目半行配對 6 列",
+    "  [計] ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 14 份 · 欄位檢查 {'PASS': 193, 'OCR': 2} · 一標題四重點 14 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 4937 筆 · {'ALIGNED': 4410, 'TRANSALIGNED': 75, 'SUBALIGNED': 452} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentVerify_202610",
+    "  [計] ⑪ 獨立驗證 · 年度數據 4937 筆 · {'ALIGNED': 4410, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 8 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 8 項",
+    "  [人工] 1 項"
+   ],
+   "auto2": [
+    "[GREEN] boot: Handle-All v0114 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0166.json · 上一輪輸出冊 有(輸出冊是啟動器 v0166 做的 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0166(SHA-256 68d6d03d3fd1 · 11 檔逐檔相符)· <sbx>/home/Downloads/VRN2_Closeout_v0166",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 6 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 6 項",
+    "  [人工] 1 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ],
+   "b_full": [
+    "[GREEN] boot: Handle-All v0114 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0166 以前做的 · 管理器 v0258 要重做輸出冊:補回原文有、以前漏掉的年度表)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 套件就位 <sbx-b>/home/Downloads/VRN2_Closeout_v0166(SHA-256 68d6d03d3fd1 · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "      [計] v0258 表格修補:科目半行配對 60 列(6 表)· 子表頭重排 1 表 20 列 · 對不上 0 列(剔除冊) · Daiwa-6278 20260521.pdf P2·F·01·TB 子表頭重排 20 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·01·TB 科目半行配對 2 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·02·TB 科目半行配對 6 列 | 欣銓(3264,B",
+    "    → GREEN ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 16 份 · 欄位檢查 {'PASS': 210, 'OCR': 2} · 一標題四重點 16 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 5192 筆 · {'ALIGNED': 4665, 'SUBALIGNED': 452, 'TRANSALIGNED': 75} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentVerify_",
+    "  [計] v0258 表格修補:科目半行配對 60 列(6 表)· 子表頭重排 1 表 20 列 · 對不上 0 列(剔除冊) · Daiwa-6278 20260521.pdf P2·F·01·TB 子表頭重排 20 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·01·TB 科目半行配對 2 列 | 晶心科(6533,N,中立)-CTBC25120 P5·F·02·TB 科目半行配對 6 列 | 欣銓(3264,B_買進)-CTBC260918 P5",
+    "  [計] ⑪ 獨立驗證(背景 · 只讀) · 錯值 0 · 基本資料 16 份 · 欄位檢查 {'PASS': 210, 'OCR': 2} · 一標題四重點 16 份 · 欄位檢查 {'PASS': 65, 'OCR': 5} · 年度數據 5192 筆 · {'ALIGNED': 4665, 'SUBALIGNED': 452, 'TRANSALIGNED': 75} · U/I「驗證過的輸出」已寫回 · 報告 VRN2_IndependentVerify_202610",
+    "  [計] ⑪ 獨立驗證 · 年度數據 5192 筆 · {'ALIGNED': 4665, 'SUBALIGNED': 452, 'TRANSALIGNED': 75}",
+    "[YELLOW] ⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點) · 個股 16 份 · 基本資料 16 · 年度數據 5192 筆 · 一標題四重點 16 · 缺項 4 份",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 8 項",
+    "  [人工] 6 項",
+    "    · ⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點) · 個股 16 份 · 基本資料 16 · 年度數據 5192 筆 · 一標題四重點 16 · 缺項 4 份 · 缺項:Daiwa-6278 20260521.pdf:TITLE、四重點 0/4 | 欣銓(3264,B_買進)-CTBC260918.pdf:TITLE、四重點 0/4 | Daiwa-6"
+   ]
+  },
+  "confirm_list": [
+   "[待核] H-764d04e4 · ⑥ 四點原文核對 · REVIEW_OCR · {\"PASS\": 52, \"OCR_PENDING\": 4} · 不過 4 點:MQ-1560 20260520.pdf 第 1 點 OCR_PENDING(image page; OCR excerpt needs image verification) | MQ-1560 20260520.pdf 第 2 點 ",
+   "       你核對過原文 / 做了決定 → python \"<sbx>/home/Downloads/VRN2_RoundAll_v0122.py\" --confirm H-764d04e4"
+  ],
+  "closeout_states": {
+   "auto1": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 8,
+     "人工": 1
+    },
+    "items": [
+     [
+      "VCGC",
+      "② VRN-2 套件",
+      null
+     ],
+     [
+      "VCGC",
+      "② 擷取 Python(⑥e / ⑥f)",
+      null
+     ],
+     [
+      "VCGC",
+      "② 擷取 Python · VDF 版本界線(⑥e)",
+      null
+     ],
+     [
+      "彙總",
+      "④ 跑啟動器 ActivateVRN-2_v0166.py",
+      null
+     ],
+     [
+      "VCGC",
+      "⑤ 修 · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(Consensu",
+      null
+     ],
+     [
+      "彙總",
+      "⑥ 收尾收據",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ③b OCR 隔離環境",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market",
+      null
+     ],
+     [
+      "人工",
+      "⑥ 四點原文核對",
+      "H-764d04e4"
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ① 結果計算驗證",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ⑦ 基本資料雙讀",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ Combined 冊",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ ⑥e 擷取 Python(VDF 版本界線)",
+      null
+     ]
+    ]
+   },
+   "auto2": {
+    "state": "BLOCKED",
+    "per_owner": {
+     "VCGC": 6,
+     "人工": 1
+    },
+    "items": [
+     [
+      "VCGC",
+      "⑤ 修 · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(Consensu",
+      null
+     ],
+     [
+      "彙總",
+      "⑥ 收尾收據",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ③b OCR 隔離環境",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ⑥f 共識合併(FactSet / YFinance → Combined 冊)",
+      null
+     ],
+     [
+      "人工",
+      "⑥ 四點原文核對",
+      "H-764d04e4"
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ① 結果計算驗證",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ⑦ 基本資料雙讀",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ Combined 冊",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ ⑥e 擷取 Python(VDF 版本界線)",
+      null
+     ]
+    ]
+   },
+   "b_full": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 8,
+     "VRN-2": 3,
+     "人工": 6
+    },
+    "items": [
+     [
+      "VCGC",
+      "② VRN-2 套件",
+      null
+     ],
+     [
+      "VCGC",
+      "② 擷取 Python(⑥e / ⑥f)",
+      null
+     ],
+     [
+      "VCGC",
+      "② 擷取 Python · VDF 版本界線(⑥e)",
+      null
+     ],
+     [
+      "彙總",
+      "④ 跑啟動器 ActivateVRN-2_v0166.py",
+      null
+     ],
+     [
+      "VCGC",
+      "⑤ 修 · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(Consensu",
+      null
+     ],
+     [
+      "彙總",
+      "⑥ 收尾收據",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ③b OCR 隔離環境",
+      null
+     ],
+     [
+      "VRN-2",
+      "⑥ 步驟 ⑧ 完成判定",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market",
+      null
+     ],
+     [
+      "人工",
+      "⑥ 四點原文核對",
+      "H-1be341c7"
+     ],
+     [
+      "人工",
+      "⑥ 輸出缺項",
+      "H-3364a6bd"
+     ],
+     [
+      "人工",
+      "⑥ 輸出缺項",
+      "H-124bbeac"
+     ],
+     [
+      "人工",
+      "⑥ 輸出缺項",
+      "H-aeedb695"
+     ],
+     [
+      "人工",
+      "⑥ 輸出缺項",
+      "H-34cac748"
+     ],
+     [
+      "人工",
+      "⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點)",
+      "H-6d1019bf"
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ① 結果計算驗證",
+      null
+     ],
+     [
+      "VRN-2",
+      "⑥ 完成判定 · ⑤ 一標題四重點",
+      null
+     ],
+     [
+      "VRN-2",
+      "⑥ 完成判定 · ⑥ AUDIT 新輸入",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · ⑦ 基本資料雙讀",
+      null
+     ],
+     [
+      "提醒",
+      "⑥ 完成判定 · 輸出值驗證(第二讀取器逐值回查 · 年度數據對欄)",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ Combined 冊",
+      null
+     ],
+     [
+      "VCGC",
+      "⑥ ⑥e 擷取 Python(VDF 版本界線)",
+      null
+     ]
+    ]
+   }
+  },
+  "originals": [
+   "[驗證] 年度數據 685 筆 · {'ALIGNED': 685}",
+   "  3014TT-20231005.pdf                            {'ALIGNED': 430}",
+   "  Daiwa-6278_20260521.pdf                        {'ALIGNED': 30}",
+   "  欣銓(3264,B_買進)-CTBC260918.pdf                   {'ALIGNED': 225}"
+  ],
+  "regression_14": [
+   "[驗證] 年度數據 4937 筆 · {'ALIGNED': 4410, 'TRANSALIGNED': 75, 'SUBALIGNED': 452}",
+   "  晶心科(6533,N,中立)-CTBC251208.pdf                  {'ALIGNED': 111}"
+  ],
+  "regression_books": "FinancialData 4905 → 4937 (removed 0 · added 32 晶心科 6533 P5) · Rejected 744 = 744 (0 changed) · BasicInfo / Summary identical",
+  "not_run": "the desktop itself (next run: auto → full because the last receipt is v0164 · books rebuilt by v0258) · 華南-6143 original (not uploaded) · the operator's own --confirm"
+ }
+}
