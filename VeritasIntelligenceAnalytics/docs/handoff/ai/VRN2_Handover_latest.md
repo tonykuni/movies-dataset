@@ -93,3 +93,24 @@ NEXT: <收尾頁印的下一步>
    ```
 3. 桌機那 4 本 VRN-2 自己的冊上船:貼 `VRN2_ChainShip_v0101.md` §3 的一鍵(`ship` 先找本機的冊 → 只增上船)。`VRN2_Publish_Config_v0100.json` 若有憑證路徑,先拿掉再跑。
 4. 跑第 3 節的一行入口(repair)→ 收尾頁 REVIEW → 看原文 → `--confirm`。兩項人工都確認、華南 6143 有交代之後,收尾頁才會到 PASS / DATA_GAP。
+
+## 9. 更新 · 2026-11-01 夜(U/I:右面板第一頁「00 系統現況」· v0168)
+
+操作員令:以目前 HTML U/I 為基礎,把 `taiwan_stock_data_matrix.html` 的版面與字體階層加進視覺鎖,右面板第一頁放系統現況 SUMMARY(含 DataFrame 表頭),原有功能不改。
+
+- **新版**:Workbench v0103 · 啟動器 v0168 · 套件 v0168 · RoundAll v0124 · Handle-All v0116(發行夾 `vrn2_release_v0168`)。輸出冊不變。
+- **00 系統現況**(開頁預設):輸出冊 × 來源 × 端點 × 真實欄名 × 燈 · 本輪步驟 · VDF / VCGC / VRN-1 只讀互看 · 點一列看全部欄 · 圖例篩選。01 ~ 04 不動。
+- **版本鎖**:`VRN2_FreezeLock_v0101.json`(v0100 不動)。第 8 節第 2 步的核對一行,把檔名 `v0100` 換成 `v0101` 再貼。
+- **取件分支**:這一輪放在 `claude/vrn2-closeout-authorization-y4ixl7`(退路 main)。
+
+### 桌機要做的
+
+1. 開新的 PowerShell 7 視窗。要經 VIA 網路工具抓共識,先貼 `$env:VIA_SCRAPE_CONSENT = 'YES'`(你決定)。
+2. 貼這一行(第 3 節那行換成這行):
+   ```powershell
+   $r="$HOME\OneDrive\Documents\movies-dataset";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;$c=(git -C $r show "FETCH_HEAD:VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0168/VRN2_HandleAll_v0116_boot.txt")-join"`n";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]][char[]]$c))).Hash-eq'd50fd1ac12b33ac6527b391eb3c85f1fe7f114ea3d6dfc2036fc357c84d4df7d'){iex $c}else{'[RED] boot SHA-256 mismatch - not run'}
+   ```
+   第一行應是 `[GREEN] boot: Handle-All v0116 SHA-256 OK`。auto 選 repair(幾分鐘),⑤ 會把 Workbench v0103 補放進 runtime 夾並重渲染。
+3. 自動跳出的 Workbench 開頁就是「00 系統現況」。收尾仍應是 REVIEW(VRN-2 0 · 人工 2 · 資料源 3)。人工兩項照第 3 節第 4 步。
+
+雲端沒有 PowerShell:這一行沒在 pwsh 實跑過,雜湊在 Python 端核過。若印 `[RED]`,貼回給 AI。
