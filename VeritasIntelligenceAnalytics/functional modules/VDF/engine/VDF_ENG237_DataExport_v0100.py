@@ -223,6 +223,15 @@ def resolve_dest(dest: str | None, env: dict | None = None, home_dir: Path | Non
     return Path(d), "指定夾"
 
 
+def date_exprs(date_col: str) -> tuple:
+    """日期欄 → (日鍵式, 月鍵式)。用長度分辨 'YYYYMMDD'(8)與 'YYYYMM'(6)/ 'YYYY-MM'(7),免得 202612 被當成 2026-01-02。"""
+    q = _qi(date_col)
+    v = "trim(CAST(%s AS VARCHAR))" % q
+    day = "coalesce(try_cast(%s AS DATE), CASE WHEN length(%s) = 8 THEN try_strptime(%s, '%%Y%%m%%d')::DATE END)" % (q, v, v)
+    mon = "CASE WHEN length(%s) = 6 THEN try_strptime(%s, '%%Y%%m')::DATE WHEN length(%s) = 7 THEN try_strptime(%s, '%%Y-%%m')::DATE END" % (v, v, v, v)
+    return day, mon
+
+
 def build_query(con, table: str, cols: list | None, date_col: str | None, key_col: str | None, d_from: str | None, d_to: str | None,
                 codes: list | None, limit: int | None) -> tuple:
     have = columns_of(con, "src", table)
@@ -238,13 +247,14 @@ def build_query(con, table: str, cols: list | None, date_col: str | None, key_co
     if d_from or d_to:
         if not date_col:
             raise ValueError("表 %s 認不出日期欄(認得的:%s)→ 不能依期間取" % (table, ", ".join(DATE_COLS[:8])))
-        expr = "coalesce(try_cast(%s AS DATE), try_strptime(CAST(%s AS VARCHAR), '%%Y%%m%%d')::DATE)" % (_qi(date_col), _qi(date_col))
+        day, mon = date_exprs(date_col)
+        # 日鍵(DATE / 'YYYY-MM-DD' / 'YYYYMMDD')照日比;月鍵('YYYYMM' / 'YYYY-MM',如月營收 ym)照月比:那個月和期間有交集就收
         if d_from:
-            where.append("%s >= CAST(? AS DATE)" % expr)
-            params.append(d_from)
+            where.append("(%s >= CAST(? AS DATE) OR (%s IS NULL AND %s >= date_trunc('month', CAST(? AS DATE))))" % (day, day, mon))
+            params += [d_from, d_from]
         if d_to:
-            where.append("%s <= CAST(? AS DATE)" % expr)
-            params.append(d_to)
+            where.append("(%s <= CAST(? AS DATE) OR (%s IS NULL AND %s <= CAST(? AS DATE)))" % (day, day, mon))
+            params += [d_to, d_to]
     if codes:
         if not key_col:
             raise ValueError("表 %s 認不出代號欄 → 不能依代號取" % table)
@@ -302,6 +312,7 @@ def export(table: str, db: str | None = None, d_from: str | None = None, d_to: s
         base = re.sub(r"[^\w.\-]+", "_", base)
         target = out_dir / ("%s.%s" % (base, fmt))
         rows = con.execute("SELECT count(*) FROM (%s)" % sql, params).fetchall()[0][0]
+        selected, truncated = rows, False
         if fmt == "xlsx" and rows > XLSX_MAX:
             raise ValueError("xlsx 上限 %d 列,這次 %d 列 → 縮小範圍或改 csv / parquet" % (XLSX_MAX, rows))
         if fmt == "csv":
@@ -324,6 +335,7 @@ def export(table: str, db: str | None = None, d_from: str | None = None, d_to: s
             con.execute(sql, params).df().to_excel(target, index=False)
         else:
             df = con.execute(sql + ("" if limit else " LIMIT %d" % MD_MAX), params).df()
+            truncated, rows = len(df) < selected, len(df)          # 收據寫實際寫進檔的列數;截掉就照實標
             cols_ = [str(c) for c in df.columns]
             lines = ["| " + " | ".join(cols_) + " |", "|" + "---|" * len(cols_)]
             for rec in df.itertuples(index=False):
@@ -332,7 +344,8 @@ def export(table: str, db: str | None = None, d_from: str | None = None, d_to: s
     finally:
         con.close()
     rec = {"ts": datetime.datetime.now().isoformat(timespec="seconds"), "tag": TAG, "table": table, "db": f.name, "db_path": str(f), "home": str(h), "home_from": h_why,
-           "from": d_from, "to": d_to, "codes": codes or [], "cols": cols or [], "format": fmt, "rows": rows, "file": str(target), "dest": d_why,
+           "from": d_from, "to": d_to, "codes": codes or [], "cols": cols or [], "format": fmt, "rows": rows, "rows_selected": selected,
+           "truncated": truncated, "file": str(target), "dest": d_why,
            "bytes": target.stat().st_size, "sha256": _sha256(target), "secs": round(time.time() - t0, 2), "sql": sql, "params": params,
            "date_col": date_col, "key_col": key_col}
     led = Path(ledger or (VIA / "VIA_Reports" / "vdf" / "export" / "EXPORT_runs.jsonl"))
@@ -376,8 +389,10 @@ def main(argv=None) -> int:
             print("[VDF 取資料] RED · %s" % exc)
             return 1
         print(json.dumps(r, ensure_ascii=False, indent=1, default=str) if "--json" in a else
-              "[VDF 取資料] GREEN · %s.%s · %d 列 · %s · %s · %s 位元組 · sha256 %s · %.2f 秒" % (
-                  r["db"], r["table"], r["rows"], r["format"], r["file"], r["bytes"], r["sha256"][:12], r["secs"]))
+              "[VDF 取資料] %s · %s.%s · %d 列%s · %s · %s · %s 位元組 · sha256 %s · %.2f 秒" % (
+                  "YELLOW" if r.get("truncated") else "GREEN", r["db"], r["table"], r["rows"],
+                  "(md 上限 %d 列,共選到 %d 列只寫前 %d 列;要全部請改 csv / parquet)" % (MD_MAX, r["rows_selected"], r["rows"]) if r.get("truncated") else "",
+                  r["format"], r["file"], r["bytes"], r["sha256"][:12], r["secs"]))
         return 0
     print("用法:python %s tables [--home 家] | export --table T [--db 庫] [--from YYYY-MM-DD] [--to YYYY-MM-DD] [--codes a,b] [--cols a,b] "
           "[--format csv|parquet|json|xlsx|md] [--dest onedrive|gdrive|夾] [--home 家] [--limit N] · --selftest" % Path(__file__).name)
@@ -415,6 +430,8 @@ def selftest() -> int:
                     "('2026-02-03','2317.TW',200,20),('2026-02-03','6488.TWO',500,30)")
         con.execute("CREATE TABLE tw_monthly_revenue (ym VARCHAR, code VARCHAR, revenue BIGINT, \"名稱\" VARCHAR)")
         con.execute("INSERT INTO tw_monthly_revenue VALUES ('20260101','2330',100,'台積電'),('20260201','2330',110,'台積電')")
+        con.execute("CREATE TABLE tw_monthly_ym (ym VARCHAR, code VARCHAR, revenue BIGINT)")
+        con.execute("INSERT INTO tw_monthly_ym VALUES ('202606','2330',1),('202607','2330',2),('2026-08','2330',3),('202612','2330',4)")
         con.close()
         before = _sha256(db)
         env = {"VIA_VDF_DB_HOME": str(home.parent)}
@@ -439,6 +456,21 @@ def selftest() -> int:
             pq == 3 and len(js) == 3 and (outs["xlsx"].get("rows") == 3 or "openpyxl" in outs["xlsx"].get("err", "")) and outs["md"].get("rows") == 3)
         r2 = export("tw_monthly_revenue", d_from="2026-02-01", fmt="csv", dest=str(tmp / "out"), env=env, ledger=led)
         chk("④ 'YYYYMMDD' 期間也認(ym 20260201 ≥ 2026-02-01 → 1 列)· 中文欄名照帶", r2["rows"] == 1 and "名稱" in Path(r2["file"]).read_text(encoding="utf-8-sig"))
+        m1 = export("tw_monthly_ym", d_from="2026-07-15", d_to="2026-07-31", fmt="csv", dest=str(tmp / "out"), env=env, ledger=led)
+        m2 = export("tw_monthly_ym", d_from="2026-07-01", d_to="2026-08-10", fmt="csv", dest=str(tmp / "out"), env=env, ledger=led)
+        m3 = export("tw_monthly_ym", d_from="2026-12-01", d_to="2026-12-31", fmt="csv", dest=str(tmp / "out"), env=env, ledger=led)
+        m4 = export("tw_monthly_ym", d_from="2026-01-01", d_to="2026-01-31", fmt="csv", dest=str(tmp / "out"), env=env, ledger=led)
+        chk("④b 月鍵照月比:'202607' 落在 7/15–7/31 → %d 列 · 7/1–8/10 收 202607 + '2026-08' → %d 列 · 202612 只在 12 月(%d)、不被當成 2026-01-02(1 月 %d)"
+            % (m1["rows"], m2["rows"], m3["rows"], m4["rows"]), (m1["rows"], m2["rows"], m3["rows"], m4["rows"]) == (1, 2, 1, 0))
+        _md = globals()["MD_MAX"]
+        globals()["MD_MAX"] = 2
+        try:
+            mt = export("tw_daily_prices", fmt="md", dest=str(tmp / "out"), env=env, ledger=led)
+        finally:
+            globals()["MD_MAX"] = _md
+        md_rows = sum(1 for ln in Path(mt["file"]).read_text(encoding="utf-8").splitlines() if ln.startswith("| ") and "date" not in ln)
+        chk("④c md 截斷照實:上限 2 列 · 選到 %d 列 → 收據 rows %d(= 檔裡 %d 列)· truncated %s" % (mt["rows_selected"], mt["rows"], md_rows, mt["truncated"]),
+            mt["rows_selected"] == 5 and mt["rows"] == 2 == md_rows and mt["truncated"] is True)
         errs = []
         for kw in ({"cols": ["close; DROP TABLE x"]}, {"table": "nope"}, {"d_from": "2026/01/01"}, {"fmt": "exe"}):
             try:
@@ -458,10 +490,10 @@ def selftest() -> int:
         chk("⑦ 真的寫進雲端同步夾(%s · %d 列)" % (Path(rr["file"]).parent, rr["rows"]), Path(rr["file"]).parent == od / "VDF_Export" and rr["rows"] == 5)
         lines = [json.loads(x) for x in led.read_text(encoding="utf-8").splitlines()]
         chk("⑧ 收據:每次一行(%d 行)· 列數 · 檔 · SHA-256 · 參數化 SQL(值不進 SQL 字串)" % len(lines),
-            len(lines) >= 7 and all(x.get("sha256") and x.get("rows") is not None for x in lines) and "2330" not in lines[0]["sql"] and "2330" in lines[0]["params"])
+            len(lines) >= 12 and all(x.get("sha256") and x.get("rows") is not None for x in lines) and "2330" not in lines[0]["sql"] and "2330" in lines[0]["params"])
         tabs = list_tables(home.parent)
         tp = next((t for t in tabs if t.get("table") == "tw_daily_prices"), {})
-        chk("⑨ tables:列出庫 · 表 · 欄位 · 認得的日期欄(date)/ 代號欄(ticker)", tp.get("date_col") == "date" and tp.get("key_col") == "ticker" and len(tabs) == 2)
+        chk("⑨ tables:列出庫 · 表 · 欄位 · 認得的日期欄(date)/ 代號欄(ticker)", tp.get("date_col") == "date" and tp.get("key_col") == "ticker" and len(tabs) == 3)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     src = Path(__file__).read_text(encoding="utf-8")

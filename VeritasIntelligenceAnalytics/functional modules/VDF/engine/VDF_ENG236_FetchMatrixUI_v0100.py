@@ -301,7 +301,7 @@ def build_model(books: dict, dbc: dict | None = None, launch: dict | None = None
     if mh:
         mgr = str(max(mh, key=_vnum))
     return {
-        "export": {"manager": mgr, "python": "python", "formats": ["csv", "parquet", "json", "xlsx", "md"],
+        "export": {"manager": mgr, "python": "python", "formats": ["csv", "parquet", "json", "xlsx", "md"], "home": (dbc or {}).get("home") or None,
                    "dests": [["onedrive", "OneDrive 雲端硬碟"], ["gdrive", "Google 雲端硬碟"], ["", "本機(VIA_Reports/vdf/export)"], ["custom", "自訂資料夾"]]},
         "tag": TAG, "ts": now or datetime.datetime.now().isoformat(timespec="seconds"),
         "books": {k: v[0] for k, v in books.items()}, "db_check": {"ts": (dbc or {}).get("ts"), "home": (dbc or {}).get("home"), "tag": (dbc or {}).get("tag")} if dbc else None,
@@ -446,7 +446,7 @@ function exportBlock(d){var box=el('div',{'class':'xp'});box.appendChild(el('div
  box.appendChild(g);box.appendChild(field('自訂資料夾',cu));
  var ta=el('textarea',{rows:'3',readonly:'readonly'});box.appendChild(ta);
  var act=el('div',{'class':'act'}),btn=el('button',{type:'button'},'複製指令'),msg=el('span',{},'');act.appendChild(btn);act.appendChild(msg);box.appendChild(act);
- function upd(){var a=["$env:VIA_FROM_VCGC='YES';",XP.python||'python',q(XP.manager),'export','--table',q(d.table),'--db',q(d.db)];
+ function upd(){var a=["$env:VIA_FROM_VCGC='YES';",XP.python||'python',q(XP.manager),'export','--table',q(d.table),'--db',q(d.db)];if(XP.home)a.push('--home',q(XP.home));
   if(f.value)a.push('--from',f.value);if(t.value)a.push('--to',t.value);if(c.value.trim())a.push('--codes',q(c.value.replace(/\s+/g,'')));
   if(co.value.trim())a.push('--cols',q(co.value.replace(/\s+/g,'')));a.push('--format',fm.value);
   var dv=ds.value==='custom'?cu.value.trim():ds.value;if(dv)a.push('--dest',q(dv));ta.value=a.join(' ');}
@@ -725,6 +725,8 @@ def selftest() -> int:
     chk("⑮ 取出資料:明細區組 export 指令(期間 · 代號 · 欄位 · 格式 · OneDrive / Google 雲端 / 本機 / 自訂)· 指令走 VDF 管理員 %s · 值用 PowerShell 單引號跳脫"
         % Path(xp.get("manager") or "?").name, xp.get("manager") and "VDF_SystemManager_v" in xp["manager"] and {"onedrive", "gdrive"} <= {x[0] for x in xp.get("dests") or []}
         and "exportBlock" in page and "replace(/'/g,\"''\")" in page)
+    chk("⑮b 匯出指令帶 db check 的資料庫家(--home %s):矩陣看到哪本庫,指令就取哪本(不另行猜家)" % xp.get("home"),
+        xp.get("home") == fake_dbc["home"] and "a.push('--home',q(XP.home))" in page)
     tmp2 = Path(tempfile.mkdtemp(prefix="vdf_fm236s_"))
     try:
         pg = tmp2 / "X_latest.html"
