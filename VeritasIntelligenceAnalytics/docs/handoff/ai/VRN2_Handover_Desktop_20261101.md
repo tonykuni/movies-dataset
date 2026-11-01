@@ -73,3 +73,23 @@ NEXT: <收尾頁印的下一步>
 ## 7. 停下來的條件
 
 收尾頁 OPEN 且 VRN-2 > 0 · 開機行印 `[RED]` · 需要刪改既有版本檔 · 需要改 VRN-1 / VDF / VCGC / v1652 合規層 · 同家族連兩版仍不轉綠 → 停,貼回包給 AI。
+
+## 8. 更新 · 2026-11-01 晚(現役線已併 main · VRN-2 版本鎖)
+
+- **現役線已併進 main**:PR #583(合併提交 `0d5383a7`)· v0159 ~ v0167 共 14 筆 · 89 檔全新增 · Windows CI 三項綠。第 4 節第 1 條已完成:一行入口讀分支或 main 都拿得到 v0167。
+- **VRN-2 版本鎖**:`docs/handoff/ai/VRN2_FreezeLock_v0100.json`。鎖的是現役版本檔與 SHA-256,不是驗收:`closeout_state = REVIEW`(VRN-2 0 · 人工 2 · 資料源 3)。
+  鎖住後 VRN-2 不再出新版;要解鎖只能由操作員下令,出 `VRN2_FreezeLock_v0101.json`(只增,v0100 不動)。其他系統可以照這把鎖進行自己的 CLOSE OUT。
+
+### 桌機同步(讓桌機與 GitHub 一致 · 在 PowerShell 7 依序貼)
+
+1. 拉 main:
+   ```powershell
+   git -C "$HOME\OneDrive\Documents\movies-dataset" pull --ff-only origin main
+   ```
+   `--ff-only` 不成功 = 桌機有沒推的提交 → 先貼回給 AI,不要強推。
+2. 核對鎖(全部 OK 才算一致;只讀):
+   ```powershell
+   python -c "import json,hashlib,pathlib,sys;r=pathlib.Path(r'$HOME\OneDrive\Documents\movies-dataset');L=json.load(open(r/'VeritasIntelligenceAnalytics/docs/handoff/ai/VRN2_FreezeLock_v0100.json',encoding='utf-8'));bad=[f for f,h in L['files'].items() if not (r/f).is_file() or hashlib.sha256((r/f).read_bytes().replace(b'\r\n',b'\n')).hexdigest()!=h];print('[GREEN] VRN-2 鎖一致' if not bad else '[RED] 不一致: '+', '.join(bad))"
+   ```
+3. 桌機那 4 本 VRN-2 自己的冊上船:貼 `VRN2_ChainShip_v0101.md` §3 的一鍵(`ship` 先找本機的冊 → 只增上船)。`VRN2_Publish_Config_v0100.json` 若有憑證路徑,先拿掉再跑。
+4. 跑第 3 節的一行入口(repair)→ 收尾頁 REVIEW → 看原文 → `--confirm`。兩項人工都確認、華南 6143 有交代之後,收尾頁才會到 PASS / DATA_GAP。
