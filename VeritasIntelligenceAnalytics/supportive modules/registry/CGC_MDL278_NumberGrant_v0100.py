@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-r"""CGC_MDL278_NumberGrant v0100 — VCGC 核號:讀子系統(VDF · VRN-2)的核號請求 → 偵測三系統衝突 → 無衝突給號 → 三系統共用帳本
+r"""CGC_MDL278_NumberGrant v0100 — VCGC 收件:子系統(VDF · VRN-2 · VRN)的核號請求 → 候選冊 → CGC_MDL237 中央檢測與發號 → 核發冊
 
 操作員政策(2026-10-29;2026-11-01 重申):「SSOT REGEX 同義字 邏輯 政策等由 VDF VRN 生成 · 經 VCGC 檢測後無衝突給予編號 · VDF VRN 自動擷取編號 ·
   若有衝突由我跟 AI 解決後 VCGC 檢測無誤後給予編號及更新修正內容 · 子系統自動識別編號及更新內容 · 三個系統的 SSOT REGEX 同義字 政策 邏輯的帳本是相同的」。
-這是 VCGC 自己的模組(四系統對等,L123):只讀子系統的請求檔,不寫 VDF / VRN-2 的任何檔;子系統各自用自己的 SSOTSync apply 讀核發冊補號。
-  check(預設,零寫):蒐集請求 → 列可核發 · 衝突 · 沿用帳本號。
-  grant --apply:寫 supportive modules/registry/VCGC_NUMBER_GRANT_latest.json({grants:{鍵與暫編號: 核發號}, conflicts:[{key, with, why}]};
-       內容沒變不重寫)+ 共用帳本 VIA_SharedSSOT_Ledger_v0100.jsonl(只增:新號 · 新擁有者)。
-  請求檔:<VIA>/functional modules/*/contract/*_NUMBER_REQUEST_latest.json(VDF · VRN2 …)· <VIA>/VCGC/contract/(VCGC 自己提的)。
-  衝突(不給號,等人判):① 同一別名在不同系統 / 帳本對到不同統一路徑 ② 同一個鍵兩邊指紋不同 ③ 子系統自報的自撞 ④ 已核發的號內容被改了
-     (修好後重跑 grant;帳本號永不改、不回收)。
-  同內容同類(正則原文 · 別名對照 · 參數值 · 無內容時用指紋)= 同一個號 → 三系統共用一本帳。號格式 VIA-<類>-####(類照請求的 vcgc_kind)。
+這是 VCGC 自己的模組(四系統對等,L123):只讀子系統的請求檔,不寫 VDF / VRN-2 / VRN 的任何檔。
+本檔不發號:號只由 CGC_MDL237 中央編號(VIA_Numbering_SSOT / VIA_NumberBooks;VIA-<子系統>-<類>NNN)發,三系統共用這一本帳
+(CGC_MDL237 v0114「reuse central allocator, never invent IDs」)。本檔做三件事:
+  check(預設,零寫):蒐集請求 → 候選契約驗證(CGC_MDL237 validate_candidate)→ 跨系統衝突(中央檢測只比同 owner 同 scope;
+       這裡補:同一別名在不同系統對到不同目標 · 同一正則語意鍵在不同系統寫法不同)→ 合併進候選冊試算 → CGC_MDL237 make_plan 檢測。
+  intake --apply:合併後的候選冊寫成新版號檔 VIA_AssetCandidates_SSOT_vNNNN.json(舊資產照留;同身分換新版;契約不合 / 跨系統衝突的不收)。
+       之後:提交候選冊 → via-vcgc run CGC_MDL237_NumberingSystem manager sync --apply(中央發號,唯一寫號者)。
+  grant --apply:讀中央已發的號 → VCGC_NUMBER_GRANT_latest.json({grants:{登記鍵 · 候選編號 · 暫編號: 中央號},
+       assets:{登記鍵: {code, version, source_sha256}}, conflicts:[{key, system, with, why}]};內容沒變不重寫;來源記相對路徑)。
+       子系統各自用自己的 SSOTSync apply 讀(VDF_SSOTSync · VRN2_SSOTSync)。
+  請求檔:<VIA>/functional modules/*/contract/*_NUMBER_REQUEST_latest.json · <VIA>/VCGC/contract/;條目要附 asset(候選契約)才收,
+       沒附的照實列「無候選契約」(待該系統升級)。
 零網路;不匯入他系統程式;同意閘不讀不寫;不碰 TA-Lib。
 """
 from __future__ import annotations
@@ -31,11 +35,11 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import datetime
-import hashlib
+import importlib.util
 import json
-import os
 import re
 import sys
+import warnings
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -43,76 +47,36 @@ VIA = HERE.parents[1]
 ENGINE = "CGC_MDL278_NumberGrant"
 TAG = "v" + Path(__file__).stem.rsplit("_v", 1)[-1]
 GRANT_NAME = "VCGC_NUMBER_GRANT_latest.json"
-LEDGER_NAME = "VIA_SharedSSOT_Ledger_v0100.jsonl"
+CENTRAL_GLOB = "CGC_MDL237_NumberingSystem_v[0-9][0-9][0-9][0-9].py"
+SYS_OWNER = {"VDF": "VDF", "VRN-2": "VRN", "VRN2": "VRN", "VRN": "VRN", "VCGC": "VCGC"}
+SYNC_SOURCE = re.compile(r"^[a-z0-9]+-ssotsync:")       # 子系統 SSOTSync 送來的候選(其餘是操作員提案,不進核發冊)
+_C = None
 
 
 def now() -> str:
     return datetime.datetime.now().isoformat(timespec="seconds")
 
 
-def _sha16(s) -> str:
-    return hashlib.sha256(str(s).encode("utf-8")).hexdigest()[:16]
+def _vnum(p) -> int:
+    m = re.search(r"_v(\d{4})$", Path(p).stem)
+    return int(m.group(1)) if m else -1
 
 
-def request_files(via: Path = VIA) -> list:
-    out = sorted((via / "functional modules").glob("*/contract/*_NUMBER_REQUEST_latest.json"))
-    out += sorted((via / "VCGC" / "contract").glob("*_NUMBER_REQUEST_latest.json")) if (via / "VCGC" / "contract").is_dir() else []
-    return out
-
-
-CENTRAL_SSOT = "VIA_Numbering_SSOT_v0100.json"                 # CGC_MDL237 編號正本(SSOT · RGX · SYN 列)
-CENTRAL_BOOKS = {"PRMT": "VIA_NumberBooks/VIA_NumberBook_PRMT_v0100.jsonl", "PLCY": "VIA_NumberBooks/VIA_NumberBook_PLCY_v0100.jsonl"}
-SYS_TO_SUB = {"VDF": "VDF", "VRN-2": "VRN", "VRN2": "VRN", "VRN": "VRN", "VCGC": "VCGC"}
-
-
-def central_index(reg_dir: Path = HERE) -> dict:
-    """CGC_MDL237 已發的號(只讀):(子系統, 類, 名) → [號…]。名去掉 _v### 版尾(那邊一版一號,這邊一族一號)。"""
-    idx = {}
-
-    def put(sub, kind, name, code):
-        if sub and name and code:
-            idx.setdefault((sub, kind, re.sub(r"_v\d+$", "", str(name))), []).append(code)
-    f = Path(reg_dir) / CENTRAL_SSOT
-    if f.is_file():
-        try:
-            rows = json.loads(f.read_text(encoding="utf-8")).get("rows") or {}
-        except (OSError, ValueError):
-            rows = {}
-        for kind, lst in rows.items():
-            for r in lst if isinstance(lst, list) else []:
-                put(r.get("sub"), kind, r.get("name"), r.get("code"))
-    for kind, rel in CENTRAL_BOOKS.items():
-        b = Path(reg_dir) / rel
-        if b.is_file():
-            for i, ln in enumerate(b.read_text(encoding="utf-8").splitlines(), 1):
-                try:
-                    r = json.loads(ln)
-                except ValueError:
-                    idx.setdefault(("_bad", kind, rel), []).append(i)      # 壞列照實留著(只讀對照,不修 CGC_MDL237 的冊)
-                    continue
-                put(r.get("sub"), kind, r.get("name"), r.get("code"))
-    return idx
-
-
-def xref_mdl237(rows: list, idx: dict) -> dict:
-    """共用帳本號 → CGC_MDL237 號(同一東西兩套號的對照;不改任何一邊):冊 / 政策看族名 · 參數看參數名 · 別名看別名。"""
-    out = {}
-    for r in rows:
-        c = r.get("content")
-        for o in r.get("owners") or []:
-            sub, key = SYS_TO_SUB.get(o.get("system")), str(o.get("key") or "")
-            names = []
-            if r.get("kind") in ("SSOT", "PLCY"):
-                fam = key.split(":")[-1].split("|")[-1]
-                names = [("SSOT", fam), ("PLCY", fam)]
-            elif r.get("kind") == "PRMT" and isinstance(c, dict) and c.get("name"):
-                names = [("PRMT", str(c["name"]))]
-            elif r.get("kind") == "SYN" and isinstance(c, dict) and c.get("alias"):
-                names = [("SYN", str(c["alias"]))]
-            hits = sorted({x for kn in names for x in idx.get((sub, kn[0], kn[1]), [])})
-            if hits:
-                out[r["no"]] = hits[:8]
-    return out
+def central():
+    """CGC_MDL237 中央編號尾版(VCGC 自己的模組;只用它的候選契約 · 檢測 · 中央狀態讀取)。"""
+    global _C
+    if _C is None:
+        hits = sorted(HERE.glob(CENTRAL_GLOB), key=_vnum)
+        if not hits:
+            raise RuntimeError("找不到 CGC_MDL237_NumberingSystem 尾版")
+        sp = importlib.util.spec_from_file_location("_vcgc278_central_" + hits[-1].stem, hits[-1])
+        mod = importlib.util.module_from_spec(sp)
+        sys.modules[sp.name] = mod
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)
+            sp.loader.exec_module(mod)
+        _C = mod
+    return _C
 
 
 def _rel(f, via: Path) -> str:
@@ -123,179 +87,182 @@ def _rel(f, via: Path) -> str:
         return Path(f).name
 
 
+def request_files(via: Path = VIA) -> list:
+    out = sorted((via / "functional modules").glob("*/contract/*_NUMBER_REQUEST_latest.json"))
+    out += sorted((via / "VCGC" / "contract").glob("*_NUMBER_REQUEST_latest.json")) if (via / "VCGC" / "contract").is_dir() else []
+    return out
+
+
 def load_requests(via: Path = VIA) -> list:
     reqs = []
     for f in request_files(via):
         try:
             r = json.loads(f.read_text(encoding="utf-8-sig"))
         except (OSError, ValueError) as exc:
-            reqs.append({"from": f.parent.parent.name, "file": str(f), "error": "%s: %s" % (type(exc).__name__, exc), "items": []})
+            reqs.append({"from": f.parent.parent.name, "file": str(f), "error": "%s: %s" % (type(exc).__name__, exc), "items": [], "no_contract": 0})
             continue
-        items = list(r.get("ssot_items") or []) + list(r.get("program_items") or [])
-        # 舊格式(只有 pending 號、沒有 ssot_items 的類 / 指紋 / 內容):不核號 — 沒內容就無從偵測衝突,也可能是引擎號(引擎歸 CGC_MDL237 編號冊)
-        legacy = [] if items else [x for x in (r.get("pending") or []) if isinstance(x, str)]
-        reqs.append({"from": r.get("from") or f.parent.parent.name, "file": str(f), "items": items, "legacy": legacy, "self_conflicts": r.get("self_conflicts") or []})
+        raw = [x for x in list(r.get("ssot_items") or []) + list(r.get("program_items") or []) if isinstance(x, dict)]
+        items = [x for x in raw if isinstance(x.get("asset"), dict) and x.get("key")]
+        no_contract = len(raw) - len(items) if raw else len([x for x in r.get("pending") or [] if isinstance(x, str)])
+        reqs.append({"from": r.get("from") or f.parent.parent.name, "file": str(f), "items": items, "no_contract": no_contract,
+                     "self_conflicts": r.get("self_conflicts") or []})
     return reqs
 
 
-def content_id(it: dict) -> str:
-    """同內容同類 = 同一個號:正則看原文 · 別名看「別名=統一路徑」· 參數看「名=值」· 冊 / 程式看(系統 · 鍵 · 指紋)。"""
-    k, c = it.get("vcgc_kind") or it.get("kind") or "SSOT", it.get("content")
-    if k == "RGX" and isinstance(c, str):
-        return "RGX:" + _sha16(c)
-    if k == "SYN" and isinstance(c, dict) and c.get("alias"):
-        return "SYN:" + _sha16("%s=%s" % (str(c["alias"]).upper(), c.get("canonical")))
-    if k == "PRMT" and isinstance(c, dict) and c.get("name"):
-        return "PRMT:" + _sha16("%s=%s" % (c["name"], json.dumps(c.get("value"), ensure_ascii=False, sort_keys=True)))
-    return "%s:%s:%s" % (k, it.get("_sys"), it.get("key")) if k in ("SSOT", "PLCY") else "%s:%s" % (k, it.get("fingerprint") or _sha16(it.get("key")))
+def newest_book(book_dir: Path) -> Path | None:
+    hits = sorted(Path(book_dir).glob(central().BOOK_PATTERN), key=_vnum)
+    return hits[-1] if hits else None
 
 
-LEDGER_BAD: list = []      # 上一次讀帳本時壞掉的列號(照實報,不默吞;帳本只增,不就地修)
+def cross_conflicts(items: list) -> list:
+    """中央檢測只比同 owner 同 scope;三系統共用帳本要再比跨系統:同一別名 → 不同目標 · 同一正則語意鍵 → 不同寫法。"""
+    C, out = central(), []
+    groups = {}
+    for it in items:
+        a = it["asset"]
+        if a["asset_type"] == "SYNONYM":
+            for w in a["aliases"]:
+                groups.setdefault(("SYN", C.normalized(w)), []).append(it)
+        elif a["asset_type"] == "REGEX":
+            groups.setdefault(("RGX", C.normalized(a["semantic_key"])), []).append(it)
+    for (kind, term), grp in sorted(groups.items()):
+        systems = {g["_sys"] for g in grp}
+        vals = {C.normalized(str(g["asset"]["value"])) if kind == "SYN" else str(g["asset"]["value"]) for g in grp}
+        if len(systems) > 1 and len(vals) > 1:
+            for g in grp:
+                others = sorted({"%s:%s" % (o["_sys"], o["asset"]["value"]) for o in grp if o["_sys"] != g["_sys"]})
+                out.append({"key": g["key"], "system": g["_sys"], "with": " / ".join(others)[:200],
+                            "why": ("同一別名 %s 在不同系統對到不同目標" if kind == "SYN" else "同一正則語意鍵 %s 在不同系統寫法不同") % term})
+    return out
 
 
-def read_ledger(path: Path) -> list:
-    rows = []
-    LEDGER_BAD.clear()
-    if path.is_file():
-        for i, ln in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if not ln.strip():
-                continue
-            try:
-                rows.append(json.loads(ln))
-            except ValueError:
-                LEDGER_BAD.append(i)
-    return rows
-
-
-def plan(via: Path = VIA, ledger_path: Path | None = None) -> dict:
-    ledger_path = Path(ledger_path or (HERE / LEDGER_NAME))
-    led = read_ledger(ledger_path)
-    by_cid, by_key, used = {}, {}, {}
-    for r in led:
-        if r.get("cid") and r.get("no"):
-            by_cid.setdefault(r["cid"], r["no"])
-        for o in r.get("owners") or []:
-            by_key[(o.get("system"), o.get("key"))] = {"no": r["no"], "cid": r.get("cid")}
-        m = re.match(r"VIA-([A-Z]+)-(\d{4,})$", str(r.get("no") or ""))
-        if m:
-            used[m.group(1)] = max(used.get(m.group(1), 0), int(m.group(2)))
-    syn_led = {}
-    for r in led:
-        c = r.get("content")
-        if r.get("kind") == "SYN" and isinstance(c, dict) and c.get("alias"):
-            syn_led.setdefault(str(c["alias"]).upper(), (c.get("canonical"), r["no"]))
+def plan(via: Path = VIA, book_dir: Path = HERE, registered: list | None = None, legacy: list | None = None) -> dict:
+    C = central()
+    bp = newest_book(book_dir)
+    prior = C.read_book(bp) if bp else {"schema": "VIA.AssetCandidates.v1", "version": "1.0.0", "assets": []}
     reqs = load_requests(via)
-    items = []
-    for rq in reqs:
-        for it in rq["items"]:
-            if not isinstance(it, dict) or not it.get("key"):
-                continue
-            it = dict(it, _sys=rq["from"])
-            it["_cid"] = content_id(it)
-            items.append(it)
+    items = [dict(it, _sys=rq["from"]) for rq in reqs for it in rq["items"]]
     conflicts, bad = [], set()
 
     def conflict(it, with_, why):
         conflicts.append({"key": it["key"], "system": it["_sys"], "proposed_no": it.get("proposed_no"), "with": with_, "why": why})
         bad.add((it["_sys"], it["key"]))
-    syn_now = {}
     for it in items:
-        c = it.get("content")
-        if (it.get("vcgc_kind") or it.get("kind")) == "SYN" and isinstance(c, dict) and c.get("alias"):
-            a = str(c["alias"]).upper()
-            if a in syn_led and syn_led[a][0] != c.get("canonical"):
-                conflict(it, "帳本 %s" % syn_led[a][1], "別名 %s 帳本是 %s,這裡是 %s" % (a, syn_led[a][0], c.get("canonical")))
-            syn_now.setdefault(a, []).append(it)
-    for a, its in syn_now.items():
-        cans = {i["content"].get("canonical") for i in its}
-        if len(cans) > 1:
-            for i in its:
-                others = sorted({"%s:%s" % (j["_sys"], j["content"].get("canonical")) for j in its if j is not i})
-                conflict(i, " / ".join(others), "同一別名 %s 對到不同統一路徑 %s" % (a, " / ".join(sorted(map(str, cans)))))
-    keymap = {}
-    for it in items:
-        keymap.setdefault(it["key"], []).append(it)
-    for k, its in keymap.items():
-        fps = {i.get("fingerprint") for i in its}
-        if len({i["_sys"] for i in its}) > 1 and len(fps) > 1:
-            for i in its:
-                conflict(i, " / ".join(sorted({j["_sys"] for j in its if j is not i})), "同一個鍵兩邊內容(指紋)不同")
-    for rq in reqs:
-        for sc in rq.get("self_conflicts") or []:
-            it = next((i for i in items if i["_sys"] == rq["from"] and i["key"] == sc.get("key")), None)
-            if it:
-                conflict(it, rq["from"] + "(自撞)", sc.get("why") or "子系統自報自撞")
-    for it in items:
-        prev = by_key.get((it["_sys"], it["key"]))
-        if prev and prev.get("cid") and prev["cid"] != it["_cid"] and (it["_sys"], it["key"]) not in bad:
-            conflict(it, "帳本 %s" % prev["no"], "已核發 %s 的內容改了 → 待人判(沿用 %s 或改提新鍵)" % (prev["no"], prev["no"]))
-    grants, new_rows, reused = {}, [], 0
-    new_cid = {}
-    for it in sorted(items, key=lambda x: (x["_sys"], x["key"])):
-        if (it["_sys"], it["key"]) in bad:
+        try:
+            C.validate_candidate(it["asset"])
+        except (ValueError, TypeError, KeyError) as exc:
+            conflict(it, "VCGC 候選契約(CGC_MDL237)", "候選契約不合:%s" % exc)
             continue
-        prev = by_key.get((it["_sys"], it["key"]))
-        no = (prev or {}).get("no") or by_cid.get(it["_cid"]) or new_cid.get(it["_cid"])
-        if no:
-            reused += 1 if (prev or by_cid.get(it["_cid"])) else 0
-        else:
-            kind = it.get("vcgc_kind") or "SSOT"
-            used[kind] = used.get(kind, 0) + 1
-            no = "VIA-%s-%04d" % (kind, used[kind])
-            new_cid[it["_cid"]] = no
-        grants[it["key"]] = no
-        if it.get("proposed_no"):
-            grants[it["proposed_no"]] = no
-        if not prev:
-            new_rows.append({"no": no, "cid": it["_cid"], "kind": it.get("vcgc_kind"), "content": it.get("content"), "owners": [
-                {"system": it["_sys"], "key": it["key"], "proposed_no": it.get("proposed_no"), "src": it.get("src")}], "granted_at": now(), "by": "%s %s" % (ENGINE, TAG)})
-    return {"requests": [{"from": r["from"], "file": r["file"], "items": len(r["items"]), "legacy": len(r.get("legacy") or []), "error": r.get("error")} for r in reqs],
-            "items": len(items),
-            "grants": grants, "conflicts": conflicts, "new_rows": new_rows, "reused": reused, "ledger": str(ledger_path), "ledger_rows": len(led)}
+        if it["asset"]["owner"] != SYS_OWNER.get(it["_sys"], it["asset"]["owner"]):
+            conflict(it, "VCGC 收件", "owner %s 不是送件系統 %s" % (it["asset"]["owner"], it["_sys"]))
+    cross = cross_conflicts([it for it in items if (it["_sys"], it["key"]) not in bad])
+    for c in cross:
+        conflicts.append(dict(c, proposed_no=None))
+        bad.add((c["system"], c["key"]))
+    merged = list(prior["assets"])
+    index = {C.identity(a): i for i, a in enumerate(merged)}
+    added = replaced = 0
+    good = [it for it in items if (it["_sys"], it["key"]) not in bad]
+    for it in good:
+        a, idn = it["asset"], C.identity(it["asset"])
+        if idn not in index:
+            index[idn] = len(merged)
+            merged.append(a)
+            added += 1
+        elif merged[index[idn]] != a:
+            merged[index[idn]] = a
+            replaced += 1
+    over = len(merged) > C.MAX_CANDIDATES
+    if registered is None:
+        registered = list(C.BASE.load_state()["rows"].values())
+        legacy = [r for r in registered if not r.get("asset_intake") and r.get("kind") in ("SYN", "RGX")]
+    cp = C.make_plan(merged[:C.MAX_CANDIDATES], registered, legacy or [])
+    res = {C.identity(a): r for a, r in zip(merged, cp["results"])}
+    states = {}
+    for it in good:
+        r = res.get(C.identity(it["asset"])) or {"state": "OVER_LIMIT", "reasons": ["CANDIDATE_LIMIT"]}
+        states[r["state"]] = states.get(r["state"], 0) + 1
+        if r["state"] not in ("READY", "REGISTERED"):
+            conflict(it, "VCGC 中央檢測(CGC_MDL237)", "%s:%s" % (r["state"], " · ".join(r.get("reasons") or [])))
+    return {"requests": [{"from": r["from"], "file": r["file"], "items": len(r["items"]), "no_contract": r.get("no_contract", 0), "error": r.get("error")}
+                         for r in reqs],
+            "items": items, "conflicts": conflicts, "cross": len(cross), "states": states, "prior_book": bp, "prior": prior, "merged": merged,
+            "added": added, "replaced": replaced, "over_limit": over, "registered": registered}
 
 
-def grant(via: Path = VIA, apply: bool = False, grant_path: Path | None = None, ledger_path: Path | None = None) -> dict:
-    p = plan(via, ledger_path)
+def intake(via: Path = VIA, apply: bool = False, book_dir: Path = HERE, registered: list | None = None, legacy: list | None = None) -> dict:
+    p = plan(via, book_dir, registered, legacy)
+    changed = p["merged"] != p["prior"]["assets"]
+    out = None
+    if apply and changed and not p["over_limit"]:
+        bp = p["prior_book"]
+        out = Path(book_dir) / ("VIA_AssetCandidates_SSOT_v%04d.json" % ((_vnum(bp) + 1) if bp else 100))
+        m = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", str(p["prior"].get("version") or "1.0.0"))
+        ver = "%d.%d.0" % (int(m.group(1)), int(m.group(2)) + 1) if (m and bp) else "1.0.0"
+        out.write_text(json.dumps({"schema": "VIA.AssetCandidates.v1", "version": ver, "assets": p["merged"]}, ensure_ascii=False, indent=1) + "\n",
+                       encoding="utf-8")
+    p.update(verb="intake", changed=changed, applied=apply, book_out=str(out) if out else None)
+    p["line"] = _line(p, via, ("候選冊寫成 %s(下一步:提交 → via-vcgc run CGC_MDL237_NumberingSystem manager sync --apply)" % out.name) if out else
+                      ("超過候選上限 %d,不寫" % central().MAX_CANDIDATES if p["over_limit"] else ("候選冊不變" if apply else "乾跑(--apply 才寫)")))
+    return p
+
+
+def central_codes(registered: list) -> dict:
+    """中央已發的子系統候選號:登記鍵(source_pointer)→ 最新版的 {code, version, source_sha256, candidate_id, source_id}。"""
+    C, latest = central(), {}
+    for r in registered:
+        ca = r.get("candidate_asset")
+        if not (r.get("asset_intake") and isinstance(ca, dict) and SYNC_SOURCE.match(str(ca.get("source_id") or ""))):
+            continue
+        k = str(ca.get("source_pointer"))
+        if k not in latest or C.version_key(ca["version"]) > C.version_key(latest[k]["version"]):
+            latest[k] = {"code": r.get("code"), "version": ca["version"], "source_sha256": ca.get("source_sha256"), "candidate_id": ca.get("candidate_id"),
+                         "source_id": ca.get("source_id")}
+    return latest
+
+
+def grant(via: Path = VIA, apply: bool = False, grant_path: Path | None = None, book_dir: Path = HERE, registered: list | None = None,
+          legacy: list | None = None) -> dict:
+    p = plan(via, book_dir, registered, legacy)
     gp = Path(grant_path or (HERE / GRANT_NAME))
+    codes = central_codes(p["registered"])
+    grants, assets = {}, {}
+    for k, v in sorted(codes.items()):
+        grants[k] = v["code"]
+        grants[v["candidate_id"]] = v["code"]
+        assets[k] = {"code": v["code"], "version": v["version"], "source_sha256": v["source_sha256"]}
+    for it in p["items"]:
+        if it["key"] in codes and it.get("proposed_no"):
+            grants[it["proposed_no"]] = codes[it["key"]]["code"]
+    srcs = sorted(_rel(r["file"], via) for r in p["requests"])
+    body = {"grants": dict(sorted(grants.items())), "assets": dict(sorted(assets.items())), "conflicts": p["conflicts"]}
     old = {}
     if gp.is_file():
         try:
             old = json.loads(gp.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            old = {}
-    merged = dict(old.get("grants") or {})
-    for r in read_ledger(Path(p["ledger"])):                 # 核發冊可由共用帳本重建(帳本 = 正本;請求檔只放未核號的)
-        for o in r.get("owners") or []:
-            for k in (o.get("key"), o.get("proposed_no")):
-                if k and r.get("no"):
-                    merged[k] = r["no"]
-    merged.update(p["grants"])
-    srcs = sorted(_rel(r["file"], via) for r in p["requests"])
-    xref = xref_mdl237(read_ledger(Path(p["ledger"])) + p["new_rows"], central_index(gp.parent if grant_path else HERE))
-    body = {"grants": dict(sorted(merged.items())), "conflicts": p["conflicts"], "xref_mdl237": dict(sorted(xref.items()))}
-    changed = (body["grants"] != (old.get("grants") or {}) or body["conflicts"] != (old.get("conflicts") or [])
-               or srcs != (old.get("sources") or []) or body["xref_mdl237"] != (old.get("xref_mdl237") or {}))
-    lamp = "YELLOW" if (p["conflicts"] or LEDGER_BAD or any(r.get("legacy") or r.get("error") for r in p["requests"])) else "GREEN"
-    if apply:
-        if changed:
-            gp.parent.mkdir(parents=True, exist_ok=True)
-            gp.write_text(json.dumps(dict({"schema": "VIA.VCGC.NumberGrant.v1", "engine": "%s %s" % (ENGINE, TAG), "ts": now(),
-                                           "rule": "VCGC 偵測三系統衝突後核發;同內容同類同一個號(共用帳本 %s);號永不改、不回收;conflicts 修好後重跑;"
-                                                   "xref_mdl237 = 同子系統同名在 CGC_MDL237 編號冊的號(那邊一檔一版一號,這邊三系統同內容一號;同名可多個、不代表同值;只供追溯,不合併)" % LEDGER_NAME,
-                                           "sources": srcs}, **body), ensure_ascii=False, indent=1), encoding="utf-8")
-        if p["new_rows"]:
-            lp = Path(p["ledger"])
-            with open(lp, "a", encoding="utf-8") as fh:
-                for r in p["new_rows"]:
-                    fh.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
-    line = "[VCGC 核號] %s · 請求 %d 份(%s)· 條目 %d · 給號 %d(沿用 %d · 新號 %d)· 衝突 %d · 帳本 %d → %d 列%s · 對照 CGC_MDL237 號 %d · %s" % (
-        lamp, len(p["requests"]), " · ".join("%s %d%s%s" % (r["from"], r["items"], " · 舊格式 %d 號不核(待升 SSOTSync 格式)" % r["legacy"] if r.get("legacy") else "",
-                                                       " · 讀不到 %s" % r["error"] if r.get("error") else "") for r in p["requests"]) or "無", p["items"],
-        len({k for k in p["grants"] if not re.match(r"^[A-Z0-9]+-[A-Z]+-\d{4}$", k)}), p["reused"], len({r["no"] for r in p["new_rows"]}),
-        len(p["conflicts"]), p["ledger_rows"], p["ledger_rows"] + (len(p["new_rows"]) if apply else 0),
-        (" · 帳本壞列 %s(不就地修,待人判)" % LEDGER_BAD[:5]) if LEDGER_BAD else "", len(xref),
-        ("寫入核發冊" if changed else "核發冊不變") if apply else "乾跑(--apply 才寫)")
-    return dict(p, lamp=lamp, changed=changed, applied=apply, grant_file=str(gp), line=line)
+            old = {"_unreadable": True}                          # 讀不到 → 視為有變,重寫(舊檔不是正本;中央號才是)
+    changed = any(body[k] != (old.get(k) or ({} if k != "conflicts" else [])) for k in body) or srcs != (old.get("sources") or [])
+    if apply and changed:
+        gp.parent.mkdir(parents=True, exist_ok=True)
+        gp.write_text(json.dumps(dict({"schema": "VIA.VCGC.NumberGrant.v2", "engine": "%s %s" % (ENGINE, TAG), "ts": now(),
+                                       "rule": "號只由 CGC_MDL237 中央編號發(三系統共用一本帳);本冊是中央號的投影:登記鍵 / 候選編號 / 暫編號 → 中央號;"
+                                               "assets 給版本與內容指紋(子系統對得上才確認);conflicts = 跨系統衝突 · 契約不合 · 中央檢測擋下(人 + AI 修好後重跑)",
+                                       "sources": srcs}, **body), ensure_ascii=False, indent=1), encoding="utf-8")
+    p.update(verb="grant", changed=changed, applied=apply, grant_file=str(gp), central_codes=len(codes))
+    p["line"] = _line(p, via, ("寫入核發冊" if changed else "核發冊不變") if apply else "乾跑(--apply 才寫)")
+    return p
+
+
+def _line(p: dict, via: Path, tail: str) -> str:
+    warn = p["conflicts"] or p["over_limit"] or any(r.get("no_contract") or r.get("error") for r in p["requests"])
+    reqs = " · ".join("%s %d%s%s" % (r["from"], r["items"], " · 無候選契約 %d(待該系統升級)" % r["no_contract"] if r.get("no_contract") else "",
+                                      " · 讀不到 %s" % r["error"] if r.get("error") else "") for r in p["requests"]) or "無"
+    st = " · ".join("%s %d" % kv for kv in sorted(p["states"].items())) or "—"
+    extra = " · 中央號 %d" % p["central_codes"] if "central_codes" in p else ""
+    return "[VCGC 核號] %s · 請求 %d 份(%s)· 候選冊 %s %d → %d(新 %d · 改 %d)· 中央檢測 %s · 衝突待人判 %d(跨系統 %d)%s · %s" % (
+        "YELLOW" if warn else "GREEN", len(p["requests"]), reqs, p["prior_book"].name if p["prior_book"] else "無", len(p["prior"]["assets"]),
+        len(p["merged"]), p["added"], p["replaced"], st, len(p["conflicts"]), p["cross"], extra, tail)
 
 
 def main(argv=None) -> int:
@@ -303,16 +270,19 @@ def main(argv=None) -> int:
     if a[:1] == ["--selftest"]:
         return selftest()
     verb = a[0] if a and not a[0].startswith("--") else "check"
-    if verb not in ("check", "grant"):
-        print("用法:python %s check | grant [--apply] [--json] · --selftest" % Path(__file__).name)
+    if verb not in ("check", "intake", "grant"):
+        print("用法:python %s check | intake [--apply] | grant [--apply] [--json] · --selftest" % Path(__file__).name)
         return 2
-    r = grant(apply=(verb == "grant" and "--apply" in a))
+    if verb == "grant":
+        r = grant(apply="--apply" in a)
+    else:
+        r = intake(apply=(verb == "intake" and "--apply" in a))
     if "--json" in a:
-        print(json.dumps({k: v for k, v in r.items() if k != "new_rows"}, ensure_ascii=False, indent=1, default=str))
+        print(json.dumps({k: v for k, v in r.items() if k not in ("items", "merged", "prior", "registered")}, ensure_ascii=False, indent=1, default=str))
     else:
         print(r["line"])
-        for c in r["conflicts"][:20]:
-            print("  [衝突] %s · %s · 對 %s · %s" % (c["system"], c["key"], c["with"], c["why"]))
+        for c in r["conflicts"][:30]:
+            print("  [待人判] %s · %s · 對 %s · %s" % (c["system"], c["key"], c["with"], c["why"]))
     return 0
 
 
@@ -330,84 +300,82 @@ def selftest() -> int:
             f += 1
             print("  [FAIL] %s%s" % (name, (" · " + str(note)[:300]) if note else ""))
 
-    print("=== %s %s · 自測(兩系統請求 → 衝突 → 給號 → 帳本 → 再跑不改號)===" % (ENGINE, TAG))
+    print("=== %s %s · 自測(兩系統請求 → 契約 / 跨系統衝突 → 候選冊 → 中央檢測 → 中央號投影)===" % (ENGINE, TAG))
+    C = central()
+    chk("① 中央編號尾版在(%s)· 有候選契約 / 檢測 / 身分函式" % Path(C.__file__).name,
+        all(callable(getattr(C, n, None)) for n in ("validate_candidate", "make_plan", "identity", "read_book", "normalized", "version_key")))
+
+    def asset(sys_, key, atype, scope, skey, value, aliases=(), pos=(), neg=(), version="1.0.0", **kw):
+        a = {"candidate_id": re.sub(r"[^A-Za-z0-9_.:-]", "_", key), "ssot_code": None, "asset_type": atype, "owner": SYS_OWNER[sys_],
+             "source_id": "%s-ssotsync:Register" % sys_.lower().replace("-", ""), "source_pointer": key, "source_sha256": format(abs(hash(key + str(value))), "x").rjust(64, "0")[:64],
+             "version": version, "supersedes": None, "scope": scope, "semantic_key": skey, "name": "%s %s" % (sys_, skey), "value": value,
+             "risk_level": "LOW", "environment": "via_core", "libraries": [], "aliases": list(aliases), "positive": list(pos), "negative": list(neg)}
+        a.update(kw)
+        return a
     tmp = Path(tempfile.mkdtemp(prefix="vcgc_ng278_"))
     try:
         via = tmp / "VIA"
         reg = via / "supportive modules" / "registry"
         reg.mkdir(parents=True)
+        prior_asset = asset("VDF", "operator:twse_start", "INPT", "daily.start", "start_date", "2026-01-02", source_id="operator-proposal:1")
+        (reg / "VIA_AssetCandidates_SSOT_v0100.json").write_text(json.dumps({"schema": "VIA.AssetCandidates.v1", "version": "1.0.0", "assets": [prior_asset]}),
+                                                                encoding="utf-8")
 
-        def req(sys_, folder, items, self_c=None):
+        def req(sys_, folder, items):
             d = via / "functional modules" / folder / "contract"
             d.mkdir(parents=True, exist_ok=True)
-            (d / ("%s_NUMBER_REQUEST_latest.json" % folder)).write_text(json.dumps({"from": sys_, "ssot_items": items, "self_conflicts": self_c or []},
-                                                                                     ensure_ascii=False), encoding="utf-8")
-        rx = {"kind": "REGEX", "vcgc_kind": "RGX", "content": "^[1-9]\\d{3}$", "fingerprint": "f1"}
-        req("VDF", "VDF", [dict(rx, key="VDF:RGX:a", proposed_no="VDF-RGX-0001"),
-                           {"key": "VDF:SYN:START_DATE", "kind": "SYN", "vcgc_kind": "SYN", "content": {"alias": "START_DATE", "canonical": "time.start_date"},
-                            "proposed_no": "VDF-SYN-0001", "fingerprint": "s1"},
-                           {"key": "VDF:SYN:TIMEOUT", "kind": "SYN", "vcgc_kind": "SYN", "content": {"alias": "TIMEOUT", "canonical": "fetch.timeout_s"},
-                            "proposed_no": "VDF-SYN-0002", "fingerprint": "s2"},
-                           {"key": "VDF:SSOT:VDF_X_SSOT", "kind": "SSOT", "vcgc_kind": "SSOT", "proposed_no": "VDF-SSOT-0001", "fingerprint": "b1"}])
-        req("VRN-2", "VRN2", [dict(rx, key="REGEX|ticker", proposed_no="VRN2-REGEX-0003"),
-                              {"key": "SYN|timeout", "kind": "SYN", "vcgc_kind": "SYN", "content": {"alias": "timeout", "canonical": "http.timeout"},
-                               "proposed_no": "VRN2-SYN-0001", "fingerprint": "s9"}])
-        r = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        g = r["grants"]
-        chk("① 同一條正則(VDF 與 VRN-2 都提)= 同一個號 %s(三系統共用帳本)· 鍵與暫編號都對得到" % g.get("VDF:RGX:a"),
-            g.get("VDF:RGX:a") and g.get("VDF:RGX:a") == g.get("REGEX|ticker") == g.get("VDF-RGX-0001") == g.get("VRN2-REGEX-0003"))
-        ck = {(c["system"], c["key"]) for c in r["conflicts"]}
-        chk("② 衝突:同一別名 TIMEOUT 在 VDF 對 fetch.timeout_s、VRN-2 對 http.timeout → 兩邊都不給號、列待人判(含對方)",
-            ("VDF", "VDF:SYN:TIMEOUT") in ck and ("VRN-2", "SYN|timeout") in ck and "VDF:SYN:TIMEOUT" not in g, r["conflicts"])
-        chk("③ 沒衝突的照給:START_DATE · VDF 自己的冊(號格式 VIA-<類>-####)", re.match(r"VIA-SYN-\d{4}$", g.get("VDF:SYN:START_DATE") or "")
-            and re.match(r"VIA-SSOT-\d{4}$", g.get("VDF:SSOT:VDF_X_SSOT") or ""))
+            (d / ("%s_NUMBER_REQUEST_latest.json" % folder)).write_text(json.dumps({"from": sys_, "ssot_items": items}), encoding="utf-8")
+        vdf_items = [
+            {"key": "VDF:SYN:START_DATE", "proposed_no": "VDF-SYN-0001", "asset": asset("VDF", "VDF:SYN:START_DATE", "SYNONYM", "vdf.unified_alias", "START_DATE",
+                                                                                     "time.start_date", aliases=["START_DATE"])},
+            {"key": "VDF:SYN:TIMEOUT", "proposed_no": "VDF-SYN-0002", "asset": asset("VDF", "VDF:SYN:TIMEOUT", "SYNONYM", "vdf.unified_alias", "TIMEOUT",
+                                                                                  "fetch.timeout_s", aliases=["TIMEOUT"])},
+            {"key": "VDF:RGX:IN-01", "proposed_no": "VDF-RGX-0001", "asset": asset("VDF", "VDF:RGX:IN-01", "REGEX", "vdf.regex.code", "IN-01", "^[1-9][0-9]{3}$",
+                                                                                pos=["2330"], neg=["0050"])},
+            {"key": "VDF:RGX:IN-02", "proposed_no": "VDF-RGX-0002", "asset": asset("VDF", "VDF:RGX:IN-02", "REGEX", "vdf.regex.code", "IN-02", "^00[0-9]{3}A$")},
+            {"key": "VDF:PRM:BAD", "proposed_no": "VDF-PRM-0001", "asset": asset("VDF", "VDF:PRM:BAD", "CNFG", "vdf.param", "BAD", 1, ssot_code="VIA-VDF-PRMT001")},
+            {"key": "VDF:PRM:TIMEOUT_S", "proposed_no": "VDF-PRM-0002", "asset": asset("VDF", "VDF:PRM:TIMEOUT_S", "CNFG", "vdf.param", "TIMEOUT_S", 30)}]
+        req("VDF", "VDF", vdf_items)
+        req("VRN-2", "VRN2", [{"key": "SYN|timeout", "proposed_no": "VRN2-SYN-0001",
+                               "asset": asset("VRN-2", "SYN|timeout", "SYNONYM", "vrn2.alias", "timeout", "http.timeout", aliases=["timeout"])}])
+        (via / "functional modules" / "VRN" / "contract").mkdir(parents=True)
+        (via / "functional modules" / "VRN" / "contract" / "VRN_NUMBER_REQUEST_latest.json").write_text(json.dumps({"from": "VRN", "pending": ["VRN-E-0001"]}),
+                                                                                                         encoding="utf-8")
+        r = intake(via, apply=False, book_dir=reg, registered=[], legacy=[])
+        why = {(c["system"], c["key"]): c["why"] for c in r["conflicts"]}
+        chk("② 跨系統衝突:同一別名 TIMEOUT 在 VDF → fetch.timeout_s、VRN-2 → http.timeout → 兩邊都不收、列待人判(中央檢測只比同 owner 同 scope,這裡補)",
+            "不同目標" in why.get(("VDF", "VDF:SYN:TIMEOUT"), "") and "不同目標" in why.get(("VRN-2", "SYN|timeout"), ""), why)
+        chk("③ 契約不合不收:子系統自填中央號(CENTRAL_CODE_MUST_BE_NULL)· 正則沒附正反例(REGEX_CONTRACT)",
+            "CENTRAL_CODE_MUST_BE_NULL" in why.get(("VDF", "VDF:PRM:BAD"), "") and "REGEX_CONTRACT" in why.get(("VDF", "VDF:RGX:IN-02"), ""), why)
+        chk("④ 中央檢測(CGC_MDL237 make_plan):其餘 READY %s · 舊格式(只有 pending 號)照實列「無候選契約」· 黃燈" % r["states"],
+            r["states"].get("READY") == 3 and "無候選契約 1" in r["line"] and r["line"].startswith("[VCGC 核號] YELLOW"), r["line"])
+        r2 = intake(via, apply=True, book_dir=reg, registered=[], legacy=[])
+        book = json.loads((reg / "VIA_AssetCandidates_SSOT_v0101.json").read_text(encoding="utf-8"))
+        ids = [a["candidate_id"] for a in book["assets"]]
+        chk("⑤ intake --apply:候選冊出新版號檔 v0101(舊版不動 · 舊資產照留 · 收 3 條)· 中央 read_book 讀得過 · 冊版 %s" % book["version"],
+            r2["book_out"] and ids[0] == "operator:twse_start" and len(ids) == 4 and C.read_book(reg / "VIA_AssetCandidates_SSOT_v0101.json")
+            and json.loads((reg / "VIA_AssetCandidates_SSOT_v0100.json").read_text(encoding="utf-8"))["assets"] == [prior_asset] and book["version"] == "1.1.0", ids)
+        r3 = intake(via, apply=True, book_dir=reg, registered=[], legacy=[])
+        chk("⑥ 再收一次:沒變 → 不出新版", not r3["changed"] and not (reg / "VIA_AssetCandidates_SSOT_v0102.json").exists())
+        st_asset = vdf_items[0]["asset"]
+        rows = [{"code": "VIA-VDF-SYN777", "asset_intake": True, "candidate_asset": st_asset, "definition_sha256": C.digest(st_asset)},
+                {"code": "VIA-VDF-INPT001", "asset_intake": True, "candidate_asset": prior_asset, "definition_sha256": C.digest(prior_asset)}]
+        g = grant(via, apply=True, grant_path=reg / GRANT_NAME, book_dir=reg, registered=rows, legacy=[])
         gf = json.loads((reg / GRANT_NAME).read_text(encoding="utf-8"))
-        led = read_ledger(reg / LEDGER_NAME)
-        rx_row = next(x for x in led if x["no"] == g["VDF:RGX:a"])
-        chk("④ 核發冊格式同 VRN-2 apply 讀法({grants, conflicts})· 帳本每個擁有者一列(同內容的 VDF / VRN-2 兩列共用同一個號)", isinstance(gf.get("grants"), dict)
-            and isinstance(gf.get("conflicts"), list) and len({x["no"] for x in led}) == len(led) - 1 and len([x for x in led if x["no"] == rx_row["no"]]) == 2)
-        mt = (reg / GRANT_NAME).stat().st_mtime_ns
-        r2 = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        chk("⑤ 再跑一次:號不變 · 帳本不加 · 核發冊內容沒變不重寫", r2["grants"] == g and not r2["new_rows"] and not r2["changed"] and (reg / GRANT_NAME).stat().st_mtime_ns == mt)
-        req("VRN-2", "VRN2", [dict(rx, key="REGEX|ticker", proposed_no="VRN2-REGEX-0003"),
-                              {"key": "SYN|timeout", "kind": "SYN", "vcgc_kind": "SYN", "content": {"alias": "timeout", "canonical": "fetch.timeout_s"},
-                               "proposed_no": "VRN2-SYN-0001", "fingerprint": "s9b"}])
-        r3 = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        chk("⑥ 人 + AI 把 VRN-2 的別名改成同一個統一路徑 → 衝突解除 · 兩邊拿到同一個號 %s" % r3["grants"].get("VDF:SYN:TIMEOUT"),
-            not r3["conflicts"] and r3["grants"].get("VDF:SYN:TIMEOUT") == r3["grants"].get("SYN|timeout") and r3["grants"].get("VDF:SYN:TIMEOUT"))
-        req("VDF", "VDF", [{"key": "VDF:SYN:START_DATE", "kind": "SYN", "vcgc_kind": "SYN", "content": {"alias": "START_DATE", "canonical": "time.begin"},
-                            "proposed_no": "VDF-SYN-0001", "fingerprint": "s1b"}])
-        r4 = grant(via, apply=False, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        chk("⑦ 已核發的內容改了(START_DATE → time.begin)→ 衝突待人判(帳本號不改、不回收)· 乾跑零寫",
-            any(c["key"] == "VDF:SYN:START_DATE" for c in r4["conflicts"]) and not r4["applied"])
-        (reg / GRANT_NAME).unlink()
-        for q in (via / "functional modules").glob("*/contract/*_NUMBER_REQUEST_latest.json"):
-            q.unlink()
-        r6 = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        g6 = json.loads((reg / GRANT_NAME).read_text(encoding="utf-8"))
-        chk("⑦a 核發冊刪了、請求都已核號(空)→ 由共用帳本重建,號一個不少 · 來源記相對路徑(不寫本機絕對路徑)",
-            g6["grants"].get("VDF:SYN:TIMEOUT") == r3["grants"].get("VDF:SYN:TIMEOUT") and g6["grants"].get("VRN2-REGEX-0003") == g.get("VRN2-REGEX-0003")
-            and not any(str(x).startswith(("/", "\\")) or ":" in str(x)[:3] for x in g6.get("sources") or []) and r6["changed"], g6.get("sources"))
-        (via / "functional modules" / "VRN" / "contract").mkdir(parents=True, exist_ok=True)
-        (via / "functional modules" / "VRN" / "contract" / "VRN_NUMBER_REQUEST_latest.json").write_text(
-            json.dumps({"from": "VRN", "pending": ["VRN-E-0001", "VRN-B-0002"]}), encoding="utf-8")
-        r5 = grant(via, apply=False, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        chk("⑦b 舊格式請求(只有 pending 號、沒內容)→ 不核號 · 黃燈 · 一行寫明「舊格式 2 號不核」",
-            "VRN-E-0001" not in r5["grants"] and r5["lamp"] == "YELLOW" and "舊格式 2 號不核" in r5["line"], r5["line"])
-        (reg / CENTRAL_SSOT).write_text(json.dumps({"rows": {"SSOT": [{"sub": "VDF", "name": "VDF_X_SSOT_v0100", "code": "VIA-VDF-SSOT009"},
-                                                                       {"sub": "VRN", "name": "VDF_X_SSOT_v0100", "code": "VIA-VRN-SSOT001"}]}}), encoding="utf-8")
-        r7 = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
-        g7 = json.loads((reg / GRANT_NAME).read_text(encoding="utf-8"))
-        xno = g.get("VDF:SSOT:VDF_X_SSOT")
-        chk("⑦c 對照 CGC_MDL237 號(只讀;同子系統同族名才對;版尾不計)· %s → %s" % (xno, g7.get("xref_mdl237", {}).get(xno)),
-            g7.get("xref_mdl237", {}).get(xno) == ["VIA-VDF-SSOT009"] and "對照 CGC_MDL237 號 1" in r7["line"], g7.get("xref_mdl237"))
+        chk("⑦ grant:中央號投影 — 登記鍵 / 候選編號 / 暫編號 → VIA-VDF-SYN777 · assets 帶版本與指紋 · 操作員提案不進 · 衝突照列 · 來源相對路徑",
+            gf["grants"].get("VDF:SYN:START_DATE") == gf["grants"].get("VDF-SYN-0001") == gf["grants"].get(st_asset["candidate_id"]) == "VIA-VDF-SYN777"
+            and gf["assets"]["VDF:SYN:START_DATE"] == {"code": "VIA-VDF-SYN777", "version": "1.0.0", "source_sha256": st_asset["source_sha256"]}
+            and "operator:twse_start" not in gf["grants"] and any(c["key"] == "VDF:SYN:TIMEOUT" for c in gf["conflicts"])
+            and all(not str(x).startswith("/") for x in gf["sources"]) and g["changed"], gf)
+        g2 = grant(via, apply=True, grant_path=reg / GRANT_NAME, book_dir=reg, registered=rows, legacy=[])
+        chk("⑧ 再核一次:中央號沒變 → 核發冊不重寫(REGISTERED 不再列衝突)", not g2["changed"] and g2["states"].get("REGISTERED") == 1, g2["states"])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     src = Path(__file__).read_text(encoding="utf-8")
     body = src.split("def selftest", 1)[0]
-    writes = re.findall(r"(\w+)\.write_text\(|open\((\w+), \"a\"", body)
-    chk("⑧ VCGC 自己的模組:寫檔點只有核發冊(gp)與共用帳本(lp)· 子系統的請求檔只讀 · 加速器橋在 · 零網路 · 同意閘不讀不寫 · %s" % writes,
-        sorted(w[0] or w[1] for w in writes) == ["gp", "lp"] and "VIA:ACCEL-BRIDGE" in src
+    writes = sorted(set(re.findall(r"(\w+)\.write_text\(", body)))
+    chk("⑨ 不發號(號只由 CGC_MDL237 中央發;本檔沒有任何 VIA-<…> 號碼產生式)· 寫檔點只有候選冊(out)與核發冊(gp)· 子系統請求只讀 · 加速器橋在 · 零網路 · 同意閘不讀不寫 · %s" % writes,
+        writes == ["gp", "out"] and not re.search(r"[\"']VIA-%|VIA-\{", body) and "VIA:ACCEL-BRIDGE" in src
         and not re.search(r"^\s*(import|from)\s+(requests|httpx|urllib\.request|VDF_|VRN_)", src, re.M) and "CONSENT" not in body)
     print("[計] %s_%s 自測 %d/%d · %s" % (ENGINE, TAG, p, p + f, "PASS" if f == 0 else "FAIL"))
     return 0 if f == 0 else 1
