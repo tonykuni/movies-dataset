@@ -1,0 +1,26 @@
+{
+  "schema": "VDF_DataHome_v0101",
+  "owner": "VDF",
+  "prior": "VDF_DataHome_SSOT_v0100.json",
+  "why": "操作員 2026-10-22 選 A:VDF 資料庫家 = C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database。實測證據(工作站 2026-10-22):VDF db where 在該夾找到冊上 5/5 本庫;v0100 指的 via_01_vdf 底下 .duckdb 0 個(Get-ChildItem 空)→ ActivateVDF v0114 照冊選它 → db check 44 張「缺庫」。改帶 --db-home 指向本夾重跑 → db check GREEN(紅 0 · 黃 25 · 綠 26)· db verify 83 表 PASS。v0100 原冊不改(L04 出新版號)。",
+  "rules": [
+    "家本身直接有 .duckdb → 庫就在家;否則底下所有 .duckdb 在同一個夾 → 那個夾;散在多夾 → 家本身(清點用 rglob 都找得到,db check 會照 db where 選)。",
+    "冊上的家在這台機器不在(例:容器 / CI)→ 不猜、照前版(倉內 output_hub)並在總覽頁標黃。",
+    "改家不改程式:出新版號冊(VDF_DataHome_SSOT_v0101.json …),尾版生效。",
+    "homes 照順序:取第一個在這台機器存在的家(v0101 起明寫;ActivateVDF v0114 resolve_homes 本來就這樣取)。"
+  ],
+  "homes": [
+    {
+      "id": "workstation",
+      "db_home": "C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database",
+      "fetch_home": null,
+      "note": "操作員 2026-10-22 選 A;fetch_home 沒寫 → 由 db_home 底下唯一的 output_hub 上一層推(倉內 VDF\\output_hub 接點也指到本夾的 output_hub)"
+    },
+    {
+      "id": "workstation_via_01_vdf",
+      "db_home": "C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_01_vdf",
+      "fetch_home": null,
+      "note": "操作員 2026-10-21 指定的家;2026-10-22 實測底下沒有 .duckdb → 排第二(冊上照順序取第一個在這台機器存在的家;第一個不在才輪到)。日後要搬到這裡:VDF db move --to 乾跑 → --apply,再出新版冊把它排第一"
+    }
+  ]
+}
