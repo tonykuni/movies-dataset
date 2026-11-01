@@ -20,7 +20,7 @@ r"""VDF_MDL013_ActivateVDF v0115 — 薄尾:全部用記憶體 · 每支子行�
      一起掃(工作站實錄:db check 在 via_01_vdf 找 0 本、對照卻從倉內 output_hub 讀到 11 萬筆 → 同一頁兩個說法)。同名檔取法同
      VDF db check(mega / active_tw_etf 優先 · 再比大小)。
   ⑤ 引擎流程:VIA_VDF_LAUNCH_JOBS = min(核 − 1, (可用 − 1 GB) ÷ 700 MB) · VIA_VDF_LAUNCH_MEM_MB = 總預算 ÷ (工作數 + 其他流程)·
-     VIA_VDF_LAUNCH_THREADS = 1 → VDF_SystemManager v0162 並行跑自測、逐支印進度(心跳看得到)、逾時照實。操作員自己設了就照用。
+     VIA_VDF_LAUNCH_THREADS = 1 → VDF_SystemManager v0164 並行跑自測、逐支印進度(心跳看得到)、逾時照實。操作員自己設了就照用。
 VDF 自己的模組:不匯入他系統程式(鎖冊只讀資料);同意閘不讀不寫(只原樣傳);不碰 TA-Lib;不裝套件、不寫環境(只寫子行程 env)。
 """
 from __future__ import annotations

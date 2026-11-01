@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""VDF_SystemManager v0162 — 薄尾:engine launch 並行 + 逐支進度 + 逾時照實 + 最慢先跑 + 紅燈序跑複驗 + 每支記憶體 / 執行緒預算
+"""VDF_SystemManager v0164 — 薄尾:engine launch 並行 + 逐支進度 + 逾時照實 + 最慢先跑 + 紅燈序跑複驗 + 每支記憶體 / 執行緒預算
 
 操作員令(2026-10-22):「為何指令跑不完 全部用記憶體 全部加入最新的加速器及網路工具」。
 量測(改前):engine launch 96 支逐支序跑(每支 load_probe ≤120 s + --selftest ≤600 s),一次只用一核;整段跑完才印 →
   ActivateVDF 心跳一直「還沒有輸出」。工作站上一輪 2881 s;這一輪 23 分鐘被 Ctrl+C。逾時那支 tail 是空的(看不出是逾時)。
-本版(判法 · 結果檔 · 合併規則照 v0150 launch_paths / save_launch):
+本版(判法 · 結果檔 · 合併規則照 v0150 launch_paths / save_launch;疊在 main 的 v0163 之上,v0162 fetch 不補套 · v0163 Windows 自測接點照舊):
   ① 並行:工作數 = VIA_VDF_LAUNCH_JOBS(ActivateVDF v0115 依核數 / 可用記憶體給)> 自算 min(核 − 1, (可用 − 保留 1 GB) ÷ 每支 700 MB),至少 1。
   ② 每支跑完立刻印一行「[n/N] 燈 秒 家族」(flush)→ 外層心跳看得到進度;最後照前版 _print_launch 總結。
   ③ 逾時照實:rc TIMEOUT → tail 第一行「逾時 N 秒(VIA_VDF_LAUNCH_TIMEOUT 可調)」+ 逾時前印出的最後幾行;燈 RED 不變。
@@ -79,18 +79,18 @@ HERE = Path(__file__).resolve().parent
 VIA_ROOT = HERE.parents[1]
 _STEM = "VDF_SystemManager"
 TAG = "v" + Path(__file__).stem.rsplit("_v", 1)[-1]
-RESERVE_MB_V0162 = 1024
-PER_JOB_MB_V0162 = 700
-THREAD_KEYS_V0162 = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS", "NUMEXPR_MAX_THREADS",
+RESERVE_MB_V0164 = 1024
+PER_JOB_MB_V0164 = 700
+THREAD_KEYS_V0164 = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS", "NUMEXPR_MAX_THREADS",
                      "VECLIB_MAXIMUM_THREADS", "NUMBA_NUM_THREADS", "POLARS_MAX_THREADS", "RAYON_NUM_THREADS", "VIA_DUCKDB_THREADS")
 
 
-def _vnum_v0162(path) -> int:
+def _vnum_v0164(path) -> int:
     m = re.search(r"_v(\d{4})$", Path(path).stem)
     return int(m.group(1)) if m else -1
 
 
-def _load_v0162(path: Path, name: str):
+def _load_v0164(path: Path, name: str):
     if name not in sys.modules:
         spec = importlib.util.spec_from_file_location(name, path)
         mod = importlib.util.module_from_spec(spec)
@@ -99,15 +99,15 @@ def _load_v0162(path: Path, name: str):
     return sys.modules[name]
 
 
-PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0162(p) < _vnum_v0162(__file__)), key=_vnum_v0162)
-PRIOR = _load_v0162(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
+PRIOR_PATH = max((p for p in HERE.glob(_STEM + "_v*.py") if 0 <= _vnum_v0164(p) < _vnum_v0164(__file__)), key=_vnum_v0164)
+PRIOR = _load_v0164(PRIOR_PATH, _STEM + "_prior_for_" + Path(__file__).stem)
 
 
 def __getattr__(name):
     return getattr(PRIOR, name)
 
 
-def _chain_v0162() -> list:
+def _chain_v0164() -> list:
     out, m = [], PRIOR
     while isinstance(m, types.ModuleType) and m not in out:
         out.append(m)
@@ -115,15 +115,15 @@ def _chain_v0162() -> list:
     return out
 
 
-def _owner_v0162(name: str):
-    for m in _chain_v0162():
+def _owner_v0164(name: str):
+    for m in _chain_v0164():
         if name in vars(m):
             return m
     return None
 
 
-_OWN_LP = _owner_v0162("launch_paths")          # v0150:engine launch 本體(main 叫模組全域 launch_paths)
-_OWN_RP = _owner_v0162("run_path")              # v0149:_python · _LOAD_PROBE · run_path
+_OWN_LP = _owner_v0164("launch_paths")          # v0150:engine launch 本體(main 叫模組全域 launch_paths)
+_OWN_RP = _owner_v0164("run_path")              # v0149:_python · _LOAD_PROBE · run_path
 _ORIG_LAUNCH_PATHS = _OWN_LP.launch_paths if _OWN_LP else None
 
 
@@ -156,15 +156,15 @@ def plan_jobs(n: int, env: dict | None = None, cores: int | None = None, avail: 
     if want > 0:
         jobs, src = want, "VIA_VDF_LAUNCH_JOBS"
     else:
-        by_mem = (cores - 1) if avail is None else max(1, (avail - RESERVE_MB_V0162) // PER_JOB_MB_V0162)
-        jobs, src = max(1, min(cores - 1, by_mem)), "自算(核 %d − 1 · 可用 %s MB ÷ %d)" % (cores, avail, PER_JOB_MB_V0162)
+        by_mem = (cores - 1) if avail is None else max(1, (avail - RESERVE_MB_V0164) // PER_JOB_MB_V0164)
+        jobs, src = max(1, min(cores - 1, by_mem)), "自算(核 %d − 1 · 可用 %s MB ÷ %d)" % (cores, avail, PER_JOB_MB_V0164)
     jobs = max(1, min(jobs, max(1, n)))
     try:
         mem_mb = int(env.get("VIA_VDF_LAUNCH_MEM_MB") or 0)
     except ValueError:
         mem_mb = 0
     if mem_mb <= 0:
-        mem_mb = 1024 if avail is None else max(256, int((avail - RESERVE_MB_V0162) * 0.9) // jobs)
+        mem_mb = 1024 if avail is None else max(256, int((avail - RESERVE_MB_V0164) * 0.9) // jobs)
     try:
         threads = max(1, int(env.get("VIA_VDF_LAUNCH_THREADS") or 1))
     except ValueError:
@@ -176,7 +176,7 @@ def plan_jobs(n: int, env: dict | None = None, cores: int | None = None, avail: 
 def child_env(plan: dict, base: dict | None = None) -> dict:
     env = dict(os.environ if base is None else base, VIA_FROM_VCGC="YES")
     env["VIA_DUCKDB_MEM"] = "%dMB" % plan["mem_mb"]
-    for k in THREAD_KEYS_V0162:
+    for k in THREAD_KEYS_V0164:
         env[k] = str(plan["threads"])
     env["PYTHONIOENCODING"] = "utf-8"
     return env
@@ -311,19 +311,19 @@ def launch_paths(paths: list) -> dict:
     return o
 
 
-def _patch_v0162() -> bool:
+def _patch_v0164() -> bool:
     if _OWN_LP is None:
         return False
     _OWN_LP.launch_paths = launch_paths
     return True
 
 
-def _unpatch_v0162() -> None:
+def _unpatch_v0164() -> None:
     if _OWN_LP is not None and _ORIG_LAUNCH_PATHS is not None:
         _OWN_LP.launch_paths = _ORIG_LAUNCH_PATHS
 
 
-PATCHED_V0162 = _patch_v0162()
+PATCHED_V0164 = _patch_v0164()
 
 
 def main(argv=None) -> int:
@@ -366,7 +366,7 @@ def selftest() -> int:
     env = child_env(pl2, base={"VIA_NET_CONSENT": "sentinel"})
     chk("③ 子行程環境:VIA_DUCKDB_MEM 900MB · 執行緒鍵 = 2 · VIA_FROM_VCGC=YES · 同意閘原樣(不加不減)",
         env["VIA_DUCKDB_MEM"] == "900MB" and env["OMP_NUM_THREADS"] == "2" and env["VIA_FROM_VCGC"] == "YES" and env["VIA_NET_CONSENT"] == "sentinel")
-    tmp = Path(tempfile.mkdtemp(prefix="vdf_sm0162_"))
+    tmp = Path(tempfile.mkdtemp(prefix="vdf_sm0164_"))
     try:
         items = []
         for name in ("green", "green2", "green3", "green4", "nodata", "red", "slow", "flaky"):
@@ -407,18 +407,18 @@ def selftest() -> int:
     finally:
         os.environ.pop("_SOLO_MARK", None)
         shutil.rmtree(tmp, ignore_errors=True)
-    chk("⑩ engine launch 已換本版(v0150 模組全域 launch_paths;main 走它)", PATCHED_V0162 and _OWN_LP is not None and _OWN_LP.launch_paths is launch_paths)
+    chk("⑩ engine launch 已換本版(v0150 模組全域 launch_paths;main 走它)", PATCHED_V0164 and _OWN_LP is not None and _OWN_LP.launch_paths is launch_paths)
     src = Path(__file__).read_text(encoding="utf-8")
     body = src.split("def selftest", 1)[0]
     chk("⑪ 不匯入他系統程式 · 兩座橋在 · 同意閘不寫 · 零網路(不 import 抓取套件)",
         not re.search(r"^\s*(import|from)\s+(CGC_|VRN_|VCGC)", src, re.M) and "VIA:ACCEL-BRIDGE" in src and "VIA:NET-BRIDGE" in src
         and "_CONSENT\"] =" not in body and not re.search(r"^\s*import\s+(requests|httpx|urllib\.request)", body, re.M))
     print("  ── 前版鏈自測(原樣印出;VIA_SKIP_PRIOR_SELFTEST=1 略過)──")
-    _unpatch_v0162()
+    _unpatch_v0164()
     try:
         prc = 0 if os.environ.get("VIA_SKIP_PRIOR_SELFTEST") == "1" else PRIOR.selftest()
     finally:
-        _patch_v0162()
+        _patch_v0164()
     chk("⑫ 前版鏈 %s 自測 rc 0 · 跑完本版又換上" % PRIOR_PATH.stem, prc == 0 and _OWN_LP.launch_paths is launch_paths)
     print("[計] %s_%s 自測 %d/%d · %s" % (_STEM, TAG, p, p + f, "PASS" if f == 0 else "FAIL"))
     return 0 if f == 0 else 1
