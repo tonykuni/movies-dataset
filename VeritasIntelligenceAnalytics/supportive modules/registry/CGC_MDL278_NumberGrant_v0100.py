@@ -60,6 +60,61 @@ def request_files(via: Path = VIA) -> list:
     return out
 
 
+CENTRAL_SSOT = "VIA_Numbering_SSOT_v0100.json"                 # CGC_MDL237 編號正本(SSOT · RGX · SYN 列)
+CENTRAL_BOOKS = {"PRMT": "VIA_NumberBooks/VIA_NumberBook_PRMT_v0100.jsonl", "PLCY": "VIA_NumberBooks/VIA_NumberBook_PLCY_v0100.jsonl"}
+SYS_TO_SUB = {"VDF": "VDF", "VRN-2": "VRN", "VRN2": "VRN", "VRN": "VRN", "VCGC": "VCGC"}
+
+
+def central_index(reg_dir: Path = HERE) -> dict:
+    """CGC_MDL237 已發的號(只讀):(子系統, 類, 名) → [號…]。名去掉 _v### 版尾(那邊一版一號,這邊一族一號)。"""
+    idx = {}
+
+    def put(sub, kind, name, code):
+        if sub and name and code:
+            idx.setdefault((sub, kind, re.sub(r"_v\d+$", "", str(name))), []).append(code)
+    f = Path(reg_dir) / CENTRAL_SSOT
+    if f.is_file():
+        try:
+            rows = json.loads(f.read_text(encoding="utf-8")).get("rows") or {}
+        except (OSError, ValueError):
+            rows = {}
+        for kind, lst in rows.items():
+            for r in lst if isinstance(lst, list) else []:
+                put(r.get("sub"), kind, r.get("name"), r.get("code"))
+    for kind, rel in CENTRAL_BOOKS.items():
+        b = Path(reg_dir) / rel
+        if b.is_file():
+            for i, ln in enumerate(b.read_text(encoding="utf-8").splitlines(), 1):
+                try:
+                    r = json.loads(ln)
+                except ValueError:
+                    idx.setdefault(("_bad", kind, rel), []).append(i)      # 壞列照實留著(只讀對照,不修 CGC_MDL237 的冊)
+                    continue
+                put(r.get("sub"), kind, r.get("name"), r.get("code"))
+    return idx
+
+
+def xref_mdl237(rows: list, idx: dict) -> dict:
+    """共用帳本號 → CGC_MDL237 號(同一東西兩套號的對照;不改任何一邊):冊 / 政策看族名 · 參數看參數名 · 別名看別名。"""
+    out = {}
+    for r in rows:
+        c = r.get("content")
+        for o in r.get("owners") or []:
+            sub, key = SYS_TO_SUB.get(o.get("system")), str(o.get("key") or "")
+            names = []
+            if r.get("kind") in ("SSOT", "PLCY"):
+                fam = key.split(":")[-1].split("|")[-1]
+                names = [("SSOT", fam), ("PLCY", fam)]
+            elif r.get("kind") == "PRMT" and isinstance(c, dict) and c.get("name"):
+                names = [("PRMT", str(c["name"]))]
+            elif r.get("kind") == "SYN" and isinstance(c, dict) and c.get("alias"):
+                names = [("SYN", str(c["alias"]))]
+            hits = sorted({x for kn in names for x in idx.get((sub, kn[0], kn[1]), [])})
+            if hits:
+                out[r["no"]] = hits[:8]
+    return out
+
+
 def _rel(f, via: Path) -> str:
     """VIA 樹內相對路徑(正斜線):核發冊入版控,不寫本機絕對路徑(工作站 / 容器同一份)。"""
     try:
@@ -216,27 +271,29 @@ def grant(via: Path = VIA, apply: bool = False, grant_path: Path | None = None, 
                     merged[k] = r["no"]
     merged.update(p["grants"])
     srcs = sorted(_rel(r["file"], via) for r in p["requests"])
-    body = {"grants": dict(sorted(merged.items())), "conflicts": p["conflicts"]}
+    xref = xref_mdl237(read_ledger(Path(p["ledger"])) + p["new_rows"], central_index(gp.parent if grant_path else HERE))
+    body = {"grants": dict(sorted(merged.items())), "conflicts": p["conflicts"], "xref_mdl237": dict(sorted(xref.items()))}
     changed = (body["grants"] != (old.get("grants") or {}) or body["conflicts"] != (old.get("conflicts") or [])
-               or srcs != (old.get("sources") or []))
+               or srcs != (old.get("sources") or []) or body["xref_mdl237"] != (old.get("xref_mdl237") or {}))
     lamp = "YELLOW" if (p["conflicts"] or LEDGER_BAD or any(r.get("legacy") or r.get("error") for r in p["requests"])) else "GREEN"
     if apply:
         if changed:
             gp.parent.mkdir(parents=True, exist_ok=True)
             gp.write_text(json.dumps(dict({"schema": "VIA.VCGC.NumberGrant.v1", "engine": "%s %s" % (ENGINE, TAG), "ts": now(),
-                                           "rule": "VCGC 偵測三系統衝突後核發;同內容同類同一個號(共用帳本 %s);號永不改、不回收;conflicts 修好後重跑" % LEDGER_NAME,
+                                           "rule": "VCGC 偵測三系統衝突後核發;同內容同類同一個號(共用帳本 %s);號永不改、不回收;conflicts 修好後重跑;"
+                                                   "xref_mdl237 = 同子系統同名在 CGC_MDL237 編號冊的號(那邊一檔一版一號,這邊三系統同內容一號;同名可多個、不代表同值;只供追溯,不合併)" % LEDGER_NAME,
                                            "sources": srcs}, **body), ensure_ascii=False, indent=1), encoding="utf-8")
         if p["new_rows"]:
             lp = Path(p["ledger"])
             with open(lp, "a", encoding="utf-8") as fh:
                 for r in p["new_rows"]:
                     fh.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
-    line = "[VCGC 核號] %s · 請求 %d 份(%s)· 條目 %d · 給號 %d(沿用 %d · 新號 %d)· 衝突 %d · 帳本 %d → %d 列%s · %s" % (
+    line = "[VCGC 核號] %s · 請求 %d 份(%s)· 條目 %d · 給號 %d(沿用 %d · 新號 %d)· 衝突 %d · 帳本 %d → %d 列%s · 對照 CGC_MDL237 號 %d · %s" % (
         lamp, len(p["requests"]), " · ".join("%s %d%s%s" % (r["from"], r["items"], " · 舊格式 %d 號不核(待升 SSOTSync 格式)" % r["legacy"] if r.get("legacy") else "",
                                                        " · 讀不到 %s" % r["error"] if r.get("error") else "") for r in p["requests"]) or "無", p["items"],
         len({k for k in p["grants"] if not re.match(r"^[A-Z0-9]+-[A-Z]+-\d{4}$", k)}), p["reused"], len({r["no"] for r in p["new_rows"]}),
         len(p["conflicts"]), p["ledger_rows"], p["ledger_rows"] + (len(p["new_rows"]) if apply else 0),
-        (" · 帳本壞列 %s(不就地修,待人判)" % LEDGER_BAD[:5]) if LEDGER_BAD else "",
+        (" · 帳本壞列 %s(不就地修,待人判)" % LEDGER_BAD[:5]) if LEDGER_BAD else "", len(xref),
         ("寫入核發冊" if changed else "核發冊不變") if apply else "乾跑(--apply 才寫)")
     return dict(p, lamp=lamp, changed=changed, applied=apply, grant_file=str(gp), line=line)
 
@@ -337,6 +394,13 @@ def selftest() -> int:
         r5 = grant(via, apply=False, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
         chk("⑦b 舊格式請求(只有 pending 號、沒內容)→ 不核號 · 黃燈 · 一行寫明「舊格式 2 號不核」",
             "VRN-E-0001" not in r5["grants"] and r5["lamp"] == "YELLOW" and "舊格式 2 號不核" in r5["line"], r5["line"])
+        (reg / CENTRAL_SSOT).write_text(json.dumps({"rows": {"SSOT": [{"sub": "VDF", "name": "VDF_X_SSOT_v0100", "code": "VIA-VDF-SSOT009"},
+                                                                       {"sub": "VRN", "name": "VDF_X_SSOT_v0100", "code": "VIA-VRN-SSOT001"}]}}), encoding="utf-8")
+        r7 = grant(via, apply=True, grant_path=reg / GRANT_NAME, ledger_path=reg / LEDGER_NAME)
+        g7 = json.loads((reg / GRANT_NAME).read_text(encoding="utf-8"))
+        xno = g.get("VDF:SSOT:VDF_X_SSOT")
+        chk("⑦c 對照 CGC_MDL237 號(只讀;同子系統同族名才對;版尾不計)· %s → %s" % (xno, g7.get("xref_mdl237", {}).get(xno)),
+            g7.get("xref_mdl237", {}).get(xno) == ["VIA-VDF-SSOT009"] and "對照 CGC_MDL237 號 1" in r7["line"], g7.get("xref_mdl237"))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     src = Path(__file__).read_text(encoding="utf-8")
