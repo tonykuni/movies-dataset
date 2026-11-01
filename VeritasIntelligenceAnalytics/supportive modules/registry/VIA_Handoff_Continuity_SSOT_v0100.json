@@ -1,7 +1,7 @@
 {
   "schema": "VIA.HandoffContinuity.SSOT.v1",
   "version": "v0100",
-  "updated_at": "2026-10-04T04:10:00+00:00",
+  "updated_at": "2026-10-30T04:15:29+00:00",
   "requirements": "supportive modules/registry/VIA_Requirements_SSOT_v*.json",
   "component_inventory": "supportive modules/registry/VIA_Component_Inventory_SSOT_v0100.json",
   "source_contract": "supportive modules/registry/VRN_SourceProvenance_SSOT_v0100.json",
@@ -144,7 +144,8 @@
     "supportive modules/registry/CGC_MDL185_SsotBookSync_v0101.py",
     "supportive modules/registry/CGC_MDL276_QuarantineRecover_v0100.py",
     "supportive modules/registry/CGC_MDL277_AiOps_v0100.py",
-    "supportive modules/registry/CGC_MDL249_DataFrameLock_v0101.py"
+    "supportive modules/registry/CGC_MDL249_DataFrameLock_v0101.py",
+    "functional modules/VDF/VDF_SystemManager_v0157.py"
   ],
   "frozen_sources": {
     "functional modules/VRN/references/intake/GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/generic_layout_engine.py": "9ea20fcf056a33d8a0e2b949f91d6f7b41ce86b01ed7dca91f4717d4cadffe74",
@@ -3207,6 +3208,363 @@
       ],
       "timeout_seconds": 2700,
       "registered_at": "2026-10-20T16:41:17+00:00"
+    },
+    "vdf_ws_manager_fetch_quiet": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0162 自測 6/6 · PASS",
+      "scope": "VDF_SystemManager v0162(工作站 2026-10-27 實錄:fetch 動詞不產頁卻每支多跑一遍字級套件 → fetch 那一輪借位 v0153 的 typekit_dir 零動作、跑完還原;載前版鏈壓掉 v0155 的無效跳脫編譯警告,正本不改)經尾版全鏈跑;四系統對等獨立 L123,不改 VCGC 的冊與程式",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-27T10:17:32+00:00"
+    },
+    "validation_ssot_v0101": {
+      "argv": [
+        "CGC_MDL246_ValidationSSOT",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL246_ValidationSSOT_v0101 薄尾 8/8 · PASS",
+      "scope": "CGC_MDL246 v0101 交叉代碼准多段(X-REQ-BACK · X-REQ-OPEN · X-PEER · X-PEER-TEXT)+ 驗證冊 v0101 登記四碼(L120);真冊 GREEN · 負控 V-SDD / V-CODE 仍紅 · v0100 鏈 12/12(VCGC-REQ180)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0101.py",
+        "supportive modules/registry/CGC_MDL246_ValidationSSOT_v0100.py",
+        "supportive modules/registry/VIA_Validation_SSOT_v0101.json",
+        "supportive modules/registry/CGC_MDL245_SDDValidator_v*.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-11T18:55:50+00:00"
+    },
+    "vdf_fetch_groups_v0107": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0107",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0107 本版 9/9 · 前版鏈 PASS · 合計 PASS",
+      "scope": "MDL012 v0107 run:清單引擎 009(台股全市場清單)· 010(主動式 ETF 清單)先跑(紅就停 rc 5)→ 其餘族群依 DuckDB 庫 / 同引擎 / 相依分道,3~5 流程同時跑(--jobs,auto = CPU − 1)· 起每支前 CPU / DRAM / TEMP 守門 · 子行程 TEMP 為主(MDL262 規則)· 直接從 MDL008 尾版起(執行緒安全)· fg_runs + PARALLEL_latest.json;ui 多頁「並行擷取 · USER-TEST」與並行 / USER-TEST 鈕;前版鏈 v0106 → v0100 照跑(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0106.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0100.py",
+        "functional modules/VDF/VDF_FetchGroups_SSOT_v0102.json",
+        "functional modules/VDF/VDF_FetchSystem_SSOT_v0106.json",
+        "supportive modules/registry/CGC_MDL262_DuckTempHook_v*.py"
+      ],
+      "timeout_seconds": 1200,
+      "registered_at": "2026-10-11T21:48:23+00:00"
+    },
+    "vdf_fetch_groups_usertest": {
+      "argv": [
+        "VDF_MDL012_FetchGroups",
+        "usertest"
+      ],
+      "success_marker": "紅 0 · 驗法 browser",
+      "scope": "MDL012 v0107 usertest:建頁(報告夾,不碰已追蹤正式頁)→ 靜態驗(功能鍵有分支 · 頁籤有頁 · 快照 · id 唯一)→ 瀏覽器 headless 逐鍵實測(Chromium / Chrome / Edge;找不到照實紅)→ USERTEST_latest.json 掛頁;標記要「紅 0 · 驗法 browser」(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-11T21:48:23+00:00"
+    },
+    "vdf_fetch_groups_v0108": {
+      "argv": [
+        "VDF_MDL012_FetchGroups_v0108",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_MDL012_FetchGroups v0108 本版 7/7 · 前版鏈 PASS · 合計 PASS",
+      "scope": "MDL012 v0108 族群頁版面最佳化:VDF 字級套件(VIA_UI_Template_SSOT 尾版,經 VDF_SystemManager typekit_block,套一次不重複)· 左面板每節 <details>(① 輸入控制 · ② 功能 開;③ 收尾 · 頁 · 回母系統 · 跳到其他系統 收並標鈕數;Live log 擷取中才開)· 展現規則 JS(燈欄第一 · 空值 — · 路徑縮檔名 · 表頭不換行)· 鈕 / 頁籤 / id 與 v0107 完全相同 · usertest 探針讀法放寬(套件給 <pre> 補 style);前版鏈 v0107 → v0100 照跑(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0107.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0105.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0101.py",
+        "functional modules/VDF/VDF_SystemManager_v0153.py",
+        "functional modules/VDF/VDF_SystemManager_v0154.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v0102.json"
+      ],
+      "timeout_seconds": 1500,
+      "registered_at": "2026-10-12T00:05:14+00:00"
+    },
+    "vdf_manager_v0155": {
+      "argv": [
+        "VDF_SystemManager_v0155",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0155 自測 8/8 · PASS",
+      "scope": "VDF_SystemManager v0155 all 一鍵全部:health → 啟動就緒(read_launch 門回來,v0104 本體代答)→ Open-VIA-VDF 問參數頁(pwsh;容器無 pwsh 跳過照實)→ VDF_MDL012 run 清單先跑分道並行(rc 4 GATED 黃 · rc 5 清單紅停)→ universe list → usertest → 族群頁 → 主頁 → 跳出;每步一列、總燈最壞、ONE_LAUNCH_latest.json;python 子行程走前版 run_path、pwsh 只在 run_cmd_v0155 一處;前版鏈全跑(VDF-REQ018)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0155.py",
+        "functional modules/VDF/VDF_SystemManager_v0154.py",
+        "functional modules/VDF/VDF_SystemManager_v0153.py",
+        "functional modules/VDF/VDF_SystemManager_v0149.py",
+        "functional modules/VDF/VDF_SystemManager_v0104.py",
+        "functional modules/VDF/VDF_MDL012_FetchGroups_v0108.py",
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py"
+      ],
+      "timeout_seconds": 1800,
+      "registered_at": "2026-10-12T02:34:47+00:00"
+    },
+    "activate_vdf_v0276": {
+      "argv": [
+        "CGC_MDL157_VIAUniqueEntryControl",
+        "--selftest"
+      ],
+      "success_marker": "[OK] 撞號以編號系統唯一碼為準:同號群組每支有碼 = 不算撞號;沒碼 = 撞號",
+      "scope": "短令 activate_vdf(VDF-REQ019):Register-VIA-Commands-v0276 尾版 function global:activate_vdf(別名 activate-vdf · 啟動VDF全部)+ 同名梭 activate_vdf.cmd;CGC_MDL157 自測 = 命令冊沿 dot-source 鏈讀(尾版 v0276 → v0275 …)· 尾版拆掉的函式不算 · 鏈防環 · 撞號以編號唯一碼;梭檢(status)全有梭 · 零釘死。容器無 pwsh:函式本體要工作站實跑(activate_vdf 貼回 [activate_vdf] 行)",
+      "dependencies": [
+        "Register-VIA-Commands-v0276.ps1",
+        "Register-VIA-Commands-v0275.ps1",
+        "activate_vdf.cmd",
+        "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v*.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-12T03:51:31+00:00"
+    },
+    "activate_vdf_v0277": {
+      "argv": [
+        "CGC_MDL157_VIAUniqueEntryControl",
+        "--selftest"
+      ],
+      "success_marker": "[OK] 撞號以編號系統唯一碼為準:同號群組每支有碼 = 不算撞號;沒碼 = 撞號",
+      "scope": "短令 activate_vdf v0277(VCGC-REQ181 三台獨立 · VDF-REQ019):Register-VIA-Commands-v0277 蓋過 v0276 的 activate_vdf = 純 VDF 操作台(① VDF_SystemManager activate --import / 文字改動 ② all(尾版 < v0155 → 紅不起)③ 跳出 VDF 主頁 + 族群頁;-Check 才跑 VCGC 只讀監控)+ 載入旗標行;CGC_MDL157 自測 = 命令冊沿 dot-source 鏈讀(v0277 → v0276 → v0275 …)· 梭檢全有梭 · 零釘死。容器無 pwsh:函式本體要工作站實跑",
+      "dependencies": [
+        "Register-VIA-Commands-v0277.ps1",
+        "Register-VIA-Commands-v0276.ps1",
+        "Register-VIA-Commands-v0275.ps1",
+        "activate_vdf.cmd",
+        "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v*.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-12T06:46:38+00:00"
+    },
+    "vdf_manager_v0156": {
+      "argv": [
+        "VDF_SystemManager_v0156",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0156 自測 8/8 · PASS",
+      "scope": "VDF_SystemManager v0156 啟動就緒假紅修正:v0104 本體代答前把 _src 換成 Register 冊沿 dot-source 鏈讀(尾版 → 前版;只讀;防環;非 Register 檔照舊),16 個啟動短令沿鏈全找到 · why 不再含「Register via-vdffetch」· 代答完還原 · v0155 的 READY 指到本版門(all 的 ready 步)· all --dry 直通;前版鏈全跑(VDF-REQ018;工作站問參數頁 2026-10-12 14:59 實錄)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0156.py",
+        "functional modules/VDF/VDF_SystemManager_v0155.py",
+        "functional modules/VDF/VDF_SystemManager_v0104.py",
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v*.py",
+        "Register-VIA-Commands-v*.ps1"
+      ],
+      "timeout_seconds": 1800,
+      "registered_at": "2026-10-12T07:08:26+00:00"
+    },
+    "smartdecode_v0100": {
+      "argv": [
+        "SUP_MDL756_SmartDecode",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL756_SmartDecode v0100 自測 13/13 · PASS",
+      "scope": "亂碼問題解碼器(純函式 · 零網路):smart_decode(BOM → 宣告 charset → meta → utf-8 嚴格 → cp950 / big5hkscs / gb18030 嚴格 + 常用字可信度;永不 replace / ignore)· demojibake(可逆亂碼反解 latin1→utf8 / latin1→cp950 / cp950→utf8 …;U+FFFD 誠實 UNRECOVERABLE)· plan_values(一欄一種轉換多數決)· 長句 Big5 不被 gb18030 假字搶走(VDF-REQ020)",
+      "dependencies": [
+        "supportive modules/network/SUP_MDL756_SmartDecode_v0100.py"
+      ],
+      "timeout_seconds": 300,
+      "registered_at": "2026-10-12T09:26:35+00:00"
+    },
+    "netunified_v0119": {
+      "argv": [
+        "SUP_MDL740_NetUnified",
+        "--selftest"
+      ],
+      "success_marker": "[計] SUP_MDL740_NetUnified v0119 自測 9/9 · PASS",
+      "scope": "網路工具薄尾 v0119:http_text 雙閘先行 → 先位元組(Aegis fetch_bytes → 標準庫 http_bytes 重試道)→ SUP_MDL756 智慧解碼 → {data · via+smartdecode · encoding · lossy};拿不到位元組退前版 http_text + 可逆反解;閘沒開零抓取;名稱沿前版;前版鏈(v0118 鎖冊核心)全跑(VDF-REQ020)",
+      "dependencies": [
+        "supportive modules/network/SUP_MDL740_NetUnified_v0119.py",
+        "supportive modules/network/SUP_MDL740_NetUnified_v0118.py",
+        "supportive modules/network/SUP_MDL740_NetUnified_v0115.py",
+        "supportive modules/network/SUP_MDL756_SmartDecode_v*.py",
+        "supportive modules/network/VeritasAegisNexus_v*.py",
+        "supportive modules/registry/VIA_ToolVersion_Lock_v0100.json"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-12T09:26:35+00:00"
+    },
+    "mojibake_repair_v0100": {
+      "argv": [
+        "VDF_ENG235_MojibakeRepair",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG235_MojibakeRepair_v0100 自測 8/8 · PASS",
+      "scope": "VDF 亂碼修復引擎:scan(每檔每欄 可修 / 不可逆 + 樣本;燈 GREEN / YELLOW / RED)· fix 乾跑只列計畫 · --apply 先備份 _pre_mojibake 再用 DuckDB 重寫 parquet(欄序 · 型別 · 列數核對)/ UPDATE … FROM 對應表改 DuckDB 表 · U+FFFD 原樣不猜 · 冪等 · --units-only;報告 VIA_Reports/vdf/mojibake(VDF-REQ020)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG235_MojibakeRepair_v0100.py",
+        "supportive modules/network/SUP_MDL756_SmartDecode_v*.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-12T09:26:35+00:00"
+    },
+    "db_import_v0102": {
+      "argv": [
+        "VDF_ENG065_DbImport",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG065_DbImport_v0102 自測 6/6 · PASS",
+      "scope": "單元檔匯入薄尾 v0102:run_import 前先 ENG235 fix --apply --units-only(可逆亂碼修回正字、備份、U+FFFD 照實)再照 v0101 anti-join 匯入;VIA_MOJIBAKE_FIX=0 關掉;ENG235 缺席誠實印一行照舊匯入;前版鏈全跑(VDF-REQ020)",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG065_DbImport_v0102.py",
+        "functional modules/VDF/engine/VDF_ENG065_DbImport_v0101.py",
+        "functional modules/VDF/engine/VDF_ENG235_MojibakeRepair_v*.py",
+        "supportive modules/SUP_MDL753_*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-12T09:26:35+00:00"
+    },
+    "vdf_manager_v0157": {
+      "argv": [
+        "VDF_SystemManager_v0157",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0157 自測 9/9 · PASS",
+      "scope": "VDF_SystemManager v0157 設計稿 1c 汝窯天青視覺:冊尾版 tokens + systems.VDF(燈四色鎖)· design.css 只收純 CSS · 字級套件本體(v0154 v2;鏈上每份 typekit_book / typekit_block)換成本版 → 同一段 style 尾端接 :root + design.css(冪等)· JS 字體吸附對 h1 / .via-serif / .brand 放行 · v0144 via-theme 讀冊尾版 + systems.VDF · 誠實退路(沒冊 / 壞 css / 沒 systems)· 不載 VCGC 程式;前版鏈全跑(VCGC-REQ182)",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v0157.py",
+        "functional modules/VDF/VDF_SystemManager_v0154.py",
+        "functional modules/VDF/VDF_SystemManager_v0153.py",
+        "functional modules/VDF/VDF_SystemManager_v0144.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v*.json"
+      ],
+      "timeout_seconds": 1800,
+      "registered_at": "2026-10-12T16:47:41+00:00"
+    },
+    "health_matrix_v0115": {
+      "argv": [
+        "CGC_MDL274_HealthMatrix_v0115",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL274_HealthMatrix v0115 本版 11/11 · PASS",
+      "scope": "CGC_MDL274_HealthMatrix v0115 設計稿 1a 母系統視覺:冊尾版 tokens + systems.VCGC(燈四色鎖)· 字級套件 v2 本體換成本版(VCGC 頁 · 健康矩陣頁)· portal 後入口頁補套 · v0112 via-theme 讀冊尾版 + systems.VCGC · theme preview 三系統頁首預覽頁(1a / 1b / 1c 各一區,只攤開冊值)· 誠實退路;前版鏈全跑(VCGC-REQ182)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0115.py",
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0114.py",
+        "supportive modules/registry/CGC_MDL274_HealthMatrix_v0112.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v*.json"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-12T16:47:41+00:00"
+    },
+    "ui_engine_v0107": {
+      "argv": [
+        "CGC_MDL261_UIEngine_v0107",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL261_UIEngine v0107 本版 9/9 · PASS",
+      "scope": "CGC_MDL261_UIEngine v0107 設計稿 1a 母系統視覺(操作台):冊尾版 tokens + systems.VCGC · 字級套件 v2 本體(v0106 · v0105 build 用的那份)換成本版 → 範本 --paper / --ink / --mute / --blue / --co / --soft / --r 對映到冊 token · JS 字體吸附放行 · 真建頁只一段套件 · 誠實退路;前版鏈全跑(VCGC-REQ182)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0107.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0106.py",
+        "supportive modules/registry/CGC_MDL261_UIEngine_v0105.py",
+        "supportive modules/registry/VIA_UI_Template_SSOT_v*.json"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-12T16:47:41+00:00"
+    },
+    "fixall_v0112": {
+      "argv": [
+        "CGC_MDL125_FixAll_v0112",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL125_FixAll v0112 薄尾 6/6 · PASS",
+      "scope": "CGC_MDL125_FixAll v0112 清單先行:步冊 = 前版 18 步 + datahome 之後 tw_list(VDF_MDL009 尾版 run)· etf_list(VDF_MDL010 尾版 run);net · 逾時 600 · 引擎缺照實;前版 run / main 走本版步冊;DRY 全鏈 20 步零執行;前版七檢(VDF-REQ021)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL125_FixAll_v0112.py",
+        "supportive modules/registry/CGC_MDL125_FixAll_v0111.py",
+        "functional modules/VDF/VDF_MDL009_TWStockList_v*.py",
+        "functional modules/VDF/VDF_MDL010_ActiveETFList_v*.py"
+      ],
+      "timeout_seconds": 600,
+      "registered_at": "2026-10-13T10:01:06+00:00"
+    },
+    "lanes_v0102": {
+      "argv": [
+        "CGC_MDL134_ParallelLanes_v0102",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL134_ParallelLanes v0102 薄尾 8/8 · PASS",
+      "scope": "CGC_MDL134_ParallelLanes v0102 清單先行:鏈冊 += lists(tw_list 等 datahome · etf_list 等 tw_list)· 資料鏈每步 after += etf_list(安裝鏈除外)· --only 子集自動帶上清單步 · 清單步子行程 VIA_FROM_VCGC=YES · 排程實測清單跑完資料鏈才起 · 真步冊 20 步全入鏈;前版九檢(VDF-REQ021)",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL134_ParallelLanes_v0102.py",
+        "supportive modules/registry/CGC_MDL134_ParallelLanes_v0101.py",
+        "supportive modules/registry/CGC_MDL125_FixAll_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-13T10:01:06+00:00"
+    },
+    "launch_console_v0105": {
+      "argv": [
+        "VDF_ENG093_LaunchConsole_v0105",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG093_LaunchConsole v0105 薄尾 16/16 · PASS",
+      "scope": "VDF_ENG093_LaunchConsole v0105 清單先行鎖定列:矩陣最前兩列 tw_list · etf_list(lock · checked · disabled,JS boxes() 與 -Steps 不含)· 決定 / validate 不變(清單步交 CGC_MDL134 自動先跑)· 頁首 v0105 · 真樹矩陣與渲染;前版鏈 v0104 → v0103(VDF-REQ021);2026-10-30 標記 7/7 → 16/16:v0105 於 PR #548(2026-10-20,清單先行 ask 自己跑 009 → 010 · Codex #548 兩條 P2)就地擴充為 16 檢,原 7/7 標記已無對應輸出(收據 rc 1 只因標記對不上;自測本身 16/16 PASS)",
+      "dependencies": [
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v0105.py",
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v0104.py",
+        "functional modules/VDF/VDF_ENG093_LaunchConsole_v0103.py",
+        "supportive modules/registry/CGC_MDL125_FixAll_v*.py",
+        "supportive modules/registry/CGC_MDL134_ParallelLanes_v*.py",
+        "Invoke-VIA-VdfFetch-v*.ps1"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-10-13T10:01:06+00:00"
+    },
+    "activate_vdf_v0278": {
+      "argv": [
+        "CGC_MDL157_VIAUniqueEntryControl",
+        "--selftest"
+      ],
+      "success_marker": "[OK] 撞號以編號系統唯一碼為準:同號群組每支有碼 = 不算撞號;沒碼 = 撞號",
+      "scope": "短令 activate_vdf v0278(VDF-REQ021;操作員准 2026-10-13「准 Register v0278 出版」):Register-VIA-Commands-v0278 蓋過 v0277 的 activate_vdf —— ② all 呼叫前 $env:VIA_PY_TIMEOUT_SEC 沒設 / 不是數字 / < 14400 就放寬到 14400 秒,跑完還原;其餘一字不差;CGC_MDL157 自測 = 命令冊沿 dot-source 鏈讀(v0278 → v0277 → v0276 …)· 梭檢全有梭 · 零釘死。容器無 pwsh:函式本體要工作站實跑",
+      "dependencies": [
+        "Register-VIA-Commands-v0278.ps1",
+        "Register-VIA-Commands-v0277.ps1",
+        "Register-VIA-Commands-v0276.ps1",
+        "activate_vdf.cmd",
+        "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v*.py"
+      ],
+      "timeout_seconds": 600
+    },
+    "eng077_v0106": {
+      "argv": [
+        "VDF_ENG077_ActiveETFUniverse_v0106",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG077_ActiveETFUniverse v0106 薄尾 9/9 · PASS",
+      "scope": "VDF_ENG077_ActiveETFUniverse v0106 退役冊(VDF-REQ021;操作員裁定「00998A 標退役」):unify 濾掉退役碼 · persist 後註冊表 RETIRED · daily_required=FALSE · 不計官方冊消失 · run 印 [退役];撤銷(revoked_at)不算退役;本體照尾版律 v0101 · ScrapeGate 尾版 · 橋在 · PINVER 0;離線 rc 2 誠實",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0106.py",
+        "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0105.py",
+        "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0101.py",
+        "functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v*.json",
+        "supportive modules/registry/CGC_MDL224_ScrapeGate_v*.py"
+      ],
+      "timeout_seconds": 900
+    },
+    "vdf_ws_manager_junction": {
+      "argv": [
+        "VDF_SystemManager",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SystemManager_v0163 自測 6/6 · PASS",
+      "scope": "VDF_SystemManager v0163(工作站 2026-10-21 實錄:全鏈自測到 v0151 布置舊接點 os.symlink → WinError 1314 一般帳號沒有建符號連結特權,之後全鏈沒跑;CI 的 Windows runner 是管理員所以綠)→ 自測跑前版鏈時把 v0151 看到的 os 換成代理,目錄連結走 link_dir(Windows = mklink /J,同 v0151 正式 db move;其他 = 符號連結),跑完還原;v0151 正本不改;四系統對等獨立 L123,不改 VCGC 的冊與程式",
+      "dependencies": [
+        "functional modules/VDF/VDF_SystemManager_v*.py"
+      ],
+      "timeout_seconds": 2700,
+      "registered_at": "2026-10-30T04:15:29+00:00"
     }
   },
   "work_items": [
@@ -6540,6 +6898,424 @@
       "next": "無",
       "case": "vdf_ws_sync_worktree",
       "receipt": "docs/handoff/evidence/vdf_ws_sync_worktree.json"
+    },
+    {
+      "id": "VDF-REQ018:ws-fetch-quiet-vdf_ws_manager_fetch_quiet",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI",
+      "reason": "工作站 2026-10-27 逐支啟動 36 支擷取引擎(操作員令「先啟動這兩個清單後單獨啟動每一個VDF的引擎」)實錄:每個 fetch 動詞跑完都對 VIA_Reports/vdf 補一遍字級套件(不產頁的白工;操作員在 fetch status 收尾按 Ctrl+C)· 每次印 v0155 的 SyntaxWarning。管理員 v0162:fetch 不補套 · 載前版鏈壓掉編譯警告。本版自測 6/6 · 突變 9 個全抓到;全鏈自測在本容器因沒有 pandas(v0151 的 db 自測)跑不動 → 收據待工作站 / CI(Windows 有 pandas · duckdb)",
+      "next": "工作站或 CI 跑 handoff test vdf_ws_manager_fetch_quiet(需 pandas · duckdb);綠了轉 VERIFIED",
+      "pended_at": "2026-10-27T10:17:32+00:00",
+      "case": "vdf_ws_manager_fetch_quiet",
+      "receipt": "docs/handoff/evidence/vdf_ws_manager_fetch_quiet.json"
+    },
+    {
+      "id": "VCGC-REQ180:validation_ssot_v0101",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "新交接案 validation_ssot_v0101(V-val 紅根因:多段交叉代碼沒登 → MDL246 v0101 + 冊 v0101) → 已驗:validation_ssot_v0101 2026-10-11T19:00:30+00:00 rc 0 標記見到",
+      "next": "handoff test validation_ssot_v0101 實跑轉 VERIFIED",
+      "case": "validation_ssot_v0101",
+      "receipt": "docs/handoff/evidence/validation_ssot_v0101.json",
+      "resolved": "2026-10-11T19:03:57+00:00"
+    },
+    {
+      "id": "VCGC-REQ180:ps_station_chain",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "P-ui_cmds 紅根因:Register-VIA-Commands 自 v0270 是 PS 薄尾(點源前版),站只讀尾版文字 → TestAuto v0106 驗整條點源鏈;交接案 chain 標記釘 v0106 → 已驗:chain 2026-10-11T19:00:55+00:00 rc 0 標記見到",
+      "next": "handoff test chain 實跑轉 VERIFIED;VCGC test 站 P-ui_cmds 不再「少了串測步」",
+      "case": "chain",
+      "receipt": "docs/handoff/evidence/chain.json",
+      "resolved": "2026-10-11T19:03:57+00:00"
+    },
+    {
+      "id": "VCGC-REQ180:fetch_groups_isolation",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "C-vdf_fetch_groups_v0100–v0105 六站紅根因:v0100 自測 ⑫ 算到 VDF 活資料樞的 vdf_tw_market.duckdb(4 庫 ≠ 3)→ VDF_MDL012 v0106 自測鏈隔離活樞;六案標記釘 v0106(v0102 / v0104 / v0105 改跑尾版) → 已驗:vdf_fetch_groups_v0100 2026-10-11T19:01:09+00:00 rc 0 標記見到 · vdf_fetch_groups_v0101 2026-10-11T19:01:23+00:00 rc 0 標記見到 · vdf_fetch_groups_v0102 2026-10-11T19:01:37+00:00 rc 0 標記見到 · vdf_fetch_groups_v0103 2026-10-11T19:01:51+00:00 rc 0 標記見到 · vdf_fetch_groups_v0104 2026-10-11T19:02:05+00:00 rc 0 標記見到 · vdf_fetch_groups_v0105 2026-10-11T19:02:18+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0100 … v0105 六案實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0105",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0105.json",
+      "resolved": "2026-10-11T19:03:57+00:00"
+    },
+    {
+      "id": "VCGC-REQ180:numbering_batch",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "SDD X-NUM 紅:CGC_MDL183_CeleritasPolicyGate_v0105 · CGC_MDL140_HandoverConsole_v0107 沒編號;健康矩陣另列 VCGC 7 支 · VDF 4 支尾版沒號(MDL186 v0101 · MDL244 v0102 · MDL257 v0102 · MDL270 v0106 · MDL273 v0102 · MDL275 v0100 · test_master_control_contract v0103 · VDF_ENG093 v0104 · VDF_MDL001 / MDL201 / MDL303 v0100 雙胞)+ 本輪三支新尾版 → 已驗:2026-10-11 registry-sync --apply 新 7 · 變 18;MDL237 --apply --scope 19 檔 +288 列;audit 遺失 0 · 改身分 0 · 重號 0;sdd check X-NUM 只剩 VRN 兩支",
+      "next": "registry-sync --apply → run CGC_MDL237_NumberingSystem --apply --scope <清單> → audit 遺失 0 · 改身分 0 · 重號 0 → sdd check X-NUM 只剩 VRN 兩支",
+      "resolved": "2026-10-11T19:03:57+00:00",
+      "case": "numbering",
+      "receipt": "docs/handoff/evidence/numbering.json",
+      "note": "證據 = 交接案 numbering(CGC_MDL237 自測 9/9,編號批後重跑 rc 0)+ audit 遺失 0 · 改身分 0 · 重號 0(VIA_Numbering_SSOT_v0100 · VIA_NumberBooks 已提交 cd07d958 / ae12a26e)"
+    },
+    {
+      "id": "VCGC-REQ180:vrn_xnum",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "VRN / 操作員",
+      "reason": "SDD X-NUM 列 VRN_ENG086_FirstPageLogicBridge_v0120 · VRN_SystemManager_v0151(容器;工作站是 v0192)沒編號;L120 三系統對等,VCGC 不動 VRN 的號(操作員 2026-10-10「不改他系統的正本 / 冊 / 號 / 檔」) → 操作員 2026-10-12「全副同意授權自行最佳化處理」:VCGC 代編 VRN 兩支(VRN_ENG086_FirstPageLogicBridge_v0120 · VRN_SystemManager_v0151;commit 18ab0a67)· audit 遺失 0 · 改身分 0 · 重號 0 · sdd check X-NUM 綠",
+      "next": "工作站 VRN v0194 自己的尾版編號(先提交再 --apply --scope,正斜線路徑)",
+      "case": "numbering",
+      "receipt": "docs/handoff/evidence/numbering.json",
+      "resolved": "2026-10-11T21:48:23+00:00"
+    },
+    {
+      "id": "VCGC-REQ180:handoff_env_cases",
+      "requirement": "VCGC-REQ180",
+      "state": "BLOCKED",
+      "owner": "操作員(工作站)",
+      "reason": "交接閘 5 紅 CHANGED_CODE_WITHOUT_TEST 都不是容器能過的:VDF_ENG086_QuantGuardOneBridge_v0102(案 qg_onebridge 要 polars,容器 ABSENT)· CGC_MDL264_ViaUnified_v0100(案 via_unified 要 pwsh)· VIA_VRN_FirstPageEngine_v0130(案 first_page_engine / cov_vrn_firstpage_engine 要真 sidecar ≥ 20,工作站 66)· SUP_MDL749 v0116 / v0117(案 vrn_ssot_consistency,操作員 2026-10-10 VRN 暫緩;自測唯讀,工作站可跑)",
+      "next": "工作站:handoff test qg_onebridge · via_unified · first_page_engine · cov_vrn_firstpage_engine · vrn_ssot_consistency → handoff check 綠 → handoff checkpoint(全景交接閘落後 / 快照 / 未登歸零)"
+    },
+    {
+      "id": "VCGC-REQ180:sdd_relock",
+      "requirement": "VCGC-REQ180",
+      "state": "BLOCKED",
+      "owner": "AI(工作站交接綠後)",
+      "reason": "SDD X-LOCK 黃 6 處(VCGC-WKF007 MDL156 v0111→v0114 · WKF010 MDL866 v0105→v0108 · WKF011 MDL140 v0102→v0107 · WKF012 MDL149 v0186→v0191 · VDF-WKF011 VDF_SystemManager v0122→v0154 · VRN-WKF008 VRN_SystemManager v0111→v0151);MDL245 v0103 lock 閘:交接防遺漏不綠拒寫(容器 5 紅 → 工作站先過)",
+      "next": "工作站交接綠後:run CGC_MDL245_SDDValidator real → lock --apply(燈鎖冊下一版;VRN-WKF008 交 VRN 自己定)"
+    },
+    {
+      "id": "VCGC-REQ180:container_env_reds",
+      "requirement": "VCGC-REQ180",
+      "state": "BLOCKED",
+      "owner": "操作員(環境)",
+      "reason": "VCGC 串測容器紅 / 黃裡屬環境的:C-vdf_akshare_v0101 / v0102(polars 缺)· C-vrn_layout(reportlab 缺)· C-via_unified(pwsh 缺)· P-entry / P-step1 / P-vdf_fill / P-vdf_groups_ui / P-ui_engine(pwsh 缺照實黃)· V-ssot / V-check / V-panorama(境根 VIA_ENV_ROOT 沒設)· VRN lib 缺 pdfplumber;不裝套件(操作員令),工作站環境齊就綠",
+      "next": "工作站跑 via-vcgc test 整輪對照;容器不代裝"
+    },
+    {
+      "id": "VCGC-REQ180:immut_receipts",
+      "requirement": "VCGC-REQ180",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "事後全景新紅:E-number-audit rc 1 IMMUT 6 —— 交接收據 docs/handoff/evidence/vdf_fetch_groups_v0100–v0105.json 重跑後改了,v0109 把檔名 *_vNNNN.json 同夾 ≥ 2 版當版號冊就地改;收據的 _vNNNN 是案名,依設計每次重跑覆寫(MDL140 先按 SHA 封存)→ CGC_MDL237 v0118 IMMUT 具名豁免 docs/handoff/evidence/(其餘規則不動;5/5 · v0117 7/7) → 已驗:numbering 案 2026-10-11T19:48:25+00:00 rc 0 標記見到(尾版 v0118 鏈);audit IMMUT 0 · 遺失 0 · 改身分 0 · 重號 0;E-number-audit 站 紅 → 黃",
+      "next": "handoff test numbering(尾版 v0118 鏈)實跑轉 VERIFIED;audit IMMUT 0",
+      "case": "numbering",
+      "receipt": "docs/handoff/evidence/numbering.json",
+      "resolved": "2026-10-11T20:00:29+00:00"
+    },
+    {
+      "id": "VDF-REQ018:fetch_groups_parallel",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VDF_MDL012_FetchGroups v0107:清單引擎先跑 → 分道並行(3~5 流程)· CPU / DRAM / TEMP 守門 · TEMP 為主;容器自測 9/9 · 前版鏈 PASS;fixture 煙霧跑(暫存家,TW_INDEX + TW_ACTIVE_ETF):010 清單先跑 rc 0 → 兩道同時起、目錄 fg_runs 寫入 ok(引擎本身 fixture 下照自己的閘回 rc 2/3/4) → 已驗:vdf_fetch_groups_v0107 2026-10-11T21:51:43+00:00 rc 0 標記見到 · vdf_fetch_groups_v0100 2026-10-11T21:52:14+00:00 rc 0 標記見到 · vdf_fetch_groups_v0101 2026-10-11T21:52:32+00:00 rc 0 標記見到 · vdf_fetch_groups_v0103 2026-10-11T21:52:55+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_fetch_groups_v0107 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_v0107",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0107.json",
+      "resolved": "2026-10-11T21:55:33+00:00"
+    },
+    {
+      "id": "VDF-REQ018:usertest_browser",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "頁功能鍵 USER-TEST:容器 Chromium headless 逐鍵點 79 綠 0 紅(功能鈕 · 收尾鈕 · 頁籤 · 全選 / 清除 · 快照);結果掛頁「並行擷取 · USER-TEST」 → 已驗:vdf_fetch_groups_usertest 2026-10-11T21:51:57+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_fetch_groups_usertest 實跑轉 VERIFIED",
+      "case": "vdf_fetch_groups_usertest",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_usertest.json",
+      "resolved": "2026-10-11T21:55:33+00:00"
+    },
+    {
+      "id": "VDF-REQ018:bridges_ps_accel",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI / 操作員(工作站對照)",
+      "reason": "容器稽核(乾跑,只讀):NET 橋 functional modules/VDF 掃 524 · 已掛 137 · 缺 0 · 覆蓋 100%;ACCEL 橋計畫 0;PS 入口(Invoke-VIA-VdfFetch-v0108 · Invoke-VDF-FetchFill-v0100 · Invoke-VIA-RealTest-v0106 · Invoke-VDF-FetchGroupsUI-v0100 …)已帶 Invoke-VIACeleritasScoped / Invoke-VIAPython;沒有缺可補(.ps1 不改,L70)",
+      "next": "工作站 via-vcgc run CGC_MDL124_BridgeSweeper 乾跑對照(應仍缺 0)後轉 VERIFIED(用 sweeper 收據)"
+    },
+    {
+      "id": "VDF-REQ018:live_parallel_run",
+      "requirement": "VDF-REQ018",
+      "state": "BLOCKED",
+      "owner": "操作員(雙閘 · 工作站)",
+      "reason": "live 擷取要 VIA_NET_CONSENT / VIA_SCRAPE_CONSENT(操作員的手,AI 永不代設);容器無閘,只能 fixture 煙霧",
+      "next": "工作站一貼:run --family vdf VDF_SystemManager universe → run --family vdf VDF_MDL012_FetchGroups run --groups ALL --jobs 4 --mode live → usertest → ui(見 docs/handoff/ai/VIA_ThreeSystems_FixRound_20261012.md 三)"
+    },
+    {
+      "id": "VDF-REQ018:env_tools",
+      "requirement": "VDF-REQ018",
+      "state": "BLOCKED",
+      "owner": "操作員(環境)",
+      "reason": "VCGC 檢視沒裝的工具(容器):pdftoppm 缺(CGC_MDL273 ext 出 winget 計畫 oschwartz10612.Poppler)· pdfplumber 缺(VRN 首頁文字)· polars / reportlab / pwsh 缺(容器專屬);不裝套件(操作員令)",
+      "next": "工作站:run CGC_MDL273_EnvToolAudit ext(--apply 要本視窗 VIA_NET_CONSENT=YES)· run CGC_MDL240_EnvManager 對照;裝完轉 VERIFIED"
+    },
+    {
+      "id": "VDF-REQ018:page_layout",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-12 看過 via-groups-ui 跳出的頁:「字體大小有位階但畫面凌亂,要用工具最佳化」→ v0108 套 VDF 字級套件 + 左面板摺疊 + 展現規則;容器 headless 截圖對照:左面板 2000px 一條到底 → 兩節開其餘收;引擎表短欄逐字直排 → 不換行;燈欄移第一;路徑縮檔名;空值 —;瀏覽器逐鍵實測 79 綠 0 紅 → 已驗:vdf_fetch_groups_v0108 2026-10-12T00:08:18+00:00 rc 0 標記見到;家族案 v0100 / v0101 / v0103 / usertest / vdf_activate / chain 在 v0108 尾版重跑全 rc 0",
+      "next": "handoff test vdf_fetch_groups_v0108 實跑轉 VERIFIED;工作站 via-groups-ui 再看一次",
+      "case": "vdf_fetch_groups_v0108",
+      "receipt": "docs/handoff/evidence/vdf_fetch_groups_v0108.json",
+      "resolved": "2026-10-12T00:12:47+00:00"
+    },
+    {
+      "id": "VDF-REQ018:one_launch",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-12「給我一個啟動VDF啟動全部及HTML U/I 的指令並在上面操作」→「INTEGRATE ALL ABOVE INTO ONE」:VDF_SystemManager v0155 `all` 一個動詞串起 健康 → 啟動就緒 → 問參數頁啟動 11 步擷取 → 族群並行擷取 → 輸入清單 → USER-TEST → 族群頁 → 主頁 → 跳出;問參數頁「啟動就緒」ABSENT 的根因 = 薄尾鏈接不到 v0104 的 read_launch → 本版門代答 → 已驗:vdf_manager_v0155 2026-10-12T02:42:17+00:00 rc 0 標記見到;容器 all --skip ask --mode fixture 整跑九步一列(health GREEN · ready RED 容器無短令冊 · groups RED fixture · lists YELLOW · usertest GREEN 79/0 · page / hub GREEN)",
+      "next": "handoff test vdf_manager_v0155 實跑轉 VERIFIED;工作站 python $V run --family vdf VDF_SystemManager all(問參數頁 → 在頁上按啟動)",
+      "case": "vdf_manager_v0155",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0155.json",
+      "resolved": "2026-10-12T03:06:22+00:00"
+    },
+    {
+      "id": "VDF-REQ019:activate_vdf",
+      "requirement": "VDF-REQ019",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-12「設立一個指令啟動VDF  短指令activate_vdf  啟動前後端系統介面 從html u/i操作」:Register-VIA-Commands-v0276(點源 v0275)+ activate_vdf(① CGC_MDL265 監控 ② 啟動前改 ③ VDF_SystemManager all 前後端 ④ CGC_MDL261 操作頁跳出)+ 同名梭;冊上 via-* 缺梭 23 支本輪補範本梭(MDL157 梭檢轉綠;失門 via-activate-vdf · 別名歧指 總檢 為既有,只攤開) → 已驗:activate_vdf_v0276 2026-10-12T03:55:45+00:00 rc 0 標記見到(MDL157 自測:命令冊沿鏈讀到 v0276);MDL157 status 梭檢 208 支全有梭 · 零釘死;函式本體待工作站實跑(容器無 pwsh) → 轉回 PENDING(帶理由):工作站實錄 2026-10-12 activate_vdf 跑起來但 VDF_SystemManager 尾版 v0154「未知動詞 all」(分支沒併全),且 ④ 開的是 VCGC 統一操作頁;操作員裁定「vrn vdf  vcgc都是獨立操作台  只是顏色及lauout基本規劃相同」(VCGC-REQ181)→ Register v0277 蓋過:純 VDF 台 · 尾版門 · 旗標行 → 已驗:activate_vdf_v0277 2026-10-12T06:54:02+00:00 rc 0 標記見到(MDL157 自測:命令冊沿鏈讀到 v0277(純 VDF 台 · 尾版門 · 旗標行));MDL157 status 梭檢 208 支全有梭 · 零釘死;函式本體待工作站實跑(容器無 pwsh)",
+      "next": "handoff test activate_vdf_v0277 收據 → VERIFIED;工作站:git merge --no-edit origin/claude/kind-cannon-pti15g(帳本衝突 via-medic)→ 點源尾版(看到 [VIA] Register 尾版 v0277)→ 開雙閘 → activate_vdf → 貼回 [activate_vdf] 行與 [計] VDF_SystemManager_v0155 all 行",
+      "case": "activate_vdf_v0277",
+      "receipt": "docs/handoff/evidence/activate_vdf_v0277.json",
+      "resolved": "2026-10-12T06:56:45+00:00"
+    },
+    {
+      "id": "VDF-REQ018:ready_door",
+      "requirement": "VDF-REQ018",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "工作站問參數頁(2026-10-12 14:59,來源 VDF_SystemManager_v0155.py)「啟動就緒 RED · [修] 這些是樹上的檔,不是設定:git pull…」是假紅:v0104 read_launch ④ 只讀 Register 尾版一檔找 16 個啟動短令,冊自 v0244 起是薄尾、短令全在 v0243 → 永遠找不到。v0156:代答前換成沿點源鏈讀的讀器(只讀 · 防環 · 代答完還原),all 的 ready 步也走本版門;自測 8/8 + 前版鏈 PASS → 已驗:vdf_manager_v0156 2026-10-12T07:14:42+00:00 rc 0 標記見到(8/8 + 前版鏈 v0149 → v0155);容器 ENG093 readiness 經尾版門 = GATED(閘未開,料齊),不再是「啟動器/鏈缺」",
+      "next": "handoff test vdf_manager_v0156 收據 → VERIFIED;工作站:再併一次分支 → 問參數頁重開看「啟動就緒」(應不再是「啟動器/鏈缺」)",
+      "case": "vdf_manager_v0156",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0156.json",
+      "resolved": "2026-10-12T07:38:52+00:00"
+    },
+    {
+      "id": "VDF-REQ020:fetch_decoder",
+      "requirement": "VDF-REQ020",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "操作員 2026-10-12「…再回朔到擷取他的工具加上亂碼問題解碼器」:根因在網路工具當文字那一步(resp.text 無 charset 當 latin-1 · decode utf-8 replace / ignore)。SUP_MDL756_SmartDecode v0100(解碼器)+ SUP_MDL740_NetUnified v0119(http_text 先位元組再智慧解碼;via_net_unified 轉接件自動接到尾版) → 已驗:smartdecode_v0100 2026-10-12T09:31:03+00:00 rc 0 標記見到 · netunified_v0119 2026-10-12T09:31:13+00:00 rc 0 標記見到",
+      "next": "handoff test smartdecode_v0100 · netunified_v0119 收據 → VERIFIED",
+      "case": "netunified_v0119",
+      "receipt": "docs/handoff/evidence/netunified_v0119.json",
+      "resolved": "2026-10-12T09:31:40+00:00"
+    },
+    {
+      "id": "VDF-REQ020:repair_tool",
+      "requirement": "VDF-REQ020",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "「先把它修正為非亂碼」的工具:VDF_ENG235_MojibakeRepair v0100(scan / fix parquet 與 DuckDB 表;備份只增;不可逆照實)+ VDF_ENG065_DbImport v0102(匯入前先修單元檔) → 已驗:mojibake_repair_v0100 2026-10-12T09:31:23+00:00 rc 0 標記見到 · db_import_v0102 2026-10-12T09:31:34+00:00 rc 0 標記見到",
+      "next": "handoff test mojibake_repair_v0100 · db_import_v0102 收據 → VERIFIED",
+      "case": "mojibake_repair_v0100",
+      "receipt": "docs/handoff/evidence/mojibake_repair_v0100.json",
+      "resolved": "2026-10-12T09:31:40+00:00"
+    },
+    {
+      "id": "VDF-REQ020:workstation_run",
+      "requirement": "VDF-REQ020",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "21 個單元檔在工作站 C:\\Users\\tonyk\\OneDrive\\Documents\\VeritasIntelligenceAnalytics\\via_database\\vdf_database(容器看不到):scan → fix --apply → 複掃;「解取實用一次 輸出實用一次」要雙閘與真資料(操作員的手)",
+      "next": "照交接文件第十二節一貼:scan → fix --apply → 複掃 → 開雙閘真抓一次(http_text 已帶解碼器)→ ENG065 import 匯入一次 → db check;貼回三段 [計] 行與 MOJIBAKE_SCAN_latest.json 的 lamp / 不可逆數",
+      "case": null,
+      "receipt": null
+    },
+    {
+      "id": "VDF-REQ020:import_hook",
+      "requirement": "VDF-REQ020",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "VDF_ENG065_DbImport v0102 匯入前先修單元檔(交接閘以 VERIFIED 工作項所指收據的相依為「已測」:v0102 要有自己的項才不算改了沒測) → 已驗:db_import_v0102 2026-10-12T09:31:34+00:00 rc 0 標記見到",
+      "next": "—",
+      "case": "db_import_v0102",
+      "receipt": "docs/handoff/evidence/db_import_v0102.json",
+      "resolved": "2026-10-12T09:36:46+00:00"
+    },
+    {
+      "id": "VDF-REQ020:smartdecode",
+      "requirement": "VDF-REQ020",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "SUP_MDL756_SmartDecode v0100 亂碼問題解碼器(純函式自測 13/13) → 已驗:smartdecode_v0100 2026-10-12T09:31:03+00:00 rc 0 標記見到",
+      "next": "—",
+      "case": "smartdecode_v0100",
+      "receipt": "docs/handoff/evidence/smartdecode_v0100.json",
+      "resolved": "2026-10-12T09:36:46+00:00"
+    },
+    {
+      "id": "VCGC-REQ182:vdf_1c",
+      "requirement": "VCGC-REQ182",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "設計稿 1c 汝窯天青 → VDF_SystemManager v0157(冊 v0103 systems.VDF + design.css 進字級套件;via-theme 跟冊走;JS 襯線放行);容器自測 9/9 + 前版鏈 PASS · 經 VCGC run 重產 VDF 頁 / 族群頁 / vdf 夾 *_latest 各帶一段 [VIA:DESIGN:…v0103] · 無頭截圖核對 → 已驗:vdf_manager_v0157 2026-10-12T16:54:22+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_manager_v0157 收據 → VERIFIED;工作站:併分支 → activate_vdf 看 1c 頁",
+      "case": "vdf_manager_v0157",
+      "receipt": "docs/handoff/evidence/vdf_manager_v0157.json",
+      "resolved": "2026-10-12T16:54:51+00:00"
+    },
+    {
+      "id": "VCGC-REQ182:vcgc_1a_matrix",
+      "requirement": "VCGC-REQ182",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "設計稿 1a 母系統 → CGC_MDL274_HealthMatrix v0115(VCGC 頁 · 健康矩陣頁 · 入口頁;theme preview 預覽頁);容器自測 PASS + 前版鏈 · 經 VCGC run ui / portal / theme preview 重產 · 無頭截圖核對 → 已驗:health_matrix_v0115 2026-10-12T16:51:18+00:00 rc 0 標記見到",
+      "next": "handoff test health_matrix_v0115 收據 → VERIFIED;工作站:via-vcgc run CGC_MDL274_HealthMatrix theme preview 看三區",
+      "case": "health_matrix_v0115",
+      "receipt": "docs/handoff/evidence/health_matrix_v0115.json",
+      "resolved": "2026-10-12T16:54:51+00:00"
+    },
+    {
+      "id": "VCGC-REQ182:vcgc_1a_console",
+      "requirement": "VCGC-REQ182",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "設計稿 1a 母系統 → CGC_MDL261_UIEngine v0107(操作台範本變數對映到冊 token);容器自測 9/9 + 前版鏈 PASS · 經 VCGC run build 重產(3.4 MB 頁一段套件)· 無頭截圖核對 → 已驗:ui_engine_v0107 2026-10-12T16:51:38+00:00 rc 0 標記見到",
+      "next": "handoff test ui_engine_v0107 收據 → VERIFIED;工作站:via-vcgc run CGC_MDL261_UIEngine build --open",
+      "case": "ui_engine_v0107",
+      "receipt": "docs/handoff/evidence/ui_engine_v0107.json",
+      "resolved": "2026-10-12T16:54:51+00:00"
+    },
+    {
+      "id": "VCGC-REQ182:vrn_1b",
+      "requirement": "VCGC-REQ182",
+      "state": "PENDING",
+      "owner": "操作員(VRN 側)",
+      "reason": "設計稿 1b 青花 → 冊 v0103 systems.VRN(頁首條 #ccd8ea · 鈷藍 #24457f · 白瓷左欄 274px · 六色頂條 · ADOPTED #3d7a52)+ 預覽頁 1b 區攤開;L120 三系統獨立 + 衝突裁定甲 / 撤回令 → 倉內不出 VRN 尾版,VRN 自己的 manager 下一版照冊 adoption.VRN 讀法套(冊尾版 tokens + systems.VRN + design.css 接在字級套件 CSS 後;燈四色仍鎖)",
+      "next": "VRN-MAIN(工作站 v0194+)下一版:ui 讀 VIA_UI_Template_SSOT 尾版 tokens + systems.VRN + design.css;貼回 [計] 行 → 轉 VERIFIED(理由:VRN 側自報)"
+    },
+    {
+      "id": "VCGC-REQ182:workstation_view",
+      "requirement": "VCGC-REQ182",
+      "state": "PENDING",
+      "owner": "操作員",
+      "reason": "容器只有無頭截圖(襯線 Cormorant Garamond 本機沒裝 → 退 Georgia / 系統襯線;工作站字體不同);頁面實看在工作站",
+      "next": "工作站看 VDF 頁 · 預覽頁 · 操作台;要改的顏色 / 字體貼回 → 出冊 v0104(只改冊,引擎不動)"
+    },
+    {
+      "id": "VDF-REQ021:list_engines_ok",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "兩支清單生成引擎正常作業(容器離線自測:MDL009 v0100 7/7 · v0101 9/9 · v0102 5/5;MDL010 v0100 7/7;來源 TWSE / TPEX OpenAPI;驗證七項;輸出 *_latest.parquet / csv + vdf_master_lists.duckdb 增量);FetchSystem 冊 35 支引擎 needs 009 · 010 = 輸出作為其他引擎的輸入 → 已驗:vdf_list_stock_v0102 2026-10-07T09:37:41+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_list_stock_v0102 · vdf_list_etf 收據 → VERIFIED;真抓在工作站",
+      "case": "vdf_list_stock_v0102",
+      "receipt": "docs/handoff/evidence/vdf_list_stock_v0102.json",
+      "resolved": "2026-10-13T10:08:23+00:00"
+    },
+    {
+      "id": "VDF-REQ021:list_engines_ok_etf",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "主動式台股 ETF 清單引擎(MDL010 v0100 7/7;t187ap47_L · ENG077 代碼律 / 揭露律) → 已驗:vdf_list_etf 2026-10-07T09:37:03+00:00 rc 0 標記見到",
+      "next": "handoff test vdf_list_etf 收據 → VERIFIED",
+      "case": "vdf_list_etf",
+      "receipt": "docs/handoff/evidence/vdf_list_etf.json",
+      "resolved": "2026-10-13T10:08:23+00:00"
+    },
+    {
+      "id": "VDF-REQ021:lists_first_book",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "一鍵啟動 ② 步冊 CGC_MDL125 沒有清單步 → v0112 在 datahome 之後插 tw_list · etf_list;容器自測 6/6 + 前版七檢 → 已驗:fixall_v0112 2026-10-13T10:07:08+00:00 rc 0 標記見到",
+      "next": "handoff test fixall_v0112 收據 → VERIFIED",
+      "case": "fixall_v0112",
+      "receipt": "docs/handoff/evidence/fixall_v0112.json",
+      "resolved": "2026-10-13T10:08:23+00:00"
+    },
+    {
+      "id": "VDF-REQ021:lists_first_lanes",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "並行道 CGC_MDL134 v0102:lists 鏈先跑、資料鏈全等 etf_list、--only 子集自動帶上(啟動器 $stepBook 不必改)、清單步帶 VCGC 入口標記;容器 plan 20 步 9 鏈 · run --only … --dry 清單步自動加入並先於資料步;自測 8/8 + 前版九檢 → 已驗:lanes_v0102 2026-10-13T10:07:21+00:00 rc 0 標記見到",
+      "next": "handoff test lanes_v0102 收據 → VERIFIED",
+      "case": "lanes_v0102",
+      "receipt": "docs/handoff/evidence/lanes_v0102.json",
+      "resolved": "2026-10-13T10:08:23+00:00"
+    },
+    {
+      "id": "VDF-REQ021:lists_first_page",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI",
+      "reason": "問參數頁 VDF_ENG093 v0105:矩陣最前兩列 tw_list · etf_list 鎖定必跑(不經 -Steps);容器渲染截圖核對;自測 7/7 + 前版鏈 → 已驗:launch_console_v0105 2026-10-13T10:07:40+00:00 rc 0 標記見到",
+      "next": "handoff test launch_console_v0105 收據 → VERIFIED",
+      "case": "launch_console_v0105",
+      "receipt": "docs/handoff/evidence/launch_console_v0105.json",
+      "resolved": "2026-10-13T10:08:23+00:00"
+    },
+    {
+      "id": "VDF-REQ021:workstation_run",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "操作員",
+      "reason": "真抓清單與一鍵啟動要工作站雙閘與網路(容器離線:清單步 SKIP 誠實);每日自動更新倉內沒有排程器,掛不掛每日鏈是操作員的手",
+      "next": "選:工作站 `python $V run --family vdf VDF_MDL009_TWStockList status` 貼回 verify_report.json 燈;每日自動更新 = 操作員把 via-vdffetch 掛進每日鏈",
+      "resolved": "受理憑據 = 操作員工作站貼回(本冊無法在容器生成工作站收據;原話收在需求冊 v0207 quotes 與 round doc 十四):工作站貼回 2026-10-13 20:32(工作站本地時間;Invoke-VIA-VdfFetch v0108 → v0107 → CGC_MDL134 run):道 1/13 datahome OK 11.1s · 2/13 tw_list OK 121.5s · 3/13 etf_list OK 46.3s · 4/13 hist_2023 OK 26.3s · 5/13 revenue_backfill OK 5.9s(清單兩步在 datahome 之後、資料步之前);單跑 VDF_MDL009_TWStockList v0102 run OK · 1,985 筆 · 12.4s(status 卡沒貼;verify_report 燈未見);⑦ 每日兩張清單檔 GREEN(台股個股 1,985 · 主動式 ETF 22 已驗證 22);PLAN 步 20 · 鏈 9(lists:tw_list → etf_list)· LIVE 13 步 = 問參數頁 11 步 + 清單 2 步(問參數頁決定行仍印「步 11/11」:鎖定列不經 -Steps,道上自動帶上 —— 設計如此;道橫幅印前版 ENGINE_TAG v0101,功能已是 v0102)。掛 lanes_v0102 收據 = 同一清單先行邏輯(CGC_MDL134 v0102)的容器自測錨點(交接閘 VERIFIED 需收據,比照 VCGC-REQ092:ps-parse-errors 掛相關案收據)",
+      "case": "lanes_v0102",
+      "receipt": "docs/handoff/evidence/lanes_v0102.json"
+    },
+    {
+      "id": "VDF-REQ021:one_launch_ceiling",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "AI(出版)/ 操作員(准 · 工作站實跑)",
+      "reason": "工作站 activate_vdf 一鍵:清單先行 OK 之後整程被 Invoke-VIAPython 預設天花板 1800s 停掉 → all rc 124 · RED;步 7–13 沒跑完。天花板根因:activate_vdf(Register v0277)→ via-vcgc run --family vdf VDF_SystemManager all → Invoke-VIAPython 沒帶 -TimeoutSec → 預設 1800s(VIA_PS_PyProgress_Module;$env:VIA_PY_TIMEOUT_SEC 可調,0 = 不設限);問參數頁等待(≤ 15 分)+ ① 7 步 698s + ② 道並行都在同一支 python 子樹內,整程被殺 → rc 124。VdfFetch-v0107 內層那次 Invoke-VIAPython 也沒帶 -TimeoutSec(同一條 env 可解)",
+      "next": "工作站併分支後 activate_vdf 一次:旗標行印「尾版 v0278」、② 前印「天花板放寬到 14400 秒」→ lanes 跑完 13/13(見 one_launch_rerun)",
+      "case": "activate_vdf_v0278",
+      "receipt": "docs/handoff/evidence/activate_vdf_v0278.json",
+      "resolved": "操作員 2026-10-13「准 Register v0278 出版」→ Register-VIA-Commands-v0278.ps1(操作員准 2026-10-13;L70):點源 v0277、只蓋 activate_vdf —— ② all 呼叫前比照 via-in(v0263):$env:VIA_PY_TIMEOUT_SEC 沒設 / 不是數字 / 小於 14400 就放寬到 14400 秒,跑完還原,設 0 照你的;env 由 pwsh 子行程(問參數頁 → VdfFetch)繼承,內層那次 Invoke-VIAPython 同受惠;其餘與 v0277 一字不差(diff = 點源行 + 10 行天花板段 + 旗標行);activate_vdf.cmd 梭照 glob 取尾版自動接上;容器無 pwsh:括號平衡 73/73 · 全景剖析 問題 0 · CGC_MDL157 自測 rc 0,函式本體要工作站實跑"
+    },
+    {
+      "id": "VDF-REQ021:etf_universe_00998A",
+      "requirement": "VDF-REQ021",
+      "state": "VERIFIED",
+      "owner": "操作員裁定 → AI",
+      "reason": "道 etf_universe FAIL 47.3s:ENG077 v0105 rc 2 = 官方冊消失 1(00998A 主動復華金融股息;TWSE 冊 A 碼 31 · 既有快照 32)→ 標 MISSING_FROM_SOURCE 候查不刪;道上 rc≠0 = FAIL → etf 鏈後三步(etf_fetch · etf_history · etf_revenue)沒起;① 7 步裡同一支也 NODATA rc 2(黃)。清單引擎 MDL010 與 ENG231 仍 GREEN 22 檔,不受影響",
+      "next": "工作站下一次 etf_universe 跑到:印 [退役] 一行 · 註冊表 00998A 改標 RETIRED · rc 不再因它回 2 → etf 鏈後三步起;再有退役就加進冊(新版號),撤銷填 revoked_at",
+      "case": "eng077_v0106",
+      "receipt": "docs/handoff/evidence/eng077_v0106.json",
+      "resolved": "操作員 2026-10-13「00998A 標退役」→ VDF_ENG077_ActiveETFUniverse_v0106.py(薄尾,本體照尾版律仍是 v0101)+ 退役冊 functional modules/VDF/VDF_ActiveETF_Retired_SSOT_v0100.json(00998A 主動復華金融股息 · 裁定「00998A 標退役」2026-10-13 · 只增不減,撤銷填 revoked_at):① unify 之後濾掉退役碼(不入當日宇宙列 · 不入 SSOT csv · ENG051 不再抓其持股)② persist 之後註冊表 status=RETIRED · daily_required=FALSE(不刪列)③ 不計官方冊消失(rc 不因它回 2)· run 收尾印 [退役];自測 9/9(冊在 · 濾 · 撤銷不濾 · RETIRED · 離線 rc 2 誠實)。工作站下一次一鍵 / etf_universe 跑到就把 00998A 那列改標"
+    },
+    {
+      "id": "VDF-REQ021:lanes_banner_tag",
+      "requirement": "VDF-REQ021",
+      "state": "PENDING",
+      "owner": "AI(下一次 MDL134 出尾版時)",
+      "reason": "並行道橫幅印前版 ENGINE_TAG「CGC_MDL134_ParallelLanes v0101」(v0102 薄尾沒蓋 ENGINE_TAG);功能已是 v0102(PLAN 20 步 9 鏈含 lists · LIVE 13 步含 tw_list · etf_list)。問參數頁決定行「步 11/11」同理:鎖定列不經 -Steps,設計如此",
+      "next": "下次 MDL134 出尾版順手 PRIOR.ENGINE_TAG 蓋成本版;ENG093 決定行可加印「+ 清單先行 2」;不單獨出版(不擴大範圍)"
+    },
+    {
+      "id": "VDF-REQ021:one_launch_rerun",
+      "requirement": "VDF-REQ021",
+      "state": "PENDING",
+      "owner": "操作員(工作站)",
+      "reason": "一鍵整程要在 v0278(天花板)+ ENG077 v0106(退役)之後重跑一次才算驗:今天那趟 rc 124、LANES_*.json 沒寫,資料庫狀況頁還掛 2026-09-24 那份報告",
+      "next": "併分支 → activate_vdf → 貼回 [道] 1..13/13 各列(OK · 秒數)· [退役] 行 · 資料庫狀況頁(分類燈 · 增量缺口表數)→ VERIFIED(理由:工作站實錄)"
+    },
+    {
+      "id": "VDF-REQ021:db_stale_engines",
+      "requirement": "VDF-REQ021",
+      "state": "PENDING",
+      "owner": "操作員(貼 log)→ AI(定根因)",
+      "reason": "VDF 資料庫狀況頁貼回(VDF_ENG093 v0105 · 2026-10-13 21:03:17):各步結果 PART 但那份是 LANES_20260924_145157(頁自己註明比本次決定早 = 今天那趟被殺前沒寫 LANES_*.json);資料庫目錄 FRESH(21:03 重點)· 分類燈 RED(ETF 滯後 48 · 宏觀 49 · 國際 47 · 其他 104;營收 NODATA)· 增量缺口 表 73 有缺口 32(tw__tw_daily_prices → 2026-08-25 缺 49 · tw_chip_inst / margin → 2026-08-25 缺 415 · gl__global_daily → 2026-08-25 缺 49 …)· 引擎狀況(FG_20261012T113922Z 族群跑):RED rc 1 = e054 TWDailyBackfill · e057 TradingValueBackfill · e056 ChipBackfill · e078 ActiveETFHoldingsHistory · e082 FinStatements · e066 GlobalUniverse · e074 FredMacroSSOT;rc 124 = e232 TWIndexOfficial · 011d AkshareFetcher;YELLOW e063 rc 2;GREEN 009 · 010 · e077 · 006 · e113 · e229 · e116 · e115。rc 124 兩支 = 族群跑的逾時(同一類天花板);rc 1 七支容器看不到 log,不猜",
+      "next": "貼 VIA_Reports/vdf/fg_runs/FG_20261012T113922Z/ 各引擎 log 最後 30 行(或 VDF_SystemManager engine matrix 的紅列詳情)→ AI 逐支定根因、出修法;分類燈與缺口表在一鍵跑完後重看"
+    },
+    {
+      "id": "VDF-REQ018:ws-junction-vdf_ws_manager_junction",
+      "requirement": "VDF-REQ018",
+      "state": "PENDING",
+      "owner": "AI / 工作站(要 duckdb · pandas)",
+      "reason": "工作站 vdf_ws_manager_design 收據(2026-10-21 · win32)實錄全鏈自測崩在 v0151 第 458 行 os.symlink → [WinError 1314] 用戶端沒有這項特殊權限;凡指令 VDF_SystemManager --selftest 的 16 案在工作站一般帳號一律紅。管理員 v0163:自測窗內 v0151 布置接點改走 mklink /J(同正式 db move)。本版自測 6/6(前版鏈略過)· 模擬 Windows 實跑 v0151 自測確認改走 mklink /J、參數順序對、os 換回原樣 · 突變 10 個全抓到;全鏈自測在本容器因沒有 duckdb(v0151 db 自測 · FetchGroups 來源狀態)跑不動 → 收據待工作站 / CI(Windows 有 duckdb · pandas)",
+      "next": "併入 main 後工作站跑 VDF_MDL014_WorkstationSync 尾版 --apply --case vdf_ws_manager_junction(與其他 VDF 失效案同一輪);綠了轉 VERIFIED",
+      "pended_at": "2026-10-30T04:15:29+00:00",
+      "case": "vdf_ws_manager_junction",
+      "receipt": "docs/handoff/evidence/vdf_ws_manager_junction.json"
     }
   ]
 }

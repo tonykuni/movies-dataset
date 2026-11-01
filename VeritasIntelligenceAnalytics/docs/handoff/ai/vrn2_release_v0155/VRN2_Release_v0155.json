@@ -1,0 +1,79 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0111 + VRN2_HandleAll_v0103 (package v0154 unchanged)",
+ "date": "2026-10-31",
+ "trigger": "桌機 2026-10-31 02:06 Handle-All v0102 repair:⑥f GREEN(ConsensusJoin v0103 · 搬 38 / 43 · 8358 / 2891 抓到 · 404 × 3 不納入閘)· 收尾 OPEN「VRN-2 1」= Combined 冊 GFHK Apple(AAPL)共識欄空被 v0110 算 VRN-2",
+ "package": {
+  "name": "VRN2_Closeout_v0154.zip",
+  "folder": "vrn2_release_v0154",
+  "sha256": "a74f476610b9282ec5a85c869cea914fd6933ea677bb570a4716258f0478baf7",
+  "changed": false
+ },
+ "fixes": {
+  "RoundAll_v0111_non_tw_consensus": "Combined gaps: consensus columns empty and TICKER not a TW 4-digit code → 'code is not a TW 4-digit code · consensus covers TW only' → data source (blank TICKER → human), same rule as TARGET_PRICE(ADJ); v0109 got data source by accident (batch summary text), v0110 → VRN-2; selftest 51",
+  "HandleAll_v0103": "v0102 pointed at RoundAll v0111 (vrn2_release_v0155); short line / boot line / cmd line as v0102"
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0110.py",
+   "sha256": "cc1d4b5d7a04783faa6363baf2b9c35cb6f298e32432b32104e0f9b682c49484",
+   "status": "superseded 2026-10-31 (AAPL consensus gap counted as VRN-2); file kept in vrn2_release_v0154"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0111.py",
+  "sha256": "1d094c0d5c3602167eee8c5c5c5d55e3783c75db854afc9499dd13829754c4c7",
+  "pinned_package_sha256": "a74f476610b9282ec5a85c869cea914fd6933ea677bb570a4716258f0478baf7",
+  "guide": "VRN2_RoundAll_v0111.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0103.md",
+  "line_sha256": "c407fd42f103e51de0436b260f39c1aa3202f146e9f00fb5d99732fe44a022a6",
+  "line_chars": 9009,
+  "boot_file": "VRN2_HandleAll_v0103_boot.txt",
+  "boot_line_sha256": "ddc3139d3d60422f71a2d30a923693803639093ff50a2cfe712bd6a96baf7a49",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 4640
+ },
+ "not_fixed_here": {
+  "MOPS_DENY": "VDF financial fetch through the VIA network bridge is denied by its compliance layer (never bypassed by VDF / VRN-2) → VCGC decision; close-out page lists it under VCGC",
+  "OCR_PENDING_4": "MQ-1560 20260520.pdf image page: OCR excerpts need a human look at the image (close-out page: human check)",
+  "annual_gaps_3": "Daiwa-6278 / 3264 / 6143 annual data missing: check whether the source has an annual table (close-out page: human check)",
+  "market_AAPL": "GFHK Apple (ticker AAPL, not a TW 4-digit code): no TW market data → data source",
+  "market_before_report_5": "神達 3706 (3 reports) / 緯穎 6669 (2 reports): no adjusted close in the week before the report date — those daily windows came back PARTIAL (rc 2) from the VDF engine; VDF / data source, not changed by VRN-2",
+  "VDF_v0102_package": "operator uploaded VDF_v0102_Redownload_4.zip (VDF's own standalone system v0102, installed through VCGC): read only; VRN-2 does not install or change it (four systems independent)",
+  "cnyes_transient": "if cnyes still answers some codes without data after the retries, they stay YELLOW · data source (source_gap) until the next run"
+ },
+ "results": {
+  "selftest": [
+   "[PASS] 51 Combined:代號不是台股 4 碼(GFHK Apple · AAPL)那列共識欄空 → 資料源(桌機 02:06 被 v0110 算成 VRN-2)· TICKER 空白 → 人工 · 台股代號的「共識缺」照舊 VRN-2",
+   "[PASS] VRN2_RoundAll v0111 --selftest · 51 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析 0 錯 · Handle-All 一行 = 可讀版 · 開機行 = 可讀版(詞序列相同)",
+  "e2e": {
+   "report": [
+    "[GREEN] boot: Handle-All v0103 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 5 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 5 項",
+    "  [人工] 1 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 1 秒(視窗不會關)"
+   ],
+   "auto": [
+    "[GREEN] boot: Handle-All v0103 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(輸出冊是啟動器 v0153 以後做的 · 這版只改 ⑥f 共識 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[計] ④ 模式 repair:取套件 v0154 → ⑤ 自動修(⑥f 共識閘只因 404 / 一時抓不到 → 用 ConsensusJoin v0103 重跑 · 沿用今天抓到的 · 重組 Combined · 增量庫 · Workbench)→ 除錯報告 → 收尾頁 → 貼回包(幾分鐘)",
+    "[計] ⑤ 自動修計畫:市場資料比歷史對齊新 / 歷史對齊沒跑 → 重跑 ⑬b · Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+    "===== 收尾 · BLOCKED · 等 VCGC · VRN-2 側沒有待修 · 6 項等 VCGC 決定 / 安裝",
+    "  [VCGC] 6 項",
+    "  [人工] 1 項",
+    "[計] Handle-All 結束 · RoundAll 結束碼 1 · 13 秒(視窗不會關)"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "desktop_0206": "⑥f GREEN(搬 38 / 43 · 8358 / 2891 抓到 · 4171 / 6933 / 7728 重試仍 404 不納入閘)· 收尾 OPEN VRN-2 1 = Combined(AAPL 共識欄)· VCGC 1 · 人工 2 · 資料源 1 → v0111 重算預期 BLOCKED · VRN-2 0 · VCGC 1 · 人工 2 · 資料源 2"
+ }
+}
