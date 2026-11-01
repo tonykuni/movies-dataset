@@ -1,13 +1,14 @@
 {
  "schema": "VIA.VCGC.NumberGrant.v2",
  "engine": "CGC_MDL278_NumberGrant v0100",
- "ts": "2026-11-01T15:19:02",
+ "ts": "2026-11-01T16:06:26",
  "rule": "號只由 CGC_MDL237 中央編號發(三系統共用一本帳);本冊是中央號的投影:登記鍵 / 候選編號 / 暫編號 → 中央號;assets 給版本與內容指紋(子系統對得上才確認);conflicts = 跨系統衝突 · 契約不合 · 中央檢測擋下(人 + AI 修好後重跑)",
  "sources": [
   "functional modules/VDF/contract/VDF_NUMBER_REQUEST_latest.json"
  ],
  "grants": {
-  "VDF-SSOT-0009": "VIA-VDF-SSOT113",
+  "VDF-RGX-0001": "VIA-VDF-RGX007",
+  "VDF-RGX-0002": "VIA-VDF-RGX008",
   "VDF:CFG:VDF_AdjPrice_Rule_SSOT": "VIA-VDF-PLCY107",
   "VDF:CFG:VDF_DataArchitecture_Rule_SSOT": "VIA-VDF-PLCY108",
   "VDF:PRM:BASE_DIR": "VIA-VDF-PRMT721",
@@ -54,6 +55,8 @@
   "VDF:PRM:unified.time.end_date": "VIA-VDF-PRMT762",
   "VDF:PRM:unified.time.start_date": "VIA-VDF-PRMT763",
   "VDF:PRM:unified.time.use_current_as_end": "VIA-VDF-PRMT764",
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex": "VIA-VDF-RGX007",
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex": "VIA-VDF-RGX008",
   "VDF:SSOT:VDF_ActiveETF_Retired_SSOT": "VIA-VDF-SSOT087",
   "VDF:SSOT:VDF_AkshareSelection_MacroShipping": "VIA-VDF-SSOT088",
   "VDF:SSOT:VDF_DataHome_SSOT": "VIA-VDF-SSOT089",
@@ -325,6 +328,16 @@
    "version": "1.0.0",
    "source_sha256": "bf25a9db09d2d8eafe0952272a0a66f356f642d0ce020c5b79d8ed715edb0f69"
   },
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex": {
+   "code": "VIA-VDF-RGX007",
+   "version": "1.0.0",
+   "source_sha256": "ff532ef8fb420d49bb4246448fd9cd8667d99b8c263d90b198575a49339b5707"
+  },
+  "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex": {
+   "code": "VIA-VDF-RGX008",
+   "version": "1.0.0",
+   "source_sha256": "a094fd549a772c7a47a61984bcb5a66ae88bdcf2949723ab24c1f65be6ccd589"
+  },
   "VDF:SSOT:VDF_ActiveETF_Retired_SSOT": {
    "code": "VIA-VDF-SSOT087",
    "version": "1.0.0",
@@ -521,20 +534,5 @@
    "source_sha256": "c8fb69dc21ab853c2051fff22570f2c9bac0c79d0013dfb57c8d1b15852bfe20"
   }
  },
- "conflicts": [
-  {
-   "key": "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex",
-   "system": "VDF",
-   "proposed_no": "VDF-RGX-0001",
-   "with": "VCGC 中央檢測(CGC_MDL237)",
-   "why": "REVIEW:LEGACY_REGEX_CONFLICT_OR_UNPROVEN"
-  },
-  {
-   "key": "VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex",
-   "system": "VDF",
-   "proposed_no": "VDF-RGX-0002",
-   "with": "VCGC 中央檢測(CGC_MDL237)",
-   "why": "REVIEW:LEGACY_REGEX_CONFLICT_OR_UNPROVEN"
-  }
- ]
+ "conflicts": []
 }
