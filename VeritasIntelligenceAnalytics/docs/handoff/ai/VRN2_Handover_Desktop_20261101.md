@@ -131,3 +131,9 @@ NEXT: <收尾頁印的下一步>
    ```
    第一行應是 `[GREEN] boot: Handle-All v0117 SHA-256 OK` → auto 選 repair(幾分鐘)→ 自動跳出的 Workbench 標題是 VeritasReportNova。
 3. 收尾仍應是 REVIEW(VRN 0 · 人工 2 · 資料源 3);人工兩項照第 3 節第 4 步。印 `[RED]` → 整段貼回。
+
+## 11. VDF / VCGC 同一 U/I 模板(2026-11-01 深夜)
+
+VRN 之後照令做 VDF / VCGC:共用模板冊 `VIA_UI_Template_SSOT_v0104.json`(= VeritasReportNova Workbench 範本)+ 共用印章 / 字型;
+VCGC `CGC_MDL274_HealthMatrix_v0116`(操作台印章頁首 · VRN 分頁改指 VeritasReportNova)· VDF `VDF_ENG236_FetchMatrixUI_v0101`(DataFrame 表頭欄 · 印章頁首)+ `VDF_SystemManager_v0167`。
+細節、測試與桌機步驟:`docs/handoff/ai/VIA_UI_TemplateLock_Closeout_20261101.md`。桌機:拉分支後跑 `via-vcgc` 與 `via-vdf` 看頁首;VDF 表頭欄第一次會讀庫。
