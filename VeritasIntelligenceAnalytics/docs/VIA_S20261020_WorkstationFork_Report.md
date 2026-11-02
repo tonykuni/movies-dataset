@@ -371,3 +371,65 @@ python "%V%" run VDF_ENG093_LaunchConsole ask --open --out "%TEMP%\vdf_ask_check
 - 在閘開之前:VDF 的擷取 / 管理員直接跑(`python VDF_SystemManager_v0162.py …`)不受影響;只有經 `via-vcgc run` 的路徑被擋。
 
 **閘開之後要補的 VDF 債(本批先登記)**:`VDF_ENG056_ChipBackfill_v0108.py` · `VDF_MDL011_AkshareFetcher_v0103.py` 編號 + registry-sync;closeout ② 點名的 VDF 案(qg_onebridge · vdf_akshare_v0101 · vdf_akshare)重跑;編號 audit 遺失 0 · 改身分 0 · 重號 0。
+
+## 第八批(2026-10-30)· 閘開後 VDF 這側收尾 + 工作站一般帳號 WinError 1314
+
+**閘已開**:VRN-2 在 #571 補船 `VRN_SystemManager_v0248` / `v0253`、尾版 `v0256`(檔面 `def main` / `def selftest`);main `a80fc6ae` CI 三個 job 全綠;#572 已合併。
+
+**本批做完的(全部經 VCGC 主控台 `VIA_FROM_VCGC=YES VIA_VCGC_PUSH=NO`)**
+- 編號:第七批登記的債已清 —— `VDF_ENG056_ChipBackfill_v0108` = VIA-VDF-ENG342、`VDF_MDL011_AkshareFetcher_v0103` = VIA-VDF-MDL199(都已在冊);
+  另補 `VDF_MDL303_RegistryActivation_v0100` = VIA-VDF-MDL231 · `VDF_XsrcVerifier_v0100` = VIA-VDF-MDL232 · `VDF_SystemManager_v0163` = VIA-VDF-MDL233。
+  8 本編號冊重排回正典次序、SSOT books 的 n / sha 重封(#572 聯集只併列沒重封 → 冊內不一致 10;現在 1 = 54 紅列待裁定)。只增稽核 遺失 0 · 改身分 0 · 重號 0。
+- registry-sync 兩輪:元件冊 18556 → 18989 列。SSOT 全景:自動編號 VDF 綠 · 註冊 VDF / VRN / SUP 綠。
+- **工作站一般帳號 WinError 1314 → `VDF_SystemManager_v0163`**:工作站收據 `vdf_ws_manager_design`(10-21 · win32)實錄全鏈自測崩在 v0151 第 458 行
+  `os.symlink(home, point, target_is_directory=True)` → `[WinError 1314] 用戶端沒有這項特殊權限`。一般帳號沒有建符號連結特權,
+  凡指令 `VDF_SystemManager --selftest` 的交接案在工作站一律紅;CI 的 Windows runner 是管理員所以綠。正式 `db move` 在 Windows 本來就走 `mklink /J`。
+  v0163:自測跑前版鏈時把 v0151 看到的 `os` 換成代理,目錄連結走 `link_dir`(Windows = `mklink /J`;其他 = 符號連結),跑完還原;v0151 正本不改。
+  自測 6/6 · 模擬 Windows 實跑 v0151 自測確認改走 `mklink /J`、參數順序對 · 突變 10 個全抓到。新交接案 `vdf_ws_manager_junction`(PENDING,要 duckdb)。
+- 交接案 `launch_console_v0105` 標記 7/7 → 16/16:v0105 於 PR #548 就地擴充為 16 檢,原標記已無對應輸出(收據 rc 1 只因標記對不上)。
+- 容器真跑綠 14 案(不需要 duckdb 的):manager_parity · vdf_activatevdf · vdf_r2_swallow_eng050 / eng069 · vdf_r2_tailapi_eng056 / 057 / 059 / 075 / 100 / 102 / 110 / 115 · vdfstart · launch_console_v0105。
+  交接 findings 272 → 189;VDF 收據失效 72 → 48 項;VDF 改了沒測 74 → 10 支。紅收據一張都不提交(舊收據原樣保留)。
+
+**工作站要跑的 49 案(44 案收據失效 + 5 案 PENDING;都要 duckdb / pandas,容器沒有、不代裝)**:本 PR 併入 main 之後,PowerShell:
+
+```powershell
+via-entry
+cd <你平常的倉根>
+git fetch origin
+$wt = "$env:LOCALAPPDATA\VIA\movies-dataset-vdf-main"
+git -C $wt status --short
+git -C $wt restore --staged --worktree -- VeritasIntelligenceAnalytics/docs/handoff/evidence "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Lessons_Ledger_v0100.json" "VeritasIntelligenceAnalytics/supportive modules/registry/VIA_VCGC_SubsystemSeat_v0100.json"
+git -C $wt clean -fdq -- VeritasIntelligenceAnalytics/docs/handoff/evidence
+git -C $wt checkout --detach origin/main
+$M14 = "$wt\VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL014_WorkstationSync_v0102.py"
+$cases = @(
+  "vdf_universe", "vdf_universe_r50", "vdf_engine", "vdf_engine_params", "qg_onebridge", "vdf_unknown_verb",
+  "vdf_fetch_verb", "vdf_fetch_integration", "vdf_master_control", "vdf_akshare_v0101", "vdf_akshare_v0102",
+  "vdf_fetch_groups_v0100", "vdf_fetch_groups_v0101", "vdf_fetch_groups_v0102", "vdf_fetch_groups_v0103",
+  "vdf_activate", "vdf_fetch_groups_v0104", "vdf_fetch_groups_v0105", "vdf_manager_v0152", "vdf_manager_v0153",
+  "vdf_manager_v0154", "sentiment_dedupe", "omnifetch_sentiment", "vdf_fetchgroups_home", "vdf_manager_split_xcheck",
+  "vdf_manager_db_verify", "vdf_r2_tailapi_eng113", "vdf_r2_tailapi_eng116", "vdf_r2_swallow_eng052",
+  "vdf_eng045_outputhub", "vdf_ws_manager_all", "vdf_ws_fetch_groups", "vdf_eng065_v0102", "vdf_eng235_v0100",
+  "vdf_eng077_v0106", "vdf_ws_manager_ready", "vdf_ws_fetch_groups_layout", "vdf_ws_manager_design",
+  "vdf_ws_manager_fetch_quiet", "vdf_fetch_groups_v0107", "vdf_fetch_groups_usertest", "vdf_fetch_groups_v0108",
+  "vdf_manager_v0155", "vdf_manager_v0156", "mojibake_repair_v0100", "db_import_v0102", "vdf_manager_v0157",
+  "eng077_v0106", "vdf_ws_manager_junction"
+)
+python $M14 --apply @($cases | ForEach-Object { "--case"; $_ }) 2>&1 | Tee-Object -FilePath "$env:TEMP\vdf_ws_49.log"
+Select-String -Path "$env:TEMP\vdf_ws_49.log" -Pattern "\[交接\]|\[收據\]|NEXT:|\[計\]"
+```
+
+- 全鏈案每案約 3–8 分鐘,49 案合計約 2–3 小時;MDL014 先印 [倉] [備份] [VDF MAIN] [交接案] 幾行,49 案全跑完才一次印各案結果(中間沒有輸出不是卡住)。跑完它會把 VDF 收據推到新分支並印 `NEXT: 開 PR …`,把最後那段(Select-String 的結果)貼回來即可。
+- `vdf_manager_v0155` / `v0156` / `v0157` 三案的指令直接跑舊版(鏈上沒有 v0163),工作站一般帳號照樣會撞 WinError 1314:
+  要這三案綠,請先開 Windows「設定 → 系統 → 開發人員專用 → 開發人員模式」(Python 3.8+ 開了就能不提權建符號連結),或用系統管理員 PowerShell 跑上面那段。不開也行,這三案會留紅,其餘不受影響。
+- `qg_onebridge` 要 polars · `vdf_akshare_v0101` / `v0102` 要 akshare · `vdf_fetch_groups_usertest` 要瀏覽器(Playwright);工作站沒有就照實紅、不代裝。
+
+**仍是黃 / 紅、而且不是本批能在容器裡清掉的(照實列)**
+- VDF 待操作員裁定:命名「同號異名」3 組(`VDF_ENG110` AKShareProbe / USMacroProbe / USMacroTree · `VDF_ENG117` ForwardVintage / ForwardVintageDoor · `VDF_ENG118` ExportDesk / TWMarket;規則是不自動改名)·
+  編號冊 FM 22 列「exchange 兩源不一 TWSE / TPEX」(直得 · 正德 · 瓦城 · 禾伸堂 · 大量 · 順達 · 威剛 · 加百裕 · 雙鴻 · 泰碩 · 先進光 · 上詮 · 京鼎 · 力致 · 新盛力 · 眾達-KY · 廣運 · 精誠 · 光聖 · 保瑞 · 晶心科 · 千附;規則是不改任何一邊,要以最新官方上市 / 上櫃清單裁定)。
+- VDF 等交接轉綠之後:SDD X-LOCK `VDF-WKF004`(ENG056 v0106 → v0108 · ENG057 v0109 → v0111)要 `sdd selftests --wkf VDF-WKF004` → `real` → `lock --apply`;燈鎖要求交接閘先 GREEN。
+- 他系統(只攤開不代修,四系統對等 L123):
+  - VRN-2:closeout ③ `manager` 案(`VRN_SystemManager --selftest`)rc 0 但標記「[VRN 來源入口] fail=0」沒出現;SSOT 全景 註冊@VCGC 紅 = 正主呼叫 `vrn_manager_prior_for_v0256` 沒有 `collect`(尾版少公開名稱);
+    交接 VRN 改了沒測 49 支 · 收據失效 4 項;`VRN2_UIAction_v0100` · `_vdf_fetch/VDF_TW_AllInOne_v039` 缺加速器橋 / 未登(在 VRN 夾);SDD X-NUM 尾版沒編號 `VRN_SystemManager_v0256` · `VRN_ENG086_FirstPageLogicBridge_v0120` · `VRN_ENG062_SummarizerV1_v0113`。
+  - VCGC:收據失效 12 項(numbering · inventory · ps-entry …)· SDD X-NUM `CGC_MDL140_HandoverConsole_v0107` · `CGC_MDL183_CeleritasPolicyGate_v0105` 沒編號 · REQ_CHANGED 一批(VCGC-REQ132 起)待 `handoff checkpoint`。
+- 所以 closeout 前最後檢查目前還不會全綠:VDF 這側剩「工作站 49 案」與上面兩項裁定;其餘是 VRN-2 / VCGC 自己的項目。
