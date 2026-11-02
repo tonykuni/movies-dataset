@@ -1,0 +1,195 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "ActivateVRN-2 v0168 (manager v0259 · runtime v0159) + VRN2_RoundAll_v0124 + VRN2_HandleAll_v0116",
+ "date": "2026-11-02",
+ "trigger": "操作員 2026-11-02 上傳華南投顧-6143-振曜-1141128.pdf(收尾頁最後一個「輸出冊缺項 · 年度數據」)+ 桌機 10:30 v0123 repair 收尾 REVIEW(VRN-2 0)+ Handle-All 收尾行 Write-Host ForegroundColor 錯",
+ "finding": {
+  "6143": "page 1 annual table 「年度EPS預估」 (years as rows 2022 – 2026(F) · 8 items · 40 values) · v0236 transposed-table third-reader gate (pdfplumber) rejected the whole table: a stray space glyph (Calibri, 2 pt lower) lies across 「3.0」 in the 2026(F) row → pdfplumber words 「3」+「.0」 (glyphs touch: x1 406.6 / x0 406.5) → the row's number sequence differs",
+  "desktop_scope": "09:19 Rejected book: exactly 40 rows carry this reason, all 6143",
+  "handleall_color": "build of Handle-All v0113 put the --confirm hint into $col's REVIEW (the first REVIEW = '…' match) instead of $nx's → Write-Host -ForegroundColor 'Yellow · …' fails twice on REVIEW"
+ },
+ "base_package": {
+  "name": "VRN2_Closeout_v0166 (launcher v0166 · runtime v0158)",
+  "retained": "runtime v0158's 197 members byte-identical inside runtime v0159; every package member except launcher / runtime byte-identical to v0166"
+ },
+ "fixes": {
+  "SystemManager_v0259": "thin tail over v0258: rows rejected with 「轉置表第三讀法(pdfplumber)對不上」 are grouped per table and asked again with v0236's _g3_trans on the pdfplumber lines with touching number fragments joined (gap <= 0.5 pt · left has a digit · decimal / thousands separator at the joint · result is a number token) · passing table → back to the annual book (VERIFY notes v0259) and the gap 「年度數據」 is cleared · failing / already in the book → stays in Rejected · recheck error → v0258 books stand",
+  "launcher_v0168": "runtime v0159 · manager v0259 · receipt VRN2_Closeout_v0168.json · selftest block v0168 (launcher number v0167 skipped)",
+  "RoundAll_v0124": "package v0168 · step 3 selftest runs manager v0259 · gap hint names 6143 / v0259",
+  "HandleAll_v0116": "v0115 pointed at RoundAll v0124 (vrn2_release_v0168) · auto: full when the last receipt is older than launcher v0168 · $col REVIEW = 'Yellow' again, the --confirm hint moved to $nx REVIEW"
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
+   "bytes": 2346947
+  },
+  {
+   "path": "ActivateVRN-2_v0168.py",
+   "sha256": "f9108cd26b0f402dcd7de5aba86989c014894c48ca43b7505f02f667b0f94236",
+   "bytes": 128083
+  },
+  {
+   "path": "PACKAGE_SHA256.json",
+   "sha256": "32ea44c201c1b477ff3e1d999480a882902e9e8df7b91aa04ac67cb1b7308992",
+   "bytes": 1573
+  },
+  {
+   "path": "README.txt",
+   "sha256": "076dd98fe24b707ecca215d34a998708bfb678a665d421e8fcf9faaa7a27a8ab",
+   "bytes": 1285
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "a78f016ad6dc99026d587199532f39de0b7ef7ea0c54e3ea23e513bcd5196a7f",
+   "bytes": 44
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
+   "bytes": 5895
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
+   "bytes": 2109
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
+   "bytes": 4846
+  },
+  {
+   "path": "VRN2_Runtime_v0159.json",
+   "sha256": "9c109b94a360facd5c5e8dbc492d3cae0ecb5cfb9f13ae068697a5d022eef930",
+   "bytes": 26222
+  },
+  {
+   "path": "VRN2_Runtime_v0159.zip",
+   "sha256": "5bab209968d3db34169c393b3f28caaee3b0d50794c1039e4c0b94cb087c65bc",
+   "bytes": 7043310
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
+   "bytes": 8558
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
+   "bytes": 6739
+  }
+ ],
+ "runtime": {
+  "version": "v0159",
+  "zip_sha256": "5bab209968d3db34169c393b3f28caaee3b0d50794c1039e4c0b94cb087c65bc",
+  "based_on": "VRN2_Runtime_v0158.zip 5cc42b34834485e50630c05ea9c7711f4e10b45478d85b026903f2af4c284aec",
+  "retained_members": 197,
+  "new_members": [
+   "VRN_SystemManager_v0259.py"
+  ],
+  "changed": true
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0123.py",
+   "sha256": "fc9f640cacd78d66d6927ed882ba50a6ec42ececc9ed21fa821f6972f01d79eb",
+   "status": "superseded 2026-11-02 (package v0166); file kept in vrn2_release_v0167"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0124.py",
+  "sha256": "47cdc2b2a16ea2563057992a9b30b21bc2c23a7cbc6dd22e0fa4f4cbce272340",
+  "pinned_package_sha256": "931b6a9ac38cd561c06dc17c9226f342e4d64d1593bacbcab784c4ddd4525730",
+  "guide": "VRN2_RoundAll_v0124.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0116.md",
+  "line_sha256": "e0bb916f23bb26ba1b338b72742b449157f7ec15d05385e25b5cdd727d3348df",
+  "line_chars": 13522,
+  "boot_file": "VRN2_HandleAll_v0116_boot.txt",
+  "boot_line_sha256": "f3d3821564bacf4f81806f73718207f7cfb451559c2dc97c84d837246e8b32da",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0168.zip",
+  "sha256": "931b6a9ac38cd561c06dc17c9226f342e4d64d1593bacbcab784c4ddd4525730",
+  "bytes": 7842079,
+  "layout": "VRN2_Closeout_v0168/<files> (no .ps1)"
+ },
+ "launcher": {
+  "name": "ActivateVRN-2_v0168.py",
+  "sha256": "f9108cd26b0f402dcd7de5aba86989c014894c48ca43b7505f02f667b0f94236"
+ },
+ "results": {
+  "manager_v0259_selftest": [
+   "[PASS] v0259: transposed tables asked again with the third reader's touching number fragments joined · still failing stays in Rejected · 9 checks · failed 0"
+  ],
+  "launcher_v0168_selftest": [
+   "[PASS] v0168: manager v0259 is the active manager (transposed tables re-asked with the third reader's touching number fragments joined · still failing stays in Rejected) · v0258 kept as PRIOR"
+  ],
+  "roundall_v0124_selftest": [
+   "[PASS] 88 v0124:套件 v0168(啟動器 v0168 · runtime v0159)· ③ 自測跑管理器 v0259 · 缺項提示寫 6143 已由 v0259 補",
+   "[PASS] VRN2_RoundAll v0124 --selftest · 90 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "auto1": [
+    "[GREEN] boot: Handle-All v0116 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0168 以前做的 · 管理器 v0259 要重做輸出冊:補回華南 6143 這種轉置表 · 原文有、以前漏掉的年度表)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 套件就位 <sbx>/home/Downloads/VRN2_Closeout_v0168(SHA-256 931b6a9ac38c · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "      [計] v0259 轉置表再驗(第三讀法相連的數字碎片接回):回主冊 40 值 · 華南投顧-6143-振曜-1141128.pdf P1·M·05·TB 40 值",
+    "  [計] v0259 轉置表再驗(第三讀法相連的數字碎片接回):回主冊 40 值 · 華南投顧-6143-振曜-1141128.pdf P1·M·05·TB 40 值",
+    "  [計] ⑪ 獨立驗證 · 年度數據 5232 筆 · {'ALIGNED': 4665, 'TRANSALIGNED': 115, 'SUBALIGNED': 452}",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 8 項",
+    "  [人工] 8 項"
+   ],
+   "auto2": [
+    "[GREEN] boot: Handle-All v0116 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0168.json · 上一輪輸出冊 有(輸出冊是啟動器 v0168 做的 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0168(SHA-256 931b6a9ac38c · 11 檔逐檔相符)· <sbx>/home/Downloads/VRN2_Closeout_v0168",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 6 項",
+    "  [人工] 8 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "closeout_states": {
+   "auto1": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 8,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   },
+   "auto2": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 6,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   }
+  },
+  "original_6143": "sandbox, manager run on the original: 40 / 40 values back (rejected 40 → 0) · independent verifier v0114 TRANSALIGNED 40 · every cell equals the printed table",
+  "regression_19": "14 real reports + 5 originals, v0258 vs v0259: FinancialData 5622 → 5662 (removed 0 · added 40 = 6143 P1·M·05·TB) · Rejected 806 → 766 (the same 40) · BasicInfo / Summary identical",
+  "desktop_scope": "desktop 09:19 Rejected book: exactly 40 rows carry 「轉置表第三讀法(pdfplumber)對不上」, all 6143",
+  "handleall_color": "pwsh: the v0115 REVIEW lines raise Write-Host ForegroundColor error · the v0116 lines print (colcheck)",
+  "not_run": "the desktop itself (next: auto → full · books rebuilt by v0259) · the operator's own --confirm"
+ }
+}
