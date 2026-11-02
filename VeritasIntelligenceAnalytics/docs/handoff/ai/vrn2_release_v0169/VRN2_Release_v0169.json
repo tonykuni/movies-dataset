@@ -1,129 +1,112 @@
 {
  "system": "VRN-2",
- "display_name": "VeritasReportNova (VRN)",
  "independent": true,
- "release": "ActivateVRN-2 v0169 (Workbench v0104 · runtime v0160) + VRN2_RoundAll_v0125 + VRN2_HandleAll_v0117",
- "date": "2026-11-01",
- "trigger": "操作員 2026-11-01:U/I 子系統名稱還原為 VeritasReportNova(VRN 唯一系統)· 印章 logo 透明去背無框無特效 · 以紅字大小為依據做 header 大小 logo 最佳化",
- "base_package": {
-  "name": "VRN2_Closeout_v0168",
-  "retained": "runtime v0159's 198 members byte-identical inside runtime v0160; package members except launcher / runtime byte-identical to v0168"
+ "release": "VRN2_RoundAll_v0125 + VRN2_HandleAll_v0117 (package v0168 unchanged)",
+ "date": "2026-11-02",
+ "trigger": "桌機 2026-11-02 12:31(Handle-All v0116 整輪 · 套件 v0168 · 管理器 v0259)收尾 OPEN「VRN-2 1 項」= ⑥f VIA 網路工具 DENY 列 · 操作員「之前不是收尾了嗎 · 全景式檢視 · 儘快收尾」",
+ "desktop_1231": {
+  "data_side": "COMPLETE — 6143 40 values back (annual 11,865 → 11,905 · Rejected 2,548 → 2,508) · gaps 0 · idempotence GREEN · independent verifier 0 wrong (TRANSALIGNED 190 → 230) · completion 紅 0",
+  "gate": "operator pasted cmd-style set in a PowerShell window → VIA_SCRAPE_CONSENT unset → step 6f DENIED fail-closed → Combined consensus columns empty this round (store keeps both runs; repair with the gate open re-fetches and appends corrected rows)"
  },
+ "root_cause": "the dedicated closeout row 「⑥f VIA 網路工具 DENY」 matched no owner branch → default VRN-2; it shares the ⑥f 共識 root, and merge_same takes the heaviest owner → the whole merged consensus item was labelled VRN-2",
  "fixes": {
-  "Workbench_v0104": "screen names VRN-2 → VRN / VeritasReportNova (files, commands, receipts, window.VRN2_DATA untouched) · page 00 read-only VDF / VCGC · built-in seal (operator image, already transparent, cropped to the ink) when no local logo · main seal box = header text block height (browser-measured · 44 – 120 px)",
-  "launcher_v0169": "WORKBENCH v0104 · runtime v0160 · receipt VRN2_Closeout_v0169.json · selftest block v0169",
-  "RoundAll_v0125": "package v0169 · Workbench chain + seal (only-add) · re-render when the page lacks the v0104 marker · selftest runs Workbench v0104",
-  "HandleAll_v0117": "points at RoundAll v0125 (vrn2_release_v0169) · branch claude/vrn2-closeout-authorization-y4ixl7 then main"
+  "RoundAll_v0125": "owner: a ⑥f row whose detail carries 同意閘未開 → 人工 (with both shells' syntax and the note that repair re-fetches consensus) · 合規 DENY → VCGC · root unchanged (merges into the one consensus item)",
+  "HandleAll_v0117": "v0116 pointed at RoundAll v0125 (vrn2_release_v0169) · full mode with the consent gate closed now PROMPTS first: A = abort so the operator sets the gate and re-pastes, Enter/other = run with the gate closed; the gate itself is never set by the script (VRN-2 不代設) · non-interactive stdin = continue (today's behaviour)"
  },
- "freeze": "VRN2_FreezeLock_v0101 → v0102 (operator order 2026-11-01)",
- "components": [
-  {
-   "path": "ActivateVRN-2_v0136.py",
-   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354",
-   "bytes": 2346947
-  },
-  {
-   "path": "ActivateVRN-2_v0169.py",
-   "sha256": "6a0b63643f8491304d0da23b41517468b698530398e3d1c2bd7d5810c2659133",
-   "bytes": 130473
-  },
-  {
-   "path": "PACKAGE_SHA256.json",
-   "sha256": "fc230017022000a2321669814ae708c3de8c18a3ab02886a4512871c0097c5f3",
-   "bytes": 1573
-  },
-  {
-   "path": "README.txt",
-   "sha256": "0c6388db4b62fa627cbacc1f69c8a6d0b9df53be4684d0d8593fe4521da0731b",
-   "bytes": 814
-  },
-  {
-   "path": "VALIDATION_RESULT.json",
-   "sha256": "bded05e6f5fb869d34b636a7b38e537a66bd0f31e957a5694ea07eb9c4fff098",
-   "bytes": 44
-  },
-  {
-   "path": "VIA_ExecutionBridge_v0103.py",
-   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706",
-   "bytes": 5895
-  },
-  {
-   "path": "VIA_RunWithTools_v0103.py",
-   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e",
-   "bytes": 2109
-  },
-  {
-   "path": "VRN2_OCRBridge_v0101.py",
-   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9",
-   "bytes": 4846
-  },
-  {
-   "path": "VRN2_Runtime_v0160.json",
-   "sha256": "d030c4bb776485c9ae1a378568865be19eb632a225fe0609e1d87ab2abffb526",
-   "bytes": 26501
-  },
-  {
-   "path": "VRN2_Runtime_v0160.zip",
-   "sha256": "b53ab11f4a31c070700fe0c3b3ca15506a3189721a2dcef5592b14ace34374a2",
-   "bytes": 7146641
-  },
-  {
-   "path": "VRN2_VerbatimVerifier_v0104.py",
-   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f",
-   "bytes": 8558
-  },
-  {
-   "path": "VRN2_VerbatimVerifier_v0105.py",
-   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6",
-   "bytes": 6739
-  }
- ],
- "runtime": {
-  "version": "v0160",
-  "zip_sha256": "b53ab11f4a31c070700fe0c3b3ca15506a3189721a2dcef5592b14ace34374a2",
-  "based_on": "VRN2_Runtime_v0159.zip 476d774b7fd394fac8da56a288435cd20deab147ad5ded31f7e18a1681aad532",
-  "retained_members": 198,
-  "new_members": [
-   "VRN2_Logo_Seal_v0100.png",
-   "VRN2_Workbench_v0104.py"
-  ],
-  "changed": true
+ "package": {
+  "name": "VRN2_Closeout_v0168.zip",
+  "sha256": "931b6a9ac38cd561c06dc17c9226f342e4d64d1593bacbcab784c4ddd4525730",
+  "release_folder": "vrn2_release_v0168",
+  "changed": false
  },
  "roundall_previous": [
   {
    "name": "VRN2_RoundAll_v0124.py",
-   "sha256": "e6767575617f2084e5857396754ace71b0c2f548891d6afebfc828ffc39bb388",
-   "status": "superseded 2026-11-01; kept in vrn2_release_v0168"
+   "sha256": "47cdc2b2a16ea2563057992a9b30b21bc2c23a7cbc6dd22e0fa4f4cbce272340",
+   "status": "superseded 2026-11-02; file kept in vrn2_release_v0168"
   }
  ],
  "roundall": {
   "name": "VRN2_RoundAll_v0125.py",
-  "sha256": "099f62ca06a1ca70690303dd59b141d54e1780b04bc7303bc177f71fe389c7b7",
-  "pinned_package_sha256": "e71ba31e628fb96000b7922793fd17054a7eb703d6b4fa9d65ed146e4fb8edaa",
+  "sha256": "617542d2f196aba96754b8b96c464b47e9068644e79978d5d5edef32ca008340",
+  "pinned_package_sha256": "931b6a9ac38cd561c06dc17c9226f342e4d64d1593bacbcab784c4ddd4525730",
   "guide": "VRN2_RoundAll_v0125.md"
  },
  "handleall": {
   "name": "VRN2_HandleAll_v0117.md",
-  "line_sha256": "8d1e06b5fbfb23bf8e38d3c867a7b9681c9acde3f90e57ae5e8560c6c087f4a9",
-  "line_chars": 13539,
+  "line_sha256": "3f23f333b0367905556c1ab240be54f719bc9107c5609cb15dee8fe827178fdf",
+  "line_chars": 14080,
   "boot_file": "VRN2_HandleAll_v0117_boot.txt",
-  "boot_line_sha256": "0b9eb106465d3dcc3098131f176834f74089630d3c47c1ea24df41d9b975f259",
-  "boot_line_chars": 1728,
-  "tiny_line_chars": 452,
-  "cmd_line_chars": 1264,
-  "branch": "claude/vrn2-closeout-authorization-y4ixl7"
- },
- "package": {
-  "name": "VRN2_Closeout_v0169.zip",
-  "sha256": "e71ba31e628fb96000b7922793fd17054a7eb703d6b4fa9d65ed146e4fb8edaa",
-  "bytes": 7945789,
-  "layout": "VRN2_Closeout_v0169/<files> (no .ps1)"
- },
- "launcher": {
-  "name": "ActivateVRN-2_v0169.py",
-  "sha256": "6a0b63643f8491304d0da23b41517468b698530398e3d1c2bd7d5810c2659133"
+  "boot_line_sha256": "38188cd76b7fd4eb23b80107326437192cac4c71758e94ba213e6bbe7ed29949",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
  },
  "results": {
-  "status": "see VRN2_Verification_v0169.md"
+  "roundall_v0125_selftest": [
+   "[PASS] 89 v0125:⑥f「VIA 網路工具 DENY · 同意閘未開」列 → 人工(操作員決定 · 兩種視窗的設法 · repair 會補回共識 · 桌機 12:31 被算成 VRN-2 1 項)· 根同 ⑥f 共識(合併後整項人工)· 合規 DENY → VCGC",
+   "[PASS] VRN2_RoundAll v0125 --selftest · 91 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "abort rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "auto1": [
+    "[GREEN] boot: Handle-All v0117 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0168 以前做的 · 管理器 v0259 要重做輸出冊:補回華南 6143 這種轉置表 · 原文有、以前漏掉的年度表)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[YELLOW] ④ 同意閘未開 + 整輪:⑥f 共識會被 DENY(Combined 共識欄留空 · 收尾頁列「人工」)",
+    "[GREEN] ① 套件 · 套件就位 <sbx>/home/Downloads/VRN2_Closeout_v0168(SHA-256 931b6a9ac38c · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "      [計] v0259 轉置表再驗(第三讀法相連的數字碎片接回):回主冊 40 值 · 華南投顧-6143-振曜-1141128.pdf P1·M·05·TB 40 值",
+    "  [計] v0259 轉置表再驗(第三讀法相連的數字碎片接回):回主冊 40 值 · 華南投顧-6143-振曜-1141128.pdf P1·M·05·TB 40 值",
+    "  [計] ⑪ 獨立驗證 · 年度數據 5232 筆 · {'ALIGNED': 4665, 'TRANSALIGNED': 115, 'SUBALIGNED': 452}",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 8 項",
+    "  [人工] 8 項"
+   ],
+   "auto2": [
+    "[GREEN] boot: Handle-All v0117 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0168.json · 上一輪輸出冊 有(輸出冊是啟動器 v0168 做的 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0168(SHA-256 931b6a9ac38c · 11 檔逐檔相符)· <sbx>/home/Downloads/VRN2_Closeout_v0168",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 6 項",
+    "  [人工] 8 項"
+   ],
+   "abort": [
+    "[GREEN] boot: Handle-All v0117 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ④ 同意閘未開 + 整輪:⑥f 共識會被 DENY(Combined 共識欄留空 · 收尾頁列「人工」)",
+    "    已中止(視窗不會關)· 在這個視窗貼(PowerShell):$env:VIA_NET_CONSENT = 'YES'; $env:VIA_SCRAPE_CONSENT = 'YES'(cmd 視窗:set VIA_NET_CONSENT=YES 與 set VIA_SCRAPE_CONSENT=YES)· 設好再重貼同一行(操作員決定 · VRN-2 不代設)"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "closeout_states": {
+   "auto1": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 8,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   },
+   "auto2": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 6,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   }
+  },
+  "merge_check": "owner_of + merge_same on the 12:31 rows (sandbox, read-only): the 「⑥f VIA 網路工具 DENY · 同意閘未開」 row and the step-⑥f row both → 人工 · merged into ONE 人工 item (was VRN-2)",
+  "abort_prompt": "full mode + gate closed + piped 'A' → Handle-All stops before RoundAll with both shells' syntax printed · empty / non-interactive stdin → continues with the gate closed (previous behaviour) · the gate itself is never set by the script",
+  "not_run": "the desktop itself (next: open the gates in the SAME PowerShell window with $env: syntax → auto = repair re-fetches consensus, ~10-15 min) · the operator's own --confirm"
  }
 }

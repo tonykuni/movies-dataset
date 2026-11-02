@@ -1,4 +1,4 @@
-# VRN-2 交接報告 · ActivateVRN-2 v0168 + VRN2_RoundAll_v0124 + VRN2_HandleAll_v0116 · 2026-11-01(Workbench v0103 右面板第一頁「00 系統現況」· DataFrame 表頭 · 版面與字體階層照操作員附件 · 01 ~ 04 不動 · 套件 v0168 · 版本鎖 v0101)
+# VRN-2 交接報告 · ActivateVRN-2 v0168 + VRN2_RoundAll_v0124 + VRN2_HandleAll_v0116 · 2026-11-02(華南 6143 原文有年度表 → 管理器 v0259 轉置表再驗 · Handle-All 收尾 REVIEW 顏色修正 · 套件 v0168)
 
 > 給下一個 AI 工作階段:先讀本檔,再讀使用者貼回的貼包(結尾 `NEXT:`)與**驗證摘要**(`VIA_Reports\vrn2\verify_independent\*.digest.txt` · ≤150 行)。不要重讀整份程式;要看程式先用省 Token 卡(`read` / `slice` / `chain`)。
 > **操作員裁決(2026-10-18)**:「都是獨立系統 · 完成 VRN-2 及收尾 · 自動完成」→ VRN-2 / VCGC / VDF 三系統各自獨立:VRN-2 不寫進別的系統的家族、不經 VCGC 核號、不登 VCGC 中央冊。
@@ -14,7 +14,7 @@
 > **操作員令(2026-10-29 · 政策)**:「獨立系統 VRN-2 / VDF / VCGC 3 個都是獨立系統 3 個彼此是有依賴性的但不會直接影響他們 … VRN-2 / VDF 此系統端會產生很多的 SSOT REGEX 同義字 政策上有很多規範都是由基層提出來 如 VDF / VRN-2 但有時 VCGC 也有他們的需求可提出 子系統提出後沒有 SSOT ID 空白 另一個子系統也有提 SSOT ID 空白 VCGC 會提示有衝突 等使用者與 AI 修改無誤後自動生成 SSOT 號碼 子系統看到了也會自動填上補全資料 三者靠使用者及 AI 協調 … 三個系統的這類手冊是一致的 三個系統都有自己的 SYSTEM MANAGER SSOT REGEX 同義字 政策庫及 MAIN() 自測至完成 TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG TILL THEY WORKS PERFECTLY. VRN-2 幾乎完成 快速收尾 用 HTML U/I 去做 輸出位置可用 WINDOWS I/O 拖曳式 或是連接雲端 … 輸出 PARQUET 增量擷取 增量擷取用 DUCKDB 管理 全景式檢視」(原文口述,錯字依語意校正)。
 > **桌機 2026-10-31 02:06(最短一行 → Handle-All v0102 repair · 608 秒)**:⑥f 用 ConsensusJoin v0103 重跑:搬 38 / 43 份 · 只重抓 5 檔 · **8358 / 2891 抓到** · 4171 / 6933 / 7728 重試仍 404 → 不納入閘 → 搬 40 / 40 份 → GREEN。收尾卻 OPEN「VRN-2 1」= Combined 冊 GFHK Apple(AAPL)共識欄空 → v0110 算 VRN-2(v0109 是碰巧算資料源)。之前兩次又貼了 9,000 字元的長行 → PSReadLine 當掉 → 加了 443 字元的最短一行(`vrn2_release_v0154/VRN2_HandleAll_v0102_short.md` · 開機檔 `VRN2_HandleAll_v0102_boot.txt`)。
 > **桌機 2026-10-31 05:30(Handle-All v0106 repair · 操作員設了 `VIA_SCRAPE_CONSENT`)**:⑥f 第一次經 VIA 網路工具真抓(`SUP_MDL740_NetUnified_v0119 · 閘 開 · 加速器 VIA_SuperAccel_Module · VeritasCeleritas_v1141`)· 43 檔 · 3706 一時抓不到 → 重試補到 · 404 × 3 不納入閘 · gate PASS_WITH_WARNINGS → **GREEN** · 收尾 BLOCKED · VRN-2 0 · VCGC 1 · 人工 2 · 資料源 2(`vrn2_release_v0158/VRN2_DesktopRun_20261031.md`)。③ 23 套件全在 · ③b `envs\vrn2_ocr` 就緒。⑥f 擷取 Python 是 `envs\via_core_312`(⑥e 是 `C:\Python313`)→ Raw Parquet WARN。
-> **本輪(v0168)**:操作員 2026-11-01 上傳 `taiwan_stock_data_matrix.html`,令「放在右面板第一個頁面的系統現況 SUMMARY · 含 DATAFRAME HEADERS · 以目前 HTML U/I 為基礎 · LAYOUT 及字體階層視覺鎖定 · 原有功能設定不改」。**Workbench v0103**(v0102 薄尾):右面板最前面「00 系統現況」(開頁預設)= 輸出冊 × 來源 × 端點 × 真實欄名 × 燈 · 本輪步驟 · 其他系統只讀互看(VCGC 交接快照燈 · VDF 自報收據 · VRN-1 入口)· 點一列看全部欄 · 圖例篩選 · 摘要卡 · 窄螢幕一列一卡;拿掉 v0103 的部分 = v0102 頁面逐字相同。**runtime v0159**(v0158 全部成員不動 + v0103)· **啟動器 v0168** · **套件 v0168** · **RoundAll v0124**(⑤ 先只增補放 Workbench 鏈 · 收尾頁沒有 v0103 標記 → 重渲染 · 取件分支 `claude/vrn2-closeout-authorization-y4ixl7` 退路 main)· **Handle-All v0116**。輸出冊不變 → auto 照樣選 repair。版本鎖 v0100 → **v0101**(操作員令 = 這次 U/I 改動的解鎖 · 換上新版本再鎖)。容器沒有 pwsh:PowerShell 一行沒有實跑(只在 Python 端核雜湊)。
+> **本輪(v0168)**:桌機 10:30 跑 v0123 repair → 收尾 **REVIEW**(VRN-2 0 · 人工 2 · 資料源 3)· 缺項只剩華南 6143。操作員上傳 6143 原文:第 1 頁年度表(年份在列 · 8 科目 · 40 值)原文有;第三讀法(pdfplumber)把 2026(F) 列一個疊了別字型空白字的「3.0」切成「3」「.0」→ 轉置表閘整張剔除。**管理器 v0259**(只對這種剔除列 · 相連的數字碎片接回再問同一個閘 · 原文 40 / 40 回主冊 · 獨立驗證 TRANSALIGNED 40 · 19 份回歸只多這 40 值)· **Handle-All v0116**(收尾 REVIEW 的 Write-Host 顏色錯修好 · 最短一行 443 字元 · cmd 一行 1240 字元)· **RoundAll v0124** · 套件 v0168(啟動器 v0168 · runtime v0159)。
 > **本輪(v0167)**:桌機 09:19 跑 v0166 整輪(5434 秒)→ 管理器 v0258 補回年度表(11505 → 11865 · 欣銓 225 · Daiwa 30 · 南亞 / 啟碁 / 晶心科各 32 · 6933 +9)· ⑪ 錯值 0(新增 360 筆全對欄)· 輸出冊 1279 秒(沒變慢)· 缺項只剩華南 6143。收尾 OPEN 的「VRN-2 1 項」是 ⑥e「擷取 YELLOW · 失敗 0」那一列被 RoundAll 截到 220 字、「失敗 0」被截掉 → 負責方規則對不到。**RoundAll v0123**(keep_facts:截掉的判斷要點移到前面)· **Handle-All v0115**(最短一行 443 字元 · cmd 一行 1240 字元)· 套件 v0166 不動 · 桌機狀態 dry run:OPEN → REVIEW(VRN-2 0 · 人工 2 · 資料源 3)。
 > **本輪(v0166)**:操作員上傳原文 4 份(MQ-1560 · 3014TT · Daiwa-6278 · 欣銓 3264)核對收尾頁兩個人工項 → **欣銓 3264 與 Daiwa-6278 原文都有年度表**(以前「原文沒有」的結論是用本機合成替身下的 · 不成立)。**管理器 v0258**(薄尾 · PRIOR v0257):輸出冊前在擷取結果副本上修兩種表 —— ① 科目印在數字下方 3pt(CTBC)→ 第二讀取器同一印刷列有「科目 + 這串年度數字」才併;② 年份橫幅蓋在真正的期間表頭上(Daiwa)→ 依真正的表頭重排(第二讀取器 x 位置 · 放不進去的列進剔除冊)。原文實測 3264 → 225 筆 · 6278 → 30 筆 · 獨立驗證 685 / 685;沙盒 14 份真報告回歸 0 筆少 · 剔除冊不變 · 晶心科 +32(同一種 CTBC 版面)。**套件 v0166**(啟動器 v0166 · runtime v0158)· **RoundAll v0122** · **Handle-All v0114**(auto:上一輪收據不是 v0166 → 整輪 · 最短一行 443 字元 · cmd 一行 1240 字元)。MQ-1560 四點對原圖:數字全對 · 一處字詞 OCR 錯(chi players ← chip layers)。
 > **本輪(v0165)**:桌機 04:11 跑 v0164 repair → 收尾 **REVIEW**(VRN-2 0 · 人工 2 · 資料源 3 · 增量庫清 MOPS 列 4584 / 38 · TARGET_PRICE(ADJ) 同步還原 5)。**RoundAll v0121**:人工確認紀錄(收尾頁人工項帶代碼 `H-xxxxxxxx` 與一行 `--confirm` 指令 · 只有操作員親手打才記 · 只增 · 內容變了就重列)· 「輸出冊 · 缺項 N 份」寫出哪幾份 · ⑤ ssot(repair 也把提案冊 v0101 送 ⑤b 核號請求 · 提案 9 → 17)· **Handle-All v0113**(最短一行 443 字元 · cmd 一行 1240 字元)· 套件 v0164 不動。
@@ -128,8 +128,11 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | **VRN2_Workbench** | **v0100** + Assets v0100(117 woff2 · 4.4 MB)| 見 runtime 清單 | 見 runtime 清單 | **新**(範本視覺鎖定 · 綁收據與輸出冊 · vrn2:// · logo 去背 · 自測 16 · 真瀏覽器 17)|
 | **VRN2_ChainShip** | **v0100**(倉 `functional modules/VRN/`)| 26,530 | `cfee9e2d056d` | **新**(PR #570:釘名前版盤點 check · 在位未入倉補船 ship;桌機一鍵貼 `docs/handoff/ai/VRN2_ChainShip_v0100.md` §3)|
 | **VRN2_ChainShip** | **v0101**(v0100 留著)| 39,259 | `81b47d7f9b83` | **新**(`recover`:缺的環在 VIA 樹 / 私有 runtime / 備份 / Downloads VRN2_* 夾與 zip 找同名唯一內容 → 複製進 VRN 夾再隨船;`ship --no-recover` 關;自測 27)|
+| **VRN2_HandleAll_v0116.md**(發行夾 · 最短一行 + cmd 一行 + 開機行 + 一段碼 · 不是 .ps1)| **v0116** | `vrn2_release_v0168` | 一行版 `e0bb916f23bb` · 開機檔 `f3d3821564ba` | **新**(指向 RoundAll v0124 · REVIEW 顏色修正 · auto:收據 < v0168 → 整輪)|
+| **VRN2_RoundAll_v0124.py**(發行夾 · 一支入口 · 不在套件內)| **v0124** | `vrn2_release_v0168` | `47cdc2b2a16e` | **新**(套件 v0168 · ③ 自測跑管理器 v0259 · 自測 90 項)|
+| **VRN2_Closeout_v0168.zip**(發行夾 · 套件)| **v0168** | `vrn2_release_v0168` | `931b6a9ac38c` | **新**(啟動器 v0168 · runtime v0159 · 管理器 v0259)|
 | **VRN2_HandleAll_v0115.md**(發行夾 · 最短一行 + cmd 一行 + 開機行 + 一段碼 · 不是 .ps1)| **v0115** | `vrn2_release_v0167` | 一行版 `ded97b49bb12` · 開機檔 `a25ea4d00f1e` | **新**(指向 RoundAll v0123)|
-| **VRN2_RoundAll_v0123.py**(發行夾 · 一支入口 · 不在套件內)| **v0123** | `vrn2_release_v0167` | `fc9f640cacd7` | **新**(keep_facts · 自測 89 項 · 套件 v0166 照釘)|
+| **VRN2_RoundAll_v0123.py**(發行夾 · 一支入口 · 不在套件內)| **v0123** | `vrn2_release_v0167` | `fc9f640cacd7` | 被 v0124 取代(套件 v0166 → v0168)· (keep_facts · 自測 89 項 · 套件 v0166 照釘)|
 | **VRN2_HandleAll_v0114.md**(發行夾 · 最短一行 + cmd 一行 + 開機行 + 一段碼 · 不是 .ps1)| **v0114** | `vrn2_release_v0166` | 一行版 `48cef1e897b6` · 開機檔 `26774199d3e6` | **新**(指向 RoundAll v0122 · auto:收據 < v0166 → 整輪)|
 | **VRN2_RoundAll_v0122.py**(發行夾 · 一支入口 · 不在套件內)| **v0122** | `vrn2_release_v0166` | `9d63be0ebd65` | 被 v0123 取代(套件同為 v0166)· (套件 v0166 · ③ 自測跑管理器 v0258 · 缺項提示:先上傳原 PDF 給 AI 對 · 自測 87 項)|
 | **VRN2_Closeout_v0166.zip**(發行夾 · 套件)| **v0166** | `vrn2_release_v0166` | `68d6d03d3fd1` | **新**(啟動器 v0166 · runtime v0158 · 管理器 v0258)|
@@ -151,6 +154,9 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 | **VRN2_RoundAll_v0115.py**(發行夾 · 一支入口 · 不在套件內)| **v0115** | `vrn2_release_v0159` | `92ea3b3e4b1f` | 被 v0116 取代(沒有本行程加速器 / 進度行 · 舊收尾頁版面)· (⑥e / ⑥f 同一個擷取 Python · 套件 v0158 · 自測 59 項)|
 | **VRN2_HandleAll_v0106.md**(發行夾 · 最短一行 + 開機行 + 一段碼 · 不是 .ps1)| **v0106** | `vrn2_release_v0158` | 一行版 `99598c668e4b` · 開機檔 `5aba98f6172f` | **新**(RoundAll v0114 · 最短一行 443 字元)|
 | **VRN2_RoundAll_v0114.py**(發行夾 · 一支入口 · 不在套件內)| **v0114** | `vrn2_release_v0158` | `425397f5d724` | 被 v0115 取代(⑥f 擷取 Python 只看匯入)· (套件 v0158 · 收尾頁 ③b → VCGC · 自測 58 項)|
+| ActivateVRN-2_v0168.py(套件 · 底座 v0136 · runtime v0159 · 版號跳過 v0167)| **v0168** | 見發行清單 | `f9108cd26b0f` | **新**(管理器 v0259 · 收據 v0168 · 自測多一段 v0168)|
+| VRN2_Runtime_v0159.zip(套件 · runtime)| **v0159** | 套件內 | `5bab209968d3` | **新**(v0158 的 197 個成員不動 + VRN_SystemManager_v0259)|
+| VRN_SystemManager_v0259.py(runtime · 薄尾 v0258)| **v0259** | runtime v0159 | 見 runtime 清單 | **新**(轉置表第三讀法對不上的剔除列 · 相連數字碎片接回再問同一個閘 · 過了回主冊)|
 | ActivateVRN-2_v0166.py(套件 · 底座 v0136 · runtime v0158 · 版號跳過 v0165)| **v0166** | 見發行清單 | `06bf8b2a3719` | **新**(管理器 v0258 · 收據 v0166 · 自測多一段 v0166)|
 | VRN2_Runtime_v0158.zip(套件 · runtime)| **v0158** | 套件內 | `5cc42b348344` | **新**(v0157 的 196 個成員不動 + VRN_SystemManager_v0258)|
 | VRN_SystemManager_v0258.py(runtime · 薄尾 v0257)| **v0258** | runtime v0158 | 見 runtime 清單 | **新**(輸出冊前表格修補:科目半行配對 · 兩層期間表頭重排 · 都要第二讀取器確認 · 放不進去的列進剔除冊)|
@@ -603,7 +609,7 @@ VIA 根目錄:`C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntellige
 
 ## 8. 已知問題與待辦(依優先序)
 
-| 0 | **(v0168)** PowerShell 7 先貼 `$env:VIA_SCRAPE_CONSENT = 'YES'`(操作員決定)再貼 `vrn2_release_v0168/VRN2_HandleAll_v0116.md` 的最短一行(取件分支 `claude/vrn2-closeout-authorization-y4ixl7`)→ auto 選 repair(幾分鐘)→ Workbench 換 v0103 · 開頁就是「00 系統現況」· 收尾仍應是 REVIEW(VRN-2 0)· 人工兩項照舊(MQ-1560 四點 `--confirm` · 華南 6143 原文)| 貼回 |
+| 0 | **(v0168)** cmd 視窗:`set "VIA_SCRAPE_CONSENT=YES"`(PowerShell 視窗是 `$env:VIA_SCRAPE_CONSENT = 'YES'`)再貼 `vrn2_release_v0168/VRN2_HandleAll_v0116.md` 的 cmd 一行 → auto 選整輪(約 90 分鐘 · 輸出冊由 v0259 重做)→ 收尾應是 REVIEW · 缺項清空(6143 補回)· 只剩 MQ-1560 四點(操作員自己打 `--confirm H-fd2ea35f`)| 貼回 / 人工 |
 | 0 | **(v0167)** cmd 視窗:`set "VIA_SCRAPE_CONSENT=YES"` 再貼 `vrn2_release_v0167/VRN2_HandleAll_v0115.md` 的 cmd 一行 → auto 選 repair(幾分鐘)→ 收尾應是 REVIEW(VRN-2 0)· MQ-1560 四點看過原圖後操作員自己打 `--confirm H-fd2ea35f`(AI 不代打)· 華南 6143 原文上傳給 AI | 貼回 / 人工 |
 | 0 | **(v0166)** cmd 視窗:`set "VIA_SCRAPE_CONSENT=YES"` 再貼 `vrn2_release_v0166/VRN2_HandleAll_v0114.md` 的 cmd 一行 → auto 選整輪(輸出冊由 v0258 重做 · 約 40 分鐘)· 收尾頁「輸出冊缺項」應只剩華南 6143(若原文有年度表 → 上傳原文)· MQ-1560 四點看過原圖後操作員自己打 `--confirm H-…`(AI 不代打)· 上傳貼回包 | 貼回 / 人工 |
 | 0 | **(v0165)** cmd 視窗:`set "VIA_SCRAPE_CONSENT=YES"` 再貼 `vrn2_release_v0165/VRN2_HandleAll_v0113.md` 的 cmd 一行 → repair(⑤ ssot · 收尾頁人工項帶 `--confirm` 指令)· 操作員看過原 PDF 後自己打 `--confirm H-…`(AI 不代打)· 上傳貼回包(含 `market\\VRN2_TPAdjSync_latest.json` 核 5 筆同步還原的比值)| 貼回 / 人工 |
@@ -697,6 +703,8 @@ VRN-2 自己的收尾頁:`VIA_Reports\vrn2\VRN2_CloseoutUI_latest.html`(RoundAll
 | DATA_GAP | 剩外部來源本來沒有的(鉅亨 404 · Yahoo / TWSE 沒有)· 已附證據 | 否(VRN-2 側結案)|
 | PASS | 全綠(或只剩提醒)| 是 |
 
+**v0168(2026-11-02)**:華南 6143 原文有年度表 → 管理器 v0259(轉置表第三讀法數字碎片接回)· 套件 v0168(啟動器 v0168 · runtime v0159)· RoundAll v0124 · Handle-All v0116(REVIEW 顏色修正)。
+
 **v0167(2026-11-01)**:桌機 v0166 整輪(年度表補回 · ⑪ 錯值 0)→ 收尾 OPEN 的 1 項 = ⑥e 步驟列截字誤判 → RoundAll v0123(keep_facts)· Handle-All v0115 · 套件 v0166 不動。
 
 **v0166(2026-11-01)**:操作員上傳原文 → 欣銓 3264 / Daiwa-6278 年度表是擷取後漏掉 → 管理器 v0258(輸出冊前表格修補)· 套件 v0166(啟動器 v0166 · runtime v0158)· RoundAll v0122 · Handle-All v0114。
@@ -714,8 +722,6 @@ VRN-2 自己的收尾頁:`VIA_Reports\vrn2\VRN2_CloseoutUI_latest.html`(RoundAll
 **v0160(2026-10-31)**:PowerShell 指令導入 VIA 加速器進度模板(真百分比 · 不卡斷)· RoundAll 本行程點加速器 · 跑完自動跳出收尾頁 · 收尾頁新版面 · cmd 一行;套件 v0158 不動。
 
 **v0159(2026-10-31)**:桌機 05:30 經 VIA 網路工具真抓共識成功;RoundAll v0115 讓 ⑥e / ⑥f 用同一個擷取 Python;Handle-All v0107;套件 v0158 不動。
-
-**v0168(2026-11-01)**:Workbench v0103「00 系統現況」· 啟動器 v0168 · runtime v0159 · RoundAll v0124 · Handle-All v0116 · 輸出冊不變 · 版本鎖 v0101 · 收尾以桌機為準(REVIEW)。
 
 **v0158(2026-10-31)**:③b OCR 隔離環境也不由 VRN-2 pip(就緒照用 · 沒就緒交 VCGC 建)· 啟動器 v0158 · RoundAll v0114 · Handle-All v0106 · runtime v0156 原樣。
 
@@ -758,6 +764,10 @@ VRN-2 自己的收尾頁:`VIA_Reports\vrn2\VRN2_CloseoutUI_latest.html`(RoundAll
 **沒有宣稱 / 桌機要做的**:桌機線的 v0246 / v0247(MarketFetch · V2 規範)與 SSOT 三冊 + `VRN2_BasicInfo_Headers_v0100.json` 只在桌機(`VRN2_Handover_v0145.md` §3 §5);補環 v0248 直通 v0245,跳過 v0246 / v0247 的內容。桌機請先看 `functional modules\VRN\_archive_vrn2\` 有沒有原 v0248 / v0253 / v0246 / v0247,有就用 ChainShip `ship` 推上(同名不同內容會列 `[FIND?]` 交人判);之後可出 v0257 重新釘名到真正的前版。SDD 的 X-REG / X-NUM(註冊冊 · 編號)是 VCGC 的冊,`via-vcgc registry-sync --apply` / `CGC_MDL237 --apply` 要在閘開後由 VCGC 線跑,不在本 PR 代寫。
 
 ## 11. 給下一個 AI 的關鍵規則(本輪新增在前)
+
+- **(v0168)** **讀取器之間的字詞切法會不同**:Word 輸出的 PDF 會留下別的字型的空白字疊在數字上;pdfplumber 依字元順序切詞會把相連的「3」「.0」分開,pypdfium2 不會。閘要比對數字序列時,先把同一行相連(≤ 0.5pt)的數字碎片接回再比;不要放寬比對本身(數字一定要完全相同)。
+- **(v0168)** **測試的固定資料不放原文的值**:自測 / 範例用合成的數字(形狀照原文 · 值不照抄),原文 PDF 與輸出冊的值不進倉。
+- **(v0168)** **建置時的字串替換要錨定**:Handle-All v0113 用「第一個 REVIEW = '…'」去改提示,改到的是顏色表(v0116 才修好);替換前先確認那個字串在檔裡只出現在要改的地方。
 
 - **(v0167)** **截字不能改判斷**:收尾頁 / 負責方規則看的是步驟列文字;任何截短(收據 300 字 · 步驟列 220 字)都要先把判斷要點(失敗 N · 燈 · 逾時 · Traceback · 致命錯)留在前面(keep_facts),不然規則會落到預設負責方。改截字長度或加新規則時,用最長的真實收據列測一次。
 
