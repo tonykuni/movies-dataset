@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taiwan Stock Data Matrix — VDS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:      #0f0f0e;
+    --surface: #161614;
+    --border:  #252420;
+    --border2: #2e2b26;
+    --text:    #e8e4dc;
+    --muted:   #7a7670;
+    --dim:     #4a4740;
+
+    --ok:      #5fcea0;
+    --ok-bg:   rgba(95,206,160,0.08);
+    --ok-bd:   rgba(95,206,160,0.22);
+
+    --warn:    #e8b84b;
+    --warn-bg: rgba(232,184,75,0.08);
+    --warn-bd: rgba(232,184,75,0.22);
+
+    --fix:     #e87060;
+    --fix-bg:  rgba(232,112,96,0.08);
+    --fix-bd:  rgba(232,112,96,0.22);
+
+    --twse:    #7eb8f0;
+    --tpex:    #a78bfa;
+    --yf:      #f0c060;
+    --native:  #5fcea0;
+
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 14px; background: var(--bg); }
+
+  body {
+    font-family: var(--sans);
+    color: var(--text);
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 0%, rgba(95,206,160,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(126,184,240,0.04) 0%, transparent 60%),
+      var(--bg);
+    padding: 32px 24px 60px;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  .hdr {
+    max-width: 960px;
+    margin: 0 auto 40px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .hdr-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ok);
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-bd);
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin-bottom: 6px;
+  }
+  .hdr-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+  .hdr-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+  .hdr-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .stat {
+    text-align: right;
+  }
+  .stat-n {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--ok);
+    line-height: 1;
+  }
+  .stat-l {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Legend ─────────────────────────────── */
+  .legend {
+    max-width: 960px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 5px 10px 5px 8px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: all .18s;
+  }
+  .leg:hover { background: rgba(255,255,255,.03); border-color: var(--border2); }
+  .leg.active { border-color: var(--border2); background: rgba(255,255,255,.04); color: var(--text); }
+  .leg-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Section ─────────────────────────────── */
+  .section {
+    max-width: 960px;
+    margin: 0 auto 20px;
+  }
+  .section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  /* ── Matrix Grid ─────────────────────────── */
+  .matrix {
+    display: grid;
+    grid-template-columns: 220px 1fr 100px 80px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  /* column headers */
+  .col-hdr {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 10px 14px;
+    background: rgba(0,0,0,.2);
+    border-bottom: 1px solid var(--border);
+  }
+  .col-hdr:not(:last-child) { border-right: 1px solid var(--border); }
+
+  /* rows */
+  .row {
+    display: contents;
+    cursor: pointer;
+  }
+  .row > .cell {
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+    position: relative;
+  }
+  .row:last-child > .cell { border-bottom: none; }
+  .row > .cell:not(:last-child) { border-right: 1px solid var(--border); }
+  .row:hover > .cell { background: rgba(255,255,255,.025); }
+
+  /* cell content */
+  .cell-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .cell-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .cell-db {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  /* source badge */
+  .src-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    border: 1px solid;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .src-badge + .src-badge { margin-top: 5px; }
+  .src-badge-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+
+  .src-twse  { color: var(--twse);   background: rgba(126,184,240,.07); border-color: rgba(126,184,240,.25); }
+  .src-tpex  { color: var(--tpex);   background: rgba(167,139,250,.07); border-color: rgba(167,139,250,.25); }
+  .src-yf    { color: var(--yf);     background: rgba(240,192,96,.07);  border-color: rgba(240,192,96,.25);  }
+  .src-both  { color: var(--native); background: rgba(95,206,160,.07);  border-color: rgba(95,206,160,.25);  }
+
+  .src-fallback {
+    font-size: 10px;
+    color: var(--warn);
+    font-family: var(--mono);
+    margin-top: 4px;
+    opacity: .8;
+  }
+
+  /* status badge */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .status-ok   { color: var(--ok);   background: var(--ok-bg);   border-color: var(--ok-bd); }
+  .status-warn { color: var(--warn); background: var(--warn-bg); border-color: var(--warn-bd); }
+  .status-fix  { color: var(--fix);  background: var(--fix-bg);  border-color: var(--fix-bd); }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .dot-ok   { background: var(--ok); }
+  .dot-warn { background: var(--warn); }
+  .dot-fix  { background: var(--fix); }
+
+  /* endpoint line */
+  .endpoint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .endpoint:hover { color: var(--muted); white-space: normal; word-break: break-all; }
+
+  /* ── Detail panel ─────────────────────────── */
+  .detail-panel {
+    max-width: 960px;
+    margin: 0 auto 28px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+  }
+  .detail-panel.open { display: block; animation: slideDown .2s ease; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .detail-hdr {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .detail-hdr-title {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .detail-close {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    cursor: pointer;
+    padding: 3px 7px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .detail-close:hover { color: var(--text); border-color: var(--border2); }
+  .detail-body {
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .detail-kv { display: flex; flex-direction: column; gap: 3px; }
+  .detail-k  { font-size: 10px; font-family: var(--mono); color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .detail-v  { font-size: 12.5px; color: var(--text); font-family: var(--mono); word-break: break-all; }
+
+  /* ── Summary bar ─────────────────────────── */
+  .summary {
+    max-width: 960px;
+    margin: 28px auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .sum-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 14px 16px;
+    transition: border-color .18s;
+  }
+  .sum-card:hover { border-color: var(--border2); }
+  .sum-n {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .sum-l {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  .sum-bar {
+    height: 2px;
+    border-radius: 2px;
+    margin-top: 10px;
+    opacity: .5;
+  }
+
+  /* ── Filter active dim ───────────────────── */
+  .row.dimmed > .cell { opacity: .25; }
+  .row.dimmed > .cell { pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div>
+    <div class="hdr-badge">VDS · VIA DATA MATRIX</div>
+    <div class="hdr-title">Taiwan Stock Data Sources</div>
+    <div class="hdr-sub">VDS_TW_FullPipeline_v2 · 3 DuckDB · 11 Tables</div>
+  </div>
+  <div class="hdr-stats">
+    <div class="stat">
+      <div class="stat-n" id="ok-count">10</div>
+      <div class="stat-l">Correct</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:var(--warn)">1</div>
+      <div class="stat-l">Fixed ✓</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:var(--muted)">11</div>
+      <div class="stat-l">Tables</div>
+    </div>
+  </div>
+</div>
+
+<!-- Legend / Filter -->
+<div class="legend">
+  <div class="leg active" data-src="all" onclick="filterSrc(this,'all')">
+    <span class="leg-dot" style="background:var(--text)"></span> All Sources
+  </div>
+  <div class="leg" data-src="TWSE" onclick="filterSrc(this,'TWSE')">
+    <span class="leg-dot" style="background:var(--twse)"></span> TWSE API
+  </div>
+  <div class="leg" data-src="TPEX" onclick="filterSrc(this,'TPEX')">
+    <span class="leg-dot" style="background:var(--tpex)"></span> TPEX API
+  </div>
+  <div class="leg" data-src="YFINANCE" onclick="filterSrc(this,'YFINANCE')">
+    <span class="leg-dot" style="background:var(--yf)"></span> yfinance
+  </div>
+  <div class="leg" data-src="BOTH" onclick="filterSrc(this,'BOTH')">
+    <span class="leg-dot" style="background:var(--native)"></span> TWSE + TPEX
+  </div>
+</div>
+
+<!-- Detail panel -->
+<div class="detail-panel" id="detail">
+  <div class="detail-hdr">
+    <div class="detail-hdr-title" id="detail-title">—</div>
+    <div class="detail-close" onclick="closeDetail()">ESC</div>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<!-- Section: DB-1 -->
+<div class="section">
+  <div class="section-title">DB-1 · VDS_TW_StockInfo.duckdb</div>
+  <div class="matrix">
+    <div class="col-hdr">資料 / Table</div>
+    <div class="col-hdr">來源 / Source</div>
+    <div class="col-hdr">端點 / Endpoint</div>
+    <div class="col-hdr">狀態</div>
+
+    <div class="row" data-src="YFINANCE" data-detail='{"table":"tw_stock_info","desc":"個股基本面、分析師評等、技術指標","source":"yfinance Ticker.info","endpoint":"yf.Ticker({ticker}.TW).info","fields":"market_cap, trailing_pe, beta, current_price, target_mean, recommendation, dividend_yield, ma_5d…","db":"DB-1","note":"yfinance 官方 API，無替代方案"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">個股基本面 / Info</div>
+        <div class="cell-sub">tw_stock_info</div>
+        <div class="cell-db">DB-1 · 1 table</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge src-yf">
+          <span class="dot" style="background:var(--yf)"></span>
+          yfinance
+        </div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">yf.Ticker({tk}.TW).info</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section: DB-2 -->
+<div class="section">
+  <div class="section-title">DB-2 · VDS_TW_Daily.duckdb</div>
+  <div class="matrix">
+    <div class="col-hdr">資料 / Table</div>
+    <div class="col-hdr">來源 / Source</div>
+    <div class="col-hdr">端點 / Endpoint</div>
+    <div class="col-hdr">狀態</div>
+
+    <!-- price -->
+    <div class="row" data-src="YFINANCE" data-detail='{"table":"tw_price_daily","desc":"個股 OHLCV + Adj Close，批量 yf.download","source":"yfinance batch download","endpoint":"yf.download([2330.TW, 2317.TW, …], batch=50)","fields":"open, high, low, close, volume, adj_close","db":"DB-2","note":"個股量價唯一來源，正確設計"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">個股量價 OHLCV</div>
+        <div class="cell-sub">tw_price_daily</div>
+        <div class="cell-db">DB-2 · PK(date, ticker)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge src-yf">
+          <span class="dot" style="background:var(--yf)"></span>
+          yfinance
+        </div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">yf.download([…TW], batch=50)</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+
+    <!-- inst -->
+    <div class="row" data-src="BOTH" data-detail='{"table":"tw_chip_inst","desc":"個股三大法人 — 外資、投信、自營商買賣超","source":"TWSE T86 + TPEX 3insti_daily_rpt","endpoint":"TWSE: T86?selectType=ALLBUT0999 / TPEX: openapi/v1/tpex_3insti_daily_rpt","fields":"fi_buy, fi_sell, fi_net, it_buy, it_sell, it_net, dt_buy, dt_sell, dt_net, total_net","db":"DB-2","note":"每日逐日批次，TWSE+TPEX 並行"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">三大法人</div>
+        <div class="cell-sub">tw_chip_inst</div>
+        <div class="cell-db">DB-2 · PK(date, ticker)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge-wrap">
+          <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE T86</div>
+          <div class="src-badge src-tpex"><span class="dot" style="background:var(--tpex)"></span>TPEX 3insti</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">T86?selectType=ALLBUT0999</div>
+        <div class="endpoint">openapi/v1/tpex_3insti_daily_rpt</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+
+    <!-- margin -->
+    <div class="row" data-src="BOTH" data-detail='{"table":"tw_chip_margin","desc":"個股融資融券 — 融資餘額、融券餘額","source":"TWSE MI_MARGN + TPEX margin_trading_balance","endpoint":"TWSE: MI_MARGN?selectType=STOCK / TPEX: openapi/v1/tpex_margin_trading_balance","fields":"margin_buy, margin_sell, margin_bal, margin_offset, short_buy, short_sell, short_bal","db":"DB-2","note":"TWSE 15欄, TPEX 14欄，欄位 mapping 已校正"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">融資融券</div>
+        <div class="cell-sub">tw_chip_margin</div>
+        <div class="cell-db">DB-2 · PK(date, ticker)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge-wrap">
+          <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE MI_MARGN</div>
+          <div class="src-badge src-tpex"><span class="dot" style="background:var(--tpex)"></span>TPEX margin</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">MI_MARGN?selectType=STOCK</div>
+        <div class="endpoint">tpex_margin_trading_balance</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+
+    <!-- daytrade -->
+    <div class="row" data-src="BOTH" data-detail='{"table":"tw_chip_daytrade","desc":"個股當沖 — 當沖買賣股數、金額、當沖率","source":"TWSE TWTB4U + TPEX dtsold_result_dl","endpoint":"TWSE: TWTB4U?selectType=0 / TPEX: openapi/v1/tpex_dtsold_result_dl","fields":"dt_buy_vol, dt_sell_vol, dt_vol, dt_value, dt_ratio","db":"DB-2","note":"BUG-1 已修: wrapper table 干擾問題，改用欄名關鍵字篩選"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">當沖</div>
+        <div class="cell-sub">tw_chip_daytrade</div>
+        <div class="cell-db">DB-2 · PK(date, ticker)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge-wrap">
+          <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE TWTB4U</div>
+          <div class="src-badge src-tpex"><span class="dot" style="background:var(--tpex)"></span>TPEX dtsold</div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">TWTB4U?selectType=0</div>
+        <div class="endpoint">tpex_dtsold_result_dl</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section: DB-3 -->
+<div class="section">
+  <div class="section-title">DB-3 · VDS_TW_Index.duckdb</div>
+  <div class="matrix">
+    <div class="col-hdr">資料 / Table</div>
+    <div class="col-hdr">來源 / Source</div>
+    <div class="col-hdr">端點 / Endpoint</div>
+    <div class="col-hdr">狀態</div>
+
+    <!-- index price — FIXED -->
+    <div class="row" data-src="BOTH" data-detail='{"table":"tw_index_price","desc":"加權指數 + 櫃買指數 OHLCV","source":"^TWII: TWSE FMTQIK (逐月) / ^TWOII: TPEX stockidx_result.php (逐日)","endpoint":"TWSE: afterTrading/FMTQIK?date=YYYYMM01 / TPEX: stockidx_result.php?d=YYYMMDD","fields":"open, high, low, close, volume","db":"DB-3","note":"修正前為 yfinance，現改為 TWSE/TPEX 原生 API，yfinance 僅作降級備援"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">指數量價 OHLCV</div>
+        <div class="cell-sub">tw_index_price</div>
+        <div class="cell-db">DB-3 · ^TWII + ^TWOII</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge-wrap">
+          <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE FMTQIK</div>
+          <div class="src-badge src-tpex"><span class="dot" style="background:var(--tpex)"></span>TPEX stockidx</div>
+        </div>
+        <div class="src-fallback">▸ fallback: yfinance</div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">FMTQIK?date=YYYYMM01</div>
+        <div class="endpoint">stockidx_result.php?d=YYY</div>
+      </div>
+      <div class="cell"><span class="status status-warn"><span class="dot dot-warn"></span>Fixed</span></div>
+    </div>
+
+    <!-- index chip -->
+    <div class="row" data-src="TWSE" data-detail='{"table":"tw_index_chip","desc":"加權指數三大法人整體買賣超","source":"TWSE MI_INDEX3 (7欄結構)","endpoint":"TWSE: fund/MI_INDEX3?response=json&date=YYYYMMDD","fields":"fi_net, it_net, dt_net, total_net","db":"DB-3","note":"BUG-2 已修: MI_INDEX3 實際 7 欄，只取買賣超行，gc 索引修正 fi=1 it=2 dt=5 total=6"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">指數三大法人</div>
+        <div class="cell-sub">tw_index_chip</div>
+        <div class="cell-db">DB-3 · PK(date, index_id)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE MI_INDEX3</div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">MI_INDEX3?response=json</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+
+    <!-- index margin -->
+    <div class="row" data-src="TWSE" data-detail='{"table":"tw_index_margin","desc":"加權指數融資融券整體","source":"TWSE MI_MARGN (selectType=MS)","endpoint":"TWSE: marginTrading/MI_MARGN?selectType=MS","fields":"margin_buy, margin_sell, margin_bal, short_buy, short_sell, short_bal","db":"DB-3","note":"市場整體融資融券，非個股"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">指數融資融券整體</div>
+        <div class="cell-sub">tw_index_margin</div>
+        <div class="cell-db">DB-3 · PK(date, index_id)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE MI_MARGN(MS)</div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">MI_MARGN?selectType=MS</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+
+    <!-- index daytrade -->
+    <div class="row" data-src="TWSE" data-detail='{"table":"tw_index_daytrade","desc":"加權指數當沖整體","source":"TWSE TWTB4U (selectType=MS)","endpoint":"TWSE: afterTrading/TWTB4U?selectType=MS","fields":"dt_vol, dt_value, dt_ratio","db":"DB-3","note":"BUG-3 已修: fetch_one_date_index key 由 daytrade 改為 dt，修正 acc[idx_dt] mapping 錯誤"}' onclick="showDetail(this)">
+      <div class="cell">
+        <div class="cell-label">指數當沖整體</div>
+        <div class="cell-sub">tw_index_daytrade</div>
+        <div class="cell-db">DB-3 · PK(date, index_id)</div>
+      </div>
+      <div class="cell">
+        <div class="src-badge src-twse"><span class="dot" style="background:var(--twse)"></span>TWSE TWTB4U(MS)</div>
+      </div>
+      <div class="cell">
+        <div class="endpoint">TWTB4U?selectType=MS</div>
+      </div>
+      <div class="cell"><span class="status status-ok"><span class="dot dot-ok"></span>OK</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary bar -->
+<div class="summary">
+  <div class="sum-card">
+    <div class="sum-n" style="color:var(--yf)">yfinance</div>
+    <div class="sum-l">個股 OHLCV + 基本面</div>
+    <div class="sum-bar" style="background:var(--yf)"></div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-n" style="color:var(--twse)">TWSE</div>
+    <div class="sum-l">T86 / MI_MARGN / TWTB4U / FMTQIK / MI_INDEX3</div>
+    <div class="sum-bar" style="background:var(--twse)"></div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-n" style="color:var(--tpex)">TPEX</div>
+    <div class="sum-l">3insti / margin / dtsold / stockidx</div>
+    <div class="sum-bar" style="background:var(--tpex)"></div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-n" style="color:var(--ok)">11</div>
+    <div class="sum-l">Tables · 3 DuckDB · 4 bugs fixed</div>
+    <div class="sum-bar" style="background:var(--ok)"></div>
+  </div>
+</div>
+
+<script>
+  // ── Detail panel ────────────────────────────
+  function showDetail(row) {
+    const data  = JSON.parse(row.dataset.detail);
+    const panel = document.getElementById('detail');
+    document.getElementById('detail-title').textContent = data.table + ' — ' + data.desc;
+
+    const kv = [
+      ['資料表',   data.table],
+      ['來源',     data.source],
+      ['端點',     data.endpoint],
+      ['欄位',     data.fields],
+      ['DB',       data.db],
+      ['備注',     data.note],
+    ];
+    document.getElementById('detail-body').innerHTML = kv.map(([k,v]) => `
+      <div class="detail-kv">
+        <div class="detail-k">${k}</div>
+        <div class="detail-v">${v}</div>
+      </div>
+    `).join('');
+
+    panel.classList.add('open');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeDetail() {
+    document.getElementById('detail').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDetail();
+  });
+
+  // ── Source filter ────────────────────────────
+  function filterSrc(el, src) {
+    document.querySelectorAll('.leg').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+
+    document.querySelectorAll('.row').forEach(row => {
+      if (src === 'all') {
+        row.classList.remove('dimmed');
+        return;
+      }
+      const rs = row.dataset.src;
+      const match =
+        rs === src ||
+        (src === 'BOTH' && rs === 'BOTH') ||
+        (src === 'TWSE' && (rs === 'TWSE' || rs === 'BOTH')) ||
+        (src === 'TPEX' && (rs === 'TPEX' || rs === 'BOTH'));
+      row.classList.toggle('dimmed', !match);
+    });
+  }
+</script>
+</body>
+</html>
