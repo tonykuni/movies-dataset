@@ -1,0 +1,156 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0172 (launcher v0172 · runtime v0162) + VRN2_RoundAll_v0128 + VRN2_HandleAll_v0120",
+ "date": "2026-11-03",
+ "trigger": "操作員 2026-11-03:「新增小數欄,舊欄保留並標註,三項一起修 · 授權給你依照你建議最佳化完成」+ 睡前授權「自動解決完善三個獨立系統一切問題 · 完成既有範圍不可擴張」",
+ "findings": {
+  "F1": "HistoryAlign FinancialAligned Parquet not written (ArrowInvalid: v0100 _write_books turns None into \"\" → mixed column) · desktop 15:18: 11,905 rows in JSON / CSV",
+  "F2": "Combined UPSIDE_PCT(ADJ) holds percent (46.0) not ratio (0.46) · the store already holds old rows → meaning cannot change in place",
+  "F3": "Basic Info NAME 23/52 · ADJ_CLOSE 0/52 (verbatim book) vs Combined 51/52 (merged book)"
+ },
+ "consent_gate": "unchanged and operator-only: nothing in this release sets VIA_NET_CONSENT / VIA_SCRAPE_CONSENT",
+ "fixes": {
+  "HistoryAlign_v0103": "prior writes first; only a not-written Parquet is rewritten typed (float64 with null / string / mixed as string) with a read-back check · receipt written[...].parquet_typed",
+  "ConsensusJoin_v0107": "UPSIDE_ADJ ratio column (9 decimals) inserted right after the kept percent column UPSIDE_PCT(ADJ) · filled from market per_file.upside_adj · never overwrites · output/VRN2_Combined_columns_latest.json column notes",
+  "Workbench_v0107": "self-contained post-processing tail (prior = highest version below it without wb105-css → skips v0105 and the desktop accelfix v0106 copy) · all v0105 features · Basic Info merged view (原 / 合 tags, source on hover, books unchanged) · upside from UPSIDE_ADJ × 100 · 3 more lamps · column notes · accelerator marker on line 3",
+  "RoundAll_v0128": "package v0172 pin · plan triggers (Parquet not written → history · Combined without UPSIDE_ADJ → combined · page not v0107 → workbench) with add-only installs of the new tails · Combined column order per v0107 · selftest 98",
+  "HandleAll_v0120": "points at RoundAll v0128 / release v0172 · receipts ≥ v0170 still pick repair (the three fixes land in minutes, no full round)"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0172.zip",
+  "sha256": "bd952da149bdf127fb84301f483794f9288ca9c79b5fb5e52a652052ccf2de35",
+  "release_folder": "vrn2_release_v0172",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0172.py",
+  "launcher_numbering": "v0171 skipped (release v0171 was RoundAll-only)"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0162.zip",
+  "zip_sha256": "1cff52c7fa54cc9d7ffda469f381b31322baea01a4c5b8f53741faaa9f302674",
+  "based_on": "VRN2_Runtime_v0160.zip ce3fbc82b1cefb933bcf36b251dbb3283f4e73f056b4d6133a63c084a879132a",
+  "retained_members": 200,
+  "new_members": [
+   "VRN2_HistoryAlign_v0103.py",
+   "VRN2_ConsensusJoin_v0107.py",
+   "VRN2_Workbench_v0107.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0172.py",
+   "sha256": "f58884240e915536a543e96c8fc3566d5f6419c679d50d8f0cdb20e3f3665e45"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "bfbf42cf2b1e487b32c0973e802abfca8f5b3ff0aeb5bcf7d4da47f9be458fa0"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "b69b6bddd510fb1a812e4cfdcd83c818e03540b6761b04a10066a2c8644ccca3"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0162.json",
+   "sha256": "428374cdb41390f270fb409191f3d2000e0641962bbe0f274a1c8ea738740397"
+  },
+  {
+   "path": "VRN2_Runtime_v0162.zip",
+   "sha256": "1cff52c7fa54cc9d7ffda469f381b31322baea01a4c5b8f53741faaa9f302674"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0127.py",
+   "sha256": "bdff099737f653934e923b372aa27b1297ff037b2c13e0c0faf4cb5e3fc88b7b",
+   "status": "superseded 2026-11-03; file kept in vrn2_release_v0171"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0128.py",
+  "sha256": "e1c9178f608c1ff419226fd6be7575ef2586d7bea1f7c5573a658460c9cbe7e8",
+  "pinned_package_sha256": "bd952da149bdf127fb84301f483794f9288ca9c79b5fb5e52a652052ccf2de35",
+  "guide": "VRN2_RoundAll_v0128.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0120.md",
+  "line_sha256": "fc5ea103058735667c27aaebf2fa141c051132daf28b5ad670c6baa8552e8ee4",
+  "line_chars": 14508,
+  "boot_file": "VRN2_HandleAll_v0120_boot.txt",
+  "boot_line_sha256": "07795cbdcd2a6f1e6013d37018373c03c299010cc23361c2b9ebd7136e6b1d75",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "every new number checked free on BOTH this branch and origin/main before minting (RoundAll v0128 · HandleAll v0120 · Workbench v0107 · HistoryAlign v0103 · ConsensusJoin v0107 · runtime v0162 · launcher / package / receipt v0172)",
+ "results": {
+  "roundall_v0128_selftest": [
+   "[PASS] VRN2_RoundAll v0128 --selftest · 98 項 · 不過 0"
+  ],
+  "launcher_v0172_selftest": [
+   "[PASS] v0172: HistoryAlign v0103 (typed Parquet rewrite · JSON / CSV unchanged) · ConsensusJoin v0107 (UPSIDE_ADJ ratio column after the kept percent column · column notes) · Workbench v0107 (Basic Info merged view · self-contained · accelerator marker) are active"
+  ],
+  "module_selftests": {
+   "HistoryAlign v0103(pyarrow)": "[GREEN] VRN2_HistoryAlign v0103 自測 全過(6 項)",
+   "ConsensusJoin v0107": "[GREEN] VRN2_ConsensusJoin v0107 自測 全過(9 項)",
+   "Workbench v0107": "[GREEN] VRN2_Workbench v0107 自測 全過(15 項)",
+   "ConsensusJoin v0106 回歸": "[GREEN] VRN2_ConsensusJoin v0106 自測 全過(11 項)",
+   "Workbench v0105 回歸": "[GREEN] VRN2_Workbench v0105 自測 全過(10 項)"
+  },
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "closeout_states": {
+   "auto1": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 8,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   },
+   "auto2": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 6,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   }
+  },
+  "closeout_vrn2_items_same_as_v0171_baseline": true,
+  "repair_plan": "歷史對齊 FinancialAligned,Deleted 的 Parquet 沒寫(ImportError(這支 Python 的 pyarrow 載不起來))→ HistoryAlign v0103 依欄位型別重寫(JSON / CSV 照舊) · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+  "F1": "auto1 (sandbox venv: pyarrow cannot load) → receipt honestly '(沒寫:ImportError) · 型別版也沒寫成:ImportError' → auto2 repair with a pyarrow Python: the prior write hit ArrowInvalid (mixed column) → v0103 typed rewrite · FinancialAligned 5232 rows · num 6 · str 16 · mixed→str ['VALUE_FINAL']",
+  "F2": "Combined UPSIDE_ADJ right after UPSIDE_PCT(ADJ) · filled 11 = old 11 · cross-check mismatches 0 · column notes file written · DuckDB book_combined 多 UPSIDE_ADJ 欄(31 列 · 新輪 17 列有值 · 舊列 NULL)",
+  "F3": "Workbench v0107 over v0102 (repo runtime) · marks {\"id=\\\"wb107-css\\\"\": 1, \"id=\\\"wb107\\\"\": 1, \"id=\\\"wb107b\\\"\": 1, \"id=\\\"wb107-js\\\"\": 1, \"id=\\\"wb105\\\"\": 0} · lamps {\"Basic Info · 合併檢視\": \"YELLOW\", \"上漲空間 新欄 × 舊欄\": \"GREEN\", \"歷史對齊 Parquet\": \"GREEN\"} · browser 1920/1366/390: card rows 17, nothing overflows outside the table container; the 390-px page scroll is the prior page header (unchanged when the v0107 blocks are removed)",
+  "tamper": "tampered boot file → '[RED] boot SHA-256 mismatch - not run'",
+  "not_run": "the desktop itself (one line · auto = repair, minutes) · the operator's own --confirm (H-fd2ea35f) · a real ArrowInvalid on the desktop's 11,905-row book (reproduced on sandbox data + unit fixture)"
+ }
+}

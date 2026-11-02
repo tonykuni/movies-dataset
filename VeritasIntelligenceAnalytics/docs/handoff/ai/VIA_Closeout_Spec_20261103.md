@@ -88,3 +88,17 @@
 - 人工核對只有操作員親手打 `--confirm` 才算。
 - 安裝經 VCGC InstallGate;InstallGate 只能 `pip --user` 進主 Python 的工具(例 Graphify 這種相依很多的第三方 CLI)走隔離 venv,前後核對主 Python 套件清單不變,並在收據寫明。
 - 不推使用者資料 / 原文數值進倉,只寫結論與筆數。
+
+## 10. v0172 輪更新(2026-11-03 · 只增 · 上面各節原文不動)
+
+| 項目 | 狀態 |
+|---|---|
+| F1 Parquet 混型 | **已修**:`VRN2_HistoryAlign_v0103`(前版照寫 · 沒寫成才依欄位型別重寫 · 讀回比對)· 沙盒:前版 ArrowInvalid → 型別版寫成 · 細節見 `vrn2_release_v0172/VRN2_Verification_v0172.md` |
+| F2 上漲空間刻度 | **已修(操作員選「新增小數欄 · 舊欄保留並標註」)**:`VRN2_ConsensusJoin_v0107` 新增 `UPSIDE_ADJ`(純小數)緊接 `UPSIDE_PCT(ADJ)`(百分數 · 保留)· `output/VRN2_Combined_columns_latest.json` 標註 · 增量庫加欄(舊列 NULL)|
+| F3 Basic 頁讀合併欄 | **已修**:`VRN2_Workbench_v0107`「Basic Info · 合併檢視」(原文標「原」· Combined 補上標「合」+ 來源 · 兩冊不改)|
+| 桌機要做 | 貼 `vrn2_release_v0172/VRN2_HandleAll_v0120.md` 最短一行(收據 ≥ v0170 → repair · 幾分鐘)· MQ-1560 `--confirm`(操作員)|
+| ClickStart(另一線)| 3221225786 = 0xC000013A(STATUS_CONTROL_C_EXIT · 視窗被關 / Ctrl+C)· 另一線 v0103 的根因是 venv 父子 PID 不同被誤判逾時 · 內含本線 RoundAll v0127(雜湊相符)· 本線只讀 |
+| 非個股摘要器 v0300 | 個股以外的報告(產業 / 晨會 / 總經 / 訊息)屬它;依賴 `NON_STOCK_CORE_v0200` / `reuse/vrn2/` 不在倉 · zip 未上傳 → 本線無法重現;預覽可見品質待修點(行號殘字 · `nan` 點 · 跨公司段落混在一份)→ VRN 之後的階段 |
+| Graphify | v0101:根目錄要有系統夾才算 VIA 根(修桌機 4 系統全灰仍印綠)· 一張圖都沒出 → 總結黃 |
+| 最嚴格要求 | 操作員 11/03 貼上的 Ultimate Performance Standard → `VIA_Ultimate_Requirements_v0100.md`(UP-0 ~ UP-20 逐條 + 現況 + 負責系統 · 不擴張)|
+| 收尾佇列(§8)| 1. VRN P0 → **完成(待桌機 repair 實跑 + 操作員 --confirm)** · 2. VRN P1(F4 / F5 · 歷史對齊 · Input List)· 3. VDF · 4. VCGC 照舊 |
