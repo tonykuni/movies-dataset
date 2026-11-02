@@ -169,9 +169,9 @@ VCGC `CGC_MDL274_HealthMatrix_v0116`(操作台印章頁首 · VRN 分頁改指 V
 - 紅字只有前版鏈轉手那兩行(v0128 第 104 行 → v0127 第 108 行 `__getattr__`),最後一行錯誤訊息被截掉了。
 - **第 1 步做完再跑 `via-vdf`**;還是紅 → 把 `VIA_Reports\review\ps_<時間>\B.python.log` 整個檔上傳給 AI(最後一行才是真正的錯誤名)。VRN 不改 VDF 的檔(四系統互不干涉)。
 
-## 13. 一支收尾全部 · VIA_SettleAll_v0100(2026-11-02 · 取代第 12 節的三步)
+## 13. 一支收尾全部 · VIA_SettleAll_v0101(2026-11-02 · 取代第 12 節的三步)
 
-操作員 2026-11-02「全景式分析檢視 · 識別問題 · AST 定位 · GENERATE A CODE TO SETTLE DOWN AND HANDLE ALL ABOVE」→ `docs/handoff/ai/VIA_SettleAll_v0100.py`(Python · PowerShell 只負責取檔與核雜湊)。
+操作員 2026-11-02「全景式分析檢視 · 識別問題 · AST 定位 · GENERATE A CODE TO SETTLE DOWN AND HANDLE ALL ABOVE」→ `docs/handoff/ai/VIA_SettleAll_v0101.py`(v0101 修 PR #585 Codex 三項:舊收據 / 交接閘紅 / 黃燈不再被報成綠 · Python · PowerShell 只負責取檔與核雜湊)。
 
 | 步 | 做什麼 | 寫什麼 |
 |---|---|---|
@@ -183,12 +183,12 @@ VCGC `CGC_MDL274_HealthMatrix_v0116`(操作台印章頁首 · VRN 分頁改指 V
 | ⑥ VCGC | `handoff check`(交接閘紅分類計數)+ `test --quick`(串測總行 · 紅站) | VCGC 自己的紀錄冊 |
 | ⑦ 報告 | `VIA_Reports\settle\SETTLE_latest.json / .md` + `Downloads\VIA_Settle_<時間>.zip` | 只寫這兩處 |
 
-各系統只經自己的入口跑(四系統對等 · 不改他系統的檔)。容器實測:自測 10 / 10(含假遠端真 git 合併 · 有改動拒合併)· 實跑 AST 286 檔錯 0 · VDF ui 6 GREEN · VCGC 紅站 0。
+各系統只經自己的入口跑(四系統對等 · 不改他系統的檔)。容器實測:自測 13 / 13(含假遠端真 git 合併 · 有改動拒合併)· 實跑 AST 286 檔錯 0 · VDF ui 6 GREEN · VCGC 紅站 0(但交接閘既有紅 → ⑥ 照實 RED)。
 
 ### 桌機要做的(PowerShell 7 · 一行 · 從檔案複製)
 
 ```powershell
-$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0100";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0100.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0100.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'68F63CB1E6476BED100738982E77AE43EDEFCA1B2CD3BA7D530E7CBB43D40B08'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0101";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0101.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0101.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'BE95A346FE46DEDBA139C7C81C575D60C2FC09D3D2D3133CD8203B15E45CBB06'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
 跑完看最後一行 `NEXT:`;不是 GREEN → 把 `Downloads\VIA_Settle_<時間>.zip` 上傳給 AI(VDF 紅字的 AST 定位在裡面)。VRN 收尾 REVIEW 的兩個人工項仍要你看原文後 `--confirm`。

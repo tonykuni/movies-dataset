@@ -127,4 +127,4 @@ RoundAll v0125 → v0126 只差去重一行 + 版號字樣;v0125 同環境同結
 
 ## 一支收尾全部(後續 · 2026-11-02)
 
-`VIA_SettleAll_v0100.py`:全景 → 同步 → VDF ui(AST 定位)→ VRN repair → VCGC 驗 → 報告。桌機一行見 `VRN2_Handover_latest.md` 第 13 節。
+`VIA_SettleAll_v0101.py`(v0100 + PR #585 Codex 三項判燈修正):全景 → 同步 → VDF ui(AST 定位)→ VRN repair → VCGC 驗 → 報告。桌機一行見 `VRN2_Handover_latest.md` 第 13 節。
