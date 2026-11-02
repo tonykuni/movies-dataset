@@ -1,0 +1,186 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0170 (launcher v0170 · runtime v0160) + VRN2_RoundAll_v0126 + VRN2_HandleAll_v0118",
+ "date": "2026-11-02",
+ "trigger": "操作員 2026-11-02:「開閘共識欄 · 要有共識資料 · Workbench 面板緊湊 / 字體比頁首略小 / 有底色的字白色 / 矩陣欄寬自動 / 紅黃綠資料驗證燈 · 授權自行完成 VRN-2 收尾」",
+ "consent_gate": "unchanged and operator-only: nothing in this release sets VIA_NET_CONSENT / VIA_SCRAPE_CONSENT; the snapshot backfill only reuses data already on disk and labels it ASOF",
+ "fixes": {
+  "Workbench_v0105": "dynamic-prior thin tail (desktop chains its local v0104, this runtime chains v0102; prior renders, v0105 post-processes): compact-panel CSS override · largest panel font 17px < header 20px · white text on solid badges · auto table column widths + sticky headers · per-receipt red/yellow/green verification-lamp panel · consensus panel with ASOF badge",
+  "ConsensusJoin_v0106": "gate-closed DENY with empty per_code → fill from the newest on-disk engine matrix (consensus/factset_yfinance_consensus_matrix.csv) · receipt snapshot_reused{asof/source/codes} · why starts with 快照補位(ASOF …) · compliance DENY never backfilled · VIA_VRN2_NO_SNAPSHOT=1 off switch · open-gate rounds fetch fresh and overwrite",
+  "RoundAll_v0126": "plan step consensus_snapshot (gate closed · snapshot on disk · not planned when the gate is open or another consensus step is planned) → Combined rebuild follows · closeout owner: ⑥f 快照補位 → 提醒 (before the 同意閘未開 → 人工 rule)",
+  "HandleAll_v0118": "points at v0170 · the gate-closed full-run prompt now says the snapshot backfill will fill the Combined consensus columns (ASOF-labelled) · still never sets the gate"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0170.zip",
+  "sha256": "bb4a7b04103548c34601d0ff2b9460004954b68a11b47c668fa60e155c3cdc20",
+  "release_folder": "vrn2_release_v0170",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0170.py",
+  "launcher_numbering": "v0169 skipped (release v0169 was RoundAll-only)"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0160.zip",
+  "zip_sha256": "ce3fbc82b1cefb933bcf36b251dbb3283f4e73f056b4d6133a63c084a879132a",
+  "based_on": "VRN2_Runtime_v0159.zip 5bab209968d3db34169c393b3f28caaee3b0d50794c1039e4c0b94cb087c65bc",
+  "retained_members": 198,
+  "new_members": [
+   "VRN2_Workbench_v0105.py",
+   "VRN2_ConsensusJoin_v0106.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0170.py",
+   "sha256": "e8e7f4f7220926134d3b6a97263d197ae8525f4767e24de18ef478bb79d658a3"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "5a05bc3bf5c3a1a93cea55e789b1a66e1b176ce4f210e9c14a203a622bb5c00b"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "770b49fd1d3bc8ec27ed73bf4f5929de9a029aeac0c97206ea5338fe5a2f28c5"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0160.json",
+   "sha256": "acf7292eff1eacb7eb3fbe393d56bf0049f6d911690ef768cbc22d7e52f6259d"
+  },
+  {
+   "path": "VRN2_Runtime_v0160.zip",
+   "sha256": "ce3fbc82b1cefb933bcf36b251dbb3283f4e73f056b4d6133a63c084a879132a"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0125.py",
+   "sha256": "617542d2f196aba96754b8b96c464b47e9068644e79978d5d5edef32ca008340",
+   "status": "superseded 2026-11-02; file kept in vrn2_release_v0169"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0126.py",
+  "sha256": "174df7b572c0fbb043906496f162d28d74d636ae4b31c2dd945873f34a8fe2b7",
+  "pinned_package_sha256": "bb4a7b04103548c34601d0ff2b9460004954b68a11b47c668fa60e155c3cdc20",
+  "guide": "VRN2_RoundAll_v0126.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0118.md",
+  "line_sha256": "3d233d8e8e88d370dc8d9ec8ad1925366d2a89a8d276b8a24c0b72474985d30e",
+  "line_chars": 14287,
+  "boot_file": "VRN2_HandleAll_v0118_boot.txt",
+  "boot_line_sha256": "47dd726d9beca7939fea744240df9b2de7657d5a8cbf2d8743bb6ab2fff9015e",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "results": {
+  "roundall_v0126_selftest": [
+   "[PASS] VRN2_RoundAll v0126 --selftest · 93 項 · 不過 0"
+  ],
+  "module_selftests": {
+   "workbench_v0105": "[GREEN] VRN2_Workbench v0105 自測 全過(10 項)",
+   "consensusjoin_v0106": "[GREEN] VRN2_ConsensusJoin v0106 自測 全過(11 項)",
+   "launcher_v0170": "[PASS] v0143: v0142 checks + single-instance lock (live / stale / forced / foreign), child limits (env · floor · mapping), ⑫b in-process fallback (missing page "
+  },
+  "pwsh_parse": "pwsh 7.4.6 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "e2e": {
+   "auto1": [
+    "[GREEN] boot: Handle-All v0118 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· 不重抓 ⑥f;被 DENY 的輪次碟上有共識快照 → ConsensusJoin v0106 用 ASOF 快照補位 Combined 共識欄(收尾頁列「提醒」)· 沒有快照 → 留空(列「人工」)",
+    "[計] ④ 自動選模式 full · 上一輪收據 VRN2_Closeout_v0153.json · 上一輪輸出冊 有(上一輪輸出冊是啟動器 v0170 以前做的 → 整輪:Workbench v0105 U/I + 共識欄快照補位要在新啟動器輪跑)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[YELLOW] ④ 同意閘未開 + 整輪:⑥f 共識會被 DENY(碟上有共識快照 → ConsensusJoin v0106 用 ASOF 快照補位 Combined 共識欄 · 收尾頁列「提醒」;沒有快照 → 留空 · 列「人工」)",
+    "[計] ④ 模式 full:整輪(取套件 v0170 → 診斷 → 全部自測 → 跑啟動器 v0170(③ / ③b 不 pip · 缺的經 VCGC · 管理器 v0259 · Workbench v0105(緊湊 / 白字 / 欄寬自動 / 資料驗證燈 / 共識面板) · ⑥f ConsensusJoin v0106(閘未開 DENY → 碟上快照補位 ASOF 標示 · v0105 同步還原 · TWSE / TPEX 格式合併)",
+    "[GREEN] ① 套件 · 套件就位 <sbx>/home/Downloads/VRN2_Closeout_v0170(SHA-256 bb4a7b041035 · 11 檔逐檔相符) · 來源 GitHub claude/optimistic-goodall-yhalc5",
+    "    → GREEN ② 定位 VRN-2 程式夾 · <sbx>/VIA/functional modules/VRN2 · VRN-2 private runtime; exact ship v0160 (launcher v0170 · Workbench v0105 · ConsensusJoin v0106 snapshot backfill · no MOPS); manager v0259 transposed re-c",
+    "  [計] ② 定位 VRN-2 程式夾 · <sbx>/VIA/functional modules/VRN2 · VRN-2 private runtime; exact ship v0160 (launcher v0170 · Workbench v0105 · ConsensusJoin v0106 snapshot backfill · no MOPS); manager v0259 transposed re-check (",
+    "  [計] ⑪ 獨立驗證 · 年度數據 5232 筆 · {'ALIGNED': 4665, 'TRANSALIGNED': 115, 'SUBALIGNED': 452}",
+    "    [U/I] [GREEN] VRN2_Workbench v0105(前版 v0102)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+    "[GREEN] ⑤ 修 · Workbench 重渲染(最新收據) · VRN2_Workbench v0105(前版 v0102)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 8 項",
+    "  [人工] 8 項"
+   ],
+   "auto2": [
+    "[GREEN] boot: Handle-All v0118 SHA-256 OK (claude/optimistic-goodall-yhalc5)",
+    "[YELLOW] ③b VIA 網路工具同意閘 未開(VIA_NET_CONSENT=(未設) · VIA_SCRAPE_CONSENT=(未設))· 不重抓 ⑥f;被 DENY 的輪次碟上有共識快照 → ConsensusJoin v0106 用 ASOF 快照補位 Combined 共識欄(收尾頁列「提醒」)· 沒有快照 → 留空(列「人工」)",
+    "[計] ④ 自動選模式 repair · 上一輪收據 VRN2_Closeout_v0170.json · 上一輪輸出冊 有(輸出冊是啟動器 v0170 做的 → 不整輪)(整輪:先貼 $env:VRN2_MODE = 'full')",
+    "[計] ④ 模式 repair:取套件 v0170 → ⑤ 自動修(同意閘開:⑥f 共識改經 VIA 網路工具重抓 · ConsensusJoin v0106 + 引擎 v0122 · ⑥e 不用 MOPS(MOPS 財報移開 · 只用 TWSE / TPEX)· 擷取鎖過期 → 移開後重抓 ⑥e · 重組 Combined(同步還原 · 合併)· 增量庫(先清 MOPS 算的列 · 備份)· SSOT 新提案送核號請求 · Workb",
+    "[GREEN] ① 套件 · 本機已是 VRN2_Closeout_v0170(SHA-256 bb4a7b041035 · 11 檔逐檔相符)· <sbx>/home/Downloads/VRN2_Closeout_v0170",
+    "    [U/I] [GREEN] VRN2_Workbench v0105(前版 v0102)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+    "[GREEN] ⑤ 修 · Workbench 重渲染(最新收據) · VRN2_Workbench v0105(前版 v0102)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+    "===== 收尾 · OPEN · 未結案 · VRN-2 還有 3 項要修",
+    "  [VRN-2] 3 項",
+    "  [VCGC] 6 項",
+    "  [人工] 8 項"
+   ],
+   "tamper": [
+    "[RED] boot SHA-256 mismatch - not run"
+   ]
+  },
+  "closeout_states": {
+   "auto1": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 8,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   },
+   "auto2": {
+    "state": "OPEN",
+    "per_owner": {
+     "VCGC": 6,
+     "VRN-2": 3,
+     "人工": 8
+    }
+   }
+  },
+  "snapshot_backfill_boundary_test": {
+   "snapshot_reused": {
+    "asof": "2026-11-01",
+    "source": "/home/user/vrn2_work/v170/t170a/VIA/VIA_Reports/vrn2/consensus/factset_yfinance_consensus_matrix.csv",
+    "codes": 6,
+    "why": "同意閘未開(操作員決定 · VRN-2 不代設)· 引擎這輪 DENY 沒有新抓 → 先用碟上 ASOF 2026-11-01 快照補位 Combined 共識欄(6 檔)· 要最新共識:開閘後再跑一次(auto = repair)會重抓並蓋掉快照"
+   },
+   "combined_rows": 17,
+   "factset_filled": 6,
+   "yfinance_filled": 6,
+   "owner": "提醒",
+   "note": "沙盒擷取環境缺 requests → 前版鏈走「擷取環境缺」路徑到不了同意閘(桌機才到得了 · 12:31 / 13:01 實錄是 gate_closed DENY);本測在 v0106 邊界把前版 run 換成桌機形狀的 DENY 收據(合成矩陣 · 合成數字),之後 run / plan_fixes / join / Workbench / owner_of 全走真程式;閘從頭到尾沒被設"
+  },
+  "workbench_v0105_e2e": "rendered over v0102 in the sandbox (desktop will chain its local v0104): wb105 CSS × 1 · verification-lamp panel · consensus panel · ASOF badge",
+  "not_run": "the desktop itself (one line · auto = full round on the new launcher; opening the gate stays optional and operator-only) · the operator's own --confirm"
+ }
+}
