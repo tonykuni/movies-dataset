@@ -168,3 +168,27 @@ VCGC `CGC_MDL274_HealthMatrix_v0116`(操作台印章頁首 · VRN 分頁改指 V
 - 雲端容器用 v0162 那一代的樹(`efeea85a4^`)、用現在的樹(v0167)、裝上 duckdb、換工作目錄各跑一次 `ui` → **都是 rc 0 GREEN**,在容器裡重現不出來。
 - 紅字只有前版鏈轉手那兩行(v0128 第 104 行 → v0127 第 108 行 `__getattr__`),最後一行錯誤訊息被截掉了。
 - **第 1 步做完再跑 `via-vdf`**;還是紅 → 把 `VIA_Reports\review\ps_<時間>\B.python.log` 整個檔上傳給 AI(最後一行才是真正的錯誤名)。VRN 不改 VDF 的檔(四系統互不干涉)。
+
+## 13. 一支收尾全部 · VIA_SettleAll_v0100(2026-11-02 · 取代第 12 節的三步)
+
+操作員 2026-11-02「全景式分析檢視 · 識別問題 · AST 定位 · GENERATE A CODE TO SETTLE DOWN AND HANDLE ALL ABOVE」→ `docs/handoff/ai/VIA_SettleAll_v0100.py`(Python · PowerShell 只負責取檔與核雜湊)。
+
+| 步 | 做什麼 | 寫什麼 |
+|---|---|---|
+| ① 環境 | Python · duckdb · pyarrow · pwsh 有沒有 | — |
+| ② AST 全景 | 8 個家族(VRN / VDF / VCGC 管理器 · ENG236 · UIEngine · HealthMatrix · TestAuto · RoundAll)全部版本 `ast.parse` + `compile`(只在記憶體 · 不執行)· 錯誤與警告記檔:行 | — |
+| ③ 同步 | 比 GitHub 少幾個 / 多幾個沒推 → **合併**(不 rebase · 不強推 · 桌機的提交保留)· 有沒提交的改動就不合併 · 失敗自動 `merge --abort` | git 合併提交 |
+| ④ VDF ui | 跑 VDF 尾版 `ui` 拿全文;紅 → traceback 逐框 **AST 定位**(在哪個 def · 原文那一行)· AttributeError 掃同家族每一版誰定義 / 誰先讀(前版鏈轉手落空)· 遞迴偵測 | VDF 自己的頁 |
+| ⑤ VRN | 跑 RoundAll 尾版 repair(= Handle-All 那一輪)· 讀收尾頁燈與負責方 | VRN 自己的收據 |
+| ⑥ VCGC | `handoff check`(交接閘紅分類計數)+ `test --quick`(串測總行 · 紅站) | VCGC 自己的紀錄冊 |
+| ⑦ 報告 | `VIA_Reports\settle\SETTLE_latest.json / .md` + `Downloads\VIA_Settle_<時間>.zip` | 只寫這兩處 |
+
+各系統只經自己的入口跑(四系統對等 · 不改他系統的檔)。容器實測:自測 10 / 10(含假遠端真 git 合併 · 有改動拒合併)· 實跑 AST 286 檔錯 0 · VDF ui 6 GREEN · VCGC 紅站 0。
+
+### 桌機要做的(PowerShell 7 · 一行 · 從檔案複製)
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0100";git -C $r fetch -q origin claude/vrn2-closeout-authorization-y4ixl7;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0100.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0100.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'68F63CB1E6476BED100738982E77AE43EDEFCA1B2CD3BA7D530E7CBB43D40B08'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
+跑完看最後一行 `NEXT:`;不是 GREEN → 把 `Downloads\VIA_Settle_<時間>.zip` 上傳給 AI(VDF 紅字的 AST 定位在裡面)。VRN 收尾 REVIEW 的兩個人工項仍要你看原文後 `--confirm`。

@@ -124,3 +124,7 @@ RoundAll v0125 → v0126 只差去重一行 + 版號字樣;v0125 同環境同結
 
 ## 桌機下一步
 照 `VRN2_Handover_latest.md` 第 12 節:① 同步一行 → ② VRN 一行(Handle-All v0118)→ ③ `via-vdf`;紅字 → 上傳 `B.python.log` 或貼回包。
+
+## 一支收尾全部(後續 · 2026-11-02)
+
+`VIA_SettleAll_v0100.py`:全景 → 同步 → VDF ui(AST 定位)→ VRN repair → VCGC 驗 → 報告。桌機一行見 `VRN2_Handover_latest.md` 第 13 節。
