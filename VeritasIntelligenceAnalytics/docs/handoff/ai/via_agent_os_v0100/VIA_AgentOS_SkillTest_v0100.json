@@ -1,0 +1,453 @@
+{
+  "case_count": 23,
+  "cases": [
+    {
+      "case_id": "missing_objective_guard",
+      "detail": "必要欄位缺漏時阻擋產生計畫。",
+      "duration_ms": 0,
+      "skill_id": "via-planner",
+      "status": "PASS"
+    },
+    {
+      "case_id": "stable_task_dependencies",
+      "detail": "產生穩定任務編號與前置依賴；狀態維持 DRAFT。",
+      "duration_ms": 0,
+      "skill_id": "via-planner",
+      "status": "PASS"
+    },
+    {
+      "case_id": "missing_requirements_guard",
+      "detail": "缺少架構需求時拒絕生成。",
+      "duration_ms": 0,
+      "skill_id": "via-architect",
+      "status": "PASS"
+    },
+    {
+      "case_id": "cycle_detection",
+      "detail": "循環依賴被標示為 REVIEW，沒有執行模組。",
+      "duration_ms": 0,
+      "skill_id": "via-architect",
+      "status": "PASS"
+    },
+    {
+      "case_id": "rationale_required",
+      "detail": "缺少 rationale 時不建立 ADR。",
+      "duration_ms": 0,
+      "skill_id": "via-decision-log",
+      "status": "PASS"
+    },
+    {
+      "case_id": "deterministic_id_and_pending_approval",
+      "detail": "相同輸入產生相同 ADR ID，且仍需人工核准。",
+      "duration_ms": 0,
+      "skill_id": "via-decision-log",
+      "status": "PASS"
+    },
+    {
+      "case_id": "incomplete_factor_stays_draft",
+      "detail": "定義不完整的因子只會輸出 DRAFT 與待補欄位。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-builder",
+      "status": "PASS"
+    },
+    {
+      "case_id": "complete_factor_ready_for_validation",
+      "detail": "欄位齊備可交給驗證；沒有宣稱因子有效。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-builder",
+      "status": "PASS"
+    },
+    {
+      "case_id": "missing_evidence_incomplete",
+      "detail": "未提供完整驗證證據時標示 INCOMPLETE。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-validator",
+      "status": "PASS"
+    },
+    {
+      "case_id": "lookahead_failure_review_gate",
+      "detail": "前視偏誤失敗會觸發 REVIEW_REQUIRED。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-validator",
+      "status": "PASS"
+    },
+    {
+      "case_id": "minimum_observation_gate",
+      "detail": "低於明示樣本門檻時觸發 REVIEW_REQUIRED。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-validator",
+      "status": "PASS"
+    },
+    {
+      "case_id": "complete_evidence_not_certification",
+      "detail": "完整欄位不等於統計認證或因子有效。",
+      "duration_ms": 0,
+      "skill_id": "via-factor-validator",
+      "status": "PASS"
+    },
+    {
+      "case_id": "factor_list_required",
+      "detail": "未提供 factor_list 時阻擋策略輸出。",
+      "duration_ms": 0,
+      "skill_id": "via-strategy-builder",
+      "status": "PASS"
+    },
+    {
+      "case_id": "backtest_gate_preserved",
+      "detail": "策略進入回測前保留成本、滑價與樣本外檢查閘。",
+      "duration_ms": 0,
+      "skill_id": "via-strategy-builder",
+      "status": "PASS"
+    },
+    {
+      "case_id": "source_required",
+      "detail": "缺少來源碼時拒絕執行審查。",
+      "duration_ms": 0,
+      "skill_id": "via-code-review",
+      "status": "PASS"
+    },
+    {
+      "case_id": "static_dynamic_code_warning",
+      "detail": "eval 僅被 AST 靜態標記；程式未執行、未修改。",
+      "duration_ms": 0,
+      "skill_id": "via-code-review",
+      "status": "PASS"
+    },
+    {
+      "case_id": "syntax_failure_no_autofix",
+      "detail": "語法錯誤被回報；不嘗試自動修補或執行來源。",
+      "duration_ms": 0,
+      "skill_id": "via-code-review",
+      "status": "PASS"
+    },
+    {
+      "case_id": "candidate_required",
+      "detail": "缺少候選記憶時不寫入任何資料。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    },
+    {
+      "case_id": "debug_log_rejected",
+      "detail": "debug/log 類別被拒絕保存。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    },
+    {
+      "case_id": "synthetic_secret_rejected",
+      "detail": "合成的假憑證字串觸發拒絕；未使用或保存真實憑證。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    },
+    {
+      "case_id": "explicit_approval_required",
+      "detail": "缺少明確核准時只要求人工審查。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    },
+    {
+      "case_id": "duplicate_fingerprint_archived",
+      "detail": "正規化指紋命中時標示重複並封存，不新增。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    },
+    {
+      "case_id": "approved_candidate_not_persisted",
+      "detail": "核准後只回傳候選物件；本 Skill 本身不落盤。",
+      "duration_ms": 0,
+      "skill_id": "via-memory-manager",
+      "status": "PASS"
+    }
+  ],
+  "execution_mode": "deterministic in-process; synthetic fixtures; no network, subprocess, agent calls, or source writes",
+  "failed_count": 0,
+  "generated_at": "2026-11-03T16:48:17.344448+00:00",
+  "passed_count": 23,
+  "schema": "VIA_SKILL_TEST_REPORT/1.0",
+  "skill_count": 8,
+  "skills": [
+    {
+      "cases": [
+        {
+          "case_id": "missing_objective_guard",
+          "detail": "必要欄位缺漏時阻擋產生計畫。",
+          "duration_ms": 0,
+          "skill_id": "via-planner",
+          "status": "PASS"
+        },
+        {
+          "case_id": "stable_task_dependencies",
+          "detail": "產生穩定任務編號與前置依賴；狀態維持 DRAFT。",
+          "duration_ms": 0,
+          "skill_id": "via-planner",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Planner",
+      "passed": 2,
+      "skill_id": "via-planner",
+      "status": "PASS",
+      "total": 2
+    },
+    {
+      "cases": [
+        {
+          "case_id": "missing_requirements_guard",
+          "detail": "缺少架構需求時拒絕生成。",
+          "duration_ms": 0,
+          "skill_id": "via-architect",
+          "status": "PASS"
+        },
+        {
+          "case_id": "cycle_detection",
+          "detail": "循環依賴被標示為 REVIEW，沒有執行模組。",
+          "duration_ms": 0,
+          "skill_id": "via-architect",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Architect",
+      "passed": 2,
+      "skill_id": "via-architect",
+      "status": "PASS",
+      "total": 2
+    },
+    {
+      "cases": [
+        {
+          "case_id": "rationale_required",
+          "detail": "缺少 rationale 時不建立 ADR。",
+          "duration_ms": 0,
+          "skill_id": "via-decision-log",
+          "status": "PASS"
+        },
+        {
+          "case_id": "deterministic_id_and_pending_approval",
+          "detail": "相同輸入產生相同 ADR ID，且仍需人工核准。",
+          "duration_ms": 0,
+          "skill_id": "via-decision-log",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Decision Log",
+      "passed": 2,
+      "skill_id": "via-decision-log",
+      "status": "PASS",
+      "total": 2
+    },
+    {
+      "cases": [
+        {
+          "case_id": "incomplete_factor_stays_draft",
+          "detail": "定義不完整的因子只會輸出 DRAFT 與待補欄位。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-builder",
+          "status": "PASS"
+        },
+        {
+          "case_id": "complete_factor_ready_for_validation",
+          "detail": "欄位齊備可交給驗證；沒有宣稱因子有效。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-builder",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Factor Builder",
+      "passed": 2,
+      "skill_id": "via-factor-builder",
+      "status": "PASS",
+      "total": 2
+    },
+    {
+      "cases": [
+        {
+          "case_id": "missing_evidence_incomplete",
+          "detail": "未提供完整驗證證據時標示 INCOMPLETE。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-validator",
+          "status": "PASS"
+        },
+        {
+          "case_id": "lookahead_failure_review_gate",
+          "detail": "前視偏誤失敗會觸發 REVIEW_REQUIRED。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-validator",
+          "status": "PASS"
+        },
+        {
+          "case_id": "minimum_observation_gate",
+          "detail": "低於明示樣本門檻時觸發 REVIEW_REQUIRED。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-validator",
+          "status": "PASS"
+        },
+        {
+          "case_id": "complete_evidence_not_certification",
+          "detail": "完整欄位不等於統計認證或因子有效。",
+          "duration_ms": 0,
+          "skill_id": "via-factor-validator",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Factor Validator",
+      "passed": 4,
+      "skill_id": "via-factor-validator",
+      "status": "PASS",
+      "total": 4
+    },
+    {
+      "cases": [
+        {
+          "case_id": "factor_list_required",
+          "detail": "未提供 factor_list 時阻擋策略輸出。",
+          "duration_ms": 0,
+          "skill_id": "via-strategy-builder",
+          "status": "PASS"
+        },
+        {
+          "case_id": "backtest_gate_preserved",
+          "detail": "策略進入回測前保留成本、滑價與樣本外檢查閘。",
+          "duration_ms": 0,
+          "skill_id": "via-strategy-builder",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Strategy Builder",
+      "passed": 2,
+      "skill_id": "via-strategy-builder",
+      "status": "PASS",
+      "total": 2
+    },
+    {
+      "cases": [
+        {
+          "case_id": "source_required",
+          "detail": "缺少來源碼時拒絕執行審查。",
+          "duration_ms": 0,
+          "skill_id": "via-code-review",
+          "status": "PASS"
+        },
+        {
+          "case_id": "static_dynamic_code_warning",
+          "detail": "eval 僅被 AST 靜態標記；程式未執行、未修改。",
+          "duration_ms": 0,
+          "skill_id": "via-code-review",
+          "status": "PASS"
+        },
+        {
+          "case_id": "syntax_failure_no_autofix",
+          "detail": "語法錯誤被回報；不嘗試自動修補或執行來源。",
+          "duration_ms": 0,
+          "skill_id": "via-code-review",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Code Review",
+      "passed": 3,
+      "skill_id": "via-code-review",
+      "status": "PASS",
+      "total": 3
+    },
+    {
+      "cases": [
+        {
+          "case_id": "candidate_required",
+          "detail": "缺少候選記憶時不寫入任何資料。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        },
+        {
+          "case_id": "debug_log_rejected",
+          "detail": "debug/log 類別被拒絕保存。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        },
+        {
+          "case_id": "synthetic_secret_rejected",
+          "detail": "合成的假憑證字串觸發拒絕；未使用或保存真實憑證。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        },
+        {
+          "case_id": "explicit_approval_required",
+          "detail": "缺少明確核准時只要求人工審查。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        },
+        {
+          "case_id": "duplicate_fingerprint_archived",
+          "detail": "正規化指紋命中時標示重複並封存，不新增。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        },
+        {
+          "case_id": "approved_candidate_not_persisted",
+          "detail": "核准後只回傳候選物件；本 Skill 本身不落盤。",
+          "duration_ms": 0,
+          "skill_id": "via-memory-manager",
+          "status": "PASS"
+        }
+      ],
+      "name": "VIA Memory Manager",
+      "passed": 6,
+      "skill_id": "via-memory-manager",
+      "status": "PASS",
+      "total": 6
+    }
+  ],
+  "status": "PASS",
+  "token_benchmarks": {
+    "fixture_count": 3,
+    "fixtures": [
+      {
+        "after_chars": 107,
+        "after_tokens_est": 27,
+        "before_chars": 171,
+        "before_tokens_est": 43,
+        "fixture_id": "json_lossless_compaction",
+        "lossy": false,
+        "mode": "json_lossless_semantic_compact",
+        "saved_tokens_est": 16,
+        "saving_percent_est": 37.21,
+        "scope": "SYNTHETIC_TEST_ONLY",
+        "semantic_roundtrip": true
+      },
+      {
+        "after_chars": 11999,
+        "after_tokens_est": 3000,
+        "before_chars": 11999,
+        "before_tokens_est": 3000,
+        "fixture_id": "plain_text_safe_passthrough",
+        "lossy": false,
+        "mode": "passthrough",
+        "saved_tokens_est": 0,
+        "saving_percent_est": 0.0,
+        "scope": "SYNTHETIC_TEST_ONLY",
+        "semantic_roundtrip": null
+      },
+      {
+        "after_chars": 1510,
+        "after_tokens_est": 378,
+        "before_chars": 25247,
+        "before_tokens_est": 6312,
+        "fixture_id": "query_extraction_lossy_opt_in",
+        "lossy": true,
+        "mode": "query_line_extraction",
+        "saved_tokens_est": 5934,
+        "saving_percent_est": 94.01,
+        "scope": "SYNTHETIC_TEST_ONLY",
+        "semantic_roundtrip": null
+      }
+    ],
+    "label": "synthetic fixtures; not VIA/VCGC/provider measurements"
+  }
+}
