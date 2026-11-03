@@ -123,4 +123,6 @@
 | 輸入分類 | 01 頁矩陣:個股報告 · 非個股報告 · 新聞與盤勢 · 頁面影像 · 未分類 × PDF / Word / TXT / 影像 / 其他(檔名初判 · 候選)· 本版主體只擷取 PDF |
 | Word / 影像 | 已收下 · **未擷取**(Word 需轉 PDF · 影像需 OCR · 環境交 VCGC)→ 收尾佇列 VRN P1 |
 | MQ-1560 | 操作員 11/03 貼的原文與摘錄四點逐字比:差異只在 OCR 斷字(英文字被空白拆開或黏在一起 · 不改字義)· 內容一致 → 等操作員 `--confirm H-fd2ea35f` |
+| VCGC 收尾(只讀 · 本線不改 VCGC 的冊)| 11/03 容器實跑 VCGC 自己的指令:`token` 6/6 啟用 · `handoff check` **RED**(需求 226 · pending 217 · REQ132–155 等標 REQ_CHANGED)· `test --quick` rc 2(綠 8 · 黃 2:handoff-check · P-entry 沒有 pwsh)· SDD **RED**(尾版沒編號 · 待 `CGC_MDL237 --apply`)· 註冊冊待同步(新 36 · 改 120 · `via-vcgc registry-sync --apply` 要批准) → 這些都是 VCGC 正本的寫入動作,依四系統互不干涉由 VCGC / 操作員批准執行,本線不代做 |
+| VDF 收尾(只讀)| §8 第 3 項(外連動詞經網路工具的執行收據 · 增量庫 · 桌機倉同步)都要 VDF 在桌機實跑產生的收據;容器沒有桌機收據 → 不能代判綠 · 下一步:桌機跑 VDF 自己的入口後貼回收據 |
 | 桌機要做 | 貼 `vrn2_release_v0175/VRN2_HandleAll_v0123.md` 最短一行(repair)|
