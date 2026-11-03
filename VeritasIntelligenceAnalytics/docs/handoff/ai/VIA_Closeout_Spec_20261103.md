@@ -138,3 +138,16 @@
 | VCGC 編號套用 | **操作員授權** · `run CGC_MDL237_NumberingSystem --apply --scope`:先 5 支(X-NUM · +153 列)再 38 支(+843 列 · MDL +36 · ENG +2)· 四層缺號 VCGC 0 · VDF 0 · VRN 0 · SUP 0 · audit 遺失 0 · 改身分 0 · 重號 0 · SDD X-NUM GREEN |
 | VCGC 仍黃(不在本次授權範圍 · 只記)| 編號冊內不一致 54 列(冊上宣告碼 ≠ 發出號 · 待裁定 · 不改任何一邊)· 命名同號異名 / 版號異形(操作員排序)· 已鎖工作流尾版換了待重驗 14 處 · 需求未全落地 80 條 |
 | 桌機要做 | 貼 `vrn2_release_v0176/VRN2_HandleAll_v0124.md` 最短一行(repair)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|
+
+## 14. v0177 輪更新(2026-11-04 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 桌機 11/03 22:28 整輪 | ⑦ 跑滿 7200 秒被停 · ⑧ 沒寫完成判定 · 收尾 OPEN(VRN-2 2 · 人工 3 · 資料源 2)· 同一晚 repair(v0176)把 ⑬a / ⑬ / Workbench 做完(四點 / 主題與摘要 綠) |
+| 根因 | 來源夾 305 份 = 60 份報告 + 200 份 page_NNNN[_雜湊].pdf 分割頁 → 舊範圍規則收進個股範圍(260)→ 逐份 OCR → 逾時 |
+| 修正 | 管理器 v0260(分割頁不進範圍 · 原檔不動)· Handle-All v0125(上一輪 ⑦ 沒跑完 → 自動整輪 · ⑧ 只因資料面紅照舊 repair)· RoundAll v0133(頁面分割檔列) |
+| 千分位兩位小數 | BookSource v0102(主題與摘要 1,234.50 / 23.45%)· Workbench v0110(顯示)· 資料冊數值欄不加千分位 |
+| U/I | Workbench v0110:頁首第三行 = 「Transform investment reports into structured database intelligence.」(只換字)· 左右同字級 10.45px · 按鍵同高 28px · 卡片自動縮字(不超框)· 左欄 / 交接矩陣 · 檢視副本 · 分頁列不動 · 收尾頁字級小一號 |
+| 加速器 / 網路工具 | VRN-2 現役尾版加速器 100%(VerbatimVerifier v0106 補上 · 它的自測在沒有 pypdfium2 的 Python 上照實「略過」PDF 那段 · 不冒充通過)· VRN-2 向外擷取經 VIA 網路工具 · VDF 的 AllInOne_v039 直接連線 → 交 VDF(只記錄) |
+| VCGC(操作員授權剩餘黃燈)| 做了:registry-sync --apply(新 1 · 變更 128)· 編號 audit 遺失 0 · 改身分 0 · 重號 0 · 四層缺號 0。擋住:X-LOCK 14 處重驗 = 交接加鎖閘 RED(待辦 217 · 發現 357 · 改了沒測 203 檔)+ 本容器 SDD 自測 FAIL 15(多為桌機環境才有的套件 / 資料)。要操作員裁:冊內不一致 54 列(法條缺號 Z263 · 同義字一詞兩主 Z264)· 命名同號異名(L04 排序)· 需求未落地 80 條 |
+| 桌機要做 | 貼 `vrn2_release_v0177/VRN2_HandleAll_v0125.md` 最短一行(這次自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|

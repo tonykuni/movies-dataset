@@ -1,0 +1,269 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0177 (launcher v0177 · runtime v0166) + VRN2_RoundAll_v0133 + VRN2_HandleAll_v0125",
+ "date": "2026-11-04",
+ "trigger": "桌機 2026-11-03 22:28:整輪 ⑦ 逾時 7200 秒(範圍 260 份含 200 份 page_NNNN 分割頁)· 操作員:數字小數點兩位要有千分位號 · 第二圖超出格子 · 左右面板字體大小一致 · 按鍵高度要一致 · 左右面板矩陣化 · 擷取特定資料 · 特定日期 → 檢視副本 · html u/i 自動最佳化 · 字體偏小較佳 · ps py 都要加加速器 · 覆蓋率 100% · 向外擷取引擎加最新網路工具",
+ "root_cause": "source folder 305 files = 60 reports + 200 page_NNNN[_hash].pdf single pages (split 11-02, scanned) → vrn2scope kept them as stock reports (260) → OCR for each → p1loop 6798 s → step 7 cap 7200 s",
+ "fixes": {
+  "Manager_v0260": "thin tail over v0259 · page fragments join the non-stock filename rule · selftest 6 (+ v0259)",
+  "BookSource_v0102": "thin tail over v0101 · 1,234.50 / 23.45% in TOPIC & SUMMARY · selftest 7 (+ v0101)",
+  "OutputStore_v0105": "thin tail over v0104 · same behaviour · selftest pins v0104's BookSource + v0101→v0102 scenario × 2 engines",
+  "Workbench_v0110": "thin tail over v0109 · same font both panels · 28 px buttons · cards fit · matrices · view copy · thousands separators · header line 3 = operator tagline · tab bar untouched · selftest 7 + browser",
+  "VerbatimVerifier_v0106": "thin tail over v0105 · accelerator marker · selftest skips (not passes) the PDF step on a Python without pypdfium2",
+  "launcher_v0177": "new actives · selftest",
+  "RoundAll_v0133": "package v0177 · page-fragment row · BookSource < v0102 → ⑬a · closeout font · selftest 105",
+  "HandleAll_v0125": "auto mode: last receipt step 7 not finished (rc 1-9 / completion not written this round) → full; a data-only RED step 8 stays repair"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0177.zip",
+  "sha256": "a56970c387d1e0be6d3f95d7b11089372f90797f2ad46e4d642337d0c1fd6e03",
+  "release_folder": "vrn2_release_v0177",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0177.py"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0166.zip",
+  "zip_sha256": "a0e03405fa3dc8d6fdde89fca83f2515511bebf7d8ab0717688e8f15b7ab6537",
+  "based_on": "VRN2_Runtime_v0165.zip a7bb955ab15147c0c1b4b018f08a3654c46f91dcf92c07b898ea2b81169faed1",
+  "retained_members": 209,
+  "new_members": [
+   "VRN_SystemManager_v0260.py",
+   "VRN2_BookSource_v0102.py",
+   "VRN2_OutputStore_v0105.py",
+   "VRN2_Workbench_v0110.py",
+   "VRN2_VerbatimVerifier_v0106.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0177.py",
+   "sha256": "c29ee4c1095e2e5a8f0e35ede93ad937910454c4f2f5e80d981876078413aaa3"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "6fa1eef30056b1c13933a0fb8a9c4205a04e3442edd8ab79c8a35e7150e6fa3c"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "e55267de3cf8d79a48c127281408d689413d88dd3ea66fa3726fa923e38d55af"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0166.json",
+   "sha256": "c1aec0a982f8743e54b87c7b02bb59cc86024f40a51d5962f2183eac2bdb5f0f"
+  },
+  {
+   "path": "VRN2_Runtime_v0166.zip",
+   "sha256": "a0e03405fa3dc8d6fdde89fca83f2515511bebf7d8ab0717688e8f15b7ab6537"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0106.py",
+   "sha256": "06066559d40f5cc37d576b36d5cbc4c7b57fc174be09f80ffd4e3f2cbd5d3946"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0132.py",
+   "sha256": "9b61c18d8e399514d29cbbd02a1482893a61a91deead56d927ea75a2dd107d90",
+   "status": "superseded 2026-11-04; file kept in vrn2_release_v0176"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0133.py",
+  "sha256": "090239434553e05e3298b664f4757137cebc9056b82bc60d0ad1a12ebe6e278b",
+  "pinned_package_sha256": "a56970c387d1e0be6d3f95d7b11089372f90797f2ad46e4d642337d0c1fd6e03",
+  "guide": "VRN2_RoundAll_v0133.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0125.md",
+  "line_sha256": "db3494455cea3a900ac9cdaa60f56187d3c2a52b9202d59b88745e661d7ae15d",
+  "line_chars": 15584,
+  "boot_file": "VRN2_HandleAll_v0125_boot.txt",
+  "boot_line_sha256": "26c8a5f524c39088fde70255448b23770fa112a94ec290bdf8eddc0343b08681",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "Manager v0260 · BookSource v0102 · OutputStore v0105 · Workbench v0110 · VerbatimVerifier v0106 · runtime v0166 · launcher / package / receipt v0177 · RoundAll v0133 · HandleAll v0125 checked free on this branch and origin/main",
+ "results": {
+  "roundall_v0133_selftest": [
+   "[PASS] VRN2_RoundAll v0133 --selftest · 105 項 · 不過 0"
+  ],
+  "launcher_v0177_selftest": [
+   "[PASS] v0177: manager v0260 (page_NNNN[_hash].pdf out of the stock scope) · BookSource v0102 (1,234.50 / 23.45%) · OutputStore v0105 · Workbench v0110 (same font · 28 px buttons · matrices · 檢視副本) · VerbatimVerifier v0106 (accelerator marker) are active"
+  ],
+  "module_selftests": {
+   "管理器 v0260(含 v0259 鏈)": "[PASS] v0260: page fragments kept out of the stock scope (counted · source untouched) · 6 checks · failed 0",
+   "BookSource v0102(含 v0101 / v0100)": "[PASS] VRN2_BookSource v0102 --selftest · 不過 0",
+   "OutputStore v0105(含 v0104 → v0100)": "[PASS] VRN2_OutputStore v0105 --selftest · 引擎 duckdb+pyarrow · 不過 0",
+   "Workbench v0110(含 v0109 鏈)": "[GREEN] VRN2_Workbench v0110 自測 全過(7 項)",
+   "VerbatimVerifier v0106(含 v0105 / v0104)": "[PASS] VRN2_VerbatimVerifier v0106 --selftest · 3 項 · 不過 0"
+  },
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "handleall_mode_test": "bad=full good=repair datared=repair",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "closeout_per_owner": {
+   "auto1": {
+    "VCGC": 8,
+    "VRN-2": 3,
+    "人工": 8
+   },
+   "auto2": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "closeout_vrn2_items_same_as_v0176_baseline": true,
+  "e2e": {
+   "scope_line": "→ GREEN ⑥b 範圍聚焦(個股報告) · [計] VRN-2 範圍(只擷取個股報告)· 來源 <sbx>/samples · 檔 25(PDF 25 · 非 PDF 0 不在範圍)· 個股範圍 17 · 排除非個股 8(上輪判定 0 · 檔名 8)· 同步 新增 / 更新 3 · 移除 0 · 耗時 3 秒(平行)",
+   "fragment_line": "[計] v0260 頁面分割檔(page_NNNN[_雜湊].pdf · 從別的檔切出來的單頁 · 不是整份報告)3 份不進個股範圍(原檔不動 · 輸入矩陣算「頁面影像」)",
+   "scope_in_page_fragments": 0,
+   "scope_in_files": 17,
+   "plan": "歷史對齊 FinancialAligned,Deleted 的 Parquet 沒寫(ImportError(這支 Python 的 pyarrow 載不起來))→ HistoryAlign v0103 依欄位型別重寫(JSON / CSV 照舊) · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬a 輸出冊 SOURCE / BROKER_EN 欄 · 四點 / 主題與摘要:本輪重算歷史對齊 / Combined → BookSource v0101 寫最後兩欄 · 四點去",
+   "source_fix": "[GREEN] ⑤ 修 · ⑬a 輸出冊 SOURCE / BROKER_EN 欄 · 四點 / 主題與摘要:本輪重算歷史對齊 / Combined · VRN2_BookSource v0102 · 7 冊 · 11364 列 · 改寫 9 檔 · 不變 8 檔 · BROKER_EN 對到 11364 / 11364 列 · 四點去符號 0 格 · 主題與摘要 17 列(改算上漲空間 11)",
+   "page_fragment_row": "[GREEN] ⑥ 頁面分割檔 · 範圍夾 17 份 · 沒有頁面分割檔(page_NNNN)",
+   "topic_rows_with_basis": 11,
+   "topic_rows_new_number_format": 11,
+   "booksource_module": "VRN2_BookSource v0102",
+   "store": "auto2 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Combined\": 0, \"Rejected\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 整理 {\"Summary\": 0, \"Combined\": 0}",
+   "store_no_double": true,
+   "workbench_v0110": true,
+   "header_line3": "Transform investment reports into structured database intelligence.",
+   "closeout_per_owner": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "browser": {
+   "1100": {
+    "buttons_px": [
+     28
+    ],
+    "font_left_right": [
+     [
+      "10.45px",
+      "9.95px"
+     ],
+     [
+      "10.45px"
+     ]
+    ],
+    "overflow": 0,
+    "card_fit": [
+     "20261103_130820=19px",
+     "3 冊=19px",
+     "VRN2_Closeout_v0176.json=17.5px",
+     "3 份=19px"
+    ],
+    "view_copy_rows": 5232,
+    "thousands": [
+     "4,200.00",
+     "2,037.00",
+     "1,249.50"
+    ],
+    "header": [
+     "VERITAS INTELLIGENCE ANALYTICS · VRN-2 WORKBENCH",
+     "VeritasReportNova",
+     "Transform investment reports into structured database intelligence."
+    ],
+    "header_line3_overflow": 0,
+    "tab_bar_px": [
+     27,
+     29
+    ],
+    "errors": []
+   },
+   "1366": {
+    "buttons_px": [
+     28
+    ],
+    "font_left_right": [
+     [
+      "10.45px",
+      "9.95px"
+     ],
+     [
+      "10.45px"
+     ]
+    ],
+    "overflow": 0,
+    "card_fit": [
+     "20261103_130820=19px",
+     "3 冊=19px",
+     "VRN2_Closeout_v0176.json=17.5px",
+     "3 份=19px"
+    ],
+    "view_copy_rows": 5232,
+    "thousands": [
+     "4,200.00",
+     "2,037.00",
+     "1,249.50"
+    ],
+    "header": [
+     "VERITAS INTELLIGENCE ANALYTICS · VRN-2 WORKBENCH",
+     "VeritasReportNova",
+     "Transform investment reports into structured database intelligence."
+    ],
+    "header_line3_overflow": 0,
+    "tab_bar_px": [
+     27,
+     29
+    ],
+    "errors": []
+   }
+  },
+  "accelerator_network_audit": {
+   "active_chain_modules": 44,
+   "accelerator_missing_after_v0177": [
+    "VRN2_VerbatimVerifier_v0105.py"
+   ],
+   "outbound_in_active_chain": [],
+   "consensus_engine_v0122": {
+    "net_tool": true,
+    "accelerator": true
+   },
+   "vdf_fetch_engine_VDF_TW_AllInOne_v039 (VDF · read-only)": {
+    "imports_urllib_request": true,
+    "imports_yfinance": true,
+    "net_bridge_mark": true,
+    "accelerator_mark": true,
+    "vcgc_handoff_flag": "ACCEL_BRIDGE_MISSING · MODULE_UNREGISTERED"
+   },
+   "repo_functional_modules_VRN_VRN2_tails_missing_accelerator": 0,
+   "summary_md": "| 範圍 | 結果 |\n|---|---|\n| VRN-2 現役模組鏈(啟動器 v0177 常數 → 前版鏈)| 44 支 · 現役尾版加速器標記缺 **0**(v0176 缺 1:VerbatimVerifier v0105 → v0106 補上 · v0105 留作 v0106 的凍結前版 · 由帶標記的 v0106 載入)|\n| VRN-2 自己向外擷取 | 共識引擎 v0122 經 VIA 網路工具(SUP_MDL740_NetUnified · 法遵雙閘)+ 加速器 · 現役鏈裡沒有不經網路工具的直接連線 |\n| 倉內 functional modules/VRN 的 VRN2_* 尾版 | 5 支全有加速器標記(VCGC 交接檢查點名的 VRN2_UIAction_v0100 是被後版引用的凍結前版 · 不改)|\n| ⑥e 價格(借 VDF 的 VDF_TW_AllInOne_v039)| **VDF 的檔 · 只記錄不改**:直接 import urllib.request / yfinance · 只有 DENY 處理的網路橋註記 · VCGC 交接檢查標 ACCEL_BRIDGE_MISSING / MODULE_UNREGISTERED → 交 VDF 那一線改(四系統互不干涉)|",
+   "active_tails_missing_accelerator": []
+  },
+  "not_run": "the desktop itself (one line · auto = full this time because the last receipt's step 7 timed out) · the operator's own --confirm (H-fd2ea35f)"
+ }
+}
