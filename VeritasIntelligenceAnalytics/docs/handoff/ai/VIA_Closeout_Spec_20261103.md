@@ -164,3 +164,15 @@
 | VIA Agent OS | v0100 整合進 `supportive modules\agent_os`(自測 15 · 八 Skill 23 / 23)· 桌機一行啟動 · `.via\ssot.json` 不進倉 |
 | 他系統燈(只讀)| VCGC:交接閘 RED · 驗收 RED(待辦 217)· VDF:沒有自報收據(灰)· 自測 RED(DuckDB)· 見 vrn2_release_v0178/VRN2_Verification_v0178.md §3 |
 | 桌機要做 | 貼 `vrn2_release_v0178/VRN2_HandleAll_v0126.md` 開閘一行(自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VIA Agent OS 一行(via_agent_os_v0100)|
+
+## 16. v0179 輪更新(2026-11-04 · 四系統收尾 · KPI)
+
+| 項目 | 現況 |
+|---|---|
+| VRN-2 | 桌機 v0178 = REVIEW(VRN-2 0 · 人工 1 · 資料源 3)· RoundAll v0135 / Handle-All v0127(套件 v0178 不動)· 正確性 KPI 達標(不符 0) |
+| 速度 KPI | 收據 2286.87 秒 · 管理器最慢「輸出冊」占 74% · 8 核 / 執行緒 7 / RAM 6.8 GB · ④b 2.29 倍 · 還不是最快(見 KPI §1)|
+| VDF | 自測經 VCGC rc 0(SUP_MDL753 v0113 · DuckDB 2.x)· 自報收尾收據仍灰(要桌機 ActivateVDF)|
+| VCGC | 串測 9 綠 1 黃 0 紅 · SSOT 全景 紅 → 黃(VRN_SystemManager v0261 對接口)· registry-sync / 編號 +28(遺失 0 · 改身分 0 · 重號 0)· 交接閘 紅(結構性)|
+| VIA Agent OS | v0100 · 自測 15 / 15 · Skill 23 / 23 |
+| 加速器 / 網路工具 | 都解到鎖冊最新(Celeritas v1141 · Aegis v1652);缺口照列(VRN-2 runtime VerbatimVerifier v0105 · VRN_ENG112 · ⑥e AllInOne_v039 不經網路工具)|
+| 桌機要做 | 開閘一行(vrn2_release_v0179/VRN2_HandleAll_v0127.md)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VDF 桌機 ActivateVDF(VDF 線)|
