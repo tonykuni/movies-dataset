@@ -1,0 +1,257 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0175 (launcher v0175 · runtime v0164) + VRN2_RoundAll_v0131 + VRN2_HandleAll_v0123",
+ "date": "2026-11-03",
+ "trigger": "操作員 2026-11-03:BROKER 一律用英文縮寫 · 輸出冊和增量庫也實體加 Source 欄 · 字型字級以細節 / Detail 為準 · 資料驗證狀況放入系統現況並改名系統摘要 · 所有資訊矩陣化燈號化 · 不用括號說明 · 備註放底下 · 全形標點 · 表頭統一寫完整 · 資料不可超過卡片及格子 · 左面板步驟編號 · Word / 影像處理與 STOCK / NON-STOCK / NEWS 分類",
+ "data_rule": "BookSource writes BROKER_EN + SOURCE as the last two columns of the seven report books; every other value is byte-identical (JSON keeps its indent, CSV keeps BOM / CRLF, Parquet keeps column types); BROKER stays as written in the report; MarketConsensus keeps its own SOURCE; window.VRN2_DATA still equals the output books",
+ "store_rule": "OutputStore v0103 row hash ignores SOURCE / BROKER_EN (no re-append); stored rows get the two columns filled in place after a DuckDB file backup (restore-fill)",
+ "ui": {
+  "font": "Consolas + Microsoft JhengHei 10.45 px (the Detail column) · section 11 · labels 9 · tags 8 · display 19 (brand / title / stats)",
+  "palette": "ENG049 template 15 colours (unchanged)",
+  "summary": "00 tab 系統摘要: verification matrix (status · item · detail) + consensus matrix (FactSet 目標價中位數 · FactSet 分析師人數 …)",
+  "acceptance": "04 tab 待驗收項目 matrix (status · category · item · detail · count)",
+  "headers": "English line + Chinese line everywhere",
+  "left_panel": "numbered steps 1–6",
+  "input_classes": "stock report · non-stock report · news and market notes · page image · unclassified × PDF / Word / TXT / image / other (filename candidates; PDF only is extracted)",
+  "css_sha256": "739a2a9d93198a422ba2ac9e47ee395b3b2a30aa3fddda2bf3becae28fab54f5"
+ },
+ "fixes": {
+  "BookSource_v0100": "new family · ⑬a · selftest 14 (rules cross-checked with Workbench v0108)",
+  "OutputStore_v0103": "thin tail over v0102 · selftest v0102 + 2 engines × 5",
+  "Workbench_v0109": "thin tail over v0108 · selftest 12 · CSS SHA-256 pinned",
+  "launcher_v0175": "⑬a between ⑬b and ⑬ · OutputStore v0103 / Workbench v0109 active",
+  "RoundAll_v0131": "package v0175 pin · ⑤ source / store fill / workbench v0109 · selftest 103 · Combined column check ignores the two ⑬a columns",
+  "HandleAll_v0123": "points at RoundAll v0131 / release v0175"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0175.zip",
+  "sha256": "aa02705018bfee83f89578abe457b5f8e14691b184df0d2549f440e949da37b1",
+  "release_folder": "vrn2_release_v0175",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0175.py"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0164.zip",
+  "zip_sha256": "800777be51e0f84edc020d234e11930e931a4fee2613556f0a0e5c40e1bb938c",
+  "based_on": "VRN2_Runtime_v0163.zip c2058a1f9783001b030da6efac10a284260c6aff0cbe8c02262e985009739d01",
+  "retained_members": 204,
+  "new_members": [
+   "VRN2_BookSource_v0100.py",
+   "VRN2_OutputStore_v0103.py",
+   "VRN2_Workbench_v0109.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0175.py",
+   "sha256": "f42aedf4f18e2a1e3e47916457c83dc5ecb5b5e10850919f211759ec5ce6f9cb"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "e20784e4af3425b477607e00673d01e9838c3d815412330c907cf2da055cc04a"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "2057e9e4cace7ee1bf0269f9c94185a4e2e4eed52a5ea9b4df7e4dbd498b5716"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0164.json",
+   "sha256": "b8092ad0f5d3422a8136ed1a27f56f8b71205eb12c1405b505950f8ec7e01253"
+  },
+  {
+   "path": "VRN2_Runtime_v0164.zip",
+   "sha256": "800777be51e0f84edc020d234e11930e931a4fee2613556f0a0e5c40e1bb938c"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0130.py",
+   "sha256": "93762c0f8ad72b633721aac498a4f4ed871a7032fb97d27cc49741fd5366d697",
+   "status": "superseded 2026-11-03; file kept in vrn2_release_v0174"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0131.py",
+  "sha256": "0f58b9464d9514f24dcba1c69e1252446eb443367e6d0255ebdbc95f630d0830",
+  "pinned_package_sha256": "aa02705018bfee83f89578abe457b5f8e14691b184df0d2549f440e949da37b1",
+  "guide": "VRN2_RoundAll_v0131.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0123.md",
+  "line_sha256": "b893cd3d5b537a416369610ebddc3dfa83825873ac378aab65d0a16d7a194bed",
+  "line_chars": 14705,
+  "boot_file": "VRN2_HandleAll_v0123_boot.txt",
+  "boot_line_sha256": "96c13d8a199d2439e256dec6f7a322d6b13db1abe0b35569a5cdd9a926295715",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "BookSource v0100 (new family) · OutputStore v0103 · Workbench v0109 · runtime v0164 · launcher / package / receipt v0175 · RoundAll v0131 · HandleAll v0123 checked free on this branch and origin/main",
+ "results": {
+  "roundall_v0131_selftest": [
+   "[PASS] VRN2_RoundAll v0131 --selftest · 101 項 · 不過 0"
+  ],
+  "launcher_v0175_selftest": [
+   "[PASS] v0175: ⑬a BookSource v0100 (no books → GRAY · BROKER_EN KGI + SOURCE 報告預估 as the last two columns · BROKER kept · opt-out → GRAY · after ⑬b, before ⑬) · OutputStore v0103 active · Workbench v0109 active"
+  ],
+  "module_selftests": {
+   "BookSource v0100": "[PASS] VRN2_BookSource v0100 --selftest · 不過 0",
+   "OutputStore v0103": "[PASS] VRN2_OutputStore v0103 --selftest · 引擎 duckdb+pyarrow · 不過 0",
+   "Workbench v0109": "[GREEN] VRN2_Workbench v0109 自測 全過(12 項)",
+   "Workbench v0108 回歸": "[GREEN] VRN2_Workbench v0108 自測 全過(12 項)",
+   "OutputStore v0102 回歸": "[PASS] VRN2_OutputStore v0102 --selftest · 引擎 duckdb+pyarrow · 不過 0"
+  },
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "closeout_per_owner": {
+   "auto1": {
+    "VCGC": 8,
+    "VRN-2": 3,
+    "人工": 8
+   },
+   "auto2": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "closeout_vrn2_items_same_as_v0174_baseline": true,
+  "e2e": {
+   "auto1_13a": "[計] ⑬a 輸出冊 Source / Broker 欄 · GREEN · 7 冊 · 11364 列 · 改寫 14 檔 · 不變 0 檔 · BROKER_EN 對到 11364 / 11364 列 · Parquet 1 檔沒寫(pyarrow 載不起來)",
+   "auto1_page_v0109": true,
+   "auto2_page_v0109": true,
+   "auto2_books_cols": true,
+   "rows_FinancialData": 5232,
+   "booksource_receipt": {
+    "lamp": "GREEN",
+    "why": "7 冊 · 11364 列 · 改寫 17 檔 · 不變 0 檔 · BROKER_EN 對到 11364 / 11364 列",
+    "unmapped": []
+   },
+   "plan": "年度數據比歷史對齊新 → 重跑 ⑬b · FinancialAligned,Deleted 的 Parquet 沒寫 → HistoryAlign v0103 依欄位型別重寫 · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬a 輸出冊 SOURCE / BROKER_EN 欄:本輪重算歷史對齊 / Combined → BookSource v0100 寫最後兩欄(BROKER 原文不改 · 其他值不變) · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+   "plan_ok": true,
+   "source_fix": "[GREEN] ⑤ 修 · ⑬a 輸出冊 SOURCE / BROKER_EN 欄:本輪重算歷史對齊 / Combined · VRN2_BookSource v0100 · 7 冊 · 11364 列 · 改寫 17 檔 · 不變 0 檔 · BROKER_EN 對到 11364 / 11364 列",
+   "store_fix": "[GREEN] ⑤ 修 · ⑬ 增量庫補寫(本輪有修正) · duckdb · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0, \"MarketConsensus\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combi",
+   "workbench_fix": "[GREEN] ⑤ 修 · Workbench 重渲染(最新收據) · VRN2_Workbench v0109(前版 v0108)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+   "store": "auto2 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Combined\": 0, \"Rejected\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 補欄 {} · 累計 {\"BasicInfo\": 17, \"FinancialData\": 5232, \"Summary\": 17, \"Rejected\": 834, \"Combined\": 31, \"FinancialAligned\": 295, \"Deleted\": 0}",
+   "store_no_double": true
+  },
+  "browser": {
+   "fonts": {
+    "body": "Consolas, \"Microsoft JhengHei\", \"Segoe U 10.45px",
+    "td": "Consolas, \"Microsoft JhengHei\", \"Segoe U 10.45px",
+    "th": "Consolas, \"Microsoft JhengHei\", \"Segoe U 9px",
+    "h2": "Consolas, \"Microsoft JhengHei\", \"Segoe U 11px",
+    "title": null
+   },
+   "tab0": "01 輸入總覽",
+   "steps": [
+    "選擇報告來源",
+    "確認輸入",
+    "啟動處理",
+    "輸出位置",
+    "開啟資料夾",
+    "其他系統"
+   ],
+   "verify_rows": 14,
+   "accept_rows": 11,
+   "input_rows": 6,
+   "overflowN": 0,
+   "overflow": [],
+   "books": {
+    "BasicInfo": {
+     "n": 19,
+     "source_cols": 1,
+     "broker_en_cols": 0,
+     "first": "FRESH",
+     "last": "SOURCE",
+     "last_val": "報告",
+     "broker": "CLSA"
+    },
+    "FinancialData": {
+     "n": 15,
+     "source_cols": 1,
+     "broker_en_cols": 0,
+     "first": "FRESH",
+     "last": "SOURCE",
+     "last_val": "報告實際",
+     "broker": "CLSA"
+    },
+    "Summary": {
+     "n": 13,
+     "source_cols": 1,
+     "broker_en_cols": 0,
+     "first": "FRESH",
+     "last": "SOURCE",
+     "last_val": "報告",
+     "broker": "CLSA"
+    },
+    "Combined": {
+     "n": 27,
+     "source_cols": 1,
+     "broker_en_cols": 0,
+     "first": "FRESH",
+     "last": "SOURCE",
+     "last_val": "報告 + TWSE/TPEX/Yahoo + 共識",
+     "broker": "CLSA"
+    },
+    "FinancialAligned": {
+     "n": 25,
+     "source_cols": 1,
+     "broker_en_cols": 0,
+     "first": "FRESH",
+     "last": "SOURCE",
+     "last_val": "報告實際",
+     "broker": "CLSA"
+    }
+   },
+   "csv_source_count": 1,
+   "csv_tail": "SECTION,BROKER_EN,SOURCE",
+   "errors": []
+  },
+  "desktop_shape_check": {
+   "rows": 11905,
+   "lamp": "GREEN",
+   "last_two_columns": true,
+   "other_values_identical": true,
+   "source_counts": {
+    "報告實際": 5416,
+    "報告預估": 6489
+   },
+   "same_as_v0108_export_source": "11905 / 11905",
+   "brokers": 13,
+   "broker_en_mapped_rows": 11905,
+   "unmapped": []
+  },
+  "not_run": "the desktop itself (one line · auto = repair · ⑬a + ⑬ fill + Workbench v0109) · the operator's own --confirm (H-fd2ea35f)"
+ }
+}
