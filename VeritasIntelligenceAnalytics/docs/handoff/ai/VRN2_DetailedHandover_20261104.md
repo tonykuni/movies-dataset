@@ -76,6 +76,18 @@
 - 範圍數字突然變大先看檔名:page_NNNN[_雜湊].pdf 是分割頁,不是報告(管理器 v0260);⑦ 有 7,200 秒上限。
 - repair 補不了 ⑦:上一輪 ⑦ 沒跑完 → 整輪(Handle-All v0125 會自動判斷)。
 - Workbench 分頁列(操作員截圖一)不動;千分位只改顯示,資料冊與匯出不改。頁首第三行固定是「Transform investment reports into structured database intelligence.」。
-- 沙盒測試底版若有未發佈的同名檔(這輪碰到一份 v0106 草稿),先確認任何發行套件 / runtime 都沒有它,再在沙盒拿掉 —— 不改號、不覆蓋。
+- ~~沙盒測試底版若有未發佈的同名檔(這輪碰到一份 v0106 草稿)…在沙盒拿掉~~ **更正(v0178)**:那支 v0106 是啟動器 ④ 加速器注入的 v0105 副本,桌機也有 —— 沙盒要保留;撞號就換新號(見 §8)。
 - VRN-2 不改 VDF / VCGC / VRN-1 的檔;VCGC 的事只在操作員授權時經 VCGC 自己的主控台做,而且 VCGC 的燈不寫成 VRN-2 的成功。
 - 不提交:`VIA_Lessons_Ledger_v0100.json` · `VIA_Reports/**` · VCGC 自測副作用寫到的檔(這輪還原了 acceptance / ssot_autocode / VapStack html)。
+
+## 8. v0178 補充(2026-11-04 下午 · 桌機跑 v0177 之後)
+
+| 問題 | 回答 |
+|---|---|
+| 為何錯誤增加? | v0177 的啟動器根本沒跑:桌機 `functional modules\VRN2\VRN2_VerbatimVerifier_v0106.py` 是啟動器自己 ④ 加速器注入的 v0105 副本,v0177 的 runtime 又帶一支不同內容的同名 v0106 → 啟動器只增不覆寫 → 2 秒 rc 1。收尾只能沿用 v0175 那份 ⑦ 逾時的收據,再多出「④ 跑啟動器 紅」「頁面分割檔 黃」兩列 |
+| 成功的改善有沒有遺失? | 沒有。同一輪 ⑤ 自動修已套上 BookSource v0102(主題與摘要 42 列千分位)· Workbench v0110(頁首第三行 · 同字級 · 按鍵同高 · 檢視副本)· 增量庫就地整理 · 四點 / 主題與摘要 綠 |
+| 我哪裡錯 | 容器第一次 e2e 其實出現同一句錯誤,我判成「沙盒底版的未發佈草稿」而把沙盒那支刪掉 → 測試綠、桌機紅。v0178 起沙盒保留注入版 v0106,e2e 證明啟動器 v0178 在同樣狀態實跑 154 秒 |
+| 修了什麼 | 套件 v0178(VERBATIM 回 v0105 · runtime v0167 不帶 v0106)· RoundAll v0134(④ 前比套件 runtime 與現役夾同名檔 · 同名不同內容 → 紅 · 不跑)· Workbench v0111 · Handle-All v0126 |
+| 華南投顧背景色花俏 · 表格字不好擷取 · WORD / TXT / IMAGE | 記為下一輪需求:目前主體只擷取 PDF(Word / TXT / 影像已收下但不擷取);華南 6143 的轉置表在 v0168 / v0259 已補第三讀法。要做「背景底色 / 網底干擾」要原檔:把出問題的華南 PDF 上傳,我先量是文字層還是影像層再決定(不猜)|
+| VDF / VCGC 驗收燈 | VCGC 交接閘 RED · 驗收 RED(待辦 217 · 發現 357)· VDF 沒有自報收據(灰)· 自測 RED(DuckDB 連線)· 詳見 VRN2_Verification_v0178.md §3 |
+| VIA Agent OS | 已整合 `supportive modules\agent_os\VIA_AgentOS_v0100.py` · 容器實跑自測 / 驗收全過 · 桌機一行在 `via_agent_os_v0100\VIA_AgentOS_v0100.md` |
