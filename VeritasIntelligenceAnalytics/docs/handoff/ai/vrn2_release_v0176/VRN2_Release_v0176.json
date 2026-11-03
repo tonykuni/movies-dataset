@@ -1,0 +1,224 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0176 (launcher v0176 · runtime v0165) + VRN2_RoundAll_v0132 + VRN2_HandleAll_v0124",
+ "date": "2026-11-03",
+ "trigger": "操作員 2026-11-03:四點摘要前面出現任何標點符號如 ➢ 則刪除 · 第一點通常為評價,採取每日更新後的 ADJ 目標價 · ADJ CLOSE 來計算上漲空間 · 標題格式 Name(YFinance Ticker, 評等) - 原文標題",
+ "data_rule": "BookSource v0101 removes only leading bullets / punctuation / numbering from Summary TITLE and POINT_1..4 (inner text unchanged, so the verbatim check still finds every point); Combined TOPIC & SUMMARY = Name(YFinance Ticker, Rating) - title · valuation point first · upside = TARGET_PRICE(ADJ) / ADJ_CLOSE - 1 with the basis appended; no valuation point -> one is added as point 1 (still four); a missing adjusted price -> numbers untouched; every other column unchanged; JSON / CSV / Parquet alike; idempotent",
+ "store_rule": "OutputStore v0104 row hash strips the same leading symbols from Summary rows and ignores Combined TOPIC & SUMMARY (no re-append); stored rows tidied in place after a DuckDB file backup (restore-fill); a changed ADJ_CLOSE still appends a Combined row",
+ "fixes": {
+  "BookSource_v0101": "thin tail over v0100 · selftest v0100 + 11",
+  "OutputStore_v0104": "thin tail over v0103 · selftest v0103 + 2 engines × 6 + 2",
+  "launcher_v0176": "BookSource v0101 / OutputStore v0104 active · selftest adds the four-point / topic check",
+  "RoundAll_v0132": "package v0176 pin · ⑤ source when the receipt has no summary_cleanup · store when no summary_tidy · ⑥ four-point / topic row · selftest 103",
+  "HandleAll_v0124": "points at RoundAll v0132 / release v0176"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0176.zip",
+  "sha256": "90bcb8c5166aebba934c5fe16cb16791f4ae5a8b68cae0c7a42c053f94e2abe5",
+  "release_folder": "vrn2_release_v0176",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0176.py"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0165.zip",
+  "zip_sha256": "a7bb955ab15147c0c1b4b018f08a3654c46f91dcf92c07b898ea2b81169faed1",
+  "based_on": "VRN2_Runtime_v0164.zip 800777be51e0f84edc020d234e11930e931a4fee2613556f0a0e5c40e1bb938c",
+  "retained_members": 207,
+  "new_members": [
+   "VRN2_BookSource_v0101.py",
+   "VRN2_OutputStore_v0104.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0176.py",
+   "sha256": "f15b431ebaba0453442c7f6be30b63a2fbc4932bcc039bc7bbd548b69fbbaaab"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "3e68e3852586ee971d8a30a8444161ad322582a3fae0979ca0521c16f1e3cc01"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "1dd092c4acb3e0c84f6e88a04da01c9d1c5aa306093db3fc416bc216e5b7eceb"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0165.json",
+   "sha256": "149720761bb39f6e924243ca55be305f0041148734237b51ff679e33fc619552"
+  },
+  {
+   "path": "VRN2_Runtime_v0165.zip",
+   "sha256": "a7bb955ab15147c0c1b4b018f08a3654c46f91dcf92c07b898ea2b81169faed1"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0131.py",
+   "sha256": "0f58b9464d9514f24dcba1c69e1252446eb443367e6d0255ebdbc95f630d0830",
+   "status": "superseded 2026-11-03; file kept in vrn2_release_v0175"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0132.py",
+  "sha256": "9b61c18d8e399514d29cbbd02a1482893a61a91deead56d927ea75a2dd107d90",
+  "pinned_package_sha256": "90bcb8c5166aebba934c5fe16cb16791f4ae5a8b68cae0c7a42c053f94e2abe5",
+  "guide": "VRN2_RoundAll_v0132.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0124.md",
+  "line_sha256": "c348366174a83d9c8d09b1e60e84892837d72196d91d156a1188bd2f7b112b75",
+  "line_chars": 14849,
+  "boot_file": "VRN2_HandleAll_v0124_boot.txt",
+  "boot_line_sha256": "54db4a8fc7929bf091f78466fe5639197c793449d34596a77c2d960f7bf763a5",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "BookSource v0101 · OutputStore v0104 · runtime v0165 · launcher / package / receipt v0176 · RoundAll v0132 · HandleAll v0124 checked free on this branch and origin/main",
+ "results": {
+  "roundall_v0132_selftest": [
+   "[PASS] VRN2_RoundAll v0132 --selftest · 103 項 · 不過 0"
+  ],
+  "launcher_v0176_selftest": [
+   "[PASS] v0176: ⑬a BookSource v0101 (Summary 四點 / 標題去開頭符號 · Combined 主題與摘要 = 示例公司(9999.TW, 買進) - 標題甲 · 評價點第一 · 上漲空間 118 ÷ 100 − 1 = 18.0% · 再跑不變) · OutputStore v0104 active (chain v0103 → v0100)"
+  ],
+  "module_selftests": {
+   "BookSource v0101(含 v0100 自測)": "[PASS] VRN2_BookSource v0101 --selftest · 不過 0",
+   "OutputStore v0104(含 v0103 → v0100 自測)": "[PASS] VRN2_OutputStore v0104 --selftest · 引擎 duckdb+pyarrow · 不過 0"
+  },
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "closeout_per_owner": {
+   "auto1": {
+    "VCGC": 8,
+    "VRN-2": 3,
+    "人工": 8
+   },
+   "auto2": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "closeout_vrn2_items_same_as_v0175_baseline": true,
+  "e2e": {
+   "auto1_13a": "[計] ⑬a 輸出冊 Source / Broker 欄 · GREEN · 7 冊 · 11364 列 · 改寫 14 檔 · 不變 0 檔 · BROKER_EN 對到 11364 / 11364 列 · Parquet 1 檔沒寫(pyarrow 載不起來) · 四點去符號 1 格 · 主題與摘要 17 列(改算上漲空間 11)",
+   "plan": "歷史對齊 FinancialAligned,Deleted 的 Parquet 沒寫(ImportError(這支 Python 的 pyarrow 載不起來))→ HistoryAlign v0103 依欄位型別重寫(JSON / CSV 照舊) · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬a 輸出冊 SOURCE / BROKER_EN 欄 · 四點 / 主題與摘要:本輪重算歷史對齊 / Combined → BookSource v0101 寫最後兩欄 · 四點去開頭符號 · 主題與摘要 = Name(YFinance Ticker, 評等) - 原文標題 · 評價點用調整後目標價 ÷ 調整後收盤(BROKER 原文不改 · 其他值不變) · ⑬ 增量庫補寫(本輪有修正) · Workbench 重",
+   "plan_ok": true,
+   "source_fix": "[GREEN] ⑤ 修 · ⑬a 輸出冊 SOURCE / BROKER_EN 欄 · 四點 / 主題與摘要:本輪重算歷史對齊 / Combined · VRN2_BookSource v0101 · 7 冊 · 11364 列 · 改寫 10 檔 · 不變 7 檔 · BROKER_EN 對到 11364 / 11364 列 · 四點去符號 56 格 · 主題與摘要 17 列(改算上漲空間 11)",
+   "store_fix": "[GREEN] ⑤ 修 · ⑬ 增量庫補寫(本輪有修正) · duckdb · 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted\": 0, \"MarketConsensus\": 0} · 補缺 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Rejected\": 0, \"Combined\": 0, \"FinancialAligned\": 0, \"Deleted",
+   "points_format_row": "[GREEN] ⑥ 四點 / 主題與摘要 · Summary 17 份 · 開頭還有符號 0 格 · Combined 17 列 · 主題與摘要不是 Name(YFinance Ticker, 評等) - 原文標題 開頭 0 列 · 評價點用調整後目標價 ÷ 調整後收盤 11 列",
+   "summary_rows": 17,
+   "leading_marks_left": 0,
+   "combined_rows": 17,
+   "combined_title_format_rows": 17,
+   "combined_rows_with_tp_adj_and_adj_close": 11,
+   "upside_basis_rows": 11,
+   "booksource_receipt": {
+    "module": "VRN2_BookSource v0101",
+    "lamp": "GREEN",
+    "summary_cleanup": {
+     "stripped_cells": 56,
+     "topic_rows": 17,
+     "upside_rows": 11
+    }
+   },
+   "store": "auto2 追加 {\"BasicInfo\": 0, \"FinancialData\": 0, \"Summary\": 0, \"Combined\": 0, \"Rejected\": 0, \"FinancialAligned\": 0, \"Deleted\": 0} · 整理 {\"Summary\": 0, \"Combined\": 0} · 累計 {\"BasicInfo\": 17, \"FinancialData\": 5232, \"Summary\": 17, \"Rejected\": 834, \"Combined\": 31, \"FinancialAligned\": 295, \"Deleted\": 0}",
+   "store_no_double": true,
+   "closeout_per_owner": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "desktop_shape_check": {
+   "summary_book": {
+    "summary_rows": 52,
+    "combined_rows": 44,
+    "lamp": "GREEN",
+    "leading_marks_before": {
+     "➢": 1,
+     "2": 1
+    },
+    "leading_marks_after": 0,
+    "stripped_points_are_suffix_of_original": true,
+    "summary_other_columns_identical": true,
+    "non_empty_points_before_after": [
+     201,
+     201
+    ],
+    "combined_title_format_rows": "0 / 44",
+    "title_with_rating_rows": 0,
+    "rows_with_tp_adj_and_adj_close": 0,
+    "valuation_point_first_rows": 0,
+    "upside_recomputed_rows": 0,
+    "combined_other_columns_identical": false,
+    "receipt_summary_cleanup": {
+     "stripped_cells": 2,
+     "topic_rows": 0,
+     "upside_rows": 0
+    },
+    "second_run_unchanged": true,
+    "second_run_cleanup": {
+     "stripped_cells": 0,
+     "topic_rows": 0,
+     "upside_rows": 0
+    }
+   },
+   "combined_from_basic_view": {
+    "basic_rows": 52,
+    "summary_rows": 52,
+    "basic_with_summary": 52,
+    "with_target_price": 43,
+    "title_format_rows": 23,
+    "yfinance_in_title": 27,
+    "rating_in_title": 46,
+    "upside_basis_rows": 43,
+    "valuation_point_from_report_first": 43,
+    "valuation_point_added": 0,
+    "at_most_title_plus_four": "52 / 52",
+    "receipt": {
+     "stripped_cells": 2,
+     "topic_rows": 52,
+     "upside_rows": 43
+    },
+    "second_run": {
+     "stripped_cells": 0,
+     "topic_rows": 0,
+     "upside_rows": 43
+    }
+   }
+  },
+  "not_run": "the desktop itself (one line · auto = repair · ⑬a v0101 + ⑬ v0104 tidy + Workbench) · the operator's own --confirm (H-fd2ea35f)"
+ }
+}

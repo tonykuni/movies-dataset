@@ -126,3 +126,15 @@
 | VCGC 收尾(只讀 · 本線不改 VCGC 的冊)| 11/03 容器實跑 VCGC 自己的指令:`token` 6/6 啟用 · `handoff check` **RED**(需求 226 · pending 217 · REQ132–155 等標 REQ_CHANGED)· `test --quick` rc 2(綠 8 · 黃 2:handoff-check · P-entry 沒有 pwsh)· SDD **RED**(尾版沒編號 · 待 `CGC_MDL237 --apply`)· 註冊冊待同步(新 36 · 改 120 · `via-vcgc registry-sync --apply` 要批准) → 這些都是 VCGC 正本的寫入動作,依四系統互不干涉由 VCGC / 操作員批准執行,本線不代做 |
 | VDF 收尾(只讀)| §8 第 3 項(外連動詞經網路工具的執行收據 · 增量庫 · 桌機倉同步)都要 VDF 在桌機實跑產生的收據;容器沒有桌機收據 → 不能代判綠 · 下一步:桌機跑 VDF 自己的入口後貼回收據 |
 | 桌機要做 | 貼 `vrn2_release_v0175/VRN2_HandleAll_v0123.md` 最短一行(repair)|
+
+## 13. v0176 輪更新(2026-11-03 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 四點開頭符號 | ⑬a `VRN2_BookSource_v0101`:Summary 冊四點 / 標題開頭的項目符號 · 標點 · 編號刪掉(內文不改 · 原文核對照樣過)|
+| 主題與摘要 | Combined:`Name(YFinance Ticker, 評等) - 原文標題` · 評價點排第一 · 上漲空間 = TARGET_PRICE(ADJ) ÷ ADJ_CLOSE − 1(每日 ADJ_CLOSE)· 附算法 |
+| 增量庫 | `VRN2_OutputStore_v0104`:格式改了不重複追加 · 舊列就地整理(先備份 · restore-fill)· ADJ_CLOSE 變了照樣追加 |
+| VCGC registry-sync | **操作員授權**(2026-11-03)· `registry-sync --apply`:新 36 · 變更 120 · 退役 1 · AST 錯 0 · 撞號 0 · 再跑 新 0 變更 0 退役 0 |
+| VCGC 編號套用 | **操作員授權** · `run CGC_MDL237_NumberingSystem --apply --scope`:先 5 支(X-NUM · +153 列)再 38 支(+843 列 · MDL +36 · ENG +2)· 四層缺號 VCGC 0 · VDF 0 · VRN 0 · SUP 0 · audit 遺失 0 · 改身分 0 · 重號 0 · SDD X-NUM GREEN |
+| VCGC 仍黃(不在本次授權範圍 · 只記)| 編號冊內不一致 54 列(冊上宣告碼 ≠ 發出號 · 待裁定 · 不改任何一邊)· 命名同號異名 / 版號異形(操作員排序)· 已鎖工作流尾版換了待重驗 14 處 · 需求未全落地 80 條 |
+| 桌機要做 | 貼 `vrn2_release_v0176/VRN2_HandleAll_v0124.md` 最短一行(repair)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|
