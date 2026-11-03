@@ -1,0 +1,260 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_Closeout_v0174 (launcher v0174 · runtime v0163) + VRN2_RoundAll_v0130 + VRN2_HandleAll_v0122",
+ "date": "2026-11-03",
+ "trigger": "操作員 2026-11-03:Ticker / YFinance 同步顯示 · 代號下一欄接 Name · Broker 英文縮寫 · 報告日左邊加時效欄(法定財報日之前或超過 30 個交易日 → 過期)· ENG049 對帳頁當靜態視覺模板(字體大小與顏色一致且鎖定 · 左右面板加上去)· 擷取時間 YYYY / YYYY-MM / YYYY-MM-DD · 所有資料最後加 Source(歷史 vs 報告預估)",
+ "template": {
+  "source": "VRN_ENG049_ContentReconcile_v0102.py (functional modules/VRN) · reconcile page 'VRN-RECONCILE · READ-ONLY · 零落庫 · OCR EXTRACTION × SSOT v2 · CONTENT RECONCILE MATRIX'",
+  "palette": [
+   "#f2f1ec",
+   "#ffffff",
+   "#33403f",
+   "#1b1a17",
+   "#6b6860",
+   "#dcdad3",
+   "#dbd9d3",
+   "#ebe9e3",
+   "#3d7a52",
+   "#e6efec",
+   "#2c4f4a",
+   "#f2ecdd",
+   "#6f5c31",
+   "#f3e7e6",
+   "#9e2b25"
+  ],
+  "font_sizes_px": [
+   19,
+   11,
+   9.5,
+   9,
+   8
+  ],
+  "fonts": [
+   "Microsoft JhengHei / Segoe UI",
+   "Cormorant Garamond / Georgia",
+   "Consolas"
+  ],
+  "note": "the earlier 'white text on solid badges' rule (Workbench v0105) is superseded by the template's pastel tags with dark text",
+  "css_sha256": "4a9fe74d7aba4e9cc2552ccbc6db3c26a18046510f3b32d32ce84f3636eb0e7a"
+ },
+ "data_rule": "window.VRN2_DATA stays byte-identical to the output books (the other line's v0104 rule); all changes are display-time; every export keeps the book values and appends SOURCE as the last column",
+ "freshness": "過期 when the report date is before the latest statutory filing deadline already passed (3/31 · 5/15 · 8/14 · 11/14) or more than 30 trading days before the as-of date; trading days = Mon-Fri minus VDF's TW_KNOWN_HOLIDAYS (VDF_MDL001, read with ast, VDF untouched)",
+ "broker_abbreviations": "candidate table in Workbench v0108 (display only · not written to books) · pending VCGC as the governed synonym list",
+ "fixes": {
+  "Workbench_v0108": "template lock CSS + data-tab display layer (Freshness · Ticker / YFinance + Name · broker abbreviations · YYYY dates · Source) + exports append SOURCE + Basic Info merged card re-laid out · selftest 12",
+  "RoundAll_v0130": "package v0174 pin · workbench trigger on the wb108-tpl page marker · install chain v0108 + v0107 · selftest 100",
+  "HandleAll_v0122": "points at RoundAll v0130 / release v0174 · receipts ≥ v0170 still pick repair"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0174.zip",
+  "sha256": "3f87bee1bda5ac6eb57889b3ce79f9fe8026dbd7fa143af607ba1ea5cfb19545",
+  "release_folder": "vrn2_release_v0174",
+  "changed": true,
+  "launcher": "ActivateVRN-2_v0174.py",
+  "launcher_numbering": "v0173 skipped (release v0173 was RoundAll-only)"
+ },
+ "runtime": {
+  "name": "VRN2_Runtime_v0163.zip",
+  "zip_sha256": "c2058a1f9783001b030da6efac10a284260c6aff0cbe8c02262e985009739d01",
+  "based_on": "VRN2_Runtime_v0162.zip 1cff52c7fa54cc9d7ffda469f381b31322baea01a4c5b8f53741faaa9f302674",
+  "retained_members": 203,
+  "new_members": [
+   "VRN2_Workbench_v0108.py"
+  ]
+ },
+ "components": [
+  {
+   "path": "ActivateVRN-2_v0136.py",
+   "sha256": "cb6bf142a0e33824e3ef97ec134f37fd970b6225cd1384cecdee409c77d68354"
+  },
+  {
+   "path": "ActivateVRN-2_v0174.py",
+   "sha256": "38c6382b5fcf209dcb023a001ede8208619084f81c9a0a55f9aa892c8cc3d3da"
+  },
+  {
+   "path": "README.txt",
+   "sha256": "6ea74eb91295f13b6bb51544f1c39971ae728b91e2eb63f4c482be5d8d12f2c0"
+  },
+  {
+   "path": "VALIDATION_RESULT.json",
+   "sha256": "c00add172e49b608690932133be499bc495e07b60f4f6a2562d7810005cb93d6"
+  },
+  {
+   "path": "VIA_ExecutionBridge_v0103.py",
+   "sha256": "1feb984b8da0168016f46413a348d44ecdf4af7d06ec2547a99dd9ed784e7706"
+  },
+  {
+   "path": "VIA_RunWithTools_v0103.py",
+   "sha256": "a72eaa5ead76dc76347e3a7c4a9aaf84044c0ef1327f077ce07682e5191bd58e"
+  },
+  {
+   "path": "VRN2_OCRBridge_v0101.py",
+   "sha256": "75ea1fda17217b624dbfd49081fdc304699804c4181fbed195638b4fb2b722f9"
+  },
+  {
+   "path": "VRN2_Runtime_v0163.json",
+   "sha256": "c5c4c3bb62b768fd307cefc7ac9e634e1ca53f0a07a60d5fc8f867109774b5af"
+  },
+  {
+   "path": "VRN2_Runtime_v0163.zip",
+   "sha256": "c2058a1f9783001b030da6efac10a284260c6aff0cbe8c02262e985009739d01"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0104.py",
+   "sha256": "9d01d71fcf0b6a3a824af57e1da4371adde7055d7536638dac98514241b6b08f"
+  },
+  {
+   "path": "VRN2_VerbatimVerifier_v0105.py",
+   "sha256": "6c9ec7a226bfa5f210922dab3ae4d7f560b3e186ec30be4c99627cc5d7d3bac6"
+  }
+ ],
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0129.py",
+   "sha256": "4ea7b177e321ed7309fdeb290fac6cd3a16d71f94697aa6ea009e8c5751c249a",
+   "status": "superseded 2026-11-03; file kept in vrn2_release_v0173"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0130.py",
+  "sha256": "93762c0f8ad72b633721aac498a4f4ed871a7032fb97d27cc49741fd5366d697",
+  "pinned_package_sha256": "3f87bee1bda5ac6eb57889b3ce79f9fe8026dbd7fa143af607ba1ea5cfb19545",
+  "guide": "VRN2_RoundAll_v0130.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0122.md",
+  "line_sha256": "d1f7fdcf68c6b0f790c233036a2d3b637fe185b67798c7204b10c45da9584a3d",
+  "line_chars": 14605,
+  "boot_file": "VRN2_HandleAll_v0122_boot.txt",
+  "boot_line_sha256": "922c3656ff40081c7f85d8f4715d444f45ac2f9d0c76bc14ad8ba4a6a64cd3c7",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "Workbench v0108 · runtime v0163 · launcher / package / receipt v0174 · RoundAll v0130 · HandleAll v0122 checked free on this branch and origin/main",
+ "results": {
+  "roundall_v0130_selftest": [
+   "[PASS] VRN2_RoundAll v0130 --selftest · 100 項 · 不過 0"
+  ],
+  "launcher_v0174_selftest": [
+   "[PASS] v0174: Workbench v0108 (ENG049 template lock · Freshness · Ticker / YFinance + Name · broker abbreviations · YYYY / YYYY-MM / YYYY-MM-DD · Source last · exports append SOURCE) is the active Workbench"
+  ],
+  "module_selftests": {
+   "Workbench v0108": "[GREEN] VRN2_Workbench v0108 自測 全過(12 項)",
+   "Workbench v0107 回歸": "[GREEN] VRN2_Workbench v0107 自測 全過(15 項)"
+  },
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "auto1 rc 0",
+   "confirm list rc 0",
+   "auto2 rc 0",
+   "tamper rc 0"
+  ],
+  "closeout_per_owner": {
+   "auto1": {
+    "VCGC": 8,
+    "VRN-2": 3,
+    "人工": 8
+   },
+   "auto2": {
+    "VCGC": 6,
+    "VRN-2": 3,
+    "人工": 8
+   }
+  },
+  "closeout_vrn2_items_same_as_v0171_baseline": true,
+  "repair_plan": "歷史對齊 FinancialAligned,Deleted 的 Parquet 沒寫(ImportError(這支 Python 的 pyarrow 載不起來))→ HistoryAlign v0103 依欄位型別重寫(JSON / CSV 照舊) · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+  "repair_workbench": "[GREEN] ⑤ 修 · Workbench 重渲染(最新收據) · VRN2_Workbench v0108(前版 v0107)· <sbx>/VIA/VIA_Reports/vrn2/VRN2_Workbench_latest.html",
+  "browser": {
+   "books": {
+    "BasicInfo": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 19,
+     "fresh_vals": [
+      "過期",
+      "有效"
+     ]
+    },
+    "FinancialData": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 15,
+     "fresh_vals": [
+      "過期"
+     ]
+    },
+    "Summary": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 13,
+     "fresh_vals": [
+      "過期",
+      "有效"
+     ]
+    },
+    "Combined": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 27,
+     "fresh_vals": [
+      "過期",
+      "有效"
+     ]
+    },
+    "Rejected": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 14,
+     "fresh_vals": [
+      "過期"
+     ]
+    },
+    "FinancialAligned": {
+     "first": "Freshness / 時效",
+     "second": "Report Date / 報告日期",
+     "ticker_then": "Company Name / 公司名稱",
+     "last": "Source / 來源",
+     "n": 25,
+     "fresh_vals": [
+      "過期"
+     ]
+    }
+   },
+   "csv_first": "REPORT_DATE",
+   "csv_last": "SOURCE",
+   "style": {
+    "body": [
+     "Microsoft JhengHei",
+     "11px",
+     "rgb(51, 64, 63)"
+    ],
+    "h1": [
+     "Cormorant Garamond",
+     "19px",
+     "rgb(27, 26, 23)"
+    ],
+    "th": [
+     "Consolas",
+     "9px",
+     "rgb(107, 104, 96)"
+    ],
+    "bg": "rgb(242, 241, 236)"
+   },
+   "errors": []
+  },
+  "desktop_shape_check": "the desktop's FinancialData export (11,905 rows, uploaded by the operator, used only in the sandbox): every PERIOD normalised (est 6,489 · act 5,416 · unparsed 0) · all 13 brokers mapped to an abbreviation · rendered over the other line's v0104 → v0107 → v0108 with no JS errors",
+  "not_run": "the desktop itself (one line · auto = repair · Workbench re-render) · the operator's own --confirm (H-fd2ea35f)"
+ }
+}

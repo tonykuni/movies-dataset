@@ -102,3 +102,14 @@
 | Graphify | v0101:根目錄要有系統夾才算 VIA 根(修桌機 4 系統全灰仍印綠)· 一張圖都沒出 → 總結黃 |
 | 最嚴格要求 | 操作員 11/03 貼上的 Ultimate Performance Standard → `VIA_Ultimate_Requirements_v0100.md`(UP-0 ~ UP-20 逐條 + 現況 + 負責系統 · 不擴張)|
 | 收尾佇列(§8)| 1. VRN P0 → **完成(待桌機 repair 實跑 + 操作員 --confirm)** · 2. VRN P1(F4 / F5 · 歷史對齊 · Input List)· 3. VDF · 4. VCGC 照舊 |
+
+## 11. v0173 / v0174 輪更新(2026-11-03 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 桌機 05:54 v0128 repair | VRN P0 三項上桌(⑬b Parquet 寫成 · Combined 含 UPSIDE_ADJ · Workbench v0107)· 收尾 REVIEW(VRN 0 · VCGC 0)|
+| v0173 | RoundAll v0129:⑬b 只在輸入變了才重跑(收據 GRAY「無歷史」不再每次白做)|
+| U/I 視覺模板 | VRN_ENG049_ContentReconcile v0102 的對帳頁(VRN-RECONCILE · READ-ONLY · 零落庫 · CONTENT RECONCILE MATRIX)= 靜態視覺模板;Workbench v0108 鎖定 15 色 · 字級 19 / 11 / 9.5 / 9 / 8 px · JhengHei / Cormorant / Consolas(CSS SHA-256 釘住)· 左欄 / 頁首 / 分頁 / 卡片 / 矩陣一起套 |
+| 資料頁顯示規則 | 報告日左邊「時效」(法定財報日 3/31 · 5/15 · 8/14 · 11/14 之前或 > 30 交易日 → 過期 · 交易日扣 VDF 休市表)· 「Ticker / YFinance」+ Name 緊接 · 券商英文縮寫 · 期間 / 日期 YYYY / YYYY-MM / YYYY-MM-DD · 最後一欄 Source(歷史 TWSE/TPEX · 報告預估 · 報告實際 · 報告)|
+| 資料冊 | 不改(`window.VRN2_DATA` = 輸出冊逐字);匯出值照輸出冊 + 最後一欄 SOURCE。輸出冊 / 增量庫本身要不要實體加 SOURCE 欄(會讓增量庫把每列當內容有變再追加一次)→ 待操作員決定 |
+| 券商縮寫表 | 候選(Workbench v0108 內)· 要成正式同義字 → VCGC 核 |
