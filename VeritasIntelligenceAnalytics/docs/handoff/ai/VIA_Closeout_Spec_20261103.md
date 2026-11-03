@@ -1,0 +1,153 @@
+# VIA 收尾規格與現況核實 · 2026-11-03(VRN → VDF → VCGC)
+
+> 來源:操作員 2026-11-02 / 11-03 的文字要求(整理自操作員貼回的對話紀錄)+ 另一工作階段的架構審查與 17 項發現 —— 本檔逐條用**真資料**核實後才寫入。
+> 核實基準:GitHub main `2aaff8b02ea1`(PR #586 = 本分支 claude/optimistic-goodall-yhalc5 併入)· 桌機貼回包 2026-11-02 15:18(套件 v0170 · RoundAll v0126 · 閘開整輪)。
+> 本檔是**規格與待辦正本**,不是已部署。只增不減;四系統對等獨立(政策 L123),VRN 只改 VRN 自己的檔,VDF / VCGC 的事只列不代修。
+> 另一工作階段交付的 `VRN2_Consolidation_v0100/v0101`、`ClickStart v0103`、架構審查 HTML **不在 GitHub 任何分支**(全分支掃過)—— 它們是那邊的下載包,本線沒有它們的原始碼,不得假設已存在。
+
+---
+
+## 1. 收尾原則(操作員原文要點)
+
+- **不擴張範圍**:只修缺陷 / 錯誤 / 穩定性 / 測試 / UI 流程 / 防呆;不新增大型功能、不重構、不改商業邏輯。
+- **九頭龍風險 = 0**:一個問題變多個、新增特例分支堆疊、流程循環、隱藏依賴、跨系統耦合、可維護性下降 → 停手、標記、改走最小方案。
+- **安全**:不傷害引擎與系統;所有變更可回滾、有紀錄;add-only 新版號,前版一字不改。
+- **證據**:不猜、不虛報;所有結論來自實際測試;REVIEW / BLOCKED / DATA_GAP 都不是成功。
+- **收尾順序**:VRN(現行收尾中 · 對外顯示一律 **VRN**,檔名 / 版號 / 資料鍵照舊 VRN2)→ VDF → VCGC;一次只動一個系統。
+- **UI 目標**:最少必要輸入、≤ 3 次點擊、最快完成;矩陣 / 卡片式結構化,不要散亂文字;資料不可超出格子(自動換行 / 自動調高)。
+
+## 2. 系統關係(核實後的寫法)
+
+| 系統 | 獨立執行 | 本地持有 | 與 VCGC 的契約 |
+|---|---|---|---|
+| **VRN**(Veritas ReportNova · 原 VRN-2;VRN-1 已併入,不再是可選系統)| 報告輸入 · 解析 · OCR · 財務核對 · 摘要 · 輸出 | 自己的 Main / SystemManager / SSOT·Regex·同義字**候選**與已核准快照 / 資料庫 / 日誌 | 送提案(ssot_id 留空);收 VCGC 核發的號與衝突裁定 |
+| **VDF**(Veritas DataForge)| 官方市場 / 財務 / 共識擷取 · 轉換 · 增量庫 | 同上(自己的一套)| 同上 |
+| **VCGC**(Veritas Central Governance Console)| 環境 / 工具安裝治理(InstallGate · 工具鎖冊)· 衝突檢查 · **唯一正式編號** · 政策版本 · 稽核 | 中央正本帳冊 · 工具鎖版 | 無衝突才發號;有衝突列待裁定;不直接覆寫運行中子系統 |
+| VAP Gate | 保留入口(左欄第三)| — | 缺件顯示「未安裝」,不放無效按鈕 |
+
+更正(避免錯誤寫進規格):
+- 「同一套帳」= **同一治理帳冊**(編號 · 政策 · 工具版本),**不是**已實作的共同登入(SSO)—— 沒有證據顯示 SSO 存在。
+- 子系統**仍有**自己的領域規則與候選;VCGC 負責共用正本、去衝突、正式發號。不另立 `CFG-000001` 之類新編號體系,沿用 VCGC 既有 AutoCode / Component Inventory 規則。
+- 左欄 Gate 順序:**VCGC Gate → VDF Gate → VAP Gate**(語音轉錄的「VC Juicy Gate」= VCGC Gate)。
+- 顯示標籤 Title Case、底線改空格;縮寫(VCGC / VDF / VRN / VAP / PDF / EPS / ROE)保持大寫;只改顯示,不改 JSON 欄名 / 函式名 / 版號 / 註冊 ID。
+
+## 3. 網路工具與加速器(核實)
+
+- 桌機 15:18 實跑:⑥f `def Net tool : SUP_MDL740_NetUnified_v0119 · 閘 開 · 加速器 VIA_SuperAccel_Module · VeritasCeleritas_v1141` —— 共識引擎 v0122 確實經 NetUnified v0119;底層核心由 VCGC 工具鎖冊指定(Aegis v1652)。
+- **仍待證**:「所有向外擷取的引擎都經網路工具」—— VRN2_MarketFetch v0112 屬共用 / VDF 線工具(VRN 只讀不改),原碼有非拒絕錯誤時的 standalone 直連支路;要 100% 需每個外連動詞的執行收據。這是 VDF / VCGC 階段的事,VRN 不代修。
+- 加速器:「未覆蓋 0」是**掛橋標記**覆蓋,不等於每個動詞實際呼叫加速 API,也不等於加速效果。三個指標分開報。
+
+## 4. VRN 現況(15:18 真資料)
+
+| 項目 | 結果 |
+|---|---|
+| 收尾 | REVIEW · **VRN 0 · VCGC 0** · 人工 1(MQ-1560 四點 · `--confirm H-fd2ea35f`)· 資料源 3 |
+| 輸出冊 | FinancialData 11,905 · BasicInfo 52 · Summary 52 · Rejected 2,508 · 冪等 GREEN · ⑪ 錯值 0(PRESENT 101 = 值存在、未強定位期間欄)|
+| 共識 | ⑥f 真抓 41/41(404 的 4171 / 6933 依規則排除)· Combined FactSet 中位數 49/52 · Yahoo 48/52 |
+| U/I | Workbench v0105(動態前版尾 · 桌機接 v0104)已上線 |
+| 尚未過 | 歷史對齊:47 份無歷史 · 覆蓋 0 格 · 512 項檢驗不過 6 · 口徑不明 9 |
+| 輸入格式 | Word 7 · TXT 1 · 影像 201 已收下,**主體只擷取 PDF**(收據明寫)|
+
+## 5. 另一工作階段的發現 · 逐條核實
+
+| # | 發現 | 核實 | 負責 | 最小修法(未做 · 待下一輪)|
+|---|---|---|---|---|
+| F1 | HistoryAlign 的 FinancialAligned **Parquet 沒寫出**(`ArrowInvalid`)| **屬實**。`VRN2_HistoryAlign_v0100._write_books` 把 `None` 換成 `""`,同欄其他列是數字 → 同欄混型 → pyarrow 拒寫;CSV / JSON 正常 11,905 列 | VRN | HistoryAlign 薄尾:空值保留 null、真混型欄才轉字串;前版不動 |
+| F2 | Combined `UPSIDE_PCT(ADJ)` 存百分數(`46.0`)不是小數(`0.46`)| **屬實**:42 筆有值,39 筆 \|值\| > 1.5 | VRN | **不能直接改語意**:增量庫已累積舊列,同欄混兩種刻度 = 資料錯。要嗎新增小數欄(例 `UPSIDE_ADJ`)、舊欄照舊並標註;要嗎全庫一次遷移 —— 操作員決定 |
+| F3 | Basic Info `NAME` 23/52、`ADJ_CLOSE` 0/52,Combined 51/52 | **屬實** | VRN | Basic Info 是「原文照抄」冊,Combined 是合併冊;U/I 的 Basic 頁改讀 Combined 的已合併欄並標來源(不改冊的語意)|
+| F4 | HTML「刪除勾選者」未接後端;拖曳輸入改提示用檔案框 | 需看桌機 Workbench v0104(另一線碼)· 本線 v0102 / v0105 的按鈕走 `vrn2://` 處理器 | VRN | 下一輪實測 v0105 頁 + 處理器 v0110 的 integrate / pick 動作後定 |
+| F5 | HTML 匯出下載的是 `.catalog.json` 指標,不是 Parquet 檔 | 待核(頁面行為)| VRN | 同 F4 |
+| F6 | 兩線同版號不同內容 · v0169 發行清單雜湊不符 FreezeLock v0103 | 前半已在 v0171 輪處理(合併 main · 本線版號跳開:RoundAll v0127+ · Handle-All v0119+)· 後半是另一線檔 | 另一線 | 不改另一線的檔;本線新版號先查兩邊 |
+| F7 | PR #558 / #557 / #555 / #379 / #12 仍開著 | **屬實**(open)| VDF / VCGC / 舊線 | 四系統互不干涉:VRN 不動 |
+| F8 | SSOT 500 項待核號 | **屬實**(15:18:待核號 500 · 提案 17 · 自撞 0)| VCGC | VRN 只讀等待 |
+
+## 6. VRN 的 U/I 輸入規格(操作員原文 · 範圍內)
+
+唯一必要輸入:Windows 選檔 / 選資料夾,或拖曳 → 自動生成 Input List:
+- 候選分群(只標候選、不自動刪):① 同格式 + **完全相同 bytes**;② 名稱相似 + 同報告日期;③ 同個股 + 券商 + 日期 / 標題。候選群再算 SHA-256,同雜湊才標「完全相同」。
+- 點檔名 = 用 Windows 關聯程式開(PDF / Word / 影像),只開清單內登記過的檔。
+- Select All / Deselect All / Delete Selected(移出本輪清單,不刪來源檔)/ Confirm Input List → **Start** 一次跑完。
+- 輸出正本 **Parquet**(DuckDB 管理);CSV(UTF-8 BOM · 防公式注入)/ JSON / Google Sheets 只在獨立的 Database Export 頁產生。
+- 右欄卡片:`min-width:0` · `height:auto` · `overflow-wrap:anywhere` · 寬表只在表格容器內橫捲;1920 / 1366 / 768 / 390 寬與 125% / 150% 縮放都不溢出。
+- 範圍界線:XLSX / CSV / JSON **不是**研報擷取的預設輸入;Word / TXT / 影像要有經驗證的適配器才列「支援」,現在誠實列「收下未擷取」。
+
+## 7. Auto Deploy(規劃 · VCGC 階段)
+
+新機預設 `C:\VeritasIntelligenceAnalytics\`,可用 Windows Folder Picker 改位置;installation manifest 記實際根目錄,程式一律相對解析(不寫死 `C:\Users\tonyk`)。**不搬動**操作員現有的 OneDrive / GitHub / Downloads 系統。
+
+## 8. 收尾佇列(依序 · 每階段全 PASS 才進下一個)
+
+1. **VRN P0**:F1(Parquet 混型)· F2(上漲空間刻度 · 待操作員選遷移方式)· F3(U/I Basic 頁讀合併欄)· MQ-1560 `--confirm`(操作員)。
+2. **VRN P1**:F4 / F5 實測後修 · 歷史對齊 6 不過 / 9 口徑不明 · Input List 規格(§6)缺的部分。
+3. **VDF**:外連動詞 100% 經網路工具的執行收據 · 增量庫 · 桌機倉同步(main `VRN2_Handover_latest.md` 第 13 節 SettleAll v0101)。
+4. **VCGC**:SSOT 核號(500 待核)· 工具 / 環境治理 · Auto Deploy · 衝突裁定。
+
+## 9. 操作員規則(持續有效 · 本檔重申)
+
+- 同意閘 `VIA_NET_CONSENT` / `VIA_SCRAPE_CONSENT` 只由操作員設;任何腳本 / AI 不代設、不繞道。
+- 人工核對只有操作員親手打 `--confirm` 才算。
+- 安裝經 VCGC InstallGate;InstallGate 只能 `pip --user` 進主 Python 的工具(例 Graphify 這種相依很多的第三方 CLI)走隔離 venv,前後核對主 Python 套件清單不變,並在收據寫明。
+- 不推使用者資料 / 原文數值進倉,只寫結論與筆數。
+
+## 10. v0172 輪更新(2026-11-03 · 只增 · 上面各節原文不動)
+
+| 項目 | 狀態 |
+|---|---|
+| F1 Parquet 混型 | **已修**:`VRN2_HistoryAlign_v0103`(前版照寫 · 沒寫成才依欄位型別重寫 · 讀回比對)· 沙盒:前版 ArrowInvalid → 型別版寫成 · 細節見 `vrn2_release_v0172/VRN2_Verification_v0172.md` |
+| F2 上漲空間刻度 | **已修(操作員選「新增小數欄 · 舊欄保留並標註」)**:`VRN2_ConsensusJoin_v0107` 新增 `UPSIDE_ADJ`(純小數)緊接 `UPSIDE_PCT(ADJ)`(百分數 · 保留)· `output/VRN2_Combined_columns_latest.json` 標註 · 增量庫加欄(舊列 NULL)|
+| F3 Basic 頁讀合併欄 | **已修**:`VRN2_Workbench_v0107`「Basic Info · 合併檢視」(原文標「原」· Combined 補上標「合」+ 來源 · 兩冊不改)|
+| 桌機要做 | 貼 `vrn2_release_v0172/VRN2_HandleAll_v0120.md` 最短一行(收據 ≥ v0170 → repair · 幾分鐘)· MQ-1560 `--confirm`(操作員)|
+| ClickStart(另一線)| 3221225786 = 0xC000013A(STATUS_CONTROL_C_EXIT · 視窗被關 / Ctrl+C)· 另一線 v0103 的根因是 venv 父子 PID 不同被誤判逾時 · 內含本線 RoundAll v0127(雜湊相符)· 本線只讀 |
+| 非個股摘要器 v0300 | 個股以外的報告(產業 / 晨會 / 總經 / 訊息)屬它;依賴 `NON_STOCK_CORE_v0200` / `reuse/vrn2/` 不在倉 · zip 未上傳 → 本線無法重現;預覽可見品質待修點(行號殘字 · `nan` 點 · 跨公司段落混在一份)→ VRN 之後的階段 |
+| Graphify | v0101:根目錄要有系統夾才算 VIA 根(修桌機 4 系統全灰仍印綠)· 一張圖都沒出 → 總結黃 |
+| 最嚴格要求 | 操作員 11/03 貼上的 Ultimate Performance Standard → `VIA_Ultimate_Requirements_v0100.md`(UP-0 ~ UP-20 逐條 + 現況 + 負責系統 · 不擴張)|
+| 收尾佇列(§8)| 1. VRN P0 → **完成(待桌機 repair 實跑 + 操作員 --confirm)** · 2. VRN P1(F4 / F5 · 歷史對齊 · Input List)· 3. VDF · 4. VCGC 照舊 |
+
+## 11. v0173 / v0174 輪更新(2026-11-03 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 桌機 05:54 v0128 repair | VRN P0 三項上桌(⑬b Parquet 寫成 · Combined 含 UPSIDE_ADJ · Workbench v0107)· 收尾 REVIEW(VRN 0 · VCGC 0)|
+| v0173 | RoundAll v0129:⑬b 只在輸入變了才重跑(收據 GRAY「無歷史」不再每次白做)|
+| U/I 視覺模板 | VRN_ENG049_ContentReconcile v0102 的對帳頁(VRN-RECONCILE · READ-ONLY · 零落庫 · CONTENT RECONCILE MATRIX)= 靜態視覺模板;Workbench v0108 鎖定 15 色 · 字級 19 / 11 / 9.5 / 9 / 8 px · JhengHei / Cormorant / Consolas(CSS SHA-256 釘住)· 左欄 / 頁首 / 分頁 / 卡片 / 矩陣一起套 |
+| 資料頁顯示規則 | 報告日左邊「時效」(法定財報日 3/31 · 5/15 · 8/14 · 11/14 之前或 > 30 交易日 → 過期 · 交易日扣 VDF 休市表)· 「Ticker / YFinance」+ Name 緊接 · 券商英文縮寫 · 期間 / 日期 YYYY / YYYY-MM / YYYY-MM-DD · 最後一欄 Source(歷史 TWSE/TPEX · 報告預估 · 報告實際 · 報告)|
+| 資料冊 | 不改(`window.VRN2_DATA` = 輸出冊逐字);匯出值照輸出冊 + 最後一欄 SOURCE。輸出冊 / 增量庫本身要不要實體加 SOURCE 欄(會讓增量庫把每列當內容有變再追加一次)→ 待操作員決定 |
+| 券商縮寫表 | 候選(Workbench v0108 內)· 要成正式同義字 → VCGC 核 |
+
+## 12. v0175 輪更新(2026-11-03 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 實體 SOURCE / BROKER_EN | **操作員決定加**(§11 待決)→ ⑬a `VRN2_BookSource_v0100` 寫進七本報告冊最後兩欄(其他值不變 · BROKER 原文不改)· 增量庫 `VRN2_OutputStore_v0103` 列雜湊不算兩欄(不重複追加)· 舊列就地補欄(先備份 · restore-fill)|
+| U/I | `VRN2_Workbench_v0109`:細節欄字型 10.45px · 00「系統摘要」驗證 / 共識矩陣 · 04「待驗收項目」矩陣 · 表頭英文 + 中文兩行 · 說明放底下 · 全形標點 · 左欄步驟 1–6 · 溢出格 0 |
+| 輸入分類 | 01 頁矩陣:個股報告 · 非個股報告 · 新聞與盤勢 · 頁面影像 · 未分類 × PDF / Word / TXT / 影像 / 其他(檔名初判 · 候選)· 本版主體只擷取 PDF |
+| Word / 影像 | 已收下 · **未擷取**(Word 需轉 PDF · 影像需 OCR · 環境交 VCGC)→ 收尾佇列 VRN P1 |
+| MQ-1560 | 操作員 11/03 貼的原文與摘錄四點逐字比:差異只在 OCR 斷字(英文字被空白拆開或黏在一起 · 不改字義)· 內容一致 → 等操作員 `--confirm H-fd2ea35f` |
+| VCGC 收尾(只讀 · 本線不改 VCGC 的冊)| 11/03 容器實跑 VCGC 自己的指令:`token` 6/6 啟用 · `handoff check` **RED**(需求 226 · pending 217 · REQ132–155 等標 REQ_CHANGED)· `test --quick` rc 2(綠 8 · 黃 2:handoff-check · P-entry 沒有 pwsh)· SDD **RED**(尾版沒編號 · 待 `CGC_MDL237 --apply`)· 註冊冊待同步(新 36 · 改 120 · `via-vcgc registry-sync --apply` 要批准) → 這些都是 VCGC 正本的寫入動作,依四系統互不干涉由 VCGC / 操作員批准執行,本線不代做 |
+| VDF 收尾(只讀)| §8 第 3 項(外連動詞經網路工具的執行收據 · 增量庫 · 桌機倉同步)都要 VDF 在桌機實跑產生的收據;容器沒有桌機收據 → 不能代判綠 · 下一步:桌機跑 VDF 自己的入口後貼回收據 |
+| 桌機要做 | 貼 `vrn2_release_v0175/VRN2_HandleAll_v0123.md` 最短一行(repair)|
+
+## 13. v0176 輪更新(2026-11-03 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 四點開頭符號 | ⑬a `VRN2_BookSource_v0101`:Summary 冊四點 / 標題開頭的項目符號 · 標點 · 編號刪掉(內文不改 · 原文核對照樣過)|
+| 主題與摘要 | Combined:`Name(YFinance Ticker, 評等) - 原文標題` · 評價點排第一 · 上漲空間 = TARGET_PRICE(ADJ) ÷ ADJ_CLOSE − 1(每日 ADJ_CLOSE)· 附算法 |
+| 增量庫 | `VRN2_OutputStore_v0104`:格式改了不重複追加 · 舊列就地整理(先備份 · restore-fill)· ADJ_CLOSE 變了照樣追加 |
+| VCGC registry-sync | **操作員授權**(2026-11-03)· `registry-sync --apply`:新 36 · 變更 120 · 退役 1 · AST 錯 0 · 撞號 0 · 再跑 新 0 變更 0 退役 0 |
+| VCGC 編號套用 | **操作員授權** · `run CGC_MDL237_NumberingSystem --apply --scope`:先 5 支(X-NUM · +153 列)再 38 支(+843 列 · MDL +36 · ENG +2)· 四層缺號 VCGC 0 · VDF 0 · VRN 0 · SUP 0 · audit 遺失 0 · 改身分 0 · 重號 0 · SDD X-NUM GREEN |
+| VCGC 仍黃(不在本次授權範圍 · 只記)| 編號冊內不一致 54 列(冊上宣告碼 ≠ 發出號 · 待裁定 · 不改任何一邊)· 命名同號異名 / 版號異形(操作員排序)· 已鎖工作流尾版換了待重驗 14 處 · 需求未全落地 80 條 |
+| 桌機要做 | 貼 `vrn2_release_v0176/VRN2_HandleAll_v0124.md` 最短一行(repair)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|
+
+## 14. v0177 輪更新(2026-11-04 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 桌機 11/03 22:28 整輪 | ⑦ 跑滿 7200 秒被停 · ⑧ 沒寫完成判定 · 收尾 OPEN(VRN-2 2 · 人工 3 · 資料源 2)· 同一晚 repair(v0176)把 ⑬a / ⑬ / Workbench 做完(四點 / 主題與摘要 綠) |
+| 根因 | 來源夾 305 份 = 60 份報告 + 200 份 page_NNNN[_雜湊].pdf 分割頁 → 舊範圍規則收進個股範圍(260)→ 逐份 OCR → 逾時 |
+| 修正 | 管理器 v0260(分割頁不進範圍 · 原檔不動)· Handle-All v0125(上一輪 ⑦ 沒跑完 → 自動整輪 · ⑧ 只因資料面紅照舊 repair)· RoundAll v0133(頁面分割檔列) |
+| 千分位兩位小數 | BookSource v0102(主題與摘要 1,234.50 / 23.45%)· Workbench v0110(顯示)· 資料冊數值欄不加千分位 |
+| U/I | Workbench v0110:頁首第三行 = 「Transform investment reports into structured database intelligence.」(只換字)· 左右同字級 10.45px · 按鍵同高 28px · 卡片自動縮字(不超框)· 左欄 / 交接矩陣 · 檢視副本 · 分頁列不動 · 收尾頁字級小一號 |
+| 加速器 / 網路工具 | VRN-2 現役尾版加速器 100%(VerbatimVerifier v0106 補上 · 它的自測在沒有 pypdfium2 的 Python 上照實「略過」PDF 那段 · 不冒充通過)· VRN-2 向外擷取經 VIA 網路工具 · VDF 的 AllInOne_v039 直接連線 → 交 VDF(只記錄) |
+| VCGC(操作員授權剩餘黃燈)| 做了:registry-sync --apply(新 1 · 變更 128)· 編號 audit 遺失 0 · 改身分 0 · 重號 0 · 四層缺號 0。擋住:X-LOCK 14 處重驗 = 交接加鎖閘 RED(待辦 217 · 發現 357 · 改了沒測 203 檔)+ 本容器 SDD 自測 FAIL 15(多為桌機環境才有的套件 / 資料)。要操作員裁:冊內不一致 54 列(法條缺號 Z263 · 同義字一詞兩主 Z264)· 命名同號異名(L04 排序)· 需求未落地 80 條 |
+| 桌機要做 | 貼 `vrn2_release_v0177/VRN2_HandleAll_v0125.md` 最短一行(這次自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|
