@@ -151,3 +151,16 @@
 | 加速器 / 網路工具 | VRN-2 現役尾版加速器 100%(VerbatimVerifier v0106 補上 · 它的自測在沒有 pypdfium2 的 Python 上照實「略過」PDF 那段 · 不冒充通過)· VRN-2 向外擷取經 VIA 網路工具 · VDF 的 AllInOne_v039 直接連線 → 交 VDF(只記錄) |
 | VCGC(操作員授權剩餘黃燈)| 做了:registry-sync --apply(新 1 · 變更 128)· 編號 audit 遺失 0 · 改身分 0 · 重號 0 · 四層缺號 0。擋住:X-LOCK 14 處重驗 = 交接加鎖閘 RED(待辦 217 · 發現 357 · 改了沒測 203 檔)+ 本容器 SDD 自測 FAIL 15(多為桌機環境才有的套件 / 資料)。要操作員裁:冊內不一致 54 列(法條缺號 Z263 · 同義字一詞兩主 Z264)· 命名同號異名(L04 排序)· 需求未落地 80 條 |
 | 桌機要做 | 貼 `vrn2_release_v0177/VRN2_HandleAll_v0125.md` 最短一行(這次自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)|
+
+## 15. v0178 輪更新(2026-11-04 · 只增)
+
+| 項目 | 狀態 |
+|---|---|
+| 桌機 11/03 23:32 / 23:43 | 啟動器 v0177 兩次都 2-3 秒 rc 1 · 收尾 OPEN(VRN-2 3 · 人工 3 · 資料源 2)· 沿用 v0175 收據 |
+| 根因 | `functional modules\VRN2\VRN2_VerbatimVerifier_v0106.py` 在桌機是**啟動器 ④ 加速器自己注入**的 v0105 副本(v0149 起);v0177 的 runtime 帶了另一支同名 v0106 → 只增不覆寫 → 拒裝。§14 那條「VerbatimVerifier v0106 補上加速器」**作廢**:④ 本來就會補,覆蓋率在桌機一直是 100%(收尾頁「④ 加速器覆蓋 · 未覆蓋 0」)|
+| 改善有沒有遺失 | 沒有(BookSource v0102 千分位 · Workbench v0110 · 四點 / 主題與摘要 綠 都已在桌機)|
+| 修正 | 套件 v0178:VERBATIM 回 v0105 · runtime v0167 不帶 v0106 · 其他新模組跟 v0166 逐位元組相同 · RoundAll v0134 ④ 前同名檢查 · Handle-All v0126(開閘一行)|
+| HTML U/I(視覺鎖定 · 其他優化可加)| Workbench v0111:1000px 以上逐元件與 v0110 相同 · 999px 以下不溢出 · 控制項可讀名稱 · 操作員給的跨裝置規格 4 視窗稽核全過 |
+| VIA Agent OS | v0100 整合進 `supportive modules\agent_os`(自測 15 · 八 Skill 23 / 23)· 桌機一行啟動 · `.via\ssot.json` 不進倉 |
+| 他系統燈(只讀)| VCGC:交接閘 RED · 驗收 RED(待辦 217)· VDF:沒有自報收據(灰)· 自測 RED(DuckDB)· 見 vrn2_release_v0178/VRN2_Verification_v0178.md §3 |
+| 桌機要做 | 貼 `vrn2_release_v0178/VRN2_HandleAll_v0126.md` 開閘一行(自動整輪)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VIA Agent OS 一行(via_agent_os_v0100)|
