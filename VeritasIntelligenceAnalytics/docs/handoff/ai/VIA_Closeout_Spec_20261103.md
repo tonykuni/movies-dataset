@@ -188,4 +188,5 @@
 | VRN-2 / VDF | 照 §16:VRN-2 REVIEW(MQ-1560 人工確認 · 兆豐 4 份分析師缺 · numba 顯示不一致)· VDF 自測綠 · 自報收據待桌機 |
 | SDD / 編號 | VQG 需求代碼依 X-REQ 規則歸 VCGC 中樞 = VCGC-REQ183(子系統欄 VCGC · 題目 VQG)· 編號 VIA-VCGC-REQ183 · audit 遺失 0 · 改身分 0 · 重號 0 · SDD YELLOW(無紅)· v0104 原檔登 frozen_sources |
 | 交接閘(收尾)| 105:REQ_CHANGED 57(黃)· CCWT 42(VRN 舊模組)· ACCEL_BRIDGE_MISSING 3(含 VQG v0104 原檔 · 橋在 v0105)· UNREGISTERED 1 · EVIDENCE_INVALID 1(vrn_logic_index)· STALE 1;numbering / chain / backup 三案重跑 true;`test --quick` 綠 9 黃 1 紅 0 · SSOT 全景無紅 |
+| 桌機四條貼回 → 一支程式 | Graphify 綠 3 黃 1(VCGC 固定估 6 GB 跳過)· VRN-2 confirm H-fd2ea35f 已記 DATA_GAP 結案 · VQG 紅(工作樹 VDF 冊 v0100 → via_01_vdf;分支 v0101 → via_database\vdf_database)· Agent OS selftest rc 2(symlink_to WinError 1314)→ `VIA_SettleAll_v0102.py`(看門狗 · 多家探根 · 自測分類 · VRN 只讀狀態)· 自測 23 / 23 · 一行見 VRN2_Handover_latest §14 |
 | 交接閘 | 本線併入後 171:多的是本線兩支薄尾(SUP_MDL753 v0113 · VRN_SystemManager v0261)讓 6 案相依變了 → 重跑 5 過 1 同前(vrn_logic_index 標記從未印出 · 豁免案)· `manager` 案 = 操作員 10-10 裁定「VRN 暫緩」待選 (a) 改釘尾版標記 / (b) 新尾版重鏈 ≤v0118 自測 —— 不代選 |

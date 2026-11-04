@@ -192,3 +192,13 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 ```
 
 跑完看最後一行 `NEXT:`;不是 GREEN → 把 `Downloads\VIA_Settle_<時間>.zip` 上傳給 AI(VDF 紅字的 AST 定位在裡面)。VRN 收尾 REVIEW 的兩個人工項仍要你看原文後 `--confirm`。
+
+## 14. 一支收尾全部 · VIA_SettleAll_v0102(2026-11-04 · 取代第 13 節 · 多 Graphify / VQG / Agent OS 三段 · VRN 預設只讀狀態)
+
+操作員 2026-11-04 桌機四條貼回(Graphify VCGC 記憶體跳過 · VQG NO_DAILY_PRICES · Agent OS selftest rc 2 · VRN-2 confirm 已記)→ 「integrate into one code to handle above」
+→ `docs/handoff/ai/VIA_SettleAll_v0102.py`;根因、段表與預期在 `docs/handoff/ai/VIA_SettleAll_v0102.md`。一行(從檔案複製):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0102";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0102.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0102.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'AD2036AD24B165BD6D9BA12E23BE78D679B8B5A04BDBB7AD500498095ABE7373'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
