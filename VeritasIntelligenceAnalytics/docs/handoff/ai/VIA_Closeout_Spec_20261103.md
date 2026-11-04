@@ -176,3 +176,14 @@
 | VIA Agent OS | v0100 · 自測 15 / 15 · Skill 23 / 23 |
 | 加速器 / 網路工具 | 都解到鎖冊最新(Celeritas v1141 · Aegis v1652);缺口照列(VRN-2 runtime VerbatimVerifier v0105 · VRN_ENG112 · ⑥e AllInOne_v039 不經網路工具)|
 | 桌機要做 | 開閘一行(vrn2_release_v0179/VRN2_HandleAll_v0127.md)· MQ-1560 `--confirm H-fd2ea35f`(操作員)· VDF 桌機 ActivateVDF(VDF 線)|
+
+## 17. 2026-11-04 五系統 · VQG 入列 · 併 main(另一工作階段的 VDF / VCGC 收尾不重做)
+
+| 項目 | 現況 |
+|---|---|
+| main 併入 | 另一工作階段 2026-11-04:交接閘 357 → 103 · ENG113 / 115 / 116 經網路工具 · 盤點冊 v0182 · 交接案 +4 —— 本線只併不重做;衝突 4 冊(只增 jsonl 取聯集 · 重生 JSON 由 VCGC 重生)· 稽核 遺失 0 · 改身分 0 · 重號 0 |
+| VQG(第五系統)| v0104 原檔 + v0105 薄尾 · 只讀 VDF 資料庫 · 不連網 · 交接案 vqg(收據 rc 0 標記見到)· VCGC-REQ183(子系統欄 VCGC · 題目 VQG)(PARTIAL)· 站 C-vqg · 編號 VIA-VQG-MDL001 / 002 · 桌機一行見 vqg_v0105 |
+| VIA Agent OS | v0102(引擎 1.0.2 hardened · 第 3 行加速器標記 · AST 相同)· 48 / 48 · 27 / 27 · 預檢離線 20 / 20 · 本倉只讀實跑 · 桌機一行見 via_agent_os_v0102 |
+| DeployLedger v0300 | 只測未啟用(47 / 48 · 1 = 容器系統 Python 重複套件 fail-closed)· 原包含桌機路徑不進倉 |
+| VRN-2 / VDF | 照 §16:VRN-2 REVIEW(MQ-1560 人工確認 · 兆豐 4 份分析師缺 · numba 顯示不一致)· VDF 自測綠 · 自報收據待桌機 |
+| 交接閘 | 本線併入後 171:多的是本線兩支薄尾(SUP_MDL753 v0113 · VRN_SystemManager v0261)讓 6 案相依變了 → 重跑 5 過 1 同前(vrn_logic_index 標記從未印出 · 豁免案)· `manager` 案 = 操作員 10-10 裁定「VRN 暫緩」待選 (a) 改釘尾版標記 / (b) 新尾版重鏈 ≤v0118 自測 —— 不代選 |
