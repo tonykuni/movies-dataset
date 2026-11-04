@@ -202,3 +202,11 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0102";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0102.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0102.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'AD2036AD24B165BD6D9BA12E23BE78D679B8B5A04BDBB7AD500498095ABE7373'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
+## 15. VIA_SettleAll_v0103(2026-11-04 · 取代第 14 節:同步會自己 stash 收據類改動 · 分支尾版對照 · VCGC 輸出入報告 · Graphify 實測用量)
+
+桌機 v0102 貼回:VQG 第一次算出來(黃 · 351 日線檔 · 0050.TW)· Agent OS 黃(symlink 權限)· Graphify VCGC 吃 ≥ 3.2 GB 被看門狗殺 · VDF ui / VCGC 紅 = 桌機工作樹停在 main 舊版(38 個已追蹤改動讓 ③ 不合併)。細節 `docs/handoff/ai/VIA_SettleAll_v0103.md`。一行(從檔案複製):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0103";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0103.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0103.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'F673698309AB6FDE77A6DA5A6EEFDA7A2EBF3CA0B4C62F690BDECB36BE0871B2'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
