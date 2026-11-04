@@ -1,0 +1,25 @@
+{
+ "tool": "VIA_Graphify",
+ "version": "v0101",
+ "date": "2026-11-03",
+ "supersedes": "v0100 (folder via_graphify_v0100 kept)",
+ "graphifyy": "0.9.100",
+ "source": "https://github.com/Graphify-Labs/graphify @ 32e5efe (Apache-2.0)",
+ "wheel_sha256": "64c5ed6f2dcc8c28b6a96c87023851c1644c16f55a87f45dbc9127119eb6e769",
+ "mode": "code-only · GRAPHIFY_BACKEND=none · offline · isolated venv · one graph per system · excludes references/ intake/ *quarantine*/ VIA_RetiredEngines/ backup*/ archive*/",
+ "fix": {
+  "desktop_2026_11_03": "v0100 took ...\\Documents\\VeritasIntelligenceAnalytics because the folder exists, but it is not a VIA root (no system folders) → all 4 systems GRAY 'folder missing' and the summary printed '綠 0 黃 0 紅 0' in green",
+  "v0101": "a candidate root must contain at least one system folder (functional modules\\VRN2 / VRN / VDF · supportive modules\\registry); candidates tried in order VIA_GRAPHIFY_DIR → Documents\\VeritasIntelligenceAnalytics → Documents\\movies-dataset\\VeritasIntelligenceAnalytics, skipped ones printed with the reason and kept in the receipt (root_skipped) · summary lamp RED if any RED, YELLOW when no graph was produced, else GREEN"
+ },
+ "line_sha256": "49002982269b4567f4de9855fe77b0dcefad91de485ac61a1458669403089a10",
+ "boot_line_sha256": "845a4d6cf1f0b308005ed24122c48a92d59375bd9b0d0006892cab2aca81c552",
+ "tests": {
+  "pwsh_parse": "5 files · 0 errors · line == readable · boot == readable",
+  "root_A": "given folder not a VIA root and no fallback → RED 找不到 VIA 根 with each reason",
+  "root_B": "given folder not a root → falls back to the movies-dataset copy → GREEN 1 graph (3 nodes / 3 edges)",
+  "root_C": "only a missing system requested → GRAY 1 → summary [YELLOW] 一張圖都沒出",
+  "root_D_desktop_case": "Documents\\VeritasIntelligenceAnalytics exists without system folders → skipped with the reason → movies-dataset copy → GREEN",
+  "boot_chain_e2e": "tiny line → boot SHA OK → main SHA OK → graph built · tampered boot file → '[RED] boot SHA-256 mismatch - not run'"
+ },
+ "not_installed_via_installgate": "unchanged from v0100: InstallGate only does pip --user into the main Python (C:\\Python313 = VRN/VDF fetch Python) → isolated venv, main Python package list compared before/after"
+}

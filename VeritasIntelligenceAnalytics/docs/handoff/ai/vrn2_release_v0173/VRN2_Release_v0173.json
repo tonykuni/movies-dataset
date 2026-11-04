@@ -1,0 +1,67 @@
+{
+ "system": "VRN-2",
+ "independent": true,
+ "release": "VRN2_RoundAll_v0129 + VRN2_HandleAll_v0121 (package v0172 unchanged)",
+ "date": "2026-11-03",
+ "trigger": "桌機 2026-11-03 05:54 / 07:59 Handle-All v0120 主控台貼回(VRN P0 三項上桌 · 收尾 REVIEW · VRN-2 0)· 授權「自動解決 · 完成既有範圍不可擴張」",
+ "desktop_0554": {
+  "result": "repair 55 s: step 13b installed HistoryAlign v0103 → Parquet written · Combined rebuilt by ConsensusJoin v0107 (52 rows · FactSet median 49 · Yahoo 48) · store: 42 Combined rows whose content changed (now carrying UPSIDE_ADJ) appended, old rows kept (OutputStore v0101 rule) · Workbench v0107 over the desktop's v0104 · closeout REVIEW: VRN-2 0 · VCGC 0 · 人工 1 · 資料源 3",
+  "rerun_0759": "Combined no longer planned · store appended 0 (idempotent) · but step 13b + store + Workbench re-ran again"
+ },
+ "fix": {
+  "RoundAll_v0129": "step 13b is re-run only when its inputs changed (market refetch/refill planned · no HistoryAlign receipt · market json newer · FinancialData newer) or the Parquet was not written; a GRAY '無歷史' receipt with unchanged inputs no longer triggers it · the plan text names the actual reason · selftest 99"
+ },
+ "package": {
+  "name": "VRN2_Closeout_v0172.zip",
+  "sha256": "bd952da149bdf127fb84301f483794f9288ca9c79b5fb5e52a652052ccf2de35",
+  "release_folder": "vrn2_release_v0172",
+  "changed": false
+ },
+ "roundall_previous": [
+  {
+   "name": "VRN2_RoundAll_v0128.py",
+   "sha256": "e1c9178f608c1ff419226fd6be7575ef2586d7bea1f7c5573a658460c9cbe7e8",
+   "status": "superseded 2026-11-03; file kept in vrn2_release_v0172"
+  }
+ ],
+ "roundall": {
+  "name": "VRN2_RoundAll_v0129.py",
+  "sha256": "4ea7b177e321ed7309fdeb290fac6cd3a16d71f94697aa6ea009e8c5751c249a",
+  "pinned_package_sha256": "bd952da149bdf127fb84301f483794f9288ca9c79b5fb5e52a652052ccf2de35",
+  "guide": "VRN2_RoundAll_v0129.md"
+ },
+ "handleall": {
+  "name": "VRN2_HandleAll_v0121.md",
+  "line_sha256": "31c34f966e22e726c919bb19d7998deb0e6b8d7c064282b9ddce9e6b53050c34",
+  "line_chars": 14530,
+  "boot_file": "VRN2_HandleAll_v0121_boot.txt",
+  "boot_line_sha256": "b5da0085f113ec042ccf2e5c375293d853f4fb433bffa4fdad47b86703500b66",
+  "boot_line_chars": 1719,
+  "tiny_line_chars": 443,
+  "cmd_line_chars": 1240
+ },
+ "version_check": "RoundAll v0129 · HandleAll v0121 · release v0173 checked free on this branch and origin/main",
+ "results": {
+  "roundall_v0129_selftest": [
+   "[PASS] VRN2_RoundAll v0129 --selftest · 99 項 · 不過 0"
+  ],
+  "pwsh_parse": "pwsh 剖析錯 [0, 0, 0, 0, 0] · Handle-All 一行 = 可讀版 True · 開機行 = 可讀版 True",
+  "e2e_rc": [
+   "steady rc 0",
+   "fin rc 0",
+   "steady2 rc 0",
+   "tamper rc 0"
+  ],
+  "e2e_plans": {
+   "steady": "Combined 比市場 / 共識舊(或不在)→ 重組 · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+   "fin": "年度數據比歷史對齊新 → 重跑 ⑬b · TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)",
+   "steady2": "TARGET_PRICE(ADJ) 同步還原 + 共識照 TWSE / TPEX 格式合併(ConsensusJoin v0105)→ 重組 Combined · ⑬ 增量庫補寫(本輪有修正) · Workbench 重渲染(最新收據)"
+  },
+  "e2e_note": "sandbox steady state = receipt history GRAY with HistoryAlign newer than market / FinancialData → step 13b not planned (v0128 planned it every time) · FinancialData touched → '年度數據比歷史對齊新 → 重跑 ⑬b' · again steady → not planned · the remaining Combined rebuild in the sandbox is sandbox-only (its fetch env lacks requests → no TP-sync evidence; the desktop 07:59 run had no such trigger)",
+  "desktop_0554_0759": {
+   "result": "repair 55 s: step 13b installed HistoryAlign v0103 → Parquet written · Combined rebuilt by ConsensusJoin v0107 (52 rows · FactSet median 49 · Yahoo 48) · store: 42 Combined rows whose content changed (now carrying UPSIDE_ADJ) appended, old rows kept (OutputStore v0101 rule) · Workbench v0107 over the desktop's v0104 · closeout REVIEW: VRN-2 0 · VCGC 0 · 人工 1 · 資料源 3",
+   "rerun_0759": "Combined no longer planned · store appended 0 (idempotent) · but step 13b + store + Workbench re-ran again"
+  },
+  "not_run": "the desktop itself with v0121 (expected: repair plan empty → '沒有要修的' in seconds) · the operator's own --confirm (H-fd2ea35f)"
+ }
+}

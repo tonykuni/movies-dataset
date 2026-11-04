@@ -3,16 +3,23 @@
 # [VIA:ACCEL-BRIDGE:v0111]
 """VRN2_RoundAll v0125 — 一支 Python 跑完 VRN-2 一輪:取套件 → 環境診斷 → 全部自測 → 跑啟動器 → 自動修 → 除錯報告 → 收尾頁(HTML U/I)→ 貼回包。
 
-v0125(操作員 2026-11-01:「U/I 上的子系統名稱還原為 VeritasReportNova · 成為 VRN 唯一系統 · 印章 logo 透明去背無框無特效 · 以紅字大小為依據做 header 大小 logo 最佳化」):
-  · 套件 v0169(啟動器 v0169 · runtime v0160 = v0159 全部成員不動 + VRN2_Workbench_v0104 + 內建印章 VRN2_Logo_Seal_v0100.png)· 輸出冊不變。
-  · ⑤ Workbench 鏈多兩檔(v0104 + 印章)· 收尾頁沒有 v0104 標記 → 重渲染(repair 幾分鐘)。③ 自測改跑 Workbench v0104。自測 91 項(v0124 的 90 項 + 89)。
+v0125(桌機 2026-11-02 12:31 · Handle-All v0116 整輪 3117 秒 · 管理器 v0259):資料面全完成 —— 6143 補回 40 值(年度 11905 · 剔除 2508 ·
+  缺項 0 · 冪等 GREEN · ⑪ 錯值 0 · TRANSALIGNED 230)。收尾 OPEN「VRN-2 1 項」是標籤錯:
+  · 這輪操作員在 PowerShell 視窗貼了 cmd 寫法的 set,VIA_SCRAPE_CONSENT 沒設成 → ⑥f 共識被 VIA 網路工具 DENY(同意閘未開 · 引擎不代設 · 不換道)
+    → Combined 共識欄留空。收尾頁的「⑥f VIA 網路工具 DENY」那一列在負責方規則沒有分支 → 落到預設 VRN-2;合併(⑥f 共識同根)時 VRN-2 最重 →
+    整個共識項被標成 VRN-2。同意閘是操作員的決定,從來不是 VRN-2 要修的程式。
+  · v0125:⑥f 列 detail 帶「同意閘未開」→ 人工(附 PowerShell 與 cmd 兩種設法 · 開了再跑 auto = repair 會重抓共識補回 Combined)·
+    帶「合規 DENY」→ VCGC。負責方其他規則不變 · 套件照舊 v0168(雜湊照釘)。
+  · 自測 91 項(v0124 的 90 項 + 89)。共用 MarketFetch 與 VDF 引擎照舊只讀不改。
 
-v0124(操作員 2026-11-01 上傳 taiwan_stock_data_matrix.html:「右面板第一頁放系統現況 SUMMARY · 含 DATAFRAME HEADERS · 原有功能設定不改 · 視覺鎖定更新」):
-  · 套件 v0168(啟動器 v0168 · runtime v0159 = v0158 全部成員不動 + VRN2_Workbench_v0103「00 系統現況」)· 輸出冊不變(管理器 v0258)。
-  · ⑤ 自動修:Workbench 重渲染前先把套件 runtime 的 Workbench 鏈(v0100 ~ v0103 + 字型資產包)只增不覆寫地補放進 functional modules\\VRN2
-    (核對清單雜湊 · 同名不同內容不覆寫)· 收尾頁 VRN2_Workbench_latest.html 沒有 v0103 標記 → 計畫加「Workbench 重渲染」(repair 幾分鐘 · 不整輪)。
-  · ③ 自測改跑 Workbench v0103(它先渲染 v0102 再比對:拿掉 v0103 的部分 = v0102 頁面逐字相同)。
-  · 取件分支 claude/vrn2-closeout-authorization-y4ixl7(退路 main)。自測 90 項(v0123 的 89 項 + 88)。
+v0124(操作員 2026-11-02 上傳華南投顧-6143 原文 · 桌機 10:30 v0123 repair 收尾 REVIEW · VRN-2 0 · 缺項只剩 6143):
+  · 6143 第 1 頁「年度EPS預估」年份在列(2022 ~ 2026(F))· 8 個科目在欄 = 40 值;v0236 轉置表第三讀法(pdfplumber)整張剔除「每個年份一行對不上」——
+    2026(F) 那列「3.0」上面疊了一個別的字型的空白字(Word 留下的),pdfplumber 把它切成「3」「.0」(兩個字其實相連)。
+  · 套件 v0168(啟動器 v0168 · runtime v0159 = v0158 的 197 個成員不動 + 管理器 VRN_SystemManager_v0259):只對「轉置表第三讀法對不上」那些剔除列,
+    把第三讀法同一行裡相連(間距 ≤ 0.5pt)的數字碎片接回(小數點 / 千分位 · 接起來要是數字)再問同一個閘;過了整張表回主冊 · 還是不過照留剔除冊。
+    原文實測 40 / 40 值回主冊 · 獨立驗證 TRANSALIGNED 40。
+  · ③ 自測改跑管理器 v0259(它再跑 v0258 / v0257 / v0255 的自測)。給 Handle-All v0116 用(auto:上一輪收據不是啟動器 v0168 做的 → 整輪)。
+  · 自測 90 項(v0123 的 89 項 + 88)。共用 MarketFetch 與 VDF 引擎照舊只讀不改。
 
 v0123(桌機 2026-11-01 09:19 · Handle-All v0114 整輪 5434 秒 · 管理器 v0258 · 收尾 OPEN「VRN-2 1 項」· 操作員「繼續下一步,依照你的建議進行」):
   · 那一項是 ⑥e 市場擷取「擷取 YELLOW · 跑 10 次 · 失敗 0」(VDF rc 2 PARTIAL · v0120 起算資料源)。啟動器收據那一列 300 字內有「失敗 0」,
@@ -288,17 +295,17 @@ from pathlib import Path
 # ===== 1. 參數 =====
 VERSION = "v0125"
 NAME = "VRN2_RoundAll"
-PACKAGE = "VRN2_Closeout_v0169"
-PACKAGE_SHA256 = "e71ba31e628fb96000b7922793fd17054a7eb703d6b4fa9d65ed146e4fb8edaa"                                   # 建置時填入 VRN2_Closeout_v0169.zip 的 SHA-256
-RELEASE_REL = "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0169"
-RELEASE_JSON = "VRN2_Release_v0169.json"
-BRANCH = "claude/vrn2-closeout-authorization-y4ixl7"   # v0124 這個對話推得到的分支(退路 main)
-LAUNCHER = "ActivateVRN-2_v0169.py"
-RUNTIME_ZIP = "VRN2_Runtime_v0160.zip"
-RUNTIME_MANIFEST = "VRN2_Runtime_v0160.json"
-RECEIPT = "VRN2_Closeout_v0169.json"
-SELFTESTS = (("VRN2_Workbench_v0104.py", 600), ("VRN2_HistoryAlign_v0100.py", 300), ("VRN2_HistoryAlign_v0102.py", 300), ("VRN2_DataIntegrate_v0100.py", 300), ("VRN2_DataIntegrate_v0101.py", 300),
-             ("VRN2_UIAction_v0110.py", 300), ("VRN2_SSOTSync_v0102.py", 300), ("VRN2_OutputStore_v0102.py", 300), ("VRN2_ConsensusJoin_v0105.py", 900), ("VRN_SystemManager_v0258.py", 1800),
+PACKAGE = "VRN2_Closeout_v0168"
+PACKAGE_SHA256 = "931b6a9ac38cd561c06dc17c9226f342e4d64d1593bacbcab784c4ddd4525730"                                   # 建置時填入 VRN2_Closeout_v0168.zip 的 SHA-256
+RELEASE_REL = "VeritasIntelligenceAnalytics/docs/handoff/ai/vrn2_release_v0168"
+RELEASE_JSON = "VRN2_Release_v0168.json"
+BRANCH = "claude/optimistic-goodall-yhalc5"
+LAUNCHER = "ActivateVRN-2_v0168.py"
+RUNTIME_ZIP = "VRN2_Runtime_v0159.zip"
+RUNTIME_MANIFEST = "VRN2_Runtime_v0159.json"
+RECEIPT = "VRN2_Closeout_v0168.json"
+SELFTESTS = (("VRN2_Workbench_v0102.py", 600), ("VRN2_HistoryAlign_v0100.py", 300), ("VRN2_HistoryAlign_v0102.py", 300), ("VRN2_DataIntegrate_v0100.py", 300), ("VRN2_DataIntegrate_v0101.py", 300),
+             ("VRN2_UIAction_v0110.py", 300), ("VRN2_SSOTSync_v0102.py", 300), ("VRN2_OutputStore_v0102.py", 300), ("VRN2_ConsensusJoin_v0105.py", 900), ("VRN_SystemManager_v0259.py", 1800),
              ("VRN2_VerbatimVerifier_v0105.py", 300), ("VRN2_MarketFetchRun_v0100.py", 600))
 MARKET_RUNNER = "VRN2_MarketFetchRun_v0100.py"                       # v0102:⑥e 擷取 Python 照 VDF 引擎自己的版本界線挑(runtime 裡 · 只用標準庫)
 VDF_BOUNDS = ("pandas>=2.2,<3", "pyarrow>=17,<27", "duckdb>=1.1,<3", "yfinance>=0.2.54,<2", "lxml>=5,<7", "tzdata>=2024.1")   # VDF_TW_AllInOne_v039 · 實際以引擎檔為準
@@ -310,7 +317,7 @@ FETCH_REQUIRED = ("yfinance", "lxml", "pandas", "pyarrow", "duckdb")
 COMBINED_HEAD = ["REPORT_DATE", "FILENAME", "TICKER", "YFINANCE_TICKER", "BLOOMBERG_TICKER", "NAME", "BROKER", "ANALYST", "RATING", "TARGET_PRICE", "TARGET_PRICE(ADJ)", "FACTSET_TARGET_PRICE_MEDIAN", "YFINANCE_TARGET_PRICE_MEDIAN"]
 COMBINED_TAIL = ["CURRENT_PRICE_REPORT", "UPSIDE_PCT(ADJ)", "ADJ_CLOSE", "ADJ_CLOSE_BEFORE_REPORT", "TOPIC & SUMMARY", "STATUS"]
 WORKBENCH_MARKS = (('id="first"', "右欄第一區(去重矩陣 + 引擎狀態)"), ('id="outfolder"', "左欄輸出檔案夾"), ("Report Date / 報告日期", "雙語表頭"), ("function fitStats", "自動縮放"), ("function unitOf", "百萬台幣換算"))
-PASTE_FILES = ("VRN2_Closeout_v0169.json", "VRN2_Closeout_v0169.before_roundall.json", "VRN2_Closeout_v0168.json", "VRN2_Closeout_v0168.before_roundall.json", "VRN2_Closeout_v0166.json", "VRN2_Closeout_v0166.before_roundall.json", "VRN2_RoundAll_latest.json", "VRN2_Phase_Timing_latest.json", "VRN2_OutputStore_latest.json", "VRN2_Output_Config.json",
+PASTE_FILES = ("VRN2_Closeout_v0168.json", "VRN2_Closeout_v0168.before_roundall.json", "VRN2_RoundAll_latest.json", "VRN2_Phase_Timing_latest.json", "VRN2_OutputStore_latest.json", "VRN2_Output_Config.json",
                "IDEMPOTENCE_latest.json", "VRN2_VerbatimVerify_latest.json", "VRN2_Completion_latest.json", "VRN2_Activate_latest.json", "VRN2_Input_latest.json", "VRN2_HistoryAlign_latest.json",
                "VRN2_Integrate_latest.json", "VRN2_Acceptance_latest.json", "market/VRN2_Market_latest.json", "consensus/VRN2_Consensus_latest.json", "VRN2_Workbench_latest.html",
                "VRN2_VCGCInstall_latest.json", "VRN2_Env_latest.json", "output/VRN2_Combined_latest.csv", "output/VRN2_BasicInfo_latest.csv", "output/VRN2_Summary_latest.csv", "output/VRN2_FinancialData_latest.csv", "output/VRN2_Rejected_latest.csv",
@@ -787,7 +794,7 @@ def e_partial_reason(ctx: dict) -> str:
     if sync.get("counts"):
         parts.append("TARGET_PRICE(ADJ) 同步還原 %s(ConsensusJoin v0105)" % json.dumps(sync["counts"], ensure_ascii=False))
     if len(parts) == 1:
-        parts.append("沒有同步還原證據(market\\VRN2_TPAdjSync_latest.json)· 套件 v0166 的 ⑥f 會寫")
+        parts.append("沒有同步還原證據(market\\VRN2_TPAdjSync_latest.json)· 套件 v0168 的 ⑥f 會寫")
     return " · ".join(parts)
 
 
@@ -805,19 +812,6 @@ def keep_facts(detail, n: int = 220) -> str:
         if m.start() + len(fact) > n and fact not in cut and fact not in lost:
             lost.append(fact)
     return ("要點 %s | %s" % (" · ".join(lost[:6]), cut)) if lost else cut
-
-
-WORKBENCH_CHAIN = ("VRN2_Workbench_Assets_v0100.zip", "VRN2_Logo_Seal_v0100.png", "VRN2_Workbench_v0100.py", "VRN2_Workbench_v0101.py", "VRN2_Workbench_v0102.py", "VRN2_Workbench_v0103.py", "VRN2_Workbench_v0104.py")
-WORKBENCH_TAG = "<!-- VRN2_Workbench v0104 over v0103 -->"
-
-
-def _head_text(path, n: int = 65536) -> str:
-    """v0124 收尾頁前 n 字(Workbench 版本標記在 <title> 後面)。讀不到 → 空字串(= 要重渲染)。"""
-    try:
-        with open(path, "r", encoding="utf-8", errors="replace") as handle:
-            return handle.read(n)
-    except OSError:
-        return ""
 
 
 def market_fetch_sec() -> int:
@@ -1215,7 +1209,7 @@ def step_preflight(root: Path, pkg, vpy: str, vpy_how: str, args) -> dict:
     miss = [m for m in VRN2_REQUIRED if not got.get(m)]
     opt = [m for m in VRN2_OPTIONAL if not got.get(m)]
     say("YELLOW" if miss else "GREEN", "② VRN-2 套件", "必裝 %s%s · 選裝缺 %s" % ("全在" if not miss else "缺 " + ", ".join(miss), "" if miss else "", ", ".join(opt) or "無"),
-        "啟動器 v0166 ③ 只檢查 · 缺的經 VCGC 安裝閘(CGC_MDL056_InstallGate)裝 · 仍缺 → 交 VCGC:via-install %s(VRN-2 不 pip)" % " ".join(miss) if miss else "")
+        "啟動器 v0168 ③ 只檢查 · 缺的經 VCGC 安裝閘(CGC_MDL056_InstallGate)裝 · 仍缺 → 交 VCGC:via-install %s(VRN-2 不 pip)" % " ".join(miss) if miss else "")
     fpy, report = find_fetch_python()
     state["fetch_python"] = fpy
     if SKIPPED_ENVS:
@@ -1385,11 +1379,11 @@ def step_run(pkg: Path, root: Path, vpy: str, state: dict, args) -> int:
         except OSError as error:
             info("④ last_error.txt 移不開(%s)· 照跑" % type(error).__name__)
     try:
-        moved = quarantine_mops_financial(Path(root) / "VIA_Reports" / "vrn2")   # v0119 不用 MOPS(啟動器 v0166 也會做 · 先做不衝突)
+        moved = quarantine_mops_financial(Path(root) / "VIA_Reports" / "vrn2")   # v0119 不用 MOPS(啟動器 v0168 也會做 · 先做不衝突)
         if moved:
             say("GREEN", "④ 不用 MOPS", "已落盤的 MOPS 財報移到 market\\vdf\\%s(不刪 · ⑬b 不再用它)" % moved)
     except OSError as error:
-        say("YELLOW", "④ 不用 MOPS", "MOPS 財報移不開(%s)· 啟動器 v0166 會再移一次" % type(error).__name__)
+        say("YELLOW", "④ 不用 MOPS", "MOPS 財報移不開(%s)· 啟動器 v0168 會再移一次" % type(error).__name__)
     cmd = [vpy, "-X", "utf8", str(Path(pkg) / LAUNCHER)]
     src = args.source or os.environ.get("VRN2_SOURCE") or ""
     if src:
@@ -1493,7 +1487,7 @@ def plan_fixes(root: Path, receipt: dict, fetch_py, args, market_tool: str = "")
     if lock.is_file() and not pid_alive(int((jread(lock, {}) or {}).get("pid") or 0)):
         plan.append(("lock", "過期鎖(PID 已不在)→ 清掉"))
     wb = v2 / "VRN2_Workbench_latest.html"
-    if plan or not wb.is_file() or WORKBENCH_TAG not in _head_text(wb):   # v0124 收尾頁還是 v0103 以前渲染的 → 重渲染
+    if plan or not wb.is_file():
         plan.append(("workbench", "Workbench 重渲染(最新收據)"))
     return plan
 
@@ -1681,16 +1675,12 @@ def step_fix(root: Path, vpy: str, state: dict, args) -> list:
             except OSError as error:
                 lamp, detail = "YELLOW", "清不掉(%s)" % type(error).__name__
         elif key == "workbench":
-            placed = [install_runtime_member(state.get("pkg"), root, n) for n in WORKBENCH_CHAIN] if state.get("pkg") else []   # v0124 Workbench 鏈只增補放
-            refused = [why for dest, why in placed if dest is None]
             wb = _latest_in(rt, "VRN2_Workbench_v[0-9][0-9][0-9][0-9].py")
             if step_updates:
                 _patch_receipt(rpath, receipt, step_updates)
             if wb:
                 rc, lines = run_stream([vpy, "-X", "utf8", str(wb), "render", "--root", str(root)], cwd=rt, env=env, timeout=600, prefix="    [U/I] ")
                 lamp, detail = _cli_lamp(lines)
-                if refused:
-                    lamp, detail = ("YELLOW" if lamp == "GREEN" else lamp), detail + " · Workbench 鏈沒補放:" + "; ".join(refused)[:160]
             else:
                 lamp, detail = "YELLOW", "私有 runtime 沒有 VRN2_Workbench_v*.py"
         done.append(say(lamp, "⑤ 修 · " + desc.split(" → ")[0][:60], detail))
@@ -1700,7 +1690,7 @@ def step_fix(root: Path, vpy: str, state: dict, args) -> list:
 
 
 def receipt_path(v2) -> Path:
-    """v0108:這版啟動器的收據;還沒有(這輪只重跑 ⑪b / 只重做報告,啟動器 v0166 還沒跑過)→ 最新的前版收據 VRN2_Closeout_v0NNN.json(不含 .before_roundall)。"""
+    """v0108:這版啟動器的收據;還沒有(這輪只重跑 ⑪b / 只重做報告,啟動器 v0168 還沒跑過)→ 最新的前版收據 VRN2_Closeout_v0NNN.json(不含 .before_roundall)。"""
     p = Path(v2) / RECEIPT
     if p.is_file() or not Path(v2).is_dir():
         return p
@@ -1811,7 +1801,7 @@ def step_verify(root, pkg, vpy) -> dict:
 
 
 # ===== 9. ⑥ 除錯報告 =====
-ADVICE = (("③", "缺必裝套件 / 加速器:看 ③ 那行列的缺項;啟動器 v0166 只檢查,缺的經 VCGC 安裝閘裝,仍缺 → 交 VCGC:via-install(VRN-2 不 pip)"),
+ADVICE = (("③", "缺必裝套件 / 加速器:看 ③ 那行列的缺項;啟動器 v0168 只檢查,缺的經 VCGC 安裝閘裝,仍缺 → 交 VCGC:via-install(VRN-2 不 pip)"),
           ("⑥c", "vrn2:// 協定沒註冊:非 Windows 或權限 → 桌機重跑一次;仍灰看 ⑤b 那行"),
           ("⑥e", "市場擷取:共用夾沒有 MarketFetch → git pull;缺套件 → 建 via_tw_fetch 環境(VCGC);網路 → 看 VIA_Reports\\vrn2\\market\\vdf\\last_error.txt"),
           ("⑥f", "共識:缺 yfinance → via_tw_fetch 環境;gate FAIL_CLOSED → 看 VIA_Reports\\vrn2\\consensus 的 quality_matrix.csv"),
@@ -2117,7 +2107,7 @@ def diagnose(root: Path, vpy=None) -> dict:
         f("YELLOW", "⑥f 共識閘 FAIL 列", "%d 列 · 代號 %s · %s" % (len(qf), ",".join(codes[:12]), " | ".join("%s %s 實際 %s 應為 %s(%s)" % (r.get("code"), r.get("check_id"), r.get("actual"), r.get("expected"), str(r.get("note", ""))[:60]) for r in qf[:6]))[:700],
           "共識引擎(原樣內附)品質閘不過就 FAIL_CLOSED;FactSet 沒有覆蓋的代號(未評等 / 新上市)= 真的沒有,其餘看 quality_matrix.csv")
     vinst = jread(v2 / "VRN2_VCGCInstall_latest.json", {}) or {}
-    if vinst:                                                                 # v0113 啟動器 v0166 ③:VCGC 安裝閘沒裝起來的套件(24 小時內不重試)
+    if vinst:                                                                 # v0113 啟動器 v0168 ③:VCGC 安裝閘沒裝起來的套件(24 小時內不重試)
         must = sorted(k for k, v in vinst.items() if (v or {}).get("kind") == "必裝")
         rest = sorted(k for k in vinst if k not in must)
         def _why(k):
@@ -2150,7 +2140,7 @@ def diagnose(root: Path, vpy=None) -> dict:
         num = re.search(r"_v(\d{4})$", ver)
         new_enough = bool(num) and int(num.group(1)) >= 114                # v0108:v0114 起年度 FAIL 依欄位對齊(v0113 起 BADITEM 先用第二種讀法)
         f("GREEN" if new_enough else "YELLOW", "⑪ 驗證器版本", "%s · %s" % (ver, reps[-1].name),
-          "" if new_enough else "還是舊驗證器(v0114 以前:年度 FAIL / BADITEM 只用字元框讀法)→ 套件 v0166 的 runtime 沒還原進 functional modules\\VRN2?看 ④ 的 runtime 那行")
+          "" if new_enough else "還是舊驗證器(v0114 以前:年度 FAIL / BADITEM 只用字元框讀法)→ 套件 v0168 的 runtime 沒還原進 functional modules\\VRN2?看 ④ 的 runtime 那行")
     for ev in fail_evidence(root, vpy):
         err = next((r["error"] for r in ev["lines"] if r.get("error")), "")
         per = []                                                          # v0103 逐值:每個冊值各列數字相等的行(跳過 Email / 電話)
@@ -2374,6 +2364,11 @@ def owner_of(row: dict, ctx: dict):
         return (own or "資料源"), "空格原因:%s" % json.dumps(ctx.get("combined_gaps") or {}, ensure_ascii=False)[:200]
     if step.startswith("⑤ 修") and re.search(r"擷取環境缺|缺 yfinance|缺 requests", detail):   # v0122 ⑤ 自動修的列寫「擷取環境缺 … 交 VCGC」(重組 Combined 時共識欄留空)
         return "VCGC", "⑤ 自動修照跑 · 共識欄留空是擷取環境缺套件(requests / yfinance)→ VCGC 建 via_tw_fetch(VRN-2 不 pip)"
+    if "⑥f" in step and "同意閘未開" in detail:                             # v0125 ⑥f 的 DENY 說明列沒有對到共識字樣 → 以前落到預設 VRN-2(桌機 12:31 整輪 · 合併後整項被標 VRN-2)
+        return "人工", ("同意閘是操作員的環境變數 · PowerShell 視窗貼 $env:VIA_NET_CONSENT = 'YES'; $env:VIA_SCRAPE_CONSENT = 'YES'"
+                        "(cmd 視窗:set VIA_NET_CONSENT=YES 與 set VIA_SCRAPE_CONSENT=YES)· 開了再跑一次(auto = repair)會重抓共識補回 Combined 共識欄 · VRN-2 不代設 · 不換道直連")
+    if "⑥f" in step and "合規 DENY" in detail:
+        return "VCGC", "VIA 網路工具合規 DENY → 放不放行是 VCGC 的決定 · 不繞道"
     if "⑥f" in step:
         if "Yahoo 代號" in step:
             return "資料源", "Yahoo 沒有這些代號"
@@ -2415,7 +2410,7 @@ def owner_of(row: dict, ctx: dict):
             return "VRN-2", "摘要器的摘錄跟原文不一樣(一字不差才算)"
         return "人工", "影像頁(OCR)摘錄要對原圖"
     if step.startswith("⑥ 輸出缺項") or step.startswith("⑥ 完成判定 · 輸出冊"):
-        return "人工", "先把那幾份原 PDF 上傳給 AI 對:原文有年度表 = 擷取漏(要修 · 欣銓 3264 / Daiwa-6278 就是 · 管理器 v0258 已補);原文真的沒有年度表才算缺"
+        return "人工", "先把那幾份原 PDF 上傳給 AI 對:原文有年度表 = 擷取漏(要修 · 欣銓 3264 / Daiwa-6278 就是 · 管理器 v0258 已補 · 華南 6143 管理器 v0259 已補);原文真的沒有年度表才算缺"
     if "⑪" in step:
         dk = re.search(r"'DUPKEY': (\d+)", detail)
         if dk and int(dk.group(1)) > 0 and "FAIL 證據" not in step:                # v0109:驗證器自己寫「錯值 / 分不出」→ 輸出冊的事
@@ -3104,7 +3099,7 @@ def selftest() -> int:
             names = set(z.namelist())
             last = z.read("digest_last300.txt").decode("utf-8").splitlines()
         chk("⑧ 貼回包:Downloads 下 · 逐字稿 + 最後 300 行 + 收尾收據 + 備份 + Combined / Workbench", zpath.parent == Path(os.environ["VRN2_DOWNLOADS"]) and "transcript.txt" in names and len(last) == 300 and last[0] == "line 100"
-            and "vrn2/" + RECEIPT in names and "vrn2/" + Path(RECEIPT).stem + ".before_roundall.json" in names and "vrn2/VRN2_Workbench_latest.html" in names)
+            and "vrn2/" + RECEIPT in names and "vrn2/VRN2_Closeout_v0168.before_roundall.json" in names and "vrn2/VRN2_Workbench_latest.html" in names)
         # ⑨ 子行程串流 + 逾時 + 心跳
         rc, lines = run_stream([sys.executable, "-c", "import time;print('a');print('b')"], quiet=True)
         rc2, lines2 = run_stream([sys.executable, "-c", "import time;time.sleep(30)"], timeout=6, quiet=True, heartbeat=1)
@@ -3223,7 +3218,7 @@ def selftest() -> int:
         chk("㉒ 除錯:⑥e last_error 是 VIA 網路工具 DENY(MOPS)→ 說明「不繞道 · 交 VCGC 決定」· ⑬b 無歷史的原因", "VCGC" in a4.get("⑥e MOPS 財報被拒(VIA 網路工具 DENY)", {}).get("next", "") and "MOPS" in a4.get("⑥e MOPS 財報被拒(VIA 網路工具 DENY)", {}).get("finding", ""))
         # ㉓ ~ ㉗ v0104 收尾頁
         ctx0 = {"receipt": True, "mops_deny": True, "fetch_env_ok": True, "no_cov": {"6933", "4171"}, "gate_other": set(), "combined_gaps": {"TARGET_PRICE(ADJ)": {"原文沒有目標價": 15}}, "combined_owner": None}
-        rows = [("YELLOW", "⑥ 收尾收據", "ActivateVRN-2 v0166 · rc 2 · 3654 秒", "彙總"), ("YELLOW", "⑥ ⑥e MOPS 財報被拒(VIA 網路工具 DENY)", "VDF 引擎打 MOPS", "VCGC"),
+        rows = [("YELLOW", "⑥ 收尾收據", "ActivateVRN-2 v0168 · rc 2 · 3654 秒", "彙總"), ("YELLOW", "⑥ ⑥e MOPS 財報被拒(VIA 網路工具 DENY)", "VDF 引擎打 MOPS", "VCGC"),
                 ("YELLOW", "⑥ 步驟 ⑥e 市場擷取(TWSE / TPEX / Yahoo · 借共用 Market", "擷取 RED:失敗 4 · rc2", "VCGC"), ("YELLOW", "⑥ 四點原文核對", "REVIEW_OCR · {\"PASS\": 204, \"OCR_PENDING\": 4}", "人工"),
                 ("RED", "⑥ 四點原文核對", "FAIL · 3014TT 第 3 點", "VRN-2"), ("YELLOW", "⑥ ⑥f 共識閘 FAIL 列", "2 列 · 代號 4171,6933 · 404", "資料源"), ("YELLOW", "⑥ 完成判定 · ① 結果計算驗證", "黃 1(提醒 · 不擋完成)", "提醒"),
                 ("YELLOW", "⑥ ⑪ 基本資料 FAIL 證據", "MS-8358 20260916.pdf · CURRENT_PRICE_REPORT FAIL", "人工"), ("RED", "⑥ 步驟 ⑪ 獨立驗證(背景 · 只讀)", "逾時 3600 秒", "VRN-2"),
@@ -3398,7 +3393,7 @@ def selftest() -> int:
             chk("㊱ ⑪ 年度數據 FAIL 證據:原文表頭(2024A 2025E 2026E 2027E)+ 科目列(PBR (x) n.a. 29.2 25.1 20.3)依欄位對齊 → 26E 是 25.1 ≠ 冊值 n.a.(擷取對錯欄)· 24A 是 n.a. = 冊值(驗證器讀法)", al_ok)
         except Exception as error:  # noqa: BLE001
             print("[SKIP] ㊱ 沒有 PyMuPDF / pypdfium2(%s)· 不產生 PDF" % type(error).__name__)
-        hint = acl_hint("C:\\Users\\x\\Downloads\\VRN2_Closeout_v0166\\VRN2_Closeout_v0166.zip: Access is denied.", Path("C:/Users/x/Downloads/VRN2_Closeout_v0166/VRN2_Closeout_v0166.zip"))
+        hint = acl_hint("C:\\Users\\x\\Downloads\\VRN2_Closeout_v0168\\VRN2_Closeout_v0168.zip: Access is denied.", Path("C:/Users/x/Downloads/VRN2_Closeout_v0168/VRN2_Closeout_v0168.zip"))
         chk("㊲ 證據:icacls「Access is denied」→ 說明權限不給目前使用者 + 以系統管理員身分 icacls /reset 的指令 · 讀得到權限時不多話", "系統管理員" in hint and "/reset /T /C" in hint and acl_hint("ok (F)", Path("x")) == "")
         # ㊳ ㊴ v0107
         dl = Path(os.environ["VRN2_DOWNLOADS"])
@@ -3637,7 +3632,7 @@ def selftest() -> int:
             (v10 / "consensus" / "VRN2_Consensus_latest.json").write_text(json.dumps({"gate": "PASS", "engine": "x/VIA_CNYES_FactSet_YFinance_Consensus_Fusion_Engine_v0121.py"}), encoding="utf-8")
             qm.write_text("\ufeffcode,check_id,actual,expected,status,severity,note\n2330,HTTP_PAGE_200,200,200,PASS,FAIL,ok\n", encoding="utf-8")
             if not (v10 / RECEIPT).is_file():
-                (v10 / RECEIPT).write_text(json.dumps({"version": "ActivateVRN-2 v0166", "rc": 2, "elapsed_s": 1, "steps": []}), encoding="utf-8")
+                (v10 / RECEIPT).write_text(json.dumps({"version": "ActivateVRN-2 v0168", "rc": 2, "elapsed_s": 1, "steps": []}), encoding="utf-8")
             p53 = [k for k, _ in plan_fixes(r10, {"consensus": {"run": {"lamp": "GREEN", "gate": "PASS"}}}, "/x/py", A(), "")]
             rep53 = diagnose(r10, None)
             row53 = next((x for x in rep53.get("findings") or [] if x["area"].startswith("⑥f 共識還沒經 VIA 網路工具")), None)
@@ -3767,7 +3762,7 @@ def selftest() -> int:
             r62a["lamp"] == "GRAY" and r62b["lamp"] == "GREEN" and "VeritasCeleritas_v1141.py" in r62b["detail"] and "accelerator=EXACT" in r62b["detail"] and "執行緒 6" in r62b["detail"]
             and r62c["lamp"] == "YELLOW" and o62 is not None and o62[0] == "VCGC" and r62d["lamp"] == "GRAY" and r62e["lamp"] == "GRAY" and r62f["lamp"] == "GRAY")
         doc63 = {"tool": "VRN2_RoundAll v0116", "at": "2026-10-31T09:00:00", "state": "BLOCKED", "state_label": "等 VCGC", "state_text": "VRN-2 側沒有待修 · 1 項等 VCGC 決定 / 安裝", "vrn2_closed": True,
-                 "per_owner": {"VCGC": 1, "人工": 2}, "counts": {"GREEN": 20, "YELLOW": 8, "RED": 0, "GRAY": 12}, "elapsed_s": 321.4, "package": "C:/x/VRN2_Closeout_v0166", "launcher": LAUNCHER,
+                 "per_owner": {"VCGC": 1, "人工": 2}, "counts": {"GREEN": 20, "YELLOW": 8, "RED": 0, "GRAY": 12}, "elapsed_s": 321.4, "package": "C:/x/VRN2_Closeout_v0168", "launcher": LAUNCHER,
                  "items": [{"owner": "VCGC", "lamp": "YELLOW", "step": "⑥ ⑥e MOPS", "detail": "DENY", "hint": "", "why": "VCGC 決定"},
                            {"owner": "人工", "lamp": "YELLOW", "step": "⑥ 四點原文核對", "detail": "OCR_PENDING 4", "hint": "", "why": ""},
                            {"owner": "人工", "lamp": "YELLOW", "step": "⑥ 輸出缺項", "detail": "<b>x</b>", "hint": "", "why": ""}],
@@ -3918,9 +3913,9 @@ def selftest() -> int:
             and m73a.startswith("_mops_quarantine_") and (vdf73 / m73a / "parquet" / "tw_financial" / "ticker=2330" / "year=2025" / "data.parquet").read_bytes() == b"mops"
             and m73b.startswith("_mops_quarantine_") and m73b != m73a and (vdf73 / "parquet" / "tw_equity_daily").is_dir() and "mops_quarantine" not in p73c)
         src74 = Path(__file__).read_text(encoding="utf-8")
-        chk("74 ⑤ 重抓 ⑥e 的 --fetch 帶 --no-financial(--fill 不帶)· ④ 跑啟動器前先移 MOPS 財報 · 套件 / 啟動器 v0166(--no-financial 也在啟動器裡)",
+        chk("74 ⑤ 重抓 ⑥e 的 --fetch 帶 --no-financial(--fill 不帶)· ④ 跑啟動器前先移 MOPS 財報 · 套件 / 啟動器 v0168(--no-financial 也在啟動器裡)",
             src74.count('+ (["--no-' + 'financial"] if verb == "--fetch" else [])') == 1 and src74.count("moved = quarantine_" + "mops_financial(Path(root)") == 1
-            and LAUNCHER >= "ActivateVRN-2_v0166.py" and PACKAGE >= "VRN2_Closeout_v0166")
+            and LAUNCHER == "ActivateVRN-2_v0168.py" and PACKAGE == "VRN2_Closeout_v0168")
         ctx75 = {"tp_sync": {"vdf": {"status": "PARTIAL", "daily_quality": {"REVIEW": 9}, "tickers": {"3706": {"mismatch": 7, "mismatch_dates": "2025-08-15 ~ 2025-11-27"}}},
                              "counts": {"SYNC_YAHOO_RATIO": 3, "MISSING": 2}}, "market_missing": {"非台股代號(範圍外)": 1}}
         row75 = {"lamp": "YELLOW", "step": "⑥ 步驟 ⑥e 市場擷取", "detail": "RoundAll 修正後 · 擷取 YELLOW:VDF AllInOne_v039 增量 · 跑 10 次 · 失敗 0 · 09-18~10-04(2檔) rc0 · 填值 YELLOW:缺 1"}
@@ -3963,8 +3958,8 @@ def selftest() -> int:
         g77, own77 = combined_gaps(comb77)
         chk("77 Combined TARGET_PRICE(ADJ) 缺:同步還原寫的 MISSING(…) 原因 → 資料源 · 日期 / 比值不同不拆類(2 類 · 3 份)",
             own77 == "資料源" and len([k for k in g77["TARGET_PRICE(ADJ)"]]) == 2 and sum(g77["TARGET_PRICE(ADJ)"].values()) == 3)
-        chk("78 套件 v0166(啟動器 v0166 · runtime v0158)· ③ 自測跑 OutputStore v0102 / ConsensusJoin v0105 · 貼回包收清 MOPS 列收據 / 同步還原證據 / VDF status / 合併冊 · ⑤ 補放 v0102 鏈",
-            PACKAGE >= "VRN2_Closeout_v0166" and LAUNCHER >= "ActivateVRN-2_v0166.py" and RUNTIME_ZIP >= "VRN2_Runtime_v0158.zip"
+        chk("78 套件 v0168(啟動器 v0168 · runtime v0158)· ③ 自測跑 OutputStore v0102 / ConsensusJoin v0105 · 貼回包收清 MOPS 列收據 / 同步還原證據 / VDF status / 合併冊 · ⑤ 補放 v0102 鏈",
+            PACKAGE == "VRN2_Closeout_v0168" and LAUNCHER == "ActivateVRN-2_v0168.py" and RUNTIME_ZIP == "VRN2_Runtime_v0159.zip"
             and ("VRN2_OutputStore_v0102.py", 300) in SELFTESTS and ("VRN2_ConsensusJoin_v0105.py", 900) in SELFTESTS and ("VRN2_ConsensusJoin_v0104.py", 900) not in SELFTESTS
             and ("VRN2_SSOTSync_v0102.py", 300) in SELFTESTS and ("VRN2_SSOTSync_v0101.py", 300) not in SELFTESTS
             and all(p in PASTE_FILES for p in ("VRN2_StorePurge_latest.json", "market/VRN2_TPAdjSync_latest.json", "market/vdf/status.json", "output/VRN2_MarketConsensus_latest.csv"))
@@ -4021,9 +4016,9 @@ def selftest() -> int:
         chk("83 「輸出冊 · 缺項 N 份」寫出哪幾份(讀最新啟動器日誌的「輸出冊缺項 · 檔:缺什麼」· 去色碼)· 代碼含檔名(檔變了要重核)",
             "缺項:Daiwa-6278 20260521.pdf:年度數據 | 凱基投顧_Takeaway_3605:年度數據" in i83["detail"] and i83["code"] != confirm_code(dict(i83, detail="個股 52 份 · 缺項 2 份"), {})[0]
             and output_gaps(td / "nowhere") == [])
-        chk("84 v0122:套件 v0166(啟動器 v0166 · runtime v0158 · 收據 VRN2_Closeout_v0166.json)· ③ 自測跑管理器 v0258(它再跑 v0257 / v0255 的自測)· 不再單跑 v0257",
-            PACKAGE >= "VRN2_Closeout_v0166" and LAUNCHER >= "ActivateVRN-2_v0166.py" and RUNTIME_ZIP >= "VRN2_Runtime_v0158.zip" and RECEIPT >= "VRN2_Closeout_v0166.json"
-            and RELEASE_REL[-4:] >= "0166" and ("VRN_SystemManager_v0258.py", 1800) in SELFTESTS and ("VRN_SystemManager_v0257.py", 1800) not in SELFTESTS and VERSION >= "v0122")
+        chk("84 v0122 起:套件照釘(v0124 起 v0168 · 啟動器 v0168 · runtime v0159 · 收據 VRN2_Closeout_v0168.json)· ③ 自測跑最新管理器(v0124 起 v0259 · 它再跑前版的自測)· 不單跑 v0257",
+            PACKAGE == "VRN2_Closeout_v0168" and LAUNCHER == "ActivateVRN-2_v0168.py" and RUNTIME_ZIP == "VRN2_Runtime_v0159.zip" and RECEIPT == "VRN2_Closeout_v0168.json"
+            and RELEASE_REL.endswith("/vrn2_release_v0168") and ("VRN_SystemManager_v0259.py", 1800) in SELFTESTS and ("VRN_SystemManager_v0257.py", 1800) not in SELFTESTS and VERSION >= "v0122")
         o85 = owner_of({"lamp": "YELLOW", "step": "⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點)", "detail": "個股 52 份 · 缺項 1 份"}, {})
         h85 = next((x[2] for x in [("YELLOW", "輸出缺項", "缺年度數據 → 把那幾份原 PDF 上傳給 AI 對(有年度表 = 擷取漏 · 要修);原文真的沒有年度表才算缺")]), "")
         src85 = Path(__file__).read_text(encoding="utf-8")
@@ -4040,28 +4035,24 @@ def selftest() -> int:
         o87 = owner_of({"lamp": "YELLOW", "step": st87, "detail": k87}, {})
         o87old = owner_of({"lamp": "YELLOW", "step": st87, "detail": d87[:220]}, {})
         o87tb = owner_of({"lamp": "YELLOW", "step": st87, "detail": keep_facts(d87 + " · Traceback (most recent call last)")}, {})
-        with tempfile.TemporaryDirectory() as t88:
-            r88 = Path(t88); (r88 / "VIA_Reports" / "vrn2").mkdir(parents=True)
-            w88 = r88 / "VIA_Reports" / "vrn2" / "VRN2_Workbench_latest.html"
-            w88.write_text("<title>VRN-2 Workbench</title><!-- VRN2_Workbench v0103 over v0102 -->", encoding="utf-8")
-            a88 = type("A", (), {"integrate": "skip"})()
-            p_old = [k for k, _ in plan_fixes(r88, {"steps": []}, None, a88)]
-            w88.write_text("<title>VRN-2 Workbench</title>" + WORKBENCH_TAG, encoding="utf-8")
-            p_new = [k for k, _ in plan_fixes(r88, {"steps": []}, None, a88)]
-        chk("88 v0124:收尾頁還是 v0102 渲染的 → 計畫只有「Workbench 重渲染」(repair · 不整輪)· 已是 v0103 → 不重渲染 · Workbench 鏈 5 檔(資產包 + v0100 ~ v0103)· 套件 v0168 · 自測跑 v0103",
-            p_old == ["workbench"] and p_new == [] and "VRN2_Workbench_v0103.py" in WORKBENCH_CHAIN and len(WORKBENCH_CHAIN) >= 5 and PACKAGE >= "VRN2_Closeout_v0168"
-            and SELFTESTS[0][0] >= "VRN2_Workbench_v0103.py" and _head_text(Path(t88) / "none.html") == "")
-        chk("89 v0125:Workbench 鏈多內建印章 + v0104(只增補放 · 先後照舊)· 收尾頁還是 v0103 渲染的 → 重渲染 · 套件 v0169 · 自測跑 v0104",
-            WORKBENCH_CHAIN[-1] == "VRN2_Workbench_v0104.py" and "VRN2_Logo_Seal_v0100.png" in WORKBENCH_CHAIN and WORKBENCH_TAG.endswith("v0104 over v0103 -->")
-            and PACKAGE == "VRN2_Closeout_v0169" and SELFTESTS[0] == ("VRN2_Workbench_v0104.py", 600) and RUNTIME_ZIP == "VRN2_Runtime_v0160.zip")
         chk("87 v0123:收據步驟列超過 220 字 → 截掉的「失敗 0」移到最前面 → ⑥e「擷取 YELLOW · 失敗 0」= 資料源(桌機 09:19 被算成 VRN-2 1 項)· 後面有 Traceback → 還是 VRN-2 · 短的不動",
             "失敗 0" not in d87[:220] and k87.startswith("要點 失敗 0 | ") and k87.endswith(d87[:220]) and o87[0] == "資料源" and o87old[0] == "VRN-2" and o87tb[0] == "VRN-2"
             and keep_facts("短的 · 失敗 0") == "短的 · 失敗 0" and keep_facts("x" * 300) == "x" * 220)
+        r89 = {"lamp": "YELLOW", "step": "⑥f VIA 網路工具 DENY", "detail": "VIA_NET_DENY: VIA 網路工具同意閘未開(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT · 操作員決定 · 引擎不代設 · 不換道直連) · 同意閘未開(操作員決定)"}
+        o89 = owner_of(r89, {})
+        o89b = owner_of({"lamp": "YELLOW", "step": "⑥f VIA 網路工具 DENY", "detail": "VIA_NET_DENY: robots 不允許 · 合規 DENY(VCGC 決定)"}, {})
+        chk("89 v0125:⑥f「VIA 網路工具 DENY · 同意閘未開」列 → 人工(操作員決定 · 兩種視窗的設法 · repair 會補回共識 · 桌機 12:31 被算成 VRN-2 1 項)· 根同 ⑥f 共識(合併後整項人工)· 合規 DENY → VCGC",
+            o89[0] == "人工" and "$env:VIA_NET_CONSENT" in o89[1] and "set VIA_NET_CONSENT=YES" in o89[1] and "repair" in o89[1]
+            and closeout_root(dict(r89, owner="人工"), {}) == "⑥f 共識" and o89b[0] == "VCGC")
+        chk("88 v0124:套件 v0168(啟動器 v0168 · runtime v0159)· ③ 自測跑管理器 v0259 · 缺項提示寫 6143 已由 v0259 補",
+            PACKAGE == "VRN2_Closeout_v0168" and LAUNCHER == "ActivateVRN-2_v0168.py" and RUNTIME_ZIP == "VRN2_Runtime_v0159.zip" and RECEIPT == "VRN2_Closeout_v0168.json"
+            and ("VRN_SystemManager_v0259.py", 1800) in SELFTESTS and ("VRN_SystemManager_v0258.py", 1800) not in SELFTESTS and VERSION >= "v0124"
+            and "v0259" in owner_of({"lamp": "YELLOW", "step": "⑥ 完成判定 · 輸出冊(基本資料 / 年度數據 / 一標題四重點)", "detail": "缺項 1 份"}, {})[1])
         chk("86 v0122:⑤ 自動修那一列寫「擷取環境缺 requests … 交 VCGC」→ VCGC(沙盒整輪實錄被算成 VRN-2 1 項)· 沒寫擷取環境 → 照舊",
             o86[0] == "VCGC" and "via_tw_fetch" in o86[1] and o86b[0] != "VCGC")
         src82 = Path(__file__).read_text(encoding="utf-8")
-        chk("82 v0121:套件照釘(v0122 起 v0166)· 貼回包收人工確認紀錄 · 只有 step_confirm 寫確認冊(流程裡不呼叫)· ⑤ ssot 補放提案冊鏈",
-            PACKAGE >= "VRN2_Closeout_v0166" and "VRN2_HumanConfirm.json" in PASTE_FILES and src82.count("(v2 / CONFIRM_BOOK)" + ".write_text(") == 1
+        chk("82 v0121:套件照釘(v0122 起 v0168)· 貼回包收人工確認紀錄 · 只有 step_confirm 寫確認冊(流程裡不呼叫)· ⑤ ssot 補放提案冊鏈",
+            PACKAGE == "VRN2_Closeout_v0168" and "VRN2_HumanConfirm.json" in PASTE_FILES and src82.count("(v2 / CONFIRM_BOOK)" + ".write_text(") == 1
             and src82.count("return step_" + "confirm(args)") == 1 and SSOT_CHAIN[0] == "VRN2_SSOT_Proposals_v0101.json" and VERSION >= "v0121")
         src64 = Path(__file__).read_text(encoding="utf-8")
         chk("64 --launcher-args 去外圍引號(PowerShell 傳進來的 \"--no-install\")· 舊資料庫問句整行先印再等輸入 · 收尾頁 json 帶每一步的燈(流程)",
