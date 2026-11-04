@@ -210,3 +210,11 @@ $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v010
 $r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0103";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0103.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0103.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'F673698309AB6FDE77A6DA5A6EEFDA7A2EBF3CA0B4C62F690BDECB36BE0871B2'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
 ```
 
+## 16. VIA_SettleAll_v0104(2026-11-05 · 取代第 15 節:改動分類 bridge / state / eol 自動合併 · ④⑤⑧⑨ 併行 · VCGC 事件冊 · Graphify 1 worker · ⓫ L103 政策全景只讀)
+
+桌機 v0103 貼回:37 個「其他」改動 = VRN 舊版注入橋塊 + VCGC 狀態冊等 → v0104 逐檔算類別,只有真的改了程式才停。細節 `docs/handoff/ai/VIA_SettleAll_v0104.md`。一行(從檔案複製):
+
+```powershell
+$r="$HOME\OneDrive\Documents\movies-dataset";$t="$HOME\Downloads\VIA_Settle_v0104";git -C $r fetch -q origin claude/optimistic-goodall-yhalc5;git -C $r archive --format=zip -o "$t.zip" FETCH_HEAD VeritasIntelligenceAnalytics/docs/handoff/ai/VIA_SettleAll_v0104.py;Expand-Archive "$t.zip" $t -Force;$f="$t\VeritasIntelligenceAnalytics\docs\handoff\ai\VIA_SettleAll_v0104.py";if((Get-FileHash -InputStream ([IO.MemoryStream]::new([byte[]]([IO.File]::ReadAllBytes($f) -ne 13)))).Hash-eq'F6F6EF1052B435E8BB6D3E8F2CCE30B10A1A2B12CBB11D1C2FAC38BF9FF0F086'){python $f --root $r}else{'[RED] SettleAll SHA-256 mismatch - not run'}
+```
+
