@@ -3749,6 +3749,58 @@
       ],
       "timeout_seconds": 2700,
       "registered_at": "2026-10-30T04:15:29+00:00"
+    },
+    "cov_vdf_eng236": {
+      "argv": [
+        "VDF_ENG236_FetchMatrixUI",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG236_FetchMatrixUI v0101 自測 12/12 · PASS",
+      "scope": "VDF_ENG236 FetchMatrixUI 尾版 v0101(擷取矩陣 · DataFrame 表頭欄 · 印章頁首 · 前版 v0100 16/16) · 交接覆蓋補測(VDF / VCGC 收尾 2026-11-04):家族改過但沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS 才登案",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG236_FetchMatrixUI_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-11-04T00:00:00+00:00"
+    },
+    "cov_vdf_eng237": {
+      "argv": [
+        "VDF_ENG237_DataExport",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_ENG237_DataExport v0100 自測 12/12 · PASS",
+      "scope": "VDF_ENG237 DataExport v0100(唯讀 ATTACH 讀庫 · 匯出) · 交接覆蓋補測(VDF / VCGC 收尾 2026-11-04):家族改過但沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS 才登案",
+      "dependencies": [
+        "functional modules/VDF/engine/VDF_ENG237_DataExport_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-11-04T00:00:00+00:00"
+    },
+    "cov_vdf_ssotsync": {
+      "argv": [
+        "VDF_SSOTSync",
+        "--selftest"
+      ],
+      "success_marker": "[計] VDF_SSOTSync v0100 自測 12/12 · PASS",
+      "scope": "VDF_SSOTSync v0100(VDF 自己的 SSOT 同步) · 交接覆蓋補測(VDF / VCGC 收尾 2026-11-04):家族改過但沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS 才登案",
+      "dependencies": [
+        "functional modules/VDF/VDF_SSOTSync_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-11-04T00:00:00+00:00"
+    },
+    "cov_cgc_numbergrant": {
+      "argv": [
+        "CGC_MDL278_NumberGrant",
+        "--selftest"
+      ],
+      "success_marker": "[計] CGC_MDL278_NumberGrant_v0100 自測 9/9 · PASS",
+      "scope": "CGC_MDL278 NumberGrant v0100(VCGC 核發子系統 SSOT 號) · 交接覆蓋補測(VDF / VCGC 收尾 2026-11-04):家族改過但沒有交接測試案 → CHANGED_CODE_WITHOUT_TEST;尾版自測在容器實跑 PASS 才登案",
+      "dependencies": [
+        "supportive modules/registry/CGC_MDL278_NumberGrant_v*.py"
+      ],
+      "timeout_seconds": 900,
+      "registered_at": "2026-11-04T00:00:00+00:00"
     }
   },
   "work_items": [
@@ -5190,14 +5242,14 @@
     {
       "id": "VCGC-REQ139:qg_onebridge",
       "requirement": "VCGC-REQ139",
-      "state": "PENDING",
+      "state": "VERIFIED",
       "owner": "操作員(工作站)",
       "reason": "container rerun 2026-10-10: polars absent in the container (roster env via_vdf carries it); no pip install allowed here",
       "next": "workstation (roster env carries the package): via-vcgc handoff test qg_onebridge → commit the receipt; the item returns to VERIFIED only on rc0 + marker",
       "case": "qg_onebridge",
       "receipt": "docs/handoff/evidence/qg_onebridge.json",
-      "pended_at": "2026-10-10T08:12:49+00:00",
-      "pended_from": "VERIFIED"
+      "verified_from": "PENDING",
+      "verified_why": "2026-11-04 容器已有 polars(VDF / VCGC 收尾補裝 · 只在容器);pending 的理由不再成立 → 重跑 handoff test qg_onebridge 取收據(rc0 + marker 才算 · 不過就退回 PENDING)"
     },
     {
       "id": "VCGC-REQ139:usmacro_probe",
@@ -7500,6 +7552,34 @@
       "pended_at": "2026-10-30T04:15:29+00:00",
       "case": "vdf_ws_manager_junction",
       "receipt": "docs/handoff/evidence/vdf_ws_manager_junction.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vdf_eng236",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vdf_eng236",
+      "receipt": "docs/handoff/evidence/cov_vdf_eng236.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vdf_eng237",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vdf_eng237",
+      "receipt": "docs/handoff/evidence/cov_vdf_eng237.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_vdf_ssotsync",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_vdf_ssotsync",
+      "receipt": "docs/handoff/evidence/cov_vdf_ssotsync.json"
+    },
+    {
+      "id": "VCGC-REQ075:cov_cgc_numbergrant",
+      "requirement": "VCGC-REQ075",
+      "state": "VERIFIED",
+      "case": "cov_cgc_numbergrant",
+      "receipt": "docs/handoff/evidence/cov_cgc_numbergrant.json"
     }
   ]
 }
