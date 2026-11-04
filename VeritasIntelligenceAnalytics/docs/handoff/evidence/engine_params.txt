@@ -31,49 +31,20 @@
 [政策] L50 全景 · 尾版 644 · import 0 · 提及 105 · 已裝 False · GREEN
 [政策] L50 附冊 L50 · rank 2 · 替代 VDF_ENG086_QuantGuardOneBridge · 正本未改
 [政策] L50 不刪字 · 禁令加在旁邊 · 正本未改
-  [via-vcgc run] [流程] 政策過 · CGC_MDL253_ToolingInventory_v0102.py(家族 core)
-  [OK] ① 全景用鎖版那一支(雜湊相符;不自己取尾版) · v0117
-  [OK] ② 尾版律:同家族只留版號最大那支 · ['Demo-Tool-v0100.ps1', 'VDF_ENG999_Demo_v0101.py']
-  [OK] ③ 全景卡:定義樹 + 說明(去掉「名稱 vNNNN —」) · (1, '示範引擎')
-  [OK] ④ CLI 面:argparse 子令 / 旗標 + sys.argv 字面旗標 · (['fix', 'scan'], ['--json', '--menu'])
-  [OK] ⑤ L103:PY 缺加速器 · VDF 用到 requests 缺網路橋 = MISS · {'py_accel': 'MISS', 'vdf_net': 'MISS', 'ps_tpl': '—'}
-  [OK] ⑥ PS:.SYNOPSIS 當說明 · param() 當旗標 · 缺模板章 = MISS · ('示範 PS 工具', ['-NoOpen', '-RepoPath'], {'py_accel': '—', 'vdf_net': '—', 'ps_tpl': 'MISS'})
-  [OK] ⑦ 編號冊有料就帶號 / 子系統;沒號 = 未編號 + 黃
-  [OK] ⑧ 短令按家族接回檔 · ['via-demo']
-  [OK] ⑨ 短令冊順點源鏈:看得到舊版定義的 via-in / via-vcgc 與尾版的 via-review · 212
-  [OK] ⑩ 別名接回(via-in = 進入環境)· 新增於 v0263 · (['進入環境'], 263)
-  [OK] ⑫ 引擎解析:229 → ENG229 一支;同號異名 ENG110 照實回 2 個候選不猜
-  [OK] ⑬ 啟動前閘:缺加速器 / 用網路缺網路橋 = 紅擋 · ['缺 PY 加速器橋 [VIA:ACCEL-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply', '用到網路套件卻缺 VDF 網路工具橋 [VIA:NET-BRIDGE(L103)→ via-bridge-sweep --subsystems --apply']
-  [OK] ⑭ 沒 __main__ = 程式庫 NA(不單獨啟動,不算紅);基線具名唯讀本缺橋 = 黃不擋 · ('NA', 'YELLOW')
-  [OK] ⑯ 引擎冊:同號異名的短令改給全名;不重號的照用引擎號 · via-vdfeng VDF_ENG110_AKShareProbe
-  [OK] ⑮ 綠燈引擎給出單引擎短令與 VCGC 路徑 · {'vcgc': ['run', '--family', 'vdf', 'VDF_ENG229_CNNFearGreedHistory'], 'short': 'via-vdfeng ENG229', 'selftest': 'via-vdfeng ENG229 --selftest'}
-  [OK] ⑪ 檔頭 · 加速器橋 · 網路橋在;只收 VCGC;不碰 TA-Lib
-[工具盤點 v0100] 自測 16/16
-=== CGC_MDL253_ToolingInventory_v0101 · 薄尾自測(單引擎備料:參數 · 環境變數 · SSOT · regex · 同義字 · 工作流步)===
-  [OK] ① 前版 v0100 自測過(list · check · card 照舊) · rc 0
-  [OK] ② 輸入參數:旗標 · 預設 · 選項 · 必填 · 說明 · 位置參數 · 子令 · {'args': [{'names': ['--date'], 'positional': False, 'required': False, 'default': '2026-10-01', 'help': '資料日'}, {'names': ['--market'], 'positional': False, 'required': True, 'choices': ['TWSE', 'TPEX']}, {'names': ['target'], 'positional': True, 'required': True}], 'subparsers': ['daily']}
-  [OK] ③ 環境變數:get / in 都認;同意閘名字照實列 · ['VIA_DEMO_FLAG', 'VIA_NET_CONSENT']
-  [OK] ④ SSOT 冊:萬用 _v* 與釘版名都解到樹上尾版;冊不在 = ABSENT · {'VDF_InputUniverse_SSOT': ('v0103', 'OK'), 'VIA_Central_Synonym_Regex': ('v0102', 'OK'), 'VIA_NoSuchBook_SSOT': ('', 'ABSENT')}
-  [OK] ⑤ regex:本地字面條數 · 中央屬本支的鍵 · 與中央同式(可委中央,只列) · {'local': 2, 'local_unique': 2, 'samples': ['abc', '^[1-9]\\d{3}$'], 'central_owned': ['TW_TICKER'], 'same_as_central': ['TW_TICKER']}
-  [OK] ⑥ 同義字:本地表(≥ 5 鍵、值是字串)抓到 · 沒委樞印記 · 中央來源提到本支 · {'delegated': ['中央同義字 / 正則冊'], 'local_tables': [{'name': 'SYN', 'keys': 5, 'line': 2}], 'central_keys_from_this': ['RATING_BUY']}
-  [OK] ⑦ 實樹 VDF:ENG055 備料卡 → 輸入範圍冊 E-01(IN-01 用到)· 工作流步 · 啟動短令 via-vdfeng · ('GREEN', ['E-01', 'E-09'], 'via-vdfeng ENG055')
-  [FAIL] ⑦b 薄尾鏈:ENG055 尾版只蓋閘,參數在本體 → 鏈走到 exec 的本體(v0118)· 收到本體的旗標(--lane …)/ 環境變數 · (['v0123'], 0, [], ['--selftest'])
-  [OK] ⑧ 實樹 VRN:ENG398 備料卡 → 有輸入參數(argparse 或字面旗標)· 短令 via-vrneng · ('YELLOW', 0, [])
-  [OK] ⑨ prep:整個子系統一支一列 · json + html 落地(暫存夾)· 燈數加總 = 支數 · {'engines': 75, 'lamps': {'GREEN': 18, 'YELLOW': 56, 'RED': 0, 'NA': 1}, 'with_cli': 64, 'with_books': 27, 'local_synonym_tables': 70, 'delegated': 11, 'regex_same_as_central': 33, 'consent': 4}
-  [OK] ⑩ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 不代設同意閘 · 只讀(無寫被讀檔的呼叫)
-  [計] CGC_MDL253_ToolingInventory_v0101 本版 10/11 · 前版 PASS · 合計 FAIL
-=== CGC_MDL253_ToolingInventory_v0102 · 薄尾自測(⑧ 輸出 · ⑨ 掛入的工具 · ⑩ AST 定位與編號 · engine tools)===
-  [FAIL] ① 前版 v0101 自測過(①–⑦ 照舊) · rc 1
-  [OK] ② 輸出:SQL 寫表(CREATE / INSERT)· 輸出檔(VIA_Reports · .duckdb)· f-string 動態另計 · {'sql_tables': ['demo_*', 'demo_rows'], 'files': ['VIA_Reports/vrn/demo/DEMO_latest.json', 'functional modules/VRN/output_hub/demo.duckdb'], 'dynamic': 1, 'header_book': 'VIA_Output_Header_SSOT_v0103.json', 'header_tables': [], 'universe_writes': []}
-  [OK] ③ 掛入的工具:提到 LAYOUT 檔名幹 = 用到鎖冊 layout(帶鎖版號)· 沒提 NLP = 不列 · PDF/OCR 套件匯入(含 find_spec) · {'locked_tools': [{'family': 'layout', 'stem': 'SUP_MDL743_GenericLayoutHub', 'pinned': 'v0110'}], 'pdf_ocr_packages': ['fitz', 'pdfplumber', 'rapidocr_onnxruntime']}
-  [OK] ④ 實樹 VRN:ENG398 卡多 ⑧⑨⑩ · 用到 layout(鎖冊)· 匯入層 OCR 套件不在主行程(只列字面)· 尾版有中央編號 · ('YELLOW', ['layout', 'praddle', 'pdfplumber', 'ocr'], 'VIA-VRN-ENG321')
-  [OK] ⑤ engine tools(VRN):layout · nlp · praddle · pdfplumber · ocr 五家都在組裡 · 每一版都有中央編號 · (['hub', 'layout', 'nlp', 'ocr', 'pdfplumber', 'praddle'], {'groups': 14, 'lamps': {'GREEN': 8, 'YELLOW': 6, 'RED': 0}, 'versions': 36, 'numbered': 36, 'own_record': 29, 'locked_families': 5})
-  [OK] ⑥ LAYOUT 組:鎖冊現役那一版標「現役」· 前版標「前版」 · [('v0110', '現役'), ('v0109', '前版'), ('v0108', ''), ('v0107', '')]
-  [OK] ⑦ prep 每張卡帶 ⑧⑨⑩;頁落地;燈數加總 = 支數 · {'engines': 75, 'lamps': {'GREEN': 18, 'YELLOW': 56, 'RED': 0, 'NA': 1}, 'with_outputs': 36, 'uses_locked_tools': 16, 'unnumbered_tails': 3}
-  [OK] ⑧ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 不代設同意閘
-  [計] CGC_MDL253_ToolingInventory_v0102 本版 7/8 · 前版 rc=1 · 合計 FAIL
-  [同步] 樹有變 · 註冊冊待同步 {'new': 1, 'changed': 130, 'stale': 0, 'expected': 19337, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
-  [教訓] 重複出錯:run CGC_MDL253_ToolingInventory · rc=1 · <unknown>:<n>: SyntaxWarning: invalid escape sequence '<path>' · 第 2 次 · 帳本 CGC_MDL058(via-lessons)
+  [via-vcgc run] [流程] 政策過 · CGC_MDL253_ToolingInventory_v0103.py(家族 core)
+=== CGC_MDL253_ToolingInventory v0103 · 薄尾自測(薄尾鏈認得尾版律)===
+  [OK] ① 尾版律寫法(自己 exec + 照同族 _v*.py 找)認得;真本體裡有 exec 但不找同族 → 不算
+  [OK] ② 尾版律取本體:跳過點名同族版號的 v0101 → 本體 v0100
+  [OK] ③ 實樹 ENG055:鏈從尾版走到本體 v0118(不再停在尾版) · ['v0123', 'v0118']
+  [OK] ④ 換裝在 v0101 模組上(v0101 / v0102 備料卡都經它)
+  ── 前版 [OK] ⑦b 薄尾鏈:ENG055 尾版只蓋閘,參數在本體 → 鏈走到 exec 的本體(v0118)· 收到本體的旗標(--lane …)/ 環境變數 · (['v0123', 'v0118'], 0, ['FRED_API_KEY', 'VIA_L8_BUILTIN'], ['--date', '--export', '--from-file', '--lane', '--market', 
+  ── 前版 [計] CGC_MDL253_ToolingInventory_v0101 本版 11/11 · 前版 PASS · 合計 PASS
+  ── 前版 [計] CGC_MDL253_ToolingInventory_v0102 本版 8/8 · 前版 PASS · 合計 PASS
+  [OK] ⑤ 前版 v0102 自測(含 v0101 ⑦b 實樹 ENG055 備料卡)rc 0 · rc 0
+  [OK] ⑥ 加速器橋 · 網路工具橋在;只讀(不寫檔 · 不執行被讀的檔);不碰 TA-Lib
+  [計] CGC_MDL253_ToolingInventory v0103 本版 6/6 · 前版 PASS · 合計 PASS
+  [同步] SDD 驗證 RED:X-REG 未註冊 [] · 註冊冊不是尾版(待 registry-sync --apply)['VDF_MDL011_AkshareFetcher_v0104.py(冊上 | X-NUM 尾版沒編號(待 CGC_MDL237 --apply):['VDF_MDL011_AkshareFetcher_v0104.py'] → via-vcgc sdd check
+  [同步] 樹有變 · 註冊冊待同步 {'new': 70, 'changed': 157, 'stale': 0, 'expected': 19406, 'recode': 0} · 座位 對齊 → 批准寫入:via-vcgc registry-sync --apply
 <unknown>:3: SyntaxWarning: invalid escape sequence '\*'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\*'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\*'
@@ -218,4 +189,4 @@
 <unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
 <unknown>:1050: SyntaxWarning: invalid escape sequence '\-'
 <unknown>:3: SyntaxWarning: invalid escape sequence '\*'
-[監控] 背景全景監控中 pid 508 · 觸碰 run CGC_MDL253_ToolingInventory · 交接閘 RED · 落後 265 提交 · 快照 772.1h · 未推 26 · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 1671 · 觸碰 run CGC_MDL253_ToolingInventory · 交接閘 RED · 落後 274 提交 · 快照 773.3h · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
