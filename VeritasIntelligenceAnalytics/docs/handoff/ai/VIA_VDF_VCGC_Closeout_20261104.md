@@ -28,7 +28,30 @@
 
 ## 3. 交接案重跑結果
 
-(第二批跑完後填)
+| 批 | 案數 | 結果 |
+|---|---|---|
+| 一(EVIDENCE_INVALID 的 66 案)| 66 | 50 過 · 9 只是標記字樣換了 · 3 釘舊版單跑 · engine_params 真紅(已修)· fetch_integration 缺 yfinance · usertest 找不到瀏覽器 · vrn_logic_index(VRN)|
+| 二(改釘 12 案 + 上面 3 案)| 15 | 15 過 |
+| 三~五(改冊後連帶失效 · 新登 4 個 cov 案 · qg_onebridge)| 13 + 6 | 全過(改釘 4 案:tooling · fetch_groups v0100 / v0101 / v0103)|
+
+另補:`VCGC-REQ075:cov_*` 照既有格式新登 4 案(cov_vdf_eng236 · cov_vdf_eng237 · cov_vdf_ssotsync · cov_cgc_numbergrant · 尾版自測容器實跑 PASS 才登)+ 功能盤點冊 `VIA_VCGC_FunctionInventory_SSOT_v0182.json` 登 4 站;
+`VCGC-REQ139:qg_onebridge` 原本 PENDING 的理由(容器沒 polars)不再成立 → 重跑 rc 0 + marker → VERIFIED。
+
+**VCGC 自己的燈(容器實跑 · 最後一次):**
+
+| 項 | 開始 | 現在 |
+|---|---|---|
+| `handoff check` findings | 357 | **103** |
+| EVIDENCE_INVALID | 94 | **1**(VRN logic-index)|
+| CHANGED_CODE_WITHOUT_TEST | 203 | **42**(41 支 VRN 的 · 1 支 CGC_MDL264_ViaUnified 要 pwsh)|
+| 可沿用收據 | 179 | **277** |
+| `test --quick` | 紅 0 · 黃 2 | **紅 0** · 綠 9 · 黃 2(handoff-check 只剩 VRN 的紅 · P-entry 沒 pwsh)· case **234 / 234** · 家族尾版 282 支 compile 錯 0 |
+| 中央編號 audit | — | +106 列 · **遺失 0 · 改身分 0 · 重號 0**(冊內不一致 1 = 改動前就有)|
+| registry-sync | — | 新 70 · 變 157 · 退役 0 · **撞號 0** |
+| SSOT 全景 | RED | RED(前後一樣 · 改動前就有)|
+| `handoff checkpoint` | — | 沒做:交接閘仍紅(VRN 的項目)· checkpoint 規則本來就拒絕 |
+
+**VDF / VCGC 這一側只剩:** `CGC_MDL264_ViaUnified_v0100` 自測要 PowerShell(容器 SKIP · 不算過)→ 桌機驗。
 
 ## 4. 給 VRN(只讀 · 不代修)
 
