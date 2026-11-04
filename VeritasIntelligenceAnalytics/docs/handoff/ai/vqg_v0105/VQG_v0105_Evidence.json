@@ -1,0 +1,140 @@
+{
+ "engine": "VeritaQuantGuard v0105 (formula engine v0104)",
+ "date": "2026-11-04",
+ "python": "3.13 · polars 2.0.0 · duckdb 2.0.0 (container)",
+ "selftest": [
+  "  [OK] ① v0104 自測照過(PASS · 14 核心三解入口、六窗口、特殊參數、四組淨量值、缺值與重扣防護、雙時間口徑及離線雙軸圖)",
+  "  [OK] ② 第 3 行加速器標記 · 前版 v0104 位元組 = 操作員原檔(SHA-256 釘住)· 本檔不匯入任何網路模組",
+  "  [OK] ③ VDF 形狀的日線(沒有 market / session_index / available_on)· 嚴格模式 = v0104:台股 NEED_VDF_CALENDAR_OR_AVAILABILITY · 美股 MARKET_UNRESOLVED(乾淨的 ValueError)",
+  "  [OK] ④ --calendar derive:台股 2330.TW 算得出 · 數值與「同價格 + 明寫序號 / 可用日」的 v0104 嚴格結果逐格相同(24 格)· 每列 engine_version = v0104+derived_calendar",
+  "  [OK] ⑤ 停牌日:2317.TW 少第 101 天(同市場 2330 有)→ derive 插 1 列明確空值(v0104 要求的上游插空列)· 結果 = 明寫空列的嚴格結果",
+  "  [OK] ⑥ 美股 NVDA(VDF 檔沒有 market 欄)→ derive 推為 US · 算得出 24 列 · 依據寫進統計",
+  "  [OK] ⑦ --calendar auto:嚴格先試 → 只因缺曆才改 derive(原因記在統計)· 結果 = derive",
+  "  [OK] ⑧ 同表兩個批次、舊日還原價不同:strict = v0104 CONFLICT 拒算 · --snapshots latest = 只用最新批次(= 只有新批次時的結果 · 被取代的檔列在統計)",
+  "  [OK] ⑨ doctor:VDF 形狀 → DERIVE_READY(缺 available_on · market · session_index)· 明寫的 → STRICT_READY · 多批次表點名",
+  "  [OK] ⑩ 預設 VDF 庫根照 VDF 的冊(VDF_DataHome_SSOT 尾版 · homes 照順序取第一個在的)",
+  "  [OK] ⑪ closeout:收據寫在 VIA_Reports\\vqg(YELLOW = 曆是推的 · 探針 2330.TW)· 收據夾在 VDF 庫裡 → 拒寫 rc 2 · VDF 夾沒多任何檔",
+  "[PASS] VQG v0105 selftest · v0104 + 本版 10 項 · 不過 0"
+ ],
+ "kpi_selftest": {
+  "rc": 0,
+  "wall_s": 1.6,
+  "cpu_s": 1.8,
+  "cores_used_avg": 1.11,
+  "peak_rss_mb": 138.7,
+  "cores_available": 4
+ },
+ "kpi_closeout": {
+  "rc": 0,
+  "wall_s": 1.8,
+  "cpu_s": 2.0,
+  "cores_used_avg": 1.1,
+  "peak_rss_mb": 138.8,
+  "cores_available": 4
+ },
+ "e2e": {
+  "A_gen": {
+   "rc": 0,
+   "seconds": 0,
+   "last": "tw_daily_prices_20261104_072914.parquet 479"
+  },
+  "A_vdf_files": "['output_hub/mega/tw_daily_prices_20261104_072911.parquet', 'output_hub/mega/tw_daily_prices_20261104_072914.parquet', 'output_hub/mega/vdf_tw_market.duckdb']",
+  "A_doctor": {
+   "rc": 0,
+   "seconds": 0.31,
+   "last": "}"
+  },
+  "A_strict": {
+   "rc": 2,
+   "seconds": 0.29,
+   "last": "[RED] VQG calc · CONFLICT: 2330.TW 2026-06-01 adj_close tw_daily_prices_20261104_072914.parquet → VDF 同一張表有多個批次檔、同一天值不同(還原價重算)→ 加 --snapshots latest(同表只用最新批次)"
+  },
+  "A_auto": {
+   "rc": 2,
+   "seconds": 0.29,
+   "last": "[RED] VQG calc · CONFLICT: 2330.TW 2026-06-01 adj_close tw_daily_prices_20261104_072914.parquet → VDF 同一張表有多個批次檔、同一天值不同(還原價重算)→ 加 --snapshots latest(同表只用最新批次)"
+  },
+  "A_auto_latest": {
+   "rc": 0,
+   "seconds": 0.42,
+   "last": "s\",\"valid\":true,\"value_json\":\"57.92079207920793\",\"value_num\":57.92079207920793,\"verdict\":\"NOT_COMPARABLE\",\"window_n\":14},{\"as_of\":\"2026-11-18\",\"coverage\":1.0,\"engine_version\":\"v0104+derived_calendar\",\"estimator\":\"ema_12_26_9\",\"formula_sha256\":\"48be0488f4a7a1b383b34935f400c30b7fca2e52d0063e506b9dd9b2b95c2905\",\"indicator_id\":\"VQG.IND.MACD\",\"input_sha256\":\"213076d047f87504e01acf748318df2d46dd8da5409a"
+  },
+  "A_halt_2317": {
+   "rc": 0,
+   "seconds": 0.42,
+   "last": ",\"market_source\":\"台股代號樣式\",\"mode\":\"derived\",\"session_index\":\"同市場 VDF 日線日期聯集排序\",\"sessions_in_vdf\":160},\"engine\":\"VQG v0105\",\"executed\":[\"sma\"],\"snapshots\":\"latest\",\"superseded_snapshots\":[\"<sandbox>\"]} [{\"as_of\":\"2026-11-18\",\"coverage\":0.95,\"engine_version\":\"v0104+derived_calendar\",\"estimator\":\"strict_window\",\"formula_sha256\":\"797d5eb9744f10d74190a2045da65174fa038db241d28aa16dd7375e8087e750\",\"indica"
+  },
+  "A_closeout": {
+   "rc": 0,
+   "seconds": 1.69,
+   "last": "[計] VDF 庫根 <sandbox> 的冊 VDF_DataHome_SSOT_v0101.json · workstation)"
+  },
+  "A_vdf_untouched": "True",
+  "A_receipt": {
+   "lamp": "YELLOW",
+   "steps": [
+    [
+     "① 自測",
+     "GREEN",
+     "[PASS] VQG v0105 selftest · v0104 + 本版 10 項 · 不過 0"
+    ],
+    [
+     "② VDF 庫就緒(VDF 的冊 VDF_DataHome_SSOT_v0101.json · workstation)",
+     "YELLOW",
+     "DERIVE_READY · <sandbox> · 日線檔 2 · VDF 檔缺 available_on、market、session_index → 用 --calendar derive(或 auto)· 要嚴格綠 = VDF 那側出 session_index / available_on / market · 同一張表有多個批次:1 張 → 值不同時加 --snapshots late"
+    ],
+    [
+     "③ 探針計算 2330.TW(sma · rsi · macd)",
+     "YELLOW",
+     "24 列 · 有效 21 · 曆 derived · 批次取最新"
+    ]
+   ]
+  },
+  "B_doctor": {
+   "rc": 0,
+   "seconds": 0.31,
+   "last": "}"
+  },
+  "B_strict_NVDA": {
+   "rc": 2,
+   "seconds": 0.33,
+   "last": "[RED] VQG calc · MARKET_UNRESOLVED: NONE → VDF 檔沒有 market 欄 · 代號不是台股樣式 → 加 --calendar derive(英文代號推為 US)或 --market TW|US"
+  },
+  "B_auto_NVDA": {
+   "rc": 0,
+   "seconds": 0.44,
+   "last": "wer\\\":144.31016140562647,\\\"mid\\\":162.51914874656794,\\\"upper\\\":180.7281360875094}\",\"value_num\":null,\"verdict\":\"NOT_COMPARABLE\",\"window_n\":120},{\"as_of\":\"2023-11-01\",\"coverage\":1.0,\"engine_version\":\"v0104+derived_calendar\",\"estimator\":\"sample_k2\",\"formula_sha256\":\"a2f7752f110c99294eaa2ac194e86952b25204f6f7943c18f1dd28a30383375a\",\"indicator_id\":\"VQG.IND.BOLLINGER\",\"input_sha256\":\"64a3da7424716141e8f8"
+  },
+  "B_closeout": {
+   "rc": 0,
+   "seconds": 1.57,
+   "last": "[YELLOW] VQG 收尾 · 能算 · 但交易日序號 / 可用日 / 市場是 VQG 從 VDF 日線推的(列上 engine_version 標 derived)· 要嚴格綠 = VDF 出 session_index / available_on / market · 收據 <sandbox> · 1.3 秒"
+  },
+  "B_vdf_untouched": "True",
+  "B_receipt": {
+   "lamp": "YELLOW",
+   "steps": [
+    [
+     "① 自測",
+     "GREEN",
+     "[PASS] VQG v0105 selftest · v0104 + 本版 10 項 · 不過 0"
+    ],
+    [
+     "② VDF 庫就緒(--root)",
+     "YELLOW",
+     "DERIVE_READY · <sandbox> · 日線檔 3 · VDF 檔缺 available_on、market、session_index → 用 --calendar derive(或 auto)· 要嚴格綠 = VDF 那側出 session_index / available_on / market"
+    ],
+    [
+     "③ 探針計算 TSM(sma · rsi · macd)",
+     "YELLOW",
+     "24 列 · 有效 23 · 曆 derived"
+    ]
+   ]
+  }
+ },
+ "notes": [
+  "A = VDF 自己的寫檔程式(ENG054 v0100 write_parquet / upsert_duckdb)在沙盒產生兩個批次 + DuckDB · 第二批把舊日還原價重算(除權息)",
+  "B = VDF CentralHub 形狀樣本(VAP sim_vdf 副本)· 美股代號 · 沒有 market 欄",
+  "A_vdf_untouched / B_vdf_untouched = VQG 跑完後 VDF 庫檔名 + 大小 + mtime 前後相同(只讀)"
+ ]
+}

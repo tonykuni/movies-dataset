@@ -1,0 +1,39 @@
+& {
+$ErrorActionPreference = 'Continue'
+if ($PSVersionTable.PSVersion.Major -lt 7) { Write-Host '[RED] Agent OS boot needs PowerShell 7 (pwsh)' -ForegroundColor Red; return }
+try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch { }
+$env:PYTHONUTF8 = '1'
+$R = $env:VIA_AGENTOS_REPO ?? (Join-Path $HOME 'OneDrive\Documents\movies-dataset')
+$V = $env:VIA_AGENTOS_ROOT ?? (Join-Path $R 'VeritasIntelligenceAnalytics')
+$F = 'VIA_AgentOS_v0102.py'
+$H = '3d23c7adefce5e688277676fadc0a4a70311da3d41fd6b6ef6de1c1bcd9077fb'
+$t = Join-Path ([IO.Path]::GetTempPath()) ('via_aos_' + (Get-Date -Format yyyyMMdd_HHmmss))
+New-Item -ItemType Directory -Force -Path $t | Out-Null
+$z = Join-Path $t 'a.zip'
+git -C $R archive --format=zip -o $z 'FETCH_HEAD:VeritasIntelligenceAnalytics/supportive modules/agent_os' $F 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $z)) { Write-Host '[RED] Agent OS: git archive failed (fetch first)' -ForegroundColor Red; return }
+$ProgressPreference = 'SilentlyContinue'; Expand-Archive -LiteralPath $z -DestinationPath $t -Force; $ProgressPreference = 'Continue'
+$code = [IO.File]::ReadAllText((Join-Path $t $F), [Text.Encoding]::UTF8) -replace "`r`n", "`n"
+$bytes = [Text.UTF8Encoding]::new($false).GetBytes($code)
+$sha = ([BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($bytes)) -replace '-', '').ToLowerInvariant()
+if ($sha -ne $H) { Write-Host "[RED] Agent OS: $F SHA-256 mismatch ($sha) - not run" -ForegroundColor Red; return }
+$dl = Join-Path $HOME 'Downloads'
+New-Item -ItemType Directory -Force -Path $dl | Out-Null
+$f = Join-Path $dl $F
+[IO.File]::WriteAllBytes($f, $bytes)
+Write-Host "[GREEN] VIA Agent OS v0102 (engine 1.0.2 hardened) SHA-256 OK -> $f" -ForegroundColor Green
+$py = $env:VIA_AGENTOS_PY ?? (Get-Command python, py -ErrorAction SilentlyContinue | Where-Object Source -NotMatch 'WindowsApps' | Select-Object -First 1).Source
+if (-not $py) { Write-Host '[RED] Agent OS: no python on PATH (set $env:VIA_AGENTOS_PY)' -ForegroundColor Red; return }
+$out = Join-Path $V 'VIA_Reports\agent_os'
+New-Item -ItemType Directory -Force -Path $out | Out-Null
+& $py $f selftest > (Join-Path $out 'VIA_AgentOS_v0102_selftest.json'); $a = $LASTEXITCODE
+& $py $f skills test > (Join-Path $out 'VIA_AgentOS_v0102_skills.json'); $b = $LASTEXITCODE
+& $py $f status --repo-root $R > (Join-Path $out 'VIA_AgentOS_v0102_status.json'); $c = $LASTEXITCODE
+& $py $f vcgc-status --repo-root $R > (Join-Path $out 'VIA_AgentOS_v0102_vcgc_status.json'); $d = $LASTEXITCODE
+$lamp = (($a + $b + $c + $d) -eq 0) ? 'GREEN' : 'RED'
+Write-Host "[$lamp] Agent OS selftest rc $a - skills rc $b - status rc $c - vcgc-status rc $d -> $out" -ForegroundColor (($lamp -eq 'GREEN') ? 'Green' : 'Red')
+if ($lamp -ne 'GREEN') { return }
+$html = Join-Path $dl ('VIA_AgentOS_Dashboard_v0102_' + (Get-Date -Format yyyyMMdd_HHmmss) + '.html')
+& $py $f dashboard --root $V --out $html --label 'VIA desktop'
+if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $html)) { Write-Host "[GREEN] Agent OS dashboard $html" -ForegroundColor Green; Start-Process $html } else { Write-Host '[YELLOW] Agent OS dashboard not written (see above)' -ForegroundColor Yellow }
+}
