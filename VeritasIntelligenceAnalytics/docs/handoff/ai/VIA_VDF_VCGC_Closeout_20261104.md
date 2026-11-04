@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | 1 | 外連沒經 VIA 網路工具(L103 · 規格 §8-3) | 全景 AST 稽核:擷取矩陣列的 23 支現役引擎裡,ENG113 · ENG115 · ENG116 · MDL011 的 v0100 直接 `urlopen` / `requests.get`(MDL011 檔頭寫「經鎖版網路工具」,程式裡沒有接線) | `VDF_ENG113_MacroMethod_v0103` · `VDF_ENG115_SentimentFetch_v0103` · `VDF_ENG116_AAIIWorkbook_v0103` · `VDF_MDL011_AkshareFetcher_v0104`:只把那幾個直連函數換成經 NetUnified(`http_json` / `http_bytes` / `http_text`)· 雙閘先行 · 工具不在或閘沒開 → 照實失敗,不退回直連 | 各 6/6(前版自測照跑 · 假網路工具 · 直連 0 次 · DENY · 工具不在);經 VDF 管理器 `engine run` 實跑:閘沒開 → FAIL「網路工具 DENY」、0.2 秒、零網路 |
 | 2 | 其餘 18 支現役引擎 | — | 不用改:ENG055 一支就有 323 處網路工具呼叫,其他都已經經網路工具 | 同一次稽核 |
+| 3 | PR #589 Codex P2:v0103 讓前版鏈的公開名稱取不到(ENG115 `allowed` / `cnn` / `AAII_URL` 等 9 個)| v0103 的 `__getattr__` 只看 v0101 / v0102 的 `vars()`,漏掉 v0102 自己動態轉接的 v0100 名稱;v0103 自測也只列 `vars()` | `VDF_ENG113 / ENG115 / ENG116_v0104`:轉接順序 = v0103 → 改道後的 v0100(網路函數照走網路工具)→ v0102 動態轉接 | 各 5/5 · v0102 `public_names()` 14 / 14 / 15 個全取得到 · 經本版取到的網路函數直連 0 次 · 管理器 `engine run` 走 v0104 |
 
 **沒改、照實列出:**
 - `VDF_MDL006_FinancialModel`:`yf.Ticker` 一次取歷史 + 損益 / 資產負債 / 現金流量表 + info;NetUnified 沒有財報這條道(只有 `yf_history` 價格)→ 要在共用網路工具加一條道,是 VCGC / 共用工具的設計決定,不從 VDF 硬改。
