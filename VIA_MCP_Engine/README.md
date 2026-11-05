@@ -1,4 +1,4 @@
-# VIA MCP Engine
+# VIA MCP Engine(v0102)
 
 泛用型多 AI 平台 MCP 設定引擎:**Python 後端 + 只靠滑鼠操作的 HTML 前端**。
 把「哪個 AI 平台 → 接哪幾個 MCP Server → 用什麼執行器 → 秘密放哪 → 設定檔寫到哪」五件事收成一個本機平台;
@@ -9,8 +9,16 @@
 ## 啟動
 
 ```bash
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py serve
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py serve
 ```
+
+經 VCGC(CGC_MDL149 v0192 起的 `mcp` 動詞,子指令原樣下放):
+
+```bash
+VIA_FROM_VCGC=YES via-vcgc mcp serve
+```
+
+`via-vcgc mcp` 不帶參數印短卡;`mcp doctor` / `mcp selftest` 是 VCGC 串測的三個只讀站(盤點冊 v0183:V-mcp · V-mcp-doctor · V-mcp-selftest)。
 
 瀏覽器自動開 `http://127.0.0.1:8765/`(只綁本機)。畫面三欄,照 ①②③ 點:
 
@@ -21,6 +29,9 @@ python3 VIA_MCP_Engine/VIA_MCP_Engine.py serve
 | ③ | MCP 目錄 | 點 **+** 加入(滿 5 個自動變灰);「推薦 / 全部」切換;「不建議」預設收合 |
 
 然後按 **預覽設定**(dry-run,不寫檔)→ **套用**(先備份舊檔再合併寫入)。
+每個格子右側的 **▶** 是「測試啟動」:用渲染出來的指令真的把該 MCP 跑起來,走 stdio JSON-RPC `initialize` → `tools/list`,
+回報 server 名稱、版本與工具數(第一次 npx / uvx 會先下載套件,慢一點);**▶ 全部測試啟動** 逐個跑完目前平台的五個。
+秘密只從憑證庫或環境變數注入子行程,stderr 回報前先遮掉。
 Claude Code / VS Code 的設定檔放在「專案資料夾」,左下角按鈕用滑鼠選。
 
 ### 平台四種模式(卡片右側徽章)
@@ -42,7 +53,7 @@ Claude Code / VS Code 的設定檔放在「專案資料夾」,左下角按鈕用
 | 搜尋 | Brave Search ★4 · Playwright ★4 |
 | 不建議 | Discord ★3 · Telegram ★3(權限過大 / API 常變;預設收合) |
 
-目錄與平台都是 `VIA_MCP_Engine.py` 頂端的資料表(`CATALOG` / `PLATFORMS`),加一筆就多一個選項,不用改邏輯。
+目錄與平台都是 `VIA_MCP_Engine_v0102.py` 頂端的資料表(`CATALOG` / `PLATFORMS`),加一筆就多一個選項,不用改邏輯。
 
 ## 自適應
 
@@ -75,41 +86,47 @@ Claude Code / VS Code 的設定檔放在「專案資料夾」,左下角按鈕用
 命令列同功能:
 
 ```bash
-GITHUB_PERSONAL_ACCESS_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine.py token check
-GITHUB_PERSONAL_ACCESS_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine.py token readonly-test --repo owner/repo
-GITHUB_PERSONAL_ACCESS_TOKEN=… GITHUB_ADMIN_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine.py token readonly-test --temp
+GITHUB_PERSONAL_ACCESS_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py token check
+GITHUB_PERSONAL_ACCESS_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py token readonly-test --repo owner/repo
+GITHUB_PERSONAL_ACCESS_TOKEN=… GITHUB_ADMIN_TOKEN=… python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py token readonly-test --temp
 ```
 
 ## 命令列(前端做得到的,命令列都做得到)
 
 ```bash
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py doctor
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py platforms
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py catalog
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py add claude-desktop filesystem paths=D:\Research
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py add claude-desktop github
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py apply claude-desktop --dry-run
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py apply claude-desktop
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py doctor
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py platforms
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py catalog
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py add claude-desktop filesystem paths=D:\Research
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py add claude-desktop github
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py apply claude-desktop --dry-run
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py apply claude-desktop
 ```
 
 ## 測試
 
 ```bash
-python3 VIA_MCP_Engine/VIA_MCP_Engine.py selftest
+python3 VIA_MCP_Engine/VIA_MCP_Engine_v0102.py selftest
 ```
 
-離線、用假 HOME 與假 GitHub 傳輸,不連網、不碰真實設定檔;涵蓋目錄完整性、上限 5、各格式渲染、
-Windows / Linux 包裝器、合併與備份、拒絕明文秘密、Token 判決與自動清理、資料夾瀏覽、API 路由(54 項)。
-`tests/test_engine.py` 是同一套自測的 pytest 入口。
+離線、用假 HOME、假 GitHub 傳輸與假 MCP server,不連網、不碰真實設定檔;涵蓋目錄完整性、上限 5、各格式渲染、
+Windows / Linux 包裝器、合併與備份、拒絕明文秘密、Token 判決與自動清理、資料夾瀏覽、API 路由、probe 握手與遮秘密(64 項)。
+`tests/test_engine.py` 是同一套自測的 pytest 入口;`--selftest` 與 `selftest` 同義(VCGC `run … --selftest` 慣例)。
+
+使用者測試(容器 2026-11-05 實跑):`probe` 真啟動 Filesystem(14 工具)· Memory(9)· Fetch(1)· SQLite(8)· Sequential Thinking(1)全綠;
+Playwright 真點擊走完加 MCP → 選夾 → 參數開關 → ▶ 測試啟動 → 套用 → 複製到 Codex(TOML)→ 遠端橋接 → Token 三步(對本機假 GitHub:唯讀 Token READONLY_OK、可寫 Token NOT_READONLY 並自動清理)。
+假 GitHub 用 `VIA_MCP_GITHUB_API=http://127.0.0.1:<port>` 指過去,正式環境不設此變數。
 
 ## 檔案
 
 ```
 VIA_MCP_Engine/
-├─ VIA_MCP_Engine.py     後端 + CLI + 自測(標準庫,Python 3.11+)
-├─ VIA_MCP_Engine.html   前端(單檔、無外部資源、深淺色自動)
-├─ tests/test_engine.py  pytest 入口
+├─ VIA_MCP_Engine_v0102.py     後端 + CLI + 自測(標準庫,Python 3.11+)
+├─ VIA_MCP_Engine_v0102.html   前端(單檔、無外部資源、深淺色自動;與後端同 stem 同版號)
+├─ tests/test_engine.py        pytest 入口
 └─ README.md
 ```
+
+換版:出新版號檔(`_v0102.py` + `_v0102.html`),舊版留著;VCGC 的 `mcp` 動詞自動取最大版號。
 
 執行期資料在 `~/.via_mcp_engine/`(`state.json` · `backups/` · `wrappers/` · `evidence/`),可用 `VIA_MCP_HOME` 改位置;不進 git。
