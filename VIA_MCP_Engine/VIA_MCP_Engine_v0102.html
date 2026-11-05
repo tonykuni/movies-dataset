@@ -285,7 +285,7 @@ function renderSlots() {
       body.append(line);
     }
     box.append(el("div", { class: "slot filled" }, el("span", { class: "idx" }, i + 1), body,
-      el("button", { class: "play" + (pr?.busy ? " busy" : ""), title: "測試啟動(initialize / tools/list)", disabled: pr?.busy ? "" : null, onclick: () => probe(inst) }, "▶"),
+      el("button", { class: "play" + (pr?.busy ? " busy" : ""), title: "測試啟動(initialize / tools/list)", disabled: pr?.busy ? "" : null, onclick: () => probe(inst, cur) }, "▶"),
       el("button", { class: "minus", title: "移除", onclick: () => remove(inst) }, "−")));
   }
 }
@@ -320,9 +320,10 @@ async function add(cat) {
     if (need) editParam(inst, cat, need);
   } catch (e) { toast(e.message, true); }
 }
-async function probe(inst) {
-  const key = cur + "/" + inst.name; probes[key] = { busy: true }; renderSlots();
-  try { const r = await api("/api/probe", { platform: cur, name: inst.name, timeout: 120 }); probes[key] = r; toast(r.ok ? `${inst.name} 可啟動,工具 ${r.tool_count} 個` : `${inst.name} 啟動失敗:${r.error || ""}`, !r.ok); }
+async function probe(inst, platformId) {
+  const pid = platformId || cur;                       // 批次測試綁定啟動時的平台;中途切換平台不影響
+  const key = pid + "/" + inst.name; probes[key] = { busy: true }; renderSlots();
+  try { const r = await api("/api/probe", { platform: pid, name: inst.name, timeout: 120 }); probes[key] = r; toast(r.ok ? `${inst.name} 可啟動,工具 ${r.tool_count} 個` : `${inst.name} 啟動失敗:${r.error || ""}`, !r.ok); }
   catch (e) { probes[key] = { ok: false, error: e.message }; toast(e.message, true); }
   renderSlots();
 }
@@ -401,7 +402,7 @@ function storeCmd(key) {
   if (o === "Darwin") return `security add-generic-password -s ${key} -a via -w`;
   return `secret-tool store --label='${key}' service ${key}`;
 }
-$("#btnProbeAll").onclick = async () => { const p = plat(); if (!p.assigned.length) return toast("還沒加入任何 MCP", true); for (const inst of p.assigned) await probe(inst); };
+$("#btnProbeAll").onclick = async () => { const p = plat(); if (!p.assigned.length) return toast("還沒加入任何 MCP", true); const pid = p.id; const batch = [...p.assigned]; for (const inst of batch) await probe(inst, pid); };
 $("#btnPreview").onclick = async () => { try { showResult(await api("/api/apply", { platform: cur, dry_run: true })); } catch (e) { toast(e.message, true); } };
 $("#btnApply").onclick = async () => { try { const r = await api("/api/apply", { platform: cur, dry_run: false }); showResult(r, true); await refresh(); toast(r.applied ? "已套用" : (r.reason || "已產生")); } catch (e) { toast(e.message, true); } };
 $("#btnCopy").onclick = async () => { try { const r = await api("/api/render?platform=" + encodeURIComponent(cur)); const t = r.paste_json || r.text || r.bridge || ""; await navigator.clipboard.writeText(t); toast("已複製到剪貼簿"); } catch (e) { toast("複製失敗:" + e.message, true); } };

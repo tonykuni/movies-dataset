@@ -45,6 +45,25 @@ v0102(2026-11-05;v0101 = PR #591 併入 main 的無 probe 版,已發布不就地
 """
 from __future__ import annotations
 
+
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        if (_sa_p / "VeritasIntelligenceAnalytics" / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "VeritasIntelligenceAnalytics" / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
 import argparse
 import base64
 import copy
@@ -1023,6 +1042,17 @@ def _redact(text: str, secrets: List[str]) -> str:
     return text
 
 
+def _redact_deep(obj: Any, secrets: List[str]) -> Any:
+    """遞迴遮掉結構裡所有字串中的秘密(server 自己回的 error / serverInfo 也可能把注入的憑證回聲出來)。"""
+    if isinstance(obj, str):
+        return _redact(obj, secrets)
+    if isinstance(obj, list):
+        return [_redact_deep(x, secrets) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _redact_deep(v, secrets) for k, v in obj.items()}
+    return obj
+
+
 def probe_command(command: str, args: List[str], env: Dict[str, str], timeout: float = 90.0,
                   secret_values: Optional[List[str]] = None, cwd: Optional[str] = None) -> Dict[str, Any]:
     """啟動子行程,做 MCP 握手並列工具。回傳 ok / server / protocol / tools / stderr_tail / elapsed;不丟例外。"""
@@ -1134,9 +1164,9 @@ def probe_command(command: str, args: List[str], env: Dict[str, str], timeout: f
                 res.setdefault("notes", []).append("子行程 kill 後仍未收尾")
         res["rc"] = proc.returncode
         tail = b"".join(err_buf[-30:]).decode("utf-8", "replace")
-        res["stderr_tail"] = _redact(tail[-2000:], secret_values)
+        res["stderr_tail"] = tail[-2000:]
         res["elapsed"] = round(time.time() - t0, 2)
-    return res
+    return _redact_deep(res, secret_values)   # 整份結果(含 server 回的 error / serverInfo / tools)都遮,才能落 evidence
 
 
 def probe_instance(st: Dict[str, Any], platform_id: str, name: str, timeout: float = 90.0,
@@ -1239,6 +1269,13 @@ class Api:
 
     def handle(self, method: str, route: str, query: Dict[str, List[str]], body: Dict[str, Any]) -> Tuple[int, Any]:
         q = {k: v[0] for k, v in query.items()}
+        if route == "/api/probe" and method == "POST":
+            with self.lock:                      # 只在鎖內拿快照;子行程握手(最長 timeout 秒)在鎖外,不擋其他 API
+                st = load_state()
+                env_info = self.env()
+            res = probe_instance(st, body["platform"], body["name"], float(body.get("timeout") or 90), env_info)
+            self._append_evidence("probe", res)
+            return 200, res
         with self.lock:
             if route == "/api/state" and method == "GET":
                 return 200, self.state_payload()
@@ -1328,11 +1365,6 @@ class Api:
                     res = readonly_test(token, body["repo"])
                 res["source"] = src
                 self._append_evidence("readonly_test", res)
-                return 200, res
-            if route == "/api/probe" and method == "POST":
-                st = load_state()
-                res = probe_instance(st, body["platform"], body["name"], float(body.get("timeout") or 90), self.env())
-                self._append_evidence("probe", res)
                 return 200, res
             if route == "/api/store-hint" and method == "GET":
                 return 200, {"hints": store_hints(q.get("key", "GITHUB_PAT_READONLY"))}
@@ -1493,6 +1525,14 @@ for line in sys.stdin:
     else:
         out = {"jsonrpc": "2.0", "id": i, "error": {"code": -32601, "message": "no such method"}}
     sys.stdout.write(json.dumps(out) + "\n"); sys.stdout.flush()
+'''
+FAKE_MCP_ECHO_ERROR = r'''
+import json, sys, os
+for line in sys.stdin:
+    msg = json.loads(line) if line.strip() else None
+    if msg and msg.get("id") is not None:
+        sys.stdout.write(json.dumps({"jsonrpc": "2.0", "id": msg["id"], "error": {"code": -32000,
+                         "message": "auth failed for token " + os.environ.get("FAKE_TOKEN", "")}}) + "\n"); sys.stdout.flush()
 '''
 TOTAL_CHECKS = [0]
 
@@ -1688,6 +1728,12 @@ def selftest() -> int:
         check(pr["ok"] and pr["tool_count"] == 2 and pr["server"]["name"] == "fake-mcp" and pr["protocol"] == PROBE_PROTOCOL,
               f"握手 + tools/list:{pr.get('server')} 工具 {pr['tool_count']} · {pr['elapsed']}s")
         check("sekrit-token-123456" not in json.dumps(pr) and "sekr…3456" in pr["stderr_tail"], "stderr 回報把秘密遮掉")
+        echo = Path(td) / "echo_mcp.py"
+        echo.write_text(FAKE_MCP_ECHO_ERROR, encoding="utf-8")
+        pe = probe_command(sys.executable, ["-I", str(echo)], {"FAKE_TOKEN": "sekrit-token-123456"}, timeout=20,
+                           secret_values=["sekrit-token-123456"])
+        check(not pe["ok"] and "sekrit-token-123456" not in json.dumps(pe) and "sekr…3456" in (pe.get("error") or ""),
+              "server 把憑證回聲在 initialize error 裡 → 結果整份遮罩(落 evidence 前)")
         bad = probe_command(sys.executable, ["-I", "-c", "import sys; sys.exit(3)"], {}, timeout=5)
         check(not bad["ok"] and bad["rc"] == 3 and bad.get("error"), f"立刻退出的 server 照實回報:{bad.get('error')}")
         nf = probe_command("definitely-not-a-command-xyz", [], {}, timeout=5)
@@ -1720,6 +1766,21 @@ def selftest() -> int:
             os.environ.pop("GITHUB_PERSONAL_ACCESS_TOKEN", None)
         code, payload = api.handle("POST", "/api/probe", {}, {"platform": "cursor", "name": "nope"})
         check(code == 200 and payload["ok"] is False and "沒有" in payload["error"], "/api/probe 找不到項目照實回")
+        slow_seen: Dict[str, Any] = {}
+
+        def slow_probe(command, args, env, timeout=90.0, secret_values=None, cwd=None):
+            import time as _t
+            slow_seen["locked_during_probe"] = api.lock.locked()
+            _t.sleep(0.05)
+            return {"command": command, "args": list(args), "ok": True, "tool_count": 0, "tools": [], "server": None,
+                    "protocol": None, "stderr_tail": "", "elapsed": 0.05, "rc": 0, "stage": "done"}
+
+        globals()["probe_command"] = slow_probe
+        try:
+            code, payload = api.handle("POST", "/api/probe", {}, {"platform": "cursor", "name": "fetch"})
+        finally:
+            globals()["probe_command"] = real_probe
+        check(code == 200 and payload["ok"] and slow_seen.get("locked_during_probe") is False, "/api/probe 的子行程握手在 API 鎖外(不擋其他請求)")
 
     for k in ("VIA_MCP_FAKE_HOME", "VIA_MCP_HOME", "VIA_MCP_SKIP_VERSIONS"):
         os.environ.pop(k, None)
