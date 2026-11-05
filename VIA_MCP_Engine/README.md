@@ -34,6 +34,17 @@ VIA_FROM_VCGC=YES via-vcgc mcp serve
 秘密只從憑證庫或環境變數注入子行程,stderr 回報前先遮掉。
 Claude Code / VS Code 的設定檔放在「專案資料夾」,左下角按鈕用滑鼠選。
 
+## Windows 一支 PS 搞定(Invoke-VIA-MCP v0100)
+
+```powershell
+.\VeritasIntelligenceAnalytics\Invoke-VIA-MCP-v0100.ps1 -InstallShortcut
+```
+
+之後任何資料夾都可以打 `via-mcp`:自己找倉 → `git pull --ff-only` → `VIA_FROM_VCGC=YES` 主控台 `mcp`(doctor → 平台空就加預設五個 → ▶ probe → apply 乾跑 → Token 有就測)→ 開滑鼠操作頁。
+常用:`via-mcp -Action serve`、`via-mcp -Action apply -Platform claude-desktop -Apply`、`via-mcp -Action token -TokenSource store -TokenRepo owner/repo`。
+PS 只做啟動與連結 U/I,邏輯全在引擎;它不改任何既有 `.ps1`(L70),短令只在你加 `-InstallShortcut` 時寫進你自己的 `$PROFILE`。
+在 `C:\Users\tonyk` 打 `git pull` 會 fatal,因為那不是倉;`via-mcp` 會自己切到倉根再 pull。
+
 ### 平台四種模式(卡片右側徽章)
 
 - **本機**:直接寫設定檔(Claude Desktop / Cowork、Claude Code、Codex CLI、VS Code Copilot、Gemini CLI、Cursor、Windsurf)。
