@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-VIA_MCP_Engine — 泛用型多 AI 平台 MCP 設定引擎(Python 後端 + 滑鼠操作 HTML 前端)
+VIA_MCP_Engine v0101 — 泛用型多 AI 平台 MCP 設定引擎(Python 後端 + 滑鼠操作 HTML 前端)
+
+v0101(2026-11-05;操作員令「UPGRADE AGAIN AND ADD VERSION NO. ON THE NAME · OPTIMIZE TEST DEBUG USER-TEST DEBUG TILL IT WORKS · ADD IT TO VCGC」):
+  • 檔名帶版號(VIA_MCP_Engine_v0101.py / .html;前端檔照本檔 stem 找,舊名不再用)。
+  • 新增 probe(▶ 測試啟動):真的用渲染出的指令把 MCP server 跑起來,走 stdio JSON-RPC initialize → tools/list,
+    回報 server 名稱 / 版本 / 工具數;秘密只從憑證庫或環境變數注入子行程,stderr 回報前把秘密遮掉。
+  • VCGC 入口:via-vcgc mcp <子指令>(CGC_MDL149 v0192 薄尾轉接到本檔 main);--selftest 與 selftest 同義。
+  • GitHub API 位址可用 VIA_MCP_GITHUB_API 指到本機假伺服器(使用者測試用;預設 https://api.github.com)。
+  • 自測收尾印機讀判決行「[計] VIA_MCP_Engine v0101 自測 N/N · PASS」。
 
 一句話:把「哪個 AI 平台 → 接哪幾個 MCP Server → 用什麼跑 → 秘密放哪 → 設定檔寫到哪」
 這五件事收成一個只靠滑鼠點選就能完成的本機平台;每個平台最多掛 5 個 MCP。
@@ -19,15 +27,17 @@ VIA_MCP_Engine — 泛用型多 AI 平台 MCP 設定引擎(Python 後端 + 滑�
   • 零第三方依賴:只用 Python 標準庫(3.11+;tomllib 用於 Codex TOML 回讀驗證)。
 
 用法
-  python3 VIA_MCP_Engine.py serve [--port 8765] [--no-browser]     開前端(預設只綁 127.0.0.1)
-  python3 VIA_MCP_Engine.py doctor                                  環境偵測
-  python3 VIA_MCP_Engine.py platforms | catalog                     列平台 / MCP 目錄
-  python3 VIA_MCP_Engine.py add <platform> <server> [k=v ...]       加一個 MCP(上限 5)
-  python3 VIA_MCP_Engine.py remove <platform> <server>
-  python3 VIA_MCP_Engine.py apply <platform> [--dry-run]            寫設定檔(先備份)
-  python3 VIA_MCP_Engine.py token check                             Token 類型 / 範圍 / 到期
-  python3 VIA_MCP_Engine.py token readonly-test --repo o/r [--temp] 讀成功寫被拒驗證(+自動清理)
-  python3 VIA_MCP_Engine.py selftest                                離線自測(不連網、不碰真設定)
+  python3 VIA_MCP_Engine_v0101.py serve [--port 8765] [--no-browser]     開前端(預設只綁 127.0.0.1)
+  python3 VIA_MCP_Engine_v0101.py doctor                                  環境偵測
+  python3 VIA_MCP_Engine_v0101.py platforms | catalog                     列平台 / MCP 目錄
+  python3 VIA_MCP_Engine_v0101.py add <platform> <server> [k=v ...]       加一個 MCP(上限 5)
+  python3 VIA_MCP_Engine_v0101.py remove <platform> <server>
+  python3 VIA_MCP_Engine_v0101.py apply <platform> [--dry-run]            寫設定檔(先備份)
+  python3 VIA_MCP_Engine_v0101.py probe <platform> [name] [--timeout S]   真啟動 MCP 做 initialize / tools/list
+  python3 VIA_MCP_Engine_v0101.py token check                             Token 類型 / 範圍 / 到期
+  python3 VIA_MCP_Engine_v0101.py token readonly-test --repo o/r [--temp] 讀成功寫被拒驗證(+自動清理)
+  python3 VIA_MCP_Engine_v0101.py selftest | --selftest                   離線自測(不連網、不碰真設定)
+  經 VCGC:VIA_FROM_VCGC=YES via-vcgc mcp <以上任一子指令>
 
 環境變數
   VIA_MCP_HOME                   state / 備份 / 包裝器存放夾(預設 ~/.via_mcp_engine)
@@ -58,14 +68,14 @@ import webbrowser
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-VERSION = "0.1.0"
+VERSION = "v0101"
 ENGINE_NAME = "VIA_MCP_Engine"
 MAX_SERVERS_PER_PLATFORM = 5
 HERE = Path(__file__).resolve().parent
-HTML_FILE = HERE / "VIA_MCP_Engine.html"
-MANAGED_TAG = "via_mcp_engine"  # 寫進設定時標在 server 名稱清單(state),不寫進設定本體
-GITHUB_API = "https://api.github.com"
+HTML_FILE = HERE / (Path(__file__).stem + ".html")        # 前端與後端同 stem 同版號
+GITHUB_API = os.environ.get("VIA_MCP_GITHUB_API", "https://api.github.com").rstrip("/")  # 使用者測試可指本機假伺服器
 USER_AGENT = f"{ENGINE_NAME}/{VERSION}"
+PROBE_PROTOCOL = "2025-06-18"
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -902,7 +912,7 @@ def token_check(token: str, transport: Transport = http_transport) -> Dict[str, 
 def list_repos(token: str, transport: Transport = http_transport, limit: int = 100) -> List[Dict[str, Any]]:
     s, _, b = transport("GET", f"{GITHUB_API}/user/repos?per_page={limit}&sort=updated&affiliation=owner,collaborator", None, gh_headers(token))
     if s != 200 or not isinstance(b, list):
-        return []
+        raise ValueError(f"列倉失敗 HTTP {s}:{(b or {}).get('message') if isinstance(b, dict) else b}")
     return [{"full_name": r.get("full_name"), "private": r.get("private"), "default_branch": r.get("default_branch", "main")} for r in b]
 
 
@@ -1001,6 +1011,163 @@ def readonly_test_with_temp_repo(readonly_token: str, admin_token: str, owner: O
         result.setdefault("cleanup", []).append(
             f"刪除臨時倉 {full}:{'完成' if s2 == 204 else '失敗 ' + str(s2) + '(admin Token 需 delete_repo / Administration 權限)'}")
     return result
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# probe:用渲染出的指令真的把 MCP server 跑起來(stdio JSON-RPC:initialize → initialized → tools/list)
+# ────────────────────────────────────────────────────────────────────────────
+def _redact(text: str, secrets: List[str]) -> str:
+    for sv in secrets:
+        if sv and len(sv) >= 6:
+            text = text.replace(sv, mask(sv))
+    return text
+
+
+def probe_command(command: str, args: List[str], env: Dict[str, str], timeout: float = 90.0,
+                  secret_values: Optional[List[str]] = None, cwd: Optional[str] = None) -> Dict[str, Any]:
+    """啟動子行程,做 MCP 握手並列工具。回傳 ok / server / protocol / tools / stderr_tail / elapsed;不丟例外。"""
+    import time
+    import queue
+    t0 = time.time()
+    res: Dict[str, Any] = {"command": command, "args": args, "ok": False, "stage": "spawn", "tools": [], "tool_count": 0,
+                           "server": None, "protocol": None, "stderr_tail": "", "elapsed": 0.0, "rc": None}
+    full_env = dict(os.environ)
+    full_env.update(env or {})
+    secret_values = list(secret_values or [])
+    try:
+        proc = subprocess.Popen([command, *args], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                env=full_env, cwd=cwd or None, text=False)
+    except (OSError, ValueError) as e:
+        res["error"] = f"{type(e).__name__}: {e}"
+        res["elapsed"] = round(time.time() - t0, 2)
+        return res
+    out_q: "queue.Queue[Optional[bytes]]" = queue.Queue()
+    err_buf: List[bytes] = []
+
+    def pump_out() -> None:
+        assert proc.stdout is not None
+        for line in iter(proc.stdout.readline, b""):
+            out_q.put(line)
+        out_q.put(None)
+
+    def pump_err() -> None:
+        assert proc.stderr is not None
+        for line in iter(proc.stderr.readline, b""):
+            err_buf.append(line)
+            if sum(len(x) for x in err_buf) > 65536:
+                del err_buf[0]
+
+    threading.Thread(target=pump_out, daemon=True).start()
+    threading.Thread(target=pump_err, daemon=True).start()
+
+    def send(obj: Dict[str, Any]) -> bool:
+        try:
+            assert proc.stdin is not None
+            proc.stdin.write((json.dumps(obj) + "\n").encode("utf-8"))
+            proc.stdin.flush()
+            return True
+        except (OSError, ValueError):
+            return False
+
+    def recv(want_id: int) -> Optional[Dict[str, Any]]:
+        deadline = t0 + timeout
+        while time.time() < deadline:
+            try:
+                line = out_q.get(timeout=min(1.0, max(0.05, deadline - time.time())))
+            except queue.Empty:
+                if proc.poll() is not None and out_q.empty():
+                    return None
+                continue
+            if line is None:
+                return None
+            try:
+                msg = json.loads(line.decode("utf-8", "replace"))
+            except json.JSONDecodeError:
+                continue  # 有些 server 會往 stdout 印雜訊;只認 JSON 行
+            if isinstance(msg, dict) and msg.get("id") == want_id:
+                return msg
+        return None
+
+    try:
+        res["stage"] = "initialize"
+        if send({"jsonrpc": "2.0", "id": 1, "method": "initialize",
+                 "params": {"protocolVersion": PROBE_PROTOCOL, "capabilities": {},
+                            "clientInfo": {"name": ENGINE_NAME, "version": VERSION}}}):
+            init = recv(1)
+            if init and "result" in init:
+                r = init["result"]
+                res["server"] = r.get("serverInfo")
+                res["protocol"] = r.get("protocolVersion")
+                send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+                res["stage"] = "tools/list"
+                send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
+                tl = recv(2)
+                if tl and "result" in tl:
+                    tools = tl["result"].get("tools") or []
+                    res["tools"] = [t.get("name") for t in tools][:50]
+                    res["tool_count"] = len(tools)
+                    res["ok"] = True
+                    res["stage"] = "done"
+                elif tl and "error" in tl:
+                    res["error"] = f"tools/list 錯誤:{tl['error']}"
+                else:
+                    res["error"] = "tools/list 逾時或無回應"
+            elif init and "error" in init:
+                res["error"] = f"initialize 錯誤:{init['error']}"
+            else:
+                res["error"] = "initialize 逾時或無回應(第一次 npx / uvx 會先下載套件,可拉長 --timeout)"
+        else:
+            res["error"] = "無法寫入子行程 stdin(可能立刻退出)"
+    finally:
+        try:
+            if proc.stdin:
+                proc.stdin.close()
+        except OSError:
+            res.setdefault("notes", []).append("stdin 關閉時子行程已結束")
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            try:
+                proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                res.setdefault("notes", []).append("子行程 kill 後仍未收尾")
+        res["rc"] = proc.returncode
+        tail = b"".join(err_buf[-30:]).decode("utf-8", "replace")
+        res["stderr_tail"] = _redact(tail[-2000:], secret_values)
+        res["elapsed"] = round(time.time() - t0, 2)
+    return res
+
+
+def probe_instance(st: Dict[str, Any], platform_id: str, name: str, timeout: float = 90.0,
+                   env_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """對某平台已加入的一個 MCP 做 probe。秘密:先憑證庫、再環境變數;都沒有就照實回報缺秘密(仍嘗試啟動)。"""
+    env_info = env_info or doctor(st.get("project_dir"))
+    insts = [a for a in st["assignments"].get(platform_id, []) if a["name"] == name]
+    if not insts:
+        return {"ok": False, "error": f"{platform_id} 沒有 {name}"}
+    inst = insts[0]
+    cat = CATALOG_BY_ID[inst["server_id"]]
+    p = PLATFORM_BY_ID[platform_id]
+    fmt = p.get("format", "mcp_json")
+    srv, warnings, _ = render_server(cat, inst, {**p, "format": fmt}, env_info, "env")  # probe 一律本行程注入,不經包裝器
+    env = dict(srv["env"])
+    secret_values: List[str] = []
+    missing: List[str] = []
+    for sec in cat.get("secrets", []):
+        tok, _src = resolve_token("store", sec["store_key"], sec["env"])
+        if not tok:
+            tok, _src = resolve_token("env", sec["store_key"], sec["env"])
+        if tok:
+            env[sec["env"]] = tok
+            secret_values.append(tok)
+        else:
+            missing.append(sec["env"])
+    res = probe_command(srv["command"], srv["args"], env, timeout, secret_values)
+    res.update({"platform": platform_id, "name": name, "server_id": cat["id"], "runner": srv["runner"],
+                "warnings": warnings, "missing_secrets": missing, "at": now_iso()})
+    res["args"] = [_redact(a, secret_values) for a in res["args"]]
+    return res
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -1162,6 +1329,11 @@ class Api:
                 res["source"] = src
                 self._append_evidence("readonly_test", res)
                 return 200, res
+            if route == "/api/probe" and method == "POST":
+                st = load_state()
+                res = probe_instance(st, body["platform"], body["name"], float(body.get("timeout") or 90), self.env())
+                self._append_evidence("probe", res)
+                return 200, res
             if route == "/api/store-hint" and method == "GET":
                 return 200, {"hints": store_hints(q.get("key", "GITHUB_PAT_READONLY"))}
             return 404, {"error": f"無此路徑 {method} {route}"}
@@ -1302,10 +1474,35 @@ def _fake_github(readonly: bool) -> Transport:
     return t
 
 
+FAKE_MCP_SERVER = r'''
+import json, sys, os
+sys.stderr.write("fake-mcp booting with token " + os.environ.get("FAKE_TOKEN", "") + "\n"); sys.stderr.flush()
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    msg = json.loads(line)
+    m, i = msg.get("method"), msg.get("id")
+    if m == "initialize":
+        out = {"jsonrpc": "2.0", "id": i, "result": {"protocolVersion": msg["params"]["protocolVersion"], "capabilities": {"tools": {}},
+                                                     "serverInfo": {"name": "fake-mcp", "version": "9.9"}}}
+    elif m == "tools/list":
+        out = {"jsonrpc": "2.0", "id": i, "result": {"tools": [{"name": "read_file"}, {"name": "list_directory"}]}}
+    elif i is None:
+        continue
+    else:
+        out = {"jsonrpc": "2.0", "id": i, "error": {"code": -32601, "message": "no such method"}}
+    sys.stdout.write(json.dumps(out) + "\n"); sys.stdout.flush()
+'''
+TOTAL_CHECKS = [0]
+
+
 def selftest() -> int:
     fails: List[str] = []
+    TOTAL_CHECKS[0] = 0
 
     def check(cond: bool, msg: str) -> None:
+        TOTAL_CHECKS[0] += 1
         print(("  ✓ " if cond else "  ✗ ") + msg)
         if not cond:
             fails.append(msg)
@@ -1318,7 +1515,7 @@ def selftest() -> int:
         os.environ["VIA_MCP_FAKE_HOME"] = str(fake_home)
         os.environ["VIA_MCP_HOME"] = str(Path(td) / "engine")
         os.environ["VIA_MCP_SKIP_VERSIONS"] = "1"
-        print(f"[selftest] {ENGINE_NAME} v{VERSION} · 假 HOME {fake_home}")
+        print(f"[selftest] {ENGINE_NAME} {VERSION} · 假 HOME {fake_home}")
 
         print("[1] 目錄 / 平台資料完整性")
         check(len(CATALOG) >= 15 and len(set(c["id"] for c in CATALOG)) == len(CATALOG), f"目錄 {len(CATALOG)} 筆、id 不重複")
@@ -1481,12 +1678,55 @@ def selftest() -> int:
         code, payload = api.handle("GET", "/api/nope", {}, {})
         check(code == 404, "未知路徑 404")
         check(HTML_FILE.exists() and "VIA MCP Engine" in HTML_FILE.read_text(encoding="utf-8"), f"前端檔存在 {HTML_FILE.name}")
+        check(HTML_FILE.stem == Path(__file__).stem and VERSION in Path(__file__).stem, f"前後端同 stem 同版號 {VERSION}")
+
+        print("[10] probe:假 MCP server(stdio JSON-RPC)")
+        fake = Path(td) / "fake_mcp.py"
+        fake.write_text(FAKE_MCP_SERVER, encoding="utf-8")
+        pr = probe_command(sys.executable, ["-I", str(fake)], {"FAKE_TOKEN": "sekrit-token-123456"}, timeout=20,
+                           secret_values=["sekrit-token-123456"])
+        check(pr["ok"] and pr["tool_count"] == 2 and pr["server"]["name"] == "fake-mcp" and pr["protocol"] == PROBE_PROTOCOL,
+              f"握手 + tools/list:{pr.get('server')} 工具 {pr['tool_count']} · {pr['elapsed']}s")
+        check("sekrit-token-123456" not in json.dumps(pr) and "sekr…3456" in pr["stderr_tail"], "stderr 回報把秘密遮掉")
+        bad = probe_command(sys.executable, ["-I", "-c", "import sys; sys.exit(3)"], {}, timeout=5)
+        check(not bad["ok"] and bad["rc"] == 3 and bad.get("error"), f"立刻退出的 server 照實回報:{bad.get('error')}")
+        nf = probe_command("definitely-not-a-command-xyz", [], {}, timeout=5)
+        check(not nf["ok"] and "FileNotFoundError" in (nf.get("error") or ""), "找不到指令照實回報")
+        st = load_state()
+        st["assignments"]["cursor"] = []
+        assign(st, "cursor", "fetch")
+        save_state(st)
+        st["assignments"]["cursor"].append({"server_id": "github", "name": "github", "params": {"read_only": True}, "added_at": now_iso()})
+        save_state(st)
+        seen: Dict[str, Any] = {}
+
+        def stub_probe(command, args, env, timeout=90.0, secret_values=None, cwd=None):
+            seen.update(command=command, args=list(args), env=dict(env), secrets=list(secret_values or []))
+            return {"command": command, "args": list(args), "ok": True, "tool_count": 1, "tools": ["x"], "server": {"name": "stub"},
+                    "protocol": PROBE_PROTOCOL, "stderr_tail": "", "elapsed": 0.01, "rc": 0, "stage": "done"}
+
+        real_probe = globals()["probe_command"]
+        os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"] = "ghp_" + "q" * 36
+        try:
+            globals()["probe_command"] = stub_probe
+            pi = probe_instance(st, "cursor", "fetch", 5, {**env_linux, "runners": {"npx": False, "uvx": False, "docker": False, "binary": False}})
+            check(pi["name"] == "fetch" and pi["ok"] is True and any("uvx" in w for w in pi["warnings"]) and seen["command"] == "uvx",
+                  "probe_instance 缺執行器:仍組出 uvx 指令、帶警告、不丟例外")
+            pg = probe_instance(st, "cursor", "github", 5, env_linux)
+            check(seen["env"].get("GITHUB_PERSONAL_ACCESS_TOKEN", "").startswith("ghp_") and seen["env"].get("GITHUB_READ_ONLY") == "1"
+                  and pg["missing_secrets"] == [] and ("q" * 36) not in json.dumps(pg), "probe_instance 秘密由環境注入子行程、唯讀旗標在、回報不含秘密")
+        finally:
+            globals()["probe_command"] = real_probe
+            os.environ.pop("GITHUB_PERSONAL_ACCESS_TOKEN", None)
+        code, payload = api.handle("POST", "/api/probe", {}, {"platform": "cursor", "name": "nope"})
+        check(code == 200 and payload["ok"] is False and "沒有" in payload["error"], "/api/probe 找不到項目照實回")
 
     for k in ("VIA_MCP_FAKE_HOME", "VIA_MCP_HOME", "VIA_MCP_SKIP_VERSIONS"):
         os.environ.pop(k, None)
     print(f"[selftest] {'PASS' if not fails else 'FAIL'} · 失敗 {len(fails)}")
     for f in fails:
         print("   -", f)
+    print(f"[計] {ENGINE_NAME} {VERSION} 自測 {TOTAL_CHECKS[0] - len(fails)}/{TOTAL_CHECKS[0]} · {'PASS' if not fails else 'FAIL'}")
     return 0 if not fails else 1
 
 
@@ -1535,9 +1775,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     tk.add_argument("--source", choices=["env", "store"], default="env")
     tk.add_argument("--store-key", default="GITHUB_PAT_READONLY")
     tk.add_argument("--no-cleanup", action="store_true")
+    pb = sub.add_parser("probe", help="真啟動 MCP:initialize / tools/list")
+    pb.add_argument("platform"); pb.add_argument("name", nargs="?"); pb.add_argument("--timeout", type=float, default=90)
     sub.add_parser("selftest", help="離線自測")
     sub.add_parser("version")
-    ns = ap.parse_args(argv)
+    raw = list(sys.argv[1:] if argv is None else argv)
+    if raw == ["--selftest"]:                      # VCGC 慣例:run X --selftest 照路由給 X
+        return selftest()
+    ns = ap.parse_args(raw)
 
     if ns.cmd in (None, "serve"):
         serve(getattr(ns, "port", 8765), not getattr(ns, "no_browser", False), getattr(ns, "host", "127.0.0.1"))
@@ -1576,6 +1821,22 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
     if ns.cmd == "render":
         print(json.dumps(render_platform(st, ns.platform), ensure_ascii=False, indent=2)); return 0
+    if ns.cmd == "probe":
+        names = [ns.name] if ns.name else [a["name"] for a in st["assignments"].get(ns.platform, [])]
+        if not names:
+            print("此平台沒有已加入的 MCP", file=sys.stderr); return 2
+        worst = 0
+        for n in names:
+            r = probe_instance(st, ns.platform, n, ns.timeout)
+            lamp = "GREEN" if r["ok"] else "RED"
+            print(f"[probe] {ns.platform}/{n} {lamp} · {r.get('runner')} · 工具 {r['tool_count']} · {r['elapsed']}s"
+                  + (f" · {r.get('error')}" if r.get("error") else "") + (f" · 缺秘密 {r['missing_secrets']}" if r.get("missing_secrets") else ""))
+            if r["tools"]:
+                print("        " + ", ".join(r["tools"][:12]) + (" …" if r["tool_count"] > 12 else ""))
+            if r.get("stderr_tail") and not r["ok"]:
+                print("        stderr: " + r["stderr_tail"].strip().splitlines()[-1][:160] if r["stderr_tail"].strip() else "")
+            worst = max(worst, 0 if r["ok"] else 1)
+        return worst
     if ns.cmd == "apply":
         res = apply_platform(st, ns.platform, ns.dry_run); save_state(st)
         print(json.dumps({k: v for k, v in res.items() if k in ("applied", "dry_run", "config_path", "backup", "warnings", "reason", "bridge", "paste_json")}, ensure_ascii=False, indent=2))

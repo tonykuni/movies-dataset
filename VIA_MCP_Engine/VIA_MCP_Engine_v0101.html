@@ -58,6 +58,11 @@ main>*{min-width:0}
 .slot .meta{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot .body{flex:1;min-width:0}
 .slot .empty{color:var(--muted);font-size:13px}
+.probe{font-size:12px;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.probe .dot{width:8px;height:8px}
+button.play{width:30px;height:30px;border-radius:50%;font-size:13px;line-height:1;padding:0;color:var(--ok)}
+button.play.busy{animation:pulse 1s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
 .params{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .pbtn{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--chip);border-color:transparent;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pbtn.missing{outline:1px solid var(--bad);color:var(--bad)}
@@ -101,7 +106,7 @@ th{color:var(--muted);font-weight:600;font-size:12px}
 <body>
 <header>
   <div>
-    <h1>VIA MCP Engine</h1>
+    <h1>VIA MCP Engine <span class="badge" id="ver"></span></h1>
     <div class="sub">① 點平台 → ② 按 <b>+</b> 加 MCP(每平台最多 <span id="maxN">5</span>)→ ③ 套用 / 檢查。全程滑鼠。</div>
   </div>
   <div class="lights" id="lights"></div>
@@ -128,6 +133,7 @@ th{color:var(--muted);font-weight:600;font-size:12px}
       <button id="btnCopy">⎘ 複製 JSON</button>
       <button id="btnClone">⇆ 複製到別的平台</button>
       <button id="btnToken">🔐 GitHub Token 檢查</button>
+      <button id="btnProbeAll" title="用渲染出的指令真的啟動每個 MCP,做 initialize 與 tools/list">▶ 全部測試啟動</button>
     </div>
     <div id="platNote" class="note"></div>
     <div id="result"></div>
@@ -194,6 +200,7 @@ const el = (tag, attrs = {}, ...kids) => {
 };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let S = null, cur = null, showAll = false, tokSrc = "env", tokRepo = null;
+const probes = {};
 const openGroups = new Set();
 
 function toast(msg, bad) { const t = $("#toast"); t.textContent = msg; t.style.background = bad ? "var(--bad)" : "var(--ink)"; t.style.color = bad ? "#fff" : "var(--bg)"; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3200); }
@@ -205,7 +212,7 @@ async function api(path, body) {
 }
 async function refresh() {
   S = await api("/api/state");
-  $("#maxN").textContent = S.max_per_platform;
+  $("#maxN").textContent = S.max_per_platform; $("#ver").textContent = S.version;
   try { cur = cur || localStorage.getItem("via_mcp_platform") || "claude-desktop"; } catch (e) { cur = cur || "claude-desktop"; }
   if (!S.platforms.find(p => p.id === cur)) cur = S.platforms[0].id;
   renderLights(); renderPlatforms(); renderSlots(); renderCatalog();
@@ -249,7 +256,7 @@ function renderSlots() {
   $("#slotCount").textContent = p.mode === "none" ? "此平台沒有 MCP 入口" : `${p.assigned.length} / ${p.max}`;
   $("#platNote").innerHTML = (p.note ? esc(p.note) + " · " : "") + (p.config_path_resolved ? `設定檔:<code>${esc(p.config_path_resolved)}</code>${p.config_exists ? "(已存在,套用時合併並備份)" : "(尚不存在,套用時建立)"}` : "");
   const disabled = p.mode === "none";
-  ["btnPreview", "btnApply", "btnCopy", "btnClone"].forEach(id => $("#" + id).disabled = disabled);
+  ["btnPreview", "btnApply", "btnCopy", "btnClone", "btnProbeAll"].forEach(id => $("#" + id).disabled = disabled);
   $("#btnApply").textContent = p.mode === "local" ? "✔ 套用(先備份)" : p.mode === "paste" ? "✔ 產生貼上用 JSON" : p.mode === "remote" ? "✔ 產生橋接指令" : "✔ 套用";
   for (let i = 0; i < p.max; i++) {
     const inst = p.assigned[i];
@@ -268,7 +275,17 @@ function renderSlots() {
     }
     for (const sec of (cat.secrets || [])) params.append(el("span", { class: "pbtn", title: "秘密不入設定檔;走憑證庫包裝器 / VS Code inputs" }, `🔒 ${sec.label} → ${sec.store_key}`));
     body.append(params);
+    const pr = probes[cur + "/" + inst.name];
+    if (pr) {
+      const line = el("div", { class: "probe" }, el("span", { class: "dot " + (pr.busy ? "warn" : pr.ok ? "ok" : "bad") }),
+        pr.busy ? "啟動中…(第一次會先下載套件)" : pr.ok ? `可啟動 · ${pr.server?.name || ""} ${pr.server?.version || ""} · 工具 ${pr.tool_count} · ${pr.elapsed}s` : `啟動失敗 · ${pr.error || ""} · ${pr.elapsed || 0}s`);
+      if (!pr.busy && pr.tools?.length) line.append(el("span", { class: "badge", title: pr.tools.join(", ") }, pr.tools.slice(0, 4).join(" · ") + (pr.tool_count > 4 ? " …" : "")));
+      if (!pr.busy && pr.missing_secrets?.length) line.append(el("span", { class: "badge bad" }, "缺秘密 " + pr.missing_secrets.join(", ")));
+      if (!pr.busy && !pr.ok && pr.stderr_tail) line.append(el("span", { class: "badge", title: pr.stderr_tail }, "stderr…"));
+      body.append(line);
+    }
     box.append(el("div", { class: "slot filled" }, el("span", { class: "idx" }, i + 1), body,
+      el("button", { class: "play" + (pr?.busy ? " busy" : ""), title: "測試啟動(initialize / tools/list)", disabled: pr?.busy ? "" : null, onclick: () => probe(inst) }, "▶"),
       el("button", { class: "minus", title: "移除", onclick: () => remove(inst) }, "−")));
   }
 }
@@ -302,6 +319,12 @@ async function add(cat) {
     const need = (cat.params || []).find(pr => pr.required && !(inst.params?.[pr.key]?.length));
     if (need) editParam(inst, cat, need);
   } catch (e) { toast(e.message, true); }
+}
+async function probe(inst) {
+  const key = cur + "/" + inst.name; probes[key] = { busy: true }; renderSlots();
+  try { const r = await api("/api/probe", { platform: cur, name: inst.name, timeout: 120 }); probes[key] = r; toast(r.ok ? `${inst.name} 可啟動,工具 ${r.tool_count} 個` : `${inst.name} 啟動失敗:${r.error || ""}`, !r.ok); }
+  catch (e) { probes[key] = { ok: false, error: e.message }; toast(e.message, true); }
+  renderSlots();
 }
 async function remove(inst) {
   try { await api("/api/remove", { platform: cur, name: inst.name }); await refresh(); toast(`已移除 ${inst.name}`); } catch (e) { toast(e.message, true); }
@@ -378,6 +401,7 @@ function storeCmd(key) {
   if (o === "Darwin") return `security add-generic-password -s ${key} -a via -w`;
   return `secret-tool store --label='${key}' service ${key}`;
 }
+$("#btnProbeAll").onclick = async () => { const p = plat(); if (!p.assigned.length) return toast("還沒加入任何 MCP", true); for (const inst of p.assigned) await probe(inst); };
 $("#btnPreview").onclick = async () => { try { showResult(await api("/api/apply", { platform: cur, dry_run: true })); } catch (e) { toast(e.message, true); } };
 $("#btnApply").onclick = async () => { try { const r = await api("/api/apply", { platform: cur, dry_run: false }); showResult(r, true); await refresh(); toast(r.applied ? "已套用" : (r.reason || "已產生")); } catch (e) { toast(e.message, true); } };
 $("#btnCopy").onclick = async () => { try { const r = await api("/api/render?platform=" + encodeURIComponent(cur)); const t = r.paste_json || r.text || r.bridge || ""; await navigator.clipboard.writeText(t); toast("已複製到剪貼簿"); } catch (e) { toast("複製失敗:" + e.message, true); } };
@@ -438,7 +462,7 @@ async function runTest(temp) {
 $("#tokTest").onclick = () => runTest(false);
 $("#tokTemp").onclick = () => runTest(true);
 
-refresh().catch(e => { document.body.insertAdjacentHTML("beforeend", `<div class="panel" style="margin:16px">無法連到後端:${esc(e.message)}。請用 <code>python3 VIA_MCP_Engine.py serve</code> 啟動後再開此頁。</div>`); });
+refresh().catch(e => { document.body.insertAdjacentHTML("beforeend", `<div class="panel" style="margin:16px">無法連到後端:${esc(e.message)}。請用 <code>python3 VIA_MCP_Engine_v0101.py serve</code> 啟動後再開此頁。</div>`); });
 })();
 </script>
 </body>
