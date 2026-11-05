@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA MCP Engine</title>
+<meta name="description" content="泛用型多 AI 平台 MCP 設定引擎:點選平台 → 按 + 加 MCP(最多 5)→ 套用。秘密不落地,GitHub Token 一鍵唯讀驗證。">
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--ink:#17202a;--muted:#5d6b7a;--line:#dde3ea;--accent:#1f6feb;--accent-ink:#fff;
+  --ok:#1a7f37;--warn:#9a6700;--bad:#cf222e;--chip:#eef2f6;--chip-ink:#17202a;--shadow:0 1px 2px rgba(0,0,0,.06);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1116;--panel:#161b22;--ink:#e6edf3;--muted:#8b98a5;--line:#2b333d;--accent:#4493f8;--accent-ink:#0b1320;
+  --ok:#3fb950;--warn:#d29922;--bad:#f85149;--chip:#21262d;--chip-ink:#e6edf3;--shadow:none;}}
+:root[data-theme="dark"]{
+  --bg:#0e1116;--panel:#161b22;--ink:#e6edf3;--muted:#8b98a5;--line:#2b333d;--accent:#4493f8;--accent-ink:#0b1320;
+  --ok:#3fb950;--warn:#d29922;--bad:#f85149;--chip:#21262d;--chip-ink:#e6edf3;--shadow:none;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button.ghost{background:transparent}
+button.plus{width:34px;height:34px;border-radius:50%;font-size:20px;line-height:1;padding:0;font-weight:700;color:var(--accent)}
+button.minus{width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;padding:0;color:var(--bad)}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-width:0;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0;letter-spacing:.3px}
+header .sub{color:var(--muted);font-size:13px}
+.lights{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.light{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--chip-ink)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}.dot.warn{background:var(--warn)}
+main{display:grid;grid-template-columns:270px 1fr 330px;gap:14px;padding:14px 16px;max-width:1500px;margin:0 auto}
+@media (max-width:1100px){main{grid-template-columns:1fr 1fr}.col3{grid-column:1/-1}}
+@media (max-width:720px){main{grid-template-columns:1fr;padding:12px 16px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px;min-width:0;overflow-wrap:anywhere}
+main>*{min-width:0}
+.panel h2{font-size:14px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
+.panel h2 .n{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.step{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:700;align-items:center;justify-content:center}
+.vendor{margin:10px 0 4px;font-size:12px;color:var(--muted);font-weight:600}
+.plat{display:flex;align-items:center;gap:8px;width:100%;min-width:0;text-align:left;padding:8px 10px;margin:4px 0;border-radius:10px;border:1px solid var(--line);background:transparent}
+.plat .name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plat.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.plat .name{flex:1;font-size:14px}
+.badge{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.badge.local{color:var(--ok)}.badge.remote{color:var(--warn)}.badge.none{color:var(--bad)}.badge.paste{color:var(--accent)}
+.cnt{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);min-width:28px;text-align:right}
+.slots{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:12px}
+.slots>*{min-width:0}
+.slot{display:flex;align-items:center;gap:10px;border:1px dashed var(--line);border-radius:10px;padding:8px 10px;min-height:48px}
+.slot.filled{border-style:solid}
+.slot .idx{width:22px;color:var(--muted);font-size:12px;text-align:center}
+.slot .title{font-weight:600}
+.slot .meta{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .body{flex:1;min-width:0}
+.slot .empty{color:var(--muted);font-size:13px}
+.params{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.pbtn{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--chip);border-color:transparent;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbtn.missing{outline:1px solid var(--bad);color:var(--bad)}
+.pbtn.on{outline:1px solid var(--ok)}
+.group{margin:10px 0 2px;font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+.group button{font-size:11px;padding:1px 8px;border-radius:999px}
+.chips{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.chips>*{min-width:0}
+.chip{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:6px 8px 6px 12px}
+.chip .t{flex:1;min-width:0;overflow:hidden}
+.chip .t b{font-size:14px}
+.chip .t small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{color:var(--warn);font-size:12px;letter-spacing:1px;white-space:nowrap}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.note{color:var(--muted);font-size:13px;margin-top:8px;overflow-wrap:anywhere}
+code{font:12.5px var(--mono);background:var(--chip);padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
+.warn{color:var(--warn)}.bad{color:var(--bad)}.ok{color:var(--ok)}
+pre{background:var(--chip);border-radius:10px;padding:10px;font:12.5px/1.45 var(--mono);overflow:auto;max-height:360px;margin:8px 0 0;white-space:pre-wrap;word-break:break-all}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:90vw}
+.toast.show{opacity:1}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);padding:0;width:min(720px,94vw);max-height:86vh}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{display:flex;flex-direction:column;max-height:86vh}
+.dlg header{position:static;border-radius:14px 14px 0 0}
+.dlg .bodyx{padding:12px 16px;overflow:auto;flex:1}
+.dlg footer{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--line)}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.crumbs button{font-size:12px;padding:2px 8px;border-radius:999px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+.list button{text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list button.file{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:4px 12px;font-size:13px}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>VIA MCP Engine</h1>
+    <div class="sub">① 點平台 → ② 按 <b>+</b> 加 MCP(每平台最多 <span id="maxN">5</span>)→ ③ 套用 / 檢查。全程滑鼠。</div>
+  </div>
+  <div class="lights" id="lights"></div>
+  <button class="ghost" id="btnDoctor" title="重新偵測環境">↻ 偵測</button>
+  <button class="ghost" id="btnTheme" title="切換深淺色">◐</button>
+</header>
+
+<main>
+  <section class="panel col1">
+    <h2><span class="step">1</span> 平台 <span class="n" id="projLine"></span></h2>
+    <div id="platforms"></div>
+    <div class="actions">
+      <button id="btnProject" title="選 Claude Code / VS Code 的專案資料夾">📁 專案資料夾</button>
+    </div>
+    <div class="note">本機 = 直接寫設定檔 · 貼上 = 產生 JSON 讓你貼 · 遠端 = 只收 URL,給橋接指令 · 無 = 目前沒有 MCP 入口</div>
+  </section>
+
+  <section class="panel col2">
+    <h2><span class="step">2</span> <span id="platTitle">已加入</span> <span class="n" id="slotCount"></span></h2>
+    <div class="slots" id="slots"></div>
+    <div class="actions">
+      <button class="primary" id="btnPreview">👁 預覽設定</button>
+      <button class="primary" id="btnApply">✔ 套用(先備份)</button>
+      <button id="btnCopy">⎘ 複製 JSON</button>
+      <button id="btnClone">⇆ 複製到別的平台</button>
+      <button id="btnToken">🔐 GitHub Token 檢查</button>
+    </div>
+    <div id="platNote" class="note"></div>
+    <div id="result"></div>
+  </section>
+
+  <section class="panel col3">
+    <h2><span class="step">3</span> MCP 目錄 <span class="n"><span class="seg" id="segRec"><button class="on" data-v="1">推薦</button><button data-v="0">全部</button></span></span></h2>
+    <div id="catalog"></div>
+    <div class="note">★ 越多越安全(免費 · 開源 · 主流維護 · 資料不出本機)。「不建議」預設收合。</div>
+  </section>
+</main>
+
+<dialog id="dlgBrowse"><div class="dlg">
+  <header><div><h1 id="browseTitle" style="font-size:16px">選資料夾</h1><div class="sub" id="browsePath"></div></div></header>
+  <div class="bodyx">
+    <div class="crumbs" id="crumbs"></div>
+    <div class="group">常用</div><div class="list" id="suggested"></div>
+    <div class="group" style="margin-top:10px">內容</div><div class="list" id="entries"></div>
+  </div>
+  <footer><button id="browseCancel">取消</button><button class="primary" id="browsePick">選這個資料夾</button></footer>
+</div></dialog>
+
+<dialog id="dlgChoice"><div class="dlg">
+  <header><div><h1 id="choiceTitle" style="font-size:16px">選擇</h1></div></header>
+  <div class="bodyx"><div class="list" id="choiceList"></div></div>
+  <footer><button id="choiceCancel">取消</button></footer>
+</div></dialog>
+
+<dialog id="dlgToken"><div class="dlg">
+  <header><div><h1 style="font-size:16px">GitHub Token 檢查與唯讀驗證</h1><div class="sub">Token 只在記憶體,不寫 state、不寫設定檔;結果 JSON 只含遮罩</div></div></header>
+  <div class="bodyx">
+    <div class="group">Token 來源</div>
+    <div class="seg" id="segSrc"><button class="on" data-v="env">環境變數</button><button data-v="store" id="srcStore">憑證庫</button><button data-v="paste">一次性貼上</button></div>
+    <div id="pasteRow" class="note" style="display:none"><input id="pasteTok" type="password" placeholder="貼上 Token(只在本次使用)" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)"></div>
+    <div class="note" id="storeHint"></div>
+    <div class="actions">
+      <button class="primary" id="tokCheck">① 檢查類型 / 範圍 / 到期</button>
+      <button id="tokRepos">② 載入倉清單</button>
+      <span id="repoPick" style="display:none"><button id="tokPickRepo">選測試倉…</button> <span id="repoName" class="badge"></span></span>
+      <button class="primary" id="tokTest" disabled>③ 唯讀驗證(讀 ✓ 寫 ✗ · 自動清理)</button>
+      <button id="tokTemp" title="需要 GITHUB_ADMIN_TOKEN 環境變數;建私有臨時倉 → 測 → 刪">臨時倉模式</button>
+    </div>
+    <div id="tokOut"></div>
+  </div>
+  <footer><button id="tokClose">關閉</button></footer>
+</div></dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined) n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k !== null && k !== undefined) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let S = null, cur = null, showAll = false, tokSrc = "env", tokRepo = null;
+const openGroups = new Set();
+
+function toast(msg, bad) { const t = $("#toast"); t.textContent = msg; t.style.background = bad ? "var(--bad)" : "var(--ink)"; t.style.color = bad ? "#fff" : "var(--bg)"; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3200); }
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  const j = await r.json().catch(() => ({ error: "回應不是 JSON" }));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+async function refresh() {
+  S = await api("/api/state");
+  $("#maxN").textContent = S.max_per_platform;
+  try { cur = cur || localStorage.getItem("via_mcp_platform") || "claude-desktop"; } catch (e) { cur = cur || "claude-desktop"; }
+  if (!S.platforms.find(p => p.id === cur)) cur = S.platforms[0].id;
+  renderLights(); renderPlatforms(); renderSlots(); renderCatalog();
+  $("#projLine").textContent = S.state.project_dir;
+}
+function plat() { return S.platforms.find(p => p.id === cur); }
+function renderLights() {
+  const L = $("#lights"); L.innerHTML = "";
+  const t = S.env.tools;
+  const items = [["node", t.node.found], ["npx", t.npx.found], ["uvx", t.uvx.found], ["docker", t.docker.found],
+                 [S.env.secret_store.kind, S.env.secret_store.available]];
+  for (const [n, ok] of items) L.append(el("span", { class: "light", title: ok ? "已安裝" : "未安裝 — 用到時會警告" }, el("span", { class: "dot " + (ok ? "ok" : "bad") }), n));
+  L.append(el("span", { class: "light" }, el("span", { class: "dot ok" }), S.env.os));
+}
+function renderPlatforms() {
+  const box = $("#platforms"); box.innerHTML = "";
+  for (const v of S.vendors) {
+    const ps = S.platforms.filter(p => p.vendor === v);
+    if (!ps.length) continue;
+    box.append(el("div", { class: "vendor" }, v));
+    for (const p of ps) {
+      const modeLabel = { local: "本機", paste: "貼上", remote: "遠端", none: "無" }[p.mode];
+      const b = el("button", { class: "plat" + (p.id === cur ? " active" : ""), onclick: () => { cur = p.id; try { localStorage.setItem("via_mcp_platform", cur); } catch (e) {} renderPlatforms(); renderSlots(); renderCatalog(); $("#result").innerHTML = ""; } },
+        el("span", { class: "name" }, p.name), el("span", { class: "badge " + p.mode }, modeLabel),
+        el("span", { class: "cnt" }, p.mode === "none" ? "—" : `${p.assigned.length}/${p.max}`));
+      box.append(b);
+    }
+  }
+}
+function paramSummary(cat, inst) {
+  return (cat.params || []).map(pr => {
+    const v = inst.params?.[pr.key];
+    if (pr.type === "bool") return `${pr.label}:${v ? "開" : "關"}`;
+    if (v === undefined || v === "" || (Array.isArray(v) && !v.length)) return pr.required ? `⚠ ${pr.label} 未選` : null;
+    return `${pr.label}:${Array.isArray(v) ? v.join(" · ") : v}`;
+  }).filter(Boolean).join(" ｜ ");
+}
+function renderSlots() {
+  const p = plat(); const box = $("#slots"); box.innerHTML = "";
+  $("#platTitle").textContent = p.name;
+  $("#slotCount").textContent = p.mode === "none" ? "此平台沒有 MCP 入口" : `${p.assigned.length} / ${p.max}`;
+  $("#platNote").innerHTML = (p.note ? esc(p.note) + " · " : "") + (p.config_path_resolved ? `設定檔:<code>${esc(p.config_path_resolved)}</code>${p.config_exists ? "(已存在,套用時合併並備份)" : "(尚不存在,套用時建立)"}` : "");
+  const disabled = p.mode === "none";
+  ["btnPreview", "btnApply", "btnCopy", "btnClone"].forEach(id => $("#" + id).disabled = disabled);
+  $("#btnApply").textContent = p.mode === "local" ? "✔ 套用(先備份)" : p.mode === "paste" ? "✔ 產生貼上用 JSON" : p.mode === "remote" ? "✔ 產生橋接指令" : "✔ 套用";
+  for (let i = 0; i < p.max; i++) {
+    const inst = p.assigned[i];
+    if (!inst) { box.append(el("div", { class: "slot" }, el("span", { class: "idx" }, i + 1), el("span", { class: "empty" }, disabled ? "—" : "空位:在右側目錄按 + 加入"))); continue; }
+    const cat = S.catalog.find(c => c.id === inst.server_id);
+    const body = el("div", { class: "body" }, el("div", { class: "title" }, cat.name, " ", el("span", { class: "badge" }, inst.name)), el("div", { class: "meta" }, cat.desc));
+    const params = el("div", { class: "params" });
+    for (const pr of (cat.params || [])) {
+      const v = inst.params?.[pr.key];
+      const has = !(v === undefined || v === "" || (Array.isArray(v) && !v.length));
+      let label;
+      if (pr.type === "bool") label = `${pr.label}:${v ? "開" : "關"}`;
+      else label = has ? `${pr.label}:${Array.isArray(v) ? v.map(x => x.split(/[\\/]/).pop() || x).join(" · ") : String(v).split(/[\\/]/).pop()}` : `${pr.label}…`;
+      const cls = "pbtn" + (pr.type === "bool" ? (v ? " on" : "") : (has ? " on" : (pr.required ? " missing" : "")));
+      params.append(el("button", { class: cls, title: has && pr.type !== "bool" ? (Array.isArray(v) ? v.join("\n") : v) : "點選", onclick: () => editParam(inst, cat, pr) }, label));
+    }
+    for (const sec of (cat.secrets || [])) params.append(el("span", { class: "pbtn", title: "秘密不入設定檔;走憑證庫包裝器 / VS Code inputs" }, `🔒 ${sec.label} → ${sec.store_key}`));
+    body.append(params);
+    box.append(el("div", { class: "slot filled" }, el("span", { class: "idx" }, i + 1), body,
+      el("button", { class: "minus", title: "移除", onclick: () => remove(inst) }, "−")));
+  }
+}
+function renderCatalog() {
+  const p = plat(); const box = $("#catalog"); box.innerHTML = "";
+  const full = p.mode !== "none" && p.assigned.length >= p.max;
+  for (const g of S.groups) {
+    let items = S.catalog.filter(c => c.group === g && (showAll || c.recommended || g !== "不建議"));
+    if (!showAll) items = items.filter(c => c.recommended || c.group === "核心");
+    if (!items.length) continue;
+    const collapsed = g === "不建議" && !openGroups.has(g);
+    box.append(el("div", { class: "group" }, g, g === "不建議" ? el("button", { onclick: () => { openGroups.has(g) ? openGroups.delete(g) : openGroups.add(g); renderCatalog(); } }, collapsed ? "展開" : "收合") : null));
+    if (collapsed) continue;
+    const list = el("div", { class: "chips" });
+    for (const c of items) {
+      const disabled = p.mode === "none" || full;
+      list.append(el("div", { class: "chip", title: `${c.maintainer} · ${c.runner} ${c.package || c.image || ""}` },
+        el("div", { class: "t" }, el("b", {}, c.name), el("small", {}, c.desc)),
+        el("span", { class: "stars", title: `安全 ${c.safety}/5` }, "★".repeat(c.safety) + "☆".repeat(5 - c.safety)),
+        el("button", { class: "plus", disabled: disabled ? "" : null, title: disabled ? (full ? "已滿 5 個" : "此平台無法加入") : `加入 ${c.name}`, onclick: () => add(c) }, "+")));
+    }
+    box.append(list);
+  }
+}
+async function add(cat) {
+  try {
+    const r = await api("/api/assign", { platform: cur, server: cat.id });
+    await refresh();
+    toast(`已加入 ${cat.name}(${r.count}/${S.max_per_platform})`);
+    const p = plat(); const inst = p.assigned.find(a => a.name === r.instance.name);
+    const need = (cat.params || []).find(pr => pr.required && !(inst.params?.[pr.key]?.length));
+    if (need) editParam(inst, cat, need);
+  } catch (e) { toast(e.message, true); }
+}
+async function remove(inst) {
+  try { await api("/api/remove", { platform: cur, name: inst.name }); await refresh(); toast(`已移除 ${inst.name}`); } catch (e) { toast(e.message, true); }
+}
+async function saveParams(inst) {
+  await api("/api/update-params", { platform: cur, name: inst.name, params: inst.params });
+  await refresh();
+}
+async function editParam(inst, cat, pr) {
+  inst.params = inst.params || {};
+  if (pr.type === "bool") { inst.params[pr.key] = !inst.params[pr.key]; return saveParams(inst); }
+  if (pr.type === "choice") {
+    const v = await choose(pr.label, pr.choices.map(c => ({ label: c, value: c })));
+    if (v !== null) { inst.params[pr.key] = v; return saveParams(inst); }
+    return;
+  }
+  if (pr.type === "paths") {
+    const picked = await browseDialog(`加一個「${pr.label}」(可重複加)`, false);
+    if (picked) { const arr = inst.params[pr.key] || []; if (!arr.includes(picked)) arr.push(picked); inst.params[pr.key] = arr; await saveParams(inst); toast("已加入資料夾;再點一次可加更多,點 − 可整個移除"); }
+    return;
+  }
+  if (pr.type === "path") { const v = await browseDialog(pr.label, false); if (v) { inst.params[pr.key] = v; return saveParams(inst); } return; }
+  if (pr.type === "file") { const v = await browseDialog(pr.label, true, pr.ext); if (v) { inst.params[pr.key] = v; return saveParams(inst); } return; }
+}
+function choose(title, items) {
+  return new Promise(res => {
+    const d = $("#dlgChoice"); $("#choiceTitle").textContent = title; const L = $("#choiceList"); L.innerHTML = "";
+    for (const it of items) L.append(el("button", { onclick: () => { d.close(); res(it.value); } }, it.label));
+    $("#choiceCancel").onclick = () => { d.close(); res(null); };
+    d.showModal();
+  });
+}
+function browseDialog(title, wantFiles, exts) {
+  return new Promise(res => {
+    const d = $("#dlgBrowse"); $("#browseTitle").textContent = title; let curPath = null;
+    $("#browsePick").style.display = wantFiles ? "none" : "";
+    const load = async (path) => {
+      const q = new URLSearchParams(); if (path) q.set("path", path); if (wantFiles) { q.set("files", "1"); if (exts) q.set("ext", exts.join(",")); }
+      const b = await api("/api/browse?" + q.toString());
+      curPath = b.path; $("#browsePath").textContent = b.path || "選磁碟 / 根目錄";
+      const C = $("#crumbs"); C.innerHTML = "";
+      if (b.path) {
+        const parts = b.path.split(/[\\/]/).filter(Boolean); let acc = b.path.match(/^[A-Za-z]:/) ? "" : "/";
+        C.append(el("button", { onclick: () => load(null) }, "⌂"));
+        parts.forEach((seg, i) => { acc = acc === "/" || acc === "" ? (acc + seg + (b.path.match(/^[A-Za-z]:/) && i === 0 ? "/" : "")) : acc.replace(/\/?$/, "/") + seg; const target = acc; C.append(el("button", { onclick: () => load(target) }, seg)); });
+        if (b.parent) C.append(el("button", { onclick: () => load(b.parent) }, "↑ 上一層"));
+      }
+      const Sg = $("#suggested"); Sg.innerHTML = ""; for (const s of b.suggested) Sg.append(el("button", { onclick: () => load(s) }, s));
+      const E = $("#entries"); E.innerHTML = "";
+      for (const dd of b.dirs) E.append(el("button", { onclick: () => load(dd.path) }, "📁 " + dd.name));
+      for (const f of b.files) E.append(el("button", { class: "file", onclick: () => { d.close(); res(f.path); } }, "📄 " + f.name));
+      if (!b.dirs.length && !b.files.length) E.append(el("div", { class: "note" }, "(空)"));
+    };
+    $("#browseCancel").onclick = () => { d.close(); res(null); };
+    $("#browsePick").onclick = () => { if (!curPath) return toast("先點進一個資料夾", true); d.close(); res(curPath); };
+    d.showModal(); load(null).catch(e => toast(e.message, true));
+  });
+}
+function showResult(r, applied) {
+  const R = $("#result"); R.innerHTML = "";
+  const lines = [];
+  if (r.warnings?.length) lines.push(el("div", { class: "note warn" }, "⚠ " + r.warnings.filter(Boolean).join(" ｜ ")));
+  if (applied && r.applied) lines.push(el("div", { class: "note ok" }, `✔ 已寫入 ${r.config_path}` + (r.backup ? ` · 舊檔備份:${r.backup}` : "") + " · 重啟該 AI 應用後生效"));
+  if (applied && !r.applied && r.reason) lines.push(el("div", { class: "note" }, r.reason));
+  if (r.wrappers?.length) lines.push(el("div", { class: "note" }, "🔒 包裝器:" + r.wrappers.map(w => `${w.path}(憑證鍵 ${w.store_keys.join(", ")})`).join(" ｜ ") + " — 先把 Token 存進憑證庫:", el("pre", {}, r.wrappers.map(w => w.store_keys.map(k => storeCmd(k)).join("\n")).join("\n"))));
+  if (r.bridge) lines.push(el("pre", {}, r.bridge));
+  const text = r.merged_preview || r.text || r.paste_json;
+  if (text) lines.push(el("pre", {}, text));
+  R.append(...lines);
+}
+function storeCmd(key) {
+  const o = S.env.os;
+  if (o === "Windows") return `cmdkey /generic:${key} /user:via /pass:<貼上 Token>`;
+  if (o === "Darwin") return `security add-generic-password -s ${key} -a via -w`;
+  return `secret-tool store --label='${key}' service ${key}`;
+}
+$("#btnPreview").onclick = async () => { try { showResult(await api("/api/apply", { platform: cur, dry_run: true })); } catch (e) { toast(e.message, true); } };
+$("#btnApply").onclick = async () => { try { const r = await api("/api/apply", { platform: cur, dry_run: false }); showResult(r, true); await refresh(); toast(r.applied ? "已套用" : (r.reason || "已產生")); } catch (e) { toast(e.message, true); } };
+$("#btnCopy").onclick = async () => { try { const r = await api("/api/render?platform=" + encodeURIComponent(cur)); const t = r.paste_json || r.text || r.bridge || ""; await navigator.clipboard.writeText(t); toast("已複製到剪貼簿"); } catch (e) { toast("複製失敗:" + e.message, true); } };
+$("#btnClone").onclick = async () => {
+  const targets = S.platforms.filter(p => p.id !== cur && p.mode !== "none").map(p => ({ label: `${p.name}(目前 ${p.assigned.length})`, value: p.id }));
+  const to = await choose("把這個平台的 MCP 複製到…(會覆蓋目標現有指派)", targets);
+  if (!to) return;
+  try { const r = await api("/api/clone", { from: cur, to }); toast(`已複製 ${r.count} 個到 ${S.platforms.find(p => p.id === to).name}`); await refresh(); } catch (e) { toast(e.message, true); }
+};
+$("#btnProject").onclick = async () => { const v = await browseDialog("專案資料夾(Claude Code .mcp.json / VS Code .vscode/mcp.json 會放這裡)", false); if (v) { try { await api("/api/project", { project_dir: v }); await refresh(); toast("專案資料夾已設定"); } catch (e) { toast(e.message, true); } } };
+$("#btnDoctor").onclick = async () => { try { await api("/api/doctor"); await refresh(); toast("已重新偵測"); } catch (e) { toast(e.message, true); } };
+$("#btnTheme").onclick = () => { const r = document.documentElement; const nxt = r.dataset.theme === "dark" ? "light" : "dark"; r.dataset.theme = nxt; try { localStorage.setItem("via_mcp_theme", nxt); } catch (e) {} };
+try { const th = localStorage.getItem("via_mcp_theme"); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+$("#segRec").onclick = e => { const b = e.target.closest("button"); if (!b) return; showAll = b.dataset.v === "0"; [...$("#segRec").children].forEach(x => x.classList.toggle("on", x === b)); renderCatalog(); };
+
+/* ── Token 對話框 ── */
+const tokBody = () => ({ source: tokSrc, token: tokSrc === "paste" ? $("#pasteTok").value : undefined, store_key: "GITHUB_PAT_READONLY" });
+$("#btnToken").onclick = async () => {
+  $("#srcStore").textContent = S.env.secret_store.label.split("(")[0];
+  $("#storeHint").textContent = "存入憑證庫:" + storeCmd("GITHUB_PAT_READONLY") + "   ·   環境變數:GITHUB_PERSONAL_ACCESS_TOKEN";
+  $("#tokOut").innerHTML = ""; $("#dlgToken").showModal();
+};
+$("#tokClose").onclick = () => { $("#pasteTok").value = ""; $("#dlgToken").close(); };
+$("#segSrc").onclick = e => { const b = e.target.closest("button"); if (!b) return; tokSrc = b.dataset.v; [...$("#segSrc").children].forEach(x => x.classList.toggle("on", x === b)); $("#pasteRow").style.display = tokSrc === "paste" ? "" : "none"; };
+function kv(obj, keys) { const T = el("table"); for (const k of keys) if (obj[k] !== undefined && obj[k] !== null) T.append(el("tr", {}, el("th", {}, k), el("td", {}, Array.isArray(obj[k]) ? (obj[k].join(", ") || "(無)") : String(obj[k])))); return T; }
+$("#tokCheck").onclick = async () => {
+  const O = $("#tokOut"); O.innerHTML = "檢查中…";
+  try {
+    const r = await api("/api/token/check", tokBody());
+    O.innerHTML = ""; O.append(el("div", { class: "note " + (r.ok ? "ok" : "bad") }, r.ok ? `✔ Token 有效(${r.kind},${r.source})` : `✘ ${r.error || "無效"}`));
+    O.append(kv(r, ["login", "kind", "token_masked", "classic_scopes", "expires", "looks_readonly", "can_list_repos", "rate_limit_remaining", "advice"]));
+  } catch (e) { O.innerHTML = ""; O.append(el("div", { class: "note bad" }, e.message)); }
+};
+$("#tokRepos").onclick = async () => {
+  try {
+    const r = await api("/api/token/repos", tokBody());
+    if (!r.repos.length) return toast("此 Token 看不到任何倉(fine-grained 需先授權倉)", true);
+    $("#repoPick").style.display = "";
+    $("#tokPickRepo").onclick = async () => { const v = await choose("選一個測試倉(建議用專門的測試倉)", r.repos.map(x => ({ label: (x.private ? "🔒 " : "🌐 ") + x.full_name, value: x.full_name }))); if (v) { tokRepo = v; $("#repoName").textContent = v; $("#tokTest").disabled = false; } };
+    $("#tokPickRepo").click();
+  } catch (e) { toast(e.message, true); }
+};
+async function runTest(temp) {
+  const O = $("#tokOut"); O.innerHTML = "驗證中…(讀 5 項、寫 3 項;寫入若成功會立即清理)";
+  try {
+    const r = await api("/api/token/readonly-test", { ...tokBody(), repo: tokRepo, temp });
+    O.innerHTML = "";
+    if (r.error) { O.append(el("div", { class: "note bad" }, r.error)); return; }
+    const cls = r.verdict === "READONLY_OK" ? "ok" : "bad";
+    O.append(el("div", { class: "note " + cls }, `${r.verdict === "READONLY_OK" ? "✔" : "✘"} ${r.verdict} — ${r.advice}` + (r.temp_repo ? ` · 臨時倉 ${r.temp_repo}` : "")));
+    const T = el("table", {}, el("tr", {}, el("th", {}, "測試"), el("th", {}, "預期"), el("th", {}, "實際"), el("th", {}, "HTTP"), el("th", {}, "")));
+    for (const row of r.rows) T.append(el("tr", {}, el("td", {}, row.test), el("td", {}, row.expected), el("td", {}, row.actual), el("td", {}, String(row.status)), el("td", { class: row.pass ? "ok" : "bad" }, row.pass ? "✅" : "❌ " + (row.message || ""))));
+    O.append(T);
+    if (r.cleanup?.length) O.append(el("div", { class: "note" }, "🧹 清理:" + r.cleanup.join(" ｜ ")));
+    if (r.note) O.append(el("div", { class: "note" }, r.note));
+  } catch (e) { O.innerHTML = ""; O.append(el("div", { class: "note bad" }, e.message)); }
+}
+$("#tokTest").onclick = () => runTest(false);
+$("#tokTemp").onclick = () => runTest(true);
+
+refresh().catch(e => { document.body.insertAdjacentHTML("beforeend", `<div class="panel" style="margin:16px">無法連到後端:${esc(e.message)}。請用 <code>python3 VIA_MCP_Engine.py serve</code> 啟動後再開此頁。</div>`); });
+})();
+</script>
+</body>
+</html>
