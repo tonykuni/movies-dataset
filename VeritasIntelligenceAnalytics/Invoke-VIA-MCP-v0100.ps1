@@ -138,12 +138,13 @@ function Invoke-VIAMcp([string]$Step, [string[]]$McpArgs, [int]$Sec = 0, [switch
 # ---------- 短令(只寫自己的 $PROFILE;L70:不碰 Register / Override / Launch) ----------
 function Install-VIAMcpShortcut {
     $marker = '# [VIA-MCP-SHORTCUT v0100]'
-    $line = "$marker function via-mcp { & pwsh -ExecutionPolicy Bypass -File '" + $PSCommandPath + "' @args }"
+    # 函式定義在前、標記當行尾註解(標記放行首整行會變註解,via-mcp 永遠不會被定義)
+    $line = "function via-mcp { & pwsh -ExecutionPolicy Bypass -File '" + $PSCommandPath + "' @args }   $marker"
     $prof = $PROFILE
     if (-not (Test-Path $prof)) { New-Item -ItemType File -Force -Path $prof | Out-Null }
     $cur = Get-Content -LiteralPath $prof -Raw -ErrorAction SilentlyContinue
     if ($cur -and $cur.Contains($marker)) {
-        $cur = ($cur -split "`r?`n" | Where-Object { -not $_.StartsWith($marker) }) -join [Environment]::NewLine
+        $cur = ($cur -split "`r?`n" | Where-Object { -not $_.Contains($marker) }) -join [Environment]::NewLine
         Set-Content -LiteralPath $prof -Value $cur -Encoding UTF8
     }
     Add-Content -LiteralPath $prof -Value $line -Encoding UTF8
@@ -201,10 +202,11 @@ if ($Action -in @('all', 'pull') -and -not $NoPull) {
         if ($git) {
             $before = (& git -C $RepoRoot rev-parse --short HEAD 2>$null)
             $pull = & git -C $RepoRoot pull --ff-only 2>&1
+            $pullRc = $LASTEXITCODE                                   # 先存,後面的 rev-parse 會蓋掉 $LASTEXITCODE
             $after = (& git -C $RepoRoot rev-parse --short HEAD 2>$null)
             $pull | Out-String | Add-Content -LiteralPath $LogFile -Encoding UTF8
-            if ($LASTEXITCODE -eq 0) { Write-Lamp 'pull' 'GREEN' ("{0} → {1}" -f $before, $after) }
-            else { Write-Lamp 'pull' 'YELLOW' ("git pull 回 rc {0}(本機有改動或非 ff;看日誌;照舊版繼續)" -f $LASTEXITCODE) }
+            if ($pullRc -eq 0) { Write-Lamp 'pull' 'GREEN' ("{0} → {1}" -f $before, $after) }
+            else { Write-Lamp 'pull' 'YELLOW' ("git pull 回 rc {0}(本機有改動或非 ff;看日誌;照舊版繼續)" -f $pullRc) }
             # pull 後尾版可能換了,重取
             $Console = Get-ChildItem -LiteralPath (Join-Path $VIA 'supportive modules\registry') -Filter 'CGC_MDL149_VeritasCentralGovernanceConsole_v*.py' -File | Sort-Object { [int]([regex]::Match($_.Name, '_v(\d+)\.py$').Groups[1].Value) } | Select-Object -Last 1
             $Engine = Get-ChildItem -LiteralPath (Join-Path $RepoRoot 'VIA_MCP_Engine') -Filter 'VIA_MCP_Engine_v*.py' -File -ErrorAction SilentlyContinue | Sort-Object { [int]([regex]::Match($_.Name, '_v(\d+)\.py$').Groups[1].Value) } | Select-Object -Last 1
