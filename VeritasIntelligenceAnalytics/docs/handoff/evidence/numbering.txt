@@ -37,12 +37,12 @@
   [OK] ② 冊上那一欄是引用不是正則(「正本 TW_TICKER」)→ 只記 pattern_ref,不假造 pattern · 正本 TW_TICKER
   [OK] ③ 非 RGX / 非 R22 的項原樣不動
   [OK] ③b 陣列索引:name[1].pattern · name.0.pattern · 帶點鍵 + 多層索引 a.b[1][0].rx 都取得到;越界回 None · ['^B[0-9]$', '^A$', '^Y$', None]
-  [OK] ④ 中央檢測:舊列沒 scope → REVIEW ['LEGACY_REGEX_CONFLICT_OR_UNPROVEN'];補 scope 後 → READY(不同欄的新正則不再拿它比)
-  [OK] ⑤ 同一欄照比:同 scope · 原式重疊 · 語意鍵不同 → 照樣擋(REVIEW ['LEGACY_REGEX_CONFLICT_OR_UNPROVEN'])—— 不是全面放行
+  [FAIL] ④ 中央檢測:舊列沒 scope → REVIEW ['LEGACY_REGEX_CONFLICT_OR_UNPROVEN', 'REGEX_PROOF_ENGINE_ABSENT'];補 scope 後 → REVIEW(不同欄的新正則不再拿它比) · ({'candidate_id': 'VDF:RGX:IN-01', 'source_id': 'vdf-ssotsync:t', 'ssot_code': None, 'state': 'REVIEW', 'reasons': ['LEGACY_REGEX_CONFLICT_OR_UNPROVEN', 'REGEX_PROOF_ENGINE_ABSENT'], 'conflicts': [{'code': None, 'source': 'VIA_VDF_StartTestRegister_SSOT_v0100.json', 'name': 'verbs.vdf.verb.start.regex', 'kind': 'RGX', 'scope': None}, {'code': None, 'source': 'VIA_VDF_TWMarketEndpoints_SSOT_v0100.json', 'name': 'daily_universe.columns.ticker.rx', 'kind': 'RGX', 'scope': None}], 'conflict_count': 2}, {'candidate_id': 'VDF:RGX:IN-01', 'source_id': 'vdf-ssotsync:t', 'ssot_code': None, 'state': 'REVIEW', 'reasons': ['REGEX_PROOF_ENGINE_ABSENT']})
+  [OK] ⑤ 同一欄照比:同 scope · 原式重疊 · 語意鍵不同 → 照樣擋(REVIEW ['LEGACY_REGEX_CONFLICT_OR_UNPROVEN', 'REGEX_PROOF_ENGINE_ABSENT'])—— 不是全面放行
   [OK] ⑥ 換裝在位:v0100 collect 叫的 r22_items = 本版 · 真倉 VDF 那 4 列都有 scope(4 列 · 原式 3 · 引用 1)
   [OK] ⑥a 真倉 R22 正則 148 列:帶陣列索引的 120 列取到原式 / 引用 120 列(只有冊讀不到或那一欄不在才缺)
   [OK] ⑥b 讀冊投影:存冊那 4 列(VIA-VDF-RGX001 … 004)讀進來都有 scope · 號不變 · 存冊本身一字不動(沒有 scope 欄)
-  [OK] ⑥c 真候選冊(VIA_AssetCandidates_SSOT_v0102.json)× 真存冊:VDF 兩條代號正則 → ['REGISTERED', 'REGISTERED'](manager 照這份計畫發號)
+  [FAIL] ⑥c 真候選冊(VIA_AssetCandidates_SSOT_v0102.json)× 真存冊:VDF 兩條代號正則 → ['REVIEW', 'REVIEW'](manager 照這份計畫發號) · [{'candidate_id': 'VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-01.code_regex', 'source_id': 'vdf-ssotsync:VDF_SSOT_Register', 'ssot_code': 'VIA-VDF-RGX007', 'state': 'REVIEW', 'reasons': ['REGEX_PROOF_ENGINE_ABSENT']}, {'candidate_id': 'VDF:RGX:VDF_InputUniverse_SSOT:inputs.IN-02.code_regex', 'source_id': 'vdf-ssotsync:VDF_SSOT_Register', 'ssot_code': 'VIA-VDF-RGX008', 'state': 'REVIEW', 'reasons': ['REGEX_PROOF_ENGINE_ABSENT']}]
   [OK] ⑦ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 本檔不寫任何檔(寫冊只走前版的 --apply)
 === CGC_MDL237_NumberingSystem_v0118 · 薄尾自測(IMMUT 不算交接收據)===
   [OK] ① 沿鏈找到 immut_violations / registry_checks 的本體(v0109)並換裝;door 報本尾版
@@ -71,12 +71,12 @@
   [OK] ⑧ XCODE:共用 VIA-TOOL 空間同號兩主抓到 · ['VIA-TOOL-0001:b.py ↔ tool|a']
   [OK] ⑨ FPSTALE:指紋過期抓到;CRLF 工作複本照容忍 · ['S2 a.json']
   [OK] ⑩ UNCOMMITTED · TIMEFMT:未提交列與不帶時區的新時間抓到 · {'u': ['X1', 'X3'], 'tf': ['N3', 'N4']}
-  [OK] ⑪ 實樹唯讀:六項註冊完整性都量得出(引擎版本冊 · 元件冊 · 編號冊 · 架構冊都讀得到) · {'IMMUT': ('GREEN', 0), 'DUPREG': ('GREEN', 0), 'XCODE': ('GREEN', 0), 'FPSTALE': ('YELLOW', 528), 'UNCOMMITTED': ('YELLOW', 150), 'TIMEFMT': ('GREEN', 0)}
+  [OK] ⑪ 實樹唯讀:六項註冊完整性都量得出(引擎版本冊 · 元件冊 · 編號冊 · 架構冊都讀得到) · {'IMMUT': ('GREEN', 0), 'DUPREG': ('GREEN', 0), 'XCODE': ('GREEN', 0), 'FPSTALE': ('YELLOW', 527), 'UNCOMMITTED': ('YELLOW', 150), 'TIMEFMT': ('GREEN', 0)}
   [OK] ⑫ 檔頭 · 加速器橋 · 網路橋在;不碰 TA-Lib
 [編號 v0109] 本版 12/12
   [OK] ① 活檔只看目錄:檔名含隔離字樣不算隔離,目錄才算 · {'x_invalid_quarantine_gate_v02783.py': True, 'x_v0100.py': False, 'y_v0100.py': False, 'z.py': False, 'RUN_2026_note_v0100.py': True}
   [OK] ② 本版裝進本體(收集器呼叫的就是本版)
-  [OK] ③ 實樹:被檔名誤排的活檔現在收得到,其餘判定一支不少 · 舊 4036 → 新 4037
+  [OK] ③ 實樹:被檔名誤排的活檔現在收得到,其餘判定一支不少 · 舊 4041 → 新 4042
   [OK] ④ 只增:新增 1 · 遺失 0 · 改身分 0 · 重號 0 · {'before': 4, 'after': 5, 'added': 1, 'missing': [], 'changed_identity': [], 'duplicate_codes': 0, 'duplicate_sample': []}
   [OK] ⑤ 反控:遺失(MDL002 · SSOT001)· 改身分(MDL001 · FNC001)· 重號 都抓得到 · {'before': 4, 'after': 3, 'added': 0, 'missing': ['VIA-A-MDL002', 'VIA-A-SSOT001'], 'changed_identity': ['VIA-A-MDL001', 'VIA-A-MDL001-FNC001'], 'duplicate_codes': 1, 'duplicate_sample': ['VIA-A-MDL001']}
   [OK] ⑥ 冊內一致:乾淨冊 0 項
@@ -105,7 +105,7 @@
   [OK] 再跑一次同鍵同號(只增)
   [OK] 冊上代碼跳號 = 紅燈記下,不改任何一邊 · VIA-VCGC-WKF001
   [OK] Z282③ 編號系統自己的產出不帶 content_sha(寫完就對不上的那一列) · 1 列
-  [OK] 其他 SSOT 冊照舊帶內容指紋 · 926 本
+  [OK] 其他 SSOT 冊照舊帶內容指紋 · 928 本
   [OK] ① 下市:列留著、標 gone_since、號不動
   [OK] ① 代號被別家重用:新號 · 舊號原封(下市不蓋) · VIA-VDF-FM-TW-EQT-0003
   [OK] ① 重跑:別家重用的代號仍是同一個 #L2 號,不長 #L3
@@ -113,7 +113,7 @@
   [OK] ① 在市改名:沿用舊號,記 name_history
   [OK] ① 重跑:gone_history / name_history 跨次保留
   [OK] ② 同名不同來源 = 不同號
-  [OK] ③ SSOT 每列帶內容指紋;有宣告版號的帶 declared_version · 927 冊 · 有宣告版號 487
+  [OK] ③ SSOT 每列帶內容指紋;有宣告版號的帶 declared_version · 929 冊 · 有宣告版號 489
   [OK] ④ 凍結鎖編成 ENV 列 · 105 本
   CGC_MDL237_NumberingSystem_v0102 selftest 9/9 PASS
 [版本補強] 14 checks; inherited selftest rc=0; fail=0
@@ -138,12 +138,12 @@
 [編號 v0111 重號歸位] 自測 9/9 PASS
 === CGC_MDL237_NumberingSystem_v0116 · 薄尾自測(可選依賴缺件不崩)===
   [OK] ① v0111 核心鏈自測過(重號歸位 · 只增稽核 · 發號) · rc 0
-  [略過] v0112–v0115 自測要可選套件;本直譯器缺 14 件:re2 · polars · pandera · ahocorasick · flashtext · rapidfuzz · fasttext · gensim · jellyfish · nltk · polyfuzz · recordlinkage · regex · spacy → 照實略過(不算過、不算錯)
+  [略過] v0112–v0115 自測要可選套件;本直譯器缺 15 件:duckdb · re2 · polars · pandera · ahocorasick · flashtext · rapidfuzz · fasttext · gensim · jellyfish · nltk · polyfuzz · recordlinkage · regex · spacy → 照實略過(不算過、不算錯)
   [OK] ③ 缺 pydantic:標準庫同規則嚴格驗(合格照收;library / stable_id / 空值 / 缺鍵 / 非字串 五種全擋) · (True, 5)
   [OK] ③b pydantic 在時兩把尺判法一致
   [OK] ④ 缺 duckdb:Regex 候選回 REGEX_PROOF_ENGINE_ABSENT(留 REVIEW 不發號,不拿 re 冒充) · REGEX_PROOF_ENGINE_ABSENT
   [OK] ⑤ 缺 re2 等:L1 清洗回 ABSENT_PACKAGES 點名缺件(manager 印 BLOCKED,不崩) · ABSENT_PACKAGES: re2,polars,pydantic,pandera,ahocorasick(L1 清洗要的套件不在本直譯器;不代裝)
-  [OK] ⑥ 真樹 collect():本直譯器照樣收齊(含 VQG 指標候選 · 不因可選套件停擺) · 列 134558 · 指標 14
+  [OK] ⑥ 真樹 collect():本直譯器照樣收齊(含 VQG 指標候選 · 不因可選套件停擺) · 列 134835 · 指標 14
   [OK] ⑦ 加速器橋 · 網路橋在 · 不碰 TA-Lib · 換裝在位
   [計] CGC_MDL237_NumberingSystem_v0116 本版 7/7 · v0111 PASS · v0112–v0115 略過(缺件) · 合計 PASS
 === CGC_MDL237_NumberingSystem_v0117 · 薄尾自測(未知動詞 / 旗標拒跑 · door 報尾版)===
@@ -158,7 +158,8 @@
   [OK] ⑤ 前版鏈 v0117 → … 自測 rc 0;跑完 door 仍報本尾版
   [計] CGC_MDL237_NumberingSystem_v0118 本版 5/5 · 前版鏈 PASS · 合計 PASS
   [OK] ⑧ 前版鏈 v0118 → … 自測 rc 0;跑完 door 報本尾版、r22_items / load_state 仍是本版
-  [計] CGC_MDL237_NumberingSystem_v0119 本版 12/12 · 前版鏈 PASS · 合計 PASS
+  [計] CGC_MDL237_NumberingSystem_v0119 本版 10/12 · 前版鏈 PASS · 合計 FAIL
+  [教訓] 重複出錯:run CGC_MDL237_NumberingSystem · rc=1 · <unknown>:<n>: SyntaxWarning: invalid escape sequence '<path>' · 第 5 次 · 帳本 CGC_MDL058(via-lessons)
 <unknown>:11: SyntaxWarning: invalid escape sequence '\l'
 <unknown>:670: SyntaxWarning: invalid escape sequence '\d'
 <unknown>:670: SyntaxWarning: invalid escape sequence '\d'
@@ -239,4 +240,4 @@
 <unknown>:7: SyntaxWarning: invalid escape sequence '\ '
 <unknown>:84: SyntaxWarning: invalid escape sequence '\ '
 <unknown>:209: SyntaxWarning: invalid escape sequence '\*'
-[監控] 背景全景監控中 pid 6263 · 觸碰 run CGC_MDL237_NumberingSystem · 交接閘 RED · 落後 349 提交 · 快照 780.7h · 未推 30 · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
+[監控] 背景全景監控中 pid 954 · 觸碰 run CGC_MDL237_NumberingSystem · 交接閘 RED · 落後 247 提交 · 快照 805.3h · 未推 2 · 未登 2388 支(3a2e975b-3512-437f-9a17-f5b359958e7b · 8bd5bc08-9d82-4fb1-98d0-1763f5210a27 · 9df6891b-d309-4af6-bc58-a21b2907308e …) · 頁 /home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/panorama/dashboard_latest.html
